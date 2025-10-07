@@ -204,17 +204,14 @@ let tests = [
       | (Some (), Some ()) => ()
       | (_, _) => Alcotest.fail("should be (Some(), Some())")
       };
-    let () =
-      switch (parser("A")) {
-      | (Some (), None) => ()
-      | (_, _) => Alcotest.fail("should be (Some(), None)")
-      };
-    let () =
-      switch (parser("B")) {
-      | (None, Some ()) => ()
-      | (_, _) => Alcotest.fail("should be (None, Some())")
-      };
-    ();
+    switch (parser("A")) {
+    | (Some (), None) => ()
+    | (_, _) => Alcotest.fail("should be (Some(), None)")
+    };
+    switch (parser("B")) {
+    | (None, Some ()) => ()
+    | (_, _) => Alcotest.fail("should be (None, Some())")
+    };
   }),
   test("A || B || C", _ => {
     let parser = parse_exn([%value "A || B || C"]);
@@ -229,122 +226,98 @@ let tests = [
   }),
   test("<number> || B", () => {
     let parser = parse_exn([%value "<number> || B"]);
-    let () =
-      switch (parser("19 B")) {
-      | (Some(number), Some ()) =>
-        Alcotest.check(~pos=__POS__, Alcotest.float(1.), "", number, 19.0)
-      | (_, _) => Alcotest.fail("should be (Some(number), Some())")
-      };
-    let () =
-      switch (parser("B 20")) {
-      | (Some(number), Some ()) =>
-        Alcotest.check(~pos=__POS__, Alcotest.float(1.), "", number, 20.0)
-      | (_, _) => Alcotest.fail("should be (Some(number), Some())")
-      };
-    let () =
-      switch (parser("21")) {
-      | (Some(number), None) =>
-        Alcotest.check(~pos=__POS__, Alcotest.float(1.), "", number, 21.0)
-      | (_, _) => Alcotest.fail("should be (Some(number), None)")
-      };
-    let () =
-      switch (parser("B")) {
-      | (None, Some ()) => ()
-      | (_, _) => Alcotest.fail("should be (None, Some())")
-      };
-    ();
+    switch (parser("19 B")) {
+    | (Some(number), Some ()) =>
+      Alcotest.check(~pos=__POS__, Alcotest.float(1.), "", number, 19.0)
+    | (_, _) => Alcotest.fail("should be (Some(number), Some())")
+    };
+    switch (parser("B 20")) {
+    | (Some(number), Some ()) =>
+      Alcotest.check(~pos=__POS__, Alcotest.float(1.), "", number, 20.0)
+    | (_, _) => Alcotest.fail("should be (Some(number), Some())")
+    };
+    switch (parser("21")) {
+    | (Some(number), None) =>
+      Alcotest.check(~pos=__POS__, Alcotest.float(1.), "", number, 21.0)
+    | (_, _) => Alcotest.fail("should be (Some(number), None)")
+    };
+    switch (parser("B")) {
+    | (None, Some ()) => ()
+    | (_, _) => Alcotest.fail("should be (None, Some())")
+    };
   }),
   test("A*", _ => {
     let parser = parse_exn([%value "A*"]);
-    let () =
-      switch (parser("A A A A")) {
-      | [_, _, _, _] => ()
-      | _ => Alcotest.fail("should be [_, _, _, _]")
-      };
-    ();
-    let () =
-      switch (parser("A A")) {
-      | [_, _] => ()
-      | _ => Alcotest.fail("should be [_, _]")
-      };
-    ();
+    switch (parser("A A A A")) {
+    | [_, _, _, _] => ()
+    | _ => Alcotest.fail("should be [_, _, _, _]")
+    };
+    switch (parser("A A")) {
+    | [_, _] => ()
+    | _ => Alcotest.fail("should be [_, _]")
+    };
   }),
   test("[ A? [B | C] ]+ A?", _ => {
     let parser = parse_exn([%value "[ A? [B | C] ]+ A?"]);
-    let () =
-      switch (parser("A B A C")) {
-      | ([(Some (), `B), (Some (), `C)], None) => ()
-      | _ => Alcotest.fail("should be ([(Some(), `B), (Some(), `C)], None)")
-      };
-    let () =
-      switch (parser("B A C A")) {
-      | ([(None, `B), (Some (), `C)], Some ()) => ()
-      | _ => Alcotest.fail("should be ([(None, `B), (Some(), `C)], Some())")
-      };
-    ();
+    switch (parser("A B A C")) {
+    | ([(Some (), `B), (Some (), `C)], None) => ()
+    | _ => Alcotest.fail("should be ([(Some(), `B), (Some(), `C)], None)")
+    };
+    switch (parser("B A C A")) {
+    | ([(None, `B), (Some (), `C)], Some ()) => ()
+    | _ => Alcotest.fail("should be ([(None, `B), (Some(), `C)], Some())")
+    };
   }),
   test("xor with three alternatives", _ => {
     let parser = parse_exn([%value "red | blue | green"]);
-    let () =
-      switch (parser("red")) {
-      | `Red => ()
-      | _ => Alcotest.fail("should be `Red")
-      };
-    let () =
-      switch (parser("blue")) {
-      | `Blue => ()
-      | _ => Alcotest.fail("should be `Blue")
-      };
-    let () =
-      switch (parser("green")) {
-      | `Green => ()
-      | _ => Alcotest.fail("should be `Green")
-      };
-    ();
+    switch (parser("red")) {
+    | `Red => ()
+    | _ => Alcotest.fail("should be `Red")
+    };
+    switch (parser("blue")) {
+    | `Blue => ()
+    | _ => Alcotest.fail("should be `Blue")
+    };
+    switch (parser("green")) {
+    | `Green => ()
+    | _ => Alcotest.fail("should be `Green")
+    };
   }),
   test("xor with data types", () => {
     let parser = parse_exn([%value "<number> | <percentage> | auto"]);
-    let () =
-      switch (parser("50")) {
-      | `Number(n) =>
-        Alcotest.check(~pos=__POS__, Alcotest.float(1.), "", n, 50.0)
-      | _ => Alcotest.fail("should be `Number")
-      };
-    let () =
-      switch (parser("50%")) {
-      | `Percentage(p) =>
-        Alcotest.check(~pos=__POS__, Alcotest.float(1.), "", p, 50.0)
-      | _ => Alcotest.fail("should be `Percentage")
-      };
-    let () =
-      switch (parser("auto")) {
-      | `Auto => ()
-      | _ => Alcotest.fail("should be `Auto")
-      };
-    ();
+    switch (parser("50")) {
+    | `Number(n) =>
+      Alcotest.check(~pos=__POS__, Alcotest.float(1.), "", n, 50.0)
+    | _ => Alcotest.fail("should be `Number")
+    };
+    switch (parser("50%")) {
+    | `Percentage(p) =>
+      Alcotest.check(~pos=__POS__, Alcotest.float(1.), "", p, 50.0)
+    | _ => Alcotest.fail("should be `Percentage")
+    };
+    switch (parser("auto")) {
+    | `Auto => ()
+    | _ => Alcotest.fail("should be `Auto")
+    };
   }),
   test("xor with complex combinations", _ => {
     let parser = parse_exn([%value "[A B] | [C D] | E"]);
-    let () =
-      switch (parser("A B")) {
-      | `Static_0((), ()) => ()
-      | _ => Alcotest.fail("should be `Static_0((), ())")
-      };
-    let () =
-      switch (parser("C D")) {
-      | `Static_1((), ()) => ()
-      | _ => Alcotest.fail("should be `Static_1((), ())")
-      };
-    let () =
-      switch (parser("E")) {
-      | `E => ()
-      | _ => Alcotest.fail("should be `E")
-      };
-    ();
+    switch (parser("A B")) {
+    | `Static_0((), ()) => ()
+    | _ => Alcotest.fail("should be `Static_0((), ())")
+    };
+    switch (parser("C D")) {
+    | `Static_1((), ()) => ()
+    | _ => Alcotest.fail("should be `Static_1((), ())")
+    };
+    switch (parser("E")) {
+    | `E => ()
+    | _ => Alcotest.fail("should be `E")
+    };
   }),
   test("xor error handling - invalid input", _ => {
-    let parser = Parser.parse([%value "red | blue | green"].parser, "yellow");
-    switch (parser) {
+    let output = Parser.parse([%value "red | blue | green"], "yellow");
+    switch (output) {
     | Error(msg) =>
       let has_red = string_contains(msg, "red");
       let has_blue = string_contains(msg, "blue");
@@ -358,8 +331,8 @@ let tests = [
     };
   }),
   test("xor error handling - typo suggestion", _ => {
-    let parser = Parser.parse([%value "red | blue | green"].parser, "gren");
-    switch (parser) {
+    let output = Parser.parse([%value "red | blue | green"], "gren");
+    switch (output) {
     | Error(msg) =>
       if (!string_contains(msg, "did you mean")) {
         Alcotest.fail("Error message should suggest correction: " ++ msg);
@@ -372,56 +345,45 @@ let tests = [
   }),
   test("xor with nested alternatives", _ => {
     let parser = parse_exn([%value "A | [B | C]"]);
-    let () =
-      switch (parser("A")) {
-      | `A => ()
-      | _ => Alcotest.fail("should be `A")
-      };
-    let () =
-      switch (parser("B")) {
-      | `Xor(`B) => ()
-      | _ => Alcotest.fail("should be `Xor(`B)")
-      };
-    let () =
-      switch (parser("C")) {
-      | `Xor(`C) => ()
-      | _ => Alcotest.fail("should be `Xor(`C)")
-      };
-    ();
+    switch (parser("A")) {
+    | `A => ()
+    | _ => Alcotest.fail("should be `A")
+    };
+    switch (parser("B")) {
+    | `Xor(`B) => ()
+    | _ => Alcotest.fail("should be `Xor(`B)")
+    };
+    switch (parser("C")) {
+    | `Xor(`C) => ()
+    | _ => Alcotest.fail("should be `Xor(`C)")
+    };
   }),
   test("xor prefers longest match", _ => {
     let parser = parse_exn([%value "A | A B"]);
     /* When both match, xor should prefer the longer match */
-    let () =
-      switch (parser("A B")) {
-      | `Static((), ()) => ()
-      | _ => Alcotest.fail("should prefer longer match A B")
-      };
-    let () =
-      switch (parser("A")) {
-      | `A => ()
-      | _ => Alcotest.fail("should match single A when B is not present")
-      };
-    ();
+    switch (parser("A B")) {
+    | `Static((), ()) => ()
+    | _ => Alcotest.fail("should prefer longer match A B")
+    };
+    switch (parser("A")) {
+    | `A => ()
+    | _ => Alcotest.fail("should match single A when B is not present")
+    };
   }),
   test("xor with mixed types and keywords", () => {
     let parser = parse_exn([%value "<number> | inherit | initial"]);
-    let () =
-      switch (parser("42")) {
-      | `Number(n) =>
-        Alcotest.check(~pos=__POS__, Alcotest.float(1.), "", n, 42.0)
-      | _ => Alcotest.fail("should be `Number")
-      };
-    let () =
-      switch (parser("inherit")) {
-      | `Inherit => ()
-      | _ => Alcotest.fail("should be `Inherit")
-      };
-    let () =
-      switch (parser("initial")) {
-      | `Initial => ()
-      | _ => Alcotest.fail("should be `Initial")
-      };
-    ();
+    switch (parser("42")) {
+    | `Number(n) =>
+      Alcotest.check(~pos=__POS__, Alcotest.float(1.), "", n, 42.0)
+    | _ => Alcotest.fail("should be `Number")
+    };
+    switch (parser("inherit")) {
+    | `Inherit => ()
+    | _ => Alcotest.fail("should be `Inherit")
+    };
+    switch (parser("initial")) {
+    | `Initial => ()
+    | _ => Alcotest.fail("should be `Initial")
+    };
   }),
 ];

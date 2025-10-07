@@ -5,412 +5,427 @@
   
   module rec Color : sig
     type nonrec t =
-      [ `Function_rgb of function_rgb
-      | `Function_rgba of function_rgba
-      | `Function_hsl of function_hsl
-      | `Function_hsla of function_hsla
-      | `Hex_color of hex_color
-      | `Named_color of named_color
+      [ `Function_rgb of Function_rgb.t
+      | `Function_rgba of Function_rgba.t
+      | `Function_hsl of Function_hsl.t
+      | `Function_hsla of Function_hsla.t
+      | `Hex_color of Hex_color.t
+      | `Named_color of Named_color.t
       | `CurrentColor
-      | `Deprecated_system_color of deprecated_system_color
-      | `Interpolation of interpolation
-      | `Function_var of function_var
-      | `Function_color_mix of function_color_mix ]
+      | `Deprecated_system_color of Deprecated_system_color.t
+      | `Interpolation of Interpolation.t
+      | `Function_var of Function_var.t
+      | `Function_color_mix of Function_color_mix.t ]
   
-    val parse :
+    val parser :
       Styled_ppx_css_parser.Tokens.t list ->
       t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
     type nonrec t =
-      [ `Function_rgb of function_rgb
-      | `Function_rgba of function_rgba
-      | `Function_hsl of function_hsl
-      | `Function_hsla of function_hsla
-      | `Hex_color of hex_color
-      | `Named_color of named_color
+      [ `Function_rgb of Function_rgb.t
+      | `Function_rgba of Function_rgba.t
+      | `Function_hsl of Function_hsl.t
+      | `Function_hsla of Function_hsla.t
+      | `Hex_color of Hex_color.t
+      | `Named_color of Named_color.t
       | `CurrentColor
-      | `Deprecated_system_color of deprecated_system_color
-      | `Interpolation of interpolation
-      | `Function_var of function_var
-      | `Function_color_mix of function_color_mix ]
+      | `Deprecated_system_color of Deprecated_system_color.t
+      | `Interpolation of Interpolation.t
+      | `Function_var of Function_var.t
+      | `Function_color_mix of Function_color_mix.t ]
   
-    let parse =
-      Combinator.xor
+    let parser =
+      Combinators.xor
         [
-          map function_rgb (fun v -> `Function_rgb v);
-          map function_rgba (fun v -> `Function_rgba v);
-          map function_hsl (fun v -> `Function_hsl v);
-          map function_hsla (fun v -> `Function_hsla v);
-          map hex_color (fun v -> `Hex_color v);
-          map named_color (fun v -> `Named_color v);
+          map Function_rgb.parser (fun v -> `Function_rgb v);
+          map Function_rgba.parser (fun v -> `Function_rgba v);
+          map Function_hsl.parser (fun v -> `Function_hsl v);
+          map Function_hsla.parser (fun v -> `Function_hsla v);
+          map Hex_color.parser (fun v -> `Hex_color v);
+          map Named_color.parser (fun v -> `Named_color v);
           map (keyword "currentColor") (fun _v -> `CurrentColor);
-          map deprecated_system_color (fun v -> `Deprecated_system_color v);
-          map interpolation (fun v -> `Interpolation v);
-          map function_var (fun v -> `Function_var v);
-          map function_color_mix (fun v -> `Function_color_mix v);
+          map Deprecated_system_color.parser (fun v -> `Deprecated_system_color v);
+          map Interpolation.parser (fun v -> `Interpolation v);
+          map Function_var.parser (fun v -> `Function_var v);
+          map Function_color_mix.parser (fun v -> `Function_color_mix v);
         ]
+    [@@ocaml.warning "-8-26-27"]
   
     let toString (value : t) =
       match value with
-      | `Function_rgb v -> function_rgb.toString v
-      | `Function_rgba v -> function_rgba.toString v
-      | `Function_hsl v -> function_hsl.toString v
-      | `Function_hsla v -> function_hsla.toString v
-      | `Hex_color v -> hex_color.toString v
-      | `Named_color v -> named_color.toString v
+      | `Function_rgb v -> Function_rgb.toString v
+      | `Function_rgba v -> Function_rgba.toString v
+      | `Function_hsl v -> Function_hsl.toString v
+      | `Function_hsla v -> Function_hsla.toString v
+      | `Hex_color v -> Hex_color.toString v
+      | `Named_color v -> Named_color.toString v
       | `CurrentColor -> "currentColor"
-      | `Deprecated_system_color v -> deprecated_system_color.toString v
-      | `Interpolation v -> interpolation.toString v
-      | `Function_var v -> function_var.toString v
-      | `Function_color_mix v -> function_color_mix.toString v
+      | `Deprecated_system_color v -> Deprecated_system_color.toString v
+      | `Interpolation v -> Interpolation.toString v
+      | `Function_var v -> Function_var.toString v
+      | `Function_color_mix v -> Function_color_mix.toString v
   end
   
   and Function_rgb : sig
     type nonrec t =
-      [ `Rgb_0 of extended_percentage list * (unit * alpha_value) option
-      | `Rgb_1 of number list * (unit * alpha_value) option
-      | `Rgb_2 of extended_percentage list * (unit * alpha_value) option
-      | `Rgb_3 of number list * (unit * alpha_value) option ]
+      [ `Rgb_0 of Extended_percentage.t list * (unit * Alpha_value.t) option
+      | `Rgb_1 of Number.t list * (unit * Alpha_value.t) option
+      | `Rgb_2 of Extended_percentage.t list * (unit * Alpha_value.t) option
+      | `Rgb_3 of Number.t list * (unit * Alpha_value.t) option ]
   
-    val parse :
+    val parser :
       Styled_ppx_css_parser.Tokens.t list ->
       t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
     type nonrec t =
-      [ `Rgb_0 of extended_percentage list * (unit * alpha_value) option
-      | `Rgb_1 of number list * (unit * alpha_value) option
-      | `Rgb_2 of extended_percentage list * (unit * alpha_value) option
-      | `Rgb_3 of number list * (unit * alpha_value) option ]
+      [ `Rgb_0 of Extended_percentage.t list * (unit * Alpha_value.t) option
+      | `Rgb_1 of Number.t list * (unit * Alpha_value.t) option
+      | `Rgb_2 of Extended_percentage.t list * (unit * Alpha_value.t) option
+      | `Rgb_3 of Number.t list * (unit * Alpha_value.t) option ]
   
-    let parse =
-      Combinator.xor
+    let parser =
+      Combinators.xor
         [
           map
             (function_call "rgb"
                (map
-                  (Combinator.static
+                  (Combinators.static
                      [
                        map
-                         (repeat (3, Some 3) extended_percentage)
+                         (repeat (3, Some 3) Extended_percentage.parser)
                          (fun v -> `V0 v);
                        map
                          (optional
                             (map
-                               (Combinator.static
+                               (Combinators.static
                                   [
                                     map (delim "/") (fun v -> `V0 v);
-                                    map alpha_value (fun v -> `V1 v);
+                                    map Alpha_value.parser (fun v -> `V1 v);
                                   ])
-                               (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] ->
-                                 (v0, v1))))
+                               (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ]
+                                                              -> (v0, v1))))
                          (fun v -> `V1 v);
                      ])
-                  (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] -> (v0, v1))))
+                  (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ] -> (v0, v1))))
             (fun v -> `Rgb_0 v);
           map
             (function_call "rgb"
                (map
-                  (Combinator.static
+                  (Combinators.static
                      [
-                       map (repeat (3, Some 3) number) (fun v -> `V0 v);
+                       map (repeat (3, Some 3) Number.parser) (fun v -> `V0 v);
                        map
                          (optional
                             (map
-                               (Combinator.static
+                               (Combinators.static
                                   [
                                     map (delim "/") (fun v -> `V0 v);
-                                    map alpha_value (fun v -> `V1 v);
+                                    map Alpha_value.parser (fun v -> `V1 v);
                                   ])
-                               (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] ->
-                                 (v0, v1))))
+                               (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ]
+                                                              -> (v0, v1))))
                          (fun v -> `V1 v);
                      ])
-                  (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] -> (v0, v1))))
+                  (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ] -> (v0, v1))))
             (fun v -> `Rgb_1 v);
           map
             (function_call "rgb"
                (map
-                  (Combinator.static
+                  (Combinators.static
                      [
                        map
-                         (repeat_by_comma (3, Some 3) extended_percentage)
+                         (repeat_by_comma (3, Some 3) Extended_percentage.parser)
                          (fun v -> `V0 v);
                        map
                          (optional
                             (map
-                               (Combinator.static
+                               (Combinators.static
                                   [
                                     map comma (fun v -> `V0 v);
-                                    map alpha_value (fun v -> `V1 v);
+                                    map Alpha_value.parser (fun v -> `V1 v);
                                   ])
-                               (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] ->
-                                 (v0, v1))))
+                               (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ]
+                                                              -> (v0, v1))))
                          (fun v -> `V1 v);
                      ])
-                  (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] -> (v0, v1))))
+                  (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ] -> (v0, v1))))
             (fun v -> `Rgb_2 v);
           map
             (function_call "rgb"
                (map
-                  (Combinator.static
+                  (Combinators.static
                      [
-                       map (repeat_by_comma (3, Some 3) number) (fun v -> `V0 v);
+                       map
+                         (repeat_by_comma (3, Some 3) Number.parser)
+                         (fun v -> `V0 v);
                        map
                          (optional
                             (map
-                               (Combinator.static
+                               (Combinators.static
                                   [
                                     map comma (fun v -> `V0 v);
-                                    map alpha_value (fun v -> `V1 v);
+                                    map Alpha_value.parser (fun v -> `V1 v);
                                   ])
-                               (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] ->
-                                 (v0, v1))))
+                               (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ]
+                                                              -> (v0, v1))))
                          (fun v -> `V1 v);
                      ])
-                  (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] -> (v0, v1))))
+                  (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ] -> (v0, v1))))
             (fun v -> `Rgb_3 v);
         ]
+    [@@ocaml.warning "-8-26-27"]
   
     let toString (value : t) =
       match value with
       | `Rgb_0 v ->
-          "rgb("
-          ^ (let v0, v1 = v in
-             (v0
-             |> List.map (fun x -> extended_percentage.toString x)
-             |> String.concat " ")
-             ^ " "
-             ^
-             match v1 with
-             | Some x ->
-                 let v0, v1 = x in
-                 "/" ^ " " ^ alpha_value.toString v1
-             | None -> "")
+          (("rgb" ^ "(")
+          ^
+          let v0, v1 = v in
+          ((v0
+           |> List.map (fun x -> Extended_percentage.toString x)
+           |> String.concat " ")
+          ^ " ")
+          ^
+          match v1 with
+          | Some x ->
+              let v0, v1 = x in
+              ("/" ^ " ") ^ Alpha_value.toString v1
+          | None -> "")
           ^ ")"
       | `Rgb_1 v ->
-          "rgb("
-          ^ (let v0, v1 = v in
-             (v0 |> List.map (fun x -> number.toString x) |> String.concat " ")
-             ^ " "
-             ^
-             match v1 with
-             | Some x ->
-                 let v0, v1 = x in
-                 "/" ^ " " ^ alpha_value.toString v1
-             | None -> "")
+          (("rgb" ^ "(")
+          ^
+          let v0, v1 = v in
+          ((v0 |> List.map (fun x -> Number.toString x) |> String.concat " ")
+          ^ " ")
+          ^
+          match v1 with
+          | Some x ->
+              let v0, v1 = x in
+              ("/" ^ " ") ^ Alpha_value.toString v1
+          | None -> "")
           ^ ")"
       | `Rgb_2 v ->
-          "rgb("
-          ^ (let v0, v1 = v in
-             (v0
-             |> List.map (fun x -> extended_percentage.toString x)
-             |> String.concat " ")
-             ^ " "
-             ^
-             match v1 with
-             | Some x ->
-                 let v0, v1 = x in
-                 "," ^ " " ^ alpha_value.toString v1
-             | None -> "")
+          (("rgb" ^ "(")
+          ^
+          let v0, v1 = v in
+          ((v0
+           |> List.map (fun x -> Extended_percentage.toString x)
+           |> String.concat " ")
+          ^ " ")
+          ^
+          match v1 with
+          | Some x ->
+              let v0, v1 = x in
+              ("," ^ " ") ^ Alpha_value.toString v1
+          | None -> "")
           ^ ")"
       | `Rgb_3 v ->
-          "rgb("
-          ^ (let v0, v1 = v in
-             (v0 |> List.map (fun x -> number.toString x) |> String.concat " ")
-             ^ " "
-             ^
-             match v1 with
-             | Some x ->
-                 let v0, v1 = x in
-                 "," ^ " " ^ alpha_value.toString v1
-             | None -> "")
+          (("rgb" ^ "(")
+          ^
+          let v0, v1 = v in
+          ((v0 |> List.map (fun x -> Number.toString x) |> String.concat " ")
+          ^ " ")
+          ^
+          match v1 with
+          | Some x ->
+              let v0, v1 = x in
+              ("," ^ " ") ^ Alpha_value.toString v1
+          | None -> "")
           ^ ")"
   end
   
   and Function_rgba : sig
     type nonrec t =
-      [ `Rgba_0 of extended_percentage list * (unit * alpha_value) option
-      | `Rgba_1 of number list * (unit * alpha_value) option
-      | `Rgba_2 of extended_percentage list * (unit * alpha_value) option
-      | `Rgba_3 of number list * (unit * alpha_value) option ]
+      [ `Rgba_0 of Extended_percentage.t list * (unit * Alpha_value.t) option
+      | `Rgba_1 of Number.t list * (unit * Alpha_value.t) option
+      | `Rgba_2 of Extended_percentage.t list * (unit * Alpha_value.t) option
+      | `Rgba_3 of Number.t list * (unit * Alpha_value.t) option ]
   
-    val parse :
+    val parser :
       Styled_ppx_css_parser.Tokens.t list ->
       t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
     type nonrec t =
-      [ `Rgba_0 of extended_percentage list * (unit * alpha_value) option
-      | `Rgba_1 of number list * (unit * alpha_value) option
-      | `Rgba_2 of extended_percentage list * (unit * alpha_value) option
-      | `Rgba_3 of number list * (unit * alpha_value) option ]
+      [ `Rgba_0 of Extended_percentage.t list * (unit * Alpha_value.t) option
+      | `Rgba_1 of Number.t list * (unit * Alpha_value.t) option
+      | `Rgba_2 of Extended_percentage.t list * (unit * Alpha_value.t) option
+      | `Rgba_3 of Number.t list * (unit * Alpha_value.t) option ]
   
-    let parse =
-      Combinator.xor
+    let parser =
+      Combinators.xor
         [
           map
             (function_call "rgba"
                (map
-                  (Combinator.static
+                  (Combinators.static
                      [
                        map
-                         (repeat (3, Some 3) extended_percentage)
+                         (repeat (3, Some 3) Extended_percentage.parser)
                          (fun v -> `V0 v);
                        map
                          (optional
                             (map
-                               (Combinator.static
+                               (Combinators.static
                                   [
                                     map (delim "/") (fun v -> `V0 v);
-                                    map alpha_value (fun v -> `V1 v);
+                                    map Alpha_value.parser (fun v -> `V1 v);
                                   ])
-                               (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] ->
-                                 (v0, v1))))
+                               (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ]
+                                                              -> (v0, v1))))
                          (fun v -> `V1 v);
                      ])
-                  (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] -> (v0, v1))))
+                  (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ] -> (v0, v1))))
             (fun v -> `Rgba_0 v);
           map
             (function_call "rgba"
                (map
-                  (Combinator.static
+                  (Combinators.static
                      [
-                       map (repeat (3, Some 3) number) (fun v -> `V0 v);
+                       map (repeat (3, Some 3) Number.parser) (fun v -> `V0 v);
                        map
                          (optional
                             (map
-                               (Combinator.static
+                               (Combinators.static
                                   [
                                     map (delim "/") (fun v -> `V0 v);
-                                    map alpha_value (fun v -> `V1 v);
+                                    map Alpha_value.parser (fun v -> `V1 v);
                                   ])
-                               (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] ->
-                                 (v0, v1))))
+                               (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ]
+                                                              -> (v0, v1))))
                          (fun v -> `V1 v);
                      ])
-                  (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] -> (v0, v1))))
+                  (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ] -> (v0, v1))))
             (fun v -> `Rgba_1 v);
           map
             (function_call "rgba"
                (map
-                  (Combinator.static
+                  (Combinators.static
                      [
                        map
-                         (repeat_by_comma (3, Some 3) extended_percentage)
+                         (repeat_by_comma (3, Some 3) Extended_percentage.parser)
                          (fun v -> `V0 v);
                        map
                          (optional
                             (map
-                               (Combinator.static
+                               (Combinators.static
                                   [
                                     map comma (fun v -> `V0 v);
-                                    map alpha_value (fun v -> `V1 v);
+                                    map Alpha_value.parser (fun v -> `V1 v);
                                   ])
-                               (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] ->
-                                 (v0, v1))))
+                               (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ]
+                                                              -> (v0, v1))))
                          (fun v -> `V1 v);
                      ])
-                  (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] -> (v0, v1))))
+                  (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ] -> (v0, v1))))
             (fun v -> `Rgba_2 v);
           map
             (function_call "rgba"
                (map
-                  (Combinator.static
+                  (Combinators.static
                      [
-                       map (repeat_by_comma (3, Some 3) number) (fun v -> `V0 v);
+                       map
+                         (repeat_by_comma (3, Some 3) Number.parser)
+                         (fun v -> `V0 v);
                        map
                          (optional
                             (map
-                               (Combinator.static
+                               (Combinators.static
                                   [
                                     map comma (fun v -> `V0 v);
-                                    map alpha_value (fun v -> `V1 v);
+                                    map Alpha_value.parser (fun v -> `V1 v);
                                   ])
-                               (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] ->
-                                 (v0, v1))))
+                               (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ]
+                                                              -> (v0, v1))))
                          (fun v -> `V1 v);
                      ])
-                  (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] -> (v0, v1))))
+                  (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ] -> (v0, v1))))
             (fun v -> `Rgba_3 v);
         ]
+    [@@ocaml.warning "-8-26-27"]
   
     let toString (value : t) =
       match value with
       | `Rgba_0 v ->
-          "rgba("
-          ^ (let v0, v1 = v in
-             (v0
-             |> List.map (fun x -> extended_percentage.toString x)
-             |> String.concat " ")
-             ^ " "
-             ^
-             match v1 with
-             | Some x ->
-                 let v0, v1 = x in
-                 "/" ^ " " ^ alpha_value.toString v1
-             | None -> "")
+          (("rgba" ^ "(")
+          ^
+          let v0, v1 = v in
+          ((v0
+           |> List.map (fun x -> Extended_percentage.toString x)
+           |> String.concat " ")
+          ^ " ")
+          ^
+          match v1 with
+          | Some x ->
+              let v0, v1 = x in
+              ("/" ^ " ") ^ Alpha_value.toString v1
+          | None -> "")
           ^ ")"
       | `Rgba_1 v ->
-          "rgba("
-          ^ (let v0, v1 = v in
-             (v0 |> List.map (fun x -> number.toString x) |> String.concat " ")
-             ^ " "
-             ^
-             match v1 with
-             | Some x ->
-                 let v0, v1 = x in
-                 "/" ^ " " ^ alpha_value.toString v1
-             | None -> "")
+          (("rgba" ^ "(")
+          ^
+          let v0, v1 = v in
+          ((v0 |> List.map (fun x -> Number.toString x) |> String.concat " ")
+          ^ " ")
+          ^
+          match v1 with
+          | Some x ->
+              let v0, v1 = x in
+              ("/" ^ " ") ^ Alpha_value.toString v1
+          | None -> "")
           ^ ")"
       | `Rgba_2 v ->
-          "rgba("
-          ^ (let v0, v1 = v in
-             (v0
-             |> List.map (fun x -> extended_percentage.toString x)
-             |> String.concat " ")
-             ^ " "
-             ^
-             match v1 with
-             | Some x ->
-                 let v0, v1 = x in
-                 "," ^ " " ^ alpha_value.toString v1
-             | None -> "")
+          (("rgba" ^ "(")
+          ^
+          let v0, v1 = v in
+          ((v0
+           |> List.map (fun x -> Extended_percentage.toString x)
+           |> String.concat " ")
+          ^ " ")
+          ^
+          match v1 with
+          | Some x ->
+              let v0, v1 = x in
+              ("," ^ " ") ^ Alpha_value.toString v1
+          | None -> "")
           ^ ")"
       | `Rgba_3 v ->
-          "rgba("
-          ^ (let v0, v1 = v in
-             (v0 |> List.map (fun x -> number.toString x) |> String.concat " ")
-             ^ " "
-             ^
-             match v1 with
-             | Some x ->
-                 let v0, v1 = x in
-                 "," ^ " " ^ alpha_value.toString v1
-             | None -> "")
+          (("rgba" ^ "(")
+          ^
+          let v0, v1 = v in
+          ((v0 |> List.map (fun x -> Number.toString x) |> String.concat " ")
+          ^ " ")
+          ^
+          match v1 with
+          | Some x ->
+              let v0, v1 = x in
+              ("," ^ " ") ^ Alpha_value.toString v1
+          | None -> "")
           ^ ")"
   end
   
   and Function_hsl : sig
     type nonrec t =
       [ `Hsl_0 of
-        hue
-        * extended_percentage
-        * extended_percentage
-        * (unit * alpha_value) option
+        Hue.t
+        * Extended_percentage.t
+        * Extended_percentage.t
+        * (unit * Alpha_value.t) option
       | `Hsl_1 of
-        hue
+        Hue.t
         * unit
-        * extended_percentage
+        * Extended_percentage.t
         * unit
-        * extended_percentage
-        * (unit * alpha_value) option ]
+        * Extended_percentage.t
+        * (unit * Alpha_value.t) option ]
   
-    val parse :
+    val parser :
       Styled_ppx_css_parser.Tokens.t list ->
       t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
@@ -418,138 +433,145 @@
   end = struct
     type nonrec t =
       [ `Hsl_0 of
-        hue
-        * extended_percentage
-        * extended_percentage
-        * (unit * alpha_value) option
+        Hue.t
+        * Extended_percentage.t
+        * Extended_percentage.t
+        * (unit * Alpha_value.t) option
       | `Hsl_1 of
-        hue
+        Hue.t
         * unit
-        * extended_percentage
+        * Extended_percentage.t
         * unit
-        * extended_percentage
-        * (unit * alpha_value) option ]
+        * Extended_percentage.t
+        * (unit * Alpha_value.t) option ]
   
-    let parse =
-      Combinator.xor
+    let parser =
+      Combinators.xor
         [
           map
             (function_call "hsl"
                (map
-                  (Combinator.static
+                  (Combinators.static
                      [
-                       map hue (fun v -> `V0 v);
-                       map extended_percentage (fun v -> `V1 v);
-                       map extended_percentage (fun v -> `V2 v);
+                       map Hue.parser (fun v -> `V0 v);
+                       map Extended_percentage.parser (fun v -> `V1 v);
+                       map Extended_percentage.parser (fun v -> `V2 v);
                        map
                          (optional
                             (map
-                               (Combinator.static
+                               (Combinators.static
                                   [
                                     map (delim "/") (fun v -> `V0 v);
-                                    map alpha_value (fun v -> `V1 v);
+                                    map Alpha_value.parser (fun v -> `V1 v);
                                   ])
-                               (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] ->
-                                 (v0, v1))))
+                               (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ]
+                                                              -> (v0, v1))))
                          (fun v -> `V3 v);
                      ])
-                  (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1; `V2 v2; `V3 v3 ] ->
-                    (v0, v1, v2, v3))))
+                  (fun [@ocaml.warning "-8-26-27"] [
+                                                     `V0 v0;
+                                                     `V1 v1;
+                                                     `V2 v2;
+                                                     `V3 v3;
+                                                   ]
+                                                 -> (v0, v1, v2, v3))))
             (fun v -> `Hsl_0 v);
           map
             (function_call "hsl"
                (map
-                  (Combinator.static
+                  (Combinators.static
                      [
-                       map hue (fun v -> `V0 v);
+                       map Hue.parser (fun v -> `V0 v);
                        map comma (fun v -> `V1 v);
-                       map extended_percentage (fun v -> `V2 v);
+                       map Extended_percentage.parser (fun v -> `V2 v);
                        map comma (fun v -> `V3 v);
-                       map extended_percentage (fun v -> `V4 v);
+                       map Extended_percentage.parser (fun v -> `V4 v);
                        map
                          (optional
                             (map
-                               (Combinator.static
+                               (Combinators.static
                                   [
                                     map comma (fun v -> `V0 v);
-                                    map alpha_value (fun v -> `V1 v);
+                                    map Alpha_value.parser (fun v -> `V1 v);
                                   ])
-                               (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] ->
-                                 (v0, v1))))
+                               (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ]
+                                                              -> (v0, v1))))
                          (fun v -> `V5 v);
                      ])
-                  (fun [@ocaml.warning "-8"] [
-                                               `V0 v0;
-                                               `V1 v1;
-                                               `V2 v2;
-                                               `V3 v3;
-                                               `V4 v4;
-                                               `V5 v5;
-                                             ]
-                                           -> (v0, v1, v2, v3, v4, v5))))
+                  (fun [@ocaml.warning "-8-26-27"] [
+                                                     `V0 v0;
+                                                     `V1 v1;
+                                                     `V2 v2;
+                                                     `V3 v3;
+                                                     `V4 v4;
+                                                     `V5 v5;
+                                                   ]
+                                                 -> (v0, v1, v2, v3, v4, v5))))
             (fun v -> `Hsl_1 v);
         ]
+    [@@ocaml.warning "-8-26-27"]
   
     let toString (value : t) =
       match value with
       | `Hsl_0 v ->
-          "hsl("
-          ^ (let v0, v1, v2, v3 = v in
-             ((hue.toString v0 ^ " " ^ extended_percentage.toString v1)
-             ^ " "
-             ^ extended_percentage.toString v2)
-             ^ " "
-             ^
-             match v3 with
-             | Some x ->
-                 let v0, v1 = x in
-                 "/" ^ " " ^ alpha_value.toString v1
-             | None -> "")
+          (("hsl" ^ "(")
+          ^
+          let v0, v1, v2, v3 = v in
+          (((((Hue.toString v0 ^ " ") ^ Extended_percentage.toString v1) ^ " ")
+           ^ Extended_percentage.toString v2)
+          ^ " ")
+          ^
+          match v3 with
+          | Some x ->
+              let v0, v1 = x in
+              ("/" ^ " ") ^ Alpha_value.toString v1
+          | None -> "")
           ^ ")"
       | `Hsl_1 v ->
-          "hsl("
-          ^ (let v0, v1, v2, v3, v4, v5 = v in
-             ((((hue.toString v0 ^ " " ^ ",")
-               ^ " "
-               ^ extended_percentage.toString v2)
-              ^ " " ^ ",")
-             ^ " "
-             ^ extended_percentage.toString v4)
-             ^ " "
-             ^
-             match v5 with
-             | Some x ->
-                 let v0, v1 = x in
-                 "," ^ " " ^ alpha_value.toString v1
-             | None -> "")
+          (("hsl" ^ "(")
+          ^
+          let v0, v1, v2, v3, v4, v5 = v in
+          (((((((((Hue.toString v0 ^ " ") ^ ",") ^ " ")
+               ^ Extended_percentage.toString v2)
+              ^ " ")
+             ^ ",")
+            ^ " ")
+           ^ Extended_percentage.toString v4)
+          ^ " ")
+          ^
+          match v5 with
+          | Some x ->
+              let v0, v1 = x in
+              ("," ^ " ") ^ Alpha_value.toString v1
+          | None -> "")
           ^ ")"
   end
   
   and Function_hsla : sig
     type nonrec t =
       [ `Hsla_0 of
-        hue
-        * extended_percentage
-        * extended_percentage
-        * (unit * alpha_value) option
+        Hue.t
+        * Extended_percentage.t
+        * Extended_percentage.t
+        * (unit * Alpha_value.t) option
       | `Hsla_1 of
-        hue
+        Hue.t
         * unit
-        * extended_percentage
+        * Extended_percentage.t
         * unit
-        * extended_percentage
+        * Extended_percentage.t
         * unit
-        * alpha_value option
+        * Alpha_value.t option
       | `Hsla_2 of
-        hue
+        Hue.t
         * unit
-        * extended_percentage
+        * Extended_percentage.t
         * unit
-        * extended_percentage
+        * Extended_percentage.t
         * unit
-        * alpha_value option ]
+        * Alpha_value.t option ]
   
-    val parse :
+    val parser :
       Styled_ppx_css_parser.Tokens.t list ->
       t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
@@ -557,169 +579,180 @@
   end = struct
     type nonrec t =
       [ `Hsla_0 of
-        hue
-        * extended_percentage
-        * extended_percentage
-        * (unit * alpha_value) option
+        Hue.t
+        * Extended_percentage.t
+        * Extended_percentage.t
+        * (unit * Alpha_value.t) option
       | `Hsla_1 of
-        hue
+        Hue.t
         * unit
-        * extended_percentage
+        * Extended_percentage.t
         * unit
-        * extended_percentage
+        * Extended_percentage.t
         * unit
-        * alpha_value option
+        * Alpha_value.t option
       | `Hsla_2 of
-        hue
+        Hue.t
         * unit
-        * extended_percentage
+        * Extended_percentage.t
         * unit
-        * extended_percentage
+        * Extended_percentage.t
         * unit
-        * alpha_value option ]
+        * Alpha_value.t option ]
   
-    let parse =
-      Combinator.xor
+    let parser =
+      Combinators.xor
         [
           map
             (function_call "hsla"
                (map
-                  (Combinator.static
+                  (Combinators.static
                      [
-                       map hue (fun v -> `V0 v);
-                       map extended_percentage (fun v -> `V1 v);
-                       map extended_percentage (fun v -> `V2 v);
+                       map Hue.parser (fun v -> `V0 v);
+                       map Extended_percentage.parser (fun v -> `V1 v);
+                       map Extended_percentage.parser (fun v -> `V2 v);
                        map
                          (optional
                             (map
-                               (Combinator.static
+                               (Combinators.static
                                   [
                                     map (delim "/") (fun v -> `V0 v);
-                                    map alpha_value (fun v -> `V1 v);
+                                    map Alpha_value.parser (fun v -> `V1 v);
                                   ])
-                               (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] ->
-                                 (v0, v1))))
+                               (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ]
+                                                              -> (v0, v1))))
                          (fun v -> `V3 v);
                      ])
-                  (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1; `V2 v2; `V3 v3 ] ->
-                    (v0, v1, v2, v3))))
+                  (fun [@ocaml.warning "-8-26-27"] [
+                                                     `V0 v0;
+                                                     `V1 v1;
+                                                     `V2 v2;
+                                                     `V3 v3;
+                                                   ]
+                                                 -> (v0, v1, v2, v3))))
             (fun v -> `Hsla_0 v);
           map
             (function_call "hsla"
                (map
-                  (Combinator.static
+                  (Combinators.static
                      [
-                       map hue (fun v -> `V0 v);
+                       map Hue.parser (fun v -> `V0 v);
                        map comma (fun v -> `V1 v);
-                       map extended_percentage (fun v -> `V2 v);
+                       map Extended_percentage.parser (fun v -> `V2 v);
                        map comma (fun v -> `V3 v);
-                       map extended_percentage (fun v -> `V4 v);
+                       map Extended_percentage.parser (fun v -> `V4 v);
                        map comma (fun v -> `V5 v);
-                       map (optional alpha_value) (fun v -> `V6 v);
+                       map (optional Alpha_value.parser) (fun v -> `V6 v);
                      ])
-                  (fun [@ocaml.warning "-8"] [
-                                               `V0 v0;
-                                               `V1 v1;
-                                               `V2 v2;
-                                               `V3 v3;
-                                               `V4 v4;
-                                               `V5 v5;
-                                               `V6 v6;
-                                             ]
-                                           -> (v0, v1, v2, v3, v4, v5, v6))))
+                  (fun [@ocaml.warning "-8-26-27"] [
+                                                     `V0 v0;
+                                                     `V1 v1;
+                                                     `V2 v2;
+                                                     `V3 v3;
+                                                     `V4 v4;
+                                                     `V5 v5;
+                                                     `V6 v6;
+                                                   ]
+                                                 -> (v0, v1, v2, v3, v4, v5, v6))))
             (fun v -> `Hsla_1 v);
           map
             (function_call "hsla"
                (map
-                  (Combinator.static
+                  (Combinators.static
                      [
-                       map hue (fun v -> `V0 v);
+                       map Hue.parser (fun v -> `V0 v);
                        map comma (fun v -> `V1 v);
-                       map extended_percentage (fun v -> `V2 v);
+                       map Extended_percentage.parser (fun v -> `V2 v);
                        map comma (fun v -> `V3 v);
-                       map extended_percentage (fun v -> `V4 v);
+                       map Extended_percentage.parser (fun v -> `V4 v);
                        map comma (fun v -> `V5 v);
-                       map (optional alpha_value) (fun v -> `V6 v);
+                       map (optional Alpha_value.parser) (fun v -> `V6 v);
                      ])
-                  (fun [@ocaml.warning "-8"] [
-                                               `V0 v0;
-                                               `V1 v1;
-                                               `V2 v2;
-                                               `V3 v3;
-                                               `V4 v4;
-                                               `V5 v5;
-                                               `V6 v6;
-                                             ]
-                                           -> (v0, v1, v2, v3, v4, v5, v6))))
+                  (fun [@ocaml.warning "-8-26-27"] [
+                                                     `V0 v0;
+                                                     `V1 v1;
+                                                     `V2 v2;
+                                                     `V3 v3;
+                                                     `V4 v4;
+                                                     `V5 v5;
+                                                     `V6 v6;
+                                                   ]
+                                                 -> (v0, v1, v2, v3, v4, v5, v6))))
             (fun v -> `Hsla_2 v);
         ]
+    [@@ocaml.warning "-8-26-27"]
   
     let toString (value : t) =
       match value with
       | `Hsla_0 v ->
-          "hsla("
-          ^ (let v0, v1, v2, v3 = v in
-             ((hue.toString v0 ^ " " ^ extended_percentage.toString v1)
-             ^ " "
-             ^ extended_percentage.toString v2)
-             ^ " "
-             ^
-             match v3 with
-             | Some x ->
-                 let v0, v1 = x in
-                 "/" ^ " " ^ alpha_value.toString v1
-             | None -> "")
+          (("hsla" ^ "(")
+          ^
+          let v0, v1, v2, v3 = v in
+          (((((Hue.toString v0 ^ " ") ^ Extended_percentage.toString v1) ^ " ")
+           ^ Extended_percentage.toString v2)
+          ^ " ")
+          ^
+          match v3 with
+          | Some x ->
+              let v0, v1 = x in
+              ("/" ^ " ") ^ Alpha_value.toString v1
+          | None -> "")
           ^ ")"
       | `Hsla_1 v ->
-          "hsla("
-          ^ (let v0, v1, v2, v3, v4, v5, v6 = v in
-             (((((hue.toString v0 ^ " " ^ ",")
-                ^ " "
-                ^ extended_percentage.toString v2)
-               ^ " " ^ ",")
-              ^ " "
-              ^ extended_percentage.toString v4)
-             ^ " " ^ ",")
-             ^ " "
-             ^ match v6 with Some x -> alpha_value.toString x | None -> "")
+          (("hsla" ^ "(")
+          ^
+          let v0, v1, v2, v3, v4, v5, v6 = v in
+          (((((((((((Hue.toString v0 ^ " ") ^ ",") ^ " ")
+                 ^ Extended_percentage.toString v2)
+                ^ " ")
+               ^ ",")
+              ^ " ")
+             ^ Extended_percentage.toString v4)
+            ^ " ")
+           ^ ",")
+          ^ " ")
+          ^ match v6 with Some x -> Alpha_value.toString x | None -> "")
           ^ ")"
       | `Hsla_2 v ->
-          "hsla("
-          ^ (let v0, v1, v2, v3, v4, v5, v6 = v in
-             (((((hue.toString v0 ^ " " ^ ",")
-                ^ " "
-                ^ extended_percentage.toString v2)
-               ^ " " ^ ",")
-              ^ " "
-              ^ extended_percentage.toString v4)
-             ^ " " ^ ",")
-             ^ " "
-             ^ match v6 with Some x -> alpha_value.toString x | None -> "")
+          (("hsla" ^ "(")
+          ^
+          let v0, v1, v2, v3, v4, v5, v6 = v in
+          (((((((((((Hue.toString v0 ^ " ") ^ ",") ^ " ")
+                 ^ Extended_percentage.toString v2)
+                ^ " ")
+               ^ ",")
+              ^ " ")
+             ^ Extended_percentage.toString v4)
+            ^ " ")
+           ^ ",")
+          ^ " ")
+          ^ match v6 with Some x -> Alpha_value.toString x | None -> "")
           ^ ")"
   end
   
   and Hue : sig
-    type nonrec t = [ `Number of number | `Extended_angle of extended_angle ]
+    type nonrec t = [ `Number of Number.t | `Extended_angle of Extended_angle.t ]
   
-    val parse :
+    val parser :
       Styled_ppx_css_parser.Tokens.t list ->
       t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
-    type nonrec t = [ `Number of number | `Extended_angle of extended_angle ]
+    type nonrec t = [ `Number of Number.t | `Extended_angle of Extended_angle.t ]
   
-    let parse =
-      Combinator.xor
+    let parser =
+      Combinators.xor
         [
-          map number (fun v -> `Number v);
-          map extended_angle (fun v -> `Extended_angle v);
+          map Number.parser (fun v -> `Number v);
+          map Extended_angle.parser (fun v -> `Extended_angle v);
         ]
+    [@@ocaml.warning "-8-26-27"]
   
     let toString (value : t) =
       match value with
-      | `Number v -> number.toString v
-      | `Extended_angle v -> extended_angle.toString v
+      | `Number v -> Number.toString v
+      | `Extended_angle v -> Extended_angle.toString v
   end
   
   and Named_color : sig
@@ -873,9 +906,9 @@
       | `Whitesmoke
       | `Yellow
       | `Yellowgreen
-      | `_non_standard_color of _non_standard_color ]
+      | `_non_standard_color of Non_standard_color.t ]
   
-    val parse :
+    val parser :
       Styled_ppx_css_parser.Tokens.t list ->
       t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
@@ -1031,10 +1064,10 @@
       | `Whitesmoke
       | `Yellow
       | `Yellowgreen
-      | `_non_standard_color of _non_standard_color ]
+      | `_non_standard_color of Non_standard_color.t ]
   
-    let parse =
-      Combinator.xor
+    let parser =
+      Combinators.xor
         [
           map (keyword "transparent") (fun _v -> `Transparent);
           map (keyword "aliceblue") (fun _v -> `Aliceblue);
@@ -1185,8 +1218,9 @@
           map (keyword "whitesmoke") (fun _v -> `Whitesmoke);
           map (keyword "yellow") (fun _v -> `Yellow);
           map (keyword "yellowgreen") (fun _v -> `Yellowgreen);
-          map _non_standard_color (fun v -> `_non_standard_color v);
+          map Non_standard_color.parser (fun v -> `_non_standard_color v);
         ]
+    [@@ocaml.warning "-8-26-27"]
   
     let toString (value : t) =
       match value with
@@ -1339,7 +1373,7 @@
       | `Whitesmoke -> "whitesmoke"
       | `Yellow -> "yellow"
       | `Yellowgreen -> "yellowgreen"
-      | `_non_standard_color v -> _non_standard_color.toString v
+      | `_non_standard_color v -> Non_standard_color.toString v
   end
   
   and Deprecated_system_color : sig
@@ -1373,7 +1407,7 @@
       | `WindowFrame
       | `WindowText ]
   
-    val parse :
+    val parser :
       Styled_ppx_css_parser.Tokens.t list ->
       t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
@@ -1409,8 +1443,8 @@
       | `WindowFrame
       | `WindowText ]
   
-    let parse =
-      Combinator.xor
+    let parser =
+      Combinators.xor
         [
           map (keyword "ActiveBorder") (fun _v -> `ActiveBorder);
           map (keyword "ActiveCaption") (fun _v -> `ActiveCaption);
@@ -1441,6 +1475,7 @@
           map (keyword "WindowFrame") (fun _v -> `WindowFrame);
           map (keyword "WindowText") (fun _v -> `WindowText);
         ]
+    [@@ocaml.warning "-8-26-27"]
   
     let toString (value : t) =
       match value with
@@ -1476,44 +1511,45 @@
   
   and Color_stop_list : sig
     type nonrec t =
-      [ `Static_0 of color option * length_percentage
-      | `Static_1 of color * length_percentage option ]
+      [ `Static_0 of Color.t option * Length_percentage.t
+      | `Static_1 of Color.t * Length_percentage.t option ]
       list
   
-    val parse :
+    val parser :
       Styled_ppx_css_parser.Tokens.t list ->
       t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
     type nonrec t =
-      [ `Static_0 of color option * length_percentage
-      | `Static_1 of color * length_percentage option ]
+      [ `Static_0 of Color.t option * Length_percentage.t
+      | `Static_1 of Color.t * Length_percentage.t option ]
       list
   
-    let parse =
+    let parser =
       repeat_by_comma (1, None)
-        (Combinator.xor
+        (Combinators.xor
            [
              map
                (map
-                  (Combinator.static
+                  (Combinators.static
                      [
-                       map (optional color) (fun v -> `V0 v);
-                       map length_percentage (fun v -> `V1 v);
+                       map (optional Color.parser) (fun v -> `V0 v);
+                       map Length_percentage.parser (fun v -> `V1 v);
                      ])
-                  (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] -> (v0, v1)))
+                  (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ] -> (v0, v1)))
                (fun v -> `Static_0 v);
              map
                (map
-                  (Combinator.static
+                  (Combinators.static
                      [
-                       map color (fun v -> `V0 v);
-                       map (optional length_percentage) (fun v -> `V1 v);
+                       map Color.parser (fun v -> `V0 v);
+                       map (optional Length_percentage.parser) (fun v -> `V1 v);
                      ])
-                  (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] -> (v0, v1)))
+                  (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ] -> (v0, v1)))
                (fun v -> `Static_1 v);
            ])
+    [@@ocaml.warning "-8-26-27"]
   
     let toString (value : t) =
       value
@@ -1521,269 +1557,282 @@
              match x with
              | `Static_0 v ->
                  let v0, v1 = v in
-                 (match v0 with Some x -> color.toString x | None -> "")
-                 ^ " "
-                 ^ length_percentage.toString v1
+                 ((match v0 with Some x -> Color.toString x | None -> "") ^ " ")
+                 ^ Length_percentage.toString v1
              | `Static_1 v -> (
                  let v0, v1 = v in
-                 color.toString v0 ^ " "
+                 (Color.toString v0 ^ " ")
                  ^
                  match v1 with
-                 | Some x -> length_percentage.toString x
+                 | Some x -> Length_percentage.toString x
                  | None -> ""))
       |> String.concat " "
   end
   
   and Color_stop : sig
     type nonrec t =
-      [ `Color_stop_length of color_stop_length
-      | `Color_stop_angle of color_stop_angle ]
+      [ `Color_stop_length of Color_stop_length.t
+      | `Color_stop_angle of Color_stop_angle.t ]
   
-    val parse :
+    val parser :
       Styled_ppx_css_parser.Tokens.t list ->
       t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
     type nonrec t =
-      [ `Color_stop_length of color_stop_length
-      | `Color_stop_angle of color_stop_angle ]
+      [ `Color_stop_length of Color_stop_length.t
+      | `Color_stop_angle of Color_stop_angle.t ]
   
-    let parse =
-      Combinator.xor
+    let parser =
+      Combinators.xor
         [
-          map color_stop_length (fun v -> `Color_stop_length v);
-          map color_stop_angle (fun v -> `Color_stop_angle v);
+          map Color_stop_length.parser (fun v -> `Color_stop_length v);
+          map Color_stop_angle.parser (fun v -> `Color_stop_angle v);
         ]
+    [@@ocaml.warning "-8-26-27"]
   
     let toString (value : t) =
       match value with
-      | `Color_stop_length v -> color_stop_length.toString v
-      | `Color_stop_angle v -> color_stop_angle.toString v
+      | `Color_stop_length v -> Color_stop_length.toString v
+      | `Color_stop_angle v -> Color_stop_angle.toString v
   end
   
   and Color_stop_length : sig
     type nonrec t =
-      [ `Extended_length of extended_length
-      | `Extended_percentage of extended_percentage ]
+      [ `Extended_length of Extended_length.t
+      | `Extended_percentage of Extended_percentage.t ]
   
-    val parse :
+    val parser :
       Styled_ppx_css_parser.Tokens.t list ->
       t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
     type nonrec t =
-      [ `Extended_length of extended_length
-      | `Extended_percentage of extended_percentage ]
+      [ `Extended_length of Extended_length.t
+      | `Extended_percentage of Extended_percentage.t ]
   
-    let parse =
-      Combinator.xor
+    let parser =
+      Combinators.xor
         [
-          map extended_length (fun v -> `Extended_length v);
-          map extended_percentage (fun v -> `Extended_percentage v);
+          map Extended_length.parser (fun v -> `Extended_length v);
+          map Extended_percentage.parser (fun v -> `Extended_percentage v);
         ]
+    [@@ocaml.warning "-8-26-27"]
   
     let toString (value : t) =
       match value with
-      | `Extended_length v -> extended_length.toString v
-      | `Extended_percentage v -> extended_percentage.toString v
+      | `Extended_length v -> Extended_length.toString v
+      | `Extended_percentage v -> Extended_percentage.toString v
   end
   
   and Color_stop_angle : sig
-    type nonrec t = extended_angle list
+    type nonrec t = Extended_angle.t list
   
-    val parse :
+    val parser :
       Styled_ppx_css_parser.Tokens.t list ->
       t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
-    type nonrec t = extended_angle list
+    type nonrec t = Extended_angle.t list
   
-    let parse = repeat (1, Some 2) extended_angle
+    let parser = repeat (1, Some 2) Extended_angle.parser
+    [@@ocaml.warning "-8-26-27"]
   
     let toString (value : t) =
-      value |> List.map (fun x -> extended_angle.toString x) |> String.concat " "
+      value |> List.map (fun x -> Extended_angle.toString x) |> String.concat " "
   end
   
   and Linear_color_stop : sig
-    type nonrec t = color * length_percentage option
+    type nonrec t = Color.t * Length_percentage.t option
   
-    val parse :
+    val parser :
       Styled_ppx_css_parser.Tokens.t list ->
       t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
-    type nonrec t = color * length_percentage option
+    type nonrec t = Color.t * Length_percentage.t option
   
-    let parse =
+    let parser =
       map
-        (Combinator.static
+        (Combinators.static
            [
-             map color (fun v -> `V0 v);
-             map (optional length_percentage) (fun v -> `V1 v);
+             map Color.parser (fun v -> `V0 v);
+             map (optional Length_percentage.parser) (fun v -> `V1 v);
            ])
-        (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] -> (v0, v1))
+        (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ] -> (v0, v1))
+    [@@ocaml.warning "-8-26-27"]
   
     let toString (value : t) =
       let v0, v1 = value in
-      color.toString v0 ^ " "
-      ^ match v1 with Some x -> length_percentage.toString x | None -> ""
+      (Color.toString v0 ^ " ")
+      ^ match v1 with Some x -> Length_percentage.toString x | None -> ""
   end
   
   and Linear_color_hint : sig
     type nonrec t =
-      [ `Extended_length of extended_length
-      | `Extended_percentage of extended_percentage ]
+      [ `Extended_length of Extended_length.t
+      | `Extended_percentage of Extended_percentage.t ]
   
-    val parse :
+    val parser :
       Styled_ppx_css_parser.Tokens.t list ->
       t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
     type nonrec t =
-      [ `Extended_length of extended_length
-      | `Extended_percentage of extended_percentage ]
+      [ `Extended_length of Extended_length.t
+      | `Extended_percentage of Extended_percentage.t ]
   
-    let parse =
-      Combinator.xor
+    let parser =
+      Combinators.xor
         [
-          map extended_length (fun v -> `Extended_length v);
-          map extended_percentage (fun v -> `Extended_percentage v);
+          map Extended_length.parser (fun v -> `Extended_length v);
+          map Extended_percentage.parser (fun v -> `Extended_percentage v);
         ]
+    [@@ocaml.warning "-8-26-27"]
   
     let toString (value : t) =
       match value with
-      | `Extended_length v -> extended_length.toString v
-      | `Extended_percentage v -> extended_percentage.toString v
+      | `Extended_length v -> Extended_length.toString v
+      | `Extended_percentage v -> Extended_percentage.toString v
   end
   
   and Angular_color_stop : sig
-    type nonrec t = color * color_stop_angle option
+    type nonrec t = Color.t * Color_stop_angle.t option
   
-    val parse :
+    val parser :
       Styled_ppx_css_parser.Tokens.t list ->
       t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
-    type nonrec t = color * color_stop_angle option
+    type nonrec t = Color.t * Color_stop_angle.t option
   
-    let parse =
+    let parser =
       map
-        (Combinator.and_
+        (Combinators.and_
            [
-             map color (fun v -> `V0 v);
-             map (optional color_stop_angle) (fun v -> `V1 v);
+             map Color.parser (fun v -> `V0 v);
+             map (optional Color_stop_angle.parser) (fun v -> `V1 v);
            ])
-        (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] -> (v0, v1))
+        (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ] -> (v0, v1))
+    [@@ocaml.warning "-8-26-27"]
   
     let toString (value : t) =
       let v0, v1 = value in
-      color.toString v0 ^ " "
-      ^ match v1 with Some x -> color_stop_angle.toString x | None -> ""
+      (Color.toString v0 ^ " ")
+      ^ match v1 with Some x -> Color_stop_angle.toString x | None -> ""
   end
   
   and Angular_color_hint : sig
     type nonrec t =
-      [ `Extended_angle of extended_angle
-      | `Extended_percentage of extended_percentage ]
+      [ `Extended_angle of Extended_angle.t
+      | `Extended_percentage of Extended_percentage.t ]
   
-    val parse :
+    val parser :
       Styled_ppx_css_parser.Tokens.t list ->
       t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
     type nonrec t =
-      [ `Extended_angle of extended_angle
-      | `Extended_percentage of extended_percentage ]
+      [ `Extended_angle of Extended_angle.t
+      | `Extended_percentage of Extended_percentage.t ]
   
-    let parse =
-      Combinator.xor
+    let parser =
+      Combinators.xor
         [
-          map extended_angle (fun v -> `Extended_angle v);
-          map extended_percentage (fun v -> `Extended_percentage v);
+          map Extended_angle.parser (fun v -> `Extended_angle v);
+          map Extended_percentage.parser (fun v -> `Extended_percentage v);
         ]
+    [@@ocaml.warning "-8-26-27"]
   
     let toString (value : t) =
       match value with
-      | `Extended_angle v -> extended_angle.toString v
-      | `Extended_percentage v -> extended_percentage.toString v
+      | `Extended_angle v -> Extended_angle.toString v
+      | `Extended_percentage v -> Extended_percentage.toString v
   end
   
   and Angular_color_stop_list : sig
     type nonrec t =
-      (angular_color_stop * (unit * angular_color_hint) option) list
+      (Angular_color_stop.t * (unit * Angular_color_hint.t) option) list
       * unit
-      * angular_color_stop
+      * Angular_color_stop.t
   
-    val parse :
+    val parser :
       Styled_ppx_css_parser.Tokens.t list ->
       t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
     type nonrec t =
-      (angular_color_stop * (unit * angular_color_hint) option) list
+      (Angular_color_stop.t * (unit * Angular_color_hint.t) option) list
       * unit
-      * angular_color_stop
+      * Angular_color_stop.t
   
-    let parse =
+    let parser =
       map
-        (Combinator.static
+        (Combinators.static
            [
              map
                (repeat_by_comma (1, None)
                   (map
-                     (Combinator.static
+                     (Combinators.static
                         [
-                          map angular_color_stop (fun v -> `V0 v);
+                          map Angular_color_stop.parser (fun v -> `V0 v);
                           map
                             (optional
                                (map
-                                  (Combinator.static
+                                  (Combinators.static
                                      [
                                        map comma (fun v -> `V0 v);
-                                       map angular_color_hint (fun v -> `V1 v);
+                                       map Angular_color_hint.parser (fun v ->
+                                           `V1 v);
                                      ])
-                                  (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] ->
-                                    (v0, v1))))
+                                  (fun [@ocaml.warning "-8-26-27"] [
+                                                                     `V0 v0;
+                                                                     `V1 v1;
+                                                                   ]
+                                                                 -> (v0, v1))))
                             (fun v -> `V1 v);
                         ])
-                     (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] -> (v0, v1))))
+                     (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ] ->
+                       (v0, v1))))
                (fun v -> `V0 v);
              map comma (fun v -> `V1 v);
-             map angular_color_stop (fun v -> `V2 v);
+             map Angular_color_stop.parser (fun v -> `V2 v);
            ])
-        (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1; `V2 v2 ] -> (v0, v1, v2))
+        (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1; `V2 v2 ] ->
+          (v0, v1, v2))
+    [@@ocaml.warning "-8-26-27"]
   
     let toString (value : t) =
       let v0, v1, v2 = value in
-      ((v0
-       |> List.map (fun x ->
-              let v0, v1 = x in
-              angular_color_stop.toString v0
-              ^ " "
-              ^
-              match v1 with
-              | Some x ->
-                  let v0, v1 = x in
-                  "," ^ " " ^ angular_color_hint.toString v1
-              | None -> "")
-       |> String.concat " ")
-      ^ " " ^ ",")
-      ^ " "
-      ^ angular_color_stop.toString v2
+      ((((v0
+         |> List.map (fun x ->
+                let v0, v1 = x in
+                (Angular_color_stop.toString v0 ^ " ")
+                ^
+                match v1 with
+                | Some x ->
+                    let v0, v1 = x in
+                    ("," ^ " ") ^ Angular_color_hint.toString v1
+                | None -> "")
+         |> String.concat " ")
+        ^ " ")
+       ^ ",")
+      ^ " ")
+      ^ Angular_color_stop.toString v2
   end
   
   and Hue_interpolation_method : sig
     type nonrec t = [ `Shorter | `Longer | `Increasing | `Decreasing ] * unit
   
-    val parse :
+    val parser :
       Styled_ppx_css_parser.Tokens.t list ->
       t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
@@ -1791,12 +1840,12 @@
   end = struct
     type nonrec t = [ `Shorter | `Longer | `Increasing | `Decreasing ] * unit
   
-    let parse =
+    let parser =
       map
-        (Combinator.and_
+        (Combinators.and_
            [
              map
-               (Combinator.xor
+               (Combinators.xor
                   [
                     map (keyword "shorter") (fun _v -> `Shorter);
                     map (keyword "longer") (fun _v -> `Longer);
@@ -1806,22 +1855,24 @@
                (fun v -> `V0 v);
              map (keyword "hue") (fun v -> `V1 v);
            ])
-        (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] -> (v0, v1))
+        (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ] -> (v0, v1))
+    [@@ocaml.warning "-8-26-27"]
   
     let toString (value : t) =
       let v0, v1 = value in
-      (match v0 with
-      | `Shorter -> "shorter"
-      | `Longer -> "longer"
-      | `Increasing -> "increasing"
-      | `Decreasing -> "decreasing")
-      ^ " " ^ "hue"
+      ((match v0 with
+       | `Shorter -> "shorter"
+       | `Longer -> "longer"
+       | `Increasing -> "increasing"
+       | `Decreasing -> "decreasing")
+      ^ " ")
+      ^ "hue"
   end
   
   and Polar_color_space : sig
     type nonrec t = [ `Hsl | `Hwb | `Lch | `Oklch ]
   
-    val parse :
+    val parser :
       Styled_ppx_css_parser.Tokens.t list ->
       t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
@@ -1829,14 +1880,15 @@
   end = struct
     type nonrec t = [ `Hsl | `Hwb | `Lch | `Oklch ]
   
-    let parse =
-      Combinator.xor
+    let parser =
+      Combinators.xor
         [
           map (keyword "hsl") (fun _v -> `Hsl);
           map (keyword "hwb") (fun _v -> `Hwb);
           map (keyword "lch") (fun _v -> `Lch);
           map (keyword "oklch") (fun _v -> `Oklch);
         ]
+    [@@ocaml.warning "-8-26-27"]
   
     let toString (value : t) =
       match value with
@@ -1860,7 +1912,7 @@
       | `Xyz_d50
       | `Xyz_d65 ]
   
-    val parse :
+    val parser :
       Styled_ppx_css_parser.Tokens.t list ->
       t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
@@ -1879,8 +1931,8 @@
       | `Xyz_d50
       | `Xyz_d65 ]
   
-    let parse =
-      Combinator.xor
+    let parser =
+      Combinators.xor
         [
           map (keyword "srgb") (fun _v -> `Srgb);
           map (keyword "srgb-linear") (fun _v -> `Srgb_linear);
@@ -1894,6 +1946,7 @@
           map (keyword "xyz-d50") (fun _v -> `Xyz_d50);
           map (keyword "xyz-d65") (fun _v -> `Xyz_d65);
         ]
+    [@@ocaml.warning "-8-26-27"]
   
     let toString (value : t) =
       match value with
@@ -1913,10 +1966,10 @@
   and Color_interpolation_method : sig
     type nonrec t =
       unit
-      * [ `Rectangular_color_space of rectangular_color_space
-        | `Static of polar_color_space * hue_interpolation_method option ]
+      * [ `Rectangular_color_space of Rectangular_color_space.t
+        | `Static of Polar_color_space.t * Hue_interpolation_method.t option ]
   
-    val parse :
+    val parser :
       Styled_ppx_css_parser.Tokens.t list ->
       t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
@@ -1924,130 +1977,140 @@
   end = struct
     type nonrec t =
       unit
-      * [ `Rectangular_color_space of rectangular_color_space
-        | `Static of polar_color_space * hue_interpolation_method option ]
+      * [ `Rectangular_color_space of Rectangular_color_space.t
+        | `Static of Polar_color_space.t * Hue_interpolation_method.t option ]
   
-    let parse =
+    let parser =
       map
-        (Combinator.and_
+        (Combinators.and_
            [
              map (keyword "in") (fun v -> `V0 v);
              map
-               (Combinator.xor
+               (Combinators.xor
                   [
-                    map rectangular_color_space (fun v ->
+                    map Rectangular_color_space.parser (fun v ->
                         `Rectangular_color_space v);
                     map
                       (map
-                         (Combinator.static
+                         (Combinators.static
                             [
-                              map polar_color_space (fun v -> `V0 v);
-                              map (optional hue_interpolation_method) (fun v ->
-                                  `V1 v);
+                              map Polar_color_space.parser (fun v -> `V0 v);
+                              map (optional Hue_interpolation_method.parser)
+                                (fun v -> `V1 v);
                             ])
-                         (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] ->
+                         (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ] ->
                            (v0, v1)))
                       (fun v -> `Static v);
                   ])
                (fun v -> `V1 v);
            ])
-        (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] -> (v0, v1))
+        (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ] -> (v0, v1))
+    [@@ocaml.warning "-8-26-27"]
   
     let toString (value : t) =
       let v0, v1 = value in
-      "in" ^ " "
+      ("in" ^ " ")
       ^
       match v1 with
-      | `Rectangular_color_space v -> rectangular_color_space.toString v
+      | `Rectangular_color_space v -> Rectangular_color_space.toString v
       | `Static v -> (
           let v0, v1 = v in
-          polar_color_space.toString v0
-          ^ " "
+          (Polar_color_space.toString v0 ^ " ")
           ^
           match v1 with
-          | Some x -> hue_interpolation_method.toString x
+          | Some x -> Hue_interpolation_method.toString x
           | None -> "")
   end
   
   and Function_color_mix : sig
     type nonrec t =
-      color_interpolation_method
+      Color_interpolation_method.t
       * unit
-      * (color * percentage option)
+      * (Color.t * Percentage.t option)
       * unit
-      * (color * percentage option)
+      * (Color.t * Percentage.t option)
   
-    val parse :
+    val parser :
       Styled_ppx_css_parser.Tokens.t list ->
       t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
     type nonrec t =
-      color_interpolation_method
+      Color_interpolation_method.t
       * unit
-      * (color * percentage option)
+      * (Color.t * Percentage.t option)
       * unit
-      * (color * percentage option)
+      * (Color.t * Percentage.t option)
   
-    let parse =
+    let parser =
       function_call "color-mix"
         (map
-           (Combinator.static
+           (Combinators.static
               [
-                map color_interpolation_method (fun v -> `V0 v);
+                map Color_interpolation_method.parser (fun v -> `V0 v);
                 map comma (fun v -> `V1 v);
                 map
                   (map
-                     (Combinator.and_
+                     (Combinators.and_
                         [
-                          map color (fun v -> `V0 v);
-                          map (optional percentage) (fun v -> `V1 v);
+                          map Color.parser (fun v -> `V0 v);
+                          map (optional Percentage.parser) (fun v -> `V1 v);
                         ])
-                     (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] -> (v0, v1)))
+                     (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ] ->
+                       (v0, v1)))
                   (fun v -> `V2 v);
                 map comma (fun v -> `V3 v);
                 map
                   (map
-                     (Combinator.and_
+                     (Combinators.and_
                         [
-                          map color (fun v -> `V0 v);
-                          map (optional percentage) (fun v -> `V1 v);
+                          map Color.parser (fun v -> `V0 v);
+                          map (optional Percentage.parser) (fun v -> `V1 v);
                         ])
-                     (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] -> (v0, v1)))
+                     (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ] ->
+                       (v0, v1)))
                   (fun v -> `V4 v);
               ])
-           (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1; `V2 v2; `V3 v3; `V4 v4 ]
-                                    -> (v0, v1, v2, v3, v4)))
+           (fun [@ocaml.warning "-8-26-27"] [
+                                              `V0 v0;
+                                              `V1 v1;
+                                              `V2 v2;
+                                              `V3 v3;
+                                              `V4 v4;
+                                            ]
+                                          -> (v0, v1, v2, v3, v4)))
+    [@@ocaml.warning "-8-26-27"]
   
     let toString (value : t) =
-      "color-mix("
-      ^ (let v0, v1, v2, v3, v4 = value in
-         (((color_interpolation_method.toString v0 ^ " " ^ ",")
-          ^ " "
-          ^
-          let v0, v1 = v2 in
-          color.toString v0 ^ " "
-          ^ match v1 with Some x -> percentage.toString x | None -> "")
-         ^ " " ^ ",")
-         ^ " "
+      (("color-mix" ^ "(")
+      ^
+      let v0, v1, v2, v3, v4 = value in
+      (((((((Color_interpolation_method.toString v0 ^ " ") ^ ",") ^ " ")
          ^
-         let v0, v1 = v4 in
-         color.toString v0 ^ " "
-         ^ match v1 with Some x -> percentage.toString x | None -> "")
+         let v0, v1 = v2 in
+         (Color.toString v0 ^ " ")
+         ^ match v1 with Some x -> Percentage.toString x | None -> "")
+        ^ " ")
+       ^ ",")
+      ^ " ")
+      ^
+      let v0, v1 = v4 in
+      (Color.toString v0 ^ " ")
+      ^ match v1 with Some x -> Percentage.toString x | None -> "")
       ^ ")"
   end
   
   and Paint : sig
     type nonrec t =
       [ `None
-      | `Color of color
-      | `Static of url * [ `None | `Color of color ] option
+      | `Color of Color.t
+      | `Static of Url.t * [ `None | `Color of Color.t ] option
       | `Context_fill
       | `Context_stroke
-      | `Interpolation of interpolation ]
+      | `Interpolation of Interpolation.t ]
   
-    val parse :
+    val parser :
       Styled_ppx_css_parser.Tokens.t list ->
       t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
@@ -2055,53 +2118,54 @@
   end = struct
     type nonrec t =
       [ `None
-      | `Color of color
-      | `Static of url * [ `None | `Color of color ] option
+      | `Color of Color.t
+      | `Static of Url.t * [ `None | `Color of Color.t ] option
       | `Context_fill
       | `Context_stroke
-      | `Interpolation of interpolation ]
+      | `Interpolation of Interpolation.t ]
   
-    let parse =
-      Combinator.xor
+    let parser =
+      Combinators.xor
         [
           map (keyword "none") (fun _v -> `None);
-          map color (fun v -> `Color v);
+          map Color.parser (fun v -> `Color v);
           map
             (map
-               (Combinator.static
+               (Combinators.static
                   [
-                    map url (fun v -> `V0 v);
+                    map Url.parser (fun v -> `V0 v);
                     map
                       (optional
-                         (Combinator.xor
+                         (Combinators.xor
                             [
                               map (keyword "none") (fun _v -> `None);
-                              map color (fun v -> `Color v);
+                              map Color.parser (fun v -> `Color v);
                             ]))
                       (fun v -> `V1 v);
                   ])
-               (fun [@ocaml.warning "-8"] [ `V0 v0; `V1 v1 ] -> (v0, v1)))
+               (fun [@ocaml.warning "-8-26-27"] [ `V0 v0; `V1 v1 ] -> (v0, v1)))
             (fun v -> `Static v);
           map (keyword "context-fill") (fun _v -> `Context_fill);
           map (keyword "context-stroke") (fun _v -> `Context_stroke);
-          map interpolation (fun v -> `Interpolation v);
+          map Interpolation.parser (fun v -> `Interpolation v);
         ]
+    [@@ocaml.warning "-8-26-27"]
   
     let toString (value : t) =
       match value with
       | `None -> "none"
-      | `Color v -> color.toString v
+      | `Color v -> Color.toString v
       | `Static v -> (
           let v0, v1 = v in
-          url.toString v0 ^ " "
+          (Url.toString v0 ^ " ")
           ^
           match v1 with
           | Some x -> (
-              match x with `None -> "none" | `Color v -> color.toString v)
+              match x with `None -> "none" | `Color v -> Color.toString v)
           | None -> "")
       | `Context_fill -> "context-fill"
       | `Context_stroke -> "context-stroke"
-      | `Interpolation v -> interpolation.toString v
+      | `Interpolation v -> Interpolation.toString v
   end
   
   and Non_standard_color : sig
@@ -2152,7 +2216,7 @@
       | `_webkit_link
       | `_webkit_text ]
   
-    val parse :
+    val parser :
       Styled_ppx_css_parser.Tokens.t list ->
       t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
@@ -2205,8 +2269,8 @@
       | `_webkit_link
       | `_webkit_text ]
   
-    let parse =
-      Combinator.xor
+    let parser =
+      Combinators.xor
         [
           map (keyword "-moz-ButtonDefault") (fun _v -> `_moz_ButtonDefault);
           map (keyword "-moz-ButtonHoverFace") (fun _v -> `_moz_ButtonHoverFace);
@@ -2272,6 +2336,7 @@
           map (keyword "-webkit-link") (fun _v -> `_webkit_link);
           map (keyword "-webkit-text") (fun _v -> `_webkit_text);
         ]
+    [@@ocaml.warning "-8-26-27"]
   
     let toString (value : t) =
       match value with

@@ -150,8 +150,7 @@ let render_length =
 
   | `Zero => render_string("0");
 
-let rec render_function_calc =
-        (calc_sum: Property_parser.Calc_sum.t) => {
+let rec render_function_calc = (calc_sum: Property_parser.Calc_sum.t) => {
   [%expr "calc(" ++ [%e render_calc_sum(calc_sum)] ++ ")"];
 }
 and render_calc_sum = ((product, sums)) => {
@@ -296,7 +295,7 @@ let transform_with_variable = (parser, mapper, value_to_expr) =>
     Combinators.xor([
       /* If the CSS value is an interpolation, we treat as one `
          ariable */
-      Rule.Match.map(Standard.Interpolation.parserr, data => `Variable(data)),
+      Rule.Match.map(Standard.Interpolation.parser, data => `Variable(data)),
       /* Otherwise it's a regular CSS `Value */
       Rule.Match.map(parser, data => `Value(data)),
     ]),
@@ -312,17 +311,38 @@ let apply = (parser, id, map) =>
   );
 
 let width =
-  apply(  Property_parser.Property_width.parser, [%expr "width"], render_size);
+  apply(Property_parser.Property_width.parser, [%expr "width"], render_size);
 let min_width =
-  apply(Property_parser.Property_width.parser, [%expr "min-width"], render_size);
+  apply(
+    Property_parser.Property_width.parser,
+    [%expr "min-width"],
+    render_size,
+  );
 
 let max_width =
-  apply(Property_parser.Property_width.parser, [%expr "max-width"], render_size);
-let height = apply(Property_parser.Property_height.parser, [%expr "height"], render_size);
+  apply(
+    Property_parser.Property_width.parser,
+    [%expr "max-width"],
+    render_size,
+  );
+let height =
+  apply(
+    Property_parser.Property_height.parser,
+    [%expr "height"],
+    render_size,
+  );
 let min_height =
-  apply(Property_parser.Property_height.parser, [%expr "min-height"], render_size);
+  apply(
+    Property_parser.Property_height.parser,
+    [%expr "min-height"],
+    render_size,
+  );
 let max_height =
-  apply(Property_parser.Property_height.parser, [%expr "max-height"], render_size);
+  apply(
+    Property_parser.Property_height.parser,
+    [%expr "max-height"],
+    render_size,
+  );
 
 let render_ratio =
   fun
@@ -336,7 +356,7 @@ let render_ratio =
 
 let aspect_ratio =
   apply(
-     Parser.Property_media_max_aspect_ratio.parser,
+    Parser.Property_media_max_aspect_ratio.parser,
     [%expr "aspect-ratio"],
     render_ratio,
   );
@@ -360,7 +380,8 @@ let orientation =
     | `Landscape => [%expr "landscape"]
     | `Portrait => [%expr "portrait"],
   );
-let grid = apply(Parser.Property_media_grid.parser, [%expr "grid"], render_integer);
+let grid =
+  apply(Parser.Property_media_grid.parser, [%expr "grid"], render_integer);
 let update =
   apply(
     Parser.Property_media_update.parser,
@@ -396,7 +417,8 @@ let overflow_inline =
     | `Interpolation(i) => render_variable(i),
   );
 
-let color = apply(Parser.Positive_integer.parser, [%expr "color"], render_integer);
+let color =
+  apply(Parser.Positive_integer.parser, [%expr "color"], render_integer);
 let min_color =
   apply(Parser.Positive_integer.parser, [%expr "min-color"], render_integer);
 let max_color =
