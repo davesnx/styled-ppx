@@ -629,7 +629,7 @@ let rec type_check_rule = (rule: Styled_ppx_css_parser.Ast.rule) => {
   switch (rule) {
   | Declaration({name: (name, _), value: (value, _), loc, _}) =>
     let value = Styled_ppx_css_parser.Render.component_value_list(value);
-    [Css_grammar_parser.Parser.check_property(~loc, ~name, value)];
+    [Css_grammar_parser.check_property(~loc, ~name, value)];
   | Style_rule(style_rule) =>
     let rule_list = style_rule.block;
     /* TODO: we don't typecheck prelude selectors */

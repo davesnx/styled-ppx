@@ -4,7 +4,7 @@ open Modifier;
 open Standard;
 
 let parse_exn = (prop, str) =>
-  switch (Parser.parse(prop, str)) {
+  switch (parse(prop, str)) {
   | Ok(data) => data
   | Error(message) => Alcotest.fail(message)
   };
@@ -316,7 +316,7 @@ let tests = [
     };
   }),
   test("xor error handling - invalid input", _ => {
-    let output = Parser.parse([%value "red | blue | green"], "yellow");
+    let output = parse([%value "red | blue | green"], "yellow");
     switch (output) {
     | Error(msg) =>
       let has_red = string_contains(msg, "red");
@@ -331,7 +331,7 @@ let tests = [
     };
   }),
   test("xor error handling - typo suggestion", _ => {
-    let output = Parser.parse([%value "red | blue | green"], "gren");
+    let output = parse([%value "red | blue | green"], "gren");
     switch (output) {
     | Error(msg) =>
       if (!string_contains(msg, "did you mean")) {

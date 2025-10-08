@@ -35,7 +35,7 @@ type transform('ast, 'value) = {
 };
 
 let emit = (property, value_of_ast, value_to_expr) => {
-  let ast_of_string = Parser.parse(property);
+  let ast_of_string = parse(property);
   let ast_to_expr = ast => value_of_ast(ast) |> value_to_expr;
   let string_to_expr = string =>
     ast_of_string(string) |> Result.map(ast_to_expr);
@@ -625,7 +625,7 @@ let parse_declarations = (property: string, value: string) => {
     ];
     Ok([unsafe]);
   | _ =>
-    switch (Parser.check_property(~loc, ~name=property, value)) {
+    switch (check_property(~loc, ~name=property, value)) {
     | Ok () =>
       switch (render_to_expr(property, value)) {
       | Ok(value) => Ok(value)
