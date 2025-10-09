@@ -2,58 +2,54 @@ open Standard
 open Modifier
 open Rule.Match
 open Styled_ppx_css_parser
-module StringMap = Map.Make (String)
 
-[@@@warning "-8-26-27"]
-
-(* https://developer.mozilla.org/en-US/docs/Web/CSS/gradient *)
-module rec Legacy_gradient =
+let rec _legacy_gradient =
   [%value.rec
     "<-webkit-gradient()> | <-legacy-linear-gradient> | \
      <-legacy-repeating-linear-gradient> | <-legacy-radial-gradient> | \
      <-legacy-repeating-radial-gradient>"]
 
-and Legacy_linear_gradient =
+and _legacy_linear_gradient =
   [%value.rec
     "-moz-linear-gradient( <-legacy-linear-gradient-arguments> ) | \
      -webkit-linear-gradient( <-legacy-linear-gradient-arguments> ) | \
      -o-linear-gradient( <-legacy-linear-gradient-arguments> )"]
 
-and Legacy_linear_gradient_arguments =
+and _legacy_linear_gradient_arguments =
   [%value.rec "[ <extended-angle> | <side-or-corner> ]? ',' <color-stop-list>"]
 
-and Legacy_radial_gradient =
+and _legacy_radial_gradient =
   [%value.rec
     "-moz-radial-gradient( <-legacy-radial-gradient-arguments> ) | \
      -webkit-radial-gradient( <-legacy-radial-gradient-arguments> ) | \
      -o-radial-gradient( <-legacy-radial-gradient-arguments> )"]
 
-and Legacy_radial_gradient_arguments =
+and _legacy_radial_gradient_arguments =
   [%value.rec
     "[ <position> ',' ]? [ [ <-legacy-radial-gradient-shape> || \
      <-legacy-radial-gradient-size> | [ <extended-length> | \
      <extended-percentage> ]{2} ] ',' ]? <color-stop-list>"]
 
-and Legacy_radial_gradient_shape = [%value.rec "'circle' | 'ellipse'"]
+and _legacy_radial_gradient_shape = [%value.rec "'circle' | 'ellipse'"]
 
-and Legacy_radial_gradient_size =
+and _legacy_radial_gradient_size =
   [%value.rec
     "'closest-side' | 'closest-corner' | 'farthest-side' | 'farthest-corner' | \
      'contain' | 'cover'"]
 
-and Legacy_repeating_linear_gradient =
+and _legacy_repeating_linear_gradient =
   [%value.rec
     "-moz-repeating-linear-gradient( <-legacy-linear-gradient-arguments> ) | \
      -webkit-repeating-linear-gradient( <-legacy-linear-gradient-arguments> ) \
      | -o-repeating-linear-gradient( <-legacy-linear-gradient-arguments> )"]
 
-and Legacy_repeating_radial_gradient =
+and _legacy_repeating_radial_gradient =
   [%value.rec
     "-moz-repeating-radial-gradient( <-legacy-radial-gradient-arguments> ) | \
      -webkit-repeating-radial-gradient( <-legacy-radial-gradient-arguments> ) \
      | -o-repeating-radial-gradient( <-legacy-radial-gradient-arguments> )"]
 
-and Non_standard_color =
+and _non_standard_color =
   [%value.rec
     "'-moz-ButtonDefault' | '-moz-ButtonHoverFace' | '-moz-ButtonHoverText' | \
      '-moz-CellHighlight' | '-moz-CellHighlightText' | '-moz-Combobox' | \
@@ -74,7 +70,7 @@ and Non_standard_color =
      '-moz-hyperlinktext' | '-moz-visitedhyperlinktext' | '-webkit-activelink' \
      | '-webkit-focus-ring-color' | '-webkit-link' | '-webkit-text'"]
 
-and Non_standard_font =
+and _non_standard_font =
   [%value.rec
     "'-apple-system-body' | '-apple-system-headline' | \
      '-apple-system-subheadline' | '-apple-system-caption1' | \
@@ -83,95 +79,95 @@ and Non_standard_font =
      '-apple-system-short-subheadline' | '-apple-system-short-caption1' | \
      '-apple-system-short-footnote' | '-apple-system-tall-body'"]
 
-and Non_standard_image_rendering =
+and _non_standard_image_rendering =
   [%value.rec
     "'optimize-contrast' | '-moz-crisp-edges' | '-o-crisp-edges' | \
      '-webkit-optimize-contrast'"]
 
-and Non_standard_overflow =
+and _non_standard_overflow =
   [%value.rec
     "'-moz-scrollbars-none' | '-moz-scrollbars-horizontal' | \
      '-moz-scrollbars-vertical' | '-moz-hidden-unscrollable'"]
 
-and Non_standard_width =
+and _non_standard_width =
   [%value.rec
     "'min-intrinsic' | 'intrinsic' | '-moz-min-content' | '-moz-max-content' | \
      '-webkit-min-content' | '-webkit-max-content'"]
 
-and Webkit_gradient_color_stop =
+and _webkit_gradient_color_stop =
   [%value.rec
     "from( <color> ) | color-stop( [ <alpha-value> | <extended-percentage> ] \
      ',' <color> ) | to( <color> )"]
 
-and Webkit_gradient_point =
+and _webkit_gradient_point =
   [%value.rec
     "[ 'left' | 'center' | 'right' | <extended-length> | <extended-percentage> \
      ] [ 'top' | 'center' | 'bottom' | <extended-length> | \
      <extended-percentage> ]"]
 
-and Webkit_gradient_radius =
+and _webkit_gradient_radius =
   [%value.rec "<extended-length> | <extended-percentage>"]
 
-and Webkit_gradient_type = [%value.rec "'linear' | 'radial'"]
-and Webkit_mask_box_repeat = [%value.rec "'repeat' | 'stretch' | 'round'"]
+and _webkit_gradient_type = [%value.rec "'linear' | 'radial'"]
+and _webkit_mask_box_repeat = [%value.rec "'repeat' | 'stretch' | 'round'"]
 
-and Webkit_mask_clip_style =
+and _webkit_mask_clip_style =
   [%value.rec
     "'border' | 'border-box' | 'padding' | 'padding-box' | 'content' | \
      'content-box' | 'text'"]
 
-and Absolute_size =
+and absolute_size =
   [%value.rec
     "'xx-small' | 'x-small' | 'small' | 'medium' | 'large' | 'x-large' | \
      'xx-large' | 'xxx-large'"]
 
-and Age = [%value.rec "'child' | 'young' | 'old'"]
-and Alpha_value = [%value.rec "<number> | <extended-percentage>"]
-and Angular_color_hint = [%value.rec "<extended-angle> | <extended-percentage>"]
-and Angular_color_stop = [%value.rec "<color> && [ <color-stop-angle> ]?"]
+and age = [%value.rec "'child' | 'young' | 'old'"]
+and alpha_value = [%value.rec "<number> | <extended-percentage>"]
+and angular_color_hint = [%value.rec "<extended-angle> | <extended-percentage>"]
+and angular_color_stop = [%value.rec "<color> && [ <color-stop-angle> ]?"]
 
-and Angular_color_stop_list =
+and angular_color_stop_list =
   [%value.rec
     "[ <angular-color-stop> [ ',' <angular-color-hint> ]? ]# ',' \
      <angular-color-stop>"]
 
-and Animateable_feature =
+and animateable_feature =
   [%value.rec "'scroll-position' | 'contents' | <custom-ident>"]
 
-and Attachment = [%value.rec "'scroll' | 'fixed' | 'local'"]
-and Attr_fallback = [%value.rec "<any-value>"]
-and Attr_matcher = [%value.rec "[ '~' | '|' | '^' | '$' | '*' ]? '='"]
-and Attr_modifier = [%value.rec "'i' | 's'"]
+and attachment = [%value.rec "'scroll' | 'fixed' | 'local'"]
+and attr_fallback = [%value.rec "<any-value>"]
+and attr_matcher = [%value.rec "[ '~' | '|' | '^' | '$' | '*' ]? '='"]
+and attr_modifier = [%value.rec "'i' | 's'"]
 
-and Attribute_selector =
+and attribute_selector =
   [%value.rec
     "'[' <wq-name> ']' | '[' <wq-name> <attr-matcher> [ <string-token> | \
      <ident-token> ] [ <attr-modifier> ]? ']'"]
 
-and Auto_repeat =
+and auto_repeat =
   [%value.rec
     "repeat( [ 'auto-fill' | 'auto-fit' ] ',' [ [ <line-names> ]? <fixed-size> \
      ]+ [ <line-names> ]? )"]
 
-and Auto_track_list =
+and auto_track_list =
   [%value.rec
     "[ [ <line-names> ]? [ <fixed-size> | <fixed-repeat> ] ]* [ <line-names> \
      ]? <auto-repeat> [ [ <line-names> ]? [ <fixed-size> | <fixed-repeat> ] ]* \
      [ <line-names> ]?"]
 
-and Baseline_position = [%value.rec "[ 'first' | 'last' ]? 'baseline'"]
+and baseline_position = [%value.rec "[ 'first' | 'last' ]? 'baseline'"]
 
-and Basic_shape =
+and basic_shape =
   [%value.rec "<inset()> | <circle()> | <ellipse()> | <polygon()> | <path()>"]
 
-and Bg_image = [%value.rec "'none' | <image>"]
+and bg_image = [%value.rec "'none' | <image>"]
 
-and Bg_layer =
+and bg_layer =
   [%value.rec
     "<bg-image> || <bg-position> [ '/' <bg-size> ]? || <repeat-style> || \
      <attachment> || <box> || <box>"]
 
-and Bg_position =
+and bg_position =
   [%value.rec
     "[ 'left' | 'center' | 'right' | 'top' | 'bottom' | <length-percentage> ]\n\
     \  | [ 'left' | 'center' | 'right' | <length-percentage> ] [ 'top' | \
@@ -180,149 +176,149 @@ and Bg_position =
      'center' | [ 'top' | 'bottom' ] <length-percentage>? ]"]
 
 (* one_bg_size isn't part of the spec, helps us with Type generation *)
-and One_bg_size =
+and one_bg_size =
   [%value.rec
     "[ <extended-length> | <extended-percentage> | 'auto' ] [ \
      <extended-length> | <extended-percentage> | 'auto' ]?"]
 
-and Bg_size = [%value.rec "<one-bg-size> | 'cover' | 'contain'"]
+and bg_size = [%value.rec "<one-bg-size> | 'cover' | 'contain'"]
 
-and Blend_mode =
+and blend_mode =
   [%value.rec
     "'normal' | 'multiply' | 'screen' | 'overlay' | 'darken' | 'lighten' | \
      'color-dodge' | 'color-burn' | 'hard-light' | 'soft-light' | 'difference' \
      | 'exclusion' | 'hue' | 'saturation' | 'color' | 'luminosity'"]
 
 (* and border_radius = [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"] *)
-and Border_radius = [%value.rec "<extended-length> | <extended-percentage>"]
-and Bottom = [%value.rec "<extended-length> | 'auto'"]
-and Box = [%value.rec "'border-box' | 'padding-box' | 'content-box'"]
+and border_radius = [%value.rec "<extended-length> | <extended-percentage>"]
+and bottom = [%value.rec "<extended-length> | 'auto'"]
+and box = [%value.rec "'border-box' | 'padding-box' | 'content-box'"]
 
-and Calc_product =
+and calc_product =
   [%value.rec "<calc-value> [ '*' <calc-value> | '/' <number> ]*"]
 
-and Dimension =
+and dimension =
   [%value.rec
     "<extended-length> | <extended-time> | <extended-frequency> | <resolution>"]
 
-and Calc_sum = [%value.rec "<calc-product> [ [ '+' | '-' ] <calc-product> ]*"]
+and calc_sum = [%value.rec "<calc-product> [ [ '+' | '-' ] <calc-product> ]*"]
 
 (* and calc_value = [%value.rec "<number> | <dimension> | <extended-percentage> | <calc>"] *)
-and Calc_value =
+and calc_value =
   [%value.rec
     "<number> | <extended-length> | <extended-percentage> | <extended-angle> | \
      <extended-time> | '(' <calc-sum> ')'"]
 
-and Cf_final_image = [%value.rec "<image> | <color>"]
-and Cf_mixing_image = [%value.rec "[ <extended-percentage> ]? && <image>"]
-and Class_selector = [%value.rec "'.' <ident-token>"]
-and Clip_source = [%value.rec "<url>"]
+and cf_final_image = [%value.rec "<image> | <color>"]
+and cf_mixing_image = [%value.rec "[ <extended-percentage> ]? && <image>"]
+and class_selector = [%value.rec "'.' <ident-token>"]
+and clip_source = [%value.rec "<url>"]
 
-and Color =
+and color =
   [%value.rec
     "<rgb()> | <rgba()> | <hsl()> | <hsla()> | <hex-color> | <named-color> | \
      'currentColor' | <deprecated-system-color> | <interpolation> | <var()> | \
      <color-mix()>"]
 
-and Color_stop = [%value.rec "<color-stop-length> | <color-stop-angle>"]
-and Color_stop_angle = [%value.rec "[ <extended-angle> ]{1,2}"]
+and color_stop = [%value.rec "<color-stop-length> | <color-stop-angle>"]
+and color_stop_angle = [%value.rec "[ <extended-angle> ]{1,2}"]
 
 (* and color_stop_length = [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"] *)
-and Color_stop_length = [%value.rec "<extended-length> | <extended-percentage>"]
+and color_stop_length = [%value.rec "<extended-length> | <extended-percentage>"]
 
 (* color_stop_list is modified from the original spec, here is a simplified version where it tries to be fully compatible but easier for code-gen:
 
-   The current impl allows values that aren't really supported such as: `linear-gradient(0deg, 10%, blue)` which is invalid, but we allow it for now to make it easier to generate the types. The correct value would require always a color to be in the first position `linear-gradient(0deg, red, 10%, blue),`
+   The current impl allows values that aren't really supported such as: `linear-gradient(0deg, 10%, blue)` which is invalid, but we allow it for now to make it easier to generate the types. The correct value would require always a color to be in the first position `linear-gradient(0deg, red, 10%, blue);`
 
    The original spec is `color_stop_list = [%value.rec "[ <linear-color-stop> [ ',' <linear-color-hint> ]? ]# ',' <linear-color-stop>"]`
    *)
-and Color_stop_list =
+and color_stop_list =
   [%value.rec
     "[ [<color>? <length-percentage>] | [<color> <length-percentage>?] ]#"]
 
-and Hue_interpolation_method =
+and hue_interpolation_method =
   [%value.rec
     " [ 'shorter' | 'longer' | 'increasing' | 'decreasing' ] && 'hue' "]
 
-and Polar_color_space = [%value.rec " 'hsl' | 'hwb' | 'lch' | 'oklch' "]
+and polar_color_space = [%value.rec " 'hsl' | 'hwb' | 'lch' | 'oklch' "]
 
-and Rectangular_color_space =
+and rectangular_color_space =
   [%value.rec
     " 'srgb' | 'srgb-linear' | 'display-p3' | 'a98-rgb' | 'prophoto-rgb' | \
      'rec2020' | 'lab' | 'oklab' | 'xyz' | 'xyz-d50' | 'xyz-d65' "]
 
-and Color_interpolation_method =
+and color_interpolation_method =
   [%value.rec
     " 'in' && [<rectangular-color-space> | <polar-color-space> \
      <hue-interpolation-method>?] "]
 
-and Function_color_mix =
+and function_color_mix =
   [%value.rec
     (* TODO: Use <extended-percentage> *)
     "color-mix(<color-interpolation-method> ',' [ <color> && <percentage>? ] \
      ',' [ <color> && <percentage>? ])"]
 
-and Combinator = [%value.rec "'>' | '+' | '~' | '||'"]
+and combinator = [%value.rec "'>' | '+' | '~' | '||'"]
 
-and Common_lig_values =
+and common_lig_values =
   [%value.rec "'common-ligatures' | 'no-common-ligatures'"]
 
-and Compat_auto =
+and compat_auto =
   [%value.rec
     "'searchfield' | 'textarea' | 'push-button' | 'slider-horizontal' | \
      'checkbox' | 'radio' | 'square-button' | 'menulist' | 'listbox' | 'meter' \
      | 'progress-bar'"]
 
-and Complex_selector =
+and complex_selector =
   [%value.rec "<compound-selector> [ [ <combinator> ]? <compound-selector> ]*"]
 
-and Complex_selector_list = [%value.rec "[ <complex-selector> ]#"]
+and complex_selector_list = [%value.rec "[ <complex-selector> ]#"]
 
-and Composite_style =
+and composite_style =
   [%value.rec
     "'clear' | 'copy' | 'source-over' | 'source-in' | 'source-out' | \
      'source-atop' | 'destination-over' | 'destination-in' | 'destination-out' \
      | 'destination-atop' | 'xor'"]
 
-and Compositing_operator =
+and compositing_operator =
   [%value.rec "'add' | 'subtract' | 'intersect' | 'exclude'"]
 
-and Compound_selector =
+and compound_selector =
   [%value.rec
     "[ <type-selector> ]? [ <subclass-selector> ]* [ <pseudo-element-selector> \
      [ <pseudo-class-selector> ]* ]*"]
 
-and Compound_selector_list = [%value.rec "[ <compound-selector> ]#"]
+and compound_selector_list = [%value.rec "[ <compound-selector> ]#"]
 
-and Content_distribution =
+and content_distribution =
   [%value.rec "'space-between' | 'space-around' | 'space-evenly' | 'stretch'"]
 
-and Content_list =
+and content_list =
   [%value.rec
     "[ <string> | 'contents' | <url> | <quote> | <attr()> | counter( <ident> \
      ',' [ <'list-style-type'> ]? ) ]+"]
 
-and Content_position =
+and content_position =
   [%value.rec "'center' | 'start' | 'end' | 'flex-start' | 'flex-end'"]
 
-and Content_replacement = [%value.rec "<image>"]
-and Contextual_alt_values = [%value.rec "'contextual' | 'no-contextual'"]
-and Counter_style = [%value.rec "<counter-style-name> | <symbols()>"]
-and Counter_style_name = [%value.rec "<custom-ident>"]
-and Counter_name = [%value.rec "<custom-ident>"]
+and content_replacement = [%value.rec "<image>"]
+and contextual_alt_values = [%value.rec "'contextual' | 'no-contextual'"]
+and counter_style = [%value.rec "<counter-style-name> | <symbols()>"]
+and counter_style_name = [%value.rec "<custom-ident>"]
+and counter_name = [%value.rec "<custom-ident>"]
 
-and Cubic_bezier_timing_function =
+and cubic_bezier_timing_function =
   [%value.rec
     "'ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | cubic-bezier( <number> \
      ',' <number> ',' <number> ',' <number> )"]
 
-and Declaration =
+and declaration =
   [%value.rec "<ident-token> ':' [ <declaration-value> ]? [ '!' 'important' ]?"]
 
-and Declaration_list =
+and declaration_list =
   [%value.rec "[ [ <declaration> ]? ';' ]* [ <declaration> ]?"]
 
-and Deprecated_system_color =
+and deprecated_system_color =
   [%value.rec
     "'ActiveBorder' | 'ActiveCaption' | 'AppWorkspace' | 'Background' | \
      'ButtonFace' | 'ButtonHighlight' | 'ButtonShadow' | 'ButtonText' | \
@@ -333,98 +329,98 @@ and Deprecated_system_color =
      'ThreeDLightShadow' | 'ThreeDShadow' | 'Window' | 'WindowFrame' | \
      'WindowText'"]
 
-and Discretionary_lig_values =
+and discretionary_lig_values =
   [%value.rec "'discretionary-ligatures' | 'no-discretionary-ligatures'"]
 
-and Display_box = [%value.rec "'contents' | 'none'"]
+and display_box = [%value.rec "'contents' | 'none'"]
 
-and Display_inside =
+and display_inside =
   [%value.rec "'flow' | 'flow-root' | 'table' | 'flex' | 'grid' | 'ruby'"]
 
-and Display_internal =
+and display_internal =
   [%value.rec
     "'table-row-group' | 'table-header-group' | 'table-footer-group' | \
      'table-row' | 'table-cell' | 'table-column-group' | 'table-column' | \
      'table-caption' | 'ruby-base' | 'ruby-text' | 'ruby-base-container' | \
      'ruby-text-container'"]
 
-and Display_legacy =
+and display_legacy =
   [%value.rec
     "'inline-block' | 'inline-list-item' | 'inline-table' | 'inline-flex' | \
      'inline-grid'"]
 
-and Display_listitem =
+and display_listitem =
   [%value.rec
     "[ <display-outside> ]? && [ 'flow' | 'flow-root' ]? && 'list-item'"]
 
-and Display_outside = [%value.rec "'block' | 'inline' | 'run-in'"]
+and display_outside = [%value.rec "'block' | 'inline' | 'run-in'"]
 
-and East_asian_variant_values =
+and east_asian_variant_values =
   [%value.rec
     "'jis78' | 'jis83' | 'jis90' | 'jis04' | 'simplified' | 'traditional'"]
 
-and East_asian_width_values = [%value.rec "'full-width' | 'proportional-width'"]
-and Ending_shape = [%value.rec "'circle' | 'ellipse'"]
+and east_asian_width_values = [%value.rec "'full-width' | 'proportional-width'"]
+and ending_shape = [%value.rec "'circle' | 'ellipse'"]
 
-and Explicit_track_list =
+and explicit_track_list =
   [%value.rec "[ [ <line-names> ]? <track-size> ]+ [ <line-names> ]?"]
 
-and Family_name = [%value.rec "<string> | <custom-ident>"]
-and Feature_tag_value = [%value.rec "<string> [ <integer> | 'on' | 'off' ]?"]
+and family_name = [%value.rec "<string> | <custom-ident>"]
+and feature_tag_value = [%value.rec "<string> [ <integer> | 'on' | 'off' ]?"]
 
-and Feature_type =
+and feature_type =
   [%value.rec
     "'@stylistic' | '@historical-forms' | '@styleset' | '@character-variant' | \
      '@swash' | '@ornaments' | '@annotation'"]
 
-and Feature_value_block =
+and feature_value_block =
   [%value.rec "<feature-type> '{' <feature-value-declaration-list> '}'"]
 
-and Feature_value_block_list = [%value.rec "[ <feature-value-block> ]+"]
+and feature_value_block_list = [%value.rec "[ <feature-value-block> ]+"]
 
-and Feature_value_declaration =
+and feature_value_declaration =
   [%value.rec "<custom-ident> ':' [ <integer> ]+ ';'"]
 
-and Feature_value_declaration_list = [%value.rec "<feature-value-declaration>"]
-and Feature_value_name = [%value.rec "<custom-ident>"]
-and Fill_rule = [%value.rec "'nonzero' | 'evenodd'"]
+and feature_value_declaration_list = [%value.rec "<feature-value-declaration>"]
+and feature_value_name = [%value.rec "<custom-ident>"]
+and fill_rule = [%value.rec "'nonzero' | 'evenodd'"]
 
-and Filter_function =
+and filter_function =
   [%value.rec
     "<blur()> | <brightness()> | <contrast()> | <drop-shadow()> | \
      <grayscale()> | <hue-rotate()> | <invert()> | <opacity()> | <saturate()> \
      | <sepia()>"]
 
-and Filter_function_list = [%value.rec "[ <filter-function> | <url> ]+"]
+and filter_function_list = [%value.rec "[ <filter-function> | <url> ]+"]
 
-and Final_bg_layer =
+and final_bg_layer =
   [%value.rec
     "<'background-color'> || <bg-image> || <bg-position> [ '/' <bg-size> ]? || \
      <repeat-style> || <attachment> || <box> || <box>"]
 
-and Line_names = [%value.rec "'[' <custom-ident>* ']'"]
-and Fixed_breadth = [%value.rec "<extended-length> | <extended-percentage>"]
+and line_names = [%value.rec "'[' <custom-ident>* ']'"]
+and fixed_breadth = [%value.rec "<extended-length> | <extended-percentage>"]
 
-and Fixed_repeat =
+and fixed_repeat =
   [%value.rec
     "repeat( <positive-integer> ',' [ [ <line-names> ]? <fixed-size> ]+ [ \
      <line-names> ]? )"]
 
-and Fixed_size =
+and fixed_size =
   [%value.rec
     "<fixed-breadth> | minmax( <fixed-breadth> ',' <track-breadth> ) | minmax( \
      <inflexible-breadth> ',' <fixed-breadth> )"]
 
-and Font_stretch_absolute =
+and font_stretch_absolute =
   [%value.rec
     "'normal' | 'ultra-condensed' | 'extra-condensed' | 'condensed' | \
      'semi-condensed' | 'semi-expanded' | 'expanded' | 'extra-expanded' | \
      'ultra-expanded' | <extended-percentage>"]
 
-and Font_variant_css21 = [%value.rec "'normal' | 'small-caps'"]
-and Font_weight_absolute = [%value.rec "'normal' | 'bold' | <integer>"]
+and font_variant_css21 = [%value.rec "'normal' | 'small-caps'"]
+and font_weight_absolute = [%value.rec "'normal' | 'bold' | <integer>"]
 
-and Function__webkit_gradient =
+and function__webkit_gradient =
   [%value.rec
     "-webkit-gradient( <-webkit-gradient-type> ',' <-webkit-gradient-point> [ \
      ',' <-webkit-gradient-point> | ',' <-webkit-gradient-radius> ',' \
@@ -432,131 +428,131 @@ and Function__webkit_gradient =
      <-webkit-gradient-color-stop> ]* )"]
 
 (* We don't support attr() with fallback value (since it's a declaration value) yet, original spec is: "attr(<attr-name> <attr-type>? , <declaration-value>?)" *)
-and Function_attr = [%value.rec "attr(<attr-name> <attr-type>?)"]
+and function_attr = [%value.rec "attr(<attr-name> <attr-type>?)"]
 
 (* and function_attr = [%value.rec
      "attr(<attr-name> <attr-type>? , <declaration-value>?)"
    ] *)
-and Function_blur = [%value.rec "blur( <extended-length> )"]
-and Function_brightness = [%value.rec "brightness( <number-percentage> )"]
-and Function_calc = [%value.rec "calc( <calc-sum> )"]
+and function_blur = [%value.rec "blur( <extended-length> )"]
+and function_brightness = [%value.rec "brightness( <number-percentage> )"]
+and function_calc = [%value.rec "calc( <calc-sum> )"]
 
-and Function_circle =
+and function_circle =
   [%value.rec "circle( [ <shape-radius> ]? [ 'at' <position> ]? )"]
 
-and Function_clamp = [%value.rec "clamp( [ <calc-sum> ]#{3} )"]
+and function_clamp = [%value.rec "clamp( [ <calc-sum> ]#{3} )"]
 
-and Function_conic_gradient =
+and function_conic_gradient =
   [%value.rec
     "conic-gradient( [ 'from' <extended-angle> ]? [ 'at' <position> ]? ',' \
      <angular-color-stop-list> )"]
 
-and Function_contrast = [%value.rec "contrast( <number-percentage> )"]
+and function_contrast = [%value.rec "contrast( <number-percentage> )"]
 
-and Function_counter =
+and function_counter =
   [%value.rec "counter( <counter-name> , <counter-style>? )"]
 
-and Function_counters =
+and function_counters =
   [%value.rec
     "counters( <custom-ident> ',' <string> ',' [ <counter-style> ]? )"]
 
-and Function_cross_fade =
+and function_cross_fade =
   [%value.rec "cross-fade( <cf-mixing-image> ',' [ <cf-final-image> ]? )"]
 
 (* drop-shadow can have 2 length and order doesn't matter, we changed to be more restrict and always expect 3 *)
-and Function_drop_shadow =
+and function_drop_shadow =
   [%value.rec
     "drop-shadow(<extended-length> <extended-length> <extended-length> [ \
      <color> ]?)"]
 
-and Function_element = [%value.rec "element( <id-selector> )"]
+and function_element = [%value.rec "element( <id-selector> )"]
 
-and Function_ellipse =
+and function_ellipse =
   [%value.rec "ellipse( [ [ <shape-radius> ]{2} ]? [ 'at' <position> ]? )"]
 
-and Function_env =
+and function_env =
   [%value.rec "env( <custom-ident> ',' [ <declaration-value> ]? )"]
 
-and Function_fit_content =
+and function_fit_content =
   [%value.rec "fit-content( <extended-length> | <extended-percentage> )"]
 
-and Function_grayscale = [%value.rec "grayscale( <number-percentage> )"]
+and function_grayscale = [%value.rec "grayscale( <number-percentage> )"]
 
-and Function_hsl =
+and function_hsl =
   [%value.rec
     " hsl( <hue> <extended-percentage> <extended-percentage> [ '/' \
      <alpha-value> ]? )\n\
     \  | hsl( <hue> ',' <extended-percentage> ',' <extended-percentage> [ ',' \
      <alpha-value> ]? )"]
 
-and Function_hsla =
+and function_hsla =
   [%value.rec
     " hsla( <hue> <extended-percentage> <extended-percentage> [ '/' \
      <alpha-value> ]? )\n\
     \  | hsla( <hue> ',' <extended-percentage> ',' <extended-percentage> ',' [ \
      <alpha-value> ]? )"]
 
-and Function_hue_rotate = [%value.rec "hue-rotate( <extended-angle> )"]
+and function_hue_rotate = [%value.rec "hue-rotate( <extended-angle> )"]
 
-and Function_image =
+and function_image =
   [%value.rec "image( [ <image-tags> ]? [ <image-src> ]? ',' [ <color> ]? )"]
 
-and Function_image_set = [%value.rec "image-set( [ <image-set-option> ]# )"]
+and function_image_set = [%value.rec "image-set( [ <image-set-option> ]# )"]
 
-and Function_inset =
+and function_inset =
   [%value.rec
     "inset( [ <extended-length> | <extended-percentage> ]{1,4} [ 'round' \
      <'border-radius'> ]? )"]
 
-and Function_invert = [%value.rec "invert( <number-percentage> )"]
-and Function_leader = [%value.rec "leader( <leader-type> )"]
+and function_invert = [%value.rec "invert( <number-percentage> )"]
+and function_leader = [%value.rec "leader( <leader-type> )"]
 
-and Function_linear_gradient =
+and function_linear_gradient =
   [%value.rec
     "linear-gradient( [ [<extended-angle> ','] | ['to' <side-or-corner> ','] \
      ]? <color-stop-list> )"]
 
 (* and function_linear_gradient = [%value.rec "linear-gradient( [ <extended-angle> | 'to' <side-or-corner> ]? ',' <color-stop-list> )"] *)
-and Function_matrix = [%value.rec "matrix( [ <number> ]#{6} )"]
-and Function_matrix3d = [%value.rec "matrix3d( [ <number> ]#{16} )"]
-and Function_max = [%value.rec "max( [ <calc-sum> ]# )"]
-and Function_min = [%value.rec "min( [ <calc-sum> ]# )"]
+and function_matrix = [%value.rec "matrix( [ <number> ]#{6} )"]
+and function_matrix3d = [%value.rec "matrix3d( [ <number> ]#{16} )"]
+and function_max = [%value.rec "max( [ <calc-sum> ]# )"]
+and function_min = [%value.rec "min( [ <calc-sum> ]# )"]
 
-and Function_minmax =
+and function_minmax =
   [%value.rec
     "minmax( [ <extended-length> | <extended-percentage> | 'min-content' | \
      'max-content' | 'auto' ] ',' [ <extended-length> | <extended-percentage> \
      | <flex-value> | 'min-content' | 'max-content' | 'auto' ] )"]
 
-and Function_opacity = [%value.rec "opacity( <number-percentage> )"]
+and function_opacity = [%value.rec "opacity( <number-percentage> )"]
 
-and Function_paint =
+and function_paint =
   [%value.rec "paint( <ident> ',' [ <declaration-value> ]? )"]
 
-and Function_path = [%value.rec "path( <string> )"]
-and Function_perspective = [%value.rec "perspective( <property-perspective> )"]
+and function_path = [%value.rec "path( <string> )"]
+and function_perspective = [%value.rec "perspective( <property-perspective> )"]
 
-and Function_polygon =
+and function_polygon =
   [%value.rec
     "polygon( [ <fill-rule> ',' ]? [ <length-percentage> <length-percentage> \
      ]# )"]
 
-and Function_radial_gradient =
+and function_radial_gradient =
   [%value.rec
     "radial-gradient( <ending-shape>? <radial-size>? ['at' <position> ]? ','? \
      <color-stop-list> )"]
 
-and Function_repeating_linear_gradient =
+and function_repeating_linear_gradient =
   [%value.rec
     "repeating-linear-gradient( [ <extended-angle> | 'to' <side-or-corner> ]? \
      ',' <color-stop-list> )"]
 
-and Function_repeating_radial_gradient =
+and function_repeating_radial_gradient =
   [%value.rec
     "repeating-radial-gradient( [ <ending-shape> || <size> ]? [ 'at' \
      <position> ]? ',' <color-stop-list> )"]
 
-and Function_rgb =
+and function_rgb =
   [%value.rec
     "\n\
     \    rgb( [ <extended-percentage> ]{3} [ '/' <alpha-value> ]? )\n\
@@ -564,7 +560,7 @@ and Function_rgb =
     \  | rgb( [ <extended-percentage> ]#{3} [ ',' <alpha-value> ]? )\n\
     \  | rgb( [ <number> ]#{3} [ ',' <alpha-value> ]? )\n"]
 
-and Function_rgba =
+and function_rgba =
   [%value.rec
     "\n\
     \    rgba( [ <extended-percentage> ]{3} [ '/' <alpha-value> ]? )\n\
@@ -572,227 +568,227 @@ and Function_rgba =
     \  | rgba( [ <extended-percentage> ]#{3} [ ',' <alpha-value> ]? )\n\
     \  | rgba( [ <number> ]#{3} [ ',' <alpha-value> ]? )\n"]
 
-and Function_rotate = [%value.rec "rotate( <extended-angle> | <zero> )"]
+and function_rotate = [%value.rec "rotate( <extended-angle> | <zero> )"]
 
-and Function_rotate3d =
+and function_rotate3d =
   [%value.rec
     "rotate3d( <number> ',' <number> ',' <number> ',' [ <extended-angle> | \
      <zero> ] )"]
 
-and Function_rotateX = [%value.rec "rotateX( <extended-angle> | <zero> )"]
-and Function_rotateY = [%value.rec "rotateY( <extended-angle> | <zero> )"]
-and Function_rotateZ = [%value.rec "rotateZ( <extended-angle> | <zero> )"]
-and Function_saturate = [%value.rec "saturate( <number-percentage> )"]
-and Function_scale = [%value.rec "scale( <number> [',' [ <number> ]]? )"]
+and function_rotateX = [%value.rec "rotateX( <extended-angle> | <zero> )"]
+and function_rotateY = [%value.rec "rotateY( <extended-angle> | <zero> )"]
+and function_rotateZ = [%value.rec "rotateZ( <extended-angle> | <zero> )"]
+and function_saturate = [%value.rec "saturate( <number-percentage> )"]
+and function_scale = [%value.rec "scale( <number> [',' [ <number> ]]? )"]
 
-and Function_scale3d =
+and function_scale3d =
   [%value.rec "scale3d( <number> ',' <number> ',' <number> )"]
 
-and Function_scaleX = [%value.rec "scaleX( <number> )"]
-and Function_scaleY = [%value.rec "scaleY( <number> )"]
-and Function_scaleZ = [%value.rec "scaleZ( <number> )"]
-and Function_sepia = [%value.rec "sepia( <number-percentage> )"]
+and function_scaleX = [%value.rec "scaleX( <number> )"]
+and function_scaleY = [%value.rec "scaleY( <number> )"]
+and function_scaleZ = [%value.rec "scaleZ( <number> )"]
+and function_sepia = [%value.rec "sepia( <number-percentage> )"]
 
-and Function_skew =
+and function_skew =
   [%value.rec
     "skew( [ <extended-angle> | <zero> ] [',' [ <extended-angle> | <zero> ]]? )"]
 
-and Function_skewX = [%value.rec "skewX( <extended-angle> | <zero> )"]
-and Function_skewY = [%value.rec "skewY( <extended-angle> | <zero> )"]
+and function_skewX = [%value.rec "skewX( <extended-angle> | <zero> )"]
+and function_skewY = [%value.rec "skewY( <extended-angle> | <zero> )"]
 
-and Function_symbols =
+and function_symbols =
   [%value.rec "symbols( [ <symbols-type> ]? [ <string> | <image> ]+ )"]
 
-and Function_target_counter =
+and function_target_counter =
   [%value.rec
     "target-counter( [ <string> | <url> ] ',' <custom-ident> ',' [ \
      <counter-style> ]? )"]
 
-and Function_target_counters =
+and function_target_counters =
   [%value.rec
     "target-counters( [ <string> | <url> ] ',' <custom-ident> ',' <string> ',' \
      [ <counter-style> ]? )"]
 
-and Function_target_text =
+and function_target_text =
   [%value.rec
     "target-text( [ <string> | <url> ] ',' [ 'content' | 'before' | 'after' | \
      'first-letter' ]? )"]
 
-and Function_translate =
+and function_translate =
   [%value.rec
     "translate( [<extended-length> | <extended-percentage>] [',' [ \
      <extended-length> | <extended-percentage> ]]? )"]
 
-and Function_translate3d =
+and function_translate3d =
   [%value.rec
     "translate3d( [<extended-length> | <extended-percentage>] ',' \
      [<extended-length> | <extended-percentage>] ',' <extended-length> )"]
 
-and Function_translateX =
+and function_translateX =
   [%value.rec "translateX( [<extended-length> | <extended-percentage>] )"]
 
-and Function_translateY =
+and function_translateY =
   [%value.rec "translateY( [<extended-length> | <extended-percentage>] )"]
 
-and Function_translateZ = [%value.rec "translateZ( <extended-length> )"]
+and function_translateZ = [%value.rec "translateZ( <extended-length> )"]
 
 (* and function_var = [%value.rec "var( <ident> ',' [ <declaration-value> ]? )"] *)
-and Function_var = [%value.rec "var( <ident> )"]
-and Gender = [%value.rec "'male' | 'female' | 'neutral'"]
+and function_var = [%value.rec "var( <ident> )"]
+and gender = [%value.rec "'male' | 'female' | 'neutral'"]
 
-and General_enclosed =
+and general_enclosed =
   [%value.rec "<function-token> <any-value> ')' | '(' <ident> <any-value> ')'"]
 
-and Generic_family =
+and generic_family =
   [%value.rec
     "'serif' | 'sans-serif' | 'cursive' | 'fantasy' | 'monospace' | \
      '-apple-system'"]
 
-and Generic_name =
+and generic_name =
   [%value.rec "'serif' | 'sans-serif' | 'cursive' | 'fantasy' | 'monospace'"]
 
-and Generic_voice = [%value.rec "[ <age> ]? <gender> [ <integer> ]?"]
+and generic_voice = [%value.rec "[ <age> ]? <gender> [ <integer> ]?"]
 
-and Geometry_box =
+and geometry_box =
   [%value.rec "<shape-box> | 'fill-box' | 'stroke-box' | 'view-box'"]
 
-and Gradient =
+and gradient =
   [%value.rec
     "<linear-gradient()> | <repeating-linear-gradient()> | <radial-gradient()> \
      | <repeating-radial-gradient()> | <conic-gradient()> | <-legacy-gradient>"]
 
-and Grid_line =
+and grid_line =
   [%value.rec
     "<custom-ident-without-span-or-auto> | <integer> && [ \
      <custom-ident-without-span-or-auto> ]? | 'span' && [ <integer> || \
      <custom-ident-without-span-or-auto> ] | 'auto' | <interpolation>"]
 
-and Historical_lig_values =
+and historical_lig_values =
   [%value.rec "'historical-ligatures' | 'no-historical-ligatures'"]
 
-and Hue = [%value.rec "<number> | <extended-angle>"]
-and Id_selector = [%value.rec "<hash-token>"]
+and hue = [%value.rec "<number> | <extended-angle>"]
+and id_selector = [%value.rec "<hash-token>"]
 
-and Image =
+and image =
   [%value.rec
     "<url> | <image()> | <image-set()> | <element()> | <paint()> | \
      <cross-fade()> | <gradient> | <interpolation>"]
 
-and Image_set_option = [%value.rec "[ <image> | <string> ] <resolution>"]
-and Image_src = [%value.rec "<url> | <string>"]
-and Image_tags = [%value.rec "'ltr' | 'rtl'"]
+and image_set_option = [%value.rec "[ <image> | <string> ] <resolution>"]
+and image_src = [%value.rec "<url> | <string>"]
+and image_tags = [%value.rec "'ltr' | 'rtl'"]
 
-and Inflexible_breadth =
+and inflexible_breadth =
   [%value.rec
     "<extended-length> | <extended-percentage> | 'min-content' | 'max-content' \
      | 'auto'"]
 
-and Keyframe_block =
+and keyframe_block =
   [%value.rec "[ <keyframe-selector> ]# '{' <declaration-list> '}'"]
 
-and Keyframe_block_list = [%value.rec "[ <keyframe-block> ]+"]
-and Keyframe_selector = [%value.rec "'from' | 'to' | <extended-percentage>"]
-and Keyframes_name = [%value.rec "<custom-ident> | <string>"]
-and Leader_type = [%value.rec "'dotted' | 'solid' | 'space' | <string>"]
-and Left = [%value.rec "<extended-length> | 'auto'"]
-and Line_name_list = [%value.rec "[ <line-names> | <name-repeat> ]+"]
+and keyframe_block_list = [%value.rec "[ <keyframe-block> ]+"]
+and keyframe_selector = [%value.rec "'from' | 'to' | <extended-percentage>"]
+and keyframes_name = [%value.rec "<custom-ident> | <string>"]
+and leader_type = [%value.rec "'dotted' | 'solid' | 'space' | <string>"]
+and left = [%value.rec "<extended-length> | 'auto'"]
+and line_name_list = [%value.rec "[ <line-names> | <name-repeat> ]+"]
 
-and Line_style =
+and line_style =
   [%value.rec
     "'none' | 'hidden' | 'dotted' | 'dashed' | 'solid' | 'double' | 'groove' | \
      'ridge' | 'inset' | 'outset'"]
 
-and Line_width = [%value.rec "<extended-length> | 'thin' | 'medium' | 'thick'"]
-and Linear_color_hint = [%value.rec "<extended-length> | <extended-percentage>"]
-and Linear_color_stop = [%value.rec "<color> <length-percentage>?"]
-and Mask_image = [%value.rec "[ <mask-reference> ]#"]
+and line_width = [%value.rec "<extended-length> | 'thin' | 'medium' | 'thick'"]
+and linear_color_hint = [%value.rec "<extended-length> | <extended-percentage>"]
+and linear_color_stop = [%value.rec "<color> <length-percentage>?"]
+and mask_image = [%value.rec "[ <mask-reference> ]#"]
 
-and Mask_layer =
+and mask_layer =
   [%value.rec
     "<mask-reference> || <position> [ '/' <bg-size> ]? || <repeat-style> || \
      <geometry-box> || [ <geometry-box> | 'no-clip' ] || \
      <compositing-operator> || <masking-mode>"]
 
-and Mask_position =
+and mask_position =
   [%value.rec
     "[ <extended-length> | <extended-percentage> | 'left' | 'center' | 'right' \
      ] [ <extended-length> | <extended-percentage> | 'top' | 'center' | \
      'bottom' ]?"]
 
-and Mask_reference = [%value.rec "'none' | <image> | <mask-source>"]
-and Mask_source = [%value.rec "<url>"]
-and Masking_mode = [%value.rec "'alpha' | 'luminance' | 'match-source'"]
-and Mf_comparison = [%value.rec "<mf-lt> | <mf-gt> | <mf-eq>"]
-and Mf_eq = [%value.rec "'='"]
-and Mf_gt = [%value.rec "'>=' | '>'"]
-and Mf_lt = [%value.rec "'<=' | '<'"]
+and mask_reference = [%value.rec "'none' | <image> | <mask-source>"]
+and mask_source = [%value.rec "<url>"]
+and masking_mode = [%value.rec "'alpha' | 'luminance' | 'match-source'"]
+and mf_comparison = [%value.rec "<mf-lt> | <mf-gt> | <mf-eq>"]
+and mf_eq = [%value.rec "'='"]
+and mf_gt = [%value.rec "'>=' | '>'"]
+and mf_lt = [%value.rec "'<=' | '<'"]
 
-and Mf_value =
+and mf_value =
   [%value.rec "<number> | <dimension> | <ident> | <ratio> | <interpolation>"]
 
-and Mf_name = [%value.rec "<ident>"]
+and mf_name = [%value.rec "<ident>"]
 
-and Mf_range =
+and mf_range =
   [%value.rec
     "<mf-name> <mf-comparison> <mf-value> | <mf-value> <mf-comparison> \
      <mf-name> | <mf-value> <mf-lt> <mf-name> <mf-lt> <mf-value> | <mf-value> \
      <mf-gt> <mf-name> <mf-gt> <mf-value>"]
 
-and Mf_boolean = [%value.rec "<mf-name>"]
-and Mf_plain = [%value.rec "<mf-name> ':' <mf-value>"]
+and mf_boolean = [%value.rec "<mf-name>"]
+and mf_plain = [%value.rec "<mf-name> ':' <mf-value>"]
 
-and Media_feature =
+and media_feature =
   [%value.rec "'(' [ <mf-plain> | <mf-boolean> | <mf-range> ] ')'"]
 
-and Media_in_parens =
+and media_in_parens =
   [%value.rec "'(' <media-condition> ')' | <media-feature> | <interpolation>"]
 
-and Media_or = [%value.rec "'or' <media-in-parens>"]
-and Media_and = [%value.rec "'and' <media-in-parens>"]
-and Media_not = [%value.rec "'not' <media-in-parens>"]
+and media_or = [%value.rec "'or' <media-in-parens>"]
+and media_and = [%value.rec "'and' <media-in-parens>"]
+and media_not = [%value.rec "'not' <media-in-parens>"]
 
-and Media_condition_without_or =
+and media_condition_without_or =
   [%value.rec "<media-not> | <media-in-parens> <media-and>*"]
 
-and Media_condition =
+and media_condition =
   [%value.rec "<media-not> | <media-in-parens> [ <media-and>* | <media-or>* ]"]
 
-and Media_query =
+and media_query =
   [%value.rec
     "<media-condition> | [ 'not' | 'only' ]? <media-type> [ 'and' \
      <media-condition-without-or> ]?"]
 
-and Media_query_list = [%value.rec "[ <media-query> ]# | <interpolation>"]
-and Container_condition_list = [%value.rec "<container-condition>#"]
-and Container_condition = [%value.rec "[ <container-name> ]? <container-query>"]
+and media_query_list = [%value.rec "[ <media-query> ]# | <interpolation>"]
+and container_condition_list = [%value.rec "<container-condition>#"]
+and container_condition = [%value.rec "[ <container-name> ]? <container-query>"]
 
-and Container_query =
+and container_query =
   [%value.rec
     "'not' <query-in-parens> | <query-in-parens> [ [ 'and' <query-in-parens> \
      ]* | [ 'or' <query-in-parens> ]* ]"]
 
-and Query_in_parens =
+and query_in_parens =
   [%value.rec
     "'(' <container-query> ')' | '(' <size-feature> ')' | style( <style-query> \
      )"]
 
-and Size_feature = [%value.rec "<mf-plain> | <mf-boolean> | <mf-range>"]
+and size_feature = [%value.rec "<mf-plain> | <mf-boolean> | <mf-range>"]
 
-and Style_query =
+and style_query =
   [%value.rec
     "'not' <style-in-parens> | <style-in-parens> [ [ and <style-in-parens> ]* \
      | [ or <style-in-parens> ]* ] | <style-feature>"]
 
-and Style_feature = [%value.rec "<dashed_ident> ':' <mf-value>"]
+and style_feature = [%value.rec "<dashed_ident> ':' <mf-value>"]
 
-and Style_in_parens =
+and style_in_parens =
   [%value.rec "'(' <style-query> ')' | '(' <style-feature> ')'"]
 
-and Name_repeat =
+and name_repeat =
   [%value.rec
     "repeat( [ <positive-integer> | 'auto-fill' ] ',' [ <line-names> ]+ )"]
 
-and Named_color =
+and named_color =
   [%value.rec
     "'transparent' | 'aliceblue' | 'antiquewhite' | 'aqua' | 'aquamarine' | \
      'azure' | 'beige' | 'bisque' | 'black' | 'blanchedalmond' | 'blue' | \
@@ -826,29 +822,29 @@ and Named_color =
      'turquoise' | 'violet' | 'wheat' | 'white' | 'whitesmoke' | 'yellow' | \
      'yellowgreen' | <-non-standard-color>"]
 
-and Namespace_prefix = [%value.rec "<ident>"]
-and Ns_prefix = [%value.rec "[ <ident-token> | '*' ]? '|'"]
-and Nth = [%value.rec "<an-plus-b> | 'even' | 'odd'"]
-and Number_one_or_greater = [%value.rec "<number>"]
-and Number_percentage = [%value.rec "<number> | <extended-percentage>"]
-and Number_zero_one = [%value.rec "<number>"]
-and Numeric_figure_values = [%value.rec "'lining-nums' | 'oldstyle-nums'"]
+and namespace_prefix = [%value.rec "<ident>"]
+and ns_prefix = [%value.rec "[ <ident-token> | '*' ]? '|'"]
+and nth = [%value.rec "<an-plus-b> | 'even' | 'odd'"]
+and number_one_or_greater = [%value.rec "<number>"]
+and number_percentage = [%value.rec "<number> | <extended-percentage>"]
+and number_zero_one = [%value.rec "<number>"]
+and numeric_figure_values = [%value.rec "'lining-nums' | 'oldstyle-nums'"]
 
-and Numeric_fraction_values =
+and numeric_fraction_values =
   [%value.rec "'diagonal-fractions' | 'stacked-fractions'"]
 
-and Numeric_spacing_values = [%value.rec "'proportional-nums' | 'tabular-nums'"]
-and Outline_radius = [%value.rec "<extended-length> | <extended-percentage>"]
-and Overflow_position = [%value.rec "'unsafe' | 'safe'"]
+and numeric_spacing_values = [%value.rec "'proportional-nums' | 'tabular-nums'"]
+and outline_radius = [%value.rec "<extended-length> | <extended-percentage>"]
+and overflow_position = [%value.rec "'unsafe' | 'safe'"]
 
-and Page_body =
+and page_body =
   [%value.rec
     "[ <declaration> ]? [ ';' <page-body> ]? | <page-margin-box> <page-body>"]
 
-and Page_margin_box =
+and page_margin_box =
   [%value.rec "<page-margin-box-type> '{' <declaration-list> '}'"]
 
-and Page_margin_box_type =
+and page_margin_box_type =
   [%value.rec
     "'@top-left-corner' | '@top-left' | '@top-center' | '@top-right' | \
      '@top-right-corner' | '@bottom-left-corner' | '@bottom-left' | \
@@ -856,17 +852,17 @@ and Page_margin_box_type =
      | '@left-middle' | '@left-bottom' | '@right-top' | '@right-middle' | \
      '@right-bottom'"]
 
-and Page_selector =
+and page_selector =
   [%value.rec "[ <pseudo-page> ]+ | <ident> [ <pseudo-page> ]*"]
 
-and Page_selector_list = [%value.rec "[ [ <page-selector> ]# ]?"]
+and page_selector_list = [%value.rec "[ [ <page-selector> ]# ]?"]
 
-and Paint =
+and paint =
   [%value.rec
     "'none' | <color> | <url> [ 'none' | <color> ]? | 'context-fill' | \
      'context-stroke' | <interpolation>"]
 
-and Position =
+and position =
   [%value.rec
     "[ 'left' | 'center' | 'right' | 'top' | 'bottom' | <length-percentage> ]\n\
     \  | [ 'left' | 'center' | 'right' ] && [ 'top' | 'center' | 'bottom' ]\n\
@@ -875,9 +871,9 @@ and Position =
     \  | [ [ 'left' | 'right' ] <length-percentage> ] && [ [ 'top' | 'bottom' \
      ] <length-percentage> ]"]
 
-and Positive_integer = [%value.rec "<integer>"]
+and positive_integer = [%value.rec "<integer>"]
 
-and Property__moz_appearance =
+and property__moz_appearance =
   [%value.rec
     "'none' | 'button' | 'button-arrow-down' | 'button-arrow-next' | \
      'button-arrow-previous' | 'button-arrow-up' | 'button-bevel' | \
@@ -915,79 +911,79 @@ and Property__moz_appearance =
      '-moz-window-frame-right' | '-moz-window-titlebar' | \
      '-moz-window-titlebar-maximized'"]
 
-and Property__moz_background_clip = [%value.rec "'padding' | 'border'"]
-and Property__moz_binding = [%value.rec "<url> | 'none'"]
-and Property__moz_border_bottom_colors = [%value.rec "[ <color> ]+ | 'none'"]
-and Property__moz_border_left_colors = [%value.rec "[ <color> ]+ | 'none'"]
+and property__moz_background_clip = [%value.rec "'padding' | 'border'"]
+and property__moz_binding = [%value.rec "<url> | 'none'"]
+and property__moz_border_bottom_colors = [%value.rec "[ <color> ]+ | 'none'"]
+and property__moz_border_left_colors = [%value.rec "[ <color> ]+ | 'none'"]
 
-and Property__moz_border_radius_bottomleft =
+and property__moz_border_radius_bottomleft =
   [%value.rec "<'border-bottom-left-radius'>"]
 
-and Property__moz_border_radius_bottomright =
+and property__moz_border_radius_bottomright =
   [%value.rec "<'border-bottom-right-radius'>"]
 
-and Property__moz_border_radius_topleft =
+and property__moz_border_radius_topleft =
   [%value.rec "<'border-top-left-radius'>"]
 
-and Property__moz_border_radius_topright =
+and property__moz_border_radius_topright =
   [%value.rec "<'border-bottom-right-radius'>"]
 
 (* TODO: Remove interpolation without <> *)
-and Property__moz_border_right_colors =
+and property__moz_border_right_colors =
   [%value.rec "[ <color> ]+ | 'none' | interpolation"]
 
 (* TODO: Remove interpolation without <> *)
-and Property__moz_border_top_colors =
+and property__moz_border_top_colors =
   [%value.rec "[ <color> ]+ | 'none' | interpolation"]
 
-and Property__moz_context_properties =
+and property__moz_context_properties =
   [%value.rec
     "'none' | [ 'fill' | 'fill-opacity' | 'stroke' | 'stroke-opacity' ]#"]
 
-and Property__moz_control_character_visibility =
+and property__moz_control_character_visibility =
   [%value.rec "'visible' | 'hidden'"]
 
-and Property__moz_float_edge =
+and property__moz_float_edge =
   [%value.rec "'border-box' | 'content-box' | 'margin-box' | 'padding-box'"]
 
-and Property__moz_force_broken_image_icon = [%value.rec "<integer>"]
-and Property__moz_image_region = [%value.rec "<shape> | 'auto'"]
+and property__moz_force_broken_image_icon = [%value.rec "<integer>"]
+and property__moz_image_region = [%value.rec "<shape> | 'auto'"]
 
-and Property__moz_orient =
+and property__moz_orient =
   [%value.rec "'inline' | 'block' | 'horizontal' | 'vertical'"]
 
-and Property__moz_osx_font_smoothing = [%value.rec "'auto' | 'grayscale'"]
+and property__moz_osx_font_smoothing = [%value.rec "'auto' | 'grayscale'"]
 
-and Property__moz_outline_radius =
+and property__moz_outline_radius =
   [%value.rec "[ <outline-radius> ]{1,4} [ '/' [ <outline-radius> ]{1,4} ]?"]
 
-and Property__moz_outline_radius_bottomleft = [%value.rec "<outline-radius>"]
-and Property__moz_outline_radius_bottomright = [%value.rec "<outline-radius>"]
-and Property__moz_outline_radius_topleft = [%value.rec "<outline-radius>"]
-and Property__moz_outline_radius_topright = [%value.rec "<outline-radius>"]
-and Property__moz_stack_sizing = [%value.rec "'ignore' | 'stretch-to-fit'"]
-and Property__moz_text_blink = [%value.rec "'none' | 'blink'"]
+and property__moz_outline_radius_bottomleft = [%value.rec "<outline-radius>"]
+and property__moz_outline_radius_bottomright = [%value.rec "<outline-radius>"]
+and property__moz_outline_radius_topleft = [%value.rec "<outline-radius>"]
+and property__moz_outline_radius_topright = [%value.rec "<outline-radius>"]
+and property__moz_stack_sizing = [%value.rec "'ignore' | 'stretch-to-fit'"]
+and property__moz_text_blink = [%value.rec "'none' | 'blink'"]
 
-and Property__moz_user_focus =
+and property__moz_user_focus =
   [%value.rec
     "'ignore' | 'normal' | 'select-after' | 'select-before' | 'select-menu' | \
      'select-same' | 'select-all' | 'none'"]
 
-and Property__moz_user_input =
+and property__moz_user_input =
   [%value.rec "'auto' | 'none' | 'enabled' | 'disabled'"]
 
-and Property__moz_user_modify =
+and property__moz_user_modify =
   [%value.rec "'read-only' | 'read-write' | 'write-only'"]
 
-and Property__moz_user_select =
+and property__moz_user_select =
   [%value.rec "'none' | 'text' | 'all' | '-moz-none'"]
 
-and Property__moz_window_dragging = [%value.rec "'drag' | 'no-drag'"]
+and property__moz_window_dragging = [%value.rec "'drag' | 'no-drag'"]
 
-and Property__moz_window_shadow =
+and property__moz_window_shadow =
   [%value.rec "'default' | 'menu' | 'tooltip' | 'sheet' | 'none'"]
 
-and Property__webkit_appearance =
+and property__webkit_appearance =
   [%value.rec
     "'none' | 'button' | 'button-bevel' | 'caps-lock-indicator' | 'caret' | \
      'checkbox' | 'default-button' | 'listbox' | 'listitem' | \
@@ -1004,414 +1000,414 @@ and Property__webkit_appearance =
      'slider-horizontal' | 'slider-vertical' | 'sliderthumb-horizontal' | \
      'sliderthumb-vertical' | 'square-button' | 'textarea' | 'textfield'"]
 
-and Property__webkit_background_clip =
+and property__webkit_background_clip =
   [%value.rec "[ <box> | 'border' | 'padding' | 'content' | 'text' ]#"]
 
-and Property__webkit_border_before =
+and property__webkit_border_before =
   [%value.rec "<'border-width'> || <'border-style'> || <'color'>"]
 
-and Property__webkit_border_before_color = [%value.rec "<'color'>"]
-and Property__webkit_border_before_style = [%value.rec "<'border-style'>"]
-and Property__webkit_border_before_width = [%value.rec "<'border-width'>"]
+and property__webkit_border_before_color = [%value.rec "<'color'>"]
+and property__webkit_border_before_style = [%value.rec "<'border-style'>"]
+and property__webkit_border_before_width = [%value.rec "<'border-width'>"]
 
-and Property__webkit_box_reflect =
+and property__webkit_box_reflect =
   [%value.rec
     "[ 'above' | 'below' | 'right' | 'left' ]? [ <extended-length> ]? [ \
      <image> ]?"]
 
-and Property__webkit_column_break_after =
+and property__webkit_column_break_after =
   [%value.rec "'always' | 'auto' | 'avoid'"]
 
-and Property__webkit_column_break_before =
+and property__webkit_column_break_before =
   [%value.rec "'always' | 'auto' | 'avoid'"]
 
-and Property__webkit_column_break_inside =
+and property__webkit_column_break_inside =
   [%value.rec "'always' | 'auto' | 'avoid'"]
 
-and Property__webkit_font_smoothing =
+and property__webkit_font_smoothing =
   [%value.rec "'auto' | 'none' | 'antialiased' | 'subpixel-antialiased'"]
 
-and Property__webkit_line_clamp = [%value.rec "'none' | <integer>"]
+and property__webkit_line_clamp = [%value.rec "'none' | <integer>"]
 
-and Property__webkit_mask =
+and property__webkit_mask =
   [%value.rec
     "[ <mask-reference> || <position> [ '/' <bg-size> ]? || <repeat-style> || \
      [ <box> | 'border' | 'padding' | 'content' | 'text' ] || [ <box> | \
      'border' | 'padding' | 'content' ] ]#"]
 
-and Property__webkit_mask_attachment = [%value.rec "[ <attachment> ]#"]
+and property__webkit_mask_attachment = [%value.rec "[ <attachment> ]#"]
 
-and Property__webkit_mask_box_image =
+and property__webkit_mask_box_image =
   [%value.rec
     "[ <url> | <gradient> | 'none' ] [ [ <extended-length> | \
      <extended-percentage> ]{4} [ <-webkit-mask-box-repeat> ]{2} ]?"]
 
-and Property__webkit_mask_clip =
+and property__webkit_mask_clip =
   [%value.rec "[ <box> | 'border' | 'padding' | 'content' | 'text' ]#"]
 
-and Property__webkit_mask_composite = [%value.rec "[ <composite-style> ]#"]
-and Property__webkit_mask_image = [%value.rec "[ <mask-reference> ]#"]
+and property__webkit_mask_composite = [%value.rec "[ <composite-style> ]#"]
+and property__webkit_mask_image = [%value.rec "[ <mask-reference> ]#"]
 
-and Property__webkit_mask_origin =
+and property__webkit_mask_origin =
   [%value.rec "[ <box> | 'border' | 'padding' | 'content' ]#"]
 
-and Property__webkit_mask_position = [%value.rec "[ <position> ]#"]
+and property__webkit_mask_position = [%value.rec "[ <position> ]#"]
 
-and Property__webkit_mask_position_x =
+and property__webkit_mask_position_x =
   [%value.rec
     "[ <extended-length> | <extended-percentage> | 'left' | 'center' | 'right' \
      ]#"]
 
-and Property__webkit_mask_position_y =
+and property__webkit_mask_position_y =
   [%value.rec
     "[ <extended-length> | <extended-percentage> | 'top' | 'center' | 'bottom' \
      ]#"]
 
-and Property__webkit_mask_repeat = [%value.rec "[ <repeat-style> ]#"]
+and property__webkit_mask_repeat = [%value.rec "[ <repeat-style> ]#"]
 
-and Property__webkit_mask_repeat_x =
+and property__webkit_mask_repeat_x =
   [%value.rec "'repeat' | 'no-repeat' | 'space' | 'round'"]
 
-and Property__webkit_mask_repeat_y =
+and property__webkit_mask_repeat_y =
   [%value.rec "'repeat' | 'no-repeat' | 'space' | 'round'"]
 
-and Property__webkit_mask_size = [%value.rec "[ <bg-size> ]#"]
-and Property__webkit_overflow_scrolling = [%value.rec "'auto' | 'touch'"]
-and Property__webkit_print_color_adjust = [%value.rec "'economy' | 'exact'"]
-and Property__webkit_tap_highlight_color = [%value.rec "<color>"]
-and Property__webkit_text_fill_color = [%value.rec "<color>"]
+and property__webkit_mask_size = [%value.rec "[ <bg-size> ]#"]
+and property__webkit_overflow_scrolling = [%value.rec "'auto' | 'touch'"]
+and property__webkit_print_color_adjust = [%value.rec "'economy' | 'exact'"]
+and property__webkit_tap_highlight_color = [%value.rec "<color>"]
+and property__webkit_text_fill_color = [%value.rec "<color>"]
 
-and Property__webkit_text_security =
+and property__webkit_text_security =
   [%value.rec "'none' | 'circle' | 'disc' | 'square'"]
 
-and Property__webkit_text_stroke = [%value.rec "<extended-length> || <color>"]
-and Property__webkit_text_stroke_color = [%value.rec "<color>"]
-and Property__webkit_text_stroke_width = [%value.rec "<extended-length>"]
-and Property__webkit_touch_callout = [%value.rec "'default' | 'none'"]
-and Property__webkit_user_drag = [%value.rec "'none' | 'element' | 'auto'"]
+and property__webkit_text_stroke = [%value.rec "<extended-length> || <color>"]
+and property__webkit_text_stroke_color = [%value.rec "<color>"]
+and property__webkit_text_stroke_width = [%value.rec "<extended-length>"]
+and property__webkit_touch_callout = [%value.rec "'default' | 'none'"]
+and property__webkit_user_drag = [%value.rec "'none' | 'element' | 'auto'"]
 
-and Property__webkit_user_modify =
+and property__webkit_user_modify =
   [%value.rec "'read-only' | 'read-write' | 'read-write-plaintext-only'"]
 
-and Property__webkit_user_select =
+and property__webkit_user_select =
   [%value.rec "'auto' | 'none' | 'text' | 'all'"]
 
-and Property_align_content =
+and property_align_content =
   [%value.rec
     "'normal' | <baseline-position> | <content-distribution> | [ \
      <overflow-position> ]? <content-position>"]
 
-and Property_align_items =
+and property_align_items =
   [%value.rec
     "'normal' | 'stretch' | <baseline-position> | [ <overflow-position> ]? \
      <self-position> | <interpolation>"]
 
-and Property_align_self =
+and property_align_self =
   [%value.rec
     "'auto' | 'normal' | 'stretch' | <baseline-position> | [ \
      <overflow-position> ]? <self-position> | <interpolation>"]
 
-and Property_alignment_baseline =
+and property_alignment_baseline =
   [%value.rec
     "'auto' | 'baseline' | 'before-edge' | 'text-before-edge' | 'middle' | \
      'central' | 'after-edge' | 'text-after-edge' | 'ideographic' | \
      'alphabetic' | 'hanging' | 'mathematical'"]
 
-and Property_all = [%value.rec "'initial' | 'inherit' | 'unset' | 'revert'"]
+and property_all = [%value.rec "'initial' | 'inherit' | 'unset' | 'revert'"]
 
-and Property_animation =
+and property_animation =
   [%value.rec "[ <single-animation> | <single-animation-no-interp> ]#"]
 
-and Property_animation_delay = [%value.rec "[ <extended-time> ]#"]
+and property_animation_delay = [%value.rec "[ <extended-time> ]#"]
 
-and Property_animation_direction =
+and property_animation_direction =
   [%value.rec "[ <single-animation-direction> ]#"]
 
-and Property_animation_duration = [%value.rec "[ <extended-time> ]#"]
+and property_animation_duration = [%value.rec "[ <extended-time> ]#"]
 
-and Property_animation_fill_mode =
+and property_animation_fill_mode =
   [%value.rec "[ <single-animation-fill-mode> ]#"]
 
-and Property_animation_iteration_count =
+and property_animation_iteration_count =
   [%value.rec "[ <single-animation-iteration-count> ]#"]
 
-and Property_animation_name =
+and property_animation_name =
   [%value.rec "[ <keyframes-name> | 'none' | <interpolation> ]#"]
 
-and Property_animation_play_state =
+and property_animation_play_state =
   [%value.rec "[ <single-animation-play-state> ]#"]
 
-and Property_animation_timing_function = [%value.rec "[ <timing-function> ]#"]
+and property_animation_timing_function = [%value.rec "[ <timing-function> ]#"]
 
-and Property_appearance =
+and property_appearance =
   [%value.rec
     "'none' | 'auto' | 'button' | 'textfield' | 'menulist-button' | \
      <compat-auto>"]
 
-and Property_aspect_ratio = [%value.rec "'auto' | <ratio>"]
+and property_aspect_ratio = [%value.rec "'auto' | <ratio>"]
 
-and Property_azimuth =
+and property_azimuth =
   [%value.rec
     "<extended-angle> | [ 'left-side' | 'far-left' | 'left' | 'center-left' | \
      'center' | 'center-right' | 'right' | 'far-right' | 'right-side' ] || \
      'behind' | 'leftwards' | 'rightwards'"]
 
-and Property_backdrop_filter =
+and property_backdrop_filter =
   [%value.rec "'none' | <interpolation> | <filter-function-list>"]
 
-and Property_backface_visibility = [%value.rec "'visible' | 'hidden'"]
-and Property_background = [%value.rec "[ <bg-layer> ',' ]* <final-bg-layer>"]
-and Property_background_attachment = [%value.rec "[ <attachment> ]#"]
-and Property_background_blend_mode = [%value.rec "[ <blend-mode> ]#"]
+and property_backface_visibility = [%value.rec "'visible' | 'hidden'"]
+and property_background = [%value.rec "[ <bg-layer> ',' ]* <final-bg-layer>"]
+and property_background_attachment = [%value.rec "[ <attachment> ]#"]
+and property_background_blend_mode = [%value.rec "[ <blend-mode> ]#"]
 
-and Property_background_clip =
+and property_background_clip =
   [%value.rec "[ <box> | 'text' | 'border-area' ]#"]
 
-and Property_background_color = [%value.rec "<color>"]
-and Property_background_image = [%value.rec "[ <bg-image> ]#"]
-and Property_background_origin = [%value.rec "[ <box> ]#"]
-and Property_background_position = [%value.rec "[ <bg-position> ]#"]
+and property_background_color = [%value.rec "<color>"]
+and property_background_image = [%value.rec "[ <bg-image> ]#"]
+and property_background_origin = [%value.rec "[ <box> ]#"]
+and property_background_position = [%value.rec "[ <bg-position> ]#"]
 
-and Property_background_position_x =
+and property_background_position_x =
   [%value.rec
     "[ 'center' | [ 'left' | 'right' | 'x-start' | 'x-end' ]? [ \
      <extended-length> | <extended-percentage> ]? ]#"]
 
-and Property_background_position_y =
+and property_background_position_y =
   [%value.rec
     "[ 'center' | [ 'top' | 'bottom' | 'y-start' | 'y-end' ]? [ \
      <extended-length> | <extended-percentage> ]? ]#"]
 
-and Property_background_repeat = [%value.rec "[ <repeat-style> ]#"]
-and Property_background_size = [%value.rec "[ <bg-size> ]#"]
+and property_background_repeat = [%value.rec "[ <repeat-style> ]#"]
+and property_background_size = [%value.rec "[ <bg-size> ]#"]
 
-and Property_baseline_shift =
+and property_baseline_shift =
   [%value.rec "'baseline' | 'sub' | 'super' | <svg-length>"]
 
-and Property_behavior = [%value.rec "[ <url> ]+"]
-and Property_block_overflow = [%value.rec "'clip' | 'ellipsis' | <string>"]
-and Property_block_size = [%value.rec "<'width'>"]
+and property_behavior = [%value.rec "[ <url> ]+"]
+and property_block_overflow = [%value.rec "'clip' | 'ellipsis' | <string>"]
+and property_block_size = [%value.rec "<'width'>"]
 
-and Property_border =
+and property_border =
   [%value.rec
     "'none' | [ <line-width> | <interpolation> ] | [ <line-width> | \
      <interpolation> ] [ <line-style> | <interpolation> ] | [ <line-width> | \
      <interpolation> ] [ <line-style> | <interpolation> ] [ <color> | \
      <interpolation> ]"]
 
-and Property_border_block = [%value.rec "<'border'>"]
-and Property_border_block_color = [%value.rec "[ <'border-top-color'> ]{1,2}"]
-and Property_border_block_end = [%value.rec "<'border'>"]
-and Property_border_block_end_color = [%value.rec "<'border-top-color'>"]
-and Property_border_block_end_style = [%value.rec "<'border-top-style'>"]
-and Property_border_block_end_width = [%value.rec "<'border-top-width'>"]
-and Property_border_block_start = [%value.rec "<'border'>"]
-and Property_border_block_start_color = [%value.rec "<'border-top-color'>"]
-and Property_border_block_start_style = [%value.rec "<'border-top-style'>"]
-and Property_border_block_start_width = [%value.rec "<'border-top-width'>"]
-and Property_border_block_style = [%value.rec "<'border-top-style'>"]
-and Property_border_block_width = [%value.rec "<'border-top-width'>"]
-and Property_border_bottom = [%value.rec "<'border'>"]
-and Property_border_bottom_color = [%value.rec "<'border-top-color'>"]
+and property_border_block = [%value.rec "<'border'>"]
+and property_border_block_color = [%value.rec "[ <'border-top-color'> ]{1,2}"]
+and property_border_block_end = [%value.rec "<'border'>"]
+and property_border_block_end_color = [%value.rec "<'border-top-color'>"]
+and property_border_block_end_style = [%value.rec "<'border-top-style'>"]
+and property_border_block_end_width = [%value.rec "<'border-top-width'>"]
+and property_border_block_start = [%value.rec "<'border'>"]
+and property_border_block_start_color = [%value.rec "<'border-top-color'>"]
+and property_border_block_start_style = [%value.rec "<'border-top-style'>"]
+and property_border_block_start_width = [%value.rec "<'border-top-width'>"]
+and property_border_block_style = [%value.rec "<'border-top-style'>"]
+and property_border_block_width = [%value.rec "<'border-top-width'>"]
+and property_border_bottom = [%value.rec "<'border'>"]
+and property_border_bottom_color = [%value.rec "<'border-top-color'>"]
 
-and Property_border_bottom_left_radius =
+and property_border_bottom_left_radius =
   [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"]
 
-and Property_border_bottom_right_radius =
+and property_border_bottom_right_radius =
   [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"]
 
-and Property_border_bottom_style = [%value.rec "<line-style>"]
-and Property_border_bottom_width = [%value.rec "<line-width>"]
-and Property_border_collapse = [%value.rec "'collapse' | 'separate'"]
-and Property_border_color = [%value.rec "[ <color> ]{1,4}"]
+and property_border_bottom_style = [%value.rec "<line-style>"]
+and property_border_bottom_width = [%value.rec "<line-width>"]
+and property_border_collapse = [%value.rec "'collapse' | 'separate'"]
+and property_border_color = [%value.rec "[ <color> ]{1,4}"]
 
-and Property_border_end_end_radius =
+and property_border_end_end_radius =
   [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"]
 
-and Property_border_end_start_radius =
+and property_border_end_start_radius =
   [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"]
 
-and Property_border_image =
+and property_border_image =
   [%value.rec
     "<'border-image-source'> || <'border-image-slice'> [ '/' \
      <'border-image-width'> | '/' [ <'border-image-width'> ]? '/' \
      <'border-image-outset'> ]? || <'border-image-repeat'>"]
 
-and Property_border_image_outset =
+and property_border_image_outset =
   [%value.rec "[ <extended-length> | <number> ]{1,4}"]
 
-and Property_border_image_repeat =
+and property_border_image_repeat =
   [%value.rec "[ 'stretch' | 'repeat' | 'round' | 'space' ]{1,2}"]
 
-and Property_border_image_slice =
+and property_border_image_slice =
   [%value.rec "[ <number-percentage> ]{1,4} && [ 'fill' ]?"]
 
-and Property_border_image_source = [%value.rec "'none' | <image>"]
+and property_border_image_source = [%value.rec "'none' | <image>"]
 
-and Property_border_image_width =
+and property_border_image_width =
   [%value.rec
     "[ <extended-length> | <extended-percentage> | <number> | 'auto' ]{1,4}"]
 
-and Property_border_inline = [%value.rec "<'border'>"]
-and Property_border_inline_color = [%value.rec "[ <'border-top-color'> ]{1,2}"]
-and Property_border_inline_end = [%value.rec "<'border'>"]
-and Property_border_inline_end_color = [%value.rec "<'border-top-color'>"]
-and Property_border_inline_end_style = [%value.rec "<'border-top-style'>"]
-and Property_border_inline_end_width = [%value.rec "<'border-top-width'>"]
-and Property_border_inline_start = [%value.rec "<'border'>"]
-and Property_border_inline_start_color = [%value.rec "<'border-top-color'>"]
-and Property_border_inline_start_style = [%value.rec "<'border-top-style'>"]
-and Property_border_inline_start_width = [%value.rec "<'border-top-width'>"]
-and Property_border_inline_style = [%value.rec "<'border-top-style'>"]
-and Property_border_inline_width = [%value.rec "<'border-top-width'>"]
-and Property_border_left = [%value.rec "<'border'>"]
-and Property_border_left_color = [%value.rec "<color>"]
-and Property_border_left_style = [%value.rec "<line-style>"]
-and Property_border_left_width = [%value.rec "<line-width>"]
+and property_border_inline = [%value.rec "<'border'>"]
+and property_border_inline_color = [%value.rec "[ <'border-top-color'> ]{1,2}"]
+and property_border_inline_end = [%value.rec "<'border'>"]
+and property_border_inline_end_color = [%value.rec "<'border-top-color'>"]
+and property_border_inline_end_style = [%value.rec "<'border-top-style'>"]
+and property_border_inline_end_width = [%value.rec "<'border-top-width'>"]
+and property_border_inline_start = [%value.rec "<'border'>"]
+and property_border_inline_start_color = [%value.rec "<'border-top-color'>"]
+and property_border_inline_start_style = [%value.rec "<'border-top-style'>"]
+and property_border_inline_start_width = [%value.rec "<'border-top-width'>"]
+and property_border_inline_style = [%value.rec "<'border-top-style'>"]
+and property_border_inline_width = [%value.rec "<'border-top-width'>"]
+and property_border_left = [%value.rec "<'border'>"]
+and property_border_left_color = [%value.rec "<color>"]
+and property_border_left_style = [%value.rec "<line-style>"]
+and property_border_left_width = [%value.rec "<line-width>"]
 
 (* border-radius isn't supported with the entire spec in bs-css: `"[ <extended-length> | <extended-percentage> ]{1,4} [ '/' [ <extended-length> | <extended-percentage> ]{1,4} ]?"` *)
-and Property_border_radius =
+and property_border_radius =
   [%value.rec "<extended-length> | <extended-percentage>"]
 
-and Property_border_right = [%value.rec "<'border'>"]
-and Property_border_right_color = [%value.rec "<color>"]
-and Property_border_right_style = [%value.rec "<line-style>"]
-and Property_border_right_width = [%value.rec "<line-width>"]
+and property_border_right = [%value.rec "<'border'>"]
+and property_border_right_color = [%value.rec "<color>"]
+and property_border_right_style = [%value.rec "<line-style>"]
+and property_border_right_width = [%value.rec "<line-width>"]
 
-and Property_border_spacing =
+and property_border_spacing =
   [%value.rec "<extended-length> [ <extended-length> ]?"]
 
-and Property_border_start_end_radius =
+and property_border_start_end_radius =
   [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"]
 
-and Property_border_start_start_radius =
+and property_border_start_start_radius =
   [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"]
 
 (* bs-css doesn't support list of styles, the original spec is: `[ <line-style> ]{1,4}` *)
-and Property_border_style = [%value.rec "<line-style>"]
-and Property_border_top = [%value.rec "<'border'>"]
-and Property_border_top_color = [%value.rec "<color>"]
+and property_border_style = [%value.rec "<line-style>"]
+and property_border_top = [%value.rec "<'border'>"]
+and property_border_top_color = [%value.rec "<color>"]
 
-and Property_border_top_left_radius =
+and property_border_top_left_radius =
   [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"]
 
-and Property_border_top_right_radius =
+and property_border_top_right_radius =
   [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"]
 
-and Property_border_top_style = [%value.rec "<line-style>"]
-and Property_border_top_width = [%value.rec "<line-width>"]
-and Property_border_width = [%value.rec "[ <line-width> ]{1,4}"]
+and property_border_top_style = [%value.rec "<line-style>"]
+and property_border_top_width = [%value.rec "<line-width>"]
+and property_border_width = [%value.rec "[ <line-width> ]{1,4}"]
 
-and Property_bottom =
+and property_bottom =
   [%value.rec "<extended-length> | <extended-percentage> | 'auto'"]
 
-and Property_box_align =
+and property_box_align =
   [%value.rec "'start' | 'center' | 'end' | 'baseline' | 'stretch'"]
 
-and Property_box_decoration_break = [%value.rec "'slice' | 'clone'"]
-and Property_box_direction = [%value.rec "'normal' | 'reverse' | 'inherit'"]
-and Property_box_flex = [%value.rec "<number>"]
-and Property_box_flex_group = [%value.rec "<integer>"]
-and Property_box_lines = [%value.rec "'single' | 'multiple'"]
-and Property_box_ordinal_group = [%value.rec "<integer>"]
+and property_box_decoration_break = [%value.rec "'slice' | 'clone'"]
+and property_box_direction = [%value.rec "'normal' | 'reverse' | 'inherit'"]
+and property_box_flex = [%value.rec "<number>"]
+and property_box_flex_group = [%value.rec "<integer>"]
+and property_box_lines = [%value.rec "'single' | 'multiple'"]
+and property_box_ordinal_group = [%value.rec "<integer>"]
 
-and Property_box_orient =
+and property_box_orient =
   [%value.rec
     "'horizontal' | 'vertical' | 'inline-axis' | 'block-axis' | 'inherit'"]
 
-and Property_box_pack = [%value.rec "'start' | 'center' | 'end' | 'justify'"]
+and property_box_pack = [%value.rec "'start' | 'center' | 'end' | 'justify'"]
 
-and Property_box_shadow =
+and property_box_shadow =
   [%value.rec "'none' | <interpolation> | [ <shadow> ]#"]
 
-and Property_box_sizing = [%value.rec "'content-box' | 'border-box'"]
+and property_box_sizing = [%value.rec "'content-box' | 'border-box'"]
 
-and Property_break_after =
+and property_break_after =
   [%value.rec
     "'auto' | 'avoid' | 'always' | 'all' | 'avoid-page' | 'page' | 'left' | \
      'right' | 'recto' | 'verso' | 'avoid-column' | 'column' | 'avoid-region' \
      | 'region'"]
 
-and Property_break_before =
+and property_break_before =
   [%value.rec
     "'auto' | 'avoid' | 'always' | 'all' | 'avoid-page' | 'page' | 'left' | \
      'right' | 'recto' | 'verso' | 'avoid-column' | 'column' | 'avoid-region' \
      | 'region'"]
 
-and Property_break_inside =
+and property_break_inside =
   [%value.rec
     "'auto' | 'avoid' | 'avoid-page' | 'avoid-column' | 'avoid-region'"]
 
-and Property_caption_side =
+and property_caption_side =
   [%value.rec
     "'top' | 'bottom' | 'block-start' | 'block-end' | 'inline-start' | \
      'inline-end'"]
 
-and Property_caret_color = [%value.rec "'auto' | <color>"]
+and property_caret_color = [%value.rec "'auto' | <color>"]
 
-and Property_clear =
+and property_clear =
   [%value.rec
     "'none' | 'left' | 'right' | 'both' | 'inline-start' | 'inline-end'"]
 
-and Property_clip = [%value.rec "<shape> | 'auto'"]
+and property_clip = [%value.rec "<shape> | 'auto'"]
 
-and Property_clip_path =
+and property_clip_path =
   [%value.rec "<clip-source> | <basic-shape> || <geometry-box> | 'none'"]
 
-and Property_clip_rule = [%value.rec "'nonzero' | 'evenodd'"]
-and Property_color = [%value.rec "<color>"]
+and property_clip_rule = [%value.rec "'nonzero' | 'evenodd'"]
+and property_color = [%value.rec "<color>"]
 
-and Property_color_interpolation_filters =
+and property_color_interpolation_filters =
   [%value.rec "'auto' | 'sRGB' | 'linearRGB'"]
 
-and Property_color_interpolation = [%value.rec "'auto' | 'sRGB' | 'linearRGB'"]
-and Property_color_adjust = [%value.rec "'economy' | 'exact'"]
-and Property_column_count = [%value.rec "<integer> | 'auto'"]
-and Property_column_fill = [%value.rec "'auto' | 'balance' | 'balance-all'"]
+and property_color_interpolation = [%value.rec "'auto' | 'sRGB' | 'linearRGB'"]
+and property_color_adjust = [%value.rec "'economy' | 'exact'"]
+and property_column_count = [%value.rec "<integer> | 'auto'"]
+and property_column_fill = [%value.rec "'auto' | 'balance' | 'balance-all'"]
 
-and Property_column_gap =
+and property_column_gap =
   [%value.rec "'normal' | <extended-length> | <extended-percentage>"]
 
-and Property_column_rule =
+and property_column_rule =
   [%value.rec
     "<'column-rule-width'> || <'column-rule-style'> || <'column-rule-color'>"]
 
-and Property_column_rule_color = [%value.rec "<color>"]
-and Property_column_rule_style = [%value.rec "<'border-style'>"]
-and Property_column_rule_width = [%value.rec "<'border-width'>"]
-and Property_column_span = [%value.rec "'none' | 'all'"]
-and Property_column_width = [%value.rec "<extended-length> | 'auto'"]
-and Property_columns = [%value.rec "<'column-width'> || <'column-count'>"]
+and property_column_rule_color = [%value.rec "<color>"]
+and property_column_rule_style = [%value.rec "<'border-style'>"]
+and property_column_rule_width = [%value.rec "<'border-width'>"]
+and property_column_span = [%value.rec "'none' | 'all'"]
+and property_column_width = [%value.rec "<extended-length> | 'auto'"]
+and property_columns = [%value.rec "<'column-width'> || <'column-count'>"]
 
-and Property_contain =
+and property_contain =
   [%value.rec
     "'none' | 'strict' | 'content' | 'size' || 'layout' || 'style' || 'paint'"]
 
-and Property_content =
+and property_content =
   [%value.rec
     "'normal' | 'none' | <string> | <interpolation> | [ <content-replacement> \
      | <content-list> ] [ '/' <string> ]?"]
 
-and Property_content_visibility = [%value.rec "'visible' | 'hidden' | 'auto'"]
+and property_content_visibility = [%value.rec "'visible' | 'hidden' | 'auto'"]
 
-and Property_counter_increment =
+and property_counter_increment =
   [%value.rec "[ <custom-ident> [ <integer> ]? ]+ | 'none'"]
 
-and Property_counter_reset =
+and property_counter_reset =
   [%value.rec "[ <custom-ident> [ <integer> ]? ]+ | 'none'"]
 
-and Property_counter_set =
+and property_counter_set =
   [%value.rec "[ <custom-ident> [ <integer> ]? ]+ | 'none'"]
 
-and Property_cue = [%value.rec "<'cue-before'> [ <'cue-after'> ]?"]
-and Property_cue_after = [%value.rec "<url> [ <decibel> ]? | 'none'"]
-and Property_cue_before = [%value.rec "<url> [ <decibel> ]? | 'none'"]
+and property_cue = [%value.rec "<'cue-before'> [ <'cue-after'> ]?"]
+and property_cue_after = [%value.rec "<url> [ <decibel> ]? | 'none'"]
+and property_cue_before = [%value.rec "<url> [ <decibel> ]? | 'none'"]
 
 (* and property_cursor = [%value.rec
      "[ <url> [ <x> <y> ]? ',' ]* [ 'auto' | 'default' | 'none' | 'context-menu' | 'help' | 'pointer' | 'progress' | 'wait' | 'cell' | 'crosshair' | 'text' | 'vertical-text' | 'alias' | 'copy' | 'move' | 'no-drop' | 'not-allowed' | 'e-resize' | 'n-resize' | 'ne-resize' | 'nw-resize' | 's-resize' | 'se-resize' | 'sw-resize' | 'w-resize' | 'ew-resize' | 'ns-resize' | 'nesw-resize' | 'nwse-resize' | 'col-resize' | 'row-resize' | 'all-scroll' | 'zoom-in' | 'zoom-out' | 'grab' | 'grabbing' | 'hand' | '-webkit-grab' | '-webkit-grabbing' | '-webkit-zoom-in' | '-webkit-zoom-out' | '-moz-grab' | '-moz-grabbing' | '-moz-zoom-in' | '-moz-zoom-out' ] | <interpolation>"
    ] *)
 (* Removed [ <url> [ <x> <y> ]? ',' ]* *)
-and Property_cursor =
+and property_cursor =
   [%value.rec
     "'auto' | 'default' | 'none' | 'context-menu' | 'help' | 'pointer' | \
      'progress' | 'wait' | 'cell' | 'crosshair' | 'text' | 'vertical-text' | \
@@ -1423,9 +1419,9 @@ and Property_cursor =
      '-webkit-grabbing' | '-webkit-zoom-in' | '-webkit-zoom-out' | '-moz-grab' \
      | '-moz-grabbing' | '-moz-zoom-in' | '-moz-zoom-out' | <interpolation>"]
 
-and Property_direction = [%value.rec "'ltr' | 'rtl'"]
+and property_direction = [%value.rec "'ltr' | 'rtl'"]
 
-and Property_display =
+and property_display =
   [%value.rec
     "'block' | 'contents' | 'flex' | 'flow' | 'flow-root' | 'grid' | 'inline' \
      | 'inline-block' | 'inline-flex' | 'inline-grid' | 'inline-list-item' | \
@@ -1437,85 +1433,85 @@ and Property_display =
      | '-webkit-box' | '-webkit-inline-box' | '-moz-inline-stack' | '-moz-box' \
      | '-moz-inline-box'"]
 
-and Property_dominant_baseline =
+and property_dominant_baseline =
   [%value.rec
     "'auto' | 'use-script' | 'no-change' | 'reset-size' | 'ideographic' | \
      'alphabetic' | 'hanging' | 'mathematical' | 'central' | 'middle' | \
      'text-after-edge' | 'text-before-edge'"]
 
-and Property_empty_cells = [%value.rec "'show' | 'hide'"]
-and Property_fill = [%value.rec "<paint>"]
-and Property_fill_opacity = [%value.rec "<alpha-value>"]
-and Property_fill_rule = [%value.rec "'nonzero' | 'evenodd'"]
+and property_empty_cells = [%value.rec "'show' | 'hide'"]
+and property_fill = [%value.rec "<paint>"]
+and property_fill_opacity = [%value.rec "<alpha-value>"]
+and property_fill_rule = [%value.rec "'nonzero' | 'evenodd'"]
 
-and Property_filter =
+and property_filter =
   [%value.rec "'none' | <interpolation> | <filter-function-list>"]
 
-and Property_flex =
+and property_flex =
   [%value.rec
     "'none' | [<'flex-grow'> [ <'flex-shrink'> ]? || <'flex-basis'>] | \
      <interpolation>"]
 
-and Property_flex_basis = [%value.rec "'content' | <'width'> | <interpolation>"]
+and property_flex_basis = [%value.rec "'content' | <'width'> | <interpolation>"]
 
-and Property_flex_direction =
+and property_flex_direction =
   [%value.rec "'row' | 'row-reverse' | 'column' | 'column-reverse'"]
 
-and Property_flex_flow = [%value.rec "<'flex-direction'> || <'flex-wrap'>"]
-and Property_flex_grow = [%value.rec "<number> | <interpolation>"]
-and Property_flex_shrink = [%value.rec "<number> | <interpolation>"]
-and Property_flex_wrap = [%value.rec "'nowrap' | 'wrap' | 'wrap-reverse'"]
+and property_flex_flow = [%value.rec "<'flex-direction'> || <'flex-wrap'>"]
+and property_flex_grow = [%value.rec "<number> | <interpolation>"]
+and property_flex_shrink = [%value.rec "<number> | <interpolation>"]
+and property_flex_wrap = [%value.rec "'nowrap' | 'wrap' | 'wrap-reverse'"]
 
-and Property_float =
+and property_float =
   [%value.rec "'left' | 'right' | 'none' | 'inline-start' | 'inline-end'"]
 
-and Property_font =
+and property_font =
   [%value.rec
     "[ <'font-style'> || <font-variant-css21> || <'font-weight'> || \
      <'font-stretch'> ]? <'font-size'> [ '/' <'line-height'> ]? \
      <'font-family'> | 'caption' | 'icon' | 'menu' | 'message-box' | \
      'small-caption' | 'status-bar'"]
 
-and Font_families =
+and font_families =
   [%value.rec "[ <family-name> | <generic-family> | <interpolation> ]#"]
 
-and Property_font_family = [%value.rec "<font_families> | <interpolation>"]
+and property_font_family = [%value.rec "<font_families> | <interpolation>"]
 
-and Property_font_feature_settings =
+and property_font_feature_settings =
   [%value.rec "'normal' | [ <feature-tag-value> ]#"]
 
-and Property_font_kerning = [%value.rec "'auto' | 'normal' | 'none'"]
-and Property_font_language_override = [%value.rec "'normal' | <string>"]
-and Property_font_optical_sizing = [%value.rec "'auto' | 'none'"]
-and Property_font_palette = [%value.rec "'normal' | 'light' | 'dark'"]
+and property_font_kerning = [%value.rec "'auto' | 'normal' | 'none'"]
+and property_font_language_override = [%value.rec "'normal' | <string>"]
+and property_font_optical_sizing = [%value.rec "'auto' | 'none'"]
+and property_font_palette = [%value.rec "'normal' | 'light' | 'dark'"]
 
-and Property_font_size =
+and property_font_size =
   [%value.rec
     "<absolute-size> | <relative-size> | <extended-length> | \
      <extended-percentage>"]
 
-and Property_font_size_adjust = [%value.rec "'none' | <number>"]
+and property_font_size_adjust = [%value.rec "'none' | <number>"]
 
-and Property_font_smooth =
+and property_font_smooth =
   [%value.rec
     "'auto' | 'never' | 'always' | <absolute-size> | <extended-length>"]
 
-and Property_font_stretch = [%value.rec "<font-stretch-absolute>"]
+and property_font_stretch = [%value.rec "<font-stretch-absolute>"]
 
-and Property_font_style =
+and property_font_style =
   [%value.rec
     "'normal' | 'italic' | 'oblique' | <interpolation> | [ 'oblique' \
      <extended-angle> ]?"]
 
-and Property_font_synthesis =
+and property_font_synthesis =
   [%value.rec "'none' | [ 'weight' || 'style' || 'small-caps' || 'position' ]"]
 
-and Property_font_synthesis_weight = [%value.rec "'auto' | 'none'"]
-and Property_font_synthesis_style = [%value.rec "'auto' | 'none'"]
-and Property_font_synthesis_small_caps = [%value.rec "'auto' | 'none'"]
-and Property_font_synthesis_position = [%value.rec "'auto' | 'none'"]
+and property_font_synthesis_weight = [%value.rec "'auto' | 'none'"]
+and property_font_synthesis_style = [%value.rec "'auto' | 'none'"]
+and property_font_synthesis_small_caps = [%value.rec "'auto' | 'none'"]
+and property_font_synthesis_position = [%value.rec "'auto' | 'none'"]
 
-and Property_font_variant =
+and property_font_variant =
   [%value.rec
     "'normal' | 'none' | 'small-caps' | <common-lig-values> || \
      <discretionary-lig-values> || <historical-lig-values> || \
@@ -1530,49 +1526,49 @@ and Property_font_variant =
      <east-asian-variant-values> || <east-asian-width-values> || 'ruby' || \
      'sub' || 'super' || 'text' || 'emoji' || 'unicode'"]
 
-and Property_font_variant_alternates =
+and property_font_variant_alternates =
   [%value.rec
     "'normal' | stylistic( <feature-value-name> ) || 'historical-forms' || \
      styleset( [ <feature-value-name> ]# ) || character-variant( [ \
      <feature-value-name> ]# ) || swash( <feature-value-name> ) || ornaments( \
      <feature-value-name> ) || annotation( <feature-value-name> )"]
 
-and Property_font_variant_caps =
+and property_font_variant_caps =
   [%value.rec
     "'normal' | 'small-caps' | 'all-small-caps' | 'petite-caps' | \
      'all-petite-caps' | 'unicase' | 'titling-caps'"]
 
-and Property_font_variant_east_asian =
+and property_font_variant_east_asian =
   [%value.rec
     "'normal' | <east-asian-variant-values> || <east-asian-width-values> || \
      'ruby'"]
 
-and Property_font_variant_ligatures =
+and property_font_variant_ligatures =
   [%value.rec
     "'normal' | 'none' | <common-lig-values> || <discretionary-lig-values> || \
      <historical-lig-values> || <contextual-alt-values>"]
 
-and Property_font_variant_numeric =
+and property_font_variant_numeric =
   [%value.rec
     "'normal' | <numeric-figure-values> || <numeric-spacing-values> || \
      <numeric-fraction-values> || 'ordinal' || 'slashed-zero'"]
 
-and Property_font_variant_position = [%value.rec "'normal' | 'sub' | 'super'"]
+and property_font_variant_position = [%value.rec "'normal' | 'sub' | 'super'"]
 
-and Property_font_variation_settings =
+and property_font_variation_settings =
   [%value.rec "'normal' | [ <string> <number> ]#"]
 
-and Property_font_variant_emoji =
+and property_font_variant_emoji =
   [%value.rec "'normal' | 'text' | 'emoji' | 'unicode'"]
 
-and Property_font_weight =
+and property_font_weight =
   [%value.rec "<font-weight-absolute> | 'bolder' | 'lighter' | <interpolation>"]
 
-and Property_gap = [%value.rec "<'row-gap'> [ <'column-gap'> ]?"]
-and Property_glyph_orientation_horizontal = [%value.rec "<extended-angle>"]
-and Property_glyph_orientation_vertical = [%value.rec "<extended-angle>"]
+and property_gap = [%value.rec "<'row-gap'> [ <'column-gap'> ]?"]
+and property_glyph_orientation_horizontal = [%value.rec "<extended-angle>"]
+and property_glyph_orientation_vertical = [%value.rec "<extended-angle>"]
 
-and Property_grid =
+and property_grid =
   [%value.rec
     "<'grid-template'>\n\
     \  | <'grid-template-rows'> '/' [ 'auto-flow' && [ 'dense' ]? ] [ \
@@ -1580,735 +1576,735 @@ and Property_grid =
     \  | [ 'auto-flow' && [ 'dense' ]? ] [ <'grid-auto-rows'> ]? '/' \
      <'grid-template-columns'>"]
 
-and Property_grid_area = [%value.rec "<grid-line> [ '/' <grid-line> ]{0,3}"]
-and Property_grid_auto_columns = [%value.rec "[ <track-size> ]+"]
+and property_grid_area = [%value.rec "<grid-line> [ '/' <grid-line> ]{0,3}"]
+and property_grid_auto_columns = [%value.rec "[ <track-size> ]+"]
 
-and Property_grid_auto_flow =
+and property_grid_auto_flow =
   [%value.rec "[ [ 'row' | 'column' ] || 'dense' ] | <interpolation>"]
 
-and Property_grid_auto_rows = [%value.rec "[ <track-size> ]+"]
-and Property_grid_column = [%value.rec "<grid-line> [ '/' <grid-line> ]?"]
-and Property_grid_column_end = [%value.rec "<grid-line>"]
+and property_grid_auto_rows = [%value.rec "[ <track-size> ]+"]
+and property_grid_column = [%value.rec "<grid-line> [ '/' <grid-line> ]?"]
+and property_grid_column_end = [%value.rec "<grid-line>"]
 
-and Property_grid_column_gap =
+and property_grid_column_gap =
   [%value.rec "<extended-length> | <extended-percentage>"]
 
-and Property_grid_column_start = [%value.rec "<grid-line>"]
-and Property_grid_gap = [%value.rec "<'grid-row-gap'> [ <'grid-column-gap'> ]?"]
-and Property_grid_row = [%value.rec "<grid-line> [ '/' <grid-line> ]?"]
-and Property_grid_row_end = [%value.rec "<grid-line>"]
+and property_grid_column_start = [%value.rec "<grid-line>"]
+and property_grid_gap = [%value.rec "<'grid-row-gap'> [ <'grid-column-gap'> ]?"]
+and property_grid_row = [%value.rec "<grid-line> [ '/' <grid-line> ]?"]
+and property_grid_row_end = [%value.rec "<grid-line>"]
 
-and Property_grid_row_gap =
+and property_grid_row_gap =
   [%value.rec "<extended-length> | <extended-percentage>"]
 
-and Property_grid_row_start = [%value.rec "<grid-line>"]
+and property_grid_row_start = [%value.rec "<grid-line>"]
 
-and Property_grid_template =
+and property_grid_template =
   [%value.rec
     "'none' | <'grid-template-rows'> '/' <'grid-template-columns'> | [ [ \
      <line-names> ]? <string> [ <track-size> ]? [ <line-names> ]? ]+ [ '/' \
      <explicit-track-list> ]?"]
 
-and Property_grid_template_areas =
+and property_grid_template_areas =
   [%value.rec "'none' | [ <string> | <interpolation> ]+"]
 
-and Property_grid_template_columns =
+and property_grid_template_columns =
   [%value.rec
     "'none' | <track-list> | <auto-track-list> | 'subgrid' [ <line-name-list> \
      ]? | 'masonry' | <interpolation>"]
 
-and Property_grid_template_rows =
+and property_grid_template_rows =
   [%value.rec
     "'none' | <track-list> | <auto-track-list> | 'subgrid' [ <line-name-list> \
      ]? | 'masonry' | <interpolation>"]
 
-and Property_hanging_punctuation =
+and property_hanging_punctuation =
   [%value.rec "'none' | 'first' || [ 'force-end' | 'allow-end' ] || 'last'"]
 
-and Property_height =
+and property_height =
   [%value.rec
     "'auto' | <extended-length> | <extended-percentage> | 'min-content' | \
      'max-content' | 'fit-content' | fit-content( <extended-length> | \
      <extended-percentage> )"]
 
-and Property_hyphens = [%value.rec "'none' | 'manual' | 'auto'"]
-and Property_hyphenate_character = [%value.rec "'auto' | <string-token>"]
-and Property_hyphenate_limit_chars = [%value.rec "'auto' | <integer>"]
-and Property_hyphenate_limit_lines = [%value.rec "'no-limit' | <integer>"]
+and property_hyphens = [%value.rec "'none' | 'manual' | 'auto'"]
+and property_hyphenate_character = [%value.rec "'auto' | <string-token>"]
+and property_hyphenate_limit_chars = [%value.rec "'auto' | <integer>"]
+and property_hyphenate_limit_lines = [%value.rec "'no-limit' | <integer>"]
 
-and Property_hyphenate_limit_zone =
+and property_hyphenate_limit_zone =
   [%value.rec "<extended-length> | <extended-percentage>"]
 
-and Property_image_orientation =
+and property_image_orientation =
   [%value.rec "'from-image' | <extended-angle> | [ <extended-angle> ]? 'flip'"]
 
-and Property_image_rendering =
+and property_image_rendering =
   [%value.rec "'auto' |'smooth' | 'high-quality' | 'crisp-edges' | 'pixelated'"]
 
-and Property_image_resolution =
+and property_image_resolution =
   [%value.rec "[ 'from-image' || <resolution> ] && [ 'snap' ]?"]
 
-and Property_ime_mode =
+and property_ime_mode =
   [%value.rec "'auto' | 'normal' | 'active' | 'inactive' | 'disabled'"]
 
-and Property_initial_letter = [%value.rec "'normal' | <number> [ <integer> ]?"]
+and property_initial_letter = [%value.rec "'normal' | <number> [ <integer> ]?"]
 
-and Property_initial_letter_align =
+and property_initial_letter_align =
   [%value.rec "'auto' | 'alphabetic' | 'hanging' | 'ideographic'"]
 
-and Property_inline_size = [%value.rec "<'width'>"]
-and Property_inset = [%value.rec "[ <'top'> ]{1,4}"]
-and Property_inset_block = [%value.rec "[ <'top'> ]{1,2}"]
-and Property_inset_block_end = [%value.rec "<'top'>"]
-and Property_inset_block_start = [%value.rec "<'top'>"]
-and Property_inset_inline = [%value.rec "[ <'top'> ]{1,2}"]
-and Property_inset_inline_end = [%value.rec "<'top'>"]
-and Property_inset_inline_start = [%value.rec "<'top'>"]
-and Property_isolation = [%value.rec "'auto' | 'isolate'"]
+and property_inline_size = [%value.rec "<'width'>"]
+and property_inset = [%value.rec "[ <'top'> ]{1,4}"]
+and property_inset_block = [%value.rec "[ <'top'> ]{1,2}"]
+and property_inset_block_end = [%value.rec "<'top'>"]
+and property_inset_block_start = [%value.rec "<'top'>"]
+and property_inset_inline = [%value.rec "[ <'top'> ]{1,2}"]
+and property_inset_inline_end = [%value.rec "<'top'>"]
+and property_inset_inline_start = [%value.rec "<'top'>"]
+and property_isolation = [%value.rec "'auto' | 'isolate'"]
 
-and Property_justify_content =
+and property_justify_content =
   [%value.rec
     "'normal' | <content-distribution> | [ <overflow-position> ]? [ \
      <content-position> | 'left' | 'right' ]"]
 
-and Property_justify_items =
+and property_justify_items =
   [%value.rec
     "'normal' | 'stretch' | <baseline-position> | [ <overflow-position> ]? [ \
      <self-position> | 'left' | 'right' ] | 'legacy' | 'legacy' && [ 'left' | \
      'right' | 'center' ]"]
 
-and Property_justify_self =
+and property_justify_self =
   [%value.rec
     "'auto' | 'normal' | 'stretch' | <baseline-position> | [ \
      <overflow-position> ]? [ <self-position> | 'left' | 'right' ]"]
 
-and Property_kerning = [%value.rec "'auto' | <svg-length>"]
+and property_kerning = [%value.rec "'auto' | <svg-length>"]
 
-and Property_layout_grid =
+and property_layout_grid =
   [%value.rec "'auto' | <custom-ident> | <integer> && [ <custom-ident> ]?"]
 
-and Property_layout_grid_char =
+and property_layout_grid_char =
   [%value.rec "'auto' | <custom-ident> | <string>"]
 
-and Property_layout_grid_line =
+and property_layout_grid_line =
   [%value.rec "'auto' | <custom-ident> | <string>"]
 
-and Property_layout_grid_mode =
+and property_layout_grid_mode =
   [%value.rec "'auto' | <custom-ident> | <string>"]
 
-and Property_layout_grid_type =
+and property_layout_grid_type =
   [%value.rec "'auto' | <custom-ident> | <string>"]
 
-and Property_left =
+and property_left =
   [%value.rec "<extended-length> | <extended-percentage> | 'auto'"]
 
-and Property_letter_spacing =
+and property_letter_spacing =
   [%value.rec "'normal' | <extended-length> | <extended-percentage>"]
 
-and Property_line_break =
+and property_line_break =
   [%value.rec
     "'auto' | 'loose' | 'normal' | 'strict' | 'anywhere' | <interpolation>"]
 
-and Property_line_clamp = [%value.rec "'none' | <integer>"]
+and property_line_clamp = [%value.rec "'none' | <integer>"]
 
-and Property_line_height =
+and property_line_height =
   [%value.rec "'normal' | <number> | <extended-length> | <extended-percentage>"]
 
-and Property_line_height_step = [%value.rec "<extended-length>"]
+and property_line_height_step = [%value.rec "<extended-length>"]
 
-and Property_list_style =
+and property_list_style =
   [%value.rec
     "<'list-style-type'> || <'list-style-position'> || <'list-style-image'>"]
 
-and Property_list_style_image = [%value.rec "'none' | <image>"]
-and Property_list_style_position = [%value.rec "'inside' | 'outside'"]
+and property_list_style_image = [%value.rec "'none' | <image>"]
+and property_list_style_position = [%value.rec "'inside' | 'outside'"]
 
-and Property_list_style_type =
+and property_list_style_type =
   [%value.rec "<counter-style> | <string> | 'none'"]
 
-and Property_margin =
+and property_margin =
   [%value.rec
     "[ <extended-length> | <extended-percentage> | 'auto' | <interpolation> \
      ]{1,4}"]
 
-and Property_margin_block = [%value.rec "[ <'margin-left'> ]{1,2}"]
-and Property_margin_block_end = [%value.rec "<'margin-left'>"]
-and Property_margin_block_start = [%value.rec "<'margin-left'>"]
+and property_margin_block = [%value.rec "[ <'margin-left'> ]{1,2}"]
+and property_margin_block_end = [%value.rec "<'margin-left'>"]
+and property_margin_block_start = [%value.rec "<'margin-left'>"]
 
-and Property_margin_bottom =
+and property_margin_bottom =
   [%value.rec "<extended-length> | <extended-percentage> | 'auto'"]
 
-and Property_margin_inline = [%value.rec "[ <'margin-left'> ]{1,2}"]
-and Property_margin_inline_end = [%value.rec "<'margin-left'>"]
-and Property_margin_inline_start = [%value.rec "<'margin-left'>"]
+and property_margin_inline = [%value.rec "[ <'margin-left'> ]{1,2}"]
+and property_margin_inline_end = [%value.rec "<'margin-left'>"]
+and property_margin_inline_start = [%value.rec "<'margin-left'>"]
 
-and Property_margin_left =
+and property_margin_left =
   [%value.rec "<extended-length> | <extended-percentage> | 'auto'"]
 
-and Property_margin_right =
+and property_margin_right =
   [%value.rec "<extended-length> | <extended-percentage> | 'auto'"]
 
-and Property_margin_top =
+and property_margin_top =
   [%value.rec "<extended-length> | <extended-percentage> | 'auto'"]
 
-and Property_margin_trim = [%value.rec "'none' | 'in-flow' | 'all'"]
-and Property_marker = [%value.rec "'none' | <url>"]
-and Property_marker_end = [%value.rec "'none' | <url>"]
-and Property_marker_mid = [%value.rec "'none' | <url>"]
-and Property_marker_start = [%value.rec "'none' | <url>"]
-and Property_mask = [%value.rec "[ <mask-layer> ]#"]
+and property_margin_trim = [%value.rec "'none' | 'in-flow' | 'all'"]
+and property_marker = [%value.rec "'none' | <url>"]
+and property_marker_end = [%value.rec "'none' | <url>"]
+and property_marker_mid = [%value.rec "'none' | <url>"]
+and property_marker_start = [%value.rec "'none' | <url>"]
+and property_mask = [%value.rec "[ <mask-layer> ]#"]
 
-and Property_mask_border =
+and property_mask_border =
   [%value.rec
     "<'mask-border-source'> || <'mask-border-slice'> [ '/' [ \
      <'mask-border-width'> ]? [ '/' <'mask-border-outset'> ]? ]? || \
      <'mask-border-repeat'> || <'mask-border-mode'>"]
 
-and Property_mask_border_mode = [%value.rec "'luminance' | 'alpha'"]
+and property_mask_border_mode = [%value.rec "'luminance' | 'alpha'"]
 
-and Property_mask_border_outset =
+and property_mask_border_outset =
   [%value.rec "[ <extended-length> | <number> ]{1,4}"]
 
-and Property_mask_border_repeat =
+and property_mask_border_repeat =
   [%value.rec "[ 'stretch' | 'repeat' | 'round' | 'space' ]{1,2}"]
 
-and Property_mask_border_slice =
+and property_mask_border_slice =
   [%value.rec "[ <number-percentage> ]{1,4} [ 'fill' ]?"]
 
-and Property_mask_border_source = [%value.rec "'none' | <image>"]
+and property_mask_border_source = [%value.rec "'none' | <image>"]
 
-and Property_mask_border_width =
+and property_mask_border_width =
   [%value.rec
     "[ <extended-length> | <extended-percentage> | <number> | 'auto' ]{1,4}"]
 
-and Property_mask_clip = [%value.rec "[ <geometry-box> | 'no-clip' ]#"]
-and Property_mask_composite = [%value.rec "[ <compositing-operator> ]#"]
-and Property_mask_image = [%value.rec "[ <mask-reference> ]#"]
-and Property_mask_mode = [%value.rec "[ <masking-mode> ]#"]
-and Property_mask_origin = [%value.rec "[ <geometry-box> ]#"]
-and Property_mask_position = [%value.rec "[ <position> ]#"]
-and Property_mask_repeat = [%value.rec "[ <repeat-style> ]#"]
-and Property_mask_size = [%value.rec "[ <bg-size> ]#"]
-and Property_mask_type = [%value.rec "'luminance' | 'alpha'"]
+and property_mask_clip = [%value.rec "[ <geometry-box> | 'no-clip' ]#"]
+and property_mask_composite = [%value.rec "[ <compositing-operator> ]#"]
+and property_mask_image = [%value.rec "[ <mask-reference> ]#"]
+and property_mask_mode = [%value.rec "[ <masking-mode> ]#"]
+and property_mask_origin = [%value.rec "[ <geometry-box> ]#"]
+and property_mask_position = [%value.rec "[ <position> ]#"]
+and property_mask_repeat = [%value.rec "[ <repeat-style> ]#"]
+and property_mask_size = [%value.rec "[ <bg-size> ]#"]
+and property_mask_type = [%value.rec "'luminance' | 'alpha'"]
 
-and Property_masonry_auto_flow =
+and property_masonry_auto_flow =
   [%value.rec "[ 'pack' | 'next' ] || [ 'definite-first' | 'ordered' ]"]
 
-and Property_max_block_size = [%value.rec "<'max-width'>"]
+and property_max_block_size = [%value.rec "<'max-width'>"]
 
-and Property_max_height =
+and property_max_height =
   [%value.rec
     "'auto' | <extended-length> | <extended-percentage> | 'min-content' | \
      'max-content' | 'fit-content' | fit-content( <extended-length> | \
      <extended-percentage> )"]
 
-and Property_max_inline_size = [%value.rec "<'max-width'>"]
-and Property_max_lines = [%value.rec "'none' | <integer>"]
+and property_max_inline_size = [%value.rec "<'max-width'>"]
+and property_max_lines = [%value.rec "'none' | <integer>"]
 
-and Property_max_width =
+and property_max_width =
   [%value.rec
     "<extended-length> | <extended-percentage> | 'none' | 'max-content' | \
      'min-content' | 'fit-content' | fit-content( <extended-length> | \
      <extended-percentage> ) | 'fill-available' | <-non-standard-width>"]
 
-and Property_min_block_size = [%value.rec "<'min-width'>"]
+and property_min_block_size = [%value.rec "<'min-width'>"]
 
-and Property_min_height =
+and property_min_height =
   [%value.rec
     "'auto' | <extended-length> | <extended-percentage> | 'min-content' | \
      'max-content' | 'fit-content' | fit-content( <extended-length> | \
      <extended-percentage> )"]
 
-and Property_min_inline_size = [%value.rec "<'min-width'>"]
+and property_min_inline_size = [%value.rec "<'min-width'>"]
 
-and Property_min_width =
+and property_min_width =
   [%value.rec
     "<extended-length> | <extended-percentage> | 'auto' | 'max-content' | \
      'min-content' | 'fit-content' | fit-content( <extended-length> | \
      <extended-percentage> ) | 'fill-available' | <-non-standard-width>"]
 
-and Property_mix_blend_mode = [%value.rec "<blend-mode>"]
-and Property_media_any_hover = [%value.rec "none | hover"]
-and Property_media_any_pointer = [%value.rec "none | coarse | fine"]
-and Property_media_pointer = [%value.rec "none | coarse | fine"]
-and Property_media_max_aspect_ratio = [%value.rec "<ratio>"]
-and Property_media_min_aspect_ratio = [%value.rec "<ratio>"]
-and Property_media_min_color = [%value.rec "<integer>"]
-and Property_media_color_gamut = [%value.rec "'srgb' | 'p3' | 'rec2020'"]
-and Property_media_color_index = [%value.rec "<integer>"]
-and Property_media_min_color_index = [%value.rec "<integer>"]
+and property_mix_blend_mode = [%value.rec "<blend-mode>"]
+and property_media_any_hover = [%value.rec "none | hover"]
+and property_media_any_pointer = [%value.rec "none | coarse | fine"]
+and property_media_pointer = [%value.rec "none | coarse | fine"]
+and property_media_max_aspect_ratio = [%value.rec "<ratio>"]
+and property_media_min_aspect_ratio = [%value.rec "<ratio>"]
+and property_media_min_color = [%value.rec "<integer>"]
+and property_media_color_gamut = [%value.rec "'srgb' | 'p3' | 'rec2020'"]
+and property_media_color_index = [%value.rec "<integer>"]
+and property_media_min_color_index = [%value.rec "<integer>"]
 
-and Property_media_display_mode =
+and property_media_display_mode =
   [%value.rec "'fullscreen' | 'standalone' | 'minimal-ui' | 'browser'"]
 
-and Property_media_forced_colors = [%value.rec "'none' | 'active'"]
+and property_media_forced_colors = [%value.rec "'none' | 'active'"]
 
-and Property_forced_color_adjust =
+and property_forced_color_adjust =
   [%value.rec "'auto' | 'none' | 'preserve-parent-color'"]
 
-and Property_media_grid = [%value.rec "<integer>"]
-and Property_media_hover = [%value.rec "'hover' | 'none'"]
-and Property_media_inverted_colors = [%value.rec "'inverted' | 'none'"]
-and Property_media_monochrome = [%value.rec "<integer>"]
-and Property_media_prefers_color_scheme = [%value.rec "'dark' | 'light'"]
+and property_media_grid = [%value.rec "<integer>"]
+and property_media_hover = [%value.rec "'hover' | 'none'"]
+and property_media_inverted_colors = [%value.rec "'inverted' | 'none'"]
+and property_media_monochrome = [%value.rec "<integer>"]
+and property_media_prefers_color_scheme = [%value.rec "'dark' | 'light'"]
 
-and Property_color_scheme =
+and property_color_scheme =
   [%value.rec "'normal' |\n  [ 'dark' | 'light' | <custom-ident> ]+ && 'only'?"]
 
-and Property_media_prefers_contrast =
+and property_media_prefers_contrast =
   [%value.rec "'no-preference' | 'more' | 'less'"]
 
-and Property_media_prefers_reduced_motion =
+and property_media_prefers_reduced_motion =
   [%value.rec "'no-preference' | 'reduce'"]
 
-and Property_media_resolution = [%value.rec "<resolution>"]
-and Property_media_min_resolution = [%value.rec "<resolution>"]
-and Property_media_max_resolution = [%value.rec "<resolution>"]
+and property_media_resolution = [%value.rec "<resolution>"]
+and property_media_min_resolution = [%value.rec "<resolution>"]
+and property_media_max_resolution = [%value.rec "<resolution>"]
 
-and Property_media_scripting =
+and property_media_scripting =
   [%value.rec "'none' | 'initial-only' | 'enabled'"]
 
-and Property_media_update = [%value.rec "'none' | 'slow' | 'fast'"]
-and Property_media_orientation = [%value.rec "'portrait' | 'landscape'"]
+and property_media_update = [%value.rec "'none' | 'slow' | 'fast'"]
+and property_media_orientation = [%value.rec "'portrait' | 'landscape'"]
 
-and Property_object_fit =
+and property_object_fit =
   [%value.rec "'fill' | 'contain' | 'cover' | 'none' | 'scale-down'"]
 
-and Property_object_position = [%value.rec "<position>"]
+and property_object_position = [%value.rec "<position>"]
 
-and Property_offset =
+and property_offset =
   [%value.rec
     "[ [ <'offset-position'> ]? <'offset-path'> [ <'offset-distance'> || \
      <'offset-rotate'> ]? ]? [ '/' <'offset-anchor'> ]?"]
 
-and Property_offset_anchor = [%value.rec "'auto' | <position>"]
+and property_offset_anchor = [%value.rec "'auto' | <position>"]
 
-and Property_offset_distance =
+and property_offset_distance =
   [%value.rec "<extended-length> | <extended-percentage>"]
 
-and Property_offset_path =
+and property_offset_path =
   [%value.rec
     "'none' | ray( <extended-angle> && [ <ray_size> ]? && [ 'contain' ]? ) | \
      <path()> | <url> | <basic-shape> || <geometry-box>"]
 
-and Property_offset_position = [%value.rec "'auto' | <position>"]
+and property_offset_position = [%value.rec "'auto' | <position>"]
 
-and Property_offset_rotate =
+and property_offset_rotate =
   [%value.rec "[ 'auto' | 'reverse' ] || <extended-angle>"]
 
-and Property_opacity = [%value.rec "<alpha-value>"]
-and Property_order = [%value.rec "<integer>"]
-and Property_orphans = [%value.rec "<integer>"]
+and property_opacity = [%value.rec "<alpha-value>"]
+and property_order = [%value.rec "<integer>"]
+and property_orphans = [%value.rec "<integer>"]
 
-and Property_outline =
+and property_outline =
   [%value.rec
     "'none' | <'outline-width'> | [ <'outline-width'> <'outline-style'> ] | [ \
      <'outline-width'> <'outline-style'> [ <color> | <interpolation> ]]"]
 
-and Property_outline_color = [%value.rec "<color>"]
-and Property_outline_offset = [%value.rec "<extended-length>"]
+and property_outline_color = [%value.rec "<color>"]
+and property_outline_offset = [%value.rec "<extended-length>"]
 
-and Property_outline_style =
+and property_outline_style =
   [%value.rec "'auto' | <line-style> | <interpolation>"]
 
-and Property_outline_width = [%value.rec "<line-width> | <interpolation>"]
+and property_outline_width = [%value.rec "<line-width> | <interpolation>"]
 
-and Property_overflow =
+and property_overflow =
   [%value.rec
     "[ 'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' ]{1,2} | \
      <-non-standard-overflow> | <interpolation>"]
 
-and Property_overflow_anchor = [%value.rec "'auto' | 'none'"]
+and property_overflow_anchor = [%value.rec "'auto' | 'none'"]
 
-and Property_overflow_block =
+and property_overflow_block =
   [%value.rec
     "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"]
 
-and Property_overflow_clip_margin =
+and property_overflow_clip_margin =
   [%value.rec "<visual-box> || <extended-length>"]
 
-and Property_overflow_inline =
+and property_overflow_inline =
   [%value.rec
     "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"]
 
-and Property_overflow_wrap = [%value.rec "'normal' | 'break-word' | 'anywhere'"]
+and property_overflow_wrap = [%value.rec "'normal' | 'break-word' | 'anywhere'"]
 
-and Property_overflow_x =
+and property_overflow_x =
   [%value.rec
     "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"]
 
-and Property_overflow_y =
+and property_overflow_y =
   [%value.rec
     "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"]
 
-and Property_overscroll_behavior =
+and property_overscroll_behavior =
   [%value.rec "[ 'contain' | 'none' | 'auto' ]{1,2}"]
 
-and Property_overscroll_behavior_block =
+and property_overscroll_behavior_block =
   [%value.rec "'contain' | 'none' | 'auto'"]
 
-and Property_overscroll_behavior_inline =
+and property_overscroll_behavior_inline =
   [%value.rec "'contain' | 'none' | 'auto'"]
 
-and Property_overscroll_behavior_x = [%value.rec "'contain' | 'none' | 'auto'"]
-and Property_overscroll_behavior_y = [%value.rec "'contain' | 'none' | 'auto'"]
+and property_overscroll_behavior_x = [%value.rec "'contain' | 'none' | 'auto'"]
+and property_overscroll_behavior_y = [%value.rec "'contain' | 'none' | 'auto'"]
 
-and Property_padding =
+and property_padding =
   [%value.rec
     "[ <extended-length> | <extended-percentage> | <interpolation> ]{1,4}"]
 
-and Property_padding_block = [%value.rec "[ <'padding-left'> ]{1,2}"]
-and Property_padding_block_end = [%value.rec "<'padding-left'>"]
-and Property_padding_block_start = [%value.rec "<'padding-left'>"]
+and property_padding_block = [%value.rec "[ <'padding-left'> ]{1,2}"]
+and property_padding_block_end = [%value.rec "<'padding-left'>"]
+and property_padding_block_start = [%value.rec "<'padding-left'>"]
 
-and Property_padding_bottom =
+and property_padding_bottom =
   [%value.rec "<extended-length> | <extended-percentage>"]
 
-and Property_padding_inline = [%value.rec "[ <'padding-left'> ]{1,2}"]
-and Property_padding_inline_end = [%value.rec "<'padding-left'>"]
-and Property_padding_inline_start = [%value.rec "<'padding-left'>"]
+and property_padding_inline = [%value.rec "[ <'padding-left'> ]{1,2}"]
+and property_padding_inline_end = [%value.rec "<'padding-left'>"]
+and property_padding_inline_start = [%value.rec "<'padding-left'>"]
 
-and Property_padding_left =
+and property_padding_left =
   [%value.rec "<extended-length> | <extended-percentage>"]
 
-and Property_padding_right =
+and property_padding_right =
   [%value.rec "<extended-length> | <extended-percentage>"]
 
-and Property_padding_top =
+and property_padding_top =
   [%value.rec "<extended-length> | <extended-percentage>"]
 
-and Property_page_break_after =
+and property_page_break_after =
   [%value.rec
     "'auto' | 'always' | 'avoid' | 'left' | 'right' | 'recto' | 'verso'"]
 
-and Property_page_break_before =
+and property_page_break_before =
   [%value.rec
     "'auto' | 'always' | 'avoid' | 'left' | 'right' | 'recto' | 'verso'"]
 
-and Property_page_break_inside = [%value.rec "'auto' | 'avoid'"]
+and property_page_break_inside = [%value.rec "'auto' | 'avoid'"]
 
-and Property_paint_order =
+and property_paint_order =
   [%value.rec "'normal' | 'fill' || 'stroke' || 'markers'"]
 
-and Property_pause = [%value.rec "<'pause-before'> [ <'pause-after'> ]?"]
+and property_pause = [%value.rec "<'pause-before'> [ <'pause-after'> ]?"]
 
-and Property_pause_after =
+and property_pause_after =
   [%value.rec
     "<extended-time> | 'none' | 'x-weak' | 'weak' | 'medium' | 'strong' | \
      'x-strong'"]
 
-and Property_pause_before =
+and property_pause_before =
   [%value.rec
     "<extended-time> | 'none' | 'x-weak' | 'weak' | 'medium' | 'strong' | \
      'x-strong'"]
 
-and Property_perspective = [%value.rec "'none' | <extended-length>"]
-and Property_perspective_origin = [%value.rec "<position>"]
+and property_perspective = [%value.rec "'none' | <extended-length>"]
+and property_perspective_origin = [%value.rec "<position>"]
 
-and Property_place_content =
+and property_place_content =
   [%value.rec "<'align-content'> [ <'justify-content'> ]?"]
 
-and Property_place_items = [%value.rec "<'align-items'> [ <'justify-items'> ]?"]
-and Property_place_self = [%value.rec "<'align-self'> [ <'justify-self'> ]?"]
+and property_place_items = [%value.rec "<'align-items'> [ <'justify-items'> ]?"]
+and property_place_self = [%value.rec "<'align-self'> [ <'justify-self'> ]?"]
 
-and Property_pointer_events =
+and property_pointer_events =
   [%value.rec
     "'auto' | 'none' | 'visiblePainted' | 'visibleFill' | 'visibleStroke' | \
      'visible' | 'painted' | 'fill' | 'stroke' | 'all' | 'inherit'"]
 
-and Property_position =
+and property_position =
   [%value.rec
     "'static' | 'relative' | 'absolute' | 'sticky' | 'fixed' | '-webkit-sticky'"]
 
-and Property_quotes = [%value.rec "'none' | 'auto' | [ <string> <string> ]+"]
+and property_quotes = [%value.rec "'none' | 'auto' | [ <string> <string> ]+"]
 
-and Property_resize =
+and property_resize =
   [%value.rec
     "'none' | 'both' | 'horizontal' | 'vertical' | 'block' | 'inline'"]
 
-and Property_rest = [%value.rec "<'rest-before'> [ <'rest-after'> ]?"]
+and property_rest = [%value.rec "<'rest-before'> [ <'rest-after'> ]?"]
 
-and Property_rest_after =
+and property_rest_after =
   [%value.rec
     "<extended-time> | 'none' | 'x-weak' | 'weak' | 'medium' | 'strong' | \
      'x-strong'"]
 
-and Property_rest_before =
+and property_rest_before =
   [%value.rec
     "<extended-time> | 'none' | 'x-weak' | 'weak' | 'medium' | 'strong' | \
      'x-strong'"]
 
-and Property_right =
+and property_right =
   [%value.rec "<extended-length> | <extended-percentage> | 'auto'"]
 
-and Property_rotate =
+and property_rotate =
   [%value.rec
     "'none' | <extended-angle> | [ 'x' | 'y' | 'z' | [ <number> ]{3} ] && \
      <extended-angle>"]
 
-and Property_row_gap =
+and property_row_gap =
   [%value.rec "'normal' | <extended-length> | <extended-percentage>"]
 
-and Property_ruby_align =
+and property_ruby_align =
   [%value.rec "'start' | 'center' | 'space-between' | 'space-around'"]
 
-and Property_ruby_merge = [%value.rec "'separate' | 'collapse' | 'auto'"]
-and Property_ruby_position = [%value.rec "'over' | 'under' | 'inter-character'"]
-and Property_scale = [%value.rec "'none' | [ <number-percentage> ]{1,3}"]
-and Property_scroll_behavior = [%value.rec "'auto' | 'smooth'"]
-and Property_scroll_margin = [%value.rec "[ <extended-length> ]{1,4}"]
-and Property_scroll_margin_block = [%value.rec "[ <extended-length> ]{1,2}"]
-and Property_scroll_margin_block_end = [%value.rec "<extended-length>"]
-and Property_scroll_margin_block_start = [%value.rec "<extended-length>"]
-and Property_scroll_margin_bottom = [%value.rec "<extended-length>"]
-and Property_scroll_margin_inline = [%value.rec "[ <extended-length> ]{1,2}"]
-and Property_scroll_margin_inline_end = [%value.rec "<extended-length>"]
-and Property_scroll_margin_inline_start = [%value.rec "<extended-length>"]
-and Property_scroll_margin_left = [%value.rec "<extended-length>"]
-and Property_scroll_margin_right = [%value.rec "<extended-length>"]
-and Property_scroll_margin_top = [%value.rec "<extended-length>"]
+and property_ruby_merge = [%value.rec "'separate' | 'collapse' | 'auto'"]
+and property_ruby_position = [%value.rec "'over' | 'under' | 'inter-character'"]
+and property_scale = [%value.rec "'none' | [ <number-percentage> ]{1,3}"]
+and property_scroll_behavior = [%value.rec "'auto' | 'smooth'"]
+and property_scroll_margin = [%value.rec "[ <extended-length> ]{1,4}"]
+and property_scroll_margin_block = [%value.rec "[ <extended-length> ]{1,2}"]
+and property_scroll_margin_block_end = [%value.rec "<extended-length>"]
+and property_scroll_margin_block_start = [%value.rec "<extended-length>"]
+and property_scroll_margin_bottom = [%value.rec "<extended-length>"]
+and property_scroll_margin_inline = [%value.rec "[ <extended-length> ]{1,2}"]
+and property_scroll_margin_inline_end = [%value.rec "<extended-length>"]
+and property_scroll_margin_inline_start = [%value.rec "<extended-length>"]
+and property_scroll_margin_left = [%value.rec "<extended-length>"]
+and property_scroll_margin_right = [%value.rec "<extended-length>"]
+and property_scroll_margin_top = [%value.rec "<extended-length>"]
 
-and Property_scroll_padding =
+and property_scroll_padding =
   [%value.rec "[ 'auto' | <extended-length> | <extended-percentage> ]{1,4}"]
 
-and Property_scroll_padding_block =
+and property_scroll_padding_block =
   [%value.rec "[ 'auto' | <extended-length> | <extended-percentage> ]{1,2}"]
 
-and Property_scroll_padding_block_end =
+and property_scroll_padding_block_end =
   [%value.rec "'auto' | <extended-length> | <extended-percentage>"]
 
-and Property_scroll_padding_block_start =
+and property_scroll_padding_block_start =
   [%value.rec "'auto' | <extended-length> | <extended-percentage>"]
 
-and Property_scroll_padding_bottom =
+and property_scroll_padding_bottom =
   [%value.rec "'auto' | <extended-length> | <extended-percentage>"]
 
-and Property_scroll_padding_inline =
+and property_scroll_padding_inline =
   [%value.rec "[ 'auto' | <extended-length> | <extended-percentage> ]{1,2}"]
 
-and Property_scroll_padding_inline_end =
+and property_scroll_padding_inline_end =
   [%value.rec "'auto' | <extended-length> | <extended-percentage>"]
 
-and Property_scroll_padding_inline_start =
+and property_scroll_padding_inline_start =
   [%value.rec "'auto' | <extended-length> | <extended-percentage>"]
 
-and Property_scroll_padding_left =
+and property_scroll_padding_left =
   [%value.rec "'auto' | <extended-length> | <extended-percentage>"]
 
-and Property_scroll_padding_right =
+and property_scroll_padding_right =
   [%value.rec "'auto' | <extended-length> | <extended-percentage>"]
 
-and Property_scroll_padding_top =
+and property_scroll_padding_top =
   [%value.rec "'auto' | <extended-length> | <extended-percentage>"]
 
-and Property_scroll_snap_align =
+and property_scroll_snap_align =
   [%value.rec "[ 'none' | 'start' | 'end' | 'center' ]{1,2}"]
 
-and Property_scroll_snap_coordinate = [%value.rec "'none' | [ <position> ]#"]
-and Property_scroll_snap_destination = [%value.rec "<position>"]
+and property_scroll_snap_coordinate = [%value.rec "'none' | [ <position> ]#"]
+and property_scroll_snap_destination = [%value.rec "<position>"]
 
-and Property_scroll_snap_points_x =
+and property_scroll_snap_points_x =
   [%value.rec "'none' | repeat( <extended-length> | <extended-percentage> )"]
 
-and Property_scroll_snap_points_y =
+and property_scroll_snap_points_y =
   [%value.rec "'none' | repeat( <extended-length> | <extended-percentage> )"]
 
-and Property_scroll_snap_stop = [%value.rec "'normal' | 'always'"]
+and property_scroll_snap_stop = [%value.rec "'normal' | 'always'"]
 
-and Property_scroll_snap_type =
+and property_scroll_snap_type =
   [%value.rec
     "'none' | [ 'x' | 'y' | 'block' | 'inline' | 'both' ] [ 'mandatory' | \
      'proximity' ]?"]
 
-and Property_scroll_snap_type_x =
+and property_scroll_snap_type_x =
   [%value.rec "'none' | 'mandatory' | 'proximity'"]
 
-and Property_scroll_snap_type_y =
+and property_scroll_snap_type_y =
   [%value.rec "'none' | 'mandatory' | 'proximity'"]
 
-and Property_scrollbar_color = [%value.rec "'auto' | [ <color> <color> ]"]
-and Property_scrollbar_width = [%value.rec "'auto' | 'thin' | 'none'"]
+and property_scrollbar_color = [%value.rec "'auto' | [ <color> <color> ]"]
+and property_scrollbar_width = [%value.rec "'auto' | 'thin' | 'none'"]
 
-and Property_scrollbar_gutter =
+and property_scrollbar_gutter =
   [%value.rec "'auto' | 'stable' && 'both-edges'?"]
 
-and Property_scrollbar_3dlight_color = [%value.rec "<color>"]
-and Property_scrollbar_arrow_color = [%value.rec "<color>"]
-and Property_scrollbar_base_color = [%value.rec "<color>"]
-and Property_scrollbar_darkshadow_color = [%value.rec "<color>"]
-and Property_scrollbar_face_color = [%value.rec "<color>"]
-and Property_scrollbar_highlight_color = [%value.rec "<color>"]
-and Property_scrollbar_shadow_color = [%value.rec "<color>"]
-and Property_scrollbar_track_color = [%value.rec "<color>"]
-and Property_shape_image_threshold = [%value.rec "<alpha-value>"]
+and property_scrollbar_3dlight_color = [%value.rec "<color>"]
+and property_scrollbar_arrow_color = [%value.rec "<color>"]
+and property_scrollbar_base_color = [%value.rec "<color>"]
+and property_scrollbar_darkshadow_color = [%value.rec "<color>"]
+and property_scrollbar_face_color = [%value.rec "<color>"]
+and property_scrollbar_highlight_color = [%value.rec "<color>"]
+and property_scrollbar_shadow_color = [%value.rec "<color>"]
+and property_scrollbar_track_color = [%value.rec "<color>"]
+and property_shape_image_threshold = [%value.rec "<alpha-value>"]
 
-and Property_shape_margin =
+and property_shape_margin =
   [%value.rec "<extended-length> | <extended-percentage>"]
 
-and Property_shape_outside =
+and property_shape_outside =
   [%value.rec "'none' | <shape-box> || <basic-shape> | <image>"]
 
-and Property_shape_rendering =
+and property_shape_rendering =
   [%value.rec "'auto' | 'optimizeSpeed' | 'crispEdges' | 'geometricPrecision'"]
 
-and Property_speak = [%value.rec "'auto' | 'none' | 'normal'"]
+and property_speak = [%value.rec "'auto' | 'none' | 'normal'"]
 
-and Property_speak_as =
+and property_speak_as =
   [%value.rec
     "'normal' | 'spell-out' || 'digits' || [ 'literal-punctuation' | \
      'no-punctuation' ]"]
 
-and Property_src =
+and property_src =
   [%value.rec
     "[ <url> [ format( [ <string> ]# ) ]? | local( <family-name> ) ]#"]
 
-and Property_stroke = [%value.rec "<paint>"]
-and Property_stroke_dasharray = [%value.rec "'none' | [ [ <svg-length> ]+ ]#"]
-and Property_stroke_dashoffset = [%value.rec "<svg-length>"]
-and Property_stroke_linecap = [%value.rec "'butt' | 'round' | 'square'"]
-and Property_stroke_linejoin = [%value.rec "'miter' | 'round' | 'bevel'"]
-and Property_stroke_miterlimit = [%value.rec "<number-one-or-greater>"]
-and Property_stroke_opacity = [%value.rec "<alpha-value>"]
-and Property_stroke_width = [%value.rec "<svg-length>"]
-and Property_tab_size = [%value.rec " <number> | <extended-length>"]
-and Property_table_layout = [%value.rec "'auto' | 'fixed'"]
+and property_stroke = [%value.rec "<paint>"]
+and property_stroke_dasharray = [%value.rec "'none' | [ [ <svg-length> ]+ ]#"]
+and property_stroke_dashoffset = [%value.rec "<svg-length>"]
+and property_stroke_linecap = [%value.rec "'butt' | 'round' | 'square'"]
+and property_stroke_linejoin = [%value.rec "'miter' | 'round' | 'bevel'"]
+and property_stroke_miterlimit = [%value.rec "<number-one-or-greater>"]
+and property_stroke_opacity = [%value.rec "<alpha-value>"]
+and property_stroke_width = [%value.rec "<svg-length>"]
+and property_tab_size = [%value.rec " <number> | <extended-length>"]
+and property_table_layout = [%value.rec "'auto' | 'fixed'"]
 
-and Property_text_autospace =
+and property_text_autospace =
   [%value.rec
     "'none' | 'ideograph-alpha' | 'ideograph-numeric' | \
      'ideograph-parenthesis' | 'ideograph-space'"]
 
-and Property_text_blink = [%value.rec "'none' | 'blink' | 'blink-anywhere'"]
+and property_text_blink = [%value.rec "'none' | 'blink' | 'blink-anywhere'"]
 
-and Property_text_align =
+and property_text_align =
   [%value.rec
     "'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | \
      'match-parent' | 'justify-all'"]
 
-and Property_text_align_all =
+and property_text_align_all =
   [%value.rec
     "'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | 'match-parent'"]
 
-and Property_text_align_last =
+and property_text_align_last =
   [%value.rec
     "'auto' | 'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | \
      'match-parent'"]
 
-and Property_text_anchor = [%value.rec "'start' | 'middle' | 'end'"]
+and property_text_anchor = [%value.rec "'start' | 'middle' | 'end'"]
 
-and Property_text_combine_upright =
+and property_text_combine_upright =
   [%value.rec "'none' | 'all' | 'digits' [ <integer> ]?"]
 
-and Property_text_decoration =
+and property_text_decoration =
   [%value.rec
     "<'text-decoration-color'> || <'text-decoration-style'> || \
      <'text-decoration-thickness'> || <'text-decoration-line'>"]
 
-and Property_text_justify_trim = [%value.rec "'none' | 'all' | 'auto'"]
+and property_text_justify_trim = [%value.rec "'none' | 'all' | 'auto'"]
 
-and Property_text_kashida =
+and property_text_kashida =
   [%value.rec "'none' | 'horizontal' | 'vertical' | 'both'"]
 
-and Property_text_kashida_space = [%value.rec "'normal' | 'pre' | 'post'"]
-and Property_text_decoration_color = [%value.rec "<color>"]
+and property_text_kashida_space = [%value.rec "'normal' | 'pre' | 'post'"]
+and property_text_decoration_color = [%value.rec "<color>"]
 
 (* Spec doesn't contain spelling-error and grammar-error: https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-line but this list used to have them | 'spelling-error' | 'grammar-error'. Leaving this comment here for reference *)
 (* and this definition has changed from the origianl, it might be a bug on the spec or our Generator,
    but simplifying to "|" simplifies it and solves the bug *)
-and Property_text_decoration_line =
+and property_text_decoration_line =
   [%value.rec
     "'none' | <interpolation> | [ 'underline' || 'overline' || 'line-through' \
      || 'blink' ]"]
 
-and Property_text_decoration_skip =
+and property_text_decoration_skip =
   [%value.rec
     "'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' \
      ] || 'edges' || 'box-decoration'"]
 
-and Property_text_decoration_skip_self =
+and property_text_decoration_skip_self =
   [%value.rec
     "'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' \
      ] || 'edges' || 'box-decoration'"]
 
-and Property_text_decoration_skip_ink = [%value.rec "'auto' | 'all' | 'none'"]
-and Property_text_decoration_skip_box = [%value.rec "'none' | 'all'"]
+and property_text_decoration_skip_ink = [%value.rec "'auto' | 'all' | 'none'"]
+and property_text_decoration_skip_box = [%value.rec "'none' | 'all'"]
 
-and Property_text_decoration_skip_spaces =
+and property_text_decoration_skip_spaces =
   [%value.rec
     "'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' \
      ] || 'edges' || 'box-decoration'"]
 
-and Property_text_decoration_skip_inset = [%value.rec "'none' | 'auto'"]
+and property_text_decoration_skip_inset = [%value.rec "'none' | 'auto'"]
 
-and Property_text_decoration_style =
+and property_text_decoration_style =
   [%value.rec "'solid' | 'double' | 'dotted' | 'dashed' | 'wavy'"]
 
-and Property_text_decoration_thickness =
+and property_text_decoration_thickness =
   [%value.rec
     "'auto' | 'from-font' | <extended-length> | <extended-percentage>"]
 
-and Property_text_emphasis =
+and property_text_emphasis =
   [%value.rec "<'text-emphasis-style'> || <'text-emphasis-color'>"]
 
-and Property_text_emphasis_color = [%value.rec "<color>"]
+and property_text_emphasis_color = [%value.rec "<color>"]
 
-and Property_text_emphasis_position =
+and property_text_emphasis_position =
   [%value.rec "[ 'over' | 'under' ] && [ 'right' | 'left' ]?"]
 
-and Property_text_emphasis_style =
+and property_text_emphasis_style =
   [%value.rec
     "'none' | [ 'filled' | 'open' ] || [ 'dot' | 'circle' | 'double-circle' | \
      'triangle' | 'sesame' ] | <string>"]
 
-and Property_text_indent =
+and property_text_indent =
   [%value.rec
     "[<extended-length> | <extended-percentage>] && [ 'hanging' ]? && [ \
      'each-line' ]?"]
 
-and Property_text_justify =
+and property_text_justify =
   [%value.rec "'auto' | 'inter-character' | 'inter-word' | 'none'"]
 
-and Property_text_orientation = [%value.rec "'mixed' | 'upright' | 'sideways'"]
+and property_text_orientation = [%value.rec "'mixed' | 'upright' | 'sideways'"]
 
-and Property_text_overflow =
+and property_text_overflow =
   [%value.rec "[ 'clip' | 'ellipsis' | <string> ]{1,2}"]
 
-and Property_text_rendering =
+and property_text_rendering =
   [%value.rec
     "'auto' | 'optimizeSpeed' | 'optimizeLegibility' | 'geometricPrecision'"]
 
-and Property_text_shadow =
+and property_text_shadow =
   [%value.rec "'none' | <interpolation> | [ <shadow-t> ]#"]
 
-and Property_text_size_adjust =
+and property_text_size_adjust =
   [%value.rec "'none' | 'auto' | <extended-percentage>"]
 
-and Property_text_transform =
+and property_text_transform =
   [%value.rec
     "'none' | 'capitalize' | 'uppercase' | 'lowercase' | 'full-width' | \
      'full-size-kana'"]
 
-and Property_text_underline_offset =
+and property_text_underline_offset =
   [%value.rec "'auto' | <extended-length> | <extended-percentage>"]
 
-and Property_text_underline_position =
+and property_text_underline_position =
   [%value.rec "'auto' | 'from-font' | 'under' || [ 'left' | 'right' ]"]
 
-and Property_top =
+and property_top =
   [%value.rec "<extended-length> | <extended-percentage> | 'auto'"]
 
-and Property_touch_action =
+and property_touch_action =
   [%value.rec
     "'auto' | 'none' | [ 'pan-x' | 'pan-left' | 'pan-right' ] || [ 'pan-y' | \
      'pan-up' | 'pan-down' ] || 'pinch-zoom' | 'manipulation'"]
 
-and Property_transform = [%value.rec "'none' | <transform-list>"]
+and property_transform = [%value.rec "'none' | <transform-list>"]
 
-and Property_transform_box =
+and property_transform_box =
   [%value.rec
     "'content-box' | 'border-box' | 'fill-box' | 'stroke-box' | 'view-box'"]
 
-and Property_transform_origin =
+and property_transform_origin =
   [%value.rec
     "[ 'left' | 'center' | 'right' | 'top' | 'bottom' | <length-percentage> ]\n\
     \  | [ 'left' | 'center' | 'right' | <length-percentage> ] [ 'top' | \
@@ -2316,171 +2312,171 @@ and Property_transform_origin =
     \  | [[ 'center' | 'left' | 'right' ] && [ 'center' | 'top' | 'bottom' ]] \
      <length>? "]
 
-and Property_transform_style = [%value.rec "'flat' | 'preserve-3d'"]
+and property_transform_style = [%value.rec "'flat' | 'preserve-3d'"]
 
-and Property_transition =
+and property_transition =
   [%value.rec "[ <single-transition> | <single-transition-no-interp> ]#"]
 
-and Property_transition_behavior = [%value.rec "<transition-behavior-value>#"]
-and Property_transition_delay = [%value.rec "[ <extended-time> ]#"]
-and Property_transition_duration = [%value.rec "[ <extended-time> ]#"]
+and property_transition_behavior = [%value.rec "<transition-behavior-value>#"]
+and property_transition_delay = [%value.rec "[ <extended-time> ]#"]
+and property_transition_duration = [%value.rec "[ <extended-time> ]#"]
 
-and Property_transition_property =
+and property_transition_property =
   [%value.rec "[ <single-transition-property> ]# | 'none'"]
 
-and Property_transition_timing_function = [%value.rec "[ <timing-function> ]#"]
+and property_transition_timing_function = [%value.rec "[ <timing-function> ]#"]
 
-and Property_translate =
+and property_translate =
   [%value.rec "'none' | <length-percentage> [ <length-percentage> <length>? ]?"]
 
-and Property_unicode_bidi =
+and property_unicode_bidi =
   [%value.rec
     "'normal' | 'embed' | 'isolate' | 'bidi-override' | 'isolate-override' | \
      'plaintext' | '-moz-isolate' | '-moz-isolate-override' | '-moz-plaintext' \
      | '-webkit-isolate'"]
 
-and Property_unicode_range = [%value.rec "[ <urange> ]#"]
+and property_unicode_range = [%value.rec "[ <urange> ]#"]
 
-and Property_user_select =
+and property_user_select =
   [%value.rec "'auto' | 'text' | 'none' | 'contain' | 'all' | <interpolation>"]
 
-and Property_vertical_align =
+and property_vertical_align =
   [%value.rec
     "'baseline' | 'sub' | 'super' | 'text-top' | 'text-bottom' | 'middle' | \
      'top' | 'bottom' | <extended-percentage> | <extended-length>"]
 
-and Property_visibility =
+and property_visibility =
   [%value.rec "'visible' | 'hidden' | 'collapse' | <interpolation>"]
 
-and Property_voice_balance =
+and property_voice_balance =
   [%value.rec
     "<number> | 'left' | 'center' | 'right' | 'leftwards' | 'rightwards'"]
 
-and Property_voice_duration = [%value.rec "'auto' | <extended-time>"]
+and property_voice_duration = [%value.rec "'auto' | <extended-time>"]
 
-and Property_voice_family =
+and property_voice_family =
   [%value.rec
     "[ [ <family-name> | <generic-voice> ] ',' ]* [ <family-name> | \
      <generic-voice> ] | 'preserve'"]
 
-and Property_voice_pitch =
+and property_voice_pitch =
   [%value.rec
     "<extended-frequency> && 'absolute' | [ 'x-low' | 'low' | 'medium' | \
      'high' | 'x-high' ] || [ <extended-frequency> | <semitones> | \
      <extended-percentage> ]"]
 
-and Property_voice_range =
+and property_voice_range =
   [%value.rec
     "<extended-frequency> && 'absolute' | [ 'x-low' | 'low' | 'medium' | \
      'high' | 'x-high' ] || [ <extended-frequency> | <semitones> | \
      <extended-percentage> ]"]
 
-and Property_voice_rate =
+and property_voice_rate =
   [%value.rec
     "[ 'normal' | 'x-slow' | 'slow' | 'medium' | 'fast' | 'x-fast' ] || \
      <extended-percentage>"]
 
-and Property_voice_stress =
+and property_voice_stress =
   [%value.rec "'normal' | 'strong' | 'moderate' | 'none' | 'reduced'"]
 
-and Property_voice_volume =
+and property_voice_volume =
   [%value.rec
     "'silent' | [ 'x-soft' | 'soft' | 'medium' | 'loud' | 'x-loud' ] || \
      <decibel>"]
 
-and Property_white_space =
+and property_white_space =
   [%value.rec
     "'normal' | 'pre' | 'nowrap' | 'pre-wrap' | 'pre-line' | 'break-spaces'"]
 
-and Property_widows = [%value.rec "<integer>"]
+and property_widows = [%value.rec "<integer>"]
 
-and Property_width =
+and property_width =
   [%value.rec
     "'auto' | <extended-length> | <extended-percentage> | 'min-content' | \
      'max-content' | 'fit-content' | fit-content( <extended-length> | \
      <extended-percentage> )"]
 
-and Property_will_change = [%value.rec "'auto' | [ <animateable-feature> ]#"]
+and property_will_change = [%value.rec "'auto' | [ <animateable-feature> ]#"]
 
-and Property_word_break =
+and property_word_break =
   [%value.rec "'normal' | 'break-all' | 'keep-all' | 'break-word'"]
 
-and Property_word_spacing =
+and property_word_spacing =
   [%value.rec "'normal' | <extended-length> | <extended-percentage>"]
 
-and Property_word_wrap = [%value.rec "'normal' | 'break-word' | 'anywhere'"]
+and property_word_wrap = [%value.rec "'normal' | 'break-word' | 'anywhere'"]
 
-and Property_writing_mode =
+and property_writing_mode =
   [%value.rec
     "'horizontal-tb' | 'vertical-rl' | 'vertical-lr' | 'sideways-rl' | \
      'sideways-lr' | <svg-writing-mode>"]
 
-and Property_z_index = [%value.rec "'auto' | <integer> | <interpolation>"]
+and property_z_index = [%value.rec "'auto' | <integer> | <interpolation>"]
 
-and Property_zoom =
+and property_zoom =
   [%value.rec "'normal' | 'reset' | <number> | <extended-percentage>"]
 
-and Property_container =
+and property_container =
   [%value.rec "<'container-name'> [ '/' <'container-type'> ]?"]
 
-and Property_container_name = [%value.rec "<custom-ident>+ | 'none'"]
-and Property_container_type = [%value.rec "'normal' | 'size' | 'inline-size'"]
-and Property_nav_down = [%value.rec "'auto' | <integer> | <interpolation>"]
-and Property_nav_left = [%value.rec "'auto' | <integer> | <interpolation>"]
-and Property_nav_right = [%value.rec "'auto' | <integer> | <interpolation>"]
-and Property_nav_up = [%value.rec "'auto' | <integer> | <interpolation>"]
+and property_container_name = [%value.rec "<custom-ident>+ | 'none'"]
+and property_container_type = [%value.rec "'normal' | 'size' | 'inline-size'"]
+and property_nav_down = [%value.rec "'auto' | <integer> | <interpolation>"]
+and property_nav_left = [%value.rec "'auto' | <integer> | <interpolation>"]
+and property_nav_right = [%value.rec "'auto' | <integer> | <interpolation>"]
+and property_nav_up = [%value.rec "'auto' | <integer> | <interpolation>"]
 
-and Pseudo_class_selector =
+and pseudo_class_selector =
   [%value.rec "':' <ident-token> | ':' <function-token> <any-value> ')'"]
 
-and Pseudo_element_selector = [%value.rec "':' <pseudo-class-selector>"]
-and Pseudo_page = [%value.rec "':' [ 'left' | 'right' | 'first' | 'blank' ]"]
+and pseudo_element_selector = [%value.rec "':' <pseudo-class-selector>"]
+and pseudo_page = [%value.rec "':' [ 'left' | 'right' | 'first' | 'blank' ]"]
 
-and Quote =
+and quote =
   [%value.rec
     "'open-quote' | 'close-quote' | 'no-open-quote' | 'no-close-quote'"]
 
-and Ratio = [%value.rec "<integer> '/' <integer> | <number> | <interpolation>"]
-and Relative_selector = [%value.rec "[ <combinator> ]? <complex-selector>"]
-and Relative_selector_list = [%value.rec "[ <relative-selector> ]#"]
-and Relative_size = [%value.rec "'larger' | 'smaller'"]
+and ratio = [%value.rec "<integer> '/' <integer> | <number> | <interpolation>"]
+and relative_selector = [%value.rec "[ <combinator> ]? <complex-selector>"]
+and relative_selector_list = [%value.rec "[ <relative-selector> ]#"]
+and relative_size = [%value.rec "'larger' | 'smaller'"]
 
-and Repeat_style =
+and repeat_style =
   [%value.rec
     "'repeat-x' | 'repeat-y' | [ 'repeat' | 'space' | 'round' | 'no-repeat' ] \
      [ 'repeat' | 'space' | 'round' | 'no-repeat' ]?"]
 
-and Right = [%value.rec "<extended-length> | 'auto'"]
+and right = [%value.rec "<extended-length> | 'auto'"]
 
-and Self_position =
+and self_position =
   [%value.rec
     "'center' | 'start' | 'end' | 'self-start' | 'self-end' | 'flex-start' | \
      'flex-end'"]
 
-and Shadow =
+and shadow =
   [%value.rec
     "[ 'inset' ]? [ <extended-length> | <interpolation> ]{4} [ <color> | \
      <interpolation> ]?"]
 
-and Shadow_t =
+and shadow_t =
   [%value.rec
     "[ <extended-length> | <interpolation> ]{3} [ <color> | <interpolation> ]?"]
 
-and Shape =
+and shape =
   [%value.rec
     "rect( <top> ',' <right> ',' <bottom> ',' <left> ) | rect( <top> <right> \
      <bottom> <left> )"]
 
-and Shape_box = [%value.rec "<box> | 'margin-box'"]
+and shape_box = [%value.rec "<box> | 'margin-box'"]
 
-and Shape_radius =
+and shape_radius =
   [%value.rec
     "<extended-length> | <extended-percentage> | 'closest-side' | \
      'farthest-side'"]
 
-and Side_or_corner = [%value.rec "[ 'left' | 'right' ] || [ 'top' | 'bottom' ]"]
+and side_or_corner = [%value.rec "[ 'left' | 'right' ] || [ 'top' | 'bottom' ]"]
 
-and Single_animation =
+and single_animation =
   [%value.rec
     "[ [ <keyframes-name> | 'none' | <interpolation> ] ]\n\
     \  | [ [ <keyframes-name> | 'none' | <interpolation> ] <extended-time> ]\n\
@@ -2501,7 +2497,7 @@ and Single_animation =
      <single-animation-direction> <single-animation-fill-mode> \
      <single-animation-play-state> ]"]
 
-and Single_animation_no_interp =
+and single_animation_no_interp =
   [%value.rec
     "[ <keyframes-name> | 'none' ] || <extended-time-no-interp> || \
      <timing-function-no-interp> || <extended-time-no-interp> || \
@@ -2510,37 +2506,37 @@ and Single_animation_no_interp =
      <single-animation-fill-mode-no-interp> || \
      <single-animation-play-state-no-interp>"]
 
-and Single_animation_direction =
+and single_animation_direction =
   [%value.rec
     "'normal' | 'reverse' | 'alternate' | 'alternate-reverse' | <interpolation>"]
 
-and Single_animation_direction_no_interp =
+and single_animation_direction_no_interp =
   [%value.rec "'normal' | 'reverse' | 'alternate' | 'alternate-reverse'"]
 
-and Single_animation_fill_mode =
+and single_animation_fill_mode =
   [%value.rec "'none' | 'forwards' | 'backwards' | 'both' | <interpolation>"]
 
-and Single_animation_fill_mode_no_interp =
+and single_animation_fill_mode_no_interp =
   [%value.rec "'none' | 'forwards' | 'backwards' | 'both'"]
 
-and Single_animation_iteration_count =
+and single_animation_iteration_count =
   [%value.rec "'infinite' | <number> | <interpolation>"]
 
-and Single_animation_iteration_count_no_interp =
+and single_animation_iteration_count_no_interp =
   [%value.rec "'infinite' | <number>"]
 
-and Single_animation_play_state =
+and single_animation_play_state =
   [%value.rec "'running' | 'paused' | <interpolation>"]
 
-and Single_animation_play_state_no_interp = [%value.rec "'running' | 'paused'"]
+and single_animation_play_state_no_interp = [%value.rec "'running' | 'paused'"]
 
-and Single_transition_no_interp =
+and single_transition_no_interp =
   [%value.rec
     "[ <single-transition-property-no-interp> | 'none' ] || \
      <extended-time-no-interp> || <timing-function-no-interp> || \
      <extended-time-no-interp> || <transition-behavior-value-no-interp>"]
 
-and Single_transition =
+and single_transition =
   [%value.rec
     "[<single-transition-property> | 'none']\n\
     \  | [ [<single-transition-property> | 'none'] <extended-time> ]\n\
@@ -2551,133 +2547,133 @@ and Single_transition =
     \  | [ [<single-transition-property> | 'none'] <extended-time> \
      <timing-function> <extended-time> <transition-behavior-value> ]"]
 
-and Single_transition_property =
+and single_transition_property =
   [%value.rec "<custom-ident> | <interpolation> | 'all'"]
 
-and Single_transition_property_no_interp = [%value.rec "<custom-ident> | 'all'"]
+and single_transition_property_no_interp = [%value.rec "<custom-ident> | 'all'"]
 
-and Size =
+and size =
   [%value.rec
     "'closest-side' | 'farthest-side' | 'closest-corner' | 'farthest-corner' | \
      <extended-length> | [ <extended-length> | <extended-percentage> ]{2}"]
 
-and Ray_size =
+and ray_size =
   [%value.rec
     "'closest-side' | 'farthest-side' | 'closest-corner' | 'farthest-corner' | \
      'sides'"]
 
-and Radial_size =
+and radial_size =
   [%value.rec
     "'closest-side' | 'farthest-side' | 'closest-corner' | 'farthest-corner' | \
      <extended-length> | [ <extended-length> | <extended-percentage> ]{2}"]
 
-and Step_position =
+and step_position =
   [%value.rec
     "'jump-start' | 'jump-end' | 'jump-none' | 'jump-both' | 'start' | 'end'"]
 
-and Step_timing_function =
+and step_timing_function =
   [%value.rec
     "'step-start' | 'step-end' | steps( <integer> [ ',' <step-position> ]? )"]
 
-and Subclass_selector =
+and subclass_selector =
   [%value.rec
     "<id-selector> | <class-selector> | <attribute-selector> | \
      <pseudo-class-selector>"]
 
-and Supports_condition =
+and supports_condition =
   [%value.rec
     "'not' <supports-in-parens> | <supports-in-parens> [ 'and' \
      <supports-in-parens> ]* | <supports-in-parens> [ 'or' \
      <supports-in-parens> ]*"]
 
-and Supports_decl = [%value.rec "'(' <declaration> ')'"]
-and Supports_feature = [%value.rec "<supports-decl> | <supports-selector-fn>"]
+and supports_decl = [%value.rec "'(' <declaration> ')'"]
+and supports_feature = [%value.rec "<supports-decl> | <supports-selector-fn>"]
 
-and Supports_in_parens =
+and supports_in_parens =
   [%value.rec "'(' <supports-condition> ')' | <supports-feature>"]
 
-and Supports_selector_fn = [%value.rec "selector( <complex-selector> )"]
+and supports_selector_fn = [%value.rec "selector( <complex-selector> )"]
 
-and Svg_length =
+and svg_length =
   [%value.rec "<extended-percentage> | <extended-length> | <number>"]
 
-and Svg_writing_mode =
+and svg_writing_mode =
   [%value.rec "'lr-tb' | 'rl-tb' | 'tb-rl' | 'lr' | 'rl' | 'tb'"]
 
-and Symbol = [%value.rec "<string> | <image> | <custom-ident>"]
+and symbol = [%value.rec "<string> | <image> | <custom-ident>"]
 
-and Symbols_type =
+and symbols_type =
   [%value.rec "'cyclic' | 'numeric' | 'alphabetic' | 'symbolic' | 'fixed'"]
 
-and Target =
+and target =
   [%value.rec "<target-counter()> | <target-counters()> | <target-text()>"]
 
-and Url = [%value.rec "<url-no-interp> | url( <interpolation> )"]
+and url = [%value.rec "<url-no-interp> | url( <interpolation> )"]
 
-and Extended_length =
+and extended_length =
   [%value.rec "<length> | <calc()> | <interpolation> | <min()> | <max()>"]
 
-and Length_percentage = [%value.rec "<extended-length> | <extended-percentage>"]
+and length_percentage = [%value.rec "<extended-length> | <extended-percentage>"]
 
-and Extended_frequency =
+and extended_frequency =
   [%value.rec "<frequency> | <calc()> | <interpolation> | <min()> | <max()>"]
 
-and Extended_angle =
+and extended_angle =
   [%value.rec "<angle> | <calc()> | <interpolation> | <min()> | <max()>"]
 
-and Extended_time =
+and extended_time =
   [%value.rec "<time> | <calc()> | <interpolation> | <min()> | <max()>"]
 
-and Extended_time_no_interp =
+and extended_time_no_interp =
   [%value.rec "<time> | <calc()> | <min()> | <max()>"]
 
-and Extended_percentage =
+and extended_percentage =
   [%value.rec "<percentage> | <calc()> | <interpolation> | <min()> | <max()> "]
 
-and Timing_function =
+and timing_function =
   [%value.rec
     "'linear' | <cubic-bezier-timing-function> | <step-timing-function> | \
      <interpolation>"]
 
-and Timing_function_no_interp =
+and timing_function_no_interp =
   [%value.rec
     "'linear' | <cubic-bezier-timing-function> | <step-timing-function>"]
 
-and Top = [%value.rec "<extended-length> | 'auto'"]
+and top = [%value.rec "<extended-length> | 'auto'"]
 
-and Track_breadth =
+and track_breadth =
   [%value.rec
     "<extended-length> | <extended-percentage> | <flex-value> | 'min-content' \
      | 'max-content' | 'auto'"]
 
-and Track_group =
+and track_group =
   [%value.rec
     "'(' [ [ <string> ]* <track-minmax> [ <string> ]* ]+ ')' [ '[' \
      <positive-integer> ']' ]? | <track-minmax>"]
 
-and Track_list =
+and track_list =
   [%value.rec
     "[ [ <line-names> ]? [ <track-size> | <track-repeat> ] ]+ [ <line-names> ]?"]
 
-and Track_list_v0 =
+and track_list_v0 =
   [%value.rec "[ [ <string> ]* <track-group> [ <string> ]* ]+ | 'none'"]
 
-and Track_minmax =
+and track_minmax =
   [%value.rec
     "minmax( <track-breadth> ',' <track-breadth> ) | 'auto' | <track-breadth> \
      | fit-content( <extended-length> | <extended-percentage> )"]
 
-and Track_repeat =
+and track_repeat =
   [%value.rec
     "repeat( <positive-integer> ',' [ [ <line-names> ]? <track-size> ]+ [ \
      <line-names> ]? )"]
 
-and Track_size =
+and track_size =
   [%value.rec
     "<track-breadth> | minmax( <inflexible-breadth> ',' <track-breadth> ) | \
      fit-content( <extended-length> | <extended-percentage> )"]
 
-and Transform_function =
+and transform_function =
   [%value.rec
     "<matrix()> | <translate()> | <translateX()> | <translateY()> | <scale()> \
      | <scaleX()> | <scaleY()> | <rotate()> | <skew()> | <skewX()> | <skewY()> \
@@ -2685,15 +2681,15 @@ and Transform_function =
      <scaleZ()> | <rotate3d()> | <rotateX()> | <rotateY()> | <rotateZ()> | \
      <perspective()>"]
 
-and Transform_list = [%value.rec "[ <transform-function> ]+"]
+and transform_list = [%value.rec "[ <transform-function> ]+"]
 
-and Transition_behavior_value =
+and transition_behavior_value =
   [%value.rec "'normal' | 'allow-discrete' | <interpolation>"]
 
-and Transition_behavior_value_no_interp =
+and transition_behavior_value_no_interp =
   [%value.rec "'normal' | 'allow-discrete'"]
 
-and Type_or_unit =
+and type_or_unit =
   [%value.rec
     "'string' | 'color' | 'url' | 'integer' | 'number' | 'length' | 'angle' | \
      'time' | 'frequency' | 'cap' | 'ch' | 'em' | 'ex' | 'ic' | 'lh' | 'rlh' | \
@@ -2701,50 +2697,50 @@ and Type_or_unit =
      'in' | 'pt' | 'pc' | 'px' | 'deg' | 'grad' | 'rad' | 'turn' | 'ms' | 's' \
      | 'Hz' | 'kHz' | '%'"]
 
-and Type_selector = [%value.rec "<wq-name> | [ <ns-prefix> ]? '*'"]
+and type_selector = [%value.rec "<wq-name> | [ <ns-prefix> ]? '*'"]
 
-and Viewport_length =
+and viewport_length =
   [%value.rec "'auto' | <extended-length> | <extended-percentage>"]
 
-and Visual_box = [%value.rec "'content-box' | 'padding-box' | 'border-box'"]
-and Wq_name = [%value.rec "[ <ns-prefix> ]? <ident-token>"]
-and Attr_name = [%value.rec "[ <ident-token>? '|' ]? <ident-token>"]
+and visual_box = [%value.rec "'content-box' | 'padding-box' | 'border-box'"]
+and wq_name = [%value.rec "[ <ns-prefix> ]? <ident-token>"]
+and attr_name = [%value.rec "[ <ident-token>? '|' ]? <ident-token>"]
 
-and Attr_unit =
+and attr_unit =
   [%value.rec
     "'%' | 'em' | 'ex' | 'ch' | 'rem' | 'vw' | 'vh' | 'vmin' | 'vmax' | 'cm' | \
      'mm' | 'in' | 'px' | 'pt' | 'pc' | 'deg' | 'grad' | 'rad' | 'turn' | 'ms' \
      | 's' | 'Hz' | 'kHz'"]
 
-and Syntax_type_name =
+and syntax_type_name =
   [%value.rec
     "'angle' | 'color' | 'custom-ident' | 'image' | 'integer' | 'length' | \
      'length-percentage' | 'number' | 'percentage' | 'resolution' | 'string' | \
      'time' | 'url' | 'transform-function'"]
 
-and Syntax_multiplier = [%value.rec "'#' | '+'"]
+and syntax_multiplier = [%value.rec "'#' | '+'"]
 
-and Syntax_single_component =
+and syntax_single_component =
   [%value.rec "'<' <syntax-type-name> '>' | <ident>"]
 
-and Syntax_string = [%value.rec "<string>"]
-and Syntax_combinator = [%value.rec "'|'"]
+and syntax_string = [%value.rec "<string>"]
+and syntax_combinator = [%value.rec "'|'"]
 
-and Syntax_component =
+and syntax_component =
   [%value.rec
     "<syntax-single-component> [ <syntax-multiplier> ]? | '<' 'transform-list' \
      '>'"]
 
-and Syntax =
+and syntax =
   [%value.rec
     "'*' | <syntax-component> [ <syntax-combinator> <syntax-component> ]* | \
      <syntax-string>"]
 
-(*
- We don't support type() yet, original spec is: "type( <syntax> ) | 'raw-string' | <attr-unit>" *)
-and Attr_type = [%value.rec "'raw-string' | <attr-unit>"]
-and X = [%value.rec "<number>"]
-and Y = [%value.rec "<number>"]
+(* (*
+ We don't support type() yet, original spec is: "type( <syntax> ) | 'raw-string' | <attr-unit>" *) *)
+and attr_type = [%value.rec "'raw-string' | <attr-unit>"]
+and x = [%value.rec "<number>"]
+and y = [%value.rec "<number>"]
 
 let ( let+ ) = Result.bind
 
@@ -2842,887 +2838,891 @@ let fn (type a) (name : string) (rule : a Rule.rule) : (module RULE) =
 
 let packed_rules : (module RULE) list =
   [
-value "-legacy-gradient" Legacy_gradient.parser;
-value "-legacy-linear-gradient" Legacy_linear_gradient.parser;
-value "-legacy-linear-gradient-arguments" Legacy_linear_gradient_arguments.parser;
-value "-legacy-radial-gradient" Legacy_radial_gradient.parser;
-value "-legacy-radial-gradient-arguments" Legacy_radial_gradient_arguments.parser;
-value "-legacy-radial-gradient-shape" Legacy_radial_gradient_shape.parser;
-value "-legacy-radial-gradient-size" Legacy_radial_gradient_size.parser;
-value "-legacy-repeating-linear-gradient" Legacy_repeating_linear_gradient.parser;
-value "-legacy-repeating-radial-gradient" Legacy_repeating_radial_gradient.parser;
-value "-non-standard-color" Non_standard_color.parser;
-value "-non-standard-font" Non_standard_font.parser;
-value "-non-standard-image-rendering" Non_standard_image_rendering.parser;
-value "-non-standard-overflow" Non_standard_overflow.parser;
-value "-non-standard-width" Non_standard_width.parser;
-value "-webkit-gradient-color-stop" Webkit_gradient_color_stop.parser;
-value "-webkit-gradient-point" Webkit_gradient_point.parser;
-value "-webkit-gradient-radius" Webkit_gradient_radius.parser;
-value "-webkit-gradient-type" Webkit_gradient_type.parser;
-value "-webkit-mask-box-repeat" Webkit_mask_box_repeat.parser;
-value "-webkit-mask-clip-style" Webkit_mask_clip_style.parser;
-value "absolute-size" Absolute_size.parser;
-value "attr-name" Attr_name.parser;
-value "attr-type" Attr_type.parser;
-value "attr-unit" Attr_unit.parser;
-value "syntax" Syntax.parser;
-value "syntax-combinator" Syntax_combinator.parser;
-value "syntax-component" Syntax_component.parser;
-value "syntax-multiplier" Syntax_multiplier.parser;
-value "syntax-single-component" Syntax_single_component.parser;
-value "syntax-string" Syntax_string.parser;
-value "syntax-type-name" Syntax_type_name.parser;
-value "age" Age.parser;
-value "alpha-value" Alpha_value.parser;
-value "angular-color-hint" Angular_color_hint.parser;
-value "angular-color-stop" Angular_color_stop.parser;
-value "angular-color-stop-list" Angular_color_stop_list.parser;
-value "hue-interpolation-method" Hue_interpolation_method.parser;
-value "polar-color-space" Polar_color_space.parser;
-value "rectangular-color-space" Rectangular_color_space.parser;
-value "color-interpolation-method" Color_interpolation_method.parser;
-value "animateable-feature" Animateable_feature.parser;
-value "attachment" Attachment.parser;
-value "attr-fallback" Attr_fallback.parser;
-value "attr-matcher" Attr_matcher.parser;
-value "attr-modifier" Attr_modifier.parser;
-value "attr-name" Attr_name.parser;
-value "attribute-selector" Attribute_selector.parser;
-value "auto-repeat" Auto_repeat.parser;
-value "auto-track-list" Auto_track_list.parser;
-value "baseline-position" Baseline_position.parser;
-value "basic-shape" Basic_shape.parser;
-value "bg-image" Bg_image.parser;
-value "bg-layer" Bg_layer.parser;
-value "bg-position" Bg_position.parser;
-value "bg-size" Bg_size.parser;
-value "blend-mode" Blend_mode.parser;
-value "border-radius" Border_radius.parser;
-value "bottom" Bottom.parser;
-value "box" Box.parser;
-value "calc-product" Calc_product.parser;
-value "calc-sum" Calc_sum.parser;
-value "calc-value" Calc_value.parser;
-value "cf-final-image" Cf_final_image.parser;
-value "cf-mixing-image" Cf_mixing_image.parser;
-value "class-selector" Class_selector.parser;
-value "clip-source" Clip_source.parser;
-value "color" Color.parser;
-value "color-stop" Color_stop.parser;
-value "color-stop-angle" Color_stop_angle.parser;
-value "color-stop-length" Color_stop_length.parser;
-value "color-stop-list" Color_stop_list.parser;
-value "combinator" Combinator.parser;
-value "common-lig-values" Common_lig_values.parser;
-value "compat-auto" Compat_auto.parser;
-value "complex-selector" Complex_selector.parser;
-value "complex-selector-list" Complex_selector_list.parser;
-value "composite-style" Composite_style.parser;
-value "compositing-operator" Compositing_operator.parser;
-value "compound-selector" Compound_selector.parser;
-value "compound-selector-list" Compound_selector_list.parser;
-value "content-distribution" Content_distribution.parser;
-value "content-list" Content_list.parser;
-value "content-position" Content_position.parser;
-value "content-replacement" Content_replacement.parser;
-value "contextual-alt-values" Contextual_alt_values.parser;
-value "counter-style" Counter_style.parser;
-value "counter-style-name" Counter_style_name.parser;
-value "cubic-bezier-timing-function" Cubic_bezier_timing_function.parser;
-value "declaration" Declaration.parser;
-value "declaration-list" Declaration_list.parser;
-value "deprecated-system-color" Deprecated_system_color.parser;
-value "discretionary-lig-values" Discretionary_lig_values.parser;
-value "display-box" Display_box.parser;
-value "display-inside" Display_inside.parser;
-value "display-internal" Display_internal.parser;
-value "display-legacy" Display_legacy.parser;
-value "display-listitem" Display_listitem.parser;
-value "display-outside" Display_outside.parser;
-value "east-asian-variant-values" East_asian_variant_values.parser;
-value "east-asian-width-values" East_asian_width_values.parser;
-value "ending-shape" Ending_shape.parser;
-value "explicit-track-list" Explicit_track_list.parser;
-value "family-name" Family_name.parser;
-value "feature-tag-value" Feature_tag_value.parser;
-value "feature-type" Feature_type.parser;
-value "feature-value-block" Feature_value_block.parser;
-value "feature-value-block-list" Feature_value_block_list.parser;
-value "feature-value-declaration" Feature_value_declaration.parser;
-value "feature-value-declaration-list" Feature_value_declaration_list.parser;
-value "feature-value-name" Feature_value_name.parser;
-value "fill-rule" Fill_rule.parser;
-value "filter-function" Filter_function.parser;
-value "filter-function-list" Filter_function_list.parser;
-value "final-bg-layer" Final_bg_layer.parser;
-value "fixed-breadth" Fixed_breadth.parser;
-value "fixed-repeat" Fixed_repeat.parser;
-value "fixed-size" Fixed_size.parser;
-value "font-stretch-absolute" Font_stretch_absolute.parser;
-value "font-variant-css21" Font_variant_css21.parser;
-value "font-weight-absolute" Font_weight_absolute.parser;
-fn "-webkit-gradient" Function__webkit_gradient.parser;
-fn "attr" Function_attr.parser;
-fn "blur" Function_blur.parser;
-fn "brightness" Function_brightness.parser;
-fn "calc" Function_calc.parser;
-fn "circle" Function_circle.parser;
-fn "clamp" Function_clamp.parser;
-fn "conic-gradient" Function_conic_gradient.parser;
-fn "contrast" Function_contrast.parser;
-fn "counter" Function_counter.parser;
-fn "counters" Function_counters.parser;
-fn "cross-fade" Function_cross_fade.parser;
-fn "drop-shadow" Function_drop_shadow.parser;
-fn "element" Function_element.parser;
-fn "ellipse" Function_ellipse.parser;
-fn "env" Function_env.parser;
-fn "fit-content" Function_fit_content.parser;
-fn "grayscale" Function_grayscale.parser;
-fn "hsl" Function_hsl.parser;
-fn "hsla" Function_hsla.parser;
-fn "hue-rotate" Function_hue_rotate.parser;
-fn "image" Function_image.parser;
-fn "image-set" Function_image_set.parser;
-fn "inset" Function_inset.parser;
-fn "invert" Function_invert.parser;
-fn "leader" Function_leader.parser;
-fn "linear-gradient" Function_linear_gradient.parser;
-fn "matrix" Function_matrix.parser;
-fn "matrix3d" Function_matrix3d.parser;
-fn "max" Function_max.parser;
-fn "min" Function_min.parser;
-fn "minmax" Function_minmax.parser;
-fn "opacity" Function_opacity.parser;
-fn "paint" Function_paint.parser;
-fn "path" Function_path.parser;
-fn "perspective" Function_perspective.parser;
-fn "polygon" Function_polygon.parser;
-fn "radial-gradient" Function_radial_gradient.parser;
-fn "repeating-linear-gradient" Function_repeating_linear_gradient.parser;
-fn "repeating-radial-gradient" Function_repeating_radial_gradient.parser;
-fn "rgb" Function_rgb.parser;
-fn "rgba" Function_rgba.parser;
-fn "rotate" Function_rotate.parser;
-fn "rotate3d" Function_rotate3d.parser;
-fn "rotateX" Function_rotateX.parser;
-fn "rotateY" Function_rotateY.parser;
-fn "rotateZ" Function_rotateZ.parser;
-fn "saturate" Function_saturate.parser;
-fn "scale" Function_scale.parser;
-fn "scale3d" Function_scale3d.parser;
-fn "scaleX" Function_scaleX.parser;
-fn "scaleY" Function_scaleY.parser;
-fn "scaleZ" Function_scaleZ.parser;
-fn "sepia" Function_sepia.parser;
-fn "skew" Function_skew.parser;
-fn "skewX" Function_skewX.parser;
-fn "skewY" Function_skewY.parser;
-fn "symbols" Function_symbols.parser;
-fn "target-counter" Function_target_counter.parser;
-fn "target-counters" Function_target_counters.parser;
-fn "target-text" Function_target_text.parser;
-fn "translate" Function_translate.parser;
-fn "translate3d" Function_translate3d.parser;
-fn "translateX" Function_translateX.parser;
-fn "translateY" Function_translateY.parser;
-fn "translateZ" Function_translateZ.parser;
-fn "var" Function_var.parser;
-value "gender" Gender.parser;
-value "general-enclosed" General_enclosed.parser;
-value "generic-family" Generic_family.parser;
-value "generic-name" Generic_name.parser;
-value "generic-voice" Generic_voice.parser;
-value "geometry-box" Geometry_box.parser;
-value "gradient" Gradient.parser;
-value "grid-line" Grid_line.parser;
-value "historical-lig-values" Historical_lig_values.parser;
-value "hue" Hue.parser;
-value "id-selector" Id_selector.parser;
-value "image" Image.parser;
-value "image-set-option" Image_set_option.parser;
-value "image-src" Image_src.parser;
-value "image-tags" Image_tags.parser;
-value "inflexible-breadth" Inflexible_breadth.parser;
-value "keyframe-block" Keyframe_block.parser;
-value "keyframe-block-list" Keyframe_block_list.parser;
-value "keyframe-selector" Keyframe_selector.parser;
-value "keyframes-name" Keyframes_name.parser;
-value "leader-type" Leader_type.parser;
-value "left" Left.parser;
-value "line-name-list" Line_name_list.parser;
-value "line-names" Line_names.parser;
-value "line-style" Line_style.parser;
-value "line-width" Line_width.parser;
-value "linear-color-hint" Linear_color_hint.parser;
-value "linear-color-stop" Linear_color_stop.parser;
-value "mask-image" Mask_image.parser;
-value "mask-layer" Mask_layer.parser;
-value "mask-position" Mask_position.parser;
-value "mask-reference" Mask_reference.parser;
-value "mask-source" Mask_source.parser;
-value "masking-mode" Masking_mode.parser;
-mq "and" Media_and.parser;
-mq "condition" Media_condition.parser;
-mq "condition-without-or" Media_condition_without_or.parser;
-mq "feature" Media_feature.parser;
-mq "in-parens" Media_in_parens.parser;
-mq "not" Media_not.parser;
-mq "or" Media_or.parser;
-mq "query" Media_query.parser;
-mq "query-list" Media_query_list.parser;
-mq "type" Media_type.parser;
-value "mf-boolean" Mf_boolean.parser;
-value "mf-name" Mf_name.parser;
-value "mf-plain" Mf_plain.parser;
-value "mf-range" Mf_range.parser;
-value "mf-value" Mf_value.parser;
-value "name-repeat" Name_repeat.parser;
-value "named-color" Named_color.parser;
-value "namespace-prefix" Namespace_prefix.parser;
-value "ns-prefix" Ns_prefix.parser;
-value "nth" Nth.parser;
-value "number-one-or-greater" Number_one_or_greater.parser;
-value "number-percentage" Number_percentage.parser;
-value "alpha-value" Number_zero_one.parser;
-value "numeric-figure-values" Numeric_figure_values.parser;
-value "numeric-fraction-values" Numeric_fraction_values.parser;
-value "numeric-spacing-values" Numeric_spacing_values.parser;
-value "outline-radius" Outline_radius.parser;
-value "overflow-position" Overflow_position.parser;
-value "page-body" Page_body.parser;
-value "page-margin-box" Page_margin_box.parser;
-value "page-margin-box-type" Page_margin_box_type.parser;
-value "page-selector" Page_selector.parser;
-value "page-selector-list" Page_selector_list.parser;
-value "paint" Paint.parser;
-value "position" Position.parser;
-value "positive-integer" Positive_integer.parser;
-prop "-moz-appearance" Property__moz_appearance.parser;
-prop "-moz-background-clip" Property__moz_background_clip.parser;
-prop "-moz-binding" Property__moz_binding.parser;
-prop "-moz-border-bottom-colors" Property__moz_border_bottom_colors.parser;
-prop "-moz-border-left-colors" Property__moz_border_left_colors.parser;
-prop "-moz-border-radius-bottomleft" Property__moz_border_radius_bottomleft.parser;
-prop "-moz-border-radius-bottomright" Property__moz_border_radius_bottomright.parser;
-prop "-moz-border-radius-topleft" Property__moz_border_radius_topleft.parser;
-prop "-moz-border-radius-topright" Property__moz_border_radius_topright.parser;
-prop "-moz-border-right-colors" Property__moz_border_right_colors.parser;
-prop "-moz-border-top-colors" Property__moz_border_top_colors.parser;
-prop "-moz-context-properties" Property__moz_context_properties.parser;
-prop "-moz-control-character-visibility" Property__moz_control_character_visibility.parser;
-prop "-moz-float-edge" Property__moz_float_edge.parser;
-prop "-moz-force-broken-image-icon" Property__moz_force_broken_image_icon.parser;
-prop "-moz-image-region" Property__moz_image_region.parser;
-prop "-moz-orient" Property__moz_orient.parser;
-prop "-moz-osx-font-smoothing" Property__moz_osx_font_smoothing.parser;
-prop "-moz-outline-radius" Property__moz_outline_radius.parser;
-prop "-moz-outline-radius-bottomleft" Property__moz_outline_radius_bottomleft.parser;
-prop "-moz-outline-radius-bottomright" Property__moz_outline_radius_bottomright.parser;
-prop "-moz-outline-radius-topleft" Property__moz_outline_radius_topleft.parser;
-prop "-moz-outline-radius-topright" Property__moz_outline_radius_topright.parser;
-prop "-moz-stack-sizing" Property__moz_stack_sizing.parser;
-prop "-moz-text-blink" Property__moz_text_blink.parser;
-prop "-moz-user-focus" Property__moz_user_focus.parser;
-prop "-moz-user-input" Property__moz_user_input.parser;
-prop "-moz-user-modify" Property__moz_user_modify.parser;
-prop "-moz-user-select" Property__moz_user_select.parser;
-prop "-moz-window-dragging" Property__moz_window_dragging.parser;
-prop "-moz-window-shadow" Property__moz_window_shadow.parser;
-prop "-webkit-appearance" Property__webkit_appearance.parser;
-prop "-webkit-background-clip" Property__webkit_background_clip.parser;
-prop "-webkit-border-before" Property__webkit_border_before.parser;
-prop "-webkit-border-before-color" Property__webkit_border_before_color.parser;
-prop "-webkit-border-before-style" Property__webkit_border_before_style.parser;
-prop "-webkit-border-before-width" Property__webkit_border_before_width.parser;
-prop "-webkit-box-reflect" Property__webkit_box_reflect.parser;
-prop "-webkit-box-shadow" Property_box_shadow.parser;
-prop "-webkit-box-orient" Property_box_orient.parser;
-prop "-webkit-column-break-after" Property__webkit_column_break_after.parser;
-prop "-webkit-column-break-before" Property__webkit_column_break_before.parser;
-prop "-webkit-column-break-inside" Property__webkit_column_break_inside.parser;
-prop "-webkit-font-smoothing" Property__webkit_font_smoothing.parser;
-prop "-webkit-line-clamp" Property__webkit_line_clamp.parser;
-prop "-webkit-mask" Property__webkit_mask.parser;
-prop "-webkit-mask-attachment" Property__webkit_mask_attachment.parser;
-prop "-webkit-mask-box-image" Property__webkit_mask_box_image.parser;
-prop "-webkit-mask-clip" Property__webkit_mask_clip.parser;
-prop "-webkit-mask-composite" Property__webkit_mask_composite.parser;
-prop "-webkit-mask-image" Property__webkit_mask_image.parser;
-prop "-webkit-mask-origin" Property__webkit_mask_origin.parser;
-prop "-webkit-mask-position" Property__webkit_mask_position.parser;
-prop "-webkit-mask-position-x" Property__webkit_mask_position_x.parser;
-prop "-webkit-mask-position-y" Property__webkit_mask_position_y.parser;
-prop "-webkit-mask-repeat" Property__webkit_mask_repeat.parser;
-prop "-webkit-mask-repeat-x" Property__webkit_mask_repeat_x.parser;
-prop "-webkit-mask-repeat-y" Property__webkit_mask_repeat_y.parser;
-prop "-webkit-mask-size" Property__webkit_mask_size.parser;
-prop "-webkit-overflow-scrolling" Property__webkit_overflow_scrolling.parser;
-prop "-webkit-print-color-adjust" Property__webkit_print_color_adjust.parser;
-prop "-webkit-tap-highlight-color" Property__webkit_tap_highlight_color.parser;
-prop "-webkit-text-fill-color" Property__webkit_text_fill_color.parser;
-prop "-webkit-text-security" Property__webkit_text_security.parser;
-prop "-webkit-text-stroke" Property__webkit_text_stroke.parser;
-prop "-webkit-text-stroke-color" Property__webkit_text_stroke_color.parser;
-prop "-webkit-text-stroke-width" Property__webkit_text_stroke_width.parser;
-prop "-webkit-touch-callout" Property__webkit_touch_callout.parser;
-prop "-webkit-user-drag" Property__webkit_user_drag.parser;
-prop "-webkit-user-modify" Property__webkit_user_modify.parser;
-prop "-webkit-user-select" Property__webkit_user_select.parser;
-prop "align-content" Property_align_content.parser;
-prop "align-items" Property_align_items.parser;
-prop "align-self" Property_align_self.parser;
-prop "alignment-baseline" Property_alignment_baseline.parser;
-prop "all" Property_all.parser;
-prop "animation" Property_animation.parser;
-prop "animation-delay" Property_animation_delay.parser;
-prop "animation-direction" Property_animation_direction.parser;
-prop "animation-duration" Property_animation_duration.parser;
-prop "animation-fill-mode" Property_animation_fill_mode.parser;
-prop "animation-iteration-count" Property_animation_iteration_count.parser;
-prop "animation-name" Property_animation_name.parser;
-prop "animation-play-state" Property_animation_play_state.parser;
-prop "animation-timing-function" Property_animation_timing_function.parser;
-prop "appearance" Property_appearance.parser;
-prop "aspect-ratio" Property_aspect_ratio.parser;
-prop "azimuth" Property_azimuth.parser;
-prop "backdrop-filter" Property_backdrop_filter.parser;
-prop "backface-visibility" Property_backface_visibility.parser;
-prop "background" Property_background.parser;
-prop "background-attachment" Property_background_attachment.parser;
-prop "background-blend-mode" Property_background_blend_mode.parser;
-prop "background-clip" Property_background_clip.parser;
-prop "background-color" Property_background_color.parser;
-prop "background-image" Property_background_image.parser;
-prop "background-origin" Property_background_origin.parser;
-prop "background-position" Property_background_position.parser;
-prop "background-position-x" Property_background_position_x.parser;
-prop "background-position-y" Property_background_position_y.parser;
-prop "background-repeat" Property_background_repeat.parser;
-prop "background-size" Property_background_size.parser;
-prop "baseline-shift" Property_baseline_shift.parser;
-prop "behavior" Property_behavior.parser;
-prop "block-overflow" Property_block_overflow.parser;
-prop "block-size" Property_block_size.parser;
-prop "border" Property_border.parser;
-prop "border-block" Property_border_block.parser;
-prop "border-block-color" Property_border_block_color.parser;
-prop "border-block-end" Property_border_block_end.parser;
-prop "border-block-end-color" Property_border_block_end_color.parser;
-prop "border-block-end-style" Property_border_block_end_style.parser;
-prop "border-block-end-width" Property_border_block_end_width.parser;
-prop "border-block-start" Property_border_block_start.parser;
-prop "border-block-start-color" Property_border_block_start_color.parser;
-prop "border-block-start-style" Property_border_block_start_style.parser;
-prop "border-block-start-width" Property_border_block_start_width.parser;
-prop "border-block-style" Property_border_block_style.parser;
-prop "border-block-width" Property_border_block_width.parser;
-prop "border-bottom" Property_border_bottom.parser;
-prop "border-bottom-color" Property_border_bottom_color.parser;
-prop "border-bottom-left-radius" Property_border_bottom_left_radius.parser;
-prop "border-bottom-right-radius" Property_border_bottom_right_radius.parser;
-prop "border-bottom-style" Property_border_bottom_style.parser;
-prop "border-bottom-width" Property_border_bottom_width.parser;
-prop "border-collapse" Property_border_collapse.parser;
-prop "border-color" Property_border_color.parser;
-prop "border-end-end-radius" Property_border_end_end_radius.parser;
-prop "border-end-start-radius" Property_border_end_start_radius.parser;
-prop "border-image" Property_border_image.parser;
-prop "border-image-outset" Property_border_image_outset.parser;
-prop "border-image-repeat" Property_border_image_repeat.parser;
-prop "border-image-slice" Property_border_image_slice.parser;
-prop "border-image-source" Property_border_image_source.parser;
-prop "border-image-width" Property_border_image_width.parser;
-prop "border-inline" Property_border_inline.parser;
-prop "border-inline-color" Property_border_inline_color.parser;
-prop "border-inline-end" Property_border_inline_end.parser;
-prop "border-inline-end-color" Property_border_inline_end_color.parser;
-prop "border-inline-end-style" Property_border_inline_end_style.parser;
-prop "border-inline-end-width" Property_border_inline_end_width.parser;
-prop "border-inline-start" Property_border_inline_start.parser;
-prop "border-inline-start-color" Property_border_inline_start_color.parser;
-prop "border-inline-start-style" Property_border_inline_start_style.parser;
-prop "border-inline-start-width" Property_border_inline_start_width.parser;
-prop "border-inline-style" Property_border_inline_style.parser;
-prop "border-inline-width" Property_border_inline_width.parser;
-prop "border-left" Property_border_left.parser;
-prop "border-left-color" Property_border_left_color.parser;
-prop "border-left-style" Property_border_left_style.parser;
-prop "border-left-width" Property_border_left_width.parser;
-prop "border-radius" Property_border_radius.parser;
-prop "border-right" Property_border_right.parser;
-prop "border-right-color" Property_border_right_color.parser;
-prop "border-right-style" Property_border_right_style.parser;
-prop "border-right-width" Property_border_right_width.parser;
-prop "border-spacing" Property_border_spacing.parser;
-prop "border-start-end-radius" Property_border_start_end_radius.parser;
-prop "border-start-start-radius" Property_border_start_start_radius.parser;
-prop "border-style" Property_border_style.parser;
-prop "border-top" Property_border_top.parser;
-prop "border-top-color" Property_border_top_color.parser;
-prop "border-top-left-radius" Property_border_top_left_radius.parser;
-prop "border-top-right-radius" Property_border_top_right_radius.parser;
-prop "border-top-style" Property_border_top_style.parser;
-prop "border-top-width" Property_border_top_width.parser;
-prop "border-width" Property_border_width.parser;
-prop "bottom" Property_bottom.parser;
-prop "box-align" Property_box_align.parser;
-prop "box-decoration-break" Property_box_decoration_break.parser;
-prop "box-direction" Property_box_direction.parser;
-prop "box-flex" Property_box_flex.parser;
-prop "box-flex-group" Property_box_flex_group.parser;
-prop "box-lines" Property_box_lines.parser;
-prop "box-ordinal-group" Property_box_ordinal_group.parser;
-prop "box-orient" Property_box_orient.parser;
-prop "box-pack" Property_box_pack.parser;
-prop "box-shadow" Property_box_shadow.parser;
-prop "box-sizing" Property_box_sizing.parser;
-prop "break-after" Property_break_after.parser;
-prop "break-before" Property_break_before.parser;
-prop "break-inside" Property_break_inside.parser;
-prop "caption-side" Property_caption_side.parser;
-prop "caret-color" Property_caret_color.parser;
-prop "clear" Property_clear.parser;
-prop "clip" Property_clip.parser;
-prop "clip-path" Property_clip_path.parser;
-prop "clip-rule" Property_clip_rule.parser;
-prop "color" Property_color.parser;
-prop "color-adjust" Property_color_adjust.parser;
-prop "color-scheme" Property_color_scheme.parser;
-prop "column-count" Property_column_count.parser;
-prop "column-fill" Property_column_fill.parser;
-prop "column-gap" Property_column_gap.parser;
-prop "column-rule" Property_column_rule.parser;
-prop "column-rule-color" Property_column_rule_color.parser;
-prop "column-rule-style" Property_column_rule_style.parser;
-prop "column-rule-width" Property_column_rule_width.parser;
-prop "column-span" Property_column_span.parser;
-prop "column-width" Property_column_width.parser;
-prop "columns" Property_columns.parser;
-prop "contain" Property_contain.parser;
-prop "content" Property_content.parser;
-prop "counter-increment" Property_counter_increment.parser;
-prop "counter-reset" Property_counter_reset.parser;
-prop "counter-set" Property_counter_set.parser;
-prop "cue" Property_cue.parser;
-prop "cue-after" Property_cue_after.parser;
-prop "cue-before" Property_cue_before.parser;
-prop "cursor" Property_cursor.parser;
-prop "direction" Property_direction.parser;
-prop "display" Property_display.parser;
-prop "dominant-baseline" Property_dominant_baseline.parser;
-prop "empty-cells" Property_empty_cells.parser;
-prop "fill" Property_fill.parser;
-prop "fill-opacity" Property_fill_opacity.parser;
-prop "fill-rule" Property_fill_rule.parser;
-prop "filter" Property_filter.parser;
-prop "flex" Property_flex.parser;
-prop "flex-basis" Property_flex_basis.parser;
-prop "flex-direction" Property_flex_direction.parser;
-prop "flex-flow" Property_flex_flow.parser;
-prop "flex-grow" Property_flex_grow.parser;
-prop "flex-shrink" Property_flex_shrink.parser;
-prop "flex-wrap" Property_flex_wrap.parser;
-prop "float" Property_float.parser;
-prop "font" Property_font.parser;
-prop "font-family" Property_font_family.parser;
-prop "font-feature-settings" Property_font_feature_settings.parser;
-prop "font-kerning" Property_font_kerning.parser;
-prop "font-language-override" Property_font_language_override.parser;
-prop "font-optical-sizing" Property_font_optical_sizing.parser;
-prop "font-palette" Property_font_palette.parser;
-prop "font-variant-emoji" Property_font_variant_emoji.parser;
-prop "font-size" Property_font_size.parser;
-prop "font-size-adjust" Property_font_size_adjust.parser;
-prop "font-smooth" Property_font_smooth.parser;
-prop "font-stretch" Property_font_stretch.parser;
-prop "font-style" Property_font_style.parser;
-prop "font-synthesis" Property_font_synthesis.parser;
-prop "font-synthesis-weight" Property_font_synthesis_weight.parser;
-prop "font-synthesis-style" Property_font_synthesis_style.parser;
-prop "font-synthesis-small-caps" Property_font_synthesis_small_caps.parser;
-prop "font-synthesis-position" Property_font_synthesis_position.parser;
-prop "font-variant" Property_font_variant.parser;
-prop "font-variant-alternates" Property_font_variant_alternates.parser;
-prop "font-variant-caps" Property_font_variant_caps.parser;
-prop "font-variant-east-asian" Property_font_variant_east_asian.parser;
-prop "font-variant-ligatures" Property_font_variant_ligatures.parser;
-prop "font-variant-numeric" Property_font_variant_numeric.parser;
-prop "font-variant-position" Property_font_variant_position.parser;
-prop "font-variation-settings" Property_font_variation_settings.parser;
-prop "font-weight" Property_font_weight.parser;
-prop "gap" Property_gap.parser;
-prop "glyph-orientation-horizontal" Property_glyph_orientation_horizontal.parser;
-prop "glyph-orientation-vertical" Property_glyph_orientation_vertical.parser;
-prop "grid" Property_grid.parser;
-prop "grid-area" Property_grid_area.parser;
-prop "grid-auto-columns" Property_grid_auto_columns.parser;
-prop "grid-auto-flow" Property_grid_auto_flow.parser;
-prop "grid-auto-rows" Property_grid_auto_rows.parser;
-prop "grid-column" Property_grid_column.parser;
-prop "grid-column-end" Property_grid_column_end.parser;
-prop "grid-column-gap" Property_grid_column_gap.parser;
-prop "grid-column-start" Property_grid_column_start.parser;
-prop "grid-gap" Property_grid_gap.parser;
-prop "grid-row" Property_grid_row.parser;
-prop "grid-row-end" Property_grid_row_end.parser;
-prop "grid-row-gap" Property_grid_row_gap.parser;
-prop "grid-row-start" Property_grid_row_start.parser;
-prop "grid-template" Property_grid_template.parser;
-prop "grid-template-areas" Property_grid_template_areas.parser;
-prop "grid-template-columns" Property_grid_template_columns.parser;
-prop "grid-template-rows" Property_grid_template_rows.parser;
-prop "hanging-punctuation" Property_hanging_punctuation.parser;
-prop "height" Property_height.parser;
-prop "hyphens" Property_hyphens.parser;
-prop "image-orientation" Property_image_orientation.parser;
-prop "image-rendering" Property_image_rendering.parser;
-prop "image-resolution" Property_image_resolution.parser;
-prop "ime-mode" Property_ime_mode.parser;
-prop "initial-letter" Property_initial_letter.parser;
-prop "initial-letter-align" Property_initial_letter_align.parser;
-prop "inline-size" Property_inline_size.parser;
-prop "inset" Property_inset.parser;
-prop "inset-block" Property_inset_block.parser;
-prop "inset-block-end" Property_inset_block_end.parser;
-prop "inset-block-start" Property_inset_block_start.parser;
-prop "inset-inline" Property_inset_inline.parser;
-prop "inset-inline-end" Property_inset_inline_end.parser;
-prop "inset-inline-start" Property_inset_inline_start.parser;
-prop "isolation" Property_isolation.parser;
-prop "justify-content" Property_justify_content.parser;
-prop "justify-items" Property_justify_items.parser;
-prop "justify-self" Property_justify_self.parser;
-prop "kerning" Property_kerning.parser;
-prop "left" Property_left.parser;
-prop "letter-spacing" Property_letter_spacing.parser;
-prop "line-break" Property_line_break.parser;
-prop "line-clamp" Property_line_clamp.parser;
-prop "line-height" Property_line_height.parser;
-prop "line-height-step" Property_line_height_step.parser;
-prop "list-style" Property_list_style.parser;
-prop "list-style-image" Property_list_style_image.parser;
-prop "list-style-position" Property_list_style_position.parser;
-prop "list-style-type" Property_list_style_type.parser;
-prop "margin" Property_margin.parser;
-prop "margin-block" Property_margin_block.parser;
-prop "margin-block-end" Property_margin_block_end.parser;
-prop "margin-block-start" Property_margin_block_start.parser;
-prop "margin-bottom" Property_margin_bottom.parser;
-prop "margin-inline" Property_margin_inline.parser;
-prop "margin-inline-end" Property_margin_inline_end.parser;
-prop "margin-inline-start" Property_margin_inline_start.parser;
-prop "margin-left" Property_margin_left.parser;
-prop "margin-right" Property_margin_right.parser;
-prop "margin-top" Property_margin_top.parser;
-prop "margin-trim" Property_margin_trim.parser;
-prop "marker" Property_marker.parser;
-prop "marker-end" Property_marker_end.parser;
-prop "marker-mid" Property_marker_mid.parser;
-prop "marker-start" Property_marker_start.parser;
-prop "mask" Property_mask.parser;
-prop "mask-border" Property_mask_border.parser;
-prop "mask-border-mode" Property_mask_border_mode.parser;
-prop "mask-border-outset" Property_mask_border_outset.parser;
-prop "mask-border-repeat" Property_mask_border_repeat.parser;
-prop "mask-border-slice" Property_mask_border_slice.parser;
-prop "mask-border-source" Property_mask_border_source.parser;
-prop "mask-border-width" Property_mask_border_width.parser;
-prop "mask-clip" Property_mask_clip.parser;
-prop "mask-composite" Property_mask_composite.parser;
-prop "mask-image" Property_mask_image.parser;
-prop "mask-mode" Property_mask_mode.parser;
-prop "mask-origin" Property_mask_origin.parser;
-prop "mask-position" Property_mask_position.parser;
-prop "mask-repeat" Property_mask_repeat.parser;
-prop "mask-size" Property_mask_size.parser;
-prop "mask-type" Property_mask_type.parser;
-prop "masonry-auto-flow" Property_masonry_auto_flow.parser;
-prop "max-block-size" Property_max_block_size.parser;
-prop "max-height" Property_max_height.parser;
-prop "max-inline-size" Property_max_inline_size.parser;
-prop "max-lines" Property_max_lines.parser;
-prop "max-width" Property_max_width.parser;
-prop "min-block-size" Property_min_block_size.parser;
-prop "min-height" Property_min_height.parser;
-prop "min-inline-size" Property_min_inline_size.parser;
-prop "min-width" Property_min_width.parser;
-prop "mix-blend-mode" Property_mix_blend_mode.parser;
-prop "object-fit" Property_object_fit.parser;
-prop "object-position" Property_object_position.parser;
-prop "offset" Property_offset.parser;
-prop "offset-anchor" Property_offset_anchor.parser;
-prop "offset-distance" Property_offset_distance.parser;
-prop "offset-path" Property_offset_path.parser;
-prop "offset-position" Property_offset_position.parser;
-prop "offset-rotate" Property_offset_rotate.parser;
-prop "opacity" Property_opacity.parser;
-prop "order" Property_order.parser;
-prop "orphans" Property_orphans.parser;
-prop "outline" Property_outline.parser;
-prop "outline-color" Property_outline_color.parser;
-prop "outline-offset" Property_outline_offset.parser;
-prop "outline-style" Property_outline_style.parser;
-prop "outline-width" Property_outline_width.parser;
-prop "overflow" Property_overflow.parser;
-prop "overflow-anchor" Property_overflow_anchor.parser;
-prop "overflow-block" Property_overflow_block.parser;
-prop "overflow-clip-margin" Property_overflow_clip_margin.parser;
-prop "overflow-inline" Property_overflow_inline.parser;
-prop "overflow-wrap" Property_overflow_wrap.parser;
-prop "overflow-x" Property_overflow_x.parser;
-prop "overflow-y" Property_overflow_y.parser;
-prop "overscroll-behavior" Property_overscroll_behavior.parser;
-prop "overscroll-behavior-block" Property_overscroll_behavior_block.parser;
-prop "overscroll-behavior-inline" Property_overscroll_behavior_inline.parser;
-prop "overscroll-behavior-x" Property_overscroll_behavior_x.parser;
-prop "overscroll-behavior-y" Property_overscroll_behavior_y.parser;
-prop "any-hover" Property_media_any_hover.parser;
-prop "any-pointer" Property_media_any_pointer.parser;
-prop "pointer" Property_media_pointer.parser;
-prop "max-aspect-ratio" Property_media_max_aspect_ratio.parser;
-prop "min-aspect-ratio" Property_media_min_aspect_ratio.parser;
-prop "min-color" Property_media_min_color.parser;
-prop "color-gamut" Property_media_color_gamut.parser;
-prop "color-index" Property_media_color_index.parser;
-prop "min-color-index" Property_media_min_color_index.parser;
-prop "display-mode" Property_media_display_mode.parser;
-prop "forced-colors" Property_media_forced_colors.parser;
-prop "forced-color-adjust" Property_forced_color_adjust.parser;
-prop "grid" Property_media_grid.parser;
-prop "hover" Property_media_hover.parser;
-prop "inverted-colors" Property_media_inverted_colors.parser;
-prop "monochrome" Property_media_monochrome.parser;
-prop "prefers-color-scheme" Property_media_prefers_color_scheme.parser;
-prop "prefers-contrast" Property_media_prefers_contrast.parser;
-prop "prefers-reduced-motion" Property_media_prefers_reduced_motion.parser;
-prop "resolution" Property_media_resolution.parser;
-prop "min-resolution" Property_media_min_resolution.parser;
-prop "max-resolution" Property_media_max_resolution.parser;
-prop "scripting" Property_media_scripting.parser;
-prop "update" Property_media_update.parser;
-prop "orientation" Property_media_orientation.parser;
-prop "padding" Property_padding.parser;
-prop "padding-block" Property_padding_block.parser;
-prop "padding-block-end" Property_padding_block_end.parser;
-prop "padding-block-start" Property_padding_block_start.parser;
-prop "padding-bottom" Property_padding_bottom.parser;
-prop "padding-inline" Property_padding_inline.parser;
-prop "padding-inline-end" Property_padding_inline_end.parser;
-prop "padding-inline-start" Property_padding_inline_start.parser;
-prop "padding-left" Property_padding_left.parser;
-prop "padding-right" Property_padding_right.parser;
-prop "padding-top" Property_padding_top.parser;
-prop "page-break-after" Property_page_break_after.parser;
-prop "page-break-before" Property_page_break_before.parser;
-prop "page-break-inside" Property_page_break_inside.parser;
-prop "paint-order" Property_paint_order.parser;
-prop "pause" Property_pause.parser;
-prop "pause-after" Property_pause_after.parser;
-prop "pause-before" Property_pause_before.parser;
-prop "perspective" Property_perspective.parser;
-prop "perspective-origin" Property_perspective_origin.parser;
-prop "place-content" Property_place_content.parser;
-prop "place-items" Property_place_items.parser;
-prop "place-self" Property_place_self.parser;
-prop "pointer-events" Property_pointer_events.parser;
-prop "position" Property_position.parser;
-prop "quotes" Property_quotes.parser;
-prop "resize" Property_resize.parser;
-prop "rest" Property_rest.parser;
-prop "rest-after" Property_rest_after.parser;
-prop "rest-before" Property_rest_before.parser;
-prop "right" Property_right.parser;
-prop "rotate" Property_rotate.parser;
-prop "row-gap" Property_row_gap.parser;
-prop "ruby-align" Property_ruby_align.parser;
-prop "ruby-merge" Property_ruby_merge.parser;
-prop "ruby-position" Property_ruby_position.parser;
-prop "scale" Property_scale.parser;
-prop "scroll-behavior" Property_scroll_behavior.parser;
-prop "scroll-margin" Property_scroll_margin.parser;
-prop "scroll-margin-block" Property_scroll_margin_block.parser;
-prop "scroll-margin-block-end" Property_scroll_margin_block_end.parser;
-prop "scroll-margin-block-start" Property_scroll_margin_block_start.parser;
-prop "scroll-margin-bottom" Property_scroll_margin_bottom.parser;
-prop "scroll-margin-inline" Property_scroll_margin_inline.parser;
-prop "scroll-margin-inline-end" Property_scroll_margin_inline_end.parser;
-prop "scroll-margin-inline-start" Property_scroll_margin_inline_start.parser;
-prop "scroll-margin-left" Property_scroll_margin_left.parser;
-prop "scroll-margin-right" Property_scroll_margin_right.parser;
-prop "scroll-margin-top" Property_scroll_margin_top.parser;
-prop "scroll-padding" Property_scroll_padding.parser;
-prop "scroll-padding-block" Property_scroll_padding_block.parser;
-prop "scroll-padding-block-end" Property_scroll_padding_block_end.parser;
-prop "scroll-padding-block-start" Property_scroll_padding_block_start.parser;
-prop "scroll-padding-bottom" Property_scroll_padding_bottom.parser;
-prop "scroll-padding-inline" Property_scroll_padding_inline.parser;
-prop "scroll-padding-inline-end" Property_scroll_padding_inline_end.parser;
-prop "scroll-padding-inline-start" Property_scroll_padding_inline_start.parser;
-prop "scroll-padding-left" Property_scroll_padding_left.parser;
-prop "scroll-padding-right" Property_scroll_padding_right.parser;
-prop "scroll-padding-top" Property_scroll_padding_top.parser;
-prop "scroll-snap-align" Property_scroll_snap_align.parser;
-prop "scroll-snap-coordinate" Property_scroll_snap_coordinate.parser;
-prop "scroll-snap-destination" Property_scroll_snap_destination.parser;
-prop "scroll-snap-points-x" Property_scroll_snap_points_x.parser;
-prop "scroll-snap-points-y" Property_scroll_snap_points_y.parser;
-prop "scroll-snap-stop" Property_scroll_snap_stop.parser;
-prop "scroll-snap-type" Property_scroll_snap_type.parser;
-prop "scroll-snap-type-x" Property_scroll_snap_type_x.parser;
-prop "scroll-snap-type-y" Property_scroll_snap_type_y.parser;
-prop "scrollbar-color" Property_scrollbar_color.parser;
-prop "scrollbar-width" Property_scrollbar_width.parser;
-prop "scrollbar-gutter" Property_scrollbar_gutter.parser;
-prop "shape-image-threshold" Property_shape_image_threshold.parser;
-prop "shape-margin" Property_shape_margin.parser;
-prop "shape-outside" Property_shape_outside.parser;
-prop "shape-rendering" Property_shape_rendering.parser;
-prop "speak" Property_speak.parser;
-prop "speak-as" Property_speak_as.parser;
-prop "src" Property_src.parser;
-prop "stroke" Property_stroke.parser;
-prop "stroke-dasharray" Property_stroke_dasharray.parser;
-prop "stroke-dashoffset" Property_stroke_dashoffset.parser;
-prop "stroke-linecap" Property_stroke_linecap.parser;
-prop "stroke-linejoin" Property_stroke_linejoin.parser;
-prop "stroke-miterlimit" Property_stroke_miterlimit.parser;
-prop "stroke-opacity" Property_stroke_opacity.parser;
-prop "stroke-width" Property_stroke_width.parser;
-prop "tab-size" Property_tab_size.parser;
-prop "table-layout" Property_table_layout.parser;
-prop "text-align" Property_text_align.parser;
-prop "text-align-all" Property_text_align_all.parser;
-prop "text-align-last" Property_text_align_last.parser;
-prop "text-anchor" Property_text_anchor.parser;
-prop "text-combine-upright" Property_text_combine_upright.parser;
-prop "text-decoration" Property_text_decoration.parser;
-prop "text-decoration-color" Property_text_decoration_color.parser;
-prop "text-decoration-line" Property_text_decoration_line.parser;
-prop "text-decoration-skip" Property_text_decoration_skip.parser;
-prop "text-decoration-skip-ink" Property_text_decoration_skip_ink.parser;
-prop "text-decoration-skip-box" Property_text_decoration_skip_box.parser;
-prop "text-decoration-skip-inset" Property_text_decoration_skip_inset.parser;
-prop "text-decoration-style" Property_text_decoration_style.parser;
-prop "text-decoration-thickness" Property_text_decoration_thickness.parser;
-prop "text-emphasis" Property_text_emphasis.parser;
-prop "text-emphasis-color" Property_text_emphasis_color.parser;
-prop "text-emphasis-position" Property_text_emphasis_position.parser;
-prop "text-emphasis-style" Property_text_emphasis_style.parser;
-prop "text-indent" Property_text_indent.parser;
-prop "text-justify" Property_text_justify.parser;
-prop "text-orientation" Property_text_orientation.parser;
-prop "text-overflow" Property_text_overflow.parser;
-prop "text-rendering" Property_text_rendering.parser;
-prop "text-shadow" Property_text_shadow.parser;
-prop "text-size-adjust" Property_text_size_adjust.parser;
-prop "text-transform" Property_text_transform.parser;
-prop "text-underline-offset" Property_text_underline_offset.parser;
-prop "text-underline-position" Property_text_underline_position.parser;
-prop "top" Property_top.parser;
-prop "touch-action" Property_touch_action.parser;
-prop "transform" Property_transform.parser;
-prop "transform-box" Property_transform_box.parser;
-prop "transform-origin" Property_transform_origin.parser;
-prop "transform-style" Property_transform_style.parser;
-prop "transition" Property_transition.parser;
-prop "transition-behavior" Property_transition_behavior.parser;
-prop "transition-delay" Property_transition_delay.parser;
-prop "transition-duration" Property_transition_duration.parser;
-prop "transition-property" Property_transition_property.parser;
-prop "transition-timing-function" Property_transition_timing_function.parser;
-prop "translate" Property_translate.parser;
-prop "unicode-bidi" Property_unicode_bidi.parser;
-prop "unicode-range" Property_unicode_range.parser;
-prop "user-select" Property_user_select.parser;
-prop "vertical-align" Property_vertical_align.parser;
-prop "visibility" Property_visibility.parser;
-prop "voice-balance" Property_voice_balance.parser;
-prop "voice-duration" Property_voice_duration.parser;
-prop "voice-family" Property_voice_family.parser;
-prop "voice-pitch" Property_voice_pitch.parser;
-prop "voice-range" Property_voice_range.parser;
-prop "voice-rate" Property_voice_rate.parser;
-prop "voice-stress" Property_voice_stress.parser;
-prop "voice-volume" Property_voice_volume.parser;
-prop "white-space" Property_white_space.parser;
-prop "widows" Property_widows.parser;
-prop "width" Property_width.parser;
-prop "will-change" Property_will_change.parser;
-prop "word-break" Property_word_break.parser;
-prop "word-spacing" Property_word_spacing.parser;
-prop "word-wrap" Property_word_wrap.parser;
-prop "writing-mode" Property_writing_mode.parser;
-prop "z-index" Property_z_index.parser;
-prop "zoom" Property_zoom.parser;
-prop "container" Property_container.parser;
-prop "container-name" Property_container_name.parser;
-prop "container-type" Property_container_type.parser;
-value "pseudo-class-selector" Pseudo_class_selector.parser;
-value "pseudo-element-selector" Pseudo_element_selector.parser;
-value "pseudo-page" Pseudo_page.parser;
-value "quote" Quote.parser;
-value "ratio" Ratio.parser;
-value "relative-selector" Relative_selector.parser;
-value "relative-selector-list" Relative_selector_list.parser;
-value "relative-size" Relative_size.parser;
-value "repeat-style" Repeat_style.parser;
-value "right" Right.parser;
-value "self-position" Self_position.parser;
-value "shadow" Shadow.parser;
-value "shadow-t" Shadow_t.parser;
-value "shape" Shape.parser;
-value "shape-box" Shape_box.parser;
-value "shape-radius" Shape_radius.parser;
-value "side-or-corner" Side_or_corner.parser;
-value "single-animation" Single_animation.parser;
-value "font-families" Font_families.parser;
-value "single-animation-direction" Single_animation_direction.parser;
-value "single-animation-fill-mode" Single_animation_fill_mode.parser;
-value "single-animation-iteration-count" Single_animation_iteration_count.parser;
-value "single-animation-play-state" Single_animation_play_state.parser;
-value "single-transition" Single_transition.parser;
-value "single-transition-property" Single_transition_property.parser;
-value "size" Size.parser;
-value "ray-size" Ray_size.parser;
-value "radial-size" Radial_size.parser;
-value "step-position" Step_position.parser;
-value "step-timing-function" Step_timing_function.parser;
-value "subclass-selector" Subclass_selector.parser;
-value "supports-condition" Supports_condition.parser;
-value "supports-decl" Supports_decl.parser;
-value "supports-feature" Supports_feature.parser;
-value "supports-in-parens" Supports_in_parens.parser;
-value "supports-selector-fn" Supports_selector_fn.parser;
-value "svg-length" Svg_length.parser;
-value "svg-writing-mode" Svg_writing_mode.parser;
-value "symbol" Symbol.parser;
-value "symbols-type" Symbols_type.parser;
-value "target" Target.parser;
-value "timing-function" Timing_function.parser;
-value "top" Top.parser;
-value "track-breadth" Track_breadth.parser;
-value "track-group" Track_group.parser;
-value "track-list" Track_list.parser;
-value "track-list-v0" Track_list_v0.parser;
-value "track-minmax" Track_minmax.parser;
-value "track-repeat" Track_repeat.parser;
-value "track-size" Track_size.parser;
-value "transform-function" Transform_function.parser;
-value "transform-list" Transform_list.parser;
-value "type-or-unit" Type_or_unit.parser;
-value "type-selector" Type_selector.parser;
-value "viewport-length" Viewport_length.parser;
-value "wq-name" Wq_name.parser;
-value "x" X.parser;
-value "y" Y.parser;
+    value "-legacy-gradient" _legacy_gradient;
+    value "-legacy-linear-gradient" _legacy_linear_gradient;
+    value "-legacy-linear-gradient-arguments" _legacy_linear_gradient_arguments;
+    value "-legacy-radial-gradient" _legacy_radial_gradient;
+    value "-legacy-radial-gradient-arguments" _legacy_radial_gradient_arguments;
+    value "-legacy-radial-gradient-shape" _legacy_radial_gradient_shape;
+    value "-legacy-radial-gradient-size" _legacy_radial_gradient_size;
+    value "-legacy-repeating-linear-gradient" _legacy_repeating_linear_gradient;
+    value "-legacy-repeating-radial-gradient" _legacy_repeating_radial_gradient;
+    value "-non-standard-color" _non_standard_color;
+    value "-non-standard-font" _non_standard_font;
+    value "-non-standard-image-rendering" _non_standard_image_rendering;
+    value "-non-standard-overflow" _non_standard_overflow;
+    value "-non-standard-width" _non_standard_width;
+    value "-webkit-gradient-color-stop" _webkit_gradient_color_stop;
+    value "-webkit-gradient-point" _webkit_gradient_point;
+    value "-webkit-gradient-radius" _webkit_gradient_radius;
+    value "-webkit-gradient-type" _webkit_gradient_type;
+    value "-webkit-mask-box-repeat" _webkit_mask_box_repeat;
+    value "-webkit-mask-clip-style" _webkit_mask_clip_style;
+    value "absolute-size" absolute_size;
+    value "attr-name" attr_name;
+    value "attr-type" attr_type;
+    value "attr-unit" attr_unit;
+    value "syntax" syntax;
+    value "syntax-combinator" syntax_combinator;
+    value "syntax-component" syntax_component;
+    value "syntax-multiplier" syntax_multiplier;
+    value "syntax-single-component" syntax_single_component;
+    value "syntax-string" syntax_string;
+    value "syntax-type-name" syntax_type_name;
+    value "age" age;
+    value "alpha-value" alpha_value;
+    value "angular-color-hint" angular_color_hint;
+    value "angular-color-stop" angular_color_stop;
+    value "angular-color-stop-list" angular_color_stop_list;
+    value "hue-interpolation-method" hue_interpolation_method;
+    value "polar-color-space" polar_color_space;
+    value "rectangular-color-space" rectangular_color_space;
+    value "color-interpolation-method" color_interpolation_method;
+    value "animateable-feature" animateable_feature;
+    value "attachment" attachment;
+    value "attr-fallback" attr_fallback;
+    value "attr-matcher" attr_matcher;
+    value "attr-modifier" attr_modifier;
+    value "attr-name" attr_name;
+    value "attribute-selector" attribute_selector;
+    value "auto-repeat" auto_repeat;
+    value "auto-track-list" auto_track_list;
+    value "baseline-position" baseline_position;
+    value "basic-shape" basic_shape;
+    value "bg-image" bg_image;
+    value "bg-layer" bg_layer;
+    value "bg-position" bg_position;
+    value "bg-size" bg_size;
+    value "blend-mode" blend_mode;
+    value "border-radius" border_radius;
+    value "bottom" bottom;
+    value "box" box;
+    value "calc-product" calc_product;
+    value "calc-sum" calc_sum;
+    value "calc-value" calc_value;
+    value "cf-final-image" cf_final_image;
+    value "cf-mixing-image" cf_mixing_image;
+    value "class-selector" class_selector;
+    value "clip-source" clip_source;
+    value "color" color;
+    value "color-stop" color_stop;
+    value "color-stop-angle" color_stop_angle;
+    value "color-stop-length" color_stop_length;
+    value "color-stop-list" color_stop_list;
+    value "combinator" combinator;
+    value "common-lig-values" common_lig_values;
+    value "compat-auto" compat_auto;
+    value "complex-selector" complex_selector;
+    value "complex-selector-list" complex_selector_list;
+    value "composite-style" composite_style;
+    value "compositing-operator" compositing_operator;
+    value "compound-selector" compound_selector;
+    value "compound-selector-list" compound_selector_list;
+    value "content-distribution" content_distribution;
+    value "content-list" content_list;
+    value "content-position" content_position;
+    value "content-replacement" content_replacement;
+    value "contextual-alt-values" contextual_alt_values;
+    value "counter-style" counter_style;
+    value "counter-style-name" counter_style_name;
+    value "cubic-bezier-timing-function" cubic_bezier_timing_function;
+    value "declaration" declaration;
+    value "declaration-list" declaration_list;
+    value "deprecated-system-color" deprecated_system_color;
+    value "discretionary-lig-values" discretionary_lig_values;
+    value "display-box" display_box;
+    value "display-inside" display_inside;
+    value "display-internal" display_internal;
+    value "display-legacy" display_legacy;
+    value "display-listitem" display_listitem;
+    value "display-outside" display_outside;
+    value "east-asian-variant-values" east_asian_variant_values;
+    value "east-asian-width-values" east_asian_width_values;
+    value "ending-shape" ending_shape;
+    value "explicit-track-list" explicit_track_list;
+    value "family-name" family_name;
+    value "feature-tag-value" feature_tag_value;
+    value "feature-type" feature_type;
+    value "feature-value-block" feature_value_block;
+    value "feature-value-block-list" feature_value_block_list;
+    value "feature-value-declaration" feature_value_declaration;
+    value "feature-value-declaration-list" feature_value_declaration_list;
+    value "feature-value-name" feature_value_name;
+    value "fill-rule" fill_rule;
+    value "filter-function" filter_function;
+    value "filter-function-list" filter_function_list;
+    value "final-bg-layer" final_bg_layer;
+    value "fixed-breadth" fixed_breadth;
+    value "fixed-repeat" fixed_repeat;
+    value "fixed-size" fixed_size;
+    value "font-stretch-absolute" font_stretch_absolute;
+    value "font-variant-css21" font_variant_css21;
+    value "font-weight-absolute" font_weight_absolute;
+    fn "-webkit-gradient" function__webkit_gradient;
+    fn "attr" function_attr;
+    fn "blur" function_blur;
+    fn "brightness" function_brightness;
+    fn "calc" function_calc;
+    fn "circle" function_circle;
+    fn "clamp" function_clamp;
+    fn "conic-gradient" function_conic_gradient;
+    fn "contrast" function_contrast;
+    fn "counter" function_counter;
+    fn "counters" function_counters;
+    fn "cross-fade" function_cross_fade;
+    fn "drop-shadow" function_drop_shadow;
+    fn "element" function_element;
+    fn "ellipse" function_ellipse;
+    fn "env" function_env;
+    fn "fit-content" function_fit_content;
+    fn "grayscale" function_grayscale;
+    fn "hsl" function_hsl;
+    fn "hsla" function_hsla;
+    fn "hue-rotate" function_hue_rotate;
+    fn "image" function_image;
+    fn "image-set" function_image_set;
+    fn "inset" function_inset;
+    fn "invert" function_invert;
+    fn "leader" function_leader;
+    fn "linear-gradient" function_linear_gradient;
+    fn "matrix" function_matrix;
+    fn "matrix3d" function_matrix3d;
+    fn "max" function_max;
+    fn "min" function_min;
+    fn "minmax" function_minmax;
+    fn "opacity" function_opacity;
+    fn "paint" function_paint;
+    fn "path" function_path;
+    fn "perspective" function_perspective;
+    fn "polygon" function_polygon;
+    fn "radial-gradient" function_radial_gradient;
+    fn "repeating-linear-gradient" function_repeating_linear_gradient;
+    fn "repeating-radial-gradient" function_repeating_radial_gradient;
+    fn "rgb" function_rgb;
+    fn "rgba" function_rgba;
+    fn "rotate" function_rotate;
+    fn "rotate3d" function_rotate3d;
+    fn "rotateX" function_rotateX;
+    fn "rotateY" function_rotateY;
+    fn "rotateZ" function_rotateZ;
+    fn "saturate" function_saturate;
+    fn "scale" function_scale;
+    fn "scale3d" function_scale3d;
+    fn "scaleX" function_scaleX;
+    fn "scaleY" function_scaleY;
+    fn "scaleZ" function_scaleZ;
+    fn "sepia" function_sepia;
+    fn "skew" function_skew;
+    fn "skewX" function_skewX;
+    fn "skewY" function_skewY;
+    fn "symbols" function_symbols;
+    fn "target-counter" function_target_counter;
+    fn "target-counters" function_target_counters;
+    fn "target-text" function_target_text;
+    fn "translate" function_translate;
+    fn "translate3d" function_translate3d;
+    fn "translateX" function_translateX;
+    fn "translateY" function_translateY;
+    fn "translateZ" function_translateZ;
+    fn "var" function_var;
+    value "gender" gender;
+    value "general-enclosed" general_enclosed;
+    value "generic-family" generic_family;
+    value "generic-name" generic_name;
+    value "generic-voice" generic_voice;
+    value "geometry-box" geometry_box;
+    value "gradient" gradient;
+    value "grid-line" grid_line;
+    value "historical-lig-values" historical_lig_values;
+    value "hue" hue;
+    value "id-selector" id_selector;
+    value "image" image;
+    value "image-set-option" image_set_option;
+    value "image-src" image_src;
+    value "image-tags" image_tags;
+    value "inflexible-breadth" inflexible_breadth;
+    value "keyframe-block" keyframe_block;
+    value "keyframe-block-list" keyframe_block_list;
+    value "keyframe-selector" keyframe_selector;
+    value "keyframes-name" keyframes_name;
+    value "leader-type" leader_type;
+    value "left" left;
+    value "line-name-list" line_name_list;
+    value "line-names" line_names;
+    value "line-style" line_style;
+    value "line-width" line_width;
+    value "linear-color-hint" linear_color_hint;
+    value "linear-color-stop" linear_color_stop;
+    value "mask-image" mask_image;
+    value "mask-layer" mask_layer;
+    value "mask-position" mask_position;
+    value "mask-reference" mask_reference;
+    value "mask-source" mask_source;
+    value "masking-mode" masking_mode;
+    mq "and" media_and;
+    mq "condition" media_condition;
+    mq "condition-without-or" media_condition_without_or;
+    mq "feature" media_feature;
+    mq "in-parens" media_in_parens;
+    mq "not" media_not;
+    mq "or" media_or;
+    mq "query" media_query;
+    mq "query-list" media_query_list;
+    mq "type" media_type;
+    value "mf-boolean" mf_boolean;
+    value "mf-name" mf_name;
+    value "mf-plain" mf_plain;
+    value "mf-range" mf_range;
+    value "mf-value" mf_value;
+    value "name-repeat" name_repeat;
+    value "named-color" named_color;
+    value "namespace-prefix" namespace_prefix;
+    value "ns-prefix" ns_prefix;
+    value "nth" nth;
+    value "number-one-or-greater" number_one_or_greater;
+    value "number-percentage" number_percentage;
+    value "alpha-value" number_zero_one;
+    value "numeric-figure-values" numeric_figure_values;
+    value "numeric-fraction-values" numeric_fraction_values;
+    value "numeric-spacing-values" numeric_spacing_values;
+    value "outline-radius" outline_radius;
+    value "overflow-position" overflow_position;
+    value "page-body" page_body;
+    value "page-margin-box" page_margin_box;
+    value "page-margin-box-type" page_margin_box_type;
+    value "page-selector" page_selector;
+    value "page-selector-list" page_selector_list;
+    value "paint" paint;
+    value "position" position;
+    value "positive-integer" positive_integer;
+    prop "-moz-appearance" property__moz_appearance;
+    prop "-moz-background-clip" property__moz_background_clip;
+    prop "-moz-binding" property__moz_binding;
+    prop "-moz-border-bottom-colors" property__moz_border_bottom_colors;
+    prop "-moz-border-left-colors" property__moz_border_left_colors;
+    prop "-moz-border-radius-bottomleft" property__moz_border_radius_bottomleft;
+    prop "-moz-border-radius-bottomright"
+      property__moz_border_radius_bottomright;
+    prop "-moz-border-radius-topleft" property__moz_border_radius_topleft;
+    prop "-moz-border-radius-topright" property__moz_border_radius_topright;
+    prop "-moz-border-right-colors" property__moz_border_right_colors;
+    prop "-moz-border-top-colors" property__moz_border_top_colors;
+    prop "-moz-context-properties" property__moz_context_properties;
+    prop "-moz-control-character-visibility"
+      property__moz_control_character_visibility;
+    prop "-moz-float-edge" property__moz_float_edge;
+    prop "-moz-force-broken-image-icon" property__moz_force_broken_image_icon;
+    prop "-moz-image-region" property__moz_image_region;
+    prop "-moz-orient" property__moz_orient;
+    prop "-moz-osx-font-smoothing" property__moz_osx_font_smoothing;
+    prop "-moz-outline-radius" property__moz_outline_radius;
+    prop "-moz-outline-radius-bottomleft"
+      property__moz_outline_radius_bottomleft;
+    prop "-moz-outline-radius-bottomright"
+      property__moz_outline_radius_bottomright;
+    prop "-moz-outline-radius-topleft" property__moz_outline_radius_topleft;
+    prop "-moz-outline-radius-topright" property__moz_outline_radius_topright;
+    prop "-moz-stack-sizing" property__moz_stack_sizing;
+    prop "-moz-text-blink" property__moz_text_blink;
+    prop "-moz-user-focus" property__moz_user_focus;
+    prop "-moz-user-input" property__moz_user_input;
+    prop "-moz-user-modify" property__moz_user_modify;
+    prop "-moz-user-select" property__moz_user_select;
+    prop "-moz-window-dragging" property__moz_window_dragging;
+    prop "-moz-window-shadow" property__moz_window_shadow;
+    prop "-webkit-appearance" property__webkit_appearance;
+    prop "-webkit-background-clip" property__webkit_background_clip;
+    prop "-webkit-border-before" property__webkit_border_before;
+    prop "-webkit-border-before-color" property__webkit_border_before_color;
+    prop "-webkit-border-before-style" property__webkit_border_before_style;
+    prop "-webkit-border-before-width" property__webkit_border_before_width;
+    prop "-webkit-box-reflect" property__webkit_box_reflect;
+    prop "-webkit-box-shadow" property_box_shadow;
+    prop "-webkit-box-orient" property_box_orient;
+    prop "-webkit-column-break-after" property__webkit_column_break_after;
+    prop "-webkit-column-break-before" property__webkit_column_break_before;
+    prop "-webkit-column-break-inside" property__webkit_column_break_inside;
+    prop "-webkit-font-smoothing" property__webkit_font_smoothing;
+    prop "-webkit-line-clamp" property__webkit_line_clamp;
+    prop "-webkit-mask" property__webkit_mask;
+    prop "-webkit-mask-attachment" property__webkit_mask_attachment;
+    prop "-webkit-mask-box-image" property__webkit_mask_box_image;
+    prop "-webkit-mask-clip" property__webkit_mask_clip;
+    prop "-webkit-mask-composite" property__webkit_mask_composite;
+    prop "-webkit-mask-image" property__webkit_mask_image;
+    prop "-webkit-mask-origin" property__webkit_mask_origin;
+    prop "-webkit-mask-position" property__webkit_mask_position;
+    prop "-webkit-mask-position-x" property__webkit_mask_position_x;
+    prop "-webkit-mask-position-y" property__webkit_mask_position_y;
+    prop "-webkit-mask-repeat" property__webkit_mask_repeat;
+    prop "-webkit-mask-repeat-x" property__webkit_mask_repeat_x;
+    prop "-webkit-mask-repeat-y" property__webkit_mask_repeat_y;
+    prop "-webkit-mask-size" property__webkit_mask_size;
+    prop "-webkit-overflow-scrolling" property__webkit_overflow_scrolling;
+    prop "-webkit-print-color-adjust" property__webkit_print_color_adjust;
+    prop "-webkit-tap-highlight-color" property__webkit_tap_highlight_color;
+    prop "-webkit-text-fill-color" property__webkit_text_fill_color;
+    prop "-webkit-text-security" property__webkit_text_security;
+    prop "-webkit-text-stroke" property__webkit_text_stroke;
+    prop "-webkit-text-stroke-color" property__webkit_text_stroke_color;
+    prop "-webkit-text-stroke-width" property__webkit_text_stroke_width;
+    prop "-webkit-touch-callout" property__webkit_touch_callout;
+    prop "-webkit-user-drag" property__webkit_user_drag;
+    prop "-webkit-user-modify" property__webkit_user_modify;
+    prop "-webkit-user-select" property__webkit_user_select;
+    prop "align-content" property_align_content;
+    prop "align-items" property_align_items;
+    prop "align-self" property_align_self;
+    prop "alignment-baseline" property_alignment_baseline;
+    prop "all" property_all;
+    prop "animation" property_animation;
+    prop "animation-delay" property_animation_delay;
+    prop "animation-direction" property_animation_direction;
+    prop "animation-duration" property_animation_duration;
+    prop "animation-fill-mode" property_animation_fill_mode;
+    prop "animation-iteration-count" property_animation_iteration_count;
+    prop "animation-name" property_animation_name;
+    prop "animation-play-state" property_animation_play_state;
+    prop "animation-timing-function" property_animation_timing_function;
+    prop "appearance" property_appearance;
+    prop "aspect-ratio" property_aspect_ratio;
+    prop "azimuth" property_azimuth;
+    prop "backdrop-filter" property_backdrop_filter;
+    prop "backface-visibility" property_backface_visibility;
+    prop "background" property_background;
+    prop "background-attachment" property_background_attachment;
+    prop "background-blend-mode" property_background_blend_mode;
+    prop "background-clip" property_background_clip;
+    prop "background-color" property_background_color;
+    prop "background-image" property_background_image;
+    prop "background-origin" property_background_origin;
+    prop "background-position" property_background_position;
+    prop "background-position-x" property_background_position_x;
+    prop "background-position-y" property_background_position_y;
+    prop "background-repeat" property_background_repeat;
+    prop "background-size" property_background_size;
+    prop "baseline-shift" property_baseline_shift;
+    prop "behavior" property_behavior;
+    prop "block-overflow" property_block_overflow;
+    prop "block-size" property_block_size;
+    prop "border" property_border;
+    prop "border-block" property_border_block;
+    prop "border-block-color" property_border_block_color;
+    prop "border-block-end" property_border_block_end;
+    prop "border-block-end-color" property_border_block_end_color;
+    prop "border-block-end-style" property_border_block_end_style;
+    prop "border-block-end-width" property_border_block_end_width;
+    prop "border-block-start" property_border_block_start;
+    prop "border-block-start-color" property_border_block_start_color;
+    prop "border-block-start-style" property_border_block_start_style;
+    prop "border-block-start-width" property_border_block_start_width;
+    prop "border-block-style" property_border_block_style;
+    prop "border-block-width" property_border_block_width;
+    prop "border-bottom" property_border_bottom;
+    prop "border-bottom-color" property_border_bottom_color;
+    prop "border-bottom-left-radius" property_border_bottom_left_radius;
+    prop "border-bottom-right-radius" property_border_bottom_right_radius;
+    prop "border-bottom-style" property_border_bottom_style;
+    prop "border-bottom-width" property_border_bottom_width;
+    prop "border-collapse" property_border_collapse;
+    prop "border-color" property_border_color;
+    prop "border-end-end-radius" property_border_end_end_radius;
+    prop "border-end-start-radius" property_border_end_start_radius;
+    prop "border-image" property_border_image;
+    prop "border-image-outset" property_border_image_outset;
+    prop "border-image-repeat" property_border_image_repeat;
+    prop "border-image-slice" property_border_image_slice;
+    prop "border-image-source" property_border_image_source;
+    prop "border-image-width" property_border_image_width;
+    prop "border-inline" property_border_inline;
+    prop "border-inline-color" property_border_inline_color;
+    prop "border-inline-end" property_border_inline_end;
+    prop "border-inline-end-color" property_border_inline_end_color;
+    prop "border-inline-end-style" property_border_inline_end_style;
+    prop "border-inline-end-width" property_border_inline_end_width;
+    prop "border-inline-start" property_border_inline_start;
+    prop "border-inline-start-color" property_border_inline_start_color;
+    prop "border-inline-start-style" property_border_inline_start_style;
+    prop "border-inline-start-width" property_border_inline_start_width;
+    prop "border-inline-style" property_border_inline_style;
+    prop "border-inline-width" property_border_inline_width;
+    prop "border-left" property_border_left;
+    prop "border-left-color" property_border_left_color;
+    prop "border-left-style" property_border_left_style;
+    prop "border-left-width" property_border_left_width;
+    prop "border-radius" property_border_radius;
+    prop "border-right" property_border_right;
+    prop "border-right-color" property_border_right_color;
+    prop "border-right-style" property_border_right_style;
+    prop "border-right-width" property_border_right_width;
+    prop "border-spacing" property_border_spacing;
+    prop "border-start-end-radius" property_border_start_end_radius;
+    prop "border-start-start-radius" property_border_start_start_radius;
+    prop "border-style" property_border_style;
+    prop "border-top" property_border_top;
+    prop "border-top-color" property_border_top_color;
+    prop "border-top-left-radius" property_border_top_left_radius;
+    prop "border-top-right-radius" property_border_top_right_radius;
+    prop "border-top-style" property_border_top_style;
+    prop "border-top-width" property_border_top_width;
+    prop "border-width" property_border_width;
+    prop "bottom" property_bottom;
+    prop "box-align" property_box_align;
+    prop "box-decoration-break" property_box_decoration_break;
+    prop "box-direction" property_box_direction;
+    prop "box-flex" property_box_flex;
+    prop "box-flex-group" property_box_flex_group;
+    prop "box-lines" property_box_lines;
+    prop "box-ordinal-group" property_box_ordinal_group;
+    prop "box-orient" property_box_orient;
+    prop "box-pack" property_box_pack;
+    prop "box-shadow" property_box_shadow;
+    prop "box-sizing" property_box_sizing;
+    prop "break-after" property_break_after;
+    prop "break-before" property_break_before;
+    prop "break-inside" property_break_inside;
+    prop "caption-side" property_caption_side;
+    prop "caret-color" property_caret_color;
+    prop "clear" property_clear;
+    prop "clip" property_clip;
+    prop "clip-path" property_clip_path;
+    prop "clip-rule" property_clip_rule;
+    prop "color" property_color;
+    prop "color-adjust" property_color_adjust;
+    prop "color-scheme" property_color_scheme;
+    prop "column-count" property_column_count;
+    prop "column-fill" property_column_fill;
+    prop "column-gap" property_column_gap;
+    prop "column-rule" property_column_rule;
+    prop "column-rule-color" property_column_rule_color;
+    prop "column-rule-style" property_column_rule_style;
+    prop "column-rule-width" property_column_rule_width;
+    prop "column-span" property_column_span;
+    prop "column-width" property_column_width;
+    prop "columns" property_columns;
+    prop "contain" property_contain;
+    prop "content" property_content;
+    prop "counter-increment" property_counter_increment;
+    prop "counter-reset" property_counter_reset;
+    prop "counter-set" property_counter_set;
+    prop "cue" property_cue;
+    prop "cue-after" property_cue_after;
+    prop "cue-before" property_cue_before;
+    prop "cursor" property_cursor;
+    prop "direction" property_direction;
+    prop "display" property_display;
+    prop "dominant-baseline" property_dominant_baseline;
+    prop "empty-cells" property_empty_cells;
+    prop "fill" property_fill;
+    prop "fill-opacity" property_fill_opacity;
+    prop "fill-rule" property_fill_rule;
+    prop "filter" property_filter;
+    prop "flex" property_flex;
+    prop "flex-basis" property_flex_basis;
+    prop "flex-direction" property_flex_direction;
+    prop "flex-flow" property_flex_flow;
+    prop "flex-grow" property_flex_grow;
+    prop "flex-shrink" property_flex_shrink;
+    prop "flex-wrap" property_flex_wrap;
+    prop "float" property_float;
+    prop "font" property_font;
+    prop "font-family" property_font_family;
+    prop "font-feature-settings" property_font_feature_settings;
+    prop "font-kerning" property_font_kerning;
+    prop "font-language-override" property_font_language_override;
+    prop "font-optical-sizing" property_font_optical_sizing;
+    prop "font-palette" property_font_palette;
+    prop "font-variant-emoji" property_font_variant_emoji;
+    prop "font-size" property_font_size;
+    prop "font-size-adjust" property_font_size_adjust;
+    prop "font-smooth" property_font_smooth;
+    prop "font-stretch" property_font_stretch;
+    prop "font-style" property_font_style;
+    prop "font-synthesis" property_font_synthesis;
+    prop "font-synthesis-weight" property_font_synthesis_weight;
+    prop "font-synthesis-style" property_font_synthesis_style;
+    prop "font-synthesis-small-caps" property_font_synthesis_small_caps;
+    prop "font-synthesis-position" property_font_synthesis_position;
+    prop "font-variant" property_font_variant;
+    prop "font-variant-alternates" property_font_variant_alternates;
+    prop "font-variant-caps" property_font_variant_caps;
+    prop "font-variant-east-asian" property_font_variant_east_asian;
+    prop "font-variant-ligatures" property_font_variant_ligatures;
+    prop "font-variant-numeric" property_font_variant_numeric;
+    prop "font-variant-position" property_font_variant_position;
+    prop "font-variation-settings" property_font_variation_settings;
+    prop "font-weight" property_font_weight;
+    prop "gap" property_gap;
+    prop "glyph-orientation-horizontal" property_glyph_orientation_horizontal;
+    prop "glyph-orientation-vertical" property_glyph_orientation_vertical;
+    prop "grid" property_grid;
+    prop "grid-area" property_grid_area;
+    prop "grid-auto-columns" property_grid_auto_columns;
+    prop "grid-auto-flow" property_grid_auto_flow;
+    prop "grid-auto-rows" property_grid_auto_rows;
+    prop "grid-column" property_grid_column;
+    prop "grid-column-end" property_grid_column_end;
+    prop "grid-column-gap" property_grid_column_gap;
+    prop "grid-column-start" property_grid_column_start;
+    prop "grid-gap" property_grid_gap;
+    prop "grid-row" property_grid_row;
+    prop "grid-row-end" property_grid_row_end;
+    prop "grid-row-gap" property_grid_row_gap;
+    prop "grid-row-start" property_grid_row_start;
+    prop "grid-template" property_grid_template;
+    prop "grid-template-areas" property_grid_template_areas;
+    prop "grid-template-columns" property_grid_template_columns;
+    prop "grid-template-rows" property_grid_template_rows;
+    prop "hanging-punctuation" property_hanging_punctuation;
+    prop "height" property_height;
+    prop "hyphens" property_hyphens;
+    prop "image-orientation" property_image_orientation;
+    prop "image-rendering" property_image_rendering;
+    prop "image-resolution" property_image_resolution;
+    prop "ime-mode" property_ime_mode;
+    prop "initial-letter" property_initial_letter;
+    prop "initial-letter-align" property_initial_letter_align;
+    prop "inline-size" property_inline_size;
+    prop "inset" property_inset;
+    prop "inset-block" property_inset_block;
+    prop "inset-block-end" property_inset_block_end;
+    prop "inset-block-start" property_inset_block_start;
+    prop "inset-inline" property_inset_inline;
+    prop "inset-inline-end" property_inset_inline_end;
+    prop "inset-inline-start" property_inset_inline_start;
+    prop "isolation" property_isolation;
+    prop "justify-content" property_justify_content;
+    prop "justify-items" property_justify_items;
+    prop "justify-self" property_justify_self;
+    prop "kerning" property_kerning;
+    prop "left" property_left;
+    prop "letter-spacing" property_letter_spacing;
+    prop "line-break" property_line_break;
+    prop "line-clamp" property_line_clamp;
+    prop "line-height" property_line_height;
+    prop "line-height-step" property_line_height_step;
+    prop "list-style" property_list_style;
+    prop "list-style-image" property_list_style_image;
+    prop "list-style-position" property_list_style_position;
+    prop "list-style-type" property_list_style_type;
+    prop "margin" property_margin;
+    prop "margin-block" property_margin_block;
+    prop "margin-block-end" property_margin_block_end;
+    prop "margin-block-start" property_margin_block_start;
+    prop "margin-bottom" property_margin_bottom;
+    prop "margin-inline" property_margin_inline;
+    prop "margin-inline-end" property_margin_inline_end;
+    prop "margin-inline-start" property_margin_inline_start;
+    prop "margin-left" property_margin_left;
+    prop "margin-right" property_margin_right;
+    prop "margin-top" property_margin_top;
+    prop "margin-trim" property_margin_trim;
+    prop "marker" property_marker;
+    prop "marker-end" property_marker_end;
+    prop "marker-mid" property_marker_mid;
+    prop "marker-start" property_marker_start;
+    prop "mask" property_mask;
+    prop "mask-border" property_mask_border;
+    prop "mask-border-mode" property_mask_border_mode;
+    prop "mask-border-outset" property_mask_border_outset;
+    prop "mask-border-repeat" property_mask_border_repeat;
+    prop "mask-border-slice" property_mask_border_slice;
+    prop "mask-border-source" property_mask_border_source;
+    prop "mask-border-width" property_mask_border_width;
+    prop "mask-clip" property_mask_clip;
+    prop "mask-composite" property_mask_composite;
+    prop "mask-image" property_mask_image;
+    prop "mask-mode" property_mask_mode;
+    prop "mask-origin" property_mask_origin;
+    prop "mask-position" property_mask_position;
+    prop "mask-repeat" property_mask_repeat;
+    prop "mask-size" property_mask_size;
+    prop "mask-type" property_mask_type;
+    prop "masonry-auto-flow" property_masonry_auto_flow;
+    prop "max-block-size" property_max_block_size;
+    prop "max-height" property_max_height;
+    prop "max-inline-size" property_max_inline_size;
+    prop "max-lines" property_max_lines;
+    prop "max-width" property_max_width;
+    prop "min-block-size" property_min_block_size;
+    prop "min-height" property_min_height;
+    prop "min-inline-size" property_min_inline_size;
+    prop "min-width" property_min_width;
+    prop "mix-blend-mode" property_mix_blend_mode;
+    prop "object-fit" property_object_fit;
+    prop "object-position" property_object_position;
+    prop "offset" property_offset;
+    prop "offset-anchor" property_offset_anchor;
+    prop "offset-distance" property_offset_distance;
+    prop "offset-path" property_offset_path;
+    prop "offset-position" property_offset_position;
+    prop "offset-rotate" property_offset_rotate;
+    prop "opacity" property_opacity;
+    prop "order" property_order;
+    prop "orphans" property_orphans;
+    prop "outline" property_outline;
+    prop "outline-color" property_outline_color;
+    prop "outline-offset" property_outline_offset;
+    prop "outline-style" property_outline_style;
+    prop "outline-width" property_outline_width;
+    prop "overflow" property_overflow;
+    prop "overflow-anchor" property_overflow_anchor;
+    prop "overflow-block" property_overflow_block;
+    prop "overflow-clip-margin" property_overflow_clip_margin;
+    prop "overflow-inline" property_overflow_inline;
+    prop "overflow-wrap" property_overflow_wrap;
+    prop "overflow-x" property_overflow_x;
+    prop "overflow-y" property_overflow_y;
+    prop "overscroll-behavior" property_overscroll_behavior;
+    prop "overscroll-behavior-block" property_overscroll_behavior_block;
+    prop "overscroll-behavior-inline" property_overscroll_behavior_inline;
+    prop "overscroll-behavior-x" property_overscroll_behavior_x;
+    prop "overscroll-behavior-y" property_overscroll_behavior_y;
+    prop "any-hover" property_media_any_hover;
+    prop "any-pointer" property_media_any_pointer;
+    prop "pointer" property_media_pointer;
+    prop "max-aspect-ratio" property_media_max_aspect_ratio;
+    prop "min-aspect-ratio" property_media_min_aspect_ratio;
+    prop "min-color" property_media_min_color;
+    prop "color-gamut" property_media_color_gamut;
+    prop "color-index" property_media_color_index;
+    prop "min-color-index" property_media_min_color_index;
+    prop "display-mode" property_media_display_mode;
+    prop "forced-colors" property_media_forced_colors;
+    prop "forced-color-adjust" property_forced_color_adjust;
+    prop "grid" property_media_grid;
+    prop "hover" property_media_hover;
+    prop "inverted-colors" property_media_inverted_colors;
+    prop "monochrome" property_media_monochrome;
+    prop "prefers-color-scheme" property_media_prefers_color_scheme;
+    prop "prefers-contrast" property_media_prefers_contrast;
+    prop "prefers-reduced-motion" property_media_prefers_reduced_motion;
+    prop "resolution" property_media_resolution;
+    prop "min-resolution" property_media_min_resolution;
+    prop "max-resolution" property_media_max_resolution;
+    prop "scripting" property_media_scripting;
+    prop "update" property_media_update;
+    prop "orientation" property_media_orientation;
+    prop "padding" property_padding;
+    prop "padding-block" property_padding_block;
+    prop "padding-block-end" property_padding_block_end;
+    prop "padding-block-start" property_padding_block_start;
+    prop "padding-bottom" property_padding_bottom;
+    prop "padding-inline" property_padding_inline;
+    prop "padding-inline-end" property_padding_inline_end;
+    prop "padding-inline-start" property_padding_inline_start;
+    prop "padding-left" property_padding_left;
+    prop "padding-right" property_padding_right;
+    prop "padding-top" property_padding_top;
+    prop "page-break-after" property_page_break_after;
+    prop "page-break-before" property_page_break_before;
+    prop "page-break-inside" property_page_break_inside;
+    prop "paint-order" property_paint_order;
+    prop "pause" property_pause;
+    prop "pause-after" property_pause_after;
+    prop "pause-before" property_pause_before;
+    prop "perspective" property_perspective;
+    prop "perspective-origin" property_perspective_origin;
+    prop "place-content" property_place_content;
+    prop "place-items" property_place_items;
+    prop "place-self" property_place_self;
+    prop "pointer-events" property_pointer_events;
+    prop "position" property_position;
+    prop "quotes" property_quotes;
+    prop "resize" property_resize;
+    prop "rest" property_rest;
+    prop "rest-after" property_rest_after;
+    prop "rest-before" property_rest_before;
+    prop "right" property_right;
+    prop "rotate" property_rotate;
+    prop "row-gap" property_row_gap;
+    prop "ruby-align" property_ruby_align;
+    prop "ruby-merge" property_ruby_merge;
+    prop "ruby-position" property_ruby_position;
+    prop "scale" property_scale;
+    prop "scroll-behavior" property_scroll_behavior;
+    prop "scroll-margin" property_scroll_margin;
+    prop "scroll-margin-block" property_scroll_margin_block;
+    prop "scroll-margin-block-end" property_scroll_margin_block_end;
+    prop "scroll-margin-block-start" property_scroll_margin_block_start;
+    prop "scroll-margin-bottom" property_scroll_margin_bottom;
+    prop "scroll-margin-inline" property_scroll_margin_inline;
+    prop "scroll-margin-inline-end" property_scroll_margin_inline_end;
+    prop "scroll-margin-inline-start" property_scroll_margin_inline_start;
+    prop "scroll-margin-left" property_scroll_margin_left;
+    prop "scroll-margin-right" property_scroll_margin_right;
+    prop "scroll-margin-top" property_scroll_margin_top;
+    prop "scroll-padding" property_scroll_padding;
+    prop "scroll-padding-block" property_scroll_padding_block;
+    prop "scroll-padding-block-end" property_scroll_padding_block_end;
+    prop "scroll-padding-block-start" property_scroll_padding_block_start;
+    prop "scroll-padding-bottom" property_scroll_padding_bottom;
+    prop "scroll-padding-inline" property_scroll_padding_inline;
+    prop "scroll-padding-inline-end" property_scroll_padding_inline_end;
+    prop "scroll-padding-inline-start" property_scroll_padding_inline_start;
+    prop "scroll-padding-left" property_scroll_padding_left;
+    prop "scroll-padding-right" property_scroll_padding_right;
+    prop "scroll-padding-top" property_scroll_padding_top;
+    prop "scroll-snap-align" property_scroll_snap_align;
+    prop "scroll-snap-coordinate" property_scroll_snap_coordinate;
+    prop "scroll-snap-destination" property_scroll_snap_destination;
+    prop "scroll-snap-points-x" property_scroll_snap_points_x;
+    prop "scroll-snap-points-y" property_scroll_snap_points_y;
+    prop "scroll-snap-stop" property_scroll_snap_stop;
+    prop "scroll-snap-type" property_scroll_snap_type;
+    prop "scroll-snap-type-x" property_scroll_snap_type_x;
+    prop "scroll-snap-type-y" property_scroll_snap_type_y;
+    prop "scrollbar-color" property_scrollbar_color;
+    prop "scrollbar-width" property_scrollbar_width;
+    prop "scrollbar-gutter" property_scrollbar_gutter;
+    prop "shape-image-threshold" property_shape_image_threshold;
+    prop "shape-margin" property_shape_margin;
+    prop "shape-outside" property_shape_outside;
+    prop "shape-rendering" property_shape_rendering;
+    prop "speak" property_speak;
+    prop "speak-as" property_speak_as;
+    prop "src" property_src;
+    prop "stroke" property_stroke;
+    prop "stroke-dasharray" property_stroke_dasharray;
+    prop "stroke-dashoffset" property_stroke_dashoffset;
+    prop "stroke-linecap" property_stroke_linecap;
+    prop "stroke-linejoin" property_stroke_linejoin;
+    prop "stroke-miterlimit" property_stroke_miterlimit;
+    prop "stroke-opacity" property_stroke_opacity;
+    prop "stroke-width" property_stroke_width;
+    prop "tab-size" property_tab_size;
+    prop "table-layout" property_table_layout;
+    prop "text-align" property_text_align;
+    prop "text-align-all" property_text_align_all;
+    prop "text-align-last" property_text_align_last;
+    prop "text-anchor" property_text_anchor;
+    prop "text-combine-upright" property_text_combine_upright;
+    prop "text-decoration" property_text_decoration;
+    prop "text-decoration-color" property_text_decoration_color;
+    prop "text-decoration-line" property_text_decoration_line;
+    prop "text-decoration-skip" property_text_decoration_skip;
+    prop "text-decoration-skip-ink" property_text_decoration_skip_ink;
+    prop "text-decoration-skip-box" property_text_decoration_skip_box;
+    prop "text-decoration-skip-inset" property_text_decoration_skip_inset;
+    prop "text-decoration-style" property_text_decoration_style;
+    prop "text-decoration-thickness" property_text_decoration_thickness;
+    prop "text-emphasis" property_text_emphasis;
+    prop "text-emphasis-color" property_text_emphasis_color;
+    prop "text-emphasis-position" property_text_emphasis_position;
+    prop "text-emphasis-style" property_text_emphasis_style;
+    prop "text-indent" property_text_indent;
+    prop "text-justify" property_text_justify;
+    prop "text-orientation" property_text_orientation;
+    prop "text-overflow" property_text_overflow;
+    prop "text-rendering" property_text_rendering;
+    prop "text-shadow" property_text_shadow;
+    prop "text-size-adjust" property_text_size_adjust;
+    prop "text-transform" property_text_transform;
+    prop "text-underline-offset" property_text_underline_offset;
+    prop "text-underline-position" property_text_underline_position;
+    prop "top" property_top;
+    prop "touch-action" property_touch_action;
+    prop "transform" property_transform;
+    prop "transform-box" property_transform_box;
+    prop "transform-origin" property_transform_origin;
+    prop "transform-style" property_transform_style;
+    prop "transition" property_transition;
+    prop "transition-behavior" property_transition_behavior;
+    prop "transition-delay" property_transition_delay;
+    prop "transition-duration" property_transition_duration;
+    prop "transition-property" property_transition_property;
+    prop "transition-timing-function" property_transition_timing_function;
+    prop "translate" property_translate;
+    prop "unicode-bidi" property_unicode_bidi;
+    prop "unicode-range" property_unicode_range;
+    prop "user-select" property_user_select;
+    prop "vertical-align" property_vertical_align;
+    prop "visibility" property_visibility;
+    prop "voice-balance" property_voice_balance;
+    prop "voice-duration" property_voice_duration;
+    prop "voice-family" property_voice_family;
+    prop "voice-pitch" property_voice_pitch;
+    prop "voice-range" property_voice_range;
+    prop "voice-rate" property_voice_rate;
+    prop "voice-stress" property_voice_stress;
+    prop "voice-volume" property_voice_volume;
+    prop "white-space" property_white_space;
+    prop "widows" property_widows;
+    prop "width" property_width;
+    prop "will-change" property_will_change;
+    prop "word-break" property_word_break;
+    prop "word-spacing" property_word_spacing;
+    prop "word-wrap" property_word_wrap;
+    prop "writing-mode" property_writing_mode;
+    prop "z-index" property_z_index;
+    prop "zoom" property_zoom;
+    prop "container" property_container;
+    prop "container-name" property_container_name;
+    prop "container-type" property_container_type;
+    value "pseudo-class-selector" pseudo_class_selector;
+    value "pseudo-element-selector" pseudo_element_selector;
+    value "pseudo-page" pseudo_page;
+    value "quote" quote;
+    value "ratio" ratio;
+    value "relative-selector" relative_selector;
+    value "relative-selector-list" relative_selector_list;
+    value "relative-size" relative_size;
+    value "repeat-style" repeat_style;
+    value "right" right;
+    value "self-position" self_position;
+    value "shadow" shadow;
+    value "shadow-t" shadow_t;
+    value "shape" shape;
+    value "shape-box" shape_box;
+    value "shape-radius" shape_radius;
+    value "side-or-corner" side_or_corner;
+    value "single-animation" single_animation;
+    value "font-families" font_families;
+    value "single-animation-direction" single_animation_direction;
+    value "single-animation-fill-mode" single_animation_fill_mode;
+    value "single-animation-iteration-count" single_animation_iteration_count;
+    value "single-animation-play-state" single_animation_play_state;
+    value "single-transition" single_transition;
+    value "single-transition-property" single_transition_property;
+    value "size" size;
+    value "ray-size" ray_size;
+    value "radial-size" radial_size;
+    value "step-position" step_position;
+    value "step-timing-function" step_timing_function;
+    value "subclass-selector" subclass_selector;
+    value "supports-condition" supports_condition;
+    value "supports-decl" supports_decl;
+    value "supports-feature" supports_feature;
+    value "supports-in-parens" supports_in_parens;
+    value "supports-selector-fn" supports_selector_fn;
+    value "svg-length" svg_length;
+    value "svg-writing-mode" svg_writing_mode;
+    value "symbol" symbol;
+    value "symbols-type" symbols_type;
+    value "target" target;
+    value "timing-function" timing_function;
+    value "top" top;
+    value "track-breadth" track_breadth;
+    value "track-group" track_group;
+    value "track-list" track_list;
+    value "track-list-v0" track_list_v0;
+    value "track-minmax" track_minmax;
+    value "track-repeat" track_repeat;
+    value "track-size" track_size;
+    value "transform-function" transform_function;
+    value "transform-list" transform_list;
+    value "type-or-unit" type_or_unit;
+    value "type-selector" type_selector;
+    value "viewport-length" viewport_length;
+    value "wq-name" wq_name;
+    value "x" x;
+    value "y" y;
     (* TODO: calc needs to be available in length *)
-value "extended-length" Extended_length.parser;
-value "extended-frequency" Extended_frequency.parser;
-value "extended-angle" Extended_angle.parser;
-value "extended-time" Extended_time.parser;
-value "extended-percentage" Extended_percentage.parser;
+    value "extended-length" extended_length;
+    value "extended-frequency" extended_frequency;
+    value "extended-angle" extended_angle;
+    value "extended-time" extended_time;
+    value "extended-percentage" extended_percentage;
   ]
 
 (* Apply a packed rule to tokens and check if it's valid *)

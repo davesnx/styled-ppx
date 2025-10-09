@@ -1,10 +1,10 @@
 (executable
  (name as_standalone)
  (public_name as_standalone)
- (libraries reason_css_parser_ppx ppxlib))
+ (libraries css_grammar_ppx_generate ppxlib))
 
 (cram
- (alias test-css-spec-types)
+ (alias test-css-grammar-parser-snapshot)
  (deps
   %{exe:as_standalone.exe}
   %{bin:refmt}

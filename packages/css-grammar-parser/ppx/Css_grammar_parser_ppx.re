@@ -72,28 +72,50 @@ let is_open =
   | {pstr_desc: Pstr_open(_), pstr_loc: _loc} => true
   | _ => false;
 
-let preprocess_impl = structure_items => {
-  let (module_bindings, rest) =
-    List.partition(is_structure_item_recmodule, structure_items);
+/* let _preprocess_impl = structure_items => {
+     let (module_bindings, rest) =
+       List.partition(is_structure_item_recmodule, structure_items);
 
-  switch (module_bindings) {
-  | [{pstr_desc: Pstr_recmodule(module_bindings), pstr_loc, _}] =>
+     switch (module_bindings) {
+     | [{pstr_desc: Pstr_recmodule(module_bindings), pstr_loc, _}] =>
+       module Ast_builder =
+         Ppxlib.Ast_builder.Make({
+           let loc = pstr_loc;
+         });
+       module Emit = Generate.Make(Ast_builder);
+       let generated_module_bindings = Emit.make_modules(module_bindings);
+       let (open_bindings, rest) = List.partition(is_open, rest);
+
+       switch (generated_module_bindings) {
+       | [] => structure_items
+       | bindings =>
+         let rec_modules = Ast_helper.Str.rec_module(~loc=pstr_loc, bindings);
+         open_bindings @ [rec_modules] @ rest;
+       };
+     | [_more_than_one_rec_module] =>
+       failwith("expected a single recursive module binding")
+     | _ => structure_items
+     };
+   }; */
+
+let preprocess_impl = structure_items => {
+  let (bindings, rest) =
+    List.partition(is_structure_item_recursive, structure_items);
+
+  switch (bindings) {
+  | [{pstr_desc: Pstr_value(_, value_binding), pstr_loc, _}] =>
     module Ast_builder =
       Ppxlib.Ast_builder.Make({
         let loc = pstr_loc;
       });
     module Emit = Generate.Make(Ast_builder);
-    let generated_module_bindings = Emit.make_modules(module_bindings);
+    let generated_types = Emit.make_types(value_binding);
+    let modified_bindings = Emit.add_types(~loc=pstr_loc, value_binding);
+    /* This is clearly a nasty one, I asume the content of the file and re-organise it */
     let (open_bindings, rest) = List.partition(is_open, rest);
-
-    switch (generated_module_bindings) {
-    | [] => structure_items
-    | bindings =>
-      let rec_modules = Ast_helper.Str.rec_module(~loc=pstr_loc, bindings);
-      open_bindings @ [rec_modules] @ rest;
-    };
-  | [_more_than_one_rec_module] =>
-    failwith("expected a single recursive module binding")
+    open_bindings @ [generated_types] @ modified_bindings @ rest;
+  | [_more_than_one_rec_binding] =>
+    failwith("expected a single recursive value binding")
   | _ => structure_items
   };
 };

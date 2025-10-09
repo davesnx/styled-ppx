@@ -91,9 +91,7 @@ let transform_with_variable = (parser, mapper, value_to_expr) => {
     emit(
       Combinators.xor([
         /* If the entire CSS value is interpolated, we treat it as a `Variable */
-        Rule.Match.map(Standard.Interpolation.parser, data =>
-          `Variable(data)
-        ),
+        Rule.Match.map(Standard.interpolation, data => `Variable(data)),
         /* Otherwise it's a regular CSS `Value and match the parser */
         Rule.Match.map(parser, data => `Value(data)),
       ]),
@@ -119,7 +117,7 @@ let transform_with_variable = (parser, mapper, value_to_expr) => {
 /* Monomoprhipc properties are the ones that can only have one representation
     of the value (and it's one argument also) which it's also possible to interpolate on them.
 
-   For example: Property_parser.Property_font_size.parser => CSS.fontSize
+   For example: Property_parser.property_font_size => CSS.fontSize
    */
 let monomorphic = (parser, property_renderer, value_renderer) =>
   transform_with_variable(parser, value_renderer, (~loc, value) =>
@@ -330,20 +328,20 @@ let rec render_function_calc = (~loc, calc_sum) => {
   [%expr `calc([%e render_calc_sum(~loc, calc_sum)])];
 }
 
-and render_calc_sum = (~loc, (product, sums): Property_parser.Calc_sum.t) => {
+and render_calc_sum = (~loc, (product, sums): Property_parser.Types.calc_sum) => {
   let rec go = (left, rest) => {
     switch (rest) {
     | [] => left
     | [x, ...xs] =>
       switch (x) {
-      | (`Cross, calc_product) =>
+      | (`Cross (), calc_product) =>
         go(
           [%expr
             `add(([%e left], [%e render_calc_product(~loc, calc_product)]))
           ],
           xs,
         )
-      | (`Dash, calc_product) =>
+      | (`Dash (), calc_product) =>
         go(
           [%expr
             `sub(([%e left], [%e render_calc_product(~loc, calc_product)]))
@@ -356,7 +354,7 @@ and render_calc_sum = (~loc, (product, sums): Property_parser.Calc_sum.t) => {
   go(render_calc_product(~loc, product), sums);
 }
 and render_function_min_or_max =
-    (~loc, calc_sums: list(Property_parser.Calc_sum.t)) => {
+    (~loc, calc_sums: list(Property_parser.Types.calc_sum)) => {
   switch (calc_sums) {
   | [] => raise(Impossible_state)
   | [x, ...xs] =>
@@ -371,7 +369,7 @@ and render_function_max = (~loc, calc_sums) => {
   [%expr `max([%e render_function_min_or_max(~loc, calc_sums)])];
 }
 and render_calc_product =
-    (~loc, (value, products): Property_parser.Calc_product.t) => {
+    (~loc, (value, products): Property_parser.Types.calc_product) => {
   let rec go = (left, rest) => {
     switch (rest) {
     | [] => left
@@ -430,12 +428,12 @@ and render_extended_time_no_interp = (~loc) =>
 
 and render_extended_time = (~loc) =>
   fun
-  | #Property_parser.Extended_time_no_interp.t as x =>
+  | #Property_parser.Types.extended_time_no_interp as x =>
     render_extended_time_no_interp(~loc, x)
   | `Interpolation(v) => render_variable(~loc, v)
 
 and render_calc_value = (~loc, calc_value) => {
-  switch ((calc_value: Property_parser.Calc_value.t)) {
+  switch ((calc_value: Property_parser.Types.calc_value)) {
   | `Number(float) => [%expr `num([%e render_float(~loc, float)])]
   | `Extended_length(l) => render_extended_length(~loc, l)
   | `Extended_percentage(p) => render_extended_percentage(~loc, p)
@@ -484,7 +482,7 @@ let render_one_bg_size = (~loc, value) => {
   };
 };
 
-let render_bg_size = (~loc, value: Property_parser.Bg_size.t) =>
+let render_bg_size = (~loc, value: Property_parser.Types.bg_size) =>
   switch (value) {
   | `One_bg_size(one, None) => render_one_bg_size(~loc, one)
   | `One_bg_size(one, Some(two)) => [%expr
@@ -532,7 +530,8 @@ let render_extended_angle = (~loc) =>
   | `Function_min(values) => render_function_min(~loc, values)
   | `Function_max(values) => render_function_max(~loc, values);
 
-let render_side_or_corner = (~loc, value: Property_parser.Side_or_corner.t) => {
+let render_side_or_corner =
+    (~loc, value: Property_parser.Types.side_or_corner) => {
   switch (value) {
   | (None, Some(`Top)) => [%expr `Top]
   | (Some(`Left), None) => [%expr `Left]
@@ -553,58 +552,58 @@ let variants = (parser, identifier) =>
 
 let width =
   monomorphic(
-    Property_parser.Property_width.parser,
+    Property_parser.property_width,
     (~loc) => [%expr CSS.width],
     render_size,
   );
 
 let height =
   monomorphic(
-    Property_parser.Property_height.parser,
+    Property_parser.property_height,
     (~loc) => [%expr CSS.height],
     render_size,
   );
 
 let min_width =
   monomorphic(
-    Property_parser.Property_min_width.parser,
+    Property_parser.property_min_width,
     (~loc) => [%expr CSS.minWidth],
     render_min_size,
   );
 
 let min_height =
   monomorphic(
-    Property_parser.Property_min_height.parser,
+    Property_parser.property_min_height,
     (~loc) => [%expr CSS.minHeight],
     render_min_size,
   );
 
 let max_width =
   monomorphic(
-    Property_parser.Property_max_width.parser,
+    Property_parser.property_max_width,
     (~loc) => [%expr CSS.maxWidth],
     render_max_width,
   );
 
 let max_height =
   monomorphic(
-    Property_parser.Property_max_height.parser,
+    Property_parser.property_max_height,
     (~loc) => [%expr CSS.maxHeight],
     render_size,
   );
 
 let box_sizing =
   monomorphic(
-    Property_parser.Property_box_sizing.parser,
+    Property_parser.property_box_sizing,
     (~loc) => [%expr CSS.boxSizing],
     variant_to_expression,
   );
 
 let column_width =
   monomorphic(
-    Property_parser.Property_column_width.parser,
+    Property_parser.property_column_width,
     (~loc) => [%expr CSS.columnWidth],
-    (~loc, value: Property_parser.Property_column_width.t) =>
+    (~loc, value: Property_parser.Types.property_column_width) =>
       switch (value) {
       | `Auto => variant_to_expression(~loc, `Auto)
       | `Extended_length(l) => render_extended_length(~loc, l)
@@ -626,35 +625,35 @@ let render_padding = (~loc) =>
 // css-box-3
 let margin_top =
   monomorphic(
-    Property_parser.Property_margin_top.parser,
+    Property_parser.property_margin_top,
     (~loc) => [%expr CSS.marginTop],
     render_margin,
   );
 
 let margin_right =
   monomorphic(
-    Property_parser.Property_margin_right.parser,
+    Property_parser.property_margin_right,
     (~loc) => [%expr CSS.marginRight],
     render_margin,
   );
 
 let margin_bottom =
   monomorphic(
-    Property_parser.Property_margin_bottom.parser,
+    Property_parser.property_margin_bottom,
     (~loc) => [%expr CSS.marginBottom],
     render_margin,
   );
 
 let margin_left =
   monomorphic(
-    Property_parser.Property_margin_left.parser,
+    Property_parser.property_margin_left,
     (~loc) => [%expr CSS.marginLeft],
     render_margin,
   );
 
 let margin =
   emit_shorthand(
-    Property_parser.Property_margin.parser,
+    Property_parser.property_margin,
     (~loc) =>
       fun
       | `Auto => variant_to_expression(~loc, `Auto)
@@ -684,35 +683,35 @@ let margin =
 
 let padding_top =
   monomorphic(
-    Property_parser.Property_padding_top.parser,
+    Property_parser.property_padding_top,
     (~loc) => [%expr CSS.paddingTop],
     render_padding,
   );
 
 let padding_right =
   monomorphic(
-    Property_parser.Property_padding_right.parser,
+    Property_parser.property_padding_right,
     (~loc) => [%expr CSS.paddingRight],
     render_padding,
   );
 
 let padding_bottom =
   monomorphic(
-    Property_parser.Property_padding_bottom.parser,
+    Property_parser.property_padding_bottom,
     (~loc) => [%expr CSS.paddingBottom],
     render_padding,
   );
 
 let padding_left =
   monomorphic(
-    Property_parser.Property_padding_left.parser,
+    Property_parser.property_padding_left,
     (~loc) => [%expr CSS.paddingLeft],
     render_padding,
   );
 
 let padding =
   emit_shorthand(
-    Property_parser.Property_padding.parser,
+    Property_parser.property_padding,
     (~loc) =>
       fun
       | `Extended_length(l) => render_extended_length(~loc, l)
@@ -900,7 +899,7 @@ let render_color_alpha = (~loc, color_alpha) =>
   | `Extended_percentage(pct) => render_extended_percentage(~loc, pct)
   };
 
-let render_function_rgb = (~loc, ast: Property_parser.Function_rgb.t) => {
+let render_function_rgb = (~loc, ast: Property_parser.Types.function_rgb) => {
   let color_to_float = v => render_integer(~loc, v |> Float.to_int);
 
   let to_number =
@@ -942,7 +941,7 @@ let render_function_rgb = (~loc, ast: Property_parser.Function_rgb.t) => {
   };
 };
 
-let render_function_rgba = (~loc, ast: Property_parser.Function_rgba.t) => {
+let render_function_rgba = (~loc, ast: Property_parser.Types.function_rgba) => {
   let color_to_float = v => render_integer(~loc, v |> Float.to_int);
 
   let to_number =
@@ -1044,7 +1043,7 @@ let render_var = (~loc, string) => {
 };
 
 let rec render_color = (~loc, value) =>
-  switch ((value: Property_parser.Color.t)) {
+  switch ((value: Property_parser.Types.color)) {
   | `Interpolation(v) => render_variable(~loc, v)
   | `Hex_color(hex) => id([%expr `hex([%e render_string(~loc, hex)])])
   | `Named_color(color) => render_named_color(~loc, color)
@@ -1063,9 +1062,9 @@ let rec render_color = (~loc, value) =>
   }
 
 and render_function_color_mix =
-    (~loc, value: Property_parser.Function_color_mix.t) => {
+    (~loc, value: Property_parser.Types.function_color_mix) => {
   let render_rectangular_color_space =
-      (x: Property_parser.Rectangular_color_space.t) => {
+      (x: Property_parser.Types.rectangular_color_space) => {
     switch (x) {
     | `Srgb => [%expr `srgb]
     | `Srgb_linear => [%expr `srgbLinear]
@@ -1080,7 +1079,7 @@ and render_function_color_mix =
     | `Xyz_d65 => [%expr `xyzD65]
     };
   };
-  let render_polar_color_space = (x: Property_parser.Polar_color_space.t) => {
+  let render_polar_color_space = (x: Property_parser.Types.polar_color_space) => {
     switch (x) {
     | `Hsl => [%expr `hsl]
     | `Hwb => [%expr `hwb]
@@ -1133,14 +1132,14 @@ and render_function_color_mix =
 
 let color =
   monomorphic(
-    Property_parser.Property_color.parser,
+    Property_parser.property_color,
     (~loc) => [%expr CSS.color],
     render_color,
   );
 
 let opacity =
   monomorphic(
-    Property_parser.Property_opacity.parser,
+    Property_parser.property_opacity,
     (~loc) => [%expr CSS.opacity],
     (~loc) =>
       fun
@@ -1176,7 +1175,7 @@ let render_position_four = (~loc, x, xo, y, yo) => [%expr
 ];
 
 // css-images-4
-let render_position = (~loc, position: Property_parser.Position.t) => {
+let render_position = (~loc, position: Property_parser.Types.position) => {
   switch (position) {
   | `Xor(x) => render_position_one(~loc, x)
   | `And_0(x, y) => render_position_two(~loc, x, y)
@@ -1193,22 +1192,22 @@ let render_position = (~loc, position: Property_parser.Position.t) => {
 };
 
 let object_fit =
-  variants(Property_parser.Property_object_fit.parser, (~loc) =>
+  variants(Property_parser.property_object_fit, (~loc) =>
     [%expr CSS.objectFit]
   );
 
 let object_position =
   monomorphic(
-    Property_parser.Property_object_position.parser,
+    Property_parser.property_object_position,
     (~loc) => [%expr CSS.objectPosition],
     render_position,
   );
 
 let pointer_events =
   monomorphic(
-    Property_parser.Property_pointer_events.parser,
+    Property_parser.property_pointer_events,
     (~loc) => [%expr CSS.pointerEvents],
-    (~loc, value: Property_parser.Property_pointer_events.t) => {
+    (~loc, value: Property_parser.Types.property_pointer_events) => {
       switch (value) {
       | `Auto => [%expr `auto]
       | `None => [%expr `none]
@@ -1226,13 +1225,13 @@ let pointer_events =
   );
 
 let image_resolution =
-  unsupportedProperty(Property_parser.Property_image_resolution.parser);
+  unsupportedProperty(Property_parser.property_image_resolution);
 
 let image_orientation =
-  unsupportedProperty(Property_parser.Property_image_orientation.parser);
+  unsupportedProperty(Property_parser.property_image_orientation);
 
 let image_rendering =
-  variants(Property_parser.Property_image_rendering.parser, (~loc) =>
+  variants(Property_parser.property_image_rendering, (~loc) =>
     [%expr CSS.imageRendering]
   );
 
@@ -1302,13 +1301,13 @@ let render_box_shadow = (~loc, shadow) => {
 
 let background_color =
   monomorphic(
-    Property_parser.Property_background_color.parser,
+    Property_parser.property_background_color,
     (~loc) => [%expr CSS.backgroundColor],
     render_color,
   );
 
 let _render_color_stop_length =
-    (~loc, value: Property_parser.Color_stop_length.t) => {
+    (~loc, value: Property_parser.Types.color_stop_length) => {
   switch (value) {
   | `Extended_length(l) => render_extended_length(~loc, l)
   | `Extended_percentage(p) => render_extended_percentage(~loc, p)
@@ -1316,7 +1315,7 @@ let _render_color_stop_length =
 };
 
 let render_color_stop_angle =
-    (~loc, value: Property_parser.Color_stop_angle.t) => {
+    (~loc, value: Property_parser.Types.color_stop_angle) => {
   switch (value) {
   | [`Angle(a), _] => render_angle(~loc, a)
   | [_, `Angle(a)] => render_angle(~loc, a)
@@ -1325,7 +1324,7 @@ let render_color_stop_angle =
 };
 
 let render_angular_color_stop =
-    (~loc, value: Property_parser.Angular_color_stop.t) => {
+    (~loc, value: Property_parser.Types.angular_color_stop) => {
   switch (value) {
   | (color, None) =>
     let color = render_color(~loc, color);
@@ -1337,7 +1336,8 @@ let render_angular_color_stop =
   };
 };
 
-let render_color_stop_list = (~loc, value: Property_parser.Color_stop_list.t) => {
+let render_color_stop_list =
+    (~loc, value: Property_parser.Types.color_stop_list) => {
   value
   |> List.map(stop =>
        switch (stop) {
@@ -1361,7 +1361,7 @@ let render_color_stop_list = (~loc, value: Property_parser.Color_stop_list.t) =>
 };
 
 let render_angular_color_hint =
-    (~loc, value: Property_parser.Angular_color_hint.t) => {
+    (~loc, value: Property_parser.Types.angular_color_hint) => {
   switch (value) {
   | `Extended_percentage(pct) => render_extended_percentage(~loc, pct)
   | `Extended_angle(a) => render_extended_angle(~loc, a)
@@ -1369,7 +1369,7 @@ let render_angular_color_hint =
 };
 
 let render_angular_color_stop_list =
-    (~loc, value: Property_parser.Angular_color_stop_list.t) => {
+    (~loc, value: Property_parser.Types.angular_color_stop_list) => {
   let (rest_of_stops, (), last_stops) = value;
   let stops =
     rest_of_stops
@@ -1380,7 +1380,7 @@ let render_angular_color_stop_list =
            [%expr ([%e stop], None)];
          | (
              stop,
-             Some(((), color_hint: Property_parser.Angular_color_hint.t)),
+             Some(((), color_hint: Property_parser.Types.angular_color_hint)),
            ) =>
            let stop = render_angular_color_stop(~loc, stop);
            let color_hint = render_angular_color_hint(~loc, color_hint);
@@ -1392,7 +1392,7 @@ let render_angular_color_stop_list =
 };
 
 let render_function_linear_gradient =
-    (~loc, value: Property_parser.Function_linear_gradient.t) => {
+    (~loc, value: Property_parser.Types.function_linear_gradient) => {
   switch (value) {
   | (None, stops) => [%expr
      `linearGradient((
@@ -1416,7 +1416,7 @@ let render_function_linear_gradient =
 };
 
 let render_function_repeating_linear_gradient =
-    (~loc, value: Property_parser.Function_repeating_linear_gradient.t) => {
+    (~loc, value: Property_parser.Types.function_repeating_linear_gradient) => {
   switch (value) {
   | (Some(`Extended_angle(angle)), (), stops) => [%expr
      `repeatingLinearGradient((
@@ -1442,7 +1442,7 @@ let render_eding_shape = (~loc, value) => {
   };
 };
 
-let render_radial_size = (~loc, value: Property_parser.Radial_size.t) => {
+let render_radial_size = (~loc, value: Property_parser.Types.radial_size) => {
   switch (value) {
   | `Extended_length(l) => render_extended_length(~loc, l)
   | `Farthest_side => [%expr `farthestSide]
@@ -1454,7 +1454,7 @@ let render_radial_size = (~loc, value: Property_parser.Radial_size.t) => {
 };
 
 let render_function_radial_gradient =
-    (~loc, value: Property_parser.Function_radial_gradient.t) => {
+    (~loc, value: Property_parser.Types.function_radial_gradient) => {
   switch (value) {
   | (shape, None, None, None | Some (), color_stop_list) =>
     let shape = render_eding_shape(~loc, shape);
@@ -1510,7 +1510,7 @@ let render_function_radial_gradient =
 };
 
 let render_function_repeating_radial_gradient =
-    (~loc, value: Property_parser.Function_repeating_radial_gradient.t) => {
+    (~loc, value: Property_parser.Types.function_repeating_radial_gradient) => {
   switch (value) {
   | (None, None, (), stops) => [%expr
      `radialGradient([%e render_color_stop_list(~loc, stops)])
@@ -1520,7 +1520,7 @@ let render_function_repeating_radial_gradient =
 };
 
 let render_function_conic_gradient =
-    (~loc, value: Property_parser.Function_conic_gradient.t) => {
+    (~loc, value: Property_parser.Types.function_conic_gradient) => {
   switch (value) {
   | (None, None, (), stops) => [%expr
      `conicGradient([%e render_angular_color_stop_list(~loc, stops)])
@@ -1529,7 +1529,7 @@ let render_function_conic_gradient =
   };
 };
 
-let render_gradient = (~loc, value: Property_parser.Gradient.t) =>
+let render_gradient = (~loc, value: Property_parser.Types.gradient) =>
   switch (value) {
   | `Function_linear_gradient(lg) => render_function_linear_gradient(~loc, lg)
   | `Function_repeating_linear_gradient(rlg) =>
@@ -1546,14 +1546,14 @@ let render_url_no_interp = (~loc, url) => [%expr
   `url([%e render_string(~loc, url)])
 ];
 
-let render_url = (~loc, url: Property_parser.Url.t) => {
+let render_url = (~loc, url: Property_parser.Types.url) => {
   switch (url) {
   | `Url(v) => [%expr `url([%e render_variable(~loc, v)])]
   | `Url_no_interp(v) => render_url_no_interp(~loc, v)
   };
 };
 
-let render_image = (~loc, value: Property_parser.Image.t) =>
+let render_image = (~loc, value: Property_parser.Types.image) =>
   switch (value) {
   | `Gradient(gradient) => render_gradient(~loc, gradient)
   | `Url(url) => render_url(~loc, url)
@@ -1565,13 +1565,13 @@ let render_image = (~loc, value: Property_parser.Image.t) =>
   | `Function_cross_fade(_) => raise(Unsupported_feature)
   };
 
-let render_bg_image = (~loc, value: Property_parser.Bg_image.t) =>
+let render_bg_image = (~loc, value: Property_parser.Types.bg_image) =>
   switch (value) {
   | `None => [%expr `none]
   | `Image(i) => render_image(~loc, i)
   };
 
-let render_bg_images = (~loc, value: list(Property_parser.Bg_image.t)) => {
+let render_bg_images = (~loc, value: list(Property_parser.Types.bg_image)) => {
   value |> List.map(render_bg_image(~loc)) |> Builder.pexp_array(~loc);
 };
 
@@ -1603,7 +1603,7 @@ let render_attachment = (~loc) =>
   | `Scroll => [%expr `scroll];
 
 let background_image =
-  polymorphic(Property_parser.Property_background_image.parser, (~loc) =>
+  polymorphic(Property_parser.property_background_image, (~loc) =>
     fun
     | [one] => [
         [%expr CSS.backgroundImage([%e render_bg_image(~loc, one)])],
@@ -1614,7 +1614,7 @@ let background_image =
   );
 
 let background_repeat =
-  polymorphic(Property_parser.Property_background_repeat.parser, (~loc) =>
+  polymorphic(Property_parser.property_background_repeat, (~loc) =>
     fun
     | [one] => [
         [%expr CSS.backgroundRepeat([%e render_repeat_style(~loc, one)])],
@@ -1634,7 +1634,7 @@ let background_repeat =
 
 let background_attachment =
   monomorphic(
-    Property_parser.Property_background_attachment.parser,
+    Property_parser.property_background_attachment,
     (~loc) => [%expr CSS.backgroundAttachment],
     (~loc) =>
       fun
@@ -1657,7 +1657,7 @@ let render_bg_position_three_and_four = (~loc) =>
       };
     };
 
-let render_bg_position = (~loc, position: Property_parser.Bg_position.t) => {
+let render_bg_position = (~loc, position: Property_parser.Types.bg_position) => {
   switch (position) {
   | `Xor(x) => render_position_one(~loc, x)
   | `Static(x, y) => render_position_two(~loc, x, y)
@@ -1671,7 +1671,7 @@ let render_bg_position = (~loc, position: Property_parser.Bg_position.t) => {
 };
 
 let background_position =
-  polymorphic(Property_parser.Property_background_position.parser, (~loc) =>
+  polymorphic(Property_parser.property_background_position, (~loc) =>
     fun
     | [one] => [
         [%expr CSS.backgroundPosition([%e render_bg_position(~loc, one)])],
@@ -1690,10 +1690,10 @@ let background_position =
   );
 
 let background_position_x =
-  unsupportedProperty(Property_parser.Property_background_position_x.parser);
+  unsupportedProperty(Property_parser.property_background_position_x);
 
 let background_position_y =
-  unsupportedProperty(Property_parser.Property_background_position_y.parser);
+  unsupportedProperty(Property_parser.property_background_position_y);
 
 let render_background_clip = (~loc) =>
   fun
@@ -1702,7 +1702,7 @@ let render_background_clip = (~loc) =>
   | `Border_area => variant_to_expression(~loc, `Border_area);
 
 let background_clip =
-  polymorphic(Property_parser.Property_background_clip.parser, (~loc) =>
+  polymorphic(Property_parser.property_background_clip, (~loc) =>
     fun
     | [one] => [
         [%expr CSS.backgroundClip([%e render_background_clip(~loc, one)])],
@@ -1722,7 +1722,7 @@ let background_clip =
 
 let background_origin =
   monomorphic(
-    Property_parser.Property_background_origin.parser,
+    Property_parser.property_background_origin,
     (~loc) => [%expr CSS.backgroundOrigin],
     (~loc) =>
       fun
@@ -1733,7 +1733,7 @@ let background_origin =
 
 let background_size =
   monomorphic(
-    Property_parser.Property_background_size.parser,
+    Property_parser.property_background_size,
     (~loc) => [%expr CSS.backgroundSize],
     (~loc) =>
       fun
@@ -1743,13 +1743,13 @@ let background_size =
   );
 
 let render_background =
-    (~loc, background: Property_parser.Property_background.t) => {
+    (~loc, background: Property_parser.Types.property_background) => {
   let (layers, final_layer) = background;
   let render_layer = (layer, fn, render) =>
     layer
     |> Option.fold(~none=[], ~some=l => [[%expr [%e fn]([%e render(l)])]]);
 
-  let render_layers = (value: Property_parser.Bg_layer.t) => {
+  let render_layers = (value: Property_parser.Types.bg_layer) => {
     let (image, position, repeat_style, attachment, clip, origin) = value;
     [
       render_layer(image, [%expr CSS.backgroundImage], render_bg_image(~loc)),
@@ -1796,7 +1796,7 @@ let render_background =
     );
   };
 
-  let render_final_layer = (value: Property_parser.Final_bg_layer.t) => {
+  let render_final_layer = (value: Property_parser.Types.final_bg_layer) => {
     let (color, image, position, repeat_style, attachment, clip, origin) = value;
     [
       render_layer(color, [%expr CSS.backgroundColor], render_color(~loc)),
@@ -1855,39 +1855,39 @@ let render_background =
 };
 
 let background =
-  polymorphic(Property_parser.Property_background.parser, render_background);
+  polymorphic(Property_parser.property_background, render_background);
 
 let border_top_color =
   monomorphic(
-    Property_parser.Property_border_top_color.parser,
+    Property_parser.property_border_top_color,
     (~loc) => [%expr CSS.borderTopColor],
     render_color,
   );
 
 let border_right_color =
   monomorphic(
-    Property_parser.Property_border_right_color.parser,
+    Property_parser.property_border_right_color,
     (~loc) => [%expr CSS.borderRightColor],
     render_color,
   );
 
 let border_bottom_color =
   monomorphic(
-    Property_parser.Property_border_bottom_color.parser,
+    Property_parser.property_border_bottom_color,
     (~loc) => [%expr CSS.borderBottomColor],
     render_color,
   );
 
 let border_left_color =
   monomorphic(
-    Property_parser.Property_border_left_color.parser,
+    Property_parser.property_border_left_color,
     (~loc) => [%expr CSS.borderLeftColor],
     render_color,
   );
 
 let border_color =
   monomorphic(
-    Property_parser.Property_border_color.parser,
+    Property_parser.property_border_color,
     (~loc) => [%expr CSS.borderColor],
     (~loc) =>
       fun
@@ -1896,33 +1896,33 @@ let border_color =
   );
 
 let border_top_style =
-  variants(Property_parser.Property_border_top_style.parser, (~loc) =>
+  variants(Property_parser.property_border_top_style, (~loc) =>
     [%expr CSS.borderTopStyle]
   );
 
 let border_right_style =
-  variants(Property_parser.Property_border_right_style.parser, (~loc) =>
+  variants(Property_parser.property_border_right_style, (~loc) =>
     [%expr CSS.borderRightStyle]
   );
 
 let border_bottom_style =
-  variants(Property_parser.Property_border_bottom_style.parser, (~loc) =>
+  variants(Property_parser.property_border_bottom_style, (~loc) =>
     [%expr CSS.borderBottomStyle]
   );
 
 let border_left_style =
-  variants(Property_parser.Property_border_left_style.parser, (~loc) =>
+  variants(Property_parser.property_border_left_style, (~loc) =>
     [%expr CSS.borderLeftStyle]
   );
 
 let border_style =
   monomorphic(
-    Property_parser.Property_border_style.parser,
+    Property_parser.property_border_style,
     (~loc) => [%expr CSS.borderStyle],
     variant_to_expression,
   );
 
-let render_line_width = (~loc, value: Property_parser.Line_width.t) =>
+let render_line_width = (~loc, value: Property_parser.Types.line_width) =>
   switch (value) {
   | `Extended_length(l) => render_extended_length(~loc, l)
   | `Thick => [%expr `thick]
@@ -1932,35 +1932,35 @@ let render_line_width = (~loc, value: Property_parser.Line_width.t) =>
 
 let border_top_width =
   monomorphic(
-    Property_parser.Property_border_top_width.parser,
+    Property_parser.property_border_top_width,
     (~loc) => [%expr CSS.borderTopWidth],
     render_line_width,
   );
 
 let border_right_width =
   monomorphic(
-    Property_parser.Property_border_right_width.parser,
+    Property_parser.property_border_right_width,
     (~loc) => [%expr CSS.borderRightWidth],
     render_line_width,
   );
 
 let border_bottom_width =
   monomorphic(
-    Property_parser.Property_border_bottom_width.parser,
+    Property_parser.property_border_bottom_width,
     (~loc) => [%expr CSS.borderBottomWidth],
     render_line_width,
   );
 
 let border_left_width =
   monomorphic(
-    Property_parser.Property_border_left_width.parser,
+    Property_parser.property_border_left_width,
     (~loc) => [%expr CSS.borderLeftWidth],
     render_line_width,
   );
 
 let border_width =
   monomorphic(
-    Property_parser.Property_border_width.parser,
+    Property_parser.property_border_width,
     (~loc) => [%expr CSS.borderWidth],
     (~loc) =>
       fun
@@ -2053,40 +2053,39 @@ let render_outline = (~loc) =>
       ],
     ];
 
-let outline =
-  polymorphic(Property_parser.Property_outline.parser, render_outline);
+let outline = polymorphic(Property_parser.property_outline, render_outline);
 
 let outline_color =
   monomorphic(
-    Property_parser.Property_outline_color.parser,
+    Property_parser.property_outline_color,
     (~loc) => [%expr CSS.outlineColor],
     render_color,
   );
 
 let outline_offset =
   monomorphic(
-    Property_parser.Property_outline_offset.parser,
+    Property_parser.property_outline_offset,
     (~loc) => [%expr CSS.outlineOffset],
     render_extended_length,
   );
 
 let outline_style =
   monomorphic(
-    Property_parser.Property_outline_style.parser,
+    Property_parser.property_outline_style,
     (~loc) => [%expr CSS.outlineStyle],
     render_outline_style_interp,
   );
 
 let outline_width =
   monomorphic(
-    Property_parser.Property_outline_width.parser,
+    Property_parser.property_outline_width,
     (~loc) => [%expr CSS.outlineWidth],
     render_line_width_interp,
   );
 
 let vertical_align =
   monomorphic(
-    Property_parser.Property_vertical_align.parser,
+    Property_parser.property_vertical_align,
     (~loc) => [%expr CSS.verticalAlign],
     (~loc, value) => {
       switch (value) {
@@ -2106,31 +2105,31 @@ let vertical_align =
 
 let border =
   polymorphic(
-    Property_parser.Property_border.parser,
+    Property_parser.property_border,
     render_border(~direction=All),
   );
 
 let border_top =
   polymorphic(
-    Property_parser.Property_border.parser,
+    Property_parser.property_border,
     render_border(~direction=Top),
   );
 
 let border_right =
   polymorphic(
-    Property_parser.Property_border.parser,
+    Property_parser.property_border,
     render_border(~direction=Right),
   );
 
 let border_bottom =
   polymorphic(
-    Property_parser.Property_border.parser,
+    Property_parser.property_border,
     render_border(~direction=Bottom),
   );
 
 let border_left =
   polymorphic(
-    Property_parser.Property_border.parser,
+    Property_parser.property_border,
     render_border(~direction=Left),
   );
 
@@ -2142,42 +2141,42 @@ let render_border_radius_value = (~loc) =>
 
 let border_top_left_radius =
   monomorphic(
-    Property_parser.Property_border_top_left_radius.parser,
+    Property_parser.property_border_top_left_radius,
     (~loc) => [%expr CSS.borderTopLeftRadius],
     render_border_radius_value,
   );
 
 let border_top_right_radius =
   monomorphic(
-    Property_parser.Property_border_top_right_radius.parser,
+    Property_parser.property_border_top_right_radius,
     (~loc) => [%expr CSS.borderTopRightRadius],
     render_border_radius_value,
   );
 
 let border_bottom_right_radius =
   monomorphic(
-    Property_parser.Property_border_bottom_right_radius.parser,
+    Property_parser.property_border_bottom_right_radius,
     (~loc) => [%expr CSS.borderBottomRightRadius],
     render_border_radius_value,
   );
 
 let border_bottom_left_radius =
   monomorphic(
-    Property_parser.Property_border_bottom_left_radius.parser,
+    Property_parser.property_border_bottom_left_radius,
     (~loc) => [%expr CSS.borderBottomLeftRadius],
     render_border_radius_value,
   );
 
 let border_radius =
   monomorphic(
-    Property_parser.Property_border_radius.parser,
+    Property_parser.property_border_radius,
     (~loc) => [%expr CSS.borderRadius],
     render_length_percentage,
   );
 
 let border_image_source =
   monomorphic(
-    Property_parser.Property_border_image_source.parser,
+    Property_parser.property_border_image_source,
     (~loc) => [%expr CSS.borderImageSource],
     (~loc, value) => {
       switch (value) {
@@ -2188,24 +2187,23 @@ let border_image_source =
   );
 
 let border_image_slice =
-  unsupportedProperty(Property_parser.Property_border_image_slice.parser);
+  unsupportedProperty(Property_parser.property_border_image_slice);
 
 let border_image_width =
-  unsupportedProperty(Property_parser.Property_border_image_width.parser);
+  unsupportedProperty(Property_parser.property_border_image_width);
 
 let border_image_outset =
-  unsupportedProperty(Property_parser.Property_border_image_outset.parser);
+  unsupportedProperty(Property_parser.property_border_image_outset);
 
 let border_image_repeat =
-  unsupportedProperty(Property_parser.Property_border_image_repeat.parser);
+  unsupportedProperty(Property_parser.property_border_image_repeat);
 
-let border_image =
-  unsupportedProperty(Property_parser.Property_border_image.parser);
+let border_image = unsupportedProperty(Property_parser.property_border_image);
 
 let box_shadow =
   polymorphic(
-    Property_parser.Property_box_shadow.parser,
-    (~loc, value: Property_parser.Property_box_shadow.t) =>
+    Property_parser.property_box_shadow,
+    (~loc, value: Property_parser.Types.property_box_shadow) =>
     switch (value) {
     | `Interpolation(variable) =>
       /* Here we rely on boxShadow*s* which makes the value be an array */
@@ -2224,7 +2222,7 @@ let box_shadow =
 // css-overflow-3
 let overflow_x =
   monomorphic(
-    Property_parser.Property_overflow_x.parser,
+    Property_parser.property_overflow_x,
     (~loc) => [%expr CSS.overflowX],
     (~loc) =>
       fun
@@ -2235,7 +2233,7 @@ let overflow_x =
 
 let overflow_y =
   monomorphic(
-    Property_parser.Property_overflow_y.parser,
+    Property_parser.property_overflow_y,
     (~loc) => [%expr CSS.overflowY],
     (~loc) =>
       fun
@@ -2245,7 +2243,7 @@ let overflow_y =
   );
 
 let overflow =
-  polymorphic(Property_parser.Property_overflow.parser, (~loc) =>
+  polymorphic(Property_parser.property_overflow, (~loc) =>
     fun
     | `Interpolation(i) => [
         [%expr CSS.overflow([%e render_variable(~loc, i)])],
@@ -2280,7 +2278,7 @@ let overflow =
 
 let overflow_clip_margin =
   polymorphic(
-    Property_parser.Property_overflow_clip_margin.parser,
+    Property_parser.property_overflow_clip_margin,
     (~loc, (clipEdgeOrigin, margin)) => {
       let margin = Option.value(margin, ~default=`Length(`Px(0.)));
       [
@@ -2298,7 +2296,7 @@ let overflow_clip_margin =
 
 let overflow_block =
   monomorphic(
-    Property_parser.Property_overflow_block.parser,
+    Property_parser.property_overflow_block,
     (~loc) => [%expr CSS.overflowBlock],
     (~loc) =>
       fun
@@ -2309,7 +2307,7 @@ let overflow_block =
 
 let overflow_inline =
   monomorphic(
-    Property_parser.Property_overflow_inline.parser,
+    Property_parser.property_overflow_inline,
     (~loc) => [%expr CSS.overflowInline],
     (~loc) =>
       fun
@@ -2320,9 +2318,9 @@ let overflow_inline =
 
 let scrollbar_gutter =
   monomorphic(
-    Property_parser.Property_scrollbar_gutter.parser,
+    Property_parser.property_scrollbar_gutter,
     (~loc) => [%expr CSS.scrollbarGutter],
-    (~loc, value: Property_parser.Property_scrollbar_gutter.t) => {
+    (~loc, value: Property_parser.Types.property_scrollbar_gutter) => {
       switch (value) {
       | `Auto => [%expr `auto]
       | `And(_, None) => [%expr `stable]
@@ -2333,7 +2331,7 @@ let scrollbar_gutter =
 
 let text_overflow =
   monomorphic(
-    Property_parser.Property_text_overflow.parser,
+    Property_parser.property_text_overflow,
     (~loc) => [%expr CSS.textOverflow],
     (~loc) =>
       fun
@@ -2346,24 +2344,23 @@ let text_overflow =
       | []
       | _ => raise(Unsupported_feature),
   );
-// let block_ellipsis = unsupportedProperty(Property_parser.Property_block_ellipsis.parser);
+// let block_ellipsis = unsupportedProperty(Property_parser.property_block_ellipsis);
 
-let max_lines =
-  unsupportedProperty(Property_parser.Property_max_lines.parser);
-// let continue = unsupportedProperty(Property_parser.Property_continue.parser);
+let max_lines = unsupportedProperty(Property_parser.property_max_lines);
+// let continue = unsupportedProperty(Property_parser.property_continue);
 
 // css-text-3
 let text_transform =
-  variants(Property_parser.Property_text_transform.parser, (~loc) =>
+  variants(Property_parser.property_text_transform, (~loc) =>
     [%expr CSS.textTransform]
   );
 
 let white_space =
-  variants(Property_parser.Property_white_space.parser, (~loc) =>
+  variants(Property_parser.property_white_space, (~loc) =>
     [%expr CSS.whiteSpace]
   );
 
-let render_tab_size = (~loc, value: Property_parser.Property_tab_size.t) => {
+let render_tab_size = (~loc, value: Property_parser.Types.property_tab_size) => {
   switch (value) {
   | `Number(n) =>
     int_of_float(n) < 0
@@ -2377,13 +2374,13 @@ let render_tab_size = (~loc, value: Property_parser.Property_tab_size.t) => {
 
 let tab_size =
   monomorphic(
-    Property_parser.Property_tab_size.parser,
+    Property_parser.property_tab_size,
     (~loc) => [%expr CSS.tabSize],
     render_tab_size,
   );
 
 let word_break =
-  variants(Property_parser.Property_word_break.parser, (~loc) =>
+  variants(Property_parser.property_word_break, (~loc) =>
     [%expr CSS.wordBreak]
   );
 
@@ -2396,56 +2393,54 @@ let render_line_height = (~loc) =>
 
 let line_height =
   monomorphic(
-    Property_parser.Property_line_height.parser,
+    Property_parser.property_line_height,
     (~loc) => [%expr CSS.lineHeight],
     render_line_height,
   );
 
 let line_height_step =
   monomorphic(
-    Property_parser.Property_line_height_step.parser,
+    Property_parser.property_line_height_step,
     (~loc) => [%expr CSS.lineHeightStep],
     render_extended_length,
   );
 
 let hyphens =
-  variants(Property_parser.Property_hyphens.parser, (~loc) =>
-    [%expr CSS.hyphens]
-  );
+  variants(Property_parser.property_hyphens, (~loc) => [%expr CSS.hyphens]);
 
 let overflow_wrap =
-  variants(Property_parser.Property_overflow_wrap.parser, (~loc) =>
+  variants(Property_parser.property_overflow_wrap, (~loc) =>
     [%expr CSS.overflowWrap]
   );
 
 let word_wrap =
-  variants(Property_parser.Property_word_wrap.parser, (~loc) =>
+  variants(Property_parser.property_word_wrap, (~loc) =>
     [%expr CSS.wordWrap]
   );
 
 let text_align =
-  variants(Property_parser.Property_text_align.parser, (~loc) =>
+  variants(Property_parser.property_text_align, (~loc) =>
     [%expr CSS.textAlign]
   );
 
 let text_align_all =
-  variants(Property_parser.Property_text_align_all.parser, (~loc) =>
+  variants(Property_parser.property_text_align_all, (~loc) =>
     [%expr CSS.textAlignAll]
   );
 
 let text_align_last =
-  variants(Property_parser.Property_text_align_last.parser, (~loc) =>
+  variants(Property_parser.property_text_align_last, (~loc) =>
     [%expr CSS.textAlignLast]
   );
 
 let text_justify =
-  variants(Property_parser.Property_text_justify.parser, (~loc) =>
+  variants(Property_parser.property_text_justify, (~loc) =>
     [%expr CSS.textJustify]
   );
 
 let word_spacing =
   monomorphic(
-    Property_parser.Property_word_spacing.parser,
+    Property_parser.property_word_spacing,
     (~loc) => [%expr CSS.wordSpacing],
     (~loc) =>
       fun
@@ -2456,7 +2451,7 @@ let word_spacing =
 
 let letter_spacing =
   monomorphic(
-    Property_parser.Property_word_spacing.parser,
+    Property_parser.property_word_spacing,
     (~loc) => [%expr CSS.letterSpacing],
     (~loc) =>
       fun
@@ -2467,7 +2462,7 @@ let letter_spacing =
 
 let text_indent =
   monomorphic(
-    Property_parser.Property_text_indent.parser,
+    Property_parser.property_text_indent,
     (~loc) => [%expr CSS.textIndent],
     (~loc) =>
       fun
@@ -2478,7 +2473,7 @@ let text_indent =
   );
 
 let hanging_punctuation =
-  unsupportedProperty(Property_parser.Property_hanging_punctuation.parser);
+  unsupportedProperty(Property_parser.property_hanging_punctuation);
 
 let render_generic_family = (~loc) =>
   fun
@@ -2512,8 +2507,8 @@ let render_font_family = (~loc, value) =>
 // css-fonts-4
 let font_family =
   polymorphic(
-    Property_parser.Property_font_family.parser,
-    (~loc, value: Property_parser.Property_font_family.t) =>
+    Property_parser.property_font_family,
+    (~loc, value: Property_parser.Types.property_font_family) =>
     switch (value) {
     | `Interpolation(v) =>
       /* We need to add annotation since arrays can be mutable and the type isn't scoped enough */
@@ -2550,13 +2545,12 @@ let render_font_weight = (~loc) =>
 
 let font_weight =
   monomorphic(
-    Property_parser.Property_font_weight.parser,
+    Property_parser.property_font_weight,
     (~loc) => [%expr CSS.fontWeight],
     render_font_weight,
   );
 
-let font_stretch =
-  unsupportedProperty(Property_parser.Property_font_stretch.parser);
+let font_stretch = unsupportedProperty(Property_parser.property_font_stretch);
 
 let render_font_style = (~loc) =>
   fun
@@ -2568,13 +2562,13 @@ let render_font_style = (~loc) =>
 
 let font_style =
   monomorphic(
-    Property_parser.Property_font_style.parser,
+    Property_parser.property_font_style,
     (~loc) => [%expr CSS.fontStyle],
     render_font_style,
   );
 
 /* bs-css does not support these variants */
-let render_absolute_size = (~loc, value: Property_parser.Absolute_size.t) =>
+let render_absolute_size = (~loc, value: Property_parser.Types.absolute_size) =>
   switch (value) {
   | `Large => id([%expr `large])
   | `Medium => id([%expr `medium])
@@ -2586,13 +2580,13 @@ let render_absolute_size = (~loc, value: Property_parser.Absolute_size.t) =>
   | `Xxx_large => id([%expr `xxx_large])
   };
 
-let render_relative_size = (~loc, value: Property_parser.Relative_size.t) =>
+let render_relative_size = (~loc, value: Property_parser.Types.relative_size) =>
   switch (value) {
   | `Larger => id([%expr `larger])
   | `Smaller => id([%expr `smaller])
   };
 
-let render_font_size = (~loc, value: Property_parser.Property_font_size.t) =>
+let render_font_size = (~loc, value: Property_parser.Types.property_font_size) =>
   switch (value) {
   | `Absolute_size(size) => render_absolute_size(~loc, size)
   | `Relative_size(size) => render_relative_size(~loc, size)
@@ -2602,72 +2596,68 @@ let render_font_size = (~loc, value: Property_parser.Property_font_size.t) =>
 
 let font_size =
   monomorphic(
-    Property_parser.Property_font_size.parser,
+    Property_parser.property_font_size,
     (~loc) => [%expr CSS.fontSize],
     render_font_size,
   );
 
 let font_size_adjust =
-  unsupportedProperty(Property_parser.Property_font_size_adjust.parser);
+  unsupportedProperty(Property_parser.property_font_size_adjust);
 
-let font = unsupportedProperty(Property_parser.Property_font.parser);
+let font = unsupportedProperty(Property_parser.property_font);
 
 let font_synthesis_weight =
-  variants(Property_parser.Property_font_synthesis_weight.parser, (~loc) =>
+  variants(Property_parser.property_font_synthesis_weight, (~loc) =>
     [%expr CSS.fontSynthesisWeight]
   );
 
 let font_synthesis_style =
-  variants(Property_parser.Property_font_synthesis_style.parser, (~loc) =>
+  variants(Property_parser.property_font_synthesis_style, (~loc) =>
     [%expr CSS.fontSynthesisStyle]
   );
 
 let font_synthesis_small_caps =
-  variants(Property_parser.Property_font_synthesis_small_caps.parser, (~loc) =>
+  variants(Property_parser.property_font_synthesis_small_caps, (~loc) =>
     [%expr CSS.fontSynthesisSmallCaps]
   );
 
 let font_synthesis_position =
-  variants(Property_parser.Property_font_synthesis_position.parser, (~loc) =>
+  variants(Property_parser.property_font_synthesis_position, (~loc) =>
     [%expr CSS.fontSynthesisPosition]
   );
 
 let font_synthesis =
-  unsupportedProperty(Property_parser.Property_font_synthesis.parser);
+  unsupportedProperty(Property_parser.property_font_synthesis);
 
 let font_kerning =
-  variants(Property_parser.Property_font_kerning.parser, (~loc) =>
+  variants(Property_parser.property_font_kerning, (~loc) =>
     [%expr CSS.fontKerning]
   );
 
 let font_variant_ligatures =
-  unsupportedProperty(Property_parser.Property_font_variant_ligatures.parser);
+  unsupportedProperty(Property_parser.property_font_variant_ligatures);
 
 let font_variant_position =
-  variants(Property_parser.Property_font_variant_position.parser, (~loc) =>
+  variants(Property_parser.property_font_variant_position, (~loc) =>
     [%expr CSS.fontVariantPosition]
   );
 
 let font_variant_caps =
-  variants(Property_parser.Property_font_variant_caps.parser, (~loc) =>
+  variants(Property_parser.property_font_variant_caps, (~loc) =>
     [%expr CSS.fontVariantCaps]
   );
 
 let font_variant_numeric =
-  unsupportedProperty(Property_parser.Property_font_variant_numeric.parser);
+  unsupportedProperty(Property_parser.property_font_variant_numeric);
 
 let font_variant_alternates =
-  unsupportedProperty(
-    Property_parser.Property_font_variant_alternates.parser,
-  );
+  unsupportedProperty(Property_parser.property_font_variant_alternates);
 
 let font_variant_east_asian =
-  unsupportedProperty(
-    Property_parser.Property_font_variant_east_asian.parser,
-  );
+  unsupportedProperty(Property_parser.property_font_variant_east_asian);
 
 let font_variant =
-  polymorphic(Property_parser.Property_font_variant.parser, (~loc) =>
+  polymorphic(Property_parser.property_font_variant, (~loc) =>
     fun
     | `None => [[%expr CSS.unsafe({|fontVariant|}, {|none|})]]
     | `Normal => [[%expr CSS.fontVariant(`normal)]]
@@ -2676,23 +2666,20 @@ let font_variant =
   );
 
 let font_feature_settings =
-  unsupportedProperty(Property_parser.Property_font_feature_settings.parser);
+  unsupportedProperty(Property_parser.property_font_feature_settings);
 
 let font_optical_sizing =
-  variants(Property_parser.Property_font_optical_sizing.parser, (~loc) =>
+  variants(Property_parser.property_font_optical_sizing, (~loc) =>
     [%expr CSS.fontOpticalSizing]
   );
 
 let font_variation_settings =
-  unsupportedProperty(
-    Property_parser.Property_font_variation_settings.parser,
-  );
+  unsupportedProperty(Property_parser.property_font_variation_settings);
 
-let font_palette =
-  unsupportedProperty(Property_parser.Property_font_palette.parser);
+let font_palette = unsupportedProperty(Property_parser.property_font_palette);
 
 let font_variant_emoji =
-  variants(Property_parser.Property_font_variant_emoji.parser, (~loc) =>
+  variants(Property_parser.property_font_variant_emoji, (~loc) =>
     [%expr CSS.fontVariantEmoji]
   );
 
@@ -2719,7 +2706,7 @@ let render_text_decoration_line = (~loc) =>
 // css-text-decor-3
 let text_decoration_line =
   monomorphic(
-    Property_parser.Property_text_decoration_line.parser,
+    Property_parser.property_text_decoration_line,
     (~loc) => [%expr CSS.textDecorationLine],
     render_text_decoration_line,
   );
@@ -2734,14 +2721,14 @@ let render_text_decoration_style = (~loc) =>
 
 let text_decoration_style =
   monomorphic(
-    Property_parser.Property_text_decoration_style.parser,
+    Property_parser.property_text_decoration_style,
     (~loc) => [%expr CSS.textDecorationStyle],
     render_text_decoration_style,
   );
 
 let text_decoration_color =
   monomorphic(
-    Property_parser.Property_text_decoration_color.parser,
+    Property_parser.property_text_decoration_color,
     (~loc) => [%expr CSS.textDecorationColor],
     render_color,
   );
@@ -2755,14 +2742,14 @@ let render_text_decoration_thickness = (~loc) =>
 
 let text_decoration_thickness =
   monomorphic(
-    Property_parser.Property_text_decoration_thickness.parser,
+    Property_parser.property_text_decoration_thickness,
     (~loc) => [%expr CSS.textDecorationThickness],
     render_text_decoration_thickness,
   );
 
 let text_decoration =
   polymorphic(
-    Property_parser.Property_text_decoration.parser,
+    Property_parser.property_text_decoration,
     (~loc, (color, style, thickness, line)) =>
     [
       [%expr
@@ -2782,44 +2769,38 @@ let text_decoration =
   );
 
 let text_underline_position =
-  unsupportedProperty(
-    Property_parser.Property_text_underline_position.parser,
-  );
+  unsupportedProperty(Property_parser.property_text_underline_position);
 
 let text_underline_offset =
-  unsupportedProperty(Property_parser.Property_text_underline_offset.parser);
+  unsupportedProperty(Property_parser.property_text_underline_offset);
 
 let text_decoration_skip =
-  unsupportedProperty(Property_parser.Property_text_decoration_skip.parser);
+  unsupportedProperty(Property_parser.property_text_decoration_skip);
 
 let text_decoration_skip_self =
-  unsupportedProperty(
-    Property_parser.Property_text_decoration_skip_self.parser,
-  );
+  unsupportedProperty(Property_parser.property_text_decoration_skip_self);
 
 let text_decoration_skip_box =
-  variants(Property_parser.Property_text_decoration_skip_box.parser, (~loc) =>
+  variants(Property_parser.property_text_decoration_skip_box, (~loc) =>
     [%expr CSS.textDecorationSkipBox]
   );
 
 let text_decoration_skip_inset =
-  variants(Property_parser.Property_text_decoration_skip_inset.parser, (~loc) =>
+  variants(Property_parser.property_text_decoration_skip_inset, (~loc) =>
     [%expr CSS.textDecorationSkipInset]
   );
 
 let text_decoration_skip_spaces =
-  unsupportedProperty(
-    Property_parser.Property_text_decoration_skip_spaces.parser,
-  );
+  unsupportedProperty(Property_parser.property_text_decoration_skip_spaces);
 
 let text_decoration_skip_ink =
-  variants(Property_parser.Property_text_decoration_skip_ink.parser, (~loc) =>
+  variants(Property_parser.property_text_decoration_skip_ink, (~loc) =>
     [%expr CSS.textDecorationSkipInk]
   );
 
 let text_emphasis_style =
   polymorphic(
-    Property_parser.Property_text_emphasis_style.parser,
+    Property_parser.property_text_emphasis_style,
     (~loc, value) => {
       let render_filled_or_open = (~loc) => {
         fun
@@ -2864,17 +2845,17 @@ let text_emphasis_style =
 
 let text_emphasis_color =
   monomorphic(
-    Property_parser.Property_text_emphasis_color.parser,
+    Property_parser.property_text_emphasis_color,
     (~loc) => [%expr CSS.textEmphasisColor],
     render_color,
   );
 
 let text_emphasis =
-  unsupportedProperty(Property_parser.Property_text_emphasis.parser);
+  unsupportedProperty(Property_parser.property_text_emphasis);
 
 let text_emphasis_position =
   polymorphic(
-    Property_parser.Property_text_emphasis_position.parser,
+    Property_parser.property_text_emphasis_position,
     (~loc, value) => {
       let render_position_left_right = (~loc) => {
         fun
@@ -2906,7 +2887,7 @@ let text_emphasis_position =
     },
   );
 
-// let text_emphasis_skip = unsupportedProperty(Property_parser.Property_text_emphasis_skip.parser);
+// let text_emphasis_skip = unsupportedProperty(Property_parser.property_text_emphasis_skip);
 
 let render_text_shadow = (~loc, shadow) => {
   let (x, y, blur, color) =
@@ -2939,7 +2920,7 @@ let render_text_shadow = (~loc, shadow) => {
 };
 
 let text_shadow =
-  polymorphic(Property_parser.Property_text_shadow.parser, (~loc) =>
+  polymorphic(Property_parser.property_text_shadow, (~loc) =>
     fun
     | `Interpolation(variable) => [
         [%expr CSS.textShadows([%e render_variable(~loc, variable)])],
@@ -2961,7 +2942,7 @@ let render_transform_functions = (~loc) =>
   | `Zero(_) => [%expr `zero]
   | `Extended_angle(a) => [%expr [%e render_extended_angle(~loc, a)]];
 
-let render_transform = (~loc, value: Property_parser.Transform_function.t) =>
+let render_transform = (~loc, value: Property_parser.Types.transform_function) =>
   switch (value) {
   | `Function_perspective(_) => raise(Unsupported_feature)
   | `Function_matrix(_) => raise(Unsupported_feature)
@@ -3049,7 +3030,7 @@ let render_transform = (~loc, value: Property_parser.Transform_function.t) =>
 
 // css-transforms-2
 let transform =
-  polymorphic(Property_parser.Property_transform.parser, (~loc) =>
+  polymorphic(Property_parser.property_transform, (~loc) =>
     fun
     | `None => [[%expr CSS.transform(`none)]]
     | `Transform_list([one]) => [
@@ -3072,7 +3053,7 @@ let render_transform_origin_3 = (~loc, x, y, z) => [%expr
 
 let transform_origin =
   monomorphic(
-    Property_parser.Property_transform_origin.parser,
+    Property_parser.property_transform_origin,
     (~loc) => [%expr CSS.transformOrigin],
     (~loc) =>
       fun
@@ -3085,12 +3066,12 @@ let transform_origin =
   );
 
 let transform_box =
-  variants(Property_parser.Property_transform_box.parser, (~loc) =>
+  variants(Property_parser.property_transform_box, (~loc) =>
     [%expr CSS.transformBox]
   );
 
 let translate =
-  polymorphic(Property_parser.Property_translate.parser, (~loc) =>
+  polymorphic(Property_parser.property_translate, (~loc) =>
     fun
     | `None => [[%expr CSS.translateProperty(`none)]]
     | `Static(x, None) => [
@@ -3119,7 +3100,7 @@ let translate =
 
 let rotate =
   monomorphic(
-    Property_parser.Property_rotate.parser,
+    Property_parser.property_rotate,
     (~loc) => [%expr CSS.rotateProperty],
     (~loc) =>
       fun
@@ -3153,7 +3134,7 @@ let render_number_percentage = (~loc) =>
   | `Extended_percentage(x) => render_extended_percentage(~loc, x);
 
 let scale =
-  polymorphic(Property_parser.Property_scale.parser, (~loc) =>
+  polymorphic(Property_parser.property_scale, (~loc) =>
     fun
     | `None => [[%expr CSS.scaleProperty(`none)]]
     | `Number_percentage([x, y, z]) => [
@@ -3181,7 +3162,7 @@ let scale =
 
 let transform_style =
   monomorphic(
-    Property_parser.Property_transform_style.parser,
+    Property_parser.property_transform_style,
     (~loc) => [%expr CSS.transformStyle],
     (~loc) =>
       fun
@@ -3191,7 +3172,7 @@ let transform_style =
 
 let perspective =
   monomorphic(
-    Property_parser.Property_perspective.parser,
+    Property_parser.property_perspective,
     (~loc) => [%expr CSS.perspectiveProperty],
     (~loc) =>
       fun
@@ -3201,13 +3182,13 @@ let perspective =
 
 let perspective_origin =
   monomorphic(
-    Property_parser.Property_perspective_origin.parser,
+    Property_parser.property_perspective_origin,
     (~loc) => [%expr CSS.perspectiveOrigin],
     render_position,
   );
 
 let backface_visibility =
-  variants(Property_parser.Property_backface_visibility.parser, (~loc) =>
+  variants(Property_parser.property_backface_visibility, (~loc) =>
     [%expr CSS.backfaceVisibility]
   );
 
@@ -3220,7 +3201,7 @@ let render_single_transition_property_no_interp = (~loc) =>
 
 let render_single_transition_property = (~loc, value) => {
   switch (value) {
-  | #Property_parser.Single_transition_property_no_interp.t as x =>
+  | #Property_parser.Types.single_transition_property_no_interp as x =>
     render_single_transition_property_no_interp(~loc, x)
   | `Interpolation(v) => render_variable(~loc, v)
   };
@@ -3228,7 +3209,7 @@ let render_single_transition_property = (~loc, value) => {
 
 // css-transition-1
 let transition_property =
-  polymorphic(Property_parser.Property_transition_property.parser, (~loc) =>
+  polymorphic(Property_parser.property_transition_property, (~loc) =>
     fun
     | `None => [
         [%expr CSS.transitionProperty(CSS.Types.TransitionProperty.none)],
@@ -3243,7 +3224,7 @@ let transition_property =
   );
 
 let transition_duration =
-  polymorphic(Property_parser.Property_transition_duration.parser, (~loc) =>
+  polymorphic(Property_parser.property_transition_duration, (~loc) =>
     fun
     | [one] => [
         [%expr CSS.transitionDuration([%e render_extended_time(~loc, one)])],
@@ -3263,7 +3244,7 @@ let transition_duration =
 
 let widows =
   monomorphic(
-    Property_parser.Property_widows.parser,
+    Property_parser.property_widows,
     (~loc) => [%expr CSS.widows],
     render_integer,
   );
@@ -3313,13 +3294,12 @@ let render_timing_no_interp = (~loc) =>
 
 let render_timing = (~loc) =>
   fun
-  | #Property_parser.Timing_function_no_interp.t as x =>
+  | #Property_parser.Types.timing_function_no_interp as x =>
     render_timing_no_interp(~loc, x)
   | `Interpolation(v) => render_variable(~loc, v);
 
 let transition_timing_function =
-  polymorphic(
-    Property_parser.Property_transition_timing_function.parser, (~loc) =>
+  polymorphic(Property_parser.property_transition_timing_function, (~loc) =>
     fun
     | [one] => [
         [%expr CSS.transitionTimingFunction([%e render_timing(~loc, one)])],
@@ -3338,7 +3318,7 @@ let transition_timing_function =
   );
 
 let transition_delay =
-  polymorphic(Property_parser.Property_transition_delay.parser, (~loc) =>
+  polymorphic(Property_parser.property_transition_delay, (~loc) =>
     fun
     | [one] => [
         [%expr CSS.transitionDelay([%e render_extended_time(~loc, one)])],
@@ -3363,12 +3343,12 @@ let render_transition_behavior_value_no_interp = (~loc) =>
 
 let render_transition_behavior_value = (~loc) =>
   fun
-  | #Property_parser.Transition_behavior_value_no_interp.t as x =>
+  | #Property_parser.Types.transition_behavior_value_no_interp as x =>
     render_transition_behavior_value_no_interp(~loc, x)
   | `Interpolation(v) => render_variable(~loc, v);
 
 let transition_behavior =
-  polymorphic(Property_parser.Property_transition_behavior.parser, (~loc) =>
+  polymorphic(Property_parser.property_transition_behavior, (~loc) =>
     fun
     | [one] => [
         [%expr
@@ -3454,7 +3434,7 @@ let render_single_transition = (~loc) =>
 let render_single_transition_no_interp =
     (
       ~loc,
-      (property, delay, timingFunction, duration, behavior): Property_parser.Single_transition_no_interp.t,
+      (property, delay, timingFunction, duration, behavior): Property_parser.Types.single_transition_no_interp,
     ) => {
   [%expr
    CSS.Types.Transition.Value.make(
@@ -3482,7 +3462,7 @@ let render_single_transition_no_interp =
 
 let transition =
   monomorphic(
-    Property_parser.Property_transition.parser,
+    Property_parser.property_transition,
     (~loc) => [%expr CSS.transitions],
     (~loc, transitions) =>
       transitions
@@ -3512,7 +3492,7 @@ let render_animation_name = (~loc) =>
 
 // css-animation-1
 let animation_name =
-  polymorphic(Property_parser.Property_animation_name.parser, (~loc) =>
+  polymorphic(Property_parser.property_animation_name, (~loc) =>
     fun
     | [one] => [
         [%expr CSS.animationName([%e render_animation_name(~loc, one)])],
@@ -3531,7 +3511,7 @@ let animation_name =
   );
 
 let animation_duration =
-  polymorphic(Property_parser.Property_animation_duration.parser, (~loc) =>
+  polymorphic(Property_parser.property_animation_duration, (~loc) =>
     fun
     | [one] => [
         [%expr CSS.animationDuration([%e render_extended_time(~loc, one)])],
@@ -3550,8 +3530,7 @@ let animation_duration =
   );
 
 let animation_timing_function =
-  polymorphic(
-    Property_parser.Property_animation_timing_function.parser, (~loc) =>
+  polymorphic(Property_parser.property_animation_timing_function, (~loc) =>
     fun
     | [one] => [
         [%expr CSS.animationTimingFunction([%e render_timing(~loc, one)])],
@@ -3576,13 +3555,12 @@ let render_single_animation_iteration_count_no_interp = (~loc) =>
 
 let render_single_animation_iteration_count = (~loc) =>
   fun
-  | #Property_parser.Single_animation_iteration_count_no_interp.t as x =>
+  | #Property_parser.Types.single_animation_iteration_count_no_interp as x =>
     render_single_animation_iteration_count_no_interp(~loc, x)
   | `Interpolation(v) => render_variable(~loc, v);
 
 let animation_iteration_count =
-  polymorphic(
-    Property_parser.Property_animation_iteration_count.parser, (~loc) =>
+  polymorphic(Property_parser.property_animation_iteration_count, (~loc) =>
     fun
     | [one] => [
         [%expr
@@ -3613,12 +3591,12 @@ let render_single_animation_direction_no_interp = (~loc) =>
 
 let render_single_animation_direction = (~loc) =>
   fun
-  | #Property_parser.Single_animation_direction_no_interp.t as x =>
+  | #Property_parser.Types.single_animation_direction_no_interp as x =>
     render_single_animation_direction_no_interp(~loc, x)
   | `Interpolation(v) => render_variable(~loc, v);
 
 let animation_direction =
-  polymorphic(Property_parser.Property_animation_direction.parser, (~loc) =>
+  polymorphic(Property_parser.property_animation_direction, (~loc) =>
     fun
     | [one] => [
         [%expr
@@ -3647,12 +3625,12 @@ let render_single_animation_play_state_no_interp = (~loc) =>
 
 let render_single_animation_play_state = (~loc) =>
   fun
-  | #Property_parser.Single_animation_play_state_no_interp.t as x =>
+  | #Property_parser.Types.single_animation_play_state_no_interp as x =>
     render_single_animation_play_state_no_interp(~loc, x)
   | `Interpolation(v) => render_variable(~loc, v);
 
 let animation_play_state =
-  polymorphic(Property_parser.Property_animation_play_state.parser, (~loc) =>
+  polymorphic(Property_parser.property_animation_play_state, (~loc) =>
     fun
     | [one] => [
         [%expr
@@ -3675,7 +3653,7 @@ let animation_play_state =
   );
 
 let animation_delay =
-  polymorphic(Property_parser.Property_animation_delay.parser, (~loc) =>
+  polymorphic(Property_parser.property_animation_delay, (~loc) =>
     fun
     | [one] => [
         [%expr CSS.animationDelay([%e render_extended_time(~loc, one)])],
@@ -3702,12 +3680,12 @@ let render_single_animation_fill_mode_no_interp = (~loc) =>
 
 let render_single_animation_fill_mode = (~loc) =>
   fun
-  | #Property_parser.Single_animation_fill_mode_no_interp.t as x =>
+  | #Property_parser.Types.single_animation_fill_mode_no_interp as x =>
     render_single_animation_fill_mode_no_interp(~loc, x)
   | `Interpolation(v) => render_variable(~loc, v);
 
 let animation_fill_mode =
-  polymorphic(Property_parser.Property_animation_fill_mode.parser, (~loc) =>
+  polymorphic(Property_parser.property_animation_fill_mode, (~loc) =>
     fun
     | [one] => [
         [%expr
@@ -3853,7 +3831,7 @@ let render_single_animation_no_interp =
         direction,
         fillMode,
         playState,
-      ): Property_parser.Single_animation_no_interp.t,
+      ): Property_parser.Types.single_animation_no_interp,
     ) => {
   [%expr
    CSS.Types.Animation.Value.make(
@@ -3900,7 +3878,7 @@ let render_single_animation_no_interp =
 
 let animation =
   monomorphic(
-    Property_parser.Property_animation.parser,
+    Property_parser.property_animation,
     (~loc) => [%expr CSS.animations],
     (~loc, animations) => {
       animations
@@ -3914,7 +3892,7 @@ let animation =
     },
   );
 
-let render_ratio = (~loc, value: Property_parser.Ratio.t) => {
+let render_ratio = (~loc, value: Property_parser.Types.ratio) => {
   switch (value) {
   | `Number(n) => [%expr `num([%e render_float(~loc, n)])]
   | `Interpolation(v) => render_variable(~loc, v)
@@ -3929,7 +3907,7 @@ let render_ratio = (~loc, value: Property_parser.Ratio.t) => {
 
 let aspect_ratio =
   monomorphic(
-    Property_parser.Property_aspect_ratio.parser,
+    Property_parser.property_aspect_ratio,
     (~loc) => [%expr CSS.aspectRatio],
     (~loc, value) => {
       switch (value) {
@@ -3941,12 +3919,12 @@ let aspect_ratio =
 
 // css-flexbox-1
 let flex_direction =
-  variants(Property_parser.Property_flex_direction.parser, (~loc) =>
+  variants(Property_parser.property_flex_direction, (~loc) =>
     [%expr CSS.flexDirection]
   );
 
 let flex_wrap =
-  variants(Property_parser.Property_flex_wrap.parser, (~loc) =>
+  variants(Property_parser.property_flex_wrap, (~loc) =>
     [%expr CSS.flexWrap]
   );
 
@@ -3954,7 +3932,7 @@ let flex_wrap =
 /* TODO: Avoid using `Value outside emit/emit_shorthand */
 let flex_flow =
   polymorphic(
-    Property_parser.Property_flex_flow.parser,
+    Property_parser.property_flex_flow,
     (~loc, (direction_ast, wrap_ast)) => {
       let direction =
         Option.map(
@@ -3973,7 +3951,7 @@ let flex_flow =
 // TODO: this is safe?
 let order =
   monomorphic(
-    Property_parser.Property_order.parser,
+    Property_parser.property_order,
     (~loc) => [%expr CSS.order],
     render_integer,
   );
@@ -3987,14 +3965,14 @@ let render_float_interp = (~loc, value) => {
 
 let flex_grow =
   monomorphic(
-    Property_parser.Property_flex_grow.parser,
+    Property_parser.property_flex_grow,
     (~loc) => [%expr CSS.flexGrow],
     render_float_interp,
   );
 
 let flex_shrink =
   monomorphic(
-    Property_parser.Property_flex_shrink.parser,
+    Property_parser.property_flex_shrink,
     (~loc) => [%expr CSS.flexShrink],
     render_float_interp,
   );
@@ -4007,13 +3985,13 @@ let render_flex_basis = (~loc) =>
 
 let flex_basis =
   monomorphic(
-    Property_parser.Property_flex_basis.parser,
+    Property_parser.property_flex_basis,
     (~loc) => [%expr CSS.flexBasis],
     render_flex_basis,
   );
 
 let flex =
-  polymorphic(Property_parser.Property_flex.parser, (~loc, value) =>
+  polymorphic(Property_parser.property_flex, (~loc, value) =>
     switch (value) {
     | `None => [[%expr CSS.flex1(`none)]]
     | `Interpolation(interp) => [
@@ -4055,7 +4033,7 @@ let flex =
   );
 
 let render_content_position =
-    (~loc, value: Property_parser.Content_position.t) => {
+    (~loc, value: Property_parser.Types.content_position) => {
   switch (value) {
   | `Center => [%expr `center]
   | `Start => [%expr `start]
@@ -4065,7 +4043,7 @@ let render_content_position =
   };
 };
 
-let render_self_position = (~loc, value: Property_parser.Self_position.t) => {
+let render_self_position = (~loc, value: Property_parser.Types.self_position) => {
   switch (value) {
   | `Center => [%expr `center]
   | `Start => [%expr `start]
@@ -4102,7 +4080,7 @@ let render_content_distribution = (~loc) =>
 
 let justify_content =
   monomorphic(
-    Property_parser.Property_justify_content.parser,
+    Property_parser.property_justify_content,
     (~loc) => [%expr CSS.justifyContent],
     (~loc, value) => {
       switch (value) {
@@ -4140,7 +4118,7 @@ let render_baseline_position = (~loc, value) => {
 
 let justify_items =
   monomorphic(
-    Property_parser.Property_justify_items.parser,
+    Property_parser.property_justify_items,
     (~loc) => [%expr CSS.justifyItems],
     (~loc, value) => {
       switch (value) {
@@ -4164,7 +4142,7 @@ let justify_items =
 
 let justify_self =
   monomorphic(
-    Property_parser.Property_justify_self.parser,
+    Property_parser.property_justify_self,
     (~loc) => [%expr CSS.justifySelf],
     (~loc, value) => {
       switch (value) {
@@ -4187,7 +4165,7 @@ let justify_self =
 
 let align_items =
   monomorphic(
-    Property_parser.Property_align_items.parser,
+    Property_parser.property_align_items,
     (~loc) => [%expr CSS.alignItems],
     (~loc, value) => {
       switch (value) {
@@ -4210,7 +4188,7 @@ let align_items =
 
 let align_self =
   monomorphic(
-    Property_parser.Property_align_self.parser,
+    Property_parser.property_align_self,
     (~loc) => [%expr CSS.alignSelf],
     (~loc, value) => {
       switch (value) {
@@ -4234,7 +4212,7 @@ let align_self =
 
 let align_content =
   monomorphic(
-    Property_parser.Property_align_content.parser,
+    Property_parser.property_align_content,
     (~loc) => [%expr CSS.alignContent],
     (~loc, value) => {
       switch (value) {
@@ -4255,7 +4233,7 @@ let align_content =
     },
   );
 
-let render_line_names = (~loc, value: Property_parser.Line_names.t) => {
+let render_line_names = (~loc, value: Property_parser.Types.line_names) => {
   let ((), line_names, ()) = value;
   line_names
   |> String.concat(" ")
@@ -4271,7 +4249,7 @@ let render_maybe_line_names = (~loc, value) => {
 };
 
 let render_inflexible_breadth =
-    (~loc, value: Property_parser.Inflexible_breadth.t) => {
+    (~loc, value: Property_parser.Types.inflexible_breadth) => {
   switch (value) {
   | `Auto => [%expr `auto]
   | `Min_content => [%expr `minContent]
@@ -4282,20 +4260,20 @@ let render_inflexible_breadth =
   };
 };
 
-let render_fixed_breadth = (~loc, value: Property_parser.Fixed_breadth.t) => {
+let render_fixed_breadth = (~loc, value: Property_parser.Types.fixed_breadth) => {
   switch (value) {
   | `Extended_length(l) => render_extended_length(~loc, l)
   | `Extended_percentage(p) => render_extended_percentage(~loc, p)
   };
 };
 
-let render_flex_value = (~loc, value: Standard.Flex_value.t) => {
+let render_flex_value = (~loc, value) => {
   switch (value) {
   | `Fr(f) => [%expr `fr([%e render_float(~loc, f)])]
   };
 };
 
-let render_track_breadth = (~loc, value: Property_parser.Track_breadth.t) => {
+let render_track_breadth = (~loc, value: Property_parser.Types.track_breadth) => {
   switch (value) {
   | `Flex_value(f) => render_flex_value(~loc, f)
   | `Auto => [%expr `auto]
@@ -4307,7 +4285,8 @@ let render_track_breadth = (~loc, value: Property_parser.Track_breadth.t) => {
   };
 };
 
-let rec render_track_repeat = (~loc, repeat: Property_parser.Track_repeat.t) => {
+let rec render_track_repeat =
+        (~loc, repeat: Property_parser.Types.track_repeat) => {
   let (positiveInteger, (), trackSizes, lineNames) = repeat;
   let lineNamesExpr = render_maybe_line_names(~loc, lineNames);
   let trackSizesExpr =
@@ -4322,7 +4301,7 @@ let rec render_track_repeat = (~loc, repeat: Property_parser.Track_repeat.t) => 
    `repeat((`num([%e render_integer(~loc, positiveInteger)]), [%e items]))
   ];
 }
-and render_track_size = (~loc, value: Property_parser.Track_size.t) => {
+and render_track_size = (~loc, value: Property_parser.Types.track_size) => {
   switch (value) {
   | `Track_breadth(breadth) => render_track_breadth(~loc, breadth)
   | `Minmax(inflexible, (), breadth) => [%expr
@@ -4363,7 +4342,7 @@ let render_track_list = (~loc, track_list, line_names) => {
   List.append(lineNamesExpr, tracks) |> Builder.pexp_array(~loc);
 };
 
-let render_fixed_size = (~loc, value: Property_parser.Fixed_size.t) => {
+let render_fixed_size = (~loc, value: Property_parser.Types.fixed_size) => {
   switch (value) {
   | `Fixed_breadth(breadth) => render_fixed_breadth(~loc, breadth)
   | `Minmax_0(fixed, (), breadth) => [%expr
@@ -4381,7 +4360,7 @@ let render_fixed_size = (~loc, value: Property_parser.Fixed_size.t) => {
   };
 };
 
-let render_fixed_repeat = (~loc, value: Property_parser.Fixed_repeat.t) => {
+let render_fixed_repeat = (~loc, value: Property_parser.Types.fixed_repeat) => {
   let (positiveInteger, (), fixedSizes, lineNames) = value;
   let number = render_integer(~loc, positiveInteger);
   let lineNamesExpr = render_maybe_line_names(~loc, lineNames);
@@ -4397,7 +4376,7 @@ let render_fixed_repeat = (~loc, value: Property_parser.Fixed_repeat.t) => {
   [%expr `repeat((`num([%e number]), [%e fixedSizesExpr]))];
 };
 
-let render_auto_repeat = (~loc, value: Property_parser.Auto_repeat.t) => {
+let render_auto_repeat = (~loc, value: Property_parser.Types.auto_repeat) => {
   let (autos, (), fixedSized, lineNames) = value;
   let lineNamesExpr = render_maybe_line_names(~loc, lineNames);
   let autosExpr =
@@ -4430,7 +4409,8 @@ let render_repeat_fixed = (~loc, value) => {
      });
 };
 
-let render_auto_track_list = (~loc, value: Property_parser.Auto_track_list.t) => {
+let render_auto_track_list =
+    (~loc, value: Property_parser.Types.auto_track_list) => {
   let (fixed, lineNames, autoRepeat, fixed2, lineNames2) = value;
   let fixed1Expr = render_repeat_fixed(~loc, fixed);
   let lineNamesExpr = render_maybe_line_names(~loc, lineNames);
@@ -4443,7 +4423,7 @@ let render_auto_track_list = (~loc, value: Property_parser.Auto_track_list.t) =>
   |> Builder.pexp_array(~loc);
 };
 
-let render_name_repeat = (~loc, value: Property_parser.Name_repeat.t) => {
+let render_name_repeat = (~loc, value: Property_parser.Types.name_repeat) => {
   let (repeatValue, (), listOfLineNames) = value;
   let lineNamesExpr =
     listOfLineNames
@@ -4459,7 +4439,8 @@ let render_name_repeat = (~loc, value: Property_parser.Name_repeat.t) => {
   };
 };
 
-let render_subgrid = (~loc, line_name_list: Property_parser.Line_name_list.t) => {
+let render_subgrid =
+    (~loc, line_name_list: Property_parser.Types.line_name_list) => {
   line_name_list
   |> List.concat_map(value => {
        switch (value) {
@@ -4490,21 +4471,21 @@ let render_grid_template_rows_and_columns = (~loc) =>
 // css-grid-1
 let grid_template_columns =
   monomorphic(
-    Property_parser.Property_grid_template_columns.parser,
+    Property_parser.property_grid_template_columns,
     (~loc) => [%expr CSS.gridTemplateColumns],
     render_grid_template_rows_and_columns,
   );
 
 let grid_template_rows =
   monomorphic(
-    Property_parser.Property_grid_template_rows.parser,
+    Property_parser.property_grid_template_rows,
     (~loc) => [%expr CSS.gridTemplateRows],
     render_grid_template_rows_and_columns,
   );
 
 let grid_template_areas =
   monomorphic(
-    Property_parser.Property_grid_template_areas.parser,
+    Property_parser.property_grid_template_areas,
     (~loc) => [%expr CSS.gridTemplateAreas],
     (~loc) =>
       fun
@@ -4566,14 +4547,14 @@ let render_grid_template = (~loc) =>
 
 let grid_template =
   monomorphic(
-    Property_parser.Property_grid_template.parser,
+    Property_parser.property_grid_template,
     (~loc) => [%expr CSS.gridTemplate],
     render_grid_template,
   );
 
 let grid_auto_columns =
   monomorphic(
-    Property_parser.Property_grid_auto_columns.parser,
+    Property_parser.property_grid_auto_columns,
     (~loc) => [%expr CSS.gridAutoColumns],
     (~loc, sizes) => {
       let sizesExpr =
@@ -4586,7 +4567,7 @@ let grid_auto_columns =
 
 let grid_auto_rows =
   monomorphic(
-    Property_parser.Property_grid_auto_rows.parser,
+    Property_parser.property_grid_auto_rows,
     (~loc) => [%expr CSS.gridAutoRows],
     (~loc, sizes) => {
       let sizesExpr =
@@ -4599,7 +4580,7 @@ let grid_auto_rows =
 
 let grid_auto_flow =
   monomorphic(
-    Property_parser.Property_grid_auto_flow.parser,
+    Property_parser.property_grid_auto_flow,
     (~loc) => [%expr CSS.gridAutoFlow],
     (~loc) =>
       fun
@@ -4612,7 +4593,7 @@ let grid_auto_flow =
       | `Or(None, None) => raise(Impossible_state),
   );
 
-let render_grid_line = (~loc, x: Property_parser.Grid_line.t) =>
+let render_grid_line = (~loc, x: Property_parser.Types.grid_line) =>
   switch (x) {
   | `Interpolation(x) => render_variable(~loc, x)
   | `Auto => [%expr `auto]
@@ -4645,7 +4626,7 @@ let render_grid_line = (~loc, x: Property_parser.Grid_line.t) =>
 
 let grid =
   monomorphic(
-    Property_parser.Property_grid.parser,
+    Property_parser.property_grid,
     (~loc) => [%expr CSS.gridProperty],
     (~loc) =>
       fun
@@ -4706,7 +4687,7 @@ let grid =
 
 let grid_row_gap =
   monomorphic(
-    Property_parser.Property_grid_row_gap.parser,
+    Property_parser.property_grid_row_gap,
     (~loc) => [%expr CSS.gridRowGap],
     (~loc) =>
       fun
@@ -4716,7 +4697,7 @@ let grid_row_gap =
 
 let grid_column_gap =
   monomorphic(
-    Property_parser.Property_grid_column_gap.parser,
+    Property_parser.property_grid_column_gap,
     (~loc) => [%expr CSS.gridColumnGap],
     (~loc) =>
       fun
@@ -4726,34 +4707,34 @@ let grid_column_gap =
 
 let grid_row_start =
   monomorphic(
-    Property_parser.Property_grid_row_start.parser,
+    Property_parser.property_grid_row_start,
     (~loc) => [%expr CSS.gridRowStart],
     render_grid_line,
   );
 
 let grid_column_start =
   monomorphic(
-    Property_parser.Property_grid_column_start.parser,
+    Property_parser.property_grid_column_start,
     (~loc) => [%expr CSS.gridColumnStart],
     render_grid_line,
   );
 
 let grid_row_end =
   monomorphic(
-    Property_parser.Property_grid_row_end.parser,
+    Property_parser.property_grid_row_end,
     (~loc) => [%expr CSS.gridRowEnd],
     render_grid_line,
   );
 
 let grid_column_end =
   monomorphic(
-    Property_parser.Property_grid_column_end.parser,
+    Property_parser.property_grid_column_end,
     (~loc) => [%expr CSS.gridColumnEnd],
     render_grid_line,
   );
 
 let grid_area =
-  polymorphic(Property_parser.Property_grid_area.parser, (~loc, value) =>
+  polymorphic(Property_parser.property_grid_area, (~loc, value) =>
     switch (value) {
     | (gl1, [(_, gl2), (_, gl3), (_, gl4), ..._]) => [
         [%expr
@@ -4788,7 +4769,7 @@ let grid_area =
   );
 
 let grid_row =
-  polymorphic(Property_parser.Property_grid_row.parser, (~loc) =>
+  polymorphic(Property_parser.property_grid_row, (~loc) =>
     fun
     | (start, None) => [
         [%expr CSS.gridRow([%e render_grid_line(~loc, start)])],
@@ -4804,7 +4785,7 @@ let grid_row =
   );
 
 let grid_column =
-  polymorphic(Property_parser.Property_grid_column.parser, (~loc) =>
+  polymorphic(Property_parser.property_grid_column, (~loc) =>
     fun
     | (start, None) => [
         [%expr CSS.gridColumn([%e render_grid_line(~loc, start)])],
@@ -4823,8 +4804,8 @@ let render_gap =
     (
       ~loc,
       value: [<
-        Property_parser.Property_column_gap.t
-        | Property_parser.Property_row_gap.t
+        Property_parser.Types.property_column_gap
+        | Property_parser.Types.property_row_gap
       ],
     ) => {
   switch (value) {
@@ -4835,7 +4816,7 @@ let render_gap =
 };
 
 let grid_gap =
-  polymorphic(Property_parser.Property_grid_gap.parser, (~loc) =>
+  polymorphic(Property_parser.property_grid_gap, (~loc) =>
     fun
     | (row, None) => [[%expr CSS.gridGap([%e render_gap(~loc, row)])]]
     | (row, Some(column)) => [
@@ -4849,7 +4830,7 @@ let grid_gap =
   );
 
 let gap =
-  polymorphic(Property_parser.Property_gap.parser, (~loc) =>
+  polymorphic(Property_parser.property_gap, (~loc) =>
     fun
     | (row, None) => [[%expr CSS.gap([%e render_gap(~loc, row)])]]
     | (row, Some(column)) => [
@@ -4864,7 +4845,7 @@ let gap =
 
 let z_index =
   monomorphic(
-    Property_parser.Property_z_index.parser,
+    Property_parser.property_z_index,
     (~loc) => [%expr CSS.zIndex],
     (~loc, value) => {
       switch (value) {
@@ -4883,28 +4864,28 @@ let render_position_value = (~loc) =>
 
 let left =
   monomorphic(
-    Property_parser.Property_left.parser,
+    Property_parser.property_left,
     (~loc) => [%expr CSS.left],
     render_position_value,
   );
 
 let top =
   monomorphic(
-    Property_parser.Property_top.parser,
+    Property_parser.property_top,
     (~loc) => [%expr CSS.top],
     render_position_value,
   );
 
 let right =
   monomorphic(
-    Property_parser.Property_right.parser,
+    Property_parser.property_right,
     (~loc) => [%expr CSS.right],
     render_position_value,
   );
 
 let bottom =
   monomorphic(
-    Property_parser.Property_bottom.parser,
+    Property_parser.property_bottom,
     (~loc) => [%expr CSS.bottom],
     render_position_value,
   );
@@ -4954,7 +4935,7 @@ let render_display = (~loc) =>
 
 let display =
   monomorphic(
-    Property_parser.Property_display.parser,
+    Property_parser.property_display,
     (~loc) => [%expr CSS.display],
     render_display,
   );
@@ -4967,7 +4948,7 @@ let render_mask_image = (~loc) =>
 
 let mask_image =
   monomorphic(
-    Property_parser.Property_mask_image.parser,
+    Property_parser.property_mask_image,
     (~loc) => [%expr CSS.maskImage],
     (~loc) =>
       fun
@@ -4975,7 +4956,7 @@ let mask_image =
       | _ => raise(Unsupported_feature),
   );
 
-let render_paint = (~loc, value: Property_parser.Paint.t) => {
+let render_paint = (~loc, value: Property_parser.Types.paint) => {
   switch (value) {
   | `Color(c) => render_color(~loc, c)
   | `Interpolation(variable) => render_variable(~loc, variable)
@@ -4988,19 +4969,19 @@ let render_paint = (~loc, value: Property_parser.Paint.t) => {
 
 let fill =
   monomorphic(
-    Property_parser.Property_fill.parser,
+    Property_parser.property_fill,
     (~loc) => [%expr CSS.SVG.fill],
     render_paint,
   );
 
 let stroke =
   monomorphic(
-    Property_parser.Property_stroke.parser,
+    Property_parser.property_stroke,
     (~loc) => [%expr CSS.SVG.stroke],
     render_paint,
   );
 
-let render_alpha_value = (~loc, value: Property_parser.Alpha_value.t) => {
+let render_alpha_value = (~loc, value: Property_parser.Types.alpha_value) => {
   switch (value) {
   | `Number(n) => [%expr `num([%e render_float(~loc, n)])]
   | `Extended_percentage(pct) => render_extended_percentage(~loc, pct)
@@ -5009,14 +4990,14 @@ let render_alpha_value = (~loc, value: Property_parser.Alpha_value.t) => {
 
 let stroke_opacity =
   monomorphic(
-    Property_parser.Property_stroke_opacity.parser,
+    Property_parser.property_stroke_opacity,
     (~loc) => [%expr CSS.SVG.strokeOpacity],
     render_alpha_value,
   );
 
 let line_break =
   monomorphic(
-    Property_parser.Property_line_break.parser,
+    Property_parser.property_line_break,
     (~loc) => [%expr CSS.lineBreak],
     (~loc, value) => {
       switch (value) {
@@ -5061,54 +5042,47 @@ let found = ({ast_of_string, string_to_expr}) => {
   (check_value, string_to_expr);
 };
 
-let caret_color =
-  unsupportedProperty(Property_parser.Property_caret_color.parser);
+let caret_color = unsupportedProperty(Property_parser.property_caret_color);
 
-let clear = unsupportedProperty(Property_parser.Property_clear.parser);
+let clear = unsupportedProperty(Property_parser.property_clear);
 
-let clip = unsupportedProperty(Property_parser.Property_clip.parser);
+let clip = unsupportedProperty(Property_parser.property_clip);
 
-let clip_path =
-  unsupportedProperty(Property_parser.Property_clip_path.parser);
+let clip_path = unsupportedProperty(Property_parser.property_clip_path);
 
-let column_count =
-  unsupportedProperty(Property_parser.Property_column_count.parser);
+let column_count = unsupportedProperty(Property_parser.property_column_count);
 
-let column_fill =
-  unsupportedProperty(Property_parser.Property_column_fill.parser);
+let column_fill = unsupportedProperty(Property_parser.property_column_fill);
 
 let column_gap =
   monomorphic(
-    Property_parser.Property_column_gap.parser,
+    Property_parser.property_column_gap,
     (~loc) => [%expr CSS.columnGap],
     (~loc) => render_gap(~loc),
   );
 
-let column_rule =
-  unsupportedProperty(Property_parser.Property_column_rule.parser);
+let column_rule = unsupportedProperty(Property_parser.property_column_rule);
 
 let column_rule_color =
-  unsupportedProperty(Property_parser.Property_column_rule_color.parser);
+  unsupportedProperty(Property_parser.property_column_rule_color);
 
 let column_rule_style =
-  unsupportedProperty(Property_parser.Property_column_rule_style.parser);
+  unsupportedProperty(Property_parser.property_column_rule_style);
 
 let column_rule_width =
-  unsupportedProperty(Property_parser.Property_column_rule_width.parser);
+  unsupportedProperty(Property_parser.property_column_rule_width);
 
-let column_span =
-  unsupportedProperty(Property_parser.Property_column_span.parser);
+let column_span = unsupportedProperty(Property_parser.property_column_span);
 
-let columns = unsupportedProperty(Property_parser.Property_columns.parser);
+let columns = unsupportedProperty(Property_parser.property_columns);
 
 let counter_increment =
-  unsupportedProperty(Property_parser.Property_counter_increment.parser);
+  unsupportedProperty(Property_parser.property_counter_increment);
 
 let counter_reset =
-  unsupportedProperty(Property_parser.Property_counter_reset.parser);
+  unsupportedProperty(Property_parser.property_counter_reset);
 
-let counter_set =
-  unsupportedProperty(Property_parser.Property_counter_set.parser);
+let counter_set = unsupportedProperty(Property_parser.property_counter_set);
 
 let render_cursor = (~loc, value) =>
   switch (value) {
@@ -5162,15 +5136,15 @@ let render_cursor = (~loc, value) =>
 
 let cursor =
   monomorphic(
-    Property_parser.Property_cursor.parser,
+    Property_parser.property_cursor,
     (~loc) => [%expr CSS.cursor],
     render_cursor,
   );
 
-let direction =
-  unsupportedProperty(Property_parser.Property_direction.parser);
+let direction = unsupportedProperty(Property_parser.property_direction);
 
-let render_drop_shadow = (~loc, value: Property_parser.Function_drop_shadow.t) => {
+let render_drop_shadow =
+    (~loc, value: Property_parser.Types.function_drop_shadow) => {
   let (offset1, offset2, offset3, color) = value;
   let offset1Expr = render_extended_length(~loc, offset1);
   let offset2Expr = render_extended_length(~loc, offset2);
@@ -5192,14 +5166,15 @@ let render_drop_shadow = (~loc, value: Property_parser.Function_drop_shadow.t) =
 };
 
 let render_float_percentage =
-    (~loc, value: Property_parser.Number_percentage.t) => {
+    (~loc, value: Property_parser.Types.number_percentage) => {
   switch (value) {
   | `Number(number) => [%expr `num([%e render_float(~loc, number)])]
   | `Extended_percentage(pct) => render_extended_percentage(~loc, pct)
   };
 };
 
-let render_filter_function = (~loc, value: Property_parser.Filter_function.t) => {
+let render_filter_function =
+    (~loc, value: Property_parser.Types.filter_function) => {
   switch (value) {
   | `Function_blur(v) => [%expr `blur([%e render_extended_length(~loc, v)])]
   | `Function_brightness(v) => [%expr
@@ -5231,7 +5206,7 @@ let render_filter_function = (~loc, value: Property_parser.Filter_function.t) =>
 };
 
 let render_filter_function_list =
-    (~loc, value: Property_parser.Filter_function_list.t) => {
+    (~loc, value: Property_parser.Types.filter_function_list) => {
   value
   |> List.map(ff =>
        switch (ff) {
@@ -5244,7 +5219,7 @@ let render_filter_function_list =
 
 let filter =
   monomorphic(
-    Property_parser.Property_filter.parser,
+    Property_parser.property_filter,
     (~loc) => [%expr CSS.filter],
     (~loc, value) => {
       switch (value) {
@@ -5257,7 +5232,7 @@ let filter =
 
 let backdrop_filter =
   monomorphic(
-    Property_parser.Property_backdrop_filter.parser,
+    Property_parser.property_backdrop_filter,
     (~loc) => [%expr CSS.backdropFilter],
     (~loc, value) =>
       switch (value) {
@@ -5267,27 +5242,24 @@ let backdrop_filter =
       },
   );
 
-let float = unsupportedProperty(Property_parser.Property_float.parser);
+let float = unsupportedProperty(Property_parser.property_float);
 
 let font_language_override =
-  unsupportedProperty(Property_parser.Property_font_language_override.parser);
+  unsupportedProperty(Property_parser.property_font_language_override);
 
-let ime_mode = unsupportedProperty(Property_parser.Property_ime_mode.parser);
+let ime_mode = unsupportedProperty(Property_parser.property_ime_mode);
 
-let isolation =
-  unsupportedProperty(Property_parser.Property_isolation.parser);
+let isolation = unsupportedProperty(Property_parser.property_isolation);
 
-let line_clamp =
-  unsupportedProperty(Property_parser.Property_line_clamp.parser);
+let line_clamp = unsupportedProperty(Property_parser.property_line_clamp);
 
-let list_style =
-  unsupportedProperty(Property_parser.Property_list_style.parser);
+let list_style = unsupportedProperty(Property_parser.property_list_style);
 
 let list_style_image =
   monomorphic(
-    Property_parser.Property_list_style_image.parser,
+    Property_parser.property_list_style_image,
     (~loc) => [%expr CSS.listStyleImage],
-    (~loc, value: Property_parser.Property_list_style_image.t) => {
+    (~loc, value: Property_parser.Types.property_list_style_image) => {
       switch (value) {
       | `None => [%expr `none]
       | `Image(i) => render_image(~loc, i)
@@ -5296,41 +5268,39 @@ let list_style_image =
   );
 
 let list_style_position =
-  unsupportedProperty(Property_parser.Property_list_style_position.parser);
+  unsupportedProperty(Property_parser.property_list_style_position);
 
 let list_style_type =
-  unsupportedProperty(Property_parser.Property_list_style_type.parser);
+  unsupportedProperty(Property_parser.property_list_style_type);
 
 let mix_blend_mode =
-  unsupportedProperty(Property_parser.Property_mix_blend_mode.parser);
+  unsupportedProperty(Property_parser.property_mix_blend_mode);
 
-let position = unsupportedProperty(Property_parser.Property_position.parser);
+let position = unsupportedProperty(Property_parser.property_position);
 
-let resize = unsupportedProperty(Property_parser.Property_resize.parser);
+let resize = unsupportedProperty(Property_parser.property_resize);
 
 let row_gap =
   monomorphic(
-    Property_parser.Property_row_gap.parser,
+    Property_parser.property_row_gap,
     (~loc) => [%expr CSS.rowGap],
     (~loc) => render_gap(~loc),
   );
 
 let scrollbar_3dlight_color =
-  unsupportedProperty(
-    Property_parser.Property_scrollbar_3dlight_color.parser,
-  );
+  unsupportedProperty(Property_parser.property_scrollbar_3dlight_color);
 
 let scrollbar_arrow_color =
-  unsupportedProperty(Property_parser.Property_scrollbar_arrow_color.parser);
+  unsupportedProperty(Property_parser.property_scrollbar_arrow_color);
 
 let scrollbar_base_color =
-  unsupportedProperty(Property_parser.Property_scrollbar_base_color.parser);
+  unsupportedProperty(Property_parser.property_scrollbar_base_color);
 
 let scrollbar_color =
   monomorphic(
-    Property_parser.Property_scrollbar_color.parser,
+    Property_parser.property_scrollbar_color,
     (~loc) => [%expr CSS.scrollbarColor],
-    (~loc, value: Property_parser.Property_scrollbar_color.t) =>
+    (~loc, value: Property_parser.Types.property_scrollbar_color) =>
       switch (value) {
       | `Auto => [%expr `auto]
       | `Static(thumbColor, trackColor) => [%expr
@@ -5343,29 +5313,25 @@ let scrollbar_color =
   );
 
 let scrollbar_darkshadow_color =
-  unsupportedProperty(
-    Property_parser.Property_scrollbar_darkshadow_color.parser,
-  );
+  unsupportedProperty(Property_parser.property_scrollbar_darkshadow_color);
 
 let scrollbar_face_color =
-  unsupportedProperty(Property_parser.Property_scrollbar_face_color.parser);
+  unsupportedProperty(Property_parser.property_scrollbar_face_color);
 
 let scrollbar_highlight_color =
-  unsupportedProperty(
-    Property_parser.Property_scrollbar_highlight_color.parser,
-  );
+  unsupportedProperty(Property_parser.property_scrollbar_highlight_color);
 
 let scrollbar_shadow_color =
-  unsupportedProperty(Property_parser.Property_scrollbar_shadow_color.parser);
+  unsupportedProperty(Property_parser.property_scrollbar_shadow_color);
 
 let scrollbar_track_color =
-  unsupportedProperty(Property_parser.Property_scrollbar_track_color.parser);
+  unsupportedProperty(Property_parser.property_scrollbar_track_color);
 
 let scrollbar_width =
   monomorphic(
-    Property_parser.Property_scrollbar_width.parser,
+    Property_parser.property_scrollbar_width,
     (~loc) => [%expr CSS.scrollbarWidth],
-    (~loc, value: Property_parser.Property_scrollbar_width.t) =>
+    (~loc, value: Property_parser.Types.property_scrollbar_width) =>
       switch (value) {
       | `Thin => [%expr `thin]
       | `Auto => [%expr `auto]
@@ -5374,189 +5340,152 @@ let scrollbar_width =
   );
 
 let stroke_dasharray =
-  unsupportedProperty(Property_parser.Property_stroke_dasharray.parser);
+  unsupportedProperty(Property_parser.property_stroke_dasharray);
 
 let stroke_linecap =
-  unsupportedProperty(Property_parser.Property_stroke_linecap.parser);
+  unsupportedProperty(Property_parser.property_stroke_linecap);
 
 let stroke_linejoin =
-  unsupportedProperty(Property_parser.Property_stroke_linejoin.parser);
+  unsupportedProperty(Property_parser.property_stroke_linejoin);
 
 let stroke_miterlimit =
-  unsupportedProperty(Property_parser.Property_stroke_miterlimit.parser);
+  unsupportedProperty(Property_parser.property_stroke_miterlimit);
 
-let stroke_width =
-  unsupportedProperty(Property_parser.Property_stroke_width.parser);
+let stroke_width = unsupportedProperty(Property_parser.property_stroke_width);
 
 let text_combine_upright =
-  unsupportedProperty(Property_parser.Property_text_combine_upright.parser);
+  unsupportedProperty(Property_parser.property_text_combine_upright);
 
-let all = unsupportedProperty(Property_parser.Property_all.parser);
+let all = unsupportedProperty(Property_parser.property_all);
 
-let appearance =
-  unsupportedProperty(Property_parser.Property_appearance.parser);
+let appearance = unsupportedProperty(Property_parser.property_appearance);
 
 let background_blend_mode =
-  unsupportedProperty(Property_parser.Property_background_blend_mode.parser);
+  unsupportedProperty(Property_parser.property_background_blend_mode);
 
 let baseline_shift =
-  unsupportedProperty(Property_parser.Property_baseline_shift.parser);
+  unsupportedProperty(Property_parser.property_baseline_shift);
 
-let block_size =
-  unsupportedProperty(Property_parser.Property_block_size.parser);
+let block_size = unsupportedProperty(Property_parser.property_block_size);
 
 let border_block_color =
-  unsupportedProperty(Property_parser.Property_border_block_color.parser);
+  unsupportedProperty(Property_parser.property_border_block_color);
 
 let border_block_end_color =
-  unsupportedProperty(Property_parser.Property_border_block_end_color.parser);
+  unsupportedProperty(Property_parser.property_border_block_end_color);
 
 let border_block_end_style =
-  unsupportedProperty(Property_parser.Property_border_block_end_style.parser);
+  unsupportedProperty(Property_parser.property_border_block_end_style);
 
 let border_block_end_width =
-  unsupportedProperty(Property_parser.Property_border_block_end_width.parser);
+  unsupportedProperty(Property_parser.property_border_block_end_width);
 
 let border_block_end =
-  unsupportedProperty(Property_parser.Property_border_block_end.parser);
+  unsupportedProperty(Property_parser.property_border_block_end);
 
 let border_block_start_color =
-  unsupportedProperty(
-    Property_parser.Property_border_block_start_color.parser,
-  );
+  unsupportedProperty(Property_parser.property_border_block_start_color);
 
 let border_block_start_style =
-  unsupportedProperty(
-    Property_parser.Property_border_block_start_style.parser,
-  );
+  unsupportedProperty(Property_parser.property_border_block_start_style);
 
 let border_block_start_width =
-  unsupportedProperty(
-    Property_parser.Property_border_block_start_width.parser,
-  );
+  unsupportedProperty(Property_parser.property_border_block_start_width);
 
 let border_block_start =
-  unsupportedProperty(Property_parser.Property_border_block_start.parser);
+  unsupportedProperty(Property_parser.property_border_block_start);
 
 let border_block_style =
-  unsupportedProperty(Property_parser.Property_border_block_style.parser);
+  unsupportedProperty(Property_parser.property_border_block_style);
 
 let border_block_width =
-  unsupportedProperty(Property_parser.Property_border_block_width.parser);
+  unsupportedProperty(Property_parser.property_border_block_width);
 
-let border_block =
-  unsupportedProperty(Property_parser.Property_border_block.parser);
+let border_block = unsupportedProperty(Property_parser.property_border_block);
 
 let border_collapse =
-  unsupportedProperty(Property_parser.Property_border_collapse.parser);
+  unsupportedProperty(Property_parser.property_border_collapse);
 
 let border_end_end_radius =
-  unsupportedProperty(Property_parser.Property_border_end_end_radius.parser);
+  unsupportedProperty(Property_parser.property_border_end_end_radius);
 
 let border_end_start_radius =
-  unsupportedProperty(
-    Property_parser.Property_border_end_start_radius.parser,
-  );
+  unsupportedProperty(Property_parser.property_border_end_start_radius);
 
 let border_inline_color =
-  unsupportedProperty(Property_parser.Property_border_inline_color.parser);
+  unsupportedProperty(Property_parser.property_border_inline_color);
 
 let border_inline_end_color =
-  unsupportedProperty(
-    Property_parser.Property_border_inline_end_color.parser,
-  );
+  unsupportedProperty(Property_parser.property_border_inline_end_color);
 
 let border_inline_end_style =
-  unsupportedProperty(
-    Property_parser.Property_border_inline_end_style.parser,
-  );
+  unsupportedProperty(Property_parser.property_border_inline_end_style);
 
 let border_inline_end_width =
-  unsupportedProperty(
-    Property_parser.Property_border_inline_end_width.parser,
-  );
+  unsupportedProperty(Property_parser.property_border_inline_end_width);
 
 let border_inline_end =
-  unsupportedProperty(Property_parser.Property_border_inline_end.parser);
+  unsupportedProperty(Property_parser.property_border_inline_end);
 
 let border_inline_start_color =
-  unsupportedProperty(
-    Property_parser.Property_border_inline_start_color.parser,
-  );
+  unsupportedProperty(Property_parser.property_border_inline_start_color);
 
 let border_inline_start_style =
-  unsupportedProperty(
-    Property_parser.Property_border_inline_start_style.parser,
-  );
+  unsupportedProperty(Property_parser.property_border_inline_start_style);
 
 let border_inline_start_width =
-  unsupportedProperty(
-    Property_parser.Property_border_inline_start_width.parser,
-  );
+  unsupportedProperty(Property_parser.property_border_inline_start_width);
 
 let border_inline_start =
-  unsupportedProperty(Property_parser.Property_border_inline_start.parser);
+  unsupportedProperty(Property_parser.property_border_inline_start);
 
 let border_inline_style =
-  unsupportedProperty(Property_parser.Property_border_inline_style.parser);
+  unsupportedProperty(Property_parser.property_border_inline_style);
 
 let border_inline_width =
-  unsupportedProperty(Property_parser.Property_border_inline_width.parser);
+  unsupportedProperty(Property_parser.property_border_inline_width);
 
 let border_inline =
-  unsupportedProperty(Property_parser.Property_border_inline.parser);
+  unsupportedProperty(Property_parser.property_border_inline);
 
 let border_spacing =
-  unsupportedProperty(Property_parser.Property_border_spacing.parser);
+  unsupportedProperty(Property_parser.property_border_spacing);
 
 let border_start_end_radius =
-  unsupportedProperty(
-    Property_parser.Property_border_start_end_radius.parser,
-  );
+  unsupportedProperty(Property_parser.property_border_start_end_radius);
 
 let border_start_start_radius =
-  unsupportedProperty(
-    Property_parser.Property_border_start_start_radius.parser,
-  );
+  unsupportedProperty(Property_parser.property_border_start_start_radius);
 
 let box_decoration_break =
-  unsupportedProperty(Property_parser.Property_box_decoration_break.parser);
+  unsupportedProperty(Property_parser.property_box_decoration_break);
 
-let break_after =
-  unsupportedProperty(Property_parser.Property_break_after.parser);
+let break_after = unsupportedProperty(Property_parser.property_break_after);
 
-let break_before =
-  unsupportedProperty(Property_parser.Property_break_before.parser);
+let break_before = unsupportedProperty(Property_parser.property_break_before);
 
-let break_inside =
-  unsupportedProperty(Property_parser.Property_break_inside.parser);
+let break_inside = unsupportedProperty(Property_parser.property_break_inside);
 
-let caption_side =
-  unsupportedProperty(Property_parser.Property_caption_side.parser);
+let caption_side = unsupportedProperty(Property_parser.property_caption_side);
 
-let clip_rule =
-  unsupportedProperty(Property_parser.Property_clip_rule.parser);
+let clip_rule = unsupportedProperty(Property_parser.property_clip_rule);
 
-let color_adjust =
-  unsupportedProperty(Property_parser.Property_color_adjust.parser);
+let color_adjust = unsupportedProperty(Property_parser.property_color_adjust);
 
 let color_interpolation_filters =
-  unsupportedProperty(
-    Property_parser.Property_color_interpolation_filters.parser,
-  );
+  unsupportedProperty(Property_parser.property_color_interpolation_filters);
 
 let color_interpolation =
-  unsupportedProperty(Property_parser.Property_color_interpolation.parser);
+  unsupportedProperty(Property_parser.property_color_interpolation);
 
-let color_scheme =
-  unsupportedProperty(Property_parser.Property_color_scheme.parser);
+let color_scheme = unsupportedProperty(Property_parser.property_color_scheme);
 
-let contain = unsupportedProperty(Property_parser.Property_contain.parser);
+let contain = unsupportedProperty(Property_parser.property_contain);
 
 let content_visibility =
-  unsupportedProperty(Property_parser.Property_content_visibility.parser);
+  unsupportedProperty(Property_parser.property_content_visibility);
 
-let render_quote = (~loc, quote: Property_parser.Quote.t) => {
+let render_quote = (~loc, quote: Property_parser.Types.quote) => {
   switch (quote) {
   | `Close_quote => [%expr `closeQuote]
   | `No_close_quote => [%expr `noCloseQuote]
@@ -5591,7 +5520,7 @@ let render_content_string = (~loc, str) => {
   [%expr `text([%e str])];
 };
 
-let render_attr_name = (~loc, attr_name: Property_parser.Attr_name.t) => {
+let render_attr_name = (~loc, attr_name: Property_parser.Types.attr_name) => {
   switch (attr_name) {
   | (Some((Some(label), _)), _label) => [%expr
      [%e render_string(~loc, label)]
@@ -5601,7 +5530,7 @@ let render_attr_name = (~loc, attr_name: Property_parser.Attr_name.t) => {
   };
 };
 
-let render_attr_unit = (~loc, attr_unit: Property_parser.Attr_unit.t) => {
+let render_attr_unit = (~loc, attr_unit: Property_parser.Types.attr_unit) => {
   switch (attr_unit) {
   | `Percent => [%expr [%e render_string(~loc, "%")]]
   | `Em => [%expr [%e render_string(~loc, "em")]]
@@ -5629,7 +5558,7 @@ let render_attr_unit = (~loc, attr_unit: Property_parser.Attr_unit.t) => {
   };
 };
 
-let render_attr_type = (~loc, attr_type: Property_parser.Attr_type.t) => {
+let render_attr_type = (~loc, attr_type: Property_parser.Types.attr_type) => {
   switch (attr_type) {
   | `Raw_string => [%expr [%e render_string(~loc, "raw-string")]]
   | `Attr_unit(attr_unit) => [%expr [%e render_attr_unit(~loc, attr_unit)]]
@@ -5639,8 +5568,8 @@ let render_attr_type = (~loc, attr_type: Property_parser.Attr_type.t) => {
 let render_function_attr =
     (
       ~loc,
-      attr_name: Property_parser.Attr_name.t,
-      attr_type: option(Property_parser.Attr_type.t),
+      attr_name: Property_parser.Types.attr_name,
+      attr_type: option(Property_parser.Types.attr_type),
     ) => {
   switch (attr_type) {
   | Some(attr_type) => [%expr
@@ -5653,7 +5582,8 @@ let render_function_attr =
   };
 };
 
-let render_symbols_type = (~loc, symbols_type: Property_parser.Symbols_type.t) => {
+let render_symbols_type =
+    (~loc, symbols_type: Property_parser.Types.symbols_type) => {
   switch (symbols_type) {
   | `Cyclic => [%expr `cyclic]
   | `Numeric => [%expr `numeric]
@@ -5677,7 +5607,7 @@ let render_list_image_or_string = (~loc, list_image_or_string) => {
 let render_symbols =
     (
       ~loc,
-      symbols_type: option(Property_parser.Symbols_type.t),
+      symbols_type: option(Property_parser.Types.symbols_type),
       list_image_or_string,
     ) => {
   switch (symbols_type) {
@@ -5697,7 +5627,7 @@ let render_symbols =
 };
 
 let render_counter_style =
-    (~loc, counter_style: Property_parser.Counter_style.t) => {
+    (~loc, counter_style: Property_parser.Types.counter_style) => {
   switch (counter_style) {
   | `Counter_style_name(label) => [%expr
      `Custom([%e render_string(~loc, label)])
@@ -5709,7 +5639,7 @@ let render_counter_style =
 };
 
 let render_counter =
-    (~loc, label: string, style: option(Property_parser.Counter_style.t)) => {
+    (~loc, label: string, style: option(Property_parser.Types.counter_style)) => {
   switch (style) {
   | Some(counter_style) => [%expr
      `counter((
@@ -5721,7 +5651,8 @@ let render_counter =
   };
 };
 
-let render_content_list = (~loc, content_list: Property_parser.Content_list.t) => {
+let render_content_list =
+    (~loc, content_list: Property_parser.Types.content_list) => {
   content_list
   |> List.map(content_item =>
        switch (content_item) {
@@ -5738,7 +5669,7 @@ let render_content_list = (~loc, content_list: Property_parser.Content_list.t) =
            };
          render_counter(~loc, counter_name, counter_style_opt);
        | `Function_attr(
-           (attr_name, attr_type): Property_parser.Function_attr.t,
+           (attr_name, attr_type): Property_parser.Types.function_attr,
          ) =>
          render_function_attr(~loc, attr_name, attr_type)
        }
@@ -5747,7 +5678,7 @@ let render_content_list = (~loc, content_list: Property_parser.Content_list.t) =
 };
 
 let content =
-  polymorphic(Property_parser.Property_content.parser, (~loc, value) => {
+  polymorphic(Property_parser.property_content, (~loc, value) => {
     switch (value) {
     | `Normal => [[%expr CSS.contentRule(`normal)]]
     | `None => [[%expr CSS.contentRule(`none)]]
@@ -5782,103 +5713,93 @@ let content =
     }
   });
 
-let empty_cells =
-  unsupportedProperty(Property_parser.Property_empty_cells.parser);
+let empty_cells = unsupportedProperty(Property_parser.property_empty_cells);
 
-let fill_opacity =
-  unsupportedProperty(Property_parser.Property_fill_opacity.parser);
+let fill_opacity = unsupportedProperty(Property_parser.property_fill_opacity);
 
-let fill_rule =
-  unsupportedProperty(Property_parser.Property_fill_rule.parser);
+let fill_rule = unsupportedProperty(Property_parser.property_fill_rule);
 
 let hyphenate_character =
-  unsupportedProperty(Property_parser.Property_hyphenate_character.parser);
+  unsupportedProperty(Property_parser.property_hyphenate_character);
 
 let hyphenate_limit_chars =
-  unsupportedProperty(Property_parser.Property_hyphenate_limit_chars.parser);
+  unsupportedProperty(Property_parser.property_hyphenate_limit_chars);
 
 let hyphenate_limit_lines =
-  unsupportedProperty(Property_parser.Property_hyphenate_limit_lines.parser);
+  unsupportedProperty(Property_parser.property_hyphenate_limit_lines);
 
 let hyphenate_limit_zone =
-  unsupportedProperty(Property_parser.Property_hyphenate_limit_zone.parser);
+  unsupportedProperty(Property_parser.property_hyphenate_limit_zone);
 
 let initial_letter_align =
-  unsupportedProperty(Property_parser.Property_initial_letter_align.parser);
+  unsupportedProperty(Property_parser.property_initial_letter_align);
 
 let initial_letter =
-  unsupportedProperty(Property_parser.Property_initial_letter.parser);
+  unsupportedProperty(Property_parser.property_initial_letter);
 
-let inline_size =
-  unsupportedProperty(Property_parser.Property_inline_size.parser);
+let inline_size = unsupportedProperty(Property_parser.property_inline_size);
 
 let inset_block_end =
-  unsupportedProperty(Property_parser.Property_inset_block_end.parser);
+  unsupportedProperty(Property_parser.property_inset_block_end);
 
 let inset_block_start =
-  unsupportedProperty(Property_parser.Property_inset_block_start.parser);
+  unsupportedProperty(Property_parser.property_inset_block_start);
 
-let inset_block =
-  unsupportedProperty(Property_parser.Property_inset_block.parser);
+let inset_block = unsupportedProperty(Property_parser.property_inset_block);
 
 let inset_inline_end =
-  unsupportedProperty(Property_parser.Property_inset_inline_end.parser);
+  unsupportedProperty(Property_parser.property_inset_inline_end);
 
 let inset_inline_start =
-  unsupportedProperty(Property_parser.Property_inset_inline_start.parser);
+  unsupportedProperty(Property_parser.property_inset_inline_start);
 
-let inset_inline =
-  unsupportedProperty(Property_parser.Property_inset_inline.parser);
+let inset_inline = unsupportedProperty(Property_parser.property_inset_inline);
 
-let inset = unsupportedProperty(Property_parser.Property_inset.parser);
+let inset = unsupportedProperty(Property_parser.property_inset);
 
 let layout_grid_char =
-  unsupportedProperty(Property_parser.Property_layout_grid_char.parser);
+  unsupportedProperty(Property_parser.property_layout_grid_char);
 
 let layout_grid_line =
-  unsupportedProperty(Property_parser.Property_layout_grid_line.parser);
+  unsupportedProperty(Property_parser.property_layout_grid_line);
 
 let layout_grid_mode =
-  unsupportedProperty(Property_parser.Property_layout_grid_mode.parser);
+  unsupportedProperty(Property_parser.property_layout_grid_mode);
 
 let layout_grid_type =
-  unsupportedProperty(Property_parser.Property_layout_grid_type.parser);
+  unsupportedProperty(Property_parser.property_layout_grid_type);
 
-let layout_grid =
-  unsupportedProperty(Property_parser.Property_layout_grid.parser);
+let layout_grid = unsupportedProperty(Property_parser.property_layout_grid);
 
 let mask_border_mode =
-  unsupportedProperty(Property_parser.Property_mask_border_mode.parser);
+  unsupportedProperty(Property_parser.property_mask_border_mode);
 
 let mask_border_outset =
-  unsupportedProperty(Property_parser.Property_mask_border_outset.parser);
+  unsupportedProperty(Property_parser.property_mask_border_outset);
 
 let mask_border_repeat =
-  unsupportedProperty(Property_parser.Property_mask_border_repeat.parser);
+  unsupportedProperty(Property_parser.property_mask_border_repeat);
 
 let mask_border_slice =
-  unsupportedProperty(Property_parser.Property_mask_border_slice.parser);
+  unsupportedProperty(Property_parser.property_mask_border_slice);
 
 let mask_border_source =
-  unsupportedProperty(Property_parser.Property_mask_border_source.parser);
+  unsupportedProperty(Property_parser.property_mask_border_source);
 
 let mask_border_width =
-  unsupportedProperty(Property_parser.Property_mask_border_width.parser);
+  unsupportedProperty(Property_parser.property_mask_border_width);
 
-let mask_clip =
-  unsupportedProperty(Property_parser.Property_mask_clip.parser);
+let mask_clip = unsupportedProperty(Property_parser.property_mask_clip);
 
 let mask_composite =
-  unsupportedProperty(Property_parser.Property_mask_composite.parser);
+  unsupportedProperty(Property_parser.property_mask_composite);
 
-let mask_mode =
-  unsupportedProperty(Property_parser.Property_mask_mode.parser);
+let mask_mode = unsupportedProperty(Property_parser.property_mask_mode);
 
-let mask_origin =
-  unsupportedProperty(Property_parser.Property_mask_origin.parser);
+let mask_origin = unsupportedProperty(Property_parser.property_mask_origin);
 
 let mask_position =
-  polymorphic(Property_parser.Property_mask_position.parser, (~loc) =>
+  polymorphic(Property_parser.property_mask_position, (~loc) =>
     fun
     | [one] => [[%expr CSS.maskPosition([%e render_position(~loc, one)])]]
     | more => [
@@ -5894,39 +5815,35 @@ let mask_position =
       ]
   );
 
-let mask_repeat =
-  unsupportedProperty(Property_parser.Property_mask_repeat.parser);
+let mask_repeat = unsupportedProperty(Property_parser.property_mask_repeat);
 
-let mask_size =
-  unsupportedProperty(Property_parser.Property_mask_size.parser);
+let mask_size = unsupportedProperty(Property_parser.property_mask_size);
 
-let mask_type =
-  unsupportedProperty(Property_parser.Property_mask_type.parser);
+let mask_type = unsupportedProperty(Property_parser.property_mask_type);
 
 let max_block_size =
-  unsupportedProperty(Property_parser.Property_max_block_size.parser);
+  unsupportedProperty(Property_parser.property_max_block_size);
 
 let max_inline_size =
-  unsupportedProperty(Property_parser.Property_max_inline_size.parser);
+  unsupportedProperty(Property_parser.property_max_inline_size);
 
 let min_block_size =
-  unsupportedProperty(Property_parser.Property_min_block_size.parser);
+  unsupportedProperty(Property_parser.property_min_block_size);
 
 let min_inline_size =
-  unsupportedProperty(Property_parser.Property_min_inline_size.parser);
+  unsupportedProperty(Property_parser.property_min_inline_size);
 
-let nav_down = unsupportedProperty(Property_parser.Property_nav_down.parser);
+let nav_down = unsupportedProperty(Property_parser.property_nav_down);
 
-let nav_left = unsupportedProperty(Property_parser.Property_nav_left.parser);
+let nav_left = unsupportedProperty(Property_parser.property_nav_left);
 
-let nav_right =
-  unsupportedProperty(Property_parser.Property_nav_right.parser);
+let nav_right = unsupportedProperty(Property_parser.property_nav_right);
 
-let nav_up = unsupportedProperty(Property_parser.Property_nav_up.parser);
+let nav_up = unsupportedProperty(Property_parser.property_nav_up);
 
 let offset_anchor =
   monomorphic(
-    Property_parser.Property_offset_anchor.parser,
+    Property_parser.property_offset_anchor,
     (~loc) => [%expr CSS.offsetAnchor],
     (~loc) =>
       fun
@@ -5935,53 +5852,51 @@ let offset_anchor =
   );
 
 let offset_distance =
-  unsupportedProperty(Property_parser.Property_offset_distance.parser);
+  unsupportedProperty(Property_parser.property_offset_distance);
 
-let offset_path =
-  unsupportedProperty(Property_parser.Property_offset_path.parser);
+let offset_path = unsupportedProperty(Property_parser.property_offset_path);
 
 let offset_position =
-  unsupportedProperty(Property_parser.Property_offset_position.parser);
+  unsupportedProperty(Property_parser.property_offset_position);
 
 let offset_rotate =
-  unsupportedProperty(Property_parser.Property_offset_rotate.parser);
+  unsupportedProperty(Property_parser.property_offset_rotate);
 
-let offset = unsupportedProperty(Property_parser.Property_offset.parser);
+let offset = unsupportedProperty(Property_parser.property_offset);
 
-let orphans = unsupportedProperty(Property_parser.Property_orphans.parser);
+let orphans = unsupportedProperty(Property_parser.property_orphans);
 
 let overflow_anchor =
-  unsupportedProperty(Property_parser.Property_overflow_anchor.parser);
+  unsupportedProperty(Property_parser.property_overflow_anchor);
 
 let padding_block_end =
-  unsupportedProperty(Property_parser.Property_padding_block_end.parser);
+  unsupportedProperty(Property_parser.property_padding_block_end);
 
 let padding_block_start =
-  unsupportedProperty(Property_parser.Property_padding_block_start.parser);
+  unsupportedProperty(Property_parser.property_padding_block_start);
 
 let padding_block =
-  unsupportedProperty(Property_parser.Property_padding_block.parser);
+  unsupportedProperty(Property_parser.property_padding_block);
 
 let padding_inline_end =
-  unsupportedProperty(Property_parser.Property_padding_inline_end.parser);
+  unsupportedProperty(Property_parser.property_padding_inline_end);
 
 let padding_inline_start =
-  unsupportedProperty(Property_parser.Property_padding_inline_start.parser);
+  unsupportedProperty(Property_parser.property_padding_inline_start);
 
 let padding_inline =
-  unsupportedProperty(Property_parser.Property_padding_inline.parser);
+  unsupportedProperty(Property_parser.property_padding_inline);
 
 let page_break_after =
-  unsupportedProperty(Property_parser.Property_page_break_after.parser);
+  unsupportedProperty(Property_parser.property_page_break_after);
 
 let page_break_before =
-  unsupportedProperty(Property_parser.Property_page_break_before.parser);
+  unsupportedProperty(Property_parser.property_page_break_before);
 
 let page_break_inside =
-  unsupportedProperty(Property_parser.Property_page_break_inside.parser);
+  unsupportedProperty(Property_parser.property_page_break_inside);
 
-let table_layout =
-  unsupportedProperty(Property_parser.Property_table_layout.parser);
+let table_layout = unsupportedProperty(Property_parser.property_table_layout);
 
 /* let render_animatable_feature = (~loc) =>
    fun
@@ -5991,9 +5906,9 @@ let table_layout =
 
 let will_change =
   monomorphic(
-    Property_parser.Property_will_change.parser,
+    Property_parser.property_will_change,
     (~loc) => [%expr CSS.willChange],
-    (~loc, value: Property_parser.Property_will_change.t) => {
+    (~loc, value: Property_parser.Types.property_will_change) => {
       switch (value) {
       | `Auto => [%expr `auto]
       | _ => raise(Unsupported_feature)
@@ -6001,18 +5916,16 @@ let will_change =
     },
   );
 
-let writing_mode =
-  unsupportedProperty(Property_parser.Property_writing_mode.parser);
+let writing_mode = unsupportedProperty(Property_parser.property_writing_mode);
 
 let text_orientation =
-  unsupportedProperty(Property_parser.Property_text_orientation.parser);
+  unsupportedProperty(Property_parser.property_text_orientation);
 
-let touch_action =
-  unsupportedProperty(Property_parser.Property_touch_action.parser);
+let touch_action = unsupportedProperty(Property_parser.property_touch_action);
 
 let user_select =
   monomorphic(
-    Property_parser.Property_user_select.parser,
+    Property_parser.property_user_select,
     (~loc) => [%expr CSS.userSelect],
     (~loc) =>
       fun
@@ -6026,7 +5939,7 @@ let user_select =
 
 let zoom =
   monomorphic(
-    Property_parser.Property_zoom.parser,
+    Property_parser.property_zoom,
     (~loc) => [%expr CSS.zoom],
     (~loc) =>
       fun
@@ -6038,7 +5951,7 @@ let zoom =
 
 let visibility =
   monomorphic(
-    Property_parser.Property_visibility.parser,
+    Property_parser.property_visibility,
     (~loc) => [%expr CSS.visibility],
     (~loc) =>
       fun

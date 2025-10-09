@@ -1,5 +1,5 @@
 (library
- (name reason_css_parser_ppx_generate)
+ (name css_grammar_ppx_generate)
  (wrapped false)
  (modules :standard \ Css_grammar_parser_ppx)
  (libraries ppxlib ppxlib.astlib styled-ppx.css-spec-parser)
@@ -15,6 +15,6 @@
   styled-ppx.css-spec-parser
   ppxlib
   ppxlib.astlib
-  reason_css_parser_ppx_generate)
+  css_grammar_ppx_generate)
  (preprocess
   (pps ppxlib.metaquot)))

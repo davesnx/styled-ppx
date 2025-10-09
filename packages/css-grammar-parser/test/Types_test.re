@@ -17,8 +17,8 @@ let test = (name, expr: Ppxlib.expression, output) => {
     Alcotest.check(
       Alcotest.string,
       "",
-      Ppxlib.Pprintast.string_of_structure([expected]),
       Ppxlib.Pprintast.string_of_structure([output]),
+      Ppxlib.Pprintast.string_of_structure([expected]),
     )
   );
 };
@@ -36,13 +36,13 @@ let tests: tests = [
   test(
     "ident",
     [%expr [%value "<string>"]],
-    [%stri type nonrec ident = String_value.t],
+    [%stri type nonrec ident = string],
   ),
   // Property_type
   test(
     "color",
     [%expr [%value "<'color'>"]],
-    [%stri type nonrec color = Property_color.t],
+    [%stri type nonrec color = property_color],
   ),
   // Delim
   test(
@@ -50,14 +50,14 @@ let tests: tests = [
     [%expr [%value "<calc-product> [ [ '+' | '-' ] <calc-product> ]*"]],
     [%stri
       type nonrec calc_sum = (
-        Calc_product.t,
+        calc_product,
         list(
           (
             [
-              | `Cross
-              | `Dash
+              | `Cross(unit)
+              | `Dash(unit)
             ],
-            Calc_product.t,
+            calc_product,
           ),
         ),
       )
@@ -100,8 +100,8 @@ let tests: tests = [
     ],
     [%stri
       type nonrec property_clip_path = [
-        | `Clip_source(Clip_source.t)
-        | `Or(option(Basic_shape.t), option(Geometry_box.t))
+        | `Clip_source(clip_source)
+        | `Or(option(basic_shape), option(geometry_box))
         | `None
       ]
     ],
@@ -110,7 +110,7 @@ let tests: tests = [
   test(
     "contradiction",
     [%expr [%value "'not' <string>"]],
-    [%stri type nonrec contradiction = (unit, String_value.t)],
+    [%stri type nonrec contradiction = (unit, string)],
   ),
   // Group
   test(
@@ -127,7 +127,7 @@ let tests: tests = [
   test(
     "calc",
     [%expr [%value "calc( <calc-sum> )"]],
-    [%stri type nonrec calc = Calc_sum.t],
+    [%stri type nonrec calc = calc_sum],
   ),
   // Polymorphism
   test(
@@ -142,16 +142,10 @@ let tests: tests = [
     ],
     [%stri
       type nonrec function_color = [
-        | `Rgb_0(
-            list(Extended_percentage.t),
-            option((unit, Alpha_value.t)),
-          )
-        | `Rgb_1(list(Number.t), option((unit, Alpha_value.t)))
-        | `Rgb_2(
-            list(Extended_percentage.t),
-            option((unit, Alpha_value.t)),
-          )
-        | `Rgb_3(list(Number.t), option((unit, Alpha_value.t)))
+        | `Rgb_0(list(extended_percentage), option((unit, alpha_value)))
+        | `Rgb_1(list(number), option((unit, alpha_value)))
+        | `Rgb_2(list(extended_percentage), option((unit, alpha_value)))
+        | `Rgb_3(list(number), option((unit, alpha_value)))
       ]
     ],
   ),
