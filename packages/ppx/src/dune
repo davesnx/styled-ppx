@@ -6,7 +6,7 @@
   (:standard -w -9))
  (libraries
   styled-ppx.css-parser
-  styled-ppx.css-grammar-parser
+  styled-ppx.css-grammar
   styled-ppx.string-interpolation
   sedlex
   ppxlib

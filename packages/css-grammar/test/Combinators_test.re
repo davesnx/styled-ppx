@@ -4,7 +4,7 @@ open Modifier;
 open Standard;
 
 let parse_exn = (prop, str) =>
-  switch (parse(prop, str)) {
+  switch (Css_grammar_parser.parse(prop, str)) {
   | Ok(data) => data
   | Error(message) => Alcotest.fail(message)
   };

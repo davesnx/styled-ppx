@@ -169,6 +169,17 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     );
   };
 
+  let make_variant_declaration = (name, constructors) => {
+    type_declaration(
+      ~name=txt(name),
+      ~params=[],
+      ~cstrs=[],
+      ~kind=Ptype_variant(constructors),
+      ~private_=Public,
+      ~manifest=None,
+    );
+  };
+
   let make_variant_branch = (name, constructor, types) => {
     rtag(txt(name), constructor, types);
   };
@@ -254,27 +265,38 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         | Xor =>
           let names = variant_names(values);
           let pairs = List.combine(names, values);
-          let types =
+          let constructors =
             List.map(
-              ((type_name, value)) =>
-                switch (value) {
-                | Terminal(kind, multiplier) =>
-                  terminal_xor_op(type_name, kind, multiplier)
-                | Function_call(name, value) =>
-                  let name =
-                    first_uppercase(name) |> kebab_case_to_snake_case;
-                  let type_ = function_call(name, value);
-                  make_variant_branch(type_name, false, [type_]);
-                | Combinator(kind, values) =>
-                  let type_ = combinator_op(kind, values);
-                  make_variant_branch(type_name, false, [type_]);
-                | Group(value, multiplier) =>
-                  let type_ = group_op(value, multiplier);
-                  make_variant_branch(type_name, false, [type_]);
-                },
+              ((type_name, value)) => {
+                let args =
+                  switch (value) {
+                  | Terminal(Keyword(_), _)
+                  | Terminal(Delim(_), _) =>
+                    /* No payload for keywords/delimiters */
+                    Pcstr_tuple([])
+                  | Terminal(kind, multiplier) =>
+                    Pcstr_tuple([terminal_op(kind, multiplier)])
+                  | Function_call(name, value) =>
+                    let name =
+                      first_uppercase(name) |> kebab_case_to_snake_case;
+                    let type_ = function_call(name, value);
+                    Pcstr_tuple([type_]);
+                  | Combinator(kind, values) =>
+                    let type_ = combinator_op(kind, values);
+                    Pcstr_tuple([type_]);
+                  | Group(value, multiplier) =>
+                    let type_ = group_op(value, multiplier);
+                    Pcstr_tuple([type_]);
+                  };
+                constructor_declaration(
+                  ~name=txt(type_name),
+                  ~args,
+                  ~res=None,
+                );
+              },
               pairs,
             );
-          ptyp_variant(types, Closed, None);
+          ptyp_constr(txt(Lident("t")), []);
         | Static
         | And => ptyp_tuple(List.map(create_type, values))
         | Or =>
@@ -851,19 +873,72 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     };
   };
 
+  /* Helper to check if value is an Xor at top level */
+  let is_xor_value = value =>
+    switch (value) {
+    | Combinator(Xor, _) => true
+    | _ => false
+    };
+
+  /* Generate variant constructors from Xor values */
+  let make_xor_constructors = values => {
+    let names = variant_names(values);
+    let pairs = List.combine(names, values);
+    List.map(
+      ((type_name, value)) => {
+        let args =
+          switch (value) {
+          | Terminal(Keyword(_), _)
+          | Terminal(Delim(_), _) => Pcstr_tuple([])
+          | Terminal(kind, multiplier) =>
+            let type_ =
+              switch (kind) {
+              | Delim(_)
+              | Keyword(_) => ptyp_constr(txt @@ Lident("unit"), [])
+              | Data_type(name) =>
+                let module_name = value_name_to_module_name(name);
+                ptyp_constr(txt @@ Ldot(Lident(module_name), "t"), []);
+              | Property_type(name) =>
+                let module_name =
+                  property_value_name(name) |> value_name_to_module_name;
+                ptyp_constr(txt @@ Ldot(Lident(module_name), "t"), []);
+              };
+            let type_ = apply_modifier(multiplier, type_);
+            Pcstr_tuple([type_]);
+          | _ =>
+            let type_ = create_type_parser(value);
+            Pcstr_tuple([type_]);
+          };
+        constructor_declaration(~name=txt(type_name), ~args, ~res=None);
+      },
+      pairs,
+    );
+  };
+
   let make_module = (module_name: string, value_spec: string) => {
     switch (Css_spec_parser.value_of_string(value_spec)) {
     | Some(ast) =>
-      let core_type = create_type_parser(ast);
       let parse_expr = make_value(ast);
       let to_string_expr = make_to_string(ast);
 
+      /* Check if we should generate a variant type */
+      let (type_decl, core_type_ref) =
+        switch (ast) {
+        | Combinator(Xor, values) =>
+          /* Generate variant type */
+          let constructors = make_xor_constructors(values);
+          let type_decl = make_variant_declaration("t", constructors);
+          let core_type_ref = ptyp_constr(txt(Lident("t")), []);
+          (type_decl, core_type_ref);
+        | _ =>
+          /* Generate abstract type with manifest */
+          let core_type = create_type_parser(ast);
+          let type_decl = make_type_declaration("t", core_type);
+          (type_decl, core_type);
+        };
+
       let sig_t =
-        Ast_helper.Sig.type_(
-          ~loc,
-          Nonrecursive,
-          [make_type_declaration("t", core_type)],
-        );
+        Ast_helper.Sig.type_(~loc, Nonrecursive, [type_decl]);
       let sig_parse =
         Ast_helper.Sig.value(
           ~loc,
@@ -898,7 +973,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         Ast_helper.Mty.signature(~loc, [sig_t, sig_parse, sig_toString]);
 
       /* Module implementation */
-      let type_decl = make_type_declaration("t", core_type);
       let type_item = Ast_helper.Str.type_(~loc, Nonrecursive, [type_decl]);
 
       let parse_val = [%stri let parser = [%e parse_expr]];
