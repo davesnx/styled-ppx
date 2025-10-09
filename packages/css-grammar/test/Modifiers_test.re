@@ -1,4 +1,4 @@
-open Css_grammar_parser;
+open Css_grammar;
 open Standard;
 open Modifier;
 open Rule.Match;

@@ -1,19 +1,19 @@
 /* Property_to_type: Parse CSS values and extract interpolation type information
 
-   Given a property name and value string, this module:
-   1. Parses the value with the appropriate Property_parser
-   2. Pattern matches on the parsed AST to find Interpolation nodes
-   3. Maps each interpolation's parser type to the corresponding Css_types toString
+      Given a property name and value string, this module:
+      1. Parses the value with the appropriate Property_parser
+      2. Pattern matches on the parsed AST to find Interpolation nodes
+      3. Maps each interpolation's parser type to the corresponding Css_types toString
 
-   Example:
-   - parse_and_extract("color", "$(myColor)")
-     -> Returns [(["myColor"], "Color")]
+      Example:
+      - parse_and_extract("color", "$(myColor)")
+        -> Returns [(["myColor"], "Color")]
 
-   - parse_and_extract("margin", "10px $(right) $(bottom) $(left)")
-     -> Returns [(["right"], "Margin"), (["bottom"], "Margin"), (["left"], "Margin")]
-*/
+      - parse_and_extract("margin", "10px $(right) $(bottom) $(left)")
+        -> Returns [(["right"], "Margin"), (["bottom"], "Margin"), (["left"], "Margin")]
+   */
 
-module Property_parser = Css_grammar_parser.Parser;
+module Property_parser = Css_grammar.Parser;
 
 /* Helper to find the property parser by name */
 let find_property_parser = (property_name: string) => {
@@ -25,18 +25,18 @@ let find_property_parser = (property_name: string) => {
 
 /* Extract interpolations and their types from a parsed AST.
 
-   Pattern match on parser types to determine the Css_types module.
-   When we encounter `Interpolation(vars), return (vars, type_module_name).
+      Pattern match on parser types to determine the Css_types module.
+      When we encounter `Interpolation(vars), return (vars, type_module_name).
 
-   Note: We ignore/assert false on Interpolation nodes during pattern matching
-   because at this stage they're already replaced with CSS variables in the transform.
-*/
+      Note: We ignore/assert false on Interpolation nodes during pattern matching
+      because at this stage they're already replaced with CSS variables in the transform.
+   */
 
 /* Map parsed property types to Css_types toString modules.
 
-   This is the core type mapping - for each property's parsed type,
-   determine which Css_types module should be used for toString.
-*/
+      This is the core type mapping - for each property's parsed type,
+      determine which Css_types module should be used for toString.
+   */
 let get_type_for_property = (property_name: string): option(string) => {
   switch (property_name) {
   /* Simple properties that map directly to a type */
@@ -284,34 +284,33 @@ let get_type_for_property = (property_name: string): option(string) => {
 
 /* Parse a CSS property value and extract interpolation types.
 
-   This function:
-   1. Finds the property's parser
-   2. Parses the value to get typed AST
-   3. Pattern matches on AST to find interpolations and their types
-   4. Returns list of (variable_path, type_module_name)
-*/
-let extract_interpolations_from_value = (property_name: string, value: string): list((list(string), string)) => {
-  /* For now, use the simple property-based approach since:
-     - The parser AST types are complex polymorphic variants
-     - Each property has many possible variants
-     - We'd need exhaustive pattern matching for each property type
+      This function:
+      1. Finds the property's parser
+      2. Parses the value to get typed AST
+      3. Pattern matches on AST to find interpolations and their types
+      4. Returns list of (variable_path, type_module_name)
+   */
+let extract_interpolations_from_value =
+    (property_name: string, value: string): list((list(string), string)) => {
+  []/* For now, use the simple property-based approach since:
+          - The parser AST types are complex polymorphic variants
+          - Each property has many possible variants
+          - We'd need exhaustive pattern matching for each property type
 
-     The property-level type module is sufficient because:
-     - OCaml's type system will enforce correctness at the interpolation site
-     - The Css_types modules handle all variants of their type
-     - For example, Margin.toString handles both Length.t and Auto.t
-  */
-
-  /* TODO: Implement proper AST walking to extract interpolations and their specific types.
-     For example, for "flex: 1 1 $(basis)", we should:
-     1. Parse with Property_flex.parser
-     2. Get AST like `Or(Some((grow, Some(shrink))), Some(Interpolation(basis)))
-     3. Determine that the interpolation is in flex-basis position
-     4. Return (basis, "FlexBasis") or more specifically the narrower type if possible
-  */
-
-  /* For now, just return empty since Css_runtime will use get_type_for_property */
-  [];
+          The property-level type module is sufficient because:
+          - OCaml's type system will enforce correctness at the interpolation site
+          - The Css_types modules handle all variants of their type
+          - For example, Margin.toString handles both Length.t and Auto.t
+       */
+    /* TODO: Implement proper AST walking to extract interpolations and their specific types.
+          For example, for "flex: 1 1 $(basis)", we should:
+          1. Parse with Property_flex.parser
+          2. Get AST like `Or(Some((grow, Some(shrink))), Some(Interpolation(basis)))
+          3. Determine that the interpolation is in flex-basis position
+          4. Return (basis, "FlexBasis") or more specifically the narrower type if possible
+       */
+    ;
+    /* For now, just return empty since Css_runtime will use get_type_for_property */
 };
 
 /* Get the Css_types module name for a property.

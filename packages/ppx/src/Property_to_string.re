@@ -1,8 +1,8 @@
-open Css_grammar_parser;
+open Css_grammar;
 
 module Helper = Ppxlib.Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
-module Property_parser = Css_grammar_parser.Parser;
+module Property_parser = Css_grammar.Parser;
 
 exception Invalid_value(string);
 

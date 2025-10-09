@@ -19,7 +19,7 @@
   
     val parser :
       Styled_ppx_css_parser.Tokens.t list ->
-      t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
+      t Css_grammar__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
@@ -77,7 +77,7 @@
   
     val parser :
       Styled_ppx_css_parser.Tokens.t list ->
-      t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
+      t Css_grammar__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
@@ -248,7 +248,7 @@
   
     val parser :
       Styled_ppx_css_parser.Tokens.t list ->
-      t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
+      t Css_grammar__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
@@ -427,7 +427,7 @@
   
     val parser :
       Styled_ppx_css_parser.Tokens.t list ->
-      t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
+      t Css_grammar__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
@@ -573,7 +573,7 @@
   
     val parser :
       Styled_ppx_css_parser.Tokens.t list ->
-      t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
+      t Css_grammar__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
@@ -735,7 +735,7 @@
   
     val parser :
       Styled_ppx_css_parser.Tokens.t list ->
-      t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
+      t Css_grammar__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
@@ -910,7 +910,7 @@
   
     val parser :
       Styled_ppx_css_parser.Tokens.t list ->
-      t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
+      t Css_grammar__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
@@ -1409,7 +1409,7 @@
   
     val parser :
       Styled_ppx_css_parser.Tokens.t list ->
-      t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
+      t Css_grammar__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
@@ -1517,7 +1517,7 @@
   
     val parser :
       Styled_ppx_css_parser.Tokens.t list ->
-      t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
+      t Css_grammar__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
@@ -1576,7 +1576,7 @@
   
     val parser :
       Styled_ppx_css_parser.Tokens.t list ->
-      t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
+      t Css_grammar__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
@@ -1605,7 +1605,7 @@
   
     val parser :
       Styled_ppx_css_parser.Tokens.t list ->
-      t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
+      t Css_grammar__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
@@ -1632,7 +1632,7 @@
   
     val parser :
       Styled_ppx_css_parser.Tokens.t list ->
-      t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
+      t Css_grammar__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
@@ -1650,7 +1650,7 @@
   
     val parser :
       Styled_ppx_css_parser.Tokens.t list ->
-      t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
+      t Css_grammar__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
@@ -1679,7 +1679,7 @@
   
     val parser :
       Styled_ppx_css_parser.Tokens.t list ->
-      t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
+      t Css_grammar__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
@@ -1706,7 +1706,7 @@
   
     val parser :
       Styled_ppx_css_parser.Tokens.t list ->
-      t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
+      t Css_grammar__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
@@ -1735,7 +1735,7 @@
   
     val parser :
       Styled_ppx_css_parser.Tokens.t list ->
-      t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
+      t Css_grammar__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
@@ -1765,7 +1765,7 @@
   
     val parser :
       Styled_ppx_css_parser.Tokens.t list ->
-      t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
+      t Css_grammar__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
@@ -1834,7 +1834,7 @@
   
     val parser :
       Styled_ppx_css_parser.Tokens.t list ->
-      t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
+      t Css_grammar__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
@@ -1874,7 +1874,7 @@
   
     val parser :
       Styled_ppx_css_parser.Tokens.t list ->
-      t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
+      t Css_grammar__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
@@ -1914,7 +1914,7 @@
   
     val parser :
       Styled_ppx_css_parser.Tokens.t list ->
-      t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
+      t Css_grammar__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
@@ -1971,7 +1971,7 @@
   
     val parser :
       Styled_ppx_css_parser.Tokens.t list ->
-      t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
+      t Css_grammar__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
@@ -2032,7 +2032,7 @@
   
     val parser :
       Styled_ppx_css_parser.Tokens.t list ->
-      t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
+      t Css_grammar__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
@@ -2112,7 +2112,7 @@
   
     val parser :
       Styled_ppx_css_parser.Tokens.t list ->
-      t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
+      t Css_grammar__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct
@@ -2218,7 +2218,7 @@
   
     val parser :
       Styled_ppx_css_parser.Tokens.t list ->
-      t Css_grammar_parser__Rule.data * Styled_ppx_css_parser.Tokens.t list
+      t Css_grammar__Rule.data * Styled_ppx_css_parser.Tokens.t list
   
     val toString : t -> string
   end = struct

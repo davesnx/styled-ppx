@@ -1,10 +1,10 @@
-open Css_grammar_parser;
+open Css_grammar;
 open Rule.Match;
 open Modifier;
 open Standard;
 
 let parse_exn = (prop, str) =>
-  switch (Css_grammar_parser.parse(prop, str)) {
+  switch (Css_grammar.parse(prop, str)) {
   | Ok(data) => data
   | Error(message) => Alcotest.fail(message)
   };

@@ -122,10 +122,7 @@ and render_media_query = (~loc, at_rule: at_rule) => {
   let parse_condition = {
     let prelude =
       Styled_ppx_css_parser.Render.component_value_list(at_rule_prelude_ast);
-    Css_grammar_parser.parse(
-      Css_grammar_parser.Parser.Media_query_list.parser,
-      prelude,
-    )
+    Css_grammar.parse(Css_grammar.Parser.Media_query_list.parser, prelude)
     |> Result.map(_ => prelude);
   };
 
@@ -167,8 +164,8 @@ and render_container_query = (~loc, at_rule: at_rule) => {
   let parse_condition = {
     let prelude =
       Styled_ppx_css_parser.Render.component_value_list(at_rule_prelude_ast);
-    Css_grammar_parser.parse(
-      Css_grammar_parser.Parser.Container_condition_list.parser,
+    Css_grammar.parse(
+      Css_grammar.Parser.Container_condition_list.parser,
       prelude,
     )
     |> Result.map(_ => prelude);

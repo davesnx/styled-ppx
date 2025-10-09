@@ -219,7 +219,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       | Function_call(name, value) => function_call(name, value)
       | Group(value, multiplier) => group_op(value, multiplier)
 
-    and terminal_xor_op = (type_name, kind, multiplier) => {
+    and _terminal_xor_op = (type_name, kind, multiplier) => {
       let (type_, is_constructor, params) =
         switch (kind) {
         | Keyword(_)
@@ -265,7 +265,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         | Xor =>
           let names = variant_names(values);
           let pairs = List.combine(names, values);
-          let constructors =
+          let _constructors =
             List.map(
               ((type_name, value)) => {
                 let args =
@@ -372,12 +372,14 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         },
         [],
       );
+    let data_type =
+      ptyp_constr(
+        txt(Ldot(Lident("Css_grammar__Rule"), "data")),
+        [core_type],
+      );
     let type_anotation = [%type:
       list(Styled_ppx_css_parser.Tokens.t) =>
-      (
-        Css_grammar_parser__Rule.data([%t core_type]),
-        list(Styled_ppx_css_parser.Tokens.t),
-      )
+      ([%t data_type], list(Styled_ppx_css_parser.Tokens.t))
     ];
     [%expr ([%e expression]: [%t type_anotation])];
   };
@@ -477,7 +479,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     kebab_case_to_snake_case(str);
   };
 
-  let apply_modifier = {
+  let apply_modifier_expr = {
     let option_int_to_expr =
       fun
       | None => construct("None")
@@ -525,10 +527,10 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
             property_value_name(name) |> value_name_to_module_name;
           eapply(evar(module_name ++ ".parser"), []);
         };
-      apply_modifier(modifier, rule);
+      apply_modifier_expr(modifier, rule);
     };
     let group_op = (value, modifier) =>
-      make_value(value) |> apply_modifier(modifier);
+      make_value(value) |> apply_modifier_expr(modifier);
     let combinator_op = (kind, values) => {
       let apply = (fn, args) => {
         let args = elist(args);
@@ -922,7 +924,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       let to_string_expr = make_to_string(ast);
 
       /* Check if we should generate a variant type */
-      let (type_decl, core_type_ref) =
+      let (type_decl, _core_type_ref) =
         switch (ast) {
         | Combinator(Xor, values) =>
           /* Generate variant type */
@@ -937,8 +939,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
           (type_decl, core_type);
         };
 
-      let sig_t =
-        Ast_helper.Sig.type_(~loc, Nonrecursive, [type_decl]);
+      let sig_t = Ast_helper.Sig.type_(~loc, Nonrecursive, [type_decl]);
       let sig_parse =
         Ast_helper.Sig.value(
           ~loc,
@@ -948,13 +949,18 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
               txt: "parser",
               loc,
             },
-            [%type:
-              list(Styled_ppx_css_parser.Tokens.t) =>
-              (
-                Css_grammar_parser__Rule.data(t),
-                list(Styled_ppx_css_parser.Tokens.t),
-              )
-            ],
+            {
+              let t_type = ptyp_constr(txt(Lident("t")), []);
+              let data_type =
+                ptyp_constr(
+                  txt(Ldot(Lident("Css_grammar__Rule"), "data")),
+                  [t_type],
+                );
+              [%type:
+                list(Styled_ppx_css_parser.Tokens.t) =>
+                ([%t data_type], list(Styled_ppx_css_parser.Tokens.t))
+              ];
+            },
           ),
         );
       let sig_toString =
