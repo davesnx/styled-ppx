@@ -22,7 +22,6 @@ module CSS = {
   let style = (~loc) => ident(~loc, "style");
   let keyframes = (~loc) => ident(~loc, "keyframes");
   let make = (~loc) => ident(~loc, "make");
-  let get_value_from_rule = (~loc) => ident(~loc, "get_value_from_rule");
 };
 
 let string_to_const = (~loc, s) => {
@@ -544,29 +543,15 @@ let render_make_call = (~loc, ~classNames, ~dynamic_vars) => {
          let field_name_expr =
            Helper.Exp.constant(~loc, Pconst_string(field_name, loc, None));
 
-         /* Get the variable value */
          let var_value =
            render_variable(~loc, String.split_on_char('.', original_path));
 
-         /* Wrap the value with the appropriate CSS function and get_value_from_rule */
          let field_value =
-           if (property_name != "") {
-             /* CSS.get_value_from_rule(CSS.propertyFunction(value)) */
-             let property_call =
-               Property_to_runtime.get_css_function_for_property(
-                 ~loc,
-                 property_name,
-                 var_value,
-               );
-             Helper.Exp.apply(
-               ~loc,
-               CSS.get_value_from_rule(~loc),
-               [(Nolabel, property_call)],
-             );
-           } else {
-             /* Fallback to raw value if no property is tracked (shouldn't happen normally) */
-             var_value;
-           };
+           Property_to_types.get_to_string_for_property(
+             ~loc,
+             property_name,
+             var_value,
+           );
 
          Builder.pexp_tuple(~loc, [field_name_expr, field_value]);
        });

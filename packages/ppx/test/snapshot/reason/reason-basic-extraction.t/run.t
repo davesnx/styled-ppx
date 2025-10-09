@@ -8,11 +8,8 @@
     CSS.make(
       "css-3tpy8b css-1uzc9um css-17vxl0k css-1lr2y8",
       [
-        ("--var-19ja411", CSS.get_value_from_rule(CSS.color(main))),
-        (
-          "--var-1xt8d8f",
-          CSS.get_value_from_rule(CSS.backgroundColor(CSS.black)),
-        ),
+        ("--var-19ja411", CSS.Types.Color.toString(main)),
+        ("--var-1xt8d8f", CSS.Types.Color.toString(CSS.black)),
       ],
     );
   <div className={css(CSS.red)} />;

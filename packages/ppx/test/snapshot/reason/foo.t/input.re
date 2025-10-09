@@ -13,4 +13,4 @@ let css = main => [%cx2
 |}
 ];
 
-<div className={css(CSS.red)} />;
+<div styles={css(CSS.red)} />;

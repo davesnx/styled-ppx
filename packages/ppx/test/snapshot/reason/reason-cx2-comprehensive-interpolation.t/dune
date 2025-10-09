@@ -1,0 +1,4 @@
+(cram
+ (deps
+  (package styled-ppx)
+  %{bin:standalone}))

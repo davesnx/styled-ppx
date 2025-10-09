@@ -9,15 +9,12 @@
     CSS.make(
       "css-3tpy8b css-1uzc9um css-6ke9ka css-17vxl0k css-1lr2y8",
       [
-        ("--var-19ja411", CSS.get_value_from_rule(CSS.color(main))),
-        (
-          "--var-1xt8d8f",
-          CSS.get_value_from_rule(CSS.backgroundColor(CSS.black)),
-        ),
-        ("--var-ex0pzk", CSS.get_value_from_rule(CSS.flex(px100))),
+        ("--var-19ja411", CSS.Types.Color.toString(main)),
+        ("--var-1xt8d8f", CSS.Types.Color.toString(CSS.black)),
+        ("--var-ex0pzk", CSS.Types.Flex.toString(px100)),
       ],
     );
-  <div className={css(CSS.red)} />;
+  <div className={fst(css(CSS.red))} style={snd(css(CSS.red))} />;
 
   $ styled-ppx.generate output.ml > styles.css
   $ cat styles.css

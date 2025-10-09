@@ -8,13 +8,10 @@
     CSS.make(
       "css-17vxl0k css-1641h1j css-1uzc9um",
       [
-        ("--var-j35jbq", CSS.get_value_from_rule(CSS.margin(right))),
-        ("--var-15kzvoi", CSS.get_value_from_rule(CSS.margin(bottom))),
-        ("--var-oyh7mz", CSS.get_value_from_rule(CSS.margin(left))),
-        (
-          "--var-1xt8d8f",
-          CSS.get_value_from_rule(CSS.backgroundColor(CSS.black)),
-        ),
+        ("--var-j35jbq", CSS.Types.Margin.toString(right)),
+        ("--var-15kzvoi", CSS.Types.Margin.toString(bottom)),
+        ("--var-oyh7mz", CSS.Types.Margin.toString(left)),
+        ("--var-1xt8d8f", CSS.Types.Color.toString(CSS.black)),
       ],
     );
   <div
