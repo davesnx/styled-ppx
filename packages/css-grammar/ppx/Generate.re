@@ -450,7 +450,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       );
     let type_anotation = [%type:
       list(Tokens.t) =>
-      (Css_grammar_parser__Rule.data([%t core_type]), list(Tokens.t))
+      (Css_grammar__Rule.data([%t core_type]), list(Tokens.t))
     ];
     [%expr ([%e expression]: [%t type_anotation])];
   };

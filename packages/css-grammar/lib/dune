@@ -1,5 +1,5 @@
 (library
- (name Css_grammar_parser)
+ (name Css_grammar)
  (public_name styled-ppx.css-grammar-parser)
  (libraries
   sedlex

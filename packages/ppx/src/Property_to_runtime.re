@@ -2,8 +2,8 @@ module Location = Ppxlib.Location;
 module Parsetree = Ppxlib.Parsetree;
 module Builder = Ppxlib.Ast_builder.Default;
 
-module Standard = Css_grammar_parser.Standard;
-module Property_parser = Css_grammar_parser.Parser;
+module Standard = Css_grammar.Standard;
+module Property_parser = Css_grammar.Parser;
 
 let txt = (~loc, txt) => {
   Location.loc,
@@ -87,7 +87,7 @@ let render_variable = (~loc, name) => {
 };
 
 let transform_with_variable = (parser, mapper, value_to_expr) => {
-  Css_grammar_parser.(
+  Css_grammar.(
     emit(
       Combinators.xor([
         /* If the entire CSS value is interpolated, we treat it as a `Variable */
