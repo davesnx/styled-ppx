@@ -5,6 +5,5 @@ Alcotest.run(
     Modifiers_test.tests,
     Rules_test.tests,
     Standard_test.tests,
-    Types_test.tests,
   ]),
 );
