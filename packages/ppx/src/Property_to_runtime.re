@@ -19,8 +19,6 @@ exception Impossible_state;
 
 exception Invalid_value(string);
 
-let id = Fun.id;
-
 /* Why this type contains so much when only `string_to_expr` is used? */
 type transform('ast, 'value) = {
   ast_of_string: string => result('ast, string),
@@ -178,107 +176,107 @@ let to_camel_case = txt =>
 
 let variant_to_expression = (~loc) =>
   fun
-  | `Anywhere => id([%expr `anywhere])
-  | `Auto => id([%expr `auto])
-  | `Baseline => id([%expr `baseline])
-  | `Blink => id([%expr `blink])
-  | `Bold => id([%expr `bold])
-  | `Bolder => id([%expr `bolder])
-  | `Border_box => id([%expr `borderBox])
-  | `Border_area => id([%expr `borderArea])
-  | `Bottom => id([%expr `bottom])
-  | `Break_all => id([%expr `breakAll])
-  | `Break_spaces => id([%expr `breakSpaces])
+  | `Anywhere => [%expr `anywhere]
+  | `Auto => [%expr `auto]
+  | `Baseline => [%expr `baseline]
+  | `Blink => [%expr `blink]
+  | `Bold => [%expr `bold]
+  | `Bolder => [%expr `bolder]
+  | `Border_box => [%expr `borderBox]
+  | `Border_area => [%expr `borderArea]
+  | `Bottom => [%expr `bottom]
+  | `Break_all => [%expr `breakAll]
+  | `Break_spaces => [%expr `breakSpaces]
   | `Break_word => raise(Unsupported_feature)
-  | `BreakWord => id([%expr `breakWord])
-  | `Capitalize => id([%expr `capitalize])
-  | `Center => id([%expr `center])
-  | `Clip => id([%expr `clip])
-  | `Column => id([%expr `column])
-  | `Column_reverse => id([%expr `columnReverse])
-  | `Contain => id([%expr `contain])
-  | `Content => id([%expr `content])
-  | `Content_box => id([%expr `contentBox])
-  | `Cover => id([%expr `cover])
-  | `Dashed => id([%expr `dashed])
-  | `Dotted => id([%expr `dotted])
-  | `Double => id([%expr `double])
-  | `Ellipsis => id([%expr `ellipsis])
-  | `End => id([%expr `end_])
-  | `Fill => id([%expr `fill])
-  | `Flat => id([%expr `flat])
-  | `Flex_end => id([%expr `flexEnd])
-  | `Flex_start => id([%expr `flexStart])
+  | `BreakWord => [%expr `breakWord]
+  | `Capitalize => [%expr `capitalize]
+  | `Center => [%expr `center]
+  | `Clip => [%expr `clip]
+  | `Column => [%expr `column]
+  | `Column_reverse => [%expr `columnReverse]
+  | `Contain => [%expr `contain]
+  | `Content => [%expr `content]
+  | `Content_box => [%expr `contentBox]
+  | `Cover => [%expr `cover]
+  | `Dashed => [%expr `dashed]
+  | `Dotted => [%expr `dotted]
+  | `Double => [%expr `double]
+  | `Ellipsis => [%expr `ellipsis]
+  | `End => [%expr `end_]
+  | `Fill => [%expr `fill]
+  | `Flat => [%expr `flat]
+  | `Flex_end => [%expr `flexEnd]
+  | `Flex_start => [%expr `flexStart]
   | `From_font => raise(Unsupported_feature)
-  | `Groove => id([%expr `groove])
-  | `Hidden => id([%expr `hidden])
-  | `Inset => id([%expr `inset])
-  | `Italic => id([%expr `italic])
-  | `Justify => id([%expr `justify])
-  | `Keep_all => id([%expr `keepAll])
-  | `Left => id([%expr `left])
-  | `Lighter => id([%expr `lighter])
-  | `Line_Through => id([%expr `lineThrough])
-  | `Lowercase => id([%expr `lowercase])
-  | `MaxContent => id([%expr `maxContent])
-  | `MinContent => id([%expr `minContent])
-  | `None => id([%expr `none])
-  | `Normal => id([%expr `normal])
-  | `Nowrap => id([%expr `nowrap])
-  | `Oblique => id([%expr `oblique])
-  | `Outset => id([%expr `outset])
-  | `Overline => id([%expr `overline])
-  | `Padding_box => id([%expr `paddingBox])
-  | `Pre => id([%expr `pre])
-  | `Pre_line => id([%expr `preLine])
-  | `Pre_wrap => id([%expr `preWrap])
-  | `Preserve_3d => id([%expr `preserve3d])
-  | `Repeat_x => id([%expr `repeatX])
-  | `Repeat_y => id([%expr `repeatY])
-  | `Ridge => id([%expr `ridge])
-  | `Right => id([%expr `right])
-  | `Row => id([%expr `row])
-  | `Row_reverse => id([%expr `rowReverse])
-  | `Scale_down => id([%expr `scaleDown])
-  | `Scroll => id([%expr `scroll])
-  | `Small_caps => id([%expr `smallCaps])
-  | `Solid => id([%expr `solid])
-  | `Space_around => id([%expr `spaceAround])
-  | `Space_between => id([%expr `spaceBetween])
-  | `Start => id([%expr `start])
-  | `Stretch => id([%expr `stretch])
-  | `Top => id([%expr `top])
-  | `Transparent => id([%expr `transparent])
-  | `Underline => id([%expr `underline])
-  | `Unset => id([%expr `unset])
-  | `Uppercase => id([%expr `uppercase])
-  | `Visible => id([%expr `visible])
-  | `Wavy => id([%expr `wavy])
-  | `Wrap => id([%expr `wrap])
-  | `Match_parent => id([%expr `matchParent])
-  | `Justify_all => id([%expr `justifyAll])
-  | `Wrap_reverse => id([%expr `wrapReverse])
-  | `Manual => id([%expr `manual])
-  | `Inter_word => id([%expr `interWord])
-  | `Inter_character => id([%expr `interCharacter])
-  | `Sub => id([%expr `sub])
-  | `Super => id([%expr `super])
-  | `All_small_caps => id([%expr `allSmallCaps])
-  | `Petite_caps => id([%expr `petiteCaps])
-  | `All_petite_caps => id([%expr `allPetiteCaps])
-  | `Unicase => id([%expr `unicase])
-  | `Titling_caps => id([%expr `titlingCaps])
-  | `Text => id([%expr `text])
-  | `Emoji => id([%expr `emoji])
-  | `Unicode => id([%expr `unicode])
-  | `All => id([%expr `all])
-  | `Fill_box => id([%expr `fillBox])
-  | `Stroke_box => id([%expr `strokeBox])
-  | `View_box => id([%expr `viewBox])
-  | `Smooth => id([%expr `smooth])
-  | `High_quality => id([%expr `highQuality])
-  | `Pixelated => id([%expr `pixelated])
-  | `Crisp_edges => id([%expr `crispEdges])
+  | `Groove => [%expr `groove]
+  | `Hidden => [%expr `hidden]
+  | `Inset => [%expr `inset]
+  | `Italic => [%expr `italic]
+  | `Justify => [%expr `justify]
+  | `Keep_all => [%expr `keepAll]
+  | `Left => [%expr `left]
+  | `Lighter => [%expr `lighter]
+  | `Line_Through => [%expr `lineThrough]
+  | `Lowercase => [%expr `lowercase]
+  | `MaxContent => [%expr `maxContent]
+  | `MinContent => [%expr `minContent]
+  | `None => [%expr `none]
+  | `Normal => [%expr `normal]
+  | `Nowrap => [%expr `nowrap]
+  | `Oblique => [%expr `oblique]
+  | `Outset => [%expr `outset]
+  | `Overline => [%expr `overline]
+  | `Padding_box => [%expr `paddingBox]
+  | `Pre => [%expr `pre]
+  | `Pre_line => [%expr `preLine]
+  | `Pre_wrap => [%expr `preWrap]
+  | `Preserve_3d => [%expr `preserve3d]
+  | `Repeat_x => [%expr `repeatX]
+  | `Repeat_y => [%expr `repeatY]
+  | `Ridge => [%expr `ridge]
+  | `Right => [%expr `right]
+  | `Row => [%expr `row]
+  | `Row_reverse => [%expr `rowReverse]
+  | `Scale_down => [%expr `scaleDown]
+  | `Scroll => [%expr `scroll]
+  | `Small_caps => [%expr `smallCaps]
+  | `Solid => [%expr `solid]
+  | `Space_around => [%expr `spaceAround]
+  | `Space_between => [%expr `spaceBetween]
+  | `Start => [%expr `start]
+  | `Stretch => [%expr `stretch]
+  | `Top => [%expr `top]
+  | `Transparent => [%expr `transparent]
+  | `Underline => [%expr `underline]
+  | `Unset => [%expr `unset]
+  | `Uppercase => [%expr `uppercase]
+  | `Visible => [%expr `visible]
+  | `Wavy => [%expr `wavy]
+  | `Wrap => [%expr `wrap]
+  | `Match_parent => [%expr `matchParent]
+  | `Justify_all => [%expr `justifyAll]
+  | `Wrap_reverse => [%expr `wrapReverse]
+  | `Manual => [%expr `manual]
+  | `Inter_word => [%expr `interWord]
+  | `Inter_character => [%expr `interCharacter]
+  | `Sub => [%expr `sub]
+  | `Super => [%expr `super]
+  | `All_small_caps => [%expr `allSmallCaps]
+  | `Petite_caps => [%expr `petiteCaps]
+  | `All_petite_caps => [%expr `allPetiteCaps]
+  | `Unicase => [%expr `unicase]
+  | `Titling_caps => [%expr `titlingCaps]
+  | `Text => [%expr `text]
+  | `Emoji => [%expr `emoji]
+  | `Unicode => [%expr `unicode]
+  | `All => [%expr `all]
+  | `Fill_box => [%expr `fillBox]
+  | `Stroke_box => [%expr `strokeBox]
+  | `View_box => [%expr `viewBox]
+  | `Smooth => [%expr `smooth]
+  | `High_quality => [%expr `highQuality]
+  | `Pixelated => [%expr `pixelated]
+  | `Crisp_edges => [%expr `crispEdges]
   | `FitContent => raise(Unsupported_feature)
   | `Full_width => raise(Unsupported_feature)
   | `Full_size_kana => raise(Unsupported_feature);
@@ -390,10 +388,10 @@ and render_calc_product =
 }
 and render_angle = (~loc) =>
   fun
-  | `Deg(number) => id([%expr `deg([%e render_float(~loc, number)])])
-  | `Rad(number) => id([%expr `rad([%e render_float(~loc, number)])])
-  | `Grad(number) => id([%expr `grad([%e render_float(~loc, number)])])
-  | `Turn(number) => id([%expr `turn([%e render_float(~loc, number)])])
+  | `Deg(number) => [%expr `deg([%e render_float(~loc, number)])]
+  | `Rad(number) => [%expr `rad([%e render_float(~loc, number)])]
+  | `Grad(number) => [%expr `grad([%e render_float(~loc, number)])]
+  | `Turn(number) => [%expr `turn([%e render_float(~loc, number)])]
 
 and render_extended_angle = (~loc) =>
   fun
@@ -515,10 +513,10 @@ let render_min_size = (~loc) =>
 
 let render_angle = (~loc) =>
   fun
-  | `Deg(number) => id([%expr `deg([%e render_float(~loc, number)])])
-  | `Rad(number) => id([%expr `rad([%e render_float(~loc, number)])])
-  | `Grad(number) => id([%expr `grad([%e render_float(~loc, number)])])
-  | `Turn(number) => id([%expr `turn([%e render_float(~loc, number)])]);
+  | `Deg(number) => [%expr `deg([%e render_float(~loc, number)])]
+  | `Rad(number) => [%expr `rad([%e render_float(~loc, number)])]
+  | `Grad(number) => [%expr `grad([%e render_float(~loc, number)])]
+  | `Turn(number) => [%expr `turn([%e render_float(~loc, number)])];
 
 let render_extended_angle = (~loc) =>
   fun
@@ -934,8 +932,8 @@ let render_function_rgb = (~loc, ast: Property_parser.Types.function_rgb) => {
   let alpha = Option.map(render_color_alpha(~loc), alpha);
 
   switch (alpha) {
-  | Some(a) => id([%expr `rgba(([%e red], [%e green], [%e blue], [%e a]))])
-  | None => id([%expr `rgb(([%e red], [%e green], [%e blue]))])
+  | Some(a) => [%expr `rgba(([%e red], [%e green], [%e blue], [%e a]))]
+  | None => [%expr `rgb(([%e red], [%e green], [%e blue]))]
   };
 };
 
@@ -976,8 +974,8 @@ let render_function_rgba = (~loc, ast: Property_parser.Types.function_rgba) => {
   let alpha = Option.map(render_color_alpha(~loc), alpha);
 
   switch (alpha) {
-  | Some(a) => id([%expr `rgba(([%e red], [%e green], [%e blue], [%e a]))])
-  | None => id([%expr `rgb(([%e red], [%e green], [%e blue]))])
+  | Some(a) => [%expr `rgba(([%e red], [%e green], [%e blue], [%e a]))]
+  | None => [%expr `rgb(([%e red], [%e green], [%e blue]))]
   };
 };
 
@@ -1000,11 +998,10 @@ let render_function_hsl = (~loc, (hue, saturation, lightness, alpha)) => {
   let alpha = Option.map(render_color_alpha(~loc), alpha);
 
   switch (alpha) {
-  | Some(alpha) =>
-    id(
-      [%expr `hsla(([%e hue], [%e saturation], [%e lightness], [%e alpha]))],
-    )
-  | None => id([%expr `hsl(([%e hue], [%e saturation], [%e lightness]))])
+  | Some(alpha) => [%expr
+     `hsla(([%e hue], [%e saturation], [%e lightness], [%e alpha]))
+    ]
+  | None => [%expr `hsl(([%e hue], [%e saturation], [%e lightness]))]
   };
 };
 
@@ -1027,11 +1024,10 @@ let render_function_hsla = (~loc, (hue, saturation, lightness, alpha)) => {
   let alpha = Option.map(render_color_alpha(~loc), alpha);
 
   switch (alpha) {
-  | Some(alpha) =>
-    id(
-      [%expr `hsla(([%e hue], [%e saturation], [%e lightness], [%e alpha]))],
-    )
-  | None => id([%expr `hsl(([%e hue], [%e saturation], [%e lightness]))])
+  | Some(alpha) => [%expr
+     `hsla(([%e hue], [%e saturation], [%e lightness], [%e alpha]))
+    ]
+  | None => [%expr `hsl(([%e hue], [%e saturation], [%e lightness]))]
   };
 };
 
@@ -1043,9 +1039,9 @@ let render_var = (~loc, string) => {
 let rec render_color = (~loc, value) =>
   switch ((value: Property_parser.Types.color)) {
   | `Interpolation(v) => render_variable(~loc, v)
-  | `Hex_color(hex) => id([%expr `hex([%e render_string(~loc, hex)])])
+  | `Hex_color(hex) => [%expr `hex([%e render_string(~loc, hex)])]
   | `Named_color(color) => render_named_color(~loc, color)
-  | `CurrentColor => id([%expr `currentColor])
+  | `CurrentColor => [%expr `currentColor]
   | `Function_color_mix(color_mix) =>
     render_function_color_mix(~loc, color_mix)
   | `Function_rgb(rgb) => render_function_rgb(~loc, rgb)
@@ -2568,20 +2564,20 @@ let font_style =
 /* bs-css does not support these variants */
 let render_absolute_size = (~loc, value: Property_parser.Types.absolute_size) =>
   switch (value) {
-  | `Large => id([%expr `large])
-  | `Medium => id([%expr `medium])
-  | `Small => id([%expr `small])
-  | `X_large => id([%expr `x_large])
-  | `X_small => id([%expr `x_small])
-  | `Xx_large => id([%expr `xx_large])
-  | `Xx_small => id([%expr `xx_small])
-  | `Xxx_large => id([%expr `xxx_large])
+  | `Large => [%expr `large]
+  | `Medium => [%expr `medium]
+  | `Small => [%expr `small]
+  | `X_large => [%expr `x_large]
+  | `X_small => [%expr `x_small]
+  | `Xx_large => [%expr `xx_large]
+  | `Xx_small => [%expr `xx_small]
+  | `Xxx_large => [%expr `xxx_large]
   };
 
 let render_relative_size = (~loc, value: Property_parser.Types.relative_size) =>
   switch (value) {
-  | `Larger => id([%expr `larger])
-  | `Smaller => id([%expr `smaller])
+  | `Larger => [%expr `larger]
+  | `Smaller => [%expr `smaller]
   };
 
 let render_font_size = (~loc, value: Property_parser.Types.property_font_size) =>
@@ -2935,10 +2931,11 @@ let text_shadow =
       }
   );
 
-let render_transform_functions = (~loc) =>
-  fun
+let render_transform_functions = (~loc, value) =>
+  switch (value) {
   | `Zero(_) => [%expr `zero]
-  | `Extended_angle(a) => [%expr [%e render_extended_angle(~loc, a)]];
+  | `Extended_angle(a) => [%expr [%e render_extended_angle(~loc, a)]]
+  };
 
 let render_transform = (~loc, value: Property_parser.Types.transform_function) =>
   switch (value) {

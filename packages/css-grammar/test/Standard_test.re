@@ -6,11 +6,24 @@ open Rule.Match;
 
 let check = Alcotest_extra.check;
 
+let render_angle = (x: Types.angle) => {
+  switch (x) {
+  | `Deg(x) => string_of_float(x) ++ "deg"
+  | `Grad(x) => string_of_float(x) ++ "grad"
+  | `Rad(x) => string_of_float(x) ++ "rad"
+  | `Turn(x) => string_of_float(x) ++ "turn"
+  };
+};
+
 let tests = [
   // TODO: case insensitive
   test("integer", () => {
     let parse = parse([%value "<integer>"]);
-    let unwrap = Result.map(fun | `Integer(i) => i);
+    let unwrap =
+      Result.map(
+        fun
+        | `Integer(i) => i,
+      );
     check(
       ~__POS__,
       Alcotest.result(Alcotest.int, Alcotest.string),
@@ -32,7 +45,11 @@ let tests = [
   }),
   test("<number>", () => {
     let parse = parse([%value "<number>"]);
-    let unwrap = Result.map(fun | `Number(f) => f);
+    let unwrap =
+      Result.map(
+        fun
+        | `Number(f) => f,
+      );
     check(
       ~__POS__,
       Alcotest.result(Alcotest.float(1.), Alcotest.string),
@@ -102,14 +119,6 @@ let tests = [
   }),
   test("<angle>", () => {
     let parse = parse([%value "<angle>"]);
-    let render_angle = x => {
-      switch (x) {
-      | `Deg(x) => string_of_float(x) ++ "deg"
-      | `Grad(x) => string_of_float(x) ++ "grad"
-      | `Rad(x) => string_of_float(x) ++ "rad"
-      | `Turn(x) => string_of_float(x) ++ "turn"
-      };
-    };
     let pp_length = (ppf, x) => Fmt.pf(ppf, "%S", render_angle(x));
     let angle = Alcotest.testable(pp_length, (==));
     check(
@@ -269,7 +278,11 @@ let tests = [
   }),
   test("<percentage>", () => {
     let parse = parse([%value "<percentage>"]);
-    let unwrap = Result.map(fun | `Percentage(f) => f);
+    let unwrap =
+      Result.map(
+        fun
+        | `Percentage(f) => f,
+      );
     check(
       ~__POS__,
       Alcotest.result(Alcotest.float(1.), Alcotest.string),
@@ -306,7 +319,11 @@ let tests = [
   }),
   test("<ident>", () => {
     let parse = parse([%value "<ident>"]);
-    let unwrap = Result.map(fun | `Ident(s) => s);
+    let unwrap =
+      Result.map(
+        fun
+        | `Ident(s) => s,
+      );
     let to_check = Alcotest.result(Alcotest.string, Alcotest.string);
     let expect = check(~__POS__, to_check);
     expect(parse("test") |> unwrap, Ok("test"));
@@ -367,26 +384,46 @@ let tests = [
   }),
   test("<string>", () => {
     let parse = parse([%value "<string>"]);
-    let unwrap = Result.map(fun | `String_token(s) => s);
+    let unwrap =
+      Result.map(
+        fun
+        | `String_token(s) => s,
+      );
     let to_check = Alcotest.result(Alcotest.string, Alcotest.string);
     let expect = check(~__POS__, to_check);
     expect(parse({|'tuturu'|}) |> unwrap, Ok("tuturu"));
     expect(parse({|'67.8'|}) |> unwrap, Ok("67.8"));
     expect(parse({|ident|}) |> unwrap, Error("Expected a string."));
     expect(parse({|68.9|}) |> unwrap, Error("Expected a string."));
-    expect(parse({|"this is a 'string'."|}) |> unwrap, Ok("this is a 'string'."));
+    expect(
+      parse({|"this is a 'string'."|}) |> unwrap,
+      Ok("this is a 'string'."),
+    );
     expect(parse({|""|}) |> unwrap, Ok(""));
     expect(parse({|''|}) |> unwrap, Ok(""));
     expect(parse({|" "|}) |> unwrap, Ok(" "));
     expect(parse({|'"'|}) |> unwrap, Ok("\""));
     expect(parse({|' '|}) |> unwrap, Ok(" "));
-    expect(parse({|"this is a \"string\"."|}) |> unwrap, Ok("this is a \"string\"."));
-    expect(parse({|'this is a "string".'|}) |> unwrap, Ok("this is a \"string\"."));
-    expect(parse({|'this is a \'string\'.'|}) |> unwrap, Ok("this is a \'string\'."));
+    expect(
+      parse({|"this is a \"string\"."|}) |> unwrap,
+      Ok("this is a \"string\"."),
+    );
+    expect(
+      parse({|'this is a "string".'|}) |> unwrap,
+      Ok("this is a \"string\"."),
+    );
+    expect(
+      parse({|'this is a \'string\'.'|}) |> unwrap,
+      Ok("this is a \'string\'."),
+    );
   }),
   test("<dashed-ident>", () => {
     let parse = parse([%value "<dashed-ident>"]);
-    let unwrap = Result.map(fun | `Dashed_ident(s) => s);
+    let unwrap =
+      Result.map(
+        fun
+        | `Dashed_ident(s) => s,
+      );
     let to_check = Alcotest.result(Alcotest.string, Alcotest.string);
     let expect = check(~__POS__, to_check);
     expect(parse("--random") |> unwrap, Ok("--random"));
@@ -405,7 +442,11 @@ let tests = [
   // css-color-4
   test("<hex-color>", () => {
     let parse = parse([%value "<hex-color>"]);
-    let unwrap = Result.map(fun | `Hex_color(s) => s);
+    let unwrap =
+      Result.map(
+        fun
+        | `Hex_color(s) => s,
+      );
     let to_check = Alcotest.result(Alcotest.string, Alcotest.string);
     let expect = check(~__POS__, to_check);
     expect(parse("#abc") |> unwrap, Ok("abc"));
@@ -467,7 +508,11 @@ let tests = [
   }),
   test("interpolation", () => {
     let parse = parse([%value "<interpolation>"]);
-    let unwrap = Result.map(fun | `Interpolation(lst) => lst);
+    let unwrap =
+      Result.map(
+        fun
+        | `Interpolation(lst) => lst,
+      );
     let to_check =
       Alcotest.result(Alcotest.list(Alcotest.string), Alcotest.string);
     let expect = check(~__POS__, to_check);

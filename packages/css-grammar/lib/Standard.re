@@ -375,11 +375,7 @@ let ident_token =
   );
 
 // TODO: workarounds
-let invalid =
-  token(
-    fun
-    | _ => Ok(),
-  );
+let invalid = expect(STRING("not-implemented"));
 
 let declaration_value = invalid;
 
