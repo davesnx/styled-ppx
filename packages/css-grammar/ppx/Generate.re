@@ -132,6 +132,48 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     rtag(txt(name), constructor, types);
   };
 
+  /* Helper to check if a type is a primitive wrapper */
+  let is_primitive_wrapper_type = name => {
+    switch (name) {
+    | "integer"
+    | "number"
+    | "percentage"
+    | "ident"
+    | "custom_ident"
+    | "dashed_ident"
+    | "custom_ident_without_span_or_auto"
+    | "hex_color"
+    | "interpolation"
+    | "media_type"
+    | "container_name"
+    | "ident_token"
+    | "string_token"
+    | "string" /* string is an alias to string_token */ => true
+    | _ => false
+    };
+  };
+
+  /* Helper to get the inner type of a primitive wrapper */
+  let get_primitive_inner_type = name => {
+    switch (name) {
+    | "integer" => [%type: int]
+    | "number"
+    | "percentage" => [%type: float]
+    | "interpolation" => [%type: list(string)]
+    | "ident"
+    | "custom_ident"
+    | "dashed_ident"
+    | "custom_ident_without_span_or_auto"
+    | "hex_color"
+    | "media_type"
+    | "container_name"
+    | "ident_token"
+    | "string_token"
+    | "string" /* string is an alias to string_token */ => [%type: string]
+    | _ => failwith("Not a primitive wrapper type")
+    };
+  };
+
   let apply_modifier = (modifier, type_) => {
     switch (modifier) {
     | One => type_
@@ -173,7 +215,13 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         | Keyword(_name) => (type_name, false, [])
         | Data_type(name) =>
           let name = value_name_of_css(name);
-          let params = [ptyp_constr(txt @@ Lident(name), [])];
+          /* For primitive wrappers, unwrap to get the inner type */
+          let params =
+            if (is_primitive_wrapper_type(name)) {
+              [get_primitive_inner_type(name)];
+            } else {
+              [ptyp_constr(txt @@ Lident(name), [])];
+            };
           (type_name, false, params);
         | Property_type(name) =>
           let name = property_value_name(name) |> value_name_of_css;
@@ -187,18 +235,41 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     }
 
     and terminal_op = (kind, multiplier) => {
-      let type_ =
-        switch (kind) {
-        | Delim(_)
-        | Keyword(_) => ptyp_constr(txt @@ Lident("unit"), [])
-        | Data_type(name) =>
-          let name = value_name_of_css(name);
-          ptyp_constr(txt @@ Lident(name), []);
-        | Property_type(name) =>
-          let name = property_value_name(name) |> value_name_of_css;
-          ptyp_constr(txt @@ Lident(name), []);
+      switch (kind) {
+      | Delim(_)
+      | Keyword(_) =>
+        let t = ptyp_constr(txt @@ Lident("unit"), []);
+        apply_modifier(multiplier, t);
+      | Data_type(name) =>
+        let name = value_name_of_css(name);
+        /* Unwrap primitives, applying modifiers to the inner type */
+        if (is_primitive_wrapper_type(name)) {
+          switch (multiplier) {
+          | One => get_primitive_inner_type(name)
+          | Optional =>
+            ptyp_constr(
+              txt @@ Lident("option"),
+              [get_primitive_inner_type(name)],
+            )
+          | Repeat(_)
+          | Repeat_by_comma(_, _)
+          | Zero_or_more
+          | One_or_more
+          | At_least_one =>
+            ptyp_constr(
+              txt @@ Lident("list"),
+              [get_primitive_inner_type(name)],
+            )
+          };
+        } else {
+          let t = ptyp_constr(txt @@ Lident(name), []);
+          apply_modifier(multiplier, t);
         };
-      apply_modifier(multiplier, type_);
+      | Property_type(name) =>
+        let name = property_value_name(name) |> value_name_of_css;
+        let t = ptyp_constr(txt @@ Lident(name), []);
+        apply_modifier(multiplier, t);
+      };
     }
 
     and combinator_op: (combinator, list(value)) => Parsetree.core_type =
@@ -268,43 +339,43 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     };
 
     [
-      type_("integer", [%type: int]),
-      type_("number", [%type: float]),
+      type_("integer", [%type: [ | `Integer(int)]]),
+      type_("number", [%type: [ | `Number(float)]]),
       type_(
         "length",
         [%type:
           [
-            | `Cap(number)
-            | `Ch(number)
-            | `Em(number)
-            | `Ex(number)
-            | `Ic(number)
-            | `Lh(number)
-            | `Rcap(number)
-            | `Rch(number)
-            | `Rem(number)
-            | `Rex(number)
-            | `Ric(number)
-            | `Rlh(number)
-            | `Vh(number)
-            | `Vw(number)
-            | `Vmax(number)
-            | `Vmin(number)
-            | `Vb(number)
-            | `Vi(number)
-            | `Cqw(number)
-            | `Cqh(number)
-            | `Cqi(number)
-            | `Cqb(number)
-            | `Cqmin(number)
-            | `Cqmax(number)
-            | `Px(number)
-            | `Cm(number)
-            | `Mm(number)
-            | `Q(number)
-            | `In(number)
-            | `Pc(number)
-            | `Pt(number)
+            | `Cap(float)
+            | `Ch(float)
+            | `Em(float)
+            | `Ex(float)
+            | `Ic(float)
+            | `Lh(float)
+            | `Rcap(float)
+            | `Rch(float)
+            | `Rem(float)
+            | `Rex(float)
+            | `Ric(float)
+            | `Rlh(float)
+            | `Vh(float)
+            | `Vw(float)
+            | `Vmax(float)
+            | `Vmin(float)
+            | `Vb(float)
+            | `Vi(float)
+            | `Cqw(float)
+            | `Cqh(float)
+            | `Cqi(float)
+            | `Cqb(float)
+            | `Cqmin(float)
+            | `Cqmax(float)
+            | `Px(float)
+            | `Cm(float)
+            | `Mm(float)
+            | `Q(float)
+            | `In(float)
+            | `Pc(float)
+            | `Pt(float)
             | `Zero
           ]
         ],
@@ -313,10 +384,10 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         "angle",
         [%type:
           [
-            | `Deg(number)
-            | `Grad(number)
-            | `Rad(number)
-            | `Turn(number)
+            | `Deg(float)
+            | `Grad(float)
+            | `Rad(float)
+            | `Turn(float)
           ]
         ],
       ),
@@ -348,21 +419,23 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
           ]
         ],
       ),
-      type_("percentage", [%type: float]),
-      type_("ident", [%type: string]),
-      type_("custom_ident", [%type: string]),
-      type_("dashed_ident", [%type: string]),
-      type_("custom_ident_without_span_or_auto", [%type: string]),
-      // abstract_type("string"), already represented by OCaml string type
+      type_("percentage", [%type: [ | `Percentage(float)]]),
+      type_("ident", [%type: [ | `Ident(string)]]),
+      type_("custom_ident", [%type: [ | `Custom_ident(string)]]),
+      type_("dashed_ident", [%type: [ | `Dashed_ident(string)]]),
+      type_(
+        "custom_ident_without_span_or_auto",
+        [%type: [ | `Custom_ident_without_span_or_auto(string)]],
+      ),
       type_("url_no_interp", [%type: string]),
-      type_("hex_color", [%type: string]),
-      type_("interpolation", [%type: list(string)]),
+      type_("hex_color", [%type: [ | `Hex_color(string)]]),
+      type_("interpolation", [%type: [ | `Interpolation(list(string))]]),
       type_("flex_value", [%type: [ | `Fr(float)]]),
-      type_("media_type", [%type: string]),
-      type_("container_name", [%type: string]),
-      type_("ident_token", [%type: string]),
-      type_("string_token", [%type: string]),
-      // From Parser_helper, those are `invalid` represented here as unit
+      type_("media_type", [%type: [ | `Media_type(string)]]),
+      type_("container_name", [%type: [ | `Container_name(string)]]),
+      type_("ident_token", [%type: [ | `Ident_token(string)]]),
+      type_("string_token", [%type: [ | `String_token(string)]]),
+      // From Parser_helper, those are `invalid` represented here as plain unit
       type_("function_token", [%type: unit]),
       type_("hash_token", [%type: unit]),
       type_("any_value", [%type: unit]),
@@ -417,6 +490,28 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     };
   };
 
+  let make_all_type = type_declarations => {
+    let variants =
+      List.map(
+        (decl: Parsetree.type_declaration) => {
+          let name = decl.ptype_name.txt;
+          let variant_name = String.capitalize_ascii(name);
+          switch (decl.ptype_manifest) {
+          | Some(core_type) => rtag(txt(variant_name), false, [core_type])
+          | None =>
+            rtag(
+              txt(variant_name),
+              false,
+              [ptyp_constr(txt @@ Lident(name), [])],
+            )
+          };
+        },
+        type_declarations,
+      );
+    let all_type = ptyp_variant(variants, Closed, None);
+    make_type_declaration("all", all_type);
+  };
+
   let make_types = bindings => {
     let type_declarations =
       List.map(
@@ -427,13 +522,12 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         bindings,
       );
 
+    let all_types = type_declarations @ standard_types;
+    let all_type_decl = make_all_type(all_types);
+
     let loc = List.hd(type_declarations).ptype_loc;
     let types =
-      Ast_helper.Str.type_(
-        ~loc,
-        Recursive,
-        type_declarations @ standard_types,
-      );
+      Ast_helper.Str.type_(~loc, Recursive, all_types @ [all_type_decl]);
     let types_structure = Ast_helper.Mod.structure(~loc, [types]);
     [%stri module Types = [%m types_structure]];
   };
@@ -462,6 +556,65 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     };
   };
 
+  let get_source_primitive = (binding: Parsetree.value_binding) => {
+    /* Check if this binding is a single primitive wrapper and return the source primitive name */
+    switch (binding.pvb_expr.pexp_desc) {
+    | Pexp_extension((
+        {txt: "value.rec", _},
+        PStr([
+          {
+            pstr_desc:
+              Pstr_eval(
+                {pexp_desc: Pexp_constant(Pconst_string(value, _, _)), _},
+                _,
+              ),
+            _,
+          },
+        ]),
+      )) =>
+      switch (Css_spec_parser.value_of_string(value)) {
+      | Some(Terminal(Data_type(name), One)) =>
+        let name = value_name_of_css(name);
+        if (is_primitive_wrapper_type(name)) {
+          Some(name);
+        } else {
+          None;
+        };
+      | _ => None
+      }
+    | _ => None
+    };
+  };
+
+  let add_unwrapping = (name, expression) => {
+    /* Wrap expression with unwrapping logic using Rule.Let monadic bind */
+    let tag =
+      switch (name) {
+      | "integer" => "Integer"
+      | "number" => "Number"
+      | "percentage" => "Percentage"
+      | "ident" => "Ident"
+      | "custom_ident" => "Custom_ident"
+      | "dashed_ident" => "Dashed_ident"
+      | "custom_ident_without_span_or_auto" => "Custom_ident_without_span_or_auto"
+      | "hex_color" => "Hex_color"
+      | "interpolation" => "Interpolation"
+      | "media_type" => "Media_type"
+      | "container_name" => "Container_name"
+      | "ident_token" => "Ident_token"
+      | "string_token" => "String_token"
+      | "string" => "String_token" /* string is an alias to string_token */
+      | _ => failwith("Not a primitive wrapper: " ++ name)
+      };
+
+    [@reason.preserve_braces]
+    open%expr Rule.Let;
+    let.bind_match [%p ppat_variant(tag, Some(pvar("v")))] = [%e
+      expression
+    ];
+    Rule.Match.return([%e evar("v")]);
+  };
+
   let add_types = (~loc, bindings): list(Ppxlib.structure_item) => {
     let new_bindings =
       bindings
@@ -469,8 +622,13 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
            let name = value_binding |> get_name_from_binding;
            switch (name) {
            | Some(type_name) =>
-             let new_expression =
-               add_type_to_expr(type_name, value_binding.pvb_expr);
+             let expr =
+               switch (get_source_primitive(value_binding)) {
+               | Some(source_primitive) =>
+                 add_unwrapping(source_primitive, value_binding.pvb_expr)
+               | None => value_binding.pvb_expr
+               };
+             let new_expression = add_type_to_expr(type_name, expr);
              {
                ...value_binding,
                pvb_expr: new_expression,
@@ -596,8 +754,101 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         };
       apply_modifier(modifier, rule);
     };
-    let group_op = (value, modifier) =>
-      make_value(value) |> apply_modifier(modifier);
+    let group_op = (value, modifier) => {
+      /* Check if this is a primitive that needs unwrapping */
+      let base_rule = make_value(value);
+      let with_modifier = apply_modifier(modifier, base_rule);
+
+      /* If the inner value is a simple primitive terminal, add unwrapping */
+      switch (value) {
+      | Terminal(Data_type(name), One) =>
+        let name = value_name_of_css(name);
+        if (is_primitive_wrapper_type(name)) {
+          /* Generate unwrapping code for groups containing primitives */
+          let tag =
+            switch (name) {
+            | "integer" => "Integer"
+            | "number" => "Number"
+            | "percentage" => "Percentage"
+            | "ident" => "Ident"
+            | "custom_ident" => "Custom_ident"
+            | "dashed_ident" => "Dashed_ident"
+            | "custom_ident_without_span_or_auto" => "Custom_ident_without_span_or_auto"
+            | "hex_color" => "Hex_color"
+            | "interpolation" => "Interpolation"
+            | "media_type" => "Media_type"
+            | "container_name" => "Container_name"
+            | "ident_token" => "Ident_token"
+            | "string_token" => "String_token"
+            | "string" => "String_token"
+            | _ => failwith("Unknown primitive: " ++ name)
+            };
+
+          /* Only unwrap for list/optional modifiers in groups (function call context) */
+          /* For One multiplier in groups used in combinators, don't unwrap here */
+          switch (modifier) {
+          | One => with_modifier /* Don't unwrap - will be handled by map_value if in combinator */
+          | Optional =>
+            /* Optional primitive: map option */
+            eapply(
+              evar("map"),
+              [
+                with_modifier,
+                pexp_fun(
+                  Nolabel,
+                  None,
+                  pvar("opt"),
+                  eapply(
+                    evar("Option.map"),
+                    [
+                      pexp_fun(
+                        Nolabel,
+                        None,
+                        ppat_variant(tag, Some(pvar("v"))),
+                        evar("v"),
+                      ),
+                      evar("opt"),
+                    ],
+                  ),
+                ),
+              ],
+            )
+          | Repeat(_)
+          | Repeat_by_comma(_, _)
+          | Zero_or_more
+          | One_or_more
+          | At_least_one =>
+            /* List of primitives: map list */
+            eapply(
+              evar("map"),
+              [
+                with_modifier,
+                pexp_fun(
+                  Nolabel,
+                  None,
+                  pvar("lst"),
+                  eapply(
+                    evar("List.map"),
+                    [
+                      pexp_fun(
+                        Nolabel,
+                        None,
+                        ppat_variant(tag, Some(pvar("v"))),
+                        evar("v"),
+                      ),
+                      evar("lst"),
+                    ],
+                  ),
+                ),
+              ],
+            )
+          };
+        } else {
+          with_modifier;
+        };
+      | _ => with_modifier
+      };
+    };
     let combinator_op = (kind, values) => {
       let apply = (fn, args) => {
         let args = elist(args);
@@ -610,10 +861,116 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         | And => evar("Combinators.and_")
         | Or => evar("Combinators.or_");
 
-      let map_value = (content, (name, value)) => {
-        let variant = pexp_variant(name, content ? Some(evar("v")) : None);
-        let map_fn =
-          pexp_fun(Nolabel, None, pvar(content ? "v" : "_v"), variant);
+      let map_value = (content, should_unwrap, (name, value)) => {
+        /* Check if this value is a primitive that needs unwrapping */
+        let (pattern, expr) =
+          switch (value) {
+          | Terminal(Data_type(data_name), multiplier) =>
+            let data_name = value_name_of_css(data_name);
+            /* Only unwrap primitives in Xor context or in And/Static/Or with One multiplier */
+            if (is_primitive_wrapper_type(data_name)
+                && content
+                && should_unwrap) {
+              /* Unwrap the primitive variant */
+              let make_unwrap_pattern = tag => {
+                switch (multiplier) {
+                | One => ppat_variant(tag, Some(pvar("v")))
+                | Optional =>
+                  /* For optional primitives, match both Some and None cases */
+                  pvar("opt_v")
+                | Repeat(_)
+                | Repeat_by_comma(_, _)
+                | Zero_or_more
+                | One_or_more
+                | At_least_one =>
+                  /* For lists of primitives, need to unwrap each element */
+                  pvar("list_v")
+                };
+              };
+              let make_unwrap_expr = tag => {
+                switch (multiplier) {
+                | One => evar("v")
+                | Optional =>
+                  /* Unwrap the optional primitive */
+                  pexp_match(
+                    evar("opt_v"),
+                    [
+                      case(
+                        ~lhs=ppat_construct(txt(Lident("None")), None),
+                        ~rhs=pexp_construct(txt(Lident("None")), None),
+                        ~guard=None,
+                      ),
+                      case(
+                        ~lhs=
+                          ppat_construct(
+                            txt(Lident("Some")),
+                            Some(ppat_variant(tag, Some(pvar("inner_v")))),
+                          ),
+                        ~rhs=
+                          pexp_construct(
+                            txt(Lident("Some")),
+                            Some(evar("inner_v")),
+                          ),
+                        ~guard=None,
+                      ),
+                    ],
+                  )
+                | Repeat(_)
+                | Repeat_by_comma(_, _)
+                | Zero_or_more
+                | One_or_more
+                | At_least_one =>
+                  /* Unwrap each element in the list */
+                  eapply(
+                    evar("List.map"),
+                    [
+                      pexp_fun(
+                        Nolabel,
+                        None,
+                        ppat_variant(tag, Some(pvar("item_v"))),
+                        evar("item_v"),
+                      ),
+                      evar("list_v"),
+                    ],
+                  )
+                };
+              };
+
+              let tag =
+                switch (data_name) {
+                | "integer" => "Integer"
+                | "number" => "Number"
+                | "percentage" => "Percentage"
+                | "ident" => "Ident"
+                | "custom_ident" => "Custom_ident"
+                | "dashed_ident" => "Dashed_ident"
+                | "custom_ident_without_span_or_auto" => "Custom_ident_without_span_or_auto"
+                | "hex_color" => "Hex_color"
+                | "interpolation" => "Interpolation"
+                | "media_type" => "Media_type"
+                | "container_name" => "Container_name"
+                | "ident_token" => "Ident_token"
+                | "string_token" => "String_token"
+                | "string" => "String_token" /* string is an alias */
+                | _ => failwith("Unknown primitive wrapper: " ++ data_name)
+                };
+
+              let inner_pattern = make_unwrap_pattern(tag);
+              let inner_expr = make_unwrap_expr(tag);
+              let variant = pexp_variant(name, Some(inner_expr));
+              (inner_pattern, variant);
+            } else {
+              let variant =
+                pexp_variant(name, content ? Some(evar("v")) : None);
+              (pvar(content ? "v" : "_v"), variant);
+            };
+          | _ =>
+            let variant =
+              pexp_variant(name, content ? Some(evar("v")) : None);
+            (pvar(content ? "v" : "_v"), variant);
+          };
+
+        let map_fn = pexp_fun(Nolabel, None, pattern, expr);
         eapply(evar("map"), [make_value(value), map_fn]);
       };
 
@@ -628,14 +985,16 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
                  | Terminal(Keyword(_), _) => false
                  | _ => true
                  };
-               map_value(has_content, pair);
+               /* Unwrap primitives in Xor */
+               map_value(has_content, true, pair);
              });
         apply(op_ident(kind), args);
       | _ =>
         let combinator_args =
           values
           |> List.mapi((index, v) => ("V" ++ string_of_int(index), v))
-          |> List.map(map_value(true));
+          /* Unwrap primitives in Static/And/Or runtime code */
+          |> List.map(map_value(true, true));
         let combinator = apply(op_ident(kind), combinator_args);
         let (args, body) =
           values
@@ -692,7 +1051,50 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       };
     };
     let function_call = (name, value) => {
-      eapply(evar("function_call"), [estring(name), make_value(value)]);
+      /* Check if the function argument is a simple primitive that needs unwrapping */
+      let arg_expr =
+        switch (value) {
+        | Terminal(Data_type(data_name), One) =>
+          let data_name = value_name_of_css(data_name);
+          if (is_primitive_wrapper_type(data_name)) {
+            /* Unwrap the primitive argument */
+            let tag =
+              switch (data_name) {
+              | "integer" => "Integer"
+              | "number" => "Number"
+              | "percentage" => "Percentage"
+              | "ident" => "Ident"
+              | "custom_ident" => "Custom_ident"
+              | "dashed_ident" => "Dashed_ident"
+              | "custom_ident_without_span_or_auto" => "Custom_ident_without_span_or_auto"
+              | "hex_color" => "Hex_color"
+              | "interpolation" => "Interpolation"
+              | "media_type" => "Media_type"
+              | "container_name" => "Container_name"
+              | "ident_token" => "Ident_token"
+              | "string_token" => "String_token"
+              | "string" => "String_token"
+              | _ => failwith("Unknown primitive: " ++ data_name)
+              };
+            eapply(
+              evar("map"),
+              [
+                make_value(value),
+                pexp_fun(
+                  Nolabel,
+                  None,
+                  ppat_variant(tag, Some(pvar("v"))),
+                  evar("v"),
+                ),
+              ],
+            );
+          } else {
+            make_value(value);
+          };
+        | _ => make_value(value)
+        };
+
+      eapply(evar("function_call"), [estring(name), arg_expr]);
     };
 
     switch (value) {

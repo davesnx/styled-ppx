@@ -769,6 +769,38 @@ let property_to_module = property_name => {
   /* Unicode range */
   | "unicode-range" => Some("UnicodeRange")
 
+  /* Modern CSS Properties */
+  | "accent-color" => Some("AccentColor")
+  | "overlay" => Some("Overlay")
+  | "text-wrap" => Some("TextWrap")
+  | "field-sizing" => Some("FieldSizing")
+  | "interpolate-size" => Some("InterpolateSize")
+  | "reading-flow" => Some("ReadingFlow")
+  | "text-spacing-trim" => Some("TextSpacingTrim")
+  | "white-space-collapse" => Some("WhiteSpaceCollapse")
+  | "math-depth" => Some("MathDepth")
+  | "math-shift" => Some("MathShift")
+  | "math-style" => Some("MathStyle")
+  | "text-wrap-mode" => Some("TextWrapMode")
+  | "text-wrap-style" => Some("TextWrapStyle")
+
+  /* SVG geometry properties */
+  | "cx" => Some("Length")
+  | "cy" => Some("Length")
+  | "r" => Some("Length")
+  | "rx" => Some("Length")
+  | "ry" => Some("Length")
+  | "x" => Some("Length")
+  | "y" => Some("Length")
+  | "d" => Some("SVGPath")
+
+  /* SVG paint server properties */
+  | "stop-color" => Some("Color")
+  | "stop-opacity" => Some("AlphaValue")
+  | "flood-color" => Some("Color")
+  | "flood-opacity" => Some("AlphaValue")
+  | "lighting-color" => Some("Color")
+
   /* Mask properties */
   | "mask" => Some("Mask")
   | "mask-border" => Some("MaskBorder")

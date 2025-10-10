@@ -14,8 +14,6 @@ let txt = txt => {
 
 let (let.ok) = Result.bind;
 
-let id = Fun.id;
-
 let render_string = string =>
   Helper.Const.string(string) |> Helper.Exp.constant;
 
@@ -46,66 +44,6 @@ let emit = (property, value_of_ast, value_to_expr) => {
   };
 };
 
-let variants_to_string =
-  fun
-  | `Row => id([%expr "row"])
-  | `Row_reverse => id([%expr "row-reverse"])
-  | `Column => id([%expr "column"])
-  | `Column_reverse => id([%expr "column-reverse"])
-  | `Nowrap => id([%expr "nowrap"])
-  | `Wrap => id([%expr "wrap"])
-  | `Wrap_reverse => id([%expr "wrap-reverse"])
-  | `Content => id([%expr "content"])
-  | `Flex_start => id([%expr "flex-start"])
-  | `Flex_end => id([%expr "flex-end"])
-  | `Center => id([%expr "center"])
-  | `Space_between => id([%expr "space-between"])
-  | `Space_around => id([%expr "space-around"])
-  | `Baseline => id([%expr "baseline"])
-  | `Stretch => id([%expr "strecth"])
-  | `Auto => id([%expr "auto"])
-  | `None => id([%expr "none"])
-  | `Content_box => id([%expr "content-box"])
-  | `Border_box => id([%expr "border-box"])
-  | `Clip => id([%expr "clip"])
-  | `Hidden => id([%expr "hidden"])
-  | `Visible => id([%expr "visible"])
-  | `Scroll => id([%expr "scroll"])
-  | `Ellipsis => id([%expr "ellipsis"])
-  | `Capitalize => id([%expr "capitalize"])
-  | `Lowercase => id([%expr "lowercase"])
-  | `Uppercase => id([%expr "uppercase"])
-  | `Break_spaces => id([%expr "break-spaces"])
-  | `Normal => id([%expr "normal"])
-  | `Break_all => id([%expr "break-all"])
-  | `Break_word => id([%expr "break-word"])
-  | `Keep_all => id([%expr "keep-all"])
-  | `Anywhere => id([%expr "anywhere"])
-  | `BreakWord => id([%expr "breakword"])
-  | `End => id([%expr "end"])
-  | `Justify => id([%expr "justify"])
-  | `Left => id([%expr "left"])
-  | `Match_parent => id([%expr "match-parent"])
-  | `Right => id([%expr "right"])
-  | `Start => id([%expr "start"])
-  | `Transparent => id([%expr "transparent"])
-  | `Bottom => id([%expr "bottom"])
-  | `Top => id([%expr "top"])
-  | `Fill => id([%expr "fill"])
-  | `Dotted => id([%expr "dotted"])
-  | `Dashed => id([%expr "dashlet"])
-  | `Solid => id([%expr "solid"])
-  | `Double => id([%expr "double"])
-  | `Groove => id([%expr "groove"])
-  | `Ridge => id([%expr "ridge"])
-  | `Inset => id([%expr "inset"])
-  | `Outset => id([%expr "outset"])
-  | `Contain => id([%expr "contain"])
-  | `Scale_down => id([%expr "scale-down"])
-  | `Cover => id([%expr "cover"])
-  | `Full_width => [%expr "full-width"]
-  | `Unset => id([%expr "unset"])
-  | `Full_size_kana => id([%expr "full-size-kana"]);
 let render_number = (number, unit) =>
   string_of_int(Float.to_int(number)) ++ unit |> render_string;
 let render_percentage = percentage =>
@@ -274,7 +212,7 @@ let render_length_percentage =
 
 let render_size =
   fun
-  | `Auto => variants_to_string(`Auto)
+  | `Auto => [%expr "auto"]
   | `Extended_length(_) as lp
   | `Extended_percentage(_) as lp => render_length_percentage(lp)
   | `Max_content => [%expr "max-content"]
@@ -293,14 +231,13 @@ let found = ({ast_of_string, string_to_expr, _}) => {
 let transform_with_variable = (parser, mapper, value_to_expr) =>
   emit(
     Combinators.xor([
-      /* If the CSS value is an interpolation, we treat as one `
-         ariable */
-      Rule.Match.map(Standard.interpolation, data => `Variable(data)),
+      /* If the CSS value is an interpolation */
+      Rule.Match.map(Standard.interpolation, data => data),
       /* Otherwise it's a regular CSS `Value */
       Rule.Match.map(parser, data => `Value(data)),
     ]),
     fun
-    | `Variable(name) => render_variable(name)
+    | `Interpolation(name) => render_variable(name)
     | `Value(ast) => mapper(ast),
     value_to_expr,
   );

@@ -1480,6 +1480,9 @@ and property_font_family = [%value.rec "<font_families> | <interpolation>"]
 and property_font_feature_settings =
   [%value.rec "'normal' | [ <feature-tag-value> ]#"]
 
+and property_font_display =
+  [%value.rec "'auto' | 'block' | 'swap' | 'fallback' | 'optional'"]
+
 and property_font_kerning = [%value.rec "'auto' | 'normal' | 'none'"]
 and property_font_language_override = [%value.rec "'normal' | <string>"]
 and property_font_optical_sizing = [%value.rec "'auto' | 'none'"]
@@ -2425,6 +2428,227 @@ and property_nav_down = [%value.rec "'auto' | <integer> | <interpolation>"]
 and property_nav_left = [%value.rec "'auto' | <integer> | <interpolation>"]
 and property_nav_right = [%value.rec "'auto' | <integer> | <interpolation>"]
 and property_nav_up = [%value.rec "'auto' | <integer> | <interpolation>"]
+and property_accent_color = [%value.rec "'auto' | <color>"]
+
+and property_animation_composition =
+  [%value.rec "[ 'replace' | 'add' | 'accumulate' ]#"]
+
+and property_animation_range =
+  [%value.rec "[ 'normal' | <extended-length> | <extended-percentage> ]{1,2}"]
+
+and property_animation_range_end =
+  [%value.rec "'normal' | <extended-length> | <extended-percentage>"]
+
+and property_animation_range_start =
+  [%value.rec "'normal' | <extended-length> | <extended-percentage>"]
+
+and property_animation_timeline = [%value.rec "[ 'none' | <custom-ident> ]#"]
+and property_field_sizing = [%value.rec "'content' | 'fixed'"]
+and property_interpolate_size = [%value.rec "'numeric-only' | 'allow-keywords'"]
+and property_media_type = [%value.rec "<ident>"]
+and property_overlay = [%value.rec "'none' | 'auto'"]
+
+and property_scroll_timeline =
+  [%value.rec
+    "[ 'none' | <custom-ident> ]# [ 'block' | 'inline' | 'x' | 'y' ]#"]
+
+and property_scroll_timeline_axis =
+  [%value.rec "[ 'block' | 'inline' | 'x' | 'y' ]#"]
+
+and property_scroll_timeline_name = [%value.rec "[ 'none' | <custom-ident> ]#"]
+
+and property_text_wrap =
+  [%value.rec "'wrap' | 'nowrap' | 'balance' | 'stable' | 'pretty'"]
+
+and property_view_timeline =
+  [%value.rec
+    "[ 'none' | <custom-ident> ]# [ 'block' | 'inline' | 'x' | 'y' ]#"]
+
+and property_view_timeline_axis =
+  [%value.rec "[ 'block' | 'inline' | 'x' | 'y' ]#"]
+
+and property_view_timeline_inset =
+  [%value.rec "[ 'auto' | <extended-length> | <extended-percentage> ]{1,2}"]
+
+and property_view_timeline_name = [%value.rec "[ 'none' | <custom-ident> ]#"]
+and property_view_transition_name = [%value.rec "'none' | <custom-ident>"]
+and property_anchor_name = [%value.rec "'none' | [ <dashed-ident> ]#"]
+and property_anchor_scope = [%value.rec "'none' | 'all' | [ <dashed-ident> ]#"]
+and property_position_anchor = [%value.rec "'auto' | <dashed-ident>"]
+
+and property_position_area =
+  [%value.rec
+    "'none' | [ 'top' | 'bottom' | 'left' | 'right' | 'center' | 'self-start' \
+     | 'self-end' | 'start' | 'end' ]"]
+
+and property_position_try =
+  [%value.rec "'none' | [ <dashed-ident> | <try-tactic> ]#"]
+
+and property_position_try_fallbacks =
+  [%value.rec "'none' | [ <dashed-ident> | <try-tactic> ]#"]
+
+and property_position_try_options =
+  [%value.rec "'none' | [ 'flip-block' || 'flip-inline' || 'flip-start' ]"]
+
+and property_position_visibility =
+  [%value.rec "'always' | 'anchors-valid' | 'anchors-visible' | 'no-overflow'"]
+
+and property_inset_area =
+  [%value.rec
+    "'none' | [ 'top' | 'bottom' | 'left' | 'right' | 'center' | 'self-start' \
+     | 'self-end' | 'start' | 'end' ]{1,2}"]
+
+and property_scroll_start =
+  [%value.rec
+    "'auto' | 'start' | 'end' | 'center' | 'top' | 'bottom' | 'left' | 'right' \
+     | <extended-length> | <extended-percentage>"]
+
+and property_scroll_start_block =
+  [%value.rec
+    "'auto' | 'start' | 'end' | 'center' | <extended-length> | \
+     <extended-percentage>"]
+
+and property_scroll_start_inline =
+  [%value.rec
+    "'auto' | 'start' | 'end' | 'center' | <extended-length> | \
+     <extended-percentage>"]
+
+and property_scroll_start_x =
+  [%value.rec
+    "'auto' | 'start' | 'end' | 'center' | <extended-length> | \
+     <extended-percentage>"]
+
+and property_scroll_start_y =
+  [%value.rec
+    "'auto' | 'start' | 'end' | 'center' | <extended-length> | \
+     <extended-percentage>"]
+
+and property_scroll_start_target = [%value.rec "'none' | 'auto'"]
+and property_scroll_start_target_block = [%value.rec "'none' | 'auto'"]
+and property_scroll_start_target_inline = [%value.rec "'none' | 'auto'"]
+and property_scroll_start_target_x = [%value.rec "'none' | 'auto'"]
+and property_scroll_start_target_y = [%value.rec "'none' | 'auto'"]
+
+and property_text_spacing_trim =
+  [%value.rec "'normal' | 'space-all' | 'space-first' | 'trim-start'"]
+
+and property_word_space_transform =
+  [%value.rec "'none' | 'auto' | 'ideograph-alpha' | 'ideograph-numeric'"]
+
+and property_reading_flow =
+  [%value.rec
+    "'normal' | 'flex-visual' | 'flex-flow' | 'grid-rows' | 'grid-columns' | \
+     'grid-order'"]
+
+and property_math_depth =
+  [%value.rec "'auto-add' | 'add(' <integer> ')' | <integer>"]
+
+and property_math_shift = [%value.rec "'normal' | 'compact'"]
+and property_math_style = [%value.rec "'normal' | 'compact'"]
+and property_text_wrap_mode = [%value.rec "'wrap' | 'nowrap'"]
+
+and property_text_wrap_style =
+  [%value.rec "'auto' | 'balance' | 'stable' | 'pretty'"]
+
+and property_white_space_collapse =
+  [%value.rec
+    "'collapse' | 'preserve' | 'preserve-breaks' | 'preserve-spaces' | \
+     'break-spaces'"]
+
+and property_text_box_trim =
+  [%value.rec "'none' | 'trim-start' | 'trim-end' | 'trim-both'"]
+
+and property_text_box_edge =
+  [%value.rec "'leading' | 'text' | 'cap' | 'ex' | 'alphabetic'"]
+
+(* Print and paged media properties *)
+and property_page = [%value.rec "'auto' | <custom-ident>"]
+
+and property_size =
+  [%value.rec
+    "<extended-length>{1,2} | 'auto' | [ 'A5' | 'A4' | 'A3' | 'B5' | 'B4' | \
+     'JIS-B5' | 'JIS-B4' | 'letter' | 'legal' | 'ledger' ] [ 'portrait' | \
+     'landscape' ]?"]
+
+and property_marks = [%value.rec "'none' | 'crop' || 'cross'"]
+and property_bleed = [%value.rec "'auto' | <extended-length>"]
+
+(* More modern layout and effect properties *)
+and property_backdrop_blur = [%value.rec "<extended-length>"]
+and property_scrollbar_color_legacy = [%value.rec "<color>"]
+
+(* SVG paint server properties *)
+and property_stop_color = [%value.rec "<color>"]
+and property_stop_opacity = [%value.rec "<alpha-value>"]
+and property_flood_color = [%value.rec "<color>"]
+and property_flood_opacity = [%value.rec "<alpha-value>"]
+and property_lighting_color = [%value.rec "<color>"]
+
+and property_color_rendering =
+  [%value.rec "'auto' | 'optimizeSpeed' | 'optimizeQuality'"]
+
+and property_vector_effect = [%value.rec "'none' | 'non-scaling-stroke'"]
+
+(* SVG geometry properties *)
+and property_cx = [%value.rec "<extended-length> | <extended-percentage>"]
+and property_cy = [%value.rec "<extended-length> | <extended-percentage>"]
+and property_d = [%value.rec "'none' | <string>"]
+and property_r = [%value.rec "<extended-length> | <extended-percentage>"]
+
+and property_rx =
+  [%value.rec "'auto' | <extended-length> | <extended-percentage>"]
+
+and property_ry =
+  [%value.rec "'auto' | <extended-length> | <extended-percentage>"]
+
+and property_x = [%value.rec "<extended-length> | <extended-percentage>"]
+and property_y = [%value.rec "<extended-length> | <extended-percentage>"]
+
+(* Contain intrinsic sizing *)
+and property_contain_intrinsic_size =
+  [%value.rec "'none' | [ 'auto' ]? <extended-length>{1,2}"]
+
+and property_contain_intrinsic_width =
+  [%value.rec "'none' | 'auto' <extended-length> | <extended-length>"]
+
+and property_contain_intrinsic_height =
+  [%value.rec "'none' | 'auto' <extended-length> | <extended-length>"]
+
+and property_contain_intrinsic_block_size =
+  [%value.rec "'none' | 'auto' <extended-length> | <extended-length>"]
+
+and property_contain_intrinsic_inline_size =
+  [%value.rec "'none' | 'auto' <extended-length> | <extended-length>"]
+
+(* Print *)
+and property_print_color_adjust = [%value.rec "'economy' | 'exact'"]
+
+(* Ruby *)
+and property_ruby_overhang = [%value.rec "'auto' | 'none'"]
+
+(* Timeline scope *)
+and property_timeline_scope =
+  [%value.rec "[ 'none' | <custom-ident> | <dashed-ident> ]#"]
+
+(* Scroll driven animations *)
+and property_animation_delay_end = [%value.rec "[ <extended-time> ]#"]
+and property_animation_delay_start = [%value.rec "[ <extended-time> ]#"]
+
+(* Custom properties for at-rules *)
+and property_syntax = [%value.rec "<string>"]
+and property_inherits = [%value.rec "'true' | 'false'"]
+and property_initial_value = [%value.rec "<string>"]
+
+(* Additional modern properties *)
+and property_scroll_marker_group = [%value.rec "'none' | 'before' | 'after'"]
+
+and property_container_name_computed =
+  [%value.rec "'none' | [ <custom-ident> ]#"]
+
+and property_text_edge = [%value.rec "[ 'leading' | <'text-box-edge'> ]{1,2}"]
+
+and property_hyphenate_limit_last =
+  [%value.rec "'none' | 'always' | 'column' | 'page' | 'spread'"]
 
 and pseudo_class_selector =
   [%value.rec "':' <ident-token> | ':' <function-token> <any-value> ')'"]
@@ -2640,6 +2864,7 @@ and timing_function_no_interp =
     "'linear' | <cubic-bezier-timing-function> | <step-timing-function>"]
 
 and top = [%value.rec "<extended-length> | 'auto'"]
+and try_tactic = [%value.rec "'flip-block' | 'flip-inline' | 'flip-start'"]
 
 and track_breadth =
   [%value.rec
@@ -2836,128 +3061,26 @@ let fn (type a) (name : string) (rule : a Rule.rule) : (module RULE) =
     let name = Function name
   end)
 
+(* type all = [
+  | Types._legacy_gradient
+  | Types._legacy_linear_gradient
+  | Types._legacy_linear_gradient_arguments
+  | Types._legacy_radial_gradient
+  | Types._legacy_radial_gradient_arguments
+  | Types._legacy_radial_gradient_shape
+  | Types._legacy_radial_gradient_size
+  | Types._legacy_repeating_linear_gradient
+  | Types._legacy_repeating_radial_gradient
+  | Types._non_standard_color
+  | Types._non_standard_font
+  | Types._non_standard_image_rendering
+  | Types._non_standard_overflow
+  | Types._non_standard_width
+  | Types._webkit_gradient_color_stop
+] *)
+
 let packed_rules : (module RULE) list =
   [
-    value "-legacy-gradient" _legacy_gradient;
-    value "-legacy-linear-gradient" _legacy_linear_gradient;
-    value "-legacy-linear-gradient-arguments" _legacy_linear_gradient_arguments;
-    value "-legacy-radial-gradient" _legacy_radial_gradient;
-    value "-legacy-radial-gradient-arguments" _legacy_radial_gradient_arguments;
-    value "-legacy-radial-gradient-shape" _legacy_radial_gradient_shape;
-    value "-legacy-radial-gradient-size" _legacy_radial_gradient_size;
-    value "-legacy-repeating-linear-gradient" _legacy_repeating_linear_gradient;
-    value "-legacy-repeating-radial-gradient" _legacy_repeating_radial_gradient;
-    value "-non-standard-color" _non_standard_color;
-    value "-non-standard-font" _non_standard_font;
-    value "-non-standard-image-rendering" _non_standard_image_rendering;
-    value "-non-standard-overflow" _non_standard_overflow;
-    value "-non-standard-width" _non_standard_width;
-    value "-webkit-gradient-color-stop" _webkit_gradient_color_stop;
-    value "-webkit-gradient-point" _webkit_gradient_point;
-    value "-webkit-gradient-radius" _webkit_gradient_radius;
-    value "-webkit-gradient-type" _webkit_gradient_type;
-    value "-webkit-mask-box-repeat" _webkit_mask_box_repeat;
-    value "-webkit-mask-clip-style" _webkit_mask_clip_style;
-    value "absolute-size" absolute_size;
-    value "attr-name" attr_name;
-    value "attr-type" attr_type;
-    value "attr-unit" attr_unit;
-    value "syntax" syntax;
-    value "syntax-combinator" syntax_combinator;
-    value "syntax-component" syntax_component;
-    value "syntax-multiplier" syntax_multiplier;
-    value "syntax-single-component" syntax_single_component;
-    value "syntax-string" syntax_string;
-    value "syntax-type-name" syntax_type_name;
-    value "age" age;
-    value "alpha-value" alpha_value;
-    value "angular-color-hint" angular_color_hint;
-    value "angular-color-stop" angular_color_stop;
-    value "angular-color-stop-list" angular_color_stop_list;
-    value "hue-interpolation-method" hue_interpolation_method;
-    value "polar-color-space" polar_color_space;
-    value "rectangular-color-space" rectangular_color_space;
-    value "color-interpolation-method" color_interpolation_method;
-    value "animateable-feature" animateable_feature;
-    value "attachment" attachment;
-    value "attr-fallback" attr_fallback;
-    value "attr-matcher" attr_matcher;
-    value "attr-modifier" attr_modifier;
-    value "attr-name" attr_name;
-    value "attribute-selector" attribute_selector;
-    value "auto-repeat" auto_repeat;
-    value "auto-track-list" auto_track_list;
-    value "baseline-position" baseline_position;
-    value "basic-shape" basic_shape;
-    value "bg-image" bg_image;
-    value "bg-layer" bg_layer;
-    value "bg-position" bg_position;
-    value "bg-size" bg_size;
-    value "blend-mode" blend_mode;
-    value "border-radius" border_radius;
-    value "bottom" bottom;
-    value "box" box;
-    value "calc-product" calc_product;
-    value "calc-sum" calc_sum;
-    value "calc-value" calc_value;
-    value "cf-final-image" cf_final_image;
-    value "cf-mixing-image" cf_mixing_image;
-    value "class-selector" class_selector;
-    value "clip-source" clip_source;
-    value "color" color;
-    value "color-stop" color_stop;
-    value "color-stop-angle" color_stop_angle;
-    value "color-stop-length" color_stop_length;
-    value "color-stop-list" color_stop_list;
-    value "combinator" combinator;
-    value "common-lig-values" common_lig_values;
-    value "compat-auto" compat_auto;
-    value "complex-selector" complex_selector;
-    value "complex-selector-list" complex_selector_list;
-    value "composite-style" composite_style;
-    value "compositing-operator" compositing_operator;
-    value "compound-selector" compound_selector;
-    value "compound-selector-list" compound_selector_list;
-    value "content-distribution" content_distribution;
-    value "content-list" content_list;
-    value "content-position" content_position;
-    value "content-replacement" content_replacement;
-    value "contextual-alt-values" contextual_alt_values;
-    value "counter-style" counter_style;
-    value "counter-style-name" counter_style_name;
-    value "cubic-bezier-timing-function" cubic_bezier_timing_function;
-    value "declaration" declaration;
-    value "declaration-list" declaration_list;
-    value "deprecated-system-color" deprecated_system_color;
-    value "discretionary-lig-values" discretionary_lig_values;
-    value "display-box" display_box;
-    value "display-inside" display_inside;
-    value "display-internal" display_internal;
-    value "display-legacy" display_legacy;
-    value "display-listitem" display_listitem;
-    value "display-outside" display_outside;
-    value "east-asian-variant-values" east_asian_variant_values;
-    value "east-asian-width-values" east_asian_width_values;
-    value "ending-shape" ending_shape;
-    value "explicit-track-list" explicit_track_list;
-    value "family-name" family_name;
-    value "feature-tag-value" feature_tag_value;
-    value "feature-type" feature_type;
-    value "feature-value-block" feature_value_block;
-    value "feature-value-block-list" feature_value_block_list;
-    value "feature-value-declaration" feature_value_declaration;
-    value "feature-value-declaration-list" feature_value_declaration_list;
-    value "feature-value-name" feature_value_name;
-    value "fill-rule" fill_rule;
-    value "filter-function" filter_function;
-    value "filter-function-list" filter_function_list;
-    value "final-bg-layer" final_bg_layer;
-    value "fixed-breadth" fixed_breadth;
-    value "fixed-repeat" fixed_repeat;
-    value "fixed-size" fixed_size;
-    value "font-stretch-absolute" font_stretch_absolute;
-    value "font-variant-css21" font_variant_css21;
-    value "font-weight-absolute" font_weight_absolute;
     fn "-webkit-gradient" function__webkit_gradient;
     fn "attr" function_attr;
     fn "blur" function_blur;
@@ -2979,8 +3102,8 @@ let packed_rules : (module RULE) list =
     fn "hsl" function_hsl;
     fn "hsla" function_hsla;
     fn "hue-rotate" function_hue_rotate;
-    fn "image" function_image;
     fn "image-set" function_image_set;
+    fn "image" function_image;
     fn "inset" function_inset;
     fn "invert" function_invert;
     fn "leader" function_leader;
@@ -3025,76 +3148,17 @@ let packed_rules : (module RULE) list =
     fn "translateY" function_translateY;
     fn "translateZ" function_translateZ;
     fn "var" function_var;
-    value "gender" gender;
-    value "general-enclosed" general_enclosed;
-    value "generic-family" generic_family;
-    value "generic-name" generic_name;
-    value "generic-voice" generic_voice;
-    value "geometry-box" geometry_box;
-    value "gradient" gradient;
-    value "grid-line" grid_line;
-    value "historical-lig-values" historical_lig_values;
-    value "hue" hue;
-    value "id-selector" id_selector;
-    value "image" image;
-    value "image-set-option" image_set_option;
-    value "image-src" image_src;
-    value "image-tags" image_tags;
-    value "inflexible-breadth" inflexible_breadth;
-    value "keyframe-block" keyframe_block;
-    value "keyframe-block-list" keyframe_block_list;
-    value "keyframe-selector" keyframe_selector;
-    value "keyframes-name" keyframes_name;
-    value "leader-type" leader_type;
-    value "left" left;
-    value "line-name-list" line_name_list;
-    value "line-names" line_names;
-    value "line-style" line_style;
-    value "line-width" line_width;
-    value "linear-color-hint" linear_color_hint;
-    value "linear-color-stop" linear_color_stop;
-    value "mask-image" mask_image;
-    value "mask-layer" mask_layer;
-    value "mask-position" mask_position;
-    value "mask-reference" mask_reference;
-    value "mask-source" mask_source;
-    value "masking-mode" masking_mode;
     mq "and" media_and;
-    mq "condition" media_condition;
     mq "condition-without-or" media_condition_without_or;
+    mq "condition" media_condition;
     mq "feature" media_feature;
     mq "in-parens" media_in_parens;
     mq "not" media_not;
     mq "or" media_or;
-    mq "query" media_query;
     mq "query-list" media_query_list;
+    mq "query" media_query;
     mq "type" media_type;
-    value "mf-boolean" mf_boolean;
-    value "mf-name" mf_name;
-    value "mf-plain" mf_plain;
-    value "mf-range" mf_range;
-    value "mf-value" mf_value;
-    value "name-repeat" name_repeat;
-    value "named-color" named_color;
-    value "namespace-prefix" namespace_prefix;
-    value "ns-prefix" ns_prefix;
-    value "nth" nth;
-    value "number-one-or-greater" number_one_or_greater;
-    value "number-percentage" number_percentage;
-    value "alpha-value" number_zero_one;
-    value "numeric-figure-values" numeric_figure_values;
-    value "numeric-fraction-values" numeric_fraction_values;
-    value "numeric-spacing-values" numeric_spacing_values;
-    value "outline-radius" outline_radius;
-    value "overflow-position" overflow_position;
-    value "page-body" page_body;
-    value "page-margin-box" page_margin_box;
-    value "page-margin-box-type" page_margin_box_type;
-    value "page-selector" page_selector;
-    value "page-selector-list" page_selector_list;
-    value "paint" paint;
-    value "position" position;
-    value "positive-integer" positive_integer;
+    mq "type" property_media_type;
     prop "-moz-appearance" property__moz_appearance;
     prop "-moz-background-clip" property__moz_background_clip;
     prop "-moz-binding" property__moz_binding;
@@ -3115,13 +3179,13 @@ let packed_rules : (module RULE) list =
     prop "-moz-image-region" property__moz_image_region;
     prop "-moz-orient" property__moz_orient;
     prop "-moz-osx-font-smoothing" property__moz_osx_font_smoothing;
-    prop "-moz-outline-radius" property__moz_outline_radius;
     prop "-moz-outline-radius-bottomleft"
       property__moz_outline_radius_bottomleft;
     prop "-moz-outline-radius-bottomright"
       property__moz_outline_radius_bottomright;
     prop "-moz-outline-radius-topleft" property__moz_outline_radius_topleft;
     prop "-moz-outline-radius-topright" property__moz_outline_radius_topright;
+    prop "-moz-outline-radius" property__moz_outline_radius;
     prop "-moz-stack-sizing" property__moz_stack_sizing;
     prop "-moz-text-blink" property__moz_text_blink;
     prop "-moz-user-focus" property__moz_user_focus;
@@ -3132,50 +3196,55 @@ let packed_rules : (module RULE) list =
     prop "-moz-window-shadow" property__moz_window_shadow;
     prop "-webkit-appearance" property__webkit_appearance;
     prop "-webkit-background-clip" property__webkit_background_clip;
-    prop "-webkit-border-before" property__webkit_border_before;
     prop "-webkit-border-before-color" property__webkit_border_before_color;
     prop "-webkit-border-before-style" property__webkit_border_before_style;
     prop "-webkit-border-before-width" property__webkit_border_before_width;
+    prop "-webkit-border-before" property__webkit_border_before;
+    prop "-webkit-box-orient" property_box_orient;
     prop "-webkit-box-reflect" property__webkit_box_reflect;
     prop "-webkit-box-shadow" property_box_shadow;
-    prop "-webkit-box-orient" property_box_orient;
     prop "-webkit-column-break-after" property__webkit_column_break_after;
     prop "-webkit-column-break-before" property__webkit_column_break_before;
     prop "-webkit-column-break-inside" property__webkit_column_break_inside;
     prop "-webkit-font-smoothing" property__webkit_font_smoothing;
     prop "-webkit-line-clamp" property__webkit_line_clamp;
-    prop "-webkit-mask" property__webkit_mask;
     prop "-webkit-mask-attachment" property__webkit_mask_attachment;
     prop "-webkit-mask-box-image" property__webkit_mask_box_image;
     prop "-webkit-mask-clip" property__webkit_mask_clip;
     prop "-webkit-mask-composite" property__webkit_mask_composite;
     prop "-webkit-mask-image" property__webkit_mask_image;
     prop "-webkit-mask-origin" property__webkit_mask_origin;
-    prop "-webkit-mask-position" property__webkit_mask_position;
     prop "-webkit-mask-position-x" property__webkit_mask_position_x;
     prop "-webkit-mask-position-y" property__webkit_mask_position_y;
-    prop "-webkit-mask-repeat" property__webkit_mask_repeat;
+    prop "-webkit-mask-position" property__webkit_mask_position;
     prop "-webkit-mask-repeat-x" property__webkit_mask_repeat_x;
     prop "-webkit-mask-repeat-y" property__webkit_mask_repeat_y;
+    prop "-webkit-mask-repeat" property__webkit_mask_repeat;
     prop "-webkit-mask-size" property__webkit_mask_size;
+    prop "-webkit-mask" property__webkit_mask;
     prop "-webkit-overflow-scrolling" property__webkit_overflow_scrolling;
     prop "-webkit-print-color-adjust" property__webkit_print_color_adjust;
     prop "-webkit-tap-highlight-color" property__webkit_tap_highlight_color;
     prop "-webkit-text-fill-color" property__webkit_text_fill_color;
     prop "-webkit-text-security" property__webkit_text_security;
-    prop "-webkit-text-stroke" property__webkit_text_stroke;
     prop "-webkit-text-stroke-color" property__webkit_text_stroke_color;
     prop "-webkit-text-stroke-width" property__webkit_text_stroke_width;
+    prop "-webkit-text-stroke" property__webkit_text_stroke;
     prop "-webkit-touch-callout" property__webkit_touch_callout;
     prop "-webkit-user-drag" property__webkit_user_drag;
     prop "-webkit-user-modify" property__webkit_user_modify;
     prop "-webkit-user-select" property__webkit_user_select;
+    prop "accent-color" property_accent_color;
     prop "align-content" property_align_content;
     prop "align-items" property_align_items;
     prop "align-self" property_align_self;
     prop "alignment-baseline" property_alignment_baseline;
     prop "all" property_all;
-    prop "animation" property_animation;
+    prop "anchor-name" property_anchor_name;
+    prop "anchor-scope" property_anchor_scope;
+    prop "animation-composition" property_animation_composition;
+    prop "animation-delay-end" property_animation_delay_end;
+    prop "animation-delay-start" property_animation_delay_start;
     prop "animation-delay" property_animation_delay;
     prop "animation-direction" property_animation_direction;
     prop "animation-duration" property_animation_duration;
@@ -3183,95 +3252,104 @@ let packed_rules : (module RULE) list =
     prop "animation-iteration-count" property_animation_iteration_count;
     prop "animation-name" property_animation_name;
     prop "animation-play-state" property_animation_play_state;
+    prop "animation-range-end" property_animation_range_end;
+    prop "animation-range-start" property_animation_range_start;
+    prop "animation-range" property_animation_range;
+    prop "animation-timeline" property_animation_timeline;
     prop "animation-timing-function" property_animation_timing_function;
+    prop "animation" property_animation;
+    prop "any-hover" property_media_any_hover;
+    prop "any-pointer" property_media_any_pointer;
     prop "appearance" property_appearance;
     prop "aspect-ratio" property_aspect_ratio;
     prop "azimuth" property_azimuth;
+    prop "backdrop-blur" property_backdrop_blur;
     prop "backdrop-filter" property_backdrop_filter;
     prop "backface-visibility" property_backface_visibility;
-    prop "background" property_background;
     prop "background-attachment" property_background_attachment;
     prop "background-blend-mode" property_background_blend_mode;
     prop "background-clip" property_background_clip;
     prop "background-color" property_background_color;
     prop "background-image" property_background_image;
     prop "background-origin" property_background_origin;
-    prop "background-position" property_background_position;
     prop "background-position-x" property_background_position_x;
     prop "background-position-y" property_background_position_y;
+    prop "background-position" property_background_position;
     prop "background-repeat" property_background_repeat;
     prop "background-size" property_background_size;
+    prop "background" property_background;
     prop "baseline-shift" property_baseline_shift;
     prop "behavior" property_behavior;
+    prop "bleed" property_bleed;
     prop "block-overflow" property_block_overflow;
     prop "block-size" property_block_size;
-    prop "border" property_border;
-    prop "border-block" property_border_block;
     prop "border-block-color" property_border_block_color;
-    prop "border-block-end" property_border_block_end;
     prop "border-block-end-color" property_border_block_end_color;
     prop "border-block-end-style" property_border_block_end_style;
     prop "border-block-end-width" property_border_block_end_width;
-    prop "border-block-start" property_border_block_start;
+    prop "border-block-end" property_border_block_end;
     prop "border-block-start-color" property_border_block_start_color;
     prop "border-block-start-style" property_border_block_start_style;
     prop "border-block-start-width" property_border_block_start_width;
+    prop "border-block-start" property_border_block_start;
     prop "border-block-style" property_border_block_style;
     prop "border-block-width" property_border_block_width;
-    prop "border-bottom" property_border_bottom;
+    prop "border-block" property_border_block;
     prop "border-bottom-color" property_border_bottom_color;
     prop "border-bottom-left-radius" property_border_bottom_left_radius;
     prop "border-bottom-right-radius" property_border_bottom_right_radius;
     prop "border-bottom-style" property_border_bottom_style;
     prop "border-bottom-width" property_border_bottom_width;
+    prop "border-bottom" property_border_bottom;
     prop "border-collapse" property_border_collapse;
     prop "border-color" property_border_color;
     prop "border-end-end-radius" property_border_end_end_radius;
     prop "border-end-start-radius" property_border_end_start_radius;
-    prop "border-image" property_border_image;
     prop "border-image-outset" property_border_image_outset;
     prop "border-image-repeat" property_border_image_repeat;
     prop "border-image-slice" property_border_image_slice;
     prop "border-image-source" property_border_image_source;
     prop "border-image-width" property_border_image_width;
-    prop "border-inline" property_border_inline;
+    prop "border-image" property_border_image;
     prop "border-inline-color" property_border_inline_color;
-    prop "border-inline-end" property_border_inline_end;
     prop "border-inline-end-color" property_border_inline_end_color;
     prop "border-inline-end-style" property_border_inline_end_style;
     prop "border-inline-end-width" property_border_inline_end_width;
-    prop "border-inline-start" property_border_inline_start;
+    prop "border-inline-end" property_border_inline_end;
     prop "border-inline-start-color" property_border_inline_start_color;
     prop "border-inline-start-style" property_border_inline_start_style;
     prop "border-inline-start-width" property_border_inline_start_width;
+    prop "border-inline-start" property_border_inline_start;
     prop "border-inline-style" property_border_inline_style;
     prop "border-inline-width" property_border_inline_width;
-    prop "border-left" property_border_left;
+    prop "border-inline" property_border_inline;
     prop "border-left-color" property_border_left_color;
     prop "border-left-style" property_border_left_style;
     prop "border-left-width" property_border_left_width;
+    prop "border-left" property_border_left;
     prop "border-radius" property_border_radius;
-    prop "border-right" property_border_right;
     prop "border-right-color" property_border_right_color;
     prop "border-right-style" property_border_right_style;
     prop "border-right-width" property_border_right_width;
+    prop "border-right" property_border_right;
     prop "border-spacing" property_border_spacing;
     prop "border-start-end-radius" property_border_start_end_radius;
     prop "border-start-start-radius" property_border_start_start_radius;
     prop "border-style" property_border_style;
-    prop "border-top" property_border_top;
     prop "border-top-color" property_border_top_color;
     prop "border-top-left-radius" property_border_top_left_radius;
     prop "border-top-right-radius" property_border_top_right_radius;
     prop "border-top-style" property_border_top_style;
     prop "border-top-width" property_border_top_width;
+    prop "border-top" property_border_top;
     prop "border-width" property_border_width;
+    prop "border" property_border;
     prop "bottom" property_bottom;
     prop "box-align" property_box_align;
     prop "box-decoration-break" property_box_decoration_break;
     prop "box-direction" property_box_direction;
-    prop "box-flex" property_box_flex;
     prop "box-flex-group" property_box_flex_group;
+    prop "box-flex" property_box_flex;
     prop "box-lines" property_box_lines;
     prop "box-ordinal-group" property_box_ordinal_group;
     prop "box-orient" property_box_orient;
@@ -3284,151 +3362,194 @@ let packed_rules : (module RULE) list =
     prop "caption-side" property_caption_side;
     prop "caret-color" property_caret_color;
     prop "clear" property_clear;
-    prop "clip" property_clip;
     prop "clip-path" property_clip_path;
     prop "clip-rule" property_clip_rule;
-    prop "color" property_color;
+    prop "clip" property_clip;
     prop "color-adjust" property_color_adjust;
+    prop "color-gamut" property_media_color_gamut;
+    prop "color-index" property_media_color_index;
+    prop "color-interpolation-filters" property_color_interpolation_filters;
+    prop "color-interpolation" property_color_interpolation;
+    prop "color-rendering" property_color_rendering;
     prop "color-scheme" property_color_scheme;
+    prop "color" property_color;
     prop "column-count" property_column_count;
     prop "column-fill" property_column_fill;
     prop "column-gap" property_column_gap;
-    prop "column-rule" property_column_rule;
     prop "column-rule-color" property_column_rule_color;
     prop "column-rule-style" property_column_rule_style;
     prop "column-rule-width" property_column_rule_width;
+    prop "column-rule" property_column_rule;
     prop "column-span" property_column_span;
     prop "column-width" property_column_width;
     prop "columns" property_columns;
+    prop "contain-intrinsic-block-size" property_contain_intrinsic_block_size;
+    prop "contain-intrinsic-height" property_contain_intrinsic_height;
+    prop "contain-intrinsic-inline-size" property_contain_intrinsic_inline_size;
+    prop "contain-intrinsic-size" property_contain_intrinsic_size;
+    prop "contain-intrinsic-width" property_contain_intrinsic_width;
     prop "contain" property_contain;
+    prop "container-name-computed" property_container_name_computed;
+    prop "container-name" property_container_name;
+    prop "container-type" property_container_type;
+    prop "container" property_container;
+    prop "content-visibility" property_content_visibility;
     prop "content" property_content;
     prop "counter-increment" property_counter_increment;
     prop "counter-reset" property_counter_reset;
     prop "counter-set" property_counter_set;
-    prop "cue" property_cue;
     prop "cue-after" property_cue_after;
     prop "cue-before" property_cue_before;
+    prop "cue" property_cue;
     prop "cursor" property_cursor;
+    prop "cx" property_cx;
+    prop "cy" property_cy;
+    prop "d" property_d;
     prop "direction" property_direction;
+    prop "display-mode" property_media_display_mode;
     prop "display" property_display;
     prop "dominant-baseline" property_dominant_baseline;
     prop "empty-cells" property_empty_cells;
-    prop "fill" property_fill;
+    prop "field-sizing" property_field_sizing;
     prop "fill-opacity" property_fill_opacity;
     prop "fill-rule" property_fill_rule;
+    prop "fill" property_fill;
     prop "filter" property_filter;
-    prop "flex" property_flex;
     prop "flex-basis" property_flex_basis;
     prop "flex-direction" property_flex_direction;
     prop "flex-flow" property_flex_flow;
     prop "flex-grow" property_flex_grow;
     prop "flex-shrink" property_flex_shrink;
     prop "flex-wrap" property_flex_wrap;
+    prop "flex" property_flex;
     prop "float" property_float;
-    prop "font" property_font;
+    prop "flood-color" property_flood_color;
+    prop "flood-opacity" property_flood_opacity;
+    prop "font-display" property_font_display;
     prop "font-family" property_font_family;
     prop "font-feature-settings" property_font_feature_settings;
     prop "font-kerning" property_font_kerning;
     prop "font-language-override" property_font_language_override;
     prop "font-optical-sizing" property_font_optical_sizing;
     prop "font-palette" property_font_palette;
-    prop "font-variant-emoji" property_font_variant_emoji;
-    prop "font-size" property_font_size;
     prop "font-size-adjust" property_font_size_adjust;
+    prop "font-size" property_font_size;
     prop "font-smooth" property_font_smooth;
     prop "font-stretch" property_font_stretch;
     prop "font-style" property_font_style;
-    prop "font-synthesis" property_font_synthesis;
-    prop "font-synthesis-weight" property_font_synthesis_weight;
-    prop "font-synthesis-style" property_font_synthesis_style;
-    prop "font-synthesis-small-caps" property_font_synthesis_small_caps;
     prop "font-synthesis-position" property_font_synthesis_position;
-    prop "font-variant" property_font_variant;
+    prop "font-synthesis-small-caps" property_font_synthesis_small_caps;
+    prop "font-synthesis-style" property_font_synthesis_style;
+    prop "font-synthesis-weight" property_font_synthesis_weight;
+    prop "font-synthesis" property_font_synthesis;
     prop "font-variant-alternates" property_font_variant_alternates;
     prop "font-variant-caps" property_font_variant_caps;
     prop "font-variant-east-asian" property_font_variant_east_asian;
+    prop "font-variant-emoji" property_font_variant_emoji;
     prop "font-variant-ligatures" property_font_variant_ligatures;
     prop "font-variant-numeric" property_font_variant_numeric;
     prop "font-variant-position" property_font_variant_position;
+    prop "font-variant" property_font_variant;
     prop "font-variation-settings" property_font_variation_settings;
     prop "font-weight" property_font_weight;
+    prop "font" property_font;
+    prop "forced-color-adjust" property_forced_color_adjust;
+    prop "forced-colors" property_media_forced_colors;
     prop "gap" property_gap;
     prop "glyph-orientation-horizontal" property_glyph_orientation_horizontal;
     prop "glyph-orientation-vertical" property_glyph_orientation_vertical;
-    prop "grid" property_grid;
     prop "grid-area" property_grid_area;
     prop "grid-auto-columns" property_grid_auto_columns;
     prop "grid-auto-flow" property_grid_auto_flow;
     prop "grid-auto-rows" property_grid_auto_rows;
-    prop "grid-column" property_grid_column;
     prop "grid-column-end" property_grid_column_end;
     prop "grid-column-gap" property_grid_column_gap;
     prop "grid-column-start" property_grid_column_start;
+    prop "grid-column" property_grid_column;
     prop "grid-gap" property_grid_gap;
-    prop "grid-row" property_grid_row;
     prop "grid-row-end" property_grid_row_end;
     prop "grid-row-gap" property_grid_row_gap;
     prop "grid-row-start" property_grid_row_start;
-    prop "grid-template" property_grid_template;
+    prop "grid-row" property_grid_row;
     prop "grid-template-areas" property_grid_template_areas;
     prop "grid-template-columns" property_grid_template_columns;
     prop "grid-template-rows" property_grid_template_rows;
+    prop "grid-template" property_grid_template;
+    prop "grid" property_grid;
+    prop "grid" property_media_grid;
     prop "hanging-punctuation" property_hanging_punctuation;
     prop "height" property_height;
+    prop "hover" property_media_hover;
+    prop "hyphenate-character" property_hyphenate_character;
+    prop "hyphenate-limit-chars" property_hyphenate_limit_chars;
+    prop "hyphenate-limit-last" property_hyphenate_limit_last;
+    prop "hyphenate-limit-lines" property_hyphenate_limit_lines;
+    prop "hyphenate-limit-zone" property_hyphenate_limit_zone;
     prop "hyphens" property_hyphens;
     prop "image-orientation" property_image_orientation;
     prop "image-rendering" property_image_rendering;
     prop "image-resolution" property_image_resolution;
     prop "ime-mode" property_ime_mode;
-    prop "initial-letter" property_initial_letter;
+    prop "inherits" property_inherits;
     prop "initial-letter-align" property_initial_letter_align;
+    prop "initial-letter" property_initial_letter;
+    prop "initial-value" property_initial_value;
     prop "inline-size" property_inline_size;
-    prop "inset" property_inset;
-    prop "inset-block" property_inset_block;
+    prop "inset-area" property_inset_area;
     prop "inset-block-end" property_inset_block_end;
     prop "inset-block-start" property_inset_block_start;
-    prop "inset-inline" property_inset_inline;
+    prop "inset-block" property_inset_block;
     prop "inset-inline-end" property_inset_inline_end;
     prop "inset-inline-start" property_inset_inline_start;
+    prop "inset-inline" property_inset_inline;
+    prop "inset" property_inset;
+    prop "interpolate-size" property_interpolate_size;
+    prop "inverted-colors" property_media_inverted_colors;
     prop "isolation" property_isolation;
     prop "justify-content" property_justify_content;
     prop "justify-items" property_justify_items;
     prop "justify-self" property_justify_self;
     prop "kerning" property_kerning;
+    prop "layout-grid-char" property_layout_grid_char;
+    prop "layout-grid-line" property_layout_grid_line;
+    prop "layout-grid-mode" property_layout_grid_mode;
+    prop "layout-grid-type" property_layout_grid_type;
+    prop "layout-grid" property_layout_grid;
     prop "left" property_left;
     prop "letter-spacing" property_letter_spacing;
+    prop "lighting-color" property_lighting_color;
     prop "line-break" property_line_break;
     prop "line-clamp" property_line_clamp;
-    prop "line-height" property_line_height;
     prop "line-height-step" property_line_height_step;
-    prop "list-style" property_list_style;
+    prop "line-height" property_line_height;
     prop "list-style-image" property_list_style_image;
     prop "list-style-position" property_list_style_position;
     prop "list-style-type" property_list_style_type;
-    prop "margin" property_margin;
-    prop "margin-block" property_margin_block;
+    prop "list-style" property_list_style;
     prop "margin-block-end" property_margin_block_end;
     prop "margin-block-start" property_margin_block_start;
+    prop "margin-block" property_margin_block;
     prop "margin-bottom" property_margin_bottom;
-    prop "margin-inline" property_margin_inline;
     prop "margin-inline-end" property_margin_inline_end;
     prop "margin-inline-start" property_margin_inline_start;
+    prop "margin-inline" property_margin_inline;
     prop "margin-left" property_margin_left;
     prop "margin-right" property_margin_right;
     prop "margin-top" property_margin_top;
     prop "margin-trim" property_margin_trim;
-    prop "marker" property_marker;
+    prop "margin" property_margin;
     prop "marker-end" property_marker_end;
     prop "marker-mid" property_marker_mid;
     prop "marker-start" property_marker_start;
-    prop "mask" property_mask;
-    prop "mask-border" property_mask_border;
+    prop "marker" property_marker;
+    prop "marks" property_marks;
     prop "mask-border-mode" property_mask_border_mode;
     prop "mask-border-outset" property_mask_border_outset;
     prop "mask-border-repeat" property_mask_border_repeat;
     prop "mask-border-slice" property_mask_border_slice;
     prop "mask-border-source" property_mask_border_source;
     prop "mask-border-width" property_mask_border_width;
+    prop "mask-border" property_mask_border;
     prop "mask-clip" property_mask_clip;
     prop "mask-composite" property_mask_composite;
     prop "mask-image" property_mask_image;
@@ -3438,34 +3559,49 @@ let packed_rules : (module RULE) list =
     prop "mask-repeat" property_mask_repeat;
     prop "mask-size" property_mask_size;
     prop "mask-type" property_mask_type;
+    prop "mask" property_mask;
     prop "masonry-auto-flow" property_masonry_auto_flow;
+    prop "math-depth" property_math_depth;
+    prop "math-shift" property_math_shift;
+    prop "math-style" property_math_style;
+    prop "max-aspect-ratio" property_media_max_aspect_ratio;
     prop "max-block-size" property_max_block_size;
     prop "max-height" property_max_height;
     prop "max-inline-size" property_max_inline_size;
     prop "max-lines" property_max_lines;
+    prop "max-resolution" property_media_max_resolution;
     prop "max-width" property_max_width;
+    prop "min-aspect-ratio" property_media_min_aspect_ratio;
     prop "min-block-size" property_min_block_size;
+    prop "min-color-index" property_media_min_color_index;
+    prop "min-color" property_media_min_color;
     prop "min-height" property_min_height;
     prop "min-inline-size" property_min_inline_size;
+    prop "min-resolution" property_media_min_resolution;
     prop "min-width" property_min_width;
     prop "mix-blend-mode" property_mix_blend_mode;
+    prop "monochrome" property_media_monochrome;
+    prop "nav-down" property_nav_down;
+    prop "nav-left" property_nav_left;
+    prop "nav-right" property_nav_right;
+    prop "nav-up" property_nav_up;
     prop "object-fit" property_object_fit;
     prop "object-position" property_object_position;
-    prop "offset" property_offset;
     prop "offset-anchor" property_offset_anchor;
     prop "offset-distance" property_offset_distance;
     prop "offset-path" property_offset_path;
     prop "offset-position" property_offset_position;
     prop "offset-rotate" property_offset_rotate;
+    prop "offset" property_offset;
     prop "opacity" property_opacity;
     prop "order" property_order;
+    prop "orientation" property_media_orientation;
     prop "orphans" property_orphans;
-    prop "outline" property_outline;
     prop "outline-color" property_outline_color;
     prop "outline-offset" property_outline_offset;
     prop "outline-style" property_outline_style;
     prop "outline-width" property_outline_width;
-    prop "overflow" property_overflow;
+    prop "outline" property_outline;
     prop "overflow-anchor" property_overflow_anchor;
     prop "overflow-block" property_overflow_block;
     prop "overflow-clip-margin" property_overflow_clip_margin;
@@ -3473,116 +3609,136 @@ let packed_rules : (module RULE) list =
     prop "overflow-wrap" property_overflow_wrap;
     prop "overflow-x" property_overflow_x;
     prop "overflow-y" property_overflow_y;
-    prop "overscroll-behavior" property_overscroll_behavior;
+    prop "overflow" property_overflow;
+    prop "overlay" property_overlay;
     prop "overscroll-behavior-block" property_overscroll_behavior_block;
     prop "overscroll-behavior-inline" property_overscroll_behavior_inline;
     prop "overscroll-behavior-x" property_overscroll_behavior_x;
     prop "overscroll-behavior-y" property_overscroll_behavior_y;
-    prop "any-hover" property_media_any_hover;
-    prop "any-pointer" property_media_any_pointer;
-    prop "pointer" property_media_pointer;
-    prop "max-aspect-ratio" property_media_max_aspect_ratio;
-    prop "min-aspect-ratio" property_media_min_aspect_ratio;
-    prop "min-color" property_media_min_color;
-    prop "color-gamut" property_media_color_gamut;
-    prop "color-index" property_media_color_index;
-    prop "min-color-index" property_media_min_color_index;
-    prop "display-mode" property_media_display_mode;
-    prop "forced-colors" property_media_forced_colors;
-    prop "forced-color-adjust" property_forced_color_adjust;
-    prop "grid" property_media_grid;
-    prop "hover" property_media_hover;
-    prop "inverted-colors" property_media_inverted_colors;
-    prop "monochrome" property_media_monochrome;
-    prop "prefers-color-scheme" property_media_prefers_color_scheme;
-    prop "prefers-contrast" property_media_prefers_contrast;
-    prop "prefers-reduced-motion" property_media_prefers_reduced_motion;
-    prop "resolution" property_media_resolution;
-    prop "min-resolution" property_media_min_resolution;
-    prop "max-resolution" property_media_max_resolution;
-    prop "scripting" property_media_scripting;
-    prop "update" property_media_update;
-    prop "orientation" property_media_orientation;
-    prop "padding" property_padding;
-    prop "padding-block" property_padding_block;
+    prop "overscroll-behavior" property_overscroll_behavior;
     prop "padding-block-end" property_padding_block_end;
     prop "padding-block-start" property_padding_block_start;
+    prop "padding-block" property_padding_block;
     prop "padding-bottom" property_padding_bottom;
-    prop "padding-inline" property_padding_inline;
     prop "padding-inline-end" property_padding_inline_end;
     prop "padding-inline-start" property_padding_inline_start;
+    prop "padding-inline" property_padding_inline;
     prop "padding-left" property_padding_left;
     prop "padding-right" property_padding_right;
     prop "padding-top" property_padding_top;
+    prop "padding" property_padding;
     prop "page-break-after" property_page_break_after;
     prop "page-break-before" property_page_break_before;
     prop "page-break-inside" property_page_break_inside;
+    prop "page" property_page;
     prop "paint-order" property_paint_order;
-    prop "pause" property_pause;
     prop "pause-after" property_pause_after;
     prop "pause-before" property_pause_before;
-    prop "perspective" property_perspective;
+    prop "pause" property_pause;
     prop "perspective-origin" property_perspective_origin;
+    prop "perspective" property_perspective;
     prop "place-content" property_place_content;
     prop "place-items" property_place_items;
     prop "place-self" property_place_self;
     prop "pointer-events" property_pointer_events;
+    prop "pointer" property_media_pointer;
+    prop "position-anchor" property_position_anchor;
+    prop "position-area" property_position_area;
+    prop "position-try-fallbacks" property_position_try_fallbacks;
+    prop "position-try-options" property_position_try_options;
+    prop "position-try" property_position_try;
+    prop "position-visibility" property_position_visibility;
     prop "position" property_position;
+    prop "prefers-color-scheme" property_media_prefers_color_scheme;
+    prop "prefers-contrast" property_media_prefers_contrast;
+    prop "prefers-reduced-motion" property_media_prefers_reduced_motion;
+    prop "print-color-adjust" property_print_color_adjust;
     prop "quotes" property_quotes;
+    prop "r" property_r;
+    prop "reading-flow" property_reading_flow;
     prop "resize" property_resize;
-    prop "rest" property_rest;
+    prop "resolution" property_media_resolution;
     prop "rest-after" property_rest_after;
     prop "rest-before" property_rest_before;
+    prop "rest" property_rest;
     prop "right" property_right;
     prop "rotate" property_rotate;
     prop "row-gap" property_row_gap;
     prop "ruby-align" property_ruby_align;
     prop "ruby-merge" property_ruby_merge;
+    prop "ruby-overhang" property_ruby_overhang;
     prop "ruby-position" property_ruby_position;
+    prop "rx" property_rx;
+    prop "ry" property_ry;
     prop "scale" property_scale;
+    prop "scripting" property_media_scripting;
     prop "scroll-behavior" property_scroll_behavior;
-    prop "scroll-margin" property_scroll_margin;
-    prop "scroll-margin-block" property_scroll_margin_block;
     prop "scroll-margin-block-end" property_scroll_margin_block_end;
     prop "scroll-margin-block-start" property_scroll_margin_block_start;
+    prop "scroll-margin-block" property_scroll_margin_block;
     prop "scroll-margin-bottom" property_scroll_margin_bottom;
-    prop "scroll-margin-inline" property_scroll_margin_inline;
     prop "scroll-margin-inline-end" property_scroll_margin_inline_end;
     prop "scroll-margin-inline-start" property_scroll_margin_inline_start;
+    prop "scroll-margin-inline" property_scroll_margin_inline;
     prop "scroll-margin-left" property_scroll_margin_left;
     prop "scroll-margin-right" property_scroll_margin_right;
     prop "scroll-margin-top" property_scroll_margin_top;
-    prop "scroll-padding" property_scroll_padding;
-    prop "scroll-padding-block" property_scroll_padding_block;
+    prop "scroll-margin" property_scroll_margin;
+    prop "scroll-marker-group" property_scroll_marker_group;
     prop "scroll-padding-block-end" property_scroll_padding_block_end;
     prop "scroll-padding-block-start" property_scroll_padding_block_start;
+    prop "scroll-padding-block" property_scroll_padding_block;
     prop "scroll-padding-bottom" property_scroll_padding_bottom;
-    prop "scroll-padding-inline" property_scroll_padding_inline;
     prop "scroll-padding-inline-end" property_scroll_padding_inline_end;
     prop "scroll-padding-inline-start" property_scroll_padding_inline_start;
+    prop "scroll-padding-inline" property_scroll_padding_inline;
     prop "scroll-padding-left" property_scroll_padding_left;
     prop "scroll-padding-right" property_scroll_padding_right;
     prop "scroll-padding-top" property_scroll_padding_top;
+    prop "scroll-padding" property_scroll_padding;
     prop "scroll-snap-align" property_scroll_snap_align;
     prop "scroll-snap-coordinate" property_scroll_snap_coordinate;
     prop "scroll-snap-destination" property_scroll_snap_destination;
     prop "scroll-snap-points-x" property_scroll_snap_points_x;
     prop "scroll-snap-points-y" property_scroll_snap_points_y;
     prop "scroll-snap-stop" property_scroll_snap_stop;
-    prop "scroll-snap-type" property_scroll_snap_type;
     prop "scroll-snap-type-x" property_scroll_snap_type_x;
     prop "scroll-snap-type-y" property_scroll_snap_type_y;
+    prop "scroll-snap-type" property_scroll_snap_type;
+    prop "scroll-start-block" property_scroll_start_block;
+    prop "scroll-start-inline" property_scroll_start_inline;
+    prop "scroll-start-target-block" property_scroll_start_target_block;
+    prop "scroll-start-target-inline" property_scroll_start_target_inline;
+    prop "scroll-start-target-x" property_scroll_start_target_x;
+    prop "scroll-start-target-y" property_scroll_start_target_y;
+    prop "scroll-start-target" property_scroll_start_target;
+    prop "scroll-start-x" property_scroll_start_x;
+    prop "scroll-start-y" property_scroll_start_y;
+    prop "scroll-start" property_scroll_start;
+    prop "scroll-timeline-axis" property_scroll_timeline_axis;
+    prop "scroll-timeline-name" property_scroll_timeline_name;
+    prop "scroll-timeline" property_scroll_timeline;
+    prop "scrollbar-3dlight-color" property_scrollbar_3dlight_color;
+    prop "scrollbar-arrow-color" property_scrollbar_arrow_color;
+    prop "scrollbar-base-color" property_scrollbar_base_color;
     prop "scrollbar-color" property_scrollbar_color;
-    prop "scrollbar-width" property_scrollbar_width;
+    prop "scrollbar-darkshadow-color" property_scrollbar_darkshadow_color;
+    prop "scrollbar-face-color" property_scrollbar_face_color;
     prop "scrollbar-gutter" property_scrollbar_gutter;
+    prop "scrollbar-highlight-color" property_scrollbar_highlight_color;
+    prop "scrollbar-shadow-color" property_scrollbar_shadow_color;
+    prop "scrollbar-track-color" property_scrollbar_track_color;
+    prop "scrollbar-width" property_scrollbar_width;
     prop "shape-image-threshold" property_shape_image_threshold;
     prop "shape-margin" property_shape_margin;
     prop "shape-outside" property_shape_outside;
     prop "shape-rendering" property_shape_rendering;
-    prop "speak" property_speak;
+    prop "size" property_size;
     prop "speak-as" property_speak_as;
+    prop "speak" property_speak;
     prop "src" property_src;
-    prop "stroke" property_stroke;
+    prop "stop-color" property_stop_color;
+    prop "stop-opacity" property_stop_opacity;
     prop "stroke-dasharray" property_stroke_dasharray;
     prop "stroke-dashoffset" property_stroke_dashoffset;
     prop "stroke-linecap" property_stroke_linecap;
@@ -3590,53 +3746,77 @@ let packed_rules : (module RULE) list =
     prop "stroke-miterlimit" property_stroke_miterlimit;
     prop "stroke-opacity" property_stroke_opacity;
     prop "stroke-width" property_stroke_width;
+    prop "stroke" property_stroke;
+    prop "syntax" property_syntax;
     prop "tab-size" property_tab_size;
     prop "table-layout" property_table_layout;
-    prop "text-align" property_text_align;
     prop "text-align-all" property_text_align_all;
     prop "text-align-last" property_text_align_last;
+    prop "text-align" property_text_align;
     prop "text-anchor" property_text_anchor;
+    prop "text-autospace" property_text_autospace;
+    prop "text-blink" property_text_blink;
+    prop "text-box-edge" property_text_box_edge;
+    prop "text-box-trim" property_text_box_trim;
     prop "text-combine-upright" property_text_combine_upright;
-    prop "text-decoration" property_text_decoration;
     prop "text-decoration-color" property_text_decoration_color;
     prop "text-decoration-line" property_text_decoration_line;
-    prop "text-decoration-skip" property_text_decoration_skip;
-    prop "text-decoration-skip-ink" property_text_decoration_skip_ink;
     prop "text-decoration-skip-box" property_text_decoration_skip_box;
+    prop "text-decoration-skip-ink" property_text_decoration_skip_ink;
     prop "text-decoration-skip-inset" property_text_decoration_skip_inset;
+    prop "text-decoration-skip-self" property_text_decoration_skip_self;
+    prop "text-decoration-skip-spaces" property_text_decoration_skip_spaces;
+    prop "text-decoration-skip" property_text_decoration_skip;
     prop "text-decoration-style" property_text_decoration_style;
     prop "text-decoration-thickness" property_text_decoration_thickness;
-    prop "text-emphasis" property_text_emphasis;
+    prop "text-decoration" property_text_decoration;
+    prop "text-edge" property_text_edge;
     prop "text-emphasis-color" property_text_emphasis_color;
     prop "text-emphasis-position" property_text_emphasis_position;
     prop "text-emphasis-style" property_text_emphasis_style;
+    prop "text-emphasis" property_text_emphasis;
     prop "text-indent" property_text_indent;
+    prop "text-justify-trim" property_text_justify_trim;
     prop "text-justify" property_text_justify;
+    prop "text-kashida-space" property_text_kashida_space;
+    prop "text-kashida" property_text_kashida;
     prop "text-orientation" property_text_orientation;
     prop "text-overflow" property_text_overflow;
     prop "text-rendering" property_text_rendering;
     prop "text-shadow" property_text_shadow;
     prop "text-size-adjust" property_text_size_adjust;
+    prop "text-spacing-trim" property_text_spacing_trim;
     prop "text-transform" property_text_transform;
     prop "text-underline-offset" property_text_underline_offset;
     prop "text-underline-position" property_text_underline_position;
+    prop "text-wrap-mode" property_text_wrap_mode;
+    prop "text-wrap-style" property_text_wrap_style;
+    prop "text-wrap" property_text_wrap;
+    prop "timeline-scope" property_timeline_scope;
     prop "top" property_top;
     prop "touch-action" property_touch_action;
-    prop "transform" property_transform;
     prop "transform-box" property_transform_box;
     prop "transform-origin" property_transform_origin;
     prop "transform-style" property_transform_style;
-    prop "transition" property_transition;
+    prop "transform" property_transform;
     prop "transition-behavior" property_transition_behavior;
     prop "transition-delay" property_transition_delay;
     prop "transition-duration" property_transition_duration;
     prop "transition-property" property_transition_property;
     prop "transition-timing-function" property_transition_timing_function;
+    prop "transition" property_transition;
     prop "translate" property_translate;
     prop "unicode-bidi" property_unicode_bidi;
     prop "unicode-range" property_unicode_range;
+    prop "update" property_media_update;
     prop "user-select" property_user_select;
+    prop "vector-effect" property_vector_effect;
     prop "vertical-align" property_vertical_align;
+    prop "view-timeline-axis" property_view_timeline_axis;
+    prop "view-timeline-inset" property_view_timeline_inset;
+    prop "view-timeline-name" property_view_timeline_name;
+    prop "view-timeline" property_view_timeline;
+    prop "view-transition-name" property_view_transition_name;
     prop "visibility" property_visibility;
     prop "voice-balance" property_voice_balance;
     prop "voice-duration" property_voice_duration;
@@ -3646,47 +3826,221 @@ let packed_rules : (module RULE) list =
     prop "voice-rate" property_voice_rate;
     prop "voice-stress" property_voice_stress;
     prop "voice-volume" property_voice_volume;
+    prop "white-space-collapse" property_white_space_collapse;
     prop "white-space" property_white_space;
     prop "widows" property_widows;
     prop "width" property_width;
     prop "will-change" property_will_change;
     prop "word-break" property_word_break;
+    prop "word-space-transform" property_word_space_transform;
     prop "word-spacing" property_word_spacing;
     prop "word-wrap" property_word_wrap;
     prop "writing-mode" property_writing_mode;
+    prop "x" property_x;
+    prop "y" property_y;
     prop "z-index" property_z_index;
     prop "zoom" property_zoom;
-    prop "container" property_container;
-    prop "container-name" property_container_name;
-    prop "container-type" property_container_type;
+    value "-legacy-gradient" _legacy_gradient;
+    value "-legacy-linear-gradient-arguments" _legacy_linear_gradient_arguments;
+    value "-legacy-linear-gradient" _legacy_linear_gradient;
+    value "-legacy-radial-gradient-arguments" _legacy_radial_gradient_arguments;
+    value "-legacy-radial-gradient-shape" _legacy_radial_gradient_shape;
+    value "-legacy-radial-gradient-size" _legacy_radial_gradient_size;
+    value "-legacy-radial-gradient" _legacy_radial_gradient;
+    value "-legacy-repeating-linear-gradient" _legacy_repeating_linear_gradient;
+    value "-legacy-repeating-radial-gradient" _legacy_repeating_radial_gradient;
+    value "-non-standard-color" _non_standard_color;
+    value "-non-standard-font" _non_standard_font;
+    value "-non-standard-image-rendering" _non_standard_image_rendering;
+    value "-non-standard-overflow" _non_standard_overflow;
+    value "-non-standard-width" _non_standard_width;
+    value "-webkit-gradient-color-stop" _webkit_gradient_color_stop;
+    value "-webkit-gradient-point" _webkit_gradient_point;
+    value "-webkit-gradient-radius" _webkit_gradient_radius;
+    value "-webkit-gradient-type" _webkit_gradient_type;
+    value "-webkit-mask-box-repeat" _webkit_mask_box_repeat;
+    value "-webkit-mask-clip-style" _webkit_mask_clip_style;
+    value "absolute-size" absolute_size;
+    value "age" age;
+    value "alpha-value" alpha_value;
+    value "alpha-value" number_zero_one;
+    value "angular-color-hint" angular_color_hint;
+    value "angular-color-stop-list" angular_color_stop_list;
+    value "angular-color-stop" angular_color_stop;
+    value "animateable-feature" animateable_feature;
+    value "attachment" attachment;
+    value "attr-fallback" attr_fallback;
+    value "attr-matcher" attr_matcher;
+    value "attr-modifier" attr_modifier;
+    value "attr-name" attr_name;
+    value "attr-name" attr_name;
+    value "attr-type" attr_type;
+    value "attr-unit" attr_unit;
+    value "attribute-selector" attribute_selector;
+    value "auto-repeat" auto_repeat;
+    value "auto-track-list" auto_track_list;
+    value "baseline-position" baseline_position;
+    value "basic-shape" basic_shape;
+    value "bg-image" bg_image;
+    value "bg-layer" bg_layer;
+    value "bg-position" bg_position;
+    value "bg-size" bg_size;
+    value "blend-mode" blend_mode;
+    value "border-radius" border_radius;
+    value "bottom" bottom;
+    value "box" box;
+    value "calc-product" calc_product;
+    value "calc-sum" calc_sum;
+    value "calc-value" calc_value;
+    value "cf-final-image" cf_final_image;
+    value "cf-mixing-image" cf_mixing_image;
+    value "class-selector" class_selector;
+    value "clip-source" clip_source;
+    value "color-interpolation-method" color_interpolation_method;
+    value "color-stop-angle" color_stop_angle;
+    value "color-stop-length" color_stop_length;
+    value "color-stop-list" color_stop_list;
+    value "color-stop" color_stop;
+    value "color" color;
+    value "combinator" combinator;
+    value "common-lig-values" common_lig_values;
+    value "compat-auto" compat_auto;
+    value "complex-selector-list" complex_selector_list;
+    value "complex-selector" complex_selector;
+    value "composite-style" composite_style;
+    value "compositing-operator" compositing_operator;
+    value "compound-selector-list" compound_selector_list;
+    value "compound-selector" compound_selector;
+    value "content-distribution" content_distribution;
+    value "content-list" content_list;
+    value "content-position" content_position;
+    value "content-replacement" content_replacement;
+    value "contextual-alt-values" contextual_alt_values;
+    value "counter-style-name" counter_style_name;
+    value "counter-style" counter_style;
+    value "cubic-bezier-timing-function" cubic_bezier_timing_function;
+    value "declaration-list" declaration_list;
+    value "declaration" declaration;
+    value "deprecated-system-color" deprecated_system_color;
+    value "discretionary-lig-values" discretionary_lig_values;
+    value "display-box" display_box;
+    value "display-inside" display_inside;
+    value "display-internal" display_internal;
+    value "display-legacy" display_legacy;
+    value "display-listitem" display_listitem;
+    value "display-outside" display_outside;
+    value "east-asian-variant-values" east_asian_variant_values;
+    value "east-asian-width-values" east_asian_width_values;
+    value "ending-shape" ending_shape;
+    value "explicit-track-list" explicit_track_list;
+    value "family-name" family_name;
+    value "feature-tag-value" feature_tag_value;
+    value "feature-type" feature_type;
+    value "feature-value-block-list" feature_value_block_list;
+    value "feature-value-block" feature_value_block;
+    value "feature-value-declaration-list" feature_value_declaration_list;
+    value "feature-value-declaration" feature_value_declaration;
+    value "feature-value-name" feature_value_name;
+    value "fill-rule" fill_rule;
+    value "filter-function-list" filter_function_list;
+    value "filter-function" filter_function;
+    value "final-bg-layer" final_bg_layer;
+    value "fixed-breadth" fixed_breadth;
+    value "fixed-repeat" fixed_repeat;
+    value "fixed-size" fixed_size;
+    value "font-families" font_families;
+    value "font-stretch-absolute" font_stretch_absolute;
+    value "font-variant-css21" font_variant_css21;
+    value "font-weight-absolute" font_weight_absolute;
+    value "gender" gender;
+    value "general-enclosed" general_enclosed;
+    value "generic-family" generic_family;
+    value "generic-name" generic_name;
+    value "generic-voice" generic_voice;
+    value "geometry-box" geometry_box;
+    value "gradient" gradient;
+    value "grid-line" grid_line;
+    value "historical-lig-values" historical_lig_values;
+    value "hue-interpolation-method" hue_interpolation_method;
+    value "hue" hue;
+    value "id-selector" id_selector;
+    value "image-set-option" image_set_option;
+    value "image-src" image_src;
+    value "image-tags" image_tags;
+    value "image" image;
+    value "inflexible-breadth" inflexible_breadth;
+    value "keyframe-block-list" keyframe_block_list;
+    value "keyframe-block" keyframe_block;
+    value "keyframe-selector" keyframe_selector;
+    value "keyframes-name" keyframes_name;
+    value "leader-type" leader_type;
+    value "left" left;
+    value "line-name-list" line_name_list;
+    value "line-names" line_names;
+    value "line-style" line_style;
+    value "line-width" line_width;
+    value "linear-color-hint" linear_color_hint;
+    value "linear-color-stop" linear_color_stop;
+    value "mask-image" mask_image;
+    value "mask-layer" mask_layer;
+    value "mask-position" mask_position;
+    value "mask-reference" mask_reference;
+    value "mask-source" mask_source;
+    value "masking-mode" masking_mode;
+    value "mf-boolean" mf_boolean;
+    value "mf-name" mf_name;
+    value "mf-plain" mf_plain;
+    value "mf-range" mf_range;
+    value "mf-value" mf_value;
+    value "name-repeat" name_repeat;
+    value "named-color" named_color;
+    value "namespace-prefix" namespace_prefix;
+    value "ns-prefix" ns_prefix;
+    value "nth" nth;
+    value "number-one-or-greater" number_one_or_greater;
+    value "number-percentage" number_percentage;
+    value "numeric-figure-values" numeric_figure_values;
+    value "numeric-fraction-values" numeric_fraction_values;
+    value "numeric-spacing-values" numeric_spacing_values;
+    value "outline-radius" outline_radius;
+    value "overflow-position" overflow_position;
+    value "page-body" page_body;
+    value "page-margin-box-type" page_margin_box_type;
+    value "page-margin-box" page_margin_box;
+    value "page-selector-list" page_selector_list;
+    value "page-selector" page_selector;
+    value "paint" paint;
+    value "polar-color-space" polar_color_space;
+    value "position" position;
+    value "positive-integer" positive_integer;
     value "pseudo-class-selector" pseudo_class_selector;
     value "pseudo-element-selector" pseudo_element_selector;
     value "pseudo-page" pseudo_page;
     value "quote" quote;
+    value "radial-size" radial_size;
     value "ratio" ratio;
-    value "relative-selector" relative_selector;
+    value "ray-size" ray_size;
+    value "rectangular-color-space" rectangular_color_space;
     value "relative-selector-list" relative_selector_list;
+    value "relative-selector" relative_selector;
     value "relative-size" relative_size;
     value "repeat-style" repeat_style;
     value "right" right;
     value "self-position" self_position;
-    value "shadow" shadow;
     value "shadow-t" shadow_t;
-    value "shape" shape;
+    value "shadow" shadow;
     value "shape-box" shape_box;
     value "shape-radius" shape_radius;
+    value "shape" shape;
     value "side-or-corner" side_or_corner;
-    value "single-animation" single_animation;
-    value "font-families" font_families;
     value "single-animation-direction" single_animation_direction;
     value "single-animation-fill-mode" single_animation_fill_mode;
     value "single-animation-iteration-count" single_animation_iteration_count;
     value "single-animation-play-state" single_animation_play_state;
-    value "single-transition" single_transition;
+    value "single-animation" single_animation;
     value "single-transition-property" single_transition_property;
+    value "single-transition" single_transition;
     value "size" size;
-    value "ray-size" ray_size;
-    value "radial-size" radial_size;
     value "step-position" step_position;
     value "step-timing-function" step_timing_function;
     value "subclass-selector" subclass_selector;
@@ -3699,18 +4053,26 @@ let packed_rules : (module RULE) list =
     value "svg-writing-mode" svg_writing_mode;
     value "symbol" symbol;
     value "symbols-type" symbols_type;
+    value "syntax-combinator" syntax_combinator;
+    value "syntax-component" syntax_component;
+    value "syntax-multiplier" syntax_multiplier;
+    value "syntax-single-component" syntax_single_component;
+    value "syntax-string" syntax_string;
+    value "syntax-type-name" syntax_type_name;
+    value "syntax" syntax;
     value "target" target;
     value "timing-function" timing_function;
     value "top" top;
     value "track-breadth" track_breadth;
     value "track-group" track_group;
-    value "track-list" track_list;
     value "track-list-v0" track_list_v0;
+    value "track-list" track_list;
     value "track-minmax" track_minmax;
     value "track-repeat" track_repeat;
     value "track-size" track_size;
     value "transform-function" transform_function;
     value "transform-list" transform_list;
+    value "try-tactic" try_tactic;
     value "type-or-unit" type_or_unit;
     value "type-selector" type_selector;
     value "viewport-length" viewport_length;

@@ -10,8 +10,6 @@ let txt = (~loc, txt) => {
   txt,
 };
 
-let (let.ok) = Result.bind;
-
 /* TODO: Separate unsupported_feature from bs-css doesn't support or can't interpolate on those */
 /* TODO: Add payload on those exceptions */
 exception Unsupported_feature;
@@ -90,14 +88,14 @@ let transform_with_variable = (parser, mapper, value_to_expr) => {
   Css_grammar.(
     emit(
       Combinators.xor([
-        /* If the entire CSS value is interpolated, we treat it as a `Variable */
-        Rule.Match.map(Standard.interpolation, data => `Variable(data)),
+        /* This xor ensures that interpolation could be placed as the entire value, without the need of modifying the entire grammar. */
+        Rule.Match.map(Standard.interpolation, data => data),
         /* Otherwise it's a regular CSS `Value and match the parser */
         Rule.Match.map(parser, data => `Value(data)),
       ]),
       (~loc) =>
         fun
-        | `Variable(name) => render_variable(~loc, name)
+        | `Interpolation(name) => render_variable(~loc, name)
         | `Value(ast) => mapper(~loc, ast),
       (~loc, expression) => {
         switch (expression) {
@@ -5011,29 +5009,8 @@ let line_break =
     },
   );
 
-/* Helper to create a property renderer from a property name */
-let property_name_to_renderer = (~loc, property_name) => {
-  /* Convert kebab-case to camelCase for the CSS function name */
-  let css_function_name =
-    property_name
-    |> String.split_on_char('-')
-    |> (
-      fun
-      | [] => ""
-      | [first, ...rest] =>
-        first ++ String.concat("", List.map(String.capitalize_ascii, rest))
-    );
-
-  Builder.pexp_ident(
-    ~loc,
-    {
-      txt: Ldot(Lident("CSS"), css_function_name),
-      loc,
-    },
-  );
-};
-
 let found = ({ast_of_string, string_to_expr}) => {
+  let (let.ok) = Result.bind;
   /* TODO: Why we have 'check_value' when we don't use it? */
   let check_value = string => {
     let.ok _ = ast_of_string(string);
@@ -5961,22 +5938,334 @@ let visibility =
       | `Interpolation(v) => render_variable(~loc, v),
   );
 
+let accent_color = unsupportedProperty(Property_parser.property_accent_color);
+let animation_composition =
+  unsupportedProperty(Property_parser.property_animation_composition);
+let animation_range =
+  unsupportedProperty(Property_parser.property_animation_range);
+let animation_range_end =
+  unsupportedProperty(Property_parser.property_animation_range_end);
+let animation_range_start =
+  unsupportedProperty(Property_parser.property_animation_range_start);
+let animation_timeline =
+  unsupportedProperty(Property_parser.property_animation_timeline);
+let anchor_name = unsupportedProperty(Property_parser.property_anchor_name);
+let anchor_scope = unsupportedProperty(Property_parser.property_anchor_scope);
+let field_sizing = unsupportedProperty(Property_parser.property_field_sizing);
+let interpolate_size =
+  unsupportedProperty(Property_parser.property_interpolate_size);
+let inset_area = unsupportedProperty(Property_parser.property_inset_area);
+let overlay = unsupportedProperty(Property_parser.property_overlay);
+let position_anchor =
+  unsupportedProperty(Property_parser.property_position_anchor);
+let position_area =
+  unsupportedProperty(Property_parser.property_position_area);
+let position_try = unsupportedProperty(Property_parser.property_position_try);
+let position_try_fallbacks =
+  unsupportedProperty(Property_parser.property_position_try_fallbacks);
+let position_try_options =
+  unsupportedProperty(Property_parser.property_position_try_options);
+let position_visibility =
+  unsupportedProperty(Property_parser.property_position_visibility);
+let reading_flow = unsupportedProperty(Property_parser.property_reading_flow);
+let scroll_start = unsupportedProperty(Property_parser.property_scroll_start);
+let scroll_start_block =
+  unsupportedProperty(Property_parser.property_scroll_start_block);
+let scroll_start_inline =
+  unsupportedProperty(Property_parser.property_scroll_start_inline);
+let scroll_start_x =
+  unsupportedProperty(Property_parser.property_scroll_start_x);
+let scroll_start_y =
+  unsupportedProperty(Property_parser.property_scroll_start_y);
+let scroll_start_target =
+  unsupportedProperty(Property_parser.property_scroll_start_target);
+let scroll_start_target_block =
+  unsupportedProperty(Property_parser.property_scroll_start_target_block);
+let scroll_start_target_inline =
+  unsupportedProperty(Property_parser.property_scroll_start_target_inline);
+let scroll_start_target_x =
+  unsupportedProperty(Property_parser.property_scroll_start_target_x);
+let scroll_start_target_y =
+  unsupportedProperty(Property_parser.property_scroll_start_target_y);
+let scroll_timeline =
+  unsupportedProperty(Property_parser.property_scroll_timeline);
+let scroll_timeline_axis =
+  unsupportedProperty(Property_parser.property_scroll_timeline_axis);
+let scroll_timeline_name =
+  unsupportedProperty(Property_parser.property_scroll_timeline_name);
+let text_spacing_trim =
+  unsupportedProperty(Property_parser.property_text_spacing_trim);
+let text_wrap = unsupportedProperty(Property_parser.property_text_wrap);
+let text_wrap_mode =
+  unsupportedProperty(Property_parser.property_text_wrap_mode);
+let text_wrap_style =
+  unsupportedProperty(Property_parser.property_text_wrap_style);
+let text_box_trim =
+  unsupportedProperty(Property_parser.property_text_box_trim);
+let text_box_edge =
+  unsupportedProperty(Property_parser.property_text_box_edge);
+let white_space_collapse =
+  unsupportedProperty(Property_parser.property_white_space_collapse);
+let math_depth = unsupportedProperty(Property_parser.property_math_depth);
+let math_shift = unsupportedProperty(Property_parser.property_math_shift);
+let math_style = unsupportedProperty(Property_parser.property_math_style);
+let font_display = unsupportedProperty(Property_parser.property_font_display);
+let page = unsupportedProperty(Property_parser.property_page);
+let size = unsupportedProperty(Property_parser.property_size);
+let marks = unsupportedProperty(Property_parser.property_marks);
+let bleed = unsupportedProperty(Property_parser.property_bleed);
+let stop_color = unsupportedProperty(Property_parser.property_stop_color);
+let stop_opacity = unsupportedProperty(Property_parser.property_stop_opacity);
+let flood_color = unsupportedProperty(Property_parser.property_flood_color);
+let flood_opacity =
+  unsupportedProperty(Property_parser.property_flood_opacity);
+let lighting_color =
+  unsupportedProperty(Property_parser.property_lighting_color);
+let contain_intrinsic_size =
+  unsupportedProperty(Property_parser.property_contain_intrinsic_size);
+let contain_intrinsic_width =
+  unsupportedProperty(Property_parser.property_contain_intrinsic_width);
+let contain_intrinsic_height =
+  unsupportedProperty(Property_parser.property_contain_intrinsic_height);
+let contain_intrinsic_block_size =
+  unsupportedProperty(Property_parser.property_contain_intrinsic_block_size);
+let contain_intrinsic_inline_size =
+  unsupportedProperty(Property_parser.property_contain_intrinsic_inline_size);
+let print_color_adjust =
+  unsupportedProperty(Property_parser.property_print_color_adjust);
+let ruby_overhang =
+  unsupportedProperty(Property_parser.property_ruby_overhang);
+let timeline_scope =
+  unsupportedProperty(Property_parser.property_timeline_scope);
+let animation_delay_end =
+  unsupportedProperty(Property_parser.property_animation_delay_end);
+let animation_delay_start =
+  unsupportedProperty(Property_parser.property_animation_delay_start);
+let syntax = unsupportedProperty(Property_parser.property_syntax);
+let inherits = unsupportedProperty(Property_parser.property_inherits);
+let initial_value =
+  unsupportedProperty(Property_parser.property_initial_value);
+let color_rendering =
+  unsupportedProperty(Property_parser.property_color_rendering);
+let vector_effect =
+  unsupportedProperty(Property_parser.property_vector_effect);
+let cx = unsupportedProperty(Property_parser.property_cx);
+let cy = unsupportedProperty(Property_parser.property_cy);
+let d = unsupportedProperty(Property_parser.property_d);
+let r = unsupportedProperty(Property_parser.property_r);
+let rx = unsupportedProperty(Property_parser.property_rx);
+let ry = unsupportedProperty(Property_parser.property_ry);
+let x = unsupportedProperty(Property_parser.property_x);
+let y = unsupportedProperty(Property_parser.property_y);
+let scroll_marker_group =
+  unsupportedProperty(Property_parser.property_scroll_marker_group);
+let container_name_computed =
+  unsupportedProperty(Property_parser.property_container_name_computed);
+let text_edge = unsupportedProperty(Property_parser.property_text_edge);
+let hyphenate_limit_last =
+  unsupportedProperty(Property_parser.property_hyphenate_limit_last);
+let margin_trim = unsupportedProperty(Property_parser.property_margin_trim);
+let marker = unsupportedProperty(Property_parser.property_marker);
+let marker_end = unsupportedProperty(Property_parser.property_marker_end);
+let marker_mid = unsupportedProperty(Property_parser.property_marker_mid);
+let marker_start = unsupportedProperty(Property_parser.property_marker_start);
+let margin_block = unsupportedProperty(Property_parser.property_margin_block);
+let margin_block_end =
+  unsupportedProperty(Property_parser.property_margin_block_end);
+let margin_block_start =
+  unsupportedProperty(Property_parser.property_margin_block_start);
+let margin_inline =
+  unsupportedProperty(Property_parser.property_margin_inline);
+let margin_inline_end =
+  unsupportedProperty(Property_parser.property_margin_inline_end);
+let margin_inline_start =
+  unsupportedProperty(Property_parser.property_margin_inline_start);
+let alignment_baseline =
+  unsupportedProperty(Property_parser.property_alignment_baseline);
+let azimuth = unsupportedProperty(Property_parser.property_azimuth);
+let backdrop_blur =
+  unsupportedProperty(Property_parser.property_backdrop_blur);
+let behavior = unsupportedProperty(Property_parser.property_behavior);
+let block_overflow =
+  unsupportedProperty(Property_parser.property_block_overflow);
+let box_align = unsupportedProperty(Property_parser.property_box_align);
+let box_direction =
+  unsupportedProperty(Property_parser.property_box_direction);
+let box_flex = unsupportedProperty(Property_parser.property_box_flex);
+let box_flex_group =
+  unsupportedProperty(Property_parser.property_box_flex_group);
+let box_lines = unsupportedProperty(Property_parser.property_box_lines);
+let box_ordinal_group =
+  unsupportedProperty(Property_parser.property_box_ordinal_group);
+let box_orient = unsupportedProperty(Property_parser.property_box_orient);
+let box_pack = unsupportedProperty(Property_parser.property_box_pack);
+let container = unsupportedProperty(Property_parser.property_container);
+let container_name =
+  unsupportedProperty(Property_parser.property_container_name);
+let container_type =
+  unsupportedProperty(Property_parser.property_container_type);
+let cue = unsupportedProperty(Property_parser.property_cue);
+let cue_after = unsupportedProperty(Property_parser.property_cue_after);
+let cue_before = unsupportedProperty(Property_parser.property_cue_before);
+let dominant_baseline =
+  unsupportedProperty(Property_parser.property_dominant_baseline);
+let font_smooth = unsupportedProperty(Property_parser.property_font_smooth);
+let glyph_orientation_horizontal =
+  unsupportedProperty(Property_parser.property_glyph_orientation_horizontal);
+let glyph_orientation_vertical =
+  unsupportedProperty(Property_parser.property_glyph_orientation_vertical);
+let kerning = unsupportedProperty(Property_parser.property_kerning);
+let paint_order = unsupportedProperty(Property_parser.property_paint_order);
+let pause = unsupportedProperty(Property_parser.property_pause);
+let pause_after = unsupportedProperty(Property_parser.property_pause_after);
+let pause_before = unsupportedProperty(Property_parser.property_pause_before);
+let rest = unsupportedProperty(Property_parser.property_rest);
+let rest_after = unsupportedProperty(Property_parser.property_rest_after);
+let rest_before = unsupportedProperty(Property_parser.property_rest_before);
+let voice_family = unsupportedProperty(Property_parser.property_voice_family);
+let voice_pitch = unsupportedProperty(Property_parser.property_voice_pitch);
+let voice_range = unsupportedProperty(Property_parser.property_voice_range);
+let voice_balance =
+  unsupportedProperty(Property_parser.property_voice_balance);
+let voice_duration =
+  unsupportedProperty(Property_parser.property_voice_duration);
+let voice_rate = unsupportedProperty(Property_parser.property_voice_rate);
+let voice_stress = unsupportedProperty(Property_parser.property_voice_stress);
+let voice_volume = unsupportedProperty(Property_parser.property_voice_volume);
+let speak = unsupportedProperty(Property_parser.property_speak);
+let speak_as = unsupportedProperty(Property_parser.property_speak_as);
+let shape_image_threshold =
+  unsupportedProperty(Property_parser.property_shape_image_threshold);
+let shape_margin = unsupportedProperty(Property_parser.property_shape_margin);
+let shape_outside =
+  unsupportedProperty(Property_parser.property_shape_outside);
+let shape_rendering =
+  unsupportedProperty(Property_parser.property_shape_rendering);
+let src = unsupportedProperty(Property_parser.property_src);
+let stroke_dashoffset =
+  unsupportedProperty(Property_parser.property_stroke_dashoffset);
+let unicode_bidi = unsupportedProperty(Property_parser.property_unicode_bidi);
+let unicode_range =
+  unsupportedProperty(Property_parser.property_unicode_range);
+let text_autospace =
+  unsupportedProperty(Property_parser.property_text_autospace);
+let text_blink = unsupportedProperty(Property_parser.property_text_blink);
+let text_justify_trim =
+  unsupportedProperty(Property_parser.property_text_justify_trim);
+let text_kashida = unsupportedProperty(Property_parser.property_text_kashida);
+let text_kashida_space =
+  unsupportedProperty(Property_parser.property_text_kashida_space);
+let text_anchor = unsupportedProperty(Property_parser.property_text_anchor);
+let text_rendering =
+  unsupportedProperty(Property_parser.property_text_rendering);
+let text_size_adjust =
+  unsupportedProperty(Property_parser.property_text_size_adjust);
+let scroll_behavior =
+  unsupportedProperty(Property_parser.property_scroll_behavior);
+let scroll_margin =
+  unsupportedProperty(Property_parser.property_scroll_margin);
+let scroll_margin_block =
+  unsupportedProperty(Property_parser.property_scroll_margin_block);
+let scroll_margin_block_end =
+  unsupportedProperty(Property_parser.property_scroll_margin_block_end);
+let scroll_margin_block_start =
+  unsupportedProperty(Property_parser.property_scroll_margin_block_start);
+let scroll_margin_bottom =
+  unsupportedProperty(Property_parser.property_scroll_margin_bottom);
+let scroll_margin_inline =
+  unsupportedProperty(Property_parser.property_scroll_margin_inline);
+let scroll_margin_inline_end =
+  unsupportedProperty(Property_parser.property_scroll_margin_inline_end);
+let scroll_margin_inline_start =
+  unsupportedProperty(Property_parser.property_scroll_margin_inline_start);
+let scroll_margin_left =
+  unsupportedProperty(Property_parser.property_scroll_margin_left);
+let scroll_margin_right =
+  unsupportedProperty(Property_parser.property_scroll_margin_right);
+let scroll_margin_top =
+  unsupportedProperty(Property_parser.property_scroll_margin_top);
+let scroll_padding =
+  unsupportedProperty(Property_parser.property_scroll_padding);
+let scroll_padding_block =
+  unsupportedProperty(Property_parser.property_scroll_padding_block);
+let scroll_padding_block_end =
+  unsupportedProperty(Property_parser.property_scroll_padding_block_end);
+let scroll_padding_block_start =
+  unsupportedProperty(Property_parser.property_scroll_padding_block_start);
+let scroll_padding_bottom =
+  unsupportedProperty(Property_parser.property_scroll_padding_bottom);
+let scroll_padding_inline =
+  unsupportedProperty(Property_parser.property_scroll_padding_inline);
+let scroll_padding_inline_end =
+  unsupportedProperty(Property_parser.property_scroll_padding_inline_end);
+let scroll_padding_inline_start =
+  unsupportedProperty(Property_parser.property_scroll_padding_inline_start);
+let scroll_padding_left =
+  unsupportedProperty(Property_parser.property_scroll_padding_left);
+let scroll_padding_right =
+  unsupportedProperty(Property_parser.property_scroll_padding_right);
+let scroll_padding_top =
+  unsupportedProperty(Property_parser.property_scroll_padding_top);
+let scroll_snap_align =
+  unsupportedProperty(Property_parser.property_scroll_snap_align);
+let scroll_snap_coordinate =
+  unsupportedProperty(Property_parser.property_scroll_snap_coordinate);
+let scroll_snap_destination =
+  unsupportedProperty(Property_parser.property_scroll_snap_destination);
+let scroll_snap_points_x =
+  unsupportedProperty(Property_parser.property_scroll_snap_points_x);
+let scroll_snap_points_y =
+  unsupportedProperty(Property_parser.property_scroll_snap_points_y);
+let scroll_snap_stop =
+  unsupportedProperty(Property_parser.property_scroll_snap_stop);
+let scroll_snap_type =
+  unsupportedProperty(Property_parser.property_scroll_snap_type);
+let scroll_snap_type_x =
+  unsupportedProperty(Property_parser.property_scroll_snap_type_x);
+let scroll_snap_type_y =
+  unsupportedProperty(Property_parser.property_scroll_snap_type_y);
+let view_timeline =
+  unsupportedProperty(Property_parser.property_view_timeline);
+let view_timeline_axis =
+  unsupportedProperty(Property_parser.property_view_timeline_axis);
+let view_timeline_inset =
+  unsupportedProperty(Property_parser.property_view_timeline_inset);
+let view_timeline_name =
+  unsupportedProperty(Property_parser.property_view_timeline_name);
+let view_transition_name =
+  unsupportedProperty(Property_parser.property_view_transition_name);
+let word_space_transform =
+  unsupportedProperty(Property_parser.property_word_space_transform);
+
 let properties = [
+  ("accent-color", found(accent_color)),
   ("align-content", found(align_content)),
   ("align-items", found(align_items)),
   ("align-self", found(align_self)),
+  ("alignment-baseline", found(alignment_baseline)),
   ("all", found(all)),
+  ("anchor-name", found(anchor_name)),
+  ("anchor-scope", found(anchor_scope)),
+  ("animation-composition", found(animation_composition)),
   ("animation-delay", found(animation_delay)),
+  ("animation-delay-end", found(animation_delay_end)),
+  ("animation-delay-start", found(animation_delay_start)),
   ("animation-direction", found(animation_direction)),
   ("animation-duration", found(animation_duration)),
   ("animation-fill-mode", found(animation_fill_mode)),
   ("animation-iteration-count", found(animation_iteration_count)),
   ("animation-name", found(animation_name)),
   ("animation-play-state", found(animation_play_state)),
+  ("animation-range", found(animation_range)),
+  ("animation-range-end", found(animation_range_end)),
+  ("animation-range-start", found(animation_range_start)),
+  ("animation-timeline", found(animation_timeline)),
   ("animation-timing-function", found(animation_timing_function)),
   ("animation", found(animation)),
   ("appearance", found(appearance)),
   ("aspect-ratio", found(aspect_ratio)),
+  ("azimuth", found(azimuth)),
+  ("backdrop-blur", found(backdrop_blur)),
   ("backdrop-filter", found(backdrop_filter)),
   ("backface-visibility", found(backface_visibility)),
   ("background-attachment", found(background_attachment)),
@@ -5992,6 +6281,9 @@ let properties = [
   ("background-size", found(background_size)),
   ("background", found(background)),
   ("baseline-shift", found(baseline_shift)),
+  ("behavior", found(behavior)),
+  ("bleed", found(bleed)),
+  ("block-overflow", found(block_overflow)),
   ("block-size", found(block_size)),
   ("border-block-color", found(border_block_color)),
   ("border-block-end-color", found(border_block_end_color)),
@@ -6055,7 +6347,15 @@ let properties = [
   ("border-width", found(border_width)),
   ("border", found(border)),
   ("bottom", found(bottom)),
+  ("box-align", found(box_align)),
   ("box-decoration-break", found(box_decoration_break)),
+  ("box-direction", found(box_direction)),
+  ("box-flex", found(box_flex)),
+  ("box-flex-group", found(box_flex_group)),
+  ("box-lines", found(box_lines)),
+  ("box-ordinal-group", found(box_ordinal_group)),
+  ("box-orient", found(box_orient)),
+  ("box-pack", found(box_pack)),
   ("box-shadow", found(box_shadow)),
   ("box-sizing", found(box_sizing)),
   ("break-after", found(break_after)),
@@ -6071,6 +6371,7 @@ let properties = [
   ("color-adjust", found(color_adjust)),
   ("color-interpolation-filters", found(color_interpolation_filters)),
   ("color-interpolation", found(color_interpolation)),
+  ("color-rendering", found(color_rendering)),
   ("color-scheme", found(color_scheme)),
   ("color", found(color)),
   ("column-count", found(column_count)),
@@ -6084,15 +6385,32 @@ let properties = [
   ("column-width", found(column_width)),
   ("columns", found(columns)),
   ("contain", found(contain)),
+  ("container", found(container)),
+  ("container-name", found(container_name)),
+  ("container-name-computed", found(container_name_computed)),
+  ("container-type", found(container_type)),
+  ("contain-intrinsic-block-size", found(contain_intrinsic_block_size)),
+  ("contain-intrinsic-height", found(contain_intrinsic_height)),
+  ("contain-intrinsic-inline-size", found(contain_intrinsic_inline_size)),
+  ("contain-intrinsic-size", found(contain_intrinsic_size)),
+  ("contain-intrinsic-width", found(contain_intrinsic_width)),
   ("content-visibility", found(content_visibility)),
   ("content", found(content)),
   ("counter-increment", found(counter_increment)),
   ("counter-reset", found(counter_reset)),
   ("counter-set", found(counter_set)),
+  ("cue", found(cue)),
+  ("cue-after", found(cue_after)),
+  ("cue-before", found(cue_before)),
   ("cursor", found(cursor)),
+  ("cx", found(cx)),
+  ("cy", found(cy)),
+  ("d", found(d)),
   ("direction", found(direction)),
   ("display", found(display)),
+  ("dominant-baseline", found(dominant_baseline)),
   ("empty-cells", found(empty_cells)),
+  ("field-sizing", found(field_sizing)),
   ("fill-opacity", found(fill_opacity)),
   ("fill-rule", found(fill_rule)),
   ("fill", found(fill)),
@@ -6105,7 +6423,10 @@ let properties = [
   ("flex-shrink", found(flex_shrink)),
   ("flex-wrap", found(flex_wrap)),
   ("float", found(float)),
+  ("flood-color", found(flood_color)),
+  ("flood-opacity", found(flood_opacity)),
   ("font-family", found(font_family)),
+  ("font-display", found(font_display)),
   ("font-feature-settings", found(font_feature_settings)),
   ("font-kerning", found(font_kerning)),
   ("font-language-override", found(font_language_override)),
@@ -6113,6 +6434,7 @@ let properties = [
   ("font-size-adjust", found(font_size_adjust)),
   ("font-size", found(font_size)),
   ("font-palette", found(font_palette)),
+  ("font-smooth", found(font_smooth)),
   ("font-stretch", found(font_stretch)),
   ("font-style", found(font_style)),
   ("font-synthesis-position", found(font_synthesis_position)),
@@ -6132,6 +6454,8 @@ let properties = [
   ("font-weight", found(font_weight)),
   ("font", found(font)),
   ("gap", found(gap)),
+  ("glyph-orientation-horizontal", found(glyph_orientation_horizontal)),
+  ("glyph-orientation-vertical", found(glyph_orientation_vertical)),
   ("grid-area", found(grid_area)),
   ("grid-auto-columns", found(grid_auto_columns)),
   ("grid-auto-flow", found(grid_auto_flow)),
@@ -6155,15 +6479,19 @@ let properties = [
   ("hyphenate-character", found(hyphenate_character)),
   ("hyphenate-limit-chars", found(hyphenate_limit_chars)),
   ("hyphenate-limit-lines", found(hyphenate_limit_lines)),
+  ("hyphenate-limit-last", found(hyphenate_limit_last)),
   ("hyphenate-limit-zone", found(hyphenate_limit_zone)),
   ("hyphens", found(hyphens)),
   ("image-orientation", found(image_orientation)),
   ("image-rendering", found(image_rendering)),
   ("image-resolution", found(image_resolution)),
   ("ime-mode", found(ime_mode)),
+  ("inherits", found(inherits)),
   ("initial-letter-align", found(initial_letter_align)),
   ("initial-letter", found(initial_letter)),
+  ("initial-value", found(initial_value)),
   ("inline-size", found(inline_size)),
+  ("inset-area", found(inset_area)),
   ("inset-block-end", found(inset_block_end)),
   ("inset-block-start", found(inset_block_start)),
   ("inset-block", found(inset_block)),
@@ -6171,10 +6499,12 @@ let properties = [
   ("inset-inline-start", found(inset_inline_start)),
   ("inset-inline", found(inset_inline)),
   ("inset", found(inset)),
+  ("interpolate-size", found(interpolate_size)),
   ("isolation", found(isolation)),
   ("justify-content", found(justify_content)),
   ("justify-items", found(justify_items)),
   ("justify-self", found(justify_self)),
+  ("kerning", found(kerning)),
   ("layout-grid-char", found(layout_grid_char)),
   ("layout-grid-line", found(layout_grid_line)),
   ("layout-grid-mode", found(layout_grid_mode)),
@@ -6182,6 +6512,7 @@ let properties = [
   ("layout-grid", found(layout_grid)),
   ("left", found(left)),
   ("letter-spacing", found(letter_spacing)),
+  ("lighting-color", found(lighting_color)),
   ("line-break", found(line_break)),
   ("line-clamp", found(line_clamp)),
   ("line-height-step", found(line_height_step)),
@@ -6190,11 +6521,23 @@ let properties = [
   ("list-style-position", found(list_style_position)),
   ("list-style-type", found(list_style_type)),
   ("list-style", found(list_style)),
+  ("margin-block", found(margin_block)),
+  ("margin-block-end", found(margin_block_end)),
+  ("margin-block-start", found(margin_block_start)),
   ("margin-bottom", found(margin_bottom)),
+  ("margin-inline", found(margin_inline)),
+  ("margin-inline-end", found(margin_inline_end)),
+  ("margin-inline-start", found(margin_inline_start)),
   ("margin-left", found(margin_left)),
   ("margin-right", found(margin_right)),
   ("margin-top", found(margin_top)),
+  ("margin-trim", found(margin_trim)),
   ("margin", found(margin)),
+  ("marker", found(marker)),
+  ("marker-end", found(marker_end)),
+  ("marker-mid", found(marker_mid)),
+  ("marker-start", found(marker_start)),
+  ("marks", found(marks)),
   ("mask-border-mode", found(mask_border_mode)),
   ("mask-border-outset", found(mask_border_outset)),
   ("mask-border-repeat", found(mask_border_repeat)),
@@ -6210,6 +6553,9 @@ let properties = [
   ("mask-repeat", found(mask_repeat)),
   ("mask-size", found(mask_size)),
   ("mask-type", found(mask_type)),
+  ("math-depth", found(math_depth)),
+  ("math-shift", found(math_shift)),
+  ("math-style", found(math_style)),
   ("max-block-size", found(max_block_size)),
   ("max-height", found(max_height)),
   ("max-inline-size", found(max_inline_size)),
@@ -6240,6 +6586,7 @@ let properties = [
   ("outline-offset", found(outline_offset)),
   ("outline-style", found(outline_style)),
   ("outline-width", found(outline_width)),
+  ("overlay", found(overlay)),
   ("overflow-anchor", found(overflow_anchor)),
   ("overflow-block", found(overflow_block)),
   ("overflow-clip-margin", found(overflow_clip_margin)),
@@ -6259,18 +6606,42 @@ let properties = [
   ("padding-right", found(padding_right)),
   ("padding-top", found(padding_top)),
   ("padding", found(padding)),
+  ("page", found(page)),
   ("page-break-after", found(page_break_after)),
+  ("paint-order", found(paint_order)),
+  ("pause", found(pause)),
+  ("pause-after", found(pause_after)),
+  ("pause-before", found(pause_before)),
   ("page-break-before", found(page_break_before)),
   ("page-break-inside", found(page_break_inside)),
   ("perspective-origin", found(perspective_origin)),
   ("perspective", found(perspective)),
   ("pointer-events", found(pointer_events)),
   ("position", found(position)),
+  ("position-anchor", found(position_anchor)),
+  ("print-color-adjust", found(print_color_adjust)),
+  ("position-area", found(position_area)),
+  ("position-try", found(position_try)),
+  ("position-try-fallbacks", found(position_try_fallbacks)),
+  ("position-try-options", found(position_try_options)),
+  ("position-visibility", found(position_visibility)),
+  ("r", found(r)),
+  ("reading-flow", found(reading_flow)),
   ("resize", found(resize)),
+  ("rest", found(rest)),
+  ("rest-after", found(rest_after)),
+  ("rest-before", found(rest_before)),
   ("right", found(right)),
   ("rotate", found(rotate)),
   ("row-gap", found(row_gap)),
+  ("ruby-overhang", found(ruby_overhang)),
+  ("rx", found(rx)),
+  ("ry", found(ry)),
   ("scale", found(scale)),
+  ("shape-image-threshold", found(shape_image_threshold)),
+  ("shape-margin", found(shape_margin)),
+  ("shape-outside", found(shape_outside)),
+  ("shape-rendering", found(shape_rendering)),
   ("scrollbar-3dlight-color", found(scrollbar_3dlight_color)),
   ("scrollbar-arrow-color", found(scrollbar_arrow_color)),
   ("scrollbar-base-color", found(scrollbar_base_color)),
@@ -6282,18 +6653,77 @@ let properties = [
   ("scrollbar-track-color", found(scrollbar_track_color)),
   ("scrollbar-width", found(scrollbar_width)),
   ("scrollbar-gutter", found(scrollbar_gutter)),
-  ("stroke-opacity", found(stroke_opacity)),
-  ("stroke-width", found(stroke_width)),
+  ("speak", found(speak)),
+  ("speak-as", found(speak_as)),
+  ("src", found(src)),
+  ("scroll-behavior", found(scroll_behavior)),
+  ("scroll-margin", found(scroll_margin)),
+  ("scroll-margin-block", found(scroll_margin_block)),
+  ("scroll-margin-block-end", found(scroll_margin_block_end)),
+  ("scroll-margin-block-start", found(scroll_margin_block_start)),
+  ("scroll-margin-bottom", found(scroll_margin_bottom)),
+  ("scroll-margin-inline", found(scroll_margin_inline)),
+  ("scroll-margin-inline-end", found(scroll_margin_inline_end)),
+  ("scroll-margin-inline-start", found(scroll_margin_inline_start)),
+  ("scroll-margin-left", found(scroll_margin_left)),
+  ("scroll-margin-right", found(scroll_margin_right)),
+  ("scroll-margin-top", found(scroll_margin_top)),
+  ("scroll-marker-group", found(scroll_marker_group)),
+  ("scroll-padding", found(scroll_padding)),
+  ("scroll-padding-block", found(scroll_padding_block)),
+  ("scroll-padding-block-end", found(scroll_padding_block_end)),
+  ("scroll-padding-block-start", found(scroll_padding_block_start)),
+  ("scroll-padding-bottom", found(scroll_padding_bottom)),
+  ("scroll-padding-inline", found(scroll_padding_inline)),
+  ("scroll-padding-inline-end", found(scroll_padding_inline_end)),
+  ("scroll-padding-inline-start", found(scroll_padding_inline_start)),
+  ("scroll-padding-left", found(scroll_padding_left)),
+  ("scroll-padding-right", found(scroll_padding_right)),
+  ("scroll-padding-top", found(scroll_padding_top)),
+  ("scroll-snap-align", found(scroll_snap_align)),
+  ("scroll-snap-coordinate", found(scroll_snap_coordinate)),
+  ("scroll-snap-destination", found(scroll_snap_destination)),
+  ("scroll-snap-points-x", found(scroll_snap_points_x)),
+  ("scroll-snap-points-y", found(scroll_snap_points_y)),
+  ("scroll-snap-stop", found(scroll_snap_stop)),
+  ("scroll-snap-type", found(scroll_snap_type)),
+  ("scroll-snap-type-x", found(scroll_snap_type_x)),
+  ("scroll-snap-type-y", found(scroll_snap_type_y)),
+  ("size", found(size)),
+  ("scroll-start", found(scroll_start)),
+  ("scroll-start-block", found(scroll_start_block)),
+  ("scroll-start-inline", found(scroll_start_inline)),
+  ("scroll-start-x", found(scroll_start_x)),
+  ("scroll-start-y", found(scroll_start_y)),
+  ("scroll-start-target", found(scroll_start_target)),
+  ("scroll-start-target-block", found(scroll_start_target_block)),
+  ("scroll-start-target-inline", found(scroll_start_target_inline)),
+  ("scroll-start-target-x", found(scroll_start_target_x)),
+  ("scroll-start-target-y", found(scroll_start_target_y)),
+  ("scroll-timeline", found(scroll_timeline)),
+  ("scroll-timeline-axis", found(scroll_timeline_axis)),
+  ("scroll-timeline-name", found(scroll_timeline_name)),
+  ("stop-color", found(stop_color)),
+  ("stop-opacity", found(stop_opacity)),
+  ("stroke", found(stroke)),
   ("stroke-dasharray", found(stroke_dasharray)),
+  ("stroke-dashoffset", found(stroke_dashoffset)),
   ("stroke-linecap", found(stroke_linecap)),
   ("stroke-linejoin", found(stroke_linejoin)),
   ("stroke-miterlimit", found(stroke_miterlimit)),
-  ("stroke", found(stroke)),
+  ("stroke-opacity", found(stroke_opacity)),
+  ("stroke-width", found(stroke_width)),
+  ("syntax", found(syntax)),
   ("tab-size", found(tab_size)),
   ("table-layout", found(table_layout)),
   ("text-align-last", found(text_align_last)),
   ("text-align", found(text_align)),
   ("text-align-all", found(text_align_all)),
+  ("text-anchor", found(text_anchor)),
+  ("text-autospace", found(text_autospace)),
+  ("text-blink", found(text_blink)),
+  ("text-box-edge", found(text_box_edge)),
+  ("text-box-trim", found(text_box_trim)),
   ("text-combine-upright", found(text_combine_upright)),
   ("text-decoration-color", found(text_decoration_color)),
   ("text-decoration-line", found(text_decoration_line)),
@@ -6302,6 +6732,7 @@ let properties = [
   ("text-decoration-style", found(text_decoration_style)),
   ("text-decoration-thickness", found(text_decoration_thickness)),
   ("text-decoration", found(text_decoration)),
+  ("text-edge", found(text_edge)),
   ("text-decoration-skip-box", found(text_decoration_skip_box)),
   ("text-decoration-skip-inset", found(text_decoration_skip_inset)),
   ("text-decoration-skip-self", found(text_decoration_skip_self)),
@@ -6312,12 +6743,22 @@ let properties = [
   ("text-emphasis", found(text_emphasis)),
   ("text-indent", found(text_indent)),
   ("text-justify", found(text_justify)),
+  ("text-justify-trim", found(text_justify_trim)),
+  ("text-kashida", found(text_kashida)),
+  ("text-kashida-space", found(text_kashida_space)),
   ("text-orientation", found(text_orientation)),
   ("text-overflow", found(text_overflow)),
+  ("text-rendering", found(text_rendering)),
   ("text-shadow", found(text_shadow)),
+  ("text-size-adjust", found(text_size_adjust)),
+  ("text-spacing-trim", found(text_spacing_trim)),
   ("text-transform", found(text_transform)),
   ("text-underline-offset", found(text_underline_offset)),
   ("text-underline-position", found(text_underline_position)),
+  ("text-wrap", found(text_wrap)),
+  ("text-wrap-mode", found(text_wrap_mode)),
+  ("text-wrap-style", found(text_wrap_style)),
+  ("timeline-scope", found(timeline_scope)),
   ("top", found(top)),
   ("touch-action", found(touch_action)),
   ("transform-box", found(transform_box)),
@@ -6331,17 +6772,37 @@ let properties = [
   ("transition-timing-function", found(transition_timing_function)),
   ("transition", found(transition)),
   ("translate", found(translate)),
+  ("unicode-bidi", found(unicode_bidi)),
+  ("unicode-range", found(unicode_range)),
   ("user-select", found(user_select)),
+  ("vector-effect", found(vector_effect)),
   ("vertical-align", found(vertical_align)),
+  ("view-timeline", found(view_timeline)),
+  ("view-timeline-axis", found(view_timeline_axis)),
+  ("view-timeline-inset", found(view_timeline_inset)),
+  ("view-timeline-name", found(view_timeline_name)),
+  ("view-transition-name", found(view_transition_name)),
   ("visibility", found(visibility)),
+  ("voice-balance", found(voice_balance)),
+  ("voice-duration", found(voice_duration)),
+  ("voice-family", found(voice_family)),
+  ("voice-pitch", found(voice_pitch)),
+  ("voice-range", found(voice_range)),
+  ("voice-rate", found(voice_rate)),
+  ("voice-stress", found(voice_stress)),
+  ("voice-volume", found(voice_volume)),
   ("will-change", found(will_change)),
   ("white-space", found(white_space)),
+  ("white-space-collapse", found(white_space_collapse)),
   ("widows", found(widows)),
   ("width", found(width)),
   ("word-break", found(word_break)),
+  ("word-space-transform", found(word_space_transform)),
   ("word-spacing", found(word_spacing)),
   ("word-wrap", found(word_wrap)),
   ("writing-mode", found(writing_mode)),
+  ("x", found(x)),
+  ("y", found(y)),
   ("z-index", found(z_index)),
   ("zoom", found(zoom)),
 ];
@@ -6371,6 +6832,7 @@ let render_variable_declaration = (~loc, property, value) => {
 };
 
 let render_to_expr = (~loc, property, value, important) => {
+  let (let.ok) = Result.bind;
   let.ok expr_of_string =
     switch (findProperty(property)) {
     | Some((_, (_, expr_of_string))) => Ok(expr_of_string)
@@ -6383,50 +6845,6 @@ let render_to_expr = (~loc, property, value, important) => {
   | Ok(expr) => Ok(expr)
   | Error(err) => Error(`Invalid_value(err))
   | exception (Invalid_value(v)) => Error(`Invalid_value(v))
-  };
-};
-
-/* Get the CSS runtime function for a property with a dynamic variable value.
-   This uses the existing property definitions to generate the correct CSS function call.
-
-   The approach is to parse a dummy value through the property's transform
-   and extract the CSS function wrapper. For monomorphic properties, this will give us
-   something like CSS.color(`inherit), from which we can extract CSS.color. */
-let get_css_function_for_property = (~loc, property_name, var_expr) => {
-  switch (findProperty(property_name)) {
-  | Some((_, (_, string_to_expr))) =>
-    /* Try to parse "inherit" which is valid for all CSS properties */
-    switch (string_to_expr(~loc, "inherit")) {
-    | Ok([expr]) =>
-      /* Extract the CSS function from the generated expression.
-         For monomorphic properties, expr will be something like CSS.color(`inherit).
-         We want to replace `inherit with our var_expr. */
-      switch (expr.pexp_desc) {
-      | Pexp_apply(css_function, [(label, _value)]) =>
-        /* Reconstruct the application with our variable */
-        Builder.pexp_apply(~loc, css_function, [(label, var_expr)])
-      | _ =>
-        /* For polymorphic properties or unexpected structures,
-           fall back to using the property name to generate the function */
-        let css_function = property_name_to_renderer(~loc, property_name);
-        Builder.pexp_apply(~loc, css_function, [(Nolabel, var_expr)]);
-      }
-    | Ok(_multiple_exprs) =>
-      /* Some properties generate multiple expressions.
-         Fall back to using the property name. */
-      let css_function = property_name_to_renderer(~loc, property_name);
-      Builder.pexp_apply(~loc, css_function, [(Nolabel, var_expr)]);
-    | Error(_) =>
-      /* If we can't parse "inherit", fall back to the property name approach */
-      let css_function = property_name_to_renderer(~loc, property_name);
-      Builder.pexp_apply(~loc, css_function, [(Nolabel, var_expr)]);
-    }
-  | None =>
-    /* Property not found in our definitions, use CSS.unsafe */
-    let property_camel = to_camel_case(property_name);
-    [%expr
-     CSS.unsafe([%e render_string(~loc, property_camel)], [%e var_expr])
-    ];
   };
 };
 

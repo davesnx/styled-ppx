@@ -12,10 +12,10 @@
   ppxlib.astlib
   fmt)
  (preprocess
-  (pps reason_css_parser_ppx sedlex.ppx ppxlib.metaquot)))
+  (pps css_grammar_ppx sedlex.ppx ppxlib.metaquot)))
 
 (rule
- (alias test-css-grammar-parser)
+ (alias test-css-grammar)
  (deps Runner.exe)
  (action
   (run %{deps})))

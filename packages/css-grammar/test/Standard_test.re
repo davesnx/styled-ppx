@@ -10,43 +10,45 @@ let tests = [
   // TODO: case insensitive
   test("integer", () => {
     let parse = parse([%value "<integer>"]);
+    let unwrap = Result.map(fun | `Integer(i) => i);
     check(
       ~__POS__,
       Alcotest.result(Alcotest.int, Alcotest.string),
-      parse("54"),
+      parse("54") |> unwrap,
       Ok(54),
     );
     check(
       ~__POS__,
       Alcotest.result(Alcotest.int, Alcotest.string),
-      parse("54.4"),
+      parse("54.4") |> unwrap,
       Error("Expected an integer, got a float instead."),
     );
     check(
       ~__POS__,
       Alcotest.result(Alcotest.int, Alcotest.string),
-      parse("ident"),
+      parse("ident") |> unwrap,
       Error("Expected an integer."),
     );
   }),
   test("<number>", () => {
     let parse = parse([%value "<number>"]);
+    let unwrap = Result.map(fun | `Number(f) => f);
     check(
       ~__POS__,
       Alcotest.result(Alcotest.float(1.), Alcotest.string),
-      parse("55"),
+      parse("55") |> unwrap,
       Ok(55.),
     );
     check(
       ~__POS__,
       Alcotest.result(Alcotest.float(1.), Alcotest.string),
-      parse("55.5"),
+      parse("55.5") |> unwrap,
       Ok(55.5),
     );
     check(
       ~__POS__,
       Alcotest.result(Alcotest.float(1.), Alcotest.string),
-      parse("ident"),
+      parse("ident") |> unwrap,
       Error("Expected a number. Got 'ident' instead."),
     );
   }),
@@ -267,22 +269,23 @@ let tests = [
   }),
   test("<percentage>", () => {
     let parse = parse([%value "<percentage>"]);
+    let unwrap = Result.map(fun | `Percentage(f) => f);
     check(
       ~__POS__,
       Alcotest.result(Alcotest.float(1.), Alcotest.string),
-      parse("61%"),
+      parse("61%") |> unwrap,
       Ok(61.),
     );
     check(
       ~__POS__,
       Alcotest.result(Alcotest.float(1.), Alcotest.string),
-      parse("62.3%"),
+      parse("62.3%") |> unwrap,
       Ok(62.3),
     );
     check(
       ~__POS__,
       Alcotest.result(Alcotest.float(1.), Alcotest.string),
-      parse("63.4:"),
+      parse("63.4:") |> unwrap,
       Error("Expected '%' but instead got ':'."),
     );
   }),
@@ -303,10 +306,11 @@ let tests = [
   }),
   test("<ident>", () => {
     let parse = parse([%value "<ident>"]);
+    let unwrap = Result.map(fun | `Ident(s) => s);
     let to_check = Alcotest.result(Alcotest.string, Alcotest.string);
     let expect = check(~__POS__, to_check);
-    expect(parse("test"), Ok("test"));
-    expect(parse("'ohno'"), Error("Expected an indentifier."));
+    expect(parse("test") |> unwrap, Ok("test"));
+    expect(parse("'ohno'") |> unwrap, Error("Expected an indentifier."));
   }),
   test("<css-wide-keywords>", () => {
     let parse = parse([%value "<css-wide-keywords>"]);
@@ -363,28 +367,30 @@ let tests = [
   }),
   test("<string>", () => {
     let parse = parse([%value "<string>"]);
+    let unwrap = Result.map(fun | `String_token(s) => s);
     let to_check = Alcotest.result(Alcotest.string, Alcotest.string);
     let expect = check(~__POS__, to_check);
-    expect(parse({|'tuturu'|}), Ok("tuturu"));
-    expect(parse({|'67.8'|}), Ok("67.8"));
-    expect(parse({|ident|}), Error("Expected a string."));
-    expect(parse({|68.9|}), Error("Expected a string."));
-    expect(parse({|"this is a 'string'."|}), Ok("this is a 'string'."));
-    expect(parse({|""|}), Ok(""));
-    expect(parse({|''|}), Ok(""));
-    expect(parse({|" "|}), Ok(" "));
-    expect(parse({|'"'|}), Ok("\""));
-    expect(parse({|' '|}), Ok(" "));
-    expect(parse({|"this is a \"string\"."|}), Ok("this is a \"string\"."));
-    expect(parse({|'this is a "string".'|}), Ok("this is a \"string\"."));
-    expect(parse({|'this is a \'string\'.'|}), Ok("this is a \'string\'."));
+    expect(parse({|'tuturu'|}) |> unwrap, Ok("tuturu"));
+    expect(parse({|'67.8'|}) |> unwrap, Ok("67.8"));
+    expect(parse({|ident|}) |> unwrap, Error("Expected a string."));
+    expect(parse({|68.9|}) |> unwrap, Error("Expected a string."));
+    expect(parse({|"this is a 'string'."|}) |> unwrap, Ok("this is a 'string'."));
+    expect(parse({|""|}) |> unwrap, Ok(""));
+    expect(parse({|''|}) |> unwrap, Ok(""));
+    expect(parse({|" "|}) |> unwrap, Ok(" "));
+    expect(parse({|'"'|}) |> unwrap, Ok("\""));
+    expect(parse({|' '|}) |> unwrap, Ok(" "));
+    expect(parse({|"this is a \"string\"."|}) |> unwrap, Ok("this is a \"string\"."));
+    expect(parse({|'this is a "string".'|}) |> unwrap, Ok("this is a \"string\"."));
+    expect(parse({|'this is a \'string\'.'|}) |> unwrap, Ok("this is a \'string\'."));
   }),
   test("<dashed-ident>", () => {
     let parse = parse([%value "<dashed-ident>"]);
+    let unwrap = Result.map(fun | `Dashed_ident(s) => s);
     let to_check = Alcotest.result(Alcotest.string, Alcotest.string);
     let expect = check(~__POS__, to_check);
-    expect(parse("--random"), Ok("--random"));
-    expect(parse("random'"), Error("Expected a --variable."));
+    expect(parse("--random") |> unwrap, Ok("--random"));
+    expect(parse("random'") |> unwrap, Error("Expected a --variable."));
   }),
   test("<url-no-interp>", () => {
     let parse = parse([%value "<url-no-interp>"]);
@@ -399,14 +405,16 @@ let tests = [
   // css-color-4
   test("<hex-color>", () => {
     let parse = parse([%value "<hex-color>"]);
+    let unwrap = Result.map(fun | `Hex_color(s) => s);
     let to_check = Alcotest.result(Alcotest.string, Alcotest.string);
     let expect = check(~__POS__, to_check);
-    expect(parse("#abc"), Ok("abc"));
-    expect(parse("#abcdefgh"), Ok("abcdefgh"));
-    expect(parse("#abcdefghi"), Error("Expected a hex-color."));
+    expect(parse("#abc") |> unwrap, Ok("abc"));
+    expect(parse("#abcdefgh") |> unwrap, Ok("abcdefgh"));
+    expect(parse("#abcdefghi") |> unwrap, Error("Expected a hex-color."));
   }),
   test("<linenames>", () => {
     let parse = parse([%value "<line_names>"]);
+    /* Static combinator already unwraps custom_ident, so no need to unwrap again */
     let to_check =
       Alcotest.result(
         Alcotest.triple(
@@ -423,6 +431,7 @@ let tests = [
   }),
   test("chars", () => {
     let parse = parse([%value "<string>? ',' <string>"]);
+    /* Static combinator already unwraps string_token, so no need to unwrap again */
     let to_check =
       Alcotest.result(
         Alcotest.triple(
@@ -458,12 +467,13 @@ let tests = [
   }),
   test("interpolation", () => {
     let parse = parse([%value "<interpolation>"]);
+    let unwrap = Result.map(fun | `Interpolation(lst) => lst);
     let to_check =
       Alcotest.result(Alcotest.list(Alcotest.string), Alcotest.string);
     let expect = check(~__POS__, to_check);
-    expect(parse("$(Module.value)"), Ok(["Module", "value"]));
-    expect(parse("$(Module'.value')"), Ok(["Module'", "value'"]));
+    expect(parse("$(Module.value)") |> unwrap, Ok(["Module", "value"]));
+    expect(parse("$(Module'.value')") |> unwrap, Ok(["Module'", "value'"]));
     /* TODO: Add error message into interpolation */
-    expect(parse("asd"), Error("Expected interpolation."));
+    expect(parse("asd") |> unwrap, Error("Expected interpolation."));
   }),
 ];

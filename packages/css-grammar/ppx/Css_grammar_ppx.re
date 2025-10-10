@@ -41,7 +41,7 @@ let string_patten =
     )
   );
 
-let valueExtension =
+let value_extension =
   Ppxlib.Extension.declare_with_path_arg(
     "value",
     Ppxlib.Extension.Context.Expression,
@@ -49,7 +49,7 @@ let valueExtension =
     expander(~recursive=false),
   );
 
-let valueRecExtension =
+let value_rec_extension =
   Ppxlib.Extension.declare_with_path_arg(
     "value.rec",
     Ppxlib.Extension.Context.Expression,
@@ -122,6 +122,6 @@ let preprocess_impl = structure_items => {
 
 Driver.register_transformation(
   ~preprocess_impl,
-  ~extensions=[valueExtension, valueRecExtension],
+  ~extensions=[value_extension, value_rec_extension],
   "css-grammar-ppx",
 );

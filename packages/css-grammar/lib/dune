@@ -7,7 +7,7 @@
   )
  (preprocess
   (per_module
-   ((pps reason_css_parser_ppx)
+   ((pps css_grammar_ppx)
     Parser)))
  ; TODO : remove these flags
  (flags

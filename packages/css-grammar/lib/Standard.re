@@ -65,7 +65,7 @@ let integer =
     fun
     | NUMBER(string) =>
       Float.is_integer(Float.of_string(string))
-        ? Ok(Float.of_string(string) |> Float.to_int)
+        ? Ok(`Integer(Float.of_string(string) |> Float.to_int))
         : Error(["Expected an integer, got a float instead."])
     | _ => Error(["Expected an integer."]),
   );
@@ -73,7 +73,7 @@ let integer =
 let number =
   token(
     fun
-    | NUMBER(num_str) => Ok(Float.of_string(num_str))
+    | NUMBER(num_str) => Ok(`Number(Float.of_string(num_str)))
     | token =>
       Error(["Expected a number. Got '" ++ humanize(token) ++ "' instead."]),
   );
@@ -194,9 +194,9 @@ let resolution =
 
 // TODO: positive numbers like <number [0,infinity]>
 let percentage = {
-  let.bind_match num = number;
+  let.bind_match `Number(num) = number;
   let.bind_match () = expect(PERCENT);
-  Rule.Match.return(num);
+  Rule.Match.return(`Percentage(num));
 };
 
 // https://drafts.csswg.org/css-values-4/#css-identifier
@@ -204,8 +204,8 @@ let percentage = {
 let ident =
   token(
     fun
-    | IDENT(string) => Ok(string)
-    | TAG(string) => Ok(string)
+    | IDENT(string) => Ok(`Ident(string))
+    | TAG(string) => Ok(`Ident(string))
     | _ => Error(["Expected an indentifier."]),
   );
 
@@ -224,9 +224,9 @@ let css_wide_keywords =
 let custom_ident =
   token(
     fun
-    | IDENT(string) => Ok(string)
-    | TAG(string) => Ok(string)
-    | STRING(string) => Ok(string)
+    | IDENT(string) => Ok(`Custom_ident(string))
+    | TAG(string) => Ok(`Custom_ident(string))
+    | STRING(string) => Ok(`Custom_ident(string))
     | _ => Error(["Expected an identifier."]),
   );
 
@@ -234,7 +234,8 @@ let custom_ident =
 let dashed_ident =
   token(
     fun
-    | IDENT(string) when String.sub(string, 0, 2) == "--" => Ok(string)
+    | IDENT(string) when String.sub(string, 0, 2) == "--" =>
+      Ok(`Dashed_ident(string))
     | _ => Error(["Expected a --variable."]),
   );
 
@@ -242,7 +243,7 @@ let dashed_ident =
 let string_token =
   token(
     fun
-    | STRING(string) => Ok(string)
+    | STRING(string) => Ok(`String_token(string))
     | _ => Error(["Expected a string."]),
   );
 
@@ -258,8 +259,11 @@ let url_no_interp = {
       | URL(url) => Ok(url)
       | _ => Error(["Expected a url."]),
     );
-  let url_fun = function_call("url", string_token);
-  Combinators.xor([url_token, url_fun]);
+  let string_unwrapped = {
+    let.bind_match `String_token(s) = string_token;
+    Rule.Match.return(s);
+  };
+  Combinators.xor([url_token, function_call("url", string_unwrapped)]);
 };
 
 // css-color-4
@@ -268,7 +272,7 @@ let hex_color =
   token(
     fun
     | HASH(str) when String.length(str) >= 3 && String.length(str) <= 8 =>
-      Ok(str)
+      Ok(`Hex_color(str))
     | _ => Error(["Expected a hex-color."]),
   );
 
@@ -280,7 +284,7 @@ let hex_color =
 let interpolation =
   token(
     fun
-    | INTERPOLATION(parts) => Ok(parts)
+    | INTERPOLATION(parts) => Ok(`Interpolation(parts))
     | _ => Error(["Expected interpolation."]),
   );
 
@@ -297,7 +301,7 @@ let media_type =
           Error([
             Format.sprintf("media_type has an invalid value: '%s'", value),
           ])
-        | _ => Ok(value)
+        | _ => Ok(`Media_type(value))
         };
       }
     | token =>
@@ -311,7 +315,7 @@ let media_type =
 
 let container_name = {
   open Rule.Let;
-  let.bind_match name = custom_ident;
+  let.bind_match `Custom_ident(name) = custom_ident;
   let value = {
     switch (name) {
     | "none"
@@ -321,7 +325,7 @@ let container_name = {
       Error([
         Format.sprintf("container_name has an invalid value: '%s'", name),
       ])
-    | _ => Ok(name)
+    | _ => Ok(`Container_name(name))
     };
   };
   return_data(value);
@@ -356,22 +360,26 @@ let custom_ident_without_span_or_auto =
     | IDENT("span")
     | TAG("span")
     | STRING("span") => Error(["Custom ident cannot be span or auto."])
-    | IDENT(string) => Ok(string)
-    | TAG(string) => Ok(string)
-    | STRING(string) => Ok(string)
+    | IDENT(string) => Ok(`Custom_ident_without_span_or_auto(string))
+    | TAG(string) => Ok(`Custom_ident_without_span_or_auto(string))
+    | STRING(string) => Ok(`Custom_ident_without_span_or_auto(string))
     | _ => Error(["expected an identifier."]),
   );
 
 let ident_token =
   token(
     fun
-    | IDENT(string) => Ok(string)
-    | TAG(string) => Ok(string)
+    | IDENT(string) => Ok(`Ident_token(string))
+    | TAG(string) => Ok(`Ident_token(string))
     | _ => Error(["expected an identifier."]),
   );
 
 // TODO: workarounds
-let invalid = expect(STRING("not-implemented"));
+let invalid =
+  token(
+    fun
+    | _ => Ok(),
+  );
 
 let declaration_value = invalid;
 
