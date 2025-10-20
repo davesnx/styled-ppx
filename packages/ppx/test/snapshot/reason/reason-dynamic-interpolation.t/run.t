@@ -966,7 +966,7 @@
     let styles = (~var, _) =>
       CSS.style([|
         CSS.label("DynamicComponent"),
-        (CSS.color(var): CSS.rule),
+        CSS.color(var),
         CSS.display(`block),
       |]);
     let make = (props: makeProps('var)) => {

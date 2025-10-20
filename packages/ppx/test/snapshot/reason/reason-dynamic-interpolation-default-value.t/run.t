@@ -968,7 +968,7 @@
       CSS.style([|
         CSS.label("DynamicComponentWithDefaultValue"),
         CSS.display(`block),
-        (CSS.color(var): CSS.rule),
+        CSS.color(var),
       |]);
     let make = (props: makeProps('var)) => {
       let className =

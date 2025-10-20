@@ -10,9 +10,9 @@
     let styles = (~var, ~id, _) =>
       CSS.style([|
         CSS.label("DynamicComponent"),
-        (CSS.color(var): CSS.rule),
+        CSS.color(var),
         CSS.display(`flex),
-        (CSS.backgroundColor(id): CSS.rule),
+        CSS.backgroundColor(id),
       |]);
     let make =
         (

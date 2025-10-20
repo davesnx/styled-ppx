@@ -5,7 +5,7 @@ let tests =
     (
       "color: $(mono100)",
       [%expr [%css "color: $(mono100)"]],
-      [%expr (CSS.color(mono100): CSS.rule)],
+      [%expr CSS.color(mono100)],
     ),
     (
       "margin: $(Size.big) $(Size.small)",
@@ -35,27 +35,27 @@ let tests =
     (
       "width: $(width)",
       [%expr [%css "width: $(width)"]],
-      [%expr (CSS.width(width): CSS.rule)],
+      [%expr CSS.width(width)],
     ),
     (
       "max-width: $(max)",
       [%expr [%css "max-width: $(max)"]],
-      [%expr (CSS.maxWidth(max): CSS.rule)],
+      [%expr CSS.maxWidth(max)],
     ),
     (
       "height: $(height)",
       [%expr [%css "height: $(height)"]],
-      [%expr (CSS.height(height): CSS.rule)],
+      [%expr CSS.height(height)],
     ),
     (
       "border-radius: $(border)",
       [%expr [%css "border-radius: $(border)"]],
-      [%expr (CSS.borderRadius(border): CSS.rule)],
+      [%expr CSS.borderRadius(border)],
     ),
     (
       "font-size: $(font)",
       [%expr [%css "font-size: $(font)"]],
-      [%expr (CSS.fontSize(font): CSS.rule)],
+      [%expr CSS.fontSize(font)],
     ),
     (
       "font-family: $(mono)",
@@ -65,22 +65,22 @@ let tests =
     (
       "line-height: $(lh)",
       [%expr [%css "line-height: $(lh)"]],
-      [%expr (CSS.lineHeight(lh): CSS.rule)],
+      [%expr CSS.lineHeight(lh)],
     ),
     (
       "z-index: $(zLevel)",
       [%expr [%css "z-index: $(zLevel)"]],
-      [%expr (CSS.zIndex(zLevel): CSS.rule)],
+      [%expr CSS.zIndex(zLevel)],
     ),
     (
       "left: $(left)",
       [%expr [%css "left: $(left)"]],
-      [%expr (CSS.left(left): CSS.rule)],
+      [%expr CSS.left(left)],
     ),
     (
       "text-decoration-color: $(decorationColor)",
       [%expr [%css "text-decoration-color: $(decorationColor)"]],
-      [%expr (CSS.textDecorationColor(decorationColor): CSS.rule)],
+      [%expr CSS.textDecorationColor(decorationColor)],
     ),
     (
       "background-image: $(wat);",
@@ -90,7 +90,7 @@ let tests =
     (
       "mask-image: $(externalImageUrl);",
       [%expr [%css "mask-image: $(externalImageUrl);"]],
-      [%expr (CSS.maskImage(externalImageUrl): CSS.rule)],
+      [%expr CSS.maskImage(externalImageUrl)],
     ),
     (
       "text-shadow: $(h) $(v) $(blur) $(color)",
@@ -100,7 +100,7 @@ let tests =
     (
       "color: $(Theme.blue)",
       [%expr [%css "color: $(Theme.blue)"]],
-      [%expr (CSS.color(Theme.blue): CSS.rule)],
+      [%expr CSS.color(Theme.blue)],
     ),
     /* Changed properties */
     (
@@ -163,7 +163,7 @@ let tests =
     (
       "column-gap: $(Size.px30);",
       [%expr [%css "column-gap: $(Size.px30)"]],
-      [%expr (CSS.columnGap(Size.px30): CSS.rule)],
+      [%expr CSS.columnGap(Size.px30)],
     ),
     // Test for property not inside properties list on declarations_to_emotion.re, should trigger unsafe interpolation
     (

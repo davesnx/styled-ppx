@@ -19,14 +19,6 @@ exception Impossible_state;
 
 exception Invalid_value(string);
 
-/* Why this type contains so much when only `string_to_expr` is used? */
-type transform('ast, 'value) = {
-  ast_of_string: string => result('ast, string),
-  ast_to_expr: (~loc: Location.t, 'ast) => list(Parsetree.expression),
-  string_to_expr:
-    (~loc: Location.t, string) => result(list(Parsetree.expression), string),
-};
-
 let add_CSS_rule_constraint = (~loc, expr) => {
   let typ =
     Builder.ptyp_constr(
@@ -38,35 +30,6 @@ let add_CSS_rule_constraint = (~loc, expr) => {
       [],
     );
   Builder.pexp_constraint(~loc, expr, typ);
-};
-
-/* TODO: emit is better to keep value_of_ast and value_to_expr in the same fn */
-let emit = (parser, value_of_ast, value_to_expr) => {
-  let ast_of_string = Property_parser.parse(parser);
-  let ast_to_expr = (~loc, ast) =>
-    value_of_ast(~loc, ast) |> value_to_expr(~loc);
-  let string_to_expr = (~loc, string) =>
-    ast_of_string(string) |> Result.map(ast_to_expr(~loc));
-
-  {
-    ast_of_string,
-    ast_to_expr,
-    string_to_expr,
-  };
-};
-
-let emit_shorthand = (parser, mapper, value_to_expr) => {
-  let ast_of_string = Property_parser.parse(parser);
-  let ast_to_expr = (~loc, ast) =>
-    ast |> List.map(mapper(~loc)) |> value_to_expr(~loc);
-  let string_to_expr = (~loc, string) =>
-    ast_of_string(string) |> Result.map(ast_to_expr(~loc));
-
-  {
-    ast_of_string,
-    ast_to_expr,
-    string_to_expr,
-  };
 };
 
 let render_option = (~loc, f) =>
@@ -81,98 +44,6 @@ let render_variable = (~loc, name) => {
   let ident = list_to_longident(name) |> txt(~loc);
   Builder.pexp_ident(~loc, ident);
 };
-
-let transform_with_variable = (parser, mapper, value_to_expr) => {
-  Css_grammar.(
-    emit(
-      Combinators.xor([
-        /* This xor ensures that interpolation could be placed as the entire value, without the need of modifying the entire grammar. */
-        Rule.Match.map(Standard.interpolation, data => data),
-        /* Otherwise it's a regular CSS `Value and match the parser */
-        Rule.Match.map(parser, data => `Value(data)),
-      ]),
-      (~loc) =>
-        fun
-        | `Interpolation(name) => render_variable(~loc, name)
-        | `Value(ast) => mapper(~loc, ast),
-      (~loc, expression) => {
-        switch (expression) {
-        // Since we are treating with expressions here, we don't have any other way to detect if it's interpolation or not. We want to add type constraints on interpolation only.
-        | {pexp_desc: Pexp_ident({txt: Ldot(Lident("CSS"), _), _}), _} as exp =>
-          value_to_expr(~loc, exp)
-        | {pexp_desc: Pexp_ident(_), pexp_loc: _, _} as exp =>
-          value_to_expr(~loc, exp)
-          |> List.map(add_CSS_rule_constraint(~loc))
-        | exp => value_to_expr(~loc, exp)
-        }
-      },
-    )
-  );
-};
-
-/* Monomoprhipc properties are the ones that can only have one representation
-    of the value (and it's one argument also) which it's also possible to interpolate on them.
-
-   For example: Property_parser.property_font_size => CSS.fontSize
-   */
-let monomorphic = (parser, property_renderer, value_renderer) =>
-  transform_with_variable(parser, value_renderer, (~loc, value) =>
-    [[%expr [%e property_renderer(~loc)]([%e value])]]
-  );
-
-/* Polymorphic is when a property can have multiple representations and/or can generate multiple declarations */
-let polymorphic = (property, value_to_expr) => {
-  emit(property, (~loc as _, ast) => ast, value_to_expr);
-};
-
-/* Triggers Unsupported_feature and it's rendered as a string */
-//let unsupportedValue = (parser, property) =>
-//  transform_with_variable(
-//    parser,
-//    (~loc as _, _) => raise(Unsupported_feature),
-//    (~loc, arg) => [[%expr [%e property(~loc)]([%e arg])]],
-//  );
-
-/* Triggers Unsupported_feature and it's rendered as a string,
-   supports interpolation as a string, which is unsafe */
-let unsupportedProperty = parser =>
-  transform_with_variable(
-    parser,
-    (~loc as _) => raise(Unsupported_feature),
-    (~loc as _) => raise(Unsupported_feature),
-  );
-
-let render_string = (~loc, s) => {
-  switch (File.get()) {
-  | Some(ReScript) =>
-    Builder.pexp_constant(~loc, Pconst_string(s, loc, Some("*j")))
-  | Some(Reason)
-  | _ => Builder.pexp_constant(~loc, Pconst_string(s, loc, Some("js")))
-  };
-};
-
-let render_integer = (~loc, integer) => {
-  Builder.pexp_constant(~loc, Pconst_integer(Int.to_string(integer), None));
-};
-
-let render_float = (~loc, number) =>
-  Builder.pexp_constant(~loc, Pconst_float(Float.to_string(number), None));
-
-let render_percentage = (~loc, number) => [%expr
-  `percent([%e render_float(~loc, number)])
-];
-
-let to_camel_case = txt =>
-  (
-    switch (String.split_on_char('-', txt)) {
-    | [first, ...remaining] => [
-        first,
-        ...List.map(String.capitalize_ascii, remaining),
-      ]
-    | [] => []
-    }
-  )
-  |> String.concat("");
 
 let variant_to_expression = (~loc) =>
   fun
@@ -280,6 +151,88 @@ let variant_to_expression = (~loc) =>
   | `FitContent => raise(Unsupported_feature)
   | `Full_width => raise(Unsupported_feature)
   | `Full_size_kana => raise(Unsupported_feature);
+
+let transform_with_variable = (parser, mapper, value_to_expr, ~loc, string) => {
+  open Css_grammar;
+  let parse =
+    Property_parser.parse(
+      Combinators.xor([
+        /* This xor ensures that interpolation could be placed as the entire value, without the need of modifying the entire grammar. */
+        Rule.Match.map(Standard.interpolation, data => data),
+        /* Otherwise it's a regular CSS `Value and match the parser */
+        Rule.Match.map(parser, data => `Value(data)),
+      ]),
+    );
+  let to_expr = (~loc, ast) => {
+    switch (ast) {
+    | `Interpolation(name) =>
+      render_variable(~loc, name)
+      |> value_to_expr(~loc)
+      |> List.map(add_CSS_rule_constraint(~loc))
+    | `Value(ast) => mapper(~loc, ast) |> value_to_expr(~loc)
+    };
+  };
+
+  parse(string) |> Result.map(to_expr(~loc));
+};
+
+/* Monomoprhipc properties are the ones that can only have one representation
+    of the value (and it's one argument also) which it's also possible to interpolate on them.
+
+   For example: Property_parser.property_font_size => CSS.fontSize
+   */
+let monomorphic = (parser, property_renderer, value_renderer) =>
+  transform_with_variable(parser, value_renderer, (~loc, value) =>
+    [[%expr [%e property_renderer(~loc)]([%e value])]]
+  );
+
+/* Polymorphic is when a property can have multiple representations and/or can generate multiple declarations */
+let polymorphic = (property, to_expr, ~loc, string) =>
+  Property_parser.parse(property, string) |> Result.map(to_expr(~loc));
+
+let variants = (parser, identifier) =>
+  monomorphic(parser, identifier, variant_to_expression);
+
+/* Triggers Unsupported_feature and it's rendered as a string,
+   supports interpolation as a string, which is unsafe */
+let unsupportedProperty = parser =>
+  transform_with_variable(
+    parser,
+    (~loc as _) => raise(Unsupported_feature),
+    (~loc as _) => raise(Unsupported_feature),
+  );
+
+let render_string = (~loc, s) => {
+  switch (File.get()) {
+  | Some(ReScript) =>
+    Builder.pexp_constant(~loc, Pconst_string(s, loc, Some("*j")))
+  | Some(Reason)
+  | _ => Builder.pexp_constant(~loc, Pconst_string(s, loc, Some("js")))
+  };
+};
+
+let render_integer = (~loc, integer) => {
+  Builder.pexp_constant(~loc, Pconst_integer(Int.to_string(integer), None));
+};
+
+let render_float = (~loc, number) =>
+  Builder.pexp_constant(~loc, Pconst_float(Float.to_string(number), None));
+
+let render_percentage = (~loc, number) => [%expr
+  `percent([%e render_float(~loc, number)])
+];
+
+let to_camel_case = txt =>
+  (
+    switch (String.split_on_char('-', txt)) {
+    | [first, ...remaining] => [
+        first,
+        ...List.map(String.capitalize_ascii, remaining),
+      ]
+    | [] => []
+    }
+  )
+  |> String.concat("");
 
 // TODO: all of them could be float, but bs-css doesn't support it
 let render_length = (~loc) =>
@@ -542,10 +495,6 @@ let render_side_or_corner =
   };
 };
 
-/* Applies variants to one argument */
-let variants = (parser, identifier) =>
-  monomorphic(parser, identifier, variant_to_expression);
-
 let width =
   monomorphic(
     Property_parser.property_width,
@@ -610,13 +559,15 @@ let render_margin = (~loc) =>
   fun
   | `Auto => variant_to_expression(~loc, `Auto)
   | `Extended_length(l) => render_extended_length(~loc, l)
-  | `Extended_percentage(p) => render_extended_percentage(~loc, p);
+  | `Extended_percentage(p) => render_extended_percentage(~loc, p)
+  | `Interpolation(name) => render_variable(~loc, name);
 
 let render_padding = (~loc) =>
   fun
   | `Auto => variant_to_expression(~loc, `Auto)
   | `Extended_length(l) => render_extended_length(~loc, l)
-  | `Extended_percentage(p) => render_extended_percentage(~loc, p);
+  | `Extended_percentage(p) => render_extended_percentage(~loc, p)
+  | `Interpolation(name) => render_variable(~loc, name);
 
 // css-box-3
 let margin_top =
@@ -648,33 +599,38 @@ let margin_left =
   );
 
 let margin =
-  emit_shorthand(
-    Property_parser.property_margin,
-    (~loc) =>
-      fun
-      | `Auto => variant_to_expression(~loc, `Auto)
-      | `Extended_length(l) => render_extended_length(~loc, l)
-      | `Extended_percentage(p) => render_extended_percentage(~loc, p)
-      | `Interpolation(name) => render_variable(~loc, name),
-    (~loc) =>
-      fun
-      | [all] => [[%expr CSS.margin([%e all])]]
-      | [v, h] => [[%expr CSS.margin2(~v=[%e v], ~h=[%e h])]]
-      | [t, h, b] => [
-          [%expr CSS.margin3(~top=[%e t], ~h=[%e h], ~bottom=[%e b])],
-        ]
-      | [t, r, b, l] => [
-          [%expr
-            CSS.margin4(
-              ~top=[%e t],
-              ~right=[%e r],
-              ~bottom=[%e b],
-              ~left=[%e l],
-            )
-          ],
-        ]
-      | []
-      | _ => raise(Impossible_state),
+  polymorphic(Property_parser.property_margin, (~loc) =>
+    fun
+    | [one] => [[%expr CSS.margin([%e render_margin(~loc, one)])]]
+    | [v, h] => [
+        [%expr
+          CSS.margin2(
+            ~v=[%e render_margin(~loc, v)],
+            ~h=[%e render_margin(~loc, h)],
+          )
+        ],
+      ]
+    | [t, h, b] => [
+        [%expr
+          CSS.margin3(
+            ~top=[%e render_margin(~loc, t)],
+            ~h=[%e render_margin(~loc, h)],
+            ~bottom=[%e render_margin(~loc, b)],
+          )
+        ],
+      ]
+    | [t, r, b, l] => [
+        [%expr
+          CSS.margin4(
+            ~top=[%e render_margin(~loc, t)],
+            ~right=[%e render_margin(~loc, r)],
+            ~bottom=[%e render_margin(~loc, b)],
+            ~left=[%e render_margin(~loc, l)],
+          )
+        ],
+      ]
+    | []
+    | _ => raise(Impossible_state)
   );
 
 let padding_top =
@@ -706,34 +662,39 @@ let padding_left =
   );
 
 let padding =
-  emit_shorthand(
-    Property_parser.property_padding,
-    (~loc) =>
-      fun
-      | `Extended_length(l) => render_extended_length(~loc, l)
-      | `Extended_percentage(p) => render_extended_percentage(~loc, p)
-      | `Interpolation(name) => render_variable(~loc, name),
-    (~loc) =>
-      fun
-      | [all] => [[%expr CSS.padding([%e all])]]
-      | [v, h] => [[%expr CSS.padding2(~v=[%e v], ~h=[%e h])]]
-      | [t, h, b] => [
-          [%expr CSS.padding3(~top=[%e t], ~h=[%e h], ~bottom=[%e b])],
-        ]
-      | [t, r, b, l] => [
-          [%expr
-            CSS.padding4(
-              ~top=[%e t],
-              ~right=[%e r],
-              ~bottom=[%e b],
-              ~left=[%e l],
-            )
-          ],
-        ]
-      | []
-      | _ => raise(Impossible_state),
+  polymorphic(Property_parser.property_padding, (~loc) =>
+    fun
+    | [one] => [[%expr CSS.padding([%e render_padding(~loc, one)])]]
+    | [v, h] => [
+        [%expr
+          CSS.padding2(
+            ~v=[%e render_padding(~loc, v)],
+            ~h=[%e render_padding(~loc, h)],
+          )
+        ],
+      ]
+    | [t, h, b] => [
+        [%expr
+          CSS.padding3(
+            ~top=[%e render_padding(~loc, t)],
+            ~h=[%e render_padding(~loc, h)],
+            ~bottom=[%e render_padding(~loc, b)],
+          )
+        ],
+      ]
+    | [t, r, b, l] => [
+        [%expr
+          CSS.padding4(
+            ~top=[%e render_padding(~loc, t)],
+            ~right=[%e render_padding(~loc, r)],
+            ~bottom=[%e render_padding(~loc, b)],
+            ~left=[%e render_padding(~loc, l)],
+          )
+        ],
+      ]
+    | []
+    | _ => raise(Impossible_state)
   );
-
 let render_named_color = (~loc) =>
   fun
   | `Transparent => variant_to_expression(~loc, `Transparent)
@@ -3923,23 +3884,22 @@ let flex_wrap =
     [%expr CSS.flexWrap]
   );
 
-// shorthand - https://drafts.csswg.org/css-flexbox-1/#flex-flow-property
-/* TODO: Avoid using `Value outside emit/emit_shorthand */
+// https://drafts.csswg.org/css-flexbox-1/#flex-flow-property
 let flex_flow =
   polymorphic(
     Property_parser.property_flex_flow,
-    (~loc, (direction_ast, wrap_ast)) => {
+    (~loc, (direction, wrap)) => {
       let direction =
-        Option.map(
-          ast => flex_direction.ast_to_expr(~loc, `Value(ast)),
-          direction_ast,
-        );
+        switch (direction) {
+        | Some(value) => variant_to_expression(~loc, value)
+        | None => [%expr None]
+        };
       let wrap =
-        Option.map(
-          ast => flex_wrap.ast_to_expr(~loc, `Value(ast)),
-          wrap_ast,
-        );
-      [direction, wrap] |> List.concat_map(Option.value(~default=[]));
+        switch (wrap) {
+        | Some(value) => variant_to_expression(~loc, value)
+        | None => [%expr None]
+        };
+      [[%expr CSS.flexFlow([%e direction], [%e wrap])]];
     },
   );
 
@@ -5005,16 +4965,6 @@ let line_break =
       }
     },
   );
-
-let found = ({ast_of_string, string_to_expr}) => {
-  let (let.ok) = Result.bind;
-  /* TODO: Why we have 'check_value' when we don't use it? */
-  let check_value = string => {
-    let.ok _ = ast_of_string(string);
-    Ok();
-  };
-  (check_value, string_to_expr);
-};
 
 let caret_color = unsupportedProperty(Property_parser.property_caret_color);
 
@@ -6235,573 +6185,573 @@ let word_space_transform =
   unsupportedProperty(Property_parser.property_word_space_transform);
 
 let properties = [
-  ("accent-color", found(accent_color)),
-  ("align-content", found(align_content)),
-  ("align-items", found(align_items)),
-  ("align-self", found(align_self)),
-  ("alignment-baseline", found(alignment_baseline)),
-  ("all", found(all)),
-  ("anchor-name", found(anchor_name)),
-  ("anchor-scope", found(anchor_scope)),
-  ("animation-composition", found(animation_composition)),
-  ("animation-delay", found(animation_delay)),
-  ("animation-delay-end", found(animation_delay_end)),
-  ("animation-delay-start", found(animation_delay_start)),
-  ("animation-direction", found(animation_direction)),
-  ("animation-duration", found(animation_duration)),
-  ("animation-fill-mode", found(animation_fill_mode)),
-  ("animation-iteration-count", found(animation_iteration_count)),
-  ("animation-name", found(animation_name)),
-  ("animation-play-state", found(animation_play_state)),
-  ("animation-range", found(animation_range)),
-  ("animation-range-end", found(animation_range_end)),
-  ("animation-range-start", found(animation_range_start)),
-  ("animation-timeline", found(animation_timeline)),
-  ("animation-timing-function", found(animation_timing_function)),
-  ("animation", found(animation)),
-  ("appearance", found(appearance)),
-  ("aspect-ratio", found(aspect_ratio)),
-  ("azimuth", found(azimuth)),
-  ("backdrop-blur", found(backdrop_blur)),
-  ("backdrop-filter", found(backdrop_filter)),
-  ("backface-visibility", found(backface_visibility)),
-  ("background-attachment", found(background_attachment)),
-  ("background-blend-mode", found(background_blend_mode)),
-  ("background-clip", found(background_clip)),
-  ("background-color", found(background_color)),
-  ("background-image", found(background_image)),
-  ("background-origin", found(background_origin)),
-  ("background-position-x", found(background_position_x)),
-  ("background-position-y", found(background_position_y)),
-  ("background-position", found(background_position)),
-  ("background-repeat", found(background_repeat)),
-  ("background-size", found(background_size)),
-  ("background", found(background)),
-  ("baseline-shift", found(baseline_shift)),
-  ("behavior", found(behavior)),
-  ("bleed", found(bleed)),
-  ("block-overflow", found(block_overflow)),
-  ("block-size", found(block_size)),
-  ("border-block-color", found(border_block_color)),
-  ("border-block-end-color", found(border_block_end_color)),
-  ("border-block-end-style", found(border_block_end_style)),
-  ("border-block-end-width", found(border_block_end_width)),
-  ("border-block-end", found(border_block_end)),
-  ("border-block-start-color", found(border_block_start_color)),
-  ("border-block-start-style", found(border_block_start_style)),
-  ("border-block-start-width", found(border_block_start_width)),
-  ("border-block-start", found(border_block_start)),
-  ("border-block-style", found(border_block_style)),
-  ("border-block-width", found(border_block_width)),
-  ("border-block", found(border_block)),
-  ("border-bottom-color", found(border_bottom_color)),
-  ("border-bottom-left-radius", found(border_bottom_left_radius)),
-  ("border-bottom-right-radius", found(border_bottom_right_radius)),
-  ("border-bottom-style", found(border_bottom_style)),
-  ("border-bottom-width", found(border_bottom_width)),
-  ("border-bottom", found(border_bottom)),
-  ("border-collapse", found(border_collapse)),
-  ("border-color", found(border_color)),
-  ("border-end-end-radius", found(border_end_end_radius)),
-  ("border-end-start-radius", found(border_end_start_radius)),
-  ("border-image-outset", found(border_image_outset)),
-  ("border-image-repeat", found(border_image_repeat)),
-  ("border-image-slice", found(border_image_slice)),
-  ("border-image-source", found(border_image_source)),
-  ("border-image-width", found(border_image_width)),
-  ("border-image", found(border_image)),
-  ("border-inline-color", found(border_inline_color)),
-  ("border-inline-end-color", found(border_inline_end_color)),
-  ("border-inline-end-style", found(border_inline_end_style)),
-  ("border-inline-end-width", found(border_inline_end_width)),
-  ("border-inline-end", found(border_inline_end)),
-  ("border-inline-start-color", found(border_inline_start_color)),
-  ("border-inline-start-style", found(border_inline_start_style)),
-  ("border-inline-start-width", found(border_inline_start_width)),
-  ("border-inline-start", found(border_inline_start)),
-  ("border-inline-style", found(border_inline_style)),
-  ("border-inline-width", found(border_inline_width)),
-  ("border-inline", found(border_inline)),
-  ("border-left-color", found(border_left_color)),
-  ("border-left-style", found(border_left_style)),
-  ("border-left-width", found(border_left_width)),
-  ("border-left", found(border_left)),
-  ("border-radius", found(border_radius)),
-  ("border-right-color", found(border_right_color)),
-  ("border-right-style", found(border_right_style)),
-  ("border-right-width", found(border_right_width)),
-  ("border-right", found(border_right)),
-  ("border-spacing", found(border_spacing)),
-  ("border-start-end-radius", found(border_start_end_radius)),
-  ("border-start-start-radius", found(border_start_start_radius)),
-  ("border-style", found(border_style)),
-  ("border-top-color", found(border_top_color)),
-  ("border-top-left-radius", found(border_top_left_radius)),
-  ("border-top-right-radius", found(border_top_right_radius)),
-  ("border-top-style", found(border_top_style)),
-  ("border-top-width", found(border_top_width)),
-  ("border-top", found(border_top)),
-  ("border-width", found(border_width)),
-  ("border", found(border)),
-  ("bottom", found(bottom)),
-  ("box-align", found(box_align)),
-  ("box-decoration-break", found(box_decoration_break)),
-  ("box-direction", found(box_direction)),
-  ("box-flex", found(box_flex)),
-  ("box-flex-group", found(box_flex_group)),
-  ("box-lines", found(box_lines)),
-  ("box-ordinal-group", found(box_ordinal_group)),
-  ("box-orient", found(box_orient)),
-  ("box-pack", found(box_pack)),
-  ("box-shadow", found(box_shadow)),
-  ("box-sizing", found(box_sizing)),
-  ("break-after", found(break_after)),
-  ("break-before", found(break_before)),
-  ("break-inside", found(break_inside)),
-  ("caption-side", found(caption_side)),
-  ("caret-color", found(caret_color)),
-  ("clear", found(clear)),
-  ("clip-path", found(clip_path)),
-  ("clip-rule", found(clip_rule)),
-  ("clip", found(clip)),
-  ("content", found(content)),
-  ("color-adjust", found(color_adjust)),
-  ("color-interpolation-filters", found(color_interpolation_filters)),
-  ("color-interpolation", found(color_interpolation)),
-  ("color-rendering", found(color_rendering)),
-  ("color-scheme", found(color_scheme)),
-  ("color", found(color)),
-  ("column-count", found(column_count)),
-  ("column-fill", found(column_fill)),
-  ("column-gap", found(column_gap)),
-  ("column-rule-color", found(column_rule_color)),
-  ("column-rule-style", found(column_rule_style)),
-  ("column-rule-width", found(column_rule_width)),
-  ("column-rule", found(column_rule)),
-  ("column-span", found(column_span)),
-  ("column-width", found(column_width)),
-  ("columns", found(columns)),
-  ("contain", found(contain)),
-  ("container", found(container)),
-  ("container-name", found(container_name)),
-  ("container-name-computed", found(container_name_computed)),
-  ("container-type", found(container_type)),
-  ("contain-intrinsic-block-size", found(contain_intrinsic_block_size)),
-  ("contain-intrinsic-height", found(contain_intrinsic_height)),
-  ("contain-intrinsic-inline-size", found(contain_intrinsic_inline_size)),
-  ("contain-intrinsic-size", found(contain_intrinsic_size)),
-  ("contain-intrinsic-width", found(contain_intrinsic_width)),
-  ("content-visibility", found(content_visibility)),
-  ("content", found(content)),
-  ("counter-increment", found(counter_increment)),
-  ("counter-reset", found(counter_reset)),
-  ("counter-set", found(counter_set)),
-  ("cue", found(cue)),
-  ("cue-after", found(cue_after)),
-  ("cue-before", found(cue_before)),
-  ("cursor", found(cursor)),
-  ("cx", found(cx)),
-  ("cy", found(cy)),
-  ("d", found(d)),
-  ("direction", found(direction)),
-  ("display", found(display)),
-  ("dominant-baseline", found(dominant_baseline)),
-  ("empty-cells", found(empty_cells)),
-  ("field-sizing", found(field_sizing)),
-  ("fill-opacity", found(fill_opacity)),
-  ("fill-rule", found(fill_rule)),
-  ("fill", found(fill)),
-  ("filter", found(filter)),
-  ("flex", found(flex)),
-  ("flex-basis", found(flex_basis)),
-  ("flex-direction", found(flex_direction)),
-  ("flex-flow", found(flex_flow)),
-  ("flex-grow", found(flex_grow)),
-  ("flex-shrink", found(flex_shrink)),
-  ("flex-wrap", found(flex_wrap)),
-  ("float", found(float)),
-  ("flood-color", found(flood_color)),
-  ("flood-opacity", found(flood_opacity)),
-  ("font-family", found(font_family)),
-  ("font-display", found(font_display)),
-  ("font-feature-settings", found(font_feature_settings)),
-  ("font-kerning", found(font_kerning)),
-  ("font-language-override", found(font_language_override)),
-  ("font-optical-sizing", found(font_optical_sizing)),
-  ("font-size-adjust", found(font_size_adjust)),
-  ("font-size", found(font_size)),
-  ("font-palette", found(font_palette)),
-  ("font-smooth", found(font_smooth)),
-  ("font-stretch", found(font_stretch)),
-  ("font-style", found(font_style)),
-  ("font-synthesis-position", found(font_synthesis_position)),
-  ("font-synthesis-small-caps", found(font_synthesis_small_caps)),
-  ("font-synthesis-style", found(font_synthesis_style)),
-  ("font-synthesis-weight", found(font_synthesis_weight)),
-  ("font-synthesis", found(font_synthesis)),
-  ("font-variant-alternates", found(font_variant_alternates)),
-  ("font-variant-caps", found(font_variant_caps)),
-  ("font-variant-east-asian", found(font_variant_east_asian)),
-  ("font-variant-ligatures", found(font_variant_ligatures)),
-  ("font-variant-numeric", found(font_variant_numeric)),
-  ("font-variant-position", found(font_variant_position)),
-  ("font-variant-emoji", found(font_variant_emoji)),
-  ("font-variant", found(font_variant)),
-  ("font-variation-settings", found(font_variation_settings)),
-  ("font-weight", found(font_weight)),
-  ("font", found(font)),
-  ("gap", found(gap)),
-  ("glyph-orientation-horizontal", found(glyph_orientation_horizontal)),
-  ("glyph-orientation-vertical", found(glyph_orientation_vertical)),
-  ("grid-area", found(grid_area)),
-  ("grid-auto-columns", found(grid_auto_columns)),
-  ("grid-auto-flow", found(grid_auto_flow)),
-  ("grid-auto-rows", found(grid_auto_rows)),
-  ("grid-column-end", found(grid_column_end)),
-  ("grid-column-gap", found(grid_column_gap)),
-  ("grid-column-start", found(grid_column_start)),
-  ("grid-column", found(grid_column)),
-  ("grid-gap", found(grid_gap)),
-  ("grid-row-end", found(grid_row_end)),
-  ("grid-row-gap", found(grid_row_gap)),
-  ("grid-row-start", found(grid_row_start)),
-  ("grid-row", found(grid_row)),
-  ("grid-template-areas", found(grid_template_areas)),
-  ("grid-template-columns", found(grid_template_columns)),
-  ("grid-template-rows", found(grid_template_rows)),
-  ("grid-template", found(grid_template)),
-  ("grid", found(grid)),
-  ("hanging-punctuation", found(hanging_punctuation)),
-  ("height", found(height)),
-  ("hyphenate-character", found(hyphenate_character)),
-  ("hyphenate-limit-chars", found(hyphenate_limit_chars)),
-  ("hyphenate-limit-lines", found(hyphenate_limit_lines)),
-  ("hyphenate-limit-last", found(hyphenate_limit_last)),
-  ("hyphenate-limit-zone", found(hyphenate_limit_zone)),
-  ("hyphens", found(hyphens)),
-  ("image-orientation", found(image_orientation)),
-  ("image-rendering", found(image_rendering)),
-  ("image-resolution", found(image_resolution)),
-  ("ime-mode", found(ime_mode)),
-  ("inherits", found(inherits)),
-  ("initial-letter-align", found(initial_letter_align)),
-  ("initial-letter", found(initial_letter)),
-  ("initial-value", found(initial_value)),
-  ("inline-size", found(inline_size)),
-  ("inset-area", found(inset_area)),
-  ("inset-block-end", found(inset_block_end)),
-  ("inset-block-start", found(inset_block_start)),
-  ("inset-block", found(inset_block)),
-  ("inset-inline-end", found(inset_inline_end)),
-  ("inset-inline-start", found(inset_inline_start)),
-  ("inset-inline", found(inset_inline)),
-  ("inset", found(inset)),
-  ("interpolate-size", found(interpolate_size)),
-  ("isolation", found(isolation)),
-  ("justify-content", found(justify_content)),
-  ("justify-items", found(justify_items)),
-  ("justify-self", found(justify_self)),
-  ("kerning", found(kerning)),
-  ("layout-grid-char", found(layout_grid_char)),
-  ("layout-grid-line", found(layout_grid_line)),
-  ("layout-grid-mode", found(layout_grid_mode)),
-  ("layout-grid-type", found(layout_grid_type)),
-  ("layout-grid", found(layout_grid)),
-  ("left", found(left)),
-  ("letter-spacing", found(letter_spacing)),
-  ("lighting-color", found(lighting_color)),
-  ("line-break", found(line_break)),
-  ("line-clamp", found(line_clamp)),
-  ("line-height-step", found(line_height_step)),
-  ("line-height", found(line_height)),
-  ("list-style-image", found(list_style_image)),
-  ("list-style-position", found(list_style_position)),
-  ("list-style-type", found(list_style_type)),
-  ("list-style", found(list_style)),
-  ("margin-block", found(margin_block)),
-  ("margin-block-end", found(margin_block_end)),
-  ("margin-block-start", found(margin_block_start)),
-  ("margin-bottom", found(margin_bottom)),
-  ("margin-inline", found(margin_inline)),
-  ("margin-inline-end", found(margin_inline_end)),
-  ("margin-inline-start", found(margin_inline_start)),
-  ("margin-left", found(margin_left)),
-  ("margin-right", found(margin_right)),
-  ("margin-top", found(margin_top)),
-  ("margin-trim", found(margin_trim)),
-  ("margin", found(margin)),
-  ("marker", found(marker)),
-  ("marker-end", found(marker_end)),
-  ("marker-mid", found(marker_mid)),
-  ("marker-start", found(marker_start)),
-  ("marks", found(marks)),
-  ("mask-border-mode", found(mask_border_mode)),
-  ("mask-border-outset", found(mask_border_outset)),
-  ("mask-border-repeat", found(mask_border_repeat)),
-  ("mask-border-slice", found(mask_border_slice)),
-  ("mask-border-source", found(mask_border_source)),
-  ("mask-border-width", found(mask_border_width)),
-  ("mask-clip", found(mask_clip)),
-  ("mask-composite", found(mask_composite)),
-  ("mask-image", found(mask_image)),
-  ("mask-mode", found(mask_mode)),
-  ("mask-origin", found(mask_origin)),
-  ("mask-position", found(mask_position)),
-  ("mask-repeat", found(mask_repeat)),
-  ("mask-size", found(mask_size)),
-  ("mask-type", found(mask_type)),
-  ("math-depth", found(math_depth)),
-  ("math-shift", found(math_shift)),
-  ("math-style", found(math_style)),
-  ("max-block-size", found(max_block_size)),
-  ("max-height", found(max_height)),
-  ("max-inline-size", found(max_inline_size)),
-  ("max-lines", found(max_lines)),
-  ("max-width", found(max_width)),
-  ("min-block-size", found(min_block_size)),
-  ("min-height", found(min_height)),
-  ("min-inline-size", found(min_inline_size)),
-  ("min-width", found(min_width)),
-  ("mix-blend-mode", found(mix_blend_mode)),
-  ("nav-down", found(nav_down)),
-  ("nav-left", found(nav_left)),
-  ("nav-right", found(nav_right)),
-  ("nav-up", found(nav_up)),
-  ("object-fit", found(object_fit)),
-  ("object-position", found(object_position)),
-  ("offset-anchor", found(offset_anchor)),
-  ("offset-distance", found(offset_distance)),
-  ("offset-path", found(offset_path)),
-  ("offset-position", found(offset_position)),
-  ("offset-rotate", found(offset_rotate)),
-  ("offset", found(offset)),
-  ("opacity", found(opacity)),
-  ("order", found(order)),
-  ("orphans", found(orphans)),
-  ("outline", found(outline)),
-  ("outline-color", found(outline_color)),
-  ("outline-offset", found(outline_offset)),
-  ("outline-style", found(outline_style)),
-  ("outline-width", found(outline_width)),
-  ("overlay", found(overlay)),
-  ("overflow-anchor", found(overflow_anchor)),
-  ("overflow-block", found(overflow_block)),
-  ("overflow-clip-margin", found(overflow_clip_margin)),
-  ("overflow-inline", found(overflow_inline)),
-  ("overflow-wrap", found(overflow_wrap)),
-  ("overflow-x", found(overflow_x)),
-  ("overflow-y", found(overflow_y)),
-  ("overflow", found(overflow)),
-  ("padding-block-end", found(padding_block_end)),
-  ("padding-block-start", found(padding_block_start)),
-  ("padding-block", found(padding_block)),
-  ("padding-bottom", found(padding_bottom)),
-  ("padding-inline-end", found(padding_inline_end)),
-  ("padding-inline-start", found(padding_inline_start)),
-  ("padding-inline", found(padding_inline)),
-  ("padding-left", found(padding_left)),
-  ("padding-right", found(padding_right)),
-  ("padding-top", found(padding_top)),
-  ("padding", found(padding)),
-  ("page", found(page)),
-  ("page-break-after", found(page_break_after)),
-  ("paint-order", found(paint_order)),
-  ("pause", found(pause)),
-  ("pause-after", found(pause_after)),
-  ("pause-before", found(pause_before)),
-  ("page-break-before", found(page_break_before)),
-  ("page-break-inside", found(page_break_inside)),
-  ("perspective-origin", found(perspective_origin)),
-  ("perspective", found(perspective)),
-  ("pointer-events", found(pointer_events)),
-  ("position", found(position)),
-  ("position-anchor", found(position_anchor)),
-  ("print-color-adjust", found(print_color_adjust)),
-  ("position-area", found(position_area)),
-  ("position-try", found(position_try)),
-  ("position-try-fallbacks", found(position_try_fallbacks)),
-  ("position-try-options", found(position_try_options)),
-  ("position-visibility", found(position_visibility)),
-  ("r", found(r)),
-  ("reading-flow", found(reading_flow)),
-  ("resize", found(resize)),
-  ("rest", found(rest)),
-  ("rest-after", found(rest_after)),
-  ("rest-before", found(rest_before)),
-  ("right", found(right)),
-  ("rotate", found(rotate)),
-  ("row-gap", found(row_gap)),
-  ("ruby-overhang", found(ruby_overhang)),
-  ("rx", found(rx)),
-  ("ry", found(ry)),
-  ("scale", found(scale)),
-  ("shape-image-threshold", found(shape_image_threshold)),
-  ("shape-margin", found(shape_margin)),
-  ("shape-outside", found(shape_outside)),
-  ("shape-rendering", found(shape_rendering)),
-  ("scrollbar-3dlight-color", found(scrollbar_3dlight_color)),
-  ("scrollbar-arrow-color", found(scrollbar_arrow_color)),
-  ("scrollbar-base-color", found(scrollbar_base_color)),
-  ("scrollbar-color", found(scrollbar_color)),
-  ("scrollbar-darkshadow-color", found(scrollbar_darkshadow_color)),
-  ("scrollbar-face-color", found(scrollbar_face_color)),
-  ("scrollbar-highlight-color", found(scrollbar_highlight_color)),
-  ("scrollbar-shadow-color", found(scrollbar_shadow_color)),
-  ("scrollbar-track-color", found(scrollbar_track_color)),
-  ("scrollbar-width", found(scrollbar_width)),
-  ("scrollbar-gutter", found(scrollbar_gutter)),
-  ("speak", found(speak)),
-  ("speak-as", found(speak_as)),
-  ("src", found(src)),
-  ("scroll-behavior", found(scroll_behavior)),
-  ("scroll-margin", found(scroll_margin)),
-  ("scroll-margin-block", found(scroll_margin_block)),
-  ("scroll-margin-block-end", found(scroll_margin_block_end)),
-  ("scroll-margin-block-start", found(scroll_margin_block_start)),
-  ("scroll-margin-bottom", found(scroll_margin_bottom)),
-  ("scroll-margin-inline", found(scroll_margin_inline)),
-  ("scroll-margin-inline-end", found(scroll_margin_inline_end)),
-  ("scroll-margin-inline-start", found(scroll_margin_inline_start)),
-  ("scroll-margin-left", found(scroll_margin_left)),
-  ("scroll-margin-right", found(scroll_margin_right)),
-  ("scroll-margin-top", found(scroll_margin_top)),
-  ("scroll-marker-group", found(scroll_marker_group)),
-  ("scroll-padding", found(scroll_padding)),
-  ("scroll-padding-block", found(scroll_padding_block)),
-  ("scroll-padding-block-end", found(scroll_padding_block_end)),
-  ("scroll-padding-block-start", found(scroll_padding_block_start)),
-  ("scroll-padding-bottom", found(scroll_padding_bottom)),
-  ("scroll-padding-inline", found(scroll_padding_inline)),
-  ("scroll-padding-inline-end", found(scroll_padding_inline_end)),
-  ("scroll-padding-inline-start", found(scroll_padding_inline_start)),
-  ("scroll-padding-left", found(scroll_padding_left)),
-  ("scroll-padding-right", found(scroll_padding_right)),
-  ("scroll-padding-top", found(scroll_padding_top)),
-  ("scroll-snap-align", found(scroll_snap_align)),
-  ("scroll-snap-coordinate", found(scroll_snap_coordinate)),
-  ("scroll-snap-destination", found(scroll_snap_destination)),
-  ("scroll-snap-points-x", found(scroll_snap_points_x)),
-  ("scroll-snap-points-y", found(scroll_snap_points_y)),
-  ("scroll-snap-stop", found(scroll_snap_stop)),
-  ("scroll-snap-type", found(scroll_snap_type)),
-  ("scroll-snap-type-x", found(scroll_snap_type_x)),
-  ("scroll-snap-type-y", found(scroll_snap_type_y)),
-  ("size", found(size)),
-  ("scroll-start", found(scroll_start)),
-  ("scroll-start-block", found(scroll_start_block)),
-  ("scroll-start-inline", found(scroll_start_inline)),
-  ("scroll-start-x", found(scroll_start_x)),
-  ("scroll-start-y", found(scroll_start_y)),
-  ("scroll-start-target", found(scroll_start_target)),
-  ("scroll-start-target-block", found(scroll_start_target_block)),
-  ("scroll-start-target-inline", found(scroll_start_target_inline)),
-  ("scroll-start-target-x", found(scroll_start_target_x)),
-  ("scroll-start-target-y", found(scroll_start_target_y)),
-  ("scroll-timeline", found(scroll_timeline)),
-  ("scroll-timeline-axis", found(scroll_timeline_axis)),
-  ("scroll-timeline-name", found(scroll_timeline_name)),
-  ("stop-color", found(stop_color)),
-  ("stop-opacity", found(stop_opacity)),
-  ("stroke", found(stroke)),
-  ("stroke-dasharray", found(stroke_dasharray)),
-  ("stroke-dashoffset", found(stroke_dashoffset)),
-  ("stroke-linecap", found(stroke_linecap)),
-  ("stroke-linejoin", found(stroke_linejoin)),
-  ("stroke-miterlimit", found(stroke_miterlimit)),
-  ("stroke-opacity", found(stroke_opacity)),
-  ("stroke-width", found(stroke_width)),
-  ("syntax", found(syntax)),
-  ("tab-size", found(tab_size)),
-  ("table-layout", found(table_layout)),
-  ("text-align-last", found(text_align_last)),
-  ("text-align", found(text_align)),
-  ("text-align-all", found(text_align_all)),
-  ("text-anchor", found(text_anchor)),
-  ("text-autospace", found(text_autospace)),
-  ("text-blink", found(text_blink)),
-  ("text-box-edge", found(text_box_edge)),
-  ("text-box-trim", found(text_box_trim)),
-  ("text-combine-upright", found(text_combine_upright)),
-  ("text-decoration-color", found(text_decoration_color)),
-  ("text-decoration-line", found(text_decoration_line)),
-  ("text-decoration-skip-ink", found(text_decoration_skip_ink)),
-  ("text-decoration-skip", found(text_decoration_skip)),
-  ("text-decoration-style", found(text_decoration_style)),
-  ("text-decoration-thickness", found(text_decoration_thickness)),
-  ("text-decoration", found(text_decoration)),
-  ("text-edge", found(text_edge)),
-  ("text-decoration-skip-box", found(text_decoration_skip_box)),
-  ("text-decoration-skip-inset", found(text_decoration_skip_inset)),
-  ("text-decoration-skip-self", found(text_decoration_skip_self)),
-  ("text-decoration-skip-spaces", found(text_decoration_skip_spaces)),
-  ("text-emphasis-color", found(text_emphasis_color)),
-  ("text-emphasis-position", found(text_emphasis_position)),
-  ("text-emphasis-style", found(text_emphasis_style)),
-  ("text-emphasis", found(text_emphasis)),
-  ("text-indent", found(text_indent)),
-  ("text-justify", found(text_justify)),
-  ("text-justify-trim", found(text_justify_trim)),
-  ("text-kashida", found(text_kashida)),
-  ("text-kashida-space", found(text_kashida_space)),
-  ("text-orientation", found(text_orientation)),
-  ("text-overflow", found(text_overflow)),
-  ("text-rendering", found(text_rendering)),
-  ("text-shadow", found(text_shadow)),
-  ("text-size-adjust", found(text_size_adjust)),
-  ("text-spacing-trim", found(text_spacing_trim)),
-  ("text-transform", found(text_transform)),
-  ("text-underline-offset", found(text_underline_offset)),
-  ("text-underline-position", found(text_underline_position)),
-  ("text-wrap", found(text_wrap)),
-  ("text-wrap-mode", found(text_wrap_mode)),
-  ("text-wrap-style", found(text_wrap_style)),
-  ("timeline-scope", found(timeline_scope)),
-  ("top", found(top)),
-  ("touch-action", found(touch_action)),
-  ("transform-box", found(transform_box)),
-  ("transform-origin", found(transform_origin)),
-  ("transform-style", found(transform_style)),
-  ("transform", found(transform)),
-  ("transition-behavior", found(transition_behavior)),
-  ("transition-delay", found(transition_delay)),
-  ("transition-duration", found(transition_duration)),
-  ("transition-property", found(transition_property)),
-  ("transition-timing-function", found(transition_timing_function)),
-  ("transition", found(transition)),
-  ("translate", found(translate)),
-  ("unicode-bidi", found(unicode_bidi)),
-  ("unicode-range", found(unicode_range)),
-  ("user-select", found(user_select)),
-  ("vector-effect", found(vector_effect)),
-  ("vertical-align", found(vertical_align)),
-  ("view-timeline", found(view_timeline)),
-  ("view-timeline-axis", found(view_timeline_axis)),
-  ("view-timeline-inset", found(view_timeline_inset)),
-  ("view-timeline-name", found(view_timeline_name)),
-  ("view-transition-name", found(view_transition_name)),
-  ("visibility", found(visibility)),
-  ("voice-balance", found(voice_balance)),
-  ("voice-duration", found(voice_duration)),
-  ("voice-family", found(voice_family)),
-  ("voice-pitch", found(voice_pitch)),
-  ("voice-range", found(voice_range)),
-  ("voice-rate", found(voice_rate)),
-  ("voice-stress", found(voice_stress)),
-  ("voice-volume", found(voice_volume)),
-  ("will-change", found(will_change)),
-  ("white-space", found(white_space)),
-  ("white-space-collapse", found(white_space_collapse)),
-  ("widows", found(widows)),
-  ("width", found(width)),
-  ("word-break", found(word_break)),
-  ("word-space-transform", found(word_space_transform)),
-  ("word-spacing", found(word_spacing)),
-  ("word-wrap", found(word_wrap)),
-  ("writing-mode", found(writing_mode)),
-  ("x", found(x)),
-  ("y", found(y)),
-  ("z-index", found(z_index)),
-  ("zoom", found(zoom)),
+  ("accent-color", accent_color),
+  ("align-content", align_content),
+  ("align-items", align_items),
+  ("align-self", align_self),
+  ("alignment-baseline", alignment_baseline),
+  ("all", all),
+  ("anchor-name", anchor_name),
+  ("anchor-scope", anchor_scope),
+  ("animation-composition", animation_composition),
+  ("animation-delay", animation_delay),
+  ("animation-delay-end", animation_delay_end),
+  ("animation-delay-start", animation_delay_start),
+  ("animation-direction", animation_direction),
+  ("animation-duration", animation_duration),
+  ("animation-fill-mode", animation_fill_mode),
+  ("animation-iteration-count", animation_iteration_count),
+  ("animation-name", animation_name),
+  ("animation-play-state", animation_play_state),
+  ("animation-range", animation_range),
+  ("animation-range-end", animation_range_end),
+  ("animation-range-start", animation_range_start),
+  ("animation-timeline", animation_timeline),
+  ("animation-timing-function", animation_timing_function),
+  ("animation", animation),
+  ("appearance", appearance),
+  ("aspect-ratio", aspect_ratio),
+  ("azimuth", azimuth),
+  ("backdrop-blur", backdrop_blur),
+  ("backdrop-filter", backdrop_filter),
+  ("backface-visibility", backface_visibility),
+  ("background-attachment", background_attachment),
+  ("background-blend-mode", background_blend_mode),
+  ("background-clip", background_clip),
+  ("background-color", background_color),
+  ("background-image", background_image),
+  ("background-origin", background_origin),
+  ("background-position-x", background_position_x),
+  ("background-position-y", background_position_y),
+  ("background-position", background_position),
+  ("background-repeat", background_repeat),
+  ("background-size", background_size),
+  ("background", background),
+  ("baseline-shift", baseline_shift),
+  ("behavior", behavior),
+  ("bleed", bleed),
+  ("block-overflow", block_overflow),
+  ("block-size", block_size),
+  ("border-block-color", border_block_color),
+  ("border-block-end-color", border_block_end_color),
+  ("border-block-end-style", border_block_end_style),
+  ("border-block-end-width", border_block_end_width),
+  ("border-block-end", border_block_end),
+  ("border-block-start-color", border_block_start_color),
+  ("border-block-start-style", border_block_start_style),
+  ("border-block-start-width", border_block_start_width),
+  ("border-block-start", border_block_start),
+  ("border-block-style", border_block_style),
+  ("border-block-width", border_block_width),
+  ("border-block", border_block),
+  ("border-bottom-color", border_bottom_color),
+  ("border-bottom-left-radius", border_bottom_left_radius),
+  ("border-bottom-right-radius", border_bottom_right_radius),
+  ("border-bottom-style", border_bottom_style),
+  ("border-bottom-width", border_bottom_width),
+  ("border-bottom", border_bottom),
+  ("border-collapse", border_collapse),
+  ("border-color", border_color),
+  ("border-end-end-radius", border_end_end_radius),
+  ("border-end-start-radius", border_end_start_radius),
+  ("border-image-outset", border_image_outset),
+  ("border-image-repeat", border_image_repeat),
+  ("border-image-slice", border_image_slice),
+  ("border-image-source", border_image_source),
+  ("border-image-width", border_image_width),
+  ("border-image", border_image),
+  ("border-inline-color", border_inline_color),
+  ("border-inline-end-color", border_inline_end_color),
+  ("border-inline-end-style", border_inline_end_style),
+  ("border-inline-end-width", border_inline_end_width),
+  ("border-inline-end", border_inline_end),
+  ("border-inline-start-color", border_inline_start_color),
+  ("border-inline-start-style", border_inline_start_style),
+  ("border-inline-start-width", border_inline_start_width),
+  ("border-inline-start", border_inline_start),
+  ("border-inline-style", border_inline_style),
+  ("border-inline-width", border_inline_width),
+  ("border-inline", border_inline),
+  ("border-left-color", border_left_color),
+  ("border-left-style", border_left_style),
+  ("border-left-width", border_left_width),
+  ("border-left", border_left),
+  ("border-radius", border_radius),
+  ("border-right-color", border_right_color),
+  ("border-right-style", border_right_style),
+  ("border-right-width", border_right_width),
+  ("border-right", border_right),
+  ("border-spacing", border_spacing),
+  ("border-start-end-radius", border_start_end_radius),
+  ("border-start-start-radius", border_start_start_radius),
+  ("border-style", border_style),
+  ("border-top-color", border_top_color),
+  ("border-top-left-radius", border_top_left_radius),
+  ("border-top-right-radius", border_top_right_radius),
+  ("border-top-style", border_top_style),
+  ("border-top-width", border_top_width),
+  ("border-top", border_top),
+  ("border-width", border_width),
+  ("border", border),
+  ("bottom", bottom),
+  ("box-align", box_align),
+  ("box-decoration-break", box_decoration_break),
+  ("box-direction", box_direction),
+  ("box-flex", box_flex),
+  ("box-flex-group", box_flex_group),
+  ("box-lines", box_lines),
+  ("box-ordinal-group", box_ordinal_group),
+  ("box-orient", box_orient),
+  ("box-pack", box_pack),
+  ("box-shadow", box_shadow),
+  ("box-sizing", box_sizing),
+  ("break-after", break_after),
+  ("break-before", break_before),
+  ("break-inside", break_inside),
+  ("caption-side", caption_side),
+  ("caret-color", caret_color),
+  ("clear", clear),
+  ("clip-path", clip_path),
+  ("clip-rule", clip_rule),
+  ("clip", clip),
+  ("content", content),
+  ("color-adjust", color_adjust),
+  ("color-interpolation-filters", color_interpolation_filters),
+  ("color-interpolation", color_interpolation),
+  ("color-rendering", color_rendering),
+  ("color-scheme", color_scheme),
+  ("color", color),
+  ("column-count", column_count),
+  ("column-fill", column_fill),
+  ("column-gap", column_gap),
+  ("column-rule-color", column_rule_color),
+  ("column-rule-style", column_rule_style),
+  ("column-rule-width", column_rule_width),
+  ("column-rule", column_rule),
+  ("column-span", column_span),
+  ("column-width", column_width),
+  ("columns", columns),
+  ("contain", contain),
+  ("container", container),
+  ("container-name", container_name),
+  ("container-name-computed", container_name_computed),
+  ("container-type", container_type),
+  ("contain-intrinsic-block-size", contain_intrinsic_block_size),
+  ("contain-intrinsic-height", contain_intrinsic_height),
+  ("contain-intrinsic-inline-size", contain_intrinsic_inline_size),
+  ("contain-intrinsic-size", contain_intrinsic_size),
+  ("contain-intrinsic-width", contain_intrinsic_width),
+  ("content-visibility", content_visibility),
+  ("content", content),
+  ("counter-increment", counter_increment),
+  ("counter-reset", counter_reset),
+  ("counter-set", counter_set),
+  ("cue", cue),
+  ("cue-after", cue_after),
+  ("cue-before", cue_before),
+  ("cursor", cursor),
+  ("cx", cx),
+  ("cy", cy),
+  ("d", d),
+  ("direction", direction),
+  ("display", display),
+  ("dominant-baseline", dominant_baseline),
+  ("empty-cells", empty_cells),
+  ("field-sizing", field_sizing),
+  ("fill-opacity", fill_opacity),
+  ("fill-rule", fill_rule),
+  ("fill", fill),
+  ("filter", filter),
+  ("flex", flex),
+  ("flex-basis", flex_basis),
+  ("flex-direction", flex_direction),
+  ("flex-flow", flex_flow),
+  ("flex-grow", flex_grow),
+  ("flex-shrink", flex_shrink),
+  ("flex-wrap", flex_wrap),
+  ("float", float),
+  ("flood-color", flood_color),
+  ("flood-opacity", flood_opacity),
+  ("font-family", font_family),
+  ("font-display", font_display),
+  ("font-feature-settings", font_feature_settings),
+  ("font-kerning", font_kerning),
+  ("font-language-override", font_language_override),
+  ("font-optical-sizing", font_optical_sizing),
+  ("font-size-adjust", font_size_adjust),
+  ("font-size", font_size),
+  ("font-palette", font_palette),
+  ("font-smooth", font_smooth),
+  ("font-stretch", font_stretch),
+  ("font-style", font_style),
+  ("font-synthesis-position", font_synthesis_position),
+  ("font-synthesis-small-caps", font_synthesis_small_caps),
+  ("font-synthesis-style", font_synthesis_style),
+  ("font-synthesis-weight", font_synthesis_weight),
+  ("font-synthesis", font_synthesis),
+  ("font-variant-alternates", font_variant_alternates),
+  ("font-variant-caps", font_variant_caps),
+  ("font-variant-east-asian", font_variant_east_asian),
+  ("font-variant-ligatures", font_variant_ligatures),
+  ("font-variant-numeric", font_variant_numeric),
+  ("font-variant-position", font_variant_position),
+  ("font-variant-emoji", font_variant_emoji),
+  ("font-variant", font_variant),
+  ("font-variation-settings", font_variation_settings),
+  ("font-weight", font_weight),
+  ("font", font),
+  ("gap", gap),
+  ("glyph-orientation-horizontal", glyph_orientation_horizontal),
+  ("glyph-orientation-vertical", glyph_orientation_vertical),
+  ("grid-area", grid_area),
+  ("grid-auto-columns", grid_auto_columns),
+  ("grid-auto-flow", grid_auto_flow),
+  ("grid-auto-rows", grid_auto_rows),
+  ("grid-column-end", grid_column_end),
+  ("grid-column-gap", grid_column_gap),
+  ("grid-column-start", grid_column_start),
+  ("grid-column", grid_column),
+  ("grid-gap", grid_gap),
+  ("grid-row-end", grid_row_end),
+  ("grid-row-gap", grid_row_gap),
+  ("grid-row-start", grid_row_start),
+  ("grid-row", grid_row),
+  ("grid-template-areas", grid_template_areas),
+  ("grid-template-columns", grid_template_columns),
+  ("grid-template-rows", grid_template_rows),
+  ("grid-template", grid_template),
+  ("grid", grid),
+  ("hanging-punctuation", hanging_punctuation),
+  ("height", height),
+  ("hyphenate-character", hyphenate_character),
+  ("hyphenate-limit-chars", hyphenate_limit_chars),
+  ("hyphenate-limit-lines", hyphenate_limit_lines),
+  ("hyphenate-limit-last", hyphenate_limit_last),
+  ("hyphenate-limit-zone", hyphenate_limit_zone),
+  ("hyphens", hyphens),
+  ("image-orientation", image_orientation),
+  ("image-rendering", image_rendering),
+  ("image-resolution", image_resolution),
+  ("ime-mode", ime_mode),
+  ("inherits", inherits),
+  ("initial-letter-align", initial_letter_align),
+  ("initial-letter", initial_letter),
+  ("initial-value", initial_value),
+  ("inline-size", inline_size),
+  ("inset-area", inset_area),
+  ("inset-block-end", inset_block_end),
+  ("inset-block-start", inset_block_start),
+  ("inset-block", inset_block),
+  ("inset-inline-end", inset_inline_end),
+  ("inset-inline-start", inset_inline_start),
+  ("inset-inline", inset_inline),
+  ("inset", inset),
+  ("interpolate-size", interpolate_size),
+  ("isolation", isolation),
+  ("justify-content", justify_content),
+  ("justify-items", justify_items),
+  ("justify-self", justify_self),
+  ("kerning", kerning),
+  ("layout-grid-char", layout_grid_char),
+  ("layout-grid-line", layout_grid_line),
+  ("layout-grid-mode", layout_grid_mode),
+  ("layout-grid-type", layout_grid_type),
+  ("layout-grid", layout_grid),
+  ("left", left),
+  ("letter-spacing", letter_spacing),
+  ("lighting-color", lighting_color),
+  ("line-break", line_break),
+  ("line-clamp", line_clamp),
+  ("line-height-step", line_height_step),
+  ("line-height", line_height),
+  ("list-style-image", list_style_image),
+  ("list-style-position", list_style_position),
+  ("list-style-type", list_style_type),
+  ("list-style", list_style),
+  ("margin-block", margin_block),
+  ("margin-block-end", margin_block_end),
+  ("margin-block-start", margin_block_start),
+  ("margin-bottom", margin_bottom),
+  ("margin-inline", margin_inline),
+  ("margin-inline-end", margin_inline_end),
+  ("margin-inline-start", margin_inline_start),
+  ("margin-left", margin_left),
+  ("margin-right", margin_right),
+  ("margin-top", margin_top),
+  ("margin-trim", margin_trim),
+  ("margin", margin),
+  ("marker", marker),
+  ("marker-end", marker_end),
+  ("marker-mid", marker_mid),
+  ("marker-start", marker_start),
+  ("marks", marks),
+  ("mask-border-mode", mask_border_mode),
+  ("mask-border-outset", mask_border_outset),
+  ("mask-border-repeat", mask_border_repeat),
+  ("mask-border-slice", mask_border_slice),
+  ("mask-border-source", mask_border_source),
+  ("mask-border-width", mask_border_width),
+  ("mask-clip", mask_clip),
+  ("mask-composite", mask_composite),
+  ("mask-image", mask_image),
+  ("mask-mode", mask_mode),
+  ("mask-origin", mask_origin),
+  ("mask-position", mask_position),
+  ("mask-repeat", mask_repeat),
+  ("mask-size", mask_size),
+  ("mask-type", mask_type),
+  ("math-depth", math_depth),
+  ("math-shift", math_shift),
+  ("math-style", math_style),
+  ("max-block-size", max_block_size),
+  ("max-height", max_height),
+  ("max-inline-size", max_inline_size),
+  ("max-lines", max_lines),
+  ("max-width", max_width),
+  ("min-block-size", min_block_size),
+  ("min-height", min_height),
+  ("min-inline-size", min_inline_size),
+  ("min-width", min_width),
+  ("mix-blend-mode", mix_blend_mode),
+  ("nav-down", nav_down),
+  ("nav-left", nav_left),
+  ("nav-right", nav_right),
+  ("nav-up", nav_up),
+  ("object-fit", object_fit),
+  ("object-position", object_position),
+  ("offset-anchor", offset_anchor),
+  ("offset-distance", offset_distance),
+  ("offset-path", offset_path),
+  ("offset-position", offset_position),
+  ("offset-rotate", offset_rotate),
+  ("offset", offset),
+  ("opacity", opacity),
+  ("order", order),
+  ("orphans", orphans),
+  ("outline", outline),
+  ("outline-color", outline_color),
+  ("outline-offset", outline_offset),
+  ("outline-style", outline_style),
+  ("outline-width", outline_width),
+  ("overlay", overlay),
+  ("overflow-anchor", overflow_anchor),
+  ("overflow-block", overflow_block),
+  ("overflow-clip-margin", overflow_clip_margin),
+  ("overflow-inline", overflow_inline),
+  ("overflow-wrap", overflow_wrap),
+  ("overflow-x", overflow_x),
+  ("overflow-y", overflow_y),
+  ("overflow", overflow),
+  ("padding-block-end", padding_block_end),
+  ("padding-block-start", padding_block_start),
+  ("padding-block", padding_block),
+  ("padding-bottom", padding_bottom),
+  ("padding-inline-end", padding_inline_end),
+  ("padding-inline-start", padding_inline_start),
+  ("padding-inline", padding_inline),
+  ("padding-left", padding_left),
+  ("padding-right", padding_right),
+  ("padding-top", padding_top),
+  ("padding", padding),
+  ("page", page),
+  ("page-break-after", page_break_after),
+  ("paint-order", paint_order),
+  ("pause", pause),
+  ("pause-after", pause_after),
+  ("pause-before", pause_before),
+  ("page-break-before", page_break_before),
+  ("page-break-inside", page_break_inside),
+  ("perspective-origin", perspective_origin),
+  ("perspective", perspective),
+  ("pointer-events", pointer_events),
+  ("position", position),
+  ("position-anchor", position_anchor),
+  ("print-color-adjust", print_color_adjust),
+  ("position-area", position_area),
+  ("position-try", position_try),
+  ("position-try-fallbacks", position_try_fallbacks),
+  ("position-try-options", position_try_options),
+  ("position-visibility", position_visibility),
+  ("r", r),
+  ("reading-flow", reading_flow),
+  ("resize", resize),
+  ("rest", rest),
+  ("rest-after", rest_after),
+  ("rest-before", rest_before),
+  ("right", right),
+  ("rotate", rotate),
+  ("row-gap", row_gap),
+  ("ruby-overhang", ruby_overhang),
+  ("rx", rx),
+  ("ry", ry),
+  ("scale", scale),
+  ("shape-image-threshold", shape_image_threshold),
+  ("shape-margin", shape_margin),
+  ("shape-outside", shape_outside),
+  ("shape-rendering", shape_rendering),
+  ("scrollbar-3dlight-color", scrollbar_3dlight_color),
+  ("scrollbar-arrow-color", scrollbar_arrow_color),
+  ("scrollbar-base-color", scrollbar_base_color),
+  ("scrollbar-color", scrollbar_color),
+  ("scrollbar-darkshadow-color", scrollbar_darkshadow_color),
+  ("scrollbar-face-color", scrollbar_face_color),
+  ("scrollbar-highlight-color", scrollbar_highlight_color),
+  ("scrollbar-shadow-color", scrollbar_shadow_color),
+  ("scrollbar-track-color", scrollbar_track_color),
+  ("scrollbar-width", scrollbar_width),
+  ("scrollbar-gutter", scrollbar_gutter),
+  ("speak", speak),
+  ("speak-as", speak_as),
+  ("src", src),
+  ("scroll-behavior", scroll_behavior),
+  ("scroll-margin", scroll_margin),
+  ("scroll-margin-block", scroll_margin_block),
+  ("scroll-margin-block-end", scroll_margin_block_end),
+  ("scroll-margin-block-start", scroll_margin_block_start),
+  ("scroll-margin-bottom", scroll_margin_bottom),
+  ("scroll-margin-inline", scroll_margin_inline),
+  ("scroll-margin-inline-end", scroll_margin_inline_end),
+  ("scroll-margin-inline-start", scroll_margin_inline_start),
+  ("scroll-margin-left", scroll_margin_left),
+  ("scroll-margin-right", scroll_margin_right),
+  ("scroll-margin-top", scroll_margin_top),
+  ("scroll-marker-group", scroll_marker_group),
+  ("scroll-padding", scroll_padding),
+  ("scroll-padding-block", scroll_padding_block),
+  ("scroll-padding-block-end", scroll_padding_block_end),
+  ("scroll-padding-block-start", scroll_padding_block_start),
+  ("scroll-padding-bottom", scroll_padding_bottom),
+  ("scroll-padding-inline", scroll_padding_inline),
+  ("scroll-padding-inline-end", scroll_padding_inline_end),
+  ("scroll-padding-inline-start", scroll_padding_inline_start),
+  ("scroll-padding-left", scroll_padding_left),
+  ("scroll-padding-right", scroll_padding_right),
+  ("scroll-padding-top", scroll_padding_top),
+  ("scroll-snap-align", scroll_snap_align),
+  ("scroll-snap-coordinate", scroll_snap_coordinate),
+  ("scroll-snap-destination", scroll_snap_destination),
+  ("scroll-snap-points-x", scroll_snap_points_x),
+  ("scroll-snap-points-y", scroll_snap_points_y),
+  ("scroll-snap-stop", scroll_snap_stop),
+  ("scroll-snap-type", scroll_snap_type),
+  ("scroll-snap-type-x", scroll_snap_type_x),
+  ("scroll-snap-type-y", scroll_snap_type_y),
+  ("size", size),
+  ("scroll-start", scroll_start),
+  ("scroll-start-block", scroll_start_block),
+  ("scroll-start-inline", scroll_start_inline),
+  ("scroll-start-x", scroll_start_x),
+  ("scroll-start-y", scroll_start_y),
+  ("scroll-start-target", scroll_start_target),
+  ("scroll-start-target-block", scroll_start_target_block),
+  ("scroll-start-target-inline", scroll_start_target_inline),
+  ("scroll-start-target-x", scroll_start_target_x),
+  ("scroll-start-target-y", scroll_start_target_y),
+  ("scroll-timeline", scroll_timeline),
+  ("scroll-timeline-axis", scroll_timeline_axis),
+  ("scroll-timeline-name", scroll_timeline_name),
+  ("stop-color", stop_color),
+  ("stop-opacity", stop_opacity),
+  ("stroke", stroke),
+  ("stroke-dasharray", stroke_dasharray),
+  ("stroke-dashoffset", stroke_dashoffset),
+  ("stroke-linecap", stroke_linecap),
+  ("stroke-linejoin", stroke_linejoin),
+  ("stroke-miterlimit", stroke_miterlimit),
+  ("stroke-opacity", stroke_opacity),
+  ("stroke-width", stroke_width),
+  ("syntax", syntax),
+  ("tab-size", tab_size),
+  ("table-layout", table_layout),
+  ("text-align-last", text_align_last),
+  ("text-align", text_align),
+  ("text-align-all", text_align_all),
+  ("text-anchor", text_anchor),
+  ("text-autospace", text_autospace),
+  ("text-blink", text_blink),
+  ("text-box-edge", text_box_edge),
+  ("text-box-trim", text_box_trim),
+  ("text-combine-upright", text_combine_upright),
+  ("text-decoration-color", text_decoration_color),
+  ("text-decoration-line", text_decoration_line),
+  ("text-decoration-skip-ink", text_decoration_skip_ink),
+  ("text-decoration-skip", text_decoration_skip),
+  ("text-decoration-style", text_decoration_style),
+  ("text-decoration-thickness", text_decoration_thickness),
+  ("text-decoration", text_decoration),
+  ("text-edge", text_edge),
+  ("text-decoration-skip-box", text_decoration_skip_box),
+  ("text-decoration-skip-inset", text_decoration_skip_inset),
+  ("text-decoration-skip-self", text_decoration_skip_self),
+  ("text-decoration-skip-spaces", text_decoration_skip_spaces),
+  ("text-emphasis-color", text_emphasis_color),
+  ("text-emphasis-position", text_emphasis_position),
+  ("text-emphasis-style", text_emphasis_style),
+  ("text-emphasis", text_emphasis),
+  ("text-indent", text_indent),
+  ("text-justify", text_justify),
+  ("text-justify-trim", text_justify_trim),
+  ("text-kashida", text_kashida),
+  ("text-kashida-space", text_kashida_space),
+  ("text-orientation", text_orientation),
+  ("text-overflow", text_overflow),
+  ("text-rendering", text_rendering),
+  ("text-shadow", text_shadow),
+  ("text-size-adjust", text_size_adjust),
+  ("text-spacing-trim", text_spacing_trim),
+  ("text-transform", text_transform),
+  ("text-underline-offset", text_underline_offset),
+  ("text-underline-position", text_underline_position),
+  ("text-wrap", text_wrap),
+  ("text-wrap-mode", text_wrap_mode),
+  ("text-wrap-style", text_wrap_style),
+  ("timeline-scope", timeline_scope),
+  ("top", top),
+  ("touch-action", touch_action),
+  ("transform-box", transform_box),
+  ("transform-origin", transform_origin),
+  ("transform-style", transform_style),
+  ("transform", transform),
+  ("transition-behavior", transition_behavior),
+  ("transition-delay", transition_delay),
+  ("transition-duration", transition_duration),
+  ("transition-property", transition_property),
+  ("transition-timing-function", transition_timing_function),
+  ("transition", transition),
+  ("translate", translate),
+  ("unicode-bidi", unicode_bidi),
+  ("unicode-range", unicode_range),
+  ("user-select", user_select),
+  ("vector-effect", vector_effect),
+  ("vertical-align", vertical_align),
+  ("view-timeline", view_timeline),
+  ("view-timeline-axis", view_timeline_axis),
+  ("view-timeline-inset", view_timeline_inset),
+  ("view-timeline-name", view_timeline_name),
+  ("view-transition-name", view_transition_name),
+  ("visibility", visibility),
+  ("voice-balance", voice_balance),
+  ("voice-duration", voice_duration),
+  ("voice-family", voice_family),
+  ("voice-pitch", voice_pitch),
+  ("voice-range", voice_range),
+  ("voice-rate", voice_rate),
+  ("voice-stress", voice_stress),
+  ("voice-volume", voice_volume),
+  ("will-change", will_change),
+  ("white-space", white_space),
+  ("white-space-collapse", white_space_collapse),
+  ("widows", widows),
+  ("width", width),
+  ("word-break", word_break),
+  ("word-space-transform", word_space_transform),
+  ("word-spacing", word_spacing),
+  ("word-wrap", word_wrap),
+  ("writing-mode", writing_mode),
+  ("x", x),
+  ("y", y),
+  ("z-index", z_index),
+  ("zoom", zoom),
 ];
 
 let render_when_unsupported_features = (~loc, property, value) => {
@@ -6830,13 +6780,13 @@ let render_variable_declaration = (~loc, property, value) => {
 
 let render_to_expr = (~loc, property, value, important) => {
   let (let.ok) = Result.bind;
-  let.ok expr_of_string =
+  let.ok parse_and_transform =
     switch (findProperty(property)) {
-    | Some((_, (_, expr_of_string))) => Ok(expr_of_string)
+    | Some((_, parse_and_transform)) => Ok(parse_and_transform)
     | None => Error(`Property_not_found)
     };
 
-  switch (expr_of_string(~loc, value)) {
+  switch (parse_and_transform(~loc, value)) {
   | Ok(expr) when important =>
     Ok(expr |> List.map(expr => [%expr CSS.important([%e expr])]))
   | Ok(expr) => Ok(expr)

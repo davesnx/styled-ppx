@@ -310,6 +310,17 @@ let flexDirection x =
 let flexGrow x = Rule.declaration ({js|flexGrow|js}, Kloth.Float.to_string x)
 let flexShrink x = Rule.declaration ({js|flexShrink|js}, Kloth.Float.to_string x)
 let flexWrap x = Rule.declaration ({js|flexWrap|js}, FlexWrap.toString x)
+
+let flexFlow direction wrap =
+  Rule.declaration
+    ( {js|flexFlow|js},
+      match direction, wrap with
+      | Some direction, None -> FlexDirection.toString direction
+      | None, Some wrap -> FlexWrap.toString wrap
+      | Some direction, Some wrap ->
+        FlexDirection.toString direction ^ {js| |js} ^ FlexWrap.toString wrap
+      | None, None -> "" )
+
 let float x = Rule.declaration ({js|float|js}, Float.toString x)
 
 let fontFamily x =
