@@ -26,7 +26,6 @@ If this test fail means that the module is not in sync with the ppx
   CSS.transform(CSS.scale(2., -1.));
   CSS.transform(CSS.scaleX(2.));
   CSS.transform(CSS.scaleY(2.5));
-
   CSS.transform(CSS.rotate(`deg(45.)));
   CSS.transform(CSS.skew(`deg(45.), `deg(0.)));
   CSS.transform(CSS.skew(`deg(45.), `deg(15.)));

@@ -7,42 +7,21 @@ module Property_parser = Css_grammar.Parser;
 exception Invalid_value(string);
 
 let loc = Ppxlib.Location.none;
-let txt = txt => {
-  Ppxlib.Location.loc: Ppxlib.Location.none,
-  txt,
-};
-
-let (let.ok) = Result.bind;
 
 let render_string = string =>
-  Helper.Const.string(string) |> Helper.Exp.constant;
+  string |> Helper.Const.string |> Helper.Exp.constant;
 
 let render_integer = integer =>
-  Helper.Const.int(integer) |> Helper.Exp.constant;
+  integer |> Helper.Const.int |> Helper.Exp.constant;
 
 let list_to_longident = vars =>
   vars |> String.concat(".") |> Ppxlib.Longident.parse;
 
 let render_variable = name =>
-  list_to_longident(name) |> txt |> Helper.Exp.ident;
-
-type transform('ast, 'value) = {
-  ast_of_string: string => result('ast, string),
-  string_to_expr:
-    string => result(list(Ppxlib.Parsetree.expression), string),
-};
-
-let emit = (property, value_of_ast, value_to_expr) => {
-  let ast_of_string = Parser.parse(property);
-  let ast_to_expr = ast => value_of_ast(ast) |> value_to_expr;
-  let string_to_expr = string =>
-    ast_of_string(string) |> Result.map(ast_to_expr);
-
-  {
-    ast_of_string,
-    string_to_expr,
-  };
-};
+  Helper.Exp.ident({
+    loc,
+    txt: list_to_longident(name),
+  });
 
 let render_number = (number, unit) =>
   string_of_int(Float.to_int(number)) ++ unit |> render_string;
@@ -220,46 +199,50 @@ let render_size =
   | `Fit_content_0 => [%expr "fit-content"]
   | `Fit_content_1(lp) => render_length_percentage(lp);
 
-let found = ({ast_of_string, string_to_expr, _}) => {
-  let check_value = string => {
-    let.ok _ = ast_of_string(string);
-    Ok();
-  };
-  (check_value, string_to_expr);
-};
-
-let transform_with_variable = (parser, mapper, value_to_expr) =>
-  emit(
+let transform_with_variable = (parser, mapper, value_to_expr, string) => {
+  Parser.parse(
     Combinators.xor([
       /* If the CSS value is an interpolation */
       Rule.Match.map(Standard.interpolation, data => data),
       /* Otherwise it's a regular CSS `Value */
       Rule.Match.map(parser, data => `Value(data)),
     ]),
-    fun
-    | `Interpolation(name) => render_variable(name)
-    | `Value(ast) => mapper(ast),
-    value_to_expr,
-  );
+    string,
+  )
+  |> Result.map(ast =>
+       switch (ast) {
+       | `Interpolation(name) => render_variable(name) |> value_to_expr
+       | `Value(ast) => mapper(ast) |> value_to_expr
+       }
+     );
+};
 
-let apply = (parser, id, map) =>
+let transform = (parser, id, map) =>
   transform_with_variable(parser, map, arg =>
     [[%expr "(" ++ [%e id] ++ ": " ++ [%e arg] ++ ") "]]
   );
 
 let width =
-  apply(Property_parser.property_width, [%expr "width"], render_size);
+  transform(Property_parser.property_width, [%expr "width"], render_size);
 let min_width =
-  apply(Property_parser.property_width, [%expr "min-width"], render_size);
+  transform(Property_parser.property_width, [%expr "min-width"], render_size);
 
 let max_width =
-  apply(Property_parser.property_width, [%expr "max-width"], render_size);
+  transform(Property_parser.property_width, [%expr "max-width"], render_size);
 let height =
-  apply(Property_parser.property_height, [%expr "height"], render_size);
+  transform(Property_parser.property_height, [%expr "height"], render_size);
 let min_height =
-  apply(Property_parser.property_height, [%expr "min-height"], render_size);
+  transform(
+    Property_parser.property_height,
+    [%expr "min-height"],
+    render_size,
+  );
 let max_height =
-  apply(Property_parser.property_height, [%expr "max-height"], render_size);
+  transform(
+    Property_parser.property_height,
+    [%expr "max-height"],
+    render_size,
+  );
 
 let render_ratio =
   fun
@@ -272,34 +255,35 @@ let render_ratio =
   | `Interpolation(v) => render_variable(v);
 
 let aspect_ratio =
-  apply(
+  transform(
     Parser.property_media_max_aspect_ratio,
     [%expr "aspect-ratio"],
     render_ratio,
   );
 let min_aspect_ratio =
-  apply(
+  transform(
     Parser.property_media_max_aspect_ratio,
     [%expr "min-aspect-ratio"],
     render_ratio,
   );
 let max_aspect_ratio =
-  apply(
+  transform(
     Parser.property_media_max_aspect_ratio,
     [%expr "max-aspect-ratio"],
     render_ratio,
   );
 let orientation =
-  apply(
+  transform(
     Parser.property_media_orientation,
     [%expr "orientation"],
     fun
     | `Landscape => [%expr "landscape"]
     | `Portrait => [%expr "portrait"],
   );
-let grid = apply(Parser.property_media_grid, [%expr "grid"], render_integer);
+let grid =
+  transform(Parser.property_media_grid, [%expr "grid"], render_integer);
 let update =
-  apply(
+  transform(
     Parser.property_media_update,
     [%expr "update"],
     fun
@@ -308,7 +292,7 @@ let update =
     | `Slow => [%expr "slow"],
   );
 let overflow_block =
-  apply(
+  transform(
     Parser.property_overflow_block,
     [%expr "overflow-block"],
     fun
@@ -321,7 +305,7 @@ let overflow_block =
   );
 
 let overflow_inline =
-  apply(
+  transform(
     Parser.property_overflow_inline,
     [%expr "overflow-inline"],
     fun
@@ -333,14 +317,15 @@ let overflow_inline =
     | `Interpolation(i) => render_variable(i),
   );
 
-let color = apply(Parser.positive_integer, [%expr "color"], render_integer);
+let color =
+  transform(Parser.positive_integer, [%expr "color"], render_integer);
 let min_color =
-  apply(Parser.positive_integer, [%expr "min-color"], render_integer);
+  transform(Parser.positive_integer, [%expr "min-color"], render_integer);
 let max_color =
-  apply(Parser.positive_integer, [%expr "max-color"], render_integer);
+  transform(Parser.positive_integer, [%expr "max-color"], render_integer);
 
 let color_gamut =
-  apply(
+  transform(
     Parser.property_media_color_gamut,
     [%expr "color_gamut"],
     fun
@@ -349,7 +334,7 @@ let color_gamut =
     | `Srgb => [%expr "Srgb"],
   );
 let display_mode =
-  apply(
+  transform(
     Parser.property_media_display_mode,
     [%expr "display-mode"],
     fun
@@ -359,27 +344,27 @@ let display_mode =
     | `Standalone => [%expr "standalone"],
   );
 let monochrome =
-  apply(
+  transform(
     Parser.property_media_monochrome,
     [%expr "monochrome"],
     render_integer,
   );
 
 let min_monochrome =
-  apply(
+  transform(
     Parser.property_media_monochrome,
     [%expr "min-monochrome"],
     render_integer,
   );
 
 let max_monochrome =
-  apply(
+  transform(
     Parser.property_media_monochrome,
     [%expr "max-monochrome"],
     render_integer,
   );
 let inverted_colors =
-  apply(
+  transform(
     Parser.property_media_inverted_colors,
     [%expr "inverted-colors"],
     fun
@@ -387,7 +372,7 @@ let inverted_colors =
     | `None => [%expr "none"],
   );
 let pointer =
-  apply(
+  transform(
     Parser.property_media_pointer,
     [%expr "pointer"],
     fun
@@ -396,7 +381,7 @@ let pointer =
     | `None => [%expr "none"],
   );
 let hover =
-  apply(
+  transform(
     Parser.property_media_hover,
     [%expr "hover"],
     fun
@@ -404,7 +389,7 @@ let hover =
     | `None => [%expr "none"],
   );
 let any_pointer =
-  apply(
+  transform(
     Parser.property_media_any_pointer,
     [%expr "any_pointer"],
     fun
@@ -413,7 +398,7 @@ let any_pointer =
     | `None => [%expr "none"],
   );
 let any_hover =
-  apply(
+  transform(
     Parser.property_media_any_hover,
     [%expr "any_hover"],
     fun
@@ -421,7 +406,7 @@ let any_hover =
     | `None => [%expr "none"],
   );
 let scripting =
-  apply(
+  transform(
     Parser.property_media_scripting,
     [%expr "scripting"],
     fun
@@ -431,7 +416,7 @@ let scripting =
   );
 
 let resolution =
-  apply(
+  transform(
     Parser.property_media_resolution,
     [%expr "resolution"],
     fun
@@ -441,7 +426,7 @@ let resolution =
   );
 
 let max_resolution =
-  apply(
+  transform(
     Parser.property_media_resolution,
     [%expr "min-resolution"],
     fun
@@ -449,8 +434,9 @@ let max_resolution =
     | `Dpi(v) => render_number(v, "dpi")
     | `Dppx(v) => render_number(v, "dppx"),
   );
+
 let min_resolution =
-  apply(
+  transform(
     Parser.property_media_resolution,
     [%expr "max-resolution"],
     fun
@@ -458,60 +444,61 @@ let min_resolution =
     | `Dpi(v) => render_number(v, "dpi")
     | `Dppx(v) => render_number(v, "dppx"),
   );
+
 let color_index =
-  apply(
+  transform(
     Parser.property_media_color_index,
     [%expr "color-index"],
     render_integer,
   );
 let min_color_index =
-  apply(
+  transform(
     Parser.property_media_color_index,
     [%expr "min-color-index"],
     render_integer,
   );
 let max_color_index =
-  apply(
+  transform(
     Parser.property_media_color_index,
     [%expr "max-color-index"],
     render_integer,
   );
 
 let properties = [
-  ("width", found(width)),
-  ("min-width", found(min_width)),
-  ("max-width", found(max_width)),
-  ("height", found(height)),
-  ("min-height", found(min_height)),
-  ("max-height", found(max_height)),
-  ("aspect-ratio", found(aspect_ratio)),
-  ("min-aspect-ratio", found(min_aspect_ratio)),
-  ("max-aspect-ratio", found(max_aspect_ratio)),
-  ("orientation", found(orientation)),
-  ("resolution", found(resolution)),
-  ("min-resolution", found(min_resolution)),
-  ("max-resolution", found(max_resolution)),
-  ("grid", found(grid)),
-  ("update", found(update)),
-  ("overflow-block", found(overflow_block)),
-  ("overflow-inline", found(overflow_inline)),
-  ("color", found(color)),
-  ("min_color", found(min_color)),
-  ("max_color", found(max_color)),
-  ("color-gamut", found(color_gamut)),
-  ("color-index", found(color_index)),
-  ("min_color-index", found(min_color_index)),
-  ("max_color-index", found(max_color_index)),
-  ("display-mode", found(display_mode)), // display-mode
-  ("monochrome", found(monochrome)),
-  ("min-monochrome", found(min_monochrome)),
-  ("max-monochrome", found(max_monochrome)),
-  ("inverted-colors", found(inverted_colors)),
-  ("pointer", found(pointer)),
-  ("hover", found(hover)),
-  ("any-pointer", found(any_pointer)),
-  ("any-hover", found(any_hover)),
-  ("scripting", found(scripting)),
+  ("width", width),
+  ("min-width", min_width),
+  ("max-width", max_width),
+  ("height", height),
+  ("min-height", min_height),
+  ("max-height", max_height),
+  ("aspect-ratio", aspect_ratio),
+  ("min-aspect-ratio", min_aspect_ratio),
+  ("max-aspect-ratio", max_aspect_ratio),
+  ("orientation", orientation),
+  ("resolution", resolution),
+  ("min-resolution", min_resolution),
+  ("max-resolution", max_resolution),
+  ("grid", grid),
+  ("update", update),
+  ("overflow-block", overflow_block),
+  ("overflow-inline", overflow_inline),
+  ("color", color),
+  ("min_color", min_color),
+  ("max_color", max_color),
+  ("color-gamut", color_gamut),
+  ("color-index", color_index),
+  ("min_color-index", min_color_index),
+  ("max_color-index", max_color_index),
+  ("display-mode", display_mode), // display-mode
+  ("monochrome", monochrome),
+  ("min-monochrome", min_monochrome),
+  ("max-monochrome", max_monochrome),
+  ("inverted-colors", inverted_colors),
+  ("pointer", pointer),
+  ("hover", hover),
+  ("any-pointer", any_pointer),
+  ("any-hover", any_hover),
+  ("scripting", scripting),
 ];
 
 let findProperty = name => {
@@ -519,13 +506,14 @@ let findProperty = name => {
 };
 
 let render_to_expr = (property, value) => {
-  let.ok expr_of_string =
-    switch (findProperty(property)) {
-    | Some((_, (_, expr_of_string))) => Ok(expr_of_string)
-    | None => Error(`Property_not_found)
-    };
-
-  expr_of_string(value) |> Result.map_error(str => `Invalid_value(str));
+  switch (findProperty(property)) {
+  | None => Error(`Property_not_found)
+  | Some((_, transform)) =>
+    switch (transform(value)) {
+    | Ok(v) => Ok(v)
+    | Error(str) => Error(`Invalid_value(str))
+    }
+  };
 };
 
 let parse_declarations = (property: string, value: string) => {

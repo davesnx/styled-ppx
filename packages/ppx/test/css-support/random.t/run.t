@@ -54,7 +54,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.aspectRatio(`ratio((21, 8)));
   
   let c = CSS.hex("e15a46");
-  (CSS.backgroundColor(c): CSS.rule);
+  CSS.backgroundColor(c);
   CSS.unsafe({js|border|js}, {js|none|js});
   CSS.unsafe({js|bottom|js}, {js|unset|js});
   CSS.boxShadow(`none);
@@ -68,7 +68,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.display(`webkitBox);
   CSS.display(`contents);
   CSS.display(`table);
-  (CSS.SVG.fill(c): CSS.rule);
+  CSS.SVG.fill(c);
   CSS.SVG.fill(`currentColor);
   CSS.gap(`pxFloat(4.));
   
@@ -96,7 +96,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|justifySelf|js}, {js|unset|js});
   CSS.unsafe({js|left|js}, {js|unset|js});
   let maskedImageUrl = `url("https://www.example.com/eye-uncrossed.svg");
-  (CSS.maskImage(maskedImageUrl): CSS.rule);
+  CSS.maskImage(maskedImageUrl);
   CSS.maskPosition(`hv((`center, `center)));
   CSS.unsafe({js|maskRepeat|js}, {js|no-repeat|js});
   CSS.maxWidth(`maxContent);
@@ -107,7 +107,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.right(`calc(`sub((`percent(50.), `pxFloat(4.)))));
   CSS.unsafe({js|scrollBehavior|js}, {js|smooth|js});
   CSS.SVG.strokeOpacity(`num(0.));
-  (CSS.SVG.stroke(Color.text): CSS.rule);
+  CSS.SVG.stroke(Color.text);
   CSS.top(`calc(`sub((`percent(50.), `pxFloat(1.)))));
   CSS.unsafe({js|top|js}, {js|unset|js});
   CSS.unsafe({js|touchAction|js}, {js|none|js});
@@ -135,13 +135,13 @@ If this test fail means that the module is not in sync with the ppx
   let lola = `hidden;
   CSS.overflow(lola);
   CSS.overflow(`hidden);
-  (CSS.overflowY(lola): CSS.rule);
+  CSS.overflowY(lola);
   CSS.overflowX(`hidden);
   
   let value = `clip;
   CSS.overflowBlock(`hidden);
-  (CSS.overflowBlock(value): CSS.rule);
-  (CSS.overflowInline(value): CSS.rule);
+  CSS.overflowBlock(value);
+  CSS.overflowInline(value);
   
   CSS.style([|
     CSS.backgroundImage(
@@ -161,9 +161,6 @@ If this test fail means that the module is not in sync with the ppx
   CSS.color(`var({js|--color-link|js}));
   
   let interpolation = `px(10);
-  CSS.style([|
-    (CSS.right(interpolation): CSS.rule),
-    (CSS.bottom(interpolation): CSS.rule),
-  |]);
+  CSS.style([|CSS.right(interpolation), CSS.bottom(interpolation)|]);
 
   $ dune build

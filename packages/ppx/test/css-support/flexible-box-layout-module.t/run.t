@@ -49,12 +49,12 @@ If this test fail means that the module is not in sync with the ppx
   CSS.flexDirection(`rowReverse);
   CSS.flexDirection(`column);
   CSS.flexDirection(`columnReverse);
-  CSS.flexDirection(`row);
-  CSS.flexDirection(`rowReverse);
-  CSS.flexDirection(`column);
-  CSS.flexDirection(`columnReverse);
-  CSS.flexWrap(`wrap);
-  CSS.flexWrap(`wrapReverse);
+  CSS.flexFlow(`row, None);
+  CSS.flexFlow(`rowReverse, None);
+  CSS.flexFlow(`column, None);
+  CSS.flexFlow(`columnReverse, None);
+  CSS.flexFlow(None, `wrap);
+  CSS.flexFlow(None, `wrapReverse);
   CSS.flexGrow(0.);
   CSS.flexGrow(5.);
   CSS.flexShrink(1.);
