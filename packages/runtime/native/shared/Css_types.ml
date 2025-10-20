@@ -5964,7 +5964,7 @@ module Quotes = struct
       pairs
       |> Array.to_list
       |> List.map (fun (open_, close) ->
-        {js|"|js} ^ open_ ^ {js|" "|js} ^ close ^ {js|"|js})
+           {js|"|js} ^ open_ ^ {js|" "|js} ^ close ^ {js|"|js})
       |> String.concat {js| |js}
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
