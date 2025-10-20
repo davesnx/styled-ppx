@@ -25,8 +25,10 @@ let render_variable = name =>
 
 let render_number = (number, unit) =>
   string_of_int(Float.to_int(number)) ++ unit |> render_string;
+
 let render_percentage = percentage =>
   string_of_int(Float.to_int(percentage)) ++ "%" |> render_string;
+
 let render_length =
   fun
   | `Cap(n) => render_number(n, "cap")
