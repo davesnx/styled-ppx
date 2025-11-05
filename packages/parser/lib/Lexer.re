@@ -342,7 +342,7 @@ let _y = [%sedlex.regexp? 'Y' | 'y'];
 let _z = [%sedlex.regexp? 'Z' | 'z'];
 
 let important = [%sedlex.regexp?
-  ("!", Star(whitespace), _i, _m, _p, _o, _r, _t, _a, _n, _t)
+  ("!", whitespaces, _i, _m, _p, _o, _r, _t, _a, _n, _t)
 ];
 
 let length = [%sedlex.regexp?

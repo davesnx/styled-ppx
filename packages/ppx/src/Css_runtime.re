@@ -119,8 +119,10 @@ let rec render_at_rule = (~loc, at_rule: at_rule) => {
 and render_media_query = (~loc, at_rule: at_rule) => {
   let (at_rule_prelude_ast, at_rule_prelude_loc) = at_rule.prelude;
   let parse_condition = {
+    /* TODO: Trimming is a mistake from the lexer/parser, it should be fixed */
     let prelude =
-      Styled_ppx_css_parser.Render.component_value_list(at_rule_prelude_ast);
+      Styled_ppx_css_parser.Render.component_value_list(at_rule_prelude_ast)
+      |> String.trim;
     Css_grammar.Parser.parse(Css_grammar.Parser.media_query_list, prelude)
     |> Result.map(_ => prelude);
   };
@@ -161,8 +163,10 @@ and render_media_query = (~loc, at_rule: at_rule) => {
 and render_container_query = (~loc, at_rule: at_rule) => {
   let (at_rule_prelude_ast, at_rule_prelude_loc) = at_rule.prelude;
   let parse_condition = {
+    /* TODO: Trimming is a mistake from the lexer/parser */
     let prelude =
-      Styled_ppx_css_parser.Render.component_value_list(at_rule_prelude_ast);
+      Styled_ppx_css_parser.Render.component_value_list(at_rule_prelude_ast)
+      |> String.trim;
     Css_grammar.Parser.parse(
       Css_grammar.Parser.container_condition_list,
       prelude,
@@ -214,8 +218,10 @@ and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
   let (property, property_loc) = d.name;
   let (valueList, value_loc) = d.value;
   let (important, _) = d.important;
+  /* TODO: Trimming is a mistake from the lexer/parser */
   let value_source =
-    Styled_ppx_css_parser.Render.component_value_list(valueList);
+    Styled_ppx_css_parser.Render.component_value_list(valueList)
+    |> String.trim;
 
   let value_loc =
     Styled_ppx_css_parser.Parser_location.intersection(loc, value_loc);

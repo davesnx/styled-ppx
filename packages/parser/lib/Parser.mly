@@ -230,7 +230,7 @@ declaration_without_eof:
   /* property: value; */
   | property = loc(IDENT)
     WS? COLON
-    WS? value = loc(skip_ws(values))
+    WS? value = loc(values)
     WS? important = loc(boption(IMPORTANT))
     WS? SEMI_COLON? {
     { name = property;

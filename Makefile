@@ -2,7 +2,6 @@ project_name = styled-ppx
 
 OPAM_EXEC = opam exec --
 DUNE = $(OPAM_EXEC) dune
-opam_file = $(project_name).opam
 
 .PHONY: help
 help: ## Print this help message
