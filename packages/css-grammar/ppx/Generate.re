@@ -606,13 +606,14 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       | "string" => "String_token" /* string is an alias to string_token */
       | _ => failwith("Not a primitive wrapper: " ++ name)
       };
-
-    [@reason.preserve_braces]
-    open%expr Rule.Let;
-    let.bind_match [%p ppat_variant(tag, Some(pvar("v")))] = [%e
-      expression
+    [%expr
+     Rule.Match.bind(
+       [%e expression],
+       fun
+       | [%p ppat_variant(tag, Some(pvar("v")))] =>
+         Rule.Match.return([%e evar("v")]),
+     )
     ];
-    Rule.Match.return([%e evar("v")]);
   };
 
   let add_types = (~loc, bindings): list(Ppxlib.structure_item) => {
