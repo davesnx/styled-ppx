@@ -960,6 +960,12 @@ let () = {
     Arg.Unit(_ => Settings.Update.debug(true)),
   );
 
+  Ppxlib.Driver.add_arg(
+    ~doc=Settings.minify.doc,
+    Settings.minify.flag,
+    Arg.Unit(_ => Settings.Update.minify(true)),
+  );
+
   let (version, mode) = Bsconfig.getJSX();
 
   switch (version) {

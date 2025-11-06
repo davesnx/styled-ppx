@@ -6,5 +6,6 @@ module Parser = Parser;
 module Parser_location = Parser_location;
 module Driver = Driver;
 module Render = Render;
+module Minify = Minify;
 module Tokens = Tokens;
 module Transform = Transform;

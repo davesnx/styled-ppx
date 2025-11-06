@@ -309,7 +309,11 @@ module Css_transform = {
                    loc: Ppxlib.Location.none,
                  });
                let rule_string =
-                 Styled_ppx_css_parser.Render.rule(style_rule);
+                 if (Settings.Get.minify()) {
+                   Styled_ppx_css_parser.Minify.rule(style_rule);
+                 } else {
+                   Styled_ppx_css_parser.Render.rule(style_rule);
+                 };
                let className = generate_class_from_content(rule_string);
                [(className, style_rule)];
              | Style_rule(_) as nested => extract_atomic_rules(nested)
@@ -320,7 +324,12 @@ module Css_transform = {
       | At_rule({name, prelude, block, loc}) =>
         switch (block) {
         | Empty =>
-          let at_string = Styled_ppx_css_parser.Render.rule(rule);
+          let at_string =
+            if (Settings.Get.minify()) {
+              Styled_ppx_css_parser.Minify.rule(rule);
+            } else {
+              Styled_ppx_css_parser.Render.rule(rule);
+            };
           let className = generate_class_from_content(at_string);
           [(className, rule)];
 
@@ -337,7 +346,11 @@ module Css_transform = {
                  });
                /* Generate new className for the wrapped rule */
                let wrapped_string =
-                 Styled_ppx_css_parser.Render.rule(wrapped);
+                 if (Settings.Get.minify()) {
+                   Styled_ppx_css_parser.Minify.rule(wrapped);
+                 } else {
+                   Styled_ppx_css_parser.Render.rule(wrapped);
+                 };
                let new_className =
                  generate_class_from_content(wrapped_string);
                (new_className, wrapped);
@@ -455,7 +468,12 @@ let push = (declarations: Styled_ppx_css_parser.Ast.rule_list) => {
   let classNames =
     atomic_classnames
     |> List.map(((className, rule)) => {
-         let rendered_css = Styled_ppx_css_parser.Render.rule(rule);
+         let rendered_css =
+           if (Settings.Get.minify()) {
+             Styled_ppx_css_parser.Minify.rule(rule);
+           } else {
+             Styled_ppx_css_parser.Render.rule(rule);
+           };
          Buffer.add_rule(className, rendered_css);
          className;
        });
