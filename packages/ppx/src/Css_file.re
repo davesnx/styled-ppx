@@ -20,13 +20,14 @@ module Buffer = {
   /* Generates the final CSS content */
   let get_all_css = () => {
     let buffer = Buffer.create(1024);
+    let separator = Settings.Get.minify() ? "" : "\n";
 
     /* Reverse to maintain insertion order, then concatenate */
     accumulated_rules^
     |> List.rev
     |> List.iter(((_, cssText)) => {
          Buffer.add_string(buffer, cssText);
-         Buffer.add_char(buffer, '\n');
+         Buffer.add_string(buffer, separator);
        });
 
     Buffer.contents(buffer);
@@ -289,10 +290,23 @@ module Css_transform = {
 
   /* Split rules into atomic units (individual declarations) */
   let atomize_rules = (rules: list(rule)): list((string, rule)) => {
+    let (render_rule, render_declaration) =
+      if (Settings.Get.minify()) {
+        (
+          Styled_ppx_css_parser.Minify.rule,
+          Styled_ppx_css_parser.Minify.declaration,
+        );
+      } else {
+        (
+          Styled_ppx_css_parser.Render.rule,
+          Styled_ppx_css_parser.Render.declaration,
+        );
+      };
+
     let rec extract_atomic_rules = (rule: rule): list((string, rule)) => {
       switch (rule) {
       | Declaration(decl) =>
-        let decl_string = Styled_ppx_css_parser.Render.declaration(decl);
+        let decl_string = render_declaration(decl);
         let className = generate_class_from_content(decl_string);
         [(className, Declaration(decl))];
 
@@ -308,12 +322,7 @@ module Css_transform = {
                    block: ([Declaration(decl)], Ppxlib.Location.none),
                    loc: Ppxlib.Location.none,
                  });
-               let rule_string =
-                 if (Settings.Get.minify()) {
-                   Styled_ppx_css_parser.Minify.rule(style_rule);
-                 } else {
-                   Styled_ppx_css_parser.Render.rule(style_rule);
-                 };
+               let rule_string = render_rule(style_rule);
                let className = generate_class_from_content(rule_string);
                [(className, style_rule)];
              | Style_rule(_) as nested => extract_atomic_rules(nested)
@@ -324,12 +333,7 @@ module Css_transform = {
       | At_rule({name, prelude, block, loc}) =>
         switch (block) {
         | Empty =>
-          let at_string =
-            if (Settings.Get.minify()) {
-              Styled_ppx_css_parser.Minify.rule(rule);
-            } else {
-              Styled_ppx_css_parser.Render.rule(rule);
-            };
+          let at_string = render_rule(rule);
           let className = generate_class_from_content(at_string);
           [(className, rule)];
 
@@ -345,12 +349,7 @@ module Css_transform = {
                    loc,
                  });
                /* Generate new className for the wrapped rule */
-               let wrapped_string =
-                 if (Settings.Get.minify()) {
-                   Styled_ppx_css_parser.Minify.rule(wrapped);
-                 } else {
-                   Styled_ppx_css_parser.Render.rule(wrapped);
-                 };
+               let wrapped_string = render_rule(wrapped);
                let new_className =
                  generate_class_from_content(wrapped_string);
                (new_className, wrapped);
@@ -420,40 +419,6 @@ module Css_transform = {
 };
 
 /*
- * Determines where CSS files should be generated.
- *
- * The output directory MUST be explicitly specified via the --output flag.
- * There is no automatic detection or fallback behavior.
- *
- * Usage:
- * - Pass --output=/path/to/output when invoking the ppx
- */
-/* let get_output_path = () => {
-     /* TODO: Check if is a valid path */
-     /* TODO: Catch all errors from mkdir */
-     let output_directory = Settings.Get.output();
-
-     if (!Sys.file_exists(output_directory)) {
-       let rec create_parent_dirs = path => {
-         let parent = Filename.dirname(path);
-         if (parent != path && parent != "." && !Sys.file_exists(parent)) {
-           create_parent_dirs(parent);
-           Unix.mkdir(parent, 0o755);
-         };
-       };
-
-       create_parent_dirs(output_directory);
-       if (!Sys.file_exists(output_directory)) {
-         Unix.mkdir(output_directory, 0o755);
-       };
-     };
-
-     let output_path = Filename.concat(output_directory, "styles.css");
-     Log.debug(Printf.sprintf("CSS output path: %s", output_path));
-     output_path;
-   }; */
-
-/*
  * Takes CSS declarations and:
  * 1. Unnests nested selectors and media queries
  * 2. Transforms dynamic variables to CSS custom properties
@@ -468,12 +433,7 @@ let push = (declarations: Styled_ppx_css_parser.Ast.rule_list) => {
   let classNames =
     atomic_classnames
     |> List.map(((className, rule)) => {
-         let rendered_css =
-           if (Settings.Get.minify()) {
-             Styled_ppx_css_parser.Minify.rule(rule);
-           } else {
-             Styled_ppx_css_parser.Render.rule(rule);
-           };
+         let rendered_css = Styled_ppx_css_parser.Render.rule(rule);
          Buffer.add_rule(className, rendered_css);
          className;
        });
