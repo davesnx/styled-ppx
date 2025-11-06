@@ -123,29 +123,12 @@ and selector = (ast: Ast.selector) => {
   and render_complex_selector = complex => {
     switch (complex) {
     | Combinator({left, right}) =>
-      let is_class_selector = s => {
-        switch (s) {
-        | Ast.CompoundSelector({
-            type_selector: None,
-            subclass_selectors: [Ast.Class(_), ..._],
-            _,
-          }) =>
-          true
-        | _ => false
-        };
-      };
-
       let right_str =
         right
         |> List.map(((combinator, s)) => {
-             switch (
-               combinator,
-               is_class_selector(left),
-               is_class_selector(s),
-             ) {
-             | (None, true, true) => selector(s)
-             | (None, _, _) => selector(s)
-             | (Some(comb), _, _) => comb ++ selector(s)
+             switch (combinator) {
+             | None => " " ++ selector(s) // Descendant selector - space is required
+             | Some(comb) => comb ++ selector(s) // Explicit combinator - no spaces needed
              }
            })
         |> String.concat("");
@@ -155,7 +138,7 @@ and selector = (ast: Ast.selector) => {
   }
   and render_relative_selector =
       ({combinator, complex_selector}: Ast.relative_selector) => {
-    Option.fold(~none="", ~some=o => o, combinator)
+    Option.fold(~none="", ~some=o => o ++ " ", combinator)
     ++ render_complex_selector(complex_selector);
   };
 
@@ -171,7 +154,7 @@ and selector_list = (ast: Ast.selector_list) => {
 }
 and component_value = (ast: Ast.component_value) => {
   switch (ast) {
-  | Whitespace => ""
+  | Whitespace => " "  // Preserve whitespace in values - semantically important
   | Paren_block(block) => "(" ++ component_value_list(block) ++ ")"
   | Bracket_block(block) => "[" ++ component_value_list(block) ++ "]"
   | Percentage(string) => string ++ "%"

@@ -1,6 +1,6 @@
 (test
  (name Runner)
- (modules Lexer_test Parser_test Runner)
+ (modules Lexer_test Parser_test Minify_test Runner)
  (flags
   (:standard -open Alcotest_extra))
  (libraries
