@@ -20,7 +20,7 @@ let parse_and_minify = input => {
 let test_cases = [
   /* Basic declarations */
   ("color: red;", "color:red;"),
-  ("color: red !important;", "color:red!important;"),
+  ("color: red !important;", "color:red !important;"),
   ("padding: 10px; margin: 20px;", "padding:10px;margin:20px;"),
   /* Selectors with single declaration */
   (".button { color: blue; }", ".button{color:blue;}"),
@@ -42,8 +42,8 @@ let test_cases = [
   /* Pseudo-classes and pseudo-elements */
   ("a:hover { color: red; }", "a:hover{color:red;}"),
   ("input:focus { border-color: blue; }", "input:focus{border-color:blue;}"),
-  ("p::before { content: ''; }", {|p::before{content:'';}|}),
-  ("p::after { content: '→'; }", {|p::after{content:'→';}|}),
+  ("p::before { content: ''; }", {|p::before{content:"";}|}),
+  ("p::after { content: '→'; }", {|p::after{content:"→";}|}),
   (
     "li:nth-child(2n) { background: gray; }",
     "li:nth-child(2n){background:gray;}",
@@ -62,28 +62,28 @@ let test_cases = [
   /* Attribute selectors */
   (
     "input[type=\"text\"] { border: 1px solid gray; }",
-    {|input[type='text']{border:1px solid gray;}|},
+    {|input[type="text"]{border:1px solid gray;}|},
   ),
   (
     "a[href^=\"https\"] { color: green; }",
-    {|a[href^='https']{color:green;}|},
+    {|a[href^="https"]{color:green;}|},
   ),
   /* Complex values */
-  ("font-family: Arial, sans-serif;", "font-family:Arial,sans-serif;"),
+  ("font-family: Arial, sans-serif;", "font-family:Arial, sans-serif;"),
   ("padding: 1em 2rem 3px 4%;", "padding:1em 2rem 3px 4%;"),
   ("border: 1px solid black;", "border:1px solid black;"),
   (
     "box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);",
-    "box-shadow:0 2px 4px rgba(0,0,0,0.1);",
+    "box-shadow:0 2px 4px rgba(0, 0, 0, 0.1);",
   ),
   (
     "background: linear-gradient(to bottom, #fff, #000);",
-    "background:linear-gradient(to bottom,#fff,#000);",
+    "background:linear-gradient(to bottom, #fff, #000);",
   ),
   ("width: calc(100% - 20px);", "width:calc(100% - 20px);"),
   (
     "background-image: url('image.png');",
-    {|background-image:url('image.png');|},
+    {|background-image:url("image.png");|},
   ),
   /* Media queries */
   (
@@ -140,7 +140,7 @@ let tests =
                ),
              )
            };
-         check(~__POS__, Alcotest.string, expected, minified);
+         check(~__POS__, Alcotest.string, minified, expected);
        };
 
        test(input, assertion);

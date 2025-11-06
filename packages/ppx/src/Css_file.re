@@ -427,13 +427,21 @@ module Css_transform = {
  *
  */
 let push = (declarations: Styled_ppx_css_parser.Ast.rule_list) => {
+  /* Select renderer function once based on minify setting */
+  let render_rule =
+    if (Settings.Get.minify()) {
+      Styled_ppx_css_parser.Minify.rule;
+    } else {
+      Styled_ppx_css_parser.Render.rule;
+    };
+
   let (atomic_classnames, dynamic_vars) =
     Css_transform.transform_rule_list(declarations);
 
   let classNames =
     atomic_classnames
     |> List.map(((className, rule)) => {
-         let rendered_css = Styled_ppx_css_parser.Render.rule(rule);
+         let rendered_css = render_rule(rule);
          Buffer.add_rule(className, rendered_css);
          className;
        });
