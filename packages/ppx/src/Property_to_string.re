@@ -26,8 +26,24 @@ let render_variable = name =>
 let render_number = (number, unit) =>
   string_of_int(Float.to_int(number)) ++ unit |> render_string;
 
+let render_resolution = resolution => {
+  switch (resolution) {
+  | `Dpcm(v) => render_number(v, "dpcm")
+  | `Dpi(v) => render_number(v, "dpi")
+  | `Dppx(v) => render_number(v, "dppx")
+  };
+};
 let render_percentage = percentage =>
   string_of_int(Float.to_int(percentage)) ++ "%" |> render_string;
+
+let render_wide_keyword = (~loc, keyword) => {
+  switch (keyword) {
+  | `Initial => [%expr "initial"]
+  | `Inherit => [%expr "inherit"]
+  | `Unset => [%expr "unset"]
+  | `Revert => [%expr "revert"]
+  };
+};
 
 let render_length =
   fun
@@ -193,6 +209,8 @@ let render_length_percentage =
 
 let render_size =
   fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+  | `Interpolation(v) => render_variable(v)
   | `Auto => [%expr "auto"]
   | `Extended_length(_) as lp
   | `Extended_percentage(_) as lp => render_length_percentage(lp)
@@ -230,7 +248,13 @@ let min_width =
   transform(Property_parser.property_width, [%expr "min-width"], render_size);
 
 let max_width =
-  transform(Property_parser.property_width, [%expr "max-width"], render_size);
+  transform(
+    Property_parser.property_width,
+    [%expr "min-width"],
+    fun
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+    | size => render_size(size),
+  );
 let height =
   transform(Property_parser.property_height, [%expr "height"], render_size);
 let min_height =
@@ -260,35 +284,49 @@ let aspect_ratio =
   transform(
     Parser.property_media_max_aspect_ratio,
     [%expr "aspect-ratio"],
-    render_ratio,
+    fun
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+    | `Ratio(ratio) => render_ratio(ratio),
   );
 let min_aspect_ratio =
   transform(
     Parser.property_media_max_aspect_ratio,
     [%expr "min-aspect-ratio"],
-    render_ratio,
+    fun
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+    | `Ratio(ratio) => render_ratio(ratio),
   );
 let max_aspect_ratio =
   transform(
     Parser.property_media_max_aspect_ratio,
     [%expr "max-aspect-ratio"],
-    render_ratio,
+    fun
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+    | `Ratio(ratio) => render_ratio(ratio),
   );
 let orientation =
   transform(
     Parser.property_media_orientation,
     [%expr "orientation"],
     fun
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
     | `Landscape => [%expr "landscape"]
     | `Portrait => [%expr "portrait"],
   );
 let grid =
-  transform(Parser.property_media_grid, [%expr "grid"], render_integer);
+  transform(
+    Parser.property_media_grid,
+    [%expr "grid"],
+    fun
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+    | `Integer(i) => render_integer(i),
+  );
 let update =
   transform(
     Parser.property_media_update,
     [%expr "update"],
     fun
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
     | `Fast => [%expr "fast"]
     | `None => [%expr "none"]
     | `Slow => [%expr "slow"],
@@ -298,6 +336,7 @@ let overflow_block =
     Parser.property_overflow_block,
     [%expr "overflow-block"],
     fun
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
     | `Auto => [%expr "auto"]
     | `Clip => [%expr "clip"]
     | `Hidden => [%expr "hidden"]
@@ -311,6 +350,7 @@ let overflow_inline =
     Parser.property_overflow_inline,
     [%expr "overflow-inline"],
     fun
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
     | `Auto => [%expr "auto"]
     | `Clip => [%expr "clip"]
     | `Hidden => [%expr "hidden"]
@@ -331,6 +371,7 @@ let color_gamut =
     Parser.property_media_color_gamut,
     [%expr "color_gamut"],
     fun
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
     | `P3 => [%expr "p3"]
     | `Rec2020 => [%expr "Rec2020"]
     | `Srgb => [%expr "Srgb"],
@@ -340,6 +381,7 @@ let display_mode =
     Parser.property_media_display_mode,
     [%expr "display-mode"],
     fun
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
     | `Browser => [%expr "browser"]
     | `Fullscreen => [%expr "fullscreen"]
     | `Minimal_ui => [%expr "minimal-ui"]
@@ -349,27 +391,34 @@ let monochrome =
   transform(
     Parser.property_media_monochrome,
     [%expr "monochrome"],
-    render_integer,
+    fun
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+    | `Integer(i) => render_integer(i),
   );
 
 let min_monochrome =
   transform(
     Parser.property_media_monochrome,
     [%expr "min-monochrome"],
-    render_integer,
+    fun
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+    | `Integer(i) => render_integer(i),
   );
 
 let max_monochrome =
   transform(
     Parser.property_media_monochrome,
     [%expr "max-monochrome"],
-    render_integer,
+    fun
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+    | `Integer(i) => render_integer(i),
   );
 let inverted_colors =
   transform(
     Parser.property_media_inverted_colors,
     [%expr "inverted-colors"],
     fun
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
     | `Inverted => [%expr "Inverted"]
     | `None => [%expr "none"],
   );
@@ -378,6 +427,7 @@ let pointer =
     Parser.property_media_pointer,
     [%expr "pointer"],
     fun
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
     | `Coarse => [%expr "coarse"]
     | `Fine => [%expr "fine"]
     | `None => [%expr "none"],
@@ -387,6 +437,7 @@ let hover =
     Parser.property_media_hover,
     [%expr "hover"],
     fun
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
     | `Hover => [%expr "hover"]
     | `None => [%expr "none"],
   );
@@ -395,6 +446,7 @@ let any_pointer =
     Parser.property_media_any_pointer,
     [%expr "any_pointer"],
     fun
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
     | `Coarse => [%expr "coarse"]
     | `Fine => [%expr "fine"]
     | `None => [%expr "none"],
@@ -404,6 +456,7 @@ let any_hover =
     Parser.property_media_any_hover,
     [%expr "any_hover"],
     fun
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
     | `Hover => [%expr "hover"]
     | `None => [%expr "none"],
   );
@@ -412,6 +465,7 @@ let scripting =
     Parser.property_media_scripting,
     [%expr "scripting"],
     fun
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
     | `Enabled => [%expr "enabled"]
     | `Initial_only => [%expr "initial-only"]
     | `None => [%expr "none"],
@@ -422,9 +476,8 @@ let resolution =
     Parser.property_media_resolution,
     [%expr "resolution"],
     fun
-    | `Dpcm(v) => render_number(v, "dpcm")
-    | `Dpi(v) => render_number(v, "dpi")
-    | `Dppx(v) => render_number(v, "dppx"),
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+    | `Resolution(v) => render_resolution(v),
   );
 
 let max_resolution =
@@ -432,9 +485,8 @@ let max_resolution =
     Parser.property_media_resolution,
     [%expr "min-resolution"],
     fun
-    | `Dpcm(v) => render_number(v, "dpcm")
-    | `Dpi(v) => render_number(v, "dpi")
-    | `Dppx(v) => render_number(v, "dppx"),
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+    | `Resolution(v) => render_resolution(v),
   );
 
 let min_resolution =
@@ -442,28 +494,33 @@ let min_resolution =
     Parser.property_media_resolution,
     [%expr "max-resolution"],
     fun
-    | `Dpcm(v) => render_number(v, "dpcm")
-    | `Dpi(v) => render_number(v, "dpi")
-    | `Dppx(v) => render_number(v, "dppx"),
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+    | `Resolution(v) => render_resolution(v),
   );
 
 let color_index =
   transform(
     Parser.property_media_color_index,
     [%expr "color-index"],
-    render_integer,
+    fun
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+    | `Integer(i) => render_integer(i),
   );
 let min_color_index =
   transform(
     Parser.property_media_color_index,
     [%expr "min-color-index"],
-    render_integer,
+    fun
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+    | `Integer(i) => render_integer(i),
   );
 let max_color_index =
   transform(
     Parser.property_media_color_index,
     [%expr "max-color-index"],
-    render_integer,
+    fun
+    | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+    | `Integer(i) => render_integer(i),
   );
 
 let properties = [

@@ -127,3 +127,5 @@ let interpolation = `px(10);
     right: $(interpolation);
     bottom: $(interpolation);
   |}];
+
+[%cx2 {|color: inherit;|}];

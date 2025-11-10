@@ -395,7 +395,7 @@ and filter_function_list = [%value.rec "[ <filter-function> | <url> ]+"]
 
 and final_bg_layer =
   [%value.rec
-    "<'background-color'> || <bg-image> || <bg-position> [ '/' <bg-size> ]? || \
+    "<color> || <bg-image> || <bg-position> [ '/' <bg-size> ]? || \
      <repeat-style> || <attachment> || <box> || <box>"]
 
 and line_names = [%value.rec "'[' <custom-ident>* ']'"]
@@ -909,79 +909,79 @@ and property__moz_appearance =
      '-moz-window-button-minimize' | '-moz-window-button-restore' | \
      '-moz-window-frame-bottom' | '-moz-window-frame-left' | \
      '-moz-window-frame-right' | '-moz-window-titlebar' | \
-     '-moz-window-titlebar-maximized'"]
+     '-moz-window-titlebar-maximized' | <wide-keyword>"]
 
-and property__moz_background_clip = [%value.rec "'padding' | 'border'"]
-and property__moz_binding = [%value.rec "<url> | 'none'"]
-and property__moz_border_bottom_colors = [%value.rec "[ <color> ]+ | 'none'"]
-and property__moz_border_left_colors = [%value.rec "[ <color> ]+ | 'none'"]
+and property__moz_background_clip = [%value.rec "'padding' | 'border' | <wide-keyword>"]
+and property__moz_binding = [%value.rec "<url> | 'none' | <wide-keyword>"]
+and property__moz_border_bottom_colors = [%value.rec "[ <color> ]+ | 'none' | <wide-keyword>"]
+and property__moz_border_left_colors = [%value.rec "[ <color> ]+ | 'none' | <wide-keyword>"]
 
 and property__moz_border_radius_bottomleft =
-  [%value.rec "<'border-bottom-left-radius'>"]
+  [%value.rec "<'border-bottom-left-radius'> | <wide-keyword>"]
 
 and property__moz_border_radius_bottomright =
-  [%value.rec "<'border-bottom-right-radius'>"]
+  [%value.rec "<'border-bottom-right-radius'> | <wide-keyword>"]
 
 and property__moz_border_radius_topleft =
-  [%value.rec "<'border-top-left-radius'>"]
+  [%value.rec "<'border-top-left-radius'> | <wide-keyword>"]
 
 and property__moz_border_radius_topright =
-  [%value.rec "<'border-bottom-right-radius'>"]
+  [%value.rec "<'border-bottom-right-radius'> | <wide-keyword>"]
 
 (* TODO: Remove interpolation without <> *)
 and property__moz_border_right_colors =
-  [%value.rec "[ <color> ]+ | 'none' | interpolation"]
+  [%value.rec "[ <color> ]+ | 'none' | interpolation | <wide-keyword>"]
 
 (* TODO: Remove interpolation without <> *)
 and property__moz_border_top_colors =
-  [%value.rec "[ <color> ]+ | 'none' | interpolation"]
+  [%value.rec "[ <color> ]+ | 'none' | interpolation | <wide-keyword>"]
 
 and property__moz_context_properties =
   [%value.rec
-    "'none' | [ 'fill' | 'fill-opacity' | 'stroke' | 'stroke-opacity' ]#"]
+    "'none' | [ 'fill' | 'fill-opacity' | 'stroke' | 'stroke-opacity' ]# | <wide-keyword>"]
 
 and property__moz_control_character_visibility =
-  [%value.rec "'visible' | 'hidden'"]
+  [%value.rec "'visible' | 'hidden' | <wide-keyword>"]
 
 and property__moz_float_edge =
-  [%value.rec "'border-box' | 'content-box' | 'margin-box' | 'padding-box'"]
+  [%value.rec "'border-box' | 'content-box' | 'margin-box' | 'padding-box' | <wide-keyword>"]
 
-and property__moz_force_broken_image_icon = [%value.rec "<integer>"]
-and property__moz_image_region = [%value.rec "<shape> | 'auto'"]
+and property__moz_force_broken_image_icon = [%value.rec "<integer> | <wide-keyword>"]
+and property__moz_image_region = [%value.rec "<shape> | 'auto' | <wide-keyword>"]
 
 and property__moz_orient =
-  [%value.rec "'inline' | 'block' | 'horizontal' | 'vertical'"]
+  [%value.rec "'inline' | 'block' | 'horizontal' | 'vertical' | <wide-keyword>"]
 
-and property__moz_osx_font_smoothing = [%value.rec "'auto' | 'grayscale'"]
+and property__moz_osx_font_smoothing = [%value.rec "'auto' | 'grayscale' | <wide-keyword>"]
 
 and property__moz_outline_radius =
-  [%value.rec "[ <outline-radius> ]{1,4} [ '/' [ <outline-radius> ]{1,4} ]?"]
+  [%value.rec "[ <outline-radius> ]{1,4} [ '/' [ <outline-radius> ]{1,4} ]? | <wide-keyword>"]
 
-and property__moz_outline_radius_bottomleft = [%value.rec "<outline-radius>"]
-and property__moz_outline_radius_bottomright = [%value.rec "<outline-radius>"]
-and property__moz_outline_radius_topleft = [%value.rec "<outline-radius>"]
-and property__moz_outline_radius_topright = [%value.rec "<outline-radius>"]
-and property__moz_stack_sizing = [%value.rec "'ignore' | 'stretch-to-fit'"]
-and property__moz_text_blink = [%value.rec "'none' | 'blink'"]
+and property__moz_outline_radius_bottomleft = [%value.rec "<outline-radius> | <wide-keyword>"]
+and property__moz_outline_radius_bottomright = [%value.rec "<outline-radius> | <wide-keyword>"]
+and property__moz_outline_radius_topleft = [%value.rec "<outline-radius> | <wide-keyword>"]
+and property__moz_outline_radius_topright = [%value.rec "<outline-radius> | <wide-keyword>"]
+and property__moz_stack_sizing = [%value.rec "'ignore' | 'stretch-to-fit' | <wide-keyword>"]
+and property__moz_text_blink = [%value.rec "'none' | 'blink' | <wide-keyword>"]
 
 and property__moz_user_focus =
   [%value.rec
     "'ignore' | 'normal' | 'select-after' | 'select-before' | 'select-menu' | \
-     'select-same' | 'select-all' | 'none'"]
+     'select-same' | 'select-all' | 'none' | <wide-keyword>"]
 
 and property__moz_user_input =
-  [%value.rec "'auto' | 'none' | 'enabled' | 'disabled'"]
+  [%value.rec "'auto' | 'none' | 'enabled' | 'disabled' | <wide-keyword>"]
 
 and property__moz_user_modify =
-  [%value.rec "'read-only' | 'read-write' | 'write-only'"]
+  [%value.rec "'read-only' | 'read-write' | 'write-only' | <wide-keyword>"]
 
 and property__moz_user_select =
-  [%value.rec "'none' | 'text' | 'all' | '-moz-none'"]
+  [%value.rec "'none' | 'text' | 'all' | '-moz-none' | <wide-keyword>"]
 
-and property__moz_window_dragging = [%value.rec "'drag' | 'no-drag'"]
+and property__moz_window_dragging = [%value.rec "'drag' | 'no-drag' | <wide-keyword>"]
 
 and property__moz_window_shadow =
-  [%value.rec "'default' | 'menu' | 'tooltip' | 'sheet' | 'none'"]
+  [%value.rec "'default' | 'menu' | 'tooltip' | 'sheet' | 'none' | <wide-keyword>"]
 
 and property__webkit_appearance =
   [%value.rec
@@ -998,410 +998,409 @@ and property__webkit_appearance =
      'searchfield-cancel-button' | 'searchfield-decoration' | \
      'searchfield-results-button' | 'searchfield-results-decoration' | \
      'slider-horizontal' | 'slider-vertical' | 'sliderthumb-horizontal' | \
-     'sliderthumb-vertical' | 'square-button' | 'textarea' | 'textfield'"]
+     'sliderthumb-vertical' | 'square-button' | 'textarea' | 'textfield' | <wide-keyword>"]
 
 and property__webkit_background_clip =
-  [%value.rec "[ <box> | 'border' | 'padding' | 'content' | 'text' ]#"]
+  [%value.rec "[ <box> | 'border' | 'padding' | 'content' | 'text' ]# | <wide-keyword>"]
 
 and property__webkit_border_before =
-  [%value.rec "<'border-width'> || <'border-style'> || <'color'>"]
+  [%value.rec "<'border-width'> || <'border-style'> || <'color'> | <wide-keyword>"]
 
-and property__webkit_border_before_color = [%value.rec "<'color'>"]
-and property__webkit_border_before_style = [%value.rec "<'border-style'>"]
-and property__webkit_border_before_width = [%value.rec "<'border-width'>"]
+and property__webkit_border_before_color = [%value.rec "<'color'> | <wide-keyword>"]
+and property__webkit_border_before_style = [%value.rec "<'border-style'> | <wide-keyword>"]
+and property__webkit_border_before_width = [%value.rec "<'border-width'> | <wide-keyword>"]
 
 and property__webkit_box_reflect =
   [%value.rec
     "[ 'above' | 'below' | 'right' | 'left' ]? [ <extended-length> ]? [ \
-     <image> ]?"]
+     <image> ]? | <wide-keyword>"]
 
 and property__webkit_column_break_after =
-  [%value.rec "'always' | 'auto' | 'avoid'"]
+  [%value.rec "'always' | 'auto' | 'avoid' | <wide-keyword>"]
 
 and property__webkit_column_break_before =
-  [%value.rec "'always' | 'auto' | 'avoid'"]
+  [%value.rec "'always' | 'auto' | 'avoid' | <wide-keyword>"]
 
 and property__webkit_column_break_inside =
-  [%value.rec "'always' | 'auto' | 'avoid'"]
+  [%value.rec "'always' | 'auto' | 'avoid' | <wide-keyword>"]
 
 and property__webkit_font_smoothing =
-  [%value.rec "'auto' | 'none' | 'antialiased' | 'subpixel-antialiased'"]
+  [%value.rec "'auto' | 'none' | 'antialiased' | 'subpixel-antialiased' | <wide-keyword>"]
 
-and property__webkit_line_clamp = [%value.rec "'none' | <integer>"]
+and property__webkit_line_clamp = [%value.rec "'none' | <integer> | <wide-keyword>"]
 
 and property__webkit_mask =
   [%value.rec
     "[ <mask-reference> || <position> [ '/' <bg-size> ]? || <repeat-style> || \
      [ <box> | 'border' | 'padding' | 'content' | 'text' ] || [ <box> | \
-     'border' | 'padding' | 'content' ] ]#"]
+     'border' | 'padding' | 'content' ] ]# | <wide-keyword>"]
 
-and property__webkit_mask_attachment = [%value.rec "[ <attachment> ]#"]
+and property__webkit_mask_attachment = [%value.rec "[ <attachment> ]# | <wide-keyword>"]
 
 and property__webkit_mask_box_image =
   [%value.rec
     "[ <url> | <gradient> | 'none' ] [ [ <extended-length> | \
-     <extended-percentage> ]{4} [ <-webkit-mask-box-repeat> ]{2} ]?"]
+     <extended-percentage> ]{4} [ <-webkit-mask-box-repeat> ]{2} ]? | <wide-keyword>"]
 
 and property__webkit_mask_clip =
-  [%value.rec "[ <box> | 'border' | 'padding' | 'content' | 'text' ]#"]
+  [%value.rec "[ <box> | 'border' | 'padding' | 'content' | 'text' ]# | <wide-keyword>"]
 
-and property__webkit_mask_composite = [%value.rec "[ <composite-style> ]#"]
-and property__webkit_mask_image = [%value.rec "[ <mask-reference> ]#"]
+and property__webkit_mask_composite = [%value.rec "[ <composite-style> ]# | <wide-keyword>"]
+and property__webkit_mask_image = [%value.rec "[ <mask-reference> ]# | <wide-keyword>"]
 
 and property__webkit_mask_origin =
-  [%value.rec "[ <box> | 'border' | 'padding' | 'content' ]#"]
+  [%value.rec "[ <box> | 'border' | 'padding' | 'content' ]# | <wide-keyword>"]
 
-and property__webkit_mask_position = [%value.rec "[ <position> ]#"]
+and property__webkit_mask_position = [%value.rec "[ <position> ]# | <wide-keyword>"]
 
 and property__webkit_mask_position_x =
   [%value.rec
     "[ <extended-length> | <extended-percentage> | 'left' | 'center' | 'right' \
-     ]#"]
+     ]# | <wide-keyword>"]
 
 and property__webkit_mask_position_y =
   [%value.rec
     "[ <extended-length> | <extended-percentage> | 'top' | 'center' | 'bottom' \
-     ]#"]
+     ]# | <wide-keyword>"]
 
-and property__webkit_mask_repeat = [%value.rec "[ <repeat-style> ]#"]
+and property__webkit_mask_repeat = [%value.rec "[ <repeat-style> ]# | <wide-keyword>"]
 
 and property__webkit_mask_repeat_x =
-  [%value.rec "'repeat' | 'no-repeat' | 'space' | 'round'"]
+  [%value.rec "'repeat' | 'no-repeat' | 'space' | 'round' | <wide-keyword>"]
 
 and property__webkit_mask_repeat_y =
-  [%value.rec "'repeat' | 'no-repeat' | 'space' | 'round'"]
+  [%value.rec "'repeat' | 'no-repeat' | 'space' | 'round' | <wide-keyword>"]
 
-and property__webkit_mask_size = [%value.rec "[ <bg-size> ]#"]
-and property__webkit_overflow_scrolling = [%value.rec "'auto' | 'touch'"]
-and property__webkit_print_color_adjust = [%value.rec "'economy' | 'exact'"]
-and property__webkit_tap_highlight_color = [%value.rec "<color>"]
-and property__webkit_text_fill_color = [%value.rec "<color>"]
+and property__webkit_mask_size = [%value.rec "[ <bg-size> ]# | <wide-keyword>"]
+and property__webkit_overflow_scrolling = [%value.rec "'auto' | 'touch' | <wide-keyword>"]
+and property__webkit_print_color_adjust = [%value.rec "'economy' | 'exact' | <wide-keyword>"]
+and property__webkit_tap_highlight_color = [%value.rec "<color> | <wide-keyword>"]
+and property__webkit_text_fill_color = [%value.rec "<color> | <wide-keyword>"]
 
 and property__webkit_text_security =
-  [%value.rec "'none' | 'circle' | 'disc' | 'square'"]
+  [%value.rec "'none' | 'circle' | 'disc' | 'square' | <wide-keyword>"]
 
-and property__webkit_text_stroke = [%value.rec "<extended-length> || <color>"]
-and property__webkit_text_stroke_color = [%value.rec "<color>"]
-and property__webkit_text_stroke_width = [%value.rec "<extended-length>"]
-and property__webkit_touch_callout = [%value.rec "'default' | 'none'"]
-and property__webkit_user_drag = [%value.rec "'none' | 'element' | 'auto'"]
+and property__webkit_text_stroke = [%value.rec "<extended-length> || <color> | <wide-keyword>"]
+and property__webkit_text_stroke_color = [%value.rec "<color> | <wide-keyword>"]
+and property__webkit_text_stroke_width = [%value.rec "<extended-length> | <wide-keyword>"]
+and property__webkit_touch_callout = [%value.rec "'default' | 'none' | <wide-keyword>"]
+and property__webkit_user_drag = [%value.rec "'none' | 'element' | 'auto' | <wide-keyword>"]
 
 and property__webkit_user_modify =
-  [%value.rec "'read-only' | 'read-write' | 'read-write-plaintext-only'"]
+  [%value.rec "'read-only' | 'read-write' | 'read-write-plaintext-only' | <wide-keyword>"]
 
 and property__webkit_user_select =
-  [%value.rec "'auto' | 'none' | 'text' | 'all'"]
+  [%value.rec "'auto' | 'none' | 'text' | 'all' | <wide-keyword>"]
 
 and property_align_content =
   [%value.rec
     "'normal' | <baseline-position> | <content-distribution> | [ \
-     <overflow-position> ]? <content-position>"]
+     <overflow-position> ]? <content-position> | <wide-keyword>"]
 
 and property_align_items =
   [%value.rec
     "'normal' | 'stretch' | <baseline-position> | [ <overflow-position> ]? \
-     <self-position> | <interpolation>"]
+     <self-position> | <interpolation> | <wide-keyword>"]
 
 and property_align_self =
   [%value.rec
     "'auto' | 'normal' | 'stretch' | <baseline-position> | [ \
-     <overflow-position> ]? <self-position> | <interpolation>"]
+     <overflow-position> ]? <self-position> | <interpolation> | <wide-keyword>"]
 
 and property_alignment_baseline =
   [%value.rec
     "'auto' | 'baseline' | 'before-edge' | 'text-before-edge' | 'middle' | \
      'central' | 'after-edge' | 'text-after-edge' | 'ideographic' | \
-     'alphabetic' | 'hanging' | 'mathematical'"]
-
-and property_all = [%value.rec "'initial' | 'inherit' | 'unset' | 'revert'"]
+     'alphabetic' | 'hanging' | 'mathematical' | <wide-keyword>"]
 
 and property_animation =
-  [%value.rec "[ <single-animation> | <single-animation-no-interp> ]#"]
+  [%value.rec "[ [<single-animation> | <single-animation-no-interp>] | <wide-keyword> ]#"]
 
-and property_animation_delay = [%value.rec "[ <extended-time> ]#"]
+and property_animation_delay = [%value.rec "[ <extended-time> ]# | <wide-keyword>"]
 
 and property_animation_direction =
-  [%value.rec "[ <single-animation-direction> ]#"]
+  [%value.rec "[ <single-animation-direction> | <wide-keyword> ]#"]
 
-and property_animation_duration = [%value.rec "[ <extended-time> ]#"]
+and property_animation_duration = [%value.rec "[ <extended-time> | <wide-keyword> ]#"]
 
 and property_animation_fill_mode =
-  [%value.rec "[ <single-animation-fill-mode> ]#"]
+  [%value.rec "[ <single-animation-fill-mode> | <wide-keyword> ]#"]
 
 and property_animation_iteration_count =
-  [%value.rec "[ <single-animation-iteration-count> ]#"]
+  [%value.rec "[ <single-animation-iteration-count> | <wide-keyword>]#"]
 
 and property_animation_name =
-  [%value.rec "[ <keyframes-name> | 'none' | <interpolation> ]#"]
+[%value.rec "[ <keyframes-name> | 'none' | <interpolation> | <wide-keyword> ]#"]
 
 and property_animation_play_state =
-  [%value.rec "[ <single-animation-play-state> ]#"]
+  [%value.rec "[ <single-animation-play-state> | <wide-keyword> ]#"]
 
-and property_animation_timing_function = [%value.rec "[ <timing-function> ]#"]
+and property_animation_timing_function = [%value.rec "[ <timing-function> | <wide-keyword>]#"]
 
 and property_appearance =
   [%value.rec
     "'none' | 'auto' | 'button' | 'textfield' | 'menulist-button' | \
-     <compat-auto>"]
+     <compat-auto> | <wide-keyword>"]
 
-and property_aspect_ratio = [%value.rec "'auto' | <ratio>"]
+and property_aspect_ratio = [%value.rec "'auto' | <ratio> | <wide-keyword>"]
 
 and property_azimuth =
   [%value.rec
     "<extended-angle> | [ 'left-side' | 'far-left' | 'left' | 'center-left' | \
      'center' | 'center-right' | 'right' | 'far-right' | 'right-side' ] || \
-     'behind' | 'leftwards' | 'rightwards'"]
+     'behind' | 'leftwards' | 'rightwards' | <wide-keyword>"]
 
 and property_backdrop_filter =
-  [%value.rec "'none' | <interpolation> | <filter-function-list>"]
+  [%value.rec "'none' | <interpolation> | <filter-function-list> | <wide-keyword>"]
 
-and property_backface_visibility = [%value.rec "'visible' | 'hidden'"]
-and property_background = [%value.rec "[ <bg-layer> ',' ]* <final-bg-layer>"]
-and property_background_attachment = [%value.rec "[ <attachment> ]#"]
-and property_background_blend_mode = [%value.rec "[ <blend-mode> ]#"]
+and property_backface_visibility = [%value.rec "'visible' | 'hidden' | <wide-keyword>"]
+and property_background = [%value.rec "[ [<bg-layer> | <wide-keyword>] ',' ]* <final-bg-layer>"]
+and property_background_attachment = [%value.rec "[ <attachment> | <wide-keyword> ]#"]
+and property_background_blend_mode = [%value.rec "[ <blend-mode> | <wide-keyword> ]#"]
 
 and property_background_clip =
-  [%value.rec "[ <box> | 'text' | 'border-area' ]#"]
+  [%value.rec "[ <box> | 'text' | 'border-area' | <wide-keyword> ]#"]
 
-and property_background_color = [%value.rec "<color>"]
-and property_background_image = [%value.rec "[ <bg-image> ]#"]
-and property_background_origin = [%value.rec "[ <box> ]#"]
-and property_background_position = [%value.rec "[ <bg-position> ]#"]
+and property_background_color = [%value.rec "<color> | <wide-keyword>"]
+and property_background_image = [%value.rec "[ <bg-image> | <wide-keyword> ]#"]
+and property_background_origin = [%value.rec "[ <box> | <wide-keyword> ]#"]
+and property_background_position = [%value.rec "[ <bg-position> | <wide-keyword> ]#"]
 
 and property_background_position_x =
   [%value.rec
     "[ 'center' | [ 'left' | 'right' | 'x-start' | 'x-end' ]? [ \
-     <extended-length> | <extended-percentage> ]? ]#"]
+     <extended-length> | <extended-percentage> ]? | <wide-keyword> ]#"]
 
 and property_background_position_y =
   [%value.rec
     "[ 'center' | [ 'top' | 'bottom' | 'y-start' | 'y-end' ]? [ \
-     <extended-length> | <extended-percentage> ]? ]#"]
+     <extended-length> | <extended-percentage> ]? ]# | <wide-keyword>"]
 
-and property_background_repeat = [%value.rec "[ <repeat-style> ]#"]
-and property_background_size = [%value.rec "[ <bg-size> ]#"]
+and property_background_repeat =
+  [%value.rec "[ <repeat-style> | <wide-keyword> ]#"]
+and property_background_size = [%value.rec "[ <bg-size> | <wide-keyword> ]#"]
 
 and property_baseline_shift =
-  [%value.rec "'baseline' | 'sub' | 'super' | <svg-length>"]
+  [%value.rec "'baseline' | 'sub' | 'super' | <svg-length> | <wide-keyword>"]
 
-and property_behavior = [%value.rec "[ <url> ]+"]
-and property_block_overflow = [%value.rec "'clip' | 'ellipsis' | <string>"]
-and property_block_size = [%value.rec "<'width'>"]
+and property_behavior = [%value.rec "[ <url> ]+ | <wide-keyword>"]
+and property_block_overflow = [%value.rec "'clip' | 'ellipsis' | <string> | <wide-keyword>"]
+and property_block_size = [%value.rec "<'width'> | <wide-keyword>"]
 
 and property_border =
   [%value.rec
     "'none' | [ <line-width> | <interpolation> ] | [ <line-width> | \
      <interpolation> ] [ <line-style> | <interpolation> ] | [ <line-width> | \
      <interpolation> ] [ <line-style> | <interpolation> ] [ <color> | \
-     <interpolation> ]"]
+     <interpolation> ] | <wide-keyword>"]
 
 and property_border_block = [%value.rec "<'border'>"]
-and property_border_block_color = [%value.rec "[ <'border-top-color'> ]{1,2}"]
+and property_border_block_color = [%value.rec "[ <'border-top-color'> ]{1,2} "]
 and property_border_block_end = [%value.rec "<'border'>"]
 and property_border_block_end_color = [%value.rec "<'border-top-color'>"]
-and property_border_block_end_style = [%value.rec "<'border-top-style'>"]
-and property_border_block_end_width = [%value.rec "<'border-top-width'>"]
-and property_border_block_start = [%value.rec "<'border'>"]
-and property_border_block_start_color = [%value.rec "<'border-top-color'>"]
-and property_border_block_start_style = [%value.rec "<'border-top-style'>"]
-and property_border_block_start_width = [%value.rec "<'border-top-width'>"]
-and property_border_block_style = [%value.rec "<'border-top-style'>"]
-and property_border_block_width = [%value.rec "<'border-top-width'>"]
-and property_border_bottom = [%value.rec "<'border'>"]
+and property_border_block_end_style = [%value.rec "<'border-top-style'> | <wide-keyword>"]
+and property_border_block_end_width = [%value.rec "<'border-top-width'> | <wide-keyword>"]
+and property_border_block_start = [%value.rec "<'border'> | <wide-keyword>"]
+and property_border_block_start_color = [%value.rec "<'border-top-color'> | <wide-keyword>"]
+and property_border_block_start_style = [%value.rec "<'border-top-style'> | <wide-keyword>"]
+and property_border_block_start_width = [%value.rec "<'border-top-width'> | <wide-keyword>"]
+and property_border_block_style = [%value.rec "<'border-top-style'> | <wide-keyword>"]
+and property_border_block_width = [%value.rec "<'border-top-width'> | <wide-keyword>"]
+and property_border_bottom = [%value.rec "<'border'> | <wide-keyword>"]
 and property_border_bottom_color = [%value.rec "<'border-top-color'>"]
 
 and property_border_bottom_left_radius =
-  [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"]
+  [%value.rec "[ <extended-length> | <extended-percentage> | <wide-keyword>]{1,2}"]
 
 and property_border_bottom_right_radius =
-  [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"]
+  [%value.rec "[ <extended-length> | <extended-percentage> | <wide-keyword>]{1,2}"]
 
-and property_border_bottom_style = [%value.rec "<line-style>"]
-and property_border_bottom_width = [%value.rec "<line-width>"]
-and property_border_collapse = [%value.rec "'collapse' | 'separate'"]
-and property_border_color = [%value.rec "[ <color> ]{1,4}"]
+and property_border_bottom_style = [%value.rec "<line-style> | <wide-keyword>"]
+and property_border_bottom_width = [%value.rec "<line-width> | <wide-keyword>"]
+and property_border_collapse = [%value.rec "'collapse' | 'separate' | <wide-keyword>"]
+and property_border_color = [%value.rec "[ <color> | <wide-keyword>]{1,4}"]
 
 and property_border_end_end_radius =
-  [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"]
+  [%value.rec "[ <extended-length> | <extended-percentage> | <wide-keyword>]{1,2}"]
 
 and property_border_end_start_radius =
-  [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"]
+  [%value.rec "[ <extended-length> | <extended-percentage> | <wide-keyword>]{1,2}"]
 
 and property_border_image =
   [%value.rec
     "<'border-image-source'> || <'border-image-slice'> [ '/' \
      <'border-image-width'> | '/' [ <'border-image-width'> ]? '/' \
-     <'border-image-outset'> ]? || <'border-image-repeat'>"]
+     <'border-image-outset'> ]? || <'border-image-repeat'> | <wide-keyword>"]
 
 and property_border_image_outset =
-  [%value.rec "[ <extended-length> | <number> ]{1,4}"]
+  [%value.rec "[ <extended-length> | <number> | <wide-keyword>]{1,4}"]
 
 and property_border_image_repeat =
-  [%value.rec "[ 'stretch' | 'repeat' | 'round' | 'space' ]{1,2}"]
+  [%value.rec "[ 'stretch' | 'repeat' | 'round' | 'space' | <wide-keyword>]{1,2}"]
 
 and property_border_image_slice =
-  [%value.rec "[ <number-percentage> ]{1,4} && [ 'fill' ]?"]
+  [%value.rec "[ <number-percentage> | <wide-keyword>]{1,4} && [ 'fill' ]?"]
 
-and property_border_image_source = [%value.rec "'none' | <image>"]
+and property_border_image_source = [%value.rec "'none' | <image> | <wide-keyword>"]
 
 and property_border_image_width =
   [%value.rec
-    "[ <extended-length> | <extended-percentage> | <number> | 'auto' ]{1,4}"]
+    "[ <extended-length> | <extended-percentage> | <number> | 'auto' | <wide-keyword>]{1,4}"]
 
-and property_border_inline = [%value.rec "<'border'>"]
-and property_border_inline_color = [%value.rec "[ <'border-top-color'> ]{1,2}"]
-and property_border_inline_end = [%value.rec "<'border'>"]
-and property_border_inline_end_color = [%value.rec "<'border-top-color'>"]
-and property_border_inline_end_style = [%value.rec "<'border-top-style'>"]
-and property_border_inline_end_width = [%value.rec "<'border-top-width'>"]
-and property_border_inline_start = [%value.rec "<'border'>"]
-and property_border_inline_start_color = [%value.rec "<'border-top-color'>"]
-and property_border_inline_start_style = [%value.rec "<'border-top-style'>"]
-and property_border_inline_start_width = [%value.rec "<'border-top-width'>"]
-and property_border_inline_style = [%value.rec "<'border-top-style'>"]
-and property_border_inline_width = [%value.rec "<'border-top-width'>"]
-and property_border_left = [%value.rec "<'border'>"]
-and property_border_left_color = [%value.rec "<color>"]
-and property_border_left_style = [%value.rec "<line-style>"]
-and property_border_left_width = [%value.rec "<line-width>"]
+and property_border_inline = [%value.rec "<'border'> | <wide-keyword>"]
+and property_border_inline_color = [%value.rec "[ <'border-top-color'> | <wide-keyword>]{1,2}"]
+and property_border_inline_end = [%value.rec "<'border'> | <wide-keyword>"]
+and property_border_inline_end_color = [%value.rec "<'border-top-color'> | <wide-keyword>"]
+and property_border_inline_end_style = [%value.rec "<'border-top-style'> | <wide-keyword>"]
+and property_border_inline_end_width = [%value.rec "<'border-top-width'> | <wide-keyword>"]
+and property_border_inline_start = [%value.rec "<'border'> | <wide-keyword>"]
+and property_border_inline_start_color = [%value.rec "<'border-top-color'> | <wide-keyword>"]
+and property_border_inline_start_style = [%value.rec "<'border-top-style'> | <wide-keyword>"]
+and property_border_inline_start_width = [%value.rec "<'border-top-width'> | <wide-keyword>"]
+and property_border_inline_style = [%value.rec "<'border-top-style'> | <wide-keyword>"]
+and property_border_inline_width = [%value.rec "<'border-top-width'> | <wide-keyword>"]
+and property_border_left = [%value.rec "<'border'> | <wide-keyword>"]
+and property_border_left_color = [%value.rec "<color> | <wide-keyword>"]
+and property_border_left_style = [%value.rec "<line-style> | <wide-keyword>"]
+and property_border_left_width = [%value.rec "<line-width> | <wide-keyword>"]
 
 (* border-radius isn't supported with the entire spec in bs-css: `"[ <extended-length> | <extended-percentage> ]{1,4} [ '/' [ <extended-length> | <extended-percentage> ]{1,4} ]?"` *)
 and property_border_radius =
-  [%value.rec "<extended-length> | <extended-percentage>"]
+  [%value.rec "<extended-length> | <extended-percentage> | <wide-keyword>"]
 
-and property_border_right = [%value.rec "<'border'>"]
-and property_border_right_color = [%value.rec "<color>"]
-and property_border_right_style = [%value.rec "<line-style>"]
-and property_border_right_width = [%value.rec "<line-width>"]
+and property_border_right = [%value.rec "<'border'> | <wide-keyword>"]
+and property_border_right_color = [%value.rec "<color> | <wide-keyword>"]
+and property_border_right_style = [%value.rec "<line-style> | <wide-keyword>"]
+and property_border_right_width = [%value.rec "<line-width> | <wide-keyword>"]
 
 and property_border_spacing =
-  [%value.rec "<extended-length> [ <extended-length> ]?"]
+  [%value.rec "<extended-length> [ <extended-length> ]? | <wide-keyword>"]
 
 and property_border_start_end_radius =
-  [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"]
+  [%value.rec "[ <extended-length> | <extended-percentage> | <wide-keyword>]{1,2}"]
 
 and property_border_start_start_radius =
-  [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"]
+  [%value.rec "[ <extended-length> | <extended-percentage> | <wide-keyword>]{1,2}"]
 
 (* bs-css doesn't support list of styles, the original spec is: `[ <line-style> ]{1,4}` *)
-and property_border_style = [%value.rec "<line-style>"]
-and property_border_top = [%value.rec "<'border'>"]
-and property_border_top_color = [%value.rec "<color>"]
+and property_border_style = [%value.rec "<line-style> | <wide-keyword>"]
+and property_border_top = [%value.rec "<'border'> | <wide-keyword>"]
+and property_border_top_color = [%value.rec "<color> | <wide-keyword>"]
 
 and property_border_top_left_radius =
-  [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"]
+  [%value.rec "[ <extended-length> | <extended-percentage> | <wide-keyword>]{1,2}"]
 
 and property_border_top_right_radius =
-  [%value.rec "[ <extended-length> | <extended-percentage> ]{1,2}"]
+  [%value.rec "[ <extended-length> | <extended-percentage> | <wide-keyword>]{1,2}"]
 
-and property_border_top_style = [%value.rec "<line-style>"]
-and property_border_top_width = [%value.rec "<line-width>"]
-and property_border_width = [%value.rec "[ <line-width> ]{1,4}"]
+and property_border_top_style = [%value.rec "<line-style> | <wide-keyword>"]
+and property_border_top_width = [%value.rec "<line-width> | <wide-keyword>"]
+and property_border_width = [%value.rec "[ <line-width> | <wide-keyword>]{1,4}"]
 
 and property_bottom =
-  [%value.rec "<extended-length> | <extended-percentage> | 'auto'"]
+  [%value.rec "<extended-length> | <extended-percentage> | 'auto' | <wide-keyword>"]
 
 and property_box_align =
-  [%value.rec "'start' | 'center' | 'end' | 'baseline' | 'stretch'"]
+  [%value.rec "'start' | 'center' | 'end' | 'baseline' | 'stretch' | <wide-keyword>"]
 
-and property_box_decoration_break = [%value.rec "'slice' | 'clone'"]
-and property_box_direction = [%value.rec "'normal' | 'reverse' | 'inherit'"]
-and property_box_flex = [%value.rec "<number>"]
-and property_box_flex_group = [%value.rec "<integer>"]
-and property_box_lines = [%value.rec "'single' | 'multiple'"]
-and property_box_ordinal_group = [%value.rec "<integer>"]
+and property_box_decoration_break = [%value.rec "'slice' | 'clone' | <wide-keyword>"]
+and property_box_direction = [%value.rec "'normal' | 'reverse' | 'inherit' | <wide-keyword>"]
+and property_box_flex = [%value.rec "<number> | <wide-keyword>"]
+and property_box_flex_group = [%value.rec "<integer> | <wide-keyword>"]
+and property_box_lines = [%value.rec "'single' | 'multiple' | <wide-keyword>"]
+and property_box_ordinal_group = [%value.rec "<integer> | <wide-keyword>"]
 
 and property_box_orient =
   [%value.rec
-    "'horizontal' | 'vertical' | 'inline-axis' | 'block-axis' | 'inherit'"]
+    "'horizontal' | 'vertical' | 'inline-axis' | 'block-axis' | 'inherit' | <wide-keyword>"]
 
-and property_box_pack = [%value.rec "'start' | 'center' | 'end' | 'justify'"]
+and property_box_pack = [%value.rec "'start' | 'center' | 'end' | 'justify' | <wide-keyword>"]
 
 and property_box_shadow =
-  [%value.rec "'none' | <interpolation> | [ <shadow> ]#"]
+  [%value.rec "'none' | <interpolation> | [ <shadow> ]# | <wide-keyword>"]
 
-and property_box_sizing = [%value.rec "'content-box' | 'border-box'"]
+and property_box_sizing = [%value.rec "'content-box' | 'border-box' | <wide-keyword>"]
 
 and property_break_after =
   [%value.rec
     "'auto' | 'avoid' | 'always' | 'all' | 'avoid-page' | 'page' | 'left' | \
      'right' | 'recto' | 'verso' | 'avoid-column' | 'column' | 'avoid-region' \
-     | 'region'"]
+     | 'region' | <wide-keyword>"]
 
 and property_break_before =
   [%value.rec
     "'auto' | 'avoid' | 'always' | 'all' | 'avoid-page' | 'page' | 'left' | \
      'right' | 'recto' | 'verso' | 'avoid-column' | 'column' | 'avoid-region' \
-     | 'region'"]
+     | 'region' | <wide-keyword>"]
 
 and property_break_inside =
   [%value.rec
-    "'auto' | 'avoid' | 'avoid-page' | 'avoid-column' | 'avoid-region'"]
+    "'auto' | 'avoid' | 'avoid-page' | 'avoid-column' | 'avoid-region' | <wide-keyword>"]
 
 and property_caption_side =
   [%value.rec
     "'top' | 'bottom' | 'block-start' | 'block-end' | 'inline-start' | \
-     'inline-end'"]
+     'inline-end' | <wide-keyword>"]
 
-and property_caret_color = [%value.rec "'auto' | <color>"]
+and property_caret_color = [%value.rec "'auto' | <color> | <wide-keyword>"]
 
 and property_clear =
   [%value.rec
-    "'none' | 'left' | 'right' | 'both' | 'inline-start' | 'inline-end'"]
+    "'none' | 'left' | 'right' | 'both' | 'inline-start' | 'inline-end' | <wide-keyword>"]
 
-and property_clip = [%value.rec "<shape> | 'auto'"]
+and property_clip = [%value.rec "<shape> | 'auto' | <wide-keyword>"]
 
 and property_clip_path =
-  [%value.rec "<clip-source> | <basic-shape> || <geometry-box> | 'none'"]
+  [%value.rec "<clip-source> | <basic-shape> || <geometry-box> | 'none' | <wide-keyword>"]
 
-and property_clip_rule = [%value.rec "'nonzero' | 'evenodd'"]
-and property_color = [%value.rec "<color>"]
+and property_clip_rule = [%value.rec "'nonzero' | 'evenodd' | <wide-keyword>"]
+and property_color = [%value.rec "<color> | <wide-keyword>"]
 
 and property_color_interpolation_filters =
-  [%value.rec "'auto' | 'sRGB' | 'linearRGB'"]
+  [%value.rec "'auto' | 'sRGB' | 'linearRGB' | <wide-keyword>"]
 
-and property_color_interpolation = [%value.rec "'auto' | 'sRGB' | 'linearRGB'"]
-and property_color_adjust = [%value.rec "'economy' | 'exact'"]
-and property_column_count = [%value.rec "<integer> | 'auto'"]
-and property_column_fill = [%value.rec "'auto' | 'balance' | 'balance-all'"]
+and property_color_interpolation = [%value.rec "'auto' | 'sRGB' | 'linearRGB' | <wide-keyword>"]
+and property_color_adjust = [%value.rec "'economy' | 'exact' | <wide-keyword>"]
+and property_column_count = [%value.rec "<integer> | 'auto' | <wide-keyword>"]
+and property_column_fill = [%value.rec "'auto' | 'balance' | 'balance-all' | <wide-keyword>"]
 
 and property_column_gap =
-  [%value.rec "'normal' | <extended-length> | <extended-percentage>"]
+  [%value.rec "'normal' | <extended-length> | <extended-percentage> | <wide-keyword>"]
 
 and property_column_rule =
   [%value.rec
-    "<'column-rule-width'> || <'column-rule-style'> || <'column-rule-color'>"]
+    "<'column-rule-width'> || <'column-rule-style'> || <'column-rule-color'> | <wide-keyword>"]
 
-and property_column_rule_color = [%value.rec "<color>"]
-and property_column_rule_style = [%value.rec "<'border-style'>"]
-and property_column_rule_width = [%value.rec "<'border-width'>"]
-and property_column_span = [%value.rec "'none' | 'all'"]
-and property_column_width = [%value.rec "<extended-length> | 'auto'"]
-and property_columns = [%value.rec "<'column-width'> || <'column-count'>"]
+and property_column_rule_color = [%value.rec "<color> | <wide-keyword>"]
+and property_column_rule_style = [%value.rec "<'border-style'> | <wide-keyword>"]
+and property_column_rule_width = [%value.rec "<'border-width'> | <wide-keyword>"]
+and property_column_span = [%value.rec "'none' | 'all' | <wide-keyword>"]
+and property_column_width = [%value.rec "<extended-length> | 'auto' | <wide-keyword>"]
+and property_columns = [%value.rec "<'column-width'> || <'column-count'> | <wide-keyword>"]
 
 and property_contain =
   [%value.rec
-    "'none' | 'strict' | 'content' | 'size' || 'layout' || 'style' || 'paint'"]
+    "'none' | 'strict' | 'content' | 'size' || 'layout' || 'style' || 'paint' | <wide-keyword>"]
 
 and property_content =
   [%value.rec
     "'normal' | 'none' | <string> | <interpolation> | [ <content-replacement> \
-     | <content-list> ] [ '/' <string> ]?"]
+     | <content-list> ] [ '/' <string> ]? | <wide-keyword>"]
 
-and property_content_visibility = [%value.rec "'visible' | 'hidden' | 'auto'"]
+and property_content_visibility = [%value.rec "'visible' | 'hidden' | 'auto' | <wide-keyword>"]
 
 and property_counter_increment =
-  [%value.rec "[ <custom-ident> [ <integer> ]? ]+ | 'none'"]
+  [%value.rec "[ <custom-ident> [ <integer> ]? ]+ | 'none' | <wide-keyword>"]
 
 and property_counter_reset =
-  [%value.rec "[ <custom-ident> [ <integer> ]? ]+ | 'none'"]
+  [%value.rec "[ <custom-ident> [ <integer> ]? ]+ | 'none' | <wide-keyword>"]
 
 and property_counter_set =
-  [%value.rec "[ <custom-ident> [ <integer> ]? ]+ | 'none'"]
+  [%value.rec "[ <custom-ident> [ <integer> ]? ]+ | 'none' | <wide-keyword>"]
 
-and property_cue = [%value.rec "<'cue-before'> [ <'cue-after'> ]?"]
-and property_cue_after = [%value.rec "<url> [ <decibel> ]? | 'none'"]
-and property_cue_before = [%value.rec "<url> [ <decibel> ]? | 'none'"]
+and property_cue = [%value.rec "<'cue-before'> [ <'cue-after'> ]? | <wide-keyword>"]
+and property_cue_after = [%value.rec "<url> [ <decibel> ]? | 'none' | <wide-keyword>"]
+and property_cue_before = [%value.rec "<url> [ <decibel> ]? | 'none' | <wide-keyword>"]
 
 (* and property_cursor = [%value.rec
      "[ <url> [ <x> <y> ]? ',' ]* [ 'auto' | 'default' | 'none' | 'context-menu' | 'help' | 'pointer' | 'progress' | 'wait' | 'cell' | 'crosshair' | 'text' | 'vertical-text' | 'alias' | 'copy' | 'move' | 'no-drop' | 'not-allowed' | 'e-resize' | 'n-resize' | 'ne-resize' | 'nw-resize' | 's-resize' | 'se-resize' | 'sw-resize' | 'w-resize' | 'ew-resize' | 'ns-resize' | 'nesw-resize' | 'nwse-resize' | 'col-resize' | 'row-resize' | 'all-scroll' | 'zoom-in' | 'zoom-out' | 'grab' | 'grabbing' | 'hand' | '-webkit-grab' | '-webkit-grabbing' | '-webkit-zoom-in' | '-webkit-zoom-out' | '-moz-grab' | '-moz-grabbing' | '-moz-zoom-in' | '-moz-zoom-out' ] | <interpolation>"
@@ -1417,9 +1416,9 @@ and property_cursor =
      'nwse-resize' | 'col-resize' | 'row-resize' | 'all-scroll' | 'zoom-in' | \
      'zoom-out' | 'grab' | 'grabbing' | 'hand' | '-webkit-grab' | \
      '-webkit-grabbing' | '-webkit-zoom-in' | '-webkit-zoom-out' | '-moz-grab' \
-     | '-moz-grabbing' | '-moz-zoom-in' | '-moz-zoom-out' | <interpolation>"]
+     | '-moz-grabbing' | '-moz-zoom-in' | '-moz-zoom-out' | <interpolation> | <wide-keyword>"]
 
-and property_direction = [%value.rec "'ltr' | 'rtl'"]
+and property_direction = [%value.rec "'ltr' | 'rtl' | <wide-keyword>"]
 
 and property_display =
   [%value.rec
@@ -1431,88 +1430,88 @@ and property_display =
      'table-column-group' | 'table-footer-group' | 'table-header-group' | \
      'table-row' | 'table-row-group' | '-webkit-flex' | '-webkit-inline-flex' \
      | '-webkit-box' | '-webkit-inline-box' | '-moz-inline-stack' | '-moz-box' \
-     | '-moz-inline-box'"]
+     | '-moz-inline-box' | <wide-keyword>"]
 
 and property_dominant_baseline =
   [%value.rec
     "'auto' | 'use-script' | 'no-change' | 'reset-size' | 'ideographic' | \
      'alphabetic' | 'hanging' | 'mathematical' | 'central' | 'middle' | \
-     'text-after-edge' | 'text-before-edge'"]
+     'text-after-edge' | 'text-before-edge' | <wide-keyword>"]
 
-and property_empty_cells = [%value.rec "'show' | 'hide'"]
-and property_fill = [%value.rec "<paint>"]
-and property_fill_opacity = [%value.rec "<alpha-value>"]
-and property_fill_rule = [%value.rec "'nonzero' | 'evenodd'"]
+and property_empty_cells = [%value.rec "'show' | 'hide' | <wide-keyword>"]
+and property_fill = [%value.rec "<paint> | <wide-keyword>"]
+and property_fill_opacity = [%value.rec "<alpha-value> | <wide-keyword>"]
+and property_fill_rule = [%value.rec "'nonzero' | 'evenodd' | <wide-keyword>"]
 
 and property_filter =
-  [%value.rec "'none' | <interpolation> | <filter-function-list>"]
+  [%value.rec "'none' | <interpolation> | <filter-function-list> | <wide-keyword>"]
 
 and property_flex =
   [%value.rec
     "'none' | [<'flex-grow'> [ <'flex-shrink'> ]? || <'flex-basis'>] | \
-     <interpolation>"]
+     <interpolation> | <wide-keyword>"]
 
-and property_flex_basis = [%value.rec "'content' | <'width'> | <interpolation>"]
+and property_flex_basis = [%value.rec "'content' | <'width'> | <interpolation> | <wide-keyword>"]
 
 and property_flex_direction =
-  [%value.rec "'row' | 'row-reverse' | 'column' | 'column-reverse'"]
+  [%value.rec "'row' | 'row-reverse' | 'column' | 'column-reverse' | <wide-keyword>"]
 
 and property_flex_flow = [%value.rec "<'flex-direction'> || <'flex-wrap'>"]
-and property_flex_grow = [%value.rec "<number> | <interpolation>"]
-and property_flex_shrink = [%value.rec "<number> | <interpolation>"]
-and property_flex_wrap = [%value.rec "'nowrap' | 'wrap' | 'wrap-reverse'"]
+and property_flex_grow = [%value.rec "<number> | <interpolation> | <wide-keyword>"]
+and property_flex_shrink = [%value.rec "<number> | <interpolation> | <wide-keyword>"]
+and property_flex_wrap = [%value.rec "'nowrap' | 'wrap' | 'wrap-reverse' | <wide-keyword>"]
 
 and property_float =
-  [%value.rec "'left' | 'right' | 'none' | 'inline-start' | 'inline-end'"]
+  [%value.rec "'left' | 'right' | 'none' | 'inline-start' | 'inline-end' | <wide-keyword>"]
 
 and property_font =
   [%value.rec
     "[ <'font-style'> || <font-variant-css21> || <'font-weight'> || \
      <'font-stretch'> ]? <'font-size'> [ '/' <'line-height'> ]? \
      <'font-family'> | 'caption' | 'icon' | 'menu' | 'message-box' | \
-     'small-caption' | 'status-bar'"]
+     'small-caption' | 'status-bar' | <wide-keyword>"]
 
 and font_families =
   [%value.rec "[ <family-name> | <generic-family> | <interpolation> ]#"]
 
-and property_font_family = [%value.rec "<font_families> | <interpolation>"]
+and property_font_family = [%value.rec "<font_families> | <interpolation> | <wide-keyword>"]
 
 and property_font_feature_settings =
-  [%value.rec "'normal' | [ <feature-tag-value> ]#"]
+  [%value.rec "'normal' | [ <feature-tag-value> ]# | <wide-keyword>"]
 
 and property_font_display =
-  [%value.rec "'auto' | 'block' | 'swap' | 'fallback' | 'optional'"]
+  [%value.rec "'auto' | 'block' | 'swap' | 'fallback' | 'optional' | <wide-keyword>"]
 
-and property_font_kerning = [%value.rec "'auto' | 'normal' | 'none'"]
-and property_font_language_override = [%value.rec "'normal' | <string>"]
-and property_font_optical_sizing = [%value.rec "'auto' | 'none'"]
-and property_font_palette = [%value.rec "'normal' | 'light' | 'dark'"]
+and property_font_kerning = [%value.rec "'auto' | 'normal' | 'none' | <wide-keyword>"]
+and property_font_language_override = [%value.rec "'normal' | <string> | <wide-keyword>"]
+and property_font_optical_sizing = [%value.rec "'auto' | 'none' | <wide-keyword>"]
+and property_font_palette = [%value.rec "'normal' | 'light' | 'dark' | <wide-keyword>"]
 
 and property_font_size =
   [%value.rec
     "<absolute-size> | <relative-size> | <extended-length> | \
-     <extended-percentage>"]
+     <extended-percentage> | <wide-keyword>"]
 
-and property_font_size_adjust = [%value.rec "'none' | <number>"]
+and property_font_size_adjust = [%value.rec "'none' | <number> | <wide-keyword>"]
 
 and property_font_smooth =
   [%value.rec
-    "'auto' | 'never' | 'always' | <absolute-size> | <extended-length>"]
+    "'auto' | 'never' | 'always' | <absolute-size> | <extended-length> | <wide-keyword>"]
 
-and property_font_stretch = [%value.rec "<font-stretch-absolute>"]
+and property_font_stretch = [%value.rec "<font-stretch-absolute> | <wide-keyword>"]
 
 and property_font_style =
   [%value.rec
     "'normal' | 'italic' | 'oblique' | <interpolation> | [ 'oblique' \
-     <extended-angle> ]?"]
+     <extended-angle> ]? | <wide-keyword>"]
 
 and property_font_synthesis =
-  [%value.rec "'none' | [ 'weight' || 'style' || 'small-caps' || 'position' ]"]
+  [%value.rec "'none' | [ 'weight' || 'style' || 'small-caps' || 'position' ] | <wide-keyword>"]
 
-and property_font_synthesis_weight = [%value.rec "'auto' | 'none'"]
-and property_font_synthesis_style = [%value.rec "'auto' | 'none'"]
-and property_font_synthesis_small_caps = [%value.rec "'auto' | 'none'"]
-and property_font_synthesis_position = [%value.rec "'auto' | 'none'"]
+and property_font_synthesis_weight = [%value.rec "'auto' | 'none' | <wide-keyword>"]
+and property_font_synthesis_style = [%value.rec "'auto' | 'none' | <wide-keyword>"]
+and property_font_synthesis_small_caps = [%value.rec "'auto' | 'none' | <wide-keyword>"]
+and property_font_synthesis_position = [%value.rec "'auto' | 'none' | <wide-keyword>"]
 
 and property_font_variant =
   [%value.rec
@@ -1527,49 +1526,49 @@ and property_font_variant =
      <numeric-figure-values> || <numeric-spacing-values> || \
      <numeric-fraction-values> || 'ordinal' || 'slashed-zero' || \
      <east-asian-variant-values> || <east-asian-width-values> || 'ruby' || \
-     'sub' || 'super' || 'text' || 'emoji' || 'unicode'"]
+     'sub' || 'super' || 'text' || 'emoji' || 'unicode' | <wide-keyword>"]
 
 and property_font_variant_alternates =
   [%value.rec
     "'normal' | stylistic( <feature-value-name> ) || 'historical-forms' || \
      styleset( [ <feature-value-name> ]# ) || character-variant( [ \
      <feature-value-name> ]# ) || swash( <feature-value-name> ) || ornaments( \
-     <feature-value-name> ) || annotation( <feature-value-name> )"]
+     <feature-value-name> ) || annotation( <feature-value-name> ) | <wide-keyword>"]
 
 and property_font_variant_caps =
   [%value.rec
     "'normal' | 'small-caps' | 'all-small-caps' | 'petite-caps' | \
-     'all-petite-caps' | 'unicase' | 'titling-caps'"]
+     'all-petite-caps' | 'unicase' | 'titling-caps' | <wide-keyword>"]
 
 and property_font_variant_east_asian =
   [%value.rec
     "'normal' | <east-asian-variant-values> || <east-asian-width-values> || \
-     'ruby'"]
+     'ruby' | <wide-keyword>"]
 
 and property_font_variant_ligatures =
   [%value.rec
     "'normal' | 'none' | <common-lig-values> || <discretionary-lig-values> || \
-     <historical-lig-values> || <contextual-alt-values>"]
+     <historical-lig-values> || <contextual-alt-values> | <wide-keyword>"]
 
 and property_font_variant_numeric =
   [%value.rec
     "'normal' | <numeric-figure-values> || <numeric-spacing-values> || \
-     <numeric-fraction-values> || 'ordinal' || 'slashed-zero'"]
+     <numeric-fraction-values> || 'ordinal' || 'slashed-zero' | <wide-keyword>"]
 
-and property_font_variant_position = [%value.rec "'normal' | 'sub' | 'super'"]
+and property_font_variant_position = [%value.rec "'normal' | 'sub' | 'super' | <wide-keyword>"]
 
 and property_font_variation_settings =
-  [%value.rec "'normal' | [ <string> <number> ]#"]
+  [%value.rec "'normal' | [ <string> <number> ]# | <wide-keyword>"]
 
 and property_font_variant_emoji =
-  [%value.rec "'normal' | 'text' | 'emoji' | 'unicode'"]
+  [%value.rec "'normal' | 'text' | 'emoji' | 'unicode' | <wide-keyword>"]
 
 and property_font_weight =
-  [%value.rec "<font-weight-absolute> | 'bolder' | 'lighter' | <interpolation>"]
+  [%value.rec "<font-weight-absolute> | 'bolder' | 'lighter' | <interpolation> | <wide-keyword>"]
 
-and property_gap = [%value.rec "<'row-gap'> [ <'column-gap'> ]?"]
-and property_glyph_orientation_horizontal = [%value.rec "<extended-angle>"]
-and property_glyph_orientation_vertical = [%value.rec "<extended-angle>"]
+and property_gap = [%value.rec "[<'row-gap'> [ <'column-gap'> ]?] | <wide-keyword>"]
+and property_glyph_orientation_horizontal = [%value.rec "<extended-angle> | <wide-keyword>"]
+and property_glyph_orientation_vertical = [%value.rec "<extended-angle> | <wide-keyword>"]
 
 and property_grid =
   [%value.rec
@@ -1577,639 +1576,638 @@ and property_grid =
     \  | <'grid-template-rows'> '/' [ 'auto-flow' && [ 'dense' ]? ] [ \
      <'grid-auto-columns'> ]?\n\
     \  | [ 'auto-flow' && [ 'dense' ]? ] [ <'grid-auto-rows'> ]? '/' \
-     <'grid-template-columns'>"]
+     <'grid-template-columns'> | <wide-keyword>"]
 
-and property_grid_area = [%value.rec "<grid-line> [ '/' <grid-line> ]{0,3}"]
-and property_grid_auto_columns = [%value.rec "[ <track-size> ]+"]
+and property_grid_area = [%value.rec "<grid-line> [ '/' <grid-line> ]{0,3} | <wide-keyword>"]
+and property_grid_auto_columns = [%value.rec "[ <track-size> ]+ | <wide-keyword>"]
 
 and property_grid_auto_flow =
-  [%value.rec "[ [ 'row' | 'column' ] || 'dense' ] | <interpolation>"]
+  [%value.rec "[ [ 'row' | 'column' ] || 'dense' ] | <interpolation> | <wide-keyword>"]
 
-and property_grid_auto_rows = [%value.rec "[ <track-size> ]+"]
-and property_grid_column = [%value.rec "<grid-line> [ '/' <grid-line> ]?"]
-and property_grid_column_end = [%value.rec "<grid-line>"]
+and property_grid_auto_rows = [%value.rec "[ <track-size> ]+ | <wide-keyword>"]
+and property_grid_column = [%value.rec "<grid-line> [ '/' <grid-line> ]? | <wide-keyword>"]
+and property_grid_column_end = [%value.rec "<grid-line> | <wide-keyword>"]
 
 and property_grid_column_gap =
-  [%value.rec "<extended-length> | <extended-percentage>"]
+  [%value.rec "<extended-length> | <extended-percentage> | <wide-keyword>"]
 
-and property_grid_column_start = [%value.rec "<grid-line>"]
-and property_grid_gap = [%value.rec "<'grid-row-gap'> [ <'grid-column-gap'> ]?"]
-and property_grid_row = [%value.rec "<grid-line> [ '/' <grid-line> ]?"]
-and property_grid_row_end = [%value.rec "<grid-line>"]
+and property_grid_column_start = [%value.rec "<grid-line> | <wide-keyword>"]
+and property_grid_gap = [%value.rec "<'grid-row-gap'> [ <'grid-column-gap'> ]? | <wide-keyword>"]
+and property_grid_row = [%value.rec "<grid-line> [ '/' <grid-line> ]? | <wide-keyword>"]
+and property_grid_row_end = [%value.rec "<grid-line> | <wide-keyword>"]
 
 and property_grid_row_gap =
-  [%value.rec "<extended-length> | <extended-percentage>"]
+  [%value.rec "<extended-length> | <extended-percentage> | <wide-keyword>"]
 
-and property_grid_row_start = [%value.rec "<grid-line>"]
+and property_grid_row_start = [%value.rec "<grid-line> | <wide-keyword>"]
 
 and property_grid_template =
   [%value.rec
     "'none' | <'grid-template-rows'> '/' <'grid-template-columns'> | [ [ \
      <line-names> ]? <string> [ <track-size> ]? [ <line-names> ]? ]+ [ '/' \
-     <explicit-track-list> ]?"]
+     <explicit-track-list> ]? | <wide-keyword>"]
 
 and property_grid_template_areas =
-  [%value.rec "'none' | [ <string> | <interpolation> ]+"]
+  [%value.rec "'none' | [ <string> | <interpolation> ]+ | <wide-keyword>"]
 
 and property_grid_template_columns =
   [%value.rec
     "'none' | <track-list> | <auto-track-list> | 'subgrid' [ <line-name-list> \
-     ]? | 'masonry' | <interpolation>"]
+     ]? | 'masonry' | <interpolation> | <wide-keyword>"]
 
 and property_grid_template_rows =
   [%value.rec
     "'none' | <track-list> | <auto-track-list> | 'subgrid' [ <line-name-list> \
-     ]? | 'masonry' | <interpolation>"]
+     ]? | 'masonry' | <interpolation> | <wide-keyword>"]
 
 and property_hanging_punctuation =
-  [%value.rec "'none' | 'first' || [ 'force-end' | 'allow-end' ] || 'last'"]
+  [%value.rec "'none' | 'first' || [ 'force-end' | 'allow-end' ] || 'last' | <wide-keyword>"]
 
 and property_height =
   [%value.rec
     "'auto' | <extended-length> | <extended-percentage> | 'min-content' | \
      'max-content' | 'fit-content' | fit-content( <extended-length> | \
-     <extended-percentage> )"]
+     <extended-percentage> ) | <wide-keyword>"]
 
-and property_hyphens = [%value.rec "'none' | 'manual' | 'auto'"]
-and property_hyphenate_character = [%value.rec "'auto' | <string-token>"]
-and property_hyphenate_limit_chars = [%value.rec "'auto' | <integer>"]
-and property_hyphenate_limit_lines = [%value.rec "'no-limit' | <integer>"]
+and property_hyphens = [%value.rec "'none' | 'manual' | 'auto' | <wide-keyword>"]
+and property_hyphenate_character = [%value.rec "'auto' | <string-token> | <wide-keyword>"]
+and property_hyphenate_limit_chars = [%value.rec "'auto' | <integer> | <wide-keyword>"]
+and property_hyphenate_limit_lines = [%value.rec "'no-limit' | <integer> | <wide-keyword>"]
 
 and property_hyphenate_limit_zone =
-  [%value.rec "<extended-length> | <extended-percentage>"]
+  [%value.rec "<extended-length> | <extended-percentage> | <wide-keyword>"]
 
 and property_image_orientation =
-  [%value.rec "'from-image' | <extended-angle> | [ <extended-angle> ]? 'flip'"]
+  [%value.rec "'from-image' | <extended-angle> | [ <extended-angle> ]? 'flip' | <wide-keyword>"]
 
 and property_image_rendering =
-  [%value.rec "'auto' |'smooth' | 'high-quality' | 'crisp-edges' | 'pixelated'"]
+  [%value.rec "'auto' |'smooth' | 'high-quality' | 'crisp-edges' | 'pixelated' | <wide-keyword>"]
 
 and property_image_resolution =
-  [%value.rec "[ 'from-image' || <resolution> ] && [ 'snap' ]?"]
+  [%value.rec "[ 'from-image' || <resolution> ] && [ 'snap' ]? | <wide-keyword>"]
 
 and property_ime_mode =
-  [%value.rec "'auto' | 'normal' | 'active' | 'inactive' | 'disabled'"]
+  [%value.rec "'auto' | 'normal' | 'active' | 'inactive' | 'disabled' | <wide-keyword>"]
 
-and property_initial_letter = [%value.rec "'normal' | <number> [ <integer> ]?"]
+and property_initial_letter = [%value.rec "'normal' | <number> [ <integer> ]? | <wide-keyword>"]
 
 and property_initial_letter_align =
-  [%value.rec "'auto' | 'alphabetic' | 'hanging' | 'ideographic'"]
+  [%value.rec "'auto' | 'alphabetic' | 'hanging' | 'ideographic' | <wide-keyword>"]
 
-and property_inline_size = [%value.rec "<'width'>"]
-and property_inset = [%value.rec "[ <'top'> ]{1,4}"]
-and property_inset_block = [%value.rec "[ <'top'> ]{1,2}"]
-and property_inset_block_end = [%value.rec "<'top'>"]
-and property_inset_block_start = [%value.rec "<'top'>"]
-and property_inset_inline = [%value.rec "[ <'top'> ]{1,2}"]
-and property_inset_inline_end = [%value.rec "<'top'>"]
-and property_inset_inline_start = [%value.rec "<'top'>"]
-and property_isolation = [%value.rec "'auto' | 'isolate'"]
+and property_inline_size = [%value.rec "<'width'> | <wide-keyword>"]
+and property_inset = [%value.rec "[ <'top'> ]{1,4} | <wide-keyword>"]
+and property_inset_block = [%value.rec "[ <'top'> ]{1,2} | <wide-keyword>"]
+and property_inset_block_end = [%value.rec "<'top'> | <wide-keyword>"]
+and property_inset_block_start = [%value.rec "<'top'> | <wide-keyword>"]
+and property_inset_inline = [%value.rec "[ <'top'> ]{1,2} | <wide-keyword>"]
+and property_inset_inline_end = [%value.rec "<'top'> | <wide-keyword>"]
+and property_inset_inline_start = [%value.rec "<'top'> | <wide-keyword>"]
+and property_isolation = [%value.rec "'auto' | 'isolate' | <wide-keyword>"]
 
 and property_justify_content =
   [%value.rec
     "'normal' | <content-distribution> | [ <overflow-position> ]? [ \
-     <content-position> | 'left' | 'right' ]"]
+     <content-position> | 'left' | 'right' | <interpolation>  ] | <wide-keyword>"]
 
 and property_justify_items =
   [%value.rec
     "'normal' | 'stretch' | <baseline-position> | [ <overflow-position> ]? [ \
      <self-position> | 'left' | 'right' ] | 'legacy' | 'legacy' && [ 'left' | \
-     'right' | 'center' ]"]
+     'right' | 'center' ] | <wide-keyword>"]
 
 and property_justify_self =
   [%value.rec
     "'auto' | 'normal' | 'stretch' | <baseline-position> | [ \
-     <overflow-position> ]? [ <self-position> | 'left' | 'right' ]"]
+     <overflow-position> ]? [ <self-position> | 'left' | 'right' ] | <wide-keyword>"]
 
-and property_kerning = [%value.rec "'auto' | <svg-length>"]
+and property_kerning = [%value.rec "'auto' | <svg-length> | <wide-keyword>"]
 
 and property_layout_grid =
-  [%value.rec "'auto' | <custom-ident> | <integer> && [ <custom-ident> ]?"]
+  [%value.rec "'auto' | <custom-ident> | <integer> && [ <custom-ident> ]? | <wide-keyword>"]
 
 and property_layout_grid_char =
-  [%value.rec "'auto' | <custom-ident> | <string>"]
+  [%value.rec "'auto' | <custom-ident> | <string> | <wide-keyword>"]
 
 and property_layout_grid_line =
-  [%value.rec "'auto' | <custom-ident> | <string>"]
+  [%value.rec "'auto' | <custom-ident> | <string> | <wide-keyword>"]
 
 and property_layout_grid_mode =
-  [%value.rec "'auto' | <custom-ident> | <string>"]
+  [%value.rec "'auto' | <custom-ident> | <string> | <wide-keyword>"]
 
 and property_layout_grid_type =
-  [%value.rec "'auto' | <custom-ident> | <string>"]
+  [%value.rec "'auto' | <custom-ident> | <string> | <wide-keyword>"]
 
 and property_left =
-  [%value.rec "<extended-length> | <extended-percentage> | 'auto'"]
+  [%value.rec "<extended-length> | <extended-percentage> | 'auto' | <wide-keyword>"]
 
 and property_letter_spacing =
-  [%value.rec "'normal' | <extended-length> | <extended-percentage>"]
+  [%value.rec "'normal' | <extended-length> | <extended-percentage> | <wide-keyword>"]
 
 and property_line_break =
   [%value.rec
-    "'auto' | 'loose' | 'normal' | 'strict' | 'anywhere' | <interpolation>"]
+    "'auto' | 'loose' | 'normal' | 'strict' | 'anywhere' | <interpolation> | <wide-keyword>"]
 
-and property_line_clamp = [%value.rec "'none' | <integer>"]
+and property_line_clamp = [%value.rec "'none' | <integer> | <wide-keyword>"]
 
 and property_line_height =
-  [%value.rec "'normal' | <number> | <extended-length> | <extended-percentage>"]
+  [%value.rec "'normal' | <number> | <extended-length> | <extended-percentage> | <wide-keyword>"]
 
-and property_line_height_step = [%value.rec "<extended-length>"]
+and property_line_height_step = [%value.rec "<extended-length> | <wide-keyword>"]
 
 and property_list_style =
   [%value.rec
-    "<'list-style-type'> || <'list-style-position'> || <'list-style-image'>"]
+    "<'list-style-type'> || <'list-style-position'> || <'list-style-image'> | <wide-keyword>"]
 
-and property_list_style_image = [%value.rec "'none' | <image>"]
-and property_list_style_position = [%value.rec "'inside' | 'outside'"]
+and property_list_style_image = [%value.rec "'none' | <image> | <wide-keyword>"]
+and property_list_style_position = [%value.rec "'inside' | 'outside' | <wide-keyword>"]
 
 and property_list_style_type =
-  [%value.rec "<counter-style> | <string> | 'none'"]
+  [%value.rec "<counter-style> | <string> | 'none' | <wide-keyword>"]
 
 and property_margin =
   [%value.rec
-    "[ <extended-length> | <extended-percentage> | 'auto' | <interpolation> \
-     ]{1,4}"]
+    "[ <extended-length> | <extended-percentage> | 'auto' | <interpolation> | <wide-keyword>]{1,4}"]
 
-and property_margin_block = [%value.rec "[ <'margin-left'> ]{1,2}"]
-and property_margin_block_end = [%value.rec "<'margin-left'>"]
-and property_margin_block_start = [%value.rec "<'margin-left'>"]
+and property_margin_block = [%value.rec "[ <'margin-left'> | <wide-keyword> ]{1,2}"]
+and property_margin_block_end = [%value.rec "<'margin-left'> | <wide-keyword>"]
+and property_margin_block_start = [%value.rec "<'margin-left'> | <wide-keyword>"]
 
 and property_margin_bottom =
-  [%value.rec "<extended-length> | <extended-percentage> | 'auto'"]
+  [%value.rec "<extended-length> | <extended-percentage> | 'auto' | <wide-keyword>"]
 
-and property_margin_inline = [%value.rec "[ <'margin-left'> ]{1,2}"]
-and property_margin_inline_end = [%value.rec "<'margin-left'>"]
-and property_margin_inline_start = [%value.rec "<'margin-left'>"]
+and property_margin_inline = [%value.rec "[ <'margin-left'> | <wide-keyword> ]{1,2}"]
+and property_margin_inline_end = [%value.rec "<'margin-left'> | <wide-keyword>"]
+and property_margin_inline_start = [%value.rec "<'margin-left'> | <wide-keyword>"]
 
 and property_margin_left =
-  [%value.rec "<extended-length> | <extended-percentage> | 'auto'"]
+  [%value.rec "<extended-length> | <extended-percentage> | 'auto' | <wide-keyword>"]
 
 and property_margin_right =
-  [%value.rec "<extended-length> | <extended-percentage> | 'auto'"]
+  [%value.rec "<extended-length> | <extended-percentage> | 'auto' | <wide-keyword>"]
 
 and property_margin_top =
-  [%value.rec "<extended-length> | <extended-percentage> | 'auto'"]
+  [%value.rec "<extended-length> | <extended-percentage> | 'auto' | <wide-keyword>"]
 
-and property_margin_trim = [%value.rec "'none' | 'in-flow' | 'all'"]
-and property_marker = [%value.rec "'none' | <url>"]
-and property_marker_end = [%value.rec "'none' | <url>"]
-and property_marker_mid = [%value.rec "'none' | <url>"]
-and property_marker_start = [%value.rec "'none' | <url>"]
-and property_mask = [%value.rec "[ <mask-layer> ]#"]
+and property_margin_trim = [%value.rec "'none' | 'in-flow' | 'all' | <wide-keyword>"]
+and property_marker = [%value.rec "'none' | <url> | <wide-keyword>"]
+and property_marker_end = [%value.rec "'none' | <url> | <wide-keyword>"]
+and property_marker_mid = [%value.rec "'none' | <url> | <wide-keyword>"]
+and property_marker_start = [%value.rec "'none' | <url> | <wide-keyword>"]
+and property_mask = [%value.rec "[ <mask-layer> ]# | <wide-keyword>"]
 
 and property_mask_border =
   [%value.rec
     "<'mask-border-source'> || <'mask-border-slice'> [ '/' [ \
      <'mask-border-width'> ]? [ '/' <'mask-border-outset'> ]? ]? || \
-     <'mask-border-repeat'> || <'mask-border-mode'>"]
+     <'mask-border-repeat'> || <'mask-border-mode'> | <wide-keyword>"]
 
-and property_mask_border_mode = [%value.rec "'luminance' | 'alpha'"]
+and property_mask_border_mode = [%value.rec "'luminance' | 'alpha' | <wide-keyword>"]
 
 and property_mask_border_outset =
-  [%value.rec "[ <extended-length> | <number> ]{1,4}"]
+  [%value.rec "[ <extended-length> | <number> | <wide-keyword> ]{1,4}"]
 
 and property_mask_border_repeat =
-  [%value.rec "[ 'stretch' | 'repeat' | 'round' | 'space' ]{1,2}"]
+  [%value.rec "[ 'stretch' | 'repeat' | 'round' | 'space' | <wide-keyword> ]{1,2}"]
 
 and property_mask_border_slice =
-  [%value.rec "[ <number-percentage> ]{1,4} [ 'fill' ]?"]
+  [%value.rec "[ <number-percentage> ]{1,4} [ 'fill' ]? | <wide-keyword>"]
 
-and property_mask_border_source = [%value.rec "'none' | <image>"]
+and property_mask_border_source = [%value.rec "'none' | <image> | <wide-keyword>"]
 
 and property_mask_border_width =
   [%value.rec
-    "[ <extended-length> | <extended-percentage> | <number> | 'auto' ]{1,4}"]
+    "[ <extended-length> | <extended-percentage> | <number> | 'auto' ]{1,4} | <wide-keyword>"]
 
-and property_mask_clip = [%value.rec "[ <geometry-box> | 'no-clip' ]#"]
-and property_mask_composite = [%value.rec "[ <compositing-operator> ]#"]
-and property_mask_image = [%value.rec "[ <mask-reference> ]#"]
-and property_mask_mode = [%value.rec "[ <masking-mode> ]#"]
-and property_mask_origin = [%value.rec "[ <geometry-box> ]#"]
-and property_mask_position = [%value.rec "[ <position> ]#"]
-and property_mask_repeat = [%value.rec "[ <repeat-style> ]#"]
-and property_mask_size = [%value.rec "[ <bg-size> ]#"]
-and property_mask_type = [%value.rec "'luminance' | 'alpha'"]
+and property_mask_clip = [%value.rec "[ <geometry-box> | 'no-clip' ]# | <wide-keyword>"]
+and property_mask_composite = [%value.rec "[ <compositing-operator> ]# | <wide-keyword>"]
+and property_mask_image = [%value.rec "[ <mask-reference> ]# | <wide-keyword>"]
+and property_mask_mode = [%value.rec "[ <masking-mode> ]# | <wide-keyword>"]
+and property_mask_origin = [%value.rec "[ <geometry-box> ]# | <wide-keyword>"]
+and property_mask_position = [%value.rec "[ <position> ]# | <wide-keyword>"]
+and property_mask_repeat = [%value.rec "[ <repeat-style> ]# | <wide-keyword>"]
+and property_mask_size = [%value.rec "[ <bg-size> ]# | <wide-keyword>"]
+and property_mask_type = [%value.rec "'luminance' | 'alpha' | <wide-keyword>"]
 
 and property_masonry_auto_flow =
-  [%value.rec "[ 'pack' | 'next' ] || [ 'definite-first' | 'ordered' ]"]
+  [%value.rec "[ 'pack' | 'next' ] || [ 'definite-first' | 'ordered' ] | <wide-keyword>"]
 
-and property_max_block_size = [%value.rec "<'max-width'>"]
+and property_max_block_size = [%value.rec "<'max-width'> | <wide-keyword>"]
 
 and property_max_height =
   [%value.rec
     "'auto' | <extended-length> | <extended-percentage> | 'min-content' | \
      'max-content' | 'fit-content' | fit-content( <extended-length> | \
-     <extended-percentage> )"]
+     <extended-percentage> ) | <wide-keyword>"]
 
-and property_max_inline_size = [%value.rec "<'max-width'>"]
-and property_max_lines = [%value.rec "'none' | <integer>"]
+and property_max_inline_size = [%value.rec "<'max-width'> | <wide-keyword>"]
+and property_max_lines = [%value.rec "'none' | <integer> | <wide-keyword>"]
 
 and property_max_width =
   [%value.rec
-    "<extended-length> | <extended-percentage> | 'none' | 'max-content' | \
+    "unset | <interpolation> | <extended-length> | <extended-percentage> | 'none' | 'max-content' | \
      'min-content' | 'fit-content' | fit-content( <extended-length> | \
-     <extended-percentage> ) | 'fill-available' | <-non-standard-width>"]
+     <extended-percentage> ) | 'fill-available' | <-non-standard-width> | <wide-keyword>"]
 
-and property_min_block_size = [%value.rec "<'min-width'>"]
+and property_min_block_size = [%value.rec "<'min-width'> | <wide-keyword>"]
 
 and property_min_height =
   [%value.rec
     "'auto' | <extended-length> | <extended-percentage> | 'min-content' | \
      'max-content' | 'fit-content' | fit-content( <extended-length> | \
-     <extended-percentage> )"]
+     <extended-percentage> ) | <wide-keyword>"]
 
-and property_min_inline_size = [%value.rec "<'min-width'>"]
+and property_min_inline_size = [%value.rec "<'min-width'> | <wide-keyword>"]
 
 and property_min_width =
   [%value.rec
     "<extended-length> | <extended-percentage> | 'auto' | 'max-content' | \
      'min-content' | 'fit-content' | fit-content( <extended-length> | \
-     <extended-percentage> ) | 'fill-available' | <-non-standard-width>"]
+     <extended-percentage> ) | 'fill-available' | <-non-standard-width> | <wide-keyword>"]
 
-and property_mix_blend_mode = [%value.rec "<blend-mode>"]
-and property_media_any_hover = [%value.rec "none | hover"]
-and property_media_any_pointer = [%value.rec "none | coarse | fine"]
-and property_media_pointer = [%value.rec "none | coarse | fine"]
-and property_media_max_aspect_ratio = [%value.rec "<ratio>"]
-and property_media_min_aspect_ratio = [%value.rec "<ratio>"]
-and property_media_min_color = [%value.rec "<integer>"]
-and property_media_color_gamut = [%value.rec "'srgb' | 'p3' | 'rec2020'"]
-and property_media_color_index = [%value.rec "<integer>"]
-and property_media_min_color_index = [%value.rec "<integer>"]
+and property_mix_blend_mode = [%value.rec "<blend-mode> | <wide-keyword>"]
+and property_media_any_hover = [%value.rec "none | hover | <wide-keyword>"]
+and property_media_any_pointer = [%value.rec "none | coarse | fine | <wide-keyword>"]
+and property_media_pointer = [%value.rec "none | coarse | fine | <wide-keyword>"]
+and property_media_max_aspect_ratio = [%value.rec "<ratio> | <wide-keyword>"]
+and property_media_min_aspect_ratio = [%value.rec "<ratio> | <wide-keyword>"]
+and property_media_min_color = [%value.rec "<integer> | <wide-keyword>"]
+and property_media_color_gamut = [%value.rec "'srgb' | 'p3' | 'rec2020' | <wide-keyword>"]
+and property_media_color_index = [%value.rec "<integer> | <wide-keyword>"]
+and property_media_min_color_index = [%value.rec "<integer> | <wide-keyword>"]
 
 and property_media_display_mode =
-  [%value.rec "'fullscreen' | 'standalone' | 'minimal-ui' | 'browser'"]
+  [%value.rec "'fullscreen' | 'standalone' | 'minimal-ui' | 'browser' | <wide-keyword>"]
 
-and property_media_forced_colors = [%value.rec "'none' | 'active'"]
+and property_media_forced_colors = [%value.rec "'none' | 'active' | <wide-keyword>"]
 
 and property_forced_color_adjust =
-  [%value.rec "'auto' | 'none' | 'preserve-parent-color'"]
+  [%value.rec "'auto' | 'none' | 'preserve-parent-color' | <wide-keyword>"]
 
-and property_media_grid = [%value.rec "<integer>"]
-and property_media_hover = [%value.rec "'hover' | 'none'"]
-and property_media_inverted_colors = [%value.rec "'inverted' | 'none'"]
-and property_media_monochrome = [%value.rec "<integer>"]
-and property_media_prefers_color_scheme = [%value.rec "'dark' | 'light'"]
+and property_media_grid = [%value.rec "<integer> | <wide-keyword>"]
+and property_media_hover = [%value.rec "'hover' | 'none' | <wide-keyword>"]
+and property_media_inverted_colors = [%value.rec "'inverted' | 'none' | <wide-keyword>"]
+and property_media_monochrome = [%value.rec "<integer> | <wide-keyword>"]
+and property_media_prefers_color_scheme = [%value.rec "'dark' | 'light' | <wide-keyword>"]
 
 and property_color_scheme =
-  [%value.rec "'normal' |\n  [ 'dark' | 'light' | <custom-ident> ]+ && 'only'?"]
+  [%value.rec "'normal' |\n  [ 'dark' | 'light' | <custom-ident> ]+ && 'only'? | <wide-keyword>"]
 
 and property_media_prefers_contrast =
-  [%value.rec "'no-preference' | 'more' | 'less'"]
+  [%value.rec "'no-preference' | 'more' | 'less' | <wide-keyword>"]
 
 and property_media_prefers_reduced_motion =
-  [%value.rec "'no-preference' | 'reduce'"]
+  [%value.rec "'no-preference' | 'reduce' | <wide-keyword>"]
 
-and property_media_resolution = [%value.rec "<resolution>"]
-and property_media_min_resolution = [%value.rec "<resolution>"]
-and property_media_max_resolution = [%value.rec "<resolution>"]
+and property_media_resolution = [%value.rec "<resolution> | <wide-keyword>"]
+and property_media_min_resolution = [%value.rec "<resolution> | <wide-keyword>"]
+and property_media_max_resolution = [%value.rec "<resolution> | <wide-keyword>"]
 
 and property_media_scripting =
-  [%value.rec "'none' | 'initial-only' | 'enabled'"]
+  [%value.rec "'none' | 'initial-only' | 'enabled' | <wide-keyword>"]
 
-and property_media_update = [%value.rec "'none' | 'slow' | 'fast'"]
-and property_media_orientation = [%value.rec "'portrait' | 'landscape'"]
+and property_media_update = [%value.rec "'none' | 'slow' | 'fast' | <wide-keyword>"]
+and property_media_orientation = [%value.rec "'portrait' | 'landscape' | <wide-keyword>"]
 
 and property_object_fit =
-  [%value.rec "'fill' | 'contain' | 'cover' | 'none' | 'scale-down'"]
+  [%value.rec "['fill' | 'contain' | 'cover' | 'none' | 'scale-down'] | <wide-keyword>"]
 
-and property_object_position = [%value.rec "<position>"]
+and property_object_position = [%value.rec "<position> | <wide-keyword>"]
 
 and property_offset =
   [%value.rec
     "[ [ <'offset-position'> ]? <'offset-path'> [ <'offset-distance'> || \
-     <'offset-rotate'> ]? ]? [ '/' <'offset-anchor'> ]?"]
+     <'offset-rotate'> ]? ]? [ '/' <'offset-anchor'> ]? | <wide-keyword>"]
 
-and property_offset_anchor = [%value.rec "'auto' | <position>"]
+and property_offset_anchor = [%value.rec "'auto' | <position> | <wide-keyword>"]
 
 and property_offset_distance =
-  [%value.rec "<extended-length> | <extended-percentage>"]
+  [%value.rec "<extended-length> | <extended-percentage> | <wide-keyword>"]
 
 and property_offset_path =
   [%value.rec
     "'none' | ray( <extended-angle> && [ <ray_size> ]? && [ 'contain' ]? ) | \
-     <path()> | <url> | <basic-shape> || <geometry-box>"]
+     <path()> | <url> | <basic-shape> || <geometry-box> | <wide-keyword>"]
 
-and property_offset_position = [%value.rec "'auto' | <position>"]
+and property_offset_position = [%value.rec "'auto' | <position> | <wide-keyword>"]
 
 and property_offset_rotate =
-  [%value.rec "[ 'auto' | 'reverse' ] || <extended-angle>"]
+  [%value.rec "[ 'auto' | 'reverse' ] || <extended-angle> | <wide-keyword>"]
 
-and property_opacity = [%value.rec "<alpha-value>"]
-and property_order = [%value.rec "<integer>"]
-and property_orphans = [%value.rec "<integer>"]
+and property_opacity = [%value.rec "<alpha-value> | <wide-keyword>"]
+and property_order = [%value.rec "<integer> | <wide-keyword>"]
+and property_orphans = [%value.rec "<integer> | <wide-keyword>"]
 
 and property_outline =
   [%value.rec
     "'none' | <'outline-width'> | [ <'outline-width'> <'outline-style'> ] | [ \
-     <'outline-width'> <'outline-style'> [ <color> | <interpolation> ]]"]
+     <'outline-width'> <'outline-style'> [ <color> | <interpolation> ]] | <wide-keyword>"]
 
-and property_outline_color = [%value.rec "<color>"]
-and property_outline_offset = [%value.rec "<extended-length>"]
+and property_outline_color = [%value.rec "<color> | <wide-keyword>"]
+and property_outline_offset = [%value.rec "<extended-length> | <wide-keyword>"]
 
 and property_outline_style =
-  [%value.rec "'auto' | <line-style> | <interpolation>"]
+  [%value.rec "'auto' | <line-style> | <interpolation> | <wide-keyword>"]
 
-and property_outline_width = [%value.rec "<line-width> | <interpolation>"]
+and property_outline_width = [%value.rec "<line-width> | <interpolation> | <wide-keyword>"]
 
 and property_overflow =
   [%value.rec
     "[ 'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' ]{1,2} | \
-     <-non-standard-overflow> | <interpolation>"]
+     <-non-standard-overflow> | <interpolation> | <wide-keyword>"]
 
-and property_overflow_anchor = [%value.rec "'auto' | 'none'"]
+and property_overflow_anchor = [%value.rec "'auto' | 'none' | <wide-keyword>"]
 
 and property_overflow_block =
   [%value.rec
-    "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"]
+    "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation> | <wide-keyword>"]
 
 and property_overflow_clip_margin =
-  [%value.rec "<visual-box> || <extended-length>"]
+  [%value.rec "[<visual-box> | <wide-keyword>] || [<extended-length> | <wide-keyword>]"]
 
 and property_overflow_inline =
   [%value.rec
-    "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"]
+    "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation> | <wide-keyword>"]
 
-and property_overflow_wrap = [%value.rec "'normal' | 'break-word' | 'anywhere'"]
+and property_overflow_wrap = [%value.rec "'normal' | 'break-word' | 'anywhere' | <wide-keyword>"]
 
 and property_overflow_x =
   [%value.rec
-    "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"]
+    "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation> | <wide-keyword>"]
 
 and property_overflow_y =
   [%value.rec
-    "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"]
+    "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation> | <wide-keyword>"]
 
 and property_overscroll_behavior =
-  [%value.rec "[ 'contain' | 'none' | 'auto' ]{1,2}"]
+  [%value.rec "[ 'contain' | 'none' | 'auto' | <wide-keyword> ]{1,2}"]
 
 and property_overscroll_behavior_block =
-  [%value.rec "'contain' | 'none' | 'auto'"]
+  [%value.rec "'contain' | 'none' | 'auto' | <wide-keyword>"]
 
 and property_overscroll_behavior_inline =
-  [%value.rec "'contain' | 'none' | 'auto'"]
+  [%value.rec "'contain' | 'none' | 'auto' | <wide-keyword>"]
 
-and property_overscroll_behavior_x = [%value.rec "'contain' | 'none' | 'auto'"]
-and property_overscroll_behavior_y = [%value.rec "'contain' | 'none' | 'auto'"]
+and property_overscroll_behavior_x = [%value.rec "'contain' | 'none' | 'auto' | <wide-keyword>"]
+and property_overscroll_behavior_y = [%value.rec "'contain' | 'none' | 'auto' | <wide-keyword>"]
 
 and property_padding =
   [%value.rec
-    "[ <extended-length> | <extended-percentage> | <interpolation> ]{1,4}"]
+    "[ <extended-length> | <extended-percentage> | <interpolation> | <wide-keyword> ]{1,4}"]
 
-and property_padding_block = [%value.rec "[ <'padding-left'> ]{1,2}"]
-and property_padding_block_end = [%value.rec "<'padding-left'>"]
-and property_padding_block_start = [%value.rec "<'padding-left'>"]
+and property_padding_block = [%value.rec "[ <'padding-left'> | <wide-keyword> ]{1,2}"]
+and property_padding_block_end = [%value.rec "<'padding-left'> | <wide-keyword>"]
+and property_padding_block_start = [%value.rec "<'padding-left'> | <wide-keyword>"]
 
 and property_padding_bottom =
-  [%value.rec "<extended-length> | <extended-percentage>"]
+  [%value.rec "<extended-length> | <extended-percentage> | <wide-keyword>"]
 
-and property_padding_inline = [%value.rec "[ <'padding-left'> ]{1,2}"]
-and property_padding_inline_end = [%value.rec "<'padding-left'>"]
-and property_padding_inline_start = [%value.rec "<'padding-left'>"]
+and property_padding_inline = [%value.rec "[ <'padding-left'> | <wide-keyword> ]{1,2}"]
+and property_padding_inline_end = [%value.rec "<'padding-left'> | <wide-keyword>"]
+and property_padding_inline_start = [%value.rec "<'padding-left'> | <wide-keyword>"]
 
 and property_padding_left =
-  [%value.rec "<extended-length> | <extended-percentage>"]
+  [%value.rec "<extended-length> | <extended-percentage> | <wide-keyword>"]
 
 and property_padding_right =
-  [%value.rec "<extended-length> | <extended-percentage>"]
+  [%value.rec "<extended-length> | <extended-percentage> | <wide-keyword>"]
 
 and property_padding_top =
-  [%value.rec "<extended-length> | <extended-percentage>"]
+  [%value.rec "<extended-length> | <extended-percentage> | <wide-keyword>"]
 
 and property_page_break_after =
   [%value.rec
-    "'auto' | 'always' | 'avoid' | 'left' | 'right' | 'recto' | 'verso'"]
+    "'auto' | 'always' | 'avoid' | 'left' | 'right' | 'recto' | 'verso' | <wide-keyword>"]
 
 and property_page_break_before =
   [%value.rec
-    "'auto' | 'always' | 'avoid' | 'left' | 'right' | 'recto' | 'verso'"]
+    "'auto' | 'always' | 'avoid' | 'left' | 'right' | 'recto' | 'verso' | <wide-keyword>"]
 
-and property_page_break_inside = [%value.rec "'auto' | 'avoid'"]
+and property_page_break_inside = [%value.rec "'auto' | 'avoid' | <wide-keyword>"]
 
 and property_paint_order =
-  [%value.rec "'normal' | 'fill' || 'stroke' || 'markers'"]
+  [%value.rec "'normal' | 'fill' || 'stroke' || 'markers' | <wide-keyword>"]
 
-and property_pause = [%value.rec "<'pause-before'> [ <'pause-after'> ]?"]
+and property_pause = [%value.rec "<'pause-before'> [ <'pause-after'> ]? | <wide-keyword>"]
 
 and property_pause_after =
   [%value.rec
     "<extended-time> | 'none' | 'x-weak' | 'weak' | 'medium' | 'strong' | \
-     'x-strong'"]
+     'x-strong' | <wide-keyword>"]
 
 and property_pause_before =
   [%value.rec
     "<extended-time> | 'none' | 'x-weak' | 'weak' | 'medium' | 'strong' | \
-     'x-strong'"]
+     'x-strong' | <wide-keyword>"]
 
-and property_perspective = [%value.rec "'none' | <extended-length>"]
-and property_perspective_origin = [%value.rec "<position>"]
+and property_perspective = [%value.rec "'none' | <extended-length> | <wide-keyword>"]
+and property_perspective_origin = [%value.rec "<position> | <wide-keyword>"]
 
 and property_place_content =
-  [%value.rec "<'align-content'> [ <'justify-content'> ]?"]
+  [%value.rec "<'align-content'> [ <'justify-content'> ]? | <wide-keyword>"]
 
-and property_place_items = [%value.rec "<'align-items'> [ <'justify-items'> ]?"]
-and property_place_self = [%value.rec "<'align-self'> [ <'justify-self'> ]?"]
+and property_place_items = [%value.rec "<'align-items'> [ <'justify-items'> ]? | <wide-keyword>"]
+and property_place_self = [%value.rec "<'align-self'> [ <'justify-self'> ]? | <wide-keyword>"]
 
 and property_pointer_events =
   [%value.rec
     "'auto' | 'none' | 'visiblePainted' | 'visibleFill' | 'visibleStroke' | \
-     'visible' | 'painted' | 'fill' | 'stroke' | 'all' | 'inherit'"]
+     'visible' | 'painted' | 'fill' | 'stroke' | 'all' | <wide-keyword>"]
 
 and property_position =
   [%value.rec
-    "'static' | 'relative' | 'absolute' | 'sticky' | 'fixed' | '-webkit-sticky'"]
+    "'static' | 'relative' | 'absolute' | 'sticky' | 'fixed' | '-webkit-sticky' | <wide-keyword>"]
 
-and property_quotes = [%value.rec "'none' | 'auto' | [ <string> <string> ]+"]
+and property_quotes = [%value.rec "'none' | 'auto' | [ <string> <string> ]+ | <wide-keyword>"]
 
 and property_resize =
   [%value.rec
-    "'none' | 'both' | 'horizontal' | 'vertical' | 'block' | 'inline'"]
+    "'none' | 'both' | 'horizontal' | 'vertical' | 'block' | 'inline' | <wide-keyword>"]
 
-and property_rest = [%value.rec "<'rest-before'> [ <'rest-after'> ]?"]
+and property_rest = [%value.rec "<'rest-before'> [ <'rest-after'> ]? | <wide-keyword>"]
 
 and property_rest_after =
   [%value.rec
     "<extended-time> | 'none' | 'x-weak' | 'weak' | 'medium' | 'strong' | \
-     'x-strong'"]
+     'x-strong' | <wide-keyword>"]
 
 and property_rest_before =
   [%value.rec
     "<extended-time> | 'none' | 'x-weak' | 'weak' | 'medium' | 'strong' | \
-     'x-strong'"]
+     'x-strong' | <wide-keyword>"]
 
 and property_right =
-  [%value.rec "<extended-length> | <extended-percentage> | 'auto'"]
+  [%value.rec "<extended-length> | <extended-percentage> | 'auto' | <wide-keyword>"]
 
 and property_rotate =
   [%value.rec
     "'none' | <extended-angle> | [ 'x' | 'y' | 'z' | [ <number> ]{3} ] && \
-     <extended-angle>"]
+     <extended-angle> | <wide-keyword>"]
 
 and property_row_gap =
-  [%value.rec "'normal' | <extended-length> | <extended-percentage>"]
+  [%value.rec "'normal' | <extended-length> | <extended-percentage> | <wide-keyword>"]
 
 and property_ruby_align =
-  [%value.rec "'start' | 'center' | 'space-between' | 'space-around'"]
+  [%value.rec "'start' | 'center' | 'space-between' | 'space-around' | <wide-keyword>"]
 
-and property_ruby_merge = [%value.rec "'separate' | 'collapse' | 'auto'"]
-and property_ruby_position = [%value.rec "'over' | 'under' | 'inter-character'"]
-and property_scale = [%value.rec "'none' | [ <number-percentage> ]{1,3}"]
-and property_scroll_behavior = [%value.rec "'auto' | 'smooth'"]
-and property_scroll_margin = [%value.rec "[ <extended-length> ]{1,4}"]
-and property_scroll_margin_block = [%value.rec "[ <extended-length> ]{1,2}"]
-and property_scroll_margin_block_end = [%value.rec "<extended-length>"]
-and property_scroll_margin_block_start = [%value.rec "<extended-length>"]
-and property_scroll_margin_bottom = [%value.rec "<extended-length>"]
-and property_scroll_margin_inline = [%value.rec "[ <extended-length> ]{1,2}"]
-and property_scroll_margin_inline_end = [%value.rec "<extended-length>"]
-and property_scroll_margin_inline_start = [%value.rec "<extended-length>"]
-and property_scroll_margin_left = [%value.rec "<extended-length>"]
-and property_scroll_margin_right = [%value.rec "<extended-length>"]
-and property_scroll_margin_top = [%value.rec "<extended-length>"]
+and property_ruby_merge = [%value.rec "'separate' | 'collapse' | 'auto' | <wide-keyword>"]
+and property_ruby_position = [%value.rec "'over' | 'under' | 'inter-character' | <wide-keyword>"]
+and property_scale = [%value.rec "'none' | [ <number-percentage> ]{1,3} | <wide-keyword>"]
+and property_scroll_behavior = [%value.rec "'auto' | 'smooth' | <wide-keyword>"]
+and property_scroll_margin = [%value.rec "[ <extended-length> ]{1,4} | <wide-keyword>"]
+and property_scroll_margin_block = [%value.rec "[ <extended-length> ]{1,2} | <wide-keyword>"]
+and property_scroll_margin_block_end = [%value.rec "<extended-length> | <wide-keyword>"]
+and property_scroll_margin_block_start = [%value.rec "<extended-length> | <wide-keyword>"]
+and property_scroll_margin_bottom = [%value.rec "<extended-length> | <wide-keyword>"]
+and property_scroll_margin_inline = [%value.rec "[ <extended-length> ]{1,2} | <wide-keyword>"]
+and property_scroll_margin_inline_end = [%value.rec "<extended-length> | <wide-keyword>"]
+and property_scroll_margin_inline_start = [%value.rec "<extended-length> | <wide-keyword>"]
+and property_scroll_margin_left = [%value.rec "<extended-length> | <wide-keyword>"]
+and property_scroll_margin_right = [%value.rec "<extended-length> | <wide-keyword>"]
+and property_scroll_margin_top = [%value.rec "<extended-length> | <wide-keyword>"]
 
 and property_scroll_padding =
-  [%value.rec "[ 'auto' | <extended-length> | <extended-percentage> ]{1,4}"]
+  [%value.rec "[ 'auto' | <extended-length> | <extended-percentage> ]{1,4} | <wide-keyword>"]
 
 and property_scroll_padding_block =
-  [%value.rec "[ 'auto' | <extended-length> | <extended-percentage> ]{1,2}"]
+  [%value.rec "[ 'auto' | <extended-length> | <extended-percentage> ]{1,2} | <wide-keyword>"]
 
 and property_scroll_padding_block_end =
-  [%value.rec "'auto' | <extended-length> | <extended-percentage>"]
+  [%value.rec "'auto' | <extended-length> | <extended-percentage> | <wide-keyword>"]
 
 and property_scroll_padding_block_start =
-  [%value.rec "'auto' | <extended-length> | <extended-percentage>"]
+  [%value.rec "'auto' | <extended-length> | <extended-percentage> | <wide-keyword>"]
 
 and property_scroll_padding_bottom =
-  [%value.rec "'auto' | <extended-length> | <extended-percentage>"]
+  [%value.rec "'auto' | <extended-length> | <extended-percentage> | <wide-keyword>"]
 
 and property_scroll_padding_inline =
-  [%value.rec "[ 'auto' | <extended-length> | <extended-percentage> ]{1,2}"]
+  [%value.rec "[ 'auto' | <extended-length> | <extended-percentage> ]{1,2} | <wide-keyword>"]
 
 and property_scroll_padding_inline_end =
-  [%value.rec "'auto' | <extended-length> | <extended-percentage>"]
+  [%value.rec "'auto' | <extended-length> | <extended-percentage> | <wide-keyword>"]
 
 and property_scroll_padding_inline_start =
-  [%value.rec "'auto' | <extended-length> | <extended-percentage>"]
+  [%value.rec "'auto' | <extended-length> | <extended-percentage> | <wide-keyword>"]
 
 and property_scroll_padding_left =
-  [%value.rec "'auto' | <extended-length> | <extended-percentage>"]
+  [%value.rec "'auto' | <extended-length> | <extended-percentage> | <wide-keyword>"]
 
 and property_scroll_padding_right =
-  [%value.rec "'auto' | <extended-length> | <extended-percentage>"]
+  [%value.rec "'auto' | <extended-length> | <extended-percentage> | <wide-keyword>"]
 
 and property_scroll_padding_top =
-  [%value.rec "'auto' | <extended-length> | <extended-percentage>"]
+  [%value.rec "'auto' | <extended-length> | <extended-percentage> | <wide-keyword>"]
 
 and property_scroll_snap_align =
-  [%value.rec "[ 'none' | 'start' | 'end' | 'center' ]{1,2}"]
+  [%value.rec "[ 'none' | 'start' | 'end' | 'center' ]{1,2} | <wide-keyword>"]
 
-and property_scroll_snap_coordinate = [%value.rec "'none' | [ <position> ]#"]
-and property_scroll_snap_destination = [%value.rec "<position>"]
+and property_scroll_snap_coordinate = [%value.rec "'none' | [ <position> ]# | <wide-keyword>"]
+and property_scroll_snap_destination = [%value.rec "<position> | <wide-keyword>"]
 
 and property_scroll_snap_points_x =
-  [%value.rec "'none' | repeat( <extended-length> | <extended-percentage> )"]
+  [%value.rec "'none' | repeat( <extended-length> | <extended-percentage> ) | <wide-keyword>"]
 
 and property_scroll_snap_points_y =
-  [%value.rec "'none' | repeat( <extended-length> | <extended-percentage> )"]
+  [%value.rec "'none' | repeat( <extended-length> | <extended-percentage> ) | <wide-keyword>"]
 
-and property_scroll_snap_stop = [%value.rec "'normal' | 'always'"]
+and property_scroll_snap_stop = [%value.rec "'normal' | 'always' | <wide-keyword>"]
 
 and property_scroll_snap_type =
   [%value.rec
     "'none' | [ 'x' | 'y' | 'block' | 'inline' | 'both' ] [ 'mandatory' | \
-     'proximity' ]?"]
+     'proximity' ]? | <wide-keyword>"]
 
 and property_scroll_snap_type_x =
-  [%value.rec "'none' | 'mandatory' | 'proximity'"]
+  [%value.rec "'none' | 'mandatory' | 'proximity' | <wide-keyword>"]
 
 and property_scroll_snap_type_y =
-  [%value.rec "'none' | 'mandatory' | 'proximity'"]
+  [%value.rec "'none' | 'mandatory' | 'proximity' | <wide-keyword>"]
 
-and property_scrollbar_color = [%value.rec "'auto' | [ <color> <color> ]"]
-and property_scrollbar_width = [%value.rec "'auto' | 'thin' | 'none'"]
+and property_scrollbar_color = [%value.rec "'auto' | [ <color> <color> ] | <wide-keyword>"]
+and property_scrollbar_width = [%value.rec "'auto' | 'thin' | 'none' | <wide-keyword>"]
 
 and property_scrollbar_gutter =
-  [%value.rec "'auto' | 'stable' && 'both-edges'?"]
+  [%value.rec "<interpolation> | 'auto' | 'stable' && 'both-edges'? | <wide-keyword>"]
 
-and property_scrollbar_3dlight_color = [%value.rec "<color>"]
-and property_scrollbar_arrow_color = [%value.rec "<color>"]
-and property_scrollbar_base_color = [%value.rec "<color>"]
-and property_scrollbar_darkshadow_color = [%value.rec "<color>"]
-and property_scrollbar_face_color = [%value.rec "<color>"]
-and property_scrollbar_highlight_color = [%value.rec "<color>"]
-and property_scrollbar_shadow_color = [%value.rec "<color>"]
-and property_scrollbar_track_color = [%value.rec "<color>"]
-and property_shape_image_threshold = [%value.rec "<alpha-value>"]
+and property_scrollbar_3dlight_color = [%value.rec "<color> | <wide-keyword>"]
+and property_scrollbar_arrow_color = [%value.rec "<color> | <wide-keyword>"]
+and property_scrollbar_base_color = [%value.rec "<color> | <wide-keyword>"]
+and property_scrollbar_darkshadow_color = [%value.rec "<color> | <wide-keyword>"]
+and property_scrollbar_face_color = [%value.rec "<color> | <wide-keyword>"]
+and property_scrollbar_highlight_color = [%value.rec "<color> | <wide-keyword>"]
+and property_scrollbar_shadow_color = [%value.rec "<color> | <wide-keyword>"]
+and property_scrollbar_track_color = [%value.rec "<color> | <wide-keyword>"]
+and property_shape_image_threshold = [%value.rec "<alpha-value> | <wide-keyword>"]
 
 and property_shape_margin =
-  [%value.rec "<extended-length> | <extended-percentage>"]
+  [%value.rec "<extended-length> | <extended-percentage> | <wide-keyword>"]
 
 and property_shape_outside =
-  [%value.rec "'none' | <shape-box> || <basic-shape> | <image>"]
+  [%value.rec "'none' | <shape-box> || <basic-shape> | <image> | <wide-keyword>"]
 
 and property_shape_rendering =
-  [%value.rec "'auto' | 'optimizeSpeed' | 'crispEdges' | 'geometricPrecision'"]
+  [%value.rec "'auto' | 'optimizeSpeed' | 'crispEdges' | 'geometricPrecision' | <wide-keyword>"]
 
-and property_speak = [%value.rec "'auto' | 'none' | 'normal'"]
+and property_speak = [%value.rec "'auto' | 'none' | 'normal' | <wide-keyword>"]
 
 and property_speak_as =
   [%value.rec
     "'normal' | 'spell-out' || 'digits' || [ 'literal-punctuation' | \
-     'no-punctuation' ]"]
+     'no-punctuation' ] | <wide-keyword>"]
 
 and property_src =
   [%value.rec
-    "[ <url> [ format( [ <string> ]# ) ]? | local( <family-name> ) ]#"]
+    "[ <url> [ format( [ <string> ]# ) ]? | local( <family-name> ) ]# | <wide-keyword>"]
 
-and property_stroke = [%value.rec "<paint>"]
-and property_stroke_dasharray = [%value.rec "'none' | [ [ <svg-length> ]+ ]#"]
-and property_stroke_dashoffset = [%value.rec "<svg-length>"]
-and property_stroke_linecap = [%value.rec "'butt' | 'round' | 'square'"]
-and property_stroke_linejoin = [%value.rec "'miter' | 'round' | 'bevel'"]
-and property_stroke_miterlimit = [%value.rec "<number-one-or-greater>"]
-and property_stroke_opacity = [%value.rec "<alpha-value>"]
-and property_stroke_width = [%value.rec "<svg-length>"]
-and property_tab_size = [%value.rec " <number> | <extended-length>"]
-and property_table_layout = [%value.rec "'auto' | 'fixed'"]
+and property_stroke = [%value.rec "<paint> | <wide-keyword>"]
+and property_stroke_dasharray = [%value.rec "'none' | [ [ <svg-length> ]+ ]# | <wide-keyword>"]
+and property_stroke_dashoffset = [%value.rec "<svg-length> | <wide-keyword>"]
+and property_stroke_linecap = [%value.rec "'butt' | 'round' | 'square' | <wide-keyword>"]
+and property_stroke_linejoin = [%value.rec "'miter' | 'round' | 'bevel' | <wide-keyword>"]
+and property_stroke_miterlimit = [%value.rec "<number-one-or-greater> | <wide-keyword>"]
+and property_stroke_opacity = [%value.rec "<alpha-value> | <wide-keyword>"]
+and property_stroke_width = [%value.rec "<svg-length> | <wide-keyword>"]
+and property_tab_size = [%value.rec " <number> | <extended-length> | <wide-keyword>"]
+and property_table_layout = [%value.rec "'auto' | 'fixed' | <wide-keyword>"]
 
 and property_text_autospace =
   [%value.rec
     "'none' | 'ideograph-alpha' | 'ideograph-numeric' | \
-     'ideograph-parenthesis' | 'ideograph-space'"]
+     'ideograph-parenthesis' | 'ideograph-space' | <wide-keyword>"]
 
-and property_text_blink = [%value.rec "'none' | 'blink' | 'blink-anywhere'"]
+and property_text_blink = [%value.rec "'none' | 'blink' | 'blink-anywhere' | <wide-keyword>"]
 
 and property_text_align =
   [%value.rec
     "'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | \
-     'match-parent' | 'justify-all'"]
+     'match-parent' | 'justify-all' | <wide-keyword>"]
 
 and property_text_align_all =
   [%value.rec
-    "'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | 'match-parent'"]
+    "'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | 'match-parent' | <wide-keyword>"]
 
 and property_text_align_last =
   [%value.rec
     "'auto' | 'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | \
-     'match-parent'"]
+     'match-parent' | <wide-keyword>"]
 
-and property_text_anchor = [%value.rec "'start' | 'middle' | 'end'"]
+and property_text_anchor = [%value.rec "'start' | 'middle' | 'end' | <wide-keyword>"]
 
 and property_text_combine_upright =
-  [%value.rec "'none' | 'all' | 'digits' [ <integer> ]?"]
+  [%value.rec "'none' | 'all' | 'digits' [ <integer> ]? | <wide-keyword>"]
 
 and property_text_decoration =
   [%value.rec
     "<'text-decoration-color'> || <'text-decoration-style'> || \
-     <'text-decoration-thickness'> || <'text-decoration-line'>"]
+     <'text-decoration-thickness'> || <'text-decoration-line'> | <wide-keyword>"]
 
-and property_text_justify_trim = [%value.rec "'none' | 'all' | 'auto'"]
+and property_text_justify_trim = [%value.rec "'none' | 'all' | 'auto' | <wide-keyword>"]
 
 and property_text_kashida =
-  [%value.rec "'none' | 'horizontal' | 'vertical' | 'both'"]
+  [%value.rec "'none' | 'horizontal' | 'vertical' | 'both' | <wide-keyword>"]
 
-and property_text_kashida_space = [%value.rec "'normal' | 'pre' | 'post'"]
-and property_text_decoration_color = [%value.rec "<color>"]
+and property_text_kashida_space = [%value.rec "'normal' | 'pre' | 'post' | <wide-keyword>"]
+and property_text_decoration_color = [%value.rec "<color> | <wide-keyword>"]
 
 (* Spec doesn't contain spelling-error and grammar-error: https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration-line but this list used to have them | 'spelling-error' | 'grammar-error'. Leaving this comment here for reference *)
 (* and this definition has changed from the origianl, it might be a bug on the spec or our Generator,
@@ -2217,95 +2215,95 @@ and property_text_decoration_color = [%value.rec "<color>"]
 and property_text_decoration_line =
   [%value.rec
     "'none' | <interpolation> | [ 'underline' || 'overline' || 'line-through' \
-     || 'blink' ]"]
+     || 'blink' ] | <wide-keyword>"]
 
 and property_text_decoration_skip =
   [%value.rec
     "'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' \
-     ] || 'edges' || 'box-decoration'"]
+     ] || 'edges' || 'box-decoration' | <wide-keyword>"]
 
 and property_text_decoration_skip_self =
   [%value.rec
     "'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' \
-     ] || 'edges' || 'box-decoration'"]
+     ] || 'edges' || 'box-decoration' | <wide-keyword>"]
 
-and property_text_decoration_skip_ink = [%value.rec "'auto' | 'all' | 'none'"]
-and property_text_decoration_skip_box = [%value.rec "'none' | 'all'"]
+and property_text_decoration_skip_ink = [%value.rec "'auto' | 'all' | 'none' | <wide-keyword>"]
+and property_text_decoration_skip_box = [%value.rec "'none' | 'all' | <wide-keyword>"]
 
 and property_text_decoration_skip_spaces =
   [%value.rec
     "'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' \
-     ] || 'edges' || 'box-decoration'"]
+     ] || 'edges' || 'box-decoration' | <wide-keyword>"]
 
-and property_text_decoration_skip_inset = [%value.rec "'none' | 'auto'"]
+and property_text_decoration_skip_inset = [%value.rec "'none' | 'auto' | <wide-keyword>"]
 
 and property_text_decoration_style =
-  [%value.rec "'solid' | 'double' | 'dotted' | 'dashed' | 'wavy'"]
+  [%value.rec "'solid' | 'double' | 'dotted' | 'dashed' | 'wavy' | <wide-keyword>"]
 
 and property_text_decoration_thickness =
   [%value.rec
-    "'auto' | 'from-font' | <extended-length> | <extended-percentage>"]
+    "'auto' | 'from-font' | <extended-length> | <extended-percentage> | <wide-keyword>"]
 
 and property_text_emphasis =
-  [%value.rec "<'text-emphasis-style'> || <'text-emphasis-color'>"]
+  [%value.rec "<'text-emphasis-style'> || <'text-emphasis-color'> | <wide-keyword>"]
 
-and property_text_emphasis_color = [%value.rec "<color>"]
+and property_text_emphasis_color = [%value.rec "<color> | <wide-keyword>"]
 
 and property_text_emphasis_position =
-  [%value.rec "[ 'over' | 'under' ] && [ 'right' | 'left' ]?"]
+  [%value.rec "[ 'over' | 'under' ] && [ 'right' | 'left' ]? | <wide-keyword>"]
 
 and property_text_emphasis_style =
   [%value.rec
     "'none' | [ 'filled' | 'open' ] || [ 'dot' | 'circle' | 'double-circle' | \
-     'triangle' | 'sesame' ] | <string>"]
+     'triangle' | 'sesame' ] | <string> | <wide-keyword>"]
 
 and property_text_indent =
   [%value.rec
-    "[<extended-length> | <extended-percentage>] && [ 'hanging' ]? && [ \
-     'each-line' ]?"]
+    "[[<extended-length> | <extended-percentage>] && [ 'hanging' ]? && [ \
+     'each-line' ]?] | <wide-keyword>"]
 
 and property_text_justify =
-  [%value.rec "'auto' | 'inter-character' | 'inter-word' | 'none'"]
+  [%value.rec "'auto' | 'inter-character' | 'inter-word' | 'none' | <wide-keyword>"]
 
-and property_text_orientation = [%value.rec "'mixed' | 'upright' | 'sideways'"]
+and property_text_orientation = [%value.rec "'mixed' | 'upright' | 'sideways' | <wide-keyword>"]
 
 and property_text_overflow =
-  [%value.rec "[ 'clip' | 'ellipsis' | <string> ]{1,2}"]
+  [%value.rec "[ 'clip' | 'ellipsis' | <string> ]{1,2} | <wide-keyword>"]
 
 and property_text_rendering =
   [%value.rec
-    "'auto' | 'optimizeSpeed' | 'optimizeLegibility' | 'geometricPrecision'"]
+    "'auto' | 'optimizeSpeed' | 'optimizeLegibility' | 'geometricPrecision' | <wide-keyword>"]
 
 and property_text_shadow =
-  [%value.rec "'none' | <interpolation> | [ <shadow-t> ]#"]
+  [%value.rec "'none' | <interpolation> | [ <shadow-t> ]# | <wide-keyword>"]
 
 and property_text_size_adjust =
-  [%value.rec "'none' | 'auto' | <extended-percentage>"]
+  [%value.rec "'none' | 'auto' | <extended-percentage> | <wide-keyword>"]
 
 and property_text_transform =
   [%value.rec
     "'none' | 'capitalize' | 'uppercase' | 'lowercase' | 'full-width' | \
-     'full-size-kana'"]
+     'full-size-kana' | <wide-keyword>"]
 
 and property_text_underline_offset =
-  [%value.rec "'auto' | <extended-length> | <extended-percentage>"]
+  [%value.rec "'auto' | <extended-length> | <extended-percentage> | <wide-keyword>"]
 
 and property_text_underline_position =
-  [%value.rec "'auto' | 'from-font' | 'under' || [ 'left' | 'right' ]"]
+  [%value.rec "'auto' | 'from-font' | 'under' || [ 'left' | 'right' ] | <wide-keyword>"]
 
 and property_top =
-  [%value.rec "<extended-length> | <extended-percentage> | 'auto'"]
+  [%value.rec "<extended-length> | <extended-percentage> | 'auto' | <wide-keyword>"]
 
 and property_touch_action =
   [%value.rec
     "'auto' | 'none' | [ 'pan-x' | 'pan-left' | 'pan-right' ] || [ 'pan-y' | \
-     'pan-up' | 'pan-down' ] || 'pinch-zoom' | 'manipulation'"]
+     'pan-up' | 'pan-down' ] || 'pinch-zoom' | 'manipulation' | <wide-keyword>"]
 
-and property_transform = [%value.rec "'none' | <transform-list>"]
+and property_transform = [%value.rec "'none' | <transform-list> | <wide-keyword>"]
 
 and property_transform_box =
   [%value.rec
-    "'content-box' | 'border-box' | 'fill-box' | 'stroke-box' | 'view-box'"]
+    "['content-box' | 'border-box' | 'fill-box' | 'stroke-box' | 'view-box' | <wide-keyword>]"]
 
 and property_transform_origin =
   [%value.rec
@@ -2313,342 +2311,342 @@ and property_transform_origin =
     \  | [ 'left' | 'center' | 'right' | <length-percentage> ] [ 'top' | \
      'center' | 'bottom' | <length-percentage> ] <length>?\n\
     \  | [[ 'center' | 'left' | 'right' ] && [ 'center' | 'top' | 'bottom' ]] \
-     <length>? "]
+     <length>?  | <wide-keyword>"]
 
-and property_transform_style = [%value.rec "'flat' | 'preserve-3d'"]
+and property_transform_style = [%value.rec "'flat' | 'preserve-3d' | <wide-keyword>"]
 
 and property_transition =
-  [%value.rec "[ <single-transition> | <single-transition-no-interp> ]#"]
+[%value.rec "[ <single-transition> | <single-transition-no-interp> | <wide-keyword> ]#"]
 
-and property_transition_behavior = [%value.rec "<transition-behavior-value>#"]
-and property_transition_delay = [%value.rec "[ <extended-time> ]#"]
-and property_transition_duration = [%value.rec "[ <extended-time> ]#"]
+and property_transition_behavior = [%value.rec "<transition-behavior-value># | <wide-keyword>"]
+and property_transition_delay = [%value.rec "[ <extended-time> ]# | <wide-keyword>"]
+and property_transition_duration = [%value.rec "[ <extended-time> ]# | <wide-keyword>"]
 
 and property_transition_property =
-  [%value.rec "[ <single-transition-property> ]# | 'none'"]
+  [%value.rec "[ <single-transition-property> ]# | 'none' | <wide-keyword>"]
 
-and property_transition_timing_function = [%value.rec "[ <timing-function> ]#"]
+and property_transition_timing_function = [%value.rec "[ <timing-function> ]# | <wide-keyword>"]
 
 and property_translate =
-  [%value.rec "'none' | <length-percentage> [ <length-percentage> <length>? ]?"]
+  [%value.rec "'none' | <wide-keyword> | <length-percentage> [ <length-percentage> <length>? ]?"]
 
 and property_unicode_bidi =
   [%value.rec
     "'normal' | 'embed' | 'isolate' | 'bidi-override' | 'isolate-override' | \
      'plaintext' | '-moz-isolate' | '-moz-isolate-override' | '-moz-plaintext' \
-     | '-webkit-isolate'"]
+     | '-webkit-isolate' | <wide-keyword>"]
 
-and property_unicode_range = [%value.rec "[ <urange> ]#"]
+and property_unicode_range = [%value.rec "[ <urange> ]# | <wide-keyword>"]
 
 and property_user_select =
-  [%value.rec "'auto' | 'text' | 'none' | 'contain' | 'all' | <interpolation>"]
+  [%value.rec "'auto' | 'text' | 'none' | 'contain' | 'all' | <interpolation> | <wide-keyword>"]
 
 and property_vertical_align =
   [%value.rec
     "'baseline' | 'sub' | 'super' | 'text-top' | 'text-bottom' | 'middle' | \
-     'top' | 'bottom' | <extended-percentage> | <extended-length>"]
+     'top' | 'bottom' | <extended-percentage> | <extended-length> | <wide-keyword>"]
 
 and property_visibility =
-  [%value.rec "'visible' | 'hidden' | 'collapse' | <interpolation>"]
+  [%value.rec "'visible' | 'hidden' | 'collapse' | <interpolation> | <wide-keyword>"]
 
 and property_voice_balance =
   [%value.rec
-    "<number> | 'left' | 'center' | 'right' | 'leftwards' | 'rightwards'"]
+    "<number> | 'left' | 'center' | 'right' | 'leftwards' | 'rightwards' | <wide-keyword>"]
 
-and property_voice_duration = [%value.rec "'auto' | <extended-time>"]
+and property_voice_duration = [%value.rec "'auto' | <extended-time> | <wide-keyword>"]
 
 and property_voice_family =
   [%value.rec
     "[ [ <family-name> | <generic-voice> ] ',' ]* [ <family-name> | \
-     <generic-voice> ] | 'preserve'"]
+     <generic-voice> ] | 'preserve' | <wide-keyword>"]
 
 and property_voice_pitch =
   [%value.rec
     "<extended-frequency> && 'absolute' | [ 'x-low' | 'low' | 'medium' | \
      'high' | 'x-high' ] || [ <extended-frequency> | <semitones> | \
-     <extended-percentage> ]"]
+     <extended-percentage> ] | <wide-keyword>"]
 
 and property_voice_range =
   [%value.rec
     "<extended-frequency> && 'absolute' | [ 'x-low' | 'low' | 'medium' | \
      'high' | 'x-high' ] || [ <extended-frequency> | <semitones> | \
-     <extended-percentage> ]"]
+     <extended-percentage> ] | <wide-keyword>"]
 
 and property_voice_rate =
   [%value.rec
     "[ 'normal' | 'x-slow' | 'slow' | 'medium' | 'fast' | 'x-fast' ] || \
-     <extended-percentage>"]
+     <extended-percentage> | <wide-keyword>"]
 
 and property_voice_stress =
-  [%value.rec "'normal' | 'strong' | 'moderate' | 'none' | 'reduced'"]
+  [%value.rec "'normal' | 'strong' | 'moderate' | 'none' | 'reduced' | <wide-keyword>"]
 
 and property_voice_volume =
   [%value.rec
     "'silent' | [ 'x-soft' | 'soft' | 'medium' | 'loud' | 'x-loud' ] || \
-     <decibel>"]
+     <decibel> | <wide-keyword>"]
 
 and property_white_space =
   [%value.rec
-    "'normal' | 'pre' | 'nowrap' | 'pre-wrap' | 'pre-line' | 'break-spaces'"]
+    "'normal' | 'pre' | 'nowrap' | 'pre-wrap' | 'pre-line' | 'break-spaces' | <wide-keyword>"]
 
-and property_widows = [%value.rec "<integer>"]
+and property_widows = [%value.rec "<integer> | <wide-keyword>"]
 
 and property_width =
   [%value.rec
-    "'auto' | <extended-length> | <extended-percentage> | 'min-content' | \
+    "'auto' | <interpolation> | <extended-length> | <extended-percentage> | 'min-content' | \
      'max-content' | 'fit-content' | fit-content( <extended-length> | \
-     <extended-percentage> )"]
+     <extended-percentage> ) | <wide-keyword>"]
 
-and property_will_change = [%value.rec "'auto' | [ <animateable-feature> ]#"]
+and property_will_change = [%value.rec "'auto' | [ <animateable-feature> ]# | <wide-keyword>"]
 
 and property_word_break =
-  [%value.rec "'normal' | 'break-all' | 'keep-all' | 'break-word'"]
+  [%value.rec "'normal' | 'break-all' | 'keep-all' | 'break-word' | <wide-keyword>"]
 
 and property_word_spacing =
-  [%value.rec "'normal' | <extended-length> | <extended-percentage>"]
+  [%value.rec "'normal' | <extended-length> | <extended-percentage> | <wide-keyword>"]
 
-and property_word_wrap = [%value.rec "'normal' | 'break-word' | 'anywhere'"]
+and property_word_wrap = [%value.rec "'normal' | 'break-word' | 'anywhere' | <wide-keyword>"]
 
 and property_writing_mode =
   [%value.rec
     "'horizontal-tb' | 'vertical-rl' | 'vertical-lr' | 'sideways-rl' | \
-     'sideways-lr' | <svg-writing-mode>"]
+     'sideways-lr' | <svg-writing-mode> | <wide-keyword>"]
 
-and property_z_index = [%value.rec "'auto' | <integer> | <interpolation>"]
+and property_z_index = [%value.rec "'auto' | <integer> | <interpolation> | <wide-keyword>"]
 
 and property_zoom =
-  [%value.rec "'normal' | 'reset' | <number> | <extended-percentage>"]
+  [%value.rec "'normal' | 'reset' | <number> | <extended-percentage> | <wide-keyword>"]
 
 and property_container =
-  [%value.rec "<'container-name'> [ '/' <'container-type'> ]?"]
+  [%value.rec "<'container-name'> [ '/' <'container-type'> ]? | <wide-keyword>"]
 
-and property_container_name = [%value.rec "<custom-ident>+ | 'none'"]
-and property_container_type = [%value.rec "'normal' | 'size' | 'inline-size'"]
-and property_nav_down = [%value.rec "'auto' | <integer> | <interpolation>"]
-and property_nav_left = [%value.rec "'auto' | <integer> | <interpolation>"]
-and property_nav_right = [%value.rec "'auto' | <integer> | <interpolation>"]
-and property_nav_up = [%value.rec "'auto' | <integer> | <interpolation>"]
-and property_accent_color = [%value.rec "'auto' | <color>"]
+and property_container_name = [%value.rec "<custom-ident>+ | 'none' | <wide-keyword>"]
+and property_container_type = [%value.rec "'normal' | 'size' | 'inline-size' | <wide-keyword>"]
+and property_nav_down = [%value.rec "'auto' | <integer> | <interpolation> | <wide-keyword>"]
+and property_nav_left = [%value.rec "'auto' | <integer> | <interpolation> | <wide-keyword>"]
+and property_nav_right = [%value.rec "'auto' | <integer> | <interpolation> | <wide-keyword>"]
+and property_nav_up = [%value.rec "'auto' | <integer> | <interpolation> | <wide-keyword>"]
+and property_accent_color = [%value.rec "'auto' | <color> | <wide-keyword>"]
 
 and property_animation_composition =
-  [%value.rec "[ 'replace' | 'add' | 'accumulate' ]#"]
+  [%value.rec "[ 'replace' | 'add' | 'accumulate' ]# | <wide-keyword>"]
 
 and property_animation_range =
-  [%value.rec "[ 'normal' | <extended-length> | <extended-percentage> ]{1,2}"]
+  [%value.rec "[ 'normal' | <extended-length> | <extended-percentage> ]{1,2} | <wide-keyword>"]
 
 and property_animation_range_end =
-  [%value.rec "'normal' | <extended-length> | <extended-percentage>"]
+  [%value.rec "'normal' | <extended-length> | <extended-percentage> | <wide-keyword>"]
 
 and property_animation_range_start =
-  [%value.rec "'normal' | <extended-length> | <extended-percentage>"]
+  [%value.rec "'normal' | <extended-length> | <extended-percentage> | <wide-keyword>"]
 
-and property_animation_timeline = [%value.rec "[ 'none' | <custom-ident> ]#"]
-and property_field_sizing = [%value.rec "'content' | 'fixed'"]
-and property_interpolate_size = [%value.rec "'numeric-only' | 'allow-keywords'"]
-and property_media_type = [%value.rec "<ident>"]
-and property_overlay = [%value.rec "'none' | 'auto'"]
+and property_animation_timeline = [%value.rec "[ 'none' | <custom-ident> ]# | <wide-keyword>"]
+and property_field_sizing = [%value.rec "'content' | 'fixed' | <wide-keyword>"]
+and property_interpolate_size = [%value.rec "'numeric-only' | 'allow-keywords' | <wide-keyword>"]
+and property_media_type = [%value.rec "<ident> | <wide-keyword>"]
+and property_overlay = [%value.rec "'none' | 'auto' | <wide-keyword>"]
 
 and property_scroll_timeline =
   [%value.rec
-    "[ 'none' | <custom-ident> ]# [ 'block' | 'inline' | 'x' | 'y' ]#"]
+    "[ 'none' | <custom-ident> ]# [ 'block' | 'inline' | 'x' | 'y' ]# | <wide-keyword>"]
 
 and property_scroll_timeline_axis =
-  [%value.rec "[ 'block' | 'inline' | 'x' | 'y' ]#"]
+  [%value.rec "[ 'block' | 'inline' | 'x' | 'y' ]# | <wide-keyword>"]
 
-and property_scroll_timeline_name = [%value.rec "[ 'none' | <custom-ident> ]#"]
+and property_scroll_timeline_name = [%value.rec "[ 'none' | <custom-ident> ]# | <wide-keyword>"]
 
 and property_text_wrap =
-  [%value.rec "'wrap' | 'nowrap' | 'balance' | 'stable' | 'pretty'"]
+  [%value.rec "'wrap' | 'nowrap' | 'balance' | 'stable' | 'pretty' | <wide-keyword>"]
 
 and property_view_timeline =
   [%value.rec
-    "[ 'none' | <custom-ident> ]# [ 'block' | 'inline' | 'x' | 'y' ]#"]
+    "[ 'none' | <custom-ident> ]# [ 'block' | 'inline' | 'x' | 'y' ]# | <wide-keyword>"]
 
 and property_view_timeline_axis =
-  [%value.rec "[ 'block' | 'inline' | 'x' | 'y' ]#"]
+  [%value.rec "[ 'block' | 'inline' | 'x' | 'y' ]# | <wide-keyword>"]
 
 and property_view_timeline_inset =
-  [%value.rec "[ 'auto' | <extended-length> | <extended-percentage> ]{1,2}"]
+  [%value.rec "[ 'auto' | <extended-length> | <extended-percentage> ]{1,2} | <wide-keyword>"]
 
-and property_view_timeline_name = [%value.rec "[ 'none' | <custom-ident> ]#"]
-and property_view_transition_name = [%value.rec "'none' | <custom-ident>"]
-and property_anchor_name = [%value.rec "'none' | [ <dashed-ident> ]#"]
-and property_anchor_scope = [%value.rec "'none' | 'all' | [ <dashed-ident> ]#"]
-and property_position_anchor = [%value.rec "'auto' | <dashed-ident>"]
+and property_view_timeline_name = [%value.rec "[ 'none' | <custom-ident> ]# | <wide-keyword>"]
+and property_view_transition_name = [%value.rec "'none' | <custom-ident> | <wide-keyword>"]
+and property_anchor_name = [%value.rec "'none' | [ <dashed-ident> ]# | <wide-keyword>"]
+and property_anchor_scope = [%value.rec "'none' | 'all' | [ <dashed-ident> ]# | <wide-keyword>"]
+and property_position_anchor = [%value.rec "'auto' | <dashed-ident> | <wide-keyword>"]
 
 and property_position_area =
   [%value.rec
     "'none' | [ 'top' | 'bottom' | 'left' | 'right' | 'center' | 'self-start' \
-     | 'self-end' | 'start' | 'end' ]"]
+     | 'self-end' | 'start' | 'end' ] | <wide-keyword>"]
 
 and property_position_try =
-  [%value.rec "'none' | [ <dashed-ident> | <try-tactic> ]#"]
+  [%value.rec "'none' | [ <dashed-ident> | <try-tactic> ]# | <wide-keyword>"]
 
 and property_position_try_fallbacks =
-  [%value.rec "'none' | [ <dashed-ident> | <try-tactic> ]#"]
+  [%value.rec "'none' | [ <dashed-ident> | <try-tactic> ]# | <wide-keyword>"]
 
 and property_position_try_options =
-  [%value.rec "'none' | [ 'flip-block' || 'flip-inline' || 'flip-start' ]"]
+  [%value.rec "'none' | [ 'flip-block' || 'flip-inline' || 'flip-start' ] | <wide-keyword>"]
 
 and property_position_visibility =
-  [%value.rec "'always' | 'anchors-valid' | 'anchors-visible' | 'no-overflow'"]
+  [%value.rec "'always' | 'anchors-valid' | 'anchors-visible' | 'no-overflow' | <wide-keyword>"]
 
 and property_inset_area =
   [%value.rec
     "'none' | [ 'top' | 'bottom' | 'left' | 'right' | 'center' | 'self-start' \
-     | 'self-end' | 'start' | 'end' ]{1,2}"]
+     | 'self-end' | 'start' | 'end' ]{1,2} | <wide-keyword>"]
 
 and property_scroll_start =
   [%value.rec
     "'auto' | 'start' | 'end' | 'center' | 'top' | 'bottom' | 'left' | 'right' \
-     | <extended-length> | <extended-percentage>"]
+     | <extended-length> | <extended-percentage> | <wide-keyword>"]
 
 and property_scroll_start_block =
   [%value.rec
     "'auto' | 'start' | 'end' | 'center' | <extended-length> | \
-     <extended-percentage>"]
+     <extended-percentage> | <wide-keyword>"]
 
 and property_scroll_start_inline =
   [%value.rec
     "'auto' | 'start' | 'end' | 'center' | <extended-length> | \
-     <extended-percentage>"]
+     <extended-percentage> | <wide-keyword>"]
 
 and property_scroll_start_x =
   [%value.rec
     "'auto' | 'start' | 'end' | 'center' | <extended-length> | \
-     <extended-percentage>"]
+     <extended-percentage> | <wide-keyword>"]
 
 and property_scroll_start_y =
   [%value.rec
     "'auto' | 'start' | 'end' | 'center' | <extended-length> | \
-     <extended-percentage>"]
+     <extended-percentage> | <wide-keyword>"]
 
-and property_scroll_start_target = [%value.rec "'none' | 'auto'"]
-and property_scroll_start_target_block = [%value.rec "'none' | 'auto'"]
-and property_scroll_start_target_inline = [%value.rec "'none' | 'auto'"]
-and property_scroll_start_target_x = [%value.rec "'none' | 'auto'"]
-and property_scroll_start_target_y = [%value.rec "'none' | 'auto'"]
+and property_scroll_start_target = [%value.rec "'none' | 'auto' | <wide-keyword>"]
+and property_scroll_start_target_block = [%value.rec "'none' | 'auto' | <wide-keyword>"]
+and property_scroll_start_target_inline = [%value.rec "'none' | 'auto' | <wide-keyword>"]
+and property_scroll_start_target_x = [%value.rec "'none' | 'auto' | <wide-keyword>"]
+and property_scroll_start_target_y = [%value.rec "'none' | 'auto' | <wide-keyword>"]
 
 and property_text_spacing_trim =
-  [%value.rec "'normal' | 'space-all' | 'space-first' | 'trim-start'"]
+  [%value.rec "'normal' | 'space-all' | 'space-first' | 'trim-start' | <wide-keyword>"]
 
 and property_word_space_transform =
-  [%value.rec "'none' | 'auto' | 'ideograph-alpha' | 'ideograph-numeric'"]
+  [%value.rec "'none' | 'auto' | 'ideograph-alpha' | 'ideograph-numeric' | <wide-keyword>"]
 
 and property_reading_flow =
   [%value.rec
     "'normal' | 'flex-visual' | 'flex-flow' | 'grid-rows' | 'grid-columns' | \
-     'grid-order'"]
+     'grid-order' | <wide-keyword>"]
 
 and property_math_depth =
-  [%value.rec "'auto-add' | 'add(' <integer> ')' | <integer>"]
+  [%value.rec "'auto-add' | 'add(' <integer> ')' | <integer> | <wide-keyword>"]
 
-and property_math_shift = [%value.rec "'normal' | 'compact'"]
-and property_math_style = [%value.rec "'normal' | 'compact'"]
-and property_text_wrap_mode = [%value.rec "'wrap' | 'nowrap'"]
+and property_math_shift = [%value.rec "'normal' | 'compact' | <wide-keyword>"]
+and property_math_style = [%value.rec "'normal' | 'compact' | <wide-keyword>"]
+and property_text_wrap_mode = [%value.rec "'wrap' | 'nowrap' | <wide-keyword>"]
 
 and property_text_wrap_style =
-  [%value.rec "'auto' | 'balance' | 'stable' | 'pretty'"]
+  [%value.rec "'auto' | 'balance' | 'stable' | 'pretty' | <wide-keyword>"]
 
 and property_white_space_collapse =
   [%value.rec
     "'collapse' | 'preserve' | 'preserve-breaks' | 'preserve-spaces' | \
-     'break-spaces'"]
+     'break-spaces' | <wide-keyword>"]
 
 and property_text_box_trim =
-  [%value.rec "'none' | 'trim-start' | 'trim-end' | 'trim-both'"]
+  [%value.rec "'none' | 'trim-start' | 'trim-end' | 'trim-both' | <wide-keyword>"]
 
 and property_text_box_edge =
-  [%value.rec "'leading' | 'text' | 'cap' | 'ex' | 'alphabetic'"]
+  [%value.rec "'leading' | 'text' | 'cap' | 'ex' | 'alphabetic' | <wide-keyword>"]
 
 (* Print and paged media properties *)
-and property_page = [%value.rec "'auto' | <custom-ident>"]
+and property_page = [%value.rec "'auto' | <custom-ident> | <wide-keyword>"]
 
 and property_size =
   [%value.rec
     "<extended-length>{1,2} | 'auto' | [ 'A5' | 'A4' | 'A3' | 'B5' | 'B4' | \
      'JIS-B5' | 'JIS-B4' | 'letter' | 'legal' | 'ledger' ] [ 'portrait' | \
-     'landscape' ]?"]
+     'landscape' ]? | <wide-keyword>"]
 
-and property_marks = [%value.rec "'none' | 'crop' || 'cross'"]
-and property_bleed = [%value.rec "'auto' | <extended-length>"]
+and property_marks = [%value.rec "'none' | 'crop' || 'cross' | <wide-keyword>"]
+and property_bleed = [%value.rec "'auto' | <extended-length> | <wide-keyword>"]
 
 (* More modern layout and effect properties *)
-and property_backdrop_blur = [%value.rec "<extended-length>"]
-and property_scrollbar_color_legacy = [%value.rec "<color>"]
+and property_backdrop_blur = [%value.rec "<extended-length> | <wide-keyword>"]
+and property_scrollbar_color_legacy = [%value.rec "<color> | <wide-keyword>"]
 
 (* SVG paint server properties *)
-and property_stop_color = [%value.rec "<color>"]
-and property_stop_opacity = [%value.rec "<alpha-value>"]
-and property_flood_color = [%value.rec "<color>"]
-and property_flood_opacity = [%value.rec "<alpha-value>"]
-and property_lighting_color = [%value.rec "<color>"]
+and property_stop_color = [%value.rec "<color> | <wide-keyword>"]
+and property_stop_opacity = [%value.rec "<alpha-value> | <wide-keyword>"]
+and property_flood_color = [%value.rec "<color> | <wide-keyword>"]
+and property_flood_opacity = [%value.rec "<alpha-value> | <wide-keyword>"]
+and property_lighting_color = [%value.rec "<color> | <wide-keyword>"]
 
 and property_color_rendering =
-  [%value.rec "'auto' | 'optimizeSpeed' | 'optimizeQuality'"]
+  [%value.rec "'auto' | 'optimizeSpeed' | 'optimizeQuality' | <wide-keyword>"]
 
-and property_vector_effect = [%value.rec "'none' | 'non-scaling-stroke'"]
+and property_vector_effect = [%value.rec "'none' | 'non-scaling-stroke' | <wide-keyword>"]
 
 (* SVG geometry properties *)
-and property_cx = [%value.rec "<extended-length> | <extended-percentage>"]
-and property_cy = [%value.rec "<extended-length> | <extended-percentage>"]
-and property_d = [%value.rec "'none' | <string>"]
-and property_r = [%value.rec "<extended-length> | <extended-percentage>"]
+and property_cx = [%value.rec "<extended-length> | <extended-percentage> | <wide-keyword>"]
+and property_cy = [%value.rec "<extended-length> | <extended-percentage> | <wide-keyword>"]
+and property_d = [%value.rec "'none' | <string> | <wide-keyword>"]
+and property_r = [%value.rec "<extended-length> | <extended-percentage> | <wide-keyword>"]
 
 and property_rx =
-  [%value.rec "'auto' | <extended-length> | <extended-percentage>"]
+  [%value.rec "'auto' | <extended-length> | <extended-percentage> | <wide-keyword>"]
 
 and property_ry =
-  [%value.rec "'auto' | <extended-length> | <extended-percentage>"]
+  [%value.rec "'auto' | <extended-length> | <extended-percentage> | <wide-keyword>"]
 
-and property_x = [%value.rec "<extended-length> | <extended-percentage>"]
-and property_y = [%value.rec "<extended-length> | <extended-percentage>"]
+and property_x = [%value.rec "<extended-length> | <extended-percentage> | <wide-keyword>"]
+and property_y = [%value.rec "<extended-length> | <extended-percentage> | <wide-keyword>"]
 
 (* Contain intrinsic sizing *)
 and property_contain_intrinsic_size =
-  [%value.rec "'none' | [ 'auto' ]? <extended-length>{1,2}"]
+  [%value.rec "'none' | [ 'auto' ]? <extended-length>{1,2} | <wide-keyword>"]
 
 and property_contain_intrinsic_width =
-  [%value.rec "'none' | 'auto' <extended-length> | <extended-length>"]
+  [%value.rec "'none' | 'auto' <extended-length> | <extended-length> | <wide-keyword>"]
 
 and property_contain_intrinsic_height =
-  [%value.rec "'none' | 'auto' <extended-length> | <extended-length>"]
+  [%value.rec "'none' | 'auto' <extended-length> | <extended-length> | <wide-keyword>"]
 
 and property_contain_intrinsic_block_size =
-  [%value.rec "'none' | 'auto' <extended-length> | <extended-length>"]
+  [%value.rec "'none' | 'auto' <extended-length> | <extended-length> | <wide-keyword>"]
 
 and property_contain_intrinsic_inline_size =
-  [%value.rec "'none' | 'auto' <extended-length> | <extended-length>"]
+  [%value.rec "'none' | 'auto' <extended-length> | <extended-length> | <wide-keyword>"]
 
 (* Print *)
-and property_print_color_adjust = [%value.rec "'economy' | 'exact'"]
+and property_print_color_adjust = [%value.rec "'economy' | 'exact' | <wide-keyword>"]
 
 (* Ruby *)
-and property_ruby_overhang = [%value.rec "'auto' | 'none'"]
+and property_ruby_overhang = [%value.rec "'auto' | 'none' | <wide-keyword>"]
 
 (* Timeline scope *)
 and property_timeline_scope =
-  [%value.rec "[ 'none' | <custom-ident> | <dashed-ident> ]#"]
+  [%value.rec "[ 'none' | <custom-ident> | <dashed-ident> ]# | <wide-keyword>"]
 
 (* Scroll driven animations *)
-and property_animation_delay_end = [%value.rec "[ <extended-time> ]#"]
-and property_animation_delay_start = [%value.rec "[ <extended-time> ]#"]
+and property_animation_delay_end = [%value.rec "[ <extended-time> ]# | <wide-keyword>"]
+and property_animation_delay_start = [%value.rec "[ <extended-time> ]# | <wide-keyword>"]
 
 (* Custom properties for at-rules *)
-and property_syntax = [%value.rec "<string>"]
-and property_inherits = [%value.rec "'true' | 'false'"]
-and property_initial_value = [%value.rec "<string>"]
+and property_syntax = [%value.rec "<string> | <wide-keyword>"]
+and property_inherits = [%value.rec "'true' | 'false' | <wide-keyword>"]
+and property_initial_value = [%value.rec "<string> | <wide-keyword>"]
 
 (* Additional modern properties *)
-and property_scroll_marker_group = [%value.rec "'none' | 'before' | 'after'"]
+and property_scroll_marker_group = [%value.rec "'none' | 'before' | 'after' | <wide-keyword>"]
 
 and property_container_name_computed =
-  [%value.rec "'none' | [ <custom-ident> ]#"]
+  [%value.rec "'none' | [ <custom-ident> ]# | <wide-keyword>"]
 
-and property_text_edge = [%value.rec "[ 'leading' | <'text-box-edge'> ]{1,2}"]
+and property_text_edge = [%value.rec "[ 'leading' | <'text-box-edge'> ]{1,2} | <wide-keyword>"]
 
 and property_hyphenate_limit_last =
-  [%value.rec "'none' | 'always' | 'column' | 'page' | 'spread'"]
+  [%value.rec "'none' | 'always' | 'column' | 'page' | 'spread' | <wide-keyword>"]
 
 and pseudo_class_selector =
   [%value.rec "':' <ident-token> | ':' <function-token> <any-value> ')'"]
@@ -2928,6 +2926,7 @@ and viewport_length =
   [%value.rec "'auto' | <extended-length> | <extended-percentage>"]
 
 and visual_box = [%value.rec "'content-box' | 'padding-box' | 'border-box'"]
+and wide_keyword = [%value.rec "'initial' | 'inherit' | 'unset' | 'revert'"]
 and wq_name = [%value.rec "[ <ns-prefix> ]? <ident-token>"]
 and attr_name = [%value.rec "[ <ident-token>? '|' ]? <ident-token>"]
 
@@ -3239,7 +3238,7 @@ let packed_rules : (module RULE) list =
     prop "align-items" property_align_items;
     prop "align-self" property_align_self;
     prop "alignment-baseline" property_alignment_baseline;
-    prop "all" property_all;
+    prop "all" wide_keyword;
     prop "anchor-name" property_anchor_name;
     prop "anchor-scope" property_anchor_scope;
     prop "animation-composition" property_animation_composition;

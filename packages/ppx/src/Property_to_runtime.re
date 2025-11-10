@@ -45,8 +45,18 @@ let render_variable = (~loc, name) => {
   Builder.pexp_ident(~loc, ident);
 };
 
+let render_wide_keyword = (~loc, keyword) => {
+  switch (keyword) {
+  | `Initial => [%expr `initial]
+  | `Inherit => [%expr `inherit_]
+  | `Unset => [%expr `unset]
+  | `Revert => [%expr `revert]
+  };
+};
+
 let variant_to_expression = (~loc) =>
   fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
   | `Anywhere => [%expr `anywhere]
   | `Auto => [%expr `auto]
   | `Baseline => [%expr `baseline]
@@ -138,6 +148,14 @@ let variant_to_expression = (~loc) =>
   | `Unicase => [%expr `unicase]
   | `Titling_caps => [%expr `titlingCaps]
   | `Text => [%expr `text]
+  | `VisiblePainted => [%expr `visiblePainted]
+  | `VisibleFill => [%expr `visibleFill]
+  | `VisibleStroke => [%expr `visibleStroke]
+  | `Painted => [%expr `painted]
+  | `Stroke => [%expr `stroke]
+  | `Inherit => [%expr `inherit_]
+  | `Initial => [%expr `initial]
+  | `Revert => [%expr `revert]
   | `Emoji => [%expr `emoji]
   | `Unicode => [%expr `unicode]
   | `All => [%expr `all]
@@ -538,10 +556,8 @@ let max_height =
   );
 
 let box_sizing =
-  monomorphic(
-    Property_parser.property_box_sizing,
-    (~loc) => [%expr CSS.boxSizing],
-    variant_to_expression,
+  variants(Property_parser.property_box_sizing, (~loc) =>
+    [%expr CSS.boxSizing]
   );
 
 let column_width =
@@ -550,6 +566,7 @@ let column_width =
     (~loc) => [%expr CSS.columnWidth],
     (~loc, value: Property_parser.Types.property_column_width) =>
       switch (value) {
+      | `Wide_keyword(kw) => variant_to_expression(~loc, kw)
       | `Auto => variant_to_expression(~loc, `Auto)
       | `Extended_length(l) => render_extended_length(~loc, l)
       },
@@ -557,6 +574,7 @@ let column_width =
 
 let render_margin = (~loc) =>
   fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
   | `Auto => variant_to_expression(~loc, `Auto)
   | `Extended_length(l) => render_extended_length(~loc, l)
   | `Extended_percentage(p) => render_extended_percentage(~loc, p)
@@ -564,6 +582,7 @@ let render_margin = (~loc) =>
 
 let render_padding = (~loc) =>
   fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
   | `Auto => variant_to_expression(~loc, `Auto)
   | `Extended_length(l) => render_extended_length(~loc, l)
   | `Extended_percentage(p) => render_extended_percentage(~loc, p)
@@ -999,7 +1018,7 @@ let render_var = (~loc, string) => {
 
 let rec render_color = (~loc, value) =>
   switch ((value: Property_parser.Types.color)) {
-  | `Interpolation(v) => render_variable(~loc, v)
+  | `Interpolation(interpolation) => render_variable(~loc, interpolation)
   | `Hex_color(hex) => [%expr `hex([%e render_string(~loc, hex)])]
   | `Named_color(color) => render_named_color(~loc, color)
   | `CurrentColor => [%expr `currentColor]
@@ -1083,25 +1102,36 @@ and render_function_color_mix =
      [%e render_color_with_percentage(~loc, color_y)],
    ))
   ];
-};
+}
 
+and render_alpha_value = (~loc, value: Property_parser.Types.alpha_value) => {
+  switch (value) {
+  | `Number(number) => render_float(~loc, number)
+  | `Extended_percentage(`Percentage(number)) =>
+    render_float(~loc, number /. 100.0)
+  | `Extended_percentage(pct) => render_extended_percentage(~loc, pct)
+  };
+};
 let color =
   monomorphic(
     Property_parser.property_color,
     (~loc) => [%expr CSS.color],
-    render_color,
+    (~loc, value: Property_parser.Types.property_color) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Color(color) => render_color(~loc, color)
+      },
   );
 
 let opacity =
   monomorphic(
     Property_parser.property_opacity,
     (~loc) => [%expr CSS.opacity],
-    (~loc) =>
-      fun
-      | `Number(number) => render_float(~loc, number)
-      | `Extended_percentage(`Percentage(number)) =>
-        render_float(~loc, number /. 100.0)
-      | `Extended_percentage(pct) => render_extended_percentage(~loc, pct),
+    (~loc, value: Property_parser.Types.property_opacity) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Alpha_value(alpha_value) => render_alpha_value(~loc, alpha_value)
+      },
   );
 
 let render_position_one = (~loc) =>
@@ -1147,36 +1177,30 @@ let render_position = (~loc, position: Property_parser.Types.position) => {
 };
 
 let object_fit =
-  variants(Property_parser.property_object_fit, (~loc) =>
-    [%expr CSS.objectFit]
+  monomorphic(
+    Property_parser.property_object_fit,
+    (~loc) => [%expr CSS.objectFit],
+    (~loc, value: Property_parser.Types.property_object_fit) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Xor(object_fit) => variant_to_expression(~loc, object_fit)
+      },
   );
 
 let object_position =
   monomorphic(
     Property_parser.property_object_position,
     (~loc) => [%expr CSS.objectPosition],
-    render_position,
+    (~loc, value: Property_parser.Types.property_object_position) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Position(position) => render_position(~loc, position)
+      },
   );
 
 let pointer_events =
-  monomorphic(
-    Property_parser.property_pointer_events,
-    (~loc) => [%expr CSS.pointerEvents],
-    (~loc, value: Property_parser.Types.property_pointer_events) => {
-      switch (value) {
-      | `Auto => [%expr `auto]
-      | `None => [%expr `none]
-      | `VisiblePainted => [%expr `visiblePainted]
-      | `VisibleFill => [%expr `visibleFill]
-      | `VisibleStroke => [%expr `visibleStroke]
-      | `Visible => [%expr `visible]
-      | `Painted => [%expr `painted]
-      | `Fill => [%expr `fill]
-      | `Stroke => [%expr `stroke]
-      | `All => [%expr `all]
-      | `Inherit => [%expr `inherit_]
-      }
-    },
+  variants(Property_parser.property_pointer_events, (~loc) =>
+    [%expr CSS.pointerEvents]
   );
 
 let image_resolution =
@@ -1258,7 +1282,11 @@ let background_color =
   monomorphic(
     Property_parser.property_background_color,
     (~loc) => [%expr CSS.backgroundColor],
-    render_color,
+    (~loc, value: Property_parser.Types.property_background_color) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Color(color) => render_color(~loc, color)
+      },
   );
 
 let _render_color_stop_length =
@@ -1520,18 +1548,15 @@ let render_image = (~loc, value: Property_parser.Types.image) =>
   | `Function_cross_fade(_) => raise(Unsupported_feature)
   };
 
-let render_bg_image = (~loc, value: Property_parser.Types.bg_image) =>
+let render_bg_image = (~loc, value) =>
   switch (value) {
   | `None => [%expr `none]
   | `Image(i) => render_image(~loc, i)
   };
 
-let render_bg_images = (~loc, value: list(Property_parser.Types.bg_image)) => {
-  value |> List.map(render_bg_image(~loc)) |> Builder.pexp_array(~loc);
-};
-
 let render_repeat_style = (~loc) =>
   fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
   | `Repeat_x => variant_to_expression(~loc, `Repeat_x)
   | `Repeat_y => variant_to_expression(~loc, `Repeat_y)
   | `Static(values) => {
@@ -1561,25 +1586,52 @@ let background_image =
   polymorphic(Property_parser.property_background_image, (~loc) =>
     fun
     | [one] => [
-        [%expr CSS.backgroundImage([%e render_bg_image(~loc, one)])],
+        [%expr
+          CSS.backgroundImage(
+            switch%e (one) {
+            | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+            | `Bg_image(bg_image) => render_bg_image(~loc, bg_image)
+            },
+          )
+        ],
       ]
     | more => [
-        [%expr CSS.backgroundImages([%e render_bg_images(~loc, more)])],
+        [%expr
+          CSS.backgroundImages(
+            [%e
+              more
+              |> List.map(
+                   fun
+                   | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+                   | `Bg_image(bg_image) => render_bg_image(~loc, bg_image),
+                 )
+              |> Builder.pexp_array(~loc)
+            ],
+          )
+        ],
       ]
   );
 
 let background_repeat =
   polymorphic(Property_parser.property_background_repeat, (~loc) =>
     fun
-    | [one] => [
-        [%expr CSS.backgroundRepeat([%e render_repeat_style(~loc, one)])],
+    | [`Wide_keyword(kw)] => [render_wide_keyword(~loc, kw)]
+    | [`Repeat_style(repeat_style)] => [
+        [%expr
+          CSS.backgroundRepeat([%e render_repeat_style(~loc, repeat_style)])
+        ],
       ]
     | more => [
         [%expr
           CSS.backgroundRepeats(
             [%e
               more
-              |> List.map(render_repeat_style(~loc))
+              |> List.map(
+                   fun
+                   | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+                   | `Repeat_style(repeat_style) =>
+                     render_repeat_style(~loc, repeat_style),
+                 )
               |> Builder.pexp_array(~loc)
             ],
           )
@@ -1594,7 +1646,8 @@ let background_attachment =
     (~loc) =>
       fun
       | [] => raise(Impossible_state)
-      | [v] => render_attachment(~loc, v)
+      | [`Wide_keyword(kw)] => render_wide_keyword(~loc, kw)
+      | [`Attachment(attachment)] => render_attachment(~loc, attachment)
       | _ => raise(Unsupported_feature),
   );
 
@@ -1625,18 +1678,25 @@ let render_bg_position = (~loc, position: Property_parser.Types.bg_position) => 
   };
 };
 
+let render_background_position = (~loc) =>
+  fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+  | `Bg_position(bg_position) => render_bg_position(~loc, bg_position)
+
 let background_position =
   polymorphic(Property_parser.property_background_position, (~loc) =>
     fun
     | [one] => [
-        [%expr CSS.backgroundPosition([%e render_bg_position(~loc, one)])],
+        [%expr
+          CSS.backgroundPosition([%e render_background_position(~loc, one)])
+        ],
       ]
     | more => [
         [%expr
           CSS.backgroundPositions(
             [%e
               more
-              |> List.map(render_bg_position(~loc))
+              |> List.map(render_background_position(~loc))
               |> Builder.pexp_array(~loc)
             ],
           )
@@ -1652,6 +1712,7 @@ let background_position_y =
 
 let render_background_clip = (~loc) =>
   fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
   | `Box(b) => variant_to_expression(~loc, b)
   | `Text => variant_to_expression(~loc, `Text)
   | `Border_area => variant_to_expression(~loc, `Border_area);
@@ -1682,7 +1743,8 @@ let background_origin =
     (~loc) =>
       fun
       | [] => raise(Impossible_state)
-      | [v] => variant_to_expression(~loc, v)
+      | [`Wide_keyword(kw)] => render_wide_keyword(~loc, kw)
+      | [`Box(box)] => variant_to_expression(~loc, box)
       | _ => raise(Unsupported_feature),
   );
 
@@ -1693,7 +1755,8 @@ let background_size =
     (~loc) =>
       fun
       | [] => raise(Impossible_state)
-      | [v] => render_bg_size(~loc, v)
+      | [`Wide_keyword(kw)] => render_wide_keyword(~loc, kw)
+      | [`Bg_size(bg_size)] => render_bg_size(~loc, bg_size)
       | _ => raise(Unsupported_feature),
   );
 
@@ -1805,7 +1868,14 @@ let render_background =
 
   List.concat([
     render_final_layer(final_layer) |> List.flatten,
-    layers |> List.concat_map(x => x |> fst |> render_layers) |> List.flatten,
+    layers
+    |> List.concat_map(x =>
+         switch (x |> fst) {
+         | `Bg_layer(layer) => render_layers(layer)
+         | `Wide_keyword(kw) => [[render_wide_keyword(~loc, kw)]]
+         }
+       )
+    |> List.flatten,
   ]);
 };
 
@@ -1816,28 +1886,44 @@ let border_top_color =
   monomorphic(
     Property_parser.property_border_top_color,
     (~loc) => [%expr CSS.borderTopColor],
-    render_color,
+    (~loc, value: Property_parser.Types.property_border_top_color) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Color(color) => render_color(~loc, color)
+      },
   );
 
 let border_right_color =
   monomorphic(
     Property_parser.property_border_right_color,
     (~loc) => [%expr CSS.borderRightColor],
-    render_color,
+    (~loc, value: Property_parser.Types.property_border_right_color) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Color(color) => render_color(~loc, color)
+      },
   );
 
 let border_bottom_color =
   monomorphic(
     Property_parser.property_border_bottom_color,
     (~loc) => [%expr CSS.borderBottomColor],
-    render_color,
+    (~loc, value: Property_parser.Types.property_border_bottom_color) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Color(color) => render_color(~loc, color)
+      },
   );
 
 let border_left_color =
   monomorphic(
     Property_parser.property_border_left_color,
     (~loc) => [%expr CSS.borderLeftColor],
-    render_color,
+    (~loc, value: Property_parser.Types.property_border_left_color) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Color(color) => render_color(~loc, color)
+      },
   );
 
 let border_color =
@@ -1846,35 +1932,67 @@ let border_color =
     (~loc) => [%expr CSS.borderColor],
     (~loc) =>
       fun
-      | [c] => render_color(~loc, c)
+      | [c] =>
+        switch (c) {
+        | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+        | `Color(color) => render_color(~loc, color)
+        }
       | _ => raise(Unsupported_feature),
   );
 
 let border_top_style =
-  variants(Property_parser.property_border_top_style, (~loc) =>
-    [%expr CSS.borderTopStyle]
+  monomorphic(
+    Property_parser.property_border_top_style,
+    (~loc) => [%expr CSS.borderTopStyle],
+    (~loc, value: Property_parser.Types.property_border_top_style) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Line_style(style) => variant_to_expression(~loc, style)
+      },
   );
 
 let border_right_style =
-  variants(Property_parser.property_border_right_style, (~loc) =>
-    [%expr CSS.borderRightStyle]
+  monomorphic(
+    Property_parser.property_border_right_style,
+    (~loc) => [%expr CSS.borderRightStyle],
+    (~loc, value: Property_parser.Types.property_border_right_style) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Line_style(style) => variant_to_expression(~loc, style)
+      },
   );
 
 let border_bottom_style =
-  variants(Property_parser.property_border_bottom_style, (~loc) =>
-    [%expr CSS.borderBottomStyle]
+  monomorphic(
+    Property_parser.property_border_bottom_style,
+    (~loc) => [%expr CSS.borderBottomStyle],
+    (~loc, value: Property_parser.Types.property_border_bottom_style) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Line_style(style) => variant_to_expression(~loc, style)
+      },
   );
 
 let border_left_style =
-  variants(Property_parser.property_border_left_style, (~loc) =>
-    [%expr CSS.borderLeftStyle]
+  monomorphic(
+    Property_parser.property_border_left_style,
+    (~loc) => [%expr CSS.borderLeftStyle],
+    (~loc, value: Property_parser.Types.property_border_left_style) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Line_style(style) => variant_to_expression(~loc, style)
+      },
   );
 
 let border_style =
   monomorphic(
     Property_parser.property_border_style,
     (~loc) => [%expr CSS.borderStyle],
-    variant_to_expression,
+    (~loc, value: Property_parser.Types.property_border_style) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Line_style(style) => variant_to_expression(~loc, style)
+      },
   );
 
 let render_line_width = (~loc, value: Property_parser.Types.line_width) =>
@@ -1889,28 +2007,44 @@ let border_top_width =
   monomorphic(
     Property_parser.property_border_top_width,
     (~loc) => [%expr CSS.borderTopWidth],
-    render_line_width,
+    (~loc, value: Property_parser.Types.property_border_top_width) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Line_width(lw) => render_line_width(~loc, lw)
+      },
   );
 
 let border_right_width =
   monomorphic(
     Property_parser.property_border_right_width,
     (~loc) => [%expr CSS.borderRightWidth],
-    render_line_width,
+    (~loc, value: Property_parser.Types.property_border_right_width) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Line_width(lw) => render_line_width(~loc, lw)
+      },
   );
 
 let border_bottom_width =
   monomorphic(
     Property_parser.property_border_bottom_width,
     (~loc) => [%expr CSS.borderBottomWidth],
-    render_line_width,
+    (~loc, value: Property_parser.Types.property_border_bottom_width) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Line_width(lw) => render_line_width(~loc, lw)
+      },
   );
 
 let border_left_width =
   monomorphic(
     Property_parser.property_border_left_width,
     (~loc) => [%expr CSS.borderLeftWidth],
-    render_line_width,
+    (~loc, value: Property_parser.Types.property_border_left_width) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Line_width(lw) => render_line_width(~loc, lw)
+      },
   );
 
 let border_width =
@@ -1919,12 +2053,17 @@ let border_width =
     (~loc) => [%expr CSS.borderWidth],
     (~loc) =>
       fun
-      | [w] => render_line_width(~loc, w)
+      | [w] =>
+        switch (w) {
+        | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+        | `Line_width(lw) => render_line_width(~loc, lw)
+        }
       | _ => raise(Unsupported_feature),
   );
 
 let render_line_width_interp = (~loc) =>
   fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
   | `Line_width(lw) => render_line_width(~loc, lw)
   | `Interpolation(name) => render_variable(~loc, name);
 
@@ -1958,6 +2097,7 @@ let direction_to_fn_name = (~loc) =>
 
 let render_border = (~loc, ~direction: borderDirection, border) => {
   switch (border) {
+  | `Wide_keyword(kw) => [render_wide_keyword(~loc, kw)]
   | `None =>
     let borderFn = direction_to_fn_name(~loc, direction);
     [[%expr CSS.unsafe([%e borderFn], {js|none|js})]];
@@ -1984,12 +2124,15 @@ let render_border = (~loc, ~direction: borderDirection, border) => {
 
 let render_outline_style_interp = (~loc) =>
   fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
   | `Auto => variant_to_expression(~loc, `Auto)
   | `Interpolation(name) => render_variable(~loc, name)
   | `Line_style(ls) => variant_to_expression(~loc, ls);
 
 let render_outline = (~loc) =>
   fun
+  | `Interpolation(name) => [render_variable(~loc, name)]
+  | `Wide_keyword(kw) => [render_wide_keyword(~loc, kw)]
   | `None => [[%expr CSS.unsafe({js|outline|js}, {js|none|js})]]
   | `Property_outline_width(`Interpolation(name)) => [
       [%expr CSS.outline([%e render_variable(~loc, name)])],
@@ -2014,14 +2157,22 @@ let outline_color =
   monomorphic(
     Property_parser.property_outline_color,
     (~loc) => [%expr CSS.outlineColor],
-    render_color,
+    (~loc, value: Property_parser.Types.property_outline_color) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Color(color) => render_color(~loc, color)
+      },
   );
 
 let outline_offset =
   monomorphic(
     Property_parser.property_outline_offset,
     (~loc) => [%expr CSS.outlineOffset],
-    render_extended_length,
+    (~loc, value: Property_parser.Types.property_outline_offset) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Extended_length(l) => render_extended_length(~loc, l)
+      },
   );
 
 let outline_style =
@@ -2035,7 +2186,12 @@ let outline_width =
   monomorphic(
     Property_parser.property_outline_width,
     (~loc) => [%expr CSS.outlineWidth],
-    render_line_width_interp,
+    (~loc, value: Property_parser.Types.property_outline_width) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Interpolation(name) => render_variable(~loc, name)
+      | `Line_width(lw) => render_line_width(~loc, lw)
+      },
   );
 
 let vertical_align =
@@ -2044,6 +2200,7 @@ let vertical_align =
     (~loc) => [%expr CSS.verticalAlign],
     (~loc, value) => {
       switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Baseline => [%expr `baseline]
       | `Sub => [%expr `sub]
       | `Super => [%expr `super]
@@ -2126,7 +2283,12 @@ let border_radius =
   monomorphic(
     Property_parser.property_border_radius,
     (~loc) => [%expr CSS.borderRadius],
-    render_length_percentage,
+    (~loc, value) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Extended_length(l) => render_extended_length(~loc, l)
+      | `Extended_percentage(p) => render_extended_percentage(~loc, p)
+      },
   );
 
 let border_image_source =
@@ -2135,6 +2297,7 @@ let border_image_source =
     (~loc) => [%expr CSS.borderImageSource],
     (~loc, value) => {
       switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `None => [%expr `none]
       | `Image(i) => render_image(~loc, i)
       }
@@ -2160,6 +2323,7 @@ let box_shadow =
     Property_parser.property_box_shadow,
     (~loc, value: Property_parser.Types.property_box_shadow) =>
     switch (value) {
+    | `Wide_keyword(kw) => [render_wide_keyword(~loc, kw)]
     | `Interpolation(variable) =>
       /* Here we rely on boxShadow*s* which makes the value be an array */
       let var = render_variable(~loc, variable);
@@ -2181,6 +2345,7 @@ let overflow_x =
     (~loc) => [%expr CSS.overflowX],
     (~loc) =>
       fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Interpolation(x) => render_variable(~loc, x)
       | (`Visible | `Hidden | `Clip | `Scroll | `Auto) as x =>
         variant_to_expression(~loc, x),
@@ -2192,6 +2357,7 @@ let overflow_y =
     (~loc) => [%expr CSS.overflowY],
     (~loc) =>
       fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Interpolation(x) => render_variable(~loc, x)
       | (`Visible | `Hidden | `Clip | `Scroll | `Auto) as x =>
         variant_to_expression(~loc, x),
@@ -2200,6 +2366,7 @@ let overflow_y =
 let overflow =
   polymorphic(Property_parser.property_overflow, (~loc) =>
     fun
+    | `Wide_keyword(kw) => [render_wide_keyword(~loc, kw)]
     | `Interpolation(i) => [
         [%expr CSS.overflow([%e render_variable(~loc, i)])],
       ]
@@ -2235,14 +2402,26 @@ let overflow_clip_margin =
   polymorphic(
     Property_parser.property_overflow_clip_margin,
     (~loc, (clipEdgeOrigin, margin)) => {
-      let margin = Option.value(margin, ~default=`Length(`Px(0.)));
+      let margin =
+        Option.value(margin, ~default=`Extended_length(`Length(`Px(0.))));
       [
         [%expr
           CSS.overflowClipMargin2(
             ~clipEdgeOrigin=?[%e
-              render_option(~loc, variant_to_expression, clipEdgeOrigin)
+              render_option(
+                ~loc,
+                (~loc, x) =>
+                  switch (x) {
+                  | `Visual_box(vb) => variant_to_expression(~loc, vb)
+                  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+                  },
+                clipEdgeOrigin,
+              )
             ],
-            [%e render_extended_length(~loc, margin)],
+            switch%e (margin) {
+            | `Extended_length(l) => render_extended_length(~loc, l)
+            | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+            },
           )
         ],
       ];
@@ -2255,6 +2434,7 @@ let overflow_block =
     (~loc) => [%expr CSS.overflowBlock],
     (~loc) =>
       fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Interpolation(x) => render_variable(~loc, x)
       | (`Visible | `Hidden | `Clip | `Scroll | `Auto) as x =>
         variant_to_expression(~loc, x),
@@ -2266,6 +2446,7 @@ let overflow_inline =
     (~loc) => [%expr CSS.overflowInline],
     (~loc) =>
       fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Interpolation(x) => render_variable(~loc, x)
       | (`Visible | `Hidden | `Clip | `Scroll | `Auto) as x =>
         variant_to_expression(~loc, x),
@@ -2277,9 +2458,11 @@ let scrollbar_gutter =
     (~loc) => [%expr CSS.scrollbarGutter],
     (~loc, value: Property_parser.Types.property_scrollbar_gutter) => {
       switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Auto => [%expr `auto]
       | `And(_, None) => [%expr `stable]
       | `And(_, Some(_)) => [%expr `stableBothEdges]
+      | `Interpolation(v) => render_variable(~loc, v)
       }
     },
   );
@@ -2288,16 +2471,18 @@ let text_overflow =
   monomorphic(
     Property_parser.property_text_overflow,
     (~loc) => [%expr CSS.textOverflow],
-    (~loc) =>
-      fun
-      | [one] =>
+    (~loc, value: Property_parser.Types.property_text_overflow) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Xor([one]) =>
         switch (one) {
         | `Clip => variant_to_expression(~loc, `Clip)
         | `Ellipsis => variant_to_expression(~loc, `Ellipsis)
         | `String(str) => [%expr `string([%e render_string(~loc, str)])]
         }
-      | []
-      | _ => raise(Unsupported_feature),
+      | `Xor([])
+      | _ => raise(Unsupported_feature)
+      },
   );
 // let block_ellipsis = unsupportedProperty(Property_parser.property_block_ellipsis);
 
@@ -2317,6 +2502,7 @@ let white_space =
 
 let render_tab_size = (~loc, value: Property_parser.Types.property_tab_size) => {
   switch (value) {
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
   | `Number(n) =>
     int_of_float(n) < 0
       ? raise(
@@ -2341,6 +2527,7 @@ let word_break =
 
 let render_line_height = (~loc) =>
   fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
   | `Extended_length(ext) => render_extended_length(~loc, ext)
   | `Extended_percentage(ext) => render_extended_percentage(~loc, ext)
   | `Normal => variant_to_expression(~loc, `Normal)
@@ -2357,7 +2544,11 @@ let line_height_step =
   monomorphic(
     Property_parser.property_line_height_step,
     (~loc) => [%expr CSS.lineHeightStep],
-    render_extended_length,
+    (~loc, value: Property_parser.Types.property_line_height_step) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Extended_length(l) => render_extended_length(~loc, l)
+      },
   );
 
 let hyphens =
@@ -2397,11 +2588,13 @@ let word_spacing =
   monomorphic(
     Property_parser.property_word_spacing,
     (~loc) => [%expr CSS.wordSpacing],
-    (~loc) =>
-      fun
+    (~loc, value: Property_parser.Types.property_word_spacing) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Normal => variant_to_expression(~loc, `Normal)
       | `Extended_length(l) => render_extended_length(~loc, l)
-      | `Extended_percentage(p) => render_extended_percentage(~loc, p),
+      | `Extended_percentage(p) => render_extended_percentage(~loc, p)
+      },
   );
 
 let letter_spacing =
@@ -2410,6 +2603,7 @@ let letter_spacing =
     (~loc) => [%expr CSS.letterSpacing],
     (~loc) =>
       fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Normal => variant_to_expression(~loc, `Normal)
       | `Extended_length(l) => render_extended_length(~loc, l)
       | `Extended_percentage(p) => render_extended_percentage(~loc, p),
@@ -2419,12 +2613,15 @@ let text_indent =
   monomorphic(
     Property_parser.property_text_indent,
     (~loc) => [%expr CSS.textIndent],
-    (~loc) =>
-      fun
-      | (`Extended_length(l), None, None) => render_extended_length(~loc, l)
-      | (`Extended_percentage(p), None, None) =>
+    (~loc, value: Property_parser.Types.property_text_indent) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `And(`Extended_length(l), None, None) =>
+        render_extended_length(~loc, l)
+      | `And(`Extended_percentage(p), None, None) =>
         render_extended_percentage(~loc, p)
-      | _ => raise(Unsupported_feature),
+      | _ => raise(Unsupported_feature)
+      },
   );
 
 let hanging_punctuation =
@@ -2465,6 +2662,7 @@ let font_family =
     Property_parser.property_font_family,
     (~loc, value: Property_parser.Types.property_font_family) =>
     switch (value) {
+    | `Wide_keyword(kw) => [render_wide_keyword(~loc, kw)]
     | `Interpolation(v) =>
       /* We need to add annotation since arrays can be mutable and the type isn't scoped enough */
       let annotation = [%type: array(CSS.Types.FontFamilyName.t)];
@@ -2489,6 +2687,7 @@ let font_family =
 
 let render_font_weight = (~loc) =>
   fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
   | `Interpolation(v) => render_variable(~loc, v)
   | `Bolder => variant_to_expression(~loc, `Bolder)
   | `Lighter => variant_to_expression(~loc, `Lighter)
@@ -2509,6 +2708,7 @@ let font_stretch = unsupportedProperty(Property_parser.property_font_stretch);
 
 let render_font_style = (~loc) =>
   fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
   | `Normal => variant_to_expression(~loc, `Normal)
   | `Italic => variant_to_expression(~loc, `Italic)
   | `Oblique => variant_to_expression(~loc, `Oblique)
@@ -2543,6 +2743,7 @@ let render_relative_size = (~loc, value: Property_parser.Types.relative_size) =>
 
 let render_font_size = (~loc, value: Property_parser.Types.property_font_size) =>
   switch (value) {
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
   | `Absolute_size(size) => render_absolute_size(~loc, size)
   | `Relative_size(size) => render_relative_size(~loc, size)
   | `Extended_length(ext) => render_extended_length(~loc, ext)
@@ -2640,6 +2841,7 @@ let font_variant_emoji =
 
 let render_text_decoration_line = (~loc) =>
   fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
   | `Interpolation(v) => render_variable(~loc, v)
   | `None => [%expr `none]
   | `Or(underline, overline, lineThrough, blink) => [%expr
@@ -2668,6 +2870,7 @@ let text_decoration_line =
 
 let render_text_decoration_style = (~loc) =>
   fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
   | `Solid => variant_to_expression(~loc, `Solid)
   | `Double => variant_to_expression(~loc, `Double)
   | `Dotted => variant_to_expression(~loc, `Dotted)
@@ -2685,11 +2888,16 @@ let text_decoration_color =
   monomorphic(
     Property_parser.property_text_decoration_color,
     (~loc) => [%expr CSS.textDecorationColor],
-    render_color,
+    (~loc, value: Property_parser.Types.property_text_decoration_color) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Color(color) => render_color(~loc, color)
+      },
   );
 
 let render_text_decoration_thickness = (~loc) =>
   fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
   | `Auto => variant_to_expression(~loc, `Auto)
   | `From_font => variant_to_expression(~loc, `From_font)
   | `Extended_length(l) => render_extended_length(~loc, l)
@@ -2703,24 +2911,37 @@ let text_decoration_thickness =
   );
 
 let text_decoration =
-  polymorphic(
-    Property_parser.property_text_decoration,
-    (~loc, (color, style, thickness, line)) =>
-    [
-      [%expr
-        CSS.textDecorations(
-          ~line=?[%e render_option(~loc, render_text_decoration_line, line)],
-          ~thickness=?[%e
-            render_option(~loc, render_text_decoration_thickness, thickness)
-          ],
-          ~style=?[%e
-            render_option(~loc, render_text_decoration_style, style)
-          ],
-          ~color=?[%e render_option(~loc, render_color, color)],
-          (),
-        )
-      ],
-    ]
+  polymorphic(Property_parser.property_text_decoration, (~loc) =>
+    fun
+    | `Wide_keyword(kw) => [
+        [%expr CSS.textDecoration([%e render_wide_keyword(~loc, kw)])],
+      ]
+    | `Or(color, style, thickness, line) => [
+        [%expr
+          CSS.textDecorations(
+            ~line=?[%e
+              render_option(~loc, render_text_decoration_line, line)
+            ],
+            ~thickness=?[%e
+              render_option(~loc, render_text_decoration_thickness, thickness)
+            ],
+            ~style=?[%e
+              render_option(~loc, render_text_decoration_style, style)
+            ],
+            ~color=?[%e
+              render_option(
+                ~loc,
+                (~loc) =>
+                  fun
+                  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+                  | `Color(color) => render_color(~loc, color),
+                color,
+              )
+            ],
+            (),
+          )
+        ],
+      ]
   );
 
 let text_underline_position =
@@ -2773,6 +2994,7 @@ let text_emphasis_style =
       };
 
       switch (value) {
+      | `Wide_keyword(kw) => [render_wide_keyword(~loc, kw)]
       | `Or(Some(x), None) => [
           [%expr CSS.textEmphasisStyle([%e render_filled_or_open(~loc, x)])],
         ]
@@ -2802,44 +3024,60 @@ let text_emphasis_color =
   monomorphic(
     Property_parser.property_text_emphasis_color,
     (~loc) => [%expr CSS.textEmphasisColor],
-    render_color,
+    (~loc, value: Property_parser.Types.property_text_emphasis_color) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Color(color) => render_color(~loc, color)
+      },
   );
 
 let text_emphasis =
   unsupportedProperty(Property_parser.property_text_emphasis);
 
 let text_emphasis_position =
-  polymorphic(
-    Property_parser.property_text_emphasis_position,
-    (~loc, value) => {
-      let render_position_left_right = (~loc) => {
-        fun
-        | `Left => [%expr `left]
-        | `Right => [%expr `right];
-      };
-
-      let render_over_or_under = (~loc) => {
-        fun
-        | `Over => [%expr `over]
-        | `Under => [%expr `under];
-      };
-
-      switch (value) {
-      | (y, None) => [
+  polymorphic(Property_parser.property_text_emphasis_position, (~loc) =>
+    fun
+    | `Wide_keyword(kw) => [
+        [%expr CSS.textEmphasisPosition([%e render_wide_keyword(~loc, kw)])],
+      ]
+    | `And(y, None) => {
+        let render_over_or_under = (~loc) => {
+          (
+            fun
+            | `Over => [%expr `over]
+            | `Under => [%expr `under]
+          );
+        };
+        [
           [%expr
             CSS.textEmphasisPosition([%e render_over_or_under(~loc, y)])
           ],
-        ]
-      | (y, Some(position)) => [
+        ];
+      }
+    | `And(y, Some(position)) => {
+        let render_position_left_right = (~loc) => {
+          (
+            fun
+            | `Left => [%expr `left]
+            | `Right => [%expr `right]
+          );
+        };
+        let render_over_or_under = (~loc) => {
+          (
+            fun
+            | `Over => [%expr `over]
+            | `Under => [%expr `under]
+          );
+        };
+        [
           [%expr
             CSS.textEmphasisPositions(
               [%e render_over_or_under(~loc, y)],
               [%e render_position_left_right(~loc, position)],
             )
           ],
-        ]
-      };
-    },
+        ];
+      }
   );
 
 // let text_emphasis_skip = unsupportedProperty(Property_parser.property_text_emphasis_skip);
@@ -2877,6 +3115,7 @@ let render_text_shadow = (~loc, shadow) => {
 let text_shadow =
   polymorphic(Property_parser.property_text_shadow, (~loc) =>
     fun
+    | `Wide_keyword(kw) => [render_wide_keyword(~loc, kw)]
     | `Interpolation(variable) => [
         [%expr CSS.textShadows([%e render_variable(~loc, variable)])],
       ]
@@ -2988,6 +3227,7 @@ let render_transform = (~loc, value: Property_parser.Types.transform_function) =
 let transform =
   polymorphic(Property_parser.property_transform, (~loc) =>
     fun
+    | `Wide_keyword(kw) => [render_wide_keyword(~loc, kw)]
     | `None => [[%expr CSS.transform(`none)]]
     | `Transform_list([one]) => [
         [%expr CSS.transform([%e render_transform(~loc, one)])],
@@ -3013,6 +3253,7 @@ let transform_origin =
     (~loc) => [%expr CSS.transformOrigin],
     (~loc) =>
       fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Xor(x) => render_position_one(~loc, x)
       | `Static_0(h, v, None) => render_position_two(~loc, h, v)
       | `Static_1((h, v), None) => render_position_two(~loc, h, v)
@@ -3029,6 +3270,7 @@ let transform_box =
 let translate =
   polymorphic(Property_parser.property_translate, (~loc) =>
     fun
+    | `Wide_keyword(kw) => [render_wide_keyword(~loc, kw)]
     | `None => [[%expr CSS.translateProperty(`none)]]
     | `Static(x, None) => [
         [%expr
@@ -3060,6 +3302,7 @@ let rotate =
     (~loc) => [%expr CSS.rotateProperty],
     (~loc) =>
       fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `None => [%expr `none]
       | `Extended_angle(x) => [%expr
           `rotate([%e render_extended_angle(~loc, x)])
@@ -3092,6 +3335,7 @@ let render_number_percentage = (~loc) =>
 let scale =
   polymorphic(Property_parser.property_scale, (~loc) =>
     fun
+    | `Wide_keyword(kw) => [render_wide_keyword(~loc, kw)]
     | `None => [[%expr CSS.scaleProperty(`none)]]
     | `Number_percentage([x, y, z]) => [
         [%expr
@@ -3122,6 +3366,7 @@ let transform_style =
     (~loc) => [%expr CSS.transformStyle],
     (~loc) =>
       fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Flat => variant_to_expression(~loc, `Flat)
       | `Preserve_3d => variant_to_expression(~loc, `Preserve_3d),
   );
@@ -3132,6 +3377,7 @@ let perspective =
     (~loc) => [%expr CSS.perspectiveProperty],
     (~loc) =>
       fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `None => [%expr `none]
       | `Extended_length(x) => render_extended_length(~loc, x),
   );
@@ -3140,7 +3386,10 @@ let perspective_origin =
   monomorphic(
     Property_parser.property_perspective_origin,
     (~loc) => [%expr CSS.perspectiveOrigin],
-    render_position,
+    (~loc) =>
+      fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Position(position) => render_position(~loc, position),
   );
 
 let backface_visibility =
@@ -3167,6 +3416,7 @@ let render_single_transition_property = (~loc, value) => {
 let transition_property =
   polymorphic(Property_parser.property_transition_property, (~loc) =>
     fun
+    | `Wide_keyword(kw) => [render_wide_keyword(~loc, kw)]
     | `None => [
         [%expr CSS.transitionProperty(CSS.Types.TransitionProperty.none)],
       ]
@@ -3182,27 +3432,37 @@ let transition_property =
 let transition_duration =
   polymorphic(Property_parser.property_transition_duration, (~loc) =>
     fun
-    | [one] => [
-        [%expr CSS.transitionDuration([%e render_extended_time(~loc, one)])],
-      ]
-    | more => [
-        [%expr
-          CSS.transitionDurations(
-            [%e
-              more
-              |> List.map(render_extended_time(~loc))
-              |> Builder.pexp_array(~loc)
-            ],
-          )
-        ],
-      ]
+    | `Wide_keyword(kw) => [render_wide_keyword(~loc, kw)]
+    | `Extended_time(extended_time) =>
+      switch (extended_time) {
+      | [one] => [
+          [%expr
+            CSS.transitionDuration([%e render_extended_time(~loc, one)])
+          ],
+        ]
+      | more => [
+          [%expr
+            CSS.transitionDurations(
+              [%e
+                more
+                |> List.map(render_extended_time(~loc))
+                |> Builder.pexp_array(~loc)
+              ],
+            )
+          ],
+        ]
+      }
   );
 
 let widows =
   monomorphic(
     Property_parser.property_widows,
     (~loc) => [%expr CSS.widows],
-    render_integer,
+    (~loc, value: Property_parser.Types.property_widows) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Integer(num) => [%expr `num([%e render_integer(~loc, num)])]
+      },
   );
 
 let render_cubic_bezier_timing_function = (~loc) =>
@@ -3257,39 +3517,49 @@ let render_timing = (~loc) =>
 let transition_timing_function =
   polymorphic(Property_parser.property_transition_timing_function, (~loc) =>
     fun
-    | [one] => [
-        [%expr CSS.transitionTimingFunction([%e render_timing(~loc, one)])],
-      ]
-    | many => [
-        [%expr
-          CSS.transitionTimingFunctions(
-            [%e
-              many
-              |> List.map(render_timing(~loc))
-              |> Builder.pexp_array(~loc)
-            ],
-          )
-        ],
-      ]
+    | `Wide_keyword(kw) => [render_wide_keyword(~loc, kw)]
+    | `Timing_function(timing_function) =>
+      switch (timing_function) {
+      | [one] => [
+          [%expr
+            CSS.transitionTimingFunction([%e render_timing(~loc, one)])
+          ],
+        ]
+      | many => [
+          [%expr
+            CSS.transitionTimingFunctions(
+              [%e
+                many
+                |> List.map(render_timing(~loc))
+                |> Builder.pexp_array(~loc)
+              ],
+            )
+          ],
+        ]
+      }
   );
 
 let transition_delay =
   polymorphic(Property_parser.property_transition_delay, (~loc) =>
     fun
-    | [one] => [
-        [%expr CSS.transitionDelay([%e render_extended_time(~loc, one)])],
-      ]
-    | more => [
-        [%expr
-          CSS.transitionDelays(
-            [%e
-              more
-              |> List.map(render_extended_time(~loc))
-              |> Builder.pexp_array(~loc)
-            ],
-          )
-        ],
-      ]
+    | `Wide_keyword(kw) => [render_wide_keyword(~loc, kw)]
+    | `Extended_time(extended_time_list) =>
+      switch (extended_time_list) {
+      | [one] => [
+          [%expr CSS.transitionDelay([%e render_extended_time(~loc, one)])],
+        ]
+      | more => [
+          [%expr
+            CSS.transitionDelays(
+              [%e
+                more
+                |> List.map(render_extended_time(~loc))
+                |> Builder.pexp_array(~loc)
+              ],
+            )
+          ],
+        ]
+      }
   );
 
 let render_transition_behavior_value_no_interp = (~loc) =>
@@ -3306,24 +3576,28 @@ let render_transition_behavior_value = (~loc) =>
 let transition_behavior =
   polymorphic(Property_parser.property_transition_behavior, (~loc) =>
     fun
-    | [one] => [
-        [%expr
-          CSS.transitionBehavior(
-            [%e render_transition_behavior_value(~loc, one)],
-          )
-        ],
-      ]
-    | more => [
-        [%expr
-          CSS.transitionBehaviors(
-            [%e
-              more
-              |> List.map(render_transition_behavior_value(~loc))
-              |> Builder.pexp_array(~loc)
-            ],
-          )
-        ],
-      ]
+    | `Wide_keyword(kw) => [render_wide_keyword(~loc, kw)]
+    | `Transition_behavior_value(transition_behavior_value) =>
+      switch (transition_behavior_value) {
+      | [one] => [
+          [%expr
+            CSS.transitionBehavior(
+              [%e render_transition_behavior_value(~loc, one)],
+            )
+          ],
+        ]
+      | more => [
+          [%expr
+            CSS.transitionBehaviors(
+              [%e
+                more
+                |> List.map(render_transition_behavior_value(~loc))
+                |> Builder.pexp_array(~loc)
+              ],
+            )
+          ],
+        ]
+      }
   );
 
 let render_transition_property = (~loc) =>
@@ -3336,6 +3610,9 @@ let render_transition_property = (~loc) =>
 
 let render_single_transition = (~loc) =>
   fun
+  | `Wide_keyword(kw) => [%expr
+      CSS.transition([%e render_wide_keyword(~loc, kw)])
+    ]
   | `Xor(property) => {
       [%expr
        CSS.Types.Transition.Value.make(
@@ -3424,6 +3701,9 @@ let transition =
       transitions
       |> List.map(
            fun
+           | `Wide_keyword(kw) => [%expr
+               CSS.transitions([%e render_wide_keyword(~loc, kw)])
+             ]
            | `Single_transition(x) => render_single_transition(~loc, x)
            | `Single_transition_no_interp(x) =>
              render_single_transition_no_interp(~loc, x),
@@ -3438,6 +3718,7 @@ let render_keyframes_name = (~loc) =>
 
 let render_animation_name = (~loc) =>
   fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
   | `None => [%expr CSS.Types.AnimationName.none]
   | `Keyframes_name(name) => {
       [%expr
@@ -3466,18 +3747,26 @@ let animation_name =
       ]
   );
 
+let render_animation_duration = (~loc) =>
+  fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+  | `Extended_time(extended_time) =>
+    render_extended_time(~loc, extended_time);
+
 let animation_duration =
   polymorphic(Property_parser.property_animation_duration, (~loc) =>
     fun
     | [one] => [
-        [%expr CSS.animationDuration([%e render_extended_time(~loc, one)])],
+        [%expr
+          CSS.animationDuration([%e render_animation_duration(~loc, one)])
+        ],
       ]
     | more => [
         [%expr
           CSS.animationDurations(
             [%e
               more
-              |> List.map(render_extended_time(~loc))
+              |> List.map(render_animation_duration(~loc))
               |> Builder.pexp_array(~loc)
             ],
           )
@@ -3485,18 +3774,28 @@ let animation_duration =
       ]
   );
 
+let render_animation_timing = (~loc) =>
+  fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+  | `Timing_function(timing_function) =>
+    render_timing(~loc, timing_function);
+
 let animation_timing_function =
   polymorphic(Property_parser.property_animation_timing_function, (~loc) =>
     fun
     | [one] => [
-        [%expr CSS.animationTimingFunction([%e render_timing(~loc, one)])],
+        [%expr
+          CSS.animationTimingFunction(
+            [%e render_animation_timing(~loc, one)],
+          )
+        ],
       ]
     | more => [
         [%expr
           CSS.animationTimingFunctions(
             [%e
               more
-              |> List.map(render_timing(~loc))
+              |> List.map(render_animation_timing(~loc))
               |> Builder.pexp_array(~loc)
             ],
           )
@@ -3515,13 +3814,23 @@ let render_single_animation_iteration_count = (~loc) =>
     render_single_animation_iteration_count_no_interp(~loc, x)
   | `Interpolation(v) => render_variable(~loc, v);
 
+let render_animation_iteration_count = (~loc) =>
+  fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+  | `Single_animation_iteration_count(single_animation_iteration_count) =>
+    switch (single_animation_iteration_count) {
+    | #Property_parser.Types.single_animation_iteration_count_no_interp as x =>
+      render_single_animation_iteration_count_no_interp(~loc, x)
+    | `Interpolation(v) => render_variable(~loc, v)
+    };
+
 let animation_iteration_count =
   polymorphic(Property_parser.property_animation_iteration_count, (~loc) =>
     fun
     | [one] => [
         [%expr
           CSS.animationIterationCount(
-            [%e render_single_animation_iteration_count(~loc, one)],
+            [%e render_animation_iteration_count(~loc, one)],
           )
         ],
       ]
@@ -3530,7 +3839,7 @@ let animation_iteration_count =
           CSS.animationIterationCounts(
             [%e
               more
-              |> List.map(render_single_animation_iteration_count(~loc))
+              |> List.map(render_animation_iteration_count(~loc))
               |> Builder.pexp_array(~loc)
             ],
           )
@@ -3551,14 +3860,22 @@ let render_single_animation_direction = (~loc) =>
     render_single_animation_direction_no_interp(~loc, x)
   | `Interpolation(v) => render_variable(~loc, v);
 
+let render_animation_direction = (~loc) =>
+  fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+  | `Single_animation_direction(single_animation_direction) =>
+    switch (single_animation_direction) {
+    | #Property_parser.Types.single_animation_direction_no_interp as x =>
+      render_single_animation_direction_no_interp(~loc, x)
+    | `Interpolation(v) => render_variable(~loc, v)
+    };
+
 let animation_direction =
   polymorphic(Property_parser.property_animation_direction, (~loc) =>
     fun
     | [one] => [
         [%expr
-          CSS.animationDirection(
-            [%e render_single_animation_direction(~loc, one)],
-          )
+          CSS.animationDirection([%e render_animation_direction(~loc, one)])
         ],
       ]
     | more => [
@@ -3566,7 +3883,7 @@ let animation_direction =
           CSS.animationDirections(
             [%e
               more
-              |> List.map(render_single_animation_direction(~loc))
+              |> List.map(render_animation_direction(~loc))
               |> Builder.pexp_array(~loc)
             ],
           )
@@ -3585,14 +3902,22 @@ let render_single_animation_play_state = (~loc) =>
     render_single_animation_play_state_no_interp(~loc, x)
   | `Interpolation(v) => render_variable(~loc, v);
 
+let render_animation_play_state = (~loc) =>
+  fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+  | `Single_animation_play_state(single_animation_play_state) =>
+    switch (single_animation_play_state) {
+    | #Property_parser.Types.single_animation_play_state_no_interp as x =>
+      render_single_animation_play_state_no_interp(~loc, x)
+    | `Interpolation(v) => render_variable(~loc, v)
+    };
+
 let animation_play_state =
   polymorphic(Property_parser.property_animation_play_state, (~loc) =>
     fun
     | [one] => [
         [%expr
-          CSS.animationPlayState(
-            [%e render_single_animation_play_state(~loc, one)],
-          )
+          CSS.animationPlayState([%e render_animation_play_state(~loc, one)])
         ],
       ]
     | more => [
@@ -3600,7 +3925,7 @@ let animation_play_state =
           CSS.animationPlayStates(
             [%e
               more
-              |> List.map(render_single_animation_play_state(~loc))
+              |> List.map(render_animation_play_state(~loc))
               |> Builder.pexp_array(~loc)
             ],
           )
@@ -3611,20 +3936,26 @@ let animation_play_state =
 let animation_delay =
   polymorphic(Property_parser.property_animation_delay, (~loc) =>
     fun
-    | [one] => [
-        [%expr CSS.animationDelay([%e render_extended_time(~loc, one)])],
+    | `Wide_keyword(kw) => [
+        [%expr CSS.animationDelay([%e render_wide_keyword(~loc, kw)])],
       ]
-    | more => [
-        [%expr
-          CSS.animationDelays(
-            [%e
-              more
-              |> List.map(render_extended_time(~loc))
-              |> Builder.pexp_array(~loc)
-            ],
-          )
-        ],
-      ]
+    | `Extended_time(extended_time_list) =>
+      switch (extended_time_list) {
+      | [one] => [
+          [%expr CSS.animationDelay([%e render_extended_time(~loc, one)])],
+        ]
+      | more => [
+          [%expr
+            CSS.animationDelays(
+              [%e
+                more
+                |> List.map(render_extended_time(~loc))
+                |> Builder.pexp_array(~loc)
+              ],
+            )
+          ],
+        ]
+      }
   );
 
 let render_single_animation_fill_mode_no_interp = (~loc) =>
@@ -3640,14 +3971,22 @@ let render_single_animation_fill_mode = (~loc) =>
     render_single_animation_fill_mode_no_interp(~loc, x)
   | `Interpolation(v) => render_variable(~loc, v);
 
+let render_animation_fill_mode = (~loc) =>
+  fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+  | `Single_animation_fill_mode(single_animation_fill_mode) =>
+    switch (single_animation_fill_mode) {
+    | #Property_parser.Types.single_animation_fill_mode_no_interp as x =>
+      render_single_animation_fill_mode_no_interp(~loc, x)
+    | `Interpolation(v) => render_variable(~loc, v)
+    };
+
 let animation_fill_mode =
   polymorphic(Property_parser.property_animation_fill_mode, (~loc) =>
     fun
     | [one] => [
         [%expr
-          CSS.animationFillMode(
-            [%e render_single_animation_fill_mode(~loc, one)],
-          )
+          CSS.animationFillMode([%e render_animation_fill_mode(~loc, one)])
         ],
       ]
     | more => [
@@ -3655,7 +3994,7 @@ let animation_fill_mode =
           CSS.animationFillModes(
             [%e
               more
-              |> List.map(render_single_animation_fill_mode(~loc))
+              |> List.map(render_animation_fill_mode(~loc))
               |> Builder.pexp_array(~loc)
             ],
           )
@@ -3840,8 +4179,11 @@ let animation =
       animations
       |> List.map(
            fun
-           | `Single_animation(x) => render_single_animation(~loc, x)
-           | `Single_animation_no_interp(x) =>
+           | `Wide_keyword(kw) => [%expr
+               CSS.animations([%e render_wide_keyword(~loc, kw)])
+             ]
+           | `Xor(`Single_animation(x)) => render_single_animation(~loc, x)
+           | `Xor(`Single_animation_no_interp(x)) =>
              render_single_animation_no_interp(~loc, x),
          )
       |> Builder.pexp_array(~loc)
@@ -3867,6 +4209,7 @@ let aspect_ratio =
     (~loc) => [%expr CSS.aspectRatio],
     (~loc, value) => {
       switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Auto => [%expr `auto]
       | `Ratio(ratio) => render_ratio(~loc, ratio)
       }
@@ -3908,11 +4251,16 @@ let order =
   monomorphic(
     Property_parser.property_order,
     (~loc) => [%expr CSS.order],
-    render_integer,
+    (~loc, value: Property_parser.Types.property_order) =>
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Integer(integer) => render_integer(~loc, integer)
+      },
   );
 
 let render_float_interp = (~loc, value) => {
   switch (value) {
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
   | `Number(n) => [%expr [%e render_float(~loc, n)]]
   | `Interpolation(v) => render_variable(~loc, v)
   };
@@ -3934,6 +4282,7 @@ let flex_shrink =
 
 let render_flex_basis = (~loc) =>
   fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
   | `Content => variant_to_expression(~loc, `Content)
   | `Property_width(value_width) => render_size(~loc, value_width)
   | `Interpolation(v) => render_variable(~loc, v);
@@ -3948,6 +4297,7 @@ let flex_basis =
 let flex =
   polymorphic(Property_parser.property_flex, (~loc, value) =>
     switch (value) {
+    | `Wide_keyword(kw) => [render_wide_keyword(~loc, kw)]
     | `None => [[%expr CSS.flex1(`none)]]
     | `Interpolation(interp) => [
         [%expr CSS.flex1([%e render_variable(~loc, interp)])],
@@ -4015,6 +4365,7 @@ let render_content_position_left_right = (~loc, value) => {
   | `Content_position(position) => render_content_position(~loc, position)
   | `Left => [%expr `left]
   | `Right => [%expr `right]
+  | `Interpolation(v) => render_variable(~loc, v)
   };
 };
 
@@ -4039,6 +4390,7 @@ let justify_content =
     (~loc) => [%expr CSS.justifyContent],
     (~loc, value) => {
       switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Normal => [%expr `normal]
       | `Content_distribution(distribution) =>
         render_content_distribution(~loc, distribution)
@@ -4077,6 +4429,7 @@ let justify_items =
     (~loc) => [%expr CSS.justifyItems],
     (~loc, value) => {
       switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Normal => [%expr `normal]
       | `Stretch => [%expr `stretch]
       | `Legacy => [%expr `legacy]
@@ -4101,6 +4454,7 @@ let justify_self =
     (~loc) => [%expr CSS.justifySelf],
     (~loc, value) => {
       switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Auto => [%expr `auto]
       | `Normal => [%expr `normal]
       | `Stretch => [%expr `stretch]
@@ -4124,6 +4478,7 @@ let align_items =
     (~loc) => [%expr CSS.alignItems],
     (~loc, value) => {
       switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Normal => [%expr `normal]
       | `Stretch => [%expr `stretch]
       | `Baseline_position(pos, ()) => render_baseline_position(~loc, pos)
@@ -4147,6 +4502,7 @@ let align_self =
     (~loc) => [%expr CSS.alignSelf],
     (~loc, value) => {
       switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Auto => [%expr `auto]
       | `Normal => [%expr `normal]
       | `Stretch => [%expr `stretch]
@@ -4171,6 +4527,7 @@ let align_content =
     (~loc) => [%expr CSS.alignContent],
     (~loc, value) => {
       switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Baseline_position(pos, ()) => render_baseline_position(~loc, pos)
       | `Normal => [%expr `normal]
       | `Content_distribution(distribution) =>
@@ -4409,6 +4766,7 @@ let render_subgrid =
 
 let render_grid_template_rows_and_columns = (~loc) =>
   fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
   | `Interpolation(v) => render_variable(~loc, v)
   | `None => [%expr `none]
   | `Masonry => [%expr `masonry]
@@ -4444,6 +4802,7 @@ let grid_template_areas =
     (~loc) => [%expr CSS.gridTemplateAreas],
     (~loc) =>
       fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `None => [%expr `none]
       | `Xor(areas) => {
           let areasExpr =
@@ -4481,6 +4840,7 @@ let render_explicit_track_list = (~loc, track_list, line_names) => {
 
 let render_grid_template = (~loc) =>
   fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
   | `None => [%expr `none]
   | `Static_0(rows, _, columns) => [%expr
       `rowsColumns((
@@ -4513,9 +4873,13 @@ let grid_auto_columns =
     (~loc) => [%expr CSS.gridAutoColumns],
     (~loc, sizes) => {
       let sizesExpr =
-        sizes
-        |> List.map(render_track_size(~loc))
-        |> Builder.pexp_array(~loc);
+        switch (sizes) {
+        | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+        | `Track_size(sizes) =>
+          sizes
+          |> List.map(render_track_size(~loc))
+          |> Builder.pexp_array(~loc)
+        };
       [%expr `trackSizes([%e sizesExpr])];
     },
   );
@@ -4526,9 +4890,13 @@ let grid_auto_rows =
     (~loc) => [%expr CSS.gridAutoRows],
     (~loc, sizes) => {
       let sizesExpr =
-        sizes
-        |> List.map(render_track_size(~loc))
-        |> Builder.pexp_array(~loc);
+        switch (sizes) {
+        | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+        | `Track_size(sizes) =>
+          sizes
+          |> List.map(render_track_size(~loc))
+          |> Builder.pexp_array(~loc)
+        };
       [%expr `trackSizes([%e sizesExpr])];
     },
   );
@@ -4539,6 +4907,7 @@ let grid_auto_flow =
     (~loc) => [%expr CSS.gridAutoFlow],
     (~loc) =>
       fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Interpolation(values) => render_variable(~loc, values)
       | `Or(Some(`Row), None) => [%expr `row]
       | `Or(Some(`Column), None) => [%expr `column]
@@ -4585,6 +4954,7 @@ let grid =
     (~loc) => [%expr CSS.gridProperty],
     (~loc) =>
       fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Property_grid_template(x) => [%expr
           `template([%e render_grid_template(~loc, x)])
         ]
@@ -4598,7 +4968,9 @@ let grid =
             };
           let auto_columns =
             switch (auto_columns) {
-            | Some(cols) => [%expr
+            | Some(`Wide_keyword(wide_keyword)) =>
+              render_wide_keyword(~loc, wide_keyword)
+            | Some(`Track_size(cols)) => [%expr
                Some(
                  [%e
                    cols
@@ -4621,7 +4993,9 @@ let grid =
             };
           let auto_rows =
             switch (auto_rows) {
-            | Some(cols) => [%expr
+            | Some(`Wide_keyword(wide_keyword)) =>
+              render_wide_keyword(~loc, wide_keyword)
+            | Some(`Track_size(cols)) => [%expr
                Some(
                  [%e
                    cols
@@ -4646,6 +5020,7 @@ let grid_row_gap =
     (~loc) => [%expr CSS.gridRowGap],
     (~loc) =>
       fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Extended_length(el) => render_extended_length(~loc, el)
       | `Extended_percentage(ep) => render_extended_percentage(~loc, ep),
   );
@@ -4656,6 +5031,7 @@ let grid_column_gap =
     (~loc) => [%expr CSS.gridColumnGap],
     (~loc) =>
       fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Extended_length(el) => render_extended_length(~loc, el)
       | `Extended_percentage(ep) => render_extended_percentage(~loc, ep),
   );
@@ -4664,34 +5040,49 @@ let grid_row_start =
   monomorphic(
     Property_parser.property_grid_row_start,
     (~loc) => [%expr CSS.gridRowStart],
-    render_grid_line,
+    (~loc) =>
+      fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Grid_line(grid_line) => render_grid_line(~loc, grid_line),
   );
 
 let grid_column_start =
   monomorphic(
     Property_parser.property_grid_column_start,
     (~loc) => [%expr CSS.gridColumnStart],
-    render_grid_line,
+    (~loc) =>
+      fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Grid_line(grid_line) => render_grid_line(~loc, grid_line),
   );
 
 let grid_row_end =
   monomorphic(
     Property_parser.property_grid_row_end,
     (~loc) => [%expr CSS.gridRowEnd],
-    render_grid_line,
+    (~loc) =>
+      fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Grid_line(grid_line) => render_grid_line(~loc, grid_line),
   );
 
 let grid_column_end =
   monomorphic(
     Property_parser.property_grid_column_end,
     (~loc) => [%expr CSS.gridColumnEnd],
-    render_grid_line,
+    (~loc) =>
+      fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Grid_line(grid_line) => render_grid_line(~loc, grid_line),
   );
 
 let grid_area =
-  polymorphic(Property_parser.property_grid_area, (~loc, value) =>
-    switch (value) {
-    | (gl1, [(_, gl2), (_, gl3), (_, gl4), ..._]) => [
+  polymorphic(Property_parser.property_grid_area, (~loc) =>
+    fun
+    | `Wide_keyword(kw) => [
+        [%expr CSS.gridArea([%e render_wide_keyword(~loc, kw)])],
+      ]
+    | `Static(gl1, [(_, gl2), (_, gl3), (_, gl4), ..._]) => [
         [%expr
           CSS.gridArea4(
             [%e render_grid_line(~loc, gl1)],
@@ -4701,7 +5092,7 @@ let grid_area =
           )
         ],
       ]
-    | (gl1, [(_, gl2), (_, gl3), ..._]) => [
+    | `Static(gl1, [(_, gl2), (_, gl3), ..._]) => [
         [%expr
           CSS.gridArea3(
             [%e render_grid_line(~loc, gl1)],
@@ -4710,8 +5101,7 @@ let grid_area =
           )
         ],
       ]
-
-    | (gl1, [(_, gl2), ..._]) => [
+    | `Static(gl1, [(_, gl2), ..._]) => [
         [%expr
           CSS.gridArea2(
             [%e render_grid_line(~loc, gl1)],
@@ -4719,17 +5109,21 @@ let grid_area =
           )
         ],
       ]
-    | (gl1, []) => [[%expr CSS.gridArea([%e render_grid_line(~loc, gl1)])]]
-    }
+    | `Static(gl1, []) => [
+        [%expr CSS.gridArea([%e render_grid_line(~loc, gl1)])],
+      ]
   );
 
 let grid_row =
   polymorphic(Property_parser.property_grid_row, (~loc) =>
     fun
-    | (start, None) => [
+    | `Wide_keyword(kw) => [
+        [%expr CSS.gridRow([%e render_wide_keyword(~loc, kw)])],
+      ]
+    | `Static(start, None) => [
         [%expr CSS.gridRow([%e render_grid_line(~loc, start)])],
       ]
-    | (start, Some((_, end_))) => [
+    | `Static(start, Some((_, end_))) => [
         [%expr
           CSS.gridRow2(
             [%e render_grid_line(~loc, start)],
@@ -4742,10 +5136,13 @@ let grid_row =
 let grid_column =
   polymorphic(Property_parser.property_grid_column, (~loc) =>
     fun
-    | (start, None) => [
+    | `Wide_keyword(kw) => [
+        [%expr CSS.gridColumn([%e render_wide_keyword(~loc, kw)])],
+      ]
+    | `Static(start, None) => [
         [%expr CSS.gridColumn([%e render_grid_line(~loc, start)])],
       ]
-    | (start, Some((_, end_))) => [
+    | `Static(start, Some((_, end_))) => [
         [%expr
           CSS.gridColumn2(
             [%e render_grid_line(~loc, start)],
@@ -4764,6 +5161,7 @@ let render_gap =
       ],
     ) => {
   switch (value) {
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
   | `Extended_length(el) => render_extended_length(~loc, el)
   | `Extended_percentage(ep) => render_extended_percentage(~loc, ep)
   | `Normal => [%expr `normal]
@@ -4773,8 +5171,13 @@ let render_gap =
 let grid_gap =
   polymorphic(Property_parser.property_grid_gap, (~loc) =>
     fun
-    | (row, None) => [[%expr CSS.gridGap([%e render_gap(~loc, row)])]]
-    | (row, Some(column)) => [
+    | `Wide_keyword(kw) => [
+        [%expr CSS.gridGap([%e render_wide_keyword(~loc, kw)])],
+      ]
+    | `Static(row, None) => [
+        [%expr CSS.gridGap([%e render_gap(~loc, row)])],
+      ]
+    | `Static(row, Some(column)) => [
         [%expr
           CSS.gridGap2(
             ~rowGap=[%e render_gap(~loc, row)],
@@ -4787,8 +5190,11 @@ let grid_gap =
 let gap =
   polymorphic(Property_parser.property_gap, (~loc) =>
     fun
-    | (row, None) => [[%expr CSS.gap([%e render_gap(~loc, row)])]]
-    | (row, Some(column)) => [
+    | `Wide_keyword(kw) => [
+        [%expr CSS.gap([%e render_wide_keyword(~loc, kw)])],
+      ]
+    | `Static(row, None) => [[%expr CSS.gap([%e render_gap(~loc, row)])]]
+    | `Static(row, Some(column)) => [
         [%expr
           CSS.gap2(
             ~rowGap=[%e render_gap(~loc, row)],
@@ -4804,6 +5210,7 @@ let z_index =
     (~loc) => [%expr CSS.zIndex],
     (~loc, value) => {
       switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Auto => [%expr `auto]
       | `Interpolation(v) => render_variable(~loc, v)
       | `Integer(i) => [%expr `num([%e render_integer(~loc, i)])]
@@ -4813,6 +5220,7 @@ let z_index =
 
 let render_position_value = (~loc) =>
   fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
   | `Auto => variant_to_expression(~loc, `Auto)
   | `Extended_length(l) => render_extended_length(~loc, l)
   | `Extended_percentage(pct) => render_extended_percentage(~loc, pct);
@@ -4847,6 +5255,7 @@ let bottom =
 
 let render_display = (~loc) =>
   fun
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
   | `Block => [%expr `block]
   | `Contents => [%expr `contents]
   | `Flex => [%expr `flex]
@@ -4907,7 +5316,8 @@ let mask_image =
     (~loc) => [%expr CSS.maskImage],
     (~loc) =>
       fun
-      | [one] => render_mask_image(~loc, one)
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Mask_reference([one]) => render_mask_image(~loc, one)
       | _ => raise(Unsupported_feature),
   );
 
@@ -4926,14 +5336,20 @@ let fill =
   monomorphic(
     Property_parser.property_fill,
     (~loc) => [%expr CSS.SVG.fill],
-    render_paint,
+    (~loc) =>
+      fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Paint(paint) => render_paint(~loc, paint),
   );
 
 let stroke =
   monomorphic(
     Property_parser.property_stroke,
     (~loc) => [%expr CSS.SVG.stroke],
-    render_paint,
+    (~loc) =>
+      fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Paint(paint) => render_paint(~loc, paint),
   );
 
 let render_alpha_value = (~loc, value: Property_parser.Types.alpha_value) => {
@@ -4947,7 +5363,12 @@ let stroke_opacity =
   monomorphic(
     Property_parser.property_stroke_opacity,
     (~loc) => [%expr CSS.SVG.strokeOpacity],
-    render_alpha_value,
+    (~loc, value) => {
+      switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Alpha_value(alpha_value) => render_alpha_value(~loc, alpha_value)
+      }
+    },
   );
 
 let line_break =
@@ -4956,6 +5377,7 @@ let line_break =
     (~loc) => [%expr CSS.lineBreak],
     (~loc, value) => {
       switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Auto => [%expr `auto]
       | `Loose => [%expr `loose]
       | `Normal => [%expr `normal]
@@ -4982,7 +5404,12 @@ let column_gap =
   monomorphic(
     Property_parser.property_column_gap,
     (~loc) => [%expr CSS.columnGap],
-    (~loc) => render_gap(~loc),
+    (~loc) =>
+      fun
+      | `Normal => [%expr `normal]
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Extended_length(el) => render_extended_length(~loc, el)
+      | `Extended_percentage(ep) => render_extended_percentage(~loc, ep),
   );
 
 let column_rule = unsupportedProperty(Property_parser.property_column_rule);
@@ -5010,6 +5437,7 @@ let counter_set = unsupportedProperty(Property_parser.property_counter_set);
 
 let render_cursor = (~loc, value) =>
   switch (value) {
+  | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
   | `Interpolation(variable) => render_variable(~loc, variable)
   | `Auto => [%expr `auto]
   | `Default => [%expr `default]
@@ -5147,6 +5575,7 @@ let filter =
     (~loc) => [%expr CSS.filter],
     (~loc, value) => {
       switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `None => [%expr [|`none|]]
       | `Interpolation(v) => render_variable(~loc, v)
       | `Filter_function_list(ffl) => render_filter_function_list(~loc, ffl)
@@ -5160,6 +5589,7 @@ let backdrop_filter =
     (~loc) => [%expr CSS.backdropFilter],
     (~loc, value) =>
       switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `None => [%expr [|`none|]]
       | `Interpolation(v) => render_variable(~loc, v)
       | `Filter_function_list(ffl) => render_filter_function_list(~loc, ffl)
@@ -5185,6 +5615,7 @@ let list_style_image =
     (~loc) => [%expr CSS.listStyleImage],
     (~loc, value: Property_parser.Types.property_list_style_image) => {
       switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `None => [%expr `none]
       | `Image(i) => render_image(~loc, i)
       }
@@ -5208,7 +5639,12 @@ let row_gap =
   monomorphic(
     Property_parser.property_row_gap,
     (~loc) => [%expr CSS.rowGap],
-    (~loc) => render_gap(~loc),
+    (~loc) =>
+      fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
+      | `Normal => [%expr `normal]
+      | `Extended_length(el) => render_extended_length(~loc, el)
+      | `Extended_percentage(ep) => render_extended_percentage(~loc, ep),
   );
 
 let scrollbar_3dlight_color =
@@ -5226,6 +5662,7 @@ let scrollbar_color =
     (~loc) => [%expr CSS.scrollbarColor],
     (~loc, value: Property_parser.Types.property_scrollbar_color) =>
       switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Auto => [%expr `auto]
       | `Static(thumbColor, trackColor) => [%expr
          `thumbTrackColor((
@@ -5257,6 +5694,7 @@ let scrollbar_width =
     (~loc) => [%expr CSS.scrollbarWidth],
     (~loc, value: Property_parser.Types.property_scrollbar_width) =>
       switch (value) {
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Thin => [%expr `thin]
       | `Auto => [%expr `auto]
       | `None => [%expr `none]
@@ -5280,7 +5718,7 @@ let stroke_width = unsupportedProperty(Property_parser.property_stroke_width);
 let text_combine_upright =
   unsupportedProperty(Property_parser.property_text_combine_upright);
 
-let all = unsupportedProperty(Property_parser.property_all);
+let all = unsupportedProperty(Property_parser.wide_keyword);
 
 let appearance = unsupportedProperty(Property_parser.property_appearance);
 
@@ -5588,7 +6026,7 @@ let render_content_list =
          let counter_style_opt =
            switch (list_style_type_opt) {
            | Some(`Counter_style(cs)) => Some(cs)
-           | Some(`None | `String(_)) => None
+           | Some(`None | `String(_) | `Wide_keyword(_)) => None
            | None => None
            };
          render_counter(~loc, counter_name, counter_style_opt);
@@ -5604,6 +6042,7 @@ let render_content_list =
 let content =
   polymorphic(Property_parser.property_content, (~loc, value) => {
     switch (value) {
+    | `Wide_keyword(kw) => [render_wide_keyword(~loc, kw)]
     | `Normal => [[%expr CSS.contentRule(`normal)]]
     | `None => [[%expr CSS.contentRule(`none)]]
     | `String(str) => [
@@ -5725,8 +6164,11 @@ let mask_origin = unsupportedProperty(Property_parser.property_mask_origin);
 let mask_position =
   polymorphic(Property_parser.property_mask_position, (~loc) =>
     fun
-    | [one] => [[%expr CSS.maskPosition([%e render_position(~loc, one)])]]
-    | more => [
+    | `Wide_keyword(kw) => [render_wide_keyword(~loc, kw)]
+    | `Position([one]) => [
+        [%expr CSS.maskPosition([%e render_position(~loc, one)])],
+      ]
+    | `Position(more) => [
         [%expr
           CSS.maskPositions(
             [%e
@@ -5771,6 +6213,7 @@ let offset_anchor =
     (~loc) => [%expr CSS.offsetAnchor],
     (~loc) =>
       fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Auto => [%expr `auto]
       | `Position(x) => render_position(~loc, x),
   );
@@ -5853,6 +6296,7 @@ let user_select =
     (~loc) => [%expr CSS.userSelect],
     (~loc) =>
       fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Auto => [%expr `auto]
       | `Text => [%expr `text]
       | `Contain => [%expr `contain]
@@ -5867,6 +6311,7 @@ let zoom =
     (~loc) => [%expr CSS.zoom],
     (~loc) =>
       fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Number(number) => [%expr `num([%e render_float(~loc, number)])]
       | `Extended_percentage(v) => render_extended_percentage(~loc, v)
       | `Reset => [%expr `reset]
@@ -5879,6 +6324,7 @@ let visibility =
     (~loc) => [%expr CSS.visibility],
     (~loc) =>
       fun
+      | `Wide_keyword(kw) => render_wide_keyword(~loc, kw)
       | `Visible => [%expr `visible]
       | `Hidden => [%expr `hidden]
       | `Collapse => [%expr `collapse]
