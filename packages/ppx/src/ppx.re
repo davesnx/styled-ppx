@@ -833,6 +833,44 @@ let keyframe_extension =
     ),
   );
 
+let keyframe2_extension =
+  Ppxlib.Context_free.Rule.extension(
+    Ppxlib.Extension.declare(
+      "keyframe2",
+      Ppxlib.Extension.Context.Expression,
+      any_payload_pattern,
+      (~loc as _, ~path, payload) => {
+        File.set(path);
+        switch (payload.pexp_desc) {
+        | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
+          switch (Styled_ppx_css_parser.Driver.parse_keyframes(txt)) {
+          | Ok(declarations) =>
+            let keyframe_name = Css_file.push_keyframe(declarations);
+            Builder.estring(~loc=stringLoc, keyframe_name);
+          | Error((start_pos, end_pos, msg)) =>
+            let loc =
+              Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
+                ~loc=stringLoc,
+                ~delimiter,
+                start_pos,
+                end_pos,
+              );
+            Error.expr(~loc, msg);
+          }
+        | _ =>
+          Error.raise(
+            ~loc=payload.pexp_loc,
+            ~examples=[
+              "[%keyframe2 \"0% { opacity: 0; } 100% { opacity: 1; }\"]",
+            ],
+            ~link="https://styled-ppx.vercel.app/reference/keyframe",
+            "[%keyframe2] expects a string of CSS with keyframe definitions.",
+          )
+        };
+      },
+    ),
+  );
+
 let css_extension =
   Ppxlib.Context_free.Rule.extension(
     Ppxlib.Extension.declare(
@@ -904,6 +942,65 @@ let styled_global_extension =
             ],
             ~link="https://styled-ppx.vercel.app/reference/global",
             "[%styled.global] expects a string of CSS with selectors that apply to the whole document.",
+          )
+        };
+      },
+    ),
+  );
+
+let styled_global2_extension =
+  Ppxlib.Context_free.Rule.extension(
+    Ppxlib.Extension.declare(
+      "styled.global2",
+      Ppxlib.Extension.Context.Expression,
+      any_payload_pattern,
+      (~loc as _, ~path, payload) => {
+        File.set(path);
+        switch (payload.pexp_desc) {
+        | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
+          switch (Styled_ppx_css_parser.Driver.parse_declaration_list(txt)) {
+          | Ok(rule_list) =>
+            let (rules, rule_loc) = rule_list;
+            /* Validate that only Style_rule and At_rule are present */
+            let has_invalid_rules =
+              List.exists(
+                fun
+                | Styled_ppx_css_parser.Ast.Declaration(_) => true
+                | _ => false,
+                rules,
+              );
+            if (has_invalid_rules) {
+              Error.expr(
+                ~loc=rule_loc,
+                {|Declarations does not make sense in global styles. Global should consists of style rules or at-rules (e.g @media, @print, etc.)
+
+If your intent is to apply the declaration to all elements, use the universal selector
+* {
+  /* Your declarations here */
+}|},
+              );
+            } else {
+              Css_file.push_global(rule_list);
+              Builder.eunit(~loc=stringLoc);
+            };
+          | Error((start_pos, end_pos, msg)) =>
+            let loc =
+              Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
+                ~loc=stringLoc,
+                ~delimiter,
+                start_pos,
+                end_pos,
+              );
+            Error.expr(~loc, msg);
+          }
+        | _ =>
+          Error.expr(
+            ~loc=payload.pexp_loc,
+            ~examples=[
+              "[%styled.global2 \"body { margin: 0; } .container { padding: 20px; }\"]",
+            ],
+            ~link="https://styled-ppx.vercel.app/reference/global",
+            "[%styled.global2] expects a string of CSS with selectors that apply to the whole document.",
           )
         };
       },
@@ -1019,7 +1116,9 @@ let () = {
       cx_extension_without_let_binding,
       css_extension,
       styled_global_extension,
+      styled_global2_extension,
       keyframe_extension,
+      keyframe2_extension,
       legacy_styled_extension,
       cx2_extension,
     ],

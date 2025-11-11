@@ -1,7 +1,5 @@
 let element = ReactDOM.querySelector("#root");
 
-let x = [%cx2 {| object-position: inherit; |}];
-
 switch (element) {
 | Some(root) =>
   let root = ReactDOM.Client.createRoot(root);
