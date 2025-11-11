@@ -625,8 +625,23 @@ let cx_extension_without_let_binding =
     ),
   );
 
+let is_css_keyword = (value: Styled_ppx_css_parser.Ast.component_value) => {
+  switch (value) {
+  | Ident("inherit")
+  | Ident("unset")
+  | Ident("initial")
+  | Ident("revert")
+  | Ident("revert-layer") => true
+  | _ => false
+  };
+};
+
 let rec type_check_rule = (rule: Styled_ppx_css_parser.Ast.rule) => {
   switch (rule) {
+  | Declaration({name: _, value: ([(value, _)], _), _})
+      when is_css_keyword(value) => [
+      Ok(),
+    ]
   | Declaration({name: (name, _), value: (value, _), loc, _}) =>
     let value = Styled_ppx_css_parser.Render.component_value_list(value);
     [Css_grammar.Parser.check_property(~loc, ~name, value)];
