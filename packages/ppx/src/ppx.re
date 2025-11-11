@@ -625,6 +625,7 @@ let cx_extension_without_let_binding =
     ),
   );
 
+/* This a slight hack to allow the use of CSS keywords as values, since the parser/type-checker doesn't contain them on each property. This enforces it as a general value. */
 let is_css_keyword = (value: Styled_ppx_css_parser.Ast.component_value) => {
   switch (value) {
   | Ident("inherit")
