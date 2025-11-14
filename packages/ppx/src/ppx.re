@@ -919,22 +919,8 @@ let expands_styles_prop = (~traverse, expr: Ppxlib.expression) => {
   switch (expr.pexp_desc) {
   | Pexp_apply(tag, args) when is_jsx(expr) =>
     let new_args =
-      List.concat_map(
-        ((arg_label, arg)) => {
-          switch (arg_label) {
-          | Ppxlib.Labelled("styles") => [
-              (Ppxlib.Labelled("className"), [%expr fst([%e arg])]),
-              (Ppxlib.Labelled("style"), [%expr snd([%e arg])]),
-            ]
-          | Ppxlib.Optional("styles") => [
-              (Ppxlib.Optional("className"), [%expr fst([%e arg])]),
-              (Ppxlib.Optional("style"), [%expr snd([%e arg])]),
-            ]
-          | _ => [(arg_label, traverse(arg))]
-          }
-        },
-        args,
-      );
+      Expand_styles_attribute.make(~loc, args)
+      |> List.map(((label, expr)) => (label, traverse(expr)));
 
     {
       ...Builder.pexp_apply(~loc, traverse(tag), new_args),
