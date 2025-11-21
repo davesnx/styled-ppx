@@ -1,0 +1,6 @@
+(melange.emit
+ (target melange-styles-prop-expansion)
+ (modules input)
+ (libraries styled-ppx.melange)
+ (preprocess
+  (pps styled-ppx reason-react-ppx)))
