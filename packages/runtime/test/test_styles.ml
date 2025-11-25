@@ -797,7 +797,7 @@ let style_tag () =
   let global_hash = "18zdck7" in
   assert_string css
     (Printf.sprintf
-       "<style data-emotion=\"css %s %s %s\" data-s>html{line-height:1.15;} \
+       "<style data-emotion=\"css %s %s %s\" data-s=\"\">html{line-height:1.15;} \
         @keyframes %s { 0%% { -webkit-transform: rotate(0deg); -moz-transform: \
         rotate(0deg); -ms-transform: rotate(0deg); transform: rotate(0deg); } \
         100%% { -webkit-transform: rotate(-360deg); -moz-transform: \

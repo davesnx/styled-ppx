@@ -129,6 +129,12 @@ test: build
 		fi \
 	done
 
+.PHONY: test
+test-promote: build
+	@for target in $(TEST_TARGETS); do \
+		ALCOTEST_VERBOSE=false make $${target}-promote; \
+	done
+
 .PHONY: test-demo
 test-demo: build test-demo-rescript-v9 test-demo-rescript-v10 ## Run demo tests
 

@@ -15,3 +15,23 @@ let maybe_css = Some([%cx2 {|
 |}]);
 
 <div styles=?maybe_css />;
+<div className="extra-classname" styles={css(CSS.red)} />;
+<div className="extra-classname" styles=?maybe_css />;
+<div
+  style={ReactDOM.Style.make([|("display", "flex")|])}
+  styles={css(CSS.red)}
+/>;
+<div
+  style={ReactDOM.Style.make([|("display", "flex")|])}
+  styles=?maybe_css
+/>;
+<div
+  className="extra-classname"
+  style={ReactDOM.Style.make([|("display", "flex")|])}
+  styles={css(CSS.red)}
+/>;
+<div
+  className="extra-classname"
+  style={ReactDOM.Style.make([|("display", "flex")|])}
+  styles=?maybe_css
+/>;

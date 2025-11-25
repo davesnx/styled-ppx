@@ -3,6 +3,7 @@ module Buffer = {
      Ensures uniqueness of CSS rules by className */
   type rule = (string, string);
   let accumulated_rules: ref(list(rule)) = ref([]);
+  let global_rules: ref(list(rule)) = ref([]);
 
   /* Adds a CSS rule if not already present */
   let add_rule = (className: string, cssText: string) => {
@@ -17,12 +18,33 @@ module Buffer = {
     };
   };
 
-  /* Generates the final CSS content */
+  /* Adds a global CSS rule if not already present */
+  let add_global_rule = (className: string, cssText: string) => {
+    let already_exists =
+      List.exists(
+        ((existingClass, _)) => existingClass == className,
+        global_rules^,
+      );
+
+    if (!already_exists) {
+      global_rules := [(className, cssText), ...global_rules^];
+    };
+  };
+
+  /* Generates the final CSS content with global rules first */
   let get_all_css = () => {
     let buffer = Buffer.create(1024);
     let separator = Settings.Get.minify() ? "" : "\n";
 
-    /* Reverse to maintain insertion order, then concatenate */
+    /* First, add global rules */
+    global_rules^
+    |> List.rev
+    |> List.iter(((_, cssText)) => {
+         Buffer.add_string(buffer, cssText);
+         Buffer.add_string(buffer, separator);
+       });
+
+    /* Then, add regular rules */
     accumulated_rules^
     |> List.rev
     |> List.iter(((_, cssText)) => {
@@ -35,6 +57,7 @@ module Buffer = {
 
   let clear = () => {
     accumulated_rules := [];
+    global_rules := [];
   };
 };
 
@@ -447,6 +470,94 @@ let push = (declarations: Styled_ppx_css_parser.Ast.rule_list) => {
        });
 
   (classNames, dynamic_vars);
+};
+
+/*
+ * Takes keyframe declarations and:
+ * 1. Generates a unique keyframe name from content hash
+ * 2. Wraps the rules in an @keyframes at-rule
+ * 3. Renders and pushes the CSS into the Buffer
+ * 4. Returns the generated keyframe name
+ */
+let push_keyframe = (keyframe_rules: Styled_ppx_css_parser.Ast.rule_list) => {
+  open Styled_ppx_css_parser.Ast;
+
+  /* Select renderer function based on minify setting for final output */
+  let render_rule =
+    if (Settings.Get.minify()) {
+      Styled_ppx_css_parser.Minify.rule;
+    } else {
+      Styled_ppx_css_parser.Render.rule;
+    };
+
+  /* Always use non-minified renderer for hash generation to ensure stable names */
+  let (rules, _) = keyframe_rules;
+  let rendered_body =
+    rules
+    |> List.map(Styled_ppx_css_parser.Render.rule)
+    |> String.concat(" ");
+
+  /* Generate unique keyframe name from content */
+  let keyframe_name =
+    Printf.sprintf("keyframe-%s", Murmur2.default(rendered_body));
+
+  /* Create the @keyframes at-rule */
+  let at_rule: at_rule = {
+    name: ("keyframes", Ppxlib.Location.none),
+    prelude: (
+      [(Ident(keyframe_name), Ppxlib.Location.none)],
+      Ppxlib.Location.none,
+    ),
+    block: Rule_list(keyframe_rules),
+    loc: Ppxlib.Location.none,
+  };
+
+  /* Render the complete @keyframes rule */
+  let rendered_keyframe = render_rule(At_rule(at_rule));
+
+  /* Add to buffer with the keyframe name as the key */
+  Buffer.add_rule(keyframe_name, rendered_keyframe);
+
+  /* Return the keyframe name for use in animation properties */
+  keyframe_name;
+};
+
+/*
+ * Takes global style rules and:
+ * 1. Renders each rule (style rules and at-rules)
+ * 2. Pushes them directly into the Buffer without transformation
+ * 3. Global styles are output as-is without className prefixing
+ */
+let push_global = (global_rules: Styled_ppx_css_parser.Ast.rule_list) => {
+  open Styled_ppx_css_parser.Ast;
+
+  /* Select renderer function based on minify setting */
+  let render_rule =
+    if (Settings.Get.minify()) {
+      Styled_ppx_css_parser.Minify.rule;
+    } else {
+      Styled_ppx_css_parser.Render.rule;
+    };
+
+  let (rules, _) = global_rules;
+
+  /* Process each rule individually */
+  rules
+  |> List.iter(rule => {
+       /* Validate that only style_rule and at_rule are present */
+       switch (rule) {
+       | Style_rule(_)
+       | At_rule(_) =>
+         /* Render and add each rule to the global buffer */
+         let rendered = render_rule(rule);
+         /* Generate a unique key from the content for deduplication */
+         let key = Printf.sprintf("global-%s", Murmur2.default(rendered));
+         Buffer.add_global_rule(key, rendered);
+       | Declaration(_) =>
+         /* This case should be caught by the ppx before reaching here */
+         ()
+       }
+     });
 };
 
 let get = () => {
