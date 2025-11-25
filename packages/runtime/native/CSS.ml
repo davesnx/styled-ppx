@@ -517,7 +517,7 @@ let style_tag ?key:_ ?children:_ () =
     [
       String
         ("data-emotion", "data-emotion", "css " ^ get_string_style_hashes ());
-      Bool ("data-s", "data-s", true);
+      String ("data-s", "data-s", "");
       DangerouslyInnerHtml (get_stylesheet ());
     ]
     []
