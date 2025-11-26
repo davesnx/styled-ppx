@@ -1,7 +1,4 @@
 open Css_grammar;
-open Rule.Match;
-open Modifier;
-open Standard;
 
 let parse_exn = (prop, str) =>
   switch (Parser.parse(prop, str)) {

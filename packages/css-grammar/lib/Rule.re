@@ -139,3 +139,26 @@ module Pattern = {
 
   let value = (value, rule) => Match.bind(rule, () => Match.return(value));
 };
+
+/* TODO: Duplicated with Parser.parse */
+/* Parse a string input using a rule, returning Ok(value) or Error(message) */
+let parse_string = (rule: rule('a), input: string): result('a, string) => {
+  open Styled_ppx_css_parser.Lexer;
+  let tokens_with_loc = from_string(input);
+  let tokens =
+    tokens_with_loc
+    |> List.map(({txt, _}) =>
+         switch (txt) {
+         | Ok(token) => token
+         | Error((token, _)) => token
+         }
+       );
+  let tokens_without_ws =
+    tokens |> List.filter(token => token != Styled_ppx_css_parser.Parser.WS);
+  switch (rule(tokens_without_ws)) {
+  | (Ok(value), []) => Ok(value)
+  | (Ok(value), [Styled_ppx_css_parser.Parser.EOF]) => Ok(value)
+  | (Ok(_), _rest) => Error("Failed to parse CSS: tokens remaining")
+  | (Error(err), _) => Error(String.concat(", ", err))
+  };
+};

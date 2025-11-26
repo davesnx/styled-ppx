@@ -8,12 +8,31 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     txt,
   };
 
-  let kebab_case_to_snake_case = name =>
+  let kebab_case_to_snake_case = name => {
+    /* Strip leading hyphens (e.g., "-non-standard-color" -> "non_standard_color") */
+    let name =
+      if (String.length(name) > 0 && name.[0] == '-') {
+        String.sub(name, 1, String.length(name) - 1);
+      } else {
+        name;
+      };
     name |> String.split_on_char('-') |> String.concat("_");
+  };
 
   let first_uppercase = name =>
-    (String.sub(name, 0, 1) |> String.uppercase_ascii)
-    ++ String.sub(name, 1, String.length(name) - 1);
+    if (String.length(name) == 0) {
+      "";
+    } else {
+      (String.sub(name, 0, 1) |> String.uppercase_ascii)
+      ++ String.sub(name, 1, String.length(name) - 1);
+    };
+
+  let kebab_case_to_pascal_case = name =>
+    name
+    |> String.split_on_char('-')
+    |> List.filter(s => String.length(s) > 0)
+    |> List.map(first_uppercase)
+    |> String.concat("");
 
   let is_function = str => {
     open String;
@@ -49,6 +68,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     | "=" => "equal"
     | ">" => "biggerthan"
     | "|" => "vbar"
+    | "||" => "doublevbar"
     | "~" => "tilde"
     | "$" => "dollar"
     | _ => "unknown";
@@ -67,8 +87,26 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
   };
 
   let keyword_to_css = str => {
+    /* Handle special characters that can't be OCaml identifiers */
+    let str =
+      if (String.length(str) > 0 && str.[0] == '@') {
+        "at_" ++ String.sub(str, 1, String.length(str) - 1);
+      } else {
+        str;
+      };
     switch (str) {
     | "%" => "percent"
+    | ">" => "biggerthan"
+    | ">=" => "biggerthan_equal"
+    | "<" => "lessthan"
+    | "<=" => "lessthan_equal"
+    | "+" => "cross"
+    | "~" => "tilde"
+    | "||" => "doublevbar"
+    | "|" => "vbar"
+    | "=" => "equal"
+    | "#" => "hash"
+    | "!" => "bang"
     | _ => kebab_case_to_snake_case(str)
     };
   };
@@ -132,6 +170,26 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     rtag(txt(name), constructor, types);
   };
 
+  /* Helper to check if a type is unimplemented (always fails at parse time). These should generate `unit` as a placeholder type. */
+  let is_invalid_type = name => {
+    switch (name) {
+    | "declaration_value"
+    | "function_token"
+    | "any_value"
+    | "hash_token"
+    | "zero"
+    | "custom_property_name"
+    | "declaration_list"
+    | "an_plus_b"
+    | "declaration"
+    | "decibel"
+    | "urange"
+    | "semitones"
+    | "url_token" => true
+    | _ => false
+    };
+  };
+
   /* Helper to check if a type is a primitive wrapper */
   let is_primitive_wrapper_type = name => {
     switch (name) {
@@ -148,6 +206,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     | "container_name"
     | "ident_token"
     | "string_token"
+    | "url_no_interp" /* url_no_interp returns string */
     | "string" /* string is an alias to string_token */ => true
     | _ => false
     };
@@ -160,6 +219,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     | "number"
     | "percentage" => [%type: float]
     | "interpolation" => [%type: list(string)]
+    | "url_no_interp" => [%type: string]
     | "ident"
     | "custom_ident"
     | "dashed_ident"
@@ -201,6 +261,40 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       make_variant_branch(type_, is_constructor, params);
     };
 
+  // List of ONLY standard specs defined in Standard.re that use direct parser references
+  // Everything else uses local bindings (for let rec) or lookup_property_rule()
+  let standard_specs = [
+    "integer",
+    "number",
+    "length",
+    "angle",
+    "time",
+    "frequency",
+    "resolution",
+    "percentage",
+    "ident",
+    "custom-ident",
+    "dashed-ident",
+    "custom-ident-without-span-or-auto",
+    "url-no-interp",
+    "hex-color",
+    "interpolation",
+    "flex-value",
+    "media-type",
+    "ident-token",
+    "string-token",
+    "string",
+    /* Extended types - have rules in Standard.re */
+    "extended-length",
+    "extended-angle",
+    "extended-percentage",
+    "extended-time",
+    "extended-frequency",
+    "css-wide-keywords",
+  ];
+
+  let is_standard_spec = name => List.mem(name, standard_specs);
+
   let create_type_parser = value => {
     let rec create_type =
       fun
@@ -214,18 +308,31 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         switch (kind) {
         | Keyword(_name) => (type_name, false, [])
         | Data_type(name) =>
-          let name = value_name_of_css(name);
-          /* For primitive wrappers, unwrap to get the inner type */
+          let snake_name = value_name_of_css(name);
+          /* Priority order:
+             1. Invalid/unimplemented types -> unit
+             2. Primitive wrappers (integer, number, etc.) -> unwrapped OCaml types
+             3. Everything else -> direct type reference (will be in Types.ml) */
           let params =
-            if (is_primitive_wrapper_type(name)) {
-              [get_primitive_inner_type(name)];
+            if (is_invalid_type(snake_name)) {
+              [
+                /* Unimplemented types get unit as placeholder */
+                [%type: unit],
+              ];
+            } else if (is_primitive_wrapper_type(snake_name)) {
+              [get_primitive_inner_type(snake_name)];
             } else {
-              [ptyp_constr(txt @@ Lident(name), [])];
+              [
+                /* Direct type reference - all types are in the same recursive block */
+                ptyp_constr(txt @@ Lident(snake_name), []),
+              ];
             };
           (type_name, false, params);
         | Property_type(name) =>
-          let name = property_value_name(name) |> value_name_of_css;
-          let params = [ptyp_constr(txt @@ Lident(name), [])];
+          /* Property types - direct reference */
+          let snake_name = value_name_of_css(name);
+          let property_type_name = "property_" ++ snake_name;
+          let params = [ptyp_constr(txt @@ Lident(property_type_name), [])];
           (type_name, false, params);
         | Delim(_string) =>
           let params = [ptyp_constr(txt @@ Lident("unit"), [])];
@@ -241,15 +348,24 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         let t = ptyp_constr(txt @@ Lident("unit"), []);
         apply_modifier(multiplier, t);
       | Data_type(name) =>
-        let name = value_name_of_css(name);
-        /* Unwrap primitives, applying modifiers to the inner type */
-        if (is_primitive_wrapper_type(name)) {
+        let snake_name = value_name_of_css(name);
+        /* Priority order:
+           1. Invalid/unimplemented types -> unit
+           2. Primitive wrappers (integer, number, etc.) -> unwrapped OCaml types with modifiers
+           3. Everything else -> direct type reference (will be in Types.ml) */
+        if (is_invalid_type(snake_name)) {
+          /* Unimplemented types get unit as placeholder */
+          apply_modifier(
+            multiplier,
+            [%type: unit],
+          );
+        } else if (is_primitive_wrapper_type(snake_name)) {
           switch (multiplier) {
-          | One => get_primitive_inner_type(name)
+          | One => get_primitive_inner_type(snake_name)
           | Optional =>
             ptyp_constr(
               txt @@ Lident("option"),
-              [get_primitive_inner_type(name)],
+              [get_primitive_inner_type(snake_name)],
             )
           | Repeat(_)
           | Repeat_by_comma(_, _)
@@ -258,16 +374,19 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
           | At_least_one =>
             ptyp_constr(
               txt @@ Lident("list"),
-              [get_primitive_inner_type(name)],
+              [get_primitive_inner_type(snake_name)],
             )
           };
         } else {
-          let t = ptyp_constr(txt @@ Lident(name), []);
+          /* Direct type reference - all types are in the same recursive block */
+          let t = ptyp_constr(txt @@ Lident(snake_name), []);
           apply_modifier(multiplier, t);
         };
       | Property_type(name) =>
-        let name = property_value_name(name) |> value_name_of_css;
-        let t = ptyp_constr(txt @@ Lident(name), []);
+        /* Property types - direct reference */
+        let snake_name = value_name_of_css(name);
+        let property_type_name = "property_" ++ snake_name;
+        let t = ptyp_constr(txt @@ Lident(property_type_name), []);
         apply_modifier(multiplier, t);
       };
     }
@@ -322,325 +441,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     };
   };
 
-  /* TODO: Move this to Standard and use as ppx_runtime */
-  let standard_types = {
-    let type_ = (~kind=Parsetree.Ptype_abstract, name, core_type) => {
-      Builder.type_declaration(
-        ~name={
-          txt: name,
-          loc: Location.none,
-        },
-        ~params=[],
-        ~cstrs=[],
-        ~private_=Public,
-        ~manifest=Some(core_type),
-        ~kind,
-      );
-    };
-
-    [
-      type_("integer", [%type: [ | `Integer(int)]]),
-      type_("number", [%type: [ | `Number(float)]]),
-      type_(
-        "length",
-        [%type:
-          [
-            | `Cap(float)
-            | `Ch(float)
-            | `Em(float)
-            | `Ex(float)
-            | `Ic(float)
-            | `Lh(float)
-            | `Rcap(float)
-            | `Rch(float)
-            | `Rem(float)
-            | `Rex(float)
-            | `Ric(float)
-            | `Rlh(float)
-            | `Vh(float)
-            | `Vw(float)
-            | `Vmax(float)
-            | `Vmin(float)
-            | `Vb(float)
-            | `Vi(float)
-            | `Cqw(float)
-            | `Cqh(float)
-            | `Cqi(float)
-            | `Cqb(float)
-            | `Cqmin(float)
-            | `Cqmax(float)
-            | `Px(float)
-            | `Cm(float)
-            | `Mm(float)
-            | `Q(float)
-            | `In(float)
-            | `Pc(float)
-            | `Pt(float)
-            | `Zero
-          ]
-        ],
-      ),
-      type_(
-        "angle",
-        [%type:
-          [
-            | `Deg(float)
-            | `Grad(float)
-            | `Rad(float)
-            | `Turn(float)
-          ]
-        ],
-      ),
-      type_(
-        "time",
-        [%type:
-          [
-            | `Ms(float)
-            | `S(float)
-          ]
-        ],
-      ),
-      type_(
-        "frequency",
-        [%type:
-          [
-            | `Hz(float)
-            | `KHz(float)
-          ]
-        ],
-      ),
-      type_(
-        "resolution",
-        [%type:
-          [
-            | `Dpi(float)
-            | `Dpcm(float)
-            | `Dppx(float)
-          ]
-        ],
-      ),
-      type_("percentage", [%type: [ | `Percentage(float)]]),
-      type_("ident", [%type: [ | `Ident(string)]]),
-      type_("custom_ident", [%type: [ | `Custom_ident(string)]]),
-      type_("dashed_ident", [%type: [ | `Dashed_ident(string)]]),
-      type_(
-        "custom_ident_without_span_or_auto",
-        [%type: [ | `Custom_ident_without_span_or_auto(string)]],
-      ),
-      type_("url_no_interp", [%type: string]),
-      type_("hex_color", [%type: [ | `Hex_color(string)]]),
-      type_("interpolation", [%type: [ | `Interpolation(list(string))]]),
-      type_("flex_value", [%type: [ | `Fr(float)]]),
-      type_("media_type", [%type: [ | `Media_type(string)]]),
-      type_("container_name", [%type: [ | `Container_name(string)]]),
-      type_("ident_token", [%type: [ | `Ident_token(string)]]),
-      type_("string_token", [%type: [ | `String_token(string)]]),
-      // From Parser_helper, those are `invalid` represented here as plain unit
-      type_("function_token", [%type: unit]),
-      type_("hash_token", [%type: unit]),
-      type_("any_value", [%type: unit]),
-      type_("declaration_value", [%type: unit]),
-      type_("zero", [%type: unit]),
-      type_("decibel", [%type: unit]),
-      type_("urange", [%type: unit]),
-      type_("semitones", [%type: unit]),
-      type_("an_plus_b", [%type: unit]),
-    ];
-  };
-
-  let make_type = (binding: Parsetree.value_binding) => {
-    let (name, payload) =
-      switch (binding) {
-      | {
-          pvb_pat: {ppat_desc: Ppat_var({txt, _}), _},
-          pvb_expr:
-            {
-              pexp_desc:
-                Pexp_extension((
-                  _,
-                  PStr([
-                    {
-                      pstr_desc:
-                        Pstr_eval(
-                          {
-                            pexp_desc:
-                              Pexp_constant(
-                                Pconst_string(value, _loc, _delim),
-                              ),
-                            _,
-                          },
-                          _attrs,
-                        ),
-                      _,
-                    },
-                  ]),
-                )),
-              _,
-            },
-          _,
-        } => (
-          txt,
-          value,
-        )
-      | _ => failwith("Error when extracting CSS spec content")
-      };
-    switch (Css_spec_parser.value_of_string(payload)) {
-    | Some(ast) => (name, create_type_parser(ast))
-    | None => failwith("Error while parsing CSS spec")
-    };
-  };
-
-  let make_all_type = type_declarations => {
-    let variants =
-      List.map(
-        (decl: Parsetree.type_declaration) => {
-          let name = decl.ptype_name.txt;
-          let variant_name = String.capitalize_ascii(name);
-          switch (decl.ptype_manifest) {
-          | Some(core_type) => rtag(txt(variant_name), false, [core_type])
-          | None =>
-            rtag(
-              txt(variant_name),
-              false,
-              [ptyp_constr(txt @@ Lident(name), [])],
-            )
-          };
-        },
-        type_declarations,
-      );
-    let all_type = ptyp_variant(variants, Closed, None);
-    make_type_declaration("all", all_type);
-  };
-
-  let make_types = bindings => {
-    let type_declarations =
-      List.map(
-        binding => {
-          let (name, core_type) = make_type(binding);
-          make_type_declaration(name, core_type);
-        },
-        bindings,
-      );
-
-    let all_types = type_declarations @ standard_types;
-    let all_type_decl = make_all_type(all_types);
-
-    let loc = List.hd(type_declarations).ptype_loc;
-    let types =
-      Ast_helper.Str.type_(~loc, Recursive, all_types @ [all_type_decl]);
-    let types_structure = Ast_helper.Mod.structure(~loc, [types]);
-    [%stri module Types = [%m types_structure]];
-  };
-
-  let add_type_to_expr = (name: string, expression) => {
-    let core_type =
-      Ast_helper.Typ.constr(
-        ~loc,
-        {
-          loc: Location.none,
-          txt: Ldot(Lident("Types"), name),
-        },
-        [],
-      );
-    let type_anotation = [%type:
-      list(Tokens.t) =>
-      (Css_grammar__Rule.data([%t core_type]), list(Tokens.t))
-    ];
-    [%expr ([%e expression]: [%t type_anotation])];
-  };
-
-  let get_name_from_binding = (binding: Parsetree.value_binding) => {
-    switch (binding) {
-    | {pvb_pat: {ppat_desc: Ppat_var({txt, _}), _}, _} => Some(txt)
-    | _ => None
-    };
-  };
-
-  let get_source_primitive = (binding: Parsetree.value_binding) => {
-    /* Check if this binding is a single primitive wrapper and return the source primitive name */
-    switch (binding.pvb_expr.pexp_desc) {
-    | Pexp_extension((
-        {txt: "value.rec", _},
-        PStr([
-          {
-            pstr_desc:
-              Pstr_eval(
-                {pexp_desc: Pexp_constant(Pconst_string(value, _, _)), _},
-                _,
-              ),
-            _,
-          },
-        ]),
-      )) =>
-      switch (Css_spec_parser.value_of_string(value)) {
-      | Some(Terminal(Data_type(name), One)) =>
-        let name = value_name_of_css(name);
-        if (is_primitive_wrapper_type(name)) {
-          Some(name);
-        } else {
-          None;
-        };
-      | _ => None
-      }
-    | _ => None
-    };
-  };
-
-  let add_unwrapping = (name, expression) => {
-    /* Wrap expression with unwrapping logic using Rule.Let monadic bind */
-    let tag =
-      switch (name) {
-      | "integer" => "Integer"
-      | "number" => "Number"
-      | "percentage" => "Percentage"
-      | "ident" => "Ident"
-      | "custom_ident" => "Custom_ident"
-      | "dashed_ident" => "Dashed_ident"
-      | "custom_ident_without_span_or_auto" => "Custom_ident_without_span_or_auto"
-      | "hex_color" => "Hex_color"
-      | "interpolation" => "Interpolation"
-      | "media_type" => "Media_type"
-      | "container_name" => "Container_name"
-      | "ident_token" => "Ident_token"
-      | "string_token" => "String_token"
-      | "string" => "String_token" /* string is an alias to string_token */
-      | _ => failwith("Not a primitive wrapper: " ++ name)
-      };
-    [%expr
-     Rule.Match.bind(
-       [%e expression],
-       fun
-       | [%p ppat_variant(tag, Some(pvar("v")))] =>
-         Rule.Match.return([%e evar("v")]),
-     )
-    ];
-  };
-
-  let add_types = (~loc, bindings): list(Ppxlib.structure_item) => {
-    let new_bindings =
-      bindings
-      |> List.map(value_binding => {
-           let name = value_binding |> get_name_from_binding;
-           switch (name) {
-           | Some(type_name) =>
-             let expr =
-               switch (get_source_primitive(value_binding)) {
-               | Some(source_primitive) =>
-                 add_unwrapping(source_primitive, value_binding.pvb_expr)
-               | None => value_binding.pvb_expr
-               };
-             let new_expression = add_type_to_expr(type_name, expr);
-             {
-               ...value_binding,
-               pvb_expr: new_expression,
-             };
-           | None => value_binding
-           };
-         });
-
-    [Ast_helper.Str.value(~loc, Recursive, new_bindings)];
-  };
-
   let create_variant_name = (type_name, name) =>
     type_name ++ "__make__" ++ name;
 
@@ -651,13 +451,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
 
   let construct = (~expr=None, name) =>
     pexp_construct(txt(Lident(name)), expr);
-
-  let kebab_case_to_snake_case = name =>
-    name |> String.split_on_char('-') |> String.concat("_");
-
-  let first_uppercase = name =>
-    (String.sub(name, 0, 1) |> String.uppercase_ascii)
-    ++ String.sub(name, 1, String.length(name) - 1);
 
   let is_function = str => {
     open String;
@@ -693,6 +486,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     | "=" => "equal"
     | ">" => "biggerthan"
     | "|" => "vbar"
+    | "||" => "doublevbar"
     | "~" => "tilde"
     | "$" => "dollar"
     | _ => "unknown";
@@ -716,21 +510,21 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       | Some(int) => construct(~expr=Some(eint(int)), "Some");
     let modifier_op =
       fun
-      | One => evar("one")
-      | Zero_or_more => evar("zero_or_more")
-      | One_or_more => evar("one_or_more")
-      | Optional => evar("optional")
+      | One => evar("Modifier.one")
+      | Zero_or_more => evar("Modifier.zero_or_more")
+      | One_or_more => evar("Modifier.one_or_more")
+      | Optional => evar("Modifier.optional")
       | Repeat(min, max) =>
         eapply(
-          evar("repeat"),
+          evar("Modifier.repeat"),
           [pexp_tuple([eint(min), option_int_to_expr(max)])],
         )
       | Repeat_by_comma(min, max) =>
         eapply(
-          evar("repeat_by_comma"),
+          evar("Modifier.repeat_by_comma"),
           [pexp_tuple([eint(min), option_int_to_expr(max)])],
         )
-      | At_least_one => evar("at_least_one");
+      | At_least_one => evar("Modifier.at_least_one");
 
     (modifier, rule) =>
       switch (modifier) {
@@ -741,114 +535,51 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       };
   };
 
-  let rec make_value = value => {
+  let rec make_value = (~use_lookup=false, value) => {
     let terminal_op = (kind, modifier) => {
       // as everyrule is in the same namespace
       let rule =
         switch (kind) {
-        | Delim(delim) when delim == "," => evar("comma")
-        | Delim(delim) => eapply(evar("delim"), [estring(delim)])
-        | Keyword(name) => eapply(evar("keyword"), [estring(name)])
-        | Data_type(name) => value_name_of_css(name) |> evar
+        | Delim(delim) when delim == "," => evar("Standard.comma")
+        | Delim(delim) => eapply(evar("Standard.delim"), [estring(delim)])
+        | Keyword(name) =>
+          eapply(evar("Standard.keyword"), [estring(name)])
+        | Data_type(name) =>
+          let snake_name = value_name_of_css(name);
+          if (is_primitive_wrapper_type(snake_name)) {
+            // Primitive wrapper - use Standard.name directly (returns unwrapped values like int, float, string)
+            "Standard." ++ snake_name |> evar;
+          } else if (is_standard_spec(name)) {
+            // Standard spec (length, angle, css-wide-keywords, etc.) - use Standard.name directly
+            "Standard." ++ snake_name |> evar;
+          } else if (use_lookup) {
+            // Use lazy_lookup to defer rule resolution until parse time
+            eapply(
+              evar("lazy_lookup_property_rule"),
+              [estring(name)],
+            );
+          } else {
+            // Without lookup - reference local binding directly (for let rec)
+            snake_name |> evar;
+          };
         | Property_type(name) =>
-          property_value_name(name) |> value_name_of_css |> evar
+          if (use_lookup) {
+            // Property types use lazy_lookup to defer until parse time
+            eapply(
+              evar("lazy_lookup_property_rule"),
+              [estring(name)],
+            );
+          } else {
+            // Without lookup - reference local binding directly (for let rec)
+            property_value_name(name) |> value_name_of_css |> evar;
+          }
         };
       apply_modifier(modifier, rule);
     };
     let group_op = (value, modifier) => {
-      /* Check if this is a primitive that needs unwrapping */
-      let base_rule = make_value(value);
-      let with_modifier = apply_modifier(modifier, base_rule);
-
-      /* If the inner value is a simple primitive terminal, add unwrapping */
-      switch (value) {
-      | Terminal(Data_type(name), One) =>
-        let name = value_name_of_css(name);
-        if (is_primitive_wrapper_type(name)) {
-          /* Generate unwrapping code for groups containing primitives */
-          let tag =
-            switch (name) {
-            | "integer" => "Integer"
-            | "number" => "Number"
-            | "percentage" => "Percentage"
-            | "ident" => "Ident"
-            | "custom_ident" => "Custom_ident"
-            | "dashed_ident" => "Dashed_ident"
-            | "custom_ident_without_span_or_auto" => "Custom_ident_without_span_or_auto"
-            | "hex_color" => "Hex_color"
-            | "interpolation" => "Interpolation"
-            | "media_type" => "Media_type"
-            | "container_name" => "Container_name"
-            | "ident_token" => "Ident_token"
-            | "string_token" => "String_token"
-            | "string" => "String_token"
-            | _ => failwith("Unknown primitive: " ++ name)
-            };
-
-          /* Only unwrap for list/optional modifiers in groups (function call context) */
-          /* For One multiplier in groups used in combinators, don't unwrap here */
-          switch (modifier) {
-          | One => with_modifier /* Don't unwrap - will be handled by map_value if in combinator */
-          | Optional =>
-            /* Optional primitive: map option */
-            eapply(
-              evar("map"),
-              [
-                with_modifier,
-                pexp_fun(
-                  Nolabel,
-                  None,
-                  pvar("opt"),
-                  eapply(
-                    evar("Option.map"),
-                    [
-                      pexp_fun(
-                        Nolabel,
-                        None,
-                        ppat_variant(tag, Some(pvar("v"))),
-                        evar("v"),
-                      ),
-                      evar("opt"),
-                    ],
-                  ),
-                ),
-              ],
-            )
-          | Repeat(_)
-          | Repeat_by_comma(_, _)
-          | Zero_or_more
-          | One_or_more
-          | At_least_one =>
-            /* List of primitives: map list */
-            eapply(
-              evar("map"),
-              [
-                with_modifier,
-                pexp_fun(
-                  Nolabel,
-                  None,
-                  pvar("lst"),
-                  eapply(
-                    evar("List.map"),
-                    [
-                      pexp_fun(
-                        Nolabel,
-                        None,
-                        ppat_variant(tag, Some(pvar("v"))),
-                        evar("v"),
-                      ),
-                      evar("lst"),
-                    ],
-                  ),
-                ),
-              ],
-            )
-          };
-        } else {
-          with_modifier;
-        };
-      | _ => with_modifier
-      };
+      /* Primitives now return unwrapped values directly, no need for special handling */
+      let base_rule = make_value(~use_lookup, value);
+      apply_modifier(modifier, base_rule);
     };
     let combinator_op = (kind, values) => {
       let apply = (fn, args) => {
@@ -862,117 +593,21 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         | And => evar("Combinators.and_")
         | Or => evar("Combinators.or_");
 
-      let map_value = (content, should_unwrap, (name, value)) => {
-        /* Check if this value is a primitive that needs unwrapping */
+      let map_value = (content, _should_unwrap, (name, value)) => {
         let (pattern, expr) =
-          switch (value) {
-          | Terminal(Data_type(data_name), multiplier) =>
-            let data_name = value_name_of_css(data_name);
-            /* Only unwrap primitives in Xor context or in And/Static/Or with One multiplier */
-            if (is_primitive_wrapper_type(data_name)
-                && content
-                && should_unwrap) {
-              /* Unwrap the primitive variant */
-              let make_unwrap_pattern = tag => {
-                switch (multiplier) {
-                | One => ppat_variant(tag, Some(pvar("v")))
-                | Optional =>
-                  /* For optional primitives, match both Some and None cases */
-                  pvar("opt_v")
-                | Repeat(_)
-                | Repeat_by_comma(_, _)
-                | Zero_or_more
-                | One_or_more
-                | At_least_one =>
-                  /* For lists of primitives, need to unwrap each element */
-                  pvar("list_v")
-                };
-              };
-              let make_unwrap_expr = tag => {
-                switch (multiplier) {
-                | One => evar("v")
-                | Optional =>
-                  /* Unwrap the optional primitive */
-                  pexp_match(
-                    evar("opt_v"),
-                    [
-                      case(
-                        ~lhs=ppat_construct(txt(Lident("None")), None),
-                        ~rhs=pexp_construct(txt(Lident("None")), None),
-                        ~guard=None,
-                      ),
-                      case(
-                        ~lhs=
-                          ppat_construct(
-                            txt(Lident("Some")),
-                            Some(ppat_variant(tag, Some(pvar("inner_v")))),
-                          ),
-                        ~rhs=
-                          pexp_construct(
-                            txt(Lident("Some")),
-                            Some(evar("inner_v")),
-                          ),
-                        ~guard=None,
-                      ),
-                    ],
-                  )
-                | Repeat(_)
-                | Repeat_by_comma(_, _)
-                | Zero_or_more
-                | One_or_more
-                | At_least_one =>
-                  /* Unwrap each element in the list */
-                  eapply(
-                    evar("List.map"),
-                    [
-                      pexp_fun(
-                        Nolabel,
-                        None,
-                        ppat_variant(tag, Some(pvar("item_v"))),
-                        evar("item_v"),
-                      ),
-                      evar("list_v"),
-                    ],
-                  )
-                };
-              };
-
-              let tag =
-                switch (data_name) {
-                | "integer" => "Integer"
-                | "number" => "Number"
-                | "percentage" => "Percentage"
-                | "ident" => "Ident"
-                | "custom_ident" => "Custom_ident"
-                | "dashed_ident" => "Dashed_ident"
-                | "custom_ident_without_span_or_auto" => "Custom_ident_without_span_or_auto"
-                | "hex_color" => "Hex_color"
-                | "interpolation" => "Interpolation"
-                | "media_type" => "Media_type"
-                | "container_name" => "Container_name"
-                | "ident_token" => "Ident_token"
-                | "string_token" => "String_token"
-                | "string" => "String_token" /* string is an alias */
-                | _ => failwith("Unknown primitive wrapper: " ++ data_name)
-                };
-
-              let inner_pattern = make_unwrap_pattern(tag);
-              let inner_expr = make_unwrap_expr(tag);
-              let variant = pexp_variant(name, Some(inner_expr));
-              (inner_pattern, variant);
-            } else {
-              let variant =
-                pexp_variant(name, content ? Some(evar("v")) : None);
-              (pvar(content ? "v" : "_v"), variant);
-            };
-          | _ =>
-            let variant =
-              pexp_variant(name, content ? Some(evar("v")) : None);
-            (pvar(content ? "v" : "_v"), variant);
+          if (content) {
+            let variant = pexp_variant(name, Some(evar("v")));
+            (pvar("v"), variant);
+          } else {
+            let variant = pexp_variant(name, None);
+            (pvar("_v"), variant);
           };
 
         let map_fn = pexp_fun(Nolabel, None, pattern, expr);
-        eapply(evar("map"), [make_value(value), map_fn]);
+        eapply(
+          evar("Rule.Match.map"),
+          [make_value(~use_lookup, value), map_fn],
+        );
       };
 
       switch (kind) {
@@ -1048,54 +683,13 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
           ...pexp_fun(Nolabel, None, args, body),
           pexp_attributes: [disable_warning],
         };
-        eapply(evar("map"), [combinator, map_fn]);
+        eapply(evar("Rule.Match.map"), [combinator, map_fn]);
       };
     };
     let function_call = (name, value) => {
-      /* Check if the function argument is a simple primitive that needs unwrapping */
-      let arg_expr =
-        switch (value) {
-        | Terminal(Data_type(data_name), One) =>
-          let data_name = value_name_of_css(data_name);
-          if (is_primitive_wrapper_type(data_name)) {
-            /* Unwrap the primitive argument */
-            let tag =
-              switch (data_name) {
-              | "integer" => "Integer"
-              | "number" => "Number"
-              | "percentage" => "Percentage"
-              | "ident" => "Ident"
-              | "custom_ident" => "Custom_ident"
-              | "dashed_ident" => "Dashed_ident"
-              | "custom_ident_without_span_or_auto" => "Custom_ident_without_span_or_auto"
-              | "hex_color" => "Hex_color"
-              | "interpolation" => "Interpolation"
-              | "media_type" => "Media_type"
-              | "container_name" => "Container_name"
-              | "ident_token" => "Ident_token"
-              | "string_token" => "String_token"
-              | "string" => "String_token"
-              | _ => failwith("Unknown primitive: " ++ data_name)
-              };
-            eapply(
-              evar("map"),
-              [
-                make_value(value),
-                pexp_fun(
-                  Nolabel,
-                  None,
-                  ppat_variant(tag, Some(pvar("v"))),
-                  evar("v"),
-                ),
-              ],
-            );
-          } else {
-            make_value(value);
-          };
-        | _ => make_value(value)
-        };
-
-      eapply(evar("function_call"), [estring(name), arg_expr]);
+      /* Primitives now return unwrapped values directly */
+      let arg_expr = make_value(~use_lookup, value);
+      eapply(evar("Standard.function_call"), [estring(name), arg_expr]);
     };
 
     switch (value) {
@@ -1104,5 +698,223 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     | Combinator(kind, values) => combinator_op(kind, values)
     | Function_call(name, value) => function_call(name, value)
     };
+  };
+
+  /* Check if a spec contains interpolation - currently unused but kept for future use */
+  let rec _spec_contains_interpolation = (spec: Css_spec_parser.value): bool => {
+    switch (spec) {
+    | Terminal(Data_type("interpolation"), _) => true
+    | Terminal(_, _) => false
+    | Group(inner, _) => _spec_contains_interpolation(inner)
+    | Combinator(_, values) =>
+      List.exists(_spec_contains_interpolation, values)
+    | Function_call(_, inner) => _spec_contains_interpolation(inner)
+    };
+  };
+
+  /* Generate to_string function from spec */
+  let generate_to_string_function =
+      (spec: Css_spec_parser.value, ~loc as _: Location.t)
+      : Parsetree.expression => {
+    /* For now, generate simple placeholder to_string */
+    let collect_cases = (_spec: Css_spec_parser.value): list(Parsetree.case) => {
+      [
+        /* Placeholder: generate a wildcard case that returns "TODO" */
+        case(~lhs=ppat_any, ~guard=None, ~rhs=estring("TODO: to_string")),
+      ];
+    };
+
+    let cases = collect_cases(spec);
+    pexp_fun(
+      Nolabel,
+      None,
+      pvar("value"),
+      pexp_match(evar("value"), cases),
+    );
+  };
+
+  let generate_spec_module =
+      (
+        ~spec: Css_spec_parser.value,
+        ~witness: option(Parsetree.expression),
+        ~runtime_module_path: option(string),
+        ~type_name: option(string),
+        ~loc: Location.t,
+      )
+      : list(Ppxlib.structure_item) => {
+    /* When type_name is provided, generate an alias to Types.<type_name>
+       Otherwise, generate the full inline type */
+    let core_type =
+      switch (type_name) {
+      | Some(name) =>
+        /* Generate type t = Types.<name> */
+        ptyp_constr(txt @@ Ldot(Lident("Types"), name), [])
+      | None =>
+        /* Generate inline type */
+        create_type_parser(spec)
+      };
+    let type_decl =
+      Ast_helper.Str.type_(
+        ~loc,
+        Nonrecursive,
+        [make_type_declaration("t", core_type)],
+      );
+
+    let t_type = ptyp_constr(txt @@ Lident("t"), []);
+    let string_type = ptyp_constr(txt @@ Lident("string"), []);
+
+    let rule_body = make_value(~use_lookup=true, spec);
+    let rule_type =
+      ptyp_constr(txt @@ Ldot(Lident("Rule"), "rule"), [t_type]);
+    let rule_binding =
+      Ast_helper.Str.value(
+        ~loc,
+        Nonrecursive,
+        [
+          Ast_helper.Vb.mk(
+            ~loc,
+            Ast_helper.Pat.constraint_(~loc, pvar("rule"), rule_type),
+            rule_body,
+          ),
+        ],
+      );
+
+    let result_type =
+      ptyp_constr(txt @@ Lident("result"), [t_type, string_type]);
+    let parse_body =
+      pexp_fun(
+        Nolabel,
+        None,
+        Ast_helper.Pat.constraint_(~loc, pvar("input"), string_type),
+        pexp_constraint([%expr Rule.parse_string(rule, input)], result_type),
+      );
+    let parse_binding =
+      Ast_helper.Str.value(
+        ~loc,
+        Nonrecursive,
+        [Ast_helper.Vb.mk(~loc, pvar("parse"), parse_body)],
+      );
+
+    let to_string_inner = generate_to_string_function(spec, ~loc);
+    /* Wrap the body with type annotations */
+    let to_string_body =
+      switch (to_string_inner.pexp_desc) {
+      | Pexp_fun(lbl, default, pat, body) =>
+        /* Add type constraint to parameter and return type */
+        let typed_pat = Ast_helper.Pat.constraint_(~loc, pat, t_type);
+        let typed_body = pexp_constraint(body, string_type);
+        pexp_fun(lbl, default, typed_pat, typed_body);
+      | _ =>
+        /* Fallback: wrap entire expression */
+        pexp_fun(
+          Nolabel,
+          None,
+          Ast_helper.Pat.constraint_(~loc, pvar("value"), t_type),
+          pexp_constraint(
+            pexp_apply(to_string_inner, [(Nolabel, evar("value"))]),
+            string_type,
+          ),
+        )
+      };
+    let to_string_binding =
+      Ast_helper.Str.value(
+        ~loc,
+        Nonrecursive,
+        [Ast_helper.Vb.mk(~loc, pvar("to_string"), to_string_body)],
+      );
+
+    let string_list_type =
+      ptyp_constr(txt @@ Lident("list"), [string_type]);
+    /* TODO: extract_interpolations is not used for now, always return [] */
+    let extract_interpolations_body =
+      pexp_fun(
+        Nolabel,
+        None,
+        Ast_helper.Pat.constraint_(~loc, pvar("_value"), t_type),
+        pexp_constraint([%expr []], string_list_type),
+      );
+    let extract_interpolations_binding =
+      Ast_helper.Str.value(
+        ~loc,
+        Nonrecursive,
+        [
+          Ast_helper.Vb.mk(
+            ~loc,
+            pvar("extract_interpolations"),
+            extract_interpolations_body,
+          ),
+        ],
+      );
+
+    let base_bindings = [
+      type_decl,
+      rule_binding,
+      parse_binding,
+      to_string_binding,
+      extract_interpolations_binding,
+    ];
+
+    /* Always emit runtime_module and runtime_module_path bindings (as option types) */
+    let runtime_module_binding =
+      switch (witness) {
+      | Some(witness_expr) =>
+        /* Wrap the witness module in Some */
+        Ast_helper.Str.value(
+          ~loc,
+          Nonrecursive,
+          [
+            Ast_helper.Vb.mk(
+              ~loc,
+              pvar("runtime_module"),
+              pexp_construct(txt(Lident("Some")), Some(witness_expr)),
+            ),
+          ],
+        )
+      | None =>
+        /* No runtime module provided - emit None */
+        Ast_helper.Str.value(
+          ~loc,
+          Nonrecursive,
+          [
+            Ast_helper.Vb.mk(
+              ~loc,
+              pvar("runtime_module"),
+              pexp_construct(txt(Lident("None")), None),
+            ),
+          ],
+        )
+      };
+
+    let runtime_module_path_binding =
+      switch (runtime_module_path) {
+      | Some(path) =>
+        /* Wrap the path string in Some */
+        Ast_helper.Str.value(
+          ~loc,
+          Nonrecursive,
+          [
+            Ast_helper.Vb.mk(
+              ~loc,
+              pvar("runtime_module_path"),
+              pexp_construct(txt(Lident("Some")), Some(estring(path))),
+            ),
+          ],
+        )
+      | None =>
+        /* No runtime module path provided - emit None */
+        Ast_helper.Str.value(
+          ~loc,
+          Nonrecursive,
+          [
+            Ast_helper.Vb.mk(
+              ~loc,
+              pvar("runtime_module_path"),
+              pexp_construct(txt(Lident("None")), None),
+            ),
+          ],
+        )
+      };
+
+    base_bindings @ [runtime_module_binding, runtime_module_path_binding];
   };
 };

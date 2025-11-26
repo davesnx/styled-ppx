@@ -1,5 +1,6 @@
 open Styled_ppx_css_parser.Ast;
 
+module Parser = Css_grammar.Parser;
 module Helper = Ppxlib.Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
 
@@ -123,8 +124,7 @@ and render_media_query = (~loc, at_rule: at_rule) => {
     let prelude =
       Styled_ppx_css_parser.Render.component_value_list(at_rule_prelude_ast)
       |> String.trim;
-    Css_grammar.Parser.parse(Css_grammar.Parser.media_query_list, prelude)
-    |> Result.map(_ => prelude);
+    Parser.Media_query.parse(prelude) |> Result.map(_ => prelude);
   };
 
   let (delimiter, attrs) =
@@ -167,11 +167,7 @@ and render_container_query = (~loc, at_rule: at_rule) => {
     let prelude =
       Styled_ppx_css_parser.Render.component_value_list(at_rule_prelude_ast)
       |> String.trim;
-    Css_grammar.Parser.parse(
-      Css_grammar.Parser.container_condition_list,
-      prelude,
-    )
-    |> Result.map(_ => prelude);
+    Parser.Container_condition.parse(prelude) |> Result.map(_ => prelude);
   };
 
   let (delimiter, attrs) =

@@ -237,47 +237,59 @@
     ];
   };
   let rec _legacy_gradient:
-    list(Tokens.t) =>
-    (Css_grammar__Rule.data(Types._legacy_gradient), list(Tokens.t)) =
+    list(Styled_ppx_css_parser.Tokens.t) =>
+    (
+      Css_grammar__Rule.data(Types._legacy_gradient),
+      list(Styled_ppx_css_parser.Tokens.t),
+    ) =
     tokens =>
       Combinators.xor(
         [
-          map(function__webkit_gradient, v => `Function__webkit_gradient(v)),
-          map(_legacy_linear_gradient, v => `_legacy_linear_gradient(v)),
-          map(_legacy_repeating_linear_gradient, v =>
+          Rule.Match.map(function__webkit_gradient, v =>
+            `Function__webkit_gradient(v)
+          ),
+          Rule.Match.map(_legacy_linear_gradient, v =>
+            `_legacy_linear_gradient(v)
+          ),
+          Rule.Match.map(_legacy_repeating_linear_gradient, v =>
             `_legacy_repeating_linear_gradient(v)
           ),
-          map(_legacy_radial_gradient, v => `_legacy_radial_gradient(v)),
-          map(_legacy_repeating_radial_gradient, v =>
+          Rule.Match.map(_legacy_radial_gradient, v =>
+            `_legacy_radial_gradient(v)
+          ),
+          Rule.Match.map(_legacy_repeating_radial_gradient, v =>
             `_legacy_repeating_radial_gradient(v)
           ),
         ],
         tokens,
       )
   and _legacy_linear_gradient:
-    list(Tokens.t) =>
-    (Css_grammar__Rule.data(Types._legacy_linear_gradient), list(Tokens.t)) =
+    list(Styled_ppx_css_parser.Tokens.t) =>
+    (
+      Css_grammar__Rule.data(Types._legacy_linear_gradient),
+      list(Styled_ppx_css_parser.Tokens.t),
+    ) =
     tokens =>
       Combinators.xor(
         [
-          map(
-            function_call(
+          Rule.Match.map(
+            Standard.function_call(
               "-moz-linear-gradient",
               _legacy_linear_gradient_arguments,
             ),
             v =>
             `_moz_linear_gradient(v)
           ),
-          map(
-            function_call(
+          Rule.Match.map(
+            Standard.function_call(
               "-webkit-linear-gradient",
               _legacy_linear_gradient_arguments,
             ),
             v =>
             `_webkit_linear_gradient(v)
           ),
-          map(
-            function_call(
+          Rule.Match.map(
+            Standard.function_call(
               "-o-linear-gradient",
               _legacy_linear_gradient_arguments,
             ),
@@ -288,23 +300,28 @@
         tokens,
       )
   and property_height:
-    list(Tokens.t) =>
-    (Css_grammar__Rule.data(Types.property_height), list(Tokens.t)) =
+    list(Styled_ppx_css_parser.Tokens.t) =>
+    (
+      Css_grammar__Rule.data(Types.property_height),
+      list(Styled_ppx_css_parser.Tokens.t),
+    ) =
     tokens =>
       Combinators.xor(
         [
-          map(keyword("auto"), _v => `Auto),
-          map(extended_length, v => `Extended_length(v)),
-          map(extended_percentage, v => `Extended_percentage(v)),
-          map(keyword("min-content"), _v => `Min_content),
-          map(keyword("max-content"), _v => `Max_content),
-          map(keyword("fit-content"), _v => `Fit_content_0),
-          map(
-            function_call(
+          Rule.Match.map(Standard.keyword("auto"), _v => `Auto),
+          Rule.Match.map(extended_length, v => `Extended_length(v)),
+          Rule.Match.map(extended_percentage, v => `Extended_percentage(v)),
+          Rule.Match.map(Standard.keyword("min-content"), _v => `Min_content),
+          Rule.Match.map(Standard.keyword("max-content"), _v => `Max_content),
+          Rule.Match.map(Standard.keyword("fit-content"), _v => `Fit_content_0),
+          Rule.Match.map(
+            Standard.function_call(
               "fit-content",
               Combinators.xor([
-                map(extended_length, v => `Extended_length(v)),
-                map(extended_percentage, v => `Extended_percentage(v)),
+                Rule.Match.map(extended_length, v => `Extended_length(v)),
+                Rule.Match.map(extended_percentage, v =>
+                  `Extended_percentage(v)
+                ),
               ]),
             ),
             v =>

@@ -1,4 +1,4 @@
-open Styled_ppx_css_parser.Tokens;
+module Tokens = Styled_ppx_css_parser.Tokens;
 open Rule.Let;
 open Rule.Pattern;
 
@@ -17,7 +17,7 @@ let keyword = kw => {
           "Expected '"
           ++ kw
           ++ "' but instead got '"
-          ++ humanize(token)
+          ++ Tokens.humanize(token)
           ++ "'.",
         ]),
     )
@@ -51,7 +51,7 @@ let function_call = (name, rule) => {
           "Expected 'function "
           ++ name
           ++ "'. Got '"
-          ++ humanize(token)
+          ++ Tokens.humanize(token)
           ++ "' instead.",
         ]),
     );
@@ -65,7 +65,7 @@ let integer =
     fun
     | NUMBER(string) =>
       Float.is_integer(Float.of_string(string))
-        ? Ok(`Integer(Float.of_string(string) |> Float.to_int))
+        ? Ok(Float.of_string(string) |> Float.to_int)
         : Error(["Expected an integer, got a float instead."])
     | _ => Error(["Expected an integer."]),
   );
@@ -73,9 +73,11 @@ let integer =
 let number =
   token(
     fun
-    | NUMBER(num_str) => Ok(`Number(Float.of_string(num_str)))
+    | NUMBER(num_str) => Ok(Float.of_string(num_str))
     | token =>
-      Error(["Expected a number. Got '" ++ humanize(token) ++ "' instead."]),
+      Error([
+        "Expected a number. Got '" ++ Tokens.humanize(token) ++ "' instead.",
+      ]),
   );
 
 let length =
@@ -158,6 +160,13 @@ let time =
     }
   );
 
+module Time = {
+  type t = [
+    | `S(float)
+    | `Ms(float)
+  ];
+};
+
 // https://drafts.csswg.org/css-values-4/#frequency
 let frequency =
   token(token =>
@@ -194,9 +203,9 @@ let resolution =
 
 // TODO: positive numbers like <number [0,infinity]>
 let percentage = {
-  let.bind_match `Number(num) = number;
+  let.bind_match num = number;
   let.bind_match () = expect(PERCENT);
-  Rule.Match.return(`Percentage(num));
+  Rule.Match.return(num);
 };
 
 // https://drafts.csswg.org/css-values-4/#css-identifier
@@ -204,8 +213,8 @@ let percentage = {
 let ident =
   token(
     fun
-    | IDENT(string) => Ok(`Ident(string))
-    | TAG(string) => Ok(`Ident(string))
+    | IDENT(string) => Ok(string)
+    | TAG(string) => Ok(string)
     | _ => Error(["Expected an indentifier."]),
   );
 
@@ -224,9 +233,9 @@ let css_wide_keywords =
 let custom_ident =
   token(
     fun
-    | IDENT(string) => Ok(`Custom_ident(string))
-    | TAG(string) => Ok(`Custom_ident(string))
-    | STRING(string) => Ok(`Custom_ident(string))
+    | IDENT(string) => Ok(string)
+    | TAG(string) => Ok(string)
+    | STRING(string) => Ok(string)
     | _ => Error(["Expected an identifier."]),
   );
 
@@ -234,8 +243,7 @@ let custom_ident =
 let dashed_ident =
   token(
     fun
-    | IDENT(string) when String.sub(string, 0, 2) == "--" =>
-      Ok(`Dashed_ident(string))
+    | IDENT(string) when String.sub(string, 0, 2) == "--" => Ok(string)
     | _ => Error(["Expected a --variable."]),
   );
 
@@ -243,7 +251,7 @@ let dashed_ident =
 let string_token =
   token(
     fun
-    | STRING(string) => Ok(`String_token(string))
+    | STRING(string) => Ok(string)
     | _ => Error(["Expected a string."]),
   );
 
@@ -259,11 +267,7 @@ let url_no_interp = {
       | URL(url) => Ok(url)
       | _ => Error(["Expected a url."]),
     );
-  let string_unwrapped = {
-    let.bind_match `String_token(s) = string_token;
-    Rule.Match.return(s);
-  };
-  Combinators.xor([url_token, function_call("url", string_unwrapped)]);
+  Combinators.xor([url_token, function_call("url", string_token)]);
 };
 
 // css-color-4
@@ -272,7 +276,7 @@ let hex_color =
   token(
     fun
     | HASH(str) when String.length(str) >= 3 && String.length(str) <= 8 =>
-      Ok(`Hex_color(str))
+      Ok(str)
     | _ => Error(["Expected a hex-color."]),
   );
 
@@ -284,7 +288,7 @@ let hex_color =
 let interpolation =
   token(
     fun
-    | INTERPOLATION(parts) => Ok(`Interpolation(parts))
+    | INTERPOLATION(parts) => Ok(parts)
     | _ => Error(["Expected interpolation."]),
   );
 
@@ -301,21 +305,21 @@ let media_type =
           Error([
             Format.sprintf("media_type has an invalid value: '%s'", value),
           ])
-        | _ => Ok(`Media_type(value))
+        | _ => Ok(value)
         };
       }
     | token =>
       Error([
         Format.sprintf(
           "expected media_type, got %s instead",
-          show_token(token),
+          Tokens.show_token(token),
         ),
       ]),
   );
 
 let container_name = {
   open Rule.Let;
-  let.bind_match `Custom_ident(name) = custom_ident;
+  let.bind_match name = custom_ident;
   let value = {
     switch (name) {
     | "none"
@@ -325,7 +329,7 @@ let container_name = {
       Error([
         Format.sprintf("container_name has an invalid value: '%s'", name),
       ])
-    | _ => Ok(`Container_name(name))
+    | _ => Ok(name)
     };
   };
   return_data(value);
@@ -360,23 +364,24 @@ let custom_ident_without_span_or_auto =
     | IDENT("span")
     | TAG("span")
     | STRING("span") => Error(["Custom ident cannot be span or auto."])
-    | IDENT(string) => Ok(`Custom_ident_without_span_or_auto(string))
-    | TAG(string) => Ok(`Custom_ident_without_span_or_auto(string))
-    | STRING(string) => Ok(`Custom_ident_without_span_or_auto(string))
+    | IDENT(string) => Ok(string)
+    | TAG(string) => Ok(string)
+    | STRING(string) => Ok(string)
     | _ => Error(["expected an identifier."]),
   );
 
 let ident_token =
   token(
     fun
-    | IDENT(string) => Ok(`Ident_token(string))
-    | TAG(string) => Ok(`Ident_token(string))
+    | IDENT(string) => Ok(string)
+    | TAG(string) => Ok(string)
     | _ => Error(["expected an identifier."]),
   );
 
 // TODO: workarounds
 let invalid = expect(STRING("not-implemented"));
 
+/* TODO: Implement all invalid rules */
 let declaration_value = invalid;
 
 let positive_integer = integer;
@@ -393,8 +398,6 @@ let custom_property_name = invalid;
 
 let declaration_list = invalid;
 
-let name_repeat = invalid;
-
 let ratio = invalid;
 
 let an_plus_b = invalid;
@@ -408,3 +411,39 @@ let urange = invalid;
 let semitones = invalid;
 
 let url_token = invalid;
+
+/* Extended types - these are defined at the top of Parser.ml and need rules */
+let extended_percentage =
+  Combinators.xor([
+    Rule.Match.map(percentage, p => `Percentage(p)),
+    Rule.Match.map(interpolation, i => `Interpolation(i)),
+    /* TODO: calc, min, max need lazy lookups */
+  ]);
+
+let extended_length =
+  Combinators.xor([
+    Rule.Match.map(length, l => `Length(l)),
+    Rule.Match.map(interpolation, i => `Interpolation(i)),
+    /* TODO: calc, min, max need lazy lookups */
+  ]);
+
+let extended_angle =
+  Combinators.xor([
+    Rule.Match.map(angle, a => `Angle(a)),
+    Rule.Match.map(interpolation, i => `Interpolation(i)),
+    /* TODO: calc, min, max need lazy lookups */
+  ]);
+
+let extended_time =
+  Combinators.xor([
+    Rule.Match.map(time, t => `Time(t)),
+    Rule.Match.map(interpolation, i => `Interpolation(i)),
+    /* TODO: calc, min, max need lazy lookups */
+  ]);
+
+let extended_frequency =
+  Combinators.xor([
+    Rule.Match.map(frequency, f => `Frequency(f)),
+    Rule.Match.map(interpolation, i => `Interpolation(i)),
+    /* TODO: calc, min, max need lazy lookups */
+  ]);

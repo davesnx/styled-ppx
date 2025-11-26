@@ -75,3 +75,6 @@ module Pattern: {
   let expect: Tokens.t => rule(unit);
   let value: ('a, rule(unit)) => rule('a);
 };
+
+/* Parse a string input using a rule, returning Ok(value) or Error(message) */
+let parse_string: (rule('a), string) => result('a, string);

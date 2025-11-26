@@ -275,9 +275,9 @@ end
 
 type animationName = AnimationName.t
 type angle = Angle.t
-type animationDirection = AnimationDirection.Value.t
-type animationFillMode = AnimationFillMode.Value.t
-type animationIterationCount = AnimationIterationCount.Value.t
+type animationDirection = AnimationDirection.t
+type animationFillMode = AnimationFillMode.t
+type animationIterationCount = AnimationIterationCount.t
 type animationPlayState = AnimationPlayState.Value.t
 type cascading = Cascading.t
 type color = Color.t

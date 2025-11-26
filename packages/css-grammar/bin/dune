@@ -1,0 +1,10 @@
+(executable
+ (name generate_types)
+ (public_name styled-ppx.css-grammar-types-gen)
+ (modules generate_types)
+ (libraries
+  ppxlib
+  ppxlib.astlib
+  styled-ppx.css-spec-parser
+  css_grammar_ppx_generate))
+

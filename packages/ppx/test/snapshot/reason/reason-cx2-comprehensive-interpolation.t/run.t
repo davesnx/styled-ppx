@@ -12,17 +12,17 @@ Comprehensive test for cx2 interpolation with various property types
   let test1 =
     CSS.make(
       "css-1kchgva css-gascpj css-cbvxw4 css-yl4um3",
-      [("--var-yq31wd", CSS.Types.Width.toString(lengthVar))],
+      [("--var-yq31wd", CSS.Types.Length.toString(lengthVar))],
     );
   let test2 =
     CSS.make(
       "css-c42q25 css-ai6rtm css-mjx1j css-g3iwpg",
-      [("--var-yq31wd", CSS.Types.Margin.toString(lengthVar))],
+      [("--var-yq31wd", CSS.Types.Length.toString(lengthVar))],
     );
   let test3 =
     CSS.make(
       "css-32u9gy css-1nv4nym css-1nl0ld0",
-      [("--var-yq31wd", CSS.Types.Gap.toString(lengthVar))],
+      [("--var-yq31wd", CSS.Types.Length.toString(lengthVar))],
     );
   let test4 =
     CSS.make(
@@ -33,7 +33,7 @@ Comprehensive test for cx2 interpolation with various property types
   let test5 =
     CSS.make(
       "css-13ho3oh",
-      [("--var-x7fhjg", CSS.Types.FlexBasis.toString(flexBasisVar))],
+      [("--var-x7fhjg", CSS.Types.LengthPercentage.toString(flexBasisVar))],
     );
   let gridLineVar = `auto;
   let test6 =
@@ -45,7 +45,7 @@ Comprehensive test for cx2 interpolation with various property types
   let test7 =
     CSS.make(
       "css-1457p3r css-t129nw",
-      [("--var-1n3wsy", CSS.Types.Top.toString(topVar))],
+      [("--var-1n3wsy", CSS.Types.Length.toString(topVar))],
     );
   let zIndexVar = `num(10);
   let test8 =
@@ -57,17 +57,17 @@ Comprehensive test for cx2 interpolation with various property types
   let test9 =
     CSS.make(
       "css-14zw3md css-1jugcl4",
-      [("--var-wag9af", CSS.Types.LineWidth.toString(borderWidthVar))],
+      [("--var-wag9af", CSS.Types.Length.toString(borderWidthVar))],
     );
   let spacingVar = CSS.px(2);
   let test10 =
     CSS.make(
       "css-wx7rkh css-1s0bla0",
-      [("--var-apx1x0", CSS.Types.LetterSpacing.toString(spacingVar))],
+      [("--var-apx1x0", CSS.Types.Length.toString(spacingVar))],
     );
   let test11 = width =>
     CSS.make(
       "css-y0qb0l css-16ve3ed css-jk0pkr",
-      [("--var-a9b677", CSS.Types.Width.toString(width))],
+      [("--var-a9b677", CSS.Types.Length.toString(width))],
     );
 

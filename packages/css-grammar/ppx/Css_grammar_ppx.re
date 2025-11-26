@@ -4,6 +4,7 @@ open Asttypes;
 let expander =
     (
       ~recursive,
+      ~use_lookup=false,
       ~loc as exprLoc,
       ~path as _: string,
       ~arg as _: option(loc(Longident.t)),
@@ -18,7 +19,7 @@ let expander =
         let loc = exprLoc;
       });
     module Emit = Generate.Make(Ast_builder);
-    let expr = Emit.make_value(value);
+    let expr = Emit.make_value(~use_lookup, value);
 
     recursive
       ? Ast_builder.pexp_fun(
@@ -46,7 +47,7 @@ let value_extension =
     "value",
     Ppxlib.Extension.Context.Expression,
     string_patten,
-    expander(~recursive=false),
+    expander(~recursive=false, ~use_lookup=false),
   );
 
 let value_rec_extension =
@@ -54,74 +55,202 @@ let value_rec_extension =
     "value.rec",
     Ppxlib.Extension.Context.Expression,
     string_patten,
-    expander(~recursive=true),
+    expander(~recursive=true, ~use_lookup=false),
   );
 
-let is_structure_item_recursive =
-  fun
-  | {pstr_desc: Pstr_value(Recursive, _), pstr_loc: _loc} => true
-  | _ => false;
+let spec_extension =
+  Ppxlib.Extension.declare_with_path_arg(
+    "spec",
+    Ppxlib.Extension.Context.Expression,
+    string_patten,
+    expander(~recursive=true, ~use_lookup=true),
+  );
 
-let is_structure_item_recmodule =
-  fun
-  | {pstr_desc: Pstr_recmodule(_), pstr_loc: _loc} => true
-  | _ => false;
+/* Extract module path string from a packed module expression like
+   (module Css_types.Display : RUNTIME_TYPE) -> "Css_types.Display" */
+let rec longident_to_string = (lid: Longident.t): string =>
+  switch (lid) {
+  | Lident(s) => s
+  | Ldot(prefix, s) => longident_to_string(prefix) ++ "." ++ s
+  | Lapply(_, _) => failwith("Lapply not supported in module path")
+  };
 
-let is_open =
-  fun
-  | {pstr_desc: Pstr_open(_), pstr_loc: _loc} => true
-  | _ => false;
+let extract_module_path = (expr: expression): option(string) =>
+  switch (expr.pexp_desc) {
+  /* (module M : T) is Pexp_constraint(Pexp_pack(...), _) */
+  | Pexp_constraint({pexp_desc: Pexp_pack(mod_expr), _}, _) =>
+    switch (mod_expr.pmod_desc) {
+    | Pmod_ident({txt: lid, _}) => Some(longident_to_string(lid))
+    | _ => None
+    }
+  /* (module M) without constraint is just Pexp_pack */
+  | Pexp_pack(mod_expr) =>
+    switch (mod_expr.pmod_desc) {
+    | Pmod_ident({txt: lid, _}) => Some(longident_to_string(lid))
+    | _ => None
+    }
+  | _ => None
+  };
 
-/* let _preprocess_impl = structure_items => {
-     let (module_bindings, rest) =
-       List.partition(is_structure_item_recmodule, structure_items);
+/* Extract spec string from an expression */
+let extract_spec_string = (expr: expression): option(string) =>
+  switch (expr.pexp_desc) {
+  | Pexp_constant(Pconst_string(s, _, _)) => Some(s)
+  | _ => None
+  };
 
-     switch (module_bindings) {
-     | [{pstr_desc: Pstr_recmodule(module_bindings), pstr_loc, _}] =>
-       module Ast_builder =
-         Ppxlib.Ast_builder.Make({
-           let loc = pstr_loc;
-         });
-       module Emit = Generate.Make(Ast_builder);
-       let generated_module_bindings = Emit.make_modules(module_bindings);
-       let (open_bindings, rest) = List.partition(is_open, rest);
+/* Pattern for spec_module: captures the whole payload expression */
+let spec_module_pattern =
+  Ast_pattern.(
+    pstr(pstr_eval(__, nil) ^:: nil)
+  );
 
-       switch (generated_module_bindings) {
-       | [] => structure_items
-       | bindings =>
-         let rec_modules = Ast_helper.Str.rec_module(~loc=pstr_loc, bindings);
-         open_bindings @ [rec_modules] @ rest;
-       };
-     | [_more_than_one_rec_module] =>
-       failwith("expected a single recursive module binding")
-     | _ => structure_items
-     };
-   }; */
+/* Unified expander for spec_module - handles multiple forms:
+   1. [%spec_module "spec_string"] - generates inline type
+   2. [%spec_module "type_name", "spec_string"] - generates type alias to Types.type_name
+   3. [%spec_module "spec_string", (module Css_types.Foo : RUNTIME_TYPE)] - with witness
+   4. [%spec_module "type_name", "spec_string", (module ...)] - with type name and witness */
+let spec_module_expander =
+    (~loc as _exprLoc, ~path as _: string, payload_expr: expression) => {
+  module Ast_builder =
+    Ast_builder.Make({
+      let loc = _exprLoc;
+    });
+  module Emit = Generate.Make(Ast_builder);
 
-let preprocess_impl = structure_items => {
-  let (bindings, rest) =
-    List.partition(is_structure_item_recursive, structure_items);
+  /* Determine which form we have and extract values */
+  let (type_name_opt, spec_string, witness_opt, runtime_path_opt) =
+    switch (payload_expr.pexp_desc) {
+    /* Form 1: Just a string - [%spec_module "spec_string"] */
+    | Pexp_constant(Pconst_string(s, _, _)) => (None, s, None, None)
+    /* Form 2+: Tuple */
+    | Pexp_tuple(elements) =>
+      switch (elements) {
+      /* Form 2: [%spec_module "type_name", "spec_string"] */
+      | [type_name_expr, spec_expr]
+          when
+            extract_spec_string(type_name_expr) != None
+            && extract_spec_string(spec_expr) != None =>
+        let type_name = extract_spec_string(type_name_expr);
+        let spec = extract_spec_string(spec_expr);
+        switch (type_name, spec) {
+        | (Some(tn), Some(s)) => (Some(tn), s, None, None)
+        | _ =>
+          raise(
+            Location.raise_errorf(
+              ~loc=_exprLoc,
+              "expected two string literals",
+            ),
+          )
+        };
+      /* Form 3: [%spec_module "spec_string", (module ...)] */
+      | [spec_expr, witness_expr]
+          when extract_spec_string(spec_expr) != None =>
+        switch (extract_spec_string(spec_expr)) {
+        | Some(s) =>
+          let runtime_path =
+            switch (extract_module_path(witness_expr)) {
+            | Some(path) => path
+            | None =>
+              raise(
+                Location.raise_errorf(
+                  ~loc=_exprLoc,
+                  "couldn't extract module path from witness expression",
+                ),
+              )
+            };
+          (None, s, Some(witness_expr), Some(runtime_path));
+        | None =>
+          raise(
+            Location.raise_errorf(
+              ~loc=_exprLoc,
+              "first element of tuple must be a string literal",
+            ),
+          )
+        }
+      /* Form 4: [%spec_module "type_name", "spec_string", (module ...)] */
+      | [type_name_expr, spec_expr, witness_expr] =>
+        switch (
+          extract_spec_string(type_name_expr),
+          extract_spec_string(spec_expr),
+        ) {
+        | (Some(tn), Some(s)) =>
+          let runtime_path =
+            switch (extract_module_path(witness_expr)) {
+            | Some(path) => path
+            | None =>
+              raise(
+                Location.raise_errorf(
+                  ~loc=_exprLoc,
+                  "couldn't extract module path from witness expression",
+                ),
+              )
+            };
+          (Some(tn), s, Some(witness_expr), Some(runtime_path));
+        | _ =>
+          raise(
+            Location.raise_errorf(
+              ~loc=_exprLoc,
+              "expected type_name and spec as string literals",
+            ),
+          )
+        }
+      | _ =>
+        raise(
+          Location.raise_errorf(
+            ~loc=_exprLoc,
+            "spec_module expects (string), (string, string), (string, module), or (string, string, module)",
+          ),
+        )
+      }
+    | _ =>
+      raise(
+        Location.raise_errorf(
+          ~loc=_exprLoc,
+          "spec_module expects either a string or a tuple",
+        ),
+      )
+    };
 
-  switch (bindings) {
-  | [{pstr_desc: Pstr_value(_, value_binding), pstr_loc, _}] =>
-    module Ast_builder =
-      Ppxlib.Ast_builder.Make({
-        let loc = pstr_loc;
-      });
-    module Emit = Generate.Make(Ast_builder);
-    let generated_types = Emit.make_types(value_binding);
-    let modified_bindings = Emit.add_types(~loc=pstr_loc, value_binding);
-    /* This is clearly a nasty one, I asume the content of the file and re-organise it */
-    let (open_bindings, rest) = List.partition(is_open, rest);
-    open_bindings @ [generated_types] @ modified_bindings @ rest;
-  | [_more_than_one_rec_binding] =>
-    failwith("expected a single recursive value binding")
-  | _ => structure_items
+  switch (Css_spec_parser.value_of_string(spec_string)) {
+  | Some(parsed_spec) =>
+    let structure_items =
+      Emit.generate_spec_module(
+        ~spec=parsed_spec,
+        ~witness=witness_opt,
+        ~runtime_module_path=runtime_path_opt,
+        ~type_name=type_name_opt,
+        ~loc=_exprLoc,
+      );
+    Ast_helper.Mod.structure(~loc=_exprLoc, structure_items);
+  | None =>
+    raise(
+      Location.raise_errorf(
+        ~loc=_exprLoc,
+        "couldn't parse CSS spec: %s",
+        spec_string,
+      ),
+    )
   };
 };
 
+let spec_module_extension =
+  Ppxlib.Extension.declare(
+    "spec_module",
+    Ppxlib.Extension.Context.Module_expr,
+    spec_module_pattern,
+    spec_module_expander,
+  );
+
+let preprocess_impl = structure_items => structure_items;
+
 Driver.register_transformation(
   ~preprocess_impl,
-  ~extensions=[value_extension, value_rec_extension],
+  ~extensions=[
+    value_extension,
+    value_rec_extension,
+    spec_extension,
+    spec_module_extension,
+  ],
   "css-grammar-ppx",
 );
