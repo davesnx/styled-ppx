@@ -217,7 +217,7 @@ let get_interpolation_tostrings =
                }
              );
         Ok(infos);
-      };
+      }
     };
   };
 };
@@ -229,5 +229,71 @@ let is_property_registered = (property_name: string): bool => {
   switch (Css_grammar.Parser.find_property(property_name)) {
   | Some(_) => true
   | None => false
+  };
+};
+
+/**
+ * Type-safe helper for working with property modules.
+ *
+ * This function encapsulates the pattern of unpacking a first-class module
+ * and applying a function to its operations. The type [a] is existentially
+ * quantified - the caller doesn't need to know the concrete type, only that
+ * the function [f] receives consistent types.
+ *
+ * Example:
+ * {[
+ *   with_property_module "display" (fun (module M : RULE) ->
+ *     match M.parse "block" with
+ *     | Ok value -> M.to_string value
+ *     | Error _ -> "invalid"
+ *   )
+ * ]}
+ */
+let with_property_module:
+  (string, (module Css_grammar.Parser.RULE) => 'result) => option('result) =
+  (property_name, f) => {
+    switch (Css_grammar.Parser.find_property(property_name)) {
+    | Some(spec_module) => Some(f(spec_module))
+    | None => None
+    };
+  };
+
+/**
+ * Parse a CSS value for a property and return information about interpolations.
+ *
+ * This is a type-safe wrapper that demonstrates the proper pattern for working
+ * with property modules. The type of the parsed value is existentially quantified
+ * within the function scope - we don't expose it to callers because they don't
+ * need it. They only need the extracted information (interpolation names, paths).
+ */
+let parse_and_extract_interpolations =
+    (property_name: string, value: string)
+    : result(list(interpolation_info), string) => {
+  switch (Css_grammar.Parser.find_property(property_name)) {
+  | None => Error("Property not found in registry: " ++ property_name)
+  | Some(spec_module) =>
+    /* Unpack the first-class module - M.t is existentially quantified */
+    module M = (val spec_module: Css_grammar.Parser.RULE);
+    switch (M.runtime_module_path) {
+    | None => Error("Property has no runtime module path: " ++ property_name)
+    | Some(runtime_path) =>
+      switch (M.parse(value)) {
+      | Error(parse_error) => Error("Failed to parse value: " ++ parse_error)
+      | Ok(parsed_value) =>
+        /* parsed_value : M.t - the type is abstract but we can work with it
+           through M's operations which all use the same type */
+        let interpolation_names = M.extract_interpolations(parsed_value);
+        let to_string_path = runtime_path ++ ".toString";
+        let infos =
+          interpolation_names
+          |> List.map(variable_name =>
+               {
+                 variable_name,
+                 to_string_path,
+               }
+             );
+        Ok(infos);
+      }
+    };
   };
 };

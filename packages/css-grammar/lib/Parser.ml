@@ -174,51 +174,35 @@ type kind =
   | Function of string
   | Media_query of string
 
-let registry_ref : (kind * (module RULE)) list ref = ref []
+let properties_tbl : (string, (module RULE)) Hashtbl.t = Hashtbl.create 700
+let values_tbl : (string, (module RULE)) Hashtbl.t = Hashtbl.create 300
+let functions_tbl : (string, (module RULE)) Hashtbl.t = Hashtbl.create 70
+let media_queries_tbl : (string, (module RULE)) Hashtbl.t = Hashtbl.create 20
 
-(* Lookup a value rule from the registry - prioritizes Value entries, then Functions, then Media_query *)
 let lookup_value_rule (name : string) : 'a Rule.rule =
-  let rec find_value = function
-    | [] -> None
-    | (Value n, (module M : RULE)) :: rest ->
-      if n = name then Some (Obj.magic M.rule) else find_value rest
-    | _ :: rest -> find_value rest
+  let lookup_in tbl =
+    match Hashtbl.find_opt tbl name with
+    | Some (module M : RULE) -> Some (Obj.magic M.rule)
+    | None -> None
   in
-  let rec find_function = function
-    | [] -> None
-    | (Function n, (module M : RULE)) :: rest ->
-      if n = name then Some (Obj.magic M.rule) else find_function rest
-    | _ :: rest -> find_function rest
-  in
-  let rec find_media_query = function
-    | [] -> None
-    | (Media_query n, (module M : RULE)) :: rest ->
-      if n = name then Some (Obj.magic M.rule) else find_media_query rest
-    | _ :: rest -> find_media_query rest
-  in
-  match find_value !registry_ref with
+  match lookup_in values_tbl with
   | Some rule -> rule
   | None ->
-    (match find_function !registry_ref with
+    (match lookup_in functions_tbl with
     | Some rule -> rule
     | None ->
-      (match find_media_query !registry_ref with
+      (match lookup_in media_queries_tbl with
       | Some rule -> rule
       | None -> failwith ("Rule not found: " ^ name)))
 
-(* Lookup a property rule from the registry *)
+(* Lookup a property rule from the registry using Hashtbl - O(1).
+   WARNING: Uses Obj.magic - see documentation above for type safety notes. *)
 let lookup_property_rule (name : string) : 'a Rule.rule =
-  let rec find_property = function
-    | [] -> None
-    | (Property n, (module M : RULE)) :: rest ->
-      if n = name then Some (Obj.magic M.rule) else find_property rest
-    | _ :: rest -> find_property rest
-  in
-  match find_property !registry_ref with
-  | Some rule -> rule
+  match Hashtbl.find_opt properties_tbl name with
+  | Some (module M : RULE) -> Obj.magic M.rule
   | None -> failwith ("Property rule not found: " ^ name)
 
-(* Lazy versions of lookup - defers the lookup until the rule is actually run *)
+(* Lazy versions of lookup, because modules may reference each other before all modules are defined. The lookup happens at parse time, not definition time. *)
 let lazy_lookup_value_rule (name : string) : 'a Rule.rule =
  fun tokens ->
   let rule = lookup_value_rule name in
@@ -7717,29 +7701,32 @@ let registry : (kind * (module RULE)) list =
     Value "y", (module Y : RULE);
   ]
 
-let () = registry_ref := registry
+let () =
+  List.iter
+    (fun (kind, rule) ->
+      match kind with
+      | Property name -> Hashtbl.replace properties_tbl name rule
+      | Value name -> Hashtbl.replace values_tbl name rule
+      | Function name -> Hashtbl.replace functions_tbl name rule
+      | Media_query name -> Hashtbl.replace media_queries_tbl name rule)
+    registry
 
 let find_property (name : string) : (module RULE) option =
-  List.find_opt (fun (k, _) -> k = Property name) registry |> Option.map snd
+  Hashtbl.find_opt properties_tbl name
 
 let find_value (name : string) : (module RULE) option =
-  List.find_opt (fun (k, _) -> k = Value name) registry |> Option.map snd
+  Hashtbl.find_opt values_tbl name
 
 let find_function (name : string) : (module RULE) option =
-  List.find_opt (fun (k, _) -> k = Function name) registry |> Option.map snd
+  Hashtbl.find_opt functions_tbl name
 
 let find_media_query (name : string) : (module RULE) option =
-  List.find_opt (fun (k, _) -> k = Media_query name) registry |> Option.map snd
+  Hashtbl.find_opt media_queries_tbl name
 
-let value_names () : string list =
-  registry
-  |> List.filter_map (fun (k, _) ->
-       match k with Value name -> Some name | _ -> None)
+let value_names () : string list = Hashtbl.to_seq_keys values_tbl |> List.of_seq
 
 let function_names () : string list =
-  registry
-  |> List.filter_map (fun (k, _) ->
-       match k with Function name -> Some name | _ -> None)
+  Hashtbl.to_seq_keys functions_tbl |> List.of_seq
 
 module Css_tokens = Styled_ppx_css_parser.Tokens
 module Css_parser = Styled_ppx_css_parser.Parser
