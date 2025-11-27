@@ -176,21 +176,55 @@ type kind =
 
 let registry_ref : (kind * (module RULE)) list ref = ref []
 
-let lookup_property_rule (name : string) : 'a Rule.rule =
-  (* For function lookups, try both "name" and "name()" since functions are registered with "()" *)
+(* Lookup a value rule from the registry - prioritizes Value entries, then Functions, then Media_query *)
+let lookup_value_rule (name : string) : 'a Rule.rule =
   let function_name = name ^ "()" in
-  let rec find_rule = function
-    | [] -> failwith ("Rule not found: " ^ name)
-    | (k, (module M : RULE)) :: rest ->
-      let n =
-        match k with Property n | Value n | Function n | Media_query n -> n
-      in
-      (* Match exact name, or function name with "()" appended *)
-      if n = name || n = function_name then Obj.magic M.rule else find_rule rest
+  let rec find_value = function
+    | [] -> None
+    | (Value n, (module M : RULE)) :: rest ->
+      if n = name then Some (Obj.magic M.rule) else find_value rest
+    | _ :: rest -> find_value rest
   in
-  find_rule !registry_ref
+  let rec find_function = function
+    | [] -> None
+    | (Function n, (module M : RULE)) :: rest ->
+      if n = name || n = function_name then Some (Obj.magic M.rule) else find_function rest
+    | _ :: rest -> find_function rest
+  in
+  let rec find_media_query = function
+    | [] -> None
+    | (Media_query n, (module M : RULE)) :: rest ->
+      if n = name then Some (Obj.magic M.rule) else find_media_query rest
+    | _ :: rest -> find_media_query rest
+  in
+  match find_value !registry_ref with
+  | Some rule -> rule
+  | None -> (
+    match find_function !registry_ref with
+    | Some rule -> rule
+    | None -> (
+      match find_media_query !registry_ref with
+      | Some rule -> rule
+      | None -> failwith ("Rule not found: " ^ name)))
 
-(* Lazy version of lookup - defers the lookup until the rule is actually run *)
+(* Lookup a property rule from the registry *)
+let lookup_property_rule (name : string) : 'a Rule.rule =
+  let rec find_property = function
+    | [] -> None
+    | (Property n, (module M : RULE)) :: rest ->
+      if n = name then Some (Obj.magic M.rule) else find_property rest
+    | _ :: rest -> find_property rest
+  in
+  match find_property !registry_ref with
+  | Some rule -> rule
+  | None -> failwith ("Property rule not found: " ^ name)
+
+(* Lazy versions of lookup - defers the lookup until the rule is actually run *)
+let lazy_lookup_value_rule (name : string) : 'a Rule.rule =
+ fun tokens ->
+  let rule = lookup_value_rule name in
+  rule tokens
+
 let lazy_lookup_property_rule (name : string) : 'a Rule.rule =
  fun tokens ->
   let rule = lookup_property_rule name in
@@ -938,7 +972,7 @@ module Function_path = [%spec_module "function_path", "path( <string> )"]
 
 module Function_perspective =
   [%spec_module
-  "function_perspective", "perspective( <property-perspective> )"]
+  "function_perspective", "perspective( <'perspective'> )"]
 
 module Function_polygon =
   [%spec_module
@@ -3215,7 +3249,7 @@ module Property_offset_distance =
 module Property_offset_path =
   [%spec_module
   "property_offset_path",
-  "'none' | ray( <extended-angle> && [ <ray_size> ]? && [ 'contain' ]? ) | \
+  "'none' | ray( <extended-angle> && [ <ray-size> ]? && [ 'contain' ]? ) | \
    <path()> | <url> | <basic-shape> || <geometry-box>"]
 
 module Property_offset_position =

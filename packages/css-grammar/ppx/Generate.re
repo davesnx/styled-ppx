@@ -284,13 +284,10 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     "ident-token",
     "string-token",
     "string",
-    /* Extended types - have rules in Standard.re */
-    "extended-length",
-    "extended-angle",
-    "extended-percentage",
-    "extended-time",
-    "extended-frequency",
     "css-wide-keywords",
+    /* Note: extended-length, extended-angle, extended-percentage, extended-time, extended-frequency
+       are NOT in this list. They use lazy_lookup_property_rule to reference the generated modules
+       in Parser.ml which include calc(), min(), and max() support. */
   ];
 
   let is_standard_spec = name => List.mem(name, standard_specs);
@@ -553,9 +550,9 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
             // Standard spec (length, angle, css-wide-keywords, etc.) - use Standard.name directly
             "Standard." ++ snake_name |> evar;
           } else if (use_lookup) {
-            // Use lazy_lookup to defer rule resolution until parse time
+            // Use lazy_lookup_value_rule for data types (values and functions)
             eapply(
-              evar("lazy_lookup_property_rule"),
+              evar("lazy_lookup_value_rule"),
               [estring(name)],
             );
           } else {
@@ -564,7 +561,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
           };
         | Property_type(name) =>
           if (use_lookup) {
-            // Property types use lazy_lookup to defer until parse time
+            // Property types use lazy_lookup_property_rule for property references
             eapply(
               evar("lazy_lookup_property_rule"),
               [estring(name)],

@@ -29,10 +29,7 @@ If this test fail means that the module is not in sync with the ppx
   let backgroundString = Color.background |> CSS.Types.Color.toString;
   let colorTextString = Color.text |> CSS.Types.Color.toString;
   
-  CSS.unsafe(
-    {js|WebkitBoxShadow|js},
-    {js|inset 0 0 0 1000px |js} ++ backgroundString,
-  );
+  [%ocaml.error "Unknown property '-webkit-box-shadow'"];
   CSS.unsafe({js|WebkitLineClamp|js}, {js|2|js});
   CSS.unsafe({js|WebkitOverflowScrolling|js}, {js|touch|js});
   CSS.unsafe({js|WebkitTapHighlightColor|js}, {js|transparent|js});
@@ -164,3 +161,8 @@ If this test fail means that the module is not in sync with the ppx
   CSS.style([|CSS.right(interpolation), CSS.bottom(interpolation)|]);
 
   $ dune build
+  File "input.re", lines 19-20, characters 6-24:
+  19 | [%css {|-webkit-box-shadow: inset 0 0 0 1000px $(backgroundString);|}];
+             ^^^^^^^^^^^^^^^^^^
+  Error: Unknown property '-webkit-box-shadow'
+  [1]

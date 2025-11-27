@@ -53,10 +53,8 @@
     Combinators.xor(
       [
         Rule.Match.map(Standard.keyword("auto"), _v => `Auto),
-        Rule.Match.map(Standard.extended_length, v => `Extended_length(v)),
-        Rule.Match.map(Standard.extended_percentage, v =>
-          `Extended_percentage(v)
-        ),
+        Rule.Match.map(extended_length, v => `Extended_length(v)),
+        Rule.Match.map(extended_percentage, v => `Extended_percentage(v)),
         Rule.Match.map(Standard.keyword("min-content"), _v => `Min_content),
         Rule.Match.map(Standard.keyword("max-content"), _v => `Max_content),
         Rule.Match.map(Standard.keyword("fit-content"), _v => `Fit_content_0),
@@ -64,12 +62,8 @@
           Standard.function_call(
             "fit-content",
             Combinators.xor([
-              Rule.Match.map(Standard.extended_length, v =>
-                `Extended_length(v)
-              ),
-              Rule.Match.map(Standard.extended_percentage, v =>
-                `Extended_percentage(v)
-              ),
+              Rule.Match.map(extended_length, v => `Extended_length(v)),
+              Rule.Match.map(extended_percentage, v => `Extended_percentage(v)),
             ]),
           ),
           v =>
