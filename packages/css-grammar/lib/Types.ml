@@ -1401,6 +1401,7 @@ and mf_value =
   | `Ident of string
   | `Ratio of ratio
   | `Interpolation of string list
+  | `Function_calc of function_calc
   ]
 
 and mf_name = string

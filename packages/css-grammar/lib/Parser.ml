@@ -1225,7 +1225,8 @@ module Mf_lt = [%spec_module "mf_lt", "'<=' | '<'"]
 
 module Mf_value =
   [%spec_module
-  "mf_value", "<number> | <dimension> | <ident> | <ratio> | <interpolation>"]
+  "mf_value",
+  "<number> | <dimension> | <ident> | <ratio> | <interpolation> | <calc()>"]
 
 module Mf_name = [%spec_module "mf_name", "<ident>"]
 
@@ -5521,6 +5522,7 @@ let registry : (kind * (module RULE)) list =
     Property "box-lines", (module Property_box_lines : RULE);
     Property "box-ordinal-group", (module Property_box_ordinal_group : RULE);
     Property "box-orient", (module Property_box_orient : RULE);
+    Property "-webkit-box-orient", (module Property_box_orient : RULE);
     Property "box-pack", (module Property_box_pack : RULE);
     Property "box-shadow", (module Property_box_shadow : RULE);
     Property "clip", (module Property_clip : RULE);
