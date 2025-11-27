@@ -1908,13 +1908,11 @@ and property__moz_border_radius_topright = property_border_bottom_right_radius
 and property__moz_border_right_colors =
   [ `Color of color list
   | `None
-  | `Interpolation
   ]
 
 and property__moz_border_top_colors =
   [ `Color of color list
   | `None
-  | `Interpolation
   ]
 
 and property__moz_context_properties =

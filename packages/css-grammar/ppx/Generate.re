@@ -697,16 +697,189 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     };
   };
 
-  /* Check if a spec contains interpolation - currently unused but kept for future use */
-  let rec _spec_contains_interpolation = (spec: Css_spec_parser.value): bool => {
+  /* Check if a spec contains interpolation */
+  let rec spec_contains_interpolation = (spec: Css_spec_parser.value): bool => {
     switch (spec) {
     | Terminal(Data_type("interpolation"), _) => true
     | Terminal(_, _) => false
-    | Group(inner, _) => _spec_contains_interpolation(inner)
+    | Group(inner, _) => spec_contains_interpolation(inner)
     | Combinator(_, values) =>
-      List.exists(_spec_contains_interpolation, values)
-    | Function_call(_, inner) => _spec_contains_interpolation(inner)
+      List.exists(spec_contains_interpolation, values)
+    | Function_call(_, inner) => spec_contains_interpolation(inner)
     };
+  };
+
+  /* Generate extract_interpolations function from spec
+     This generates a function that walks the parsed value and collects all interpolation strings */
+  let generate_extract_interpolations_function =
+      (spec: Css_spec_parser.value, ~loc as _: Location.t)
+      : Parsetree.expression => {
+    /* Helper to generate extraction expression for a value accessed by a variable name */
+    let rec generate_extraction =
+            (spec: Css_spec_parser.value, var_expr: Parsetree.expression)
+            : Parsetree.expression => {
+      switch (spec) {
+      /* Direct interpolation - extract the string list and join with "." */
+      | Terminal(Data_type("interpolation"), modifier) =>
+        let extract_one = [%expr String.concat(".", [%e var_expr])];
+        switch (modifier) {
+        | One => [%expr [[%e extract_one]]]
+        | Optional =>
+          switch%expr ([%e var_expr]) {
+          | None => []
+          | Some(parts) => [String.concat(".", parts)]
+          }
+        | Zero_or_more
+        | One_or_more
+        | At_least_one
+        | Repeat(_)
+        | Repeat_by_comma(_, _) => [%expr
+           List.map(parts => String.concat(".", parts), [%e var_expr])
+          ]
+        };
+
+      /* Other terminals (keywords, other data types) - no interpolations */
+      | Terminal(_, _) => [%expr []]
+
+      /* Groups - recurse into the inner value */
+      | Group(inner, modifier) =>
+        let inner_extract = generate_extraction(inner, var_expr);
+        switch (modifier) {
+        | One => inner_extract
+        | Optional =>
+          switch%expr ([%e var_expr]) {
+          | None => []
+          | Some(v) => [%e generate_extraction(inner, evar("v"))]
+          }
+        | Zero_or_more
+        | One_or_more
+        | At_least_one
+        | Repeat(_)
+        | Repeat_by_comma(_, _) => [%expr
+           List.concat(
+             List.map(
+               v => [%e generate_extraction(inner, evar("v"))],
+               [%e var_expr],
+             ),
+           )
+          ]
+        };
+
+      /* Xor combinator - pattern match on variants */
+      | Combinator(Xor, values) =>
+        let names = variant_names(values);
+        let pairs = List.combine(names, values);
+        let cases =
+          List.map(
+            ((name, inner_spec)) => {
+              let has_content =
+                switch (inner_spec) {
+                | Terminal(Keyword(_), _) => false
+                | _ => true
+                };
+              if (has_content && spec_contains_interpolation(inner_spec)) {
+                case(
+                  ~lhs=ppat_variant(name, Some(pvar("inner"))),
+                  ~guard=None,
+                  ~rhs=generate_extraction(inner_spec, evar("inner")),
+                );
+              } else {
+                case(
+                  ~lhs=
+                    ppat_variant(
+                      name,
+                      has_content ? Some(pvar("_")) : None,
+                    ),
+                  ~guard=None,
+                  ~rhs=[%expr []],
+                );
+              };
+            },
+            pairs,
+          );
+        pexp_match(var_expr, cases);
+
+      /* Static/And combinator - tuple, extract from each element */
+      | Combinator(Static, values)
+      | Combinator(And, values) =>
+        let extractions =
+          List.mapi(
+            (i, inner_spec) =>
+              if (spec_contains_interpolation(inner_spec)) {
+                let var_name = "v" ++ string_of_int(i);
+                generate_extraction(inner_spec, evar(var_name));
+              } else {
+                [%expr []];
+              },
+            values,
+          );
+        let combined =
+          List.fold_right(
+            (extract, acc) => [%expr [%e extract] @ [%e acc]],
+            extractions,
+            [%expr []],
+          );
+        /* Generate: let (v0, v1, ...) = var_expr in combined */
+        let tuple_pat =
+          ppat_tuple(
+            List.mapi((i, _) => pvar("v" ++ string_of_int(i)), values),
+          );
+        pexp_let(
+          Nonrecursive,
+          [Ast_helper.Vb.mk(tuple_pat, var_expr)],
+          combined,
+        );
+
+      /* Or combinator - tuple of options, extract from each Some */
+      | Combinator(Or, values) =>
+        let extractions =
+          List.mapi(
+            (i, inner_spec) =>
+              if (spec_contains_interpolation(inner_spec)) {
+                let var_name = "v" ++ string_of_int(i);
+                switch%expr ([%e evar(var_name)]) {
+                | None => []
+                | Some(inner) => [%e
+                   generate_extraction(inner_spec, evar("inner"))
+                  ]
+                };
+              } else {
+                [%expr []];
+              },
+            values,
+          );
+        let combined =
+          List.fold_right(
+            (extract, acc) => [%expr [%e extract] @ [%e acc]],
+            extractions,
+            [%expr []],
+          );
+        let tuple_pat =
+          ppat_tuple(
+            List.mapi((i, _) => pvar("v" ++ string_of_int(i)), values),
+          );
+        pexp_let(
+          Nonrecursive,
+          [Ast_helper.Vb.mk(tuple_pat, var_expr)],
+          combined,
+        );
+
+      /* Function call - recurse into the argument */
+      | Function_call(_, inner) => generate_extraction(inner, var_expr)
+      };
+    };
+
+    /* Generate the function body */
+    let body =
+      if (spec_contains_interpolation(spec)) {
+        generate_extraction(spec, evar("value"));
+      } else {
+        /* Optimization: if spec doesn't contain interpolation, just return [] */
+
+        [%expr []];
+      };
+
+    pexp_fun(Nolabel, None, pvar("value"), body);
   };
 
   /* Generate to_string function from spec */
@@ -822,14 +995,30 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
 
     let string_list_type =
       ptyp_constr(txt @@ Lident("list"), [string_type]);
-    /* TODO: extract_interpolations is not used for now, always return [] */
+    let extract_interpolations_inner =
+      generate_extract_interpolations_function(spec, ~loc);
+    /* Wrap with type annotations */
     let extract_interpolations_body =
-      pexp_fun(
-        Nolabel,
-        None,
-        Ast_helper.Pat.constraint_(~loc, pvar("_value"), t_type),
-        pexp_constraint([%expr []], string_list_type),
-      );
+      switch (extract_interpolations_inner.pexp_desc) {
+      | Pexp_fun(lbl, default, pat, body) =>
+        let typed_pat = Ast_helper.Pat.constraint_(~loc, pat, t_type);
+        let typed_body = pexp_constraint(body, string_list_type);
+        pexp_fun(lbl, default, typed_pat, typed_body);
+      | _ =>
+        /* Fallback: wrap entire expression */
+        pexp_fun(
+          Nolabel,
+          None,
+          Ast_helper.Pat.constraint_(~loc, pvar("value"), t_type),
+          pexp_constraint(
+            pexp_apply(
+              extract_interpolations_inner,
+              [(Nolabel, evar("value"))],
+            ),
+            string_list_type,
+          ),
+        )
+      };
     let extract_interpolations_binding =
       Ast_helper.Str.value(
         ~loc,

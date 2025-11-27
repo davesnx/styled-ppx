@@ -178,7 +178,6 @@ let registry_ref : (kind * (module RULE)) list ref = ref []
 
 (* Lookup a value rule from the registry - prioritizes Value entries, then Functions, then Media_query *)
 let lookup_value_rule (name : string) : 'a Rule.rule =
-  let function_name = name ^ "()" in
   let rec find_value = function
     | [] -> None
     | (Value n, (module M : RULE)) :: rest ->
@@ -188,7 +187,7 @@ let lookup_value_rule (name : string) : 'a Rule.rule =
   let rec find_function = function
     | [] -> None
     | (Function n, (module M : RULE)) :: rest ->
-      if n = name || n = function_name then Some (Obj.magic M.rule) else find_function rest
+      if n = name then Some (Obj.magic M.rule) else find_function rest
     | _ :: rest -> find_function rest
   in
   let rec find_media_query = function
@@ -199,11 +198,11 @@ let lookup_value_rule (name : string) : 'a Rule.rule =
   in
   match find_value !registry_ref with
   | Some rule -> rule
-  | None -> (
-    match find_function !registry_ref with
+  | None ->
+    (match find_function !registry_ref with
     | Some rule -> rule
-    | None -> (
-      match find_media_query !registry_ref with
+    | None ->
+      (match find_media_query !registry_ref with
       | Some rule -> rule
       | None -> failwith ("Rule not found: " ^ name)))
 
@@ -233,52 +232,61 @@ let lazy_lookup_property_rule (name : string) : 'a Rule.rule =
 module Legacy_linear_gradient_arguments =
   [%spec_module
   "legacy_linear_gradient_arguments",
-  "[ <extended-angle> | <side-or-corner> ]? ',' <color-stop-list>"]
+  "[ <extended-angle> | <side-or-corner> ]? ',' <color-stop-list>",
+  (module Css_types.LegacyLinearGradientArguments : RUNTIME_TYPE)]
 
 module Legacy_radial_gradient_shape =
   [%spec_module
-  "legacy_radial_gradient_shape", "'circle' | 'ellipse'"]
+  "legacy_radial_gradient_shape",
+  "'circle' | 'ellipse'",
+  (module Css_types.LegacyRadialGradientShape : RUNTIME_TYPE)]
 
 module Legacy_radial_gradient_size =
   [%spec_module
   "legacy_radial_gradient_size",
   "'closest-side' | 'closest-corner' | 'farthest-side' | 'farthest-corner' | \
-   'contain' | 'cover'"]
+   'contain' | 'cover'",
+  (module Css_types.LegacyRadialGradientSize : RUNTIME_TYPE)]
 
 module Legacy_radial_gradient_arguments =
   [%spec_module
   "legacy_radial_gradient_arguments",
   "[ <position> ',' ]? [ [ <legacy-radial-gradient-shape> || \
    <legacy-radial-gradient-size> | [ <extended-length> | <extended-percentage> \
-   ]{2} ] ',' ]? <color-stop-list>"]
+   ]{2} ] ',' ]? <color-stop-list>",
+  (module Css_types.LegacyRadialGradientArguments : RUNTIME_TYPE)]
 
 module Legacy_linear_gradient =
   [%spec_module
   "legacy_linear_gradient",
   "-moz-linear-gradient( <legacy-linear-gradient-arguments> ) | \
    -webkit-linear-gradient( <legacy-linear-gradient-arguments> ) | \
-   -o-linear-gradient( <legacy-linear-gradient-arguments> )"]
+   -o-linear-gradient( <legacy-linear-gradient-arguments> )",
+  (module Css_types.LegacyLinearGradient : RUNTIME_TYPE)]
 
 module Legacy_radial_gradient =
   [%spec_module
   "legacy_radial_gradient",
   "-moz-radial-gradient( <legacy-radial-gradient-arguments> ) | \
    -webkit-radial-gradient( <legacy-radial-gradient-arguments> ) | \
-   -o-radial-gradient( <legacy-radial-gradient-arguments> )"]
+   -o-radial-gradient( <legacy-radial-gradient-arguments> )",
+  (module Css_types.LegacyRadialGradient : RUNTIME_TYPE)]
 
 module Legacy_repeating_linear_gradient =
   [%spec_module
   "legacy_repeating_linear_gradient",
   "-moz-repeating-linear-gradient( <legacy-linear-gradient-arguments> ) | \
    -webkit-repeating-linear-gradient( <legacy-linear-gradient-arguments> ) | \
-   -o-repeating-linear-gradient( <legacy-linear-gradient-arguments> )"]
+   -o-repeating-linear-gradient( <legacy-linear-gradient-arguments> )",
+  (module Css_types.LegacyRepeatingLinearGradient : RUNTIME_TYPE)]
 
 module Legacy_repeating_radial_gradient =
   [%spec_module
   "legacy_repeating_radial_gradient",
   "-moz-repeating-radial-gradient( <legacy-radial-gradient-arguments> ) | \
    -webkit-repeating-radial-gradient( <legacy-radial-gradient-arguments> ) | \
-   -o-repeating-radial-gradient( <legacy-radial-gradient-arguments> )"]
+   -o-repeating-radial-gradient( <legacy-radial-gradient-arguments> )",
+  (module Css_types.LegacyRepeatingRadialGradient : RUNTIME_TYPE)]
 
 (* Legacy_gradient depends on all the above, so it must come last *)
 module Legacy_gradient =
@@ -286,7 +294,8 @@ module Legacy_gradient =
   "legacy_gradient",
   "<-webkit-gradient()> | <legacy-linear-gradient> | \
    <legacy-repeating-linear-gradient> | <legacy-radial-gradient> | \
-   <legacy-repeating-radial-gradient>"]
+   <legacy-repeating-radial-gradient>",
+  (module Css_types.LegacyGradient : RUNTIME_TYPE)]
 
 module Non_standard_color =
   [%spec_module
@@ -308,7 +317,8 @@ module Non_standard_color =
    '-moz-activehyperlinktext' | '-moz-default-background-color' | \
    '-moz-default-color' | '-moz-hyperlinktext' | '-moz-visitedhyperlinktext' | \
    '-webkit-activelink' | '-webkit-focus-ring-color' | '-webkit-link' | \
-   '-webkit-text'"]
+   '-webkit-text'",
+  (module Css_types.NonStandardColor : RUNTIME_TYPE)]
 
 module Non_standard_font =
   [%spec_module
@@ -318,129 +328,175 @@ module Non_standard_font =
    '-apple-system-caption2' | '-apple-system-footnote' | \
    '-apple-system-short-body' | '-apple-system-short-headline' | \
    '-apple-system-short-subheadline' | '-apple-system-short-caption1' | \
-   '-apple-system-short-footnote' | '-apple-system-tall-body'"]
+   '-apple-system-short-footnote' | '-apple-system-tall-body'",
+  (module Css_types.NonStandardFont : RUNTIME_TYPE)]
 
 module Non_standard_image_rendering =
   [%spec_module
   "non_standard_image_rendering",
   "'optimize-contrast' | '-moz-crisp-edges' | '-o-crisp-edges' | \
-   '-webkit-optimize-contrast'"]
+   '-webkit-optimize-contrast'",
+  (module Css_types.NonStandardImageRendering : RUNTIME_TYPE)]
 
 module Non_standard_overflow =
   [%spec_module
   "non_standard_overflow",
   "'-moz-scrollbars-none' | '-moz-scrollbars-horizontal' | \
-   '-moz-scrollbars-vertical' | '-moz-hidden-unscrollable'"]
+   '-moz-scrollbars-vertical' | '-moz-hidden-unscrollable'",
+  (module Css_types.NonStandardOverflow : RUNTIME_TYPE)]
 
 module Non_standard_width =
   [%spec_module
   "non_standard_width",
   "'min-intrinsic' | 'intrinsic' | '-moz-min-content' | '-moz-max-content' | \
-   '-webkit-min-content' | '-webkit-max-content'"]
+   '-webkit-min-content' | '-webkit-max-content'",
+  (module Css_types.NonStandardWidth : RUNTIME_TYPE)]
 
 module Webkit_gradient_color_stop =
   [%spec_module
   "webkit_gradient_color_stop",
   "from( <color> ) | color-stop( [ <alpha-value> | <extended-percentage> ] ',' \
-   <color> ) | to( <color> )"]
+   <color> ) | to( <color> )",
+  (module Css_types.WebkitGradientColorStop : RUNTIME_TYPE)]
 
 module Webkit_gradient_point =
   [%spec_module
   "webkit_gradient_point",
   "[ 'left' | 'center' | 'right' | <extended-length> | <extended-percentage> ] \
-   [ 'top' | 'center' | 'bottom' | <extended-length> | <extended-percentage> ]"]
+   [ 'top' | 'center' | 'bottom' | <extended-length> | <extended-percentage> ]",
+  (module Css_types.WebkitGradientPoint : RUNTIME_TYPE)]
 
 module Webkit_gradient_radius =
   [%spec_module
-  "webkit_gradient_radius", "<extended-length> | <extended-percentage>"]
+  "webkit_gradient_radius",
+  "<extended-length> | <extended-percentage>",
+  (module Css_types.WebkitGradientRadius : RUNTIME_TYPE)]
 
 module Webkit_gradient_type =
   [%spec_module
-  "webkit_gradient_type", "'linear' | 'radial'"]
+  "webkit_gradient_type",
+  "'linear' | 'radial'",
+  (module Css_types.WebkitGradientType : RUNTIME_TYPE)]
 
 module Webkit_mask_box_repeat =
   [%spec_module
-  "webkit_mask_box_repeat", "'repeat' | 'stretch' | 'round'"]
+  "webkit_mask_box_repeat",
+  "'repeat' | 'stretch' | 'round'",
+  (module Css_types.WebkitMaskBoxRepeat : RUNTIME_TYPE)]
 
 module Webkit_mask_clip_style =
   [%spec_module
   "webkit_mask_clip_style",
   "'border' | 'border-box' | 'padding' | 'padding-box' | 'content' | \
-   'content-box' | 'text'"]
+   'content-box' | 'text'",
+  (module Css_types.WebkitMaskClipStyle : RUNTIME_TYPE)]
 
 module Absolute_size =
   [%spec_module
   "absolute_size",
   "'xx-small' | 'x-small' | 'small' | 'medium' | 'large' | 'x-large' | \
-   'xx-large' | 'xxx-large'"]
+   'xx-large' | 'xxx-large'",
+  (module Css_types.AbsoluteSize : RUNTIME_TYPE)]
 
-module Age = [%spec_module "age", "'child' | 'young' | 'old'"]
+module Age =
+  [%spec_module
+  "age", "'child' | 'young' | 'old'", (module Css_types.Age : RUNTIME_TYPE)]
 
 module Alpha_value =
   [%spec_module
-  "alpha_value", "<number> | <extended-percentage>"]
+  "alpha_value",
+  "<number> | <extended-percentage>",
+  (module Css_types.AlphaValue : RUNTIME_TYPE)]
 
 module Angular_color_hint =
   [%spec_module
-  "angular_color_hint", "<extended-angle> | <extended-percentage>"]
+  "angular_color_hint",
+  "<extended-angle> | <extended-percentage>",
+  (module Css_types.AngularColorHint : RUNTIME_TYPE)]
 
 module Angular_color_stop =
   [%spec_module
-  "angular_color_stop", "<color> && [ <color-stop-angle> ]?"]
+  "angular_color_stop",
+  "<color> && [ <color-stop-angle> ]?",
+  (module Css_types.AngularColorStop : RUNTIME_TYPE)]
 
 module Angular_color_stop_list =
   [%spec_module
   "angular_color_stop_list",
   "[ <angular-color-stop> [ ',' <angular-color-hint> ]? ]# ',' \
-   <angular-color-stop>"]
+   <angular-color-stop>",
+  (module Css_types.AngularColorStopList : RUNTIME_TYPE)]
 
 module Animateable_feature =
   [%spec_module
-  "animateable_feature", "'scroll-position' | 'contents' | <custom-ident>"]
+  "animateable_feature",
+  "'scroll-position' | 'contents' | <custom-ident>",
+  (module Css_types.AnimateableFeature : RUNTIME_TYPE)]
 
-module Attachment = [%spec_module "attachment", "'scroll' | 'fixed' | 'local'"]
-module Attr_fallback = [%spec_module "attr_fallback", "<any-value>"]
+module Attachment =
+  [%spec_module
+  "attachment",
+  "'scroll' | 'fixed' | 'local'",
+  (module Css_types.Attachment : RUNTIME_TYPE)]
+
+module Attr_fallback =
+  [%spec_module
+  "attr_fallback", "<any-value>", (module Css_types.AttrFallback : RUNTIME_TYPE)]
 
 module Attr_matcher =
   [%spec_module
-  "attr_matcher", "[ '~' | '|' | '^' | '$' | '*' ]? '='"]
+  "attr_matcher",
+  "[ '~' | '|' | '^' | '$' | '*' ]? '='",
+  (module Css_types.AttrMatcher : RUNTIME_TYPE)]
 
-module Attr_modifier = [%spec_module "attr_modifier", "'i' | 's'"]
+module Attr_modifier =
+  [%spec_module
+  "attr_modifier", "'i' | 's'", (module Css_types.AttrModifier : RUNTIME_TYPE)]
 
 module Attribute_selector =
   [%spec_module
   "attribute_selector",
   "'[' <wq-name> ']' | '[' <wq-name> <attr-matcher> [ <string-token> | \
-   <ident-token> ] [ <attr-modifier> ]? ']'"]
+   <ident-token> ] [ <attr-modifier> ]? ']'",
+  (module Css_types.AttributeSelector : RUNTIME_TYPE)]
 
 module Auto_repeat =
   [%spec_module
   "auto_repeat",
   "repeat( [ 'auto-fill' | 'auto-fit' ] ',' [ [ <line-names> ]? <fixed-size> \
-   ]+ [ <line-names> ]? )"]
+   ]+ [ <line-names> ]? )",
+  (module Css_types.AutoRepeat : RUNTIME_TYPE)]
 
 module Auto_track_list =
   [%spec_module
   "auto_track_list",
   "[ [ <line-names> ]? [ <fixed-size> | <fixed-repeat> ] ]* [ <line-names> ]? \
    <auto-repeat> [ [ <line-names> ]? [ <fixed-size> | <fixed-repeat> ] ]* [ \
-   <line-names> ]?"]
+   <line-names> ]?",
+  (module Css_types.AutoTrackList : RUNTIME_TYPE)]
 
 module Baseline_position =
   [%spec_module
-  "baseline_position", "[ 'first' | 'last' ]? 'baseline'"]
+  "baseline_position",
+  "[ 'first' | 'last' ]? 'baseline'",
+  (module Css_types.BaselinePosition : RUNTIME_TYPE)]
 
 module Basic_shape =
   [%spec_module
-  "basic_shape", "<inset()> | <circle()> | <ellipse()> | <polygon()> | <path()>"]
+  "basic_shape",
+  "<inset()> | <circle()> | <ellipse()> | <polygon()> | <path()>",
+  (module Css_types.BasicShape : RUNTIME_TYPE)]
 
-module Bg_image = [%spec_module "bg_image", "'none' | <image>"]
+module Bg_image =
+  [%spec_module
+  "bg_image", "'none' | <image>", (module Css_types.BgImage : RUNTIME_TYPE)]
 
 module Bg_layer =
   [%spec_module
   "bg_layer",
   "<bg-image> || <bg-position> [ '/' <bg-size> ]? || <repeat-style> || \
-   <attachment> || <box> || <box>"]
+   <attachment> || <box> || <box>",
+  (module Css_types.BgLayer : RUNTIME_TYPE)]
 
 module Bg_position =
   [%spec_module
@@ -449,86 +505,127 @@ module Bg_position =
    [ 'left' | 'center' | 'right' | <length-percentage> ] [ 'top' | 'center' | \
    'bottom' | <length-percentage> ] | [ 'center' | [ 'left' | 'right' ] \
    <length-percentage>? ] && [ 'center' | [ 'top' | 'bottom' ] \
-   <length-percentage>? ]"]
+   <length-percentage>? ]",
+  (module Css_types.BgPosition : RUNTIME_TYPE)]
 
 (* one_bg_size isn't part of the spec, helps us with Type generation *)
 module One_bg_size =
   [%spec_module
   "one_bg_size",
   "[ <extended-length> | <extended-percentage> | 'auto' ] [ <extended-length> \
-   | <extended-percentage> | 'auto' ]?"]
+   | <extended-percentage> | 'auto' ]?",
+  (module Css_types.OneBgSize : RUNTIME_TYPE)]
 
-module Bg_size = [%spec_module "bg_size", "<one-bg-size> | 'cover' | 'contain'"]
+module Bg_size =
+  [%spec_module
+  "bg_size",
+  "<one-bg-size> | 'cover' | 'contain'",
+  (module Css_types.BgSize : RUNTIME_TYPE)]
 
 module Blend_mode =
   [%spec_module
   "blend_mode",
   "'normal' | 'multiply' | 'screen' | 'overlay' | 'darken' | 'lighten' | \
    'color-dodge' | 'color-burn' | 'hard-light' | 'soft-light' | 'difference' | \
-   'exclusion' | 'hue' | 'saturation' | 'color' | 'luminosity'"]
+   'exclusion' | 'hue' | 'saturation' | 'color' | 'luminosity'",
+  (module Css_types.BlendMode : RUNTIME_TYPE)]
 
 (* module border_radius = [%spec_module "border_radius",
-  "[ <extended-length> | <extended-percentage> ]{1,2}"] *)
+  "[ <extended-length> | <extended-percentage> ]{1,2}", (module Css_types.BorderRadius : RUNTIME_TYPE)] *)
 module Border_radius =
   [%spec_module
-  "border_radius", "<extended-length> | <extended-percentage>"]
+  "border_radius",
+  "<extended-length> | <extended-percentage>",
+  (module Css_types.BorderRadius : RUNTIME_TYPE)]
 
-module Bottom = [%spec_module "bottom", "<extended-length> | 'auto'"]
+module Bottom =
+  [%spec_module
+  "bottom",
+  "<extended-length> | 'auto'",
+  (module Css_types.Bottom : RUNTIME_TYPE)]
 
 module Box =
   [%spec_module
-  "box", "'border-box' | 'padding-box' | 'content-box'"]
+  "box",
+  "'border-box' | 'padding-box' | 'content-box'",
+  (module Css_types.Box : RUNTIME_TYPE)]
 
 module Calc_product =
   [%spec_module
-  "calc_product", "<calc-value> [ '*' <calc-value> | '/' <number> ]*"]
+  "calc_product",
+  "<calc-value> [ '*' <calc-value> | '/' <number> ]*",
+  (module Css_types.CalcProduct : RUNTIME_TYPE)]
 
 module Dimension =
   [%spec_module
   "dimension",
-  "<extended-length> | <extended-time> | <extended-frequency> | <resolution>"]
+  "<extended-length> | <extended-time> | <extended-frequency> | <resolution>",
+  (module Css_types.Dimension : RUNTIME_TYPE)]
 
 module Calc_sum =
   [%spec_module
-  "calc_sum", "<calc-product> [ [ '+' | '-' ] <calc-product> ]*"]
+  "calc_sum",
+  "<calc-product> [ [ '+' | '-' ] <calc-product> ]*",
+  (module Css_types.CalcSum : RUNTIME_TYPE)]
 
 (* module calc_value = [%spec_module "calc_value",
-  "<number> | <dimension> | <extended-percentage> | <calc>"] *)
+  "<number> | <dimension> | <extended-percentage> | <calc>", (module Css_types.CalcValue : RUNTIME_TYPE)] *)
 module Calc_value =
   [%spec_module
   "calc_value",
   "<number> | <extended-length> | <extended-percentage> | <extended-angle> | \
-   <extended-time> | '(' <calc-sum> ')'"]
+   <extended-time> | '(' <calc-sum> ')'",
+  (module Css_types.CalcValue : RUNTIME_TYPE)]
 
-module Cf_final_image = [%spec_module "cf_final_image", "<image> | <color>"]
+module Cf_final_image =
+  [%spec_module
+  "cf_final_image",
+  "<image> | <color>",
+  (module Css_types.CfFinalImage : RUNTIME_TYPE)]
 
 module Cf_mixing_image =
   [%spec_module
-  "cf_mixing_image", "[ <extended-percentage> ]? && <image>"]
+  "cf_mixing_image",
+  "[ <extended-percentage> ]? && <image>",
+  (module Css_types.CfMixingImage : RUNTIME_TYPE)]
 
-module Class_selector = [%spec_module "class_selector", "'.' <ident-token>"]
-module Clip_source = [%spec_module "clip_source", "<url>"]
+module Class_selector =
+  [%spec_module
+  "class_selector",
+  "'.' <ident-token>",
+  (module Css_types.ClassSelector : RUNTIME_TYPE)]
+
+module Clip_source =
+  [%spec_module
+  "clip_source", "<url>", (module Css_types.ClipSource : RUNTIME_TYPE)]
 
 module Color =
   [%spec_module
   "color",
   "<rgb()> | <rgba()> | <hsl()> | <hsla()> | <hex-color> | <named-color> | \
    'currentColor' | <deprecated-system-color> | <interpolation> | <var()> | \
-   <color-mix()>"]
+   <color-mix()>",
+  (module Css_types.Color : RUNTIME_TYPE)]
 
 module Color_stop =
   [%spec_module
-  "color_stop", "<color-stop-length> | <color-stop-angle>"]
+  "color_stop",
+  "<color-stop-length> | <color-stop-angle>",
+  (module Css_types.ColorStop : RUNTIME_TYPE)]
 
 module Color_stop_angle =
   [%spec_module
-  "color_stop_angle", "[ <extended-angle> ]{1,2}"]
+  "color_stop_angle",
+  "[ <extended-angle> ]{1,2}",
+  (module Css_types.ColorStopAngle : RUNTIME_TYPE)]
 
 (* module color_stop_length = [%spec_module "color_stop_length",
-  "[ <extended-length> | <extended-percentage> ]{1,2}"] *)
+  "[ <extended-length> | <extended-percentage> ]{1,2}", (module Css_types.ColorStopLength : RUNTIME_TYPE)] *)
 module Color_stop_length =
   [%spec_module
-  "color_stop_length", "<extended-length> | <extended-percentage>"]
+  "color_stop_length",
+  "<extended-length> | <extended-percentage>",
+  (module Css_types.ColorStopLength : RUNTIME_TYPE)]
 
 (* color_stop_list is modified from the original spec, here is a simplified version where it tries to be fully compatible but easier for code-gen:
 
@@ -539,28 +636,34 @@ module Color_stop_length =
 module Color_stop_list =
   [%spec_module
   "color_stop_list",
-  "[ [<color>? <length-percentage>] | [<color> <length-percentage>?] ]#"]
+  "[ [<color>? <length-percentage>] | [<color> <length-percentage>?] ]#",
+  (module Css_types.ColorStopList : RUNTIME_TYPE)]
 
 module Hue_interpolation_method =
   [%spec_module
   "hue_interpolation_method",
-  " [ 'shorter' | 'longer' | 'increasing' | 'decreasing' ] && 'hue' "]
+  " [ 'shorter' | 'longer' | 'increasing' | 'decreasing' ] && 'hue' ",
+  (module Css_types.HueInterpolationMethod : RUNTIME_TYPE)]
 
 module Polar_color_space =
   [%spec_module
-  "polar_color_space", " 'hsl' | 'hwb' | 'lch' | 'oklch' "]
+  "polar_color_space",
+  " 'hsl' | 'hwb' | 'lch' | 'oklch' ",
+  (module Css_types.PolarColorSpace : RUNTIME_TYPE)]
 
 module Rectangular_color_space =
   [%spec_module
   "rectangular_color_space",
   " 'srgb' | 'srgb-linear' | 'display-p3' | 'a98-rgb' | 'prophoto-rgb' | \
-   'rec2020' | 'lab' | 'oklab' | 'xyz' | 'xyz-d50' | 'xyz-d65' "]
+   'rec2020' | 'lab' | 'oklab' | 'xyz' | 'xyz-d50' | 'xyz-d65' ",
+  (module Css_types.RectangularColorSpace : RUNTIME_TYPE)]
 
 module Color_interpolation_method =
   [%spec_module
   "color_interpolation_method",
   " 'in' && [<rectangular-color-space> | <polar-color-space> \
-   <hue-interpolation-method>?] "]
+   <hue-interpolation-method>?] ",
+  (module Css_types.ColorInterpolationMethod : RUNTIME_TYPE)]
 
 module Function_color_mix =
   [%spec_module
@@ -569,94 +672,132 @@ module Function_color_mix =
   "color-mix(<color-interpolation-method> ',' [ <color> && <percentage>? ] ',' \
    [ <color> && <percentage>? ])"]
 
-module Combinator = [%spec_module "combinator", "'>' | '+' | '~' | '||'"]
+module Combinator =
+  [%spec_module
+  "combinator",
+  "'>' | '+' | '~' | '||'",
+  (module Css_types.Combinator : RUNTIME_TYPE)]
 
 module Common_lig_values =
   [%spec_module
-  "common_lig_values", "'common-ligatures' | 'no-common-ligatures'"]
+  "common_lig_values",
+  "'common-ligatures' | 'no-common-ligatures'",
+  (module Css_types.CommonLigValues : RUNTIME_TYPE)]
 
 module Compat_auto =
   [%spec_module
   "compat_auto",
   "'searchfield' | 'textarea' | 'push-button' | 'slider-horizontal' | \
    'checkbox' | 'radio' | 'square-button' | 'menulist' | 'listbox' | 'meter' | \
-   'progress-bar'"]
+   'progress-bar'",
+  (module Css_types.CompatAuto : RUNTIME_TYPE)]
 
 module Complex_selector =
   [%spec_module
   "complex_selector",
-  "<compound-selector> [ [ <combinator> ]? <compound-selector> ]*"]
+  "<compound-selector> [ [ <combinator> ]? <compound-selector> ]*",
+  (module Css_types.ComplexSelector : RUNTIME_TYPE)]
 
 module Complex_selector_list =
   [%spec_module
-  "complex_selector_list", "[ <complex-selector> ]#"]
+  "complex_selector_list",
+  "[ <complex-selector> ]#",
+  (module Css_types.ComplexSelectorList : RUNTIME_TYPE)]
 
 module Composite_style =
   [%spec_module
   "composite_style",
   "'clear' | 'copy' | 'source-over' | 'source-in' | 'source-out' | \
    'source-atop' | 'destination-over' | 'destination-in' | 'destination-out' | \
-   'destination-atop' | 'xor'"]
+   'destination-atop' | 'xor'",
+  (module Css_types.CompositeStyle : RUNTIME_TYPE)]
 
 module Compositing_operator =
   [%spec_module
-  "compositing_operator", "'add' | 'subtract' | 'intersect' | 'exclude'"]
+  "compositing_operator",
+  "'add' | 'subtract' | 'intersect' | 'exclude'",
+  (module Css_types.CompositingOperator : RUNTIME_TYPE)]
 
 module Compound_selector =
   [%spec_module
   "compound_selector",
   "[ <type-selector> ]? [ <subclass-selector> ]* [ <pseudo-element-selector> [ \
-   <pseudo-class-selector> ]* ]*"]
+   <pseudo-class-selector> ]* ]*",
+  (module Css_types.CompoundSelector : RUNTIME_TYPE)]
 
 module Compound_selector_list =
   [%spec_module
-  "compound_selector_list", "[ <compound-selector> ]#"]
+  "compound_selector_list",
+  "[ <compound-selector> ]#",
+  (module Css_types.CompoundSelectorList : RUNTIME_TYPE)]
 
 module Content_distribution =
   [%spec_module
   "content_distribution",
-  "'space-between' | 'space-around' | 'space-evenly' | 'stretch'"]
+  "'space-between' | 'space-around' | 'space-evenly' | 'stretch'",
+  (module Css_types.ContentDistribution : RUNTIME_TYPE)]
 
 module Content_list =
   [%spec_module
   "content_list",
   "[ <string> | 'contents' | <url> | <quote> | <attr()> | counter( <ident> ',' \
-   [ <'list-style-type'> ]? ) ]+"]
+   [ <'list-style-type'> ]? ) ]+",
+  (module Css_types.ContentList : RUNTIME_TYPE)]
 
 module Content_position =
   [%spec_module
-  "content_position", "'center' | 'start' | 'end' | 'flex-start' | 'flex-end'"]
+  "content_position",
+  "'center' | 'start' | 'end' | 'flex-start' | 'flex-end'",
+  (module Css_types.ContentPosition : RUNTIME_TYPE)]
 
-module Content_replacement = [%spec_module "content_replacement", "<image>"]
+module Content_replacement =
+  [%spec_module
+  "content_replacement",
+  "<image>",
+  (module Css_types.ContentReplacement : RUNTIME_TYPE)]
 
 module Contextual_alt_values =
   [%spec_module
-  "contextual_alt_values", "'contextual' | 'no-contextual'"]
+  "contextual_alt_values",
+  "'contextual' | 'no-contextual'",
+  (module Css_types.ContextualAltValues : RUNTIME_TYPE)]
 
 module Counter_style =
   [%spec_module
-  "counter_style", "<counter-style-name> | <symbols()>"]
+  "counter_style",
+  "<counter-style-name> | <symbols()>",
+  (module Css_types.CounterStyle : RUNTIME_TYPE)]
 
 module Counter_style_name =
   [%spec_module
-  "counter_style_name", "<custom-ident>"]
+  "counter_style_name",
+  "<custom-ident>",
+  (module Css_types.CounterStyleName : RUNTIME_TYPE)]
 
-module Counter_name = [%spec_module "counter_name", "<custom-ident>"]
+module Counter_name =
+  [%spec_module
+  "counter_name",
+  "<custom-ident>",
+  (module Css_types.CounterName : RUNTIME_TYPE)]
 
 module Cubic_bezier_timing_function =
   [%spec_module
   "cubic_bezier_timing_function",
   "'ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | cubic-bezier( <number> \
-   ',' <number> ',' <number> ',' <number> )"]
+   ',' <number> ',' <number> ',' <number> )",
+  (module Css_types.CubicBezierTimingFunction : RUNTIME_TYPE)]
 
 module Declaration =
   [%spec_module
   "declaration",
-  "<ident-token> ':' [ <declaration-value> ]? [ '!' 'important' ]?"]
+  "<ident-token> ':' [ <declaration-value> ]? [ '!' 'important' ]?",
+  (module Css_types.Declaration : RUNTIME_TYPE)]
 
 module Declaration_list =
   [%spec_module
-  "declaration_list", "[ [ <declaration> ]? ';' ]* [ <declaration> ]?"]
+  "declaration_list",
+  "[ [ <declaration> ]? ';' ]* [ <declaration> ]?",
+  (module Css_types.DeclarationList : RUNTIME_TYPE)]
 
 module Deprecated_system_color =
   [%spec_module
@@ -667,18 +808,26 @@ module Deprecated_system_color =
    'InactiveBorder' | 'InactiveCaption' | 'InactiveCaptionText' | \
    'InfoBackground' | 'InfoText' | 'Menu' | 'MenuText' | 'Scrollbar' | \
    'ThreeDDarkShadow' | 'ThreeDFace' | 'ThreeDHighlight' | 'ThreeDLightShadow' \
-   | 'ThreeDShadow' | 'Window' | 'WindowFrame' | 'WindowText'"]
+   | 'ThreeDShadow' | 'Window' | 'WindowFrame' | 'WindowText'",
+  (module Css_types.DeprecatedSystemColor : RUNTIME_TYPE)]
 
 module Discretionary_lig_values =
   [%spec_module
   "discretionary_lig_values",
-  "'discretionary-ligatures' | 'no-discretionary-ligatures'"]
+  "'discretionary-ligatures' | 'no-discretionary-ligatures'",
+  (module Css_types.DiscretionaryLigValues : RUNTIME_TYPE)]
 
-module Display_box = [%spec_module "display_box", "'contents' | 'none'"]
+module Display_box =
+  [%spec_module
+  "display_box",
+  "'contents' | 'none'",
+  (module Css_types.DisplayBox : RUNTIME_TYPE)]
 
 module Display_inside =
   [%spec_module
-  "display_inside", "'flow' | 'flow-root' | 'table' | 'flex' | 'grid' | 'ruby'"]
+  "display_inside",
+  "'flow' | 'flow-root' | 'table' | 'flex' | 'grid' | 'ruby'",
+  (module Css_types.DisplayInside : RUNTIME_TYPE)]
 
 module Display_internal =
   [%spec_module
@@ -686,124 +835,175 @@ module Display_internal =
   "'table-row-group' | 'table-header-group' | 'table-footer-group' | \
    'table-row' | 'table-cell' | 'table-column-group' | 'table-column' | \
    'table-caption' | 'ruby-base' | 'ruby-text' | 'ruby-base-container' | \
-   'ruby-text-container'"]
+   'ruby-text-container'",
+  (module Css_types.DisplayInternal : RUNTIME_TYPE)]
 
 module Display_legacy =
   [%spec_module
   "display_legacy",
   "'inline-block' | 'inline-list-item' | 'inline-table' | 'inline-flex' | \
-   'inline-grid'"]
+   'inline-grid'",
+  (module Css_types.DisplayLegacy : RUNTIME_TYPE)]
 
 module Display_listitem =
   [%spec_module
   "display_listitem",
-  "[ <display-outside> ]? && [ 'flow' | 'flow-root' ]? && 'list-item'"]
+  "[ <display-outside> ]? && [ 'flow' | 'flow-root' ]? && 'list-item'",
+  (module Css_types.DisplayListitem : RUNTIME_TYPE)]
 
 module Display_outside =
   [%spec_module
-  "display_outside", "'block' | 'inline' | 'run-in'"]
+  "display_outside",
+  "'block' | 'inline' | 'run-in'",
+  (module Css_types.DisplayOutside : RUNTIME_TYPE)]
 
 module East_asian_variant_values =
   [%spec_module
   "east_asian_variant_values",
-  "'jis78' | 'jis83' | 'jis90' | 'jis04' | 'simplified' | 'traditional'"]
+  "'jis78' | 'jis83' | 'jis90' | 'jis04' | 'simplified' | 'traditional'",
+  (module Css_types.EastAsianVariantValues : RUNTIME_TYPE)]
 
 module East_asian_width_values =
   [%spec_module
-  "east_asian_width_values", "'full-width' | 'proportional-width'"]
+  "east_asian_width_values",
+  "'full-width' | 'proportional-width'",
+  (module Css_types.EastAsianWidthValues : RUNTIME_TYPE)]
 
-module Ending_shape = [%spec_module "ending_shape", "'circle' | 'ellipse'"]
+module Ending_shape =
+  [%spec_module
+  "ending_shape",
+  "'circle' | 'ellipse'",
+  (module Css_types.EndingShape : RUNTIME_TYPE)]
 
 module Explicit_track_list =
   [%spec_module
-  "explicit_track_list", "[ [ <line-names> ]? <track-size> ]+ [ <line-names> ]?"]
+  "explicit_track_list",
+  "[ [ <line-names> ]? <track-size> ]+ [ <line-names> ]?",
+  (module Css_types.ExplicitTrackList : RUNTIME_TYPE)]
 
-module Family_name = [%spec_module "family_name", "<string> | <custom-ident>"]
+module Family_name =
+  [%spec_module
+  "family_name",
+  "<string> | <custom-ident>",
+  (module Css_types.FamilyName : RUNTIME_TYPE)]
 
 module Feature_tag_value =
   [%spec_module
-  "feature_tag_value", "<string> [ <integer> | 'on' | 'off' ]?"]
+  "feature_tag_value",
+  "<string> [ <integer> | 'on' | 'off' ]?",
+  (module Css_types.FeatureTagValue : RUNTIME_TYPE)]
 
 module Feature_type =
   [%spec_module
   "feature_type",
   "'@stylistic' | '@historical-forms' | '@styleset' | '@character-variant' | \
-   '@swash' | '@ornaments' | '@annotation'"]
+   '@swash' | '@ornaments' | '@annotation'",
+  (module Css_types.FeatureType : RUNTIME_TYPE)]
 
 module Feature_value_block =
   [%spec_module
   "feature_value_block",
-  "<feature-type> '{' <feature-value-declaration-list> '}'"]
+  "<feature-type> '{' <feature-value-declaration-list> '}'",
+  (module Css_types.FeatureValueBlock : RUNTIME_TYPE)]
 
 module Feature_value_block_list =
   [%spec_module
-  "feature_value_block_list", "[ <feature-value-block> ]+"]
+  "feature_value_block_list",
+  "[ <feature-value-block> ]+",
+  (module Css_types.FeatureValueBlockList : RUNTIME_TYPE)]
 
 module Feature_value_declaration =
   [%spec_module
-  "feature_value_declaration", "<custom-ident> ':' [ <integer> ]+ ';'"]
+  "feature_value_declaration",
+  "<custom-ident> ':' [ <integer> ]+ ';'",
+  (module Css_types.FeatureValueDeclaration : RUNTIME_TYPE)]
 
 module Feature_value_declaration_list =
   [%spec_module
-  "feature_value_declaration_list", "<feature-value-declaration>"]
+  "feature_value_declaration_list",
+  "<feature-value-declaration>",
+  (module Css_types.FeatureValueDeclarationList : RUNTIME_TYPE)]
 
 module Feature_value_name =
   [%spec_module
-  "feature_value_name", "<custom-ident>"]
+  "feature_value_name",
+  "<custom-ident>",
+  (module Css_types.FeatureValueName : RUNTIME_TYPE)]
 
 (* <zero> represents the literal value 0, used in contexts like rotate(0) *)
 module Zero = [%spec_module "zero", "'0'"]
 
-module Fill_rule = [%spec_module "fill_rule", "'nonzero' | 'evenodd'"]
+module Fill_rule =
+  [%spec_module
+  "fill_rule",
+  "'nonzero' | 'evenodd'",
+  (module Css_types.FillRule : RUNTIME_TYPE)]
 
 module Filter_function =
   [%spec_module
   "filter_function",
   "<blur()> | <brightness()> | <contrast()> | <drop-shadow()> | <grayscale()> \
-   | <hue-rotate()> | <invert()> | <opacity()> | <saturate()> | <sepia()>"]
+   | <hue-rotate()> | <invert()> | <opacity()> | <saturate()> | <sepia()>",
+  (module Css_types.FilterFunction : RUNTIME_TYPE)]
 
 module Filter_function_list =
   [%spec_module
-  "filter_function_list", "[ <filter-function> | <url> ]+"]
+  "filter_function_list",
+  "[ <filter-function> | <url> ]+",
+  (module Css_types.FilterFunctionList : RUNTIME_TYPE)]
 
 module Final_bg_layer =
   [%spec_module
   "final_bg_layer",
   "<'background-color'> || <bg-image> || <bg-position> [ '/' <bg-size> ]? || \
-   <repeat-style> || <attachment> || <box> || <box>"]
+   <repeat-style> || <attachment> || <box> || <box>",
+  (module Css_types.FinalBgLayer : RUNTIME_TYPE)]
 
-module Line_names = [%spec_module "line_names", "'[' <custom-ident>* ']'"]
+module Line_names =
+  [%spec_module
+  "line_names",
+  "'[' <custom-ident>* ']'",
+  (module Css_types.LineNames : RUNTIME_TYPE)]
 
 module Fixed_breadth =
   [%spec_module
-  "fixed_breadth", "<extended-length> | <extended-percentage>"]
+  "fixed_breadth",
+  "<extended-length> | <extended-percentage>",
+  (module Css_types.FixedBreadth : RUNTIME_TYPE)]
 
 module Fixed_repeat =
   [%spec_module
   "fixed_repeat",
   "repeat( <positive-integer> ',' [ [ <line-names> ]? <fixed-size> ]+ [ \
-   <line-names> ]? )"]
+   <line-names> ]? )",
+  (module Css_types.FixedRepeat : RUNTIME_TYPE)]
 
 module Fixed_size =
   [%spec_module
   "fixed_size",
   "<fixed-breadth> | minmax( <fixed-breadth> ',' <track-breadth> ) | minmax( \
-   <inflexible-breadth> ',' <fixed-breadth> )"]
+   <inflexible-breadth> ',' <fixed-breadth> )",
+  (module Css_types.FixedSize : RUNTIME_TYPE)]
 
 module Font_stretch_absolute =
   [%spec_module
   "font_stretch_absolute",
   "'normal' | 'ultra-condensed' | 'extra-condensed' | 'condensed' | \
    'semi-condensed' | 'semi-expanded' | 'expanded' | 'extra-expanded' | \
-   'ultra-expanded' | <extended-percentage>"]
+   'ultra-expanded' | <extended-percentage>",
+  (module Css_types.FontStretchAbsolute : RUNTIME_TYPE)]
 
 module Font_variant_css21 =
   [%spec_module
-  "font_variant_css21", "'normal' | 'small-caps'"]
+  "font_variant_css21",
+  "'normal' | 'small-caps'",
+  (module Css_types.FontVariantCss21 : RUNTIME_TYPE)]
 
 module Font_weight_absolute =
   [%spec_module
-  "font_weight_absolute", "'normal' | 'bold' | <integer>"]
+  "font_weight_absolute",
+  "'normal' | 'bold' | <integer>",
+  (module Css_types.FontWeightAbsolute : RUNTIME_TYPE)]
 
 module Function__webkit_gradient =
   [%spec_module
@@ -852,12 +1052,15 @@ module Function_contrast =
 
 module Function_counter =
   [%spec_module
-  "function_counter", "counter( <counter-name> , <counter-style>? )"]
+  "function_counter",
+  "counter( <counter-name> , <counter-style>? )",
+  (module Css_types.Counter : RUNTIME_TYPE)]
 
 module Function_counters =
   [%spec_module
   "function_counters",
-  "counters( <custom-ident> ',' <string> ',' [ <counter-style> ]? )"]
+  "counters( <custom-ident> ',' <string> ',' [ <counter-style> ]? )",
+  (module Css_types.Counters : RUNTIME_TYPE)]
 
 module Function_cross_fade =
   [%spec_module
@@ -914,7 +1117,8 @@ module Function_hue_rotate =
 module Function_image =
   [%spec_module
   "function_image",
-  "image( [ <image-tags> ]? [ <image-src> ]? ',' [ <color> ]? )"]
+  "image( [ <image-tags> ]? [ <image-src> ]? ',' [ <color> ]? )",
+  (module Css_types.Image : RUNTIME_TYPE)]
 
 module Function_image_set =
   [%spec_module
@@ -924,7 +1128,8 @@ module Function_inset =
   [%spec_module
   "function_inset",
   "inset( [ <extended-length> | <extended-percentage> ]{1,4} [ 'round' \
-   <'border-radius'> ]? )"]
+   <'border-radius'> ]? )",
+  (module Css_types.Inset : RUNTIME_TYPE)]
 
 module Function_invert =
   [%spec_module
@@ -966,13 +1171,17 @@ module Function_opacity =
 
 module Function_paint =
   [%spec_module
-  "function_paint", "paint( <ident> ',' [ <declaration-value> ]? )"]
+  "function_paint",
+  "paint( <ident> ',' [ <declaration-value> ]? )",
+  (module Css_types.Paint : RUNTIME_TYPE)]
 
 module Function_path = [%spec_module "function_path", "path( <string> )"]
 
 module Function_perspective =
   [%spec_module
-  "function_perspective", "perspective( <'perspective'> )"]
+  "function_perspective",
+  "perspective( <'perspective'> )",
+  (module Css_types.Perspective : RUNTIME_TYPE)]
 
 module Function_polygon =
   [%spec_module
@@ -1014,7 +1223,9 @@ module Function_rgba =
 
 module Function_rotate =
   [%spec_module
-  "function_rotate", "rotate( <extended-angle> | <zero> )"]
+  "function_rotate",
+  "rotate( <extended-angle> | <zero> )",
+  (module Css_types.Rotate : RUNTIME_TYPE)]
 
 module Function_rotate3d =
   [%spec_module
@@ -1040,7 +1251,9 @@ module Function_saturate =
 
 module Function_scale =
   [%spec_module
-  "function_scale", "scale( <number> [',' [ <number> ]]? )"]
+  "function_scale",
+  "scale( <number> [',' [ <number> ]]? )",
+  (module Css_types.Scale : RUNTIME_TYPE)]
 
 module Function_scale3d =
   [%spec_module
@@ -1069,7 +1282,9 @@ module Function_skewY =
 
 module Function_symbols =
   [%spec_module
-  "function_symbols", "symbols( [ <symbols-type> ]? [ <string> | <image> ]+ )"]
+  "function_symbols",
+  "symbols( [ <symbols-type> ]? [ <string> | <image> ]+ )",
+  (module Css_types.Symbols : RUNTIME_TYPE)]
 
 module Function_target_counter =
   [%spec_module
@@ -1093,7 +1308,8 @@ module Function_translate =
   [%spec_module
   "function_translate",
   "translate( [<extended-length> | <extended-percentage>] [',' [ \
-   <extended-length> | <extended-percentage> ]]? )"]
+   <extended-length> | <extended-percentage> ]]? )",
+  (module Css_types.Translate : RUNTIME_TYPE)]
 
 module Function_translate3d =
   [%spec_module
@@ -1116,240 +1332,364 @@ module Function_translateZ =
   "function_translateZ", "translateZ( <extended-length> )"]
 
 (* module function_var = [%spec_module "function_var",
-  "var( <ident> ',' [ <declaration-value> ]? )"] *)
-module Function_var = [%spec_module "function_var", "var( <ident> )"]
-module Gender = [%spec_module "gender", "'male' | 'female' | 'neutral'"]
+  "var( <ident> ',' [ <declaration-value> ]? )", (module Css_types.Var : RUNTIME_TYPE)] *)
+module Function_var =
+  [%spec_module
+  "function_var", "var( <ident> )", (module Css_types.Var : RUNTIME_TYPE)]
+
+module Gender =
+  [%spec_module
+  "gender",
+  "'male' | 'female' | 'neutral'",
+  (module Css_types.Gender : RUNTIME_TYPE)]
 
 module General_enclosed =
   [%spec_module
   "general_enclosed",
-  "<function-token> <any-value> ')' | '(' <ident> <any-value> ')'"]
+  "<function-token> <any-value> ')' | '(' <ident> <any-value> ')'",
+  (module Css_types.GeneralEnclosed : RUNTIME_TYPE)]
 
 module Generic_family =
   [%spec_module
   "generic_family",
   "'serif' | 'sans-serif' | 'cursive' | 'fantasy' | 'monospace' | \
-   '-apple-system'"]
+   '-apple-system'",
+  (module Css_types.GenericFamily : RUNTIME_TYPE)]
 
 module Generic_name =
   [%spec_module
-  "generic_name", "'serif' | 'sans-serif' | 'cursive' | 'fantasy' | 'monospace'"]
+  "generic_name",
+  "'serif' | 'sans-serif' | 'cursive' | 'fantasy' | 'monospace'",
+  (module Css_types.GenericName : RUNTIME_TYPE)]
 
 module Generic_voice =
   [%spec_module
-  "generic_voice", "[ <age> ]? <gender> [ <integer> ]?"]
+  "generic_voice",
+  "[ <age> ]? <gender> [ <integer> ]?",
+  (module Css_types.GenericVoice : RUNTIME_TYPE)]
 
 module Geometry_box =
   [%spec_module
-  "geometry_box", "<shape-box> | 'fill-box' | 'stroke-box' | 'view-box'"]
+  "geometry_box",
+  "<shape-box> | 'fill-box' | 'stroke-box' | 'view-box'",
+  (module Css_types.GeometryBox : RUNTIME_TYPE)]
 
 module Gradient =
   [%spec_module
   "gradient",
   "<linear-gradient()> | <repeating-linear-gradient()> | <radial-gradient()> | \
-   <repeating-radial-gradient()> | <conic-gradient()> | <legacy-gradient>"]
+   <repeating-radial-gradient()> | <conic-gradient()> | <legacy-gradient>",
+  (module Css_types.Gradient : RUNTIME_TYPE)]
 
 module Grid_line =
   [%spec_module
   "grid_line",
   "<custom-ident-without-span-or-auto> | <integer> && [ \
    <custom-ident-without-span-or-auto> ]? | 'span' && [ <integer> || \
-   <custom-ident-without-span-or-auto> ] | 'auto' | <interpolation>"]
+   <custom-ident-without-span-or-auto> ] | 'auto' | <interpolation>",
+  (module Css_types.GridLine : RUNTIME_TYPE)]
 
 module Historical_lig_values =
   [%spec_module
-  "historical_lig_values", "'historical-ligatures' | 'no-historical-ligatures'"]
+  "historical_lig_values",
+  "'historical-ligatures' | 'no-historical-ligatures'",
+  (module Css_types.HistoricalLigValues : RUNTIME_TYPE)]
 
-module Hue = [%spec_module "hue", "<number> | <extended-angle>"]
-module Id_selector = [%spec_module "id_selector", "<hash-token>"]
+module Hue =
+  [%spec_module
+  "hue", "<number> | <extended-angle>", (module Css_types.Hue : RUNTIME_TYPE)]
+
+module Id_selector =
+  [%spec_module
+  "id_selector", "<hash-token>", (module Css_types.IdSelector : RUNTIME_TYPE)]
 
 module Image =
   [%spec_module
   "image",
   "<url> | <image()> | <image-set()> | <element()> | <paint()> | \
-   <cross-fade()> | <gradient> | <interpolation>"]
+   <cross-fade()> | <gradient> | <interpolation>",
+  (module Css_types.Image : RUNTIME_TYPE)]
 
 module Image_set_option =
   [%spec_module
-  "image_set_option", "[ <image> | <string> ] <resolution>"]
+  "image_set_option",
+  "[ <image> | <string> ] <resolution>",
+  (module Css_types.ImageSetOption : RUNTIME_TYPE)]
 
-module Image_src = [%spec_module "image_src", "<url> | <string>"]
-module Image_tags = [%spec_module "image_tags", "'ltr' | 'rtl'"]
+module Image_src =
+  [%spec_module
+  "image_src", "<url> | <string>", (module Css_types.ImageSrc : RUNTIME_TYPE)]
+
+module Image_tags =
+  [%spec_module
+  "image_tags", "'ltr' | 'rtl'", (module Css_types.ImageTags : RUNTIME_TYPE)]
 
 module Inflexible_breadth =
   [%spec_module
   "inflexible_breadth",
   "<extended-length> | <extended-percentage> | 'min-content' | 'max-content' | \
-   'auto'"]
+   'auto'",
+  (module Css_types.InflexibleBreadth : RUNTIME_TYPE)]
 
 module Keyframe_block =
   [%spec_module
-  "keyframe_block", "[ <keyframe-selector> ]# '{' <declaration-list> '}'"]
+  "keyframe_block",
+  "[ <keyframe-selector> ]# '{' <declaration-list> '}'",
+  (module Css_types.KeyframeBlock : RUNTIME_TYPE)]
 
 module Keyframe_block_list =
   [%spec_module
-  "keyframe_block_list", "[ <keyframe-block> ]+"]
+  "keyframe_block_list",
+  "[ <keyframe-block> ]+",
+  (module Css_types.KeyframeBlockList : RUNTIME_TYPE)]
 
 module Keyframe_selector =
   [%spec_module
-  "keyframe_selector", "'from' | 'to' | <extended-percentage>"]
+  "keyframe_selector",
+  "'from' | 'to' | <extended-percentage>",
+  (module Css_types.KeyframeSelector : RUNTIME_TYPE)]
 
 module Keyframes_name =
   [%spec_module
-  "keyframes_name", "<custom-ident> | <string>"]
+  "keyframes_name",
+  "<custom-ident> | <string>",
+  (module Css_types.KeyframesName : RUNTIME_TYPE)]
 
 module Leader_type =
   [%spec_module
-  "leader_type", "'dotted' | 'solid' | 'space' | <string>"]
+  "leader_type",
+  "'dotted' | 'solid' | 'space' | <string>",
+  (module Css_types.LeaderType : RUNTIME_TYPE)]
 
-module Left = [%spec_module "left", "<extended-length> | 'auto'"]
+module Left =
+  [%spec_module
+  "left", "<extended-length> | 'auto'", (module Css_types.Left : RUNTIME_TYPE)]
 
 module Line_name_list =
   [%spec_module
-  "line_name_list", "[ <line-names> | <name-repeat> ]+"]
+  "line_name_list",
+  "[ <line-names> | <name-repeat> ]+",
+  (module Css_types.LineNameList : RUNTIME_TYPE)]
 
 module Line_style =
   [%spec_module
   "line_style",
   "'none' | 'hidden' | 'dotted' | 'dashed' | 'solid' | 'double' | 'groove' | \
-   'ridge' | 'inset' | 'outset'"]
+   'ridge' | 'inset' | 'outset'",
+  (module Css_types.LineStyle : RUNTIME_TYPE)]
 
 module Line_width =
   [%spec_module
-  "line_width", "<extended-length> | 'thin' | 'medium' | 'thick'"]
+  "line_width",
+  "<extended-length> | 'thin' | 'medium' | 'thick'",
+  (module Css_types.LineWidth : RUNTIME_TYPE)]
 
 module Linear_color_hint =
   [%spec_module
-  "linear_color_hint", "<extended-length> | <extended-percentage>"]
+  "linear_color_hint",
+  "<extended-length> | <extended-percentage>",
+  (module Css_types.LinearColorHint : RUNTIME_TYPE)]
 
 module Linear_color_stop =
   [%spec_module
-  "linear_color_stop", "<color> <length-percentage>?"]
+  "linear_color_stop",
+  "<color> <length-percentage>?",
+  (module Css_types.LinearColorStop : RUNTIME_TYPE)]
 
-module Mask_image = [%spec_module "mask_image", "[ <mask-reference> ]#"]
+module Mask_image =
+  [%spec_module
+  "mask_image",
+  "[ <mask-reference> ]#",
+  (module Css_types.MaskImage : RUNTIME_TYPE)]
 
 module Mask_layer =
   [%spec_module
   "mask_layer",
   "<mask-reference> || <position> [ '/' <bg-size> ]? || <repeat-style> || \
    <geometry-box> || [ <geometry-box> | 'no-clip' ] || <compositing-operator> \
-   || <masking-mode>"]
+   || <masking-mode>",
+  (module Css_types.MaskLayer : RUNTIME_TYPE)]
 
 module Mask_position =
   [%spec_module
   "mask_position",
   "[ <extended-length> | <extended-percentage> | 'left' | 'center' | 'right' ] \
    [ <extended-length> | <extended-percentage> | 'top' | 'center' | 'bottom' \
-   ]?"]
+   ]?",
+  (module Css_types.MaskPosition : RUNTIME_TYPE)]
 
 module Mask_reference =
   [%spec_module
-  "mask_reference", "'none' | <image> | <mask-source>"]
+  "mask_reference",
+  "'none' | <image> | <mask-source>",
+  (module Css_types.MaskReference : RUNTIME_TYPE)]
 
-module Mask_source = [%spec_module "mask_source", "<url>"]
+module Mask_source =
+  [%spec_module
+  "mask_source", "<url>", (module Css_types.MaskSource : RUNTIME_TYPE)]
 
 module Masking_mode =
   [%spec_module
-  "masking_mode", "'alpha' | 'luminance' | 'match-source'"]
+  "masking_mode",
+  "'alpha' | 'luminance' | 'match-source'",
+  (module Css_types.MaskingMode : RUNTIME_TYPE)]
 
 module Mf_comparison =
   [%spec_module
-  "mf_comparison", "<mf-lt> | <mf-gt> | <mf-eq>"]
+  "mf_comparison",
+  "<mf-lt> | <mf-gt> | <mf-eq>",
+  (module Css_types.MfComparison : RUNTIME_TYPE)]
 
-module Mf_eq = [%spec_module "mf_eq", "'='"]
-module Mf_gt = [%spec_module "mf_gt", "'>=' | '>'"]
-module Mf_lt = [%spec_module "mf_lt", "'<=' | '<'"]
+module Mf_eq =
+  [%spec_module
+  "mf_eq", "'='", (module Css_types.MfEq : RUNTIME_TYPE)]
+
+module Mf_gt =
+  [%spec_module
+  "mf_gt", "'>=' | '>'", (module Css_types.MfGt : RUNTIME_TYPE)]
+
+module Mf_lt =
+  [%spec_module
+  "mf_lt", "'<=' | '<'", (module Css_types.MfLt : RUNTIME_TYPE)]
 
 module Mf_value =
   [%spec_module
   "mf_value",
-  "<number> | <dimension> | <ident> | <ratio> | <interpolation> | <calc()>"]
+  "<number> | <dimension> | <ident> | <ratio> | <interpolation> | <calc()>",
+  (module Css_types.MfValue : RUNTIME_TYPE)]
 
-module Mf_name = [%spec_module "mf_name", "<ident>"]
+module Mf_name =
+  [%spec_module
+  "mf_name", "<ident>", (module Css_types.MfName : RUNTIME_TYPE)]
 
 module Mf_range =
   [%spec_module
   "mf_range",
   "<mf-name> <mf-comparison> <mf-value> | <mf-value> <mf-comparison> <mf-name> \
    | <mf-value> <mf-lt> <mf-name> <mf-lt> <mf-value> | <mf-value> <mf-gt> \
-   <mf-name> <mf-gt> <mf-value>"]
+   <mf-name> <mf-gt> <mf-value>",
+  (module Css_types.MfRange : RUNTIME_TYPE)]
 
-module Mf_boolean = [%spec_module "mf_boolean", "<mf-name>"]
-module Mf_plain = [%spec_module "mf_plain", "<mf-name> ':' <mf-value>"]
+module Mf_boolean =
+  [%spec_module
+  "mf_boolean", "<mf-name>", (module Css_types.MfBoolean : RUNTIME_TYPE)]
+
+module Mf_plain =
+  [%spec_module
+  "mf_plain",
+  "<mf-name> ':' <mf-value>",
+  (module Css_types.MfPlain : RUNTIME_TYPE)]
 
 module Media_feature =
   [%spec_module
-  "media_feature", "'(' [ <mf-plain> | <mf-boolean> | <mf-range> ] ')'"]
+  "media_feature",
+  "'(' [ <mf-plain> | <mf-boolean> | <mf-range> ] ')'",
+  (module Css_types.MediaFeature : RUNTIME_TYPE)]
 
 module Media_in_parens =
   [%spec_module
   "media_in_parens",
-  "'(' <media-condition> ')' | <media-feature> | <interpolation>"]
+  "'(' <media-condition> ')' | <media-feature> | <interpolation>",
+  (module Css_types.MediaInParens : RUNTIME_TYPE)]
 
-module Media_and = [%spec_module "media_and", "'and' <media-in-parens>"]
-module Media_or = [%spec_module "media_or", "'or' <media-in-parens>"]
-module Media_not = [%spec_module "media_not", "'not' <media-in-parens>"]
+module Media_and =
+  [%spec_module
+  "media_and",
+  "'and' <media-in-parens>",
+  (module Css_types.MediaAnd : RUNTIME_TYPE)]
+
+module Media_or =
+  [%spec_module
+  "media_or",
+  "'or' <media-in-parens>",
+  (module Css_types.MediaOr : RUNTIME_TYPE)]
+
+module Media_not =
+  [%spec_module
+  "media_not",
+  "'not' <media-in-parens>",
+  (module Css_types.MediaNot : RUNTIME_TYPE)]
 
 module Media_condition_without_or =
   [%spec_module
-  "media_condition_without_or", "<media-not> | <media-in-parens> <media-and>*"]
+  "media_condition_without_or",
+  "<media-not> | <media-in-parens> <media-and>*",
+  (module Css_types.MediaConditionWithoutOr : RUNTIME_TYPE)]
 
 module Media_condition =
   [%spec_module
   "media_condition",
-  "<media-not> | <media-in-parens> [ <media-and>* | <media-or>* ]"]
+  "<media-not> | <media-in-parens> [ <media-and>* | <media-or>* ]",
+  (module Css_types.MediaCondition : RUNTIME_TYPE)]
 
 module Media_query =
   [%spec_module
   "media_query",
   "<media-condition> | [ 'not' | 'only' ]? <media-type> [ 'and' \
-   <media-condition-without-or> ]?"]
+   <media-condition-without-or> ]?",
+  (module Css_types.MediaQuery : RUNTIME_TYPE)]
 
 module Media_query_list =
   [%spec_module
-  "media_query_list", "[ <media-query> ]# | <interpolation>"]
+  "media_query_list",
+  "[ <media-query> ]# | <interpolation>",
+  (module Css_types.MediaQueryList : RUNTIME_TYPE)]
 
 module Container_condition_list =
   [%spec_module
-  "container_condition_list", "<container-condition>#"]
+  "container_condition_list",
+  "<container-condition>#",
+  (module Css_types.ContainerConditionList : RUNTIME_TYPE)]
 
 module Container_condition =
   [%spec_module
-  "container_condition", "[ <container-name> ]? <container-query>"]
+  "container_condition",
+  "[ <container-name> ]? <container-query>",
+  (module Css_types.ContainerCondition : RUNTIME_TYPE)]
 
 module Container_query =
   [%spec_module
   "container_query",
   "'not' <query-in-parens> | <query-in-parens> [ [ 'and' <query-in-parens> ]* \
-   | [ 'or' <query-in-parens> ]* ]"]
+   | [ 'or' <query-in-parens> ]* ]",
+  (module Css_types.ContainerQuery : RUNTIME_TYPE)]
 
 module Query_in_parens =
   [%spec_module
   "query_in_parens",
-  "'(' <container-query> ')' | '(' <size-feature> ')' | style( <style-query> )"]
+  "'(' <container-query> ')' | '(' <size-feature> ')' | style( <style-query> )",
+  (module Css_types.QueryInParens : RUNTIME_TYPE)]
 
 module Size_feature =
   [%spec_module
-  "size_feature", "<mf-plain> | <mf-boolean> | <mf-range>"]
+  "size_feature",
+  "<mf-plain> | <mf-boolean> | <mf-range>",
+  (module Css_types.SizeFeature : RUNTIME_TYPE)]
 
 module Style_query =
   [%spec_module
   "style_query",
   "'not' <style-in-parens> | <style-in-parens> [ [ module <style-in-parens> ]* \
-   | [ or <style-in-parens> ]* ] | <style-feature>"]
+   | [ or <style-in-parens> ]* ] | <style-feature>",
+  (module Css_types.StyleQuery : RUNTIME_TYPE)]
 
 module Style_feature =
   [%spec_module
-  "style_feature", "<dashed_ident> ':' <mf-value>"]
+  "style_feature",
+  "<dashed_ident> ':' <mf-value>",
+  (module Css_types.StyleFeature : RUNTIME_TYPE)]
 
 module Style_in_parens =
   [%spec_module
-  "style_in_parens", "'(' <style-query> ')' | '(' <style-feature> ')'"]
+  "style_in_parens",
+  "'(' <style-query> ')' | '(' <style-feature> ')'",
+  (module Css_types.StyleInParens : RUNTIME_TYPE)]
 
 module Name_repeat =
   [%spec_module
   "name_repeat",
-  "repeat( [ <positive-integer> | 'auto-fill' ] ',' [ <line-names> ]+ )"]
+  "repeat( [ <positive-integer> | 'auto-fill' ] ',' [ <line-names> ]+ )",
+  (module Css_types.NameRepeat : RUNTIME_TYPE)]
 
 module Named_color =
   [%spec_module
@@ -1383,50 +1723,82 @@ module Named_color =
    'seashell' | 'sienna' | 'silver' | 'skyblue' | 'slateblue' | 'slategray' | \
    'slategrey' | 'snow' | 'springgreen' | 'steelblue' | 'tan' | 'teal' | \
    'thistle' | 'tomato' | 'turquoise' | 'violet' | 'wheat' | 'white' | \
-   'whitesmoke' | 'yellow' | 'yellowgreen' | <-non-standard-color>"]
+   'whitesmoke' | 'yellow' | 'yellowgreen' | <-non-standard-color>",
+  (module Css_types.NamedColor : RUNTIME_TYPE)]
 
-module Namespace_prefix = [%spec_module "namespace_prefix", "<ident>"]
-module Ns_prefix = [%spec_module "ns_prefix", "[ <ident-token> | '*' ]? '|'"]
-module Nth = [%spec_module "nth", "<an-plus-b> | 'even' | 'odd'"]
+module Namespace_prefix =
+  [%spec_module
+  "namespace_prefix",
+  "<ident>",
+  (module Css_types.NamespacePrefix : RUNTIME_TYPE)]
+
+module Ns_prefix =
+  [%spec_module
+  "ns_prefix",
+  "[ <ident-token> | '*' ]? '|'",
+  (module Css_types.NsPrefix : RUNTIME_TYPE)]
+
+module Nth =
+  [%spec_module
+  "nth", "<an-plus-b> | 'even' | 'odd'", (module Css_types.Nth : RUNTIME_TYPE)]
 
 module Number_one_or_greater =
   [%spec_module
-  "number_one_or_greater", "<number>"]
+  "number_one_or_greater",
+  "<number>",
+  (module Css_types.NumberOneOrGreater : RUNTIME_TYPE)]
 
 module Number_percentage =
   [%spec_module
-  "number_percentage", "<number> | <extended-percentage>"]
+  "number_percentage",
+  "<number> | <extended-percentage>",
+  (module Css_types.NumberPercentage : RUNTIME_TYPE)]
 
-module Number_zero_one = [%spec_module "number_zero_one", "<number>"]
+module Number_zero_one =
+  [%spec_module
+  "number_zero_one", "<number>", (module Css_types.NumberZeroOne : RUNTIME_TYPE)]
 
 module Numeric_figure_values =
   [%spec_module
-  "numeric_figure_values", "'lining-nums' | 'oldstyle-nums'"]
+  "numeric_figure_values",
+  "'lining-nums' | 'oldstyle-nums'",
+  (module Css_types.NumericFigureValues : RUNTIME_TYPE)]
 
 module Numeric_fraction_values =
   [%spec_module
-  "numeric_fraction_values", "'diagonal-fractions' | 'stacked-fractions'"]
+  "numeric_fraction_values",
+  "'diagonal-fractions' | 'stacked-fractions'",
+  (module Css_types.NumericFractionValues : RUNTIME_TYPE)]
 
 module Numeric_spacing_values =
   [%spec_module
-  "numeric_spacing_values", "'proportional-nums' | 'tabular-nums'"]
+  "numeric_spacing_values",
+  "'proportional-nums' | 'tabular-nums'",
+  (module Css_types.NumericSpacingValues : RUNTIME_TYPE)]
 
 module Outline_radius =
   [%spec_module
-  "outline_radius", "<extended-length> | <extended-percentage>"]
+  "outline_radius",
+  "<extended-length> | <extended-percentage>",
+  (module Css_types.OutlineRadius : RUNTIME_TYPE)]
 
 module Overflow_position =
   [%spec_module
-  "overflow_position", "'unsafe' | 'safe'"]
+  "overflow_position",
+  "'unsafe' | 'safe'",
+  (module Css_types.OverflowPosition : RUNTIME_TYPE)]
 
 module Page_body =
   [%spec_module
   "page_body",
-  "[ <declaration> ]? [ ';' <page-body> ]? | <page-margin-box> <page-body>"]
+  "[ <declaration> ]? [ ';' <page-body> ]? | <page-margin-box> <page-body>",
+  (module Css_types.PageBody : RUNTIME_TYPE)]
 
 module Page_margin_box =
   [%spec_module
-  "page_margin_box", "<page-margin-box-type> '{' <declaration-list> '}'"]
+  "page_margin_box",
+  "<page-margin-box-type> '{' <declaration-list> '}'",
+  (module Css_types.PageMarginBox : RUNTIME_TYPE)]
 
 module Page_margin_box_type =
   [%spec_module
@@ -1435,21 +1807,27 @@ module Page_margin_box_type =
    '@top-right-corner' | '@bottom-left-corner' | '@bottom-left' | \
    '@bottom-center' | '@bottom-right' | '@bottom-right-corner' | '@left-top' | \
    '@left-middle' | '@left-bottom' | '@right-top' | '@right-middle' | \
-   '@right-bottom'"]
+   '@right-bottom'",
+  (module Css_types.PageMarginBoxType : RUNTIME_TYPE)]
 
 module Page_selector =
   [%spec_module
-  "page_selector", "[ <pseudo-page> ]+ | <ident> [ <pseudo-page> ]*"]
+  "page_selector",
+  "[ <pseudo-page> ]+ | <ident> [ <pseudo-page> ]*",
+  (module Css_types.PageSelector : RUNTIME_TYPE)]
 
 module Page_selector_list =
   [%spec_module
-  "page_selector_list", "[ [ <page-selector> ]# ]?"]
+  "page_selector_list",
+  "[ [ <page-selector> ]# ]?",
+  (module Css_types.PageSelectorList : RUNTIME_TYPE)]
 
 module Paint =
   [%spec_module
   "paint",
   "'none' | <color> | <url> [ 'none' | <color> ]? | 'context-fill' | \
-   'context-stroke' | <interpolation>"]
+   'context-stroke' | <interpolation>",
+  (module Css_types.Paint : RUNTIME_TYPE)]
 
 module Position =
   [%spec_module
@@ -1458,9 +1836,14 @@ module Position =
    [ 'left' | 'center' | 'right' ] && [ 'top' | 'center' | 'bottom' ] | [ \
    'left' | 'center' | 'right' | <length-percentage> ] [ 'top' | 'center' | \
    'bottom' | <length-percentage> ] | [ [ 'left' | 'right' ] \
-   <length-percentage> ] && [ [ 'top' | 'bottom' ] <length-percentage> ]"]
+   <length-percentage> ] && [ [ 'top' | 'bottom' ] <length-percentage> ]",
+  (module Css_types.Position : RUNTIME_TYPE)]
 
-module Positive_integer = [%spec_module "positive_integer", "<integer>"]
+module Positive_integer =
+  [%spec_module
+  "positive_integer",
+  "<integer>",
+  (module Css_types.PositiveInteger : RUNTIME_TYPE)]
 
 module Property__moz_appearance =
   [%spec_module
@@ -1498,135 +1881,189 @@ module Property__moz_appearance =
    '-moz-window-button-minimize' | '-moz-window-button-restore' | \
    '-moz-window-frame-bottom' | '-moz-window-frame-left' | \
    '-moz-window-frame-right' | '-moz-window-titlebar' | \
-   '-moz-window-titlebar-maximized'"]
+   '-moz-window-titlebar-maximized'",
+  (module Css_types.MozAppearance : RUNTIME_TYPE)]
 
 module Property__moz_background_clip =
   [%spec_module
-  "property__moz_background_clip", "'padding' | 'border'"]
+  "property__moz_background_clip",
+  "'padding' | 'border'",
+  (module Css_types.MozBackgroundClip : RUNTIME_TYPE)]
 
 module Property__moz_binding =
   [%spec_module
-  "property__moz_binding", "<url> | 'none'"]
+  "property__moz_binding",
+  "<url> | 'none'",
+  (module Css_types.MozBinding : RUNTIME_TYPE)]
 
 module Property__moz_border_bottom_colors =
   [%spec_module
-  "property__moz_border_bottom_colors", "[ <color> ]+ | 'none'"]
+  "property__moz_border_bottom_colors",
+  "[ <color> ]+ | 'none'",
+  (module Css_types.MozBorderBottomColors : RUNTIME_TYPE)]
 
 module Property__moz_border_left_colors =
   [%spec_module
-  "property__moz_border_left_colors", "[ <color> ]+ | 'none'"]
+  "property__moz_border_left_colors",
+  "[ <color> ]+ | 'none'",
+  (module Css_types.MozBorderLeftColors : RUNTIME_TYPE)]
 
 module Property__moz_border_radius_bottomleft =
   [%spec_module
-  "property__moz_border_radius_bottomleft", "<'border-bottom-left-radius'>"]
+  "property__moz_border_radius_bottomleft",
+  "<'border-bottom-left-radius'>",
+  (module Css_types.MozBorderRadiusBottomleft : RUNTIME_TYPE)]
 
 module Property__moz_border_radius_bottomright =
   [%spec_module
-  "property__moz_border_radius_bottomright", "<'border-bottom-right-radius'>"]
+  "property__moz_border_radius_bottomright",
+  "<'border-bottom-right-radius'>",
+  (module Css_types.MozBorderRadiusBottomright : RUNTIME_TYPE)]
 
 module Property__moz_border_radius_topleft =
   [%spec_module
-  "property__moz_border_radius_topleft", "<'border-top-left-radius'>"]
+  "property__moz_border_radius_topleft",
+  "<'border-top-left-radius'>",
+  (module Css_types.MozBorderRadiusTopleft : RUNTIME_TYPE)]
 
 module Property__moz_border_radius_topright =
   [%spec_module
-  "property__moz_border_radius_topright", "<'border-bottom-right-radius'>"]
+  "property__moz_border_radius_topright",
+  "<'border-bottom-right-radius'>",
+  (module Css_types.MozBorderRadiusTopright : RUNTIME_TYPE)]
 
-(* TODO: Remove interpolation without <> *)
 module Property__moz_border_right_colors =
   [%spec_module
-  "property__moz_border_right_colors", "[ <color> ]+ | 'none' | interpolation"]
+  "property__moz_border_right_colors",
+  "[ <color> ]+ | 'none'",
+  (module Css_types.MozBorderRightColors : RUNTIME_TYPE)]
 
-(* TODO: Remove interpolation without <> *)
 module Property__moz_border_top_colors =
   [%spec_module
-  "property__moz_border_top_colors", "[ <color> ]+ | 'none' | interpolation"]
+  "property__moz_border_top_colors",
+  "[ <color> ]+ | 'none'",
+  (module Css_types.MozBorderTopColors : RUNTIME_TYPE)]
 
 module Property__moz_context_properties =
   [%spec_module
   "property__moz_context_properties",
-  "'none' | [ 'fill' | 'fill-opacity' | 'stroke' | 'stroke-opacity' ]#"]
+  "'none' | [ 'fill' | 'fill-opacity' | 'stroke' | 'stroke-opacity' ]#",
+  (module Css_types.MozContextProperties : RUNTIME_TYPE)]
 
 module Property__moz_control_character_visibility =
   [%spec_module
-  "property__moz_control_character_visibility", "'visible' | 'hidden'"]
+  "property__moz_control_character_visibility",
+  "'visible' | 'hidden'",
+  (module Css_types.MozControlCharacterVisibility : RUNTIME_TYPE)]
 
 module Property__moz_float_edge =
   [%spec_module
   "property__moz_float_edge",
-  "'border-box' | 'content-box' | 'margin-box' | 'padding-box'"]
+  "'border-box' | 'content-box' | 'margin-box' | 'padding-box'",
+  (module Css_types.MozFloatEdge : RUNTIME_TYPE)]
 
 module Property__moz_force_broken_image_icon =
   [%spec_module
-  "property__moz_force_broken_image_icon", "<integer>"]
+  "property__moz_force_broken_image_icon",
+  "<integer>",
+  (module Css_types.MozForceBrokenImageIcon : RUNTIME_TYPE)]
 
 module Property__moz_image_region =
   [%spec_module
-  "property__moz_image_region", "<shape> | 'auto'"]
+  "property__moz_image_region",
+  "<shape> | 'auto'",
+  (module Css_types.MozImageRegion : RUNTIME_TYPE)]
 
 module Property__moz_orient =
   [%spec_module
-  "property__moz_orient", "'inline' | 'block' | 'horizontal' | 'vertical'"]
+  "property__moz_orient",
+  "'inline' | 'block' | 'horizontal' | 'vertical'",
+  (module Css_types.MozOrient : RUNTIME_TYPE)]
 
 module Property__moz_osx_font_smoothing =
   [%spec_module
-  "property__moz_osx_font_smoothing", "'auto' | 'grayscale'"]
+  "property__moz_osx_font_smoothing",
+  "'auto' | 'grayscale'",
+  (module Css_types.MozOsxFontSmoothing : RUNTIME_TYPE)]
 
 module Property__moz_outline_radius =
   [%spec_module
   "property__moz_outline_radius",
-  "[ <outline-radius> ]{1,4} [ '/' [ <outline-radius> ]{1,4} ]?"]
+  "[ <outline-radius> ]{1,4} [ '/' [ <outline-radius> ]{1,4} ]?",
+  (module Css_types.MozOutlineRadius : RUNTIME_TYPE)]
 
 module Property__moz_outline_radius_bottomleft =
   [%spec_module
-  "property__moz_outline_radius_bottomleft", "<outline-radius>"]
+  "property__moz_outline_radius_bottomleft",
+  "<outline-radius>",
+  (module Css_types.MozOutlineRadiusBottomleft : RUNTIME_TYPE)]
 
 module Property__moz_outline_radius_bottomright =
   [%spec_module
-  "property__moz_outline_radius_bottomright", "<outline-radius>"]
+  "property__moz_outline_radius_bottomright",
+  "<outline-radius>",
+  (module Css_types.MozOutlineRadiusBottomright : RUNTIME_TYPE)]
 
 module Property__moz_outline_radius_topleft =
   [%spec_module
-  "property__moz_outline_radius_topleft", "<outline-radius>"]
+  "property__moz_outline_radius_topleft",
+  "<outline-radius>",
+  (module Css_types.MozOutlineRadiusTopleft : RUNTIME_TYPE)]
 
 module Property__moz_outline_radius_topright =
   [%spec_module
-  "property__moz_outline_radius_topright", "<outline-radius>"]
+  "property__moz_outline_radius_topright",
+  "<outline-radius>",
+  (module Css_types.MozOutlineRadiusTopright : RUNTIME_TYPE)]
 
 module Property__moz_stack_sizing =
   [%spec_module
-  "property__moz_stack_sizing", "'ignore' | 'stretch-to-fit'"]
+  "property__moz_stack_sizing",
+  "'ignore' | 'stretch-to-fit'",
+  (module Css_types.MozStackSizing : RUNTIME_TYPE)]
 
 module Property__moz_text_blink =
   [%spec_module
-  "property__moz_text_blink", "'none' | 'blink'"]
+  "property__moz_text_blink",
+  "'none' | 'blink'",
+  (module Css_types.MozTextBlink : RUNTIME_TYPE)]
 
 module Property__moz_user_focus =
   [%spec_module
   "property__moz_user_focus",
   "'ignore' | 'normal' | 'select-after' | 'select-before' | 'select-menu' | \
-   'select-same' | 'select-all' | 'none'"]
+   'select-same' | 'select-all' | 'none'",
+  (module Css_types.MozUserFocus : RUNTIME_TYPE)]
 
 module Property__moz_user_input =
   [%spec_module
-  "property__moz_user_input", "'auto' | 'none' | 'enabled' | 'disabled'"]
+  "property__moz_user_input",
+  "'auto' | 'none' | 'enabled' | 'disabled'",
+  (module Css_types.MozUserInput : RUNTIME_TYPE)]
 
 module Property__moz_user_modify =
   [%spec_module
-  "property__moz_user_modify", "'read-only' | 'read-write' | 'write-only'"]
+  "property__moz_user_modify",
+  "'read-only' | 'read-write' | 'write-only'",
+  (module Css_types.MozUserModify : RUNTIME_TYPE)]
 
 module Property__moz_user_select =
   [%spec_module
-  "property__moz_user_select", "'none' | 'text' | 'all' | '-moz-none'"]
+  "property__moz_user_select",
+  "'none' | 'text' | 'all' | '-moz-none'",
+  (module Css_types.MozUserSelect : RUNTIME_TYPE)]
 
 module Property__moz_window_dragging =
   [%spec_module
-  "property__moz_window_dragging", "'drag' | 'no-drag'"]
+  "property__moz_window_dragging",
+  "'drag' | 'no-drag'",
+  (module Css_types.MozWindowDragging : RUNTIME_TYPE)]
 
 module Property__moz_window_shadow =
   [%spec_module
   "property__moz_window_shadow",
-  "'default' | 'menu' | 'tooltip' | 'sheet' | 'none'"]
+  "'default' | 'menu' | 'tooltip' | 'sheet' | 'none'",
+  (module Css_types.MozWindowShadow : RUNTIME_TYPE)]
 
 module Property__webkit_appearance =
   [%spec_module
@@ -1644,224 +2081,305 @@ module Property__webkit_appearance =
    'searchfield-cancel-button' | 'searchfield-decoration' | \
    'searchfield-results-button' | 'searchfield-results-decoration' | \
    'slider-horizontal' | 'slider-vertical' | 'sliderthumb-horizontal' | \
-   'sliderthumb-vertical' | 'square-button' | 'textarea' | 'textfield'"]
+   'sliderthumb-vertical' | 'square-button' | 'textarea' | 'textfield'",
+  (module Css_types.WebkitAppearance : RUNTIME_TYPE)]
 
 module Property__webkit_background_clip =
   [%spec_module
   "property__webkit_background_clip",
-  "[ <box> | 'border' | 'padding' | 'content' | 'text' ]#"]
+  "[ <box> | 'border' | 'padding' | 'content' | 'text' ]#",
+  (module Css_types.WebkitBackgroundClip : RUNTIME_TYPE)]
 
 module Property__webkit_border_before =
   [%spec_module
   "property__webkit_border_before",
-  "<'border-width'> || <'border-style'> || <'color'>"]
+  "<'border-width'> || <'border-style'> || <'color'>",
+  (module Css_types.WebkitBorderBefore : RUNTIME_TYPE)]
 
 module Property__webkit_border_before_color =
   [%spec_module
-  "property__webkit_border_before_color", "<'color'>"]
+  "property__webkit_border_before_color",
+  "<'color'>",
+  (module Css_types.WebkitBorderBeforeColor : RUNTIME_TYPE)]
 
 module Property__webkit_border_before_style =
   [%spec_module
-  "property__webkit_border_before_style", "<'border-style'>"]
+  "property__webkit_border_before_style",
+  "<'border-style'>",
+  (module Css_types.WebkitBorderBeforeStyle : RUNTIME_TYPE)]
 
 module Property__webkit_border_before_width =
   [%spec_module
-  "property__webkit_border_before_width", "<'border-width'>"]
+  "property__webkit_border_before_width",
+  "<'border-width'>",
+  (module Css_types.WebkitBorderBeforeWidth : RUNTIME_TYPE)]
 
 module Property__webkit_box_reflect =
   [%spec_module
   "property__webkit_box_reflect",
   "[ 'above' | 'below' | 'right' | 'left' ]? [ <extended-length> ]? [ <image> \
-   ]?"]
+   ]?",
+  (module Css_types.WebkitBoxReflect : RUNTIME_TYPE)]
 
 module Property__webkit_column_break_after =
   [%spec_module
-  "property__webkit_column_break_after", "'always' | 'auto' | 'avoid'"]
+  "property__webkit_column_break_after",
+  "'always' | 'auto' | 'avoid'",
+  (module Css_types.WebkitColumnBreakAfter : RUNTIME_TYPE)]
 
 module Property__webkit_column_break_before =
   [%spec_module
-  "property__webkit_column_break_before", "'always' | 'auto' | 'avoid'"]
+  "property__webkit_column_break_before",
+  "'always' | 'auto' | 'avoid'",
+  (module Css_types.WebkitColumnBreakBefore : RUNTIME_TYPE)]
 
 module Property__webkit_column_break_inside =
   [%spec_module
-  "property__webkit_column_break_inside", "'always' | 'auto' | 'avoid'"]
+  "property__webkit_column_break_inside",
+  "'always' | 'auto' | 'avoid'",
+  (module Css_types.WebkitColumnBreakInside : RUNTIME_TYPE)]
 
 module Property__webkit_font_smoothing =
   [%spec_module
   "property__webkit_font_smoothing",
-  "'auto' | 'none' | 'antialiased' | 'subpixel-antialiased'"]
+  "'auto' | 'none' | 'antialiased' | 'subpixel-antialiased'",
+  (module Css_types.WebkitFontSmoothing : RUNTIME_TYPE)]
 
 module Property__webkit_line_clamp =
   [%spec_module
-  "property__webkit_line_clamp", "'none' | <integer>"]
+  "property__webkit_line_clamp",
+  "'none' | <integer>",
+  (module Css_types.WebkitLineClamp : RUNTIME_TYPE)]
 
 module Property__webkit_mask =
   [%spec_module
   "property__webkit_mask",
   "[ <mask-reference> || <position> [ '/' <bg-size> ]? || <repeat-style> || [ \
    <box> | 'border' | 'padding' | 'content' | 'text' ] || [ <box> | 'border' | \
-   'padding' | 'content' ] ]#"]
+   'padding' | 'content' ] ]#",
+  (module Css_types.WebkitMask : RUNTIME_TYPE)]
 
 module Property__webkit_mask_attachment =
   [%spec_module
-  "property__webkit_mask_attachment", "[ <attachment> ]#"]
+  "property__webkit_mask_attachment",
+  "[ <attachment> ]#",
+  (module Css_types.WebkitMaskAttachment : RUNTIME_TYPE)]
 
 module Property__webkit_mask_box_image =
   [%spec_module
   "property__webkit_mask_box_image",
   "[ <url> | <gradient> | 'none' ] [ [ <extended-length> | \
-   <extended-percentage> ]{4} [ <webkit-mask-box-repeat> ]{2} ]?"]
+   <extended-percentage> ]{4} [ <webkit-mask-box-repeat> ]{2} ]?",
+  (module Css_types.WebkitMaskBoxImage : RUNTIME_TYPE)]
 
 module Property__webkit_mask_clip =
   [%spec_module
   "property__webkit_mask_clip",
-  "[ <box> | 'border' | 'padding' | 'content' | 'text' ]#"]
+  "[ <box> | 'border' | 'padding' | 'content' | 'text' ]#",
+  (module Css_types.WebkitMaskClip : RUNTIME_TYPE)]
 
 module Property__webkit_mask_composite =
   [%spec_module
-  "property__webkit_mask_composite", "[ <composite-style> ]#"]
+  "property__webkit_mask_composite",
+  "[ <composite-style> ]#",
+  (module Css_types.WebkitMaskComposite : RUNTIME_TYPE)]
 
 module Property__webkit_mask_image =
   [%spec_module
-  "property__webkit_mask_image", "[ <mask-reference> ]#"]
+  "property__webkit_mask_image",
+  "[ <mask-reference> ]#",
+  (module Css_types.WebkitMaskImage : RUNTIME_TYPE)]
 
 module Property__webkit_mask_origin =
   [%spec_module
   "property__webkit_mask_origin",
-  "[ <box> | 'border' | 'padding' | 'content' ]#"]
+  "[ <box> | 'border' | 'padding' | 'content' ]#",
+  (module Css_types.WebkitMaskOrigin : RUNTIME_TYPE)]
 
 module Property__webkit_mask_position =
   [%spec_module
-  "property__webkit_mask_position", "[ <position> ]#"]
+  "property__webkit_mask_position",
+  "[ <position> ]#",
+  (module Css_types.WebkitMaskPosition : RUNTIME_TYPE)]
 
 module Property__webkit_mask_position_x =
   [%spec_module
   "property__webkit_mask_position_x",
-  "[ <extended-length> | <extended-percentage> | 'left' | 'center' | 'right' ]#"]
+  "[ <extended-length> | <extended-percentage> | 'left' | 'center' | 'right' ]#",
+  (module Css_types.WebkitMaskPositionX : RUNTIME_TYPE)]
 
 module Property__webkit_mask_position_y =
   [%spec_module
   "property__webkit_mask_position_y",
-  "[ <extended-length> | <extended-percentage> | 'top' | 'center' | 'bottom' ]#"]
+  "[ <extended-length> | <extended-percentage> | 'top' | 'center' | 'bottom' ]#",
+  (module Css_types.WebkitMaskPositionY : RUNTIME_TYPE)]
 
 module Property__webkit_mask_repeat =
   [%spec_module
-  "property__webkit_mask_repeat", "[ <repeat-style> ]#"]
+  "property__webkit_mask_repeat",
+  "[ <repeat-style> ]#",
+  (module Css_types.WebkitMaskRepeat : RUNTIME_TYPE)]
 
 module Property__webkit_mask_repeat_x =
   [%spec_module
-  "property__webkit_mask_repeat_x", "'repeat' | 'no-repeat' | 'space' | 'round'"]
+  "property__webkit_mask_repeat_x",
+  "'repeat' | 'no-repeat' | 'space' | 'round'",
+  (module Css_types.WebkitMaskRepeatX : RUNTIME_TYPE)]
 
 module Property__webkit_mask_repeat_y =
   [%spec_module
-  "property__webkit_mask_repeat_y", "'repeat' | 'no-repeat' | 'space' | 'round'"]
+  "property__webkit_mask_repeat_y",
+  "'repeat' | 'no-repeat' | 'space' | 'round'",
+  (module Css_types.WebkitMaskRepeatY : RUNTIME_TYPE)]
 
 module Property__webkit_mask_size =
   [%spec_module
-  "property__webkit_mask_size", "[ <bg-size> ]#"]
+  "property__webkit_mask_size",
+  "[ <bg-size> ]#",
+  (module Css_types.WebkitMaskSize : RUNTIME_TYPE)]
 
 module Property__webkit_overflow_scrolling =
   [%spec_module
-  "property__webkit_overflow_scrolling", "'auto' | 'touch'"]
+  "property__webkit_overflow_scrolling",
+  "'auto' | 'touch'",
+  (module Css_types.WebkitOverflowScrolling : RUNTIME_TYPE)]
 
 module Property__webkit_print_color_adjust =
   [%spec_module
-  "property__webkit_print_color_adjust", "'economy' | 'exact'"]
+  "property__webkit_print_color_adjust",
+  "'economy' | 'exact'",
+  (module Css_types.WebkitPrintColorAdjust : RUNTIME_TYPE)]
 
 module Property__webkit_tap_highlight_color =
   [%spec_module
-  "property__webkit_tap_highlight_color", "<color>"]
+  "property__webkit_tap_highlight_color",
+  "<color>",
+  (module Css_types.WebkitTapHighlightColor : RUNTIME_TYPE)]
 
 module Property__webkit_text_fill_color =
   [%spec_module
-  "property__webkit_text_fill_color", "<color>"]
+  "property__webkit_text_fill_color",
+  "<color>",
+  (module Css_types.WebkitTextFillColor : RUNTIME_TYPE)]
 
 module Property__webkit_text_security =
   [%spec_module
-  "property__webkit_text_security", "'none' | 'circle' | 'disc' | 'square'"]
+  "property__webkit_text_security",
+  "'none' | 'circle' | 'disc' | 'square'",
+  (module Css_types.WebkitTextSecurity : RUNTIME_TYPE)]
 
 module Property__webkit_text_stroke =
   [%spec_module
-  "property__webkit_text_stroke", "<extended-length> || <color>"]
+  "property__webkit_text_stroke",
+  "<extended-length> || <color>",
+  (module Css_types.WebkitTextStroke : RUNTIME_TYPE)]
 
 module Property__webkit_text_stroke_color =
   [%spec_module
-  "property__webkit_text_stroke_color", "<color>"]
+  "property__webkit_text_stroke_color",
+  "<color>",
+  (module Css_types.WebkitTextStrokeColor : RUNTIME_TYPE)]
 
 module Property__webkit_text_stroke_width =
   [%spec_module
-  "property__webkit_text_stroke_width", "<extended-length>"]
+  "property__webkit_text_stroke_width",
+  "<extended-length>",
+  (module Css_types.WebkitTextStrokeWidth : RUNTIME_TYPE)]
 
 module Property__webkit_touch_callout =
   [%spec_module
-  "property__webkit_touch_callout", "'default' | 'none'"]
+  "property__webkit_touch_callout",
+  "'default' | 'none'",
+  (module Css_types.WebkitTouchCallout : RUNTIME_TYPE)]
 
 module Property__webkit_user_drag =
   [%spec_module
-  "property__webkit_user_drag", "'none' | 'element' | 'auto'"]
+  "property__webkit_user_drag",
+  "'none' | 'element' | 'auto'",
+  (module Css_types.WebkitUserDrag : RUNTIME_TYPE)]
 
 module Property__webkit_user_modify =
   [%spec_module
   "property__webkit_user_modify",
-  "'read-only' | 'read-write' | 'read-write-plaintext-only'"]
+  "'read-only' | 'read-write' | 'read-write-plaintext-only'",
+  (module Css_types.WebkitUserModify : RUNTIME_TYPE)]
 
 module Property__webkit_user_select =
   [%spec_module
-  "property__webkit_user_select", "'auto' | 'none' | 'text' | 'all'"]
+  "property__webkit_user_select",
+  "'auto' | 'none' | 'text' | 'all'",
+  (module Css_types.WebkitUserSelect : RUNTIME_TYPE)]
 
 module Property_align_content =
   [%spec_module
   "property_align_content",
   "'normal' | <baseline-position> | <content-distribution> | [ \
-   <overflow-position> ]? <content-position>"]
+   <overflow-position> ]? <content-position>",
+  (module Css_types.AlignContent : RUNTIME_TYPE)]
 
 module Property_align_items =
   [%spec_module
   "property_align_items",
   "'normal' | 'stretch' | <baseline-position> | [ <overflow-position> ]? \
-   <self-position> | <interpolation>"]
+   <self-position> | <interpolation>",
+  (module Css_types.AlignItems : RUNTIME_TYPE)]
 
 module Property_align_self =
   [%spec_module
   "property_align_self",
   "'auto' | 'normal' | 'stretch' | <baseline-position> | [ <overflow-position> \
-   ]? <self-position> | <interpolation>"]
+   ]? <self-position> | <interpolation>",
+  (module Css_types.AlignSelf : RUNTIME_TYPE)]
 
 module Property_alignment_baseline =
   [%spec_module
   "property_alignment_baseline",
   "'auto' | 'baseline' | 'before-edge' | 'text-before-edge' | 'middle' | \
    'central' | 'after-edge' | 'text-after-edge' | 'ideographic' | 'alphabetic' \
-   | 'hanging' | 'mathematical'"]
+   | 'hanging' | 'mathematical'",
+  (module Css_types.AlignmentBaseline : RUNTIME_TYPE)]
 
 module Property_all =
   [%spec_module
-  "property_all", "'initial' | 'inherit' | 'unset' | 'revert'"]
+  "property_all",
+  "'initial' | 'inherit' | 'unset' | 'revert'",
+  (module Css_types.All : RUNTIME_TYPE)]
 
 module Property_animation =
   [%spec_module
-  "property_animation", "[ <single-animation> | <single-animation-no-interp> ]#"]
+  "property_animation",
+  "[ <single-animation> | <single-animation-no-interp> ]#",
+  (module Css_types.Animation : RUNTIME_TYPE)]
 
 module Property_animation_delay =
   [%spec_module
-  "property_animation_delay", "[ <extended-time> ]#"]
+  "property_animation_delay",
+  "[ <extended-time> ]#",
+  (module Css_types.AnimationDelay : RUNTIME_TYPE)]
 
 module Property_animation_direction =
   [%spec_module
-  "property_animation_direction", "[ <single-animation-direction> ]#"]
+  "property_animation_direction",
+  "[ <single-animation-direction> ]#",
+  (module Css_types.AnimationDirection : RUNTIME_TYPE)]
 
 module Property_animation_duration =
   [%spec_module
-  "property_animation_duration", "[ <extended-time> ]#"]
+  "property_animation_duration",
+  "[ <extended-time> ]#",
+  (module Css_types.AnimationDuration : RUNTIME_TYPE)]
 
 module Property_animation_fill_mode =
   [%spec_module
-  "property_animation_fill_mode", "[ <single-animation-fill-mode> ]#"]
+  "property_animation_fill_mode",
+  "[ <single-animation-fill-mode> ]#",
+  (module Css_types.AnimationFillMode : RUNTIME_TYPE)]
 
 module Property_animation_iteration_count =
   [%spec_module
   "property_animation_iteration_count",
-  "[ <single-animation-iteration-count> ]#"]
+  "[ <single-animation-iteration-count> ]#",
+  (module Css_types.AnimationIterationCount : RUNTIME_TYPE)]
 
 module Property_animation_name =
   [%spec_module
@@ -1869,27 +2387,35 @@ module Property_animation_name =
 
 module Property_animation_play_state =
   [%spec_module
-  "property_animation_play_state", "[ <single-animation-play-state> ]#"]
+  "property_animation_play_state",
+  "[ <single-animation-play-state> ]#",
+  (module Css_types.AnimationPlayState : RUNTIME_TYPE)]
 
 module Property_animation_timing_function =
   [%spec_module
-  "property_animation_timing_function", "[ <timing-function> ]#"]
+  "property_animation_timing_function",
+  "[ <timing-function> ]#",
+  (module Css_types.AnimationTimingFunction : RUNTIME_TYPE)]
 
 module Property_appearance =
   [%spec_module
   "property_appearance",
-  "'none' | 'auto' | 'button' | 'textfield' | 'menulist-button' | <compat-auto>"]
+  "'none' | 'auto' | 'button' | 'textfield' | 'menulist-button' | <compat-auto>",
+  (module Css_types.Appearance : RUNTIME_TYPE)]
 
 module Property_aspect_ratio =
   [%spec_module
-  "property_aspect_ratio", "'auto' | <ratio>"]
+  "property_aspect_ratio",
+  "'auto' | <ratio>",
+  (module Css_types.AspectRatio : RUNTIME_TYPE)]
 
 module Property_azimuth =
   [%spec_module
   "property_azimuth",
   "<extended-angle> | [ 'left-side' | 'far-left' | 'left' | 'center-left' | \
    'center' | 'center-right' | 'right' | 'far-right' | 'right-side' ] || \
-   'behind' | 'leftwards' | 'rightwards'"]
+   'behind' | 'leftwards' | 'rightwards'",
+  (module Css_types.Azimuth : RUNTIME_TYPE)]
 
 module Property_backdrop_filter =
   [%spec_module
@@ -1898,23 +2424,33 @@ module Property_backdrop_filter =
 
 module Property_backface_visibility =
   [%spec_module
-  "property_backface_visibility", "'visible' | 'hidden'"]
+  "property_backface_visibility",
+  "'visible' | 'hidden'",
+  (module Css_types.BackfaceVisibility : RUNTIME_TYPE)]
 
 module Property_background =
   [%spec_module
-  "property_background", "[ <bg-layer> ',' ]* <final-bg-layer>"]
+  "property_background",
+  "[ <bg-layer> ',' ]* <final-bg-layer>",
+  (module Css_types.Background : RUNTIME_TYPE)]
 
 module Property_background_attachment =
   [%spec_module
-  "property_background_attachment", "[ <attachment> ]#"]
+  "property_background_attachment",
+  "[ <attachment> ]#",
+  (module Css_types.BackgroundAttachment : RUNTIME_TYPE)]
 
 module Property_background_blend_mode =
   [%spec_module
-  "property_background_blend_mode", "[ <blend-mode> ]#"]
+  "property_background_blend_mode",
+  "[ <blend-mode> ]#",
+  (module Css_types.BackgroundBlendMode : RUNTIME_TYPE)]
 
 module Property_background_clip =
   [%spec_module
-  "property_background_clip", "[ <box> | 'text' | 'border-area' ]#"]
+  "property_background_clip",
+  "[ <box> | 'text' | 'border-area' ]#",
+  (module Css_types.BackgroundClip : RUNTIME_TYPE)]
 
 module Property_background_color =
   [%spec_module
@@ -1922,45 +2458,63 @@ module Property_background_color =
 
 module Property_background_image =
   [%spec_module
-  "property_background_image", "[ <bg-image> ]#"]
+  "property_background_image",
+  "[ <bg-image> ]#",
+  (module Css_types.BackgroundImage : RUNTIME_TYPE)]
 
 module Property_background_origin =
   [%spec_module
-  "property_background_origin", "[ <box> ]#"]
+  "property_background_origin",
+  "[ <box> ]#",
+  (module Css_types.BackgroundOrigin : RUNTIME_TYPE)]
 
 module Property_background_position =
   [%spec_module
-  "property_background_position", "[ <bg-position> ]#"]
+  "property_background_position",
+  "[ <bg-position> ]#",
+  (module Css_types.BackgroundPosition : RUNTIME_TYPE)]
 
 module Property_background_position_x =
   [%spec_module
   "property_background_position_x",
   "[ 'center' | [ 'left' | 'right' | 'x-start' | 'x-end' ]? [ \
-   <extended-length> | <extended-percentage> ]? ]#"]
+   <extended-length> | <extended-percentage> ]? ]#",
+  (module Css_types.BackgroundPositionX : RUNTIME_TYPE)]
 
 module Property_background_position_y =
   [%spec_module
   "property_background_position_y",
   "[ 'center' | [ 'top' | 'bottom' | 'y-start' | 'y-end' ]? [ \
-   <extended-length> | <extended-percentage> ]? ]#"]
+   <extended-length> | <extended-percentage> ]? ]#",
+  (module Css_types.BackgroundPositionY : RUNTIME_TYPE)]
 
 module Property_background_repeat =
   [%spec_module
-  "property_background_repeat", "[ <repeat-style> ]#"]
+  "property_background_repeat",
+  "[ <repeat-style> ]#",
+  (module Css_types.BackgroundRepeat : RUNTIME_TYPE)]
 
 module Property_background_size =
   [%spec_module
-  "property_background_size", "[ <bg-size> ]#"]
+  "property_background_size",
+  "[ <bg-size> ]#",
+  (module Css_types.BackgroundSize : RUNTIME_TYPE)]
 
 module Property_baseline_shift =
   [%spec_module
-  "property_baseline_shift", "'baseline' | 'sub' | 'super' | <svg-length>"]
+  "property_baseline_shift",
+  "'baseline' | 'sub' | 'super' | <svg-length>",
+  (module Css_types.BaselineShift : RUNTIME_TYPE)]
 
-module Property_behavior = [%spec_module "property_behavior", "[ <url> ]+"]
+module Property_behavior =
+  [%spec_module
+  "property_behavior", "[ <url> ]+", (module Css_types.Behavior : RUNTIME_TYPE)]
 
 module Property_block_overflow =
   [%spec_module
-  "property_block_overflow", "'clip' | 'ellipsis' | <string>"]
+  "property_block_overflow",
+  "'clip' | 'ellipsis' | <string>",
+  (module Css_types.BlockOverflow : RUNTIME_TYPE)]
 
 module Property_block_size = [%spec_module "property_block_size", "<'width'>"]
 
@@ -1974,55 +2528,81 @@ module Property_border =
 
 module Property_border_block =
   [%spec_module
-  "property_border_block", "<'border'>"]
+  "property_border_block",
+  "<'border'>",
+  (module Css_types.BorderBlock : RUNTIME_TYPE)]
 
 module Property_border_block_color =
   [%spec_module
-  "property_border_block_color", "[ <'border-top-color'> ]{1,2}"]
+  "property_border_block_color",
+  "[ <'border-top-color'> ]{1,2}",
+  (module Css_types.BorderBlockColor : RUNTIME_TYPE)]
 
 module Property_border_block_end =
   [%spec_module
-  "property_border_block_end", "<'border'>"]
+  "property_border_block_end",
+  "<'border'>",
+  (module Css_types.BorderBlockEnd : RUNTIME_TYPE)]
 
 module Property_border_block_end_color =
   [%spec_module
-  "property_border_block_end_color", "<'border-top-color'>"]
+  "property_border_block_end_color",
+  "<'border-top-color'>",
+  (module Css_types.BorderBlockEndColor : RUNTIME_TYPE)]
 
 module Property_border_block_end_style =
   [%spec_module
-  "property_border_block_end_style", "<'border-top-style'>"]
+  "property_border_block_end_style",
+  "<'border-top-style'>",
+  (module Css_types.BorderBlockEndStyle : RUNTIME_TYPE)]
 
 module Property_border_block_end_width =
   [%spec_module
-  "property_border_block_end_width", "<'border-top-width'>"]
+  "property_border_block_end_width",
+  "<'border-top-width'>",
+  (module Css_types.BorderBlockEndWidth : RUNTIME_TYPE)]
 
 module Property_border_block_start =
   [%spec_module
-  "property_border_block_start", "<'border'>"]
+  "property_border_block_start",
+  "<'border'>",
+  (module Css_types.BorderBlockStart : RUNTIME_TYPE)]
 
 module Property_border_block_start_color =
   [%spec_module
-  "property_border_block_start_color", "<'border-top-color'>"]
+  "property_border_block_start_color",
+  "<'border-top-color'>",
+  (module Css_types.BorderBlockStartColor : RUNTIME_TYPE)]
 
 module Property_border_block_start_style =
   [%spec_module
-  "property_border_block_start_style", "<'border-top-style'>"]
+  "property_border_block_start_style",
+  "<'border-top-style'>",
+  (module Css_types.BorderBlockStartStyle : RUNTIME_TYPE)]
 
 module Property_border_block_start_width =
   [%spec_module
-  "property_border_block_start_width", "<'border-top-width'>"]
+  "property_border_block_start_width",
+  "<'border-top-width'>",
+  (module Css_types.BorderBlockStartWidth : RUNTIME_TYPE)]
 
 module Property_border_block_style =
   [%spec_module
-  "property_border_block_style", "<'border-top-style'>"]
+  "property_border_block_style",
+  "<'border-top-style'>",
+  (module Css_types.BorderBlockStyle : RUNTIME_TYPE)]
 
 module Property_border_block_width =
   [%spec_module
-  "property_border_block_width", "<'border-top-width'>"]
+  "property_border_block_width",
+  "<'border-top-width'>",
+  (module Css_types.BorderBlockWidth : RUNTIME_TYPE)]
 
 module Property_border_bottom =
   [%spec_module
-  "property_border_bottom", "<'border'>"]
+  "property_border_bottom",
+  "<'border'>",
+  (module Css_types.BorderBottom : RUNTIME_TYPE)]
 
 module Property_border_bottom_color =
   [%spec_module
@@ -2048,7 +2628,9 @@ module Property_border_bottom_width =
 
 module Property_border_collapse =
   [%spec_module
-  "property_border_collapse", "'collapse' | 'separate'"]
+  "property_border_collapse",
+  "'collapse' | 'separate'",
+  (module Css_types.BorderCollapse : RUNTIME_TYPE)]
 
 module Property_border_color =
   [%spec_module
@@ -2069,81 +2651,116 @@ module Property_border_image =
   "property_border_image",
   "<'border-image-source'> || <'border-image-slice'> [ '/' \
    <'border-image-width'> | '/' [ <'border-image-width'> ]? '/' \
-   <'border-image-outset'> ]? || <'border-image-repeat'>"]
+   <'border-image-outset'> ]? || <'border-image-repeat'>",
+  (module Css_types.BorderImage : RUNTIME_TYPE)]
 
 module Property_border_image_outset =
   [%spec_module
-  "property_border_image_outset", "[ <extended-length> | <number> ]{1,4}"]
+  "property_border_image_outset",
+  "[ <extended-length> | <number> ]{1,4}",
+  (module Css_types.BorderImageOutset : RUNTIME_TYPE)]
 
 module Property_border_image_repeat =
   [%spec_module
   "property_border_image_repeat",
-  "[ 'stretch' | 'repeat' | 'round' | 'space' ]{1,2}"]
+  "[ 'stretch' | 'repeat' | 'round' | 'space' ]{1,2}",
+  (module Css_types.BorderImageRepeat : RUNTIME_TYPE)]
 
 module Property_border_image_slice =
   [%spec_module
-  "property_border_image_slice", "[ <number-percentage> ]{1,4} && [ 'fill' ]?"]
+  "property_border_image_slice",
+  "[ <number-percentage> ]{1,4} && [ 'fill' ]?",
+  (module Css_types.BorderImageSlice : RUNTIME_TYPE)]
 
 module Property_border_image_source =
   [%spec_module
-  "property_border_image_source", "'none' | <image>"]
+  "property_border_image_source",
+  "'none' | <image>",
+  (module Css_types.BorderImageSource : RUNTIME_TYPE)]
 
 module Property_border_image_width =
   [%spec_module
   "property_border_image_width",
-  "[ <extended-length> | <extended-percentage> | <number> | 'auto' ]{1,4}"]
+  "[ <extended-length> | <extended-percentage> | <number> | 'auto' ]{1,4}",
+  (module Css_types.BorderImageWidth : RUNTIME_TYPE)]
 
 module Property_border_inline =
   [%spec_module
-  "property_border_inline", "<'border'>"]
+  "property_border_inline",
+  "<'border'>",
+  (module Css_types.BorderInline : RUNTIME_TYPE)]
 
 module Property_border_inline_color =
   [%spec_module
-  "property_border_inline_color", "[ <'border-top-color'> ]{1,2}"]
+  "property_border_inline_color",
+  "[ <'border-top-color'> ]{1,2}",
+  (module Css_types.BorderInlineColor : RUNTIME_TYPE)]
 
 module Property_border_inline_end =
   [%spec_module
-  "property_border_inline_end", "<'border'>"]
+  "property_border_inline_end",
+  "<'border'>",
+  (module Css_types.BorderInlineEnd : RUNTIME_TYPE)]
 
 module Property_border_inline_end_color =
   [%spec_module
-  "property_border_inline_end_color", "<'border-top-color'>"]
+  "property_border_inline_end_color",
+  "<'border-top-color'>",
+  (module Css_types.BorderInlineEndColor : RUNTIME_TYPE)]
 
 module Property_border_inline_end_style =
   [%spec_module
-  "property_border_inline_end_style", "<'border-top-style'>"]
+  "property_border_inline_end_style",
+  "<'border-top-style'>",
+  (module Css_types.BorderInlineEndStyle : RUNTIME_TYPE)]
 
 module Property_border_inline_end_width =
   [%spec_module
-  "property_border_inline_end_width", "<'border-top-width'>"]
+  "property_border_inline_end_width",
+  "<'border-top-width'>",
+  (module Css_types.BorderInlineEndWidth : RUNTIME_TYPE)]
 
 module Property_border_inline_start =
   [%spec_module
-  "property_border_inline_start", "<'border'>"]
+  "property_border_inline_start",
+  "<'border'>",
+  (module Css_types.BorderInlineStart : RUNTIME_TYPE)]
 
 module Property_border_inline_start_color =
   [%spec_module
-  "property_border_inline_start_color", "<'border-top-color'>"]
+  "property_border_inline_start_color",
+  "<'border-top-color'>",
+  (module Css_types.BorderInlineStartColor : RUNTIME_TYPE)]
 
 module Property_border_inline_start_style =
   [%spec_module
-  "property_border_inline_start_style", "<'border-top-style'>"]
+  "property_border_inline_start_style",
+  "<'border-top-style'>",
+  (module Css_types.BorderInlineStartStyle : RUNTIME_TYPE)]
 
 module Property_border_inline_start_width =
   [%spec_module
-  "property_border_inline_start_width", "<'border-top-width'>"]
+  "property_border_inline_start_width",
+  "<'border-top-width'>",
+  (module Css_types.BorderInlineStartWidth : RUNTIME_TYPE)]
 
 module Property_border_inline_style =
   [%spec_module
-  "property_border_inline_style", "<'border-top-style'>"]
+  "property_border_inline_style",
+  "<'border-top-style'>",
+  (module Css_types.BorderInlineStyle : RUNTIME_TYPE)]
 
 module Property_border_inline_width =
   [%spec_module
-  "property_border_inline_width", "<'border-top-width'>"]
+  "property_border_inline_width",
+  "<'border-top-width'>",
+  (module Css_types.BorderInlineWidth : RUNTIME_TYPE)]
 
 module Property_border_left =
   [%spec_module
-  "property_border_left", "<'border'>"]
+  "property_border_left",
+  "<'border'>",
+  (module Css_types.BorderLeft : RUNTIME_TYPE)]
 
 module Property_border_left_color =
   [%spec_module
@@ -2160,11 +2777,15 @@ module Property_border_left_width =
 (* border-radius isn't supported with the entire spec in bs-css: `"[ <extended-length> | <extended-percentage> ]{1,4} [ '/' [ <extended-length> | <extended-percentage> ]{1,4} ]?"` *)
 module Property_border_radius =
   [%spec_module
-  "property_border_radius", "<extended-length> | <extended-percentage>"]
+  "property_border_radius",
+  "<extended-length> | <extended-percentage>",
+  (module Css_types.BorderRadius : RUNTIME_TYPE)]
 
 module Property_border_right =
   [%spec_module
-  "property_border_right", "<'border'>"]
+  "property_border_right",
+  "<'border'>",
+  (module Css_types.BorderRight : RUNTIME_TYPE)]
 
 module Property_border_right_color =
   [%spec_module
@@ -2180,7 +2801,9 @@ module Property_border_right_width =
 
 module Property_border_spacing =
   [%spec_module
-  "property_border_spacing", "<extended-length> [ <extended-length> ]?"]
+  "property_border_spacing",
+  "<extended-length> [ <extended-length> ]?",
+  (module Css_types.BorderSpacing : RUNTIME_TYPE)]
 
 module Property_border_start_end_radius =
   [%spec_module
@@ -2195,9 +2818,15 @@ module Property_border_start_start_radius =
 (* bs-css doesn't support list of styles, the original spec is: `[ <line-style> ]{1,4}` *)
 module Property_border_style =
   [%spec_module
-  "property_border_style", "<line-style>"]
+  "property_border_style",
+  "<line-style>",
+  (module Css_types.BorderStyle : RUNTIME_TYPE)]
 
-module Property_border_top = [%spec_module "property_border_top", "<'border'>"]
+module Property_border_top =
+  [%spec_module
+  "property_border_top",
+  "<'border'>",
+  (module Css_types.BorderTop : RUNTIME_TYPE)]
 
 module Property_border_top_color =
   [%spec_module
@@ -2227,42 +2856,61 @@ module Property_border_width =
 
 module Property_bottom =
   [%spec_module
-  "property_bottom", "<extended-length> | <extended-percentage> | 'auto'"]
+  "property_bottom",
+  "<extended-length> | <extended-percentage> | 'auto'",
+  (module Css_types.Bottom : RUNTIME_TYPE)]
 
 module Property_box_align =
   [%spec_module
-  "property_box_align", "'start' | 'center' | 'end' | 'baseline' | 'stretch'"]
+  "property_box_align",
+  "'start' | 'center' | 'end' | 'baseline' | 'stretch'",
+  (module Css_types.BoxAlign : RUNTIME_TYPE)]
 
 module Property_box_decoration_break =
   [%spec_module
-  "property_box_decoration_break", "'slice' | 'clone'"]
+  "property_box_decoration_break",
+  "'slice' | 'clone'",
+  (module Css_types.BoxDecorationBreak : RUNTIME_TYPE)]
 
 module Property_box_direction =
   [%spec_module
-  "property_box_direction", "'normal' | 'reverse' | 'inherit'"]
+  "property_box_direction",
+  "'normal' | 'reverse' | 'inherit'",
+  (module Css_types.BoxDirection : RUNTIME_TYPE)]
 
-module Property_box_flex = [%spec_module "property_box_flex", "<number>"]
+module Property_box_flex =
+  [%spec_module
+  "property_box_flex", "<number>", (module Css_types.BoxFlex : RUNTIME_TYPE)]
 
 module Property_box_flex_group =
   [%spec_module
-  "property_box_flex_group", "<integer>"]
+  "property_box_flex_group",
+  "<integer>",
+  (module Css_types.BoxFlexGroup : RUNTIME_TYPE)]
 
 module Property_box_lines =
   [%spec_module
-  "property_box_lines", "'single' | 'multiple'"]
+  "property_box_lines",
+  "'single' | 'multiple'",
+  (module Css_types.BoxLines : RUNTIME_TYPE)]
 
 module Property_box_ordinal_group =
   [%spec_module
-  "property_box_ordinal_group", "<integer>"]
+  "property_box_ordinal_group",
+  "<integer>",
+  (module Css_types.BoxOrdinalGroup : RUNTIME_TYPE)]
 
 module Property_box_orient =
   [%spec_module
   "property_box_orient",
-  "'horizontal' | 'vertical' | 'inline-axis' | 'block-axis' | 'inherit'"]
+  "'horizontal' | 'vertical' | 'inline-axis' | 'block-axis' | 'inherit'",
+  (module Css_types.BoxOrient : RUNTIME_TYPE)]
 
 module Property_box_pack =
   [%spec_module
-  "property_box_pack", "'start' | 'center' | 'end' | 'justify'"]
+  "property_box_pack",
+  "'start' | 'center' | 'end' | 'justify'",
+  (module Css_types.BoxPack : RUNTIME_TYPE)]
 
 module Property_box_shadow =
   [%spec_module
@@ -2270,74 +2918,100 @@ module Property_box_shadow =
 
 module Property_box_sizing =
   [%spec_module
-  "property_box_sizing", "'content-box' | 'border-box'"]
+  "property_box_sizing",
+  "'content-box' | 'border-box'",
+  (module Css_types.BoxSizing : RUNTIME_TYPE)]
 
 module Property_break_after =
   [%spec_module
   "property_break_after",
   "'auto' | 'avoid' | 'always' | 'all' | 'avoid-page' | 'page' | 'left' | \
    'right' | 'recto' | 'verso' | 'avoid-column' | 'column' | 'avoid-region' | \
-   'region'"]
+   'region'",
+  (module Css_types.BreakAfter : RUNTIME_TYPE)]
 
 module Property_break_before =
   [%spec_module
   "property_break_before",
   "'auto' | 'avoid' | 'always' | 'all' | 'avoid-page' | 'page' | 'left' | \
    'right' | 'recto' | 'verso' | 'avoid-column' | 'column' | 'avoid-region' | \
-   'region'"]
+   'region'",
+  (module Css_types.BreakBefore : RUNTIME_TYPE)]
 
 module Property_break_inside =
   [%spec_module
   "property_break_inside",
-  "'auto' | 'avoid' | 'avoid-page' | 'avoid-column' | 'avoid-region'"]
+  "'auto' | 'avoid' | 'avoid-page' | 'avoid-column' | 'avoid-region'",
+  (module Css_types.BreakInside : RUNTIME_TYPE)]
 
 module Property_caption_side =
   [%spec_module
   "property_caption_side",
   "'top' | 'bottom' | 'block-start' | 'block-end' | 'inline-start' | \
-   'inline-end'"]
+   'inline-end'",
+  (module Css_types.CaptionSide : RUNTIME_TYPE)]
 
 module Property_caret_color =
   [%spec_module
-  "property_caret_color", "'auto' | <color>"]
+  "property_caret_color",
+  "'auto' | <color>",
+  (module Css_types.CaretColor : RUNTIME_TYPE)]
 
 module Property_clear =
   [%spec_module
   "property_clear",
-  "'none' | 'left' | 'right' | 'both' | 'inline-start' | 'inline-end'"]
+  "'none' | 'left' | 'right' | 'both' | 'inline-start' | 'inline-end'",
+  (module Css_types.Clear : RUNTIME_TYPE)]
 
-module Property_clip = [%spec_module "property_clip", "<shape> | 'auto'"]
+module Property_clip =
+  [%spec_module
+  "property_clip", "<shape> | 'auto'", (module Css_types.Clip : RUNTIME_TYPE)]
 
 module Property_clip_path =
   [%spec_module
   "property_clip_path",
-  "<clip-source> | <basic-shape> || <geometry-box> | 'none'"]
+  "<clip-source> | <basic-shape> || <geometry-box> | 'none'",
+  (module Css_types.ClipPath : RUNTIME_TYPE)]
 
 module Property_clip_rule =
   [%spec_module
-  "property_clip_rule", "'nonzero' | 'evenodd'"]
+  "property_clip_rule",
+  "'nonzero' | 'evenodd'",
+  (module Css_types.ClipRule : RUNTIME_TYPE)]
 
-module Property_color = [%spec_module "property_color", "<color>"]
+module Property_color =
+  [%spec_module
+  "property_color", "<color>", (module Css_types.Color : RUNTIME_TYPE)]
 
 module Property_color_interpolation_filters =
   [%spec_module
-  "property_color_interpolation_filters", "'auto' | 'sRGB' | 'linearRGB'"]
+  "property_color_interpolation_filters",
+  "'auto' | 'sRGB' | 'linearRGB'",
+  (module Css_types.ColorInterpolationFilters : RUNTIME_TYPE)]
 
 module Property_color_interpolation =
   [%spec_module
-  "property_color_interpolation", "'auto' | 'sRGB' | 'linearRGB'"]
+  "property_color_interpolation",
+  "'auto' | 'sRGB' | 'linearRGB'",
+  (module Css_types.ColorInterpolation : RUNTIME_TYPE)]
 
 module Property_color_adjust =
   [%spec_module
-  "property_color_adjust", "'economy' | 'exact'"]
+  "property_color_adjust",
+  "'economy' | 'exact'",
+  (module Css_types.ColorAdjust : RUNTIME_TYPE)]
 
 module Property_column_count =
   [%spec_module
-  "property_column_count", "<integer> | 'auto'"]
+  "property_column_count",
+  "<integer> | 'auto'",
+  (module Css_types.ColumnCount : RUNTIME_TYPE)]
 
 module Property_column_fill =
   [%spec_module
-  "property_column_fill", "'auto' | 'balance' | 'balance-all'"]
+  "property_column_fill",
+  "'auto' | 'balance' | 'balance-all'",
+  (module Css_types.ColumnFill : RUNTIME_TYPE)]
 
 module Property_column_gap =
   [%spec_module
@@ -2346,75 +3020,104 @@ module Property_column_gap =
 module Property_column_rule =
   [%spec_module
   "property_column_rule",
-  "<'column-rule-width'> || <'column-rule-style'> || <'column-rule-color'>"]
+  "<'column-rule-width'> || <'column-rule-style'> || <'column-rule-color'>",
+  (module Css_types.ColumnRule : RUNTIME_TYPE)]
 
 module Property_column_rule_color =
   [%spec_module
-  "property_column_rule_color", "<color>"]
+  "property_column_rule_color",
+  "<color>",
+  (module Css_types.ColumnRuleColor : RUNTIME_TYPE)]
 
 module Property_column_rule_style =
   [%spec_module
-  "property_column_rule_style", "<'border-style'>"]
+  "property_column_rule_style",
+  "<'border-style'>",
+  (module Css_types.ColumnRuleStyle : RUNTIME_TYPE)]
 
 module Property_column_rule_width =
   [%spec_module
-  "property_column_rule_width", "<'border-width'>"]
+  "property_column_rule_width",
+  "<'border-width'>",
+  (module Css_types.ColumnRuleWidth : RUNTIME_TYPE)]
 
 module Property_column_span =
   [%spec_module
-  "property_column_span", "'none' | 'all'"]
+  "property_column_span",
+  "'none' | 'all'",
+  (module Css_types.ColumnSpan : RUNTIME_TYPE)]
 
 module Property_column_width =
   [%spec_module
-  "property_column_width", "<extended-length> | 'auto'"]
+  "property_column_width",
+  "<extended-length> | 'auto'",
+  (module Css_types.ColumnWidth : RUNTIME_TYPE)]
 
 module Property_columns =
   [%spec_module
-  "property_columns", "<'column-width'> || <'column-count'>"]
+  "property_columns",
+  "<'column-width'> || <'column-count'>",
+  (module Css_types.Columns : RUNTIME_TYPE)]
 
 module Property_contain =
   [%spec_module
   "property_contain",
-  "'none' | 'strict' | 'content' | 'size' || 'layout' || 'style' || 'paint'"]
+  "'none' | 'strict' | 'content' | 'size' || 'layout' || 'style' || 'paint'",
+  (module Css_types.Contain : RUNTIME_TYPE)]
 
 module Property_content =
   [%spec_module
   "property_content",
   "'normal' | 'none' | <string> | <interpolation> | [ <content-replacement> | \
-   <content-list> ] [ '/' <string> ]?"]
+   <content-list> ] [ '/' <string> ]?",
+  (module Css_types.Content : RUNTIME_TYPE)]
 
 module Property_content_visibility =
   [%spec_module
-  "property_content_visibility", "'visible' | 'hidden' | 'auto'"]
+  "property_content_visibility",
+  "'visible' | 'hidden' | 'auto'",
+  (module Css_types.ContentVisibility : RUNTIME_TYPE)]
 
 module Property_counter_increment =
   [%spec_module
-  "property_counter_increment", "[ <custom-ident> [ <integer> ]? ]+ | 'none'"]
+  "property_counter_increment",
+  "[ <custom-ident> [ <integer> ]? ]+ | 'none'",
+  (module Css_types.CounterIncrement : RUNTIME_TYPE)]
 
 module Property_counter_reset =
   [%spec_module
-  "property_counter_reset", "[ <custom-ident> [ <integer> ]? ]+ | 'none'"]
+  "property_counter_reset",
+  "[ <custom-ident> [ <integer> ]? ]+ | 'none'",
+  (module Css_types.CounterReset : RUNTIME_TYPE)]
 
 module Property_counter_set =
   [%spec_module
-  "property_counter_set", "[ <custom-ident> [ <integer> ]? ]+ | 'none'"]
+  "property_counter_set",
+  "[ <custom-ident> [ <integer> ]? ]+ | 'none'",
+  (module Css_types.CounterSet : RUNTIME_TYPE)]
 
 module Property_cue =
   [%spec_module
-  "property_cue", "<'cue-before'> [ <'cue-after'> ]?"]
+  "property_cue",
+  "<'cue-before'> [ <'cue-after'> ]?",
+  (module Css_types.Cue : RUNTIME_TYPE)]
 
 module Property_cue_after =
   [%spec_module
-  "property_cue_after", "<url> [ <decibel> ]? | 'none'"]
+  "property_cue_after",
+  "<url> [ <decibel> ]? | 'none'",
+  (module Css_types.CueAfter : RUNTIME_TYPE)]
 
 module Property_cue_before =
   [%spec_module
-  "property_cue_before", "<url> [ <decibel> ]? | 'none'"]
+  "property_cue_before",
+  "<url> [ <decibel> ]? | 'none'",
+  (module Css_types.CueBefore : RUNTIME_TYPE)]
 
 (* module property_cursor = [%spec_module
      "property_cursor",
   "[ <url> [ <x> <y> ]? ',' ]* [ 'auto' | 'default' | 'none' | 'context-menu' | 'help' | 'pointer' | 'progress' | 'wait' | 'cell' | 'crosshair' | 'text' | 'vertical-text' | 'alias' | 'copy' | 'move' | 'no-drop' | 'not-allowed' | 'e-resize' | 'n-resize' | 'ne-resize' | 'nw-resize' | 's-resize' | 'se-resize' | 'sw-resize' | 'w-resize' | 'ew-resize' | 'ns-resize' | 'nesw-resize' | 'nwse-resize' | 'col-resize' | 'row-resize' | 'all-scroll' | 'zoom-in' | 'zoom-out' | 'grab' | 'grabbing' | 'hand' | '-webkit-grab' | '-webkit-grabbing' | '-webkit-zoom-in' | '-webkit-zoom-out' | '-moz-grab' | '-moz-grabbing' | '-moz-zoom-in' | '-moz-zoom-out' ] | <interpolation>"
-   ] *)
+   , (module Css_types.Cursor : RUNTIME_TYPE)] *)
 (* Removed [ <url> [ <x> <y> ]? ',' ]* *)
 module Property_cursor =
   [%spec_module
@@ -2427,9 +3130,14 @@ module Property_cursor =
    'nwse-resize' | 'col-resize' | 'row-resize' | 'all-scroll' | 'zoom-in' | \
    'zoom-out' | 'grab' | 'grabbing' | 'hand' | '-webkit-grab' | \
    '-webkit-grabbing' | '-webkit-zoom-in' | '-webkit-zoom-out' | '-moz-grab' | \
-   '-moz-grabbing' | '-moz-zoom-in' | '-moz-zoom-out' | <interpolation>"]
+   '-moz-grabbing' | '-moz-zoom-in' | '-moz-zoom-out' | <interpolation>",
+  (module Css_types.Cursor : RUNTIME_TYPE)]
 
-module Property_direction = [%spec_module "property_direction", "'ltr' | 'rtl'"]
+module Property_direction =
+  [%spec_module
+  "property_direction",
+  "'ltr' | 'rtl'",
+  (module Css_types.Direction : RUNTIME_TYPE)]
 
 module Property_display =
   [%spec_module
@@ -2442,67 +3150,93 @@ module Property_display =
    'table-column-group' | 'table-footer-group' | 'table-header-group' | \
    'table-row' | 'table-row-group' | '-webkit-flex' | '-webkit-inline-flex' | \
    '-webkit-box' | '-webkit-inline-box' | '-moz-inline-stack' | '-moz-box' | \
-   '-moz-inline-box'"]
+   '-moz-inline-box'",
+  (module Css_types.Display : RUNTIME_TYPE)]
 
 module Property_dominant_baseline =
   [%spec_module
   "property_dominant_baseline",
   "'auto' | 'use-script' | 'no-change' | 'reset-size' | 'ideographic' | \
    'alphabetic' | 'hanging' | 'mathematical' | 'central' | 'middle' | \
-   'text-after-edge' | 'text-before-edge'"]
+   'text-after-edge' | 'text-before-edge'",
+  (module Css_types.DominantBaseline : RUNTIME_TYPE)]
 
 module Property_empty_cells =
   [%spec_module
-  "property_empty_cells", "'show' | 'hide'"]
+  "property_empty_cells",
+  "'show' | 'hide'",
+  (module Css_types.EmptyCells : RUNTIME_TYPE)]
 
-module Property_fill = [%spec_module "property_fill", "<paint>"]
+module Property_fill =
+  [%spec_module
+  "property_fill", "<paint>", (module Css_types.Fill : RUNTIME_TYPE)]
 
 module Property_fill_opacity =
   [%spec_module
-  "property_fill_opacity", "<alpha-value>"]
+  "property_fill_opacity",
+  "<alpha-value>",
+  (module Css_types.FillOpacity : RUNTIME_TYPE)]
 
 module Property_fill_rule =
   [%spec_module
-  "property_fill_rule", "'nonzero' | 'evenodd'"]
+  "property_fill_rule",
+  "'nonzero' | 'evenodd'",
+  (module Css_types.FillRule : RUNTIME_TYPE)]
 
 module Property_filter =
   [%spec_module
-  "property_filter", "'none' | <interpolation> | <filter-function-list>"]
+  "property_filter",
+  "'none' | <interpolation> | <filter-function-list>",
+  (module Css_types.Filter : RUNTIME_TYPE)]
 
 module Property_flex =
   [%spec_module
   "property_flex",
   "'none' | [<'flex-grow'> [ <'flex-shrink'> ]? || <'flex-basis'>] | \
-   <interpolation>"]
+   <interpolation>",
+  (module Css_types.Flex : RUNTIME_TYPE)]
 
 module Property_flex_basis =
   [%spec_module
-  "property_flex_basis", "'content' | <'width'> | <interpolation>"]
+  "property_flex_basis",
+  "'content' | <'width'> | <interpolation>",
+  (module Css_types.FlexBasis : RUNTIME_TYPE)]
 
 module Property_flex_direction =
   [%spec_module
   "property_flex_direction",
-  "'row' | 'row-reverse' | 'column' | 'column-reverse'"]
+  "'row' | 'row-reverse' | 'column' | 'column-reverse'",
+  (module Css_types.FlexDirection : RUNTIME_TYPE)]
 
 module Property_flex_flow =
   [%spec_module
-  "property_flex_flow", "<'flex-direction'> || <'flex-wrap'>"]
+  "property_flex_flow",
+  "<'flex-direction'> || <'flex-wrap'>",
+  (module Css_types.FlexFlow : RUNTIME_TYPE)]
 
 module Property_flex_grow =
   [%spec_module
-  "property_flex_grow", "<number> | <interpolation>"]
+  "property_flex_grow",
+  "<number> | <interpolation>",
+  (module Css_types.FlexGrow : RUNTIME_TYPE)]
 
 module Property_flex_shrink =
   [%spec_module
-  "property_flex_shrink", "<number> | <interpolation>"]
+  "property_flex_shrink",
+  "<number> | <interpolation>",
+  (module Css_types.FlexShrink : RUNTIME_TYPE)]
 
 module Property_flex_wrap =
   [%spec_module
-  "property_flex_wrap", "'nowrap' | 'wrap' | 'wrap-reverse'"]
+  "property_flex_wrap",
+  "'nowrap' | 'wrap' | 'wrap-reverse'",
+  (module Css_types.FlexWrap : RUNTIME_TYPE)]
 
 module Property_float =
   [%spec_module
-  "property_float", "'left' | 'right' | 'none' | 'inline-start' | 'inline-end'"]
+  "property_float",
+  "'left' | 'right' | 'none' | 'inline-start' | 'inline-end'",
+  (module Css_types.Float : RUNTIME_TYPE)]
 
 module Property_font =
   [%spec_module
@@ -2510,85 +3244,118 @@ module Property_font =
   "[ <'font-style'> || <font-variant-css21> || <'font-weight'> || \
    <'font-stretch'> ]? <'font-size'> [ '/' <'line-height'> ]? <'font-family'> \
    | 'caption' | 'icon' | 'menu' | 'message-box' | 'small-caption' | \
-   'status-bar'"]
+   'status-bar'",
+  (module Css_types.Font : RUNTIME_TYPE)]
 
 module Font_families =
   [%spec_module
-  "font_families", "[ <family-name> | <generic-family> | <interpolation> ]#"]
+  "font_families",
+  "[ <family-name> | <generic-family> | <interpolation> ]#",
+  (module Css_types.FontFamilies : RUNTIME_TYPE)]
 
 module Property_font_family =
   [%spec_module
-  "property_font_family", "<font_families> | <interpolation>"]
+  "property_font_family",
+  "<font_families> | <interpolation>",
+  (module Css_types.FontFamily : RUNTIME_TYPE)]
 
 module Property_font_feature_settings =
   [%spec_module
-  "property_font_feature_settings", "'normal' | [ <feature-tag-value> ]#"]
+  "property_font_feature_settings",
+  "'normal' | [ <feature-tag-value> ]#",
+  (module Css_types.FontFeatureSettings : RUNTIME_TYPE)]
 
 module Property_font_display =
   [%spec_module
-  "property_font_display", "'auto' | 'block' | 'swap' | 'fallback' | 'optional'"]
+  "property_font_display",
+  "'auto' | 'block' | 'swap' | 'fallback' | 'optional'",
+  (module Css_types.FontDisplay : RUNTIME_TYPE)]
 
 module Property_font_kerning =
   [%spec_module
-  "property_font_kerning", "'auto' | 'normal' | 'none'"]
+  "property_font_kerning",
+  "'auto' | 'normal' | 'none'",
+  (module Css_types.FontKerning : RUNTIME_TYPE)]
 
 module Property_font_language_override =
   [%spec_module
-  "property_font_language_override", "'normal' | <string>"]
+  "property_font_language_override",
+  "'normal' | <string>",
+  (module Css_types.FontLanguageOverride : RUNTIME_TYPE)]
 
 module Property_font_optical_sizing =
   [%spec_module
-  "property_font_optical_sizing", "'auto' | 'none'"]
+  "property_font_optical_sizing",
+  "'auto' | 'none'",
+  (module Css_types.FontOpticalSizing : RUNTIME_TYPE)]
 
 module Property_font_palette =
   [%spec_module
-  "property_font_palette", "'normal' | 'light' | 'dark'"]
+  "property_font_palette",
+  "'normal' | 'light' | 'dark'",
+  (module Css_types.FontPalette : RUNTIME_TYPE)]
 
 module Property_font_size =
   [%spec_module
   "property_font_size",
   "<absolute-size> | <relative-size> | <extended-length> | \
-   <extended-percentage>"]
+   <extended-percentage>",
+  (module Css_types.FontSize : RUNTIME_TYPE)]
 
 module Property_font_size_adjust =
   [%spec_module
-  "property_font_size_adjust", "'none' | <number>"]
+  "property_font_size_adjust",
+  "'none' | <number>",
+  (module Css_types.FontSizeAdjust : RUNTIME_TYPE)]
 
 module Property_font_smooth =
   [%spec_module
   "property_font_smooth",
-  "'auto' | 'never' | 'always' | <absolute-size> | <extended-length>"]
+  "'auto' | 'never' | 'always' | <absolute-size> | <extended-length>",
+  (module Css_types.FontSmooth : RUNTIME_TYPE)]
 
 module Property_font_stretch =
   [%spec_module
-  "property_font_stretch", "<font-stretch-absolute>"]
+  "property_font_stretch",
+  "<font-stretch-absolute>",
+  (module Css_types.FontStretch : RUNTIME_TYPE)]
 
 module Property_font_style =
   [%spec_module
   "property_font_style",
   "'normal' | 'italic' | 'oblique' | <interpolation> | [ 'oblique' \
-   <extended-angle> ]?"]
+   <extended-angle> ]?",
+  (module Css_types.FontStyle : RUNTIME_TYPE)]
 
 module Property_font_synthesis =
   [%spec_module
   "property_font_synthesis",
-  "'none' | [ 'weight' || 'style' || 'small-caps' || 'position' ]"]
+  "'none' | [ 'weight' || 'style' || 'small-caps' || 'position' ]",
+  (module Css_types.FontSynthesis : RUNTIME_TYPE)]
 
 module Property_font_synthesis_weight =
   [%spec_module
-  "property_font_synthesis_weight", "'auto' | 'none'"]
+  "property_font_synthesis_weight",
+  "'auto' | 'none'",
+  (module Css_types.FontSynthesisWeight : RUNTIME_TYPE)]
 
 module Property_font_synthesis_style =
   [%spec_module
-  "property_font_synthesis_style", "'auto' | 'none'"]
+  "property_font_synthesis_style",
+  "'auto' | 'none'",
+  (module Css_types.FontSynthesisStyle : RUNTIME_TYPE)]
 
 module Property_font_synthesis_small_caps =
   [%spec_module
-  "property_font_synthesis_small_caps", "'auto' | 'none'"]
+  "property_font_synthesis_small_caps",
+  "'auto' | 'none'",
+  (module Css_types.FontSynthesisSmallCaps : RUNTIME_TYPE)]
 
 module Property_font_synthesis_position =
   [%spec_module
-  "property_font_synthesis_position", "'auto' | 'none'"]
+  "property_font_synthesis_position",
+  "'auto' | 'none'",
+  (module Css_types.FontSynthesisPosition : RUNTIME_TYPE)]
 
 module Property_font_variant =
   [%spec_module
@@ -2604,7 +3371,8 @@ module Property_font_variant =
    <numeric-figure-values> || <numeric-spacing-values> || \
    <numeric-fraction-values> || 'ordinal' || 'slashed-zero' || \
    <east-asian-variant-values> || <east-asian-width-values> || 'ruby' || 'sub' \
-   || 'super' || 'text' || 'emoji' || 'unicode'"]
+   || 'super' || 'text' || 'emoji' || 'unicode'",
+  (module Css_types.FontVariant : RUNTIME_TYPE)]
 
 module Property_font_variant_alternates =
   [%spec_module
@@ -2612,92 +3380,122 @@ module Property_font_variant_alternates =
   "'normal' | stylistic( <feature-value-name> ) || 'historical-forms' || \
    styleset( [ <feature-value-name> ]# ) || character-variant( [ \
    <feature-value-name> ]# ) || swash( <feature-value-name> ) || ornaments( \
-   <feature-value-name> ) || annotation( <feature-value-name> )"]
+   <feature-value-name> ) || annotation( <feature-value-name> )",
+  (module Css_types.FontVariantAlternates : RUNTIME_TYPE)]
 
 module Property_font_variant_caps =
   [%spec_module
   "property_font_variant_caps",
   "'normal' | 'small-caps' | 'all-small-caps' | 'petite-caps' | \
-   'all-petite-caps' | 'unicase' | 'titling-caps'"]
+   'all-petite-caps' | 'unicase' | 'titling-caps'",
+  (module Css_types.FontVariantCaps : RUNTIME_TYPE)]
 
 module Property_font_variant_east_asian =
   [%spec_module
   "property_font_variant_east_asian",
   "'normal' | <east-asian-variant-values> || <east-asian-width-values> || \
-   'ruby'"]
+   'ruby'",
+  (module Css_types.FontVariantEastAsian : RUNTIME_TYPE)]
 
 module Property_font_variant_ligatures =
   [%spec_module
   "property_font_variant_ligatures",
   "'normal' | 'none' | <common-lig-values> || <discretionary-lig-values> || \
-   <historical-lig-values> || <contextual-alt-values>"]
+   <historical-lig-values> || <contextual-alt-values>",
+  (module Css_types.FontVariantLigatures : RUNTIME_TYPE)]
 
 module Property_font_variant_numeric =
   [%spec_module
   "property_font_variant_numeric",
   "'normal' | <numeric-figure-values> || <numeric-spacing-values> || \
-   <numeric-fraction-values> || 'ordinal' || 'slashed-zero'"]
+   <numeric-fraction-values> || 'ordinal' || 'slashed-zero'",
+  (module Css_types.FontVariantNumeric : RUNTIME_TYPE)]
 
 module Property_font_variant_position =
   [%spec_module
-  "property_font_variant_position", "'normal' | 'sub' | 'super'"]
+  "property_font_variant_position",
+  "'normal' | 'sub' | 'super'",
+  (module Css_types.FontVariantPosition : RUNTIME_TYPE)]
 
 module Property_font_variation_settings =
   [%spec_module
-  "property_font_variation_settings", "'normal' | [ <string> <number> ]#"]
+  "property_font_variation_settings",
+  "'normal' | [ <string> <number> ]#",
+  (module Css_types.FontVariationSettings : RUNTIME_TYPE)]
 
 module Property_font_variant_emoji =
   [%spec_module
-  "property_font_variant_emoji", "'normal' | 'text' | 'emoji' | 'unicode'"]
+  "property_font_variant_emoji",
+  "'normal' | 'text' | 'emoji' | 'unicode'",
+  (module Css_types.FontVariantEmoji : RUNTIME_TYPE)]
 
 module Property_font_weight =
   [%spec_module
   "property_font_weight",
-  "<font-weight-absolute> | 'bolder' | 'lighter' | <interpolation>"]
+  "<font-weight-absolute> | 'bolder' | 'lighter' | <interpolation>",
+  (module Css_types.FontWeight : RUNTIME_TYPE)]
 
 module Property_gap =
   [%spec_module
-  "property_gap", "<'row-gap'> [ <'column-gap'> ]?"]
+  "property_gap",
+  "<'row-gap'> [ <'column-gap'> ]?",
+  (module Css_types.Gap : RUNTIME_TYPE)]
 
 module Property_glyph_orientation_horizontal =
   [%spec_module
-  "property_glyph_orientation_horizontal", "<extended-angle>"]
+  "property_glyph_orientation_horizontal",
+  "<extended-angle>",
+  (module Css_types.GlyphOrientationHorizontal : RUNTIME_TYPE)]
 
 module Property_glyph_orientation_vertical =
   [%spec_module
-  "property_glyph_orientation_vertical", "<extended-angle>"]
+  "property_glyph_orientation_vertical",
+  "<extended-angle>",
+  (module Css_types.GlyphOrientationVertical : RUNTIME_TYPE)]
 
 module Property_grid =
   [%spec_module
   "property_grid",
   "<'grid-template'> | <'grid-template-rows'> '/' [ 'auto-flow' && [ 'dense' \
    ]? ] [ <'grid-auto-columns'> ]? | [ 'auto-flow' && [ 'dense' ]? ] [ \
-   <'grid-auto-rows'> ]? '/' <'grid-template-columns'>"]
+   <'grid-auto-rows'> ]? '/' <'grid-template-columns'>",
+  (module Css_types.Grid : RUNTIME_TYPE)]
 
 module Property_grid_area =
   [%spec_module
-  "property_grid_area", "<grid-line> [ '/' <grid-line> ]{0,3}"]
+  "property_grid_area",
+  "<grid-line> [ '/' <grid-line> ]{0,3}",
+  (module Css_types.GridArea : RUNTIME_TYPE)]
 
 module Property_grid_auto_columns =
   [%spec_module
-  "property_grid_auto_columns", "[ <track-size> ]+"]
+  "property_grid_auto_columns",
+  "[ <track-size> ]+",
+  (module Css_types.GridAutoColumns : RUNTIME_TYPE)]
 
 module Property_grid_auto_flow =
   [%spec_module
   "property_grid_auto_flow",
-  "[ [ 'row' | 'column' ] || 'dense' ] | <interpolation>"]
+  "[ [ 'row' | 'column' ] || 'dense' ] | <interpolation>",
+  (module Css_types.GridAutoFlow : RUNTIME_TYPE)]
 
 module Property_grid_auto_rows =
   [%spec_module
-  "property_grid_auto_rows", "[ <track-size> ]+"]
+  "property_grid_auto_rows",
+  "[ <track-size> ]+",
+  (module Css_types.GridAutoRows : RUNTIME_TYPE)]
 
 module Property_grid_column =
   [%spec_module
-  "property_grid_column", "<grid-line> [ '/' <grid-line> ]?"]
+  "property_grid_column",
+  "<grid-line> [ '/' <grid-line> ]?",
+  (module Css_types.GridColumn : RUNTIME_TYPE)]
 
 module Property_grid_column_end =
   [%spec_module
-  "property_grid_column_end", "<grid-line>"]
+  "property_grid_column_end",
+  "<grid-line>",
+  (module Css_types.GridColumnEnd : RUNTIME_TYPE)]
 
 module Property_grid_column_gap =
   [%spec_module
@@ -2705,7 +3503,9 @@ module Property_grid_column_gap =
 
 module Property_grid_column_start =
   [%spec_module
-  "property_grid_column_start", "<grid-line>"]
+  "property_grid_column_start",
+  "<grid-line>",
+  (module Css_types.GridColumnStart : RUNTIME_TYPE)]
 
 module Property_grid_gap =
   [%spec_module
@@ -2713,11 +3513,15 @@ module Property_grid_gap =
 
 module Property_grid_row =
   [%spec_module
-  "property_grid_row", "<grid-line> [ '/' <grid-line> ]?"]
+  "property_grid_row",
+  "<grid-line> [ '/' <grid-line> ]?",
+  (module Css_types.GridRow : RUNTIME_TYPE)]
 
 module Property_grid_row_end =
   [%spec_module
-  "property_grid_row_end", "<grid-line>"]
+  "property_grid_row_end",
+  "<grid-line>",
+  (module Css_types.GridRowEnd : RUNTIME_TYPE)]
 
 module Property_grid_row_gap =
   [%spec_module
@@ -2725,96 +3529,129 @@ module Property_grid_row_gap =
 
 module Property_grid_row_start =
   [%spec_module
-  "property_grid_row_start", "<grid-line>"]
+  "property_grid_row_start",
+  "<grid-line>",
+  (module Css_types.GridRowStart : RUNTIME_TYPE)]
 
 module Property_grid_template =
   [%spec_module
   "property_grid_template",
   "'none' | <'grid-template-rows'> '/' <'grid-template-columns'> | [ [ \
    <line-names> ]? <string> [ <track-size> ]? [ <line-names> ]? ]+ [ '/' \
-   <explicit-track-list> ]?"]
+   <explicit-track-list> ]?",
+  (module Css_types.GridTemplate : RUNTIME_TYPE)]
 
 module Property_grid_template_areas =
   [%spec_module
-  "property_grid_template_areas", "'none' | [ <string> | <interpolation> ]+"]
+  "property_grid_template_areas",
+  "'none' | [ <string> | <interpolation> ]+",
+  (module Css_types.GridTemplateAreas : RUNTIME_TYPE)]
 
 module Property_grid_template_columns =
   [%spec_module
   "property_grid_template_columns",
   "'none' | <track-list> | <auto-track-list> | 'subgrid' [ <line-name-list> ]? \
-   | 'masonry' | <interpolation>"]
+   | 'masonry' | <interpolation>",
+  (module Css_types.GridTemplateColumns : RUNTIME_TYPE)]
 
 module Property_grid_template_rows =
   [%spec_module
   "property_grid_template_rows",
   "'none' | <track-list> | <auto-track-list> | 'subgrid' [ <line-name-list> ]? \
-   | 'masonry' | <interpolation>"]
+   | 'masonry' | <interpolation>",
+  (module Css_types.GridTemplateRows : RUNTIME_TYPE)]
 
 module Property_hanging_punctuation =
   [%spec_module
   "property_hanging_punctuation",
-  "'none' | 'first' || [ 'force-end' | 'allow-end' ] || 'last'"]
+  "'none' | 'first' || [ 'force-end' | 'allow-end' ] || 'last'",
+  (module Css_types.HangingPunctuation : RUNTIME_TYPE)]
 
 module Property_height =
   [%spec_module
   "property_height",
   "'auto' | <extended-length> | <extended-percentage> | 'min-content' | \
    'max-content' | 'fit-content' | fit-content( <extended-length> | \
-   <extended-percentage> )"]
+   <extended-percentage> )",
+  (module Css_types.Height : RUNTIME_TYPE)]
 
 module Property_hyphens =
   [%spec_module
-  "property_hyphens", "'none' | 'manual' | 'auto'"]
+  "property_hyphens",
+  "'none' | 'manual' | 'auto'",
+  (module Css_types.Hyphens : RUNTIME_TYPE)]
 
 module Property_hyphenate_character =
   [%spec_module
-  "property_hyphenate_character", "'auto' | <string-token>"]
+  "property_hyphenate_character",
+  "'auto' | <string-token>",
+  (module Css_types.HyphenateCharacter : RUNTIME_TYPE)]
 
 module Property_hyphenate_limit_chars =
   [%spec_module
-  "property_hyphenate_limit_chars", "'auto' | <integer>"]
+  "property_hyphenate_limit_chars",
+  "'auto' | <integer>",
+  (module Css_types.HyphenateLimitChars : RUNTIME_TYPE)]
 
 module Property_hyphenate_limit_lines =
   [%spec_module
-  "property_hyphenate_limit_lines", "'no-limit' | <integer>"]
+  "property_hyphenate_limit_lines",
+  "'no-limit' | <integer>",
+  (module Css_types.HyphenateLimitLines : RUNTIME_TYPE)]
 
 module Property_hyphenate_limit_zone =
   [%spec_module
-  "property_hyphenate_limit_zone", "<extended-length> | <extended-percentage>"]
+  "property_hyphenate_limit_zone",
+  "<extended-length> | <extended-percentage>",
+  (module Css_types.HyphenateLimitZone : RUNTIME_TYPE)]
 
 module Property_image_orientation =
   [%spec_module
   "property_image_orientation",
-  "'from-image' | <extended-angle> | [ <extended-angle> ]? 'flip'"]
+  "'from-image' | <extended-angle> | [ <extended-angle> ]? 'flip'",
+  (module Css_types.ImageOrientation : RUNTIME_TYPE)]
 
 module Property_image_rendering =
   [%spec_module
   "property_image_rendering",
-  "'auto' |'smooth' | 'high-quality' | 'crisp-edges' | 'pixelated'"]
+  "'auto' |'smooth' | 'high-quality' | 'crisp-edges' | 'pixelated'",
+  (module Css_types.ImageRendering : RUNTIME_TYPE)]
 
 module Property_image_resolution =
   [%spec_module
-  "property_image_resolution", "[ 'from-image' || <resolution> ] && [ 'snap' ]?"]
+  "property_image_resolution",
+  "[ 'from-image' || <resolution> ] && [ 'snap' ]?",
+  (module Css_types.ImageResolution : RUNTIME_TYPE)]
 
 module Property_ime_mode =
   [%spec_module
-  "property_ime_mode", "'auto' | 'normal' | 'active' | 'inactive' | 'disabled'"]
+  "property_ime_mode",
+  "'auto' | 'normal' | 'active' | 'inactive' | 'disabled'",
+  (module Css_types.ImeMode : RUNTIME_TYPE)]
 
 module Property_initial_letter =
   [%spec_module
-  "property_initial_letter", "'normal' | <number> [ <integer> ]?"]
+  "property_initial_letter",
+  "'normal' | <number> [ <integer> ]?",
+  (module Css_types.InitialLetter : RUNTIME_TYPE)]
 
 module Property_initial_letter_align =
   [%spec_module
   "property_initial_letter_align",
-  "'auto' | 'alphabetic' | 'hanging' | 'ideographic'"]
+  "'auto' | 'alphabetic' | 'hanging' | 'ideographic'",
+  (module Css_types.InitialLetterAlign : RUNTIME_TYPE)]
 
 module Property_inline_size = [%spec_module "property_inline_size", "<'width'>"]
-module Property_inset = [%spec_module "property_inset", "[ <'top'> ]{1,4}"]
+
+module Property_inset =
+  [%spec_module
+  "property_inset", "[ <'top'> ]{1,4}", (module Css_types.Inset : RUNTIME_TYPE)]
 
 module Property_inset_block =
   [%spec_module
-  "property_inset_block", "[ <'top'> ]{1,2}"]
+  "property_inset_block",
+  "[ <'top'> ]{1,2}",
+  (module Css_types.InsetBlock : RUNTIME_TYPE)]
 
 module Property_inset_block_end =
   [%spec_module
@@ -2826,7 +3663,9 @@ module Property_inset_block_start =
 
 module Property_inset_inline =
   [%spec_module
-  "property_inset_inline", "[ <'top'> ]{1,2}"]
+  "property_inset_inline",
+  "[ <'top'> ]{1,2}",
+  (module Css_types.InsetInline : RUNTIME_TYPE)]
 
 module Property_inset_inline_end =
   [%spec_module
@@ -2838,105 +3677,140 @@ module Property_inset_inline_start =
 
 module Property_isolation =
   [%spec_module
-  "property_isolation", "'auto' | 'isolate'"]
+  "property_isolation",
+  "'auto' | 'isolate'",
+  (module Css_types.Isolation : RUNTIME_TYPE)]
 
 module Property_justify_content =
   [%spec_module
   "property_justify_content",
   "'normal' | <content-distribution> | [ <overflow-position> ]? [ \
-   <content-position> | 'left' | 'right' ]"]
+   <content-position> | 'left' | 'right' ]",
+  (module Css_types.JustifyContent : RUNTIME_TYPE)]
 
 module Property_justify_items =
   [%spec_module
   "property_justify_items",
   "'normal' | 'stretch' | <baseline-position> | [ <overflow-position> ]? [ \
    <self-position> | 'left' | 'right' ] | 'legacy' | 'legacy' && [ 'left' | \
-   'right' | 'center' ]"]
+   'right' | 'center' ]",
+  (module Css_types.JustifyItems : RUNTIME_TYPE)]
 
 module Property_justify_self =
   [%spec_module
   "property_justify_self",
   "'auto' | 'normal' | 'stretch' | <baseline-position> | [ <overflow-position> \
-   ]? [ <self-position> | 'left' | 'right' ]"]
+   ]? [ <self-position> | 'left' | 'right' ]",
+  (module Css_types.JustifySelf : RUNTIME_TYPE)]
 
 module Property_kerning =
   [%spec_module
-  "property_kerning", "'auto' | <svg-length>"]
+  "property_kerning",
+  "'auto' | <svg-length>",
+  (module Css_types.Kerning : RUNTIME_TYPE)]
 
 module Property_layout_grid =
   [%spec_module
   "property_layout_grid",
-  "'auto' | <custom-ident> | <integer> && [ <custom-ident> ]?"]
+  "'auto' | <custom-ident> | <integer> && [ <custom-ident> ]?",
+  (module Css_types.LayoutGrid : RUNTIME_TYPE)]
 
 module Property_layout_grid_char =
   [%spec_module
-  "property_layout_grid_char", "'auto' | <custom-ident> | <string>"]
+  "property_layout_grid_char",
+  "'auto' | <custom-ident> | <string>",
+  (module Css_types.LayoutGridChar : RUNTIME_TYPE)]
 
 module Property_layout_grid_line =
   [%spec_module
-  "property_layout_grid_line", "'auto' | <custom-ident> | <string>"]
+  "property_layout_grid_line",
+  "'auto' | <custom-ident> | <string>",
+  (module Css_types.LayoutGridLine : RUNTIME_TYPE)]
 
 module Property_layout_grid_mode =
   [%spec_module
-  "property_layout_grid_mode", "'auto' | <custom-ident> | <string>"]
+  "property_layout_grid_mode",
+  "'auto' | <custom-ident> | <string>",
+  (module Css_types.LayoutGridMode : RUNTIME_TYPE)]
 
 module Property_layout_grid_type =
   [%spec_module
-  "property_layout_grid_type", "'auto' | <custom-ident> | <string>"]
+  "property_layout_grid_type",
+  "'auto' | <custom-ident> | <string>",
+  (module Css_types.LayoutGridType : RUNTIME_TYPE)]
 
 module Property_left =
   [%spec_module
-  "property_left", "<extended-length> | <extended-percentage> | 'auto'"]
+  "property_left",
+  "<extended-length> | <extended-percentage> | 'auto'",
+  (module Css_types.Left : RUNTIME_TYPE)]
 
 module Property_letter_spacing =
   [%spec_module
   "property_letter_spacing",
-  "'normal' | <extended-length> | <extended-percentage>"]
+  "'normal' | <extended-length> | <extended-percentage>",
+  (module Css_types.LetterSpacing : RUNTIME_TYPE)]
 
 module Property_line_break =
   [%spec_module
   "property_line_break",
-  "'auto' | 'loose' | 'normal' | 'strict' | 'anywhere' | <interpolation>"]
+  "'auto' | 'loose' | 'normal' | 'strict' | 'anywhere' | <interpolation>",
+  (module Css_types.LineBreak : RUNTIME_TYPE)]
 
 module Property_line_clamp =
   [%spec_module
-  "property_line_clamp", "'none' | <integer>"]
+  "property_line_clamp",
+  "'none' | <integer>",
+  (module Css_types.LineClamp : RUNTIME_TYPE)]
 
 module Property_line_height =
   [%spec_module
   "property_line_height",
-  "'normal' | <number> | <extended-length> | <extended-percentage>"]
+  "'normal' | <number> | <extended-length> | <extended-percentage>",
+  (module Css_types.LineHeight : RUNTIME_TYPE)]
 
 module Property_line_height_step =
   [%spec_module
-  "property_line_height_step", "<extended-length>"]
+  "property_line_height_step",
+  "<extended-length>",
+  (module Css_types.LineHeightStep : RUNTIME_TYPE)]
 
 module Property_list_style =
   [%spec_module
   "property_list_style",
-  "<'list-style-type'> || <'list-style-position'> || <'list-style-image'>"]
+  "<'list-style-type'> || <'list-style-position'> || <'list-style-image'>",
+  (module Css_types.ListStyle : RUNTIME_TYPE)]
 
 module Property_list_style_image =
   [%spec_module
-  "property_list_style_image", "'none' | <image>"]
+  "property_list_style_image",
+  "'none' | <image>",
+  (module Css_types.ListStyleImage : RUNTIME_TYPE)]
 
 module Property_list_style_position =
   [%spec_module
-  "property_list_style_position", "'inside' | 'outside'"]
+  "property_list_style_position",
+  "'inside' | 'outside'",
+  (module Css_types.ListStylePosition : RUNTIME_TYPE)]
 
 module Property_list_style_type =
   [%spec_module
-  "property_list_style_type", "<counter-style> | <string> | 'none'"]
+  "property_list_style_type",
+  "<counter-style> | <string> | 'none'",
+  (module Css_types.ListStyleType : RUNTIME_TYPE)]
 
 module Property_margin =
   [%spec_module
   "property_margin",
   "[ <extended-length> | <extended-percentage> | 'auto' | <interpolation> \
-   ]{1,4}"]
+   ]{1,4}",
+  (module Css_types.Margin : RUNTIME_TYPE)]
 
 module Property_margin_block =
   [%spec_module
-  "property_margin_block", "[ <'margin-left'> ]{1,2}"]
+  "property_margin_block",
+  "[ <'margin-left'> ]{1,2}",
+  (module Css_types.MarginBlock : RUNTIME_TYPE)]
 
 module Property_margin_block_end =
   [%spec_module
@@ -2952,7 +3826,9 @@ module Property_margin_bottom =
 
 module Property_margin_inline =
   [%spec_module
-  "property_margin_inline", "[ <'margin-left'> ]{1,2}"]
+  "property_margin_inline",
+  "[ <'margin-left'> ]{1,2}",
+  (module Css_types.MarginInline : RUNTIME_TYPE)]
 
 module Property_margin_inline_end =
   [%spec_module
@@ -2976,97 +3852,139 @@ module Property_margin_top =
 
 module Property_margin_trim =
   [%spec_module
-  "property_margin_trim", "'none' | 'in-flow' | 'all'"]
+  "property_margin_trim",
+  "'none' | 'in-flow' | 'all'",
+  (module Css_types.MarginTrim : RUNTIME_TYPE)]
 
-module Property_marker = [%spec_module "property_marker", "'none' | <url>"]
+module Property_marker =
+  [%spec_module
+  "property_marker", "'none' | <url>", (module Css_types.Marker : RUNTIME_TYPE)]
 
 module Property_marker_end =
   [%spec_module
-  "property_marker_end", "'none' | <url>"]
+  "property_marker_end",
+  "'none' | <url>",
+  (module Css_types.MarkerEnd : RUNTIME_TYPE)]
 
 module Property_marker_mid =
   [%spec_module
-  "property_marker_mid", "'none' | <url>"]
+  "property_marker_mid",
+  "'none' | <url>",
+  (module Css_types.MarkerMid : RUNTIME_TYPE)]
 
 module Property_marker_start =
   [%spec_module
-  "property_marker_start", "'none' | <url>"]
+  "property_marker_start",
+  "'none' | <url>",
+  (module Css_types.MarkerStart : RUNTIME_TYPE)]
 
-module Property_mask = [%spec_module "property_mask", "[ <mask-layer> ]#"]
+module Property_mask =
+  [%spec_module
+  "property_mask", "[ <mask-layer> ]#", (module Css_types.Mask : RUNTIME_TYPE)]
 
 module Property_mask_border =
   [%spec_module
   "property_mask_border",
   "<'mask-border-source'> || <'mask-border-slice'> [ '/' [ \
    <'mask-border-width'> ]? [ '/' <'mask-border-outset'> ]? ]? || \
-   <'mask-border-repeat'> || <'mask-border-mode'>"]
+   <'mask-border-repeat'> || <'mask-border-mode'>",
+  (module Css_types.MaskBorder : RUNTIME_TYPE)]
 
 module Property_mask_border_mode =
   [%spec_module
-  "property_mask_border_mode", "'luminance' | 'alpha'"]
+  "property_mask_border_mode",
+  "'luminance' | 'alpha'",
+  (module Css_types.MaskBorderMode : RUNTIME_TYPE)]
 
 module Property_mask_border_outset =
   [%spec_module
-  "property_mask_border_outset", "[ <extended-length> | <number> ]{1,4}"]
+  "property_mask_border_outset",
+  "[ <extended-length> | <number> ]{1,4}",
+  (module Css_types.MaskBorderOutset : RUNTIME_TYPE)]
 
 module Property_mask_border_repeat =
   [%spec_module
   "property_mask_border_repeat",
-  "[ 'stretch' | 'repeat' | 'round' | 'space' ]{1,2}"]
+  "[ 'stretch' | 'repeat' | 'round' | 'space' ]{1,2}",
+  (module Css_types.MaskBorderRepeat : RUNTIME_TYPE)]
 
 module Property_mask_border_slice =
   [%spec_module
-  "property_mask_border_slice", "[ <number-percentage> ]{1,4} [ 'fill' ]?"]
+  "property_mask_border_slice",
+  "[ <number-percentage> ]{1,4} [ 'fill' ]?",
+  (module Css_types.MaskBorderSlice : RUNTIME_TYPE)]
 
 module Property_mask_border_source =
   [%spec_module
-  "property_mask_border_source", "'none' | <image>"]
+  "property_mask_border_source",
+  "'none' | <image>",
+  (module Css_types.MaskBorderSource : RUNTIME_TYPE)]
 
 module Property_mask_border_width =
   [%spec_module
   "property_mask_border_width",
-  "[ <extended-length> | <extended-percentage> | <number> | 'auto' ]{1,4}"]
+  "[ <extended-length> | <extended-percentage> | <number> | 'auto' ]{1,4}",
+  (module Css_types.MaskBorderWidth : RUNTIME_TYPE)]
 
 module Property_mask_clip =
   [%spec_module
-  "property_mask_clip", "[ <geometry-box> | 'no-clip' ]#"]
+  "property_mask_clip",
+  "[ <geometry-box> | 'no-clip' ]#",
+  (module Css_types.MaskClip : RUNTIME_TYPE)]
 
 module Property_mask_composite =
   [%spec_module
-  "property_mask_composite", "[ <compositing-operator> ]#"]
+  "property_mask_composite",
+  "[ <compositing-operator> ]#",
+  (module Css_types.MaskComposite : RUNTIME_TYPE)]
 
 module Property_mask_image =
   [%spec_module
-  "property_mask_image", "[ <mask-reference> ]#"]
+  "property_mask_image",
+  "[ <mask-reference> ]#",
+  (module Css_types.MaskImage : RUNTIME_TYPE)]
 
 module Property_mask_mode =
   [%spec_module
-  "property_mask_mode", "[ <masking-mode> ]#"]
+  "property_mask_mode",
+  "[ <masking-mode> ]#",
+  (module Css_types.MaskMode : RUNTIME_TYPE)]
 
 module Property_mask_origin =
   [%spec_module
-  "property_mask_origin", "[ <geometry-box> ]#"]
+  "property_mask_origin",
+  "[ <geometry-box> ]#",
+  (module Css_types.MaskOrigin : RUNTIME_TYPE)]
 
 module Property_mask_position =
   [%spec_module
-  "property_mask_position", "[ <position> ]#"]
+  "property_mask_position",
+  "[ <position> ]#",
+  (module Css_types.MaskPosition : RUNTIME_TYPE)]
 
 module Property_mask_repeat =
   [%spec_module
-  "property_mask_repeat", "[ <repeat-style> ]#"]
+  "property_mask_repeat",
+  "[ <repeat-style> ]#",
+  (module Css_types.MaskRepeat : RUNTIME_TYPE)]
 
 module Property_mask_size =
   [%spec_module
-  "property_mask_size", "[ <bg-size> ]#"]
+  "property_mask_size",
+  "[ <bg-size> ]#",
+  (module Css_types.MaskSize : RUNTIME_TYPE)]
 
 module Property_mask_type =
   [%spec_module
-  "property_mask_type", "'luminance' | 'alpha'"]
+  "property_mask_type",
+  "'luminance' | 'alpha'",
+  (module Css_types.MaskType : RUNTIME_TYPE)]
 
 module Property_masonry_auto_flow =
   [%spec_module
   "property_masonry_auto_flow",
-  "[ 'pack' | 'next' ] || [ 'definite-first' | 'ordered' ]"]
+  "[ 'pack' | 'next' ] || [ 'definite-first' | 'ordered' ]",
+  (module Css_types.MasonryAutoFlow : RUNTIME_TYPE)]
 
 module Property_max_block_size =
   [%spec_module
@@ -3077,7 +3995,8 @@ module Property_max_height =
   "property_max_height",
   "'auto' | <extended-length> | <extended-percentage> | 'min-content' | \
    'max-content' | 'fit-content' | fit-content( <extended-length> | \
-   <extended-percentage> )"]
+   <extended-percentage> )",
+  (module Css_types.MaxHeight : RUNTIME_TYPE)]
 
 module Property_max_inline_size =
   [%spec_module
@@ -3085,14 +4004,17 @@ module Property_max_inline_size =
 
 module Property_max_lines =
   [%spec_module
-  "property_max_lines", "'none' | <integer>"]
+  "property_max_lines",
+  "'none' | <integer>",
+  (module Css_types.MaxLines : RUNTIME_TYPE)]
 
 module Property_max_width =
   [%spec_module
   "property_max_width",
   "<extended-length> | <extended-percentage> | 'none' | 'max-content' | \
    'min-content' | 'fit-content' | fit-content( <extended-length> | \
-   <extended-percentage> ) | 'fill-available' | <-non-standard-width>"]
+   <extended-percentage> ) | 'fill-available' | <-non-standard-width>",
+  (module Css_types.MaxWidth : RUNTIME_TYPE)]
 
 module Property_min_block_size =
   [%spec_module
@@ -3103,7 +4025,8 @@ module Property_min_height =
   "property_min_height",
   "'auto' | <extended-length> | <extended-percentage> | 'min-content' | \
    'max-content' | 'fit-content' | fit-content( <extended-length> | \
-   <extended-percentage> )"]
+   <extended-percentage> )",
+  (module Css_types.MinHeight : RUNTIME_TYPE)]
 
 module Property_min_inline_size =
   [%spec_module
@@ -3114,161 +4037,237 @@ module Property_min_width =
   "property_min_width",
   "<extended-length> | <extended-percentage> | 'auto' | 'max-content' | \
    'min-content' | 'fit-content' | fit-content( <extended-length> | \
-   <extended-percentage> ) | 'fill-available' | <-non-standard-width>"]
+   <extended-percentage> ) | 'fill-available' | <-non-standard-width>",
+  (module Css_types.MinWidth : RUNTIME_TYPE)]
 
 module Property_mix_blend_mode =
   [%spec_module
-  "property_mix_blend_mode", "<blend-mode>"]
+  "property_mix_blend_mode",
+  "<blend-mode>",
+  (module Css_types.MixBlendMode : RUNTIME_TYPE)]
 
 module Property_media_any_hover =
   [%spec_module
-  "property_media_any_hover", "none | hover"]
+  "property_media_any_hover",
+  "none | hover",
+  (module Css_types.MediaAnyHover : RUNTIME_TYPE)]
 
 module Property_media_any_pointer =
   [%spec_module
-  "property_media_any_pointer", "none | coarse | fine"]
+  "property_media_any_pointer",
+  "none | coarse | fine",
+  (module Css_types.MediaAnyPointer : RUNTIME_TYPE)]
 
 module Property_media_pointer =
   [%spec_module
-  "property_media_pointer", "none | coarse | fine"]
+  "property_media_pointer",
+  "none | coarse | fine",
+  (module Css_types.MediaPointer : RUNTIME_TYPE)]
 
 module Property_media_max_aspect_ratio =
   [%spec_module
-  "property_media_max_aspect_ratio", "<ratio>"]
+  "property_media_max_aspect_ratio",
+  "<ratio>",
+  (module Css_types.MediaMaxAspectRatio : RUNTIME_TYPE)]
 
 module Property_media_min_aspect_ratio =
   [%spec_module
-  "property_media_min_aspect_ratio", "<ratio>"]
+  "property_media_min_aspect_ratio",
+  "<ratio>",
+  (module Css_types.MediaMinAspectRatio : RUNTIME_TYPE)]
 
 module Property_media_min_color =
   [%spec_module
-  "property_media_min_color", "<integer>"]
+  "property_media_min_color",
+  "<integer>",
+  (module Css_types.MediaMinColor : RUNTIME_TYPE)]
 
 module Property_media_color_gamut =
   [%spec_module
-  "property_media_color_gamut", "'srgb' | 'p3' | 'rec2020'"]
+  "property_media_color_gamut",
+  "'srgb' | 'p3' | 'rec2020'",
+  (module Css_types.MediaColorGamut : RUNTIME_TYPE)]
 
 module Property_media_color_index =
   [%spec_module
-  "property_media_color_index", "<integer>"]
+  "property_media_color_index",
+  "<integer>",
+  (module Css_types.MediaColorIndex : RUNTIME_TYPE)]
 
 module Property_media_min_color_index =
   [%spec_module
-  "property_media_min_color_index", "<integer>"]
+  "property_media_min_color_index",
+  "<integer>",
+  (module Css_types.MediaMinColorIndex : RUNTIME_TYPE)]
 
 module Property_media_display_mode =
   [%spec_module
   "property_media_display_mode",
-  "'fullscreen' | 'standalone' | 'minimal-ui' | 'browser'"]
+  "'fullscreen' | 'standalone' | 'minimal-ui' | 'browser'",
+  (module Css_types.MediaDisplayMode : RUNTIME_TYPE)]
 
 module Property_media_forced_colors =
   [%spec_module
-  "property_media_forced_colors", "'none' | 'active'"]
+  "property_media_forced_colors",
+  "'none' | 'active'",
+  (module Css_types.MediaForcedColors : RUNTIME_TYPE)]
 
 module Property_forced_color_adjust =
   [%spec_module
-  "property_forced_color_adjust", "'auto' | 'none' | 'preserve-parent-color'"]
+  "property_forced_color_adjust",
+  "'auto' | 'none' | 'preserve-parent-color'",
+  (module Css_types.ForcedColorAdjust : RUNTIME_TYPE)]
 
-module Property_media_grid = [%spec_module "property_media_grid", "<integer>"]
+module Property_media_grid =
+  [%spec_module
+  "property_media_grid",
+  "<integer>",
+  (module Css_types.MediaGrid : RUNTIME_TYPE)]
 
 module Property_media_hover =
   [%spec_module
-  "property_media_hover", "'hover' | 'none'"]
+  "property_media_hover",
+  "'hover' | 'none'",
+  (module Css_types.MediaHover : RUNTIME_TYPE)]
 
 module Property_media_inverted_colors =
   [%spec_module
-  "property_media_inverted_colors", "'inverted' | 'none'"]
+  "property_media_inverted_colors",
+  "'inverted' | 'none'",
+  (module Css_types.MediaInvertedColors : RUNTIME_TYPE)]
 
 module Property_media_monochrome =
   [%spec_module
-  "property_media_monochrome", "<integer>"]
+  "property_media_monochrome",
+  "<integer>",
+  (module Css_types.MediaMonochrome : RUNTIME_TYPE)]
 
 module Property_media_prefers_color_scheme =
   [%spec_module
-  "property_media_prefers_color_scheme", "'dark' | 'light'"]
+  "property_media_prefers_color_scheme",
+  "'dark' | 'light'",
+  (module Css_types.MediaPrefersColorScheme : RUNTIME_TYPE)]
 
 module Property_color_scheme =
   [%spec_module
   "property_color_scheme",
-  "'normal' | [ 'dark' | 'light' | <custom-ident> ]+ && 'only'?"]
+  "'normal' | [ 'dark' | 'light' | <custom-ident> ]+ && 'only'?",
+  (module Css_types.ColorScheme : RUNTIME_TYPE)]
 
 module Property_media_prefers_contrast =
   [%spec_module
-  "property_media_prefers_contrast", "'no-preference' | 'more' | 'less'"]
+  "property_media_prefers_contrast",
+  "'no-preference' | 'more' | 'less'",
+  (module Css_types.MediaPrefersContrast : RUNTIME_TYPE)]
 
 module Property_media_prefers_reduced_motion =
   [%spec_module
-  "property_media_prefers_reduced_motion", "'no-preference' | 'reduce'"]
+  "property_media_prefers_reduced_motion",
+  "'no-preference' | 'reduce'",
+  (module Css_types.MediaPrefersReducedMotion : RUNTIME_TYPE)]
 
 module Property_media_resolution =
   [%spec_module
-  "property_media_resolution", "<resolution>"]
+  "property_media_resolution",
+  "<resolution>",
+  (module Css_types.MediaResolution : RUNTIME_TYPE)]
 
 module Property_media_min_resolution =
   [%spec_module
-  "property_media_min_resolution", "<resolution>"]
+  "property_media_min_resolution",
+  "<resolution>",
+  (module Css_types.MediaMinResolution : RUNTIME_TYPE)]
 
 module Property_media_max_resolution =
   [%spec_module
-  "property_media_max_resolution", "<resolution>"]
+  "property_media_max_resolution",
+  "<resolution>",
+  (module Css_types.MediaMaxResolution : RUNTIME_TYPE)]
 
 module Property_media_scripting =
   [%spec_module
-  "property_media_scripting", "'none' | 'initial-only' | 'enabled'"]
+  "property_media_scripting",
+  "'none' | 'initial-only' | 'enabled'",
+  (module Css_types.MediaScripting : RUNTIME_TYPE)]
 
 module Property_media_update =
   [%spec_module
-  "property_media_update", "'none' | 'slow' | 'fast'"]
+  "property_media_update",
+  "'none' | 'slow' | 'fast'",
+  (module Css_types.MediaUpdate : RUNTIME_TYPE)]
 
 module Property_media_orientation =
   [%spec_module
-  "property_media_orientation", "'portrait' | 'landscape'"]
+  "property_media_orientation",
+  "'portrait' | 'landscape'",
+  (module Css_types.MediaOrientation : RUNTIME_TYPE)]
 
 module Property_object_fit =
   [%spec_module
-  "property_object_fit", "'fill' | 'contain' | 'cover' | 'none' | 'scale-down'"]
+  "property_object_fit",
+  "'fill' | 'contain' | 'cover' | 'none' | 'scale-down'",
+  (module Css_types.ObjectFit : RUNTIME_TYPE)]
 
 module Property_object_position =
   [%spec_module
-  "property_object_position", "<position>"]
+  "property_object_position",
+  "<position>",
+  (module Css_types.ObjectPosition : RUNTIME_TYPE)]
 
 module Property_offset =
   [%spec_module
   "property_offset",
   "[ [ <'offset-position'> ]? <'offset-path'> [ <'offset-distance'> || \
-   <'offset-rotate'> ]? ]? [ '/' <'offset-anchor'> ]?"]
+   <'offset-rotate'> ]? ]? [ '/' <'offset-anchor'> ]?",
+  (module Css_types.Offset : RUNTIME_TYPE)]
 
 module Property_offset_anchor =
   [%spec_module
-  "property_offset_anchor", "'auto' | <position>"]
+  "property_offset_anchor",
+  "'auto' | <position>",
+  (module Css_types.OffsetAnchor : RUNTIME_TYPE)]
 
 module Property_offset_distance =
   [%spec_module
-  "property_offset_distance", "<extended-length> | <extended-percentage>"]
+  "property_offset_distance",
+  "<extended-length> | <extended-percentage>",
+  (module Css_types.OffsetDistance : RUNTIME_TYPE)]
 
 module Property_offset_path =
   [%spec_module
   "property_offset_path",
   "'none' | ray( <extended-angle> && [ <ray-size> ]? && [ 'contain' ]? ) | \
-   <path()> | <url> | <basic-shape> || <geometry-box>"]
+   <path()> | <url> | <basic-shape> || <geometry-box>",
+  (module Css_types.OffsetPath : RUNTIME_TYPE)]
 
 module Property_offset_position =
   [%spec_module
-  "property_offset_position", "'auto' | <position>"]
+  "property_offset_position",
+  "'auto' | <position>",
+  (module Css_types.OffsetPosition : RUNTIME_TYPE)]
 
 module Property_offset_rotate =
   [%spec_module
-  "property_offset_rotate", "[ 'auto' | 'reverse' ] || <extended-angle>"]
+  "property_offset_rotate",
+  "[ 'auto' | 'reverse' ] || <extended-angle>",
+  (module Css_types.OffsetRotate : RUNTIME_TYPE)]
 
 module Property_opacity = [%spec_module "property_opacity", "<alpha-value>"]
-module Property_order = [%spec_module "property_order", "<integer>"]
-module Property_orphans = [%spec_module "property_orphans", "<integer>"]
+
+module Property_order =
+  [%spec_module
+  "property_order", "<integer>", (module Css_types.Order : RUNTIME_TYPE)]
+
+module Property_orphans =
+  [%spec_module
+  "property_orphans", "<integer>", (module Css_types.Orphans : RUNTIME_TYPE)]
 
 module Property_outline =
   [%spec_module
   "property_outline",
   "'none' | <'outline-width'> | [ <'outline-width'> <'outline-style'> ] | [ \
-   <'outline-width'> <'outline-style'> [ <color> | <interpolation> ]]"]
+   <'outline-width'> <'outline-style'> [ <color> | <interpolation> ]]",
+  (module Css_types.Outline : RUNTIME_TYPE)]
 
 module Property_outline_color =
   [%spec_module
@@ -3280,7 +4279,9 @@ module Property_outline_offset =
 
 module Property_outline_style =
   [%spec_module
-  "property_outline_style", "'auto' | <line-style> | <interpolation>"]
+  "property_outline_style",
+  "'auto' | <line-style> | <interpolation>",
+  (module Css_types.OutlineStyle : RUNTIME_TYPE)]
 
 module Property_outline_width =
   [%spec_module
@@ -3290,29 +4291,38 @@ module Property_overflow =
   [%spec_module
   "property_overflow",
   "[ 'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' ]{1,2} | \
-   <-non-standard-overflow> | <interpolation>"]
+   <-non-standard-overflow> | <interpolation>",
+  (module Css_types.Overflow : RUNTIME_TYPE)]
 
 module Property_overflow_anchor =
   [%spec_module
-  "property_overflow_anchor", "'auto' | 'none'"]
+  "property_overflow_anchor",
+  "'auto' | 'none'",
+  (module Css_types.OverflowAnchor : RUNTIME_TYPE)]
 
 module Property_overflow_block =
   [%spec_module
   "property_overflow_block",
-  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"]
+  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>",
+  (module Css_types.OverflowBlock : RUNTIME_TYPE)]
 
 module Property_overflow_clip_margin =
   [%spec_module
-  "property_overflow_clip_margin", "<visual-box> || <extended-length>"]
+  "property_overflow_clip_margin",
+  "<visual-box> || <extended-length>",
+  (module Css_types.OverflowClipMargin : RUNTIME_TYPE)]
 
 module Property_overflow_inline =
   [%spec_module
   "property_overflow_inline",
-  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"]
+  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>",
+  (module Css_types.OverflowInline : RUNTIME_TYPE)]
 
 module Property_overflow_wrap =
   [%spec_module
-  "property_overflow_wrap", "'normal' | 'break-word' | 'anywhere'"]
+  "property_overflow_wrap",
+  "'normal' | 'break-word' | 'anywhere'",
+  (module Css_types.OverflowWrap : RUNTIME_TYPE)]
 
 module Property_overflow_x =
   [%spec_module
@@ -3326,32 +4336,45 @@ module Property_overflow_y =
 
 module Property_overscroll_behavior =
   [%spec_module
-  "property_overscroll_behavior", "[ 'contain' | 'none' | 'auto' ]{1,2}"]
+  "property_overscroll_behavior",
+  "[ 'contain' | 'none' | 'auto' ]{1,2}",
+  (module Css_types.OverscrollBehavior : RUNTIME_TYPE)]
 
 module Property_overscroll_behavior_block =
   [%spec_module
-  "property_overscroll_behavior_block", "'contain' | 'none' | 'auto'"]
+  "property_overscroll_behavior_block",
+  "'contain' | 'none' | 'auto'",
+  (module Css_types.OverscrollBehaviorBlock : RUNTIME_TYPE)]
 
 module Property_overscroll_behavior_inline =
   [%spec_module
-  "property_overscroll_behavior_inline", "'contain' | 'none' | 'auto'"]
+  "property_overscroll_behavior_inline",
+  "'contain' | 'none' | 'auto'",
+  (module Css_types.OverscrollBehaviorInline : RUNTIME_TYPE)]
 
 module Property_overscroll_behavior_x =
   [%spec_module
-  "property_overscroll_behavior_x", "'contain' | 'none' | 'auto'"]
+  "property_overscroll_behavior_x",
+  "'contain' | 'none' | 'auto'",
+  (module Css_types.OverscrollBehaviorX : RUNTIME_TYPE)]
 
 module Property_overscroll_behavior_y =
   [%spec_module
-  "property_overscroll_behavior_y", "'contain' | 'none' | 'auto'"]
+  "property_overscroll_behavior_y",
+  "'contain' | 'none' | 'auto'",
+  (module Css_types.OverscrollBehaviorY : RUNTIME_TYPE)]
 
 module Property_padding =
   [%spec_module
   "property_padding",
-  "[ <extended-length> | <extended-percentage> | <interpolation> ]{1,4}"]
+  "[ <extended-length> | <extended-percentage> | <interpolation> ]{1,4}",
+  (module Css_types.Padding : RUNTIME_TYPE)]
 
 module Property_padding_block =
   [%spec_module
-  "property_padding_block", "[ <'padding-left'> ]{1,2}"]
+  "property_padding_block",
+  "[ <'padding-left'> ]{1,2}",
+  (module Css_types.PaddingBlock : RUNTIME_TYPE)]
 
 module Property_padding_block_end =
   [%spec_module
@@ -3367,7 +4390,9 @@ module Property_padding_bottom =
 
 module Property_padding_inline =
   [%spec_module
-  "property_padding_inline", "[ <'padding-left'> ]{1,2}"]
+  "property_padding_inline",
+  "[ <'padding-left'> ]{1,2}",
+  (module Css_types.PaddingInline : RUNTIME_TYPE)]
 
 module Property_padding_inline_end =
   [%spec_module
@@ -3392,102 +4417,134 @@ module Property_padding_top =
 module Property_page_break_after =
   [%spec_module
   "property_page_break_after",
-  "'auto' | 'always' | 'avoid' | 'left' | 'right' | 'recto' | 'verso'"]
+  "'auto' | 'always' | 'avoid' | 'left' | 'right' | 'recto' | 'verso'",
+  (module Css_types.PageBreakAfter : RUNTIME_TYPE)]
 
 module Property_page_break_before =
   [%spec_module
   "property_page_break_before",
-  "'auto' | 'always' | 'avoid' | 'left' | 'right' | 'recto' | 'verso'"]
+  "'auto' | 'always' | 'avoid' | 'left' | 'right' | 'recto' | 'verso'",
+  (module Css_types.PageBreakBefore : RUNTIME_TYPE)]
 
 module Property_page_break_inside =
   [%spec_module
-  "property_page_break_inside", "'auto' | 'avoid'"]
+  "property_page_break_inside",
+  "'auto' | 'avoid'",
+  (module Css_types.PageBreakInside : RUNTIME_TYPE)]
 
 module Property_paint_order =
   [%spec_module
-  "property_paint_order", "'normal' | 'fill' || 'stroke' || 'markers'"]
+  "property_paint_order",
+  "'normal' | 'fill' || 'stroke' || 'markers'",
+  (module Css_types.PaintOrder : RUNTIME_TYPE)]
 
 module Property_pause =
   [%spec_module
-  "property_pause", "<'pause-before'> [ <'pause-after'> ]?"]
+  "property_pause",
+  "<'pause-before'> [ <'pause-after'> ]?",
+  (module Css_types.Pause : RUNTIME_TYPE)]
 
 module Property_pause_after =
   [%spec_module
   "property_pause_after",
   "<extended-time> | 'none' | 'x-weak' | 'weak' | 'medium' | 'strong' | \
-   'x-strong'"]
+   'x-strong'",
+  (module Css_types.PauseAfter : RUNTIME_TYPE)]
 
 module Property_pause_before =
   [%spec_module
   "property_pause_before",
   "<extended-time> | 'none' | 'x-weak' | 'weak' | 'medium' | 'strong' | \
-   'x-strong'"]
+   'x-strong'",
+  (module Css_types.PauseBefore : RUNTIME_TYPE)]
 
 module Property_perspective =
   [%spec_module
-  "property_perspective", "'none' | <extended-length>"]
+  "property_perspective",
+  "'none' | <extended-length>",
+  (module Css_types.Perspective : RUNTIME_TYPE)]
 
 module Property_perspective_origin =
   [%spec_module
-  "property_perspective_origin", "<position>"]
+  "property_perspective_origin",
+  "<position>",
+  (module Css_types.PerspectiveOrigin : RUNTIME_TYPE)]
 
 module Property_place_content =
   [%spec_module
-  "property_place_content", "<'align-content'> [ <'justify-content'> ]?"]
+  "property_place_content",
+  "<'align-content'> [ <'justify-content'> ]?",
+  (module Css_types.PlaceContent : RUNTIME_TYPE)]
 
 module Property_place_items =
   [%spec_module
-  "property_place_items", "<'align-items'> [ <'justify-items'> ]?"]
+  "property_place_items",
+  "<'align-items'> [ <'justify-items'> ]?",
+  (module Css_types.PlaceItems : RUNTIME_TYPE)]
 
 module Property_place_self =
   [%spec_module
-  "property_place_self", "<'align-self'> [ <'justify-self'> ]?"]
+  "property_place_self",
+  "<'align-self'> [ <'justify-self'> ]?",
+  (module Css_types.PlaceSelf : RUNTIME_TYPE)]
 
 module Property_pointer_events =
   [%spec_module
   "property_pointer_events",
   "'auto' | 'none' | 'visiblePainted' | 'visibleFill' | 'visibleStroke' | \
-   'visible' | 'painted' | 'fill' | 'stroke' | 'all' | 'inherit'"]
+   'visible' | 'painted' | 'fill' | 'stroke' | 'all' | 'inherit'",
+  (module Css_types.PointerEvents : RUNTIME_TYPE)]
 
 module Property_position =
   [%spec_module
   "property_position",
-  "'static' | 'relative' | 'absolute' | 'sticky' | 'fixed' | '-webkit-sticky'"]
+  "'static' | 'relative' | 'absolute' | 'sticky' | 'fixed' | '-webkit-sticky'",
+  (module Css_types.Position : RUNTIME_TYPE)]
 
 module Property_quotes =
   [%spec_module
-  "property_quotes", "'none' | 'auto' | [ <string> <string> ]+"]
+  "property_quotes",
+  "'none' | 'auto' | [ <string> <string> ]+",
+  (module Css_types.Quotes : RUNTIME_TYPE)]
 
 module Property_resize =
   [%spec_module
   "property_resize",
-  "'none' | 'both' | 'horizontal' | 'vertical' | 'block' | 'inline'"]
+  "'none' | 'both' | 'horizontal' | 'vertical' | 'block' | 'inline'",
+  (module Css_types.Resize : RUNTIME_TYPE)]
 
 module Property_rest =
   [%spec_module
-  "property_rest", "<'rest-before'> [ <'rest-after'> ]?"]
+  "property_rest",
+  "<'rest-before'> [ <'rest-after'> ]?",
+  (module Css_types.Rest : RUNTIME_TYPE)]
 
 module Property_rest_after =
   [%spec_module
   "property_rest_after",
   "<extended-time> | 'none' | 'x-weak' | 'weak' | 'medium' | 'strong' | \
-   'x-strong'"]
+   'x-strong'",
+  (module Css_types.RestAfter : RUNTIME_TYPE)]
 
 module Property_rest_before =
   [%spec_module
   "property_rest_before",
   "<extended-time> | 'none' | 'x-weak' | 'weak' | 'medium' | 'strong' | \
-   'x-strong'"]
+   'x-strong'",
+  (module Css_types.RestBefore : RUNTIME_TYPE)]
 
 module Property_right =
   [%spec_module
-  "property_right", "<extended-length> | <extended-percentage> | 'auto'"]
+  "property_right",
+  "<extended-length> | <extended-percentage> | 'auto'",
+  (module Css_types.Right : RUNTIME_TYPE)]
 
 module Property_rotate =
   [%spec_module
   "property_rotate",
   "'none' | <extended-angle> | [ 'x' | 'y' | 'z' | [ <number> ]{3} ] && \
-   <extended-angle>"]
+   <extended-angle>",
+  (module Css_types.Rotate : RUNTIME_TYPE)]
 
 module Property_row_gap =
   [%spec_module
@@ -3495,27 +4552,39 @@ module Property_row_gap =
 
 module Property_ruby_align =
   [%spec_module
-  "property_ruby_align", "'start' | 'center' | 'space-between' | 'space-around'"]
+  "property_ruby_align",
+  "'start' | 'center' | 'space-between' | 'space-around'",
+  (module Css_types.RubyAlign : RUNTIME_TYPE)]
 
 module Property_ruby_merge =
   [%spec_module
-  "property_ruby_merge", "'separate' | 'collapse' | 'auto'"]
+  "property_ruby_merge",
+  "'separate' | 'collapse' | 'auto'",
+  (module Css_types.RubyMerge : RUNTIME_TYPE)]
 
 module Property_ruby_position =
   [%spec_module
-  "property_ruby_position", "'over' | 'under' | 'inter-character'"]
+  "property_ruby_position",
+  "'over' | 'under' | 'inter-character'",
+  (module Css_types.RubyPosition : RUNTIME_TYPE)]
 
 module Property_scale =
   [%spec_module
-  "property_scale", "'none' | [ <number-percentage> ]{1,3}"]
+  "property_scale",
+  "'none' | [ <number-percentage> ]{1,3}",
+  (module Css_types.Scale : RUNTIME_TYPE)]
 
 module Property_scroll_behavior =
   [%spec_module
-  "property_scroll_behavior", "'auto' | 'smooth'"]
+  "property_scroll_behavior",
+  "'auto' | 'smooth'",
+  (module Css_types.ScrollBehavior : RUNTIME_TYPE)]
 
 module Property_scroll_margin =
   [%spec_module
-  "property_scroll_margin", "[ <extended-length> ]{1,4}"]
+  "property_scroll_margin",
+  "[ <extended-length> ]{1,4}",
+  (module Css_types.ScrollMargin : RUNTIME_TYPE)]
 
 module Property_scroll_margin_block =
   [%spec_module
@@ -3560,7 +4629,8 @@ module Property_scroll_margin_top =
 module Property_scroll_padding =
   [%spec_module
   "property_scroll_padding",
-  "[ 'auto' | <extended-length> | <extended-percentage> ]{1,4}"]
+  "[ 'auto' | <extended-length> | <extended-percentage> ]{1,4}",
+  (module Css_types.ScrollPadding : RUNTIME_TYPE)]
 
 module Property_scroll_padding_block =
   [%spec_module
@@ -3614,35 +4684,46 @@ module Property_scroll_padding_top =
 
 module Property_scroll_snap_align =
   [%spec_module
-  "property_scroll_snap_align", "[ 'none' | 'start' | 'end' | 'center' ]{1,2}"]
+  "property_scroll_snap_align",
+  "[ 'none' | 'start' | 'end' | 'center' ]{1,2}",
+  (module Css_types.ScrollSnapAlign : RUNTIME_TYPE)]
 
 module Property_scroll_snap_coordinate =
   [%spec_module
-  "property_scroll_snap_coordinate", "'none' | [ <position> ]#"]
+  "property_scroll_snap_coordinate",
+  "'none' | [ <position> ]#",
+  (module Css_types.ScrollSnapCoordinate : RUNTIME_TYPE)]
 
 module Property_scroll_snap_destination =
   [%spec_module
-  "property_scroll_snap_destination", "<position>"]
+  "property_scroll_snap_destination",
+  "<position>",
+  (module Css_types.ScrollSnapDestination : RUNTIME_TYPE)]
 
 module Property_scroll_snap_points_x =
   [%spec_module
   "property_scroll_snap_points_x",
-  "'none' | repeat( <extended-length> | <extended-percentage> )"]
+  "'none' | repeat( <extended-length> | <extended-percentage> )",
+  (module Css_types.ScrollSnapPointsX : RUNTIME_TYPE)]
 
 module Property_scroll_snap_points_y =
   [%spec_module
   "property_scroll_snap_points_y",
-  "'none' | repeat( <extended-length> | <extended-percentage> )"]
+  "'none' | repeat( <extended-length> | <extended-percentage> )",
+  (module Css_types.ScrollSnapPointsY : RUNTIME_TYPE)]
 
 module Property_scroll_snap_stop =
   [%spec_module
-  "property_scroll_snap_stop", "'normal' | 'always'"]
+  "property_scroll_snap_stop",
+  "'normal' | 'always'",
+  (module Css_types.ScrollSnapStop : RUNTIME_TYPE)]
 
 module Property_scroll_snap_type =
   [%spec_module
   "property_scroll_snap_type",
   "'none' | [ 'x' | 'y' | 'block' | 'inline' | 'both' ] [ 'mandatory' | \
-   'proximity' ]?"]
+   'proximity' ]?",
+  (module Css_types.ScrollSnapType : RUNTIME_TYPE)]
 
 module Property_scroll_snap_type_x =
   [%spec_module
@@ -3654,81 +4735,116 @@ module Property_scroll_snap_type_y =
 
 module Property_scrollbar_color =
   [%spec_module
-  "property_scrollbar_color", "'auto' | [ <color> <color> ]"]
+  "property_scrollbar_color",
+  "'auto' | [ <color> <color> ]",
+  (module Css_types.ScrollbarColor : RUNTIME_TYPE)]
 
 module Property_scrollbar_width =
   [%spec_module
-  "property_scrollbar_width", "'auto' | 'thin' | 'none'"]
+  "property_scrollbar_width",
+  "'auto' | 'thin' | 'none'",
+  (module Css_types.ScrollbarWidth : RUNTIME_TYPE)]
 
 module Property_scrollbar_gutter =
   [%spec_module
-  "property_scrollbar_gutter", "'auto' | 'stable' && 'both-edges'?"]
+  "property_scrollbar_gutter",
+  "'auto' | 'stable' && 'both-edges'?",
+  (module Css_types.ScrollbarGutter : RUNTIME_TYPE)]
 
 module Property_scrollbar_3dlight_color =
   [%spec_module
-  "property_scrollbar_3dlight_color", "<color>"]
+  "property_scrollbar_3dlight_color",
+  "<color>",
+  (module Css_types.Scrollbar3dlightColor : RUNTIME_TYPE)]
 
 module Property_scrollbar_arrow_color =
   [%spec_module
-  "property_scrollbar_arrow_color", "<color>"]
+  "property_scrollbar_arrow_color",
+  "<color>",
+  (module Css_types.ScrollbarArrowColor : RUNTIME_TYPE)]
 
 module Property_scrollbar_base_color =
   [%spec_module
-  "property_scrollbar_base_color", "<color>"]
+  "property_scrollbar_base_color",
+  "<color>",
+  (module Css_types.ScrollbarBaseColor : RUNTIME_TYPE)]
 
 module Property_scrollbar_darkshadow_color =
   [%spec_module
-  "property_scrollbar_darkshadow_color", "<color>"]
+  "property_scrollbar_darkshadow_color",
+  "<color>",
+  (module Css_types.ScrollbarDarkshadowColor : RUNTIME_TYPE)]
 
 module Property_scrollbar_face_color =
   [%spec_module
-  "property_scrollbar_face_color", "<color>"]
+  "property_scrollbar_face_color",
+  "<color>",
+  (module Css_types.ScrollbarFaceColor : RUNTIME_TYPE)]
 
 module Property_scrollbar_highlight_color =
   [%spec_module
-  "property_scrollbar_highlight_color", "<color>"]
+  "property_scrollbar_highlight_color",
+  "<color>",
+  (module Css_types.ScrollbarHighlightColor : RUNTIME_TYPE)]
 
 module Property_scrollbar_shadow_color =
   [%spec_module
-  "property_scrollbar_shadow_color", "<color>"]
+  "property_scrollbar_shadow_color",
+  "<color>",
+  (module Css_types.ScrollbarShadowColor : RUNTIME_TYPE)]
 
 module Property_scrollbar_track_color =
   [%spec_module
-  "property_scrollbar_track_color", "<color>"]
+  "property_scrollbar_track_color",
+  "<color>",
+  (module Css_types.ScrollbarTrackColor : RUNTIME_TYPE)]
 
 module Property_shape_image_threshold =
   [%spec_module
-  "property_shape_image_threshold", "<alpha-value>"]
+  "property_shape_image_threshold",
+  "<alpha-value>",
+  (module Css_types.ShapeImageThreshold : RUNTIME_TYPE)]
 
 module Property_shape_margin =
   [%spec_module
-  "property_shape_margin", "<extended-length> | <extended-percentage>"]
+  "property_shape_margin",
+  "<extended-length> | <extended-percentage>",
+  (module Css_types.ShapeMargin : RUNTIME_TYPE)]
 
 module Property_shape_outside =
   [%spec_module
-  "property_shape_outside", "'none' | <shape-box> || <basic-shape> | <image>"]
+  "property_shape_outside",
+  "'none' | <shape-box> || <basic-shape> | <image>",
+  (module Css_types.ShapeOutside : RUNTIME_TYPE)]
 
 module Property_shape_rendering =
   [%spec_module
   "property_shape_rendering",
-  "'auto' | 'optimizeSpeed' | 'crispEdges' | 'geometricPrecision'"]
+  "'auto' | 'optimizeSpeed' | 'crispEdges' | 'geometricPrecision'",
+  (module Css_types.ShapeRendering : RUNTIME_TYPE)]
 
 module Property_speak =
   [%spec_module
-  "property_speak", "'auto' | 'none' | 'normal'"]
+  "property_speak",
+  "'auto' | 'none' | 'normal'",
+  (module Css_types.Speak : RUNTIME_TYPE)]
 
 module Property_speak_as =
   [%spec_module
   "property_speak_as",
   "'normal' | 'spell-out' || 'digits' || [ 'literal-punctuation' | \
-   'no-punctuation' ]"]
+   'no-punctuation' ]",
+  (module Css_types.SpeakAs : RUNTIME_TYPE)]
 
 module Property_src =
   [%spec_module
   "property_src",
-  "[ <url> [ format( [ <string> ]# ) ]? | local( <family-name> ) ]#"]
+  "[ <url> [ format( [ <string> ]# ) ]? | local( <family-name> ) ]#",
+  (module Css_types.Src : RUNTIME_TYPE)]
 
-module Property_stroke = [%spec_module "property_stroke", "<paint>"]
+module Property_stroke =
+  [%spec_module
+  "property_stroke", "<paint>", (module Css_types.Stroke : RUNTIME_TYPE)]
 
 module Property_stroke_dasharray =
   [%spec_module
@@ -3736,88 +4852,121 @@ module Property_stroke_dasharray =
 
 module Property_stroke_dashoffset =
   [%spec_module
-  "property_stroke_dashoffset", "<svg-length>"]
+  "property_stroke_dashoffset",
+  "<svg-length>",
+  (module Css_types.StrokeDashoffset : RUNTIME_TYPE)]
 
 module Property_stroke_linecap =
   [%spec_module
-  "property_stroke_linecap", "'butt' | 'round' | 'square'"]
+  "property_stroke_linecap",
+  "'butt' | 'round' | 'square'",
+  (module Css_types.StrokeLinecap : RUNTIME_TYPE)]
 
 module Property_stroke_linejoin =
   [%spec_module
-  "property_stroke_linejoin", "'miter' | 'round' | 'bevel'"]
+  "property_stroke_linejoin",
+  "'miter' | 'round' | 'bevel'",
+  (module Css_types.StrokeLinejoin : RUNTIME_TYPE)]
 
 module Property_stroke_miterlimit =
   [%spec_module
-  "property_stroke_miterlimit", "<number-one-or-greater>"]
+  "property_stroke_miterlimit",
+  "<number-one-or-greater>",
+  (module Css_types.StrokeMiterlimit : RUNTIME_TYPE)]
 
 module Property_stroke_opacity =
   [%spec_module
-  "property_stroke_opacity", "<alpha-value>"]
+  "property_stroke_opacity",
+  "<alpha-value>",
+  (module Css_types.StrokeOpacity : RUNTIME_TYPE)]
 
 module Property_stroke_width =
   [%spec_module
-  "property_stroke_width", "<svg-length>"]
+  "property_stroke_width",
+  "<svg-length>",
+  (module Css_types.StrokeWidth : RUNTIME_TYPE)]
 
 module Property_tab_size =
   [%spec_module
-  "property_tab_size", " <number> | <extended-length>"]
+  "property_tab_size",
+  " <number> | <extended-length>",
+  (module Css_types.TabSize : RUNTIME_TYPE)]
 
 module Property_table_layout =
   [%spec_module
-  "property_table_layout", "'auto' | 'fixed'"]
+  "property_table_layout",
+  "'auto' | 'fixed'",
+  (module Css_types.TableLayout : RUNTIME_TYPE)]
 
 module Property_text_autospace =
   [%spec_module
   "property_text_autospace",
   "'none' | 'ideograph-alpha' | 'ideograph-numeric' | 'ideograph-parenthesis' \
-   | 'ideograph-space'"]
+   | 'ideograph-space'",
+  (module Css_types.TextAutospace : RUNTIME_TYPE)]
 
 module Property_text_blink =
   [%spec_module
-  "property_text_blink", "'none' | 'blink' | 'blink-anywhere'"]
+  "property_text_blink",
+  "'none' | 'blink' | 'blink-anywhere'",
+  (module Css_types.TextBlink : RUNTIME_TYPE)]
 
 module Property_text_align =
   [%spec_module
   "property_text_align",
   "'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | 'match-parent' \
-   | 'justify-all'"]
+   | 'justify-all'",
+  (module Css_types.TextAlign : RUNTIME_TYPE)]
 
 module Property_text_align_all =
   [%spec_module
   "property_text_align_all",
-  "'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | 'match-parent'"]
+  "'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | 'match-parent'",
+  (module Css_types.TextAlignAll : RUNTIME_TYPE)]
 
 module Property_text_align_last =
   [%spec_module
   "property_text_align_last",
   "'auto' | 'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | \
-   'match-parent'"]
+   'match-parent'",
+  (module Css_types.TextAlignLast : RUNTIME_TYPE)]
 
 module Property_text_anchor =
   [%spec_module
-  "property_text_anchor", "'start' | 'middle' | 'end'"]
+  "property_text_anchor",
+  "'start' | 'middle' | 'end'",
+  (module Css_types.TextAnchor : RUNTIME_TYPE)]
 
 module Property_text_combine_upright =
   [%spec_module
-  "property_text_combine_upright", "'none' | 'all' | 'digits' [ <integer> ]?"]
+  "property_text_combine_upright",
+  "'none' | 'all' | 'digits' [ <integer> ]?",
+  (module Css_types.TextCombineUpright : RUNTIME_TYPE)]
 
 module Property_text_decoration =
   [%spec_module
   "property_text_decoration",
   "<'text-decoration-color'> || <'text-decoration-style'> || \
-   <'text-decoration-thickness'> || <'text-decoration-line'>"]
+   <'text-decoration-thickness'> || <'text-decoration-line'>",
+  (module Css_types.TextDecoration : RUNTIME_TYPE)]
 
 module Property_text_justify_trim =
   [%spec_module
-  "property_text_justify_trim", "'none' | 'all' | 'auto'"]
+  "property_text_justify_trim",
+  "'none' | 'all' | 'auto'",
+  (module Css_types.TextJustifyTrim : RUNTIME_TYPE)]
 
 module Property_text_kashida =
   [%spec_module
-  "property_text_kashida", "'none' | 'horizontal' | 'vertical' | 'both'"]
+  "property_text_kashida",
+  "'none' | 'horizontal' | 'vertical' | 'both'",
+  (module Css_types.TextKashida : RUNTIME_TYPE)]
 
 module Property_text_kashida_space =
   [%spec_module
-  "property_text_kashida_space", "'normal' | 'pre' | 'post'"]
+  "property_text_kashida_space",
+  "'normal' | 'pre' | 'post'",
+  (module Css_types.TextKashidaSpace : RUNTIME_TYPE)]
 
 module Property_text_decoration_color =
   [%spec_module
@@ -3830,51 +4979,65 @@ module Property_text_decoration_line =
   [%spec_module
   "property_text_decoration_line",
   "'none' | <interpolation> | [ 'underline' || 'overline' || 'line-through' || \
-   'blink' ]"]
+   'blink' ]",
+  (module Css_types.TextDecorationLine : RUNTIME_TYPE)]
 
 module Property_text_decoration_skip =
   [%spec_module
   "property_text_decoration_skip",
   "'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' ] \
-   || 'edges' || 'box-decoration'"]
+   || 'edges' || 'box-decoration'",
+  (module Css_types.TextDecorationSkip : RUNTIME_TYPE)]
 
 module Property_text_decoration_skip_self =
   [%spec_module
   "property_text_decoration_skip_self",
   "'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' ] \
-   || 'edges' || 'box-decoration'"]
+   || 'edges' || 'box-decoration'",
+  (module Css_types.TextDecorationSkipSelf : RUNTIME_TYPE)]
 
 module Property_text_decoration_skip_ink =
   [%spec_module
-  "property_text_decoration_skip_ink", "'auto' | 'all' | 'none'"]
+  "property_text_decoration_skip_ink",
+  "'auto' | 'all' | 'none'",
+  (module Css_types.TextDecorationSkipInk : RUNTIME_TYPE)]
 
 module Property_text_decoration_skip_box =
   [%spec_module
-  "property_text_decoration_skip_box", "'none' | 'all'"]
+  "property_text_decoration_skip_box",
+  "'none' | 'all'",
+  (module Css_types.TextDecorationSkipBox : RUNTIME_TYPE)]
 
 module Property_text_decoration_skip_spaces =
   [%spec_module
   "property_text_decoration_skip_spaces",
   "'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' ] \
-   || 'edges' || 'box-decoration'"]
+   || 'edges' || 'box-decoration'",
+  (module Css_types.TextDecorationSkipSpaces : RUNTIME_TYPE)]
 
 module Property_text_decoration_skip_inset =
   [%spec_module
-  "property_text_decoration_skip_inset", "'none' | 'auto'"]
+  "property_text_decoration_skip_inset",
+  "'none' | 'auto'",
+  (module Css_types.TextDecorationSkipInset : RUNTIME_TYPE)]
 
 module Property_text_decoration_style =
   [%spec_module
   "property_text_decoration_style",
-  "'solid' | 'double' | 'dotted' | 'dashed' | 'wavy'"]
+  "'solid' | 'double' | 'dotted' | 'dashed' | 'wavy'",
+  (module Css_types.TextDecorationStyle : RUNTIME_TYPE)]
 
 module Property_text_decoration_thickness =
   [%spec_module
   "property_text_decoration_thickness",
-  "'auto' | 'from-font' | <extended-length> | <extended-percentage>"]
+  "'auto' | 'from-font' | <extended-length> | <extended-percentage>",
+  (module Css_types.TextDecorationThickness : RUNTIME_TYPE)]
 
 module Property_text_emphasis =
   [%spec_module
-  "property_text_emphasis", "<'text-emphasis-style'> || <'text-emphasis-color'>"]
+  "property_text_emphasis",
+  "<'text-emphasis-style'> || <'text-emphasis-color'>",
+  (module Css_types.TextEmphasis : RUNTIME_TYPE)]
 
 module Property_text_emphasis_color =
   [%spec_module
@@ -3883,36 +5046,46 @@ module Property_text_emphasis_color =
 module Property_text_emphasis_position =
   [%spec_module
   "property_text_emphasis_position",
-  "[ 'over' | 'under' ] && [ 'right' | 'left' ]?"]
+  "[ 'over' | 'under' ] && [ 'right' | 'left' ]?",
+  (module Css_types.TextEmphasisPosition : RUNTIME_TYPE)]
 
 module Property_text_emphasis_style =
   [%spec_module
   "property_text_emphasis_style",
   "'none' | [ 'filled' | 'open' ] || [ 'dot' | 'circle' | 'double-circle' | \
-   'triangle' | 'sesame' ] | <string>"]
+   'triangle' | 'sesame' ] | <string>",
+  (module Css_types.TextEmphasisStyle : RUNTIME_TYPE)]
 
 module Property_text_indent =
   [%spec_module
   "property_text_indent",
   "[<extended-length> | <extended-percentage>] && [ 'hanging' ]? && [ \
-   'each-line' ]?"]
+   'each-line' ]?",
+  (module Css_types.TextIndent : RUNTIME_TYPE)]
 
 module Property_text_justify =
   [%spec_module
-  "property_text_justify", "'auto' | 'inter-character' | 'inter-word' | 'none'"]
+  "property_text_justify",
+  "'auto' | 'inter-character' | 'inter-word' | 'none'",
+  (module Css_types.TextJustify : RUNTIME_TYPE)]
 
 module Property_text_orientation =
   [%spec_module
-  "property_text_orientation", "'mixed' | 'upright' | 'sideways'"]
+  "property_text_orientation",
+  "'mixed' | 'upright' | 'sideways'",
+  (module Css_types.TextOrientation : RUNTIME_TYPE)]
 
 module Property_text_overflow =
   [%spec_module
-  "property_text_overflow", "[ 'clip' | 'ellipsis' | <string> ]{1,2}"]
+  "property_text_overflow",
+  "[ 'clip' | 'ellipsis' | <string> ]{1,2}",
+  (module Css_types.TextOverflow : RUNTIME_TYPE)]
 
 module Property_text_rendering =
   [%spec_module
   "property_text_rendering",
-  "'auto' | 'optimizeSpeed' | 'optimizeLegibility' | 'geometricPrecision'"]
+  "'auto' | 'optimizeSpeed' | 'optimizeLegibility' | 'geometricPrecision'",
+  (module Css_types.TextRendering : RUNTIME_TYPE)]
 
 module Property_text_shadow =
   [%spec_module
@@ -3920,42 +5093,53 @@ module Property_text_shadow =
 
 module Property_text_size_adjust =
   [%spec_module
-  "property_text_size_adjust", "'none' | 'auto' | <extended-percentage>"]
+  "property_text_size_adjust",
+  "'none' | 'auto' | <extended-percentage>",
+  (module Css_types.TextSizeAdjust : RUNTIME_TYPE)]
 
 module Property_text_transform =
   [%spec_module
   "property_text_transform",
   "'none' | 'capitalize' | 'uppercase' | 'lowercase' | 'full-width' | \
-   'full-size-kana'"]
+   'full-size-kana'",
+  (module Css_types.TextTransform : RUNTIME_TYPE)]
 
 module Property_text_underline_offset =
   [%spec_module
   "property_text_underline_offset",
-  "'auto' | <extended-length> | <extended-percentage>"]
+  "'auto' | <extended-length> | <extended-percentage>",
+  (module Css_types.TextUnderlineOffset : RUNTIME_TYPE)]
 
 module Property_text_underline_position =
   [%spec_module
   "property_text_underline_position",
-  "'auto' | 'from-font' | 'under' || [ 'left' | 'right' ]"]
+  "'auto' | 'from-font' | 'under' || [ 'left' | 'right' ]",
+  (module Css_types.TextUnderlinePosition : RUNTIME_TYPE)]
 
 module Property_top =
   [%spec_module
-  "property_top", "<extended-length> | <extended-percentage> | 'auto'"]
+  "property_top",
+  "<extended-length> | <extended-percentage> | 'auto'",
+  (module Css_types.Top : RUNTIME_TYPE)]
 
 module Property_touch_action =
   [%spec_module
   "property_touch_action",
   "'auto' | 'none' | [ 'pan-x' | 'pan-left' | 'pan-right' ] || [ 'pan-y' | \
-   'pan-up' | 'pan-down' ] || 'pinch-zoom' | 'manipulation'"]
+   'pan-up' | 'pan-down' ] || 'pinch-zoom' | 'manipulation'",
+  (module Css_types.TouchAction : RUNTIME_TYPE)]
 
 module Property_transform =
   [%spec_module
-  "property_transform", "'none' | <transform-list>"]
+  "property_transform",
+  "'none' | <transform-list>",
+  (module Css_types.Transform : RUNTIME_TYPE)]
 
 module Property_transform_box =
   [%spec_module
   "property_transform_box",
-  "'content-box' | 'border-box' | 'fill-box' | 'stroke-box' | 'view-box'"]
+  "'content-box' | 'border-box' | 'fill-box' | 'stroke-box' | 'view-box'",
+  (module Css_types.TransformBox : RUNTIME_TYPE)]
 
 module Property_transform_origin =
   [%spec_module
@@ -3963,28 +5147,38 @@ module Property_transform_origin =
   "[ 'left' | 'center' | 'right' | 'top' | 'bottom' | <length-percentage> ] | \
    [ 'left' | 'center' | 'right' | <length-percentage> ] [ 'top' | 'center' | \
    'bottom' | <length-percentage> ] <length>? | [[ 'center' | 'left' | 'right' \
-   ] && [ 'center' | 'top' | 'bottom' ]] <length>? "]
+   ] && [ 'center' | 'top' | 'bottom' ]] <length>? ",
+  (module Css_types.TransformOrigin : RUNTIME_TYPE)]
 
 module Property_transform_style =
   [%spec_module
-  "property_transform_style", "'flat' | 'preserve-3d'"]
+  "property_transform_style",
+  "'flat' | 'preserve-3d'",
+  (module Css_types.TransformStyle : RUNTIME_TYPE)]
 
 module Property_transition =
   [%spec_module
   "property_transition",
-  "[ <single-transition> | <single-transition-no-interp> ]#"]
+  "[ <single-transition> | <single-transition-no-interp> ]#",
+  (module Css_types.Transition : RUNTIME_TYPE)]
 
 module Property_transition_behavior =
   [%spec_module
-  "property_transition_behavior", "<transition-behavior-value>#"]
+  "property_transition_behavior",
+  "<transition-behavior-value>#",
+  (module Css_types.TransitionBehavior : RUNTIME_TYPE)]
 
 module Property_transition_delay =
   [%spec_module
-  "property_transition_delay", "[ <extended-time> ]#"]
+  "property_transition_delay",
+  "[ <extended-time> ]#",
+  (module Css_types.TransitionDelay : RUNTIME_TYPE)]
 
 module Property_transition_duration =
   [%spec_module
-  "property_transition_duration", "[ <extended-time> ]#"]
+  "property_transition_duration",
+  "[ <extended-time> ]#",
+  (module Css_types.TransitionDuration : RUNTIME_TYPE)]
 
 module Property_transition_property =
   [%spec_module
@@ -3992,403 +5186,546 @@ module Property_transition_property =
 
 module Property_transition_timing_function =
   [%spec_module
-  "property_transition_timing_function", "[ <timing-function> ]#"]
+  "property_transition_timing_function",
+  "[ <timing-function> ]#",
+  (module Css_types.TransitionTimingFunction : RUNTIME_TYPE)]
 
 module Property_translate =
   [%spec_module
   "property_translate",
-  "'none' | <length-percentage> [ <length-percentage> <length>? ]?"]
+  "'none' | <length-percentage> [ <length-percentage> <length>? ]?",
+  (module Css_types.Translate : RUNTIME_TYPE)]
 
 module Property_unicode_bidi =
   [%spec_module
   "property_unicode_bidi",
   "'normal' | 'embed' | 'isolate' | 'bidi-override' | 'isolate-override' | \
    'plaintext' | '-moz-isolate' | '-moz-isolate-override' | '-moz-plaintext' | \
-   '-webkit-isolate'"]
+   '-webkit-isolate'",
+  (module Css_types.UnicodeBidi : RUNTIME_TYPE)]
 
 module Property_unicode_range =
   [%spec_module
-  "property_unicode_range", "[ <urange> ]#"]
+  "property_unicode_range",
+  "[ <urange> ]#",
+  (module Css_types.UnicodeRange : RUNTIME_TYPE)]
 
 module Property_user_select =
   [%spec_module
   "property_user_select",
-  "'auto' | 'text' | 'none' | 'contain' | 'all' | <interpolation>"]
+  "'auto' | 'text' | 'none' | 'contain' | 'all' | <interpolation>",
+  (module Css_types.UserSelect : RUNTIME_TYPE)]
 
 module Property_vertical_align =
   [%spec_module
   "property_vertical_align",
   "'baseline' | 'sub' | 'super' | 'text-top' | 'text-bottom' | 'middle' | \
-   'top' | 'bottom' | <extended-percentage> | <extended-length>"]
+   'top' | 'bottom' | <extended-percentage> | <extended-length>",
+  (module Css_types.VerticalAlign : RUNTIME_TYPE)]
 
 module Property_visibility =
   [%spec_module
-  "property_visibility", "'visible' | 'hidden' | 'collapse' | <interpolation>"]
+  "property_visibility",
+  "'visible' | 'hidden' | 'collapse' | <interpolation>",
+  (module Css_types.Visibility : RUNTIME_TYPE)]
 
 module Property_voice_balance =
   [%spec_module
   "property_voice_balance",
-  "<number> | 'left' | 'center' | 'right' | 'leftwards' | 'rightwards'"]
+  "<number> | 'left' | 'center' | 'right' | 'leftwards' | 'rightwards'",
+  (module Css_types.VoiceBalance : RUNTIME_TYPE)]
 
 module Property_voice_duration =
   [%spec_module
-  "property_voice_duration", "'auto' | <extended-time>"]
+  "property_voice_duration",
+  "'auto' | <extended-time>",
+  (module Css_types.VoiceDuration : RUNTIME_TYPE)]
 
 module Property_voice_family =
   [%spec_module
   "property_voice_family",
   "[ [ <family-name> | <generic-voice> ] ',' ]* [ <family-name> | \
-   <generic-voice> ] | 'preserve'"]
+   <generic-voice> ] | 'preserve'",
+  (module Css_types.VoiceFamily : RUNTIME_TYPE)]
 
 module Property_voice_pitch =
   [%spec_module
   "property_voice_pitch",
   "<extended-frequency> && 'absolute' | [ 'x-low' | 'low' | 'medium' | 'high' \
    | 'x-high' ] || [ <extended-frequency> | <semitones> | \
-   <extended-percentage> ]"]
+   <extended-percentage> ]",
+  (module Css_types.VoicePitch : RUNTIME_TYPE)]
 
 module Property_voice_range =
   [%spec_module
   "property_voice_range",
   "<extended-frequency> && 'absolute' | [ 'x-low' | 'low' | 'medium' | 'high' \
    | 'x-high' ] || [ <extended-frequency> | <semitones> | \
-   <extended-percentage> ]"]
+   <extended-percentage> ]",
+  (module Css_types.VoiceRange : RUNTIME_TYPE)]
 
 module Property_voice_rate =
   [%spec_module
   "property_voice_rate",
   "[ 'normal' | 'x-slow' | 'slow' | 'medium' | 'fast' | 'x-fast' ] || \
-   <extended-percentage>"]
+   <extended-percentage>",
+  (module Css_types.VoiceRate : RUNTIME_TYPE)]
 
 module Property_voice_stress =
   [%spec_module
   "property_voice_stress",
-  "'normal' | 'strong' | 'moderate' | 'none' | 'reduced'"]
+  "'normal' | 'strong' | 'moderate' | 'none' | 'reduced'",
+  (module Css_types.VoiceStress : RUNTIME_TYPE)]
 
 module Property_voice_volume =
   [%spec_module
   "property_voice_volume",
-  "'silent' | [ 'x-soft' | 'soft' | 'medium' | 'loud' | 'x-loud' ] || <decibel>"]
+  "'silent' | [ 'x-soft' | 'soft' | 'medium' | 'loud' | 'x-loud' ] || <decibel>",
+  (module Css_types.VoiceVolume : RUNTIME_TYPE)]
 
 module Property_white_space =
   [%spec_module
   "property_white_space",
-  "'normal' | 'pre' | 'nowrap' | 'pre-wrap' | 'pre-line' | 'break-spaces'"]
+  "'normal' | 'pre' | 'nowrap' | 'pre-wrap' | 'pre-line' | 'break-spaces'",
+  (module Css_types.WhiteSpace : RUNTIME_TYPE)]
 
-module Property_widows = [%spec_module "property_widows", "<integer>"]
+module Property_widows =
+  [%spec_module
+  "property_widows", "<integer>", (module Css_types.Widows : RUNTIME_TYPE)]
 
 module Property_width =
   [%spec_module
   "property_width",
   "'auto' | <extended-length> | <extended-percentage> | 'min-content' | \
    'max-content' | 'fit-content' | fit-content( <extended-length> | \
-   <extended-percentage> )"]
+   <extended-percentage> )",
+  (module Css_types.Width : RUNTIME_TYPE)]
 
 module Property_will_change =
   [%spec_module
-  "property_will_change", "'auto' | [ <animateable-feature> ]#"]
+  "property_will_change",
+  "'auto' | [ <animateable-feature> ]#",
+  (module Css_types.WillChange : RUNTIME_TYPE)]
 
 module Property_word_break =
   [%spec_module
-  "property_word_break", "'normal' | 'break-all' | 'keep-all' | 'break-word'"]
+  "property_word_break",
+  "'normal' | 'break-all' | 'keep-all' | 'break-word'",
+  (module Css_types.WordBreak : RUNTIME_TYPE)]
 
 module Property_word_spacing =
   [%spec_module
   "property_word_spacing",
-  "'normal' | <extended-length> | <extended-percentage>"]
+  "'normal' | <extended-length> | <extended-percentage>",
+  (module Css_types.WordSpacing : RUNTIME_TYPE)]
 
 module Property_word_wrap =
   [%spec_module
-  "property_word_wrap", "'normal' | 'break-word' | 'anywhere'"]
+  "property_word_wrap",
+  "'normal' | 'break-word' | 'anywhere'",
+  (module Css_types.WordWrap : RUNTIME_TYPE)]
 
 module Property_writing_mode =
   [%spec_module
   "property_writing_mode",
   "'horizontal-tb' | 'vertical-rl' | 'vertical-lr' | 'sideways-rl' | \
-   'sideways-lr' | <svg-writing-mode>"]
+   'sideways-lr' | <svg-writing-mode>",
+  (module Css_types.WritingMode : RUNTIME_TYPE)]
 
 module Property_z_index =
   [%spec_module
-  "property_z_index", "'auto' | <integer> | <interpolation>"]
+  "property_z_index",
+  "'auto' | <integer> | <interpolation>",
+  (module Css_types.ZIndex : RUNTIME_TYPE)]
 
 module Property_zoom =
   [%spec_module
-  "property_zoom", "'normal' | 'reset' | <number> | <extended-percentage>"]
+  "property_zoom",
+  "'normal' | 'reset' | <number> | <extended-percentage>",
+  (module Css_types.Zoom : RUNTIME_TYPE)]
 
 module Property_container =
   [%spec_module
-  "property_container", "<'container-name'> [ '/' <'container-type'> ]?"]
+  "property_container",
+  "<'container-name'> [ '/' <'container-type'> ]?",
+  (module Css_types.Container : RUNTIME_TYPE)]
 
 module Property_container_name =
   [%spec_module
-  "property_container_name", "<custom-ident>+ | 'none'"]
+  "property_container_name",
+  "<custom-ident>+ | 'none'",
+  (module Css_types.ContainerName : RUNTIME_TYPE)]
 
 module Property_container_type =
   [%spec_module
-  "property_container_type", "'normal' | 'size' | 'inline-size'"]
+  "property_container_type",
+  "'normal' | 'size' | 'inline-size'",
+  (module Css_types.ContainerType : RUNTIME_TYPE)]
 
 module Property_nav_down =
   [%spec_module
-  "property_nav_down", "'auto' | <integer> | <interpolation>"]
+  "property_nav_down",
+  "'auto' | <integer> | <interpolation>",
+  (module Css_types.NavDown : RUNTIME_TYPE)]
 
 module Property_nav_left =
   [%spec_module
-  "property_nav_left", "'auto' | <integer> | <interpolation>"]
+  "property_nav_left",
+  "'auto' | <integer> | <interpolation>",
+  (module Css_types.NavLeft : RUNTIME_TYPE)]
 
 module Property_nav_right =
   [%spec_module
-  "property_nav_right", "'auto' | <integer> | <interpolation>"]
+  "property_nav_right",
+  "'auto' | <integer> | <interpolation>",
+  (module Css_types.NavRight : RUNTIME_TYPE)]
 
 module Property_nav_up =
   [%spec_module
-  "property_nav_up", "'auto' | <integer> | <interpolation>"]
+  "property_nav_up",
+  "'auto' | <integer> | <interpolation>",
+  (module Css_types.NavUp : RUNTIME_TYPE)]
 
 module Property_accent_color =
   [%spec_module
-  "property_accent_color", "'auto' | <color>"]
+  "property_accent_color",
+  "'auto' | <color>",
+  (module Css_types.AccentColor : RUNTIME_TYPE)]
 
 module Property_animation_composition =
   [%spec_module
-  "property_animation_composition", "[ 'replace' | 'add' | 'accumulate' ]#"]
+  "property_animation_composition",
+  "[ 'replace' | 'add' | 'accumulate' ]#",
+  (module Css_types.AnimationComposition : RUNTIME_TYPE)]
 
 module Property_animation_range =
   [%spec_module
   "property_animation_range",
-  "[ 'normal' | <extended-length> | <extended-percentage> ]{1,2}"]
+  "[ 'normal' | <extended-length> | <extended-percentage> ]{1,2}",
+  (module Css_types.AnimationRange : RUNTIME_TYPE)]
 
 module Property_animation_range_end =
   [%spec_module
   "property_animation_range_end",
-  "'normal' | <extended-length> | <extended-percentage>"]
+  "'normal' | <extended-length> | <extended-percentage>",
+  (module Css_types.AnimationRangeEnd : RUNTIME_TYPE)]
 
 module Property_animation_range_start =
   [%spec_module
   "property_animation_range_start",
-  "'normal' | <extended-length> | <extended-percentage>"]
+  "'normal' | <extended-length> | <extended-percentage>",
+  (module Css_types.AnimationRangeStart : RUNTIME_TYPE)]
 
 module Property_animation_timeline =
   [%spec_module
-  "property_animation_timeline", "[ 'none' | <custom-ident> ]#"]
+  "property_animation_timeline",
+  "[ 'none' | <custom-ident> ]#",
+  (module Css_types.AnimationTimeline : RUNTIME_TYPE)]
 
 module Property_field_sizing =
   [%spec_module
-  "property_field_sizing", "'content' | 'fixed'"]
+  "property_field_sizing",
+  "'content' | 'fixed'",
+  (module Css_types.FieldSizing : RUNTIME_TYPE)]
 
 module Property_interpolate_size =
   [%spec_module
-  "property_interpolate_size", "'numeric-only' | 'allow-keywords'"]
+  "property_interpolate_size",
+  "'numeric-only' | 'allow-keywords'",
+  (module Css_types.InterpolateSize : RUNTIME_TYPE)]
 
-module Property_media_type = [%spec_module "property_media_type", "<ident>"]
-module Property_overlay = [%spec_module "property_overlay", "'none' | 'auto'"]
+module Property_media_type =
+  [%spec_module
+  "property_media_type", "<ident>", (module Css_types.MediaType : RUNTIME_TYPE)]
+
+module Property_overlay =
+  [%spec_module
+  "property_overlay",
+  "'none' | 'auto'",
+  (module Css_types.Overlay : RUNTIME_TYPE)]
 
 module Property_scroll_timeline =
   [%spec_module
   "property_scroll_timeline",
-  "[ 'none' | <custom-ident> ]# [ 'block' | 'inline' | 'x' | 'y' ]#"]
+  "[ 'none' | <custom-ident> ]# [ 'block' | 'inline' | 'x' | 'y' ]#",
+  (module Css_types.ScrollTimeline : RUNTIME_TYPE)]
 
 module Property_scroll_timeline_axis =
   [%spec_module
-  "property_scroll_timeline_axis", "[ 'block' | 'inline' | 'x' | 'y' ]#"]
+  "property_scroll_timeline_axis",
+  "[ 'block' | 'inline' | 'x' | 'y' ]#",
+  (module Css_types.ScrollTimelineAxis : RUNTIME_TYPE)]
 
 module Property_scroll_timeline_name =
   [%spec_module
-  "property_scroll_timeline_name", "[ 'none' | <custom-ident> ]#"]
+  "property_scroll_timeline_name",
+  "[ 'none' | <custom-ident> ]#",
+  (module Css_types.ScrollTimelineName : RUNTIME_TYPE)]
 
 module Property_text_wrap =
   [%spec_module
-  "property_text_wrap", "'wrap' | 'nowrap' | 'balance' | 'stable' | 'pretty'"]
+  "property_text_wrap",
+  "'wrap' | 'nowrap' | 'balance' | 'stable' | 'pretty'",
+  (module Css_types.TextWrap : RUNTIME_TYPE)]
 
 module Property_view_timeline =
   [%spec_module
   "property_view_timeline",
-  "[ 'none' | <custom-ident> ]# [ 'block' | 'inline' | 'x' | 'y' ]#"]
+  "[ 'none' | <custom-ident> ]# [ 'block' | 'inline' | 'x' | 'y' ]#",
+  (module Css_types.ViewTimeline : RUNTIME_TYPE)]
 
 module Property_view_timeline_axis =
   [%spec_module
-  "property_view_timeline_axis", "[ 'block' | 'inline' | 'x' | 'y' ]#"]
+  "property_view_timeline_axis",
+  "[ 'block' | 'inline' | 'x' | 'y' ]#",
+  (module Css_types.ViewTimelineAxis : RUNTIME_TYPE)]
 
 module Property_view_timeline_inset =
   [%spec_module
   "property_view_timeline_inset",
-  "[ 'auto' | <extended-length> | <extended-percentage> ]{1,2}"]
+  "[ 'auto' | <extended-length> | <extended-percentage> ]{1,2}",
+  (module Css_types.ViewTimelineInset : RUNTIME_TYPE)]
 
 module Property_view_timeline_name =
   [%spec_module
-  "property_view_timeline_name", "[ 'none' | <custom-ident> ]#"]
+  "property_view_timeline_name",
+  "[ 'none' | <custom-ident> ]#",
+  (module Css_types.ViewTimelineName : RUNTIME_TYPE)]
 
 module Property_view_transition_name =
   [%spec_module
-  "property_view_transition_name", "'none' | <custom-ident>"]
+  "property_view_transition_name",
+  "'none' | <custom-ident>",
+  (module Css_types.ViewTransitionName : RUNTIME_TYPE)]
 
 module Property_anchor_name =
   [%spec_module
-  "property_anchor_name", "'none' | [ <dashed-ident> ]#"]
+  "property_anchor_name",
+  "'none' | [ <dashed-ident> ]#",
+  (module Css_types.AnchorName : RUNTIME_TYPE)]
 
 module Property_anchor_scope =
   [%spec_module
-  "property_anchor_scope", "'none' | 'all' | [ <dashed-ident> ]#"]
+  "property_anchor_scope",
+  "'none' | 'all' | [ <dashed-ident> ]#",
+  (module Css_types.AnchorScope : RUNTIME_TYPE)]
 
 module Property_position_anchor =
   [%spec_module
-  "property_position_anchor", "'auto' | <dashed-ident>"]
+  "property_position_anchor",
+  "'auto' | <dashed-ident>",
+  (module Css_types.PositionAnchor : RUNTIME_TYPE)]
 
 module Property_position_area =
   [%spec_module
   "property_position_area",
   "'none' | [ 'top' | 'bottom' | 'left' | 'right' | 'center' | 'self-start' | \
-   'self-end' | 'start' | 'end' ]"]
+   'self-end' | 'start' | 'end' ]",
+  (module Css_types.PositionArea : RUNTIME_TYPE)]
 
 module Property_position_try =
   [%spec_module
-  "property_position_try", "'none' | [ <dashed-ident> | <try-tactic> ]#"]
+  "property_position_try",
+  "'none' | [ <dashed-ident> | <try-tactic> ]#",
+  (module Css_types.PositionTry : RUNTIME_TYPE)]
 
 module Property_position_try_fallbacks =
   [%spec_module
   "property_position_try_fallbacks",
-  "'none' | [ <dashed-ident> | <try-tactic> ]#"]
+  "'none' | [ <dashed-ident> | <try-tactic> ]#",
+  (module Css_types.PositionTryFallbacks : RUNTIME_TYPE)]
 
 module Property_position_try_options =
   [%spec_module
   "property_position_try_options",
-  "'none' | [ 'flip-block' || 'flip-inline' || 'flip-start' ]"]
+  "'none' | [ 'flip-block' || 'flip-inline' || 'flip-start' ]",
+  (module Css_types.PositionTryOptions : RUNTIME_TYPE)]
 
 module Property_position_visibility =
   [%spec_module
   "property_position_visibility",
-  "'always' | 'anchors-valid' | 'anchors-visible' | 'no-overflow'"]
+  "'always' | 'anchors-valid' | 'anchors-visible' | 'no-overflow'",
+  (module Css_types.PositionVisibility : RUNTIME_TYPE)]
 
 module Property_inset_area =
   [%spec_module
   "property_inset_area",
   "'none' | [ 'top' | 'bottom' | 'left' | 'right' | 'center' | 'self-start' | \
-   'self-end' | 'start' | 'end' ]{1,2}"]
+   'self-end' | 'start' | 'end' ]{1,2}",
+  (module Css_types.InsetArea : RUNTIME_TYPE)]
 
 module Property_scroll_start =
   [%spec_module
   "property_scroll_start",
   "'auto' | 'start' | 'end' | 'center' | 'top' | 'bottom' | 'left' | 'right' | \
-   <extended-length> | <extended-percentage>"]
+   <extended-length> | <extended-percentage>",
+  (module Css_types.ScrollStart : RUNTIME_TYPE)]
 
 module Property_scroll_start_block =
   [%spec_module
   "property_scroll_start_block",
   "'auto' | 'start' | 'end' | 'center' | <extended-length> | \
-   <extended-percentage>"]
+   <extended-percentage>",
+  (module Css_types.ScrollStartBlock : RUNTIME_TYPE)]
 
 module Property_scroll_start_inline =
   [%spec_module
   "property_scroll_start_inline",
   "'auto' | 'start' | 'end' | 'center' | <extended-length> | \
-   <extended-percentage>"]
+   <extended-percentage>",
+  (module Css_types.ScrollStartInline : RUNTIME_TYPE)]
 
 module Property_scroll_start_x =
   [%spec_module
   "property_scroll_start_x",
   "'auto' | 'start' | 'end' | 'center' | <extended-length> | \
-   <extended-percentage>"]
+   <extended-percentage>",
+  (module Css_types.ScrollStartX : RUNTIME_TYPE)]
 
 module Property_scroll_start_y =
   [%spec_module
   "property_scroll_start_y",
   "'auto' | 'start' | 'end' | 'center' | <extended-length> | \
-   <extended-percentage>"]
+   <extended-percentage>",
+  (module Css_types.ScrollStartY : RUNTIME_TYPE)]
 
 module Property_scroll_start_target =
   [%spec_module
-  "property_scroll_start_target", "'none' | 'auto'"]
+  "property_scroll_start_target",
+  "'none' | 'auto'",
+  (module Css_types.ScrollStartTarget : RUNTIME_TYPE)]
 
 module Property_scroll_start_target_block =
   [%spec_module
-  "property_scroll_start_target_block", "'none' | 'auto'"]
+  "property_scroll_start_target_block",
+  "'none' | 'auto'",
+  (module Css_types.ScrollStartTargetBlock : RUNTIME_TYPE)]
 
 module Property_scroll_start_target_inline =
   [%spec_module
-  "property_scroll_start_target_inline", "'none' | 'auto'"]
+  "property_scroll_start_target_inline",
+  "'none' | 'auto'",
+  (module Css_types.ScrollStartTargetInline : RUNTIME_TYPE)]
 
 module Property_scroll_start_target_x =
   [%spec_module
-  "property_scroll_start_target_x", "'none' | 'auto'"]
+  "property_scroll_start_target_x",
+  "'none' | 'auto'",
+  (module Css_types.ScrollStartTargetX : RUNTIME_TYPE)]
 
 module Property_scroll_start_target_y =
   [%spec_module
-  "property_scroll_start_target_y", "'none' | 'auto'"]
+  "property_scroll_start_target_y",
+  "'none' | 'auto'",
+  (module Css_types.ScrollStartTargetY : RUNTIME_TYPE)]
 
 module Property_text_spacing_trim =
   [%spec_module
   "property_text_spacing_trim",
-  "'normal' | 'space-all' | 'space-first' | 'trim-start'"]
+  "'normal' | 'space-all' | 'space-first' | 'trim-start'",
+  (module Css_types.TextSpacingTrim : RUNTIME_TYPE)]
 
 module Property_word_space_transform =
   [%spec_module
   "property_word_space_transform",
-  "'none' | 'auto' | 'ideograph-alpha' | 'ideograph-numeric'"]
+  "'none' | 'auto' | 'ideograph-alpha' | 'ideograph-numeric'",
+  (module Css_types.WordSpaceTransform : RUNTIME_TYPE)]
 
 module Property_reading_flow =
   [%spec_module
   "property_reading_flow",
   "'normal' | 'flex-visual' | 'flex-flow' | 'grid-rows' | 'grid-columns' | \
-   'grid-order'"]
+   'grid-order'",
+  (module Css_types.ReadingFlow : RUNTIME_TYPE)]
 
 module Property_math_depth =
   [%spec_module
-  "property_math_depth", "'auto-add' | 'add(' <integer> ')' | <integer>"]
+  "property_math_depth",
+  "'auto-add' | 'add(' <integer> ')' | <integer>",
+  (module Css_types.MathDepth : RUNTIME_TYPE)]
 
 module Property_math_shift =
   [%spec_module
-  "property_math_shift", "'normal' | 'compact'"]
+  "property_math_shift",
+  "'normal' | 'compact'",
+  (module Css_types.MathShift : RUNTIME_TYPE)]
 
 module Property_math_style =
   [%spec_module
-  "property_math_style", "'normal' | 'compact'"]
+  "property_math_style",
+  "'normal' | 'compact'",
+  (module Css_types.MathStyle : RUNTIME_TYPE)]
 
 module Property_text_wrap_mode =
   [%spec_module
-  "property_text_wrap_mode", "'wrap' | 'nowrap'"]
+  "property_text_wrap_mode",
+  "'wrap' | 'nowrap'",
+  (module Css_types.TextWrapMode : RUNTIME_TYPE)]
 
 module Property_text_wrap_style =
   [%spec_module
-  "property_text_wrap_style", "'auto' | 'balance' | 'stable' | 'pretty'"]
+  "property_text_wrap_style",
+  "'auto' | 'balance' | 'stable' | 'pretty'",
+  (module Css_types.TextWrapStyle : RUNTIME_TYPE)]
 
 module Property_white_space_collapse =
   [%spec_module
   "property_white_space_collapse",
   "'collapse' | 'preserve' | 'preserve-breaks' | 'preserve-spaces' | \
-   'break-spaces'"]
+   'break-spaces'",
+  (module Css_types.WhiteSpaceCollapse : RUNTIME_TYPE)]
 
 module Property_text_box_trim =
   [%spec_module
-  "property_text_box_trim", "'none' | 'trim-start' | 'trim-end' | 'trim-both'"]
+  "property_text_box_trim",
+  "'none' | 'trim-start' | 'trim-end' | 'trim-both'",
+  (module Css_types.TextBoxTrim : RUNTIME_TYPE)]
 
 module Property_text_box_edge =
   [%spec_module
-  "property_text_box_edge", "'leading' | 'text' | 'cap' | 'ex' | 'alphabetic'"]
+  "property_text_box_edge",
+  "'leading' | 'text' | 'cap' | 'ex' | 'alphabetic'",
+  (module Css_types.TextBoxEdge : RUNTIME_TYPE)]
 
 (* Print module paged media properties *)
-module Property_page = [%spec_module "property_page", "'auto' | <custom-ident>"]
+module Property_page =
+  [%spec_module
+  "property_page",
+  "'auto' | <custom-ident>",
+  (module Css_types.Page : RUNTIME_TYPE)]
 
 module Property_size =
   [%spec_module
   "property_size",
   "<extended-length>{1,2} | 'auto' | [ 'A5' | 'A4' | 'A3' | 'B5' | 'B4' | \
    'JIS-B5' | 'JIS-B4' | 'letter' | 'legal' | 'ledger' ] [ 'portrait' | \
-   'landscape' ]?"]
+   'landscape' ]?",
+  (module Css_types.Size : RUNTIME_TYPE)]
 
 module Property_marks =
   [%spec_module
-  "property_marks", "'none' | 'crop' || 'cross'"]
+  "property_marks",
+  "'none' | 'crop' || 'cross'",
+  (module Css_types.Marks : RUNTIME_TYPE)]
 
 module Property_bleed =
   [%spec_module
-  "property_bleed", "'auto' | <extended-length>"]
+  "property_bleed",
+  "'auto' | <extended-length>",
+  (module Css_types.Bleed : RUNTIME_TYPE)]
 
 (* More modern layout module effect properties *)
 module Property_backdrop_blur =
   [%spec_module
-  "property_backdrop_blur", "<extended-length>"]
+  "property_backdrop_blur",
+  "<extended-length>",
+  (module Css_types.BackdropBlur : RUNTIME_TYPE)]
 
 module Property_scrollbar_color_legacy =
   [%spec_module
-  "property_scrollbar_color_legacy", "<color>"]
+  "property_scrollbar_color_legacy",
+  "<color>",
+  (module Css_types.ScrollbarColorLegacy : RUNTIME_TYPE)]
 
 (* SVG paint server properties *)
 module Property_stop_color = [%spec_module "property_stop_color", "<color>"]
@@ -4409,11 +5746,15 @@ module Property_lighting_color =
 
 module Property_color_rendering =
   [%spec_module
-  "property_color_rendering", "'auto' | 'optimizeSpeed' | 'optimizeQuality'"]
+  "property_color_rendering",
+  "'auto' | 'optimizeSpeed' | 'optimizeQuality'",
+  (module Css_types.ColorRendering : RUNTIME_TYPE)]
 
 module Property_vector_effect =
   [%spec_module
-  "property_vector_effect", "'none' | 'non-scaling-stroke'"]
+  "property_vector_effect",
+  "'none' | 'non-scaling-stroke'",
+  (module Css_types.VectorEffect : RUNTIME_TYPE)]
 
 (* SVG geometry properties *)
 module Property_cx =
@@ -4440,135 +5781,188 @@ module Property_ry =
 
 module Property_x =
   [%spec_module
-  "property_x", "<extended-length> | <extended-percentage>"]
+  "property_x",
+  "<extended-length> | <extended-percentage>",
+  (module Css_types.X : RUNTIME_TYPE)]
 
 module Property_y =
   [%spec_module
-  "property_y", "<extended-length> | <extended-percentage>"]
+  "property_y",
+  "<extended-length> | <extended-percentage>",
+  (module Css_types.Y : RUNTIME_TYPE)]
 
 (* Contain intrinsic sizing *)
 module Property_contain_intrinsic_size =
   [%spec_module
   "property_contain_intrinsic_size",
-  "'none' | [ 'auto' ]? <extended-length>{1,2}"]
+  "'none' | [ 'auto' ]? <extended-length>{1,2}",
+  (module Css_types.ContainIntrinsicSize : RUNTIME_TYPE)]
 
 module Property_contain_intrinsic_width =
   [%spec_module
   "property_contain_intrinsic_width",
-  "'none' | 'auto' <extended-length> | <extended-length>"]
+  "'none' | 'auto' <extended-length> | <extended-length>",
+  (module Css_types.ContainIntrinsicWidth : RUNTIME_TYPE)]
 
 module Property_contain_intrinsic_height =
   [%spec_module
   "property_contain_intrinsic_height",
-  "'none' | 'auto' <extended-length> | <extended-length>"]
+  "'none' | 'auto' <extended-length> | <extended-length>",
+  (module Css_types.ContainIntrinsicHeight : RUNTIME_TYPE)]
 
 module Property_contain_intrinsic_block_size =
   [%spec_module
   "property_contain_intrinsic_block_size",
-  "'none' | 'auto' <extended-length> | <extended-length>"]
+  "'none' | 'auto' <extended-length> | <extended-length>",
+  (module Css_types.ContainIntrinsicBlockSize : RUNTIME_TYPE)]
 
 module Property_contain_intrinsic_inline_size =
   [%spec_module
   "property_contain_intrinsic_inline_size",
-  "'none' | 'auto' <extended-length> | <extended-length>"]
+  "'none' | 'auto' <extended-length> | <extended-length>",
+  (module Css_types.ContainIntrinsicInlineSize : RUNTIME_TYPE)]
 
 (* Print *)
 module Property_print_color_adjust =
   [%spec_module
-  "property_print_color_adjust", "'economy' | 'exact'"]
+  "property_print_color_adjust",
+  "'economy' | 'exact'",
+  (module Css_types.PrintColorAdjust : RUNTIME_TYPE)]
 
 (* Ruby *)
 module Property_ruby_overhang =
   [%spec_module
-  "property_ruby_overhang", "'auto' | 'none'"]
+  "property_ruby_overhang",
+  "'auto' | 'none'",
+  (module Css_types.RubyOverhang : RUNTIME_TYPE)]
 
 (* Timeline scope *)
 module Property_timeline_scope =
   [%spec_module
-  "property_timeline_scope", "[ 'none' | <custom-ident> | <dashed-ident> ]#"]
+  "property_timeline_scope",
+  "[ 'none' | <custom-ident> | <dashed-ident> ]#",
+  (module Css_types.TimelineScope : RUNTIME_TYPE)]
 
 (* Scroll driven animations *)
 module Property_animation_delay_end =
   [%spec_module
-  "property_animation_delay_end", "[ <extended-time> ]#"]
+  "property_animation_delay_end",
+  "[ <extended-time> ]#",
+  (module Css_types.AnimationDelayEnd : RUNTIME_TYPE)]
 
 module Property_animation_delay_start =
   [%spec_module
-  "property_animation_delay_start", "[ <extended-time> ]#"]
+  "property_animation_delay_start",
+  "[ <extended-time> ]#",
+  (module Css_types.AnimationDelayStart : RUNTIME_TYPE)]
 
 (* Custom properties for at-rules *)
-module Property_syntax = [%spec_module "property_syntax", "<string>"]
+module Property_syntax =
+  [%spec_module
+  "property_syntax", "<string>", (module Css_types.Syntax : RUNTIME_TYPE)]
 
 module Property_inherits =
   [%spec_module
-  "property_inherits", "'true' | 'false'"]
+  "property_inherits",
+  "'true' | 'false'",
+  (module Css_types.Inherits : RUNTIME_TYPE)]
 
 module Property_initial_value =
   [%spec_module
-  "property_initial_value", "<string>"]
+  "property_initial_value",
+  "<string>",
+  (module Css_types.InitialValue : RUNTIME_TYPE)]
 
 (* Additional modern properties *)
 module Property_scroll_marker_group =
   [%spec_module
-  "property_scroll_marker_group", "'none' | 'before' | 'after'"]
+  "property_scroll_marker_group",
+  "'none' | 'before' | 'after'",
+  (module Css_types.ScrollMarkerGroup : RUNTIME_TYPE)]
 
 module Property_container_name_computed =
   [%spec_module
-  "property_container_name_computed", "'none' | [ <custom-ident> ]#"]
+  "property_container_name_computed",
+  "'none' | [ <custom-ident> ]#",
+  (module Css_types.ContainerNameComputed : RUNTIME_TYPE)]
 
 module Property_text_edge =
   [%spec_module
-  "property_text_edge", "[ 'leading' | <'text-box-edge'> ]{1,2}"]
+  "property_text_edge",
+  "[ 'leading' | <'text-box-edge'> ]{1,2}",
+  (module Css_types.TextEdge : RUNTIME_TYPE)]
 
 module Property_hyphenate_limit_last =
   [%spec_module
   "property_hyphenate_limit_last",
-  "'none' | 'always' | 'column' | 'page' | 'spread'"]
+  "'none' | 'always' | 'column' | 'page' | 'spread'",
+  (module Css_types.HyphenateLimitLast : RUNTIME_TYPE)]
 
 module Pseudo_class_selector =
   [%spec_module
   "pseudo_class_selector",
-  "':' <ident-token> | ':' <function-token> <any-value> ')'"]
+  "':' <ident-token> | ':' <function-token> <any-value> ')'",
+  (module Css_types.PseudoClassSelector : RUNTIME_TYPE)]
 
 module Pseudo_element_selector =
   [%spec_module
-  "pseudo_element_selector", "':' <pseudo-class-selector>"]
+  "pseudo_element_selector",
+  "':' <pseudo-class-selector>",
+  (module Css_types.PseudoElementSelector : RUNTIME_TYPE)]
 
 module Pseudo_page =
   [%spec_module
-  "pseudo_page", "':' [ 'left' | 'right' | 'first' | 'blank' ]"]
+  "pseudo_page",
+  "':' [ 'left' | 'right' | 'first' | 'blank' ]",
+  (module Css_types.PseudoPage : RUNTIME_TYPE)]
 
 module Quote =
   [%spec_module
-  "quote", "'open-quote' | 'close-quote' | 'no-open-quote' | 'no-close-quote'"]
+  "quote",
+  "'open-quote' | 'close-quote' | 'no-open-quote' | 'no-close-quote'",
+  (module Css_types.Quote : RUNTIME_TYPE)]
 
 module Ratio =
   [%spec_module
-  "ratio", "<integer> '/' <integer> | <number> | <interpolation>"]
+  "ratio",
+  "<integer> '/' <integer> | <number> | <interpolation>",
+  (module Css_types.Ratio : RUNTIME_TYPE)]
 
 module Relative_selector =
   [%spec_module
-  "relative_selector", "[ <combinator> ]? <complex-selector>"]
+  "relative_selector",
+  "[ <combinator> ]? <complex-selector>",
+  (module Css_types.RelativeSelector : RUNTIME_TYPE)]
 
 module Relative_selector_list =
   [%spec_module
-  "relative_selector_list", "[ <relative-selector> ]#"]
+  "relative_selector_list",
+  "[ <relative-selector> ]#",
+  (module Css_types.RelativeSelectorList : RUNTIME_TYPE)]
 
-module Relative_size = [%spec_module "relative_size", "'larger' | 'smaller'"]
+module Relative_size =
+  [%spec_module
+  "relative_size",
+  "'larger' | 'smaller'",
+  (module Css_types.RelativeSize : RUNTIME_TYPE)]
 
 module Repeat_style =
   [%spec_module
   "repeat_style",
   "'repeat-x' | 'repeat-y' | [ 'repeat' | 'space' | 'round' | 'no-repeat' ] [ \
-   'repeat' | 'space' | 'round' | 'no-repeat' ]?"]
+   'repeat' | 'space' | 'round' | 'no-repeat' ]?",
+  (module Css_types.RepeatStyle : RUNTIME_TYPE)]
 
-module Right = [%spec_module "right", "<extended-length> | 'auto'"]
+module Right =
+  [%spec_module
+  "right", "<extended-length> | 'auto'", (module Css_types.Right : RUNTIME_TYPE)]
 
 module Self_position =
   [%spec_module
   "self_position",
   "'center' | 'start' | 'end' | 'self-start' | 'self-end' | 'flex-start' | \
-   'flex-end'"]
+   'flex-end'",
+  (module Css_types.SelfPosition : RUNTIME_TYPE)]
 
 module Shadow =
   [%spec_module
@@ -4579,24 +5973,33 @@ module Shadow =
 module Shadow_t =
   [%spec_module
   "shadow_t",
-  "[ <extended-length> | <interpolation> ]{3} [ <color> | <interpolation> ]?"]
+  "[ <extended-length> | <interpolation> ]{3} [ <color> | <interpolation> ]?",
+  (module Css_types.ShadowT : RUNTIME_TYPE)]
 
 module Shape =
   [%spec_module
   "shape",
   "rect( <top> ',' <right> ',' <bottom> ',' <left> ) | rect( <top> <right> \
-   <bottom> <left> )"]
+   <bottom> <left> )",
+  (module Css_types.Shape : RUNTIME_TYPE)]
 
-module Shape_box = [%spec_module "shape_box", "<box> | 'margin-box'"]
+module Shape_box =
+  [%spec_module
+  "shape_box",
+  "<box> | 'margin-box'",
+  (module Css_types.ShapeBox : RUNTIME_TYPE)]
 
 module Shape_radius =
   [%spec_module
   "shape_radius",
-  "<extended-length> | <extended-percentage> | 'closest-side' | 'farthest-side'"]
+  "<extended-length> | <extended-percentage> | 'closest-side' | 'farthest-side'",
+  (module Css_types.ShapeRadius : RUNTIME_TYPE)]
 
 module Side_or_corner =
   [%spec_module
-  "side_or_corner", "[ 'left' | 'right' ] || [ 'top' | 'bottom' ]"]
+  "side_or_corner",
+  "[ 'left' | 'right' ] || [ 'top' | 'bottom' ]",
+  (module Css_types.SideOrCorner : RUNTIME_TYPE)]
 
 module Single_animation =
   [%spec_module
@@ -4616,7 +6019,8 @@ module Single_animation =
    <keyframes-name> | 'none' | <interpolation> ] <extended-time> \
    <timing-function> <extended-time> <single-animation-iteration-count> \
    <single-animation-direction> <single-animation-fill-mode> \
-   <single-animation-play-state> ]"]
+   <single-animation-play-state> ]",
+  (module Css_types.SingleAnimation : RUNTIME_TYPE)]
 
 module Single_animation_no_interp =
   [%spec_module
@@ -4626,50 +6030,64 @@ module Single_animation_no_interp =
    <single-animation-iteration-count-no-interp> || \
    <single-animation-direction-no-interp> || \
    <single-animation-fill-mode-no-interp> || \
-   <single-animation-play-state-no-interp>"]
+   <single-animation-play-state-no-interp>",
+  (module Css_types.SingleAnimationNoInterp : RUNTIME_TYPE)]
 
 module Single_animation_direction =
   [%spec_module
   "single_animation_direction",
-  "'normal' | 'reverse' | 'alternate' | 'alternate-reverse' | <interpolation>"]
+  "'normal' | 'reverse' | 'alternate' | 'alternate-reverse' | <interpolation>",
+  (module Css_types.SingleAnimationDirection : RUNTIME_TYPE)]
 
 module Single_animation_direction_no_interp =
   [%spec_module
   "single_animation_direction_no_interp",
-  "'normal' | 'reverse' | 'alternate' | 'alternate-reverse'"]
+  "'normal' | 'reverse' | 'alternate' | 'alternate-reverse'",
+  (module Css_types.SingleAnimationDirectionNoInterp : RUNTIME_TYPE)]
 
 module Single_animation_fill_mode =
   [%spec_module
   "single_animation_fill_mode",
-  "'none' | 'forwards' | 'backwards' | 'both' | <interpolation>"]
+  "'none' | 'forwards' | 'backwards' | 'both' | <interpolation>",
+  (module Css_types.SingleAnimationFillMode : RUNTIME_TYPE)]
 
 module Single_animation_fill_mode_no_interp =
   [%spec_module
   "single_animation_fill_mode_no_interp",
-  "'none' | 'forwards' | 'backwards' | 'both'"]
+  "'none' | 'forwards' | 'backwards' | 'both'",
+  (module Css_types.SingleAnimationFillModeNoInterp : RUNTIME_TYPE)]
 
 module Single_animation_iteration_count =
   [%spec_module
-  "single_animation_iteration_count", "'infinite' | <number> | <interpolation>"]
+  "single_animation_iteration_count",
+  "'infinite' | <number> | <interpolation>",
+  (module Css_types.SingleAnimationIterationCount : RUNTIME_TYPE)]
 
 module Single_animation_iteration_count_no_interp =
   [%spec_module
-  "single_animation_iteration_count_no_interp", "'infinite' | <number>"]
+  "single_animation_iteration_count_no_interp",
+  "'infinite' | <number>",
+  (module Css_types.SingleAnimationIterationCountNoInterp : RUNTIME_TYPE)]
 
 module Single_animation_play_state =
   [%spec_module
-  "single_animation_play_state", "'running' | 'paused' | <interpolation>"]
+  "single_animation_play_state",
+  "'running' | 'paused' | <interpolation>",
+  (module Css_types.SingleAnimationPlayState : RUNTIME_TYPE)]
 
 module Single_animation_play_state_no_interp =
   [%spec_module
-  "single_animation_play_state_no_interp", "'running' | 'paused'"]
+  "single_animation_play_state_no_interp",
+  "'running' | 'paused'",
+  (module Css_types.SingleAnimationPlayStateNoInterp : RUNTIME_TYPE)]
 
 module Single_transition_no_interp =
   [%spec_module
   "single_transition_no_interp",
   "[ <single-transition-property-no-interp> | 'none' ] || \
    <extended-time-no-interp> || <timing-function-no-interp> || \
-   <extended-time-no-interp> || <transition-behavior-value-no-interp>"]
+   <extended-time-no-interp> || <transition-behavior-value-no-interp>",
+  (module Css_types.SingleTransitionNoInterp : RUNTIME_TYPE)]
 
 module Single_transition =
   [%spec_module
@@ -4679,178 +6097,242 @@ module Single_transition =
    <extended-time> <timing-function> ] | [ [<single-transition-property> | \
    'none'] <extended-time> <timing-function> <extended-time> ] | [ \
    [<single-transition-property> | 'none'] <extended-time> <timing-function> \
-   <extended-time> <transition-behavior-value> ]"]
+   <extended-time> <transition-behavior-value> ]",
+  (module Css_types.SingleTransition : RUNTIME_TYPE)]
 
 module Single_transition_property =
   [%spec_module
-  "single_transition_property", "<custom-ident> | <interpolation> | 'all'"]
+  "single_transition_property",
+  "<custom-ident> | <interpolation> | 'all'",
+  (module Css_types.SingleTransitionProperty : RUNTIME_TYPE)]
 
 module Single_transition_property_no_interp =
   [%spec_module
-  "single_transition_property_no_interp", "<custom-ident> | 'all'"]
+  "single_transition_property_no_interp",
+  "<custom-ident> | 'all'",
+  (module Css_types.SingleTransitionPropertyNoInterp : RUNTIME_TYPE)]
 
 module Size =
   [%spec_module
   "size",
   "'closest-side' | 'farthest-side' | 'closest-corner' | 'farthest-corner' | \
-   <extended-length> | [ <extended-length> | <extended-percentage> ]{2}"]
+   <extended-length> | [ <extended-length> | <extended-percentage> ]{2}",
+  (module Css_types.Size : RUNTIME_TYPE)]
 
 module Ray_size =
   [%spec_module
   "ray_size",
   "'closest-side' | 'farthest-side' | 'closest-corner' | 'farthest-corner' | \
-   'sides'"]
+   'sides'",
+  (module Css_types.RaySize : RUNTIME_TYPE)]
 
 module Radial_size =
   [%spec_module
   "radial_size",
   "'closest-side' | 'farthest-side' | 'closest-corner' | 'farthest-corner' | \
-   <extended-length> | [ <extended-length> | <extended-percentage> ]{2}"]
+   <extended-length> | [ <extended-length> | <extended-percentage> ]{2}",
+  (module Css_types.RadialSize : RUNTIME_TYPE)]
 
 module Step_position =
   [%spec_module
   "step_position",
-  "'jump-start' | 'jump-end' | 'jump-none' | 'jump-both' | 'start' | 'end'"]
+  "'jump-start' | 'jump-end' | 'jump-none' | 'jump-both' | 'start' | 'end'",
+  (module Css_types.StepPosition : RUNTIME_TYPE)]
 
 module Step_timing_function =
   [%spec_module
   "step_timing_function",
-  "'step-start' | 'step-end' | steps( <integer> [ ',' <step-position> ]? )"]
+  "'step-start' | 'step-end' | steps( <integer> [ ',' <step-position> ]? )",
+  (module Css_types.StepTimingFunction : RUNTIME_TYPE)]
 
 module Subclass_selector =
   [%spec_module
   "subclass_selector",
   "<id-selector> | <class-selector> | <attribute-selector> | \
-   <pseudo-class-selector>"]
+   <pseudo-class-selector>",
+  (module Css_types.SubclassSelector : RUNTIME_TYPE)]
 
 module Supports_condition =
   [%spec_module
   "supports_condition",
   "'not' <supports-in-parens> | <supports-in-parens> [ 'and' \
    <supports-in-parens> ]* | <supports-in-parens> [ 'or' <supports-in-parens> \
-   ]*"]
+   ]*",
+  (module Css_types.SupportsCondition : RUNTIME_TYPE)]
 
-module Supports_decl = [%spec_module "supports_decl", "'(' <declaration> ')'"]
+module Supports_decl =
+  [%spec_module
+  "supports_decl",
+  "'(' <declaration> ')'",
+  (module Css_types.SupportsDecl : RUNTIME_TYPE)]
 
 module Supports_feature =
   [%spec_module
-  "supports_feature", "<supports-decl> | <supports-selector-fn>"]
+  "supports_feature",
+  "<supports-decl> | <supports-selector-fn>",
+  (module Css_types.SupportsFeature : RUNTIME_TYPE)]
 
 module Supports_in_parens =
   [%spec_module
-  "supports_in_parens", "'(' <supports-condition> ')' | <supports-feature>"]
+  "supports_in_parens",
+  "'(' <supports-condition> ')' | <supports-feature>",
+  (module Css_types.SupportsInParens : RUNTIME_TYPE)]
 
 module Supports_selector_fn =
   [%spec_module
-  "supports_selector_fn", "selector( <complex-selector> )"]
+  "supports_selector_fn",
+  "selector( <complex-selector> )",
+  (module Css_types.SupportsSelectorFn : RUNTIME_TYPE)]
 
 module Svg_length =
   [%spec_module
-  "svg_length", "<extended-percentage> | <extended-length> | <number>"]
+  "svg_length",
+  "<extended-percentage> | <extended-length> | <number>",
+  (module Css_types.SvgLength : RUNTIME_TYPE)]
 
 module Svg_writing_mode =
   [%spec_module
-  "svg_writing_mode", "'lr-tb' | 'rl-tb' | 'tb-rl' | 'lr' | 'rl' | 'tb'"]
+  "svg_writing_mode",
+  "'lr-tb' | 'rl-tb' | 'tb-rl' | 'lr' | 'rl' | 'tb'",
+  (module Css_types.SvgWritingMode : RUNTIME_TYPE)]
 
-module Symbol = [%spec_module "symbol", "<string> | <image> | <custom-ident>"]
+module Symbol =
+  [%spec_module
+  "symbol",
+  "<string> | <image> | <custom-ident>",
+  (module Css_types.Symbol : RUNTIME_TYPE)]
 
 module Symbols_type =
   [%spec_module
-  "symbols_type", "'cyclic' | 'numeric' | 'alphabetic' | 'symbolic' | 'fixed'"]
+  "symbols_type",
+  "'cyclic' | 'numeric' | 'alphabetic' | 'symbolic' | 'fixed'",
+  (module Css_types.SymbolsType : RUNTIME_TYPE)]
 
 module Target =
   [%spec_module
-  "target", "<target-counter()> | <target-counters()> | <target-text()>"]
+  "target",
+  "<target-counter()> | <target-counters()> | <target-text()>",
+  (module Css_types.Target : RUNTIME_TYPE)]
 
-module Url = [%spec_module "url", "<url-no-interp> | url( <interpolation> )"]
+module Url =
+  [%spec_module
+  "url",
+  "<url-no-interp> | url( <interpolation> )",
+  (module Css_types.Url : RUNTIME_TYPE)]
 
 (* https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/length-percentage#use_in_calc *)
 module Extended_length =
   [%spec_module
-  "extended_length", "<length> | <calc()> | <interpolation> | <min()> | <max()>"]
+  "extended_length",
+  "<length> | <calc()> | <interpolation> | <min()> | <max()>",
+  (module Css_types.ExtendedLength : RUNTIME_TYPE)]
 
 (* https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/length-percentage#use_in_calc *)
 module Length_percentage =
   [%spec_module
-  "length_percentage", "<extended-length> | <extended-percentage>"]
+  "length_percentage",
+  "<extended-length> | <extended-percentage>",
+  (module Css_types.LengthPercentage : RUNTIME_TYPE)]
 
 module Extended_frequency =
   [%spec_module
   "extended_frequency",
-  "<frequency> | <calc()> | <interpolation> | <min()> | <max()>"]
+  "<frequency> | <calc()> | <interpolation> | <min()> | <max()>",
+  (module Css_types.ExtendedFrequency : RUNTIME_TYPE)]
 
 module Extended_angle =
   [%spec_module
-  "extended_angle", "<angle> | <calc()> | <interpolation> | <min()> | <max()>"]
+  "extended_angle",
+  "<angle> | <calc()> | <interpolation> | <min()> | <max()>",
+  (module Css_types.ExtendedAngle : RUNTIME_TYPE)]
 
 module Extended_time =
   [%spec_module
-  "extended_time", "<time> | <calc()> | <interpolation> | <min()> | <max()>"]
+  "extended_time",
+  "<time> | <calc()> | <interpolation> | <min()> | <max()>",
+  (module Css_types.ExtendedTime : RUNTIME_TYPE)]
 
 module Extended_time_no_interp =
   [%spec_module
-  "extended_time_no_interp", "<time> | <calc()> | <min()> | <max()>"]
+  "extended_time_no_interp",
+  "<time> | <calc()> | <min()> | <max()>",
+  (module Css_types.ExtendedTimeNoInterp : RUNTIME_TYPE)]
 
 module Extended_percentage =
   [%spec_module
   "extended_percentage",
-  "<percentage> | <calc()> | <interpolation> | <min()> | <max()> "]
+  "<percentage> | <calc()> | <interpolation> | <min()> | <max()> ",
+  (module Css_types.ExtendedPercentage : RUNTIME_TYPE)]
 
 module Timing_function =
   [%spec_module
   "timing_function",
   "'linear' | <cubic-bezier-timing-function> | <step-timing-function> | \
-   <interpolation>"]
+   <interpolation>",
+  (module Css_types.TimingFunction : RUNTIME_TYPE)]
 
 module Timing_function_no_interp =
   [%spec_module
   "timing_function_no_interp",
-  "'linear' | <cubic-bezier-timing-function> | <step-timing-function>"]
+  "'linear' | <cubic-bezier-timing-function> | <step-timing-function>",
+  (module Css_types.TimingFunctionNoInterp : RUNTIME_TYPE)]
 
-module Top = [%spec_module "top", "<extended-length> | 'auto'"]
+module Top =
+  [%spec_module
+  "top", "<extended-length> | 'auto'", (module Css_types.Top : RUNTIME_TYPE)]
 
 module Try_tactic =
   [%spec_module
-  "try_tactic", "'flip-block' | 'flip-inline' | 'flip-start'"]
+  "try_tactic",
+  "'flip-block' | 'flip-inline' | 'flip-start'",
+  (module Css_types.TryTactic : RUNTIME_TYPE)]
 
 module Track_breadth =
   [%spec_module
   "track_breadth",
   "<extended-length> | <extended-percentage> | <flex-value> | 'min-content' | \
-   'max-content' | 'auto'"]
+   'max-content' | 'auto'",
+  (module Css_types.TrackBreadth : RUNTIME_TYPE)]
 
 module Track_group =
   [%spec_module
   "track_group",
   "'(' [ [ <string> ]* <track-minmax> [ <string> ]* ]+ ')' [ '[' \
-   <positive-integer> ']' ]? | <track-minmax>"]
+   <positive-integer> ']' ]? | <track-minmax>",
+  (module Css_types.TrackGroup : RUNTIME_TYPE)]
 
 module Track_list =
   [%spec_module
   "track_list",
-  "[ [ <line-names> ]? [ <track-size> | <track-repeat> ] ]+ [ <line-names> ]?"]
+  "[ [ <line-names> ]? [ <track-size> | <track-repeat> ] ]+ [ <line-names> ]?",
+  (module Css_types.TrackList : RUNTIME_TYPE)]
 
 module Track_list_v0 =
   [%spec_module
-  "track_list_v0", "[ [ <string> ]* <track-group> [ <string> ]* ]+ | 'none'"]
+  "track_list_v0",
+  "[ [ <string> ]* <track-group> [ <string> ]* ]+ | 'none'",
+  (module Css_types.TrackListV0 : RUNTIME_TYPE)]
 
 module Track_minmax =
   [%spec_module
   "track_minmax",
   "minmax( <track-breadth> ',' <track-breadth> ) | 'auto' | <track-breadth> | \
-   fit-content( <extended-length> | <extended-percentage> )"]
+   fit-content( <extended-length> | <extended-percentage> )",
+  (module Css_types.TrackMinmax : RUNTIME_TYPE)]
 
 module Track_repeat =
   [%spec_module
   "track_repeat",
   "repeat( <positive-integer> ',' [ [ <line-names> ]? <track-size> ]+ [ \
-   <line-names> ]? )"]
+   <line-names> ]? )",
+  (module Css_types.TrackRepeat : RUNTIME_TYPE)]
 
 module Track_size =
   [%spec_module
   "track_size",
   "<track-breadth> | minmax( <inflexible-breadth> ',' <track-breadth> ) | \
-   fit-content( <extended-length> | <extended-percentage> )"]
+   fit-content( <extended-length> | <extended-percentage> )",
+  (module Css_types.TrackSize : RUNTIME_TYPE)]
 
 module Transform_function =
   [%spec_module
@@ -4858,19 +6340,26 @@ module Transform_function =
   "<matrix()> | <translate()> | <translateX()> | <translateY()> | <scale()> | \
    <scaleX()> | <scaleY()> | <rotate()> | <skew()> | <skewX()> | <skewY()> | \
    <matrix3d()> | <translate3d()> | <translateZ()> | <scale3d()> | <scaleZ()> \
-   | <rotate3d()> | <rotateX()> | <rotateY()> | <rotateZ()> | <perspective()>"]
+   | <rotate3d()> | <rotateX()> | <rotateY()> | <rotateZ()> | <perspective()>",
+  (module Css_types.TransformFunction : RUNTIME_TYPE)]
 
 module Transform_list =
   [%spec_module
-  "transform_list", "[ <transform-function> ]+"]
+  "transform_list",
+  "[ <transform-function> ]+",
+  (module Css_types.TransformList : RUNTIME_TYPE)]
 
 module Transition_behavior_value =
   [%spec_module
-  "transition_behavior_value", "'normal' | 'allow-discrete' | <interpolation>"]
+  "transition_behavior_value",
+  "'normal' | 'allow-discrete' | <interpolation>",
+  (module Css_types.TransitionBehaviorValue : RUNTIME_TYPE)]
 
 module Transition_behavior_value_no_interp =
   [%spec_module
-  "transition_behavior_value_no_interp", "'normal' | 'allow-discrete'"]
+  "transition_behavior_value_no_interp",
+  "'normal' | 'allow-discrete'",
+  (module Css_types.TransitionBehaviorValueNoInterp : RUNTIME_TYPE)]
 
 module Type_or_unit =
   [%spec_module
@@ -4879,66 +6368,99 @@ module Type_or_unit =
    'time' | 'frequency' | 'cap' | 'ch' | 'em' | 'ex' | 'ic' | 'lh' | 'rlh' | \
    'rem' | 'vb' | 'vi' | 'vw' | 'vh' | 'vmin' | 'vmax' | 'mm' | 'Q' | 'cm' | \
    'in' | 'pt' | 'pc' | 'px' | 'deg' | 'grad' | 'rad' | 'turn' | 'ms' | 's' | \
-   'Hz' | 'kHz' | '%'"]
+   'Hz' | 'kHz' | '%'",
+  (module Css_types.TypeOrUnit : RUNTIME_TYPE)]
 
 module Type_selector =
   [%spec_module
-  "type_selector", "<wq-name> | [ <ns-prefix> ]? '*'"]
+  "type_selector",
+  "<wq-name> | [ <ns-prefix> ]? '*'",
+  (module Css_types.TypeSelector : RUNTIME_TYPE)]
 
 module Viewport_length =
   [%spec_module
-  "viewport_length", "'auto' | <extended-length> | <extended-percentage>"]
+  "viewport_length",
+  "'auto' | <extended-length> | <extended-percentage>",
+  (module Css_types.ViewportLength : RUNTIME_TYPE)]
 
 module Visual_box =
   [%spec_module
-  "visual_box", "'content-box' | 'padding-box' | 'border-box'"]
+  "visual_box",
+  "'content-box' | 'padding-box' | 'border-box'",
+  (module Css_types.VisualBox : RUNTIME_TYPE)]
 
-module Wq_name = [%spec_module "wq_name", "[ <ns-prefix> ]? <ident-token>"]
+module Wq_name =
+  [%spec_module
+  "wq_name",
+  "[ <ns-prefix> ]? <ident-token>",
+  (module Css_types.WqName : RUNTIME_TYPE)]
 
 module Attr_name =
   [%spec_module
-  "attr_name", "[ <ident-token>? '|' ]? <ident-token>"]
+  "attr_name",
+  "[ <ident-token>? '|' ]? <ident-token>",
+  (module Css_types.AttrName : RUNTIME_TYPE)]
 
 module Attr_unit =
   [%spec_module
   "attr_unit",
   "'%' | 'em' | 'ex' | 'ch' | 'rem' | 'vw' | 'vh' | 'vmin' | 'vmax' | 'cm' | \
    'mm' | 'in' | 'px' | 'pt' | 'pc' | 'deg' | 'grad' | 'rad' | 'turn' | 'ms' | \
-   's' | 'Hz' | 'kHz'"]
+   's' | 'Hz' | 'kHz'",
+  (module Css_types.AttrUnit : RUNTIME_TYPE)]
 
 module Syntax_type_name =
   [%spec_module
   "syntax_type_name",
   "'angle' | 'color' | 'custom-ident' | 'image' | 'integer' | 'length' | \
    'length-percentage' | 'number' | 'percentage' | 'resolution' | 'string' | \
-   'time' | 'url' | 'transform-function'"]
+   'time' | 'url' | 'transform-function'",
+  (module Css_types.SyntaxTypeName : RUNTIME_TYPE)]
 
-module Syntax_multiplier = [%spec_module "syntax_multiplier", "'#' | '+'"]
+module Syntax_multiplier =
+  [%spec_module
+  "syntax_multiplier",
+  "'#' | '+'",
+  (module Css_types.SyntaxMultiplier : RUNTIME_TYPE)]
 
 module Syntax_single_component =
   [%spec_module
-  "syntax_single_component", "'<' <syntax-type-name> '>' | <ident>"]
+  "syntax_single_component",
+  "'<' <syntax-type-name> '>' | <ident>",
+  (module Css_types.SyntaxSingleComponent : RUNTIME_TYPE)]
 
-module Syntax_string = [%spec_module "syntax_string", "<string>"]
-module Syntax_combinator = [%spec_module "syntax_combinator", "'|'"]
+module Syntax_string =
+  [%spec_module
+  "syntax_string", "<string>", (module Css_types.SyntaxString : RUNTIME_TYPE)]
+
+module Syntax_combinator =
+  [%spec_module
+  "syntax_combinator", "'|'", (module Css_types.SyntaxCombinator : RUNTIME_TYPE)]
 
 module Syntax_component =
   [%spec_module
   "syntax_component",
   "<syntax-single-component> [ <syntax-multiplier> ]? | '<' 'transform-list' \
-   '>'"]
+   '>'",
+  (module Css_types.SyntaxComponent : RUNTIME_TYPE)]
 
 module Syntax =
   [%spec_module
   "syntax",
   "'*' | <syntax-component> [ <syntax-combinator> <syntax-component> ]* | \
-   <syntax-string>"]
+   <syntax-string>",
+  (module Css_types.Syntax : RUNTIME_TYPE)]
 
 (* (*
  We don't support type() yet, original spec is: "type( <syntax> ) | 'raw-string' | <attr-unit>" *) *)
-module Attr_type = [%spec_module "attr_type", "'raw-string' | <attr-unit>"]
-module X = [%spec_module "x", "<number>"]
-module Y = [%spec_module "y", "<number>"]
+module Attr_type =
+  [%spec_module
+  "attr_type",
+  "'raw-string' | <attr-unit>",
+  (module Css_types.AttrType : RUNTIME_TYPE)]
+
+module X = [%spec_module "x", "<number>", (module Css_types.X : RUNTIME_TYPE)]
+module Y = [%spec_module "y", "<number>", (module Css_types.Y : RUNTIME_TYPE)]
 
 let registry : (kind * (module RULE)) list =
   [

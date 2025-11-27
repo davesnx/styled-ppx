@@ -8,14 +8,10 @@ let test_flex_grow_with_interpolation = () => {
     module M = (val spec_module: Parser.RULE);
     switch (M.parse("$(myVar)")) {
     | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
-    | Ok(_parsed_value) =>
-      /* TODO: extract_interpolations is not implemented yet (always returns [])
-         Once implemented, uncomment these checks:
-         let interps = M.extract_interpolations(parsed_value);
-         Alcotest.check(Alcotest.int, "should have one interpolation", 1, List.length(interps));
-         Alcotest.check(Alcotest.string, "variable name should be myVar", "myVar", List.hd(interps));
-      */
-      ()
+    | Ok(parsed_value) =>
+      let interps = M.extract_interpolations(parsed_value);
+      Alcotest.check(Alcotest.int, "should have one interpolation", 1, List.length(interps));
+      Alcotest.check(Alcotest.string, "variable name should be myVar", "myVar", List.hd(interps));
     };
   };
 };
@@ -48,14 +44,10 @@ let test_overflow_with_interpolation = () => {
     module M = (val spec_module: Parser.RULE);
     switch (M.parse("$(x)")) {
     | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
-    | Ok(_parsed_value) =>
-      /* TODO: extract_interpolations is not implemented yet (always returns [])
-         Once implemented, uncomment these checks:
-         let interps = M.extract_interpolations(parsed_value);
-         Alcotest.check(Alcotest.int, "should have one interpolation", 1, List.length(interps));
-         Alcotest.check(Alcotest.string, "variable name should be x", "x", List.hd(interps));
-      */
-      ()
+    | Ok(parsed_value) =>
+      let interps = M.extract_interpolations(parsed_value);
+      Alcotest.check(Alcotest.int, "should have one interpolation", 1, List.length(interps));
+      Alcotest.check(Alcotest.string, "variable name should be x", "x", List.hd(interps));
     };
   };
 };
@@ -68,14 +60,10 @@ let test_flex_basis_with_interpolation = () => {
     module M = (val spec_module: Parser.RULE);
     switch (M.parse("$(basis)")) {
     | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
-    | Ok(_parsed_value) =>
-      /* TODO: extract_interpolations is not implemented yet (always returns [])
-         Once implemented, uncomment these checks:
-         let interps = M.extract_interpolations(parsed_value);
-         Alcotest.check(Alcotest.int, "should have one interpolation", 1, List.length(interps));
-         Alcotest.check(Alcotest.string, "variable name should be basis", "basis", List.hd(interps));
-      */
-      ()
+    | Ok(parsed_value) =>
+      let interps = M.extract_interpolations(parsed_value);
+      Alcotest.check(Alcotest.int, "should have one interpolation", 1, List.length(interps));
+      Alcotest.check(Alcotest.string, "variable name should be basis", "basis", List.hd(interps));
     };
   };
 };
