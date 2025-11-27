@@ -411,11 +411,11 @@ module Bg_layer =
 module Bg_position =
   [%spec_module
   "bg_position",
-  "[ 'left' | 'center' | 'right' | 'top' | 'bottom' | <length-percentage> ]\n\
-  \  | [ 'left' | 'center' | 'right' | <length-percentage> ] [ 'top' | \
-   'center' | 'bottom' | <length-percentage> ]\n\
-  \  | [ 'center' | [ 'left' | 'right' ] <length-percentage>? ] && [ 'center' \
-   | [ 'top' | 'bottom' ] <length-percentage>? ]"]
+  "[ 'left' | 'center' | 'right' | 'top' | 'bottom' | <length-percentage> ] | \
+   [ 'left' | 'center' | 'right' | <length-percentage> ] [ 'top' | 'center' | \
+   'bottom' | <length-percentage> ] | [ 'center' | [ 'left' | 'right' ] \
+   <length-percentage>? ] && [ 'center' | [ 'top' | 'bottom' ] \
+   <length-percentage>? ]"]
 
 (* one_bg_size isn't part of the spec, helps us with Type generation *)
 module One_bg_size =
@@ -860,17 +860,15 @@ module Function_hsl =
   [%spec_module
   "function_hsl",
   " hsl( <hue> <extended-percentage> <extended-percentage> [ '/' <alpha-value> \
-   ]? )\n\
-  \  | hsl( <hue> ',' <extended-percentage> ',' <extended-percentage> [ ',' \
+   ]? ) | hsl( <hue> ',' <extended-percentage> ',' <extended-percentage> [ ',' \
    <alpha-value> ]? )"]
 
 module Function_hsla =
   [%spec_module
   "function_hsla",
   " hsla( <hue> <extended-percentage> <extended-percentage> [ '/' \
-   <alpha-value> ]? )\n\
-  \  | hsla( <hue> ',' <extended-percentage> ',' <extended-percentage> ',' [ \
-   <alpha-value> ]? )"]
+   <alpha-value> ]? ) | hsla( <hue> ',' <extended-percentage> ',' \
+   <extended-percentage> ',' [ <alpha-value> ]? )"]
 
 module Function_hue_rotate =
   [%spec_module
@@ -965,20 +963,17 @@ module Function_repeating_radial_gradient =
 module Function_rgb =
   [%spec_module
   "function_rgb",
-  "\n\
-  \    rgb( [ <extended-percentage> ]{3} [ '/' <alpha-value> ]? )\n\
-  \  | rgb( [ <number> ]{3} [ '/' <alpha-value> ]? )\n\
-  \  | rgb( [ <extended-percentage> ]#{3} [ ',' <alpha-value> ]? )\n\
-  \  | rgb( [ <number> ]#{3} [ ',' <alpha-value> ]? )\n"]
+  "rgb( [ <extended-percentage> ]{3} [ '/' <alpha-value> ]? ) | rgb( [ \
+   <number> ]{3} [ '/' <alpha-value> ]? ) | rgb( [ <extended-percentage> ]#{3} \
+   [ ',' <alpha-value> ]? ) | rgb( [ <number> ]#{3} [ ',' <alpha-value> ]? )"]
 
 module Function_rgba =
   [%spec_module
   "function_rgba",
-  "\n\
-  \    rgba( [ <extended-percentage> ]{3} [ '/' <alpha-value> ]? )\n\
-  \  | rgba( [ <number> ]{3} [ '/' <alpha-value> ]? )\n\
-  \  | rgba( [ <extended-percentage> ]#{3} [ ',' <alpha-value> ]? )\n\
-  \  | rgba( [ <number> ]#{3} [ ',' <alpha-value> ]? )\n"]
+  "rgba( [ <extended-percentage> ]{3} [ '/' <alpha-value> ]? ) | rgba( [ \
+   <number> ]{3} [ '/' <alpha-value> ]? ) | rgba( [ <extended-percentage> \
+   ]#{3} [ ',' <alpha-value> ]? ) | rgba( [ <number> ]#{3} [ ',' <alpha-value> \
+   ]? )"]
 
 module Function_rotate =
   [%spec_module
@@ -1421,12 +1416,11 @@ module Paint =
 module Position =
   [%spec_module
   "position",
-  "[ 'left' | 'center' | 'right' | 'top' | 'bottom' | <length-percentage> ]\n\
-  \  | [ 'left' | 'center' | 'right' ] && [ 'top' | 'center' | 'bottom' ]\n\
-  \  | [ 'left' | 'center' | 'right' | <length-percentage> ] [ 'top' | \
-   'center' | 'bottom' | <length-percentage> ]\n\
-  \  | [ [ 'left' | 'right' ] <length-percentage> ] && [ [ 'top' | 'bottom' ] \
-   <length-percentage> ]"]
+  "[ 'left' | 'center' | 'right' | 'top' | 'bottom' | <length-percentage> ] | \
+   [ 'left' | 'center' | 'right' ] && [ 'top' | 'center' | 'bottom' ] | [ \
+   'left' | 'center' | 'right' | <length-percentage> ] [ 'top' | 'center' | \
+   'bottom' | <length-percentage> ] | [ [ 'left' | 'right' ] \
+   <length-percentage> ] && [ [ 'top' | 'bottom' ] <length-percentage> ]"]
 
 module Positive_integer = [%spec_module "positive_integer", "<integer>"]
 
@@ -2638,11 +2632,9 @@ module Property_glyph_orientation_vertical =
 module Property_grid =
   [%spec_module
   "property_grid",
-  "<'grid-template'>\n\
-  \  | <'grid-template-rows'> '/' [ 'auto-flow' && [ 'dense' ]? ] [ \
-   <'grid-auto-columns'> ]?\n\
-  \  | [ 'auto-flow' && [ 'dense' ]? ] [ <'grid-auto-rows'> ]? '/' \
-   <'grid-template-columns'>"]
+  "<'grid-template'> | <'grid-template-rows'> '/' [ 'auto-flow' && [ 'dense' \
+   ]? ] [ <'grid-auto-columns'> ]? | [ 'auto-flow' && [ 'dense' ]? ] [ \
+   <'grid-auto-rows'> ]? '/' <'grid-template-columns'>"]
 
 module Property_grid_area =
   [%spec_module
@@ -3160,7 +3152,7 @@ module Property_media_prefers_color_scheme =
 module Property_color_scheme =
   [%spec_module
   "property_color_scheme",
-  "'normal' |\n  [ 'dark' | 'light' | <custom-ident> ]+ && 'only'?"]
+  "'normal' | [ 'dark' | 'light' | <custom-ident> ]+ && 'only'?"]
 
 module Property_media_prefers_contrast =
   [%spec_module
@@ -3930,11 +3922,10 @@ module Property_transform_box =
 module Property_transform_origin =
   [%spec_module
   "property_transform_origin",
-  "[ 'left' | 'center' | 'right' | 'top' | 'bottom' | <length-percentage> ]\n\
-  \  | [ 'left' | 'center' | 'right' | <length-percentage> ] [ 'top' | \
-   'center' | 'bottom' | <length-percentage> ] <length>?\n\
-  \  | [[ 'center' | 'left' | 'right' ] && [ 'center' | 'top' | 'bottom' ]] \
-   <length>? "]
+  "[ 'left' | 'center' | 'right' | 'top' | 'bottom' | <length-percentage> ] | \
+   [ 'left' | 'center' | 'right' | <length-percentage> ] [ 'top' | 'center' | \
+   'bottom' | <length-percentage> ] <length>? | [[ 'center' | 'left' | 'right' \
+   ] && [ 'center' | 'top' | 'bottom' ]] <length>? "]
 
 module Property_transform_style =
   [%spec_module
@@ -4572,21 +4563,19 @@ module Side_or_corner =
 module Single_animation =
   [%spec_module
   "single_animation",
-  "[ [ <keyframes-name> | 'none' | <interpolation> ] ]\n\
-  \  | [ [ <keyframes-name> | 'none' | <interpolation> ] <extended-time> ]\n\
-  \  | [ [ <keyframes-name> | 'none' | <interpolation> ] <extended-time> \
-   <timing-function> ]\n\
-  \  | [ [ <keyframes-name> | 'none' | <interpolation> ] <extended-time> \
-   <timing-function> <extended-time> ]\n\
-  \  | [ [ <keyframes-name> | 'none' | <interpolation> ] <extended-time> \
-   <timing-function> <extended-time> <single-animation-iteration-count> ]\n\
-  \  | [ [ <keyframes-name> | 'none' | <interpolation> ] <extended-time> \
+  "[ [ <keyframes-name> | 'none' | <interpolation> ] ] | [ [ <keyframes-name> \
+   | 'none' | <interpolation> ] <extended-time> ] | [ [ <keyframes-name> | \
+   'none' | <interpolation> ] <extended-time> <timing-function> ] | [ [ \
+   <keyframes-name> | 'none' | <interpolation> ] <extended-time> \
+   <timing-function> <extended-time> ] | [ [ <keyframes-name> | 'none' | \
+   <interpolation> ] <extended-time> <timing-function> <extended-time> \
+   <single-animation-iteration-count> ] | [ [ <keyframes-name> | 'none' | \
+   <interpolation> ] <extended-time> <timing-function> <extended-time> \
+   <single-animation-iteration-count> <single-animation-direction> ] | [ [ \
+   <keyframes-name> | 'none' | <interpolation> ] <extended-time> \
    <timing-function> <extended-time> <single-animation-iteration-count> \
-   <single-animation-direction> ]\n\
-  \  | [ [ <keyframes-name> | 'none' | <interpolation> ] <extended-time> \
-   <timing-function> <extended-time> <single-animation-iteration-count> \
-   <single-animation-direction> <single-animation-fill-mode> ]\n\
-  \  | [ [ <keyframes-name> | 'none' | <interpolation> ] <extended-time> \
+   <single-animation-direction> <single-animation-fill-mode> ] | [ [ \
+   <keyframes-name> | 'none' | <interpolation> ] <extended-time> \
    <timing-function> <extended-time> <single-animation-iteration-count> \
    <single-animation-direction> <single-animation-fill-mode> \
    <single-animation-play-state> ]"]
@@ -4647,14 +4636,12 @@ module Single_transition_no_interp =
 module Single_transition =
   [%spec_module
   "single_transition",
-  "[<single-transition-property> | 'none']\n\
-  \  | [ [<single-transition-property> | 'none'] <extended-time> ]\n\
-  \  | [ [<single-transition-property> | 'none'] <extended-time> \
-   <timing-function> ]\n\
-  \  | [ [<single-transition-property> | 'none'] <extended-time> \
-   <timing-function> <extended-time> ]\n\
-  \  | [ [<single-transition-property> | 'none'] <extended-time> \
-   <timing-function> <extended-time> <transition-behavior-value> ]"]
+  "[<single-transition-property> | 'none'] | [ [<single-transition-property> | \
+   'none'] <extended-time> ] | [ [<single-transition-property> | 'none'] \
+   <extended-time> <timing-function> ] | [ [<single-transition-property> | \
+   'none'] <extended-time> <timing-function> <extended-time> ] | [ \
+   [<single-transition-property> | 'none'] <extended-time> <timing-function> \
+   <extended-time> <transition-behavior-value> ]"]
 
 module Single_transition_property =
   [%spec_module
@@ -6182,11 +6169,6 @@ let find_function (name : string) : (module RULE) option =
 let find_media_query (name : string) : (module RULE) option =
   List.find_opt (fun (k, _) -> k = Media_query name) registry |> Option.map snd
 
-let property_names () : string list =
-  registry
-  |> List.filter_map (fun (k, _) ->
-       match k with Property name -> Some name | _ -> None)
-
 let value_names () : string list =
   registry
   |> List.filter_map (fun (k, _) ->
@@ -6197,18 +6179,19 @@ let function_names () : string list =
   |> List.filter_map (fun (k, _) ->
        match k with Function name -> Some name | _ -> None)
 
+module Css_tokens = Styled_ppx_css_parser.Tokens
+module Css_parser = Styled_ppx_css_parser.Parser
+module Css_lexer = Styled_ppx_css_parser.Lexer
+
 let apply_parser (parser, tokens_with_loc) =
-  let open Styled_ppx_css_parser.Lexer in
   let ( let+ ) = Result.bind in
   let tokens =
     tokens_with_loc
-    |> List.map (fun { txt; _ } ->
+    |> List.map (fun ({ txt; _ } : Css_lexer.token_with_location) ->
          match txt with Ok token -> token | Error (token, _) -> token)
   in
 
-  let tokens_without_ws =
-    tokens |> List.filter (( != ) Styled_ppx_css_parser.Parser.WS)
-  in
+  let tokens_without_ws = tokens |> List.filter (( != ) Css_parser.WS) in
 
   let output, remaining_tokens = parser tokens_without_ws in
   let+ output =
@@ -6220,9 +6203,11 @@ let apply_parser (parser, tokens_with_loc) =
   in
   let+ () =
     match remaining_tokens with
-    | [] | [ Styled_ppx_css_parser.Parser.EOF ] -> Ok ()
+    | [] | [ Css_parser.EOF ] -> Ok ()
     | tokens ->
-      let tokens = tokens |> List.map render_token |> String.concat ", " in
+      let tokens =
+        tokens |> List.map Css_tokens.show_token |> String.concat ", "
+      in
       Error ("tokens remaining: " ^ tokens)
   in
   Ok output
