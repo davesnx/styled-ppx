@@ -717,6 +717,9 @@ module Feature_value_name =
   [%spec_module
   "feature_value_name", "<custom-ident>"]
 
+(* <zero> represents the literal value 0, used in contexts like rotate(0) *)
+module Zero = [%spec_module "zero", "'0'"]
+
 module Fill_rule = [%spec_module "fill_rule", "'nonzero' | 'evenodd'"]
 
 module Filter_function =
@@ -5023,6 +5026,7 @@ let registry : (kind * (module RULE)) list =
     Value "display-outside", (module Display_outside : RULE);
     Value "ending-shape", (module Ending_shape : RULE);
     Value "fill-rule", (module Fill_rule : RULE);
+    Value "zero", (module Zero : RULE);
     Value "gender", (module Gender : RULE);
     Value "combinator", (module Combinator : RULE);
     Value "contextual-alt-values", (module Contextual_alt_values : RULE);

@@ -846,6 +846,7 @@ and feature_value_block_list = feature_value_block list
 and feature_value_declaration = string * unit * int list * unit
 and feature_value_declaration_list = feature_value_declaration
 and feature_value_name = string
+and zero = unit
 
 and fill_rule =
   [ `Nonzero
@@ -6070,6 +6071,7 @@ and all =
   | `Feature_Value_Declaration of feature_value_declaration
   | `Feature_Value_Declaration_List of feature_value_declaration_list
   | `Feature_Value_Name of feature_value_name
+  | `Zero of zero
   | `Fill_Rule of fill_rule
   | `Filter_Function of filter_function
   | `Filter_Function_List of filter_function_list
