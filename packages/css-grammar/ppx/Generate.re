@@ -46,6 +46,14 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     is_function(property_name)
       ? function_value_name(property_name) : "property-" ++ property_name;
 
+  /* Generate witness constructor name for type-safe lookups.
+        CSS name -> type name -> witness name:
+          "color" -> "color" -> "W_color"
+          "width" (property) -> "property_width" -> "W_property_width"
+          "calc()" -> "function_calc" -> "W_function_calc"
+     */
+  let witness_name_of_type = type_name => "W_" ++ type_name;
+
   let value_of_delimiter =
     fun
     | "+" => "cross"
@@ -170,22 +178,27 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     rtag(txt(name), constructor, types);
   };
 
-  /* Helper to check if a type is unimplemented (always fails at parse time). These should generate `unit` as a placeholder type. */
+  /* Helper to check if a type is unimplemented (always fails at parse time).
+     These should generate `unit` as a placeholder type.
+     NOTE: Only include types that are NOT registered as modules in Parser.ml.
+     Registered modules (ratio, declaration, declaration_list, zero) have proper types. */
   let is_invalid_type = name => {
     switch (name) {
     | "declaration_value"
     | "function_token"
     | "any_value"
     | "hash_token"
-    | "zero"
     | "custom_property_name"
-    | "declaration_list"
     | "an_plus_b"
-    | "declaration"
     | "decibel"
     | "urange"
     | "semitones"
     | "url_token" => true
+    // NOTE: These ARE registered and have proper types:
+    // | "zero"
+    // | "declaration_list"
+    // | "declaration"
+    // | "ratio"
     | _ => false
     };
   };
@@ -262,7 +275,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     };
 
   // List of ONLY standard specs defined in Standard.re that use direct parser references
-  // Everything else uses local bindings (for let rec) or lookup_property_rule()
+  // Everything else uses local bindings (for let rec) or witness lookup
   let standard_specs = [
     "integer",
     "number",
@@ -285,8 +298,21 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     "string-token",
     "string",
     "css-wide-keywords",
+    // Invalid/unimplemented types - these map to Standard.invalid
+    // NOTE: ratio, declaration, declaration-list, zero ARE registered as modules
+    // and should use witness lookup, not Standard.invalid
+    "any-value",
+    "declaration-value",
+    "function-token",
+    "hash-token",
+    "custom-property-name",
+    "an-plus-b",
+    "decibel",
+    "urange",
+    "semitones",
+    "url-token",
     /* Note: extended-length, extended-angle, extended-percentage, extended-time, extended-frequency
-       are NOT in this list. They use lazy_lookup_property_rule to reference the generated modules
+       are NOT in this list. They use lookup_typed to reference the generated modules
        in Parser.ml which include calc(), min(), and max() support. */
   ];
 
@@ -550,10 +576,17 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
             // Standard spec (length, angle, css-wide-keywords, etc.) - use Standard.name directly
             "Standard." ++ snake_name |> evar;
           } else if (use_lookup) {
-            // Use lazy_lookup_value_rule for data types (values and functions)
+            // TYPE-SAFE lookup using GADT witness - NO Obj.magic!
+            let witness_name = witness_name_of_type(snake_name);
+            let witness_constructor = first_uppercase(witness_name);
             eapply(
-              evar("lazy_lookup_value_rule"),
-              [estring(name)],
+              evar("lookup_typed"),
+              [
+                pexp_construct(
+                  txt @@ Ldot(Lident("Types"), witness_constructor),
+                  None,
+                ),
+              ],
             );
           } else {
             // Without lookup - reference local binding directly (for let rec)
@@ -561,10 +594,18 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
           };
         | Property_type(name) =>
           if (use_lookup) {
-            // Property types use lazy_lookup_property_rule for property references
+            // TYPE-SAFE lookup using GADT witness - NO Obj.magic!
+            let type_name = "property_" ++ kebab_case_to_snake_case(name);
+            let witness_name = witness_name_of_type(type_name);
+            let witness_constructor = first_uppercase(witness_name);
             eapply(
-              evar("lazy_lookup_property_rule"),
-              [estring(name)],
+              evar("lookup_typed"),
+              [
+                pexp_construct(
+                  txt @@ Ldot(Lident("Types"), witness_constructor),
+                  None,
+                ),
+              ],
             );
           } else {
             // Without lookup - reference local binding directly (for let rec)

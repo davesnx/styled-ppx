@@ -716,7 +716,7 @@ and cubic_bezier_timing_function =
   ]
 
 and declaration = string * unit * unit option * (unit * unit) option
-and declaration_list = (unit option * unit) list * unit option
+and declaration_list = (declaration option * unit) list * declaration option
 
 and deprecated_system_color =
   [ `ActiveBorder
@@ -1079,7 +1079,7 @@ and function_rgba =
 
 and function_rotate =
   [ `Extended_angle of extended_angle
-  | `Zero of unit
+  | `Zero of zero
   ]
 
 and function_rotate3d =
@@ -1089,21 +1089,21 @@ and function_rotate3d =
   * unit
   * float
   * unit
-  * [ `Extended_angle of extended_angle | `Zero of unit ]
+  * [ `Extended_angle of extended_angle | `Zero of zero ]
 
 and function_rotateX =
   [ `Extended_angle of extended_angle
-  | `Zero of unit
+  | `Zero of zero
   ]
 
 and function_rotateY =
   [ `Extended_angle of extended_angle
-  | `Zero of unit
+  | `Zero of zero
   ]
 
 and function_rotateZ =
   [ `Extended_angle of extended_angle
-  | `Zero of unit
+  | `Zero of zero
   ]
 
 and function_saturate = number_percentage
@@ -1115,17 +1115,17 @@ and function_scaleZ = float
 and function_sepia = number_percentage
 
 and function_skew =
-  [ `Extended_angle of extended_angle | `Zero of unit ]
-  * (unit * [ `Extended_angle of extended_angle | `Zero of unit ]) option
+  [ `Extended_angle of extended_angle | `Zero of zero ]
+  * (unit * [ `Extended_angle of extended_angle | `Zero of zero ]) option
 
 and function_skewX =
   [ `Extended_angle of extended_angle
-  | `Zero of unit
+  | `Zero of zero
   ]
 
 and function_skewY =
   [ `Extended_angle of extended_angle
-  | `Zero of unit
+  | `Zero of zero
   ]
 
 and function_symbols =
@@ -1283,7 +1283,7 @@ and inflexible_breadth =
   | `Auto
   ]
 
-and keyframe_block = keyframe_selector list * unit * unit * unit
+and keyframe_block = keyframe_selector list * unit * declaration_list * unit
 and keyframe_block_list = keyframe_block list
 
 and keyframe_selector =
@@ -1703,11 +1703,11 @@ and overflow_position =
   ]
 
 and page_body =
-  [ `Static_0 of unit option * (unit * page_body) option
+  [ `Static_0 of declaration option * (unit * page_body) option
   | `Static_1 of page_margin_box * page_body
   ]
 
-and page_margin_box = page_margin_box_type * unit * unit * unit
+and page_margin_box = page_margin_box_type * unit * declaration_list * unit
 
 and page_margin_box_type =
   [ `At_top_left_corner
@@ -5658,7 +5658,7 @@ and supports_condition =
   | `Static_2 of supports_in_parens * (unit * supports_in_parens) list
   ]
 
-and supports_decl = unit * unit * unit
+and supports_decl = unit * declaration * unit
 
 and supports_feature =
   [ `Supports_decl of supports_decl
@@ -7014,3 +7014,3455 @@ and all =
   | `X of x
   | `Y of y
   ]
+
+(** Type equality proof - used for safe casting *)
+type (_, _) eq = Refl : ('a, 'a) eq
+
+(** GADT witness type - connects CSS names to OCaml types *)
+type _ witness =
+  | W_property_display : property_display witness
+  | W_property_overflow : property_overflow witness
+  | W_property_position : property_position witness
+  | W_property_visibility : property_visibility witness
+  | W_property_float : property_float witness
+  | W_property_clear : property_clear witness
+  | W_property_table_layout : property_table_layout witness
+  | W_property_border_collapse : property_border_collapse witness
+  | W_property_empty_cells : property_empty_cells witness
+  | W_property_caption_side : property_caption_side witness
+  | W_property_direction : property_direction witness
+  | W_property_unicode_bidi : property_unicode_bidi witness
+  | W_property_writing_mode : property_writing_mode witness
+  | W_property_text_orientation : property_text_orientation witness
+  | W_property_text_transform : property_text_transform witness
+  | W_property_white_space : property_white_space witness
+  | W_property_word_break : property_word_break witness
+  | W_property_overflow_wrap : property_overflow_wrap witness
+  | W_property_text_align : property_text_align witness
+  | W_property_text_align_last : property_text_align_last witness
+  | W_property_text_justify : property_text_justify witness
+  | W_property_text_decoration_line : property_text_decoration_line witness
+  | W_property_text_decoration_style : property_text_decoration_style witness
+  | W_property_text_decoration_skip_ink :
+      property_text_decoration_skip_ink witness
+  | W_property_font_style : property_font_style witness
+  | W_property_font_variant_caps : property_font_variant_caps witness
+  | W_property_font_stretch : property_font_stretch witness
+  | W_property_font_kerning : property_font_kerning witness
+  | W_property_font_variant_position : property_font_variant_position witness
+  | W_property_list_style_position : property_list_style_position witness
+  | W_property_list_style_type : property_list_style_type witness
+  | W_property_pointer_events : property_pointer_events witness
+  | W_property_user_select : property_user_select witness
+  | W_property_resize : property_resize witness
+  | W_property_box_sizing : property_box_sizing witness
+  | W_property_object_fit : property_object_fit witness
+  | W_property_isolation : property_isolation witness
+  | W_property_mix_blend_mode : property_mix_blend_mode witness
+  | W_property_backface_visibility : property_backface_visibility witness
+  | W_property_flex_direction : property_flex_direction witness
+  | W_property_flex_wrap : property_flex_wrap witness
+  | W_property_justify_content : property_justify_content witness
+  | W_property_align_items : property_align_items witness
+  | W_property_align_content : property_align_content witness
+  | W_property_align_self : property_align_self witness
+  | W_property_justify_items : property_justify_items witness
+  | W_property_justify_self : property_justify_self witness
+  | W_property_scroll_behavior : property_scroll_behavior witness
+  | W_property_overscroll_behavior : property_overscroll_behavior witness
+  | W_property_overflow_anchor : property_overflow_anchor witness
+  | W_property_touch_action : property_touch_action witness
+  | W_property_caret_color : property_caret_color witness
+  | W_property_appearance : property_appearance witness
+  | W_property_text_rendering : property_text_rendering witness
+  | W_property_image_rendering : property_image_rendering witness
+  | W_property_color_scheme : property_color_scheme witness
+  | W_property_forced_color_adjust : property_forced_color_adjust witness
+  | W_property_print_color_adjust : property_print_color_adjust witness
+  | W_property_contain_intrinsic_size : property_contain_intrinsic_size witness
+  | W_property_content_visibility : property_content_visibility witness
+  | W_property_hyphens : property_hyphens witness
+  | W_property_column_fill : property_column_fill witness
+  | W_property_column_span : property_column_span witness
+  | W_property_clip_rule : property_clip_rule witness
+  | W_property_font_optical_sizing : property_font_optical_sizing witness
+  | W_property_font_palette : property_font_palette witness
+  | W_property_font_synthesis_weight : property_font_synthesis_weight witness
+  | W_property_font_synthesis_style : property_font_synthesis_style witness
+  | W_property_font_synthesis_small_caps :
+      property_font_synthesis_small_caps witness
+  | W_property_font_synthesis_position :
+      property_font_synthesis_position witness
+  | W_property_mask_border_mode : property_mask_border_mode witness
+  | W_property_mask_type : property_mask_type witness
+  | W_property_ruby_merge : property_ruby_merge witness
+  | W_property_ruby_position : property_ruby_position witness
+  | W_property_scroll_snap_stop : property_scroll_snap_stop witness
+  | W_property_scrollbar_width : property_scrollbar_width witness
+  | W_property_speak : property_speak witness
+  | W_property_stroke_linecap : property_stroke_linecap witness
+  | W_property_box_decoration_break : property_box_decoration_break witness
+  | W_property_color_adjust : property_color_adjust witness
+  | W_property_text_decoration_thickness :
+      property_text_decoration_thickness witness
+  | W_property_text_underline_position :
+      property_text_underline_position witness
+  | W_property_word_wrap : property_word_wrap witness
+  | W_property_break_inside : property_break_inside witness
+  | W_property_break_before : property_break_before witness
+  | W_property_break_after : property_break_after witness
+  | W_property_page_break_after : property_page_break_after witness
+  | W_property_page_break_before : property_page_break_before witness
+  | W_property_page_break_inside : property_page_break_inside witness
+  | W_property_border_image_repeat : property_border_image_repeat witness
+  | W_property_transform_style : property_transform_style witness
+  | W_property_transform_box : property_transform_box witness
+  | W_property_grid_auto_flow : property_grid_auto_flow witness
+  | W_property_font_display : property_font_display witness
+  | W_property_will_change : property_will_change witness
+  | W_property_contain : property_contain witness
+  | W_property_all : property_all witness
+  | W_property_row_gap : property_row_gap witness
+  | W_property_column_gap : property_column_gap witness
+  | W_property_outline_width : property_outline_width witness
+  | W_property_outline_style : property_outline_style witness
+  | W_property_width : property_width witness
+  | W_property_border : property_border witness
+  | W_property_flex_grow : property_flex_grow witness
+  | W_property_flex_shrink : property_flex_shrink witness
+  | W_property_flex_basis : property_flex_basis witness
+  | W_property__webkit_appearance : property__webkit_appearance witness
+  | W_property_stroke_linejoin : property_stroke_linejoin witness
+  | W_property_perspective_origin : property_perspective_origin witness
+  | W_property_media_type : property_media_type witness
+  | W_property_container_type : property_container_type witness
+  | W_property__moz_appearance : property__moz_appearance witness
+  | W_property__moz_background_clip : property__moz_background_clip witness
+  | W_property__moz_binding : property__moz_binding witness
+  | W_property__moz_border_bottom_colors :
+      property__moz_border_bottom_colors witness
+  | W_property__moz_border_left_colors :
+      property__moz_border_left_colors witness
+  | W_property__moz_border_radius_bottomleft :
+      property__moz_border_radius_bottomleft witness
+  | W_property__moz_border_radius_bottomright :
+      property__moz_border_radius_bottomright witness
+  | W_property__moz_border_radius_topleft :
+      property__moz_border_radius_topleft witness
+  | W_property__moz_border_radius_topright :
+      property__moz_border_radius_topright witness
+  | W_property__moz_border_right_colors :
+      property__moz_border_right_colors witness
+  | W_property__moz_border_top_colors : property__moz_border_top_colors witness
+  | W_property__moz_context_properties :
+      property__moz_context_properties witness
+  | W_property__moz_control_character_visibility :
+      property__moz_control_character_visibility witness
+  | W_property__moz_float_edge : property__moz_float_edge witness
+  | W_property__moz_force_broken_image_icon :
+      property__moz_force_broken_image_icon witness
+  | W_property__moz_image_region : property__moz_image_region witness
+  | W_property__moz_orient : property__moz_orient witness
+  | W_property__moz_osx_font_smoothing :
+      property__moz_osx_font_smoothing witness
+  | W_property__moz_outline_radius : property__moz_outline_radius witness
+  | W_property__moz_outline_radius_bottomleft :
+      property__moz_outline_radius_bottomleft witness
+  | W_property__moz_outline_radius_bottomright :
+      property__moz_outline_radius_bottomright witness
+  | W_property__moz_outline_radius_topleft :
+      property__moz_outline_radius_topleft witness
+  | W_property__moz_outline_radius_topright :
+      property__moz_outline_radius_topright witness
+  | W_property__moz_stack_sizing : property__moz_stack_sizing witness
+  | W_property__moz_text_blink : property__moz_text_blink witness
+  | W_property__moz_user_focus : property__moz_user_focus witness
+  | W_property__moz_user_input : property__moz_user_input witness
+  | W_property__moz_user_modify : property__moz_user_modify witness
+  | W_property__moz_user_select : property__moz_user_select witness
+  | W_property__moz_window_dragging : property__moz_window_dragging witness
+  | W_property__moz_window_shadow : property__moz_window_shadow witness
+  | W_property__webkit_background_clip :
+      property__webkit_background_clip witness
+  | W_property__webkit_border_before : property__webkit_border_before witness
+  | W_property__webkit_border_before_color :
+      property__webkit_border_before_color witness
+  | W_property__webkit_border_before_style :
+      property__webkit_border_before_style witness
+  | W_property__webkit_border_before_width :
+      property__webkit_border_before_width witness
+  | W_property__webkit_box_reflect : property__webkit_box_reflect witness
+  | W_property__webkit_column_break_after :
+      property__webkit_column_break_after witness
+  | W_property__webkit_column_break_before :
+      property__webkit_column_break_before witness
+  | W_property__webkit_column_break_inside :
+      property__webkit_column_break_inside witness
+  | W_property__webkit_font_smoothing : property__webkit_font_smoothing witness
+  | W_property__webkit_line_clamp : property__webkit_line_clamp witness
+  | W_property__webkit_mask : property__webkit_mask witness
+  | W_property__webkit_mask_attachment :
+      property__webkit_mask_attachment witness
+  | W_property__webkit_mask_box_image : property__webkit_mask_box_image witness
+  | W_property__webkit_mask_clip : property__webkit_mask_clip witness
+  | W_property__webkit_mask_composite : property__webkit_mask_composite witness
+  | W_property__webkit_mask_image : property__webkit_mask_image witness
+  | W_property__webkit_mask_origin : property__webkit_mask_origin witness
+  | W_property__webkit_mask_position : property__webkit_mask_position witness
+  | W_property__webkit_mask_position_x :
+      property__webkit_mask_position_x witness
+  | W_property__webkit_mask_position_y :
+      property__webkit_mask_position_y witness
+  | W_property__webkit_mask_repeat : property__webkit_mask_repeat witness
+  | W_property__webkit_mask_repeat_x : property__webkit_mask_repeat_x witness
+  | W_property__webkit_mask_repeat_y : property__webkit_mask_repeat_y witness
+  | W_property__webkit_mask_size : property__webkit_mask_size witness
+  | W_property__webkit_overflow_scrolling :
+      property__webkit_overflow_scrolling witness
+  | W_property__webkit_print_color_adjust :
+      property__webkit_print_color_adjust witness
+  | W_property__webkit_tap_highlight_color :
+      property__webkit_tap_highlight_color witness
+  | W_property__webkit_text_fill_color :
+      property__webkit_text_fill_color witness
+  | W_property__webkit_text_security : property__webkit_text_security witness
+  | W_property__webkit_text_stroke : property__webkit_text_stroke witness
+  | W_property__webkit_text_stroke_color :
+      property__webkit_text_stroke_color witness
+  | W_property__webkit_text_stroke_width :
+      property__webkit_text_stroke_width witness
+  | W_property__webkit_touch_callout : property__webkit_touch_callout witness
+  | W_property__webkit_user_drag : property__webkit_user_drag witness
+  | W_property__webkit_user_modify : property__webkit_user_modify witness
+  | W_property__webkit_user_select : property__webkit_user_select witness
+  | W_property_accent_color : property_accent_color witness
+  | W_property_alignment_baseline : property_alignment_baseline witness
+  | W_property_anchor_name : property_anchor_name witness
+  | W_property_anchor_scope : property_anchor_scope witness
+  | W_property_animation : property_animation witness
+  | W_property_animation_composition : property_animation_composition witness
+  | W_property_animation_delay : property_animation_delay witness
+  | W_property_animation_delay_end : property_animation_delay_end witness
+  | W_property_animation_delay_start : property_animation_delay_start witness
+  | W_property_animation_direction : property_animation_direction witness
+  | W_property_animation_duration : property_animation_duration witness
+  | W_property_animation_fill_mode : property_animation_fill_mode witness
+  | W_property_animation_iteration_count :
+      property_animation_iteration_count witness
+  | W_property_animation_name : property_animation_name witness
+  | W_property_animation_play_state : property_animation_play_state witness
+  | W_property_animation_range : property_animation_range witness
+  | W_property_animation_range_end : property_animation_range_end witness
+  | W_property_animation_range_start : property_animation_range_start witness
+  | W_property_animation_timeline : property_animation_timeline witness
+  | W_property_animation_timing_function :
+      property_animation_timing_function witness
+  | W_property_aspect_ratio : property_aspect_ratio witness
+  | W_property_azimuth : property_azimuth witness
+  | W_property_backdrop_blur : property_backdrop_blur witness
+  | W_property_backdrop_filter : property_backdrop_filter witness
+  | W_property_background : property_background witness
+  | W_property_background_attachment : property_background_attachment witness
+  | W_property_background_blend_mode : property_background_blend_mode witness
+  | W_property_background_clip : property_background_clip witness
+  | W_property_background_color : property_background_color witness
+  | W_property_background_image : property_background_image witness
+  | W_property_background_origin : property_background_origin witness
+  | W_property_background_position : property_background_position witness
+  | W_property_background_position_x : property_background_position_x witness
+  | W_property_background_position_y : property_background_position_y witness
+  | W_property_background_repeat : property_background_repeat witness
+  | W_property_background_size : property_background_size witness
+  | W_property_baseline_shift : property_baseline_shift witness
+  | W_property_behavior : property_behavior witness
+  | W_property_bleed : property_bleed witness
+  | W_property_block_overflow : property_block_overflow witness
+  | W_property_block_size : property_block_size witness
+  | W_property_border_block : property_border_block witness
+  | W_property_border_block_color : property_border_block_color witness
+  | W_property_border_block_end : property_border_block_end witness
+  | W_property_border_block_end_color : property_border_block_end_color witness
+  | W_property_border_block_end_style : property_border_block_end_style witness
+  | W_property_border_block_end_width : property_border_block_end_width witness
+  | W_property_border_block_start : property_border_block_start witness
+  | W_property_border_block_start_color :
+      property_border_block_start_color witness
+  | W_property_border_block_start_style :
+      property_border_block_start_style witness
+  | W_property_border_block_start_width :
+      property_border_block_start_width witness
+  | W_property_border_block_style : property_border_block_style witness
+  | W_property_border_block_width : property_border_block_width witness
+  | W_property_border_bottom : property_border_bottom witness
+  | W_property_border_bottom_color : property_border_bottom_color witness
+  | W_property_border_bottom_left_radius :
+      property_border_bottom_left_radius witness
+  | W_property_border_bottom_right_radius :
+      property_border_bottom_right_radius witness
+  | W_property_border_bottom_style : property_border_bottom_style witness
+  | W_property_border_bottom_width : property_border_bottom_width witness
+  | W_property_border_color : property_border_color witness
+  | W_property_border_end_end_radius : property_border_end_end_radius witness
+  | W_property_border_end_start_radius :
+      property_border_end_start_radius witness
+  | W_property_border_image : property_border_image witness
+  | W_property_border_image_outset : property_border_image_outset witness
+  | W_property_border_image_slice : property_border_image_slice witness
+  | W_property_border_image_source : property_border_image_source witness
+  | W_property_border_image_width : property_border_image_width witness
+  | W_property_border_inline : property_border_inline witness
+  | W_property_border_inline_color : property_border_inline_color witness
+  | W_property_border_inline_end : property_border_inline_end witness
+  | W_property_border_inline_end_color :
+      property_border_inline_end_color witness
+  | W_property_border_inline_end_style :
+      property_border_inline_end_style witness
+  | W_property_border_inline_end_width :
+      property_border_inline_end_width witness
+  | W_property_border_inline_start : property_border_inline_start witness
+  | W_property_border_inline_start_color :
+      property_border_inline_start_color witness
+  | W_property_border_inline_start_style :
+      property_border_inline_start_style witness
+  | W_property_border_inline_start_width :
+      property_border_inline_start_width witness
+  | W_property_border_inline_style : property_border_inline_style witness
+  | W_property_border_inline_width : property_border_inline_width witness
+  | W_property_border_left : property_border_left witness
+  | W_property_border_left_color : property_border_left_color witness
+  | W_property_border_left_style : property_border_left_style witness
+  | W_property_border_left_width : property_border_left_width witness
+  | W_property_border_radius : property_border_radius witness
+  | W_property_border_right : property_border_right witness
+  | W_property_border_right_color : property_border_right_color witness
+  | W_property_border_right_style : property_border_right_style witness
+  | W_property_border_right_width : property_border_right_width witness
+  | W_property_border_spacing : property_border_spacing witness
+  | W_property_border_start_end_radius :
+      property_border_start_end_radius witness
+  | W_property_border_start_start_radius :
+      property_border_start_start_radius witness
+  | W_property_border_style : property_border_style witness
+  | W_property_border_top : property_border_top witness
+  | W_property_border_top_color : property_border_top_color witness
+  | W_property_border_top_left_radius : property_border_top_left_radius witness
+  | W_property_border_top_right_radius :
+      property_border_top_right_radius witness
+  | W_property_border_top_style : property_border_top_style witness
+  | W_property_border_top_width : property_border_top_width witness
+  | W_property_border_width : property_border_width witness
+  | W_property_bottom : property_bottom witness
+  | W_property_box_align : property_box_align witness
+  | W_property_box_direction : property_box_direction witness
+  | W_property_box_flex : property_box_flex witness
+  | W_property_box_flex_group : property_box_flex_group witness
+  | W_property_box_lines : property_box_lines witness
+  | W_property_box_ordinal_group : property_box_ordinal_group witness
+  | W_property_box_orient : property_box_orient witness
+  | W_property_box_pack : property_box_pack witness
+  | W_property_box_shadow : property_box_shadow witness
+  | W_property_clip : property_clip witness
+  | W_property_clip_path : property_clip_path witness
+  | W_property_color : property_color witness
+  | W_property_color_interpolation : property_color_interpolation witness
+  | W_property_color_interpolation_filters :
+      property_color_interpolation_filters witness
+  | W_property_color_rendering : property_color_rendering witness
+  | W_property_column_count : property_column_count witness
+  | W_property_column_rule : property_column_rule witness
+  | W_property_column_rule_color : property_column_rule_color witness
+  | W_property_column_rule_style : property_column_rule_style witness
+  | W_property_column_rule_width : property_column_rule_width witness
+  | W_property_column_width : property_column_width witness
+  | W_property_columns : property_columns witness
+  | W_property_contain_intrinsic_block_size :
+      property_contain_intrinsic_block_size witness
+  | W_property_contain_intrinsic_height :
+      property_contain_intrinsic_height witness
+  | W_property_contain_intrinsic_inline_size :
+      property_contain_intrinsic_inline_size witness
+  | W_property_contain_intrinsic_width :
+      property_contain_intrinsic_width witness
+  | W_property_container : property_container witness
+  | W_property_container_name : property_container_name witness
+  | W_property_container_name_computed :
+      property_container_name_computed witness
+  | W_property_content : property_content witness
+  | W_property_counter_increment : property_counter_increment witness
+  | W_property_counter_reset : property_counter_reset witness
+  | W_property_counter_set : property_counter_set witness
+  | W_property_cue : property_cue witness
+  | W_property_cue_after : property_cue_after witness
+  | W_property_cue_before : property_cue_before witness
+  | W_property_cursor : property_cursor witness
+  | W_property_cx : property_cx witness
+  | W_property_cy : property_cy witness
+  | W_property_d : property_d witness
+  | W_property_dominant_baseline : property_dominant_baseline witness
+  | W_property_field_sizing : property_field_sizing witness
+  | W_property_fill : property_fill witness
+  | W_property_fill_opacity : property_fill_opacity witness
+  | W_property_fill_rule : property_fill_rule witness
+  | W_property_filter : property_filter witness
+  | W_property_flex : property_flex witness
+  | W_property_flex_flow : property_flex_flow witness
+  | W_property_flood_color : property_flood_color witness
+  | W_property_flood_opacity : property_flood_opacity witness
+  | W_property_font : property_font witness
+  | W_property_font_family : property_font_family witness
+  | W_property_font_feature_settings : property_font_feature_settings witness
+  | W_property_font_language_override : property_font_language_override witness
+  | W_property_font_size : property_font_size witness
+  | W_property_font_size_adjust : property_font_size_adjust witness
+  | W_property_font_smooth : property_font_smooth witness
+  | W_property_font_synthesis : property_font_synthesis witness
+  | W_property_font_variant : property_font_variant witness
+  | W_property_font_variant_alternates :
+      property_font_variant_alternates witness
+  | W_property_font_variant_east_asian :
+      property_font_variant_east_asian witness
+  | W_property_font_variant_emoji : property_font_variant_emoji witness
+  | W_property_font_variant_ligatures : property_font_variant_ligatures witness
+  | W_property_font_variant_numeric : property_font_variant_numeric witness
+  | W_property_font_variation_settings :
+      property_font_variation_settings witness
+  | W_property_font_weight : property_font_weight witness
+  | W_property_gap : property_gap witness
+  | W_property_glyph_orientation_horizontal :
+      property_glyph_orientation_horizontal witness
+  | W_property_glyph_orientation_vertical :
+      property_glyph_orientation_vertical witness
+  | W_property_grid : property_grid witness
+  | W_property_grid_area : property_grid_area witness
+  | W_property_grid_auto_columns : property_grid_auto_columns witness
+  | W_property_grid_auto_rows : property_grid_auto_rows witness
+  | W_property_grid_column : property_grid_column witness
+  | W_property_grid_column_end : property_grid_column_end witness
+  | W_property_grid_column_gap : property_grid_column_gap witness
+  | W_property_grid_column_start : property_grid_column_start witness
+  | W_property_grid_gap : property_grid_gap witness
+  | W_property_grid_row : property_grid_row witness
+  | W_property_grid_row_end : property_grid_row_end witness
+  | W_property_grid_row_gap : property_grid_row_gap witness
+  | W_property_grid_row_start : property_grid_row_start witness
+  | W_property_grid_template : property_grid_template witness
+  | W_property_grid_template_areas : property_grid_template_areas witness
+  | W_property_grid_template_columns : property_grid_template_columns witness
+  | W_property_grid_template_rows : property_grid_template_rows witness
+  | W_property_hanging_punctuation : property_hanging_punctuation witness
+  | W_property_height : property_height witness
+  | W_property_hyphenate_character : property_hyphenate_character witness
+  | W_property_hyphenate_limit_chars : property_hyphenate_limit_chars witness
+  | W_property_hyphenate_limit_last : property_hyphenate_limit_last witness
+  | W_property_hyphenate_limit_lines : property_hyphenate_limit_lines witness
+  | W_property_hyphenate_limit_zone : property_hyphenate_limit_zone witness
+  | W_property_image_orientation : property_image_orientation witness
+  | W_property_image_resolution : property_image_resolution witness
+  | W_property_ime_mode : property_ime_mode witness
+  | W_property_inherits : property_inherits witness
+  | W_property_initial_letter : property_initial_letter witness
+  | W_property_initial_letter_align : property_initial_letter_align witness
+  | W_property_initial_value : property_initial_value witness
+  | W_property_inline_size : property_inline_size witness
+  | W_property_inset : property_inset witness
+  | W_property_inset_area : property_inset_area witness
+  | W_property_inset_block : property_inset_block witness
+  | W_property_inset_block_end : property_inset_block_end witness
+  | W_property_inset_block_start : property_inset_block_start witness
+  | W_property_inset_inline : property_inset_inline witness
+  | W_property_inset_inline_end : property_inset_inline_end witness
+  | W_property_inset_inline_start : property_inset_inline_start witness
+  | W_property_interpolate_size : property_interpolate_size witness
+  | W_property_kerning : property_kerning witness
+  | W_property_layout_grid : property_layout_grid witness
+  | W_property_layout_grid_char : property_layout_grid_char witness
+  | W_property_layout_grid_line : property_layout_grid_line witness
+  | W_property_layout_grid_mode : property_layout_grid_mode witness
+  | W_property_layout_grid_type : property_layout_grid_type witness
+  | W_property_left : property_left witness
+  | W_property_letter_spacing : property_letter_spacing witness
+  | W_property_lighting_color : property_lighting_color witness
+  | W_property_line_break : property_line_break witness
+  | W_property_line_clamp : property_line_clamp witness
+  | W_property_line_height : property_line_height witness
+  | W_property_line_height_step : property_line_height_step witness
+  | W_property_list_style : property_list_style witness
+  | W_property_list_style_image : property_list_style_image witness
+  | W_property_margin : property_margin witness
+  | W_property_margin_block : property_margin_block witness
+  | W_property_margin_block_end : property_margin_block_end witness
+  | W_property_margin_block_start : property_margin_block_start witness
+  | W_property_margin_bottom : property_margin_bottom witness
+  | W_property_margin_inline : property_margin_inline witness
+  | W_property_margin_inline_end : property_margin_inline_end witness
+  | W_property_margin_inline_start : property_margin_inline_start witness
+  | W_property_margin_left : property_margin_left witness
+  | W_property_margin_right : property_margin_right witness
+  | W_property_margin_top : property_margin_top witness
+  | W_property_margin_trim : property_margin_trim witness
+  | W_property_marker : property_marker witness
+  | W_property_marker_end : property_marker_end witness
+  | W_property_marker_mid : property_marker_mid witness
+  | W_property_marker_start : property_marker_start witness
+  | W_property_marks : property_marks witness
+  | W_property_mask : property_mask witness
+  | W_property_mask_border : property_mask_border witness
+  | W_property_mask_border_outset : property_mask_border_outset witness
+  | W_property_mask_border_repeat : property_mask_border_repeat witness
+  | W_property_mask_border_slice : property_mask_border_slice witness
+  | W_property_mask_border_source : property_mask_border_source witness
+  | W_property_mask_border_width : property_mask_border_width witness
+  | W_property_mask_clip : property_mask_clip witness
+  | W_property_mask_composite : property_mask_composite witness
+  | W_property_mask_image : property_mask_image witness
+  | W_property_mask_mode : property_mask_mode witness
+  | W_property_mask_origin : property_mask_origin witness
+  | W_property_mask_position : property_mask_position witness
+  | W_property_mask_repeat : property_mask_repeat witness
+  | W_property_mask_size : property_mask_size witness
+  | W_property_masonry_auto_flow : property_masonry_auto_flow witness
+  | W_property_math_depth : property_math_depth witness
+  | W_property_math_shift : property_math_shift witness
+  | W_property_math_style : property_math_style witness
+  | W_property_max_block_size : property_max_block_size witness
+  | W_property_max_height : property_max_height witness
+  | W_property_max_inline_size : property_max_inline_size witness
+  | W_property_max_lines : property_max_lines witness
+  | W_property_max_width : property_max_width witness
+  | W_property_media_any_hover : property_media_any_hover witness
+  | W_property_media_any_pointer : property_media_any_pointer witness
+  | W_property_media_color_gamut : property_media_color_gamut witness
+  | W_property_media_color_index : property_media_color_index witness
+  | W_property_media_display_mode : property_media_display_mode witness
+  | W_property_media_forced_colors : property_media_forced_colors witness
+  | W_property_media_grid : property_media_grid witness
+  | W_property_media_hover : property_media_hover witness
+  | W_property_media_inverted_colors : property_media_inverted_colors witness
+  | W_property_media_max_aspect_ratio : property_media_max_aspect_ratio witness
+  | W_property_media_max_resolution : property_media_max_resolution witness
+  | W_property_media_min_aspect_ratio : property_media_min_aspect_ratio witness
+  | W_property_media_min_color : property_media_min_color witness
+  | W_property_media_min_color_index : property_media_min_color_index witness
+  | W_property_media_min_resolution : property_media_min_resolution witness
+  | W_property_media_monochrome : property_media_monochrome witness
+  | W_property_media_orientation : property_media_orientation witness
+  | W_property_media_pointer : property_media_pointer witness
+  | W_property_media_prefers_color_scheme :
+      property_media_prefers_color_scheme witness
+  | W_property_media_prefers_contrast : property_media_prefers_contrast witness
+  | W_property_media_prefers_reduced_motion :
+      property_media_prefers_reduced_motion witness
+  | W_property_media_resolution : property_media_resolution witness
+  | W_property_media_scripting : property_media_scripting witness
+  | W_property_media_update : property_media_update witness
+  | W_property_min_block_size : property_min_block_size witness
+  | W_property_min_height : property_min_height witness
+  | W_property_min_inline_size : property_min_inline_size witness
+  | W_property_min_width : property_min_width witness
+  | W_property_nav_down : property_nav_down witness
+  | W_property_nav_left : property_nav_left witness
+  | W_property_nav_right : property_nav_right witness
+  | W_property_nav_up : property_nav_up witness
+  | W_property_object_position : property_object_position witness
+  | W_property_offset : property_offset witness
+  | W_property_offset_anchor : property_offset_anchor witness
+  | W_property_offset_distance : property_offset_distance witness
+  | W_property_offset_path : property_offset_path witness
+  | W_property_offset_position : property_offset_position witness
+  | W_property_offset_rotate : property_offset_rotate witness
+  | W_property_opacity : property_opacity witness
+  | W_property_order : property_order witness
+  | W_property_orphans : property_orphans witness
+  | W_property_outline : property_outline witness
+  | W_property_outline_color : property_outline_color witness
+  | W_property_outline_offset : property_outline_offset witness
+  | W_property_overflow_block : property_overflow_block witness
+  | W_property_overflow_clip_margin : property_overflow_clip_margin witness
+  | W_property_overflow_inline : property_overflow_inline witness
+  | W_property_overflow_x : property_overflow_x witness
+  | W_property_overflow_y : property_overflow_y witness
+  | W_property_overlay : property_overlay witness
+  | W_property_overscroll_behavior_block :
+      property_overscroll_behavior_block witness
+  | W_property_overscroll_behavior_inline :
+      property_overscroll_behavior_inline witness
+  | W_property_overscroll_behavior_x : property_overscroll_behavior_x witness
+  | W_property_overscroll_behavior_y : property_overscroll_behavior_y witness
+  | W_property_padding : property_padding witness
+  | W_property_padding_block : property_padding_block witness
+  | W_property_padding_block_end : property_padding_block_end witness
+  | W_property_padding_block_start : property_padding_block_start witness
+  | W_property_padding_bottom : property_padding_bottom witness
+  | W_property_padding_inline : property_padding_inline witness
+  | W_property_padding_inline_end : property_padding_inline_end witness
+  | W_property_padding_inline_start : property_padding_inline_start witness
+  | W_property_padding_left : property_padding_left witness
+  | W_property_padding_right : property_padding_right witness
+  | W_property_padding_top : property_padding_top witness
+  | W_property_page : property_page witness
+  | W_property_paint_order : property_paint_order witness
+  | W_property_pause : property_pause witness
+  | W_property_pause_after : property_pause_after witness
+  | W_property_pause_before : property_pause_before witness
+  | W_property_perspective : property_perspective witness
+  | W_property_place_content : property_place_content witness
+  | W_property_place_items : property_place_items witness
+  | W_property_place_self : property_place_self witness
+  | W_property_position_anchor : property_position_anchor witness
+  | W_property_position_area : property_position_area witness
+  | W_property_position_try : property_position_try witness
+  | W_property_position_try_fallbacks : property_position_try_fallbacks witness
+  | W_property_position_try_options : property_position_try_options witness
+  | W_property_position_visibility : property_position_visibility witness
+  | W_property_quotes : property_quotes witness
+  | W_property_r : property_r witness
+  | W_property_reading_flow : property_reading_flow witness
+  | W_property_rest : property_rest witness
+  | W_property_rest_after : property_rest_after witness
+  | W_property_rest_before : property_rest_before witness
+  | W_property_right : property_right witness
+  | W_property_rotate : property_rotate witness
+  | W_property_ruby_align : property_ruby_align witness
+  | W_property_ruby_overhang : property_ruby_overhang witness
+  | W_property_rx : property_rx witness
+  | W_property_ry : property_ry witness
+  | W_property_scale : property_scale witness
+  | W_property_scroll_margin : property_scroll_margin witness
+  | W_property_scroll_margin_block : property_scroll_margin_block witness
+  | W_property_scroll_margin_block_end :
+      property_scroll_margin_block_end witness
+  | W_property_scroll_margin_block_start :
+      property_scroll_margin_block_start witness
+  | W_property_scroll_margin_bottom : property_scroll_margin_bottom witness
+  | W_property_scroll_margin_inline : property_scroll_margin_inline witness
+  | W_property_scroll_margin_inline_end :
+      property_scroll_margin_inline_end witness
+  | W_property_scroll_margin_inline_start :
+      property_scroll_margin_inline_start witness
+  | W_property_scroll_margin_left : property_scroll_margin_left witness
+  | W_property_scroll_margin_right : property_scroll_margin_right witness
+  | W_property_scroll_margin_top : property_scroll_margin_top witness
+  | W_property_scroll_marker_group : property_scroll_marker_group witness
+  | W_property_scroll_padding : property_scroll_padding witness
+  | W_property_scroll_padding_block : property_scroll_padding_block witness
+  | W_property_scroll_padding_block_end :
+      property_scroll_padding_block_end witness
+  | W_property_scroll_padding_block_start :
+      property_scroll_padding_block_start witness
+  | W_property_scroll_padding_bottom : property_scroll_padding_bottom witness
+  | W_property_scroll_padding_inline : property_scroll_padding_inline witness
+  | W_property_scroll_padding_inline_end :
+      property_scroll_padding_inline_end witness
+  | W_property_scroll_padding_inline_start :
+      property_scroll_padding_inline_start witness
+  | W_property_scroll_padding_left : property_scroll_padding_left witness
+  | W_property_scroll_padding_right : property_scroll_padding_right witness
+  | W_property_scroll_padding_top : property_scroll_padding_top witness
+  | W_property_scroll_snap_align : property_scroll_snap_align witness
+  | W_property_scroll_snap_coordinate : property_scroll_snap_coordinate witness
+  | W_property_scroll_snap_destination :
+      property_scroll_snap_destination witness
+  | W_property_scroll_snap_points_x : property_scroll_snap_points_x witness
+  | W_property_scroll_snap_points_y : property_scroll_snap_points_y witness
+  | W_property_scroll_snap_type : property_scroll_snap_type witness
+  | W_property_scroll_snap_type_x : property_scroll_snap_type_x witness
+  | W_property_scroll_snap_type_y : property_scroll_snap_type_y witness
+  | W_property_scroll_start : property_scroll_start witness
+  | W_property_scroll_start_block : property_scroll_start_block witness
+  | W_property_scroll_start_inline : property_scroll_start_inline witness
+  | W_property_scroll_start_target : property_scroll_start_target witness
+  | W_property_scroll_start_target_block :
+      property_scroll_start_target_block witness
+  | W_property_scroll_start_target_inline :
+      property_scroll_start_target_inline witness
+  | W_property_scroll_start_target_x : property_scroll_start_target_x witness
+  | W_property_scroll_start_target_y : property_scroll_start_target_y witness
+  | W_property_scroll_start_x : property_scroll_start_x witness
+  | W_property_scroll_start_y : property_scroll_start_y witness
+  | W_property_scroll_timeline : property_scroll_timeline witness
+  | W_property_scroll_timeline_axis : property_scroll_timeline_axis witness
+  | W_property_scroll_timeline_name : property_scroll_timeline_name witness
+  | W_property_scrollbar_3dlight_color :
+      property_scrollbar_3dlight_color witness
+  | W_property_scrollbar_arrow_color : property_scrollbar_arrow_color witness
+  | W_property_scrollbar_base_color : property_scrollbar_base_color witness
+  | W_property_scrollbar_color : property_scrollbar_color witness
+  | W_property_scrollbar_color_legacy : property_scrollbar_color_legacy witness
+  | W_property_scrollbar_darkshadow_color :
+      property_scrollbar_darkshadow_color witness
+  | W_property_scrollbar_face_color : property_scrollbar_face_color witness
+  | W_property_scrollbar_gutter : property_scrollbar_gutter witness
+  | W_property_scrollbar_highlight_color :
+      property_scrollbar_highlight_color witness
+  | W_property_scrollbar_shadow_color : property_scrollbar_shadow_color witness
+  | W_property_scrollbar_track_color : property_scrollbar_track_color witness
+  | W_property_shape_image_threshold : property_shape_image_threshold witness
+  | W_property_shape_margin : property_shape_margin witness
+  | W_property_shape_outside : property_shape_outside witness
+  | W_property_shape_rendering : property_shape_rendering witness
+  | W_property_size : property_size witness
+  | W_property_speak_as : property_speak_as witness
+  | W_property_src : property_src witness
+  | W_property_stop_color : property_stop_color witness
+  | W_property_stop_opacity : property_stop_opacity witness
+  | W_property_stroke : property_stroke witness
+  | W_property_stroke_dasharray : property_stroke_dasharray witness
+  | W_property_stroke_dashoffset : property_stroke_dashoffset witness
+  | W_property_stroke_miterlimit : property_stroke_miterlimit witness
+  | W_property_stroke_opacity : property_stroke_opacity witness
+  | W_property_stroke_width : property_stroke_width witness
+  | W_property_syntax : property_syntax witness
+  | W_property_tab_size : property_tab_size witness
+  | W_property_text_align_all : property_text_align_all witness
+  | W_property_text_anchor : property_text_anchor witness
+  | W_property_text_autospace : property_text_autospace witness
+  | W_property_text_blink : property_text_blink witness
+  | W_property_text_box_edge : property_text_box_edge witness
+  | W_property_text_box_trim : property_text_box_trim witness
+  | W_property_text_combine_upright : property_text_combine_upright witness
+  | W_property_text_decoration : property_text_decoration witness
+  | W_property_text_decoration_color : property_text_decoration_color witness
+  | W_property_text_decoration_skip : property_text_decoration_skip witness
+  | W_property_text_decoration_skip_box :
+      property_text_decoration_skip_box witness
+  | W_property_text_decoration_skip_inset :
+      property_text_decoration_skip_inset witness
+  | W_property_text_decoration_skip_self :
+      property_text_decoration_skip_self witness
+  | W_property_text_decoration_skip_spaces :
+      property_text_decoration_skip_spaces witness
+  | W_property_text_edge : property_text_edge witness
+  | W_property_text_emphasis : property_text_emphasis witness
+  | W_property_text_emphasis_color : property_text_emphasis_color witness
+  | W_property_text_emphasis_position : property_text_emphasis_position witness
+  | W_property_text_emphasis_style : property_text_emphasis_style witness
+  | W_property_text_indent : property_text_indent witness
+  | W_property_text_justify_trim : property_text_justify_trim witness
+  | W_property_text_kashida : property_text_kashida witness
+  | W_property_text_kashida_space : property_text_kashida_space witness
+  | W_property_text_overflow : property_text_overflow witness
+  | W_property_text_shadow : property_text_shadow witness
+  | W_property_text_size_adjust : property_text_size_adjust witness
+  | W_property_text_spacing_trim : property_text_spacing_trim witness
+  | W_property_text_underline_offset : property_text_underline_offset witness
+  | W_property_text_wrap : property_text_wrap witness
+  | W_property_text_wrap_mode : property_text_wrap_mode witness
+  | W_property_text_wrap_style : property_text_wrap_style witness
+  | W_property_timeline_scope : property_timeline_scope witness
+  | W_property_top : property_top witness
+  | W_property_transform : property_transform witness
+  | W_property_transform_origin : property_transform_origin witness
+  | W_property_transition : property_transition witness
+  | W_property_transition_behavior : property_transition_behavior witness
+  | W_property_transition_delay : property_transition_delay witness
+  | W_property_transition_duration : property_transition_duration witness
+  | W_property_transition_property : property_transition_property witness
+  | W_property_transition_timing_function :
+      property_transition_timing_function witness
+  | W_property_translate : property_translate witness
+  | W_property_unicode_range : property_unicode_range witness
+  | W_property_vector_effect : property_vector_effect witness
+  | W_property_vertical_align : property_vertical_align witness
+  | W_property_view_timeline : property_view_timeline witness
+  | W_property_view_timeline_axis : property_view_timeline_axis witness
+  | W_property_view_timeline_inset : property_view_timeline_inset witness
+  | W_property_view_timeline_name : property_view_timeline_name witness
+  | W_property_view_transition_name : property_view_transition_name witness
+  | W_property_voice_balance : property_voice_balance witness
+  | W_property_voice_duration : property_voice_duration witness
+  | W_property_voice_family : property_voice_family witness
+  | W_property_voice_pitch : property_voice_pitch witness
+  | W_property_voice_range : property_voice_range witness
+  | W_property_voice_rate : property_voice_rate witness
+  | W_property_voice_stress : property_voice_stress witness
+  | W_property_voice_volume : property_voice_volume witness
+  | W_property_white_space_collapse : property_white_space_collapse witness
+  | W_property_widows : property_widows witness
+  | W_property_word_space_transform : property_word_space_transform witness
+  | W_property_word_spacing : property_word_spacing witness
+  | W_property_x : property_x witness
+  | W_property_y : property_y witness
+  | W_property_z_index : property_z_index witness
+  | W_property_zoom : property_zoom witness
+  | W_age : age witness
+  | W_attachment : attachment witness
+  | W_box : box witness
+  | W_display_box : display_box witness
+  | W_display_outside : display_outside witness
+  | W_ending_shape : ending_shape witness
+  | W_fill_rule : fill_rule witness
+  | W_zero : zero witness
+  | W_gender : gender witness
+  | W_combinator : combinator witness
+  | W_contextual_alt_values : contextual_alt_values witness
+  | W_east_asian_width_values : east_asian_width_values witness
+  | W_attr_modifier : attr_modifier witness
+  | W_image_tags : image_tags witness
+  | W_line_style : line_style witness
+  | W_line_width : line_width witness
+  | W_named_color : named_color witness
+  | W_color : color witness
+  | W_alpha_value : alpha_value witness
+  | W_hue : hue witness
+  | W_bg_image : bg_image witness
+  | W_content_replacement : content_replacement witness
+  | W_transform_list : transform_list witness
+  | W_transform_function : transform_function witness
+  | W_image : image witness
+  | W_font_families : font_families witness
+  | W_color_interpolation_method : color_interpolation_method witness
+  | W_family_name : family_name witness
+  | W_keyframes_name : keyframes_name witness
+  | W_url : url witness
+  | W_gradient : gradient witness
+  | W_shadow : shadow witness
+  | W_track_list : track_list witness
+  | W_line_names : line_names witness
+  | W_side_or_corner : side_or_corner witness
+  | W_track_size : track_size witness
+  | W_track_breadth : track_breadth witness
+  | W_track_repeat : track_repeat witness
+  | W_content_list : content_list witness
+  | W_mask_reference : mask_reference witness
+  | W_color_stop_list : color_stop_list witness
+  | W_mask_source : mask_source witness
+  | W_length_percentage : length_percentage witness
+  | W_auto_track_list : auto_track_list witness
+  | W_counter_style : counter_style witness
+  | W_counter_style_name : counter_style_name witness
+  | W_fixed_size : fixed_size witness
+  | W_fixed_repeat : fixed_repeat witness
+  | W_fixed_breadth : fixed_breadth witness
+  | W_auto_repeat : auto_repeat witness
+  | W_extended_time_no_interp : extended_time_no_interp witness
+  | W_timing_function_no_interp : timing_function_no_interp witness
+  | W_cubic_bezier_timing_function : cubic_bezier_timing_function witness
+  | W_step_timing_function : step_timing_function witness
+  | W_single_animation : single_animation witness
+  | W_single_animation_no_interp : single_animation_no_interp witness
+  | W_single_animation_direction_no_interp :
+      single_animation_direction_no_interp witness
+  | W_single_animation_fill_mode_no_interp :
+      single_animation_fill_mode_no_interp witness
+  | W_single_animation_iteration_count_no_interp :
+      single_animation_iteration_count_no_interp witness
+  | W_single_animation_play_state_no_interp :
+      single_animation_play_state_no_interp witness
+  | W_shadow_t : shadow_t witness
+  | W_font_weight_absolute : font_weight_absolute witness
+  | W_position : position witness
+  | W_timing_function : timing_function witness
+  | W_number_percentage : number_percentage witness
+  | W_grid_line : grid_line witness
+  | W_single_transition_property : single_transition_property witness
+  | W_outline_radius : outline_radius witness
+  | W_bg_size : bg_size witness
+  | W_bg_position : bg_position witness
+  | W_feature_value_name : feature_value_name witness
+  | W_svg_length : svg_length witness
+  | W_single_animation_iteration_count :
+      single_animation_iteration_count witness
+  | W_basic_shape : basic_shape witness
+  | W_filter_function : filter_function witness
+  | W_overflow_position : overflow_position witness
+  | W_relative_size : relative_size witness
+  | W_repeat_style : repeat_style witness
+  | W_self_position : self_position witness
+  | W_single_animation_direction : single_animation_direction witness
+  | W_single_animation_fill_mode : single_animation_fill_mode witness
+  | W_single_animation_play_state : single_animation_play_state witness
+  | W_step_position : step_position witness
+  | W_symbols_type : symbols_type witness
+  | W_masking_mode : masking_mode witness
+  | W_numeric_figure_values : numeric_figure_values witness
+  | W_numeric_spacing_values : numeric_spacing_values witness
+  | W_absolute_size : absolute_size witness
+  | W_content_position : content_position witness
+  | W_baseline_position : baseline_position witness
+  | W_blend_mode : blend_mode witness
+  | W_geometry_box : geometry_box witness
+  | W_calc_product : calc_product witness
+  | W_calc_sum : calc_sum witness
+  | W_calc_value : calc_value witness
+  | W_mf_eq : mf_eq witness
+  | W_mf_gt : mf_gt witness
+  | W_mf_lt : mf_lt witness
+  | W_dimension : dimension witness
+  | W_ratio : ratio witness
+  | W_mf_name : mf_name witness
+  | W_mf_value : mf_value witness
+  | W_mf_boolean : mf_boolean witness
+  | W_mf_plain : mf_plain witness
+  | W_mf_comparison : mf_comparison witness
+  | W_mf_range : mf_range witness
+  | W_container_query : container_query witness
+  | W_container_condition : container_condition witness
+  | W_query_in_parens : query_in_parens witness
+  | W_size_feature : size_feature witness
+  | W_style_query : style_query witness
+  | W_style_feature : style_feature witness
+  | W_style_in_parens : style_in_parens witness
+  | W_legacy_radial_gradient_shape : legacy_radial_gradient_shape witness
+  | W_legacy_radial_gradient_size : legacy_radial_gradient_size witness
+  | W_legacy_radial_gradient_arguments :
+      legacy_radial_gradient_arguments witness
+  | W_legacy_radial_gradient : legacy_radial_gradient witness
+  | W_legacy_repeating_radial_gradient :
+      legacy_repeating_radial_gradient witness
+  | W_legacy_linear_gradient : legacy_linear_gradient witness
+  | W_legacy_linear_gradient_arguments :
+      legacy_linear_gradient_arguments witness
+  | W_legacy_repeating_linear_gradient :
+      legacy_repeating_linear_gradient witness
+  | W_legacy_gradient : legacy_gradient witness
+  | W_non_standard_color : non_standard_color witness
+  | W_non_standard_font : non_standard_font witness
+  | W_non_standard_image_rendering : non_standard_image_rendering witness
+  | W_non_standard_overflow : non_standard_overflow witness
+  | W_non_standard_width : non_standard_width witness
+  | W_webkit_gradient_type : webkit_gradient_type witness
+  | W_webkit_mask_box_repeat : webkit_mask_box_repeat witness
+  | W_webkit_mask_clip_style : webkit_mask_clip_style witness
+  | W_common_lig_values : common_lig_values witness
+  | W_compat_auto : compat_auto witness
+  | W_composite_style : composite_style witness
+  | W_compositing_operator : compositing_operator witness
+  | W_content_distribution : content_distribution witness
+  | W_deprecated_system_color : deprecated_system_color witness
+  | W_discretionary_lig_values : discretionary_lig_values witness
+  | W_display_inside : display_inside witness
+  | W_display_internal : display_internal witness
+  | W_display_legacy : display_legacy witness
+  | W_east_asian_variant_values : east_asian_variant_values witness
+  | W_feature_type : feature_type witness
+  | W_font_variant_css21 : font_variant_css21 witness
+  | W_generic_family : generic_family witness
+  | W_generic_name : generic_name witness
+  | W_historical_lig_values : historical_lig_values witness
+  | W_numeric_fraction_values : numeric_fraction_values witness
+  | W_page_margin_box_type : page_margin_box_type witness
+  | W_polar_color_space : polar_color_space witness
+  | W_quote : quote witness
+  | W_rectangular_color_space : rectangular_color_space witness
+  | W_shape_box : shape_box witness
+  | W_visual_box : visual_box witness
+  | W_angular_color_hint : angular_color_hint witness
+  | W_angular_color_stop : angular_color_stop witness
+  | W_angular_color_stop_list : angular_color_stop_list witness
+  | W_animateable_feature : animateable_feature witness
+  | W_attr_fallback : attr_fallback witness
+  | W_attr_matcher : attr_matcher witness
+  | W_attr_name : attr_name witness
+  | W_attr_type : attr_type witness
+  | W_attr_unit : attr_unit witness
+  | W_attribute_selector : attribute_selector witness
+  | W_bg_layer : bg_layer witness
+  | W_border_radius : border_radius witness
+  | W_bottom : bottom witness
+  | W_cf_final_image : cf_final_image witness
+  | W_cf_mixing_image : cf_mixing_image witness
+  | W_class_selector : class_selector witness
+  | W_clip_source : clip_source witness
+  | W_color_stop : color_stop witness
+  | W_color_stop_angle : color_stop_angle witness
+  | W_color_stop_length : color_stop_length witness
+  | W_complex_selector : complex_selector witness
+  | W_complex_selector_list : complex_selector_list witness
+  | W_compound_selector : compound_selector witness
+  | W_compound_selector_list : compound_selector_list witness
+  | W_container_condition_list : container_condition_list witness
+  | W_counter_name : counter_name witness
+  | W_declaration : declaration witness
+  | W_declaration_list : declaration_list witness
+  | W_display_listitem : display_listitem witness
+  | W_explicit_track_list : explicit_track_list witness
+  | W_extended_angle : extended_angle witness
+  | W_extended_frequency : extended_frequency witness
+  | W_extended_length : extended_length witness
+  | W_extended_percentage : extended_percentage witness
+  | W_extended_time : extended_time witness
+  | W_feature_tag_value : feature_tag_value witness
+  | W_feature_value_block : feature_value_block witness
+  | W_feature_value_block_list : feature_value_block_list witness
+  | W_feature_value_declaration : feature_value_declaration witness
+  | W_feature_value_declaration_list : feature_value_declaration_list witness
+  | W_filter_function_list : filter_function_list witness
+  | W_final_bg_layer : final_bg_layer witness
+  | W_font_stretch_absolute : font_stretch_absolute witness
+  | W_general_enclosed : general_enclosed witness
+  | W_generic_voice : generic_voice witness
+  | W_hue_interpolation_method : hue_interpolation_method witness
+  | W_id_selector : id_selector witness
+  | W_image_set_option : image_set_option witness
+  | W_image_src : image_src witness
+  | W_inflexible_breadth : inflexible_breadth witness
+  | W_keyframe_block : keyframe_block witness
+  | W_keyframe_block_list : keyframe_block_list witness
+  | W_keyframe_selector : keyframe_selector witness
+  | W_leader_type : leader_type witness
+  | W_left : left witness
+  | W_line_name_list : line_name_list witness
+  | W_linear_color_hint : linear_color_hint witness
+  | W_linear_color_stop : linear_color_stop witness
+  | W_mask_image : mask_image witness
+  | W_mask_layer : mask_layer witness
+  | W_mask_position : mask_position witness
+  | W_name_repeat : name_repeat witness
+  | W_namespace_prefix : namespace_prefix witness
+  | W_ns_prefix : ns_prefix witness
+  | W_nth : nth witness
+  | W_number_one_or_greater : number_one_or_greater witness
+  | W_number_zero_one : number_zero_one witness
+  | W_one_bg_size : one_bg_size witness
+  | W_page_body : page_body witness
+  | W_page_margin_box : page_margin_box witness
+  | W_page_selector : page_selector witness
+  | W_page_selector_list : page_selector_list witness
+  | W_paint : paint witness
+  | W_positive_integer : positive_integer witness
+  | W_pseudo_class_selector : pseudo_class_selector witness
+  | W_pseudo_element_selector : pseudo_element_selector witness
+  | W_pseudo_page : pseudo_page witness
+  | W_radial_size : radial_size witness
+  | W_ray_size : ray_size witness
+  | W_relative_selector : relative_selector witness
+  | W_relative_selector_list : relative_selector_list witness
+  | W_right : right witness
+  | W_shape : shape witness
+  | W_shape_radius : shape_radius witness
+  | W_single_transition : single_transition witness
+  | W_single_transition_no_interp : single_transition_no_interp witness
+  | W_single_transition_property_no_interp :
+      single_transition_property_no_interp witness
+  | W_size : size witness
+  | W_subclass_selector : subclass_selector witness
+  | W_supports_condition : supports_condition witness
+  | W_supports_decl : supports_decl witness
+  | W_supports_feature : supports_feature witness
+  | W_supports_in_parens : supports_in_parens witness
+  | W_supports_selector_fn : supports_selector_fn witness
+  | W_svg_writing_mode : svg_writing_mode witness
+  | W_symbol : symbol witness
+  | W_syntax : syntax witness
+  | W_syntax_combinator : syntax_combinator witness
+  | W_syntax_component : syntax_component witness
+  | W_syntax_multiplier : syntax_multiplier witness
+  | W_syntax_single_component : syntax_single_component witness
+  | W_syntax_string : syntax_string witness
+  | W_syntax_type_name : syntax_type_name witness
+  | W_target : target witness
+  | W_top : top witness
+  | W_track_group : track_group witness
+  | W_track_list_v0 : track_list_v0 witness
+  | W_track_minmax : track_minmax witness
+  | W_transition_behavior_value : transition_behavior_value witness
+  | W_transition_behavior_value_no_interp :
+      transition_behavior_value_no_interp witness
+  | W_try_tactic : try_tactic witness
+  | W_type_or_unit : type_or_unit witness
+  | W_type_selector : type_selector witness
+  | W_viewport_length : viewport_length witness
+  | W_webkit_gradient_color_stop : webkit_gradient_color_stop witness
+  | W_webkit_gradient_point : webkit_gradient_point witness
+  | W_webkit_gradient_radius : webkit_gradient_radius witness
+  | W_wq_name : wq_name witness
+  | W_x : x witness
+  | W_y : y witness
+  | W_function_image : function_image witness
+  | W_function_image_set : function_image_set witness
+  | W_function_element : function_element witness
+  | W_function_paint : function_paint witness
+  | W_function_cross_fade : function_cross_fade witness
+  | W_function_attr : function_attr witness
+  | W_function_symbols : function_symbols witness
+  | W_function_linear_gradient : function_linear_gradient witness
+  | W_function_radial_gradient : function_radial_gradient witness
+  | W_function_conic_gradient : function_conic_gradient witness
+  | W_function_repeating_linear_gradient :
+      function_repeating_linear_gradient witness
+  | W_function_repeating_radial_gradient :
+      function_repeating_radial_gradient witness
+  | W_function__webkit_gradient : function__webkit_gradient witness
+  | W_function_matrix : function_matrix witness
+  | W_function_matrix3d : function_matrix3d witness
+  | W_function_translate : function_translate witness
+  | W_function_translateX : function_translateX witness
+  | W_function_translateY : function_translateY witness
+  | W_function_translateZ : function_translateZ witness
+  | W_function_translate3d : function_translate3d witness
+  | W_function_scale : function_scale witness
+  | W_function_scale3d : function_scale3d witness
+  | W_function_scaleX : function_scaleX witness
+  | W_function_scaleY : function_scaleY witness
+  | W_function_scaleZ : function_scaleZ witness
+  | W_function_rotate : function_rotate witness
+  | W_function_rotate3d : function_rotate3d witness
+  | W_function_rotateX : function_rotateX witness
+  | W_function_rotateY : function_rotateY witness
+  | W_function_rotateZ : function_rotateZ witness
+  | W_function_skew : function_skew witness
+  | W_function_skewX : function_skewX witness
+  | W_function_skewY : function_skewY witness
+  | W_function_perspective : function_perspective witness
+  | W_function_calc : function_calc witness
+  | W_function_min : function_min witness
+  | W_function_max : function_max witness
+  | W_function_rgb : function_rgb witness
+  | W_function_rgba : function_rgba witness
+  | W_function_hsl : function_hsl witness
+  | W_function_hsla : function_hsla witness
+  | W_function_var : function_var witness
+  | W_function_color_mix : function_color_mix witness
+  | W_function_blur : function_blur witness
+  | W_function_brightness : function_brightness witness
+  | W_function_circle : function_circle witness
+  | W_function_clamp : function_clamp witness
+  | W_function_contrast : function_contrast witness
+  | W_function_counter : function_counter witness
+  | W_function_counters : function_counters witness
+  | W_function_drop_shadow : function_drop_shadow witness
+  | W_function_ellipse : function_ellipse witness
+  | W_function_env : function_env witness
+  | W_function_fit_content : function_fit_content witness
+  | W_function_grayscale : function_grayscale witness
+  | W_function_hue_rotate : function_hue_rotate witness
+  | W_function_inset : function_inset witness
+  | W_function_invert : function_invert witness
+  | W_function_leader : function_leader witness
+  | W_function_minmax : function_minmax witness
+  | W_function_opacity : function_opacity witness
+  | W_function_path : function_path witness
+  | W_function_polygon : function_polygon witness
+  | W_function_saturate : function_saturate witness
+  | W_function_sepia : function_sepia witness
+  | W_function_target_counter : function_target_counter witness
+  | W_function_target_counters : function_target_counters witness
+  | W_function_target_text : function_target_text witness
+  | W_media_feature : media_feature witness
+  | W_media_in_parens : media_in_parens witness
+  | W_media_or : media_or witness
+  | W_media_and : media_and witness
+  | W_media_not : media_not witness
+  | W_media_condition_without_or : media_condition_without_or witness
+  | W_media_condition : media_condition witness
+  | W_media_query : media_query witness
+  | W_media_query_list : media_query_list witness
+
+(** Convert witness to CSS name for registry lookup *)
+let witness_to_name : type a. a witness -> string = function
+  | W_property_display -> "display"
+  | W_property_overflow -> "overflow"
+  | W_property_position -> "position"
+  | W_property_visibility -> "visibility"
+  | W_property_float -> "float"
+  | W_property_clear -> "clear"
+  | W_property_table_layout -> "table-layout"
+  | W_property_border_collapse -> "border-collapse"
+  | W_property_empty_cells -> "empty-cells"
+  | W_property_caption_side -> "caption-side"
+  | W_property_direction -> "direction"
+  | W_property_unicode_bidi -> "unicode-bidi"
+  | W_property_writing_mode -> "writing-mode"
+  | W_property_text_orientation -> "text-orientation"
+  | W_property_text_transform -> "text-transform"
+  | W_property_white_space -> "white-space"
+  | W_property_word_break -> "word-break"
+  | W_property_overflow_wrap -> "overflow-wrap"
+  | W_property_text_align -> "text-align"
+  | W_property_text_align_last -> "text-align-last"
+  | W_property_text_justify -> "text-justify"
+  | W_property_text_decoration_line -> "text-decoration-line"
+  | W_property_text_decoration_style -> "text-decoration-style"
+  | W_property_text_decoration_skip_ink -> "text-decoration-skip-ink"
+  | W_property_font_style -> "font-style"
+  | W_property_font_variant_caps -> "font-variant-caps"
+  | W_property_font_stretch -> "font-stretch"
+  | W_property_font_kerning -> "font-kerning"
+  | W_property_font_variant_position -> "font-variant-position"
+  | W_property_list_style_position -> "list-style-position"
+  | W_property_list_style_type -> "list-style-type"
+  | W_property_pointer_events -> "pointer-events"
+  | W_property_user_select -> "user-select"
+  | W_property_resize -> "resize"
+  | W_property_box_sizing -> "box-sizing"
+  | W_property_object_fit -> "object-fit"
+  | W_property_isolation -> "isolation"
+  | W_property_mix_blend_mode -> "mix-blend-mode"
+  | W_property_backface_visibility -> "backface-visibility"
+  | W_property_flex_direction -> "flex-direction"
+  | W_property_flex_wrap -> "flex-wrap"
+  | W_property_justify_content -> "justify-content"
+  | W_property_align_items -> "align-items"
+  | W_property_align_content -> "align-content"
+  | W_property_align_self -> "align-self"
+  | W_property_justify_items -> "justify-items"
+  | W_property_justify_self -> "justify-self"
+  | W_property_scroll_behavior -> "scroll-behavior"
+  | W_property_overscroll_behavior -> "overscroll-behavior"
+  | W_property_overflow_anchor -> "overflow-anchor"
+  | W_property_touch_action -> "touch-action"
+  | W_property_caret_color -> "caret-color"
+  | W_property_appearance -> "appearance"
+  | W_property_text_rendering -> "text-rendering"
+  | W_property_image_rendering -> "image-rendering"
+  | W_property_color_scheme -> "color-scheme"
+  | W_property_forced_color_adjust -> "forced-color-adjust"
+  | W_property_print_color_adjust -> "print-color-adjust"
+  | W_property_contain_intrinsic_size -> "contain-intrinsic-size"
+  | W_property_content_visibility -> "content-visibility"
+  | W_property_hyphens -> "hyphens"
+  | W_property_column_fill -> "column-fill"
+  | W_property_column_span -> "column-span"
+  | W_property_clip_rule -> "clip-rule"
+  | W_property_font_optical_sizing -> "font-optical-sizing"
+  | W_property_font_palette -> "font-palette"
+  | W_property_font_synthesis_weight -> "font-synthesis-weight"
+  | W_property_font_synthesis_style -> "font-synthesis-style"
+  | W_property_font_synthesis_small_caps -> "font-synthesis-small-caps"
+  | W_property_font_synthesis_position -> "font-synthesis-position"
+  | W_property_mask_border_mode -> "mask-border-mode"
+  | W_property_mask_type -> "mask-type"
+  | W_property_ruby_merge -> "ruby-merge"
+  | W_property_ruby_position -> "ruby-position"
+  | W_property_scroll_snap_stop -> "scroll-snap-stop"
+  | W_property_scrollbar_width -> "scrollbar-width"
+  | W_property_speak -> "speak"
+  | W_property_stroke_linecap -> "stroke-linecap"
+  | W_property_box_decoration_break -> "box-decoration-break"
+  | W_property_color_adjust -> "color-adjust"
+  | W_property_text_decoration_thickness -> "text-decoration-thickness"
+  | W_property_text_underline_position -> "text-underline-position"
+  | W_property_word_wrap -> "word-wrap"
+  | W_property_break_inside -> "break-inside"
+  | W_property_break_before -> "break-before"
+  | W_property_break_after -> "break-after"
+  | W_property_page_break_after -> "page-break-after"
+  | W_property_page_break_before -> "page-break-before"
+  | W_property_page_break_inside -> "page-break-inside"
+  | W_property_border_image_repeat -> "border-image-repeat"
+  | W_property_transform_style -> "transform-style"
+  | W_property_transform_box -> "transform-box"
+  | W_property_grid_auto_flow -> "grid-auto-flow"
+  | W_property_font_display -> "font-display"
+  | W_property_will_change -> "will-change"
+  | W_property_contain -> "contain"
+  | W_property_all -> "all"
+  | W_property_row_gap -> "row-gap"
+  | W_property_column_gap -> "column-gap"
+  | W_property_outline_width -> "outline-width"
+  | W_property_outline_style -> "outline-style"
+  | W_property_width -> "width"
+  | W_property_border -> "border"
+  | W_property_flex_grow -> "flex-grow"
+  | W_property_flex_shrink -> "flex-shrink"
+  | W_property_flex_basis -> "flex-basis"
+  | W_property__webkit_appearance -> "-webkit-appearance"
+  | W_property_stroke_linejoin -> "stroke-linejoin"
+  | W_property_perspective_origin -> "perspective-origin"
+  | W_property_media_type -> "media-type"
+  | W_property_container_type -> "container-type"
+  | W_property__moz_appearance -> "-moz-appearance"
+  | W_property__moz_background_clip -> "-moz-background-clip"
+  | W_property__moz_binding -> "-moz-binding"
+  | W_property__moz_border_bottom_colors -> "-moz-border-bottom-colors"
+  | W_property__moz_border_left_colors -> "-moz-border-left-colors"
+  | W_property__moz_border_radius_bottomleft -> "-moz-border-radius-bottomleft"
+  | W_property__moz_border_radius_bottomright ->
+    "-moz-border-radius-bottomright"
+  | W_property__moz_border_radius_topleft -> "-moz-border-radius-topleft"
+  | W_property__moz_border_radius_topright -> "-moz-border-radius-topright"
+  | W_property__moz_border_right_colors -> "-moz-border-right-colors"
+  | W_property__moz_border_top_colors -> "-moz-border-top-colors"
+  | W_property__moz_context_properties -> "-moz-context-properties"
+  | W_property__moz_control_character_visibility ->
+    "-moz-control-character-visibility"
+  | W_property__moz_float_edge -> "-moz-float-edge"
+  | W_property__moz_force_broken_image_icon -> "-moz-force-broken-image-icon"
+  | W_property__moz_image_region -> "-moz-image-region"
+  | W_property__moz_orient -> "-moz-orient"
+  | W_property__moz_osx_font_smoothing -> "-moz-osx-font-smoothing"
+  | W_property__moz_outline_radius -> "-moz-outline-radius"
+  | W_property__moz_outline_radius_bottomleft ->
+    "-moz-outline-radius-bottomleft"
+  | W_property__moz_outline_radius_bottomright ->
+    "-moz-outline-radius-bottomright"
+  | W_property__moz_outline_radius_topleft -> "-moz-outline-radius-topleft"
+  | W_property__moz_outline_radius_topright -> "-moz-outline-radius-topright"
+  | W_property__moz_stack_sizing -> "-moz-stack-sizing"
+  | W_property__moz_text_blink -> "-moz-text-blink"
+  | W_property__moz_user_focus -> "-moz-user-focus"
+  | W_property__moz_user_input -> "-moz-user-input"
+  | W_property__moz_user_modify -> "-moz-user-modify"
+  | W_property__moz_user_select -> "-moz-user-select"
+  | W_property__moz_window_dragging -> "-moz-window-dragging"
+  | W_property__moz_window_shadow -> "-moz-window-shadow"
+  | W_property__webkit_background_clip -> "-webkit-background-clip"
+  | W_property__webkit_border_before -> "-webkit-border-before"
+  | W_property__webkit_border_before_color -> "-webkit-border-before-color"
+  | W_property__webkit_border_before_style -> "-webkit-border-before-style"
+  | W_property__webkit_border_before_width -> "-webkit-border-before-width"
+  | W_property__webkit_box_reflect -> "-webkit-box-reflect"
+  | W_property__webkit_column_break_after -> "-webkit-column-break-after"
+  | W_property__webkit_column_break_before -> "-webkit-column-break-before"
+  | W_property__webkit_column_break_inside -> "-webkit-column-break-inside"
+  | W_property__webkit_font_smoothing -> "-webkit-font-smoothing"
+  | W_property__webkit_line_clamp -> "-webkit-line-clamp"
+  | W_property__webkit_mask -> "-webkit-mask"
+  | W_property__webkit_mask_attachment -> "-webkit-mask-attachment"
+  | W_property__webkit_mask_box_image -> "-webkit-mask-box-image"
+  | W_property__webkit_mask_clip -> "-webkit-mask-clip"
+  | W_property__webkit_mask_composite -> "-webkit-mask-composite"
+  | W_property__webkit_mask_image -> "-webkit-mask-image"
+  | W_property__webkit_mask_origin -> "-webkit-mask-origin"
+  | W_property__webkit_mask_position -> "-webkit-mask-position"
+  | W_property__webkit_mask_position_x -> "-webkit-mask-position-x"
+  | W_property__webkit_mask_position_y -> "-webkit-mask-position-y"
+  | W_property__webkit_mask_repeat -> "-webkit-mask-repeat"
+  | W_property__webkit_mask_repeat_x -> "-webkit-mask-repeat-x"
+  | W_property__webkit_mask_repeat_y -> "-webkit-mask-repeat-y"
+  | W_property__webkit_mask_size -> "-webkit-mask-size"
+  | W_property__webkit_overflow_scrolling -> "-webkit-overflow-scrolling"
+  | W_property__webkit_print_color_adjust -> "-webkit-print-color-adjust"
+  | W_property__webkit_tap_highlight_color -> "-webkit-tap-highlight-color"
+  | W_property__webkit_text_fill_color -> "-webkit-text-fill-color"
+  | W_property__webkit_text_security -> "-webkit-text-security"
+  | W_property__webkit_text_stroke -> "-webkit-text-stroke"
+  | W_property__webkit_text_stroke_color -> "-webkit-text-stroke-color"
+  | W_property__webkit_text_stroke_width -> "-webkit-text-stroke-width"
+  | W_property__webkit_touch_callout -> "-webkit-touch-callout"
+  | W_property__webkit_user_drag -> "-webkit-user-drag"
+  | W_property__webkit_user_modify -> "-webkit-user-modify"
+  | W_property__webkit_user_select -> "-webkit-user-select"
+  | W_property_accent_color -> "accent-color"
+  | W_property_alignment_baseline -> "alignment-baseline"
+  | W_property_anchor_name -> "anchor-name"
+  | W_property_anchor_scope -> "anchor-scope"
+  | W_property_animation -> "animation"
+  | W_property_animation_composition -> "animation-composition"
+  | W_property_animation_delay -> "animation-delay"
+  | W_property_animation_delay_end -> "animation-delay-end"
+  | W_property_animation_delay_start -> "animation-delay-start"
+  | W_property_animation_direction -> "animation-direction"
+  | W_property_animation_duration -> "animation-duration"
+  | W_property_animation_fill_mode -> "animation-fill-mode"
+  | W_property_animation_iteration_count -> "animation-iteration-count"
+  | W_property_animation_name -> "animation-name"
+  | W_property_animation_play_state -> "animation-play-state"
+  | W_property_animation_range -> "animation-range"
+  | W_property_animation_range_end -> "animation-range-end"
+  | W_property_animation_range_start -> "animation-range-start"
+  | W_property_animation_timeline -> "animation-timeline"
+  | W_property_animation_timing_function -> "animation-timing-function"
+  | W_property_aspect_ratio -> "aspect-ratio"
+  | W_property_azimuth -> "azimuth"
+  | W_property_backdrop_blur -> "backdrop-blur"
+  | W_property_backdrop_filter -> "backdrop-filter"
+  | W_property_background -> "background"
+  | W_property_background_attachment -> "background-attachment"
+  | W_property_background_blend_mode -> "background-blend-mode"
+  | W_property_background_clip -> "background-clip"
+  | W_property_background_color -> "background-color"
+  | W_property_background_image -> "background-image"
+  | W_property_background_origin -> "background-origin"
+  | W_property_background_position -> "background-position"
+  | W_property_background_position_x -> "background-position-x"
+  | W_property_background_position_y -> "background-position-y"
+  | W_property_background_repeat -> "background-repeat"
+  | W_property_background_size -> "background-size"
+  | W_property_baseline_shift -> "baseline-shift"
+  | W_property_behavior -> "behavior"
+  | W_property_bleed -> "bleed"
+  | W_property_block_overflow -> "block-overflow"
+  | W_property_block_size -> "block-size"
+  | W_property_border_block -> "border-block"
+  | W_property_border_block_color -> "border-block-color"
+  | W_property_border_block_end -> "border-block-end"
+  | W_property_border_block_end_color -> "border-block-end-color"
+  | W_property_border_block_end_style -> "border-block-end-style"
+  | W_property_border_block_end_width -> "border-block-end-width"
+  | W_property_border_block_start -> "border-block-start"
+  | W_property_border_block_start_color -> "border-block-start-color"
+  | W_property_border_block_start_style -> "border-block-start-style"
+  | W_property_border_block_start_width -> "border-block-start-width"
+  | W_property_border_block_style -> "border-block-style"
+  | W_property_border_block_width -> "border-block-width"
+  | W_property_border_bottom -> "border-bottom"
+  | W_property_border_bottom_color -> "border-bottom-color"
+  | W_property_border_bottom_left_radius -> "border-bottom-left-radius"
+  | W_property_border_bottom_right_radius -> "border-bottom-right-radius"
+  | W_property_border_bottom_style -> "border-bottom-style"
+  | W_property_border_bottom_width -> "border-bottom-width"
+  | W_property_border_color -> "border-color"
+  | W_property_border_end_end_radius -> "border-end-end-radius"
+  | W_property_border_end_start_radius -> "border-end-start-radius"
+  | W_property_border_image -> "border-image"
+  | W_property_border_image_outset -> "border-image-outset"
+  | W_property_border_image_slice -> "border-image-slice"
+  | W_property_border_image_source -> "border-image-source"
+  | W_property_border_image_width -> "border-image-width"
+  | W_property_border_inline -> "border-inline"
+  | W_property_border_inline_color -> "border-inline-color"
+  | W_property_border_inline_end -> "border-inline-end"
+  | W_property_border_inline_end_color -> "border-inline-end-color"
+  | W_property_border_inline_end_style -> "border-inline-end-style"
+  | W_property_border_inline_end_width -> "border-inline-end-width"
+  | W_property_border_inline_start -> "border-inline-start"
+  | W_property_border_inline_start_color -> "border-inline-start-color"
+  | W_property_border_inline_start_style -> "border-inline-start-style"
+  | W_property_border_inline_start_width -> "border-inline-start-width"
+  | W_property_border_inline_style -> "border-inline-style"
+  | W_property_border_inline_width -> "border-inline-width"
+  | W_property_border_left -> "border-left"
+  | W_property_border_left_color -> "border-left-color"
+  | W_property_border_left_style -> "border-left-style"
+  | W_property_border_left_width -> "border-left-width"
+  | W_property_border_radius -> "border-radius"
+  | W_property_border_right -> "border-right"
+  | W_property_border_right_color -> "border-right-color"
+  | W_property_border_right_style -> "border-right-style"
+  | W_property_border_right_width -> "border-right-width"
+  | W_property_border_spacing -> "border-spacing"
+  | W_property_border_start_end_radius -> "border-start-end-radius"
+  | W_property_border_start_start_radius -> "border-start-start-radius"
+  | W_property_border_style -> "border-style"
+  | W_property_border_top -> "border-top"
+  | W_property_border_top_color -> "border-top-color"
+  | W_property_border_top_left_radius -> "border-top-left-radius"
+  | W_property_border_top_right_radius -> "border-top-right-radius"
+  | W_property_border_top_style -> "border-top-style"
+  | W_property_border_top_width -> "border-top-width"
+  | W_property_border_width -> "border-width"
+  | W_property_bottom -> "bottom"
+  | W_property_box_align -> "box-align"
+  | W_property_box_direction -> "box-direction"
+  | W_property_box_flex -> "box-flex"
+  | W_property_box_flex_group -> "box-flex-group"
+  | W_property_box_lines -> "box-lines"
+  | W_property_box_ordinal_group -> "box-ordinal-group"
+  | W_property_box_orient -> "box-orient"
+  | W_property_box_pack -> "box-pack"
+  | W_property_box_shadow -> "box-shadow"
+  | W_property_clip -> "clip"
+  | W_property_clip_path -> "clip-path"
+  | W_property_color -> "color"
+  | W_property_color_interpolation -> "color-interpolation"
+  | W_property_color_interpolation_filters -> "color-interpolation-filters"
+  | W_property_color_rendering -> "color-rendering"
+  | W_property_column_count -> "column-count"
+  | W_property_column_rule -> "column-rule"
+  | W_property_column_rule_color -> "column-rule-color"
+  | W_property_column_rule_style -> "column-rule-style"
+  | W_property_column_rule_width -> "column-rule-width"
+  | W_property_column_width -> "column-width"
+  | W_property_columns -> "columns"
+  | W_property_contain_intrinsic_block_size -> "contain-intrinsic-block-size"
+  | W_property_contain_intrinsic_height -> "contain-intrinsic-height"
+  | W_property_contain_intrinsic_inline_size -> "contain-intrinsic-inline-size"
+  | W_property_contain_intrinsic_width -> "contain-intrinsic-width"
+  | W_property_container -> "container"
+  | W_property_container_name -> "container-name"
+  | W_property_container_name_computed -> "container-name-computed"
+  | W_property_content -> "content"
+  | W_property_counter_increment -> "counter-increment"
+  | W_property_counter_reset -> "counter-reset"
+  | W_property_counter_set -> "counter-set"
+  | W_property_cue -> "cue"
+  | W_property_cue_after -> "cue-after"
+  | W_property_cue_before -> "cue-before"
+  | W_property_cursor -> "cursor"
+  | W_property_cx -> "cx"
+  | W_property_cy -> "cy"
+  | W_property_d -> "d"
+  | W_property_dominant_baseline -> "dominant-baseline"
+  | W_property_field_sizing -> "field-sizing"
+  | W_property_fill -> "fill"
+  | W_property_fill_opacity -> "fill-opacity"
+  | W_property_fill_rule -> "fill-rule"
+  | W_property_filter -> "filter"
+  | W_property_flex -> "flex"
+  | W_property_flex_flow -> "flex-flow"
+  | W_property_flood_color -> "flood-color"
+  | W_property_flood_opacity -> "flood-opacity"
+  | W_property_font -> "font"
+  | W_property_font_family -> "font-family"
+  | W_property_font_feature_settings -> "font-feature-settings"
+  | W_property_font_language_override -> "font-language-override"
+  | W_property_font_size -> "font-size"
+  | W_property_font_size_adjust -> "font-size-adjust"
+  | W_property_font_smooth -> "font-smooth"
+  | W_property_font_synthesis -> "font-synthesis"
+  | W_property_font_variant -> "font-variant"
+  | W_property_font_variant_alternates -> "font-variant-alternates"
+  | W_property_font_variant_east_asian -> "font-variant-east-asian"
+  | W_property_font_variant_emoji -> "font-variant-emoji"
+  | W_property_font_variant_ligatures -> "font-variant-ligatures"
+  | W_property_font_variant_numeric -> "font-variant-numeric"
+  | W_property_font_variation_settings -> "font-variation-settings"
+  | W_property_font_weight -> "font-weight"
+  | W_property_gap -> "gap"
+  | W_property_glyph_orientation_horizontal -> "glyph-orientation-horizontal"
+  | W_property_glyph_orientation_vertical -> "glyph-orientation-vertical"
+  | W_property_grid -> "grid"
+  | W_property_grid_area -> "grid-area"
+  | W_property_grid_auto_columns -> "grid-auto-columns"
+  | W_property_grid_auto_rows -> "grid-auto-rows"
+  | W_property_grid_column -> "grid-column"
+  | W_property_grid_column_end -> "grid-column-end"
+  | W_property_grid_column_gap -> "grid-column-gap"
+  | W_property_grid_column_start -> "grid-column-start"
+  | W_property_grid_gap -> "grid-gap"
+  | W_property_grid_row -> "grid-row"
+  | W_property_grid_row_end -> "grid-row-end"
+  | W_property_grid_row_gap -> "grid-row-gap"
+  | W_property_grid_row_start -> "grid-row-start"
+  | W_property_grid_template -> "grid-template"
+  | W_property_grid_template_areas -> "grid-template-areas"
+  | W_property_grid_template_columns -> "grid-template-columns"
+  | W_property_grid_template_rows -> "grid-template-rows"
+  | W_property_hanging_punctuation -> "hanging-punctuation"
+  | W_property_height -> "height"
+  | W_property_hyphenate_character -> "hyphenate-character"
+  | W_property_hyphenate_limit_chars -> "hyphenate-limit-chars"
+  | W_property_hyphenate_limit_last -> "hyphenate-limit-last"
+  | W_property_hyphenate_limit_lines -> "hyphenate-limit-lines"
+  | W_property_hyphenate_limit_zone -> "hyphenate-limit-zone"
+  | W_property_image_orientation -> "image-orientation"
+  | W_property_image_resolution -> "image-resolution"
+  | W_property_ime_mode -> "ime-mode"
+  | W_property_inherits -> "inherits"
+  | W_property_initial_letter -> "initial-letter"
+  | W_property_initial_letter_align -> "initial-letter-align"
+  | W_property_initial_value -> "initial-value"
+  | W_property_inline_size -> "inline-size"
+  | W_property_inset -> "inset"
+  | W_property_inset_area -> "inset-area"
+  | W_property_inset_block -> "inset-block"
+  | W_property_inset_block_end -> "inset-block-end"
+  | W_property_inset_block_start -> "inset-block-start"
+  | W_property_inset_inline -> "inset-inline"
+  | W_property_inset_inline_end -> "inset-inline-end"
+  | W_property_inset_inline_start -> "inset-inline-start"
+  | W_property_interpolate_size -> "interpolate-size"
+  | W_property_kerning -> "kerning"
+  | W_property_layout_grid -> "layout-grid"
+  | W_property_layout_grid_char -> "layout-grid-char"
+  | W_property_layout_grid_line -> "layout-grid-line"
+  | W_property_layout_grid_mode -> "layout-grid-mode"
+  | W_property_layout_grid_type -> "layout-grid-type"
+  | W_property_left -> "left"
+  | W_property_letter_spacing -> "letter-spacing"
+  | W_property_lighting_color -> "lighting-color"
+  | W_property_line_break -> "line-break"
+  | W_property_line_clamp -> "line-clamp"
+  | W_property_line_height -> "line-height"
+  | W_property_line_height_step -> "line-height-step"
+  | W_property_list_style -> "list-style"
+  | W_property_list_style_image -> "list-style-image"
+  | W_property_margin -> "margin"
+  | W_property_margin_block -> "margin-block"
+  | W_property_margin_block_end -> "margin-block-end"
+  | W_property_margin_block_start -> "margin-block-start"
+  | W_property_margin_bottom -> "margin-bottom"
+  | W_property_margin_inline -> "margin-inline"
+  | W_property_margin_inline_end -> "margin-inline-end"
+  | W_property_margin_inline_start -> "margin-inline-start"
+  | W_property_margin_left -> "margin-left"
+  | W_property_margin_right -> "margin-right"
+  | W_property_margin_top -> "margin-top"
+  | W_property_margin_trim -> "margin-trim"
+  | W_property_marker -> "marker"
+  | W_property_marker_end -> "marker-end"
+  | W_property_marker_mid -> "marker-mid"
+  | W_property_marker_start -> "marker-start"
+  | W_property_marks -> "marks"
+  | W_property_mask -> "mask"
+  | W_property_mask_border -> "mask-border"
+  | W_property_mask_border_outset -> "mask-border-outset"
+  | W_property_mask_border_repeat -> "mask-border-repeat"
+  | W_property_mask_border_slice -> "mask-border-slice"
+  | W_property_mask_border_source -> "mask-border-source"
+  | W_property_mask_border_width -> "mask-border-width"
+  | W_property_mask_clip -> "mask-clip"
+  | W_property_mask_composite -> "mask-composite"
+  | W_property_mask_image -> "mask-image"
+  | W_property_mask_mode -> "mask-mode"
+  | W_property_mask_origin -> "mask-origin"
+  | W_property_mask_position -> "mask-position"
+  | W_property_mask_repeat -> "mask-repeat"
+  | W_property_mask_size -> "mask-size"
+  | W_property_masonry_auto_flow -> "masonry-auto-flow"
+  | W_property_math_depth -> "math-depth"
+  | W_property_math_shift -> "math-shift"
+  | W_property_math_style -> "math-style"
+  | W_property_max_block_size -> "max-block-size"
+  | W_property_max_height -> "max-height"
+  | W_property_max_inline_size -> "max-inline-size"
+  | W_property_max_lines -> "max-lines"
+  | W_property_max_width -> "max-width"
+  | W_property_media_any_hover -> "media-any-hover"
+  | W_property_media_any_pointer -> "media-any-pointer"
+  | W_property_media_color_gamut -> "media-color-gamut"
+  | W_property_media_color_index -> "media-color-index"
+  | W_property_media_display_mode -> "media-display-mode"
+  | W_property_media_forced_colors -> "media-forced-colors"
+  | W_property_media_grid -> "media-grid"
+  | W_property_media_hover -> "media-hover"
+  | W_property_media_inverted_colors -> "media-inverted-colors"
+  | W_property_media_max_aspect_ratio -> "media-max-aspect-ratio"
+  | W_property_media_max_resolution -> "media-max-resolution"
+  | W_property_media_min_aspect_ratio -> "media-min-aspect-ratio"
+  | W_property_media_min_color -> "media-min-color"
+  | W_property_media_min_color_index -> "media-min-color-index"
+  | W_property_media_min_resolution -> "media-min-resolution"
+  | W_property_media_monochrome -> "media-monochrome"
+  | W_property_media_orientation -> "media-orientation"
+  | W_property_media_pointer -> "media-pointer"
+  | W_property_media_prefers_color_scheme -> "media-prefers-color-scheme"
+  | W_property_media_prefers_contrast -> "media-prefers-contrast"
+  | W_property_media_prefers_reduced_motion -> "media-prefers-reduced-motion"
+  | W_property_media_resolution -> "media-resolution"
+  | W_property_media_scripting -> "media-scripting"
+  | W_property_media_update -> "media-update"
+  | W_property_min_block_size -> "min-block-size"
+  | W_property_min_height -> "min-height"
+  | W_property_min_inline_size -> "min-inline-size"
+  | W_property_min_width -> "min-width"
+  | W_property_nav_down -> "nav-down"
+  | W_property_nav_left -> "nav-left"
+  | W_property_nav_right -> "nav-right"
+  | W_property_nav_up -> "nav-up"
+  | W_property_object_position -> "object-position"
+  | W_property_offset -> "offset"
+  | W_property_offset_anchor -> "offset-anchor"
+  | W_property_offset_distance -> "offset-distance"
+  | W_property_offset_path -> "offset-path"
+  | W_property_offset_position -> "offset-position"
+  | W_property_offset_rotate -> "offset-rotate"
+  | W_property_opacity -> "opacity"
+  | W_property_order -> "order"
+  | W_property_orphans -> "orphans"
+  | W_property_outline -> "outline"
+  | W_property_outline_color -> "outline-color"
+  | W_property_outline_offset -> "outline-offset"
+  | W_property_overflow_block -> "overflow-block"
+  | W_property_overflow_clip_margin -> "overflow-clip-margin"
+  | W_property_overflow_inline -> "overflow-inline"
+  | W_property_overflow_x -> "overflow-x"
+  | W_property_overflow_y -> "overflow-y"
+  | W_property_overlay -> "overlay"
+  | W_property_overscroll_behavior_block -> "overscroll-behavior-block"
+  | W_property_overscroll_behavior_inline -> "overscroll-behavior-inline"
+  | W_property_overscroll_behavior_x -> "overscroll-behavior-x"
+  | W_property_overscroll_behavior_y -> "overscroll-behavior-y"
+  | W_property_padding -> "padding"
+  | W_property_padding_block -> "padding-block"
+  | W_property_padding_block_end -> "padding-block-end"
+  | W_property_padding_block_start -> "padding-block-start"
+  | W_property_padding_bottom -> "padding-bottom"
+  | W_property_padding_inline -> "padding-inline"
+  | W_property_padding_inline_end -> "padding-inline-end"
+  | W_property_padding_inline_start -> "padding-inline-start"
+  | W_property_padding_left -> "padding-left"
+  | W_property_padding_right -> "padding-right"
+  | W_property_padding_top -> "padding-top"
+  | W_property_page -> "page"
+  | W_property_paint_order -> "paint-order"
+  | W_property_pause -> "pause"
+  | W_property_pause_after -> "pause-after"
+  | W_property_pause_before -> "pause-before"
+  | W_property_perspective -> "perspective"
+  | W_property_place_content -> "place-content"
+  | W_property_place_items -> "place-items"
+  | W_property_place_self -> "place-self"
+  | W_property_position_anchor -> "position-anchor"
+  | W_property_position_area -> "position-area"
+  | W_property_position_try -> "position-try"
+  | W_property_position_try_fallbacks -> "position-try-fallbacks"
+  | W_property_position_try_options -> "position-try-options"
+  | W_property_position_visibility -> "position-visibility"
+  | W_property_quotes -> "quotes"
+  | W_property_r -> "r"
+  | W_property_reading_flow -> "reading-flow"
+  | W_property_rest -> "rest"
+  | W_property_rest_after -> "rest-after"
+  | W_property_rest_before -> "rest-before"
+  | W_property_right -> "right"
+  | W_property_rotate -> "rotate"
+  | W_property_ruby_align -> "ruby-align"
+  | W_property_ruby_overhang -> "ruby-overhang"
+  | W_property_rx -> "rx"
+  | W_property_ry -> "ry"
+  | W_property_scale -> "scale"
+  | W_property_scroll_margin -> "scroll-margin"
+  | W_property_scroll_margin_block -> "scroll-margin-block"
+  | W_property_scroll_margin_block_end -> "scroll-margin-block-end"
+  | W_property_scroll_margin_block_start -> "scroll-margin-block-start"
+  | W_property_scroll_margin_bottom -> "scroll-margin-bottom"
+  | W_property_scroll_margin_inline -> "scroll-margin-inline"
+  | W_property_scroll_margin_inline_end -> "scroll-margin-inline-end"
+  | W_property_scroll_margin_inline_start -> "scroll-margin-inline-start"
+  | W_property_scroll_margin_left -> "scroll-margin-left"
+  | W_property_scroll_margin_right -> "scroll-margin-right"
+  | W_property_scroll_margin_top -> "scroll-margin-top"
+  | W_property_scroll_marker_group -> "scroll-marker-group"
+  | W_property_scroll_padding -> "scroll-padding"
+  | W_property_scroll_padding_block -> "scroll-padding-block"
+  | W_property_scroll_padding_block_end -> "scroll-padding-block-end"
+  | W_property_scroll_padding_block_start -> "scroll-padding-block-start"
+  | W_property_scroll_padding_bottom -> "scroll-padding-bottom"
+  | W_property_scroll_padding_inline -> "scroll-padding-inline"
+  | W_property_scroll_padding_inline_end -> "scroll-padding-inline-end"
+  | W_property_scroll_padding_inline_start -> "scroll-padding-inline-start"
+  | W_property_scroll_padding_left -> "scroll-padding-left"
+  | W_property_scroll_padding_right -> "scroll-padding-right"
+  | W_property_scroll_padding_top -> "scroll-padding-top"
+  | W_property_scroll_snap_align -> "scroll-snap-align"
+  | W_property_scroll_snap_coordinate -> "scroll-snap-coordinate"
+  | W_property_scroll_snap_destination -> "scroll-snap-destination"
+  | W_property_scroll_snap_points_x -> "scroll-snap-points-x"
+  | W_property_scroll_snap_points_y -> "scroll-snap-points-y"
+  | W_property_scroll_snap_type -> "scroll-snap-type"
+  | W_property_scroll_snap_type_x -> "scroll-snap-type-x"
+  | W_property_scroll_snap_type_y -> "scroll-snap-type-y"
+  | W_property_scroll_start -> "scroll-start"
+  | W_property_scroll_start_block -> "scroll-start-block"
+  | W_property_scroll_start_inline -> "scroll-start-inline"
+  | W_property_scroll_start_target -> "scroll-start-target"
+  | W_property_scroll_start_target_block -> "scroll-start-target-block"
+  | W_property_scroll_start_target_inline -> "scroll-start-target-inline"
+  | W_property_scroll_start_target_x -> "scroll-start-target-x"
+  | W_property_scroll_start_target_y -> "scroll-start-target-y"
+  | W_property_scroll_start_x -> "scroll-start-x"
+  | W_property_scroll_start_y -> "scroll-start-y"
+  | W_property_scroll_timeline -> "scroll-timeline"
+  | W_property_scroll_timeline_axis -> "scroll-timeline-axis"
+  | W_property_scroll_timeline_name -> "scroll-timeline-name"
+  | W_property_scrollbar_3dlight_color -> "scrollbar-3dlight-color"
+  | W_property_scrollbar_arrow_color -> "scrollbar-arrow-color"
+  | W_property_scrollbar_base_color -> "scrollbar-base-color"
+  | W_property_scrollbar_color -> "scrollbar-color"
+  | W_property_scrollbar_color_legacy -> "scrollbar-color-legacy"
+  | W_property_scrollbar_darkshadow_color -> "scrollbar-darkshadow-color"
+  | W_property_scrollbar_face_color -> "scrollbar-face-color"
+  | W_property_scrollbar_gutter -> "scrollbar-gutter"
+  | W_property_scrollbar_highlight_color -> "scrollbar-highlight-color"
+  | W_property_scrollbar_shadow_color -> "scrollbar-shadow-color"
+  | W_property_scrollbar_track_color -> "scrollbar-track-color"
+  | W_property_shape_image_threshold -> "shape-image-threshold"
+  | W_property_shape_margin -> "shape-margin"
+  | W_property_shape_outside -> "shape-outside"
+  | W_property_shape_rendering -> "shape-rendering"
+  | W_property_size -> "size"
+  | W_property_speak_as -> "speak-as"
+  | W_property_src -> "src"
+  | W_property_stop_color -> "stop-color"
+  | W_property_stop_opacity -> "stop-opacity"
+  | W_property_stroke -> "stroke"
+  | W_property_stroke_dasharray -> "stroke-dasharray"
+  | W_property_stroke_dashoffset -> "stroke-dashoffset"
+  | W_property_stroke_miterlimit -> "stroke-miterlimit"
+  | W_property_stroke_opacity -> "stroke-opacity"
+  | W_property_stroke_width -> "stroke-width"
+  | W_property_syntax -> "syntax"
+  | W_property_tab_size -> "tab-size"
+  | W_property_text_align_all -> "text-align-all"
+  | W_property_text_anchor -> "text-anchor"
+  | W_property_text_autospace -> "text-autospace"
+  | W_property_text_blink -> "text-blink"
+  | W_property_text_box_edge -> "text-box-edge"
+  | W_property_text_box_trim -> "text-box-trim"
+  | W_property_text_combine_upright -> "text-combine-upright"
+  | W_property_text_decoration -> "text-decoration"
+  | W_property_text_decoration_color -> "text-decoration-color"
+  | W_property_text_decoration_skip -> "text-decoration-skip"
+  | W_property_text_decoration_skip_box -> "text-decoration-skip-box"
+  | W_property_text_decoration_skip_inset -> "text-decoration-skip-inset"
+  | W_property_text_decoration_skip_self -> "text-decoration-skip-self"
+  | W_property_text_decoration_skip_spaces -> "text-decoration-skip-spaces"
+  | W_property_text_edge -> "text-edge"
+  | W_property_text_emphasis -> "text-emphasis"
+  | W_property_text_emphasis_color -> "text-emphasis-color"
+  | W_property_text_emphasis_position -> "text-emphasis-position"
+  | W_property_text_emphasis_style -> "text-emphasis-style"
+  | W_property_text_indent -> "text-indent"
+  | W_property_text_justify_trim -> "text-justify-trim"
+  | W_property_text_kashida -> "text-kashida"
+  | W_property_text_kashida_space -> "text-kashida-space"
+  | W_property_text_overflow -> "text-overflow"
+  | W_property_text_shadow -> "text-shadow"
+  | W_property_text_size_adjust -> "text-size-adjust"
+  | W_property_text_spacing_trim -> "text-spacing-trim"
+  | W_property_text_underline_offset -> "text-underline-offset"
+  | W_property_text_wrap -> "text-wrap"
+  | W_property_text_wrap_mode -> "text-wrap-mode"
+  | W_property_text_wrap_style -> "text-wrap-style"
+  | W_property_timeline_scope -> "timeline-scope"
+  | W_property_top -> "top"
+  | W_property_transform -> "transform"
+  | W_property_transform_origin -> "transform-origin"
+  | W_property_transition -> "transition"
+  | W_property_transition_behavior -> "transition-behavior"
+  | W_property_transition_delay -> "transition-delay"
+  | W_property_transition_duration -> "transition-duration"
+  | W_property_transition_property -> "transition-property"
+  | W_property_transition_timing_function -> "transition-timing-function"
+  | W_property_translate -> "translate"
+  | W_property_unicode_range -> "unicode-range"
+  | W_property_vector_effect -> "vector-effect"
+  | W_property_vertical_align -> "vertical-align"
+  | W_property_view_timeline -> "view-timeline"
+  | W_property_view_timeline_axis -> "view-timeline-axis"
+  | W_property_view_timeline_inset -> "view-timeline-inset"
+  | W_property_view_timeline_name -> "view-timeline-name"
+  | W_property_view_transition_name -> "view-transition-name"
+  | W_property_voice_balance -> "voice-balance"
+  | W_property_voice_duration -> "voice-duration"
+  | W_property_voice_family -> "voice-family"
+  | W_property_voice_pitch -> "voice-pitch"
+  | W_property_voice_range -> "voice-range"
+  | W_property_voice_rate -> "voice-rate"
+  | W_property_voice_stress -> "voice-stress"
+  | W_property_voice_volume -> "voice-volume"
+  | W_property_white_space_collapse -> "white-space-collapse"
+  | W_property_widows -> "widows"
+  | W_property_word_space_transform -> "word-space-transform"
+  | W_property_word_spacing -> "word-spacing"
+  | W_property_x -> "x"
+  | W_property_y -> "y"
+  | W_property_z_index -> "z-index"
+  | W_property_zoom -> "zoom"
+  | W_age -> "age"
+  | W_attachment -> "attachment"
+  | W_box -> "box"
+  | W_display_box -> "display-box"
+  | W_display_outside -> "display-outside"
+  | W_ending_shape -> "ending-shape"
+  | W_fill_rule -> "fill-rule"
+  | W_zero -> "zero"
+  | W_gender -> "gender"
+  | W_combinator -> "combinator"
+  | W_contextual_alt_values -> "contextual-alt-values"
+  | W_east_asian_width_values -> "east-asian-width-values"
+  | W_attr_modifier -> "attr-modifier"
+  | W_image_tags -> "image-tags"
+  | W_line_style -> "line-style"
+  | W_line_width -> "line-width"
+  | W_named_color -> "named-color"
+  | W_color -> "color"
+  | W_alpha_value -> "alpha-value"
+  | W_hue -> "hue"
+  | W_bg_image -> "bg-image"
+  | W_content_replacement -> "content-replacement"
+  | W_transform_list -> "transform-list"
+  | W_transform_function -> "transform-function"
+  | W_image -> "image"
+  | W_font_families -> "font_families"
+  | W_color_interpolation_method -> "color-interpolation-method"
+  | W_family_name -> "family-name"
+  | W_keyframes_name -> "keyframes-name"
+  | W_url -> "url"
+  | W_gradient -> "gradient"
+  | W_shadow -> "shadow"
+  | W_track_list -> "track-list"
+  | W_line_names -> "line-names"
+  | W_side_or_corner -> "side-or-corner"
+  | W_track_size -> "track-size"
+  | W_track_breadth -> "track-breadth"
+  | W_track_repeat -> "track-repeat"
+  | W_content_list -> "content-list"
+  | W_mask_reference -> "mask-reference"
+  | W_color_stop_list -> "color-stop-list"
+  | W_mask_source -> "mask-source"
+  | W_length_percentage -> "length-percentage"
+  | W_auto_track_list -> "auto-track-list"
+  | W_counter_style -> "counter-style"
+  | W_counter_style_name -> "counter-style-name"
+  | W_fixed_size -> "fixed-size"
+  | W_fixed_repeat -> "fixed-repeat"
+  | W_fixed_breadth -> "fixed-breadth"
+  | W_auto_repeat -> "auto-repeat"
+  | W_extended_time_no_interp -> "extended-time-no-interp"
+  | W_timing_function_no_interp -> "timing-function-no-interp"
+  | W_cubic_bezier_timing_function -> "cubic-bezier-timing-function"
+  | W_step_timing_function -> "step-timing-function"
+  | W_single_animation -> "single-animation"
+  | W_single_animation_no_interp -> "single-animation-no-interp"
+  | W_single_animation_direction_no_interp ->
+    "single-animation-direction-no-interp"
+  | W_single_animation_fill_mode_no_interp ->
+    "single-animation-fill-mode-no-interp"
+  | W_single_animation_iteration_count_no_interp ->
+    "single-animation-iteration-count-no-interp"
+  | W_single_animation_play_state_no_interp ->
+    "single-animation-play-state-no-interp"
+  | W_shadow_t -> "shadow-t"
+  | W_font_weight_absolute -> "font-weight-absolute"
+  | W_position -> "position"
+  | W_timing_function -> "timing-function"
+  | W_number_percentage -> "number-percentage"
+  | W_grid_line -> "grid-line"
+  | W_single_transition_property -> "single-transition-property"
+  | W_outline_radius -> "outline-radius"
+  | W_bg_size -> "bg-size"
+  | W_bg_position -> "bg-position"
+  | W_feature_value_name -> "feature-value-name"
+  | W_svg_length -> "svg-length"
+  | W_single_animation_iteration_count -> "single-animation-iteration-count"
+  | W_basic_shape -> "basic-shape"
+  | W_filter_function -> "filter-function"
+  | W_overflow_position -> "overflow-position"
+  | W_relative_size -> "relative-size"
+  | W_repeat_style -> "repeat-style"
+  | W_self_position -> "self-position"
+  | W_single_animation_direction -> "single-animation-direction"
+  | W_single_animation_fill_mode -> "single-animation-fill-mode"
+  | W_single_animation_play_state -> "single-animation-play-state"
+  | W_step_position -> "step-position"
+  | W_symbols_type -> "symbols-type"
+  | W_masking_mode -> "masking-mode"
+  | W_numeric_figure_values -> "numeric-figure-values"
+  | W_numeric_spacing_values -> "numeric-spacing-values"
+  | W_absolute_size -> "absolute-size"
+  | W_content_position -> "content-position"
+  | W_baseline_position -> "baseline-position"
+  | W_blend_mode -> "blend-mode"
+  | W_geometry_box -> "geometry-box"
+  | W_calc_product -> "calc-product"
+  | W_calc_sum -> "calc-sum"
+  | W_calc_value -> "calc-value"
+  | W_mf_eq -> "mf-eq"
+  | W_mf_gt -> "mf-gt"
+  | W_mf_lt -> "mf-lt"
+  | W_dimension -> "dimension"
+  | W_ratio -> "ratio"
+  | W_mf_name -> "mf-name"
+  | W_mf_value -> "mf-value"
+  | W_mf_boolean -> "mf-boolean"
+  | W_mf_plain -> "mf-plain"
+  | W_mf_comparison -> "mf-comparison"
+  | W_mf_range -> "mf-range"
+  | W_container_query -> "container-query"
+  | W_container_condition -> "container-condition"
+  | W_query_in_parens -> "query-in-parens"
+  | W_size_feature -> "size-feature"
+  | W_style_query -> "style-query"
+  | W_style_feature -> "style-feature"
+  | W_style_in_parens -> "style-in-parens"
+  | W_legacy_radial_gradient_shape -> "legacy-radial-gradient-shape"
+  | W_legacy_radial_gradient_size -> "legacy-radial-gradient-size"
+  | W_legacy_radial_gradient_arguments -> "legacy-radial-gradient-arguments"
+  | W_legacy_radial_gradient -> "legacy-radial-gradient"
+  | W_legacy_repeating_radial_gradient -> "legacy-repeating-radial-gradient"
+  | W_legacy_linear_gradient -> "legacy-linear-gradient"
+  | W_legacy_linear_gradient_arguments -> "legacy-linear-gradient-arguments"
+  | W_legacy_repeating_linear_gradient -> "legacy-repeating-linear-gradient"
+  | W_legacy_gradient -> "legacy-gradient"
+  | W_non_standard_color -> "-non-standard-color"
+  | W_non_standard_font -> "-non-standard-font"
+  | W_non_standard_image_rendering -> "-non-standard-image-rendering"
+  | W_non_standard_overflow -> "-non-standard-overflow"
+  | W_non_standard_width -> "-non-standard-width"
+  | W_webkit_gradient_type -> "-webkit-gradient-type"
+  | W_webkit_mask_box_repeat -> "-webkit-mask-box-repeat"
+  | W_webkit_mask_clip_style -> "-webkit-mask-clip-style"
+  | W_common_lig_values -> "common-lig-values"
+  | W_compat_auto -> "compat-auto"
+  | W_composite_style -> "composite-style"
+  | W_compositing_operator -> "compositing-operator"
+  | W_content_distribution -> "content-distribution"
+  | W_deprecated_system_color -> "deprecated-system-color"
+  | W_discretionary_lig_values -> "discretionary-lig-values"
+  | W_display_inside -> "display-inside"
+  | W_display_internal -> "display-internal"
+  | W_display_legacy -> "display-legacy"
+  | W_east_asian_variant_values -> "east-asian-variant-values"
+  | W_feature_type -> "feature-type"
+  | W_font_variant_css21 -> "font-variant-css21"
+  | W_generic_family -> "generic-family"
+  | W_generic_name -> "generic-name"
+  | W_historical_lig_values -> "historical-lig-values"
+  | W_numeric_fraction_values -> "numeric-fraction-values"
+  | W_page_margin_box_type -> "page-margin-box-type"
+  | W_polar_color_space -> "polar-color-space"
+  | W_quote -> "quote"
+  | W_rectangular_color_space -> "rectangular-color-space"
+  | W_shape_box -> "shape-box"
+  | W_visual_box -> "visual-box"
+  | W_angular_color_hint -> "angular-color-hint"
+  | W_angular_color_stop -> "angular-color-stop"
+  | W_angular_color_stop_list -> "angular-color-stop-list"
+  | W_animateable_feature -> "animateable-feature"
+  | W_attr_fallback -> "attr-fallback"
+  | W_attr_matcher -> "attr-matcher"
+  | W_attr_name -> "attr-name"
+  | W_attr_type -> "attr-type"
+  | W_attr_unit -> "attr-unit"
+  | W_attribute_selector -> "attribute-selector"
+  | W_bg_layer -> "bg-layer"
+  | W_border_radius -> "border-radius"
+  | W_bottom -> "bottom"
+  | W_cf_final_image -> "cf-final-image"
+  | W_cf_mixing_image -> "cf-mixing-image"
+  | W_class_selector -> "class-selector"
+  | W_clip_source -> "clip-source"
+  | W_color_stop -> "color-stop"
+  | W_color_stop_angle -> "color-stop-angle"
+  | W_color_stop_length -> "color-stop-length"
+  | W_complex_selector -> "complex-selector"
+  | W_complex_selector_list -> "complex-selector-list"
+  | W_compound_selector -> "compound-selector"
+  | W_compound_selector_list -> "compound-selector-list"
+  | W_container_condition_list -> "container-condition-list"
+  | W_counter_name -> "counter-name"
+  | W_declaration -> "declaration"
+  | W_declaration_list -> "declaration-list"
+  | W_display_listitem -> "display-listitem"
+  | W_explicit_track_list -> "explicit-track-list"
+  | W_extended_angle -> "extended-angle"
+  | W_extended_frequency -> "extended-frequency"
+  | W_extended_length -> "extended-length"
+  | W_extended_percentage -> "extended-percentage"
+  | W_extended_time -> "extended-time"
+  | W_feature_tag_value -> "feature-tag-value"
+  | W_feature_value_block -> "feature-value-block"
+  | W_feature_value_block_list -> "feature-value-block-list"
+  | W_feature_value_declaration -> "feature-value-declaration"
+  | W_feature_value_declaration_list -> "feature-value-declaration-list"
+  | W_filter_function_list -> "filter-function-list"
+  | W_final_bg_layer -> "final-bg-layer"
+  | W_font_stretch_absolute -> "font-stretch-absolute"
+  | W_general_enclosed -> "general-enclosed"
+  | W_generic_voice -> "generic-voice"
+  | W_hue_interpolation_method -> "hue-interpolation-method"
+  | W_id_selector -> "id-selector"
+  | W_image_set_option -> "image-set-option"
+  | W_image_src -> "image-src"
+  | W_inflexible_breadth -> "inflexible-breadth"
+  | W_keyframe_block -> "keyframe-block"
+  | W_keyframe_block_list -> "keyframe-block-list"
+  | W_keyframe_selector -> "keyframe-selector"
+  | W_leader_type -> "leader-type"
+  | W_left -> "left"
+  | W_line_name_list -> "line-name-list"
+  | W_linear_color_hint -> "linear-color-hint"
+  | W_linear_color_stop -> "linear-color-stop"
+  | W_mask_image -> "mask-image"
+  | W_mask_layer -> "mask-layer"
+  | W_mask_position -> "mask-position"
+  | W_name_repeat -> "name-repeat"
+  | W_namespace_prefix -> "namespace-prefix"
+  | W_ns_prefix -> "ns-prefix"
+  | W_nth -> "nth"
+  | W_number_one_or_greater -> "number-one-or-greater"
+  | W_number_zero_one -> "number-zero-one"
+  | W_one_bg_size -> "one-bg-size"
+  | W_page_body -> "page-body"
+  | W_page_margin_box -> "page-margin-box"
+  | W_page_selector -> "page-selector"
+  | W_page_selector_list -> "page-selector-list"
+  | W_paint -> "paint"
+  | W_positive_integer -> "positive-integer"
+  | W_pseudo_class_selector -> "pseudo-class-selector"
+  | W_pseudo_element_selector -> "pseudo-element-selector"
+  | W_pseudo_page -> "pseudo-page"
+  | W_radial_size -> "radial-size"
+  | W_ray_size -> "ray-size"
+  | W_relative_selector -> "relative-selector"
+  | W_relative_selector_list -> "relative-selector-list"
+  | W_right -> "right"
+  | W_shape -> "shape"
+  | W_shape_radius -> "shape-radius"
+  | W_single_transition -> "single-transition"
+  | W_single_transition_no_interp -> "single-transition-no-interp"
+  | W_single_transition_property_no_interp ->
+    "single-transition-property-no-interp"
+  | W_size -> "size"
+  | W_subclass_selector -> "subclass-selector"
+  | W_supports_condition -> "supports-condition"
+  | W_supports_decl -> "supports-decl"
+  | W_supports_feature -> "supports-feature"
+  | W_supports_in_parens -> "supports-in-parens"
+  | W_supports_selector_fn -> "supports-selector-fn"
+  | W_svg_writing_mode -> "svg-writing-mode"
+  | W_symbol -> "symbol"
+  | W_syntax -> "syntax"
+  | W_syntax_combinator -> "syntax-combinator"
+  | W_syntax_component -> "syntax-component"
+  | W_syntax_multiplier -> "syntax-multiplier"
+  | W_syntax_single_component -> "syntax-single-component"
+  | W_syntax_string -> "syntax-string"
+  | W_syntax_type_name -> "syntax-type-name"
+  | W_target -> "target"
+  | W_top -> "top"
+  | W_track_group -> "track-group"
+  | W_track_list_v0 -> "track-list-v0"
+  | W_track_minmax -> "track-minmax"
+  | W_transition_behavior_value -> "transition-behavior-value"
+  | W_transition_behavior_value_no_interp ->
+    "transition-behavior-value-no-interp"
+  | W_try_tactic -> "try-tactic"
+  | W_type_or_unit -> "type-or-unit"
+  | W_type_selector -> "type-selector"
+  | W_viewport_length -> "viewport-length"
+  | W_webkit_gradient_color_stop -> "webkit-gradient-color-stop"
+  | W_webkit_gradient_point -> "webkit-gradient-point"
+  | W_webkit_gradient_radius -> "webkit-gradient-radius"
+  | W_wq_name -> "wq-name"
+  | W_x -> "x"
+  | W_y -> "y"
+  | W_function_image -> "image()"
+  | W_function_image_set -> "image-set()"
+  | W_function_element -> "element()"
+  | W_function_paint -> "paint()"
+  | W_function_cross_fade -> "cross-fade()"
+  | W_function_attr -> "attr()"
+  | W_function_symbols -> "symbols()"
+  | W_function_linear_gradient -> "linear-gradient()"
+  | W_function_radial_gradient -> "radial-gradient()"
+  | W_function_conic_gradient -> "conic-gradient()"
+  | W_function_repeating_linear_gradient -> "repeating-linear-gradient()"
+  | W_function_repeating_radial_gradient -> "repeating-radial-gradient()"
+  | W_function__webkit_gradient -> "-webkit-gradient()"
+  | W_function_matrix -> "matrix()"
+  | W_function_matrix3d -> "matrix3d()"
+  | W_function_translate -> "translate()"
+  | W_function_translateX -> "translateX()"
+  | W_function_translateY -> "translateY()"
+  | W_function_translateZ -> "translateZ()"
+  | W_function_translate3d -> "translate3d()"
+  | W_function_scale -> "scale()"
+  | W_function_scale3d -> "scale3d()"
+  | W_function_scaleX -> "scaleX()"
+  | W_function_scaleY -> "scaleY()"
+  | W_function_scaleZ -> "scaleZ()"
+  | W_function_rotate -> "rotate()"
+  | W_function_rotate3d -> "rotate3d()"
+  | W_function_rotateX -> "rotateX()"
+  | W_function_rotateY -> "rotateY()"
+  | W_function_rotateZ -> "rotateZ()"
+  | W_function_skew -> "skew()"
+  | W_function_skewX -> "skewX()"
+  | W_function_skewY -> "skewY()"
+  | W_function_perspective -> "perspective()"
+  | W_function_calc -> "calc()"
+  | W_function_min -> "min()"
+  | W_function_max -> "max()"
+  | W_function_rgb -> "rgb()"
+  | W_function_rgba -> "rgba()"
+  | W_function_hsl -> "hsl()"
+  | W_function_hsla -> "hsla()"
+  | W_function_var -> "var()"
+  | W_function_color_mix -> "color-mix()"
+  | W_function_blur -> "blur()"
+  | W_function_brightness -> "brightness()"
+  | W_function_circle -> "circle()"
+  | W_function_clamp -> "clamp()"
+  | W_function_contrast -> "contrast()"
+  | W_function_counter -> "counter()"
+  | W_function_counters -> "counters()"
+  | W_function_drop_shadow -> "drop-shadow()"
+  | W_function_ellipse -> "ellipse()"
+  | W_function_env -> "env()"
+  | W_function_fit_content -> "fit-content()"
+  | W_function_grayscale -> "grayscale()"
+  | W_function_hue_rotate -> "hue-rotate()"
+  | W_function_inset -> "inset()"
+  | W_function_invert -> "invert()"
+  | W_function_leader -> "leader()"
+  | W_function_minmax -> "minmax()"
+  | W_function_opacity -> "opacity()"
+  | W_function_path -> "path()"
+  | W_function_polygon -> "polygon()"
+  | W_function_saturate -> "saturate()"
+  | W_function_sepia -> "sepia()"
+  | W_function_target_counter -> "target-counter()"
+  | W_function_target_counters -> "target-counters()"
+  | W_function_target_text -> "target-text()"
+  | W_media_feature -> "media-feature"
+  | W_media_in_parens -> "media-in-parens"
+  | W_media_or -> "media-or"
+  | W_media_and -> "media-and"
+  | W_media_not -> "media-not"
+  | W_media_condition_without_or -> "media-condition-without-or"
+  | W_media_condition -> "media-condition"
+  | W_media_query -> "media-query"
+  | W_media_query_list -> "media-query-list"
+
+(** Compare witnesses for type equality *)
+let witness_eq : type a b. a witness -> b witness -> (a, b) eq option =
+ fun a b ->
+  match a, b with
+  | W_property_display, W_property_display -> Some Refl
+  | W_property_overflow, W_property_overflow -> Some Refl
+  | W_property_position, W_property_position -> Some Refl
+  | W_property_visibility, W_property_visibility -> Some Refl
+  | W_property_float, W_property_float -> Some Refl
+  | W_property_clear, W_property_clear -> Some Refl
+  | W_property_table_layout, W_property_table_layout -> Some Refl
+  | W_property_border_collapse, W_property_border_collapse -> Some Refl
+  | W_property_empty_cells, W_property_empty_cells -> Some Refl
+  | W_property_caption_side, W_property_caption_side -> Some Refl
+  | W_property_direction, W_property_direction -> Some Refl
+  | W_property_unicode_bidi, W_property_unicode_bidi -> Some Refl
+  | W_property_writing_mode, W_property_writing_mode -> Some Refl
+  | W_property_text_orientation, W_property_text_orientation -> Some Refl
+  | W_property_text_transform, W_property_text_transform -> Some Refl
+  | W_property_white_space, W_property_white_space -> Some Refl
+  | W_property_word_break, W_property_word_break -> Some Refl
+  | W_property_overflow_wrap, W_property_overflow_wrap -> Some Refl
+  | W_property_text_align, W_property_text_align -> Some Refl
+  | W_property_text_align_last, W_property_text_align_last -> Some Refl
+  | W_property_text_justify, W_property_text_justify -> Some Refl
+  | W_property_text_decoration_line, W_property_text_decoration_line ->
+    Some Refl
+  | W_property_text_decoration_style, W_property_text_decoration_style ->
+    Some Refl
+  | W_property_text_decoration_skip_ink, W_property_text_decoration_skip_ink ->
+    Some Refl
+  | W_property_font_style, W_property_font_style -> Some Refl
+  | W_property_font_variant_caps, W_property_font_variant_caps -> Some Refl
+  | W_property_font_stretch, W_property_font_stretch -> Some Refl
+  | W_property_font_kerning, W_property_font_kerning -> Some Refl
+  | W_property_font_variant_position, W_property_font_variant_position ->
+    Some Refl
+  | W_property_list_style_position, W_property_list_style_position -> Some Refl
+  | W_property_list_style_type, W_property_list_style_type -> Some Refl
+  | W_property_pointer_events, W_property_pointer_events -> Some Refl
+  | W_property_user_select, W_property_user_select -> Some Refl
+  | W_property_resize, W_property_resize -> Some Refl
+  | W_property_box_sizing, W_property_box_sizing -> Some Refl
+  | W_property_object_fit, W_property_object_fit -> Some Refl
+  | W_property_isolation, W_property_isolation -> Some Refl
+  | W_property_mix_blend_mode, W_property_mix_blend_mode -> Some Refl
+  | W_property_backface_visibility, W_property_backface_visibility -> Some Refl
+  | W_property_flex_direction, W_property_flex_direction -> Some Refl
+  | W_property_flex_wrap, W_property_flex_wrap -> Some Refl
+  | W_property_justify_content, W_property_justify_content -> Some Refl
+  | W_property_align_items, W_property_align_items -> Some Refl
+  | W_property_align_content, W_property_align_content -> Some Refl
+  | W_property_align_self, W_property_align_self -> Some Refl
+  | W_property_justify_items, W_property_justify_items -> Some Refl
+  | W_property_justify_self, W_property_justify_self -> Some Refl
+  | W_property_scroll_behavior, W_property_scroll_behavior -> Some Refl
+  | W_property_overscroll_behavior, W_property_overscroll_behavior -> Some Refl
+  | W_property_overflow_anchor, W_property_overflow_anchor -> Some Refl
+  | W_property_touch_action, W_property_touch_action -> Some Refl
+  | W_property_caret_color, W_property_caret_color -> Some Refl
+  | W_property_appearance, W_property_appearance -> Some Refl
+  | W_property_text_rendering, W_property_text_rendering -> Some Refl
+  | W_property_image_rendering, W_property_image_rendering -> Some Refl
+  | W_property_color_scheme, W_property_color_scheme -> Some Refl
+  | W_property_forced_color_adjust, W_property_forced_color_adjust -> Some Refl
+  | W_property_print_color_adjust, W_property_print_color_adjust -> Some Refl
+  | W_property_contain_intrinsic_size, W_property_contain_intrinsic_size ->
+    Some Refl
+  | W_property_content_visibility, W_property_content_visibility -> Some Refl
+  | W_property_hyphens, W_property_hyphens -> Some Refl
+  | W_property_column_fill, W_property_column_fill -> Some Refl
+  | W_property_column_span, W_property_column_span -> Some Refl
+  | W_property_clip_rule, W_property_clip_rule -> Some Refl
+  | W_property_font_optical_sizing, W_property_font_optical_sizing -> Some Refl
+  | W_property_font_palette, W_property_font_palette -> Some Refl
+  | W_property_font_synthesis_weight, W_property_font_synthesis_weight ->
+    Some Refl
+  | W_property_font_synthesis_style, W_property_font_synthesis_style ->
+    Some Refl
+  | W_property_font_synthesis_small_caps, W_property_font_synthesis_small_caps
+    ->
+    Some Refl
+  | W_property_font_synthesis_position, W_property_font_synthesis_position ->
+    Some Refl
+  | W_property_mask_border_mode, W_property_mask_border_mode -> Some Refl
+  | W_property_mask_type, W_property_mask_type -> Some Refl
+  | W_property_ruby_merge, W_property_ruby_merge -> Some Refl
+  | W_property_ruby_position, W_property_ruby_position -> Some Refl
+  | W_property_scroll_snap_stop, W_property_scroll_snap_stop -> Some Refl
+  | W_property_scrollbar_width, W_property_scrollbar_width -> Some Refl
+  | W_property_speak, W_property_speak -> Some Refl
+  | W_property_stroke_linecap, W_property_stroke_linecap -> Some Refl
+  | W_property_box_decoration_break, W_property_box_decoration_break ->
+    Some Refl
+  | W_property_color_adjust, W_property_color_adjust -> Some Refl
+  | W_property_text_decoration_thickness, W_property_text_decoration_thickness
+    ->
+    Some Refl
+  | W_property_text_underline_position, W_property_text_underline_position ->
+    Some Refl
+  | W_property_word_wrap, W_property_word_wrap -> Some Refl
+  | W_property_break_inside, W_property_break_inside -> Some Refl
+  | W_property_break_before, W_property_break_before -> Some Refl
+  | W_property_break_after, W_property_break_after -> Some Refl
+  | W_property_page_break_after, W_property_page_break_after -> Some Refl
+  | W_property_page_break_before, W_property_page_break_before -> Some Refl
+  | W_property_page_break_inside, W_property_page_break_inside -> Some Refl
+  | W_property_border_image_repeat, W_property_border_image_repeat -> Some Refl
+  | W_property_transform_style, W_property_transform_style -> Some Refl
+  | W_property_transform_box, W_property_transform_box -> Some Refl
+  | W_property_grid_auto_flow, W_property_grid_auto_flow -> Some Refl
+  | W_property_font_display, W_property_font_display -> Some Refl
+  | W_property_will_change, W_property_will_change -> Some Refl
+  | W_property_contain, W_property_contain -> Some Refl
+  | W_property_all, W_property_all -> Some Refl
+  | W_property_row_gap, W_property_row_gap -> Some Refl
+  | W_property_column_gap, W_property_column_gap -> Some Refl
+  | W_property_outline_width, W_property_outline_width -> Some Refl
+  | W_property_outline_style, W_property_outline_style -> Some Refl
+  | W_property_width, W_property_width -> Some Refl
+  | W_property_border, W_property_border -> Some Refl
+  | W_property_flex_grow, W_property_flex_grow -> Some Refl
+  | W_property_flex_shrink, W_property_flex_shrink -> Some Refl
+  | W_property_flex_basis, W_property_flex_basis -> Some Refl
+  | W_property__webkit_appearance, W_property__webkit_appearance -> Some Refl
+  | W_property_stroke_linejoin, W_property_stroke_linejoin -> Some Refl
+  | W_property_perspective_origin, W_property_perspective_origin -> Some Refl
+  | W_property_media_type, W_property_media_type -> Some Refl
+  | W_property_container_type, W_property_container_type -> Some Refl
+  | W_property__moz_appearance, W_property__moz_appearance -> Some Refl
+  | W_property__moz_background_clip, W_property__moz_background_clip ->
+    Some Refl
+  | W_property__moz_binding, W_property__moz_binding -> Some Refl
+  | W_property__moz_border_bottom_colors, W_property__moz_border_bottom_colors
+    ->
+    Some Refl
+  | W_property__moz_border_left_colors, W_property__moz_border_left_colors ->
+    Some Refl
+  | ( W_property__moz_border_radius_bottomleft,
+      W_property__moz_border_radius_bottomleft ) ->
+    Some Refl
+  | ( W_property__moz_border_radius_bottomright,
+      W_property__moz_border_radius_bottomright ) ->
+    Some Refl
+  | W_property__moz_border_radius_topleft, W_property__moz_border_radius_topleft
+    ->
+    Some Refl
+  | ( W_property__moz_border_radius_topright,
+      W_property__moz_border_radius_topright ) ->
+    Some Refl
+  | W_property__moz_border_right_colors, W_property__moz_border_right_colors ->
+    Some Refl
+  | W_property__moz_border_top_colors, W_property__moz_border_top_colors ->
+    Some Refl
+  | W_property__moz_context_properties, W_property__moz_context_properties ->
+    Some Refl
+  | ( W_property__moz_control_character_visibility,
+      W_property__moz_control_character_visibility ) ->
+    Some Refl
+  | W_property__moz_float_edge, W_property__moz_float_edge -> Some Refl
+  | ( W_property__moz_force_broken_image_icon,
+      W_property__moz_force_broken_image_icon ) ->
+    Some Refl
+  | W_property__moz_image_region, W_property__moz_image_region -> Some Refl
+  | W_property__moz_orient, W_property__moz_orient -> Some Refl
+  | W_property__moz_osx_font_smoothing, W_property__moz_osx_font_smoothing ->
+    Some Refl
+  | W_property__moz_outline_radius, W_property__moz_outline_radius -> Some Refl
+  | ( W_property__moz_outline_radius_bottomleft,
+      W_property__moz_outline_radius_bottomleft ) ->
+    Some Refl
+  | ( W_property__moz_outline_radius_bottomright,
+      W_property__moz_outline_radius_bottomright ) ->
+    Some Refl
+  | ( W_property__moz_outline_radius_topleft,
+      W_property__moz_outline_radius_topleft ) ->
+    Some Refl
+  | ( W_property__moz_outline_radius_topright,
+      W_property__moz_outline_radius_topright ) ->
+    Some Refl
+  | W_property__moz_stack_sizing, W_property__moz_stack_sizing -> Some Refl
+  | W_property__moz_text_blink, W_property__moz_text_blink -> Some Refl
+  | W_property__moz_user_focus, W_property__moz_user_focus -> Some Refl
+  | W_property__moz_user_input, W_property__moz_user_input -> Some Refl
+  | W_property__moz_user_modify, W_property__moz_user_modify -> Some Refl
+  | W_property__moz_user_select, W_property__moz_user_select -> Some Refl
+  | W_property__moz_window_dragging, W_property__moz_window_dragging ->
+    Some Refl
+  | W_property__moz_window_shadow, W_property__moz_window_shadow -> Some Refl
+  | W_property__webkit_background_clip, W_property__webkit_background_clip ->
+    Some Refl
+  | W_property__webkit_border_before, W_property__webkit_border_before ->
+    Some Refl
+  | ( W_property__webkit_border_before_color,
+      W_property__webkit_border_before_color ) ->
+    Some Refl
+  | ( W_property__webkit_border_before_style,
+      W_property__webkit_border_before_style ) ->
+    Some Refl
+  | ( W_property__webkit_border_before_width,
+      W_property__webkit_border_before_width ) ->
+    Some Refl
+  | W_property__webkit_box_reflect, W_property__webkit_box_reflect -> Some Refl
+  | W_property__webkit_column_break_after, W_property__webkit_column_break_after
+    ->
+    Some Refl
+  | ( W_property__webkit_column_break_before,
+      W_property__webkit_column_break_before ) ->
+    Some Refl
+  | ( W_property__webkit_column_break_inside,
+      W_property__webkit_column_break_inside ) ->
+    Some Refl
+  | W_property__webkit_font_smoothing, W_property__webkit_font_smoothing ->
+    Some Refl
+  | W_property__webkit_line_clamp, W_property__webkit_line_clamp -> Some Refl
+  | W_property__webkit_mask, W_property__webkit_mask -> Some Refl
+  | W_property__webkit_mask_attachment, W_property__webkit_mask_attachment ->
+    Some Refl
+  | W_property__webkit_mask_box_image, W_property__webkit_mask_box_image ->
+    Some Refl
+  | W_property__webkit_mask_clip, W_property__webkit_mask_clip -> Some Refl
+  | W_property__webkit_mask_composite, W_property__webkit_mask_composite ->
+    Some Refl
+  | W_property__webkit_mask_image, W_property__webkit_mask_image -> Some Refl
+  | W_property__webkit_mask_origin, W_property__webkit_mask_origin -> Some Refl
+  | W_property__webkit_mask_position, W_property__webkit_mask_position ->
+    Some Refl
+  | W_property__webkit_mask_position_x, W_property__webkit_mask_position_x ->
+    Some Refl
+  | W_property__webkit_mask_position_y, W_property__webkit_mask_position_y ->
+    Some Refl
+  | W_property__webkit_mask_repeat, W_property__webkit_mask_repeat -> Some Refl
+  | W_property__webkit_mask_repeat_x, W_property__webkit_mask_repeat_x ->
+    Some Refl
+  | W_property__webkit_mask_repeat_y, W_property__webkit_mask_repeat_y ->
+    Some Refl
+  | W_property__webkit_mask_size, W_property__webkit_mask_size -> Some Refl
+  | W_property__webkit_overflow_scrolling, W_property__webkit_overflow_scrolling
+    ->
+    Some Refl
+  | W_property__webkit_print_color_adjust, W_property__webkit_print_color_adjust
+    ->
+    Some Refl
+  | ( W_property__webkit_tap_highlight_color,
+      W_property__webkit_tap_highlight_color ) ->
+    Some Refl
+  | W_property__webkit_text_fill_color, W_property__webkit_text_fill_color ->
+    Some Refl
+  | W_property__webkit_text_security, W_property__webkit_text_security ->
+    Some Refl
+  | W_property__webkit_text_stroke, W_property__webkit_text_stroke -> Some Refl
+  | W_property__webkit_text_stroke_color, W_property__webkit_text_stroke_color
+    ->
+    Some Refl
+  | W_property__webkit_text_stroke_width, W_property__webkit_text_stroke_width
+    ->
+    Some Refl
+  | W_property__webkit_touch_callout, W_property__webkit_touch_callout ->
+    Some Refl
+  | W_property__webkit_user_drag, W_property__webkit_user_drag -> Some Refl
+  | W_property__webkit_user_modify, W_property__webkit_user_modify -> Some Refl
+  | W_property__webkit_user_select, W_property__webkit_user_select -> Some Refl
+  | W_property_accent_color, W_property_accent_color -> Some Refl
+  | W_property_alignment_baseline, W_property_alignment_baseline -> Some Refl
+  | W_property_anchor_name, W_property_anchor_name -> Some Refl
+  | W_property_anchor_scope, W_property_anchor_scope -> Some Refl
+  | W_property_animation, W_property_animation -> Some Refl
+  | W_property_animation_composition, W_property_animation_composition ->
+    Some Refl
+  | W_property_animation_delay, W_property_animation_delay -> Some Refl
+  | W_property_animation_delay_end, W_property_animation_delay_end -> Some Refl
+  | W_property_animation_delay_start, W_property_animation_delay_start ->
+    Some Refl
+  | W_property_animation_direction, W_property_animation_direction -> Some Refl
+  | W_property_animation_duration, W_property_animation_duration -> Some Refl
+  | W_property_animation_fill_mode, W_property_animation_fill_mode -> Some Refl
+  | W_property_animation_iteration_count, W_property_animation_iteration_count
+    ->
+    Some Refl
+  | W_property_animation_name, W_property_animation_name -> Some Refl
+  | W_property_animation_play_state, W_property_animation_play_state ->
+    Some Refl
+  | W_property_animation_range, W_property_animation_range -> Some Refl
+  | W_property_animation_range_end, W_property_animation_range_end -> Some Refl
+  | W_property_animation_range_start, W_property_animation_range_start ->
+    Some Refl
+  | W_property_animation_timeline, W_property_animation_timeline -> Some Refl
+  | W_property_animation_timing_function, W_property_animation_timing_function
+    ->
+    Some Refl
+  | W_property_aspect_ratio, W_property_aspect_ratio -> Some Refl
+  | W_property_azimuth, W_property_azimuth -> Some Refl
+  | W_property_backdrop_blur, W_property_backdrop_blur -> Some Refl
+  | W_property_backdrop_filter, W_property_backdrop_filter -> Some Refl
+  | W_property_background, W_property_background -> Some Refl
+  | W_property_background_attachment, W_property_background_attachment ->
+    Some Refl
+  | W_property_background_blend_mode, W_property_background_blend_mode ->
+    Some Refl
+  | W_property_background_clip, W_property_background_clip -> Some Refl
+  | W_property_background_color, W_property_background_color -> Some Refl
+  | W_property_background_image, W_property_background_image -> Some Refl
+  | W_property_background_origin, W_property_background_origin -> Some Refl
+  | W_property_background_position, W_property_background_position -> Some Refl
+  | W_property_background_position_x, W_property_background_position_x ->
+    Some Refl
+  | W_property_background_position_y, W_property_background_position_y ->
+    Some Refl
+  | W_property_background_repeat, W_property_background_repeat -> Some Refl
+  | W_property_background_size, W_property_background_size -> Some Refl
+  | W_property_baseline_shift, W_property_baseline_shift -> Some Refl
+  | W_property_behavior, W_property_behavior -> Some Refl
+  | W_property_bleed, W_property_bleed -> Some Refl
+  | W_property_block_overflow, W_property_block_overflow -> Some Refl
+  | W_property_block_size, W_property_block_size -> Some Refl
+  | W_property_border_block, W_property_border_block -> Some Refl
+  | W_property_border_block_color, W_property_border_block_color -> Some Refl
+  | W_property_border_block_end, W_property_border_block_end -> Some Refl
+  | W_property_border_block_end_color, W_property_border_block_end_color ->
+    Some Refl
+  | W_property_border_block_end_style, W_property_border_block_end_style ->
+    Some Refl
+  | W_property_border_block_end_width, W_property_border_block_end_width ->
+    Some Refl
+  | W_property_border_block_start, W_property_border_block_start -> Some Refl
+  | W_property_border_block_start_color, W_property_border_block_start_color ->
+    Some Refl
+  | W_property_border_block_start_style, W_property_border_block_start_style ->
+    Some Refl
+  | W_property_border_block_start_width, W_property_border_block_start_width ->
+    Some Refl
+  | W_property_border_block_style, W_property_border_block_style -> Some Refl
+  | W_property_border_block_width, W_property_border_block_width -> Some Refl
+  | W_property_border_bottom, W_property_border_bottom -> Some Refl
+  | W_property_border_bottom_color, W_property_border_bottom_color -> Some Refl
+  | W_property_border_bottom_left_radius, W_property_border_bottom_left_radius
+    ->
+    Some Refl
+  | W_property_border_bottom_right_radius, W_property_border_bottom_right_radius
+    ->
+    Some Refl
+  | W_property_border_bottom_style, W_property_border_bottom_style -> Some Refl
+  | W_property_border_bottom_width, W_property_border_bottom_width -> Some Refl
+  | W_property_border_color, W_property_border_color -> Some Refl
+  | W_property_border_end_end_radius, W_property_border_end_end_radius ->
+    Some Refl
+  | W_property_border_end_start_radius, W_property_border_end_start_radius ->
+    Some Refl
+  | W_property_border_image, W_property_border_image -> Some Refl
+  | W_property_border_image_outset, W_property_border_image_outset -> Some Refl
+  | W_property_border_image_slice, W_property_border_image_slice -> Some Refl
+  | W_property_border_image_source, W_property_border_image_source -> Some Refl
+  | W_property_border_image_width, W_property_border_image_width -> Some Refl
+  | W_property_border_inline, W_property_border_inline -> Some Refl
+  | W_property_border_inline_color, W_property_border_inline_color -> Some Refl
+  | W_property_border_inline_end, W_property_border_inline_end -> Some Refl
+  | W_property_border_inline_end_color, W_property_border_inline_end_color ->
+    Some Refl
+  | W_property_border_inline_end_style, W_property_border_inline_end_style ->
+    Some Refl
+  | W_property_border_inline_end_width, W_property_border_inline_end_width ->
+    Some Refl
+  | W_property_border_inline_start, W_property_border_inline_start -> Some Refl
+  | W_property_border_inline_start_color, W_property_border_inline_start_color
+    ->
+    Some Refl
+  | W_property_border_inline_start_style, W_property_border_inline_start_style
+    ->
+    Some Refl
+  | W_property_border_inline_start_width, W_property_border_inline_start_width
+    ->
+    Some Refl
+  | W_property_border_inline_style, W_property_border_inline_style -> Some Refl
+  | W_property_border_inline_width, W_property_border_inline_width -> Some Refl
+  | W_property_border_left, W_property_border_left -> Some Refl
+  | W_property_border_left_color, W_property_border_left_color -> Some Refl
+  | W_property_border_left_style, W_property_border_left_style -> Some Refl
+  | W_property_border_left_width, W_property_border_left_width -> Some Refl
+  | W_property_border_radius, W_property_border_radius -> Some Refl
+  | W_property_border_right, W_property_border_right -> Some Refl
+  | W_property_border_right_color, W_property_border_right_color -> Some Refl
+  | W_property_border_right_style, W_property_border_right_style -> Some Refl
+  | W_property_border_right_width, W_property_border_right_width -> Some Refl
+  | W_property_border_spacing, W_property_border_spacing -> Some Refl
+  | W_property_border_start_end_radius, W_property_border_start_end_radius ->
+    Some Refl
+  | W_property_border_start_start_radius, W_property_border_start_start_radius
+    ->
+    Some Refl
+  | W_property_border_style, W_property_border_style -> Some Refl
+  | W_property_border_top, W_property_border_top -> Some Refl
+  | W_property_border_top_color, W_property_border_top_color -> Some Refl
+  | W_property_border_top_left_radius, W_property_border_top_left_radius ->
+    Some Refl
+  | W_property_border_top_right_radius, W_property_border_top_right_radius ->
+    Some Refl
+  | W_property_border_top_style, W_property_border_top_style -> Some Refl
+  | W_property_border_top_width, W_property_border_top_width -> Some Refl
+  | W_property_border_width, W_property_border_width -> Some Refl
+  | W_property_bottom, W_property_bottom -> Some Refl
+  | W_property_box_align, W_property_box_align -> Some Refl
+  | W_property_box_direction, W_property_box_direction -> Some Refl
+  | W_property_box_flex, W_property_box_flex -> Some Refl
+  | W_property_box_flex_group, W_property_box_flex_group -> Some Refl
+  | W_property_box_lines, W_property_box_lines -> Some Refl
+  | W_property_box_ordinal_group, W_property_box_ordinal_group -> Some Refl
+  | W_property_box_orient, W_property_box_orient -> Some Refl
+  | W_property_box_pack, W_property_box_pack -> Some Refl
+  | W_property_box_shadow, W_property_box_shadow -> Some Refl
+  | W_property_clip, W_property_clip -> Some Refl
+  | W_property_clip_path, W_property_clip_path -> Some Refl
+  | W_property_color, W_property_color -> Some Refl
+  | W_property_color_interpolation, W_property_color_interpolation -> Some Refl
+  | ( W_property_color_interpolation_filters,
+      W_property_color_interpolation_filters ) ->
+    Some Refl
+  | W_property_color_rendering, W_property_color_rendering -> Some Refl
+  | W_property_column_count, W_property_column_count -> Some Refl
+  | W_property_column_rule, W_property_column_rule -> Some Refl
+  | W_property_column_rule_color, W_property_column_rule_color -> Some Refl
+  | W_property_column_rule_style, W_property_column_rule_style -> Some Refl
+  | W_property_column_rule_width, W_property_column_rule_width -> Some Refl
+  | W_property_column_width, W_property_column_width -> Some Refl
+  | W_property_columns, W_property_columns -> Some Refl
+  | ( W_property_contain_intrinsic_block_size,
+      W_property_contain_intrinsic_block_size ) ->
+    Some Refl
+  | W_property_contain_intrinsic_height, W_property_contain_intrinsic_height ->
+    Some Refl
+  | ( W_property_contain_intrinsic_inline_size,
+      W_property_contain_intrinsic_inline_size ) ->
+    Some Refl
+  | W_property_contain_intrinsic_width, W_property_contain_intrinsic_width ->
+    Some Refl
+  | W_property_container, W_property_container -> Some Refl
+  | W_property_container_name, W_property_container_name -> Some Refl
+  | W_property_container_name_computed, W_property_container_name_computed ->
+    Some Refl
+  | W_property_content, W_property_content -> Some Refl
+  | W_property_counter_increment, W_property_counter_increment -> Some Refl
+  | W_property_counter_reset, W_property_counter_reset -> Some Refl
+  | W_property_counter_set, W_property_counter_set -> Some Refl
+  | W_property_cue, W_property_cue -> Some Refl
+  | W_property_cue_after, W_property_cue_after -> Some Refl
+  | W_property_cue_before, W_property_cue_before -> Some Refl
+  | W_property_cursor, W_property_cursor -> Some Refl
+  | W_property_cx, W_property_cx -> Some Refl
+  | W_property_cy, W_property_cy -> Some Refl
+  | W_property_d, W_property_d -> Some Refl
+  | W_property_dominant_baseline, W_property_dominant_baseline -> Some Refl
+  | W_property_field_sizing, W_property_field_sizing -> Some Refl
+  | W_property_fill, W_property_fill -> Some Refl
+  | W_property_fill_opacity, W_property_fill_opacity -> Some Refl
+  | W_property_fill_rule, W_property_fill_rule -> Some Refl
+  | W_property_filter, W_property_filter -> Some Refl
+  | W_property_flex, W_property_flex -> Some Refl
+  | W_property_flex_flow, W_property_flex_flow -> Some Refl
+  | W_property_flood_color, W_property_flood_color -> Some Refl
+  | W_property_flood_opacity, W_property_flood_opacity -> Some Refl
+  | W_property_font, W_property_font -> Some Refl
+  | W_property_font_family, W_property_font_family -> Some Refl
+  | W_property_font_feature_settings, W_property_font_feature_settings ->
+    Some Refl
+  | W_property_font_language_override, W_property_font_language_override ->
+    Some Refl
+  | W_property_font_size, W_property_font_size -> Some Refl
+  | W_property_font_size_adjust, W_property_font_size_adjust -> Some Refl
+  | W_property_font_smooth, W_property_font_smooth -> Some Refl
+  | W_property_font_synthesis, W_property_font_synthesis -> Some Refl
+  | W_property_font_variant, W_property_font_variant -> Some Refl
+  | W_property_font_variant_alternates, W_property_font_variant_alternates ->
+    Some Refl
+  | W_property_font_variant_east_asian, W_property_font_variant_east_asian ->
+    Some Refl
+  | W_property_font_variant_emoji, W_property_font_variant_emoji -> Some Refl
+  | W_property_font_variant_ligatures, W_property_font_variant_ligatures ->
+    Some Refl
+  | W_property_font_variant_numeric, W_property_font_variant_numeric ->
+    Some Refl
+  | W_property_font_variation_settings, W_property_font_variation_settings ->
+    Some Refl
+  | W_property_font_weight, W_property_font_weight -> Some Refl
+  | W_property_gap, W_property_gap -> Some Refl
+  | ( W_property_glyph_orientation_horizontal,
+      W_property_glyph_orientation_horizontal ) ->
+    Some Refl
+  | W_property_glyph_orientation_vertical, W_property_glyph_orientation_vertical
+    ->
+    Some Refl
+  | W_property_grid, W_property_grid -> Some Refl
+  | W_property_grid_area, W_property_grid_area -> Some Refl
+  | W_property_grid_auto_columns, W_property_grid_auto_columns -> Some Refl
+  | W_property_grid_auto_rows, W_property_grid_auto_rows -> Some Refl
+  | W_property_grid_column, W_property_grid_column -> Some Refl
+  | W_property_grid_column_end, W_property_grid_column_end -> Some Refl
+  | W_property_grid_column_gap, W_property_grid_column_gap -> Some Refl
+  | W_property_grid_column_start, W_property_grid_column_start -> Some Refl
+  | W_property_grid_gap, W_property_grid_gap -> Some Refl
+  | W_property_grid_row, W_property_grid_row -> Some Refl
+  | W_property_grid_row_end, W_property_grid_row_end -> Some Refl
+  | W_property_grid_row_gap, W_property_grid_row_gap -> Some Refl
+  | W_property_grid_row_start, W_property_grid_row_start -> Some Refl
+  | W_property_grid_template, W_property_grid_template -> Some Refl
+  | W_property_grid_template_areas, W_property_grid_template_areas -> Some Refl
+  | W_property_grid_template_columns, W_property_grid_template_columns ->
+    Some Refl
+  | W_property_grid_template_rows, W_property_grid_template_rows -> Some Refl
+  | W_property_hanging_punctuation, W_property_hanging_punctuation -> Some Refl
+  | W_property_height, W_property_height -> Some Refl
+  | W_property_hyphenate_character, W_property_hyphenate_character -> Some Refl
+  | W_property_hyphenate_limit_chars, W_property_hyphenate_limit_chars ->
+    Some Refl
+  | W_property_hyphenate_limit_last, W_property_hyphenate_limit_last ->
+    Some Refl
+  | W_property_hyphenate_limit_lines, W_property_hyphenate_limit_lines ->
+    Some Refl
+  | W_property_hyphenate_limit_zone, W_property_hyphenate_limit_zone ->
+    Some Refl
+  | W_property_image_orientation, W_property_image_orientation -> Some Refl
+  | W_property_image_resolution, W_property_image_resolution -> Some Refl
+  | W_property_ime_mode, W_property_ime_mode -> Some Refl
+  | W_property_inherits, W_property_inherits -> Some Refl
+  | W_property_initial_letter, W_property_initial_letter -> Some Refl
+  | W_property_initial_letter_align, W_property_initial_letter_align ->
+    Some Refl
+  | W_property_initial_value, W_property_initial_value -> Some Refl
+  | W_property_inline_size, W_property_inline_size -> Some Refl
+  | W_property_inset, W_property_inset -> Some Refl
+  | W_property_inset_area, W_property_inset_area -> Some Refl
+  | W_property_inset_block, W_property_inset_block -> Some Refl
+  | W_property_inset_block_end, W_property_inset_block_end -> Some Refl
+  | W_property_inset_block_start, W_property_inset_block_start -> Some Refl
+  | W_property_inset_inline, W_property_inset_inline -> Some Refl
+  | W_property_inset_inline_end, W_property_inset_inline_end -> Some Refl
+  | W_property_inset_inline_start, W_property_inset_inline_start -> Some Refl
+  | W_property_interpolate_size, W_property_interpolate_size -> Some Refl
+  | W_property_kerning, W_property_kerning -> Some Refl
+  | W_property_layout_grid, W_property_layout_grid -> Some Refl
+  | W_property_layout_grid_char, W_property_layout_grid_char -> Some Refl
+  | W_property_layout_grid_line, W_property_layout_grid_line -> Some Refl
+  | W_property_layout_grid_mode, W_property_layout_grid_mode -> Some Refl
+  | W_property_layout_grid_type, W_property_layout_grid_type -> Some Refl
+  | W_property_left, W_property_left -> Some Refl
+  | W_property_letter_spacing, W_property_letter_spacing -> Some Refl
+  | W_property_lighting_color, W_property_lighting_color -> Some Refl
+  | W_property_line_break, W_property_line_break -> Some Refl
+  | W_property_line_clamp, W_property_line_clamp -> Some Refl
+  | W_property_line_height, W_property_line_height -> Some Refl
+  | W_property_line_height_step, W_property_line_height_step -> Some Refl
+  | W_property_list_style, W_property_list_style -> Some Refl
+  | W_property_list_style_image, W_property_list_style_image -> Some Refl
+  | W_property_margin, W_property_margin -> Some Refl
+  | W_property_margin_block, W_property_margin_block -> Some Refl
+  | W_property_margin_block_end, W_property_margin_block_end -> Some Refl
+  | W_property_margin_block_start, W_property_margin_block_start -> Some Refl
+  | W_property_margin_bottom, W_property_margin_bottom -> Some Refl
+  | W_property_margin_inline, W_property_margin_inline -> Some Refl
+  | W_property_margin_inline_end, W_property_margin_inline_end -> Some Refl
+  | W_property_margin_inline_start, W_property_margin_inline_start -> Some Refl
+  | W_property_margin_left, W_property_margin_left -> Some Refl
+  | W_property_margin_right, W_property_margin_right -> Some Refl
+  | W_property_margin_top, W_property_margin_top -> Some Refl
+  | W_property_margin_trim, W_property_margin_trim -> Some Refl
+  | W_property_marker, W_property_marker -> Some Refl
+  | W_property_marker_end, W_property_marker_end -> Some Refl
+  | W_property_marker_mid, W_property_marker_mid -> Some Refl
+  | W_property_marker_start, W_property_marker_start -> Some Refl
+  | W_property_marks, W_property_marks -> Some Refl
+  | W_property_mask, W_property_mask -> Some Refl
+  | W_property_mask_border, W_property_mask_border -> Some Refl
+  | W_property_mask_border_outset, W_property_mask_border_outset -> Some Refl
+  | W_property_mask_border_repeat, W_property_mask_border_repeat -> Some Refl
+  | W_property_mask_border_slice, W_property_mask_border_slice -> Some Refl
+  | W_property_mask_border_source, W_property_mask_border_source -> Some Refl
+  | W_property_mask_border_width, W_property_mask_border_width -> Some Refl
+  | W_property_mask_clip, W_property_mask_clip -> Some Refl
+  | W_property_mask_composite, W_property_mask_composite -> Some Refl
+  | W_property_mask_image, W_property_mask_image -> Some Refl
+  | W_property_mask_mode, W_property_mask_mode -> Some Refl
+  | W_property_mask_origin, W_property_mask_origin -> Some Refl
+  | W_property_mask_position, W_property_mask_position -> Some Refl
+  | W_property_mask_repeat, W_property_mask_repeat -> Some Refl
+  | W_property_mask_size, W_property_mask_size -> Some Refl
+  | W_property_masonry_auto_flow, W_property_masonry_auto_flow -> Some Refl
+  | W_property_math_depth, W_property_math_depth -> Some Refl
+  | W_property_math_shift, W_property_math_shift -> Some Refl
+  | W_property_math_style, W_property_math_style -> Some Refl
+  | W_property_max_block_size, W_property_max_block_size -> Some Refl
+  | W_property_max_height, W_property_max_height -> Some Refl
+  | W_property_max_inline_size, W_property_max_inline_size -> Some Refl
+  | W_property_max_lines, W_property_max_lines -> Some Refl
+  | W_property_max_width, W_property_max_width -> Some Refl
+  | W_property_media_any_hover, W_property_media_any_hover -> Some Refl
+  | W_property_media_any_pointer, W_property_media_any_pointer -> Some Refl
+  | W_property_media_color_gamut, W_property_media_color_gamut -> Some Refl
+  | W_property_media_color_index, W_property_media_color_index -> Some Refl
+  | W_property_media_display_mode, W_property_media_display_mode -> Some Refl
+  | W_property_media_forced_colors, W_property_media_forced_colors -> Some Refl
+  | W_property_media_grid, W_property_media_grid -> Some Refl
+  | W_property_media_hover, W_property_media_hover -> Some Refl
+  | W_property_media_inverted_colors, W_property_media_inverted_colors ->
+    Some Refl
+  | W_property_media_max_aspect_ratio, W_property_media_max_aspect_ratio ->
+    Some Refl
+  | W_property_media_max_resolution, W_property_media_max_resolution ->
+    Some Refl
+  | W_property_media_min_aspect_ratio, W_property_media_min_aspect_ratio ->
+    Some Refl
+  | W_property_media_min_color, W_property_media_min_color -> Some Refl
+  | W_property_media_min_color_index, W_property_media_min_color_index ->
+    Some Refl
+  | W_property_media_min_resolution, W_property_media_min_resolution ->
+    Some Refl
+  | W_property_media_monochrome, W_property_media_monochrome -> Some Refl
+  | W_property_media_orientation, W_property_media_orientation -> Some Refl
+  | W_property_media_pointer, W_property_media_pointer -> Some Refl
+  | W_property_media_prefers_color_scheme, W_property_media_prefers_color_scheme
+    ->
+    Some Refl
+  | W_property_media_prefers_contrast, W_property_media_prefers_contrast ->
+    Some Refl
+  | ( W_property_media_prefers_reduced_motion,
+      W_property_media_prefers_reduced_motion ) ->
+    Some Refl
+  | W_property_media_resolution, W_property_media_resolution -> Some Refl
+  | W_property_media_scripting, W_property_media_scripting -> Some Refl
+  | W_property_media_update, W_property_media_update -> Some Refl
+  | W_property_min_block_size, W_property_min_block_size -> Some Refl
+  | W_property_min_height, W_property_min_height -> Some Refl
+  | W_property_min_inline_size, W_property_min_inline_size -> Some Refl
+  | W_property_min_width, W_property_min_width -> Some Refl
+  | W_property_nav_down, W_property_nav_down -> Some Refl
+  | W_property_nav_left, W_property_nav_left -> Some Refl
+  | W_property_nav_right, W_property_nav_right -> Some Refl
+  | W_property_nav_up, W_property_nav_up -> Some Refl
+  | W_property_object_position, W_property_object_position -> Some Refl
+  | W_property_offset, W_property_offset -> Some Refl
+  | W_property_offset_anchor, W_property_offset_anchor -> Some Refl
+  | W_property_offset_distance, W_property_offset_distance -> Some Refl
+  | W_property_offset_path, W_property_offset_path -> Some Refl
+  | W_property_offset_position, W_property_offset_position -> Some Refl
+  | W_property_offset_rotate, W_property_offset_rotate -> Some Refl
+  | W_property_opacity, W_property_opacity -> Some Refl
+  | W_property_order, W_property_order -> Some Refl
+  | W_property_orphans, W_property_orphans -> Some Refl
+  | W_property_outline, W_property_outline -> Some Refl
+  | W_property_outline_color, W_property_outline_color -> Some Refl
+  | W_property_outline_offset, W_property_outline_offset -> Some Refl
+  | W_property_overflow_block, W_property_overflow_block -> Some Refl
+  | W_property_overflow_clip_margin, W_property_overflow_clip_margin ->
+    Some Refl
+  | W_property_overflow_inline, W_property_overflow_inline -> Some Refl
+  | W_property_overflow_x, W_property_overflow_x -> Some Refl
+  | W_property_overflow_y, W_property_overflow_y -> Some Refl
+  | W_property_overlay, W_property_overlay -> Some Refl
+  | W_property_overscroll_behavior_block, W_property_overscroll_behavior_block
+    ->
+    Some Refl
+  | W_property_overscroll_behavior_inline, W_property_overscroll_behavior_inline
+    ->
+    Some Refl
+  | W_property_overscroll_behavior_x, W_property_overscroll_behavior_x ->
+    Some Refl
+  | W_property_overscroll_behavior_y, W_property_overscroll_behavior_y ->
+    Some Refl
+  | W_property_padding, W_property_padding -> Some Refl
+  | W_property_padding_block, W_property_padding_block -> Some Refl
+  | W_property_padding_block_end, W_property_padding_block_end -> Some Refl
+  | W_property_padding_block_start, W_property_padding_block_start -> Some Refl
+  | W_property_padding_bottom, W_property_padding_bottom -> Some Refl
+  | W_property_padding_inline, W_property_padding_inline -> Some Refl
+  | W_property_padding_inline_end, W_property_padding_inline_end -> Some Refl
+  | W_property_padding_inline_start, W_property_padding_inline_start ->
+    Some Refl
+  | W_property_padding_left, W_property_padding_left -> Some Refl
+  | W_property_padding_right, W_property_padding_right -> Some Refl
+  | W_property_padding_top, W_property_padding_top -> Some Refl
+  | W_property_page, W_property_page -> Some Refl
+  | W_property_paint_order, W_property_paint_order -> Some Refl
+  | W_property_pause, W_property_pause -> Some Refl
+  | W_property_pause_after, W_property_pause_after -> Some Refl
+  | W_property_pause_before, W_property_pause_before -> Some Refl
+  | W_property_perspective, W_property_perspective -> Some Refl
+  | W_property_place_content, W_property_place_content -> Some Refl
+  | W_property_place_items, W_property_place_items -> Some Refl
+  | W_property_place_self, W_property_place_self -> Some Refl
+  | W_property_position_anchor, W_property_position_anchor -> Some Refl
+  | W_property_position_area, W_property_position_area -> Some Refl
+  | W_property_position_try, W_property_position_try -> Some Refl
+  | W_property_position_try_fallbacks, W_property_position_try_fallbacks ->
+    Some Refl
+  | W_property_position_try_options, W_property_position_try_options ->
+    Some Refl
+  | W_property_position_visibility, W_property_position_visibility -> Some Refl
+  | W_property_quotes, W_property_quotes -> Some Refl
+  | W_property_r, W_property_r -> Some Refl
+  | W_property_reading_flow, W_property_reading_flow -> Some Refl
+  | W_property_rest, W_property_rest -> Some Refl
+  | W_property_rest_after, W_property_rest_after -> Some Refl
+  | W_property_rest_before, W_property_rest_before -> Some Refl
+  | W_property_right, W_property_right -> Some Refl
+  | W_property_rotate, W_property_rotate -> Some Refl
+  | W_property_ruby_align, W_property_ruby_align -> Some Refl
+  | W_property_ruby_overhang, W_property_ruby_overhang -> Some Refl
+  | W_property_rx, W_property_rx -> Some Refl
+  | W_property_ry, W_property_ry -> Some Refl
+  | W_property_scale, W_property_scale -> Some Refl
+  | W_property_scroll_margin, W_property_scroll_margin -> Some Refl
+  | W_property_scroll_margin_block, W_property_scroll_margin_block -> Some Refl
+  | W_property_scroll_margin_block_end, W_property_scroll_margin_block_end ->
+    Some Refl
+  | W_property_scroll_margin_block_start, W_property_scroll_margin_block_start
+    ->
+    Some Refl
+  | W_property_scroll_margin_bottom, W_property_scroll_margin_bottom ->
+    Some Refl
+  | W_property_scroll_margin_inline, W_property_scroll_margin_inline ->
+    Some Refl
+  | W_property_scroll_margin_inline_end, W_property_scroll_margin_inline_end ->
+    Some Refl
+  | W_property_scroll_margin_inline_start, W_property_scroll_margin_inline_start
+    ->
+    Some Refl
+  | W_property_scroll_margin_left, W_property_scroll_margin_left -> Some Refl
+  | W_property_scroll_margin_right, W_property_scroll_margin_right -> Some Refl
+  | W_property_scroll_margin_top, W_property_scroll_margin_top -> Some Refl
+  | W_property_scroll_marker_group, W_property_scroll_marker_group -> Some Refl
+  | W_property_scroll_padding, W_property_scroll_padding -> Some Refl
+  | W_property_scroll_padding_block, W_property_scroll_padding_block ->
+    Some Refl
+  | W_property_scroll_padding_block_end, W_property_scroll_padding_block_end ->
+    Some Refl
+  | W_property_scroll_padding_block_start, W_property_scroll_padding_block_start
+    ->
+    Some Refl
+  | W_property_scroll_padding_bottom, W_property_scroll_padding_bottom ->
+    Some Refl
+  | W_property_scroll_padding_inline, W_property_scroll_padding_inline ->
+    Some Refl
+  | W_property_scroll_padding_inline_end, W_property_scroll_padding_inline_end
+    ->
+    Some Refl
+  | ( W_property_scroll_padding_inline_start,
+      W_property_scroll_padding_inline_start ) ->
+    Some Refl
+  | W_property_scroll_padding_left, W_property_scroll_padding_left -> Some Refl
+  | W_property_scroll_padding_right, W_property_scroll_padding_right ->
+    Some Refl
+  | W_property_scroll_padding_top, W_property_scroll_padding_top -> Some Refl
+  | W_property_scroll_snap_align, W_property_scroll_snap_align -> Some Refl
+  | W_property_scroll_snap_coordinate, W_property_scroll_snap_coordinate ->
+    Some Refl
+  | W_property_scroll_snap_destination, W_property_scroll_snap_destination ->
+    Some Refl
+  | W_property_scroll_snap_points_x, W_property_scroll_snap_points_x ->
+    Some Refl
+  | W_property_scroll_snap_points_y, W_property_scroll_snap_points_y ->
+    Some Refl
+  | W_property_scroll_snap_type, W_property_scroll_snap_type -> Some Refl
+  | W_property_scroll_snap_type_x, W_property_scroll_snap_type_x -> Some Refl
+  | W_property_scroll_snap_type_y, W_property_scroll_snap_type_y -> Some Refl
+  | W_property_scroll_start, W_property_scroll_start -> Some Refl
+  | W_property_scroll_start_block, W_property_scroll_start_block -> Some Refl
+  | W_property_scroll_start_inline, W_property_scroll_start_inline -> Some Refl
+  | W_property_scroll_start_target, W_property_scroll_start_target -> Some Refl
+  | W_property_scroll_start_target_block, W_property_scroll_start_target_block
+    ->
+    Some Refl
+  | W_property_scroll_start_target_inline, W_property_scroll_start_target_inline
+    ->
+    Some Refl
+  | W_property_scroll_start_target_x, W_property_scroll_start_target_x ->
+    Some Refl
+  | W_property_scroll_start_target_y, W_property_scroll_start_target_y ->
+    Some Refl
+  | W_property_scroll_start_x, W_property_scroll_start_x -> Some Refl
+  | W_property_scroll_start_y, W_property_scroll_start_y -> Some Refl
+  | W_property_scroll_timeline, W_property_scroll_timeline -> Some Refl
+  | W_property_scroll_timeline_axis, W_property_scroll_timeline_axis ->
+    Some Refl
+  | W_property_scroll_timeline_name, W_property_scroll_timeline_name ->
+    Some Refl
+  | W_property_scrollbar_3dlight_color, W_property_scrollbar_3dlight_color ->
+    Some Refl
+  | W_property_scrollbar_arrow_color, W_property_scrollbar_arrow_color ->
+    Some Refl
+  | W_property_scrollbar_base_color, W_property_scrollbar_base_color ->
+    Some Refl
+  | W_property_scrollbar_color, W_property_scrollbar_color -> Some Refl
+  | W_property_scrollbar_color_legacy, W_property_scrollbar_color_legacy ->
+    Some Refl
+  | W_property_scrollbar_darkshadow_color, W_property_scrollbar_darkshadow_color
+    ->
+    Some Refl
+  | W_property_scrollbar_face_color, W_property_scrollbar_face_color ->
+    Some Refl
+  | W_property_scrollbar_gutter, W_property_scrollbar_gutter -> Some Refl
+  | W_property_scrollbar_highlight_color, W_property_scrollbar_highlight_color
+    ->
+    Some Refl
+  | W_property_scrollbar_shadow_color, W_property_scrollbar_shadow_color ->
+    Some Refl
+  | W_property_scrollbar_track_color, W_property_scrollbar_track_color ->
+    Some Refl
+  | W_property_shape_image_threshold, W_property_shape_image_threshold ->
+    Some Refl
+  | W_property_shape_margin, W_property_shape_margin -> Some Refl
+  | W_property_shape_outside, W_property_shape_outside -> Some Refl
+  | W_property_shape_rendering, W_property_shape_rendering -> Some Refl
+  | W_property_size, W_property_size -> Some Refl
+  | W_property_speak_as, W_property_speak_as -> Some Refl
+  | W_property_src, W_property_src -> Some Refl
+  | W_property_stop_color, W_property_stop_color -> Some Refl
+  | W_property_stop_opacity, W_property_stop_opacity -> Some Refl
+  | W_property_stroke, W_property_stroke -> Some Refl
+  | W_property_stroke_dasharray, W_property_stroke_dasharray -> Some Refl
+  | W_property_stroke_dashoffset, W_property_stroke_dashoffset -> Some Refl
+  | W_property_stroke_miterlimit, W_property_stroke_miterlimit -> Some Refl
+  | W_property_stroke_opacity, W_property_stroke_opacity -> Some Refl
+  | W_property_stroke_width, W_property_stroke_width -> Some Refl
+  | W_property_syntax, W_property_syntax -> Some Refl
+  | W_property_tab_size, W_property_tab_size -> Some Refl
+  | W_property_text_align_all, W_property_text_align_all -> Some Refl
+  | W_property_text_anchor, W_property_text_anchor -> Some Refl
+  | W_property_text_autospace, W_property_text_autospace -> Some Refl
+  | W_property_text_blink, W_property_text_blink -> Some Refl
+  | W_property_text_box_edge, W_property_text_box_edge -> Some Refl
+  | W_property_text_box_trim, W_property_text_box_trim -> Some Refl
+  | W_property_text_combine_upright, W_property_text_combine_upright ->
+    Some Refl
+  | W_property_text_decoration, W_property_text_decoration -> Some Refl
+  | W_property_text_decoration_color, W_property_text_decoration_color ->
+    Some Refl
+  | W_property_text_decoration_skip, W_property_text_decoration_skip ->
+    Some Refl
+  | W_property_text_decoration_skip_box, W_property_text_decoration_skip_box ->
+    Some Refl
+  | W_property_text_decoration_skip_inset, W_property_text_decoration_skip_inset
+    ->
+    Some Refl
+  | W_property_text_decoration_skip_self, W_property_text_decoration_skip_self
+    ->
+    Some Refl
+  | ( W_property_text_decoration_skip_spaces,
+      W_property_text_decoration_skip_spaces ) ->
+    Some Refl
+  | W_property_text_edge, W_property_text_edge -> Some Refl
+  | W_property_text_emphasis, W_property_text_emphasis -> Some Refl
+  | W_property_text_emphasis_color, W_property_text_emphasis_color -> Some Refl
+  | W_property_text_emphasis_position, W_property_text_emphasis_position ->
+    Some Refl
+  | W_property_text_emphasis_style, W_property_text_emphasis_style -> Some Refl
+  | W_property_text_indent, W_property_text_indent -> Some Refl
+  | W_property_text_justify_trim, W_property_text_justify_trim -> Some Refl
+  | W_property_text_kashida, W_property_text_kashida -> Some Refl
+  | W_property_text_kashida_space, W_property_text_kashida_space -> Some Refl
+  | W_property_text_overflow, W_property_text_overflow -> Some Refl
+  | W_property_text_shadow, W_property_text_shadow -> Some Refl
+  | W_property_text_size_adjust, W_property_text_size_adjust -> Some Refl
+  | W_property_text_spacing_trim, W_property_text_spacing_trim -> Some Refl
+  | W_property_text_underline_offset, W_property_text_underline_offset ->
+    Some Refl
+  | W_property_text_wrap, W_property_text_wrap -> Some Refl
+  | W_property_text_wrap_mode, W_property_text_wrap_mode -> Some Refl
+  | W_property_text_wrap_style, W_property_text_wrap_style -> Some Refl
+  | W_property_timeline_scope, W_property_timeline_scope -> Some Refl
+  | W_property_top, W_property_top -> Some Refl
+  | W_property_transform, W_property_transform -> Some Refl
+  | W_property_transform_origin, W_property_transform_origin -> Some Refl
+  | W_property_transition, W_property_transition -> Some Refl
+  | W_property_transition_behavior, W_property_transition_behavior -> Some Refl
+  | W_property_transition_delay, W_property_transition_delay -> Some Refl
+  | W_property_transition_duration, W_property_transition_duration -> Some Refl
+  | W_property_transition_property, W_property_transition_property -> Some Refl
+  | W_property_transition_timing_function, W_property_transition_timing_function
+    ->
+    Some Refl
+  | W_property_translate, W_property_translate -> Some Refl
+  | W_property_unicode_range, W_property_unicode_range -> Some Refl
+  | W_property_vector_effect, W_property_vector_effect -> Some Refl
+  | W_property_vertical_align, W_property_vertical_align -> Some Refl
+  | W_property_view_timeline, W_property_view_timeline -> Some Refl
+  | W_property_view_timeline_axis, W_property_view_timeline_axis -> Some Refl
+  | W_property_view_timeline_inset, W_property_view_timeline_inset -> Some Refl
+  | W_property_view_timeline_name, W_property_view_timeline_name -> Some Refl
+  | W_property_view_transition_name, W_property_view_transition_name ->
+    Some Refl
+  | W_property_voice_balance, W_property_voice_balance -> Some Refl
+  | W_property_voice_duration, W_property_voice_duration -> Some Refl
+  | W_property_voice_family, W_property_voice_family -> Some Refl
+  | W_property_voice_pitch, W_property_voice_pitch -> Some Refl
+  | W_property_voice_range, W_property_voice_range -> Some Refl
+  | W_property_voice_rate, W_property_voice_rate -> Some Refl
+  | W_property_voice_stress, W_property_voice_stress -> Some Refl
+  | W_property_voice_volume, W_property_voice_volume -> Some Refl
+  | W_property_white_space_collapse, W_property_white_space_collapse ->
+    Some Refl
+  | W_property_widows, W_property_widows -> Some Refl
+  | W_property_word_space_transform, W_property_word_space_transform ->
+    Some Refl
+  | W_property_word_spacing, W_property_word_spacing -> Some Refl
+  | W_property_x, W_property_x -> Some Refl
+  | W_property_y, W_property_y -> Some Refl
+  | W_property_z_index, W_property_z_index -> Some Refl
+  | W_property_zoom, W_property_zoom -> Some Refl
+  | W_age, W_age -> Some Refl
+  | W_attachment, W_attachment -> Some Refl
+  | W_box, W_box -> Some Refl
+  | W_display_box, W_display_box -> Some Refl
+  | W_display_outside, W_display_outside -> Some Refl
+  | W_ending_shape, W_ending_shape -> Some Refl
+  | W_fill_rule, W_fill_rule -> Some Refl
+  | W_zero, W_zero -> Some Refl
+  | W_gender, W_gender -> Some Refl
+  | W_combinator, W_combinator -> Some Refl
+  | W_contextual_alt_values, W_contextual_alt_values -> Some Refl
+  | W_east_asian_width_values, W_east_asian_width_values -> Some Refl
+  | W_attr_modifier, W_attr_modifier -> Some Refl
+  | W_image_tags, W_image_tags -> Some Refl
+  | W_line_style, W_line_style -> Some Refl
+  | W_line_width, W_line_width -> Some Refl
+  | W_named_color, W_named_color -> Some Refl
+  | W_color, W_color -> Some Refl
+  | W_alpha_value, W_alpha_value -> Some Refl
+  | W_hue, W_hue -> Some Refl
+  | W_bg_image, W_bg_image -> Some Refl
+  | W_content_replacement, W_content_replacement -> Some Refl
+  | W_transform_list, W_transform_list -> Some Refl
+  | W_transform_function, W_transform_function -> Some Refl
+  | W_image, W_image -> Some Refl
+  | W_font_families, W_font_families -> Some Refl
+  | W_color_interpolation_method, W_color_interpolation_method -> Some Refl
+  | W_family_name, W_family_name -> Some Refl
+  | W_keyframes_name, W_keyframes_name -> Some Refl
+  | W_url, W_url -> Some Refl
+  | W_gradient, W_gradient -> Some Refl
+  | W_shadow, W_shadow -> Some Refl
+  | W_track_list, W_track_list -> Some Refl
+  | W_line_names, W_line_names -> Some Refl
+  | W_side_or_corner, W_side_or_corner -> Some Refl
+  | W_track_size, W_track_size -> Some Refl
+  | W_track_breadth, W_track_breadth -> Some Refl
+  | W_track_repeat, W_track_repeat -> Some Refl
+  | W_content_list, W_content_list -> Some Refl
+  | W_mask_reference, W_mask_reference -> Some Refl
+  | W_color_stop_list, W_color_stop_list -> Some Refl
+  | W_mask_source, W_mask_source -> Some Refl
+  | W_length_percentage, W_length_percentage -> Some Refl
+  | W_auto_track_list, W_auto_track_list -> Some Refl
+  | W_counter_style, W_counter_style -> Some Refl
+  | W_counter_style_name, W_counter_style_name -> Some Refl
+  | W_fixed_size, W_fixed_size -> Some Refl
+  | W_fixed_repeat, W_fixed_repeat -> Some Refl
+  | W_fixed_breadth, W_fixed_breadth -> Some Refl
+  | W_auto_repeat, W_auto_repeat -> Some Refl
+  | W_extended_time_no_interp, W_extended_time_no_interp -> Some Refl
+  | W_timing_function_no_interp, W_timing_function_no_interp -> Some Refl
+  | W_cubic_bezier_timing_function, W_cubic_bezier_timing_function -> Some Refl
+  | W_step_timing_function, W_step_timing_function -> Some Refl
+  | W_single_animation, W_single_animation -> Some Refl
+  | W_single_animation_no_interp, W_single_animation_no_interp -> Some Refl
+  | ( W_single_animation_direction_no_interp,
+      W_single_animation_direction_no_interp ) ->
+    Some Refl
+  | ( W_single_animation_fill_mode_no_interp,
+      W_single_animation_fill_mode_no_interp ) ->
+    Some Refl
+  | ( W_single_animation_iteration_count_no_interp,
+      W_single_animation_iteration_count_no_interp ) ->
+    Some Refl
+  | ( W_single_animation_play_state_no_interp,
+      W_single_animation_play_state_no_interp ) ->
+    Some Refl
+  | W_shadow_t, W_shadow_t -> Some Refl
+  | W_font_weight_absolute, W_font_weight_absolute -> Some Refl
+  | W_position, W_position -> Some Refl
+  | W_timing_function, W_timing_function -> Some Refl
+  | W_number_percentage, W_number_percentage -> Some Refl
+  | W_grid_line, W_grid_line -> Some Refl
+  | W_single_transition_property, W_single_transition_property -> Some Refl
+  | W_outline_radius, W_outline_radius -> Some Refl
+  | W_bg_size, W_bg_size -> Some Refl
+  | W_bg_position, W_bg_position -> Some Refl
+  | W_feature_value_name, W_feature_value_name -> Some Refl
+  | W_svg_length, W_svg_length -> Some Refl
+  | W_single_animation_iteration_count, W_single_animation_iteration_count ->
+    Some Refl
+  | W_basic_shape, W_basic_shape -> Some Refl
+  | W_filter_function, W_filter_function -> Some Refl
+  | W_overflow_position, W_overflow_position -> Some Refl
+  | W_relative_size, W_relative_size -> Some Refl
+  | W_repeat_style, W_repeat_style -> Some Refl
+  | W_self_position, W_self_position -> Some Refl
+  | W_single_animation_direction, W_single_animation_direction -> Some Refl
+  | W_single_animation_fill_mode, W_single_animation_fill_mode -> Some Refl
+  | W_single_animation_play_state, W_single_animation_play_state -> Some Refl
+  | W_step_position, W_step_position -> Some Refl
+  | W_symbols_type, W_symbols_type -> Some Refl
+  | W_masking_mode, W_masking_mode -> Some Refl
+  | W_numeric_figure_values, W_numeric_figure_values -> Some Refl
+  | W_numeric_spacing_values, W_numeric_spacing_values -> Some Refl
+  | W_absolute_size, W_absolute_size -> Some Refl
+  | W_content_position, W_content_position -> Some Refl
+  | W_baseline_position, W_baseline_position -> Some Refl
+  | W_blend_mode, W_blend_mode -> Some Refl
+  | W_geometry_box, W_geometry_box -> Some Refl
+  | W_calc_product, W_calc_product -> Some Refl
+  | W_calc_sum, W_calc_sum -> Some Refl
+  | W_calc_value, W_calc_value -> Some Refl
+  | W_mf_eq, W_mf_eq -> Some Refl
+  | W_mf_gt, W_mf_gt -> Some Refl
+  | W_mf_lt, W_mf_lt -> Some Refl
+  | W_dimension, W_dimension -> Some Refl
+  | W_ratio, W_ratio -> Some Refl
+  | W_mf_name, W_mf_name -> Some Refl
+  | W_mf_value, W_mf_value -> Some Refl
+  | W_mf_boolean, W_mf_boolean -> Some Refl
+  | W_mf_plain, W_mf_plain -> Some Refl
+  | W_mf_comparison, W_mf_comparison -> Some Refl
+  | W_mf_range, W_mf_range -> Some Refl
+  | W_container_query, W_container_query -> Some Refl
+  | W_container_condition, W_container_condition -> Some Refl
+  | W_query_in_parens, W_query_in_parens -> Some Refl
+  | W_size_feature, W_size_feature -> Some Refl
+  | W_style_query, W_style_query -> Some Refl
+  | W_style_feature, W_style_feature -> Some Refl
+  | W_style_in_parens, W_style_in_parens -> Some Refl
+  | W_legacy_radial_gradient_shape, W_legacy_radial_gradient_shape -> Some Refl
+  | W_legacy_radial_gradient_size, W_legacy_radial_gradient_size -> Some Refl
+  | W_legacy_radial_gradient_arguments, W_legacy_radial_gradient_arguments ->
+    Some Refl
+  | W_legacy_radial_gradient, W_legacy_radial_gradient -> Some Refl
+  | W_legacy_repeating_radial_gradient, W_legacy_repeating_radial_gradient ->
+    Some Refl
+  | W_legacy_linear_gradient, W_legacy_linear_gradient -> Some Refl
+  | W_legacy_linear_gradient_arguments, W_legacy_linear_gradient_arguments ->
+    Some Refl
+  | W_legacy_repeating_linear_gradient, W_legacy_repeating_linear_gradient ->
+    Some Refl
+  | W_legacy_gradient, W_legacy_gradient -> Some Refl
+  | W_non_standard_color, W_non_standard_color -> Some Refl
+  | W_non_standard_font, W_non_standard_font -> Some Refl
+  | W_non_standard_image_rendering, W_non_standard_image_rendering -> Some Refl
+  | W_non_standard_overflow, W_non_standard_overflow -> Some Refl
+  | W_non_standard_width, W_non_standard_width -> Some Refl
+  | W_webkit_gradient_type, W_webkit_gradient_type -> Some Refl
+  | W_webkit_mask_box_repeat, W_webkit_mask_box_repeat -> Some Refl
+  | W_webkit_mask_clip_style, W_webkit_mask_clip_style -> Some Refl
+  | W_common_lig_values, W_common_lig_values -> Some Refl
+  | W_compat_auto, W_compat_auto -> Some Refl
+  | W_composite_style, W_composite_style -> Some Refl
+  | W_compositing_operator, W_compositing_operator -> Some Refl
+  | W_content_distribution, W_content_distribution -> Some Refl
+  | W_deprecated_system_color, W_deprecated_system_color -> Some Refl
+  | W_discretionary_lig_values, W_discretionary_lig_values -> Some Refl
+  | W_display_inside, W_display_inside -> Some Refl
+  | W_display_internal, W_display_internal -> Some Refl
+  | W_display_legacy, W_display_legacy -> Some Refl
+  | W_east_asian_variant_values, W_east_asian_variant_values -> Some Refl
+  | W_feature_type, W_feature_type -> Some Refl
+  | W_font_variant_css21, W_font_variant_css21 -> Some Refl
+  | W_generic_family, W_generic_family -> Some Refl
+  | W_generic_name, W_generic_name -> Some Refl
+  | W_historical_lig_values, W_historical_lig_values -> Some Refl
+  | W_numeric_fraction_values, W_numeric_fraction_values -> Some Refl
+  | W_page_margin_box_type, W_page_margin_box_type -> Some Refl
+  | W_polar_color_space, W_polar_color_space -> Some Refl
+  | W_quote, W_quote -> Some Refl
+  | W_rectangular_color_space, W_rectangular_color_space -> Some Refl
+  | W_shape_box, W_shape_box -> Some Refl
+  | W_visual_box, W_visual_box -> Some Refl
+  | W_angular_color_hint, W_angular_color_hint -> Some Refl
+  | W_angular_color_stop, W_angular_color_stop -> Some Refl
+  | W_angular_color_stop_list, W_angular_color_stop_list -> Some Refl
+  | W_animateable_feature, W_animateable_feature -> Some Refl
+  | W_attr_fallback, W_attr_fallback -> Some Refl
+  | W_attr_matcher, W_attr_matcher -> Some Refl
+  | W_attr_name, W_attr_name -> Some Refl
+  | W_attr_type, W_attr_type -> Some Refl
+  | W_attr_unit, W_attr_unit -> Some Refl
+  | W_attribute_selector, W_attribute_selector -> Some Refl
+  | W_bg_layer, W_bg_layer -> Some Refl
+  | W_border_radius, W_border_radius -> Some Refl
+  | W_bottom, W_bottom -> Some Refl
+  | W_cf_final_image, W_cf_final_image -> Some Refl
+  | W_cf_mixing_image, W_cf_mixing_image -> Some Refl
+  | W_class_selector, W_class_selector -> Some Refl
+  | W_clip_source, W_clip_source -> Some Refl
+  | W_color_stop, W_color_stop -> Some Refl
+  | W_color_stop_angle, W_color_stop_angle -> Some Refl
+  | W_color_stop_length, W_color_stop_length -> Some Refl
+  | W_complex_selector, W_complex_selector -> Some Refl
+  | W_complex_selector_list, W_complex_selector_list -> Some Refl
+  | W_compound_selector, W_compound_selector -> Some Refl
+  | W_compound_selector_list, W_compound_selector_list -> Some Refl
+  | W_container_condition_list, W_container_condition_list -> Some Refl
+  | W_counter_name, W_counter_name -> Some Refl
+  | W_declaration, W_declaration -> Some Refl
+  | W_declaration_list, W_declaration_list -> Some Refl
+  | W_display_listitem, W_display_listitem -> Some Refl
+  | W_explicit_track_list, W_explicit_track_list -> Some Refl
+  | W_extended_angle, W_extended_angle -> Some Refl
+  | W_extended_frequency, W_extended_frequency -> Some Refl
+  | W_extended_length, W_extended_length -> Some Refl
+  | W_extended_percentage, W_extended_percentage -> Some Refl
+  | W_extended_time, W_extended_time -> Some Refl
+  | W_feature_tag_value, W_feature_tag_value -> Some Refl
+  | W_feature_value_block, W_feature_value_block -> Some Refl
+  | W_feature_value_block_list, W_feature_value_block_list -> Some Refl
+  | W_feature_value_declaration, W_feature_value_declaration -> Some Refl
+  | W_feature_value_declaration_list, W_feature_value_declaration_list ->
+    Some Refl
+  | W_filter_function_list, W_filter_function_list -> Some Refl
+  | W_final_bg_layer, W_final_bg_layer -> Some Refl
+  | W_font_stretch_absolute, W_font_stretch_absolute -> Some Refl
+  | W_general_enclosed, W_general_enclosed -> Some Refl
+  | W_generic_voice, W_generic_voice -> Some Refl
+  | W_hue_interpolation_method, W_hue_interpolation_method -> Some Refl
+  | W_id_selector, W_id_selector -> Some Refl
+  | W_image_set_option, W_image_set_option -> Some Refl
+  | W_image_src, W_image_src -> Some Refl
+  | W_inflexible_breadth, W_inflexible_breadth -> Some Refl
+  | W_keyframe_block, W_keyframe_block -> Some Refl
+  | W_keyframe_block_list, W_keyframe_block_list -> Some Refl
+  | W_keyframe_selector, W_keyframe_selector -> Some Refl
+  | W_leader_type, W_leader_type -> Some Refl
+  | W_left, W_left -> Some Refl
+  | W_line_name_list, W_line_name_list -> Some Refl
+  | W_linear_color_hint, W_linear_color_hint -> Some Refl
+  | W_linear_color_stop, W_linear_color_stop -> Some Refl
+  | W_mask_image, W_mask_image -> Some Refl
+  | W_mask_layer, W_mask_layer -> Some Refl
+  | W_mask_position, W_mask_position -> Some Refl
+  | W_name_repeat, W_name_repeat -> Some Refl
+  | W_namespace_prefix, W_namespace_prefix -> Some Refl
+  | W_ns_prefix, W_ns_prefix -> Some Refl
+  | W_nth, W_nth -> Some Refl
+  | W_number_one_or_greater, W_number_one_or_greater -> Some Refl
+  | W_number_zero_one, W_number_zero_one -> Some Refl
+  | W_one_bg_size, W_one_bg_size -> Some Refl
+  | W_page_body, W_page_body -> Some Refl
+  | W_page_margin_box, W_page_margin_box -> Some Refl
+  | W_page_selector, W_page_selector -> Some Refl
+  | W_page_selector_list, W_page_selector_list -> Some Refl
+  | W_paint, W_paint -> Some Refl
+  | W_positive_integer, W_positive_integer -> Some Refl
+  | W_pseudo_class_selector, W_pseudo_class_selector -> Some Refl
+  | W_pseudo_element_selector, W_pseudo_element_selector -> Some Refl
+  | W_pseudo_page, W_pseudo_page -> Some Refl
+  | W_radial_size, W_radial_size -> Some Refl
+  | W_ray_size, W_ray_size -> Some Refl
+  | W_relative_selector, W_relative_selector -> Some Refl
+  | W_relative_selector_list, W_relative_selector_list -> Some Refl
+  | W_right, W_right -> Some Refl
+  | W_shape, W_shape -> Some Refl
+  | W_shape_radius, W_shape_radius -> Some Refl
+  | W_single_transition, W_single_transition -> Some Refl
+  | W_single_transition_no_interp, W_single_transition_no_interp -> Some Refl
+  | ( W_single_transition_property_no_interp,
+      W_single_transition_property_no_interp ) ->
+    Some Refl
+  | W_size, W_size -> Some Refl
+  | W_subclass_selector, W_subclass_selector -> Some Refl
+  | W_supports_condition, W_supports_condition -> Some Refl
+  | W_supports_decl, W_supports_decl -> Some Refl
+  | W_supports_feature, W_supports_feature -> Some Refl
+  | W_supports_in_parens, W_supports_in_parens -> Some Refl
+  | W_supports_selector_fn, W_supports_selector_fn -> Some Refl
+  | W_svg_writing_mode, W_svg_writing_mode -> Some Refl
+  | W_symbol, W_symbol -> Some Refl
+  | W_syntax, W_syntax -> Some Refl
+  | W_syntax_combinator, W_syntax_combinator -> Some Refl
+  | W_syntax_component, W_syntax_component -> Some Refl
+  | W_syntax_multiplier, W_syntax_multiplier -> Some Refl
+  | W_syntax_single_component, W_syntax_single_component -> Some Refl
+  | W_syntax_string, W_syntax_string -> Some Refl
+  | W_syntax_type_name, W_syntax_type_name -> Some Refl
+  | W_target, W_target -> Some Refl
+  | W_top, W_top -> Some Refl
+  | W_track_group, W_track_group -> Some Refl
+  | W_track_list_v0, W_track_list_v0 -> Some Refl
+  | W_track_minmax, W_track_minmax -> Some Refl
+  | W_transition_behavior_value, W_transition_behavior_value -> Some Refl
+  | W_transition_behavior_value_no_interp, W_transition_behavior_value_no_interp
+    ->
+    Some Refl
+  | W_try_tactic, W_try_tactic -> Some Refl
+  | W_type_or_unit, W_type_or_unit -> Some Refl
+  | W_type_selector, W_type_selector -> Some Refl
+  | W_viewport_length, W_viewport_length -> Some Refl
+  | W_webkit_gradient_color_stop, W_webkit_gradient_color_stop -> Some Refl
+  | W_webkit_gradient_point, W_webkit_gradient_point -> Some Refl
+  | W_webkit_gradient_radius, W_webkit_gradient_radius -> Some Refl
+  | W_wq_name, W_wq_name -> Some Refl
+  | W_x, W_x -> Some Refl
+  | W_y, W_y -> Some Refl
+  | W_function_image, W_function_image -> Some Refl
+  | W_function_image_set, W_function_image_set -> Some Refl
+  | W_function_element, W_function_element -> Some Refl
+  | W_function_paint, W_function_paint -> Some Refl
+  | W_function_cross_fade, W_function_cross_fade -> Some Refl
+  | W_function_attr, W_function_attr -> Some Refl
+  | W_function_symbols, W_function_symbols -> Some Refl
+  | W_function_linear_gradient, W_function_linear_gradient -> Some Refl
+  | W_function_radial_gradient, W_function_radial_gradient -> Some Refl
+  | W_function_conic_gradient, W_function_conic_gradient -> Some Refl
+  | W_function_repeating_linear_gradient, W_function_repeating_linear_gradient
+    ->
+    Some Refl
+  | W_function_repeating_radial_gradient, W_function_repeating_radial_gradient
+    ->
+    Some Refl
+  | W_function__webkit_gradient, W_function__webkit_gradient -> Some Refl
+  | W_function_matrix, W_function_matrix -> Some Refl
+  | W_function_matrix3d, W_function_matrix3d -> Some Refl
+  | W_function_translate, W_function_translate -> Some Refl
+  | W_function_translateX, W_function_translateX -> Some Refl
+  | W_function_translateY, W_function_translateY -> Some Refl
+  | W_function_translateZ, W_function_translateZ -> Some Refl
+  | W_function_translate3d, W_function_translate3d -> Some Refl
+  | W_function_scale, W_function_scale -> Some Refl
+  | W_function_scale3d, W_function_scale3d -> Some Refl
+  | W_function_scaleX, W_function_scaleX -> Some Refl
+  | W_function_scaleY, W_function_scaleY -> Some Refl
+  | W_function_scaleZ, W_function_scaleZ -> Some Refl
+  | W_function_rotate, W_function_rotate -> Some Refl
+  | W_function_rotate3d, W_function_rotate3d -> Some Refl
+  | W_function_rotateX, W_function_rotateX -> Some Refl
+  | W_function_rotateY, W_function_rotateY -> Some Refl
+  | W_function_rotateZ, W_function_rotateZ -> Some Refl
+  | W_function_skew, W_function_skew -> Some Refl
+  | W_function_skewX, W_function_skewX -> Some Refl
+  | W_function_skewY, W_function_skewY -> Some Refl
+  | W_function_perspective, W_function_perspective -> Some Refl
+  | W_function_calc, W_function_calc -> Some Refl
+  | W_function_min, W_function_min -> Some Refl
+  | W_function_max, W_function_max -> Some Refl
+  | W_function_rgb, W_function_rgb -> Some Refl
+  | W_function_rgba, W_function_rgba -> Some Refl
+  | W_function_hsl, W_function_hsl -> Some Refl
+  | W_function_hsla, W_function_hsla -> Some Refl
+  | W_function_var, W_function_var -> Some Refl
+  | W_function_color_mix, W_function_color_mix -> Some Refl
+  | W_function_blur, W_function_blur -> Some Refl
+  | W_function_brightness, W_function_brightness -> Some Refl
+  | W_function_circle, W_function_circle -> Some Refl
+  | W_function_clamp, W_function_clamp -> Some Refl
+  | W_function_contrast, W_function_contrast -> Some Refl
+  | W_function_counter, W_function_counter -> Some Refl
+  | W_function_counters, W_function_counters -> Some Refl
+  | W_function_drop_shadow, W_function_drop_shadow -> Some Refl
+  | W_function_ellipse, W_function_ellipse -> Some Refl
+  | W_function_env, W_function_env -> Some Refl
+  | W_function_fit_content, W_function_fit_content -> Some Refl
+  | W_function_grayscale, W_function_grayscale -> Some Refl
+  | W_function_hue_rotate, W_function_hue_rotate -> Some Refl
+  | W_function_inset, W_function_inset -> Some Refl
+  | W_function_invert, W_function_invert -> Some Refl
+  | W_function_leader, W_function_leader -> Some Refl
+  | W_function_minmax, W_function_minmax -> Some Refl
+  | W_function_opacity, W_function_opacity -> Some Refl
+  | W_function_path, W_function_path -> Some Refl
+  | W_function_polygon, W_function_polygon -> Some Refl
+  | W_function_saturate, W_function_saturate -> Some Refl
+  | W_function_sepia, W_function_sepia -> Some Refl
+  | W_function_target_counter, W_function_target_counter -> Some Refl
+  | W_function_target_counters, W_function_target_counters -> Some Refl
+  | W_function_target_text, W_function_target_text -> Some Refl
+  | W_media_feature, W_media_feature -> Some Refl
+  | W_media_in_parens, W_media_in_parens -> Some Refl
+  | W_media_or, W_media_or -> Some Refl
+  | W_media_and, W_media_and -> Some Refl
+  | W_media_not, W_media_not -> Some Refl
+  | W_media_condition_without_or, W_media_condition_without_or -> Some Refl
+  | W_media_condition, W_media_condition -> Some Refl
+  | W_media_query, W_media_query -> Some Refl
+  | W_media_query_list, W_media_query_list -> Some Refl
+  | _, _ -> None

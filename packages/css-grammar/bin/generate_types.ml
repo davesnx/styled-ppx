@@ -121,6 +121,147 @@ let generate_all_type ~loc (type_names : string list) :
   Ast_helper.Type.mk ~loc ~kind:Ptype_abstract ~manifest:all_type
     { txt = "all"; loc }
 
+(* Extract registry entries from Parser.ml content for witness generation *)
+(* Returns list of (css_name, type_name) pairs *)
+let extract_registry_entries content =
+  let entries = ref [] in
+  let property_re =
+    Str.regexp {|Property "\([^"]+\)",[^(]*(module \([A-Za-z0-9_]+\) : RULE)|}
+  in
+  let value_re =
+    Str.regexp {|Value "\([^"]+\)",[^(]*(module \([A-Za-z0-9_]+\) : RULE)|}
+  in
+  let function_re =
+    Str.regexp {|Function "\([^"]+\)",[^(]*(module \([A-Za-z0-9_]+\) : RULE)|}
+  in
+  let media_query_re =
+    Str.regexp
+      {|Media_query "\([^"]+\)",[^(]*(module \([A-Za-z0-9_]+\) : RULE)|}
+  in
+
+  let module_to_type_name module_name =
+    if String.length module_name = 0 then module_name
+    else
+      String.make 1 (Char.lowercase_ascii module_name.[0])
+      ^ String.sub module_name 1 (String.length module_name - 1)
+  in
+
+  let pos = ref 0 in
+
+  (* Find all Property entries *)
+  (try
+     while true do
+       let _ = Str.search_forward property_re content !pos in
+       let css_name = Str.matched_group 1 content in
+       let module_name = Str.matched_group 2 content in
+       let type_name = module_to_type_name module_name in
+       entries := (css_name, type_name) :: !entries;
+       pos := Str.match_end ()
+     done
+   with Not_found -> ());
+
+  pos := 0;
+
+  (* Find all Value entries *)
+  (try
+     while true do
+       let _ = Str.search_forward value_re content !pos in
+       let css_name = Str.matched_group 1 content in
+       let module_name = Str.matched_group 2 content in
+       let type_name = module_to_type_name module_name in
+       entries := (css_name, type_name) :: !entries;
+       pos := Str.match_end ()
+     done
+   with Not_found -> ());
+
+  pos := 0;
+
+  (* Find all Function entries *)
+  (try
+     while true do
+       let _ = Str.search_forward function_re content !pos in
+       let css_name = Str.matched_group 1 content in
+       let module_name = Str.matched_group 2 content in
+       let type_name = module_to_type_name module_name in
+       entries := (css_name, type_name) :: !entries;
+       pos := Str.match_end ()
+     done
+   with Not_found -> ());
+
+  pos := 0;
+
+  (* Find all Media_query entries *)
+  (try
+     while true do
+       let _ = Str.search_forward media_query_re content !pos in
+       let css_name = Str.matched_group 1 content in
+       let module_name = Str.matched_group 2 content in
+       let type_name = module_to_type_name module_name in
+       entries := (css_name, type_name) :: !entries;
+       pos := Str.match_end ()
+     done
+   with Not_found -> ());
+
+  (* Deduplicate by type_name *)
+  let seen = Hashtbl.create 1000 in
+  List.filter
+    (fun (_css_name, type_name) ->
+      if Hashtbl.mem seen type_name then false
+      else begin
+        Hashtbl.add seen type_name ();
+        true
+      end)
+    (List.rev !entries)
+
+(* Generate witness GADT and helper functions as raw OCaml code *)
+let generate_witness_code (registry_entries : (string * string) list) : string =
+  let buf = Buffer.create 10000 in
+
+  (* Type equality proof *)
+  Buffer.add_string buf "\n(** Type equality proof - used for safe casting *)\n";
+  Buffer.add_string buf "type (_, _) eq = Refl : ('a, 'a) eq\n\n";
+
+  (* GADT witness type *)
+  Buffer.add_string buf
+    "(** GADT witness type - connects CSS names to OCaml types *)\n";
+  Buffer.add_string buf "type _ witness =\n";
+  List.iter
+    (fun (_css_name, type_name) ->
+      let witness_name = "W_" ^ type_name in
+      Buffer.add_string buf
+        (Printf.sprintf "  | %s : %s witness\n"
+           (String.capitalize_ascii witness_name)
+           type_name))
+    registry_entries;
+
+  (* witness_to_name function *)
+  Buffer.add_string buf
+    "\n(** Convert witness to CSS name for registry lookup *)\n";
+  Buffer.add_string buf
+    "let witness_to_name : type a. a witness -> string = function\n";
+  List.iter
+    (fun (css_name, type_name) ->
+      let witness_name = "W_" ^ type_name in
+      Buffer.add_string buf
+        (Printf.sprintf "  | %s -> %S\n"
+           (String.capitalize_ascii witness_name)
+           css_name))
+    registry_entries;
+
+  (* witness_eq function *)
+  Buffer.add_string buf "\n(** Compare witnesses for type equality *)\n";
+  Buffer.add_string buf
+    "let witness_eq : type a b. a witness -> b witness -> (a, b) eq option =\n";
+  Buffer.add_string buf "  fun a b -> match a, b with\n";
+  List.iter
+    (fun (_css_name, type_name) ->
+      let w = String.capitalize_ascii ("W_" ^ type_name) in
+      Buffer.add_string buf (Printf.sprintf "  | %s, %s -> Some Refl\n" w w))
+    registry_entries;
+  Buffer.add_string buf "  | _, _ -> None\n";
+
+  Buffer.contents buf
+
 (* Parse arguments *)
 let parse_args args =
   let rec parse input_file output_file verbose = function
@@ -211,6 +352,15 @@ let () =
   (* Generate the output *)
   let output_structure = [ type_structure ] in
 
+  (* Extract registry entries for witness generation *)
+  let registry_entries = extract_registry_entries content in
+  if verbose then
+    Printf.eprintf "Found %d registry entries for witness generation\n"
+      (List.length registry_entries);
+
+  (* Generate witness code *)
+  let witness_code = generate_witness_code registry_entries in
+
   (* Format and write output *)
   let out_channel =
     match output_file with Some file -> open_out file | None -> Stdlib.stdout
@@ -221,6 +371,10 @@ let () =
   Pprintast.structure Format.str_formatter output_structure;
   let formatted = Format.flush_str_formatter () in
   output_string out_channel formatted;
+  output_string out_channel "\n";
+
+  (* Append witness GADT and helpers *)
+  output_string out_channel witness_code;
   output_string out_channel "\n";
 
   match output_file with

@@ -179,38 +179,42 @@ let values_tbl : (string, (module RULE)) Hashtbl.t = Hashtbl.create 300
 let functions_tbl : (string, (module RULE)) Hashtbl.t = Hashtbl.create 70
 let media_queries_tbl : (string, (module RULE)) Hashtbl.t = Hashtbl.create 20
 
-let lookup_value_rule (name : string) : 'a Rule.rule =
+(* Type-safe lookup using GADT witness.
+
+   The witness encodes the expected type 'a, and we use it to get the CSS name
+   for lookup in the hashtables. The lookup is deferred to parse time (lazy)
+   because modules reference each other before the registry is populated.
+
+   The Obj.magic is SAFE because:
+   1. The witness W_color has type Types.color witness (compile-time known)
+   2. witness_to_name W_color returns "color" (the CSS registry key)
+   3. The registry entry for "color" was created from module Color
+   4. Module Color.rule has type Types.color Rule.rule
+   5. Therefore the cast is always valid - the GADT proves it!
+
+   Example: lookup_typed Types.W_color returns Types.color Rule.rule *)
+let lookup_typed : type a. a Types.witness -> a Rule.rule =
+ fun witness tokens ->
+  let name = Types.witness_to_name witness in
   let lookup_in tbl =
     match Hashtbl.find_opt tbl name with
-    | Some (module M : RULE) -> Some (Obj.magic M.rule)
+    | Some (module M : RULE) -> Some (Obj.magic M.rule : a Rule.rule)
     | None -> None
   in
-  match lookup_in values_tbl with
-  | Some rule -> rule
-  | None ->
-    (match lookup_in functions_tbl with
+  let rule =
+    match lookup_in values_tbl with
     | Some rule -> rule
     | None ->
-      (match lookup_in media_queries_tbl with
+      (match lookup_in functions_tbl with
       | Some rule -> rule
-      | None -> failwith ("Rule not found: " ^ name)))
-
-(* Lookup a property rule from the registry using Hashtbl - O(1).
-   WARNING: Uses Obj.magic - see documentation above for type safety notes. *)
-let lookup_property_rule (name : string) : 'a Rule.rule =
-  match Hashtbl.find_opt properties_tbl name with
-  | Some (module M : RULE) -> Obj.magic M.rule
-  | None -> failwith ("Property rule not found: " ^ name)
-
-(* Lazy versions of lookup, because modules may reference each other before all modules are defined. The lookup happens at parse time, not definition time. *)
-let lazy_lookup_value_rule (name : string) : 'a Rule.rule =
- fun tokens ->
-  let rule = lookup_value_rule name in
-  rule tokens
-
-let lazy_lookup_property_rule (name : string) : 'a Rule.rule =
- fun tokens ->
-  let rule = lookup_property_rule name in
+      | None ->
+        (match lookup_in media_queries_tbl with
+        | Some rule -> rule
+        | None ->
+          (match lookup_in properties_tbl with
+          | Some rule -> rule
+          | None -> failwith ("Rule not found: " ^ name))))
+  in
   rule tokens
 
 module Legacy_linear_gradient_arguments =
