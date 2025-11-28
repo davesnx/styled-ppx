@@ -14,8 +14,8 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune build
   File "input.re", line 20, characters 10-29:
-  Error: This expression has type [> `bold ]
+  Error: This expression has type "[> `bold ]"
          but an expression was expected of type
-           Css_types.TextDecorationLine.Value.t
-         The second variant type does not allow tag(s) `bold
+           "Css_types.TextDecorationLine.Value.t"
+         The second variant type does not allow tag(s) "`bold"
   [1]

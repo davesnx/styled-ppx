@@ -6,7 +6,7 @@ let provider = (buf, ()) => {
   (token, start, stop);
 };
 
-let multiplier_of_lex =
+let _multiplier_of_lex =
   MenhirLib.Convert.Simplified.traditional2revised(Parser.multiplier_of_lex);
 
 let rec string_of_multiplier =
@@ -24,9 +24,6 @@ let rec string_of_multiplier =
   | Repeat_by_comma(min, max) =>
     "#" ++ string_of_multiplier(Repeat(min, max))
   | At_least_one => "!";
-
-let _multiplier_of_string = string =>
-  Sedlexing.Utf8.from_string(string) |> provider |> multiplier_of_lex;
 
 let value_of_lex =
   MenhirLib.Convert.Simplified.traditional2revised(Parser.value_of_lex);

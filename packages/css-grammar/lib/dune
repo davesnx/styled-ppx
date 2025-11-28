@@ -1,10 +1,19 @@
+(rule
+ (target Types.ml)
+ (deps Parser.ml)
+ (mode promote)
+ (action
+  (progn
+   (run %{bin:styled-ppx.css-grammar-types-gen} %{deps} -o %{target})
+   (run ocamlformat -i %{target}))))
+
 (library
  (name Css_grammar)
  (public_name styled-ppx.css-grammar-parser)
  (libraries
   sedlex
   styled-ppx.css-parser ; since we use the Tokens from the CSS parser
-  )
+  styled-ppx.native)
  (preprocess
   (per_module
    ((pps css_grammar_ppx)

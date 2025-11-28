@@ -17,9 +17,9 @@ This test ensures the location of the error is correct
   File "input.re", line 3, characters 27-34:
    | isplay: $(grid); |}];
                           ^^^^^^^
-  Error: This expression has type [> `gri ]
+  Error: This expression has type "[> `gri ]"
          but an expression was expected of type
-           [< `block
+           "[< `block
             | `contents
             | `flex
             | `flow
@@ -57,8 +57,8 @@ This test ensures the location of the error is correct
             | `webkitBox
             | `webkitFlex
             | `webkitInlineBox
-            | `webkitInlineFlex ]
-         The second variant type does not allow tag(s) `gri
+            | `webkitInlineFlex ]"
+         The second variant type does not allow tag(s) "`gri"
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'

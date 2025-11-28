@@ -65,7 +65,7 @@ release-static: ## Build static release
 
 # Testing commands
 
-TEST_TARGETS := test-parser test-css-grammar test-css-grammar-snapshot test-ppx-native test-ppx-snapshot-reason test-css-support test-runtime test-murmur2 test-css-spec-parser test-string-interpolation
+TEST_TARGETS := test-css-parser test-css-grammar test-css-grammar-snapshot test-ppx-native test-ppx-snapshot-reason test-css-support test-runtime test-murmur2 test-css-spec-parser test-string-interpolation
 # Disabled test-ppx-snapshot-rescript
 
 # Create targets with the format "test-{{target_name}}-{{ "watch" | "promote" }}"
@@ -179,7 +179,7 @@ lexer: ## Print the command to debug the lexer
 
 .PHONY: interpreter
 interpreter: ## Run menhir as interpret
-	$(OPAM_EXEC) menhir --interpret --interpret-show-cst packages/parser/lib/Parser.mly
+	$(OPAM_EXEC) menhir --interpret --interpret-show-cst packages/css-parser/lib/Parser.mly
 
 # Website
 
