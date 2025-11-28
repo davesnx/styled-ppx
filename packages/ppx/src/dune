@@ -5,7 +5,6 @@
  (flags
   (:standard -w -9))
  (libraries
-  server-reason-react.expand-styles-attribute
   styled-ppx.css-parser
   styled-ppx.css-grammar-parser
   styled-ppx.string-interpolation

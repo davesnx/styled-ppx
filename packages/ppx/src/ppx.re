@@ -1030,10 +1030,8 @@ let expands_styles_prop = (~traverse, expr: Ppxlib.expression) => {
   let loc = expr.pexp_loc;
   let attributes = expr.pexp_attributes;
   switch (expr.pexp_desc) {
-  | Pexp_apply(tag, args) when is_jsx(expr) =>
-    let new_args =
-      Expand_styles_attribute.make(~loc, args)
-      |> List.map(((label, expr)) => (label, traverse(expr)));
+  | Pexp_apply(tag, _args) when is_jsx(expr) =>
+    let new_args = [] /* Expand_styles_attribute.make(~loc, args)   |> List.map(((label, expr)) => (label, traverse(expr))) */;
 
     {
       ...Builder.pexp_apply(~loc, traverse(tag), new_args),
