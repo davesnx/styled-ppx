@@ -55,7 +55,12 @@ let extract_spec_info (mod_expr : module_expr) : (string * string) option =
   | _ -> None
 
 (* Convert module name to type name (e.g., Property_display -> property_display) *)
-let module_name_to_type_name name = String.lowercase_ascii name
+(* Lowercases only the first character to preserve internal casing like RotateX *)
+let module_name_to_type_name name =
+  if String.length name = 0 then name
+  else
+    String.make 1 (Char.lowercase_ascii name.[0])
+    ^ String.sub name 1 (String.length name - 1)
 
 (* Extract all spec_module definitions from a structure *)
 (* Returns list of (type_name, spec_string) *)
@@ -215,52 +220,59 @@ let extract_registry_entries content =
 
 (* Generate witness GADT and helper functions as raw OCaml code *)
 let generate_witness_code (registry_entries : (string * string) list) : string =
-  let buf = Buffer.create 10000 in
+  if registry_entries = [] then begin
+    Printf.eprintf
+      "Warning: no registry entries found, skipping witness code generation\n";
+    "\n(* No registry entries found - witness code not generated *)\n"
+  end
+  else begin
+    let buf = Buffer.create 10000 in
 
-  (* Type equality proof *)
-  Buffer.add_string buf "\n(** Type equality proof - used for safe casting *)\n";
-  Buffer.add_string buf "type (_, _) eq = Refl : ('a, 'a) eq\n\n";
+    (* Type equality proof *)
+    Buffer.add_string buf "\n(** Type equality proof - used for safe casting *)\n";
+    Buffer.add_string buf "type (_, _) eq = Refl : ('a, 'a) eq\n\n";
 
-  (* GADT witness type *)
-  Buffer.add_string buf
-    "(** GADT witness type - connects CSS names to OCaml types *)\n";
-  Buffer.add_string buf "type _ witness =\n";
-  List.iter
-    (fun (_css_name, type_name) ->
-      let witness_name = "W_" ^ type_name in
-      Buffer.add_string buf
-        (Printf.sprintf "  | %s : %s witness\n"
-           (String.capitalize_ascii witness_name)
-           type_name))
-    registry_entries;
+    (* GADT witness type *)
+    Buffer.add_string buf
+      "(** GADT witness type - connects CSS names to OCaml types *)\n";
+    Buffer.add_string buf "type _ witness =\n";
+    List.iter
+      (fun (_css_name, type_name) ->
+        let witness_name = "W_" ^ type_name in
+        Buffer.add_string buf
+          (Printf.sprintf "  | %s : %s witness\n"
+             (String.capitalize_ascii witness_name)
+             type_name))
+      registry_entries;
 
-  (* witness_to_name function *)
-  Buffer.add_string buf
-    "\n(** Convert witness to CSS name for registry lookup *)\n";
-  Buffer.add_string buf
-    "let witness_to_name : type a. a witness -> string = function\n";
-  List.iter
-    (fun (css_name, type_name) ->
-      let witness_name = "W_" ^ type_name in
-      Buffer.add_string buf
-        (Printf.sprintf "  | %s -> %S\n"
-           (String.capitalize_ascii witness_name)
-           css_name))
-    registry_entries;
+    (* witness_to_name function *)
+    Buffer.add_string buf
+      "\n(** Convert witness to CSS name for registry lookup *)\n";
+    Buffer.add_string buf
+      "let witness_to_name : type a. a witness -> string = function\n";
+    List.iter
+      (fun (css_name, type_name) ->
+        let witness_name = "W_" ^ type_name in
+        Buffer.add_string buf
+          (Printf.sprintf "  | %s -> %S\n"
+             (String.capitalize_ascii witness_name)
+             css_name))
+      registry_entries;
 
-  (* witness_eq function *)
-  Buffer.add_string buf "\n(** Compare witnesses for type equality *)\n";
-  Buffer.add_string buf
-    "let witness_eq : type a b. a witness -> b witness -> (a, b) eq option =\n";
-  Buffer.add_string buf "  fun a b -> match a, b with\n";
-  List.iter
-    (fun (_css_name, type_name) ->
-      let w = String.capitalize_ascii ("W_" ^ type_name) in
-      Buffer.add_string buf (Printf.sprintf "  | %s, %s -> Some Refl\n" w w))
-    registry_entries;
-  Buffer.add_string buf "  | _, _ -> None\n";
+    (* witness_eq function *)
+    Buffer.add_string buf "\n(** Compare witnesses for type equality *)\n";
+    Buffer.add_string buf
+      "let witness_eq : type a b. a witness -> b witness -> (a, b) eq option =\n";
+    Buffer.add_string buf "  fun a b -> match a, b with\n";
+    List.iter
+      (fun (_css_name, type_name) ->
+        let w = String.capitalize_ascii ("W_" ^ type_name) in
+        Buffer.add_string buf (Printf.sprintf "  | %s, %s -> Some Refl\n" w w))
+      registry_entries;
+    Buffer.add_string buf "  | _, _ -> None\n";
 
-  Buffer.contents buf
+    Buffer.contents buf
+  end
 
 (* Parse arguments *)
 let parse_args args =
@@ -271,7 +283,14 @@ let parse_args args =
       parse input_file (Some file) verbose rest
     | "-v" :: rest | "-verbose" :: rest | "--verbose" :: rest ->
       parse input_file output_file true rest
-    | arg :: rest -> parse (Some arg) output_file verbose rest
+    | arg :: rest ->
+      (match input_file with
+      | Some existing ->
+        Printf.eprintf
+          "Warning: multiple input files provided. Using '%s', ignoring '%s'\n"
+          arg existing
+      | None -> ());
+      parse (Some arg) output_file verbose rest
     | [] -> input_file, output_file, verbose
   in
   parse None None false (Array.to_list args |> List.tl)
@@ -340,8 +359,9 @@ let () =
   if verbose then
     Printf.eprintf "Generated %d type declarations\n" (List.length type_decls);
 
-  (* Generate the 'all' type *)
-  let all_type = generate_all_type ~loc type_names in
+  (* Generate the 'all' type - combines ALL types (standalone + spec_module) *)
+  let all_type_names = standalone_type_names @ type_names in
+  let all_type = generate_all_type ~loc all_type_names in
 
   (* Combine: standalone types first, then spec_module types, then 'all' type *)
   let all_type_decls = standalone_types @ type_decls @ [ all_type ] in
@@ -362,23 +382,24 @@ let () =
   let witness_code = generate_witness_code registry_entries in
 
   (* Format and write output *)
-  let out_channel =
-    match output_file with Some file -> open_out file | None -> Stdlib.stdout
+  let write_output out_channel =
+    Printf.fprintf out_channel
+      "(* Auto-generated by generate_types - do not edit *)\n\n";
+    Pprintast.structure Format.str_formatter output_structure;
+    let formatted = Format.flush_str_formatter () in
+    output_string out_channel formatted;
+    output_string out_channel "\n";
+    (* Append witness GADT and helpers *)
+    output_string out_channel witness_code;
+    output_string out_channel "\n"
   in
 
-  Printf.fprintf out_channel
-    "(* Auto-generated by generate_types - do not edit *)\n\n";
-  Pprintast.structure Format.str_formatter output_structure;
-  let formatted = Format.flush_str_formatter () in
-  output_string out_channel formatted;
-  output_string out_channel "\n";
-
-  (* Append witness GADT and helpers *)
-  output_string out_channel witness_code;
-  output_string out_channel "\n";
-
   match output_file with
-  | Some _ ->
-    close_out out_channel;
-    if verbose then Printf.eprintf "Output written successfully\n"
-  | None -> ()
+  | Some file ->
+    let out_channel = open_out file in
+    Fun.protect
+      ~finally:(fun () -> close_out out_channel)
+      (fun () ->
+        write_output out_channel;
+        if verbose then Printf.eprintf "Output written successfully\n")
+  | None -> write_output Stdlib.stdout
