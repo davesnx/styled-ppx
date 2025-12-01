@@ -185,15 +185,33 @@ let registry_tbl : (string, kind * (module RULE) * Types.packed_witness option) 
    for lookup in the hashtable. The lookup is deferred to parse time (lazy)
    because modules reference each other before the registry is populated.
 
-   The Obj.magic is SAFE because the GADT witness proves type equality:
-   1. The witness W_property_color has type Types.property_color witness
-   2. witness_to_name W_property_color returns "property_color" (the registry key)
-   3. The registry entry for "property_color" was created from module Property_color
-   4. Module Property_color.rule has type Types.property_color Rule.rule
-   5. Therefore the cast from M.t to 'a is always valid
+   Why Obj.magic is Unavoidable but Safe:
 
-   Note: We keep Obj.magic because first-class modules hide the type connection
-   that the GADT proves. The stored witness confirms the types match at runtime.
+   OCaml's first-class modules (module RULE) use existential quantification to
+   hide the concrete type M.t. When we pack a module, the type information is
+   erased. The GADT witness system provides a type-level proof that we can use
+   to recover the type safely:
+
+   1. Registration: When Property_color is registered with W_property_color,
+      both refer to the same type (property_color).
+   2. Lookup: When we call lookup with W_property_color, we get back the
+      registry entry and verify the stored witness matches.
+   3. Cast: The Types.Refl proof from witness_eq proves a = b, so casting
+      M.rule to type 'a Rule.rule is sound.
+
+   The Obj.magic is needed because OCaml cannot express "unpack this module
+   at the type proven by this GADT". This is a known limitation of OCaml's
+   type system with first-class modules.
+
+   Alternative Approaches Considered:
+   - Generating a lookup function with explicit pattern matching for all 1000+
+     types would eliminate Obj.magic but create massive code bloat.
+   - Using a typeclass-style encoding would require significant refactoring.
+
+   Safety Guarantees - The following invariants are maintained to ensure type safety:
+   1. Modules are only registered with their correct witness (enforced by ppx generation)
+   2. witness_eq only returns Refl when witnesses are physically equal
+   3. _verify_witnesses in Types.ml catches any witness/type mismatches at compile time
 
    Example: lookup Types.W_property_color returns Types.property_color Rule.rule *)
 let lookup : type a. a Types.witness -> a Rule.rule =
