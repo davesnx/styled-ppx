@@ -203,14 +203,25 @@ let lookup : type a. a Types.witness -> a Rule.rule =
   | Some (_, (module M : RULE), Some (Types.Pack stored_witness)) ->
     (match Types.witness_eq witness stored_witness with
     | Some Types.Refl ->
-      (* Witnesses match - the GADT proves the types are equal *)
+      (* Witnesses match - the GADT proves the types are equal.
+         The cast is sound because:
+         - witness : a Types.witness
+         - stored_witness : b Types.witness
+         - Types.Refl : (a, b) eq proves a = b
+         - M.rule was registered with stored_witness, so M.t = b
+         - Therefore M.t = a, making the cast valid *)
       let rule = (Obj.magic M.rule : a Rule.rule) in
       rule tokens
     | None ->
-      (* This should never happen if the registry is built correctly *)
-      failwith ("Type mismatch for rule: " ^ name))
+      (* This indicates a bug in registration - a module was registered
+         with a witness that doesn't match its actual type *)
+      failwith ("Type mismatch for rule: " ^ name ^
+                ". This is a bug - please report to styled-ppx maintainers."))
   | Some (_, (module M : RULE), None) ->
-    (* Alias property without dedicated witness - use Obj.magic directly *)
+    (* Alias property without dedicated witness. These are CSS property aliases
+       that share the same module as the primary property (e.g., word-wrap
+       aliases overflow-wrap). The cast is safe because the alias was
+       intentionally registered to share the primary's type. *)
     let rule = (Obj.magic M.rule : a Rule.rule) in
     rule tokens
   | None -> failwith ("Rule not found: " ^ name)
