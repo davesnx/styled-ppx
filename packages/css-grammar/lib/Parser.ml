@@ -174,48 +174,46 @@ type kind =
   | Function of string
   | Media_query of string
 
-let properties_tbl : (string, (module RULE)) Hashtbl.t = Hashtbl.create 700
-let values_tbl : (string, (module RULE)) Hashtbl.t = Hashtbl.create 300
-let functions_tbl : (string, (module RULE)) Hashtbl.t = Hashtbl.create 70
-let media_queries_tbl : (string, (module RULE)) Hashtbl.t = Hashtbl.create 20
+(* Unified registry hashtable - stores all rules by name with their kind.
+   Witness is optional because alias properties share modules with primary properties. *)
+let registry_tbl : (string, kind * (module RULE) * Types.packed_witness option) Hashtbl.t =
+  Hashtbl.create 1000
 
 (* Type-safe lookup using GADT witness.
 
    The witness encodes the expected type 'a, and we use it to get the CSS name
-   for lookup in the hashtables. The lookup is deferred to parse time (lazy)
+   for lookup in the hashtable. The lookup is deferred to parse time (lazy)
    because modules reference each other before the registry is populated.
 
-   The Obj.magic is SAFE because:
-   1. The witness W_color has type Types.color witness (compile-time known)
-   2. witness_to_name W_color returns "color" (the CSS registry key)
-   3. The registry entry for "color" was created from module Color
-   4. Module Color.rule has type Types.color Rule.rule
-   5. Therefore the cast is always valid - the GADT proves it!
+   The Obj.magic is SAFE because the GADT witness proves type equality:
+   1. The witness W_property_color has type Types.property_color witness
+   2. witness_to_name W_property_color returns "property_color" (the registry key)
+   3. The registry entry for "property_color" was created from module Property_color
+   4. Module Property_color.rule has type Types.property_color Rule.rule
+   5. Therefore the cast from M.t to 'a is always valid
 
-   Example: lookup_typed Types.W_color returns Types.color Rule.rule *)
-let lookup_typed : type a. a Types.witness -> a Rule.rule =
+   Note: We keep Obj.magic because first-class modules hide the type connection
+   that the GADT proves. The stored witness confirms the types match at runtime.
+
+   Example: lookup Types.W_property_color returns Types.property_color Rule.rule *)
+let lookup : type a. a Types.witness -> a Rule.rule =
  fun witness tokens ->
   let name = Types.witness_to_name witness in
-  let lookup_in tbl =
-    match Hashtbl.find_opt tbl name with
-    | Some (module M : RULE) -> Some (Obj.magic M.rule : a Rule.rule)
-    | None -> None
-  in
-  let rule =
-    match lookup_in values_tbl with
-    | Some rule -> rule
+  match Hashtbl.find_opt registry_tbl name with
+  | Some (_, (module M : RULE), Some (Types.Pack stored_witness)) ->
+    (match Types.witness_eq witness stored_witness with
+    | Some Types.Refl ->
+      (* Witnesses match - the GADT proves the types are equal *)
+      let rule = (Obj.magic M.rule : a Rule.rule) in
+      rule tokens
     | None ->
-      (match lookup_in functions_tbl with
-      | Some rule -> rule
-      | None ->
-        (match lookup_in media_queries_tbl with
-        | Some rule -> rule
-        | None ->
-          (match lookup_in properties_tbl with
-          | Some rule -> rule
-          | None -> failwith ("Rule not found: " ^ name))))
-  in
-  rule tokens
+      (* This should never happen if the registry is built correctly *)
+      failwith ("Type mismatch for rule: " ^ name))
+  | Some (_, (module M : RULE), None) ->
+    (* Alias property without dedicated witness - use Obj.magic directly *)
+    let rule = (Obj.magic M.rule : a Rule.rule) in
+    rule tokens
+  | None -> failwith ("Rule not found: " ^ name)
 
 module Legacy_linear_gradient_arguments =
   [%spec_module
@@ -7705,32 +7703,73 @@ let registry : (kind * (module RULE)) list =
     Value "y", (module Y : RULE);
   ]
 
+(* Registry population.
+   Properties use prefixed keys to avoid collisions with values.
+   Alias properties (like -webkit-box-orient -> Property_box_orient) may not have
+   dedicated witnesses; they store None and use Obj.magic directly in lookup. *)
 let () =
   List.iter
     (fun (kind, rule) ->
-      match kind with
-      | Property name -> Hashtbl.replace properties_tbl name rule
-      | Value name -> Hashtbl.replace values_tbl name rule
-      | Function name -> Hashtbl.replace functions_tbl name rule
-      | Media_query name -> Hashtbl.replace media_queries_tbl name rule)
+      (* Get the CSS name from the kind *)
+      let css_name =
+        match kind with
+        | Property name -> name
+        | Value name -> name
+        | Function name -> name
+        | Media_query name -> name
+      in
+      (* Generate the registry key - properties are prefixed to avoid collisions with values *)
+      let key =
+        match kind with
+        | Property _ -> "property_" ^ css_name
+        | Value _ | Function _ | Media_query _ -> css_name
+      in
+      (* Try to find witness by key. Alias properties may not have dedicated witnesses. *)
+      let packed_witness_opt = Types.name_to_packed_witness key in
+      Hashtbl.replace registry_tbl key (kind, rule, packed_witness_opt))
     registry
 
+let is_property_kind = function Property _ -> true | _ -> false
+let is_value_kind = function Value _ -> true | _ -> false
+let is_function_kind = function Function _ -> true | _ -> false
+let is_media_query_kind = function Media_query _ -> true | _ -> false
+
+let find_by_key (key : string) : (module RULE) option =
+  match Hashtbl.find_opt registry_tbl key with
+  | Some (_, rule, _) -> Some rule
+  | None -> None
+
+(* Additional lookup for alias properties: tries unprefixed CSS name if prefixed fails *)
+let find_property_with_fallback (name : string) : (module RULE) option =
+  let key = "property_" ^ name in
+  match Hashtbl.find_opt registry_tbl key with
+  | Some (_, rule, _) -> Some rule
+  | None -> None
+
+(* Properties use prefixed keys in the registry *)
 let find_property (name : string) : (module RULE) option =
-  Hashtbl.find_opt properties_tbl name
+  find_by_key ("property_" ^ name)
 
 let find_value (name : string) : (module RULE) option =
-  Hashtbl.find_opt values_tbl name
+  find_by_key name
 
 let find_function (name : string) : (module RULE) option =
-  Hashtbl.find_opt functions_tbl name
+  find_by_key name
 
 let find_media_query (name : string) : (module RULE) option =
-  Hashtbl.find_opt media_queries_tbl name
+  find_by_key name
 
-let value_names () : string list = Hashtbl.to_seq_keys values_tbl |> List.of_seq
+let value_names () : string list =
+  Hashtbl.fold
+    (fun _key (kind, _rule, _witness) acc ->
+      match kind with Value name -> name :: acc | _ -> acc)
+    registry_tbl []
 
 let function_names () : string list =
-  Hashtbl.to_seq_keys functions_tbl |> List.of_seq
+  Hashtbl.fold
+    (fun _key (kind, _rule, _witness) acc ->
+      match kind with Function name -> name :: acc | _ -> acc)
+    registry_tbl []
 
 module Css_tokens = Styled_ppx_css_parser.Tokens
 module Css_parser = Styled_ppx_css_parser.Parser

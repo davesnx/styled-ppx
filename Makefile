@@ -48,8 +48,13 @@ install: ## Install project dependencies
 	opam install . --deps-only --with-test --with-dev-setup --working-dir . -y
 	npm install
 
+.PHONY: pin
+pin: ## Pin project dependencies
+	opam pin add server-reason-react.dev "https://github.com/ml-in-barcelona/server-reason-react.git#3d9f43a83104d0c4b0bc646242c5f04918559ec1"
+
+
 .PHONY: init
-init: setup-githooks create-switch install ## Create a local dev environment
+init: setup-githooks create-switch pin install ## Create a local dev environment
 
 .PHONY: subst
 subst: ## Run dune substitute

@@ -178,52 +178,73 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     rtag(txt(name), constructor, types);
   };
 
-  /* Helper to check if a type is unimplemented (always fails at parse time).
-     These should generate `unit` as a placeholder type.
-     NOTE: Only include types that are NOT registered as modules in Parser.ml.
-     Registered modules (ratio, declaration, declaration_list, zero) have proper types. */
-  let is_invalid_type = name => {
-    switch (name) {
-    | "declaration_value"
-    | "function_token"
-    | "any_value"
-    | "hash_token"
-    | "custom_property_name"
-    | "an_plus_b"
-    | "decibel"
-    | "urange"
-    | "semitones"
-    | "url_token" => true
-    // NOTE: These ARE registered and have proper types:
-    // | "zero"
-    // | "declaration_list"
-    // | "declaration"
-    // | "ratio"
-    | _ => false
-    };
+  /* Standard spec kinds - categorizes how types are handled during code generation:
+     - Valid: Types with proper Standard.re implementations returning proper OCaml types
+     - Primitive: Types that unwrap to simple OCaml types (int, float, string, etc.)
+     - Invalid: Unimplemented types that return unit as placeholder
+
+     NOTE: extended-length, extended-angle, extended-percentage, extended-time, extended-frequency
+     are NOT in this list. They use lookup() to reference generated modules in Parser.ml
+     which include calc(), min(), and max() support.
+
+     NOTE: ratio, declaration, declaration-list, zero ARE registered as modules
+     and should use witness lookup, not Standard.invalid. */
+  type standard_spec_kind =
+    | Valid
+    | Primitive
+    | Invalid;
+
+  let spec_names: list((string, standard_spec_kind)) = [
+    /* Primitive types - unwrap to simple OCaml types */
+    ("integer", Primitive),
+    ("number", Primitive),
+    ("percentage", Primitive),
+    ("ident", Primitive),
+    ("custom-ident", Primitive),
+    ("dashed-ident", Primitive),
+    ("custom-ident-without-span-or-auto", Primitive),
+    ("hex-color", Primitive),
+    ("interpolation", Primitive),
+    ("media-type", Primitive),
+    ("container-name", Primitive),
+    ("ident-token", Primitive),
+    ("string-token", Primitive),
+    ("url-no-interp", Primitive),
+    ("string", Primitive),
+    /* Valid types - return proper OCaml types from Standard.re */
+    ("length", Valid),
+    ("angle", Valid),
+    ("time", Valid),
+    ("frequency", Valid),
+    ("resolution", Valid),
+    ("flex-value", Valid),
+    ("css-wide-keywords", Valid),
+    /* Invalid/unimplemented types - return unit placeholder */
+    ("any-value", Invalid),
+    ("declaration-value", Invalid),
+    ("function-token", Invalid),
+    ("hash-token", Invalid),
+    ("custom-property-name", Invalid),
+    ("an-plus-b", Invalid),
+    ("decibel", Invalid),
+    ("urange", Invalid),
+    ("semitones", Invalid),
+    ("url-token", Invalid),
+  ];
+
+  /* Helper to look up kind in spec_names using snake_case name */
+  let find_spec_kind = snake_name => {
+    /* Convert snake_case back to CSS name for lookup */
+    let css_name = String.map(c => c == '_' ? '-' : c, snake_name);
+    List.assoc_opt(css_name, spec_names);
   };
 
-  /* Helper to check if a type is a primitive wrapper */
-  let is_primitive_wrapper_type = name => {
-    switch (name) {
-    | "integer"
-    | "number"
-    | "percentage"
-    | "ident"
-    | "custom_ident"
-    | "dashed_ident"
-    | "custom_ident_without_span_or_auto"
-    | "hex_color"
-    | "interpolation"
-    | "media_type"
-    | "container_name"
-    | "ident_token"
-    | "string_token"
-    | "url_no_interp" /* url_no_interp returns string */
-    | "string" /* string is an alias to string_token */ => true
-    | _ => false
-    };
-  };
+  /* Helper to check if a type is unimplemented (always fails at parse time).
+     These should generate `unit` as a placeholder type. */
+  let is_invalid_type = name => find_spec_kind(name) == Some(Invalid);
+
+  /* Helper to check if a type is a primitive wrapper. */
+  let is_primitive_wrapper_type = name => find_spec_kind(name) == Some(Primitive);
 
   /* Helper to get the inner type of a primitive wrapper */
   let get_primitive_inner_type = name => {
@@ -274,49 +295,8 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       make_variant_branch(type_, is_constructor, params);
     };
 
-  // List of ONLY standard specs defined in Standard.re that use direct parser references
-  // Everything else uses local bindings (for let rec) or witness lookup
-  let standard_specs = [
-    "integer",
-    "number",
-    "length",
-    "angle",
-    "time",
-    "frequency",
-    "resolution",
-    "percentage",
-    "ident",
-    "custom-ident",
-    "dashed-ident",
-    "custom-ident-without-span-or-auto",
-    "url-no-interp",
-    "hex-color",
-    "interpolation",
-    "flex-value",
-    "media-type",
-    "ident-token",
-    "string-token",
-    "string",
-    "css-wide-keywords",
-    // Invalid/unimplemented types - these map to Standard.invalid
-    // NOTE: ratio, declaration, declaration-list, zero ARE registered as modules
-    // and should use witness lookup, not Standard.invalid
-    "any-value",
-    "declaration-value",
-    "function-token",
-    "hash-token",
-    "custom-property-name",
-    "an-plus-b",
-    "decibel",
-    "urange",
-    "semitones",
-    "url-token",
-    /* Note: extended-length, extended-angle, extended-percentage, extended-time, extended-frequency
-       are NOT in this list. They use lookup_typed to reference the generated modules
-       in Parser.ml which include calc(), min(), and max() support. */
-  ];
-
-  let is_standard_spec = name => List.mem(name, standard_specs);
+  /* Check if a name is a standard spec. */
+  let is_standard_spec = name => List.mem_assoc(name, spec_names);
 
   let create_type_parser = value => {
     let rec create_type =
@@ -580,7 +560,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
             let witness_name = witness_name_of_type(snake_name);
             let witness_constructor = first_uppercase(witness_name);
             eapply(
-              evar("lookup_typed"),
+              evar("lookup"),
               [
                 pexp_construct(
                   txt @@ Ldot(Lident("Types"), witness_constructor),
@@ -599,7 +579,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
             let witness_name = witness_name_of_type(type_name);
             let witness_constructor = first_uppercase(witness_name);
             eapply(
-              evar("lookup_typed"),
+              evar("lookup"),
               [
                 pexp_construct(
                   txt @@ Ldot(Lident("Types"), witness_constructor),

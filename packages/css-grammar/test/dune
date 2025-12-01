@@ -1,6 +1,6 @@
 (test
  (name Runner)
- (modules Runner Combinators_test Modifiers_test Parser_test Rules_test Standard_test)
+ (modules Runner Combinators_test Modifiers_test Parser_test Rules_test Standard_test Witness_test)
  (flags
   (:standard -open Alcotest_extra))
  (libraries

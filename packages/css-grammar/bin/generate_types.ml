@@ -126,37 +126,25 @@ let generate_all_type ~loc (type_names : string list) :
   Ast_helper.Type.mk ~loc ~kind:Ptype_abstract ~manifest:all_type
     { txt = "all"; loc }
 
-(* Extract registry entries from Parser.ml content for witness generation *)
+(* Convert module name to type name (lowercase first char) *)
+let module_to_type_name module_name =
+  if String.length module_name = 0 then module_name
+  else
+    String.make 1 (Char.lowercase_ascii module_name.[0])
+    ^ String.sub module_name 1 (String.length module_name - 1)
+
+(* Extract entries of a specific kind from Parser.ml content *)
 (* Returns list of (css_name, type_name) pairs *)
-let extract_registry_entries content =
+let extract_entries_of_kind kind_name content =
   let entries = ref [] in
-  let property_re =
-    Str.regexp {|Property "\([^"]+\)",[^(]*(module \([A-Za-z0-9_]+\) : RULE)|}
-  in
-  let value_re =
-    Str.regexp {|Value "\([^"]+\)",[^(]*(module \([A-Za-z0-9_]+\) : RULE)|}
-  in
-  let function_re =
-    Str.regexp {|Function "\([^"]+\)",[^(]*(module \([A-Za-z0-9_]+\) : RULE)|}
-  in
-  let media_query_re =
+  let re =
     Str.regexp
-      {|Media_query "\([^"]+\)",[^(]*(module \([A-Za-z0-9_]+\) : RULE)|}
+      (kind_name ^ {| "\([^"]+\)",[^(]*(module \([A-Za-z0-9_]+\) : RULE)|})
   in
-
-  let module_to_type_name module_name =
-    if String.length module_name = 0 then module_name
-    else
-      String.make 1 (Char.lowercase_ascii module_name.[0])
-      ^ String.sub module_name 1 (String.length module_name - 1)
-  in
-
   let pos = ref 0 in
-
-  (* Find all Property entries *)
   (try
      while true do
-       let _ = Str.search_forward property_re content !pos in
+       let _ = Str.search_forward re content !pos in
        let css_name = Str.matched_group 1 content in
        let module_name = Str.matched_group 2 content in
        let type_name = module_to_type_name module_name in
@@ -164,50 +152,10 @@ let extract_registry_entries content =
        pos := Str.match_end ()
      done
    with Not_found -> ());
+  List.rev !entries
 
-  pos := 0;
-
-  (* Find all Value entries *)
-  (try
-     while true do
-       let _ = Str.search_forward value_re content !pos in
-       let css_name = Str.matched_group 1 content in
-       let module_name = Str.matched_group 2 content in
-       let type_name = module_to_type_name module_name in
-       entries := (css_name, type_name) :: !entries;
-       pos := Str.match_end ()
-     done
-   with Not_found -> ());
-
-  pos := 0;
-
-  (* Find all Function entries *)
-  (try
-     while true do
-       let _ = Str.search_forward function_re content !pos in
-       let css_name = Str.matched_group 1 content in
-       let module_name = Str.matched_group 2 content in
-       let type_name = module_to_type_name module_name in
-       entries := (css_name, type_name) :: !entries;
-       pos := Str.match_end ()
-     done
-   with Not_found -> ());
-
-  pos := 0;
-
-  (* Find all Media_query entries *)
-  (try
-     while true do
-       let _ = Str.search_forward media_query_re content !pos in
-       let css_name = Str.matched_group 1 content in
-       let module_name = Str.matched_group 2 content in
-       let type_name = module_to_type_name module_name in
-       entries := (css_name, type_name) :: !entries;
-       pos := Str.match_end ()
-     done
-   with Not_found -> ());
-
-  (* Deduplicate by type_name *)
+(* Deduplicate entries by type_name, keeping first occurrence *)
+let deduplicate_by_type_name entries =
   let seen = Hashtbl.create 1000 in
   List.filter
     (fun (_css_name, type_name) ->
@@ -216,7 +164,19 @@ let extract_registry_entries content =
         Hashtbl.add seen type_name ();
         true
       end)
-    (List.rev !entries)
+    entries
+
+(* Extract registry entries from Parser.ml content for witness generation *)
+(* Returns list of (css_name, type_name) pairs *)
+let extract_registry_entries content =
+  List.concat
+    [
+      extract_entries_of_kind "Property" content;
+      extract_entries_of_kind "Value" content;
+      extract_entries_of_kind "Function" content;
+      extract_entries_of_kind "Media_query" content;
+    ]
+  |> deduplicate_by_type_name
 
 (* Generate witness GADT and helper functions as raw OCaml code *)
 let generate_witness_code (registry_entries : (string * string) list) : string =
@@ -245,31 +205,76 @@ let generate_witness_code (registry_entries : (string * string) list) : string =
              type_name))
       registry_entries;
 
+    (* Helper to generate registry key - properties are prefixed to avoid collisions *)
+    let registry_key css_name type_name =
+      if String.length type_name > 9 && String.sub type_name 0 9 = "property_" then
+        "property_" ^ css_name
+      else
+        css_name
+    in
+
     (* witness_to_name function *)
     Buffer.add_string buf
-      "\n(** Convert witness to CSS name for registry lookup *)\n";
+      "\n(** Convert witness to registry key for lookup.\n\
+      \    Properties are prefixed with 'property_' to avoid collisions with values. *)\n";
     Buffer.add_string buf
       "let witness_to_name : type a. a witness -> string = function\n";
     List.iter
       (fun (css_name, type_name) ->
         let witness_name = "W_" ^ type_name in
+        let key = registry_key css_name type_name in
         Buffer.add_string buf
           (Printf.sprintf "  | %s -> %S\n"
              (String.capitalize_ascii witness_name)
-             css_name))
+             key))
       registry_entries;
 
-    (* witness_eq function *)
-    Buffer.add_string buf "\n(** Compare witnesses for type equality *)\n";
+    (* witness_eq function - O(1) using physical equality *)
     Buffer.add_string buf
-      "let witness_eq : type a b. a witness -> b witness -> (a, b) eq option =\n";
-    Buffer.add_string buf "  fun a b -> match a, b with\n";
+      "\n(** Compare witnesses for type equality.\n\
+      \    Uses physical equality for O(1) performance instead of O(n) pattern matching.\n\
+      \    This is safe because GADT constructors have unique runtime representations. *)\n";
+    Buffer.add_string buf
+      "let witness_eq : type a b. a witness -> b witness -> (a, b) eq option =\n\
+      \  fun a b ->\n\
+      \    if Obj.repr a == Obj.repr b then\n\
+      \      Some (Obj.magic Refl : (a, b) eq)\n\
+      \    else\n\
+      \      None\n";
+
+    (* Packed witness type for heterogeneous storage *)
+    Buffer.add_string buf
+      "\n(** Packed witness for heterogeneous storage - hides the type parameter *)\n";
+    Buffer.add_string buf "type packed_witness = Pack : 'a witness -> packed_witness\n";
+
+    (* name_to_packed_witness function *)
+    Buffer.add_string buf
+      "\n(** Convert registry key to packed witness.\n\
+      \    Properties use 'property_' prefix to match witness_to_name. *)\n";
+    Buffer.add_string buf
+      "let name_to_packed_witness : string -> packed_witness option = function\n";
+    List.iter
+      (fun (css_name, type_name) ->
+        let w = String.capitalize_ascii ("W_" ^ type_name) in
+        let key = registry_key css_name type_name in
+        Buffer.add_string buf
+          (Printf.sprintf "  | %S -> Some (Pack %s)\n" key w))
+      registry_entries;
+    Buffer.add_string buf "  | _ -> None\n";
+
+    (* Compile-time verification function *)
+    Buffer.add_string buf
+      "\n(** Compile-time verification that all witnesses have correct types.\n\
+      \    This function is never called at runtime, but if any witness doesn't\n\
+      \    match its declared type, this will fail to compile. *)\n";
+    Buffer.add_string buf "let _verify_witnesses () =\n";
     List.iter
       (fun (_css_name, type_name) ->
         let w = String.capitalize_ascii ("W_" ^ type_name) in
-        Buffer.add_string buf (Printf.sprintf "  | %s, %s -> Some Refl\n" w w))
+        Buffer.add_string buf
+          (Printf.sprintf "  let _ = (%s : %s witness) in\n" w type_name))
       registry_entries;
-    Buffer.add_string buf "  | _, _ -> None\n";
+    Buffer.add_string buf "  ()\n";
 
     Buffer.contents buf
   end
@@ -384,7 +389,25 @@ let () =
   (* Format and write output *)
   let write_output out_channel =
     Printf.fprintf out_channel
-      "(* Auto-generated by generate_types - do not edit *)\n\n";
+      "(** Types.ml - Auto-generated CSS type definitions and GADT witnesses\n\
+      \n\
+      \    DO NOT EDIT MANUALLY - Generated by generate_types from Parser.ml\n\
+      \n\
+      \    This module contains:\n\
+      \    - Type definitions for all CSS values (generated from spec_module definitions)\n\
+      \    - GADT witness type connecting CSS names to OCaml types\n\
+      \    - witness_to_name: Convert witness to registry key for lookups\n\
+      \    - witness_eq: O(1) witness equality check using physical comparison\n\
+      \    - name_to_packed_witness: Convert registry key to packed witness\n\
+      \n\
+      \    The witness system enables type-safe lookups in the CSS rule registry.\n\
+      \    Each CSS property/value type has a corresponding witness constructor\n\
+      \    (e.g., Types.W_property_color for property_color type).\n\
+      \n\
+      \    Usage in Parser.ml:\n\
+      \      let lookup : type a. a Types.witness -> a Rule.rule\n\
+      \      lookup Types.W_property_color  (* Returns property_color Rule.rule *)\n\
+      \ *)\n\n";
     Pprintast.structure Format.str_formatter output_structure;
     let formatted = Format.flush_str_formatter () in
     output_string out_channel formatted;

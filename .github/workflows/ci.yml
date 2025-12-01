@@ -85,6 +85,9 @@ jobs:
           chmod +x "$OPAM_PATH"
           dirname "$OPAM_PATH" >> "$GITHUB_PATH"
 
+      - name: Pin dependencies
+        run: make pin
+
       - name: Install dependencies
         run: make install
 
