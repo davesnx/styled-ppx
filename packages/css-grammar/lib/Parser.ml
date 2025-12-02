@@ -176,7 +176,8 @@ type kind =
 
 (* Unified registry hashtable - stores all rules by name with their kind.
    Witness is optional because alias properties share modules with primary properties. *)
-let registry_tbl : (string, kind * (module RULE) * Types.packed_witness option) Hashtbl.t =
+let registry_tbl :
+  (string, kind * (module RULE) * Types.packed_witness option) Hashtbl.t =
   Hashtbl.create 1000
 
 let lookup : type a. a Types.witness -> a Rule.rule =
@@ -198,8 +199,10 @@ let lookup : type a. a Types.witness -> a Rule.rule =
     | None ->
       (* This indicates a bug in registration - a module was registered
          with a witness that doesn't match its actual type *)
-      failwith ("Type mismatch for rule: " ^ name ^
-                ". This is a bug - please report to styled-ppx maintainers."))
+      failwith
+        ("Type mismatch for rule: "
+        ^ name
+        ^ ". This is a bug - please report to styled-ppx maintainers."))
   | Some (_, (module M : RULE), None) ->
     (* Alias property without dedicated witness. These are CSS property aliases
        that share the same module as the primary property (e.g., word-wrap
@@ -7745,14 +7748,9 @@ let find_property_with_fallback (name : string) : (module RULE) option =
 let find_property (name : string) : (module RULE) option =
   find_by_key ("property_" ^ name)
 
-let find_value (name : string) : (module RULE) option =
-  find_by_key name
-
-let find_function (name : string) : (module RULE) option =
-  find_by_key name
-
-let find_media_query (name : string) : (module RULE) option =
-  find_by_key name
+let find_value (name : string) : (module RULE) option = find_by_key name
+let find_function (name : string) : (module RULE) option = find_by_key name
+let find_media_query (name : string) : (module RULE) option = find_by_key name
 
 let value_names () : string list =
   Hashtbl.fold
@@ -7775,7 +7773,7 @@ let apply_parser (parser, tokens_with_loc) =
   let tokens =
     tokens_with_loc
     |> List.map (fun ({ txt; _ } : Css_lexer.token_with_location) ->
-         match txt with Ok token -> token | Error (token, _) -> token)
+      match txt with Ok token -> token | Error (token, _) -> token)
   in
 
   let tokens_without_ws = tokens |> List.filter (( != ) Css_parser.WS) in
@@ -7813,7 +7811,17 @@ let check_property ~loc ~name value :
   match find_rule name with
   | Some rule ->
     let module R = (val rule : RULE) in
-    (match parse R.rule value with
+    (* Wrap the property rule with interpolation support, similar to
+       transform_with_variable in Property_to_runtime.re. This allows any
+       property to accept a complete interpolation as its value. *)
+    let rule_with_interpolation =
+      Combinators.xor
+        [
+          Rule.Match.map Standard.interpolation (fun data -> `Interpolation data);
+          Rule.Match.map R.rule (fun data -> `Value data);
+        ]
+    in
+    (match parse rule_with_interpolation value with
     | Ok _ -> Ok ()
     | Error message -> Error (loc, `Invalid_value message))
   | None -> Error (loc, `Property_not_found)
@@ -7825,7 +7833,22 @@ let get_interpolation_types ~name value : (string * string) list =
   match find_rule name with
   | Some rule ->
     let module R = (val rule : RULE) in
-    (match parse R.rule value with
-    | Ok parsed_value -> R.extract_interpolations parsed_value
+    (* Wrap with interpolation support like check_property. When a complete
+       interpolation is provided, return its info with the property's runtime path. *)
+    let rule_with_interpolation =
+      Combinators.xor
+        [
+          Rule.Match.map Standard.interpolation (fun data -> `Interpolation data);
+          Rule.Match.map R.rule (fun data -> `Value data);
+        ]
+    in
+    (match parse rule_with_interpolation value with
+    | Ok (`Interpolation parts) ->
+      (* Complete interpolation - use the property's runtime module path *)
+      let type_path = Option.value ~default:"" R.runtime_module_path in
+      [ (String.concat "." parts, type_path) ]
+    | Ok (`Value parsed_value) ->
+      (* Regular value - extract any partial interpolations *)
+      R.extract_interpolations parsed_value
     | Error _ -> [])
   | None -> []

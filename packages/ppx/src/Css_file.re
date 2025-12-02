@@ -109,7 +109,12 @@ module Css_transform = {
         List.map(
           ((value, loc)) =>
             (
-              transform_component_value(value, dynamic_vars, property_name, get_type_for_var),
+              transform_component_value(
+                value,
+                dynamic_vars,
+                property_name,
+                get_type_for_var,
+              ),
               loc,
             ),
           body_values,
@@ -120,7 +125,12 @@ module Css_transform = {
         List.map(
           ((value, loc)) =>
             (
-              transform_component_value(value, dynamic_vars, property_name, get_type_for_var),
+              transform_component_value(
+                value,
+                dynamic_vars,
+                property_name,
+                get_type_for_var,
+              ),
               loc,
             ),
           values,
@@ -131,7 +141,12 @@ module Css_transform = {
         List.map(
           ((value, loc)) =>
             (
-              transform_component_value(value, dynamic_vars, property_name, get_type_for_var),
+              transform_component_value(
+                value,
+                dynamic_vars,
+                property_name,
+                get_type_for_var,
+              ),
               loc,
             ),
           values,
@@ -244,13 +259,18 @@ module Css_transform = {
     let value_string =
       Styled_ppx_css_parser.Render.component_value_list(value_list);
     let interpolation_types =
-      Css_grammar.Parser.get_interpolation_types(~name=property_name, value_string);
+      Css_grammar.Parser.get_interpolation_types(
+        ~name=property_name,
+        value_string,
+      );
 
     /* Create a lookup function to get type path for a variable */
     let get_type_for_var = var_name => {
-      switch (List.find_opt(((name, _)) => name == var_name, interpolation_types)) {
+      switch (
+        List.find_opt(((name, _)) => name == var_name, interpolation_types)
+      ) {
       | Some((_, type_path)) when type_path != "" => type_path
-      | _ => property_name  /* Fallback to property name if no type info */
+      | _ => property_name /* Fallback to property name if no type info */
       };
     };
 
@@ -258,7 +278,12 @@ module Css_transform = {
       List.map(
         ((cv, loc)) =>
           (
-            transform_component_value(cv, dynamic_vars, Some(property_name), get_type_for_var),
+            transform_component_value(
+              cv,
+              dynamic_vars,
+              Some(property_name),
+              get_type_for_var,
+            ),
             loc,
           ),
         value_list,
@@ -302,11 +327,19 @@ module Css_transform = {
     let {name, prelude, block, loc} = at_rule;
     let (prelude_values, prelude_loc) = prelude;
     /* At-rule preludes don't have property types, so use empty string fallback */
-    let default_type_for_var = (_var => "");
+    let default_type_for_var = _var => "";
     let transformed_prelude =
       List.map(
         ((cv, cv_loc)) =>
-          (transform_component_value(cv, dynamic_vars, None, default_type_for_var), cv_loc),
+          (
+            transform_component_value(
+              cv,
+              dynamic_vars,
+              None,
+              default_type_for_var,
+            ),
+            cv_loc,
+          ),
         prelude_values,
       );
     let transformed_block =

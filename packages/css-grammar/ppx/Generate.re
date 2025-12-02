@@ -244,7 +244,8 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
   let is_invalid_type = name => find_spec_kind(name) == Some(Invalid);
 
   /* Helper to check if a type is a primitive wrapper. */
-  let is_primitive_wrapper_type = name => find_spec_kind(name) == Some(Primitive);
+  let is_primitive_wrapper_type = name =>
+    find_spec_kind(name) == Some(Primitive);
 
   /* Helper to get the inner type of a primitive wrapper */
   let get_primitive_inner_type = name => {
@@ -774,7 +775,8 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
 
   /* Helper to extract the type name from a spec for use in interpolation type tracking.
      Returns None for primitive types that don't have runtime modules. */
-  let rec get_type_name_from_spec = (spec: Css_spec_parser.value): option(string) => {
+  let rec get_type_name_from_spec =
+          (spec: Css_spec_parser.value): option(string) => {
     switch (spec) {
     | Terminal(Data_type(name), _) =>
       /* Skip primitive types that don't have runtime modules */
@@ -794,14 +796,22 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
      Returns (variable_name, type_path) pairs for partial interpolation support.
      The type_path is determined by looking at sibling types in Xor combinators. */
   let generate_extract_interpolations_function =
-      (spec: Css_spec_parser.value, ~runtime_module_path: option(string), ~loc as _: Location.t)
+      (
+        spec: Css_spec_parser.value,
+        ~runtime_module_path: option(string),
+        ~loc as _: Location.t,
+      )
       : Parsetree.expression => {
     /* Default type path when we can't determine specific type */
     let default_type_path = Option.value(runtime_module_path, ~default="");
 
     /* Helper to generate extraction expression with type tracking */
     let rec generate_typed_extraction =
-            (spec: Css_spec_parser.value, var_expr: Parsetree.expression, type_context: string)
+            (
+              spec: Css_spec_parser.value,
+              var_expr: Parsetree.expression,
+              type_context: string,
+            )
             : Parsetree.expression => {
       switch (spec) {
       /* Direct interpolation - return (name, type_context) pair */
@@ -821,7 +831,10 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         | At_least_one
         | Repeat(_)
         | Repeat_by_comma(_, _) => [%expr
-           List.map(parts => (String.concat(".", parts), [%e type_expr]), [%e var_expr])
+           List.map(
+             parts => (String.concat(".", parts), [%e type_expr]),
+             [%e var_expr],
+           )
           ]
         };
 
@@ -830,13 +843,16 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
 
       /* Groups - recurse with same context */
       | Group(inner, modifier) =>
-        let inner_extract = generate_typed_extraction(inner, var_expr, type_context);
+        let inner_extract =
+          generate_typed_extraction(inner, var_expr, type_context);
         switch (modifier) {
         | One => inner_extract
         | Optional =>
           switch%expr ([%e var_expr]) {
           | None => []
-          | Some(v) => [%e generate_typed_extraction(inner, evar("v"), type_context)]
+          | Some(v) => [%e
+             generate_typed_extraction(inner, evar("v"), type_context)
+            ]
           }
         | Zero_or_more
         | One_or_more
@@ -845,7 +861,10 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         | Repeat_by_comma(_, _) => [%expr
            List.concat(
              List.map(
-               v => [%e generate_typed_extraction(inner, evar("v"), type_context)],
+               v =>
+                 [%e
+                  generate_typed_extraction(inner, evar("v"), type_context)
+                 ],
                [%e var_expr],
              ),
            )
@@ -886,7 +905,12 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
                 case(
                   ~lhs=ppat_variant(name, Some(pvar("inner"))),
                   ~guard=None,
-                  ~rhs=generate_typed_extraction(inner_spec, evar("inner"), effective_context),
+                  ~rhs=
+                    generate_typed_extraction(
+                      inner_spec,
+                      evar("inner"),
+                      effective_context,
+                    ),
                 );
               } else {
                 case(
@@ -918,7 +942,11 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
                   | Some(t) => "Css_types." ++ kebab_to_pascal_case(t)
                   | None => type_context
                   };
-                generate_typed_extraction(inner_spec, evar(var_name), pos_type);
+                generate_typed_extraction(
+                  inner_spec,
+                  evar(var_name),
+                  pos_type,
+                );
               } else {
                 [%expr []];
               },
@@ -955,7 +983,11 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
                 switch%expr ([%e evar(var_name)]) {
                 | None => []
                 | Some(inner) => [%e
-                   generate_typed_extraction(inner_spec, evar("inner"), pos_type)
+                   generate_typed_extraction(
+                     inner_spec,
+                     evar("inner"),
+                     pos_type,
+                   )
                   ]
                 };
               } else {
@@ -980,7 +1012,8 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         );
 
       /* Function call - recurse */
-      | Function_call(_, inner) => generate_typed_extraction(inner, var_expr, type_context)
+      | Function_call(_, inner) =>
+        generate_typed_extraction(inner, var_expr, type_context)
       };
     };
 
@@ -1107,12 +1140,15 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       );
 
     /* Generate extract_interpolations - returns (name, type_path) pairs */
-    let string_string_pair_type =
-      ptyp_tuple([string_type, string_type]);
+    let string_string_pair_type = ptyp_tuple([string_type, string_type]);
     let string_string_list_type =
       ptyp_constr(txt @@ Lident("list"), [string_string_pair_type]);
     let extract_interpolations_inner =
-      generate_extract_interpolations_function(spec, ~runtime_module_path, ~loc);
+      generate_extract_interpolations_function(
+        spec,
+        ~runtime_module_path,
+        ~loc,
+      );
     let extract_interpolations_body =
       switch (extract_interpolations_inner.pexp_desc) {
       | Pexp_fun(lbl, default, pat, body) =>
