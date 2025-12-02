@@ -11,7 +11,8 @@ let test_flex_grow_with_interpolation = () => {
     | Ok(parsed_value) =>
       let interps = M.extract_interpolations(parsed_value);
       Alcotest.check(Alcotest.int, "should have one interpolation", 1, List.length(interps));
-      Alcotest.check(Alcotest.string, "variable name should be myVar", "myVar", List.hd(interps));
+      let (var_name, _type_path) = List.hd(interps);
+      Alcotest.check(Alcotest.string, "variable name should be myVar", "myVar", var_name);
     };
   };
 };
@@ -47,7 +48,8 @@ let test_overflow_with_interpolation = () => {
     | Ok(parsed_value) =>
       let interps = M.extract_interpolations(parsed_value);
       Alcotest.check(Alcotest.int, "should have one interpolation", 1, List.length(interps));
-      Alcotest.check(Alcotest.string, "variable name should be x", "x", List.hd(interps));
+      let (var_name, _type_path) = List.hd(interps);
+      Alcotest.check(Alcotest.string, "variable name should be x", "x", var_name);
     };
   };
 };
@@ -63,7 +65,8 @@ let test_flex_basis_with_interpolation = () => {
     | Ok(parsed_value) =>
       let interps = M.extract_interpolations(parsed_value);
       Alcotest.check(Alcotest.int, "should have one interpolation", 1, List.length(interps));
-      Alcotest.check(Alcotest.string, "variable name should be basis", "basis", List.hd(interps));
+      let (var_name, _type_path) = List.hd(interps);
+      Alcotest.check(Alcotest.string, "variable name should be basis", "basis", var_name);
     };
   };
 };

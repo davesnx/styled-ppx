@@ -74,12 +74,14 @@ module Css_transform = {
     Printf.sprintf("css-%s", Murmur2.default(content));
   };
 
-  /* Transform component values, replacing Variables with CSS custom properties */
+  /* Transform component values, replacing Variables with CSS custom properties.
+     The get_type_for_var function maps variable names to their type paths for partial interpolation. */
   let rec transform_component_value =
           (
             cv: component_value,
             dynamic_vars: ref(list((string, string, string))),
             property_name: option(string),
+            get_type_for_var: string => string,
           )
           : component_value => {
     switch (cv) {
@@ -87,10 +89,11 @@ module Css_transform = {
       let var_name = variable_to_css_var_name(path);
       let original_path = String.concat(".", path);
 
-      let property = Option.value(property_name, ~default="");
+      /* Use get_type_for_var to get the correct type path for partial interpolation */
+      let type_path = get_type_for_var(original_path);
       if (!List.exists(((vn, _, _)) => vn == var_name, dynamic_vars^)) {
         dynamic_vars :=
-          [(var_name, original_path, property), ...dynamic_vars^];
+          [(var_name, original_path, type_path), ...dynamic_vars^];
       };
 
       Function(
@@ -106,7 +109,7 @@ module Css_transform = {
         List.map(
           ((value, loc)) =>
             (
-              transform_component_value(value, dynamic_vars, property_name),
+              transform_component_value(value, dynamic_vars, property_name, get_type_for_var),
               loc,
             ),
           body_values,
@@ -117,7 +120,7 @@ module Css_transform = {
         List.map(
           ((value, loc)) =>
             (
-              transform_component_value(value, dynamic_vars, property_name),
+              transform_component_value(value, dynamic_vars, property_name, get_type_for_var),
               loc,
             ),
           values,
@@ -128,7 +131,7 @@ module Css_transform = {
         List.map(
           ((value, loc)) =>
             (
-              transform_component_value(value, dynamic_vars, property_name),
+              transform_component_value(value, dynamic_vars, property_name, get_type_for_var),
               loc,
             ),
           values,
@@ -235,11 +238,27 @@ module Css_transform = {
   let transform_declaration = (decl: declaration, dynamic_vars) => {
     let (property_name, _) = decl.name;
     let (value_list, value_loc) = decl.value;
+
+    /* Get interpolation types from the property parser for partial interpolation support.
+       This returns (var_name, type_path) pairs that tell us what type each interpolation should use. */
+    let value_string =
+      Styled_ppx_css_parser.Render.component_value_list(value_list);
+    let interpolation_types =
+      Css_grammar.Parser.get_interpolation_types(~name=property_name, value_string);
+
+    /* Create a lookup function to get type path for a variable */
+    let get_type_for_var = var_name => {
+      switch (List.find_opt(((name, _)) => name == var_name, interpolation_types)) {
+      | Some((_, type_path)) when type_path != "" => type_path
+      | _ => property_name  /* Fallback to property name if no type info */
+      };
+    };
+
     let transformed_values =
       List.map(
         ((cv, loc)) =>
           (
-            transform_component_value(cv, dynamic_vars, Some(property_name)),
+            transform_component_value(cv, dynamic_vars, Some(property_name), get_type_for_var),
             loc,
           ),
         value_list,
@@ -282,10 +301,12 @@ module Css_transform = {
   and transform_at_rule = (at_rule: at_rule, dynamic_vars) => {
     let {name, prelude, block, loc} = at_rule;
     let (prelude_values, prelude_loc) = prelude;
+    /* At-rule preludes don't have property types, so use empty string fallback */
+    let default_type_for_var = (_var => "");
     let transformed_prelude =
       List.map(
         ((cv, cv_loc)) =>
-          (transform_component_value(cv, dynamic_vars, None), cv_loc),
+          (transform_component_value(cv, dynamic_vars, None, default_type_for_var), cv_loc),
         prelude_values,
       );
     let transformed_block =

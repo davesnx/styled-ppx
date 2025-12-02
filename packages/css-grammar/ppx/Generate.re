@@ -730,47 +730,113 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     };
   };
 
-  /* Generate extract_interpolations function from spec
-     This generates a function that walks the parsed value and collects all interpolation strings */
+  /* Convert kebab-case to PascalCase: "keyframes-name" -> "KeyframesName"
+     Also handles leading hyphens: "-non-standard-overflow" -> "NonStandardOverflow" */
+  let kebab_to_pascal_case = (s: string): string => {
+    s
+    |> String.split_on_char('-')
+    |> List.filter(part => part != "")  /* Remove empty strings from leading/trailing hyphens */
+    |> List.map(String.capitalize_ascii)
+    |> String.concat("");
+  };
+
+  /* Check if a type name is a primitive type without a runtime module.
+     These types are CSS grammar primitives that don't have corresponding
+     Css_types modules with toString functions. */
+  let is_primitive_type = name => {
+    switch (name) {
+    | "integer"
+    | "number"
+    | "percentage"
+    | "interpolation"
+    | "url_no_interp"
+    | "ident"
+    | "custom-ident"
+    | "custom_ident"
+    | "dashed-ident"
+    | "dashed_ident"
+    | "custom-ident-without-span-or-auto"
+    | "custom_ident_without_span_or_auto"
+    | "hex-color"
+    | "hex_color"
+    | "media-type"
+    | "media_type"
+    | "container-name"
+    | "container_name"
+    | "ident-token"
+    | "ident_token"
+    | "string-token"
+    | "string_token"
+    | "string" => true
+    | _ => false
+    };
+  };
+
+  /* Helper to extract the type name from a spec for use in interpolation type tracking.
+     Returns None for primitive types that don't have runtime modules. */
+  let rec get_type_name_from_spec = (spec: Css_spec_parser.value): option(string) => {
+    switch (spec) {
+    | Terminal(Data_type(name), _) =>
+      /* Skip primitive types that don't have runtime modules */
+      if (is_primitive_type(name)) {
+        None;
+      } else {
+        Some(name);
+      }
+    | Terminal(Property_type(name), _) => Some(name)
+    | Group(inner, _) => get_type_name_from_spec(inner)
+    | Combinator(Xor, [single]) => get_type_name_from_spec(single)
+    | _ => None
+    };
+  };
+
+  /* Generate extract_interpolations function from spec.
+     Returns (variable_name, type_path) pairs for partial interpolation support.
+     The type_path is determined by looking at sibling types in Xor combinators. */
   let generate_extract_interpolations_function =
-      (spec: Css_spec_parser.value, ~loc as _: Location.t)
+      (spec: Css_spec_parser.value, ~runtime_module_path: option(string), ~loc as _: Location.t)
       : Parsetree.expression => {
-    /* Helper to generate extraction expression for a value accessed by a variable name */
-    let rec generate_extraction =
-            (spec: Css_spec_parser.value, var_expr: Parsetree.expression)
+    /* Default type path when we can't determine specific type */
+    let default_type_path = Option.value(runtime_module_path, ~default="");
+
+    /* Helper to generate extraction expression with type tracking */
+    let rec generate_typed_extraction =
+            (spec: Css_spec_parser.value, var_expr: Parsetree.expression, type_context: string)
             : Parsetree.expression => {
       switch (spec) {
-      /* Direct interpolation - extract the string list and join with "." */
+      /* Direct interpolation - return (name, type_context) pair */
       | Terminal(Data_type("interpolation"), modifier) =>
-        let extract_one = [%expr String.concat(".", [%e var_expr])];
+        let name_expr = [%expr String.concat(".", [%e var_expr])];
+        let type_expr = estring(type_context);
+        let pair = [%expr ([%e name_expr], [%e type_expr])];
         switch (modifier) {
-        | One => [%expr [[%e extract_one]]]
+        | One => [%expr [[%e pair]]]
         | Optional =>
           switch%expr ([%e var_expr]) {
           | None => []
-          | Some(parts) => [String.concat(".", parts)]
+          | Some(parts) => [(String.concat(".", parts), [%e type_expr])]
           }
         | Zero_or_more
         | One_or_more
         | At_least_one
         | Repeat(_)
         | Repeat_by_comma(_, _) => [%expr
-           List.map(parts => String.concat(".", parts), [%e var_expr])
+           List.map(parts => (String.concat(".", parts), [%e type_expr]), [%e var_expr])
           ]
         };
 
-      /* Other terminals (keywords, other data types) - no interpolations */
+      /* Other terminals - no interpolations */
       | Terminal(_, _) => [%expr []]
 
-      /* Groups - recurse into the inner value */
+      /* Groups - recurse with same context */
       | Group(inner, modifier) =>
-        let inner_extract = generate_extraction(inner, var_expr);
+        let inner_extract = generate_typed_extraction(inner, var_expr, type_context);
         switch (modifier) {
         | One => inner_extract
         | Optional =>
           switch%expr ([%e var_expr]) {
           | None => []
-          | Some(v) => [%e generate_extraction(inner, evar("v"))]
+          | Some(v) => [%e generate_typed_extraction(inner, evar("v"), type_context)]
           }
         | Zero_or_more
         | One_or_more
@@ -779,17 +845,35 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         | Repeat_by_comma(_, _) => [%expr
            List.concat(
              List.map(
-               v => [%e generate_extraction(inner, evar("v"))],
+               v => [%e generate_typed_extraction(inner, evar("v"), type_context)],
                [%e var_expr],
              ),
            )
           ]
         };
 
-      /* Xor combinator - pattern match on variants */
+      /* Xor combinator - track sibling type for interpolation branches */
       | Combinator(Xor, values) =>
         let names = variant_names(values);
         let pairs = List.combine(names, values);
+
+        /* Find the non-interpolation sibling type if this is a <type> | <interpolation> pattern */
+        let sibling_type =
+          List.find_map(
+            inner_spec =>
+              switch (inner_spec) {
+              | Terminal(Data_type("interpolation"), _) => None
+              | _ => get_type_name_from_spec(inner_spec)
+              },
+            values,
+          );
+
+        let effective_context =
+          switch (sibling_type) {
+          | Some(t) => "Css_types." ++ kebab_to_pascal_case(t)
+          | None => type_context
+          };
+
         let cases =
           List.map(
             ((name, inner_spec)) => {
@@ -802,7 +886,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
                 case(
                   ~lhs=ppat_variant(name, Some(pvar("inner"))),
                   ~guard=None,
-                  ~rhs=generate_extraction(inner_spec, evar("inner")),
+                  ~rhs=generate_typed_extraction(inner_spec, evar("inner"), effective_context),
                 );
               } else {
                 case(
@@ -820,7 +904,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
           );
         pexp_match(var_expr, cases);
 
-      /* Static/And combinator - tuple, extract from each element */
+      /* Static/And combinator - tuple, track type for each position */
       | Combinator(Static, values)
       | Combinator(And, values) =>
         let extractions =
@@ -828,7 +912,13 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
             (i, inner_spec) =>
               if (spec_contains_interpolation(inner_spec)) {
                 let var_name = "v" ++ string_of_int(i);
-                generate_extraction(inner_spec, evar(var_name));
+                /* Try to get type from this position's spec */
+                let pos_type =
+                  switch (get_type_name_from_spec(inner_spec)) {
+                  | Some(t) => "Css_types." ++ kebab_to_pascal_case(t)
+                  | None => type_context
+                  };
+                generate_typed_extraction(inner_spec, evar(var_name), pos_type);
               } else {
                 [%expr []];
               },
@@ -840,7 +930,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
             extractions,
             [%expr []],
           );
-        /* Generate: let (v0, v1, ...) = var_expr in combined */
         let tuple_pat =
           ppat_tuple(
             List.mapi((i, _) => pvar("v" ++ string_of_int(i)), values),
@@ -851,17 +940,22 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
           combined,
         );
 
-      /* Or combinator - tuple of options, extract from each Some */
+      /* Or combinator - tuple of options */
       | Combinator(Or, values) =>
         let extractions =
           List.mapi(
             (i, inner_spec) =>
               if (spec_contains_interpolation(inner_spec)) {
                 let var_name = "v" ++ string_of_int(i);
+                let pos_type =
+                  switch (get_type_name_from_spec(inner_spec)) {
+                  | Some(t) => "Css_types." ++ kebab_to_pascal_case(t)
+                  | None => type_context
+                  };
                 switch%expr ([%e evar(var_name)]) {
                 | None => []
                 | Some(inner) => [%e
-                   generate_extraction(inner_spec, evar("inner"))
+                   generate_typed_extraction(inner_spec, evar("inner"), pos_type)
                   ]
                 };
               } else {
@@ -885,18 +979,16 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
           combined,
         );
 
-      /* Function call - recurse into the argument */
-      | Function_call(_, inner) => generate_extraction(inner, var_expr)
+      /* Function call - recurse */
+      | Function_call(_, inner) => generate_typed_extraction(inner, var_expr, type_context)
       };
     };
 
     /* Generate the function body */
     let body =
       if (spec_contains_interpolation(spec)) {
-        generate_extraction(spec, evar("value"));
+        generate_typed_extraction(spec, evar("value"), default_type_path);
       } else {
-        /* Optimization: if spec doesn't contain interpolation, just return [] */
-
         [%expr []];
       };
 
@@ -1014,19 +1106,20 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         [Ast_helper.Vb.mk(~loc, pvar("to_string"), to_string_body)],
       );
 
-    let string_list_type =
-      ptyp_constr(txt @@ Lident("list"), [string_type]);
+    /* Generate extract_interpolations - returns (name, type_path) pairs */
+    let string_string_pair_type =
+      ptyp_tuple([string_type, string_type]);
+    let string_string_list_type =
+      ptyp_constr(txt @@ Lident("list"), [string_string_pair_type]);
     let extract_interpolations_inner =
-      generate_extract_interpolations_function(spec, ~loc);
-    /* Wrap with type annotations */
+      generate_extract_interpolations_function(spec, ~runtime_module_path, ~loc);
     let extract_interpolations_body =
       switch (extract_interpolations_inner.pexp_desc) {
       | Pexp_fun(lbl, default, pat, body) =>
         let typed_pat = Ast_helper.Pat.constraint_(~loc, pat, t_type);
-        let typed_body = pexp_constraint(body, string_list_type);
+        let typed_body = pexp_constraint(body, string_string_list_type);
         pexp_fun(lbl, default, typed_pat, typed_body);
       | _ =>
-        /* Fallback: wrap entire expression */
         pexp_fun(
           Nolabel,
           None,
@@ -1036,7 +1129,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
               extract_interpolations_inner,
               [(Nolabel, evar("value"))],
             ),
-            string_list_type,
+            string_string_list_type,
           ),
         )
       };

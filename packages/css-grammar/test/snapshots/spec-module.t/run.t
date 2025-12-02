@@ -19,7 +19,7 @@
         (Rule.parse_string rule input : (t, string) result)
       let to_string (value : t) =
         (match value with | _ -> "TODO: to_string" : string)
-      let extract_interpolations (value : t) = ([] : string list)
+      let extract_interpolations (value : t) = ([] : (string * string) list)
       let runtime_module =
         Some ((module Css_types.Display) : (module RUNTIME_TYPE))
       let runtime_module_path = Some "Css_types.Display"

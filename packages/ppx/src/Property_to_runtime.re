@@ -1160,7 +1160,16 @@ let object_position =
   monomorphic(
     Parser.Property_object_position.rule,
     (~loc) => [%expr CSS.objectPosition],
-    (~loc, v) => render_position(~loc, v),
+    (~loc, v: Parser.Property_object_position.t) => {
+      switch (v) {
+      | `Position(pos) => render_position(~loc, pos)
+      | `Inherit => [%expr `inherit_]
+      | `Initial => [%expr `initial]
+      | `Unset => [%expr `unset]
+      | `Revert => [%expr `revert]
+      | `Revert_layer => [%expr `revertLayer]
+      };
+    },
   );
 
 let pointer_events =

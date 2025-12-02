@@ -12,8 +12,8 @@
         ("--var-1xt8d8f", CSS.Types.Color.toString(CSS.black)),
       ],
     );
-  let fadeIn = "keyframe-85bkd1";
-  let slideIn = "keyframe-onds1p";
+  let fadeIn = `KeyframesName("keyframe-85bkd1");
+  let slideIn = `KeyframesName("keyframe-onds1p");
   ();
   <div className={css(CSS.red)} />;
 

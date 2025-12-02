@@ -12539,9 +12539,10 @@ module TrackGroup = struct
 end
 
 module TrackList = struct
-  type t = [ `TrackList of string | Var.t | Cascading.t ]
+  type t = [ `TrackList of string | `tracks of Track.t array | Var.t | Cascading.t ]
   let toString = function
     | `TrackList s -> s
+    | `tracks x -> Kloth.Array.map_and_join ~f:Track.toString ~sep:{js| |js} x
     | #Var.t as v -> Var.toString v
     | #Cascading.t as c -> Cascading.toString c
 end

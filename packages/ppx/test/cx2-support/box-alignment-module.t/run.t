@@ -1,0 +1,191 @@
+This test ensures the ppx generates the correct output against styled-ppx.native
+If this test fail means that the module is not in sync with the ppx
+  $ cat > dune-project << EOF
+  > (lang dune 3.10)
+  > EOF
+
+  $ cat > dune << EOF
+  > (executable
+  >  (name input)
+  >  (libraries styled-ppx.native)
+  >  (preprocess (pps styled-ppx)))
+  > EOF
+
+  $ dune build
+
+  $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css
+    ".css-wy8jex { align-self: auto; }\n.css-zb22sb { align-self: normal; }\n.css-ub4hfu { align-self: stretch; }\n.css-pocgrr { align-self: baseline; }\n.css-zchczy { align-self: first baseline; }\n.css-1m0hcss { align-self: last baseline; }\n.css-118gvft { align-self: center; }\n.css-3z8q0h { align-self: start; }\n.css-1rjqdb6 { align-self: end; }\n.css-1qbpjdd { align-self: self-start; }\n.css-1tnfyot { align-self: self-end; }\n.css-10cdqs4 { align-self: unsafe start; }\n.css-1lw5c8f { align-self: safe start; }\n.css-9b5rz3 { align-items: normal; }\n.css-1umfusm { align-items: stretch; }\n.css-8fcu6c { align-items: baseline; }\n.css-10ptvgq { align-items: first baseline; }\n.css-zcns5f { align-items: last baseline; }\n.css-17m4bmy { align-items: center; }\n.css-qx6vee { align-items: start; }\n.css-166qhlh { align-items: end; }\n.css-1klot1r { align-items: self-start; }\n.css-19i15os { align-items: self-end; }\n.css-1wl3dx1 { align-items: unsafe start; }\n.css-526w1 { align-items: safe start; }\n.css-ayxb5g { align-content: normal; }\n.css-4hzigj { align-content: baseline; }\n.css-wjq7zu { align-content: first baseline; }\n.css-141i99h { align-content: last baseline; }\n.css-17956mw { align-content: space-between; }\n.css-1is2unp { align-content: space-around; }\n.css-8lco6n { align-content: space-evenly; }\n.css-ibujgy { align-content: stretch; }\n.css-15tujs5 { align-content: center; }\n.css-o62vw1 { align-content: start; }\n.css-a9w2ea { align-content: end; }\n.css-9clcc1 { align-content: flex-start; }\n.css-luqlve { align-content: flex-end; }\n.css-1hrcif0 { align-content: unsafe start; }\n.css-1ssk15e { align-content: safe start; }\n.css-exfr6k { justify-self: auto; }\n.css-1q36bnz { justify-self: normal; }\n.css-excqc9 { justify-self: stretch; }\n.css-1k2m3vx { justify-self: baseline; }\n.css-c6hlzo { justify-self: first baseline; }\n.css-1vf42b7 { justify-self: last baseline; }\n.css-zfem42 { justify-self: center; }\n.css-1mn5wzg { justify-self: start; }\n.css-1k1mwv8 { justify-self: end; }\n.css-twkiu7 { justify-self: self-start; }\n.css-1yrgdxm { justify-self: self-end; }\n.css-1r33hye { justify-self: unsafe start; }\n.css-1stnu0r { justify-self: safe start; }\n.css-br11v0 { justify-self: left; }\n.css-nqzhq6 { justify-self: right; }\n.css-14k8es0 { justify-self: safe right; }\n.css-j17hl4 { justify-items: normal; }\n.css-c80gp3 { justify-items: stretch; }\n.css-19kjl1k { justify-items: baseline; }\n.css-57asjq { justify-items: first baseline; }\n.css-1plibip { justify-items: last baseline; }\n.css-aa1d5x { justify-items: center; }\n.css-1yy5rgv { justify-items: start; }\n.css-kmewbp { justify-items: end; }\n.css-1ds7v9u { justify-items: self-start; }\n.css-ck9vio { justify-items: self-end; }\n.css-rfv75e { justify-items: unsafe start; }\n.css-xj8xm { justify-items: safe start; }\n.css-1nzn526 { justify-items: left; }\n.css-14icz1r { justify-items: right; }\n.css-1rx1bah { justify-items: safe right; }\n.css-v3jwrr { justify-items: legacy; }\n.css-urso87 { justify-items: legacy left; }\n.css-a8unje { justify-items: legacy right; }\n.css-aj04m { justify-items: legacy center; }\n.css-11gux9h { justify-content: normal; }\n.css-x61i8g { justify-content: space-between; }\n.css-1nz7ffr { justify-content: space-around; }\n.css-1pvhdj0 { justify-content: space-evenly; }\n.css-qcgw8h { justify-content: stretch; }\n.css-w5s1ik { justify-content: center; }\n.css-1kohszd { justify-content: start; }\n.css-16uo4t8 { justify-content: end; }\n.css-16fy3cs { justify-content: flex-start; }\n.css-1wmq422 { justify-content: flex-end; }\n.css-1ubeonl { justify-content: unsafe start; }\n.css-iv0zxj { justify-content: safe start; }\n.css-1bxkl15 { justify-content: left; }\n.css-18tr7aq { justify-content: right; }\n.css-doujyx { justify-content: safe right; }\n.css-17y2tfj { place-content: normal; }\n.css-1r3zdfg { place-content: baseline; }\n.css-2pt4in { place-content: first baseline; }\n.css-5vo9xc { place-content: last baseline; }\n.css-17ng3uz { place-content: space-between; }\n.css-1eebuco { place-content: space-around; }\n.css-xktsft { place-content: space-evenly; }\n.css-zrvew1 { place-content: stretch; }\n.css-63zzqc { place-content: center; }\n.css-1nqtk0e { place-content: start; }\n.css-rf8owv { place-content: end; }\n.css-1cfgmg4 { place-content: flex-start; }\n.css-ty0a8p { place-content: flex-end; }\n.css-17enn6y { place-content: unsafe start; }\n.css-1qg0uy2 { place-content: safe start; }\n.css-1qr6a4c { place-content: normal normal; }\n.css-10leewv { place-content: baseline normal; }\n.css-19455l5 { place-content: first baseline normal; }\n.css-vl6ch8 { place-content: space-between normal; }\n.css-ugnopv { place-content: center normal; }\n.css-15tmmbt { place-content: unsafe start normal; }\n.css-kn5tca { place-content: normal stretch; }\n.css-yovcj { place-content: baseline stretch; }\n.css-fpgfgl { place-content: first baseline stretch; }\n.css-y3tcjj { place-content: center stretch; }\n.css-8yfcnw { place-content: unsafe start stretch; }\n.css-98gdc7 { place-content: normal safe right; }\n.css-d7tg82 { place-content: baseline safe right; }\n.css-9gtc48 { place-content: first baseline safe right; }\n.css-1pub7is { place-content: space-between safe right; }\n.css-oyjpza { place-content: center safe right; }\n.css-a6qka9 { place-content: unsafe start safe right; }\n.css-fvkl7p { place-items: normal; }\n.css-1mc5k4r { place-items: stretch; }\n.css-1kbym7q { place-items: baseline; }\n.css-2l1qja { place-items: first baseline; }\n.css-z03ya6 { place-items: last baseline; }\n.css-w59l9f { place-items: center; }\n.css-1l4grdi { place-items: start; }\n.css-dbtdyy { place-items: end; }\n.css-1ysqxfu { place-items: self-start; }\n.css-bjv05b { place-items: self-end; }\n.css-1qvmozo { place-items: unsafe start; }\n.css-firwjw { place-items: safe start; }\n.css-rd9sf8 { place-items: normal normal; }\n.css-1glip5j { place-items: stretch normal; }\n.css-1p5z2w2 { place-items: baseline normal; }\n.css-jmhsnb { place-items: first baseline normal; }\n.css-423a6k { place-items: self-start normal; }\n.css-buq6hk { place-items: unsafe start normal; }\n.css-i08f71 { place-items: normal stretch; }\n.css-kpk6sd { place-items: stretch stretch; }\n.css-13yuome { place-items: baseline stretch; }\n.css-13h4ufn { place-items: first baseline stretch; }\n.css-1dv71s { place-items: self-start stretch; }\n.css-31qrh9 { place-items: unsafe start stretch; }\n.css-1h7d6md { place-items: normal last baseline; }\n.css-gp4uf4 { place-items: stretch last baseline; }\n.css-1k1nv6m { place-items: baseline last baseline; }\n.css-dkhr8e { place-items: first baseline last baseline; }\n.css-1y7f5gx { place-items: self-start last baseline; }\n.css-1m8qqrc { place-items: unsafe start last baseline; }\n.css-19zd3po { place-items: normal legacy left; }\n.css-1aue1jp { place-items: stretch legacy left; }\n.css-1ccxtxr { place-items: baseline legacy left; }\n.css-1due9z9 { place-items: first baseline legacy left; }\n.css-xjn5jt { place-items: self-start legacy left; }\n.css-1d1ohf5 { place-items: unsafe start legacy left; }\n.css-1tvnijo { gap: 0 0; }\n.css-zqcota { gap: 0 1em; }\n.css-1c1d9ih { gap: 1em; }\n.css-12ml49u { gap: 1em 1em; }\n.css-1o2qscg { column-gap: 0; }\n.css-7fnmgb { column-gap: 1em; }\n.css-vns7ki { column-gap: normal; }\n.css-1js38jn { row-gap: 0; }\n.css-lp9qej { row-gap: 1em; }\n.css-kz5etj { margin-trim: none; }\n.css-188px43 { margin-trim: in-flow; }\n.css-9pvm3h { margin-trim: all; }\n"
+  ];
+  CSS.make("css-wy8jex", []);
+  CSS.make("css-zb22sb", []);
+  CSS.make("css-ub4hfu", []);
+  CSS.make("css-pocgrr", []);
+  CSS.make("css-zchczy", []);
+  CSS.make("css-1m0hcss", []);
+  CSS.make("css-118gvft", []);
+  CSS.make("css-3z8q0h", []);
+  CSS.make("css-1rjqdb6", []);
+  CSS.make("css-1qbpjdd", []);
+  CSS.make("css-1tnfyot", []);
+  CSS.make("css-10cdqs4", []);
+  CSS.make("css-1lw5c8f", []);
+  CSS.make("css-9b5rz3", []);
+  CSS.make("css-1umfusm", []);
+  CSS.make("css-8fcu6c", []);
+  CSS.make("css-10ptvgq", []);
+  CSS.make("css-zcns5f", []);
+  CSS.make("css-17m4bmy", []);
+  CSS.make("css-qx6vee", []);
+  CSS.make("css-166qhlh", []);
+  CSS.make("css-1klot1r", []);
+  CSS.make("css-19i15os", []);
+  CSS.make("css-1wl3dx1", []);
+  CSS.make("css-526w1", []);
+  CSS.make("css-ayxb5g", []);
+  CSS.make("css-4hzigj", []);
+  CSS.make("css-wjq7zu", []);
+  CSS.make("css-141i99h", []);
+  CSS.make("css-17956mw", []);
+  CSS.make("css-1is2unp", []);
+  CSS.make("css-8lco6n", []);
+  CSS.make("css-ibujgy", []);
+  CSS.make("css-15tujs5", []);
+  CSS.make("css-o62vw1", []);
+  CSS.make("css-a9w2ea", []);
+  CSS.make("css-9clcc1", []);
+  CSS.make("css-luqlve", []);
+  CSS.make("css-1hrcif0", []);
+  CSS.make("css-1ssk15e", []);
+  CSS.make("css-exfr6k", []);
+  CSS.make("css-1q36bnz", []);
+  CSS.make("css-excqc9", []);
+  CSS.make("css-1k2m3vx", []);
+  CSS.make("css-c6hlzo", []);
+  CSS.make("css-1vf42b7", []);
+  CSS.make("css-zfem42", []);
+  CSS.make("css-1mn5wzg", []);
+  CSS.make("css-1k1mwv8", []);
+  CSS.make("css-twkiu7", []);
+  CSS.make("css-1yrgdxm", []);
+  CSS.make("css-1r33hye", []);
+  CSS.make("css-1stnu0r", []);
+  CSS.make("css-br11v0", []);
+  CSS.make("css-nqzhq6", []);
+  CSS.make("css-14k8es0", []);
+  CSS.make("css-j17hl4", []);
+  CSS.make("css-c80gp3", []);
+  CSS.make("css-19kjl1k", []);
+  CSS.make("css-57asjq", []);
+  CSS.make("css-1plibip", []);
+  CSS.make("css-aa1d5x", []);
+  CSS.make("css-1yy5rgv", []);
+  CSS.make("css-kmewbp", []);
+  CSS.make("css-1ds7v9u", []);
+  CSS.make("css-ck9vio", []);
+  CSS.make("css-rfv75e", []);
+  CSS.make("css-xj8xm", []);
+  CSS.make("css-1nzn526", []);
+  CSS.make("css-14icz1r", []);
+  CSS.make("css-1rx1bah", []);
+  CSS.make("css-v3jwrr", []);
+  CSS.make("css-urso87", []);
+  CSS.make("css-a8unje", []);
+  CSS.make("css-aj04m", []);
+  CSS.make("css-11gux9h", []);
+  CSS.make("css-x61i8g", []);
+  CSS.make("css-1nz7ffr", []);
+  CSS.make("css-1pvhdj0", []);
+  CSS.make("css-qcgw8h", []);
+  CSS.make("css-w5s1ik", []);
+  CSS.make("css-1kohszd", []);
+  CSS.make("css-16uo4t8", []);
+  CSS.make("css-16fy3cs", []);
+  CSS.make("css-1wmq422", []);
+  CSS.make("css-1ubeonl", []);
+  CSS.make("css-iv0zxj", []);
+  CSS.make("css-1bxkl15", []);
+  CSS.make("css-18tr7aq", []);
+  CSS.make("css-doujyx", []);
+  CSS.make("css-17y2tfj", []);
+  CSS.make("css-1r3zdfg", []);
+  CSS.make("css-2pt4in", []);
+  CSS.make("css-5vo9xc", []);
+  CSS.make("css-17ng3uz", []);
+  CSS.make("css-1eebuco", []);
+  CSS.make("css-xktsft", []);
+  CSS.make("css-zrvew1", []);
+  CSS.make("css-63zzqc", []);
+  CSS.make("css-1nqtk0e", []);
+  CSS.make("css-rf8owv", []);
+  CSS.make("css-1cfgmg4", []);
+  CSS.make("css-ty0a8p", []);
+  CSS.make("css-17enn6y", []);
+  CSS.make("css-1qg0uy2", []);
+  CSS.make("css-1qr6a4c", []);
+  CSS.make("css-10leewv", []);
+  CSS.make("css-19455l5", []);
+  CSS.make("css-vl6ch8", []);
+  CSS.make("css-ugnopv", []);
+  CSS.make("css-15tmmbt", []);
+  CSS.make("css-kn5tca", []);
+  CSS.make("css-yovcj", []);
+  CSS.make("css-fpgfgl", []);
+  CSS.make("css-y3tcjj", []);
+  CSS.make("css-8yfcnw", []);
+  CSS.make("css-98gdc7", []);
+  CSS.make("css-d7tg82", []);
+  CSS.make("css-9gtc48", []);
+  CSS.make("css-1pub7is", []);
+  CSS.make("css-oyjpza", []);
+  CSS.make("css-a6qka9", []);
+  CSS.make("css-fvkl7p", []);
+  CSS.make("css-1mc5k4r", []);
+  CSS.make("css-1kbym7q", []);
+  CSS.make("css-2l1qja", []);
+  CSS.make("css-z03ya6", []);
+  CSS.make("css-w59l9f", []);
+  CSS.make("css-1l4grdi", []);
+  CSS.make("css-dbtdyy", []);
+  CSS.make("css-1ysqxfu", []);
+  CSS.make("css-bjv05b", []);
+  CSS.make("css-1qvmozo", []);
+  CSS.make("css-firwjw", []);
+  CSS.make("css-rd9sf8", []);
+  CSS.make("css-1glip5j", []);
+  CSS.make("css-1p5z2w2", []);
+  CSS.make("css-jmhsnb", []);
+  CSS.make("css-423a6k", []);
+  CSS.make("css-buq6hk", []);
+  CSS.make("css-i08f71", []);
+  CSS.make("css-kpk6sd", []);
+  CSS.make("css-13yuome", []);
+  CSS.make("css-13h4ufn", []);
+  CSS.make("css-1dv71s", []);
+  CSS.make("css-31qrh9", []);
+  CSS.make("css-1h7d6md", []);
+  CSS.make("css-gp4uf4", []);
+  CSS.make("css-1k1nv6m", []);
+  CSS.make("css-dkhr8e", []);
+  CSS.make("css-1y7f5gx", []);
+  CSS.make("css-1m8qqrc", []);
+  CSS.make("css-19zd3po", []);
+  CSS.make("css-1aue1jp", []);
+  CSS.make("css-1ccxtxr", []);
+  CSS.make("css-1due9z9", []);
+  CSS.make("css-xjn5jt", []);
+  CSS.make("css-1d1ohf5", []);
+  
+  CSS.make("css-1tvnijo", []);
+  CSS.make("css-zqcota", []);
+  CSS.make("css-1c1d9ih", []);
+  CSS.make("css-12ml49u", []);
+  CSS.make("css-1o2qscg", []);
+  CSS.make("css-7fnmgb", []);
+  CSS.make("css-vns7ki", []);
+  CSS.make("css-1js38jn", []);
+  CSS.make("css-lp9qej", []);
+  
+  CSS.make("css-kz5etj", []);
+  CSS.make("css-188px43", []);
+  CSS.make("css-9pvm3h", []);

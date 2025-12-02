@@ -12,7 +12,7 @@ module type RULE = sig
   val to_string : t -> string
   val runtime_module : (module RUNTIME_TYPE) option
   val runtime_module_path : string option
-  val extract_interpolations : t -> string list
+  val extract_interpolations : t -> (string * string) list
 end
 
 type length =
@@ -179,41 +179,6 @@ type kind =
 let registry_tbl : (string, kind * (module RULE) * Types.packed_witness option) Hashtbl.t =
   Hashtbl.create 1000
 
-(* Type-safe lookup using GADT witness.
-
-   The witness encodes the expected type 'a, and we use it to get the CSS name
-   for lookup in the hashtable. The lookup is deferred to parse time (lazy)
-   because modules reference each other before the registry is populated.
-
-   Why Obj.magic is Unavoidable but Safe:
-
-   OCaml's first-class modules (module RULE) use existential quantification to
-   hide the concrete type M.t. When we pack a module, the type information is
-   erased. The GADT witness system provides a type-level proof that we can use
-   to recover the type safely:
-
-   1. Registration: When Property_color is registered with W_property_color,
-      both refer to the same type (property_color).
-   2. Lookup: When we call lookup with W_property_color, we get back the
-      registry entry and verify the stored witness matches.
-   3. Cast: The Types.Refl proof from witness_eq proves a = b, so casting
-      M.rule to type 'a Rule.rule is sound.
-
-   The Obj.magic is needed because OCaml cannot express "unpack this module
-   at the type proven by this GADT". This is a known limitation of OCaml's
-   type system with first-class modules.
-
-   Alternative Approaches Considered:
-   - Generating a lookup function with explicit pattern matching for all 1000+
-     types would eliminate Obj.magic but create massive code bloat.
-   - Using a typeclass-style encoding would require significant refactoring.
-
-   Safety Guarantees - The following invariants are maintained to ensure type safety:
-   1. Modules are only registered with their correct witness (enforced by ppx generation)
-   2. witness_eq only returns Refl when witnesses are physically equal
-   3. _verify_witnesses in Types.ml catches any witness/type mismatches at compile time
-
-   Example: lookup Types.W_property_color returns Types.property_color Rule.rule *)
 let lookup : type a. a Types.witness -> a Rule.rule =
  fun witness tokens ->
   let name = Types.witness_to_name witness in
@@ -4226,7 +4191,7 @@ module Property_object_fit =
 module Property_object_position =
   [%spec_module
   "property_object_position",
-  "<position>",
+  "<position> | 'inherit' | 'initial' | 'unset' | 'revert' | 'revert-layer'",
   (module Css_types.ObjectPosition : RUNTIME_TYPE)]
 
 module Property_offset =
@@ -7100,6 +7065,7 @@ let registry : (kind * (module RULE)) list =
     Property "-webkit-box-orient", (module Property_box_orient : RULE);
     Property "box-pack", (module Property_box_pack : RULE);
     Property "box-shadow", (module Property_box_shadow : RULE);
+    Property "-webkit-box-shadow", (module Property_box_shadow : RULE);
     Property "clip", (module Property_clip : RULE);
     Property "clip-path", (module Property_clip_path : RULE);
     Property "color", (module Property_color : RULE);
@@ -7851,3 +7817,15 @@ let check_property ~loc ~name value :
     | Ok _ -> Ok ()
     | Error message -> Error (loc, `Invalid_value message))
   | None -> Error (loc, `Property_not_found)
+
+(* Extract interpolation types from a property value.
+   Returns a list of (variable_name, type_path) pairs.
+   The type_path is the Css_types module path for the interpolation position. *)
+let get_interpolation_types ~name value : (string * string) list =
+  match find_rule name with
+  | Some rule ->
+    let module R = (val rule : RULE) in
+    (match parse R.rule value with
+    | Ok parsed_value -> R.extract_interpolations parsed_value
+    | Error _ -> [])
+  | None -> []

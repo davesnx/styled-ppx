@@ -192,11 +192,13 @@ let success_tests =
        div/*nice*//* nice *//*ice*/.b {}|},
          [WS, TAG("div"), DOT, TAG("b"), WS, LEFT_BRACE, RIGHT_BRACE],
        ), */
-    /* TODO: Support for escaped */
-    /* (__POS__, {|\32|}, [NUMBER("\32")]), */
-    /* (__POS__, {|\25BA|}, [NUMBER "\25BA"]), */
-    /* TODO: Support escaped "@" and others */
-    /* ("\\@desu", [IDENT("@desu")]), */
+    /* CSS escape sequences - \32 is hex for '2', \2020 is dagger */
+    (__POS__, {|\32 style|}, [IDENT("2style")]),
+    (__POS__, {|\32style|}, [IDENT("2style")]),
+    (__POS__, {|"\2020"|}, [STRING("\xe2\x80\xa0")]), /* U+2020 DAGGER */
+    (__POS__, {|'\2020'|}, [STRING("\xe2\x80\xa0")]), /* U+2020 DAGGER */
+    (__POS__, {|"\2021"|}, [STRING("\xe2\x80\xa1")]), /* U+2021 DOUBLE DAGGER */
+    (__POS__, {|"\A7"|}, [STRING("\xc2\xa7")]), /* U+00A7 SECTION SIGN */
   ]
   |> List.map(((pos, input, output)) => {
        let okInput = Lexer.tokenize(input) |> Result.get_ok;

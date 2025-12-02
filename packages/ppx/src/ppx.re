@@ -846,7 +846,12 @@ let keyframe2_extension =
           switch (Styled_ppx_css_parser.Driver.parse_keyframes(txt)) {
           | Ok(declarations) =>
             let keyframe_name = Css_file.push_keyframe(declarations);
-            Builder.estring(~loc=stringLoc, keyframe_name);
+            /* Return `KeyframesName(name) variant so it can be used with cx2 animation-name */
+            Builder.pexp_variant(
+              ~loc=stringLoc,
+              "KeyframesName",
+              Some(Builder.estring(~loc=stringLoc, keyframe_name)),
+            );
           | Error((start_pos, end_pos, msg)) =>
             let loc =
               Styled_ppx_css_parser.Parser_location.make_loc_from_pos(

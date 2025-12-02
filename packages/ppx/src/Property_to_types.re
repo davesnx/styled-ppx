@@ -35,6 +35,10 @@ let make_to_string_call = (~loc, module_name, value_expr) => {
  * Properties not in this table will have their name converted to PascalCase.
  */
 let property_to_module_mapping = [
+  /* Vendor-prefixed properties - map to their non-prefixed module */
+  ("-webkit-box-shadow", "Shadow"),
+  ("box-shadow", "Shadow"),
+  ("-webkit-box-orient", "BoxOrient"),
   /* Color properties - use Color module */
   ("background-color", "Color"),
   ("border-color", "Color"),
@@ -280,20 +284,27 @@ let get_interpolation_tostrings =
     module M = (val spec_module: Css_grammar.Parser.RULE);
     switch (M.runtime_module_path) {
     | None => Error("Property has no runtime module path: " ++ property_name)
-    | Some(runtime_path) =>
+    | Some(default_runtime_path) =>
       switch (M.parse(value)) {
       | Error(parse_error) => Error("Failed to parse value: " ++ parse_error)
       | Ok(parsed_value) =>
-        let interpolation_names = M.extract_interpolations(parsed_value);
-        let to_string_path = runtime_path ++ ".toString";
+        /* extract_interpolations returns (name, type_path) pairs */
+        let interpolations = M.extract_interpolations(parsed_value);
         let infos =
-          interpolation_names
-          |> List.map(variable_name =>
+          interpolations
+          |> List.map(((variable_name, type_path)) => {
+               /* Use specific type_path if available, otherwise fall back to property's runtime path */
+               let effective_path =
+                 if (type_path != "") {
+                   type_path;
+                 } else {
+                   default_runtime_path;
+                 };
                {
                  variable_name,
-                 to_string_path,
-               }
-             );
+                 to_string_path: effective_path ++ ".toString",
+               };
+             });
         Ok(infos);
       }
     };
@@ -354,22 +365,27 @@ let parse_and_extract_interpolations =
     module M = (val spec_module: Css_grammar.Parser.RULE);
     switch (M.runtime_module_path) {
     | None => Error("Property has no runtime module path: " ++ property_name)
-    | Some(runtime_path) =>
+    | Some(default_runtime_path) =>
       switch (M.parse(value)) {
       | Error(parse_error) => Error("Failed to parse value: " ++ parse_error)
       | Ok(parsed_value) =>
-        /* parsed_value : M.t - the type is abstract but we can work with it
-           through M's operations which all use the same type */
-        let interpolation_names = M.extract_interpolations(parsed_value);
-        let to_string_path = runtime_path ++ ".toString";
+        /* parsed_value : M.t - extract_interpolations returns (name, type_path) pairs */
+        let interpolations = M.extract_interpolations(parsed_value);
         let infos =
-          interpolation_names
-          |> List.map(variable_name =>
+          interpolations
+          |> List.map(((variable_name, type_path)) => {
+               /* Use specific type_path if available, otherwise fall back to property's runtime path */
+               let effective_path =
+                 if (type_path != "") {
+                   type_path;
+                 } else {
+                   default_runtime_path;
+                 };
                {
                  variable_name,
-                 to_string_path,
-               }
-             );
+                 to_string_path: effective_path ++ ".toString",
+               };
+             });
         Ok(infos);
       }
     };

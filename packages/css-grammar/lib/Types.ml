@@ -3809,7 +3809,14 @@ and property_object_fit =
   | `Scale_down
   ]
 
-and property_object_position = position
+and property_object_position =
+  [ `Position of position
+  | `Inherit
+  | `Initial
+  | `Unset
+  | `Revert
+  | `Revert_layer
+  ]
 
 and property_offset =
   (property_offset_position option

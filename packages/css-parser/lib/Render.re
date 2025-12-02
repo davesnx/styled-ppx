@@ -169,13 +169,40 @@ and selector = (ast: Ast.selector) => {
 and selector_list = (ast: Ast.selector_list) => {
   ast |> List.map(fst) |> List.map(selector) |> String.concat(",");
 }
+/* CSS identifiers that start with a digit or hyphen-digit need escaping.
+   When an escape sequence like \32 is parsed, it becomes "2" in the AST.
+   When rendering back, we need to escape it to maintain validity.
+   Format: \XX where XX is the hex code, followed by a space to terminate. */
+and escape_ident_if_needed = (ident: string) => {
+  if (String.length(ident) == 0) {
+    ident;
+  } else {
+    let first_char = ident.[0];
+    let needs_escape =
+      /* Starts with a digit (0-9) */
+      (first_char >= '0' && first_char <= '9')
+      /* Or starts with hyphen followed by digit */
+      || (first_char == '-'
+          && String.length(ident) > 1
+          && ident.[1] >= '0'
+          && ident.[1] <= '9');
+    if (needs_escape) {
+      /* Escape the first character as \HH followed by space */
+      let hex = Printf.sprintf("\\%X ", Char.code(first_char));
+      hex ++ String.sub(ident, 1, String.length(ident) - 1);
+    } else {
+      ident;
+    };
+  };
+}
+
 and component_value = (ast: Ast.component_value) => {
   switch (ast) {
   | Whitespace => " "
   | Paren_block(block) => "(" ++ component_value_list(block) ++ ")"
   | Bracket_block(block) => "[" ++ component_value_list(block) ++ "]"
   | Percentage(string) => string ++ "%"
-  | Ident(string) => string
+  | Ident(string) => escape_ident_if_needed(string)
   | String(string) => "\"" ++ string ++ "\""
   | Uri(string) => "url(\"" ++ string ++ "\")"
   | Operator(string) => string
