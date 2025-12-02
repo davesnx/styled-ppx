@@ -100,10 +100,7 @@ let extract_spec_string = (expr: expression): option(string) =>
   };
 
 /* Pattern for spec_module: captures the whole payload expression */
-let spec_module_pattern =
-  Ast_pattern.(
-    pstr(pstr_eval(__, nil) ^:: nil)
-  );
+let spec_module_pattern = Ast_pattern.(pstr(pstr_eval(__, nil) ^:: nil));
 
 /* Unified expander for spec_module - handles multiple forms:
    1. [%spec_module "spec_string"] - generates inline type
@@ -144,8 +141,7 @@ let spec_module_expander =
           )
         };
       /* Form 3: [%spec_module "spec_string", (module ...)] */
-      | [spec_expr, witness_expr]
-          when extract_spec_string(spec_expr) != None =>
+      | [spec_expr, witness_expr] when extract_spec_string(spec_expr) != None =>
         switch (extract_spec_string(spec_expr)) {
         | Some(s) =>
           let runtime_path =

@@ -25,8 +25,8 @@ let animationDirection x =
 let animationDirections x =
   Rule.declaration
     ( {js|animationDirection|js},
-      Kloth.Array.map_and_join ~sep:{js|, |js}
-        ~f:AnimationDirection.toString x )
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:AnimationDirection.toString x
+    )
 
 let animationDuration x =
   Rule.declaration ({js|animationDuration|js}, AnimationDuration.toString x)
@@ -42,8 +42,8 @@ let animationFillMode x =
 let animationFillModes x =
   Rule.declaration
     ( {js|animationFillMode|js},
-      Kloth.Array.map_and_join ~sep:{js|, |js}
-        ~f:AnimationFillMode.toString x )
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:AnimationFillMode.toString x
+    )
 
 let animationIterationCount x =
   Rule.declaration

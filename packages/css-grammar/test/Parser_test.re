@@ -10,9 +10,19 @@ let test_flex_grow_with_interpolation = () => {
     | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
     | Ok(parsed_value) =>
       let interps = M.extract_interpolations(parsed_value);
-      Alcotest.check(Alcotest.int, "should have one interpolation", 1, List.length(interps));
+      Alcotest.check(
+        Alcotest.int,
+        "should have one interpolation",
+        1,
+        List.length(interps),
+      );
       let (var_name, _type_path) = List.hd(interps);
-      Alcotest.check(Alcotest.string, "variable name should be myVar", "myVar", var_name);
+      Alcotest.check(
+        Alcotest.string,
+        "variable name should be myVar",
+        "myVar",
+        var_name,
+      );
     };
   };
 };
@@ -47,9 +57,19 @@ let test_overflow_with_interpolation = () => {
     | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
     | Ok(parsed_value) =>
       let interps = M.extract_interpolations(parsed_value);
-      Alcotest.check(Alcotest.int, "should have one interpolation", 1, List.length(interps));
+      Alcotest.check(
+        Alcotest.int,
+        "should have one interpolation",
+        1,
+        List.length(interps),
+      );
       let (var_name, _type_path) = List.hd(interps);
-      Alcotest.check(Alcotest.string, "variable name should be x", "x", var_name);
+      Alcotest.check(
+        Alcotest.string,
+        "variable name should be x",
+        "x",
+        var_name,
+      );
     };
   };
 };
@@ -64,9 +84,19 @@ let test_flex_basis_with_interpolation = () => {
     | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
     | Ok(parsed_value) =>
       let interps = M.extract_interpolations(parsed_value);
-      Alcotest.check(Alcotest.int, "should have one interpolation", 1, List.length(interps));
+      Alcotest.check(
+        Alcotest.int,
+        "should have one interpolation",
+        1,
+        List.length(interps),
+      );
       let (var_name, _type_path) = List.hd(interps);
-      Alcotest.check(Alcotest.string, "variable name should be basis", "basis", var_name);
+      Alcotest.check(
+        Alcotest.string,
+        "variable name should be basis",
+        "basis",
+        var_name,
+      );
     };
   };
 };
@@ -280,7 +310,10 @@ let test_property_value_separation = () => {
 
 let tests = [
   test("flex-grow with interpolation", test_flex_grow_with_interpolation),
-  test("flex-grow without interpolation", test_flex_grow_without_interpolation),
+  test(
+    "flex-grow without interpolation",
+    test_flex_grow_without_interpolation,
+  ),
   test("overflow with interpolation", test_overflow_with_interpolation),
   test("flex-basis with interpolation", test_flex_basis_with_interpolation),
   test("unregistered property", test_unregistered_property),

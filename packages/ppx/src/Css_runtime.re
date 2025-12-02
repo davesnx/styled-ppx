@@ -554,8 +554,13 @@ let render_make_call = (~loc, ~classNames, ~dynamic_vars) => {
            if (String.length(type_path) > 10
                && String.sub(type_path, 0, 10) == "Css_types.") {
              /* Extract module name from "Css_types.Color" -> "Color" */
-             let module_name = String.sub(type_path, 10, String.length(type_path) - 10);
-             Property_to_types.make_to_string_call(~loc, module_name, var_value);
+             let module_name =
+               String.sub(type_path, 10, String.length(type_path) - 10);
+             Property_to_types.make_to_string_call(
+               ~loc,
+               module_name,
+               var_value,
+             );
            } else {
              /* Fall back to property-name-based lookup */
              Property_to_types.get_to_string_for_property(

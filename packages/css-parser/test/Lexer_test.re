@@ -198,7 +198,7 @@ let success_tests =
     (__POS__, {|"\2020"|}, [STRING("\xe2\x80\xa0")]), /* U+2020 DAGGER */
     (__POS__, {|'\2020'|}, [STRING("\xe2\x80\xa0")]), /* U+2020 DAGGER */
     (__POS__, {|"\2021"|}, [STRING("\xe2\x80\xa1")]), /* U+2021 DOUBLE DAGGER */
-    (__POS__, {|"\A7"|}, [STRING("\xc2\xa7")]), /* U+00A7 SECTION SIGN */
+    (__POS__, {|"\A7"|}, [STRING("\xc2\xa7")]) /* U+00A7 SECTION SIGN */
   ]
   |> List.map(((pos, input, output)) => {
        let okInput = Lexer.tokenize(input) |> Result.get_ok;

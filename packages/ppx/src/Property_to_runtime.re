@@ -1168,7 +1168,7 @@ let object_position =
       | `Unset => [%expr `unset]
       | `Revert => [%expr `revert]
       | `Revert_layer => [%expr `revertLayer]
-      };
+      }
     },
   );
 
