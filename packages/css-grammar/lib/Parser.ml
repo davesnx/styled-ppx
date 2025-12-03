@@ -2897,7 +2897,9 @@ module Property_box_pack =
 
 module Property_box_shadow =
   [%spec_module
-  "property_box_shadow", "'none' | <interpolation> | [ <shadow> ]#"]
+  "property_box_shadow",
+  "'none' | <interpolation> | [ <shadow> ]#",
+  (module Css_types.BoxShadow : RUNTIME_TYPE)]
 
 module Property_box_sizing =
   [%spec_module
@@ -5072,7 +5074,9 @@ module Property_text_rendering =
 
 module Property_text_shadow =
   [%spec_module
-  "property_text_shadow", "'none' | <interpolation> | [ <shadow-t> ]#"]
+  "property_text_shadow",
+  "'none' | <interpolation> | [ <shadow-t> ]#",
+  (module Css_types.TextShadow : RUNTIME_TYPE)]
 
 module Property_text_size_adjust =
   [%spec_module
@@ -5957,7 +5961,7 @@ module Shadow_t =
   [%spec_module
   "shadow_t",
   "[ <extended-length> | <interpolation> ]{3} [ <color> | <interpolation> ]?",
-  (module Css_types.ShadowT : RUNTIME_TYPE)]
+  (module Css_types.TextShadow : RUNTIME_TYPE)]
 
 module Shape =
   [%spec_module
@@ -7817,7 +7821,8 @@ let check_property ~loc ~name value :
     let rule_with_interpolation =
       Combinators.xor
         [
-          Rule.Match.map Standard.interpolation (fun data -> `Interpolation data);
+          Rule.Match.map Standard.interpolation (fun data ->
+            `Interpolation data);
           Rule.Match.map R.rule (fun data -> `Value data);
         ]
     in
@@ -7838,7 +7843,8 @@ let get_interpolation_types ~name value : (string * string) list =
     let rule_with_interpolation =
       Combinators.xor
         [
-          Rule.Match.map Standard.interpolation (fun data -> `Interpolation data);
+          Rule.Match.map Standard.interpolation (fun data ->
+            `Interpolation data);
           Rule.Match.map R.rule (fun data -> `Value data);
         ]
     in
@@ -7846,7 +7852,7 @@ let get_interpolation_types ~name value : (string * string) list =
     | Ok (`Interpolation parts) ->
       (* Complete interpolation - use the property's runtime module path *)
       let type_path = Option.value ~default:"" R.runtime_module_path in
-      [ (String.concat "." parts, type_path) ]
+      [ String.concat "." parts, type_path ]
     | Ok (`Value parsed_value) ->
       (* Regular value - extract any partial interpolations *)
       R.extract_interpolations parsed_value

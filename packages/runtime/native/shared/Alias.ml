@@ -255,13 +255,9 @@ let manipulation = `manipulation
 let subgrid = Track.subgrid
 let lineNames = Track.lineNames
 
-module Shadow = struct
-  type box = Css_types.Shadow.box Css_types.Shadow.t
-  type text = Css_types.Shadow.text Css_types.Shadow.t
-
-  let box = Css_types.Shadow.box
-  let text = Css_types.Shadow.text
-end
+module Shadow = Css_types.Shadow
+module BoxShadow = Css_types.BoxShadow
+module TextShadow = Css_types.TextShadow
 
 module Animation = struct
   (* backwards compatibility *)

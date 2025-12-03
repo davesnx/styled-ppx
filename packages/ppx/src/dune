@@ -12,7 +12,6 @@
   sedlex
   ppxlib
   ppxlib.astlib
-  ppx_deriving_yojson.runtime
   yojson
   murmur2
   unix)

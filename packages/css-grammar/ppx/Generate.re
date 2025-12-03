@@ -788,6 +788,17 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     | Terminal(Property_type(name), _) => Some(name)
     | Group(inner, _) => get_type_name_from_spec(inner)
     | Combinator(Xor, [single]) => get_type_name_from_spec(single)
+    /* For multi-element Xor (like [ <color> | <interpolation> ]),
+       find the first non-interpolation type */
+    | Combinator(Xor, options) =>
+      List.find_map(
+        opt =>
+          switch (opt) {
+          | Terminal(Data_type("interpolation"), _) => None
+          | _ => get_type_name_from_spec(opt)
+          },
+        options,
+      )
     | _ => None
     };
   };
@@ -902,6 +913,15 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
                 | _ => true
                 };
               if (has_content && spec_contains_interpolation(inner_spec)) {
+                /* For direct interpolation terminals, use the property's runtime_module_path
+                   (type_context) instead of the sibling-derived type. This ensures that
+                   complete interpolations like $(x) use the property type (BoxShadow)
+                   rather than the sibling value type (Shadow). */
+                let context_for_this_spec =
+                  switch (inner_spec) {
+                  | Terminal(Data_type("interpolation"), _) => type_context
+                  | _ => effective_context
+                  };
                 case(
                   ~lhs=ppat_variant(name, Some(pvar("inner"))),
                   ~guard=None,
@@ -909,7 +929,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
                     generate_typed_extraction(
                       inner_spec,
                       evar("inner"),
-                      effective_context,
+                      context_for_this_spec,
                     ),
                 );
               } else {

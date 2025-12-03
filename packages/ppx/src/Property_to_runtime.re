@@ -1265,7 +1265,7 @@ let render_box_shadow = (~loc, shadow) => {
          Option.map(value => (label, value), value)
        );
 
-  Builder.pexp_apply(~loc, [%expr CSS.Shadow.box], args);
+  Builder.pexp_apply(~loc, [%expr CSS.BoxShadow.box], args);
 };
 
 let background_color =
@@ -2853,7 +2853,7 @@ let render_text_shadow = (~loc, shadow) => {
          Option.map(value => (label, value), value)
        );
 
-  Builder.pexp_apply(~loc, [%expr CSS.Shadow.text], args);
+  Builder.pexp_apply(~loc, [%expr CSS.TextShadow.text], args);
 };
 
 let text_shadow =

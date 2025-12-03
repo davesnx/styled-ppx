@@ -36,8 +36,9 @@ let make_to_string_call = (~loc, module_name, value_expr) => {
  */
 let property_to_module_mapping = [
   /* Vendor-prefixed properties - map to their non-prefixed module */
-  ("-webkit-box-shadow", "Shadow"),
-  ("box-shadow", "Shadow"),
+  ("-webkit-box-shadow", "BoxShadow"),
+  ("box-shadow", "BoxShadow"),
+  ("text-shadow", "TextShadow"),
   ("-webkit-box-orient", "BoxOrient"),
   /* Color properties - use Color module */
   ("background-color", "Color"),

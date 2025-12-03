@@ -1,5 +1,3 @@
-(* TODO: Split Types and Properties from this file, types are (the rest are properties) https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Types *)
-
 module Cascading = struct
   type t =
     [ `initial
@@ -3441,46 +3439,83 @@ module SideOrCorner = struct
     | `BottomRight -> "to bottom right"
 end
 
+(* Shadow module handles the actual shadow value rendering *)
 module Shadow = struct
-  type 'a value = string
-  type box
-  type text
+  type t = string
 
-  type 'a t =
-    [ `shadow of 'a value
+  let box ?(x = `zero) ?(y = `zero) ?(blur = `zero) ?(spread = `zero)
+    ?(inset = false) (color : Color.t) : t =
+    Length.toString x
+    ^ {js| |js}
+    ^ Length.toString y
+    ^ {js| |js}
+    ^ Length.toString blur
+    ^ {js| |js}
+    ^ Length.toString spread
+    ^ {js| |js}
+    ^ Color.toString color
+    ^ if inset then {js| inset|js} else {js||js}
+
+  let text ?(x = `zero) ?(y = `zero) ?(blur = `zero) (color : Color.t) : t =
+    Length.toString x
+    ^ {js| |js}
+    ^ Length.toString y
+    ^ {js| |js}
+    ^ Length.toString blur
+    ^ {js| |js}
+    ^ Color.toString color
+
+  let toString (x : t) = x
+
+  let many (arr : t array) : string =
+    Kloth.Array.map_and_join ~sep:{js|, |js} ~f:toString arr
+end
+
+(* BoxShadow wraps Shadow.t with property-level variants *)
+module BoxShadow = struct
+  type t =
+    [ `shadow of Shadow.t
+    | `shadows of Shadow.t array
     | None.t
     | Var.t
     | Cascading.t
     ]
 
-  let box ?(x = `zero) ?(y = `zero) ?(blur = `zero) ?(spread = `zero)
-    ?(inset = false) (color : Color.t) : box t =
-    `shadow
-      (Length.toString x
-      ^ {js| |js}
-      ^ Length.toString y
-      ^ {js| |js}
-      ^ Length.toString blur
-      ^ {js| |js}
-      ^ Length.toString spread
-      ^ {js| |js}
-      ^ Color.toString color
-      ^ if inset then {js| inset|js} else {js||js})
+  (* Create a single box shadow *)
+  let box = Shadow.box
 
-  let text ?(x = `zero) ?(y = `zero) ?(blur = `zero) (color : Color.t) : text t
-      =
-    `shadow
-      (Length.toString x
-      ^ {js| |js}
-      ^ Length.toString y
-      ^ {js| |js}
-      ^ Length.toString blur
-      ^ {js| |js}
-      ^ Color.toString color)
+  (* Wrap an array of shadows into BoxShadow.t *)
+  let make (arr : Shadow.t array) : t = `shadows arr
 
-  let toString (x : 'a t) =
+  let toString (x : t) : string =
     match x with
-    | `shadow x -> x
+    | `shadow s -> Shadow.toString s
+    | `shadows arr -> Shadow.many arr
+    | #None.t -> None.toString
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+(* TextShadow wraps Shadow.t with property-level variants *)
+module TextShadow = struct
+  type t =
+    [ `shadow of Shadow.t
+    | `shadows of Shadow.t array
+    | None.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  (* Create a single text shadow *)
+  let text = Shadow.text
+
+  (* Wrap an array of shadows into TextShadow.t *)
+  let make (arr : Shadow.t array) : t = `shadows arr
+
+  let toString (x : t) : string =
+    match x with
+    | `shadow s -> Shadow.toString s
+    | `shadows arr -> Shadow.many arr
     | #None.t -> None.toString
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
@@ -8197,27 +8232,6 @@ end
 
 module Padding = struct
   include Margin
-end
-
-(* Box shadow and text shadow - use custom strings for now *)
-module BoxShadowValue = struct
-  type t =
-    [ `shadow of string
-    | None.t
-    | Var.t
-    | Cascading.t
-    ]
-
-  let toString x =
-    match x with
-    | `shadow s -> s
-    | #None.t -> None.toString
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
-end
-
-module TextShadowValue = struct
-  include BoxShadowValue
 end
 
 (* Remaining voice properties *)
@@ -13950,19 +13964,6 @@ module SelfPosition = struct
 
   let toString = function
     | `SelfPosition s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
-end
-
-module ShadowT = struct
-  type t =
-    [ `ShadowT of string
-    | Var.t
-    | Cascading.t
-    ]
-
-  let toString = function
-    | `ShadowT s -> s
     | #Var.t as v -> Var.toString v
     | #Cascading.t as c -> Cascading.toString c
 end

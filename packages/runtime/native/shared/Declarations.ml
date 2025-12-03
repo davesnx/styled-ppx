@@ -769,13 +769,11 @@ let filter x =
     ( {js|filter|js},
       Kloth.Array.map_and_join ~f:Filter.toString ~sep:{js| |js} x )
 
-let boxShadow (x : Shadow.box Shadow.t) =
-  Rule.declaration ({js|boxShadow|js}, Shadow.toString x)
+let boxShadow (x : BoxShadow.t) =
+  Rule.declaration ({js|boxShadow|js}, BoxShadow.toString x)
 
-let boxShadows (x : Shadow.box Shadow.t array) =
-  Rule.declaration
-    ( {js|boxShadow|js},
-      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Shadow.toString x )
+let boxShadows (x : Shadow.t array) =
+  Rule.declaration ({js|boxShadow|js}, Shadow.many x)
 
 let border px style color =
   Rule.declaration ({js|border|js}, Border.toString px style color)
@@ -833,13 +831,11 @@ let textDecorations ?line ?thickness ?style ?color () =
       TextDecoration.toString
       @@ TextDecoration.make ?line ?thickness ?style ?color () )
 
-let textShadow (x : Shadow.text Shadow.t) =
-  Rule.declaration ({js|textShadow|js}, Shadow.toString x)
+let textShadow (x : TextShadow.t) =
+  Rule.declaration ({js|textShadow|js}, TextShadow.toString x)
 
-let textShadows (x : Shadow.text Shadow.t array) =
-  Rule.declaration
-    ( {js|textShadow|js},
-      Kloth.Array.map_and_join ~sep:{js|, |js} x ~f:Shadow.toString )
+let textShadows (x : Shadow.t array) =
+  Rule.declaration ({js|textShadow|js}, Shadow.many x)
 
 let transformStyle x =
   Rule.declaration ({js|transformStyle|js}, TransformStyle.toString x)
