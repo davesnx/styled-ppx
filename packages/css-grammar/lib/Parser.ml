@@ -513,12 +513,12 @@ module Blend_mode =
    'exclusion' | 'hue' | 'saturation' | 'color' | 'luminosity'",
   (module Css_types.BlendMode : RUNTIME_TYPE)]
 
-(* module border_radius = [%spec_module "border_radius",
-  "[ <extended-length> | <extended-percentage> ]{1,2}", (module Css_types.BorderRadius : RUNTIME_TYPE)] *)
+(* border_radius value supports 1-4 values with optional "/" for horizontal/vertical *)
 module Border_radius =
   [%spec_module
   "border_radius",
-  "<extended-length> | <extended-percentage>",
+  "[ <extended-length> | <extended-percentage> ]{1,4} [ '/' [ \
+   <extended-length> | <extended-percentage> ]{1,4} ]?",
   (module Css_types.BorderRadius : RUNTIME_TYPE)]
 
 module Bottom =
@@ -2757,11 +2757,12 @@ module Property_border_left_width =
   [%spec_module
   "property_border_left_width", "<line-width>"]
 
-(* border-radius isn't supported with the entire spec in bs-css: `"[ <extended-length> | <extended-percentage> ]{1,4} [ '/' [ <extended-length> | <extended-percentage> ]{1,4} ]?"` *)
+(* border-radius supports 1-4 values with optional "/" for horizontal/vertical radii *)
 module Property_border_radius =
   [%spec_module
   "property_border_radius",
-  "<extended-length> | <extended-percentage>",
+  "[ <extended-length> | <extended-percentage> ]{1,4} [ '/' [ \
+   <extended-length> | <extended-percentage> ]{1,4} ]?",
   (module Css_types.BorderRadius : RUNTIME_TYPE)]
 
 module Property_border_right =
@@ -3154,7 +3155,7 @@ module Property_empty_cells =
 
 module Property_fill =
   [%spec_module
-  "property_fill", "<paint>", (module Css_types.Fill : RUNTIME_TYPE)]
+  "property_fill", "<paint>", (module Css_types.Paint : RUNTIME_TYPE)]
 
 module Property_fill_opacity =
   [%spec_module
@@ -4829,7 +4830,7 @@ module Property_src =
 
 module Property_stroke =
   [%spec_module
-  "property_stroke", "<paint>", (module Css_types.Stroke : RUNTIME_TYPE)]
+  "property_stroke", "<paint>", (module Css_types.Paint : RUNTIME_TYPE)]
 
 module Property_stroke_dasharray =
   [%spec_module
@@ -5954,13 +5955,13 @@ module Self_position =
 module Shadow =
   [%spec_module
   "shadow",
-  "[ 'inset' ]? [ <extended-length> | <interpolation> ]{4} [ <color> | \
+  "[ 'inset' ]? [ <extended-length> | <interpolation> ]{2,4} [ <color> | \
    <interpolation> ]?"]
 
 module Shadow_t =
   [%spec_module
   "shadow_t",
-  "[ <extended-length> | <interpolation> ]{3} [ <color> | <interpolation> ]?",
+  "[ <extended-length> | <interpolation> ]{2,3} [ <color> | <interpolation> ]?",
   (module Css_types.TextShadow : RUNTIME_TYPE)]
 
 module Shape =
@@ -7815,20 +7816,28 @@ let check_property ~loc ~name value :
   match find_rule name with
   | Some rule ->
     let module R = (val rule : RULE) in
-    (* Wrap the property rule with interpolation support, similar to
-       transform_with_variable in Property_to_runtime.re. This allows any
-       property to accept a complete interpolation as its value. *)
-    let rule_with_interpolation =
-      Combinators.xor
-        [
-          Rule.Match.map Standard.interpolation (fun data ->
-            `Interpolation data);
-          Rule.Match.map R.rule (fun data -> `Value data);
-        ]
-    in
-    (match parse rule_with_interpolation value with
+    (* First try parsing with the property's specific rule to get accurate error messages *)
+    (match parse R.rule value with
     | Ok _ -> Ok ()
-    | Error message -> Error (loc, `Invalid_value message))
+    | Error property_error ->
+      (* If property rule fails, try universal CSS values:
+         - interpolation: $(variable)
+         - css-wide keywords: inherit, initial, unset, revert, revert-layer
+         - var() function: var(--custom-property)
+         Map all to unit since we only care about success/failure here *)
+      let universal_rule =
+        Combinators.xor
+          [
+            Rule.Match.map Standard.interpolation (fun _ -> ());
+            Rule.Match.map Standard.css_wide_keywords (fun _ -> ());
+            Rule.Match.map Function_var.rule (fun _ -> ());
+          ]
+      in
+      (match parse universal_rule value with
+      | Ok _ -> Ok ()
+      (* If universal values also fail, return the property-specific error
+         which gives more helpful feedback to the user *)
+      | Error _ -> Error (loc, `Invalid_value property_error)))
   | None -> Error (loc, `Property_not_found)
 
 (* Extract interpolation types from a property value.
@@ -7838,21 +7847,31 @@ let get_interpolation_types ~name value : (string * string) list =
   match find_rule name with
   | Some rule ->
     let module R = (val rule : RULE) in
-    (* Wrap with interpolation support like check_property. When a complete
-       interpolation is provided, return its info with the property's runtime path. *)
-    let rule_with_interpolation =
+    (* Wrap with universal support like check_property. When a complete
+       interpolation is provided, return its info with the property's runtime path.
+       css-wide keywords and var() don't contribute interpolations. *)
+    let rule_with_universal =
       Combinators.xor
         [
           Rule.Match.map Standard.interpolation (fun data ->
             `Interpolation data);
+          Rule.Match.map Standard.css_wide_keywords (fun data ->
+            `CssWideKeyword data);
+          Rule.Match.map Function_var.rule (fun data -> `Var data);
           Rule.Match.map R.rule (fun data -> `Value data);
         ]
     in
-    (match parse rule_with_interpolation value with
+    (match parse rule_with_universal value with
     | Ok (`Interpolation parts) ->
       (* Complete interpolation - use the property's runtime module path *)
       let type_path = Option.value ~default:"" R.runtime_module_path in
       [ String.concat "." parts, type_path ]
+    | Ok (`CssWideKeyword _) ->
+      (* CSS-wide keywords don't contribute interpolations *)
+      []
+    | Ok (`Var _) ->
+      (* var() doesn't contribute interpolations *)
+      []
     | Ok (`Value parsed_value) ->
       (* Regular value - extract any partial interpolations *)
       R.extract_interpolations parsed_value

@@ -13,6 +13,12 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
+  File "input.re", line 7, characters 6-32:
+  7 | [%cx2 {|animation-name: $(foo)|}];
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  Error: This expression has type "[> `KeyframesName of string ]"
+         but an expression was expected of type "Css_types.AnimationName.t"
+  [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css
@@ -25,13 +31,13 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-1i13szv", []);
   CSS.make(
     "css-1rzyjvs",
-    [("--var-13g64p", CSS.Types.KeyframesName.toString(foo))],
+    [("--var-13g64p", CSS.Types.AnimationName.toString(foo))],
   );
   CSS.make(
     "css-b88oy1",
     [
-      ("--var-13g64p", CSS.Types.KeyframesName.toString(foo)),
-      ("--var-rgjxtb", CSS.Types.KeyframesName.toString(bar)),
+      ("--var-13g64p", CSS.Types.AnimationName.toString(foo)),
+      ("--var-rgjxtb", CSS.Types.AnimationName.toString(bar)),
     ],
   );
   CSS.make("css-16l6t2h", []);

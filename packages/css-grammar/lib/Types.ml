@@ -528,6 +528,13 @@ and border_radius =
   [ `Extended_length of extended_length
   | `Extended_percentage of extended_percentage
   ]
+  list
+  * (unit
+    * [ `Extended_length of extended_length
+      | `Extended_percentage of extended_percentage
+      ]
+      list)
+    option
 
 and bottom =
   [ `Extended_length of extended_length
@@ -2513,6 +2520,13 @@ and property_border_radius =
   [ `Extended_length of extended_length
   | `Extended_percentage of extended_percentage
   ]
+  list
+  * (unit
+    * [ `Extended_length of extended_length
+      | `Extended_percentage of extended_percentage
+      ]
+      list)
+    option
 
 and property_border_right = property_border
 and property_border_right_color = color

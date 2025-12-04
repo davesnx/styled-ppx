@@ -130,7 +130,7 @@ If this test fail means that the module is not in sync with the ppx
     |]);
   CSS.make(
     "css-5h8l4l",
-    [("--var-7wrrwo", CSS.Types.TrackList.toString(value))],
+    [("--var-7wrrwo", CSS.Types.GridTemplateColumns.toString(value))],
   );
   CSS.make("css-60hsgl", []);
   CSS.make("css-1s26n4k", []);

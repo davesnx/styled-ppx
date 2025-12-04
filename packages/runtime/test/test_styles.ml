@@ -64,9 +64,10 @@ let empty_selector_simple () =
 
 let avoid_hash_collision () =
   let classname1 =
-    let color = `var "alt-text--tertiary" in
-    let hoverColor = `var "alt-text--primary" in
-    let disabledColor = `var "alt-text--tertiary" in
+    (* Use actual colors instead of CSS variables for this hash collision test *)
+    let color = `hex "333333" in
+    let hoverColor = `hex "111111" in
+    let disabledColor = `hex "333333" in
     [%cx
       {|
          color: $(color);

@@ -773,14 +773,15 @@ let properties_static_css_tests = [
   (
     [%css "color: var(--main-c)"],
     [%expr [%css "color: var(--main-c)"]],
-    [%expr CSS.color(`var({js|--main-c|js}))],
+    /* var() falls back to CSS.unsafe since it bypasses the type system */
+    [%expr CSS.unsafe({js|color|js}, {js|var(--main-c)|js})],
   ),
   (
     [%css "box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, 0.2)"],
     [%expr [%css "box-shadow: 12px 12px 2px 1px rgba(0, 0, 255, 0.2)"]],
     [%expr
       CSS.boxShadows([|
-        CSS.Shadow.box(
+        CSS.BoxShadow.box(
           ~x=`pxFloat(12.),
           ~y=`pxFloat(12.),
           ~blur=`pxFloat(2.),
@@ -1238,7 +1239,8 @@ let properties_static_css_tests = [
   (
     [%css {|color: var(--color-link);|}],
     [%expr [%css {|color: var(--color-link);|}]],
-    [%expr CSS.color(`var({js|--color-link|js}))],
+    /* var() falls back to CSS.unsafe since it bypasses the type system */
+    [%expr CSS.unsafe({js|color|js}, {js|var(--color-link)|js})],
   ),
   // unsupported
   /*

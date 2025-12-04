@@ -34,8 +34,8 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|clipPath|js}, {js|stroke-box|js});
   CSS.unsafe({js|clipPath|js}, {js|view-box|js});
   CSS.unsafe({js|clipPath|js}, {js|none|js});
-  CSS.unsafe({js|clipRule|js}, {js|nonzero|js});
-  CSS.unsafe({js|clipRule|js}, {js|evenodd|js});
+  CSS.clipRule(`nonzero);
+  CSS.clipRule(`evenodd);
   CSS.maskImage(`none);
   CSS.maskImage(
     `linearGradient((

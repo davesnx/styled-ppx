@@ -10,6 +10,7 @@ let alignContent x =
 
 let alignItems x = Rule.declaration ({js|alignItems|js}, AlignItems.toString x)
 let alignSelf x = Rule.declaration ({js|alignSelf|js}, AlignSelf.toString x)
+let appearance x = Rule.declaration ({js|appearance|js}, Appearance.toString x)
 
 let animationDelay x =
   Rule.declaration ({js|animationDelay|js}, AnimationDelay.toString x)
@@ -198,16 +199,35 @@ let borderLeftWidth x =
 let borderSpacing x = Rule.declaration ({js|borderSpacing|js}, Length.toString x)
 let borderRadius x = Rule.declaration ({js|borderRadius|js}, Length.toString x)
 
-let borderRadius4 ~topLeft ~topRight ~bottomLeft ~bottomRight =
+(* CSS border-radius with 2 values: top-left/bottom-right, top-right/bottom-left *)
+let borderRadius2 ~topLeftBottomRight ~topRightBottomLeft =
+  Rule.declaration
+    ( {js|borderRadius|js},
+      Length.toString topLeftBottomRight
+      ^ {js| |js}
+      ^ Length.toString topRightBottomLeft )
+
+(* CSS border-radius with 3 values: top-left, top-right/bottom-left, bottom-right *)
+let borderRadius3 ~topLeft ~topRightBottomLeft ~bottomRight =
+  Rule.declaration
+    ( {js|borderRadius|js},
+      Length.toString topLeft
+      ^ {js| |js}
+      ^ Length.toString topRightBottomLeft
+      ^ {js| |js}
+      ^ Length.toString bottomRight )
+
+(* CSS border-radius with 4 values: top-left, top-right, bottom-right, bottom-left *)
+let borderRadius4 ~topLeft ~topRight ~bottomRight ~bottomLeft =
   Rule.declaration
     ( {js|borderRadius|js},
       Length.toString topLeft
       ^ {js| |js}
       ^ Length.toString topRight
       ^ {js| |js}
-      ^ Length.toString bottomLeft
+      ^ Length.toString bottomRight
       ^ {js| |js}
-      ^ Length.toString bottomRight )
+      ^ Length.toString bottomLeft )
 
 let borderRightColor x =
   Rule.declaration ({js|borderRightColor|js}, Color.toString x)
@@ -230,12 +250,36 @@ let borderTopWidth x =
 let borderWidth x = Rule.declaration ({js|borderWidth|js}, LineWidth.toString x)
 let bottom x = Rule.declaration ({js|bottom|js}, Bottom.toString x)
 let boxSizing x = Rule.declaration ({js|boxSizing|js}, BoxSizing.toString x)
+let breakAfter x = Rule.declaration ({js|breakAfter|js}, BreakAfter.toString x)
+
+let breakBefore x =
+  Rule.declaration ({js|breakBefore|js}, BreakBefore.toString x)
+
+let breakInside x =
+  Rule.declaration ({js|breakInside|js}, BreakInside.toString x)
+
+let boxDecorationBreak x =
+  Rule.declaration ({js|boxDecorationBreak|js}, BoxDecorationBreak.toString x)
+
+let captionSide x =
+  Rule.declaration ({js|captionSide|js}, CaptionSide.toString x)
+
 let clear x = Rule.declaration ({js|clear|js}, Clear.toString x)
 let clipPath x = Rule.declaration ({js|clipPath|js}, ClipPath.toString x)
+let clipRule x = Rule.declaration ({js|clipRule|js}, ClipRule.toString x)
 let color x = Rule.declaration ({js|color|js}, Color.toString x)
 
 let columnCount x =
   Rule.declaration ({js|columnCount|js}, ColumnCount.toString x)
+
+let columnFill x = Rule.declaration ({js|columnFill|js}, ColumnFill.toString x)
+let columnSpan x = Rule.declaration ({js|columnSpan|js}, ColumnSpan.toString x)
+
+let containerType x =
+  Rule.declaration ({js|containerType|js}, ContainerType.toString x)
+
+let contentVisibility x =
+  Rule.declaration ({js|contentVisibility|js}, ContentVisibility.toString x)
 
 let rowGap x = Rule.declaration ({js|rowGap|js}, Gap.toString x)
 let columnGap x = Rule.declaration ({js|columnGap|js}, Gap.toString x)
@@ -280,6 +324,7 @@ let countersSet xs =
 let cursor x = Rule.declaration ({js|cursor|js}, Cursor.toString x)
 let direction x = Rule.declaration ({js|direction|js}, Direction.toString x)
 let display x = Rule.declaration ({js|display|js}, Display.toString x)
+let emptyCells x = Rule.declaration ({js|emptyCells|js}, EmptyCells.toString x)
 
 let flex grow shrink basis =
   Rule.declaration
@@ -410,6 +455,12 @@ let textEmphasisPositions x y =
       ^ {js| |js}
       ^ TextEmphasisPosition.LeftRightAlignment.toString y )
 
+let textOrientation x =
+  Rule.declaration ({js|textOrientation|js}, TextOrientation.toString x)
+
+let textRendering x =
+  Rule.declaration ({js|textRendering|js}, TextRendering.toString x)
+
 let justifyContent x =
   Rule.declaration ({js|justifyContent|js}, JustifyContent.toString x)
 
@@ -476,6 +527,10 @@ let maxHeight x = Rule.declaration ({js|maxHeight|js}, MaxHeight.toString x)
 let maxWidth x = Rule.declaration ({js|maxWidth|js}, MaxWidth.toString x)
 let minHeight x = Rule.declaration ({js|minHeight|js}, MinHeight.toString x)
 let minWidth x = Rule.declaration ({js|minWidth|js}, MinWidth.toString x)
+
+let mixBlendMode x =
+  Rule.declaration ({js|mixBlendMode|js}, MixBlendMode.toString x)
+
 let objectFit x = Rule.declaration ({js|objectFit|js}, ObjectFit.toString x)
 
 let objectPosition x =
@@ -490,6 +545,7 @@ let objectPosition4 ~x ~offsetX ~y ~offsetY =
       Position.toString (Position.hvOffset x offsetX y offsetY) )
 
 let opacity x = Rule.declaration ({js|opacity|js}, Kloth.Float.to_string x)
+let orphans x = Rule.declaration ({js|orphans|js}, Orphans.toString x)
 
 let outline size style color =
   Rule.declaration
@@ -563,6 +619,15 @@ let paddingLeft x = Rule.declaration ({js|paddingLeft|js}, Length.toString x)
 let paddingRight x = Rule.declaration ({js|paddingRight|js}, Length.toString x)
 let paddingTop x = Rule.declaration ({js|paddingTop|js}, Length.toString x)
 
+let pageBreakAfter x =
+  Rule.declaration ({js|pageBreakAfter|js}, PageBreakAfter.toString x)
+
+let pageBreakBefore x =
+  Rule.declaration ({js|pageBreakBefore|js}, PageBreakBefore.toString x)
+
+let pageBreakInside x =
+  Rule.declaration ({js|pageBreakInside|js}, PageBreakInside.toString x)
+
 let perspectiveProperty x =
   Rule.declaration ({js|perspective|js}, Perspective.toString x)
 
@@ -600,6 +665,9 @@ let justifySelf x =
 
 let resize x = Rule.declaration ({js|resize|js}, Resize.toString x)
 let right x = Rule.declaration ({js|right|js}, Right.toString x)
+
+let shapeRendering x =
+  Rule.declaration ({js|shapeRendering|js}, ShapeRendering.toString x)
 
 let tableLayout x =
   Rule.declaration ({js|tableLayout|js}, TableLayout.toString x)
@@ -653,6 +721,17 @@ let textOverflow x =
 let textTransform x =
   Rule.declaration ({js|textTransform|js}, TextTransform.toString x)
 
+let textWrap x = Rule.declaration ({js|textWrap|js}, TextWrap.toString x)
+
+let textWrapMode x =
+  Rule.declaration ({js|textWrapMode|js}, TextWrapMode.toString x)
+
+let textWrapStyle x =
+  Rule.declaration ({js|textWrapStyle|js}, TextWrapStyle.toString x)
+
+let unicodeBidi x =
+  Rule.declaration ({js|unicodeBidi|js}, UnicodeBidi.toString x)
+
 let top x = Rule.declaration ({js|top|js}, Top.toString x)
 let transform x = Rule.declaration ({js|transform|js}, Transform.toString x)
 
@@ -698,6 +777,7 @@ let columnWidth x =
 
 let caretColor x = Rule.declaration ({js|caretColor|js}, CaretColor.toString x)
 let width x = Rule.declaration ({js|width|js}, Width.toString x)
+let widows x = Rule.declaration ({js|widows|js}, Widows.toString x)
 let whiteSpace x = Rule.declaration ({js|whiteSpace|js}, WhiteSpace.toString x)
 let wordBreak x = Rule.declaration ({js|wordBreak|js}, WordBreak.toString x)
 
@@ -705,6 +785,10 @@ let wordSpacing x =
   Rule.declaration ({js|wordSpacing|js}, WordSpacing.toString x)
 
 let wordWrap x = Rule.declaration ({js|wordWrap|js}, OverflowWrap.toString x)
+
+let writingMode x =
+  Rule.declaration ({js|writingMode|js}, WritingMode.toString x)
+
 let zIndex x = Rule.declaration ({js|zIndex|js}, ZIndex.toString x)
 
 let flex3 ~grow ~shrink ~basis =
@@ -920,7 +1004,7 @@ let animationNames x =
       Kloth.Array.map_and_join x ~f:AnimationName.toString ~sep:{js|, |js} )
 
 module SVG = struct
-  let fill x = Rule.declaration ({js|fill|js}, SVG.Fill.toString x)
+  let fill x = Rule.declaration ({js|fill|js}, Paint.toString x)
 
   let fillOpacity opacity =
     Rule.declaration ({js|fillOpacity|js}, Kloth.Float.to_string opacity)
@@ -933,7 +1017,7 @@ module SVG = struct
       )
 
   (* ??? *)
-  let stroke x = Rule.declaration ({js|stroke|js}, Color.toString x)
+  let stroke x = Rule.declaration ({js|stroke|js}, Paint.toString x)
 
   let strokeDasharray x =
     Rule.declaration

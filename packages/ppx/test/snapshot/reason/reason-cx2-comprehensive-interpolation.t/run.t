@@ -33,7 +33,7 @@ Comprehensive test for cx2 interpolation with various property types
   let test5 =
     CSS.make(
       "css-13ho3oh",
-      [("--var-x7fhjg", CSS.Types.Width.toString(flexBasisVar))],
+      [("--var-x7fhjg", CSS.Types.FlexBasis.toString(flexBasisVar))],
     );
   let gridLineVar = `auto;
   let test6 =

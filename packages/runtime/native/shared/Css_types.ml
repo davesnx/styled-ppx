@@ -181,7 +181,6 @@ module Length = struct
     | `pt of int
     | `zero
     | Percentage.t
-    | Var.t
     ]
 
   type calc_value =
@@ -257,7 +256,6 @@ module Length = struct
     | #Percentage.t as p -> Percentage.toString p
     | `calc calc -> calc_value_to_string calc
     | (`min _ | `max _) as x -> minmax_to_string x
-    | #Var.t as x -> Var.toString x
 
   and calc_value_to_string x =
     match x with
@@ -299,19 +297,11 @@ module Direction = struct
   type t =
     [ `ltr
     | `rtl
-    | Var.t
-    | Cascading.t
     ]
 
   let ltr = `ltr
   let rtl = `rtl
-
-  let toString x =
-    match x with
-    | `ltr -> {js|ltr|js}
-    | `rtl -> {js|rtl|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with `ltr -> {js|ltr|js} | `rtl -> {js|rtl|js}
 end
 
 (* Don't confuse with Position (from object-position or background-position) *)
@@ -322,8 +312,6 @@ module PropertyPosition = struct
     | `static
     | `fixed
     | `sticky
-    | Var.t
-    | Cascading.t
     ]
 
   let absolute = `absolute
@@ -339,26 +327,18 @@ module PropertyPosition = struct
     | `static -> {js|static|js}
     | `fixed -> {js|fixed|js}
     | `sticky -> {js|sticky|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Isolation = struct
   type t =
     [ Auto.t
     | `isolate
-    | Cascading.t
-    | Var.t
     ]
 
   let isolate = `isolate
 
   let toString x =
-    match x with
-    | #Auto.t -> Auto.toString
-    | `isolate -> {js|isolate|js}
-    | #Cascading.t as x -> Cascading.toString x
-    | #Var.t as x -> Var.toString x
+    match x with #Auto.t -> Auto.toString | `isolate -> {js|isolate|js}
 end
 
 module AspectRatio = struct
@@ -366,8 +346,6 @@ module AspectRatio = struct
     [ Auto.t
     | `num of float
     | `ratio of int * int
-    | Var.t
-    | Cascading.t
     ]
 
   let ratio (x : int) (y : int) = `ratio (x, y)
@@ -378,8 +356,6 @@ module AspectRatio = struct
     | `num num -> Kloth.Float.to_string num
     | `ratio (up, down) ->
       Kloth.Int.to_string up ^ {js| / |js} ^ Kloth.Int.to_string down
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Resize = struct
@@ -390,8 +366,6 @@ module Resize = struct
     | `vertical
     | `block
     | `inline
-    | Var.t
-    | Cascading.t
     ]
 
   let both = `both
@@ -408,27 +382,19 @@ module Resize = struct
     | `vertical -> {js|vertical|js}
     | `block -> {js|block|js}
     | `inline -> {js|inline|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module FontVariant = struct
   type t =
     [ `normal
     | `smallCaps
-    | Var.t
-    | Cascading.t
     ]
 
   let normal = `normal
   let smallCaps = `smallCaps
 
   let toString x =
-    match x with
-    | `normal -> {js|normal|js}
-    | `smallCaps -> {js|small-caps|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with `normal -> {js|normal|js} | `smallCaps -> {js|small-caps|js}
 end
 
 module FontStyle = struct
@@ -436,8 +402,6 @@ module FontStyle = struct
     [ `normal
     | `italic
     | `oblique
-    | Var.t
-    | Cascading.t
     ]
 
   let normal = `normal
@@ -449,21 +413,15 @@ module FontStyle = struct
     | `normal -> {js|normal|js}
     | `italic -> {js|italic|js}
     | `oblique -> {js|oblique|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TabSize = struct
   type t =
     [ `num of float
     | Length.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString = function
-    | #Var.t as var -> Var.toString var
-    | #Cascading.t as c -> Cascading.toString c
     | `num n -> Kloth.Float.to_string n
     | #Length.t as len -> Length.toString len
 end
@@ -495,14 +453,10 @@ module Margin = struct
   type t =
     [ Auto.t
     | Length.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
     match x with
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
     | #Auto.t -> Auto.toString
     | #Length.t as l -> Length.toString l
 end
@@ -514,8 +468,6 @@ module GridAutoFlow = struct
     | `columnDense
     | `rowDense
     | `dense
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -525,8 +477,6 @@ module GridAutoFlow = struct
     | `columnDense -> {js|column dense|js}
     | `rowDense -> {js|row dense|js}
     | `dense -> {js|dense|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Gap = struct
@@ -534,47 +484,29 @@ module Gap = struct
     [ `normal
     | Percentage.t
     | Length.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
     match x with
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
     | `normal -> {js|normal|js}
     | #Percentage.t as p -> Percentage.toString p
     | #Length.t as l -> Length.toString l
 end
 
 module StrokeDashArray = struct
-  type t =
-    [ Length.t
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ | Length.t ]
 
-  let toString x =
-    match x with
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
-    | #Length.t as l -> Length.toString l
+  let toString x = match x with #Length.t as l -> Length.toString l
 end
 
 module ScrollBehavior = struct
   type t =
     [ Auto.t
     | `smooth
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | #Auto.t -> Auto.toString
-    | `smooth -> {js|smooth|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with #Auto.t -> Auto.toString | `smooth -> {js|smooth|js}
 end
 
 module OverscrollBehavior = struct
@@ -582,8 +514,6 @@ module OverscrollBehavior = struct
     [ Auto.t
     | `contain
     | None.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -591,22 +521,16 @@ module OverscrollBehavior = struct
     | `contain -> {js|contain|js}
     | #Auto.t -> Auto.toString
     | #None.t -> None.toString
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module OverflowAnchor = struct
   type t =
     [ Auto.t
     | None.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | #Auto.t -> Auto.toString
-    | #None.t -> None.toString
-    | #Cascading.t as c -> Cascading.toString c
+    match x with #Auto.t -> Auto.toString | #None.t -> None.toString
 end
 
 module ColumnWidth = struct
@@ -632,14 +556,10 @@ module VerticalAlign = struct
     | `bottom
     | `textBottom
     | Length.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
     match x with
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
     | `baseline -> {js|baseline|js}
     | `sub -> {js|sub|js}
     | `super -> {js|super|js}
@@ -718,32 +638,19 @@ module ListStyleType = struct
   type t =
     [ `Custom of string
     | None.t
-    | Var.t
-    | Cascading.t
     ]
 
-  let toString x =
-    match x with
-    | `Custom o -> o
-    | #None.t -> None.toString
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with `Custom o -> o | #None.t -> None.toString
 end
 
 module ListStylePosition = struct
   type t =
     [ `inside
     | `outside
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | `inside -> {js|inside|js}
-    | `outside -> {js|outside|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with `inside -> {js|inside|js} | `outside -> {js|outside|js}
 end
 
 module OutlineStyle = struct
@@ -790,8 +697,6 @@ module FontWeight = struct
     | `black
     | `lighter
     | `bolder
-    | Var.t
-    | Cascading.t
     ]
 
   let thin = `thin
@@ -818,8 +723,6 @@ module FontWeight = struct
     | `black -> {js|900|js}
     | `lighter -> {js|lighter|js}
     | `bolder -> {js|bolder|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Transform = struct
@@ -843,8 +746,6 @@ module Transform = struct
     | `skewX of Angle.t
     | `skewY of Angle.t
     | `perspective of int
-    | Var.t
-    | Cascading.t
     | None.t
     ]
 
@@ -937,8 +838,6 @@ module Transform = struct
     | `skewX a -> {js|skewX(|js} ^ Angle.toString a ^ {js|)|js}
     | `skewY a -> {js|skewY(|js} ^ Angle.toString a ^ {js|)|js}
     | `perspective x -> {js|perspective(|js} ^ Kloth.Int.to_string x ^ {js|)|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
     | #None.t -> None.toString
 end
 
@@ -973,31 +872,15 @@ module AnimationDirection = struct
       | `alternateReverse -> {js|alternate-reverse|js}
   end
 
-  type t =
-    [ Value.t
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ | Value.t ]
 
-  let toString x =
-    match x with
-    | #Value.t as x -> Value.toString x
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with #Value.t as x -> Value.toString x
 end
 
 module AnimationDuration = struct
-  type t =
-    [ Time.t
-    | Cascading.t
-    | Var.t
-    ]
+  type t = [ | Time.t ]
 
-  let toString x =
-    match x with
-    | #Time.t as x -> Time.toString x
-    | #Cascading.t as x -> Cascading.toString x
-    | #Var.t as x -> Var.toString x
+  let toString x = match x with #Time.t as x -> Time.toString x
 end
 
 module AnimationDelay = struct
@@ -1021,17 +904,9 @@ module AnimationFillMode = struct
       | `both -> {js|both|js}
   end
 
-  type t =
-    [ Value.t
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ | Value.t ]
 
-  let toString x =
-    match x with
-    | #Value.t as x -> Value.toString x
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with #Value.t as x -> Value.toString x
 end
 
 module AnimationIterationCount = struct
@@ -1047,17 +922,9 @@ module AnimationIterationCount = struct
       | `infinite -> {js|infinite|js}
   end
 
-  type t =
-    [ Value.t
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ | Value.t ]
 
-  let toString x =
-    match x with
-    | #Value.t as x -> Value.toString x
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with #Value.t as x -> Value.toString x
 end
 
 module AnimationPlayState = struct
@@ -1071,17 +938,9 @@ module AnimationPlayState = struct
       match x with `paused -> {js|paused|js} | `running -> {js|running|js}
   end
 
-  type t =
-    [ Value.t
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ | Value.t ]
 
-  let toString x =
-    match x with
-    | #Value.t as x -> Value.toString x
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with #Value.t as x -> Value.toString x
 end
 
 module TransitionProperty : sig
@@ -1109,17 +968,10 @@ module TransitionDelay = struct
 end
 
 module TransitionTimingFunction = struct
-  type t =
-    [ EasingFunction.t
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ | EasingFunction.t ]
 
   let toString x =
-    match x with
-    | #EasingFunction.t as x -> EasingFunction.toString x
-    | #Var.t as x -> Var.toString x
-    | #Cascading.t as x -> Cascading.toString x
+    match x with #EasingFunction.t as x -> EasingFunction.toString x
 end
 
 module TransitionBehavior = struct
@@ -1135,17 +987,9 @@ module TransitionBehavior = struct
       | `allowDiscrete -> {js|allow-discrete|js}
   end
 
-  type t =
-    [ Value.t
-    | Cascading.t
-    | Var.t
-    ]
+  type t = [ | Value.t ]
 
-  let toString x =
-    match x with
-    | #Value.t as x -> Value.toString x
-    | #Cascading.t as x -> Cascading.toString x
-    | #Var.t as x -> Var.toString x
+  let toString x = match x with #Value.t as x -> Value.toString x
 end
 
 module Transition = struct
@@ -1178,17 +1022,9 @@ module Transition = struct
         ^ TransitionBehavior.Value.toString v.behavior
   end
 
-  type t =
-    [ Value.t
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ | Value.t ]
 
-  let toString x =
-    match x with
-    | #Value.t as x -> Value.toString x
-    | #Var.t as x -> Var.toString x
-    | #Cascading.t as x -> Cascading.toString x
+  let toString x = match x with #Value.t as x -> Value.toString x
 end
 
 module Animation = struct
@@ -1241,17 +1077,9 @@ module Animation = struct
         ^ AnimationPlayState.Value.toString v.playState
   end
 
-  type t =
-    [ Value.t
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ | Value.t ]
 
-  let toString x =
-    match x with
-    | #Value.t as x -> Value.toString x
-    | #Var.t as var -> Var.toString var
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with #Value.t as x -> Value.toString x
 end
 
 module AnimationTimingFunction = struct
@@ -1305,8 +1133,6 @@ module Cursor = struct
     | `nwseResize
     | `zoomIn
     | `zoomOut
-    | Var.t
-    | Cascading.t
     ]
 
   let default = `default
@@ -1392,8 +1218,6 @@ module Cursor = struct
     | `wResize -> {js|w-resize|js}
     | `zoomIn -> {js|zoom-in|js}
     | `zoomOut -> {js|zoom-out|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Color = struct
@@ -1572,8 +1396,6 @@ module Color = struct
     | `hex of string
     | `transparent
     | `currentColor
-    | Var.t
-    | Cascading.t
     ]
 
   let rgb (r : int) (g : int) (b : int) = `rgb (r, g, b)
@@ -1619,8 +1441,6 @@ module Color = struct
       ^ {js|, |js}
       ^ string_of_color_with_percentage y
       ^ {js|)|js}
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
 
   and string_of_color_with_percentage (x : t * Percentage.t option) =
     match x with
@@ -1651,8 +1471,6 @@ module BorderStyle = struct
     | `ridge
     | `inset
     | `outset
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -1667,8 +1485,6 @@ module BorderStyle = struct
     | `ridge -> {js|ridge|js}
     | `inset -> {js|inset|js}
     | `outset -> {js|outset|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module PointerEvents = struct
@@ -1683,8 +1499,6 @@ module PointerEvents = struct
     | `fill
     | `stroke
     | `all
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -1699,22 +1513,16 @@ module PointerEvents = struct
     | `fill -> {js|fill|js}
     | `stroke -> {js|stroke|js}
     | `all -> {js|all|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Perspective = struct
   type t =
     [ None.t
     | Length.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
     match x with
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
     | #None.t -> None.toString
     | #Length.t as l -> Length.toString l
 end
@@ -1723,16 +1531,12 @@ module LetterSpacing = struct
   type t =
     [ `normal
     | Length.t
-    | Var.t
-    | Cascading.t
     ]
 
   let normal = `normal
 
   let toString x =
     match x with
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
     | `normal -> {js|normal|js}
     | #Length.t as l -> Length.toString l
 end
@@ -1742,14 +1546,10 @@ module LineHeight = struct
     [ `normal
     | `abs of float
     | Length.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
     match x with
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
     | `normal -> {js|normal|js}
     | `abs x -> Kloth.Float.to_string x
     | #Length.t as l -> Length.toString l
@@ -1775,15 +1575,11 @@ module WordSpacing = struct
   (* https://developer.mozilla.org/en-US/docs/Web/CSS/word-spacing *)
   type t =
     [ `normal
-    | Var.t
-    | Cascading.t
     | Length.t
     ]
 
   let toString x =
     match x with
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
     | `normal -> {js|normal|js}
     | #Length.t as l -> Length.toString l
 end
@@ -1879,16 +1675,10 @@ module TextEmphasisStyle = struct
     type t =
       [ `filled
       | `open_
-      | Var.t
-      | Cascading.t
       ]
 
     let toString x =
-      match x with
-      | `filled -> {js|filled|js}
-      | `open_ -> {js|open|js}
-      | #Var.t as va -> Var.toString va
-      | #Cascading.t as c -> Cascading.toString c
+      match x with `filled -> {js|filled|js} | `open_ -> {js|open|js}
   end
 
   module Shape = struct
@@ -1898,8 +1688,6 @@ module TextEmphasisStyle = struct
       | `double_circle
       | `triangle
       | `sesame
-      | Var.t
-      | Cascading.t
       ]
 
     let toString x =
@@ -1909,8 +1697,6 @@ module TextEmphasisStyle = struct
       | `double_circle -> {js|double-circle|js}
       | `triangle -> {js|triangle|js}
       | `sesame -> {js|sesame|js}
-      | #Var.t as va -> Var.toString va
-      | #Cascading.t as c -> Cascading.toString c
   end
 
   type t =
@@ -1918,8 +1704,6 @@ module TextEmphasisStyle = struct
     | FilledOrOpen.t
     | Shape.t
     | `string of string
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -1933,8 +1717,6 @@ module TextEmphasisStyle = struct
     | `triangle -> {js|triangle|js}
     | `sesame -> {js|sesame|js}
     | `string s -> s
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TextEmphasisPosition = struct
@@ -1942,44 +1724,25 @@ module TextEmphasisPosition = struct
     type t =
       [ `left
       | `right
-      | Var.t
-      | Cascading.t
       ]
 
     let toString x =
-      match x with
-      | `left -> {js|left|js}
-      | `right -> {js|right|js}
-      | #Var.t as va -> Var.toString va
-      | #Cascading.t as c -> Cascading.toString c
+      match x with `left -> {js|left|js} | `right -> {js|right|js}
   end
 
   module OverOrUnder = struct
     type t =
       [ `over
       | `under
-      | Var.t
-      | Cascading.t
       ]
 
     let toString x =
-      match x with
-      | `over -> {js|over|js}
-      | `under -> {js|under|js}
-      | #Var.t as va -> Var.toString va
-      | #Cascading.t as c -> Cascading.toString c
+      match x with `over -> {js|over|js} | `under -> {js|under|js}
   end
 
-  type t =
-    [ `TextEmphasisPosition of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `TextEmphasisPosition of string ]
 
-  let toString = function
-    | `TextEmphasisPosition s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `TextEmphasisPosition s -> s
 end
 
 module Position = struct
@@ -2078,14 +1841,10 @@ module TransformOrigin = struct
     | Length.t
     | `hv of [ X.t | Length.t ] * [ Y.t | Length.t ]
     | `hvOffset of [ X.t | Length.t ] * [ Y.t | Length.t ] * Length.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
     match x with
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
     | #X.t as x -> X.toString x
     | #Y.t as x -> Y.toString x
     | #Length.t as x -> Length.toString x
@@ -2114,30 +1873,18 @@ module OffsetAnchor = struct
   type t =
     [ Auto.t
     | Position.t
-    | Cascading.t
-    | Var.t
     ]
 
   let toString x =
     match x with
-    | #Cascading.t as x -> Cascading.toString x
-    | #Var.t as x -> Var.toString x
     | #Auto.t -> Auto.toString
     | #Position.t as x -> Position.toString x
 end
 
 module MaskPosition = struct
-  type t =
-    [ Position.t
-    | Cascading.t
-    | Var.t
-    ]
+  type t = [ | Position.t ]
 
-  let toString x =
-    match x with
-    | #Cascading.t as x -> Cascading.toString x
-    | #Var.t as x -> Var.toString x
-    | #Position.t as x -> Position.toString x
+  let toString x = match x with #Position.t as x -> Position.toString x
 end
 
 module ObjectPosition = struct
@@ -2210,17 +1957,9 @@ module BackgroundPosition = struct
       | #Length.t as l -> Length.toString l
   end
 
-  type t =
-    [ Value.t
-    | Cascading.t
-    | Var.t
-    ]
+  type t = [ | Value.t ]
 
-  let toString x =
-    match x with
-    | #Cascading.t as x -> Cascading.toString x
-    | #Var.t as x -> Var.toString x
-    | #Value.t as x -> Value.toString x
+  let toString x = match x with #Value.t as x -> Value.toString x
 end
 
 module PositionalAlignment = struct
@@ -2321,8 +2060,6 @@ module JustifySelf = struct
     | PositionalAlignment.t
     | OverflowAlignment.t
     | BaselineAlignment.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -2333,8 +2070,6 @@ module JustifySelf = struct
     | #PositionalAlignment.t as pa -> PositionalAlignment.toString pa
     | #OverflowAlignment.t as oa -> OverflowAlignment.toString oa
     | #BaselineAlignment.t as ba -> BaselineAlignment.toString ba
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TextAlign = struct
@@ -2347,8 +2082,6 @@ module TextAlign = struct
     | `justify
     | `matchParent
     | `justifyAll
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -2361,8 +2094,6 @@ module TextAlign = struct
     | `justify -> {js|justify|js}
     | `matchParent -> {js|match-parent|js}
     | `justifyAll -> {js|justify-all|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TextAlignAll = struct
@@ -2374,8 +2105,6 @@ module TextAlignAll = struct
     | `center
     | `justify
     | `matchParent
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -2387,8 +2116,6 @@ module TextAlignAll = struct
     | `center -> {js|center|js}
     | `justify -> {js|justify|js}
     | `matchParent -> {js|match-parent|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TextAlignLast = struct
@@ -2401,8 +2128,6 @@ module TextAlignLast = struct
     | `center
     | `justify
     | `matchParent
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -2415,8 +2140,6 @@ module TextAlignLast = struct
     | `center -> {js|center|js}
     | `justify -> {js|justify|js}
     | `matchParent -> {js|match-parent|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module WordBreak = struct
@@ -2424,8 +2147,6 @@ module WordBreak = struct
     [ `normal
     | `breakAll
     | `keepAll
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -2433,8 +2154,6 @@ module WordBreak = struct
     | `normal -> {js|normal|js}
     | `breakAll -> {js|break-all|js}
     | `keepAll -> {js|keep-all|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module WhiteSpace = struct
@@ -2445,8 +2164,6 @@ module WhiteSpace = struct
     | `preLine
     | `preWrap
     | `breakSpaces
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -2457,8 +2174,6 @@ module WhiteSpace = struct
     | `preLine -> {js|pre-line|js}
     | `preWrap -> {js|pre-wrap|js}
     | `breakSpaces -> {js|break-spaces|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module AlignItems = struct
@@ -2468,8 +2183,6 @@ module AlignItems = struct
     | PositionalAlignment.t
     | BaselineAlignment.t
     | OverflowAlignment.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -2479,8 +2192,6 @@ module AlignItems = struct
     | #PositionalAlignment.t as pa -> PositionalAlignment.toString pa
     | #BaselineAlignment.t as ba -> BaselineAlignment.toString ba
     | #OverflowAlignment.t as oa -> OverflowAlignment.toString oa
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module AlignSelf = struct
@@ -2491,8 +2202,6 @@ module AlignSelf = struct
     | PositionalAlignment.t
     | OverflowAlignment.t
     | BaselineAlignment.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -2503,8 +2212,6 @@ module AlignSelf = struct
     | #PositionalAlignment.t as pa -> PositionalAlignment.toString pa
     | #OverflowAlignment.t as pa -> OverflowAlignment.toString pa
     | #BaselineAlignment.t as ba -> BaselineAlignment.toString ba
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module AlignContent = struct
@@ -2518,8 +2225,6 @@ module AlignContent = struct
     | BaselineAlignment.t
     | OverflowAlignment.t
     | DistributedAlignment.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -2533,8 +2238,6 @@ module AlignContent = struct
     | #BaselineAlignment.t as ba -> BaselineAlignment.toString ba
     | #OverflowAlignment.t as oa -> OverflowAlignment.toString oa
     | #DistributedAlignment.t as da -> DistributedAlignment.toString da
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module JustifyItems = struct
@@ -2545,8 +2248,6 @@ module JustifyItems = struct
     | BaselineAlignment.t
     | OverflowAlignment.t
     | LegacyAlignment.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -2557,8 +2258,6 @@ module JustifyItems = struct
     | #BaselineAlignment.t as ba -> BaselineAlignment.toString ba
     | #OverflowAlignment.t as oa -> OverflowAlignment.toString oa
     | #LegacyAlignment.t as la -> LegacyAlignment.toString la
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module JustifyContent = struct
@@ -2567,8 +2266,6 @@ module JustifyContent = struct
     | NormalAlignment.t
     | DistributedAlignment.t
     | OverflowAlignment.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -2577,8 +2274,6 @@ module JustifyContent = struct
     | #NormalAlignment.t as na -> NormalAlignment.toString na
     | #DistributedAlignment.t as da -> DistributedAlignment.toString da
     | #OverflowAlignment.t as oa -> OverflowAlignment.toString oa
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module ObjectFit = struct
@@ -2588,8 +2283,6 @@ module ObjectFit = struct
     | `cover
     | None.t
     | `scaleDown
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -2599,8 +2292,6 @@ module ObjectFit = struct
     | `cover -> {js|cover|js}
     | #None.t -> None.toString
     | `scaleDown -> {js|scale-down|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Clear = struct
@@ -2611,8 +2302,6 @@ module Clear = struct
     | `both
     | `inlineStart
     | `inlineEnd
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -2623,8 +2312,6 @@ module Clear = struct
     | `both -> {js|both|js}
     | `inlineStart -> {js|inline-start|js}
     | `inlineEnd -> {js|inline-end|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Float = struct
@@ -2634,8 +2321,6 @@ module Float = struct
     | None.t
     | `inlineStart
     | `inlineEnd
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -2645,8 +2330,6 @@ module Float = struct
     | #None.t -> None.toString
     | `inlineStart -> {js|inline-start|js}
     | `inlineEnd -> {js|inline-end|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Visibility = struct
@@ -2654,8 +2337,6 @@ module Visibility = struct
     [ `visible
     | `hidden
     | `collapse
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -2663,24 +2344,16 @@ module Visibility = struct
     | `visible -> {js|visible|js}
     | `hidden -> {js|hidden|js}
     | `collapse -> {js|collapse|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TableLayout = struct
   type t =
     [ Auto.t
     | `fixed
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | #Auto.t -> Auto.toString
-    | `fixed -> {js|fixed|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with #Auto.t -> Auto.toString | `fixed -> {js|fixed|js}
 end
 
 module Border = struct
@@ -2696,16 +2369,10 @@ module BorderCollapse = struct
   type t =
     [ `collapse
     | `separate
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | `collapse -> {js|collapse|js}
-    | `separate -> {js|separate|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with `collapse -> {js|collapse|js} | `separate -> {js|separate|js}
 end
 
 module FlexWrap = struct
@@ -2713,8 +2380,6 @@ module FlexWrap = struct
     [ `nowrap
     | `wrap
     | `wrapReverse
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -2722,8 +2387,6 @@ module FlexWrap = struct
     | `nowrap -> {js|nowrap|js}
     | `wrap -> {js|wrap|js}
     | `wrapReverse -> {js|wrap-reverse|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module FlexDirection = struct
@@ -2732,8 +2395,6 @@ module FlexDirection = struct
     | `rowReverse
     | `column
     | `columnReverse
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -2742,40 +2403,28 @@ module FlexDirection = struct
     | `rowReverse -> {js|row-reverse|js}
     | `column -> {js|column|js}
     | `columnReverse -> {js|column-reverse|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module BoxSizing = struct
   type t =
     [ `contentBox
     | `borderBox
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
     match x with
     | `contentBox -> {js|content-box|js}
     | `borderBox -> {js|border-box|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module ColumnCount = struct
   type t =
     [ Auto.t
     | `count of int
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | #Auto.t -> Auto.toString
-    | `count v -> Kloth.Int.to_string v
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with #Auto.t -> Auto.toString | `count v -> Kloth.Int.to_string v
 end
 
 module UserSelect = struct
@@ -2785,8 +2434,6 @@ module UserSelect = struct
     | `text
     | `contain
     | `all
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -2796,8 +2443,6 @@ module UserSelect = struct
     | `text -> {js|text|js}
     | `contain -> {js|contain|js}
     | `all -> {js|all|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TextTransform = struct
@@ -2806,8 +2451,6 @@ module TextTransform = struct
     | `capitalize
     | `uppercase
     | `lowercase
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -2816,16 +2459,12 @@ module TextTransform = struct
     | `capitalize -> {js|capitalize|js}
     | `uppercase -> {js|uppercase|js}
     | `lowercase -> {js|lowercase|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module GridTemplateAreas = struct
   type t =
     [ None.t
     | `areas of string array
-    | Var.t
-    | Cascading.t
     ]
 
   let areas (x : string array) = `areas x
@@ -2837,8 +2476,6 @@ module GridTemplateAreas = struct
       Kloth.Array.map_and_join ~sep:{js| |js}
         ~f:(fun item -> {js|'|js} ^ item ^ {js|'|js})
         items
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module GridLine = struct
@@ -2868,17 +2505,9 @@ module GridLine = struct
 end
 
 module GridArea = struct
-  type t =
-    [ GridLine.t
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ | GridLine.t ]
 
-  let toString x =
-    match x with
-    | #GridLine.t as x -> GridLine.toString x
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with #GridLine.t as x -> GridLine.toString x
 end
 
 module GridRow = struct
@@ -2895,7 +2524,7 @@ module Filter = struct
     | `blur of Length.t
     | `brightness of [ Percentage.t | `num of float ]
     | `contrast of [ Percentage.t | `num of float ]
-    | `dropShadow of Length.t * Length.t * Length.t * [ Color.t | Var.t ]
+    | `dropShadow of Length.t * Length.t * Length.t * Color.t
     | `grayscale of [ Percentage.t | `num of float ]
     | `hueRotate of Angle.t
     | `invert of [ Percentage.t | `num of float ]
@@ -2903,8 +2532,6 @@ module Filter = struct
     | `saturate of [ Percentage.t | `num of float ]
     | `sepia of [ Percentage.t | `num of float ]
     | Url.t
-    | Var.t
-    | Cascading.t
     ]
 
   let string_of_amount x =
@@ -2935,8 +2562,6 @@ module Filter = struct
     | `sepia v -> {js|sepia(|js} ^ string_of_amount v ^ {js|%)|js}
     | #None.t -> None.toString
     | #Url.t as u -> Url.toString u
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module BackgroundAttachment = struct
@@ -2944,8 +2569,6 @@ module BackgroundAttachment = struct
     [ `scroll
     | `fixed
     | `local
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -2953,8 +2576,6 @@ module BackgroundAttachment = struct
     | `scroll -> {js|scroll|js}
     | `fixed -> {js|fixed|js}
     | `local -> {js|local|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module BackgroundClip = struct
@@ -2976,17 +2597,9 @@ module BackgroundClip = struct
       | `text -> {js|text|js}
   end
 
-  type t =
-    [ Value.t
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ | Value.t ]
 
-  let toString x =
-    match x with
-    | #Value.t as x -> Value.toString x
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with #Value.t as x -> Value.toString x
 end
 
 module BackgroundOrigin = struct
@@ -2994,8 +2607,6 @@ module BackgroundOrigin = struct
     [ `borderBox
     | `paddingBox
     | `contentBox
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -3003,8 +2614,6 @@ module BackgroundOrigin = struct
     | `borderBox -> {js|border-box|js}
     | `contentBox -> {js|content-box|js}
     | `paddingBox -> {js|padding-box|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module BackgroundRepeat = struct
@@ -3034,17 +2643,9 @@ module BackgroundRepeat = struct
       | `hv (h, v) -> toString (h :> t) ^ {js| |js} ^ toString (v :> t)
   end
 
-  type t =
-    [ Value.t
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ | Value.t ]
 
-  let toString x =
-    match x with
-    | #Value.t as x -> Value.toString x
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with #Value.t as x -> Value.toString x
 end
 
 module TextOverflow = struct
@@ -3052,8 +2653,6 @@ module TextOverflow = struct
     [ `clip
     | `ellipsis
     | `string of string
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -3061,8 +2660,6 @@ module TextOverflow = struct
     | `clip -> {js|clip|js}
     | `ellipsis -> {js|ellipsis|js}
     | `string s -> s
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TextDecorationLine = struct
@@ -3100,17 +2697,9 @@ module TextDecorationLine = struct
       | #None.t -> None.toString
   end
 
-  type t =
-    [ Value.t
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ | Value.t ]
 
-  let toString x =
-    match x with
-    | #Value.t as x -> Value.toString x
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with #Value.t as x -> Value.toString x
 end
 
 module TextDecorationStyle = struct
@@ -3134,17 +2723,9 @@ module TextDecorationStyle = struct
       | #None.t -> None.toString
   end
 
-  type t =
-    [ Value.t
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ | Value.t ]
 
-  let toString x =
-    match x with
-    | #Value.t as x -> Value.toString x
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with #Value.t as x -> Value.toString x
 end
 
 module TextDecorationThickness = struct
@@ -3164,17 +2745,9 @@ module TextDecorationThickness = struct
       | #Length.t as l -> Length.toString l
   end
 
-  type t =
-    [ Value.t
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ | Value.t ]
 
-  let toString x =
-    match x with
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
-    | #Value.t as x -> Value.toString x
+  let toString x = match x with #Value.t as x -> Value.toString x
 end
 
 module TextDecorationSkipInk = struct
@@ -3182,8 +2755,6 @@ module TextDecorationSkipInk = struct
     [ Auto.t
     | None.t
     | `all
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -3191,40 +2762,25 @@ module TextDecorationSkipInk = struct
     | #Auto.t -> Auto.toString
     | #None.t -> None.toString
     | `all -> {js|all|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TextDecorationSkipBox = struct
   type t =
     [ None.t
     | `all
-    | Var.t
-    | Cascading.t
     ]
 
-  let toString x =
-    match x with
-    | `none -> None.toString
-    | `all -> {js|all|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with `none -> None.toString | `all -> {js|all|js}
 end
 
 module TextDecorationSkipInset = struct
   type t =
     [ None.t
     | Auto.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | `none -> None.toString
-    | #Auto.t -> Auto.toString
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with `none -> None.toString | #Auto.t -> Auto.toString
 end
 
 module TextDecoration = struct
@@ -3237,8 +2793,6 @@ module TextDecoration = struct
 
   type t =
     [ `value of value
-    | Cascading.t
-    | Var.t
     | None.t
     ]
 
@@ -3263,8 +2817,6 @@ module TextDecoration = struct
         (match x.color with
         | Some color -> Color.toString color
         | None -> {js||js})
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
     | #None.t -> None.toString
 end
 
@@ -3287,31 +2839,19 @@ module Width = struct
       | #Length.t as l -> Length.toString l
   end
 
-  type t =
-    [ Value.t
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ | Value.t ]
 
-  let toString x =
-    match x with
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
-    | #Value.t as x -> Value.toString x
+  let toString x = match x with #Value.t as x -> Value.toString x
 end
 
 module MinWidth = struct
   type t =
     [ None.t
     | Width.Value.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
     match x with
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
     | #None.t -> None.toString
     | #Width.Value.t as w -> Width.Value.toString w
 end
@@ -3320,14 +2860,10 @@ module MaxWidth = struct
   type t =
     [ None.t
     | Width.Value.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
     match x with
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
     | #None.t -> None.toString
     | #Width.Value.t as mw -> Width.Value.toString mw
 end
@@ -3345,17 +2881,9 @@ module FlexBasis = struct
       | #Width.Value.t as x -> Width.Value.toString x
   end
 
-  type t =
-    [ Value.t
-    | Cascading.t
-    | Var.t
-    ]
+  type t = [ | Value.t ]
 
-  let toString x =
-    match x with
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
-    | #Value.t as x -> Value.toString x
+  let toString x = match x with #Value.t as x -> Value.toString x
 end
 
 module Height = struct
@@ -3365,14 +2893,10 @@ module Height = struct
     | `maxContent
     | `minContent
     | Length.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
     match x with
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
     | #Auto.t -> Auto.toString
     | `fitContent -> {js|fit-content|js}
     | `maxContent -> {js|max-content|js}
@@ -3403,8 +2927,6 @@ module OverflowWrap = struct
     [ `normal
     | `breakWord
     | `anywhere
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -3412,8 +2934,6 @@ module OverflowWrap = struct
     | `normal -> {js|normal|js}
     | `breakWord -> {js|break-word|js}
     | `anywhere -> {js|anywhere|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module SideOrCorner = struct
@@ -3477,8 +2997,6 @@ module BoxShadow = struct
     [ `shadow of Shadow.t
     | `shadows of Shadow.t array
     | None.t
-    | Var.t
-    | Cascading.t
     ]
 
   (* Create a single box shadow *)
@@ -3492,8 +3010,6 @@ module BoxShadow = struct
     | `shadow s -> Shadow.toString s
     | `shadows arr -> Shadow.many arr
     | #None.t -> None.toString
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* TextShadow wraps Shadow.t with property-level variants *)
@@ -3502,8 +3018,6 @@ module TextShadow = struct
     [ `shadow of Shadow.t
     | `shadows of Shadow.t array
     | None.t
-    | Var.t
-    | Cascading.t
     ]
 
   (* Create a single text shadow *)
@@ -3517,8 +3031,6 @@ module TextShadow = struct
     | `shadow s -> Shadow.toString s
     | `shadows arr -> Shadow.many arr
     | #None.t -> None.toString
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Gradient = struct
@@ -3534,7 +3046,7 @@ module Gradient = struct
     | `TopRight
     ]
 
-  type color_stop_list = ([ Color.t | Var.t ] option * Length.t option) array
+  type color_stop_list = (Color.t option * Length.t option) array
 
   type shape =
     [ `ellipse
@@ -3697,17 +3209,9 @@ module BackgroundSize = struct
       | #Auto.t -> Auto.toString
   end
 
-  type t =
-    [ Value.t
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ | Value.t ]
 
-  let toString x =
-    match x with
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
-    | #Value.t as x -> Value.toString x
+  let toString x = match x with #Value.t as x -> Value.toString x
 end
 
 module Image = struct
@@ -3726,8 +3230,6 @@ module BackgroundImage = struct
   type t =
     [ None.t
     | Image.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -3735,8 +3237,6 @@ module BackgroundImage = struct
     | #None.t -> None.toString
     | #Url.t as u -> Url.toString u
     | #Gradient.t as g -> Gradient.toString g
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Background = struct
@@ -3765,17 +3265,9 @@ module BorderImageSource = struct
       | #Image.t as i -> Image.toString i
   end
 
-  type t =
-    [ Value.t
-    | Cascading.t
-    | Var.t
-    ]
+  type t = [ | Value.t ]
 
-  let toString x =
-    match x with
-    | #Value.t as x -> Value.toString x
-    | #Cascading.t as x -> Cascading.toString x
-    | #Var.t as x -> Var.toString x
+  let toString x = match x with #Value.t as x -> Value.toString x
 end
 
 module MaskImage = struct
@@ -3795,8 +3287,6 @@ module ImageRendering = struct
     | `highQuality
     | `pixelated
     | `crispEdges
-    | Var.t
-    | Cascading.t
     ]
 
   let toString = function
@@ -3805,23 +3295,17 @@ module ImageRendering = struct
     | `highQuality -> {js|high-quality|js}
     | `pixelated -> {js|pixelated|js}
     | `crispEdges -> {js|crisp-edges|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module ImageOrientation = struct
   type t =
     [ None.t
     | `fromImage
-    | Var.t
-    | Cascading.t
     ]
 
   let toString = function
     | #None.t -> None.toString
     | `fromImage -> {js|from-image|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module GeometryBox = struct
@@ -3833,8 +3317,6 @@ module GeometryBox = struct
     | `fillBox
     | `strokeBox
     | `viewBox
-    | Var.t
-    | Cascading.t
     ]
 
   let marginBox = `marginBox
@@ -3854,8 +3336,6 @@ module GeometryBox = struct
     | `fillBox -> {js|fill-box|js}
     | `strokeBox -> {js|stroke-box|js}
     | `viewBox -> {js|view-box|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module ClipPath = struct
@@ -3877,16 +3357,10 @@ module BackfaceVisibility = struct
   type t =
     [ `visible
     | `hidden
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | `visible -> {js|visible|js}
-    | `hidden -> {js|hidden|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with `visible -> {js|visible|js} | `hidden -> {js|hidden|js}
 end
 
 module Flex = struct
@@ -3894,14 +3368,10 @@ module Flex = struct
     [ FlexBasis.Value.t
     | `num of float
     | None.t
-    | Cascading.t
-    | Var.t
     ]
 
   let toString x =
     match x with
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
     | #None.t -> None.toString
     | #FlexBasis.Value.t as x -> FlexBasis.Value.toString x
     | `num x -> Kloth.Float.to_string x
@@ -3911,16 +3381,10 @@ module TransformStyle = struct
   type t =
     [ `preserve3d
     | `flat
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | `preserve3d -> {js|preserve-3d|js}
-    | `flat -> {js|flat|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with `preserve3d -> {js|preserve-3d|js} | `flat -> {js|flat|js}
 end
 
 module TransformBox = struct
@@ -3930,8 +3394,6 @@ module TransformBox = struct
     | `fillBox
     | `strokeBox
     | `viewBox
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -3941,24 +3403,16 @@ module TransformBox = struct
     | `fillBox -> {js|fill-box|js}
     | `strokeBox -> {js|stroke-box|js}
     | `viewBox -> {js|view-box|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module ListStyleImage = struct
   type t =
     [ None.t
     | Image.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | #None.t -> None.toString
-    | #Image.t as i -> Image.toString i
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with #None.t -> None.toString | #Image.t as i -> Image.toString i
 end
 
 module FontFace = struct
@@ -4022,8 +3476,6 @@ module FontDisplay = struct
     | `swap
     | `fallback
     | `optional
-    | Var.t
-    | Cascading.t
     ]
 
   let auto = `auto
@@ -4039,8 +3491,6 @@ module FontDisplay = struct
     | `swap -> {js|swap|js}
     | `fallback -> {js|fallback|js}
     | `optional -> {js|optional|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module SymbolsType = struct
@@ -4089,7 +3539,6 @@ module CounterStyleType = struct
   type t =
     [ ListStyleType.t
     | `Symbols of Symbols.t
-    | `unset
     ]
 
   let toString (x : t) =
@@ -4146,8 +3595,6 @@ module CounterIncrement = struct
   type t =
     [ None.t
     | `increment of string * int
-    | Var.t
-    | Cascading.t
     ]
 
   let increment ?(value = 1) name = `increment (name, value)
@@ -4156,16 +3603,12 @@ module CounterIncrement = struct
     match x with
     | #None.t -> None.toString
     | `increment (name, value) -> (name ^ {js| |js}) ^ string_of_int value
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module CounterReset = struct
   type t =
     [ None.t
     | `reset of string * int
-    | Var.t
-    | Cascading.t
     ]
 
   let reset ?(value = 0) name = `reset (name, value)
@@ -4174,16 +3617,12 @@ module CounterReset = struct
     match x with
     | `reset (name, value) -> (name ^ {js| |js}) ^ string_of_int value
     | #None.t -> None.toString
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module CounterSet = struct
   type t =
     [ None.t
     | `set of string * int
-    | Var.t
-    | Cascading.t
     ]
 
   let set ?(value = 0) name = `set (name, value)
@@ -4192,8 +3631,6 @@ module CounterSet = struct
     match x with
     | #None.t -> None.toString
     | `set (name, value) -> (name ^ {js| |js}) ^ string_of_int value
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Content = struct
@@ -4209,8 +3646,6 @@ module Content = struct
     | Counter.t
     | Counters.t
     | Image.t
-    | Var.t
-    | Cascading.t
     ]
 
   let text_to_string value =
@@ -4239,32 +3674,9 @@ module Content = struct
     | #Image.t as c -> Image.toString c
     | #Counter.t as c -> Counter.toString c
     | #Counters.t as c -> Counters.toString c
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
-module SVG = struct
-  module Fill = struct
-    type t =
-      [ None.t
-      | `contextFill
-      | `contextStroke
-      | Color.t
-      | Url.t
-      ]
-
-    let contextFill = `contextFill
-    let contextStroke = `contextStroke
-
-    let toString x =
-      match x with
-      | #None.t -> None.toString
-      | `contextFill -> {js|context-fill|js}
-      | `contextStroke -> {js|context-stroke|js}
-      | #Color.t as c -> Color.toString c
-      | #Url.t as u -> Url.toString u
-  end
-end
+(* SVG.Fill has been consolidated into the Paint module above *)
 
 module TouchAction = struct
   type t =
@@ -4278,8 +3690,6 @@ module TouchAction = struct
     | `panDown
     | `pinchZoom
     | `manipulation
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -4294,40 +3704,28 @@ module TouchAction = struct
     | `panDown -> {js|pan-down|js}
     | `pinchZoom -> {js|pinch-zoom|js}
     | `manipulation -> {js|manipulation|js}
-    | #Var.t as var -> Var.toString var
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module ZIndex = struct
   type t =
     [ Auto.t
     | `num of int
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | #Auto.t -> Auto.toString
-    | `num x -> Kloth.Int.to_string x
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with #Auto.t -> Auto.toString | `num x -> Kloth.Int.to_string x
 end
 
 module AlphaValue = struct
   type t =
     [ `num of float
     | Percentage.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
     match x with
     | `num x -> Kloth.Float.to_string x
     | #Percentage.t as p -> Percentage.toString p
-    | #Var.t as var -> Var.toString var
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module LineBreak = struct
@@ -4337,8 +3735,6 @@ module LineBreak = struct
     | `normal
     | `strict
     | `anywhere
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -4348,8 +3744,6 @@ module LineBreak = struct
     | `strict -> {js|strict|js}
     | `anywhere -> {js|anywhere|js}
     | #Auto.t -> Auto.toString
-    | #Var.t as var -> Var.toString var
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Hyphens = struct
@@ -4357,8 +3751,6 @@ module Hyphens = struct
     [ None.t
     | `manual
     | Auto.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -4366,8 +3758,6 @@ module Hyphens = struct
     | `manual -> {js|manual|js}
     | #None.t -> None.toString
     | #Auto.t -> Auto.toString
-    | #Var.t as var -> Var.toString var
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TextJustify = struct
@@ -4376,8 +3766,6 @@ module TextJustify = struct
     | `interCharacter
     | Auto.t
     | None.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -4386,8 +3774,6 @@ module TextJustify = struct
     | `interCharacter -> {js|inter-character|js}
     | #Auto.t -> Auto.toString
     | #None.t -> None.toString
-    | #Var.t as var -> Var.toString var
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module OverflowInline = struct
@@ -4397,8 +3783,6 @@ module OverflowInline = struct
     | `scroll
     | `clip
     | Auto.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -4408,8 +3792,6 @@ module OverflowInline = struct
     | `scroll -> {js|scroll|js}
     | `clip -> {js|clip|js}
     | #Auto.t -> Auto.toString
-    | #Var.t as var -> Var.toString var
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module OverflowBlock = struct
@@ -4420,16 +3802,10 @@ module FontSynthesisWeight = struct
   type t =
     [ Auto.t
     | None.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | #Auto.t -> Auto.toString
-    | #None.t -> None.toString
-    | #Var.t as var -> Var.toString var
-    | #Cascading.t as c -> Cascading.toString c
+    match x with #Auto.t -> Auto.toString | #None.t -> None.toString
 end
 
 module FontSynthesisStyle = struct
@@ -4448,9 +3824,7 @@ module FontKerning = struct
   type t =
     [ `normal
     | None.t
-    | Var.t
     | Auto.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -4458,8 +3832,6 @@ module FontKerning = struct
     | `normal -> {js|normal|js}
     | #Auto.t -> Auto.toString
     | #None.t -> None.toString
-    | #Var.t as var -> Var.toString var
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module FontVariantPosition = struct
@@ -4467,8 +3839,6 @@ module FontVariantPosition = struct
     [ `normal
     | `sub
     | `super
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -4476,8 +3846,6 @@ module FontVariantPosition = struct
     | `normal -> {js|normal|js}
     | `sub -> {js|sub|js}
     | `super -> {js|super|js}
-    | #Var.t as var -> Var.toString var
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module FontVariantCaps = struct
@@ -4489,8 +3857,6 @@ module FontVariantCaps = struct
     | `allPetiteCaps
     | `unicase
     | `titlingCaps
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -4502,24 +3868,16 @@ module FontVariantCaps = struct
     | `allPetiteCaps -> {js|all-petite-caps|js}
     | `unicase -> {js|unicase|js}
     | `titlingCaps -> {js|titling-caps|js}
-    | #Var.t as var -> Var.toString var
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module FontOpticalSizing = struct
   type t =
     [ Auto.t
     | None.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | #Auto.t -> Auto.toString
-    | #None.t -> None.toString
-    | #Var.t as var -> Var.toString var
-    | #Cascading.t as c -> Cascading.toString c
+    match x with #Auto.t -> Auto.toString | #None.t -> None.toString
 end
 
 module FontVariantEmoji = struct
@@ -4528,8 +3886,6 @@ module FontVariantEmoji = struct
     | `text
     | `emoji
     | `unicode
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -4538,8 +3894,6 @@ module FontVariantEmoji = struct
     | `text -> {js|text|js}
     | `emoji -> {js|emoji|js}
     | `unicode -> {js|unicode|js}
-    | #Var.t as var -> Var.toString var
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module URange = struct
@@ -4624,8 +3978,6 @@ end
 module GridAutoRows = struct
   type t =
     [ `trackSizes of TrackSize.t array
-    | Var.t
-    | Cascading.t
     | Auto.t
     ]
 
@@ -4635,8 +3987,6 @@ module GridAutoRows = struct
     match x with
     | `trackSizes xs ->
       Kloth.Array.map_and_join ~f:TrackSize.toString ~sep:{js| |js} xs
-    | #Var.t as var -> Var.toString var
-    | #Cascading.t as c -> Cascading.toString c
     | #Auto.t -> Auto.toString
 end
 
@@ -4763,17 +4113,9 @@ module GridTemplateRows = struct
       | `tracks x -> Kloth.Array.map_and_join ~f:Track.toString ~sep:{js| |js} x
   end
 
-  type t =
-    [ Value.t
-    | Cascading.t
-    | Var.t
-    ]
+  type t = [ | Value.t ]
 
-  let toString x =
-    match x with
-    | #Value.t as x -> Value.toString x
-    | #Cascading.t as x -> Cascading.toString x
-    | #Var.t as x -> Var.toString x
+  let toString x = match x with #Value.t as x -> Value.toString x
 end
 
 module GridTemplateColumns = struct
@@ -4782,28 +4124,18 @@ end
 
 module Translate = struct
   module Value = struct
-    type t =
-      [ Length.t
-      | Var.t
-      ]
+    type t = [ | Length.t ]
 
-    let toString x =
-      match x with
-      | #Var.t as x -> Var.toString x
-      | #Length.t as x -> Length.toString x
+    let toString x = match x with #Length.t as x -> Length.toString x
   end
 
   type t =
     [ Value.t
     | None.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | #Value.t as x -> Value.toString x
-    | #None.t -> None.toString
-    | #Cascading.t as x -> Cascading.toString x
+    match x with #Value.t as x -> Value.toString x | #None.t -> None.toString
 end
 
 module Rotate = struct
@@ -4814,8 +4146,6 @@ module Rotate = struct
     | `rotateY of Angle.t
     | `rotateZ of Angle.t
     | `rotate3d of float * float * float * Angle.t
-    | Cascading.t
-    | Var.t
     ]
 
   let toString x =
@@ -4833,8 +4163,6 @@ module Rotate = struct
       ^ Kloth.Float.to_string z
       ^ {js| |js}
       ^ Angle.toString a
-    | #Cascading.t as x -> Cascading.toString x
-    | #Var.t as x -> Var.toString x
 end
 
 module Scale = struct
@@ -4842,27 +4170,21 @@ module Scale = struct
     type t =
       [ `num of float
       | Percentage.t
-      | Var.t
       ]
 
     let toString x =
       match x with
       | `num x -> Kloth.Float.to_string x
       | #Percentage.t as x -> Percentage.toString x
-      | #Var.t as x -> Var.toString x
   end
 
   type t =
     [ Value.t
     | None.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | #Value.t as x -> Value.toString x
-    | #None.t -> None.toString
-    | #Cascading.t as x -> Cascading.toString x
+    match x with #Value.t as x -> Value.toString x | #None.t -> None.toString
 end
 
 module GridRowStart = struct
@@ -4918,81 +4240,57 @@ module GridTemplate = struct
         ^ Kloth.Array.map_and_join ~sep:{js| |js} ~f:ExplicitTrack.toString c
   end
 
-  type t =
-    [ Value.t
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ | Value.t ]
 
-  let toString x =
-    match x with
-    | #Value.t as x -> Value.toString x
-    | #Var.t as x -> Var.toString x
-    | #Cascading.t as x -> Cascading.toString x
+  let toString x = match x with #Value.t as x -> Value.toString x
 end
 
 module Bottom = struct
   type t =
     [ Length.t
-    | Cascading.t
-    | Var.t
     | Auto.t
     ]
 
   let toString x =
     match x with
     | #Auto.t -> Auto.toString
-    | #Var.t as x -> Var.toString x
     | #Length.t as x -> Length.toString x
-    | #Cascading.t as x -> Cascading.toString x
 end
 
 module Top = struct
   type t =
     [ Length.t
-    | Cascading.t
-    | Var.t
     | Auto.t
     ]
 
   let toString x =
     match x with
     | #Auto.t -> Auto.toString
-    | #Var.t as x -> Var.toString x
     | #Length.t as x -> Length.toString x
-    | #Cascading.t as x -> Cascading.toString x
 end
 
 module Right = struct
   type t =
     [ Length.t
-    | Cascading.t
-    | Var.t
     | Auto.t
     ]
 
   let toString x =
     match x with
     | #Auto.t -> Auto.toString
-    | #Var.t as x -> Var.toString x
     | #Length.t as x -> Length.toString x
-    | #Cascading.t as x -> Cascading.toString x
 end
 
 module Left = struct
   type t =
     [ Length.t
-    | Cascading.t
-    | Var.t
     | Auto.t
     ]
 
   let toString x =
     match x with
     | #Auto.t -> Auto.toString
-    | #Var.t as x -> Var.toString x
     | #Length.t as x -> Length.toString x
-    | #Cascading.t as x -> Cascading.toString x
 end
 
 module Grid = struct
@@ -5000,8 +4298,6 @@ module Grid = struct
     [ `template of GridTemplate.Value.t
     | `autoColumns of GridTemplateRows.Value.t * bool * TrackSize.t array option
     | `autoRows of bool * TrackSize.t array option * GridTemplateColumns.Value.t
-    | Var.t
-    | Cascading.t
     ]
 
   let template (x : GridTemplate.Value.t) = `template x
@@ -5037,8 +4333,6 @@ module Grid = struct
         | None -> {js||js})
       ^ {js| / |js}
       ^ GridTemplateColumns.Value.toString templateColumns
-    | #Var.t as x -> Var.toString x
-    | #Cascading.t as x -> Cascading.toString x
 end
 
 module BorderImageSlice = struct
@@ -5058,17 +4352,9 @@ module BorderImageSlice = struct
     let toString = {js|fill|js}
   end
 
-  type t =
-    [ Value.t
-    | Cascading.t
-    | Var.t
-    ]
+  type t = [ | Value.t ]
 
-  let toString x =
-    match x with
-    | #Value.t as x -> Value.toString x
-    | #Cascading.t as x -> Cascading.toString x
-    | #Var.t as x -> Var.toString x
+  let toString x = match x with #Value.t as x -> Value.toString x
 end
 
 module BorderImageWidth = struct
@@ -5086,17 +4372,9 @@ module BorderImageWidth = struct
       | #Length.t as x -> Length.toString x
   end
 
-  type t =
-    [ Value.t
-    | Cascading.t
-    | Var.t
-    ]
+  type t = [ | Value.t ]
 
-  let toString x =
-    match x with
-    | #Cascading.t as x -> Cascading.toString x
-    | #Var.t as x -> Var.toString x
-    | #Value.t as x -> Value.toString x
+  let toString x = match x with #Value.t as x -> Value.toString x
 end
 
 module BorderImageOutset = struct
@@ -5112,17 +4390,9 @@ module BorderImageOutset = struct
       | #Length.t as x -> Length.toString x
   end
 
-  type t =
-    [ Value.t
-    | Cascading.t
-    | Var.t
-    ]
+  type t = [ | Value.t ]
 
-  let toString x =
-    match x with
-    | #Cascading.t as x -> Cascading.toString x
-    | #Var.t as x -> Var.toString x
-    | #Value.t as x -> Value.toString x
+  let toString x = match x with #Value.t as x -> Value.toString x
 end
 
 module BorderImageRepeat = struct
@@ -5142,17 +4412,9 @@ module BorderImageRepeat = struct
       | `space -> {js|space|js}
   end
 
-  type t =
-    [ Value.t
-    | Cascading.t
-    | Var.t
-    ]
+  type t = [ | Value.t ]
 
-  let toString x =
-    match x with
-    | #Value.t as x -> Value.toString x
-    | #Cascading.t as x -> Cascading.toString x
-    | #Var.t as x -> Var.toString x
+  let toString x = match x with #Value.t as x -> Value.toString x
 end
 
 module ScrollbarWidth = struct
@@ -5160,8 +4422,6 @@ module ScrollbarWidth = struct
     [ `thin
     | Auto.t
     | None.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -5169,8 +4429,6 @@ module ScrollbarWidth = struct
     | `thin -> {js|thin|js}
     | #Auto.t -> Auto.toString
     | #None.t -> None.toString
-    | #Var.t as var -> Var.toString var
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module ScrollbarGutter = struct
@@ -5178,8 +4436,6 @@ module ScrollbarGutter = struct
     [ `stable
     | `stableBothEdges
     | Auto.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -5187,24 +4443,18 @@ module ScrollbarGutter = struct
     | `stable -> {js|stable|js}
     | `stableBothEdges -> {js|stable both-edges|js}
     | #Auto.t -> Auto.toString
-    | #Var.t as var -> Var.toString var
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module ScrollbarColor = struct
   type t =
     [ `thumbTrackColor of Color.t * Color.t
     | Auto.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
     match x with
     | `thumbTrackColor (a, b) -> Color.toString a ^ {js| |js} ^ Color.toString b
     | #Auto.t -> Auto.toString
-    | #Var.t as var -> Var.toString var
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module VisualBox = struct
@@ -5223,138 +4473,79 @@ end
 
 module OverflowClipMargin = struct
   module ClipEdgeOrigin = struct
-    type t =
-      [ VisualBox.t
-      | Var.t
-      ]
+    type t = [ | VisualBox.t ]
 
-    let toString x =
-      match x with
-      | #VisualBox.t as vb -> VisualBox.toString vb
-      | #Var.t as va -> Var.toString va
+    let toString x = match x with #VisualBox.t as vb -> VisualBox.toString vb
   end
 
   module Margin = struct
-    type t =
-      [ Length.t
-      | Var.t
-      ]
+    type t = [ | Length.t ]
 
-    let toString x =
-      match x with
-      | #Var.t as va -> Var.toString va
-      | #Length.t as l -> Length.toString l
+    let toString x = match x with #Length.t as l -> Length.toString l
   end
 
   type t =
     [ ClipEdgeOrigin.t
     | Margin.t
-    | Cascading.t
     ]
 
   let toString x =
     match x with
     | #ClipEdgeOrigin.t as ceo -> ClipEdgeOrigin.toString ceo
     | #Margin.t as m -> Margin.toString m
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Border radius properties *)
 module BorderRadius = struct
-  type t =
-    [ Length.t
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ | Length.t ]
 
-  let toString x =
-    match x with
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
-    | #Length.t as l -> Length.toString l
+  let toString x = match x with #Length.t as l -> Length.toString l
 end
 
 module BorderSpacing = struct
-  type t =
-    [ Length.t
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ | Length.t ]
 
-  let toString x =
-    match x with
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
-    | #Length.t as l -> Length.toString l
+  let toString x = match x with #Length.t as l -> Length.toString l
 end
 
 (* Flex grow/shrink - simple number properties *)
 module FlexGrow = struct
-  type t =
-    [ `num of float
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `num of float ]
 
-  let toString x =
-    match x with
-    | `num n -> Kloth.Float.to_string n
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with `num n -> Kloth.Float.to_string n
 end
 
 module FlexShrink = struct
   include FlexGrow
 end
 
-(* Order property *)
 module Order = struct
-  type t =
-    [ `num of int
-    | Var.t
-    | Cascading.t
-    ]
+  type t = int
 
-  let toString x =
-    match x with
-    | `num n -> Kloth.Int.to_string n
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = Kloth.Int.to_string x
 end
 
-(* Orphans and Widows - print properties *)
 module Orphans = struct
-  type t =
-    [ `num of int
-    | Var.t
-    | Cascading.t
-    ]
+  type t = int
 
-  let toString x =
-    match x with
-    | `num n -> Kloth.Int.to_string n
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = Kloth.Int.to_string x
 end
 
 module Widows = struct
-  include Orphans
+  type t = int
+
+  let toString x = Kloth.Int.to_string x
 end
 
-(* Inset properties - logical positioning *)
 module Inset = struct
   type t =
     [ Length.t
     | Auto.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
     match x with
     | #Auto.t -> Auto.toString
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
     | #Length.t as l -> Length.toString l
 end
 
@@ -5385,32 +4576,20 @@ end
 
 (* Scroll margin and padding *)
 module ScrollMargin = struct
-  type t =
-    [ Length.t
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ | Length.t ]
 
-  let toString x =
-    match x with
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
-    | #Length.t as l -> Length.toString l
+  let toString x = match x with #Length.t as l -> Length.toString l
 end
 
 module ScrollPadding = struct
   type t =
     [ Auto.t
     | Length.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
     match x with
     | #Auto.t -> Auto.toString
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
     | #Length.t as l -> Length.toString l
 end
 
@@ -5421,8 +4600,6 @@ module ScrollSnapAlign = struct
     | `start
     | `end_
     | `center
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -5431,24 +4608,16 @@ module ScrollSnapAlign = struct
     | `start -> {js|start|js}
     | `end_ -> {js|end|js}
     | `center -> {js|center|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module ScrollSnapStop = struct
   type t =
     [ `normal
     | `always
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | `normal -> {js|normal|js}
-    | `always -> {js|always|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with `normal -> {js|normal|js} | `always -> {js|always|js}
 end
 
 module ScrollSnapType = struct
@@ -5469,8 +4638,6 @@ module ScrollSnapType = struct
     | `blockProximity
     | `inlineProximity
     | `bothProximity
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -5491,8 +4658,6 @@ module ScrollSnapType = struct
     | `blockProximity -> {js|block proximity|js}
     | `inlineProximity -> {js|inline proximity|js}
     | `bothProximity -> {js|both proximity|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Font properties *)
@@ -5509,7 +4674,6 @@ module FontSize = struct
     | `larger
     | `smaller
     | Length.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -5525,7 +4689,6 @@ module FontSize = struct
     | `larger -> {js|larger|js}
     | `smaller -> {js|smaller|js}
     | #Length.t as l -> Length.toString l
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module FontStretch = struct
@@ -5540,7 +4703,6 @@ module FontStretch = struct
     | `extraExpanded
     | `ultraExpanded
     | Percentage.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -5555,7 +4717,6 @@ module FontStretch = struct
     | `extraExpanded -> {js|extra-expanded|js}
     | `ultraExpanded -> {js|ultra-expanded|js}
     | #Percentage.t as p -> Percentage.toString p
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Layout and appearance *)
@@ -5566,8 +4727,6 @@ module Appearance = struct
     | `button
     | `textfield
     | `menulistButton
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -5577,8 +4736,6 @@ module Appearance = struct
     | `button -> {js|button|js}
     | `textfield -> {js|textfield|js}
     | `menulistButton -> {js|menulist-button|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Contain = struct
@@ -5596,8 +4753,6 @@ module Contain = struct
     | `layoutStyle
     | `layoutPaint
     | `stylePaint
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -5615,8 +4770,6 @@ module Contain = struct
     | `layoutStyle -> {js|layout style|js}
     | `layoutPaint -> {js|layout paint|js}
     | `stylePaint -> {js|style paint|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module ContentVisibility = struct
@@ -5624,8 +4777,6 @@ module ContentVisibility = struct
     [ `visible
     | `hidden
     | Auto.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -5633,8 +4784,6 @@ module ContentVisibility = struct
     | `visible -> {js|visible|js}
     | `hidden -> {js|hidden|js}
     | #Auto.t -> Auto.toString
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module WillChange = struct
@@ -5643,8 +4792,6 @@ module WillChange = struct
     | `scrollPosition
     | `contents
     | `custom of string
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -5653,8 +4800,6 @@ module WillChange = struct
     | `scrollPosition -> {js|scroll-position|js}
     | `contents -> {js|contents|js}
     | `custom s -> s
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module WritingMode = struct
@@ -5664,8 +4809,6 @@ module WritingMode = struct
     | `verticalLr
     | `sidewaysRl
     | `sidewaysLr
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -5675,8 +4818,6 @@ module WritingMode = struct
     | `verticalLr -> {js|vertical-lr|js}
     | `sidewaysRl -> {js|sideways-rl|js}
     | `sidewaysLr -> {js|sideways-lr|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module UnicodeBidi = struct
@@ -5687,8 +4828,6 @@ module UnicodeBidi = struct
     | `bidiOverride
     | `isolateOverride
     | `plaintext
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -5699,8 +4838,6 @@ module UnicodeBidi = struct
     | `bidiOverride -> {js|bidi-override|js}
     | `isolateOverride -> {js|isolate-override|js}
     | `plaintext -> {js|plaintext|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Blend modes *)
@@ -5722,8 +4859,6 @@ module MixBlendMode = struct
     | `saturation
     | `color
     | `luminosity
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -5744,8 +4879,6 @@ module MixBlendMode = struct
     | `saturation -> {js|saturation|js}
     | `color -> {js|color|js}
     | `luminosity -> {js|luminosity|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module BackgroundBlendMode = struct
@@ -5769,8 +4902,6 @@ module BreakAfter = struct
     | `column
     | `avoidRegion
     | `region
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -5789,8 +4920,6 @@ module BreakAfter = struct
     | `column -> {js|column|js}
     | `avoidRegion -> {js|avoid-region|js}
     | `region -> {js|region|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module BreakBefore = struct
@@ -5804,8 +4933,6 @@ module BreakInside = struct
     | `avoidPage
     | `avoidColumn
     | `avoidRegion
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -5815,8 +4942,6 @@ module BreakInside = struct
     | `avoidPage -> {js|avoid-page|js}
     | `avoidColumn -> {js|avoid-column|js}
     | `avoidRegion -> {js|avoid-region|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module PageBreakAfter = struct
@@ -5828,8 +4953,6 @@ module PageBreakAfter = struct
     | `right
     | `recto
     | `verso
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -5841,8 +4964,6 @@ module PageBreakAfter = struct
     | `right -> {js|right|js}
     | `recto -> {js|recto|js}
     | `verso -> {js|verso|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module PageBreakBefore = struct
@@ -5853,16 +4974,10 @@ module PageBreakInside = struct
   type t =
     [ Auto.t
     | `avoid
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | #Auto.t -> Auto.toString
-    | `avoid -> {js|avoid|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with #Auto.t -> Auto.toString | `avoid -> {js|avoid|js}
 end
 
 (* Column properties - combines width and count *)
@@ -5870,14 +4985,12 @@ module Columns = struct
   type t =
     [ ColumnWidth.t
     | `count of int
-    | Cascading.t
     ]
 
   let toString x =
     match x with
     | #ColumnWidth.t as cw -> ColumnWidth.toString cw
     | `count v -> Kloth.Int.to_string v
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module ColumnFill = struct
@@ -5885,8 +4998,6 @@ module ColumnFill = struct
     [ Auto.t
     | `balance
     | `balanceAll
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -5894,24 +5005,15 @@ module ColumnFill = struct
     | #Auto.t -> Auto.toString
     | `balance -> {js|balance|js}
     | `balanceAll -> {js|balance-all|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module ColumnSpan = struct
   type t =
     [ None.t
     | `all
-    | Var.t
-    | Cascading.t
     ]
 
-  let toString x =
-    match x with
-    | #None.t -> None.toString
-    | `all -> {js|all|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with #None.t -> None.toString | `all -> {js|all|js}
 end
 
 (* Container queries *)
@@ -5919,16 +5021,9 @@ module ContainerName = struct
   type t =
     [ None.t
     | `custom of string
-    | Var.t
-    | Cascading.t
     ]
 
-  let toString x =
-    match x with
-    | #None.t -> None.toString
-    | `custom s -> s
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with #None.t -> None.toString | `custom s -> s
 end
 
 module ContainerType = struct
@@ -5936,8 +5031,6 @@ module ContainerType = struct
     [ `normal
     | `size
     | `inlineSize
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -5945,8 +5038,6 @@ module ContainerType = struct
     | `normal -> {js|normal|js}
     | `size -> {js|size|js}
     | `inlineSize -> {js|inline-size|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Table properties *)
@@ -5958,8 +5049,6 @@ module CaptionSide = struct
     | `blockEnd
     | `inlineStart
     | `inlineEnd
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -5970,24 +5059,15 @@ module CaptionSide = struct
     | `blockEnd -> {js|block-end|js}
     | `inlineStart -> {js|inline-start|js}
     | `inlineEnd -> {js|inline-end|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module EmptyCells = struct
   type t =
     [ `show
     | `hide
-    | Var.t
-    | Cascading.t
     ]
 
-  let toString x =
-    match x with
-    | `show -> {js|show|js}
-    | `hide -> {js|hide|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with `show -> {js|show|js} | `hide -> {js|hide|js}
 end
 
 module Quotes = struct
@@ -5995,8 +5075,6 @@ module Quotes = struct
     [ None.t
     | Auto.t
     | `quotes of (string * string) array
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6009,35 +5087,25 @@ module Quotes = struct
       |> List.map (fun (open_, close) ->
         {js|"|js} ^ open_ ^ {js|" "|js} ^ close ^ {js|"|js})
       |> String.concat {js| |js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Text properties *)
 module TextIndent = struct
-  type t =
-    [ Length.t
-    | Cascading.t
-    ]
+  type t = [ | Length.t ]
 
-  let toString x =
-    match x with
-    | #Length.t as l -> Length.toString l
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with #Length.t as l -> Length.toString l
 end
 
 module TextUnderlineOffset = struct
   type t =
     [ Auto.t
     | Length.t
-    | Cascading.t
     ]
 
   let toString x =
     match x with
     | #Auto.t -> Auto.toString
     | #Length.t as l -> Length.toString l
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TextUnderlinePosition = struct
@@ -6049,8 +5117,6 @@ module TextUnderlinePosition = struct
     | `right
     | `underLeft
     | `underRight
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6062,8 +5128,6 @@ module TextUnderlinePosition = struct
     | `right -> {js|right|js}
     | `underLeft -> {js|under left|js}
     | `underRight -> {js|under right|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TextRendering = struct
@@ -6072,8 +5136,6 @@ module TextRendering = struct
     | `optimizeSpeed
     | `optimizeLegibility
     | `geometricPrecision
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6082,21 +5144,13 @@ module TextRendering = struct
     | `optimizeSpeed -> {js|optimizeSpeed|js}
     | `optimizeLegibility -> {js|optimizeLegibility|js}
     | `geometricPrecision -> {js|geometricPrecision|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Offset/motion path properties *)
 module OffsetDistance = struct
-  type t =
-    [ Length.t
-    | Cascading.t
-    ]
+  type t = [ | Length.t ]
 
-  let toString x =
-    match x with
-    | #Length.t as l -> Length.toString l
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with #Length.t as l -> Length.toString l
 end
 
 module OffsetRotate = struct
@@ -6106,8 +5160,6 @@ module OffsetRotate = struct
     | Angle.t
     | `autoAngle of Angle.t
     | `reverseAngle of Angle.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6117,8 +5169,6 @@ module OffsetRotate = struct
     | #Angle.t as a -> Angle.toString a
     | `autoAngle a -> {js|auto |js} ^ Angle.toString a
     | `reverseAngle a -> {js|reverse |js} ^ Angle.toString a
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Color interpolation and adjustment *)
@@ -6127,8 +5177,6 @@ module ColorInterpolation = struct
     [ Auto.t
     | `sRGB
     | `linearRGB
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6136,8 +5184,6 @@ module ColorInterpolation = struct
     | #Auto.t -> Auto.toString
     | `sRGB -> {js|sRGB|js}
     | `linearRGB -> {js|linearRGB|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module ColorInterpolationFilters = struct
@@ -6148,16 +5194,10 @@ module ColorAdjust = struct
   type t =
     [ `economy
     | `exact
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | `economy -> {js|economy|js}
-    | `exact -> {js|exact|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with `economy -> {js|economy|js} | `exact -> {js|exact|js}
 end
 
 module ColorScheme = struct
@@ -6167,8 +5207,6 @@ module ColorScheme = struct
     | `dark
     | `lightDark
     | `only of [ `light | `dark ]
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6179,15 +5217,12 @@ module ColorScheme = struct
     | `lightDark -> {js|light dark|js}
     | `only `light -> {js|light only|js}
     | `only `dark -> {js|dark only|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Clip = struct
   type t =
     [ Auto.t
     | `rect of Length.t * Length.t * Length.t * Length.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6203,23 +5238,16 @@ module Clip = struct
       ^ {js|, |js}
       ^ Length.toString left
       ^ {js|)|js}
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module ClipRule = struct
   type t =
     [ `nonzero
     | `evenodd
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | `nonzero -> {js|nonzero|js}
-    | `evenodd -> {js|evenodd|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with `nonzero -> {js|nonzero|js} | `evenodd -> {js|evenodd|js}
 end
 
 (* Zoom property *)
@@ -6229,7 +5257,6 @@ module Zoom = struct
     | `reset
     | `num of float
     | Percentage.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6238,7 +5265,6 @@ module Zoom = struct
     | `reset -> {js|reset|js}
     | `num n -> Kloth.Float.to_string n
     | #Percentage.t as p -> Percentage.toString p
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Font advanced properties *)
@@ -6246,16 +5272,10 @@ module FontSizeAdjust = struct
   type t =
     [ None.t
     | `num of float
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | #None.t -> None.toString
-    | `num n -> Kloth.Float.to_string n
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with #None.t -> None.toString | `num n -> Kloth.Float.to_string n
 end
 
 (* Text advanced properties *)
@@ -6264,8 +5284,6 @@ module TextAnchor = struct
     [ `start
     | `middle
     | `end_
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6273,8 +5291,6 @@ module TextAnchor = struct
     | `start -> {js|start|js}
     | `middle -> {js|middle|js}
     | `end_ -> {js|end|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TextSizeAdjust = struct
@@ -6282,8 +5298,6 @@ module TextSizeAdjust = struct
     [ None.t
     | Auto.t
     | Percentage.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6291,35 +5305,25 @@ module TextSizeAdjust = struct
     | #None.t -> None.toString
     | #Auto.t -> Auto.toString
     | #Percentage.t as p -> Percentage.toString p
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Shape properties *)
 module ShapeMargin = struct
-  type t =
-    [ Length.t
-    | Cascading.t
-    ]
+  type t = [ | Length.t ]
 
-  let toString x =
-    match x with
-    | #Length.t as l -> Length.toString l
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with #Length.t as l -> Length.toString l
 end
 
 module ShapeImageThreshold = struct
   type t =
     [ `num of float
     | Percentage.t
-    | Cascading.t
     ]
 
   let toString x =
     match x with
     | `num n -> Kloth.Float.to_string n
     | #Percentage.t as p -> Percentage.toString p
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Baseline properties *)
@@ -6329,7 +5333,6 @@ module BaselineShift = struct
     | `sub
     | `super
     | Length.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6338,7 +5341,6 @@ module BaselineShift = struct
     | `sub -> {js|sub|js}
     | `super -> {js|super|js}
     | #Length.t as l -> Length.toString l
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module DominantBaseline = struct
@@ -6355,8 +5357,6 @@ module DominantBaseline = struct
     | `middle
     | `textAfterEdge
     | `textBeforeEdge
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6373,8 +5373,6 @@ module DominantBaseline = struct
     | `middle -> {js|middle|js}
     | `textAfterEdge -> {js|text-after-edge|js}
     | `textBeforeEdge -> {js|text-before-edge|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module AlignmentBaseline = struct
@@ -6386,60 +5384,37 @@ module HyphenateCharacter = struct
   type t =
     [ Auto.t
     | `string of string
-    | Var.t
-    | Cascading.t
     ]
 
-  let toString x =
-    match x with
-    | #Auto.t -> Auto.toString
-    | `string s -> s
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with #Auto.t -> Auto.toString | `string s -> s
 end
 
 module HyphenateLimitChars = struct
   type t =
     [ Auto.t
     | `num of int
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | #Auto.t -> Auto.toString
-    | `num n -> Kloth.Int.to_string n
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with #Auto.t -> Auto.toString | `num n -> Kloth.Int.to_string n
 end
 
 module HyphenateLimitLines = struct
   type t =
     [ `noLimit
     | `num of int
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
     match x with
     | `noLimit -> {js|no-limit|js}
     | `num n -> Kloth.Int.to_string n
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module HyphenateLimitZone = struct
-  type t =
-    [ Length.t
-    | Cascading.t
-    ]
+  type t = [ | Length.t ]
 
-  let toString x =
-    match x with
-    | #Length.t as l -> Length.toString l
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with #Length.t as l -> Length.toString l
 end
 
 (* Initial letter *)
@@ -6448,8 +5423,6 @@ module InitialLetter = struct
     [ `normal
     | `num of float
     | `numInt of float * int
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6458,8 +5431,6 @@ module InitialLetter = struct
     | `num n -> Kloth.Float.to_string n
     | `numInt (n, i) ->
       Kloth.Float.to_string n ^ {js| |js} ^ Kloth.Int.to_string i
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module InitialLetterAlign = struct
@@ -6468,8 +5439,6 @@ module InitialLetterAlign = struct
     | `alphabetic
     | `hanging
     | `ideographic
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6478,8 +5447,6 @@ module InitialLetterAlign = struct
     | `alphabetic -> {js|alphabetic|js}
     | `hanging -> {js|hanging|js}
     | `ideographic -> {js|ideographic|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Line clamp *)
@@ -6487,16 +5454,10 @@ module LineClamp = struct
   type t =
     [ None.t
     | `num of int
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | #None.t -> None.toString
-    | `num n -> Kloth.Int.to_string n
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with #None.t -> None.toString | `num n -> Kloth.Int.to_string n
 end
 
 module MaxLines = struct
@@ -6507,16 +5468,10 @@ module BoxDecorationBreak = struct
   type t =
     [ `slice
     | `clone
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | `slice -> {js|slice|js}
-    | `clone -> {js|clone|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with `slice -> {js|slice|js} | `clone -> {js|clone|js}
 end
 
 (* Ruby properties *)
@@ -6526,8 +5481,6 @@ module RubyAlign = struct
     | `center
     | `spaceBetween
     | `spaceAround
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6536,8 +5489,6 @@ module RubyAlign = struct
     | `center -> {js|center|js}
     | `spaceBetween -> {js|space-between|js}
     | `spaceAround -> {js|space-around|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module RubyMerge = struct
@@ -6545,8 +5496,6 @@ module RubyMerge = struct
     [ `separate
     | `collapse
     | Auto.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6554,8 +5503,6 @@ module RubyMerge = struct
     | `separate -> {js|separate|js}
     | `collapse -> {js|collapse|js}
     | #Auto.t -> Auto.toString
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module RubyPosition = struct
@@ -6563,8 +5510,6 @@ module RubyPosition = struct
     [ `over
     | `under
     | `interCharacter
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6572,8 +5517,6 @@ module RubyPosition = struct
     | `over -> {js|over|js}
     | `under -> {js|under|js}
     | `interCharacter -> {js|inter-character|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Place properties - shorthands for align + justify *)
@@ -6601,8 +5544,6 @@ module MarginTrim = struct
     [ None.t
     | `inFlow
     | `all
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6610,8 +5551,6 @@ module MarginTrim = struct
     | #None.t -> None.toString
     | `inFlow -> {js|in-flow|js}
     | `all -> {js|all|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Additional scroll snap properties *)
@@ -6640,8 +5579,6 @@ module ImageResolution = struct
     | `dpi of float
     | `dpcm of float
     | `dppx of float
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6650,8 +5587,6 @@ module ImageResolution = struct
     | `dpi n -> Kloth.Float.to_string n ^ {js|dpi|js}
     | `dpcm n -> Kloth.Float.to_string n ^ {js|dpcm|js}
     | `dppx n -> Kloth.Float.to_string n ^ {js|dppx|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Additional text properties *)
@@ -6660,8 +5595,6 @@ module TextOrientation = struct
     [ `mixed
     | `upright
     | `sideways
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6669,8 +5602,6 @@ module TextOrientation = struct
     | `mixed -> {js|mixed|js}
     | `upright -> {js|upright|js}
     | `sideways -> {js|sideways|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TextCombineUpright = struct
@@ -6678,8 +5609,6 @@ module TextCombineUpright = struct
     [ None.t
     | `all
     | `digits of int
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6687,8 +5616,6 @@ module TextCombineUpright = struct
     | #None.t -> None.toString
     | `all -> {js|all|js}
     | `digits n -> {js|digits |js} ^ Kloth.Int.to_string n
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module HangingPunctuation = struct
@@ -6705,8 +5632,6 @@ module HangingPunctuation = struct
     | `firstLast
     | `firstForceEndLast
     | `firstAllowEndLast
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6723,8 +5648,6 @@ module HangingPunctuation = struct
     | `firstLast -> {js|first last|js}
     | `firstForceEndLast -> {js|first force-end last|js}
     | `firstAllowEndLast -> {js|first allow-end last|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Column rule *)
@@ -6773,11 +5696,7 @@ end
 
 (* Font family - uses existing FontFamilyName *)
 module FontFamily = struct
-  type t =
-    [ `families of FontFamilyName.t array
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `families of FontFamilyName.t array ]
 
   let toString x =
     match x with
@@ -6786,8 +5705,6 @@ module FontFamily = struct
       |> Array.to_list
       |> List.map FontFamilyName.toString
       |> String.concat {js|, |js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Font palette *)
@@ -6797,8 +5714,6 @@ module FontPalette = struct
     | `light
     | `dark
     | `custom of string
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6807,8 +5722,6 @@ module FontPalette = struct
     | `light -> {js|light|js}
     | `dark -> {js|dark|js}
     | `custom s -> s
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Font variant properties *)
@@ -6818,8 +5731,6 @@ module FontVariantAlternates = struct
     | `stylistic of string
     | `historicalForms
     | `custom of string
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6828,8 +5739,6 @@ module FontVariantAlternates = struct
     | `stylistic s -> {js|stylistic(|js} ^ s ^ {js|)|js}
     | `historicalForms -> {js|historical-forms|js}
     | `custom s -> s
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module FontVariantEastAsian = struct
@@ -6844,8 +5753,6 @@ module FontVariantEastAsian = struct
     | `fullWidth
     | `proportionalWidth
     | `ruby
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6860,8 +5767,6 @@ module FontVariantEastAsian = struct
     | `fullWidth -> {js|full-width|js}
     | `proportionalWidth -> {js|proportional-width|js}
     | `ruby -> {js|ruby|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module FontVariantLigatures = struct
@@ -6876,8 +5781,6 @@ module FontVariantLigatures = struct
     | `noHistoricalLigatures
     | `contextual
     | `noContextual
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6892,8 +5795,6 @@ module FontVariantLigatures = struct
     | `noHistoricalLigatures -> {js|no-historical-ligatures|js}
     | `contextual -> {js|contextual|js}
     | `noContextual -> {js|no-contextual|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module FontVariantNumeric = struct
@@ -6907,8 +5808,6 @@ module FontVariantNumeric = struct
     | `stackedFractions
     | `ordinal
     | `slashedZero
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6922,24 +5821,15 @@ module FontVariantNumeric = struct
     | `stackedFractions -> {js|stacked-fractions|js}
     | `ordinal -> {js|ordinal|js}
     | `slashedZero -> {js|slashed-zero|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module FontFeatureSettings = struct
   type t =
     [ `normal
     | `custom of string
-    | Var.t
-    | Cascading.t
     ]
 
-  let toString x =
-    match x with
-    | `normal -> {js|normal|js}
-    | `custom s -> s
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with `normal -> {js|normal|js} | `custom s -> s
 end
 
 module FontVariationSettings = struct
@@ -6950,16 +5840,12 @@ module FontLanguageOverride = struct
   type t =
     [ `normal
     | `string of string
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
     match x with
     | `normal -> {js|normal|js}
     | `string s -> {js|"|js} ^ s ^ {js|"|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Text decoration skip properties *)
@@ -6972,8 +5858,6 @@ module TextDecorationSkip = struct
     | `trailingSpaces
     | `edges
     | `boxDecoration
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -6985,8 +5869,6 @@ module TextDecorationSkip = struct
     | `trailingSpaces -> {js|trailing-spaces|js}
     | `edges -> {js|edges|js}
     | `boxDecoration -> {js|box-decoration|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TextDecorationSkipSelf = struct
@@ -7005,8 +5887,6 @@ module TextAutospace = struct
     | `ideographNumeric
     | `ideographParenthesis
     | `ideographSpace
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7016,8 +5896,6 @@ module TextAutospace = struct
     | `ideographNumeric -> {js|ideograph-numeric|js}
     | `ideographParenthesis -> {js|ideograph-parenthesis|js}
     | `ideographSpace -> {js|ideograph-space|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TextBlink = struct
@@ -7025,8 +5903,6 @@ module TextBlink = struct
     [ None.t
     | `blink
     | `blinkAnywhere
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7034,8 +5910,6 @@ module TextBlink = struct
     | #None.t -> None.toString
     | `blink -> {js|blink|js}
     | `blinkAnywhere -> {js|blink-anywhere|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TextJustifyTrim = struct
@@ -7043,8 +5917,6 @@ module TextJustifyTrim = struct
     [ None.t
     | `all
     | Auto.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7052,8 +5924,6 @@ module TextJustifyTrim = struct
     | #None.t -> None.toString
     | `all -> {js|all|js}
     | #Auto.t -> Auto.toString
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TextKashida = struct
@@ -7062,8 +5932,6 @@ module TextKashida = struct
     | `horizontal
     | `vertical
     | `both
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7072,8 +5940,6 @@ module TextKashida = struct
     | `horizontal -> {js|horizontal|js}
     | `vertical -> {js|vertical|js}
     | `both -> {js|both|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TextKashidaSpace = struct
@@ -7081,8 +5947,6 @@ module TextKashidaSpace = struct
     [ `normal
     | `pre
     | `post
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7090,21 +5954,13 @@ module TextKashidaSpace = struct
     | `normal -> {js|normal|js}
     | `pre -> {js|pre|js}
     | `post -> {js|post|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Line height step *)
 module LineHeightStep = struct
-  type t =
-    [ Length.t
-    | Cascading.t
-    ]
+  type t = [ | Length.t ]
 
-  let toString x =
-    match x with
-    | #Length.t as l -> Length.toString l
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with #Length.t as l -> Length.toString l
 end
 
 (* Shape outside *)
@@ -7116,8 +5972,6 @@ module ShapeOutside = struct
     | `paddingBox
     | `contentBox
     | Image.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7128,8 +5982,6 @@ module ShapeOutside = struct
     | `paddingBox -> {js|padding-box|js}
     | `contentBox -> {js|content-box|js}
     | #Image.t as i -> Image.toString i
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module ShapeRendering = struct
@@ -7138,8 +5990,6 @@ module ShapeRendering = struct
     | `optimizeSpeed
     | `crispEdges
     | `geometricPrecision
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7148,8 +5998,6 @@ module ShapeRendering = struct
     | `optimizeSpeed -> {js|optimizeSpeed|js}
     | `crispEdges -> {js|crispEdges|js}
     | `geometricPrecision -> {js|geometricPrecision|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Remaining offset properties *)
@@ -7170,8 +6018,6 @@ module OffsetPath = struct
     [ None.t
     | Url.t
     | `custom of string
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7179,8 +6025,6 @@ module OffsetPath = struct
     | #None.t -> None.toString
     | #Url.t as u -> Url.toString u
     | `custom s -> s
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Offset = struct
@@ -7198,30 +6042,22 @@ module FillRule = struct
   type t =
     [ `nonzero
     | `evenodd
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | `nonzero -> {js|nonzero|js}
-    | `evenodd -> {js|evenodd|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with `nonzero -> {js|nonzero|js} | `evenodd -> {js|evenodd|js}
 end
 
 module StrokeWidth = struct
   type t =
     [ Length.t
     | `num of float
-    | Cascading.t
     ]
 
   let toString x =
     match x with
     | #Length.t as l -> Length.toString l
     | `num n -> Kloth.Float.to_string n
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module StrokeLinecap = struct
@@ -7229,8 +6065,6 @@ module StrokeLinecap = struct
     [ `butt
     | `round
     | `square
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7238,8 +6072,6 @@ module StrokeLinecap = struct
     | `butt -> {js|butt|js}
     | `round -> {js|round|js}
     | `square -> {js|square|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module StrokeLinejoin = struct
@@ -7247,8 +6079,6 @@ module StrokeLinejoin = struct
     [ `miter
     | `round
     | `bevel
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7256,52 +6086,34 @@ module StrokeLinejoin = struct
     | `miter -> {js|miter|js}
     | `round -> {js|round|js}
     | `bevel -> {js|bevel|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module StrokeMiterlimit = struct
-  type t =
-    [ `num of float
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `num of float ]
 
-  let toString x =
-    match x with
-    | `num n -> Kloth.Float.to_string n
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with `num n -> Kloth.Float.to_string n
 end
 
 module StrokeDashoffset = struct
   type t =
     [ Length.t
     | `num of float
-    | Cascading.t
     ]
 
   let toString x =
     match x with
     | #Length.t as l -> Length.toString l
     | `num n -> Kloth.Float.to_string n
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Marker = struct
   type t =
     [ None.t
     | Url.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | #None.t -> None.toString
-    | #Url.t as u -> Url.toString u
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with #None.t -> None.toString | #Url.t as u -> Url.toString u
 end
 
 module MarkerStart = struct
@@ -7328,8 +6140,6 @@ module PaintOrder = struct
     | `strokeMarkers
     | `markersFill
     | `markersStroke
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7344,34 +6154,24 @@ module PaintOrder = struct
     | `strokeMarkers -> {js|stroke markers|js}
     | `markersFill -> {js|markers fill|js}
     | `markersStroke -> {js|markers stroke|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Kerning = struct
   type t =
     [ Auto.t
     | Length.t
-    | Cascading.t
     ]
 
   let toString x =
     match x with
     | #Auto.t -> Auto.toString
     | #Length.t as l -> Length.toString l
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module GlyphOrientationHorizontal = struct
-  type t =
-    [ Angle.t
-    | Cascading.t
-    ]
+  type t = [ | Angle.t ]
 
-  let toString x =
-    match x with
-    | #Angle.t as a -> Angle.toString a
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with #Angle.t as a -> Angle.toString a
 end
 
 module GlyphOrientationVertical = struct
@@ -7386,8 +6186,6 @@ module ImeMode = struct
     | `active
     | `inactive
     | `disabled
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7397,8 +6195,6 @@ module ImeMode = struct
     | `active -> {js|active|js}
     | `inactive -> {js|inactive|js}
     | `disabled -> {js|disabled|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Azimuth = struct
@@ -7416,8 +6212,6 @@ module Azimuth = struct
     | `behind
     | `leftwards
     | `rightwards
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7435,16 +6229,10 @@ module Azimuth = struct
     | `behind -> {js|behind|js}
     | `leftwards -> {js|leftwards|js}
     | `rightwards -> {js|rightwards|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Behavior = struct
-  type t =
-    [ `urls of string array
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `urls of string array ]
 
   let toString x =
     match x with
@@ -7453,8 +6241,6 @@ module Behavior = struct
       |> Array.to_list
       |> List.map (fun u -> {js|url(|js} ^ u ^ {js|)|js})
       |> String.concat {js| |js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module MasonryAutoFlow = struct
@@ -7467,8 +6253,6 @@ module MasonryAutoFlow = struct
     | `packOrdered
     | `nextDefiniteFirst
     | `nextOrdered
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7481,8 +6265,6 @@ module MasonryAutoFlow = struct
     | `packOrdered -> {js|pack ordered|js}
     | `nextDefiniteFirst -> {js|next definite-first|js}
     | `nextOrdered -> {js|next ordered|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module ForcedColorAdjust = struct
@@ -7490,8 +6272,6 @@ module ForcedColorAdjust = struct
     [ Auto.t
     | None.t
     | `preserveParentColor
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7499,8 +6279,6 @@ module ForcedColorAdjust = struct
     | #Auto.t -> Auto.toString
     | #None.t -> None.toString
     | `preserveParentColor -> {js|preserve-parent-color|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module BlockOverflow = struct
@@ -7508,8 +6286,6 @@ module BlockOverflow = struct
     [ `clip
     | `ellipsis
     | `string of string
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7517,8 +6293,6 @@ module BlockOverflow = struct
     | `clip -> {js|clip|js}
     | `ellipsis -> {js|ellipsis|js}
     | `string s -> s
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Navigation properties (obsolete but adding for completeness) *)
@@ -7526,16 +6300,10 @@ module NavIndex = struct
   type t =
     [ Auto.t
     | `num of int
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | #Auto.t -> Auto.toString
-    | `num n -> Kloth.Int.to_string n
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with #Auto.t -> Auto.toString | `num n -> Kloth.Int.to_string n
 end
 
 module NavDown = struct
@@ -7559,8 +6327,6 @@ module Container = struct
   type t =
     [ `name of string
     | `type_ of [ `normal | `size | `inlineSize ]
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7569,8 +6335,6 @@ module Container = struct
     | `type_ `normal -> {js|normal|js}
     | `type_ `size -> {js|size|js}
     | `type_ `inlineSize -> {js|inline-size|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Scroll snap points (legacy) *)
@@ -7578,16 +6342,12 @@ module ScrollSnapPointsX = struct
   type t =
     [ None.t
     | `repeat of Length.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
     match x with
     | #None.t -> None.toString
     | `repeat l -> {js|repeat(|js} ^ Length.toString l ^ {js|)|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module ScrollSnapPointsY = struct
@@ -7602,8 +6362,6 @@ module BoxAlign = struct
     | `end_
     | `baseline
     | `stretch
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7613,8 +6371,6 @@ module BoxAlign = struct
     | `end_ -> {js|end|js}
     | `baseline -> {js|baseline|js}
     | `stretch -> {js|stretch|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module BoxDirection = struct
@@ -7622,8 +6378,6 @@ module BoxDirection = struct
     [ `normal
     | `reverse
     | `inherit_
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7631,66 +6385,34 @@ module BoxDirection = struct
     | `normal -> {js|normal|js}
     | `reverse -> {js|reverse|js}
     | `inherit_ -> {js|inherit|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module BoxFlex = struct
-  type t =
-    [ `num of float
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `num of float ]
 
-  let toString x =
-    match x with
-    | `num n -> Kloth.Float.to_string n
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with `num n -> Kloth.Float.to_string n
 end
 
 module BoxFlexGroup = struct
-  type t =
-    [ `num of int
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `num of int ]
 
-  let toString x =
-    match x with
-    | `num n -> Kloth.Int.to_string n
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with `num n -> Kloth.Int.to_string n
 end
 
 module BoxLines = struct
   type t =
     [ `single
     | `multiple
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | `single -> {js|single|js}
-    | `multiple -> {js|multiple|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with `single -> {js|single|js} | `multiple -> {js|multiple|js}
 end
 
 module BoxOrdinalGroup = struct
-  type t =
-    [ `num of int
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `num of int ]
 
-  let toString x =
-    match x with
-    | `num n -> Kloth.Int.to_string n
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with `num n -> Kloth.Int.to_string n
 end
 
 module BoxOrient = struct
@@ -7700,8 +6422,6 @@ module BoxOrient = struct
     | `inlineAxis
     | `blockAxis
     | `inherit_
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7711,8 +6431,6 @@ module BoxOrient = struct
     | `inlineAxis -> {js|inline-axis|js}
     | `blockAxis -> {js|block-axis|js}
     | `inherit_ -> {js|inherit|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module BoxPack = struct
@@ -7721,8 +6439,6 @@ module BoxPack = struct
     | `center
     | `end_
     | `justify
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7731,8 +6447,6 @@ module BoxPack = struct
     | `center -> {js|center|js}
     | `end_ -> {js|end|js}
     | `justify -> {js|justify|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Layout grid (legacy IE) *)
@@ -7740,16 +6454,9 @@ module LayoutGrid = struct
   type t =
     [ Auto.t
     | `custom of string
-    | Var.t
-    | Cascading.t
     ]
 
-  let toString x =
-    match x with
-    | #Auto.t -> Auto.toString
-    | `custom s -> s
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with #Auto.t -> Auto.toString | `custom s -> s
 end
 
 module LayoutGridChar = struct
@@ -7775,7 +6482,6 @@ module FontSmooth = struct
     | `never
     | `always
     | Length.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7784,16 +6490,11 @@ module FontSmooth = struct
     | `never -> {js|never|js}
     | `always -> {js|always|js}
     | #Length.t as l -> Length.toString l
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Src (for @font-face) *)
 module Src = struct
-  type t =
-    [ `urls of FontFace.t array
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `urls of FontFace.t array ]
 
   let toString x =
     match x with
@@ -7802,8 +6503,6 @@ module Src = struct
       |> Array.to_list
       |> List.map FontFace.toString
       |> String.concat {js|, |js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Voice/Speech properties for audio rendering *)
@@ -7816,8 +6515,6 @@ module VoiceVolume = struct
     | `loud
     | `xLoud
     | `num of float
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7829,8 +6526,6 @@ module VoiceVolume = struct
     | `loud -> {js|loud|js}
     | `xLoud -> {js|x-loud|js}
     | `num n -> Kloth.Float.to_string n
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module VoiceBalance = struct
@@ -7841,8 +6536,6 @@ module VoiceBalance = struct
     | `right
     | `leftwards
     | `rightwards
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7853,22 +6546,16 @@ module VoiceBalance = struct
     | `right -> {js|right|js}
     | `leftwards -> {js|leftwards|js}
     | `rightwards -> {js|rightwards|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module VoiceDuration = struct
   type t =
     [ Auto.t
     | Time.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | #Auto.t -> Auto.toString
-    | #Time.t as t -> Time.toString t
-    | #Cascading.t as c -> Cascading.toString c
+    match x with #Auto.t -> Auto.toString | #Time.t as t -> Time.toString t
 end
 
 module VoiceRate = struct
@@ -7880,7 +6567,6 @@ module VoiceRate = struct
     | `fast
     | `xFast
     | Percentage.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7892,7 +6578,6 @@ module VoiceRate = struct
     | `fast -> {js|fast|js}
     | `xFast -> {js|x-fast|js}
     | #Percentage.t as p -> Percentage.toString p
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module VoiceStress = struct
@@ -7902,8 +6587,6 @@ module VoiceStress = struct
     | `moderate
     | None.t
     | `reduced
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7913,8 +6596,6 @@ module VoiceStress = struct
     | `moderate -> {js|moderate|js}
     | #None.t -> None.toString
     | `reduced -> {js|reduced|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Speak = struct
@@ -7922,8 +6603,6 @@ module Speak = struct
     [ Auto.t
     | None.t
     | `normal
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7931,8 +6610,6 @@ module Speak = struct
     | #Auto.t -> Auto.toString
     | #None.t -> None.toString
     | `normal -> {js|normal|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module SpeakAs = struct
@@ -7942,8 +6619,6 @@ module SpeakAs = struct
     | `digits
     | `literalPunctuation
     | `noPunctuation
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -7953,8 +6628,6 @@ module SpeakAs = struct
     | `digits -> {js|digits|js}
     | `literalPunctuation -> {js|literal-punctuation|js}
     | `noPunctuation -> {js|no-punctuation|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module PauseBefore = struct
@@ -7966,7 +6639,6 @@ module PauseBefore = struct
     | `medium
     | `strong
     | `xStrong
-    | Cascading.t
     ]
 
   let toString x =
@@ -7978,7 +6650,6 @@ module PauseBefore = struct
     | `medium -> {js|medium|js}
     | `strong -> {js|strong|js}
     | `xStrong -> {js|x-strong|js}
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module PauseAfter = struct
@@ -7997,16 +6668,10 @@ module CueBefore = struct
   type t =
     [ Url.t
     | None.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | #Url.t as u -> Url.toString u
-    | #None.t -> None.toString
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with #Url.t as u -> Url.toString u | #None.t -> None.toString
 end
 
 module CueAfter = struct
@@ -8021,8 +6686,6 @@ module MozAppearance = struct
     | `checkbox
     | `radio
     | `custom of string
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -8032,48 +6695,32 @@ module MozAppearance = struct
     | `checkbox -> {js|checkbox|js}
     | `radio -> {js|radio|js}
     | `custom s -> s
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module MozBackgroundClip = struct
   type t =
     [ `padding
     | `border
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | `padding -> {js|padding|js}
-    | `border -> {js|border|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with `padding -> {js|padding|js} | `border -> {js|border|js}
 end
 
 module MozBinding = struct
   type t =
     [ Url.t
     | None.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | #Url.t as u -> Url.toString u
-    | #None.t -> None.toString
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with #Url.t as u -> Url.toString u | #None.t -> None.toString
 end
 
 module MozBorderColors = struct
   type t =
     [ `colors of Color.t array
     | None.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -8084,8 +6731,6 @@ module MozBorderColors = struct
       |> List.map Color.toString
       |> String.concat {js| |js}
     | #None.t -> None.toString
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module MozBorderBottomColors = struct
@@ -8117,16 +6762,10 @@ module WebkitMask = struct
   type t =
     [ None.t
     | Image.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | #None.t -> None.toString
-    | #Image.t as i -> Image.toString i
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with #None.t -> None.toString | #Image.t as i -> Image.toString i
 end
 
 module WebkitBoxReflect = struct
@@ -8136,7 +6775,6 @@ module WebkitBoxReflect = struct
     | `right
     | `left
     | Length.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -8146,7 +6784,6 @@ module WebkitBoxReflect = struct
     | `right -> {js|right|js}
     | `left -> {js|left|js}
     | #Length.t as l -> Length.toString l
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Font synthesis shorthand *)
@@ -8159,8 +6796,6 @@ module FontSynthesis = struct
     | `position
     | `weightStyle
     | `custom of string
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -8172,8 +6807,6 @@ module FontSynthesis = struct
     | `position -> {js|position|js}
     | `weightStyle -> {js|weight style|js}
     | `custom s -> s
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Text emphasis shorthand *)
@@ -8239,16 +6872,9 @@ module VoiceFamily = struct
   type t =
     [ `custom of string
     | `preserve
-    | Var.t
-    | Cascading.t
     ]
 
-  let toString x =
-    match x with
-    | `custom s -> s
-    | `preserve -> {js|preserve|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with `custom s -> s | `preserve -> {js|preserve|js}
 end
 
 module VoicePitch = struct
@@ -8260,7 +6886,6 @@ module VoicePitch = struct
     | `xHigh
     | `num of float
     | Percentage.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -8272,7 +6897,6 @@ module VoicePitch = struct
     | `xHigh -> {js|x-high|js}
     | `num n -> Kloth.Float.to_string n
     | #Percentage.t as p -> Percentage.toString p
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module VoiceRange = struct
@@ -8363,8 +6987,6 @@ module MozContextProperties = struct
     | `fillOpacity
     | `stroke
     | `strokeOpacity
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -8374,24 +6996,16 @@ module MozContextProperties = struct
     | `fillOpacity -> {js|fill-opacity|js}
     | `stroke -> {js|stroke|js}
     | `strokeOpacity -> {js|stroke-opacity|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module MozControlCharacterVisibility = struct
   type t =
     [ `visible
     | `hidden
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | `visible -> {js|visible|js}
-    | `hidden -> {js|hidden|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with `visible -> {js|visible|js} | `hidden -> {js|hidden|js}
 end
 
 module MozFloatEdge = struct
@@ -8399,33 +7013,18 @@ module MozFloatEdge = struct
 end
 
 module MozForceBrokenImageIcon = struct
-  type t =
-    [ `num of int
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `num of int ]
 
-  let toString x =
-    match x with
-    | `num n -> Kloth.Int.to_string n
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with `num n -> Kloth.Int.to_string n
 end
 
 module MozImageRegion = struct
   type t =
     [ Auto.t
     | `custom of string
-    | Var.t
-    | Cascading.t
     ]
 
-  let toString x =
-    match x with
-    | #Auto.t -> Auto.toString
-    | `custom s -> s
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with #Auto.t -> Auto.toString | `custom s -> s
 end
 
 module MozOrient = struct
@@ -8434,8 +7033,6 @@ module MozOrient = struct
     | `block
     | `horizontal
     | `vertical
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -8444,24 +7041,16 @@ module MozOrient = struct
     | `block -> {js|block|js}
     | `horizontal -> {js|horizontal|js}
     | `vertical -> {js|vertical|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module MozOsxFontSmoothing = struct
   type t =
     [ Auto.t
     | `grayscale
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | #Auto.t -> Auto.toString
-    | `grayscale -> {js|grayscale|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with #Auto.t -> Auto.toString | `grayscale -> {js|grayscale|js}
 end
 
 module MozOutlineRadius = struct
@@ -8488,16 +7077,12 @@ module MozStackSizing = struct
   type t =
     [ `ignore
     | `stretchToFit
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
     match x with
     | `ignore -> {js|ignore|js}
     | `stretchToFit -> {js|stretch-to-fit|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module MozTextBlink = struct
@@ -8514,8 +7099,6 @@ module MozUserFocus = struct
     | `selectSame
     | `selectAll
     | None.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -8528,8 +7111,6 @@ module MozUserFocus = struct
     | `selectSame -> {js|select-same|js}
     | `selectAll -> {js|select-all|js}
     | #None.t -> None.toString
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module MozUserInput = struct
@@ -8538,8 +7119,6 @@ module MozUserInput = struct
     | None.t
     | `enabled
     | `disabled
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -8548,8 +7127,6 @@ module MozUserInput = struct
     | #None.t -> None.toString
     | `enabled -> {js|enabled|js}
     | `disabled -> {js|disabled|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module MozUserModify = struct
@@ -8557,8 +7134,6 @@ module MozUserModify = struct
     [ `readOnly
     | `readWrite
     | `writeOnly
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -8566,8 +7141,6 @@ module MozUserModify = struct
     | `readOnly -> {js|read-only|js}
     | `readWrite -> {js|read-write|js}
     | `writeOnly -> {js|write-only|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module MozUserSelect = struct
@@ -8578,16 +7151,10 @@ module MozWindowDragging = struct
   type t =
     [ `drag
     | `noDrag
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | `drag -> {js|drag|js}
-    | `noDrag -> {js|no-drag|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with `drag -> {js|drag|js} | `noDrag -> {js|no-drag|js}
 end
 
 module MozWindowShadow = struct
@@ -8597,8 +7164,6 @@ module MozWindowShadow = struct
     | `tooltip
     | `sheet
     | None.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -8608,8 +7173,6 @@ module MozWindowShadow = struct
     | `tooltip -> {js|tooltip|js}
     | `sheet -> {js|sheet|js}
     | #None.t -> None.toString
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 (* Remaining webkit properties *)
@@ -8634,8 +7197,6 @@ module WebkitColumnBreakAfter = struct
     [ `always
     | Auto.t
     | `avoid
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -8643,8 +7204,6 @@ module WebkitColumnBreakAfter = struct
     | `always -> {js|always|js}
     | #Auto.t -> Auto.toString
     | `avoid -> {js|avoid|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module WebkitColumnBreakBefore = struct
@@ -8661,8 +7220,6 @@ module WebkitFontSmoothing = struct
     | None.t
     | `antialiased
     | `subpixelAntialiased
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -8671,8 +7228,6 @@ module WebkitFontSmoothing = struct
     | #None.t -> None.toString
     | `antialiased -> {js|antialiased|js}
     | `subpixelAntialiased -> {js|subpixel-antialiased|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module WebkitLineClamp = struct
@@ -8688,8 +7243,6 @@ module WebkitMaskBoxImage = struct
     [ Url.t
     | Gradient.t
     | None.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -8697,8 +7250,6 @@ module WebkitMaskBoxImage = struct
     | #Url.t as u -> Url.toString u
     | #Gradient.t as g -> Gradient.toString g
     | #None.t -> None.toString
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module WebkitMaskClip = struct
@@ -8718,8 +7269,6 @@ module WebkitMaskComposite = struct
     | `destinationOut
     | `destinationAtop
     | `xor
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -8735,8 +7284,6 @@ module WebkitMaskComposite = struct
     | `destinationOut -> {js|destination-out|js}
     | `destinationAtop -> {js|destination-atop|js}
     | `xor -> {js|xor|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module WebkitMaskImage = struct
@@ -8757,7 +7304,6 @@ module WebkitMaskPositionX = struct
     | `left
     | `center
     | `right
-    | Cascading.t
     ]
 
   let toString x =
@@ -8766,7 +7312,6 @@ module WebkitMaskPositionX = struct
     | `left -> {js|left|js}
     | `center -> {js|center|js}
     | `right -> {js|right|js}
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module WebkitMaskPositionY = struct
@@ -8775,7 +7320,6 @@ module WebkitMaskPositionY = struct
     | `top
     | `center
     | `bottom
-    | Cascading.t
     ]
 
   let toString x =
@@ -8784,7 +7328,6 @@ module WebkitMaskPositionY = struct
     | `top -> {js|top|js}
     | `center -> {js|center|js}
     | `bottom -> {js|bottom|js}
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module WebkitMaskRepeat = struct
@@ -8797,8 +7340,6 @@ module WebkitMaskRepeatX = struct
     | `noRepeat
     | `space
     | `round
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -8807,8 +7348,6 @@ module WebkitMaskRepeatX = struct
     | `noRepeat -> {js|no-repeat|js}
     | `space -> {js|space|js}
     | `round -> {js|round|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module WebkitMaskRepeatY = struct
@@ -8823,32 +7362,20 @@ module WebkitOverflowScrolling = struct
   type t =
     [ Auto.t
     | `touch
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | #Auto.t -> Auto.toString
-    | `touch -> {js|touch|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with #Auto.t -> Auto.toString | `touch -> {js|touch|js}
 end
 
 module WebkitPrintColorAdjust = struct
   type t =
     [ `economy
     | `exact
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | `economy -> {js|economy|js}
-    | `exact -> {js|exact|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with `economy -> {js|economy|js} | `exact -> {js|exact|js}
 end
 
 module WebkitTapHighlightColor = struct
@@ -8865,8 +7392,6 @@ module WebkitTextSecurity = struct
     | `circle
     | `disc
     | `square
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -8875,8 +7400,6 @@ module WebkitTextSecurity = struct
     | `circle -> {js|circle|js}
     | `disc -> {js|disc|js}
     | `square -> {js|square|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module WebkitTextStroke = struct
@@ -8903,16 +7426,10 @@ module WebkitTouchCallout = struct
   type t =
     [ `default
     | None.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | `default -> {js|default|js}
-    | #None.t -> None.toString
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with `default -> {js|default|js} | #None.t -> None.toString
 end
 
 module WebkitUserDrag = struct
@@ -8920,8 +7437,6 @@ module WebkitUserDrag = struct
     [ None.t
     | `element
     | Auto.t
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -8929,8 +7444,6 @@ module WebkitUserDrag = struct
     | #None.t -> None.toString
     | `element -> {js|element|js}
     | #Auto.t -> Auto.toString
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module WebkitUserModify = struct
@@ -8938,8 +7451,6 @@ module WebkitUserModify = struct
     [ `readOnly
     | `readWrite
     | `readWritePlaintextOnly
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -8947,8 +7458,6 @@ module WebkitUserModify = struct
     | `readOnly -> {js|read-only|js}
     | `readWrite -> {js|read-write|js}
     | `readWritePlaintextOnly -> {js|read-write-plaintext-only|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module WebkitUserSelect = struct
@@ -8990,60 +7499,32 @@ end
 
 (* Unicode range *)
 module UnicodeRange = struct
-  type t =
-    [ `ranges of URange.t
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ranges of URange.t ]
 
-  let toString x =
-    match x with
-    | `ranges r -> URange.toString r
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with `ranges r -> URange.toString r
 end
 
 (* Remaining mask properties *)
 module Mask = struct
-  type t =
-    [ MaskImage.t
-    | Cascading.t
-    ]
+  type t = [ | MaskImage.t ]
 
-  let toString x =
-    match x with
-    | #MaskImage.t as mi -> MaskImage.toString mi
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with #MaskImage.t as mi -> MaskImage.toString mi
 end
 
 module MaskBorder = struct
-  type t =
-    [ `custom of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `custom of string ]
 
-  let toString x =
-    match x with
-    | `custom s -> s
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+  let toString x = match x with `custom s -> s
 end
 
 module MaskBorderMode = struct
   type t =
     [ `luminance
     | `alpha
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | `luminance -> {js|luminance|js}
-    | `alpha -> {js|alpha|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with `luminance -> {js|luminance|js} | `alpha -> {js|alpha|js}
 end
 
 module MaskBorderOutset = struct
@@ -9084,8 +7565,6 @@ module MaskComposite = struct
     | `subtract
     | `intersect
     | `exclude
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -9094,8 +7573,6 @@ module MaskComposite = struct
     | `subtract -> {js|subtract|js}
     | `intersect -> {js|intersect|js}
     | `exclude -> {js|exclude|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module MaskMode = struct
@@ -9103,8 +7580,6 @@ module MaskMode = struct
     [ `alpha
     | `luminance
     | `matchSource
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
@@ -9112,8 +7587,6 @@ module MaskMode = struct
     | `alpha -> {js|alpha|js}
     | `luminance -> {js|luminance|js}
     | `matchSource -> {js|match-source|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module MaskOrigin = struct
@@ -9132,5933 +7605,2775 @@ module MaskType = struct
   type t =
     [ `luminance
     | `alpha
-    | Var.t
-    | Cascading.t
     ]
 
   let toString x =
-    match x with
-    | `luminance -> {js|luminance|js}
-    | `alpha -> {js|alpha|js}
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
+    match x with `luminance -> {js|luminance|js} | `alpha -> {js|alpha|js}
 end
 (* Auto-generated wrapper modules for CSS value types - 456 modules *)
 
 module AbsoluteSize = struct
-  type t =
-    [ `AbsoluteSize of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `AbsoluteSize of string ]
 
-  let toString = function
-    | `AbsoluteSize s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `AbsoluteSize s -> s
 end
 
 module AccentColor = struct
-  type t =
-    [ `AccentColor of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `AccentColor of string ]
 
-  let toString = function
-    | `AccentColor s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `AccentColor s -> s
 end
 
 module Age = struct
-  type t =
-    [ `Age of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `Age of string ]
 
-  let toString = function
-    | `Age s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `Age s -> s
 end
 
 module AnchorName = struct
-  type t =
-    [ `AnchorName of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `AnchorName of string ]
 
-  let toString = function
-    | `AnchorName s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `AnchorName s -> s
 end
 
 module AnchorScope = struct
-  type t =
-    [ `AnchorScope of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `AnchorScope of string ]
 
-  let toString = function
-    | `AnchorScope s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `AnchorScope s -> s
 end
 
 module AngularColorHint = struct
-  type t =
-    [ `AngularColorHint of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `AngularColorHint of string ]
 
-  let toString = function
-    | `AngularColorHint s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `AngularColorHint s -> s
 end
 
 module AngularColorStop = struct
-  type t =
-    [ `AngularColorStop of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `AngularColorStop of string ]
 
-  let toString = function
-    | `AngularColorStop s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `AngularColorStop s -> s
 end
 
 module AngularColorStopList = struct
-  type t =
-    [ `AngularColorStopList of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `AngularColorStopList of string ]
 
-  let toString = function
-    | `AngularColorStopList s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `AngularColorStopList s -> s
 end
 
 module AnimateableFeature = struct
-  type t =
-    [ `AnimateableFeature of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `AnimateableFeature of string ]
 
-  let toString = function
-    | `AnimateableFeature s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `AnimateableFeature s -> s
 end
 
 module AnimationComposition = struct
-  type t =
-    [ `AnimationComposition of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `AnimationComposition of string ]
 
-  let toString = function
-    | `AnimationComposition s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `AnimationComposition s -> s
 end
 
 module AnimationDelayEnd = struct
-  type t =
-    [ `AnimationDelayEnd of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `AnimationDelayEnd of string ]
 
-  let toString = function
-    | `AnimationDelayEnd s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `AnimationDelayEnd s -> s
 end
 
 module AnimationDelayStart = struct
-  type t =
-    [ `AnimationDelayStart of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `AnimationDelayStart of string ]
 
-  let toString = function
-    | `AnimationDelayStart s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `AnimationDelayStart s -> s
 end
 
 module AnimationRange = struct
-  type t =
-    [ `AnimationRange of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `AnimationRange of string ]
 
-  let toString = function
-    | `AnimationRange s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `AnimationRange s -> s
 end
 
 module AnimationRangeEnd = struct
-  type t =
-    [ `AnimationRangeEnd of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `AnimationRangeEnd of string ]
 
-  let toString = function
-    | `AnimationRangeEnd s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `AnimationRangeEnd s -> s
 end
 
 module AnimationRangeStart = struct
-  type t =
-    [ `AnimationRangeStart of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `AnimationRangeStart of string ]
 
-  let toString = function
-    | `AnimationRangeStart s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `AnimationRangeStart s -> s
 end
 
 module AnimationTimeline = struct
-  type t =
-    [ `AnimationTimeline of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `AnimationTimeline of string ]
 
-  let toString = function
-    | `AnimationTimeline s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `AnimationTimeline s -> s
 end
 
 module Attachment = struct
-  type t =
-    [ `Attachment of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `Attachment of string ]
 
-  let toString = function
-    | `Attachment s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `Attachment s -> s
 end
 
 module AttrFallback = struct
-  type t =
-    [ `AttrFallback of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `AttrFallback of string ]
 
-  let toString = function
-    | `AttrFallback s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `AttrFallback s -> s
 end
 
 module AttrMatcher = struct
-  type t =
-    [ `AttrMatcher of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `AttrMatcher of string ]
 
-  let toString = function
-    | `AttrMatcher s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `AttrMatcher s -> s
 end
 
 module AttrModifier = struct
-  type t =
-    [ `AttrModifier of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `AttrModifier of string ]
 
-  let toString = function
-    | `AttrModifier s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `AttrModifier s -> s
 end
 
 module AttrName = struct
-  type t =
-    [ `AttrName of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `AttrName of string ]
 
-  let toString = function
-    | `AttrName s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `AttrName s -> s
 end
 
 module AttrType = struct
-  type t =
-    [ `AttrType of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `AttrType of string ]
 
-  let toString = function
-    | `AttrType s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `AttrType s -> s
 end
 
 module AttrUnit = struct
-  type t =
-    [ `AttrUnit of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `AttrUnit of string ]
 
-  let toString = function
-    | `AttrUnit s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `AttrUnit s -> s
 end
 
 module AttributeSelector = struct
-  type t =
-    [ `AttributeSelector of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `AttributeSelector of string ]
 
-  let toString = function
-    | `AttributeSelector s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `AttributeSelector s -> s
 end
 
 module AutoRepeat = struct
-  type t =
-    [ `AutoRepeat of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `AutoRepeat of string ]
 
-  let toString = function
-    | `AutoRepeat s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `AutoRepeat s -> s
 end
 
 module AutoTrackList = struct
-  type t =
-    [ `AutoTrackList of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `AutoTrackList of string ]
 
-  let toString = function
-    | `AutoTrackList s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `AutoTrackList s -> s
 end
 
 module BackdropBlur = struct
-  type t =
-    [ `BackdropBlur of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BackdropBlur of string ]
 
-  let toString = function
-    | `BackdropBlur s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BackdropBlur s -> s
 end
 
 module BackgroundPositionX = struct
-  type t =
-    [ `BackgroundPositionX of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BackgroundPositionX of string ]
 
-  let toString = function
-    | `BackgroundPositionX s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BackgroundPositionX s -> s
 end
 
 module BackgroundPositionY = struct
-  type t =
-    [ `BackgroundPositionY of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BackgroundPositionY of string ]
 
-  let toString = function
-    | `BackgroundPositionY s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BackgroundPositionY s -> s
 end
 
 module BaselinePosition = struct
-  type t =
-    [ `BaselinePosition of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BaselinePosition of string ]
 
-  let toString = function
-    | `BaselinePosition s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BaselinePosition s -> s
 end
 
 module BasicShape = struct
-  type t =
-    [ `BasicShape of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BasicShape of string ]
 
-  let toString = function
-    | `BasicShape s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BasicShape s -> s
 end
 
 module BgImage = struct
-  type t =
-    [ `BgImage of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BgImage of string ]
 
-  let toString = function
-    | `BgImage s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BgImage s -> s
 end
 
 module BgLayer = struct
-  type t =
-    [ `BgLayer of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BgLayer of string ]
 
-  let toString = function
-    | `BgLayer s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BgLayer s -> s
 end
 
 module BgPosition = struct
-  type t =
-    [ `BgPosition of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BgPosition of string ]
 
-  let toString = function
-    | `BgPosition s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BgPosition s -> s
 end
 
 module BgSize = struct
-  type t =
-    [ `BgSize of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BgSize of string ]
 
-  let toString = function
-    | `BgSize s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BgSize s -> s
 end
 
 module Bleed = struct
-  type t =
-    [ `Bleed of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `Bleed of string ]
 
-  let toString = function
-    | `Bleed s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `Bleed s -> s
 end
 
 module BlendMode = struct
-  type t =
-    [ `BlendMode of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BlendMode of string ]
 
-  let toString = function
-    | `BlendMode s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BlendMode s -> s
 end
 
 module BorderBlock = struct
-  type t =
-    [ `BorderBlock of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BorderBlock of string ]
 
-  let toString = function
-    | `BorderBlock s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BorderBlock s -> s
 end
 
 module BorderBlockColor = struct
-  type t =
-    [ `BorderBlockColor of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BorderBlockColor of string ]
 
-  let toString = function
-    | `BorderBlockColor s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BorderBlockColor s -> s
 end
 
 module BorderBlockEnd = struct
-  type t =
-    [ `BorderBlockEnd of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BorderBlockEnd of string ]
 
-  let toString = function
-    | `BorderBlockEnd s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BorderBlockEnd s -> s
 end
 
 module BorderBlockEndColor = struct
-  type t =
-    [ `BorderBlockEndColor of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BorderBlockEndColor of string ]
 
-  let toString = function
-    | `BorderBlockEndColor s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BorderBlockEndColor s -> s
 end
 
 module BorderBlockEndStyle = struct
-  type t =
-    [ `BorderBlockEndStyle of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BorderBlockEndStyle of string ]
 
-  let toString = function
-    | `BorderBlockEndStyle s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BorderBlockEndStyle s -> s
 end
 
 module BorderBlockEndWidth = struct
-  type t =
-    [ `BorderBlockEndWidth of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BorderBlockEndWidth of string ]
 
-  let toString = function
-    | `BorderBlockEndWidth s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BorderBlockEndWidth s -> s
 end
 
 module BorderBlockStart = struct
-  type t =
-    [ `BorderBlockStart of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BorderBlockStart of string ]
 
-  let toString = function
-    | `BorderBlockStart s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BorderBlockStart s -> s
 end
 
 module BorderBlockStartColor = struct
-  type t =
-    [ `BorderBlockStartColor of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BorderBlockStartColor of string ]
 
-  let toString = function
-    | `BorderBlockStartColor s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BorderBlockStartColor s -> s
 end
 
 module BorderBlockStartStyle = struct
-  type t =
-    [ `BorderBlockStartStyle of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BorderBlockStartStyle of string ]
 
-  let toString = function
-    | `BorderBlockStartStyle s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BorderBlockStartStyle s -> s
 end
 
 module BorderBlockStartWidth = struct
-  type t =
-    [ `BorderBlockStartWidth of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BorderBlockStartWidth of string ]
 
-  let toString = function
-    | `BorderBlockStartWidth s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BorderBlockStartWidth s -> s
 end
 
 module BorderBlockStyle = struct
-  type t =
-    [ `BorderBlockStyle of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BorderBlockStyle of string ]
 
-  let toString = function
-    | `BorderBlockStyle s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BorderBlockStyle s -> s
 end
 
 module BorderBlockWidth = struct
-  type t =
-    [ `BorderBlockWidth of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BorderBlockWidth of string ]
 
-  let toString = function
-    | `BorderBlockWidth s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BorderBlockWidth s -> s
 end
 
 module BorderInline = struct
-  type t =
-    [ `BorderInline of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BorderInline of string ]
 
-  let toString = function
-    | `BorderInline s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BorderInline s -> s
 end
 
 module BorderInlineColor = struct
-  type t =
-    [ `BorderInlineColor of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BorderInlineColor of string ]
 
-  let toString = function
-    | `BorderInlineColor s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BorderInlineColor s -> s
 end
 
 module BorderInlineEnd = struct
-  type t =
-    [ `BorderInlineEnd of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BorderInlineEnd of string ]
 
-  let toString = function
-    | `BorderInlineEnd s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BorderInlineEnd s -> s
 end
 
 module BorderInlineEndColor = struct
-  type t =
-    [ `BorderInlineEndColor of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BorderInlineEndColor of string ]
 
-  let toString = function
-    | `BorderInlineEndColor s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BorderInlineEndColor s -> s
 end
 
 module BorderInlineEndStyle = struct
-  type t =
-    [ `BorderInlineEndStyle of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BorderInlineEndStyle of string ]
 
-  let toString = function
-    | `BorderInlineEndStyle s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BorderInlineEndStyle s -> s
 end
 
 module BorderInlineEndWidth = struct
-  type t =
-    [ `BorderInlineEndWidth of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BorderInlineEndWidth of string ]
 
-  let toString = function
-    | `BorderInlineEndWidth s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BorderInlineEndWidth s -> s
 end
 
 module BorderInlineStart = struct
-  type t =
-    [ `BorderInlineStart of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BorderInlineStart of string ]
 
-  let toString = function
-    | `BorderInlineStart s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BorderInlineStart s -> s
 end
 
 module BorderInlineStartColor = struct
-  type t =
-    [ `BorderInlineStartColor of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BorderInlineStartColor of string ]
 
-  let toString = function
-    | `BorderInlineStartColor s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BorderInlineStartColor s -> s
 end
 
 module BorderInlineStartStyle = struct
-  type t =
-    [ `BorderInlineStartStyle of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BorderInlineStartStyle of string ]
 
-  let toString = function
-    | `BorderInlineStartStyle s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BorderInlineStartStyle s -> s
 end
 
 module BorderInlineStartWidth = struct
-  type t =
-    [ `BorderInlineStartWidth of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BorderInlineStartWidth of string ]
 
-  let toString = function
-    | `BorderInlineStartWidth s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BorderInlineStartWidth s -> s
 end
 
 module BorderInlineStyle = struct
-  type t =
-    [ `BorderInlineStyle of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BorderInlineStyle of string ]
 
-  let toString = function
-    | `BorderInlineStyle s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BorderInlineStyle s -> s
 end
 
 module BorderInlineWidth = struct
-  type t =
-    [ `BorderInlineWidth of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `BorderInlineWidth of string ]
 
-  let toString = function
-    | `BorderInlineWidth s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `BorderInlineWidth s -> s
 end
 
 module Box = struct
-  type t =
-    [ `Box of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `Box of string ]
 
-  let toString = function
-    | `Box s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `Box s -> s
 end
 
 module CalcProduct = struct
-  type t =
-    [ `CalcProduct of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `CalcProduct of string ]
 
-  let toString = function
-    | `CalcProduct s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `CalcProduct s -> s
 end
 
 module CalcSum = struct
-  type t =
-    [ `CalcSum of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `CalcSum of string ]
 
-  let toString = function
-    | `CalcSum s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `CalcSum s -> s
 end
 
 module CalcValue = struct
-  type t =
-    [ `CalcValue of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `CalcValue of string ]
 
-  let toString = function
-    | `CalcValue s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `CalcValue s -> s
 end
 
 module CfFinalImage = struct
-  type t =
-    [ `CfFinalImage of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `CfFinalImage of string ]
 
-  let toString = function
-    | `CfFinalImage s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `CfFinalImage s -> s
 end
 
 module CfMixingImage = struct
-  type t =
-    [ `CfMixingImage of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `CfMixingImage of string ]
 
-  let toString = function
-    | `CfMixingImage s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `CfMixingImage s -> s
 end
 
 module ClassSelector = struct
-  type t =
-    [ `ClassSelector of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ClassSelector of string ]
 
-  let toString = function
-    | `ClassSelector s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ClassSelector s -> s
 end
 
 module ClipSource = struct
-  type t =
-    [ `ClipSource of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ClipSource of string ]
 
-  let toString = function
-    | `ClipSource s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ClipSource s -> s
 end
 
 module ColorInterpolationMethod = struct
-  type t =
-    [ `ColorInterpolationMethod of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ColorInterpolationMethod of string ]
 
-  let toString = function
-    | `ColorInterpolationMethod s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ColorInterpolationMethod s -> s
 end
 
 module ColorRendering = struct
-  type t =
-    [ `ColorRendering of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ColorRendering of string ]
 
-  let toString = function
-    | `ColorRendering s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ColorRendering s -> s
 end
 
 module ColorStop = struct
-  type t =
-    [ `ColorStop of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ColorStop of string ]
 
-  let toString = function
-    | `ColorStop s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ColorStop s -> s
 end
 
 module ColorStopAngle = struct
-  type t =
-    [ `ColorStopAngle of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ColorStopAngle of string ]
 
-  let toString = function
-    | `ColorStopAngle s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ColorStopAngle s -> s
 end
 
 module ColorStopLength = struct
-  type t =
-    [ `ColorStopLength of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ColorStopLength of string ]
 
-  let toString = function
-    | `ColorStopLength s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ColorStopLength s -> s
 end
 
 module ColorStopList = struct
-  type t =
-    [ `ColorStopList of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ColorStopList of string ]
 
-  let toString = function
-    | `ColorStopList s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ColorStopList s -> s
 end
 
 module Combinator = struct
-  type t =
-    [ `Combinator of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `Combinator of string ]
 
-  let toString = function
-    | `Combinator s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `Combinator s -> s
 end
 
 module CommonLigValues = struct
-  type t =
-    [ `CommonLigValues of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `CommonLigValues of string ]
 
-  let toString = function
-    | `CommonLigValues s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `CommonLigValues s -> s
 end
 
 module CompatAuto = struct
-  type t =
-    [ `CompatAuto of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `CompatAuto of string ]
 
-  let toString = function
-    | `CompatAuto s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `CompatAuto s -> s
 end
 
 module ComplexSelector = struct
-  type t =
-    [ `ComplexSelector of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ComplexSelector of string ]
 
-  let toString = function
-    | `ComplexSelector s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ComplexSelector s -> s
 end
 
 module ComplexSelectorList = struct
-  type t =
-    [ `ComplexSelectorList of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ComplexSelectorList of string ]
 
-  let toString = function
-    | `ComplexSelectorList s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ComplexSelectorList s -> s
 end
 
 module CompositeStyle = struct
-  type t =
-    [ `CompositeStyle of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `CompositeStyle of string ]
 
-  let toString = function
-    | `CompositeStyle s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `CompositeStyle s -> s
 end
 
 module CompositingOperator = struct
-  type t =
-    [ `CompositingOperator of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `CompositingOperator of string ]
 
-  let toString = function
-    | `CompositingOperator s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `CompositingOperator s -> s
 end
 
 module CompoundSelector = struct
-  type t =
-    [ `CompoundSelector of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `CompoundSelector of string ]
 
-  let toString = function
-    | `CompoundSelector s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `CompoundSelector s -> s
 end
 
 module CompoundSelectorList = struct
-  type t =
-    [ `CompoundSelectorList of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `CompoundSelectorList of string ]
 
-  let toString = function
-    | `CompoundSelectorList s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `CompoundSelectorList s -> s
 end
 
 module ContainIntrinsicBlockSize = struct
-  type t =
-    [ `ContainIntrinsicBlockSize of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ContainIntrinsicBlockSize of string ]
 
-  let toString = function
-    | `ContainIntrinsicBlockSize s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ContainIntrinsicBlockSize s -> s
 end
 
 module ContainIntrinsicHeight = struct
-  type t =
-    [ `ContainIntrinsicHeight of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ContainIntrinsicHeight of string ]
 
-  let toString = function
-    | `ContainIntrinsicHeight s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ContainIntrinsicHeight s -> s
 end
 
 module ContainIntrinsicInlineSize = struct
-  type t =
-    [ `ContainIntrinsicInlineSize of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ContainIntrinsicInlineSize of string ]
 
-  let toString = function
-    | `ContainIntrinsicInlineSize s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ContainIntrinsicInlineSize s -> s
 end
 
 module ContainIntrinsicSize = struct
-  type t =
-    [ `ContainIntrinsicSize of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ContainIntrinsicSize of string ]
 
-  let toString = function
-    | `ContainIntrinsicSize s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ContainIntrinsicSize s -> s
 end
 
 module ContainIntrinsicWidth = struct
-  type t =
-    [ `ContainIntrinsicWidth of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ContainIntrinsicWidth of string ]
 
-  let toString = function
-    | `ContainIntrinsicWidth s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ContainIntrinsicWidth s -> s
 end
 
 module ContainerCondition = struct
-  type t =
-    [ `ContainerCondition of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ContainerCondition of string ]
 
-  let toString = function
-    | `ContainerCondition s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ContainerCondition s -> s
 end
 
 module ContainerConditionList = struct
-  type t =
-    [ `ContainerConditionList of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ContainerConditionList of string ]
 
-  let toString = function
-    | `ContainerConditionList s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ContainerConditionList s -> s
 end
 
 module ContainerNameComputed = struct
-  type t =
-    [ `ContainerNameComputed of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ContainerNameComputed of string ]
 
-  let toString = function
-    | `ContainerNameComputed s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ContainerNameComputed s -> s
 end
 
 module ContainerQuery = struct
-  type t =
-    [ `ContainerQuery of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ContainerQuery of string ]
 
-  let toString = function
-    | `ContainerQuery s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ContainerQuery s -> s
 end
 
 module ContentDistribution = struct
-  type t =
-    [ `ContentDistribution of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ContentDistribution of string ]
 
-  let toString = function
-    | `ContentDistribution s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ContentDistribution s -> s
 end
 
 module ContentList = struct
-  type t =
-    [ `ContentList of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ContentList of string ]
 
-  let toString = function
-    | `ContentList s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ContentList s -> s
 end
 
 module ContentPosition = struct
-  type t =
-    [ `ContentPosition of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ContentPosition of string ]
 
-  let toString = function
-    | `ContentPosition s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ContentPosition s -> s
 end
 
 module ContentReplacement = struct
-  type t =
-    [ `ContentReplacement of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ContentReplacement of string ]
 
-  let toString = function
-    | `ContentReplacement s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ContentReplacement s -> s
 end
 
 module ContextualAltValues = struct
-  type t =
-    [ `ContextualAltValues of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ContextualAltValues of string ]
 
-  let toString = function
-    | `ContextualAltValues s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ContextualAltValues s -> s
 end
 
 module CounterName = struct
-  type t =
-    [ `CounterName of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `CounterName of string ]
 
-  let toString = function
-    | `CounterName s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `CounterName s -> s
 end
 
 module CounterStyle = struct
-  type t =
-    [ `CounterStyle of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `CounterStyle of string ]
 
-  let toString = function
-    | `CounterStyle s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `CounterStyle s -> s
 end
 
 module CounterStyleName = struct
-  type t =
-    [ `CounterStyleName of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `CounterStyleName of string ]
 
-  let toString = function
-    | `CounterStyleName s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `CounterStyleName s -> s
 end
 
 module CubicBezierTimingFunction = struct
-  type t =
-    [ `CubicBezierTimingFunction of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `CubicBezierTimingFunction of string ]
 
-  let toString = function
-    | `CubicBezierTimingFunction s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `CubicBezierTimingFunction s -> s
 end
 
 module Declaration = struct
-  type t =
-    [ `Declaration of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `Declaration of string ]
 
-  let toString = function
-    | `Declaration s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `Declaration s -> s
 end
 
 module DeclarationList = struct
-  type t =
-    [ `DeclarationList of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `DeclarationList of string ]
 
-  let toString = function
-    | `DeclarationList s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `DeclarationList s -> s
 end
 
 module DeprecatedSystemColor = struct
-  type t =
-    [ `DeprecatedSystemColor of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `DeprecatedSystemColor of string ]
 
-  let toString = function
-    | `DeprecatedSystemColor s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `DeprecatedSystemColor s -> s
 end
 
 module Dimension = struct
-  type t =
-    [ `Dimension of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `Dimension of string ]
 
-  let toString = function
-    | `Dimension s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `Dimension s -> s
 end
 
 module DiscretionaryLigValues = struct
-  type t =
-    [ `DiscretionaryLigValues of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `DiscretionaryLigValues of string ]
 
-  let toString = function
-    | `DiscretionaryLigValues s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `DiscretionaryLigValues s -> s
 end
 
 module DisplayBox = struct
-  type t =
-    [ `DisplayBox of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `DisplayBox of string ]
 
-  let toString = function
-    | `DisplayBox s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `DisplayBox s -> s
 end
 
 module DisplayInside = struct
-  type t =
-    [ `DisplayInside of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `DisplayInside of string ]
 
-  let toString = function
-    | `DisplayInside s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `DisplayInside s -> s
 end
 
 module DisplayInternal = struct
-  type t =
-    [ `DisplayInternal of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `DisplayInternal of string ]
 
-  let toString = function
-    | `DisplayInternal s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `DisplayInternal s -> s
 end
 
 module DisplayLegacy = struct
-  type t =
-    [ `DisplayLegacy of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `DisplayLegacy of string ]
 
-  let toString = function
-    | `DisplayLegacy s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `DisplayLegacy s -> s
 end
 
 module DisplayListitem = struct
-  type t =
-    [ `DisplayListitem of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `DisplayListitem of string ]
 
-  let toString = function
-    | `DisplayListitem s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `DisplayListitem s -> s
 end
 
 module DisplayOutside = struct
-  type t =
-    [ `DisplayOutside of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `DisplayOutside of string ]
 
-  let toString = function
-    | `DisplayOutside s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `DisplayOutside s -> s
 end
 
 module EastAsianVariantValues = struct
-  type t =
-    [ `EastAsianVariantValues of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `EastAsianVariantValues of string ]
 
-  let toString = function
-    | `EastAsianVariantValues s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `EastAsianVariantValues s -> s
 end
 
 module EastAsianWidthValues = struct
-  type t =
-    [ `EastAsianWidthValues of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `EastAsianWidthValues of string ]
 
-  let toString = function
-    | `EastAsianWidthValues s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `EastAsianWidthValues s -> s
 end
 
 module EndingShape = struct
-  type t =
-    [ `EndingShape of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `EndingShape of string ]
 
-  let toString = function
-    | `EndingShape s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `EndingShape s -> s
 end
 
 module ExplicitTrackList = struct
-  type t =
-    [ `ExplicitTrackList of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ExplicitTrackList of string ]
 
-  let toString = function
-    | `ExplicitTrackList s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ExplicitTrackList s -> s
 end
 
 module ExtendedAngle = struct
-  type t =
-    [ `ExtendedAngle of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ExtendedAngle of string ]
 
-  let toString = function
-    | `ExtendedAngle s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ExtendedAngle s -> s
 end
 
 module ExtendedFrequency = struct
-  type t =
-    [ `ExtendedFrequency of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ExtendedFrequency of string ]
 
-  let toString = function
-    | `ExtendedFrequency s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ExtendedFrequency s -> s
 end
 
 module ExtendedLength = struct
-  type t =
-    [ `ExtendedLength of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ExtendedLength of string ]
 
-  let toString = function
-    | `ExtendedLength s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ExtendedLength s -> s
 end
 
 module ExtendedPercentage = struct
-  type t =
-    [ `ExtendedPercentage of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ExtendedPercentage of string ]
 
-  let toString = function
-    | `ExtendedPercentage s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ExtendedPercentage s -> s
 end
 
 module ExtendedTime = struct
-  type t =
-    [ `ExtendedTime of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ExtendedTime of string ]
 
-  let toString = function
-    | `ExtendedTime s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ExtendedTime s -> s
 end
 
 module ExtendedTimeNoInterp = struct
-  type t =
-    [ `ExtendedTimeNoInterp of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ExtendedTimeNoInterp of string ]
 
-  let toString = function
-    | `ExtendedTimeNoInterp s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ExtendedTimeNoInterp s -> s
 end
 
 module FamilyName = struct
-  type t =
-    [ `FamilyName of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FamilyName of string ]
 
-  let toString = function
-    | `FamilyName s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FamilyName s -> s
 end
 
 module FeatureTagValue = struct
-  type t =
-    [ `FeatureTagValue of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FeatureTagValue of string ]
 
-  let toString = function
-    | `FeatureTagValue s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FeatureTagValue s -> s
 end
 
 module FeatureType = struct
-  type t =
-    [ `FeatureType of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FeatureType of string ]
 
-  let toString = function
-    | `FeatureType s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FeatureType s -> s
 end
 
 module FeatureValueBlock = struct
-  type t =
-    [ `FeatureValueBlock of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FeatureValueBlock of string ]
 
-  let toString = function
-    | `FeatureValueBlock s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FeatureValueBlock s -> s
 end
 
 module FeatureValueBlockList = struct
-  type t =
-    [ `FeatureValueBlockList of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FeatureValueBlockList of string ]
 
-  let toString = function
-    | `FeatureValueBlockList s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FeatureValueBlockList s -> s
 end
 
 module FeatureValueDeclaration = struct
-  type t =
-    [ `FeatureValueDeclaration of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FeatureValueDeclaration of string ]
 
-  let toString = function
-    | `FeatureValueDeclaration s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FeatureValueDeclaration s -> s
 end
 
 module FeatureValueDeclarationList = struct
-  type t =
-    [ `FeatureValueDeclarationList of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FeatureValueDeclarationList of string ]
 
-  let toString = function
-    | `FeatureValueDeclarationList s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FeatureValueDeclarationList s -> s
 end
 
 module FeatureValueName = struct
-  type t =
-    [ `FeatureValueName of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FeatureValueName of string ]
 
-  let toString = function
-    | `FeatureValueName s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FeatureValueName s -> s
 end
 
 module FieldSizing = struct
-  type t =
-    [ `FieldSizing of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FieldSizing of string ]
 
-  let toString = function
-    | `FieldSizing s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FieldSizing s -> s
 end
 
-module Fill = struct
-  type t =
-    [ `Fill of string
-    | Var.t
-    | Cascading.t
-    ]
-
-  let toString = function
-    | `Fill s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
-end
+(* Fill passthrough module removed - use Paint instead *)
 
 module FilterFunction = struct
-  type t =
-    [ `FilterFunction of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FilterFunction of string ]
 
-  let toString = function
-    | `FilterFunction s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FilterFunction s -> s
 end
 
 module FilterFunctionList = struct
-  type t =
-    [ `FilterFunctionList of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FilterFunctionList of string ]
 
-  let toString = function
-    | `FilterFunctionList s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FilterFunctionList s -> s
 end
 
 module FinalBgLayer = struct
-  type t =
-    [ `FinalBgLayer of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FinalBgLayer of string ]
 
-  let toString = function
-    | `FinalBgLayer s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FinalBgLayer s -> s
 end
 
 module FixedBreadth = struct
-  type t =
-    [ `FixedBreadth of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FixedBreadth of string ]
 
-  let toString = function
-    | `FixedBreadth s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FixedBreadth s -> s
 end
 
 module FixedRepeat = struct
-  type t =
-    [ `FixedRepeat of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FixedRepeat of string ]
 
-  let toString = function
-    | `FixedRepeat s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FixedRepeat s -> s
 end
 
 module FlexFlow = struct
-  type t =
-    [ `FlexFlow of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FlexFlow of string ]
 
-  let toString = function
-    | `FlexFlow s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FlexFlow s -> s
 end
 
 module FontFamilies = struct
-  type t =
-    [ `FontFamilies of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FontFamilies of string ]
 
-  let toString = function
-    | `FontFamilies s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FontFamilies s -> s
 end
 
 module FontStretchAbsolute = struct
-  type t =
-    [ `FontStretchAbsolute of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FontStretchAbsolute of string ]
 
-  let toString = function
-    | `FontStretchAbsolute s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FontStretchAbsolute s -> s
 end
 
 module FontVariantCss21 = struct
-  type t =
-    [ `FontVariantCss21 of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FontVariantCss21 of string ]
 
-  let toString = function
-    | `FontVariantCss21 s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FontVariantCss21 s -> s
 end
 
 module FontWeightAbsolute = struct
-  type t =
-    [ `FontWeightAbsolute of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FontWeightAbsolute of string ]
 
-  let toString = function
-    | `FontWeightAbsolute s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FontWeightAbsolute s -> s
 end
 
 module FunctionAttr = struct
-  type t =
-    [ `FunctionAttr of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionAttr of string ]
 
-  let toString = function
-    | `FunctionAttr s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionAttr s -> s
 end
 
 module FunctionBlur = struct
-  type t =
-    [ `FunctionBlur of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionBlur of string ]
 
-  let toString = function
-    | `FunctionBlur s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionBlur s -> s
 end
 
 module FunctionBrightness = struct
-  type t =
-    [ `FunctionBrightness of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionBrightness of string ]
 
-  let toString = function
-    | `FunctionBrightness s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionBrightness s -> s
 end
 
 module FunctionCalc = struct
-  type t =
-    [ `FunctionCalc of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionCalc of string ]
 
-  let toString = function
-    | `FunctionCalc s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionCalc s -> s
 end
 
 module FunctionCircle = struct
-  type t =
-    [ `FunctionCircle of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionCircle of string ]
 
-  let toString = function
-    | `FunctionCircle s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionCircle s -> s
 end
 
 module FunctionClamp = struct
-  type t =
-    [ `FunctionClamp of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionClamp of string ]
 
-  let toString = function
-    | `FunctionClamp s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionClamp s -> s
 end
 
 module FunctionConicGradient = struct
-  type t =
-    [ `FunctionConicGradient of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionConicGradient of string ]
 
-  let toString = function
-    | `FunctionConicGradient s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionConicGradient s -> s
 end
 
 module FunctionContrast = struct
-  type t =
-    [ `FunctionContrast of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionContrast of string ]
 
-  let toString = function
-    | `FunctionContrast s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionContrast s -> s
 end
 
 module FunctionCounter = struct
-  type t =
-    [ `FunctionCounter of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionCounter of string ]
 
-  let toString = function
-    | `FunctionCounter s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionCounter s -> s
 end
 
 module FunctionCounters = struct
-  type t =
-    [ `FunctionCounters of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionCounters of string ]
 
-  let toString = function
-    | `FunctionCounters s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionCounters s -> s
 end
 
 module FunctionCrossFade = struct
-  type t =
-    [ `FunctionCrossFade of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionCrossFade of string ]
 
-  let toString = function
-    | `FunctionCrossFade s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionCrossFade s -> s
 end
 
 module FunctionDropShadow = struct
-  type t =
-    [ `FunctionDropShadow of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionDropShadow of string ]
 
-  let toString = function
-    | `FunctionDropShadow s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionDropShadow s -> s
 end
 
 module FunctionElement = struct
-  type t =
-    [ `FunctionElement of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionElement of string ]
 
-  let toString = function
-    | `FunctionElement s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionElement s -> s
 end
 
 module FunctionEllipse = struct
-  type t =
-    [ `FunctionEllipse of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionEllipse of string ]
 
-  let toString = function
-    | `FunctionEllipse s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionEllipse s -> s
 end
 
 module FunctionEnv = struct
-  type t =
-    [ `FunctionEnv of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionEnv of string ]
 
-  let toString = function
-    | `FunctionEnv s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionEnv s -> s
 end
 
 module FunctionFitContent = struct
-  type t =
-    [ `FunctionFitContent of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionFitContent of string ]
 
-  let toString = function
-    | `FunctionFitContent s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionFitContent s -> s
 end
 
 module FunctionGrayscale = struct
-  type t =
-    [ `FunctionGrayscale of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionGrayscale of string ]
 
-  let toString = function
-    | `FunctionGrayscale s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionGrayscale s -> s
 end
 
 module FunctionHsl = struct
-  type t =
-    [ `FunctionHsl of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionHsl of string ]
 
-  let toString = function
-    | `FunctionHsl s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionHsl s -> s
 end
 
 module FunctionHsla = struct
-  type t =
-    [ `FunctionHsla of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionHsla of string ]
 
-  let toString = function
-    | `FunctionHsla s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionHsla s -> s
 end
 
 module FunctionHueRotate = struct
-  type t =
-    [ `FunctionHueRotate of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionHueRotate of string ]
 
-  let toString = function
-    | `FunctionHueRotate s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionHueRotate s -> s
 end
 
 module FunctionImage = struct
-  type t =
-    [ `FunctionImage of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionImage of string ]
 
-  let toString = function
-    | `FunctionImage s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionImage s -> s
 end
 
 module FunctionImageSet = struct
-  type t =
-    [ `FunctionImageSet of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionImageSet of string ]
 
-  let toString = function
-    | `FunctionImageSet s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionImageSet s -> s
 end
 
 module FunctionInset = struct
-  type t =
-    [ `FunctionInset of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionInset of string ]
 
-  let toString = function
-    | `FunctionInset s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionInset s -> s
 end
 
 module FunctionInvert = struct
-  type t =
-    [ `FunctionInvert of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionInvert of string ]
 
-  let toString = function
-    | `FunctionInvert s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionInvert s -> s
 end
 
 module FunctionLeader = struct
-  type t =
-    [ `FunctionLeader of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionLeader of string ]
 
-  let toString = function
-    | `FunctionLeader s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionLeader s -> s
 end
 
 module FunctionLinearGradient = struct
-  type t =
-    [ `FunctionLinearGradient of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionLinearGradient of string ]
 
-  let toString = function
-    | `FunctionLinearGradient s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionLinearGradient s -> s
 end
 
 module FunctionMatrix = struct
-  type t =
-    [ `FunctionMatrix of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionMatrix of string ]
 
-  let toString = function
-    | `FunctionMatrix s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionMatrix s -> s
 end
 
 module FunctionMatrix3d = struct
-  type t =
-    [ `FunctionMatrix3d of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionMatrix3d of string ]
 
-  let toString = function
-    | `FunctionMatrix3d s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionMatrix3d s -> s
 end
 
 module FunctionMax = struct
-  type t =
-    [ `FunctionMax of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionMax of string ]
 
-  let toString = function
-    | `FunctionMax s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionMax s -> s
 end
 
 module FunctionMin = struct
-  type t =
-    [ `FunctionMin of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionMin of string ]
 
-  let toString = function
-    | `FunctionMin s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionMin s -> s
 end
 
 module FunctionMinmax = struct
-  type t =
-    [ `FunctionMinmax of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionMinmax of string ]
 
-  let toString = function
-    | `FunctionMinmax s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionMinmax s -> s
 end
 
 module FunctionOpacity = struct
-  type t =
-    [ `FunctionOpacity of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionOpacity of string ]
 
-  let toString = function
-    | `FunctionOpacity s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionOpacity s -> s
 end
 
 module FunctionPaint = struct
-  type t =
-    [ `FunctionPaint of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionPaint of string ]
 
-  let toString = function
-    | `FunctionPaint s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionPaint s -> s
 end
 
 module FunctionPath = struct
-  type t =
-    [ `FunctionPath of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionPath of string ]
 
-  let toString = function
-    | `FunctionPath s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionPath s -> s
 end
 
 module FunctionPerspective = struct
-  type t =
-    [ `FunctionPerspective of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionPerspective of string ]
 
-  let toString = function
-    | `FunctionPerspective s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionPerspective s -> s
 end
 
 module FunctionPolygon = struct
-  type t =
-    [ `FunctionPolygon of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionPolygon of string ]
 
-  let toString = function
-    | `FunctionPolygon s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionPolygon s -> s
 end
 
 module FunctionRadialGradient = struct
-  type t =
-    [ `FunctionRadialGradient of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionRadialGradient of string ]
 
-  let toString = function
-    | `FunctionRadialGradient s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionRadialGradient s -> s
 end
 
 module FunctionRepeatingLinearGradient = struct
-  type t =
-    [ `FunctionRepeatingLinearGradient of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionRepeatingLinearGradient of string ]
 
-  let toString = function
-    | `FunctionRepeatingLinearGradient s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionRepeatingLinearGradient s -> s
 end
 
 module FunctionRepeatingRadialGradient = struct
-  type t =
-    [ `FunctionRepeatingRadialGradient of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionRepeatingRadialGradient of string ]
 
-  let toString = function
-    | `FunctionRepeatingRadialGradient s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionRepeatingRadialGradient s -> s
 end
 
 module FunctionRgb = struct
-  type t =
-    [ `FunctionRgb of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionRgb of string ]
 
-  let toString = function
-    | `FunctionRgb s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionRgb s -> s
 end
 
 module FunctionRgba = struct
-  type t =
-    [ `FunctionRgba of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionRgba of string ]
 
-  let toString = function
-    | `FunctionRgba s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionRgba s -> s
 end
 
 module FunctionRotate = struct
-  type t =
-    [ `FunctionRotate of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionRotate of string ]
 
-  let toString = function
-    | `FunctionRotate s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionRotate s -> s
 end
 
 module FunctionRotate3d = struct
-  type t =
-    [ `FunctionRotate3d of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionRotate3d of string ]
 
-  let toString = function
-    | `FunctionRotate3d s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionRotate3d s -> s
 end
 
 module FunctionRotatex = struct
-  type t =
-    [ `FunctionRotatex of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionRotatex of string ]
 
-  let toString = function
-    | `FunctionRotatex s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionRotatex s -> s
 end
 
 module FunctionRotatey = struct
-  type t =
-    [ `FunctionRotatey of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionRotatey of string ]
 
-  let toString = function
-    | `FunctionRotatey s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionRotatey s -> s
 end
 
 module FunctionRotatez = struct
-  type t =
-    [ `FunctionRotatez of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionRotatez of string ]
 
-  let toString = function
-    | `FunctionRotatez s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionRotatez s -> s
 end
 
 module FunctionSaturate = struct
-  type t =
-    [ `FunctionSaturate of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionSaturate of string ]
 
-  let toString = function
-    | `FunctionSaturate s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionSaturate s -> s
 end
 
 module FunctionScale = struct
-  type t =
-    [ `FunctionScale of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionScale of string ]
 
-  let toString = function
-    | `FunctionScale s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionScale s -> s
 end
 
 module FunctionScale3d = struct
-  type t =
-    [ `FunctionScale3d of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionScale3d of string ]
 
-  let toString = function
-    | `FunctionScale3d s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionScale3d s -> s
 end
 
 module FunctionScalex = struct
-  type t =
-    [ `FunctionScalex of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionScalex of string ]
 
-  let toString = function
-    | `FunctionScalex s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionScalex s -> s
 end
 
 module FunctionScaley = struct
-  type t =
-    [ `FunctionScaley of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionScaley of string ]
 
-  let toString = function
-    | `FunctionScaley s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionScaley s -> s
 end
 
 module FunctionScalez = struct
-  type t =
-    [ `FunctionScalez of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionScalez of string ]
 
-  let toString = function
-    | `FunctionScalez s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionScalez s -> s
 end
 
 module FunctionSepia = struct
-  type t =
-    [ `FunctionSepia of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionSepia of string ]
 
-  let toString = function
-    | `FunctionSepia s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionSepia s -> s
 end
 
 module FunctionSkew = struct
-  type t =
-    [ `FunctionSkew of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionSkew of string ]
 
-  let toString = function
-    | `FunctionSkew s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionSkew s -> s
 end
 
 module FunctionSkewx = struct
-  type t =
-    [ `FunctionSkewx of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionSkewx of string ]
 
-  let toString = function
-    | `FunctionSkewx s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionSkewx s -> s
 end
 
 module FunctionSkewy = struct
-  type t =
-    [ `FunctionSkewy of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionSkewy of string ]
 
-  let toString = function
-    | `FunctionSkewy s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionSkewy s -> s
 end
 
 module FunctionSymbols = struct
-  type t =
-    [ `FunctionSymbols of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionSymbols of string ]
 
-  let toString = function
-    | `FunctionSymbols s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionSymbols s -> s
 end
 
 module FunctionTargetCounter = struct
-  type t =
-    [ `FunctionTargetCounter of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionTargetCounter of string ]
 
-  let toString = function
-    | `FunctionTargetCounter s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionTargetCounter s -> s
 end
 
 module FunctionTargetCounters = struct
-  type t =
-    [ `FunctionTargetCounters of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionTargetCounters of string ]
 
-  let toString = function
-    | `FunctionTargetCounters s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionTargetCounters s -> s
 end
 
 module FunctionTargetText = struct
-  type t =
-    [ `FunctionTargetText of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionTargetText of string ]
 
-  let toString = function
-    | `FunctionTargetText s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionTargetText s -> s
 end
 
 module FunctionTranslate = struct
-  type t =
-    [ `FunctionTranslate of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionTranslate of string ]
 
-  let toString = function
-    | `FunctionTranslate s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionTranslate s -> s
 end
 
 module FunctionTranslate3d = struct
-  type t =
-    [ `FunctionTranslate3d of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionTranslate3d of string ]
 
-  let toString = function
-    | `FunctionTranslate3d s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionTranslate3d s -> s
 end
 
 module FunctionTranslatex = struct
-  type t =
-    [ `FunctionTranslatex of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionTranslatex of string ]
 
-  let toString = function
-    | `FunctionTranslatex s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionTranslatex s -> s
 end
 
 module FunctionTranslatey = struct
-  type t =
-    [ `FunctionTranslatey of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionTranslatey of string ]
 
-  let toString = function
-    | `FunctionTranslatey s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionTranslatey s -> s
 end
 
 module FunctionTranslatez = struct
-  type t =
-    [ `FunctionTranslatez of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionTranslatez of string ]
 
-  let toString = function
-    | `FunctionTranslatez s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionTranslatez s -> s
 end
 
 module FunctionVar = struct
-  type t =
-    [ `FunctionVar of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionVar of string ]
 
-  let toString = function
-    | `FunctionVar s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionVar s -> s
 end
 
 module FunctionWebkitGradient = struct
-  type t =
-    [ `FunctionWebkitGradient of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `FunctionWebkitGradient of string ]
 
-  let toString = function
-    | `FunctionWebkitGradient s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `FunctionWebkitGradient s -> s
 end
 
 module Gender = struct
-  type t =
-    [ `Gender of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `Gender of string ]
 
-  let toString = function
-    | `Gender s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `Gender s -> s
 end
 
 module GeneralEnclosed = struct
-  type t =
-    [ `GeneralEnclosed of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `GeneralEnclosed of string ]
 
-  let toString = function
-    | `GeneralEnclosed s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `GeneralEnclosed s -> s
 end
 
 module GenericFamily = struct
-  type t =
-    [ `GenericFamily of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `GenericFamily of string ]
 
-  let toString = function
-    | `GenericFamily s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `GenericFamily s -> s
 end
 
 module GenericName = struct
-  type t =
-    [ `GenericName of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `GenericName of string ]
 
-  let toString = function
-    | `GenericName s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `GenericName s -> s
 end
 
 module GenericVoice = struct
-  type t =
-    [ `GenericVoice of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `GenericVoice of string ]
 
-  let toString = function
-    | `GenericVoice s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `GenericVoice s -> s
 end
 
 module HistoricalLigValues = struct
-  type t =
-    [ `HistoricalLigValues of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `HistoricalLigValues of string ]
 
-  let toString = function
-    | `HistoricalLigValues s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `HistoricalLigValues s -> s
 end
 
 module Hue = struct
-  type t =
-    [ `Hue of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `Hue of string ]
 
-  let toString = function
-    | `Hue s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `Hue s -> s
 end
 
 module HueInterpolationMethod = struct
-  type t =
-    [ `HueInterpolationMethod of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `HueInterpolationMethod of string ]
 
-  let toString = function
-    | `HueInterpolationMethod s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `HueInterpolationMethod s -> s
 end
 
 module HyphenateLimitLast = struct
-  type t =
-    [ `HyphenateLimitLast of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `HyphenateLimitLast of string ]
 
-  let toString = function
-    | `HyphenateLimitLast s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `HyphenateLimitLast s -> s
 end
 
 module IdSelector = struct
-  type t =
-    [ `IdSelector of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `IdSelector of string ]
 
-  let toString = function
-    | `IdSelector s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `IdSelector s -> s
 end
 
 module ImageSetOption = struct
-  type t =
-    [ `ImageSetOption of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ImageSetOption of string ]
 
-  let toString = function
-    | `ImageSetOption s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ImageSetOption s -> s
 end
 
 module ImageSrc = struct
-  type t =
-    [ `ImageSrc of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ImageSrc of string ]
 
-  let toString = function
-    | `ImageSrc s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ImageSrc s -> s
 end
 
 module ImageTags = struct
-  type t =
-    [ `ImageTags of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ImageTags of string ]
 
-  let toString = function
-    | `ImageTags s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ImageTags s -> s
 end
 
 module Inherits = struct
-  type t =
-    [ `Inherits of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `Inherits of string ]
 
-  let toString = function
-    | `Inherits s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `Inherits s -> s
 end
 
 module InitialValue = struct
-  type t =
-    [ `InitialValue of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `InitialValue of string ]
 
-  let toString = function
-    | `InitialValue s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `InitialValue s -> s
 end
 
 module InsetArea = struct
-  type t =
-    [ `InsetArea of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `InsetArea of string ]
 
-  let toString = function
-    | `InsetArea s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `InsetArea s -> s
 end
 
 module InterpolateSize = struct
-  type t =
-    [ `InterpolateSize of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `InterpolateSize of string ]
 
-  let toString = function
-    | `InterpolateSize s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `InterpolateSize s -> s
 end
 
 module KeyframeBlock = struct
-  type t =
-    [ `KeyframeBlock of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `KeyframeBlock of string ]
 
-  let toString = function
-    | `KeyframeBlock s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `KeyframeBlock s -> s
 end
 
 module KeyframeBlockList = struct
-  type t =
-    [ `KeyframeBlockList of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `KeyframeBlockList of string ]
 
-  let toString = function
-    | `KeyframeBlockList s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `KeyframeBlockList s -> s
 end
 
 module KeyframeSelector = struct
-  type t =
-    [ `KeyframeSelector of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `KeyframeSelector of string ]
 
-  let toString = function
-    | `KeyframeSelector s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `KeyframeSelector s -> s
 end
 
 module KeyframesName = struct
-  type t =
-    [ `KeyframesName of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `KeyframesName of string ]
 
-  let toString = function
-    | `KeyframesName s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `KeyframesName s -> s
 end
 
 module LeaderType = struct
-  type t =
-    [ `LeaderType of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `LeaderType of string ]
 
-  let toString = function
-    | `LeaderType s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `LeaderType s -> s
 end
 
 module LegacyGradient = struct
-  type t =
-    [ `LegacyGradient of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `LegacyGradient of string ]
 
-  let toString = function
-    | `LegacyGradient s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `LegacyGradient s -> s
 end
 
 module LegacyLinearGradient = struct
-  type t =
-    [ `LegacyLinearGradient of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `LegacyLinearGradient of string ]
 
-  let toString = function
-    | `LegacyLinearGradient s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `LegacyLinearGradient s -> s
 end
 
 module LegacyLinearGradientArguments = struct
-  type t =
-    [ `LegacyLinearGradientArguments of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `LegacyLinearGradientArguments of string ]
 
-  let toString = function
-    | `LegacyLinearGradientArguments s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `LegacyLinearGradientArguments s -> s
 end
 
 module LegacyRadialGradient = struct
-  type t =
-    [ `LegacyRadialGradient of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `LegacyRadialGradient of string ]
 
-  let toString = function
-    | `LegacyRadialGradient s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `LegacyRadialGradient s -> s
 end
 
 module LegacyRadialGradientArguments = struct
-  type t =
-    [ `LegacyRadialGradientArguments of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `LegacyRadialGradientArguments of string ]
 
-  let toString = function
-    | `LegacyRadialGradientArguments s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `LegacyRadialGradientArguments s -> s
 end
 
 module LegacyRadialGradientShape = struct
-  type t =
-    [ `LegacyRadialGradientShape of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `LegacyRadialGradientShape of string ]
 
-  let toString = function
-    | `LegacyRadialGradientShape s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `LegacyRadialGradientShape s -> s
 end
 
 module LegacyRadialGradientSize = struct
-  type t =
-    [ `LegacyRadialGradientSize of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `LegacyRadialGradientSize of string ]
 
-  let toString = function
-    | `LegacyRadialGradientSize s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `LegacyRadialGradientSize s -> s
 end
 
 module LegacyRepeatingLinearGradient = struct
-  type t =
-    [ `LegacyRepeatingLinearGradient of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `LegacyRepeatingLinearGradient of string ]
 
-  let toString = function
-    | `LegacyRepeatingLinearGradient s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `LegacyRepeatingLinearGradient s -> s
 end
 
 module LegacyRepeatingRadialGradient = struct
-  type t =
-    [ `LegacyRepeatingRadialGradient of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `LegacyRepeatingRadialGradient of string ]
 
-  let toString = function
-    | `LegacyRepeatingRadialGradient s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `LegacyRepeatingRadialGradient s -> s
 end
 
 module LengthPercentage = struct
-  type t =
-    [ `LengthPercentage of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `LengthPercentage of string ]
 
-  let toString = function
-    | `LengthPercentage s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `LengthPercentage s -> s
 end
 
 module LineNameList = struct
-  type t =
-    [ `LineNameList of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `LineNameList of string ]
 
-  let toString = function
-    | `LineNameList s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `LineNameList s -> s
 end
 
 module LineNames = struct
-  type t =
-    [ `LineNames of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `LineNames of string ]
 
-  let toString = function
-    | `LineNames s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `LineNames s -> s
 end
 
 module LineStyle = struct
-  type t =
-    [ `LineStyle of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `LineStyle of string ]
 
-  let toString = function
-    | `LineStyle s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `LineStyle s -> s
 end
 
 module LinearColorHint = struct
-  type t =
-    [ `LinearColorHint of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `LinearColorHint of string ]
 
-  let toString = function
-    | `LinearColorHint s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `LinearColorHint s -> s
 end
 
 module LinearColorStop = struct
-  type t =
-    [ `LinearColorStop of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `LinearColorStop of string ]
 
-  let toString = function
-    | `LinearColorStop s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `LinearColorStop s -> s
 end
 
 module ListStyle = struct
-  type t =
-    [ `ListStyle of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ListStyle of string ]
 
-  let toString = function
-    | `ListStyle s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ListStyle s -> s
 end
 
 module Marks = struct
-  type t =
-    [ `Marks of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `Marks of string ]
 
-  let toString = function
-    | `Marks s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `Marks s -> s
 end
 
 module MaskLayer = struct
-  type t =
-    [ `MaskLayer of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MaskLayer of string ]
 
-  let toString = function
-    | `MaskLayer s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MaskLayer s -> s
 end
 
 module MaskReference = struct
-  type t =
-    [ `MaskReference of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MaskReference of string ]
 
-  let toString = function
-    | `MaskReference s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MaskReference s -> s
 end
 
 module MaskSource = struct
-  type t =
-    [ `MaskSource of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MaskSource of string ]
 
-  let toString = function
-    | `MaskSource s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MaskSource s -> s
 end
 
 module MaskingMode = struct
-  type t =
-    [ `MaskingMode of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MaskingMode of string ]
 
-  let toString = function
-    | `MaskingMode s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MaskingMode s -> s
 end
 
 module MathDepth = struct
-  type t =
-    [ `MathDepth of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MathDepth of string ]
 
-  let toString = function
-    | `MathDepth s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MathDepth s -> s
 end
 
 module MathShift = struct
-  type t =
-    [ `MathShift of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MathShift of string ]
 
-  let toString = function
-    | `MathShift s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MathShift s -> s
 end
 
 module MathStyle = struct
-  type t =
-    [ `MathStyle of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MathStyle of string ]
 
-  let toString = function
-    | `MathStyle s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MathStyle s -> s
 end
 
 module MediaAnd = struct
-  type t =
-    [ `MediaAnd of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaAnd of string ]
 
-  let toString = function
-    | `MediaAnd s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaAnd s -> s
 end
 
 module MediaAnyHover = struct
-  type t =
-    [ `MediaAnyHover of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaAnyHover of string ]
 
-  let toString = function
-    | `MediaAnyHover s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaAnyHover s -> s
 end
 
 module MediaAnyPointer = struct
-  type t =
-    [ `MediaAnyPointer of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaAnyPointer of string ]
 
-  let toString = function
-    | `MediaAnyPointer s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaAnyPointer s -> s
 end
 
 module MediaColorGamut = struct
-  type t =
-    [ `MediaColorGamut of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaColorGamut of string ]
 
-  let toString = function
-    | `MediaColorGamut s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaColorGamut s -> s
 end
 
 module MediaColorIndex = struct
-  type t =
-    [ `MediaColorIndex of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaColorIndex of string ]
 
-  let toString = function
-    | `MediaColorIndex s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaColorIndex s -> s
 end
 
 module MediaCondition = struct
-  type t =
-    [ `MediaCondition of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaCondition of string ]
 
-  let toString = function
-    | `MediaCondition s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaCondition s -> s
 end
 
 module MediaConditionWithoutOr = struct
-  type t =
-    [ `MediaConditionWithoutOr of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaConditionWithoutOr of string ]
 
-  let toString = function
-    | `MediaConditionWithoutOr s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaConditionWithoutOr s -> s
 end
 
 module MediaDisplayMode = struct
-  type t =
-    [ `MediaDisplayMode of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaDisplayMode of string ]
 
-  let toString = function
-    | `MediaDisplayMode s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaDisplayMode s -> s
 end
 
 module MediaFeature = struct
-  type t =
-    [ `MediaFeature of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaFeature of string ]
 
-  let toString = function
-    | `MediaFeature s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaFeature s -> s
 end
 
 module MediaForcedColors = struct
-  type t =
-    [ `MediaForcedColors of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaForcedColors of string ]
 
-  let toString = function
-    | `MediaForcedColors s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaForcedColors s -> s
 end
 
 module MediaGrid = struct
-  type t =
-    [ `MediaGrid of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaGrid of string ]
 
-  let toString = function
-    | `MediaGrid s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaGrid s -> s
 end
 
 module MediaHover = struct
-  type t =
-    [ `MediaHover of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaHover of string ]
 
-  let toString = function
-    | `MediaHover s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaHover s -> s
 end
 
 module MediaInParens = struct
-  type t =
-    [ `MediaInParens of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaInParens of string ]
 
-  let toString = function
-    | `MediaInParens s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaInParens s -> s
 end
 
 module MediaInvertedColors = struct
-  type t =
-    [ `MediaInvertedColors of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaInvertedColors of string ]
 
-  let toString = function
-    | `MediaInvertedColors s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaInvertedColors s -> s
 end
 
 module MediaMaxAspectRatio = struct
-  type t =
-    [ `MediaMaxAspectRatio of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaMaxAspectRatio of string ]
 
-  let toString = function
-    | `MediaMaxAspectRatio s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaMaxAspectRatio s -> s
 end
 
 module MediaMaxResolution = struct
-  type t =
-    [ `MediaMaxResolution of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaMaxResolution of string ]
 
-  let toString = function
-    | `MediaMaxResolution s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaMaxResolution s -> s
 end
 
 module MediaMinAspectRatio = struct
-  type t =
-    [ `MediaMinAspectRatio of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaMinAspectRatio of string ]
 
-  let toString = function
-    | `MediaMinAspectRatio s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaMinAspectRatio s -> s
 end
 
 module MediaMinColor = struct
-  type t =
-    [ `MediaMinColor of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaMinColor of string ]
 
-  let toString = function
-    | `MediaMinColor s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaMinColor s -> s
 end
 
 module MediaMinColorIndex = struct
-  type t =
-    [ `MediaMinColorIndex of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaMinColorIndex of string ]
 
-  let toString = function
-    | `MediaMinColorIndex s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaMinColorIndex s -> s
 end
 
 module MediaMinResolution = struct
-  type t =
-    [ `MediaMinResolution of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaMinResolution of string ]
 
-  let toString = function
-    | `MediaMinResolution s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaMinResolution s -> s
 end
 
 module MediaMonochrome = struct
-  type t =
-    [ `MediaMonochrome of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaMonochrome of string ]
 
-  let toString = function
-    | `MediaMonochrome s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaMonochrome s -> s
 end
 
 module MediaNot = struct
-  type t =
-    [ `MediaNot of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaNot of string ]
 
-  let toString = function
-    | `MediaNot s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaNot s -> s
 end
 
 module MediaOr = struct
-  type t =
-    [ `MediaOr of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaOr of string ]
 
-  let toString = function
-    | `MediaOr s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaOr s -> s
 end
 
 module MediaOrientation = struct
-  type t =
-    [ `MediaOrientation of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaOrientation of string ]
 
-  let toString = function
-    | `MediaOrientation s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaOrientation s -> s
 end
 
 module MediaPointer = struct
-  type t =
-    [ `MediaPointer of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaPointer of string ]
 
-  let toString = function
-    | `MediaPointer s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaPointer s -> s
 end
 
 module MediaPrefersColorScheme = struct
-  type t =
-    [ `MediaPrefersColorScheme of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaPrefersColorScheme of string ]
 
-  let toString = function
-    | `MediaPrefersColorScheme s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaPrefersColorScheme s -> s
 end
 
 module MediaPrefersContrast = struct
-  type t =
-    [ `MediaPrefersContrast of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaPrefersContrast of string ]
 
-  let toString = function
-    | `MediaPrefersContrast s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaPrefersContrast s -> s
 end
 
 module MediaPrefersReducedMotion = struct
-  type t =
-    [ `MediaPrefersReducedMotion of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaPrefersReducedMotion of string ]
 
-  let toString = function
-    | `MediaPrefersReducedMotion s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaPrefersReducedMotion s -> s
 end
 
 module MediaQuery = struct
-  type t =
-    [ `MediaQuery of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaQuery of string ]
 
-  let toString = function
-    | `MediaQuery s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaQuery s -> s
 end
 
 module MediaQueryList = struct
-  type t =
-    [ `MediaQueryList of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaQueryList of string ]
 
-  let toString = function
-    | `MediaQueryList s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaQueryList s -> s
 end
 
 module MediaResolution = struct
-  type t =
-    [ `MediaResolution of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaResolution of string ]
 
-  let toString = function
-    | `MediaResolution s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaResolution s -> s
 end
 
 module MediaScripting = struct
-  type t =
-    [ `MediaScripting of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaScripting of string ]
 
-  let toString = function
-    | `MediaScripting s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaScripting s -> s
 end
 
 module MediaType = struct
-  type t =
-    [ `MediaType of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaType of string ]
 
-  let toString = function
-    | `MediaType s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaType s -> s
 end
 
 module MediaUpdate = struct
-  type t =
-    [ `MediaUpdate of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MediaUpdate of string ]
 
-  let toString = function
-    | `MediaUpdate s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MediaUpdate s -> s
 end
 
 module MfBoolean = struct
-  type t =
-    [ `MfBoolean of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MfBoolean of string ]
 
-  let toString = function
-    | `MfBoolean s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MfBoolean s -> s
 end
 
 module MfComparison = struct
-  type t =
-    [ `MfComparison of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MfComparison of string ]
 
-  let toString = function
-    | `MfComparison s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MfComparison s -> s
 end
 
 module MfEq = struct
-  type t =
-    [ `MfEq of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MfEq of string ]
 
-  let toString = function
-    | `MfEq s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MfEq s -> s
 end
 
 module MfGt = struct
-  type t =
-    [ `MfGt of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MfGt of string ]
 
-  let toString = function
-    | `MfGt s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MfGt s -> s
 end
 
 module MfLt = struct
-  type t =
-    [ `MfLt of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MfLt of string ]
 
-  let toString = function
-    | `MfLt s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MfLt s -> s
 end
 
 module MfName = struct
-  type t =
-    [ `MfName of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MfName of string ]
 
-  let toString = function
-    | `MfName s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MfName s -> s
 end
 
 module MfPlain = struct
-  type t =
-    [ `MfPlain of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MfPlain of string ]
 
-  let toString = function
-    | `MfPlain s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MfPlain s -> s
 end
 
 module MfRange = struct
-  type t =
-    [ `MfRange of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MfRange of string ]
 
-  let toString = function
-    | `MfRange s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MfRange s -> s
 end
 
 module MfValue = struct
-  type t =
-    [ `MfValue of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `MfValue of string ]
 
-  let toString = function
-    | `MfValue s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `MfValue s -> s
 end
 
 module NameRepeat = struct
-  type t =
-    [ `NameRepeat of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `NameRepeat of string ]
 
-  let toString = function
-    | `NameRepeat s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `NameRepeat s -> s
 end
 
 module NamedColor = struct
-  type t =
-    [ `NamedColor of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `NamedColor of string ]
 
-  let toString = function
-    | `NamedColor s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `NamedColor s -> s
 end
 
 module NamespacePrefix = struct
-  type t =
-    [ `NamespacePrefix of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `NamespacePrefix of string ]
 
-  let toString = function
-    | `NamespacePrefix s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `NamespacePrefix s -> s
 end
 
 module NonStandardColor = struct
-  type t =
-    [ `NonStandardColor of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `NonStandardColor of string ]
 
-  let toString = function
-    | `NonStandardColor s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `NonStandardColor s -> s
 end
 
 module NonStandardFont = struct
-  type t =
-    [ `NonStandardFont of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `NonStandardFont of string ]
 
-  let toString = function
-    | `NonStandardFont s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `NonStandardFont s -> s
 end
 
 module NonStandardImageRendering = struct
-  type t =
-    [ `NonStandardImageRendering of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `NonStandardImageRendering of string ]
 
-  let toString = function
-    | `NonStandardImageRendering s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `NonStandardImageRendering s -> s
 end
 
 module NonStandardOverflow = struct
-  type t =
-    [ `NonStandardOverflow of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `NonStandardOverflow of string ]
 
-  let toString = function
-    | `NonStandardOverflow s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `NonStandardOverflow s -> s
 end
 
 module NonStandardWidth = struct
-  type t =
-    [ `NonStandardWidth of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `NonStandardWidth of string ]
 
-  let toString = function
-    | `NonStandardWidth s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `NonStandardWidth s -> s
 end
 
 module NsPrefix = struct
-  type t =
-    [ `NsPrefix of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `NsPrefix of string ]
 
-  let toString = function
-    | `NsPrefix s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `NsPrefix s -> s
 end
 
 module Nth = struct
-  type t =
-    [ `Nth of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `Nth of string ]
 
-  let toString = function
-    | `Nth s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `Nth s -> s
 end
 
 module NumberOneOrGreater = struct
-  type t =
-    [ `NumberOneOrGreater of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `NumberOneOrGreater of string ]
 
-  let toString = function
-    | `NumberOneOrGreater s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `NumberOneOrGreater s -> s
 end
 
 module NumberPercentage = struct
-  type t =
-    [ `NumberPercentage of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `NumberPercentage of string ]
 
-  let toString = function
-    | `NumberPercentage s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `NumberPercentage s -> s
 end
 
 module NumberZeroOne = struct
-  type t =
-    [ `NumberZeroOne of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `NumberZeroOne of string ]
 
-  let toString = function
-    | `NumberZeroOne s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `NumberZeroOne s -> s
 end
 
 module NumericFigureValues = struct
-  type t =
-    [ `NumericFigureValues of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `NumericFigureValues of string ]
 
-  let toString = function
-    | `NumericFigureValues s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `NumericFigureValues s -> s
 end
 
 module NumericFractionValues = struct
-  type t =
-    [ `NumericFractionValues of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `NumericFractionValues of string ]
 
-  let toString = function
-    | `NumericFractionValues s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `NumericFractionValues s -> s
 end
 
 module NumericSpacingValues = struct
-  type t =
-    [ `NumericSpacingValues of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `NumericSpacingValues of string ]
 
-  let toString = function
-    | `NumericSpacingValues s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `NumericSpacingValues s -> s
 end
 
 module OneBgSize = struct
-  type t =
-    [ `OneBgSize of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `OneBgSize of string ]
 
-  let toString = function
-    | `OneBgSize s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `OneBgSize s -> s
 end
 
 module OutlineRadius = struct
-  type t =
-    [ `OutlineRadius of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `OutlineRadius of string ]
 
-  let toString = function
-    | `OutlineRadius s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `OutlineRadius s -> s
 end
 
 module OverflowPosition = struct
-  type t =
-    [ `OverflowPosition of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `OverflowPosition of string ]
 
-  let toString = function
-    | `OverflowPosition s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `OverflowPosition s -> s
 end
 
 module Overlay = struct
-  type t =
-    [ `Overlay of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `Overlay of string ]
 
-  let toString = function
-    | `Overlay s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `Overlay s -> s
 end
 
 module OverscrollBehaviorBlock = struct
-  type t =
-    [ `OverscrollBehaviorBlock of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `OverscrollBehaviorBlock of string ]
 
-  let toString = function
-    | `OverscrollBehaviorBlock s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `OverscrollBehaviorBlock s -> s
 end
 
 module OverscrollBehaviorInline = struct
-  type t =
-    [ `OverscrollBehaviorInline of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `OverscrollBehaviorInline of string ]
 
-  let toString = function
-    | `OverscrollBehaviorInline s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `OverscrollBehaviorInline s -> s
 end
 
 module OverscrollBehaviorX = struct
-  type t =
-    [ `OverscrollBehaviorX of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `OverscrollBehaviorX of string ]
 
-  let toString = function
-    | `OverscrollBehaviorX s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `OverscrollBehaviorX s -> s
 end
 
 module OverscrollBehaviorY = struct
-  type t =
-    [ `OverscrollBehaviorY of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `OverscrollBehaviorY of string ]
 
-  let toString = function
-    | `OverscrollBehaviorY s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `OverscrollBehaviorY s -> s
 end
 
 module Page = struct
-  type t =
-    [ `Page of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `Page of string ]
 
-  let toString = function
-    | `Page s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `Page s -> s
 end
 
 module PageBody = struct
-  type t =
-    [ `PageBody of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `PageBody of string ]
 
-  let toString = function
-    | `PageBody s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `PageBody s -> s
 end
 
 module PageMarginBox = struct
-  type t =
-    [ `PageMarginBox of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `PageMarginBox of string ]
 
-  let toString = function
-    | `PageMarginBox s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `PageMarginBox s -> s
 end
 
 module PageMarginBoxType = struct
-  type t =
-    [ `PageMarginBoxType of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `PageMarginBoxType of string ]
 
-  let toString = function
-    | `PageMarginBoxType s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `PageMarginBoxType s -> s
 end
 
 module PageSelector = struct
-  type t =
-    [ `PageSelector of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `PageSelector of string ]
 
-  let toString = function
-    | `PageSelector s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `PageSelector s -> s
 end
 
 module PageSelectorList = struct
-  type t =
-    [ `PageSelectorList of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `PageSelectorList of string ]
 
-  let toString = function
-    | `PageSelectorList s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `PageSelectorList s -> s
 end
 
 module Paint = struct
   type t =
-    [ `Paint of string
-    | Var.t
-    | Cascading.t
+    [ None.t
+    | `contextFill
+    | `contextStroke
+    | Color.t
+    | Url.t
     ]
 
-  let toString = function
-    | `Paint s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let contextFill = `contextFill
+  let contextStroke = `contextStroke
+
+  let toString x =
+    match x with
+    | #None.t -> None.toString
+    | `contextFill -> {js|context-fill|js}
+    | `contextStroke -> {js|context-stroke|js}
+    | #Color.t as c -> Color.toString c
+    | #Url.t as u -> Url.toString u
 end
 
 module PolarColorSpace = struct
-  type t =
-    [ `PolarColorSpace of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `PolarColorSpace of string ]
 
-  let toString = function
-    | `PolarColorSpace s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `PolarColorSpace s -> s
 end
 
 module PositionAnchor = struct
-  type t =
-    [ `PositionAnchor of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `PositionAnchor of string ]
 
-  let toString = function
-    | `PositionAnchor s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `PositionAnchor s -> s
 end
 
 module PositionArea = struct
-  type t =
-    [ `PositionArea of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `PositionArea of string ]
 
-  let toString = function
-    | `PositionArea s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `PositionArea s -> s
 end
 
 module PositionTry = struct
-  type t =
-    [ `PositionTry of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `PositionTry of string ]
 
-  let toString = function
-    | `PositionTry s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `PositionTry s -> s
 end
 
 module PositionTryFallbacks = struct
-  type t =
-    [ `PositionTryFallbacks of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `PositionTryFallbacks of string ]
 
-  let toString = function
-    | `PositionTryFallbacks s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `PositionTryFallbacks s -> s
 end
 
 module PositionTryOptions = struct
-  type t =
-    [ `PositionTryOptions of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `PositionTryOptions of string ]
 
-  let toString = function
-    | `PositionTryOptions s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `PositionTryOptions s -> s
 end
 
 module PositionVisibility = struct
-  type t =
-    [ `PositionVisibility of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `PositionVisibility of string ]
 
-  let toString = function
-    | `PositionVisibility s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `PositionVisibility s -> s
 end
 
 module PositiveInteger = struct
-  type t =
-    [ `PositiveInteger of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `PositiveInteger of string ]
 
-  let toString = function
-    | `PositiveInteger s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `PositiveInteger s -> s
 end
 
 module PrintColorAdjust = struct
-  type t =
-    [ `PrintColorAdjust of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `PrintColorAdjust of string ]
 
-  let toString = function
-    | `PrintColorAdjust s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `PrintColorAdjust s -> s
 end
 
 module PseudoClassSelector = struct
-  type t =
-    [ `PseudoClassSelector of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `PseudoClassSelector of string ]
 
-  let toString = function
-    | `PseudoClassSelector s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `PseudoClassSelector s -> s
 end
 
 module PseudoElementSelector = struct
-  type t =
-    [ `PseudoElementSelector of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `PseudoElementSelector of string ]
 
-  let toString = function
-    | `PseudoElementSelector s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `PseudoElementSelector s -> s
 end
 
 module PseudoPage = struct
-  type t =
-    [ `PseudoPage of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `PseudoPage of string ]
 
-  let toString = function
-    | `PseudoPage s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `PseudoPage s -> s
 end
 
 module QueryInParens = struct
-  type t =
-    [ `QueryInParens of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `QueryInParens of string ]
 
-  let toString = function
-    | `QueryInParens s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `QueryInParens s -> s
 end
 
 module Quote = struct
-  type t =
-    [ `Quote of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `Quote of string ]
 
-  let toString = function
-    | `Quote s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `Quote s -> s
 end
 
 module RadialSize = struct
-  type t =
-    [ `RadialSize of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `RadialSize of string ]
 
-  let toString = function
-    | `RadialSize s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `RadialSize s -> s
 end
 
 module Ratio = struct
-  type t =
-    [ `Ratio of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `Ratio of string ]
 
-  let toString = function
-    | `Ratio s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `Ratio s -> s
 end
 
 module RaySize = struct
-  type t =
-    [ `RaySize of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `RaySize of string ]
 
-  let toString = function
-    | `RaySize s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `RaySize s -> s
 end
 
 module ReadingFlow = struct
-  type t =
-    [ `ReadingFlow of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ReadingFlow of string ]
 
-  let toString = function
-    | `ReadingFlow s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ReadingFlow s -> s
 end
 
 module RectangularColorSpace = struct
-  type t =
-    [ `RectangularColorSpace of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `RectangularColorSpace of string ]
 
-  let toString = function
-    | `RectangularColorSpace s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `RectangularColorSpace s -> s
 end
 
 module RelativeSelector = struct
-  type t =
-    [ `RelativeSelector of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `RelativeSelector of string ]
 
-  let toString = function
-    | `RelativeSelector s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `RelativeSelector s -> s
 end
 
 module RelativeSelectorList = struct
-  type t =
-    [ `RelativeSelectorList of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `RelativeSelectorList of string ]
 
-  let toString = function
-    | `RelativeSelectorList s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `RelativeSelectorList s -> s
 end
 
 module RelativeSize = struct
-  type t =
-    [ `RelativeSize of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `RelativeSize of string ]
 
-  let toString = function
-    | `RelativeSize s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `RelativeSize s -> s
 end
 
 module RepeatStyle = struct
-  type t =
-    [ `RepeatStyle of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `RepeatStyle of string ]
 
-  let toString = function
-    | `RepeatStyle s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `RepeatStyle s -> s
 end
 
 module RubyOverhang = struct
-  type t =
-    [ `RubyOverhang of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `RubyOverhang of string ]
 
-  let toString = function
-    | `RubyOverhang s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `RubyOverhang s -> s
 end
 
 module SVGPath = struct
-  type t =
-    [ `SVGPath of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SVGPath of string ]
 
-  let toString = function
-    | `SVGPath s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SVGPath s -> s
 end
 
 module ScrollMarkerGroup = struct
-  type t =
-    [ `ScrollMarkerGroup of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ScrollMarkerGroup of string ]
 
-  let toString = function
-    | `ScrollMarkerGroup s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ScrollMarkerGroup s -> s
 end
 
 module ScrollStart = struct
-  type t =
-    [ `ScrollStart of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ScrollStart of string ]
 
-  let toString = function
-    | `ScrollStart s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ScrollStart s -> s
 end
 
 module ScrollStartBlock = struct
-  type t =
-    [ `ScrollStartBlock of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ScrollStartBlock of string ]
 
-  let toString = function
-    | `ScrollStartBlock s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ScrollStartBlock s -> s
 end
 
 module ScrollStartInline = struct
-  type t =
-    [ `ScrollStartInline of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ScrollStartInline of string ]
 
-  let toString = function
-    | `ScrollStartInline s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ScrollStartInline s -> s
 end
 
 module ScrollStartTarget = struct
-  type t =
-    [ `ScrollStartTarget of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ScrollStartTarget of string ]
 
-  let toString = function
-    | `ScrollStartTarget s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ScrollStartTarget s -> s
 end
 
 module ScrollStartTargetBlock = struct
-  type t =
-    [ `ScrollStartTargetBlock of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ScrollStartTargetBlock of string ]
 
-  let toString = function
-    | `ScrollStartTargetBlock s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ScrollStartTargetBlock s -> s
 end
 
 module ScrollStartTargetInline = struct
-  type t =
-    [ `ScrollStartTargetInline of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ScrollStartTargetInline of string ]
 
-  let toString = function
-    | `ScrollStartTargetInline s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ScrollStartTargetInline s -> s
 end
 
 module ScrollStartTargetX = struct
-  type t =
-    [ `ScrollStartTargetX of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ScrollStartTargetX of string ]
 
-  let toString = function
-    | `ScrollStartTargetX s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ScrollStartTargetX s -> s
 end
 
 module ScrollStartTargetY = struct
-  type t =
-    [ `ScrollStartTargetY of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ScrollStartTargetY of string ]
 
-  let toString = function
-    | `ScrollStartTargetY s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ScrollStartTargetY s -> s
 end
 
 module ScrollStartX = struct
-  type t =
-    [ `ScrollStartX of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ScrollStartX of string ]
 
-  let toString = function
-    | `ScrollStartX s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ScrollStartX s -> s
 end
 
 module ScrollStartY = struct
-  type t =
-    [ `ScrollStartY of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ScrollStartY of string ]
 
-  let toString = function
-    | `ScrollStartY s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ScrollStartY s -> s
 end
 
 module ScrollTimeline = struct
-  type t =
-    [ `ScrollTimeline of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ScrollTimeline of string ]
 
-  let toString = function
-    | `ScrollTimeline s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ScrollTimeline s -> s
 end
 
 module ScrollTimelineAxis = struct
-  type t =
-    [ `ScrollTimelineAxis of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ScrollTimelineAxis of string ]
 
-  let toString = function
-    | `ScrollTimelineAxis s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ScrollTimelineAxis s -> s
 end
 
 module ScrollTimelineName = struct
-  type t =
-    [ `ScrollTimelineName of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ScrollTimelineName of string ]
 
-  let toString = function
-    | `ScrollTimelineName s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ScrollTimelineName s -> s
 end
 
 module ScrollbarColorLegacy = struct
-  type t =
-    [ `ScrollbarColorLegacy of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ScrollbarColorLegacy of string ]
 
-  let toString = function
-    | `ScrollbarColorLegacy s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ScrollbarColorLegacy s -> s
 end
 
 module SelfPosition = struct
-  type t =
-    [ `SelfPosition of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SelfPosition of string ]
 
-  let toString = function
-    | `SelfPosition s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SelfPosition s -> s
 end
 
 module Shape = struct
-  type t =
-    [ `Shape of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `Shape of string ]
 
-  let toString = function
-    | `Shape s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `Shape s -> s
 end
 
 module ShapeBox = struct
-  type t =
-    [ `ShapeBox of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ShapeBox of string ]
 
-  let toString = function
-    | `ShapeBox s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ShapeBox s -> s
 end
 
 module ShapeRadius = struct
-  type t =
-    [ `ShapeRadius of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ShapeRadius of string ]
 
-  let toString = function
-    | `ShapeRadius s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ShapeRadius s -> s
 end
 
 module SingleAnimation = struct
-  type t =
-    [ `SingleAnimation of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SingleAnimation of string ]
 
-  let toString = function
-    | `SingleAnimation s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SingleAnimation s -> s
 end
 
 module SingleAnimationDirection = struct
-  type t =
-    [ `SingleAnimationDirection of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SingleAnimationDirection of string ]
 
-  let toString = function
-    | `SingleAnimationDirection s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SingleAnimationDirection s -> s
 end
 
 module SingleAnimationDirectionNoInterp = struct
-  type t =
-    [ `SingleAnimationDirectionNoInterp of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SingleAnimationDirectionNoInterp of string ]
 
-  let toString = function
-    | `SingleAnimationDirectionNoInterp s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SingleAnimationDirectionNoInterp s -> s
 end
 
 module SingleAnimationFillMode = struct
-  type t =
-    [ `SingleAnimationFillMode of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SingleAnimationFillMode of string ]
 
-  let toString = function
-    | `SingleAnimationFillMode s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SingleAnimationFillMode s -> s
 end
 
 module SingleAnimationFillModeNoInterp = struct
-  type t =
-    [ `SingleAnimationFillModeNoInterp of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SingleAnimationFillModeNoInterp of string ]
 
-  let toString = function
-    | `SingleAnimationFillModeNoInterp s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SingleAnimationFillModeNoInterp s -> s
 end
 
 module SingleAnimationIterationCount = struct
-  type t =
-    [ `SingleAnimationIterationCount of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SingleAnimationIterationCount of string ]
 
-  let toString = function
-    | `SingleAnimationIterationCount s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SingleAnimationIterationCount s -> s
 end
 
 module SingleAnimationIterationCountNoInterp = struct
-  type t =
-    [ `SingleAnimationIterationCountNoInterp of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SingleAnimationIterationCountNoInterp of string ]
 
-  let toString = function
-    | `SingleAnimationIterationCountNoInterp s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SingleAnimationIterationCountNoInterp s -> s
 end
 
 module SingleAnimationNoInterp = struct
-  type t =
-    [ `SingleAnimationNoInterp of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SingleAnimationNoInterp of string ]
 
-  let toString = function
-    | `SingleAnimationNoInterp s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SingleAnimationNoInterp s -> s
 end
 
 module SingleAnimationPlayState = struct
-  type t =
-    [ `SingleAnimationPlayState of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SingleAnimationPlayState of string ]
 
-  let toString = function
-    | `SingleAnimationPlayState s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SingleAnimationPlayState s -> s
 end
 
 module SingleAnimationPlayStateNoInterp = struct
-  type t =
-    [ `SingleAnimationPlayStateNoInterp of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SingleAnimationPlayStateNoInterp of string ]
 
-  let toString = function
-    | `SingleAnimationPlayStateNoInterp s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SingleAnimationPlayStateNoInterp s -> s
 end
 
 module SingleTransition = struct
-  type t =
-    [ `SingleTransition of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SingleTransition of string ]
 
-  let toString = function
-    | `SingleTransition s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SingleTransition s -> s
 end
 
 module SingleTransitionNoInterp = struct
-  type t =
-    [ `SingleTransitionNoInterp of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SingleTransitionNoInterp of string ]
 
-  let toString = function
-    | `SingleTransitionNoInterp s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SingleTransitionNoInterp s -> s
 end
 
 module SingleTransitionProperty = struct
-  type t =
-    [ `SingleTransitionProperty of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SingleTransitionProperty of string ]
 
-  let toString = function
-    | `SingleTransitionProperty s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SingleTransitionProperty s -> s
 end
 
 module SingleTransitionPropertyNoInterp = struct
-  type t =
-    [ `SingleTransitionPropertyNoInterp of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SingleTransitionPropertyNoInterp of string ]
 
-  let toString = function
-    | `SingleTransitionPropertyNoInterp s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SingleTransitionPropertyNoInterp s -> s
 end
 
 module Size = struct
-  type t =
-    [ `Size of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `Size of string ]
 
-  let toString = function
-    | `Size s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `Size s -> s
 end
 
 module SizeFeature = struct
-  type t =
-    [ `SizeFeature of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SizeFeature of string ]
 
-  let toString = function
-    | `SizeFeature s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SizeFeature s -> s
 end
 
 module StepPosition = struct
-  type t =
-    [ `StepPosition of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `StepPosition of string ]
 
-  let toString = function
-    | `StepPosition s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `StepPosition s -> s
 end
 
 module StepTimingFunction = struct
-  type t =
-    [ `StepTimingFunction of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `StepTimingFunction of string ]
 
-  let toString = function
-    | `StepTimingFunction s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `StepTimingFunction s -> s
 end
 
-module Stroke = struct
-  type t =
-    [ `Stroke of string
-    | Var.t
-    | Cascading.t
-    ]
-
-  let toString = function
-    | `Stroke s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
-end
+(* Stroke passthrough module removed - use Paint instead *)
 
 module StrokeOpacity = struct
-  type t =
-    [ `StrokeOpacity of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `StrokeOpacity of string ]
 
-  let toString = function
-    | `StrokeOpacity s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `StrokeOpacity s -> s
 end
 
 module StyleFeature = struct
-  type t =
-    [ `StyleFeature of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `StyleFeature of string ]
 
-  let toString = function
-    | `StyleFeature s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `StyleFeature s -> s
 end
 
 module StyleInParens = struct
-  type t =
-    [ `StyleInParens of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `StyleInParens of string ]
 
-  let toString = function
-    | `StyleInParens s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `StyleInParens s -> s
 end
 
 module StyleQuery = struct
-  type t =
-    [ `StyleQuery of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `StyleQuery of string ]
 
-  let toString = function
-    | `StyleQuery s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `StyleQuery s -> s
 end
 
 module SubclassSelector = struct
-  type t =
-    [ `SubclassSelector of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SubclassSelector of string ]
 
-  let toString = function
-    | `SubclassSelector s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SubclassSelector s -> s
 end
 
 module SupportsCondition = struct
-  type t =
-    [ `SupportsCondition of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SupportsCondition of string ]
 
-  let toString = function
-    | `SupportsCondition s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SupportsCondition s -> s
 end
 
 module SupportsDecl = struct
-  type t =
-    [ `SupportsDecl of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SupportsDecl of string ]
 
-  let toString = function
-    | `SupportsDecl s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SupportsDecl s -> s
 end
 
 module SupportsFeature = struct
-  type t =
-    [ `SupportsFeature of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SupportsFeature of string ]
 
-  let toString = function
-    | `SupportsFeature s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SupportsFeature s -> s
 end
 
 module SupportsInParens = struct
-  type t =
-    [ `SupportsInParens of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SupportsInParens of string ]
 
-  let toString = function
-    | `SupportsInParens s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SupportsInParens s -> s
 end
 
 module SupportsSelectorFn = struct
-  type t =
-    [ `SupportsSelectorFn of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SupportsSelectorFn of string ]
 
-  let toString = function
-    | `SupportsSelectorFn s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SupportsSelectorFn s -> s
 end
 
 module SvgLength = struct
-  type t =
-    [ `SvgLength of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SvgLength of string ]
 
-  let toString = function
-    | `SvgLength s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SvgLength s -> s
 end
 
 module SvgWritingMode = struct
-  type t =
-    [ `SvgWritingMode of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SvgWritingMode of string ]
 
-  let toString = function
-    | `SvgWritingMode s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SvgWritingMode s -> s
 end
 
 module Symbol = struct
-  type t =
-    [ `Symbol of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `Symbol of string ]
 
-  let toString = function
-    | `Symbol s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `Symbol s -> s
 end
 
 module Syntax = struct
-  type t =
-    [ `Syntax of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `Syntax of string ]
 
-  let toString = function
-    | `Syntax s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `Syntax s -> s
 end
 
 module SyntaxCombinator = struct
-  type t =
-    [ `SyntaxCombinator of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SyntaxCombinator of string ]
 
-  let toString = function
-    | `SyntaxCombinator s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SyntaxCombinator s -> s
 end
 
 module SyntaxComponent = struct
-  type t =
-    [ `SyntaxComponent of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SyntaxComponent of string ]
 
-  let toString = function
-    | `SyntaxComponent s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SyntaxComponent s -> s
 end
 
 module SyntaxMultiplier = struct
-  type t =
-    [ `SyntaxMultiplier of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SyntaxMultiplier of string ]
 
-  let toString = function
-    | `SyntaxMultiplier s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SyntaxMultiplier s -> s
 end
 
 module SyntaxSingleComponent = struct
-  type t =
-    [ `SyntaxSingleComponent of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SyntaxSingleComponent of string ]
 
-  let toString = function
-    | `SyntaxSingleComponent s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SyntaxSingleComponent s -> s
 end
 
 module SyntaxString = struct
-  type t =
-    [ `SyntaxString of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SyntaxString of string ]
 
-  let toString = function
-    | `SyntaxString s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SyntaxString s -> s
 end
 
 module SyntaxTypeName = struct
-  type t =
-    [ `SyntaxTypeName of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `SyntaxTypeName of string ]
 
-  let toString = function
-    | `SyntaxTypeName s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `SyntaxTypeName s -> s
 end
 
 module Target = struct
-  type t =
-    [ `Target of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `Target of string ]
 
-  let toString = function
-    | `Target s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `Target s -> s
 end
 
 module TextBoxEdge = struct
-  type t =
-    [ `TextBoxEdge of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `TextBoxEdge of string ]
 
-  let toString = function
-    | `TextBoxEdge s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `TextBoxEdge s -> s
 end
 
 module TextBoxTrim = struct
-  type t =
-    [ `TextBoxTrim of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `TextBoxTrim of string ]
 
-  let toString = function
-    | `TextBoxTrim s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `TextBoxTrim s -> s
 end
 
 module TextEdge = struct
-  type t =
-    [ `TextEdge of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `TextEdge of string ]
 
-  let toString = function
-    | `TextEdge s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `TextEdge s -> s
 end
 
 module TextSpacingTrim = struct
-  type t =
-    [ `TextSpacingTrim of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `TextSpacingTrim of string ]
 
-  let toString = function
-    | `TextSpacingTrim s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `TextSpacingTrim s -> s
 end
 
 module TextWrap = struct
   type t =
-    [ `TextWrap of string
-    | Var.t
-    | Cascading.t
+    [ `wrap
+    | `nowrap
+    | `balance
+    | `stable
+    | `pretty
     ]
 
   let toString = function
-    | `TextWrap s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+    | `wrap -> {js|wrap|js}
+    | `nowrap -> {js|nowrap|js}
+    | `balance -> {js|balance|js}
+    | `stable -> {js|stable|js}
+    | `pretty -> {js|pretty|js}
 end
 
 module TextWrapMode = struct
   type t =
-    [ `TextWrapMode of string
-    | Var.t
-    | Cascading.t
+    [ `wrap
+    | `nowrap
     ]
 
-  let toString = function
-    | `TextWrapMode s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `wrap -> {js|wrap|js} | `nowrap -> {js|nowrap|js}
 end
 
 module TextWrapStyle = struct
   type t =
-    [ `TextWrapStyle of string
-    | Var.t
-    | Cascading.t
+    [ `auto
+    | `balance
+    | `stable
+    | `pretty
     ]
 
   let toString = function
-    | `TextWrapStyle s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+    | `auto -> {js|auto|js}
+    | `balance -> {js|balance|js}
+    | `stable -> {js|stable|js}
+    | `pretty -> {js|pretty|js}
 end
 
 module TimelineScope = struct
-  type t =
-    [ `TimelineScope of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `TimelineScope of string ]
 
-  let toString = function
-    | `TimelineScope s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `TimelineScope s -> s
 end
 
 module TimingFunction = struct
-  type t =
-    [ `TimingFunction of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `TimingFunction of string ]
 
-  let toString = function
-    | `TimingFunction s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `TimingFunction s -> s
 end
 
 module TimingFunctionNoInterp = struct
-  type t =
-    [ `TimingFunctionNoInterp of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `TimingFunctionNoInterp of string ]
 
-  let toString = function
-    | `TimingFunctionNoInterp s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `TimingFunctionNoInterp s -> s
 end
 
 module TrackGroup = struct
-  type t =
-    [ `TrackGroup of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `TrackGroup of string ]
 
-  let toString = function
-    | `TrackGroup s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `TrackGroup s -> s
 end
 
 module TrackList = struct
   type t =
     [ `TrackList of string
     | `tracks of Track.t array
-    | Var.t
-    | Cascading.t
     ]
 
   let toString = function
     | `TrackList s -> s
     | `tracks x -> Kloth.Array.map_and_join ~f:Track.toString ~sep:{js| |js} x
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
 end
 
 module TrackListV0 = struct
-  type t =
-    [ `TrackListV0 of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `TrackListV0 of string ]
 
-  let toString = function
-    | `TrackListV0 s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `TrackListV0 s -> s
 end
 
 module TrackMinmax = struct
-  type t =
-    [ `TrackMinmax of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `TrackMinmax of string ]
 
-  let toString = function
-    | `TrackMinmax s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `TrackMinmax s -> s
 end
 
 module TrackRepeat = struct
-  type t =
-    [ `TrackRepeat of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `TrackRepeat of string ]
 
-  let toString = function
-    | `TrackRepeat s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `TrackRepeat s -> s
 end
 
 module TransformFunction = struct
-  type t =
-    [ `TransformFunction of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `TransformFunction of string ]
 
-  let toString = function
-    | `TransformFunction s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `TransformFunction s -> s
 end
 
 module TransformList = struct
-  type t =
-    [ `TransformList of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `TransformList of string ]
 
-  let toString = function
-    | `TransformList s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `TransformList s -> s
 end
 
 module TransitionBehaviorValue = struct
-  type t =
-    [ `TransitionBehaviorValue of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `TransitionBehaviorValue of string ]
 
-  let toString = function
-    | `TransitionBehaviorValue s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `TransitionBehaviorValue s -> s
 end
 
 module TransitionBehaviorValueNoInterp = struct
-  type t =
-    [ `TransitionBehaviorValueNoInterp of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `TransitionBehaviorValueNoInterp of string ]
 
-  let toString = function
-    | `TransitionBehaviorValueNoInterp s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `TransitionBehaviorValueNoInterp s -> s
 end
 
 module TryTactic = struct
-  type t =
-    [ `TryTactic of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `TryTactic of string ]
 
-  let toString = function
-    | `TryTactic s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `TryTactic s -> s
 end
 
 module TypeOrUnit = struct
-  type t =
-    [ `TypeOrUnit of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `TypeOrUnit of string ]
 
-  let toString = function
-    | `TypeOrUnit s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `TypeOrUnit s -> s
 end
 
 module TypeSelector = struct
-  type t =
-    [ `TypeSelector of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `TypeSelector of string ]
 
-  let toString = function
-    | `TypeSelector s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `TypeSelector s -> s
 end
 
 module VectorEffect = struct
-  type t =
-    [ `VectorEffect of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `VectorEffect of string ]
 
-  let toString = function
-    | `VectorEffect s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `VectorEffect s -> s
 end
 
 module ViewTimeline = struct
-  type t =
-    [ `ViewTimeline of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ViewTimeline of string ]
 
-  let toString = function
-    | `ViewTimeline s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ViewTimeline s -> s
 end
 
 module ViewTimelineAxis = struct
-  type t =
-    [ `ViewTimelineAxis of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ViewTimelineAxis of string ]
 
-  let toString = function
-    | `ViewTimelineAxis s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ViewTimelineAxis s -> s
 end
 
 module ViewTimelineInset = struct
-  type t =
-    [ `ViewTimelineInset of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ViewTimelineInset of string ]
 
-  let toString = function
-    | `ViewTimelineInset s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ViewTimelineInset s -> s
 end
 
 module ViewTimelineName = struct
-  type t =
-    [ `ViewTimelineName of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ViewTimelineName of string ]
 
-  let toString = function
-    | `ViewTimelineName s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ViewTimelineName s -> s
 end
 
 module ViewTransitionName = struct
-  type t =
-    [ `ViewTransitionName of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ViewTransitionName of string ]
 
-  let toString = function
-    | `ViewTransitionName s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ViewTransitionName s -> s
 end
 
 module ViewportLength = struct
-  type t =
-    [ `ViewportLength of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `ViewportLength of string ]
 
-  let toString = function
-    | `ViewportLength s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `ViewportLength s -> s
 end
 
 module WebkitGradientColorStop = struct
-  type t =
-    [ `WebkitGradientColorStop of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `WebkitGradientColorStop of string ]
 
-  let toString = function
-    | `WebkitGradientColorStop s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `WebkitGradientColorStop s -> s
 end
 
 module WebkitGradientPoint = struct
-  type t =
-    [ `WebkitGradientPoint of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `WebkitGradientPoint of string ]
 
-  let toString = function
-    | `WebkitGradientPoint s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `WebkitGradientPoint s -> s
 end
 
 module WebkitGradientRadius = struct
-  type t =
-    [ `WebkitGradientRadius of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `WebkitGradientRadius of string ]
 
-  let toString = function
-    | `WebkitGradientRadius s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `WebkitGradientRadius s -> s
 end
 
 module WebkitGradientType = struct
-  type t =
-    [ `WebkitGradientType of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `WebkitGradientType of string ]
 
-  let toString = function
-    | `WebkitGradientType s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `WebkitGradientType s -> s
 end
 
 module WebkitMaskBoxRepeat = struct
-  type t =
-    [ `WebkitMaskBoxRepeat of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `WebkitMaskBoxRepeat of string ]
 
-  let toString = function
-    | `WebkitMaskBoxRepeat s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `WebkitMaskBoxRepeat s -> s
 end
 
 module WebkitMaskClipStyle = struct
-  type t =
-    [ `WebkitMaskClipStyle of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `WebkitMaskClipStyle of string ]
 
-  let toString = function
-    | `WebkitMaskClipStyle s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `WebkitMaskClipStyle s -> s
 end
 
 module WhiteSpaceCollapse = struct
-  type t =
-    [ `WhiteSpaceCollapse of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `WhiteSpaceCollapse of string ]
 
-  let toString = function
-    | `WhiteSpaceCollapse s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `WhiteSpaceCollapse s -> s
 end
 
 module WordSpaceTransform = struct
-  type t =
-    [ `WordSpaceTransform of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `WordSpaceTransform of string ]
 
-  let toString = function
-    | `WordSpaceTransform s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `WordSpaceTransform s -> s
 end
 
 module WordWrap = struct
-  type t =
-    [ `WordWrap of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `WordWrap of string ]
 
-  let toString = function
-    | `WordWrap s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `WordWrap s -> s
 end
 
 module WqName = struct
-  type t =
-    [ `WqName of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `WqName of string ]
 
-  let toString = function
-    | `WqName s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `WqName s -> s
 end
 
 module X = struct
-  type t =
-    [ `X of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `X of string ]
 
-  let toString = function
-    | `X s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `X s -> s
 end
 
 module Y = struct
-  type t =
-    [ `Y of string
-    | Var.t
-    | Cascading.t
-    ]
+  type t = [ `Y of string ]
 
-  let toString = function
-    | `Y s -> s
-    | #Var.t as v -> Var.toString v
-    | #Cascading.t as c -> Cascading.toString c
+  let toString = function `Y s -> s
 end
 (* Value type wrapper modules for interpolation - 0 modules *)

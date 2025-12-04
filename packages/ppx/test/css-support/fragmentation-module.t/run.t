@@ -13,39 +13,46 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
+  File "input.re", lines 64-65, characters 12-19:
+  Error: This expression has type [> `num of int ]
+         but an expression was expected of type int
+  [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
-  CSS.unsafe({js|breakBefore|js}, {js|auto|js});
-  CSS.unsafe({js|breakBefore|js}, {js|avoid|js});
-  CSS.unsafe({js|breakBefore|js}, {js|avoid-page|js});
-  CSS.unsafe({js|breakBefore|js}, {js|page|js});
-  CSS.unsafe({js|breakBefore|js}, {js|left|js});
-  CSS.unsafe({js|breakBefore|js}, {js|right|js});
-  CSS.unsafe({js|breakBefore|js}, {js|recto|js});
-  CSS.unsafe({js|breakBefore|js}, {js|verso|js});
-  CSS.unsafe({js|breakBefore|js}, {js|avoid-column|js});
-  CSS.unsafe({js|breakBefore|js}, {js|column|js});
-  CSS.unsafe({js|breakBefore|js}, {js|avoid-region|js});
-  CSS.unsafe({js|breakBefore|js}, {js|region|js});
-  CSS.unsafe({js|breakAfter|js}, {js|auto|js});
-  CSS.unsafe({js|breakAfter|js}, {js|avoid|js});
-  CSS.unsafe({js|breakAfter|js}, {js|avoid-page|js});
-  CSS.unsafe({js|breakAfter|js}, {js|page|js});
-  CSS.unsafe({js|breakAfter|js}, {js|left|js});
-  CSS.unsafe({js|breakAfter|js}, {js|right|js});
-  CSS.unsafe({js|breakAfter|js}, {js|recto|js});
-  CSS.unsafe({js|breakAfter|js}, {js|verso|js});
-  CSS.unsafe({js|breakAfter|js}, {js|avoid-column|js});
-  CSS.unsafe({js|breakAfter|js}, {js|column|js});
-  CSS.unsafe({js|breakAfter|js}, {js|avoid-region|js});
-  CSS.unsafe({js|breakAfter|js}, {js|region|js});
-  CSS.unsafe({js|breakInside|js}, {js|auto|js});
-  CSS.unsafe({js|breakInside|js}, {js|avoid|js});
-  CSS.unsafe({js|breakInside|js}, {js|avoid-page|js});
-  CSS.unsafe({js|breakInside|js}, {js|avoid-column|js});
-  CSS.unsafe({js|breakInside|js}, {js|avoid-region|js});
-  CSS.unsafe({js|boxDecorationBreak|js}, {js|slice|js});
-  CSS.unsafe({js|boxDecorationBreak|js}, {js|clone|js});
-  CSS.unsafe({js|orphans|js}, {js|1|js});
-  CSS.unsafe({js|orphans|js}, {js|2|js});
+  CSS.breakBefore(`auto);
+  CSS.breakBefore(`avoid);
+  CSS.breakBefore(`avoidPage);
+  CSS.breakBefore(`page);
+  CSS.breakBefore(`left);
+  CSS.breakBefore(`right);
+  CSS.breakBefore(`recto);
+  CSS.breakBefore(`verso);
+  CSS.breakBefore(`avoidColumn);
+  CSS.breakBefore(`column);
+  CSS.breakBefore(`avoidRegion);
+  CSS.breakBefore(`region);
+  CSS.breakAfter(`auto);
+  CSS.breakAfter(`avoid);
+  CSS.breakAfter(`avoidPage);
+  CSS.breakAfter(`page);
+  CSS.breakAfter(`left);
+  CSS.breakAfter(`right);
+  CSS.breakAfter(`recto);
+  CSS.breakAfter(`verso);
+  CSS.breakAfter(`avoidColumn);
+  CSS.breakAfter(`column);
+  CSS.breakAfter(`avoidRegion);
+  CSS.breakAfter(`region);
+  CSS.breakInside(`auto);
+  CSS.breakInside(`avoid);
+  CSS.breakInside(`avoidPage);
+  CSS.breakInside(`avoidColumn);
+  CSS.breakInside(`avoidRegion);
+  CSS.boxDecorationBreak(`slice);
+  CSS.boxDecorationBreak(`clone);
+  CSS.orphans(`num(1));
+  CSS.orphans(`num(2));
+  
+  CSS.widows(1);
+  CSS.widows(2);

@@ -32,9 +32,9 @@ If this test fail means that the module is not in sync with the ppx
   CSS.style([|CSS.width(`cqb(5.))|]);
   CSS.style([|CSS.width(`cqmin(5.))|]);
   CSS.style([|CSS.width(`cqmax(5.))|]);
-  CSS.style([|CSS.unsafe({js|containerType|js}, {js|normal|js})|]);
-  CSS.style([|CSS.unsafe({js|containerType|js}, {js|size|js})|]);
-  CSS.style([|CSS.unsafe({js|containerType|js}, {js|inline-size|js})|]);
+  CSS.style([|CSS.containerType(`normal)|]);
+  CSS.style([|CSS.containerType(`size)|]);
+  CSS.style([|CSS.containerType(`inlineSize)|]);
   CSS.style([|CSS.unsafe({js|containerName|js}, {js|none|js})|]);
   CSS.style([|CSS.unsafe({js|containerName|js}, {js|x|js})|]);
   CSS.style([|CSS.unsafe({js|containerName|js}, {js|x y|js})|]);

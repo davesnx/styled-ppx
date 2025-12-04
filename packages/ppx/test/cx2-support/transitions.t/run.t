@@ -18,14 +18,7 @@ If this test fail means that the module is not in sync with the ppx
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
   Error: This expression has type "Css_types.TransitionProperty.t"
          but an expression was expected of type
-           "[< `inherit_
-            | `initial
-            | `revert
-            | `revertLayer
-            | `unset
-            | `value of Css_types.Transition.Value.value
-            | `var of string
-            | `varDefault of string * string ]"
+           "[< Css_types.Transition.Value.t ]"
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'

@@ -76,9 +76,17 @@
 /* [%cx2 {|text-space-trim: discard-after|}]; */
 /* [%cx2 {|text-space-trim: trim-inner discard-before|}]; */
 /* [%cx2 {|text-space-trim: trim-inner discard-before discard-after|}]; */
-/* [%cx2 {|text-wrap: wrap|}]; */
-/* [%cx2 {|text-wrap: nowrap|}]; */
-/* [%cx2 {|text-wrap: balance |}]; */
+[%cx2 {|text-wrap: wrap|}];
+[%cx2 {|text-wrap: nowrap|}];
+[%cx2 {|text-wrap: balance|}];
+[%cx2 {|text-wrap: stable|}];
+[%cx2 {|text-wrap: pretty|}];
+[%cx2 {|text-wrap-mode: wrap|}];
+[%cx2 {|text-wrap-mode: nowrap|}];
+[%cx2 {|text-wrap-style: auto|}];
+[%cx2 {|text-wrap-style: balance|}];
+[%cx2 {|text-wrap-style: stable|}];
+[%cx2 {|text-wrap-style: pretty|}];
 /* [%cx2 {|wrap-before: auto|}]; */
 /* [%cx2 {|wrap-before: avoid|}]; */
 /* [%cx2 {|wrap-before: avoid-line|}]; */

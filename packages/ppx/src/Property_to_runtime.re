@@ -160,6 +160,12 @@ let transform_with_variable = (parser, mapper, value_to_expr, ~loc, string) => {
       Combinators.xor([
         /* This xor ensures that interpolation could be placed as the entire value, without the need of modifying the entire grammar. */
         Rule.Match.map(Standard.interpolation, data => `Interpolation(data)),
+        /* CSS-wide keywords (inherit, initial, unset, revert, revert-layer) - handled via CSS.unsafe */
+        Rule.Match.map(Standard.css_wide_keywords, data =>
+          `CssWideKeyword(data)
+        ),
+        /* CSS var() function - handled via CSS.unsafe */
+        Rule.Match.map(Parser.Function_var.rule, data => `Var(data)),
         /* Otherwise it's a regular CSS `Value and match the parser */
         Rule.Match.map(parser, data => `Value(data)),
       ]),
@@ -170,6 +176,14 @@ let transform_with_variable = (parser, mapper, value_to_expr, ~loc, string) => {
       render_variable(~loc, name)
       |> value_to_expr(~loc)
       |> List.map(add_CSS_rule_constraint(~loc))
+    | `CssWideKeyword(_) =>
+      /* CSS-wide keywords (inherit, initial, unset, revert, revert-layer) bypass the type system.
+         Raise Unsupported_feature to fall back to CSS.unsafe rendering. */
+      raise(Unsupported_feature)
+    | `Var(_) =>
+      /* var() bypasses the type system.
+         Raise Unsupported_feature to fall back to CSS.unsafe rendering. */
+      raise(Unsupported_feature)
     | `Value(ast) => mapper(~loc, ast) |> value_to_expr(~loc)
     };
   };
@@ -2112,11 +2126,84 @@ let border_bottom_left_radius =
     render_border_radius_value,
   );
 
+let render_border_radius_item = (~loc, value) =>
+  switch (value) {
+  | `Extended_length(l) => render_extended_length(~loc, l)
+  | `Extended_percentage(p) => render_extended_percentage(~loc, p)
+  };
+
+let render_border_radius_item_to_string = (~loc, value) =>
+  switch (value) {
+  | `Extended_length(l) => [%expr
+     CSS.Types.Length.toString([%e render_extended_length(~loc, l)])
+    ]
+  | `Extended_percentage(p) => [%expr
+     CSS.Types.Percentage.toString([%e render_extended_percentage(~loc, p)])
+    ]
+  };
+
+let render_border_radius_list_to_string = (~loc, values) => {
+  let parts =
+    List.map(v => render_border_radius_item_to_string(~loc, v), values);
+  switch (parts) {
+  | [] => [%expr ""]
+  | [v1] => v1
+  | [v1, v2] => [%expr [%e v1] ++ " " ++ [%e v2]]
+  | [v1, v2, v3] => [%expr [%e v1] ++ " " ++ [%e v2] ++ " " ++ [%e v3]]
+  | [v1, v2, v3, v4] => [%expr
+     [%e v1] ++ " " ++ [%e v2] ++ " " ++ [%e v3] ++ " " ++ [%e v4]
+    ]
+  | _ => raise(Unsupported_feature)
+  };
+};
+
 let border_radius =
-  monomorphic(
-    Parser.Property_border_radius.rule,
-    (~loc) => [%expr CSS.borderRadius],
-    render_length_percentage,
+  polymorphic(Parser.Property_border_radius.rule, (~loc, value) =>
+    switch (value) {
+    /* No "/" syntax - use typed functions */
+    | (values, None) =>
+      switch (values) {
+      | [v1] => [
+          [%expr CSS.borderRadius([%e render_border_radius_item(~loc, v1)])],
+        ]
+      | [v1, v2] => [
+          [%expr
+            CSS.borderRadius2(
+              ~topLeftBottomRight=[%e render_border_radius_item(~loc, v1)],
+              ~topRightBottomLeft=[%e render_border_radius_item(~loc, v2)],
+            )
+          ],
+        ]
+      | [v1, v2, v3] => [
+          [%expr
+            CSS.borderRadius3(
+              ~topLeft=[%e render_border_radius_item(~loc, v1)],
+              ~topRightBottomLeft=[%e render_border_radius_item(~loc, v2)],
+              ~bottomRight=[%e render_border_radius_item(~loc, v3)],
+            )
+          ],
+        ]
+      | [v1, v2, v3, v4] => [
+          [%expr
+            CSS.borderRadius4(
+              ~topLeft=[%e render_border_radius_item(~loc, v1)],
+              ~topRight=[%e render_border_radius_item(~loc, v2)],
+              ~bottomRight=[%e render_border_radius_item(~loc, v3)],
+              ~bottomLeft=[%e render_border_radius_item(~loc, v4)],
+            )
+          ],
+        ]
+      | _ => raise(Unsupported_feature)
+      }
+    | (horizontal, Some(((), vertical))) =>
+      let h_str = render_border_radius_list_to_string(~loc, horizontal);
+      let v_str = render_border_radius_list_to_string(~loc, vertical);
+      [
+        [%expr
+          CSS.unsafe({js|borderRadius|js}, [%e h_str] ++ " / " ++ [%e v_str])
+        ],
+      ];
+    }
   );
 
 let border_image_source =
@@ -2830,6 +2917,7 @@ let render_text_shadow = (~loc, shadow) => {
   let (x, y, blur, color) =
     switch (shadow) {
     | ([x, y], None) => (x, y, None, None)
+    | ([x, y], color) => (x, y, None, color)
     | ([x, y, blur], None) => (x, y, Some(blur), None)
     | ([x, y, blur], color) => (x, y, Some(blur), color)
     | _ => raise(Impossible_state)
@@ -2845,7 +2933,7 @@ let render_text_shadow = (~loc, shadow) => {
         Some(
           color
           |> Option.map(render_color_interp(~loc))
-          |> Option.value(~default=[%expr `Color(`CurrentColor)]),
+          |> Option.value(~default=[%expr `currentColor]),
         ),
       ),
     ]
@@ -4944,15 +5032,44 @@ let line_break =
 
 let caret_color = unsupportedProperty(Parser.Property_caret_color.rule);
 
-let clear = unsupportedProperty(Parser.Property_clear.rule);
+let clear =
+  monomorphic(
+    Parser.Property_clear.rule,
+    (~loc) => [%expr CSS.clear],
+    (~loc) =>
+      fun
+      | `None => [%expr `none]
+      | `Left => [%expr `left]
+      | `Right => [%expr `right]
+      | `Both => [%expr `both]
+      | `Inline_start => [%expr `inlineStart]
+      | `Inline_end => [%expr `inlineEnd],
+  );
 
 let clip = unsupportedProperty(Parser.Property_clip.rule);
 
 let clip_path = unsupportedProperty(Parser.Property_clip_path.rule);
 
-let column_count = unsupportedProperty(Parser.Property_column_count.rule);
+let column_count =
+  monomorphic(
+    Parser.Property_column_count.rule,
+    (~loc) => [%expr CSS.columnCount],
+    (~loc) =>
+      fun
+      | `Auto => [%expr `auto]
+      | `Integer(n) => [%expr `count([%e render_integer(~loc, n)])],
+  );
 
-let column_fill = unsupportedProperty(Parser.Property_column_fill.rule);
+let column_fill =
+  monomorphic(
+    Parser.Property_column_fill.rule,
+    (~loc) => [%expr CSS.columnFill],
+    (~loc) =>
+      fun
+      | `Auto => [%expr `auto]
+      | `Balance => [%expr `balance]
+      | `Balance_all => [%expr `balanceAll],
+  );
 
 let column_gap =
   monomorphic(
@@ -4972,7 +5089,15 @@ let column_rule_style =
 let column_rule_width =
   unsupportedProperty(Parser.Property_column_rule_width.rule);
 
-let column_span = unsupportedProperty(Parser.Property_column_span.rule);
+let column_span =
+  monomorphic(
+    Parser.Property_column_span.rule,
+    (~loc) => [%expr CSS.columnSpan],
+    (~loc) =>
+      fun
+      | `None => [%expr `none]
+      | `All => [%expr `all],
+  );
 
 let columns = unsupportedProperty(Parser.Property_columns.rule);
 
@@ -5040,7 +5165,15 @@ let cursor =
     render_cursor,
   );
 
-let direction = unsupportedProperty(Parser.Property_direction.rule);
+let direction =
+  monomorphic(
+    Parser.Property_direction.rule,
+    (~loc) => [%expr CSS.direction],
+    (~loc) =>
+      fun
+      | `Ltr => [%expr `ltr]
+      | `Rtl => [%expr `rtl],
+  );
 
 let render_drop_shadow = (~loc, value: Parser.Function_drop_shadow.t) => {
   let (offset1, offset2, offset3, color) = value;
@@ -5137,14 +5270,33 @@ let backdrop_filter =
       },
   );
 
-let float = unsupportedProperty(Parser.Property_float.rule);
+let float =
+  monomorphic(
+    Parser.Property_float.rule,
+    (~loc) => [%expr CSS.float],
+    (~loc) =>
+      fun
+      | `Left => [%expr `left]
+      | `Right => [%expr `right]
+      | `None => [%expr `none]
+      | `Inline_start => [%expr `inlineStart]
+      | `Inline_end => [%expr `inlineEnd],
+  );
 
 let font_language_override =
   unsupportedProperty(Parser.Property_font_language_override.rule);
 
 let ime_mode = unsupportedProperty(Parser.Property_ime_mode.rule);
 
-let isolation = unsupportedProperty(Parser.Property_isolation.rule);
+let isolation =
+  monomorphic(
+    Parser.Property_isolation.rule,
+    (~loc) => [%expr CSS.isolation],
+    (~loc) =>
+      fun
+      | `Auto => [%expr `auto]
+      | `Isolate => [%expr `isolate],
+  );
 
 let line_clamp = unsupportedProperty(Parser.Property_line_clamp.rule);
 
@@ -5168,11 +5320,57 @@ let list_style_position =
 let list_style_type =
   unsupportedProperty(Parser.Property_list_style_type.rule);
 
-let mix_blend_mode = unsupportedProperty(Parser.Property_mix_blend_mode.rule);
+let mix_blend_mode =
+  monomorphic(
+    Parser.Property_mix_blend_mode.rule,
+    (~loc) => [%expr CSS.mixBlendMode],
+    (~loc) =>
+      fun
+      | `Normal => [%expr `normal]
+      | `Multiply => [%expr `multiply]
+      | `Screen => [%expr `screen]
+      | `Overlay => [%expr `overlay]
+      | `Darken => [%expr `darken]
+      | `Lighten => [%expr `lighten]
+      | `Color_dodge => [%expr `colorDodge]
+      | `Color_burn => [%expr `colorBurn]
+      | `Hard_light => [%expr `hardLight]
+      | `Soft_light => [%expr `softLight]
+      | `Difference => [%expr `difference]
+      | `Exclusion => [%expr `exclusion]
+      | `Hue => [%expr `hue]
+      | `Saturation => [%expr `saturation]
+      | `Color => [%expr `color]
+      | `Luminosity => [%expr `luminosity],
+  );
 
-let position = unsupportedProperty(Parser.Property_position.rule);
+let position =
+  monomorphic(
+    Parser.Property_position.rule,
+    (~loc) => [%expr CSS.position],
+    (~loc) =>
+      fun
+      | `Static => [%expr `static]
+      | `Relative => [%expr `relative]
+      | `Absolute => [%expr `absolute]
+      | `Sticky => [%expr `sticky]
+      | `Fixed => [%expr `fixed]
+      | `Webkit_sticky => [%expr `sticky],
+  );
 
-let resize = unsupportedProperty(Parser.Property_resize.rule);
+let resize =
+  monomorphic(
+    Parser.Property_resize.rule,
+    (~loc) => [%expr CSS.resize],
+    (~loc) =>
+      fun
+      | `None => [%expr `none]
+      | `Both => [%expr `both]
+      | `Horizontal => [%expr `horizontal]
+      | `Vertical => [%expr `vertical]
+      | `Block => [%expr `block]
+      | `Inline => [%expr `inline],
+  );
 
 let row_gap =
   monomorphic(
@@ -5251,7 +5449,19 @@ let text_combine_upright =
 
 let all = unsupportedProperty(Parser.Property_all.rule);
 
-let appearance = unsupportedProperty(Parser.Property_appearance.rule);
+let appearance =
+  monomorphic(
+    Parser.Property_appearance.rule,
+    (~loc) => [%expr CSS.appearance],
+    (~loc) =>
+      fun
+      | `None => [%expr `none]
+      | `Auto => [%expr `auto]
+      | `Button => [%expr `button]
+      | `Textfield => [%expr `textfield]
+      | `Menulist_button => [%expr `menulistButton]
+      | `Compat_auto(_) => [%expr `auto],
+  );
 
 let background_blend_mode =
   unsupportedProperty(Parser.Property_background_blend_mode.rule);
@@ -5296,7 +5506,14 @@ let border_block_width =
 let border_block = unsupportedProperty(Parser.Property_border_block.rule);
 
 let border_collapse =
-  unsupportedProperty(Parser.Property_border_collapse.rule);
+  monomorphic(
+    Parser.Property_border_collapse.rule,
+    (~loc) => [%expr CSS.borderCollapse],
+    (~loc) =>
+      fun
+      | `Collapse => [%expr `collapse]
+      | `Separate => [%expr `separate],
+  );
 
 let border_end_end_radius =
   unsupportedProperty(Parser.Property_border_end_end_radius.rule);
@@ -5348,17 +5565,95 @@ let border_start_start_radius =
   unsupportedProperty(Parser.Property_border_start_start_radius.rule);
 
 let box_decoration_break =
-  unsupportedProperty(Parser.Property_box_decoration_break.rule);
+  monomorphic(
+    Parser.Property_box_decoration_break.rule,
+    (~loc) => [%expr CSS.boxDecorationBreak],
+    (~loc) =>
+      fun
+      | `Slice => [%expr `slice]
+      | `Clone => [%expr `clone],
+  );
 
-let break_after = unsupportedProperty(Parser.Property_break_after.rule);
+let break_after =
+  monomorphic(
+    Parser.Property_break_after.rule,
+    (~loc) => [%expr CSS.breakAfter],
+    (~loc) =>
+      fun
+      | `Auto => [%expr `auto]
+      | `Avoid => [%expr `avoid]
+      | `Always => [%expr `always]
+      | `All => [%expr `all]
+      | `Avoid_page => [%expr `avoidPage]
+      | `Page => [%expr `page]
+      | `Left => [%expr `left]
+      | `Right => [%expr `right]
+      | `Recto => [%expr `recto]
+      | `Verso => [%expr `verso]
+      | `Avoid_column => [%expr `avoidColumn]
+      | `Column => [%expr `column]
+      | `Avoid_region => [%expr `avoidRegion]
+      | `Region => [%expr `region],
+  );
 
-let break_before = unsupportedProperty(Parser.Property_break_before.rule);
+let break_before =
+  monomorphic(
+    Parser.Property_break_before.rule,
+    (~loc) => [%expr CSS.breakBefore],
+    (~loc) =>
+      fun
+      | `Auto => [%expr `auto]
+      | `Avoid => [%expr `avoid]
+      | `Always => [%expr `always]
+      | `All => [%expr `all]
+      | `Avoid_page => [%expr `avoidPage]
+      | `Page => [%expr `page]
+      | `Left => [%expr `left]
+      | `Right => [%expr `right]
+      | `Recto => [%expr `recto]
+      | `Verso => [%expr `verso]
+      | `Avoid_column => [%expr `avoidColumn]
+      | `Column => [%expr `column]
+      | `Avoid_region => [%expr `avoidRegion]
+      | `Region => [%expr `region],
+  );
 
-let break_inside = unsupportedProperty(Parser.Property_break_inside.rule);
+let break_inside =
+  monomorphic(
+    Parser.Property_break_inside.rule,
+    (~loc) => [%expr CSS.breakInside],
+    (~loc) =>
+      fun
+      | `Auto => [%expr `auto]
+      | `Avoid => [%expr `avoid]
+      | `Avoid_page => [%expr `avoidPage]
+      | `Avoid_column => [%expr `avoidColumn]
+      | `Avoid_region => [%expr `avoidRegion],
+  );
 
-let caption_side = unsupportedProperty(Parser.Property_caption_side.rule);
+let caption_side =
+  monomorphic(
+    Parser.Property_caption_side.rule,
+    (~loc) => [%expr CSS.captionSide],
+    (~loc) =>
+      fun
+      | `Top => [%expr `top]
+      | `Bottom => [%expr `bottom]
+      | `Block_start => [%expr `blockStart]
+      | `Block_end => [%expr `blockEnd]
+      | `Inline_start => [%expr `inlineStart]
+      | `Inline_end => [%expr `inlineEnd],
+  );
 
-let clip_rule = unsupportedProperty(Parser.Property_clip_rule.rule);
+let clip_rule =
+  monomorphic(
+    Parser.Property_clip_rule.rule,
+    (~loc) => [%expr CSS.clipRule],
+    (~loc) =>
+      fun
+      | `Nonzero => [%expr `nonzero]
+      | `Evenodd => [%expr `evenodd],
+  );
 
 let color_adjust = unsupportedProperty(Parser.Property_color_adjust.rule);
 
@@ -5373,7 +5668,15 @@ let color_scheme = unsupportedProperty(Parser.Property_color_scheme.rule);
 let contain = unsupportedProperty(Parser.Property_contain.rule);
 
 let content_visibility =
-  unsupportedProperty(Parser.Property_content_visibility.rule);
+  monomorphic(
+    Parser.Property_content_visibility.rule,
+    (~loc) => [%expr CSS.contentVisibility],
+    (~loc) =>
+      fun
+      | `Visible => [%expr `visible]
+      | `Hidden => [%expr `hidden]
+      | `Auto => [%expr `auto],
+  );
 
 let render_quote = (~loc, quote: Parser.Quote.t) => {
   switch (quote) {
@@ -5594,7 +5897,15 @@ let content =
     }
   });
 
-let empty_cells = unsupportedProperty(Parser.Property_empty_cells.rule);
+let empty_cells =
+  monomorphic(
+    Parser.Property_empty_cells.rule,
+    (~loc) => [%expr CSS.emptyCells],
+    (~loc) =>
+      fun
+      | `Show => [%expr `show]
+      | `Hide => [%expr `hide],
+  );
 
 let fill_opacity = unsupportedProperty(Parser.Property_fill_opacity.rule);
 
@@ -5740,10 +6051,22 @@ let offset_rotate = unsupportedProperty(Parser.Property_offset_rotate.rule);
 
 let offset = unsupportedProperty(Parser.Property_offset.rule);
 
-let orphans = unsupportedProperty(Parser.Property_orphans.rule);
+let orphans =
+  monomorphic(
+    Parser.Property_orphans.rule,
+    (~loc) => [%expr CSS.orphans],
+    (~loc, n) => [%expr `num([%e render_integer(~loc, n)])],
+  );
 
 let overflow_anchor =
-  unsupportedProperty(Parser.Property_overflow_anchor.rule);
+  monomorphic(
+    Parser.Property_overflow_anchor.rule,
+    (~loc) => [%expr CSS.overflowAnchor],
+    (~loc) =>
+      fun
+      | `Auto => [%expr `auto]
+      | `None => [%expr `none],
+  );
 
 let padding_block_end =
   unsupportedProperty(Parser.Property_padding_block_end.rule);
@@ -5762,15 +6085,54 @@ let padding_inline_start =
 let padding_inline = unsupportedProperty(Parser.Property_padding_inline.rule);
 
 let page_break_after =
-  unsupportedProperty(Parser.Property_page_break_after.rule);
+  monomorphic(
+    Parser.Property_page_break_after.rule,
+    (~loc) => [%expr CSS.pageBreakAfter],
+    (~loc) =>
+      fun
+      | `Auto => [%expr `auto]
+      | `Always => [%expr `always]
+      | `Avoid => [%expr `avoid]
+      | `Left => [%expr `left]
+      | `Right => [%expr `right]
+      | `Recto => [%expr `recto]
+      | `Verso => [%expr `verso],
+  );
 
 let page_break_before =
-  unsupportedProperty(Parser.Property_page_break_before.rule);
+  monomorphic(
+    Parser.Property_page_break_before.rule,
+    (~loc) => [%expr CSS.pageBreakBefore],
+    (~loc) =>
+      fun
+      | `Auto => [%expr `auto]
+      | `Always => [%expr `always]
+      | `Avoid => [%expr `avoid]
+      | `Left => [%expr `left]
+      | `Right => [%expr `right]
+      | `Recto => [%expr `recto]
+      | `Verso => [%expr `verso],
+  );
 
 let page_break_inside =
-  unsupportedProperty(Parser.Property_page_break_inside.rule);
+  monomorphic(
+    Parser.Property_page_break_inside.rule,
+    (~loc) => [%expr CSS.pageBreakInside],
+    (~loc) =>
+      fun
+      | `Auto => [%expr `auto]
+      | `Avoid => [%expr `avoid],
+  );
 
-let table_layout = unsupportedProperty(Parser.Property_table_layout.rule);
+let table_layout =
+  monomorphic(
+    Parser.Property_table_layout.rule,
+    (~loc) => [%expr CSS.tableLayout],
+    (~loc) =>
+      fun
+      | `Auto => [%expr `auto]
+      | `Fixed => [%expr `fixed],
+  );
 
 /* let render_animatable_feature = (~loc) =>
    fun
@@ -5790,10 +6152,30 @@ let will_change =
     },
   );
 
-let writing_mode = unsupportedProperty(Parser.Property_writing_mode.rule);
+let writing_mode =
+  monomorphic(
+    Parser.Property_writing_mode.rule,
+    (~loc) => [%expr CSS.writingMode],
+    (~loc) =>
+      fun
+      | `Horizontal_tb => [%expr `horizontalTb]
+      | `Vertical_rl => [%expr `verticalRl]
+      | `Vertical_lr => [%expr `verticalLr]
+      | `Sideways_rl => [%expr `sidewaysRl]
+      | `Sideways_lr => [%expr `sidewaysLr]
+      | `Svg_writing_mode(_) => raise(Unsupported_feature),
+  );
 
 let text_orientation =
-  unsupportedProperty(Parser.Property_text_orientation.rule);
+  monomorphic(
+    Parser.Property_text_orientation.rule,
+    (~loc) => [%expr CSS.textOrientation],
+    (~loc) =>
+      fun
+      | `Mixed => [%expr `mixed]
+      | `Upright => [%expr `upright]
+      | `Sideways => [%expr `sideways],
+  );
 
 let touch_action = unsupportedProperty(Parser.Property_touch_action.rule);
 
@@ -5889,10 +6271,40 @@ let scroll_timeline_name =
   unsupportedProperty(Parser.Property_scroll_timeline_name.rule);
 let text_spacing_trim =
   unsupportedProperty(Parser.Property_text_spacing_trim.rule);
-let text_wrap = unsupportedProperty(Parser.Property_text_wrap.rule);
-let text_wrap_mode = unsupportedProperty(Parser.Property_text_wrap_mode.rule);
+let text_wrap =
+  monomorphic(
+    Parser.Property_text_wrap.rule,
+    (~loc) => [%expr CSS.textWrap],
+    (~loc) =>
+      fun
+      | `Wrap => [%expr `wrap]
+      | `Nowrap => [%expr `nowrap]
+      | `Balance => [%expr `balance]
+      | `Stable => [%expr `stable]
+      | `Pretty => [%expr `pretty],
+  );
+
+let text_wrap_mode =
+  monomorphic(
+    Parser.Property_text_wrap_mode.rule,
+    (~loc) => [%expr CSS.textWrapMode],
+    (~loc) =>
+      fun
+      | `Wrap => [%expr `wrap]
+      | `Nowrap => [%expr `nowrap],
+  );
+
 let text_wrap_style =
-  unsupportedProperty(Parser.Property_text_wrap_style.rule);
+  monomorphic(
+    Parser.Property_text_wrap_style.rule,
+    (~loc) => [%expr CSS.textWrapStyle],
+    (~loc) =>
+      fun
+      | `Auto => [%expr `auto]
+      | `Balance => [%expr `balance]
+      | `Stable => [%expr `stable]
+      | `Pretty => [%expr `pretty],
+  );
 let text_box_trim = unsupportedProperty(Parser.Property_text_box_trim.rule);
 let text_box_edge = unsupportedProperty(Parser.Property_text_box_edge.rule);
 let white_space_collapse =
@@ -5981,7 +6393,16 @@ let box_orient = unsupportedProperty(Parser.Property_box_orient.rule);
 let box_pack = unsupportedProperty(Parser.Property_box_pack.rule);
 let container = unsupportedProperty(Parser.Property_container.rule);
 let container_name = unsupportedProperty(Parser.Property_container_name.rule);
-let container_type = unsupportedProperty(Parser.Property_container_type.rule);
+let container_type =
+  monomorphic(
+    Parser.Property_container_type.rule,
+    (~loc) => [%expr CSS.containerType],
+    (~loc) =>
+      fun
+      | `Normal => [%expr `normal]
+      | `Size => [%expr `size]
+      | `Inline_size => [%expr `inlineSize],
+  );
 let cue = unsupportedProperty(Parser.Property_cue.rule);
 let cue_after = unsupportedProperty(Parser.Property_cue_after.rule);
 let cue_before = unsupportedProperty(Parser.Property_cue_before.rule);
@@ -6015,11 +6436,36 @@ let shape_image_threshold =
 let shape_margin = unsupportedProperty(Parser.Property_shape_margin.rule);
 let shape_outside = unsupportedProperty(Parser.Property_shape_outside.rule);
 let shape_rendering =
-  unsupportedProperty(Parser.Property_shape_rendering.rule);
+  monomorphic(
+    Parser.Property_shape_rendering.rule,
+    (~loc) => [%expr CSS.shapeRendering],
+    (~loc) =>
+      fun
+      | `Auto => [%expr `auto]
+      | `OptimizeSpeed => [%expr `optimizeSpeed]
+      | `CrispEdges => [%expr `crispEdges]
+      | `GeometricPrecision => [%expr `geometricPrecision],
+  );
 let src = unsupportedProperty(Parser.Property_src.rule);
 let stroke_dashoffset =
   unsupportedProperty(Parser.Property_stroke_dashoffset.rule);
-let unicode_bidi = unsupportedProperty(Parser.Property_unicode_bidi.rule);
+let unicode_bidi =
+  monomorphic(
+    Parser.Property_unicode_bidi.rule,
+    (~loc) => [%expr CSS.unicodeBidi],
+    (~loc) =>
+      fun
+      | `Normal => [%expr `normal]
+      | `Embed => [%expr `embed]
+      | `Isolate => [%expr `isolate]
+      | `Bidi_override => [%expr `bidiOverride]
+      | `Isolate_override => [%expr `isolateOverride]
+      | `Plaintext => [%expr `plaintext]
+      | `Moz_isolate => [%expr `isolate]
+      | `Moz_isolate_override => [%expr `isolateOverride]
+      | `Moz_plaintext => [%expr `plaintext]
+      | `Webkit_isolate => [%expr `isolate],
+  );
 let unicode_range = unsupportedProperty(Parser.Property_unicode_range.rule);
 let text_autospace = unsupportedProperty(Parser.Property_text_autospace.rule);
 let text_blink = unsupportedProperty(Parser.Property_text_blink.rule);
@@ -6029,11 +6475,28 @@ let text_kashida = unsupportedProperty(Parser.Property_text_kashida.rule);
 let text_kashida_space =
   unsupportedProperty(Parser.Property_text_kashida_space.rule);
 let text_anchor = unsupportedProperty(Parser.Property_text_anchor.rule);
-let text_rendering = unsupportedProperty(Parser.Property_text_rendering.rule);
+let text_rendering =
+  monomorphic(
+    Parser.Property_text_rendering.rule,
+    (~loc) => [%expr CSS.textRendering],
+    (~loc) =>
+      fun
+      | `Auto => [%expr `auto]
+      | `OptimizeSpeed => [%expr `optimizeSpeed]
+      | `OptimizeLegibility => [%expr `optimizeLegibility]
+      | `GeometricPrecision => [%expr `geometricPrecision],
+  );
 let text_size_adjust =
   unsupportedProperty(Parser.Property_text_size_adjust.rule);
 let scroll_behavior =
-  unsupportedProperty(Parser.Property_scroll_behavior.rule);
+  monomorphic(
+    Parser.Property_scroll_behavior.rule,
+    (~loc) => [%expr CSS.scrollBehavior],
+    (~loc) =>
+      fun
+      | `Auto => [%expr `auto]
+      | `Smooth => [%expr `smooth],
+  );
 let scroll_margin = unsupportedProperty(Parser.Property_scroll_margin.rule);
 let scroll_margin_block =
   unsupportedProperty(Parser.Property_scroll_margin_block.rule);
@@ -6717,16 +7180,32 @@ let render_to_expr = (~loc, property, value, important) => {
   };
 };
 
+let starts_with_var = value => {
+  let len = String.length(value);
+  len >= 4 && String.sub(value, 0, 4) == "var(";
+};
+
 let render = (~loc: Location.t, property, value, important) =>
   if (isVariableDeclaration(property)) {
     Ok([render_variable_declaration(~loc, property, value)]);
   } else {
     switch (value) {
+    /* CSS-wide keywords (cascading) - render as CSS.unsafe */
     | "inherit"
     | "initial"
     | "unset"
     | "revert"
     | "revert-layer" =>
+      Ok([
+        [%expr
+          CSS.unsafe(
+            [%e property |> to_camel_case |> render_string(~loc)],
+            [%e render_string(~loc, value)],
+          )
+        ],
+      ])
+    /* CSS var() function - render as CSS.unsafe since it bypasses the type system */
+    | value when starts_with_var(value) =>
       Ok([
         [%expr
           CSS.unsafe(

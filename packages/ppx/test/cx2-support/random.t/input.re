@@ -1,10 +1,10 @@
 /* CSSOM View Module */
-/* [%cx2 {|scroll-behavior: auto|}]; */
+[%cx2 {|scroll-behavior: auto|}];
 [%cx2 {|scroll-behavior: smooth|}];
 
 /* CSS Scroll Anchoring Module Level 1 */
 [%cx2 {|overflow-anchor: none|}];
-/* [%cx2 {|overflow-anchor: auto|}]; */
+[%cx2 {|overflow-anchor: auto|}];
 
 [%cx2 {|-moz-appearance: textfield;|}];
 [%cx2 {|-webkit-appearance: none;|}];
@@ -28,7 +28,21 @@ let colorTextString = Color.text |> CSS.Types.Color.toString;
 
 let c = CSS.hex("e15a46");
 [%cx2 {|background-color: $(c);|}];
-[%cx2 {|border: none;|}];
+/* border: <line-width> || <line-style> || <color>
+   Note: The border shorthand has limited support - style-only or color-only don't work
+   Combinatorial coverage for working patterns */
+[%cx2 {|border: none|}];
+/* Width only */
+[%cx2 {|border: 1px|}];
+[%cx2 {|border: thin|}];
+/* Width + style */
+[%cx2 {|border: 1px solid|}];
+[%cx2 {|border: thin dashed|}];
+/* Width + style + color (all parts - typed output!) */
+[%cx2 {|border: 1px solid black|}];
+[%cx2 {|border: thin dashed red|}];
+[%cx2 {|border: 2px dotted #333|}];
+[%cx2 {|border: medium double blue|}];
 [%cx2 {|bottom: unset;|}];
 [%cx2 {|box-shadow: none;|}];
 [%cx2 {|break-inside: avoid;|}];
@@ -37,15 +51,15 @@ let c = CSS.hex("e15a46");
 [%cx2 {|color: var(--color-link);|}];
 [%cx2 {|column-width: 125px;|}];
 [%cx2 {|column-width: auto;|}];
-/* [%cx2 {|counter-increment: ol;|}]; */
-/* [%cx2 {|counter-reset: ol;|}]; */
+[%cx2 {|counter-increment: ol;|}];
+[%cx2 {|counter-reset: ol;|}];
 [%cx2 {|display: -webkit-box;|}];
 [%cx2 {|display: contents;|}];
 [%cx2 {|display: table;|}];
 [%cx2 {|fill: $(c);|}];
 [%cx2 {|fill: currentColor;|}];
 [%cx2 {|gap: 4px;|}];
-/* [%cx2 {|grid-column-end: span 2;|}]; */
+[%cx2 {|grid-column-end: span 2;|}];
 [%cx2 {|grid-column: unset;|}];
 [%cx2 {|grid-row: unset;|}];
 [%cx2 {|grid-template-columns: max-content max-content;|}];
@@ -78,14 +92,14 @@ let maskedImageUrl = `url("https://www.example.com/eye-uncrossed.svg");
 [%cx2 {|top: unset;|}];
 [%cx2 {|touch-action: none;|}];
 [%cx2 {|touch-action: pan-x pan-y;|}];
-/* [%cx2 {|transform-origin: center bottom;|}]; */
+[%cx2 {|transform-origin: center bottom;|}];
 [%cx2 {|transform-origin: center left;|}];
 [%cx2 {|transform-origin: center right;|}];
 [%cx2 {|transform-origin: 2px;|}];
 [%cx2 {|transform-origin: bottom;|}];
 [%cx2 {|transform-origin: 3cm 2px;|}];
 [%cx2 {|transform-origin: left 2px;|}];
-/* [%cx2 {|transform-origin: center top;|}]; */
+[%cx2 {|transform-origin: center top;|}];
 [%cx2 {|transform: none;|}];
 /* [%cx2 {|width: -webkit-fill-available;|}]; */
 [%cx2 {|width: fit-content;|}];

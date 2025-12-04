@@ -87,9 +87,7 @@
                                                    [|(CSS.fontSize
                                                         (`percent 75.));(
                                                      CSS.lineHeight `zero);(
-                                                     CSS.unsafe
-                                                       {*j|position|*j}
-                                                       {js|relative|js});(
+                                                     CSS.position `relative);(
                                                      CSS.verticalAlign
                                                        `baseline)|]);(CSS.selectorMany
                                                                       [|(({*j|sub|*j})

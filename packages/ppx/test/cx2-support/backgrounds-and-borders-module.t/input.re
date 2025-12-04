@@ -70,9 +70,11 @@ module Color = {
 [%cx2 {|border-bottom-left-radius: 250px 100px|}];
 [%cx2 {|border-radius: 10px|}];
 [%cx2 {|border-radius: 50%|}];
-/* [%cx2 {|border-radius: 10px / 20px|}]; */
-/* [%cx2 {|border-radius: 2px 4px 8px 16px|}]; */
-/* [%cx2 {|border-radius: 2px 4px 8px 16px / 2px 4px 8px 16px|}]; */
+[%cx2 {|border-radius: 2px 4px|}];
+[%cx2 {|border-radius: 2px 4px 8px|}];
+[%cx2 {|border-radius: 2px 4px 8px 16px|}];
+[%cx2 {|border-radius: 10px / 20px|}];
+[%cx2 {|border-radius: 2px 4px 8px 16px / 2px 4px 8px 16px|}];
 [%cx2 {|border-image-source: none|}];
 [%cx2 {|border-image-source: url(foo.png)|}];
 [%cx2 {|border-image-slice: 10|}];
@@ -169,13 +171,39 @@ module Color = {
 [%cx2 {|border-image: url(foo.png) 10 / 10% / 10px|}];
 [%cx2 {|border-image: url(foo.png) fill 10 / 10% / 10px|}];
 [%cx2 {|border-image: url(foo.png) fill 10 / 10% / 10px space|}];
-/* The following shadow declarations are not supported in the CSS Parser */
-/* [%cx2 {|box-shadow: 1px 1px|}]; */
-/* [%cx2 {|box-shadow: 0 0 black|}]; */
-/* [%cx2 {|box-shadow: 1px 2px 3px black|}]; */
+/* box-shadow: none | inset? && <length>{2,4} && <color>?
+   Combinatorial coverage: 2 (inset) × 3 (length combos) × 2 (color) = 12 + none */
+[%cx2 {|box-shadow: none|}];
+/* Without inset (6 combinations) */
+/* x y */
+[%cx2 {|box-shadow: 1px 1px|}];
+/* x y color */
+[%cx2 {|box-shadow: 0 0 black|}];
+/* x y blur */
+[%cx2 {|box-shadow: 1px 2px 3px|}];
+/* x y blur color */
+[%cx2 {|box-shadow: 1px 2px 3px black|}];
+/* x y blur spread */
+[%cx2 {|box-shadow: 1px 2px 3px 4px|}];
+/* x y blur spread color */
 [%cx2 {|box-shadow: 1px 2px 3px 4px black|}];
+/* With inset (6 combinations) */
+/* inset x y */
+[%cx2 {|box-shadow: inset 1px 1px|}];
+/* inset x y color */
+[%cx2 {|box-shadow: inset 0 0 black|}];
+/* inset x y blur */
+[%cx2 {|box-shadow: inset 1px 2px 3px|}];
+/* inset x y blur color */
+[%cx2 {|box-shadow: inset 1px 2px 3px black|}];
+/* inset x y blur spread */
+[%cx2 {|box-shadow: inset 1px 2px 3px 4px|}];
+/* inset x y blur spread color */
 [%cx2 {|box-shadow: inset 1px 2px 3px 4px black|}];
+/* Multiple shadows - mix of combinations */
 [%cx2 {|box-shadow: inset 1px 2px 3px 4px black, 1px 2px 3px 4px black|}];
+[%cx2 {|box-shadow: 1px 1px, inset 2px 2px red|}];
+[%cx2 {|box-shadow: 0 0 5px, inset 0 0 10px black|}];
 [%css
   {|box-shadow: -1px 1px 0px 0px $(Color.Shadow.elevation1),
             1px 1px 0px 0px $(Color.Shadow.elevation1),

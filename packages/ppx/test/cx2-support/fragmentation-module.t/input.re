@@ -33,5 +33,5 @@
 [%cx2 {|orphans: 1|}];
 [%cx2 {|orphans: 2|}];
 
-/* [%cx2 {|widows: 1|}]; */
-/* [%cx2 {|widows: 2|}]; */
+[%cx2 {|widows: 1|}];
+[%cx2 {|widows: 2|}];

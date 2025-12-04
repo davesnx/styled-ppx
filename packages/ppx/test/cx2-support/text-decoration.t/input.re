@@ -37,11 +37,20 @@
 [%cx2 {|text-emphasis-position: under left|}];
 [%cx2 {|text-emphasis-position: left under|}];
 [%cx2 {|text-emphasis-position: under right|}];
+/* text-shadow: none | <length>{2,3} && <color>?
+   Combinatorial coverage: 4 combinations */
 [%cx2 {|text-shadow: none|}];
-/* The following shadow declarations are not supported in the CSS Parser */
-/* [%cx2 {|text-shadow: 1px 1px|}]; */
-/* [%cx2 {|text-shadow: 0 0 black|}]; */
+/* x y (no blur, no color) */
+[%cx2 {|text-shadow: 1px 1px|}];
+/* x y color (no blur) */
+[%cx2 {|text-shadow: 0 0 black|}];
+/* x y blur (no color) */
+[%cx2 {|text-shadow: 1px 2px 3px|}];
+/* x y blur color (all parts) */
 [%cx2 {|text-shadow: 1px 2px 3px black|}];
+/* Multiple shadows */
+[%cx2 {|text-shadow: 1px 1px, 2px 2px red|}];
+[%cx2 {|text-shadow: 1px 2px 3px black, 0 0 5px white|}];
 
 /* CSS Text Decoration Module Level 4 */
 /* [%cx2 {|text-decoration: underline solid blue 1px|}]; */
@@ -52,7 +61,7 @@
 [%cx2 {|text-decoration-skip: objects trailing-spaces|}];
 [%cx2 {|text-decoration-skip: objects leading-spaces trailing-spaces|}];
 [%cx2 {|text-decoration-skip: objects leading-spaces trailing-spaces edges|}];
-[%css
+[%cx2
   {|text-decoration-skip: objects leading-spaces trailing-spaces edges box-decoration|}
 ];
 [%cx2 {|text-decoration-skip: objects edges|}];

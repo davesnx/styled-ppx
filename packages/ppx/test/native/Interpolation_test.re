@@ -95,7 +95,7 @@ let tests =
     (
       "text-shadow: $(h) $(v) $(blur) $(color)",
       [%expr [%css "text-shadow: $(h) $(v) $(blur) $(color)"]],
-      [%expr CSS.textShadow(CSS.Shadow.text(~x=h, ~y=v, ~blur, color))],
+      [%expr CSS.textShadow(CSS.TextShadow.text(~x=h, ~y=v, ~blur, color))],
     ),
     (
       "color: $(Theme.blue)",
@@ -107,7 +107,7 @@ let tests =
       "box-shadow: $(h) $(v) $(blur) $(spread) $(color)",
       [%expr [%css "box-shadow: $(h) $(v) $(blur) $(spread) $(color)"]],
       [%expr
-        CSS.boxShadows([|CSS.Shadow.box(~x=h, ~y=v, ~blur, ~spread, color)|])
+        CSS.boxShadows([|CSS.BoxShadow.box(~x=h, ~y=v, ~blur, ~spread, color)|])
       ],
     ),
     (
@@ -115,7 +115,7 @@ let tests =
       [%expr [%css "box-shadow: 10px 10px 0px $(spread) $(color)"]],
       [%expr
         CSS.boxShadows([|
-          CSS.Shadow.box(
+          CSS.BoxShadow.box(
             ~x=`pxFloat(10.),
             ~y=`pxFloat(10.),
             ~blur=`pxFloat(0.),

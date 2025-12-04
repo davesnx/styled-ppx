@@ -14,9 +14,11 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
-  CSS.unsafe({js|scrollBehavior|js}, {js|smooth|js});
+  CSS.scrollBehavior(`auto);
+  CSS.scrollBehavior(`smooth);
   
-  CSS.unsafe({js|overflowAnchor|js}, {js|none|js});
+  CSS.overflowAnchor(`none);
+  CSS.overflowAnchor(`auto);
   
   CSS.unsafe({js|MozAppearance|js}, {js|textfield|js});
   CSS.unsafe({js|WebkitAppearance|js}, {js|none|js});
@@ -50,28 +52,41 @@ If this test fail means that the module is not in sync with the ppx
       (),
     ),
   |]);
-  CSS.unsafe({js|appearance|js}, {js|none|js});
+  CSS.appearance(`none);
   CSS.aspectRatio(`ratio((21, 8)));
   
   let c = CSS.hex("e15a46");
   CSS.backgroundColor(c);
+  
   CSS.unsafe({js|border|js}, {js|none|js});
+  
+  CSS.unsafe({js|border|js}, {js|1px|js});
+  CSS.unsafe({js|border|js}, {js|thin|js});
+  
+  CSS.unsafe({js|border|js}, {js|1px solid|js});
+  CSS.unsafe({js|border|js}, {js|thin dashed|js});
+  
+  CSS.border(`pxFloat(1.), `solid, CSS.black);
+  CSS.border(`thin, `dashed, CSS.red);
+  CSS.border(`pxFloat(2.), `dotted, `hex({js|333|js}));
+  CSS.border(`medium, `double, CSS.blue);
   CSS.unsafe({js|bottom|js}, {js|unset|js});
   CSS.boxShadow(`none);
-  CSS.unsafe({js|breakInside|js}, {js|avoid|js});
+  CSS.breakInside(`avoid);
   CSS.unsafe({js|caretColor|js}, {js|#e15a46|js});
   CSS.unsafe({js|color|js}, {js|inherit|js});
-  CSS.color(`var({js|--color-link|js}));
+  CSS.unsafe({js|color|js}, {js|var(--color-link)|js});
   CSS.columnWidth(`pxFloat(125.));
   CSS.columnWidth(`auto);
-  
+  CSS.unsafe({js|counterIncrement|js}, {js|ol|js});
+  CSS.unsafe({js|counterReset|js}, {js|ol|js});
   CSS.display(`webkitBox);
   CSS.display(`contents);
   CSS.display(`table);
   CSS.SVG.fill(c);
   CSS.SVG.fill(`currentColor);
   CSS.gap(`pxFloat(4.));
-  
+  CSS.gridColumnEnd(`span(`num(2)));
   CSS.unsafe({js|gridColumn|js}, {js|unset|js});
   CSS.unsafe({js|gridRow|js}, {js|unset|js});
   CSS.gridTemplateColumns(`tracks([|`maxContent, `maxContent|]));
@@ -101,25 +116,25 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|maskRepeat|js}, {js|no-repeat|js});
   CSS.maxWidth(`maxContent);
   CSS.unsafe({js|outline|js}, {js|none|js});
-  CSS.unsafe({js|overflowAnchor|js}, {js|none|js});
+  CSS.overflowAnchor(`none);
   CSS.unsafe({js|position|js}, {js|unset|js});
-  CSS.unsafe({js|resize|js}, {js|none|js});
+  CSS.resize(`none);
   CSS.right(`calc(`sub((`percent(50.), `pxFloat(4.)))));
-  CSS.unsafe({js|scrollBehavior|js}, {js|smooth|js});
+  CSS.scrollBehavior(`smooth);
   CSS.SVG.strokeOpacity(`num(0.));
   CSS.SVG.stroke(Color.text);
   CSS.top(`calc(`sub((`percent(50.), `pxFloat(1.)))));
   CSS.unsafe({js|top|js}, {js|unset|js});
   CSS.unsafe({js|touchAction|js}, {js|none|js});
   CSS.unsafe({js|touchAction|js}, {js|pan-x pan-y|js});
-  
+  CSS.transformOrigin(`hv((`center, `bottom)));
   CSS.transformOrigin(`hv((`left, `center)));
   CSS.transformOrigin(`hv((`right, `center)));
   CSS.transformOrigin(`pxFloat(2.));
   CSS.transformOrigin(`bottom);
   CSS.transformOrigin(`hv((`cm(3.), `pxFloat(2.))));
   CSS.transformOrigin(`hv((`left, `pxFloat(2.))));
-  
+  CSS.transformOrigin(`hv((`center, `top)));
   CSS.transform(`none);
   
   CSS.unsafe({js|width|js}, {js|fit-content|js});
@@ -158,7 +173,7 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.style([|CSS.aspectRatio(`ratio((16, 9)))|]);
   
-  CSS.color(`var({js|--color-link|js}));
+  CSS.unsafe({js|color|js}, {js|var(--color-link)|js});
   
   let interpolation = `px(10);
   CSS.style([|CSS.right(interpolation), CSS.bottom(interpolation)|]);

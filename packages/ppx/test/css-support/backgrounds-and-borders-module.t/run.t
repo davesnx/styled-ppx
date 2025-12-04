@@ -84,7 +84,47 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|borderBottomLeftRadius|js}, {js|250px 100px|js});
   CSS.borderRadius(`pxFloat(10.));
   CSS.borderRadius(`percent(50.));
-  
+  CSS.borderRadius2(
+    ~topLeftBottomRight=`pxFloat(2.),
+    ~topRightBottomLeft=`pxFloat(4.),
+  );
+  CSS.borderRadius3(
+    ~topLeft=`pxFloat(2.),
+    ~topRightBottomLeft=`pxFloat(4.),
+    ~bottomRight=`pxFloat(8.),
+  );
+  CSS.borderRadius4(
+    ~topLeft=`pxFloat(2.),
+    ~topRight=`pxFloat(4.),
+    ~bottomRight=`pxFloat(8.),
+    ~bottomLeft=`pxFloat(16.),
+  );
+  CSS.unsafe(
+    {js|borderRadius|js},
+    CSS.Types.Length.toString(`pxFloat(10.))
+    ++ " / "
+    ++ CSS.Types.Length.toString(`pxFloat(20.)),
+  );
+  CSS.unsafe(
+    {js|borderRadius|js},
+    (
+      CSS.Types.Length.toString(`pxFloat(2.))
+      ++ " "
+      ++ CSS.Types.Length.toString(`pxFloat(4.))
+      ++ " "
+      ++ CSS.Types.Length.toString(`pxFloat(8.))
+      ++ " "
+      ++ CSS.Types.Length.toString(`pxFloat(16.))
+    )
+    ++ " / "
+    ++ CSS.Types.Length.toString(`pxFloat(2.))
+    ++ " "
+    ++ CSS.Types.Length.toString(`pxFloat(4.))
+    ++ " "
+    ++ CSS.Types.Length.toString(`pxFloat(8.))
+    ++ " "
+    ++ CSS.Types.Length.toString(`pxFloat(16.)),
+  );
   CSS.borderImageSource(`none);
   CSS.borderImageSource(`url({js|foo.png|js}));
   CSS.unsafe({js|borderImageSlice|js}, {js|10|js});
@@ -185,8 +225,44 @@ If this test fail means that the module is not in sync with the ppx
     {js|url("foo.png") fill 10 / 10% / 10px space|js},
   );
   
+  CSS.boxShadow(`none);
+  
   CSS.boxShadows([|
-    CSS.Shadow.box(
+    CSS.BoxShadow.box(~x=`pxFloat(1.), ~y=`pxFloat(1.), `currentColor),
+  |]);
+  
+  CSS.boxShadows([|CSS.BoxShadow.box(~x=`zero, ~y=`zero, CSS.black)|]);
+  
+  CSS.boxShadows([|
+    CSS.BoxShadow.box(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(2.),
+      ~blur=`pxFloat(3.),
+      `currentColor,
+    ),
+  |]);
+  
+  CSS.boxShadows([|
+    CSS.BoxShadow.box(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(2.),
+      ~blur=`pxFloat(3.),
+      CSS.black,
+    ),
+  |]);
+  
+  CSS.boxShadows([|
+    CSS.BoxShadow.box(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(2.),
+      ~blur=`pxFloat(3.),
+      ~spread=`pxFloat(4.),
+      `currentColor,
+    ),
+  |]);
+  
+  CSS.boxShadows([|
+    CSS.BoxShadow.box(
       ~x=`pxFloat(1.),
       ~y=`pxFloat(2.),
       ~blur=`pxFloat(3.),
@@ -194,8 +270,53 @@ If this test fail means that the module is not in sync with the ppx
       CSS.black,
     ),
   |]);
+  
   CSS.boxShadows([|
-    CSS.Shadow.box(
+    CSS.BoxShadow.box(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(1.),
+      ~inset=true,
+      `currentColor,
+    ),
+  |]);
+  
+  CSS.boxShadows([|
+    CSS.BoxShadow.box(~x=`zero, ~y=`zero, ~inset=true, CSS.black),
+  |]);
+  
+  CSS.boxShadows([|
+    CSS.BoxShadow.box(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(2.),
+      ~blur=`pxFloat(3.),
+      ~inset=true,
+      `currentColor,
+    ),
+  |]);
+  
+  CSS.boxShadows([|
+    CSS.BoxShadow.box(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(2.),
+      ~blur=`pxFloat(3.),
+      ~inset=true,
+      CSS.black,
+    ),
+  |]);
+  
+  CSS.boxShadows([|
+    CSS.BoxShadow.box(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(2.),
+      ~blur=`pxFloat(3.),
+      ~spread=`pxFloat(4.),
+      ~inset=true,
+      `currentColor,
+    ),
+  |]);
+  
+  CSS.boxShadows([|
+    CSS.BoxShadow.box(
       ~x=`pxFloat(1.),
       ~y=`pxFloat(2.),
       ~blur=`pxFloat(3.),
@@ -204,8 +325,9 @@ If this test fail means that the module is not in sync with the ppx
       CSS.black,
     ),
   |]);
+  
   CSS.boxShadows([|
-    CSS.Shadow.box(
+    CSS.BoxShadow.box(
       ~x=`pxFloat(1.),
       ~y=`pxFloat(2.),
       ~blur=`pxFloat(3.),
@@ -213,7 +335,7 @@ If this test fail means that the module is not in sync with the ppx
       ~inset=true,
       CSS.black,
     ),
-    CSS.Shadow.box(
+    CSS.BoxShadow.box(
       ~x=`pxFloat(1.),
       ~y=`pxFloat(2.),
       ~blur=`pxFloat(3.),
@@ -222,21 +344,35 @@ If this test fail means that the module is not in sync with the ppx
     ),
   |]);
   CSS.boxShadows([|
-    CSS.Shadow.box(
+    CSS.BoxShadow.box(~x=`pxFloat(1.), ~y=`pxFloat(1.), `currentColor),
+    CSS.BoxShadow.box(~x=`pxFloat(2.), ~y=`pxFloat(2.), ~inset=true, CSS.red),
+  |]);
+  CSS.boxShadows([|
+    CSS.BoxShadow.box(~x=`zero, ~y=`zero, ~blur=`pxFloat(5.), `currentColor),
+    CSS.BoxShadow.box(
+      ~x=`zero,
+      ~y=`zero,
+      ~blur=`pxFloat(10.),
+      ~inset=true,
+      CSS.black,
+    ),
+  |]);
+  CSS.boxShadows([|
+    CSS.BoxShadow.box(
       ~x=`pxFloat(-1.),
       ~y=`pxFloat(1.),
       ~blur=`pxFloat(0.),
       ~spread=`pxFloat(0.),
       Color.Shadow.elevation1,
     ),
-    CSS.Shadow.box(
+    CSS.BoxShadow.box(
       ~x=`pxFloat(1.),
       ~y=`pxFloat(1.),
       ~blur=`pxFloat(0.),
       ~spread=`pxFloat(0.),
       Color.Shadow.elevation1,
     ),
-    CSS.Shadow.box(
+    CSS.BoxShadow.box(
       ~x=`pxFloat(0.),
       ~y=`pxFloat(-1.),
       ~blur=`pxFloat(0.),

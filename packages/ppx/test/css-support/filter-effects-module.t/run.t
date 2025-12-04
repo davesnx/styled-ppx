@@ -22,6 +22,11 @@ If this test fail means that the module is not in sync with the ppx
   CSS.filter([|`blur(`pxFloat(5.))|]);
   CSS.filter([|`brightness(`num(0.5))|]);
   CSS.filter([|`contrast(`percent(150.))|]);
+  
+  CSS.filter([|
+    `dropShadow((`pxFloat(5.), `pxFloat(5.), `pxFloat(10.), `currentColor)),
+  |]);
+  
   CSS.filter([|
     `dropShadow((
       `pxFloat(15.),

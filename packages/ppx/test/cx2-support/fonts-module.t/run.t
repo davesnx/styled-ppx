@@ -20,12 +20,12 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-1yh8y83", []);
   CSS.make(
     "css-rvdc3c",
-    [("--var-rwkopp", CSS.Types.Font_families.toString(fonts))],
+    [("--var-rwkopp", CSS.Types.FontFamily.toString(fonts))],
   );
   CSS.make("css-1tld6m7", []);
   CSS.make(
     "css-1tzlrlf",
-    [("--var-1kuyir6", CSS.Types.Font_families.toString(font))],
+    [("--var-1kuyir6", CSS.Types.FontFamily.toString(font))],
   );
   CSS.make("css-s6qja", []);
   CSS.make(

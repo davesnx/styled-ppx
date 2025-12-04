@@ -76,9 +76,17 @@
 /* [%css {|text-space-trim: discard-after|}]; */
 /* [%css {|text-space-trim: trim-inner discard-before|}]; */
 /* [%css {|text-space-trim: trim-inner discard-before discard-after|}]; */
-/* [%css {|text-wrap: wrap|}]; */
-/* [%css {|text-wrap: nowrap|}]; */
-/* [%css {|text-wrap: balance |}]; */
+[%css {|text-wrap: wrap|}];
+[%css {|text-wrap: nowrap|}];
+[%css {|text-wrap: balance|}];
+[%css {|text-wrap: stable|}];
+[%css {|text-wrap: pretty|}];
+[%css {|text-wrap-mode: wrap|}];
+[%css {|text-wrap-mode: nowrap|}];
+[%css {|text-wrap-style: auto|}];
+[%css {|text-wrap-style: balance|}];
+[%css {|text-wrap-style: stable|}];
+[%css {|text-wrap-style: pretty|}];
 /* [%css {|wrap-before: auto|}]; */
 /* [%css {|wrap-before: avoid|}]; */
 /* [%css {|wrap-before: avoid-line|}]; */

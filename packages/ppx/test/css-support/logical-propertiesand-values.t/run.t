@@ -16,14 +16,14 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
-  CSS.unsafe({js|captionSide|js}, {js|inline-start|js});
-  CSS.unsafe({js|captionSide|js}, {js|inline-end|js});
-  CSS.unsafe({js|float|js}, {js|inline-start|js});
-  CSS.unsafe({js|float|js}, {js|inline-end|js});
-  CSS.unsafe({js|clear|js}, {js|inline-start|js});
-  CSS.unsafe({js|clear|js}, {js|inline-end|js});
-  CSS.unsafe({js|resize|js}, {js|block|js});
-  CSS.unsafe({js|resize|js}, {js|inline|js});
+  CSS.captionSide(`inlineStart);
+  CSS.captionSide(`inlineEnd);
+  CSS.float(`inlineStart);
+  CSS.float(`inlineEnd);
+  CSS.clear(`inlineStart);
+  CSS.clear(`inlineEnd);
+  CSS.resize(`block);
+  CSS.resize(`inline);
   CSS.unsafe({js|blockSize|js}, {js|100px|js});
   CSS.unsafe({js|inlineSize|js}, {js|100px|js});
   CSS.unsafe({js|minBlockSize|js}, {js|100px|js});
