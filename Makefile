@@ -42,6 +42,7 @@ create-switch: ## Create opam switch
 
 .PHONY: install
 install: ## Install project dependencies
+	opam update
 	opam install . --deps-only --with-test --with-dev-setup --working-dir . -y
 	npm install
 
