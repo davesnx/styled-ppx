@@ -34,7 +34,7 @@
    (ppxlib (and (>= 0.27.0) (<= 0.34.0)))
    (sedlex (>= 3.5))
    (melange (>= 3.0.0))
-   ; (server-reason-react (>= 0.3.1))
+   (server-reason-react (>= 0.4.0))
    (reason-react (>= 0.14.0))
    (alcotest :with-test)
    (conf-npm :with-test)

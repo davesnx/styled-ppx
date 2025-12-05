@@ -24,9 +24,6 @@ build-prod: ## Build for production (--profile=prod)
 clean: ## Clean artifacts
 	$(DUNE) clean
 
-.PHONY: deps
-deps: $(opam_file) ## Alias to update the opam file and install the needed deps
-
 .PHONY: format-check
 format-check: ## Checks if format is correct
 	$(DUNE) build @fmt
@@ -50,7 +47,7 @@ install: ## Install project dependencies
 
 .PHONY: pin
 pin: ## Pin project dependencies
-	opam pin add server-reason-react.dev "https://github.com/ml-in-barcelona/server-reason-react.git#3d9f43a83104d0c4b0bc646242c5f04918559ec1" -y
+	echo "No pinned dependencies"
 
 .PHONY: init
 init: setup-githooks create-switch pin install ## Create a local dev environment
