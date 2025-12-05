@@ -16,8 +16,8 @@ If this test fail means that the module is not in sync with the ppx
   File "input.re", lines 86-87, characters 12-23:
   86 | xt-decoration-skip-inset: none|}];
                    ^^^^^^^^^^^
-  Error: This expression has type "string" but an expression was expected of type
-           "Css_types.TextShadow.t"
+  Error: This expression has type string but an expression was expected of type
+           Css_types.TextShadow.t
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
