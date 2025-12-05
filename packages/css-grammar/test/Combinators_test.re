@@ -6,6 +6,12 @@ let parse_exn = (prop, str) =>
   | Error(message) => Alcotest.fail(message)
   };
 
+let parse_error = (prop, str) =>
+  switch (Parser.parse(prop, str)) {
+  | Ok(_) => Alcotest.fail("Should have failed")
+  | Error(message) => message
+  };
+
 let string_contains = (str, substr) => {
   let str_len = String.length(str);
   let substr_len = String.length(substr);
@@ -382,5 +388,33 @@ let tests = [
     | `Initial => ()
     | _ => Alcotest.fail("should be `Initial")
     };
+  }),
+  test("xor error: no close match suggests all options", () => {
+    let msg = parse_error([%value "red | blue | green"], "yellow");
+    if (!string_contains(msg, "expected 'blue', 'green', or 'red'.")) {
+      Alcotest.fail("Error message should list options sorted. Got: " ++ msg);
+    };
+    ();
+  }),
+  test("xor error: close match suggests single option", () => {
+    let msg = parse_error([%value "red | blue | green"], "gren");
+    if (!string_contains(msg, "did you mean 'green'?")) {
+      Alcotest.fail("Error message should suggest green. Got: " ++ msg);
+    };
+    ();
+  }),
+  test("xor error: reports what was got", () => {
+    let msg = parse_error([%value "red | blue"], "yellow");
+    if (!string_contains(msg, "Got 'yellow'")) {
+      Alcotest.fail("Error should report what was got. Got: " ++ msg);
+    };
+    ();
+  }),
+  test("xor error: handles quote extraction", () => {
+    let msg = parse_error([%value "red | blue"], "'quoted'");
+    if (!string_contains(msg, "Got")) {
+      Alcotest.fail("Error should report what was got. Got: " ++ msg);
+    };
+    ();
   }),
 ];

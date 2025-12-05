@@ -7826,15 +7826,15 @@ let check_property ~loc ~name value :
          - var() function: var(--custom-property)
          Map all to unit since we only care about success/failure here *)
       let universal_rule =
-        Combinators.xor
-          [
+      Combinators.xor
+        [
             Rule.Match.map Standard.interpolation (fun _ -> ());
             Rule.Match.map Standard.css_wide_keywords (fun _ -> ());
             Rule.Match.map Function_var.rule (fun _ -> ());
-          ]
-      in
+        ]
+    in
       (match parse universal_rule value with
-      | Ok _ -> Ok ()
+    | Ok _ -> Ok ()
       (* If universal values also fail, return the property-specific error
          which gives more helpful feedback to the user *)
       | Error _ -> Error (loc, `Invalid_value property_error)))

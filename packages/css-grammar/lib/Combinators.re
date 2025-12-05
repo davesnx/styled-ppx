@@ -192,4 +192,5 @@ let and_ = rules => {
 };
 
 // [ A || B ] = [ A? && B? ]!
-let or_ = rules => rules |> List.map(Modifier.optional) |> and_;
+let or_ = rules =>
+  rules |> List.map(Modifier.optional) |> and_ |> Modifier.at_least_one;
