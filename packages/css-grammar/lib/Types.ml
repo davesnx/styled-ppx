@@ -3834,8 +3834,9 @@ and property_object_position =
 
 and property_offset =
   (property_offset_position option
-  * property_offset_path
-  * (property_offset_distance option * property_offset_rotate option) option)
+  * (property_offset_path
+    * (property_offset_distance option * property_offset_rotate option) option)
+    option)
   option
   * (unit * property_offset_anchor) option
 
