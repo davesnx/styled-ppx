@@ -33,20 +33,30 @@ let native = {
   defaultValue: false,
 };
 
+let debug = {
+  flag: "--debug",
+  doc: "Enable debug logging",
+  value: None,
+  defaultValue: false,
+};
+
 type settings = {
   jsxVersion: flag(int),
   jsxMode: flag(string),
   production: flag(bool),
   native: flag(bool),
-};
-let settings = {
-  jsxVersion,
-  jsxMode,
-  production,
-  native,
+  debug: flag(bool),
 };
 
-let currentSettings = ref(settings);
+let currentSettings =
+  ref({
+    jsxVersion,
+    jsxMode,
+    production,
+    native,
+    debug,
+  });
+
 let updateSettings = newSettings => currentSettings := newSettings;
 
 module Get = {
@@ -62,6 +72,9 @@ module Get = {
   let native = () =>
     currentSettings.contents.native.value
     |> Option.value(~default=currentSettings.contents.native.defaultValue);
+  let debug = () =>
+    currentSettings.contents.debug.value
+    |> Option.value(~default=currentSettings.contents.debug.defaultValue);
 };
 
 module Update = {
@@ -94,6 +107,14 @@ module Update = {
       ...currentSettings.contents,
       native: {
         ...currentSettings.contents.native,
+        value: Some(value),
+      },
+    });
+  let debug = value =>
+    updateSettings({
+      ...currentSettings.contents,
+      debug: {
+        ...currentSettings.contents.debug,
         value: Some(value),
       },
     });
