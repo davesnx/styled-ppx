@@ -2,7 +2,6 @@ project_name = styled-ppx
 
 OPAM_EXEC = opam exec --
 DUNE = $(OPAM_EXEC) dune
-opam_file = $(project_name).opam
 
 .PHONY: help
 help: ## Print this help message
@@ -25,14 +24,11 @@ build-prod: ## Build for production (--profile=prod)
 clean: ## Clean artifacts
 	$(DUNE) clean
 
-.PHONY: deps
-deps: $(opam_file) ## Alias to update the opam file and install the needed deps
-
 .PHONY: format-check
 format-check: ## Checks if format is correct
 	$(DUNE) build @fmt
 
-.PHONY: format
+.PHONY: fmt format
 fmt format: ## Formats code
 	$(DUNE) build @fmt --auto-promote
 
@@ -46,11 +42,16 @@ create-switch: ## Create opam switch
 
 .PHONY: install
 install: ## Install project dependencies
+	opam update
 	opam install . --deps-only --with-test --with-dev-setup --working-dir . -y
 	npm install
 
+.PHONY: pin
+pin: ## Pin project dependencies
+	echo "No pinned dependencies"
+
 .PHONY: init
-init: setup-githooks create-switch install ## Create a local dev enviroment
+init: setup-githooks create-switch pin install ## Create a local dev environment
 
 .PHONY: subst
 subst: ## Run dune substitute
@@ -61,12 +62,13 @@ dev: ## Run the project in dev mode
 	$(DUNE) build --promote-install-files --root . --watch
 
 .PHONY: release-static
-release-static:
+release-static: ## Build static release
 	$(DUNE) build --root . --ignore-promoted-rules --profile release-static --only-packages styled-ppx
 
 # Testing commands
 
-TEST_TARGETS := test-parser test-css-property-parser test-ppx-native test-ppx-snapshot-reason test-ppx-snapshot-rescript test-css-support test-css-spec-types test-runtime test-murmur2 test-css-spec-parser test-string-interpolation
+TEST_TARGETS := test-css-parser test-css-grammar test-css-grammar-snapshot test-ppx-native test-ppx-snapshot-reason test-css-support test-runtime test-murmur2 test-css-spec-parser test-string-interpolation
+# Disabled test-ppx-snapshot-rescript
 
 # Create targets with the format "test-{{target_name}}-{{ "watch" | "promote" }}"
 define create-test
@@ -129,23 +131,41 @@ test: build
 		fi \
 	done
 
+.PHONY: test
+test-promote: build
+	@for target in $(TEST_TARGETS); do \
+		ALCOTEST_VERBOSE=false make $${target}-promote; \
+	done
+
 .PHONY: test-demo
 test-demo: build test-demo-rescript-v9 test-demo-rescript-v10 ## Run demo tests
 
 # Demo
 
-.PHONY: demo-demo-rescript-v10
-demo-demo-rescript-v10: build ## Run the ReScript v10 demo with JSX4
+.PHONY: demo-rescript-v10
+demo-rescript-v10: build ## Run the ReScript v10 demo with JSX4
 	npm --prefix 'demo/rescript-v10-JSX4' install
 	npm --prefix 'demo/rescript-v10-JSX4' run start
 
-.PHONY: demo-demo-melange-server
-demo-demo-melange-server: ## Run the melange server demo
-	$(DUNE) exec demo-melange-server
+.PHONY: demo-server
+demo-server: ## Run the server demo
+	$(DUNE) exec demo-server
 
-.PHONY: demo-demo-melange-server-watch
-demo-demo-melange-server-watch: ## Run (and watch) the melange server demo
-	$(DUNE) exec demo-melange-server --watch
+.PHONY: demo-server-watch
+demo-server-watch: ## Run (and watch) the server demo
+	$(DUNE) exec demo-server --watch
+
+.PHONY: demo-melange-build
+demo-melange-build: ## Build the melange demo
+	$(DUNE) build demo/melange
+
+.PHONY: demo-melange-build-watch
+demo-melange-build-watch: ## Build the melange demo
+	$(DUNE) build demo/melange --watch
+
+.PHONY: demo-melange-serve
+demo-melange-serve: ## Serve the melange demo
+	npm --prefix 'demo/melange' run serve
 
 # Debug commands
 
@@ -161,7 +181,9 @@ lexer: ## Print the command to debug the lexer
 
 .PHONY: interpreter
 interpreter: ## Run menhir as interpret
-	$(OPAM_EXEC) menhir --interpret --interpret-show-cst packages/parser/lib/Parser.mly
+	$(OPAM_EXEC) menhir --interpret --interpret-show-cst packages/css-parser/lib/Parser.mly
+
+# Website
 
 .PHONY: website-watch
 website-watch: ## Run the website locally

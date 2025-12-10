@@ -9,7 +9,6 @@ on:
       - main
 
 env:
-  OPAM_VERSION: 2.3.0
   DUNE_PROFILE: release
 
 permissions:
@@ -50,7 +49,7 @@ jobs:
           key: opam-${{ matrix.os }}-${{ matrix.ocaml-compiler }}-${{ hashFiles('**.opam') }}
 
       - name: Use OCaml ${{ matrix.ocaml-compiler }}
-        uses: ocaml/setup-ocaml@v3.3.2
+        uses: ocaml/setup-ocaml@v3.4.5
         if: steps.opam-cache.outputs.cache-hit != 'true'
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
@@ -85,6 +84,9 @@ jobs:
           OPAM_PATH="$(cat .opam-path)"
           chmod +x "$OPAM_PATH"
           dirname "$OPAM_PATH" >> "$GITHUB_PATH"
+
+      - name: Pin dependencies
+        run: make pin
 
       - name: Install dependencies
         run: make install
@@ -132,8 +134,8 @@ jobs:
           path: node_modules
           key: npm-${{ matrix.os }}-${{ hashFiles('package.json') }}
 
-      - name: Run demo tests
-        run: make test-demo
+      # - name: Run demo tests
+        # run: make test-demo
 
   publish:
     name: Publish

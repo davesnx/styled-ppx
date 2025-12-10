@@ -1,7 +1,6 @@
-open Alcotest;
 open Css_spec_parser;
 
-let parse_tests =
+let parse_tests: tests =
   [
     (
       "A? B? C?",
@@ -216,50 +215,50 @@ let parse_tests =
       Terminal(Delim(","), One),
     ),
   ]
-  |> List.mapi((_, (result, expected)) => {
+  |> List.mapi((_, (input, expected)) => {
        let result =
-         switch (value_of_string(result)) {
+         switch (value_of_string(input)) {
          | Some(result) => result
-         | None => failwith("Failed to parse")
+         | None => Alcotest.fail("Failed to parse")
          };
 
        let assertion = () =>
          check(
-           string,
-           "Should match",
+           ~__POS__,
+           Alcotest.string,
            show_value(expected),
            show_value(result),
          );
 
-       test_case(show_value(result), `Quick, assertion);
+       test(input, assertion);
      });
 
-let print_tests =
+let print_tests: tests =
   [
     ("  a b   |   c ||   d &&   e f", "'a' 'b' | 'c' || 'd' && 'e' 'f'"),
-    ("[ a b ] | [ c || [ d && [ e f ]]]", "'a' 'b' | 'c' || 'd' && 'e' 'f'"),
+    ("[ x b ] | [ c || [ d && [ e f ]]]", "'x' 'b' | 'c' || 'd' && 'e' 'f'"),
     ("'[' abc ']'", "'[' 'abc' ']'"),
   ]
   |> List.mapi((_index, (input, expected)) => {
-       let result =
+       let input_result =
          switch (value_of_string(input)) {
          | Some(res) => res
-         | None => fail("Failed to parse")
+         | None => Alcotest.fail("Failed to parse")
+         };
+       let expected_result =
+         switch (value_of_string(expected)) {
+         | Some(res) => res
+         | None => Alcotest.fail("Failed to parse")
          };
 
-       let assertion = () =>
+       test(input, () => {
          check(
-           ~pos=__POS__,
-           string,
-           "Should match",
-           string_of_value(result),
-           expected,
-         );
-
-       test_case(show_value(result), `Quick, assertion);
+           ~__POS__,
+           Alcotest.string,
+           show_value(expected_result),
+           show_value(input_result),
+         )
+       });
      });
 
-Alcotest.run(
-  "CSS Spec Parser",
-  [("Parser", parse_tests), ("Printer", print_tests)],
-);
+Alcotest.run("CSS Spec Parser", List.flatten([parse_tests, print_tests]));

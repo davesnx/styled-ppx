@@ -35,8 +35,8 @@ type value =
   | Terminal(terminal, multiplier)
   | Combinator(combinator, list(value))
   | Group(value, multiplier) /* [ A ] */
+  // TODO: does Function_call accepts multiplier?
   | Function_call(string, value) /* F( A ) */;
-// TODO: does Function_call accepts multiplier?
 
 // the only case where At_least_one makes sense, is with static
 // A? || B? = A? && B?
