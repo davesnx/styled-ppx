@@ -1,0 +1,29 @@
+(test
+ (name Runner)
+ (modules
+  Runner
+  Combinators_test
+  Modifiers_test
+  Parser_test
+  Rules_test
+  Standard_test
+  Witness_test)
+ (flags
+  (:standard -open Alcotest_extra))
+ (libraries
+  alcotest
+  alcotest_extra
+  styled-ppx.css-grammar-parser
+  css_grammar_ppx_generate
+  styled-ppx.css-parser
+  ppxlib
+  ppxlib.astlib
+  fmt)
+ (preprocess
+  (pps css_grammar_ppx sedlex.ppx ppxlib.metaquot)))
+
+(rule
+ (alias test-css-grammar)
+ (deps Runner.exe)
+ (action
+  (run %{deps})))
