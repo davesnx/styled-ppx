@@ -1,0 +1,13 @@
+(executable
+ (name server)
+ (public_name demo-server)
+ (libraries
+  server-reason-react.js
+  server-reason-react.belt
+  server-reason-react.react
+  server-reason-react.reactDom
+  styled-ppx.native
+  ; User deps
+  universal_lib_native)
+ (preprocess
+  (pps server-reason-react.ppx styled-ppx)))

@@ -1,0 +1,6 @@
+(rule
+ (target styles.css)
+ (mode promote)
+ (deps ../styles.css)
+ (action
+  (copy %{deps} %{target})))

@@ -1,4 +1,5 @@
 let element = ReactDOM.querySelector("#root");
+
 switch (element) {
 | Some(root) =>
   let root = ReactDOM.Client.createRoot(root);
