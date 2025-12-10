@@ -6,8 +6,7 @@
   Modifiers_test
   Parser_test
   Rules_test
-  Standard_test
-  Witness_test)
+  Standard_test)
  (flags
   (:standard -open Alcotest_extra))
  (libraries

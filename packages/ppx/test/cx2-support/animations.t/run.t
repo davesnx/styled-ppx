@@ -16,8 +16,8 @@ If this test fail means that the module is not in sync with the ppx
   File "input.re", line 7, characters 6-32:
   7 | [%cx2 {|animation-name: $(foo)|}];
             ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  Error: This expression has type "[> `KeyframesName of string ]"
-         but an expression was expected of type "Css_types.AnimationName.t"
+  Error: This expression has type [> `KeyframesName of string ]
+         but an expression was expected of type Css_types.AnimationName.t
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'

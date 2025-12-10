@@ -46,14 +46,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     is_function(property_name)
       ? function_value_name(property_name) : "property-" ++ property_name;
 
-  /* Generate witness constructor name for type-safe lookups.
-        CSS name -> type name -> witness name:
-          "color" -> "color" -> "W_color"
-          "width" (property) -> "property_width" -> "W_property_width"
-          "calc()" -> "function_calc" -> "W_function_calc"
-     */
-  let witness_name_of_type = type_name => "W_" ++ type_name;
-
   let value_of_delimiter =
     fun
     | "+" => "cross"
@@ -184,11 +176,11 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
      - Invalid: Unimplemented types that return unit as placeholder
 
      NOTE: extended-length, extended-angle, extended-percentage, extended-time, extended-frequency
-     are NOT in this list. They use lookup() to reference generated modules in Parser.ml
+     are NOT in this list. They reference rules defined in Parser.ml
      which include calc(), min(), and max() support.
 
-     NOTE: ratio, declaration, declaration-list, zero ARE registered as modules
-     and should use witness lookup, not Standard.invalid. */
+     NOTE: ratio, declaration, declaration-list, zero ARE defined as rules in Parser.ml
+     and should use direct references, not Standard.invalid. */
   type standard_spec_kind =
     | Valid
     | Primitive
@@ -316,7 +308,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
           /* Priority order:
              1. Invalid/unimplemented types -> unit
              2. Primitive wrappers (integer, number, etc.) -> unwrapped OCaml types
-             3. Everything else -> direct type reference (will be in Types.ml) */
+             3. Everything else -> direct type reference (defined in Parser.ml) */
           let params =
             if (is_invalid_type(snake_name)) {
               [
@@ -356,7 +348,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         /* Priority order:
            1. Invalid/unimplemented types -> unit
            2. Primitive wrappers (integer, number, etc.) -> unwrapped OCaml types with modifiers
-           3. Everything else -> direct type reference (will be in Types.ml) */
+           3. Everything else -> direct type reference (defined in Parser.ml) */
         if (is_invalid_type(snake_name)) {
           /* Unimplemented types get unit as placeholder */
           apply_modifier(
@@ -539,7 +531,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       };
   };
 
-  let rec make_value = (~use_lookup=false, value) => {
+  let rec make_value = (value) => {
     let terminal_op = (kind, modifier) => {
       // as everyrule is in the same namespace
       let rule =
@@ -556,48 +548,20 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
           } else if (is_standard_spec(name)) {
             // Standard spec (length, angle, css-wide-keywords, etc.) - use Standard.name directly
             "Standard." ++ snake_name |> evar;
-          } else if (use_lookup) {
-            // TYPE-SAFE lookup using GADT witness - NO Obj.magic!
-            let witness_name = witness_name_of_type(snake_name);
-            let witness_constructor = first_uppercase(witness_name);
-            eapply(
-              evar("lookup"),
-              [
-                pexp_construct(
-                  txt @@ Ldot(Lident("Types"), witness_constructor),
-                  None,
-                ),
-              ],
-            );
           } else {
-            // Without lookup - reference local binding directly (for let rec)
-            snake_name |> evar;
+            // Runtime lookup by CSS name (registry uses CSS-style names with hyphens)
+            eapply(evar("lookup"), [estring(name)]);
           };
         | Property_type(name) =>
-          if (use_lookup) {
-            // TYPE-SAFE lookup using GADT witness - NO Obj.magic!
-            let type_name = "property_" ++ kebab_case_to_snake_case(name);
-            let witness_name = witness_name_of_type(type_name);
-            let witness_constructor = first_uppercase(witness_name);
-            eapply(
-              evar("lookup"),
-              [
-                pexp_construct(
-                  txt @@ Ldot(Lident("Types"), witness_constructor),
-                  None,
-                ),
-              ],
-            );
-          } else {
-            // Without lookup - reference local binding directly (for let rec)
-            property_value_name(name) |> value_name_of_css |> evar;
-          }
+          // Runtime lookup for property references (properties use prefixed keys)
+          let key = "property_" ++ name;
+          eapply(evar("lookup"), [estring(key)])
         };
       apply_modifier(modifier, rule);
     };
     let group_op = (value, modifier) => {
       /* Primitives now return unwrapped values directly, no need for special handling */
-      let base_rule = make_value(~use_lookup, value);
+      let base_rule = make_value(value);
       apply_modifier(modifier, base_rule);
     };
     let combinator_op = (kind, values) => {
@@ -625,7 +589,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         let map_fn = pexp_fun(Nolabel, None, pattern, expr);
         eapply(
           evar("Rule.Match.map"),
-          [make_value(~use_lookup, value), map_fn],
+          [make_value(value), map_fn],
         );
       };
 
@@ -707,7 +671,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     };
     let function_call = (name, value) => {
       /* Primitives now return unwrapped values directly */
-      let arg_expr = make_value(~use_lookup, value);
+      let arg_expr = make_value(value);
       eapply(evar("Standard.function_call"), [estring(name), arg_expr]);
     };
 
@@ -1074,21 +1038,11 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         ~spec: Css_spec_parser.value,
         ~witness: option(Parsetree.expression),
         ~runtime_module_path: option(string),
-        ~type_name: option(string),
         ~loc: Location.t,
       )
       : list(Ppxlib.structure_item) => {
-    /* When type_name is provided, generate an alias to Types.<type_name>
-       Otherwise, generate the full inline type */
-    let core_type =
-      switch (type_name) {
-      | Some(name) =>
-        /* Generate type t = Types.<name> */
-        ptyp_constr(txt @@ Ldot(Lident("Types"), name), [])
-      | None =>
-        /* Generate inline type */
-        create_type_parser(spec)
-      };
+    /* Always generate inline type from the spec */
+    let core_type = create_type_parser(spec);
     let type_decl =
       Ast_helper.Str.type_(
         ~loc,
@@ -1099,7 +1053,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     let t_type = ptyp_constr(txt @@ Lident("t"), []);
     let string_type = ptyp_constr(txt @@ Lident("string"), []);
 
-    let rule_body = make_value(~use_lookup=true, spec);
+    let rule_body = make_value(spec);
     let rule_type =
       ptyp_constr(txt @@ Ldot(Lident("Rule"), "rule"), [t_type]);
     let rule_binding =

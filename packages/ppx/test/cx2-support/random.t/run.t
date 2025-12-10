@@ -195,6 +195,6 @@ If this test fail means that the module is not in sync with the ppx
   File "input.re", line 20, characters 6-69:
   20 | [%cx2 {|-webkit-box-shadow: inset 0 0 0 1000px $(backgroundString);|}];
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  Error: This expression has type "string" but an expression was expected of type
-           "Css_types.BoxShadow.t"
+  Error: This expression has type string but an expression was expected of type
+           Css_types.BoxShadow.t
   [1]

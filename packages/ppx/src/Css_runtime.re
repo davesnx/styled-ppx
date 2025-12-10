@@ -124,7 +124,7 @@ and render_media_query = (~loc, at_rule: at_rule) => {
     let prelude =
       Styled_ppx_css_parser.Render.component_value_list(at_rule_prelude_ast)
       |> String.trim;
-    Parser.Media_query_list.parse(prelude) |> Result.map(_ => prelude);
+    Parser.parse(Parser.media_query_list, prelude) |> Result.map(_ => prelude);
   };
 
   let (delimiter, attrs) =
@@ -167,7 +167,7 @@ and render_container_query = (~loc, at_rule: at_rule) => {
     let prelude =
       Styled_ppx_css_parser.Render.component_value_list(at_rule_prelude_ast)
       |> String.trim;
-    Parser.Container_condition.parse(prelude) |> Result.map(_ => prelude);
+    Parser.parse(Parser.container_condition, prelude) |> Result.map(_ => prelude);
   };
 
   let (delimiter, attrs) =

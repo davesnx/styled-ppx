@@ -13,11 +13,11 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 1468, characters 6-32:
-  1468 | [%cx2 {|opacity: $(opacityVal)|}];
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  Error: This expression has type "float" but an expression was expected of type
-           "[< `percent of float ]"
+  File "input.re", line 644, characters 6-28:
+  644 | [%cx2 {|order: $(orderVal)|}];
+              ^^^^^^^^^^^^^^^^^^^^^^
+  Error: This expression has type [> `num of int ]
+         but an expression was expected of type int
   [1]
 
 

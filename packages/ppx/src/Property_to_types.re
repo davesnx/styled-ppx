@@ -206,10 +206,9 @@ let property_name_to_module_name = (property_name: string): string => {
 let property_to_module = property_name => {
   /* First try Parser which has explicit runtime_module_path */
   switch (Css_grammar.Parser.find_property(property_name)) {
-  | Some(spec_module) =>
-    module M = (val spec_module: Css_grammar.Parser.RULE);
+  | Some(Css_grammar.Parser.PackRule({ runtime_module_path, _ })) =>
     /* Extract just the module name from path like "Css_types.Display" -> "Display" */
-    switch (M.runtime_module_path) {
+    switch (runtime_module_path) {
     | Some(path) =>
       switch (String.split_on_char('.', path)) {
       | [_, module_name] => Some(module_name)
@@ -281,16 +280,15 @@ let get_interpolation_tostrings =
     : result(list(interpolation_info), string) => {
   switch (Css_grammar.Parser.find_property(property_name)) {
   | None => Error("Property not found in registry: " ++ property_name)
-  | Some(spec_module) =>
-    module M = (val spec_module: Css_grammar.Parser.RULE);
-    switch (M.runtime_module_path) {
+  | Some(Css_grammar.Parser.PackRule({ rule: _, runtime_module_path, validate })) =>
+    switch (runtime_module_path) {
     | None => Error("Property has no runtime module path: " ++ property_name)
     | Some(default_runtime_path) =>
-      switch (M.parse(value)) {
+      switch (validate(value)) {
       | Error(parse_error) => Error("Failed to parse value: " ++ parse_error)
-      | Ok(parsed_value) =>
-        /* extract_interpolations returns (name, type_path) pairs */
-        let interpolations = M.extract_interpolations(parsed_value);
+      | Ok () =>
+        /* With packed_rule, we use get_interpolation_types from Parser instead */
+        let interpolations = Css_grammar.Parser.get_interpolation_types(~name=property_name, value);
         let infos =
           interpolations
           |> List.map(((variable_name, type_path)) => {
@@ -323,27 +321,25 @@ let is_property_registered = (property_name: string): bool => {
 };
 
 /**
- * Type-safe helper for working with property modules.
+ * Type-safe helper for working with property rules.
  *
- * This function encapsulates the pattern of unpacking a first-class module
- * and applying a function to its operations. The type [a] is existentially
- * quantified - the caller doesn't need to know the concrete type, only that
- * the function [f] receives consistent types.
+ * This function encapsulates the pattern of looking up a packed rule
+ * and applying a function to it. With packed_rule, the type is existentially
+ * quantified inside the GADT.
  *
  * Example:
  * {[
- *   with_property_module "display" (fun (module M : RULE) ->
- *     match M.parse "block" with
- *     | Ok value -> M.to_string value
- *     | Error _ -> "invalid"
+ *   with_property_rule "display" (fun packed_rule ->
+ *     match packed_rule with
+ *     | PackRule { validate; _ } -> validate "block"
  *   )
  * ]}
  */
-let with_property_module:
-  (string, (module Css_grammar.Parser.RULE) => 'result) => option('result) =
+let with_property_rule:
+  (string, Css_grammar.Parser.packed_rule => 'result) => option('result) =
   (property_name, f) => {
     switch (Css_grammar.Parser.find_property(property_name)) {
-    | Some(spec_module) => Some(f(spec_module))
+    | Some(packed_rule) => Some(f(packed_rule))
     | None => None
     };
   };
@@ -351,27 +347,25 @@ let with_property_module:
 /**
  * Parse a CSS value for a property and return information about interpolations.
  *
- * This is a type-safe wrapper that demonstrates the proper pattern for working
- * with property modules. The type of the parsed value is existentially quantified
- * within the function scope - we don't expose it to callers because they don't
- * need it. They only need the extracted information (interpolation names, paths).
+ * This is a type-safe wrapper that uses packed_rule. The type of the parsed value
+ * is existentially quantified within the GADT - we don't expose it to callers
+ * because they don't need it. They only need the extracted information
+ * (interpolation names, paths).
  */
 let parse_and_extract_interpolations =
     (property_name: string, value: string)
     : result(list(interpolation_info), string) => {
   switch (Css_grammar.Parser.find_property(property_name)) {
   | None => Error("Property not found in registry: " ++ property_name)
-  | Some(spec_module) =>
-    /* Unpack the first-class module - M.t is existentially quantified */
-    module M = (val spec_module: Css_grammar.Parser.RULE);
-    switch (M.runtime_module_path) {
+  | Some(Css_grammar.Parser.PackRule({ runtime_module_path, validate, _ })) =>
+    switch (runtime_module_path) {
     | None => Error("Property has no runtime module path: " ++ property_name)
     | Some(default_runtime_path) =>
-      switch (M.parse(value)) {
+      switch (validate(value)) {
       | Error(parse_error) => Error("Failed to parse value: " ++ parse_error)
-      | Ok(parsed_value) =>
-        /* parsed_value : M.t - extract_interpolations returns (name, type_path) pairs */
-        let interpolations = M.extract_interpolations(parsed_value);
+      | Ok () =>
+        /* Use get_interpolation_types from Parser for interpolation extraction */
+        let interpolations = Css_grammar.Parser.get_interpolation_types(~name=property_name, value);
         let infos =
           interpolations
           |> List.map(((variable_name, type_path)) => {

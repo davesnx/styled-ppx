@@ -6,6 +6,5 @@ Alcotest.run(
     Rules_test.tests,
     Standard_test.tests,
     Parser_test.tests,
-    Witness_test.tests,
   ]),
 );

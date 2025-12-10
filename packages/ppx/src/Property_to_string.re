@@ -186,14 +186,14 @@ and render_extended_percentage = (value: Parser.extended_percentage) =>
   | `Function_max(values) => render_function_max(values)
   };
 
-let render_length_percentage = (value: Parser.Length_percentage.t) =>
+let render_length_percentage = (value: Parser.length_percentage) =>
   switch (value) {
   | `Extended_length(length) => render_extended_length(length)
   | `Extended_percentage(percentage) =>
     render_extended_percentage(percentage)
   };
 
-let render_size = (value: Parser.Property_width.t) =>
+let render_size = (value: Parser.property_width) =>
   switch (value) {
   | `Auto => [%expr "auto"]
   | `Extended_length(_) as lp => render_length_percentage(lp)
@@ -230,18 +230,18 @@ let transform = (parser, id, map) =>
   );
 
 let width =
-  transform(Parser.Property_width.rule, [%expr "width"], render_size);
+  transform(Parser.property_width, [%expr "width"], render_size);
 let min_width =
-  transform(Parser.Property_width.rule, [%expr "min-width"], render_size);
+  transform(Parser.property_width, [%expr "min-width"], render_size);
 
 let max_width =
-  transform(Parser.Property_width.rule, [%expr "max-width"], render_size);
+  transform(Parser.property_width, [%expr "max-width"], render_size);
 let height =
-  transform(Parser.Property_height.rule, [%expr "height"], render_size);
+  transform(Parser.property_height, [%expr "height"], render_size);
 let min_height =
-  transform(Parser.Property_height.rule, [%expr "min-height"], render_size);
+  transform(Parser.property_height, [%expr "min-height"], render_size);
 let max_height =
-  transform(Parser.Property_height.rule, [%expr "max-height"], render_size);
+  transform(Parser.property_height, [%expr "max-height"], render_size);
 
 let render_ratio_inner =
   fun
@@ -253,7 +253,7 @@ let render_ratio_inner =
   | `Number(i) => [%expr [%e string_of_float(i) |> render_string]]
   | `Interpolation(v) => render_variable(v);
 
-let render_aspect_ratio = (value: Parser.Property_aspect_ratio.t) =>
+let render_aspect_ratio = (value: Parser.property_aspect_ratio) =>
   switch (value) {
   | `Auto => render_string("auto")
   | `Ratio(r) => render_ratio_inner(r)
@@ -261,35 +261,35 @@ let render_aspect_ratio = (value: Parser.Property_aspect_ratio.t) =>
 
 let aspect_ratio =
   transform(
-    Parser.Property_aspect_ratio.rule,
+    Parser.property_aspect_ratio,
     [%expr "aspect-ratio"],
     render_aspect_ratio,
   );
 let min_aspect_ratio =
   transform(
-    Parser.Property_aspect_ratio.rule,
+    Parser.property_aspect_ratio,
     [%expr "min-aspect-ratio"],
     render_aspect_ratio,
   );
 let max_aspect_ratio =
   transform(
-    Parser.Property_aspect_ratio.rule,
+    Parser.property_aspect_ratio,
     [%expr "max-aspect-ratio"],
     render_aspect_ratio,
   );
 let orientation =
   transform(
-    Parser.Property_media_orientation.rule,
+    Parser.property_media_orientation,
     [%expr "orientation"],
     fun
     | `Landscape => [%expr "landscape"]
     | `Portrait => [%expr "portrait"],
   );
 let grid =
-  transform(Parser.Property_media_grid.rule, [%expr "grid"], render_integer);
+  transform(Parser.property_media_grid, [%expr "grid"], render_integer);
 let update =
   transform(
-    Parser.Property_media_update.rule,
+    Parser.property_media_update,
     [%expr "update"],
     fun
     | `Fast => [%expr "fast"]
@@ -298,7 +298,7 @@ let update =
   );
 let overflow_block =
   transform(
-    Parser.Property_overflow_block.rule,
+    Parser.property_overflow_block,
     [%expr "overflow-block"],
     fun
     | `Auto => [%expr "auto"]
@@ -311,7 +311,7 @@ let overflow_block =
 
 let overflow_inline =
   transform(
-    Parser.Property_overflow_inline.rule,
+    Parser.property_overflow_inline,
     [%expr "overflow-inline"],
     fun
     | `Auto => [%expr "auto"]
@@ -332,7 +332,7 @@ let max_color =
 
 let color_gamut =
   transform(
-    Parser.Property_media_color_gamut.rule,
+    Parser.property_media_color_gamut,
     [%expr "color_gamut"],
     fun
     | `P3 => [%expr "p3"]
@@ -341,7 +341,7 @@ let color_gamut =
   );
 let display_mode =
   transform(
-    Parser.Property_media_display_mode.rule,
+    Parser.property_media_display_mode,
     [%expr "display-mode"],
     fun
     | `Browser => [%expr "browser"]
@@ -351,27 +351,27 @@ let display_mode =
   );
 let monochrome =
   transform(
-    Parser.Property_media_monochrome.rule,
+    Parser.property_media_monochrome,
     [%expr "monochrome"],
     render_integer,
   );
 
 let min_monochrome =
   transform(
-    Parser.Property_media_monochrome.rule,
+    Parser.property_media_monochrome,
     [%expr "min-monochrome"],
     render_integer,
   );
 
 let max_monochrome =
   transform(
-    Parser.Property_media_monochrome.rule,
+    Parser.property_media_monochrome,
     [%expr "max-monochrome"],
     render_integer,
   );
 let inverted_colors =
   transform(
-    Parser.Property_media_inverted_colors.rule,
+    Parser.property_media_inverted_colors,
     [%expr "inverted-colors"],
     fun
     | `Inverted => [%expr "Inverted"]
@@ -379,7 +379,7 @@ let inverted_colors =
   );
 let pointer =
   transform(
-    Parser.Property_media_pointer.rule,
+    Parser.property_media_pointer,
     [%expr "pointer"],
     fun
     | `Coarse => [%expr "coarse"]
@@ -388,7 +388,7 @@ let pointer =
   );
 let hover =
   transform(
-    Parser.Property_media_hover.rule,
+    Parser.property_media_hover,
     [%expr "hover"],
     fun
     | `Hover => [%expr "hover"]
@@ -396,7 +396,7 @@ let hover =
   );
 let any_pointer =
   transform(
-    Parser.Property_media_any_pointer.rule,
+    Parser.property_media_any_pointer,
     [%expr "any_pointer"],
     fun
     | `Coarse => [%expr "coarse"]
@@ -405,7 +405,7 @@ let any_pointer =
   );
 let any_hover =
   transform(
-    Parser.Property_media_any_hover.rule,
+    Parser.property_media_any_hover,
     [%expr "any_hover"],
     fun
     | `Hover => [%expr "hover"]
@@ -413,7 +413,7 @@ let any_hover =
   );
 let scripting =
   transform(
-    Parser.Property_media_scripting.rule,
+    Parser.property_media_scripting,
     [%expr "scripting"],
     fun
     | `Enabled => [%expr "enabled"]
@@ -423,7 +423,7 @@ let scripting =
 
 let resolution =
   transform(
-    Parser.Property_media_resolution.rule,
+    Parser.property_media_resolution,
     [%expr "resolution"],
     fun
     | `Dpcm(v) => render_number(v, "dpcm")
@@ -433,7 +433,7 @@ let resolution =
 
 let max_resolution =
   transform(
-    Parser.Property_media_min_resolution.rule,
+    Parser.property_media_min_resolution,
     [%expr "min-resolution"],
     fun
     | `Dpcm(v) => render_number(v, "dpcm")
@@ -443,7 +443,7 @@ let max_resolution =
 
 let min_resolution =
   transform(
-    Parser.Property_media_max_resolution.rule,
+    Parser.property_media_max_resolution,
     [%expr "max-resolution"],
     fun
     | `Dpcm(v) => render_number(v, "dpcm")
@@ -453,19 +453,19 @@ let min_resolution =
 
 let color_index =
   transform(
-    Parser.Property_media_color_index.rule,
+    Parser.property_media_color_index,
     [%expr "color-index"],
     render_integer,
   );
 let min_color_index =
   transform(
-    Parser.Property_media_min_color_index.rule,
+    Parser.property_media_min_color_index,
     [%expr "min-color-index"],
     render_integer,
   );
 let max_color_index =
   transform(
-    Parser.Property_media_color_index.rule,
+    Parser.property_media_color_index,
     [%expr "max-color-index"],
     render_integer,
   );

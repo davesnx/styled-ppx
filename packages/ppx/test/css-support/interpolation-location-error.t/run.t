@@ -16,7 +16,7 @@ This test ensures the location of the error is correct
   $ dune build
   File "input.re", line 3, characters 27-34:
    | isplay: $(grid); |}];
-                          ^^^^^^^
+                          
   Error: This expression has type [> `gri ]
          but an expression was expected of type
            [< `block

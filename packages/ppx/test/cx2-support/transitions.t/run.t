@@ -16,9 +16,9 @@ If this test fail means that the module is not in sync with the ppx
   File "input.re", line 49, characters 6-33:
   49 | [%cx2 {|transition: $(property)|}];
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  Error: This expression has type "Css_types.TransitionProperty.t"
+  Error: This expression has type Css_types.TransitionProperty.t
          but an expression was expected of type
-           "[< Css_types.Transition.Value.t ]"
+           [< Css_types.Transition.Value.t ]
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'

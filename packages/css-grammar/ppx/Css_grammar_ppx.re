@@ -4,7 +4,6 @@ open Asttypes;
 let expander =
     (
       ~recursive,
-      ~use_lookup=false,
       ~loc as exprLoc,
       ~path as _: string,
       ~arg as _: option(loc(Longident.t)),
@@ -19,7 +18,7 @@ let expander =
         let loc = exprLoc;
       });
     module Emit = Generate.Make(Ast_builder);
-    let expr = Emit.make_value(~use_lookup, value);
+    let expr = Emit.make_value(value);
 
     recursive
       ? Ast_builder.pexp_fun(
@@ -47,7 +46,7 @@ let value_extension =
     "value",
     Ppxlib.Extension.Context.Expression,
     string_patten,
-    expander(~recursive=false, ~use_lookup=false),
+    expander(~recursive=false),
   );
 
 let value_rec_extension =
@@ -55,7 +54,7 @@ let value_rec_extension =
     "value.rec",
     Ppxlib.Extension.Context.Expression,
     string_patten,
-    expander(~recursive=true, ~use_lookup=false),
+    expander(~recursive=true),
   );
 
 let spec_extension =
@@ -63,7 +62,32 @@ let spec_extension =
     "spec",
     Ppxlib.Extension.Context.Expression,
     string_patten,
-    expander(~recursive=true, ~use_lookup=true),
+    expander(~recursive=true),
+  );
+
+/* Expander for spec_t - generates OCaml type from CSS spec string */
+let spec_t_expander =
+    (~loc as exprLoc, ~path as _: string, value: string, _loc) => {
+  switch (Css_spec_parser.value_of_string(value)) {
+  | Some(parsed_spec: Css_spec_parser.value) =>
+    module Ast_builder =
+      Ast_builder.Make({
+        let loc = exprLoc;
+      });
+    module Emit = Generate.Make(Ast_builder);
+    Emit.create_type_parser(parsed_spec);
+  | exception _
+  | None =>
+    raise(Location.raise_errorf(~loc=exprLoc, "couldn't parse CSS spec: %s", value))
+  };
+};
+
+let spec_t_extension =
+  Ppxlib.Extension.declare(
+    "spec_t",
+    Ppxlib.Extension.Context.Core_type,
+    Ast_pattern.(pstr(pstr_eval(pexp_constant(pconst_string(__, __', none)), nil) ^:: nil)),
+    spec_t_expander,
   );
 
 /* Extract module path string from a packed module expression like
@@ -104,9 +128,8 @@ let spec_module_pattern = Ast_pattern.(pstr(pstr_eval(__, nil) ^:: nil));
 
 /* Unified expander for spec_module - handles multiple forms:
    1. [%spec_module "spec_string"] - generates inline type
-   2. [%spec_module "type_name", "spec_string"] - generates type alias to Types.type_name
-   3. [%spec_module "spec_string", (module Css_types.Foo : RUNTIME_TYPE)] - with witness
-   4. [%spec_module "type_name", "spec_string", (module ...)] - with type name and witness */
+   2. [%spec_module "spec_string", (module Css_types.Foo : RUNTIME_TYPE)] - with runtime module
+   3. [%spec_module "type_name", "spec_string", (module ...)] - type_name is ignored (legacy form) */
 let spec_module_expander =
     (~loc as _exprLoc, ~path as _: string, payload_expr: expression) => {
   module Ast_builder =
@@ -116,32 +139,27 @@ let spec_module_expander =
   module Emit = Generate.Make(Ast_builder);
 
   /* Determine which form we have and extract values */
-  let (type_name_opt, spec_string, witness_opt, runtime_path_opt) =
+  let (spec_string, witness_opt, runtime_path_opt) =
     switch (payload_expr.pexp_desc) {
     /* Form 1: Just a string - [%spec_module "spec_string"] */
-    | Pexp_constant(Pconst_string(s, _, _)) => (None, s, None, None)
+    | Pexp_constant(Pconst_string(s, _, _)) => (s, None, None)
     /* Form 2+: Tuple */
     | Pexp_tuple(elements) =>
       switch (elements) {
-      /* Form 2: [%spec_module "type_name", "spec_string"] */
-      | [type_name_expr, spec_expr]
-          when
-            extract_spec_string(type_name_expr) != None
-            && extract_spec_string(spec_expr) != None =>
-        let type_name = extract_spec_string(type_name_expr);
-        let spec = extract_spec_string(spec_expr);
-        switch (type_name, spec) {
-        | (Some(tn), Some(s)) => (Some(tn), s, None, None)
-        | _ =>
+      /* Form 2a: [%spec_module "type_name", "spec_string"] - type_name is ignored */
+      | [_type_name_expr, spec_expr] when extract_spec_string(spec_expr) != None =>
+        switch (extract_spec_string(spec_expr)) {
+        | Some(s) => (s, None, None)
+        | None =>
           raise(
             Location.raise_errorf(
               ~loc=_exprLoc,
-              "expected two string literals",
+              "second element of tuple must be a spec string literal",
             ),
           )
-        };
-      /* Form 3: [%spec_module "spec_string", (module ...)] */
-      | [spec_expr, witness_expr] when extract_spec_string(spec_expr) != None =>
+        }
+      /* Form 2b: [%spec_module "spec_string", (module ...)] */
+      | [spec_expr, witness_expr] when extract_spec_string(spec_expr) != None && extract_module_path(witness_expr) != None =>
         switch (extract_spec_string(spec_expr)) {
         | Some(s) =>
           let runtime_path =
@@ -155,7 +173,7 @@ let spec_module_expander =
                 ),
               )
             };
-          (None, s, Some(witness_expr), Some(runtime_path));
+          (s, Some(witness_expr), Some(runtime_path));
         | None =>
           raise(
             Location.raise_errorf(
@@ -164,13 +182,10 @@ let spec_module_expander =
             ),
           )
         }
-      /* Form 4: [%spec_module "type_name", "spec_string", (module ...)] */
-      | [type_name_expr, spec_expr, witness_expr] =>
-        switch (
-          extract_spec_string(type_name_expr),
-          extract_spec_string(spec_expr),
-        ) {
-        | (Some(tn), Some(s)) =>
+      /* Form 3: [%spec_module "type_name", "spec_string", (module ...)] - type_name is ignored */
+      | [_type_name_expr, spec_expr, witness_expr] =>
+        switch (extract_spec_string(spec_expr)) {
+        | Some(s) =>
           let runtime_path =
             switch (extract_module_path(witness_expr)) {
             | Some(path) => path
@@ -182,12 +197,12 @@ let spec_module_expander =
                 ),
               )
             };
-          (Some(tn), s, Some(witness_expr), Some(runtime_path));
-        | _ =>
+          (s, Some(witness_expr), Some(runtime_path));
+        | None =>
           raise(
             Location.raise_errorf(
               ~loc=_exprLoc,
-              "expected type_name and spec as string literals",
+              "second element of tuple must be a spec string literal",
             ),
           )
         }
@@ -195,7 +210,7 @@ let spec_module_expander =
         raise(
           Location.raise_errorf(
             ~loc=_exprLoc,
-            "spec_module expects (string), (string, string), (string, module), or (string, string, module)",
+            "spec_module expects (string), (string, module), or (string, string, module)",
           ),
         )
       }
@@ -215,7 +230,6 @@ let spec_module_expander =
         ~spec=parsed_spec,
         ~witness=witness_opt,
         ~runtime_module_path=runtime_path_opt,
-        ~type_name=type_name_opt,
         ~loc=_exprLoc,
       );
     Ast_helper.Mod.structure(~loc=_exprLoc, structure_items);
@@ -246,6 +260,7 @@ Driver.register_transformation(
     value_extension,
     value_rec_extension,
     spec_extension,
+    spec_t_extension,
     spec_module_extension,
   ],
   "css-grammar-ppx",
