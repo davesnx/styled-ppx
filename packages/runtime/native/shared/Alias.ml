@@ -255,13 +255,9 @@ let manipulation = `manipulation
 let subgrid = Track.subgrid
 let lineNames = Track.lineNames
 
-module Shadow = struct
-  type box = Css_types.Shadow.box Css_types.Shadow.t
-  type text = Css_types.Shadow.text Css_types.Shadow.t
-
-  let box = Css_types.Shadow.box
-  let text = Css_types.Shadow.text
-end
+module Shadow = Css_types.Shadow
+module BoxShadow = Css_types.BoxShadow
+module TextShadow = Css_types.TextShadow
 
 module Animation = struct
   (* backwards compatibility *)
@@ -275,9 +271,9 @@ end
 
 type animationName = AnimationName.t
 type angle = Angle.t
-type animationDirection = AnimationDirection.Value.t
-type animationFillMode = AnimationFillMode.Value.t
-type animationIterationCount = AnimationIterationCount.Value.t
+type animationDirection = AnimationDirection.t
+type animationFillMode = AnimationFillMode.t
+type animationIterationCount = AnimationIterationCount.t
 type animationPlayState = AnimationPlayState.Value.t
 type cascading = Cascading.t
 type color = Color.t

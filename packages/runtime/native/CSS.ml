@@ -48,12 +48,12 @@ let render_declarations ~buffer rules =
   |> Array.map ~f:Autoprefixer.prefix
   |> Array.flatten
   |> Array.filter_map ~f:(function
-       | Rule.Declaration ("label", _value) -> None
-       | Rule.Declaration (property, value) -> Some (property, value)
-       | _ -> None)
+    | Rule.Declaration ("label", _value) -> None
+    | Rule.Declaration (property, value) -> Some (property, value)
+    | _ -> None)
   |> Array.iteri ~f:(fun i decl ->
-       if i > 0 then Buffer.add_char buffer ' ';
-       render_declaration ~buffer decl)
+    if i > 0 then Buffer.add_char buffer ' ';
+    render_declaration ~buffer decl)
 
 let contains_at selector = String.contains selector '@'
 let contains_ampersand selector = String.contains selector '&'
@@ -347,12 +347,12 @@ let rec render_rules ~buffer className rules =
     if Array.length declarations > 0 then Buffer.add_char buffer ' ';
     selectors
     |> Array.filter_map ~f:(function
-         | Rule.Selector (_selector, rules) when Array.is_empty rules -> None
-         | Rule.Selector (selector, rules) -> Some (selector, rules)
-         | _ -> None)
+      | Rule.Selector (_selector, rules) when Array.is_empty rules -> None
+      | Rule.Selector (selector, rules) -> Some (selector, rules)
+      | _ -> None)
     |> Array.iteri ~f:(fun i rule ->
-         if i > 0 then Buffer.add_char buffer ' ';
-         render_selectors ~buffer className rule)
+      if i > 0 then Buffer.add_char buffer ' ';
+      render_selectors ~buffer className rule)
 
 (* Renders all selectors with the hash given *)
 and render_selectors ~buffer hash (selector, rules) =
@@ -453,6 +453,21 @@ let style (styles : rule array) =
     Stylesheet.push instance (hash, Classnames { className; styles });
     className
 
+type styles = string * ReactDOM.Style.t
+
+let make className vars : styles =
+  let style =
+    List.fold_left
+      (fun style (key, value) -> ReactDOM.Style.unsafeAddProp style key value)
+      (ReactDOM.Style.make ()) vars
+  in
+  className, style
+
+let merge (styles1 : styles) (styles2 : styles) : styles =
+  let className = Printf.sprintf "%s %s" (fst styles1) (fst styles2) in
+  let style = ReactDOM.Style.combine (snd styles1) (snd styles2) in
+  String.trim className, style
+
 let global (styles : rule array) =
   match styles with
   | [||] -> ()
@@ -493,8 +508,8 @@ let get_string_style_hashes () =
   let buffer = Buffer.create initial_size in
   stylesheet
   |> List.iteri (fun i (hash, _) ->
-       if i > 0 then Buffer.add_char buffer ' ';
-       Buffer.add_string buffer (String.trim hash));
+    if i > 0 then Buffer.add_char buffer ' ';
+    Buffer.add_string buffer (String.trim hash));
   Buffer.contents buffer
 
 let style_tag ?key:_ ?children:_ () =

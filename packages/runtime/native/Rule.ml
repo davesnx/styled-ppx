@@ -2,6 +2,11 @@ type rule =
   | Declaration of string * string
   | Selector of string array * rule array
 
+let get_value_from_rule rule =
+  match rule with
+  | Declaration (_, value) -> value
+  | Selector (_, _) -> assert false
+
 let camel_case_to_kebab_case str =
   let len = String.length str in
   let extra_space_for_dashes = 10 in
