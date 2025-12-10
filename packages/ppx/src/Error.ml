@@ -1,6 +1,7 @@
 module Builder = Ppxlib.Ast_builder.Default
 
-let make ~description ~examples ~link =
+(* ?x:(y : int = 0) *)
+let make ?examples ?link description =
   let examples =
     match examples with
     | Some examples ->
@@ -14,12 +15,23 @@ let make ~description ~examples ~link =
   in
   Printf.sprintf "%s%s%s" description examples link
 
-let expr ~loc ?examples ?link description =
-  let message = make ~description ~examples ~link in
+(** Generates an expressin with a main error and sub-errors. The main error
+    should contain the location of the payload, while the rest can be relative
+    to the main error. *)
+let expressions ~loc ~description ?examples ?link errors =
   Builder.pexp_extension ~loc
   @@ Ppxlib.Location.Error.to_extension
-  @@ Ppxlib.Location.Error.make ~loc message ~sub:[]
+  @@ Ppxlib.Location.Error.make ~loc
+       (make ?examples ?link description)
+       ~sub:errors
+
+(** Generates an expressin with a single error. Error.expressions is preferred
+    instead, it handles multiple errors in the right locations *)
+let expr ~loc ?examples ?link description =
+  Builder.pexp_extension ~loc
+  @@ Ppxlib.Location.Error.to_extension
+  @@ Ppxlib.Location.Error.make ~loc (make ?examples ?link description) ~sub:[]
 
 let raise ~loc ?examples ?link description =
-  let message = make ~description ~examples ~link in
+  let message = make ?examples ?link description in
   raise @@ Ppxlib.Location.raise_errorf ~loc "%s" message
