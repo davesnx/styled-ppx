@@ -6012,37 +6012,29 @@ type kind =
   | Function of string
   | Media_query of string
 
-(* Packed rule type - stores a rule with its metadata *)
 type packed_rule =
-  | PackRule : {
+  | Pack_rule : {
       rule : 'a Rule.rule;
       validate : string -> (unit, string) result;
       runtime_module_path : string option;
     } -> packed_rule
 
-(* Unified registry hashtable - stores all rules by name with their kind. *)
 let registry_tbl : (string, kind * packed_rule) Hashtbl.t = Hashtbl.create 1000
 
-(* Lazy lookup function for cross-rule references.
-   Returns a rule that defers registry lookup to parse time.
-   This avoids initialization order issues - rules can reference
-   each other even if defined later in the file. *)
 let lookup (name : string) : _ Rule.rule =
   fun tokens ->
     match Hashtbl.find_opt registry_tbl name with
-    | Some (_, PackRule { rule; _ }) ->
-      (* Cast is safe - we control type registration *)
+    | Some (_, Pack_rule { rule; _ }) ->
       (Obj.magic rule : _ Rule.rule) tokens
     | None -> failwith ("Rule not found in registry: " ^ name)
 
-(* Helper to pack a rule with its metadata *)
 let pack_rule (type a) (rule : a Rule.rule) ?(runtime_module_path : string option) () : packed_rule =
   let validate input =
     match Rule.parse_string rule input with
     | Ok _ -> Ok ()
     | Error msg -> Error msg
   in
-  PackRule { rule; validate; runtime_module_path }
+  Pack_rule { rule; validate; runtime_module_path }
 
 let legacy_linear_gradient_arguments : legacy_linear_gradient_arguments Rule.rule = [%spec "[ <extended-angle> | <side-or-corner> ]? ',' <color-stop-list>"]
 let legacy_linear_gradient_arguments_runtime_module_path = Some "Css_types.LegacyLinearGradientArguments"
@@ -10692,7 +10684,6 @@ let () =
         | Function name -> name
         | Media_query name -> name
       in
-      (* Generate the registry key - properties are prefixed to avoid collisions with values *)
       let key =
         match kind with
         | Property _ -> "property_" ^ css_name
@@ -10711,14 +10702,12 @@ let find_by_key (key : string) : packed_rule option =
   | Some (_, rule) -> Some rule
   | None -> None
 
-(* Additional lookup for alias properties: tries unprefixed CSS name if prefixed fails *)
 let find_property_with_fallback (name : string) : packed_rule option =
   let key = "property_" ^ name in
   match Hashtbl.find_opt registry_tbl key with
   | Some (_, rule) -> Some rule
   | None -> None
 
-(* Properties use prefixed keys in the registry *)
 let find_property (name : string) : packed_rule option =
   find_by_key ("property_" ^ name)
 
@@ -10783,16 +10772,10 @@ let check_property ~loc ~name value :
     * [> `Invalid_value of string | `Property_not_found ] )
   result =
   match find_rule name with
-  | Some (PackRule { rule; _ }) ->
-    (* First try parsing with the property's specific rule to get accurate error messages *)
+  | Some (Pack_rule { rule; _ }) ->
     (match parse (Obj.magic rule) value with
     | Ok _ -> Ok ()
     | Error property_error ->
-      (* If property rule fails, try universal CSS values:
-         - interpolation: $(variable)
-         - css-wide keywords: inherit, initial, unset, revert, revert-layer
-         - var() function: var(--custom-property)
-         Map all to unit since we only care about success/failure here *)
       let universal_rule =
         Combinators.xor
           [
@@ -10803,44 +10786,27 @@ let check_property ~loc ~name value :
       in
       (match parse universal_rule value with
       | Ok _ -> Ok ()
-      (* If universal values also fail, return the property-specific error
-         which gives more helpful feedback to the user *)
       | Error _ -> Error (loc, `Invalid_value property_error)))
   | None -> Error (loc, `Property_not_found)
 
-(* Extract interpolation types from a property value.
-   Returns a list of (variable_name, type_path) pairs.
-   The type_path is the Css_types module path for the interpolation position. *)
 let get_interpolation_types ~name value : (string * string) list =
   match find_rule name with
-  | Some (PackRule { rule; runtime_module_path; _ }) ->
-    (* Wrap with universal support like check_property. When a complete
-       interpolation is provided, return its info with the property's runtime path.
-       css-wide keywords and var() don't contribute interpolations. *)
+  | Some (Pack_rule { rule; runtime_module_path; _ }) ->
     let rule_with_universal =
       Combinators.xor
         [
-          Rule.Match.map Standard.interpolation (fun data ->
-            `Interpolation data);
-          Rule.Match.map Standard.css_wide_keywords (fun data ->
-            `CssWideKeyword data);
+          Rule.Match.map Standard.interpolation (fun data -> `Interpolation data);
+          Rule.Match.map Standard.css_wide_keywords (fun data -> `CssWideKeyword data);
           Rule.Match.map function_var (fun data -> `Var data);
           Rule.Match.map (Obj.magic rule) (fun _ -> `Value);
         ]
     in
     (match parse rule_with_universal value with
     | Ok (`Interpolation parts) ->
-      (* Complete interpolation - use the property's runtime module path *)
       let type_path = Option.value ~default:"" runtime_module_path in
       [ String.concat "." parts, type_path ]
-    | Ok (`CssWideKeyword _) ->
-      (* CSS-wide keywords don't contribute interpolations *)
-      []
-    | Ok (`Var _) ->
-      (* var() doesn't contribute interpolations *)
-      []
-    | Ok `Value ->
-      (* Regular value - partial interpolations not yet supported with packed_rule *)
-      []
+    | Ok (`CssWideKeyword _) -> []
+    | Ok (`Var _) -> []
+    | Ok `Value -> []
     | Error _ -> [])
   | None -> []
