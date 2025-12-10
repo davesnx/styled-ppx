@@ -40,12 +40,20 @@ let debug = {
   defaultValue: false,
 };
 
+let minify = {
+  flag: "--minify",
+  doc: "Minify generated CSS by removing unnecessary whitespace",
+  value: None,
+  defaultValue: false,
+};
+
 type settings = {
   jsxVersion: flag(int),
   jsxMode: flag(string),
   production: flag(bool),
   native: flag(bool),
   debug: flag(bool),
+  minify: flag(bool),
 };
 
 let currentSettings =
@@ -55,6 +63,7 @@ let currentSettings =
     production,
     native,
     debug,
+    minify,
   });
 
 let updateSettings = newSettings => currentSettings := newSettings;
@@ -75,6 +84,9 @@ module Get = {
   let debug = () =>
     currentSettings.contents.debug.value
     |> Option.value(~default=currentSettings.contents.debug.defaultValue);
+  let minify = () =>
+    currentSettings.contents.minify.value
+    |> Option.value(~default=currentSettings.contents.minify.defaultValue);
 };
 
 module Update = {
@@ -115,6 +127,14 @@ module Update = {
       ...currentSettings.contents,
       debug: {
         ...currentSettings.contents.debug,
+        value: Some(value),
+      },
+    });
+  let minify = value =>
+    updateSettings({
+      ...currentSettings.contents,
+      minify: {
+        ...currentSettings.contents.minify,
         value: Some(value),
       },
     });

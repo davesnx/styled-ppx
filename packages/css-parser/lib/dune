@@ -1,0 +1,15 @@
+(menhir
+ (modules Parser)
+ (flags --explain --unused-tokens))
+
+(library
+ (name styled_ppx_css_parser)
+ (public_name styled-ppx.css-parser)
+ (libraries
+  sedlex
+  menhirLib
+  ppxlib
+  (re_export ppx_deriving.runtime) ; We expose show_token because of ppx_deriving
+  )
+ (preprocess
+  (pps sedlex.ppx ppx_deriving.show)))
