@@ -45,7 +45,3 @@ dev-repo: "git+https://github.com/davesnx/styled-ppx.git"
 depexts: [
   ["@emotion/css"] {npm-version = ">=11.0.0"}
 ]
-
-pin-depends: [
-  ["server-reason-react.0.3.2" "git+https://github.com/ml-in-barcelona/server-reason-react#b27dd3dd39b9b61bf947be5af72fc9389010741c"]
-]
