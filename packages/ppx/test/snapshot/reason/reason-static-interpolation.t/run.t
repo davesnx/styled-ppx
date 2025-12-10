@@ -972,9 +972,9 @@
     let styles =
       CSS.style([|
         CSS.label("StringInterpolation"),
-        (CSS.color(Theme.var): CSS.rule),
-        (CSS.backgroundColor(black): CSS.rule),
-        (CSS.borderColor(Theme.Border.black): CSS.rule),
+        CSS.color(Theme.var),
+        CSS.backgroundColor(black),
+        CSS.borderColor(Theme.Border.black),
         CSS.display(`block),
       |]);
     let make = (props: makeProps) => {

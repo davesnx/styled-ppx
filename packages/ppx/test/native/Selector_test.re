@@ -1,7 +1,4 @@
-open Alcotest;
-open Ppxlib;
-
-let loc = Location.none;
+let loc = Ppxlib.Location.none;
 
 let simple_tests = [
   (
@@ -176,14 +173,14 @@ let compound_tests = [
     ],
   ),
   (
-    "p#first-child",
+    "& p#first-child {}",
     [%expr [%cx {js|& p#first-child {}|js}]],
     [%expr
       CSS.style([|CSS.selectorMany([|{js|& p#first-child|js}|], [||])|])
     ],
   ),
   (
-    "#first-child",
+    "& #first-child {}",
     [%expr [%cx {js|& #first-child {}|js}]],
     [%expr
       CSS.style([|CSS.selectorMany([|{js|& #first-child|js}|], [||])|])
@@ -313,13 +310,6 @@ let complex_tests = [
     ],
   ),
   (
-    "& #first-child",
-    [%expr [%cx {js|& #first-child {}|js}]],
-    [%expr
-      CSS.style([|CSS.selectorMany([|{js|& #first-child|js}|], [||])|])
-    ],
-  ),
-  (
     "& #first-child #second",
     [%expr [%cx {js|& #first-child #second {}|js}]],
     [%expr
@@ -415,7 +405,7 @@ let complex_tests = [
     ],
   ),
   (
-    "& a[target=\"_blank\"]",
+    {|& a[ target = "_blank" ]|},
     [%expr [%cx {|& a[ target = "_blank" ] {}|}]],
     [%expr
       CSS.style([|
@@ -545,7 +535,7 @@ let stylesheet_tests = [
 
 let nested_tests = [
   (
-    ".a",
+    ".a { .b {} }",
     [%expr [%cx ".a { .b {} }"]],
     [%expr
       CSS.style([|
@@ -632,7 +622,9 @@ let nested_tests = [
 
 let comments_tests = [
   (
-    ".a",
+    {|/*c*/
+    .b {} }
+    |},
     [%expr
       [%cx
         {|/*c*/
@@ -657,7 +649,7 @@ let comments_tests = [
     ],
   ),
   (
-    ".a .b",
+    {|.a/*c*/ /*c*//*c*/.b {}|},
     [%expr
       [%cx
         {|
@@ -674,7 +666,7 @@ let comments_tests = [
     ],
   ),
   (
-    "& .a .b",
+    "/*c*/{}",
     [%expr [%cx "display: block; /*c*/& /*c*/.a /*c*//*c*/.b /*c*/{}"]],
     [%expr
       CSS.style([|
@@ -684,7 +676,7 @@ let comments_tests = [
     ],
   ),
   (
-    ".$(aaa) { .$(bbb) { } }",
+    {|/*c*/.$(aaa) { /*c*/.$(bbb) {} }|},
     [%expr
       [%cx
         {|/*c*/
@@ -706,24 +698,25 @@ let comments_tests = [
 ];
 
 let runner = tests =>
-  List.map(
-    item => {
+  List.mapi(
+    (index, item) => {
       let (title, input, expected) = item;
-      test_case(
-        title,
-        `Quick,
+      test(
+        Int.to_string(index)
+        ++ ". "
+        ++ String.sub(title, 0, min(String.length(title), 20)),
         () => {
           let pp_expr = (ppf, x) =>
-            Fmt.pf(ppf, "%S", Pprintast.string_of_expression(x));
-          let check_expr = testable(pp_expr, (==));
-          check(check_expr, "", expected, input);
+            Fmt.pf(ppf, "%S", Ppxlib.Pprintast.string_of_expression(x));
+          let check_expr = Alcotest.testable(pp_expr, (==));
+          Alcotest.check(check_expr, "", expected, input);
         },
       );
     },
     tests,
   );
 
-let tests =
+let tests: tests =
   List.flatten([
     runner(simple_tests),
     runner(compound_tests),

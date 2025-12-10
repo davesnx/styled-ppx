@@ -967,8 +967,8 @@
         CSS.label("DynamicComponentWithArray"),
         CSS.width(`percent(100.)),
         CSS.display(`block),
-        (CSS.color(color): CSS.rule),
-        (CSS.width(size): CSS.rule),
+        CSS.color(color),
+        CSS.width(size),
       |]);
     let make = (props: makeProps('color, 'size)) => {
       let className =

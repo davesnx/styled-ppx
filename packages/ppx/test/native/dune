@@ -1,16 +1,20 @@
 (test
  (name Runner)
+ (flags
+  (:standard -open Alcotest_extra))
  (libraries
   alcotest
+  alcotest_extra
   styled-ppx
   styled-ppx.native
+  styled-ppx.css-parser
   ppxlib
   ppxlib.astlib
   server-reason-react.belt
   server-reason-react.js
   fmt)
  (preprocess
-  (pps ppxlib.metaquot styled-ppx -- -no-merge)))
+  (pps ppxlib.metaquot styled-ppx -no-merge)))
 
 (rule
  (alias test-ppx-native)

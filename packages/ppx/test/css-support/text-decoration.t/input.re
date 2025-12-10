@@ -37,11 +37,20 @@
 [%css {|text-emphasis-position: under left|}];
 [%css {|text-emphasis-position: left under|}];
 [%css {|text-emphasis-position: under right|}];
+/* text-shadow: none | <length>{2,3} && <color>?
+   Combinatorial coverage: 4 combinations */
 [%css {|text-shadow: none|}];
-/* The following shadow declarations are not supported in the CSS Parser */
-/* [%css {|text-shadow: 1px 1px|}]; */
-/* [%css {|text-shadow: 0 0 black|}]; */
+/* x y (no blur, no color) */
+[%css {|text-shadow: 1px 1px|}];
+/* x y color (no blur) */
+[%css {|text-shadow: 0 0 black|}];
+/* x y blur (no color) */
+[%css {|text-shadow: 1px 2px 3px|}];
+/* x y blur color (all parts) */
 [%css {|text-shadow: 1px 2px 3px black|}];
+/* Multiple shadows */
+[%css {|text-shadow: 1px 1px, 2px 2px red|}];
+[%css {|text-shadow: 1px 2px 3px black, 0 0 5px white|}];
 
 /* CSS Text Decoration Module Level 4 */
 /* [%css {|text-decoration: underline solid blue 1px|}]; */

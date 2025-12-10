@@ -70,7 +70,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|listStyleType|js}, {js|outside|js});
   CSS.unsafe({js|listStyleType|js}, {js|\32 style|js});
   CSS.unsafe({js|listStyleType|js}, {js|"-"|js});
-  CSS.unsafe({js|listStyleType|js}, {js|'-'|js});
+  CSS.unsafe({js|listStyleType|js}, {js|"-"|js});
   
   CSS.unsafe({js|counterReset|js}, {js|foo|js});
   CSS.unsafe({js|counterReset|js}, {js|foo 1|js});

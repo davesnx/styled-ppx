@@ -79,3 +79,15 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|hangingPunctuation|js}, {js|first force-end|js});
   CSS.unsafe({js|hangingPunctuation|js}, {js|first force-end last|js});
   CSS.unsafe({js|hangingPunctuation|js}, {js|first allow-end last|js});
+  
+  CSS.textWrap(`wrap);
+  CSS.textWrap(`nowrap);
+  CSS.textWrap(`balance);
+  CSS.textWrap(`stable);
+  CSS.textWrap(`pretty);
+  CSS.textWrapMode(`wrap);
+  CSS.textWrapMode(`nowrap);
+  CSS.textWrapStyle(`auto);
+  CSS.textWrapStyle(`balance);
+  CSS.textWrapStyle(`stable);
+  CSS.textWrapStyle(`pretty);

@@ -1,10 +1,11 @@
 Alcotest.run(
   "ppx test native",
-  [
-    ("At_rule", At_rule_test.tests),
-    ("Interpolation", Interpolation_test.tests),
-    ("Selector", Selector_test.tests),
-    ("Static", Static_test.tests),
-    ("Ppx", Ppx_test.tests),
-  ],
+  List.flatten([
+    At_rule_test.tests,
+    Interpolation_test.tests,
+    Selector_test.tests,
+    Static_test.tests,
+    Ppx_test.tests,
+    Transform_test.tests,
+  ]),
 );

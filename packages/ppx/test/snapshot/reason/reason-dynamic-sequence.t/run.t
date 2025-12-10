@@ -963,7 +963,7 @@
       "Object.assign";
     let styles = (~size, _) => {
       Js.log("Logging when render");
-      CSS.style([|(CSS.width(size): CSS.rule), CSS.display(`block)|]);
+      CSS.style([|CSS.width(size), CSS.display(`block)|]);
     };
     let make = (props: makeProps('size)) => {
       let className =
@@ -1952,7 +1952,7 @@
       let color = Theme.button(variant);
       CSS.style([|
         CSS.display(`inlineFlex),
-        (CSS.color(color): CSS.rule),
+        CSS.color(color),
         CSS.width(`percent(100.)),
       |]);
     };

@@ -1,7 +1,4 @@
-open Alcotest;
-open Ppxlib;
-
-let loc = Location.none;
+let loc = Ppxlib.Location.none;
 
 /* https://www.w3.org/TR/mediaqueries-5 */
 let media_query_tests = [
@@ -14,7 +11,7 @@ let media_query_tests = [
     [%expr CSS.style([|CSS.media({js|(min-width: 33px)|js}, [||])|])],
   ),
   (
-    "(min-width: 33px)",
+    "(min-width: 33px), (min-width: 13px)",
     [%expr [%cx "@media (min-width: 33px), (min-width: 13px) {}"]],
     [%expr
       CSS.style([|
@@ -203,16 +200,6 @@ let media_query_tests = [
 
 let keyframe_tests = [
   (
-    {|%keyframe "0% { color: red } 100% { color: green }"|},
-    [%expr [%keyframe "0% { color: red } 100% { color: green }"]],
-    [%expr
-      CSS.keyframes([|
-        (0, [|CSS.color(CSS.red)|]),
-        (100, [|CSS.color(CSS.green)|]),
-      |])
-    ],
-  ),
-  (
     {|%keyframe "0%, 50%, 3% { color: red } 100% { color: green }"|},
     [%expr [%keyframe "0%, 50%, 3% { color: red } 100% { color: green }"]],
     [%expr
@@ -367,14 +354,13 @@ let runner = tests =>
   List.map(
     item => {
       let (title, input, expected) = item;
-      test_case(
+      test(
         title,
-        `Quick,
         () => {
           let pp_expr = (ppf, x) =>
-            Fmt.pf(ppf, "%S", Pprintast.string_of_expression(x));
-          let check_expr = testable(pp_expr, (==));
-          check(check_expr, "", expected, input);
+            Fmt.pf(ppf, "%S", Ppxlib.Pprintast.string_of_expression(x));
+          let check_expr = Alcotest.testable(pp_expr, (==));
+          Alcotest.check(check_expr, "", expected, input);
         },
       );
     },

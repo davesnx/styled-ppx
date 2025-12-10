@@ -87,7 +87,7 @@
         [|
           CSS.fontSize(`percent(75.)),
           CSS.lineHeight(`zero),
-          CSS.unsafe({js|position|js}, {js|relative|js}),
+          CSS.position(`relative),
           CSS.verticalAlign(`baseline),
         |],
       ),

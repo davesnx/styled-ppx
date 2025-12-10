@@ -13,9 +13,10 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 6, characters 11-18:
-  Error: Property 'color' has an invalid value: 'cositas',
-         Expected 'function color-mix'. Got 'ident cositas' instead.
+  File "input.re", line 6, characters 13-20:
+  5 | ...
+  6 | .........: cosit...
+  Error: Property 'color' has an invalid value: 'cositas'
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
@@ -26,11 +27,7 @@ If this test fail means that the module is not in sync with the ppx
       CSS.color(CSS.white),
       CSS.selectorMany(
         [|{js|&:hover|js}|],
-        [|
-          [%ocaml.error
-            "Property 'color' has an invalid value: 'cositas',\nExpected 'function color-mix'. Got 'ident cositas' instead."
-          ],
-        |],
+        [|[%ocaml.error "Property 'color' has an invalid value: 'cositas'"]|],
       ),
     |]);
 

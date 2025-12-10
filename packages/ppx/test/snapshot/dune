@@ -1,5 +1,5 @@
-; This tests ensure the transformation goes right and doesn't need to type-check.
-; If you are looking for CSS Support tests check packages/ppx/test/native folder.
+; This tests ensure the ppx transformations works, but the generated code doesn't need to type-check to make it pass.
+; If you are looking for CSS Support tests check packages/ppx/test/native/ folder
 
 (subdir
  reason

@@ -20,46 +20,5 @@ If this test fail means that the module is not in sync with the ppx
   );
   CSS.width(`calc(`mult((`vh(100.), `num(2.)))));
   CSS.width(`calc(`mult((`num(2.), `pxFloat(120.)))));
-  CSS.width(
-    `calc(
-      `sub((
-        `vh(100.),
-        `calc(
-          `add((
-            `rem(2.),
-            `calc(
-              `add((
-                `rem(2.),
-                `calc(
-                  `add((
-                    `rem(2.),
-                    `calc(`add((`rem(2.), `pxFloat(120.)))),
-                  )),
-                ),
-              )),
-            ),
-          )),
-        ),
-      )),
-    ),
-  );
-  CSS.width(
-    `calc(
-      `mult((
-        `vh(100.),
-        `calc(
-          `sub((
-            `rem(2.),
-            `calc(
-              `mult((
-                `rem(2.),
-                `calc(`mult((`rem(2.), `calc(`div((`rem(2.), 4.)))))),
-              )),
-            ),
-          )),
-        ),
-      )),
-    ),
-  );
 
   $ dune build

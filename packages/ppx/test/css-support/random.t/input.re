@@ -1,10 +1,10 @@
 /* CSSOM View Module */
-/* [%css {|scroll-behavior: auto|}]; */
+[%css {|scroll-behavior: auto|}];
 [%css {|scroll-behavior: smooth|}];
 
 /* CSS Scroll Anchoring Module Level 1 */
 [%css {|overflow-anchor: none|}];
-/* [%css {|overflow-anchor: auto|}]; */
+[%css {|overflow-anchor: auto|}];
 
 [%css {|-moz-appearance: textfield;|}];
 [%css {|-webkit-appearance: none;|}];
@@ -28,7 +28,21 @@ let colorTextString = Color.text |> CSS.Types.Color.toString;
 
 let c = CSS.hex("e15a46");
 [%css {|background-color: $(c);|}];
-[%css {|border: none;|}];
+/* border: <line-width> || <line-style> || <color>
+   Note: The border shorthand has limited support - style-only or color-only don't work
+   Combinatorial coverage for working patterns */
+[%css {|border: none|}];
+/* Width only */
+[%css {|border: 1px|}];
+[%css {|border: thin|}];
+/* Width + style */
+[%css {|border: 1px solid|}];
+[%css {|border: thin dashed|}];
+/* Width + style + color (all parts - typed output!) */
+[%css {|border: 1px solid black|}];
+[%css {|border: thin dashed red|}];
+[%css {|border: 2px dotted #333|}];
+[%css {|border: medium double blue|}];
 [%css {|bottom: unset;|}];
 [%css {|box-shadow: none;|}];
 [%css {|break-inside: avoid;|}];
@@ -37,15 +51,15 @@ let c = CSS.hex("e15a46");
 [%css {|color: var(--color-link);|}];
 [%css {|column-width: 125px;|}];
 [%css {|column-width: auto;|}];
-/* [%css {|counter-increment: ol;|}]; */
-/* [%css {|counter-reset: ol;|}]; */
+[%css {|counter-increment: ol;|}];
+[%css {|counter-reset: ol;|}];
 [%css {|display: -webkit-box;|}];
 [%css {|display: contents;|}];
 [%css {|display: table;|}];
 [%css {|fill: $(c);|}];
 [%css {|fill: currentColor;|}];
 [%css {|gap: 4px;|}];
-/* [%css {|grid-column-end: span 2;|}]; */
+[%css {|grid-column-end: span 2;|}];
 [%css {|grid-column: unset;|}];
 [%css {|grid-row: unset;|}];
 [%css {|grid-template-columns: max-content max-content;|}];
@@ -78,14 +92,14 @@ let maskedImageUrl = `url("https://www.example.com/eye-uncrossed.svg");
 [%css {|top: unset;|}];
 [%css {|touch-action: none;|}];
 [%css {|touch-action: pan-x pan-y;|}];
-/* [%css {|transform-origin: center bottom;|}]; */
+[%css {|transform-origin: center bottom;|}];
 [%css {|transform-origin: center left;|}];
 [%css {|transform-origin: center right;|}];
 [%css {|transform-origin: 2px;|}];
 [%css {|transform-origin: bottom;|}];
 [%css {|transform-origin: 3cm 2px;|}];
 [%css {|transform-origin: left 2px;|}];
-/* [%css {|transform-origin: center top;|}]; */
+[%css {|transform-origin: center top;|}];
 [%css {|transform: none;|}];
 /* [%css {|width: -webkit-fill-available;|}]; */
 [%css {|width: fit-content;|}];

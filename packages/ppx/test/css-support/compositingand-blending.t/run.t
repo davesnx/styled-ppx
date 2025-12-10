@@ -16,24 +16,24 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
-  CSS.unsafe({js|mixBlendMode|js}, {js|normal|js});
-  CSS.unsafe({js|mixBlendMode|js}, {js|multiply|js});
-  CSS.unsafe({js|mixBlendMode|js}, {js|screen|js});
-  CSS.unsafe({js|mixBlendMode|js}, {js|overlay|js});
-  CSS.unsafe({js|mixBlendMode|js}, {js|darken|js});
-  CSS.unsafe({js|mixBlendMode|js}, {js|lighten|js});
-  CSS.unsafe({js|mixBlendMode|js}, {js|color-dodge|js});
-  CSS.unsafe({js|mixBlendMode|js}, {js|color-burn|js});
-  CSS.unsafe({js|mixBlendMode|js}, {js|hard-light|js});
-  CSS.unsafe({js|mixBlendMode|js}, {js|soft-light|js});
-  CSS.unsafe({js|mixBlendMode|js}, {js|difference|js});
-  CSS.unsafe({js|mixBlendMode|js}, {js|exclusion|js});
-  CSS.unsafe({js|mixBlendMode|js}, {js|hue|js});
-  CSS.unsafe({js|mixBlendMode|js}, {js|saturation|js});
-  CSS.unsafe({js|mixBlendMode|js}, {js|color|js});
-  CSS.unsafe({js|mixBlendMode|js}, {js|luminosity|js});
-  CSS.unsafe({js|isolation|js}, {js|auto|js});
-  CSS.unsafe({js|isolation|js}, {js|isolate|js});
+  CSS.mixBlendMode(`normal);
+  CSS.mixBlendMode(`multiply);
+  CSS.mixBlendMode(`screen);
+  CSS.mixBlendMode(`overlay);
+  CSS.mixBlendMode(`darken);
+  CSS.mixBlendMode(`lighten);
+  CSS.mixBlendMode(`colorDodge);
+  CSS.mixBlendMode(`colorBurn);
+  CSS.mixBlendMode(`hardLight);
+  CSS.mixBlendMode(`softLight);
+  CSS.mixBlendMode(`difference);
+  CSS.mixBlendMode(`exclusion);
+  CSS.mixBlendMode(`hue);
+  CSS.mixBlendMode(`saturation);
+  CSS.mixBlendMode(`color);
+  CSS.mixBlendMode(`luminosity);
+  CSS.isolation(`auto);
+  CSS.isolation(`isolate);
   CSS.unsafe({js|backgroundBlendMode|js}, {js|normal|js});
   CSS.unsafe({js|backgroundBlendMode|js}, {js|multiply|js});
   CSS.unsafe({js|backgroundBlendMode|js}, {js|screen|js});

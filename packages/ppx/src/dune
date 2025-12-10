@@ -5,14 +5,15 @@
  (flags
   (:standard -w -9))
  (libraries
+  server-reason-react.expand-styles-attribute
   styled-ppx.css-parser
-  styled-ppx.css-property-parser
+  styled-ppx.css-grammar-parser
   styled-ppx.string-interpolation
   sedlex
   ppxlib
   ppxlib.astlib
-  ppx_deriving_yojson.runtime
   yojson
-  murmur2)
+  murmur2
+  unix)
  (preprocess
   (pps ppxlib.metaquot ppx_deriving_yojson)))

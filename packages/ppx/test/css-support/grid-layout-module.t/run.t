@@ -143,7 +143,7 @@ If this test fail means that the module is not in sync with the ppx
       ),
       CSS.pxFloat(10.),
     |]);
-  (CSS.gridTemplateColumns(value): CSS.rule);
+  CSS.gridTemplateColumns(value);
   CSS.gridTemplateRows(`none);
   CSS.gridTemplateRows(`tracks([|`auto|]));
   CSS.gridTemplateRows(`tracks([|`pxFloat(100.)|]));

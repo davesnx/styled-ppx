@@ -14,9 +14,9 @@ If this test fail means that the module is not in sync with the ppx
 
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  CSS.unsafe({js|clipPath|js}, {js|url('#clip')|js});
+  CSS.unsafe({js|clipPath|js}, {js|url("#clip")|js});
   CSS.unsafe({js|clipPath|js}, {js|inset(50%)|js});
-  CSS.unsafe({js|clipPath|js}, {js|path('M 20 20 H 80 V 30')|js});
+  CSS.unsafe({js|clipPath|js}, {js|path("M 20 20 H 80 V 30")|js});
   CSS.unsafe({js|clipPath|js}, {js|polygon(50% 100%, 0 0, 100% 0)|js});
   CSS.unsafe(
     {js|clipPath|js},
@@ -34,8 +34,8 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|clipPath|js}, {js|stroke-box|js});
   CSS.unsafe({js|clipPath|js}, {js|view-box|js});
   CSS.unsafe({js|clipPath|js}, {js|none|js});
-  CSS.unsafe({js|clipRule|js}, {js|nonzero|js});
-  CSS.unsafe({js|clipRule|js}, {js|evenodd|js});
+  CSS.clipRule(`nonzero);
+  CSS.clipRule(`evenodd);
   CSS.maskImage(`none);
   CSS.maskImage(
     `linearGradient((
@@ -43,7 +43,7 @@ If this test fail means that the module is not in sync with the ppx
       [|(Some(`hex({js|333|js})), None), (Some(`hex({js|000|js})), None)|]: CSS.Types.Gradient.color_stop_list,
     )),
   );
-  CSS.unsafe({js|maskImage|js}, {js|url(image.png)|js});
+  CSS.unsafe({js|maskImage|js}, {js|url("image.png")|js});
   CSS.unsafe({js|maskMode|js}, {js|alpha|js});
   CSS.unsafe({js|maskMode|js}, {js|luminance|js});
   CSS.unsafe({js|maskMode|js}, {js|match-source|js});
@@ -106,11 +106,11 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|maskComposite|js}, {js|exclude|js});
   CSS.unsafe({js|mask|js}, {js|top|js});
   CSS.unsafe({js|mask|js}, {js|space|js});
-  CSS.unsafe({js|mask|js}, {js|url(image.png)|js});
-  CSS.unsafe({js|mask|js}, {js|url(image.png) luminance|js});
-  CSS.unsafe({js|mask|js}, {js|url(image.png) luminance top space|js});
+  CSS.unsafe({js|mask|js}, {js|url("image.png")|js});
+  CSS.unsafe({js|mask|js}, {js|url("image.png") luminance|js});
+  CSS.unsafe({js|mask|js}, {js|url("image.png") luminance top space|js});
   CSS.unsafe({js|maskBorderSource|js}, {js|none|js});
-  CSS.unsafe({js|maskBorderSource|js}, {js|url(image.png)|js});
+  CSS.unsafe({js|maskBorderSource|js}, {js|url("image.png")|js});
   CSS.unsafe({js|maskBorderSlice|js}, {js|0 fill|js});
   CSS.unsafe({js|maskBorderSlice|js}, {js|50% fill|js});
   CSS.unsafe({js|maskBorderSlice|js}, {js|1.1 fill|js});
@@ -150,6 +150,6 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|maskBorderRepeat|js}, {js|repeat space|js});
   CSS.unsafe({js|maskBorderRepeat|js}, {js|round space|js});
   CSS.unsafe({js|maskBorderRepeat|js}, {js|space space|js});
-  CSS.unsafe({js|maskBorder|js}, {js|url(image.png)|js});
+  CSS.unsafe({js|maskBorder|js}, {js|url("image.png")|js});
   CSS.unsafe({js|maskType|js}, {js|luminance|js});
   CSS.unsafe({js|maskType|js}, {js|alpha|js});

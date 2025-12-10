@@ -1,12 +1,17 @@
 open Ppxlib;
 
-module Helper = Ast_helper;
+module Asttypes = Ppxlib.Asttypes;
+module Helper = Ppxlib.Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
 
-let withLoc = (~loc, txt) => {
-  loc,
-  txt,
-};
+let lident = txt => Ppxlib.Lident(txt);
+let ldot = (li, txt) => Ppxlib.Ldot(li, txt);
+
+let withLoc = (~loc: Ppxlib.location, txt) =>
+  Ppxlib.{
+    loc,
+    txt,
+  };
 
 /* (~a, ~b, ~c, _) => args */
 let rec fnWithLabeledArgs = (list, args) =>
@@ -32,11 +37,11 @@ let styles = (~loc, ~name, ~expr) => {
 let dynamicStyles = (~loc, ~name, ~args, ~expr) => {
   let variableName = Helper.Pat.mk(~loc, Ppat_var(withLoc(name, ~loc)));
   let ppatAnyArg = (
-    Nolabel,
+    Asttypes.Nolabel,
     None,
     Builder.ppat_any(~loc),
     "_",
-    Location.none,
+    Ppxlib.Location.none,
     None,
   );
   /* Last argument needs to be ignored, since it's a unit to remove the warning of optional labelled arguments */
@@ -70,18 +75,18 @@ let bindingCreateVariadicElement = (~loc) => {
       Helper.Typ.arrow(
         ~loc,
         Nolabel,
-        Helper.Typ.constr(~loc, withLoc(Lident("string"), ~loc), []),
+        Helper.Typ.constr(~loc, withLoc(lident("string"), ~loc), []),
         Helper.Typ.arrow(
           ~loc,
           Nolabel,
           Helper.Typ.constr(
             ~loc,
-            withLoc(Ldot(Lident("Js"), "t"), ~loc),
+            withLoc(ldot(lident("Js"), "t"), ~loc),
             [Helper.Typ.object_(~loc, [], Open)],
           ),
           Helper.Typ.constr(
             ~loc,
-            withLoc(Ldot(Lident("React"), "element"), ~loc),
+            withLoc(ldot(lident("React"), "element"), ~loc),
             [],
           ),
         ),
@@ -130,20 +135,15 @@ let defineGetOrEmptyFn = (~loc) => {
   ];
 };
 
-/* ignore() */
 let applyIgnore = (~loc, expr) => {
-  Helper.Exp.apply(
-    ~loc,
-    Helper.Exp.ident(~loc, withLoc(Lident("ignore"), ~loc)),
-    [(Nolabel, expr)],
-  );
+  [%expr ignore([%e expr])];
 };
 
 let propRecordAccess = (~loc, name) => {
   Helper.Exp.field(
     ~loc,
-    Helper.Exp.ident(~loc, withLoc(Lident("props"), ~loc)),
-    withLoc(Lident(name), ~loc),
+    Helper.Exp.ident(~loc, withLoc(lident("props"), ~loc)),
+    withLoc(lident(name), ~loc),
   );
 };
 
@@ -151,8 +151,8 @@ let propRecordAccess = (~loc, name) => {
 let abstractGetProp = (~loc, name) => {
   Helper.Exp.apply(
     ~loc,
-    Helper.Exp.ident(~loc, withLoc(Lident(name ++ "Get"), ~loc)),
-    [(Nolabel, Helper.Exp.ident(~loc, withLoc(Lident("props"), ~loc)))],
+    Helper.Exp.ident(~loc, withLoc(lident(name ++ "Get"), ~loc)),
+    [(Nolabel, Helper.Exp.ident(~loc, withLoc(lident("props"), ~loc)))],
   );
 };
 
@@ -182,9 +182,9 @@ let deleteProp = (~loc, key) => {
   Helper.Exp.apply(
     ~loc,
     ~attrs=[Platform_attributes.uncurried(~loc)],
-    Helper.Exp.ident(~loc, withLoc(Lident("deleteProp"), ~loc)),
+    Helper.Exp.ident(~loc, withLoc(lident("deleteProp"), ~loc)),
     [
-      (Nolabel, Helper.Exp.ident(~loc, withLoc(Lident("newProps"), ~loc))),
+      (Nolabel, Helper.Exp.ident(~loc, withLoc(lident("newProps"), ~loc))),
       (Nolabel, Helper.Exp.constant(~loc, Pconst_string(key, loc, None))),
     ],
   )
@@ -216,7 +216,7 @@ let variadicElement = (~loc, ~htmlTag) => {
   let asAttributeName =
     switch (asAttribute()) {
     | MakeProps.Attribute({name, _}) => name
-    | _ => failwith("unreachable")
+    | _ => assert(false)
     };
 
   let asTag = {
@@ -240,13 +240,13 @@ let variadicElement = (~loc, ~htmlTag) => {
       ~loc,
       Helper.Exp.ident(
         ~loc,
-        withLoc(Lident("createVariadicElement"), ~loc),
+        withLoc(lident("createVariadicElement"), ~loc),
       ),
       [
         (Nolabel, finalHtmlTag),
         (
           Nolabel,
-          Helper.Exp.ident(~loc, withLoc(Lident("newProps"), ~loc)),
+          Helper.Exp.ident(~loc, withLoc(lident("newProps"), ~loc)),
         ),
       ],
     );
@@ -260,7 +260,7 @@ let variadicElement = (~loc, ~htmlTag) => {
 };
 
 let getLabel = str =>
-  switch (str) {
+  switch ((str: Asttypes.arg_label)) {
   | Optional(str)
   | Labelled(str) => str
   | Nolabel => ""
@@ -269,7 +269,7 @@ let getLabel = str =>
 let makeParam =
     (
       ~loc,
-      ~default: option(expression)=?,
+      ~default: option(Ppxlib.expression)=?,
       ~isOptional=false,
       ~wrapOption=isOptional,
       ~discard=false,
@@ -283,7 +283,7 @@ let makeParam =
     );
 
   (
-    isOptional ? Optional(label) : Labelled(label),
+    isOptional ? Asttypes.Optional(label) : Asttypes.Labelled(label),
     default,
     switch (coreType) {
     | Some(typ) =>
@@ -317,7 +317,7 @@ let domPropParam = (~loc, ~isOptional, domProp) => {
             withLoc(~loc, MakeProps.eventTypeToIdent(type_)),
             [],
           ),
-          Helper.Typ.constr(~loc, withLoc(Lident("unit"), ~loc), []),
+          Helper.Typ.constr(~loc, withLoc(lident("unit"), ~loc), []),
         ),
       name,
     )
@@ -338,7 +338,7 @@ let domPropParam = (~loc, ~isOptional, domProp) => {
 
 let serverCreateElement = (~loc, ~htmlTag, ~variableNames) => {
   let finalHtmlTag =
-    switch%expr ([%e Helper.Exp.ident(~loc, withLoc(~loc, Lident("as_")))]) {
+    switch%expr ([%e Helper.Exp.ident(~loc, withLoc(~loc, lident("as_")))]) {
     | Some(v) => v
     | None => [%e Builder.estring(~loc, htmlTag)]
     };
@@ -353,8 +353,8 @@ let serverCreateElement = (~loc, ~htmlTag, ~variableNames) => {
        )
     |> List.map(label =>
          (
-           Optional(label),
-           Helper.Exp.ident(~loc, withLoc(~loc, Lident(label))),
+           Asttypes.Optional(label),
+           Helper.Exp.ident(~loc, withLoc(~loc, lident(label))),
          )
        );
 
@@ -362,8 +362,8 @@ let serverCreateElement = (~loc, ~htmlTag, ~variableNames) => {
     Helper.Exp.apply(
       [%expr ReactDOM.domProps],
       [
-        (Labelled("className"), [%expr className]),
-        (Optional("ref"), [%expr innerRef]),
+        (Asttypes.Labelled("className"), [%expr className]),
+        (Asttypes.Optional("ref"), [%expr innerRef]),
       ]
       @ params
       @ [(Nolabel, [%expr ()])],
@@ -375,11 +375,28 @@ let serverCreateElement = (~loc, ~htmlTag, ~variableNames) => {
 /* let stylesObject = { "className": className, "ref": props.ref }; */
 let stylesAndRefObject = (~loc) => {
   let className = (
-    withLoc(~loc, Lident("className")),
-    Helper.Exp.ident(~loc, withLoc(Lident("className"), ~loc)),
+    withLoc(~loc, lident("className")),
+    Helper.Exp.ident(~loc, withLoc(lident("className"), ~loc)),
   );
-  let refProp = (withLoc(~loc, Lident("ref")), propItem(~loc, "innerRef"));
+  let refProp = (withLoc(~loc, lident("ref")), propItem(~loc, "innerRef"));
   let record = Helper.Exp.record(~loc, [className, refProp], None);
+  Helper.Vb.mk(
+    ~loc,
+    Helper.Pat.mk(~loc, Ppat_var(withLoc("stylesObject", ~loc))),
+    Platform_attributes.obj(~loc, record),
+  );
+};
+
+/* let stylesObject = { "className": className, "style": snd(styles), "ref": props.ref }; */
+let stylesAndRefObjectWithStyle = (~loc) => {
+  let className = (
+    withLoc(~loc, lident("className")),
+    Helper.Exp.ident(~loc, withLoc(lident("className"), ~loc)),
+  );
+  let styleField = (withLoc(~loc, lident("style")), [%expr snd(styles)]);
+  let refProp = (withLoc(~loc, lident("ref")), propItem(~loc, "innerRef"));
+  let record =
+    Helper.Exp.record(~loc, [className, styleField, refProp], None);
   Helper.Vb.mk(
     ~loc,
     Helper.Pat.mk(~loc, Ppat_var(withLoc("stylesObject", ~loc))),
@@ -438,6 +455,33 @@ let makeBody = (~loc, ~htmlTag, ~className as classNameValue, ~variables) => {
   );
 };
 
+/* styled2: same as makeBody but includes style prop from snd(styles) and uses fst(styles) for className */
+let makeBodyStyled2 =
+    (~loc, ~htmlTag, ~className as classNameValue, ~variables) => {
+  let attrs = Platform_attributes.preserveBraces(~loc);
+  let sequence =
+    [deleteProp(~loc, "innerRef"), variadicElement(~loc, ~htmlTag)]
+    |> List.append(List.map(deleteProp(~loc), variables));
+
+  Helper.Exp.let_(
+    ~loc,
+    Nonrecursive,
+    [className(~loc, classNameValue)],
+    Helper.Exp.let_(
+      ~loc,
+      ~attrs,
+      Nonrecursive,
+      [stylesAndRefObjectWithStyle(~loc)],
+      Helper.Exp.let_(
+        ~loc,
+        Nonrecursive,
+        [newProps(~loc)],
+        generateSequence(~loc, sequence),
+      ),
+    ),
+  );
+};
+
 let makeBodyServer =
     (~loc, ~htmlTag, ~className as classNameValue, ~variableNames) => {
   Helper.Exp.let_(
@@ -451,7 +495,7 @@ let makeBodyServer =
 let typeVariable = (~loc, name) => Builder.ptyp_var(~loc, name);
 
 let getIsOptional = str =>
-  switch (str) {
+  switch ((str: Asttypes.arg_label)) {
   | Optional(_) => true
   | _ => false
   };
@@ -491,7 +535,14 @@ let makeFnJSXServer =
         MakeProps.get(["key"] @ variableNames)
         |> List.map(domPropParam(~loc, ~isOptional=true));
       [
-        (Nolabel, None, Builder.ppat_any(~loc), "_", Location.none, None),
+        (
+          Asttypes.Nolabel,
+          None,
+          Builder.ppat_any(~loc),
+          "_",
+          Ppxlib.Location.none,
+          None,
+        ),
         makeParam(
           ~loc,
           ~isOptional=true,
@@ -534,7 +585,7 @@ let makeFnJSX3 = (~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames) =>
       Helper.Pat.mk(~loc, Ppat_var(withLoc("props", ~loc))),
       Helper.Typ.constr(
         ~loc,
-        withLoc(Lident("makeProps"), ~loc),
+        withLoc(lident("makeProps"), ~loc),
         makePropTypes,
       ),
     ),
@@ -555,13 +606,171 @@ let makeFnJSX4 = (~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames) =>
       Helper.Pat.mk(~loc, Ppat_var(withLoc("props", ~loc))),
       Helper.Typ.constr(
         ~loc,
-        withLoc(Lident("props"), ~loc),
+        withLoc(lident("props"), ~loc),
         makePropTypes,
       ),
     ),
     makeBody(~loc, ~htmlTag, ~className, ~variables=variableNames),
   );
 };
+
+/* styled2 server: include style field in dom props */
+let serverCreateElementStyled2 = (~loc, ~htmlTag, ~variableNames) => {
+  let finalHtmlTag =
+    switch%expr ([%e Helper.Exp.ident(~loc, withLoc(~loc, lident("as_")))]) {
+    | Some(v) => v
+    | None => [%e Builder.estring(~loc, htmlTag)]
+    };
+
+  let params =
+    MakeProps.get(["key", "ref", "className"] @ variableNames)
+    |> List.map(value =>
+         switch (value) {
+         | MakeProps.Event({name, _}) => name
+         | MakeProps.Attribute({name, _}) => name
+         }
+       )
+    |> List.map(label =>
+         (
+           Asttypes.Optional(label),
+           Helper.Exp.ident(~loc, withLoc(~loc, lident(label))),
+         )
+       );
+
+  let domProps =
+    Helper.Exp.apply(
+      [%expr ReactDOM.domProps],
+      [
+        (Asttypes.Labelled("className"), [%expr className]),
+        (Asttypes.Labelled("style"), [%expr snd(styles)]),
+        (Asttypes.Optional("ref"), [%expr innerRef]),
+      ]
+      @ params
+      @ [(Nolabel, [%expr ()])],
+    );
+
+  [%expr React.createElement([%e finalHtmlTag], [%e domProps], [children])];
+};
+
+let makeFnJSXServerStyled2 = (~loc, ~htmlTag, ~styleParams, ~variableNames) => {
+  fnWithLabeledArgs(
+    {
+      let reactDomParams =
+        MakeProps.get(["key"] @ variableNames)
+        |> List.map(domPropParam(~loc, ~isOptional=true));
+      [
+        (
+          Asttypes.Nolabel,
+          None,
+          Builder.ppat_any(~loc),
+          "_",
+          Ppxlib.Location.none,
+          None,
+        ),
+        makeParam(
+          ~loc,
+          ~isOptional=true,
+          ~discard=true,
+          ~coreType=[%type: string],
+          "key",
+        ),
+        makeParam(~loc, ~isOptional=true, "innerRef"),
+        makeParam(~loc, ~isOptional=true, "as_"),
+        makeParam(
+          ~loc,
+          ~isOptional=true,
+          ~default=[%expr React.null],
+          "children",
+        ),
+      ]
+      @ reactDomParams
+      @ styleParams;
+    },
+    serverCreateElementStyled2(~loc, ~htmlTag, ~variableNames),
+  );
+};
+
+/* styled2: className uses fst(styles) and style is merged via stylesObjectWithStyle */
+let makeFnJSX3Styled2 =
+    (~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames) => {
+  let className = [%expr [%e className] ++ getOrEmpty(classNameGet(props))];
+
+  Helper.Exp.fun_(
+    ~loc,
+    Nolabel,
+    None,
+    /* props: makeProps */
+    Helper.Pat.constraint_(
+      ~loc,
+      Helper.Pat.mk(~loc, Ppat_var(withLoc("props", ~loc))),
+      Helper.Typ.constr(
+        ~loc,
+        withLoc(lident("makeProps"), ~loc),
+        makePropTypes,
+      ),
+    ),
+    makeBodyStyled2(~loc, ~htmlTag, ~className, ~variables=variableNames),
+  );
+};
+
+let makeFnJSX4Styled2 =
+    (~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames) => {
+  let className = [%expr [%e className] ++ getOrEmpty(props.className)];
+  Helper.Exp.fun_(
+    ~loc,
+    Nolabel,
+    None,
+    /* props: props */
+    Helper.Pat.constraint_(
+      ~loc,
+      Helper.Pat.mk(~loc, Ppat_var(withLoc("props", ~loc))),
+      Helper.Typ.constr(
+        ~loc,
+        withLoc(lident("props"), ~loc),
+        makePropTypes,
+      ),
+    ),
+    makeBodyStyled2(~loc, ~htmlTag, ~className, ~variables=variableNames),
+  );
+};
+
+let componentStyled2 =
+    (~loc, ~htmlTag, ~className, ~makePropTypes, ~labeledArguments) => {
+  let variableNames =
+    List.map(((arg, _, _, _, _, _)) => getLabel(arg), labeledArguments);
+
+  let makeFn =
+    switch (File.get()) {
+    | Some(ReScript) when Settings.Get.jsxVersion() === 4 =>
+      makeFnJSX4Styled2(
+        ~loc,
+        ~htmlTag,
+        ~className,
+        ~makePropTypes,
+        ~variableNames,
+      )
+    | Some(Reason)
+    | Some(OCaml) when Settings.Get.native() =>
+      makeFnJSXServerStyled2(
+        ~loc,
+        ~htmlTag,
+        ~styleParams=makeStyleParams(~labeledArguments),
+        ~variableNames,
+      )
+    | _ =>
+      makeFnJSX3Styled2(
+        ~loc,
+        ~htmlTag,
+        ~className,
+        ~makePropTypes,
+        ~variableNames,
+      )
+    };
+
+  [%stri let make = [%e makeFn]];
+};
+
+/* moved styled2 static codegen below after makeProps/styleVariableName definitions */
 
 /* [@react.component] + makeFn */
 let component =
@@ -590,7 +799,7 @@ let component =
 };
 
 let optionalType = (~loc, type_) => {
-  Helper.Typ.constr(~loc, withLoc(Lident("option"), ~loc), [type_]);
+  Helper.Typ.constr(~loc, withLoc(lident("option"), ~loc), [type_]);
 };
 
 /* color: string */
@@ -636,7 +845,7 @@ let domRefLabel = (~loc, ~isOptional) => {
   let reactDOM_domRef =
     Helper.Typ.constr(
       ~loc,
-      withLoc(Ldot(Lident("ReactDOM"), "domRef"), ~loc),
+      withLoc(ldot(lident("ReactDOM"), "domRef"), ~loc),
       [],
     );
   let type_ =
@@ -651,7 +860,7 @@ let childrenLabel = (~loc, ~isOptional) => {
   let react_element =
     Helper.Typ.constr(
       ~loc,
-      withLoc(Ldot(Lident("React"), "element"), ~loc),
+      withLoc(ldot(lident("React"), "element"), ~loc),
       [],
     );
   isOptional
@@ -676,7 +885,7 @@ let recordEventLabel = (~loc, ~isOptional, name, kind) => {
       ~loc,
       Nolabel,
       Helper.Typ.constr(~loc, withLoc(kind, ~loc), []),
-      Helper.Typ.constr(~loc, withLoc(Lident("unit"), ~loc), []),
+      Helper.Typ.constr(~loc, withLoc(lident("unit"), ~loc), []),
     );
   let type_ = isOptional ? optionalType(~loc, arrow_type) : arrow_type;
   /* Attribute optional is always present */
@@ -709,7 +918,7 @@ let asLabel = (~loc, ~isOptional) => {
 };
 
 let makePropsWithParams = (~loc, params, dynamicProps) => {
-  let dynamicPropNames = dynamicProps |> List.map(d => d.pld_name.txt);
+  let dynamicPropNames = dynamicProps |> List.map(d => {d.pld_name.txt});
 
   let makeProps =
     MakeProps.get(dynamicPropNames)
@@ -1022,34 +1231,68 @@ let staticComponent = (~loc, ~htmlTag, styles) => {
   );
 };
 
+/* styled2 static codegen (after deps are defined) */
+let staticComponentCodegenStepsStyled2 = (~loc, ~htmlTag, stylesExpr) => {
+  (
+    Settings.Get.native()
+      ? [defineGetOrEmptyFn(~loc)]
+      : [
+        makeProps(~loc, None),
+        bindingCreateVariadicElement(~loc),
+        defineGetOrEmptyFn(~loc),
+        defineDeletePropFn(~loc),
+        defineAssign2(~loc),
+      ]
+  )
+  @ [
+    styles(~loc, ~name=styleVariableName, ~expr=stylesExpr),
+    componentStyled2(
+      ~loc,
+      ~htmlTag,
+      ~className=[%expr fst(styles)],
+      ~makePropTypes=[],
+      ~labeledArguments=[],
+    ),
+  ];
+};
+
+let staticComponentStyled2 = (~loc, ~htmlTag, styles) => {
+  Builder.pmod_structure(
+    ~loc,
+    staticComponentCodegenStepsStyled2(~loc, ~htmlTag, styles),
+  );
+};
+
 let dynamicStyles = (~loc, ~moduleName, ~functionExpr, ~labeledArguments) => {
   let styles =
     switch (functionExpr.pexp_desc) {
     /* styled.div () => "string" */
     | Pexp_constant(Pconst_string(str, loc, delimiter)) =>
-      let loc =
-        Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-          loc,
-          delimiter,
-        );
-
-      switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, str)) {
+      switch (Styled_ppx_css_parser.Driver.parse_declaration_list(str)) {
       | Ok(declarations) =>
         declarations
-        |> Css_to_runtime.render_declarations(~loc)
-        |> Css_to_runtime.addLabel(~loc, moduleName)
+        |> Css_runtime.render_declarations(~loc)
+        |> Css_runtime.add_label(~loc, moduleName)
         |> Builder.pexp_array(~loc)
-        |> Css_to_runtime.render_style_call(~loc)
-      | Error((loc, msg)) => Error.expr(~loc, msg)
-      };
+        |> Css_runtime.render_style_call(~loc)
+      | Error((loc_start, loc_end, msg)) =>
+        let loc =
+          Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
+            ~loc,
+            ~delimiter,
+            loc_start,
+            loc_end,
+          );
+        Error.expr(~loc, msg);
+      }
 
     /* styled.div () => "[||]" */
     | Pexp_array(arr) =>
       arr
       |> List.rev
-      |> Css_to_runtime.addLabel(~loc, moduleName)
+      |> Css_runtime.add_label(~loc, moduleName)
       |> Builder.pexp_array(~loc)
-      |> Css_to_runtime.render_style_call(~loc)
+      |> Css_runtime.render_style_call(~loc)
 
     /* styled.div () => {
          ...
@@ -1060,7 +1303,7 @@ let dynamicStyles = (~loc, ~moduleName, ~functionExpr, ~labeledArguments) => {
       /* Generate a new sequence where the last expression is
          wrapped in render_style_call and render the other expressions. */
       let styles =
-        sequence |> getLastSequence |> Css_to_runtime.render_style_call(~loc);
+        sequence |> getLastSequence |> Css_runtime.render_style_call(~loc);
       Builder.pexp_sequence(~loc, expr, styles);
 
     /* styled.div () => {
@@ -1071,15 +1314,12 @@ let dynamicStyles = (~loc, ~moduleName, ~functionExpr, ~labeledArguments) => {
       /* Generate a new `let in` where the last expression is
          wrapped in render_style_call */
       let styles =
-        expression
-        |> getLastExpression
-        |> Css_to_runtime.render_style_call(~loc);
+        expression |> getLastExpression |> Css_runtime.render_style_call(~loc);
       Builder.pexp_let(~loc, Nonrecursive, value_binding, styles);
 
     /* styled.div () => { styles } */
     | Pexp_ident(ident) =>
-      Builder.pexp_ident(~loc, ident)
-      |> Css_to_runtime.render_style_call(~loc)
+      Builder.pexp_ident(~loc, ident) |> Css_runtime.render_style_call(~loc)
     /* TODO: With this default case we support all expressions here.
        Users might find this confusing, we could give some warnings before the type-checker does. */
     | _ => functionExpr
@@ -1103,7 +1343,7 @@ let stylesCall = (~loc, ~labeledArguments) => {
           Settings.Get.native()
             ? Builder.pexp_ident(
                 ~loc,
-                withLoc(Lident(getLabel(argumentName)), ~loc),
+                withLoc(lident(getLabel(argumentName)), ~loc),
               )
             : propItem(~loc, getLabel(argumentName));
         (argumentName, value);
@@ -1117,7 +1357,7 @@ let stylesCall = (~loc, ~labeledArguments) => {
     Builder.pexp_ident(
       ~loc,
       {
-        txt: Lident(styleVariableName),
+        txt: lident(styleVariableName),
         loc,
       },
     ),

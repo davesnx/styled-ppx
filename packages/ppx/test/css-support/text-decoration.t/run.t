@@ -13,6 +13,12 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
+  File "input.re", lines 86-87, characters 12-23:
+  86 | xt-decoration-skip-inset: none|}];
+                   ^^^^^^^^^^^
+  Error: This expression has type string but an expression was expected of type
+           Css_types.TextShadow.t
+  [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
@@ -85,16 +91,46 @@ If this test fail means that the module is not in sync with the ppx
   CSS.textEmphasisPositions(`under, `left);
   CSS.textEmphasisPositions(`under, `left);
   CSS.textEmphasisPositions(`under, `right);
+  
   CSS.textShadow(`none);
   
   CSS.textShadow(
-    CSS.Shadow.text(
+    CSS.TextShadow.text(~x=`pxFloat(1.), ~y=`pxFloat(1.), `currentColor),
+  );
+  
+  CSS.textShadow(CSS.TextShadow.text(~x=`zero, ~y=`zero, CSS.black));
+  
+  CSS.textShadow(
+    CSS.TextShadow.text(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(2.),
+      ~blur=`pxFloat(3.),
+      `currentColor,
+    ),
+  );
+  
+  CSS.textShadow(
+    CSS.TextShadow.text(
       ~x=`pxFloat(1.),
       ~y=`pxFloat(2.),
       ~blur=`pxFloat(3.),
       CSS.black,
     ),
   );
+  
+  CSS.textShadows([|
+    CSS.TextShadow.text(~x=`pxFloat(1.), ~y=`pxFloat(1.), `currentColor),
+    CSS.TextShadow.text(~x=`pxFloat(2.), ~y=`pxFloat(2.), CSS.red),
+  |]);
+  CSS.textShadows([|
+    CSS.TextShadow.text(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(2.),
+      ~blur=`pxFloat(3.),
+      CSS.black,
+    ),
+    CSS.TextShadow.text(~x=`zero, ~y=`zero, ~blur=`pxFloat(5.), CSS.white),
+  |]);
   
   CSS.unsafe({js|textDecorationSkip|js}, {js|none|js});
   CSS.unsafe({js|textDecorationSkip|js}, {js|objects|js});
