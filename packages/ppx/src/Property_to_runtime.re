@@ -6018,7 +6018,7 @@ let orphans =
   monomorphic(
     Parser.property_orphans,
     (~loc) => [%expr CSS.orphans],
-    (~loc, n) => [%expr `num([%e render_integer(~loc, n)])],
+    render_integer,
   );
 
 let overflow_anchor =

@@ -13,10 +13,6 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", lines 64-65, characters 12-19:
-  Error: This expression has type [> `num of int ]
-         but an expression was expected of type int
-  [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
@@ -51,8 +47,8 @@ If this test fail means that the module is not in sync with the ppx
   CSS.breakInside(`avoidRegion);
   CSS.boxDecorationBreak(`slice);
   CSS.boxDecorationBreak(`clone);
-  CSS.orphans(`num(1));
-  CSS.orphans(`num(2));
+  CSS.orphans(1);
+  CSS.orphans(2);
   
   CSS.widows(1);
   CSS.widows(2);

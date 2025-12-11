@@ -13,11 +13,4 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 644, characters 6-28:
-  644 | [%cx2 {|order: $(orderVal)|}];
-              ^^^^^^^^^^^^^^^^^^^^^^
-  Error: This expression has type [> `num of int ]
-         but an expression was expected of type int
-  [1]
-
 

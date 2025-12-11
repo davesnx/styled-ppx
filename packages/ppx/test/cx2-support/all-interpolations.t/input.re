@@ -639,8 +639,8 @@ let flexWrapVal = `wrap;
 /* Static */
 [%cx2 {|order: 0|}];
 [%cx2 {|order: 1|}];
-/* Interpolated */
-let orderVal = `num(2);
+/* Interpolated - order expects int, not `num(int) */
+let orderVal = 2;
 [%cx2 {|order: $(orderVal)|}];
 
 /* =============================================================================

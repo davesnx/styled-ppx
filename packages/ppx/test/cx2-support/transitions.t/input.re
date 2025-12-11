@@ -18,7 +18,9 @@
 [%cx2 {|transition-timing-function: step-end|}];
 [%cx2 {|transition-timing-function: steps(3, start)|}];
 [%cx2 {|transition-timing-function: steps(5, end)|}];
-[%cx2 {|transition-timing-function: ease, step-start, cubic-bezier(0.1, 0.7, 1, 0.1)|}];
+[%cx2
+  {|transition-timing-function: ease, step-start, cubic-bezier(0.1, 0.7, 1, 0.1)|}
+];
 [%cx2 {|transition-delay: 1s|}];
 [%cx2 {|transition-delay: -1s|}];
 [%cx2 {|transition-delay: 2s, 4ms|}];
