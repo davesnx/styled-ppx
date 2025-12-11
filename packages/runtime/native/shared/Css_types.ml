@@ -203,6 +203,7 @@ module Length = struct
     | `calc of calc_value
     | `min of t array
     | `max of t array
+    | Var.t
     ]
 
   let ch (x : float) = `ch x
@@ -256,6 +257,7 @@ module Length = struct
     | #Percentage.t as p -> Percentage.toString p
     | `calc calc -> calc_value_to_string calc
     | (`min _ | `max _) as x -> minmax_to_string x
+    | #Var.t as v -> Var.toString v
 
   and calc_value_to_string x =
     match x with
@@ -1396,6 +1398,7 @@ module Color = struct
     | `hex of string
     | `transparent
     | `currentColor
+    | Var.t
     ]
 
   let rgb (r : int) (g : int) (b : int) = `rgb (r, g, b)
@@ -1441,6 +1444,7 @@ module Color = struct
       ^ {js|, |js}
       ^ string_of_color_with_percentage y
       ^ {js|)|js}
+    | #Var.t as v -> Var.toString v
 
   and string_of_color_with_percentage (x : t * Percentage.t option) =
     match x with
@@ -2961,7 +2965,7 @@ end
 
 (* Shadow module handles the actual shadow value rendering *)
 module Shadow = struct
-  type t = string
+  type t
 
   let box ?(x = `zero) ?(y = `zero) ?(blur = `zero) ?(spread = `zero)
     ?(inset = false) (color : Color.t) : t =
@@ -6786,6 +6790,22 @@ module WebkitBoxReflect = struct
     | #Length.t as l -> Length.toString l
 end
 
+module MsOverflowStyle = struct
+  type t =
+    [ Auto.t
+    | None.t
+    | `scrollbar
+    | `msAutohidingScrollbar
+    ]
+
+  let toString x =
+    match x with
+    | #Auto.t -> Auto.toString
+    | #None.t -> None.toString
+    | `scrollbar -> {js|scrollbar|js}
+    | `msAutohidingScrollbar -> {js|-ms-autohiding-scrollbar|js}
+end
+
 (* Font synthesis shorthand *)
 module FontSynthesis = struct
   type t =
@@ -10376,4 +10396,3 @@ module Y = struct
 
   let toString = function `Y s -> s
 end
-(* Value type wrapper modules for interpolation - 0 modules *)

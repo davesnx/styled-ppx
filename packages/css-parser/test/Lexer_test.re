@@ -116,6 +116,22 @@ let success_tests =
       {|$(Module.variable')|},
       [INTERPOLATION(["Module", "variable'"])],
     ),
+    /* Test interpolation with spaces - Issues #2 and #3 */
+    (
+      __POS__,
+      {|$( Module.variable )|},
+      [INTERPOLATION(["Module", "variable"])],
+    ),
+    (
+      __POS__,
+      {|$(  maxWidth  )|},
+      [INTERPOLATION(["maxWidth"])],
+    ),
+    (
+      __POS__,
+      {|$( Color.Border.lineAlpha )|},
+      [INTERPOLATION(["Color", "Border", "lineAlpha"])],
+    ),
     (__POS__, {|-moz|}, [IDENT("-moz")]),
     (__POS__, {|--color-main|}, [IDENT("--color-main")]),
     // Test IMPORTANT token
@@ -365,6 +381,19 @@ let test_with_location =
       {|$(Module.variable')|},
       [INTERPOLATION(["Module", "variable'"])],
       19,
+    ),
+    /* Test interpolation with spaces - Issues #2 and #3 */
+    (
+      __POS__,
+      {|$( Module.variable )|},
+      [INTERPOLATION(["Module", "variable"])],
+      20,
+    ),
+    (
+      __POS__,
+      {|$(  maxWidth  )|},
+      [INTERPOLATION(["maxWidth"])],
+      15,
     ),
     (__POS__, {|--color-main|}, [IDENT("--color-main")], 12),
     (__POS__, {|>=|}, [DELIM(">=")], 2),

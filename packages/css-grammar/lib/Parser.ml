@@ -2243,6 +2243,13 @@ and property__webkit_user_select =
   | `All
   ]
 
+and property__ms_overflow_style =
+  [ `Auto
+  | `None
+  | `Scrollbar
+  | `Ms_autohiding_scrollbar
+  ]
+
 and property_align_content =
   [ `Normal
   | `Baseline_position of baseline_position
@@ -7211,6 +7218,9 @@ let property__webkit_user_modify_runtime_module_path = Some "Css_types.WebkitUse
 let property__webkit_user_select : property__webkit_user_select Rule.rule = [%spec "'auto' | 'none' | 'text' | 'all'"]
 let property__webkit_user_select_runtime_module_path = Some "Css_types.WebkitUserSelect"
 
+let property__ms_overflow_style : property__ms_overflow_style Rule.rule = [%spec "'auto' | 'none' | 'scrollbar' | '-ms-autohiding-scrollbar'"]
+let property__ms_overflow_style_runtime_module_path = Some "Css_types.MsOverflowStyle"
+
 let property_align_content : property_align_content Rule.rule = [%spec "'normal' | <baseline-position> | <content-distribution> | [ \
    <overflow-position> ]? <content-position>"]
 let property_align_content_runtime_module_path = Some "Css_types.AlignContent"
@@ -9896,6 +9906,8 @@ let registry : (kind * packed_rule) list =
     Property "-webkit-user-drag", pack_rule property__webkit_user_drag ?runtime_module_path:property__webkit_user_drag_runtime_module_path ();
     Property "-webkit-user-modify", pack_rule property__webkit_user_modify ?runtime_module_path:property__webkit_user_modify_runtime_module_path ();
     Property "-webkit-user-select", pack_rule property__webkit_user_select ?runtime_module_path:property__webkit_user_select_runtime_module_path ();
+    (* Vendor-prefixed properties - Microsoft *)
+    Property "-ms-overflow-style", pack_rule property__ms_overflow_style ?runtime_module_path:property__ms_overflow_style_runtime_module_path ();
     Property "accent-color", pack_rule property_accent_color ?runtime_module_path:property_accent_color_runtime_module_path ();
     Property "alignment-baseline", pack_rule property_alignment_baseline ?runtime_module_path:property_alignment_baseline_runtime_module_path ();
     Property "anchor-name", pack_rule property_anchor_name ?runtime_module_path:property_anchor_name_runtime_module_path ();

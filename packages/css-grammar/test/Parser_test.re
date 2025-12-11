@@ -4,7 +4,7 @@ module Parser = Css_grammar.Parser;
 let test_flex_grow_with_interpolation = () => {
   switch (Parser.find_property("flex-grow")) {
   | None => Alcotest.fail("flex-grow property should be registered")
-  | Some(Parser.PackRule({ validate, _ })) =>
+  | Some(Parser.Pack_rule({ validate, _ })) =>
     switch (validate("$(myVar)")) {
     | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
     | Ok () => ()
@@ -16,7 +16,7 @@ let test_flex_grow_with_interpolation = () => {
 let test_flex_grow_without_interpolation = () => {
   switch (Parser.find_property("flex-grow")) {
   | None => Alcotest.fail("flex-grow property should be registered")
-  | Some(Parser.PackRule({ validate, _ })) =>
+  | Some(Parser.Pack_rule({ validate, _ })) =>
     switch (validate("1.5")) {
     | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
     | Ok () => ()
@@ -28,7 +28,7 @@ let test_flex_grow_without_interpolation = () => {
 let test_overflow_with_interpolation = () => {
   switch (Parser.find_property("overflow")) {
   | None => Alcotest.fail("overflow property should be registered")
-  | Some(Parser.PackRule({ validate, _ })) =>
+  | Some(Parser.Pack_rule({ validate, _ })) =>
     switch (validate("$(x)")) {
     | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
     | Ok () => ()
@@ -40,7 +40,7 @@ let test_overflow_with_interpolation = () => {
 let test_flex_basis_with_interpolation = () => {
   switch (Parser.find_property("flex-basis")) {
   | None => Alcotest.fail("flex-basis property should be registered")
-  | Some(Parser.PackRule({ validate, _ })) =>
+  | Some(Parser.Pack_rule({ validate, _ })) =>
     switch (validate("$(basis)")) {
     | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
     | Ok () => ()
@@ -58,7 +58,7 @@ let test_unregistered_property = () => {
 let test_display_keywords = () => {
   switch (Parser.find_property("display")) {
   | None => Alcotest.fail("display property should be registered")
-  | Some(Parser.PackRule({ validate, _ })) =>
+  | Some(Parser.Pack_rule({ validate, _ })) =>
     /* Test each keyword */
     let keywords = ["block", "inline", "flex", "grid", "none", "contents"];
     List.iter(
@@ -85,7 +85,7 @@ let test_display_keywords = () => {
 let test_flex_direction = () => {
   switch (Parser.find_property("flex-direction")) {
   | None => Alcotest.fail("flex-direction property should be registered")
-  | Some(Parser.PackRule({ validate, _ })) =>
+  | Some(Parser.Pack_rule({ validate, _ })) =>
     /* Test keywords */
     let keywords = ["row", "row-reverse", "column", "column-reverse"];
     List.iter(
@@ -104,7 +104,7 @@ let test_flex_direction = () => {
 let test_align_items = () => {
   switch (Parser.find_property("align-items")) {
   | None => Alcotest.fail("align-items property should be registered")
-  | Some(Parser.PackRule({ validate, _ })) =>
+  | Some(Parser.Pack_rule({ validate, _ })) =>
     /* Test keywords */
     let keywords = [
       "center",
@@ -130,7 +130,7 @@ let test_align_items = () => {
 let test_justify_content = () => {
   switch (Parser.find_property("justify-content")) {
   | None => Alcotest.fail("justify-content property should be registered")
-  | Some(Parser.PackRule({ validate, _ })) =>
+  | Some(Parser.Pack_rule({ validate, _ })) =>
     /* Test keywords */
     let keywords = [
       "flex-start",
@@ -155,7 +155,7 @@ let test_justify_content = () => {
 let test_box_sizing = () => {
   switch (Parser.find_property("box-sizing")) {
   | None => Alcotest.fail("box-sizing property should be registered")
-  | Some(Parser.PackRule({ validate, _ })) =>
+  | Some(Parser.Pack_rule({ validate, _ })) =>
     switch (validate("content-box")) {
     | Error(msg) =>
       Alcotest.fail("parsing content-box should succeed: " ++ msg)
@@ -172,7 +172,7 @@ let test_box_sizing = () => {
 let test_white_space = () => {
   switch (Parser.find_property("white-space")) {
   | None => Alcotest.fail("white-space property should be registered")
-  | Some(Parser.PackRule({ validate, _ })) =>
+  | Some(Parser.Pack_rule({ validate, _ })) =>
     let keywords = [
       "normal",
       "pre",
@@ -197,7 +197,7 @@ let test_white_space = () => {
 let test_width_with_interpolation = () => {
   switch (Parser.find_property("width")) {
   | None => Alcotest.fail("width property should be registered")
-  | Some(Parser.PackRule({ validate, _ })) =>
+  | Some(Parser.Pack_rule({ validate, _ })) =>
     switch (validate("$(w)")) {
     | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
     | Ok () => ()
@@ -208,7 +208,7 @@ let test_width_with_interpolation = () => {
 let test_color_with_interpolation = () => {
   switch (Parser.find_property("color")) {
   | None => Alcotest.fail("color property should be registered")
-  | Some(Parser.PackRule({ validate, _ })) =>
+  | Some(Parser.Pack_rule({ validate, _ })) =>
     switch (validate("$(c)")) {
     | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
     | Ok () => ()

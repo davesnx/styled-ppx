@@ -74,7 +74,7 @@ let variable_ident_char = [%sedlex.regexp?
 let variable_name = [%sedlex.regexp? Star(variable_ident_char)];
 let module_variable = [%sedlex.regexp? (variable_name, '.')];
 let variable = [%sedlex.regexp?
-  ('$', '(', Opt(Star(module_variable)), variable_name, ')')
+  ('$', '(', whitespaces, Opt(Star(module_variable)), variable_name, whitespaces, ')')
 ];
 
 let string_quote = [%sedlex.regexp?
@@ -819,7 +819,7 @@ let consume = lexbuf => {
   | variable =>
     Ok(
       Parser.INTERPOLATION(
-        lexeme(~skip=2, ~drop=1, lexbuf) |> String.split_on_char('.'),
+        lexeme(~skip=2, ~drop=1, lexbuf) |> String.trim |> String.split_on_char('.'),
       ),
     )
   | whitespace => Ok(consume_whitespace(lexbuf))

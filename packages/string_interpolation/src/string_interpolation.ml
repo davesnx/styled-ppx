@@ -25,7 +25,8 @@ module Parser = struct
 
   let ident = [%sedlex.regexp? (letter | '_'), Star (letter | '0' .. '9' | '_')]
   let variable = [%sedlex.regexp? Star (ident, '.'), case_ident]
-  let interpolation = [%sedlex.regexp? "$(", variable, ")"]
+  let whitespaces = [%sedlex.regexp? Star (' ' | '\t')]
+  let interpolation = [%sedlex.regexp? "$(", whitespaces, variable, whitespaces, ")"]
   let rest = [%sedlex.regexp? Plus (Compl '$')]
 
   (** Parse string, producing a list of tokens from this module. *)
@@ -41,7 +42,7 @@ module Parser = struct
         let str = sub_lexeme lexbuf in
         parse (String str :: acc) lexbuf
       | interpolation ->
-        let variable = sub_lexeme ~skip:2 ~drop:1 lexbuf in
+        let variable = sub_lexeme ~skip:2 ~drop:1 lexbuf |> String.trim in
         parse (Variable variable :: acc) lexbuf
       | eof -> acc
       | _ ->
