@@ -3,8 +3,11 @@
 (library
  (name styled_ppx_runtime_native)
  (public_name styled-ppx.native)
+ (flags
+  (:standard -nopervasives -open Kloth))
  (libraries
   styled-ppx.murmur2
+  styled-ppx.kloth-native
   server-reason-react.react
   server-reason-react.reactDom)
  (wrapped false))

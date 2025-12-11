@@ -1,0 +1,13 @@
+(include_subdirs no)
+
+(library
+ (name kloth)
+ (modes melange)
+ (wrapped false)
+ (public_name styled-ppx.kloth-melange)
+ (preprocess
+  (pps melange.ppx)))
+
+(copy_files#
+ (only_sources)
+ (files ./../Kloth.mli))

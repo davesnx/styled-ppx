@@ -860,31 +860,31 @@ let boxShadows (x : Shadow.t array) =
   Rule.declaration ({js|boxShadow|js}, Shadow.many x)
 
 let border px style color =
-  Rule.declaration ({js|border|js}, Border.toString px style color)
+  Rule.declaration ({js|border|js}, Border.toString (px, style, color))
 
 let borderStyle x =
   Rule.declaration ({js|borderStyle|js}, BorderStyle.toString x)
 
 let borderLeft px style color =
-  Rule.declaration ({js|borderLeft|js}, Border.toString px style color)
+  Rule.declaration ({js|borderLeft|js}, Border.toString (px, style, color))
 
 let borderLeftStyle x =
   Rule.declaration ({js|borderLeftStyle|js}, BorderStyle.toString x)
 
 let borderRight px style color =
-  Rule.declaration ({js|borderRight|js}, Border.toString px style color)
+  Rule.declaration ({js|borderRight|js}, Border.toString (px, style, color))
 
 let borderRightStyle x =
   Rule.declaration ({js|borderRightStyle|js}, BorderStyle.toString x)
 
 let borderTop px style color =
-  Rule.declaration ({js|borderTop|js}, Border.toString px style color)
+  Rule.declaration ({js|borderTop|js}, Border.toString (px, style, color))
 
 let borderTopStyle x =
   Rule.declaration ({js|borderTopStyle|js}, BorderStyle.toString x)
 
 let borderBottom px style color =
-  Rule.declaration ({js|borderBottom|js}, Border.toString px style color)
+  Rule.declaration ({js|borderBottom|js}, Border.toString (px, style, color))
 
 let borderBottomStyle x =
   Rule.declaration ({js|borderBottomStyle|js}, BorderStyle.toString x)

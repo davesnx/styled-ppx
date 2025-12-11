@@ -6,35 +6,6 @@ include Rule
 (* The reason to have a module called Css_types and not Types directly, is because we use a unwrapped library, so all modules are exposed. "Types" would collide with a lot of modules in user's application *)
 module Types = Css_types
 
-module Array = struct
-  include Kloth.Array
-  include Stdlib.ArrayLabels
-
-  type 'a t = 'a array
-
-  let ( @ ) = Stdlib.Array.append
-  let is_empty a = Array.length a == 0
-  let is_not_empty a = Array.length a != 0
-  let join ~sep a = String.concat sep (Array.to_list a)
-
-  let partition_map ~f t =
-    let (both : _ Either.t t) = map t ~f in
-    let firsts =
-      filter_map ~f:(function Either.Left x -> Some x | Right _ -> None) both
-    in
-    let seconds =
-      filter_map ~f:(function Either.Left _ -> None | Right x -> Some x) both
-    in
-    firsts, seconds
-
-  let partition ~f t =
-    partition_map t ~f:(fun x ->
-      match f x with true -> Left x | false -> Right x)
-    [@nontail]
-
-  let flatten a = Array.concat (Array.to_list a)
-end
-
 let approximate_chars_in_rules = 50
 
 let render_declaration ~buffer (property, value) =
@@ -94,8 +65,7 @@ let replace_ampersand ~by str =
   replace_ampersand' str by
 
 let pp_selectors_to_string selectors =
-  Array.map ~f:(fun s -> Printf.sprintf "\"%s\"" s) selectors
-  |> Array.join ~sep:", "
+  Array.map_and_join ~sep:", " ~f:(fun s -> Printf.sprintf "\"%s\"" s) selectors
 
 let rec rule_to_debug nesting accumulator rule =
   let next_rule =
@@ -150,7 +120,7 @@ let add_ampersand selector =
 
 let remove_media_from_selector selector =
   (* replace "@media" from "@media (min-width: 768px)" *)
-  chop_prefix ~pre:"@media " selector |> Option.value ~default:selector
+  chop_prefix ~pre:"@media " selector |> Kloth.Option.get_with_default selector
 
 let join_media left right = left ^ " and " ^ remove_media_from_selector right
 
@@ -489,7 +459,7 @@ let get_stylesheet () =
   let initial_size = List.length stylesheet * approximate_chars_in_rules in
   let buffer = Buffer.create initial_size in
   List.iteri
-    (fun i (_, rule) ->
+    ~f:(fun i (_, rule) ->
       if i > 0 then Buffer.add_char buffer ' ';
       match rule with
       | Globals rule ->
@@ -507,7 +477,7 @@ let get_string_style_hashes () =
   let initial_size = List.length stylesheet * approximate_chars_in_rules in
   let buffer = Buffer.create initial_size in
   stylesheet
-  |> List.iteri (fun i (hash, _) ->
+  |> List.iteri ~f:(fun i (hash, _) ->
     if i > 0 then Buffer.add_char buffer ' ';
     Buffer.add_string buffer (String.trim hash));
   Buffer.contents buffer

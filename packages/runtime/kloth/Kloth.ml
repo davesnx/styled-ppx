@@ -1,3 +1,14 @@
+module List = struct
+  let fold_left = Stdlib.List.fold_left
+  let length = Stdlib.List.length
+  let map = Stdlib.List.map
+  let append = Stdlib.List.append
+  let rev = Stdlib.List.rev
+  let iteri = Stdlib.ListLabels.iteri
+end
+
+module Set = Stdlib.Set
+
 module Array = struct
   (* Taken from https://github.com/janestreet/base *)
 
@@ -46,12 +57,52 @@ module Array = struct
       else run (i + 1) (acc ^ f strings.(i) ^ sep)
     in
     run 0 ""
+
+  let append = Stdlib.ArrayLabels.append
+  let concat = Stdlib.ArrayLabels.concat
+  let to_list = Stdlib.ArrayLabels.to_list
+  let iter = Stdlib.ArrayLabels.iter
+  let iteri = Stdlib.ArrayLabels.iteri
+  let fold_left = Stdlib.ArrayLabels.fold_left
+  let fold_right = Stdlib.ArrayLabels.fold_right
+  let is_empty a = Stdlib.Array.length a == 0
+  let is_not_empty a = Stdlib.Array.length a != 0
+
+  let partition_map ~f t =
+    let (both : _ Either.t array) = map t ~f in
+    let firsts =
+      filter_map ~f:(function Either.Left x -> Some x | Right _ -> None) both
+    in
+    let seconds =
+      filter_map ~f:(function Either.Left _ -> None | Right x -> Some x) both
+    in
+    firsts, seconds
+
+  let partition ~f t =
+    partition_map t ~f:(fun x ->
+      match f x with true -> Left x | false -> Right x)
+    [@nontail]
+
+  let flatten a = concat (to_list a)
+  let exists = Stdlib.ArrayLabels.exists
+  let get = Stdlib.Array.get
+  let of_list = Stdlib.Array.of_list
+  let find_map = Stdlib.ArrayLabels.find_map
+  let ( @ ) = Stdlib.Array.append
 end
 
 module String = struct
+  type t = string
+
+  let make = Stdlib.String.make
   let get = Stdlib.String.get
   let trim = Stdlib.String.trim
   let length = Stdlib.String.length
+  let contact = Stdlib.String.concat
+  let contains = Stdlib.String.contains
+  let unsafe_get = Stdlib.String.unsafe_get
+  let sub = Stdlib.String.sub
+  let compare = Stdlib.String.compare
 
   let starts_with str ~prefix =
     let len_prefix = String.length prefix in
@@ -63,8 +114,13 @@ module String = struct
     compare_prefix 0
 end
 
+module Char = struct
+  let lowercase_ascii = Stdlib.Char.lowercase_ascii
+end
+
 module Int = struct
   let to_string v = Stdlib.string_of_int v
+  let add = Stdlib.Int.add
 end
 
 module Float = struct
@@ -90,4 +146,28 @@ end
 
 module Fun = struct
   let id = Fun.id
-end
+end [@platforn native]
+
+module Buffer = Stdlib.Buffer [@platforn native]
+module Printf = Stdlib.Printf
+
+let ( + ) = Stdlib.Int.add
+let ( - ) = Stdlib.Int.sub
+let ( * ) = Stdlib.Int.mul
+let ( ^ ) = Stdlib.String.cat
+let ( |> ) = Stdlib.( |> )
+let ( = ) = Stdlib.( = )
+let ( != ) = Stdlib.( != )
+let ( == ) = Stdlib.( == )
+let ( <> ) = Stdlib.( <> )
+let ( <= ) = Stdlib.( <= )
+let ( >= ) = Stdlib.( >= )
+let ( < ) = Stdlib.( < )
+let ( > ) = Stdlib.( > )
+let ( && ) = Stdlib.( && )
+let ( || ) = Stdlib.( || )
+let ( @@ ) = Stdlib.( @@ )
+let string_of_int = Stdlib.string_of_int
+let print_endline = Stdlib.print_endline
+let fst = Stdlib.fst
+let snd = Stdlib.snd

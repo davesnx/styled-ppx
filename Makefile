@@ -65,7 +65,7 @@ dev: ## Run the project in dev mode
 release-static: ## Build static release
 	$(DUNE) build --root . --ignore-promoted-rules --profile release-static --only-packages styled-ppx
 
-TEST_TARGETS := test-css-parser test-css-grammar test-css-grammar-snapshot test-ppx-native test-ppx-snapshot-reason test-css-support test-runtime test-murmur2 test-css-spec-parser test-string-interpolation
+TEST_TARGETS := test-css-parser test-css-grammar test-css-grammar-snapshot test-ppx-native test-ppx-snapshot-reason test-css-support test-cx2-support test-runtime test-murmur2 test-css-spec-parser test-string-interpolation
 # Disabled test-ppx-snapshot-rescript
 
 # Create targets with the format "test-{{target_name}}-{{ "watch" | "promote" }}"

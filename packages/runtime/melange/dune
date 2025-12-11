@@ -3,14 +3,12 @@
  (public_name styled-ppx.melange)
  (modes melange)
  (wrapped false)
- (libraries reason-react)
+ (flags
+  (:standard -nopervasives -open Kloth))
+ (libraries reason-react styled-ppx.kloth-melange)
  (preprocess
   (pps melange.ppx -alert -deprecated)))
 
 (copy_files#
  (mode fallback)
  (files ../native/shared/**[!.pp].ml))
-
-(copy_files#
- (only_sources)
- (files ./../native/Kloth.mli))

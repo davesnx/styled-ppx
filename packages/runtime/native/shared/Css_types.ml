@@ -2663,7 +2663,9 @@ module TableLayout = struct
 end
 
 module Border = struct
-  let toString px style color =
+  type t = LineWidth.t * BorderStyle.t * Color.t
+
+  let toString (px, style, color) =
     LineWidth.toString px
     ^ {js| |js}
     ^ BorderStyle.toString style
@@ -6902,10 +6904,7 @@ module Behavior = struct
   let toString x =
     match x with
     | `urls urls ->
-      urls
-      |> Array.to_list
-      |> List.map (fun u -> {js|url(|js} ^ u ^ {js|)|js})
-      |> String.concat {js| |js}
+      Array.map_and_join ~f:(fun u -> {js|url(|js} ^ u ^ {js|)|js}) ~sep:{js| |js} urls
 end
 
 module MasonryAutoFlow = struct
@@ -7163,11 +7162,7 @@ module Src = struct
 
   let toString x =
     match x with
-    | `urls sources ->
-      sources
-      |> Array.to_list
-      |> List.map FontFace.toString
-      |> String.concat {js|, |js}
+    | `urls sources -> Array.map_and_join ~f:FontFace.toString ~sep:{js|, |js} sources
 end
 
 (* Voice/Speech properties for audio rendering *)
@@ -7391,10 +7386,7 @@ module MozBorderColors = struct
   let toString x =
     match x with
     | `colors colors ->
-      colors
-      |> Array.to_list
-      |> List.map Color.toString
-      |> String.concat {js| |js}
+      Array.map_and_join ~f:Color.toString ~sep:{js| |js} colors
     | #None.t -> None.toString
 end
 
@@ -8751,12 +8743,18 @@ module BorderBlock = struct
   let make ?width ?style ?color () = { width; style; color }
 
   let toString { width; style; color } =
-    [ Option.map LineWidth.toString width
-    ; Option.map BorderStyle.toString style
-    ; Option.map Color.toString color
-    ]
-    |> List.filter_map Fun.id
-    |> String.concat {js| |js}
+    String.trim (match width with
+  | Some width -> LineWidth.toString width ^ {js| |js}
+  | None -> ""
+    ) ^
+  (match style with
+  | Some style -> BorderStyle.toString style ^ {js| |js}
+  | None -> ""
+  ) ^
+  (match color with
+  | Some color -> Color.toString color
+  | None -> ""
+)
 end
 
 module BorderBlockColor = struct
@@ -8770,21 +8768,7 @@ module BorderBlockColor = struct
 end
 
 module BorderBlockEnd = struct
-  type t =
-    { width : LineWidth.t option
-    ; style : BorderStyle.t option
-    ; color : Color.t option
-    }
-
-  let make ?width ?style ?color () = { width; style; color }
-
-  let toString { width; style; color } =
-    [ Option.map LineWidth.toString width
-    ; Option.map BorderStyle.toString style
-    ; Option.map Color.toString color
-    ]
-    |> List.filter_map Fun.id
-    |> String.concat {js| |js}
+  include BorderBlock
 end
 
 module BorderBlockEndColor = struct
@@ -8806,21 +8790,7 @@ module BorderBlockEndWidth = struct
 end
 
 module BorderBlockStart = struct
-  type t =
-    { width : LineWidth.t option
-    ; style : BorderStyle.t option
-    ; color : Color.t option
-    }
-
-  let make ?width ?style ?color () = { width; style; color }
-
-  let toString { width; style; color } =
-    [ Option.map LineWidth.toString width
-    ; Option.map BorderStyle.toString style
-    ; Option.map Color.toString color
-    ]
-    |> List.filter_map Fun.id
-    |> String.concat {js| |js}
+  include BorderBlock
 end
 
 module BorderBlockStartColor = struct
@@ -8862,21 +8832,7 @@ module BorderBlockWidth = struct
 end
 
 module BorderInline = struct
-  type t =
-    { width : LineWidth.t option
-    ; style : BorderStyle.t option
-    ; color : Color.t option
-    }
-
-  let make ?width ?style ?color () = { width; style; color }
-
-  let toString { width; style; color } =
-    [ Option.map LineWidth.toString width
-    ; Option.map BorderStyle.toString style
-    ; Option.map Color.toString color
-    ]
-    |> List.filter_map Fun.id
-    |> String.concat {js| |js}
+  include BorderBlock
 end
 
 module BorderInlineColor = struct
@@ -8890,57 +8846,25 @@ module BorderInlineColor = struct
 end
 
 module BorderInlineEnd = struct
-  type t =
-    { width : LineWidth.t option
-    ; style : BorderStyle.t option
-    ; color : Color.t option
-    }
-
-  let make ?width ?style ?color () = { width; style; color }
-
-  let toString { width; style; color } =
-    [ Option.map LineWidth.toString width
-    ; Option.map BorderStyle.toString style
-    ; Option.map Color.toString color
-    ]
-    |> List.filter_map Fun.id
-    |> String.concat {js| |js}
+  include BorderBlock
 end
 
 module BorderInlineEndColor = struct
-  type t = Color.t
-
-  let toString = Color.toString
+  include Color
 end
 
 module BorderInlineEndStyle = struct
-  type t = BorderStyle.t
+  include BorderStyle
 
   let toString = BorderStyle.toString
 end
 
 module BorderInlineEndWidth = struct
-  type t = LineWidth.t
-
-  let toString = LineWidth.toString
+  include LineWidth
 end
 
 module BorderInlineStart = struct
-  type t =
-    { width : LineWidth.t option
-    ; style : BorderStyle.t option
-    ; color : Color.t option
-    }
-
-  let make ?width ?style ?color () = { width; style; color }
-
-  let toString { width; style; color } =
-    [ Option.map LineWidth.toString width
-    ; Option.map BorderStyle.toString style
-    ; Option.map Color.toString color
-    ]
-    |> List.filter_map Fun.id
-    |> String.concat {js| |js}
+    include BorderBlock
 end
 
 module BorderInlineStartColor = struct

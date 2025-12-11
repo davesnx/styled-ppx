@@ -1,3 +1,14 @@
+module List = struct
+  let fold_left = Stdlib.List.fold_left
+  let length = Stdlib.List.length
+  let map = Stdlib.List.map
+  let append = Stdlib.List.append
+  let rev = Stdlib.List.rev
+  let iteri = Stdlib.ListLabels.iteri
+end
+
+module Set = Stdlib.Set
+
 module Array = struct
   external array_unsafe_get : 'a array -> int -> 'a = "%array_unsafe_get"
 
@@ -47,9 +58,19 @@ module Array = struct
       else run (i + 1) (acc ^ f strings.(i) ^ sep)
     in
     run 0 ""
+
+  let append = Stdlib.Array.append
+  let concat = Stdlib.Array.concat
+  let exists = Stdlib.Array.exists
+  let get = Stdlib.Array.get
+  let of_list = Stdlib.Array.of_list
+  let find_map = Stdlib.ArrayLabels.find_map
+  let ( @ ) = Stdlib.Array.append
 end
 
 module String = struct
+  type t = string
+
   external get : string -> int -> char = "%string_safe_get"
   external length : string -> int = "length" [@@mel.get]
 
@@ -57,6 +78,9 @@ module String = struct
   [@@mel.send]
 
   external trim : string -> string = "trim" [@@mel.send]
+
+  let concat = Stdlib.String.concat
+  let compare = Stdlib.String.compare
 end
 
 module Int = struct
@@ -64,6 +88,7 @@ module Int = struct
   [@@mel.send]
 
   let to_string v = toStringWithRadix ~radix:10 v
+  let add = Stdlib.Int.add
 end
 
 module Float = struct
@@ -86,3 +111,23 @@ end
 module Fun = struct
   let id = Fun.id
 end
+
+let ( + ) = Stdlib.Int.add
+let ( - ) = Stdlib.Int.sub
+let ( * ) = Stdlib.Int.mul
+let ( ^ ) = Stdlib.String.cat
+let ( |> ) = Stdlib.( |> )
+let ( = ) = Stdlib.( = )
+let ( != ) = Stdlib.( != )
+let ( == ) = Stdlib.( == )
+let ( <> ) = Stdlib.( <> )
+let ( <= ) = Stdlib.( <= )
+let ( >= ) = Stdlib.( >= )
+let ( < ) = Stdlib.( < )
+let ( > ) = Stdlib.( > )
+let ( && ) = Stdlib.( && )
+let ( || ) = Stdlib.( || )
+let ( @@ ) = Stdlib.( @@ )
+let string_of_int = Stdlib.string_of_int
+let fst = Stdlib.fst
+let snd = Stdlib.snd
