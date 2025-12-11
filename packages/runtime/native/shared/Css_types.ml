@@ -561,8 +561,7 @@ end
 
 module ScrollBehavior = struct
   type t =
-    [
-    | `smooth
+    [ `smooth
     | Auto.t
     | Var.t
     | Cascading.t
@@ -578,8 +577,7 @@ end
 
 module OverscrollBehavior = struct
   type t =
-    [
-    | `contain
+    [ `contain
     | Auto.t
     | None.t
     | Var.t
@@ -760,7 +758,7 @@ module OutlineStyle = struct
     | `inset
     | `outset
     | Var.t
-| Cascading.t
+    | Cascading.t
     ]
 
   let toString x =
@@ -776,7 +774,7 @@ module OutlineStyle = struct
     | `ridge -> {js|ridge|js}
     | `inset -> {js|inset|js}
     | `outset -> {js|outset|js}
-| #Var.t as va -> Var.toString va
+    | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
 end
 
@@ -3409,55 +3407,59 @@ module SideOrCorner = struct
 end
 
 module Shadow = struct
-  type box = [`shadow of string]
-  type text = [`shadow of string]
-  type t = [box | text]
+  type box = [ `shadow of string ]
+  type text = [ `shadow of string ]
+
+  type t =
+    [ box
+    | text
+    ]
 
   let box ?(x = `zero) ?(y = `zero) ?(blur = `zero) ?(spread = `zero)
     ?(inset = false) (color : Color.t) : box =
-    `shadow (Length.toString x
-    ^ {js| |js}
-    ^ Length.toString y
-    ^ {js| |js}
-    ^ Length.toString blur
-    ^ {js| |js}
-    ^ Length.toString spread
-    ^ {js| |js}
-    ^ Color.toString color
-    ^ if inset then {js| inset|js} else {js||js})
+    `shadow
+      (Length.toString x
+      ^ {js| |js}
+      ^ Length.toString y
+      ^ {js| |js}
+      ^ Length.toString blur
+      ^ {js| |js}
+      ^ Length.toString spread
+      ^ {js| |js}
+      ^ Color.toString color
+      ^ if inset then {js| inset|js} else {js||js})
 
   let text ?(x = `zero) ?(y = `zero) ?(blur = `zero) (color : Color.t) : text =
-    `shadow (Length.toString x
-    ^ {js| |js}
-    ^ Length.toString y
-    ^ {js| |js}
-    ^ Length.toString blur
-    ^ {js| |js}
-    ^ Color.toString color)
+    `shadow
+      (Length.toString x
+      ^ {js| |js}
+      ^ Length.toString y
+      ^ {js| |js}
+      ^ Length.toString blur
+      ^ {js| |js}
+      ^ Color.toString color)
 
-  let toString (x : [ box | text] ) = match x with
-    | `shadow s -> s
+  let toString (x : [ box | text ]) = match x with `shadow s -> s
 
-  let many (arr : [ box | text] array) : string =
-    Kloth.Array.map_and_join ~sep:{js|, |js} ~f:(toString) arr
+  let many (arr : [ box | text ] array) : string =
+    Kloth.Array.map_and_join ~sep:{js|, |js} ~f:toString arr
 end
 
 module BoxShadow = struct
   type t =
-    [ `shadow of Shadow.t
-    | `shadows of Shadow.t array
+    [ `shadow of string
+    | `shadows of Shadow.box array
     | None.t
     | Var.t
     | Cascading.t
     ]
 
   let box = Shadow.box
-
-  let make (arr : Shadow.t array) : t = `shadows arr
+  let make (arr : Shadow.box array) : t = `shadows arr
 
   let toString (x : t) : string =
     match x with
-    | `shadow s -> Shadow.toString s
+    | `shadow _ as s -> Shadow.toString s
     | `shadows arr -> Shadow.many arr
     | #None.t -> None.toString
     | #Var.t as va -> Var.toString va
@@ -3466,20 +3468,19 @@ end
 
 module TextShadow = struct
   type t =
-    [ `shadow of Shadow.t
-    | `shadows of Shadow.t array
+    [ `shadow of string
+    | `shadows of Shadow.text array
     | None.t
     | Var.t
     | Cascading.t
     ]
 
   let text = Shadow.text
-
-  let make (arr : Shadow.t array) : t = `shadows arr
+  let make (arr : Shadow.text array) : t = `shadows arr
 
   let toString (x : t) : string =
     match x with
-    | `shadow s -> Shadow.toString s
+    | `shadow _ as s -> Shadow.toString s
     | `shadows arr -> Shadow.many arr
     | #None.t -> None.toString
     | #Var.t as va -> Var.toString va
@@ -5754,8 +5755,10 @@ module Quotes = struct
     | #Auto.t -> Auto.toString
     | `quotes pairs ->
       pairs
-      |> Kloth.Array.map_and_join ~f:(fun (open_, close) ->
-        {js|"|js} ^ open_ ^ {js|" "|js} ^ close ^ {js|"|js}) ~sep:{js| |js}
+      |> Kloth.Array.map_and_join
+           ~f:(fun (open_, close) ->
+             {js|"|js} ^ open_ ^ {js|" "|js} ^ close ^ {js|"|js})
+           ~sep:{js| |js}
 end
 
 (* Text properties *)
@@ -6904,7 +6907,9 @@ module Behavior = struct
   let toString x =
     match x with
     | `urls urls ->
-      Array.map_and_join ~f:(fun u -> {js|url(|js} ^ u ^ {js|)|js}) ~sep:{js| |js} urls
+      Array.map_and_join
+        ~f:(fun u -> {js|url(|js} ^ u ^ {js|)|js})
+        ~sep:{js| |js} urls
 end
 
 module MasonryAutoFlow = struct
@@ -7162,7 +7167,8 @@ module Src = struct
 
   let toString x =
     match x with
-    | `urls sources -> Array.map_and_join ~f:FontFace.toString ~sep:{js|, |js} sources
+    | `urls sources ->
+      Array.map_and_join ~f:FontFace.toString ~sep:{js|, |js} sources
 end
 
 (* Voice/Speech properties for audio rendering *)
@@ -8443,9 +8449,7 @@ module AttrModifier = struct
     | `s
     ]
 
-  let toString = function
-    | `i -> {js|i|js}
-    | `s -> {js|s|js}
+  let toString = function `i -> {js|i|js} | `s -> {js|s|js}
 end
 
 module AttrUnit = struct
@@ -8513,17 +8517,15 @@ module AttrType = struct
 end
 
 module AttrName = struct
-  type t =
-    { namespace : string option
-    ; name : string
-    }
+  type t = {
+    namespace : string option;
+    name : string;
+  }
 
   let make ?namespace name = { namespace; name }
 
   let toString { namespace; name } =
-    match namespace with
-    | None -> name
-    | Some ns -> ns ^ {js|||js} ^ name
+    match namespace with None -> name | Some ns -> ns ^ {js|||js} ^ name
 end
 
 module AttributeSelector = struct
@@ -8538,10 +8540,10 @@ module AutoRepeat = struct
     | `auto_fit
     ]
 
-  type t =
-    { repeat_type : auto_repeat_type
-    ; tracks : string
-    }
+  type t = {
+    repeat_type : auto_repeat_type;
+    tracks : string;
+  }
 
   let make repeat_type tracks = { repeat_type; tracks }
 
@@ -8591,10 +8593,10 @@ module BackgroundPositionX = struct
         | Some `x_end -> {js|x-end|js}
       in
       (match offset_opt with
-       | None -> side_str
-       | Some offset ->
-         if side_str = {js||js} then Length.toString offset
-         else side_str ^ {js| |js} ^ Length.toString offset)
+      | None -> side_str
+      | Some offset ->
+        if side_str = {js||js} then Length.toString offset
+        else side_str ^ {js| |js} ^ Length.toString offset)
 end
 
 module BackgroundPositionY = struct
@@ -8622,10 +8624,10 @@ module BackgroundPositionY = struct
         | Some `y_end -> {js|y-end|js}
       in
       (match offset_opt with
-       | None -> side_str
-       | Some offset ->
-         if side_str = {js||js} then Length.toString offset
-         else side_str ^ {js| |js} ^ Length.toString offset)
+      | None -> side_str
+      | Some offset ->
+        if side_str = {js||js} then Length.toString offset
+        else side_str ^ {js| |js} ^ Length.toString offset)
 end
 
 module BaselinePosition = struct
@@ -8734,27 +8736,23 @@ module BlendMode = struct
 end
 
 module BorderBlock = struct
-  type t =
-    { width : LineWidth.t option
-    ; style : BorderStyle.t option
-    ; color : Color.t option
-    }
+  type t = {
+    width : LineWidth.t option;
+    style : BorderStyle.t option;
+    color : Color.t option;
+  }
 
   let make ?width ?style ?color () = { width; style; color }
 
   let toString { width; style; color } =
-    String.trim (match width with
-  | Some width -> LineWidth.toString width ^ {js| |js}
-  | None -> ""
-    ) ^
-  (match style with
-  | Some style -> BorderStyle.toString style ^ {js| |js}
-  | None -> ""
-  ) ^
-  (match color with
-  | Some color -> Color.toString color
-  | None -> ""
-)
+    String.trim
+      (match width with
+      | Some width -> LineWidth.toString width ^ {js| |js}
+      | None -> "")
+    ^ (match style with
+      | Some style -> BorderStyle.toString style ^ {js| |js}
+      | None -> "")
+    ^ match color with Some color -> Color.toString color | None -> ""
 end
 
 module BorderBlockColor = struct
@@ -8818,7 +8816,9 @@ module BorderBlockStyle = struct
     match end_style_opt with
     | None -> BorderStyle.toString start_style
     | Some end_style ->
-      BorderStyle.toString start_style ^ {js| |js} ^ BorderStyle.toString end_style
+      BorderStyle.toString start_style
+      ^ {js| |js}
+      ^ BorderStyle.toString end_style
 end
 
 module BorderBlockWidth = struct
@@ -8864,7 +8864,7 @@ module BorderInlineEndWidth = struct
 end
 
 module BorderInlineStart = struct
-    include BorderBlock
+  include BorderBlock
 end
 
 module BorderInlineStartColor = struct
@@ -8892,7 +8892,9 @@ module BorderInlineStyle = struct
     match end_style_opt with
     | None -> BorderStyle.toString start_style
     | Some end_style ->
-      BorderStyle.toString start_style ^ {js| |js} ^ BorderStyle.toString end_style
+      BorderStyle.toString start_style
+      ^ {js| |js}
+      ^ BorderStyle.toString end_style
 end
 
 module BorderInlineWidth = struct
@@ -9244,10 +9246,14 @@ module CubicBezierTimingFunction = struct
     | `easeInOut -> {js|ease-in-out|js}
     | `cubicBezier (x1, y1, x2, y2) ->
       {js|cubic-bezier(|js}
-      ^ Kloth.Float.to_string x1 ^ {js|, |js}
-      ^ Kloth.Float.to_string y1 ^ {js|, |js}
-      ^ Kloth.Float.to_string x2 ^ {js|, |js}
-      ^ Kloth.Float.to_string y2 ^ {js|)|js}
+      ^ Kloth.Float.to_string x1
+      ^ {js|, |js}
+      ^ Kloth.Float.to_string y1
+      ^ {js|, |js}
+      ^ Kloth.Float.to_string x2
+      ^ {js|, |js}
+      ^ Kloth.Float.to_string y2
+      ^ {js|)|js}
 end
 
 module Declaration = struct
@@ -10216,9 +10222,7 @@ module ImageTags = struct
     | `rtl
     ]
 
-  let toString = function
-    | `ltr -> {js|ltr|js}
-    | `rtl -> {js|rtl|js}
+  let toString = function `ltr -> {js|ltr|js} | `rtl -> {js|rtl|js}
 end
 
 module Inherits = struct
@@ -10508,9 +10512,7 @@ module MediaAnyHover = struct
     | `hover
     ]
 
-  let toString = function
-    | #None.t -> None.toString
-    | `hover -> {js|hover|js}
+  let toString = function #None.t -> None.toString | `hover -> {js|hover|js}
 end
 
 module MediaAnyPointer = struct
@@ -10577,9 +10579,7 @@ module MediaForcedColors = struct
     | `active
     ]
 
-  let toString = function
-    | #None.t -> None.toString
-    | `active -> {js|active|js}
+  let toString = function #None.t -> None.toString | `active -> {js|active|js}
 end
 
 module MediaGrid = struct
@@ -10594,9 +10594,7 @@ module MediaHover = struct
     | None.t
     ]
 
-  let toString = function
-    | `hover -> {js|hover|js}
-    | #None.t -> None.toString
+  let toString = function `hover -> {js|hover|js} | #None.t -> None.toString
 end
 
 module MediaInParens = struct
@@ -10793,9 +10791,7 @@ module MfGt = struct
     | `gt
     ]
 
-  let toString = function
-    | `gte -> {js|>=|js}
-    | `gt -> {js|>|js}
+  let toString = function `gte -> {js|>=|js} | `gt -> {js|>|js}
 end
 
 module MfLt = struct
@@ -10804,9 +10800,7 @@ module MfLt = struct
     | `lt
     ]
 
-  let toString = function
-    | `lte -> {js|<=|js}
-    | `lt -> {js|<|js}
+  let toString = function `lte -> {js|<=|js} | `lt -> {js|<|js}
 end
 
 module MfName = struct
@@ -11025,9 +11019,7 @@ module OverflowPosition = struct
     | `safe
     ]
 
-  let toString = function
-    | `unsafe -> {js|unsafe|js}
-    | `safe -> {js|safe|js}
+  let toString = function `unsafe -> {js|unsafe|js} | `safe -> {js|safe|js}
 end
 
 module Overlay = struct
@@ -11036,9 +11028,7 @@ module Overlay = struct
     | Auto.t
     ]
 
-  let toString = function
-    | #None.t -> None.toString
-    | #Auto.t -> Auto.toString
+  let toString = function #None.t -> None.toString | #Auto.t -> Auto.toString
 end
 
 module OverscrollBehaviorBlock = struct
@@ -11607,9 +11597,7 @@ module SingleTransitionProperty = struct
     | `all
     ]
 
-  let toString = function
-    | `customIdent s -> s
-    | `all -> {js|all|js}
+  let toString = function `customIdent s -> s | `all -> {js|all|js}
 end
 
 module SingleTransitionPropertyNoInterp = struct
@@ -11618,9 +11606,7 @@ module SingleTransitionPropertyNoInterp = struct
     | `all
     ]
 
-  let toString = function
-    | `customIdent s -> s
-    | `all -> {js|all|js}
+  let toString = function `customIdent s -> s | `all -> {js|all|js}
 end
 
 module Size = struct
@@ -11916,9 +11902,7 @@ module TimelineScope = struct
     | `dashedIdent of string
     ]
 
-  let toString = function
-    | #None.t -> None.toString
-    | `dashedIdent name -> name
+  let toString = function #None.t -> None.toString | `dashedIdent name -> name
 end
 
 module TimingFunction = struct
@@ -11957,10 +11941,10 @@ module TrackListV0 = struct
 end
 
 module TrackMinmax = struct
-  type t =
-    { min : TrackBreadth.t
-    ; max : TrackBreadth.t
-    }
+  type t = {
+    min : TrackBreadth.t;
+    max : TrackBreadth.t;
+  }
 
   let make ~min ~max = { min; max }
 
@@ -11977,16 +11961,14 @@ module TrackRepeat = struct
 end
 
 module TransformFunction = struct
-  include  Transform
-
+  include Transform
 end
 
 module TransformList = struct
   type t = Transform.t array
 
   let toString transforms =
-    transforms
-    |> Kloth.Array.map_and_join ~f:Transform.toString ~sep:{js| |js}
+    transforms |> Kloth.Array.map_and_join ~f:Transform.toString ~sep:{js| |js}
 end
 
 module TransitionBehaviorValue = struct
@@ -12091,9 +12073,7 @@ module ViewTimelineName = struct
     | `dashedIdent of string
     ]
 
-  let toString = function
-    | #None.t -> None.toString
-    | `dashedIdent name -> name
+  let toString = function #None.t -> None.toString | `dashedIdent name -> name
 end
 
 module ViewTransitionName = struct
@@ -12102,9 +12082,7 @@ module ViewTransitionName = struct
     | `customIdent of string
     ]
 
-  let toString = function
-    | #None.t -> None.toString
-    | `customIdent name -> name
+  let toString = function #None.t -> None.toString | `customIdent name -> name
 end
 
 module ViewportLength = struct
@@ -12119,10 +12097,10 @@ module ViewportLength = struct
 end
 
 module WebkitGradientColorStop = struct
-  type t =
-    { color : Color.t
-    ; position : float option
-    }
+  type t = {
+    color : Color.t;
+    position : float option;
+  }
 
   let make ~color ?position () = { color; position }
 
@@ -12138,10 +12116,10 @@ module WebkitGradientColorStop = struct
 end
 
 module WebkitGradientPoint = struct
-  type t =
-    { x : [ `left | `center | `right | `percent of float ]
-    ; y : [ `top | `center | `bottom | `percent of float ]
-    }
+  type t = {
+    x : [ `left | `center | `right | `percent of float ];
+    y : [ `top | `center | `bottom | `percent of float ];
+  }
 
   let make ~x ~y = { x; y }
 
