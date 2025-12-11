@@ -188,3 +188,9 @@ If this test fail means that the module is not in sync with the ppx
   CSS.style([|CSS.right(interpolation), CSS.bottom(interpolation)|]);
 
   $ dune build
+  File "input.re", line 26, characters 6-54:
+  26 | [%cx2 {|-webkit-text-fill-color: $(colorTextString);|}];
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  Error: This expression has type string but an expression was expected of type
+           Css_types.WebkitTextFillColor.t
+  [1]

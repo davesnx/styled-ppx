@@ -12,11 +12,10 @@ If this test fail means that the module is not in sync with the ppx
   >  (preprocess (pps styled-ppx)))
   > EOF
 
-This test ensures the location of the error is correct
   $ dune build
-  File "input.re", line 3, characters 27-34:
-   | isplay: $(grid); |}];
-                          
+  File "input.re", line 2, characters 25-32:
+  2 | let a = [%cx {| display: $(grid); |}];
+                               ^^^^^^^
   Error: This expression has type [> `gri ]
          but an expression was expected of type
            [< `block

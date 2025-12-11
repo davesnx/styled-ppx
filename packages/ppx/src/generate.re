@@ -1271,7 +1271,7 @@ let dynamicStyles = (~loc, ~moduleName, ~functionExpr, ~labeledArguments) => {
       switch (Styled_ppx_css_parser.Driver.parse_declaration_list(str)) {
       | Ok(declarations) =>
         declarations
-        |> Css_runtime.render_declarations(~loc)
+        |> Css_runtime.render_declarations(~loc, ~delimiter)
         |> Css_runtime.add_label(~loc, moduleName)
         |> Builder.pexp_array(~loc)
         |> Css_runtime.render_style_call(~loc)

@@ -15,14 +15,7 @@ Test cx2 error location accuracy. The error should point to the exact line where
 The error should be on line 5, not lines 3-4.
 
   $ dune build 2>&1 | head -n 30
-  File "input.re", lines 2-6, characters 2-2:
-  2 | ..{|
-  3 |   color: $(main);
-  4 |   background-color: $(CSS.black);
+  File "input.re", line 5, characters 0-16:
   5 |   display: fley;
-  6 | |}
-  Error: Type error on cx2 definition
-  File "input.re", line 5, characters 4-20:
-  4 | ...
-  5 |   display: fley;
-    Got 'fley', did you mean 'flex'?
+      ^^^^^^^^^^^^^^^^
+  Error: Got 'fley', did you mean 'flex'?

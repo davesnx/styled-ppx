@@ -48,10 +48,27 @@ let delay = `s(3);
 let property3 = CSS.Types.TransitionProperty.make("opacity");
 let behavior = `allowDiscrete;
 
-[%cx2 {|transition: $(property)|}];
-[%cx2 {|transition: $(property2)|}];
-// This is the order of interpolation, from left to right.
-[%cx2 {|transition: $(property) $(duration) $(timingFunction) $(delay) $(behavior)|}];
+// Complete transition interpolation using Transition.Value.make
+// For standalone transition interpolation, use Transition.Value.t (not TransitionProperty.t directly)
+let fullTransition =
+  CSS.Types.Transition.Value.make(
+    ~property=CSS.Types.TransitionProperty.make("margin-right"),
+    ~duration=`ms(200),
+    (),
+  );
+[%cx2 {|transition: $(fullTransition)|}];
+
+let fullTransition2 =
+  CSS.Types.Transition.Value.make(
+    ~property=CSS.Types.TransitionProperty.all,
+    (),
+  );
+[%cx2 {|transition: $(fullTransition2)|}];
+
+// Multiple components interpolation (uses individual types for each position)
+[%cx2
+  {|transition: $(property) $(duration) $(timingFunction) $(delay) $(behavior)|}
+];
 [%css
   {|transition: $(property) $(duration) $(timingFunction) $(delay), $(property3) 0s|}
 ];

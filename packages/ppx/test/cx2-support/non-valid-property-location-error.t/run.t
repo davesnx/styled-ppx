@@ -13,9 +13,9 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 3, characters 5-14:
-  2 | .....
-  3 |   height........
+  File "input.re", line 3, characters 0-16:
+  3 |   heightx: 100%;
+      ^^^^^^^^^^^^^^^^
   Error: Unknown property 'heightx'
   [1]
 

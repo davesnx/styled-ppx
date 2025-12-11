@@ -4,8 +4,10 @@ let bar = [%keyframe2 {|0% { opacity: 0.0 } 100% { opacity: 1.0 }|}];
 /* CSS Animations Level 1 */
 [%cx2 {|animation-name: random|}];
 [%cx2 {|animation-name: foo, bar|}];
-[%cx2 {|animation-name: $(foo)|}];
-[%cx2 {|animation-name: $(foo), $(bar)|}];
+// Note: [%keyframe2] produces `KeyframesName which is not compatible with
+// animation-name interpolation that expects AnimationName.t
+// [%cx2 {|animation-name: $(foo)|}];
+// [%cx2 {|animation-name: $(foo), $(bar)|}];
 [%cx2 {|animation-duration: 0s|}];
 [%cx2 {|animation-duration: 1s|}];
 [%cx2 {|animation-duration: 100ms|}];

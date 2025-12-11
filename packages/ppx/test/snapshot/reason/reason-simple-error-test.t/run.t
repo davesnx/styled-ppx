@@ -13,8 +13,8 @@ Simple test for error locations
 
 This should give an error for 'display: fley':
   $ dune build 2>&1
-  File "input.re", line 4, characters 26-30:
+  File "input.re", line 4, characters 27-31:
   4 | let test1 = [%cx "display: fley"];
-                                ^^^^
+                                 ^^^^
   Error: Property 'display' has an invalid value: 'fley'
   [1]

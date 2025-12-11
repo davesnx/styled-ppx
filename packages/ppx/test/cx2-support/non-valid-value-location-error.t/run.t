@@ -13,9 +13,9 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 10, characters 13-19:
-   9 | ..
-  10 | .......... block..
+  File "input.re", line 10, characters 11-17:
+  10 |   display: blocki;
+                  ^^^^^^
   Error: Property 'display' has an invalid value: 'blocki'
   [1]
 

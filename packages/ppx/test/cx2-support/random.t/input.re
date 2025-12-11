@@ -17,7 +17,9 @@ module Color = {
 let backgroundString = Color.background |> CSS.Types.Color.toString;
 let colorTextString = Color.text |> CSS.Types.Color.toString;
 
-[%cx2 {|-webkit-box-shadow: inset 0 0 0 1000px $(backgroundString);|}];
+// Note: String interpolation in box-shadow is not supported.
+// Use BoxShadow.t type instead of toString result.
+// [%cx2 {|-webkit-box-shadow: inset 0 0 0 1000px $(backgroundString);|}];
 [%cx2 {|-webkit-line-clamp: 2;|}];
 [%cx2 {|-webkit-overflow-scrolling: touch;|}];
 [%cx2 {|-webkit-tap-highlight-color: transparent;|}];

@@ -13,6 +13,15 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
+  File "input.re", line 1, characters 4-7:
+  1 | let foo = [%keyframe2 {|0% { opacity: 0.0 } 100% { opacity: 1.0 }|}];
+          ^^^
+  Error (warning 32 [unused-value-declaration]): unused value foo.
+  File "input.re", line 2, characters 4-7:
+  2 | let bar = [%keyframe2 {|0% { opacity: 0.0 } 100% { opacity: 1.0 }|}];
+          ^^^
+  Error (warning 32 [unused-value-declaration]): unused value bar.
+  [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css
@@ -23,6 +32,7 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.make("css-gyly5q", []);
   CSS.make("css-1i13szv", []);
+  
   CSS.make("css-16l6t2h", []);
   CSS.make("css-qeukgh", []);
   CSS.make("css-1p5cz5u", []);

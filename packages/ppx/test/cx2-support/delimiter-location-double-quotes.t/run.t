@@ -17,9 +17,9 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 15-21:
+  File "input.re", line 1, characters 16-22:
   1 |  [%cx "display: blocki;"];
-                     ^^^^^^
+                      ^^^^^^
   Error: Property 'display' has an invalid value: 'blocki'
   [1]
 
@@ -28,9 +28,9 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 28-34:
+  File "input.re", line 1, characters 29-35:
   1 |  [%cx "width: 100%; display: blocki;"];
-                                  ^^^^^^
+                                   ^^^^^^
   Error: Property 'display' has an invalid value: 'blocki'
   [1]
 
@@ -41,9 +41,9 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 2, characters 33-39:
-  1 | ......
-  2 | .......................... block..
+  File "input.re", line 2, characters 27-33:
+  2 |      width: 100%; display: blocki;
+                                 ^^^^^^
   Error: Property 'display' has an invalid value: 'blocki'
   [1]
 
@@ -55,8 +55,8 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 3, characters 20-26:
-  2 | ......
-  3 | ............. block..
+  File "input.re", line 3, characters 14-20:
+  3 |      display: blocki;
+                    ^^^^^^
   Error: Property 'display' has an invalid value: 'blocki'
   [1]

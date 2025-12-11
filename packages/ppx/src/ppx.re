@@ -165,7 +165,7 @@ module Mapper = {
         switch (Styled_ppx_css_parser.Driver.parse_declaration_list(str)) {
         | Ok(declarations) =>
           declarations
-          |> Css_runtime.render_declarations(~loc=stringLoc)
+          |> Css_runtime.render_declarations(~loc=stringLoc, ~delimiter)
           |> Css_runtime.add_label(~loc=stringLoc, moduleName)
           |> Builder.pexp_array(~loc=stringLoc)
           |> Css_runtime.render_style_call(~loc=stringLoc)
@@ -393,23 +393,17 @@ module Mapper = {
         switch (Styled_ppx_css_parser.Driver.parse_declaration_list(styles)) {
         | Ok(rule_list) =>
           rule_list
-          |> Css_runtime.render_declarations(~loc=stringLoc)
+          |> Css_runtime.render_declarations(~loc=stringLoc, ~delimiter)
           |> Css_runtime.add_label(~loc=stringLoc, valueName)
           |> Builder.pexp_array(~loc=stringLoc)
           |> Css_runtime.render_style_call(~loc=stringLoc)
         | Error((start_pos, end_pos, msg)) =>
-          let ppxlibloc =
-            Styled_ppx_css_parser.Parser_location.to_ppxlib_location(
+          let loc =
+            Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
+              ~loc=stringLoc,
+              ~delimiter,
               start_pos,
               end_pos,
-            );
-          let loc =
-            Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-              Styled_ppx_css_parser.Parser_location.intersection(
-                stringLoc,
-                ppxlibloc,
-              ),
-              delimiter,
             );
           Error.expr(~loc, msg);
         };
@@ -570,22 +564,16 @@ let cx_extension_without_let_binding =
           switch (Styled_ppx_css_parser.Driver.parse_declaration_list(txt)) {
           | Ok(rule_list) =>
             rule_list
-            |> Css_runtime.render_declarations(~loc=stringLoc)
+            |> Css_runtime.render_declarations(~loc=stringLoc, ~delimiter)
             |> Builder.pexp_array(~loc=stringLoc)
             |> Css_runtime.render_style_call(~loc=stringLoc)
           | Error((start_pos, end_pos, msg)) =>
-            let ppxlibloc =
-              Styled_ppx_css_parser.Parser_location.to_ppxlib_location(
+            let loc =
+              Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
+                ~loc=stringLoc,
+                ~delimiter,
                 start_pos,
                 end_pos,
-              );
-            let loc =
-              Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-                Styled_ppx_css_parser.Parser_location.intersection(
-                  stringLoc,
-                  ppxlibloc,
-                ),
-                delimiter,
               );
             Error.expr(~loc, msg);
           }
@@ -645,7 +633,31 @@ let rec type_check_rule = (rule: Styled_ppx_css_parser.Ast.rule) => {
     ]
   | Declaration({name: (name, _), value: (value, _), loc, _}) =>
     let value = Styled_ppx_css_parser.Render.component_value_list(value);
-    [Css_grammar.Parser.check_property(~loc, ~name, value)];
+    switch (Css_grammar.Parser.check_property(~loc, ~name, value)) {
+    | Ok () => [Ok()]
+    | Error((loc, `Invalid_value(raw_error))) =>
+      /* If the raw error looks like internal parser gibberish (like "tokens remaining"),
+         replace it with a user-friendly message. Otherwise keep the helpful error
+         (like "Got 'fley', did you mean 'flex'?") */
+      let is_internal_error =
+        String.length(raw_error) > 0
+        && (String.sub(raw_error, 0, min(6, String.length(raw_error)))
+            == "tokens"
+            || String.sub(raw_error, 0, min(8, String.length(raw_error)))
+            == "Expected");
+      let msg =
+        is_internal_error
+          ? Format.sprintf(
+              "Property '%s' has an invalid value: '%s'",
+              name,
+              value,
+            )
+          : raw_error;
+      [Error((loc, `Invalid_value(msg)))];
+    | Error((loc, `Property_not_found)) => [
+        Error((loc, `Property_not_found)),
+      ]
+    };
   | Style_rule(style_rule) =>
     let rule_list = style_rule.block;
     /* TODO: we don't typecheck prelude selectors */
@@ -730,21 +742,23 @@ let cx2_extension =
                 errors
                 |> List.map(((loc, error)) => {
                      (
-                       Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-                         Styled_ppx_css_parser.Parser_location.intersection(
-                           stringLoc,
-                           loc,
-                         ),
-                         delimiter,
+                       Styled_ppx_css_parser.Parser_location.make_loc_from_loc(
+                         ~string_loc=stringLoc,
+                         ~delimiter,
+                         loc,
                        ),
                        error_to_string(error),
                      )
                    });
-              Error.expressions(
-                ~loc=stringLoc,
-                ~description="Type error on cx2 definition",
-                error_messages,
-              );
+              switch (error_messages) {
+              | [(loc, msg)] => Error.expr(~loc, msg)
+              | _ =>
+                Error.expressions(
+                  ~loc=stringLoc,
+                  ~description="Multiple errors on cx2 definition",
+                  error_messages,
+                )
+              };
             };
           | Error((start_pos, end_pos, msg)) =>
             let loc =
@@ -754,11 +768,7 @@ let cx2_extension =
                 start_pos,
                 end_pos,
               );
-            Error.expressions(
-              ~loc=stringLoc,
-              ~description="Parsing error on cx2 definition",
-              [(loc, msg)],
-            );
+            Error.expr(~loc, msg);
           }
         | Pexp_array(arr) =>
           /* Valid: [%cx2 [|...|]] */
@@ -808,7 +818,7 @@ let keyframe_extension =
         | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
           switch (Styled_ppx_css_parser.Driver.parse_keyframes(txt)) {
           | Ok(declarations) =>
-            Css_runtime.render_keyframes(~loc=stringLoc, declarations)
+            Css_runtime.render_keyframes(~loc=stringLoc, ~delimiter, declarations)
           | Error((start_pos, end_pos, msg)) =>
             let loc =
               Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
@@ -889,7 +899,11 @@ let css_extension =
           switch (Styled_ppx_css_parser.Driver.parse_declaration(txt)) {
           | Ok(declarations) =>
             let declarationListValues =
-              Css_runtime.render_declaration(~loc=stringLoc, declarations);
+              Css_runtime.render_declaration(
+                ~loc=stringLoc,
+                ~delimiter,
+                declarations,
+              );
             List.nth(declarationListValues, 0);
           | Error((start_pos, end_pos, msg)) =>
             let loc =
@@ -928,7 +942,7 @@ let styled_global_extension =
         | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
           switch (Styled_ppx_css_parser.Driver.parse_declaration_list(txt)) {
           | Ok(rule_list) =>
-            Css_runtime.render_global(~loc=stringLoc, rule_list)
+            Css_runtime.render_global(~loc=stringLoc, ~delimiter, rule_list)
           | Error((start_pos, end_pos, msg)) =>
             let loc =
               Styled_ppx_css_parser.Parser_location.make_loc_from_pos(

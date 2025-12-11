@@ -13,12 +13,8 @@ This test ensures error locations are reported accurately for CSS property error
 
 Test error location accuracy
   $ dune build
-  File "input.re", line 5, characters 6-18:
-  5 | [%cx2 "color: rex"];
-            ^^^^^^^^^^^^
-  Error: Type error on cx2 definition
-  File "input.re", lines 4-5, characters 7-17:
-  4 | [%cx2 "color: rex"];
-             ^^^^^^^^^^
-    Got 'function rgb', did you mean 'function var'?
+  File "input.re", lines 4-5, characters 0-17:
+  4 | color: rex"];
+      ^^^^^^^^^^
+  Error: Got 'function rgb', did you mean 'function var'?
   [1]

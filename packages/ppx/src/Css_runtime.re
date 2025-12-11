@@ -63,12 +63,13 @@ let concat = (~loc, expr, acc) => {
   Helper.Exp.apply(~loc, concat_fn, [(Nolabel, expr), (Nolabel, acc)]);
 };
 
-let rec render_at_rule = (~loc, at_rule: at_rule) => {
+let rec render_at_rule = (~loc, ~delimiter, at_rule: at_rule) => {
   let (at_rule_name, at_rule_name_loc) = at_rule.name;
   /* TODO: Make sure this location correct */
   let at_rule_name_loc =
-    Styled_ppx_css_parser.Parser_location.intersection(
-      loc,
+    Styled_ppx_css_parser.Parser_location.make_loc_from_loc(
+      ~string_loc=loc,
+      ~delimiter,
       {
         ...at_rule_name_loc,
         loc_start: {
@@ -81,8 +82,8 @@ let rec render_at_rule = (~loc, at_rule: at_rule) => {
       },
     );
   switch (at_rule_name) {
-  | "media" => render_media_query(~loc, at_rule)
-  | "container" => render_container_query(~loc, at_rule)
+  | "media" => render_media_query(~loc, ~delimiter, at_rule)
+  | "container" => render_container_query(~loc, ~delimiter, at_rule)
   | "keyframes" =>
     Error.expr(
       ~loc=at_rule_name_loc,
@@ -117,7 +118,7 @@ let rec render_at_rule = (~loc, at_rule: at_rule) => {
   | n => Error.expr(~loc=at_rule_name_loc, Printf.sprintf("Unknown @%s ", n))
   };
 }
-and render_media_query = (~loc, at_rule: at_rule) => {
+and render_media_query = (~loc, ~delimiter, at_rule: at_rule) => {
   let (at_rule_prelude_ast, at_rule_prelude_loc) = at_rule.prelude;
   let parse_condition = {
     /* TODO: Trimming is a mistake from the lexer/parser, it should be fixed */
@@ -127,15 +128,16 @@ and render_media_query = (~loc, at_rule: at_rule) => {
     Parser.parse(Parser.media_query_list, prelude) |> Result.map(_ => prelude);
   };
 
-  let (delimiter, attrs) =
+  let (string_delimiter, attrs) =
     Platform_attributes.string_delimiter(~loc=at_rule.loc);
 
   switch (parse_condition) {
   | Error(error_msg) =>
     Error.expr(
       ~loc=
-        Styled_ppx_css_parser.Parser_location.intersection(
-          loc,
+        Styled_ppx_css_parser.Parser_location.make_loc_from_loc(
+          ~string_loc=loc,
+          ~delimiter,
           at_rule_prelude_loc,
         ),
       error_msg,
@@ -143,13 +145,17 @@ and render_media_query = (~loc, at_rule: at_rule) => {
   | Ok(conditions) =>
     let query =
       conditions
-      |> String_interpolation.transform(~attrs, ~delimiter, ~loc=at_rule.loc);
+      |> String_interpolation.transform(
+           ~attrs,
+           ~delimiter=string_delimiter,
+           ~loc=at_rule.loc,
+         );
 
     let rules =
       switch (at_rule.block) {
       | Empty => Builder.pexp_array(~loc=at_rule.loc, [])
       | Rule_list(declaration) =>
-        render_declarations(~loc, declaration)
+        render_declarations(~loc, ~delimiter, declaration)
         |> Builder.pexp_array(~loc=at_rule.loc)
       };
 
@@ -160,7 +166,7 @@ and render_media_query = (~loc, at_rule: at_rule) => {
     );
   };
 }
-and render_container_query = (~loc, at_rule: at_rule) => {
+and render_container_query = (~loc, ~delimiter, at_rule: at_rule) => {
   let (at_rule_prelude_ast, at_rule_prelude_loc) = at_rule.prelude;
   let parse_condition = {
     /* TODO: Trimming is a mistake from the lexer/parser */
@@ -171,15 +177,16 @@ and render_container_query = (~loc, at_rule: at_rule) => {
     |> Result.map(_ => prelude);
   };
 
-  let (delimiter, attrs) =
+  let (string_delimiter, attrs) =
     Platform_attributes.string_delimiter(~loc=at_rule.loc);
 
   switch (parse_condition) {
   | Error(error_msg) =>
     Error.expr(
       ~loc=
-        Styled_ppx_css_parser.Parser_location.intersection(
-          loc,
+        Styled_ppx_css_parser.Parser_location.make_loc_from_loc(
+          ~string_loc=loc,
+          ~delimiter,
           at_rule_prelude_loc,
         ),
       error_msg,
@@ -189,7 +196,7 @@ and render_container_query = (~loc, at_rule: at_rule) => {
       [
         String_interpolation.transform(
           ~attrs,
-          ~delimiter,
+          ~delimiter=string_delimiter,
           ~loc=at_rule.loc,
           "@container " ++ conditions,
         ),
@@ -200,7 +207,7 @@ and render_container_query = (~loc, at_rule: at_rule) => {
       switch (at_rule.block) {
       | Empty => Builder.pexp_array(~loc=at_rule.loc, [])
       | Rule_list(declaration) =>
-        render_declarations(~loc, declaration)
+        render_declarations(~loc, ~delimiter, declaration)
         |> Builder.pexp_array(~loc=at_rule.loc)
       };
 
@@ -211,8 +218,9 @@ and render_container_query = (~loc, at_rule: at_rule) => {
     );
   };
 }
-and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
-  let (property, property_loc) = d.name;
+and render_declaration =
+    (~loc: Ppxlib.location, ~delimiter: option(string), d: declaration) => {
+  let (property, _property_loc) = d.name;
   let (valueList, value_loc) = d.value;
   let (important, _) = d.important;
   /* TODO: Trimming is a mistake from the lexer/parser */
@@ -221,15 +229,22 @@ and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
     |> String.trim;
 
   let value_loc =
-    Styled_ppx_css_parser.Parser_location.intersection(loc, value_loc);
-  let property_loc =
-    Styled_ppx_css_parser.Parser_location.intersection(loc, property_loc);
+    Styled_ppx_css_parser.Parser_location.make_loc_from_loc(
+      ~string_loc=loc,
+      ~delimiter,
+      value_loc,
+    );
+  /* Full declaration location (property: value) for errors that affect the whole declaration */
   let declaration_loc =
-    Styled_ppx_css_parser.Parser_location.intersection(loc, property_loc);
+    Styled_ppx_css_parser.Parser_location.make_loc_from_loc(
+      ~string_loc=loc,
+      ~delimiter,
+      d.loc,
+    );
 
   switch (
     Property_to_runtime.render(
-      ~loc=declaration_loc,
+      ~loc=value_loc,
       property,
       value_source,
       important,
@@ -237,7 +252,10 @@ and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
   ) {
   | Ok(exprs) => exprs
   | Error(`Property_not_found) => [
-      Error.expr(~loc=property_loc, "Unknown property '" ++ property ++ "'"),
+      Error.expr(
+        ~loc=declaration_loc,
+        "Unknown property '" ++ property ++ "'",
+      ),
     ]
   | Error(`Impossible_state) => [
       Error.expr(
@@ -257,13 +275,16 @@ and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
     ]
   };
 }
-and render_declarations = (~loc: Ppxlib.location, (ds, _d_loc)) => {
+and render_declarations =
+    (~loc: Ppxlib.location, ~delimiter: option(string), (ds, _d_loc)) => {
   ds
   |> List.concat_map(declaration =>
        switch (declaration) {
-       | Declaration(decl) => render_declaration(~loc, decl)
-       | At_rule(ar) => [render_at_rule(~loc, ar)]
-       | Style_rule(style_rules) => [render_style_rule(~loc, style_rules)]
+       | Declaration(decl) => render_declaration(~loc, ~delimiter, decl)
+       | At_rule(ar) => [render_at_rule(~loc, ~delimiter, ar)]
+       | Style_rule(style_rules) => [
+           render_style_rule(~loc, ~delimiter, style_rules),
+         ]
        }
      );
 }
@@ -382,16 +403,20 @@ and render_selectors = (~loc, selectors) => {
   selectors
   |> List.map(((selector, _loc)) => render_selector(~loc, selector));
 }
-and render_style_rule = (~loc, rule: style_rule) => {
+and render_style_rule = (~loc, ~delimiter, rule: style_rule) => {
   let (prelude, prelude_loc) = rule.prelude;
   let selector_location =
-    Styled_ppx_css_parser.Parser_location.intersection(loc, prelude_loc);
+    Styled_ppx_css_parser.Parser_location.make_loc_from_loc(
+      ~string_loc=loc,
+      ~delimiter,
+      prelude_loc,
+    );
 
   let selector_expr =
-    render_declarations(~loc, rule.block)
+    render_declarations(~loc, ~delimiter, rule.block)
     |> Builder.pexp_array(~loc=selector_location);
 
-  let (delimiter, attrs) =
+  let (string_delimiter, attrs) =
     Platform_attributes.string_delimiter(~loc=selector_location);
 
   let selector_name =
@@ -401,7 +426,7 @@ and render_style_rule = (~loc, rule: style_rule) => {
     |> List.map(
          String_interpolation.transform(
            ~attrs,
-           ~delimiter,
+           ~delimiter=string_delimiter,
            ~loc=selector_location,
          ),
        )
@@ -429,7 +454,7 @@ let render_style_call = (~loc, declaration_list) => {
   Helper.Exp.apply(~loc, CSS.style(~loc), [(Nolabel, declaration_list)]);
 };
 
-let render_keyframes = (~loc, declarations: rule_list) => {
+let render_keyframes = (~loc, ~delimiter, declarations: rule_list) => {
   let (declarations, declarations_loc) = declarations;
   let invalid_selector = {|
     keyframe selector can be `from`, `to` or <percentage>`
@@ -487,7 +512,7 @@ let render_keyframes = (~loc, declarations: rule_list) => {
          | Style_rule({prelude: (prelude, _), block, loc: style_loc}) =>
            let percentages = prelude |> List.map(render_select_as_keyframe);
            let rules =
-             render_declarations(~loc, block)
+             render_declarations(~loc, ~delimiter, block)
              |> Builder.pexp_array(~loc=declarations_loc);
            percentages
            |> List.map(p => Builder.pexp_tuple(~loc=style_loc, [p, rules]));
@@ -504,7 +529,7 @@ let render_keyframes = (~loc, declarations: rule_list) => {
   );
 };
 
-let render_global = (~loc, (rule_list, stylesheet_loc): rule_list) => {
+let render_global = (~loc, ~delimiter, (rule_list, stylesheet_loc): rule_list) => {
   let onlyStyleRulesAndAtRulesSupported = {|Declarations does not make sense in global styles. Global should consists of style rules or at-rules (e.g @media, @print, etc.)
 
 If your intent is to apply the declaration to all elements, use the universal selector
@@ -516,8 +541,9 @@ If your intent is to apply the declaration to all elements, use the universal se
     rule_list
     |> List.map(rule => {
          switch (rule) {
-         | Style_rule(style_rule) => render_style_rule(~loc, style_rule)
-         | At_rule(at_rule) => render_at_rule(~loc, at_rule)
+         | Style_rule(style_rule) =>
+           render_style_rule(~loc, ~delimiter, style_rule)
+         | At_rule(at_rule) => render_at_rule(~loc, ~delimiter, at_rule)
          | _ =>
            Error.expr(~loc=stylesheet_loc, onlyStyleRulesAndAtRulesSupported)
          }
