@@ -13,11 +13,18 @@
             | `double
             | `groove
             | `hidden
+            | `inherit_
+            | `initial
             | `inset
             | `none
             | `outset
+            | `revert
+            | `revertLayer
             | `ridge
-            | `solid ] ->
+            | `solid
+            | `unset
+            | `var of string
+            | `varDefault of string * string ] ->
            Css_types.Color.t -> string
          but an expression was expected of type string
   [1]
