@@ -122,11 +122,7 @@ let success_tests =
       {|$( Module.variable )|},
       [INTERPOLATION(["Module", "variable"])],
     ),
-    (
-      __POS__,
-      {|$(  maxWidth  )|},
-      [INTERPOLATION(["maxWidth"])],
-    ),
+    (__POS__, {|$(  maxWidth  )|}, [INTERPOLATION(["maxWidth"])]),
     (
       __POS__,
       {|$( Color.Border.lineAlpha )|},
@@ -389,12 +385,7 @@ let test_with_location =
       [INTERPOLATION(["Module", "variable"])],
       20,
     ),
-    (
-      __POS__,
-      {|$(  maxWidth  )|},
-      [INTERPOLATION(["maxWidth"])],
-      15,
-    ),
+    (__POS__, {|$(  maxWidth  )|}, [INTERPOLATION(["maxWidth"])], 15),
     (__POS__, {|--color-main|}, [IDENT("--color-main")], 12),
     (__POS__, {|>=|}, [DELIM(">=")], 2),
     (__POS__, {|<=|}, [DELIM("<=")], 2),

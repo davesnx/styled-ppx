@@ -229,15 +229,13 @@ let transform = (parser, id, map) =>
     [[%expr "(" ++ [%e id] ++ ": " ++ [%e arg] ++ ") "]]
   );
 
-let width =
-  transform(Parser.property_width, [%expr "width"], render_size);
+let width = transform(Parser.property_width, [%expr "width"], render_size);
 let min_width =
   transform(Parser.property_width, [%expr "min-width"], render_size);
 
 let max_width =
   transform(Parser.property_width, [%expr "max-width"], render_size);
-let height =
-  transform(Parser.property_height, [%expr "height"], render_size);
+let height = transform(Parser.property_height, [%expr "height"], render_size);
 let min_height =
   transform(Parser.property_height, [%expr "min-height"], render_size);
 let max_height =

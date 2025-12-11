@@ -107,7 +107,9 @@ let tests =
       "box-shadow: $(h) $(v) $(blur) $(spread) $(color)",
       [%expr [%css "box-shadow: $(h) $(v) $(blur) $(spread) $(color)"]],
       [%expr
-        CSS.boxShadows([|CSS.BoxShadow.box(~x=h, ~y=v, ~blur, ~spread, color)|])
+        CSS.boxShadows([|
+          CSS.BoxShadow.box(~x=h, ~y=v, ~blur, ~spread, color),
+        |])
       ],
     ),
     (

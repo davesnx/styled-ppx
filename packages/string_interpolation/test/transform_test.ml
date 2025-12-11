@@ -97,7 +97,9 @@ let module_access_with_spaces () =
   assert_equal (transform "$( Module.value )") [%expr Module.value]
 
 let nested_module_with_spaces () =
-  assert_equal (transform "$( Color.Border.lineAlpha )") [%expr Color.Border.lineAlpha]
+  assert_equal
+    (transform "$( Color.Border.lineAlpha )")
+    [%expr Color.Border.lineAlpha]
 
 let () =
   Alcotest.run "String interpolation test suit"
@@ -127,8 +129,10 @@ let () =
       test "half_dollar_sign" half_dollar_sign;
       (* Interpolation with spaces tests *)
       test "inline_variable_with_spaces" inline_variable_with_spaces;
-      test "inline_variable_with_leading_space" inline_variable_with_leading_space;
-      test "inline_variable_with_trailing_space" inline_variable_with_trailing_space;
+      test "inline_variable_with_leading_space"
+        inline_variable_with_leading_space;
+      test "inline_variable_with_trailing_space"
+        inline_variable_with_trailing_space;
       test "module_access_with_spaces" module_access_with_spaces;
       test "nested_module_with_spaces" nested_module_with_spaces;
     ]

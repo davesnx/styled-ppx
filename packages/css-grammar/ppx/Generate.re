@@ -531,7 +531,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       };
   };
 
-  let rec make_value = (value) => {
+  let rec make_value = value => {
     let terminal_op = (kind, modifier) => {
       // as everyrule is in the same namespace
       let rule =
@@ -550,12 +550,15 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
             "Standard." ++ snake_name |> evar;
           } else {
             // Runtime lookup by CSS name (registry uses CSS-style names with hyphens)
-            eapply(evar("lookup"), [estring(name)]);
+            eapply(
+              evar("lookup"),
+              [estring(name)],
+            );
           };
         | Property_type(name) =>
           // Runtime lookup for property references (properties use prefixed keys)
           let key = "property_" ++ name;
-          eapply(evar("lookup"), [estring(key)])
+          eapply(evar("lookup"), [estring(key)]);
         };
       apply_modifier(modifier, rule);
     };
@@ -587,10 +590,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
           };
 
         let map_fn = pexp_fun(Nolabel, None, pattern, expr);
-        eapply(
-          evar("Rule.Match.map"),
-          [make_value(value), map_fn],
-        );
+        eapply(evar("Rule.Match.map"), [make_value(value), map_fn]);
       };
 
       switch (kind) {

@@ -167,7 +167,8 @@ and render_container_query = (~loc, at_rule: at_rule) => {
     let prelude =
       Styled_ppx_css_parser.Render.component_value_list(at_rule_prelude_ast)
       |> String.trim;
-    Parser.parse(Parser.container_condition, prelude) |> Result.map(_ => prelude);
+    Parser.parse(Parser.container_condition, prelude)
+    |> Result.map(_ => prelude);
   };
 
   let (delimiter, attrs) =

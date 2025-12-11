@@ -1206,8 +1206,7 @@ let pointer_events =
     },
   );
 
-let image_resolution =
-  unsupportedProperty(Parser.property_image_resolution);
+let image_resolution = unsupportedProperty(Parser.property_image_resolution);
 
 let image_orientation =
   unsupportedProperty(Parser.property_image_orientation);
@@ -1827,8 +1826,7 @@ let render_background = (~loc, background: Parser.property_background) => {
   ]);
 };
 
-let background =
-  polymorphic(Parser.property_background, render_background);
+let background = polymorphic(Parser.property_background, render_background);
 
 let border_top_color =
   monomorphic(
@@ -2233,8 +2231,7 @@ let border_image = unsupportedProperty(Parser.property_border_image);
 
 let box_shadow =
   polymorphic(
-    Parser.property_box_shadow,
-    (~loc, value: Parser.property_box_shadow) =>
+    Parser.property_box_shadow, (~loc, value: Parser.property_box_shadow) =>
     switch (value) {
     | `Interpolation(variable) =>
       /* Here we rely on boxShadow*s* which makes the value be an array */
@@ -2387,9 +2384,7 @@ let text_transform =
   );
 
 let white_space =
-  variants(Parser.property_white_space, (~loc) =>
-    [%expr CSS.whiteSpace]
-  );
+  variants(Parser.property_white_space, (~loc) => [%expr CSS.whiteSpace]);
 
 let render_tab_size = (~loc, value: Parser.property_tab_size) => {
   switch (value) {
@@ -2438,9 +2433,7 @@ let hyphens =
   variants(Parser.property_hyphens, (~loc) => [%expr CSS.hyphens]);
 
 let overflow_wrap =
-  variants(Parser.property_overflow_wrap, (~loc) =>
-    [%expr CSS.overflowWrap]
-  );
+  variants(Parser.property_overflow_wrap, (~loc) => [%expr CSS.overflowWrap]);
 
 let word_wrap =
   variants(Parser.property_word_wrap, (~loc) => [%expr CSS.wordWrap]);
@@ -2459,9 +2452,7 @@ let text_align_last =
   );
 
 let text_justify =
-  variants(Parser.property_text_justify, (~loc) =>
-    [%expr CSS.textJustify]
-  );
+  variants(Parser.property_text_justify, (~loc) => [%expr CSS.textJustify]);
 
 let word_spacing =
   monomorphic(
@@ -2532,8 +2523,7 @@ let render_font_family = (~loc, value) =>
 // css-fonts-4
 let font_family =
   polymorphic(
-    Parser.property_font_family,
-    (~loc, value: Parser.property_font_family) =>
+    Parser.property_font_family, (~loc, value: Parser.property_font_family) =>
     switch (value) {
     | `Interpolation(v) =>
       /* We need to add annotation since arrays can be mutable and the type isn't scoped enough */
@@ -2626,8 +2616,7 @@ let font_size =
     render_font_size,
   );
 
-let font_size_adjust =
-  unsupportedProperty(Parser.property_font_size_adjust);
+let font_size_adjust = unsupportedProperty(Parser.property_font_size_adjust);
 
 let font = unsupportedProperty(Parser.property_font);
 
@@ -2654,9 +2643,7 @@ let font_synthesis_position =
 let font_synthesis = unsupportedProperty(Parser.property_font_synthesis);
 
 let font_kerning =
-  variants(Parser.property_font_kerning, (~loc) =>
-    [%expr CSS.fontKerning]
-  );
+  variants(Parser.property_font_kerning, (~loc) => [%expr CSS.fontKerning]);
 
 let font_variant_ligatures =
   unsupportedProperty(Parser.property_font_variant_ligatures);
@@ -2773,8 +2760,7 @@ let text_decoration_thickness =
 
 let text_decoration =
   polymorphic(
-    Parser.property_text_decoration,
-    (~loc, (color, style, thickness, line)) =>
+    Parser.property_text_decoration, (~loc, (color, style, thickness, line)) =>
     [
       [%expr
         CSS.textDecorations(
@@ -3091,9 +3077,7 @@ let transform_origin =
   );
 
 let transform_box =
-  variants(Parser.property_transform_box, (~loc) =>
-    [%expr CSS.transformBox]
-  );
+  variants(Parser.property_transform_box, (~loc) => [%expr CSS.transformBox]);
 
 let translate =
   polymorphic(Parser.property_translate, (~loc) =>
@@ -3319,8 +3303,7 @@ let render_timing_no_interp = (~loc) =>
 
 let render_timing = (~loc) =>
   fun
-  | #Parser.timing_function_no_interp as x =>
-    render_timing_no_interp(~loc, x)
+  | #Parser.timing_function_no_interp as x => render_timing_no_interp(~loc, x)
   | `Interpolation(v) => render_variable(~loc, v);
 
 let transition_timing_function =
@@ -5316,8 +5299,7 @@ let list_style_image =
 let list_style_position =
   unsupportedProperty(Parser.property_list_style_position);
 
-let list_style_type =
-  unsupportedProperty(Parser.property_list_style_type);
+let list_style_type = unsupportedProperty(Parser.property_list_style_type);
 
 let mix_blend_mode =
   monomorphic(
@@ -5430,13 +5412,11 @@ let scrollbar_width =
       },
   );
 
-let stroke_dasharray =
-  unsupportedProperty(Parser.property_stroke_dasharray);
+let stroke_dasharray = unsupportedProperty(Parser.property_stroke_dasharray);
 
 let stroke_linecap = unsupportedProperty(Parser.property_stroke_linecap);
 
-let stroke_linejoin =
-  unsupportedProperty(Parser.property_stroke_linejoin);
+let stroke_linejoin = unsupportedProperty(Parser.property_stroke_linejoin);
 
 let stroke_miterlimit =
   unsupportedProperty(Parser.property_stroke_miterlimit);
@@ -5481,8 +5461,7 @@ let border_block_end_style =
 let border_block_end_width =
   unsupportedProperty(Parser.property_border_block_end_width);
 
-let border_block_end =
-  unsupportedProperty(Parser.property_border_block_end);
+let border_block_end = unsupportedProperty(Parser.property_border_block_end);
 
 let border_block_start_color =
   unsupportedProperty(Parser.property_border_block_start_color);
@@ -5758,11 +5737,7 @@ let render_attr_type = (~loc, attr_type: Parser.attr_type) => {
 };
 
 let render_function_attr =
-    (
-      ~loc,
-      attr_name: Parser.attr_name,
-      attr_type: option(Parser.attr_type),
-    ) => {
+    (~loc, attr_name: Parser.attr_name, attr_type: option(Parser.attr_type)) => {
   switch (attr_type) {
   | Some(attr_type) => [%expr
      `attrWithType((
@@ -5929,16 +5904,14 @@ let initial_letter = unsupportedProperty(Parser.property_initial_letter);
 
 let inline_size = unsupportedProperty(Parser.property_inline_size);
 
-let inset_block_end =
-  unsupportedProperty(Parser.property_inset_block_end);
+let inset_block_end = unsupportedProperty(Parser.property_inset_block_end);
 
 let inset_block_start =
   unsupportedProperty(Parser.property_inset_block_start);
 
 let inset_block = unsupportedProperty(Parser.property_inset_block);
 
-let inset_inline_end =
-  unsupportedProperty(Parser.property_inset_inline_end);
+let inset_inline_end = unsupportedProperty(Parser.property_inset_inline_end);
 
 let inset_inline_start =
   unsupportedProperty(Parser.property_inset_inline_start);
@@ -5947,22 +5920,17 @@ let inset_inline = unsupportedProperty(Parser.property_inset_inline);
 
 let inset = unsupportedProperty(Parser.property_inset);
 
-let layout_grid_char =
-  unsupportedProperty(Parser.property_layout_grid_char);
+let layout_grid_char = unsupportedProperty(Parser.property_layout_grid_char);
 
-let layout_grid_line =
-  unsupportedProperty(Parser.property_layout_grid_line);
+let layout_grid_line = unsupportedProperty(Parser.property_layout_grid_line);
 
-let layout_grid_mode =
-  unsupportedProperty(Parser.property_layout_grid_mode);
+let layout_grid_mode = unsupportedProperty(Parser.property_layout_grid_mode);
 
-let layout_grid_type =
-  unsupportedProperty(Parser.property_layout_grid_type);
+let layout_grid_type = unsupportedProperty(Parser.property_layout_grid_type);
 
 let layout_grid = unsupportedProperty(Parser.property_layout_grid);
 
-let mask_border_mode =
-  unsupportedProperty(Parser.property_mask_border_mode);
+let mask_border_mode = unsupportedProperty(Parser.property_mask_border_mode);
 
 let mask_border_outset =
   unsupportedProperty(Parser.property_mask_border_outset);
@@ -6012,13 +5980,11 @@ let mask_type = unsupportedProperty(Parser.property_mask_type);
 
 let max_block_size = unsupportedProperty(Parser.property_max_block_size);
 
-let max_inline_size =
-  unsupportedProperty(Parser.property_max_inline_size);
+let max_inline_size = unsupportedProperty(Parser.property_max_inline_size);
 
 let min_block_size = unsupportedProperty(Parser.property_min_block_size);
 
-let min_inline_size =
-  unsupportedProperty(Parser.property_min_inline_size);
+let min_inline_size = unsupportedProperty(Parser.property_min_inline_size);
 
 let nav_down = unsupportedProperty(Parser.property_nav_down);
 
@@ -6038,13 +6004,11 @@ let offset_anchor =
       | `Position(x) => render_position(~loc, x),
   );
 
-let offset_distance =
-  unsupportedProperty(Parser.property_offset_distance);
+let offset_distance = unsupportedProperty(Parser.property_offset_distance);
 
 let offset_path = unsupportedProperty(Parser.property_offset_path);
 
-let offset_position =
-  unsupportedProperty(Parser.property_offset_position);
+let offset_position = unsupportedProperty(Parser.property_offset_position);
 
 let offset_rotate = unsupportedProperty(Parser.property_offset_rotate);
 
@@ -6219,8 +6183,7 @@ let visibility =
 let accent_color = unsupportedProperty(Parser.property_accent_color);
 let animation_composition =
   unsupportedProperty(Parser.property_animation_composition);
-let animation_range =
-  unsupportedProperty(Parser.property_animation_range);
+let animation_range = unsupportedProperty(Parser.property_animation_range);
 let animation_range_end =
   unsupportedProperty(Parser.property_animation_range_end);
 let animation_range_start =
@@ -6230,12 +6193,10 @@ let animation_timeline =
 let anchor_name = unsupportedProperty(Parser.property_anchor_name);
 let anchor_scope = unsupportedProperty(Parser.property_anchor_scope);
 let field_sizing = unsupportedProperty(Parser.property_field_sizing);
-let interpolate_size =
-  unsupportedProperty(Parser.property_interpolate_size);
+let interpolate_size = unsupportedProperty(Parser.property_interpolate_size);
 let inset_area = unsupportedProperty(Parser.property_inset_area);
 let overlay = unsupportedProperty(Parser.property_overlay);
-let position_anchor =
-  unsupportedProperty(Parser.property_position_anchor);
+let position_anchor = unsupportedProperty(Parser.property_position_anchor);
 let position_area = unsupportedProperty(Parser.property_position_area);
 let position_try = unsupportedProperty(Parser.property_position_try);
 let position_try_fallbacks =
@@ -6262,8 +6223,7 @@ let scroll_start_target_x =
   unsupportedProperty(Parser.property_scroll_start_target_x);
 let scroll_start_target_y =
   unsupportedProperty(Parser.property_scroll_start_target_y);
-let scroll_timeline =
-  unsupportedProperty(Parser.property_scroll_timeline);
+let scroll_timeline = unsupportedProperty(Parser.property_scroll_timeline);
 let scroll_timeline_axis =
   unsupportedProperty(Parser.property_scroll_timeline_axis);
 let scroll_timeline_name =
@@ -6342,8 +6302,7 @@ let animation_delay_start =
 let syntax = unsupportedProperty(Parser.property_syntax);
 let inherits = unsupportedProperty(Parser.property_inherits);
 let initial_value = unsupportedProperty(Parser.property_initial_value);
-let color_rendering =
-  unsupportedProperty(Parser.property_color_rendering);
+let color_rendering = unsupportedProperty(Parser.property_color_rendering);
 let vector_effect = unsupportedProperty(Parser.property_vector_effect);
 let cx = unsupportedProperty(Parser.property_cx);
 let cy = unsupportedProperty(Parser.property_cy);
@@ -6366,8 +6325,7 @@ let marker_end = unsupportedProperty(Parser.property_marker_end);
 let marker_mid = unsupportedProperty(Parser.property_marker_mid);
 let marker_start = unsupportedProperty(Parser.property_marker_start);
 let margin_block = unsupportedProperty(Parser.property_margin_block);
-let margin_block_end =
-  unsupportedProperty(Parser.property_margin_block_end);
+let margin_block_end = unsupportedProperty(Parser.property_margin_block_end);
 let margin_block_start =
   unsupportedProperty(Parser.property_margin_block_start);
 let margin_inline = unsupportedProperty(Parser.property_margin_inline);
@@ -6485,8 +6443,7 @@ let text_rendering =
       | `OptimizeLegibility => [%expr `optimizeLegibility]
       | `GeometricPrecision => [%expr `geometricPrecision],
   );
-let text_size_adjust =
-  unsupportedProperty(Parser.property_text_size_adjust);
+let text_size_adjust = unsupportedProperty(Parser.property_text_size_adjust);
 let scroll_behavior =
   monomorphic(
     Parser.property_scroll_behavior,
@@ -6548,10 +6505,8 @@ let scroll_snap_points_x =
   unsupportedProperty(Parser.property_scroll_snap_points_x);
 let scroll_snap_points_y =
   unsupportedProperty(Parser.property_scroll_snap_points_y);
-let scroll_snap_stop =
-  unsupportedProperty(Parser.property_scroll_snap_stop);
-let scroll_snap_type =
-  unsupportedProperty(Parser.property_scroll_snap_type);
+let scroll_snap_stop = unsupportedProperty(Parser.property_scroll_snap_stop);
+let scroll_snap_type = unsupportedProperty(Parser.property_scroll_snap_type);
 let scroll_snap_type_x =
   unsupportedProperty(Parser.property_scroll_snap_type_x);
 let scroll_snap_type_y =

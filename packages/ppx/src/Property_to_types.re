@@ -162,7 +162,7 @@ let property_name_to_module_name = (property_name: string): string => {
 
 let property_to_module = property_name => {
   switch (Css_grammar.Parser.find_property(property_name)) {
-  | Some(Css_grammar.Parser.Pack_rule({ runtime_module_path, _ })) =>
+  | Some(Css_grammar.Parser.Pack_rule({runtime_module_path, _})) =>
     switch (runtime_module_path) {
     | Some(path) =>
       switch (String.split_on_char('.', path)) {
@@ -178,7 +178,7 @@ let property_to_module = property_name => {
       | Some(module_name) => Some(module_name)
       | None => Some(property_name_to_module_name(property_name))
       }
-    };
+    }
   | None =>
     switch (List.assoc_opt(property_name, property_to_module_mapping)) {
     | Some(module_name) => Some(module_name)
@@ -204,14 +204,20 @@ let get_interpolation_tostrings =
     : result(list(interpolation_info), string) => {
   switch (Css_grammar.Parser.find_property(property_name)) {
   | None => Error("Property not found in registry: " ++ property_name)
-  | Some(Css_grammar.Parser.Pack_rule({ rule: _, runtime_module_path, validate })) =>
+  | Some(
+      Css_grammar.Parser.Pack_rule({rule: _, runtime_module_path, validate}),
+    ) =>
     switch (runtime_module_path) {
     | None => Error("Property has no runtime module path: " ++ property_name)
     | Some(default_runtime_path) =>
       switch (validate(value)) {
       | Error(parse_error) => Error("Failed to parse value: " ++ parse_error)
       | Ok () =>
-        let interpolations = Css_grammar.Parser.get_interpolation_types(~name=property_name, value);
+        let interpolations =
+          Css_grammar.Parser.get_interpolation_types(
+            ~name=property_name,
+            value,
+          );
         let infos =
           interpolations
           |> List.map(((variable_name, type_path)) => {
@@ -228,7 +234,7 @@ let get_interpolation_tostrings =
              });
         Ok(infos);
       }
-    };
+    }
   };
 };
 
@@ -253,14 +259,18 @@ let parse_and_extract_interpolations =
     : result(list(interpolation_info), string) => {
   switch (Css_grammar.Parser.find_property(property_name)) {
   | None => Error("Property not found in registry: " ++ property_name)
-  | Some(Css_grammar.Parser.Pack_rule({ runtime_module_path, validate, _ })) =>
+  | Some(Css_grammar.Parser.Pack_rule({runtime_module_path, validate, _})) =>
     switch (runtime_module_path) {
     | None => Error("Property has no runtime module path: " ++ property_name)
     | Some(default_runtime_path) =>
       switch (validate(value)) {
       | Error(parse_error) => Error("Failed to parse value: " ++ parse_error)
       | Ok () =>
-        let interpolations = Css_grammar.Parser.get_interpolation_types(~name=property_name, value);
+        let interpolations =
+          Css_grammar.Parser.get_interpolation_types(
+            ~name=property_name,
+            value,
+          );
         let infos =
           interpolations
           |> List.map(((variable_name, type_path)) => {
@@ -277,6 +287,6 @@ let parse_and_extract_interpolations =
              });
         Ok(infos);
       }
-    };
+    }
   };
 };

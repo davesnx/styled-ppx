@@ -78,7 +78,13 @@ let spec_t_expander =
     Emit.create_type_parser(parsed_spec);
   | exception _
   | None =>
-    raise(Location.raise_errorf(~loc=exprLoc, "couldn't parse CSS spec: %s", value))
+    raise(
+      Location.raise_errorf(
+        ~loc=exprLoc,
+        "couldn't parse CSS spec: %s",
+        value,
+      ),
+    )
   };
 };
 
@@ -86,7 +92,11 @@ let spec_t_extension =
   Ppxlib.Extension.declare(
     "spec_t",
     Ppxlib.Extension.Context.Core_type,
-    Ast_pattern.(pstr(pstr_eval(pexp_constant(pconst_string(__, __', none)), nil) ^:: nil)),
+    Ast_pattern.(
+      pstr(
+        pstr_eval(pexp_constant(pconst_string(__, __', none)), nil) ^:: nil,
+      )
+    ),
     spec_t_expander,
   );
 
@@ -147,7 +157,8 @@ let spec_module_expander =
     | Pexp_tuple(elements) =>
       switch (elements) {
       /* Form 2a: [%spec_module "type_name", "spec_string"] - type_name is ignored */
-      | [_type_name_expr, spec_expr] when extract_spec_string(spec_expr) != None =>
+      | [_type_name_expr, spec_expr]
+          when extract_spec_string(spec_expr) != None =>
         switch (extract_spec_string(spec_expr)) {
         | Some(s) => (s, None, None)
         | None =>
@@ -159,7 +170,10 @@ let spec_module_expander =
           )
         }
       /* Form 2b: [%spec_module "spec_string", (module ...)] */
-      | [spec_expr, witness_expr] when extract_spec_string(spec_expr) != None && extract_module_path(witness_expr) != None =>
+      | [spec_expr, witness_expr]
+          when
+            extract_spec_string(spec_expr) != None
+            && extract_module_path(witness_expr) != None =>
         switch (extract_spec_string(spec_expr)) {
         | Some(s) =>
           let runtime_path =
