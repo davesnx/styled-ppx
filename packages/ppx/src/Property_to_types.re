@@ -199,45 +199,6 @@ type interpolation_info = {
   to_string_path: string,
 };
 
-let get_interpolation_tostrings =
-    (property_name: string, value: string)
-    : result(list(interpolation_info), string) => {
-  switch (Css_grammar.Parser.find_property(property_name)) {
-  | None => Error("Property not found in registry: " ++ property_name)
-  | Some(
-      Css_grammar.Parser.Pack_rule({rule: _, runtime_module_path, validate}),
-    ) =>
-    switch (runtime_module_path) {
-    | None => Error("Property has no runtime module path: " ++ property_name)
-    | Some(default_runtime_path) =>
-      switch (validate(value)) {
-      | Error(parse_error) => Error("Failed to parse value: " ++ parse_error)
-      | Ok () =>
-        let interpolations =
-          Css_grammar.Parser.get_interpolation_types(
-            ~name=property_name,
-            value,
-          );
-        let infos =
-          interpolations
-          |> List.map(((variable_name, type_path)) => {
-               let effective_path =
-                 if (type_path != "") {
-                   type_path;
-                 } else {
-                   default_runtime_path;
-                 };
-               {
-                 variable_name,
-                 to_string_path: effective_path ++ ".toString",
-               };
-             });
-        Ok(infos);
-      }
-    }
-  };
-};
-
 let is_property_registered = (property_name: string): bool => {
   switch (Css_grammar.Parser.find_property(property_name)) {
   | Some(_) => true

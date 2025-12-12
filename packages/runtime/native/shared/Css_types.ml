@@ -277,6 +277,7 @@ module Length = struct
 end
 
 module Angle = struct
+  (* TODO: Add calc and min/max support *)
   type t =
     [ `deg of float
     | `rad of float
@@ -1461,11 +1462,7 @@ module Color = struct
     | Percentage.t calc_min_max
     ]
 
-  type angle_with_calc =
-    [ Angle.t
-    | Angle.t calc_min_max
-    ]
-
+  type angle_with_calc = Angle.t
   type hsl = angle_with_calc * percent_with_calc * percent_with_calc
 
   let string_of_angle_with_calc x =
@@ -1962,9 +1959,26 @@ module TextEmphasisPosition = struct
       | #Cascading.t as c -> Cascading.toString c
   end
 
-  type t = [ `TextEmphasisPosition of string ]
+  type t =
+    [ `over
+    | `under
+    | `overRight
+    | `overLeft
+    | `underRight
+    | `underLeft
+    | Var.t
+    | Cascading.t
+    ]
 
-  let toString = function `TextEmphasisPosition s -> s
+  let toString = function
+    | `over -> {js|over|js}
+    | `under -> {js|under|js}
+    | `overRight -> {js|over right|js}
+    | `overLeft -> {js|over left|js}
+    | `underRight -> {js|under right|js}
+    | `underLeft -> {js|under left|js}
+    | #Var.t as v -> Var.toString v
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Position = struct
@@ -8315,9 +8329,14 @@ module AbsoluteSize = struct
 end
 
 module AccentColor = struct
-  type t = [ `AccentColor of string ]
+  type t =
+    [ `auto
+    | Color.t
+    ]
 
-  let toString = function `AccentColor s -> s
+  let toString = function
+    | `auto -> {js|auto|js}
+    | #Color.t as c -> Color.toString c
 end
 
 module Age = struct
@@ -8334,33 +8353,62 @@ module Age = struct
 end
 
 module AnchorName = struct
-  type t = [ `AnchorName of string ]
+  type t =
+    [ `none
+    | `dashedIdent of string
+    ]
 
-  let toString = function `AnchorName s -> s
+  let toString = function `none -> {js|none|js} | `dashedIdent s -> s
 end
 
 module AnchorScope = struct
-  type t = [ `AnchorScope of string ]
+  type t =
+    [ `none
+    | `all
+    | `dashedIdent of string
+    ]
 
-  let toString = function `AnchorScope s -> s
+  let toString = function
+    | `none -> {js|none|js}
+    | `all -> {js|all|js}
+    | `dashedIdent s -> s
 end
 
 module AngularColorHint = struct
-  type t = [ `AngularColorHint of string ]
+  type t =
+    [ Angle.t
+    | Percentage.t
+    ]
 
-  let toString = function `AngularColorHint s -> s
+  let toString = function
+    | #Angle.t as a -> Angle.toString a
+    | #Percentage.t as p -> Percentage.toString p
 end
 
 module AngularColorStop = struct
-  type t = [ `AngularColorStop of string ]
+  type t = Color.t * Angle.t option
 
-  let toString = function `AngularColorStop s -> s
+  let toString (color, angle_opt) =
+    match angle_opt with
+    | None -> Color.toString color
+    | Some angle -> Color.toString color ^ {js| |js} ^ Angle.toString angle
 end
 
 module AngularColorStopList = struct
-  type t = [ `AngularColorStopList of string ]
+  type angular_stop_item =
+    [ `stop of AngularColorStop.t
+    | `hint of AngularColorHint.t
+    ]
 
-  let toString = function `AngularColorStopList s -> s
+  type t = angular_stop_item list
+
+  let angular_stop_item_to_string = function
+    | `stop s -> AngularColorStop.toString s
+    | `hint h -> AngularColorHint.toString h
+
+  let toString items =
+    Kloth.Array.map_and_join ~sep:{js|, |js} ~f:angular_stop_item_to_string
+      (Array.of_list items)
 end
 
 module AnimateableFeature = struct
@@ -8377,45 +8425,73 @@ module AnimateableFeature = struct
 end
 
 module AnimationComposition = struct
-  type t = [ `AnimationComposition of string ]
+  type t =
+    [ `replace
+    | `add
+    | `accumulate
+    ]
 
-  let toString = function `AnimationComposition s -> s
+  let toString = function
+    | `replace -> {js|replace|js}
+    | `add -> {js|add|js}
+    | `accumulate -> {js|accumulate|js}
 end
 
 module AnimationDelayEnd = struct
-  type t = [ `AnimationDelayEnd of string ]
+  type t = Time.t
 
-  let toString = function `AnimationDelayEnd s -> s
+  let toString = Time.toString
 end
 
 module AnimationDelayStart = struct
-  type t = [ `AnimationDelayStart of string ]
+  type t = Time.t
 
-  let toString = function `AnimationDelayStart s -> s
+  let toString = Time.toString
 end
 
 module AnimationRange = struct
-  type t = [ `AnimationRange of string ]
+  type t =
+    [ `normal
+    | Length.t
+    | Percentage.t
+    ]
 
-  let toString = function `AnimationRange s -> s
+  let toString = function
+    | `normal -> {js|normal|js}
+    | #Length.t as l -> Length.toString l
 end
 
 module AnimationRangeEnd = struct
-  type t = [ `AnimationRangeEnd of string ]
+  type t =
+    [ `normal
+    | Length.t
+    | Percentage.t
+    ]
 
-  let toString = function `AnimationRangeEnd s -> s
+  let toString = function
+    | `normal -> {js|normal|js}
+    | #Length.t as l -> Length.toString l
 end
 
 module AnimationRangeStart = struct
-  type t = [ `AnimationRangeStart of string ]
+  type t =
+    [ `normal
+    | Length.t
+    | Percentage.t
+    ]
 
-  let toString = function `AnimationRangeStart s -> s
+  let toString = function
+    | `normal -> {js|normal|js}
+    | #Length.t as l -> Length.toString l
 end
 
 module AnimationTimeline = struct
-  type t = [ `AnimationTimeline of string ]
+  type t =
+    [ `none
+    | `customIdent of string
+    ]
 
-  let toString = function `AnimationTimeline s -> s
+  let toString = function `none -> {js|none|js} | `customIdent s -> s
 end
 
 module Attachment = struct
@@ -8432,15 +8508,29 @@ module Attachment = struct
 end
 
 module AttrFallback = struct
-  type t = [ `AttrFallback of string ]
+  (* <any-value> - can be any valid CSS value *)
+  type t = [ `anyValue of string ]
 
-  let toString = function `AttrFallback s -> s
+  let toString = function `anyValue s -> s
 end
 
 module AttrMatcher = struct
-  type t = [ `AttrMatcher of string ]
+  type t =
+    [ `exact (* = *)
+    | `includes (* ~= *)
+    | `dashMatch (* |= *)
+    | `prefix (* ^= *)
+    | `suffix (* $= *)
+    | `substring (* *= *)
+    ]
 
-  let toString = function `AttrMatcher s -> s
+  let toString = function
+    | `exact -> {js|=|js}
+    | `includes -> {js|~=|js}
+    | `dashMatch -> {js||=|js}
+    | `prefix -> {js|^=|js}
+    | `suffix -> {js|$=|js}
+    | `substring -> {js|*=|js}
 end
 
 module AttrModifier = struct
@@ -8529,9 +8619,26 @@ module AttrName = struct
 end
 
 module AttributeSelector = struct
-  type t = [ `AttributeSelector of string ]
+  type t =
+    [ `attrExists of string (* [attr] *)
+    | `attrValue of
+      string * AttrMatcher.t * string * AttrModifier.t option (* [attr=value] *)
+    ]
 
-  let toString = function `AttributeSelector s -> s
+  let toString = function
+    | `attrExists name -> {js|[|js} ^ name ^ {js|]|js}
+    | `attrValue (name, matcher, value, modifier) ->
+      let base =
+        {js|[|js}
+        ^ name
+        ^ AttrMatcher.toString matcher
+        ^ {js|"|js}
+        ^ value
+        ^ {js|"|js}
+      in
+      (match modifier with
+      | None -> base ^ {js|]|js}
+      | Some m -> base ^ {js| |js} ^ AttrModifier.toString m ^ {js|]|js})
 end
 
 module AutoRepeat = struct
@@ -8557,9 +8664,9 @@ module AutoRepeat = struct
 end
 
 module AutoTrackList = struct
-  type t = [ `AutoTrackList of string ]
+  type t = [ `tracks of string ]
 
-  let toString = function `AutoTrackList s -> s
+  let toString = function `tracks s -> s
 end
 
 module BackdropBlur = struct
@@ -8644,9 +8751,20 @@ module BaselinePosition = struct
 end
 
 module BasicShape = struct
-  type t = [ `BasicShape of string ]
+  type t =
+    [ `inset of string (* inset() function args *)
+    | `circle of string (* circle() function args *)
+    | `ellipse of string (* ellipse() function args *)
+    | `polygon of string (* polygon() function args *)
+    | `path of string (* path() function args *)
+    ]
 
-  let toString = function `BasicShape s -> s
+  let toString = function
+    | `inset args -> {js|inset(|js} ^ args ^ {js|)|js}
+    | `circle args -> {js|circle(|js} ^ args ^ {js|)|js}
+    | `ellipse args -> {js|ellipse(|js} ^ args ^ {js|)|js}
+    | `polygon args -> {js|polygon(|js} ^ args ^ {js|)|js}
+    | `path args -> {js|path(|js} ^ args ^ {js|)|js}
 end
 
 module BgImage = struct
@@ -8660,16 +8778,139 @@ module BgImage = struct
     | #Image.t as i -> Image.toString i
 end
 
-module BgLayer = struct
-  type t = [ `BgLayer of string ]
+module BgPosition = struct
+  type horizontal =
+    [ `left
+    | `center
+    | `right
+    | `length of Length.t
+    | `percentage of Percentage.t
+    ]
 
-  let toString = function `BgLayer s -> s
+  type vertical =
+    [ `top
+    | `center
+    | `bottom
+    | `length of Length.t
+    | `percentage of Percentage.t
+    ]
+
+  type t =
+    [ `single of horizontal
+    | `pair of horizontal * vertical
+    | `positioned of horizontal * Length.t option * vertical * Length.t option
+    ]
+
+  let horizontal_to_string = function
+    | `left -> {js|left|js}
+    | `center -> {js|center|js}
+    | `right -> {js|right|js}
+    | `length l -> Length.toString l
+    | `percentage p -> Percentage.toString p
+
+  let vertical_to_string = function
+    | `top -> {js|top|js}
+    | `center -> {js|center|js}
+    | `bottom -> {js|bottom|js}
+    | `length l -> Length.toString l
+    | `percentage p -> Percentage.toString p
+
+  let toString = function
+    | `single h -> horizontal_to_string h
+    | `pair (h, v) -> horizontal_to_string h ^ {js| |js} ^ vertical_to_string v
+    | `positioned (h, h_off, v, v_off) ->
+      let h_str = horizontal_to_string h in
+      let v_str = vertical_to_string v in
+      let h_off_str =
+        match h_off with
+        | None -> {js||js}
+        | Some l -> {js| |js} ^ Length.toString l
+      in
+      let v_off_str =
+        match v_off with
+        | None -> {js||js}
+        | Some l -> {js| |js} ^ Length.toString l
+      in
+      h_str ^ h_off_str ^ {js| |js} ^ v_str ^ v_off_str
 end
 
-module BgPosition = struct
-  type t = [ `BgPosition of string ]
+module BgLayer = struct
+  (* Complex composite: <bg-image> || <bg-position> [ '/' <bg-size> ]? || <repeat-style> || <attachment> || <box> || <box> *)
+  type t = {
+    image : [ `none | `url of string ] option;
+    position : BgPosition.t option;
+    size :
+      [ `cover
+      | `contain
+      | `auto
+      | `length of Length.t
+      | `percentage of Percentage.t
+      ]
+      option;
+    repeat :
+      [ `repeatX | `repeatY | `repeat | `space | `round | `noRepeat ] option;
+    attachment : [ `scroll | `fixed | `local ] option;
+    origin : [ `borderBox | `paddingBox | `contentBox ] option;
+    clip : [ `borderBox | `paddingBox | `contentBox ] option;
+  }
 
-  let toString = function `BgPosition s -> s
+  let toString layer =
+    let parts =
+      match layer.image with
+      | None -> []
+      | Some `none -> [ {js|none|js} ]
+      | Some (`url s) -> [ {js|url(|js} ^ s ^ {js|)|js} ]
+    in
+    let parts =
+      match layer.position with
+      | None -> parts
+      | Some pos ->
+        let pos_str = BgPosition.toString pos in
+        (match layer.size with
+        | None -> pos_str :: parts
+        | Some size ->
+          let size_str =
+            match size with
+            | `cover -> {js|cover|js}
+            | `contain -> {js|contain|js}
+            | `auto -> {js|auto|js}
+            | `length l -> Length.toString l
+            | `percentage p -> Percentage.toString p
+          in
+          (pos_str ^ {js| / |js} ^ size_str) :: parts)
+    in
+    let parts =
+      match layer.repeat with
+      | None -> parts
+      | Some `repeatX -> {js|repeat-x|js} :: parts
+      | Some `repeatY -> {js|repeat-y|js} :: parts
+      | Some `repeat -> {js|repeat|js} :: parts
+      | Some `space -> {js|space|js} :: parts
+      | Some `round -> {js|round|js} :: parts
+      | Some `noRepeat -> {js|no-repeat|js} :: parts
+    in
+    let parts =
+      match layer.attachment with
+      | None -> parts
+      | Some `scroll -> {js|scroll|js} :: parts
+      | Some `fixed -> {js|fixed|js} :: parts
+      | Some `local -> {js|local|js} :: parts
+    in
+    let parts =
+      match layer.origin with
+      | None -> parts
+      | Some `borderBox -> {js|border-box|js} :: parts
+      | Some `paddingBox -> {js|padding-box|js} :: parts
+      | Some `contentBox -> {js|content-box|js} :: parts
+    in
+    let parts =
+      match layer.clip with
+      | None -> parts
+      | Some `borderBox -> {js|border-box|js} :: parts
+      | Some `paddingBox -> {js|padding-box|js} :: parts
+      | Some `contentBox -> {js|content-box|js} :: parts
+    in
+    String.concat {js| |js} (List.rev parts)
 end
 
 module BgSize = struct
@@ -8921,63 +9162,108 @@ module Box = struct
 end
 
 module CfFinalImage = struct
-  type t = [ `CfFinalImage of string ]
+  type t =
+    [ `image of Image.t
+    | `color of Color.t
+    ]
 
-  let toString = function `CfFinalImage s -> s
+  let toString = function
+    | `image i -> Image.toString i
+    | `color c -> Color.toString c
 end
 
 module CfMixingImage = struct
-  type t = [ `CfMixingImage of string ]
+  type t = {
+    percentage : Percentage.t option;
+    image : Image.t;
+  }
 
-  let toString = function `CfMixingImage s -> s
+  let toString { percentage; image } =
+    match percentage with
+    | None -> Image.toString image
+    | Some p -> Percentage.toString p ^ {js| |js} ^ Image.toString image
 end
 
 module ClassSelector = struct
-  type t = [ `ClassSelector of string ]
+  type t = [ `class_ of string ]
 
-  let toString = function `ClassSelector s -> s
+  let toString = function `class_ s -> {js|.|js} ^ s
 end
 
 module ClipSource = struct
-  type t = [ `ClipSource of string ]
+  type t = Url.t
 
-  let toString = function `ClipSource s -> s
-end
-
-module ColorInterpolationMethod = struct
-  type t = [ `ColorInterpolationMethod of string ]
-
-  let toString = function `ColorInterpolationMethod s -> s
+  let toString = Url.toString
 end
 
 module ColorRendering = struct
-  type t = [ `ColorRendering of string ]
+  type t =
+    [ `auto
+    | `optimizeSpeed
+    | `optimizeQuality
+    ]
 
-  let toString = function `ColorRendering s -> s
+  let toString = function
+    | `auto -> {js|auto|js}
+    | `optimizeSpeed -> {js|optimizeSpeed|js}
+    | `optimizeQuality -> {js|optimizeQuality|js}
 end
 
 module ColorStop = struct
-  type t = [ `ColorStop of string ]
+  type t =
+    [ `length of Length.t
+    | `percentage of Percentage.t
+    | `angle of Angle.t
+    ]
 
-  let toString = function `ColorStop s -> s
+  let toString = function
+    | `length l -> Length.toString l
+    | `percentage p -> Percentage.toString p
+    | `angle a -> Angle.toString a
 end
 
 module ColorStopAngle = struct
-  type t = [ `ColorStopAngle of string ]
+  type t = Angle.t
 
-  let toString = function `ColorStopAngle s -> s
+  let toString = Angle.toString
 end
 
 module ColorStopLength = struct
-  type t = [ `ColorStopLength of string ]
+  type t =
+    [ Length.t
+    | Percentage.t
+    ]
 
-  let toString = function `ColorStopLength s -> s
+  let toString = function #Length.t as l -> Length.toString l
+end
+
+module LengthPercentage = struct
+  type t =
+    [ Length.t
+    | Percentage.t
+    ]
+
+  let toString = function #Length.t as l -> Length.toString l
 end
 
 module ColorStopList = struct
-  type t = [ `ColorStopList of string ]
+  type color_stop_item =
+    [ `colorOnly of Color.t
+    | `colorWithPosition of Color.t * LengthPercentage.t
+    | `positionOnly of LengthPercentage.t
+    ]
 
-  let toString = function `ColorStopList s -> s
+  type t = color_stop_item list
+
+  let color_stop_item_to_string = function
+    | `colorOnly c -> Color.toString c
+    | `colorWithPosition (c, pos) ->
+      Color.toString c ^ {js| |js} ^ LengthPercentage.toString pos
+    | `positionOnly pos -> LengthPercentage.toString pos
+
+  let toString items =
+    Kloth.Array.map_and_join ~sep:{js|, |js} ~f:color_stop_item_to_string
+      (Array.of_list items)
 end
 
 module Combinator = struct
@@ -9036,15 +9322,16 @@ module CompatAuto = struct
 end
 
 module ComplexSelector = struct
-  type t = [ `ComplexSelector of string ]
+  (* Complex selector: compound-selector [ combinator compound-selector ]* *)
+  type t = [ `selector of string ]
 
-  let toString = function `ComplexSelector s -> s
+  let toString = function `selector s -> s
 end
 
 module ComplexSelectorList = struct
-  type t = [ `ComplexSelectorList of string ]
+  type t = [ `selectors of string ]
 
-  let toString = function `ComplexSelectorList s -> s
+  let toString = function `selectors s -> s
 end
 
 module CompositeStyle = struct
@@ -9092,69 +9379,112 @@ module CompositingOperator = struct
 end
 
 module CompoundSelector = struct
-  type t = [ `CompoundSelector of string ]
+  type t = [ `selector of string ]
 
-  let toString = function `CompoundSelector s -> s
+  let toString = function `selector s -> s
 end
 
 module CompoundSelectorList = struct
-  type t = [ `CompoundSelectorList of string ]
+  type t = [ `selectors of string ]
 
-  let toString = function `CompoundSelectorList s -> s
+  let toString = function `selectors s -> s
 end
 
 module ContainIntrinsicBlockSize = struct
-  type t = [ `ContainIntrinsicBlockSize of string ]
+  type t =
+    [ `none
+    | `length of Length.t
+    | `autoLength of Length.t
+    ]
 
-  let toString = function `ContainIntrinsicBlockSize s -> s
+  let toString = function
+    | `none -> {js|none|js}
+    | `length l -> Length.toString l
+    | `autoLength l -> {js|auto |js} ^ Length.toString l
 end
 
 module ContainIntrinsicHeight = struct
-  type t = [ `ContainIntrinsicHeight of string ]
+  type t =
+    [ `none
+    | `length of Length.t
+    | `autoLength of Length.t
+    ]
 
-  let toString = function `ContainIntrinsicHeight s -> s
+  let toString = function
+    | `none -> {js|none|js}
+    | `length l -> Length.toString l
+    | `autoLength l -> {js|auto |js} ^ Length.toString l
 end
 
 module ContainIntrinsicInlineSize = struct
-  type t = [ `ContainIntrinsicInlineSize of string ]
+  type t =
+    [ `none
+    | `length of Length.t
+    | `autoLength of Length.t
+    ]
 
-  let toString = function `ContainIntrinsicInlineSize s -> s
+  let toString = function
+    | `none -> {js|none|js}
+    | `length l -> Length.toString l
+    | `autoLength l -> {js|auto |js} ^ Length.toString l
 end
 
 module ContainIntrinsicSize = struct
-  type t = [ `ContainIntrinsicSize of string ]
+  type t =
+    [ `none
+    | `length of Length.t
+    | `autoLength of Length.t
+    | `pair of Length.t * Length.t
+    | `autoPair of Length.t * Length.t
+    ]
 
-  let toString = function `ContainIntrinsicSize s -> s
+  let toString = function
+    | `none -> {js|none|js}
+    | `length l -> Length.toString l
+    | `autoLength l -> {js|auto |js} ^ Length.toString l
+    | `pair (l1, l2) -> Length.toString l1 ^ {js| |js} ^ Length.toString l2
+    | `autoPair (l1, l2) ->
+      {js|auto |js} ^ Length.toString l1 ^ {js| |js} ^ Length.toString l2
 end
 
 module ContainIntrinsicWidth = struct
-  type t = [ `ContainIntrinsicWidth of string ]
+  type t =
+    [ `none
+    | `length of Length.t
+    | `autoLength of Length.t
+    ]
 
-  let toString = function `ContainIntrinsicWidth s -> s
+  let toString = function
+    | `none -> {js|none|js}
+    | `length l -> Length.toString l
+    | `autoLength l -> {js|auto |js} ^ Length.toString l
 end
 
 module ContainerCondition = struct
-  type t = [ `ContainerCondition of string ]
+  type t = [ `condition of string ]
 
-  let toString = function `ContainerCondition s -> s
+  let toString = function `condition s -> s
 end
 
 module ContainerConditionList = struct
-  type t = [ `ContainerConditionList of string ]
+  type t = [ `conditions of string ]
 
-  let toString = function `ContainerConditionList s -> s
+  let toString = function `conditions s -> s
 end
 
 module ContainerNameComputed = struct
-  type t = [ `ContainerNameComputed of string ]
+  type t =
+    [ `none
+    | `customIdent of string
+    ]
 
-  let toString = function `ContainerNameComputed s -> s
+  let toString = function `none -> {js|none|js} | `customIdent s -> s
 end
 
 module ContainerQuery = struct
-  type t = [ `ContainerQuery of string ]
+  type t = [ `query of string ]
 
-  let toString = function `ContainerQuery s -> s
+  let toString = function `query s -> s
 end
 
 module ContentDistribution = struct
@@ -9173,9 +9503,36 @@ module ContentDistribution = struct
 end
 
 module ContentList = struct
-  type t = [ `ContentList of string ]
+  type content_item =
+    [ `string of string
+    | `contents
+    | `url of Url.t
+    | `openQuote
+    | `closeQuote
+    | `noOpenQuote
+    | `noCloseQuote
+    | `attr of string
+    | `counter of string * string option (* counter(name, style?) *)
+    ]
 
-  let toString = function `ContentList s -> s
+  type t = content_item list
+
+  let content_item_to_string = function
+    | `string s -> {js|"|js} ^ s ^ {js|"|js}
+    | `contents -> {js|contents|js}
+    | `url u -> Url.toString u
+    | `openQuote -> {js|open-quote|js}
+    | `closeQuote -> {js|close-quote|js}
+    | `noOpenQuote -> {js|no-open-quote|js}
+    | `noCloseQuote -> {js|no-close-quote|js}
+    | `attr name -> {js|attr(|js} ^ name ^ {js|)|js}
+    | `counter (name, None) -> {js|counter(|js} ^ name ^ {js|)|js}
+    | `counter (name, Some style) ->
+      {js|counter(|js} ^ name ^ {js|, |js} ^ style ^ {js|)|js}
+
+  let toString items =
+    Kloth.Array.map_and_join ~sep:{js| |js} ~f:content_item_to_string
+      (Array.of_list items)
 end
 
 module ContentPosition = struct
@@ -9196,9 +9553,9 @@ module ContentPosition = struct
 end
 
 module ContentReplacement = struct
-  type t = [ `ContentReplacement of string ]
+  type t = Image.t
 
-  let toString = function `ContentReplacement s -> s
+  let toString = Image.toString
 end
 
 module ContextualAltValues = struct
@@ -9213,21 +9570,26 @@ module ContextualAltValues = struct
 end
 
 module CounterName = struct
-  type t = [ `CounterName of string ]
+  type t = [ `customIdent of string ]
 
-  let toString = function `CounterName s -> s
+  let toString = function `customIdent s -> s
 end
 
 module CounterStyle = struct
-  type t = [ `CounterStyle of string ]
+  type t =
+    [ `counterStyleName of string
+    | `symbols of string (* symbols() function args *)
+    ]
 
-  let toString = function `CounterStyle s -> s
+  let toString = function
+    | `counterStyleName s -> s
+    | `symbols args -> {js|symbols(|js} ^ args ^ {js|)|js}
 end
 
 module CounterStyleName = struct
-  type t = [ `CounterStyleName of string ]
+  type t = [ `customIdent of string ]
 
-  let toString = function `CounterStyleName s -> s
+  let toString = function `customIdent s -> s
 end
 
 module CubicBezierTimingFunction = struct
@@ -9257,15 +9619,27 @@ module CubicBezierTimingFunction = struct
 end
 
 module Declaration = struct
-  type t = [ `Declaration of string ]
+  type t = {
+    property : string;
+    value : string option;
+    important : bool;
+  }
 
-  let toString = function `Declaration s -> s
+  let toString { property; value; important } =
+    let base =
+      match value with
+      | None -> property ^ {js|:|js}
+      | Some v -> property ^ {js|: |js} ^ v
+    in
+    if important then base ^ {js| !important|js} else base
 end
 
 module DeclarationList = struct
-  type t = [ `DeclarationList of string ]
+  type t = Declaration.t list
 
-  let toString = function `DeclarationList s -> s
+  let toString decls =
+    Kloth.Array.map_and_join ~sep:{js|; |js} ~f:Declaration.toString
+      (Array.of_list decls)
 end
 
 module DeprecatedSystemColor = struct
@@ -9331,10 +9705,85 @@ module DeprecatedSystemColor = struct
     | `windowText -> {js|WindowText|js}
 end
 
-module Dimension = struct
-  type t = [ `Dimension of string ]
+module Frequency = struct
+  type frequency =
+    [ `Hz of float
+    | `kHz of float
+    ]
 
-  let toString = function `Dimension s -> s
+  type calc_value =
+    [ frequency
+    | `min of t array
+    | `max of t array
+    | `add of calc_value * calc_value
+    | `sub of calc_value * calc_value
+    | `mult of calc_value * calc_value
+    | `div of calc_value * float
+    | `calc of calc_value
+    | `num of float
+    ]
+
+  and t =
+    [ frequency
+    | `calc of calc_value
+    | `min of t array
+    | `max of t array
+    | Var.t
+    ]
+
+  let hz (x : float) = `Hz x
+  let kHz (x : float) = `kHz x
+  let num (x : float) = `num x
+
+  let rec toString (x : t) =
+    match x with
+    | `Hz x -> Kloth.Float.to_string x ^ {js|hz|js}
+    | `kHz x -> Kloth.Float.to_string x ^ {js|khz|js}
+    | `calc calc -> calc_value_to_string calc
+    | (`min _ | `max _) as x -> minmax_to_string x
+    | #Var.t as v -> Var.toString v
+
+  and calc_value_to_string x =
+    match x with
+    | #frequency as f -> toString f
+    | `num x -> Kloth.Float.to_string x
+    | `calc calc -> calc_value_to_string calc
+    | (`min _ | `max _) as x -> minmax_to_string x
+    | (`add _ | `sub _ | `mult _ | `div _) as x ->
+      Calc.min_max_to_string calc_value_to_string minmax_to_string x
+
+  and minmax_to_string = function
+    | (`calc _ | `min _ | `max _ | `num _) as x ->
+      Calc.min_max_num_to_string toString x
+    | #frequency as f -> toString f
+end
+
+module Resolution = struct
+  type t =
+    [ `dpi of float
+    | `dpcm of float
+    | `dppx of float
+    ]
+
+  let toString = function
+    | `dpi n -> Kloth.Float.to_string n ^ {js|dpi|js}
+    | `dpcm n -> Kloth.Float.to_string n ^ {js|dpcm|js}
+    | `dppx n -> Kloth.Float.to_string n ^ {js|dppx|js}
+end
+
+module Dimension = struct
+  type t =
+    [ `length of Length.t
+    | `time of Time.t
+    | `frequency of Frequency.t
+    | `resolution of Resolution.t
+    ]
+
+  let toString = function
+    | `length l -> Length.toString l
+    | `time t -> Time.toString t
+    | `frequency f -> Frequency.toString f
+    | `resolution r -> Resolution.toString r
 end
 
 module DiscretionaryLigValues = struct
@@ -9427,9 +9876,28 @@ module DisplayLegacy = struct
 end
 
 module DisplayListitem = struct
-  type t = [ `DisplayListitem of string ]
+  type t = {
+    outside : [ `block | `inline | `runIn ] option;
+    flow : [ `flow | `flowRoot ] option;
+  }
 
-  let toString = function `DisplayListitem s -> s
+  let toString { outside; flow } =
+    let parts = [] in
+    let parts =
+      match outside with
+      | None -> parts
+      | Some `block -> {js|block|js} :: parts
+      | Some `inline -> {js|inline|js} :: parts
+      | Some `runIn -> {js|run-in|js} :: parts
+    in
+    let parts =
+      match flow with
+      | None -> parts
+      | Some `flow -> {js|flow|js} :: parts
+      | Some `flowRoot -> {js|flow-root|js} :: parts
+    in
+    let parts = {js|list-item|js} :: parts in
+    String.concat {js| |js} (List.rev parts)
 end
 
 module DisplayOutside = struct
@@ -9487,57 +9955,35 @@ module EndingShape = struct
 end
 
 module ExplicitTrackList = struct
-  type t = [ `ExplicitTrackList of string ]
+  type t = [ `tracks of string ]
 
-  let toString = function `ExplicitTrackList s -> s
-end
-
-module ExtendedAngle = struct
-  type t = [ `ExtendedAngle of string ]
-
-  let toString = function `ExtendedAngle s -> s
-end
-
-module ExtendedFrequency = struct
-  type t = [ `ExtendedFrequency of string ]
-
-  let toString = function `ExtendedFrequency s -> s
-end
-
-module ExtendedLength = struct
-  type t = [ `ExtendedLength of string ]
-
-  let toString = function `ExtendedLength s -> s
-end
-
-module ExtendedPercentage = struct
-  type t = [ `ExtendedPercentage of string ]
-
-  let toString = function `ExtendedPercentage s -> s
-end
-
-module ExtendedTime = struct
-  type t = [ `ExtendedTime of string ]
-
-  let toString = function `ExtendedTime s -> s
-end
-
-module ExtendedTimeNoInterp = struct
-  type t = [ `ExtendedTimeNoInterp of string ]
-
-  let toString = function `ExtendedTimeNoInterp s -> s
+  let toString = function `tracks s -> s
 end
 
 module FamilyName = struct
-  type t = [ `FamilyName of string ]
+  type t =
+    [ `string of string (* quoted font name *)
+    | `customIdent of string (* unquoted font name *)
+    ]
 
-  let toString = function `FamilyName s -> s
+  let toString = function
+    | `string s -> {js|"|js} ^ s ^ {js|"|js}
+    | `customIdent s -> s
 end
 
 module FeatureTagValue = struct
-  type t = [ `FeatureTagValue of string ]
+  type t =
+    [ `tag of string (* just the tag *)
+    | `tagInt of string * int (* tag with integer *)
+    | `tagOn of string (* tag 'on' *)
+    | `tagOff of string (* tag 'off' *)
+    ]
 
-  let toString = function `FeatureTagValue s -> s
+  let toString = function
+    | `tag s -> {js|"|js} ^ s ^ {js|"|js}
+    | `tagInt (s, n) -> {js|"|js} ^ s ^ {js|" |js} ^ Kloth.Int.to_string n
+    | `tagOn s -> {js|"|js} ^ s ^ {js|" on|js}
+    | `tagOff s -> {js|"|js} ^ s ^ {js|" off|js}
 end
 
 module FeatureType = struct
@@ -9562,33 +10008,33 @@ module FeatureType = struct
 end
 
 module FeatureValueBlock = struct
-  type t = [ `FeatureValueBlock of string ]
+  type t = [ `block of string ]
 
-  let toString = function `FeatureValueBlock s -> s
+  let toString = function `block s -> s
 end
 
 module FeatureValueBlockList = struct
-  type t = [ `FeatureValueBlockList of string ]
+  type t = [ `blocks of string ]
 
-  let toString = function `FeatureValueBlockList s -> s
+  let toString = function `blocks s -> s
 end
 
 module FeatureValueDeclaration = struct
-  type t = [ `FeatureValueDeclaration of string ]
+  type t = [ `declaration of string ]
 
-  let toString = function `FeatureValueDeclaration s -> s
+  let toString = function `declaration s -> s
 end
 
 module FeatureValueDeclarationList = struct
-  type t = [ `FeatureValueDeclarationList of string ]
+  type t = [ `declarations of string ]
 
-  let toString = function `FeatureValueDeclarationList s -> s
+  let toString = function `declarations s -> s
 end
 
 module FeatureValueName = struct
-  type t = [ `FeatureValueName of string ]
+  type t = [ `customIdent of string ]
 
-  let toString = function `FeatureValueName s -> s
+  let toString = function `customIdent s -> s
 end
 
 module FieldSizing = struct
@@ -9605,45 +10051,196 @@ end
 (* Fill passthrough module removed - use Paint instead *)
 
 module FilterFunction = struct
-  type t = [ `FilterFunction of string ]
+  type t =
+    [ `blur of Length.t
+    | `brightness of float
+    | `contrast of float
+    | `dropShadow of string (* drop-shadow args *)
+    | `grayscale of float
+    | `hueRotate of Angle.t
+    | `invert of float
+    | `opacity of float
+    | `saturate of float
+    | `sepia of float
+    ]
 
-  let toString = function `FilterFunction s -> s
+  let toString = function
+    | `blur l -> {js|blur(|js} ^ Length.toString l ^ {js|)|js}
+    | `brightness n -> {js|brightness(|js} ^ Kloth.Float.to_string n ^ {js|)|js}
+    | `contrast n -> {js|contrast(|js} ^ Kloth.Float.to_string n ^ {js|)|js}
+    | `dropShadow args -> {js|drop-shadow(|js} ^ args ^ {js|)|js}
+    | `grayscale n -> {js|grayscale(|js} ^ Kloth.Float.to_string n ^ {js|)|js}
+    | `hueRotate a -> {js|hue-rotate(|js} ^ Angle.toString a ^ {js|)|js}
+    | `invert n -> {js|invert(|js} ^ Kloth.Float.to_string n ^ {js|)|js}
+    | `opacity n -> {js|opacity(|js} ^ Kloth.Float.to_string n ^ {js|)|js}
+    | `saturate n -> {js|saturate(|js} ^ Kloth.Float.to_string n ^ {js|)|js}
+    | `sepia n -> {js|sepia(|js} ^ Kloth.Float.to_string n ^ {js|)|js}
 end
 
 module FilterFunctionList = struct
-  type t = [ `FilterFunctionList of string ]
+  type t = FilterFunction.t list
 
-  let toString = function `FilterFunctionList s -> s
+  let toString filters =
+    Kloth.Array.map_and_join ~sep:{js| |js} ~f:FilterFunction.toString
+      (Array.of_list filters)
 end
 
 module FinalBgLayer = struct
-  type t = [ `FinalBgLayer of string ]
+  (* Similar to BgLayer but with background-color *)
+  type t = {
+    color : Color.t option;
+    image : [ `none | `url of string ] option;
+    position : BgPosition.t option;
+    size :
+      [ `cover
+      | `contain
+      | `auto
+      | `length of Length.t
+      | `percentage of Percentage.t
+      ]
+      option;
+    repeat :
+      [ `repeatX | `repeatY | `repeat | `space | `round | `noRepeat ] option;
+    attachment : [ `scroll | `fixed | `local ] option;
+    origin : [ `borderBox | `paddingBox | `contentBox ] option;
+    clip : [ `borderBox | `paddingBox | `contentBox ] option;
+  }
 
-  let toString = function `FinalBgLayer s -> s
+  let toString layer =
+    let parts = [] in
+    let parts =
+      match layer.color with
+      | None -> parts
+      | Some c -> Color.toString c :: parts
+    in
+    let parts =
+      match layer.image with
+      | None -> parts
+      | Some `none -> {js|none|js} :: parts
+      | Some (`url s) -> ({js|url(|js} ^ s ^ {js|)|js}) :: parts
+    in
+    let parts =
+      match layer.position with
+      | None -> parts
+      | Some pos ->
+        let pos_str = BgPosition.toString pos in
+        (match layer.size with
+        | None -> pos_str :: parts
+        | Some size ->
+          let size_str =
+            match size with
+            | `cover -> {js|cover|js}
+            | `contain -> {js|contain|js}
+            | `auto -> {js|auto|js}
+            | `length l -> Length.toString l
+            | `percentage p -> Percentage.toString p
+          in
+          (pos_str ^ {js| / |js} ^ size_str) :: parts)
+    in
+    let parts =
+      match layer.repeat with
+      | None -> parts
+      | Some `repeatX -> {js|repeat-x|js} :: parts
+      | Some `repeatY -> {js|repeat-y|js} :: parts
+      | Some `repeat -> {js|repeat|js} :: parts
+      | Some `space -> {js|space|js} :: parts
+      | Some `round -> {js|round|js} :: parts
+      | Some `noRepeat -> {js|no-repeat|js} :: parts
+    in
+    let parts =
+      match layer.attachment with
+      | None -> parts
+      | Some `scroll -> {js|scroll|js} :: parts
+      | Some `fixed -> {js|fixed|js} :: parts
+      | Some `local -> {js|local|js} :: parts
+    in
+    let parts =
+      match layer.origin with
+      | None -> parts
+      | Some `borderBox -> {js|border-box|js} :: parts
+      | Some `paddingBox -> {js|padding-box|js} :: parts
+      | Some `contentBox -> {js|content-box|js} :: parts
+    in
+    let parts =
+      match layer.clip with
+      | None -> parts
+      | Some `borderBox -> {js|border-box|js} :: parts
+      | Some `paddingBox -> {js|padding-box|js} :: parts
+      | Some `contentBox -> {js|content-box|js} :: parts
+    in
+    String.concat {js| |js} (List.rev parts)
 end
 
 module FixedBreadth = struct
-  type t = [ `FixedBreadth of string ]
+  type t =
+    [ Length.t
+    | Percentage.t
+    ]
 
-  let toString = function `FixedBreadth s -> s
+  let toString = function #Length.t as l -> Length.toString l
 end
 
 module FixedRepeat = struct
-  type t = [ `FixedRepeat of string ]
+  type t = [ `repeat of string ]
 
-  let toString = function `FixedRepeat s -> s
+  let toString = function `repeat s -> {js|repeat(|js} ^ s ^ {js|)|js}
 end
 
 module FlexFlow = struct
-  type t = [ `FlexFlow of string ]
+  type t = {
+    direction : FlexDirection.t option;
+    wrap : FlexWrap.t option;
+  }
 
-  let toString = function `FlexFlow s -> s
+  let toString { direction; wrap } =
+    let parts = [] in
+    let parts =
+      match direction with
+      | None -> parts
+      | Some d -> FlexDirection.toString d :: parts
+    in
+    let parts =
+      match wrap with None -> parts | Some w -> FlexWrap.toString w :: parts
+    in
+    String.concat {js| |js} (List.rev parts)
+end
+
+module GenericFamily = struct
+  type t =
+    [ `serif
+    | `sansSerif
+    | `cursive
+    | `fantasy
+    | `monospace
+    | `appleSystem
+    ]
+
+  let toString = function
+    | `serif -> {js|serif|js}
+    | `sansSerif -> {js|sans-serif|js}
+    | `cursive -> {js|cursive|js}
+    | `fantasy -> {js|fantasy|js}
+    | `monospace -> {js|monospace|js}
+    | `appleSystem -> {js|-apple-system|js}
 end
 
 module FontFamilies = struct
-  type t = [ `FontFamilies of string ]
+  type font_item =
+    [ `familyName of FamilyName.t
+    | `genericFamily of GenericFamily.t
+    | `interpolation of string
+    ]
 
-  let toString = function `FontFamilies s -> s
+  type t = font_item list
+
+  let font_item_to_string = function
+    | `familyName f -> FamilyName.toString f
+    | `genericFamily g -> GenericFamily.toString g
+    | `interpolation s -> s
+
+  let toString items =
+    Kloth.Array.map_and_join ~sep:{js|, |js} ~f:font_item_to_string
+      (Array.of_list items)
 end
 
 module FontStretchAbsolute = struct
@@ -9697,408 +10294,6 @@ module FontWeightAbsolute = struct
     | `num n -> Kloth.Int.to_string n
 end
 
-module FunctionAttr = struct
-  type t = [ `FunctionAttr of string ]
-
-  let toString = function `FunctionAttr s -> s
-end
-
-module FunctionBlur = struct
-  type t = [ `FunctionBlur of string ]
-
-  let toString = function `FunctionBlur s -> s
-end
-
-module FunctionBrightness = struct
-  type t = [ `FunctionBrightness of string ]
-
-  let toString = function `FunctionBrightness s -> s
-end
-
-module FunctionCalc = struct
-  type t = [ `FunctionCalc of string ]
-
-  let toString = function `FunctionCalc s -> s
-end
-
-module FunctionCircle = struct
-  type t = [ `FunctionCircle of string ]
-
-  let toString = function `FunctionCircle s -> s
-end
-
-module FunctionClamp = struct
-  type t = [ `FunctionClamp of string ]
-
-  let toString = function `FunctionClamp s -> s
-end
-
-module FunctionConicGradient = struct
-  type t = [ `FunctionConicGradient of string ]
-
-  let toString = function `FunctionConicGradient s -> s
-end
-
-module FunctionContrast = struct
-  type t = [ `FunctionContrast of string ]
-
-  let toString = function `FunctionContrast s -> s
-end
-
-module FunctionCounter = struct
-  type t = [ `FunctionCounter of string ]
-
-  let toString = function `FunctionCounter s -> s
-end
-
-module FunctionCounters = struct
-  type t = [ `FunctionCounters of string ]
-
-  let toString = function `FunctionCounters s -> s
-end
-
-module FunctionCrossFade = struct
-  type t = [ `FunctionCrossFade of string ]
-
-  let toString = function `FunctionCrossFade s -> s
-end
-
-module FunctionDropShadow = struct
-  type t = [ `FunctionDropShadow of string ]
-
-  let toString = function `FunctionDropShadow s -> s
-end
-
-module FunctionElement = struct
-  type t = [ `FunctionElement of string ]
-
-  let toString = function `FunctionElement s -> s
-end
-
-module FunctionEllipse = struct
-  type t = [ `FunctionEllipse of string ]
-
-  let toString = function `FunctionEllipse s -> s
-end
-
-module FunctionEnv = struct
-  type t = [ `FunctionEnv of string ]
-
-  let toString = function `FunctionEnv s -> s
-end
-
-module FunctionFitContent = struct
-  type t = [ `FunctionFitContent of string ]
-
-  let toString = function `FunctionFitContent s -> s
-end
-
-module FunctionGrayscale = struct
-  type t = [ `FunctionGrayscale of string ]
-
-  let toString = function `FunctionGrayscale s -> s
-end
-
-module FunctionHsl = struct
-  type t = [ `FunctionHsl of string ]
-
-  let toString = function `FunctionHsl s -> s
-end
-
-module FunctionHsla = struct
-  type t = [ `FunctionHsla of string ]
-
-  let toString = function `FunctionHsla s -> s
-end
-
-module FunctionHueRotate = struct
-  type t = [ `FunctionHueRotate of string ]
-
-  let toString = function `FunctionHueRotate s -> s
-end
-
-module FunctionImage = struct
-  type t = [ `FunctionImage of string ]
-
-  let toString = function `FunctionImage s -> s
-end
-
-module FunctionImageSet = struct
-  type t = [ `FunctionImageSet of string ]
-
-  let toString = function `FunctionImageSet s -> s
-end
-
-module FunctionInset = struct
-  type t = [ `FunctionInset of string ]
-
-  let toString = function `FunctionInset s -> s
-end
-
-module FunctionInvert = struct
-  type t = [ `FunctionInvert of string ]
-
-  let toString = function `FunctionInvert s -> s
-end
-
-module FunctionLeader = struct
-  type t = [ `FunctionLeader of string ]
-
-  let toString = function `FunctionLeader s -> s
-end
-
-module FunctionLinearGradient = struct
-  type t = [ `FunctionLinearGradient of string ]
-
-  let toString = function `FunctionLinearGradient s -> s
-end
-
-module FunctionMatrix = struct
-  type t = [ `FunctionMatrix of string ]
-
-  let toString = function `FunctionMatrix s -> s
-end
-
-module FunctionMatrix3d = struct
-  type t = [ `FunctionMatrix3d of string ]
-
-  let toString = function `FunctionMatrix3d s -> s
-end
-
-module FunctionMax = struct
-  type t = [ `FunctionMax of string ]
-
-  let toString = function `FunctionMax s -> s
-end
-
-module FunctionMin = struct
-  type t = [ `FunctionMin of string ]
-
-  let toString = function `FunctionMin s -> s
-end
-
-module FunctionMinmax = struct
-  type t = [ `FunctionMinmax of string ]
-
-  let toString = function `FunctionMinmax s -> s
-end
-
-module FunctionOpacity = struct
-  type t = [ `FunctionOpacity of string ]
-
-  let toString = function `FunctionOpacity s -> s
-end
-
-module FunctionPaint = struct
-  type t = [ `FunctionPaint of string ]
-
-  let toString = function `FunctionPaint s -> s
-end
-
-module FunctionPath = struct
-  type t = [ `FunctionPath of string ]
-
-  let toString = function `FunctionPath s -> s
-end
-
-module FunctionPerspective = struct
-  type t = [ `FunctionPerspective of string ]
-
-  let toString = function `FunctionPerspective s -> s
-end
-
-module FunctionPolygon = struct
-  type t = [ `FunctionPolygon of string ]
-
-  let toString = function `FunctionPolygon s -> s
-end
-
-module FunctionRadialGradient = struct
-  type t = [ `FunctionRadialGradient of string ]
-
-  let toString = function `FunctionRadialGradient s -> s
-end
-
-module FunctionRepeatingLinearGradient = struct
-  type t = [ `FunctionRepeatingLinearGradient of string ]
-
-  let toString = function `FunctionRepeatingLinearGradient s -> s
-end
-
-module FunctionRepeatingRadialGradient = struct
-  type t = [ `FunctionRepeatingRadialGradient of string ]
-
-  let toString = function `FunctionRepeatingRadialGradient s -> s
-end
-
-module FunctionRgb = struct
-  type t = [ `FunctionRgb of string ]
-
-  let toString = function `FunctionRgb s -> s
-end
-
-module FunctionRgba = struct
-  type t = [ `FunctionRgba of string ]
-
-  let toString = function `FunctionRgba s -> s
-end
-
-module FunctionRotate = struct
-  type t = [ `FunctionRotate of string ]
-
-  let toString = function `FunctionRotate s -> s
-end
-
-module FunctionRotate3d = struct
-  type t = [ `FunctionRotate3d of string ]
-
-  let toString = function `FunctionRotate3d s -> s
-end
-
-module FunctionRotatex = struct
-  type t = [ `FunctionRotatex of string ]
-
-  let toString = function `FunctionRotatex s -> s
-end
-
-module FunctionRotatey = struct
-  type t = [ `FunctionRotatey of string ]
-
-  let toString = function `FunctionRotatey s -> s
-end
-
-module FunctionRotatez = struct
-  type t = [ `FunctionRotatez of string ]
-
-  let toString = function `FunctionRotatez s -> s
-end
-
-module FunctionSaturate = struct
-  type t = [ `FunctionSaturate of string ]
-
-  let toString = function `FunctionSaturate s -> s
-end
-
-module FunctionScale = struct
-  type t = [ `FunctionScale of string ]
-
-  let toString = function `FunctionScale s -> s
-end
-
-module FunctionScale3d = struct
-  type t = [ `FunctionScale3d of string ]
-
-  let toString = function `FunctionScale3d s -> s
-end
-
-module FunctionScalex = struct
-  type t = [ `FunctionScalex of string ]
-
-  let toString = function `FunctionScalex s -> s
-end
-
-module FunctionScaley = struct
-  type t = [ `FunctionScaley of string ]
-
-  let toString = function `FunctionScaley s -> s
-end
-
-module FunctionScalez = struct
-  type t = [ `FunctionScalez of string ]
-
-  let toString = function `FunctionScalez s -> s
-end
-
-module FunctionSepia = struct
-  type t = [ `FunctionSepia of string ]
-
-  let toString = function `FunctionSepia s -> s
-end
-
-module FunctionSkew = struct
-  type t = [ `FunctionSkew of string ]
-
-  let toString = function `FunctionSkew s -> s
-end
-
-module FunctionSkewx = struct
-  type t = [ `FunctionSkewx of string ]
-
-  let toString = function `FunctionSkewx s -> s
-end
-
-module FunctionSkewy = struct
-  type t = [ `FunctionSkewy of string ]
-
-  let toString = function `FunctionSkewy s -> s
-end
-
-module FunctionSymbols = struct
-  type t = [ `FunctionSymbols of string ]
-
-  let toString = function `FunctionSymbols s -> s
-end
-
-module FunctionTargetCounter = struct
-  type t = [ `FunctionTargetCounter of string ]
-
-  let toString = function `FunctionTargetCounter s -> s
-end
-
-module FunctionTargetCounters = struct
-  type t = [ `FunctionTargetCounters of string ]
-
-  let toString = function `FunctionTargetCounters s -> s
-end
-
-module FunctionTargetText = struct
-  type t = [ `FunctionTargetText of string ]
-
-  let toString = function `FunctionTargetText s -> s
-end
-
-module FunctionTranslate = struct
-  type t = [ `FunctionTranslate of string ]
-
-  let toString = function `FunctionTranslate s -> s
-end
-
-module FunctionTranslate3d = struct
-  type t = [ `FunctionTranslate3d of string ]
-
-  let toString = function `FunctionTranslate3d s -> s
-end
-
-module FunctionTranslatex = struct
-  type t = [ `FunctionTranslatex of string ]
-
-  let toString = function `FunctionTranslatex s -> s
-end
-
-module FunctionTranslatey = struct
-  type t = [ `FunctionTranslatey of string ]
-
-  let toString = function `FunctionTranslatey s -> s
-end
-
-module FunctionTranslatez = struct
-  type t = [ `FunctionTranslatez of string ]
-
-  let toString = function `FunctionTranslatez s -> s
-end
-
-module FunctionVar = struct
-  type t = [ `FunctionVar of string ]
-
-  let toString = function `FunctionVar s -> s
-end
-
-module FunctionWebkitGradient = struct
-  type t = [ `FunctionWebkitGradient of string ]
-
-  let toString = function `FunctionWebkitGradient s -> s
-end
-
 module Gender = struct
   type t =
     [ `male
@@ -10113,28 +10308,15 @@ module Gender = struct
 end
 
 module GeneralEnclosed = struct
-  type t = [ `GeneralEnclosed of string ]
-
-  let toString = function `GeneralEnclosed s -> s
-end
-
-module GenericFamily = struct
   type t =
-    [ `serif
-    | `sansSerif
-    | `cursive
-    | `fantasy
-    | `monospace
-    | `appleSystem
+    [ `function_ of string * string (* function name, any-value *)
+    | `parens of string * string (* ident, any-value *)
     ]
 
   let toString = function
-    | `serif -> {js|serif|js}
-    | `sansSerif -> {js|sans-serif|js}
-    | `cursive -> {js|cursive|js}
-    | `fantasy -> {js|fantasy|js}
-    | `monospace -> {js|monospace|js}
-    | `appleSystem -> {js|-apple-system|js}
+    | `function_ (name, value) -> name ^ {js|(|js} ^ value ^ {js|)|js}
+    | `parens (ident, value) ->
+      {js|(|js} ^ ident ^ {js| |js} ^ value ^ {js|)|js}
 end
 
 module GenericName = struct
@@ -10155,9 +10337,24 @@ module GenericName = struct
 end
 
 module GenericVoice = struct
-  type t = [ `GenericVoice of string ]
+  type t = {
+    age : Age.t option;
+    gender : Gender.t;
+    variant : int option;
+  }
 
-  let toString = function `GenericVoice s -> s
+  let toString { age; gender; variant } =
+    let parts = [] in
+    let parts =
+      match age with None -> parts | Some a -> Age.toString a :: parts
+    in
+    let parts = Gender.toString gender :: parts in
+    let parts =
+      match variant with
+      | None -> parts
+      | Some n -> Kloth.Int.to_string n :: parts
+    in
+    String.concat {js| |js} (List.rev parts)
 end
 
 module HistoricalLigValues = struct
@@ -10172,9 +10369,14 @@ module HistoricalLigValues = struct
 end
 
 module Hue = struct
-  type t = [ `Hue of string ]
+  type t =
+    [ `number of float
+    | `angle of Angle.t
+    ]
 
-  let toString = function `Hue s -> s
+  let toString = function
+    | `number n -> Kloth.Float.to_string n
+    | `angle a -> Angle.toString a
 end
 
 module HueInterpolationMethod = struct
@@ -10193,27 +10395,52 @@ module HueInterpolationMethod = struct
 end
 
 module HyphenateLimitLast = struct
-  type t = [ `HyphenateLimitLast of string ]
+  type t =
+    [ `none
+    | `always
+    | `column
+    | `page
+    | `spread
+    ]
 
-  let toString = function `HyphenateLimitLast s -> s
+  let toString = function
+    | `none -> {js|none|js}
+    | `always -> {js|always|js}
+    | `column -> {js|column|js}
+    | `page -> {js|page|js}
+    | `spread -> {js|spread|js}
 end
 
 module IdSelector = struct
-  type t = [ `IdSelector of string ]
+  type t = [ `id of string ]
 
-  let toString = function `IdSelector s -> s
+  let toString = function `id s -> {js|#|js} ^ s
 end
 
 module ImageSetOption = struct
-  type t = [ `ImageSetOption of string ]
+  type t = {
+    source : [ `image of Image.t | `string of string ];
+    resolution : Resolution.t;
+  }
 
-  let toString = function `ImageSetOption s -> s
+  let toString { source; resolution } =
+    let src =
+      match source with
+      | `image i -> Image.toString i
+      | `string s -> {js|"|js} ^ s ^ {js|"|js}
+    in
+    src ^ {js| |js} ^ Resolution.toString resolution
 end
 
 module ImageSrc = struct
-  type t = [ `ImageSrc of string ]
+  type t =
+    [ `url of Url.t
+    | `string of string
+    ]
 
-  let toString = function `ImageSrc s -> s
+  let toString = function
+    | `url u -> Url.toString u
+    | `string s -> {js|"|js} ^ s ^ {js|"|js}
 end
 
 module ImageTags = struct
@@ -10226,21 +10453,57 @@ module ImageTags = struct
 end
 
 module Inherits = struct
-  type t = [ `Inherits of string ]
+  type t =
+    [ `true_
+    | `false_
+    ]
 
-  let toString = function `Inherits s -> s
+  let toString = function `true_ -> {js|true|js} | `false_ -> {js|false|js}
 end
 
 module InitialValue = struct
-  type t = [ `InitialValue of string ]
+  type t = [ `string of string ]
 
-  let toString = function `InitialValue s -> s
+  let toString = function `string s -> {js|"|js} ^ s ^ {js|"|js}
 end
 
 module InsetArea = struct
-  type t = [ `InsetArea of string ]
+  type position =
+    [ `none
+    | `top
+    | `bottom
+    | `left
+    | `right
+    | `center
+    | `selfStart
+    | `selfEnd
+    | `start
+    | `end_
+    ]
 
-  let toString = function `InsetArea s -> s
+  type t =
+    [ `none
+    | `single of position
+    | `pair of position * position
+    ]
+
+  let position_to_string = function
+    | `none -> {js|none|js}
+    | `top -> {js|top|js}
+    | `bottom -> {js|bottom|js}
+    | `left -> {js|left|js}
+    | `right -> {js|right|js}
+    | `center -> {js|center|js}
+    | `selfStart -> {js|self-start|js}
+    | `selfEnd -> {js|self-end|js}
+    | `start -> {js|start|js}
+    | `end_ -> {js|end|js}
+
+  let toString = function
+    | `none -> {js|none|js}
+    | `single p -> position_to_string p
+    | `pair (p1, p2) ->
+      position_to_string p1 ^ {js| |js} ^ position_to_string p2
 end
 
 module InterpolateSize = struct
@@ -10252,18 +10515,6 @@ module InterpolateSize = struct
   let toString = function
     | `numericOnly -> {js|numeric-only|js}
     | `allowKeywords -> {js|allow-keywords|js}
-end
-
-module KeyframeBlock = struct
-  type t = [ `KeyframeBlock of string ]
-
-  let toString = function `KeyframeBlock s -> s
-end
-
-module KeyframeBlockList = struct
-  type t = [ `KeyframeBlockList of string ]
-
-  let toString = function `KeyframeBlockList s -> s
 end
 
 module KeyframeSelector = struct
@@ -10279,10 +10530,37 @@ module KeyframeSelector = struct
     | `percent p -> Kloth.Float.to_string p ^ {js|%|js}
 end
 
-module KeyframesName = struct
-  type t = [ `KeyframesName of string ]
+module KeyframeBlock = struct
+  type t = {
+    selectors : KeyframeSelector.t list;
+    declarations : DeclarationList.t;
+  }
 
-  let toString = function `KeyframesName s -> s
+  let toString { selectors; declarations } =
+    let sels =
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:KeyframeSelector.toString
+        (Array.of_list selectors)
+    in
+    sels ^ {js| { |js} ^ DeclarationList.toString declarations ^ {js| }|js}
+end
+
+module KeyframeBlockList = struct
+  type t = KeyframeBlock.t list
+
+  let toString blocks =
+    Kloth.Array.map_and_join ~sep:{js| |js} ~f:KeyframeBlock.toString
+      (Array.of_list blocks)
+end
+
+module KeyframesName = struct
+  type t =
+    [ `customIdent of string
+    | `string of string
+    ]
+
+  let toString = function
+    | `customIdent s -> s
+    | `string s -> {js|"|js} ^ s ^ {js|"|js}
 end
 
 module LeaderType = struct
@@ -10301,33 +10579,70 @@ module LeaderType = struct
 end
 
 module LegacyGradient = struct
-  type t = [ `LegacyGradient of string ]
+  type t =
+    [ `webkitGradient of string
+    | `legacyLinear of string
+    | `legacyRepeatingLinear of string
+    | `legacyRadial of string
+    | `legacyRepeatingRadial of string
+    ]
 
-  let toString = function `LegacyGradient s -> s
+  let toString = function
+    | `webkitGradient args -> {js|-webkit-gradient(|js} ^ args ^ {js|)|js}
+    | `legacyLinear args -> args
+    | `legacyRepeatingLinear args -> args
+    | `legacyRadial args -> args
+    | `legacyRepeatingRadial args -> args
 end
 
 module LegacyLinearGradient = struct
-  type t = [ `LegacyLinearGradient of string ]
+  type vendor =
+    [ `moz
+    | `webkit
+    | `o
+    ]
 
-  let toString = function `LegacyLinearGradient s -> s
+  type t = vendor * string
+
+  let toString (vendor, args) =
+    let prefix =
+      match vendor with
+      | `moz -> {js|-moz-linear-gradient(|js}
+      | `webkit -> {js|-webkit-linear-gradient(|js}
+      | `o -> {js|-o-linear-gradient(|js}
+    in
+    prefix ^ args ^ {js|)|js}
 end
 
 module LegacyLinearGradientArguments = struct
-  type t = [ `LegacyLinearGradientArguments of string ]
+  type t = [ `args of string ]
 
-  let toString = function `LegacyLinearGradientArguments s -> s
+  let toString = function `args s -> s
 end
 
 module LegacyRadialGradient = struct
-  type t = [ `LegacyRadialGradient of string ]
+  type vendor =
+    [ `moz
+    | `webkit
+    | `o
+    ]
 
-  let toString = function `LegacyRadialGradient s -> s
+  type t = vendor * string
+
+  let toString (vendor, args) =
+    let prefix =
+      match vendor with
+      | `moz -> {js|-moz-radial-gradient(|js}
+      | `webkit -> {js|-webkit-radial-gradient(|js}
+      | `o -> {js|-o-radial-gradient(|js}
+    in
+    prefix ^ args ^ {js|)|js}
 end
 
 module LegacyRadialGradientArguments = struct
-  type t = [ `LegacyRadialGradientArguments of string ]
+  type t = [ `args of string ]
 
-  let toString = function `LegacyRadialGradientArguments s -> s
+  let toString = function `args s -> s
 end
 
 module LegacyRadialGradientShape = struct
@@ -10361,33 +10676,55 @@ module LegacyRadialGradientSize = struct
 end
 
 module LegacyRepeatingLinearGradient = struct
-  type t = [ `LegacyRepeatingLinearGradient of string ]
+  type vendor =
+    [ `moz
+    | `webkit
+    | `o
+    ]
 
-  let toString = function `LegacyRepeatingLinearGradient s -> s
+  type t = vendor * string
+
+  let toString (vendor, args) =
+    let prefix =
+      match vendor with
+      | `moz -> {js|-moz-repeating-linear-gradient(|js}
+      | `webkit -> {js|-webkit-repeating-linear-gradient(|js}
+      | `o -> {js|-o-repeating-linear-gradient(|js}
+    in
+    prefix ^ args ^ {js|)|js}
 end
 
 module LegacyRepeatingRadialGradient = struct
-  type t = [ `LegacyRepeatingRadialGradient of string ]
+  type vendor =
+    [ `moz
+    | `webkit
+    | `o
+    ]
 
-  let toString = function `LegacyRepeatingRadialGradient s -> s
-end
+  type t = vendor * string
 
-module LengthPercentage = struct
-  type t = [ `LengthPercentage of string ]
-
-  let toString = function `LengthPercentage s -> s
-end
-
-module LineNameList = struct
-  type t = [ `LineNameList of string ]
-
-  let toString = function `LineNameList s -> s
+  let toString (vendor, args) =
+    let prefix =
+      match vendor with
+      | `moz -> {js|-moz-repeating-radial-gradient(|js}
+      | `webkit -> {js|-webkit-repeating-radial-gradient(|js}
+      | `o -> {js|-o-repeating-radial-gradient(|js}
+    in
+    prefix ^ args ^ {js|)|js}
 end
 
 module LineNames = struct
-  type t = [ `LineNames of string ]
+  type t = string list
 
-  let toString = function `LineNames s -> s
+  let toString names = {js|[|js} ^ String.concat {js| |js} names ^ {js|]|js}
+end
+
+module LineNameList = struct
+  type t = LineNames.t list
+
+  let toString names =
+    Kloth.Array.map_and_join ~sep:{js| |js} ~f:LineNames.toString
+      (Array.of_list names)
 end
 
 module LineStyle = struct
@@ -10418,45 +10755,88 @@ module LineStyle = struct
 end
 
 module LinearColorHint = struct
-  type t = [ `LinearColorHint of string ]
+  type t =
+    [ Length.t
+    | Percentage.t
+    ]
 
-  let toString = function `LinearColorHint s -> s
+  let toString = function #Length.t as l -> Length.toString l
 end
 
 module LinearColorStop = struct
-  type t = [ `LinearColorStop of string ]
+  type t = Color.t * LengthPercentage.t option
 
-  let toString = function `LinearColorStop s -> s
+  let toString (color, pos) =
+    match pos with
+    | None -> Color.toString color
+    | Some p -> Color.toString color ^ {js| |js} ^ LengthPercentage.toString p
 end
 
 module ListStyle = struct
-  type t = [ `ListStyle of string ]
+  type t = {
+    type_ : ListStyleType.t option;
+    position : ListStylePosition.t option;
+    image : ListStyleImage.t option;
+  }
 
-  let toString = function `ListStyle s -> s
+  let toString { type_; position; image } =
+    let parts = [] in
+    let parts =
+      match type_ with
+      | None -> parts
+      | Some t -> ListStyleType.toString t :: parts
+    in
+    let parts =
+      match position with
+      | None -> parts
+      | Some p -> ListStylePosition.toString p :: parts
+    in
+    let parts =
+      match image with
+      | None -> parts
+      | Some i -> ListStyleImage.toString i :: parts
+    in
+    String.concat {js| |js} (List.rev parts)
 end
 
 module Marks = struct
-  type t = [ `Marks of string ]
+  type t =
+    [ `none
+    | `crop
+    | `cross
+    | `cropCross
+    ]
 
-  let toString = function `Marks s -> s
+  let toString = function
+    | `none -> {js|none|js}
+    | `crop -> {js|crop|js}
+    | `cross -> {js|cross|js}
+    | `cropCross -> {js|crop cross|js}
 end
 
 module MaskLayer = struct
-  type t = [ `MaskLayer of string ]
+  type t = [ `layer of string ]
 
-  let toString = function `MaskLayer s -> s
-end
-
-module MaskReference = struct
-  type t = [ `MaskReference of string ]
-
-  let toString = function `MaskReference s -> s
+  let toString = function `layer s -> s
 end
 
 module MaskSource = struct
-  type t = [ `MaskSource of string ]
+  type t = Url.t
 
-  let toString = function `MaskSource s -> s
+  let toString = Url.toString
+end
+
+module MaskReference = struct
+  type t =
+    [ `none
+    | `image of Image.t
+    | `maskSource of MaskSource.t
+    ]
+
+  let toString = function
+    | `none -> {js|none|js}
+    | `image i -> Image.toString i
+    | `maskSource m -> MaskSource.toString m
 end
 
 module MaskingMode = struct
@@ -10473,9 +10853,16 @@ module MaskingMode = struct
 end
 
 module MathDepth = struct
-  type t = [ `MathDepth of string ]
+  type t =
+    [ `autoAdd
+    | `add of int
+    | `integer of int
+    ]
 
-  let toString = function `MathDepth s -> s
+  let toString = function
+    | `autoAdd -> {js|auto-add|js}
+    | `add n -> {js|add(|js} ^ Kloth.Int.to_string n ^ {js|)|js}
+    | `integer n -> Kloth.Int.to_string n
 end
 
 module MathShift = struct
@@ -10500,10 +10887,162 @@ module MathStyle = struct
     | `compact -> {js|compact|js}
 end
 
-module MediaAnd = struct
-  type t = [ `MediaAnd of string ]
+module MfName = struct
+  type t = [ `ident of string ]
 
-  let toString = function `MediaAnd s -> s
+  let toString = function `ident s -> s
+end
+
+module MfComparison = struct
+  type t =
+    [ `eq
+    | `lt
+    | `le
+    | `gt
+    | `ge
+    ]
+
+  let toString = function
+    | `eq -> {js|=|js}
+    | `lt -> {js|<|js}
+    | `le -> {js|<=|js}
+    | `gt -> {js|>|js}
+    | `ge -> {js|>=|js}
+end
+
+module MfEq = struct
+  type t = [ `eq ]
+
+  let toString = function `eq -> {js|=|js}
+end
+
+module MfGt = struct
+  type t =
+    [ `gte
+    | `gt
+    ]
+
+  let toString = function `gte -> {js|>=|js} | `gt -> {js|>|js}
+end
+
+module MfLt = struct
+  type t =
+    [ `lte
+    | `lt
+    ]
+
+  let toString = function `lte -> {js|<=|js} | `lt -> {js|<|js}
+end
+
+module Ratio = struct
+  type t =
+    [ `fraction of int * int
+    | `number of float
+    | `interpolation of string
+    ]
+
+  let toString = function
+    | `fraction (a, b) ->
+      Kloth.Int.to_string a ^ {js|/|js} ^ Kloth.Int.to_string b
+    | `number n -> Kloth.Float.to_string n
+    | `interpolation s -> s
+end
+
+module MfValue = struct
+  type t =
+    [ `number of float
+    | `dimension of Dimension.t
+    | `ident of string
+    | `ratio of Ratio.t
+    | `interpolation of string
+    | `calc of string
+    ]
+
+  let toString = function
+    | `number n -> Kloth.Float.to_string n
+    | `dimension d -> Dimension.toString d
+    | `ident s -> s
+    | `ratio r -> Ratio.toString r
+    | `interpolation s -> s
+    | `calc s -> {js|calc(|js} ^ s ^ {js|)|js}
+end
+
+module MfBoolean = struct
+  type t = MfName.t
+
+  let toString = MfName.toString
+end
+
+module MfPlain = struct
+  type t = MfName.t * MfValue.t
+
+  let toString (name, value) =
+    MfName.toString name ^ {js|: |js} ^ MfValue.toString value
+end
+
+module MfRange = struct
+  type t =
+    [ `nameCompValue of MfName.t * MfComparison.t * MfValue.t
+    | `valueCompName of MfValue.t * MfComparison.t * MfName.t
+    | `valueNameValue of
+      MfValue.t * MfComparison.t * MfName.t * MfComparison.t * MfValue.t
+    ]
+
+  let toString = function
+    | `nameCompValue (n, c, v) ->
+      MfName.toString n
+      ^ {js| |js}
+      ^ MfComparison.toString c
+      ^ {js| |js}
+      ^ MfValue.toString v
+    | `valueCompName (v, c, n) ->
+      MfValue.toString v
+      ^ {js| |js}
+      ^ MfComparison.toString c
+      ^ {js| |js}
+      ^ MfName.toString n
+    | `valueNameValue (v1, c1, n, c2, v2) ->
+      MfValue.toString v1
+      ^ {js| |js}
+      ^ MfComparison.toString c1
+      ^ {js| |js}
+      ^ MfName.toString n
+      ^ {js| |js}
+      ^ MfComparison.toString c2
+      ^ {js| |js}
+      ^ MfValue.toString v2
+end
+
+module MediaFeature = struct
+  type t =
+    [ `plain of MfPlain.t
+    | `boolean of MfBoolean.t
+    | `range of MfRange.t
+    ]
+
+  let toString = function
+    | `plain p -> {js|(|js} ^ MfPlain.toString p ^ {js|)|js}
+    | `boolean b -> {js|(|js} ^ MfBoolean.toString b ^ {js|)|js}
+    | `range r -> {js|(|js} ^ MfRange.toString r ^ {js|)|js}
+end
+
+module MediaInParens = struct
+  type t =
+    [ `condition of string (* <media-condition> in parens *)
+    | `feature of MediaFeature.t
+    | `interpolation of string
+    ]
+
+  let toString = function
+    | `condition c -> {js|(|js} ^ c ^ {js|)|js}
+    | `feature f -> MediaFeature.toString f
+    | `interpolation s -> s
+end
+
+module MediaAnd = struct
+  type t = MediaInParens.t
+
+  let toString inParens = {js|and |js} ^ MediaInParens.toString inParens
 end
 
 module MediaAnyHover = struct
@@ -10529,27 +11068,59 @@ module MediaAnyPointer = struct
 end
 
 module MediaColorGamut = struct
-  type t = [ `MediaColorGamut of string ]
+  type t =
+    [ `srgb
+    | `p3
+    | `rec2020
+    ]
 
-  let toString = function `MediaColorGamut s -> s
+  let toString = function
+    | `srgb -> {js|srgb|js}
+    | `p3 -> {js|p3|js}
+    | `rec2020 -> {js|rec2020|js}
 end
 
 module MediaColorIndex = struct
-  type t = [ `MediaColorIndex of string ]
+  type t = [ `integer of int ]
 
-  let toString = function `MediaColorIndex s -> s
+  let toString = function `integer n -> Kloth.Int.to_string n
 end
 
 module MediaCondition = struct
-  type t = [ `MediaCondition of string ]
+  type t =
+    [ `not of MediaInParens.t
+    | `single of MediaInParens.t
+    | `and_ of MediaInParens.t * MediaInParens.t list
+    | `or_ of MediaInParens.t * MediaInParens.t list
+    ]
 
-  let toString = function `MediaCondition s -> s
+  let toString = function
+    | `not p -> {js|not |js} ^ MediaInParens.toString p
+    | `single p -> MediaInParens.toString p
+    | `and_ (first, rest) ->
+      let all = first :: rest in
+      Kloth.Array.map_and_join ~sep:{js| and |js} ~f:MediaInParens.toString
+        (Array.of_list all)
+    | `or_ (first, rest) ->
+      let all = first :: rest in
+      Kloth.Array.map_and_join ~sep:{js| or |js} ~f:MediaInParens.toString
+        (Array.of_list all)
 end
 
 module MediaConditionWithoutOr = struct
-  type t = [ `MediaConditionWithoutOr of string ]
+  type t =
+    [ `not of MediaInParens.t
+    | `single of MediaInParens.t
+    | `and_ of MediaInParens.t * MediaInParens.t list
+    ]
 
-  let toString = function `MediaConditionWithoutOr s -> s
+  let toString = function
+    | `not p -> {js|not |js} ^ MediaInParens.toString p
+    | `single p -> MediaInParens.toString p
+    | `and_ (first, rest) ->
+      let all = first :: rest in
+      Kloth.Array.map_and_join ~sep:{js| and |js} ~f:MediaInParens.toString
+        (Array.of_list all)
 end
 
 module MediaDisplayMode = struct
@@ -10565,12 +11136,6 @@ module MediaDisplayMode = struct
     | `standalone -> {js|standalone|js}
     | `minimalUi -> {js|minimal-ui|js}
     | `browser -> {js|browser|js}
-end
-
-module MediaFeature = struct
-  type t = [ `MediaFeature of string ]
-
-  let toString = function `MediaFeature s -> s
 end
 
 module MediaForcedColors = struct
@@ -10597,12 +11162,6 @@ module MediaHover = struct
   let toString = function `hover -> {js|hover|js} | #None.t -> None.toString
 end
 
-module MediaInParens = struct
-  type t = [ `MediaInParens of string ]
-
-  let toString = function `MediaInParens s -> s
-end
-
 module MediaInvertedColors = struct
   type t =
     [ `inverted
@@ -10615,63 +11174,68 @@ module MediaInvertedColors = struct
 end
 
 module MediaMaxAspectRatio = struct
-  type t = [ `MediaMaxAspectRatio of string ]
+  type t = Ratio.t
 
-  let toString = function `MediaMaxAspectRatio s -> s
+  let toString = Ratio.toString
 end
 
 module MediaMaxResolution = struct
-  type t = [ `MediaMaxResolution of string ]
+  type t = Resolution.t
 
-  let toString = function `MediaMaxResolution s -> s
+  let toString = Resolution.toString
 end
 
 module MediaMinAspectRatio = struct
-  type t = [ `MediaMinAspectRatio of string ]
+  type t = Ratio.t
 
-  let toString = function `MediaMinAspectRatio s -> s
+  let toString = Ratio.toString
 end
 
 module MediaMinColor = struct
-  type t = [ `MediaMinColor of string ]
+  type t = [ `integer of int ]
 
-  let toString = function `MediaMinColor s -> s
+  let toString = function `integer n -> Kloth.Int.to_string n
 end
 
 module MediaMinColorIndex = struct
-  type t = [ `MediaMinColorIndex of string ]
+  type t = [ `integer of int ]
 
-  let toString = function `MediaMinColorIndex s -> s
+  let toString = function `integer n -> Kloth.Int.to_string n
 end
 
 module MediaMinResolution = struct
-  type t = [ `MediaMinResolution of string ]
+  type t = Resolution.t
 
-  let toString = function `MediaMinResolution s -> s
+  let toString = Resolution.toString
 end
 
 module MediaMonochrome = struct
-  type t = [ `MediaMonochrome of string ]
+  type t = [ `integer of int ]
 
-  let toString = function `MediaMonochrome s -> s
+  let toString = function `integer n -> Kloth.Int.to_string n
 end
 
 module MediaNot = struct
-  type t = [ `MediaNot of string ]
+  type t = MediaInParens.t
 
-  let toString = function `MediaNot s -> s
+  let toString inParens = {js|not |js} ^ MediaInParens.toString inParens
 end
 
 module MediaOr = struct
-  type t = [ `MediaOr of string ]
+  type t = MediaInParens.t
 
-  let toString = function `MediaOr s -> s
+  let toString inParens = {js|or |js} ^ MediaInParens.toString inParens
 end
 
 module MediaOrientation = struct
-  type t = [ `MediaOrientation of string ]
+  type t =
+    [ `portrait
+    | `landscape
+    ]
 
-  let toString = function `MediaOrientation s -> s
+  let toString = function
+    | `portrait -> {js|portrait|js}
+    | `landscape -> {js|landscape|js}
 end
 
 module MediaPointer = struct
@@ -10688,9 +11252,12 @@ module MediaPointer = struct
 end
 
 module MediaPrefersColorScheme = struct
-  type t = [ `MediaPrefersColorScheme of string ]
+  type t =
+    [ `dark
+    | `light
+    ]
 
-  let toString = function `MediaPrefersColorScheme s -> s
+  let toString = function `dark -> {js|dark|js} | `light -> {js|light|js}
 end
 
 module MediaPrefersContrast = struct
@@ -10717,22 +11284,46 @@ module MediaPrefersReducedMotion = struct
     | `reduce -> {js|reduce|js}
 end
 
-module MediaQuery = struct
-  type t = [ `MediaQuery of string ]
+module MediaType = struct
+  type t = [ `ident of string ]
 
-  let toString = function `MediaQuery s -> s
+  let toString = function `ident s -> s
+end
+
+module MediaQuery = struct
+  type t =
+    [ `condition of MediaCondition.t
+    | `typeOnly of MediaType.t
+    | `typeWithCondition of
+      [ `not | `only ] option * MediaType.t * MediaConditionWithoutOr.t
+    ]
+
+  let toString = function
+    | `condition c -> MediaCondition.toString c
+    | `typeOnly t -> MediaType.toString t
+    | `typeWithCondition (modifier, typ, cond) ->
+      let mod_str =
+        match modifier with
+        | None -> {js||js}
+        | Some `not -> {js|not |js}
+        | Some `only -> {js|only |js}
+      in
+      mod_str
+      ^ MediaType.toString typ
+      ^ {js| and |js}
+      ^ MediaConditionWithoutOr.toString cond
 end
 
 module MediaQueryList = struct
-  type t = [ `MediaQueryList of string ]
+  type t = string list (* media queries as strings for now *)
 
-  let toString = function `MediaQueryList s -> s
+  let toString queries = String.concat {js|, |js} queries
 end
 
 module MediaResolution = struct
-  type t = [ `MediaResolution of string ]
+  type t = Resolution.t
 
-  let toString = function `MediaResolution s -> s
+  let toString = Resolution.toString
 end
 
 module MediaScripting = struct
@@ -10748,12 +11339,6 @@ module MediaScripting = struct
     | `enabled -> {js|enabled|js}
 end
 
-module MediaType = struct
-  type t = [ `MediaType of string ]
-
-  let toString = function `MediaType s -> s
-end
-
 module MediaUpdate = struct
   type t =
     [ None.t
@@ -10767,88 +11352,32 @@ module MediaUpdate = struct
     | `fast -> {js|fast|js}
 end
 
-module MfBoolean = struct
-  type t = [ `MfBoolean of string ]
-
-  let toString = function `MfBoolean s -> s
-end
-
-module MfComparison = struct
-  type t = [ `MfComparison of string ]
-
-  let toString = function `MfComparison s -> s
-end
-
-module MfEq = struct
-  type t = [ `MfEq of string ]
-
-  let toString = function `MfEq s -> s
-end
-
-module MfGt = struct
-  type t =
-    [ `gte
-    | `gt
-    ]
-
-  let toString = function `gte -> {js|>=|js} | `gt -> {js|>|js}
-end
-
-module MfLt = struct
-  type t =
-    [ `lte
-    | `lt
-    ]
-
-  let toString = function `lte -> {js|<=|js} | `lt -> {js|<|js}
-end
-
-module MfName = struct
-  type t = [ `MfName of string ]
-
-  let toString = function `MfName s -> s
-end
-
-module MfPlain = struct
-  type t = [ `MfPlain of string ]
-
-  let toString = function `MfPlain s -> s
-end
-
-module MfRange = struct
-  type t = [ `MfRange of string ]
-
-  let toString = function `MfRange s -> s
-end
-
-module MfValue = struct
-  type t = [ `MfValue of string ]
-
-  let toString = function `MfValue s -> s
-end
-
 module NameRepeat = struct
-  type t = [ `NameRepeat of string ]
+  type t = [ `repeat of string ]
 
-  let toString = function `NameRepeat s -> s
+  let toString = function `repeat s -> {js|repeat(|js} ^ s ^ {js|)|js}
 end
 
 module NamedColor = struct
-  type t = [ `NamedColor of string ]
+  type t = [ `namedColor of string ]
 
-  let toString = function `NamedColor s -> s
+  let toString = function `namedColor s -> s
 end
 
 module NamespacePrefix = struct
-  type t = [ `NamespacePrefix of string ]
+  type t =
+    [ `ident of string
+    | `any (* * *)
+    ]
 
-  let toString = function `NamespacePrefix s -> s
+  let toString = function `ident s -> s ^ {js|||js} | `any -> {js|*||js}
 end
 
 module NonStandardColor = struct
-  type t = [ `NonStandardColor of string ]
+  (* Browser-specific or non-standard color keywords *)
+  type t = [ `color of string ]
 
-  let toString = function `NonStandardColor s -> s
+  let toString = function `color s -> s
 end
 
 module NonStandardFont = struct
@@ -10932,9 +11461,16 @@ module NonStandardWidth = struct
 end
 
 module NsPrefix = struct
-  type t = [ `NsPrefix of string ]
+  type t =
+    [ `ident of string
+    | `any (* * *)
+    | `none
+    ]
 
-  let toString = function `NsPrefix s -> s
+  let toString = function
+    | `ident s -> s ^ {js|||js}
+    | `any -> {js|*||js}
+    | `none -> {js|||js}
 end
 
 module Nth = struct
@@ -10951,21 +11487,26 @@ module Nth = struct
 end
 
 module NumberOneOrGreater = struct
-  type t = [ `NumberOneOrGreater of string ]
+  type t = [ `number of float ]
 
-  let toString = function `NumberOneOrGreater s -> s
+  let toString = function `number n -> Kloth.Float.to_string n
 end
 
 module NumberPercentage = struct
-  type t = [ `NumberPercentage of string ]
+  type t =
+    [ `number of float
+    | Percentage.t
+    ]
 
-  let toString = function `NumberPercentage s -> s
+  let toString = function
+    | `number n -> Kloth.Float.to_string n
+    | #Percentage.t as p -> Percentage.toString p
 end
 
 module NumberZeroOne = struct
-  type t = [ `NumberZeroOne of string ]
+  type t = [ `number of float ]
 
-  let toString = function `NumberZeroOne s -> s
+  let toString = function `number n -> Kloth.Float.to_string n
 end
 
 module NumericFigureValues = struct
@@ -11002,15 +11543,31 @@ module NumericSpacingValues = struct
 end
 
 module OneBgSize = struct
-  type t = [ `OneBgSize of string ]
+  type size_value =
+    [ Length.t
+    | Percentage.t
+    | `auto
+    ]
 
-  let toString = function `OneBgSize s -> s
+  type t =
+    [ `single of size_value
+    | `pair of size_value * size_value
+    ]
+
+  let size_value_to_string = function
+    | #Length.t as l -> Length.toString l
+    | `auto -> {js|auto|js}
+
+  let toString = function
+    | `single v -> size_value_to_string v
+    | `pair (v1, v2) ->
+      size_value_to_string v1 ^ {js| |js} ^ size_value_to_string v2
 end
 
 module OutlineRadius = struct
-  type t = [ `OutlineRadius of string ]
+  type t = LengthPercentage.t
 
-  let toString = function `OutlineRadius s -> s
+  let toString = LengthPercentage.toString
 end
 
 module OverflowPosition = struct
@@ -11032,63 +11589,124 @@ module Overlay = struct
 end
 
 module OverscrollBehaviorBlock = struct
-  type t = [ `OverscrollBehaviorBlock of string ]
+  type t =
+    [ `contain
+    | `none
+    | `auto
+    ]
 
-  let toString = function `OverscrollBehaviorBlock s -> s
+  let toString = function
+    | `contain -> {js|contain|js}
+    | `none -> {js|none|js}
+    | `auto -> {js|auto|js}
 end
 
 module OverscrollBehaviorInline = struct
-  type t = [ `OverscrollBehaviorInline of string ]
+  type t =
+    [ `contain
+    | `none
+    | `auto
+    ]
 
-  let toString = function `OverscrollBehaviorInline s -> s
+  let toString = function
+    | `contain -> {js|contain|js}
+    | `none -> {js|none|js}
+    | `auto -> {js|auto|js}
 end
 
 module OverscrollBehaviorX = struct
-  type t = [ `OverscrollBehaviorX of string ]
+  type t =
+    [ `contain
+    | `none
+    | `auto
+    ]
 
-  let toString = function `OverscrollBehaviorX s -> s
+  let toString = function
+    | `contain -> {js|contain|js}
+    | `none -> {js|none|js}
+    | `auto -> {js|auto|js}
 end
 
 module OverscrollBehaviorY = struct
-  type t = [ `OverscrollBehaviorY of string ]
+  type t =
+    [ `contain
+    | `none
+    | `auto
+    ]
 
-  let toString = function `OverscrollBehaviorY s -> s
+  let toString = function
+    | `contain -> {js|contain|js}
+    | `none -> {js|none|js}
+    | `auto -> {js|auto|js}
 end
 
 module Page = struct
-  type t = [ `Page of string ]
+  type t = [ `page of string ]
 
-  let toString = function `Page s -> s
+  let toString = function `page s -> s
 end
 
 module PageBody = struct
-  type t = [ `PageBody of string ]
+  type t = [ `body of string ]
 
-  let toString = function `PageBody s -> s
+  let toString = function `body s -> s
 end
 
 module PageMarginBox = struct
-  type t = [ `PageMarginBox of string ]
+  type t = [ `marginBox of string ]
 
-  let toString = function `PageMarginBox s -> s
+  let toString = function `marginBox s -> s
 end
 
 module PageMarginBoxType = struct
-  type t = [ `PageMarginBoxType of string ]
+  type t =
+    [ `topLeftCorner
+    | `topLeft
+    | `topCenter
+    | `topRight
+    | `topRightCorner
+    | `bottomLeftCorner
+    | `bottomLeft
+    | `bottomCenter
+    | `bottomRight
+    | `bottomRightCorner
+    | `leftTop
+    | `leftMiddle
+    | `leftBottom
+    | `rightTop
+    | `rightMiddle
+    | `rightBottom
+    ]
 
-  let toString = function `PageMarginBoxType s -> s
+  let toString = function
+    | `topLeftCorner -> {js|@top-left-corner|js}
+    | `topLeft -> {js|@top-left|js}
+    | `topCenter -> {js|@top-center|js}
+    | `topRight -> {js|@top-right|js}
+    | `topRightCorner -> {js|@top-right-corner|js}
+    | `bottomLeftCorner -> {js|@bottom-left-corner|js}
+    | `bottomLeft -> {js|@bottom-left|js}
+    | `bottomCenter -> {js|@bottom-center|js}
+    | `bottomRight -> {js|@bottom-right|js}
+    | `bottomRightCorner -> {js|@bottom-right-corner|js}
+    | `leftTop -> {js|@left-top|js}
+    | `leftMiddle -> {js|@left-middle|js}
+    | `leftBottom -> {js|@left-bottom|js}
+    | `rightTop -> {js|@right-top|js}
+    | `rightMiddle -> {js|@right-middle|js}
+    | `rightBottom -> {js|@right-bottom|js}
 end
 
 module PageSelector = struct
-  type t = [ `PageSelector of string ]
+  type t = [ `pageSelector of string ]
 
-  let toString = function `PageSelector s -> s
+  let toString = function `pageSelector s -> s
 end
 
 module PageSelectorList = struct
-  type t = [ `PageSelectorList of string ]
+  type t = [ `pageSelectors of string ]
 
-  let toString = function `PageSelectorList s -> s
+  let toString = function `pageSelectors s -> s
 end
 
 module Paint = struct
@@ -11128,33 +11746,71 @@ module PolarColorSpace = struct
 end
 
 module PositionAnchor = struct
-  type t = [ `PositionAnchor of string ]
+  type t =
+    [ `auto
+    | `dashedIdent of string
+    ]
 
-  let toString = function `PositionAnchor s -> s
+  let toString = function `auto -> {js|auto|js} | `dashedIdent s -> s
 end
 
 module PositionArea = struct
-  type t = [ `PositionArea of string ]
+  type t =
+    [ `none
+    | `top
+    | `bottom
+    | `left
+    | `right
+    | `center
+    | `selfStart
+    | `selfEnd
+    | `start
+    | `end_
+    ]
 
-  let toString = function `PositionArea s -> s
+  let toString = function
+    | `none -> {js|none|js}
+    | `top -> {js|top|js}
+    | `bottom -> {js|bottom|js}
+    | `left -> {js|left|js}
+    | `right -> {js|right|js}
+    | `center -> {js|center|js}
+    | `selfStart -> {js|self-start|js}
+    | `selfEnd -> {js|self-end|js}
+    | `start -> {js|start|js}
+    | `end_ -> {js|end|js}
 end
 
 module PositionTry = struct
-  type t = [ `PositionTry of string ]
+  type t =
+    [ `none
+    | `tactics of
+      [ `dashedIdent of string | `flipBlock | `flipInline | `flipStart ] list
+    ]
 
-  let toString = function `PositionTry s -> s
+  let tactic_to_string = function
+    | `dashedIdent s -> s
+    | `flipBlock -> {js|flip-block|js}
+    | `flipInline -> {js|flip-inline|js}
+    | `flipStart -> {js|flip-start|js}
+
+  let toString = function
+    | `none -> {js|none|js}
+    | `tactics l ->
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:tactic_to_string
+        (Array.of_list l)
 end
 
 module PositionTryFallbacks = struct
-  type t = [ `PositionTryFallbacks of string ]
+  type t = PositionTry.t
 
-  let toString = function `PositionTryFallbacks s -> s
+  let toString = PositionTry.toString
 end
 
 module PositionTryOptions = struct
-  type t = [ `PositionTryOptions of string ]
+  type t = PositionTry.t
 
-  let toString = function `PositionTryOptions s -> s
+  let toString = PositionTry.toString
 end
 
 module PositionVisibility = struct
@@ -11173,9 +11829,9 @@ module PositionVisibility = struct
 end
 
 module PositiveInteger = struct
-  type t = [ `PositiveInteger of string ]
+  type t = [ `integer of int ]
 
-  let toString = function `PositiveInteger s -> s
+  let toString = function `integer n -> Kloth.Int.to_string n
 end
 
 module PrintColorAdjust = struct
@@ -11190,27 +11846,36 @@ module PrintColorAdjust = struct
 end
 
 module PseudoClassSelector = struct
-  type t = [ `PseudoClassSelector of string ]
+  type t = [ `pseudoClass of string ]
 
-  let toString = function `PseudoClassSelector s -> s
+  let toString = function `pseudoClass s -> {js|:|js} ^ s
 end
 
 module PseudoElementSelector = struct
-  type t = [ `PseudoElementSelector of string ]
+  type t = [ `pseudoElement of string ]
 
-  let toString = function `PseudoElementSelector s -> s
+  let toString = function `pseudoElement s -> {js|::|js} ^ s
 end
 
 module PseudoPage = struct
-  type t = [ `PseudoPage of string ]
+  type t =
+    [ `left
+    | `right
+    | `first
+    | `blank
+    ]
 
-  let toString = function `PseudoPage s -> s
+  let toString = function
+    | `left -> {js|:left|js}
+    | `right -> {js|:right|js}
+    | `first -> {js|:first|js}
+    | `blank -> {js|:blank|js}
 end
 
 module QueryInParens = struct
-  type t = [ `QueryInParens of string ]
+  type t = [ `inParens of string ]
 
-  let toString = function `QueryInParens s -> s
+  let toString = function `inParens s -> {js|(|js} ^ s ^ {js|)|js}
 end
 
 module Quote = struct
@@ -11229,21 +11894,40 @@ module Quote = struct
 end
 
 module RadialSize = struct
-  type t = [ `RadialSize of string ]
+  type t =
+    [ `closestSide
+    | `farthestSide
+    | `closestCorner
+    | `farthestCorner
+    | `length of Length.t
+    | `pair of LengthPercentage.t * LengthPercentage.t
+    ]
 
-  let toString = function `RadialSize s -> s
-end
-
-module Ratio = struct
-  type t = [ `Ratio of string ]
-
-  let toString = function `Ratio s -> s
+  let toString = function
+    | `closestSide -> {js|closest-side|js}
+    | `farthestSide -> {js|farthest-side|js}
+    | `closestCorner -> {js|closest-corner|js}
+    | `farthestCorner -> {js|farthest-corner|js}
+    | `length l -> Length.toString l
+    | `pair (lp1, lp2) ->
+      LengthPercentage.toString lp1 ^ {js| |js} ^ LengthPercentage.toString lp2
 end
 
 module RaySize = struct
-  type t = [ `RaySize of string ]
+  type t =
+    [ `closestSide
+    | `farthestSide
+    | `closestCorner
+    | `farthestCorner
+    | `sides
+    ]
 
-  let toString = function `RaySize s -> s
+  let toString = function
+    | `closestSide -> {js|closest-side|js}
+    | `farthestSide -> {js|farthest-side|js}
+    | `closestCorner -> {js|closest-corner|js}
+    | `farthestCorner -> {js|farthest-corner|js}
+    | `sides -> {js|sides|js}
 end
 
 module ReadingFlow = struct
@@ -11294,16 +11978,33 @@ module RectangularColorSpace = struct
     | `xyzD65 -> {js|xyz-d65|js}
 end
 
-module RelativeSelector = struct
-  type t = [ `RelativeSelector of string ]
+module ColorInterpolationMethod = struct
+  type t =
+    [ `rectangular of RectangularColorSpace.t
+    | `polar of PolarColorSpace.t * HueInterpolationMethod.t option
+    ]
 
-  let toString = function `RelativeSelector s -> s
+  let toString = function
+    | `rectangular space -> {js|in |js} ^ RectangularColorSpace.toString space
+    | `polar (space, None) -> {js|in |js} ^ PolarColorSpace.toString space
+    | `polar (space, Some hue) ->
+      {js|in |js}
+      ^ PolarColorSpace.toString space
+      ^ {js| |js}
+      ^ HueInterpolationMethod.toString hue
+      ^ {js| hue|js}
+end
+
+module RelativeSelector = struct
+  type t = [ `selector of string ]
+
+  let toString = function `selector s -> s
 end
 
 module RelativeSelectorList = struct
-  type t = [ `RelativeSelectorList of string ]
+  type t = [ `selectors of string ]
 
-  let toString = function `RelativeSelectorList s -> s
+  let toString = function `selectors s -> s
 end
 
 module RelativeSize = struct
@@ -11337,87 +12038,171 @@ module RepeatStyle = struct
 end
 
 module RubyOverhang = struct
-  type t = [ `RubyOverhang of string ]
+  type t =
+    [ `auto
+    | `start
+    | `end_
+    | `none
+    ]
 
-  let toString = function `RubyOverhang s -> s
+  let toString = function
+    | `auto -> {js|auto|js}
+    | `start -> {js|start|js}
+    | `end_ -> {js|end|js}
+    | `none -> {js|none|js}
 end
 
 module SVGPath = struct
-  type t = [ `SVGPath of string ]
+  type t = [ `path of string ]
 
-  let toString = function `SVGPath s -> s
+  let toString = function `path s -> s
 end
 
 module ScrollMarkerGroup = struct
-  type t = [ `ScrollMarkerGroup of string ]
+  type t =
+    [ `none
+    | `before
+    | `after
+    ]
 
-  let toString = function `ScrollMarkerGroup s -> s
+  let toString = function
+    | `none -> {js|none|js}
+    | `before -> {js|before|js}
+    | `after -> {js|after|js}
 end
 
 module ScrollStart = struct
-  type t = [ `ScrollStart of string ]
+  type t =
+    [ `auto
+    | `start
+    | `end_
+    | `center
+    | `top
+    | `bottom
+    | `left
+    | `right
+    | `length of Length.t
+    | `percentage of Percentage.t
+    ]
 
-  let toString = function `ScrollStart s -> s
+  let toString = function
+    | `auto -> {js|auto|js}
+    | `start -> {js|start|js}
+    | `end_ -> {js|end|js}
+    | `center -> {js|center|js}
+    | `top -> {js|top|js}
+    | `bottom -> {js|bottom|js}
+    | `left -> {js|left|js}
+    | `right -> {js|right|js}
+    | `length l -> Length.toString l
+    | `percentage p -> Percentage.toString p
 end
 
 module ScrollStartBlock = struct
-  type t = [ `ScrollStartBlock of string ]
+  type t = ScrollStart.t
 
-  let toString = function `ScrollStartBlock s -> s
+  let toString = ScrollStart.toString
 end
 
 module ScrollStartInline = struct
-  type t = [ `ScrollStartInline of string ]
+  type t = ScrollStart.t
 
-  let toString = function `ScrollStartInline s -> s
+  let toString = ScrollStart.toString
 end
 
 module ScrollStartTarget = struct
-  type t = [ `ScrollStartTarget of string ]
+  type t =
+    [ `none
+    | `auto
+    ]
 
-  let toString = function `ScrollStartTarget s -> s
+  let toString = function `none -> {js|none|js} | `auto -> {js|auto|js}
 end
 
 module ScrollStartTargetBlock = struct
-  type t = [ `ScrollStartTargetBlock of string ]
+  type t =
+    [ `none
+    | `auto
+    ]
 
-  let toString = function `ScrollStartTargetBlock s -> s
+  let toString = function `none -> {js|none|js} | `auto -> {js|auto|js}
 end
 
 module ScrollStartTargetInline = struct
-  type t = [ `ScrollStartTargetInline of string ]
+  type t =
+    [ `none
+    | `auto
+    ]
 
-  let toString = function `ScrollStartTargetInline s -> s
+  let toString = function `none -> {js|none|js} | `auto -> {js|auto|js}
 end
 
 module ScrollStartTargetX = struct
-  type t = [ `ScrollStartTargetX of string ]
+  type t =
+    [ `none
+    | `auto
+    ]
 
-  let toString = function `ScrollStartTargetX s -> s
+  let toString = function `none -> {js|none|js} | `auto -> {js|auto|js}
 end
 
 module ScrollStartTargetY = struct
-  type t = [ `ScrollStartTargetY of string ]
+  type t =
+    [ `none
+    | `auto
+    ]
 
-  let toString = function `ScrollStartTargetY s -> s
+  let toString = function `none -> {js|none|js} | `auto -> {js|auto|js}
 end
 
 module ScrollStartX = struct
-  type t = [ `ScrollStartX of string ]
+  type t = ScrollStart.t
 
-  let toString = function `ScrollStartX s -> s
+  let toString = ScrollStart.toString
 end
 
 module ScrollStartY = struct
-  type t = [ `ScrollStartY of string ]
+  type t = ScrollStart.t
 
-  let toString = function `ScrollStartY s -> s
+  let toString = ScrollStart.toString
 end
 
 module ScrollTimeline = struct
-  type t = [ `ScrollTimeline of string ]
+  type name =
+    [ `none
+    | `customIdent of string
+    ]
 
-  let toString = function `ScrollTimeline s -> s
+  type axis =
+    [ `block
+    | `inline
+    | `x
+    | `y
+    ]
+
+  type t = {
+    names : name list;
+    axes : axis list;
+  }
+
+  let name_to_string = function `none -> {js|none|js} | `customIdent s -> s
+
+  let axis_to_string = function
+    | `block -> {js|block|js}
+    | `inline -> {js|inline|js}
+    | `x -> {js|x|js}
+    | `y -> {js|y|js}
+
+  let toString { names; axes } =
+    let names_str =
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:name_to_string
+        (Array.of_list names)
+    in
+    let axes_str =
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:axis_to_string
+        (Array.of_list axes)
+    in
+    names_str ^ {js| |js} ^ axes_str
 end
 
 module ScrollTimelineAxis = struct
@@ -11436,15 +12221,24 @@ module ScrollTimelineAxis = struct
 end
 
 module ScrollTimelineName = struct
-  type t = [ `ScrollTimelineName of string ]
+  type t =
+    [ `none
+    | `customIdent of string
+    ]
 
-  let toString = function `ScrollTimelineName s -> s
+  let toString = function `none -> {js|none|js} | `customIdent s -> s
 end
 
 module ScrollbarColorLegacy = struct
-  type t = [ `ScrollbarColorLegacy of string ]
+  type t =
+    [ `auto
+    | `colors of Color.t * Color.t (* thumb and track *)
+    ]
 
-  let toString = function `ScrollbarColorLegacy s -> s
+  let toString = function
+    | `auto -> {js|auto|js}
+    | `colors (thumb, track) ->
+      Color.toString thumb ^ {js| |js} ^ Color.toString track
 end
 
 module SelfPosition = struct
@@ -11469,15 +12263,24 @@ module SelfPosition = struct
 end
 
 module Shape = struct
-  type t = [ `Shape of string ]
+  type t = BasicShape.t
 
-  let toString = function `Shape s -> s
+  let toString = BasicShape.toString
 end
 
 module ShapeBox = struct
-  type t = [ `ShapeBox of string ]
+  type t =
+    [ `borderBox
+    | `paddingBox
+    | `contentBox
+    | `marginBox
+    ]
 
-  let toString = function `ShapeBox s -> s
+  let toString = function
+    | `borderBox -> {js|border-box|js}
+    | `paddingBox -> {js|padding-box|js}
+    | `contentBox -> {js|content-box|js}
+    | `marginBox -> {js|margin-box|js}
 end
 
 module ShapeRadius = struct
@@ -11492,9 +12295,10 @@ module ShapeRadius = struct
 end
 
 module SingleAnimation = struct
-  type t = [ `SingleAnimation of string ]
+  (* Complex grammar: <time> || <easing-function> || <time> || <single-animation-iteration-count> || <single-animation-direction> || <single-animation-fill-mode> || <single-animation-play-state> || [ none | <keyframes-name> ] *)
+  type t = [ `animation of string ]
 
-  let toString = function `SingleAnimation s -> s
+  let toString = function `animation s -> s
 end
 
 module SingleAnimationDirection = struct
@@ -11513,9 +12317,18 @@ module SingleAnimationDirection = struct
 end
 
 module SingleAnimationDirectionNoInterp = struct
-  type t = [ `SingleAnimationDirectionNoInterp of string ]
+  type t =
+    [ `normal
+    | `reverse
+    | `alternate
+    | `alternateReverse
+    ]
 
-  let toString = function `SingleAnimationDirectionNoInterp s -> s
+  let toString = function
+    | `normal -> {js|normal|js}
+    | `reverse -> {js|reverse|js}
+    | `alternate -> {js|alternate|js}
+    | `alternateReverse -> {js|alternate-reverse|js}
 end
 
 module SingleAnimationFillMode = struct
@@ -11534,9 +12347,18 @@ module SingleAnimationFillMode = struct
 end
 
 module SingleAnimationFillModeNoInterp = struct
-  type t = [ `SingleAnimationFillModeNoInterp of string ]
+  type t =
+    [ `none
+    | `forwards
+    | `backwards
+    | `both
+    ]
 
-  let toString = function `SingleAnimationFillModeNoInterp s -> s
+  let toString = function
+    | `none -> {js|none|js}
+    | `forwards -> {js|forwards|js}
+    | `backwards -> {js|backwards|js}
+    | `both -> {js|both|js}
 end
 
 module SingleAnimationIterationCount = struct
@@ -11551,15 +12373,20 @@ module SingleAnimationIterationCount = struct
 end
 
 module SingleAnimationIterationCountNoInterp = struct
-  type t = [ `SingleAnimationIterationCountNoInterp of string ]
+  type t =
+    [ `infinite
+    | `number of float
+    ]
 
-  let toString = function `SingleAnimationIterationCountNoInterp s -> s
+  let toString = function
+    | `infinite -> {js|infinite|js}
+    | `number n -> Kloth.Float.to_string n
 end
 
 module SingleAnimationNoInterp = struct
-  type t = [ `SingleAnimationNoInterp of string ]
+  type t = [ `animation of string ]
 
-  let toString = function `SingleAnimationNoInterp s -> s
+  let toString = function `animation s -> s
 end
 
 module SingleAnimationPlayState = struct
@@ -11574,21 +12401,27 @@ module SingleAnimationPlayState = struct
 end
 
 module SingleAnimationPlayStateNoInterp = struct
-  type t = [ `SingleAnimationPlayStateNoInterp of string ]
+  type t =
+    [ `running
+    | `paused
+    ]
 
-  let toString = function `SingleAnimationPlayStateNoInterp s -> s
+  let toString = function
+    | `running -> {js|running|js}
+    | `paused -> {js|paused|js}
 end
 
 module SingleTransition = struct
-  type t = [ `SingleTransition of string ]
+  (* Complex grammar: [ none | <single-transition-property> ] || <time> || <easing-function> || <time> *)
+  type t = [ `transition of string ]
 
-  let toString = function `SingleTransition s -> s
+  let toString = function `transition s -> s
 end
 
 module SingleTransitionNoInterp = struct
-  type t = [ `SingleTransitionNoInterp of string ]
+  type t = [ `transition of string ]
 
-  let toString = function `SingleTransitionNoInterp s -> s
+  let toString = function `transition s -> s
 end
 
 module SingleTransitionProperty = struct
@@ -11610,15 +12443,31 @@ module SingleTransitionPropertyNoInterp = struct
 end
 
 module Size = struct
-  type t = [ `Size of string ]
+  type t =
+    [ `auto
+    | `length of Length.t
+    | `percentage of Percentage.t
+    | `minContent
+    | `maxContent
+    | `fitContent of Length.t option
+    ]
 
-  let toString = function `Size s -> s
+  let toString = function
+    | `auto -> {js|auto|js}
+    | `length l -> Length.toString l
+    | `percentage p -> Percentage.toString p
+    | `minContent -> {js|min-content|js}
+    | `maxContent -> {js|max-content|js}
+    | `fitContent None -> {js|fit-content|js}
+    | `fitContent (Some l) ->
+      {js|fit-content(|js} ^ Length.toString l ^ {js|)|js}
 end
 
 module SizeFeature = struct
-  type t = [ `SizeFeature of string ]
+  (* Container size feature *)
+  type t = MfPlain.t
 
-  let toString = function `SizeFeature s -> s
+  let toString = MfPlain.toString
 end
 
 module StepPosition = struct
@@ -11641,77 +12490,130 @@ module StepPosition = struct
 end
 
 module StepTimingFunction = struct
-  type t = [ `StepTimingFunction of string ]
+  type t =
+    [ `stepStart
+    | `stepEnd
+    | `steps of int * StepPosition.t option
+    ]
 
-  let toString = function `StepTimingFunction s -> s
+  let toString = function
+    | `stepStart -> {js|step-start|js}
+    | `stepEnd -> {js|step-end|js}
+    | `steps (n, None) -> {js|steps(|js} ^ Kloth.Int.to_string n ^ {js|)|js}
+    | `steps (n, Some pos) ->
+      {js|steps(|js}
+      ^ Kloth.Int.to_string n
+      ^ {js|, |js}
+      ^ StepPosition.toString pos
+      ^ {js|)|js}
 end
 
 (* Stroke passthrough module removed - use Paint instead *)
 
 module StrokeOpacity = struct
-  type t = [ `StrokeOpacity of string ]
+  type t = [ `number of float ]
 
-  let toString = function `StrokeOpacity s -> s
+  let toString = function `number n -> Kloth.Float.to_string n
 end
 
 module StyleFeature = struct
-  type t = [ `StyleFeature of string ]
+  type t = [ `feature of string * string ] (* property: value *)
 
-  let toString = function `StyleFeature s -> s
+  let toString = function `feature (prop, value) -> prop ^ {js|: |js} ^ value
 end
 
 module StyleInParens = struct
-  type t = [ `StyleInParens of string ]
+  type t = [ `inParens of string ]
 
-  let toString = function `StyleInParens s -> s
+  let toString = function `inParens s -> {js|(|js} ^ s ^ {js|)|js}
 end
 
 module StyleQuery = struct
-  type t = [ `StyleQuery of string ]
+  type t = [ `style of string ]
 
-  let toString = function `StyleQuery s -> s
+  let toString = function `style s -> {js|style(|js} ^ s ^ {js|)|js}
 end
 
 module SubclassSelector = struct
-  type t = [ `SubclassSelector of string ]
+  type t =
+    [ `id of string
+    | `class_ of string
+    | `attribute of AttributeSelector.t
+    | `pseudoClass of PseudoClassSelector.t
+    ]
 
-  let toString = function `SubclassSelector s -> s
-end
-
-module SupportsCondition = struct
-  type t = [ `SupportsCondition of string ]
-
-  let toString = function `SupportsCondition s -> s
+  let toString = function
+    | `id s -> {js|#|js} ^ s
+    | `class_ s -> {js|.|js} ^ s
+    | `attribute a -> AttributeSelector.toString a
+    | `pseudoClass p -> PseudoClassSelector.toString p
 end
 
 module SupportsDecl = struct
-  type t = [ `SupportsDecl of string ]
+  type t = [ `decl of string * string ]
 
-  let toString = function `SupportsDecl s -> s
+  let toString = function
+    | `decl (prop, value) -> {js|(|js} ^ prop ^ {js|: |js} ^ value ^ {js|)|js}
 end
 
 module SupportsFeature = struct
-  type t = [ `SupportsFeature of string ]
+  type t =
+    [ `decl of SupportsDecl.t
+    | `selectorFn of string
+    ]
 
-  let toString = function `SupportsFeature s -> s
+  let toString = function
+    | `decl d -> SupportsDecl.toString d
+    | `selectorFn s -> {js|selector(|js} ^ s ^ {js|)|js}
 end
 
 module SupportsInParens = struct
-  type t = [ `SupportsInParens of string ]
+  type t =
+    [ `condition of string (* nested condition *)
+    | `feature of SupportsFeature.t
+    ]
 
-  let toString = function `SupportsInParens s -> s
+  let toString = function
+    | `condition s -> {js|(|js} ^ s ^ {js|)|js}
+    | `feature f -> SupportsFeature.toString f
+end
+
+module SupportsCondition = struct
+  type t =
+    [ `not of SupportsInParens.t
+    | `single of SupportsInParens.t
+    | `and_ of SupportsInParens.t list
+    | `or_ of SupportsInParens.t list
+    ]
+
+  let toString = function
+    | `not p -> {js|not |js} ^ SupportsInParens.toString p
+    | `single p -> SupportsInParens.toString p
+    | `and_ items ->
+      Kloth.Array.map_and_join ~sep:{js| and |js} ~f:SupportsInParens.toString
+        (Array.of_list items)
+    | `or_ items ->
+      Kloth.Array.map_and_join ~sep:{js| or |js} ~f:SupportsInParens.toString
+        (Array.of_list items)
 end
 
 module SupportsSelectorFn = struct
-  type t = [ `SupportsSelectorFn of string ]
+  type t = [ `selector of string ]
 
-  let toString = function `SupportsSelectorFn s -> s
+  let toString = function `selector s -> {js|selector(|js} ^ s ^ {js|)|js}
 end
 
 module SvgLength = struct
-  type t = [ `SvgLength of string ]
+  type t =
+    [ `percentage of Percentage.t
+    | `length of Length.t
+    | `number of float
+    ]
 
-  let toString = function `SvgLength s -> s
+  let toString = function
+    | `percentage p -> Percentage.toString p
+    | `length l -> Length.toString l
+    | `number n -> Kloth.Float.to_string n
 end
 
 module SvgWritingMode = struct
@@ -11734,57 +12636,114 @@ module SvgWritingMode = struct
 end
 
 module Symbol = struct
-  type t = [ `Symbol of string ]
+  type t =
+    [ `string of string
+    | `image of Image.t
+    | `customIdent of string
+    ]
 
-  let toString = function `Symbol s -> s
+  let toString = function
+    | `string s -> {js|"|js} ^ s ^ {js|"|js}
+    | `image i -> Image.toString i
+    | `customIdent s -> s
 end
 
 module Syntax = struct
-  type t = [ `Syntax of string ]
+  type t = [ `syntax of string ]
 
-  let toString = function `Syntax s -> s
+  let toString = function `syntax s -> s
 end
 
 module SyntaxCombinator = struct
-  type t = [ `SyntaxCombinator of string ]
+  type t = [ `pipe ] (* | *)
 
-  let toString = function `SyntaxCombinator s -> s
-end
-
-module SyntaxComponent = struct
-  type t = [ `SyntaxComponent of string ]
-
-  let toString = function `SyntaxComponent s -> s
+  let toString = function `pipe -> {js|||js}
 end
 
 module SyntaxMultiplier = struct
-  type t = [ `SyntaxMultiplier of string ]
+  type t =
+    [ `plus (* + *)
+    | `hash (* # *)
+    ]
 
-  let toString = function `SyntaxMultiplier s -> s
-end
-
-module SyntaxSingleComponent = struct
-  type t = [ `SyntaxSingleComponent of string ]
-
-  let toString = function `SyntaxSingleComponent s -> s
-end
-
-module SyntaxString = struct
-  type t = [ `SyntaxString of string ]
-
-  let toString = function `SyntaxString s -> s
+  let toString = function `plus -> {js|+|js} | `hash -> {js|#|js}
 end
 
 module SyntaxTypeName = struct
-  type t = [ `SyntaxTypeName of string ]
+  type t =
+    [ `length
+    | `number
+    | `percentage
+    | `lengthPercentage
+    | `color
+    | `image
+    | `url
+    | `integer
+    | `angle
+    | `time
+    | `resolution
+    | `transformFunction
+    | `transformList
+    | `customIdent
+    ]
 
-  let toString = function `SyntaxTypeName s -> s
+  let toString = function
+    | `length -> {js|<length>|js}
+    | `number -> {js|<number>|js}
+    | `percentage -> {js|<percentage>|js}
+    | `lengthPercentage -> {js|<length-percentage>|js}
+    | `color -> {js|<color>|js}
+    | `image -> {js|<image>|js}
+    | `url -> {js|<url>|js}
+    | `integer -> {js|<integer>|js}
+    | `angle -> {js|<angle>|js}
+    | `time -> {js|<time>|js}
+    | `resolution -> {js|<resolution>|js}
+    | `transformFunction -> {js|<transform-function>|js}
+    | `transformList -> {js|<transform-list>|js}
+    | `customIdent -> {js|<custom-ident>|js}
+end
+
+module SyntaxComponent = struct
+  type t =
+    [ `typeName of SyntaxTypeName.t * SyntaxMultiplier.t option
+    | `string of string
+    ]
+
+  let toString = function
+    | `typeName (tn, None) -> SyntaxTypeName.toString tn
+    | `typeName (tn, Some m) ->
+      SyntaxTypeName.toString tn ^ SyntaxMultiplier.toString m
+    | `string s -> {js|"|js} ^ s ^ {js|"|js}
+end
+
+module SyntaxSingleComponent = struct
+  type t = SyntaxComponent.t
+
+  let toString = SyntaxComponent.toString
+end
+
+module SyntaxString = struct
+  type t = [ `string of string ]
+
+  let toString = function `string s -> {js|"|js} ^ s ^ {js|"|js}
 end
 
 module Target = struct
-  type t = [ `Target of string ]
+  type t =
+    [ `self
+    | `blank
+    | `parent
+    | `top
+    | `frameName of string
+    ]
 
-  let toString = function `Target s -> s
+  let toString = function
+    | `self -> {js|_self|js}
+    | `blank -> {js|_blank|js}
+    | `parent -> {js|_parent|js}
+    | `top -> {js|_top|js}
+    | `frameName s -> s
 end
 
 module TextBoxEdge = struct
@@ -11918,9 +12877,10 @@ module TimingFunctionNoInterp = struct
 end
 
 module TrackGroup = struct
-  type t = [ `TrackGroup of string ]
+  (* Grid track group - combination of line-names and track-sizes *)
+  type t = [ `group of string ]
 
-  let toString = function `TrackGroup s -> s
+  let toString = function `group s -> s
 end
 
 module TrackList = struct
@@ -12007,9 +12967,9 @@ module TryTactic = struct
 end
 
 module TypeOrUnit = struct
-  type t = [ `TypeOrUnit of string ]
+  type t = [ `typeOrUnit of string ]
 
-  let toString = function `TypeOrUnit s -> s
+  let toString = function `typeOrUnit s -> s
 end
 
 module TypeSelector = struct
@@ -12036,9 +12996,41 @@ module VectorEffect = struct
 end
 
 module ViewTimeline = struct
-  type t = [ `ViewTimeline of string ]
+  type name =
+    [ `none
+    | `customIdent of string
+    ]
 
-  let toString = function `ViewTimeline s -> s
+  type axis =
+    [ `block
+    | `inline
+    | `x
+    | `y
+    ]
+
+  type t = {
+    names : name list;
+    axes : axis list;
+  }
+
+  let name_to_string = function `none -> {js|none|js} | `customIdent s -> s
+
+  let axis_to_string = function
+    | `block -> {js|block|js}
+    | `inline -> {js|inline|js}
+    | `x -> {js|x|js}
+    | `y -> {js|y|js}
+
+  let toString { names; axes } =
+    let names_str =
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:name_to_string
+        (Array.of_list names)
+    in
+    let axes_str =
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:axis_to_string
+        (Array.of_list axes)
+    in
+    names_str ^ {js| |js} ^ axes_str
 end
 
 module ViewTimelineAxis = struct
@@ -12089,6 +13081,7 @@ module ViewportLength = struct
   type t =
     [ Auto.t
     | Length.t
+    | Percentage.t
     ]
 
   let toString = function
@@ -12242,9 +13235,15 @@ module WordWrap = struct
 end
 
 module WqName = struct
-  type t = [ `WqName of string ]
+  (* Wildcard-qualified name *)
+  type t =
+    [ `prefixed of NsPrefix.t * string
+    | `unprefixed of string
+    ]
 
-  let toString = function `WqName s -> s
+  let toString = function
+    | `prefixed (prefix, name) -> NsPrefix.toString prefix ^ name
+    | `unprefixed name -> name
 end
 
 module X = struct

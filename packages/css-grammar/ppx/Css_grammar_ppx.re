@@ -266,6 +266,28 @@ let spec_module_extension =
     spec_module_expander,
   );
 
+/* [%module_path Css_types.Color] -> "Css_types.Color" */
+let module_path_expander =
+    (~loc as exprLoc, ~path as _: string, lid_loc: loc(Longident.t)) => {
+  module Ast_builder =
+    Ast_builder.Make({
+      let loc = exprLoc;
+    });
+  open Ast_builder;
+
+  let lid = lid_loc.txt;
+  let path_string = longident_to_string(lid);
+  estring(path_string);
+};
+
+let module_path_extension =
+  Ppxlib.Extension.declare(
+    "module_path",
+    Ppxlib.Extension.Context.Expression,
+    Ast_pattern.(pstr(pstr_eval(pexp_construct(__', none), nil) ^:: nil)),
+    module_path_expander,
+  );
+
 let preprocess_impl = structure_items => structure_items;
 
 Driver.register_transformation(
@@ -276,6 +298,7 @@ Driver.register_transformation(
     spec_extension,
     spec_t_extension,
     spec_module_extension,
+    module_path_extension,
   ],
   "css-grammar-ppx",
 );
