@@ -6207,21 +6207,15 @@ end
 
 (* Place properties - shorthands for align + justify *)
 module PlaceContent = struct
-  type t = AlignContent.t
-
-  let toString x = AlignContent.toString x
+  include AlignContent
 end
 
 module PlaceItems = struct
-  type t = AlignItems.t
-
-  let toString x = AlignItems.toString x
+  include AlignItems
 end
 
 module PlaceSelf = struct
-  type t = AlignSelf.t
-
-  let toString x = AlignSelf.toString x
+  include AlignSelf
 end
 
 (* Margin trim *)
@@ -6253,9 +6247,7 @@ module ScrollSnapCoordinate = struct
 end
 
 module ScrollSnapDestination = struct
-  type t = Position.t
-
-  let toString x = Position.toString x
+  include Position
 end
 
 (* Image properties *)
@@ -6712,9 +6704,7 @@ module OffsetPath = struct
 end
 
 module Offset = struct
-  type t = OffsetPath.t
-
-  let toString x = OffsetPath.toString x
+  include OffsetPath
 end
 
 (* SVG properties *)
@@ -7517,9 +7507,7 @@ end
 
 (* Remaining shorthands and border/outline complete forms *)
 module BorderImage = struct
-  type t = BorderImageSource.t
-
-  let toString x = BorderImageSource.toString x
+  include BorderImageSource
 end
 
 module Outline = struct
@@ -7597,21 +7585,15 @@ module VoiceRange = struct
 end
 
 module Pause = struct
-  type t = PauseBefore.t
-
-  let toString x = PauseBefore.toString x
+  include PauseBefore
 end
 
 module Rest = struct
-  type t = RestBefore.t
-
-  let toString x = RestBefore.toString x
+  include RestBefore
 end
 
 module Cue = struct
-  type t = CueBefore.t
-
-  let toString x = CueBefore.toString x
+  include CueBefore
 end
 
 (* Font shorthand - complex *)
@@ -8438,15 +8420,11 @@ module AnimationComposition = struct
 end
 
 module AnimationDelayEnd = struct
-  type t = Time.t
-
-  let toString = Time.toString
+  include Time
 end
 
 module AnimationDelayStart = struct
-  type t = Time.t
-
-  let toString = Time.toString
+  include Time
 end
 
 module AnimationRange = struct
@@ -8670,9 +8648,7 @@ module AutoTrackList = struct
 end
 
 module BackdropBlur = struct
-  type t = Length.t
-
-  let toString x = Length.toString x
+  include Length
 end
 
 module BackgroundPositionX = struct
@@ -9011,21 +8987,15 @@ module BorderBlockEnd = struct
 end
 
 module BorderBlockEndColor = struct
-  type t = Color.t
-
-  let toString = Color.toString
+  include Color
 end
 
 module BorderBlockEndStyle = struct
-  type t = BorderStyle.t
-
-  let toString = BorderStyle.toString
+  include BorderStyle
 end
 
 module BorderBlockEndWidth = struct
-  type t = LineWidth.t
-
-  let toString = LineWidth.toString
+  include LineWidth
 end
 
 module BorderBlockStart = struct
@@ -9033,21 +9003,15 @@ module BorderBlockStart = struct
 end
 
 module BorderBlockStartColor = struct
-  type t = Color.t
-
-  let toString = Color.toString
+  include Color
 end
 
 module BorderBlockStartStyle = struct
-  type t = BorderStyle.t
-
-  let toString = BorderStyle.toString
+  include BorderStyle
 end
 
 module BorderBlockStartWidth = struct
-  type t = LineWidth.t
-
-  let toString = LineWidth.toString
+  include LineWidth
 end
 
 module BorderBlockStyle = struct
@@ -9109,21 +9073,15 @@ module BorderInlineStart = struct
 end
 
 module BorderInlineStartColor = struct
-  type t = Color.t
-
-  let toString = Color.toString
+  include Color
 end
 
 module BorderInlineStartStyle = struct
-  type t = BorderStyle.t
-
-  let toString = BorderStyle.toString
+  include BorderStyle
 end
 
 module BorderInlineStartWidth = struct
-  type t = LineWidth.t
-
-  let toString = LineWidth.toString
+  include LineWidth
 end
 
 module BorderInlineStyle = struct
@@ -9191,9 +9149,7 @@ module ClassSelector = struct
 end
 
 module ClipSource = struct
-  type t = Url.t
-
-  let toString = Url.toString
+  include Url
 end
 
 module ColorRendering = struct
@@ -9223,9 +9179,7 @@ module ColorStop = struct
 end
 
 module ColorStopAngle = struct
-  type t = Angle.t
-
-  let toString = Angle.toString
+  include Angle
 end
 
 module ColorStopLength = struct
@@ -9553,9 +9507,7 @@ module ContentPosition = struct
 end
 
 module ContentReplacement = struct
-  type t = Image.t
-
-  let toString = Image.toString
+  include Image
 end
 
 module ContextualAltValues = struct
@@ -10821,9 +10773,7 @@ module MaskLayer = struct
 end
 
 module MaskSource = struct
-  type t = Url.t
-
-  let toString = Url.toString
+  include Url
 end
 
 module MaskReference = struct
@@ -10968,9 +10918,7 @@ module MfValue = struct
 end
 
 module MfBoolean = struct
-  type t = MfName.t
-
-  let toString = MfName.toString
+  include MfName
 end
 
 module MfPlain = struct
@@ -11174,21 +11122,15 @@ module MediaInvertedColors = struct
 end
 
 module MediaMaxAspectRatio = struct
-  type t = Ratio.t
-
-  let toString = Ratio.toString
+  include Ratio
 end
 
 module MediaMaxResolution = struct
-  type t = Resolution.t
-
-  let toString = Resolution.toString
+  include Resolution
 end
 
 module MediaMinAspectRatio = struct
-  type t = Ratio.t
-
-  let toString = Ratio.toString
+  include Ratio
 end
 
 module MediaMinColor = struct
@@ -11204,9 +11146,7 @@ module MediaMinColorIndex = struct
 end
 
 module MediaMinResolution = struct
-  type t = Resolution.t
-
-  let toString = Resolution.toString
+  include Resolution
 end
 
 module MediaMonochrome = struct
@@ -11321,9 +11261,7 @@ module MediaQueryList = struct
 end
 
 module MediaResolution = struct
-  type t = Resolution.t
-
-  let toString = Resolution.toString
+  include Resolution
 end
 
 module MediaScripting = struct
@@ -11565,9 +11503,7 @@ module OneBgSize = struct
 end
 
 module OutlineRadius = struct
-  type t = LengthPercentage.t
-
-  let toString = LengthPercentage.toString
+  include LengthPercentage
 end
 
 module OverflowPosition = struct
@@ -11802,15 +11738,11 @@ module PositionTry = struct
 end
 
 module PositionTryFallbacks = struct
-  type t = PositionTry.t
-
-  let toString = PositionTry.toString
+  include PositionTry
 end
 
 module PositionTryOptions = struct
-  type t = PositionTry.t
-
-  let toString = PositionTry.toString
+  include PositionTry
 end
 
 module PositionVisibility = struct
@@ -12099,15 +12031,11 @@ module ScrollStart = struct
 end
 
 module ScrollStartBlock = struct
-  type t = ScrollStart.t
-
-  let toString = ScrollStart.toString
+  include ScrollStart
 end
 
 module ScrollStartInline = struct
-  type t = ScrollStart.t
-
-  let toString = ScrollStart.toString
+  include ScrollStart
 end
 
 module ScrollStartTarget = struct
@@ -12156,15 +12084,11 @@ module ScrollStartTargetY = struct
 end
 
 module ScrollStartX = struct
-  type t = ScrollStart.t
-
-  let toString = ScrollStart.toString
+  include ScrollStart
 end
 
 module ScrollStartY = struct
-  type t = ScrollStart.t
-
-  let toString = ScrollStart.toString
+  include ScrollStart
 end
 
 module ScrollTimeline = struct
@@ -12263,9 +12187,7 @@ module SelfPosition = struct
 end
 
 module Shape = struct
-  type t = BasicShape.t
-
-  let toString = BasicShape.toString
+  include BasicShape
 end
 
 module ShapeBox = struct
@@ -12465,9 +12387,7 @@ end
 
 module SizeFeature = struct
   (* Container size feature *)
-  type t = MfPlain.t
-
-  let toString = MfPlain.toString
+  include MfPlain
 end
 
 module StepPosition = struct
@@ -12718,9 +12638,7 @@ module SyntaxComponent = struct
 end
 
 module SyntaxSingleComponent = struct
-  type t = SyntaxComponent.t
-
-  let toString = SyntaxComponent.toString
+  include SyntaxComponent
 end
 
 module SyntaxString = struct
@@ -12865,15 +12783,11 @@ module TimelineScope = struct
 end
 
 module TimingFunction = struct
-  type t = EasingFunction.t
-
-  let toString = EasingFunction.toString
+  include EasingFunction
 end
 
 module TimingFunctionNoInterp = struct
-  type t = EasingFunction.t
-
-  let toString = EasingFunction.toString
+  include EasingFunction
 end
 
 module TrackGroup = struct
