@@ -1,6 +1,17 @@
 /** Signals a lexing error at the provided source location. */
 exception LexingError((Lexing.position, Lexing.position, string));
 
+/* Lexer modes for contextual whitespace handling */
+type lexer_mode =
+  | Inside_selector /* WS is significant (descendant combinator) */
+  | Inside_declaration /* WS is ignored (cosmetic) */
+  | Inside_at_rule; /* WS handling TBD, skip for now */
+
+let reset_mode: lexer_mode => unit;
+
+/* Reset all lexer state (buffer, context stack) - call before parsing */
+let reset_lexer_state: unit => unit;
+
 type token_with_location = {
   txt: result(Tokens.token, (Tokens.token, Tokens.error)),
   loc: Ast.loc,

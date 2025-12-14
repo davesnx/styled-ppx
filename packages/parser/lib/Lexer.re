@@ -6,6 +6,28 @@ module Location = Ppxlib.Location;
 
 let (let.ok) = Result.bind;
 
+/* Lexer modes for contextual whitespace handling */
+type lexer_mode =
+  | Inside_selector /* WS is significant (descendant combinator) */
+  | Inside_declaration /* WS is ignored (cosmetic) */
+  | Inside_at_rule; /* WS handling TBD, skip for now */
+
+let mode = ref(Inside_declaration);
+let reset_mode = m => mode := m;
+
+/* Token buffer for lookahead - stores (token, start_pos, end_pos) */
+type buffered_token = (Parser.token, Lexing.position, Lexing.position);
+let token_buffer: ref(list(buffered_token)) = ref([]);
+
+/* Block context stack - tracks selector vs declaration context at each brace level */
+let context_stack: ref(list(lexer_mode)) = ref([]);
+
+/* Reset all lexer state (called by driver before parsing) */
+let reset_lexer_state = () => {
+  token_buffer := [];
+  context_stack := [];
+};
+
 /** Signals a lexing error at the provided source location. */
 exception LexingError((Lexing.position, Lexing.position, string));
 
@@ -598,10 +620,63 @@ let handle_tokenizer_error = lexbuf => {
     };
 };
 
-let rec get_next_token = lexbuf => {
+/*
+ * Lookahead mechanism for determining selector vs declaration context.
+ *
+ * After seeing `{`, we peek ahead to find either:
+ * - `{` at depth 0 → selector context (nested rule like `.foo { .bar { } }`)
+ * - `;` at depth 0 → declaration context (property like `color: red;`)
+ *
+ * We buffer the peeked tokens and filter WS based on the determined context.
+ */
+
+/* Peek ahead from current position to determine context.
+   Returns (context, list of buffered tokens).
+   Stops when we find `{` or `;` at depth 0, or `}` or EOF. */
+let rec peek_for_context = (lexbuf, depth, acc) => {
+  let (start_pos, _) = Sedlexing.lexing_positions(lexbuf);
+  let token = get_next_token_raw(lexbuf);
+  let (_, end_pos) = Sedlexing.lexing_positions(lexbuf);
+  let buffered = (token, start_pos, end_pos);
+  let acc = [buffered, ...acc];
+
+  switch (token) {
+  /* Found `{` at depth 0 - this is a nested selector */
+  | Parser.LEFT_BRACE when depth == 0 => (Inside_selector, List.rev(acc))
+  /* Found `;` at depth 0 - this is a declaration */
+  | Parser.SEMI_COLON when depth == 0 => (Inside_declaration, List.rev(acc))
+  /* Found `}` at depth 0 - end of block, assume declaration context */
+  | Parser.RIGHT_BRACE when depth == 0 => (Inside_declaration, List.rev(acc))
+  /* EOF - assume declaration context */
+  | Parser.EOF => (Inside_declaration, List.rev(acc))
+  /* Track brace depth */
+  | Parser.LEFT_BRACE => peek_for_context(lexbuf, depth + 1, acc)
+  | Parser.RIGHT_BRACE => peek_for_context(lexbuf, depth - 1, acc)
+  /* Track paren/bracket depth (for things like `calc(...)`) */
+  | Parser.LEFT_PAREN
+  | Parser.LEFT_BRACKET => peek_for_context(lexbuf, depth + 1, acc)
+  | Parser.RIGHT_PAREN
+  | Parser.RIGHT_BRACKET => peek_for_context(lexbuf, depth - 1, acc)
+  /* Keep scanning */
+  | _ => peek_for_context(lexbuf, depth, acc)
+  };
+}
+
+/* Filter WS tokens from buffer based on context.
+   NOTE: Currently disabled - we keep all WS because:
+   1. Declaration values need WS (e.g., "1px solid transparent")
+   2. @media preludes need WS (e.g., "screen and (min-width: 768px)")
+   The parser grammar handles WS via WS? for optional whitespace. */
+and filter_buffer_ws = (_context, buffer) => {
+  /* Keep all WS - the parser grammar handles it appropriately */
+  buffer;
+}
+
+/* Raw token getter - doesn't do any context-aware filtering */
+and get_next_token_raw = lexbuf => {
   switch%sedlex (lexbuf) {
   | eof => Parser.EOF
-  | Star(comment) => get_next_token(lexbuf)
+  | Star(comment) => get_next_token_raw(lexbuf)
   | "/*" => discard_comments(lexbuf)
   | '.' => DOT
   | ';' => SEMI_COLON
@@ -648,6 +723,58 @@ let rec get_next_token = lexbuf => {
   | _ => unreachable(lexbuf)
   };
 }
+
+/* Context-aware token getter with lookahead for WS handling.
+   Note: Does NOT handle buffered tokens - that's done by get_next_tokens_with_location.
+   This function populates the buffer when it sees `{`. */
+and get_next_token = lexbuf => {
+  let token = get_next_token_raw(lexbuf);
+
+  switch (token) {
+  /* On `{`, determine context via lookahead */
+  | Parser.LEFT_BRACE =>
+    /* Push current mode onto stack before entering block */
+    context_stack := [mode^, ...context_stack^];
+
+    /* Peek ahead to determine if this block contains selectors or declarations */
+    let (context, peeked_tokens) = peek_for_context(lexbuf, 0, []);
+
+    /* Set mode for this block */
+    mode := context;
+
+    /* Filter WS from peeked tokens based on context and buffer them */
+    token_buffer := filter_buffer_ws(context, peeked_tokens);
+
+    /* Return the LEFT_BRACE */
+    Parser.LEFT_BRACE;
+
+  /* On `}`, restore previous context from stack */
+  | Parser.RIGHT_BRACE =>
+    switch (context_stack^) {
+    | [prev_mode, ...rest] =>
+      mode := prev_mode;
+      context_stack := rest;
+    | [] =>
+      /* Stack underflow - reset to selector mode (top level) */
+      mode := Inside_selector
+    };
+    Parser.RIGHT_BRACE;
+
+  /* On `@`-rules, keep in selector mode to preserve WS in preludes like "@media screen and (...)" */
+  | Parser.AT_RULE(_)
+  | Parser.AT_RULE_STATEMENT(_)
+  | Parser.AT_KEYFRAMES(_) =>
+    /* At-rule preludes need WS, so stay in selector mode.
+       The `{` will trigger lookahead for the block content. */
+    token
+
+  /* Keep WS tokens - the parser grammar handles them via WS? */
+  | Parser.WS => Parser.WS
+
+  /* All other tokens pass through */
+  | _ => token
+  };
+}
 and get_dimension = (n, lexbuf) => {
   switch%sedlex (lexbuf) {
   | length => FLOAT_DIMENSION((n, lexeme(lexbuf)))
@@ -661,7 +788,7 @@ and get_dimension = (n, lexbuf) => {
 and discard_comments = lexbuf => {
   let (start_pos, curr_pos) = Sedlexing.lexing_positions(lexbuf);
   switch%sedlex (lexbuf) {
-  | "*/" => get_next_token(lexbuf)
+  | "*/" => get_next_token_raw(lexbuf)
   | any => discard_comments(lexbuf)
   | eof =>
     raise(
@@ -671,16 +798,23 @@ and discard_comments = lexbuf => {
         "Unterminated comment at the end of the string",
       )),
     )
-  | _ => get_next_token(lexbuf)
+  | _ => get_next_token_raw(lexbuf)
   };
 };
 
 let get_next_tokens_with_location = lexbuf => {
-  let (position_start, _) = Sedlexing.lexing_positions(lexbuf);
-  let token = get_next_token(lexbuf);
-  let (_, position_end) = Sedlexing.lexing_positions(lexbuf);
-
-  (token, position_start, position_end);
+  /* Check if we have a buffered token with stored positions */
+  switch (token_buffer^) {
+  | [(token, start_pos, end_pos), ...rest] =>
+    token_buffer := rest;
+    (token, start_pos, end_pos);
+  | [] =>
+    /* No buffered token - get fresh token with positions */
+    let (position_start, _) = Sedlexing.lexing_positions(lexbuf);
+    let token = get_next_token(lexbuf);
+    let (_, position_end) = Sedlexing.lexing_positions(lexbuf);
+    (token, position_start, position_end);
+  };
 };
 
 let check_if_three_codepoints_would_start_an_identifier =
@@ -973,6 +1107,11 @@ let from_string = string => {
 };
 
 let tokenize = input => {
+  /* Reset lexer state for clean tokenization */
+  reset_lexer_state();
+  /* Start in selector mode to emit WS tokens (for testing raw lexer behavior) */
+  mode := Inside_selector;
+
   let buffer = Sedlexing.Utf8.from_string(input);
   let rec from_string = acc => {
     switch (get_next_tokens_with_location(buffer)) {

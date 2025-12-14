@@ -36,14 +36,33 @@ let parse_string = (~loc, parser, string) => {
 };
 
 let parse_declaration_list = (~loc, input: string) => {
+  /* Reset lexer state (buffer, context stack) */
+  Lexer.reset_lexer_state();
+  /* Start in selector mode - lookahead will determine actual context */
+  Lexer.reset_mode(Inside_selector);
   parse_string(~loc, Parser.declaration_list, input);
 };
 
-let parse_declaration = (~loc, input: string) =>
+let parse_declaration = (~loc, input: string) => {
+  /* Reset lexer state (buffer, context stack) */
+  Lexer.reset_lexer_state();
+  /* Start in selector mode - lookahead will determine actual context */
+  Lexer.reset_mode(Inside_selector);
   parse_string(~loc, Parser.declaration, input);
+};
 
-let parse_stylesheet = (~loc, input: string) =>
+let parse_stylesheet = (~loc, input: string) => {
+  /* Reset lexer state (buffer, context stack) */
+  Lexer.reset_lexer_state();
+  /* Start in selector mode - top level is selectors */
+  Lexer.reset_mode(Inside_selector);
   parse_string(~loc, Parser.stylesheet, input);
+};
 
-let parse_keyframes = (~loc, input: string) =>
+let parse_keyframes = (~loc, input: string) => {
+  /* Reset lexer state (buffer, context stack) */
+  Lexer.reset_lexer_state();
+  /* Start in selector mode - keyframe selectors like 'from', '50%' */
+  Lexer.reset_mode(Inside_selector);
   parse_string(~loc, Parser.keyframes, input);
+};

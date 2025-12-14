@@ -55,7 +55,7 @@ stylesheet: s = stylesheet_without_eof; EOF { s }
 stylesheet_without_eof: rs = loc(list(rule)) { rs }
 
 declaration_list:
-  | WS? EOF { ([], make_loc $startpos $endpos) }
+  | EOF { ([], make_loc $startpos $endpos) }
   | ds = loc(declarations) EOF { ds }
 
 /* keyframe may contain {} */
@@ -73,7 +73,6 @@ loc(X): x = X {
 /* Handle skipping whitespace */
 skip_ws (X): x = delimited(WS?, X, WS?) { x }
 skip_ws_right (X): x = X; WS? { x }
-skip_ws_left (X): WS? x = X; { x }
 
 /* TODO: Remove empty_brace_block */
 /* {} */
@@ -88,9 +87,6 @@ bracket_block (X): xs = delimited(LEFT_BRACKET, X, RIGHT_BRACKET) { xs }
 
 /* () */
 paren_block (X): xs = delimited(LEFT_PAREN, X, RIGHT_PAREN) { xs }
-
-interpolation:
-  v = INTERPOLATION { Variable v }
 
 /* https://www.w3.org/TR/css-syntax-3/#at-rules */
 at_rule:
@@ -131,8 +127,8 @@ at_rule:
   /* @page { ... } */
   /* @{{rule}} { ... } */
   | name = loc(AT_RULE) WS?
-    xs = loc(skip_ws(values)) WS?
-    s = brace_block(stylesheet_without_eof) WS? {
+    xs = loc(values) WS?
+    s = brace_block(stylesheet_without_eof) {
     { name;
       prelude = xs;
       block = Stylesheet s;
@@ -143,50 +139,32 @@ at_rule:
 percentage: n = NUMBER PERCENT { n }
 
 /* keyframe allows stylesheet by defintion, but we restrict the usage to: */
+/* Keyframe selector: from, to, or percentages like 50%, 0%, 100% */
+keyframe_selector:
+  | id = IDENT { SimpleSelector (Type id) }  /* from, to */
+  | p = percentage { SimpleSelector (Percentage p) }  /* 50% */
+
 keyframe_style_rule:
-  /* from {} to {} */
-  | WS? id = IDENT WS?
-    declarations = brace_block(loc(declarations)) WS? {
-    let prelude = [(SimpleSelector (Type id), make_loc $startpos(id) $endpos(id))] in
-    Style_rule {
-      prelude = (prelude, make_loc $startpos(id) $endpos(id));
-      loc = make_loc $startpos $endpos;
-      block = declarations;
-    }
-  }
-  /* TODO: Support percentage in simple_selector and have selector parsing here */
-  | WS? p = percentage; WS?
-    declarations = brace_block(loc(declarations)) WS? {
-    let item = Percentage p in
-    let prelude = [(SimpleSelector item, make_loc $startpos(p) $endpos(p))] in
-    Style_rule {
-      prelude = (prelude, make_loc $startpos(p) $endpos(p));
-      loc = make_loc $startpos $endpos;
-      block = declarations;
-    }
-  }
-  | percentages = separated_list(COMMA, skip_ws(percentage));
-    declarations = brace_block(loc(declarations)) WS? {
-    let prelude = percentages
-      |> List.map (fun percent -> Percentage percent)
-      |> List.map (fun p ->
-        (SimpleSelector p, make_loc $startpos(percentages) $endpos(percentages))
+  | WS? selectors = separated_nonempty_list(COMMA, skip_ws(keyframe_selector))
+    declarations = brace_block(loc(declarations)) {
+    let prelude = selectors
+      |> List.map (fun sel ->
+        (sel, make_loc $startpos(selectors) $endpos(selectors))
       ) in
     Style_rule {
-      prelude = (prelude, make_loc $startpos(percentages) $endpos(percentages));
+      prelude = (prelude, make_loc $startpos(selectors) $endpos(selectors));
       loc = make_loc $startpos $endpos;
       block = declarations;
     }
-    (* TODO: Handle separated_list(COMMA, percentage) *)
   }
 
 selector_list:
   | selector = loc(selector) WS? { [selector] }
-  | selector = loc(selector) WS? COMMA WS? seq = selector_list WS? { selector :: seq }
+  | selector = loc(selector) WS? COMMA WS? seq = selector_list { selector :: seq }
 
 relative_selector_list:
   | selector = loc(relative_selector) WS? { [selector] }
-  | selector = loc(relative_selector) WS? COMMA WS? seq = relative_selector_list WS? { selector :: seq }
+  | selector = loc(relative_selector) WS? COMMA WS? seq = relative_selector_list { selector :: seq }
 
 /* .class {} */
 style_rule:
@@ -206,26 +184,26 @@ style_rule:
   }
 
 values: xs = list(loc(value)) { xs }
-prelude_any: xs = list(loc(skip_ws(value))) { Paren_block xs }
 
 declarations:
+  /* WS? needed to handle whitespace after { in stylesheet mode */
   | WS? xs = nonempty_list(rule) SEMI_COLON? { xs }
   | WS? xs = separated_nonempty_list(SEMI_COLON, rule) SEMI_COLON? { xs }
 
 %inline rule:
   /* Rule can have declarations, since we have nesting, so both style_rules and
   declarations can live side by side. */
-  | d = skip_ws(declaration_without_eof); { Declaration d }
+  | d = skip_ws(declaration_without_eof) { Declaration d }
   | r = skip_ws(at_rule) { At_rule r }
   | s = skip_ws(style_rule) { Style_rule s }
 
-declaration: d = skip_ws_left(declaration_without_eof); WS? EOF { d }
+declaration: d = declaration_without_eof EOF { d }
 
 declaration_without_eof:
   /* property: value; */
   | property = loc(IDENT)
-    WS? COLON
-    WS? value = loc(skip_ws(values))
+    WS? COLON WS?
+    value = loc(values)
     WS? important = loc(boption(IMPORTANT))
     WS? SEMI_COLON? {
     { name = property;
@@ -306,16 +284,16 @@ attribute_selector:
   /* https://www.w3.org/TR/selectors-4/#type-nmsp */
   /* We don't support namespaces in wq-name (`ns-prefix?`). We treat it like a IDENT */
   /* [ <wq-name> ] */
-  | LEFT_BRACKET; WS?
+  | LEFT_BRACKET WS?
     i = wq_name WS?
     RIGHT_BRACKET {
     Attribute(Attr_value i)
   }
   /* [ wq-name = "value"] */
-  | LEFT_BRACKET; WS?
+  | LEFT_BRACKET WS?
     i = wq_name WS?
-    m = attr_matcher; WS?
-    v = STRING; WS?
+    m = attr_matcher WS?
+    v = STRING WS?
     RIGHT_BRACKET {
     Attribute(
       To_equal({
@@ -326,9 +304,9 @@ attribute_selector:
     )
   }
   /* [ wq-name = value] */
-  | LEFT_BRACKET; WS?
+  | LEFT_BRACKET WS?
     i = wq_name WS?
-    m = attr_matcher; WS?
+    m = attr_matcher WS?
     v = wq_name WS?
     RIGHT_BRACKET {
     Attribute(
@@ -452,8 +430,11 @@ compound_selector:
   }
 
 combinator_sequence:
+  /* Descendant combinator (whitespace) */
   | WS s = non_complex_selector { (None, s) }
+  /* Just a selector (for compound selectors without space) */
   | s = non_complex_selector WS? { (None, s) }
+  /* Explicit combinator (>, +, ~) */
   | c = combinator WS? s = non_complex_selector WS? { (Some c, s) }
 
 %inline non_complex_selector:
@@ -472,7 +453,7 @@ complex_selector:
 /* <relative-selector> = <combinator>? <complex-selector> */
 relative_selector:
   | xs = skip_ws_right(complex_selector) { RelativeSelector { combinator = None; complex_selector = xs} }
-  | c = combinator WS? xs = complex_selector WS? { RelativeSelector { combinator = Some c; complex_selector = xs } }
+  | c = combinator WS? xs = complex_selector { RelativeSelector { combinator = Some c; complex_selector = xs } }
 
 value:
   | WS { Whitespace }
