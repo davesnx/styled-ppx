@@ -18,9 +18,7 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.transitionProperty(CSS.Types.TransitionProperty.none);
   CSS.transitionProperties([|CSS.Types.TransitionProperty.all|]);
-  CSS.transitionProperties([|
-    CSS.Types.TransitionProperty.make({js|width|js}),
-  |]);
+  CSS.transitionProperties([|CSS.Types.TransitionProperty.make({js|width|js})|]);
   CSS.transitionProperties([|
     CSS.Types.TransitionProperty.make({js|width|js}),
     CSS.Types.TransitionProperty.make({js|height|js}),
@@ -40,11 +38,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.transitionTimingFunction(`stepEnd);
   CSS.transitionTimingFunction(`steps((3, `start)));
   CSS.transitionTimingFunction(`steps((5, `end_)));
-  CSS.transitionTimingFunctions([|
-    `ease,
-    `stepStart,
-    `cubicBezier((0.1, 0.7, 1., 0.1)),
-  |]);
+  CSS.transitionTimingFunctions([|`ease, `stepStart, `cubicBezier((0.1, 0.7, 1., 0.1))|]);
   CSS.transitionDelay(`s(1));
   CSS.transitionDelay(`s(-1));
   CSS.transitionDelays([|`s(2), `ms(4)|]);
@@ -179,57 +173,20 @@ If this test fail means that the module is not in sync with the ppx
   let behavior = `allowDiscrete;
   
   CSS.transitions([|CSS.Types.Transition.Value.make(~property, ())|]);
-  CSS.transitions([|
-    CSS.Types.Transition.Value.make(~property=property2, ()),
-  |]);
+  CSS.transitions([|CSS.Types.Transition.Value.make(~property=property2, ())|]);
   
+  CSS.transitions([|CSS.Types.Transition.Value.make(~behavior, ~duration, ~delay, ~timingFunction, ~property, ())|]);
   CSS.transitions([|
-    CSS.Types.Transition.Value.make(
-      ~behavior,
-      ~duration,
-      ~delay,
-      ~timingFunction,
-      ~property,
-      (),
-    ),
-  |]);
-  CSS.transitions([|
-    CSS.Types.Transition.Value.make(
-      ~duration,
-      ~delay,
-      ~timingFunction,
-      ~property,
-      (),
-    ),
+    CSS.Types.Transition.Value.make(~duration, ~delay, ~timingFunction, ~property, ()),
     CSS.Types.Transition.Value.make(~duration=`s(0), ~property=property3, ()),
   |]);
   CSS.transitions([|
-    CSS.Types.Transition.Value.make(
-      ~duration=`ms(200),
-      ~delay=`s(3),
-      ~timingFunction=`easeOut,
-      ~property,
-      (),
-    ),
+    CSS.Types.Transition.Value.make(~duration=`ms(200), ~delay=`s(3), ~timingFunction=`easeOut, ~property, ()),
   |]);
   CSS.transitions([|
-    CSS.Types.Transition.Value.make(
-      ~duration=`ms(200),
-      ~delay=`s(3),
-      ~timingFunction,
-      ~property,
-      (),
-    ),
+    CSS.Types.Transition.Value.make(~duration=`ms(200), ~delay=`s(3), ~timingFunction, ~property, ()),
   |]);
-  CSS.transitions([|
-    CSS.Types.Transition.Value.make(
-      ~duration,
-      ~delay=`s(3),
-      ~timingFunction,
-      ~property,
-      (),
-    ),
-  |]);
+  CSS.transitions([|CSS.Types.Transition.Value.make(~duration, ~delay=`s(3), ~timingFunction, ~property, ())|]);
   CSS.transitions([|
     CSS.Types.Transition.Value.make(
       ~duration,
@@ -239,15 +196,7 @@ If this test fail means that the module is not in sync with the ppx
       (),
     ),
   |]);
-  CSS.transitions([|
-    CSS.Types.Transition.Value.make(
-      ~duration,
-      ~delay,
-      ~timingFunction=`easeOut,
-      ~property,
-      (),
-    ),
-  |]);
+  CSS.transitions([|CSS.Types.Transition.Value.make(~duration, ~delay, ~timingFunction=`easeOut, ~property, ())|]);
   CSS.transitions([|
     CSS.Types.Transition.Value.make(
       ~duration=`ms(200),
@@ -266,22 +215,8 @@ If this test fail means that the module is not in sync with the ppx
       (),
     ),
   |]);
-  CSS.transitions([|
-    CSS.Types.Transition.Value.make(
-      ~duration=`ms(200),
-      ~timingFunction=`easeIn,
-      ~property,
-      (),
-    ),
-  |]);
-  CSS.transitions([|
-    CSS.Types.Transition.Value.make(
-      ~duration=`ms(200),
-      ~timingFunction,
-      ~property,
-      (),
-    ),
-  |]);
+  CSS.transitions([|CSS.Types.Transition.Value.make(~duration=`ms(200), ~timingFunction=`easeIn, ~property, ())|]);
+  CSS.transitions([|CSS.Types.Transition.Value.make(~duration=`ms(200), ~timingFunction, ~property, ())|]);
   CSS.transitions([|
     CSS.Types.Transition.Value.make(
       ~duration,
@@ -290,14 +225,7 @@ If this test fail means that the module is not in sync with the ppx
       (),
     ),
   |]);
-  CSS.transitions([|
-    CSS.Types.Transition.Value.make(
-      ~duration,
-      ~timingFunction=`easeIn,
-      ~property,
-      (),
-    ),
-  |]);
+  CSS.transitions([|CSS.Types.Transition.Value.make(~duration, ~timingFunction=`easeIn, ~property, ())|]);
   CSS.transitions([|
     CSS.Types.Transition.Value.make(
       ~duration=`ms(200),
@@ -306,14 +234,7 @@ If this test fail means that the module is not in sync with the ppx
       (),
     ),
   |]);
-  CSS.transitions([|
-    CSS.Types.Transition.Value.make(
-      ~duration=`ms(200),
-      ~timingFunction=`easeIn,
-      ~property,
-      (),
-    ),
-  |]);
+  CSS.transitions([|CSS.Types.Transition.Value.make(~duration=`ms(200), ~timingFunction=`easeIn, ~property, ())|]);
   CSS.transitions([|
     CSS.Types.Transition.Value.make(
       ~duration,
@@ -330,13 +251,7 @@ If this test fail means that the module is not in sync with the ppx
       (),
     ),
   |]);
+  CSS.transitions([|CSS.Types.Transition.Value.make(~duration=`ms(200), ~property, ())|]);
   CSS.transitions([|
-    CSS.Types.Transition.Value.make(~duration=`ms(200), ~property, ()),
-  |]);
-  CSS.transitions([|
-    CSS.Types.Transition.Value.make(
-      ~duration,
-      ~property=CSS.Types.TransitionProperty.make({js|margin-right|js}),
-      (),
-    ),
+    CSS.Types.Transition.Value.make(~duration, ~property=CSS.Types.TransitionProperty.make({js|margin-right|js}), ()),
   |]);

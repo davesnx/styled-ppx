@@ -953,28 +953,21 @@
       onWheel: option(React.Event.Wheel.t => unit),
       color: 'color,
     };
-    [@mel.module "react"]
-    external createVariadicElement: (string, Js.t({..})) => React.element =
-      "createElement";
+    [@mel.module "react"] external createVariadicElement: (string, Js.t({..})) => React.element = "createElement";
     let deleteProp = [%mel.raw "(newProps, key) => delete newProps[key]"];
     let getOrEmpty = str =>
       switch (str) {
       | Some(str) => " " ++ str
       | None => ""
       };
-    external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
-      "Object.assign";
+    external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) = "Object.assign";
     let styles = (~color, _) => {
       let styles = sharedStylesBetweenDynamicComponents(color);
       CSS.style(styles);
     };
     let make = (props: makeProps('color)) => {
-      let className =
-        styles(~color=colorGet(props), ()) ++ getOrEmpty(classNameGet(props));
-      let stylesObject = {
-        "className": className,
-        "ref": innerRefGet(props),
-      };
+      let className = styles(~color=colorGet(props), ()) ++ getOrEmpty(classNameGet(props));
+      let stylesObject = {"className": className, "ref": innerRefGet(props)};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(. newProps, "color"));
       ignore(deleteProp(. newProps, "innerRef"));

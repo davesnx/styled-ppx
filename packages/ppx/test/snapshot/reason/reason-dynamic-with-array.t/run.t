@@ -951,17 +951,14 @@
       color: 'color,
       size: 'size,
     };
-    [@mel.module "react"]
-    external createVariadicElement: (string, Js.t({..})) => React.element =
-      "createElement";
+    [@mel.module "react"] external createVariadicElement: (string, Js.t({..})) => React.element = "createElement";
     let deleteProp = [%mel.raw "(newProps, key) => delete newProps[key]"];
     let getOrEmpty = str =>
       switch (str) {
       | Some(str) => " " ++ str
       | None => ""
       };
-    external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
-      "Object.assign";
+    external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) = "Object.assign";
     let styles = (~size, ~color, _) =>
       CSS.style([|
         CSS.label("DynamicComponentWithArray"),
@@ -971,13 +968,8 @@
         CSS.width(size),
       |]);
     let make = (props: makeProps('color, 'size)) => {
-      let className =
-        styles(~color=colorGet(props), ~size=sizeGet(props), ())
-        ++ getOrEmpty(classNameGet(props));
-      let stylesObject = {
-        "className": className,
-        "ref": innerRefGet(props),
-      };
+      let className = styles(~color=colorGet(props), ~size=sizeGet(props), ()) ++ getOrEmpty(classNameGet(props));
+      let stylesObject = {"className": className, "ref": innerRefGet(props)};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(. newProps, "color"));
       ignore(deleteProp(. newProps, "size"));

@@ -18,14 +18,8 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|clipPath|js}, {js|inset(50%)|js});
   CSS.unsafe({js|clipPath|js}, {js|path("M 20 20 H 80 V 30")|js});
   CSS.unsafe({js|clipPath|js}, {js|polygon(50% 100%, 0 0, 100% 0)|js});
-  CSS.unsafe(
-    {js|clipPath|js},
-    {js|polygon(evenodd, 0% 0%, 50% 50%, 0% 100%)|js},
-  );
-  CSS.unsafe(
-    {js|clipPath|js},
-    {js|polygon(nonzero, 0% 0%, 50% 50%, 0% 100%)|js},
-  );
+  CSS.unsafe({js|clipPath|js}, {js|polygon(evenodd, 0% 0%, 50% 50%, 0% 100%)|js});
+  CSS.unsafe({js|clipPath|js}, {js|polygon(nonzero, 0% 0%, 50% 50%, 0% 100%)|js});
   CSS.unsafe({js|clipPath|js}, {js|border-box|js});
   CSS.unsafe({js|clipPath|js}, {js|padding-box|js});
   CSS.unsafe({js|clipPath|js}, {js|content-box|js});
@@ -72,9 +66,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.maskPosition(`center);
   CSS.maskPosition(`hv((`center, `center)));
   CSS.maskPosition(`hv((`left, `percent(50.))));
-  CSS.maskPosition(
-    `hvOffset((`right, `pxFloat(20.), `bottom, `pxFloat(10.))),
-  );
+  CSS.maskPosition(`hvOffset((`right, `pxFloat(20.), `bottom, `pxFloat(10.))));
   CSS.maskPositions([|`hv((`rem(1.), `rem(1.))), `center|]);
   CSS.unsafe({js|maskClip|js}, {js|border-box|js});
   CSS.unsafe({js|maskClip|js}, {js|padding-box|js});

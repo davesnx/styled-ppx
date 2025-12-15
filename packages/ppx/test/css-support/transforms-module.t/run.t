@@ -32,10 +32,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.transform(CSS.skewX(`deg(45.)));
   CSS.transform(CSS.skewY(`deg(45.)));
   
-  CSS.transforms([|
-    CSS.translate(`pxFloat(50.), `pxFloat(-24.)),
-    CSS.skew(`deg(0.), `deg(22.5)),
-  |]);
+  CSS.transforms([|CSS.translate(`pxFloat(50.), `pxFloat(-24.)), CSS.skew(`deg(0.), `deg(22.5))|]);
   CSS.transform(CSS.translate3d(`zero, `zero, `pxFloat(5.)));
   CSS.transform(CSS.translateZ(`pxFloat(5.)));
   CSS.transform(CSS.scale3d(1., 0., -1.));

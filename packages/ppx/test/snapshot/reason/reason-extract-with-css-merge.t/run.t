@@ -1,9 +1,7 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css
-    ".css-jk0pkr { color: red; }\n.css-17vxl0k { display: flex; }\n.css-avwy6 { display: block; }\n"
-  ];
+  [@css ".css-jk0pkr { color: red; }\n.css-17vxl0k { display: flex; }\n.css-avwy6 { display: block; }\n"];
   let one = CSS.make("css-jk0pkr css-17vxl0k", []);
   let two = CSS.make("css-avwy6", []);
   let three = CSS.merge(one, two);

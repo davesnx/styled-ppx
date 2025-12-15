@@ -40,6 +40,10 @@ module X = {
 [%cx2 {|flex-flow: column-reverse|}];
 [%cx2 {|flex-flow: wrap|}];
 [%cx2 {|flex-flow: wrap-reverse|}];
+[%cx2 {|flex-flow: row wrap|}];
+[%cx2 {|flex-flow: row-reverse nowrap|}];
+[%cx2 {|flex-flow: column wrap|}];
+[%cx2 {|flex-flow: column-reverse wrap-reverse|}];
 [%cx2 {|flex-grow: 0|}];
 [%cx2 {|flex-grow: 5|}];
 [%cx2 {|flex-shrink: 1|}];

@@ -952,25 +952,18 @@
       onWheel: option(React.Event.Wheel.t => unit),
       a: 'a,
     };
-    [@mel.module "react"]
-    external createVariadicElement: (string, Js.t({..})) => React.element =
-      "createElement";
+    [@mel.module "react"] external createVariadicElement: (string, Js.t({..})) => React.element = "createElement";
     let deleteProp = [%mel.raw "(newProps, key) => delete newProps[key]"];
     let getOrEmpty = str =>
       switch (str) {
       | Some(str) => " " ++ str
       | None => ""
       };
-    external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
-      "Object.assign";
+    external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) = "Object.assign";
     let styles = (~a as _, _) => CSS.style(cssRule);
     let make = (props: makeProps('a)) => {
-      let className =
-        styles(~a=aGet(props), ()) ++ getOrEmpty(classNameGet(props));
-      let stylesObject = {
-        "className": className,
-        "ref": innerRefGet(props),
-      };
+      let className = styles(~a=aGet(props), ()) ++ getOrEmpty(classNameGet(props));
+      let stylesObject = {"className": className, "ref": innerRefGet(props)};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(. newProps, "a"));
       ignore(deleteProp(. newProps, "innerRef"));

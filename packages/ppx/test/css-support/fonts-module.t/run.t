@@ -35,22 +35,13 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|fontVariant|js}, {js|super|js});
   CSS.unsafe({js|fontVariant|js}, {js|sub lining-nums contextual ruby|js});
   CSS.unsafe({js|fontVariant|js}, {js|annotation(circled)|js});
-  CSS.unsafe(
-    {js|fontVariant|js},
-    {js|discretionary-ligatures character-variant(leo-B, leo-M, leo-N, leo-T, leo-U)|js},
-  );
+  CSS.unsafe({js|fontVariant|js}, {js|discretionary-ligatures character-variant(leo-B, leo-M, leo-N, leo-T, leo-U)|js});
   CSS.unsafe({js|fontVariantAlternates|js}, {js|normal|js});
   CSS.unsafe({js|fontVariantAlternates|js}, {js|historical-forms|js});
   CSS.unsafe({js|fontVariantAlternates|js}, {js|styleset(ss01)|js});
-  CSS.unsafe(
-    {js|fontVariantAlternates|js},
-    {js|styleset(stacked-g, geometric-m)|js},
-  );
+  CSS.unsafe({js|fontVariantAlternates|js}, {js|styleset(stacked-g, geometric-m)|js});
   CSS.unsafe({js|fontVariantAlternates|js}, {js|character-variant(cv02)|js});
-  CSS.unsafe(
-    {js|fontVariantAlternates|js},
-    {js|character-variant(beta-3, gamma)|js},
-  );
+  CSS.unsafe({js|fontVariantAlternates|js}, {js|character-variant(beta-3, gamma)|js});
   CSS.unsafe({js|fontVariantAlternates|js}, {js|swash(flowing)|js});
   CSS.unsafe({js|fontVariantAlternates|js}, {js|ornaments(leaves)|js});
   CSS.unsafe({js|fontVariantAlternates|js}, {js|annotation(blocky)|js});
@@ -127,18 +118,9 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|fontVariantNumeric|js}, {js|stacked-fractions|js});
   CSS.unsafe({js|fontVariantNumeric|js}, {js|ordinal|js});
   CSS.unsafe({js|fontVariantNumeric|js}, {js|slashed-zero|js});
-  CSS.unsafe(
-    {js|fontVariantNumeric|js},
-    {js|lining-nums proportional-nums diagonal-fractions|js},
-  );
-  CSS.unsafe(
-    {js|fontVariantNumeric|js},
-    {js|oldstyle-nums tabular-nums stacked-fractions ordinal slashed-zero|js},
-  );
-  CSS.unsafe(
-    {js|fontVariantNumeric|js},
-    {js|slashed-zero ordinal tabular-nums stacked-fractions oldstyle-nums|js},
-  );
+  CSS.unsafe({js|fontVariantNumeric|js}, {js|lining-nums proportional-nums diagonal-fractions|js});
+  CSS.unsafe({js|fontVariantNumeric|js}, {js|oldstyle-nums tabular-nums stacked-fractions ordinal slashed-zero|js});
+  CSS.unsafe({js|fontVariantNumeric|js}, {js|slashed-zero ordinal tabular-nums stacked-fractions oldstyle-nums|js});
   CSS.unsafe({js|fontVariantEastAsian|js}, {js|normal|js});
   CSS.unsafe({js|fontVariantEastAsian|js}, {js|jis78|js});
   CSS.unsafe({js|fontVariantEastAsian|js}, {js|jis83|js});

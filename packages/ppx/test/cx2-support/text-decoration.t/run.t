@@ -86,10 +86,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-1nhfs9u", []);
   CSS.make("css-16awjk5", []);
   CSS.make("css-1i4fms2", []);
-  CSS.unsafe(
-    {js|textDecorationSkip|js},
-    {js|leading-spaces trailing-spaces edges box-decoration|js},
-  );
+  CSS.unsafe({js|textDecorationSkip|js}, {js|leading-spaces trailing-spaces edges box-decoration|js});
   CSS.make("css-19v4xbp", []);
   CSS.make("css-1az6w23", []);
   CSS.make("css-1s8u3sb", []);

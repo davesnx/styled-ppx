@@ -15,22 +15,11 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  let foo =
-    CSS.keyframes([|
-      (0, [|CSS.opacity(0.)|]),
-      (100, [|CSS.opacity(1.)|]),
-    |]);
-  let bar =
-    CSS.keyframes([|
-      (0, [|CSS.opacity(0.)|]),
-      (100, [|CSS.opacity(1.)|]),
-    |]);
+  let foo = CSS.keyframes([|(0, [|CSS.opacity(0.)|]), (100, [|CSS.opacity(1.)|])|]);
+  let bar = CSS.keyframes([|(0, [|CSS.opacity(0.)|]), (100, [|CSS.opacity(1.)|])|]);
   
   CSS.animationName(CSS.Types.AnimationName.make({js|random|js}));
-  CSS.animationNames([|
-    CSS.Types.AnimationName.make({js|foo|js}),
-    CSS.Types.AnimationName.make({js|bar|js}),
-  |]);
+  CSS.animationNames([|CSS.Types.AnimationName.make({js|foo|js}), CSS.Types.AnimationName.make({js|bar|js})|]);
   CSS.animationName(foo);
   CSS.animationNames([|foo, bar|]);
   CSS.animationDuration(`s(0));
@@ -49,11 +38,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.animationTimingFunction(`stepEnd);
   CSS.animationTimingFunction(`steps((3, `start)));
   CSS.animationTimingFunction(`steps((5, `end_)));
-  CSS.animationTimingFunctions([|
-    `ease,
-    `stepStart,
-    `cubicBezier((0.1, 0.7, 1., 0.1)),
-  |]);
+  CSS.animationTimingFunctions([|`ease, `stepStart, `cubicBezier((0.1, 0.7, 1., 0.1))|]);
   CSS.animationIterationCount(`infinite);
   CSS.animationIterationCount(`count(8.));
   CSS.animationIterationCount(`count(4.35));

@@ -8,12 +8,7 @@
       | None => ""
       };
     let styles = (~var, ~id, _) =>
-      CSS.style([|
-        CSS.label("DynamicComponent"),
-        CSS.color(var),
-        CSS.display(`flex),
-        CSS.backgroundColor(id),
-      |]);
+      CSS.style([|CSS.label("DynamicComponent"), CSS.color(var), CSS.display(`flex), CSS.backgroundColor(id)|]);
     let make =
         (
           ~var,

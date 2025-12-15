@@ -25,9 +25,6 @@ If this test fail means that the module is not in sync with the ppx
     CSS.style([|
       CSS.label("selectors"),
       CSS.color(CSS.white),
-      CSS.selectorMany(
-        [|{js|&:hover|js}|],
-        [|[%ocaml.error "Property 'color' has an invalid value: 'cositas'"]|],
-      ),
+      CSS.selectorMany([|{js|&:hover|js}|], [|[%ocaml.error "Property 'color' has an invalid value: 'cositas'"]|]),
     |]);
 

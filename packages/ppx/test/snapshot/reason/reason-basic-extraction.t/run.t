@@ -7,13 +7,10 @@
   let css = main =>
     CSS.make(
       "css-3tpy8b css-1uzc9um css-17vxl0k css-1lr2y8",
-      [
-        ("--var-19ja411", CSS.Types.Color.toString(main)),
-        ("--var-1xt8d8f", CSS.Types.Color.toString(CSS.black)),
-      ],
+      [("--var-19ja411", CSS.Types.Color.toString(main)), ("--var-1xt8d8f", CSS.Types.Color.toString(CSS.black))],
     );
-  let fadeIn = `KeyframesName("keyframe-85bkd1");
-  let slideIn = `KeyframesName("keyframe-onds1p");
+  let fadeIn = CSS.Types.AnimationName.make("keyframe-85bkd1");
+  let slideIn = CSS.Types.AnimationName.make("keyframe-onds1p");
   ();
   <div className={css(CSS.red)} />;
 

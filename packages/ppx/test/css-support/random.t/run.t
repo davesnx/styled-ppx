@@ -31,10 +31,7 @@ If this test fail means that the module is not in sync with the ppx
   let backgroundString = Color.background |> CSS.Types.Color.toString;
   let colorTextString = Color.text |> CSS.Types.Color.toString;
   
-  CSS.unsafe(
-    {js|WebkitBoxShadow|js},
-    {js|inset 0 0 0 1000px |js} ++ backgroundString,
-  );
+  CSS.unsafe({js|WebkitBoxShadow|js}, {js|inset 0 0 0 1000px |js} ++ backgroundString);
   CSS.unsafe({js|WebkitLineClamp|js}, {js|2|js});
   CSS.unsafe({js|WebkitOverflowScrolling|js}, {js|touch|js});
   CSS.unsafe({js|WebkitTapHighlightColor|js}, {js|transparent|js});
@@ -91,18 +88,10 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|gridRow|js}, {js|unset|js});
   CSS.gridTemplateColumns(`tracks([|`maxContent, `maxContent|]));
   CSS.gridTemplateColumns(
-    `tracks([|
-      `minmax((`pxFloat(10.), `auto)),
-      `fitContent(`pxFloat(20.)),
-      `fitContent(`pxFloat(20.)),
-    |]),
+    `tracks([|`minmax((`pxFloat(10.), `auto)), `fitContent(`pxFloat(20.)), `fitContent(`pxFloat(20.))|]),
   );
   CSS.gridTemplateColumns(
-    `tracks([|
-      `minmax((`pxFloat(51.), `auto)),
-      `fitContent(`pxFloat(20.)),
-      `fitContent(`pxFloat(20.)),
-    |]),
+    `tracks([|`minmax((`pxFloat(51.), `auto)), `fitContent(`pxFloat(20.)), `fitContent(`pxFloat(20.))|]),
   );
   CSS.gridTemplateColumns(`tracks([|`repeat((`num(2), [|`auto|]))|]));
   CSS.gridTemplateColumns(`tracks([|`repeat((`num(3), [|`auto|]))|]));

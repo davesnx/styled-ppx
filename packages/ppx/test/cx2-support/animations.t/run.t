@@ -23,10 +23,7 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.make("css-gyly5q", []);
   CSS.make("css-1i13szv", []);
-  CSS.make(
-    "css-1rzyjvs",
-    [("--var-13g64p", CSS.Types.AnimationName.toString(foo))],
-  );
+  CSS.make("css-1rzyjvs", [("--var-13g64p", CSS.Types.AnimationName.toString(foo))]);
   CSS.make(
     "css-b88oy1",
     [
@@ -50,11 +47,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-12uv6yb", []);
   CSS.make("css-1i8h2v5", []);
   CSS.make("css-j9gfaf", []);
-  CSS.animationTimingFunctions([|
-    `ease,
-    `stepStart,
-    `cubicBezier((0.1, 0.7, 1., 0.1)),
-  |]);
+  CSS.animationTimingFunctions([|`ease, `stepStart, `cubicBezier((0.1, 0.7, 1., 0.1))|]);
   CSS.make("css-2a0skc", []);
   CSS.make("css-p5xba1", []);
   CSS.make("css-mdj2nu", []);

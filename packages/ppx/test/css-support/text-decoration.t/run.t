@@ -88,41 +88,20 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.textShadow(`none);
   
-  CSS.textShadow(
-    CSS.TextShadow.text(~x=`pxFloat(1.), ~y=`pxFloat(1.), `currentColor),
-  );
+  CSS.textShadow(CSS.TextShadow.text(~x=`pxFloat(1.), ~y=`pxFloat(1.), `currentColor));
   
   CSS.textShadow(CSS.TextShadow.text(~x=`zero, ~y=`zero, CSS.black));
   
-  CSS.textShadow(
-    CSS.TextShadow.text(
-      ~x=`pxFloat(1.),
-      ~y=`pxFloat(2.),
-      ~blur=`pxFloat(3.),
-      `currentColor,
-    ),
-  );
+  CSS.textShadow(CSS.TextShadow.text(~x=`pxFloat(1.), ~y=`pxFloat(2.), ~blur=`pxFloat(3.), `currentColor));
   
-  CSS.textShadow(
-    CSS.TextShadow.text(
-      ~x=`pxFloat(1.),
-      ~y=`pxFloat(2.),
-      ~blur=`pxFloat(3.),
-      CSS.black,
-    ),
-  );
+  CSS.textShadow(CSS.TextShadow.text(~x=`pxFloat(1.), ~y=`pxFloat(2.), ~blur=`pxFloat(3.), CSS.black));
   
   CSS.textShadows([|
     CSS.TextShadow.text(~x=`pxFloat(1.), ~y=`pxFloat(1.), `currentColor),
     CSS.TextShadow.text(~x=`pxFloat(2.), ~y=`pxFloat(2.), CSS.red),
   |]);
   CSS.textShadows([|
-    CSS.TextShadow.text(
-      ~x=`pxFloat(1.),
-      ~y=`pxFloat(2.),
-      ~blur=`pxFloat(3.),
-      CSS.black,
-    ),
+    CSS.TextShadow.text(~x=`pxFloat(1.), ~y=`pxFloat(2.), ~blur=`pxFloat(3.), CSS.black),
     CSS.TextShadow.text(~x=`zero, ~y=`zero, ~blur=`pxFloat(5.), CSS.white),
   |]);
   
@@ -131,18 +110,9 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|textDecorationSkip|js}, {js|objects spaces|js});
   CSS.unsafe({js|textDecorationSkip|js}, {js|objects leading-spaces|js});
   CSS.unsafe({js|textDecorationSkip|js}, {js|objects trailing-spaces|js});
-  CSS.unsafe(
-    {js|textDecorationSkip|js},
-    {js|objects leading-spaces trailing-spaces|js},
-  );
-  CSS.unsafe(
-    {js|textDecorationSkip|js},
-    {js|objects leading-spaces trailing-spaces edges|js},
-  );
-  CSS.unsafe(
-    {js|textDecorationSkip|js},
-    {js|objects leading-spaces trailing-spaces edges box-decoration|js},
-  );
+  CSS.unsafe({js|textDecorationSkip|js}, {js|objects leading-spaces trailing-spaces|js});
+  CSS.unsafe({js|textDecorationSkip|js}, {js|objects leading-spaces trailing-spaces edges|js});
+  CSS.unsafe({js|textDecorationSkip|js}, {js|objects leading-spaces trailing-spaces edges box-decoration|js});
   CSS.unsafe({js|textDecorationSkip|js}, {js|objects edges|js});
   CSS.unsafe({js|textDecorationSkip|js}, {js|objects box-decoration|js});
   CSS.unsafe({js|textDecorationSkip|js}, {js|spaces|js});
@@ -150,14 +120,8 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|textDecorationSkip|js}, {js|spaces edges box-decoration|js});
   CSS.unsafe({js|textDecorationSkip|js}, {js|spaces box-decoration|js});
   CSS.unsafe({js|textDecorationSkip|js}, {js|leading-spaces|js});
-  CSS.unsafe(
-    {js|textDecorationSkip|js},
-    {js|leading-spaces trailing-spaces edges|js},
-  );
-  CSS.unsafe(
-    {js|textDecorationSkip|js},
-    {js|leading-spaces trailing-spaces edges box-decoration|js},
-  );
+  CSS.unsafe({js|textDecorationSkip|js}, {js|leading-spaces trailing-spaces edges|js});
+  CSS.unsafe({js|textDecorationSkip|js}, {js|leading-spaces trailing-spaces edges box-decoration|js});
   CSS.unsafe({js|textDecorationSkip|js}, {js|edges|js});
   CSS.unsafe({js|textDecorationSkip|js}, {js|edges box-decoration|js});
   CSS.unsafe({js|textDecorationSkip|js}, {js|box-decoration|js});

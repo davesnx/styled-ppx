@@ -953,37 +953,23 @@
       [@mel.optional]
       onWheel: option(React.Event.Wheel.t => unit),
     };
-    [@mel.module "react"]
-    external createVariadicElement: (string, Js.t({..})) => React.element =
-      "createElement";
+    [@mel.module "react"] external createVariadicElement: (string, Js.t({..})) => React.element = "createElement";
     let getOrEmpty = str =>
       switch (str) {
       | Some(str) => " " ++ str
       | None => ""
       };
     let deleteProp = [%mel.raw "(newProps, key) => delete newProps[key]"];
-    external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
-      "Object.assign";
+    external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) = "Object.assign";
     let styles =
       CSS.style([|
         CSS.label("SelectorWithInterpolation"),
-        CSS.media(
-          {js|only screen and (min-width: |js} ++ width ++ {js|)|js},
-          [|CSS.color(CSS.blue)|],
-        ),
-        CSS.media(
-          {js|(min-width: 700px) and (orientation: |js}
-          ++ orientation
-          ++ {js|)|js},
-          [|CSS.display(`none)|],
-        ),
+        CSS.media({js|only screen and (min-width: |js} ++ width ++ {js|)|js}, [|CSS.color(CSS.blue)|]),
+        CSS.media({js|(min-width: 700px) and (orientation: |js} ++ orientation ++ {js|)|js}, [|CSS.display(`none)|]),
       |]);
     let make = (props: makeProps) => {
       let className = styles ++ getOrEmpty(classNameGet(props));
-      let stylesObject = {
-        "className": className,
-        "ref": innerRefGet(props),
-      };
+      let stylesObject = {"className": className, "ref": innerRefGet(props)};
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(. newProps, "innerRef"));
       let asTag = as_Get(props);

@@ -30,24 +30,12 @@ If this test fail means that the module is not in sync with the ppx
     `tracks([|
       `repeat((
         `num(4),
-        [|
-          `pxFloat(10.),
-          `lineNames({js|[col-start]|js}),
-          `pxFloat(250.),
-          `lineNames({js|[col-end]|js}),
-        |],
+        [|`pxFloat(10.), `lineNames({js|[col-start]|js}), `pxFloat(250.), `lineNames({js|[col-end]|js})|],
       )),
       `pxFloat(10.),
     |]),
   );
-  CSS.gridTemplateColumns(
-    `tracks([|
-      `pxFloat(100.),
-      `fr(1.),
-      `maxContent,
-      `minmax((`minContent, `fr(1.))),
-    |]),
-  );
+  CSS.gridTemplateColumns(`tracks([|`pxFloat(100.), `fr(1.), `maxContent, `minmax((`minContent, `fr(1.)))|]));
   CSS.make("css-hv9q82", []);
   CSS.make("css-w8gmet", []);
   CSS.gridTemplateColumns(
@@ -85,21 +73,14 @@ If this test fail means that the module is not in sync with the ppx
   );
   CSS.make("css-17q21av", []);
   CSS.gridTemplateColumns(
-    `tracks([|
-      `minmax((`pxFloat(100.), `maxContent)),
-      `repeat((`autoFill, [|`pxFloat(200.)|])),
-      `percent(20.),
-    |]),
+    `tracks([|`minmax((`pxFloat(100.), `maxContent)), `repeat((`autoFill, [|`pxFloat(200.)|])), `percent(20.)|]),
   );
   CSS.gridTemplateColumns(
     `tracks([|
       `lineNames({js|[linename1]|js}),
       `pxFloat(100.),
       `lineNames({js|[linename2]|js}),
-      `repeat((
-        `autoFit,
-        [|`lineNames({js|[linename3 linename4]|js}), `pxFloat(300.)|],
-      )),
+      `repeat((`autoFit, [|`lineNames({js|[linename3 linename4]|js}), `pxFloat(300.)|])),
       `pxFloat(100.),
     |]),
   );
@@ -108,10 +89,7 @@ If this test fail means that the module is not in sync with the ppx
     `tracks([|
       `lineNames({js|[linename1 linename2]|js}),
       `pxFloat(100.),
-      `repeat((
-        `autoFit,
-        [|`lineNames({js|[linename1]|js}), `pxFloat(300.)|],
-      )),
+      `repeat((`autoFit, [|`lineNames({js|[linename1]|js}), `pxFloat(300.)|])),
       `lineNames({js|[linename3]|js}),
     |]),
   );
@@ -128,10 +106,7 @@ If this test fail means that the module is not in sync with the ppx
       ),
       CSS.pxFloat(10.),
     |]);
-  CSS.make(
-    "css-5h8l4l",
-    [("--var-7wrrwo", CSS.Types.GridTemplateColumns.toString(value))],
-  );
+  CSS.make("css-5h8l4l", [("--var-7wrrwo", CSS.Types.GridTemplateColumns.toString(value))]);
   CSS.make("css-60hsgl", []);
   CSS.make("css-1s26n4k", []);
   CSS.make("css-1c3w97y", []);
@@ -254,10 +229,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-4iq44b", []);
   CSS.make("css-gjzd4g", []);
   let area = `num(33);
-  CSS.make(
-    "css-48iwih",
-    [("--var-1l7l92x", CSS.Types.GridArea.toString(area))],
-  );
+  CSS.make("css-48iwih", [("--var-1l7l92x", CSS.Types.GridArea.toString(area))]);
   CSS.make("css-3gxo8c", []);
   CSS.make("css-z8rhft", []);
   CSS.make("css-1p8f0m4", []);
@@ -281,11 +253,7 @@ If this test fail means that the module is not in sync with the ppx
       `lineNames({js|[sub-a]|js}),
       `repeat((
         `autoFill,
-        [|
-          `lineNames({js|[sub-b]|js}),
-          `lineNames({js|[sub-c]|js}),
-          `lineNames({js|[sub-d]|js}),
-        |],
+        [|`lineNames({js|[sub-b]|js}), `lineNames({js|[sub-c]|js}), `lineNames({js|[sub-d]|js})|],
       )),
       `lineNames({js|[sub-e]|js}),
       `repeat((`num(1), [|`lineNames({js|[sub-g]|js})|])),
@@ -303,11 +271,7 @@ If this test fail means that the module is not in sync with the ppx
       `lineNames({js|[sub-a]|js}),
       `repeat((
         `autoFill,
-        [|
-          `lineNames({js|[sub-b]|js}),
-          `lineNames({js|[sub-c]|js}),
-          `lineNames({js|[sub-d]|js}),
-        |],
+        [|`lineNames({js|[sub-b]|js}), `lineNames({js|[sub-c]|js}), `lineNames({js|[sub-d]|js})|],
       )),
       `lineNames({js|[sub-e]|js}),
       `repeat((`num(1), [|`lineNames({js|[sub-g]|js})|])),

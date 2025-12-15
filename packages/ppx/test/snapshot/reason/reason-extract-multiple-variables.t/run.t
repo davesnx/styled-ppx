@@ -18,10 +18,7 @@
     className={fst(css(CSS.px(10), CSS.px(10), CSS.px(10)))}
     style={snd(css(CSS.px(10), CSS.px(10), CSS.px(10)))}
   />;
-  <span
-    className={fst(CSS.make("css-17vxl0k", []))}
-    style={snd(CSS.make("css-17vxl0k", []))}
-  />;
+  <span className={fst(CSS.make("css-17vxl0k", []))} style={snd(CSS.make("css-17vxl0k", []))} />;
 
   $ styled-ppx.generate output.ml > styles.css
   $ cat styles.css

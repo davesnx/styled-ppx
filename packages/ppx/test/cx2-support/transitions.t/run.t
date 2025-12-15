@@ -75,20 +75,10 @@ If this test fail means that the module is not in sync with the ppx
       ~duration=`ms(200),
       (),
     );
-  CSS.make(
-    "css-133lk2h",
-    [("--var-mzypqe", CSS.Types.Transition.toString(fullTransition))],
-  );
+  CSS.make("css-133lk2h", [("--var-mzypqe", CSS.Types.Transition.toString(fullTransition))]);
   
-  let fullTransition2 =
-    CSS.Types.Transition.Value.make(
-      ~property=CSS.Types.TransitionProperty.all,
-      (),
-    );
-  CSS.make(
-    "css-hxt43r",
-    [("--var-tbzsda", CSS.Types.Transition.toString(fullTransition2))],
-  );
+  let fullTransition2 = CSS.Types.Transition.Value.make(~property=CSS.Types.TransitionProperty.all, ());
+  CSS.make("css-hxt43r", [("--var-tbzsda", CSS.Types.Transition.toString(fullTransition2))]);
   
   CSS.make(
     "css-12yumlj",
@@ -101,19 +91,10 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.transitions([|
-    CSS.Types.Transition.Value.make(
-      ~duration,
-      ~delay,
-      ~timingFunction,
-      ~property,
-      (),
-    ),
+    CSS.Types.Transition.Value.make(~duration, ~delay, ~timingFunction, ~property, ()),
     CSS.Types.Transition.Value.make(~duration=`s(0), ~property=property3, ()),
   |]);
-  CSS.make(
-    "css-1s77stt",
-    [("--var-fefko6", CSS.Types.TransitionProperty.toString(property))],
-  );
+  CSS.make("css-1s77stt", [("--var-fefko6", CSS.Types.TransitionProperty.toString(property))]);
   CSS.make(
     "css-1r5dgu9",
     [
@@ -131,10 +112,7 @@ If this test fail means that the module is not in sync with the ppx
   );
   CSS.make(
     "css-1qu06dt",
-    [
-      ("--var-7p0nz0", CSS.Types.Time.toString(duration)),
-      ("--var-h43taz", CSS.Types.Time.toString(delay)),
-    ],
+    [("--var-7p0nz0", CSS.Types.Time.toString(duration)), ("--var-h43taz", CSS.Types.Time.toString(delay))],
   );
   CSS.make(
     "css-14j7bkl",
@@ -144,15 +122,9 @@ If this test fail means that the module is not in sync with the ppx
       ("--var-h43taz", CSS.Types.Time.toString(delay)),
     ],
   );
-  CSS.make(
-    "css-f4zddx",
-    [("--var-ml3rsq", CSS.Types.TimingFunction.toString(timingFunction))],
-  );
+  CSS.make("css-f4zddx", [("--var-ml3rsq", CSS.Types.TimingFunction.toString(timingFunction))]);
   CSS.make("css-ebibhc", [("--var-h43taz", CSS.Types.Time.toString(delay))]);
-  CSS.make(
-    "css-1xh0m8n",
-    [("--var-fefko6", CSS.Types.TransitionProperty.toString(property))],
-  );
+  CSS.make("css-1xh0m8n", [("--var-fefko6", CSS.Types.TransitionProperty.toString(property))]);
   CSS.make(
     "css-qf8wt0",
     [
@@ -160,10 +132,7 @@ If this test fail means that the module is not in sync with the ppx
       ("--var-ml3rsq", CSS.Types.TimingFunction.toString(timingFunction)),
     ],
   );
-  CSS.make(
-    "css-1cdb5et",
-    [("--var-7p0nz0", CSS.Types.Time.toString(duration))],
-  );
+  CSS.make("css-1cdb5et", [("--var-7p0nz0", CSS.Types.Time.toString(duration))]);
   CSS.make(
     "css-oru0ue",
     [
@@ -171,27 +140,9 @@ If this test fail means that the module is not in sync with the ppx
       ("--var-7p0nz0", CSS.Types.Time.toString(duration)),
     ],
   );
-  CSS.make(
-    "css-1se0g6a",
-    [("--var-ml3rsq", CSS.Types.TimingFunction.toString(timingFunction))],
-  );
-  CSS.make(
-    "css-1xh0m8n",
-    [("--var-fefko6", CSS.Types.TransitionProperty.toString(property))],
-  );
-  CSS.make(
-    "css-1cdb5et",
-    [("--var-7p0nz0", CSS.Types.Time.toString(duration))],
-  );
-  CSS.make(
-    "css-1se0g6a",
-    [("--var-ml3rsq", CSS.Types.TimingFunction.toString(timingFunction))],
-  );
-  CSS.make(
-    "css-18a1zm2",
-    [("--var-fefko6", CSS.Types.TransitionProperty.toString(property))],
-  );
-  CSS.make(
-    "css-w3j1tl",
-    [("--var-7p0nz0", CSS.Types.Time.toString(duration))],
-  );
+  CSS.make("css-1se0g6a", [("--var-ml3rsq", CSS.Types.TimingFunction.toString(timingFunction))]);
+  CSS.make("css-1xh0m8n", [("--var-fefko6", CSS.Types.TransitionProperty.toString(property))]);
+  CSS.make("css-1cdb5et", [("--var-7p0nz0", CSS.Types.Time.toString(duration))]);
+  CSS.make("css-1se0g6a", [("--var-ml3rsq", CSS.Types.TimingFunction.toString(timingFunction))]);
+  CSS.make("css-18a1zm2", [("--var-fefko6", CSS.Types.TransitionProperty.toString(property))]);
+  CSS.make("css-w3j1tl", [("--var-7p0nz0", CSS.Types.Time.toString(duration))]);

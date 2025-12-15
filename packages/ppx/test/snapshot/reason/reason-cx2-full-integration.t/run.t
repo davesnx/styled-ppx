@@ -18,8 +18,8 @@
   let mediaWithInterpolation color =
     CSS.make "css-181w2g5 css-5yf2v8"
       [("--var-sj55zd", (CSS.Types.Color.toString color))]
-  let fadeIn = `KeyframesName "keyframe-85bkd1"
-  let slideUp = `KeyframesName "keyframe-jqop05"
+  let fadeIn = CSS.Types.AnimationName.make "keyframe-85bkd1"
+  let slideUp = CSS.Types.AnimationName.make "keyframe-jqop05"
   let () = ()
   let multiVar primary secondary size =
     CSS.make "css-yu2afn css-46asp6 css-6gmcrz css-avoblm"

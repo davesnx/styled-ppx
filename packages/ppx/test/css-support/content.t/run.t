@@ -22,17 +22,8 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.contentsRule([|`text({js||js})|], None);
   
-  CSS.contentsRule(
-    [|`counter(({js|count|js}, Some(`Custom({js|decimal|js}))))|],
-    None,
-  );
-  CSS.contentsRule(
-    [|
-      `counter(({js|count|js}, Some(`Custom({js|decimal|js})))),
-      `text({js|) |js}),
-    |],
-    None,
-  );
+  CSS.contentsRule([|`counter(({js|count|js}, Some(`Custom({js|decimal|js}))))|], None);
+  CSS.contentsRule([|`counter(({js|count|js}, Some(`Custom({js|decimal|js})))), `text({js|) |js})|], None);
   CSS.unsafe({js|content|js}, {js|unset|js});
   
   CSS.contentRule(`normal);
@@ -42,21 +33,12 @@ If this test fail means that the module is not in sync with the ppx
   CSS.contentRule(
     `linearGradient((
       None,
-      [|
-        (Some(`hex({js|e66465|js})), None),
-        (Some(`hex({js|9198e5|js})), None),
-      |]: CSS.Types.Gradient.color_stop_list,
+      [|(Some(`hex({js|e66465|js})), None), (Some(`hex({js|9198e5|js})), None)|]: CSS.Types.Gradient.color_stop_list,
     )),
   );
-  CSS.unsafe(
-    {js|content|js},
-    {js|image-set("image1x.png" 1x, "image2x.png" 2x)|js},
-  );
+  CSS.unsafe({js|content|js}, {js|image-set("image1x.png" 1x, "image2x.png" 2x)|js});
   
-  CSS.contentsRule(
-    [|`url({js|../img/test.png|js})|],
-    Some({js|This is the alt text|js}),
-  );
+  CSS.contentsRule([|`url({js|../img/test.png|js})|], Some({js|This is the alt text|js}));
   
   CSS.contentsRule([|`text({js|unparsed text|js})|], None);
   
@@ -68,16 +50,9 @@ If this test fail means that the module is not in sync with the ppx
   CSS.contentsRule([|`noOpenQuote|], None);
   CSS.contentsRule([|`noCloseQuote|], None);
   
+  CSS.contentsRule([|`text({js|prefix|js}), `url({js|http://www.example.com/test.png|js})|], None);
   CSS.contentsRule(
-    [|`text({js|prefix|js}), `url({js|http://www.example.com/test.png|js})|],
-    None,
-  );
-  CSS.contentsRule(
-    [|
-      `text({js|prefix|js}),
-      `url({js|/img/test.png|js}),
-      `text({js|suffix|js}),
-    |],
+    [|`text({js|prefix|js}), `url({js|/img/test.png|js}), `text({js|suffix|js})|],
     Some({js|Alt text|js}),
   );
   
@@ -102,10 +77,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.contentsRule([|`attr({js|href|js})|], None);
   CSS.contentsRule([|`attr({js|data-value|js})|], None);
   
-  CSS.contentsRule(
-    [|`attrWithType(({js|data-value|js}, {js|raw-string|js}))|],
-    None,
-  );
+  CSS.contentsRule([|`attrWithType(({js|data-value|js}, {js|raw-string|js}))|], None);
   CSS.contentsRule([|`attrWithType(({js|data-value|js}, {js|em|js}))|], None);
   CSS.contentsRule([|`attrWithType(({js|data-value|js}, {js|px|js}))|], None);
   
@@ -127,17 +99,10 @@ If this test fail means that the module is not in sync with the ppx
   CSS.contentsRule([|`text({js|✗|js})|], None);
   CSS.contentsRule([|`text({js|✦|js})|], None);
   
-  CSS.contentsRule(
-    [|`text({js||js}), `attr({js|data-title|js}), `text({js|”|js})|],
-    None,
-  );
+  CSS.contentsRule([|`text({js||js}), `attr({js|data-title|js}), `text({js|”|js})|], None);
   CSS.contentsRule([|`text({js|→|js}), `text({js| Click here|js})|], None);
   CSS.contentsRule(
-    [|
-      `text({js|Step |js}),
-      `counter(({js|step|js}, Some(`Custom({js|decimal|js})))),
-      `text({js|: |js}),
-    |],
+    [|`text({js|Step |js}), `counter(({js|step|js}, Some(`Custom({js|decimal|js})))), `text({js|: |js})|],
     None,
   );
   
@@ -160,10 +125,6 @@ If this test fail means that the module is not in sync with the ppx
   CSS.contentsRule([|`text({js|♥|js})|], None);
   CSS.contentsRule([|`text({js|→ |js}), `attr({js|href|js})|], None);
   CSS.contentsRule(
-    [|
-      `text({js|• |js}),
-      `counter(({js|item|js}, Some(`Custom({js|decimal|js})))),
-      `text({js| |js}),
-    |],
+    [|`text({js|• |js}), `counter(({js|item|js}, Some(`Custom({js|decimal|js})))), `text({js| |js})|],
     None,
   );

@@ -23,10 +23,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|scrollMargin|js}, {js|20px 3em 1in 5rem|js});
   CSS.unsafe({js|scrollMargin|js}, {js|calc(2px)|js});
   CSS.unsafe({js|scrollMargin|js}, {js|calc(3 * 25px)|js});
-  CSS.unsafe(
-    {js|scrollMargin|js},
-    {js|calc(3 * 25px) 5px 10em calc(1vw - 5px)|js},
-  );
+  CSS.unsafe({js|scrollMargin|js}, {js|calc(3 * 25px) 5px 10em calc(1vw - 5px)|js});
   CSS.unsafe({js|scrollMarginBlock|js}, {js|10px|js});
   CSS.unsafe({js|scrollMarginBlock|js}, {js|10px 10px|js});
   CSS.unsafe({js|scrollMarginBlockEnd|js}, {js|10px|js});
@@ -50,10 +47,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|scrollPadding|js}, {js|calc(2px)|js});
   CSS.unsafe({js|scrollPadding|js}, {js|calc(50%)|js});
   CSS.unsafe({js|scrollPadding|js}, {js|calc(3 * 25px)|js});
-  CSS.unsafe(
-    {js|scrollPadding|js},
-    {js|calc(3 * 25px) 5px 10% calc(10% - 5px)|js},
-  );
+  CSS.unsafe({js|scrollPadding|js}, {js|calc(3 * 25px) 5px 10% calc(10% - 5px)|js});
   CSS.unsafe({js|scrollPaddingBlock|js}, {js|10px|js});
   CSS.unsafe({js|scrollPaddingBlock|js}, {js|50%|js});
   CSS.unsafe({js|scrollPaddingBlock|js}, {js|10px 50%|js});
