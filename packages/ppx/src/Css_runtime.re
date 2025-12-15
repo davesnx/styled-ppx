@@ -529,7 +529,8 @@ let render_keyframes = (~loc, ~delimiter, declarations: rule_list) => {
   );
 };
 
-let render_global = (~loc, ~delimiter, (rule_list, stylesheet_loc): rule_list) => {
+let render_global =
+    (~loc, ~delimiter, (rule_list, stylesheet_loc): rule_list) => {
   let onlyStyleRulesAndAtRulesSupported = {|Declarations does not make sense in global styles. Global should consists of style rules or at-rules (e.g @media, @print, etc.)
 
 If your intent is to apply the declaration to all elements, use the universal selector

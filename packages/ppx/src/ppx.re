@@ -641,10 +641,12 @@ let rec type_check_rule = (rule: Styled_ppx_css_parser.Ast.rule) => {
          (like "Got 'fley', did you mean 'flex'?") */
       let is_internal_error =
         String.length(raw_error) > 0
-        && (String.sub(raw_error, 0, min(6, String.length(raw_error)))
-            == "tokens"
-            || String.sub(raw_error, 0, min(8, String.length(raw_error)))
-            == "Expected");
+        && (
+          String.sub(raw_error, 0, min(6, String.length(raw_error)))
+          == "tokens"
+          || String.sub(raw_error, 0, min(8, String.length(raw_error)))
+          == "Expected"
+        );
       let msg =
         is_internal_error
           ? Format.sprintf(
@@ -818,7 +820,11 @@ let keyframe_extension =
         | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
           switch (Styled_ppx_css_parser.Driver.parse_keyframes(txt)) {
           | Ok(declarations) =>
-            Css_runtime.render_keyframes(~loc=stringLoc, ~delimiter, declarations)
+            Css_runtime.render_keyframes(
+              ~loc=stringLoc,
+              ~delimiter,
+              declarations,
+            )
           | Error((start_pos, end_pos, msg)) =>
             let loc =
               Styled_ppx_css_parser.Parser_location.make_loc_from_pos(
@@ -859,9 +865,9 @@ let keyframe2_extension =
             let loc = stringLoc;
             /* Return AnimationName.t so it can be used with animation-name interpolation */
             [%expr
-              CSS.Types.AnimationName.make(
-                [%e Builder.estring(~loc, keyframe_name)],
-              )
+             CSS.Types.AnimationName.make(
+               [%e Builder.estring(~loc, keyframe_name)],
+             )
             ];
           | Error((start_pos, end_pos, msg)) =>
             let loc =

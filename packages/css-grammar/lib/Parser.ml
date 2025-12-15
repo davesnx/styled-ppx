@@ -6120,7 +6120,8 @@ let legacy_gradient : legacy_gradient Rule.rule =
      <legacy-repeating-linear-gradient> | <legacy-radial-gradient> | \
      <legacy-repeating-radial-gradient>"]
 
-let legacy_gradient_runtime_module_path = Some [%module_path Css_types.LegacyGradient]
+let legacy_gradient_runtime_module_path =
+  Some [%module_path Css_types.LegacyGradient]
 
 let non_standard_color : non_standard_color Rule.rule =
   [%spec
@@ -6143,7 +6144,8 @@ let non_standard_color : non_standard_color Rule.rule =
      '-moz-hyperlinktext' | '-moz-visitedhyperlinktext' | '-webkit-activelink' \
      | '-webkit-focus-ring-color' | '-webkit-link' | '-webkit-text'"]
 
-let non_standard_color_runtime_module_path = Some [%module_path Css_types.NonStandardColor]
+let non_standard_color_runtime_module_path =
+  Some [%module_path Css_types.NonStandardColor]
 
 let non_standard_font : non_standard_font Rule.rule =
   [%spec
@@ -6154,7 +6156,8 @@ let non_standard_font : non_standard_font Rule.rule =
      '-apple-system-short-subheadline' | '-apple-system-short-caption1' | \
      '-apple-system-short-footnote' | '-apple-system-tall-body'"]
 
-let non_standard_font_runtime_module_path = Some [%module_path Css_types.NonStandardFont]
+let non_standard_font_runtime_module_path =
+  Some [%module_path Css_types.NonStandardFont]
 
 let non_standard_image_rendering : non_standard_image_rendering Rule.rule =
   [%spec
@@ -6177,7 +6180,8 @@ let non_standard_width : non_standard_width Rule.rule =
     "'min-intrinsic' | 'intrinsic' | '-moz-min-content' | '-moz-max-content' | \
      '-webkit-min-content' | '-webkit-max-content'"]
 
-let non_standard_width_runtime_module_path = Some [%module_path Css_types.NonStandardWidth]
+let non_standard_width_runtime_module_path =
+  Some [%module_path Css_types.NonStandardWidth]
 
 let webkit_gradient_color_stop : webkit_gradient_color_stop Rule.rule =
   [%spec
@@ -6227,7 +6231,9 @@ let absolute_size : absolute_size Rule.rule =
     "'xx-small' | 'x-small' | 'small' | 'medium' | 'large' | 'x-large' | \
      'xx-large' | 'xxx-large'"]
 
-let absolute_size_runtime_module_path = Some [%module_path Css_types.AbsoluteSize]
+let absolute_size_runtime_module_path =
+  Some [%module_path Css_types.AbsoluteSize]
+
 let age : age Rule.rule = [%spec "'child' | 'young' | 'old'"]
 let age_runtime_module_path = Some [%module_path Css_types.Age]
 
@@ -6239,12 +6245,14 @@ let alpha_value_runtime_module_path = Some [%module_path Css_types.AlphaValue]
 let angular_color_hint : angular_color_hint Rule.rule =
   [%spec "<extended-angle> | <extended-percentage>"]
 
-let angular_color_hint_runtime_module_path = Some [%module_path Css_types.AngularColorHint]
+let angular_color_hint_runtime_module_path =
+  Some [%module_path Css_types.AngularColorHint]
 
 let angular_color_stop : angular_color_stop Rule.rule =
   [%spec "<color> && [ <color-stop-angle> ]?"]
 
-let angular_color_stop_runtime_module_path = Some [%module_path Css_types.AngularColorStop]
+let angular_color_stop_runtime_module_path =
+  Some [%module_path Css_types.AngularColorStop]
 
 let angular_color_stop_list : angular_color_stop_list Rule.rule =
   [%spec
@@ -6263,21 +6271,26 @@ let animateable_feature_runtime_module_path =
 let attachment : attachment Rule.rule = [%spec "'scroll' | 'fixed' | 'local'"]
 let attachment_runtime_module_path = Some [%module_path Css_types.Attachment]
 let attr_fallback : attr_fallback Rule.rule = [%spec "<any-value>"]
-let attr_fallback_runtime_module_path = Some [%module_path Css_types.AttrFallback]
+
+let attr_fallback_runtime_module_path =
+  Some [%module_path Css_types.AttrFallback]
 
 let attr_matcher : attr_matcher Rule.rule =
   [%spec "[ '~' | '|' | '^' | '$' | '*' ]? '='"]
 
 let attr_matcher_runtime_module_path = Some [%module_path Css_types.AttrMatcher]
 let attr_modifier : attr_modifier Rule.rule = [%spec "'i' | 's'"]
-let attr_modifier_runtime_module_path = Some [%module_path Css_types.AttrModifier]
+
+let attr_modifier_runtime_module_path =
+  Some [%module_path Css_types.AttrModifier]
 
 let attribute_selector : attribute_selector Rule.rule =
   [%spec
     "'[' <wq-name> ']' | '[' <wq-name> <attr-matcher> [ <string-token> | \
      <ident-token> ] [ <attr-modifier> ]? ']'"]
 
-let attribute_selector_runtime_module_path = Some [%module_path Css_types.AttributeSelector]
+let attribute_selector_runtime_module_path =
+  Some [%module_path Css_types.AttributeSelector]
 
 let auto_repeat : auto_repeat Rule.rule =
   [%spec
@@ -6292,12 +6305,14 @@ let auto_track_list : auto_track_list Rule.rule =
      ]? <auto-repeat> [ [ <line-names> ]? [ <fixed-size> | <fixed-repeat> ] ]* \
      [ <line-names> ]?"]
 
-let auto_track_list_runtime_module_path = Some [%module_path Css_types.AutoTrackList]
+let auto_track_list_runtime_module_path =
+  Some [%module_path Css_types.AutoTrackList]
 
 let baseline_position : baseline_position Rule.rule =
   [%spec "[ 'first' | 'last' ]? 'baseline'"]
 
-let baseline_position_runtime_module_path = Some [%module_path Css_types.BaselinePosition]
+let baseline_position_runtime_module_path =
+  Some [%module_path Css_types.BaselinePosition]
 
 let basic_shape : basic_shape Rule.rule =
   [%spec "<inset()> | <circle()> | <ellipse()> | <polygon()> | <path()>"]
@@ -6347,7 +6362,9 @@ let border_radius : border_radius Rule.rule =
     "[ <extended-length> | <extended-percentage> ]{1,4} [ '/' [ \
      <extended-length> | <extended-percentage> ]{1,4} ]?"]
 
-let border_radius_runtime_module_path = Some [%module_path Css_types.BorderRadius]
+let border_radius_runtime_module_path =
+  Some [%module_path Css_types.BorderRadius]
+
 let bottom : bottom Rule.rule = [%spec "<extended-length> | 'auto'"]
 let bottom_runtime_module_path = Some [%module_path Css_types.Bottom]
 let box : box Rule.rule = [%spec "'border-box' | 'padding-box' | 'content-box'"]
@@ -6379,14 +6396,21 @@ let calc_value : calc_value Rule.rule =
 
 let calc_value_runtime_module_path = Some [%module_path Css_types.CalcValue]
 let cf_final_image : cf_final_image Rule.rule = [%spec "<image> | <color>"]
-let cf_final_image_runtime_module_path = Some [%module_path Css_types.CfFinalImage]
+
+let cf_final_image_runtime_module_path =
+  Some [%module_path Css_types.CfFinalImage]
 
 let cf_mixing_image : cf_mixing_image Rule.rule =
   [%spec "[ <extended-percentage> ]? && <image>"]
 
-let cf_mixing_image_runtime_module_path = Some [%module_path Css_types.CfMixingImage]
+let cf_mixing_image_runtime_module_path =
+  Some [%module_path Css_types.CfMixingImage]
+
 let class_selector : class_selector Rule.rule = [%spec "'.' <ident-token>"]
-let class_selector_runtime_module_path = Some [%module_path Css_types.ClassSelector]
+
+let class_selector_runtime_module_path =
+  Some [%module_path Css_types.ClassSelector]
+
 let clip_source : clip_source Rule.rule = [%spec "<url>"]
 let clip_source_runtime_module_path = Some [%module_path Css_types.ClipSource]
 
@@ -6406,7 +6430,8 @@ let color_stop_runtime_module_path = Some [%module_path Css_types.ColorStop]
 let color_stop_angle : color_stop_angle Rule.rule =
   [%spec "[ <extended-angle> ]{1,2}"]
 
-let color_stop_angle_runtime_module_path = Some [%module_path Css_types.ColorStopAngle]
+let color_stop_angle_runtime_module_path =
+  Some [%module_path Css_types.ColorStopAngle]
 
 (* type color_stop_length = [%spec_t "[ <extended-length> | <extended-percentage> ]{1,2}"]
 let color_stop_length : color_stop_length Rule.rule = [%spec "[ <extended-length> | <extended-percentage> ]{1,2}"]
@@ -6414,7 +6439,8 @@ let color_stop_length_runtime_module_path = Some [%module_path Css_types.ColorSt
 let color_stop_length : color_stop_length Rule.rule =
   [%spec "<extended-length> | <extended-percentage>"]
 
-let color_stop_length_runtime_module_path = Some [%module_path Css_types.ColorStopLength]
+let color_stop_length_runtime_module_path =
+  Some [%module_path Css_types.ColorStopLength]
 
 (* color_stop_list is modified from the original spec, here is a simplified version where it tries to be fully compatible but easier for code-gen:
 
@@ -6425,7 +6451,8 @@ let color_stop_length_runtime_module_path = Some [%module_path Css_types.ColorSt
 let color_stop_list : color_stop_list Rule.rule =
   [%spec "[ [<color>? <length-percentage>] | [<color> <length-percentage>?] ]#"]
 
-let color_stop_list_runtime_module_path = Some [%module_path Css_types.ColorStopList]
+let color_stop_list_runtime_module_path =
+  Some [%module_path Css_types.ColorStopList]
 
 let hue_interpolation_method : hue_interpolation_method Rule.rule =
   [%spec " [ 'shorter' | 'longer' | 'increasing' | 'decreasing' ] && 'hue' "]
@@ -6436,7 +6463,8 @@ let hue_interpolation_method_runtime_module_path =
 let polar_color_space : polar_color_space Rule.rule =
   [%spec " 'hsl' | 'hwb' | 'lch' | 'oklch' "]
 
-let polar_color_space_runtime_module_path = Some [%module_path Css_types.PolarColorSpace]
+let polar_color_space_runtime_module_path =
+  Some [%module_path Css_types.PolarColorSpace]
 
 let rectangular_color_space : rectangular_color_space Rule.rule =
   [%spec
@@ -6466,7 +6494,8 @@ let combinator_runtime_module_path = Some [%module_path Css_types.Combinator]
 let common_lig_values : common_lig_values Rule.rule =
   [%spec "'common-ligatures' | 'no-common-ligatures'"]
 
-let common_lig_values_runtime_module_path = Some [%module_path Css_types.CommonLigValues]
+let common_lig_values_runtime_module_path =
+  Some [%module_path Css_types.CommonLigValues]
 
 let compat_auto : compat_auto Rule.rule =
   [%spec
@@ -6479,7 +6508,8 @@ let compat_auto_runtime_module_path = Some [%module_path Css_types.CompatAuto]
 let complex_selector : complex_selector Rule.rule =
   [%spec "<compound-selector> [ [ <combinator> ]? <compound-selector> ]*"]
 
-let complex_selector_runtime_module_path = Some [%module_path Css_types.ComplexSelector]
+let complex_selector_runtime_module_path =
+  Some [%module_path Css_types.ComplexSelector]
 
 let complex_selector_list : complex_selector_list Rule.rule =
   [%spec "[ <complex-selector> ]#"]
@@ -6493,7 +6523,8 @@ let composite_style : composite_style Rule.rule =
      'source-atop' | 'destination-over' | 'destination-in' | 'destination-out' \
      | 'destination-atop' | 'xor'"]
 
-let composite_style_runtime_module_path = Some [%module_path Css_types.CompositeStyle]
+let composite_style_runtime_module_path =
+  Some [%module_path Css_types.CompositeStyle]
 
 let compositing_operator : compositing_operator Rule.rule =
   [%spec "'add' | 'subtract' | 'intersect' | 'exclude'"]
@@ -6506,7 +6537,8 @@ let compound_selector : compound_selector Rule.rule =
     "[ <type-selector> ]? [ <subclass-selector> ]* [ <pseudo-element-selector> \
      [ <pseudo-class-selector> ]* ]*"]
 
-let compound_selector_runtime_module_path = Some [%module_path Css_types.CompoundSelector]
+let compound_selector_runtime_module_path =
+  Some [%module_path Css_types.CompoundSelector]
 
 let compound_selector_list : compound_selector_list Rule.rule =
   [%spec "[ <compound-selector> ]#"]
@@ -6530,7 +6562,9 @@ let content_list_runtime_module_path = Some [%module_path Css_types.ContentList]
 let content_position : content_position Rule.rule =
   [%spec "'center' | 'start' | 'end' | 'flex-start' | 'flex-end'"]
 
-let content_position_runtime_module_path = Some [%module_path Css_types.ContentPosition]
+let content_position_runtime_module_path =
+  Some [%module_path Css_types.ContentPosition]
+
 let content_replacement : content_replacement Rule.rule = [%spec "<image>"]
 
 let content_replacement_runtime_module_path =
@@ -6545,9 +6579,14 @@ let contextual_alt_values_runtime_module_path =
 let counter_style : counter_style Rule.rule =
   [%spec "<counter-style-name> | <symbols()>"]
 
-let counter_style_runtime_module_path = Some [%module_path Css_types.CounterStyle]
+let counter_style_runtime_module_path =
+  Some [%module_path Css_types.CounterStyle]
+
 let counter_style_name : counter_style_name Rule.rule = [%spec "<custom-ident>"]
-let counter_style_name_runtime_module_path = Some [%module_path Css_types.CounterStyleName]
+
+let counter_style_name_runtime_module_path =
+  Some [%module_path Css_types.CounterStyleName]
+
 let counter_name : counter_name Rule.rule = [%spec "<custom-ident>"]
 let counter_name_runtime_module_path = Some [%module_path Css_types.CounterName]
 
@@ -6567,7 +6606,8 @@ let declaration_runtime_module_path = Some [%module_path Css_types.Declaration]
 let declaration_list : declaration_list Rule.rule =
   [%spec "[ [ <declaration> ]? ';' ]* [ <declaration> ]?"]
 
-let declaration_list_runtime_module_path = Some [%module_path Css_types.DeclarationList]
+let declaration_list_runtime_module_path =
+  Some [%module_path Css_types.DeclarationList]
 
 let deprecated_system_color : deprecated_system_color Rule.rule =
   [%spec
@@ -6595,7 +6635,8 @@ let display_box_runtime_module_path = Some [%module_path Css_types.DisplayBox]
 let display_inside : display_inside Rule.rule =
   [%spec "'flow' | 'flow-root' | 'table' | 'flex' | 'grid' | 'ruby'"]
 
-let display_inside_runtime_module_path = Some [%module_path Css_types.DisplayInside]
+let display_inside_runtime_module_path =
+  Some [%module_path Css_types.DisplayInside]
 
 let display_internal : display_internal Rule.rule =
   [%spec
@@ -6604,24 +6645,28 @@ let display_internal : display_internal Rule.rule =
      'table-caption' | 'ruby-base' | 'ruby-text' | 'ruby-base-container' | \
      'ruby-text-container'"]
 
-let display_internal_runtime_module_path = Some [%module_path Css_types.DisplayInternal]
+let display_internal_runtime_module_path =
+  Some [%module_path Css_types.DisplayInternal]
 
 let display_legacy : display_legacy Rule.rule =
   [%spec
     "'inline-block' | 'inline-list-item' | 'inline-table' | 'inline-flex' | \
      'inline-grid'"]
 
-let display_legacy_runtime_module_path = Some [%module_path Css_types.DisplayLegacy]
+let display_legacy_runtime_module_path =
+  Some [%module_path Css_types.DisplayLegacy]
 
 let display_listitem : display_listitem Rule.rule =
   [%spec "[ <display-outside> ]? && [ 'flow' | 'flow-root' ]? && 'list-item'"]
 
-let display_listitem_runtime_module_path = Some [%module_path Css_types.DisplayListitem]
+let display_listitem_runtime_module_path =
+  Some [%module_path Css_types.DisplayListitem]
 
 let display_outside : display_outside Rule.rule =
   [%spec "'block' | 'inline' | 'run-in'"]
 
-let display_outside_runtime_module_path = Some [%module_path Css_types.DisplayOutside]
+let display_outside_runtime_module_path =
+  Some [%module_path Css_types.DisplayOutside]
 
 let east_asian_variant_values : east_asian_variant_values Rule.rule =
   [%spec "'jis78' | 'jis83' | 'jis90' | 'jis04' | 'simplified' | 'traditional'"]
@@ -6641,14 +6686,17 @@ let ending_shape_runtime_module_path = Some [%module_path Css_types.EndingShape]
 let explicit_track_list : explicit_track_list Rule.rule =
   [%spec "[ [ <line-names> ]? <track-size> ]+ [ <line-names> ]?"]
 
-let explicit_track_list_runtime_module_path = Some [%module_path Css_types.ExplicitTrackList]
+let explicit_track_list_runtime_module_path =
+  Some [%module_path Css_types.ExplicitTrackList]
+
 let family_name : family_name Rule.rule = [%spec "<string> | <custom-ident>"]
 let family_name_runtime_module_path = Some [%module_path Css_types.FamilyName]
 
 let feature_tag_value : feature_tag_value Rule.rule =
   [%spec "<string> [ <integer> | 'on' | 'off' ]?"]
 
-let feature_tag_value_runtime_module_path = Some [%module_path Css_types.FeatureTagValue]
+let feature_tag_value_runtime_module_path =
+  Some [%module_path Css_types.FeatureTagValue]
 
 let feature_type : feature_type Rule.rule =
   [%spec
@@ -6660,7 +6708,8 @@ let feature_type_runtime_module_path = Some [%module_path Css_types.FeatureType]
 let feature_value_block : feature_value_block Rule.rule =
   [%spec "<feature-type> '{' <feature-value-declaration-list> '}'"]
 
-let feature_value_block_runtime_module_path = Some [%module_path Css_types.FeatureValueBlock]
+let feature_value_block_runtime_module_path =
+  Some [%module_path Css_types.FeatureValueBlock]
 
 let feature_value_block_list : feature_value_block_list Rule.rule =
   [%spec "[ <feature-value-block> ]+"]
@@ -6681,7 +6730,9 @@ let feature_value_declaration_list_runtime_module_path =
   Some [%module_path Css_types.FeatureValueDeclarationList]
 
 let feature_value_name : feature_value_name Rule.rule = [%spec "<custom-ident>"]
-let feature_value_name_runtime_module_path = Some [%module_path Css_types.FeatureValueName]
+
+let feature_value_name_runtime_module_path =
+  Some [%module_path Css_types.FeatureValueName]
 
 (* <zero> represents the literal value 0, used in contexts like rotate(0) *)
 let zero : zero Rule.rule = [%spec "'0'"]
@@ -6694,7 +6745,8 @@ let filter_function : filter_function Rule.rule =
      <grayscale()> | <hue-rotate()> | <invert()> | <opacity()> | <saturate()> \
      | <sepia()>"]
 
-let filter_function_runtime_module_path = Some [%module_path Css_types.FilterFunction]
+let filter_function_runtime_module_path =
+  Some [%module_path Css_types.FilterFunction]
 
 let filter_function_list : filter_function_list Rule.rule =
   [%spec "[ <filter-function> | <url> ]+"]
@@ -6707,14 +6759,17 @@ let final_bg_layer : final_bg_layer Rule.rule =
     "<'background-color'> || <bg-image> || <bg-position> [ '/' <bg-size> ]? || \
      <repeat-style> || <attachment> || <box> || <box>"]
 
-let final_bg_layer_runtime_module_path = Some [%module_path Css_types.FinalBgLayer]
+let final_bg_layer_runtime_module_path =
+  Some [%module_path Css_types.FinalBgLayer]
+
 let line_names : line_names Rule.rule = [%spec "'[' <custom-ident>* ']'"]
 let line_names_runtime_module_path = Some [%module_path Css_types.LineNames]
 
 let fixed_breadth : fixed_breadth Rule.rule =
   [%spec "<extended-length> | <extended-percentage>"]
 
-let fixed_breadth_runtime_module_path = Some [%module_path Css_types.FixedBreadth]
+let fixed_breadth_runtime_module_path =
+  Some [%module_path Css_types.FixedBreadth]
 
 let fixed_repeat : fixed_repeat Rule.rule =
   [%spec
@@ -6742,7 +6797,8 @@ let font_stretch_absolute_runtime_module_path =
 let font_variant_css21 : font_variant_css21 Rule.rule =
   [%spec "'normal' | 'small-caps'"]
 
-let font_variant_css21_runtime_module_path = Some [%module_path Css_types.FontVariantCss21]
+let font_variant_css21_runtime_module_path =
+  Some [%module_path Css_types.FontVariantCss21]
 
 let font_weight_absolute : font_weight_absolute Rule.rule =
   [%spec "'normal' | 'bold' | <integer>"]
@@ -6793,7 +6849,8 @@ let function_counter_runtime_module_path = Some [%module_path Css_types.Counter]
 let function_counters : function_counters Rule.rule =
   [%spec "counters( <custom-ident> ',' <string> ',' [ <counter-style> ]? )"]
 
-let function_counters_runtime_module_path = Some [%module_path Css_types.Counters]
+let function_counters_runtime_module_path =
+  Some [%module_path Css_types.Counters]
 
 let function_cross_fade : function_cross_fade Rule.rule =
   [%spec "cross-fade( <cf-mixing-image> ',' [ <cf-final-image> ]? )"]
@@ -6889,7 +6946,8 @@ let function_path : function_path Rule.rule = [%spec "path( <string> )"]
 let function_perspective : function_perspective Rule.rule =
   [%spec "perspective( <'perspective'> )"]
 
-let function_perspective_runtime_module_path = Some [%module_path Css_types.Perspective]
+let function_perspective_runtime_module_path =
+  Some [%module_path Css_types.Perspective]
 
 let function_polygon : function_polygon Rule.rule =
   [%spec
@@ -6999,7 +7057,8 @@ let function_translate : function_translate Rule.rule =
     "translate( [<extended-length> | <extended-percentage>] [',' [ \
      <extended-length> | <extended-percentage> ]]? )"]
 
-let function_translate_runtime_module_path = Some [%module_path Css_types.Translate]
+let function_translate_runtime_module_path =
+  Some [%module_path Css_types.Translate]
 
 let function_translate3d : function_translate3d Rule.rule =
   [%spec
@@ -7026,14 +7085,16 @@ let gender_runtime_module_path = Some [%module_path Css_types.Gender]
 let general_enclosed : general_enclosed Rule.rule =
   [%spec "<function-token> <any-value> ')' | '(' <ident> <any-value> ')'"]
 
-let general_enclosed_runtime_module_path = Some [%module_path Css_types.GeneralEnclosed]
+let general_enclosed_runtime_module_path =
+  Some [%module_path Css_types.GeneralEnclosed]
 
 let generic_family : generic_family Rule.rule =
   [%spec
     "'serif' | 'sans-serif' | 'cursive' | 'fantasy' | 'monospace' | \
      '-apple-system'"]
 
-let generic_family_runtime_module_path = Some [%module_path Css_types.GenericFamily]
+let generic_family_runtime_module_path =
+  Some [%module_path Css_types.GenericFamily]
 
 let generic_name : generic_name Rule.rule =
   [%spec "'serif' | 'sans-serif' | 'cursive' | 'fantasy' | 'monospace'"]
@@ -7043,7 +7104,8 @@ let generic_name_runtime_module_path = Some [%module_path Css_types.GenericName]
 let generic_voice : generic_voice Rule.rule =
   [%spec "[ <age> ]? <gender> [ <integer> ]?"]
 
-let generic_voice_runtime_module_path = Some [%module_path Css_types.GenericVoice]
+let generic_voice_runtime_module_path =
+  Some [%module_path Css_types.GenericVoice]
 
 let geometry_box : geometry_box Rule.rule =
   [%spec "<shape-box> | 'fill-box' | 'stroke-box' | 'view-box'"]
@@ -7086,7 +7148,9 @@ let image_runtime_module_path = Some [%module_path Css_types.Image]
 let image_set_option : image_set_option Rule.rule =
   [%spec "[ <image> | <string> ] <resolution>"]
 
-let image_set_option_runtime_module_path = Some [%module_path Css_types.ImageSetOption]
+let image_set_option_runtime_module_path =
+  Some [%module_path Css_types.ImageSetOption]
+
 let image_src : image_src Rule.rule = [%spec "<url> | <string>"]
 let image_src_runtime_module_path = Some [%module_path Css_types.ImageSrc]
 let image_tags : image_tags Rule.rule = [%spec "'ltr' | 'rtl'"]
@@ -7097,27 +7161,32 @@ let inflexible_breadth : inflexible_breadth Rule.rule =
     "<extended-length> | <extended-percentage> | 'min-content' | 'max-content' \
      | 'auto'"]
 
-let inflexible_breadth_runtime_module_path = Some [%module_path Css_types.InflexibleBreadth]
+let inflexible_breadth_runtime_module_path =
+  Some [%module_path Css_types.InflexibleBreadth]
 
 let keyframe_block : keyframe_block Rule.rule =
   [%spec "[ <keyframe-selector> ]# '{' <declaration-list> '}'"]
 
-let keyframe_block_runtime_module_path = Some [%module_path Css_types.KeyframeBlock]
+let keyframe_block_runtime_module_path =
+  Some [%module_path Css_types.KeyframeBlock]
 
 let keyframe_block_list : keyframe_block_list Rule.rule =
   [%spec "[ <keyframe-block> ]+"]
 
-let keyframe_block_list_runtime_module_path = Some [%module_path Css_types.KeyframeBlockList]
+let keyframe_block_list_runtime_module_path =
+  Some [%module_path Css_types.KeyframeBlockList]
 
 let keyframe_selector : keyframe_selector Rule.rule =
   [%spec "'from' | 'to' | <extended-percentage>"]
 
-let keyframe_selector_runtime_module_path = Some [%module_path Css_types.KeyframeSelector]
+let keyframe_selector_runtime_module_path =
+  Some [%module_path Css_types.KeyframeSelector]
 
 let keyframes_name : keyframes_name Rule.rule =
   [%spec "<custom-ident> | <string>"]
 
-let keyframes_name_runtime_module_path = Some [%module_path Css_types.KeyframesName]
+let keyframes_name_runtime_module_path =
+  Some [%module_path Css_types.KeyframesName]
 
 let leader_type : leader_type Rule.rule =
   [%spec "'dotted' | 'solid' | 'space' | <string>"]
@@ -7129,7 +7198,8 @@ let left_runtime_module_path = Some [%module_path Css_types.Left]
 let line_name_list : line_name_list Rule.rule =
   [%spec "[ <line-names> | <name-repeat> ]+"]
 
-let line_name_list_runtime_module_path = Some [%module_path Css_types.LineNameList]
+let line_name_list_runtime_module_path =
+  Some [%module_path Css_types.LineNameList]
 
 let line_style : line_style Rule.rule =
   [%spec
@@ -7146,12 +7216,15 @@ let line_width_runtime_module_path = Some [%module_path Css_types.LineWidth]
 let linear_color_hint : linear_color_hint Rule.rule =
   [%spec "<extended-length> | <extended-percentage>"]
 
-let linear_color_hint_runtime_module_path = Some [%module_path Css_types.LinearColorHint]
+let linear_color_hint_runtime_module_path =
+  Some [%module_path Css_types.LinearColorHint]
 
 let linear_color_stop : linear_color_stop Rule.rule =
   [%spec "<color> <length-percentage>?"]
 
-let linear_color_stop_runtime_module_path = Some [%module_path Css_types.LinearColorStop]
+let linear_color_stop_runtime_module_path =
+  Some [%module_path Css_types.LinearColorStop]
+
 let mask_image : mask_image Rule.rule = [%spec "[ <mask-reference> ]#"]
 let mask_image_runtime_module_path = Some [%module_path Css_types.MaskImage]
 
@@ -7169,12 +7242,15 @@ let mask_position : mask_position Rule.rule =
      ] [ <extended-length> | <extended-percentage> | 'top' | 'center' | \
      'bottom' ]?"]
 
-let mask_position_runtime_module_path = Some [%module_path Css_types.MaskPosition]
+let mask_position_runtime_module_path =
+  Some [%module_path Css_types.MaskPosition]
 
 let mask_reference : mask_reference Rule.rule =
   [%spec "'none' | <image> | <mask-source>"]
 
-let mask_reference_runtime_module_path = Some [%module_path Css_types.MaskReference]
+let mask_reference_runtime_module_path =
+  Some [%module_path Css_types.MaskReference]
+
 let mask_source : mask_source Rule.rule = [%spec "<url>"]
 let mask_source_runtime_module_path = Some [%module_path Css_types.MaskSource]
 
@@ -7186,7 +7262,9 @@ let masking_mode_runtime_module_path = Some [%module_path Css_types.MaskingMode]
 let mf_comparison : mf_comparison Rule.rule =
   [%spec "<mf-lt> | <mf-gt> | <mf-eq>"]
 
-let mf_comparison_runtime_module_path = Some [%module_path Css_types.MfComparison]
+let mf_comparison_runtime_module_path =
+  Some [%module_path Css_types.MfComparison]
+
 let mf_eq : mf_eq Rule.rule = [%spec "'='"]
 let mf_eq_runtime_module_path = Some [%module_path Css_types.MfEq]
 let mf_gt : mf_gt Rule.rule = [%spec "'>=' | '>'"]
@@ -7217,12 +7295,15 @@ let mf_plain_runtime_module_path = Some [%module_path Css_types.MfPlain]
 let media_feature : media_feature Rule.rule =
   [%spec "'(' [ <mf-plain> | <mf-boolean> | <mf-range> ] ')'"]
 
-let media_feature_runtime_module_path = Some [%module_path Css_types.MediaFeature]
+let media_feature_runtime_module_path =
+  Some [%module_path Css_types.MediaFeature]
 
 let media_in_parens : media_in_parens Rule.rule =
   [%spec "'(' <media-condition> ')' | <media-feature> | <interpolation>"]
 
-let media_in_parens_runtime_module_path = Some [%module_path Css_types.MediaInParens]
+let media_in_parens_runtime_module_path =
+  Some [%module_path Css_types.MediaInParens]
+
 let media_and : media_and Rule.rule = [%spec "'and' <media-in-parens>"]
 let media_and_runtime_module_path = Some [%module_path Css_types.MediaAnd]
 let media_or : media_or Rule.rule = [%spec "'or' <media-in-parens>"]
@@ -7239,7 +7320,8 @@ let media_condition_without_or_runtime_module_path =
 let media_condition : media_condition Rule.rule =
   [%spec "<media-not> | <media-in-parens> [ <media-and>* | <media-or>* ]"]
 
-let media_condition_runtime_module_path = Some [%module_path Css_types.MediaCondition]
+let media_condition_runtime_module_path =
+  Some [%module_path Css_types.MediaCondition]
 
 let media_query : media_query Rule.rule =
   [%spec
@@ -7251,7 +7333,8 @@ let media_query_runtime_module_path = Some [%module_path Css_types.MediaQuery]
 let media_query_list : media_query_list Rule.rule =
   [%spec "[ <media-query> ]# | <interpolation>"]
 
-let media_query_list_runtime_module_path = Some [%module_path Css_types.MediaQueryList]
+let media_query_list_runtime_module_path =
+  Some [%module_path Css_types.MediaQueryList]
 
 let container_condition_list : container_condition_list Rule.rule =
   [%spec "<container-condition>#"]
@@ -7270,14 +7353,16 @@ let container_query : container_query Rule.rule =
     "'not' <query-in-parens> | <query-in-parens> [ [ 'and' <query-in-parens> \
      ]* | [ 'or' <query-in-parens> ]* ]"]
 
-let container_query_runtime_module_path = Some [%module_path Css_types.ContainerQuery]
+let container_query_runtime_module_path =
+  Some [%module_path Css_types.ContainerQuery]
 
 let query_in_parens : query_in_parens Rule.rule =
   [%spec
     "'(' <container-query> ')' | '(' <size-feature> ')' | style( <style-query> \
      )"]
 
-let query_in_parens_runtime_module_path = Some [%module_path Css_types.QueryInParens]
+let query_in_parens_runtime_module_path =
+  Some [%module_path Css_types.QueryInParens]
 
 let size_feature : size_feature Rule.rule =
   [%spec "<mf-plain> | <mf-boolean> | <mf-range>"]
@@ -7294,12 +7379,14 @@ let style_query_runtime_module_path = Some [%module_path Css_types.StyleQuery]
 let style_feature : style_feature Rule.rule =
   [%spec "<dashed_ident> ':' <mf-value>"]
 
-let style_feature_runtime_module_path = Some [%module_path Css_types.StyleFeature]
+let style_feature_runtime_module_path =
+  Some [%module_path Css_types.StyleFeature]
 
 let style_in_parens : style_in_parens Rule.rule =
   [%spec "'(' <style-query> ')' | '(' <style-feature> ')'"]
 
-let style_in_parens_runtime_module_path = Some [%module_path Css_types.StyleInParens]
+let style_in_parens_runtime_module_path =
+  Some [%module_path Css_types.StyleInParens]
 
 let name_repeat : name_repeat Rule.rule =
   [%spec "repeat( [ <positive-integer> | 'auto-fill' ] ',' [ <line-names> ]+ )"]
@@ -7342,7 +7429,10 @@ let named_color : named_color Rule.rule =
 
 let named_color_runtime_module_path = Some [%module_path Css_types.NamedColor]
 let namespace_prefix : namespace_prefix Rule.rule = [%spec "<ident>"]
-let namespace_prefix_runtime_module_path = Some [%module_path Css_types.NamespacePrefix]
+
+let namespace_prefix_runtime_module_path =
+  Some [%module_path Css_types.NamespacePrefix]
+
 let ns_prefix : ns_prefix Rule.rule = [%spec "[ <ident-token> | '*' ]? '|'"]
 let ns_prefix_runtime_module_path = Some [%module_path Css_types.NsPrefix]
 let nth : nth Rule.rule = [%spec "<an-plus-b> | 'even' | 'odd'"]
@@ -7355,9 +7445,13 @@ let number_one_or_greater_runtime_module_path =
 let number_percentage : number_percentage Rule.rule =
   [%spec "<number> | <extended-percentage>"]
 
-let number_percentage_runtime_module_path = Some [%module_path Css_types.NumberPercentage]
+let number_percentage_runtime_module_path =
+  Some [%module_path Css_types.NumberPercentage]
+
 let number_zero_one : number_zero_one Rule.rule = [%spec "<number>"]
-let number_zero_one_runtime_module_path = Some [%module_path Css_types.NumberZeroOne]
+
+let number_zero_one_runtime_module_path =
+  Some [%module_path Css_types.NumberZeroOne]
 
 let numeric_figure_values : numeric_figure_values Rule.rule =
   [%spec "'lining-nums' | 'oldstyle-nums'"]
@@ -7380,12 +7474,14 @@ let numeric_spacing_values_runtime_module_path =
 let outline_radius : outline_radius Rule.rule =
   [%spec "<extended-length> | <extended-percentage>"]
 
-let outline_radius_runtime_module_path = Some [%module_path Css_types.OutlineRadius]
+let outline_radius_runtime_module_path =
+  Some [%module_path Css_types.OutlineRadius]
 
 let overflow_position : overflow_position Rule.rule =
   [%spec "'unsafe' | 'safe'"]
 
-let overflow_position_runtime_module_path = Some [%module_path Css_types.OverflowPosition]
+let overflow_position_runtime_module_path =
+  Some [%module_path Css_types.OverflowPosition]
 
 let page_body : page_body Rule.rule =
   [%spec
@@ -7396,7 +7492,8 @@ let page_body_runtime_module_path = Some [%module_path Css_types.PageBody]
 let page_margin_box : page_margin_box Rule.rule =
   [%spec "<page-margin-box-type> '{' <declaration-list> '}'"]
 
-let page_margin_box_runtime_module_path = Some [%module_path Css_types.PageMarginBox]
+let page_margin_box_runtime_module_path =
+  Some [%module_path Css_types.PageMarginBox]
 
 let page_margin_box_type : page_margin_box_type Rule.rule =
   [%spec
@@ -7412,12 +7509,14 @@ let page_margin_box_type_runtime_module_path =
 let page_selector : page_selector Rule.rule =
   [%spec "[ <pseudo-page> ]+ | <ident> [ <pseudo-page> ]*"]
 
-let page_selector_runtime_module_path = Some [%module_path Css_types.PageSelector]
+let page_selector_runtime_module_path =
+  Some [%module_path Css_types.PageSelector]
 
 let page_selector_list : page_selector_list Rule.rule =
   [%spec "[ [ <page-selector> ]# ]?"]
 
-let page_selector_list_runtime_module_path = Some [%module_path Css_types.PageSelectorList]
+let page_selector_list_runtime_module_path =
+  Some [%module_path Css_types.PageSelectorList]
 
 let paint : paint Rule.rule =
   [%spec
@@ -7436,7 +7535,9 @@ let position : position Rule.rule =
 
 let position_runtime_module_path = Some [%module_path Css_types.Position]
 let positive_integer : positive_integer Rule.rule = [%spec "<integer>"]
-let positive_integer_runtime_module_path = Some [%module_path Css_types.PositiveInteger]
+
+let positive_integer_runtime_module_path =
+  Some [%module_path Css_types.PositiveInteger]
 
 let property__moz_appearance : property__moz_appearance Rule.rule =
   [%spec
@@ -7488,7 +7589,8 @@ let property__moz_background_clip_runtime_module_path =
 let property__moz_binding : property__moz_binding Rule.rule =
   [%spec "<url> | 'none'"]
 
-let property__moz_binding_runtime_module_path = Some [%module_path Css_types.MozBinding]
+let property__moz_binding_runtime_module_path =
+  Some [%module_path Css_types.MozBinding]
 
 let property__moz_border_bottom_colors :
   property__moz_border_bottom_colors Rule.rule =
@@ -7563,7 +7665,8 @@ let property__moz_control_character_visibility_runtime_module_path =
 let property__moz_float_edge : property__moz_float_edge Rule.rule =
   [%spec "'border-box' | 'content-box' | 'margin-box' | 'padding-box'"]
 
-let property__moz_float_edge_runtime_module_path = Some [%module_path Css_types.MozFloatEdge]
+let property__moz_float_edge_runtime_module_path =
+  Some [%module_path Css_types.MozFloatEdge]
 
 let property__moz_force_broken_image_icon :
   property__moz_force_broken_image_icon Rule.rule =
@@ -7581,7 +7684,8 @@ let property__moz_image_region_runtime_module_path =
 let property__moz_orient : property__moz_orient Rule.rule =
   [%spec "'inline' | 'block' | 'horizontal' | 'vertical'"]
 
-let property__moz_orient_runtime_module_path = Some [%module_path Css_types.MozOrient]
+let property__moz_orient_runtime_module_path =
+  Some [%module_path Css_types.MozOrient]
 
 let property__moz_osx_font_smoothing :
   property__moz_osx_font_smoothing Rule.rule =
@@ -7633,19 +7737,22 @@ let property__moz_stack_sizing_runtime_module_path =
 let property__moz_text_blink : property__moz_text_blink Rule.rule =
   [%spec "'none' | 'blink'"]
 
-let property__moz_text_blink_runtime_module_path = Some [%module_path Css_types.MozTextBlink]
+let property__moz_text_blink_runtime_module_path =
+  Some [%module_path Css_types.MozTextBlink]
 
 let property__moz_user_focus : property__moz_user_focus Rule.rule =
   [%spec
     "'ignore' | 'normal' | 'select-after' | 'select-before' | 'select-menu' | \
      'select-same' | 'select-all' | 'none'"]
 
-let property__moz_user_focus_runtime_module_path = Some [%module_path Css_types.MozUserFocus]
+let property__moz_user_focus_runtime_module_path =
+  Some [%module_path Css_types.MozUserFocus]
 
 let property__moz_user_input : property__moz_user_input Rule.rule =
   [%spec "'auto' | 'none' | 'enabled' | 'disabled'"]
 
-let property__moz_user_input_runtime_module_path = Some [%module_path Css_types.MozUserInput]
+let property__moz_user_input_runtime_module_path =
+  Some [%module_path Css_types.MozUserInput]
 
 let property__moz_user_modify : property__moz_user_modify Rule.rule =
   [%spec "'read-only' | 'read-write' | 'write-only'"]
@@ -7773,7 +7880,8 @@ let property__webkit_mask : property__webkit_mask Rule.rule =
      [ <box> | 'border' | 'padding' | 'content' | 'text' ] || [ <box> | \
      'border' | 'padding' | 'content' ] ]#"]
 
-let property__webkit_mask_runtime_module_path = Some [%module_path Css_types.WebkitMask]
+let property__webkit_mask_runtime_module_path =
+  Some [%module_path Css_types.WebkitMask]
 
 let property__webkit_mask_attachment :
   property__webkit_mask_attachment Rule.rule =
@@ -7953,21 +8061,24 @@ let property_align_content : property_align_content Rule.rule =
     "'normal' | <baseline-position> | <content-distribution> | [ \
      <overflow-position> ]? <content-position>"]
 
-let property_align_content_runtime_module_path = Some [%module_path Css_types.AlignContent]
+let property_align_content_runtime_module_path =
+  Some [%module_path Css_types.AlignContent]
 
 let property_align_items : property_align_items Rule.rule =
   [%spec
     "'normal' | 'stretch' | <baseline-position> | [ <overflow-position> ]? \
      <self-position> | <interpolation>"]
 
-let property_align_items_runtime_module_path = Some [%module_path Css_types.AlignItems]
+let property_align_items_runtime_module_path =
+  Some [%module_path Css_types.AlignItems]
 
 let property_align_self : property_align_self Rule.rule =
   [%spec
     "'auto' | 'normal' | 'stretch' | <baseline-position> | [ \
      <overflow-position> ]? <self-position> | <interpolation>"]
 
-let property_align_self_runtime_module_path = Some [%module_path Css_types.AlignSelf]
+let property_align_self_runtime_module_path =
+  Some [%module_path Css_types.AlignSelf]
 
 let property_alignment_baseline : property_alignment_baseline Rule.rule =
   [%spec
@@ -7986,7 +8097,8 @@ let property_all_runtime_module_path = Some [%module_path Css_types.All]
 let property_animation : property_animation Rule.rule =
   [%spec "[ <single-animation> | <single-animation-no-interp> ]#"]
 
-let property_animation_runtime_module_path = Some [%module_path Css_types.Animation]
+let property_animation_runtime_module_path =
+  Some [%module_path Css_types.Animation]
 
 let property_animation_delay : property_animation_delay Rule.rule =
   [%spec "[ <extended-time> ]#"]
@@ -8040,12 +8152,14 @@ let property_appearance : property_appearance Rule.rule =
     "'none' | 'auto' | 'button' | 'textfield' | 'menulist-button' | \
      <compat-auto>"]
 
-let property_appearance_runtime_module_path = Some [%module_path Css_types.Appearance]
+let property_appearance_runtime_module_path =
+  Some [%module_path Css_types.Appearance]
 
 let property_aspect_ratio : property_aspect_ratio Rule.rule =
   [%spec "'auto' | <ratio>"]
 
-let property_aspect_ratio_runtime_module_path = Some [%module_path Css_types.AspectRatio]
+let property_aspect_ratio_runtime_module_path =
+  Some [%module_path Css_types.AspectRatio]
 
 let property_azimuth : property_azimuth Rule.rule =
   [%spec
@@ -8067,7 +8181,8 @@ let property_backface_visibility_runtime_module_path =
 let property_background : property_background Rule.rule =
   [%spec "[ <bg-layer> ',' ]* <final-bg-layer>"]
 
-let property_background_runtime_module_path = Some [%module_path Css_types.Background]
+let property_background_runtime_module_path =
+  Some [%module_path Css_types.Background]
 
 let property_background_attachment : property_background_attachment Rule.rule =
   [%spec "[ <attachment> ]#"]
@@ -8139,14 +8254,20 @@ let property_background_size_runtime_module_path =
 let property_baseline_shift : property_baseline_shift Rule.rule =
   [%spec "'baseline' | 'sub' | 'super' | <svg-length>"]
 
-let property_baseline_shift_runtime_module_path = Some [%module_path Css_types.BaselineShift]
+let property_baseline_shift_runtime_module_path =
+  Some [%module_path Css_types.BaselineShift]
+
 let property_behavior : property_behavior Rule.rule = [%spec "[ <url> ]+"]
-let property_behavior_runtime_module_path = Some [%module_path Css_types.Behavior]
+
+let property_behavior_runtime_module_path =
+  Some [%module_path Css_types.Behavior]
 
 let property_block_overflow : property_block_overflow Rule.rule =
   [%spec "'clip' | 'ellipsis' | <string>"]
 
-let property_block_overflow_runtime_module_path = Some [%module_path Css_types.BlockOverflow]
+let property_block_overflow_runtime_module_path =
+  Some [%module_path Css_types.BlockOverflow]
+
 let property_block_size : property_block_size Rule.rule = [%spec "<'width'>"]
 
 let property_border : property_border Rule.rule =
@@ -8159,7 +8280,8 @@ let property_border : property_border Rule.rule =
 let property_border_block : property_border_block Rule.rule =
   [%spec "<'border'>"]
 
-let property_border_block_runtime_module_path = Some [%module_path Css_types.BorderBlock]
+let property_border_block_runtime_module_path =
+  Some [%module_path Css_types.BorderBlock]
 
 let property_border_block_color : property_border_block_color Rule.rule =
   [%spec "[ <'border-top-color'> ]{1,2}"]
@@ -8236,7 +8358,8 @@ let property_border_block_width_runtime_module_path =
 let property_border_bottom : property_border_bottom Rule.rule =
   [%spec "<'border'>"]
 
-let property_border_bottom_runtime_module_path = Some [%module_path Css_types.BorderBottom]
+let property_border_bottom_runtime_module_path =
+  Some [%module_path Css_types.BorderBottom]
 
 let property_border_bottom_color : property_border_bottom_color Rule.rule =
   [%spec "<'border-top-color'>"]
@@ -8277,7 +8400,8 @@ let property_border_image : property_border_image Rule.rule =
      <'border-image-width'> | '/' [ <'border-image-width'> ]? '/' \
      <'border-image-outset'> ]? || <'border-image-repeat'>"]
 
-let property_border_image_runtime_module_path = Some [%module_path Css_types.BorderImage]
+let property_border_image_runtime_module_path =
+  Some [%module_path Css_types.BorderImage]
 
 let property_border_image_outset : property_border_image_outset Rule.rule =
   [%spec "[ <extended-length> | <number> ]{1,4}"]
@@ -8313,7 +8437,8 @@ let property_border_image_width_runtime_module_path =
 let property_border_inline : property_border_inline Rule.rule =
   [%spec "<'border'>"]
 
-let property_border_inline_runtime_module_path = Some [%module_path Css_types.BorderInline]
+let property_border_inline_runtime_module_path =
+  Some [%module_path Css_types.BorderInline]
 
 let property_border_inline_color : property_border_inline_color Rule.rule =
   [%spec "[ <'border-top-color'> ]{1,2}"]
@@ -8388,7 +8513,9 @@ let property_border_inline_width_runtime_module_path =
   Some [%module_path Css_types.BorderInlineWidth]
 
 let property_border_left : property_border_left Rule.rule = [%spec "<'border'>"]
-let property_border_left_runtime_module_path = Some [%module_path Css_types.BorderLeft]
+
+let property_border_left_runtime_module_path =
+  Some [%module_path Css_types.BorderLeft]
 
 let property_border_left_color : property_border_left_color Rule.rule =
   [%spec "<color>"]
@@ -8405,12 +8532,14 @@ let property_border_radius : property_border_radius Rule.rule =
     "[ <extended-length> | <extended-percentage> ]{1,4} [ '/' [ \
      <extended-length> | <extended-percentage> ]{1,4} ]?"]
 
-let property_border_radius_runtime_module_path = Some [%module_path Css_types.BorderRadius]
+let property_border_radius_runtime_module_path =
+  Some [%module_path Css_types.BorderRadius]
 
 let property_border_right : property_border_right Rule.rule =
   [%spec "<'border'>"]
 
-let property_border_right_runtime_module_path = Some [%module_path Css_types.BorderRight]
+let property_border_right_runtime_module_path =
+  Some [%module_path Css_types.BorderRight]
 
 let property_border_right_color : property_border_right_color Rule.rule =
   [%spec "<color>"]
@@ -8424,7 +8553,8 @@ let property_border_right_width : property_border_right_width Rule.rule =
 let property_border_spacing : property_border_spacing Rule.rule =
   [%spec "<extended-length> [ <extended-length> ]?"]
 
-let property_border_spacing_runtime_module_path = Some [%module_path Css_types.BorderSpacing]
+let property_border_spacing_runtime_module_path =
+  Some [%module_path Css_types.BorderSpacing]
 
 let property_border_start_end_radius :
   property_border_start_end_radius Rule.rule =
@@ -8438,9 +8568,13 @@ let property_border_start_start_radius :
 let property_border_style : property_border_style Rule.rule =
   [%spec "<line-style>"]
 
-let property_border_style_runtime_module_path = Some [%module_path Css_types.BorderStyle]
+let property_border_style_runtime_module_path =
+  Some [%module_path Css_types.BorderStyle]
+
 let property_border_top : property_border_top Rule.rule = [%spec "<'border'>"]
-let property_border_top_runtime_module_path = Some [%module_path Css_types.BorderTop]
+
+let property_border_top_runtime_module_path =
+  Some [%module_path Css_types.BorderTop]
 
 let property_border_top_color : property_border_top_color Rule.rule =
   [%spec "<color>"]
@@ -8470,7 +8604,8 @@ let property_bottom_runtime_module_path = Some [%module_path Css_types.Bottom]
 let property_box_align : property_box_align Rule.rule =
   [%spec "'start' | 'center' | 'end' | 'baseline' | 'stretch'"]
 
-let property_box_align_runtime_module_path = Some [%module_path Css_types.BoxAlign]
+let property_box_align_runtime_module_path =
+  Some [%module_path Css_types.BoxAlign]
 
 let property_box_decoration_break : property_box_decoration_break Rule.rule =
   [%spec "'slice' | 'clone'"]
@@ -8481,19 +8616,25 @@ let property_box_decoration_break_runtime_module_path =
 let property_box_direction : property_box_direction Rule.rule =
   [%spec "'normal' | 'reverse' | 'inherit'"]
 
-let property_box_direction_runtime_module_path = Some [%module_path Css_types.BoxDirection]
+let property_box_direction_runtime_module_path =
+  Some [%module_path Css_types.BoxDirection]
+
 let property_box_flex : property_box_flex Rule.rule = [%spec "<number>"]
-let property_box_flex_runtime_module_path = Some [%module_path Css_types.BoxFlex]
+
+let property_box_flex_runtime_module_path =
+  Some [%module_path Css_types.BoxFlex]
 
 let property_box_flex_group : property_box_flex_group Rule.rule =
   [%spec "<integer>"]
 
-let property_box_flex_group_runtime_module_path = Some [%module_path Css_types.BoxFlexGroup]
+let property_box_flex_group_runtime_module_path =
+  Some [%module_path Css_types.BoxFlexGroup]
 
 let property_box_lines : property_box_lines Rule.rule =
   [%spec "'single' | 'multiple'"]
 
-let property_box_lines_runtime_module_path = Some [%module_path Css_types.BoxLines]
+let property_box_lines_runtime_module_path =
+  Some [%module_path Css_types.BoxLines]
 
 let property_box_ordinal_group : property_box_ordinal_group Rule.rule =
   [%spec "<integer>"]
@@ -8504,22 +8645,26 @@ let property_box_ordinal_group_runtime_module_path =
 let property_box_orient : property_box_orient Rule.rule =
   [%spec "'horizontal' | 'vertical' | 'inline-axis' | 'block-axis' | 'inherit'"]
 
-let property_box_orient_runtime_module_path = Some [%module_path Css_types.BoxOrient]
+let property_box_orient_runtime_module_path =
+  Some [%module_path Css_types.BoxOrient]
 
 let property_box_pack : property_box_pack Rule.rule =
   [%spec "'start' | 'center' | 'end' | 'justify'"]
 
-let property_box_pack_runtime_module_path = Some [%module_path Css_types.BoxPack]
+let property_box_pack_runtime_module_path =
+  Some [%module_path Css_types.BoxPack]
 
 let property_box_shadow : property_box_shadow Rule.rule =
   [%spec "'none' | <interpolation> | [ <shadow> ]#"]
 
-let property_box_shadow_runtime_module_path = Some [%module_path Css_types.BoxShadow]
+let property_box_shadow_runtime_module_path =
+  Some [%module_path Css_types.BoxShadow]
 
 let property_box_sizing : property_box_sizing Rule.rule =
   [%spec "'content-box' | 'border-box'"]
 
-let property_box_sizing_runtime_module_path = Some [%module_path Css_types.BoxSizing]
+let property_box_sizing_runtime_module_path =
+  Some [%module_path Css_types.BoxSizing]
 
 let property_break_after : property_break_after Rule.rule =
   [%spec
@@ -8527,7 +8672,8 @@ let property_break_after : property_break_after Rule.rule =
      'right' | 'recto' | 'verso' | 'avoid-column' | 'column' | 'avoid-region' \
      | 'region'"]
 
-let property_break_after_runtime_module_path = Some [%module_path Css_types.BreakAfter]
+let property_break_after_runtime_module_path =
+  Some [%module_path Css_types.BreakAfter]
 
 let property_break_before : property_break_before Rule.rule =
   [%spec
@@ -8535,24 +8681,28 @@ let property_break_before : property_break_before Rule.rule =
      'right' | 'recto' | 'verso' | 'avoid-column' | 'column' | 'avoid-region' \
      | 'region'"]
 
-let property_break_before_runtime_module_path = Some [%module_path Css_types.BreakBefore]
+let property_break_before_runtime_module_path =
+  Some [%module_path Css_types.BreakBefore]
 
 let property_break_inside : property_break_inside Rule.rule =
   [%spec "'auto' | 'avoid' | 'avoid-page' | 'avoid-column' | 'avoid-region'"]
 
-let property_break_inside_runtime_module_path = Some [%module_path Css_types.BreakInside]
+let property_break_inside_runtime_module_path =
+  Some [%module_path Css_types.BreakInside]
 
 let property_caption_side : property_caption_side Rule.rule =
   [%spec
     "'top' | 'bottom' | 'block-start' | 'block-end' | 'inline-start' | \
      'inline-end'"]
 
-let property_caption_side_runtime_module_path = Some [%module_path Css_types.CaptionSide]
+let property_caption_side_runtime_module_path =
+  Some [%module_path Css_types.CaptionSide]
 
 let property_caret_color : property_caret_color Rule.rule =
   [%spec "'auto' | <color>"]
 
-let property_caret_color_runtime_module_path = Some [%module_path Css_types.CaretColor]
+let property_caret_color_runtime_module_path =
+  Some [%module_path Css_types.CaretColor]
 
 let property_clear : property_clear Rule.rule =
   [%spec "'none' | 'left' | 'right' | 'both' | 'inline-start' | 'inline-end'"]
@@ -8564,12 +8714,15 @@ let property_clip_runtime_module_path = Some [%module_path Css_types.Clip]
 let property_clip_path : property_clip_path Rule.rule =
   [%spec "<clip-source> | <basic-shape> || <geometry-box> | 'none'"]
 
-let property_clip_path_runtime_module_path = Some [%module_path Css_types.ClipPath]
+let property_clip_path_runtime_module_path =
+  Some [%module_path Css_types.ClipPath]
 
 let property_clip_rule : property_clip_rule Rule.rule =
   [%spec "'nonzero' | 'evenodd'"]
 
-let property_clip_rule_runtime_module_path = Some [%module_path Css_types.ClipRule]
+let property_clip_rule_runtime_module_path =
+  Some [%module_path Css_types.ClipRule]
+
 let property_color : property_color Rule.rule = [%spec "<color>"]
 let property_color_runtime_module_path = Some [%module_path Css_types.Color]
 
@@ -8589,17 +8742,20 @@ let property_color_interpolation_runtime_module_path =
 let property_color_adjust : property_color_adjust Rule.rule =
   [%spec "'economy' | 'exact'"]
 
-let property_color_adjust_runtime_module_path = Some [%module_path Css_types.ColorAdjust]
+let property_color_adjust_runtime_module_path =
+  Some [%module_path Css_types.ColorAdjust]
 
 let property_column_count : property_column_count Rule.rule =
   [%spec "<integer> | 'auto'"]
 
-let property_column_count_runtime_module_path = Some [%module_path Css_types.ColumnCount]
+let property_column_count_runtime_module_path =
+  Some [%module_path Css_types.ColumnCount]
 
 let property_column_fill : property_column_fill Rule.rule =
   [%spec "'auto' | 'balance' | 'balance-all'"]
 
-let property_column_fill_runtime_module_path = Some [%module_path Css_types.ColumnFill]
+let property_column_fill_runtime_module_path =
+  Some [%module_path Css_types.ColumnFill]
 
 let property_column_gap : property_column_gap Rule.rule =
   [%spec "'normal' | <extended-length> | <extended-percentage>"]
@@ -8608,7 +8764,8 @@ let property_column_rule : property_column_rule Rule.rule =
   [%spec
     "<'column-rule-width'> || <'column-rule-style'> || <'column-rule-color'>"]
 
-let property_column_rule_runtime_module_path = Some [%module_path Css_types.ColumnRule]
+let property_column_rule_runtime_module_path =
+  Some [%module_path Css_types.ColumnRule]
 
 let property_column_rule_color : property_column_rule_color Rule.rule =
   [%spec "<color>"]
@@ -8631,12 +8788,14 @@ let property_column_rule_width_runtime_module_path =
 let property_column_span : property_column_span Rule.rule =
   [%spec "'none' | 'all'"]
 
-let property_column_span_runtime_module_path = Some [%module_path Css_types.ColumnSpan]
+let property_column_span_runtime_module_path =
+  Some [%module_path Css_types.ColumnSpan]
 
 let property_column_width : property_column_width Rule.rule =
   [%spec "<extended-length> | 'auto'"]
 
-let property_column_width_runtime_module_path = Some [%module_path Css_types.ColumnWidth]
+let property_column_width_runtime_module_path =
+  Some [%module_path Css_types.ColumnWidth]
 
 let property_columns : property_columns Rule.rule =
   [%spec "<'column-width'> || <'column-count'>"]
@@ -8671,12 +8830,14 @@ let property_counter_increment_runtime_module_path =
 let property_counter_reset : property_counter_reset Rule.rule =
   [%spec "[ <custom-ident> [ <integer> ]? ]+ | 'none'"]
 
-let property_counter_reset_runtime_module_path = Some [%module_path Css_types.CounterReset]
+let property_counter_reset_runtime_module_path =
+  Some [%module_path Css_types.CounterReset]
 
 let property_counter_set : property_counter_set Rule.rule =
   [%spec "[ <custom-ident> [ <integer> ]? ]+ | 'none'"]
 
-let property_counter_set_runtime_module_path = Some [%module_path Css_types.CounterSet]
+let property_counter_set_runtime_module_path =
+  Some [%module_path Css_types.CounterSet]
 
 let property_cue : property_cue Rule.rule =
   [%spec "<'cue-before'> [ <'cue-after'> ]?"]
@@ -8686,12 +8847,14 @@ let property_cue_runtime_module_path = Some [%module_path Css_types.Cue]
 let property_cue_after : property_cue_after Rule.rule =
   [%spec "<url> [ <decibel> ]? | 'none'"]
 
-let property_cue_after_runtime_module_path = Some [%module_path Css_types.CueAfter]
+let property_cue_after_runtime_module_path =
+  Some [%module_path Css_types.CueAfter]
 
 let property_cue_before : property_cue_before Rule.rule =
   [%spec "<url> [ <decibel> ]? | 'none'"]
 
-let property_cue_before_runtime_module_path = Some [%module_path Css_types.CueBefore]
+let property_cue_before_runtime_module_path =
+  Some [%module_path Css_types.CueBefore]
 
 (* type property_cursor = [%spec_t "[ <url> [ <x> <y> ]? ',' ]* [ 'auto' | 'default' | 'none' | 'context-menu' | 'help' | 'pointer' | 'progress' | 'wait' | 'cell' | 'crosshair' | 'text' | 'vertical-text' | 'alias' | 'copy' | 'move' | 'no-drop' | 'not-allowed' | 'e-resize' | 'n-resize' | 'ne-resize' | 'nw-resize' | 's-resize' | 'se-resize' | 'sw-resize' | 'w-resize' | 'ew-resize' | 'ns-resize' | 'nesw-resize' | 'nwse-resize' | 'col-resize' | 'row-resize' | 'all-scroll' | 'zoom-in' | 'zoom-out' | 'grab' | 'grabbing' | 'hand' | '-webkit-grab' | '-webkit-grabbing' | '-webkit-zoom-in' | '-webkit-zoom-out' | '-moz-grab' | '-moz-grabbing' | '-moz-zoom-in' | '-moz-zoom-out' ] | <interpolation>"]
 let property_cursor : property_cursor Rule.rule = [%spec "[ <url> [ <x> <y> ]? ',' ]* [ 'auto' | 'default' | 'none' | 'context-menu' | 'help' | 'pointer' | 'progress' | 'wait' | 'cell' | 'crosshair' | 'text' | 'vertical-text' | 'alias' | 'copy' | 'move' | 'no-drop' | 'not-allowed' | 'e-resize' | 'n-resize' | 'ne-resize' | 'nw-resize' | 's-resize' | 'se-resize' | 'sw-resize' | 'w-resize' | 'ew-resize' | 'ns-resize' | 'nesw-resize' | 'nwse-resize' | 'col-resize' | 'row-resize' | 'all-scroll' | 'zoom-in' | 'zoom-out' | 'grab' | 'grabbing' | 'hand' | '-webkit-grab' | '-webkit-grabbing' | '-webkit-zoom-in' | '-webkit-zoom-out' | '-moz-grab' | '-moz-grabbing' | '-moz-zoom-in' | '-moz-zoom-out' ] | <interpolation>"]
@@ -8711,7 +8874,9 @@ let property_cursor : property_cursor Rule.rule =
 
 let property_cursor_runtime_module_path = Some [%module_path Css_types.Cursor]
 let property_direction : property_direction Rule.rule = [%spec "'ltr' | 'rtl'"]
-let property_direction_runtime_module_path = Some [%module_path Css_types.Direction]
+
+let property_direction_runtime_module_path =
+  Some [%module_path Css_types.Direction]
 
 let property_display : property_display Rule.rule =
   [%spec
@@ -8739,19 +8904,23 @@ let property_dominant_baseline_runtime_module_path =
 let property_empty_cells : property_empty_cells Rule.rule =
   [%spec "'show' | 'hide'"]
 
-let property_empty_cells_runtime_module_path = Some [%module_path Css_types.EmptyCells]
+let property_empty_cells_runtime_module_path =
+  Some [%module_path Css_types.EmptyCells]
+
 let property_fill : property_fill Rule.rule = [%spec "<paint>"]
 let property_fill_runtime_module_path = Some [%module_path Css_types.Paint]
 
 let property_fill_opacity : property_fill_opacity Rule.rule =
   [%spec "<alpha-value>"]
 
-let property_fill_opacity_runtime_module_path = Some [%module_path Css_types.FillOpacity]
+let property_fill_opacity_runtime_module_path =
+  Some [%module_path Css_types.FillOpacity]
 
 let property_fill_rule : property_fill_rule Rule.rule =
   [%spec "'nonzero' | 'evenodd'"]
 
-let property_fill_rule_runtime_module_path = Some [%module_path Css_types.FillRule]
+let property_fill_rule_runtime_module_path =
+  Some [%module_path Css_types.FillRule]
 
 let property_filter : property_filter Rule.rule =
   [%spec "'none' | <interpolation> | <filter-function-list>"]
@@ -8768,32 +8937,38 @@ let property_flex_runtime_module_path = Some [%module_path Css_types.Flex]
 let property_flex_basis : property_flex_basis Rule.rule =
   [%spec "'content' | <'width'> | <interpolation>"]
 
-let property_flex_basis_runtime_module_path = Some [%module_path Css_types.FlexBasis]
+let property_flex_basis_runtime_module_path =
+  Some [%module_path Css_types.FlexBasis]
 
 let property_flex_direction : property_flex_direction Rule.rule =
   [%spec "'row' | 'row-reverse' | 'column' | 'column-reverse'"]
 
-let property_flex_direction_runtime_module_path = Some [%module_path Css_types.FlexDirection]
+let property_flex_direction_runtime_module_path =
+  Some [%module_path Css_types.FlexDirection]
 
 let property_flex_flow : property_flex_flow Rule.rule =
   [%spec "<'flex-direction'> || <'flex-wrap'>"]
 
-let property_flex_flow_runtime_module_path = Some [%module_path Css_types.FlexFlow]
+let property_flex_flow_runtime_module_path =
+  Some [%module_path Css_types.FlexFlow]
 
 let property_flex_grow : property_flex_grow Rule.rule =
   [%spec "<number> | <interpolation>"]
 
-let property_flex_grow_runtime_module_path = Some [%module_path Css_types.FlexGrow]
+let property_flex_grow_runtime_module_path =
+  Some [%module_path Css_types.FlexGrow]
 
 let property_flex_shrink : property_flex_shrink Rule.rule =
   [%spec "<number> | <interpolation>"]
 
-let property_flex_shrink_runtime_module_path = Some [%module_path Css_types.FlexShrink]
+let property_flex_shrink_runtime_module_path =
+  Some [%module_path Css_types.FlexShrink]
 
 let property_flex_wrap : property_flex_wrap Rule.rule =
   [%spec "'nowrap' | 'wrap' | 'wrap-reverse'"]
 
-let property_flex_wrap_runtime_module_path = Some [%module_path Css_types.FlexWrap]
+let property_flex_wrap_runtime_module_path =
+  Some [%module_path Css_types.FlexWrap]
 
 let property_float : property_float Rule.rule =
   [%spec "'left' | 'right' | 'none' | 'inline-start' | 'inline-end'"]
@@ -8812,12 +8987,14 @@ let property_font_runtime_module_path = Some [%module_path Css_types.Font]
 let font_families : font_families Rule.rule =
   [%spec "[ <family-name> | <generic-family> | <interpolation> ]#"]
 
-let font_families_runtime_module_path = Some [%module_path Css_types.FontFamilies]
+let font_families_runtime_module_path =
+  Some [%module_path Css_types.FontFamilies]
 
 let property_font_family : property_font_family Rule.rule =
   [%spec "<font_families> | <interpolation>"]
 
-let property_font_family_runtime_module_path = Some [%module_path Css_types.FontFamily]
+let property_font_family_runtime_module_path =
+  Some [%module_path Css_types.FontFamily]
 
 let property_font_feature_settings : property_font_feature_settings Rule.rule =
   [%spec "'normal' | [ <feature-tag-value> ]#"]
@@ -8828,12 +9005,14 @@ let property_font_feature_settings_runtime_module_path =
 let property_font_display : property_font_display Rule.rule =
   [%spec "'auto' | 'block' | 'swap' | 'fallback' | 'optional'"]
 
-let property_font_display_runtime_module_path = Some [%module_path Css_types.FontDisplay]
+let property_font_display_runtime_module_path =
+  Some [%module_path Css_types.FontDisplay]
 
 let property_font_kerning : property_font_kerning Rule.rule =
   [%spec "'auto' | 'normal' | 'none'"]
 
-let property_font_kerning_runtime_module_path = Some [%module_path Css_types.FontKerning]
+let property_font_kerning_runtime_module_path =
+  Some [%module_path Css_types.FontKerning]
 
 let property_font_language_override : property_font_language_override Rule.rule
     =
@@ -8851,14 +9030,16 @@ let property_font_optical_sizing_runtime_module_path =
 let property_font_palette : property_font_palette Rule.rule =
   [%spec "'normal' | 'light' | 'dark'"]
 
-let property_font_palette_runtime_module_path = Some [%module_path Css_types.FontPalette]
+let property_font_palette_runtime_module_path =
+  Some [%module_path Css_types.FontPalette]
 
 let property_font_size : property_font_size Rule.rule =
   [%spec
     "<absolute-size> | <relative-size> | <extended-length> | \
      <extended-percentage>"]
 
-let property_font_size_runtime_module_path = Some [%module_path Css_types.FontSize]
+let property_font_size_runtime_module_path =
+  Some [%module_path Css_types.FontSize]
 
 let property_font_size_adjust : property_font_size_adjust Rule.rule =
   [%spec "'none' | <number>"]
@@ -8869,24 +9050,28 @@ let property_font_size_adjust_runtime_module_path =
 let property_font_smooth : property_font_smooth Rule.rule =
   [%spec "'auto' | 'never' | 'always' | <absolute-size> | <extended-length>"]
 
-let property_font_smooth_runtime_module_path = Some [%module_path Css_types.FontSmooth]
+let property_font_smooth_runtime_module_path =
+  Some [%module_path Css_types.FontSmooth]
 
 let property_font_stretch : property_font_stretch Rule.rule =
   [%spec "<font-stretch-absolute>"]
 
-let property_font_stretch_runtime_module_path = Some [%module_path Css_types.FontStretch]
+let property_font_stretch_runtime_module_path =
+  Some [%module_path Css_types.FontStretch]
 
 let property_font_style : property_font_style Rule.rule =
   [%spec
     "'normal' | 'italic' | 'oblique' | <interpolation> | [ 'oblique' \
      <extended-angle> ]?"]
 
-let property_font_style_runtime_module_path = Some [%module_path Css_types.FontStyle]
+let property_font_style_runtime_module_path =
+  Some [%module_path Css_types.FontStyle]
 
 let property_font_synthesis : property_font_synthesis Rule.rule =
   [%spec "'none' | [ 'weight' || 'style' || 'small-caps' || 'position' ]"]
 
-let property_font_synthesis_runtime_module_path = Some [%module_path Css_types.FontSynthesis]
+let property_font_synthesis_runtime_module_path =
+  Some [%module_path Css_types.FontSynthesis]
 
 let property_font_synthesis_weight : property_font_synthesis_weight Rule.rule =
   [%spec "'auto' | 'none'"]
@@ -8929,7 +9114,8 @@ let property_font_variant : property_font_variant Rule.rule =
      <east-asian-variant-values> || <east-asian-width-values> || 'ruby' || \
      'sub' || 'super' || 'text' || 'emoji' || 'unicode'"]
 
-let property_font_variant_runtime_module_path = Some [%module_path Css_types.FontVariant]
+let property_font_variant_runtime_module_path =
+  Some [%module_path Css_types.FontVariant]
 
 let property_font_variant_alternates :
   property_font_variant_alternates Rule.rule =
@@ -8998,7 +9184,8 @@ let property_font_variant_emoji_runtime_module_path =
 let property_font_weight : property_font_weight Rule.rule =
   [%spec "<font-weight-absolute> | 'bolder' | 'lighter' | <interpolation>"]
 
-let property_font_weight_runtime_module_path = Some [%module_path Css_types.FontWeight]
+let property_font_weight_runtime_module_path =
+  Some [%module_path Css_types.FontWeight]
 
 let property_gap : property_gap Rule.rule =
   [%spec "<'row-gap'> [ <'column-gap'> ]?"]
@@ -9030,7 +9217,8 @@ let property_grid_runtime_module_path = Some [%module_path Css_types.Grid]
 let property_grid_area : property_grid_area Rule.rule =
   [%spec "<grid-line> [ '/' <grid-line> ]{0,3}"]
 
-let property_grid_area_runtime_module_path = Some [%module_path Css_types.GridArea]
+let property_grid_area_runtime_module_path =
+  Some [%module_path Css_types.GridArea]
 
 let property_grid_auto_columns : property_grid_auto_columns Rule.rule =
   [%spec "[ <track-size> ]+"]
@@ -9041,17 +9229,20 @@ let property_grid_auto_columns_runtime_module_path =
 let property_grid_auto_flow : property_grid_auto_flow Rule.rule =
   [%spec "[ [ 'row' | 'column' ] || 'dense' ] | <interpolation>"]
 
-let property_grid_auto_flow_runtime_module_path = Some [%module_path Css_types.GridAutoFlow]
+let property_grid_auto_flow_runtime_module_path =
+  Some [%module_path Css_types.GridAutoFlow]
 
 let property_grid_auto_rows : property_grid_auto_rows Rule.rule =
   [%spec "[ <track-size> ]+"]
 
-let property_grid_auto_rows_runtime_module_path = Some [%module_path Css_types.GridAutoRows]
+let property_grid_auto_rows_runtime_module_path =
+  Some [%module_path Css_types.GridAutoRows]
 
 let property_grid_column : property_grid_column Rule.rule =
   [%spec "<grid-line> [ '/' <grid-line> ]?"]
 
-let property_grid_column_runtime_module_path = Some [%module_path Css_types.GridColumn]
+let property_grid_column_runtime_module_path =
+  Some [%module_path Css_types.GridColumn]
 
 let property_grid_column_end : property_grid_column_end Rule.rule =
   [%spec "<grid-line>"]
@@ -9074,12 +9265,14 @@ let property_grid_gap : property_grid_gap Rule.rule =
 let property_grid_row : property_grid_row Rule.rule =
   [%spec "<grid-line> [ '/' <grid-line> ]?"]
 
-let property_grid_row_runtime_module_path = Some [%module_path Css_types.GridRow]
+let property_grid_row_runtime_module_path =
+  Some [%module_path Css_types.GridRow]
 
 let property_grid_row_end : property_grid_row_end Rule.rule =
   [%spec "<grid-line>"]
 
-let property_grid_row_end_runtime_module_path = Some [%module_path Css_types.GridRowEnd]
+let property_grid_row_end_runtime_module_path =
+  Some [%module_path Css_types.GridRowEnd]
 
 let property_grid_row_gap : property_grid_row_gap Rule.rule =
   [%spec "<extended-length> | <extended-percentage>"]
@@ -9087,7 +9280,8 @@ let property_grid_row_gap : property_grid_row_gap Rule.rule =
 let property_grid_row_start : property_grid_row_start Rule.rule =
   [%spec "<grid-line>"]
 
-let property_grid_row_start_runtime_module_path = Some [%module_path Css_types.GridRowStart]
+let property_grid_row_start_runtime_module_path =
+  Some [%module_path Css_types.GridRowStart]
 
 let property_grid_template : property_grid_template Rule.rule =
   [%spec
@@ -9095,7 +9289,8 @@ let property_grid_template : property_grid_template Rule.rule =
      <line-names> ]? <string> [ <track-size> ]? [ <line-names> ]? ]+ [ '/' \
      <explicit-track-list> ]?"]
 
-let property_grid_template_runtime_module_path = Some [%module_path Css_types.GridTemplate]
+let property_grid_template_runtime_module_path =
+  Some [%module_path Css_types.GridTemplate]
 
 let property_grid_template_areas : property_grid_template_areas Rule.rule =
   [%spec "'none' | [ <string> | <interpolation> ]+"]
@@ -9183,12 +9378,14 @@ let property_image_resolution_runtime_module_path =
 let property_ime_mode : property_ime_mode Rule.rule =
   [%spec "'auto' | 'normal' | 'active' | 'inactive' | 'disabled'"]
 
-let property_ime_mode_runtime_module_path = Some [%module_path Css_types.ImeMode]
+let property_ime_mode_runtime_module_path =
+  Some [%module_path Css_types.ImeMode]
 
 let property_initial_letter : property_initial_letter Rule.rule =
   [%spec "'normal' | <number> [ <integer> ]?"]
 
-let property_initial_letter_runtime_module_path = Some [%module_path Css_types.InitialLetter]
+let property_initial_letter_runtime_module_path =
+  Some [%module_path Css_types.InitialLetter]
 
 let property_initial_letter_align : property_initial_letter_align Rule.rule =
   [%spec "'auto' | 'alphabetic' | 'hanging' | 'ideographic'"]
@@ -9203,7 +9400,8 @@ let property_inset_runtime_module_path = Some [%module_path Css_types.Inset]
 let property_inset_block : property_inset_block Rule.rule =
   [%spec "[ <'top'> ]{1,2}"]
 
-let property_inset_block_runtime_module_path = Some [%module_path Css_types.InsetBlock]
+let property_inset_block_runtime_module_path =
+  Some [%module_path Css_types.InsetBlock]
 
 let property_inset_block_end : property_inset_block_end Rule.rule =
   [%spec "<'top'>"]
@@ -9214,7 +9412,8 @@ let property_inset_block_start : property_inset_block_start Rule.rule =
 let property_inset_inline : property_inset_inline Rule.rule =
   [%spec "[ <'top'> ]{1,2}"]
 
-let property_inset_inline_runtime_module_path = Some [%module_path Css_types.InsetInline]
+let property_inset_inline_runtime_module_path =
+  Some [%module_path Css_types.InsetInline]
 
 let property_inset_inline_end : property_inset_inline_end Rule.rule =
   [%spec "<'top'>"]
@@ -9225,7 +9424,8 @@ let property_inset_inline_start : property_inset_inline_start Rule.rule =
 let property_isolation : property_isolation Rule.rule =
   [%spec "'auto' | 'isolate'"]
 
-let property_isolation_runtime_module_path = Some [%module_path Css_types.Isolation]
+let property_isolation_runtime_module_path =
+  Some [%module_path Css_types.Isolation]
 
 let property_justify_content : property_justify_content Rule.rule =
   [%spec
@@ -9241,14 +9441,16 @@ let property_justify_items : property_justify_items Rule.rule =
      <self-position> | 'left' | 'right' ] | 'legacy' | 'legacy' && [ 'left' | \
      'right' | 'center' ]"]
 
-let property_justify_items_runtime_module_path = Some [%module_path Css_types.JustifyItems]
+let property_justify_items_runtime_module_path =
+  Some [%module_path Css_types.JustifyItems]
 
 let property_justify_self : property_justify_self Rule.rule =
   [%spec
     "'auto' | 'normal' | 'stretch' | <baseline-position> | [ \
      <overflow-position> ]? [ <self-position> | 'left' | 'right' ]"]
 
-let property_justify_self_runtime_module_path = Some [%module_path Css_types.JustifySelf]
+let property_justify_self_runtime_module_path =
+  Some [%module_path Css_types.JustifySelf]
 
 let property_kerning : property_kerning Rule.rule =
   [%spec "'auto' | <svg-length>"]
@@ -9258,7 +9460,8 @@ let property_kerning_runtime_module_path = Some [%module_path Css_types.Kerning]
 let property_layout_grid : property_layout_grid Rule.rule =
   [%spec "'auto' | <custom-ident> | <integer> && [ <custom-ident> ]?"]
 
-let property_layout_grid_runtime_module_path = Some [%module_path Css_types.LayoutGrid]
+let property_layout_grid_runtime_module_path =
+  Some [%module_path Css_types.LayoutGrid]
 
 let property_layout_grid_char : property_layout_grid_char Rule.rule =
   [%spec "'auto' | <custom-ident> | <string>"]
@@ -9292,23 +9495,27 @@ let property_left_runtime_module_path = Some [%module_path Css_types.Left]
 let property_letter_spacing : property_letter_spacing Rule.rule =
   [%spec "'normal' | <extended-length> | <extended-percentage>"]
 
-let property_letter_spacing_runtime_module_path = Some [%module_path Css_types.LetterSpacing]
+let property_letter_spacing_runtime_module_path =
+  Some [%module_path Css_types.LetterSpacing]
 
 let property_line_break : property_line_break Rule.rule =
   [%spec
     "'auto' | 'loose' | 'normal' | 'strict' | 'anywhere' | <interpolation>"]
 
-let property_line_break_runtime_module_path = Some [%module_path Css_types.LineBreak]
+let property_line_break_runtime_module_path =
+  Some [%module_path Css_types.LineBreak]
 
 let property_line_clamp : property_line_clamp Rule.rule =
   [%spec "'none' | <integer>"]
 
-let property_line_clamp_runtime_module_path = Some [%module_path Css_types.LineClamp]
+let property_line_clamp_runtime_module_path =
+  Some [%module_path Css_types.LineClamp]
 
 let property_line_height : property_line_height Rule.rule =
   [%spec "'normal' | <number> | <extended-length> | <extended-percentage>"]
 
-let property_line_height_runtime_module_path = Some [%module_path Css_types.LineHeight]
+let property_line_height_runtime_module_path =
+  Some [%module_path Css_types.LineHeight]
 
 let property_line_height_step : property_line_height_step Rule.rule =
   [%spec "<extended-length>"]
@@ -9320,7 +9527,8 @@ let property_list_style : property_list_style Rule.rule =
   [%spec
     "<'list-style-type'> || <'list-style-position'> || <'list-style-image'>"]
 
-let property_list_style_runtime_module_path = Some [%module_path Css_types.ListStyle]
+let property_list_style_runtime_module_path =
+  Some [%module_path Css_types.ListStyle]
 
 let property_list_style_image : property_list_style_image Rule.rule =
   [%spec "'none' | <image>"]
@@ -9350,7 +9558,8 @@ let property_margin_runtime_module_path = Some [%module_path Css_types.Margin]
 let property_margin_block : property_margin_block Rule.rule =
   [%spec "[ <'margin-left'> ]{1,2}"]
 
-let property_margin_block_runtime_module_path = Some [%module_path Css_types.MarginBlock]
+let property_margin_block_runtime_module_path =
+  Some [%module_path Css_types.MarginBlock]
 
 let property_margin_block_end : property_margin_block_end Rule.rule =
   [%spec "<'margin-left'>"]
@@ -9364,7 +9573,8 @@ let property_margin_bottom : property_margin_bottom Rule.rule =
 let property_margin_inline : property_margin_inline Rule.rule =
   [%spec "[ <'margin-left'> ]{1,2}"]
 
-let property_margin_inline_runtime_module_path = Some [%module_path Css_types.MarginInline]
+let property_margin_inline_runtime_module_path =
+  Some [%module_path Css_types.MarginInline]
 
 let property_margin_inline_end : property_margin_inline_end Rule.rule =
   [%spec "<'margin-left'>"]
@@ -9384,24 +9594,30 @@ let property_margin_top : property_margin_top Rule.rule =
 let property_margin_trim : property_margin_trim Rule.rule =
   [%spec "'none' | 'in-flow' | 'all'"]
 
-let property_margin_trim_runtime_module_path = Some [%module_path Css_types.MarginTrim]
+let property_margin_trim_runtime_module_path =
+  Some [%module_path Css_types.MarginTrim]
+
 let property_marker : property_marker Rule.rule = [%spec "'none' | <url>"]
 let property_marker_runtime_module_path = Some [%module_path Css_types.Marker]
 
 let property_marker_end : property_marker_end Rule.rule =
   [%spec "'none' | <url>"]
 
-let property_marker_end_runtime_module_path = Some [%module_path Css_types.MarkerEnd]
+let property_marker_end_runtime_module_path =
+  Some [%module_path Css_types.MarkerEnd]
 
 let property_marker_mid : property_marker_mid Rule.rule =
   [%spec "'none' | <url>"]
 
-let property_marker_mid_runtime_module_path = Some [%module_path Css_types.MarkerMid]
+let property_marker_mid_runtime_module_path =
+  Some [%module_path Css_types.MarkerMid]
 
 let property_marker_start : property_marker_start Rule.rule =
   [%spec "'none' | <url>"]
 
-let property_marker_start_runtime_module_path = Some [%module_path Css_types.MarkerStart]
+let property_marker_start_runtime_module_path =
+  Some [%module_path Css_types.MarkerStart]
+
 let property_mask : property_mask Rule.rule = [%spec "[ <mask-layer> ]#"]
 let property_mask_runtime_module_path = Some [%module_path Css_types.Mask]
 
@@ -9411,7 +9627,8 @@ let property_mask_border : property_mask_border Rule.rule =
      <'mask-border-width'> ]? [ '/' <'mask-border-outset'> ]? ]? || \
      <'mask-border-repeat'> || <'mask-border-mode'>"]
 
-let property_mask_border_runtime_module_path = Some [%module_path Css_types.MaskBorder]
+let property_mask_border_runtime_module_path =
+  Some [%module_path Css_types.MaskBorder]
 
 let property_mask_border_mode : property_mask_border_mode Rule.rule =
   [%spec "'luminance' | 'alpha'"]
@@ -9453,44 +9670,55 @@ let property_mask_border_width_runtime_module_path =
 let property_mask_clip : property_mask_clip Rule.rule =
   [%spec "[ <geometry-box> | 'no-clip' ]#"]
 
-let property_mask_clip_runtime_module_path = Some [%module_path Css_types.MaskClip]
+let property_mask_clip_runtime_module_path =
+  Some [%module_path Css_types.MaskClip]
 
 let property_mask_composite : property_mask_composite Rule.rule =
   [%spec "[ <compositing-operator> ]#"]
 
-let property_mask_composite_runtime_module_path = Some [%module_path Css_types.MaskComposite]
+let property_mask_composite_runtime_module_path =
+  Some [%module_path Css_types.MaskComposite]
 
 let property_mask_image : property_mask_image Rule.rule =
   [%spec "[ <mask-reference> ]#"]
 
-let property_mask_image_runtime_module_path = Some [%module_path Css_types.MaskImage]
+let property_mask_image_runtime_module_path =
+  Some [%module_path Css_types.MaskImage]
 
 let property_mask_mode : property_mask_mode Rule.rule =
   [%spec "[ <masking-mode> ]#"]
 
-let property_mask_mode_runtime_module_path = Some [%module_path Css_types.MaskMode]
+let property_mask_mode_runtime_module_path =
+  Some [%module_path Css_types.MaskMode]
 
 let property_mask_origin : property_mask_origin Rule.rule =
   [%spec "[ <geometry-box> ]#"]
 
-let property_mask_origin_runtime_module_path = Some [%module_path Css_types.MaskOrigin]
+let property_mask_origin_runtime_module_path =
+  Some [%module_path Css_types.MaskOrigin]
 
 let property_mask_position : property_mask_position Rule.rule =
   [%spec "[ <position> ]#"]
 
-let property_mask_position_runtime_module_path = Some [%module_path Css_types.MaskPosition]
+let property_mask_position_runtime_module_path =
+  Some [%module_path Css_types.MaskPosition]
 
 let property_mask_repeat : property_mask_repeat Rule.rule =
   [%spec "[ <repeat-style> ]#"]
 
-let property_mask_repeat_runtime_module_path = Some [%module_path Css_types.MaskRepeat]
+let property_mask_repeat_runtime_module_path =
+  Some [%module_path Css_types.MaskRepeat]
+
 let property_mask_size : property_mask_size Rule.rule = [%spec "[ <bg-size> ]#"]
-let property_mask_size_runtime_module_path = Some [%module_path Css_types.MaskSize]
+
+let property_mask_size_runtime_module_path =
+  Some [%module_path Css_types.MaskSize]
 
 let property_mask_type : property_mask_type Rule.rule =
   [%spec "'luminance' | 'alpha'"]
 
-let property_mask_type_runtime_module_path = Some [%module_path Css_types.MaskType]
+let property_mask_type_runtime_module_path =
+  Some [%module_path Css_types.MaskType]
 
 let property_masonry_auto_flow : property_masonry_auto_flow Rule.rule =
   [%spec "[ 'pack' | 'next' ] || [ 'definite-first' | 'ordered' ]"]
@@ -9507,7 +9735,8 @@ let property_max_height : property_max_height Rule.rule =
      'max-content' | 'fit-content' | fit-content( <extended-length> | \
      <extended-percentage> )"]
 
-let property_max_height_runtime_module_path = Some [%module_path Css_types.MaxHeight]
+let property_max_height_runtime_module_path =
+  Some [%module_path Css_types.MaxHeight]
 
 let property_max_inline_size : property_max_inline_size Rule.rule =
   [%spec "<'max-width'>"]
@@ -9515,7 +9744,8 @@ let property_max_inline_size : property_max_inline_size Rule.rule =
 let property_max_lines : property_max_lines Rule.rule =
   [%spec "'none' | <integer>"]
 
-let property_max_lines_runtime_module_path = Some [%module_path Css_types.MaxLines]
+let property_max_lines_runtime_module_path =
+  Some [%module_path Css_types.MaxLines]
 
 let property_max_width : property_max_width Rule.rule =
   [%spec
@@ -9523,7 +9753,8 @@ let property_max_width : property_max_width Rule.rule =
      'min-content' | 'fit-content' | fit-content( <extended-length> | \
      <extended-percentage> ) | 'fill-available' | <-non-standard-width>"]
 
-let property_max_width_runtime_module_path = Some [%module_path Css_types.MaxWidth]
+let property_max_width_runtime_module_path =
+  Some [%module_path Css_types.MaxWidth]
 
 let property_min_block_size : property_min_block_size Rule.rule =
   [%spec "<'min-width'>"]
@@ -9534,7 +9765,8 @@ let property_min_height : property_min_height Rule.rule =
      'max-content' | 'fit-content' | fit-content( <extended-length> | \
      <extended-percentage> )"]
 
-let property_min_height_runtime_module_path = Some [%module_path Css_types.MinHeight]
+let property_min_height_runtime_module_path =
+  Some [%module_path Css_types.MinHeight]
 
 let property_min_inline_size : property_min_inline_size Rule.rule =
   [%spec "<'min-width'>"]
@@ -9545,12 +9777,14 @@ let property_min_width : property_min_width Rule.rule =
      'min-content' | 'fit-content' | fit-content( <extended-length> | \
      <extended-percentage> ) | 'fill-available' | <-non-standard-width>"]
 
-let property_min_width_runtime_module_path = Some [%module_path Css_types.MinWidth]
+let property_min_width_runtime_module_path =
+  Some [%module_path Css_types.MinWidth]
 
 let property_mix_blend_mode : property_mix_blend_mode Rule.rule =
   [%spec "<blend-mode>"]
 
-let property_mix_blend_mode_runtime_module_path = Some [%module_path Css_types.MixBlendMode]
+let property_mix_blend_mode_runtime_module_path =
+  Some [%module_path Css_types.MixBlendMode]
 
 let property_media_any_hover : property_media_any_hover Rule.rule =
   [%spec "none | hover"]
@@ -9567,7 +9801,8 @@ let property_media_any_pointer_runtime_module_path =
 let property_media_pointer : property_media_pointer Rule.rule =
   [%spec "none | coarse | fine"]
 
-let property_media_pointer_runtime_module_path = Some [%module_path Css_types.MediaPointer]
+let property_media_pointer_runtime_module_path =
+  Some [%module_path Css_types.MediaPointer]
 
 let property_media_max_aspect_ratio : property_media_max_aspect_ratio Rule.rule
     =
@@ -9626,12 +9861,15 @@ let property_forced_color_adjust_runtime_module_path =
   Some [%module_path Css_types.ForcedColorAdjust]
 
 let property_media_grid : property_media_grid Rule.rule = [%spec "<integer>"]
-let property_media_grid_runtime_module_path = Some [%module_path Css_types.MediaGrid]
+
+let property_media_grid_runtime_module_path =
+  Some [%module_path Css_types.MediaGrid]
 
 let property_media_hover : property_media_hover Rule.rule =
   [%spec "'hover' | 'none'"]
 
-let property_media_hover_runtime_module_path = Some [%module_path Css_types.MediaHover]
+let property_media_hover_runtime_module_path =
+  Some [%module_path Css_types.MediaHover]
 
 let property_media_inverted_colors : property_media_inverted_colors Rule.rule =
   [%spec "'inverted' | 'none'"]
@@ -9655,7 +9893,8 @@ let property_media_prefers_color_scheme_runtime_module_path =
 let property_color_scheme : property_color_scheme Rule.rule =
   [%spec "'normal' | [ 'dark' | 'light' | <custom-ident> ]+ && 'only'?"]
 
-let property_color_scheme_runtime_module_path = Some [%module_path Css_types.ColorScheme]
+let property_color_scheme_runtime_module_path =
+  Some [%module_path Css_types.ColorScheme]
 
 let property_media_prefers_contrast : property_media_prefers_contrast Rule.rule
     =
@@ -9698,7 +9937,8 @@ let property_media_scripting_runtime_module_path =
 let property_media_update : property_media_update Rule.rule =
   [%spec "'none' | 'slow' | 'fast'"]
 
-let property_media_update_runtime_module_path = Some [%module_path Css_types.MediaUpdate]
+let property_media_update_runtime_module_path =
+  Some [%module_path Css_types.MediaUpdate]
 
 let property_media_orientation : property_media_orientation Rule.rule =
   [%spec "'portrait' | 'landscape'"]
@@ -9709,7 +9949,8 @@ let property_media_orientation_runtime_module_path =
 let property_object_fit : property_object_fit Rule.rule =
   [%spec "'fill' | 'contain' | 'cover' | 'none' | 'scale-down'"]
 
-let property_object_fit_runtime_module_path = Some [%module_path Css_types.ObjectFit]
+let property_object_fit_runtime_module_path =
+  Some [%module_path Css_types.ObjectFit]
 
 let property_object_position : property_object_position Rule.rule =
   [%spec
@@ -9728,7 +9969,8 @@ let property_offset_runtime_module_path = Some [%module_path Css_types.Offset]
 let property_offset_anchor : property_offset_anchor Rule.rule =
   [%spec "'auto' | <position>"]
 
-let property_offset_anchor_runtime_module_path = Some [%module_path Css_types.OffsetAnchor]
+let property_offset_anchor_runtime_module_path =
+  Some [%module_path Css_types.OffsetAnchor]
 
 let property_offset_distance : property_offset_distance Rule.rule =
   [%spec "<extended-length> | <extended-percentage>"]
@@ -9741,7 +9983,8 @@ let property_offset_path : property_offset_path Rule.rule =
     "'none' | ray( <extended-angle> && [ <ray-size> ]? && [ 'contain' ]? ) | \
      <path()> | <url> | <basic-shape> || <geometry-box>"]
 
-let property_offset_path_runtime_module_path = Some [%module_path Css_types.OffsetPath]
+let property_offset_path_runtime_module_path =
+  Some [%module_path Css_types.OffsetPath]
 
 let property_offset_position : property_offset_position Rule.rule =
   [%spec "'auto' | <position>"]
@@ -9752,7 +9995,9 @@ let property_offset_position_runtime_module_path =
 let property_offset_rotate : property_offset_rotate Rule.rule =
   [%spec "[ 'auto' | 'reverse' ] || <extended-angle>"]
 
-let property_offset_rotate_runtime_module_path = Some [%module_path Css_types.OffsetRotate]
+let property_offset_rotate_runtime_module_path =
+  Some [%module_path Css_types.OffsetRotate]
+
 let property_opacity : property_opacity Rule.rule = [%spec "<alpha-value>"]
 let property_order : property_order Rule.rule = [%spec "<integer>"]
 let property_order_runtime_module_path = Some [%module_path Css_types.Order]
@@ -9775,7 +10020,8 @@ let property_outline_offset : property_outline_offset Rule.rule =
 let property_outline_style : property_outline_style Rule.rule =
   [%spec "'auto' | <line-style> | <interpolation>"]
 
-let property_outline_style_runtime_module_path = Some [%module_path Css_types.OutlineStyle]
+let property_outline_style_runtime_module_path =
+  Some [%module_path Css_types.OutlineStyle]
 
 let property_outline_width : property_outline_width Rule.rule =
   [%spec "<line-width> | <interpolation>"]
@@ -9785,7 +10031,8 @@ let property_overflow : property_overflow Rule.rule =
     "[ 'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' ]{1,2} | \
      <-non-standard-overflow> | <interpolation>"]
 
-let property_overflow_runtime_module_path = Some [%module_path Css_types.Overflow]
+let property_overflow_runtime_module_path =
+  Some [%module_path Css_types.Overflow]
 
 let property_overflow_anchor : property_overflow_anchor Rule.rule =
   [%spec "'auto' | 'none'"]
@@ -9796,7 +10043,8 @@ let property_overflow_anchor_runtime_module_path =
 let property_overflow_block : property_overflow_block Rule.rule =
   [%spec "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"]
 
-let property_overflow_block_runtime_module_path = Some [%module_path Css_types.OverflowBlock]
+let property_overflow_block_runtime_module_path =
+  Some [%module_path Css_types.OverflowBlock]
 
 let property_overflow_clip_margin : property_overflow_clip_margin Rule.rule =
   [%spec "<visual-box> || <extended-length>"]
@@ -9813,7 +10061,8 @@ let property_overflow_inline_runtime_module_path =
 let property_overflow_wrap : property_overflow_wrap Rule.rule =
   [%spec "'normal' | 'break-word' | 'anywhere'"]
 
-let property_overflow_wrap_runtime_module_path = Some [%module_path Css_types.OverflowWrap]
+let property_overflow_wrap_runtime_module_path =
+  Some [%module_path Css_types.OverflowWrap]
 
 let property_overflow_x : property_overflow_x Rule.rule =
   [%spec "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>"]
@@ -9861,7 +10110,8 @@ let property_padding_runtime_module_path = Some [%module_path Css_types.Padding]
 let property_padding_block : property_padding_block Rule.rule =
   [%spec "[ <'padding-left'> ]{1,2}"]
 
-let property_padding_block_runtime_module_path = Some [%module_path Css_types.PaddingBlock]
+let property_padding_block_runtime_module_path =
+  Some [%module_path Css_types.PaddingBlock]
 
 let property_padding_block_end : property_padding_block_end Rule.rule =
   [%spec "<'padding-left'>"]
@@ -9875,7 +10125,8 @@ let property_padding_bottom : property_padding_bottom Rule.rule =
 let property_padding_inline : property_padding_inline Rule.rule =
   [%spec "[ <'padding-left'> ]{1,2}"]
 
-let property_padding_inline_runtime_module_path = Some [%module_path Css_types.PaddingInline]
+let property_padding_inline_runtime_module_path =
+  Some [%module_path Css_types.PaddingInline]
 
 let property_padding_inline_end : property_padding_inline_end Rule.rule =
   [%spec "<'padding-left'>"]
@@ -9913,7 +10164,8 @@ let property_page_break_inside_runtime_module_path =
 let property_paint_order : property_paint_order Rule.rule =
   [%spec "'normal' | 'fill' || 'stroke' || 'markers'"]
 
-let property_paint_order_runtime_module_path = Some [%module_path Css_types.PaintOrder]
+let property_paint_order_runtime_module_path =
+  Some [%module_path Css_types.PaintOrder]
 
 let property_pause : property_pause Rule.rule =
   [%spec "<'pause-before'> [ <'pause-after'> ]?"]
@@ -9925,19 +10177,22 @@ let property_pause_after : property_pause_after Rule.rule =
     "<extended-time> | 'none' | 'x-weak' | 'weak' | 'medium' | 'strong' | \
      'x-strong'"]
 
-let property_pause_after_runtime_module_path = Some [%module_path Css_types.PauseAfter]
+let property_pause_after_runtime_module_path =
+  Some [%module_path Css_types.PauseAfter]
 
 let property_pause_before : property_pause_before Rule.rule =
   [%spec
     "<extended-time> | 'none' | 'x-weak' | 'weak' | 'medium' | 'strong' | \
      'x-strong'"]
 
-let property_pause_before_runtime_module_path = Some [%module_path Css_types.PauseBefore]
+let property_pause_before_runtime_module_path =
+  Some [%module_path Css_types.PauseBefore]
 
 let property_perspective : property_perspective Rule.rule =
   [%spec "'none' | <extended-length>"]
 
-let property_perspective_runtime_module_path = Some [%module_path Css_types.Perspective]
+let property_perspective_runtime_module_path =
+  Some [%module_path Css_types.Perspective]
 
 let property_perspective_origin : property_perspective_origin Rule.rule =
   [%spec "<position>"]
@@ -9948,30 +10203,35 @@ let property_perspective_origin_runtime_module_path =
 let property_place_content : property_place_content Rule.rule =
   [%spec "<'align-content'> [ <'justify-content'> ]?"]
 
-let property_place_content_runtime_module_path = Some [%module_path Css_types.PlaceContent]
+let property_place_content_runtime_module_path =
+  Some [%module_path Css_types.PlaceContent]
 
 let property_place_items : property_place_items Rule.rule =
   [%spec "<'align-items'> [ <'justify-items'> ]?"]
 
-let property_place_items_runtime_module_path = Some [%module_path Css_types.PlaceItems]
+let property_place_items_runtime_module_path =
+  Some [%module_path Css_types.PlaceItems]
 
 let property_place_self : property_place_self Rule.rule =
   [%spec "<'align-self'> [ <'justify-self'> ]?"]
 
-let property_place_self_runtime_module_path = Some [%module_path Css_types.PlaceSelf]
+let property_place_self_runtime_module_path =
+  Some [%module_path Css_types.PlaceSelf]
 
 let property_pointer_events : property_pointer_events Rule.rule =
   [%spec
     "'auto' | 'none' | 'visiblePainted' | 'visibleFill' | 'visibleStroke' | \
      'visible' | 'painted' | 'fill' | 'stroke' | 'all' | 'inherit'"]
 
-let property_pointer_events_runtime_module_path = Some [%module_path Css_types.PointerEvents]
+let property_pointer_events_runtime_module_path =
+  Some [%module_path Css_types.PointerEvents]
 
 let property_position : property_position Rule.rule =
   [%spec
     "'static' | 'relative' | 'absolute' | 'sticky' | 'fixed' | '-webkit-sticky'"]
 
-let property_position_runtime_module_path = Some [%module_path Css_types.Position]
+let property_position_runtime_module_path =
+  Some [%module_path Css_types.Position]
 
 let property_quotes : property_quotes Rule.rule =
   [%spec "'none' | 'auto' | [ <string> <string> ]+"]
@@ -9993,14 +10253,16 @@ let property_rest_after : property_rest_after Rule.rule =
     "<extended-time> | 'none' | 'x-weak' | 'weak' | 'medium' | 'strong' | \
      'x-strong'"]
 
-let property_rest_after_runtime_module_path = Some [%module_path Css_types.RestAfter]
+let property_rest_after_runtime_module_path =
+  Some [%module_path Css_types.RestAfter]
 
 let property_rest_before : property_rest_before Rule.rule =
   [%spec
     "<extended-time> | 'none' | 'x-weak' | 'weak' | 'medium' | 'strong' | \
      'x-strong'"]
 
-let property_rest_before_runtime_module_path = Some [%module_path Css_types.RestBefore]
+let property_rest_before_runtime_module_path =
+  Some [%module_path Css_types.RestBefore]
 
 let property_right : property_right Rule.rule =
   [%spec "<extended-length> | <extended-percentage> | 'auto'"]
@@ -10020,17 +10282,20 @@ let property_row_gap : property_row_gap Rule.rule =
 let property_ruby_align : property_ruby_align Rule.rule =
   [%spec "'start' | 'center' | 'space-between' | 'space-around'"]
 
-let property_ruby_align_runtime_module_path = Some [%module_path Css_types.RubyAlign]
+let property_ruby_align_runtime_module_path =
+  Some [%module_path Css_types.RubyAlign]
 
 let property_ruby_merge : property_ruby_merge Rule.rule =
   [%spec "'separate' | 'collapse' | 'auto'"]
 
-let property_ruby_merge_runtime_module_path = Some [%module_path Css_types.RubyMerge]
+let property_ruby_merge_runtime_module_path =
+  Some [%module_path Css_types.RubyMerge]
 
 let property_ruby_position : property_ruby_position Rule.rule =
   [%spec "'over' | 'under' | 'inter-character'"]
 
-let property_ruby_position_runtime_module_path = Some [%module_path Css_types.RubyPosition]
+let property_ruby_position_runtime_module_path =
+  Some [%module_path Css_types.RubyPosition]
 
 let property_scale : property_scale Rule.rule =
   [%spec "'none' | [ <number-percentage> ]{1,3}"]
@@ -10046,7 +10311,8 @@ let property_scroll_behavior_runtime_module_path =
 let property_scroll_margin : property_scroll_margin Rule.rule =
   [%spec "[ <extended-length> ]{1,4}"]
 
-let property_scroll_margin_runtime_module_path = Some [%module_path Css_types.ScrollMargin]
+let property_scroll_margin_runtime_module_path =
+  Some [%module_path Css_types.ScrollMargin]
 
 let property_scroll_margin_block : property_scroll_margin_block Rule.rule =
   [%spec "[ <extended-length> ]{1,2}"]
@@ -10085,7 +10351,8 @@ let property_scroll_margin_top : property_scroll_margin_top Rule.rule =
 let property_scroll_padding : property_scroll_padding Rule.rule =
   [%spec "[ 'auto' | <extended-length> | <extended-percentage> ]{1,4}"]
 
-let property_scroll_padding_runtime_module_path = Some [%module_path Css_types.ScrollPadding]
+let property_scroll_padding_runtime_module_path =
+  Some [%module_path Css_types.ScrollPadding]
 
 let property_scroll_padding_block : property_scroll_padding_block Rule.rule =
   [%spec "[ 'auto' | <extended-length> | <extended-percentage> ]{1,2}"]
@@ -10252,12 +10519,14 @@ let property_shape_image_threshold_runtime_module_path =
 let property_shape_margin : property_shape_margin Rule.rule =
   [%spec "<extended-length> | <extended-percentage>"]
 
-let property_shape_margin_runtime_module_path = Some [%module_path Css_types.ShapeMargin]
+let property_shape_margin_runtime_module_path =
+  Some [%module_path Css_types.ShapeMargin]
 
 let property_shape_outside : property_shape_outside Rule.rule =
   [%spec "'none' | <shape-box> || <basic-shape> | <image>"]
 
-let property_shape_outside_runtime_module_path = Some [%module_path Css_types.ShapeOutside]
+let property_shape_outside_runtime_module_path =
+  Some [%module_path Css_types.ShapeOutside]
 
 let property_shape_rendering : property_shape_rendering Rule.rule =
   [%spec "'auto' | 'optimizeSpeed' | 'crispEdges' | 'geometricPrecision'"]
@@ -10275,7 +10544,8 @@ let property_speak_as : property_speak_as Rule.rule =
     "'normal' | 'spell-out' || 'digits' || [ 'literal-punctuation' | \
      'no-punctuation' ]"]
 
-let property_speak_as_runtime_module_path = Some [%module_path Css_types.SpeakAs]
+let property_speak_as_runtime_module_path =
+  Some [%module_path Css_types.SpeakAs]
 
 let property_src : property_src Rule.rule =
   [%spec "[ <url> [ format( [ <string> ]# ) ]? | local( <family-name> ) ]#"]
@@ -10296,7 +10566,8 @@ let property_stroke_dashoffset_runtime_module_path =
 let property_stroke_linecap : property_stroke_linecap Rule.rule =
   [%spec "'butt' | 'round' | 'square'"]
 
-let property_stroke_linecap_runtime_module_path = Some [%module_path Css_types.StrokeLinecap]
+let property_stroke_linecap_runtime_module_path =
+  Some [%module_path Css_types.StrokeLinecap]
 
 let property_stroke_linejoin : property_stroke_linejoin Rule.rule =
   [%spec "'miter' | 'round' | 'bevel'"]
@@ -10313,47 +10584,55 @@ let property_stroke_miterlimit_runtime_module_path =
 let property_stroke_opacity : property_stroke_opacity Rule.rule =
   [%spec "<alpha-value>"]
 
-let property_stroke_opacity_runtime_module_path = Some [%module_path Css_types.StrokeOpacity]
+let property_stroke_opacity_runtime_module_path =
+  Some [%module_path Css_types.StrokeOpacity]
 
 let property_stroke_width : property_stroke_width Rule.rule =
   [%spec "<svg-length>"]
 
-let property_stroke_width_runtime_module_path = Some [%module_path Css_types.StrokeWidth]
+let property_stroke_width_runtime_module_path =
+  Some [%module_path Css_types.StrokeWidth]
 
 let property_tab_size : property_tab_size Rule.rule =
   [%spec " <number> | <extended-length>"]
 
-let property_tab_size_runtime_module_path = Some [%module_path Css_types.TabSize]
+let property_tab_size_runtime_module_path =
+  Some [%module_path Css_types.TabSize]
 
 let property_table_layout : property_table_layout Rule.rule =
   [%spec "'auto' | 'fixed'"]
 
-let property_table_layout_runtime_module_path = Some [%module_path Css_types.TableLayout]
+let property_table_layout_runtime_module_path =
+  Some [%module_path Css_types.TableLayout]
 
 let property_text_autospace : property_text_autospace Rule.rule =
   [%spec
     "'none' | 'ideograph-alpha' | 'ideograph-numeric' | \
      'ideograph-parenthesis' | 'ideograph-space'"]
 
-let property_text_autospace_runtime_module_path = Some [%module_path Css_types.TextAutospace]
+let property_text_autospace_runtime_module_path =
+  Some [%module_path Css_types.TextAutospace]
 
 let property_text_blink : property_text_blink Rule.rule =
   [%spec "'none' | 'blink' | 'blink-anywhere'"]
 
-let property_text_blink_runtime_module_path = Some [%module_path Css_types.TextBlink]
+let property_text_blink_runtime_module_path =
+  Some [%module_path Css_types.TextBlink]
 
 let property_text_align : property_text_align Rule.rule =
   [%spec
     "'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | \
      'match-parent' | 'justify-all'"]
 
-let property_text_align_runtime_module_path = Some [%module_path Css_types.TextAlign]
+let property_text_align_runtime_module_path =
+  Some [%module_path Css_types.TextAlign]
 
 let property_text_align_all : property_text_align_all Rule.rule =
   [%spec
     "'start' | 'end' | 'left' | 'right' | 'center' | 'justify' | 'match-parent'"]
 
-let property_text_align_all_runtime_module_path = Some [%module_path Css_types.TextAlignAll]
+let property_text_align_all_runtime_module_path =
+  Some [%module_path Css_types.TextAlignAll]
 
 let property_text_align_last : property_text_align_last Rule.rule =
   [%spec
@@ -10366,7 +10645,8 @@ let property_text_align_last_runtime_module_path =
 let property_text_anchor : property_text_anchor Rule.rule =
   [%spec "'start' | 'middle' | 'end'"]
 
-let property_text_anchor_runtime_module_path = Some [%module_path Css_types.TextAnchor]
+let property_text_anchor_runtime_module_path =
+  Some [%module_path Css_types.TextAnchor]
 
 let property_text_combine_upright : property_text_combine_upright Rule.rule =
   [%spec "'none' | 'all' | 'digits' [ <integer> ]?"]
@@ -10391,7 +10671,8 @@ let property_text_justify_trim_runtime_module_path =
 let property_text_kashida : property_text_kashida Rule.rule =
   [%spec "'none' | 'horizontal' | 'vertical' | 'both'"]
 
-let property_text_kashida_runtime_module_path = Some [%module_path Css_types.TextKashida]
+let property_text_kashida_runtime_module_path =
+  Some [%module_path Css_types.TextKashida]
 
 let property_text_kashida_space : property_text_kashida_space Rule.rule =
   [%spec "'normal' | 'pre' | 'post'"]
@@ -10476,7 +10757,8 @@ let property_text_decoration_thickness_runtime_module_path =
 let property_text_emphasis : property_text_emphasis Rule.rule =
   [%spec "<'text-emphasis-style'> || <'text-emphasis-color'>"]
 
-let property_text_emphasis_runtime_module_path = Some [%module_path Css_types.TextEmphasis]
+let property_text_emphasis_runtime_module_path =
+  Some [%module_path Css_types.TextEmphasis]
 
 let property_text_emphasis_color : property_text_emphasis_color Rule.rule =
   [%spec "<color>"]
@@ -10501,12 +10783,14 @@ let property_text_indent : property_text_indent Rule.rule =
     "[<extended-length> | <extended-percentage>] && [ 'hanging' ]? && [ \
      'each-line' ]?"]
 
-let property_text_indent_runtime_module_path = Some [%module_path Css_types.TextIndent]
+let property_text_indent_runtime_module_path =
+  Some [%module_path Css_types.TextIndent]
 
 let property_text_justify : property_text_justify Rule.rule =
   [%spec "'auto' | 'inter-character' | 'inter-word' | 'none'"]
 
-let property_text_justify_runtime_module_path = Some [%module_path Css_types.TextJustify]
+let property_text_justify_runtime_module_path =
+  Some [%module_path Css_types.TextJustify]
 
 let property_text_orientation : property_text_orientation Rule.rule =
   [%spec "'mixed' | 'upright' | 'sideways'"]
@@ -10517,18 +10801,21 @@ let property_text_orientation_runtime_module_path =
 let property_text_overflow : property_text_overflow Rule.rule =
   [%spec "[ 'clip' | 'ellipsis' | <string> ]{1,2}"]
 
-let property_text_overflow_runtime_module_path = Some [%module_path Css_types.TextOverflow]
+let property_text_overflow_runtime_module_path =
+  Some [%module_path Css_types.TextOverflow]
 
 let property_text_rendering : property_text_rendering Rule.rule =
   [%spec
     "'auto' | 'optimizeSpeed' | 'optimizeLegibility' | 'geometricPrecision'"]
 
-let property_text_rendering_runtime_module_path = Some [%module_path Css_types.TextRendering]
+let property_text_rendering_runtime_module_path =
+  Some [%module_path Css_types.TextRendering]
 
 let property_text_shadow : property_text_shadow Rule.rule =
   [%spec "'none' | <interpolation> | [ <shadow-t> ]#"]
 
-let property_text_shadow_runtime_module_path = Some [%module_path Css_types.TextShadow]
+let property_text_shadow_runtime_module_path =
+  Some [%module_path Css_types.TextShadow]
 
 let property_text_size_adjust : property_text_size_adjust Rule.rule =
   [%spec "'none' | 'auto' | <extended-percentage>"]
@@ -10541,7 +10828,8 @@ let property_text_transform : property_text_transform Rule.rule =
     "'none' | 'capitalize' | 'uppercase' | 'lowercase' | 'full-width' | \
      'full-size-kana'"]
 
-let property_text_transform_runtime_module_path = Some [%module_path Css_types.TextTransform]
+let property_text_transform_runtime_module_path =
+  Some [%module_path Css_types.TextTransform]
 
 let property_text_underline_offset : property_text_underline_offset Rule.rule =
   [%spec "'auto' | <extended-length> | <extended-percentage>"]
@@ -10566,18 +10854,21 @@ let property_touch_action : property_touch_action Rule.rule =
     "'auto' | 'none' | [ 'pan-x' | 'pan-left' | 'pan-right' ] || [ 'pan-y' | \
      'pan-up' | 'pan-down' ] || 'pinch-zoom' | 'manipulation'"]
 
-let property_touch_action_runtime_module_path = Some [%module_path Css_types.TouchAction]
+let property_touch_action_runtime_module_path =
+  Some [%module_path Css_types.TouchAction]
 
 let property_transform : property_transform Rule.rule =
   [%spec "'none' | <transform-list>"]
 
-let property_transform_runtime_module_path = Some [%module_path Css_types.Transform]
+let property_transform_runtime_module_path =
+  Some [%module_path Css_types.Transform]
 
 let property_transform_box : property_transform_box Rule.rule =
   [%spec
     "'content-box' | 'border-box' | 'fill-box' | 'stroke-box' | 'view-box'"]
 
-let property_transform_box_runtime_module_path = Some [%module_path Css_types.TransformBox]
+let property_transform_box_runtime_module_path =
+  Some [%module_path Css_types.TransformBox]
 
 let property_transform_origin : property_transform_origin Rule.rule =
   [%spec
@@ -10598,7 +10889,8 @@ let property_transform_style_runtime_module_path =
 let property_transition : property_transition Rule.rule =
   [%spec "[ <single-transition> | <single-transition-no-interp> ]#"]
 
-let property_transition_runtime_module_path = Some [%module_path Css_types.Transition]
+let property_transition_runtime_module_path =
+  Some [%module_path Css_types.Transition]
 
 let property_transition_behavior : property_transition_behavior Rule.rule =
   [%spec "<transition-behavior-value>#"]
@@ -10631,7 +10923,8 @@ let property_transition_timing_function_runtime_module_path =
 let property_translate : property_translate Rule.rule =
   [%spec "'none' | <length-percentage> [ <length-percentage> <length>? ]?"]
 
-let property_translate_runtime_module_path = Some [%module_path Css_types.Translate]
+let property_translate_runtime_module_path =
+  Some [%module_path Css_types.Translate]
 
 let property_unicode_bidi : property_unicode_bidi Rule.rule =
   [%spec
@@ -10639,46 +10932,54 @@ let property_unicode_bidi : property_unicode_bidi Rule.rule =
      'plaintext' | '-moz-isolate' | '-moz-isolate-override' | '-moz-plaintext' \
      | '-webkit-isolate'"]
 
-let property_unicode_bidi_runtime_module_path = Some [%module_path Css_types.UnicodeBidi]
+let property_unicode_bidi_runtime_module_path =
+  Some [%module_path Css_types.UnicodeBidi]
 
 let property_unicode_range : property_unicode_range Rule.rule =
   [%spec "[ <urange> ]#"]
 
-let property_unicode_range_runtime_module_path = Some [%module_path Css_types.UnicodeRange]
+let property_unicode_range_runtime_module_path =
+  Some [%module_path Css_types.UnicodeRange]
 
 let property_user_select : property_user_select Rule.rule =
   [%spec "'auto' | 'text' | 'none' | 'contain' | 'all' | <interpolation>"]
 
-let property_user_select_runtime_module_path = Some [%module_path Css_types.UserSelect]
+let property_user_select_runtime_module_path =
+  Some [%module_path Css_types.UserSelect]
 
 let property_vertical_align : property_vertical_align Rule.rule =
   [%spec
     "'baseline' | 'sub' | 'super' | 'text-top' | 'text-bottom' | 'middle' | \
      'top' | 'bottom' | <extended-percentage> | <extended-length>"]
 
-let property_vertical_align_runtime_module_path = Some [%module_path Css_types.VerticalAlign]
+let property_vertical_align_runtime_module_path =
+  Some [%module_path Css_types.VerticalAlign]
 
 let property_visibility : property_visibility Rule.rule =
   [%spec "'visible' | 'hidden' | 'collapse' | <interpolation>"]
 
-let property_visibility_runtime_module_path = Some [%module_path Css_types.Visibility]
+let property_visibility_runtime_module_path =
+  Some [%module_path Css_types.Visibility]
 
 let property_voice_balance : property_voice_balance Rule.rule =
   [%spec "<number> | 'left' | 'center' | 'right' | 'leftwards' | 'rightwards'"]
 
-let property_voice_balance_runtime_module_path = Some [%module_path Css_types.VoiceBalance]
+let property_voice_balance_runtime_module_path =
+  Some [%module_path Css_types.VoiceBalance]
 
 let property_voice_duration : property_voice_duration Rule.rule =
   [%spec "'auto' | <extended-time>"]
 
-let property_voice_duration_runtime_module_path = Some [%module_path Css_types.VoiceDuration]
+let property_voice_duration_runtime_module_path =
+  Some [%module_path Css_types.VoiceDuration]
 
 let property_voice_family : property_voice_family Rule.rule =
   [%spec
     "[ [ <family-name> | <generic-voice> ] ',' ]* [ <family-name> | \
      <generic-voice> ] | 'preserve'"]
 
-let property_voice_family_runtime_module_path = Some [%module_path Css_types.VoiceFamily]
+let property_voice_family_runtime_module_path =
+  Some [%module_path Css_types.VoiceFamily]
 
 let property_voice_pitch : property_voice_pitch Rule.rule =
   [%spec
@@ -10686,7 +10987,8 @@ let property_voice_pitch : property_voice_pitch Rule.rule =
      'high' | 'x-high' ] || [ <extended-frequency> | <semitones> | \
      <extended-percentage> ]"]
 
-let property_voice_pitch_runtime_module_path = Some [%module_path Css_types.VoicePitch]
+let property_voice_pitch_runtime_module_path =
+  Some [%module_path Css_types.VoicePitch]
 
 let property_voice_range : property_voice_range Rule.rule =
   [%spec
@@ -10694,32 +10996,38 @@ let property_voice_range : property_voice_range Rule.rule =
      'high' | 'x-high' ] || [ <extended-frequency> | <semitones> | \
      <extended-percentage> ]"]
 
-let property_voice_range_runtime_module_path = Some [%module_path Css_types.VoiceRange]
+let property_voice_range_runtime_module_path =
+  Some [%module_path Css_types.VoiceRange]
 
 let property_voice_rate : property_voice_rate Rule.rule =
   [%spec
     "[ 'normal' | 'x-slow' | 'slow' | 'medium' | 'fast' | 'x-fast' ] || \
      <extended-percentage>"]
 
-let property_voice_rate_runtime_module_path = Some [%module_path Css_types.VoiceRate]
+let property_voice_rate_runtime_module_path =
+  Some [%module_path Css_types.VoiceRate]
 
 let property_voice_stress : property_voice_stress Rule.rule =
   [%spec "'normal' | 'strong' | 'moderate' | 'none' | 'reduced'"]
 
-let property_voice_stress_runtime_module_path = Some [%module_path Css_types.VoiceStress]
+let property_voice_stress_runtime_module_path =
+  Some [%module_path Css_types.VoiceStress]
 
 let property_voice_volume : property_voice_volume Rule.rule =
   [%spec
     "'silent' | [ 'x-soft' | 'soft' | 'medium' | 'loud' | 'x-loud' ] || \
      <decibel>"]
 
-let property_voice_volume_runtime_module_path = Some [%module_path Css_types.VoiceVolume]
+let property_voice_volume_runtime_module_path =
+  Some [%module_path Css_types.VoiceVolume]
 
 let property_white_space : property_white_space Rule.rule =
   [%spec
     "'normal' | 'pre' | 'nowrap' | 'pre-wrap' | 'pre-line' | 'break-spaces'"]
 
-let property_white_space_runtime_module_path = Some [%module_path Css_types.WhiteSpace]
+let property_white_space_runtime_module_path =
+  Some [%module_path Css_types.WhiteSpace]
+
 let property_widows : property_widows Rule.rule = [%spec "<integer>"]
 let property_widows_runtime_module_path = Some [%module_path Css_types.Widows]
 
@@ -10734,29 +11042,34 @@ let property_width_runtime_module_path = Some [%module_path Css_types.Width]
 let property_will_change : property_will_change Rule.rule =
   [%spec "'auto' | [ <animateable-feature> ]#"]
 
-let property_will_change_runtime_module_path = Some [%module_path Css_types.WillChange]
+let property_will_change_runtime_module_path =
+  Some [%module_path Css_types.WillChange]
 
 let property_word_break : property_word_break Rule.rule =
   [%spec "'normal' | 'break-all' | 'keep-all' | 'break-word'"]
 
-let property_word_break_runtime_module_path = Some [%module_path Css_types.WordBreak]
+let property_word_break_runtime_module_path =
+  Some [%module_path Css_types.WordBreak]
 
 let property_word_spacing : property_word_spacing Rule.rule =
   [%spec "'normal' | <extended-length> | <extended-percentage>"]
 
-let property_word_spacing_runtime_module_path = Some [%module_path Css_types.WordSpacing]
+let property_word_spacing_runtime_module_path =
+  Some [%module_path Css_types.WordSpacing]
 
 let property_word_wrap : property_word_wrap Rule.rule =
   [%spec "'normal' | 'break-word' | 'anywhere'"]
 
-let property_word_wrap_runtime_module_path = Some [%module_path Css_types.WordWrap]
+let property_word_wrap_runtime_module_path =
+  Some [%module_path Css_types.WordWrap]
 
 let property_writing_mode : property_writing_mode Rule.rule =
   [%spec
     "'horizontal-tb' | 'vertical-rl' | 'vertical-lr' | 'sideways-rl' | \
      'sideways-lr' | <svg-writing-mode>"]
 
-let property_writing_mode_runtime_module_path = Some [%module_path Css_types.WritingMode]
+let property_writing_mode_runtime_module_path =
+  Some [%module_path Css_types.WritingMode]
 
 let property_z_index : property_z_index Rule.rule =
   [%spec "'auto' | <integer> | <interpolation>"]
@@ -10771,32 +11084,38 @@ let property_zoom_runtime_module_path = Some [%module_path Css_types.Zoom]
 let property_container : property_container Rule.rule =
   [%spec "<'container-name'> [ '/' <'container-type'> ]?"]
 
-let property_container_runtime_module_path = Some [%module_path Css_types.Container]
+let property_container_runtime_module_path =
+  Some [%module_path Css_types.Container]
 
 let property_container_name : property_container_name Rule.rule =
   [%spec "<custom-ident>+ | 'none'"]
 
-let property_container_name_runtime_module_path = Some [%module_path Css_types.ContainerName]
+let property_container_name_runtime_module_path =
+  Some [%module_path Css_types.ContainerName]
 
 let property_container_type : property_container_type Rule.rule =
   [%spec "'normal' | 'size' | 'inline-size'"]
 
-let property_container_type_runtime_module_path = Some [%module_path Css_types.ContainerType]
+let property_container_type_runtime_module_path =
+  Some [%module_path Css_types.ContainerType]
 
 let property_nav_down : property_nav_down Rule.rule =
   [%spec "'auto' | <integer> | <interpolation>"]
 
-let property_nav_down_runtime_module_path = Some [%module_path Css_types.NavDown]
+let property_nav_down_runtime_module_path =
+  Some [%module_path Css_types.NavDown]
 
 let property_nav_left : property_nav_left Rule.rule =
   [%spec "'auto' | <integer> | <interpolation>"]
 
-let property_nav_left_runtime_module_path = Some [%module_path Css_types.NavLeft]
+let property_nav_left_runtime_module_path =
+  Some [%module_path Css_types.NavLeft]
 
 let property_nav_right : property_nav_right Rule.rule =
   [%spec "'auto' | <integer> | <interpolation>"]
 
-let property_nav_right_runtime_module_path = Some [%module_path Css_types.NavRight]
+let property_nav_right_runtime_module_path =
+  Some [%module_path Css_types.NavRight]
 
 let property_nav_up : property_nav_up Rule.rule =
   [%spec "'auto' | <integer> | <interpolation>"]
@@ -10806,7 +11125,8 @@ let property_nav_up_runtime_module_path = Some [%module_path Css_types.NavUp]
 let property_accent_color : property_accent_color Rule.rule =
   [%spec "'auto' | <color>"]
 
-let property_accent_color_runtime_module_path = Some [%module_path Css_types.AccentColor]
+let property_accent_color_runtime_module_path =
+  Some [%module_path Css_types.AccentColor]
 
 let property_animation_composition : property_animation_composition Rule.rule =
   [%spec "[ 'replace' | 'add' | 'accumulate' ]#"]
@@ -10841,7 +11161,8 @@ let property_animation_timeline_runtime_module_path =
 let property_field_sizing : property_field_sizing Rule.rule =
   [%spec "'content' | 'fixed'"]
 
-let property_field_sizing_runtime_module_path = Some [%module_path Css_types.FieldSizing]
+let property_field_sizing_runtime_module_path =
+  Some [%module_path Css_types.FieldSizing]
 
 let property_interpolate_size : property_interpolate_size Rule.rule =
   [%spec "'numeric-only' | 'allow-keywords'"]
@@ -10850,7 +11171,10 @@ let property_interpolate_size_runtime_module_path =
   Some [%module_path Css_types.InterpolateSize]
 
 let property_media_type : property_media_type Rule.rule = [%spec "<ident>"]
-let property_media_type_runtime_module_path = Some [%module_path Css_types.MediaType]
+
+let property_media_type_runtime_module_path =
+  Some [%module_path Css_types.MediaType]
+
 let property_overlay : property_overlay Rule.rule = [%spec "'none' | 'auto'"]
 let property_overlay_runtime_module_path = Some [%module_path Css_types.Overlay]
 
@@ -10875,12 +11199,14 @@ let property_scroll_timeline_name_runtime_module_path =
 let property_text_wrap : property_text_wrap Rule.rule =
   [%spec "'wrap' | 'nowrap' | 'balance' | 'stable' | 'pretty'"]
 
-let property_text_wrap_runtime_module_path = Some [%module_path Css_types.TextWrap]
+let property_text_wrap_runtime_module_path =
+  Some [%module_path Css_types.TextWrap]
 
 let property_view_timeline : property_view_timeline Rule.rule =
   [%spec "[ 'none' | <custom-ident> ]# [ 'block' | 'inline' | 'x' | 'y' ]#"]
 
-let property_view_timeline_runtime_module_path = Some [%module_path Css_types.ViewTimeline]
+let property_view_timeline_runtime_module_path =
+  Some [%module_path Css_types.ViewTimeline]
 
 let property_view_timeline_axis : property_view_timeline_axis Rule.rule =
   [%spec "[ 'block' | 'inline' | 'x' | 'y' ]#"]
@@ -10909,12 +11235,14 @@ let property_view_transition_name_runtime_module_path =
 let property_anchor_name : property_anchor_name Rule.rule =
   [%spec "'none' | [ <dashed-ident> ]#"]
 
-let property_anchor_name_runtime_module_path = Some [%module_path Css_types.AnchorName]
+let property_anchor_name_runtime_module_path =
+  Some [%module_path Css_types.AnchorName]
 
 let property_anchor_scope : property_anchor_scope Rule.rule =
   [%spec "'none' | 'all' | [ <dashed-ident> ]#"]
 
-let property_anchor_scope_runtime_module_path = Some [%module_path Css_types.AnchorScope]
+let property_anchor_scope_runtime_module_path =
+  Some [%module_path Css_types.AnchorScope]
 
 let property_position_anchor : property_position_anchor Rule.rule =
   [%spec "'auto' | <dashed-ident>"]
@@ -10927,12 +11255,14 @@ let property_position_area : property_position_area Rule.rule =
     "'none' | [ 'top' | 'bottom' | 'left' | 'right' | 'center' | 'self-start' \
      | 'self-end' | 'start' | 'end' ]"]
 
-let property_position_area_runtime_module_path = Some [%module_path Css_types.PositionArea]
+let property_position_area_runtime_module_path =
+  Some [%module_path Css_types.PositionArea]
 
 let property_position_try : property_position_try Rule.rule =
   [%spec "'none' | [ <dashed-ident> | <try-tactic> ]#"]
 
-let property_position_try_runtime_module_path = Some [%module_path Css_types.PositionTry]
+let property_position_try_runtime_module_path =
+  Some [%module_path Css_types.PositionTry]
 
 let property_position_try_fallbacks : property_position_try_fallbacks Rule.rule
     =
@@ -10958,14 +11288,16 @@ let property_inset_area : property_inset_area Rule.rule =
     "'none' | [ 'top' | 'bottom' | 'left' | 'right' | 'center' | 'self-start' \
      | 'self-end' | 'start' | 'end' ]{1,2}"]
 
-let property_inset_area_runtime_module_path = Some [%module_path Css_types.InsetArea]
+let property_inset_area_runtime_module_path =
+  Some [%module_path Css_types.InsetArea]
 
 let property_scroll_start : property_scroll_start Rule.rule =
   [%spec
     "'auto' | 'start' | 'end' | 'center' | 'top' | 'bottom' | 'left' | 'right' \
      | <extended-length> | <extended-percentage>"]
 
-let property_scroll_start_runtime_module_path = Some [%module_path Css_types.ScrollStart]
+let property_scroll_start_runtime_module_path =
+  Some [%module_path Css_types.ScrollStart]
 
 let property_scroll_start_block : property_scroll_start_block Rule.rule =
   [%spec
@@ -10988,14 +11320,16 @@ let property_scroll_start_x : property_scroll_start_x Rule.rule =
     "'auto' | 'start' | 'end' | 'center' | <extended-length> | \
      <extended-percentage>"]
 
-let property_scroll_start_x_runtime_module_path = Some [%module_path Css_types.ScrollStartX]
+let property_scroll_start_x_runtime_module_path =
+  Some [%module_path Css_types.ScrollStartX]
 
 let property_scroll_start_y : property_scroll_start_y Rule.rule =
   [%spec
     "'auto' | 'start' | 'end' | 'center' | <extended-length> | \
      <extended-percentage>"]
 
-let property_scroll_start_y_runtime_module_path = Some [%module_path Css_types.ScrollStartY]
+let property_scroll_start_y_runtime_module_path =
+  Some [%module_path Css_types.ScrollStartY]
 
 let property_scroll_start_target : property_scroll_start_target Rule.rule =
   [%spec "'none' | 'auto'"]
@@ -11046,27 +11380,32 @@ let property_reading_flow : property_reading_flow Rule.rule =
     "'normal' | 'flex-visual' | 'flex-flow' | 'grid-rows' | 'grid-columns' | \
      'grid-order'"]
 
-let property_reading_flow_runtime_module_path = Some [%module_path Css_types.ReadingFlow]
+let property_reading_flow_runtime_module_path =
+  Some [%module_path Css_types.ReadingFlow]
 
 let property_math_depth : property_math_depth Rule.rule =
   [%spec "'auto-add' | 'add(' <integer> ')' | <integer>"]
 
-let property_math_depth_runtime_module_path = Some [%module_path Css_types.MathDepth]
+let property_math_depth_runtime_module_path =
+  Some [%module_path Css_types.MathDepth]
 
 let property_math_shift : property_math_shift Rule.rule =
   [%spec "'normal' | 'compact'"]
 
-let property_math_shift_runtime_module_path = Some [%module_path Css_types.MathShift]
+let property_math_shift_runtime_module_path =
+  Some [%module_path Css_types.MathShift]
 
 let property_math_style : property_math_style Rule.rule =
   [%spec "'normal' | 'compact'"]
 
-let property_math_style_runtime_module_path = Some [%module_path Css_types.MathStyle]
+let property_math_style_runtime_module_path =
+  Some [%module_path Css_types.MathStyle]
 
 let property_text_wrap_mode : property_text_wrap_mode Rule.rule =
   [%spec "'wrap' | 'nowrap'"]
 
-let property_text_wrap_mode_runtime_module_path = Some [%module_path Css_types.TextWrapMode]
+let property_text_wrap_mode_runtime_module_path =
+  Some [%module_path Css_types.TextWrapMode]
 
 let property_text_wrap_style : property_text_wrap_style Rule.rule =
   [%spec "'auto' | 'balance' | 'stable' | 'pretty'"]
@@ -11085,12 +11424,14 @@ let property_white_space_collapse_runtime_module_path =
 let property_text_box_trim : property_text_box_trim Rule.rule =
   [%spec "'none' | 'trim-start' | 'trim-end' | 'trim-both'"]
 
-let property_text_box_trim_runtime_module_path = Some [%module_path Css_types.TextBoxTrim]
+let property_text_box_trim_runtime_module_path =
+  Some [%module_path Css_types.TextBoxTrim]
 
 let property_text_box_edge : property_text_box_edge Rule.rule =
   [%spec "'leading' | 'text' | 'cap' | 'ex' | 'alphabetic'"]
 
-let property_text_box_edge_runtime_module_path = Some [%module_path Css_types.TextBoxEdge]
+let property_text_box_edge_runtime_module_path =
+  Some [%module_path Css_types.TextBoxEdge]
 
 (* Print module paged media properties *)
 let property_page : property_page Rule.rule = [%spec "'auto' | <custom-ident>"]
@@ -11118,7 +11459,8 @@ let property_bleed_runtime_module_path = Some [%module_path Css_types.Bleed]
 let property_backdrop_blur : property_backdrop_blur Rule.rule =
   [%spec "<extended-length>"]
 
-let property_backdrop_blur_runtime_module_path = Some [%module_path Css_types.BackdropBlur]
+let property_backdrop_blur_runtime_module_path =
+  Some [%module_path Css_types.BackdropBlur]
 
 let property_scrollbar_color_legacy : property_scrollbar_color_legacy Rule.rule
     =
@@ -11150,7 +11492,8 @@ let property_color_rendering_runtime_module_path =
 let property_vector_effect : property_vector_effect Rule.rule =
   [%spec "'none' | 'non-scaling-stroke'"]
 
-let property_vector_effect_runtime_module_path = Some [%module_path Css_types.VectorEffect]
+let property_vector_effect_runtime_module_path =
+  Some [%module_path Css_types.VectorEffect]
 
 (* SVG geometry properties *)
 let property_cx : property_cx Rule.rule =
@@ -11227,13 +11570,15 @@ let property_print_color_adjust_runtime_module_path =
 let property_ruby_overhang : property_ruby_overhang Rule.rule =
   [%spec "'auto' | 'none'"]
 
-let property_ruby_overhang_runtime_module_path = Some [%module_path Css_types.RubyOverhang]
+let property_ruby_overhang_runtime_module_path =
+  Some [%module_path Css_types.RubyOverhang]
 
 (* Timeline scope *)
 let property_timeline_scope : property_timeline_scope Rule.rule =
   [%spec "[ 'none' | <custom-ident> | <dashed-ident> ]#"]
 
-let property_timeline_scope_runtime_module_path = Some [%module_path Css_types.TimelineScope]
+let property_timeline_scope_runtime_module_path =
+  Some [%module_path Css_types.TimelineScope]
 
 (* Scroll driven animations *)
 let property_animation_delay_end : property_animation_delay_end Rule.rule =
@@ -11252,12 +11597,15 @@ let property_animation_delay_start_runtime_module_path =
 let property_syntax : property_syntax Rule.rule = [%spec "<string>"]
 let property_syntax_runtime_module_path = Some [%module_path Css_types.Syntax]
 let property_inherits : property_inherits Rule.rule = [%spec "'true' | 'false'"]
-let property_inherits_runtime_module_path = Some [%module_path Css_types.Inherits]
+
+let property_inherits_runtime_module_path =
+  Some [%module_path Css_types.Inherits]
 
 let property_initial_value : property_initial_value Rule.rule =
   [%spec "<string>"]
 
-let property_initial_value_runtime_module_path = Some [%module_path Css_types.InitialValue]
+let property_initial_value_runtime_module_path =
+  Some [%module_path Css_types.InitialValue]
 
 (* Additional modern properties *)
 let property_scroll_marker_group : property_scroll_marker_group Rule.rule =
@@ -11276,7 +11624,8 @@ let property_container_name_computed_runtime_module_path =
 let property_text_edge : property_text_edge Rule.rule =
   [%spec "[ 'leading' | <'text-box-edge'> ]{1,2}"]
 
-let property_text_edge_runtime_module_path = Some [%module_path Css_types.TextEdge]
+let property_text_edge_runtime_module_path =
+  Some [%module_path Css_types.TextEdge]
 
 let property_hyphenate_limit_last : property_hyphenate_limit_last Rule.rule =
   [%spec "'none' | 'always' | 'column' | 'page' | 'spread'"]
@@ -11314,7 +11663,8 @@ let ratio_runtime_module_path = Some [%module_path Css_types.Ratio]
 let relative_selector : relative_selector Rule.rule =
   [%spec "[ <combinator> ]? <complex-selector>"]
 
-let relative_selector_runtime_module_path = Some [%module_path Css_types.RelativeSelector]
+let relative_selector_runtime_module_path =
+  Some [%module_path Css_types.RelativeSelector]
 
 let relative_selector_list : relative_selector_list Rule.rule =
   [%spec "[ <relative-selector> ]#"]
@@ -11323,7 +11673,9 @@ let relative_selector_list_runtime_module_path =
   Some [%module_path Css_types.RelativeSelectorList]
 
 let relative_size : relative_size Rule.rule = [%spec "'larger' | 'smaller'"]
-let relative_size_runtime_module_path = Some [%module_path Css_types.RelativeSize]
+
+let relative_size_runtime_module_path =
+  Some [%module_path Css_types.RelativeSize]
 
 let repeat_style : repeat_style Rule.rule =
   [%spec
@@ -11339,7 +11691,8 @@ let self_position : self_position Rule.rule =
     "'center' | 'start' | 'end' | 'self-start' | 'self-end' | 'flex-start' | \
      'flex-end'"]
 
-let self_position_runtime_module_path = Some [%module_path Css_types.SelfPosition]
+let self_position_runtime_module_path =
+  Some [%module_path Css_types.SelfPosition]
 
 let shadow : shadow Rule.rule =
   [%spec
@@ -11372,7 +11725,8 @@ let shape_radius_runtime_module_path = Some [%module_path Css_types.ShapeRadius]
 let side_or_corner : side_or_corner Rule.rule =
   [%spec "[ 'left' | 'right' ] || [ 'top' | 'bottom' ]"]
 
-let side_or_corner_runtime_module_path = Some [%module_path Css_types.SideOrCorner]
+let side_or_corner_runtime_module_path =
+  Some [%module_path Css_types.SideOrCorner]
 
 let single_animation : single_animation Rule.rule =
   [%spec
@@ -11393,7 +11747,8 @@ let single_animation : single_animation Rule.rule =
      <single-animation-iteration-count> <single-animation-direction> \
      <single-animation-fill-mode> <single-animation-play-state> ]"]
 
-let single_animation_runtime_module_path = Some [%module_path Css_types.SingleAnimation]
+let single_animation_runtime_module_path =
+  Some [%module_path Css_types.SingleAnimation]
 
 let single_animation_no_interp : single_animation_no_interp Rule.rule =
   [%spec
@@ -11479,7 +11834,8 @@ let single_transition : single_transition Rule.rule =
      [<single-transition-property> | 'none'] <extended-time> <timing-function> \
      <extended-time> <transition-behavior-value> ]"]
 
-let single_transition_runtime_module_path = Some [%module_path Css_types.SingleTransition]
+let single_transition_runtime_module_path =
+  Some [%module_path Css_types.SingleTransition]
 
 let single_transition_property : single_transition_property Rule.rule =
   [%spec "<custom-ident> | <interpolation> | 'all'"]
@@ -11519,7 +11875,8 @@ let step_position : step_position Rule.rule =
   [%spec
     "'jump-start' | 'jump-end' | 'jump-none' | 'jump-both' | 'start' | 'end'"]
 
-let step_position_runtime_module_path = Some [%module_path Css_types.StepPosition]
+let step_position_runtime_module_path =
+  Some [%module_path Css_types.StepPosition]
 
 let step_timing_function : step_timing_function Rule.rule =
   [%spec
@@ -11533,7 +11890,8 @@ let subclass_selector : subclass_selector Rule.rule =
     "<id-selector> | <class-selector> | <attribute-selector> | \
      <pseudo-class-selector>"]
 
-let subclass_selector_runtime_module_path = Some [%module_path Css_types.SubclassSelector]
+let subclass_selector_runtime_module_path =
+  Some [%module_path Css_types.SubclassSelector]
 
 let supports_condition : supports_condition Rule.rule =
   [%spec
@@ -11541,19 +11899,25 @@ let supports_condition : supports_condition Rule.rule =
      <supports-in-parens> ]* | <supports-in-parens> [ 'or' \
      <supports-in-parens> ]*"]
 
-let supports_condition_runtime_module_path = Some [%module_path Css_types.SupportsCondition]
+let supports_condition_runtime_module_path =
+  Some [%module_path Css_types.SupportsCondition]
+
 let supports_decl : supports_decl Rule.rule = [%spec "'(' <declaration> ')'"]
-let supports_decl_runtime_module_path = Some [%module_path Css_types.SupportsDecl]
+
+let supports_decl_runtime_module_path =
+  Some [%module_path Css_types.SupportsDecl]
 
 let supports_feature : supports_feature Rule.rule =
   [%spec "<supports-decl> | <supports-selector-fn>"]
 
-let supports_feature_runtime_module_path = Some [%module_path Css_types.SupportsFeature]
+let supports_feature_runtime_module_path =
+  Some [%module_path Css_types.SupportsFeature]
 
 let supports_in_parens : supports_in_parens Rule.rule =
   [%spec "'(' <supports-condition> ')' | <supports-feature>"]
 
-let supports_in_parens_runtime_module_path = Some [%module_path Css_types.SupportsInParens]
+let supports_in_parens_runtime_module_path =
+  Some [%module_path Css_types.SupportsInParens]
 
 let supports_selector_fn : supports_selector_fn Rule.rule =
   [%spec "selector( <complex-selector> )"]
@@ -11569,7 +11933,9 @@ let svg_length_runtime_module_path = Some [%module_path Css_types.SvgLength]
 let svg_writing_mode : svg_writing_mode Rule.rule =
   [%spec "'lr-tb' | 'rl-tb' | 'tb-rl' | 'lr' | 'rl' | 'tb'"]
 
-let svg_writing_mode_runtime_module_path = Some [%module_path Css_types.SvgWritingMode]
+let svg_writing_mode_runtime_module_path =
+  Some [%module_path Css_types.SvgWritingMode]
+
 let symbol : symbol Rule.rule = [%spec "<string> | <image> | <custom-ident>"]
 let symbol_runtime_module_path = Some [%module_path Css_types.Symbol]
 
@@ -11595,12 +11961,14 @@ let extended_length_runtime_module_path = Some [%module_path Css_types.Length]
 let length_percentage : length_percentage Rule.rule =
   [%spec "<extended-length> | <extended-percentage>"]
 
-let length_percentage_runtime_module_path = Some [%module_path Css_types.LengthPercentage]
+let length_percentage_runtime_module_path =
+  Some [%module_path Css_types.LengthPercentage]
 
 let extended_frequency : extended_frequency Rule.rule =
   [%spec "<frequency> | <calc()> | <interpolation> | <min()> | <max()>"]
 
-let extended_frequency_runtime_module_path = Some [%module_path Css_types.Frequency]
+let extended_frequency_runtime_module_path =
+  Some [%module_path Css_types.Frequency]
 
 let extended_angle : extended_angle Rule.rule =
   [%spec "<angle> | <calc()> | <interpolation> | <min()> | <max()>"]
@@ -11629,7 +11997,8 @@ let timing_function : timing_function Rule.rule =
     "'linear' | <cubic-bezier-timing-function> | <step-timing-function> | \
      <interpolation>"]
 
-let timing_function_runtime_module_path = Some [%module_path Css_types.TimingFunction]
+let timing_function_runtime_module_path =
+  Some [%module_path Css_types.TimingFunction]
 
 let timing_function_no_interp : timing_function_no_interp Rule.rule =
   [%spec "'linear' | <cubic-bezier-timing-function> | <step-timing-function>"]
@@ -11650,7 +12019,8 @@ let track_breadth : track_breadth Rule.rule =
     "<extended-length> | <extended-percentage> | <flex-value> | 'min-content' \
      | 'max-content' | 'auto'"]
 
-let track_breadth_runtime_module_path = Some [%module_path Css_types.TrackBreadth]
+let track_breadth_runtime_module_path =
+  Some [%module_path Css_types.TrackBreadth]
 
 let track_group : track_group Rule.rule =
   [%spec
@@ -11668,7 +12038,8 @@ let track_list_runtime_module_path = Some [%module_path Css_types.TrackList]
 let track_list_v0 : track_list_v0 Rule.rule =
   [%spec "[ [ <string> ]* <track-group> [ <string> ]* ]+ | 'none'"]
 
-let track_list_v0_runtime_module_path = Some [%module_path Css_types.TrackListV0]
+let track_list_v0_runtime_module_path =
+  Some [%module_path Css_types.TrackListV0]
 
 let track_minmax : track_minmax Rule.rule =
   [%spec
@@ -11699,12 +12070,14 @@ let transform_function : transform_function Rule.rule =
      <scaleZ()> | <rotate3d()> | <rotateX()> | <rotateY()> | <rotateZ()> | \
      <perspective()>"]
 
-let transform_function_runtime_module_path = Some [%module_path Css_types.TransformFunction]
+let transform_function_runtime_module_path =
+  Some [%module_path Css_types.TransformFunction]
 
 let transform_list : transform_list Rule.rule =
   [%spec "[ <transform-function> ]+"]
 
-let transform_list_runtime_module_path = Some [%module_path Css_types.TransformList]
+let transform_list_runtime_module_path =
+  Some [%module_path Css_types.TransformList]
 
 let transition_behavior_value : transition_behavior_value Rule.rule =
   [%spec "'normal' | 'allow-discrete' | <interpolation>"]
@@ -11732,12 +12105,14 @@ let type_or_unit_runtime_module_path = Some [%module_path Css_types.TypeOrUnit]
 let type_selector : type_selector Rule.rule =
   [%spec "<wq-name> | [ <ns-prefix> ]? '*'"]
 
-let type_selector_runtime_module_path = Some [%module_path Css_types.TypeSelector]
+let type_selector_runtime_module_path =
+  Some [%module_path Css_types.TypeSelector]
 
 let viewport_length : viewport_length Rule.rule =
   [%spec "'auto' | <extended-length> | <extended-percentage>"]
 
-let viewport_length_runtime_module_path = Some [%module_path Css_types.ViewportLength]
+let viewport_length_runtime_module_path =
+  Some [%module_path Css_types.ViewportLength]
 
 let visual_box : visual_box Rule.rule =
   [%spec "'content-box' | 'padding-box' | 'border-box'"]
@@ -11765,9 +12140,13 @@ let syntax_type_name : syntax_type_name Rule.rule =
      'length-percentage' | 'number' | 'percentage' | 'resolution' | 'string' | \
      'time' | 'url' | 'transform-function'"]
 
-let syntax_type_name_runtime_module_path = Some [%module_path Css_types.SyntaxTypeName]
+let syntax_type_name_runtime_module_path =
+  Some [%module_path Css_types.SyntaxTypeName]
+
 let syntax_multiplier : syntax_multiplier Rule.rule = [%spec "'#' | '+'"]
-let syntax_multiplier_runtime_module_path = Some [%module_path Css_types.SyntaxMultiplier]
+
+let syntax_multiplier_runtime_module_path =
+  Some [%module_path Css_types.SyntaxMultiplier]
 
 let syntax_single_component : syntax_single_component Rule.rule =
   [%spec "'<' <syntax-type-name> '>' | <ident>"]
@@ -11776,16 +12155,22 @@ let syntax_single_component_runtime_module_path =
   Some [%module_path Css_types.SyntaxSingleComponent]
 
 let syntax_string : syntax_string Rule.rule = [%spec "<string>"]
-let syntax_string_runtime_module_path = Some [%module_path Css_types.SyntaxString]
+
+let syntax_string_runtime_module_path =
+  Some [%module_path Css_types.SyntaxString]
+
 let syntax_combinator : syntax_combinator Rule.rule = [%spec "'|'"]
-let syntax_combinator_runtime_module_path = Some [%module_path Css_types.SyntaxCombinator]
+
+let syntax_combinator_runtime_module_path =
+  Some [%module_path Css_types.SyntaxCombinator]
 
 let syntax_component : syntax_component Rule.rule =
   [%spec
     "<syntax-single-component> [ <syntax-multiplier> ]? | '<' 'transform-list' \
      '>'"]
 
-let syntax_component_runtime_module_path = Some [%module_path Css_types.SyntaxComponent]
+let syntax_component_runtime_module_path =
+  Some [%module_path Css_types.SyntaxComponent]
 
 let syntax : syntax Rule.rule =
   [%spec
@@ -14456,7 +14841,6 @@ let registry : (kind * packed_rule) list =
     Function "target-counter()", pack_rule function_target_counter ();
     Function "target-counters()", pack_rule function_target_counters ();
     Function "target-text()", pack_rule function_target_text ();
-
     ( Value "angular-color-hint",
       pack_rule angular_color_hint
         ?runtime_module_path:angular_color_hint_runtime_module_path () );
@@ -14928,7 +15312,8 @@ let check_property ~loc ~name value :
 let extract_interpolation_from_extended_time (et : extended_time) :
   (string * string) list =
   match et with
-  | `Interpolation parts -> [ String.concat "." parts, [%module_path Css_types.Time] ]
+  | `Interpolation parts ->
+    [ String.concat "." parts, [%module_path Css_types.Time] ]
   | _ -> []
 
 let extract_interpolation_from_timing_function (tf : timing_function) :
@@ -14942,7 +15327,9 @@ let extract_interpolation_from_transition_behavior_value
   (bv : transition_behavior_value) : (string * string) list =
   match bv with
   | `Interpolation parts ->
-    [ String.concat "." parts, [%module_path Css_types.TransitionBehaviorValue] ]
+    [
+      String.concat "." parts, [%module_path Css_types.TransitionBehaviorValue];
+    ]
   | _ -> []
 
 (* For property-only interpolation (entire transition value), use Transition.toString
@@ -14973,8 +15360,8 @@ let extract_interpolations_from_single_transition (st : single_transition) :
   match st with
   | `Xor prop ->
     (* Property-only: could be a full Transition.Value.t *)
-    extract_interpolation_from_single_transition_property_opt ~is_standalone:true
-      prop
+    extract_interpolation_from_single_transition_property_opt
+      ~is_standalone:true prop
   | `Static_0 (prop, duration) ->
     (* Has other components: property should be TransitionProperty.t *)
     extract_interpolation_from_single_transition_property_opt
@@ -15008,14 +15395,16 @@ let extract_interpolations_from_property_transition
 
 let get_interpolation_types ~name value : (string * string) list =
   match find_rule name with
-  | Some (Pack_rule { rule; runtime_module_path; _ }) -> (
-    (* Special handling for transition property to get context-aware types *)
-    if name = "transition" then
+  | Some (Pack_rule { rule; runtime_module_path; _ }) ->
+    if
+      (* Special handling for transition property to get context-aware types *)
+      name = "transition"
+    then (
       match parse property_transition value with
       | Ok transitions ->
         extract_interpolations_from_property_transition transitions
-      | Error _ -> []
-    else
+      | Error _ -> [])
+    else (
       let rule_with_universal =
         Combinators.xor
           [

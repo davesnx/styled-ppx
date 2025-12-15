@@ -710,10 +710,8 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
      which expands to a string but with compile-time verification that the module exists. */
   let make_module_path_expr = (css_type_name: string): Parsetree.expression => {
     let pascal_name = kebab_to_pascal_case(css_type_name);
-    let lid =
-      Longident.Ldot(Longident.Lident("Css_types"), pascal_name);
-    let construct_expr =
-      pexp_construct(txt(lid), None);
+    let lid = Longident.Ldot(Longident.Lident("Css_types"), pascal_name);
+    let construct_expr = pexp_construct(txt(lid), None);
     pexp_extension((
       txt("module_path"),
       PStr([pstr_eval(construct_expr, [])]),
@@ -722,7 +720,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
 
   /* Extract the module name from a full path like "Css_types.BoxShadow" -> Some("BoxShadow")
      or return None if the path is empty or invalid */
-  let extract_module_name_from_path = (path: string): option(string) => {
+  let extract_module_name_from_path = (path: string): option(string) =>
     if (String.length(path) == 0) {
       None;
     } else {
@@ -731,7 +729,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       | _ => None
       };
     };
-  };
 
   /* Create a type expression - either type-safe via [%module_path] or fallback to string.
      If we can parse the path as Css_types.X, we use the type-safe version. */
@@ -739,10 +736,8 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     switch (extract_module_name_from_path(path)) {
     | Some(module_name) =>
       /* Convert PascalCase back to kebab for make_module_path_expr */
-      let lid =
-        Longident.Ldot(Longident.Lident("Css_types"), module_name);
-      let construct_expr =
-        pexp_construct(txt(lid), None);
+      let lid = Longident.Ldot(Longident.Lident("Css_types"), module_name);
+      let construct_expr = pexp_construct(txt(lid), None);
       pexp_extension((
         txt("module_path"),
         PStr([pstr_eval(construct_expr, [])]),
@@ -852,7 +847,9 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         | Optional =>
           switch%expr ([%e var_expr]) {
           | None => []
-          | Some(parts) => [(String.concat(".", parts), [%e type_context_expr])]
+          | Some(parts) => [
+              (String.concat(".", parts), [%e type_context_expr]),
+            ]
           }
         | Zero_or_more
         | One_or_more
@@ -891,7 +888,11 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
              List.map(
                v =>
                  [%e
-                  generate_typed_extraction(inner, evar("v"), type_context_expr)
+                  generate_typed_extraction(
+                    inner,
+                    evar("v"),
+                    type_context_expr,
+                  )
                  ],
                [%e var_expr],
              ),
@@ -1059,7 +1060,11 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     /* Generate the function body */
     let body =
       if (spec_contains_interpolation(spec)) {
-        generate_typed_extraction(spec, evar("value"), default_type_path_expr);
+        generate_typed_extraction(
+          spec,
+          evar("value"),
+          default_type_path_expr,
+        );
       } else {
         [%expr []];
       };
