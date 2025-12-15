@@ -72,15 +72,14 @@ loc(X): x = X {
 
 /* Handle skipping whitespace */
 skip_ws (X): x = delimited(WS?, X, WS?) { x }
-skip_ws_right (X): x = X; WS? { x }
 
-/* TODO: Remove empty_brace_block */
-/* {} */
-empty_brace_block: LEFT_BRACE WS? RIGHT_BRACE { [] }
+/* Block that can be empty or contain keyframes */
+keyframes_block:
+  | LEFT_BRACE RIGHT_BRACE { [] }
+  | LEFT_BRACE rules = keyframe RIGHT_BRACE { rules }
 
-/* TODO: Remove SEMI_COLON? from brace_block(X) */
 /* { ... } */
-brace_block(X): xs = delimited(LEFT_BRACE, X, RIGHT_BRACE) SEMI_COLON? { xs }
+brace_block(X): xs = delimited(LEFT_BRACE, X, RIGHT_BRACE) { xs }
 
 /* [] */
 bracket_block (X): xs = delimited(LEFT_BRACKET, X, RIGHT_BRACKET) { xs }
@@ -90,10 +89,10 @@ paren_block (X): xs = delimited(LEFT_PAREN, X, RIGHT_PAREN) { xs }
 
 /* https://www.w3.org/TR/css-syntax-3/#at-rules */
 at_rule:
-  /* @keyframes animationName { ... } */
+  /* @keyframes animationName { ... } or @keyframes animationName {} */
   | name = loc(AT_KEYFRAMES) WS?
     i = IDENT WS?
-    block = brace_block(keyframe) {
+    block = keyframes_block {
     let prelude = ([(Ident i, make_loc $startpos(i) $endpos(i))], make_loc $startpos(i) $endpos(i)) in
     let block = Rule_list (block, make_loc $startpos $endpos) in
     { name;
@@ -102,21 +101,9 @@ at_rule:
       loc = make_loc $startpos $endpos;
     }
   }
-  /* @keyframes animationName {} */
-  | name = loc(AT_KEYFRAMES) WS?
-    i = IDENT WS?
-    s = loc(empty_brace_block) {
-    let prelude = ([(Ident i, make_loc $startpos(i) $endpos(i))], make_loc $startpos(i) $endpos(i)) in
-    let empty_block = Rule_list s in
-    ({ name;
-      prelude;
-      block = empty_block;
-      loc = make_loc $startpos $endpos;
-    }): at_rule
-  }
   /* @charset */
   | name = loc(AT_RULE_STATEMENT) WS?
-    xs = loc(values) WS? SEMI_COLON {
+    xs = loc(values) SEMI_COLON {
     { name;
       prelude = xs;
       block = Empty;
@@ -127,7 +114,7 @@ at_rule:
   /* @page { ... } */
   /* @{{rule}} { ... } */
   | name = loc(AT_RULE) WS?
-    xs = loc(values) WS?
+    xs = loc(values)
     s = brace_block(stylesheet_without_eof) {
     { name;
       prelude = xs;
@@ -159,26 +146,27 @@ keyframe_style_rule:
   }
 
 selector_list:
-  | selector = loc(selector) WS? { [selector] }
-  | selector = loc(selector) WS? COMMA WS? seq = selector_list { selector :: seq }
+  /* complex_selector (inside selector) handles trailing WS? */
+  | selector = loc(selector) { [selector] }
+  | selector = loc(selector) COMMA WS? seq = selector_list { selector :: seq }
 
 relative_selector_list:
-  | selector = loc(relative_selector) WS? { [selector] }
-  | selector = loc(relative_selector) WS? COMMA WS? seq = relative_selector_list { selector :: seq }
+  /* complex_selector (inside relative_selector) handles trailing WS? */
+  | selector = loc(relative_selector) { [selector] }
+  | selector = loc(relative_selector) COMMA WS? seq = relative_selector_list { selector :: seq }
+
+/* Helper for style rule block content - handles both empty and non-empty */
+style_block:
+  | LEFT_BRACE WS? RIGHT_BRACE { ([], make_loc $startpos $endpos) }
+  | LEFT_BRACE ds = loc(declarations) RIGHT_BRACE { ds }
 
 /* .class {} */
 style_rule:
-  | prelude = loc(selector_list) WS?
-    block = loc(empty_brace_block) {
+  /* selector_list elements have trailing WS? from complex_selector */
+  | prelude = loc(selector_list)
+    block = style_block {
     { prelude;
       block;
-      loc = make_loc $startpos $endpos;
-    }
-  }
-  | prelude = loc(selector_list) WS?
-    declarations = brace_block(loc(declarations)) {
-    { prelude;
-      block = declarations;
       loc = make_loc $startpos $endpos;
     }
   }
@@ -186,9 +174,10 @@ style_rule:
 values: xs = list(loc(value)) { xs }
 
 declarations:
-  /* WS? needed to handle whitespace after { in stylesheet mode */
-  | WS? xs = nonempty_list(rule) SEMI_COLON? { xs }
-  | WS? xs = separated_nonempty_list(SEMI_COLON, rule) SEMI_COLON? { xs }
+  /* WS? needed to handle whitespace after { in stylesheet mode.
+     We use nonempty_list since rules (declarations) handle their own
+     trailing semicolons via SEMI_COLON? in declaration_without_eof */
+  | WS? xs = nonempty_list(rule) { xs }
 
 %inline rule:
   /* Rule can have declarations, since we have nesting, so both style_rules and
@@ -204,8 +193,19 @@ declaration_without_eof:
   | property = loc(IDENT)
     WS? COLON WS?
     value = loc(values)
-    WS? important = loc(boption(IMPORTANT))
-    WS? SEMI_COLON? {
+    important = loc(boption(IMPORTANT))
+    WS? SEMI_COLON {
+    { name = property;
+      value;
+      important;
+      loc = make_loc $startpos $endpos;
+    }
+  }
+  /* Declaration without trailing semicolon (last in block or single) */
+  | property = loc(IDENT)
+    WS? COLON WS?
+    value = loc(values)
+    important = loc(boption(IMPORTANT)) {
     { name = property;
       value;
       important;
@@ -231,11 +231,11 @@ nth_payload:
   }
   /* This is a hackish solution where combinator isn't catched because the lexer
   assignes the `-` to NUMBER. This could be solved by leftassoc or the lexer */
-  | a = DIMENSION WS? b = NUMBER {
+  | a = DIMENSION b = NUMBER {
     let b = Int.abs (int_of_string (b)) in
     Nth (ANB (((int_of_string (fst a)), "-", b)))
   }
-  | n = IDENT WS? {
+  | n = IDENT {
     match n with
       | "even" -> Nth (Even)
       | "odd" -> Nth (Odd)
@@ -259,10 +259,10 @@ nth_payload:
 /* <pseudo-class-selector> = ':' <ident-token> | ':' <function-token> <any-value> ')' */
 pseudo_class_selector:
   | COLON i = IDENT { (Pseudoclass(PseudoIdent i)) } /* :visited */
-  | COLON f = FUNCTION xs = loc(relative_selector_list) RIGHT_PAREN /* :has() */ {
-    (Pseudoclass(Function({ name = f; payload = xs })))
-  }
-  | COLON f = FUNCTION xs = loc(selector_list) RIGHT_PAREN /* :not() */ {
+  /* :has(), :not(), :is(), :where() - all take selector lists.
+     We use relative_selector_list as it's the superset (includes selectors
+     with optional leading combinator like `:has(> img)`) */
+  | COLON f = FUNCTION xs = loc(relative_selector_list) RIGHT_PAREN {
     (Pseudoclass(Function({ name = f; payload = xs })))
   }
   | COLON f = NTH_FUNCTION xs = loc(nth_payload) RIGHT_PAREN /* :nth() */ {
@@ -279,43 +279,27 @@ wq_name:
   | i = IDENT { i }
   | t = TAG { t }
 
+/* Attribute value can be string or ident */
+attr_value:
+  | v = STRING { Attr_string v }
+  | v = wq_name { Attr_ident v }
+
+/* Optional matcher with value */
+attr_matcher_part:
+  | /* empty */ { None }
+  | m = attr_matcher WS? v = attr_value { Some (m, v) }
+
 /* <attribute-selector> = '[' <wq-name> ']' | '[' <wq-name> <attr-matcher> [  <string-token> | <ident-token> ] <attr-modifier>? ']' */
 attribute_selector:
   /* https://www.w3.org/TR/selectors-4/#type-nmsp */
   /* We don't support namespaces in wq-name (`ns-prefix?`). We treat it like a IDENT */
-  /* [ <wq-name> ] */
   | LEFT_BRACKET WS?
-    i = wq_name WS?
-    RIGHT_BRACKET {
-    Attribute(Attr_value i)
-  }
-  /* [ wq-name = "value"] */
-  | LEFT_BRACKET WS?
-    i = wq_name WS?
-    m = attr_matcher WS?
-    v = STRING WS?
-    RIGHT_BRACKET {
-    Attribute(
-      To_equal({
-        name = i;
-        kind = m;
-        value = Attr_string v
-      })
-    )
-  }
-  /* [ wq-name = value] */
-  | LEFT_BRACKET WS?
-    i = wq_name WS?
-    m = attr_matcher WS?
-    v = wq_name WS?
-    RIGHT_BRACKET {
-    Attribute(
-      To_equal({
-        name = i;
-        kind = m;
-        value = Attr_ident v
-      })
-    )
+    i = wq_name
+    matcher = attr_matcher_part
+    WS? RIGHT_BRACKET {
+    match matcher with
+    | None -> Attribute(Attr_value i)
+    | Some (m, v) -> Attribute(To_equal({ name = i; kind = m; value = v }))
   }
   /* TODO: add attr-modifier */
 ;
@@ -345,9 +329,8 @@ selector:
 
   Check <non_complex_selector>
   */
-  /* | xs = skip_ws_right(simple_selector) { SimpleSelector xs } */
-  /* | xs = skip_ws_right(compound_selector) { CompoundSelector xs } */
-  | xs = skip_ws_right(complex_selector) { ComplexSelector xs }
+  /* complex_selector already handles trailing WS? */
+  | xs = complex_selector { ComplexSelector xs }
 
 type_selector:
   | AMPERSAND; { Ampersand } /* & {} https://drafts.csswg.org/css-nesting/#nest-selector */
@@ -443,16 +426,16 @@ combinator_sequence:
 
 /* <complex-selector> = <compound-selector> [ <combinator>? <compound-selector> ]* */
 complex_selector:
-  | left = skip_ws_right(non_complex_selector) { Selector left }
-  | left = non_complex_selector WS? seq = nonempty_list(combinator_sequence) {
-    Combinator {
-      left = left;
-      right = seq;
-    }
+  /* Factor out common prefix: non_complex_selector WS? followed by optional sequence */
+  | left = non_complex_selector WS? seq = list(combinator_sequence) {
+    match seq with
+    | [] -> Selector left
+    | _ -> Combinator { left = left; right = seq }
   }
 /* <relative-selector> = <combinator>? <complex-selector> */
 relative_selector:
-  | xs = skip_ws_right(complex_selector) { RelativeSelector { combinator = None; complex_selector = xs} }
+  /* complex_selector already handles trailing WS? */
+  | xs = complex_selector { RelativeSelector { combinator = None; complex_selector = xs} }
   | c = combinator WS? xs = complex_selector { RelativeSelector { combinator = Some c; complex_selector = xs } }
 
 value:
