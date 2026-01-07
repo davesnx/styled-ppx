@@ -169,7 +169,9 @@ module Css_transform = {
       let var_name = variable_to_css_var_name(path);
       let original_path = String.concat(".", path);
       if (!List.exists(((vn, _, _)) => vn == var_name, dynamic_vars^)) {
-        dynamic_vars := [(var_name, original_path, ""), ...dynamic_vars^];
+        /* Mark selector variables with special "selector" type_path */
+        dynamic_vars :=
+          [(var_name, original_path, "selector"), ...dynamic_vars^];
       };
       SimpleSelector(Variable(path));
     | SimpleSelector(simple) => SimpleSelector(simple)
@@ -229,7 +231,9 @@ module Css_transform = {
       let var_name = variable_to_css_var_name(path);
       let original_path = String.concat(".", path);
       if (!List.exists(((vn, _, _)) => vn == var_name, dynamic_vars^)) {
-        dynamic_vars := [(var_name, original_path, ""), ...dynamic_vars^];
+        /* Mark selector variables with special "selector" type_path */
+        dynamic_vars :=
+          [(var_name, original_path, "selector"), ...dynamic_vars^];
       };
       SimpleSelector(Variable(path));
     | _ => SimpleSelector(simple)
@@ -243,7 +247,9 @@ module Css_transform = {
       let var_name = variable_to_css_var_name(path);
       let original_path = String.concat(".", path);
       if (!List.exists(((vn, _, _)) => vn == var_name, dynamic_vars^)) {
-        dynamic_vars := [(var_name, original_path, ""), ...dynamic_vars^];
+        /* Mark selector variables with special "selector" type_path */
+        dynamic_vars :=
+          [(var_name, original_path, "selector"), ...dynamic_vars^];
       };
       ClassVariable(path);
     | _ => subclass
@@ -326,8 +332,8 @@ module Css_transform = {
   and transform_at_rule = (at_rule: at_rule, dynamic_vars) => {
     let {name, prelude, block, loc} = at_rule;
     let (prelude_values, prelude_loc) = prelude;
-    /* At-rule preludes don't have property types, so use empty string fallback */
-    let default_type_for_var = _var => "";
+    /* At-rule preludes (like @media conditions) use "media-query" type for fst() extraction */
+    let default_type_for_var = _var => "media-query";
     let transformed_prelude =
       List.map(
         ((cv, cv_loc)) =>

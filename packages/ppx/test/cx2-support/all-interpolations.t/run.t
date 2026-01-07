@@ -16,7 +16,7 @@ If this test fail means that the module is not in sync with the ppx
   File "input.re", line 1468, characters 6-32:
   1468 | [%cx2 {|opacity: $(opacityVal)|}];
                ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  Error: This expression has type float but an expression was expected of type
-           [< `percent of float ]
+  Error: This expression has type "float" but an expression was expected of type
+           "[< `percent of float ]"
   [1]
 

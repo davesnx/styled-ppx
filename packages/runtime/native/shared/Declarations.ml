@@ -856,7 +856,7 @@ let filter x =
 let boxShadow (x : [< BoxShadow.t ]) =
   Rule.declaration ({js|boxShadow|js}, BoxShadow.toString (x :> BoxShadow.t))
 
-let boxShadows (x : Shadow.box array) =
+let boxShadows (x : Shadow.t array) =
   Rule.declaration ({js|boxShadow|js}, Shadow.many x)
 
 let border px style color =
@@ -918,7 +918,7 @@ let textDecorations ?line ?thickness ?style ?color () =
 let textShadow (x : [< TextShadow.t ]) =
   Rule.declaration ({js|textShadow|js}, TextShadow.toString (x :> TextShadow.t))
 
-let textShadows (x : Shadow.text array) =
+let textShadows (x : Shadow.t array) =
   Rule.declaration ({js|textShadow|js}, Shadow.many x)
 
 let transformStyle x =

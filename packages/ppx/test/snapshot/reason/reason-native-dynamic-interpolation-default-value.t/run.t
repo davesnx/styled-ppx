@@ -8,7 +8,11 @@
       | None => ""
       };
     let styles = (~var=CSS.hex("333"), _) =>
-      CSS.style([|CSS.label("DynamicComponentWithDefaultValue"), CSS.display(`block), CSS.color(var)|]);
+      CSS.style([|
+        CSS.label("DynamicComponentWithDefaultValue"),
+        CSS.display(`block),
+        CSS.color(var),
+      |]);
     let make =
         (
           ~var=?,

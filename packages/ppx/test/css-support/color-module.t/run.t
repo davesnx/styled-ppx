@@ -76,12 +76,16 @@ If this test fail means that the module is not in sync with the ppx
   CSS.backgroundColor(`rgba((0, 51, 178, `num(0.5))));
   CSS.backgroundColor(`rgba((0, 64, 185, `percent(0.5))));
   CSS.backgroundColor(`rgba((0, 64, 185, `num(0.5))));
-  CSS.backgroundColor(`hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))));
+  CSS.backgroundColor(
+    `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
+  );
   CSS.backgroundColor(`rgba((0, 51, 178, `percent(0.5))));
   CSS.backgroundColor(`rgba((0, 51, 178, `num(0.5))));
   CSS.backgroundColor(`rgba((0, 64, 185, `percent(0.5))));
   CSS.backgroundColor(`rgba((0, 64, 185, `num(0.5))));
-  CSS.backgroundColor(`hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))));
+  CSS.backgroundColor(
+    `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
+  );
   CSS.backgroundColor(`hex({js|000F|js}));
   CSS.backgroundColor(`hex({js|000000FF|js}));
   CSS.backgroundColor(CSS.rebeccapurple);
@@ -92,12 +96,16 @@ If this test fail means that the module is not in sync with the ppx
   CSS.borderColor(`rgba((0, 51, 178, `num(0.5))));
   CSS.borderColor(`rgba((0, 64, 185, `percent(0.5))));
   CSS.borderColor(`rgba((0, 64, 185, `num(0.5))));
-  CSS.borderColor(`hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))));
+  CSS.borderColor(
+    `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
+  );
   CSS.borderColor(`rgba((0, 51, 178, `percent(0.5))));
   CSS.borderColor(`rgba((0, 51, 178, `num(0.5))));
   CSS.borderColor(`rgba((0, 64, 185, `percent(0.5))));
   CSS.borderColor(`rgba((0, 64, 185, `num(0.5))));
-  CSS.borderColor(`hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))));
+  CSS.borderColor(
+    `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
+  );
   CSS.borderColor(`hex({js|000F|js}));
   CSS.borderColor(`hex({js|000000FF|js}));
   CSS.borderColor(CSS.rebeccapurple);
@@ -108,12 +116,16 @@ If this test fail means that the module is not in sync with the ppx
   CSS.textDecorationColor(`rgba((0, 51, 178, `num(0.5))));
   CSS.textDecorationColor(`rgba((0, 64, 185, `percent(0.5))));
   CSS.textDecorationColor(`rgba((0, 64, 185, `num(0.5))));
-  CSS.textDecorationColor(`hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))));
+  CSS.textDecorationColor(
+    `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
+  );
   CSS.textDecorationColor(`rgba((0, 51, 178, `percent(0.5))));
   CSS.textDecorationColor(`rgba((0, 51, 178, `num(0.5))));
   CSS.textDecorationColor(`rgba((0, 64, 185, `percent(0.5))));
   CSS.textDecorationColor(`rgba((0, 64, 185, `num(0.5))));
-  CSS.textDecorationColor(`hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))));
+  CSS.textDecorationColor(
+    `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
+  );
   CSS.textDecorationColor(`hex({js|000F|js}));
   CSS.textDecorationColor(`hex({js|000000FF|js}));
   CSS.textDecorationColor(CSS.rebeccapurple);
@@ -134,9 +146,23 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|columnRuleColor|js}, {js|#000000FF|js});
   CSS.unsafe({js|columnRuleColor|js}, {js|rebeccapurple|js});
   
-  CSS.color(`colorMix((`srgb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))));
-  CSS.color(`colorMix((`srgb, (`rgba((255, 0, 0, `num(0.2))), Some(`percent(65.))), (CSS.olive, None))));
-  CSS.color(`colorMix((`srgb, (`currentColor, None), (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))))));
+  CSS.color(
+    `colorMix((`srgb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
+  );
+  CSS.color(
+    `colorMix((
+      `srgb,
+      (`rgba((255, 0, 0, `num(0.2))), Some(`percent(65.))),
+      (CSS.olive, None),
+    )),
+  );
+  CSS.color(
+    `colorMix((
+      `srgb,
+      (`currentColor, None),
+      (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))),
+    )),
+  );
   CSS.color(
     `colorMix((
       `srgb,
@@ -144,11 +170,21 @@ If this test fail means that the module is not in sync with the ppx
       (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))),
     )),
   );
-  CSS.color(`colorMix((`lch, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))));
-  CSS.color(`colorMix((`hsl, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))));
-  CSS.color(`colorMix((`hwb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))));
-  CSS.color(`colorMix((`xyz, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))));
-  CSS.color(`colorMix((`lab, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))));
+  CSS.color(
+    `colorMix((`lch, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
+  );
+  CSS.color(
+    `colorMix((`hsl, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
+  );
+  CSS.color(
+    `colorMix((`hwb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
+  );
+  CSS.color(
+    `colorMix((`xyz, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
+  );
+  CSS.color(
+    `colorMix((`lab, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
+  );
   CSS.color(
     `colorMix((
       `polar_with_hue((`lch, `longer)),
@@ -157,12 +193,22 @@ If this test fail means that the module is not in sync with the ppx
     )),
   );
   
-  CSS.backgroundColor(`colorMix((`srgb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))));
   CSS.backgroundColor(
-    `colorMix((`srgb, (`rgba((255, 0, 0, `num(0.2))), Some(`percent(65.))), (CSS.olive, None))),
+    `colorMix((`srgb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
   );
   CSS.backgroundColor(
-    `colorMix((`srgb, (`currentColor, None), (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))))),
+    `colorMix((
+      `srgb,
+      (`rgba((255, 0, 0, `num(0.2))), Some(`percent(65.))),
+      (CSS.olive, None),
+    )),
+  );
+  CSS.backgroundColor(
+    `colorMix((
+      `srgb,
+      (`currentColor, None),
+      (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))),
+    )),
   );
   CSS.backgroundColor(
     `colorMix((
@@ -171,15 +217,39 @@ If this test fail means that the module is not in sync with the ppx
       (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))),
     )),
   );
-  CSS.backgroundColor(`colorMix((`lch, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))));
-  CSS.backgroundColor(`colorMix((`hsl, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))));
-  CSS.backgroundColor(`colorMix((`hwb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))));
-  CSS.backgroundColor(`colorMix((`xyz, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))));
-  CSS.backgroundColor(`colorMix((`lab, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))));
+  CSS.backgroundColor(
+    `colorMix((`lch, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
+  );
+  CSS.backgroundColor(
+    `colorMix((`hsl, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
+  );
+  CSS.backgroundColor(
+    `colorMix((`hwb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
+  );
+  CSS.backgroundColor(
+    `colorMix((`xyz, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
+  );
+  CSS.backgroundColor(
+    `colorMix((`lab, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
+  );
   
-  CSS.borderColor(`colorMix((`srgb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))));
-  CSS.borderColor(`colorMix((`srgb, (`rgba((255, 0, 0, `num(0.2))), Some(`percent(65.))), (CSS.olive, None))));
-  CSS.borderColor(`colorMix((`srgb, (`currentColor, None), (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))))));
+  CSS.borderColor(
+    `colorMix((`srgb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
+  );
+  CSS.borderColor(
+    `colorMix((
+      `srgb,
+      (`rgba((255, 0, 0, `num(0.2))), Some(`percent(65.))),
+      (CSS.olive, None),
+    )),
+  );
+  CSS.borderColor(
+    `colorMix((
+      `srgb,
+      (`currentColor, None),
+      (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))),
+    )),
+  );
   CSS.borderColor(
     `colorMix((
       `srgb,
@@ -187,18 +257,38 @@ If this test fail means that the module is not in sync with the ppx
       (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))),
     )),
   );
-  CSS.borderColor(`colorMix((`lch, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))));
-  CSS.borderColor(`colorMix((`hsl, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))));
-  CSS.borderColor(`colorMix((`hwb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))));
-  CSS.borderColor(`colorMix((`xyz, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))));
-  CSS.borderColor(`colorMix((`lab, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))));
+  CSS.borderColor(
+    `colorMix((`lch, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
+  );
+  CSS.borderColor(
+    `colorMix((`hsl, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
+  );
+  CSS.borderColor(
+    `colorMix((`hwb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
+  );
+  CSS.borderColor(
+    `colorMix((`xyz, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
+  );
+  CSS.borderColor(
+    `colorMix((`lab, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
+  );
   
-  CSS.textDecorationColor(`colorMix((`srgb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))));
   CSS.textDecorationColor(
-    `colorMix((`srgb, (`rgba((255, 0, 0, `num(0.2))), Some(`percent(65.))), (CSS.olive, None))),
+    `colorMix((`srgb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
   );
   CSS.textDecorationColor(
-    `colorMix((`srgb, (`currentColor, None), (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))))),
+    `colorMix((
+      `srgb,
+      (`rgba((255, 0, 0, `num(0.2))), Some(`percent(65.))),
+      (CSS.olive, None),
+    )),
+  );
+  CSS.textDecorationColor(
+    `colorMix((
+      `srgb,
+      (`currentColor, None),
+      (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))),
+    )),
   );
   CSS.textDecorationColor(
     `colorMix((
@@ -207,21 +297,58 @@ If this test fail means that the module is not in sync with the ppx
       (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))),
     )),
   );
-  CSS.textDecorationColor(`colorMix((`lch, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))));
-  CSS.textDecorationColor(`colorMix((`hsl, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))));
-  CSS.textDecorationColor(`colorMix((`hwb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))));
-  CSS.textDecorationColor(`colorMix((`xyz, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))));
-  CSS.textDecorationColor(`colorMix((`lab, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))));
+  CSS.textDecorationColor(
+    `colorMix((`lch, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
+  );
+  CSS.textDecorationColor(
+    `colorMix((`hsl, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
+  );
+  CSS.textDecorationColor(
+    `colorMix((`hwb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
+  );
+  CSS.textDecorationColor(
+    `colorMix((`xyz, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
+  );
+  CSS.textDecorationColor(
+    `colorMix((`lab, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
+  );
   
-  CSS.unsafe({js|columnRuleColor|js}, {js|color-mix(in srgb, teal 65%, olive)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|color-mix(in srgb, rgb(255, 0, 0, .2) 65%, olive)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|color-mix(in srgb, currentColor, rgba(0, 0, 0, .5) 65%)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, .5) 65%)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|color-mix(in lch, teal 65%, olive)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|color-mix(in hsl, teal 65%, olive)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|color-mix(in hwb, teal 65%, olive)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|color-mix(in xyz, teal 65%, olive)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|color-mix(in lab, teal 65%, olive)|js});
+  CSS.unsafe(
+    {js|columnRuleColor|js},
+    {js|color-mix(in srgb, teal 65%, olive)|js},
+  );
+  CSS.unsafe(
+    {js|columnRuleColor|js},
+    {js|color-mix(in srgb, rgb(255, 0, 0, .2) 65%, olive)|js},
+  );
+  CSS.unsafe(
+    {js|columnRuleColor|js},
+    {js|color-mix(in srgb, currentColor, rgba(0, 0, 0, .5) 65%)|js},
+  );
+  CSS.unsafe(
+    {js|columnRuleColor|js},
+    {js|color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, .5) 65%)|js},
+  );
+  CSS.unsafe(
+    {js|columnRuleColor|js},
+    {js|color-mix(in lch, teal 65%, olive)|js},
+  );
+  CSS.unsafe(
+    {js|columnRuleColor|js},
+    {js|color-mix(in hsl, teal 65%, olive)|js},
+  );
+  CSS.unsafe(
+    {js|columnRuleColor|js},
+    {js|color-mix(in hwb, teal 65%, olive)|js},
+  );
+  CSS.unsafe(
+    {js|columnRuleColor|js},
+    {js|color-mix(in xyz, teal 65%, olive)|js},
+  );
+  CSS.unsafe(
+    {js|columnRuleColor|js},
+    {js|color-mix(in lab, teal 65%, olive)|js},
+  );
   
   CSS.color(`rgba((0, 0, 0, `calc(`num(1.)))));
   CSS.color(`rgba((0, 0, 0, `calc(`sub((`num(10.), `num(1.)))))));

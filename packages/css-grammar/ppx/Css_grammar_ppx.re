@@ -288,6 +288,71 @@ let module_path_extension =
     module_path_expander,
   );
 
+/* Pattern for spec_extract: captures spec string and optional module path */
+let spec_extract_pattern = Ast_pattern.(pstr(pstr_eval(__, nil) ^:: nil));
+
+/* [%spec_extract "spec_string"] or [%spec_extract "spec_string", (module Css_types.Foo)]
+   Generates just the extract_interpolations function expression */
+let spec_extract_expander =
+    (~loc as exprLoc, ~path as _: string, payload_expr: expression) => {
+  module Ast_builder =
+    Ast_builder.Make({
+      let loc = exprLoc;
+    });
+  module Emit = Generate.Make(Ast_builder);
+
+  let (spec_string, runtime_path_opt) =
+    switch (payload_expr.pexp_desc) {
+    /* Form 1: Just a string - [%spec_extract "spec_string"] */
+    | Pexp_constant(Pconst_string(s, _, _)) => (s, None)
+    /* Form 2: Tuple with module - [%spec_extract "spec_string", (module ...)] */
+    | Pexp_tuple([spec_expr, witness_expr]) =>
+      switch (extract_spec_string(spec_expr)) {
+      | Some(s) =>
+        let runtime_path = extract_module_path(witness_expr);
+        (s, runtime_path);
+      | None =>
+        raise(
+          Location.raise_errorf(
+            ~loc=exprLoc,
+            "first element must be a spec string literal",
+          ),
+        )
+      }
+    | _ =>
+      raise(
+        Location.raise_errorf(
+          ~loc=exprLoc,
+          "spec_extract expects a string or (string, module) tuple",
+        ),
+      )
+    };
+
+  switch (Css_spec_parser.value_of_string(spec_string)) {
+  | Some(parsed_spec) =>
+    Emit.make_extract_interpolations(
+      ~spec=parsed_spec,
+      ~runtime_module_path=runtime_path_opt,
+    )
+  | None =>
+    raise(
+      Location.raise_errorf(
+        ~loc=exprLoc,
+        "couldn't parse CSS spec: %s",
+        spec_string,
+      ),
+    )
+  };
+};
+
+let spec_extract_extension =
+  Ppxlib.Extension.declare(
+    "spec_extract",
+    Ppxlib.Extension.Context.Expression,
+    spec_extract_pattern,
+    spec_extract_expander,
+  );
+
 let preprocess_impl = structure_items => structure_items;
 
 Driver.register_transformation(
@@ -299,6 +364,7 @@ Driver.register_transformation(
     spec_t_extension,
     spec_module_extension,
     module_path_extension,
+    spec_extract_extension,
   ],
   "css-grammar-ppx",
 );

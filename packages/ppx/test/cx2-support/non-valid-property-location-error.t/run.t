@@ -20,5 +20,8 @@ If this test fail means that the module is not in sync with the ppx
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  CSS.style([|CSS.display(`block), [%ocaml.error "Unknown property 'heightx'"]|]);
+  CSS.style([|
+    CSS.display(`block),
+    [%ocaml.error "Unknown property 'heightx'"],
+  |]);
 

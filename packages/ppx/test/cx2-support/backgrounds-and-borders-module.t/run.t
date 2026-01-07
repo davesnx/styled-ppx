@@ -307,7 +307,10 @@ If this test fail means that the module is not in sync with the ppx
       None,
       [|
         (Some(CSS.red), Some(`pxFloat(-50.))),
-        (Some(CSS.white), Some(`calc(`add((`pxFloat(-25.), `percent(50.)))))),
+        (
+          Some(CSS.white),
+          Some(`calc(`add((`pxFloat(-25.), `percent(50.))))),
+        ),
         (Some(CSS.blue), Some(`percent(100.))),
       |]: CSS.Types.Gradient.color_stop_list,
     )),
@@ -321,7 +324,10 @@ If this test fail means that the module is not in sync with the ppx
       None,
       [|
         (Some(CSS.red), Some(`pxFloat(-50.))),
-        (Some(CSS.white), Some(`calc(`add((`pxFloat(-25.), `percent(50.)))))),
+        (
+          Some(CSS.white),
+          Some(`calc(`add((`pxFloat(-25.), `percent(50.))))),
+        ),
         (Some(CSS.blue), Some(`percent(100.))),
       |]: CSS.Types.Gradient.color_stop_list,
     )),
@@ -360,13 +366,19 @@ If this test fail means that the module is not in sync with the ppx
   CSS.backgroundImages([|
     `linearGradient((
       Some(`deg(45.)),
-      [|(Some(Color.Background.boxDark), Some(`percent(25.))), (Some(`transparent), Some(`percent(25.)))|]: CSS.Types.Gradient.color_stop_list,
+      [|
+        (Some(Color.Background.boxDark), Some(`percent(25.))),
+        (Some(`transparent), Some(`percent(25.))),
+      |]: CSS.Types.Gradient.color_stop_list,
     )),
     `linearGradient((
       None,
       [|
         (Some(CSS.red), Some(`pxFloat(-50.))),
-        (Some(CSS.white), Some(`calc(`add((`pxFloat(-25.), `percent(50.)))))),
+        (
+          Some(CSS.white),
+          Some(`calc(`add((`pxFloat(-25.), `percent(50.))))),
+        ),
         (Some(CSS.blue), Some(`percent(100.))),
       |]: CSS.Types.Gradient.color_stop_list,
     )),
@@ -411,7 +423,10 @@ If this test fail means that the module is not in sync with the ppx
       None,
       [|
         (Some(CSS.red), Some(`pxFloat(-50.))),
-        (Some(CSS.white), Some(`calc(`add((`pxFloat(-25.), `percent(50.)))))),
+        (
+          Some(CSS.white),
+          Some(`calc(`add((`pxFloat(-25.), `percent(50.))))),
+        ),
         (Some(CSS.blue), Some(`percent(100.))),
       |]: CSS.Types.Gradient.color_stop_list,
     )),

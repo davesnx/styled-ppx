@@ -125,6 +125,8 @@ let length =
     }
   );
 
+let length_runtime_module_path = "Css_types.Length";
+
 // https://drafts.csswg.org/css-values-4/#angles
 let angle =
   token(token =>
@@ -144,6 +146,8 @@ let angle =
     }
   );
 
+let angle_runtime_module_path = "Css_types.Angle";
+
 // https://drafts.csswg.org/css-values-4/#time
 let time =
   token(token =>
@@ -159,6 +163,8 @@ let time =
     | _ => Error(["Expected time."])
     }
   );
+
+let time_runtime_module_path = "Css_types.Time";
 
 module Time = {
   type t = [
@@ -183,6 +189,8 @@ let frequency =
     }
   );
 
+let frequency_runtime_module_path = "Css_types.Frequency";
+
 // https://drafts.csswg.org/css-values-4/#resolution
 let resolution =
   token(token =>
@@ -201,12 +209,16 @@ let resolution =
     }
   );
 
+let resolution_runtime_module_path = "Css_types.Resolution";
+
 // TODO: positive numbers like <number [0,infinity]>
 let percentage = {
   let.bind_match num = number;
   let.bind_match () = expect(PERCENT);
   Rule.Match.return(num);
 };
+
+let percentage_runtime_module_path = "Css_types.Percentage";
 
 // https://drafts.csswg.org/css-values-4/#css-identifier
 // TODO: differences between <ident> and keyword
@@ -227,6 +239,8 @@ let css_wide_keywords =
     Rule.Pattern.value(`Revert, keyword("revert")),
     Rule.Pattern.value(`RevertLayer, keyword("revert-layer")),
   ]);
+
+let css_wide_keywords_runtime_module_path = "Css_types.Cascading";
 
 // TODO: proper implement
 // https://drafts.csswg.org/css-values-4/#custom-idents
@@ -270,6 +284,8 @@ let url_no_interp = {
   Combinators.xor([url_token, function_call("url", string_token)]);
 };
 
+let url_runtime_module_path = "Css_types.Url";
+
 // css-color-4
 // https://drafts.csswg.org/css-color-4/#hex-notation
 let hex_color =
@@ -279,6 +295,9 @@ let hex_color =
       Ok(str)
     | _ => Error(["Expected a hex-color."]),
   );
+
+/* hex_color is part of the color type, so use Color as the runtime module */
+let hex_color_runtime_module_path = "Css_types.Color";
 
 /* <interpolation>, It's not part of the spec.
      It's the implementation/workaround to inject Reason variables into CSS definitions.

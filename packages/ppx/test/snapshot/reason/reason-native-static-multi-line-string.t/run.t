@@ -7,7 +7,12 @@
       | Some(str) => " " ++ str
       | None => ""
       };
-    let styles = CSS.style([|CSS.label("MultiLineStrings"), CSS.display(`flex), CSS.justifyContent(`center)|]);
+    let styles =
+      CSS.style([|
+        CSS.label("MultiLineStrings"),
+        CSS.display(`flex),
+        CSS.justifyContent(`center),
+      |]);
     let make =
         (
           ~onWheel: option(React.Event.Wheel.t => unit)=?,

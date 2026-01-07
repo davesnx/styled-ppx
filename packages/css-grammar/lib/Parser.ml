@@ -11699,6 +11699,8 @@ let shadow : shadow Rule.rule =
     "[ 'inset' ]? [ <extended-length> | <interpolation> ]{2,4} [ <color> | \
      <interpolation> ]?"]
 
+let shadow_runtime_module_path = Some [%module_path Css_types.Shadow]
+
 let shadow_t : shadow_t Rule.rule =
   [%spec
     "[ <extended-length> | <interpolation> ]{2,3} [ <color> | <interpolation> \
@@ -15187,14 +15189,9 @@ let registry : (kind * packed_rule) list =
     Value "y", pack_rule y ?runtime_module_path:y_runtime_module_path ();
   ]
 
-(* Registry population.
-   Properties use prefixed keys to avoid collisions with values.
-   Alias properties (like -webkit-box-orient -> Property_box_orient) may not have
-   dedicated witnesses; they store None and use Obj.magic directly in lookup. *)
 let () =
   List.iter
     (fun (kind, rule) ->
-      (* Get the CSS name from the kind *)
       let css_name =
         match kind with
         | Property name -> name
@@ -15204,6 +15201,7 @@ let () =
       in
       let key =
         match kind with
+        (* Properties use prefixed keys to avoid collisions with values. *)
         | Property _ -> "property_" ^ css_name
         | Value _ | Function _ | Media_query _ -> css_name
       in
@@ -15307,121 +15305,26 @@ let check_property ~loc ~name value :
       | Error _ -> Error (loc, `Invalid_value property_error)))
   | None -> Error (loc, `Property_not_found)
 
-(* Helper functions to extract interpolations from parsed values with their type paths *)
-
-let extract_interpolation_from_extended_time (et : extended_time) :
-  (string * string) list =
-  match et with
-  | `Interpolation parts ->
-    [ String.concat "." parts, [%module_path Css_types.Time] ]
-  | _ -> []
-
-let extract_interpolation_from_timing_function (tf : timing_function) :
-  (string * string) list =
-  match tf with
-  | `Interpolation parts ->
-    [ String.concat "." parts, [%module_path Css_types.TimingFunction] ]
-  | _ -> []
-
-let extract_interpolation_from_transition_behavior_value
-  (bv : transition_behavior_value) : (string * string) list =
-  match bv with
-  | `Interpolation parts ->
-    [
-      String.concat "." parts, [%module_path Css_types.TransitionBehaviorValue];
-    ]
-  | _ -> []
-
-(* For property-only interpolation (entire transition value), use Transition.toString
-   to allow Transition.Value.t values. For property in multi-component transition,
-   use TransitionProperty.toString. *)
-let extract_interpolation_from_single_transition_property ~is_standalone
-  (prop : single_transition_property) : (string * string) list =
-  match prop with
-  | `Interpolation parts ->
-    let type_path =
-      if is_standalone then [%module_path Css_types.Transition]
-      else [%module_path Css_types.TransitionProperty]
-    in
-    [ String.concat "." parts, type_path ]
-  | _ -> []
-
-let extract_interpolation_from_single_transition_property_opt ~is_standalone
-  (prop_opt :
-    [ `Single_transition_property of single_transition_property | `None ]) :
-  (string * string) list =
-  match prop_opt with
-  | `Single_transition_property prop ->
-    extract_interpolation_from_single_transition_property ~is_standalone prop
-  | `None -> []
-
-let extract_interpolations_from_single_transition (st : single_transition) :
-  (string * string) list =
-  match st with
-  | `Xor prop ->
-    (* Property-only: could be a full Transition.Value.t *)
-    extract_interpolation_from_single_transition_property_opt
-      ~is_standalone:true prop
-  | `Static_0 (prop, duration) ->
-    (* Has other components: property should be TransitionProperty.t *)
-    extract_interpolation_from_single_transition_property_opt
-      ~is_standalone:false prop
-    @ extract_interpolation_from_extended_time duration
-  | `Static_1 (prop, duration, timing) ->
-    extract_interpolation_from_single_transition_property_opt
-      ~is_standalone:false prop
-    @ extract_interpolation_from_extended_time duration
-    @ extract_interpolation_from_timing_function timing
-  | `Static_2 (prop, duration, timing, delay) ->
-    extract_interpolation_from_single_transition_property_opt
-      ~is_standalone:false prop
-    @ extract_interpolation_from_extended_time duration
-    @ extract_interpolation_from_timing_function timing
-    @ extract_interpolation_from_extended_time delay
-  | `Static_3 (prop, duration, timing, delay, behavior) ->
-    extract_interpolation_from_single_transition_property_opt
-      ~is_standalone:false prop
-    @ extract_interpolation_from_extended_time duration
-    @ extract_interpolation_from_timing_function timing
-    @ extract_interpolation_from_extended_time delay
-    @ extract_interpolation_from_transition_behavior_value behavior
-
-let extract_interpolations_from_property_transition
-  (transitions : property_transition) : (string * string) list =
-  transitions
-  |> List.concat_map (function
-    | `Single_transition st -> extract_interpolations_from_single_transition st
-    | `Single_transition_no_interp _ -> [])
-
 let get_interpolation_types ~name value : (string * string) list =
   match find_rule name with
   | Some (Pack_rule { rule; runtime_module_path; _ }) ->
-    if
-      (* Special handling for transition property to get context-aware types *)
-      name = "transition"
-    then (
-      match parse property_transition value with
-      | Ok transitions ->
-        extract_interpolations_from_property_transition transitions
-      | Error _ -> [])
-    else (
-      let rule_with_universal =
-        Combinators.xor
-          [
-            Rule.Match.map Standard.interpolation (fun data ->
-              `Interpolation data);
-            Rule.Match.map Standard.css_wide_keywords (fun data ->
-              `CssWideKeyword data);
-            Rule.Match.map function_var (fun data -> `Var data);
-            Rule.Match.map (Obj.magic rule) (fun _ -> `Value);
-          ]
-      in
-      match parse rule_with_universal value with
-      | Ok (`Interpolation parts) ->
-        let type_path = Option.value ~default:"" runtime_module_path in
-        [ String.concat "." parts, type_path ]
-      | Ok (`CssWideKeyword _) -> []
-      | Ok (`Var _) -> []
-      | Ok `Value -> []
-      | Error _ -> [])
+    let rule_with_universal =
+      Combinators.xor
+        [
+          Rule.Match.map Standard.interpolation (fun data ->
+            `Interpolation data);
+          Rule.Match.map Standard.css_wide_keywords (fun data ->
+            `Css_wide_keyword data);
+          Rule.Match.map function_var (fun data -> `Var data);
+          Rule.Match.map (Obj.magic rule) (fun _ -> `Value);
+        ]
+    in
+    (match parse rule_with_universal value with
+    | Ok (`Interpolation parts) ->
+      let type_path = Option.value ~default:"" runtime_module_path in
+      [ String.concat "." parts, type_path ]
+    | Ok (`Css_wide_keyword _) -> []
+    | Ok (`Var _) -> []
+    | Ok `Value -> []
+    | Error _ -> [])
   | None -> []

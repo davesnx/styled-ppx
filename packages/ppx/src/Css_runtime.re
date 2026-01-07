@@ -576,11 +576,17 @@ let render_make_call = (~loc, ~classNames, ~dynamic_vars) => {
          let var_value =
            render_variable(~loc, String.split_on_char('.', original_path));
 
-         /* If type_path starts with "Css_types.", use it directly as the module path.
-            Otherwise, fall back to property-based lookup. */
+         /* Handle different type_path cases:
+            - "selector" or "media-query": Use fst() to extract className from cx2 tuple result
+            - "Css_types.X": Use X.toString directly
+            - other: Fall back to property-based lookup */
          let field_value =
-           if (String.length(type_path) > 10
-               && String.sub(type_path, 0, 10) == "Css_types.") {
+           if (type_path == "selector" || type_path == "media-query") {
+             /* Selector/media-query variables: use fst() to extract className from (className, vars) tuple */
+
+             [%expr fst([%e var_value])];
+           } else if (String.length(type_path) > 10
+                      && String.sub(type_path, 0, 10) == "Css_types.") {
              /* Extract module name from "Css_types.Color" -> "Color" */
              let module_name =
                String.sub(type_path, 10, String.length(type_path) - 10);

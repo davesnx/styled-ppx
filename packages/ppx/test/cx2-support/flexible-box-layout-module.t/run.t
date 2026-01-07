@@ -42,11 +42,20 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-jz3hqm", []);
   CSS.make("css-8j9o4z", []);
   CSS.make("css-1j7ej5v", []);
-  CSS.make("css-1q5it5d", [("--var-hvez6j", CSS.Types.Flex.toString(X.flex1))]);
-  CSS.make("css-fpeblm", [("--var-volh69", CSS.Types.Flex.toString(X.value))]);
+  CSS.make(
+    "css-1q5it5d",
+    [("--var-hvez6j", CSS.Types.Flex.toString(X.flex1))],
+  );
+  CSS.make(
+    "css-fpeblm",
+    [("--var-volh69", CSS.Types.Flex.toString(X.value))],
+  );
   CSS.make(
     "css-1spvg28",
-    [("--var-volh69", CSS.Types.Flex.toString(X.value)), ("--var-1u1axvx", CSS.Types.Flex.toString(X.min))],
+    [
+      ("--var-volh69", CSS.Types.Flex.toString(X.value)),
+      ("--var-1u1axvx", CSS.Types.Flex.toString(X.min)),
+    ],
   );
   CSS.make("css-1osz5qs", []);
   CSS.make("css-169l2ov", []);

@@ -84,8 +84,15 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|borderBottomLeftRadius|js}, {js|250px 100px|js});
   CSS.borderRadius(`pxFloat(10.));
   CSS.borderRadius(`percent(50.));
-  CSS.borderRadius2(~topLeftBottomRight=`pxFloat(2.), ~topRightBottomLeft=`pxFloat(4.));
-  CSS.borderRadius3(~topLeft=`pxFloat(2.), ~topRightBottomLeft=`pxFloat(4.), ~bottomRight=`pxFloat(8.));
+  CSS.borderRadius2(
+    ~topLeftBottomRight=`pxFloat(2.),
+    ~topRightBottomLeft=`pxFloat(4.),
+  );
+  CSS.borderRadius3(
+    ~topLeft=`pxFloat(2.),
+    ~topRightBottomLeft=`pxFloat(4.),
+    ~bottomRight=`pxFloat(8.),
+  );
   CSS.borderRadius4(
     ~topLeft=`pxFloat(2.),
     ~topRight=`pxFloat(4.),
@@ -94,7 +101,9 @@ If this test fail means that the module is not in sync with the ppx
   );
   CSS.unsafe(
     {js|borderRadius|js},
-    CSS.Types.Length.toString(`pxFloat(10.)) ++ " / " ++ CSS.Types.Length.toString(`pxFloat(20.)),
+    CSS.Types.Length.toString(`pxFloat(10.))
+    ++ " / "
+    ++ CSS.Types.Length.toString(`pxFloat(20.)),
   );
   CSS.unsafe(
     {js|borderRadius|js},
@@ -211,36 +220,88 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|borderImage|js}, {js|url("foo.png") 10 / 10px|js});
   CSS.unsafe({js|borderImage|js}, {js|url("foo.png") 10 / 10% / 10px|js});
   CSS.unsafe({js|borderImage|js}, {js|url("foo.png") fill 10 / 10% / 10px|js});
-  CSS.unsafe({js|borderImage|js}, {js|url("foo.png") fill 10 / 10% / 10px space|js});
+  CSS.unsafe(
+    {js|borderImage|js},
+    {js|url("foo.png") fill 10 / 10% / 10px space|js},
+  );
   
   CSS.boxShadow(`none);
   
-  CSS.boxShadows([|CSS.BoxShadow.box(~x=`pxFloat(1.), ~y=`pxFloat(1.), `currentColor)|]);
+  CSS.boxShadows([|
+    CSS.BoxShadow.box(~x=`pxFloat(1.), ~y=`pxFloat(1.), `currentColor),
+  |]);
   
   CSS.boxShadows([|CSS.BoxShadow.box(~x=`zero, ~y=`zero, CSS.black)|]);
   
-  CSS.boxShadows([|CSS.BoxShadow.box(~x=`pxFloat(1.), ~y=`pxFloat(2.), ~blur=`pxFloat(3.), `currentColor)|]);
-  
-  CSS.boxShadows([|CSS.BoxShadow.box(~x=`pxFloat(1.), ~y=`pxFloat(2.), ~blur=`pxFloat(3.), CSS.black)|]);
-  
   CSS.boxShadows([|
-    CSS.BoxShadow.box(~x=`pxFloat(1.), ~y=`pxFloat(2.), ~blur=`pxFloat(3.), ~spread=`pxFloat(4.), `currentColor),
+    CSS.BoxShadow.box(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(2.),
+      ~blur=`pxFloat(3.),
+      `currentColor,
+    ),
   |]);
   
   CSS.boxShadows([|
-    CSS.BoxShadow.box(~x=`pxFloat(1.), ~y=`pxFloat(2.), ~blur=`pxFloat(3.), ~spread=`pxFloat(4.), CSS.black),
-  |]);
-  
-  CSS.boxShadows([|CSS.BoxShadow.box(~x=`pxFloat(1.), ~y=`pxFloat(1.), ~inset=true, `currentColor)|]);
-  
-  CSS.boxShadows([|CSS.BoxShadow.box(~x=`zero, ~y=`zero, ~inset=true, CSS.black)|]);
-  
-  CSS.boxShadows([|
-    CSS.BoxShadow.box(~x=`pxFloat(1.), ~y=`pxFloat(2.), ~blur=`pxFloat(3.), ~inset=true, `currentColor),
+    CSS.BoxShadow.box(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(2.),
+      ~blur=`pxFloat(3.),
+      CSS.black,
+    ),
   |]);
   
   CSS.boxShadows([|
-    CSS.BoxShadow.box(~x=`pxFloat(1.), ~y=`pxFloat(2.), ~blur=`pxFloat(3.), ~inset=true, CSS.black),
+    CSS.BoxShadow.box(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(2.),
+      ~blur=`pxFloat(3.),
+      ~spread=`pxFloat(4.),
+      `currentColor,
+    ),
+  |]);
+  
+  CSS.boxShadows([|
+    CSS.BoxShadow.box(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(2.),
+      ~blur=`pxFloat(3.),
+      ~spread=`pxFloat(4.),
+      CSS.black,
+    ),
+  |]);
+  
+  CSS.boxShadows([|
+    CSS.BoxShadow.box(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(1.),
+      ~inset=true,
+      `currentColor,
+    ),
+  |]);
+  
+  CSS.boxShadows([|
+    CSS.BoxShadow.box(~x=`zero, ~y=`zero, ~inset=true, CSS.black),
+  |]);
+  
+  CSS.boxShadows([|
+    CSS.BoxShadow.box(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(2.),
+      ~blur=`pxFloat(3.),
+      ~inset=true,
+      `currentColor,
+    ),
+  |]);
+  
+  CSS.boxShadows([|
+    CSS.BoxShadow.box(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(2.),
+      ~blur=`pxFloat(3.),
+      ~inset=true,
+      CSS.black,
+    ),
   |]);
   
   CSS.boxShadows([|
@@ -274,7 +335,13 @@ If this test fail means that the module is not in sync with the ppx
       ~inset=true,
       CSS.black,
     ),
-    CSS.BoxShadow.box(~x=`pxFloat(1.), ~y=`pxFloat(2.), ~blur=`pxFloat(3.), ~spread=`pxFloat(4.), CSS.black),
+    CSS.BoxShadow.box(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(2.),
+      ~blur=`pxFloat(3.),
+      ~spread=`pxFloat(4.),
+      CSS.black,
+    ),
   |]);
   CSS.boxShadows([|
     CSS.BoxShadow.box(~x=`pxFloat(1.), ~y=`pxFloat(1.), `currentColor),
@@ -282,7 +349,13 @@ If this test fail means that the module is not in sync with the ppx
   |]);
   CSS.boxShadows([|
     CSS.BoxShadow.box(~x=`zero, ~y=`zero, ~blur=`pxFloat(5.), `currentColor),
-    CSS.BoxShadow.box(~x=`zero, ~y=`zero, ~blur=`pxFloat(10.), ~inset=true, CSS.black),
+    CSS.BoxShadow.box(
+      ~x=`zero,
+      ~y=`zero,
+      ~blur=`pxFloat(10.),
+      ~inset=true,
+      CSS.black,
+    ),
   |]);
   CSS.boxShadows([|
     CSS.BoxShadow.box(
@@ -368,7 +441,10 @@ If this test fail means that the module is not in sync with the ppx
   CSS.backgroundImage(
     `linearGradient((
       Some(`deg(90.)),
-      [|(Some(CSS.blue), Some(`percent(10.))), (Some(CSS.red), Some(`percent(20.)))|]: CSS.Types.Gradient.color_stop_list,
+      [|
+        (Some(CSS.blue), Some(`percent(10.))),
+        (Some(CSS.red), Some(`percent(20.))),
+      |]: CSS.Types.Gradient.color_stop_list,
     )),
   );
   CSS.backgroundImage(
@@ -380,7 +456,11 @@ If this test fail means that the module is not in sync with the ppx
   CSS.backgroundImage(
     `linearGradient((
       Some(`deg(90.)),
-      [|(Some(CSS.blue), None), (None, Some(`percent(10.))), (Some(CSS.red), None)|]: CSS.Types.Gradient.color_stop_list,
+      [|
+        (Some(CSS.blue), None),
+        (None, Some(`percent(10.))),
+        (Some(CSS.red), None),
+      |]: CSS.Types.Gradient.color_stop_list,
     )),
   );
   CSS.backgroundImage(
@@ -410,7 +490,11 @@ If this test fail means that the module is not in sync with the ppx
   CSS.backgroundImage(
     `linearGradient((
       None,
-      [|(Some(CSS.white), None), (Some(`hex({js|f06|js})), None), (Some(CSS.black), None)|]: CSS.Types.Gradient.color_stop_list,
+      [|
+        (Some(CSS.white), None),
+        (Some(`hex({js|f06|js})), None),
+        (Some(CSS.black), None),
+      |]: CSS.Types.Gradient.color_stop_list,
     )),
   );
   CSS.backgroundImage(
@@ -418,7 +502,10 @@ If this test fail means that the module is not in sync with the ppx
       None,
       [|
         (Some(CSS.red), Some(`pxFloat(-50.))),
-        (Some(CSS.white), Some(`calc(`add((`pxFloat(-25.), `percent(50.)))))),
+        (
+          Some(CSS.white),
+          Some(`calc(`add((`pxFloat(-25.), `percent(50.))))),
+        ),
         (Some(CSS.blue), Some(`percent(100.))),
       |]: CSS.Types.Gradient.color_stop_list,
     )),
@@ -432,7 +519,10 @@ If this test fail means that the module is not in sync with the ppx
       None,
       [|
         (Some(CSS.red), Some(`pxFloat(-50.))),
-        (Some(CSS.white), Some(`calc(`add((`pxFloat(-25.), `percent(50.)))))),
+        (
+          Some(CSS.white),
+          Some(`calc(`add((`pxFloat(-25.), `percent(50.))))),
+        ),
         (Some(CSS.blue), Some(`percent(100.))),
       |]: CSS.Types.Gradient.color_stop_list,
     )),
@@ -471,13 +561,19 @@ If this test fail means that the module is not in sync with the ppx
   CSS.backgroundImages([|
     `linearGradient((
       Some(`deg(45.)),
-      [|(Some(Color.Background.boxDark), Some(`percent(25.))), (Some(`transparent), Some(`percent(25.)))|]: CSS.Types.Gradient.color_stop_list,
+      [|
+        (Some(Color.Background.boxDark), Some(`percent(25.))),
+        (Some(`transparent), Some(`percent(25.))),
+      |]: CSS.Types.Gradient.color_stop_list,
     )),
     `linearGradient((
       None,
       [|
         (Some(CSS.red), Some(`pxFloat(-50.))),
-        (Some(CSS.white), Some(`calc(`add((`pxFloat(-25.), `percent(50.)))))),
+        (
+          Some(CSS.white),
+          Some(`calc(`add((`pxFloat(-25.), `percent(50.))))),
+        ),
         (Some(CSS.blue), Some(`percent(100.))),
       |]: CSS.Types.Gradient.color_stop_list,
     )),
@@ -540,10 +636,17 @@ If this test fail means that the module is not in sync with the ppx
       Some(`ellipse),
       None,
       None,
-      [|(None, Some(`percent(50.))), (Some(CSS.white), None), (Some(CSS.black), None)|]: CSS.Types.Gradient.color_stop_list,
+      [|
+        (None, Some(`percent(50.))),
+        (Some(CSS.white), None),
+        (Some(CSS.black), None),
+      |]: CSS.Types.Gradient.color_stop_list,
     )),
   );
-  CSS.unsafe({js|backgroundImage|js}, {js|radial-gradient(60% 60%, white, black)|js});
+  CSS.unsafe(
+    {js|backgroundImage|js},
+    {js|radial-gradient(60% 60%, white, black)|js},
+  );
   
   CSS.listStyleImage(
     `linearGradient((
@@ -578,7 +681,11 @@ If this test fail means that the module is not in sync with the ppx
   CSS.listStyleImage(
     `linearGradient((
       None,
-      [|(Some(CSS.white), None), (Some(`hex({js|f06|js})), None), (Some(CSS.black), None)|]: CSS.Types.Gradient.color_stop_list,
+      [|
+        (Some(CSS.white), None),
+        (Some(`hex({js|f06|js})), None),
+        (Some(CSS.black), None),
+      |]: CSS.Types.Gradient.color_stop_list,
     )),
   );
   CSS.listStyleImage(
@@ -592,7 +699,10 @@ If this test fail means that the module is not in sync with the ppx
       None,
       [|
         (Some(CSS.red), Some(`pxFloat(-50.))),
-        (Some(CSS.white), Some(`calc(`add((`pxFloat(-25.), `percent(50.)))))),
+        (
+          Some(CSS.white),
+          Some(`calc(`add((`pxFloat(-25.), `percent(50.))))),
+        ),
         (Some(CSS.blue), Some(`percent(100.))),
       |]: CSS.Types.Gradient.color_stop_list,
     )),
@@ -658,10 +768,17 @@ If this test fail means that the module is not in sync with the ppx
       Some(`ellipse),
       None,
       None,
-      [|(None, Some(`percent(50.))), (Some(CSS.white), None), (Some(CSS.black), None)|]: CSS.Types.Gradient.color_stop_list,
+      [|
+        (None, Some(`percent(50.))),
+        (Some(CSS.white), None),
+        (Some(CSS.black), None),
+      |]: CSS.Types.Gradient.color_stop_list,
     )),
   );
-  CSS.unsafe({js|listStyleImage|js}, {js|radial-gradient(60% 60%, white, black)|js});
+  CSS.unsafe(
+    {js|listStyleImage|js},
+    {js|radial-gradient(60% 60%, white, black)|js},
+  );
   
   CSS.imageRendering(`auto);
   CSS.imageRendering(`smooth);
@@ -675,7 +792,9 @@ If this test fail means that the module is not in sync with the ppx
   CSS.backgroundPosition(`hv((`zero, `zero)));
   CSS.backgroundPosition(`hv((`rem(1.), `zero)));
   CSS.backgroundPosition(`hvOffset((`right, `bottomOffset(`pxFloat(10.)))));
-  CSS.backgroundPosition(`hvOffset((`rightOffset(`pxFloat(20.)), `bottomOffset(`pxFloat(10.)))));
+  CSS.backgroundPosition(
+    `hvOffset((`rightOffset(`pxFloat(20.)), `bottomOffset(`pxFloat(10.)))),
+  );
   CSS.backgroundPositions([|`hv((`zero, `zero)), `center|]);
   
   CSS.objectPosition(`top);
@@ -691,7 +810,9 @@ If this test fail means that the module is not in sync with the ppx
   CSS.objectPosition(`hv((`cm(1.), `cm(2.))));
   CSS.objectPosition(`hv((`ch(10.), `em(8.))));
   
-  CSS.objectPosition(`hvOffset((`right, `pxFloat(20.), `bottom, `pxFloat(10.))));
+  CSS.objectPosition(
+    `hvOffset((`right, `pxFloat(20.), `bottom, `pxFloat(10.))),
+  );
   CSS.objectPosition(`hvOffset((`right, `em(3.), `bottom, `pxFloat(10.))));
   CSS.objectPosition(`hvOffset((`right, `pxFloat(10.), `top, `zero)));
   

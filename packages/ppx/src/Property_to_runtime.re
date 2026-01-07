@@ -161,7 +161,7 @@ let transform_with_variable = (parser, mapper, value_to_expr, ~loc, string) => {
         Rule.Match.map(Standard.interpolation, data => `Interpolation(data)),
         /* CSS-wide keywords (inherit, initial, unset, revert, revert-layer) - handled via CSS.unsafe */
         Rule.Match.map(Standard.css_wide_keywords, data =>
-          `CssWideKeyword(data)
+          `Css_wide_keyword(data)
         ),
         /* CSS var() function - handled via CSS.unsafe */
         Rule.Match.map(Parser.function_var, data => `Var(data)),
@@ -175,7 +175,7 @@ let transform_with_variable = (parser, mapper, value_to_expr, ~loc, string) => {
       render_variable(~loc, name)
       |> value_to_expr(~loc)
       |> List.map(add_CSS_rule_constraint(~loc))
-    | `CssWideKeyword(_) =>
+    | `Css_wide_keyword(_) =>
       /* CSS-wide keywords (inherit, initial, unset, revert, revert-layer) bypass the type system.
          Raise Unsupported_feature to fall back to CSS.unsafe rendering. */
       raise(Unsupported_feature)

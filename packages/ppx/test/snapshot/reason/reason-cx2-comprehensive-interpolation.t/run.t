@@ -15,21 +15,59 @@ Comprehensive test for cx2 interpolation with various property types
       [("--var-yq31wd", CSS.Types.Width.toString(lengthVar))],
     );
   let test2 =
-    CSS.make("css-c42q25 css-ai6rtm css-mjx1j css-g3iwpg", [("--var-yq31wd", CSS.Types.Length.toString(lengthVar))]);
-  let test3 = CSS.make("css-32u9gy css-1nv4nym css-1nl0ld0", [("--var-yq31wd", CSS.Types.Gap.toString(lengthVar))]);
-  let test4 = CSS.make("css-k3s05 css-dw114q css-16ri0tl", [("--var-15252qs", CSS.Types.Color.toString(colorVar))]);
+    CSS.make(
+      "css-c42q25 css-ai6rtm css-mjx1j css-g3iwpg",
+      [("--var-yq31wd", CSS.Types.Length.toString(lengthVar))],
+    );
+  let test3 =
+    CSS.make(
+      "css-32u9gy css-1nv4nym css-1nl0ld0",
+      [("--var-yq31wd", CSS.Types.Gap.toString(lengthVar))],
+    );
+  let test4 =
+    CSS.make(
+      "css-k3s05 css-dw114q css-16ri0tl",
+      [("--var-15252qs", CSS.Types.Color.toString(colorVar))],
+    );
   let flexBasisVar = CSS.px(100);
-  let test5 = CSS.make("css-13ho3oh", [("--var-x7fhjg", CSS.Types.FlexBasis.toString(flexBasisVar))]);
+  let test5 =
+    CSS.make(
+      "css-13ho3oh",
+      [("--var-x7fhjg", CSS.Types.FlexBasis.toString(flexBasisVar))],
+    );
   let gridLineVar = `auto;
-  let test6 = CSS.make("css-1lap05 css-gydso", [("--var-4ff4w4", CSS.Types.GridRowStart.toString(gridLineVar))]);
+  let test6 =
+    CSS.make(
+      "css-1lap05 css-gydso",
+      [("--var-4ff4w4", CSS.Types.GridRowStart.toString(gridLineVar))],
+    );
   let topVar = CSS.px(20);
-  let test7 = CSS.make("css-1457p3r css-t129nw", [("--var-1n3wsy", CSS.Types.Top.toString(topVar))]);
+  let test7 =
+    CSS.make(
+      "css-1457p3r css-t129nw",
+      [("--var-1n3wsy", CSS.Types.Top.toString(topVar))],
+    );
   let zIndexVar = `num(10);
-  let test8 = CSS.make("css-4z3574", [("--var-fd7qxc", CSS.Types.ZIndex.toString(zIndexVar))]);
+  let test8 =
+    CSS.make(
+      "css-4z3574",
+      [("--var-fd7qxc", CSS.Types.ZIndex.toString(zIndexVar))],
+    );
   let borderWidthVar = `medium;
-  let test9 = CSS.make("css-14zw3md css-1jugcl4", [("--var-wag9af", CSS.Types.Length.toString(borderWidthVar))]);
+  let test9 =
+    CSS.make(
+      "css-14zw3md css-1jugcl4",
+      [("--var-wag9af", CSS.Types.Length.toString(borderWidthVar))],
+    );
   let spacingVar = CSS.px(2);
-  let test10 = CSS.make("css-wx7rkh css-1s0bla0", [("--var-apx1x0", CSS.Types.LetterSpacing.toString(spacingVar))]);
+  let test10 =
+    CSS.make(
+      "css-wx7rkh css-1s0bla0",
+      [("--var-apx1x0", CSS.Types.LetterSpacing.toString(spacingVar))],
+    );
   let test11 = width =>
-    CSS.make("css-y0qb0l css-16ve3ed css-jk0pkr", [("--var-a9b677", CSS.Types.Width.toString(width))]);
+    CSS.make(
+      "css-y0qb0l css-16ve3ed css-jk0pkr",
+      [("--var-a9b677", CSS.Types.Width.toString(width))],
+    );
 

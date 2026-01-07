@@ -10,6 +10,13 @@ type error = list(string);
 type data('a) = result('a, error);
 type rule('a) = list(Tokens.t) => (data('a), list(Tokens.t));
 
+/* Interpolation tracking - used during parsing to record found interpolations with their types */
+module Interpolations: {
+  let reset: unit => unit;
+  let record: (string, string) => unit;
+  let get: unit => list((string, string));
+};
+
 type return('a, 'b) = 'b => rule('a);
 type bind('a, 'b, 'c) = (rule('a), 'b => rule('c)) => rule('c);
 type map('a, 'b, 'c, 'd) = (rule('a), 'b => 'c) => rule('d);
@@ -78,3 +85,18 @@ module Pattern: {
 
 /* Parse a string input using a rule, returning Ok(value) or Error(message) */
 let parse_string: (rule('a), string) => result('a, string);
+
+/*
+   `interpolatable` wraps a rule to make it accept interpolations.
+   When an interpolation $(var) is encountered, it records (var, type_path)
+   and returns `Interpolation. Otherwise delegates to the inner rule and
+   wraps the result in `Value.
+ */
+let interpolatable:
+  (~type_path: string, rule('a)) =>
+  rule(
+    [>
+      | `Interpolation(list(string))
+      | `Value('a)
+    ],
+  );

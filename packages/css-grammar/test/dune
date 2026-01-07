@@ -3,6 +3,7 @@
  (modules
   Runner
   Combinators_test
+  Interpolation_extraction_test
   Modifiers_test
   Parser_test
   Rules_test

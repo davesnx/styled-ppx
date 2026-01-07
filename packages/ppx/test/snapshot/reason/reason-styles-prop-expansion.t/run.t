@@ -8,7 +8,10 @@
   let css = main =>
     CSS.make(
       "css-3tpy8b css-1uzc9um css-17vxl0k",
-      [("--var-19ja411", CSS.Types.Color.toString(main)), ("--var-1xt8d8f", CSS.Types.Color.toString(CSS.black))],
+      [
+        ("--var-19ja411", CSS.Types.Color.toString(main)),
+        ("--var-1xt8d8f", CSS.Types.Color.toString(CSS.black)),
+      ],
     );
   <div className={fst(css(CSS.red))} style={snd(css(CSS.red))} />;
   let maybe_css = Some(CSS.make("css-17vxl0k", []));
@@ -26,7 +29,10 @@
       }
     }
   />;
-  <div className={fst(css(CSS.red)) ++ " " ++ "extra-classname"} style={snd(css(CSS.red))} />;
+  <div
+    className={fst(css(CSS.red)) ++ " " ++ "extra-classname"}
+    style={snd(css(CSS.red))}
+  />;
   <div
     className={
       switch (
@@ -48,7 +54,10 @@
   />;
   <div
     className={fst(css(CSS.red))}
-    style={ReactDOM.Style.combine(ReactDOM.Style.make([|("display", "flex")|]), snd(css(CSS.red)))}
+    style={ReactDOM.Style.combine(
+      ReactDOM.Style.make([|("display", "flex")|]),
+      snd(css(CSS.red)),
+    )}
   />;
   <div
     className=?{
@@ -65,13 +74,20 @@
         }
       ) {
       | None => ReactDOM.Style.make([|("display", "flex")|])
-      | Some(x) => ReactDOM.Style.combine(ReactDOM.Style.make([|("display", "flex")|]), x)
+      | Some(x) =>
+        ReactDOM.Style.combine(
+          ReactDOM.Style.make([|("display", "flex")|]),
+          x,
+        )
       }
     }
   />;
   <div
     className={fst(css(CSS.red)) ++ " " ++ "extra-classname"}
-    style={ReactDOM.Style.combine(ReactDOM.Style.make([|("display", "flex")|]), snd(css(CSS.red)))}
+    style={ReactDOM.Style.combine(
+      ReactDOM.Style.make([|("display", "flex")|]),
+      snd(css(CSS.red)),
+    )}
   />;
   <div
     className={
@@ -93,7 +109,11 @@
         }
       ) {
       | None => ReactDOM.Style.make([|("display", "flex")|])
-      | Some(x) => ReactDOM.Style.combine(ReactDOM.Style.make([|("display", "flex")|]), x)
+      | Some(x) =>
+        ReactDOM.Style.combine(
+          ReactDOM.Style.make([|("display", "flex")|]),
+          x,
+        )
       }
     }
   />;

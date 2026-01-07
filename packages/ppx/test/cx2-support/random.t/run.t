@@ -36,7 +36,12 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-1oixppz", []);
   CSS.make("css-k7nrdm", []);
   CSS.make("css-187cpsq", []);
-  CSS.make("css-vzfu8m", [("--var-g5egjq", CSS.Types.WebkitTextFillColor.toString(colorTextString))]);
+  CSS.make(
+    "css-vzfu8m",
+    [
+      ("--var-g5egjq", CSS.Types.WebkitTextFillColor.toString(colorTextString)),
+    ],
+  );
   CSS.make("css-1jf3yek", []);
   CSS.make("css-1mar6mu", []);
   CSS.make("css-ocpgxz", []);
@@ -77,10 +82,18 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-1v5hebf", []);
   CSS.make("css-17cc6rg", []);
   CSS.gridTemplateColumns(
-    `tracks([|`minmax((`pxFloat(10.), `auto)), `fitContent(`pxFloat(20.)), `fitContent(`pxFloat(20.))|]),
+    `tracks([|
+      `minmax((`pxFloat(10.), `auto)),
+      `fitContent(`pxFloat(20.)),
+      `fitContent(`pxFloat(20.)),
+    |]),
   );
   CSS.gridTemplateColumns(
-    `tracks([|`minmax((`pxFloat(51.), `auto)), `fitContent(`pxFloat(20.)), `fitContent(`pxFloat(20.))|]),
+    `tracks([|
+      `minmax((`pxFloat(51.), `auto)),
+      `fitContent(`pxFloat(20.)),
+      `fitContent(`pxFloat(20.)),
+    |]),
   );
   CSS.make("css-10g80zc", []);
   CSS.make("css-1exaw09", []);
@@ -89,7 +102,10 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-eztnof", []);
   CSS.make("css-1r2eksx", []);
   let maskedImageUrl = `url("https://www.example.com/eye-uncrossed.svg");
-  CSS.make("css-1irc2jm", [("--var-1few37s", CSS.Types.MaskImage.toString(maskedImageUrl))]);
+  CSS.make(
+    "css-1irc2jm",
+    [("--var-1few37s", CSS.Types.MaskImage.toString(maskedImageUrl))],
+  );
   CSS.make("css-egl27m", []);
   CSS.make("css-13odl3r", []);
   CSS.make("css-c745rk", []);
@@ -100,7 +116,10 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-zlyoyc", []);
   CSS.make("css-15d85rl", []);
   CSS.make("css-m43xbo", []);
-  CSS.make("css-al3chi", [("--var-16dsc2j", CSS.Types.Paint.toString(Color.text))]);
+  CSS.make(
+    "css-al3chi",
+    [("--var-16dsc2j", CSS.Types.Paint.toString(Color.text))],
+  );
   CSS.make("css-rzi3gd", []);
   CSS.make("css-14w7snj", []);
   CSS.make("css-2n5rpj", []);
@@ -126,15 +145,27 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-1vic8xz", []);
   
   let lola = `hidden;
-  CSS.make("css-rqkro3", [("--var-414vlv", CSS.Types.Overflow.toString(lola))]);
+  CSS.make(
+    "css-rqkro3",
+    [("--var-414vlv", CSS.Types.Overflow.toString(lola))],
+  );
   CSS.make("css-e8c2i8", []);
-  CSS.make("css-14sj983", [("--var-414vlv", CSS.Types.OverflowY.toString(lola))]);
+  CSS.make(
+    "css-14sj983",
+    [("--var-414vlv", CSS.Types.OverflowY.toString(lola))],
+  );
   CSS.make("css-c01ve6", []);
   
   let value = `clip;
   CSS.make("css-16ut36", []);
-  CSS.make("css-1e13asw", [("--var-7wrrwo", CSS.Types.OverflowBlock.toString(value))]);
-  CSS.make("css-f33fte", [("--var-7wrrwo", CSS.Types.OverflowInline.toString(value))]);
+  CSS.make(
+    "css-1e13asw",
+    [("--var-7wrrwo", CSS.Types.OverflowBlock.toString(value))],
+  );
+  CSS.make(
+    "css-f33fte",
+    [("--var-7wrrwo", CSS.Types.OverflowInline.toString(value))],
+  );
   
   CSS.style([|
     CSS.backgroundImage(
@@ -160,6 +191,6 @@ If this test fail means that the module is not in sync with the ppx
   File "input.re", line 26, characters 6-54:
   26 | [%cx2 {|-webkit-text-fill-color: $(colorTextString);|}];
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  Error: This expression has type string but an expression was expected of type
-           Css_types.WebkitTextFillColor.t
+  Error: This expression has type "string" but an expression was expected of type
+           "Css_types.WebkitTextFillColor.t"
   [1]

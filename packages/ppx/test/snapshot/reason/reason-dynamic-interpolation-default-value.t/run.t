@@ -953,19 +953,30 @@
       [@mel.optional]
       var: 'var,
     };
-    [@mel.module "react"] external createVariadicElement: (string, Js.t({..})) => React.element = "createElement";
+    [@mel.module "react"]
+    external createVariadicElement: (string, Js.t({..})) => React.element =
+      "createElement";
     let deleteProp = [%mel.raw "(newProps, key) => delete newProps[key]"];
     let getOrEmpty = str =>
       switch (str) {
       | Some(str) => " " ++ str
       | None => ""
       };
-    external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) = "Object.assign";
+    external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
+      "Object.assign";
     let styles = (~var=CSS.hex("333"), _) =>
-      CSS.style([|CSS.label("DynamicComponentWithDefaultValue"), CSS.display(`block), CSS.color(var)|]);
+      CSS.style([|
+        CSS.label("DynamicComponentWithDefaultValue"),
+        CSS.display(`block),
+        CSS.color(var),
+      |]);
     let make = (props: makeProps('var)) => {
-      let className = styles(~var=?varGet(props), ()) ++ getOrEmpty(classNameGet(props));
-      let stylesObject = {"className": className, "ref": innerRefGet(props)};
+      let className =
+        styles(~var=?varGet(props), ()) ++ getOrEmpty(classNameGet(props));
+      let stylesObject = {
+        "className": className,
+        "ref": innerRefGet(props),
+      };
       let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
       ignore(deleteProp(. newProps, "var"));
       ignore(deleteProp(. newProps, "innerRef"));

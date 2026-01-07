@@ -33,8 +33,13 @@ If this test fail means that the module is not in sync with the ppx
         |],
       ),
       CSS.selectorMany(
-        [|{js|.recharts-scatter .recharts-scatter-symbol .recharts-symbols|js}|],
-        [|CSS.opacity(0.8), CSS.selectorMany([|{js|:hover|js}|], [|CSS.opacity(1.)|])|],
+        [|
+          {js|.recharts-scatter .recharts-scatter-symbol .recharts-symbols|js},
+        |],
+        [|
+          CSS.opacity(0.8),
+          CSS.selectorMany([|{js|:hover|js}|], [|CSS.opacity(1.)|]),
+        |],
       ),
     |]);
 

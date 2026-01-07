@@ -41,8 +41,18 @@ If this test fail means that the module is not in sync with the ppx
     `dropShadow((`zero, `pxFloat(1.), `zero, color)),
     `dropShadow((`zero, `pxFloat(1.), `zero, color)),
     `dropShadow((`zero, `pxFloat(1.), `zero, color)),
-    `dropShadow((`zero, `pxFloat(32.), `pxFloat(48.), `rgba((0, 0, 0, `num(0.075))))),
-    `dropShadow((`zero, `pxFloat(8.), `pxFloat(32.), `rgba((0, 0, 0, `num(0.03))))),
+    `dropShadow((
+      `zero,
+      `pxFloat(32.),
+      `pxFloat(48.),
+      `rgba((0, 0, 0, `num(0.075))),
+    )),
+    `dropShadow((
+      `zero,
+      `pxFloat(8.),
+      `pxFloat(32.),
+      `rgba((0, 0, 0, `num(0.03))),
+    )),
   |]);
   
   CSS.make("css-xfaeuo", []);

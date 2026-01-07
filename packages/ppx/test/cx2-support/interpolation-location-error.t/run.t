@@ -16,9 +16,9 @@ If this test fail means that the module is not in sync with the ppx
   File "input.re", line 2, characters 25-32:
   2 | let a = [%cx {| display: $(grid); |}];
                                ^^^^^^^
-  Error: This expression has type [> `gri ]
+  Error: This expression has type "[> `gri ]"
          but an expression was expected of type
-           [< `block
+           "[< `block
             | `contents
             | `flex
             | `flow
@@ -56,8 +56,8 @@ If this test fail means that the module is not in sync with the ppx
             | `webkitBox
             | `webkitFlex
             | `webkitInlineBox
-            | `webkitInlineFlex ]
-         The second variant type does not allow tag(s) `gri
+            | `webkitInlineFlex ]"
+         The second variant type does not allow tag(s) "`gri"
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'

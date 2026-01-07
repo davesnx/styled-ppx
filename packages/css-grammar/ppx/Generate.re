@@ -1287,4 +1287,17 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
 
     base_bindings @ [runtime_module_binding, runtime_module_path_binding];
   };
+
+  /* Generate just the extract_interpolations function expression from a spec.
+     This is useful for adding extract_interpolations to pack_rule calls without
+     needing to generate a full spec_module. */
+  let make_extract_interpolations =
+      (~spec: Css_spec_parser.value, ~runtime_module_path: option(string))
+      : Parsetree.expression => {
+    generate_extract_interpolations_function(
+      spec,
+      ~runtime_module_path,
+      ~loc,
+    );
+  };
 };
