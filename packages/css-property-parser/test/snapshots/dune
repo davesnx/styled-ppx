@@ -1,3 +1,7 @@
+(env
+ (_
+  (formatting disabled)))
+
 (executable
  (name Standalone)
  (libraries reason_css_parser_ppx ppxlib))
