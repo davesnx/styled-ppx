@@ -1,0 +1,7 @@
+(library
+ (name css_grammar_v2_ppx)
+ (public_name styled-ppx.css-grammar-v2-ppx)
+ (kind ppx_rewriter)
+ (libraries ppxlib styled-ppx.css-spec-parser)
+ (preprocess
+  (pps ppxlib.metaquot)))
