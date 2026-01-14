@@ -107,92 +107,92 @@ module Types = {
   and semitones = unit
   and an_plus_b = unit;
 };
-let rec _legacy_gradient
-        : list(Tokens.token) =>
-          (
-            Css_property_parser__Rule.data(Types._legacy_gradient),
-            list(Tokens.token),
-          ) =
-        tokens =>
-  Combinator.xor(
-    [
-      map(function__webkit_gradient, v => `Function__webkit_gradient(v)),
-      map(_legacy_linear_gradient, v => `_legacy_linear_gradient(v)),
-      map(_legacy_repeating_linear_gradient, v =>
-        `_legacy_repeating_linear_gradient(v)
-      ),
-      map(_legacy_radial_gradient, v => `_legacy_radial_gradient(v)),
-      map(_legacy_repeating_radial_gradient, v =>
-        `_legacy_repeating_radial_gradient(v)
-      ),
-    ],
-    tokens,
-  )
-and _legacy_linear_gradient
-    : list(Tokens.token) =>
-      (
-        Css_property_parser__Rule.data(Types._legacy_linear_gradient),
-        list(Tokens.token),
-      ) =
-    tokens =>
-  Combinator.xor(
-    [
-      map(
-        function_call(
-          "-moz-linear-gradient",
-          _legacy_linear_gradient_arguments,
+let rec _legacy_gradient:
+  list(Tokens.token) =>
+  (
+    Css_property_parser__Rule.data(Types._legacy_gradient),
+    list(Tokens.token),
+  ) =
+  tokens =>
+    Combinator.xor(
+      [
+        map(function__webkit_gradient, v => `Function__webkit_gradient(v)),
+        map(_legacy_linear_gradient, v => `_legacy_linear_gradient(v)),
+        map(_legacy_repeating_linear_gradient, v =>
+          `_legacy_repeating_linear_gradient(v)
         ),
-        v =>
-        `_moz_linear_gradient(v)
-      ),
-      map(
-        function_call(
-          "-webkit-linear-gradient",
-          _legacy_linear_gradient_arguments,
+        map(_legacy_radial_gradient, v => `_legacy_radial_gradient(v)),
+        map(_legacy_repeating_radial_gradient, v =>
+          `_legacy_repeating_radial_gradient(v)
         ),
-        v =>
-        `_webkit_linear_gradient(v)
-      ),
-      map(
-        function_call(
-          "-o-linear-gradient",
-          _legacy_linear_gradient_arguments,
+      ],
+      tokens,
+    )
+and _legacy_linear_gradient:
+  list(Tokens.token) =>
+  (
+    Css_property_parser__Rule.data(Types._legacy_linear_gradient),
+    list(Tokens.token),
+  ) =
+  tokens =>
+    Combinator.xor(
+      [
+        map(
+          function_call(
+            "-moz-linear-gradient",
+            _legacy_linear_gradient_arguments,
+          ),
+          v =>
+          `_moz_linear_gradient(v)
         ),
-        v =>
-        `_o_linear_gradient(v)
-      ),
-    ],
-    tokens,
-  )
-and property_height
-    : list(Tokens.token) =>
-      (
-        Css_property_parser__Rule.data(Types.property_height),
-        list(Tokens.token),
-      ) =
-    tokens =>
-  Combinator.xor(
-    [
-      map(keyword("auto"), _v => `Auto),
-      map(extended_length, v => `Extended_length(v)),
-      map(extended_percentage, v => `Extended_percentage(v)),
-      map(keyword("min-content"), _v => `Min_content),
-      map(keyword("max-content"), _v => `Max_content),
-      map(keyword("fit-content"), _v => `Fit_content_0),
-      map(
-        function_call(
-          "fit-content",
-          Combinator.xor([
-            map(extended_length, v => `Extended_length(v)),
-            map(extended_percentage, v => `Extended_percentage(v)),
-          ]),
+        map(
+          function_call(
+            "-webkit-linear-gradient",
+            _legacy_linear_gradient_arguments,
+          ),
+          v =>
+          `_webkit_linear_gradient(v)
         ),
-        v =>
-        `Fit_content_1(v)
-      ),
-    ],
-    tokens,
-  );
+        map(
+          function_call(
+            "-o-linear-gradient",
+            _legacy_linear_gradient_arguments,
+          ),
+          v =>
+          `_o_linear_gradient(v)
+        ),
+      ],
+      tokens,
+    )
+and property_height:
+  list(Tokens.token) =>
+  (
+    Css_property_parser__Rule.data(Types.property_height),
+    list(Tokens.token),
+  ) =
+  tokens =>
+    Combinator.xor(
+      [
+        map(keyword("auto"), _v => `Auto),
+        map(extended_length, v => `Extended_length(v)),
+        map(extended_percentage, v => `Extended_percentage(v)),
+        map(keyword("min-content"), _v => `Min_content),
+        map(keyword("max-content"), _v => `Max_content),
+        map(keyword("fit-content"), _v => `Fit_content_0),
+        map(
+          function_call(
+            "fit-content",
+            Combinator.xor([
+              map(extended_length, v => `Extended_length(v)),
+              map(extended_percentage, v => `Extended_percentage(v)),
+            ]),
+          ),
+          v =>
+          `Fit_content_1(v)
+        ),
+      ],
+      tokens,
+    );
 let check_map =
   StringMap.of_seq(
     List.to_seq([
