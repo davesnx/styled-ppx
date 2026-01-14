@@ -158,6 +158,25 @@ module Url = struct
   let toString x = match x with `url s -> ({js|url(|js} ^ s) ^ {js|)|js}
 end
 
+module Number = struct
+  type t = float
+
+  let toString (x : t) = Kloth.Float.to_string x
+end
+
+module Integer = struct
+  type t = int
+
+  let toString (x : t) = Kloth.Int.to_string x
+end
+
+module FlexValue = struct
+  type t = [ `fr of float ]
+
+  let fr (x : float) = `fr x
+  let toString x = match x with `fr n -> Kloth.Float.to_string n ^ {js|fr|js}
+end
+
 module Length = struct
   type length =
     [ `ch of float

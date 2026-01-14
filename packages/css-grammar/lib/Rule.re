@@ -1,20 +1,7 @@
 module Tokens = Styled_ppx_css_parser.Tokens;
 
-type error = list(string);
-type data('a) = result('a, error);
-type rule('a) = list(Tokens.t) => (data('a), list(Tokens.t));
-
-/* Interpolation tracking - used during parsing to record found interpolations with their types */
-module Interpolations = {
-  let found: ref(list((string, string))) = ref([]);
-
-  let reset = () => found := [];
-
-  let record = (var_name: string, type_path: string) =>
-    found := [(var_name, type_path), ...found^];
-
-  let get = () => List.rev(found^);
-};
+type rule('a) =
+  list(Tokens.t) => (result('a, list(string)), list(Tokens.t));
 
 type return('a, 'b) = 'b => rule('a);
 type bind('a, 'b, 'c) = (rule('a), 'b => rule('c)) => rule('c);
@@ -150,61 +137,4 @@ module Pattern = {
     );
 
   let value = (value, rule) => Match.bind(rule, () => Match.return(value));
-};
-
-/*
-   `interpolatable` wraps a rule to make it accept interpolations.
-   When an interpolation $(var) is encountered, it records (var, type_path)
-   and returns `Interpolation. Otherwise delegates to the inner rule and
-   wraps the result in `Value.
-
-   This allows the parser to track what types interpolations should have
-   based on their position in the grammar.
- */
-let interpolatable =
-    (~type_path: string, rule: rule('a))
-    : rule(
-        [>
-          | `Interpolation(list(string))
-          | `Value('a)
-        ],
-      ) =>
-  tokens => {
-    switch (tokens) {
-    | [INTERPOLATION(parts), ...remaining] =>
-      let var_name = String.concat(".", parts);
-      Interpolations.record(var_name, type_path);
-      (Ok(`Interpolation(parts)), remaining);
-    | _ =>
-      let (result, remaining) = rule(tokens);
-      let wrapped =
-        switch (result) {
-        | Ok(value) => Ok(`Value(value))
-        | Error(e) => Error(e)
-        };
-      (wrapped, remaining);
-    };
-  };
-
-/* TODO: Duplicated with Parser.parse */
-/* Parse a string input using a rule, returning Ok(value) or Error(message) */
-let parse_string = (rule: rule('a), input: string): result('a, string) => {
-  open Styled_ppx_css_parser.Lexer;
-  let tokens_with_loc = from_string(input);
-  let tokens =
-    tokens_with_loc
-    |> List.map(({txt, _}) =>
-         switch (txt) {
-         | Ok(token) => token
-         | Error((token, _)) => token
-         }
-       );
-  let tokens_without_ws =
-    tokens |> List.filter(token => token != Styled_ppx_css_parser.Parser.WS);
-  switch (rule(tokens_without_ws)) {
-  | (Ok(value), []) => Ok(value)
-  | (Ok(value), [Styled_ppx_css_parser.Parser.EOF]) => Ok(value)
-  | (Ok(_), _rest) => Error("Failed to parse CSS: tokens remaining")
-  | (Error(err), _) => Error(String.concat(", ", err))
-  };
 };
