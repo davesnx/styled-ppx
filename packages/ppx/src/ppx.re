@@ -2,62 +2,6 @@ module Builder = Ppxlib.Ast_builder.Default;
 
 module Mapper = {
   open Ppxlib;
-  let match = module_expr => {
-    open Ast_pattern;
-
-    let pattern =
-      pmod_extension(
-        extension(
-          __',
-          pstr(
-            pstr_eval(
-              map(
-                ~f=
-                  (catch, payload, _, delim) =>
-                    catch(`String((payload, delim))),
-                pexp_constant(pconst_string(__', __, __)),
-              )
-              ||| map(
-                    ~f=(catch, payload) => catch(`Array(payload)),
-                    pexp_array(__),
-                  )
-              ||| map(
-                    ~f=
-                      (catch, params, body) => {
-                        switch (params) {
-                        | [
-                            { pparam_desc: Pparam_val(label, def, param), _ },
-                          ] =>
-                          catch(`Function((label, def, param, body)))
-                        | _ =>
-                          catch(
-                            `Function((
-                              Nolabel,
-                              None,
-                              Ast_helper.Pat.any(),
-                              body,
-                            )),
-                          )
-                        }
-                      },
-                    pexp_function(__, none, pfunction_body(__)),
-                  ),
-              nil,
-            )
-            ^:: nil,
-          ),
-        ),
-      );
-
-    parse(
-      pattern,
-      module_expr.pmod_loc,
-      /* TODO: Render a proper error here */
-      ~on_error=_ => None,
-      module_expr,
-      (key, payload) => Some((key, payload)),
-    );
-  };
 
   let getHtmlTag = str => {
     switch (String.split_on_char('.', str)) {
