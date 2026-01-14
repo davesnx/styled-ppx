@@ -96,6 +96,7 @@ jobs:
         run: make test
 
       - name: Format
+        if: matrix.ocaml-compiler == '5.4.0'
         run: make format-check
 
       - name: Release static
