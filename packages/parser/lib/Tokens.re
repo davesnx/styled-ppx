@@ -1,4 +1,4 @@
-[@deriving show({with_path: false})]
+[@deriving show({ with_path: false })]
 type token =
   | EOF
   | IDENT(string) // <ident-token>

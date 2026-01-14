@@ -59,12 +59,12 @@ let valueRecExtension =
 
 let is_structure_item_recursive =
   fun
-  | {pstr_desc: Pstr_value(Recursive, _), pstr_loc: _loc} => true
+  | { pstr_desc: Pstr_value(Recursive, _), pstr_loc: _loc } => true
   | _ => false;
 
 let is_open =
   fun
-  | {pstr_desc: Pstr_open(_), pstr_loc: _loc} => true
+  | { pstr_desc: Pstr_open(_), pstr_loc: _loc } => true
   | _ => false;
 
 let preprocess_impl = structure_items => {
@@ -72,7 +72,7 @@ let preprocess_impl = structure_items => {
     List.partition(is_structure_item_recursive, structure_items);
 
   switch (bindings) {
-  | [{pstr_desc: Pstr_value(_, value_binding), pstr_loc, _}] =>
+  | [{ pstr_desc: Pstr_value(_, value_binding), pstr_loc, _ }] =>
     module Ast_builder =
       Ppxlib.Ast_builder.Make({
         let loc = pstr_loc;

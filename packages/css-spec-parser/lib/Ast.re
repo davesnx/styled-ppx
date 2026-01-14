@@ -5,7 +5,7 @@
 // TODO: maybe polymorphic variant?
 // TODO: best naming to no multiplier
 // TODO: can a value have two multipliers?
-[@deriving show({with_path: false})]
+[@deriving show({ with_path: false })]
 type multiplier =
   | One /* */
   | Zero_or_more /* * */
@@ -15,14 +15,14 @@ type multiplier =
   | Repeat_by_comma(int, option(int)) /* # #{A, B} */
   | At_least_one /* ! */; // TODO: ! is only allowed for groups
 
-[@deriving show({with_path: false})]
+[@deriving show({ with_path: false })]
 type terminal =
   | Delim(string) /* ',' */
   | Keyword(string) /* auto */
   | Data_type(string) /* <color> */
   | Property_type(string) /* <'color'> */;
 
-[@deriving show({with_path: false})]
+[@deriving show({ with_path: false })]
 type combinator =
   | Static /* a b */
   | And /* a && b */
@@ -30,7 +30,7 @@ type combinator =
   | Xor; /* a | b */
 
 // TODO: non-terminals https://drafts.csswg.org/css-values-3/#component-types item 4
-[@deriving show({with_path: false})]
+[@deriving show({ with_path: false })]
 type value =
   | Terminal(terminal, multiplier)
   | Combinator(combinator, list(value))

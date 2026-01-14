@@ -45,7 +45,7 @@ let render_variable = (~loc, v) => {
 };
 
 let source_code_of_loc = (loc: Ppxlib.Location.t) => {
-  let {loc_start, loc_end, _} = loc;
+  let { loc_start, loc_end, _ } = loc;
   switch (Styled_ppx_css_parser.Driver.last_buffer^) {
   | Some(buffer: Sedlexing.lexbuf) =>
     /* TODO: pos_offset is hardcoded to 0, unsure about the effects */
@@ -334,7 +334,7 @@ and render_selector = (~loc, selector: selector) => {
     | Class(v) => Printf.sprintf(".%s", v)
     | ClassVariable(v) => "." ++ render_variable_as_string(v)
     | Attribute(Attr_value(v)) => Printf.sprintf("[%s]", v)
-    | Attribute(To_equal({name, kind, value})) => {
+    | Attribute(To_equal({ name, kind, value })) => {
         let value =
           switch (value) {
           | Attr_ident(ident) => ident
@@ -362,13 +362,13 @@ and render_selector = (~loc, selector: selector) => {
   and render_pseudoclass =
     fun
     | PseudoIdent(i) => ":" ++ i
-    | NthFunction({name, payload: (payload, _loc)}) =>
+    | NthFunction({ name, payload: (payload, _loc) }) =>
       ":"
       ++ name
       ++ "("
       ++ (render_nth_payload(payload) |> String.trim)
       ++ ")"
-    | Function({name, payload: (payload, _loc)}) => {
+    | Function({ name, payload: (payload, _loc) }) => {
         ":"
         ++ name
         ++ "("
@@ -400,7 +400,7 @@ and render_selector = (~loc, selector: selector) => {
   }
   and render_complex_selector = complex => {
     switch (complex) {
-    | Combinator({left, right}) =>
+    | Combinator({ left, right }) =>
       let left = render_selector(~loc, left);
       let right = render_right_combinator(right);
       left ++ right;
@@ -415,7 +415,7 @@ and render_selector = (~loc, selector: selector) => {
        })
     |> String.concat("");
   }
-  and render_relative_selector = ({combinator, complex_selector}) => {
+  and render_relative_selector = ({ combinator, complex_selector }) => {
     Option.fold(~none="", ~some=o => o ++ " ", combinator)
     ++ render_complex_selector(complex_selector);
   };
@@ -530,7 +530,7 @@ let render_keyframes = (~loc, declarations: rule_list) => {
     declarations
     |> List.map(declaration => {
          switch (declaration) {
-         | Style_rule({prelude: (prelude, _), block, loc: style_loc}) =>
+         | Style_rule({ prelude: (prelude, _), block, loc: style_loc }) =>
            let percentages = prelude |> List.map(render_select_as_keyframe);
            let rules =
              render_declarations(~loc, block)

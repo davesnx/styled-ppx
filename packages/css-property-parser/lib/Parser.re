@@ -1962,7 +1962,7 @@ let apply_parser = (parser, tokens_with_loc) => {
 
   let tokens =
     tokens_with_loc
-    |> List.map(({txt, _}) =>
+    |> List.map(({ txt, _ }) =>
          switch (txt) {
          | Ok(token) => token
          | Error((token, _)) => token

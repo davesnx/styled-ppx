@@ -2333,8 +2333,8 @@ let data = [
 
 let hasName = (prop, propName) => {
   switch (prop) {
-  | Attribute({name, _}) => name == propName
-  | Event({name, _}) => name == propName
+  | Attribute({ name, _ }) => name == propName
+  | Event({ name, _ }) => name == propName
   };
 };
 

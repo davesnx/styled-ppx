@@ -298,7 +298,7 @@ let render_css_global_values = (name, value) => {
   Ok([[%expr CSS.unsafe([%e render_string(name)], [%e value])]]);
 };
 
-let found = ({ast_of_string, string_to_expr, _}) => {
+let found = ({ ast_of_string, string_to_expr, _ }) => {
   let check_value = string => {
     let.ok _ = ast_of_string(string);
     Ok();

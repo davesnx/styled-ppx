@@ -101,9 +101,9 @@ let transform_with_variable = (parser, mapper, value_to_expr) => {
       (~loc, expression) => {
         switch (expression) {
         // Since we are treating with expressions here, we don't have any other way to detect if it's interpolation or not. We want to add type constraints on interpolation only.
-        | {pexp_desc: Pexp_ident({txt: Ldot(Lident("CSS"), _), _}), _} as exp =>
+        | { pexp_desc: Pexp_ident({ txt: Ldot(Lident("CSS"), _), _ }), _ } as exp =>
           value_to_expr(~loc, exp)
-        | {pexp_desc: Pexp_ident(_), pexp_loc: _, _} as exp =>
+        | { pexp_desc: Pexp_ident(_), pexp_loc: _, _ } as exp =>
           value_to_expr(~loc, exp)
           |> List.map(add_CSS_rule_constraint(~loc))
         | exp => value_to_expr(~loc, exp)
@@ -5016,7 +5016,7 @@ let line_break =
     },
   );
 
-let found = ({ast_of_string, string_to_expr, _}) => {
+let found = ({ ast_of_string, string_to_expr, _ }) => {
   /* TODO: Why we have 'check_value' when we don't use it? */
   let check_value = string => {
     let.ok _ = ast_of_string(string);

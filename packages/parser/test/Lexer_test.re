@@ -174,8 +174,8 @@ let parse = input => {
     | Error(`Frozen) => failwith("Lexer got frozen")
     };
 
-  let Lexer.{loc, _} = List.hd(values);
-  let values = values |> List.map((Lexer.{txt, _}) => txt);
+  let Lexer.{ loc, _ } = List.hd(values);
+  let values = values |> List.map((Lexer.{ txt, _ }) => txt);
   (loc, values);
 };
 
