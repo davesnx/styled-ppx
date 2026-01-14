@@ -494,6 +494,7 @@
       React.createElement(
         switch (as_) {
         | Some(v) => v
+  
         | None => "section"
         },
         ReactDOM.domProps(

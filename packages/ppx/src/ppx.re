@@ -23,9 +23,14 @@ module Mapper = {
                   )
               ||| map(
                     ~f=
-                      (catch, label, def, param, body) =>
-                        catch(`Function((label, def, param, body))),
-                    pexp_fun(__, __, __, __),
+                      (catch, params, body) => {
+                        switch (params) {
+                        | [{pparam_desc: Pparam_val(label, def, param), _}] =>
+                          catch(`Function((label, def, param, body)))
+                        | _ => catch(`Function((Nolabel, None, Ast_helper.Pat.any(), body)))
+                        };
+                      },
+                    pexp_function(__, none, pfunction_body(__)),
                   ),
               nil,
             )
@@ -233,11 +238,10 @@ module Mapper = {
                         {
                           pexp_loc: functionLoc,
                           pexp_desc:
-                            Pexp_fun(
-                              fnLabel,
-                              defaultValue,
-                              param,
-                              expression,
+                            Pexp_function(
+                              [{pparam_desc: Pparam_val(fnLabel, defaultValue, param), _}],
+                              _,
+                              Pfunction_body(expression),
                             ),
                           _,
                         },

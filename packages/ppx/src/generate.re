@@ -215,7 +215,7 @@ let asAttribute = () =>
 let variadicElement = (~loc, ~htmlTag) => {
   let asAttributeName =
     switch (asAttribute()) {
-    | MakeProps.Attribute({name, _}) => name
+    | MakeProps.Attribute({ name, _ }) => name
     | _ => failwith("unreachable")
     };
 
@@ -304,7 +304,7 @@ let makeParam =
 
 let domPropParam = (~loc, ~isOptional, domProp) => {
   switch (domProp) {
-  | MakeProps.Event({name, type_}) =>
+  | MakeProps.Event({ name, type_ }) =>
     makeParam(
       ~loc,
       ~isOptional,
@@ -321,7 +321,7 @@ let domPropParam = (~loc, ~isOptional, domProp) => {
         ),
       name,
     )
-  | MakeProps.Attribute({name, type_, _}) =>
+  | MakeProps.Attribute({ name, type_, _ }) =>
     makeParam(
       ~loc,
       ~isOptional,
@@ -347,8 +347,8 @@ let serverCreateElement = (~loc, ~htmlTag, ~variableNames) => {
     MakeProps.get(["key", "ref", "className"] @ variableNames)
     |> List.map(value =>
          switch (value) {
-         | MakeProps.Event({name, _}) => name
-         | MakeProps.Attribute({name, _}) => name
+         | MakeProps.Event({ name, _ }) => name
+         | MakeProps.Attribute({ name, _ }) => name
          }
        )
     |> List.map(label =>
@@ -686,14 +686,14 @@ let recordEventLabel = (~loc, ~isOptional, name, kind) => {
 
 let domPropLabel = (~loc, ~isOptional, domProp) => {
   switch (domProp) {
-  | MakeProps.Event({name, type_}) =>
+  | MakeProps.Event({ name, type_ }) =>
     recordEventLabel(
       ~loc,
       ~isOptional,
       name,
       MakeProps.eventTypeToIdent(type_),
     )
-  | MakeProps.Attribute({name, type_, alias}) =>
+  | MakeProps.Attribute({ name, type_, alias }) =>
     recordLabel(
       ~loc,
       ~isOptional,
@@ -904,31 +904,36 @@ let getType = pattern =>
 
 let getAlias = (pattern, label) =>
   switch (pattern.ppat_desc) {
-  | Ppat_alias(_, {txt, _})
-  | Ppat_var({txt, _}) => txt
+  | Ppat_alias(_, { txt, _ })
+  | Ppat_var({ txt, _ }) => txt
   | Ppat_any => "_"
   | _ => getLabel(label)
   };
 
 let rec getArgs = (expr, list) => {
   switch (expr.pexp_desc) {
-  | Pexp_fun(arg, default, pattern, expression)
-      when getIsOptional(arg) || getIsLabelled(arg) =>
-    let alias = getAlias(pattern, arg);
-    let type_ = getType(pattern);
-
-    getArgs(
-      expression,
-      [(arg, default, pattern, alias, pattern.ppat_loc, type_), ...list],
-    );
-  | Pexp_fun(arg, _, pattern, _) when !getIsLabelled(arg) =>
-    Error.raise(
-      ~loc=pattern.ppat_loc,
-      ~examples=["[%styled.div (~a, ~b) => {}]"],
-      ~link=
-        "https://reasonml.org/docs/manual/latest/function#labeled-arguments",
-      "Dynamic components are defined with labeled arguments.",
-    )
+  | Pexp_function(params, _, Pfunction_body(expression)) =>
+    let args =
+      params
+      |> List.filter_map(param =>
+           switch (param.pparam_desc) {
+           | Pparam_val(arg, default, pattern)
+               when getIsOptional(arg) || getIsLabelled(arg) =>
+             let alias = getAlias(pattern, arg);
+             let type_ = getType(pattern);
+             Some((arg, default, pattern, alias, pattern.ppat_loc, type_));
+           | Pparam_val(arg, _, pattern) when !getIsLabelled(arg) =>
+             Error.raise(
+               ~loc=pattern.ppat_loc,
+               ~examples=["[%styled.div (~a, ~b) => {}]"],
+               ~link=
+                 "https://reasonml.org/docs/manual/latest/function#labeled-arguments",
+               "Dynamic components are defined with labeled arguments.",
+             )
+           | _ => None
+           }
+         );
+    getArgs(expression, args @ list);
   | _ => (expr, list)
   };
 };
