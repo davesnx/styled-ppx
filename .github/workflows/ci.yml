@@ -251,8 +251,8 @@ jobs:
           echo "Configuring npm with OIDC token..."
           sed -i '/_authToken/d' "${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}" 2>/dev/null || true
 
-          # Set the OIDC token as the auth token
-          echo "//registry.npmjs.org/:_authToken=${OIDC_TOKEN}" >> "${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}"
+          # Set the OIDC token as the auth token (ensure newline before appending)
+          printf '\n//registry.npmjs.org/:_authToken=%s\n' "${OIDC_TOKEN}" >> "${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}"
 
           echo "=== .npmrc after OIDC config (token redacted) ==="
           sed 's/_authToken=.*/_authToken=[REDACTED]/' "${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}"
