@@ -150,8 +150,8 @@ jobs:
 
       - name: Use Node.js
         uses: actions/setup-node@v4
-        with:
-          registry-url: 'https://registry.npmjs.org'
+        # NOTE: Do NOT use registry-url here - it sets NODE_AUTH_TOKEN to GITHUB_TOKEN
+        # which conflicts with npm's OIDC trusted publishing. Let npm handle auth via --provenance.
 
       # DEBUG: Hypothesis A - Check if id-token permission is available
       - name: "DEBUG: Check OIDC environment"
