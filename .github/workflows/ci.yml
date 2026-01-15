@@ -151,6 +151,10 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
 
+      - name: Configure npm for OIDC publishing
+        run: |
+          npm config set registry https://registry.npmjs.org/
+
       - name: Make NPM release skeleton
         run: node scripts/release-make-skeleton.js
 
@@ -186,27 +190,25 @@ jobs:
         if: ${{ success() && github.event_name == 'pull_request' && github.event.pull_request.user.login == 'davesnx' }}
         id: nightly
         working-directory: ./_release
-        env:
-          NPM_CONFIG_PROVENANCE: true
         run: |
           ls -lhsa
           npm config set scope "@davesnx"
           npm version prerelease --preid ${{ steps.sha.outputs.sha_short }} -no-git-tag-version
-          npm publish --access public --tag nightly
+          unset NODE_AUTH_TOKEN
+          npm publish --provenance --access public --tag nightly
           echo "version=$(npm view @davesnx/styled-ppx@nightly version)" >> $GITHUB_OUTPUT
 
       - name: Release (@davesnx/styled-ppx) package
         if: ${{ success() && github.event_name != 'pull_request' }}
         working-directory: ./_release
-        env:
-          NPM_CONFIG_PROVENANCE: true
         run: |
           npm config set scope "@davesnx"
           REMOTE=$(npm view @davesnx/styled-ppx version)
           CURRENT=$(jq -r '.version' package.json)
           if [ "$REMOTE" != "$CURRENT" ]
           then
-              npm publish --access public
+              unset NODE_AUTH_TOKEN
+              npm publish --provenance --access public
           else
               echo "New verison and remote version are equal, nothing to publish"
           fi
