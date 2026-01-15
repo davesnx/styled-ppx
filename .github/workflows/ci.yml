@@ -153,6 +153,34 @@ jobs:
         with:
           registry-url: 'https://registry.npmjs.org'
 
+      # DEBUG: Hypothesis A - Check if id-token permission is available
+      - name: "DEBUG: Check OIDC environment"
+        run: |
+          echo "=== HYPOTHESIS A: OIDC Token Request URL ==="
+          echo "ACTIONS_ID_TOKEN_REQUEST_URL: ${ACTIONS_ID_TOKEN_REQUEST_URL:-NOT_SET}"
+          echo "ACTIONS_ID_TOKEN_REQUEST_TOKEN is set: $([ -n "$ACTIONS_ID_TOKEN_REQUEST_TOKEN" ] && echo 'YES' || echo 'NO')"
+          echo ""
+          echo "=== HYPOTHESIS B: Try to get OIDC token ==="
+          if [ -n "$ACTIONS_ID_TOKEN_REQUEST_URL" ] && [ -n "$ACTIONS_ID_TOKEN_REQUEST_TOKEN" ]; then
+            echo "Requesting OIDC token from GitHub..."
+            OIDC_TOKEN=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+              -H "Accept: application/json" \
+              "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=npm" | head -c 200)
+            echo "OIDC response (truncated): $OIDC_TOKEN"
+          else
+            echo "OIDC environment variables not available!"
+          fi
+          echo ""
+          echo "=== HYPOTHESIS D: Check .npmrc contents ==="
+          echo "NPM_CONFIG_USERCONFIG: ${NPM_CONFIG_USERCONFIG:-NOT_SET}"
+          cat "${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}" 2>/dev/null || echo ".npmrc not found"
+          echo ""
+          echo "=== npm config list ==="
+          npm config list
+          echo ""
+          echo "=== npm version ==="
+          npm --version
+
       - name: Make NPM release skeleton
         run: node scripts/release-make-skeleton.js
 
@@ -189,13 +217,24 @@ jobs:
         id: nightly
         working-directory: ./_release
         run: |
+          echo "=== DEBUG: Starting nightly publish ==="
           ls -lhsa
           npm config set scope "@davesnx"
           npm version prerelease --preid ${{ steps.sha.outputs.sha_short }} -no-git-tag-version
-          npm publish --provenance --access public --tag nightly
+          
+          echo "=== DEBUG: Removing NODE_AUTH_TOKEN from .npmrc for OIDC ==="
+          # Remove the auth token line to force OIDC
+          sed -i '/_authToken/d' "${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}" || true
+          echo "=== .npmrc after cleanup ==="
+          cat "${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}" || true
+          
+          echo "=== DEBUG: Attempting publish with --provenance ==="
+          npm publish --provenance --access public --tag nightly 2>&1 || {
+            echo "=== DEBUG: Publish failed, checking npm debug log ==="
+            cat ~/.npm/_logs/*-debug-*.log 2>/dev/null | tail -100 || true
+            exit 1
+          }
           echo "version=$(npm view @davesnx/styled-ppx@nightly version)" >> $GITHUB_OUTPUT
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Release (@davesnx/styled-ppx) package
         if: ${{ success() && github.event_name != 'pull_request' }}
