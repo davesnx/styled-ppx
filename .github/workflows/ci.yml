@@ -219,16 +219,43 @@ jobs:
         run: |
           echo "=== DEBUG: Starting nightly publish ==="
           ls -lhsa
+
+          echo "=== HYPOTHESIS I: Check for .npmrc in _release directory ==="
+          echo "Files that could contain npm config:"
+          find . -name ".npmrc" -o -name "npmrc" 2>/dev/null || true
+          echo "Contents of _release/.npmrc (if exists):"
+          cat ./.npmrc 2>/dev/null || echo "No .npmrc in _release"
+
+          echo "=== HYPOTHESIS J: NODE_AUTH_TOKEN env var ==="
+          echo "NODE_AUTH_TOKEN is set: $([ -n \"$NODE_AUTH_TOKEN\" ] && echo 'YES (length: '${#NODE_AUTH_TOKEN}')' || echo 'NO')"
+
+          echo "=== Remove ALL auth tokens from ALL .npmrc files ==="
+          # Remove from setup-node's .npmrc
+          sed -i '/_authToken/d' "${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}" 2>/dev/null || true
+          # Remove from _release/.npmrc if it exists
+          sed -i '/_authToken/d' ./.npmrc 2>/dev/null || true
+          # Remove from home .npmrc
+          sed -i '/_authToken/d' "$HOME/.npmrc" 2>/dev/null || true
+
+          echo "=== HYPOTHESIS J FIX: Unset NODE_AUTH_TOKEN env var ==="
+          unset NODE_AUTH_TOKEN
+
+          echo "=== npm config list after cleanup ==="
+          npm config list
+
+          echo "=== All .npmrc contents after cleanup ==="
+          echo "--- NPM_CONFIG_USERCONFIG (.npmrc): ---"
+          cat "${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}" 2>/dev/null || echo "not found"
+          echo "--- _release/.npmrc: ---"
+          cat ./.npmrc 2>/dev/null || echo "not found"
+          echo "--- HOME/.npmrc: ---"
+          cat "$HOME/.npmrc" 2>/dev/null || echo "not found"
+
           npm config set scope "@davesnx"
           npm version prerelease --preid ${{ steps.sha.outputs.sha_short }} -no-git-tag-version
-          
-          echo "=== DEBUG: Removing NODE_AUTH_TOKEN from .npmrc for OIDC ==="
-          # Remove the auth token line to force OIDC
-          sed -i '/_authToken/d' "${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}" || true
-          echo "=== .npmrc after cleanup ==="
-          cat "${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}" || true
-          
+
           echo "=== DEBUG: Attempting publish with --provenance ==="
+          echo "NODE_AUTH_TOKEN after unset: $([ -n \"$NODE_AUTH_TOKEN\" ] && echo 'YES' || echo 'NO')"
           npm publish --provenance --access public --tag nightly 2>&1 || {
             echo "=== DEBUG: Publish failed, checking npm debug log ==="
             cat ~/.npm/_logs/*-debug-*.log 2>/dev/null | tail -100 || true
