@@ -1,5 +1,7 @@
 # Changes
 
+- [BREAKING] Update to ppxlib.0.36
+
 ## 0.60.0
 - [BREAKING] Transition property on `CSS.Transition.shorthand` function is now an optional argument (#499) (@zakybilfagih)
 - [BREAKING] `CSS.gridTemplateColumns`, `CSS.gridTemplateRows`, `CSS.gridAutoColumns`, `CSS.gridAutoRows` now accepts `` `value of Track.t array `` (#502) (@zakybilfagih)
