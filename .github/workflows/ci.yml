@@ -141,12 +141,17 @@ jobs:
     needs: build
     if: github.repository_owner == 'davesnx'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Use Node.js
         uses: actions/setup-node@v4
+        with:
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Make NPM release skeleton
         run: node scripts/release-make-skeleton.js
@@ -184,10 +189,9 @@ jobs:
         id: nightly
         working-directory: ./_release
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
         run: |
           ls -lhsa
-          npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
           npm config set scope "@davesnx"
           npm version prerelease --preid ${{ steps.sha.outputs.sha_short }} -no-git-tag-version
           npm publish --access public --tag nightly
@@ -197,9 +201,8 @@ jobs:
         if: ${{ success() && github.event_name != 'pull_request' }}
         working-directory: ./_release
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
         run: |
-          npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
           npm config set scope "@davesnx"
           REMOTE=$(npm view @davesnx/styled-ppx version)
           CURRENT=$(jq -r '.version' package.json)
