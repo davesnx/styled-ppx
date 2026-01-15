@@ -11,6 +11,7 @@ on:
 env:
   OPAM_VERSION: 2.3.0
   DUNE_PROFILE: release
+  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
 permissions:
   contents: write
@@ -36,7 +37,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
 
       - name: Load opam cache
         id: opam-cache
@@ -150,10 +151,8 @@ jobs:
 
       - name: Use Node.js
         uses: actions/setup-node@v4
-
-      - name: Configure npm for OIDC publishing
-        run: |
-          npm config set registry https://registry.npmjs.org/
+        with:
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Make NPM release skeleton
         run: node scripts/release-make-skeleton.js
@@ -194,7 +193,6 @@ jobs:
           ls -lhsa
           npm config set scope "@davesnx"
           npm version prerelease --preid ${{ steps.sha.outputs.sha_short }} -no-git-tag-version
-          unset NODE_AUTH_TOKEN
           npm publish --provenance --access public --tag nightly
           echo "version=$(npm view @davesnx/styled-ppx@nightly version)" >> $GITHUB_OUTPUT
 
@@ -207,7 +205,6 @@ jobs:
           CURRENT=$(jq -r '.version' package.json)
           if [ "$REMOTE" != "$CURRENT" ]
           then
-              unset NODE_AUTH_TOKEN
               npm publish --provenance --access public
           else
               echo "New verison and remote version are equal, nothing to publish"
