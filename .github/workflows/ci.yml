@@ -221,49 +221,33 @@ jobs:
           echo "=== DEBUG: Starting nightly publish ==="
           ls -lhsa
 
-          echo "=== HYPOTHESIS M: Manually fetch OIDC token and configure npm ==="
+          echo "=== HYPOTHESIS N: Let npm handle OIDC auth automatically ==="
+          echo "npm's --provenance flag should handle OIDC authentication internally"
+          echo "We should NOT set _authToken manually - it interferes with npm's OIDC flow"
 
-          # Step 1: Request OIDC token from GitHub with npm audience
-          echo "Requesting OIDC token from GitHub..."
-          if [ -z "$ACTIONS_ID_TOKEN_REQUEST_URL" ] || [ -z "$ACTIONS_ID_TOKEN_REQUEST_TOKEN" ]; then
-            echo "ERROR: OIDC environment variables not available!"
-            exit 1
-          fi
-
-          OIDC_RESPONSE=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-            -H "Accept: application/json" \
-            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=https://registry.npmjs.org")
-
-          echo "OIDC response received (first 100 chars): ${OIDC_RESPONSE:0:100}"
-
-          # Step 2: Extract the token value
-          OIDC_TOKEN=$(echo "$OIDC_RESPONSE" | jq -r '.value')
-
-          if [ -z "$OIDC_TOKEN" ] || [ "$OIDC_TOKEN" = "null" ]; then
-            echo "ERROR: Failed to extract OIDC token from response"
-            echo "Full response: $OIDC_RESPONSE"
-            exit 1
-          fi
-
-          echo "OIDC token extracted successfully (length: ${#OIDC_TOKEN})"
-
-          # Step 3: Remove any existing auth and set OIDC token
-          echo "Configuring npm with OIDC token..."
+          # Step 1: Remove ALL auth tokens - let npm handle OIDC internally
+          echo "Removing all auth tokens from .npmrc..."
           sed -i '/_authToken/d' "${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}" 2>/dev/null || true
+          sed -i '/_authToken/d' "$HOME/.npmrc" 2>/dev/null || true
 
-          # Set the OIDC token as the auth token (ensure newline before appending)
-          printf '\n//registry.npmjs.org/:_authToken=%s\n' "${OIDC_TOKEN}" >> "${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}"
+          # Step 2: Unset NODE_AUTH_TOKEN env var (setup-node sets this)
+          echo "Unsetting NODE_AUTH_TOKEN..."
+          unset NODE_AUTH_TOKEN || true
 
-          echo "=== .npmrc after OIDC config (token redacted) ==="
-          sed 's/_authToken=.*/_authToken=[REDACTED]/' "${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}"
+          echo "=== .npmrc after cleanup ==="
+          cat "${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}" 2>/dev/null || echo "not found"
 
           echo "=== npm config list ==="
           npm config list
 
+          echo "=== OIDC environment check ==="
+          echo "ACTIONS_ID_TOKEN_REQUEST_URL is set: $([ -n "$ACTIONS_ID_TOKEN_REQUEST_URL" ] && echo 'YES' || echo 'NO')"
+          echo "ACTIONS_ID_TOKEN_REQUEST_TOKEN is set: $([ -n "$ACTIONS_ID_TOKEN_REQUEST_TOKEN" ] && echo 'YES' || echo 'NO')"
+
           npm config set scope "@davesnx"
           npm version prerelease --preid ${{ steps.sha.outputs.sha_short }} -no-git-tag-version
 
-          echo "=== DEBUG: Attempting publish with --provenance and OIDC token ==="
+          echo "=== DEBUG: Attempting publish with --provenance (npm handles OIDC auth) ==="
           npm publish --provenance --access public --tag nightly 2>&1 || {
             echo "=== DEBUG: Publish failed, checking npm debug log ==="
             cat ~/.npm/_logs/*-debug-*.log 2>/dev/null | tail -100 || true
