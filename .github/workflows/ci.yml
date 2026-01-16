@@ -208,11 +208,35 @@ jobs:
               echo "New version and remote version are equal, nothing to publish"
           fi
 
-      - uses: mshick/add-pr-comment@v2
+      - name: Comment on PR with nightly version
         if: ${{ steps.nightly.outputs.version }}
+        uses: actions/github-script@v7
         with:
-          message: |
-            New **nightly** version has been published to the NPM registry: [@davesnx/styled-ppx@${{ steps.nightly.outputs.version }}](https://www.npmjs.com/package/@davesnx/styled-ppx/v/${{ steps.nightly.outputs.version }}).
-            Install it with `npm install @davesnx/styled-ppx@nightly` or `npm install @davesnx/styled-ppx@${{ steps.nightly.outputs.version }}`.
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          allow-repeats: false
+          script: |
+            const version = '${{ steps.nightly.outputs.version }}';
+            const body = `New **nightly** version has been published to the NPM registry: [@davesnx/styled-ppx@${version}](https://www.npmjs.com/package/@davesnx/styled-ppx/v/${version}).
+            Install it with \`npm install @davesnx/styled-ppx@nightly\` or \`npm install @davesnx/styled-ppx@${version}\`.`;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const existingComment = comments.find(c => c.body.includes('nightly') && c.body.includes('@davesnx/styled-ppx@'));
+            
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
