@@ -1,8 +1,8 @@
 ![styled-ppx-header-light](./.github/header-light.png#gh-dark-mode-only)![styled-ppx-header-dark](./.github/header-dark.png#gh-light-mode-only)
 
-### Typed styled components for ReScript, Melange and OCaml
+### Typed styled components for Melange and OCaml
 
-**styled-ppx** is a [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) and a library that brings styled components to ReScript, Melange and OCaml. Create **React Components** or simply `className` with type-safe style definitions with only CSS.
+**styled-ppx** is a [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) and a library that brings styled components to Melange and OCaml. Create **React Components** or simply `className` with type-safe style definitions with only CSS.
 
 It allows you to style apps safely, quickly, and performantly - just as you always done it.
 
