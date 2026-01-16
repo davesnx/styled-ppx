@@ -210,17 +210,18 @@ jobs:
           echo "version=$(npm view @davesnx/styled-ppx@nightly version)" >> $GITHUB_OUTPUT
 
       - name: Release (@davesnx/styled-ppx) package
-        if: ${{ success() && github.event_name != 'pull_request' }}
+        if: ${{ success() && startsWith(github.ref, 'refs/tags/') }}
         working-directory: ./_release
         run: |
           npm config set scope "@davesnx"
+          VERSION="${GITHUB_REF_NAME#v}"
           REMOTE=$(npm view @davesnx/styled-ppx version)
-          CURRENT=$(jq -r '.version' package.json)
-          if [ "$REMOTE" != "$CURRENT" ]
+          if [ "$REMOTE" != "$VERSION" ]
           then
+              npm version "$VERSION" --no-git-tag-version
               npm publish --access public
           else
-              echo "New version and remote version are equal, nothing to publish"
+              echo "Version $VERSION already published, skipping"
           fi
 
       - name: Comment on PR with nightly version
