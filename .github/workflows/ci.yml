@@ -152,18 +152,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '24'
-          # IMPORTANT: npm OIDC trusted publishing requires npm >= 11.5.1, which comes with Node.js 24+
-          # Do NOT use registry-url - it interferes with npm's automatic OIDC authentication
-
-      - name: "DEBUG: Verify OIDC setup"
-        run: |
-          echo "=== Node.js & npm versions ==="
-          node --version
-          npm --version
-          echo ""
-          echo "=== OIDC environment (id-token: write permission) ==="
-          echo "ACTIONS_ID_TOKEN_REQUEST_URL is set: $([ -n "$ACTIONS_ID_TOKEN_REQUEST_URL" ] && echo 'YES' || echo 'NO')"
-          echo "ACTIONS_ID_TOKEN_REQUEST_TOKEN is set: $([ -n "$ACTIONS_ID_TOKEN_REQUEST_TOKEN" ] && echo 'YES' || echo 'NO')"
 
       - name: Make NPM release skeleton
         run: node scripts/release-make-skeleton.js
@@ -200,25 +188,10 @@ jobs:
         if: ${{ success() && github.event_name == 'pull_request' && github.event.pull_request.user.login == 'davesnx' }}
         id: nightly
         working-directory: ./_release
-        shell: bash -xeo pipefail {0}
         run: |
-          echo "=== DEBUG: npm version check (need >= 11.5.1 for OIDC) ==="
-          npm --version
-          node --version
-
-          echo "=== DEBUG: OIDC environment ==="
-          echo "ACTIONS_ID_TOKEN_REQUEST_URL is set: $([ -n "$ACTIONS_ID_TOKEN_REQUEST_URL" ] && echo 'YES' || echo 'NO')"
-          echo "ACTIONS_ID_TOKEN_REQUEST_TOKEN is set: $([ -n "$ACTIONS_ID_TOKEN_REQUEST_TOKEN" ] && echo 'YES' || echo 'NO')"
-
           npm config set scope "@davesnx"
           npm version prerelease --preid ${{ steps.sha.outputs.sha_short }} -no-git-tag-version
-
-          echo "=== DEBUG: Publishing with OIDC trusted publishing ==="
-          npm publish --access public --tag nightly 2>&1 || {
-            echo "=== DEBUG: Publish failed, checking npm debug log ==="
-            cat ~/.npm/_logs/*-debug-*.log 2>/dev/null | tail -100 || true
-            exit 1
-          }
+          npm publish --access public --tag nightly
           echo "version=$(npm view @davesnx/styled-ppx@nightly version)" >> $GITHUB_OUTPUT
 
       - name: Release (@davesnx/styled-ppx) package
@@ -230,7 +203,6 @@ jobs:
           CURRENT=$(jq -r '.version' package.json)
           if [ "$REMOTE" != "$CURRENT" ]
           then
-              echo "=== Publishing with OIDC trusted publishing ==="
               npm publish --access public
           else
               echo "New version and remote version are equal, nothing to publish"
