@@ -1,4 +1,6 @@
 (cram
  (alias test-css-support)
+ (enabled_if
+  (>= %{ocaml_version} 5.4.0))
  (deps
   (package styled-ppx)))
