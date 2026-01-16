@@ -2,47 +2,6 @@ module Builder = Ppxlib.Ast_builder.Default;
 
 module Mapper = {
   open Ppxlib;
-  let match = module_expr => {
-    open Ast_pattern;
-
-    let pattern =
-      pmod_extension(
-        extension(
-          __',
-          pstr(
-            pstr_eval(
-              map(
-                ~f=
-                  (catch, payload, _, delim) =>
-                    catch(`String((payload, delim))),
-                pexp_constant(pconst_string(__', __, __)),
-              )
-              ||| map(
-                    ~f=(catch, payload) => catch(`Array(payload)),
-                    pexp_array(__),
-                  )
-              ||| map(
-                    ~f=
-                      (catch, label, def, param, body) =>
-                        catch(`Function((label, def, param, body))),
-                    pexp_fun(__, __, __, __),
-                  ),
-              nil,
-            )
-            ^:: nil,
-          ),
-        ),
-      );
-
-    parse(
-      pattern,
-      module_expr.pmod_loc,
-      /* TODO: Render a proper error here */
-      ~on_error=_ => None,
-      module_expr,
-      (key, payload) => Some((key, payload)),
-    );
-  };
 
   let getHtmlTag = str => {
     switch (String.split_on_char('.', str)) {
@@ -119,14 +78,14 @@ module Mapper = {
     switch (expr.pstr_desc) {
     /* module name = [%styled.div {||}] */
     | Pstr_module({
-        pmb_name: {loc: _, txt: Some(moduleName)} as name,
+        pmb_name: { loc: _, txt: Some(moduleName) } as name,
         pmb_attributes: _pmb_attributes,
         pmb_loc: moduleLoc,
         pmb_expr:
           {
             pmod_desc:
               Pmod_extension((
-                {txt: extensionName, loc: extensionLoc},
+                { txt: extensionName, loc: extensionLoc },
                 PStr([
                   {
                     pstr_desc:
@@ -178,19 +137,19 @@ module Mapper = {
       );
     /* [%styled.div [||]] */
     | Pstr_module({
-        pmb_name: {loc: _, txt: Some(moduleName)} as name,
+        pmb_name: { loc: _, txt: Some(moduleName) } as name,
         pmb_attributes: _pmb_attributes,
         pmb_loc: moduleLoc,
         pmb_expr:
           {
             pmod_desc:
               Pmod_extension((
-                {txt: extensionName, loc: extensionLoc},
+                { txt: extensionName, loc: extensionLoc },
                 PStr([
                   {
                     pstr_desc:
                       Pstr_eval(
-                        {pexp_loc: arrayLoc, pexp_desc: Pexp_array(arr), _},
+                        { pexp_loc: arrayLoc, pexp_desc: Pexp_array(arr), _ },
                         _,
                       ),
                     pstr_loc: _,
@@ -218,14 +177,14 @@ module Mapper = {
       );
     /* [%styled.div () => {}] */
     | Pstr_module({
-        pmb_name: {loc: _, txt: Some(moduleName)} as name,
+        pmb_name: { loc: _, txt: Some(moduleName) } as name,
         pmb_attributes: _pmb_attributes,
         pmb_loc: moduleLoc,
         pmb_expr:
           {
             pmod_desc:
               Pmod_extension((
-                {txt: extensionName, loc: extensionLoc},
+                { txt: extensionName, loc: extensionLoc },
                 PStr([
                   {
                     pstr_desc:
@@ -233,11 +192,16 @@ module Mapper = {
                         {
                           pexp_loc: functionLoc,
                           pexp_desc:
-                            Pexp_fun(
-                              fnLabel,
-                              defaultValue,
-                              param,
-                              expression,
+                            Pexp_function(
+                              [
+                                {
+                                  pparam_desc:
+                                    Pparam_val(fnLabel, defaultValue, param),
+                                  _,
+                                },
+                              ],
+                              _,
+                              Pfunction_body(expression),
                             ),
                           _,
                         },
@@ -276,12 +240,12 @@ module Mapper = {
         [
           {
             pvb_pat:
-              {ppat_desc: Ppat_var({loc: patternLoc, txt: valueName}), _} as pat,
+              { ppat_desc: Ppat_var({ loc: patternLoc, txt: valueName }), _ } as pat,
             pvb_expr:
               {
                 pexp_desc:
                   Pexp_extension((
-                    {txt: "cx", loc: _cxLoc},
+                    { txt: "cx", loc: _cxLoc },
                     PStr([
                       {
                         pstr_desc:
@@ -336,12 +300,12 @@ module Mapper = {
         [
           {
             pvb_pat:
-              {ppat_desc: Ppat_var({loc: patternLoc, txt: valueName}), _} as pat,
+              { ppat_desc: Ppat_var({ loc: patternLoc, txt: valueName }), _ } as pat,
             pvb_expr:
               {
                 pexp_desc:
                   Pexp_extension((
-                    {txt: "cx", loc: _cxLoc},
+                    { txt: "cx", loc: _cxLoc },
                     PStr([
                       {
                         pstr_desc:
@@ -385,8 +349,8 @@ module Mapper = {
               {
                 pexp_desc:
                   Pexp_extension((
-                    {txt: "cx", loc: _cxLoc},
-                    PStr([{pstr_desc: Pstr_eval(payload, _), _}]),
+                    { txt: "cx", loc: _cxLoc },
+                    PStr([{ pstr_desc: Pstr_eval(payload, _), _ }]),
                   )),
                 _,
               },

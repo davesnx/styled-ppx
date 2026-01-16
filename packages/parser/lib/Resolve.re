@@ -13,12 +13,12 @@ let rec contains_ampersand = (selector: selector) => {
   switch (selector) {
   | SimpleSelector(Ampersand) => true
   | ComplexSelector(Selector(selector)) => contains_ampersand(selector)
-  | ComplexSelector(Combinator({left: selector_left, right})) =>
+  | ComplexSelector(Combinator({ left: selector_left, right })) =>
     contains_ampersand(selector_left)
     || right
     |> List.map(snd)
     |> List.exists(contains_ampersand)
-  | CompoundSelector({type_selector, pseudo_selectors, subclass_selectors}) =>
+  | CompoundSelector({ type_selector, pseudo_selectors, subclass_selectors }) =>
     type_selector
     |> Option.map(sel => contains_ampersand(SimpleSelector(sel)))
     |> Option.value(~default=false)
@@ -31,16 +31,16 @@ let rec contains_ampersand = (selector: selector) => {
            pseudo_selector_contains_ampersand(pseudo_selector)
          | _ => false,
        )
-  | RelativeSelector({complex_selector, _}) =>
+  | RelativeSelector({ complex_selector, _ }) =>
     contains_ampersand(ComplexSelector(complex_selector))
   | _ => false
   };
 }
 and pseudo_selector_contains_ampersand =
   fun
-  | Pseudoclass(Function({payload: (selector_list, _), _})) =>
+  | Pseudoclass(Function({ payload: (selector_list, _), _ })) =>
     selector_list |> List.map(fst) |> List.exists(contains_ampersand)
-  | Pseudoclass(NthFunction({payload: (NthSelector(csl), _), _})) =>
+  | Pseudoclass(NthFunction({ payload: (NthSelector(csl), _), _ })) =>
     csl |> List.exists(cs => contains_ampersand(ComplexSelector(cs)))
   | _ => false;
 
@@ -59,12 +59,12 @@ and rule_contain_media =
   fun
   | Declaration(_) => false
   | Style_rule(_) => false
-  | At_rule({name: (name, _), _}) => name == "media";
+  | At_rule({ name: (name, _), _ }) => name == "media";
 
 let pop_last_selector =
   fun
   | ComplexSelector(Selector(sel)) => (sel, None, None)
-  | ComplexSelector(Combinator({left, right})) => {
+  | ComplexSelector(Combinator({ left, right })) => {
       let (ctor, last) = right |> List.rev |> List.hd;
       let rest = right |> List.rev |> List.tl |> List.rev;
       (
@@ -91,7 +91,7 @@ let join_selector_with_combinator = (~combinator=None, a, b) => {
   );
 };
 let join_compound_selector =
-    (selector, {subclass_selectors, pseudo_selectors, _}) => {
+    (selector, { subclass_selectors, pseudo_selectors, _ }) => {
   switch (pop_last_selector(selector)) {
   // prefix is a simple selector, can just replace the type_selector
   | (SimpleSelector(simple), None, None) =>
@@ -155,7 +155,7 @@ let rec replace_ampersand = (replaced_with: selector, selector: selector) => {
   | SimpleSelector(Ampersand) => replaced_with
   | ComplexSelector(Selector(sel)) =>
     ComplexSelector(Selector(replace_ampersand(replaced_with, sel)))
-  | ComplexSelector(Combinator({left, right})) =>
+  | ComplexSelector(Combinator({ left, right })) =>
     ComplexSelector(
       Combinator({
         left: replace_ampersand(replaced_with, left),
@@ -166,7 +166,7 @@ let rec replace_ampersand = (replaced_with: selector, selector: selector) => {
           ),
       }),
     )
-  | CompoundSelector({type_selector, subclass_selectors, pseudo_selectors}) =>
+  | CompoundSelector({ type_selector, subclass_selectors, pseudo_selectors }) =>
     let pseudo_selectors =
       pseudo_selectors
       |> List.map(pseudo_selector_replace_ampersand(replaced_with));
@@ -200,7 +200,7 @@ let rec replace_ampersand = (replaced_with: selector, selector: selector) => {
         pseudo_selectors,
       })
     };
-  | RelativeSelector({combinator, complex_selector}) =>
+  | RelativeSelector({ combinator, complex_selector }) =>
     let csel =
       switch (
         replace_ampersand(replaced_with, ComplexSelector(complex_selector))
@@ -218,7 +218,7 @@ let rec replace_ampersand = (replaced_with: selector, selector: selector) => {
 and pseudo_selector_replace_ampersand = (replaced_with: selector, selector) => {
   switch (selector) {
   | Pseudoclass(
-      Function({name, payload: (selector_list, selector_list_loc)}),
+      Function({ name, payload: (selector_list, selector_list_loc) }),
     ) =>
     let selector_list =
       selector_list
@@ -264,7 +264,7 @@ let split_multiple_selectors = (rules: list(rule)) => {
   List.fold_left(
     (acc, rule) => {
       switch (rule) {
-      | Style_rule({prelude: (selector_list, prelude_loc), block, loc}) =>
+      | Style_rule({ prelude: (selector_list, prelude_loc), block, loc }) =>
         let new_rules =
           List.map(
             selector =>
@@ -286,7 +286,7 @@ let split_multiple_selectors = (rules: list(rule)) => {
 
 let rec starts_with_double_dot =
   fun
-  | CompoundSelector({type_selector: None, subclass_selectors, _}) => {
+  | CompoundSelector({ type_selector: None, subclass_selectors, _ }) => {
       List.for_all(
         fun
         | Pseudo_class(_) => true
@@ -298,7 +298,7 @@ let rec starts_with_double_dot =
   | ComplexSelector(Selector(selector)) => starts_with_double_dot(selector)
   // :hover h1 ... {}
   // :hover + h1 ... {}
-  | ComplexSelector(Combinator({left, _})) => starts_with_double_dot(left)
+  | ComplexSelector(Combinator({ left, _ })) => starts_with_double_dot(left)
   | _ => false;
 
 let trim_right = (vs: component_value_list) => {
@@ -342,17 +342,17 @@ let rec move_media_at_top = (rules: list(rule)) => {
   List.fold_left(
     (acc, rule) => {
       switch (rule) {
-      | At_rule({name: (name, _), block, _} as at_rule)
+      | At_rule({ name: (name, _), block, _ } as at_rule)
           when name == "media" && brace_block_contain_media(block) =>
         let new_rules = swap(at_rule);
         acc @ new_rules;
-      | Style_rule({block: (block, _) as block_with_loc, prelude, loc})
+      | Style_rule({ block: (block, _) as block_with_loc, prelude, loc })
           when rule_list_contain_media(block_with_loc) =>
         let (declarations, selectors) = split_by_kind(block);
         let (media_selectors, non_media_selectors) =
           List.partition(
             fun
-            | At_rule({name: (name, _), _}) => name == "media"
+            | At_rule({ name: (name, _), _ }) => name == "media"
             | _ => false,
             selectors,
           );
@@ -406,12 +406,12 @@ let rec move_media_at_top = (rules: list(rule)) => {
           }),
         ];
         acc @ selector_without_media @ new_media_rules;
-      | Style_rule({block: (block, _), _}) when !List.is_empty(block) =>
+      | Style_rule({ block: (block, _), _ }) when !List.is_empty(block) =>
         acc @ [rule]
-      | At_rule({block: Rule_list((block, _)), _})
+      | At_rule({ block: Rule_list((block, _)), _ })
           when !List.is_empty(block) =>
         acc @ [rule]
-      | At_rule({block: Stylesheet((block, _)), _})
+      | At_rule({ block: Stylesheet((block, _)), _ })
           when !List.is_empty(block) =>
         acc @ [rule]
       | Declaration(_) => acc @ [rule]
@@ -422,7 +422,7 @@ let rec move_media_at_top = (rules: list(rule)) => {
     rules,
   );
 }
-and swap = ({prelude: swap_prelude, block, loc, _}: at_rule) => {
+and swap = ({ prelude: swap_prelude, block, loc, _ }: at_rule) => {
   let rules =
     switch (block) {
     | Empty => []
@@ -464,7 +464,7 @@ let resolve_selectors = (rules: list(rule)) => {
   let rec unnest_selectors = (~prefix, rules) => {
     List.partition_map(
       fun
-      | Style_rule({prelude: (prelude, _), block: (rules, _), _}) => {
+      | Style_rule({ prelude: (prelude, _), block: (rules, _), _ }) => {
           let current_selector = prelude |> List.hd |> fst;
           let new_prefix =
             switch (prefix) {
@@ -479,7 +479,7 @@ let resolve_selectors = (rules: list(rule)) => {
                     Selector(join_compound_selector(prefix, selector)),
                   )
                 | ComplexSelector(
-                    Combinator({left: CompoundSelector(selector), right}),
+                    Combinator({ left: CompoundSelector(selector), right }),
                   ) =>
                   ComplexSelector(
                     Combinator({

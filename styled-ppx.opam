@@ -15,10 +15,10 @@ depends: [
   "menhir" {>= "20220210"}
   "ppx_deriving" {>= "5.0"}
   "ppx_deriving_yojson" {>= "3.7.0"}
-  "ppxlib" {>= "0.27.0" & <= "0.34.0"}
+  "ppxlib" {>= "0.36.0"}
   "sedlex" {>= "3.5"}
   "melange" {>= "3.0.0"}
-  "server-reason-react" {>= "0.3.1"}
+  "server-reason-react" {>= "0.4.1"}
   "reason-react" {>= "0.14.0"}
   "alcotest" {with-test}
   "conf-npm" {with-test}
@@ -47,5 +47,5 @@ depexts: [
 ]
 
 pin-depends: [
-  ["server-reason-react.0.3.1" "git+https://github.com/ml-in-barcelona/server-reason-react#ce006ee5ad5562eee617a4c713b1efa317dc2aab"]
+  ["server-reason-react.0.4.1" "git+https://github.com/ml-in-barcelona/server-reason-react#1909c4c4ef5aece7a811920875521f27e2960fa1"]
 ]

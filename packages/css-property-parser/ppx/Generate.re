@@ -202,41 +202,40 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     }
 
     and combinator_op: (combinator, list(value)) => Parsetree.core_type =
-      (kind, values) => {
-        switch (kind) {
-        | Xor =>
-          let names = variant_names(values);
-          let pairs = List.combine(names, values);
-          let types =
-            List.map(
-              ((type_name, value)) =>
-                switch (value) {
-                | Terminal(kind, multiplier) =>
-                  terminal_xor_op(type_name, kind, multiplier)
-                | Function_call(name, value) =>
-                  let name =
-                    first_uppercase(name) |> kebab_case_to_snake_case;
-                  let type_ = function_call(name, value);
-                  make_variant_branch(type_name, false, [type_]);
-                | Combinator(kind, values) =>
-                  let type_ = combinator_op(kind, values);
-                  make_variant_branch(type_name, false, [type_]);
-                | Group(value, multiplier) =>
-                  let type_ = group_op(value, multiplier);
-                  make_variant_branch(type_name, false, [type_]);
-                },
-              pairs,
-            );
-          ptyp_variant(types, Closed, None);
-        | Static
-        | And => ptyp_tuple(List.map(create_type, values))
-        | Or =>
-          let types =
-            List.map(create_type, values)
-            |> List.map(apply_modifier(Optional));
-          ptyp_tuple(types);
-        };
-      }
+        (kind, values) => {
+      switch (kind) {
+      | Xor =>
+        let names = variant_names(values);
+        let pairs = List.combine(names, values);
+        let types =
+          List.map(
+            ((type_name, value)) =>
+              switch (value) {
+              | Terminal(kind, multiplier) =>
+                terminal_xor_op(type_name, kind, multiplier)
+              | Function_call(name, value) =>
+                let name = first_uppercase(name) |> kebab_case_to_snake_case;
+                let type_ = function_call(name, value);
+                make_variant_branch(type_name, false, [type_]);
+              | Combinator(kind, values) =>
+                let type_ = combinator_op(kind, values);
+                make_variant_branch(type_name, false, [type_]);
+              | Group(value, multiplier) =>
+                let type_ = group_op(value, multiplier);
+                make_variant_branch(type_name, false, [type_]);
+              },
+            pairs,
+          );
+        ptyp_variant(types, Closed, None);
+      | Static
+      | And => ptyp_tuple(List.map(create_type, values))
+      | Or =>
+        let types =
+          List.map(create_type, values)
+          |> List.map(apply_modifier(Optional));
+        ptyp_tuple(types);
+      };
+    }
 
     and function_call = (_name, value) => create_type(value)
 
@@ -379,7 +378,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     let (name, payload) =
       switch (binding) {
       | {
-          pvb_pat: {ppat_desc: Ppat_var({txt, _}), _},
+          pvb_pat: { ppat_desc: Ppat_var({ txt, _ }), _ },
           pvb_expr:
             {
               pexp_desc:
@@ -457,7 +456,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
 
   let get_name_from_binding = (binding: Parsetree.value_binding) => {
     switch (binding) {
-    | {pvb_pat: {ppat_desc: Ppat_var({txt, _}), _}, _} => Some(txt)
+    | { pvb_pat: { ppat_desc: Ppat_var({ txt, _ }), _ }, _ } => Some(txt)
     | _ => None
     };
   };

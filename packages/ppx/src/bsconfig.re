@@ -1,7 +1,7 @@
 let bsconfig = "bsconfig.json";
 let projectRoot = ref(None);
 
-[@deriving of_yojson({strict: false})]
+[@deriving of_yojson({ strict: false })]
 type jsx = {
   version: int,
   mode: option(string),
@@ -55,12 +55,12 @@ let parse = json => {
   switch (yojson |> Yojson.Safe.Util.member("jsx") |> jsx_of_yojson) {
   | Result.Ok(jsx) =>
     switch (jsx) {
-    | {version, mode: _} when version === 3 => (Some(version), None)
-    | {version, mode: Some("classic") as mode} when version === 4 => (
+    | { version, mode: _ } when version === 3 => (Some(version), None)
+    | { version, mode: Some("classic") as mode } when version === 4 => (
         Some(version),
         mode,
       )
-    | {version, mode: Some("automatic") as mode} when version === 4 => (
+    | { version, mode: Some("automatic") as mode } when version === 4 => (
         Some(version),
         mode,
       )

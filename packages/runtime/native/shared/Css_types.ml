@@ -2030,14 +2030,13 @@ module Position = struct
     | `center -> {js|center|js}
     | `hv (h, v) ->
       (match h with
-      | #X.t as h -> X.toString h
-      | #Length.t as l -> Length.toString l)
+        | #X.t as h -> X.toString h
+        | #Length.t as l -> Length.toString l)
       ^ {js| |js}
-      ^ begin
-          match v with
-          | #Y.t as v -> Y.toString v
-          | #Length.t as l -> Length.toString l
-        end
+      ^ begin match v with
+      | #Y.t as v -> Y.toString v
+      | #Length.t as l -> Length.toString l
+      end
     | `hvOffset (h, ho, v, vo) ->
       X.toString h
       ^ {js| |js}
@@ -2083,17 +2082,17 @@ module TransformOrigin = struct
     | #Length.t as x -> Length.toString x
     | `hv (h, v) ->
       (match h with
-      | #X.t as h -> X.toString h
-      | #Length.t as l -> Length.toString l)
+        | #X.t as h -> X.toString h
+        | #Length.t as l -> Length.toString l)
       ^ {js| |js}
       ^
-      (match v with
-      | #Y.t as v -> Y.toString v
-      | #Length.t as l -> Length.toString l)
+        (match v with
+        | #Y.t as v -> Y.toString v
+        | #Length.t as l -> Length.toString l)
     | `hvOffset (h, v, o) ->
       (match h with
-      | #X.t as h -> X.toString h
-      | #Length.t as l -> Length.toString l)
+        | #X.t as h -> X.toString h
+        | #Length.t as l -> Length.toString l)
       ^ {js| |js}
       ^ (match v with
         | #Y.t as v -> Y.toString v
@@ -2181,26 +2180,24 @@ module BackgroundPosition = struct
       | `center -> {js|center|js}
       | `hv (h, v) ->
         (match h with
-        | #X.t as h -> X.toString h
-        | #Length.t as l -> Length.toString l)
+          | #X.t as h -> X.toString h
+          | #Length.t as l -> Length.toString l)
         ^ {js| |js}
-        ^ begin
-            match v with
-            | #Y.t as v -> Y.toString v
-            | #Length.t as l -> Length.toString l
-          end
+        ^ begin match v with
+        | #Y.t as v -> Y.toString v
+        | #Length.t as l -> Length.toString l
+        end
       | `hvOffset (h, v) ->
         (match h with
-        | #X.t as h -> X.toString h
-        | `leftOffset l -> Length.toString l
-        | `rightOffset l -> Length.toString l)
+          | #X.t as h -> X.toString h
+          | `leftOffset l -> Length.toString l
+          | `rightOffset l -> Length.toString l)
         ^ {js| |js}
-        ^ begin
-            match v with
-            | #Y.t as v -> Y.toString v
-            | `topOffset l -> Length.toString l
-            | `bottomOffset l -> Length.toString l
-          end
+        ^ begin match v with
+        | #Y.t as v -> Y.toString v
+        | `topOffset l -> Length.toString l
+        | `bottomOffset l -> Length.toString l
+        end
       | #Length.t as l -> Length.toString l
   end
 
@@ -3254,9 +3251,9 @@ module TextDecoration = struct
         | Some style -> TextDecorationStyle.Value.toString style ^ {js| |js}
         | None -> {js||js})
       ^
-      (match x.color with
-      | Some color -> Color.toString color
-      | None -> {js||js})
+        (match x.color with
+        | Some color -> Color.toString color
+        | None -> {js||js})
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
     | #None.t -> None.toString
@@ -4984,11 +4981,11 @@ module Grid = struct
       ^ {js| / auto-flow|js}
       ^ (if dense then {js| dense|js} else {js||js})
       ^
-      (match autoColumns with
-      | Some cols ->
-        {js| |js}
-        ^ Kloth.Array.map_and_join ~f:TrackSize.toString ~sep:{js| |js} cols
-      | None -> {js||js})
+        (match autoColumns with
+        | Some cols ->
+          {js| |js}
+          ^ Kloth.Array.map_and_join ~f:TrackSize.toString ~sep:{js| |js} cols
+        | None -> {js||js})
     | `autoRows (dense, autoRows, templateColumns) ->
       {js|auto-flow|js}
       ^ (if dense then {js| dense|js} else {js||js})

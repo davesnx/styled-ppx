@@ -495,6 +495,7 @@
       React.createElement(
         switch (as_) {
         | Some(v) => v
+  
         | None => "div"
         },
         ReactDOM.domProps(

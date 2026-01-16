@@ -8,14 +8,14 @@ and rule = (ast: Ast.rule) => {
   | At_rule(ar) => at_rule(ar)
   };
 }
-and style_rule = ({prelude, block, _}: Ast.style_rule) => {
+and style_rule = ({ prelude, block, _ }: Ast.style_rule) => {
   Printf.sprintf(
     "%s{%s}",
     prelude |> fst |> selector_list,
     rule_list(block),
   );
 }
-and at_rule = ({name, prelude, block, _}: Ast.at_rule) => {
+and at_rule = ({ name, prelude, block, _ }: Ast.at_rule) => {
   Printf.sprintf(
     "@%s %s{%s}",
     name |> fst,
@@ -39,14 +39,15 @@ and rule_list = (rule_list: Ast.rule_list) => {
   resolved_rule_list
   |> List.filter(
        fun
-       | Ast.Style_rule({block: (block, _), _}) when List.length(block) == 0 =>
+       | Ast.Style_rule({ block: (block, _), _ })
+           when List.length(block) == 0 =>
          false
        | _ => true,
      )
   |> List.map(rule)
   |> String.concat("");
 }
-and declaration = ({name, value, important, _}: Ast.declaration) => {
+and declaration = ({ name, value, important, _ }: Ast.declaration) => {
   Printf.sprintf(
     "%s:%s%s;",
     name |> fst,
@@ -79,7 +80,7 @@ and selector = (ast: Ast.selector) => {
   and render_attribute =
     fun
     | Ast.Attr_value(v) => v
-    | To_equal({name, kind, value}) =>
+    | To_equal({ name, kind, value }) =>
       name ++ kind ++ render_attr_value(value)
   and render_attr_value =
     fun
@@ -104,9 +105,9 @@ and selector = (ast: Ast.selector) => {
   and render_pseudo_class =
     fun
     | Ast.PseudoIdent(i) => ":" ++ i
-    | Function({name, payload: (sl, _)}) =>
+    | Function({ name, payload: (sl, _) }) =>
       ":" ++ name ++ "(" ++ selector_list(sl) ++ ")"
-    | NthFunction({name, payload: (selector, _)}) =>
+    | NthFunction({ name, payload: (selector, _) }) =>
       ":" ++ name ++ "(" ++ render_nth_payload(selector) ++ ")"
   and render_pseudo_selector =
     fun
@@ -129,7 +130,7 @@ and selector = (ast: Ast.selector) => {
   }
   and render_complex_selector = complex => {
     switch (complex) {
-    | Combinator({left, right}) =>
+    | Combinator({ left, right }) =>
       let left = selector(left);
       let right = render_right_combinator(right);
       left ++ right;
@@ -145,7 +146,7 @@ and selector = (ast: Ast.selector) => {
     |> String.concat("");
   }
   and render_relative_selector =
-      ({combinator, complex_selector}: Ast.relative_selector) => {
+      ({ combinator, complex_selector }: Ast.relative_selector) => {
     Option.fold(~none="", ~some=o => o ++ " ", combinator)
     ++ render_complex_selector(complex_selector);
   };

@@ -42,7 +42,7 @@ setup-githooks: ## Setup githooks
 
 .PHONY: create-switch
 create-switch: ## Create opam switch
-	opam switch create . 5.2.0 --deps-only --with-test --no-install
+	opam switch create . 5.4.0 --deps-only --with-test --no-install
 
 .PHONY: install
 install: ## Install project dependencies
@@ -66,7 +66,9 @@ release-static:
 
 # Testing commands
 
-TEST_TARGETS := test-parser test-css-property-parser test-ppx-native test-ppx-snapshot-reason test-ppx-snapshot-rescript test-css-support test-css-spec-types test-runtime test-murmur2 test-css-spec-parser test-string-interpolation
+TEST_TARGETS := test-parser test-css-property-parser test-ppx-native test-ppx-snapshot-reason test-css-support test-css-spec-types test-runtime test-murmur2 test-css-spec-parser test-string-interpolation
+
+# test-ppx-snapshot-rescript
 
 # Create targets with the format "test-{{target_name}}-{{ "watch" | "promote" }}"
 define create-test

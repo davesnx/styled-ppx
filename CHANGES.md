@@ -1,6 +1,9 @@
 # Changes
 
+- [BREAKING] Update to ppxlib.0.36
+
 ## 0.60.0
+
 - [BREAKING] Transition property on `CSS.Transition.shorthand` function is now an optional argument (#499) (@zakybilfagih)
 - [BREAKING] `CSS.gridTemplateColumns`, `CSS.gridTemplateRows`, `CSS.gridAutoColumns`, `CSS.gridAutoRows` now accepts `` `value of Track.t array `` (#502) (@zakybilfagih)
 - [BREAKING] Rename `Track.t` `` `name `` to `` `lineNames ``  (#502) (@zakybilfagih)
@@ -8,6 +11,7 @@
 - [FIX] Unsupported feature string interpolation not supporting other than single interpolation syntax (#498) (@zakybilfagih)
 
 ## 0.59.0
+
 - [BREAKING] Change entry point module `CSS` (from `CssJs`) on `styled-ppx.melange`, `styled-ppx.native` and `styled-ppx.rescript` (#490) (@davesnx)
 - [FEATURE] Add support and interpolation for `zoom`, `will-change` and `user-select` properties (#489) (@davesnx)
 - [FEATURE] Support content with interpolation #494 (@davesnx)
@@ -20,12 +24,14 @@
 - [FIX] Warning of kebab-case on emotion client side (#493) (@davesnx)
 
 ## 0.58.1
+
 - [BREAKING] FontFamilyName.t is now a string (@davesnx)
 - [FIX] Make unsafe calls from "Cascading" be camelCase to avoid emotion's warning #488 (@davesnx)
 - [FIX] Keep classname when ampersand is at the end of the selector (@davesnx)
 - [FIX] Fix fontFace in both melange and native (@davesnx)
 
 ## 0.58.0
+
 - [FEATURE] Initial @container support #476 (@zakybilfagih)
 - [FIX] Make selector nested maintain other selectors #486 (@davesnx)
 - [BREAKING] Remove `Css` module, `styled_label` and friends #487 (@davesnx)
@@ -38,6 +44,7 @@
 - Remove server-reason-react.js and server-reason-react.belt from styled-ppx.native #487 (@davesnx)
 
 ## 0.57.1
+
 - Remove public_name from alcotest_extra #484 (@davesnx)
 - Fix nesting for selectors (and pseudo) in native #483 (@davesnx)
 

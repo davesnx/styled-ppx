@@ -40,10 +40,11 @@ module Data = {
       : f(`Right(right_data), right_tokens);
   };
   let bind_shortest: best('a, data('a), 'b, data('b), 'c) =
-    ((left, right), f) => bind_shortest_or_longest(true, (left, right), f);
+      ((left, right), f) =>
+    bind_shortest_or_longest(true, (left, right), f);
   let bind_longest: best('a, data('a), 'b, data('b), 'c) =
-    ((left, right), f) =>
-      bind_shortest_or_longest(false, (left, right), f);
+      ((left, right), f) =>
+    bind_shortest_or_longest(false, (left, right), f);
 };
 
 // monad when match is successful
