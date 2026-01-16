@@ -3,6 +3,8 @@ open Ppxlib;
 module Helper = Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
 
+let map_tr = (f, l) => List.rev_map(f, l) |> List.rev;
+
 let withLoc = (~loc, txt) => {
   loc,
   txt,
@@ -345,13 +347,13 @@ let serverCreateElement = (~loc, ~htmlTag, ~variableNames) => {
 
   let params =
     MakeProps.get(["key", "ref", "className"] @ variableNames)
-    |> List.map(value =>
+    |> map_tr(value =>
          switch (value) {
          | MakeProps.Event({ name, _ }) => name
          | MakeProps.Attribute({ name, _ }) => name
          }
        )
-    |> List.map(label =>
+    |> map_tr(label =>
          (
            Optional(label),
            Helper.Exp.ident(~loc, withLoc(~loc, Lident(label))),
@@ -489,7 +491,7 @@ let makeFnJSXServer =
     {
       let reactDomParams =
         MakeProps.get(["key"] @ variableNames)
-        |> List.map(domPropParam(~loc, ~isOptional=true));
+        |> map_tr(domPropParam(~loc, ~isOptional=true));
       [
         (Nolabel, None, Builder.ppat_any(~loc), "_", Location.none, None),
         makeParam(
@@ -713,7 +715,7 @@ let makePropsWithParams = (~loc, params, dynamicProps) => {
 
   let makeProps =
     MakeProps.get(dynamicPropNames)
-    |> List.map(domPropLabel(~loc, ~isOptional=false));
+    |> map_tr(domPropLabel(~loc, ~isOptional=false));
 
   /* List of `prop: type` */
   let reactProps =
@@ -774,7 +776,7 @@ let makeMakeProps = (~loc, ~areAllFieldsOptional, customProps) => {
 
   let makeProps =
     MakeProps.get(dynamicPropNames)
-    |> List.map(domPropLabel(~loc, ~isOptional=areAllFieldsOptional));
+    |> map_tr(domPropLabel(~loc, ~isOptional=areAllFieldsOptional));
 
   /* List of `prop: type` */
   let reactProps =
