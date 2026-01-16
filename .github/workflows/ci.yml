@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - '*'
   pull_request:
     branches:
       - main
@@ -115,6 +117,18 @@ jobs:
         with:
           name: runtime-rescript
           path: _build/default/packages/runtime/rescript
+
+      - name: Install dune-release
+        if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'ubuntu-latest' && matrix.ocaml-compiler == '5.4.0'
+        run: opam install dune-release -y
+
+      - name: Release to opam
+        uses: davesnx/dune-release-action@v0.2.14
+        if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'ubuntu-latest' && matrix.ocaml-compiler == '5.4.0'
+        with:
+          packages: 'styled-ppx'
+          changelog: './CHANGES.md'
+          github-token: ${{ secrets.GH_TOKEN }}
 
       - name: Save opam cache
         uses: actions/cache/save@v4
