@@ -144,6 +144,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
+      pull-requests: write
 
     steps:
       - uses: actions/checkout@v4
@@ -224,7 +225,7 @@ jobs:
             });
 
             const existingComment = comments.find(c => c.body.includes('nightly') && c.body.includes('@davesnx/styled-ppx@'));
-            
+
             if (existingComment) {
               await github.rest.issues.updateComment({
                 owner: context.repo.owner,
