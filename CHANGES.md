@@ -3,7 +3,7 @@
 ## 0.61.0
 
 - [BREAKING] Update to ppxlib.0.36
-- [FIX] Stack overflow on makeProps generation
+- [FIX] Stack overflow by adding upper bound on reason
 
 ## 0.60.0
 

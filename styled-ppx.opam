@@ -11,7 +11,7 @@ bug-reports: "https://github.com/davesnx/styled-ppx/issues"
 depends: [
   "dune" {>= "3.16"}
   "ocaml" {>= "4.14"}
-  "reason" {>= "3.11.0"}
+  "reason" {>= "3.11.0" & < "3.16.0"}
   "menhir" {>= "20220210"}
   "ppx_deriving" {>= "5.0"}
   "ppx_deriving_yojson" {>= "3.7.0"}
