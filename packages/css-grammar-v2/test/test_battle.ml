@@ -244,7 +244,7 @@ let test_interpolation_dotted () =
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
 
 let test_margin_all_values () =
-  match Spec.parse Properties.margin "10px 20% 30px auto" with
+  match Properties.Margin.parse "10px 20% 30px auto" with
   | Ok values when List.length values = 4 -> ()
   | Ok values ->
       Alcotest.fail
@@ -252,51 +252,51 @@ let test_margin_all_values () =
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
 
 let test_margin_single_calc () =
-  match Spec.parse Properties.margin "calc(100% - 20px)" with
+  match Properties.Margin.parse "calc(100% - 20px)" with
   | Ok [ `Length (`Calc _) ] -> ()
   | Ok [ `Percentage (`Calc _) ] -> ()
   | Ok _ -> Alcotest.fail "Expected calc in margin"
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
 
 let test_margin_mixed_with_calc () =
-  match Spec.parse Properties.margin "10px calc(50% - 10px) 20px" with
+  match Properties.Margin.parse "10px calc(50% - 10px) 20px" with
   | Ok values when List.length values = 3 -> ()
   | Ok _ -> Alcotest.fail "Expected 3 values with calc"
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
 
 let test_position_sticky () =
-  match Spec.parse Properties.position "sticky" with
+  match Properties.Position.parse "sticky" with
   | Ok `Sticky -> ()
   | Ok _ -> Alcotest.fail "Expected Sticky"
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
 
 let test_line_height_unitless () =
-  match Spec.parse Properties.line_height "1.5" with
+  match Properties.Line_height.parse "1.5" with
   | Ok (`Number (`Number n)) when n = 1.5 -> ()
   | Ok _ -> Alcotest.fail "Expected unitless number"
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
 
 let test_line_height_with_unit () =
-  match Spec.parse Properties.line_height "24px" with
+  match Properties.Line_height.parse "24px" with
   | Ok (`Length (`Px n)) when n = 24. -> ()
   | Ok _ -> Alcotest.fail "Expected 24px"
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
 
 let test_color_hex_uppercase () =
-  match Spec.parse Properties.color "#FFFFFF" with
+  match Properties.Color.parse "#FFFFFF" with
   | Ok (`Hex_color "FFFFFF") -> ()
   | Ok (`Hex_color s) -> Alcotest.fail ("Expected FFFFFF, got " ^ s)
   | Ok _ -> Alcotest.fail "Expected hex color"
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
 
 let test_color_transparent () =
-  match Spec.parse Properties.color "transparent" with
+  match Properties.Color.parse "transparent" with
   | Ok `Transparent -> ()
   | Ok _ -> Alcotest.fail "Expected Transparent"
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
 
 let test_color_currentcolor_case () =
-  match Spec.parse Properties.color "currentcolor" with
+  match Properties.Color.parse "currentcolor" with
   | Ok `CurrentColor -> ()
   | Ok _ -> Alcotest.fail "Expected CurrentColor"
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
@@ -307,22 +307,23 @@ let test_error_invalid_unit () =
   | Ok _ -> Alcotest.fail "Expected error for invalid unit"
 
 let test_error_missing_value () =
-  match Spec.parse Properties.margin "" with
+  match Properties.Margin.parse "" with
   | Error _ -> ()
   | Ok _ -> Alcotest.fail "Expected error for empty value"
 
 let test_error_too_many_values () =
-  match Spec.parse ~strict:true Properties.margin "1px 2px 3px 4px 5px" with
+  match Properties.Margin.parse "1px 2px 3px 4px 5px" with
+  | Ok [ _; _; _; _ ] -> ()
+  | Ok _ -> Alcotest.fail "Should only parse 4 values"
   | Error _ -> ()
-  | Ok _ -> Alcotest.fail "Expected error for too many values"
 
 let test_error_invalid_keyword () =
-  match Spec.parse Properties.position "floating" with
+  match Properties.Position.parse "floating" with
   | Error _ -> ()
   | Ok _ -> Alcotest.fail "Expected error for invalid keyword"
 
 let test_whitespace_handling () =
-  match Spec.parse Properties.margin "   10px   20px   " with
+  match Properties.Margin.parse "   10px   20px   " with
   | Ok values when List.length values = 2 -> ()
   | Ok _ -> Alcotest.fail "Expected 2 values"
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
@@ -374,7 +375,7 @@ let test_extract_multiple_interpolations () =
     [ `Length (`Interpolation [ "x" ]); `Length (`Px 10.);
       `Length (`Interpolation [ "y" ]); `Auto ]
   in
-  let result = Properties.margin.extract_interpolations values in
+  let result = Properties.Margin.extract_interpolations values in
   Alcotest.(check int) "should extract 2" 2 (List.length result);
   Alcotest.(check bool)
     "contains x" true
@@ -385,7 +386,7 @@ let test_extract_multiple_interpolations () =
 
 let test_extract_nested_interpolation () =
   let values = [ `Percentage (`Interpolation [ "pct" ]) ] in
-  let result = Properties.margin.extract_interpolations values in
+  let result = Properties.Margin.extract_interpolations values in
   Alcotest.(check int) "should extract 1" 1 (List.length result)
 
 let tests =

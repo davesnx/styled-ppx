@@ -1,13 +1,13 @@
 open Css_grammar_v2
 
 let test_margin_single () =
-  match Spec.parse Properties.margin "10px" with
+  match Properties.Margin.parse "10px" with
   | Ok [ `Length (`Px 10.) ] -> ()
   | Ok _ -> Alcotest.fail "Expected single length value"
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
 
 let test_margin_four_values () =
-  match Spec.parse Properties.margin "10px 20px 30px 40px" with
+  match Properties.Margin.parse "10px 20px 30px 40px" with
   | Ok [ _; _; _; _ ] -> ()
   | Ok result ->
       Alcotest.fail
@@ -15,49 +15,49 @@ let test_margin_four_values () =
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
 
 let test_margin_auto () =
-  match Spec.parse Properties.margin "auto" with
+  match Properties.Margin.parse "auto" with
   | Ok [ `Auto ] -> ()
   | Ok _ -> Alcotest.fail "Expected `Auto"
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
 
 let test_margin_mixed () =
-  match Spec.parse Properties.margin "10px auto 20%" with
+  match Properties.Margin.parse "10px auto 20%" with
   | Ok [ `Length _; `Auto; `Percentage _ ] -> ()
   | Ok _ -> Alcotest.fail "Expected length, auto, percentage"
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
 
 let test_position_static () =
-  match Spec.parse Properties.position "static" with
+  match Properties.Position.parse "static" with
   | Ok `Static -> ()
   | Ok _ -> Alcotest.fail "Expected `Static"
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
 
 let test_position_absolute () =
-  match Spec.parse Properties.position "absolute" with
+  match Properties.Position.parse "absolute" with
   | Ok `Absolute -> ()
   | Ok _ -> Alcotest.fail "Expected `Absolute"
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
 
 let test_line_height_normal () =
-  match Spec.parse Properties.line_height "normal" with
+  match Properties.Line_height.parse "normal" with
   | Ok `Normal -> ()
   | Ok _ -> Alcotest.fail "Expected `Normal"
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
 
 let test_line_height_number () =
-  match Spec.parse Properties.line_height "1.5" with
+  match Properties.Line_height.parse "1.5" with
   | Ok (`Number (`Number 1.5)) -> ()
   | Ok _ -> Alcotest.fail "Expected `Number 1.5"
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
 
 let test_color_hex () =
-  match Spec.parse Properties.color "#ff0000" with
+  match Properties.Color.parse "#ff0000" with
   | Ok (`Hex_color "ff0000") -> ()
   | Ok _ -> Alcotest.fail "Expected hex color"
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
 
 let test_color_currentcolor () =
-  match Spec.parse Properties.color "currentColor" with
+  match Properties.Color.parse "currentColor" with
   | Ok `CurrentColor -> ()
   | Ok _ -> Alcotest.fail "Expected `CurrentColor"
   | Error e -> Alcotest.fail ("Parse error: " ^ e)

@@ -48,7 +48,7 @@ install: ## Install project dependencies
 
 .PHONY: pin
 pin: ## Pin project dependencies
-	echo "No pinned dependencies"
+	opam pin add reason.3.17.0 "https://github.com/reasonml/reason.git#fix-stackoverflow-on-Pconstraint-414" -y
 
 .PHONY: init
 init: setup-githooks create-switch pin install ## Create a local dev environment

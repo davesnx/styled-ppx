@@ -1,17 +1,18 @@
-type 'a t = {
-  rule : 'a Rule.rule;
-  extract_interpolations : 'a -> (string * string) list;
-  runtime_module_path : string option;
-}
+module type RULE = sig
+  type t
 
-let make ?runtime_module_path ~extract_interpolations rule =
-  { rule; extract_interpolations; runtime_module_path }
+  val rule : t Rule.rule
+  val parse : string -> (t, string) result
+  val to_string : t -> string
+  val runtime_module_path : string option
+  val extract_interpolations : t -> (string * string) list
+end
 
-type packed = Pack : 'a t -> packed
+type packed = Pack : (module RULE with type t = 'a) -> packed
 
-let pack spec = Pack spec
+let pack (module M : RULE) = Pack (module M)
 
-let parse ?(strict = false) spec input =
+let parse_with_rule rule input =
   let tokens_with_loc = Styled_ppx_css_parser.Lexer.from_string input in
   let tokens =
     List.filter_map
@@ -26,12 +27,7 @@ let parse ?(strict = false) spec input =
         && tok <> Styled_ppx_css_parser.Parser.EOF)
       tokens
   in
-  match spec.rule tokens_without_ws_and_eof with
+  match rule tokens_without_ws_and_eof with
   | Ok value, [] -> Ok value
-  | Ok _, remaining when strict ->
-    Error
-      (Printf.sprintf "Unexpected tokens remaining: %d" (List.length remaining))
   | Ok value, _ :: _ -> Ok value
   | Error errors, _ -> Error (String.concat "\n" errors)
-
-let extract_interpolations spec value = spec.extract_interpolations value

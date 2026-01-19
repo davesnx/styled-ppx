@@ -17,10 +17,10 @@ let parse_with_rule rule input =
   | Error errors, _ -> Error (String.concat "\n" errors)
 
 let test_margin_full_interpolation () =
-  match Spec.parse Properties.margin "$(x)" with
+  match Properties.Margin.parse "$(x)" with
   | Ok [ `Length (`Interpolation [ "x" ]) ] ->
     let result =
-      Properties.margin.extract_interpolations
+      Properties.Margin.extract_interpolations
         [ `Length (`Interpolation [ "x" ]) ]
     in
     Alcotest.(check (list (pair string string)))
@@ -29,7 +29,7 @@ let test_margin_full_interpolation () =
       result
   | Ok [ `Percentage (`Interpolation [ "x" ]) ] ->
     let result =
-      Properties.margin.extract_interpolations
+      Properties.Margin.extract_interpolations
         [ `Percentage (`Interpolation [ "x" ]) ]
     in
     Alcotest.(check (list (pair string string)))
@@ -40,7 +40,7 @@ let test_margin_full_interpolation () =
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
 
 let test_margin_partial_interpolation () =
-  match Spec.parse Properties.margin "$(x) 10px" with
+  match Properties.Margin.parse "$(x) 10px" with
   | Ok [ `Length (`Interpolation [ "x" ]); `Length (`Px _) ]
   | Ok [ `Percentage (`Interpolation [ "x" ]); `Length (`Px _) ] ->
     ()
@@ -48,10 +48,10 @@ let test_margin_partial_interpolation () =
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
 
 let test_line_height_interpolation () =
-  match Spec.parse Properties.line_height "$(lh)" with
+  match Properties.Line_height.parse "$(lh)" with
   | Ok (`Number (`Interpolation [ "lh" ])) ->
     let result =
-      Properties.line_height.extract_interpolations
+      Properties.Line_height.extract_interpolations
         (`Number (`Interpolation [ "lh" ]))
     in
     Alcotest.(check (list (pair string string)))
@@ -60,7 +60,7 @@ let test_line_height_interpolation () =
       result
   | Ok (`Length (`Interpolation [ "lh" ])) ->
     let result =
-      Properties.line_height.extract_interpolations
+      Properties.Line_height.extract_interpolations
         (`Length (`Interpolation [ "lh" ]))
     in
     Alcotest.(check (list (pair string string)))
@@ -69,7 +69,7 @@ let test_line_height_interpolation () =
       result
   | Ok (`Percentage (`Interpolation [ "lh" ])) ->
     let result =
-      Properties.line_height.extract_interpolations
+      Properties.Line_height.extract_interpolations
         (`Percentage (`Interpolation [ "lh" ]))
     in
     Alcotest.(check (list (pair string string)))
@@ -81,17 +81,17 @@ let test_line_height_interpolation () =
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
 
 let test_no_interpolation_returns_empty () =
-  match Spec.parse Properties.margin "10px 20px" with
+  match Properties.Margin.parse "10px 20px" with
   | Ok values ->
-    let result = Properties.margin.extract_interpolations values in
+    let result = Properties.Margin.extract_interpolations values in
     Alcotest.(check (list (pair string string)))
       "no interpolation returns empty" [] result
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
 
 let test_mixed_values_extracts_only_interpolations () =
-  match Spec.parse Properties.margin "$(a) 10px $(b) auto" with
+  match Properties.Margin.parse "$(a) 10px $(b) auto" with
   | Ok values ->
-    let result = Properties.margin.extract_interpolations values in
+    let result = Properties.Margin.extract_interpolations values in
     Alcotest.(check int) "extracts 2 interpolations" 2 (List.length result);
     Alcotest.(check bool)
       "first is 'a'" true
@@ -102,7 +102,7 @@ let test_mixed_values_extracts_only_interpolations () =
   | Error e -> Alcotest.fail ("Parse error: " ^ e)
 
 let test_calc_parses () =
-  match Spec.parse Properties.margin "calc(10px + 20px)" with
+  match Properties.Margin.parse "calc(10px + 20px)" with
   | Ok [ `Length (`Calc _) ] -> ()
   | Ok [ `Percentage (`Calc _) ] -> ()
   | Ok _ -> Alcotest.fail "Expected calc expression"

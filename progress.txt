@@ -1,0 +1,72 @@
+# CSS Static Extraction Progress
+
+## Branch: css-static-extraction
+Created from: start-extraction-clean
+
+## Key Architecture Decision
+- Standard types (length, angle, etc.) handle interpolation internally
+- Specs don't need explicit <interpolation>
+- PPX generates type-aware extract_interpolations
+- Module-based API (not record-based) - each spec generates a module conforming to Spec.RULE
+
+## Completed Work
+
+### Phase 1: Core Module-Based API (DONE)
+- [x] Create branch from start-extraction-clean
+- [x] Standard.ml already has interpolation-aware types (length, angle, time, etc.)
+- [x] Updated Spec.ml: Added RULE module signature
+- [x] Updated Generate.ml: Added generate_module_structure to generate modules
+- [x] Updated Css_grammar_v2_ppx.ml: Added [%spec_module] extension for modules
+- [x] Updated Registry.ml for module-based API
+- [x] Updated Properties.ml to use [%spec_module]
+- [x] Updated all test files to use module-based API
+- [x] All 199 tests passing
+
+### Module Signature (Spec.RULE)
+```ocaml
+module type RULE = sig
+  type t
+  val rule : t Rule.rule
+  val parse : string -> (t, string) result
+  val to_string : t -> string
+  val runtime_module_path : string option
+  val extract_interpolations : t -> (string * string) list
+end
+```
+
+### Usage Example
+```ocaml
+module Margin = [%spec_module "[ <length> | <percentage> | 'auto' ]{1,4}"]
+
+let _ = Margin.parse "10px auto" (* Ok [`Length (`Px 10.); `Auto] *)
+let _ = Margin.extract_interpolations (`Length (`Interpolation ["x"])) 
+        (* [("x", "Css_types.Length")] *)
+```
+
+## Remaining Work
+
+### Phase 2: Integration with Main PPX
+- [ ] Rename css-grammar-v2 to css-grammar (replace old package)
+- [ ] Update packages/ppx/src to use new module-based API
+- [ ] Update Property_to_types.re for module API
+- [ ] Update Css_runtime.re for module API
+
+### Phase 3: Full Build
+- [ ] Resolve server-reason-react dependencies (pre-existing issue)
+- [ ] Verify full project builds
+- [ ] Run full test suite
+
+## Current Status
+**Phase 1 Complete**: The css-grammar-v2 package has a working module-based API with:
+- 199 passing tests
+- [%spec_module] extension generating modules
+- Type-safe interpolation extraction
+- Standard types with built-in interpolation support
+
+## Files Changed
+- packages/css-grammar-v2/lib/Spec.ml - Added RULE module signature
+- packages/css-grammar-v2/ppx/Generate.ml - Added generate_module_structure
+- packages/css-grammar-v2/ppx/Css_grammar_v2_ppx.ml - Added [%spec_module] extension
+- packages/css-grammar-v2/lib/Properties.ml - Converted to module-based API
+- packages/css-grammar-v2/lib/Registry.ml - Updated for module-based API
+- packages/css-grammar-v2/test/*.ml - All test files updated for module-based API

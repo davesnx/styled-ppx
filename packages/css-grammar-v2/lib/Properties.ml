@@ -1,50 +1,11 @@
-type margin_value =
-  [ `Length of Standard.length
-  | `Percentage of Standard.percentage
-  | `Auto
-  ]
+module Margin = [%spec_module "[ <length> | <percentage> | 'auto' ]{1,4}"]
+module Padding = [%spec_module "[ <length> | <percentage> ]{1,4}"]
 
-type margin = margin_value list
+module Position =
+  [%spec_module "'static' | 'relative' | 'absolute' | 'fixed' | 'sticky'"]
 
-let margin : margin Spec.t = [%spec "[ <length> | <percentage> | 'auto' ]{1,4}"]
+module Line_height =
+  [%spec_module "'normal' | <number> | <length> | <percentage>"]
 
-type padding_value =
-  [ `Length of Standard.length
-  | `Percentage of Standard.percentage
-  ]
-
-type padding = padding_value list
-
-let padding : padding Spec.t = [%spec "[ <length> | <percentage> ]{1,4}"]
-
-type position =
-  [ `Static
-  | `Relative
-  | `Absolute
-  | `Fixed
-  | `Sticky
-  ]
-
-let position : position Spec.t =
-  [%spec "'static' | 'relative' | 'absolute' | 'fixed' | 'sticky'"]
-
-type line_height =
-  [ `Normal
-  | `Number of Standard.number
-  | `Length of Standard.length
-  | `Percentage of Standard.percentage
-  ]
-
-let line_height : line_height Spec.t =
-  [%spec "'normal' | <number> | <length> | <percentage>"]
-
-type color =
-  [ `Hex_color of string
-  | `CurrentColor
-  | `Transparent
-  ]
-
-let color : color Spec.t =
-  [%spec "<hex-color> | 'currentColor' | 'transparent'"]
-
-let background_color = color
+module Color = [%spec_module "<hex-color> | 'currentColor' | 'transparent'"]
+module Background_color = Color

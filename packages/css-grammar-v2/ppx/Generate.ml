@@ -552,31 +552,6 @@ module Make (Builder : Ast_builder.S) = struct
     let param_pat = if has_interpolation then pvar "value" else ppat_any in
     pexp_fun Nolabel None param_pat body
 
-  (** Generate the complete Spec.t record expression.
-
-      { Spec.rule = <rule>;
-        extract_interpolations = <extraction_fn>;
-        runtime_module_path = <path_option>;
-      }
-  *)
-  let generate_spec_record ~(spec : Spec_parser.value)
-    ~(runtime_module_path : string option) : expression =
-    let rule_expr = generate_rule spec in
-    let extract_expr =
-      generate_extract_interpolations spec ~runtime_module_path
-    in
-    let runtime_path_expr =
-      match runtime_module_path with
-      | Some p -> [%expr Some [%e make_type_path_expr p]]
-      | None -> [%expr None]
-    in
-    [%expr
-      {
-        Spec.rule = [%e rule_expr];
-        extract_interpolations = [%e extract_expr];
-        runtime_module_path = [%e runtime_path_expr];
-      }]
-
   (** Map CSS type name to OCaml type path for type generation. "length" →
       "Standard.length" *)
   let css_type_to_ocaml_type name =
@@ -710,4 +685,59 @@ module Make (Builder : Ast_builder.S) = struct
     | _ ->
       let types = List.map generate_type values in
       ptyp_tuple types
+
+  (** Generate the complete module structure conforming to Spec.RULE.
+
+      struct
+        type t = ...
+        let rule = ...
+        let parse = Spec.parse_with_rule rule
+        let to_string = fun _ -> ""
+        let runtime_module_path = ...
+        let extract_interpolations = ...
+      end
+  *)
+  let generate_module_structure ~(spec : Spec_parser.value)
+    ~(runtime_module_path : string option) : module_expr =
+    let rule_expr = generate_rule spec in
+    let type_expr = generate_type spec in
+    let extract_expr =
+      generate_extract_interpolations spec ~runtime_module_path
+    in
+    let runtime_path_expr =
+      match runtime_module_path with
+      | Some p -> [%expr Some [%e make_type_path_expr p]]
+      | None -> [%expr None]
+    in
+    pmod_structure
+      [
+        pstr_type Nonrecursive
+          [
+            type_declaration ~name:(Located.mk "t") ~params:[] ~cstrs:[]
+              ~kind:Ptype_abstract ~private_:Public ~manifest:(Some type_expr);
+          ];
+        [%stri let rule = [%e rule_expr]];
+        [%stri let parse = Spec.parse_with_rule rule];
+        [%stri let to_string _ = ""];
+        [%stri let runtime_module_path = [%e runtime_path_expr]];
+        [%stri let extract_interpolations = [%e extract_expr]];
+      ]
+
+  let generate_spec_record ~(spec : Spec_parser.value)
+    ~(runtime_module_path : string option) : expression =
+    let rule_expr = generate_rule spec in
+    let extract_expr =
+      generate_extract_interpolations spec ~runtime_module_path
+    in
+    let runtime_path_expr =
+      match runtime_module_path with
+      | Some p -> [%expr Some [%e make_type_path_expr p]]
+      | None -> [%expr None]
+    in
+    [%expr
+      {
+        Spec.rule = [%e rule_expr];
+        extract_interpolations = [%e extract_expr];
+        runtime_module_path = [%e runtime_path_expr];
+      }]
 end
