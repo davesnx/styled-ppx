@@ -49,8 +49,12 @@ install: ## Install project dependencies
 	opam install . --deps-only --with-test --with-dev-setup --working-dir . -y
 	npm install
 
+.PHONY: pin
+pin: ## pin
+	opam pin add reason.3.17.3 "https://github.com/reasonml/reason.git#fix-stackoverflow-on-Pconstraint-414" -y
+
 .PHONY: init
-init: setup-githooks create-switch install ## Create a local dev enviroment
+init: setup-githooks create-switch pin install ## Create a local dev enviroment
 
 .PHONY: subst
 subst: ## Run dune substitute
