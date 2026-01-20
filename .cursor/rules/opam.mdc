@@ -1,0 +1,46 @@
+---
+alwaysApply: true
+---
+Make sure you have the right opam switch loaded. echo $OPAMSWITCH should point to the current directory.
+
+Before running any build script, you should run `eval $(opam env --switch=. --set-switch)` and be sure that the opam switch dependencies are loaded.
+
+Here are the list of commands to run:
+
+List of available make commands
+
+  make help                      Print this help message
+  make build                     Build the project, including non installable libraries and executables
+  make build-prod                Build for production (--profile=prod)
+  make clean                     Clean artifacts
+  make format-check              Checks if format is correct
+  make install                   Install project dependencies
+  make pin                       Pin project dependencies
+  make dev                       Run the project in dev mode
+  make test-demo-rescript-v9     Run End-to-end tests for JSX3
+  make test-demo-rescript-v9-watch Run End-to-end tests for JSX3
+  make test-demo-rescript-v9-promote Run End-to-end tests for JSX3
+  make test-demo-rescript-v10    Run End-to-end tests for JSX4
+  make test-demo-rescript-v10-watch Run End-to-end tests for JSX4
+  make test-demo-rescript-v10-promote Run End-to-end tests for JSX4
+  make test-demo                 Run demo tests
+  make demo-rescript-v10         Run the ReScript v10 demo with JSX4
+  make demo-server               Run the server demo
+  make demo-server-watch         Run (and watch) the server demo
+  make demo-melange-build        Build the melange demo
+  make demo-melange-build-watch  Build the melange demo
+  make demo-melange-serve        Serve the melange demo
+  make ast                       Print the command to debug the ast
+  make lexer                     Print the command to debug the lexer
+  make interpreter               Run menhir as interpret
+  make website-watch             Run the website locally
+  make test-css-parser      Run test-css-parser test (add "-watch" or "-promote")
+  make test-css-grammar     Run test-css-grammar test (add "-watch" or "-promote")
+  make test-css-grammar-snapshot Run test-css-grammar-snapshot test (add "-watch" or "-promote")
+  make test-ppx-native      Run test-ppx-native test (add "-watch" or "-promote")
+  make test-ppx-snapshot-reason Run test-ppx-snapshot-reason test (add "-watch" or "-promote")
+  make test-css-support     Run test-css-support test (add "-watch" or "-promote")
+  make test-runtime         Run test-runtime test (add "-watch" or "-promote")
+  make test-murmur2         Run test-murmur2 test (add "-watch" or "-promote")
+  make test-css-spec-parser Run test-css-spec-parser test (add "-watch" or "-promote")
+  make test-string-interpolation Run test-string-interpolation test (add "-watch" or "-promote")

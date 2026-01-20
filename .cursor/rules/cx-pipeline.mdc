@@ -1,0 +1,182 @@
+---
+alwaysApply: false
+---
+This document explains how the ppx works, and more importantly how the compiler pipeline works. From parsing, type-checking, code-generation and OCaml inference.
+
+## Simple case
+
+```reason
+[%cx "color: blue"]
+```
+
+Gets trasnformed into:
+
+```reason
+CSS.style([| CSS.color(`blue) |]);
+```
+
+1. First, the ppx calls Driver (packages/parser/lib/Driver.re), which eventually calls packages/parser/Parser.mly parses to ensure the structure of the stylesheet.
+
+2. The ppx calls `Property_to_runtime` (packages/ppx/src/Property_to_runtime.re) which type-checks the property agains the CSS Spec. The "property parser" is defined in packages/css-grammar/lib/Parser.re and it uses a nice technique for parsing the inlined CSS Spec with another ppx (css-grammar/ppx) and generate functions that act like a parser combinators which are then used to ensure the values of the properties are valid.
+
+2.1. The css-grammar works with:
+
+  2.1.1 `%value.rec` parses a CSS value definition syntax string (like "<number> | <interpolation>") and generates a recursive parser combinator function using Combinators.re operators (xor, and_, or_, static) combined with Standard.re primitives (keyword, integer, number, length, etc.)—the result is a function tokens -> (result, remaining_tokens).
+
+3. Property_to_runtime.re is the bridge between parsed CSS values (from css-grammar) and OCaml/Reason runtime expressions (the CSS module). It's essentially a massive translation layer with three core responsibilities:
+
+  3.1. Value Rendering — Converts parsed CSS AST nodes into runtime expressions. For example, render_length converts a parsed \Px(10.0) into [%expr \pxFloat(10.0)], or render_color converts a parsed RGB function into [%expr CSS.rgb(...)].
+
+  3.2. Property Mapping — Maps ~300+ CSS property names (like "color", "margin", "flex") to transformation functions that:
+
+    - Parse the property value using the grammar from Parser.Property_X.rule
+    - Transform the parsed AST into calls to CSS.* functions
+    - Handle interpolation ($(foo)) by rendering variable references type-safely
+
+  3.3 Fallback Handling — When a feature isn't supported by the typed runtime (or uses CSS-wide keywords like inherit/var()), it falls back to CSS.unsafe(property, value) as a string escape hatch.
+
+  The two key patterns are:
+  monomorphic: Simple properties with one representation (e.g., color → CSS.color(value))
+  polymorphic: Complex properties with multiple forms (e.g., margin → CSS.margin, CSS.margin2, CSS.margin3, or CSS.margin4 depending on how many values)
+
+  Essentially: parsed CSS in → typed OCaml expressions out.
+
+4. The transfomed code contains the module "CSS", the runtime, defined in packages/runtime/melange or packages/runtime/native. Contains both Declarations (color, border, margin, etc...) and Css_types, which are runtime renderers for each CSS Value.
+
+5. Finally at runtime:
+   - In the server we use a native implementation in packages/runtime/native/CSS.ml can generates the StyleSheet in one go, since the CSS.style calls collects all declarations/etc.
+   - In the client we use packages/runtime/melange/Emotion_bindings.ml that binds to emotion.sh and does the CSS-in-JS thing of adding styles in the header, etc
+
+## Complete interpolation
+
+```reason
+let foo = CSS.px(10);
+[%cx "flex-basis: $(foo)"]
+```
+
+Gets trasnformed into:
+
+```reason
+let foo = CSS.px(10);
+CSS.flexBasis(foo);
+```
+
+Same mechanism happens from the Simple case, but here there's interpolation to the entire value.
+
+The property parser has defined as `let property_flex_basis = [%value rec "'content' | <'width'> | <interpolation>"]` so the property parser allows the interpolation to transform into an identifier. This happens in `Property_to_runtime`, more specifically in `transform_with_variable`.
+
+Finally, because `CSS.flexBasis` is defined at the runtime as `let flexBasis x = Rule.declaration ({js|flexBasis|js}, FlexBasis.toString x)` where FlexBasis is:
+
+```ocaml
+module FlexBasis = struct
+  module Value = struct
+    type t =
+      [ `content
+      | Width.Value.t
+      ]
+
+    let toString x =
+      match x with
+      | `content -> {js|content|js}
+      | #Width.Value.t as x -> Width.Value.toString x
+  end
+
+  type t =
+    [ Value.t
+    | Cascading.t
+    | Var.t
+    ]
+
+  let toString x =
+    match x with
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
+    | #Value.t as x -> Value.toString x
+end
+```
+
+When the OCaml compiler runs (after running the ppx) founds this expression `CSS.flexBasis(foo);` and by their inference rules, flexBasis only accepts `| Value.t | Cascading.t | Var.t`, so it becames the only possible types, and creating this constraint... making sure that users of the interpolation remain type-safe.
+
+## Interpolation with holes
+
+```reason
+let foo = 10.0;
+
+[%cx {|flex: 33 $(X.value);|}];
+```
+
+Gets trasnformed into:
+
+```reason
+CSS.flex2(~shrink=X.value, 33.);
+```
+
+Again `flex` is defined by the property parser by with `"'none' | [<'flex-grow'> [ <'flex-shrink'> ]? || <'flex-basis'>] | <interpolation>"` and the `<'flex-grow'>` annotations means, whatever spec the property flex-grow has, which eventually `and property_flex_grow = [%value.rec "<number> | <interpolation>"]` contains interpolation as well.
+
+The key here is that interpolation can be in one of the values for the property, and I modified the original CSS Spec to introduce `<interpolation>` in many places.
+
+Property_to_runtime.flex is defined like:
+
+```reason
+let flex =
+  polymorphic(Property_parser.property_flex, (~loc, value) =>
+    switch (value) {
+    | `None => [[%expr CSS.flex1(`none)]]
+    | `Interpolation(interp) => [
+        [%expr CSS.flex1([%e render_variable(~loc, interp)])],
+      ]
+    | `Or(None, None) => [[%expr CSS.flex1(`none)]]
+    | `Or(Some((grow, None)), None) => [
+        [%expr CSS.flex1(`num([%e render_float_interp(~loc, grow)]))],
+      ]
+    | `Or(Some((grow, Some(shrink))), None) => [
+        [%expr
+          CSS.flex2(
+            ~shrink=[%e render_float_interp(~loc, shrink)],
+            [%e render_float_interp(~loc, grow)],
+          )
+        ],
+      ]
+    | `Or(Some((grow, None)), Some(basis)) => [
+        [%expr
+          CSS.flex2(
+            ~basis=[%e render_flex_basis(~loc, basis)],
+            [%e render_float_interp(~loc, grow)],
+          )
+        ],
+      ]
+    | `Or(Some((grow, Some(shrink))), Some(basis)) => [
+        [%expr
+          CSS.flex(
+            [%e render_float_interp(~loc, grow)],
+            [%e render_float_interp(~loc, shrink)],
+            [%e render_flex_basis(~loc, basis)],
+          )
+        ],
+      ]
+    | `Or(None, Some(basis)) => [
+        [%expr CSS.flexBasis([%e render_flex_basis(~loc, basis)])],
+      ]
+    }
+  );
+```
+
+value has the type given by the property parser, so the mapping between the property parser Type and the CSS runtime can be complex.
+
+## Multiple properties
+
+I made a simplification where cx adds `CSS.style([||])` wrapping the properties, so:
+
+```reason
+[%cx "color: blue; margin: 10px"]
+```
+
+gets
+
+```reason
+CSS.style([|CSS.color(`blue), CSS.margin(CSS.px(10))|]);
+```
+
+## Different extensions (css, styled.div, keyframes, styled.global)
+
+All documentation for other extensions lives on the website https://styled-ppx.vercel.app

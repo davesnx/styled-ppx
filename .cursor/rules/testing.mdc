@@ -1,0 +1,181 @@
+---
+alwaysApply: false
+---
+- Don't add files to test in the root, neither a tmp folder. Only add those files when you want to make sure some external behaviour or dependency behaves a certain way.
+- Always use the right test suite for each test
+
+File structure and test commands for each package:
+
+packages
+├── css-property-parser
+│  └── test (to run those tests `make test-css-property-parser`)
+│      ├── Combinators_test.re
+│      ├── Modifiers_test.re
+│      ├── Rules_test.re
+│      ├── Runner.re
+│      ├── Standard_test.re
+│      ├── Types_test.re
+│      ├── dune
+│      └── snapshots
+├── css-spec-parser
+│  └── test (to run those tests `make test-css-spec-parser`)
+│      ├── dune
+│      └── test.re
+├── murmur2
+│  ├── dune
+│  ├── murmur2.ml
+│  ├── murmur2.mli
+│  └── test (to run those tests `make test-murmur2`)
+├── parser
+│  ├── lib
+│  └── test (to run those tests `make test-parser`)
+│      ├── Lexer_test.re
+│      ├── Parser_test.re
+│      ├── Runner.re
+│      └── dune
+├── ppx
+│  ├── src
+│  └── test
+│      ├── css-support (to run those tests `make test-css-support`)
+│      ├── dune
+│      ├── generate-css-support
+│      ├── native (to run those tests `make test-ppx-native`)
+│      ├── rewriter.re
+│      ├── snapshot (to run those tests `make test-ppx-snapshot-reason`)
+│      └── standalone.re
+├── runtime
+│  ├── melange
+│  ├── native
+│  ├── rescript
+│  └── test (to run those tests `make test-runtime`)
+│      ├── dune
+│      ├── test.ml
+│      ├── test_autoprefixer.ml
+│      ├── test_autoprefixer.mli
+│      ├── test_hash.ml
+│      ├── test_styles.ml
+│      └── test_styles.mli
+├── string_interpolation
+   ├── src
+   └── test (to run those tests `make test-string-interpolation`)
+       ├── dune
+       └── transform_test.ml
+
+## Cram tests
+
+Cram tests capture shell sessions as executable tests with automatic diff-based verification.
+
+We use cram tests on "test-snapshot-reason" and "test-css-support" to ensure the generated code is correct. Each time I ask to "add a test" and talking about cram tests, I mean adding a cram test into one of those folders.
+
+**Test Types:**
+- **File tests**: `name.t` - single self-contained file
+- **Directory tests**: `name.t/run.t` - allows separate fixture files
+
+## Core Syntax
+
+Every line follows strict formatting rules based on its leading characters:
+
+```
+Comments appear without leading spaces
+  $ echo "hello"          # Command (2 spaces + $ + space)
+  hello                   # Expected output (2 spaces + text)
+  $ false                 # Command with error
+  [1]                     # Exit code in brackets
+  $ cat > file.txt <<EOF  # Multi-line command start
+  > line 1                # Continuation (2 spaces + > + space)
+  > line 2                # More continuation
+  > EOF                   # End delimiter
+```
+
+## Essential Patterns
+
+### Command execution and output matching
+```
+  $ echo "test"
+  test
+  $ ls nonexistent 2>&1
+  ls: cannot access 'nonexistent': No such file or directory
+  [2]
+```
+
+### Environment variables for hermetic tests
+```
+  $ echo $DUNE_ROOT      # Project root directory
+  /path/to/project
+  $ cd $TESTCASE_ROOT    # Test's sandbox directory
+```
+
+### Output sanitization for non-deterministic data
+```
+  $ date | sed 's/[0-9]*/TIMESTAMP/g'
+  TIMESTAMP
+  $ ocamlc -version | sed 's/[0-9.]+/$VERSION/'
+  $VERSION
+```
+
+## Test Execution Commands
+
+```bash
+dune build @testname          # Run specific test
+dune runtest dir/             # Run tests in directory
+dune promote                  # Accept actual output as expected
+dune build @test --watch      # Watch mode
+dune build @test --auto-promote  # Auto-accept changes
+```
+
+## Best Practices
+
+### Write hermetic tests
+```
+  $ mkdir -p tmp && cd tmp     # Create isolated workspace
+  $ echo "data" > file.txt     # Generate test data
+  $ cat file.txt
+  data
+  $ cd .. && rm -rf tmp         # Clean up
+```
+
+### Handle paths portably
+```
+  $ cat > $DUNE_ROOT/src/lib.ml <<EOF
+  > let version = "1.0"
+  > EOF
+  $ dune exec myprogram
+  Version: 1.0
+```
+
+### Document test purpose
+```
+Test that the program handles missing files gracefully:
+  $ myprogram nonexistent.txt
+  Error: File not found: nonexistent.txt
+  [1]
+```
+
+## Key Features
+
+**Automatic path scrubbing**: `$TESTCASE_ROOT`, `$TMPDIR`, `$DUNE_ROOT` are automatically sanitized in output
+
+**Sandboxed execution**: Each test runs in isolated temporary directory
+
+**Diff-based workflow**: Failed tests show diff; `dune promote` updates expected output
+
+**Language agnostic**: Test any CLI tool, not just OCaml
+
+**Self-documenting**: Tests serve as executable documentation
+
+## Common Pitfalls to Avoid
+
+- **Wrong indentation**: Must be exactly 2 spaces for commands/output
+- **Absolute paths**: Use environment variables instead
+- **Non-deterministic output**: Sanitize timestamps, PIDs, random values
+
+## Quick Reference
+
+| Syntax | Purpose |
+|--------|---------|
+| `  $ command` | Execute shell command |
+| `  > continuation` | Continue multi-line command |
+| `  output text` | Expected stdout/stderr |
+| `  [N]` | Expected exit code N |
+| `$DUNE_ROOT` | Project root directory |
+| `$TESTCASE_ROOT` | Test sandbox directory |
