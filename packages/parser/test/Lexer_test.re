@@ -299,7 +299,7 @@ let test_with_location =
       ],
       16,
     ),
-    ({|calc(10%)|}, [FUNCTION("calc"), NUMBER("10."), RIGHT_PAREN], 9),
+    ({|calc(10%)|}, [FUNCTION("calc"), NUMBER("10."), PERCENT, RIGHT_PAREN], 9),
     (
       {|$(Module.variable)|},
       [

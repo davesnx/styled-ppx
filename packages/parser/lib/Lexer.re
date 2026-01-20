@@ -685,15 +685,19 @@ let rec get_next_token = lexbuf => {
   };
 }
 and get_dimension = (n, lexbuf) => {
-  switch%sedlex (lexbuf) {
-  | length => FLOAT_DIMENSION((n, lexeme(lexbuf)))
-  | angle => FLOAT_DIMENSION((n, lexeme(lexbuf)))
-  | time => FLOAT_DIMENSION((n, lexeme(lexbuf)))
-  | frequency => FLOAT_DIMENSION((n, lexeme(lexbuf)))
-  | resolution => FLOAT_DIMENSION((n, lexeme(lexbuf)))
-  | flex => FLOAT_DIMENSION((n, lexeme(lexbuf)))
-  | 'n' => DIMENSION((n, lexeme(lexbuf)))
-  | _ => NUMBER(n)
+  if (check(check_if_three_codepoints_would_start_an_identifier, lexbuf)) {
+    switch%sedlex (lexbuf) {
+    | length => FLOAT_DIMENSION((n, lexeme(lexbuf)))
+    | angle => FLOAT_DIMENSION((n, lexeme(lexbuf)))
+    | time => FLOAT_DIMENSION((n, lexeme(lexbuf)))
+    | frequency => FLOAT_DIMENSION((n, lexeme(lexbuf)))
+    | resolution => FLOAT_DIMENSION((n, lexeme(lexbuf)))
+    | flex => FLOAT_DIMENSION((n, lexeme(lexbuf)))
+    | 'n' => DIMENSION((n, lexeme(lexbuf)))
+    | _ => NUMBER(n)
+    };
+  } else {
+    NUMBER(n)
   };
 }
 and discard_comments = lexbuf => {
@@ -875,10 +879,7 @@ let consume_numeric = lexbuf => {
     let unit = handle_consume_identifier(lexbuf, consume_identifier(lexbuf));
     Ok(Tokens.DIMENSION((number_str, unit)));
   } else {
-    switch%sedlex (lexbuf) {
-    | '%' => Ok(NUMBER(number_str))
-    | _ => Ok(NUMBER(number_str))
-    };
+    Ok(NUMBER(number_str))
   };
 };
 
@@ -961,6 +962,7 @@ let consume = lexbuf => {
     | _ => Error((DELIM("/"), Invalid_code_point))
     };
   | "]" => Ok(RIGHT_BRACKET)
+  | "%" => Ok(PERCENT)
   | digit =>
     let _ = Sedlexing.backtrack(lexbuf);
     consume_numeric(lexbuf);

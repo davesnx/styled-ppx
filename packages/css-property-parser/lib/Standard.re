@@ -193,16 +193,20 @@ let resolution =
 // TODO: positive numbers like <number [0,infinity]>
 // Note: In unified tokens, there's no PERCENTAGE token.
 // Percentages are parsed as NUMBER + PERCENT tokens.
-let percentage =
-  token(
-    fun
-    | NUMBER(str) =>
-      switch (float_of_string_opt(str)) {
-      | Some(f) => Ok(f)
-      | None => Error(["Invalid percentage format."])
-      }
-    | _ => Error(["Expected percentage."]),
-  );
+let percentage = {
+  let.bind_match value =
+    token(
+      fun
+      | NUMBER(str) =>
+        switch (float_of_string_opt(str)) {
+        | Some(f) => Ok(f)
+        | None => Error(["Invalid percentage format."])
+        }
+      | _ => Error(["Expected percentage."]),
+    );
+  let.bind_match () = expect(PERCENT);
+  Rule.Match.return(value);
+};
 
 // https://drafts.csswg.org/css-values-4/#css-identifier
 // TODO: differences between <ident> and keyword
