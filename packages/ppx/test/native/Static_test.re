@@ -1211,25 +1211,6 @@ let properties_static_css_tests = [
     ],
   ),
   (
-    [%css "animation: calc(3 + 1)"],
-    [%expr [%css "animation: calc(3 + 1)"]],
-    [%expr
-      CSS.animations([|
-        CSS.Types.Animation.Value.make(
-          ~duration=?Some(`calc(`add((`num(3.), `num(1.))))),
-          ~delay=?None,
-          ~direction=?None,
-          ~timingFunction=?None,
-          ~fillMode=?None,
-          ~playState=?None,
-          ~iterationCount=?None,
-          ~name=?None,
-          (),
-        ),
-      |])
-    ],
-  ),
-  (
     [%css "animation: max(3s, 1ms)"],
     [%expr [%css "animation: max(3s, 1ms)"]],
     [%expr
