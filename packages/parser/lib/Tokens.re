@@ -11,7 +11,6 @@ type token =
   | HASH(string)
   | STRING(string)
   | URL(string)
-  | BAD_URL
   | DELIM(string)
   | NUMBER(string)
   | FLOAT_DIMENSION((string, string))
@@ -65,7 +64,6 @@ let humanize =
   | HASH(h) => "hash: #" ++ h
   | STRING(s) => {|string "|} ++ s ++ {|"|}
   | URL(u) => "url(" ++ u ++ ")"
-  | BAD_URL => "bad url"
   | DELIM(d) => "delimiter " ++ d
   | NUMBER(n) => "number: " ++ n
   | FLOAT_DIMENSION((n, u)) => "dimension: " ++ n ++ u
@@ -106,7 +104,6 @@ let to_string =
   | HASH(s) => "#" ++ s
   | STRING(s) => "'" ++ s ++ "'"
   | URL(url) => "url(" ++ url ++ ")"
-  | BAD_URL => "bad url"
   | DELIM(s) => s
   | NUMBER(s) => s
   | FLOAT_DIMENSION((n, u)) => n ++ u
@@ -147,7 +144,6 @@ let to_debug =
   | HASH(s) => "HASH('" ++ s ++ "')"
   | STRING(s) => "STRING('" ++ s ++ "')"
   | URL(u) => "URL(" ++ u ++ ")"
-  | BAD_URL => "BAD_URL"
   | DELIM(s) => "DELIM('" ++ s ++ "')"
   | NUMBER(s) => "NUMBER('" ++ s ++ "')"
   | FLOAT_DIMENSION((n, u)) => "FLOAT_DIMENSION('" ++ n ++ ", " ++ u ++ "')"

@@ -517,6 +517,10 @@ let rec consume_remnants_bad_url = lexbuf =>
 
 // https://drafts.csswg.org/css-syntax-3/#consume-url-token
 let consume_url = lexbuf => {
+  let raise_bad_url = error => {
+    let (start_pos, curr_pos) = Sedlexing.lexing_positions(lexbuf);
+    raise(LexingError((start_pos, curr_pos, Tokens.show_error(error))));
+  };
   let _ = consume_whitespace(lexbuf);
   let rec read = acc => {
     let when_whitespace = () => {
@@ -526,7 +530,7 @@ let consume_url = lexbuf => {
       | eof => Error((Tokens.URL(acc), Tokens.Eof))
       | _ =>
         consume_remnants_bad_url(lexbuf);
-        Ok(Tokens.BAD_URL);
+        raise_bad_url(Tokens.Invalid_code_point);
       };
     };
     switch%sedlex (lexbuf) {
@@ -538,12 +542,11 @@ let consume_url = lexbuf => {
     | '('
     | non_printable_code_point =>
       consume_remnants_bad_url(lexbuf);
-      // TODO: location on error
-      Error((Tokens.BAD_URL, Tokens.Invalid_code_point));
+      raise_bad_url(Tokens.Invalid_code_point);
     | escape =>
       switch (consume_escaped(lexbuf)) {
       | Ok(char) => read(acc ++ char)
-      | Error((_, error)) => Error((Tokens.BAD_URL, error))
+      | Error((_, error)) => raise_bad_url(error)
       }
     | any => read(acc ++ lexeme(lexbuf))
     | _ => unreachable(lexbuf)
@@ -738,6 +741,10 @@ let consume_number = lexbuf => {
 
 // https://drafts.csswg.org/css-syntax-3/#consume-url-token
 let consume_url_ = lexbuf => {
+  let raise_bad_url = error => {
+    let (start_pos, curr_pos) = Sedlexing.lexing_positions(lexbuf);
+    raise(LexingError((start_pos, curr_pos, Tokens.show_error(error))));
+  };
   let _ = consume_whitespace_(lexbuf);
   let rec read = acc => {
     let when_whitespace = () => {
@@ -747,7 +754,7 @@ let consume_url_ = lexbuf => {
       | eof => Error((Tokens.URL(acc), Tokens.Eof))
       | _ =>
         consume_remnants_bad_url(lexbuf);
-        Ok(BAD_URL);
+        raise_bad_url(Tokens.Invalid_code_point);
       };
     };
     switch%sedlex (lexbuf) {
@@ -759,12 +766,11 @@ let consume_url_ = lexbuf => {
     | '('
     | non_printable_code_point =>
       consume_remnants_bad_url(lexbuf);
-      // TODO: location on error
-      Error((BAD_URL, Tokens.Invalid_code_point));
+      raise_bad_url(Tokens.Invalid_code_point);
     | escape =>
       switch (consume_escaped(lexbuf)) {
       | Ok(char) => read(acc ++ char)
-      | Error((_, error)) => Error((BAD_URL, error))
+      | Error((_, error)) => raise_bad_url(error)
       }
     | any => read(acc ++ lexeme(lexbuf))
     | _ => unreachable(lexbuf)
