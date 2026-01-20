@@ -6,6 +6,17 @@ module Standard = Css_property_parser.Standard;
 module Property_parser = Css_property_parser.Parser;
 module Types = Property_parser.Types;
 
+let validate_with_css_grammar = (property_name, value) => {
+  switch (Css_grammar.Registry.find(property_name)) {
+  | Some(Css_grammar.Spec.Pack((module M))) =>
+    switch (M.parse(value)) {
+    | Ok(_) => Some(Ok())
+    | Error(e) => Some(Error(e))
+    }
+  | None => None
+  };
+};
+
 let txt = (~loc, txt) => {
   Location.loc,
   txt,
@@ -6356,9 +6367,16 @@ let render = (~loc: Location.t, property, value, important) =>
   if (isVariableDeclaration(property)) {
     Ok([render_variable_declaration(~loc, property, value)]);
   } else {
-    let.ok is_valid_string =
-      Property_parser.check_property(~name=property, value)
-      |> Result.map_error((`Unknown_value) => `Property_not_found);
+    let validation =
+      switch (validate_with_css_grammar(property, value)) {
+      | Some(Ok ()) => Ok(true)
+      | Some(Error(_))
+      | None =>
+        Property_parser.check_property(~name=property, value)
+        |> Result.map_error((`Unknown_value) => `Property_not_found)
+      };
+
+    let.ok is_valid_string = validation;
 
     switch (render_css_global_values(~loc, property, value)) {
     | Ok(value) => Ok(value)
