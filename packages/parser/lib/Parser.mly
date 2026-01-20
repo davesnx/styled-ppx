@@ -22,7 +22,6 @@ let make_loc = Parser_location.to_ppxlib_location
 %token AMPERSAND
 %token ASTERISK
 %token COMMA
-%token BAD_IDENT
 %token WS
 %token <string> IDENT
 %token <string> TAG
@@ -43,6 +42,8 @@ let make_loc = Parser_location.to_ppxlib_location
 %token <string * string> FLOAT_DIMENSION
 %token <string * string> DIMENSION
 %token <string list> INTERPOLATION
+%token GTE
+%token LTE
 
 %start <stylesheet> stylesheet
 %start <rule_list> declaration_list

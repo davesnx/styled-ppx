@@ -1,0 +1,11 @@
+(library
+ (name Css_grammar)
+ (public_name styled-ppx.css-grammar)
+ (libraries styled-ppx.css-parser)
+ (preprocess
+  (per_module
+   ((pps css_grammar_ppx)
+    Standard
+    Properties)))
+ (flags
+  (:standard -w -26-27)))

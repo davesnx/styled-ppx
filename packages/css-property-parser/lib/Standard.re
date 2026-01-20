@@ -40,19 +40,27 @@ let function_call = (name, rule) => {
 let integer =
   token(
     fun
-    | NUMBER(float) =>
-      Float.(
-        is_integer(float)
-          ? Ok(float |> to_int)
-          : Error(["Expected an integer, got a float instead."])
-      )
+    | NUMBER(str) =>
+      switch (float_of_string_opt(str)) {
+      | Some(f) =>
+        Float.(
+          is_integer(f)
+            ? Ok(f |> to_int)
+            : Error(["Expected an integer, got a float instead."])
+        )
+      | None => Error(["Expected an integer."])
+      }
     | _ => Error(["Expected an integer."]),
   );
 
 let number =
   token(
     fun
-    | NUMBER(float) => Ok(float)
+    | NUMBER(str) =>
+      switch (float_of_string_opt(str)) {
+      | Some(f) => Ok(f)
+      | None => Error(["Invalid number format."])
+      }
     | token =>
       Error(["Expected a number. Got '" ++ humanize(token) ++ "' instead."]),
   );
@@ -60,43 +68,47 @@ let number =
 let length =
   token(token =>
     switch (token) {
-    | DIMENSION(number, dimension) =>
-      switch (dimension) {
-      | "cap" => Ok(`Cap(number))
-      | "ch" => Ok(`Ch(number))
-      | "em" => Ok(`Em(number))
-      | "ex" => Ok(`Ex(number))
-      | "ic" => Ok(`Ic(number))
-      | "lh" => Ok(`Lh(number))
-      | "rcap" => Ok(`Rcap(number))
-      | "rch" => Ok(`Rch(number))
-      | "rem" => Ok(`Rem(number))
-      | "rex" => Ok(`Rex(number))
-      | "ric" => Ok(`Ric(number))
-      | "rlh" => Ok(`Rlh(number))
-      | "vh" => Ok(`Vh(number))
-      | "vw" => Ok(`Vw(number))
-      | "vmax" => Ok(`Vmax(number))
-      | "vmin" => Ok(`Vmin(number))
-      | "vb" => Ok(`Vb(number))
-      | "vi" => Ok(`Vi(number))
-      | "cqw" => Ok(`Cqw(number))
-      | "cqh" => Ok(`Cqh(number))
-      | "cqi" => Ok(`Cqi(number))
-      | "cqb" => Ok(`Cqb(number))
-      | "cqmin" => Ok(`Cqmin(number))
-      | "cqmax" => Ok(`Cqmax(number))
-      // absolute
-      | "px" => Ok(`Px(number))
-      | "cm" => Ok(`Cm(number))
-      | "mm" => Ok(`Mm(number))
-      | "Q" => Ok(`Q(number))
-      | "in" => Ok(`In(number))
-      | "pc" => Ok(`Pc(number))
-      | "pt" => Ok(`Pt(number))
-      | dim => Error(["Invalid length unit '" ++ dim ++ "'."])
+    | DIMENSION((num_str, dimension)) =>
+      switch (float_of_string_opt(num_str)) {
+      | Some(number) =>
+        switch (dimension) {
+        | "cap" => Ok(`Cap(number))
+        | "ch" => Ok(`Ch(number))
+        | "em" => Ok(`Em(number))
+        | "ex" => Ok(`Ex(number))
+        | "ic" => Ok(`Ic(number))
+        | "lh" => Ok(`Lh(number))
+        | "rcap" => Ok(`Rcap(number))
+        | "rch" => Ok(`Rch(number))
+        | "rem" => Ok(`Rem(number))
+        | "rex" => Ok(`Rex(number))
+        | "ric" => Ok(`Ric(number))
+        | "rlh" => Ok(`Rlh(number))
+        | "vh" => Ok(`Vh(number))
+        | "vw" => Ok(`Vw(number))
+        | "vmax" => Ok(`Vmax(number))
+        | "vmin" => Ok(`Vmin(number))
+        | "vb" => Ok(`Vb(number))
+        | "vi" => Ok(`Vi(number))
+        | "cqw" => Ok(`Cqw(number))
+        | "cqh" => Ok(`Cqh(number))
+        | "cqi" => Ok(`Cqi(number))
+        | "cqb" => Ok(`Cqb(number))
+        | "cqmin" => Ok(`Cqmin(number))
+        | "cqmax" => Ok(`Cqmax(number))
+        // absolute
+        | "px" => Ok(`Px(number))
+        | "cm" => Ok(`Cm(number))
+        | "mm" => Ok(`Mm(number))
+        | "Q" => Ok(`Q(number))
+        | "in" => Ok(`In(number))
+        | "pc" => Ok(`Pc(number))
+        | "pt" => Ok(`Pt(number))
+        | dim => Error(["Invalid length unit '" ++ dim ++ "'."])
+        }
+      | None => Error(["Invalid number in length."])
       }
-    | NUMBER(0.) => Ok(`Zero)
+    | NUMBER("0" | "0." | "0.0") => Ok(`Zero)
     | _ => Error(["Expected length."])
     }
   );
@@ -105,15 +117,19 @@ let length =
 let angle =
   token(token =>
     switch (token) {
-    | DIMENSION(number, dimension) =>
-      switch (dimension) {
-      | "deg" => Ok(`Deg(number))
-      | "grad" => Ok(`Grad(number))
-      | "rad" => Ok(`Rad(number))
-      | "turn" => Ok(`Turn(number))
-      | dim => Error(["Invalid angle unit '" ++ dim ++ "'."])
+    | DIMENSION((num_str, dimension)) =>
+      switch (float_of_string_opt(num_str)) {
+      | Some(number) =>
+        switch (dimension) {
+        | "deg" => Ok(`Deg(number))
+        | "grad" => Ok(`Grad(number))
+        | "rad" => Ok(`Rad(number))
+        | "turn" => Ok(`Turn(number))
+        | dim => Error(["Invalid angle unit '" ++ dim ++ "'."])
+        }
+      | None => Error(["Invalid number in angle."])
       }
-    | NUMBER(0.) => Ok(`Deg(0.))
+    | NUMBER("0" | "0." | "0.0") => Ok(`Deg(0.))
     | _ => Error(["Expected angle."])
     }
   );
@@ -122,11 +138,15 @@ let angle =
 let time =
   token(token =>
     switch (token) {
-    | DIMENSION(number, dimension) =>
-      switch (dimension) {
-      | "s" => Ok(`S(number))
-      | "ms" => Ok(`Ms(number))
-      | un => Error(["Invalid time unit '" ++ un ++ "'."])
+    | DIMENSION((num_str, dimension)) =>
+      switch (float_of_string_opt(num_str)) {
+      | Some(number) =>
+        switch (dimension) {
+        | "s" => Ok(`S(number))
+        | "ms" => Ok(`Ms(number))
+        | un => Error(["Invalid time unit '" ++ un ++ "'."])
+        }
+      | None => Error(["Invalid number in time."])
       }
     | _ => Error(["Expected time."])
     }
@@ -136,11 +156,15 @@ let time =
 let frequency =
   token(token =>
     switch (token) {
-    | DIMENSION(number, dimension) =>
-      switch (dimension |> String.lowercase_ascii) {
-      | "hz" => Ok(`Hz(number))
-      | "khz" => Ok(`KHz(number))
-      | dim => Error(["Invalid frequency unit '" ++ dim ++ "'."])
+    | DIMENSION((num_str, dimension)) =>
+      switch (float_of_string_opt(num_str)) {
+      | Some(number) =>
+        switch (dimension |> String.lowercase_ascii) {
+        | "hz" => Ok(`Hz(number))
+        | "khz" => Ok(`KHz(number))
+        | dim => Error(["Invalid frequency unit '" ++ dim ++ "'."])
+        }
+      | None => Error(["Invalid number in frequency."])
       }
     | _ => Error(["Expected frequency."])
     }
@@ -150,23 +174,33 @@ let frequency =
 let resolution =
   token(token =>
     switch (token) {
-    | DIMENSION(number, dimension) =>
-      switch (dimension |> String.lowercase_ascii) {
-      | "dpi" => Ok(`Dpi(number))
-      | "dpcm" => Ok(`Dpcm(number))
-      | "x"
-      | "dppx" => Ok(`Dppx(number))
-      | dim => Error(["Invalid resolution unit '" ++ dim ++ "'."])
+    | DIMENSION((num_str, dimension)) =>
+      switch (float_of_string_opt(num_str)) {
+      | Some(number) =>
+        switch (dimension |> String.lowercase_ascii) {
+        | "dpi" => Ok(`Dpi(number))
+        | "dpcm" => Ok(`Dpcm(number))
+        | "x"
+        | "dppx" => Ok(`Dppx(number))
+        | dim => Error(["Invalid resolution unit '" ++ dim ++ "'."])
+        }
+      | None => Error(["Invalid number in resolution."])
       }
     | _ => Error(["Expected resolution."])
     }
   );
 
 // TODO: positive numbers like <number [0,infinity]>
+// Note: In unified tokens, there's no PERCENTAGE token.
+// Percentages are parsed as NUMBER + PERCENT tokens.
 let percentage =
   token(
     fun
-    | PERCENTAGE(float) => Ok(float)
+    | NUMBER(str) =>
+      switch (float_of_string_opt(str)) {
+      | Some(f) => Ok(f)
+      | None => Error(["Invalid percentage format."])
+      }
     | _ => Error(["Expected percentage."]),
   );
 
@@ -236,7 +270,7 @@ let url_no_interp = {
 let hex_color =
   token(
     fun
-    | HASH(str, _) when String.length(str) >= 3 && String.length(str) <= 8 =>
+    | HASH(str) when String.length(str) >= 3 && String.length(str) <= 8 =>
       Ok(str)
     | _ => Error(["Expected a hex-color."]),
   );
@@ -315,17 +349,21 @@ let container_name = {
 let flex_value =
   token(
     fun
-    | DIMENSION(number, dimension) =>
-      switch (dimension) {
-      | "fr" => Ok(`Fr(number))
-      | _ =>
-        Error([
-          Format.sprintf(
-            "Invalid flex value %g%s, only fr is valid.",
-            number,
-            dimension,
-          ),
-        ])
+    | DIMENSION((num_str, dimension)) =>
+      switch (float_of_string_opt(num_str)) {
+      | Some(number) =>
+        switch (dimension) {
+        | "fr" => Ok(`Fr(number))
+        | _ =>
+          Error([
+            Format.sprintf(
+              "Invalid flex value %g%s, only fr is valid.",
+              number,
+              dimension,
+            ),
+          ])
+        }
+      | None => Error(["Invalid number in flex_value."])
       }
     | _ => Error(["Expected flex_value."]),
   );
