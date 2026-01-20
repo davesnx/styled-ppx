@@ -104,9 +104,9 @@ let number = [%sedlex.regexp?
     Opt('-'),
     Plus(digit),
     Opt('.', Plus(digit)),
-    Opt('e' | 'E', '+' | '-', Plus(digit)),
+    Opt('e' | 'E', Opt('+' | '-'), Plus(digit)),
   ) |
-  (Opt('-'), '.', Plus(digit), Opt('e' | 'E', '+' | '-', Plus(digit)))
+  (Opt('-'), '.', Plus(digit), Opt('e' | 'E', Opt('+' | '-'), Plus(digit)))
 ];
 
 let operator = [%sedlex.regexp? "~=" | "|=" | "^=" | "$=" | "*=" | "="];
@@ -364,6 +364,27 @@ let length = [%sedlex.regexp?
   (_v, _m, _i, _n) |
   (_v, _b) |
   (_v, _i) |
+  // small viewport units
+  (_s, _v, _w) |
+  (_s, _v, _h) |
+  (_s, _v, _m, _i, _n) |
+  (_s, _v, _m, _a, _x) |
+  (_s, _v, _i) |
+  (_s, _v, _b) |
+  // large viewport units
+  (_l, _v, _w) |
+  (_l, _v, _h) |
+  (_l, _v, _m, _i, _n) |
+  (_l, _v, _m, _a, _x) |
+  (_l, _v, _i) |
+  (_l, _v, _b) |
+  // dynamic viewport units
+  (_d, _v, _w) |
+  (_d, _v, _h) |
+  (_d, _v, _m, _i, _n) |
+  (_d, _v, _m, _a, _x) |
+  (_d, _v, _i) |
+  (_d, _v, _b) |
   // container query length units
   (_c, _q, _w) |
   (_c, _q, _h) |
@@ -388,6 +409,12 @@ let angle = [%sedlex.regexp?
 let time = [%sedlex.regexp? _s | (_m, _s)];
 
 let frequency = [%sedlex.regexp? (_h, _z) | (_k, _h, _z)];
+
+let resolution = [%sedlex.regexp?
+  (_d, _p, _i) | (_d, _p, _c, _m) | (_d, _p, _p, _x) | _x
+];
+
+let flex = [%sedlex.regexp? (_f, _r)];
 
 // https://drafts.csswg.org/css-syntax-3/#starts-with-a-valid-escape
 let check_if_two_code_points_are_a_valid_escape = lexbuf =>
@@ -654,6 +681,8 @@ and get_dimension = (n, lexbuf) => {
   | angle => FLOAT_DIMENSION((n, lexeme(lexbuf)))
   | time => FLOAT_DIMENSION((n, lexeme(lexbuf)))
   | frequency => FLOAT_DIMENSION((n, lexeme(lexbuf)))
+  | resolution => FLOAT_DIMENSION((n, lexeme(lexbuf)))
+  | flex => FLOAT_DIMENSION((n, lexeme(lexbuf)))
   | 'n' => DIMENSION((n, lexeme(lexbuf)))
   | _ => NUMBER(n)
   };

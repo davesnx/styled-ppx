@@ -1,3 +1,5 @@
+type t = Parser.token;
+
 [@deriving show({ with_path: false })]
 type token =
   | EOF
@@ -46,7 +48,7 @@ let show_error =
   | Eof => "Unexpected end"
   | New_line => "New line";
 
-let humanize =
+let humanize_local_token =
   fun
   | EOF => "the end"
   | IDENT(str) => "ident " ++ str
@@ -74,6 +76,46 @@ let humanize =
   | RIGHT_BRACE => "}"
   | GTE => ">="
   | LTE => "<=";
+
+let humanize: t => string =
+  fun
+  | Parser.EOF => "the end"
+  | Parser.IDENT(str) => str
+  | Parser.TAG(str) => str
+  | Parser.BAD_IDENT => "bad ident"
+  | Parser.FUNCTION(f) => f ++ "("
+  | Parser.NTH_FUNCTION(f) => f ++ "("
+  | Parser.AT_KEYFRAMES(at)
+  | Parser.AT_RULE(at)
+  | Parser.AT_RULE_STATEMENT(at) => "@" ++ at
+  | Parser.HASH(h) => "#" ++ h
+  | Parser.STRING(s) => "\"" ++ s ++ "\""
+  | Parser.URL(u) => "url(" ++ u ++ ")"
+  | Parser.BAD_URL => "bad url"
+  | Parser.DELIM(d) => d
+  | Parser.NUMBER(s)
+  | Parser.UNICODE_RANGE(s) => s
+  | Parser.FLOAT_DIMENSION((num, unit)) => num ++ unit
+  | Parser.DIMENSION((num, unit)) => num ++ unit
+  | Parser.WS => "whitespace"
+  | Parser.COLON => ":"
+  | Parser.SEMI_COLON => ";"
+  | Parser.COMMA => ","
+  | Parser.LEFT_BRACKET => "["
+  | Parser.RIGHT_BRACKET => "]"
+  | Parser.LEFT_PAREN => "("
+  | Parser.RIGHT_PAREN => ")"
+  | Parser.LEFT_BRACE => "{"
+  | Parser.RIGHT_BRACE => "}"
+  | Parser.ASTERISK => "*"
+  | Parser.DOUBLE_COLON => "::"
+  | Parser.DOT => "."
+  | Parser.COMBINATOR(s)
+  | Parser.OPERATOR(s) => s
+  | Parser.AMPERSAND => "&"
+  | Parser.IMPORTANT => "!important"
+  | Parser.INTERPOLATION(parts) => String.concat(".", parts)
+  | Parser.PERCENT => "%";
 
 /* TODO: This should render Token, not Parser.token */
 let token_to_string =
