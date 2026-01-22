@@ -108,7 +108,12 @@ let number = [%sedlex.regexp?
     Opt('.', Plus(digit)),
     Opt('e' | 'E', Opt('+' | '-'), Plus(digit)),
   ) |
-  (Opt('-'), '.', Plus(digit), Opt('e' | 'E', Opt('+' | '-'), Plus(digit)))
+  (
+    Opt('-'),
+    '.',
+    Plus(digit),
+    Opt('e' | 'E', Opt('+' | '-'), Plus(digit)),
+  )
 ];
 
 let operator = [%sedlex.regexp? "~=" | "|=" | "^=" | "$=" | "*=" | "="];
@@ -143,179 +148,38 @@ let starts_a_number = [%sedlex.regexp?
 
 let is_tag =
   fun
-  | "a"
-  | "abbr"
-  | "address"
-  | "animate"
-  | "animateMotion"
-  | "animateTransform"
-  | "area"
-  | "article"
-  | "aside"
-  | "audio"
-  | "b"
-  | "base"
-  | "bdi"
-  | "bdo"
-  | "blockquote"
-  | "body"
-  | "br"
-  | "button"
-  | "canvas"
-  | "caption"
-  | "circle"
-  | "cite"
-  | "clipPath"
-  | "code"
-  | "col"
-  | "colgroup"
-  | "data"
-  | "datalist"
-  | "dd"
-  | "defs"
-  | "del"
-  | "desc"
-  | "details"
-  | "dfn"
-  | "dialog"
-  | "div"
-  | "dl"
-  | "dt"
-  | "ellipse"
-  | "em"
-  | "embed"
-  | "feBlend"
-  | "feColorMatrix"
-  | "feComponentTransfer"
-  | "feComposite"
-  | "feConvolveMatrix"
-  | "feDiffuseLighting"
-  | "feDisplacementMap"
-  | "feDistantLight"
-  | "feDropShadow"
-  | "feFlood"
-  | "feFuncA"
-  | "feFuncB"
-  | "feFuncG"
-  | "feFuncR"
-  | "feGaussianBlur"
-  | "feImage"
-  | "feMerge"
-  | "feMergeNode"
-  | "feMorphology"
-  | "feOffset"
-  | "fePointLight"
-  | "feSpecularLighting"
-  | "feSpotLight"
-  | "feTile"
-  | "feTurbulence"
-  | "fieldset"
-  | "figcaption"
-  | "figure"
-  | "footer"
-  | "foreignObject"
-  | "form"
+  | "a" | "abbr" | "address" | "animate" | "animateMotion" | "animateTransform"
+  | "area" | "article" | "aside" | "audio"
+  | "b" | "base" | "bdi" | "bdo" | "blockquote" | "body" | "br" | "button"
+  | "canvas" | "caption" | "circle" | "cite" | "clipPath" | "code" | "col" | "colgroup"
+  | "data" | "datalist" | "dd" | "defs" | "del" | "desc" | "details" | "dfn"
+  | "dialog" | "div" | "dl" | "dt"
+  | "ellipse" | "em" | "embed"
+  | "feBlend" | "feColorMatrix" | "feComponentTransfer" | "feComposite"
+  | "feConvolveMatrix" | "feDiffuseLighting" | "feDisplacementMap" | "feDistantLight"
+  | "feDropShadow" | "feFlood" | "feFuncA" | "feFuncB" | "feFuncG" | "feFuncR"
+  | "feGaussianBlur" | "feImage" | "feMerge" | "feMergeNode" | "feMorphology"
+  | "feOffset" | "fePointLight" | "feSpecularLighting" | "feSpotLight" | "feTile" | "feTurbulence"
+  | "fieldset" | "figcaption" | "figure" | "footer" | "foreignObject" | "form"
   | "g"
-  | "h1"
-  | "h2"
-  | "h3"
-  | "h4"
-  | "h5"
-  | "h6"
-  | "head"
-  | "header"
-  | "hgroup"
-  | "hr"
-  | "html"
-  | "i"
-  | "iframe"
-  | "image"
-  | "img"
-  | "input"
-  | "ins"
+  | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "head" | "header" | "hgroup" | "hr" | "html"
+  | "i" | "iframe" | "image" | "img" | "input" | "ins"
   | "kbd"
-  | "label"
-  | "legend"
-  | "li"
-  | "line"
-  | "linearGradient"
-  | "link"
-  | "main"
-  | "map"
-  | "mark"
-  | "marker"
-  | "math"
-  | "menu"
-  | "menuitem"
-  | "meta"
-  | "metadata"
-  | "meter"
-  | "mpath"
-  | "nav"
-  | "noscript"
-  | "object"
-  | "ol"
-  | "optgroup"
-  | "option"
-  | "output"
-  | "p"
-  | "param"
-  | "path"
-  | "pattern"
-  | "picture"
-  | "polygon"
-  | "polyline"
-  | "pre"
-  | "progress"
+  | "label" | "legend" | "li" | "line" | "linearGradient" | "link"
+  | "main" | "map" | "mark" | "marker" | "math" | "menu" | "menuitem" | "meta" | "metadata" | "meter" | "mpath"
+  | "nav" | "noscript"
+  | "object" | "ol" | "optgroup" | "option" | "output"
+  | "p" | "param" | "path" | "pattern" | "picture" | "polygon" | "polyline" | "pre" | "progress"
   | "q"
-  | "radialGradient"
-  | "rb"
-  | "rect"
-  | "rp"
-  | "rt"
-  | "rtc"
-  | "ruby"
-  | "s"
-  | "samp"
-  | "script"
-  | "section"
-  | "select"
-  | "set"
-  | "slot"
-  | "small"
-  | "source"
-  | "span"
-  | "stop"
-  | "strong"
-  | "style"
-  | "sub"
-  | "summary"
-  | "sup"
-  | "svg"
-  | "switch"
-  | "symbol"
-  | "table"
-  | "tbody"
-  | "td"
-  | "template"
-  | "text"
-  | "textarea"
-  | "textPath"
-  | "tfoot"
-  | "th"
-  | "thead"
-  | "time"
-  | "title"
-  | "tr"
-  | "track"
-  | "tspan"
-  | "u"
-  | "ul"
-  | "use"
-  | "var"
-  | "video"
-  | "view"
-  | "wbr" => true
+  | "radialGradient" | "rb" | "rect" | "rp" | "rt" | "rtc" | "ruby"
+  | "s" | "samp" | "script" | "section" | "select" | "set" | "slot" | "small" | "source" | "span"
+  | "stop" | "strong" | "style" | "sub" | "summary" | "sup" | "svg" | "switch" | "symbol"
+  | "table" | "tbody" | "td" | "template" | "text" | "textarea" | "textPath" | "tfoot"
+  | "th" | "thead" | "time" | "title" | "tr" | "track" | "tspan"
+  | "u" | "ul" | "use"
+  | "var" | "video" | "view"
+  | "wbr"
+  => true
   | _ => false;
 
 let _a = [%sedlex.regexp? 'A' | 'a'];
@@ -447,11 +311,26 @@ let check_if_three_code_points_would_start_a_number = lexbuf =>
   };
 
 let check = (f, lexbuf) => {
-  // TODO: why this second int?
   Sedlexing.mark(lexbuf, 0);
   let value = f(lexbuf);
   let _ = Sedlexing.backtrack(lexbuf);
   value;
+};
+
+let lookahead_selector_context = lexbuf => {
+  Sedlexing.mark(lexbuf, 0);
+  let result = switch (Sedlexing.next(lexbuf)) {
+  | None => `Ambiguous
+  | Some(c) =>
+    let ch = Uchar.to_int(c);
+    switch (ch) {
+    | 0x2E | 0x23 | 0x5B => `Selector
+    | 0x3B | 0x7D => `Property
+    | _ => `Ambiguous
+    };
+  };
+  let _ = Sedlexing.backtrack(lexbuf);
+  result;
 };
 
 let string_of_uchar = char => {
@@ -464,8 +343,7 @@ let uchar_of_int = n => Uchar.of_int(n) |> string_of_uchar;
 
 let is_surrogate = char_code => char_code >= 0xD800 && char_code <= 0xDFFF;
 
-/* sedlex needs a last case as wildcard _. If this error appears, means that
-   there's a bug in the lexer and there cases that aren't matched */
+/* sedlex needs a last case as wildcard _. If this error appears, means that there's a bug in the lexer and there cases that aren't matched */
 let unreachable = lexbuf => {
   let (start_pos, curr_pos) = Sedlexing.lexing_positions(lexbuf);
   raise(
@@ -516,7 +394,6 @@ let consume_identifier = lexbuf => {
     switch%sedlex (lexbuf) {
     | identifier_code_point => read(acc ++ lexeme(lexbuf))
     | escape =>
-      // TODO: spec, what should happen when fails?
       let.ok char = consume_escaped(lexbuf);
       read(acc ++ char);
     | _ => Ok(acc)
@@ -598,7 +475,6 @@ let consume_function = string => {
 // https://drafts.csswg.org/css-syntax-3/#consume-ident-like-token
 let consume_ident_like = lexbuf => {
   let read_url = string => {
-    // TODO: the whitespace trickery here?
     let _ = consume_whitespace(lexbuf);
     let is_function =
       check(_ =>
@@ -620,7 +496,7 @@ let consume_ident_like = lexbuf => {
     | "url" => read_url(string)
     | _ => Ok(consume_function(string))
     }
-  | _ => is_tag(string) ? Ok(TAG(string)) : Ok(IDENT(string))
+  | _ => is_html_element(string) ? Ok(TAG(string)) : Ok(IDENT(string))
   };
 };
 
@@ -684,7 +560,7 @@ let rec get_next_token = lexbuf => {
   | _ => unreachable(lexbuf)
   };
 }
-and get_dimension = (n, lexbuf) => {
+and get_dimension = (n, lexbuf) =>
   if (check(check_if_three_codepoints_would_start_an_identifier, lexbuf)) {
     switch%sedlex (lexbuf) {
     | length => FLOAT_DIMENSION((n, lexeme(lexbuf)))
@@ -697,9 +573,8 @@ and get_dimension = (n, lexbuf) => {
     | _ => NUMBER(n)
     };
   } else {
-    NUMBER(n)
-  };
-}
+    NUMBER(n);
+  }
 and discard_comments = lexbuf => {
   let (start_pos, curr_pos) = Sedlexing.lexing_positions(lexbuf);
   switch%sedlex (lexbuf) {
@@ -733,12 +608,6 @@ let check_if_three_code_points_would_start_a_number =
 // TODO: floats in OCaml are compatible with numbers in CSS?
 let convert_string_to_number = str => float_of_string(str);
 
-let consume_whitespace_ = lexbuf =>
-  switch%sedlex (lexbuf) {
-  | Star(whitespace) => Tokens.WS
-  | _ => Tokens.WS
-  };
-
 // TODO: check 5. without the 0 or .5 without the 0
 let consume_number = lexbuf => {
   let append = repr => repr ++ lexeme(lexbuf);
@@ -762,46 +631,6 @@ let consume_number = lexbuf => {
     }; // 5
   let value = convert_string_to_number(repr); // 6
   (value, kind); // 7
-};
-
-// https://drafts.csswg.org/css-syntax-3/#consume-url-token
-let consume_url_ = lexbuf => {
-  let raise_bad_url = error => {
-    let (start_pos, curr_pos) = Sedlexing.lexing_positions(lexbuf);
-    raise(LexingError((start_pos, curr_pos, Tokens.show_error(error))));
-  };
-  let _ = consume_whitespace_(lexbuf);
-  let rec read = acc => {
-    let when_whitespace = () => {
-      let _ = consume_whitespace_(lexbuf);
-      switch%sedlex (lexbuf) {
-      | ')' => Ok(Tokens.URL(acc))
-      | eof => Error((Tokens.URL(acc), Tokens.Eof))
-      | _ =>
-        consume_remnants_bad_url(lexbuf);
-        raise_bad_url(Tokens.Invalid_code_point);
-      };
-    };
-    switch%sedlex (lexbuf) {
-    | ')' => Ok(Tokens.URL(acc))
-    | eof => Error((Tokens.URL(acc), Tokens.Eof))
-    | whitespace => when_whitespace()
-    | '"'
-    | '\''
-    | '('
-    | non_printable_code_point =>
-      consume_remnants_bad_url(lexbuf);
-      raise_bad_url(Tokens.Invalid_code_point);
-    | escape =>
-      switch (consume_escaped(lexbuf)) {
-      | Ok(char) => read(acc ++ char)
-      | Error((_, error)) => raise_bad_url(error)
-      }
-    | any => read(acc ++ lexeme(lexbuf))
-    | _ => unreachable(lexbuf)
-    };
-  };
-  read(lexeme(lexbuf));
 };
 
 // https://drafts.csswg.org/css-syntax-3/#consume-string-token
@@ -839,12 +668,11 @@ let consume_string = (ending_code_point, lexbuf) => {
   };
 };
 
-
 // https://drafts.csswg.org/css-syntax-3/#consume-ident-like-token
 let consume_ident_like = lexbuf => {
   let read_url = string => {
     // TODO: the whitespace trickery here?
-    let _ = consume_whitespace_(lexbuf);
+    let _ = consume_whitespace(lexbuf);
     let is_function =
       check(lexbuf =>
         switch%sedlex (lexbuf) {
@@ -855,7 +683,7 @@ let consume_ident_like = lexbuf => {
         }
       );
     is_function(lexbuf)
-      ? Ok(Tokens.FUNCTION(string)) : consume_url_(lexbuf);
+      ? Ok(Tokens.FUNCTION(string)) : consume_url(lexbuf);
   };
 
   let string = handle_consume_identifier(lexbuf, consume_identifier(lexbuf));
@@ -879,7 +707,7 @@ let consume_numeric = lexbuf => {
     let unit = handle_consume_identifier(lexbuf, consume_identifier(lexbuf));
     Ok(Tokens.DIMENSION((number_str, unit)));
   } else {
-    Ok(NUMBER(number_str))
+    Ok(NUMBER(number_str));
   };
 };
 
@@ -892,10 +720,12 @@ let consume = lexbuf => {
       switch%sedlex (lexbuf) {
       | identifier_start_code_point =>
         Sedlexing.rollback(lexbuf);
-        let string = handle_consume_identifier(lexbuf, consume_identifier(lexbuf));
+        let string =
+          handle_consume_identifier(lexbuf, consume_identifier(lexbuf));
         Ok(Tokens.HASH(string));
       | _ =>
-        let string = handle_consume_identifier(lexbuf, consume_identifier(lexbuf));
+        let string =
+          handle_consume_identifier(lexbuf, consume_identifier(lexbuf));
         Ok(Tokens.HASH(string));
       };
     | _ => Ok(DELIM("#"))
@@ -913,7 +743,7 @@ let consume = lexbuf => {
       Ok(DELIM("-"));
     };
   switch%sedlex (lexbuf) {
-  | whitespace => Ok(consume_whitespace_(lexbuf))
+  | whitespace => Ok(consume_whitespace(lexbuf))
   | "\"" => consume_string("\"", lexbuf)
   | "#" => consume_hash()
   | "'" => consume_string("'", lexbuf)
@@ -946,7 +776,8 @@ let consume = lexbuf => {
   | "<" => Ok(DELIM("<"))
   | "@" =>
     if (check_if_three_codepoints_would_start_an_identifier(lexbuf)) {
-      let string = handle_consume_identifier(lexbuf, consume_identifier(lexbuf));
+      let string =
+        handle_consume_identifier(lexbuf, consume_identifier(lexbuf));
       Ok(Tokens.AT_RULE(string));
     } else {
       Ok(DELIM("@"));
@@ -1037,12 +868,7 @@ let position_to_string = pos =>
 let debug_token = ((token, loc_start, loc_end)) => {
   let pos_start = position_to_string(loc_start);
   let pos_end = position_to_string(loc_end);
-  Printf.sprintf(
-    "%s %s..%s",
-    Tokens.to_debug(token),
-    pos_start,
-    pos_end,
-  );
+  Printf.sprintf("%s %s..%s", Tokens.to_debug(token), pos_start, pos_end);
 };
 
 let to_string = tokens =>

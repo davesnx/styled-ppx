@@ -348,7 +348,6 @@ id_selector: h = HASH { Id h }
 /* <class-selector> = '.' <ident-token> */
 class_selector:
   | DOT id = IDENT { Class id }
-  /* TODO: Fix this: Here we need to add TAG in case some ident is an actual tag :( */
   | DOT tag = TAG { Class tag }
 
 /* <subclass-selector> = <id-selector> | <class-selector> | <attribute-selector> | <pseudo-class-selector> */
