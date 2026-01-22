@@ -4,6 +4,7 @@
 
 - [BREAKING] Update to ppxlib.0.36
 - [FIX] Stack overflow by adding upper bound on reason
+- [BREAKING] Install reason.3.17.3
 
 ## 0.60.0
 

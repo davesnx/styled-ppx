@@ -27,7 +27,7 @@
   "styled-ppx is a ppx and a library that brings styled components to ReScript, Melange and OCaml. Create React Components or simply `className` with type-safe style definitions with only CSS.")
   (depends
    (ocaml (>= 4.14))
-   (reason (>= 3.17.2))
+   (reason (>= 3.17.3))
    (menhir (>= 20220210))
    (ppx_deriving (>= 5.0))
    (ppx_deriving_yojson (>= 3.7.0))
