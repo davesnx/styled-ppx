@@ -7,7 +7,6 @@
  (libraries
   styled-ppx.css-parser
   styled-ppx.css-property-parser
-  styled-ppx.css-grammar
   styled-ppx.string-interpolation
   sedlex
   ppxlib

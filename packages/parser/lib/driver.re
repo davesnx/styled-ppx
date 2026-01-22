@@ -3,7 +3,7 @@ module Location = Ppxlib.Location;
 let menhir = MenhirLib.Convert.Simplified.traditional2revised;
 
 let parse = (~loc: Ppxlib.location, lexbuf, parser) => {
-  let last_token = ref((Tokens.EOF, Lexing.dummy_pos, Lexing.dummy_pos));
+  let last_token = ref((Parser.EOF, Lexing.dummy_pos, Lexing.dummy_pos));
 
   let next_token = () => {
     last_token := Lexer.get_next_tokens_with_location(lexbuf);
@@ -21,7 +21,7 @@ let parse = (~loc: Ppxlib.location, lexbuf, parser) => {
     let msg =
       Printf.sprintf(
         "Parse error while reading token '%s'",
-        Tokens.to_string(token),
+        Tokens.token_to_string(token),
       );
     Error((loc, msg));
   };

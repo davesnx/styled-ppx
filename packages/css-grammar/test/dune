@@ -1,5 +1,0 @@
-(test
- (name test_runner)
- (libraries alcotest styled-ppx.css-grammar styled-ppx.css-parser)
- (preprocess
-  (pps css_grammar_ppx)))
