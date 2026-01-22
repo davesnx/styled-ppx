@@ -33,6 +33,7 @@ let make_loc = Parser_location.to_ppxlib_location
 %token <string> FUNCTION
 %token <string> NTH_FUNCTION
 %token <string> URL
+%token BAD_URL
 %token <string> AT_KEYFRAMES
 %token <string> AT_RULE
 %token <string> AT_RULE_STATEMENT

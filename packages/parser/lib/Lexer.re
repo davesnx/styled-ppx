@@ -509,10 +509,6 @@ let rec consume_remnants_bad_url = lexbuf =>
 
 // https://drafts.csswg.org/css-syntax-3/#consume-url-token
 let consume_url = lexbuf => {
-  let raise_bad_url = error => {
-    let (start_pos, curr_pos) = Sedlexing.lexing_positions(lexbuf);
-    raise(LexingError((start_pos, curr_pos, Tokens.show_error(error))));
-  };
   let _ = consume_whitespace(lexbuf);
   let rec read = acc => {
     let when_whitespace = () => {
