@@ -2,8 +2,6 @@ open Alcotest;
 
 module Tokens = Styled_ppx_css_parser.Tokens;
 module Lexer = Styled_ppx_css_parser.Lexer;
-module Parser = Styled_ppx_css_parser.Parser;
-
 let success_tests =
   [
     (
@@ -17,29 +15,23 @@ let success_tests =
     (" \n\t ", [WS]),
     ({|"something"|}, [STRING("something")]),
     ({|'tuturu'|}, [STRING("tuturu")]),
-    /* TODO: Differentiate HASH from ID */
-    ({|#2|}, [HASH("2")]),
-    ({|#abc|}, [HASH("abc")]),
+    ({|#2|}, [HASH(("2", `UNRESTRICTED))]),
+    ({|#abc|}, [HASH(("abc", `ID))]),
     ({|#|}, [DELIM("#")]),
     ({|(|}, [LEFT_PAREN]),
     ({|)|}, [RIGHT_PAREN]),
-    /* TODO: Treat +1 to NUMBER and not COMBINATOR + NUMBER */
-    ({|+12.3|}, [COMBINATOR("+"), NUMBER("12.3")]),
-    ({|+ 12.3|}, [COMBINATOR("+"), WS, NUMBER("12.3")]),
-    /* TODO: Disambiguate + sign. Either COMBINATOR(+) or DELIM(+) */
-    ({|+|}, [COMBINATOR("+")]),
+    ({|+12.3|}, [NUMBER(12.3)]),
+    ({|+ 12.3|}, [DELIM("+"), WS, NUMBER(12.3)]),
+    ({|+|}, [DELIM("+")]),
     ({|,|}, [COMMA]),
-    ({|45.6|}, [NUMBER("45.6")]),
-    ({|-45.6|}, [NUMBER("-45.6")]),
-    ({|45%|}, [NUMBER("45"), PERCENT]),
-    ({|2n|}, [DIMENSION(("2", "n"))]),
-    /* TODO: Store Float_dimension as float/int */
-    /* TODO: Store dimension as a variant */
-    ({|45.6px|}, [FLOAT_DIMENSION(("45.6", "px"))]),
-    ({|10px|}, [FLOAT_DIMENSION(("10", "px"))]),
-    ({|.5|}, [NUMBER(".5")]),
-    /* TODO: Treat 5. as NUMBER("5.0") */
-    ({|5.|}, [NUMBER("5"), DOT]),
+    ({|45.6|}, [NUMBER(45.6)]),
+    ({|-45.6|}, [NUMBER(-45.6)]),
+    ({|45%|}, [PERCENTAGE(45.)]),
+    ({|2n|}, [DIMENSION((2., "n"))]),
+    ({|45.6px|}, [DIMENSION((45.6, "px"))]),
+    ({|10px|}, [DIMENSION((10., "px"))]),
+    ({|.5|}, [NUMBER(0.5)]),
+    ({|5.|}, [NUMBER(5.), DOT]),
     ({|--potato|}, [IDENT("--potato")]),
     ({|-|}, [DELIM("-")]),
     ({|.|}, [DOT]),
@@ -48,9 +40,6 @@ let success_tests =
     ({|:|}, [COLON]),
     ({|::|}, [DOUBLE_COLON]),
     ({|;|}, [SEMI_COLON]),
-    /* TODO: Support comments in the lexer? */
-    /* ({|<!--|}, [CDO]), */
-    /* ({|-->|}, [CDC]), */
     ({|<|}, [DELIM("<")]),
     ({|not|}, [IDENT("not")]),
     ({|not |}, [IDENT("not"), WS]),
@@ -62,45 +51,48 @@ let success_tests =
     ({|all|}, [IDENT("all")]),
     ({|screen|}, [IDENT("screen")]),
     ({|print|}, [IDENT("print")]),
+    ({|@keyframes|}, [AT_KEYFRAMES("keyframes")]),
+    ({|@charset|}, [AT_RULE_STATEMENT("charset")]),
+    ({|@media|}, [AT_RULE("media")]),
     ({|@mayushii|}, [AT_RULE("mayushii")]),
     ({|@|}, [DELIM("@")]),
+    ({|~=|}, [DELIM("~"), DELIM("=")]),
+    ({|>|}, [DELIM(">")]),
+    ({|~|}, [DELIM("~")]),
     ({|[|}, [LEFT_BRACKET]),
     ({|]|}, [RIGHT_BRACKET]),
-    ({|0.7|}, [NUMBER("0.7")]),
-    ({|12345678.9|}, [NUMBER("12345678.9")]),
+    ({|0.7|}, [NUMBER(0.7)]),
+    ({|12345678.9|}, [NUMBER(12345678.9)]),
     ({|bar|}, [IDENT("bar")]),
+    ({|div|}, [TAG("div")]),
     ({||}, [EOF]),
     ({|!|}, [DELIM("!")]),
-    ("1 / 1", [NUMBER("1"), WS, DELIM("/"), WS, NUMBER("1")]),
+    ("1 / 1", [NUMBER(1.), WS, DELIM("/"), WS, NUMBER(1.)]),
     (
       {|calc(10px + 10px)|},
       [
         FUNCTION("calc"),
-        FLOAT_DIMENSION(("10", "px")),
+        DIMENSION((10., "px")),
         WS,
-        COMBINATOR("+"),
+        DELIM("+"),
         WS,
-        FLOAT_DIMENSION(("10", "px")),
+        DIMENSION((10., "px")),
         RIGHT_PAREN,
       ],
     ),
-    ({|+10px|}, [COMBINATOR("+"), FLOAT_DIMENSION(("10", "px"))]),
+    ({|+10px|}, [DIMENSION((10., "px"))]),
     (
       {|calc(10px+ 10px)|},
       [
         FUNCTION("calc"),
-        FLOAT_DIMENSION(("10", "px")),
-        COMBINATOR("+"),
+        DIMENSION((10., "px")),
+        DELIM("+"),
         WS,
-        FLOAT_DIMENSION(("10", "px")),
+        DIMENSION((10., "px")),
         RIGHT_PAREN,
       ],
     ),
-    /* TODO: Percentage should have payload? */
-    (
-      {|calc(10%)|},
-      [FUNCTION("calc"), NUMBER("10"), PERCENT, RIGHT_PAREN],
-    ),
+    ({|calc(10%)|}, [FUNCTION("calc"), PERCENTAGE(10.), RIGHT_PAREN]),
     (
       {|background-image:url('img_tree.gif' )|},
       [
@@ -112,7 +104,6 @@ let success_tests =
         RIGHT_PAREN,
       ],
     ),
-    /* TODO: Transform this as [DELIM("$"), LEFT_PAREN, IDENT("Module"), DELIM("."), IDENT("variable"), RIGHT_PAREN]) */
     ({|$(Module.variable)|}, [INTERPOLATION(["Module", "variable"])]),
     ({|$(Module.variable')|}, [INTERPOLATION(["Module", "variable'"])]),
     ({|-moz|}, [IDENT("-moz")]),
@@ -139,11 +130,7 @@ let success_tests =
     div/*nice*//* nice *//*ice*/.b {}|},
       [WS, TAG("div"), DOT, TAG("b"), WS, LEFT_BRACE, RIGHT_BRACE],
     ),
-    /* TODO: Support for escaped */
-    /* ({|\32|}, [NUMBER("\32")]), */
-    /* ({|\25BA|}, [NUMBER "\25BA"]), */
-    /* TODO: Support escaped "@" and others */
-    /* ("\\@desu", [IDENT("@desu")]), */
+    ({|nth-child(|}, [NTH_FUNCTION("nth-child")]),
   ]
   |> List.map(((input, output)) => {
        let okInput = Lexer.tokenize(input) |> Result.get_ok;
@@ -168,12 +155,7 @@ let error_tests =
      });
 
 let parse = input => {
-  let values =
-    switch (Lexer.from_string(input)) {
-    | Ok(values) => values
-    | Error(`Frozen) => failwith("Lexer got frozen")
-    };
-
+  let values = Lexer.from_string(input);
   let Lexer.{ loc, _ } = List.hd(values);
   let values = values |> List.map((Lexer.{ txt, _ }) => txt);
   (loc, values);
@@ -207,9 +189,8 @@ let test_with_location =
     ({||}, [EOF], 0),
     (" \n\t ", [Tokens.WS], 4),
     ({|"something"|}, [STRING("something")], 11),
-    // TODO: is that right?
-    ({|#2|}, [HASH("2", `UNRESTRICTED)], 2),
-    ({|#abc|}, [HASH("abc", `ID)], 4),
+    ({|#2|}, [HASH(("2", `UNRESTRICTED))], 2),
+    ({|#abc|}, [HASH(("abc", `ID))], 4),
     ({|#|}, [DELIM("#")], 1),
     ({|'tuturu'|}, [STRING("tuturu")], 8),
     ({|(|}, [LEFT_PAREN], 1),
@@ -221,28 +202,35 @@ let test_with_location =
     ({|--potato|}, [IDENT("--potato")], 8),
     ({|-|}, [DELIM("-")], 1),
     ({|.7|}, [NUMBER(0.7)], 2),
-    ({|.|}, [DELIM(".")], 1),
+    ({|.|}, [DOT], 1),
     ({|:|}, [COLON], 1),
+    ({|::|}, [DOUBLE_COLON], 2),
     ({|;|}, [SEMI_COLON], 1),
     ({|<|}, [DELIM("<")], 1),
-    ({|@mayushii|}, [AT_KEYWORD("mayushii")], 9),
+    ({|>|}, [DELIM(">")], 1),
+    ({|!important|}, [IMPORTANT], 10),
+    ({|U+0025-00FF|}, [UNICODE_RANGE("U+0025-00FF")], 11),
+    ({|~=|}, [DELIM("~"), DELIM("=")], 2),
+    ({|@keyframes|}, [AT_KEYFRAMES("keyframes")], 10),
+    ({|@mayushii|}, [AT_RULE("mayushii")], 9),
     ({|@|}, [DELIM("@")], 1),
     ({|[|}, [LEFT_BRACKET], 1),
     ("\\@desu", [IDENT("@desu")], 6),
     ({|]|}, [RIGHT_BRACKET], 1),
     ({|12345678.9|}, [NUMBER(12345678.9)], 10),
     ({|bar|}, [IDENT("bar")], 3),
+    ({|div|}, [TAG("div")], 3),
     ({|!|}, [DELIM("!")], 1),
     ("1 / 1", [NUMBER(1.), WS, DELIM("/"), WS, NUMBER(1.)], 5),
     (
       {|calc(10px + 10px)|},
       [
         FUNCTION("calc"),
-        DIMENSION(10., "px"),
+        DIMENSION((10., "px")),
         WS,
         DELIM("+"),
         WS,
-        DIMENSION(10., "px"),
+        DIMENSION((10., "px")),
         RIGHT_PAREN,
       ],
       17,
@@ -263,39 +251,18 @@ let test_with_location =
       {|calc(10px+ 10px)|},
       [
         FUNCTION("calc"),
-        DIMENSION(10., "px"),
+        DIMENSION((10., "px")),
         DELIM("+"),
         WS,
-        DIMENSION(10., "px"),
+        DIMENSION((10., "px")),
         RIGHT_PAREN,
       ],
       16,
     ),
+    ({|nth-child(|}, [NTH_FUNCTION("nth-child")], 10),
     ({|calc(10%)|}, [FUNCTION("calc"), PERCENTAGE(10.), RIGHT_PAREN], 9),
-    (
-      {|$(Module.variable)|},
-      [
-        DELIM("$"),
-        LEFT_PAREN,
-        IDENT("Module"),
-        DELIM("."),
-        IDENT("variable"),
-        RIGHT_PAREN,
-      ],
-      18,
-    ),
-    (
-      {|$(Module.variable')|},
-      [
-        DELIM("$"),
-        LEFT_PAREN,
-        IDENT("Module"),
-        DELIM("."),
-        IDENT("variable'"),
-        RIGHT_PAREN,
-      ],
-      19,
-    ),
+    ({|$(Module.variable)|}, [INTERPOLATION(["Module", "variable"])], 18),
+    ({|$(Module.variable')|}, [INTERPOLATION(["Module", "variable'"])], 19),
     ({|--color-main|}, [IDENT("--color-main")], 12),
     ({|>=|}, [GTE], 2),
     ({|<=|}, [LTE], 2),
@@ -303,12 +270,7 @@ let test_with_location =
       {|url($(Module.variable'))|},
       [
         FUNCTION("url"),
-        DELIM("$"),
-        LEFT_PAREN,
-        IDENT("Module"),
-        DELIM("."),
-        IDENT("variable'"),
-        RIGHT_PAREN,
+        INTERPOLATION(["Module", "variable'"]),
         RIGHT_PAREN,
       ],
       24,

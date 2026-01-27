@@ -1992,10 +1992,7 @@ let apply_parser = (parser, tokens_with_loc) => {
 };
 
 let parse = (rule_parser: Rule.rule('a), str) => {
-  let.ok tokens_with_loc =
-    Styled_ppx_css_parser.Lexer.from_string(str)
-    |> Result.map_error(_ => "frozen");
-
+  let tokens_with_loc = Styled_ppx_css_parser.Lexer.from_string(str);
   apply_parser(rule_parser, tokens_with_loc);
 };
 
