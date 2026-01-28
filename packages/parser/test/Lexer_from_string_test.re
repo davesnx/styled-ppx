@@ -3,13 +3,6 @@ open Alcotest;
 module Tokens = Styled_ppx_css_parser.Tokens;
 module Lexer = Styled_ppx_css_parser.Lexer;
 
-let parse = input => {
-  let values = Lexer.from_string(input);
-  let Lexer.{ loc, _ } = List.hd(values);
-  let values = values |> List.map((Lexer.{ txt, _ }) => txt);
-  (loc, values);
-};
-
 let render_token =
   fun
   | Tokens.EOF => ""
@@ -28,6 +21,13 @@ let list_parse_tokens_to_string = tokens =>
 
 let list_tokens_to_string = tokens =>
   tokens |> List.map(render_token) |> String.concat(" ") |> String.trim;
+
+let parse = input => {
+  let values = Lexer.from_string(input);
+  let Lexer.{ loc, _ } = List.hd(values);
+  let values = values |> List.map((Lexer.{ txt, _ }) => txt);
+  (loc, values);
+};
 
 let success_tests =
   [
@@ -160,12 +160,9 @@ let success_tests =
     ({|nth-child(|}, [NTH_FUNCTION("nth-child")]),
   ]
   |> List.map(((input, output)) => {
-       let okInput = Lexer.tokenize(input) |> Result.get_ok;
-       let inputTokens = Lexer.to_string(okInput);
-       let outputTokens =
-         output
-         |> List.map(token => (token, Lexing.dummy_pos, Lexing.dummy_pos))
-         |> Lexer.to_string;
+       let (_, values) = parse(input);
+       let inputTokens = list_parse_tokens_to_string(values);
+       let outputTokens = list_tokens_to_string(output);
 
        test_case(input, `Quick, () =>
          check(string, "should match" ++ input, inputTokens, outputTokens)
@@ -174,11 +171,30 @@ let success_tests =
 
 let lexer_error_tests =
   [("/*", "Unterminated comment at the end of the string")]
-  |> List.map(((input, output)) => {
-       let error = Lexer.tokenize(input) |> Result.get_error;
-       test_case(input, `Quick, () =>
-         check(string, "should match" ++ input, error, output)
-       );
+  |> List.map(((input, expected_error)) => {
+       test_case(
+         input,
+         `Quick,
+         () => {
+           let result =
+             try({
+               let _ = Lexer.from_string(input);
+               None;
+             }) {
+             | Lexer.LexingError((_, _, msg)) => Some(msg)
+             };
+           switch (result) {
+           | Some(msg) =>
+             check(
+               string,
+               "should have error: " ++ expected_error,
+               msg,
+               expected_error,
+             )
+           | None => fail("Expected LexingError but got success")
+           };
+         },
+       )
      });
 
 let soft_error_tests =

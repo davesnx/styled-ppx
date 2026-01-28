@@ -4,6 +4,29 @@ open Ast
 
 let make_loc = Parser_location.to_ppxlib_location
 
+let int_of_float_exn value =
+  if Float.is_integer value then int_of_float value
+  else raise (Failure "Expected integer")
+
+let expect_delim expected actual =
+  if actual = expected then actual
+  else raise (Failure ("Expected delimiter " ^ expected))
+
+let combinator_from_delim =
+  function
+  | ("+" | "~" | ">") as value -> value
+  | value -> raise (Failure ("Invalid combinator " ^ value))
+
+let operator_prefix_from_delim =
+  function
+  | ("~" | "|" | "^" | "$" | "*") as value -> value
+  | value -> raise (Failure ("Invalid operator prefix " ^ value))
+
+let nth_operator_from_delim =
+  function
+  | ("+" | "-") as value -> value
+  | value -> raise (Failure ("Invalid nth operator " ^ value))
+
 %}
 
 %token EOF
@@ -17,32 +40,30 @@ let make_loc = Parser_location.to_ppxlib_location
 %token DOT
 %token DOUBLE_COLON
 %token SEMI_COLON
-%token PERCENT
 %token IMPORTANT
 %token AMPERSAND
 %token ASTERISK
 %token COMMA
-%token BAD_IDENT
 %token WS
+%token GTE
+%token LTE
 %token <string> IDENT
 %token <string> TAG
 %token <string> STRING
-%token <string> OPERATOR
-%token <string> COMBINATOR
 %token <string> DELIM
 %token <string> FUNCTION
 %token <string> NTH_FUNCTION
 %token <string> URL
-%token BAD_URL
+%token <string> AT_KEYWORD
 %token <string> AT_KEYFRAMES
 %token <string> AT_RULE
 %token <string> AT_RULE_STATEMENT
-%token <string> HASH
-%token <string> NUMBER
 %token <string> UNICODE_RANGE
-%token <string * string> FLOAT_DIMENSION
-%token <string * string> DIMENSION
 %token <string list> INTERPOLATION
+%token <string * [ `ID | `UNRESTRICTED ]> HASH
+%token <float> NUMBER
+%token <float> PERCENTAGE
+%token <float * string> DIMENSION
 
 %start <stylesheet> stylesheet
 %start <rule_list> declaration_list
@@ -140,7 +161,7 @@ at_rule:
     }
   }
 
-percentage: n = NUMBER PERCENT { n }
+percentage: n = PERCENTAGE { n }
 
 /* keyframe allows stylesheet by defintion, but we restrict the usage to: */
 keyframe_style_rule:
@@ -236,26 +257,41 @@ declaration_without_eof:
   }
 
 combinator:
-  | c = COMBINATOR { c }
+  | d = DELIM { combinator_from_delim d }
+
+nth_operator:
+  | d = DELIM { nth_operator_from_delim d }
 
 nth_payload:
   /* TODO implement [of <complex-selector-list>]? */
   /* | complex = complex_selector_list; { NthSelector complex } */
   /* <An+B> */
   /* 2 */
-  | a = NUMBER { Nth (A (int_of_string a)) }
-  /* 2n */
-  | a = DIMENSION { Nth (AN (int_of_string (fst a))) }
-  /* 2n-1 */
-  | a = DIMENSION WS? combinator = COMBINATOR WS? b = NUMBER {
-    let b = int_of_string b in
-    Nth (ANB (((int_of_string (fst a)), combinator, b)))
+  | a = NUMBER { Nth (A (int_of_float_exn a)) }
+  /* 2n or 2n-1 (ndashdigit-dimension) */
+  | a = DIMENSION {
+    let (num, unit) = a in
+    (* Check if unit matches n-<digits> pattern *)
+    if String.length unit > 2 && String.get unit 0 = 'n' && String.get unit 1 = '-' then
+      let b_str = String.sub unit 2 (String.length unit - 2) in
+      try
+        let b = int_of_string b_str in
+        Nth (ANB ((int_of_float_exn num, "-", b)))
+      with _ -> Nth (AN (int_of_float_exn num))
+    else
+      Nth (AN (int_of_float_exn num))
   }
-  /* This is a hackish solution where combinator isn't catched because the lexer
-  assignes the `-` to NUMBER. This could be solved by leftassoc or the lexer */
+  /* 2n+1 with explicit + */
+  | a = DIMENSION WS? combinator = nth_operator WS? b = NUMBER {
+    let b = int_of_float_exn b in
+    Nth (ANB (((int_of_float_exn (fst a)), combinator, b)))
+  }
+  /* This is a hackish solution where the combinator isn't captured because the lexer
+  assigns the sign (+/-) to NUMBER. We detect the sign from the number's value. */
   | a = DIMENSION WS? b = NUMBER {
-    let b = Int.abs (int_of_string (b)) in
-    Nth (ANB (((int_of_string (fst a)), "-", b)))
+    let b_int = int_of_float_exn b in
+    let (op, b_abs) = if b_int < 0 then ("-", Int.abs b_int) else ("+", b_int) in
+    Nth (ANB (((int_of_float_exn (fst a)), op, b_abs)))
   }
   | n = IDENT WS? {
     match n with
@@ -271,10 +307,18 @@ nth_payload:
   /* n-1 */
   /* n */
   /* -n */
-  | n = IDENT WS? combinator = COMBINATOR WS? b = NUMBER {
+  | n = IDENT WS? combinator = nth_operator WS? b = NUMBER {
     let first_char = String.get n 0 in
     let a = if first_char = '-' then -1 else 1 in
-    Nth (ANB ((a, combinator, int_of_string b)))
+    Nth (ANB ((a, combinator, int_of_float_exn b)))
+  }
+  /* Handle case where combinator is absorbed into NUMBER (e.g., -n+6 -> IDENT NUMBER) */
+  | n = IDENT WS? b = NUMBER {
+    let first_char = String.get n 0 in
+    let a = if first_char = '-' then -1 else 1 in
+    let b_int = int_of_float_exn b in
+    let (op, b_abs) = if b_int < 0 then ("-", Int.abs b_int) else ("+", b_int) in
+    Nth (ANB ((a, op, b_abs)))
   }
   /* TODO: Support "An+B of Selector" */
 
@@ -294,8 +338,16 @@ pseudo_class_selector:
 ;
 
 /* "~=" | "|=" | "^=" | "$=" | "*=" | "=" */
+operator_prefix:
+  | d = DELIM { operator_prefix_from_delim d }
+  | ASTERISK { operator_prefix_from_delim "*" }
+
+operator:
+  | prefix = operator_prefix d = DELIM { let _ = expect_delim "=" d in prefix ^ "=" }
+  | d = DELIM { expect_delim "=" d }
+
 attr_matcher:
- | o = OPERATOR { o }
+ | o = operator { o }
 
 wq_name:
   | i = IDENT { i }
@@ -343,7 +395,7 @@ attribute_selector:
 ;
 
 /* <id-selector> = <hash-token> */
-id_selector: h = HASH { Id h }
+id_selector: h = HASH { let (value, _) = h in Id value }
 
 /* <class-selector> = '.' <ident-token> */
 class_selector:
@@ -482,19 +534,20 @@ value:
   | i = IDENT { Ident i }
   | i = TAG { Ident i }
   | s = STRING { String s }
-  | c = COMBINATOR { Combinator c}
-  | o = OPERATOR { Operator o }
-  | d = DELIM { Delim d }
-  | DOT { Delim "." }
-  | ASTERISK { Delim "*" }
   | COLON { Delim ":" }
-  | h = HASH { Hash h }
   | DOUBLE_COLON { Delim "::" }
   | COMMA { Delim "," }
+  | DOT { Delim "." }
+  | ASTERISK { Delim "*" }
+  | AMPERSAND { Delim "&" }
+  | d = DELIM { Delim d }
+  | GTE { Delim ">=" }
+  | LTE { Delim "<=" }
+  | h = HASH { let (value, _) = h in Hash value }
   | n = NUMBER { Number n }
   | r = UNICODE_RANGE { Unicode_range r }
-  | d = FLOAT_DIMENSION { Float_dimension d }
   | d = DIMENSION { Dimension d }
   | v = INTERPOLATION { Variable v } /* $(Lola.value) */
   | f = loc(FUNCTION) v = loc(values) RIGHT_PAREN; { Function (f, v) } /* calc() */
+  | f = loc(NTH_FUNCTION) v = loc(values) RIGHT_PAREN; { Function (f, v) } /* nth-() */
   | u = URL { Uri u } /* url() */

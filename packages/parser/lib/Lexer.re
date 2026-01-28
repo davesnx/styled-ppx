@@ -551,9 +551,9 @@ let consume_number = lexbuf => {
 
 // https://drafts.csswg.org/css-syntax-3/#consume-url-token
 let consume_url_ = lexbuf => {
-  let raise_bad_url = error => {
+  let raise_bad_url = () => {
     let (start_pos, curr_pos) = Sedlexing.lexing_positions(lexbuf);
-    raise(LexingError((start_pos, curr_pos, Tokens.show_error(error))));
+    raise(LexingError((start_pos, curr_pos, Tokens.show_error(Bad_url))));
   };
   let _ = consume_whitespace_(lexbuf);
   let rec read = acc => {
@@ -561,26 +561,26 @@ let consume_url_ = lexbuf => {
       let _ = consume_whitespace_(lexbuf);
       switch%sedlex (lexbuf) {
       | ')' => Ok(Tokens.URL(acc))
-      | eof => Error((Tokens.URL(acc), Tokens.Eof))
+      | eof => Error(Tokens.Eof)
       | _ =>
         consume_remnants_bad_url(lexbuf);
-        raise_bad_url(Tokens.Invalid_code_point);
+        raise_bad_url();
       };
     };
     switch%sedlex (lexbuf) {
     | ')' => Ok(Tokens.URL(acc))
-    | eof => Error((Tokens.URL(acc), Tokens.Eof))
+    | eof => Error(Tokens.Eof)
     | whitespace => when_whitespace()
     | '"'
     | '\''
     | '('
     | non_printable_code_point =>
       consume_remnants_bad_url(lexbuf);
-      raise_bad_url(Tokens.Invalid_code_point);
+      raise_bad_url();
     | escape =>
       switch (consume_escaped(lexbuf)) {
       | Ok(char) => read(acc ++ char)
-      | Error((_, error)) => raise_bad_url(error)
+      | Error((_, _)) => raise_bad_url()
       }
     | any => read(acc ++ lexeme(lexbuf))
     | _ => unreachable(lexbuf)
@@ -620,13 +620,13 @@ let consume_string = (ending_code_point, lexbuf) => {
 
   switch (read("")) {
   | Ok(string) => Ok(Tokens.STRING(string))
-  | Error((string, error)) => Error((Tokens.STRING(string), error))
+  | Error((_, error)) => Error(error)
   };
 };
 
 let handle_consume_identifier =
   fun
-  | Error((_, error)) => Error((Tokens.BAD_IDENT, error))
+  | Error((_, _)) => Error(Tokens.Bad_ident)
   | Ok(string) => Ok(string);
 
 // https://drafts.csswg.org/css-syntax-3/#consume-ident-like-token
@@ -796,7 +796,9 @@ let rec consume = lexbuf => {
     | starts_with_a_valid_escape =>
       Sedlexing.rollback(lexbuf);
       consume_ident_like(lexbuf);
-    | _ => Error((DELIM("/"), Invalid_code_point))
+    | ('\\', any) => Error(Invalid_code_point)
+    | '\\' => Error(Invalid_code_point)
+    | _ => Error(Invalid_code_point)
     };
   | (_u, '+', unicode_range) => Ok(UNICODE_RANGE(lexeme(lexbuf)))
   | digit =>
@@ -814,7 +816,7 @@ let rec consume = lexbuf => {
 let consume_or_raise = lexbuf =>
   switch (consume(lexbuf)) {
   | Ok(token) => token
-  | Error((_, msg)) =>
+  | Error(msg) =>
     let (start_pos, curr_pos) = Sedlexing.lexing_positions(lexbuf);
     let error = Tokens.show_error(msg);
     raise(LexingError((start_pos, curr_pos, error)));
@@ -829,7 +831,7 @@ let get_next_tokens_with_location = lexbuf => {
 };
 
 type token_with_location = {
-  txt: result(Tokens.token, (Tokens.token, Tokens.error)),
+  txt: result(Tokens.token, Tokens.error),
   loc: Location.t,
 };
 

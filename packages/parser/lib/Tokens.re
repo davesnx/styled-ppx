@@ -2,25 +2,37 @@
 type token =
   | EOF
   | IDENT(string) // <ident-token>
-  | BAD_IDENT // TODO: Since we don't allow broken syntax, is this needed?
+  | TAG(string) // <tag-token> (non-standard)
   | FUNCTION(string) // <function-token>
+  | NTH_FUNCTION(string) // <function-token> (nth-*)
   | AT_KEYWORD(string) // <at-keyword-token>
+  | AT_KEYFRAMES(string) // <at-keyframes-token> (non-standard)
+  | AT_RULE(string) // <at-rule-token> (non-standard)
+  | AT_RULE_STATEMENT(string) // <at-rule-statement-token> (non-standard)
+  | UNICODE_RANGE(string) // <unicode-range-token>
   | HASH(
-      string,
-      [
-        | `ID
-        | `UNRESTRICTED
-      ],
+      (
+        string,
+        [
+          | `ID
+          | `UNRESTRICTED
+        ],
+      ),
     ) // <hash-token>
   | STRING(string) // <string-token>
   | URL(string) // <url-token>
-  | BAD_URL // <bad-url-token> TODO: Since we don't allow broken syntax, is this needed?
+  | INTERPOLATION(list(string)) // <interpolation-token>
   | DELIM(string) // <delim-token>
+  | DOT // <dot-token> (non-standard)
+  | ASTERISK // <asterisk-token> (non-standard)
+  | AMPERSAND // <ampersand-token> (non-standard)
   | NUMBER(float) // <number-token>
   | PERCENTAGE(float) // <percentage-token>
-  | DIMENSION(float, string) // <dimension-token>
+  | DIMENSION((float, string)) // <dimension-token>
   | WS // <whitespace-token>
   | COLON // <colon-token>
+  | DOUBLE_COLON // <double-colon-token>
+  | IMPORTANT // <important-token>
   | SEMI_COLON // <semicolon-token>
   | COMMA // <comma-token>
   | LEFT_BRACKET // <[-token>
@@ -29,7 +41,6 @@ type token =
   | RIGHT_PAREN // <)-token>
   | LEFT_BRACE // <{-token>
   | RIGHT_BRACE // <}-token>
-  // handle media query lte and gte explicitly since we don't allow whitespace between gt,lt and eq
   | GTE
   | LTE;
 
@@ -38,32 +49,47 @@ let string_of_char = c => String.make(1, c);
 type error =
   | Invalid_code_point
   | Eof
-  | New_line;
+  | New_line
+  | Bad_url
+  | Bad_ident;
 
 let show_error =
   fun
-  | Invalid_code_point => "Invalid code point"
-  | Eof => "Unexpected end"
-  | New_line => "New line";
+  | Invalid_code_point => "Invalid escape sequence"
+  | Eof => "Unexpected end of input"
+  | New_line => "Unexpected newline in string"
+  | Bad_url => "Invalid URL"
+  | Bad_ident => "Invalid identifier";
 
 let humanize =
   fun
   | EOF => "the end"
   | IDENT(str) => "ident " ++ str
-  | BAD_IDENT => "bad ident"
+  | TAG(str) => "tag " ++ str
   | FUNCTION(f) => "function " ++ f
+  | NTH_FUNCTION(f) => "function " ++ f
   | AT_KEYWORD(at) => "@ " ++ at
-  | HASH(h, _) => "hash: #" ++ h
+  | AT_KEYFRAMES(at)
+  | AT_RULE(at)
+  | AT_RULE_STATEMENT(at) => "@ " ++ at
+  | UNICODE_RANGE(range) => "unicode range " ++ range
+  | HASH((h, _)) => "hash: #" ++ h
   | STRING(s) => {|string "|} ++ s ++ {|"|}
   | URL(u) => "url " ++ u
-  | BAD_URL => "bad url"
+  | INTERPOLATION(path) => "interpolation " ++ String.concat(".", path)
   | DELIM(d) => "delimiter " ++ d
-  | NUMBER(f) => "number: " ++ string_of_float(f)
+  | DOT => "."
+  | ASTERISK => "*"
+  | AMPERSAND => "&"
+  | NUMBER(f) => "number: " ++ Number_format.float_to_string(f)
   | PERCENTAGE(f) =>
-    "percentage: " ++ string_of_float(f) ++ string_of_char('%')
-  | DIMENSION(f, s) => "dimension: " ++ string_of_float(f) ++ s
+    "percentage: " ++ Number_format.float_to_string(f) ++ string_of_char('%')
+  | DIMENSION((f, s)) =>
+    "dimension: " ++ Number_format.float_to_string(f) ++ s
   | WS => "whitespace"
   | COLON => ":"
+  | DOUBLE_COLON => "::"
+  | IMPORTANT => "!important"
   | SEMI_COLON => ";"
   | COMMA => ","
   | LEFT_BRACKET => "["
@@ -75,10 +101,9 @@ let humanize =
   | GTE => ">="
   | LTE => "<=";
 
-/* TODO: This should render Token, not Parser.token */
 let token_to_string =
   fun
-  | Parser.EOF => ""
+  | EOF => ""
   | LEFT_BRACE => "{"
   | RIGHT_BRACE => "}"
   | LEFT_PAREN => "("
@@ -88,38 +113,35 @@ let token_to_string =
   | COLON => ":"
   | DOUBLE_COLON => "::"
   | SEMI_COLON => ";"
-  | PERCENT => "%"
-  | AMPERSAND => "&"
+  | COMMA => ","
   | IMPORTANT => "!important"
   | IDENT(s) => s
   | TAG(s) => s
   | STRING(s) => "'" ++ s ++ "'"
-  | OPERATOR(s) => s
-  | COMBINATOR(s)
-  | DELIM(s) => s
-  | AT_KEYFRAMES(s)
-  | AT_RULE_STATEMENT(s)
-  | AT_RULE(s) => "@" ++ s
-  | HASH(s) => "#" ++ s
-  | NUMBER(s) => s
-  | UNICODE_RANGE(s) => s
-  | FLOAT_DIMENSION((n, s)) => n ++ s
-  | DIMENSION((n, d)) => n ++ d
-  | INTERPOLATION(v) => String.concat(".", v)
-  | WS => " "
-  | DOT => "."
-  | COMMA => ","
-  | ASTERISK => "*"
   | FUNCTION(fn) => fn ++ "("
   | NTH_FUNCTION(fn) => fn ++ "("
-  | URL(url) => url ++ "("
-  | BAD_URL => "bad url"
-  | BAD_IDENT => "bad indent";
+  | URL(url) => "url(" ++ url ++ ")"
+  | AT_KEYWORD(s) => "@" ++ s
+  | AT_KEYFRAMES(s) => "@" ++ s
+  | AT_RULE_STATEMENT(s) => "@" ++ s
+  | AT_RULE(s) => "@" ++ s
+  | HASH((s, _)) => "#" ++ s
+  | NUMBER(n) => Number_format.float_to_string(n)
+  | PERCENTAGE(n) => Number_format.float_to_string(n) ++ "%"
+  | DIMENSION((n, d)) => Number_format.float_to_string(n) ++ d
+  | UNICODE_RANGE(s) => s
+  | INTERPOLATION(v) => "$(" ++ String.concat(".", v) ++ ")"
+  | DELIM(s) => s
+  | DOT => "."
+  | ASTERISK => "*"
+  | AMPERSAND => "&"
+  | WS => " "
+  | GTE => ">="
+  | LTE => "<=";
 
-/* TODO: This should print Token, not Parser.token */
 let token_to_debug =
   fun
-  | Parser.EOF => "EOF"
+  | EOF => "EOF"
   | LEFT_BRACE => "LEFT_BRACE"
   | RIGHT_BRACE => "RIGHT_BRACE"
   | LEFT_PAREN => "LEFT_PAREN"
@@ -129,30 +151,36 @@ let token_to_debug =
   | COLON => "COLON"
   | DOUBLE_COLON => "DOUBLE_COLON"
   | SEMI_COLON => "SEMI_COLON"
-  | PERCENT => "PERCENTAGE"
-  | AMPERSAND => "AMPERSAND"
+  | COMMA => "COMMA"
   | IMPORTANT => "IMPORTANT"
   | IDENT(s) => "IDENT('" ++ s ++ "')"
   | TAG(s) => "TAG('" ++ s ++ "')"
   | STRING(s) => "STRING('" ++ s ++ "')"
-  | OPERATOR(s) => "OPERATOR('" ++ s ++ "')"
-  | DELIM(s) => "DELIM('" ++ s ++ "')"
-  | AT_RULE(s) => "AT_RULE('" ++ s ++ "')"
-  | AT_RULE_STATEMENT(s) => "AT_RULE_STATEMENT('" ++ s ++ "')"
-  | AT_KEYFRAMES(s) => "AT_KEYFRAMES('" ++ s ++ "')"
-  | HASH(s) => "HASH('" ++ s ++ "')"
-  | NUMBER(s) => "NUMBER('" ++ s ++ "')"
-  | UNICODE_RANGE(s) => "UNICODE_RANGE('" ++ s ++ "')"
-  | FLOAT_DIMENSION((n, s)) => "FLOAT_DIMENSION('" ++ n ++ ", " ++ s ++ "')"
-  | DIMENSION((n, d)) => "DIMENSION('" ++ n ++ ", " ++ d ++ "')"
-  | INTERPOLATION(v) => "VARIABLE('" ++ String.concat(".", v) ++ "')"
-  | COMBINATOR(s) => "COMBINATOR(" ++ s ++ ")"
-  | DOT => "DOT"
-  | COMMA => "COMMA"
-  | WS => "WS"
-  | ASTERISK => "ASTERISK"
   | FUNCTION(fn) => "FUNCTION(" ++ fn ++ ")"
-  | NTH_FUNCTION(fn) => "FUNCTION(" ++ fn ++ ")"
+  | NTH_FUNCTION(fn) => "NTH_FUNCTION(" ++ fn ++ ")"
   | URL(u) => "URL(" ++ u ++ ")"
-  | BAD_URL => "BAD_URL"
-  | BAD_IDENT => "BAD_IDENT";
+  | AT_KEYWORD(s) => "AT_KEYWORD('" ++ s ++ "')"
+  | AT_KEYFRAMES(s) => "AT_KEYFRAMES('" ++ s ++ "')"
+  | AT_RULE_STATEMENT(s) => "AT_RULE_STATEMENT('" ++ s ++ "')"
+  | AT_RULE(s) => "AT_RULE('" ++ s ++ "')"
+  | HASH((s, kind)) => {
+      let kind =
+        switch (kind) {
+        | `ID => "ID"
+        | `UNRESTRICTED => "UNRESTRICTED"
+        };
+      "HASH('" ++ s ++ "', " ++ kind ++ ")";
+    }
+  | NUMBER(n) => "NUMBER(" ++ Number_format.float_to_string(n) ++ ")"
+  | PERCENTAGE(n) => "PERCENTAGE(" ++ Number_format.float_to_string(n) ++ ")"
+  | DIMENSION((n, d)) =>
+    "DIMENSION(" ++ Number_format.float_to_string(n) ++ ", " ++ d ++ ")"
+  | UNICODE_RANGE(s) => "UNICODE_RANGE('" ++ s ++ "')"
+  | INTERPOLATION(v) => "INTERPOLATION('" ++ String.concat(".", v) ++ "')"
+  | DELIM(s) => "DELIM('" ++ s ++ "')"
+  | DOT => "DOT"
+  | ASTERISK => "ASTERISK"
+  | AMPERSAND => "AMPERSAND"
+  | WS => "WS"
+  | GTE => "GTE"
+  | LTE => "LTE";
