@@ -1,6 +1,6 @@
 (menhir
  (modules Parser)
- (flags --explain --unused-tokens))
+ (flags --explain --unused-tokens --external-tokens Tokens))
 
 (library
  (name styled_ppx_css_parser)

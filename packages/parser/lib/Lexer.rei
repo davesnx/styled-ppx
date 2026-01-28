@@ -9,9 +9,6 @@ type token_with_location = {
 let get_next_tokens_with_location:
   Sedlexing.lexbuf => (Tokens.token, Lexing.position, Lexing.position);
 let from_string: string => list(token_with_location);
-let tokenize:
-  string =>
-  result(list((Tokens.token, Lexing.position, Lexing.position)), string);
 let render_token: Tokens.token => string;
 let position_to_string: Lexing.position => string;
 let debug_token: ((Tokens.token, Lexing.position, Lexing.position)) => string;

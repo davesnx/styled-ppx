@@ -50,7 +50,7 @@ let tests = [
       __POS__,
       Alcotest.result(Alcotest.float(1.), Alcotest.string),
       parse("ident"),
-      Error("Expected a number. Got 'ident ident' instead."),
+      Error("Expected a number. Got 'ident' instead."),
     );
   }),
   test("<length>", () => {
@@ -301,7 +301,7 @@ let tests = [
       __POS__,
       Alcotest.result(Alcotest.unit, Alcotest.string),
       parse("nope"),
-      Error("Expected 'ident gintoki' but instead got 'ident nope'."),
+      Error("Expected 'gintoki'. Got 'nope' instead."),
     );
   }),
   test("<ident>", () => {
@@ -360,7 +360,7 @@ let tests = [
       __POS__,
       Alcotest.result(css_wide_keywords, Alcotest.string),
       parse("nope"),
-      Error("Expected 'ident revert-layer' but instead got 'ident nope'."),
+      Error("Expected 'revert-layer'. Got 'nope' instead."),
     );
   }),
   test("<string>", () => {
@@ -465,10 +465,9 @@ let tests = [
     let expect = check(__POS__, to_check);
     expect(parse("$(Module.value)"), Ok(["Module", "value"]));
     expect(parse("$(Module'.value')"), Ok(["Module'", "value'"]));
-    /* TODO: Add error message into interpolation */
     expect(
       parse("asd"),
-      Error("Expected 'delimiter $' but instead got 'ident asd'."),
+      Error("Expected interpolation. Got 'asd' instead."),
     );
   }),
 ];

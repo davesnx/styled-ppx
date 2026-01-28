@@ -31,10 +31,7 @@ let list_tokens_to_string = tokens =>
 
 let success_tests =
   [
-    (
-      {|url($(Module.variable))|},
-      [FUNCTION("url"), INTERPOLATION(["Module", "variable"]), RIGHT_PAREN],
-    ),
+    ({||}, [EOF]),
     ({|inset-3\.5|}, [IDENT("inset-3.5")]),
     ({|-inset-3\.5|}, [IDENT("-inset-3.5")]),
     ({|inset-1\/3|}, [IDENT("inset-1/3")]),
@@ -92,9 +89,12 @@ let success_tests =
     ({|12345678.9|}, [NUMBER(12345678.9)]),
     ({|bar|}, [IDENT("bar")]),
     ({|div|}, [TAG("div")]),
-    ({||}, [EOF]),
     ({|!|}, [DELIM("!")]),
     ("1 / 1", [NUMBER(1.), WS, DELIM("/"), WS, NUMBER(1.)]),
+    (
+      {|url($(Module.variable))|},
+      [FUNCTION("url"), INTERPOLATION(["Module", "variable"]), RIGHT_PAREN],
+    ),
     (
       {|calc(10px + 10px)|},
       [
@@ -160,12 +160,9 @@ let success_tests =
     ({|nth-child(|}, [NTH_FUNCTION("nth-child")]),
   ]
   |> List.map(((input, output)) => {
-       let okInput = Lexer.tokenize(input) |> Result.get_ok;
-       let inputTokens = Lexer.to_string(okInput);
-       let outputTokens =
-         output
-         |> List.map(token => (token, Lexing.dummy_pos, Lexing.dummy_pos))
-         |> Lexer.to_string;
+       let (_, values) = parse(input);
+       let inputTokens = list_parse_tokens_to_string(values);
+       let outputTokens = list_tokens_to_string(output);
 
        test_case(input, `Quick, () =>
          check(string, "should match" ++ input, inputTokens, outputTokens)
@@ -175,10 +172,15 @@ let success_tests =
 let lexer_error_tests =
   [("/*", "Unterminated comment at the end of the string")]
   |> List.map(((input, output)) => {
-       let error = Lexer.tokenize(input) |> Result.get_error;
        test_case(input, `Quick, () =>
-         check(string, "should match" ++ input, error, output)
-       );
+         try({
+           let _ = Lexer.from_string(input);
+           fail("Expected LexingError but got success");
+         }) {
+         | Lexer.LexingError((_, _, msg)) =>
+           check(string, "should match" ++ input, msg, output)
+         }
+       )
      });
 
 let soft_error_tests =
@@ -194,6 +196,8 @@ let soft_error_tests =
       {|Error(Unexpected newline in string) (IDENT "newline'")|},
     ),
     ({|url(unterminated|}, "Error(Unexpected end of input)"),
+    ({|url(bad"url)|}, "Error(Invalid URL)"),
+    ({|url(bad'url)|}, "Error(Invalid URL)"),
     ("\\\n", "Error(Invalid escape sequence)"),
   ]
   |> List.map(((input, expected_output)) => {

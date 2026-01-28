@@ -21,7 +21,7 @@ type token =
     ) // <hash-token>
   | STRING(string) // <string-token>
   | URL(string) // <url-token>
-  | INTERPOLATION(list(string)) // <interpolation-token>
+  | INTERPOLATION(list(string)) // <interpolation-token> (non-standard)
   | DELIM(string) // <delim-token>
   | DOT // <dot-token> (non-standard)
   | ASTERISK // <asterisk-token> (non-standard)
@@ -64,29 +64,27 @@ let show_error =
 let humanize =
   fun
   | EOF => "the end"
-  | IDENT(str) => "ident " ++ str
-  | TAG(str) => "tag " ++ str
-  | FUNCTION(f) => "function " ++ f
-  | NTH_FUNCTION(f) => "function " ++ f
-  | AT_KEYWORD(at) => "@ " ++ at
+  | IDENT(str) => str
+  | TAG(str) => str
+  | FUNCTION(f) => f
+  | NTH_FUNCTION(f) => f
+  | AT_KEYWORD(at) => "@" ++ at
   | AT_KEYFRAMES(at)
-  | AT_RULE(at)
-  | AT_RULE_STATEMENT(at) => "@ " ++ at
-  | UNICODE_RANGE(range) => "unicode range " ++ range
-  | HASH((h, _)) => "hash: #" ++ h
-  | STRING(s) => {|string "|} ++ s ++ {|"|}
-  | URL(u) => "url " ++ u
-  | INTERPOLATION(path) => "interpolation " ++ String.concat(".", path)
-  | DELIM(d) => "delimiter " ++ d
+  | AT_RULE(at) => "@" ++ at
+  | AT_RULE_STATEMENT(at) => "@" ++ at
+  | UNICODE_RANGE(range) => range
+  | HASH((h, _)) => "#" ++ h
+  | STRING(s) => "'" ++ s ++ "'"
+  | URL(u) => "url(" ++ u ++ ")"
+  | INTERPOLATION(path) => "$(" ++ String.concat(".", path) ++ ")"
+  | DELIM(d) => d
   | DOT => "."
   | ASTERISK => "*"
   | AMPERSAND => "&"
-  | NUMBER(f) => "number: " ++ Number_format.float_to_string(f)
-  | PERCENTAGE(f) =>
-    "percentage: " ++ Number_format.float_to_string(f) ++ string_of_char('%')
-  | DIMENSION((f, s)) =>
-    "dimension: " ++ Number_format.float_to_string(f) ++ s
-  | WS => "whitespace"
+  | NUMBER(f) => Number_format.float_to_string(f)
+  | PERCENTAGE(f) => Number_format.float_to_string(f) ++ string_of_char('%')
+  | DIMENSION((f, s)) => Number_format.float_to_string(f) ++ s
+  | WS => " "
   | COLON => ":"
   | DOUBLE_COLON => "::"
   | IMPORTANT => "!important"

@@ -69,7 +69,7 @@ and selector = (ast: Ast.selector) => {
     | Type(v) => v
     | Subclass(v) => render_subclass_selector(v)
     | Variable(v) => variable(v)
-    | Percentage(p) => Printf.sprintf("%s%%", p)
+    | Percentage(p) => Number_format.float_to_string(p) ++ "%"
   and render_subclass_selector: Ast.subclass_selector => string =
     fun
     | Ast.Id(v) => Printf.sprintf("#%s", v)
@@ -94,9 +94,21 @@ and selector = (ast: Ast.selector) => {
     | AN(an) when an == 1 => "n"
     | AN(an) when an == (-1) => "-n"
     | AN(an) => string_of_int(an) ++ "n"
-    | ANB(a, op, b) when a == 1 => "n" ++ op ++ string_of_int(b)
-    | ANB(a, op, b) when a == (-1) => "-n" ++ op ++ string_of_int(b)
-    | ANB(a, op, b) => string_of_int(a) ++ "n" ++ op ++ string_of_int(b)
+    | ANB(a, op, b) => {
+        let a_str =
+          switch (a) {
+          | 1 => "n"
+          | (-1) => "-n"
+          | _ => string_of_int(a) ++ "n"
+          };
+        let (actual_op, b_abs) =
+          if (b < 0) {
+            ("-", Int.abs(b));
+          } else {
+            (op, b);
+          };
+        a_str ++ actual_op ++ string_of_int(b_abs);
+      }
   and render_nth_payload =
     fun
     | Ast.Nth(nth) => render_nth(nth)
@@ -166,21 +178,18 @@ and component_value = (ast: Ast.component_value) => {
   | Whitespace => " "
   | Paren_block(block) => "(" ++ component_value_list(block) ++ ")"
   | Bracket_block(block) => "[" ++ component_value_list(block) ++ "]"
-  | Percentage(string) => string ++ "%"
+  | Percentage(value) => Number_format.float_to_string(value) ++ "%"
   | Ident(string) => string
   | String(string) => "\"" ++ string ++ "\""
   | Uri(string) => "url(\"" ++ string ++ "\")"
-  | Operator(string) => string
-  | Combinator(string) => string
   | Delim(string) => string
   | Function(name, body) =>
     let body = body |> fst |> component_value_list;
     Printf.sprintf("%s(%s)", fst(name), body);
   | Hash(string) => "#" ++ string
-  | Number(n) => n
+  | Number(n) => Number_format.float_to_string(n)
   | Unicode_range(string) => string
-  | Float_dimension((a, b)) => Printf.sprintf("%s%s", a, b)
-  | Dimension((a, b)) => Printf.sprintf("%s%s", a, b)
+  | Dimension((a, b)) => Number_format.float_to_string(a) ++ b
   | Variable(v) => variable(v)
   | Selector(v) => selector_list(v)
   };

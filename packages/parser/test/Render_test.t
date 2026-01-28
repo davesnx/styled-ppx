@@ -48,7 +48,7 @@ An+B microsyntax
   > li:nth-child(3n + 1) { foo: bar; }
   > li:nth-child(-n+ 6) { foo: bar; }
   > EOF
-  li:nth-child(even){foo:bar;}li:nth-child(odd){foo:bar;}li:nth-child(5){foo:bar;}li:nth-child(n){foo:bar;}li:nth-child(-4n+10){foo:bar;}li:nth-child(3n-6){foo:bar;}li:nth-child(3n+-6){foo:bar;}li:nth-child(3n+1){foo:bar;}li:nth-child(-n+6){foo:bar;}
+  li:nth-child(even){foo:bar;}li:nth-child(odd){foo:bar;}li:nth-child(5){foo:bar;}li:nth-child(n){foo:bar;}li:nth-child(-4n+10){foo:bar;}li:nth-child(3n-6){foo:bar;}li:nth-child(3n-6){foo:bar;}li:nth-child(3n+1){foo:bar;}li:nth-child(-n+6){foo:bar;}
 
 Remove empty rules
   $ cat << "EOF" | ./Render_test.exe
@@ -277,4 +277,4 @@ Multiple selectors
   >  }
   >  }
   > EOF
-  .classname{margin-right:20px;}.classname:hover .languageIcon{opacity:1.0;}.classname:hover svg > path{fill:#333;}.classname .menuOpened .languageIcon{opacity:1.0;}.classname .menuOpened svg > path{fill:#333;}
+  .classname{margin-right:20px;}.classname:hover .languageIcon{opacity:1;}.classname:hover svg > path{fill:#333;}.classname .menuOpened .languageIcon{opacity:1;}.classname .menuOpened svg > path{fill:#333;}

@@ -54,20 +54,17 @@ and component_value =
   | Whitespace
   | Paren_block(component_value_list)
   | Bracket_block(component_value_list)
-  | Percentage(string)
+  | Percentage(float)
   | Ident(string)
   | String(string)
   | Selector(selector_list)
   | Uri(string)
-  | Operator(string)
-  | Combinator(string)
   | Delim(string)
   | Function(with_loc(string), with_loc(component_value_list))
   | Hash(string)
-  | Number(string)
+  | Number(float)
   | Unicode_range(string)
-  | Float_dimension((string, string))
-  | Dimension((string, string))
+  | Dimension((float, string))
   | Variable(list(string))
 [@deriving show({ with_path: false })]
 and brace_block =
@@ -131,7 +128,7 @@ and simple_selector =
   | Type(string)
   | Subclass(subclass_selector)
   | Variable(list(string))
-  | Percentage(string)
+  | Percentage(float)
 [@deriving show({ with_path: false })]
 and subclass_selector =
   | Id(string)

@@ -30,33 +30,12 @@ let error_tests_data =
       {|div
         { color: red; _ }
       |},
-      "Parse error while reading token '}' on line 2 at position 23",
+      "Parse error while reading token '}' on line 2 at position 24",
     ),
     (
       "@media $",
       "Parse error while reading token '' on line 1 at position 7",
     ),
-    //(
-    //  /* whitespace must follow `not` */
-    //  "@media (not(color)){}",
-    //  "Parse error while reading token ')' on line 1 at position 17",
-    //),
-    //(
-    //  /* whitespace must follow `or` */
-    //  "@media (not (color)) or(hover) {}",
-    //  "Parse error while reading token 'or(' on line 1 at position 20",
-    //),
-    //(
-    //  /* whitespace must follow `and` */
-    //  "@media (not (color)) and(hover) {}",
-    //  "Parse error while reading token 'and(' on line 1 at position 20",
-    //),
-    // We handle this via the property parser
-    //(
-    //  /* space between < and = is invalid */
-    //  "@media (width < = 33px) {}",
-    //  "Parse error while reading token '=' on line 1 at position 15",
-    //),
   ]
   |> List.mapi((_index, (input, output)) => {
        let assertion = () =>

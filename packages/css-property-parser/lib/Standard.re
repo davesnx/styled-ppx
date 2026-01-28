@@ -6,7 +6,16 @@ let keyword =
   fun
   | "<=" => expect(LTE)
   | ">=" => expect(GTE)
-  | s => expect(IDENT(s));
+  | s =>
+    token(
+      fun
+      | IDENT(value)
+      | TAG(value) when value == s => Ok()
+      | token =>
+        Error([
+          "Expected '" ++ s ++ "'. Got '" ++ humanize(token) ++ "' instead.",
+        ]),
+    );
 
 let comma = expect(COMMA);
 let delim =
@@ -17,12 +26,16 @@ let delim =
   | "]" => expect(RIGHT_BRACKET)
   | ":" => expect(COLON)
   | ";" => expect(SEMI_COLON)
+  | "." => expect(DOT)
+  | "*" => expect(ASTERISK)
+  | "&" => expect(AMPERSAND)
   | s => expect(DELIM(s));
 let function_call = (name, rule) => {
   let.bind_match () =
     token(
       fun
       | FUNCTION(called_name) when name == called_name => Ok()
+      | NTH_FUNCTION(called_name) when name == called_name => Ok()
       | token =>
         Error([
           "Expected 'function "
@@ -60,7 +73,7 @@ let number =
 let length =
   token(token =>
     switch (token) {
-    | DIMENSION(number, dimension) =>
+    | DIMENSION((number, dimension)) =>
       switch (dimension) {
       | "cap" => Ok(`Cap(number))
       | "ch" => Ok(`Ch(number))
@@ -105,7 +118,7 @@ let length =
 let angle =
   token(token =>
     switch (token) {
-    | DIMENSION(number, dimension) =>
+    | DIMENSION((number, dimension)) =>
       switch (dimension) {
       | "deg" => Ok(`Deg(number))
       | "grad" => Ok(`Grad(number))
@@ -122,7 +135,7 @@ let angle =
 let time =
   token(token =>
     switch (token) {
-    | DIMENSION(number, dimension) =>
+    | DIMENSION((number, dimension)) =>
       switch (dimension) {
       | "s" => Ok(`S(number))
       | "ms" => Ok(`Ms(number))
@@ -136,7 +149,7 @@ let time =
 let frequency =
   token(token =>
     switch (token) {
-    | DIMENSION(number, dimension) =>
+    | DIMENSION((number, dimension)) =>
       switch (dimension |> String.lowercase_ascii) {
       | "hz" => Ok(`Hz(number))
       | "khz" => Ok(`KHz(number))
@@ -150,7 +163,7 @@ let frequency =
 let resolution =
   token(token =>
     switch (token) {
-    | DIMENSION(number, dimension) =>
+    | DIMENSION((number, dimension)) =>
       switch (dimension |> String.lowercase_ascii) {
       | "dpi" => Ok(`Dpi(number))
       | "dpcm" => Ok(`Dpcm(number))
@@ -175,7 +188,8 @@ let percentage =
 let ident =
   token(
     fun
-    | IDENT(string) => Ok(string)
+    | IDENT(string)
+    | TAG(string) => Ok(string)
     | _ => Error(["Expected an indentifier."]),
   );
 
@@ -194,7 +208,8 @@ let css_wide_keywords =
 let custom_ident =
   token(
     fun
-    | IDENT(string) => Ok(string)
+    | IDENT(string)
+    | TAG(string) => Ok(string)
     | STRING(string) => Ok(string)
     | _ => Error(["Expected an identifier."]),
   );
@@ -236,7 +251,7 @@ let url_no_interp = {
 let hex_color =
   token(
     fun
-    | HASH(str, _) when String.length(str) >= 3 && String.length(str) <= 8 =>
+    | HASH((str, _)) when String.length(str) >= 3 && String.length(str) <= 8 =>
       Ok(str)
     | _ => Error(["Expected a hex-color."]),
   );
@@ -247,32 +262,21 @@ let hex_color =
      In compile-time the bs-css bindings would enforce the types of those variables.
    */
 let interpolation = {
-  open Rule;
-  open Rule.Let;
-
-  let.bind_match _ = Pattern.expect(DELIM("$"));
-  let.bind_match _ = Pattern.expect(LEFT_PAREN);
-  let.bind_match path = {
-    let.bind_match path =
-      Modifier.zero_or_more(
-        {
-          let.bind_match ident = ident;
-          let.bind_match _ = Pattern.expect(DELIM("."));
-          Match.return(ident);
-        },
-      );
-    let.bind_match ident = ident;
-    Match.return(path @ [ident]);
-  };
-  let.bind_match _ = Pattern.expect(RIGHT_PAREN);
-
-  Match.return(path);
+  token(
+    fun
+    | INTERPOLATION(path) => Ok(path)
+    | token =>
+      Error([
+        "Expected interpolation. Got '" ++ humanize(token) ++ "' instead.",
+      ]),
+  );
 };
 
 let media_type =
   token(
     fun
-    | IDENT(value) => {
+    | IDENT(value)
+    | TAG(value) => {
         switch (value) {
         | "only"
         | "not"
@@ -315,7 +319,7 @@ let container_name = {
 let flex_value =
   token(
     fun
-    | DIMENSION(number, dimension) =>
+    | DIMENSION((number, dimension)) =>
       switch (dimension) {
       | "fr" => Ok(`Fr(number))
       | _ =>
@@ -334,10 +338,13 @@ let custom_ident_without_span_or_auto =
   token(
     fun
     | IDENT("auto")
+    | TAG("auto")
     | STRING("auto")
     | IDENT("span")
+    | TAG("span")
     | STRING("span") => Error(["Custom ident cannot be span or auto."])
-    | IDENT(string) => Ok(string)
+    | IDENT(string)
+    | TAG(string) => Ok(string)
     | STRING(string) => Ok(string)
     | _ => Error(["expected an identifier."]),
   );
@@ -355,7 +362,8 @@ let string_token =
 let ident_token =
   token(
     fun
-    | IDENT(string) => Ok(string)
+    | IDENT(string)
+    | TAG(string) => Ok(string)
     | _ => Error(["expected an identifier."]),
   );
 

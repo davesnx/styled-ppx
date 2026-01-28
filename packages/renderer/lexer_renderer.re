@@ -20,7 +20,16 @@ switch (input, help) {
   EXAMPLE: dune exec lexer-renderer \".a { color: red }\"\n",
   )
 | (Some(css), _) =>
-  let okInput = Styled_ppx_css_parser.Lexer.tokenize(css) |> Result.get_ok;
+  let tokens = Styled_ppx_css_parser.Lexer.from_string(css);
+  let okInput =
+    tokens
+    |> List.filter_map(({ Styled_ppx_css_parser.Lexer.txt, loc }) =>
+         switch (txt) {
+         | Ok(token) => Some((token, loc.loc_start, loc.loc_end))
+         | Error(_) => None
+         }
+       )
+    |> List.rev;
   let debug = Styled_ppx_css_parser.Lexer.to_debug(okInput);
   print_endline(debug);
 };
