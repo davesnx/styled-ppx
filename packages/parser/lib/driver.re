@@ -21,7 +21,7 @@ let parse = (~loc: Ppxlib.location, lexbuf, parser) => {
     let msg =
       Printf.sprintf(
         "Parse error while reading token '%s'",
-        Tokens.token_to_string(token),
+        Tokens.humanize(token),
       );
     Error((loc, msg));
   };

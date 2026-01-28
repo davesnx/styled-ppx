@@ -779,12 +779,7 @@ let from_string = string => {
   read([]);
 };
 
-let render_token =
-  fun
-  | EOF => ""
-  | t => Tokens.token_to_debug(t);
-
-let position_to_string = pos =>
+let format_position = pos =>
   Printf.sprintf(
     "[%d,%d+%d]",
     pos.Lexing.pos_lnum,
@@ -792,22 +787,16 @@ let position_to_string = pos =>
     pos.Lexing.pos_cnum - pos.Lexing.pos_bol,
   );
 
-let debug_token = ((token, loc_start, loc_end)) => {
-  let pos_start = position_to_string(loc_start);
-  let pos_end = position_to_string(loc_end);
+let format_token_with_location = ((token, loc_start, loc_end)) =>
   Printf.sprintf(
     "%s %s..%s",
-    Tokens.token_to_debug(token),
-    pos_start,
-    pos_end,
+    Tokens.to_debug(token),
+    format_position(loc_start),
+    format_position(loc_end),
   );
-};
 
-let to_string = tokens =>
+let debug = tokens =>
   tokens
-  |> List.map(((t, _, _)) => render_token(t))
-  |> String.concat(" ")
+  |> List.map(format_token_with_location)
+  |> String.concat("\n")
   |> String.trim;
-
-let to_debug = tokens =>
-  tokens |> List.map(debug_token) |> String.concat("\n") |> String.trim;

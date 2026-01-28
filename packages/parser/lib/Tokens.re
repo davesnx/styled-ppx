@@ -64,80 +64,42 @@ let show_error =
 let humanize =
   fun
   | EOF => "the end"
-  | IDENT(str) => str
-  | TAG(str) => str
-  | FUNCTION(f) => f
-  | NTH_FUNCTION(f) => f
-  | AT_KEYWORD(at) => "@" ++ at
-  | AT_KEYFRAMES(at)
-  | AT_RULE(at) => "@" ++ at
-  | AT_RULE_STATEMENT(at) => "@" ++ at
-  | UNICODE_RANGE(range) => range
-  | HASH((h, _)) => "#" ++ h
-  | STRING(s) => "'" ++ s ++ "'"
-  | URL(u) => "url(" ++ u ++ ")"
-  | INTERPOLATION(path) => "$(" ++ String.concat(".", path) ++ ")"
-  | DELIM(d) => d
-  | DOT => "."
-  | ASTERISK => "*"
-  | AMPERSAND => "&"
-  | NUMBER(f) => Number_format.float_to_string(f)
-  | PERCENTAGE(f) => Number_format.float_to_string(f) ++ string_of_char('%')
-  | DIMENSION((f, s)) => Number_format.float_to_string(f) ++ s
-  | WS => " "
-  | COLON => ":"
-  | DOUBLE_COLON => "::"
-  | IMPORTANT => "!important"
-  | SEMI_COLON => ";"
-  | COMMA => ","
-  | LEFT_BRACKET => "["
-  | RIGHT_BRACKET => "]"
-  | LEFT_PAREN => "("
-  | RIGHT_PAREN => ")"
-  | LEFT_BRACE => "{"
-  | RIGHT_BRACE => "}"
-  | GTE => ">="
-  | LTE => "<=";
-
-let token_to_string =
-  fun
-  | EOF => ""
-  | LEFT_BRACE => "{"
-  | RIGHT_BRACE => "}"
-  | LEFT_PAREN => "("
-  | RIGHT_PAREN => ")"
-  | LEFT_BRACKET => "["
-  | RIGHT_BRACKET => "]"
-  | COLON => ":"
-  | DOUBLE_COLON => "::"
-  | SEMI_COLON => ";"
-  | COMMA => ","
-  | IMPORTANT => "!important"
   | IDENT(s) => s
   | TAG(s) => s
-  | STRING(s) => "'" ++ s ++ "'"
   | FUNCTION(fn) => fn ++ "("
   | NTH_FUNCTION(fn) => fn ++ "("
-  | URL(url) => "url(" ++ url ++ ")"
   | AT_KEYWORD(s) => "@" ++ s
   | AT_KEYFRAMES(s) => "@" ++ s
   | AT_RULE_STATEMENT(s) => "@" ++ s
   | AT_RULE(s) => "@" ++ s
-  | HASH((s, _)) => "#" ++ s
-  | NUMBER(n) => Number_format.float_to_string(n)
-  | PERCENTAGE(n) => Number_format.float_to_string(n) ++ "%"
-  | DIMENSION((n, d)) => Number_format.float_to_string(n) ++ d
   | UNICODE_RANGE(s) => s
+  | HASH((s, _)) => "#" ++ s
+  | STRING(s) => "'" ++ s ++ "'"
+  | URL(url) => "url(" ++ url ++ ")"
   | INTERPOLATION(v) => "$(" ++ String.concat(".", v) ++ ")"
   | DELIM(s) => s
   | DOT => "."
   | ASTERISK => "*"
   | AMPERSAND => "&"
+  | NUMBER(n) => Number_format.float_to_string(n)
+  | PERCENTAGE(n) => Number_format.float_to_string(n) ++ "%"
+  | DIMENSION((n, d)) => Number_format.float_to_string(n) ++ d
   | WS => " "
+  | COLON => ":"
+  | DOUBLE_COLON => "::"
+  | IMPORTANT => "!important"
+  | SEMI_COLON => ";"
+  | COMMA => ","
+  | LEFT_BRACKET => "["
+  | RIGHT_BRACKET => "]"
+  | LEFT_PAREN => "("
+  | RIGHT_PAREN => ")"
+  | LEFT_BRACE => "{"
+  | RIGHT_BRACE => "}"
   | GTE => ">="
   | LTE => "<=";
 
-let token_to_debug =
+let to_debug =
   fun
   | EOF => "EOF"
   | LEFT_BRACE => "LEFT_BRACE"

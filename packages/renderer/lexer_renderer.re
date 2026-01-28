@@ -30,6 +30,6 @@ switch (input, help) {
          }
        )
     |> List.rev;
-  let debug = Styled_ppx_css_parser.Lexer.to_debug(okInput);
+  let debug = Styled_ppx_css_parser.Lexer.debug(okInput);
   print_endline(debug);
 };
