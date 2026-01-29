@@ -48,7 +48,6 @@ let parse_string = (~loc, ~initial_mode, parser, string) => {
 };
 
 let parse_declaration_list = (~loc, input: string) => {
-  // In declaration_list context, we're inside a block - can have declarations or nested rules
   parse_string(
     ~loc,
     ~initial_mode=Tokens.Declaration_block,
@@ -58,7 +57,6 @@ let parse_declaration_list = (~loc, input: string) => {
 };
 
 let parse_declaration = (~loc, input: string) =>
-  // Single declaration context
   parse_string(
     ~loc,
     ~initial_mode=Tokens.Declaration_block,
@@ -67,9 +65,7 @@ let parse_declaration = (~loc, input: string) =>
   );
 
 let parse_stylesheet = (~loc, input: string) =>
-  // Stylesheet starts at toplevel - expecting selectors
   parse_string(~loc, ~initial_mode=Tokens.Toplevel, Parser.stylesheet, input);
 
 let parse_keyframes = (~loc, input: string) =>
-  // Keyframes context
   parse_string(~loc, ~initial_mode=Tokens.Toplevel, Parser.keyframes, input);

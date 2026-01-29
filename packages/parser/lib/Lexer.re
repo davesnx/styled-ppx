@@ -757,7 +757,7 @@ type token_with_location = {
   loc: Location.t,
 };
 
-let from_string = (~initial_mode=Declaration_value, string) => {
+let from_string = (~initial_mode, string) => {
   let lexbuf = Sedlexing.Utf8.from_string(string);
   let state = {
     mode: initial_mode,

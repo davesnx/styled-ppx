@@ -4,7 +4,8 @@ module Tokens = Styled_ppx_css_parser.Tokens;
 module Lexer = Styled_ppx_css_parser.Lexer;
 
 let parse = input => {
-  let values = Lexer.from_string(input);
+  let values =
+    Lexer.from_string(~initial_mode=Tokens.Declaration_value, input);
   let Lexer.{ loc, _ } = List.hd(values);
   let values = values |> List.map((Lexer.{ txt, _ }) => txt);
   (loc, values);
@@ -170,7 +171,8 @@ let lexer_error_tests =
   |> List.map(((input, output)) => {
        test_case(input, `Quick, () =>
          try({
-           let _ = Lexer.from_string(input);
+           let _ =
+             Lexer.from_string(~initial_mode=Tokens.Declaration_value, input);
            fail("Expected LexingError but got success");
          }) {
          | Lexer.LexingError((_, _, msg)) =>

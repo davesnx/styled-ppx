@@ -20,7 +20,11 @@ switch (input, help) {
   EXAMPLE: dune exec lexer-renderer \".a { color: red }\"\n",
   )
 | (Some(css), _) =>
-  let tokens = Styled_ppx_css_parser.Lexer.from_string(css);
+  let tokens =
+    Styled_ppx_css_parser.Lexer.from_string(
+      ~initial_mode=Styled_ppx_css_parser.Tokens.Declaration_value,
+      css,
+    );
   let okInput =
     tokens
     |> List.filter_map(({ Styled_ppx_css_parser.Lexer.txt, loc }) =>
