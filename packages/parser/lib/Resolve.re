@@ -307,7 +307,13 @@ let join_media =
       (right, right_loc): with_loc(component_value_list),
     ) => {
   let new_loc = Parser_location.intersection(left_loc, right_loc);
-  (left @ [(Ident("and"), Ppxlib.Location.none)] @ right, new_loc);
+  let none = Ppxlib.Location.none;
+  (
+    left
+    @ [(Whitespace, none), (Ident("and"), none), (Whitespace, none)]
+    @ right,
+    new_loc,
+  );
 };
 
 let split_by_kind = (rules: list(rule)) => {

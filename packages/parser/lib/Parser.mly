@@ -45,6 +45,7 @@ let nth_operator_from_delim =
 %token ASTERISK
 %token COMMA
 %token DESCENDANT_COMBINATOR
+%token WS
 %token GTE
 %token LTE
 %token <string> IDENT
@@ -504,6 +505,7 @@ relative_selector:
   | c = combinator xs = complex_selector { RelativeSelector { combinator = Some c; complex_selector = xs } }
 
 value:
+  | WS { Whitespace }
   | b = paren_block(values) { Paren_block b }
   | b = bracket_block(values) { Bracket_block b }
   | n = percentage { Percentage n }

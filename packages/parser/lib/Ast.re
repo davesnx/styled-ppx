@@ -51,6 +51,7 @@ type declaration = {
 and component_value_list = list(with_loc(component_value))
 [@deriving show({ with_path: false })]
 and component_value =
+  | Whitespace
   | Paren_block(component_value_list)
   | Bracket_block(component_value_list)
   | Percentage(float)

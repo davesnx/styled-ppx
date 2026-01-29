@@ -1,3 +1,10 @@
+let rec strip_leading_whitespace = (ast: Ast.component_value_list) =>
+  switch (ast) {
+  | [] => []
+  | [(Whitespace, _), ...rest] => strip_leading_whitespace(rest)
+  | xs => xs
+  };
+
 let rec stylesheet = (ast: Ast.stylesheet) => {
   ast |> fst |> List.map(rule) |> String.concat("");
 }
@@ -19,7 +26,7 @@ and at_rule = ({ name, prelude, block, _ }: Ast.at_rule) => {
   Printf.sprintf(
     "@%s %s{%s}",
     name |> fst,
-    prelude |> fst |> component_value_list,
+    prelude |> fst |> strip_leading_whitespace |> component_value_list,
     brace_block(block),
   );
 }
@@ -51,7 +58,7 @@ and declaration = ({ name, value, important, _ }: Ast.declaration) => {
   Printf.sprintf(
     "%s:%s%s;",
     name |> fst,
-    value |> fst |> component_value_list,
+    value |> fst |> strip_leading_whitespace |> component_value_list,
     important |> fst ? " !important" : "",
   );
 }
@@ -175,6 +182,7 @@ and selector_list = (ast: Ast.selector_list) => {
 }
 and component_value = (ast: Ast.component_value) => {
   switch (ast) {
+  | Whitespace => " "
   | Paren_block(block) => "(" ++ component_value_list(block) ++ ")"
   | Bracket_block(block) => "[" ++ component_value_list(block) ++ "]"
   | Percentage(value) => Number_format.float_to_string(value) ++ "%"

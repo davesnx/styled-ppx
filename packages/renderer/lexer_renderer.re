@@ -22,7 +22,7 @@ switch (input, help) {
 | (Some(css), _) =>
   let tokens =
     Styled_ppx_css_parser.Lexer.from_string(
-      ~initial_mode=Styled_ppx_css_parser.Tokens.Declaration_value,
+      ~initial_mode=Styled_ppx_css_parser.Lexer_context.Declaration_value,
       css,
     );
   let okInput =

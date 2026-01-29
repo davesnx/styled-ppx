@@ -2,10 +2,11 @@ open Alcotest;
 
 module Tokens = Styled_ppx_css_parser.Tokens;
 module Lexer = Styled_ppx_css_parser.Lexer;
+module Lexer_context = Styled_ppx_css_parser.Lexer_context;
 
 let parse = input => {
   let values =
-    Lexer.from_string(~initial_mode=Tokens.Declaration_value, input);
+    Lexer.from_string(~initial_mode=Lexer_context.Declaration_value, input);
   let Lexer.{ loc, _ } = List.hd(values);
   let values = values |> List.map((Lexer.{ txt, _ }) => txt);
   (loc, values);
@@ -37,7 +38,7 @@ let success_tests =
     ({|-inset-3\.5|}, [IDENT("-inset-3.5")]),
     ({|inset-1\/3|}, [IDENT("inset-1/3")]),
     ({|\32xl\:container|}, [IDENT("2xl:container")]),
-    (" \n\t ", [EOF]),
+    (" \n\t ", [WS]),
     ({|"something"|}, [STRING("something")]),
     ({|'tuturu'|}, [STRING("tuturu")]),
     ({|#2|}, [HASH(("2", `UNRESTRICTED))]),
@@ -46,7 +47,7 @@ let success_tests =
     ({|(|}, [LEFT_PAREN]),
     ({|)|}, [RIGHT_PAREN]),
     ({|+12.3|}, [NUMBER(12.3)]),
-    ({|+ 12.3|}, [DELIM("+"), NUMBER(12.3)]),
+    ({|+ 12.3|}, [DELIM("+"), WS, NUMBER(12.3)]),
     ({|+|}, [DELIM("+")]),
     ({|,|}, [COMMA]),
     ({|45.6|}, [NUMBER(45.6)]),
@@ -67,12 +68,12 @@ let success_tests =
     ({|;|}, [SEMI_COLON]),
     ({|<|}, [DELIM("<")]),
     ({|not|}, [IDENT("not")]),
-    ({|not |}, [IDENT("not")]),
+    ({|not |}, [IDENT("not"), WS]),
     ({|only|}, [IDENT("only")]),
-    ({|only |}, [IDENT("only")]),
+    ({|only |}, [IDENT("only"), WS]),
     ({|and|}, [IDENT("and")]),
-    ({|and |}, [IDENT("and")]),
-    ({|or |}, [IDENT("or")]),
+    ({|and |}, [IDENT("and"), WS]),
+    ({|or |}, [IDENT("or"), WS]),
     ({|all|}, [IDENT("all")]),
     ({|screen|}, [IDENT("screen")]),
     ({|print|}, [IDENT("print")]),
@@ -91,7 +92,7 @@ let success_tests =
     ({|bar|}, [IDENT("bar")]),
     ({|div|}, [IDENT("div")]),
     ({|!|}, [DELIM("!")]),
-    ("1 / 1", [NUMBER(1.), DELIM("/"), NUMBER(1.)]),
+    ("1 / 1", [NUMBER(1.), WS, DELIM("/"), WS, NUMBER(1.)]),
     (
       {|url($(Module.variable))|},
       [FUNCTION("url"), INTERPOLATION(["Module", "variable"]), RIGHT_PAREN],
@@ -101,7 +102,9 @@ let success_tests =
       [
         FUNCTION("calc"),
         DIMENSION((10., "px")),
+        WS,
         DELIM("+"),
+        WS,
         DIMENSION((10., "px")),
         RIGHT_PAREN,
       ],
@@ -113,6 +116,7 @@ let success_tests =
         FUNCTION("calc"),
         DIMENSION((10., "px")),
         DELIM("+"),
+        WS,
         DIMENSION((10., "px")),
         RIGHT_PAREN,
       ],
@@ -125,6 +129,7 @@ let success_tests =
         COLON,
         FUNCTION("url"),
         STRING("img_tree.gif"),
+        WS,
         RIGHT_PAREN,
       ],
     ),
@@ -142,17 +147,17 @@ let success_tests =
     /* nice */
 
     div {}|},
-      [IDENT("div"), LEFT_BRACE, RIGHT_BRACE],
+      [WS, IDENT("div"), WS, LEFT_BRACE, RIGHT_BRACE],
     ),
     (
       {|
     div /*nice*/ /* nice */   /*ice*/.b {}|},
-      [IDENT("div"), DOT, IDENT("b"), LEFT_BRACE, RIGHT_BRACE],
+      [WS, IDENT("div"), WS, DOT, IDENT("b"), WS, LEFT_BRACE, RIGHT_BRACE],
     ),
     (
       {|
     div/*nice*//* nice *//*ice*/.b {}|},
-      [IDENT("div"), DOT, IDENT("b"), LEFT_BRACE, RIGHT_BRACE],
+      [WS, IDENT("div"), DOT, IDENT("b"), WS, LEFT_BRACE, RIGHT_BRACE],
     ),
     ({|nth-child(|}, [NTH_FUNCTION("nth-child")]),
   ]
@@ -172,7 +177,10 @@ let lexer_error_tests =
        test_case(input, `Quick, () =>
          try({
            let _ =
-             Lexer.from_string(~initial_mode=Tokens.Declaration_value, input);
+             Lexer.from_string(
+               ~initial_mode=Lexer_context.Declaration_value,
+               input,
+             );
            fail("Expected LexingError but got success");
          }) {
          | Lexer.LexingError((_, _, msg)) =>
@@ -220,7 +228,7 @@ let error_tests = lexer_error_tests @ soft_error_tests;
 let test_with_location =
   [
     ({||}, [EOF], 0),
-    (" \n\t ", [Tokens.EOF], 4),
+    (" \n\t ", [Tokens.WS], 4),
     ({|"something"|}, [STRING("something")], 11),
     ({|#2|}, [HASH(("2", `UNRESTRICTED))], 2),
     ({|#abc|}, [HASH(("abc", `ID))], 4),
@@ -254,13 +262,15 @@ let test_with_location =
     ({|bar|}, [IDENT("bar")], 3),
     ({|div|}, [IDENT("div")], 3),
     ({|!|}, [DELIM("!")], 1),
-    ("1 / 1", [NUMBER(1.), DELIM("/"), NUMBER(1.)], 5),
+    ("1 / 1", [NUMBER(1.), WS, DELIM("/"), WS, NUMBER(1.)], 5),
     (
       {|calc(10px + 10px)|},
       [
         FUNCTION("calc"),
         DIMENSION((10., "px")),
+        WS,
         DELIM("+"),
+        WS,
         DIMENSION((10., "px")),
         RIGHT_PAREN,
       ],
@@ -273,6 +283,7 @@ let test_with_location =
         COLON,
         FUNCTION("url"),
         STRING("img_tree.gif"),
+        WS,
         RIGHT_PAREN,
       ],
       37,
@@ -283,6 +294,7 @@ let test_with_location =
         FUNCTION("calc"),
         DIMENSION((10., "px")),
         DELIM("+"),
+        WS,
         DIMENSION((10., "px")),
         RIGHT_PAREN,
       ],
@@ -339,7 +351,7 @@ let selector_mode_tests =
   [
     (
       {|&.bar,&.foo {}|},
-      Tokens.Declaration_block,
+      Lexer_context.Declaration_block,
       [
         AMPERSAND,
         DOT,
@@ -354,17 +366,17 @@ let selector_mode_tests =
     ),
     (
       {|&>a {}|},
-      Tokens.Declaration_block,
+      Lexer_context.Declaration_block,
       [AMPERSAND, DELIM(">"), TYPE_SELECTOR("a"), LEFT_BRACE, RIGHT_BRACE],
     ),
     (
       {|#bar {}|},
-      Tokens.Declaration_block,
+      Lexer_context.Declaration_block,
       [HASH(("bar", `ID)), LEFT_BRACE, RIGHT_BRACE],
     ),
     (
       {|#bar{}|},
-      Tokens.Declaration_block,
+      Lexer_context.Declaration_block,
       [HASH(("bar", `ID)), LEFT_BRACE, RIGHT_BRACE],
     ),
   ]

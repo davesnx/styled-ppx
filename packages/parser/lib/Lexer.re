@@ -5,6 +5,7 @@ module Types = Ast;
 module Location = Ppxlib.Location;
 
 open Tokens;
+open Lexer_context;
 
 let (let.ok) = Result.bind;
 
@@ -424,16 +425,74 @@ let consume_ident_like = (~state, lexbuf) => {
       Ok(TYPE_SELECTOR(string));
     | Selector => Ok(TYPE_SELECTOR(string))
     | Declaration_block =>
+      let rec scan_colon_target = (paren_depth, bracket_depth) =>
+        switch (Sedlexing.next(lexbuf)) {
+        | None => true
+        | Some(c) => scan_colon_char(c, paren_depth, bracket_depth)
+        }
+      and scan_colon_char = (c, paren_depth, bracket_depth) => {
+        let code = Uchar.to_int(c);
+        switch (code) {
+        | 34 => scan_string(34, paren_depth, bracket_depth)
+        | 39 => scan_string(39, paren_depth, bracket_depth)
+        | 40 => scan_colon_target(paren_depth + 1, bracket_depth)
+        | 41 =>
+          let next_paren_depth = paren_depth > 0 ? paren_depth - 1 : 0;
+          scan_colon_target(next_paren_depth, bracket_depth);
+        | 91 => scan_colon_target(paren_depth, bracket_depth + 1)
+        | 93 =>
+          let next_bracket_depth = bracket_depth > 0 ? bracket_depth - 1 : 0;
+          scan_colon_target(paren_depth, next_bracket_depth);
+        | 123 =>
+          paren_depth == 0 && bracket_depth == 0
+            ? false : scan_colon_target(paren_depth, bracket_depth)
+        | 59
+        | 125 =>
+          paren_depth == 0 && bracket_depth == 0
+            ? true : scan_colon_target(paren_depth, bracket_depth)
+        | 47 => scan_slash(paren_depth, bracket_depth)
+        | _ => scan_colon_target(paren_depth, bracket_depth)
+        };
+      }
+      and scan_string = (quote, paren_depth, bracket_depth) =>
+        switch (Sedlexing.next(lexbuf)) {
+        | None => true
+        | Some(c) =>
+          let code = Uchar.to_int(c);
+          if (code == quote) {
+            scan_colon_target(paren_depth, bracket_depth);
+          } else if (code == 92) {
+            let _ = Sedlexing.next(lexbuf);
+            scan_string(quote, paren_depth, bracket_depth);
+          } else {
+            scan_string(quote, paren_depth, bracket_depth);
+          };
+        }
+      and scan_slash = (paren_depth, bracket_depth) =>
+        switch (Sedlexing.next(lexbuf)) {
+        | None => true
+        | Some(c) =>
+          if (Uchar.to_int(c) == 42) {
+            scan_comment(false, paren_depth, bracket_depth);
+          } else {
+            scan_colon_char(c, paren_depth, bracket_depth);
+          }
+        }
+      and scan_comment = (prev_star, paren_depth, bracket_depth) =>
+        switch (Sedlexing.next(lexbuf)) {
+        | None => true
+        | Some(c) =>
+          let code = Uchar.to_int(c);
+          if (prev_star && code == 47) {
+            scan_colon_target(paren_depth, bracket_depth);
+          } else {
+            scan_comment(code == 42, paren_depth, bracket_depth);
+          };
+        };
       let is_property_colon =
         check(lexbuf => {
           switch (Sedlexing.next(lexbuf)) {
-          | Some(c1) when Uchar.to_int(c1) == 58 =>
-            switch (Sedlexing.next(lexbuf)) {
-            | Some(c2) =>
-              let c2_int = Uchar.to_int(c2);
-              c2_int == 32 || c2_int == 9 || c2_int == 10 || c2_int == 13;
-            | None => true
-            }
+          | Some(c1) when Uchar.to_int(c1) == 58 => scan_colon_target(0, 0)
           | _ => false
           }
         });
@@ -632,9 +691,9 @@ let rec consume = (~state, lexbuf) => {
         };
       }
     | Declaration_value
+    | At_rule_prelude => Ok(Tokens.WS)
     | Toplevel
-    | Declaration_block
-    | At_rule_prelude => consume(~state, lexbuf)
+    | Declaration_block => consume(~state, lexbuf)
     };
   | important => Ok(IMPORTANT)
   | variable =>

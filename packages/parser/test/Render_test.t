@@ -229,7 +229,7 @@ Media query nested
   >   }
   > }
   > EOF
-  max-width:800px;@media (min-width: 300px) {margin-left:10px;}@media (min-width: 300px) and (max-width: 768px) {position:fixed;}@media (max-width: 768px) and (min-width: 300px) and (max-width: 1200px) {border:1px solid transparent;}@media (max-width: 1200px) and (min-width: 300px) and (max-width: 768px) and (max-width: 1200px) {border:1px solid transparent;}@media (max-width: 1200px) and (max-width: 768px) and (min-width: 300px) and (max-width: 1200px) and (max-width: 1200px) {border:1px solid transparent;}@media (max-width: 1200px) and (max-width: 1200px) and (min-width: 300px) and (max-width: 768px) and (max-width: 1200px) and (max-width: 1200px) {border:1px solid transparent;}
+  max-width:800px;@media (min-width: 300px) {margin-left:10px;}@media (min-width: 300px) and (max-width: 768px) {position:fixed;}@media (min-width: 300px) and (max-width: 768px) and (max-width: 1200px) {border:1px solid transparent;}@media (min-width: 300px) and (max-width: 768px) and (max-width: 1200px) and (max-width: 1200px) {border:1px solid transparent;}@media (min-width: 300px) and (max-width: 768px) and (max-width: 1200px) and (max-width: 1200px) and (max-width: 1200px) {border:1px solid transparent;}@media (min-width: 300px) and (max-width: 768px) and (max-width: 1200px) and (max-width: 1200px) and (max-width: 1200px) and (max-width: 1200px) {border:1px solid transparent;}
 
 Complex selector test
   $ cat << "EOF" | ./Render_test.exe

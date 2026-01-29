@@ -1977,8 +1977,14 @@ let apply_parser = (parser, tokens_with_loc) => {
     | Error([message, ..._]) => Error(message)
     | Error([]) => Error("weird")
     };
-  let.ok () =
-    switch (remaining_tokens) {
+  let.ok () = {
+    let rec filter_ws = tokens =>
+      switch (tokens) {
+      | [] => []
+      | [Tokens.WS, ...rest] => filter_ws(rest)
+      | [t, ...rest] => [t, ...filter_ws(rest)]
+      };
+    switch (remaining_tokens |> filter_ws) {
     | []
     | [Tokens.EOF] => Ok()
     | tokens =>
@@ -1986,13 +1992,14 @@ let apply_parser = (parser, tokens_with_loc) => {
         tokens |> List.map(Tokens.show_token) |> String.concat(", ");
       Error("tokens remaining: " ++ tokens);
     };
+  };
   Ok(output);
 };
 
 let parse = (rule_parser: Rule.rule('a), str) => {
   let tokens_with_loc =
     Styled_ppx_css_parser.Lexer.from_string(
-      ~initial_mode=Tokens.Declaration_value,
+      ~initial_mode=Lexer_context.Declaration_value,
       str,
     );
   apply_parser(rule_parser, tokens_with_loc);

@@ -2,7 +2,7 @@ module Location = Ppxlib.Location;
 
 let menhir = MenhirLib.Convert.Simplified.traditional2revised;
 
-let make_state = (~initial_mode): Tokens.lexer_state => {
+let make_state = (~initial_mode): Lexer_context.lexer_state => {
   mode: initial_mode,
   paren_depth: 0,
   brace_depth: 0,
@@ -13,7 +13,12 @@ let make_state = (~initial_mode): Tokens.lexer_state => {
 };
 
 let parse =
-    (~loc: Ppxlib.location, ~initial_mode: Tokens.lexer_mode, lexbuf, parser) => {
+    (
+      ~loc: Ppxlib.location,
+      ~initial_mode: Lexer_context.lexer_mode,
+      lexbuf,
+      parser,
+    ) => {
   let state = make_state(~initial_mode);
   let last_token = ref((Tokens.EOF, Lexing.dummy_pos, Lexing.dummy_pos));
 
@@ -50,7 +55,7 @@ let parse_string = (~loc, ~initial_mode, parser, string) => {
 let parse_declaration_list = (~loc, input: string) => {
   parse_string(
     ~loc,
-    ~initial_mode=Tokens.Declaration_block,
+    ~initial_mode=Lexer_context.Declaration_block,
     Parser.declaration_list,
     input,
   );
@@ -59,13 +64,23 @@ let parse_declaration_list = (~loc, input: string) => {
 let parse_declaration = (~loc, input: string) =>
   parse_string(
     ~loc,
-    ~initial_mode=Tokens.Declaration_block,
+    ~initial_mode=Lexer_context.Declaration_block,
     Parser.declaration,
     input,
   );
 
 let parse_stylesheet = (~loc, input: string) =>
-  parse_string(~loc, ~initial_mode=Tokens.Toplevel, Parser.stylesheet, input);
+  parse_string(
+    ~loc,
+    ~initial_mode=Lexer_context.Toplevel,
+    Parser.stylesheet,
+    input,
+  );
 
 let parse_keyframes = (~loc, input: string) =>
-  parse_string(~loc, ~initial_mode=Tokens.Toplevel, Parser.keyframes, input);
+  parse_string(
+    ~loc,
+    ~initial_mode=Lexer_context.Toplevel,
+    Parser.keyframes,
+    input,
+  );
