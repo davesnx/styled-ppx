@@ -1970,9 +1970,7 @@ let apply_parser = (parser, tokens_with_loc) => {
        )
     |> List.rev;
 
-  let tokens_without_ws = tokens |> List.filter((!=)(Tokens.WS));
-
-  let (output, remaining_tokens) = parser(tokens_without_ws);
+  let (output, remaining_tokens) = parser(tokens);
   let.ok output =
     switch (output) {
     | Ok(data) => Ok(data)

@@ -13,7 +13,7 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 6, characters 11-18:
+  File "input.re", line 6, characters 10-18:
   Error: Property 'color' has an invalid value: 'cositas',
          Expected 'function color-mix'. Got 'cositas' instead.
   [1]

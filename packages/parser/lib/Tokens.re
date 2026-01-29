@@ -1,8 +1,8 @@
 [@deriving show({ with_path: false })]
 type token =
   | EOF
-  | IDENT(string) // <ident-token>
-  | TAG(string) // <tag-token> (non-standard)
+  | IDENT(string) // <ident-token> - in value context
+  | TYPE_SELECTOR(string) // <type-selector-token> - in selector context (div, span, etc.)
   | FUNCTION(string) // <function-token>
   | NTH_FUNCTION(string) // <function-token> (nth-*)
   | AT_KEYWORD(string) // <at-keyword-token>
@@ -29,7 +29,7 @@ type token =
   | NUMBER(float) // <number-token>
   | PERCENTAGE(float) // <percentage-token>
   | DIMENSION((float, string)) // <dimension-token>
-  | WS // <whitespace-token>
+  | DESCENDANT_COMBINATOR // whitespace as selector combinator (div span)
   | COLON // <colon-token>
   | DOUBLE_COLON // <double-colon-token>
   | IMPORTANT // <important-token>
@@ -43,6 +43,33 @@ type token =
   | RIGHT_BRACE // <}-token>
   | GTE
   | LTE;
+
+type lexer_mode =
+  | Toplevel
+  | Selector
+  | Declaration_block
+  | Declaration_value
+  | At_rule_prelude;
+
+type lexer_state = {
+  mutable mode: lexer_mode,
+  mutable paren_depth: int,
+  mutable brace_depth: int,
+  mutable bracket_depth: int,
+  mutable last_was_ident: bool,
+  mutable last_was_combinator: bool,
+  mutable last_was_delimiter: bool,
+};
+
+let initial_state = () => {
+  mode: Toplevel,
+  paren_depth: 0,
+  brace_depth: 0,
+  bracket_depth: 0,
+  last_was_ident: false,
+  last_was_combinator: false,
+  last_was_delimiter: false,
+};
 
 let string_of_char = c => String.make(1, c);
 
@@ -65,7 +92,7 @@ let humanize =
   fun
   | EOF => "the end"
   | IDENT(s) => s
-  | TAG(s) => s
+  | TYPE_SELECTOR(s) => s
   | FUNCTION(fn) => fn ++ "("
   | NTH_FUNCTION(fn) => fn ++ "("
   | AT_KEYWORD(s) => "@" ++ s
@@ -84,7 +111,7 @@ let humanize =
   | NUMBER(n) => Number_format.float_to_string(n)
   | PERCENTAGE(n) => Number_format.float_to_string(n) ++ "%"
   | DIMENSION((n, d)) => Number_format.float_to_string(n) ++ d
-  | WS => " "
+  | DESCENDANT_COMBINATOR => " "
   | COLON => ":"
   | DOUBLE_COLON => "::"
   | IMPORTANT => "!important"
@@ -114,7 +141,7 @@ let to_debug =
   | COMMA => "COMMA"
   | IMPORTANT => "IMPORTANT"
   | IDENT(s) => "IDENT('" ++ s ++ "')"
-  | TAG(s) => "TAG('" ++ s ++ "')"
+  | TYPE_SELECTOR(s) => "TYPE_SELECTOR('" ++ s ++ "')"
   | STRING(s) => "STRING('" ++ s ++ "')"
   | FUNCTION(fn) => "FUNCTION(" ++ fn ++ ")"
   | NTH_FUNCTION(fn) => "NTH_FUNCTION(" ++ fn ++ ")"
@@ -141,6 +168,14 @@ let to_debug =
   | DOT => "DOT"
   | ASTERISK => "ASTERISK"
   | AMPERSAND => "AMPERSAND"
-  | WS => "WS"
+  | DESCENDANT_COMBINATOR => "DESCENDANT_COMBINATOR"
   | GTE => "GTE"
   | LTE => "LTE";
+
+let show_mode =
+  fun
+  | Toplevel => "Toplevel"
+  | Selector => "Selector"
+  | Declaration_block => "Declaration_block"
+  | Declaration_value => "Declaration_value"
+  | At_rule_prelude => "At_rule_prelude";

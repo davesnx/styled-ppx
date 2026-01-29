@@ -301,32 +301,13 @@ let rec starts_with_double_dot =
   | ComplexSelector(Combinator({ left, _ })) => starts_with_double_dot(left)
   | _ => false;
 
-let trim_right = (vs: component_value_list) => {
-  let rec go = (vs, acc) =>
-    switch (vs) {
-    | [(Whitespace, _)] => acc
-    | [v, ...rest] => go(rest, [v, ...acc])
-    | [] => acc
-    };
-  go(vs, []);
-};
-
 let join_media =
     (
       (left, left_loc): with_loc(component_value_list),
       (right, right_loc): with_loc(component_value_list),
     ) => {
   let new_loc = Parser_location.intersection(left_loc, right_loc);
-  (
-    trim_right(left)
-    @ [
-      (Whitespace, Ppxlib.Location.none),
-      (Ident("and"), Ppxlib.Location.none),
-      (Whitespace, Ppxlib.Location.none),
-    ]
-    @ right,
-    new_loc,
-  );
+  (left @ [(Ident("and"), Ppxlib.Location.none)] @ right, new_loc);
 };
 
 let split_by_kind = (rules: list(rule)) => {

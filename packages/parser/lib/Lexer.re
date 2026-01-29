@@ -124,183 +124,6 @@ let starts_a_number = [%sedlex.regexp?
   ("+" | "-", digit) | ("+" | "-", ".", digit) | ('.', digit)
 ];
 
-let is_tag =
-  fun
-  | "a"
-  | "abbr"
-  | "address"
-  | "animate"
-  | "animateMotion"
-  | "animateTransform"
-  | "area"
-  | "article"
-  | "aside"
-  | "audio"
-  | "b"
-  | "base"
-  | "bdi"
-  | "bdo"
-  | "blockquote"
-  | "body"
-  | "br"
-  | "button"
-  | "canvas"
-  | "caption"
-  | "circle"
-  | "cite"
-  | "clipPath"
-  | "code"
-  | "col"
-  | "colgroup"
-  | "data"
-  | "datalist"
-  | "dd"
-  | "defs"
-  | "del"
-  | "desc"
-  | "details"
-  | "dfn"
-  | "dialog"
-  | "div"
-  | "dl"
-  | "dt"
-  | "ellipse"
-  | "em"
-  | "embed"
-  | "feBlend"
-  | "feColorMatrix"
-  | "feComponentTransfer"
-  | "feComposite"
-  | "feConvolveMatrix"
-  | "feDiffuseLighting"
-  | "feDisplacementMap"
-  | "feDistantLight"
-  | "feDropShadow"
-  | "feFlood"
-  | "feFuncA"
-  | "feFuncB"
-  | "feFuncG"
-  | "feFuncR"
-  | "feGaussianBlur"
-  | "feImage"
-  | "feMerge"
-  | "feMergeNode"
-  | "feMorphology"
-  | "feOffset"
-  | "fePointLight"
-  | "feSpecularLighting"
-  | "feSpotLight"
-  | "feTile"
-  | "feTurbulence"
-  | "fieldset"
-  | "figcaption"
-  | "figure"
-  | "footer"
-  | "foreignObject"
-  | "form"
-  | "g"
-  | "h1"
-  | "h2"
-  | "h3"
-  | "h4"
-  | "h5"
-  | "h6"
-  | "head"
-  | "header"
-  | "hgroup"
-  | "hr"
-  | "html"
-  | "i"
-  | "iframe"
-  | "image"
-  | "img"
-  | "input"
-  | "ins"
-  | "kbd"
-  | "label"
-  | "legend"
-  | "li"
-  | "line"
-  | "linearGradient"
-  | "link"
-  | "main"
-  | "map"
-  | "mark"
-  | "marker"
-  | "math"
-  | "menu"
-  | "menuitem"
-  | "meta"
-  | "metadata"
-  | "meter"
-  | "mpath"
-  | "nav"
-  | "noscript"
-  | "object"
-  | "ol"
-  | "optgroup"
-  | "option"
-  | "output"
-  | "p"
-  | "param"
-  | "path"
-  | "pattern"
-  | "picture"
-  | "polygon"
-  | "polyline"
-  | "pre"
-  | "progress"
-  | "q"
-  | "radialGradient"
-  | "rb"
-  | "rect"
-  | "rp"
-  | "rt"
-  | "rtc"
-  | "ruby"
-  | "s"
-  | "samp"
-  | "script"
-  | "section"
-  | "select"
-  | "set"
-  | "slot"
-  | "small"
-  | "source"
-  | "span"
-  | "stop"
-  | "strong"
-  | "style"
-  | "sub"
-  | "summary"
-  | "sup"
-  | "svg"
-  | "switch"
-  | "symbol"
-  | "table"
-  | "tbody"
-  | "td"
-  | "template"
-  | "text"
-  | "textarea"
-  | "textPath"
-  | "tfoot"
-  | "th"
-  | "thead"
-  | "time"
-  | "title"
-  | "tr"
-  | "track"
-  | "tspan"
-  | "u"
-  | "ul"
-  | "use"
-  | "var"
-  | "video"
-  | "view"
-  | "wbr" => true
-  | _ => false;
-
 let _a = [%sedlex.regexp? 'A' | 'a'];
 let _i = [%sedlex.regexp? 'I' | 'i'];
 let _m = [%sedlex.regexp? 'M' | 'm'];
@@ -558,7 +381,7 @@ let function_token: string => Tokens.token =
   | name => FUNCTION(name);
 
 // https://drafts.csswg.org/css-syntax-3/#consume-ident-like-token
-let consume_ident_like = lexbuf => {
+let consume_ident_like = (~state, lexbuf) => {
   let read_url = string => {
     let _ = skip_whitespace_and_comments(lexbuf);
     let is_function =
@@ -576,13 +399,57 @@ let consume_ident_like = lexbuf => {
   // TODO: should it return IDENT() when error?
   let.ok string = consume_identifier(lexbuf) |> handle_consume_identifier;
 
-  switch%sedlex (lexbuf) {
-  | '(' =>
+  let next_is_open_paren =
+    check(lexbuf =>
+      switch%sedlex (lexbuf) {
+      | '(' => true
+      | _ => false
+      }
+    );
+  if (next_is_open_paren(lexbuf)) {
+    let _ =
+      switch%sedlex (lexbuf) {
+      | '(' => ()
+      | _ => ()
+      };
+    state.paren_depth = state.paren_depth + 1;
     switch (string) {
     | "url" => read_url(string)
     | _ => Ok(function_token(string))
-    }
-  | _ => Ok(is_tag(string) ? TAG(string) : IDENT(string))
+    };
+  } else {
+    switch (state.mode) {
+    | Toplevel =>
+      state.mode = Selector;
+      Ok(TYPE_SELECTOR(string));
+    | Selector => Ok(TYPE_SELECTOR(string))
+    | Declaration_block =>
+      let is_property_colon =
+        check(lexbuf => {
+          switch (Sedlexing.next(lexbuf)) {
+          | Some(c1) when Uchar.to_int(c1) == 58 =>
+            switch (Sedlexing.next(lexbuf)) {
+            | Some(c2) =>
+              let c2_int = Uchar.to_int(c2);
+              c2_int == 32 || c2_int == 9 || c2_int == 10 || c2_int == 13;
+            | None => true
+            }
+          | _ => false
+          }
+        });
+      if (is_property_colon(lexbuf)) {
+        state.last_was_ident = true;
+        Ok(IDENT(string));
+      } else {
+        state.mode = Selector;
+        state.last_was_ident = false;
+        Ok(TYPE_SELECTOR(string));
+      };
+    | Declaration_value
+    | At_rule_prelude =>
+      state.last_was_ident = false;
+      Ok(IDENT(string));
+    };
   };
 };
 
@@ -602,7 +469,7 @@ let consume_numeric = lexbuf => {
   };
 };
 
-let rec consume = lexbuf => {
+let rec consume = (~state, lexbuf) => {
   let consume_hash = () =>
     switch%sedlex (lexbuf) {
     | identifier_code_point
@@ -628,7 +495,7 @@ let rec consume = lexbuf => {
       consume_numeric(lexbuf);
     | starts_an_identifier =>
       Sedlexing.rollback(lexbuf);
-      consume_ident_like(lexbuf);
+      consume_ident_like(~state, lexbuf);
     | _ =>
       let _ = Sedlexing.next(lexbuf);
       Ok(DELIM("-"));
@@ -636,7 +503,7 @@ let rec consume = lexbuf => {
   let rec discard_comments = lexbuf => {
     let (start_pos, curr_pos) = Sedlexing.lexing_positions(lexbuf);
     switch%sedlex (lexbuf) {
-    | "*/" => consume(lexbuf)
+    | "*/" => consume(~state, lexbuf)
     | any => discard_comments(lexbuf)
     | eof =>
       raise(
@@ -646,35 +513,164 @@ let rec consume = lexbuf => {
           "Unterminated comment at the end of the string",
         )),
       )
-    | _ => consume(lexbuf)
+    | _ => consume(~state, lexbuf)
     };
   };
+
+  let emit_delim = char => {
+    let is_combinator =
+      switch (char) {
+      | ">"
+      | "+"
+      | "~" => true
+      | _ => false
+      };
+    if (is_combinator && state.mode == Selector) {
+      state.last_was_combinator = true;
+    };
+    Ok(Tokens.DELIM(char));
+  };
+
+  let handle_mode_transition = token => {
+    let is_ident =
+      switch (token) {
+      | IDENT(_) => true
+      | _ => false
+      };
+
+    state.last_was_combinator = false;
+    state.last_was_delimiter = false;
+
+    switch (token) {
+    | LEFT_BRACE =>
+      state.brace_depth = state.brace_depth + 1;
+      switch (state.mode) {
+      | Toplevel
+      | Selector
+      | At_rule_prelude => state.mode = Declaration_block
+      | _ => ()
+      };
+    | RIGHT_BRACE =>
+      state.brace_depth = state.brace_depth - 1;
+      state.mode = (
+        if (state.brace_depth == 0) {
+          Toplevel;
+        } else {
+          Declaration_block;
+        }
+      );
+    | COLON =>
+      switch (state.mode) {
+      | Declaration_block when state.last_was_ident =>
+        state.mode = Declaration_value
+      | Declaration_block => state.mode = Selector
+      | _ => ()
+      }
+    | SEMI_COLON =>
+      switch (state.mode) {
+      | Declaration_value => state.mode = Declaration_block
+      | _ => ()
+      }
+    | LEFT_PAREN => state.paren_depth = state.paren_depth + 1
+    | RIGHT_PAREN => state.paren_depth = state.paren_depth - 1
+    | AT_KEYFRAMES(_)
+    | AT_RULE(_)
+    | AT_RULE_STATEMENT(_) => state.mode = At_rule_prelude
+    | LEFT_BRACKET =>
+      state.bracket_depth = state.bracket_depth + 1;
+      switch (state.mode) {
+      | Toplevel
+      | Declaration_block => state.mode = Selector
+      | _ => ()
+      };
+    | RIGHT_BRACKET => state.bracket_depth = state.bracket_depth - 1
+    | DOT
+    | HASH(_)
+    | AMPERSAND
+    | ASTERISK
+    | DOUBLE_COLON =>
+      switch (state.mode) {
+      | Toplevel
+      | Declaration_block => state.mode = Selector
+      | _ => ()
+      }
+    | _ => ()
+    };
+    state.last_was_ident = is_ident;
+    token;
+  };
+
   switch%sedlex (lexbuf) {
   | whitespace =>
     let _ = skip_whitespace_and_comments(lexbuf);
-    Ok(Tokens.WS);
+    switch (state.mode) {
+    | Selector =>
+      if (state.last_was_combinator
+          || state.last_was_delimiter
+          || state.bracket_depth > 0) {
+        state.last_was_combinator = false;
+        state.last_was_delimiter = false;
+        consume(~state, lexbuf);
+      } else {
+        let is_descendant =
+          check(lexbuf =>
+            switch%sedlex (lexbuf) {
+            | '{'
+            | ','
+            | ')'
+            | '>'
+            | '+'
+            | '~'
+            | eof => false
+            | _ => true
+            }
+          );
+        if (is_descendant(lexbuf)) {
+          Ok(Tokens.DESCENDANT_COMBINATOR);
+        } else {
+          consume(~state, lexbuf);
+        };
+      }
+    | Declaration_value
+    | Toplevel
+    | Declaration_block
+    | At_rule_prelude => consume(~state, lexbuf)
+    };
   | important => Ok(IMPORTANT)
   | variable =>
+    switch (state.mode) {
+    | Toplevel
+    | Declaration_block => state.mode = Selector
+    | _ => ()
+    };
+    state.last_was_combinator = false;
+    state.last_was_delimiter = false;
     Ok(
       INTERPOLATION(
         lexeme(~skip=2, ~drop=1, lexbuf) |> String.split_on_char('.'),
       ),
-    )
+    );
   | "/*" => discard_comments(lexbuf)
   | "\"" => consume_string("\"", lexbuf)
-  | "#" => consume_hash()
+  | "#" =>
+    let.ok token = consume_hash();
+    Ok(handle_mode_transition(token));
   | "'" => consume_string("'", lexbuf)
-  | "(" => Ok(LEFT_PAREN)
-  | ")" => Ok(RIGHT_PAREN)
+  | "(" => Ok(handle_mode_transition(LEFT_PAREN))
+  | ")" => Ok(handle_mode_transition(RIGHT_PAREN))
   | "+" =>
     let _ = Sedlexing.backtrack(lexbuf);
     if (check_if_three_code_points_would_start_a_number(lexbuf)) {
       consume_numeric(lexbuf);
     } else {
       let _ = Sedlexing.next(lexbuf);
-      Ok(DELIM("+"));
+      emit_delim("+");
     };
-  | "," => Ok(COMMA)
+  | "," =>
+    if (state.mode == Selector) {
+      state.last_was_delimiter = true;
+    };
+    Ok(COMMA);
   | "-" =>
     Sedlexing.rollback(lexbuf);
     consume_minus();
@@ -684,39 +680,44 @@ let rec consume = lexbuf => {
       consume_numeric(lexbuf);
     } else {
       let _ = Sedlexing.next(lexbuf);
-      Ok(DOT);
+      Ok(handle_mode_transition(DOT));
     };
-  | "::" => Ok(DOUBLE_COLON)
-  | ":" => Ok(COLON)
-  | ";" => Ok(SEMI_COLON)
-  | "&" => Ok(AMPERSAND)
-  | "*" => Ok(ASTERISK)
+  | "::" => Ok(handle_mode_transition(DOUBLE_COLON))
+  | ":" => Ok(handle_mode_transition(COLON))
+  | ";" => Ok(handle_mode_transition(SEMI_COLON))
+  | "&" => Ok(handle_mode_transition(AMPERSAND))
+  | "*" => Ok(handle_mode_transition(ASTERISK))
   | "<=" => Ok(LTE)
   | ">=" => Ok(GTE)
   | "<" => Ok(DELIM("<"))
   | "@" =>
     if (check_if_three_codepoints_would_start_an_identifier(lexbuf)) {
       let.ok string = consume_identifier(lexbuf) |> handle_consume_identifier;
-      switch (string) {
-      | "keyframes" => Ok(Tokens.AT_KEYFRAMES(string))
-      | "charset"
-      | "import"
-      | "namespace" => Ok(Tokens.AT_RULE_STATEMENT(string))
-      | _ => Ok(Tokens.AT_RULE(string))
-      };
+      let token =
+        switch (string) {
+        | "keyframes" => Tokens.AT_KEYFRAMES(string)
+        | "charset"
+        | "import"
+        | "namespace" => Tokens.AT_RULE_STATEMENT(string)
+        | _ => Tokens.AT_RULE(string)
+        };
+      Ok(handle_mode_transition(token));
     } else {
       Ok(DELIM("@"));
     }
-  | "[" => Ok(LEFT_BRACKET)
-  | "]" => Ok(RIGHT_BRACKET)
-  | "{" => Ok(LEFT_BRACE)
-  | "}" => Ok(RIGHT_BRACE)
+  | "[" => Ok(handle_mode_transition(LEFT_BRACKET))
+  | "]" => Ok(handle_mode_transition(RIGHT_BRACKET))
+  | "{" => Ok(handle_mode_transition(LEFT_BRACE))
+  | "}" => Ok(handle_mode_transition(RIGHT_BRACE))
   | "\\" =>
     Sedlexing.rollback(lexbuf);
     switch%sedlex (lexbuf) {
     | starts_with_a_valid_escape =>
       Sedlexing.rollback(lexbuf);
-      consume_ident_like(lexbuf);
+      let result = consume_ident_like(~state, lexbuf);
+      state.last_was_combinator = false;
+      state.last_was_delimiter = false;
+      result;
     | ('\\', any)
     | '\\' => Error(Invalid_code_point)
     | _ => unreachable(lexbuf)
@@ -727,24 +728,27 @@ let rec consume = lexbuf => {
     consume_numeric(lexbuf);
   | identifier_start_code_point =>
     let _ = Sedlexing.backtrack(lexbuf);
-    consume_ident_like(lexbuf);
+    let result = consume_ident_like(~state, lexbuf);
+    // Reset flags for identifier tokens (they don't go through handle_mode_transition)
+    state.last_was_combinator = false;
+    state.last_was_delimiter = false;
+    result;
   | eof => Ok(EOF)
-  | any => Ok(DELIM(lexeme(lexbuf)))
+  | any => emit_delim(lexeme(lexbuf))
   | _ => unreachable(lexbuf)
   };
 };
 
-let get_next_tokens_with_location = lexbuf => {
-  let (position_start, _) = Sedlexing.lexing_positions(lexbuf);
+let get_next_tokens_with_location = (~state, lexbuf) => {
+  let (_, position_start) = Sedlexing.lexing_positions(lexbuf);
   let token =
-    switch (consume(lexbuf)) {
+    switch (consume(~state, lexbuf)) {
     | Ok(token) => token
     | Error(msg) =>
       let (start_pos, curr_pos) = Sedlexing.lexing_positions(lexbuf);
       raise(LexingError((start_pos, curr_pos, Tokens.show_error(msg))));
     };
   let (_, position_end) = Sedlexing.lexing_positions(lexbuf);
-
   (token, position_start, position_end);
 };
 
@@ -753,11 +757,20 @@ type token_with_location = {
   loc: Location.t,
 };
 
-let from_string = string => {
+let from_string = (~initial_mode=Declaration_value, string) => {
   let lexbuf = Sedlexing.Utf8.from_string(string);
+  let state = {
+    mode: initial_mode,
+    paren_depth: 0,
+    brace_depth: 0,
+    bracket_depth: 0,
+    last_was_ident: false,
+    last_was_combinator: false,
+    last_was_delimiter: false,
+  };
   let rec read = acc => {
     let (loc_start, _) = Sedlexing.lexing_positions(lexbuf);
-    let value = consume(lexbuf);
+    let value = consume(~state, lexbuf);
     let (_, loc_end) = Sedlexing.lexing_positions(lexbuf);
 
     let token_with_loc: token_with_location = {

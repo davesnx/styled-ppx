@@ -2,11 +2,23 @@ module Location = Ppxlib.Location;
 
 let menhir = MenhirLib.Convert.Simplified.traditional2revised;
 
-let parse = (~loc: Ppxlib.location, lexbuf, parser) => {
+let make_state = (~initial_mode): Tokens.lexer_state => {
+  mode: initial_mode,
+  paren_depth: 0,
+  brace_depth: 0,
+  bracket_depth: 0,
+  last_was_ident: false,
+  last_was_combinator: false,
+  last_was_delimiter: false,
+};
+
+let parse =
+    (~loc: Ppxlib.location, ~initial_mode: Tokens.lexer_mode, lexbuf, parser) => {
+  let state = make_state(~initial_mode);
   let last_token = ref((Tokens.EOF, Lexing.dummy_pos, Lexing.dummy_pos));
 
   let next_token = () => {
-    last_token := Lexer.get_next_tokens_with_location(lexbuf);
+    last_token := Lexer.get_next_tokens_with_location(~state, lexbuf);
     last_token^;
   };
 
@@ -29,21 +41,35 @@ let parse = (~loc: Ppxlib.location, lexbuf, parser) => {
 
 let last_buffer = ref(None);
 
-let parse_string = (~loc, parser, string) => {
+let parse_string = (~loc, ~initial_mode, parser, string) => {
   let buffer = Sedlexing.Latin1.from_string(string);
   last_buffer := Some(Sedlexing.Latin1.from_string(string));
-  parse(~loc, buffer, parser);
+  parse(~loc, ~initial_mode, buffer, parser);
 };
 
 let parse_declaration_list = (~loc, input: string) => {
-  parse_string(~loc, Parser.declaration_list, input);
+  // In declaration_list context, we're inside a block - can have declarations or nested rules
+  parse_string(
+    ~loc,
+    ~initial_mode=Tokens.Declaration_block,
+    Parser.declaration_list,
+    input,
+  );
 };
 
 let parse_declaration = (~loc, input: string) =>
-  parse_string(~loc, Parser.declaration, input);
+  // Single declaration context
+  parse_string(
+    ~loc,
+    ~initial_mode=Tokens.Declaration_block,
+    Parser.declaration,
+    input,
+  );
 
 let parse_stylesheet = (~loc, input: string) =>
-  parse_string(~loc, Parser.stylesheet, input);
+  // Stylesheet starts at toplevel - expecting selectors
+  parse_string(~loc, ~initial_mode=Tokens.Toplevel, Parser.stylesheet, input);
 
 let parse_keyframes = (~loc, input: string) =>
-  parse_string(~loc, Parser.keyframes, input);
+  // Keyframes context
+  parse_string(~loc, ~initial_mode=Tokens.Toplevel, Parser.keyframes, input);

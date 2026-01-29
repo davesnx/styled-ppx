@@ -175,7 +175,6 @@ and selector_list = (ast: Ast.selector_list) => {
 }
 and component_value = (ast: Ast.component_value) => {
   switch (ast) {
-  | Whitespace => " "
   | Paren_block(block) => "(" ++ component_value_list(block) ++ ")"
   | Bracket_block(block) => "[" ++ component_value_list(block) ++ "]"
   | Percentage(value) => Number_format.float_to_string(value) ++ "%"

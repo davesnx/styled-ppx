@@ -25,7 +25,7 @@ let parse = input => {
 
 let error_tests_data =
   [
-    ("{}", "Parse error while reading token '{' on line 0 at position 0"),
+    ("{}", "Parse error while reading token '{' on line 1 at position 0"),
     (
       {|div
         { color: red; _ }
@@ -34,7 +34,7 @@ let error_tests_data =
     ),
     (
       "@media $",
-      "Parse error while reading token 'the end' on line 1 at position 7",
+      "Parse error while reading token 'the end' on line 1 at position 8",
     ),
   ]
   |> List.mapi((_index, (input, output)) => {

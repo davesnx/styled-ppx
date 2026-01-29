@@ -13,7 +13,7 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 11, characters 21-29:
+  File "input.re", line 11, characters 20-29:
   Error: The value cosas has type [> `underlin ]
          but an expression was expected of type
            Css_types.TextDecorationLine.Value.t

@@ -9,8 +9,7 @@ let keyword =
   | s =>
     token(
       fun
-      | IDENT(value)
-      | TAG(value) when value == s => Ok()
+      | IDENT(value) when value == s => Ok()
       | token =>
         Error([
           "Expected '" ++ s ++ "'. Got '" ++ humanize(token) ++ "' instead.",
@@ -188,8 +187,7 @@ let percentage =
 let ident =
   token(
     fun
-    | IDENT(string)
-    | TAG(string) => Ok(string)
+    | IDENT(string) => Ok(string)
     | _ => Error(["Expected an indentifier."]),
   );
 
@@ -208,8 +206,7 @@ let css_wide_keywords =
 let custom_ident =
   token(
     fun
-    | IDENT(string)
-    | TAG(string) => Ok(string)
+    | IDENT(string) => Ok(string)
     | STRING(string) => Ok(string)
     | _ => Error(["Expected an identifier."]),
   );
@@ -275,8 +272,7 @@ let interpolation = {
 let media_type =
   token(
     fun
-    | IDENT(value)
-    | TAG(value) => {
+    | IDENT(value) => {
         switch (value) {
         | "only"
         | "not"
@@ -338,13 +334,10 @@ let custom_ident_without_span_or_auto =
   token(
     fun
     | IDENT("auto")
-    | TAG("auto")
     | STRING("auto")
     | IDENT("span")
-    | TAG("span")
     | STRING("span") => Error(["Custom ident cannot be span or auto."])
-    | IDENT(string)
-    | TAG(string) => Ok(string)
+    | IDENT(string) => Ok(string)
     | STRING(string) => Ok(string)
     | _ => Error(["expected an identifier."]),
   );
@@ -362,8 +355,7 @@ let string_token =
 let ident_token =
   token(
     fun
-    | IDENT(string)
-    | TAG(string) => Ok(string)
+    | IDENT(string) => Ok(string)
     | _ => Error(["expected an identifier."]),
   );
 
