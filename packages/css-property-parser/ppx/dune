@@ -2,7 +2,7 @@
  (name reason_css_parser_ppx_lib)
  (wrapped false)
  (libraries styled-ppx.css-spec-parser ppxlib ppxlib.astlib)
- (modules Generate)
+ (modules Generate Naming)
  (preprocess
   (pps ppxlib.metaquot)))
 
