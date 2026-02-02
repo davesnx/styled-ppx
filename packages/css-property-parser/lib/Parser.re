@@ -1962,25 +1962,29 @@ let apply_parser = (parser, tokens_with_loc) => {
 
   let tokens =
     tokens_with_loc
-    |> List.map(({ txt, _ }) =>
+    |> List.filter_map(({ txt, _ }) =>
          switch (txt) {
-         | Ok(token) => token
-         | Error((token, _)) => token
+         | Ok(token) => Some(token)
+         | Error(_) => None
          }
        )
     |> List.rev;
 
-  let tokens_without_ws = tokens |> List.filter((!=)(Tokens.WS));
-
-  let (output, remaining_tokens) = parser(tokens_without_ws);
+  let (output, remaining_tokens) = parser(tokens);
   let.ok output =
     switch (output) {
     | Ok(data) => Ok(data)
     | Error([message, ..._]) => Error(message)
     | Error([]) => Error("weird")
     };
-  let.ok () =
-    switch (remaining_tokens) {
+  let.ok () = {
+    let rec filter_ws = tokens =>
+      switch (tokens) {
+      | [] => []
+      | [Tokens.WS, ...rest] => filter_ws(rest)
+      | [t, ...rest] => [t, ...filter_ws(rest)]
+      };
+    switch (remaining_tokens |> filter_ws) {
     | []
     | [Tokens.EOF] => Ok()
     | tokens =>
@@ -1988,14 +1992,16 @@ let apply_parser = (parser, tokens_with_loc) => {
         tokens |> List.map(Tokens.show_token) |> String.concat(", ");
       Error("tokens remaining: " ++ tokens);
     };
+  };
   Ok(output);
 };
 
 let parse = (rule_parser: Rule.rule('a), str) => {
-  let.ok tokens_with_loc =
-    Styled_ppx_css_parser.Lexer.from_string(str)
-    |> Result.map_error(_ => "frozen");
-
+  let tokens_with_loc =
+    Styled_ppx_css_parser.Lexer.from_string(
+      ~initial_mode=Lexer_context.Declaration_value,
+      str,
+    );
   apply_parser(rule_parser, tokens_with_loc);
 };
 

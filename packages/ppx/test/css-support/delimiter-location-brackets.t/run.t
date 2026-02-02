@@ -17,9 +17,9 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 19-25:
+  File "input.re", line 1, characters 18-25:
   Error: Property 'display' has an invalid value: 'blocki',
-         Expected 'ident -moz-inline-box' but instead got 'ident blocki'.
+         Expected '-moz-inline-box'. Got 'blocki' instead.
   [1]
 
   $ cat >input.re <<EOF
@@ -27,9 +27,9 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 32-38:
+  File "input.re", line 1, characters 31-38:
   Error: Property 'display' has an invalid value: 'blocki',
-         Expected 'ident -moz-inline-box' but instead got 'ident blocki'.
+         Expected '-moz-inline-box'. Got 'blocki' instead.
   [1]
 
   $ cat >input.re <<EOF
@@ -39,9 +39,9 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 2, characters 27-33:
+  File "input.re", line 2, characters 26-33:
   Error: Property 'display' has an invalid value: 'blocki',
-         Expected 'ident -moz-inline-box' but instead got 'ident blocki'.
+         Expected '-moz-inline-box'. Got 'blocki' instead.
   [1]
 
   $ cat >input.re <<EOF
@@ -52,7 +52,7 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 3, characters 14-20:
+  File "input.re", line 3, characters 13-20:
   Error: Property 'display' has an invalid value: 'blocki',
-         Expected 'ident -moz-inline-box' but instead got 'ident blocki'.
+         Expected '-moz-inline-box'. Got 'blocki' instead.
   [1]

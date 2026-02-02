@@ -1,6 +1,7 @@
 ---
 alwaysApply: false
 ---
+
 # cx2 Pipeline - Static CSS Extraction
 
 This document explains how `[%cx2]` works—the statically extracted CSS path. Unlike `[%cx]` which generates runtime CSS-in-JS code, `[%cx2]` extracts CSS at compile-time into a separate `.css` file with zero runtime CSS generation overhead.

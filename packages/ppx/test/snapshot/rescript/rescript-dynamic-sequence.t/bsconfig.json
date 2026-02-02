@@ -1,9 +1,0 @@
-{
-  "jsx": {
-    "version": 4,
-    "mode": "classic"
-  },
-  "dependencies": [
-    "@rescript/react"
-  ]
-}

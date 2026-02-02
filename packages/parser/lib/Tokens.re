@@ -1,26 +1,51 @@
 [@deriving show({ with_path: false })]
 type token =
   | EOF
-  | IDENT(string) // <ident-token>
-  | BAD_IDENT // TODO: Since we don't allow broken syntax, is this needed?
+  | IDENT(string) // <ident-token> - in value context
+  | TYPE_SELECTOR(string) // <type-selector-token> - in selector context (div, span, etc.)
   | FUNCTION(string) // <function-token>
+  | NTH_FUNCTION(string) // <function-token> (nth-*)
   | AT_KEYWORD(string) // <at-keyword-token>
+  | AT_KEYFRAMES(string) // <at-keyframes-token> (non-standard)
+  | AT_RULE(string) // <at-rule-token> (non-standard)
+  | AT_RULE_STATEMENT(string) // <at-rule-statement-token> (non-standard)
+  | UNICODE_RANGE(string) // <unicode-range-token>
   | HASH(
-      string,
-      [
-        | `ID
-        | `UNRESTRICTED
-      ],
+      (
+        string,
+        [
+          | `ID
+          | `UNRESTRICTED
+        ],
+      ),
     ) // <hash-token>
   | STRING(string) // <string-token>
   | URL(string) // <url-token>
-  | BAD_URL // <bad-url-token> TODO: Since we don't allow broken syntax, is this needed?
-  | DELIM(string) // <delim-token>
+  | INTERPOLATION(list(string)) // <interpolation-token> (non-standard)
+  | DELIM(char) // <delim-token> for unknown single characters
+  | DOT // '.'
+  | ASTERISK // '*'
+  | AMPERSAND // '&'
+  | PLUS // '+'
+  | MINUS // '-'
+  | TILDE // '~'
+  | GREATER_THAN // '>'
+  | LESS_THAN // '<'
+  | EQUALS // '='
+  | SLASH // '/'
+  | EXCLAMATION // '!'
+  | PIPE // '|'
+  | CARET // '^'
+  | DOLLAR_SIGN // '$'
+  | QUESTION_MARK // '?'
   | NUMBER(float) // <number-token>
   | PERCENTAGE(float) // <percentage-token>
-  | DIMENSION(float, string) // <dimension-token>
-  | WS // <whitespace-token>
+  | DIMENSION((float, string)) // <dimension-token>
+  | DESCENDANT_COMBINATOR // whitespace as selector combinator (div span)
+  | WS // <whitespace-token> in value context
   | COLON // <colon-token>
+  | DOUBLE_COLON // <double-colon-token>
+  | IMPORTANT // <important-token>
   | SEMI_COLON // <semicolon-token>
   | COMMA // <comma-token>
   | LEFT_BRACKET // <[-token>
@@ -29,41 +54,116 @@ type token =
   | RIGHT_PAREN // <)-token>
   | LEFT_BRACE // <{-token>
   | RIGHT_BRACE // <}-token>
-  // handle media query lte and gte explicitly since we don't allow whitespace between gt,lt and eq
   | GTE
   | LTE;
 
 let string_of_char = c => String.make(1, c);
 
+let float_to_string = value => {
+  let raw = string_of_float(value);
+  let has_dot = String.contains(raw, '.');
+  if (!has_dot) {
+    raw;
+  } else {
+    let len = String.length(raw);
+    let rec drop_zeros = idx =>
+      idx > 0 && raw.[idx - 1] == '0' ? drop_zeros(idx - 1) : idx;
+    let trimmed_len = drop_zeros(len);
+    let trimmed_len =
+      trimmed_len > 0 && raw.[trimmed_len - 1] == '.'
+        ? trimmed_len - 1 : trimmed_len;
+    trimmed_len == len ? raw : String.sub(raw, 0, trimmed_len);
+  };
+};
+
 type error =
   | Invalid_code_point
   | Eof
-  | New_line;
+  | New_line
+  | Bad_url
+  | Bad_ident
+  | Invalid_delim;
 
 let show_error =
   fun
-  | Invalid_code_point => "Invalid code point"
-  | Eof => "Unexpected end"
-  | New_line => "New line";
+  | Invalid_code_point => "Invalid escape sequence"
+  | Eof => "Unexpected end of input"
+  | New_line => "Unexpected newline in string"
+  | Bad_url => "Invalid URL"
+  | Bad_ident => "Invalid identifier"
+  | Invalid_delim => "Invalid delimiter";
+
+let token_of_delimiter_string =
+  fun
+  | "(" => Some(LEFT_PAREN)
+  | ")" => Some(RIGHT_PAREN)
+  | "[" => Some(LEFT_BRACKET)
+  | "]" => Some(RIGHT_BRACKET)
+  | "{" => Some(LEFT_BRACE)
+  | "}" => Some(RIGHT_BRACE)
+  | ":" => Some(COLON)
+  | ";" => Some(SEMI_COLON)
+  | "," => Some(COMMA)
+  | "." => Some(DOT)
+  | "*" => Some(ASTERISK)
+  | "&" => Some(AMPERSAND)
+  | "+" => Some(PLUS)
+  | "-" => Some(MINUS)
+  | "~" => Some(TILDE)
+  | ">" => Some(GREATER_THAN)
+  | "<" => Some(LESS_THAN)
+  | "=" => Some(EQUALS)
+  | "/" => Some(SLASH)
+  | "!" => Some(EXCLAMATION)
+  | "|" => Some(PIPE)
+  | "^" => Some(CARET)
+  | "$" => Some(DOLLAR_SIGN)
+  | "?" => Some(QUESTION_MARK)
+  | "#" => Some(DELIM('#'))
+  | "@" => Some(DELIM('@'))
+  | s when String.length(s) == 1 => Some(DELIM(s.[0]))
+  | _ => None;
 
 let humanize =
   fun
   | EOF => "the end"
-  | IDENT(str) => "ident " ++ str
-  | BAD_IDENT => "bad ident"
-  | FUNCTION(f) => "function " ++ f
-  | AT_KEYWORD(at) => "@ " ++ at
-  | HASH(h, _) => "hash: #" ++ h
-  | STRING(s) => {|string "|} ++ s ++ {|"|}
-  | URL(u) => "url " ++ u
-  | BAD_URL => "bad url"
-  | DELIM(d) => "delimiter " ++ d
-  | NUMBER(f) => "number: " ++ string_of_float(f)
-  | PERCENTAGE(f) =>
-    "percentage: " ++ string_of_float(f) ++ string_of_char('%')
-  | DIMENSION(f, s) => "dimension: " ++ string_of_float(f) ++ s
-  | WS => "whitespace"
+  | IDENT(s) => s
+  | TYPE_SELECTOR(s) => s
+  | FUNCTION(fn) => Printf.sprintf("%s(", fn)
+  | NTH_FUNCTION(fn) => Printf.sprintf("%s(", fn)
+  | AT_KEYWORD(s) => Printf.sprintf("@%s", s)
+  | AT_KEYFRAMES(s) => Printf.sprintf("@%s", s)
+  | AT_RULE_STATEMENT(s) => Printf.sprintf("@%s", s)
+  | AT_RULE(s) => Printf.sprintf("@%s", s)
+  | UNICODE_RANGE(s) => s
+  | HASH((s, _)) => Printf.sprintf("#%s", s)
+  | STRING(s) => Printf.sprintf("'%s'", s)
+  | URL(url) => Printf.sprintf("url(%s)", url)
+  | INTERPOLATION(v) => Printf.sprintf("$(%s)", String.concat(".", v))
+  | DELIM(c) => String.make(1, c)
+  | DOT => "."
+  | ASTERISK => "*"
+  | AMPERSAND => "&"
+  | PLUS => "+"
+  | MINUS => "-"
+  | TILDE => "~"
+  | GREATER_THAN => ">"
+  | LESS_THAN => "<"
+  | EQUALS => "="
+  | SLASH => "/"
+  | EXCLAMATION => "!"
+  | PIPE => "|"
+  | CARET => "^"
+  | DOLLAR_SIGN => "$"
+  | QUESTION_MARK => "?"
+  | NUMBER(n) => float_to_string(n)
+  | PERCENTAGE(n) => Printf.sprintf("%s%%", float_to_string(n))
+  | DIMENSION((n, d)) => Printf.sprintf("%s%s", float_to_string(n), d)
+  | DESCENDANT_COMBINATOR => " "
+  | WS => " "
   | COLON => ":"
+  | DOUBLE_COLON => "::"
+  | IMPORTANT => "!important"
   | SEMI_COLON => ";"
   | COMMA => ","
   | LEFT_BRACKET => "["
@@ -75,51 +175,9 @@ let humanize =
   | GTE => ">="
   | LTE => "<=";
 
-/* TODO: This should render Token, not Parser.token */
-let token_to_string =
+let to_debug =
   fun
-  | Parser.EOF => ""
-  | LEFT_BRACE => "{"
-  | RIGHT_BRACE => "}"
-  | LEFT_PAREN => "("
-  | RIGHT_PAREN => ")"
-  | LEFT_BRACKET => "["
-  | RIGHT_BRACKET => "]"
-  | COLON => ":"
-  | DOUBLE_COLON => "::"
-  | SEMI_COLON => ";"
-  | PERCENT => "%"
-  | AMPERSAND => "&"
-  | IMPORTANT => "!important"
-  | IDENT(s) => s
-  | TAG(s) => s
-  | STRING(s) => "'" ++ s ++ "'"
-  | OPERATOR(s) => s
-  | COMBINATOR(s)
-  | DELIM(s) => s
-  | AT_KEYFRAMES(s)
-  | AT_RULE_STATEMENT(s)
-  | AT_RULE(s) => "@" ++ s
-  | HASH(s) => "#" ++ s
-  | NUMBER(s) => s
-  | UNICODE_RANGE(s) => s
-  | FLOAT_DIMENSION((n, s)) => n ++ s
-  | DIMENSION((n, d)) => n ++ d
-  | INTERPOLATION(v) => String.concat(".", v)
-  | WS => " "
-  | DOT => "."
-  | COMMA => ","
-  | ASTERISK => "*"
-  | FUNCTION(fn) => fn ++ "("
-  | NTH_FUNCTION(fn) => fn ++ "("
-  | URL(url) => url ++ "("
-  | BAD_URL => "bad url"
-  | BAD_IDENT => "bad indent";
-
-/* TODO: This should print Token, not Parser.token */
-let token_to_debug =
-  fun
-  | Parser.EOF => "EOF"
+  | EOF => "EOF"
   | LEFT_BRACE => "LEFT_BRACE"
   | RIGHT_BRACE => "RIGHT_BRACE"
   | LEFT_PAREN => "LEFT_PAREN"
@@ -129,30 +187,50 @@ let token_to_debug =
   | COLON => "COLON"
   | DOUBLE_COLON => "DOUBLE_COLON"
   | SEMI_COLON => "SEMI_COLON"
-  | PERCENT => "PERCENTAGE"
-  | AMPERSAND => "AMPERSAND"
-  | IMPORTANT => "IMPORTANT"
-  | IDENT(s) => "IDENT('" ++ s ++ "')"
-  | TAG(s) => "TAG('" ++ s ++ "')"
-  | STRING(s) => "STRING('" ++ s ++ "')"
-  | OPERATOR(s) => "OPERATOR('" ++ s ++ "')"
-  | DELIM(s) => "DELIM('" ++ s ++ "')"
-  | AT_RULE(s) => "AT_RULE('" ++ s ++ "')"
-  | AT_RULE_STATEMENT(s) => "AT_RULE_STATEMENT('" ++ s ++ "')"
-  | AT_KEYFRAMES(s) => "AT_KEYFRAMES('" ++ s ++ "')"
-  | HASH(s) => "HASH('" ++ s ++ "')"
-  | NUMBER(s) => "NUMBER('" ++ s ++ "')"
-  | UNICODE_RANGE(s) => "UNICODE_RANGE('" ++ s ++ "')"
-  | FLOAT_DIMENSION((n, s)) => "FLOAT_DIMENSION('" ++ n ++ ", " ++ s ++ "')"
-  | DIMENSION((n, d)) => "DIMENSION('" ++ n ++ ", " ++ d ++ "')"
-  | INTERPOLATION(v) => "VARIABLE('" ++ String.concat(".", v) ++ "')"
-  | COMBINATOR(s) => "COMBINATOR(" ++ s ++ ")"
-  | DOT => "DOT"
   | COMMA => "COMMA"
-  | WS => "WS"
+  | IMPORTANT => "IMPORTANT"
+  | IDENT(s) => Printf.sprintf("IDENT('%s')", s)
+  | TYPE_SELECTOR(s) => Printf.sprintf("TYPE_SELECTOR('%s')", s)
+  | STRING(s) => Printf.sprintf("STRING('%s')", s)
+  | FUNCTION(fn) => Printf.sprintf("FUNCTION(%s)", fn)
+  | NTH_FUNCTION(fn) => Printf.sprintf("NTH_FUNCTION(%s)", fn)
+  | URL(u) => Printf.sprintf("URL(%s)", u)
+  | AT_KEYWORD(s) => Printf.sprintf("AT_KEYWORD('%s')", s)
+  | AT_KEYFRAMES(s) => Printf.sprintf("AT_KEYFRAMES('%s')", s)
+  | AT_RULE_STATEMENT(s) => Printf.sprintf("AT_RULE_STATEMENT('%s')", s)
+  | AT_RULE(s) => Printf.sprintf("AT_RULE('%s')", s)
+  | HASH((s, kind)) => {
+      let kind =
+        switch (kind) {
+        | `ID => "ID"
+        | `UNRESTRICTED => "UNRESTRICTED"
+        };
+      Printf.sprintf("HASH('%s', %s)", s, kind);
+    }
+  | NUMBER(n) => Printf.sprintf("NUMBER(%s)", float_to_string(n))
+  | PERCENTAGE(n) => Printf.sprintf("PERCENTAGE(%s)", float_to_string(n))
+  | DIMENSION((n, d)) =>
+    Printf.sprintf("DIMENSION(%s, %s)", float_to_string(n), d)
+  | UNICODE_RANGE(s) => Printf.sprintf("UNICODE_RANGE('%s')", s)
+  | INTERPOLATION(v) =>
+    Printf.sprintf("INTERPOLATION('%s')", String.concat(".", v))
+  | DELIM(c) => Printf.sprintf("DELIM('%c')", c)
+  | DOT => "DOT"
   | ASTERISK => "ASTERISK"
-  | FUNCTION(fn) => "FUNCTION(" ++ fn ++ ")"
-  | NTH_FUNCTION(fn) => "FUNCTION(" ++ fn ++ ")"
-  | URL(u) => "URL(" ++ u ++ ")"
-  | BAD_URL => "BAD_URL"
-  | BAD_IDENT => "BAD_IDENT";
+  | AMPERSAND => "AMPERSAND"
+  | PLUS => "PLUS"
+  | MINUS => "MINUS"
+  | TILDE => "TILDE"
+  | GREATER_THAN => "GREATER_THAN"
+  | LESS_THAN => "LESS_THAN"
+  | EQUALS => "EQUALS"
+  | SLASH => "SLASH"
+  | EXCLAMATION => "EXCLAMATION"
+  | PIPE => "PIPE"
+  | CARET => "CARET"
+  | DOLLAR_SIGN => "DOLLAR_SIGN"
+  | QUESTION_MARK => "QUESTION_MARK"
+  | DESCENDANT_COMBINATOR => "DESCENDANT_COMBINATOR"
+  | WS => "WS"
+  | GTE => "GTE"
+  | LTE => "LTE";

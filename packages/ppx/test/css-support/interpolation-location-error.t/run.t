@@ -14,7 +14,7 @@ If this test fail means that the module is not in sync with the ppx
 
 This test ensures the location of the error is correct
   $ dune build
-  File "input.re", line 2, characters 25-32:
+  File "input.re", line 2, characters 24-32:
   Error: The value grid has type [> `gri ]
          but an expression was expected of type
            [< `block

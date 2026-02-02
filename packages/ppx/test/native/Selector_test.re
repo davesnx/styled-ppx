@@ -152,10 +152,10 @@ let compound_tests = [
     ],
   ),
   (
-    "p:first-child",
-    [%expr [%cx {js|p:first-child {}|js}]],
+    "& p:first-child",
+    [%expr [%cx {js|& p:first-child {}|js}]],
     [%expr
-      CSS.style([|CSS.selectorMany([|{js|p:first-child|js}|], [||])|])
+      CSS.style([|CSS.selectorMany([|{js|& p:first-child|js}|], [||])|])
     ],
   ),
   (

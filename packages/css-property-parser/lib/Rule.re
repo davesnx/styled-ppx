@@ -105,7 +105,11 @@ module Let = {
 };
 
 module Pattern = {
-  // TODO: errors
+  let rec skip_whitespace =
+    fun
+    | [WS, ...tokens] => skip_whitespace(tokens)
+    | tokens => tokens;
+
   let identity = Match.return();
 
   let next =
@@ -113,15 +117,16 @@ module Pattern = {
     | [token, ...tokens] => Match.return(token, tokens)
     | _ => (Error(["missing the token expected"]), []);
 
-  let token = (expected, tokens) =>
-    switch (tokens) {
+  let token = (expected, tokens) => {
+    switch (skip_whitespace(tokens)) {
     | [token, ...tokens] =>
-      let data = expected(token);
-      // if failed then keep the tokens intact
-      let tokens = Result.is_ok(data) ? tokens : [token, ...tokens];
-      (data, tokens);
+      switch (expected(token)) {
+      | Ok(value) => (Ok(value), tokens)
+      | Error(error) => (Error(error), [token, ...tokens])
+      }
     | [] => (Error(["missing the token expected"]), [])
     };
+  };
 
   let expect = expected =>
     token(

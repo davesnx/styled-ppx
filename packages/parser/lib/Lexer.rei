@@ -2,20 +2,15 @@
 exception LexingError((Lexing.position, Lexing.position, string));
 
 type token_with_location = {
-  txt: result(Tokens.token, (Tokens.token, Tokens.error)),
+  txt: result(Tokens.token, Tokens.error),
   loc: Ast.loc,
 };
 
-let get_next_token: Sedlexing.lexbuf => Parser.token;
+let from_string:
+  (~initial_mode: Lexer_context.lexer_mode, string) =>
+  list(token_with_location);
 let get_next_tokens_with_location:
-  Sedlexing.lexbuf => (Parser.token, Lexing.position, Lexing.position);
-let from_string: string => result(list(token_with_location), [> | `Frozen]);
-let tokenize:
-  string =>
-  result(list((Parser.token, Lexing.position, Lexing.position)), string);
-let render_token: Parser.token => string;
-let position_to_string: Lexing.position => string;
-let debug_token: ((Parser.token, Lexing.position, Lexing.position)) => string;
-let to_string: list((Parser.token, 'a, 'b)) => string;
-let to_debug:
-  list((Parser.token, Lexing.position, Lexing.position)) => string;
+  (~state: Lexer_context.lexer_state, Sedlexing.lexbuf) =>
+  (Tokens.token, Lexing.position, Lexing.position);
+
+let debug: list((Tokens.token, Lexing.position, Lexing.position)) => string;

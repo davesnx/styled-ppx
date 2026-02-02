@@ -327,7 +327,7 @@ and render_selector = (~loc, selector: selector) => {
     | Type(v) => v
     | Subclass(v) => render_subclass_selector(v)
     | Variable(v) => render_variable_as_string(v)
-    | Percentage(v) => Printf.sprintf("%s%%", v)
+    | Percentage(v) => Printf.sprintf("%f%%", v)
   and render_subclass_selector =
     fun
     | Id(v) => Printf.sprintf("#%s", v)
@@ -335,12 +335,21 @@ and render_selector = (~loc, selector: selector) => {
     | ClassVariable(v) => "." ++ render_variable_as_string(v)
     | Attribute(Attr_value(v)) => Printf.sprintf("[%s]", v)
     | Attribute(To_equal({ name, kind, value })) => {
+        let kind_str =
+          switch (kind) {
+          | Attr_exact => "="
+          | Attr_member => "~="
+          | Attr_prefix_dash => "|="
+          | Attr_prefix => "^="
+          | Attr_suffix => "$="
+          | Attr_substring => "*="
+          };
         let value =
           switch (value) {
           | Attr_ident(ident) => ident
           | Attr_string(ident) => {|"|} ++ ident ++ {|"|}
           };
-        Printf.sprintf("[%s%s%s]", name, kind, value);
+        Printf.sprintf("[%s%s%s]", name, kind_str, value);
       }
     | Pseudo_class(psc) => render_pseudo_selector(psc)
   and render_nth =
@@ -508,10 +517,19 @@ let render_keyframes = (~loc, declarations: rule_list) => {
       | Type(t) =>
         Error.expr(~loc=declarations_loc, invalid_prelude_value(t))
       | Percentage(n) =>
-        switch (int_of_string_opt(n)) {
-        | Some(n) when n >= 0 && n <= 100 =>
-          Builder.eint(~loc=declarations_loc, n)
-        | _ => Error.expr(~loc=declarations_loc, invalid_percentage_value(n))
+        if (Float.is_integer(n)) {
+          let int_value = int_of_float(n);
+          int_value >= 0 && int_value <= 100
+            ? Builder.eint(~loc=declarations_loc, int_value)
+            : Error.expr(
+                ~loc=declarations_loc,
+                invalid_percentage_value(Printf.sprintf("%f", n)),
+              );
+        } else {
+          Error.expr(
+            ~loc=declarations_loc,
+            invalid_percentage_value(Printf.sprintf("%f", n)),
+          );
         }
       | Ampersand =>
         Error.expr(~loc=declarations_loc, invalid_prelude_value("&"))
