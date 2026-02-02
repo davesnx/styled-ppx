@@ -545,7 +545,7 @@ let rec consume = (~state, lexbuf) => {
           consume_identifier(lexbuf) |> handle_consume_identifier;
         Ok(Tokens.HASH((string, `UNRESTRICTED)));
       };
-    | _ => Ok(DELIM("#"))
+    | _ => Ok(DELIM('#'))
     };
   let consume_minus = () =>
     switch%sedlex (lexbuf) {
@@ -557,7 +557,7 @@ let rec consume = (~state, lexbuf) => {
       consume_ident_like(~state, lexbuf);
     | _ =>
       let _ = Sedlexing.next(lexbuf);
-      Ok(DELIM("-"));
+      Ok(MINUS);
     };
   let rec discard_comments = lexbuf => {
     let (start_pos, curr_pos) = Sedlexing.lexing_positions(lexbuf);
@@ -576,9 +576,9 @@ let rec consume = (~state, lexbuf) => {
     };
   };
 
-  let emit_delim = char => {
+  let emit_delim = char_string => {
     let is_combinator =
-      switch (char) {
+      switch (char_string) {
       | ">"
       | "+"
       | "~" => true
@@ -587,7 +587,10 @@ let rec consume = (~state, lexbuf) => {
     if (is_combinator && state.mode == Selector) {
       state.last_was_combinator = true;
     };
-    Ok(Tokens.DELIM(char));
+    switch (Tokens.token_of_delimiter_string(char_string)) {
+    | Some(token) => Ok(token)
+    | None => Error(Tokens.Invalid_delim)
+    };
   };
 
   let handle_mode_transition = token => {
@@ -748,7 +751,7 @@ let rec consume = (~state, lexbuf) => {
   | "*" => Ok(handle_mode_transition(ASTERISK))
   | "<=" => Ok(LTE)
   | ">=" => Ok(GTE)
-  | "<" => Ok(DELIM("<"))
+  | "<" => Ok(LESS_THAN)
   | "@" =>
     if (check_if_three_codepoints_would_start_an_identifier(lexbuf)) {
       let.ok string = consume_identifier(lexbuf) |> handle_consume_identifier;
@@ -762,7 +765,7 @@ let rec consume = (~state, lexbuf) => {
         };
       Ok(handle_mode_transition(token));
     } else {
-      Ok(DELIM("@"));
+      Ok(DELIM('@'));
     }
   | "[" => Ok(handle_mode_transition(LEFT_BRACKET))
   | "]" => Ok(handle_mode_transition(RIGHT_BRACKET))

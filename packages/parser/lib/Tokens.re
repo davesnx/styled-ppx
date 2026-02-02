@@ -22,10 +22,22 @@ type token =
   | STRING(string) // <string-token>
   | URL(string) // <url-token>
   | INTERPOLATION(list(string)) // <interpolation-token> (non-standard)
-  | DELIM(string) // <delim-token>
-  | DOT // <dot-token> (non-standard)
-  | ASTERISK // <asterisk-token> (non-standard)
-  | AMPERSAND // <ampersand-token> (non-standard)
+  | DELIM(char) // <delim-token> for unknown single characters
+  | DOT // '.'
+  | ASTERISK // '*'
+  | AMPERSAND // '&'
+  | PLUS // '+'
+  | MINUS // '-'
+  | TILDE // '~'
+  | GREATER_THAN // '>'
+  | LESS_THAN // '<'
+  | EQUALS // '='
+  | SLASH // '/'
+  | EXCLAMATION // '!'
+  | PIPE // '|'
+  | CARET // '^'
+  | DOLLAR_SIGN // '$'
+  | QUESTION_MARK // '?'
   | NUMBER(float) // <number-token>
   | PERCENTAGE(float) // <percentage-token>
   | DIMENSION((float, string)) // <dimension-token>
@@ -47,12 +59,30 @@ type token =
 
 let string_of_char = c => String.make(1, c);
 
+let float_to_string = value => {
+  let raw = string_of_float(value);
+  let has_dot = String.contains(raw, '.');
+  if (!has_dot) {
+    raw;
+  } else {
+    let len = String.length(raw);
+    let rec drop_zeros = idx =>
+      idx > 0 && raw.[idx - 1] == '0' ? drop_zeros(idx - 1) : idx;
+    let trimmed_len = drop_zeros(len);
+    let trimmed_len =
+      trimmed_len > 0 && raw.[trimmed_len - 1] == '.'
+        ? trimmed_len - 1 : trimmed_len;
+    trimmed_len == len ? raw : String.sub(raw, 0, trimmed_len);
+  };
+};
+
 type error =
   | Invalid_code_point
   | Eof
   | New_line
   | Bad_url
-  | Bad_ident;
+  | Bad_ident
+  | Invalid_delim;
 
 let show_error =
   fun
@@ -60,31 +90,75 @@ let show_error =
   | Eof => "Unexpected end of input"
   | New_line => "Unexpected newline in string"
   | Bad_url => "Invalid URL"
-  | Bad_ident => "Invalid identifier";
+  | Bad_ident => "Invalid identifier"
+  | Invalid_delim => "Invalid delimiter";
+
+let token_of_delimiter_string =
+  fun
+  | "(" => Some(LEFT_PAREN)
+  | ")" => Some(RIGHT_PAREN)
+  | "[" => Some(LEFT_BRACKET)
+  | "]" => Some(RIGHT_BRACKET)
+  | "{" => Some(LEFT_BRACE)
+  | "}" => Some(RIGHT_BRACE)
+  | ":" => Some(COLON)
+  | ";" => Some(SEMI_COLON)
+  | "," => Some(COMMA)
+  | "." => Some(DOT)
+  | "*" => Some(ASTERISK)
+  | "&" => Some(AMPERSAND)
+  | "+" => Some(PLUS)
+  | "-" => Some(MINUS)
+  | "~" => Some(TILDE)
+  | ">" => Some(GREATER_THAN)
+  | "<" => Some(LESS_THAN)
+  | "=" => Some(EQUALS)
+  | "/" => Some(SLASH)
+  | "!" => Some(EXCLAMATION)
+  | "|" => Some(PIPE)
+  | "^" => Some(CARET)
+  | "$" => Some(DOLLAR_SIGN)
+  | "?" => Some(QUESTION_MARK)
+  | "#" => Some(DELIM('#'))
+  | "@" => Some(DELIM('@'))
+  | s when String.length(s) == 1 => Some(DELIM(s.[0]))
+  | _ => None;
 
 let humanize =
   fun
   | EOF => "the end"
   | IDENT(s) => s
   | TYPE_SELECTOR(s) => s
-  | FUNCTION(fn) => fn ++ "("
-  | NTH_FUNCTION(fn) => fn ++ "("
-  | AT_KEYWORD(s) => "@" ++ s
-  | AT_KEYFRAMES(s) => "@" ++ s
-  | AT_RULE_STATEMENT(s) => "@" ++ s
-  | AT_RULE(s) => "@" ++ s
+  | FUNCTION(fn) => Printf.sprintf("%s(", fn)
+  | NTH_FUNCTION(fn) => Printf.sprintf("%s(", fn)
+  | AT_KEYWORD(s) => Printf.sprintf("@%s", s)
+  | AT_KEYFRAMES(s) => Printf.sprintf("@%s", s)
+  | AT_RULE_STATEMENT(s) => Printf.sprintf("@%s", s)
+  | AT_RULE(s) => Printf.sprintf("@%s", s)
   | UNICODE_RANGE(s) => s
-  | HASH((s, _)) => "#" ++ s
-  | STRING(s) => "'" ++ s ++ "'"
-  | URL(url) => "url(" ++ url ++ ")"
-  | INTERPOLATION(v) => "$(" ++ String.concat(".", v) ++ ")"
-  | DELIM(s) => s
+  | HASH((s, _)) => Printf.sprintf("#%s", s)
+  | STRING(s) => Printf.sprintf("'%s'", s)
+  | URL(url) => Printf.sprintf("url(%s)", url)
+  | INTERPOLATION(v) => Printf.sprintf("$(%s)", String.concat(".", v))
+  | DELIM(c) => String.make(1, c)
   | DOT => "."
   | ASTERISK => "*"
   | AMPERSAND => "&"
-  | NUMBER(n) => Number_format.float_to_string(n)
-  | PERCENTAGE(n) => Number_format.float_to_string(n) ++ "%"
-  | DIMENSION((n, d)) => Number_format.float_to_string(n) ++ d
+  | PLUS => "+"
+  | MINUS => "-"
+  | TILDE => "~"
+  | GREATER_THAN => ">"
+  | LESS_THAN => "<"
+  | EQUALS => "="
+  | SLASH => "/"
+  | EXCLAMATION => "!"
+  | PIPE => "|"
+  | CARET => "^"
+  | DOLLAR_SIGN => "$"
+  | QUESTION_MARK => "?"
+  | NUMBER(n) => float_to_string(n)
+  | PERCENTAGE(n) => Printf.sprintf("%s%%", float_to_string(n))
+  | DIMENSION((n, d)) => Printf.sprintf("%s%s", float_to_string(n), d)
   | DESCENDANT_COMBINATOR => " "
   | WS => " "
   | COLON => ":"
@@ -115,34 +189,47 @@ let to_debug =
   | SEMI_COLON => "SEMI_COLON"
   | COMMA => "COMMA"
   | IMPORTANT => "IMPORTANT"
-  | IDENT(s) => "IDENT('" ++ s ++ "')"
-  | TYPE_SELECTOR(s) => "TYPE_SELECTOR('" ++ s ++ "')"
-  | STRING(s) => "STRING('" ++ s ++ "')"
-  | FUNCTION(fn) => "FUNCTION(" ++ fn ++ ")"
-  | NTH_FUNCTION(fn) => "NTH_FUNCTION(" ++ fn ++ ")"
-  | URL(u) => "URL(" ++ u ++ ")"
-  | AT_KEYWORD(s) => "AT_KEYWORD('" ++ s ++ "')"
-  | AT_KEYFRAMES(s) => "AT_KEYFRAMES('" ++ s ++ "')"
-  | AT_RULE_STATEMENT(s) => "AT_RULE_STATEMENT('" ++ s ++ "')"
-  | AT_RULE(s) => "AT_RULE('" ++ s ++ "')"
+  | IDENT(s) => Printf.sprintf("IDENT('%s')", s)
+  | TYPE_SELECTOR(s) => Printf.sprintf("TYPE_SELECTOR('%s')", s)
+  | STRING(s) => Printf.sprintf("STRING('%s')", s)
+  | FUNCTION(fn) => Printf.sprintf("FUNCTION(%s)", fn)
+  | NTH_FUNCTION(fn) => Printf.sprintf("NTH_FUNCTION(%s)", fn)
+  | URL(u) => Printf.sprintf("URL(%s)", u)
+  | AT_KEYWORD(s) => Printf.sprintf("AT_KEYWORD('%s')", s)
+  | AT_KEYFRAMES(s) => Printf.sprintf("AT_KEYFRAMES('%s')", s)
+  | AT_RULE_STATEMENT(s) => Printf.sprintf("AT_RULE_STATEMENT('%s')", s)
+  | AT_RULE(s) => Printf.sprintf("AT_RULE('%s')", s)
   | HASH((s, kind)) => {
       let kind =
         switch (kind) {
         | `ID => "ID"
         | `UNRESTRICTED => "UNRESTRICTED"
         };
-      "HASH('" ++ s ++ "', " ++ kind ++ ")";
+      Printf.sprintf("HASH('%s', %s)", s, kind);
     }
-  | NUMBER(n) => "NUMBER(" ++ Number_format.float_to_string(n) ++ ")"
-  | PERCENTAGE(n) => "PERCENTAGE(" ++ Number_format.float_to_string(n) ++ ")"
+  | NUMBER(n) => Printf.sprintf("NUMBER(%s)", float_to_string(n))
+  | PERCENTAGE(n) => Printf.sprintf("PERCENTAGE(%s)", float_to_string(n))
   | DIMENSION((n, d)) =>
-    "DIMENSION(" ++ Number_format.float_to_string(n) ++ ", " ++ d ++ ")"
-  | UNICODE_RANGE(s) => "UNICODE_RANGE('" ++ s ++ "')"
-  | INTERPOLATION(v) => "INTERPOLATION('" ++ String.concat(".", v) ++ "')"
-  | DELIM(s) => "DELIM('" ++ s ++ "')"
+    Printf.sprintf("DIMENSION(%s, %s)", float_to_string(n), d)
+  | UNICODE_RANGE(s) => Printf.sprintf("UNICODE_RANGE('%s')", s)
+  | INTERPOLATION(v) =>
+    Printf.sprintf("INTERPOLATION('%s')", String.concat(".", v))
+  | DELIM(c) => Printf.sprintf("DELIM('%c')", c)
   | DOT => "DOT"
   | ASTERISK => "ASTERISK"
   | AMPERSAND => "AMPERSAND"
+  | PLUS => "PLUS"
+  | MINUS => "MINUS"
+  | TILDE => "TILDE"
+  | GREATER_THAN => "GREATER_THAN"
+  | LESS_THAN => "LESS_THAN"
+  | EQUALS => "EQUALS"
+  | SLASH => "SLASH"
+  | EXCLAMATION => "EXCLAMATION"
+  | PIPE => "PIPE"
+  | CARET => "CARET"
+  | DOLLAR_SIGN => "DOLLAR_SIGN"
+  | QUESTION_MARK => "QUESTION_MARK"
   | DESCENDANT_COMBINATOR => "DESCENDANT_COMBINATOR"
   | WS => "WS"
   | GTE => "GTE"

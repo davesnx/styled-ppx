@@ -76,7 +76,7 @@ and selector = (ast: Ast.selector) => {
     | Type(v) => v
     | Subclass(v) => render_subclass_selector(v)
     | Variable(v) => variable(v)
-    | Percentage(p) => Number_format.float_to_string(p) ++ "%"
+    | Percentage(p) => Tokens.float_to_string(p) ++ "%"
   and render_subclass_selector: Ast.subclass_selector => string =
     fun
     | Ast.Id(v) => Printf.sprintf("#%s", v)
@@ -84,11 +84,19 @@ and selector = (ast: Ast.selector) => {
     | Attribute(attr) => Printf.sprintf("[%s]", render_attribute(attr))
     | Pseudo_class(psc) => render_pseudo_selector(psc)
     | ClassVariable(v) => "." ++ variable(v)
+  and render_attr_matcher =
+    fun
+    | Ast.Attr_exact => "="
+    | Attr_member => "~="
+    | Attr_prefix_dash => "|="
+    | Attr_prefix => "^="
+    | Attr_suffix => "$="
+    | Attr_substring => "*="
   and render_attribute =
     fun
     | Ast.Attr_value(v) => v
     | To_equal({ name, kind, value }) =>
-      name ++ kind ++ render_attr_value(value)
+      name ++ render_attr_matcher(kind) ++ render_attr_value(value)
   and render_attr_value =
     fun
     | Ast.Attr_ident(i) => i
@@ -185,7 +193,7 @@ and component_value = (ast: Ast.component_value) => {
   | Whitespace => " "
   | Paren_block(block) => "(" ++ component_value_list(block) ++ ")"
   | Bracket_block(block) => "[" ++ component_value_list(block) ++ "]"
-  | Percentage(value) => Number_format.float_to_string(value) ++ "%"
+  | Percentage(value) => Tokens.float_to_string(value) ++ "%"
   | Ident(string) => string
   | String(string) => "\"" ++ string ++ "\""
   | Uri(string) => "url(\"" ++ string ++ "\")"
@@ -194,9 +202,9 @@ and component_value = (ast: Ast.component_value) => {
     let body = body |> fst |> component_value_list;
     Printf.sprintf("%s(%s)", fst(name), body);
   | Hash(string) => "#" ++ string
-  | Number(n) => Number_format.float_to_string(n)
+  | Number(n) => Tokens.float_to_string(n)
   | Unicode_range(string) => string
-  | Dimension((a, b)) => Number_format.float_to_string(a) ++ b
+  | Dimension((a, b)) => Tokens.float_to_string(a) ++ b
   | Variable(v) => variable(v)
   | Selector(v) => selector_list(v)
   };

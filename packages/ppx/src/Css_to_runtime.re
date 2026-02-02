@@ -335,12 +335,21 @@ and render_selector = (~loc, selector: selector) => {
     | ClassVariable(v) => "." ++ render_variable_as_string(v)
     | Attribute(Attr_value(v)) => Printf.sprintf("[%s]", v)
     | Attribute(To_equal({ name, kind, value })) => {
+        let kind_str =
+          switch (kind) {
+          | Attr_exact => "="
+          | Attr_member => "~="
+          | Attr_prefix_dash => "|="
+          | Attr_prefix => "^="
+          | Attr_suffix => "$="
+          | Attr_substring => "*="
+          };
         let value =
           switch (value) {
           | Attr_ident(ident) => ident
           | Attr_string(ident) => {|"|} ++ ident ++ {|"|}
           };
-        Printf.sprintf("[%s%s%s]", name, kind, value);
+        Printf.sprintf("[%s%s%s]", name, kind_str, value);
       }
     | Pseudo_class(psc) => render_pseudo_selector(psc)
   and render_nth =

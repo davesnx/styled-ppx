@@ -118,12 +118,12 @@ module Pattern = {
     | _ => (Error(["missing the token expected"]), []);
 
   let token = (expected, tokens) => {
-    let tokens = skip_whitespace(tokens);
-    switch (tokens) {
+    switch (skip_whitespace(tokens)) {
     | [token, ...tokens] =>
-      let data = expected(token);
-      let tokens = Result.is_ok(data) ? tokens : [token, ...tokens];
-      (data, tokens);
+      switch (expected(token)) {
+      | Ok(value) => (Ok(value), tokens)
+      | Error(error) => (Error(error), [token, ...tokens])
+      }
     | [] => (Error(["missing the token expected"]), [])
     };
   };

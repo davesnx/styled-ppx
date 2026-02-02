@@ -8,24 +8,7 @@ let int_of_float_exn value =
   if Float.is_integer value then int_of_float value
   else raise (Failure "Expected integer")
 
-let expect_delim expected actual =
-  if actual = expected then actual
-  else raise (Failure ("Expected delimiter " ^ expected))
-
-let combinator_from_delim =
-  function
-  | ("+" | "~" | ">") as value -> value
-  | value -> raise (Failure ("Invalid combinator " ^ value))
-
-let operator_prefix_from_delim =
-  function
-  | ("~" | "|" | "^" | "$" | "*") as value -> value
-  | value -> raise (Failure ("Invalid operator prefix " ^ value))
-
-let nth_operator_from_delim =
-  function
-  | ("+" | "-") as value -> value
-  | value -> raise (Failure ("Invalid nth operator " ^ value))
+let string_of_char c = String.make 1 c
 
 %}
 
@@ -48,10 +31,22 @@ let nth_operator_from_delim =
 %token WS
 %token GTE
 %token LTE
+%token PLUS
+%token MINUS
+%token TILDE
+%token GREATER_THAN
+%token LESS_THAN
+%token EQUALS
+%token SLASH
+%token EXCLAMATION
+%token PIPE
+%token CARET
+%token DOLLAR_SIGN
+%token QUESTION_MARK
 %token <string> IDENT
 %token <string> TYPE_SELECTOR
 %token <string> STRING
-%token <string> DELIM
+%token <char> DELIM
 %token <string> FUNCTION
 %token <string> NTH_FUNCTION
 %token <string> URL
@@ -236,10 +231,13 @@ declaration_without_eof:
   }
 
 combinator:
-  | d = DELIM { combinator_from_delim d }
+  | PLUS { "+" }
+  | TILDE { "~" }
+  | GREATER_THAN { ">" }
 
 nth_operator:
-  | d = DELIM { nth_operator_from_delim d }
+  | PLUS { "+" }
+  | MINUS { "-" }
 
 nth_payload:
   /* TODO implement [of <complex-selector-list>]? */
@@ -318,16 +316,13 @@ pseudo_class_selector:
 ;
 
 /* "~=" | "|=" | "^=" | "$=" | "*=" | "=" */
-operator_prefix:
-  | d = DELIM { operator_prefix_from_delim d }
-  | ASTERISK { operator_prefix_from_delim "*" }
-
-operator:
-  | prefix = operator_prefix d = DELIM { let _ = expect_delim "=" d in prefix ^ "=" }
-  | d = DELIM { expect_delim "=" d }
-
 attr_matcher:
- | o = operator { o }
+  | TILDE EQUALS { Attr_member }
+  | PIPE EQUALS { Attr_prefix_dash }
+  | CARET EQUALS { Attr_prefix }
+  | DOLLAR_SIGN EQUALS { Attr_suffix }
+  | ASTERISK EQUALS { Attr_substring }
+  | EQUALS { Attr_exact }
 
 wq_name:
   | i = selector_ident { i }
@@ -518,7 +513,19 @@ value:
   | DOT { Delim "." }
   | ASTERISK { Delim "*" }
   | AMPERSAND { Delim "&" }
-  | d = DELIM { Delim d }
+  | PLUS { Delim "+" }
+  | MINUS { Delim "-" }
+  | TILDE { Delim "~" }
+  | GREATER_THAN { Delim ">" }
+  | LESS_THAN { Delim "<" }
+  | EQUALS { Delim "=" }
+  | SLASH { Delim "/" }
+  | EXCLAMATION { Delim "!" }
+  | PIPE { Delim "|" }
+  | CARET { Delim "^" }
+  | DOLLAR_SIGN { Delim "$" }
+  | QUESTION_MARK { Delim "?" }
+  | d = DELIM { Delim (string_of_char d) }
   | GTE { Delim ">=" }
   | LTE { Delim "<=" }
   | h = HASH { let (value, _) = h in Hash value }

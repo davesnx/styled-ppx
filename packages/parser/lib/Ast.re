@@ -137,11 +137,19 @@ and subclass_selector =
   | Attribute(attribute_selector)
   | Pseudo_class(pseudo_selector)
 [@deriving show({ with_path: false })]
+and attr_matcher =
+  | Attr_exact
+  | Attr_member
+  | Attr_prefix_dash
+  | Attr_prefix
+  | Attr_suffix
+  | Attr_substring
+[@deriving show({ with_path: false })]
 and attribute_selector =
   | Attr_value(string)
   | To_equal({
       name: string,
-      kind: string,
+      kind: attr_matcher,
       value: attr_value,
     })
 [@deriving show({ with_path: false })]

@@ -17,18 +17,12 @@ let keyword =
     );
 
 let comma = expect(COMMA);
-let delim =
-  fun
-  | "(" => expect(LEFT_PAREN)
-  | ")" => expect(RIGHT_PAREN)
-  | "[" => expect(LEFT_BRACKET)
-  | "]" => expect(RIGHT_BRACKET)
-  | ":" => expect(COLON)
-  | ";" => expect(SEMI_COLON)
-  | "." => expect(DOT)
-  | "*" => expect(ASTERISK)
-  | "&" => expect(AMPERSAND)
-  | s => expect(DELIM(s));
+let delim = s =>
+  switch (token_of_delimiter_string(s)) {
+  | Some(token) => expect(token)
+  | None =>
+    token(_ => Error(["delim: unexpected multi-char string '" ++ s ++ "'"]))
+  };
 let function_call = (name, rule) => {
   let.bind_match () =
     token(
