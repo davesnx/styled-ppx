@@ -1,0 +1,32 @@
+---
+alwaysApply: true
+---
+
+# OCaml Stdlib Preferences
+
+Prefer module-qualified functions over legacy top-level aliases:
+
+- `Int.of_string` instead of `int_of_string`
+- `Int.of_string_opt` instead of `int_of_string_opt`
+- `Int.to_string` instead of `string_of_int`
+- `Float.of_string` instead of `float_of_string`
+- `Float.of_string_opt` instead of `float_of_string_opt`
+- `Float.to_string` instead of `string_of_float`
+
+Unless specified, do not use `failwith`, neither `assert(false)`.
+
+# Pattern Matching Style
+
+Prefer type annotation on the matched value over module-qualified constructors:
+
+```ocaml
+(* ✅ Preferred *)
+match (value : Module.t) with
+| Constructor_1 -> ...
+| Constructor_2 -> ...
+
+(* ❌ Avoid *)
+match value with
+| Module.Constructor_1 -> ...
+| Module.Constructor_2 -> ...
+```
