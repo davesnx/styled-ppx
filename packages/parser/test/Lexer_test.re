@@ -95,7 +95,11 @@ let success_tests =
     ("1 / 1", [NUMBER(1.), WS, SLASH, WS, NUMBER(1.)]),
     (
       {|url($(Module.variable))|},
-      [FUNCTION("url"), INTERPOLATION(("Module.variable", Ppxlib.Location.none)), RIGHT_PAREN],
+      [
+        FUNCTION("url"),
+        INTERPOLATION(("Module.variable", Ppxlib.Location.none)),
+        RIGHT_PAREN,
+      ],
     ),
     (
       {|calc(10px + 10px)|},
@@ -133,19 +137,36 @@ let success_tests =
         RIGHT_PAREN,
       ],
     ),
-    ({|$(Module.variable)|}, [INTERPOLATION(("Module.variable", Ppxlib.Location.none))]),
-    ({|$(Module.variable')|}, [INTERPOLATION(("Module.variable'", Ppxlib.Location.none))]),
+    (
+      {|$(Module.variable)|},
+      [INTERPOLATION(("Module.variable", Ppxlib.Location.none))],
+    ),
+    (
+      {|$(Module.variable')|},
+      [INTERPOLATION(("Module.variable'", Ppxlib.Location.none))],
+    ),
     (
       {|$(match prop with | Big -> CSS.red | Small -> CSS.blue)|},
       [
-        INTERPOLATION(("match prop with | Big -> CSS.red | Small -> CSS.blue", Ppxlib.Location.none)),
+        INTERPOLATION((
+          "match prop with | Big -> CSS.red | Small -> CSS.blue",
+          Ppxlib.Location.none,
+        )),
       ],
     ),
     (
       {|$(switch (prop) { | Big => `red | Small => `blue })|},
-      [INTERPOLATION(("switch (prop) { | Big => `red | Small => `blue }", Ppxlib.Location.none))],
+      [
+        INTERPOLATION((
+          "switch (prop) { | Big => `red | Small => `blue }",
+          Ppxlib.Location.none,
+        )),
+      ],
     ),
-    ({|$({ let x = 1; x + 1 })|}, [INTERPOLATION(("{ let x = 1; x + 1 }", Ppxlib.Location.none))]),
+    (
+      {|$({ let x = 1; x + 1 })|},
+      [INTERPOLATION(("{ let x = 1; x + 1 }", Ppxlib.Location.none))],
+    ),
     (
       {|$(f(x) /* comment */ + 1)|},
       [INTERPOLATION(("f(x) /* comment */ + 1", Ppxlib.Location.none))],
@@ -337,14 +358,26 @@ let test_with_location =
     ),
     ({|nth-child(|}, [NTH_FUNCTION("nth-child")], 10),
     ({|calc(10%)|}, [FUNCTION("calc"), PERCENTAGE(10.), RIGHT_PAREN], 9),
-    ({|$(Module.variable)|}, [INTERPOLATION(("Module.variable", Ppxlib.Location.none))], 18),
-    ({|$(Module.variable')|}, [INTERPOLATION(("Module.variable'", Ppxlib.Location.none))], 19),
+    (
+      {|$(Module.variable)|},
+      [INTERPOLATION(("Module.variable", Ppxlib.Location.none))],
+      18,
+    ),
+    (
+      {|$(Module.variable')|},
+      [INTERPOLATION(("Module.variable'", Ppxlib.Location.none))],
+      19,
+    ),
     ({|--color-main|}, [IDENT("--color-main")], 12),
     ({|>=|}, [GTE], 2),
     ({|<=|}, [LTE], 2),
     (
       {|url($(Module.variable'))|},
-      [FUNCTION("url"), INTERPOLATION(("Module.variable'", Ppxlib.Location.none)), RIGHT_PAREN],
+      [
+        FUNCTION("url"),
+        INTERPOLATION(("Module.variable'", Ppxlib.Location.none)),
+        RIGHT_PAREN,
+      ],
       24,
     ),
   ]
@@ -1033,7 +1066,11 @@ let toplevel_mode_tests =
     // Interpolations in selectors
     (
       {|$(variable) {}|},
-      [INTERPOLATION(("variable", Ppxlib.Location.none)), LEFT_BRACE, RIGHT_BRACE],
+      [
+        INTERPOLATION(("variable", Ppxlib.Location.none)),
+        LEFT_BRACE,
+        RIGHT_BRACE,
+      ],
     ),
     (
       {|div.$(className) {}|},
@@ -1047,7 +1084,11 @@ let toplevel_mode_tests =
     ),
     (
       {|$(Module.selector) {}|},
-      [INTERPOLATION(("Module.selector", Ppxlib.Location.none)), LEFT_BRACE, RIGHT_BRACE],
+      [
+        INTERPOLATION(("Module.selector", Ppxlib.Location.none)),
+        LEFT_BRACE,
+        RIGHT_BRACE,
+      ],
     ),
     // Edge cases
     (
