@@ -656,7 +656,12 @@
               "name": "punctuation.definition.interpolation.end.bracket.round.css.styled-ppx"
             }
           },
-          "contentName": "variable.interpolation.css.styled-ppx"
+          "contentName": "variable.interpolation.css.styled-ppx",
+          "patterns": [
+            { "include": "source.ocaml" },
+            { "include": "source.reason" },
+            { "include": "source.rescript" }
+          ]
         },
         {
           "name": "variable.interpolation.css.styled-ppx",
