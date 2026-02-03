@@ -7,11 +7,6 @@ module Builder = Ppxlib.Ast_builder.Default;
 exception Invalid_value(string);
 
 let loc = Location.none;
-let txt = txt => {
-  Location.loc: Location.none,
-  txt,
-};
-
 let (let.ok) = Result.bind;
 
 let id = Fun.id;
@@ -22,10 +17,17 @@ let render_string = string =>
 let render_integer = integer =>
   Helper.Const.int(integer) |> Helper.Exp.constant;
 
-let list_to_longident = vars => vars |> String.concat(".") |> Longident.parse;
-
 let render_variable = name =>
-  list_to_longident(name) |> txt |> Helper.Exp.ident;
+  switch (
+    Expression_parser.parse_expression(~loc=Location.none, ~source=name)
+  ) {
+  | Ok(expr) => expr
+  | Error(msg) =>
+    Error.expr(
+      ~loc=Location.none,
+      "Invalid interpolation expression: " ++ msg,
+    )
+  };
 
 type transform('ast, 'value) = {
   ast_of_string: string => result('ast, string),

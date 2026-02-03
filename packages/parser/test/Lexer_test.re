@@ -95,7 +95,7 @@ let success_tests =
     ("1 / 1", [NUMBER(1.), WS, SLASH, WS, NUMBER(1.)]),
     (
       {|url($(Module.variable))|},
-      [FUNCTION("url"), INTERPOLATION(["Module", "variable"]), RIGHT_PAREN],
+      [FUNCTION("url"), INTERPOLATION(("Module.variable", Ppxlib.Location.none)), RIGHT_PAREN],
     ),
     (
       {|calc(10px + 10px)|},
@@ -133,8 +133,27 @@ let success_tests =
         RIGHT_PAREN,
       ],
     ),
-    ({|$(Module.variable)|}, [INTERPOLATION(["Module", "variable"])]),
-    ({|$(Module.variable')|}, [INTERPOLATION(["Module", "variable'"])]),
+    ({|$(Module.variable)|}, [INTERPOLATION(("Module.variable", Ppxlib.Location.none))]),
+    ({|$(Module.variable')|}, [INTERPOLATION(("Module.variable'", Ppxlib.Location.none))]),
+    (
+      {|$(match prop with | Big -> CSS.red | Small -> CSS.blue)|},
+      [
+        INTERPOLATION(("match prop with | Big -> CSS.red | Small -> CSS.blue", Ppxlib.Location.none)),
+      ],
+    ),
+    (
+      {|$(switch (prop) { | Big => `red | Small => `blue })|},
+      [INTERPOLATION(("switch (prop) { | Big => `red | Small => `blue }", Ppxlib.Location.none))],
+    ),
+    ({|$({ let x = 1; x + 1 })|}, [INTERPOLATION(("{ let x = 1; x + 1 }", Ppxlib.Location.none))]),
+    (
+      {|$(f(x) /* comment */ + 1)|},
+      [INTERPOLATION(("f(x) /* comment */ + 1", Ppxlib.Location.none))],
+    ),
+    (
+      {|$(if (x) { a } else { b })|},
+      [INTERPOLATION(("if (x) { a } else { b }", Ppxlib.Location.none))],
+    ),
     ({|-moz|}, [IDENT("-moz")]),
     ({|--color-main|}, [IDENT("--color-main")]),
     (
@@ -205,6 +224,22 @@ let soft_error_tests =
     ({|url(bad"url)|}, "Error(Invalid URL)"),
     ({|url(bad'url)|}, "Error(Invalid URL)"),
     ("\\\n", "Error(Invalid escape sequence)"),
+    ({|$(unclosed|}, "Error(Unclosed interpolation: expected ')' to close)"),
+    (
+      {|$("unterminated|},
+      "Error(Unclosed string literal inside interpolation)",
+    ),
+    ({|$('\\|}, "Error(Unclosed char literal inside interpolation)"),
+    (
+      {|$(f (* unclosed comment|},
+      "Error(Unclosed comment inside interpolation)",
+    ),
+    (
+      {|$(switch (x) { | A => a|},
+      "Error(Unclosed brace inside interpolation)",
+    ),
+    ({|$({ let x = 1;|}, "Error(Unclosed brace inside interpolation)"),
+    ({|$(f(x) /* unclosed|}, "Error(Unclosed comment inside interpolation)"),
   ]
   |> List.map(((input, expected_output)) => {
        test_case(
@@ -302,18 +337,14 @@ let test_with_location =
     ),
     ({|nth-child(|}, [NTH_FUNCTION("nth-child")], 10),
     ({|calc(10%)|}, [FUNCTION("calc"), PERCENTAGE(10.), RIGHT_PAREN], 9),
-    ({|$(Module.variable)|}, [INTERPOLATION(["Module", "variable"])], 18),
-    ({|$(Module.variable')|}, [INTERPOLATION(["Module", "variable'"])], 19),
+    ({|$(Module.variable)|}, [INTERPOLATION(("Module.variable", Ppxlib.Location.none))], 18),
+    ({|$(Module.variable')|}, [INTERPOLATION(("Module.variable'", Ppxlib.Location.none))], 19),
     ({|--color-main|}, [IDENT("--color-main")], 12),
     ({|>=|}, [GTE], 2),
     ({|<=|}, [LTE], 2),
     (
       {|url($(Module.variable'))|},
-      [
-        FUNCTION("url"),
-        INTERPOLATION(["Module", "variable'"]),
-        RIGHT_PAREN,
-      ],
+      [FUNCTION("url"), INTERPOLATION(("Module.variable'", Ppxlib.Location.none)), RIGHT_PAREN],
       24,
     ),
   ]
@@ -1002,21 +1033,21 @@ let toplevel_mode_tests =
     // Interpolations in selectors
     (
       {|$(variable) {}|},
-      [INTERPOLATION(["variable"]), LEFT_BRACE, RIGHT_BRACE],
+      [INTERPOLATION(("variable", Ppxlib.Location.none)), LEFT_BRACE, RIGHT_BRACE],
     ),
     (
       {|div.$(className) {}|},
       [
         TYPE_SELECTOR("div"),
         DOT,
-        INTERPOLATION(["className"]),
+        INTERPOLATION(("className", Ppxlib.Location.none)),
         LEFT_BRACE,
         RIGHT_BRACE,
       ],
     ),
     (
       {|$(Module.selector) {}|},
-      [INTERPOLATION(["Module", "selector"]), LEFT_BRACE, RIGHT_BRACE],
+      [INTERPOLATION(("Module.selector", Ppxlib.Location.none)), LEFT_BRACE, RIGHT_BRACE],
     ),
     // Edge cases
     (

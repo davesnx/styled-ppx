@@ -46,6 +46,10 @@ let update_loc_with_delimiter (loc : Ppxlib.location) delimiter :
   and loc_end = { loc.loc_end with pos_cnum = loc.loc_end.pos_cnum + offset } in
   { loc_start; loc_end; loc_ghost = false }
 
+let make_loc_from_loc ~string_loc ~delimiter loc =
+  let loc = update_loc_with_delimiter loc delimiter in
+  intersection string_loc loc
+
 let update_pos_lnum (a : Ppxlib.location) (b : Ppxlib.location) =
   let loc_start =
     {
@@ -57,3 +61,57 @@ let update_pos_lnum (a : Ppxlib.location) (b : Ppxlib.location) =
     { a.loc_end with pos_lnum = a.loc_end.pos_lnum + b.loc_start.pos_lnum - 1 }
   in
   { a with loc_start; loc_end }
+
+let adjust_to_file ~(relative_loc : Ppxlib.location)
+  ~(base_loc : Ppxlib.location) : Ppxlib.location =
+  let offset =
+    if relative_loc.loc_start.pos_lnum = 1 then
+      base_loc.loc_start.pos_cnum - base_loc.loc_start.pos_bol + 1
+    else 0
+  in
+  let with_offset =
+    {
+      relative_loc with
+      loc_start =
+        {
+          relative_loc.loc_start with
+          pos_cnum = relative_loc.loc_start.pos_cnum + offset;
+        };
+      loc_end =
+        {
+          relative_loc.loc_end with
+          pos_cnum = relative_loc.loc_end.pos_cnum + offset;
+        };
+    }
+  in
+  update_pos_lnum with_offset base_loc
+
+class expression_mapper base_loc =
+  let offset_cnum = base_loc.Ppxlib.loc_start.pos_cnum in
+  let offset_lnum = base_loc.loc_start.pos_lnum - 1 in
+  let base_bol = base_loc.loc_start.pos_bol in
+  let base_fname = base_loc.loc_start.pos_fname in
+
+  let relocate_position pos =
+    {
+      Lexing.pos_fname = base_fname;
+      pos_lnum = pos.Lexing.pos_lnum + offset_lnum;
+      pos_bol = base_bol;
+      pos_cnum = pos.Lexing.pos_cnum + offset_cnum;
+    }
+  in
+
+  object
+    inherit Ppxlib.Ast_traverse.map
+
+    method! location loc =
+      {
+        Ppxlib.loc_start = relocate_position loc.loc_start;
+        loc_end = relocate_position loc.loc_end;
+        loc_ghost = loc.loc_ghost;
+      }
+  end
+
+let relocate_expression base_loc expr =
+  let mapper = new expression_mapper base_loc in
+  mapper#expression expr

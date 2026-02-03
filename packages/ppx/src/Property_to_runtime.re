@@ -6,11 +6,6 @@ module Standard = Css_property_parser.Standard;
 module Property_parser = Css_property_parser.Parser;
 module Types = Property_parser.Types;
 
-let txt = (~loc, txt) => {
-  Location.loc,
-  txt,
-};
-
 let (let.ok) = Result.bind;
 
 /* TODO: Separate unsupported_feature from bs-css doesn't support or can't interpolate on those */
@@ -79,11 +74,12 @@ let render_option = (~loc, f) =>
   | Some(v) => [%expr Some([%e f(~loc, v)])]
   | None => [%expr None];
 
-let list_to_longident = vars =>
-  vars |> String.concat(".") |> Ppxlib.Longident.parse;
-
 let render_variable = (~loc, name) =>
-  list_to_longident(name) |> txt(~loc) |> Builder.pexp_ident(~loc);
+  switch (Expression_parser.parse_expression(~loc, ~source=name)) {
+  | Ok(expr) => expr
+  | Error(msg) =>
+    Error.expr(~loc, "Invalid interpolation expression: " ++ msg)
+  };
 
 let transform_with_variable = (parser, mapper, value_to_expr) => {
   Css_property_parser.(

@@ -65,7 +65,7 @@ and component_value =
   | Number(float)
   | Unicode_range(string)
   | Dimension((float, string))
-  | Variable(list(string))
+  | Variable(string, loc)
 [@deriving show({ with_path: false })]
 and brace_block =
   | Empty
@@ -127,13 +127,13 @@ and simple_selector =
   | Ampersand
   | Type(string)
   | Subclass(subclass_selector)
-  | Variable(list(string))
+  | Variable(string, loc)
   | Percentage(float)
 [@deriving show({ with_path: false })]
 and subclass_selector =
   | Id(string)
   | Class(string)
-  | ClassVariable(list(string))
+  | ClassVariable(string, loc)
   | Attribute(attribute_selector)
   | Pseudo_class(pseudo_selector)
 [@deriving show({ with_path: false })]

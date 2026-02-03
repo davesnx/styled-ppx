@@ -66,7 +66,7 @@ and component_value_list = (ast: Ast.component_value_list) => {
   ast |> List.map(fst) |> List.map(component_value) |> String.concat("");
 }
 
-and variable = v => "$(" ++ String.concat(".", v) ++ ")"
+and variable = v => "$(" ++ v ++ ")"
 
 and selector = (ast: Ast.selector) => {
   let rec render_simple_selector =
@@ -75,7 +75,7 @@ and selector = (ast: Ast.selector) => {
     | Ampersand => "&"
     | Type(v) => v
     | Subclass(v) => render_subclass_selector(v)
-    | Variable(v) => variable(v)
+    | Variable(v, _) => variable(v)
     | Percentage(p) => Tokens.float_to_string(p) ++ "%"
   and render_subclass_selector: Ast.subclass_selector => string =
     fun
@@ -83,7 +83,7 @@ and selector = (ast: Ast.selector) => {
     | Class(v) => Printf.sprintf(".%s", v)
     | Attribute(attr) => Printf.sprintf("[%s]", render_attribute(attr))
     | Pseudo_class(psc) => render_pseudo_selector(psc)
-    | ClassVariable(v) => "." ++ variable(v)
+    | ClassVariable(v, _) => "." ++ variable(v)
   and render_attr_matcher =
     fun
     | Ast.Attr_exact => "="
@@ -205,7 +205,7 @@ and component_value = (ast: Ast.component_value) => {
   | Number(n) => Tokens.float_to_string(n)
   | Unicode_range(string) => string
   | Dimension((a, b)) => Tokens.float_to_string(a) ++ b
-  | Variable(v) => variable(v)
+  | Variable(v, _) => variable(v)
   | Selector(v) => selector_list(v)
   };
 };

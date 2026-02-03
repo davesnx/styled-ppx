@@ -21,7 +21,7 @@ type token =
     ) // <hash-token>
   | STRING(string) // <string-token>
   | URL(string) // <url-token>
-  | INTERPOLATION(list(string)) // <interpolation-token> (non-standard)
+  | INTERPOLATION((string, [@opaque] Ppxlib.Location.t)) // <interpolation-token> (non-standard) - (content, content_location)
   | DELIM(char) // <delim-token> for unknown single characters
   | DOT // '.'
   | ASTERISK // '*'
@@ -82,7 +82,12 @@ type error =
   | New_line
   | Bad_url
   | Bad_ident
-  | Invalid_delim;
+  | Invalid_delim
+  | Unclosed_interpolation
+  | Unclosed_string_in_interpolation
+  | Unclosed_char_in_interpolation
+  | Unclosed_comment_in_interpolation
+  | Unclosed_brace_in_interpolation;
 
 let show_error =
   fun
@@ -91,7 +96,12 @@ let show_error =
   | New_line => "Unexpected newline in string"
   | Bad_url => "Invalid URL"
   | Bad_ident => "Invalid identifier"
-  | Invalid_delim => "Invalid delimiter";
+  | Invalid_delim => "Invalid delimiter"
+  | Unclosed_interpolation => "Unclosed interpolation: expected ')' to close"
+  | Unclosed_string_in_interpolation => "Unclosed string literal inside interpolation"
+  | Unclosed_char_in_interpolation => "Unclosed char literal inside interpolation"
+  | Unclosed_comment_in_interpolation => "Unclosed comment inside interpolation"
+  | Unclosed_brace_in_interpolation => "Unclosed brace inside interpolation";
 
 let token_of_delimiter_string =
   fun
@@ -139,7 +149,7 @@ let humanize =
   | HASH((s, _)) => Printf.sprintf("#%s", s)
   | STRING(s) => Printf.sprintf("'%s'", s)
   | URL(url) => Printf.sprintf("url(%s)", url)
-  | INTERPOLATION(v) => Printf.sprintf("$(%s)", String.concat(".", v))
+  | INTERPOLATION((v, _)) => Printf.sprintf("$(%s)", v)
   | DELIM(c) => String.make(1, c)
   | DOT => "."
   | ASTERISK => "*"
@@ -212,8 +222,7 @@ let to_debug =
   | DIMENSION((n, d)) =>
     Printf.sprintf("DIMENSION(%s, %s)", float_to_string(n), d)
   | UNICODE_RANGE(s) => Printf.sprintf("UNICODE_RANGE('%s')", s)
-  | INTERPOLATION(v) =>
-    Printf.sprintf("INTERPOLATION('%s')", String.concat(".", v))
+  | INTERPOLATION((v, _)) => Printf.sprintf("INTERPOLATION('%s')", v)
   | DELIM(c) => Printf.sprintf("DELIM('%c')", c)
   | DOT => "DOT"
   | ASTERISK => "ASTERISK"

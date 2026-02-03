@@ -249,13 +249,13 @@ let hex_color =
 
 /* <interpolation>, It's not part of the spec.
      It's the implementation/workaround to inject Reason variables into CSS definitions.
-     `$()` only supports variables and Module accessors to variables.
-     In compile-time the bs-css bindings would enforce the types of those variables.
+     `$()` supports arbitrary expressions.
+     In compile-time the bindings enforce the types of those expressions.
    */
 let interpolation = {
   token(
     fun
-    | INTERPOLATION(path) => Ok(path)
+    | INTERPOLATION((expr, _)) => Ok(expr)
     | token =>
       Error([
         "Expected interpolation. Got '" ++ humanize(token) ++ "' instead.",
