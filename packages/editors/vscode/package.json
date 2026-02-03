@@ -3,7 +3,7 @@
   "displayName": "vscode-styled-ppx",
   "description": "Syntax highlighting for styled-ppx",
   "author": "David Sancho <dsnxmoreno@gmail.com>",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "publisher": "davesnx",
   "license": "MIT",
   "repository": {
