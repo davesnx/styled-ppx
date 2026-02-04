@@ -3,7 +3,7 @@
   "displayName": "vscode-styled-ppx",
   "description": "Syntax highlighting for styled-ppx",
   "author": "David Sancho <dsnxmoreno@gmail.com>",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "publisher": "davesnx",
   "license": "MIT",
   "repository": {
@@ -27,14 +27,14 @@
         "aliases": [
           "CSS (styled-ppx)"
         ],
-        "configuration": "./css.styled-ppx.configuration.json"
+        "configuration": "./css-styled-ppx-configuration.json"
       }
     ],
     "grammars": [
       {
         "language": "source.css.styled-ppx",
         "scopeName": "source.css.styled-ppx",
-        "path": "./syntaxes/css.styled-ppx.json"
+        "path": "./syntaxes/css-styled-ppx.json"
       },
       {
         "injectTo": [

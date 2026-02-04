@@ -55,7 +55,7 @@ let string_of_char c = String.make 1 c
 %token <string> AT_RULE
 %token <string> AT_RULE_STATEMENT
 %token <string> UNICODE_RANGE
-%token <string list> INTERPOLATION
+%token <string * Ppxlib.Location.t> INTERPOLATION
 %token <string * [ `ID | `UNRESTRICTED ]> HASH
 %token <float> NUMBER
 %token <float> PERCENTAGE
@@ -381,7 +381,7 @@ subclass_selector:
   | c = class_selector { c } /* .class */
   | a = attribute_selector { a } /* [attr] */
   | pcs = pseudo_class_selector { Pseudo_class pcs } /* :pseudo-class */
-  | DOT v = INTERPOLATION { ClassVariable v } /* .$(Variable) as subclass_selector */
+  | DOT v = INTERPOLATION { let (content, loc) = v in ClassVariable (content, loc) } /* .$(Variable) as subclass_selector */
 
 selector:
   /* By definition a selector can be one of those kinds, since inside
@@ -398,7 +398,7 @@ selector:
 type_selector:
   | AMPERSAND; { Ampersand } /* & {} https://drafts.csswg.org/css-nesting/#nest-selector */
   | ASTERISK; { Universal } /* * {} */
-  | v = INTERPOLATION { Variable v } /* $(Module.value) {} */
+  | v = INTERPOLATION { let (content, loc) = v in Variable (content, loc) } /* $(Module.value) {} */
   | type_ = TYPE_SELECTOR { Type type_ } /* a {} */
 
 /* <simple-selector> = <type-selector> | <subclass-selector> */
@@ -532,7 +532,7 @@ value:
   | n = NUMBER { Number n }
   | r = UNICODE_RANGE { Unicode_range r }
   | d = DIMENSION { Dimension d }
-  | v = INTERPOLATION { Variable v } /* $(Lola.value) */
+  | v = INTERPOLATION { let (content, loc) = v in Variable (content, loc) } /* $(Lola.value) */
   | f = loc(FUNCTION) v = loc(values) RIGHT_PAREN; { Function (f, v) } /* calc() */
   | f = loc(NTH_FUNCTION) v = loc(values) RIGHT_PAREN; { Function (f, v) } /* nth-() */
   | u = URL { Uri u } /* url() */

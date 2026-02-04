@@ -460,11 +460,10 @@ let tests = [
   }),
   test("interpolation", () => {
     let parse = parse([%value "<interpolation>"]);
-    let to_check =
-      Alcotest.result(Alcotest.list(Alcotest.string), Alcotest.string);
+    let to_check = Alcotest.result(Alcotest.string, Alcotest.string);
     let expect = check(__POS__, to_check);
-    expect(parse("$(Module.value)"), Ok(["Module", "value"]));
-    expect(parse("$(Module'.value')"), Ok(["Module'", "value'"]));
+    expect(parse("$(Module.value)"), Ok("Module.value"));
+    expect(parse("$(Module'.value')"), Ok("Module'.value'"));
     expect(
       parse("asd"),
       Error("Expected interpolation. Got 'asd' instead."),

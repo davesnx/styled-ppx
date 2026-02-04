@@ -7,8 +7,10 @@
  (libraries
   styled-ppx.css-parser
   styled-ppx.css-property-parser
+  styled-ppx.murmur2
   styled-ppx.string-interpolation
   sedlex
+  reason
   ppxlib
   ppxlib.astlib
   ppx_deriving_yojson.runtime

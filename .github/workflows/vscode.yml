@@ -73,8 +73,8 @@ jobs:
           fi
 
       - name: Publish to Visual Studio Marketplace
-        if: ${{ steps.changes.outputs.src == 'true' && steps.should-publish.outputs.value == 'true' && matrix.os == 'ubuntu-latest' }}
-        uses: HaaLeo/publish-vscode-extension@v1
+        if: ${{ github.ref == 'refs/heads/main' && steps.changes.outputs.src == 'true' && steps.should-publish.outputs.value == 'true' && matrix.os == 'ubuntu-latest' }}
+        uses: HaaLeo/publish-vscode-extension@v2
         with:
           pat: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
           registryUrl: https://marketplace.visualstudio.com

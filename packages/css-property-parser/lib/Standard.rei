@@ -111,7 +111,7 @@ let url_no_interp: Rule.rule(string);
 
 let hex_color: Rule.rule(string);
 
-let interpolation: Rule.rule(list(string));
+let interpolation: Rule.rule(string);
 
 let media_type: Rule.rule(string);
 

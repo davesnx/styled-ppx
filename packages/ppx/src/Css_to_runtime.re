@@ -19,6 +19,7 @@ module CSS = {
   let label = (~loc) => ident(~loc, "label");
   let style = (~loc) => ident(~loc, "style");
   let keyframes = (~loc) => ident(~loc, "keyframes");
+  let make = (~loc) => ident(~loc, "make");
 };
 
 let string_to_const = (~loc, s) => {
@@ -38,10 +39,11 @@ let string_to_const = (~loc, s) => {
   };
 };
 let render_variable = (~loc, v) => {
-  Helper.Exp.ident({
-    loc,
-    txt: v |> String.concat(".") |> Ppxlib.Longident.parse,
-  });
+  switch (Expression_parser.parse_expression(~loc, ~source=v)) {
+  | Ok(expr) => expr
+  | Error(msg) =>
+    Error.expr(~loc, "Invalid interpolation expression: " ++ msg)
+  };
 };
 
 let source_code_of_loc = (loc: Ppxlib.Location.t) => {
@@ -220,32 +222,32 @@ and render_container_query = (~loc, at_rule: at_rule) => {
     );
   };
 }
+and find_variable_content_loc = (valueList: component_value_list, ~base_loc) => {
+  let rec find =
+    fun
+    | [] => None
+    | [(Variable(_, content_loc): component_value, _outer_loc), ..._] =>
+      Some(
+        Styled_ppx_css_parser.Parser_location.adjust_to_file(
+          ~relative_loc=content_loc,
+          ~base_loc,
+        ),
+      )
+    | [(Whitespace: component_value, _), ...rest] => find(rest)
+    | _ => None;
+  find(valueList);
+}
 and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
   let (property, name_loc) = d.name;
-  let (_valueList, value_loc) = d.value;
+  let (valueList, value_loc) = d.value;
   let (important, _) = d.important;
   /* String.trim is a hack, location should be correct and not contain any whitespace */
   let value_source = source_code_of_loc(value_loc) |> String.trim;
 
   let declaration_location =
-    Styled_ppx_css_parser.Parser_location.update_pos_lnum(
-      {
-        let offset =
-          value_loc.loc_start.pos_lnum == 1
-            ? loc.loc_start.pos_cnum - loc.loc_start.pos_bol + 1 : 0;
-        {
-          ...value_loc,
-          loc_start: {
-            ...value_loc.loc_start,
-            pos_cnum: value_loc.loc_start.pos_cnum + offset,
-          },
-          loc_end: {
-            ...value_loc.loc_end,
-            pos_cnum: value_loc.loc_end.pos_cnum + offset,
-          },
-        };
-      },
-      loc,
+    Styled_ppx_css_parser.Parser_location.adjust_to_file(
+      ~relative_loc=value_loc,
+      ~base_loc=loc,
     );
 
   let property_location =
@@ -272,9 +274,13 @@ and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
       loc,
     );
 
+  let interpolation_location =
+    find_variable_content_loc(valueList, ~base_loc=loc)
+    |> Option.value(~default=declaration_location);
+
   switch (
     Property_to_runtime.render(
-      ~loc=declaration_location,
+      ~loc=interpolation_location,
       property,
       value_source,
       important,
@@ -289,7 +295,7 @@ and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
     ]
   | Error(`Impossible_state) => [
       Error.expr(
-        ~loc=declaration_location,
+        ~loc=interpolation_location,
         "This is a broken state of the CSS parser and probably a bug. Please report back!",
       ),
     ]
@@ -317,7 +323,7 @@ and render_declarations = (~loc: Ppxlib.location, (ds, _d_loc)) => {
      );
 }
 and render_variable_as_string = variable => {
-  "$(" ++ String.concat(".", variable) ++ ")";
+  "$(" ++ String.trim(variable) ++ ")";
 }
 and render_selector = (~loc, selector: selector) => {
   let rec render_simple_selector =
@@ -326,13 +332,13 @@ and render_selector = (~loc, selector: selector) => {
     | Universal => "*"
     | Type(v) => v
     | Subclass(v) => render_subclass_selector(v)
-    | Variable(v) => render_variable_as_string(v)
+    | Variable(v, _) => render_variable_as_string(v)
     | Percentage(v) => Printf.sprintf("%f%%", v)
   and render_subclass_selector =
     fun
     | Id(v) => Printf.sprintf("#%s", v)
     | Class(v) => Printf.sprintf(".%s", v)
-    | ClassVariable(v) => "." ++ render_variable_as_string(v)
+    | ClassVariable(v, _) => "." ++ render_variable_as_string(v)
     | Attribute(Attr_value(v)) => Printf.sprintf("[%s]", v)
     | Attribute(To_equal({ name, kind, value })) => {
         let kind_str =

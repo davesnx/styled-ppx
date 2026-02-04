@@ -36,6 +36,10 @@ let error_tests_data =
       "@media $",
       "Parse error while reading token 'the end' on line 1 at position 8",
     ),
+    (
+      {|div { color: $(x)) }|},
+      "Parse error while reading token ')' on line 1 at position 17",
+    ),
   ]
   |> List.mapi((_index, (input, output)) => {
        let assertion = () =>

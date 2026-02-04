@@ -291,7 +291,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       // abstract_type("string"), already represented by OCaml string type
       type_("url_no_interp", [%type: string]),
       type_("hex_color", [%type: string]),
-      type_("interpolation", [%type: list(string)]),
+      type_("interpolation", [%type: string]),
       type_("flex_value", [%type: [ | `Fr(float)]]),
       type_("media_type", [%type: string]),
       type_("container_name", [%type: string]),
