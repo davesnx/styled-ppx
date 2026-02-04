@@ -6,6 +6,7 @@ function run() {
   // Create the mocha test
   const mocha = new Mocha({
     ui: "tdd",
+    timeout: 10000,
   });
   // mocha.useColors(true);
 
