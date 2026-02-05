@@ -5,12 +5,11 @@ type token =
   | Variable of string
 
 let token_to_string = function
-  | String s -> "String(" ^ s ^ ")"
-  | Variable v -> "Variable(" ^ v ^ ")"
+  | String s -> Printf.sprintf "String(%S)" s
+  | Variable v -> Printf.sprintf "Variable(%S)" v
 
-let print_tokens tokens =
+let[@warning "-32"] print_tokens tokens =
   List.iter (fun (p, _) -> print_endline (token_to_string p)) tokens
-[@@warning "-32"]
 
 module Parser = struct
   let sub_lexeme ?(skip = 0) ?(drop = 0) lexbuf =
@@ -25,30 +24,36 @@ module Parser = struct
 
   let ident = [%sedlex.regexp? (letter | '_'), Star (letter | '0' .. '9' | '_')]
   let variable = [%sedlex.regexp? Star (ident, '.'), case_ident]
-  let interpolation = [%sedlex.regexp? "$(", variable, ")"]
-  let rest = [%sedlex.regexp? Plus (Compl '$')]
+  let whitespaces = [%sedlex.regexp? Star (' ' | '\t')]
+
+  let interpolation =
+    [%sedlex.regexp? "$(", whitespaces, variable, whitespaces, ")"]
+
+  (* Match any non-'$' character, OR '$' followed by non-'(' *)
+  let not_interpolation_start = [%sedlex.regexp? Compl '$' | '$', Compl '(']
+  let text = [%sedlex.regexp? Plus not_interpolation_start]
+  let standalone_dollar = [%sedlex.regexp? '$']
 
   (** Parse string, producing a list of tokens from this module. *)
   let from_string ~(loc : Location.t) (input : string) =
     let lexbuf = Sedlexing.Utf8.from_string input in
-    Sedlexing.set_position lexbuf loc.loc_start;
+    let { loc_start; _ } : Location.t = loc in
+    Sedlexing.set_position lexbuf loc_start;
     let rec parse acc lexbuf =
       match%sedlex lexbuf with
-      | rest ->
-        let str = sub_lexeme lexbuf in
-        parse (String str :: acc) lexbuf
-      | any ->
-        let str = sub_lexeme lexbuf in
-        parse (String str :: acc) lexbuf
       | interpolation ->
-        let variable = sub_lexeme ~skip:2 ~drop:1 lexbuf in
+        let variable = lexbuf |> sub_lexeme ~skip:2 ~drop:1 |> String.trim in
         parse (Variable variable :: acc) lexbuf
+      | text ->
+        let str = sub_lexeme lexbuf in
+        parse (String str :: acc) lexbuf
+      | standalone_dollar -> parse (String "$" :: acc) lexbuf
       | eof -> acc
       | _ ->
         let adjust base rel = Lexing.{ rel with pos_fname = base.pos_fname } in
         let loc_start, loc_end = Sedlexing.lexing_positions lexbuf in
         let loc =
-          Location.
+          Ppxlib.Location.
             {
               loc_start = adjust loc.loc_start loc_start;
               loc_end = adjust loc.loc_start loc_end;
@@ -87,45 +92,26 @@ module Emitter = struct
     List.rev
     @@ List.fold_left
          (fun acc token ->
-           match token with
-           | Variable v ->
+           match acc, token with
+           | ( ( Nolabel,
+                 { pexp_desc = Pexp_constant (Pconst_string (s, _, _)); _ } )
+               :: rest,
+               String v ) ->
+             (Nolabel, js_string_to_const ~attrs ~delimiter ~loc (s ^ v))
+             :: rest
+           | _, Variable v ->
              (Nolabel, v |> Longident.parse |> inline_const ~loc) :: acc
-           | String v ->
+           | _, String v ->
              (Nolabel, js_string_to_const ~attrs ~delimiter ~loc v) :: acc)
          [] tokens
-
-  (* Copied from future version of ppxlib https://github.com/ocaml-ppx/ppxlib/blob/6857ca9ec803f16975e8c2e7984c35cfb50c4a5d/ast/location_error.ml *)
-  let error_extension msg =
-    let err_extension_name loc = { Location.loc; txt = "ocaml.error" } in
-    let constant = Str.eval (Exp.constant (Const.string msg)) in
-    err_extension_name loc, PStr [ constant ]
 
   let generate ~attrs ~delimiter tokens =
     match to_arguments ~attrs ~delimiter tokens with
     | [] ->
       pexp_extension ~loc:Location.none
-      @@ error_extension "Missing string payload"
+      @@ Location.error_extensionf ~loc:Location.none "Missing string payload"
     | args -> apply concat_fn args
 end
 
-(* This is currently a hack, since we can't diferentiate between sedlexes' rest
-   and interpolation, it generates different tokens. Here we "join" them back *)
-let optimize_strings tokens =
-  List.fold_left
-    (fun acc token ->
-      match acc with
-      | [] -> [ token ]
-      | String s :: rest -> begin
-        match token with
-        | String s' -> String (s ^ s') :: rest
-        | _ -> token :: acc
-      end
-      | _ -> token :: acc)
-    [] tokens
-  |> List.rev
-
 let transform ?(attrs = []) ~delimiter ~loc str =
-  str
-  |> Parser.from_string ~loc
-  |> optimize_strings
-  |> Emitter.generate ~delimiter ~attrs
+  str |> Parser.from_string ~loc |> Emitter.generate ~delimiter ~attrs
