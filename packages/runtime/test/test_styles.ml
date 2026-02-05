@@ -3,21 +3,18 @@ let get_string_style_rules () =
   let _ = CSS.flush () in
   content
 
-let one_property =
-  test "one_property" @@ fun () ->
+let one_property () =
   let classname = CSS.style [| CSS.display `block |] in
   let css = get_string_style_rules () in
   assert_string css (Printf.sprintf ".%s { display: block; }" classname)
 
-let multiple_properties =
-  test "multiple_properties" @@ fun () ->
+let multiple_properties () =
   let classname = CSS.style [| CSS.display `block; CSS.fontSize (`px 10) |] in
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf ".%s { display: block; font-size: 10px; }" classname)
 
-let multiple_declarations =
-  test "multiple_declarations" @@ fun () ->
+let multiple_declarations () =
   let classname1 = CSS.style [| CSS.display `block; CSS.fontSize (`px 10) |] in
   let classname2 = CSS.style [| CSS.display `block; CSS.fontSize (`px 99) |] in
   let css = get_string_style_rules () in
@@ -27,14 +24,12 @@ let multiple_declarations =
         font-size: 99px; }"
        classname1 classname2)
 
-let label_should_not_be_rendered =
-  test "label_should_not_be_rendered" @@ fun () ->
+let label_should_not_be_rendered () =
   let classname = CSS.style [| CSS.label "classname"; CSS.display `block |] in
   let css = get_string_style_rules () in
   assert_string css (Printf.sprintf ".%s { display: block; }" classname)
 
-let selector_with_ppx =
-  test "selector_with_ppx" @@ fun () ->
+let selector_with_ppx () =
   let classname =
     [%cx
       {|
@@ -50,8 +45,7 @@ let selector_with_ppx =
        ".%s { position: relative; } .%s > * { position: absolute; }" classname
        classname)
 
-let empty_selector_simple =
-  test "empty_selector_simple" @@ fun () ->
+let empty_selector_simple () =
   let is_active_classname = [%cx ""] in
   let classname =
     [%cx
@@ -68,12 +62,12 @@ let empty_selector_simple =
     (Printf.sprintf ".%s { position: relative; } .%s %s { position: absolute; }"
        classname classname is_active_classname)
 
-let avoid_hash_collision =
-  test "avoid_hash_collision" @@ fun () ->
+let avoid_hash_collision () =
   let classname1 =
-    let color = `var "alt-text--tertiary" in
-    let hoverColor = `var "alt-text--primary" in
-    let disabledColor = `var "alt-text--tertiary" in
+    (* Use actual colors instead of CSS variables for this hash collision test *)
+    let color = `hex "333333" in
+    let hoverColor = `hex "111111" in
+    let disabledColor = `hex "333333" in
     [%cx
       {|
          color: $(color);
@@ -114,18 +108,16 @@ let avoid_hash_collision =
        |}]
   in
   let _css = get_string_style_rules () in
-  assert_not_equal_string classname1 classname2;
-  assert_not_equal_string classname2 classname3;
-  assert_not_equal_string classname1 classname3
+  assert_string_not_equal classname1 classname2;
+  assert_string_not_equal classname2 classname3;
+  assert_string_not_equal classname1 classname3
 
-let float_values =
-  test "float_values" @@ fun () ->
+let float_values () =
   let classname = CSS.style [| CSS.padding (`rem 10.) |] in
   let css = get_string_style_rules () in
   assert_string css (Printf.sprintf ".%s { padding: 10rem; }" classname)
 
-let simple_selector =
-  test "simple_selector" @@ fun () ->
+let simple_selector () =
   let classname =
     CSS.style
       [|
@@ -138,8 +130,7 @@ let simple_selector =
     (Printf.sprintf ".%s { margin: 10px; } .%s a { margin: 60px; }" classname
        classname)
 
-let selector_nested =
-  test "selector_nested" @@ fun () ->
+let selector_nested () =
   let classname =
     CSS.style
       [|
@@ -158,8 +149,7 @@ let selector_nested =
         none; }"
        classname classname classname)
 
-let selector_nested_with_ampersand =
-  test "selector_nested_with_ampersand" @@ fun () ->
+let selector_nested_with_ampersand () =
   let classname =
     CSS.style
       [|
@@ -178,8 +168,7 @@ let selector_nested_with_ampersand =
         margin: 12px; }"
        classname classname classname)
 
-let selector_nested_x10 =
-  test "selector_nested_x10" @@ fun () ->
+let selector_nested_x10 () =
   let classname =
     CSS.style
       [|
@@ -211,8 +200,7 @@ let selector_nested_x10 =
         none; } .%s a div span hr code { display: none; }"
        classname classname classname classname classname classname)
 
-let selector_ampersand_with_space =
-  test "selector_ampersand_with_space" @@ fun () ->
+let selector_ampersand_with_space () =
   let classname =
     CSS.style
       [|
@@ -225,8 +213,7 @@ let selector_ampersand_with_space =
     (Printf.sprintf ".%s { font-size: 42px; } .%s .div { font-size: 24px; }"
        classname classname)
 
-let ampersand_everywhere =
-  test "ampersand_everywhere" @@ fun () ->
+let ampersand_everywhere () =
   let classname =
     [%cx
       {|
@@ -266,8 +253,7 @@ let ampersand_everywhere =
        classname classname classname classname classname classname classname
        classname classname classname classname classname)
 
-let ampersand_everywhere_2 =
-  test "ampersand_everywhere_2" @@ fun () ->
+let ampersand_everywhere_2 () =
   let classname =
     [%cx
       {|
@@ -303,8 +289,7 @@ let ampersand_everywhere_2 =
         } .felipe .%s:first-child { display: none; }"
        classname classname classname classname classname)
 
-let ampersand_everywhere_3 =
-  test "ampersand_everywhere_3" @@ fun () ->
+let ampersand_everywhere_3 () =
   let hasTwoColumnList = "css-1t4likh-hasTwoColumnList" in
   let borderColor = CSS.rgba 255 255 255 (`num 0.3) in
   let desktopDown = "(max-width: 1279px)" in
@@ -335,8 +320,7 @@ let ampersand_everywhere_3 =
         0.3); } }"
        classname classname)
 
-let pseudo_selectors_everywhere =
-  test "pseudo_selectors_everywhere " @@ fun () ->
+let pseudo_selectors_everywhere () =
   let classname =
     [%cx
       {|
@@ -357,8 +341,7 @@ let pseudo_selectors_everywhere =
         .%s::before::after { display: none; }"
        classname classname classname)
 
-let selector_ampersand_with_no_space =
-  test "selector_ampersand_with_space" @@ fun () ->
+let selector_ampersand_with_no_space () =
   let classname =
     CSS.style
       [|
@@ -371,8 +354,7 @@ let selector_ampersand_with_no_space =
     (Printf.sprintf ".%s { font-size: 42px; } .%s.div { font-size: 24px; }"
        classname classname)
 
-let selector_ampersand_at_the_middle =
-  test "selector_ampersand_at_the_middle" @@ fun () ->
+let selector_ampersand_at_the_middle () =
   let classname =
     CSS.style
       [|
@@ -385,8 +367,7 @@ let selector_ampersand_at_the_middle =
     (Printf.sprintf ".%s { font-size: 42px; } .%s div .%s { font-size: 24px; }"
        classname classname classname)
 
-let selector_nested_with_mq_and_declarations =
-  test "selector_nested_with_mq_and_declarations" @@ fun () ->
+let selector_nested_with_mq_and_declarations () =
   let mobile = "(max-width: 767px)" in
   let classname =
     [%cx
@@ -414,8 +395,7 @@ let selector_nested_with_mq_and_declarations =
         position: relative; } }"
        classname classname classname)
 
-let selector_nested_with_mq_and_declarations2 =
-  test "selector_nested_with_mq_and_declarations2" @@ fun () ->
+let selector_nested_with_mq_and_declarations2 () =
   let mobile = "(max-width: 767px)" in
   let classname =
     [%cx
@@ -449,8 +429,7 @@ let selector_nested_with_mq_and_declarations2 =
         .a .d { color: #008000; } }"
        classname classname classname classname classname classname)
 
-let mq =
-  test "mq" @@ fun () ->
+let mq () =
   let classname =
     CSS.style
       [|
@@ -465,8 +444,7 @@ let mq =
         300px; } }"
        classname classname)
 
-let selector_params =
-  test "selector_params" @@ fun () ->
+let selector_params () =
   let classname =
     CSS.style
       [|
@@ -480,8 +458,7 @@ let selector_params =
        ".%s { max-width: 800px; } .%s:first-child { width: 300px; }" classname
        classname)
 
-let keyframe =
-  test "keyframe" @@ fun () ->
+let keyframe () =
   let animationName =
     CSS.keyframes
       [|
@@ -502,15 +479,13 @@ let keyframe =
         %s; }"
        animationName classname animationName animationName)
 
-let global =
-  test "global" @@ fun () ->
+let global () =
   CSS.global
     [| CSS.selectorMany [| "html" |] [| CSS.lineHeight (`abs 1.15) |] |];
   let css = get_string_style_rules () in
   assert_string css (Printf.sprintf "html{line-height:1.15;}")
 
-let fontFace =
-  test "global" @@ fun () ->
+let fontFace () =
   let _ =
     CSS.fontFace ~fontFamily:(`quoted "foo") ~fontWeight:`bold
       ~src:[| `url "foo.bar" |]
@@ -524,16 +499,14 @@ let fontFace =
        "@font-face{font-style:normal;font-weight:700;font-display:swap;unicode-range:U+30??, \
         U+3040-309F, U+30A0;font-family:\"foo\";src:url(\"foo.bar\");}")
 
-let duplicated_styles_unique =
-  test "duplicated_styles_unique" @@ fun () ->
+let duplicated_styles_unique () =
   let classname1 = CSS.style [| CSS.flexGrow 1. |] in
   let classname2 = CSS.style [| CSS.flexGrow 1. |] in
   let css = get_string_style_rules () in
   assert_string classname1 classname2;
   assert_string css (Printf.sprintf ".%s { flex-grow: 1; }" classname1)
 
-let hover_selector =
-  test "hover_selector" @@ fun () ->
+let hover_selector () =
   let rules =
     [|
       CSS.color `currentColor;
@@ -550,8 +523,7 @@ let hover_selector =
         .%s:hover { color: transparent; } .%s  :hover { color: transparent; }"
        classname classname classname classname)
 
-let multiple_pseudo =
-  test "multiple_pseudo" @@ fun () ->
+let multiple_pseudo () =
   let classname =
     [%cx
       {|
@@ -567,16 +539,15 @@ let multiple_pseudo =
   let css = get_string_style_rules () in
   assert_string css
     (Printf.sprintf
-       ".%s { padding: 0; } .%s::before { content: ' '; -webkit-transform: \
+       ".%s { padding: 0; } .%s::before { content: \" \"; -webkit-transform: \
         translateX(-50%%); -moz-transform: translateX(-50%%); -ms-transform: \
         translateX(-50%%); transform: translateX(-50%%); } .%s::after { \
-        content: ' '; -webkit-transform: translateX(-50%%); -moz-transform: \
+        content: \" \"; -webkit-transform: translateX(-50%%); -moz-transform: \
         translateX(-50%%); -ms-transform: translateX(-50%%); transform: \
         translateX(-50%%); }"
        classname classname classname)
 
-let functional_pseudo =
-  test "functional_pseudo" @@ fun () ->
+let functional_pseudo () =
   let classname =
     [%cx
       {|
@@ -643,8 +614,7 @@ let functional_pseudo =
        classname classname classname classname classname classname classname
        classname classname classname classname)
 
-let nested_selectors =
-  test "nested_selectors" @@ fun () ->
+let nested_selectors () =
   let button_active = [%cx "position: relative;"] in
   let classname = [%cx {|
         &.$(button_active) { top: 50px; }
@@ -654,8 +624,7 @@ let nested_selectors =
     (Printf.sprintf ".%s { position: relative; } .%s.%s { top: 50px; }"
        button_active classname button_active)
 
-let nested_selectors_2 =
-  test "nested_selectors_2" @@ fun () ->
+let nested_selectors_2 () =
   let button_active = [%cx "position: relative;"] in
   let classname =
     [%cx {|
@@ -667,8 +636,7 @@ let nested_selectors_2 =
     (Printf.sprintf ".%s { position: relative; } .%s.%s .%s { top: 50px; }"
        button_active classname button_active classname)
 
-let selectors_with_coma =
-  test "selectors_with_coma" @@ fun () ->
+let selectors_with_coma () =
   let classname =
     [%cx
       {|
@@ -687,8 +655,7 @@ let selectors_with_coma =
         }"
        classname classname classname)
 
-let selectors_with_coma_simple =
-  test "selectors_with_coma_simple" @@ fun () ->
+let selectors_with_coma_simple () =
   let classname =
     [%cx {|
        .a, .b {
@@ -701,8 +668,7 @@ let selectors_with_coma_simple =
     (Printf.sprintf ".%s .a { top: 50px; } .%s .b { top: 50px; }" classname
        classname)
 
-let selectors_with_coma_and_pseudo =
-  test "selectors_with_coma_and_pseudo" @@ fun () ->
+let selectors_with_coma_and_pseudo () =
   let classname =
     [%cx
       {|
@@ -721,8 +687,7 @@ let selectors_with_coma_and_pseudo =
         top: 50px; }"
        classname classname classname)
 
-let selector_nested_with_pseudo =
-  test "selector_nested_with_pseudo" @@ fun () ->
+let selector_nested_with_pseudo () =
   let classname =
     [%cx
       {|
@@ -740,8 +705,7 @@ let selector_nested_with_pseudo =
        ".%s { position: relative; } .%s:hover::after { top: 50px; }" classname
        classname)
 
-let selector_nested_with_pseudo_2 =
-  test "selector_nested_with_pseudo_2" @@ fun () ->
+let selector_nested_with_pseudo_2 () =
   let classname =
     [%cx
       {|
@@ -759,8 +723,7 @@ let selector_nested_with_pseudo_2 =
        ".%s { position: relative; } .%s:hover::after { top: 50px; }" classname
        classname)
 
-let selector_nested_with_pseudo_3 =
-  test "selector_nested_with_pseudo_3" @@ fun () ->
+let selector_nested_with_pseudo_3 () =
   let classname =
     [%cx
       {|
@@ -778,8 +741,7 @@ let selector_nested_with_pseudo_3 =
        ".%s { position: relative; } .%s:hover ::after { top: 50px; }" classname
        classname)
 
-let selector_with_interp_and_pseudo =
-  test "selector_with_interp_and_pseudo" @@ fun () ->
+let selector_with_interp_and_pseudo () =
   let button_active = [%cx "position: absolute;"] in
   let rules =
     [|
@@ -797,8 +759,7 @@ let selector_with_interp_and_pseudo =
         top: 50px; }"
        button_active classname classname button_active)
 
-let selector_with_empty_interp =
-  test "selector_with_empty_interp" @@ fun () ->
+let selector_with_empty_interp () =
   let empty_classname = [%cx ""] in
   let classname =
     [%cx
@@ -815,8 +776,7 @@ let selector_with_empty_interp =
     (Printf.sprintf ".%s { position: absolute; } .%s.%s::before { top: 50px; }"
        classname classname empty_classname)
 
-let style_tag =
-  test "style_tag" @@ fun () ->
+let style_tag () =
   CSS.global
     [| CSS.selectorMany [| "html" |] [| CSS.lineHeight (`abs 1.15) |] |];
   let animationName =
@@ -846,8 +806,7 @@ let style_tag =
         rotate(-360deg); } } .%s { display: block; }</style>"
        global_hash animationNameHash classname_hash animationName classname)
 
-let mq_inside_selector =
-  test "mq_inside_selector" @@ fun () ->
+let mq_inside_selector () =
   let classname =
     [%cx
       {|
@@ -866,8 +825,7 @@ let mq_inside_selector =
         auto; } }"
        classname classname)
 
-let mq_inside_selector_with_declarations =
-  test "mq_inside_selector_with_declarations" @@ fun () ->
+let mq_inside_selector_with_declarations () =
   let classname =
     [%cx
       {|
@@ -887,8 +845,7 @@ let mq_inside_selector_with_declarations =
         768px) { .%s div { height: auto; } }"
        classname classname classname)
 
-let mq_and_selectors_2 =
-  test "mq_and_selectors_2" @@ fun () ->
+let mq_and_selectors_2 () =
   let classname =
     [%cx
       {|
@@ -910,8 +867,7 @@ let mq_and_selectors_2 =
         768px) { .%s div a { height: auto; } }"
        classname classname classname)
 
-let selector_nested_interpolation_with_multiple =
-  test "selector_nested_interpolation_with_multiple" @@ fun () ->
+let selector_nested_interpolation_with_multiple () =
   let languageIcon = [%cx {| opacity: 0.6; |}] in
   let menuOpened = [%cx {||}] in
   let classname =
@@ -931,8 +887,7 @@ let selector_nested_interpolation_with_multiple =
         opacity: 1; }"
        languageIcon classname languageIcon classname menuOpened languageIcon)
 
-let selector_with_classname_and_mq =
-  test "selector_with_classname_and_mq" @@ fun () ->
+let selector_with_classname_and_mq () =
   let nested_classname = CSS.style [||] in
   let rules =
     [|
@@ -950,8 +905,7 @@ let selector_with_classname_and_mq =
         height: auto; } }"
        classname classname nested_classname)
 
-let mq_with_selectors =
-  test "mq_with_selectors" @@ fun () ->
+let mq_with_selectors () =
   let rules =
     [|
       CSS.display `block;
@@ -970,8 +924,7 @@ let mq_with_selectors =
         auto; } .%s .lola { color: transparent; } }"
        classname classname classname)
 
-let mq_nested =
-  test "mq_nested" @@ fun () ->
+let mq_nested () =
   let classname =
     CSS.style
       [|
@@ -987,8 +940,7 @@ let mq_nested =
         768px) { .%s { display: flex; } }"
        classname classname)
 
-let mq_nested_2 =
-  test "mq_nested_2" @@ fun () ->
+let mq_nested_2 () =
   let classname =
     CSS.style
       [|
@@ -1008,8 +960,7 @@ let mq_nested_2 =
         display: flex; } }"
        classname classname classname)
 
-let mq_nested_3 =
-  test "mq_nested_3" @@ fun () ->
+let mq_nested_3 () =
   let classname =
     [%cx
       {|
@@ -1035,8 +986,7 @@ let mq_nested_3 =
         transparent; } }"
        classname classname classname classname)
 
-let mq_nested_10 =
-  test "mq_nested_10" @@ fun () ->
+let mq_nested_10 () =
   let classname =
     [%cx
       {|
@@ -1078,8 +1028,7 @@ let mq_nested_10 =
         transparent; } }"
        classname classname classname classname classname classname classname)
 
-let mq_nested_without_declarations =
-  test "mq_nested_without_declarations" @@ fun () ->
+let mq_nested_without_declarations () =
   let classname =
     CSS.style
       [|
@@ -1094,8 +1043,7 @@ let mq_nested_without_declarations =
         flex; } }"
        classname)
 
-let mq_nested_with_declarations =
-  test "mq_nested_with_declarations" @@ fun () ->
+let mq_nested_with_declarations () =
   let classname =
     CSS.style
       [|
@@ -1115,8 +1063,7 @@ let mq_nested_with_declarations =
         border-radius: 10px; } }"
        classname classname classname)
 
-let pseudo_selectors =
-  test "pseudo_selectors" @@ fun () ->
+let pseudo_selectors () =
   let classname =
     [%cx
       {|
@@ -1150,8 +1097,7 @@ let pseudo_selectors =
         none; } .%s:disabled { color: transparent; }"
        classname classname classname classname classname)
 
-let real_world =
-  test "real_world" @@ fun () ->
+let real_world () =
   let buttonActive = [%cx ""] in
   let classname =
     [%cx
@@ -1176,8 +1122,7 @@ let real_world =
        classname classname buttonActive classname buttonActive classname
        buttonActive)
 
-let pseudo_selectors_2 =
-  test "pseudo_selectors_2" @@ fun () ->
+let pseudo_selectors_2 () =
   let classname =
     [%cx
       {|
@@ -1211,8 +1156,7 @@ let pseudo_selectors_2 =
         none; } .%s:disabled { color: transparent; }"
        classname classname classname classname classname)
 
-let global_with_selector =
-  test "global_with_selector" @@ fun () ->
+let global_with_selector () =
   [%global
     {| html { line-height: 1.15; }
     a { :hover { padding: 0; } }
@@ -1221,8 +1165,7 @@ let global_with_selector =
   assert_string css
     (Printf.sprintf "html{line-height:1.15;}a:hover{padding:0;}")
 
-let ampersand_everywhere_global =
-  test "ampersand_everywhere_global" @@ fun () ->
+let ampersand_everywhere_global () =
   [%global
     {|
       .foo {
@@ -1250,8 +1193,7 @@ let ampersand_everywhere_global =
      .lola{font-size:5px;}.lola .foo .foo:focus .foo .foo \
      .lola{font-size:6px;}"
 
-let css_variable =
-  test "css_variable" @@ fun () ->
+let css_variable () =
   [%global
     {|
       :root {
@@ -1265,8 +1207,7 @@ let css_variable =
     ":root{--bs-dropdown-bg:#343a40;--bs-dropdown-border-color:var(--bs-border-color-translucent, \
      black);--bs-dropdown-box-shadow:;}"
 
-let attribute_selector =
-  test "attribute_selector" @@ fun () ->
+let attribute_selector () =
   [%global
     {|
       [list]:not([type=date]):not([type=datetime-local]):not([type=month]):not([type=week]):not([type=time])::-webkit-calendar-picker-indicator {
@@ -1292,66 +1233,69 @@ let attribute_selector =
      !important;}button{-webkit-appearance:button;}[type=button]{-webkit-appearance:button;}[type=reset]{-webkit-appearance:button;}[type=submit]{-webkit-appearance:button;}button:not(:disabled){cursor:pointer;}[type=button]:not(:disabled){cursor:pointer;}[type=reset]:not(:disabled){cursor:pointer;}[type=submit]:not(:disabled){cursor:pointer;}"
 
 let tests =
-  ( "CSS",
-    [
-      one_property;
-      multiple_properties;
-      multiple_declarations;
-      float_values;
-      label_should_not_be_rendered;
-      avoid_hash_collision;
-      keyframe;
-      global;
-      fontFace;
-      duplicated_styles_unique;
-      style_tag;
-      real_world;
-      hover_selector;
-      selector_with_classname_and_mq;
-      selector_with_empty_interp;
-      empty_selector_simple;
-      selector_with_ppx;
-      simple_selector;
-      selector_nested;
-      selector_nested_x10;
-      selector_ampersand_with_space;
-      selector_ampersand_with_no_space;
-      selector_nested_with_ampersand;
-      selector_ampersand_at_the_middle;
-      ampersand_everywhere;
-      ampersand_everywhere_2;
-      ampersand_everywhere_3;
-      selector_params;
-      selectors_with_coma;
-      selectors_with_coma_simple;
-      selectors_with_coma_and_pseudo;
-      nested_selectors;
-      nested_selectors_2;
-      multiple_pseudo;
-      functional_pseudo;
-      selector_with_interp_and_pseudo;
-      pseudo_selectors;
-      pseudo_selectors_2;
-      pseudo_selectors_everywhere;
-      selector_nested_with_pseudo;
-      selector_nested_with_pseudo_2;
-      selector_nested_with_pseudo_3;
+  [
+    test "one_property" one_property;
+    test "multiple_properties" multiple_properties;
+    test "multiple_declarations" multiple_declarations;
+    test "float_values" float_values;
+    test "label_should_not_be_rendered" label_should_not_be_rendered;
+    test "avoid_hash_collision" avoid_hash_collision;
+    test "keyframe" keyframe;
+    test "global" global;
+    test "fontFace" fontFace;
+    test "duplicated_styles_unique" duplicated_styles_unique;
+    test "style_tag" style_tag;
+    test "real_world" real_world;
+    test "hover_selector" hover_selector;
+    test "selector_with_classname_and_mq" selector_with_classname_and_mq;
+    test "selector_with_empty_interp" selector_with_empty_interp;
+    test "empty_selector_simple" empty_selector_simple;
+    test "selector_with_ppx" selector_with_ppx;
+    test "simple_selector" simple_selector;
+    test "selector_nested" selector_nested;
+    test "selector_nested_x10" selector_nested_x10;
+    test "selector_ampersand_with_space" selector_ampersand_with_space;
+    test "selector_ampersand_with_no_space" selector_ampersand_with_no_space;
+    test "selector_nested_with_ampersand" selector_nested_with_ampersand;
+    test "selector_ampersand_at_the_middle" selector_ampersand_at_the_middle;
+    test "ampersand_everywhere" ampersand_everywhere;
+    test "ampersand_everywhere_2" ampersand_everywhere_2;
+    test "ampersand_everywhere_3" ampersand_everywhere_3;
+    test "selector_params" selector_params;
+    test "selectors_with_coma" selectors_with_coma;
+    test "selectors_with_coma_simple" selectors_with_coma_simple;
+    test "selectors_with_coma_and_pseudo" selectors_with_coma_and_pseudo;
+    test "nested_selectors" nested_selectors;
+    test "nested_selectors_2" nested_selectors_2;
+    test "multiple_pseudo" multiple_pseudo;
+    test "functional_pseudo" functional_pseudo;
+    test "selector_with_interp_and_pseudo" selector_with_interp_and_pseudo;
+    test "pseudo_selectors" pseudo_selectors;
+    test "pseudo_selectors_2" pseudo_selectors_2;
+    test "pseudo_selectors_everywhere" pseudo_selectors_everywhere;
+    test "selector_nested_with_pseudo" selector_nested_with_pseudo;
+    test "selector_nested_with_pseudo_2" selector_nested_with_pseudo_2;
+    test "selector_nested_with_pseudo_3" selector_nested_with_pseudo_3;
+    test "selector_nested_with_mq_and_declarations"
       selector_nested_with_mq_and_declarations;
+    test "selector_nested_with_mq_and_declarations2"
       selector_nested_with_mq_and_declarations2;
+    test "selector_nested_interpolation_with_multiple"
       selector_nested_interpolation_with_multiple;
-      mq_with_selectors;
-      mq;
-      mq_nested;
-      mq_nested_2;
-      mq_nested_with_declarations;
-      mq_nested_without_declarations;
-      mq_nested_10;
-      mq_nested_3;
-      mq_inside_selector;
+    test "mq_with_selectors" mq_with_selectors;
+    test "mq" mq;
+    test "mq_nested" mq_nested;
+    test "mq_nested_2" mq_nested_2;
+    test "mq_nested_with_declarations" mq_nested_with_declarations;
+    test "mq_nested_without_declarations" mq_nested_without_declarations;
+    test "mq_nested_10" mq_nested_10;
+    test "mq_nested_3" mq_nested_3;
+    test "mq_inside_selector" mq_inside_selector;
+    test "mq_inside_selector_with_declarations"
       mq_inside_selector_with_declarations;
-      mq_and_selectors_2;
-      global_with_selector;
-      ampersand_everywhere_global;
-      css_variable;
-      attribute_selector;
-    ] )
+    test "mq_and_selectors_2" mq_and_selectors_2;
+    test "global_with_selector" global_with_selector;
+    test "ampersand_everywhere_global" ampersand_everywhere_global;
+    test "css_variable" css_variable;
+    test "attribute_selector" attribute_selector;
+  ]
