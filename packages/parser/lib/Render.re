@@ -38,12 +38,8 @@ and brace_block = ast => {
   };
 }
 and rule_list = (rule_list: Ast.rule_list) => {
-  let resolved_rule_list = {
-    let (declarations, selectors) =
-      rule_list |> fst |> Resolve.resolve_selectors |> Resolve.split_by_kind;
-    declarations @ selectors;
-  };
-  resolved_rule_list
+  rule_list
+  |> fst
   |> List.filter(
        fun
        | Ast.Style_rule({ block: (block, _), _ })
