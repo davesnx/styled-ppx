@@ -5478,7 +5478,7 @@ let render_content_string = (~loc, str) => {
     } else if (length == 1 && get(str, 0) == '"') {
       [%expr {js|'"'|js}];
     } else if (length == 1 && get(str, 0) == ' ') {
-      [%expr {js|' '|js}];
+      [%expr {js|" "|js}];
     } else if (length == 1 && get(str, 0) == '\'') {
       [%expr {js|"'"|js}];
     } else if (length == 2 && get(str, 0) == '"' && get(str, 1) == '"') {

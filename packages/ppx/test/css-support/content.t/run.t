@@ -93,8 +93,8 @@ If this test fail means that the module is not in sync with the ppx
   CSS.contentsRule([|`text({js|lola|js})|], None);
   CSS.contentsRule([|`text({js|lola|js})|], None);
   CSS.contentsRule([|`text({js|''|js})|], None);
-  CSS.contentsRule([|`text({js|' '|js})|], None);
-  CSS.contentsRule([|`text({js|' '|js})|], None);
+  CSS.contentsRule([|`text({js|" "|js})|], None);
+  CSS.contentsRule([|`text({js|" "|js})|], None);
   CSS.contentsRule([|`text({js|''|js})|], None);
   CSS.contentsRule([|`text({js|"'"|js})|], None);
   CSS.contentsRule([|`text({js|'"'|js})|], None);
