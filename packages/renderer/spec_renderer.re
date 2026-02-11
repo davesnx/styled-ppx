@@ -27,7 +27,7 @@ let render_terminal =
   fun
   | Delim(d) => sprintf("Delim(%s)", d)
   | Keyword(v) => sprintf("Keyword(%s)", v)
-  | Data_type(v) => sprintf("Data_type(%s)", v)
+  | Data_type(v, _) => sprintf("Data_type(%s)", v)
   | Property_type(v) => sprintf("Property_type(%s)", v);
 
 let rec render_value =
