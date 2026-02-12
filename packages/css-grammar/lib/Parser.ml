@@ -6261,7 +6261,6 @@ let cf_mixing_image : cf_mixing_image Rule.rule =
   [%spec "[ <extended-percentage> ]? && <image>"]
 
 let class_selector : class_selector Rule.rule = [%spec "'.' <ident-token>"]
-
 let clip_source : clip_source Rule.rule = [%spec "<url>"]
 
 let color : color Rule.rule =
@@ -6367,7 +6366,6 @@ let counter_style : counter_style Rule.rule =
   [%spec "<counter-style-name> | <symbols()>"]
 
 let counter_style_name : counter_style_name Rule.rule = [%spec "<custom-ident>"]
-
 let counter_name : counter_name Rule.rule = [%spec "<custom-ident>"]
 
 let cubic_bezier_timing_function : cubic_bezier_timing_function Rule.rule =
@@ -6970,7 +6968,6 @@ let named_color : named_color Rule.rule =
      'yellowgreen' | <-non-standard-color>"]
 
 let namespace_prefix : namespace_prefix Rule.rule = [%spec "<ident>"]
-
 let ns_prefix : ns_prefix Rule.rule = [%spec "[ <ident-token> | '*' ]? '|'"]
 let nth : nth Rule.rule = [%spec "<an-plus-b> | 'even' | 'odd'"]
 let number_one_or_greater : number_one_or_greater Rule.rule = [%spec "<number>"]
@@ -9188,7 +9185,6 @@ let property_interpolate_size : property_interpolate_size Rule.rule =
   [%spec "'numeric-only' | 'allow-keywords'"]
 
 let property_media_type : property_media_type Rule.rule = [%spec "<ident>"]
-
 let property_overlay : property_overlay Rule.rule = [%spec "'none' | 'auto'"]
 
 let property_scroll_timeline : property_scroll_timeline Rule.rule =
@@ -9784,7 +9780,6 @@ let syntax_single_component : syntax_single_component Rule.rule =
   [%spec "'<' <syntax-type-name> '>' | <ident>"]
 
 let syntax_string : syntax_string Rule.rule = [%spec "<string>"]
-
 let syntax_combinator : syntax_combinator Rule.rule = [%spec "'|'"]
 
 let syntax_component : syntax_component Rule.rule =
@@ -9895,8 +9890,7 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.FontVariantPosition] () );
     ( Property "list-style-position",
       pack_rule property_list_style_position
-        ~runtime_module_path:[%module_path Css_types.ListStylePosition] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.ListStylePosition] () );
     ( Property "list-style-type",
       pack_rule property_list_style_type
         ~runtime_module_path:[%module_path Css_types.ListStyleType] () );
@@ -9923,8 +9917,7 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.MixBlendMode] () );
     ( Property "backface-visibility",
       pack_rule property_backface_visibility
-        ~runtime_module_path:[%module_path Css_types.BackfaceVisibility] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.BackfaceVisibility] () );
     ( Property "flex-direction",
       pack_rule property_flex_direction
         ~runtime_module_path:[%module_path Css_types.FlexDirection] () );
@@ -9954,8 +9947,7 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.ScrollBehavior] () );
     ( Property "overscroll-behavior",
       pack_rule property_overscroll_behavior
-        ~runtime_module_path:[%module_path Css_types.OverscrollBehavior] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.OverscrollBehavior] () );
     ( Property "overflow-anchor",
       pack_rule property_overflow_anchor
         ~runtime_module_path:[%module_path Css_types.OverflowAnchor] () );
@@ -9979,19 +9971,16 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.ColorScheme] () );
     ( Property "forced-color-adjust",
       pack_rule property_forced_color_adjust
-        ~runtime_module_path:[%module_path Css_types.ForcedColorAdjust] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.ForcedColorAdjust] () );
     ( Property "print-color-adjust",
       pack_rule property_print_color_adjust
-        ~runtime_module_path:[%module_path Css_types.PrintColorAdjust] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.PrintColorAdjust] () );
     ( Property "contain-intrinsic-size",
       pack_rule property_contain_intrinsic_size
         ~runtime_module_path:[%module_path Css_types.ContainIntrinsicSize] () );
     ( Property "content-visibility",
       pack_rule property_content_visibility
-        ~runtime_module_path:[%module_path Css_types.ContentVisibility] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.ContentVisibility] () );
     ( Property "hyphens",
       pack_rule property_hyphens
         ~runtime_module_path:[%module_path Css_types.Hyphens] () );
@@ -10006,8 +9995,7 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.ClipRule] () );
     ( Property "font-optical-sizing",
       pack_rule property_font_optical_sizing
-        ~runtime_module_path:[%module_path Css_types.FontOpticalSizing] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.FontOpticalSizing] () );
     ( Property "font-palette",
       pack_rule property_font_palette
         ~runtime_module_path:[%module_path Css_types.FontPalette] () );
@@ -10019,7 +10007,8 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.FontSynthesisStyle] () );
     ( Property "font-synthesis-small-caps",
       pack_rule property_font_synthesis_small_caps
-        ~runtime_module_path:[%module_path Css_types.FontSynthesisSmallCaps] () );
+        ~runtime_module_path:[%module_path Css_types.FontSynthesisSmallCaps] ()
+    );
     ( Property "font-synthesis-position",
       pack_rule property_font_synthesis_position
         ~runtime_module_path:[%module_path Css_types.FontSynthesisPosition] () );
@@ -10055,7 +10044,8 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.ColorAdjust] () );
     ( Property "text-decoration-thickness",
       pack_rule property_text_decoration_thickness
-        ~runtime_module_path:[%module_path Css_types.TextDecorationThickness] () );
+        ~runtime_module_path:[%module_path Css_types.TextDecorationThickness] ()
+    );
     ( Property "text-underline-position",
       pack_rule property_text_underline_position
         ~runtime_module_path:[%module_path Css_types.TextUnderlinePosition] () );
@@ -10082,8 +10072,7 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.PageBreakInside] () );
     ( Property "border-image-repeat",
       pack_rule property_border_image_repeat
-        ~runtime_module_path:[%module_path Css_types.BorderImageRepeat] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.BorderImageRepeat] () );
     ( Property "transform-style",
       pack_rule property_transform_style
         ~runtime_module_path:[%module_path Css_types.TransformStyle] () );
@@ -10103,15 +10092,19 @@ let registry : (kind * packed_rule) list =
       pack_rule property_contain
         ~runtime_module_path:[%module_path Css_types.Contain] () );
     ( Property "all",
-      pack_rule property_all
-        ~runtime_module_path:[%module_path Css_types.All] () );
+      pack_rule property_all ~runtime_module_path:[%module_path Css_types.All]
+        () );
     (* Values with runtime types *)
-    Value "age", pack_rule age ~runtime_module_path:[%module_path Css_types.Age] ();
+    ( Value "age",
+      pack_rule age ~runtime_module_path:[%module_path Css_types.Age] () );
     ( Value "attachment",
-      pack_rule attachment ~runtime_module_path:[%module_path Css_types.Attachment] () );
-    Value "box", pack_rule box ~runtime_module_path:[%module_path Css_types.Box] ();
+      pack_rule attachment
+        ~runtime_module_path:[%module_path Css_types.Attachment] () );
+    ( Value "box",
+      pack_rule box ~runtime_module_path:[%module_path Css_types.Box] () );
     ( Value "display-box",
-      pack_rule display_box ~runtime_module_path:[%module_path Css_types.DisplayBox] () );
+      pack_rule display_box
+        ~runtime_module_path:[%module_path Css_types.DisplayBox] () );
     ( Value "display-outside",
       pack_rule display_outside
         ~runtime_module_path:[%module_path Css_types.DisplayOutside] () );
@@ -10119,13 +10112,14 @@ let registry : (kind * packed_rule) list =
       pack_rule ending_shape
         ~runtime_module_path:[%module_path Css_types.EndingShape] () );
     ( Value "fill-rule",
-      pack_rule fill_rule ~runtime_module_path:[%module_path Css_types.FillRule] ()
-    );
+      pack_rule fill_rule ~runtime_module_path:[%module_path Css_types.FillRule]
+        () );
     Value "zero", pack_rule zero ();
     ( Value "gender",
       pack_rule gender ~runtime_module_path:[%module_path Css_types.Gender] () );
     ( Value "combinator",
-      pack_rule combinator ~runtime_module_path:[%module_path Css_types.Combinator] () );
+      pack_rule combinator
+        ~runtime_module_path:[%module_path Css_types.Combinator] () );
     ( Value "contextual-alt-values",
       pack_rule contextual_alt_values
         ~runtime_module_path:[%module_path Css_types.ContextualAltValues] () );
@@ -10136,20 +10130,27 @@ let registry : (kind * packed_rule) list =
       pack_rule attr_modifier
         ~runtime_module_path:[%module_path Css_types.AttrModifier] () );
     ( Value "image-tags",
-      pack_rule image_tags ~runtime_module_path:[%module_path Css_types.ImageTags] () );
+      pack_rule image_tags
+        ~runtime_module_path:[%module_path Css_types.ImageTags] () );
     ( Value "line-style",
-      pack_rule line_style ~runtime_module_path:[%module_path Css_types.LineStyle] () );
+      pack_rule line_style
+        ~runtime_module_path:[%module_path Css_types.LineStyle] () );
     ( Value "line-width",
-      pack_rule line_width ~runtime_module_path:[%module_path Css_types.LineWidth] () );
+      pack_rule line_width
+        ~runtime_module_path:[%module_path Css_types.LineWidth] () );
     ( Value "named-color",
-      pack_rule named_color ~runtime_module_path:[%module_path Css_types.NamedColor] () );
+      pack_rule named_color
+        ~runtime_module_path:[%module_path Css_types.NamedColor] () );
     ( Value "color",
       pack_rule color ~runtime_module_path:[%module_path Css_types.Color] () );
     ( Value "alpha-value",
-      pack_rule alpha_value ~runtime_module_path:[%module_path Css_types.AlphaValue] () );
-    Value "hue", pack_rule hue ~runtime_module_path:[%module_path Css_types.Hue] ();
+      pack_rule alpha_value
+        ~runtime_module_path:[%module_path Css_types.AlphaValue] () );
+    ( Value "hue",
+      pack_rule hue ~runtime_module_path:[%module_path Css_types.Hue] () );
     ( Value "bg-image",
-      pack_rule bg_image ~runtime_module_path:[%module_path Css_types.BgImage] () );
+      pack_rule bg_image ~runtime_module_path:[%module_path Css_types.BgImage]
+        () );
     ( Value "content-replacement",
       pack_rule content_replacement
         ~runtime_module_path:[%module_path Css_types.ContentReplacement] () );
@@ -10166,7 +10167,8 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.FontFamilies] () );
     ( Value "color-interpolation-method",
       pack_rule color_interpolation_method
-        ~runtime_module_path:[%module_path Css_types.ColorInterpolationMethod] () );
+        ~runtime_module_path:[%module_path Css_types.ColorInterpolationMethod]
+        () );
     Property "row-gap", pack_rule property_row_gap ();
     Property "column-gap", pack_rule property_column_gap ();
     Property "outline-width", pack_rule property_outline_width ();
@@ -10187,11 +10189,13 @@ let registry : (kind * packed_rule) list =
       pack_rule property_flex_basis
         ~runtime_module_path:[%module_path Css_types.FlexBasis] () );
     ( Value "family-name",
-      pack_rule family_name ~runtime_module_path:[%module_path Css_types.FamilyName] () );
+      pack_rule family_name
+        ~runtime_module_path:[%module_path Css_types.FamilyName] () );
     ( Value "keyframes-name",
       pack_rule keyframes_name
         ~runtime_module_path:[%module_path Css_types.KeyframesName] () );
-    Value "url", pack_rule url ~runtime_module_path:[%module_path Css_types.Url] ();
+    ( Value "url",
+      pack_rule url ~runtime_module_path:[%module_path Css_types.Url] () );
     (* Image functions *)
     ( Function "image()",
       pack_rule function_image
@@ -10204,17 +10208,21 @@ let registry : (kind * packed_rule) list =
     Function "cross-fade()", pack_rule function_cross_fade ();
     (* Gradient and other values *)
     ( Value "gradient",
-      pack_rule gradient ~runtime_module_path:[%module_path Css_types.Gradient] () );
+      pack_rule gradient ~runtime_module_path:[%module_path Css_types.Gradient]
+        () );
     Value "shadow", pack_rule shadow ();
     ( Value "track-list",
-      pack_rule track_list ~runtime_module_path:[%module_path Css_types.TrackList] () );
+      pack_rule track_list
+        ~runtime_module_path:[%module_path Css_types.TrackList] () );
     ( Value "line-names",
-      pack_rule line_names ~runtime_module_path:[%module_path Css_types.LineNames] () );
+      pack_rule line_names
+        ~runtime_module_path:[%module_path Css_types.LineNames] () );
     ( Value "side-or-corner",
       pack_rule side_or_corner
         ~runtime_module_path:[%module_path Css_types.SideOrCorner] () );
     ( Value "track-size",
-      pack_rule track_size ~runtime_module_path:[%module_path Css_types.TrackSize] () );
+      pack_rule track_size
+        ~runtime_module_path:[%module_path Css_types.TrackSize] () );
     ( Value "track-breadth",
       pack_rule track_breadth
         ~runtime_module_path:[%module_path Css_types.TrackBreadth] () );
@@ -10231,7 +10239,8 @@ let registry : (kind * packed_rule) list =
       pack_rule color_stop_list
         ~runtime_module_path:[%module_path Css_types.ColorStopList] () );
     ( Value "mask-source",
-      pack_rule mask_source ~runtime_module_path:[%module_path Css_types.MaskSource] () );
+      pack_rule mask_source
+        ~runtime_module_path:[%module_path Css_types.MaskSource] () );
     ( Value "length-percentage",
       pack_rule length_percentage
         ~runtime_module_path:[%module_path Css_types.LengthPercentage] () );
@@ -10245,7 +10254,8 @@ let registry : (kind * packed_rule) list =
       pack_rule counter_style_name
         ~runtime_module_path:[%module_path Css_types.CounterStyleName] () );
     ( Value "fixed-size",
-      pack_rule fixed_size ~runtime_module_path:[%module_path Css_types.FixedSize] () );
+      pack_rule fixed_size
+        ~runtime_module_path:[%module_path Css_types.FixedSize] () );
     ( Value "fixed-repeat",
       pack_rule fixed_repeat
         ~runtime_module_path:[%module_path Css_types.FixedRepeat] () );
@@ -10253,17 +10263,19 @@ let registry : (kind * packed_rule) list =
       pack_rule fixed_breadth
         ~runtime_module_path:[%module_path Css_types.FixedBreadth] () );
     ( Value "auto-repeat",
-      pack_rule auto_repeat ~runtime_module_path:[%module_path Css_types.AutoRepeat] () );
+      pack_rule auto_repeat
+        ~runtime_module_path:[%module_path Css_types.AutoRepeat] () );
     ( Value "extended-time-no-interp",
       pack_rule extended_time_no_interp
         ~runtime_module_path:[%module_path Css_types.Time] () );
     ( Value "timing-function-no-interp",
       pack_rule timing_function_no_interp
-        ~runtime_module_path:[%module_path Css_types.TimingFunctionNoInterp] () );
+        ~runtime_module_path:[%module_path Css_types.TimingFunctionNoInterp] ()
+    );
     ( Value "cubic-bezier-timing-function",
       pack_rule cubic_bezier_timing_function
-        ~runtime_module_path:[%module_path Css_types.CubicBezierTimingFunction] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.CubicBezierTimingFunction]
+        () );
     ( Value "step-timing-function",
       pack_rule step_timing_function
         ~runtime_module_path:[%module_path Css_types.StepTimingFunction] () );
@@ -10272,27 +10284,34 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.SingleAnimation] () );
     ( Value "single-animation-no-interp",
       pack_rule single_animation_no_interp
-        ~runtime_module_path:[%module_path Css_types.SingleAnimationNoInterp] () );
+        ~runtime_module_path:[%module_path Css_types.SingleAnimationNoInterp] ()
+    );
     ( Value "single-animation-direction-no-interp",
       pack_rule single_animation_direction_no_interp
-        ~runtime_module_path:[%module_path Css_types.SingleAnimationDirectionNoInterp] () );
+        ~runtime_module_path:
+          [%module_path Css_types.SingleAnimationDirectionNoInterp] () );
     ( Value "single-animation-fill-mode-no-interp",
       pack_rule single_animation_fill_mode_no_interp
-        ~runtime_module_path:[%module_path Css_types.SingleAnimationFillModeNoInterp] () );
+        ~runtime_module_path:
+          [%module_path Css_types.SingleAnimationFillModeNoInterp] () );
     ( Value "single-animation-iteration-count-no-interp",
       pack_rule single_animation_iteration_count_no_interp
-        ~runtime_module_path:[%module_path Css_types.SingleAnimationIterationCountNoInterp] () );
+        ~runtime_module_path:
+          [%module_path Css_types.SingleAnimationIterationCountNoInterp] () );
     ( Value "single-animation-play-state-no-interp",
       pack_rule single_animation_play_state_no_interp
-        ~runtime_module_path:[%module_path Css_types.SingleAnimationPlayStateNoInterp] () );
+        ~runtime_module_path:
+          [%module_path Css_types.SingleAnimationPlayStateNoInterp] () );
     ( Value "shadow-t",
-      pack_rule shadow_t ~runtime_module_path:[%module_path Css_types.TextShadow] () );
+      pack_rule shadow_t
+        ~runtime_module_path:[%module_path Css_types.TextShadow] () );
     ( Value "font-weight-absolute",
       pack_rule font_weight_absolute
         ~runtime_module_path:[%module_path Css_types.FontWeightAbsolute] () );
     (* Commonly referenced values *)
     ( Value "position",
-      pack_rule position ~runtime_module_path:[%module_path Css_types.Position] () );
+      pack_rule position ~runtime_module_path:[%module_path Css_types.Position]
+        () );
     ( Value "timing-function",
       pack_rule timing_function
         ~runtime_module_path:[%module_path Css_types.TimingFunction] () );
@@ -10300,28 +10319,34 @@ let registry : (kind * packed_rule) list =
       pack_rule number_percentage
         ~runtime_module_path:[%module_path Css_types.NumberPercentage] () );
     ( Value "grid-line",
-      pack_rule grid_line ~runtime_module_path:[%module_path Css_types.GridLine] ()
-    );
+      pack_rule grid_line ~runtime_module_path:[%module_path Css_types.GridLine]
+        () );
     ( Value "single-transition-property",
       pack_rule single_transition_property
-        ~runtime_module_path:[%module_path Css_types.SingleTransitionProperty] () );
+        ~runtime_module_path:[%module_path Css_types.SingleTransitionProperty]
+        () );
     ( Value "outline-radius",
       pack_rule outline_radius
         ~runtime_module_path:[%module_path Css_types.OutlineRadius] () );
     ( Value "bg-size",
-      pack_rule bg_size ~runtime_module_path:[%module_path Css_types.BgSize] () );
+      pack_rule bg_size ~runtime_module_path:[%module_path Css_types.BgSize] ()
+    );
     ( Value "bg-position",
-      pack_rule bg_position ~runtime_module_path:[%module_path Css_types.BgPosition] () );
+      pack_rule bg_position
+        ~runtime_module_path:[%module_path Css_types.BgPosition] () );
     ( Value "feature-value-name",
       pack_rule feature_value_name
         ~runtime_module_path:[%module_path Css_types.FeatureValueName] () );
     ( Value "svg-length",
-      pack_rule svg_length ~runtime_module_path:[%module_path Css_types.SvgLength] () );
+      pack_rule svg_length
+        ~runtime_module_path:[%module_path Css_types.SvgLength] () );
     ( Value "single-animation-iteration-count",
       pack_rule single_animation_iteration_count
-        ~runtime_module_path:[%module_path Css_types.SingleAnimationIterationCount] () );
+        ~runtime_module_path:
+          [%module_path Css_types.SingleAnimationIterationCount] () );
     ( Value "basic-shape",
-      pack_rule basic_shape ~runtime_module_path:[%module_path Css_types.BasicShape] () );
+      pack_rule basic_shape
+        ~runtime_module_path:[%module_path Css_types.BasicShape] () );
     ( Value "filter-function",
       pack_rule filter_function
         ~runtime_module_path:[%module_path Css_types.FilterFunction] () );
@@ -10382,14 +10407,16 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.SelfPosition] () );
     ( Value "single-animation-direction",
       pack_rule single_animation_direction
-        ~runtime_module_path:[%module_path Css_types.SingleAnimationDirection] () );
+        ~runtime_module_path:[%module_path Css_types.SingleAnimationDirection]
+        () );
     ( Value "single-animation-fill-mode",
       pack_rule single_animation_fill_mode
-        ~runtime_module_path:[%module_path Css_types.SingleAnimationFillMode] () );
+        ~runtime_module_path:[%module_path Css_types.SingleAnimationFillMode] ()
+    );
     ( Value "single-animation-play-state",
       pack_rule single_animation_play_state
-        ~runtime_module_path:[%module_path Css_types.SingleAnimationPlayState] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.SingleAnimationPlayState]
+        () );
     ( Value "step-position",
       pack_rule step_position
         ~runtime_module_path:[%module_path Css_types.StepPosition] () );
@@ -10415,21 +10442,20 @@ let registry : (kind * packed_rule) list =
       pack_rule baseline_position
         ~runtime_module_path:[%module_path Css_types.BaselinePosition] () );
     ( Value "blend-mode",
-      pack_rule blend_mode ~runtime_module_path:[%module_path Css_types.BlendMode] () );
+      pack_rule blend_mode
+        ~runtime_module_path:[%module_path Css_types.BlendMode] () );
     ( Value "geometry-box",
       pack_rule geometry_box
         ~runtime_module_path:[%module_path Css_types.GeometryBox] () );
     ( Property "-webkit-appearance",
       pack_rule property__webkit_appearance
-        ~runtime_module_path:[%module_path Css_types.WebkitAppearance] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.WebkitAppearance] () );
     ( Property "stroke-linejoin",
       pack_rule property_stroke_linejoin
         ~runtime_module_path:[%module_path Css_types.StrokeLinejoin] () );
     ( Property "perspective-origin",
       pack_rule property_perspective_origin
-        ~runtime_module_path:[%module_path Css_types.PerspectiveOrigin] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.PerspectiveOrigin] () );
     (* CSS Math Functions *)
     Function "calc()", pack_rule function_calc ();
     Function "min()", pack_rule function_min ();
@@ -10440,17 +10466,19 @@ let registry : (kind * packed_rule) list =
     Function "hsl()", pack_rule function_hsl ();
     Function "hsla()", pack_rule function_hsla ();
     ( Function "var()",
-      pack_rule function_var
-        ~runtime_module_path:[%module_path Css_types.Var] () );
+      pack_rule function_var ~runtime_module_path:[%module_path Css_types.Var]
+        () );
     Function "color-mix()", pack_rule function_color_mix ();
     (* CSS Calc internal types *)
     ( Value "calc-product",
       pack_rule calc_product
         ~runtime_module_path:[%module_path Css_types.CalcProduct] () );
     ( Value "calc-sum",
-      pack_rule calc_sum ~runtime_module_path:[%module_path Css_types.CalcSum] () );
+      pack_rule calc_sum ~runtime_module_path:[%module_path Css_types.CalcSum]
+        () );
     ( Value "calc-value",
-      pack_rule calc_value ~runtime_module_path:[%module_path Css_types.CalcValue] () );
+      pack_rule calc_value
+        ~runtime_module_path:[%module_path Css_types.CalcValue] () );
     (* Media query building blocks *)
     ( Value "mf-eq",
       pack_rule mf_eq ~runtime_module_path:[%module_path Css_types.MfEq] () );
@@ -10466,23 +10494,28 @@ let registry : (kind * packed_rule) list =
       pack_rule property_container_type
         ~runtime_module_path:[%module_path Css_types.ContainerType] () );
     ( Value "dimension",
-      pack_rule dimension ~runtime_module_path:[%module_path Css_types.Dimension] ()
-    );
+      pack_rule dimension
+        ~runtime_module_path:[%module_path Css_types.Dimension] () );
     ( Value "ratio",
       pack_rule ratio ~runtime_module_path:[%module_path Css_types.Ratio] () );
     ( Value "mf-name",
-      pack_rule mf_name ~runtime_module_path:[%module_path Css_types.MfName] () );
+      pack_rule mf_name ~runtime_module_path:[%module_path Css_types.MfName] ()
+    );
     ( Value "mf-value",
-      pack_rule mf_value ~runtime_module_path:[%module_path Css_types.MfValue] () );
+      pack_rule mf_value ~runtime_module_path:[%module_path Css_types.MfValue]
+        () );
     ( Value "mf-boolean",
-      pack_rule mf_boolean ~runtime_module_path:[%module_path Css_types.MfBoolean] () );
+      pack_rule mf_boolean
+        ~runtime_module_path:[%module_path Css_types.MfBoolean] () );
     ( Value "mf-plain",
-      pack_rule mf_plain ~runtime_module_path:[%module_path Css_types.MfPlain] () );
+      pack_rule mf_plain ~runtime_module_path:[%module_path Css_types.MfPlain]
+        () );
     ( Value "mf-comparison",
       pack_rule mf_comparison
         ~runtime_module_path:[%module_path Css_types.MfComparison] () );
     ( Value "mf-range",
-      pack_rule mf_range ~runtime_module_path:[%module_path Css_types.MfRange] () );
+      pack_rule mf_range ~runtime_module_path:[%module_path Css_types.MfRange]
+        () );
     (* Media query types *)
     ( Media_query "media-feature",
       pack_rule media_feature
@@ -10491,21 +10524,24 @@ let registry : (kind * packed_rule) list =
       pack_rule media_in_parens
         ~runtime_module_path:[%module_path Css_types.MediaInParens] () );
     ( Media_query "media-or",
-      pack_rule media_or ~runtime_module_path:[%module_path Css_types.MediaOr] () );
+      pack_rule media_or ~runtime_module_path:[%module_path Css_types.MediaOr]
+        () );
     ( Media_query "media-and",
-      pack_rule media_and ~runtime_module_path:[%module_path Css_types.MediaAnd] ()
-    );
+      pack_rule media_and ~runtime_module_path:[%module_path Css_types.MediaAnd]
+        () );
     ( Media_query "media-not",
-      pack_rule media_not ~runtime_module_path:[%module_path Css_types.MediaNot] ()
-    );
+      pack_rule media_not ~runtime_module_path:[%module_path Css_types.MediaNot]
+        () );
     ( Media_query "media-condition-without-or",
       pack_rule media_condition_without_or
-        ~runtime_module_path:[%module_path Css_types.MediaConditionWithoutOr] () );
+        ~runtime_module_path:[%module_path Css_types.MediaConditionWithoutOr] ()
+    );
     ( Media_query "media-condition",
       pack_rule media_condition
         ~runtime_module_path:[%module_path Css_types.MediaCondition] () );
     ( Media_query "media-query",
-      pack_rule media_query ~runtime_module_path:[%module_path Css_types.MediaQuery] () );
+      pack_rule media_query
+        ~runtime_module_path:[%module_path Css_types.MediaQuery] () );
     ( Media_query "media-query-list",
       pack_rule media_query_list
         ~runtime_module_path:[%module_path Css_types.MediaQueryList] () );
@@ -10523,7 +10559,8 @@ let registry : (kind * packed_rule) list =
       pack_rule size_feature
         ~runtime_module_path:[%module_path Css_types.SizeFeature] () );
     ( Value "style-query",
-      pack_rule style_query ~runtime_module_path:[%module_path Css_types.StyleQuery] () );
+      pack_rule style_query
+        ~runtime_module_path:[%module_path Css_types.StyleQuery] () );
     ( Value "style-feature",
       pack_rule style_feature
         ~runtime_module_path:[%module_path Css_types.StyleFeature] () );
@@ -10533,30 +10570,34 @@ let registry : (kind * packed_rule) list =
     (* Legacy/Non-standard values - keyword only *)
     ( Value "legacy-radial-gradient-shape",
       pack_rule legacy_radial_gradient_shape
-        ~runtime_module_path:[%module_path Css_types.LegacyRadialGradientShape] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.LegacyRadialGradientShape]
+        () );
     ( Value "legacy-radial-gradient-size",
       pack_rule legacy_radial_gradient_size
-        ~runtime_module_path:[%module_path Css_types.LegacyRadialGradientSize] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.LegacyRadialGradientSize]
+        () );
     ( Value "legacy-radial-gradient-arguments",
       pack_rule legacy_radial_gradient_arguments
-        ~runtime_module_path:[%module_path Css_types.LegacyRadialGradientArguments] () );
+        ~runtime_module_path:
+          [%module_path Css_types.LegacyRadialGradientArguments] () );
     ( Value "legacy-radial-gradient",
       pack_rule legacy_radial_gradient
         ~runtime_module_path:[%module_path Css_types.LegacyRadialGradient] () );
     ( Value "legacy-repeating-radial-gradient",
       pack_rule legacy_repeating_radial_gradient
-        ~runtime_module_path:[%module_path Css_types.LegacyRepeatingRadialGradient] () );
+        ~runtime_module_path:
+          [%module_path Css_types.LegacyRepeatingRadialGradient] () );
     ( Value "legacy-linear-gradient",
       pack_rule legacy_linear_gradient
         ~runtime_module_path:[%module_path Css_types.LegacyLinearGradient] () );
     ( Value "legacy-linear-gradient-arguments",
       pack_rule legacy_linear_gradient_arguments
-        ~runtime_module_path:[%module_path Css_types.LegacyLinearGradientArguments] () );
+        ~runtime_module_path:
+          [%module_path Css_types.LegacyLinearGradientArguments] () );
     ( Value "legacy-repeating-linear-gradient",
       pack_rule legacy_repeating_linear_gradient
-        ~runtime_module_path:[%module_path Css_types.LegacyRepeatingLinearGradient] () );
+        ~runtime_module_path:
+          [%module_path Css_types.LegacyRepeatingLinearGradient] () );
     ( Value "legacy-gradient",
       pack_rule legacy_gradient
         ~runtime_module_path:[%module_path Css_types.LegacyGradient] () );
@@ -10568,8 +10609,8 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.NonStandardFont] () );
     ( Value "-non-standard-image-rendering",
       pack_rule non_standard_image_rendering
-        ~runtime_module_path:[%module_path Css_types.NonStandardImageRendering] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.NonStandardImageRendering]
+        () );
     ( Value "-non-standard-overflow",
       pack_rule non_standard_overflow
         ~runtime_module_path:[%module_path Css_types.NonStandardOverflow] () );
@@ -10590,7 +10631,8 @@ let registry : (kind * packed_rule) list =
       pack_rule common_lig_values
         ~runtime_module_path:[%module_path Css_types.CommonLigValues] () );
     ( Value "compat-auto",
-      pack_rule compat_auto ~runtime_module_path:[%module_path Css_types.CompatAuto] () );
+      pack_rule compat_auto
+        ~runtime_module_path:[%module_path Css_types.CompatAuto] () );
     ( Value "composite-style",
       pack_rule composite_style
         ~runtime_module_path:[%module_path Css_types.CompositeStyle] () );
@@ -10605,7 +10647,8 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.DeprecatedSystemColor] () );
     ( Value "discretionary-lig-values",
       pack_rule discretionary_lig_values
-        ~runtime_module_path:[%module_path Css_types.DiscretionaryLigValues] () );
+        ~runtime_module_path:[%module_path Css_types.DiscretionaryLigValues] ()
+    );
     ( Value "display-inside",
       pack_rule display_inside
         ~runtime_module_path:[%module_path Css_types.DisplayInside] () );
@@ -10617,7 +10660,8 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.DisplayLegacy] () );
     ( Value "east-asian-variant-values",
       pack_rule east_asian_variant_values
-        ~runtime_module_path:[%module_path Css_types.EastAsianVariantValues] () );
+        ~runtime_module_path:[%module_path Css_types.EastAsianVariantValues] ()
+    );
     ( Value "feature-type",
       pack_rule feature_type
         ~runtime_module_path:[%module_path Css_types.FeatureType] () );
@@ -10649,10 +10693,11 @@ let registry : (kind * packed_rule) list =
       pack_rule rectangular_color_space
         ~runtime_module_path:[%module_path Css_types.RectangularColorSpace] () );
     ( Value "shape-box",
-      pack_rule shape_box ~runtime_module_path:[%module_path Css_types.ShapeBox] ()
-    );
+      pack_rule shape_box ~runtime_module_path:[%module_path Css_types.ShapeBox]
+        () );
     ( Value "visual-box",
-      pack_rule visual_box ~runtime_module_path:[%module_path Css_types.VisualBox] () );
+      pack_rule visual_box
+        ~runtime_module_path:[%module_path Css_types.VisualBox] () );
     (* ============================================= *)
     (* Missing Properties - Added via registry scan *)
     (* ============================================= *)
@@ -10673,16 +10718,20 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.MozBorderLeftColors] () );
     ( Property "-moz-border-radius-bottomleft",
       pack_rule property__moz_border_radius_bottomleft
-        ~runtime_module_path:[%module_path Css_types.MozBorderRadiusBottomleft] () );
+        ~runtime_module_path:[%module_path Css_types.MozBorderRadiusBottomleft]
+        () );
     ( Property "-moz-border-radius-bottomright",
       pack_rule property__moz_border_radius_bottomright
-        ~runtime_module_path:[%module_path Css_types.MozBorderRadiusBottomright] () );
+        ~runtime_module_path:[%module_path Css_types.MozBorderRadiusBottomright]
+        () );
     ( Property "-moz-border-radius-topleft",
       pack_rule property__moz_border_radius_topleft
-        ~runtime_module_path:[%module_path Css_types.MozBorderRadiusTopleft] () );
+        ~runtime_module_path:[%module_path Css_types.MozBorderRadiusTopleft] ()
+    );
     ( Property "-moz-border-radius-topright",
       pack_rule property__moz_border_radius_topright
-        ~runtime_module_path:[%module_path Css_types.MozBorderRadiusTopright] () );
+        ~runtime_module_path:[%module_path Css_types.MozBorderRadiusTopright] ()
+    );
     ( Property "-moz-border-right-colors",
       pack_rule property__moz_border_right_colors
         ~runtime_module_path:[%module_path Css_types.MozBorderRightColors] () );
@@ -10694,13 +10743,15 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.MozContextProperties] () );
     ( Property "-moz-control-character-visibility",
       pack_rule property__moz_control_character_visibility
-        ~runtime_module_path:[%module_path Css_types.MozControlCharacterVisibility] () );
+        ~runtime_module_path:
+          [%module_path Css_types.MozControlCharacterVisibility] () );
     ( Property "-moz-float-edge",
       pack_rule property__moz_float_edge
         ~runtime_module_path:[%module_path Css_types.MozFloatEdge] () );
     ( Property "-moz-force-broken-image-icon",
       pack_rule property__moz_force_broken_image_icon
-        ~runtime_module_path:[%module_path Css_types.MozForceBrokenImageIcon] () );
+        ~runtime_module_path:[%module_path Css_types.MozForceBrokenImageIcon] ()
+    );
     ( Property "-moz-image-region",
       pack_rule property__moz_image_region
         ~runtime_module_path:[%module_path Css_types.MozImageRegion] () );
@@ -10712,20 +10763,23 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.MozOsxFontSmoothing] () );
     ( Property "-moz-outline-radius",
       pack_rule property__moz_outline_radius
-        ~runtime_module_path:[%module_path Css_types.MozOutlineRadius] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.MozOutlineRadius] () );
     ( Property "-moz-outline-radius-bottomleft",
       pack_rule property__moz_outline_radius_bottomleft
-        ~runtime_module_path:[%module_path Css_types.MozOutlineRadiusBottomleft] () );
+        ~runtime_module_path:[%module_path Css_types.MozOutlineRadiusBottomleft]
+        () );
     ( Property "-moz-outline-radius-bottomright",
       pack_rule property__moz_outline_radius_bottomright
-        ~runtime_module_path:[%module_path Css_types.MozOutlineRadiusBottomright] () );
+        ~runtime_module_path:
+          [%module_path Css_types.MozOutlineRadiusBottomright] () );
     ( Property "-moz-outline-radius-topleft",
       pack_rule property__moz_outline_radius_topleft
-        ~runtime_module_path:[%module_path Css_types.MozOutlineRadiusTopleft] () );
+        ~runtime_module_path:[%module_path Css_types.MozOutlineRadiusTopleft] ()
+    );
     ( Property "-moz-outline-radius-topright",
       pack_rule property__moz_outline_radius_topright
-        ~runtime_module_path:[%module_path Css_types.MozOutlineRadiusTopright] () );
+        ~runtime_module_path:[%module_path Css_types.MozOutlineRadiusTopright]
+        () );
     ( Property "-moz-stack-sizing",
       pack_rule property__moz_stack_sizing
         ~runtime_module_path:[%module_path Css_types.MozStackSizing] () );
@@ -10749,8 +10803,7 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.MozWindowDragging] () );
     ( Property "-moz-window-shadow",
       pack_rule property__moz_window_shadow
-        ~runtime_module_path:[%module_path Css_types.MozWindowShadow] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.MozWindowShadow] () );
     ( Property "-webkit-background-clip",
       pack_rule property__webkit_background_clip
         ~runtime_module_path:[%module_path Css_types.WebkitBackgroundClip] () );
@@ -10759,33 +10812,37 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.WebkitBorderBefore] () );
     ( Property "-webkit-border-before-color",
       pack_rule property__webkit_border_before_color
-        ~runtime_module_path:[%module_path Css_types.WebkitBorderBeforeColor] () );
+        ~runtime_module_path:[%module_path Css_types.WebkitBorderBeforeColor] ()
+    );
     ( Property "-webkit-border-before-style",
       pack_rule property__webkit_border_before_style
-        ~runtime_module_path:[%module_path Css_types.WebkitBorderBeforeStyle] () );
+        ~runtime_module_path:[%module_path Css_types.WebkitBorderBeforeStyle] ()
+    );
     ( Property "-webkit-border-before-width",
       pack_rule property__webkit_border_before_width
-        ~runtime_module_path:[%module_path Css_types.WebkitBorderBeforeWidth] () );
+        ~runtime_module_path:[%module_path Css_types.WebkitBorderBeforeWidth] ()
+    );
     ( Property "-webkit-box-reflect",
       pack_rule property__webkit_box_reflect
-        ~runtime_module_path:[%module_path Css_types.WebkitBoxReflect] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.WebkitBoxReflect] () );
     ( Property "-webkit-column-break-after",
       pack_rule property__webkit_column_break_after
-        ~runtime_module_path:[%module_path Css_types.WebkitColumnBreakAfter] () );
+        ~runtime_module_path:[%module_path Css_types.WebkitColumnBreakAfter] ()
+    );
     ( Property "-webkit-column-break-before",
       pack_rule property__webkit_column_break_before
-        ~runtime_module_path:[%module_path Css_types.WebkitColumnBreakBefore] () );
+        ~runtime_module_path:[%module_path Css_types.WebkitColumnBreakBefore] ()
+    );
     ( Property "-webkit-column-break-inside",
       pack_rule property__webkit_column_break_inside
-        ~runtime_module_path:[%module_path Css_types.WebkitColumnBreakInside] () );
+        ~runtime_module_path:[%module_path Css_types.WebkitColumnBreakInside] ()
+    );
     ( Property "-webkit-font-smoothing",
       pack_rule property__webkit_font_smoothing
         ~runtime_module_path:[%module_path Css_types.WebkitFontSmoothing] () );
     ( Property "-webkit-line-clamp",
       pack_rule property__webkit_line_clamp
-        ~runtime_module_path:[%module_path Css_types.WebkitLineClamp] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.WebkitLineClamp] () );
     ( Property "-webkit-mask",
       pack_rule property__webkit_mask
         ~runtime_module_path:[%module_path Css_types.WebkitMask] () );
@@ -10803,12 +10860,10 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.WebkitMaskComposite] () );
     ( Property "-webkit-mask-image",
       pack_rule property__webkit_mask_image
-        ~runtime_module_path:[%module_path Css_types.WebkitMaskImage] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.WebkitMaskImage] () );
     ( Property "-webkit-mask-origin",
       pack_rule property__webkit_mask_origin
-        ~runtime_module_path:[%module_path Css_types.WebkitMaskOrigin] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.WebkitMaskOrigin] () );
     ( Property "-webkit-mask-position",
       pack_rule property__webkit_mask_position
         ~runtime_module_path:[%module_path Css_types.WebkitMaskPosition] () );
@@ -10820,8 +10875,7 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.WebkitMaskPositionY] () );
     ( Property "-webkit-mask-repeat",
       pack_rule property__webkit_mask_repeat
-        ~runtime_module_path:[%module_path Css_types.WebkitMaskRepeat] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.WebkitMaskRepeat] () );
     ( Property "-webkit-mask-repeat-x",
       pack_rule property__webkit_mask_repeat_x
         ~runtime_module_path:[%module_path Css_types.WebkitMaskRepeatX] () );
@@ -10833,13 +10887,16 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.WebkitMaskSize] () );
     ( Property "-webkit-overflow-scrolling",
       pack_rule property__webkit_overflow_scrolling
-        ~runtime_module_path:[%module_path Css_types.WebkitOverflowScrolling] () );
+        ~runtime_module_path:[%module_path Css_types.WebkitOverflowScrolling] ()
+    );
     ( Property "-webkit-print-color-adjust",
       pack_rule property__webkit_print_color_adjust
-        ~runtime_module_path:[%module_path Css_types.WebkitPrintColorAdjust] () );
+        ~runtime_module_path:[%module_path Css_types.WebkitPrintColorAdjust] ()
+    );
     ( Property "-webkit-tap-highlight-color",
       pack_rule property__webkit_tap_highlight_color
-        ~runtime_module_path:[%module_path Css_types.WebkitTapHighlightColor] () );
+        ~runtime_module_path:[%module_path Css_types.WebkitTapHighlightColor] ()
+    );
     ( Property "-webkit-text-fill-color",
       pack_rule property__webkit_text_fill_color
         ~runtime_module_path:[%module_path Css_types.WebkitTextFillColor] () );
@@ -10848,8 +10905,7 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.WebkitTextSecurity] () );
     ( Property "-webkit-text-stroke",
       pack_rule property__webkit_text_stroke
-        ~runtime_module_path:[%module_path Css_types.WebkitTextStroke] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.WebkitTextStroke] () );
     ( Property "-webkit-text-stroke-color",
       pack_rule property__webkit_text_stroke_color
         ~runtime_module_path:[%module_path Css_types.WebkitTextStrokeColor] () );
@@ -10864,24 +10920,20 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.WebkitUserDrag] () );
     ( Property "-webkit-user-modify",
       pack_rule property__webkit_user_modify
-        ~runtime_module_path:[%module_path Css_types.WebkitUserModify] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.WebkitUserModify] () );
     ( Property "-webkit-user-select",
       pack_rule property__webkit_user_select
-        ~runtime_module_path:[%module_path Css_types.WebkitUserSelect] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.WebkitUserSelect] () );
     (* Vendor-prefixed properties - Microsoft *)
     ( Property "-ms-overflow-style",
       pack_rule property__ms_overflow_style
-        ~runtime_module_path:[%module_path Css_types.MsOverflowStyle] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.MsOverflowStyle] () );
     ( Property "accent-color",
       pack_rule property_accent_color
         ~runtime_module_path:[%module_path Css_types.AccentColor] () );
     ( Property "alignment-baseline",
       pack_rule property_alignment_baseline
-        ~runtime_module_path:[%module_path Css_types.AlignmentBaseline] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.AlignmentBaseline] () );
     ( Property "anchor-name",
       pack_rule property_anchor_name
         ~runtime_module_path:[%module_path Css_types.AnchorName] () );
@@ -10899,26 +10951,23 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.AnimationDelay] () );
     ( Property "animation-delay-end",
       pack_rule property_animation_delay_end
-        ~runtime_module_path:[%module_path Css_types.AnimationDelayEnd] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.AnimationDelayEnd] () );
     ( Property "animation-delay-start",
       pack_rule property_animation_delay_start
         ~runtime_module_path:[%module_path Css_types.AnimationDelayStart] () );
     ( Property "animation-direction",
       pack_rule property_animation_direction
-        ~runtime_module_path:[%module_path Css_types.AnimationDirection] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.AnimationDirection] () );
     ( Property "animation-duration",
       pack_rule property_animation_duration
-        ~runtime_module_path:[%module_path Css_types.AnimationDuration] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.AnimationDuration] () );
     ( Property "animation-fill-mode",
       pack_rule property_animation_fill_mode
-        ~runtime_module_path:[%module_path Css_types.AnimationFillMode] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.AnimationFillMode] () );
     ( Property "animation-iteration-count",
       pack_rule property_animation_iteration_count
-        ~runtime_module_path:[%module_path Css_types.AnimationIterationCount] () );
+        ~runtime_module_path:[%module_path Css_types.AnimationIterationCount] ()
+    );
     Property "animation-name", pack_rule property_animation_name ();
     ( Property "animation-play-state",
       pack_rule property_animation_play_state
@@ -10928,18 +10977,17 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.AnimationRange] () );
     ( Property "animation-range-end",
       pack_rule property_animation_range_end
-        ~runtime_module_path:[%module_path Css_types.AnimationRangeEnd] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.AnimationRangeEnd] () );
     ( Property "animation-range-start",
       pack_rule property_animation_range_start
         ~runtime_module_path:[%module_path Css_types.AnimationRangeStart] () );
     ( Property "animation-timeline",
       pack_rule property_animation_timeline
-        ~runtime_module_path:[%module_path Css_types.AnimationTimeline] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.AnimationTimeline] () );
     ( Property "animation-timing-function",
       pack_rule property_animation_timing_function
-        ~runtime_module_path:[%module_path Css_types.AnimationTimingFunction] () );
+        ~runtime_module_path:[%module_path Css_types.AnimationTimingFunction] ()
+    );
     ( Property "aspect-ratio",
       pack_rule property_aspect_ratio
         ~runtime_module_path:[%module_path Css_types.AspectRatio] () );
@@ -10971,8 +11019,7 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.BackgroundOrigin] () );
     ( Property "background-position",
       pack_rule property_background_position
-        ~runtime_module_path:[%module_path Css_types.BackgroundPosition] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.BackgroundPosition] () );
     ( Property "background-position-x",
       pack_rule property_background_position_x
         ~runtime_module_path:[%module_path Css_types.BackgroundPositionX] () );
@@ -11003,8 +11050,7 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.BorderBlock] () );
     ( Property "border-block-color",
       pack_rule property_border_block_color
-        ~runtime_module_path:[%module_path Css_types.BorderBlockColor] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.BorderBlockColor] () );
     ( Property "border-block-end",
       pack_rule property_border_block_end
         ~runtime_module_path:[%module_path Css_types.BorderBlockEnd] () );
@@ -11019,8 +11065,7 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.BorderBlockEndWidth] () );
     ( Property "border-block-start",
       pack_rule property_border_block_start
-        ~runtime_module_path:[%module_path Css_types.BorderBlockStart] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.BorderBlockStart] () );
     ( Property "border-block-start-color",
       pack_rule property_border_block_start_color
         ~runtime_module_path:[%module_path Css_types.BorderBlockStartColor] () );
@@ -11032,12 +11077,10 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.BorderBlockStartWidth] () );
     ( Property "border-block-style",
       pack_rule property_border_block_style
-        ~runtime_module_path:[%module_path Css_types.BorderBlockStyle] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.BorderBlockStyle] () );
     ( Property "border-block-width",
       pack_rule property_border_block_width
-        ~runtime_module_path:[%module_path Css_types.BorderBlockWidth] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.BorderBlockWidth] () );
     ( Property "border-bottom",
       pack_rule property_border_bottom
         ~runtime_module_path:[%module_path Css_types.BorderBottom] () );
@@ -11058,27 +11101,22 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.BorderImage] () );
     ( Property "border-image-outset",
       pack_rule property_border_image_outset
-        ~runtime_module_path:[%module_path Css_types.BorderImageOutset] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.BorderImageOutset] () );
     ( Property "border-image-slice",
       pack_rule property_border_image_slice
-        ~runtime_module_path:[%module_path Css_types.BorderImageSlice] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.BorderImageSlice] () );
     ( Property "border-image-source",
       pack_rule property_border_image_source
-        ~runtime_module_path:[%module_path Css_types.BorderImageSource] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.BorderImageSource] () );
     ( Property "border-image-width",
       pack_rule property_border_image_width
-        ~runtime_module_path:[%module_path Css_types.BorderImageWidth] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.BorderImageWidth] () );
     ( Property "border-inline",
       pack_rule property_border_inline
         ~runtime_module_path:[%module_path Css_types.BorderInline] () );
     ( Property "border-inline-color",
       pack_rule property_border_inline_color
-        ~runtime_module_path:[%module_path Css_types.BorderInlineColor] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.BorderInlineColor] () );
     ( Property "border-inline-end",
       pack_rule property_border_inline_end
         ~runtime_module_path:[%module_path Css_types.BorderInlineEnd] () );
@@ -11093,25 +11131,25 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.BorderInlineEndWidth] () );
     ( Property "border-inline-start",
       pack_rule property_border_inline_start
-        ~runtime_module_path:[%module_path Css_types.BorderInlineStart] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.BorderInlineStart] () );
     ( Property "border-inline-start-color",
       pack_rule property_border_inline_start_color
-        ~runtime_module_path:[%module_path Css_types.BorderInlineStartColor] () );
+        ~runtime_module_path:[%module_path Css_types.BorderInlineStartColor] ()
+    );
     ( Property "border-inline-start-style",
       pack_rule property_border_inline_start_style
-        ~runtime_module_path:[%module_path Css_types.BorderInlineStartStyle] () );
+        ~runtime_module_path:[%module_path Css_types.BorderInlineStartStyle] ()
+    );
     ( Property "border-inline-start-width",
       pack_rule property_border_inline_start_width
-        ~runtime_module_path:[%module_path Css_types.BorderInlineStartWidth] () );
+        ~runtime_module_path:[%module_path Css_types.BorderInlineStartWidth] ()
+    );
     ( Property "border-inline-style",
       pack_rule property_border_inline_style
-        ~runtime_module_path:[%module_path Css_types.BorderInlineStyle] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.BorderInlineStyle] () );
     ( Property "border-inline-width",
       pack_rule property_border_inline_width
-        ~runtime_module_path:[%module_path Css_types.BorderInlineWidth] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.BorderInlineWidth] () );
     ( Property "border-left",
       pack_rule property_border_left
         ~runtime_module_path:[%module_path Css_types.BorderLeft] () );
@@ -11185,8 +11223,8 @@ let registry : (kind * packed_rule) list =
       pack_rule property_box_shadow
         ~runtime_module_path:[%module_path Css_types.BoxShadow] () );
     ( Property "clip",
-      pack_rule property_clip
-        ~runtime_module_path:[%module_path Css_types.Clip] () );
+      pack_rule property_clip ~runtime_module_path:[%module_path Css_types.Clip]
+        () );
     ( Property "clip-path",
       pack_rule property_clip_path
         ~runtime_module_path:[%module_path Css_types.ClipPath] () );
@@ -11195,11 +11233,11 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.Color] () );
     ( Property "color-interpolation",
       pack_rule property_color_interpolation
-        ~runtime_module_path:[%module_path Css_types.ColorInterpolation] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.ColorInterpolation] () );
     ( Property "color-interpolation-filters",
       pack_rule property_color_interpolation_filters
-        ~runtime_module_path:[%module_path Css_types.ColorInterpolationFilters] () );
+        ~runtime_module_path:[%module_path Css_types.ColorInterpolationFilters]
+        () );
     ( Property "color-rendering",
       pack_rule property_color_rendering
         ~runtime_module_path:[%module_path Css_types.ColorRendering] () );
@@ -11226,13 +11264,16 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.Columns] () );
     ( Property "contain-intrinsic-block-size",
       pack_rule property_contain_intrinsic_block_size
-        ~runtime_module_path:[%module_path Css_types.ContainIntrinsicBlockSize] () );
+        ~runtime_module_path:[%module_path Css_types.ContainIntrinsicBlockSize]
+        () );
     ( Property "contain-intrinsic-height",
       pack_rule property_contain_intrinsic_height
-        ~runtime_module_path:[%module_path Css_types.ContainIntrinsicHeight] () );
+        ~runtime_module_path:[%module_path Css_types.ContainIntrinsicHeight] ()
+    );
     ( Property "contain-intrinsic-inline-size",
       pack_rule property_contain_intrinsic_inline_size
-        ~runtime_module_path:[%module_path Css_types.ContainIntrinsicInlineSize] () );
+        ~runtime_module_path:[%module_path Css_types.ContainIntrinsicInlineSize]
+        () );
     ( Property "contain-intrinsic-width",
       pack_rule property_contain_intrinsic_width
         ~runtime_module_path:[%module_path Css_types.ContainIntrinsicWidth] () );
@@ -11258,8 +11299,8 @@ let registry : (kind * packed_rule) list =
       pack_rule property_counter_set
         ~runtime_module_path:[%module_path Css_types.CounterSet] () );
     ( Property "cue",
-      pack_rule property_cue
-        ~runtime_module_path:[%module_path Css_types.Cue] () );
+      pack_rule property_cue ~runtime_module_path:[%module_path Css_types.Cue]
+        () );
     ( Property "cue-after",
       pack_rule property_cue_after
         ~runtime_module_path:[%module_path Css_types.CueAfter] () );
@@ -11291,16 +11332,16 @@ let registry : (kind * packed_rule) list =
       pack_rule property_filter
         ~runtime_module_path:[%module_path Css_types.Filter] () );
     ( Property "flex",
-      pack_rule property_flex
-        ~runtime_module_path:[%module_path Css_types.Flex] () );
+      pack_rule property_flex ~runtime_module_path:[%module_path Css_types.Flex]
+        () );
     ( Property "flex-flow",
       pack_rule property_flex_flow
         ~runtime_module_path:[%module_path Css_types.FlexFlow] () );
     Property "flood-color", pack_rule property_flood_color ();
     Property "flood-opacity", pack_rule property_flood_opacity ();
     ( Property "font",
-      pack_rule property_font
-        ~runtime_module_path:[%module_path Css_types.Font] () );
+      pack_rule property_font ~runtime_module_path:[%module_path Css_types.Font]
+        () );
     ( Property "font-family",
       pack_rule property_font_family
         ~runtime_module_path:[%module_path Css_types.FontFamily] () );
@@ -11333,8 +11374,7 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.FontVariantEastAsian] () );
     ( Property "font-variant-emoji",
       pack_rule property_font_variant_emoji
-        ~runtime_module_path:[%module_path Css_types.FontVariantEmoji] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.FontVariantEmoji] () );
     ( Property "font-variant-ligatures",
       pack_rule property_font_variant_ligatures
         ~runtime_module_path:[%module_path Css_types.FontVariantLigatures] () );
@@ -11348,17 +11388,19 @@ let registry : (kind * packed_rule) list =
       pack_rule property_font_weight
         ~runtime_module_path:[%module_path Css_types.FontWeight] () );
     ( Property "gap",
-      pack_rule property_gap
-        ~runtime_module_path:[%module_path Css_types.Gap] () );
+      pack_rule property_gap ~runtime_module_path:[%module_path Css_types.Gap]
+        () );
     ( Property "glyph-orientation-horizontal",
       pack_rule property_glyph_orientation_horizontal
-        ~runtime_module_path:[%module_path Css_types.GlyphOrientationHorizontal] () );
+        ~runtime_module_path:[%module_path Css_types.GlyphOrientationHorizontal]
+        () );
     ( Property "glyph-orientation-vertical",
       pack_rule property_glyph_orientation_vertical
-        ~runtime_module_path:[%module_path Css_types.GlyphOrientationVertical] () );
+        ~runtime_module_path:[%module_path Css_types.GlyphOrientationVertical]
+        () );
     ( Property "grid",
-      pack_rule property_grid
-        ~runtime_module_path:[%module_path Css_types.Grid] () );
+      pack_rule property_grid ~runtime_module_path:[%module_path Css_types.Grid]
+        () );
     ( Property "grid-area",
       pack_rule property_grid_area
         ~runtime_module_path:[%module_path Css_types.GridArea] () );
@@ -11394,26 +11436,22 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.GridTemplate] () );
     ( Property "grid-template-areas",
       pack_rule property_grid_template_areas
-        ~runtime_module_path:[%module_path Css_types.GridTemplateAreas] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.GridTemplateAreas] () );
     ( Property "grid-template-columns",
       pack_rule property_grid_template_columns
         ~runtime_module_path:[%module_path Css_types.GridTemplateColumns] () );
     ( Property "grid-template-rows",
       pack_rule property_grid_template_rows
-        ~runtime_module_path:[%module_path Css_types.GridTemplateRows] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.GridTemplateRows] () );
     ( Property "hanging-punctuation",
       pack_rule property_hanging_punctuation
-        ~runtime_module_path:[%module_path Css_types.HangingPunctuation] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.HangingPunctuation] () );
     ( Property "height",
       pack_rule property_height
         ~runtime_module_path:[%module_path Css_types.Height] () );
     ( Property "hyphenate-character",
       pack_rule property_hyphenate_character
-        ~runtime_module_path:[%module_path Css_types.HyphenateCharacter] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.HyphenateCharacter] () );
     ( Property "hyphenate-limit-chars",
       pack_rule property_hyphenate_limit_chars
         ~runtime_module_path:[%module_path Css_types.HyphenateLimitChars] () );
@@ -11486,8 +11524,8 @@ let registry : (kind * packed_rule) list =
       pack_rule property_layout_grid_type
         ~runtime_module_path:[%module_path Css_types.LayoutGridType] () );
     ( Property "left",
-      pack_rule property_left
-        ~runtime_module_path:[%module_path Css_types.Left] () );
+      pack_rule property_left ~runtime_module_path:[%module_path Css_types.Left]
+        () );
     ( Property "letter-spacing",
       pack_rule property_letter_spacing
         ~runtime_module_path:[%module_path Css_types.LetterSpacing] () );
@@ -11546,26 +11584,23 @@ let registry : (kind * packed_rule) list =
       pack_rule property_marks
         ~runtime_module_path:[%module_path Css_types.Marks] () );
     ( Property "mask",
-      pack_rule property_mask
-        ~runtime_module_path:[%module_path Css_types.Mask] () );
+      pack_rule property_mask ~runtime_module_path:[%module_path Css_types.Mask]
+        () );
     ( Property "mask-border",
       pack_rule property_mask_border
         ~runtime_module_path:[%module_path Css_types.MaskBorder] () );
     ( Property "mask-border-outset",
       pack_rule property_mask_border_outset
-        ~runtime_module_path:[%module_path Css_types.MaskBorderOutset] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.MaskBorderOutset] () );
     ( Property "mask-border-repeat",
       pack_rule property_mask_border_repeat
-        ~runtime_module_path:[%module_path Css_types.MaskBorderRepeat] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.MaskBorderRepeat] () );
     ( Property "mask-border-slice",
       pack_rule property_mask_border_slice
         ~runtime_module_path:[%module_path Css_types.MaskBorderSlice] () );
     ( Property "mask-border-source",
       pack_rule property_mask_border_source
-        ~runtime_module_path:[%module_path Css_types.MaskBorderSource] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.MaskBorderSource] () );
     ( Property "mask-border-width",
       pack_rule property_mask_border_width
         ~runtime_module_path:[%module_path Css_types.MaskBorderWidth] () );
@@ -11630,12 +11665,10 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.MediaColorIndex] () );
     ( Property "media-display-mode",
       pack_rule property_media_display_mode
-        ~runtime_module_path:[%module_path Css_types.MediaDisplayMode] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.MediaDisplayMode] () );
     ( Property "media-forced-colors",
       pack_rule property_media_forced_colors
-        ~runtime_module_path:[%module_path Css_types.MediaForcedColors] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.MediaForcedColors] () );
     ( Property "media-grid",
       pack_rule property_media_grid
         ~runtime_module_path:[%module_path Css_types.MediaGrid] () );
@@ -11674,13 +11707,15 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.MediaPointer] () );
     ( Property "media-prefers-color-scheme",
       pack_rule property_media_prefers_color_scheme
-        ~runtime_module_path:[%module_path Css_types.MediaPrefersColorScheme] () );
+        ~runtime_module_path:[%module_path Css_types.MediaPrefersColorScheme] ()
+    );
     ( Property "media-prefers-contrast",
       pack_rule property_media_prefers_contrast
         ~runtime_module_path:[%module_path Css_types.MediaPrefersContrast] () );
     ( Property "media-prefers-reduced-motion",
       pack_rule property_media_prefers_reduced_motion
-        ~runtime_module_path:[%module_path Css_types.MediaPrefersReducedMotion] () );
+        ~runtime_module_path:[%module_path Css_types.MediaPrefersReducedMotion]
+        () );
     ( Property "media-resolution",
       pack_rule property_media_resolution
         ~runtime_module_path:[%module_path Css_types.MediaResolution] () );
@@ -11759,10 +11794,12 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.Overlay] () );
     ( Property "overscroll-behavior-block",
       pack_rule property_overscroll_behavior_block
-        ~runtime_module_path:[%module_path Css_types.OverscrollBehaviorBlock] () );
+        ~runtime_module_path:[%module_path Css_types.OverscrollBehaviorBlock] ()
+    );
     ( Property "overscroll-behavior-inline",
       pack_rule property_overscroll_behavior_inline
-        ~runtime_module_path:[%module_path Css_types.OverscrollBehaviorInline] () );
+        ~runtime_module_path:[%module_path Css_types.OverscrollBehaviorInline]
+        () );
     ( Property "overscroll-behavior-x",
       pack_rule property_overscroll_behavior_x
         ~runtime_module_path:[%module_path Css_types.OverscrollBehaviorX] () );
@@ -11787,8 +11824,8 @@ let registry : (kind * packed_rule) list =
     Property "padding-right", pack_rule property_padding_right ();
     Property "padding-top", pack_rule property_padding_top ();
     ( Property "page",
-      pack_rule property_page
-        ~runtime_module_path:[%module_path Css_types.Page] () );
+      pack_rule property_page ~runtime_module_path:[%module_path Css_types.Page]
+        () );
     ( Property "paint-order",
       pack_rule property_paint_order
         ~runtime_module_path:[%module_path Css_types.PaintOrder] () );
@@ -11830,8 +11867,7 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.PositionTryOptions] () );
     ( Property "position-visibility",
       pack_rule property_position_visibility
-        ~runtime_module_path:[%module_path Css_types.PositionVisibility] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.PositionVisibility] () );
     ( Property "quotes",
       pack_rule property_quotes
         ~runtime_module_path:[%module_path Css_types.Quotes] () );
@@ -11840,8 +11876,8 @@ let registry : (kind * packed_rule) list =
       pack_rule property_reading_flow
         ~runtime_module_path:[%module_path Css_types.ReadingFlow] () );
     ( Property "rest",
-      pack_rule property_rest
-        ~runtime_module_path:[%module_path Css_types.Rest] () );
+      pack_rule property_rest ~runtime_module_path:[%module_path Css_types.Rest]
+        () );
     ( Property "rest-after",
       pack_rule property_rest_after
         ~runtime_module_path:[%module_path Css_types.RestAfter] () );
@@ -11884,8 +11920,7 @@ let registry : (kind * packed_rule) list =
     Property "scroll-margin-top", pack_rule property_scroll_margin_top ();
     ( Property "scroll-marker-group",
       pack_rule property_scroll_marker_group
-        ~runtime_module_path:[%module_path Css_types.ScrollMarkerGroup] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.ScrollMarkerGroup] () );
     ( Property "scroll-padding",
       pack_rule property_scroll_padding
         ~runtime_module_path:[%module_path Css_types.ScrollPadding] () );
@@ -11930,22 +11965,21 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.ScrollStart] () );
     ( Property "scroll-start-block",
       pack_rule property_scroll_start_block
-        ~runtime_module_path:[%module_path Css_types.ScrollStartBlock] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.ScrollStartBlock] () );
     ( Property "scroll-start-inline",
       pack_rule property_scroll_start_inline
-        ~runtime_module_path:[%module_path Css_types.ScrollStartInline] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.ScrollStartInline] () );
     ( Property "scroll-start-target",
       pack_rule property_scroll_start_target
-        ~runtime_module_path:[%module_path Css_types.ScrollStartTarget] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.ScrollStartTarget] () );
     ( Property "scroll-start-target-block",
       pack_rule property_scroll_start_target_block
-        ~runtime_module_path:[%module_path Css_types.ScrollStartTargetBlock] () );
+        ~runtime_module_path:[%module_path Css_types.ScrollStartTargetBlock] ()
+    );
     ( Property "scroll-start-target-inline",
       pack_rule property_scroll_start_target_inline
-        ~runtime_module_path:[%module_path Css_types.ScrollStartTargetInline] () );
+        ~runtime_module_path:[%module_path Css_types.ScrollStartTargetInline] ()
+    );
     ( Property "scroll-start-target-x",
       pack_rule property_scroll_start_target_x
         ~runtime_module_path:[%module_path Css_types.ScrollStartTargetX] () );
@@ -11984,7 +12018,8 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.ScrollbarColorLegacy] () );
     ( Property "scrollbar-darkshadow-color",
       pack_rule property_scrollbar_darkshadow_color
-        ~runtime_module_path:[%module_path Css_types.ScrollbarDarkshadowColor] () );
+        ~runtime_module_path:[%module_path Css_types.ScrollbarDarkshadowColor]
+        () );
     ( Property "scrollbar-face-color",
       pack_rule property_scrollbar_face_color
         ~runtime_module_path:[%module_path Css_types.ScrollbarFaceColor] () );
@@ -11993,7 +12028,8 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.ScrollbarGutter] () );
     ( Property "scrollbar-highlight-color",
       pack_rule property_scrollbar_highlight_color
-        ~runtime_module_path:[%module_path Css_types.ScrollbarHighlightColor] () );
+        ~runtime_module_path:[%module_path Css_types.ScrollbarHighlightColor] ()
+    );
     ( Property "scrollbar-shadow-color",
       pack_rule property_scrollbar_shadow_color
         ~runtime_module_path:[%module_path Css_types.ScrollbarShadowColor] () );
@@ -12013,14 +12049,14 @@ let registry : (kind * packed_rule) list =
       pack_rule property_shape_rendering
         ~runtime_module_path:[%module_path Css_types.ShapeRendering] () );
     ( Property "size",
-      pack_rule property_size
-        ~runtime_module_path:[%module_path Css_types.Size] () );
+      pack_rule property_size ~runtime_module_path:[%module_path Css_types.Size]
+        () );
     ( Property "speak-as",
       pack_rule property_speak_as
         ~runtime_module_path:[%module_path Css_types.SpeakAs] () );
     ( Property "src",
-      pack_rule property_src
-        ~runtime_module_path:[%module_path Css_types.Src] () );
+      pack_rule property_src ~runtime_module_path:[%module_path Css_types.Src]
+        () );
     Property "stop-color", pack_rule property_stop_color ();
     Property "stop-opacity", pack_rule property_stop_opacity ();
     ( Property "stroke",
@@ -12079,13 +12115,16 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.TextDecorationSkipBox] () );
     ( Property "text-decoration-skip-inset",
       pack_rule property_text_decoration_skip_inset
-        ~runtime_module_path:[%module_path Css_types.TextDecorationSkipInset] () );
+        ~runtime_module_path:[%module_path Css_types.TextDecorationSkipInset] ()
+    );
     ( Property "text-decoration-skip-self",
       pack_rule property_text_decoration_skip_self
-        ~runtime_module_path:[%module_path Css_types.TextDecorationSkipSelf] () );
+        ~runtime_module_path:[%module_path Css_types.TextDecorationSkipSelf] ()
+    );
     ( Property "text-decoration-skip-spaces",
       pack_rule property_text_decoration_skip_spaces
-        ~runtime_module_path:[%module_path Css_types.TextDecorationSkipSpaces] () );
+        ~runtime_module_path:[%module_path Css_types.TextDecorationSkipSpaces]
+        () );
     ( Property "text-edge",
       pack_rule property_text_edge
         ~runtime_module_path:[%module_path Css_types.TextEdge] () );
@@ -12098,8 +12137,7 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.TextEmphasisPosition] () );
     ( Property "text-emphasis-style",
       pack_rule property_text_emphasis_style
-        ~runtime_module_path:[%module_path Css_types.TextEmphasisStyle] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.TextEmphasisStyle] () );
     ( Property "text-indent",
       pack_rule property_text_indent
         ~runtime_module_path:[%module_path Css_types.TextIndent] () );
@@ -12111,8 +12149,7 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.TextKashida] () );
     ( Property "text-kashida-space",
       pack_rule property_text_kashida_space
-        ~runtime_module_path:[%module_path Css_types.TextKashidaSpace] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.TextKashidaSpace] () );
     ( Property "text-overflow",
       pack_rule property_text_overflow
         ~runtime_module_path:[%module_path Css_types.TextOverflow] () );
@@ -12141,8 +12178,8 @@ let registry : (kind * packed_rule) list =
       pack_rule property_timeline_scope
         ~runtime_module_path:[%module_path Css_types.TimelineScope] () );
     ( Property "top",
-      pack_rule property_top
-        ~runtime_module_path:[%module_path Css_types.Top] () );
+      pack_rule property_top ~runtime_module_path:[%module_path Css_types.Top]
+        () );
     ( Property "transform",
       pack_rule property_transform
         ~runtime_module_path:[%module_path Css_types.Transform] () );
@@ -12154,19 +12191,18 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.Transition] () );
     ( Property "transition-behavior",
       pack_rule property_transition_behavior
-        ~runtime_module_path:[%module_path Css_types.TransitionBehavior] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.TransitionBehavior] () );
     ( Property "transition-delay",
       pack_rule property_transition_delay
         ~runtime_module_path:[%module_path Css_types.TransitionDelay] () );
     ( Property "transition-duration",
       pack_rule property_transition_duration
-        ~runtime_module_path:[%module_path Css_types.TransitionDuration] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.TransitionDuration] () );
     Property "transition-property", pack_rule property_transition_property ();
     ( Property "transition-timing-function",
       pack_rule property_transition_timing_function
-        ~runtime_module_path:[%module_path Css_types.TransitionTimingFunction] () );
+        ~runtime_module_path:[%module_path Css_types.TransitionTimingFunction]
+        () );
     ( Property "translate",
       pack_rule property_translate
         ~runtime_module_path:[%module_path Css_types.Translate] () );
@@ -12184,16 +12220,13 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.ViewTimeline] () );
     ( Property "view-timeline-axis",
       pack_rule property_view_timeline_axis
-        ~runtime_module_path:[%module_path Css_types.ViewTimelineAxis] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.ViewTimelineAxis] () );
     ( Property "view-timeline-inset",
       pack_rule property_view_timeline_inset
-        ~runtime_module_path:[%module_path Css_types.ViewTimelineInset] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.ViewTimelineInset] () );
     ( Property "view-timeline-name",
       pack_rule property_view_timeline_name
-        ~runtime_module_path:[%module_path Css_types.ViewTimelineName] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.ViewTimelineName] () );
     ( Property "view-transition-name",
       pack_rule property_view_transition_name
         ~runtime_module_path:[%module_path Css_types.ViewTransitionName] () );
@@ -12241,8 +12274,8 @@ let registry : (kind * packed_rule) list =
       pack_rule property_z_index
         ~runtime_module_path:[%module_path Css_types.ZIndex] () );
     ( Property "zoom",
-      pack_rule property_zoom
-        ~runtime_module_path:[%module_path Css_types.Zoom] () );
+      pack_rule property_zoom ~runtime_module_path:[%module_path Css_types.Zoom]
+        () );
     Function "blur()", pack_rule function_blur ();
     Function "brightness()", pack_rule function_brightness ();
     Function "circle()", pack_rule function_circle ();
@@ -12293,19 +12326,20 @@ let registry : (kind * packed_rule) list =
       pack_rule attr_matcher
         ~runtime_module_path:[%module_path Css_types.AttrMatcher] () );
     ( Value "attr-name",
-      pack_rule attr_name ~runtime_module_path:[%module_path Css_types.AttrName] ()
-    );
+      pack_rule attr_name ~runtime_module_path:[%module_path Css_types.AttrName]
+        () );
     ( Value "attr-type",
-      pack_rule attr_type ~runtime_module_path:[%module_path Css_types.AttrType] ()
-    );
+      pack_rule attr_type ~runtime_module_path:[%module_path Css_types.AttrType]
+        () );
     ( Value "attr-unit",
-      pack_rule attr_unit ~runtime_module_path:[%module_path Css_types.AttrUnit] ()
-    );
+      pack_rule attr_unit ~runtime_module_path:[%module_path Css_types.AttrUnit]
+        () );
     ( Value "attribute-selector",
       pack_rule attribute_selector
         ~runtime_module_path:[%module_path Css_types.AttributeSelector] () );
     ( Value "bg-layer",
-      pack_rule bg_layer ~runtime_module_path:[%module_path Css_types.BgLayer] () );
+      pack_rule bg_layer ~runtime_module_path:[%module_path Css_types.BgLayer]
+        () );
     ( Value "border-radius",
       pack_rule border_radius
         ~runtime_module_path:[%module_path Css_types.BorderRadius] () );
@@ -12321,9 +12355,11 @@ let registry : (kind * packed_rule) list =
       pack_rule class_selector
         ~runtime_module_path:[%module_path Css_types.ClassSelector] () );
     ( Value "clip-source",
-      pack_rule clip_source ~runtime_module_path:[%module_path Css_types.ClipSource] () );
+      pack_rule clip_source
+        ~runtime_module_path:[%module_path Css_types.ClipSource] () );
     ( Value "color-stop",
-      pack_rule color_stop ~runtime_module_path:[%module_path Css_types.ColorStop] () );
+      pack_rule color_stop
+        ~runtime_module_path:[%module_path Css_types.ColorStop] () );
     ( Value "color-stop-angle",
       pack_rule color_stop_angle
         ~runtime_module_path:[%module_path Css_types.ColorStopAngle] () );
@@ -12344,12 +12380,14 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.CompoundSelectorList] () );
     ( Value "container-condition-list",
       pack_rule container_condition_list
-        ~runtime_module_path:[%module_path Css_types.ContainerConditionList] () );
+        ~runtime_module_path:[%module_path Css_types.ContainerConditionList] ()
+    );
     ( Value "counter-name",
       pack_rule counter_name
         ~runtime_module_path:[%module_path Css_types.CounterName] () );
     ( Value "declaration",
-      pack_rule declaration ~runtime_module_path:[%module_path Css_types.Declaration] () );
+      pack_rule declaration
+        ~runtime_module_path:[%module_path Css_types.Declaration] () );
     ( Value "declaration-list",
       pack_rule declaration_list
         ~runtime_module_path:[%module_path Css_types.DeclarationList] () );
@@ -12372,8 +12410,8 @@ let registry : (kind * packed_rule) list =
       pack_rule extended_percentage
         ~runtime_module_path:[%module_path Css_types.Percentage] () );
     ( Value "extended-time",
-      pack_rule extended_time
-        ~runtime_module_path:[%module_path Css_types.Time] () );
+      pack_rule extended_time ~runtime_module_path:[%module_path Css_types.Time]
+        () );
     ( Value "feature-tag-value",
       pack_rule feature_tag_value
         ~runtime_module_path:[%module_path Css_types.FeatureTagValue] () );
@@ -12385,10 +12423,12 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.FeatureValueBlockList] () );
     ( Value "feature-value-declaration",
       pack_rule feature_value_declaration
-        ~runtime_module_path:[%module_path Css_types.FeatureValueDeclaration] () );
+        ~runtime_module_path:[%module_path Css_types.FeatureValueDeclaration] ()
+    );
     ( Value "feature-value-declaration-list",
       pack_rule feature_value_declaration_list
-        ~runtime_module_path:[%module_path Css_types.FeatureValueDeclarationList] () );
+        ~runtime_module_path:
+          [%module_path Css_types.FeatureValueDeclarationList] () );
     ( Value "filter-function-list",
       pack_rule filter_function_list
         ~runtime_module_path:[%module_path Css_types.FilterFunctionList] () );
@@ -12406,15 +12446,17 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.GenericVoice] () );
     ( Value "hue-interpolation-method",
       pack_rule hue_interpolation_method
-        ~runtime_module_path:[%module_path Css_types.HueInterpolationMethod] () );
+        ~runtime_module_path:[%module_path Css_types.HueInterpolationMethod] ()
+    );
     ( Value "id-selector",
-      pack_rule id_selector ~runtime_module_path:[%module_path Css_types.IdSelector] () );
+      pack_rule id_selector
+        ~runtime_module_path:[%module_path Css_types.IdSelector] () );
     ( Value "image-set-option",
       pack_rule image_set_option
         ~runtime_module_path:[%module_path Css_types.ImageSetOption] () );
     ( Value "image-src",
-      pack_rule image_src ~runtime_module_path:[%module_path Css_types.ImageSrc] ()
-    );
+      pack_rule image_src ~runtime_module_path:[%module_path Css_types.ImageSrc]
+        () );
     ( Value "inflexible-breadth",
       pack_rule inflexible_breadth
         ~runtime_module_path:[%module_path Css_types.InflexibleBreadth] () );
@@ -12428,7 +12470,8 @@ let registry : (kind * packed_rule) list =
       pack_rule keyframe_selector
         ~runtime_module_path:[%module_path Css_types.KeyframeSelector] () );
     ( Value "leader-type",
-      pack_rule leader_type ~runtime_module_path:[%module_path Css_types.LeaderType] () );
+      pack_rule leader_type
+        ~runtime_module_path:[%module_path Css_types.LeaderType] () );
     ( Value "left",
       pack_rule left ~runtime_module_path:[%module_path Css_types.Left] () );
     ( Value "line-name-list",
@@ -12441,21 +12484,25 @@ let registry : (kind * packed_rule) list =
       pack_rule linear_color_stop
         ~runtime_module_path:[%module_path Css_types.LinearColorStop] () );
     ( Value "mask-image",
-      pack_rule mask_image ~runtime_module_path:[%module_path Css_types.MaskImage] () );
+      pack_rule mask_image
+        ~runtime_module_path:[%module_path Css_types.MaskImage] () );
     ( Value "mask-layer",
-      pack_rule mask_layer ~runtime_module_path:[%module_path Css_types.MaskLayer] () );
+      pack_rule mask_layer
+        ~runtime_module_path:[%module_path Css_types.MaskLayer] () );
     ( Value "mask-position",
       pack_rule mask_position
         ~runtime_module_path:[%module_path Css_types.MaskPosition] () );
     ( Value "name-repeat",
-      pack_rule name_repeat ~runtime_module_path:[%module_path Css_types.NameRepeat] () );
+      pack_rule name_repeat
+        ~runtime_module_path:[%module_path Css_types.NameRepeat] () );
     ( Value "namespace-prefix",
       pack_rule namespace_prefix
         ~runtime_module_path:[%module_path Css_types.NamespacePrefix] () );
     ( Value "ns-prefix",
-      pack_rule ns_prefix ~runtime_module_path:[%module_path Css_types.NsPrefix] ()
-    );
-    Value "nth", pack_rule nth ~runtime_module_path:[%module_path Css_types.Nth] ();
+      pack_rule ns_prefix ~runtime_module_path:[%module_path Css_types.NsPrefix]
+        () );
+    ( Value "nth",
+      pack_rule nth ~runtime_module_path:[%module_path Css_types.Nth] () );
     ( Value "number-one-or-greater",
       pack_rule number_one_or_greater
         ~runtime_module_path:[%module_path Css_types.NumberOneOrGreater] () );
@@ -12463,10 +12510,11 @@ let registry : (kind * packed_rule) list =
       pack_rule number_zero_one
         ~runtime_module_path:[%module_path Css_types.NumberZeroOne] () );
     ( Value "one-bg-size",
-      pack_rule one_bg_size ~runtime_module_path:[%module_path Css_types.OneBgSize] () );
+      pack_rule one_bg_size
+        ~runtime_module_path:[%module_path Css_types.OneBgSize] () );
     ( Value "page-body",
-      pack_rule page_body ~runtime_module_path:[%module_path Css_types.PageBody] ()
-    );
+      pack_rule page_body ~runtime_module_path:[%module_path Css_types.PageBody]
+        () );
     ( Value "page-margin-box",
       pack_rule page_margin_box
         ~runtime_module_path:[%module_path Css_types.PageMarginBox] () );
@@ -12488,11 +12536,14 @@ let registry : (kind * packed_rule) list =
       pack_rule pseudo_element_selector
         ~runtime_module_path:[%module_path Css_types.PseudoElementSelector] () );
     ( Value "pseudo-page",
-      pack_rule pseudo_page ~runtime_module_path:[%module_path Css_types.PseudoPage] () );
+      pack_rule pseudo_page
+        ~runtime_module_path:[%module_path Css_types.PseudoPage] () );
     ( Value "radial-size",
-      pack_rule radial_size ~runtime_module_path:[%module_path Css_types.RadialSize] () );
+      pack_rule radial_size
+        ~runtime_module_path:[%module_path Css_types.RadialSize] () );
     ( Value "ray-size",
-      pack_rule ray_size ~runtime_module_path:[%module_path Css_types.RaySize] () );
+      pack_rule ray_size ~runtime_module_path:[%module_path Css_types.RaySize]
+        () );
     ( Value "relative-selector",
       pack_rule relative_selector
         ~runtime_module_path:[%module_path Css_types.RelativeSelector] () );
@@ -12511,11 +12562,12 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.SingleTransition] () );
     ( Value "single-transition-no-interp",
       pack_rule single_transition_no_interp
-        ~runtime_module_path:[%module_path Css_types.SingleTransitionNoInterp] ()
-    );
+        ~runtime_module_path:[%module_path Css_types.SingleTransitionNoInterp]
+        () );
     ( Value "single-transition-property-no-interp",
       pack_rule single_transition_property_no_interp
-        ~runtime_module_path:[%module_path Css_types.SingleTransitionPropertyNoInterp] () );
+        ~runtime_module_path:
+          [%module_path Css_types.SingleTransitionPropertyNoInterp] () );
     ( Value "size",
       pack_rule size ~runtime_module_path:[%module_path Css_types.Size] () );
     ( Value "subclass-selector",
@@ -12563,9 +12615,11 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.SyntaxTypeName] () );
     ( Value "target",
       pack_rule target ~runtime_module_path:[%module_path Css_types.Target] () );
-    Value "top", pack_rule top ~runtime_module_path:[%module_path Css_types.Top] ();
+    ( Value "top",
+      pack_rule top ~runtime_module_path:[%module_path Css_types.Top] () );
     ( Value "track-group",
-      pack_rule track_group ~runtime_module_path:[%module_path Css_types.TrackGroup] () );
+      pack_rule track_group
+        ~runtime_module_path:[%module_path Css_types.TrackGroup] () );
     ( Value "track-list-v0",
       pack_rule track_list_v0
         ~runtime_module_path:[%module_path Css_types.TrackListV0] () );
@@ -12574,12 +12628,15 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.TrackMinmax] () );
     ( Value "transition-behavior-value",
       pack_rule transition_behavior_value
-        ~runtime_module_path:[%module_path Css_types.TransitionBehaviorValue] () );
+        ~runtime_module_path:[%module_path Css_types.TransitionBehaviorValue] ()
+    );
     ( Value "transition-behavior-value-no-interp",
       pack_rule transition_behavior_value_no_interp
-        ~runtime_module_path:[%module_path Css_types.TransitionBehaviorValueNoInterp] () );
+        ~runtime_module_path:
+          [%module_path Css_types.TransitionBehaviorValueNoInterp] () );
     ( Value "try-tactic",
-      pack_rule try_tactic ~runtime_module_path:[%module_path Css_types.TryTactic] () );
+      pack_rule try_tactic
+        ~runtime_module_path:[%module_path Css_types.TryTactic] () );
     ( Value "type-or-unit",
       pack_rule type_or_unit
         ~runtime_module_path:[%module_path Css_types.TypeOrUnit] () );
@@ -12591,7 +12648,8 @@ let registry : (kind * packed_rule) list =
         ~runtime_module_path:[%module_path Css_types.ViewportLength] () );
     ( Value "webkit-gradient-color-stop",
       pack_rule webkit_gradient_color_stop
-        ~runtime_module_path:[%module_path Css_types.WebkitGradientColorStop] () );
+        ~runtime_module_path:[%module_path Css_types.WebkitGradientColorStop] ()
+    );
     ( Value "webkit-gradient-point",
       pack_rule webkit_gradient_point
         ~runtime_module_path:[%module_path Css_types.WebkitGradientPoint] () );
@@ -12599,7 +12657,8 @@ let registry : (kind * packed_rule) list =
       pack_rule webkit_gradient_radius
         ~runtime_module_path:[%module_path Css_types.WebkitGradientRadius] () );
     ( Value "wq-name",
-      pack_rule wq_name ~runtime_module_path:[%module_path Css_types.WqName] () );
+      pack_rule wq_name ~runtime_module_path:[%module_path Css_types.WqName] ()
+    );
     Value "x", pack_rule x ~runtime_module_path:[%module_path Css_types.X] ();
     Value "y", pack_rule y ~runtime_module_path:[%module_path Css_types.Y] ();
   ]
@@ -12693,8 +12752,6 @@ let () =
       | _ -> ())
     registry
 
-
-
 let check_property ~loc ~name value :
   ( unit,
     Styled_ppx_css_parser.Ast.loc
@@ -12715,7 +12772,23 @@ let check_property ~loc ~name value :
       in
       (match Rule.parse_string universal_rule value with
       | Ok _ -> Ok ()
-      | Error _ -> Error (loc, `Invalid_value property_error)))
+      | Error _ ->
+        let prefix =
+          Format.sprintf "Property '%s' has an invalid value: '%s'" name value
+        in
+        let error_message =
+          if property_error = "" then prefix
+          else if
+            String.length property_error >= 6
+            && String.sub property_error 0 6 = "tokens"
+          then prefix
+          else if
+            String.length property_error >= 8
+            && String.sub property_error 0 8 = "Expected"
+          then prefix ^ ", " ^ property_error
+          else property_error
+        in
+        Error (loc, `Invalid_value error_message)))
   | None -> Error (loc, `Property_not_found)
 
 let get_interpolation_types ~name value : (string * string) list =
@@ -12732,12 +12805,12 @@ let find_property_packed (name : string) : packed_property option =
 let parse_at_rule_prelude (rule_parser : 'a Rule.rule) input =
   let tokens_with_loc =
     Styled_ppx_css_parser.Lexer.from_string
-      ~initial_mode:Styled_ppx_css_parser.Lexer_context.At_rule_prelude
-      input
+      ~initial_mode:Styled_ppx_css_parser.Lexer_context.At_rule_prelude input
   in
   let tokens =
     tokens_with_loc
-    |> List.filter_map (fun ({ txt; _ } : Styled_ppx_css_parser.Lexer.token_with_location) ->
+    |> List.filter_map
+         (fun ({ txt; _ } : Styled_ppx_css_parser.Lexer.token_with_location) ->
          match txt with Ok token -> Some token | Error _ -> None)
     |> List.rev
   in

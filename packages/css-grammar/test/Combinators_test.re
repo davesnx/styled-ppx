@@ -337,7 +337,7 @@ let tests = [
     let output = Parser.parse([%spec "red | blue | green"], "gren");
     switch (output) {
     | Error(msg) =>
-      if (!string_contains(msg, "did you mean")) {
+      if (!string_contains(msg, "Did you mean")) {
         Alcotest.fail("Error message should suggest correction: " ++ msg);
       };
       if (!string_contains(msg, "green")) {
@@ -391,29 +391,29 @@ let tests = [
   }),
   test("xor error: no close match suggests all options", () => {
     let msg = parse_error([%spec "red | blue | green"], "yellow");
-    if (!string_contains(msg, "expected 'blue', 'green', or 'red'.")) {
-      Alcotest.fail("Error message should list options sorted. Got: " ++ msg);
+    if (!string_contains(msg, "Expected 'red', 'blue', or 'green'.")) {
+      Alcotest.fail("Error message should list options. Got: " ++ msg);
     };
     ();
   }),
   test("xor error: close match suggests single option", () => {
     let msg = parse_error([%spec "red | blue | green"], "gren");
-    if (!string_contains(msg, "did you mean 'green'?")) {
+    if (!string_contains(msg, "Did you mean 'green'?")) {
       Alcotest.fail("Error message should suggest green. Got: " ++ msg);
     };
     ();
   }),
-  test("xor error: reports what was got", () => {
+  test("xor error: reports expected options", () => {
     let msg = parse_error([%spec "red | blue"], "yellow");
-    if (!string_contains(msg, "Got 'yellow'")) {
-      Alcotest.fail("Error should report what was got. Got: " ++ msg);
+    if (!string_contains(msg, "Expected 'red' or 'blue'.")) {
+      Alcotest.fail("Error should list expected options. Got: " ++ msg);
     };
     ();
   }),
   test("xor error: handles quote extraction", () => {
     let msg = parse_error([%spec "red | blue"], "'quoted'");
-    if (!string_contains(msg, "Got")) {
-      Alcotest.fail("Error should report what was got. Got: " ++ msg);
+    if (!string_contains(msg, "Expected 'red' or 'blue'.")) {
+      Alcotest.fail("Error should list expected options. Got: " ++ msg);
     };
     ();
   }),

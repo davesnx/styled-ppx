@@ -355,7 +355,7 @@ let tests = [
       Alcotest.result(css_wide_keywords, Alcotest.string),
       parse("nope"),
       Error(
-        {|Got 'nope', expected 'inherit', 'initial', 'revert', 'revert-layer', or 'unset'.|},
+        {|Expected 'initial', 'inherit', 'unset', 'revert', or 'revert-layer'.|},
       ),
     );
   }),
@@ -464,6 +464,6 @@ let tests = [
     expect(parse("$(Module.value)"), Ok(["Module.value"]));
     expect(parse("$(Module'.value')"), Ok(["Module'.value'"]));
     /* TODO: Add error message into interpolation */
-    expect(parse("asd"), Error("Expected interpolation."));
+    expect(parse("asd"), Error("Expected value."));
   }),
 ];

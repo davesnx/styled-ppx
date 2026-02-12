@@ -198,7 +198,7 @@ let interpolatable = (~type_path, inner_rule, tokens) => {
           Interpolations.record(name, type_path);
           Ok(`Interpolation(name));
         }
-      | _ => Error(["Expected interpolation"]),
+      | _ => Error(["Expected value."]),
     );
   switch (interp_rule(tokens)) {
   | (Ok(_) as result, rest) => (result, rest)

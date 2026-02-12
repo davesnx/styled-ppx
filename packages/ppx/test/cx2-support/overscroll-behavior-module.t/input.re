@@ -1,0 +1,25 @@
+/* CSS Overscroll Behavior Module Level 1 */
+[%cx2 {|overscroll-behavior: contain|}];
+[%cx2 {|overscroll-behavior: none|}];
+[%cx2 {|overscroll-behavior: auto|}];
+[%cx2 {|overscroll-behavior: contain contain|}];
+[%cx2 {|overscroll-behavior: none contain|}];
+[%cx2 {|overscroll-behavior: auto contain|}];
+[%cx2 {|overscroll-behavior: contain none|}];
+[%cx2 {|overscroll-behavior: none none|}];
+[%cx2 {|overscroll-behavior: auto none|}];
+[%cx2 {|overscroll-behavior: contain auto|}];
+[%cx2 {|overscroll-behavior: none auto|}];
+[%cx2 {|overscroll-behavior: auto auto|}];
+[%cx2 {|overscroll-behavior-x: contain|}];
+[%cx2 {|overscroll-behavior-x: none|}];
+[%cx2 {|overscroll-behavior-x: auto|}];
+[%cx2 {|overscroll-behavior-y: contain|}];
+[%cx2 {|overscroll-behavior-y: none|}];
+[%cx2 {|overscroll-behavior-y: auto|}];
+[%cx2 {|overscroll-behavior-inline: contain|}];
+[%cx2 {|overscroll-behavior-inline: none|}];
+[%cx2 {|overscroll-behavior-inline: auto|}];
+[%cx2 {|overscroll-behavior-block: contain|}];
+[%cx2 {|overscroll-behavior-block: none|}];
+[%cx2 {|overscroll-behavior-block: auto|}];

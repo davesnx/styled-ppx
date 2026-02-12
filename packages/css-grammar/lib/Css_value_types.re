@@ -318,7 +318,7 @@ let interpolation =
   token(
     fun
     | INTERPOLATION((name, _loc)) => Ok([name])
-    | _ => Error(["Expected interpolation."]),
+    | _ => Error(["Expected value."]),
   );
 
 let media_type =

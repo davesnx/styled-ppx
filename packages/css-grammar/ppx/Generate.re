@@ -572,7 +572,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       let op_ident =
         fun
         | Static => evar("Combinators.static")
-        | Xor => evar("Combinators.xor")
+        | Xor => evar("Combinators.xor_with_expected")
         | And => evar("Combinators.and_")
         | Or => evar("Combinators.or_");
 
@@ -601,8 +601,24 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
                  | Terminal(Keyword(_), _) => false
                  | _ => true
                  };
+               let expected =
+                 switch (value) {
+                 | Terminal(Keyword(name), _) => Some(name)
+                 | Function_call(name, _) => Some("function " ++ name)
+                 | _ => None
+                 };
+               let expected_expr =
+                 switch (expected) {
+                 | Some(value) =>
+                   pexp_construct(
+                     txt(Lident("Some")),
+                     Some(estring(value)),
+                   )
+                 | None => pexp_construct(txt(Lident("None")), None)
+                 };
                /* Unwrap primitives in Xor */
-               map_value(has_content, true, pair);
+               let rule_expr = map_value(has_content, true, pair);
+               pexp_tuple([expected_expr, rule_expr]);
              });
         apply(op_ident(kind), args);
       | _ =>

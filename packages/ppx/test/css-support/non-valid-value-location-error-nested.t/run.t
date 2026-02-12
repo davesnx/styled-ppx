@@ -14,8 +14,9 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune build
   File "input.re", line 6, characters 10-18:
-  Error: Property 'color' has an invalid value: 'cositas', Expected
-         interpolation.
+  Error: Property 'color' has an invalid value: 'cositas',
+         Expected 'function rgb', 'function rgba', 'function hsl', 'function
+         hsla', 'transparent', 'aliceblue', 'antiquewhite', or 'aqua'.
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
@@ -27,7 +28,7 @@ If this test fail means that the module is not in sync with the ppx
         [|{js|&:hover|js}|],
         [|
           [%ocaml.error
-            "Property 'color' has an invalid value: 'cositas', Expected interpolation."
+            "Property 'color' has an invalid value: 'cositas',\nExpected 'function rgb', 'function rgba', 'function hsl', 'function hsla', 'transparent', 'aliceblue', 'antiquewhite', or 'aqua'."
           ],
         |],
       ),
