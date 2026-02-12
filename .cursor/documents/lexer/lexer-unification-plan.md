@@ -11,7 +11,7 @@ Remove the `tokenize` API and consolidate around `from_string` for batch tokeniz
 | API | Signature | Error Handling | Encoding | Used By |
 |-----|-----------|----------------|----------|---------|
 | `tokenize` | `string => result(list((token, pos, pos)), string)` | Catches `LexingError`, returns `Error(string)` | Utf8 | `Lexer_test.re`, `lexer_renderer.re` |
-| `from_string` | `string => list(token_with_location)` | **Mixed**: soft errors in stream, hard errors raise | Utf8 | `css-property-parser`, `Lexer_from_string_test.re` |
+| `from_string` | `string => list(token_with_location)` | **Mixed**: soft errors in stream, hard errors raise | Utf8 | `css-grammar`, `Lexer_from_string_test.re` |
 | `get_next_tokens_with_location` | `lexbuf => (token, pos, pos)` | Raises `LexingError` | N/A (caller provides lexbuf) | `driver.re` (menhir parser) |
 
 ### Important: `from_string` Has Dual Error Handling
@@ -53,7 +53,7 @@ eval $(opam env --switch=. --set-switch)
 make test-parser
 make test-ppx-native
 make test-css-support
-make test-css-property-parser
+make test-css-grammar
 ```
 
 ---
@@ -227,7 +227,7 @@ let tokenize:
 make test-parser
 make test-ppx-native
 make test-css-support
-make test-css-property-parser
+make test-css-grammar
 make build
 ```
 
@@ -265,7 +265,7 @@ After each phase:
 - [ ] `make test-parser` passes
 - [ ] `make test-ppx-native` passes
 - [ ] `make test-css-support` passes
-- [ ] `make test-css-property-parser` passes
+- [ ] `make test-css-grammar` passes
 
 ---
 

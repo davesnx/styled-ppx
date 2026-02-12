@@ -18,8 +18,8 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune build
   File "input.re", line 1, characters 15-22:
-  Error: Property 'display' has an invalid value: 'blocki',
-         Expected '-moz-inline-box'. Got 'blocki' instead.
+  Error: Property 'display' has an invalid value: 'blocki', Expected
+         interpolation.
   [1]
 
   $ cat >input.re <<EOF
@@ -28,8 +28,8 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune build
   File "input.re", line 1, characters 28-35:
-  Error: Property 'display' has an invalid value: 'blocki',
-         Expected '-moz-inline-box'. Got 'blocki' instead.
+  Error: Property 'display' has an invalid value: 'blocki', Expected
+         interpolation.
   [1]
 
   $ cat >input.re <<EOF
@@ -40,8 +40,8 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune build
   File "input.re", line 2, characters 26-33:
-  Error: Property 'display' has an invalid value: 'blocki',
-         Expected '-moz-inline-box'. Got 'blocki' instead.
+  Error: Property 'display' has an invalid value: 'blocki', Expected
+         interpolation.
   [1]
 
   $ cat >input.re <<EOF
@@ -53,6 +53,6 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune build
   File "input.re", line 3, characters 13-20:
-  Error: Property 'display' has an invalid value: 'blocki',
-         Expected '-moz-inline-box'. Got 'blocki' instead.
+  Error: Property 'display' has an invalid value: 'blocki', Expected
+         interpolation.
   [1]

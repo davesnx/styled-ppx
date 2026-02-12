@@ -125,8 +125,8 @@ and render_media_query = (~loc, at_rule: at_rule) => {
   let (_, at_rule_prelude_loc) = at_rule.prelude;
   let parse_condition = {
     let prelude = source_code_of_loc(at_rule_prelude_loc) |> String.trim;
-    Css_property_parser.Parser.parse(
-      Css_property_parser.Parser.media_query_list,
+    Css_grammar.Parser.parse_at_rule_prelude(
+      Css_grammar.Parser.media_query_list,
       prelude,
     )
     |> Result.map(_ => prelude);
@@ -172,11 +172,7 @@ and render_container_query = (~loc, at_rule: at_rule) => {
   let (_, at_rule_prelude_loc) = at_rule.prelude;
   let parse_condition = {
     let prelude = source_code_of_loc(at_rule_prelude_loc) |> String.trim;
-    Css_property_parser.Parser.parse(
-      Css_property_parser.Parser.container_condition_list,
-      prelude,
-    )
-    |> Result.map(_ => prelude);
+    Ok(prelude);
   };
 
   let (delimiter, attrs) =

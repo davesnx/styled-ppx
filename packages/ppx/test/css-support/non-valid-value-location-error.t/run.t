@@ -14,8 +14,8 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune build
   File "input.re", line 10, characters 10-17:
-  Error: Property 'display' has an invalid value: 'blocki',
-         Expected '-moz-inline-box'. Got 'blocki' instead.
+  Error: Property 'display' has an invalid value: 'blocki', Expected
+         interpolation.
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
@@ -28,6 +28,6 @@ If this test fail means that the module is not in sync with the ppx
     CSS.height(`percent(100.)),
     CSS.height(`percent(100.)),
     [%ocaml.error
-      "Property 'display' has an invalid value: 'blocki',\nExpected '-moz-inline-box'. Got 'blocki' instead."
+      "Property 'display' has an invalid value: 'blocki', Expected interpolation."
     ],
   |]);

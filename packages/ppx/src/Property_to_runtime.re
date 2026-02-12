@@ -2,9 +2,9 @@ module Location = Ppxlib.Location;
 module Parsetree = Ppxlib.Parsetree;
 module Builder = Ppxlib.Ast_builder.Default;
 
-module Standard = Css_property_parser.Standard;
-module Property_parser = Css_property_parser.Parser;
-module Types = Property_parser.Types;
+module Standard = Css_grammar.Css_value_types;
+module Property_parser = Css_grammar.Parser;
+module Types = Property_parser;
 
 let (let.ok) = Result.bind;
 
@@ -12,7 +12,7 @@ let (let.ok) = Result.bind;
 /* TODO: Add payload on those exceptions */
 exception Unsupported_feature;
 
-/* This should be thrown when handling cases impossible to generate by the css property parser */
+/* This should be thrown when handling cases impossible to generate by the css grammar parser */
 exception Impossible_state;
 
 exception Invalid_value(string);
@@ -42,7 +42,7 @@ let add_CSS_rule_constraint = (~loc, expr) => {
 
 /* TODO: emit is better to keep value_of_ast and value_to_expr in the same fn */
 let emit = (property, value_of_ast, value_to_expr) => {
-  let ast_of_string = Css_property_parser.Parser.parse(property);
+  let ast_of_string = Css_grammar.Parser.parse(property);
   let ast_to_expr = (~loc, ast) =>
     value_of_ast(~loc, ast) |> value_to_expr(~loc);
   let string_to_expr = (~loc, string) =>
@@ -56,7 +56,7 @@ let emit = (property, value_of_ast, value_to_expr) => {
 };
 
 let emit_shorthand = (parser, mapper, value_to_expr) => {
-  let ast_of_string = Css_property_parser.Parser.parse(parser);
+  let ast_of_string = Css_grammar.Parser.parse(parser);
   let ast_to_expr = (~loc, ast) =>
     ast |> List.map(mapper(~loc)) |> value_to_expr(~loc);
   let string_to_expr = (~loc, string) =>
@@ -82,17 +82,19 @@ let render_variable = (~loc, name) =>
   };
 
 let transform_with_variable = (parser, mapper, value_to_expr) => {
-  Css_property_parser.(
+  Css_grammar.(
     emit(
-      Combinator.xor([
+      Combinators.xor([
         /* If the entire CSS value is interpolated, we treat it as a `Variable */
-        Rule.Match.map(Standard.interpolation, data => `Variable(data)),
+        Rule.Match.map(Css_value_types.interpolation, data =>
+          `Variable(data)
+        ),
         /* Otherwise it's a regular CSS `Value and match the parser */
         Rule.Match.map(parser, data => `Value(data)),
       ]),
       (~loc) =>
         fun
-        | `Variable(name) => render_variable(~loc, name)
+        | `Variable(name) => render_variable(~loc, String.concat(".", name))
         | `Value(ast) => mapper(~loc, ast),
       (~loc, expression) => {
         switch (expression) {
@@ -175,8 +177,8 @@ let to_camel_case = txt =>
 
 let render_css_global_values = (~loc, name, value) => {
   let.ok value =
-    Css_property_parser.Parser.parse(
-      Css_property_parser.Standard.css_wide_keywords,
+    Css_grammar.Parser.parse(
+      Css_grammar.Css_value_types.css_wide_keywords,
       value,
     );
 
@@ -420,7 +422,7 @@ and render_extended_angle = (~loc) =>
   fun
   | `Angle(a) => render_angle(~loc, a)
   | `Function_calc(fc) => render_function_calc(~loc, fc)
-  | `Interpolation(i) => render_variable(~loc, i)
+  | `Interpolation(i) => render_variable(~loc, String.concat(".", i))
   | `Function_min(values) => render_function_min(~loc, values)
   | `Function_max(values) => render_function_max(~loc, values)
 
@@ -449,7 +451,7 @@ and render_extended_time = (~loc) =>
   fun
   | #Types.extended_time_no_interp as x =>
     render_extended_time_no_interp(~loc, x)
-  | `Interpolation(v) => render_variable(~loc, v)
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
 
 and render_calc_value = (~loc, calc_value) => {
   switch ((calc_value: Types.calc_value)) {
@@ -467,12 +469,12 @@ and render_extended_length = (~loc) =>
   | `Function_calc(fc) => render_function_calc(~loc, fc)
   | `Function_min(values) => render_function_min(~loc, values)
   | `Function_max(values) => render_function_max(~loc, values)
-  | `Interpolation(i) => render_variable(~loc, i)
+  | `Interpolation(i) => render_variable(~loc, String.concat(".", i))
 and render_extended_percentage = (~loc) =>
   fun
   | `Percentage(p) => render_percentage(~loc, p)
   | `Function_calc(fc) => render_function_calc(~loc, fc)
-  | `Interpolation(i) => render_variable(~loc, i)
+  | `Interpolation(i) => render_variable(~loc, String.concat(".", i))
   | `Function_min(values) => render_function_min(~loc, values)
   | `Function_max(values) => render_function_max(~loc, values);
 
@@ -545,7 +547,7 @@ let render_extended_angle = (~loc) =>
   fun
   | `Angle(a) => render_angle(~loc, a)
   | `Function_calc(fc) => render_function_calc(~loc, fc)
-  | `Interpolation(i) => render_variable(~loc, i)
+  | `Interpolation(i) => render_variable(~loc, String.concat(".", i))
   | `Function_min(values) => render_function_min(~loc, values)
   | `Function_max(values) => render_function_max(~loc, values);
 
@@ -677,7 +679,8 @@ let margin =
       | `Auto => variant_to_expression(~loc, `Auto)
       | `Extended_length(l) => render_extended_length(~loc, l)
       | `Extended_percentage(p) => render_extended_percentage(~loc, p)
-      | `Interpolation(name) => render_variable(~loc, name),
+      | `Interpolation(name) =>
+        render_variable(~loc, String.concat(".", name)),
     (~loc) =>
       fun
       | [all] => [[%expr CSS.margin([%e all])]]
@@ -734,7 +737,8 @@ let padding =
       fun
       | `Extended_length(l) => render_extended_length(~loc, l)
       | `Extended_percentage(p) => render_extended_percentage(~loc, p)
-      | `Interpolation(name) => render_variable(~loc, name),
+      | `Interpolation(name) =>
+        render_variable(~loc, String.concat(".", name)),
     (~loc) =>
       fun
       | [all] => [[%expr CSS.padding([%e all])]]
@@ -925,7 +929,7 @@ let render_function_rgb = (~loc, ast: Types.function_rgb) => {
     // TODO: bs-css rgb(float, float, float)
     | `Percentage(pct) => color_to_float(pct *. 2.55)
     | `Function_calc(fc) => render_function_calc(~loc, fc)
-    | `Interpolation(v) => render_variable(~loc, v)
+    | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
     | `Extended_percentage(ext) => render_extended_percentage(~loc, ext)
     | `Function_min(values) => render_function_min(~loc, values)
     | `Function_max(values) => render_function_max(~loc, values);
@@ -967,7 +971,7 @@ let render_function_rgba = (~loc, ast: Types.function_rgba) => {
     // TODO: bs-css rgb(float, float, float)
     | `Percentage(pct) => color_to_float(pct *. 2.55)
     | `Function_calc(fc) => render_function_calc(~loc, fc)
-    | `Interpolation(v) => render_variable(~loc, v)
+    | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
     | `Extended_percentage(ext) => render_extended_percentage(~loc, ext)
     | `Function_min(values) => render_function_min(~loc, values)
     | `Function_max(values) => render_function_max(~loc, values);
@@ -1062,7 +1066,7 @@ let render_var = (~loc, string) => {
 
 let rec render_color = (~loc, value) =>
   switch ((value: Types.color)) {
-  | `Interpolation(v) => render_variable(~loc, v)
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
   | `Hex_color(hex) => id([%expr `hex([%e render_string(~loc, hex)])])
   | `Named_color(color) => render_named_color(~loc, color)
   | `CurrentColor => id([%expr `currentColor])
@@ -1253,13 +1257,13 @@ let image_rendering =
 
 let render_color_interp = (~loc) =>
   fun
-  | `Interpolation(name) => render_variable(~loc, name)
+  | `Interpolation(name) => render_variable(~loc, String.concat(".", name))
   | `Color(ls) => render_color(~loc, ls);
 
 let render_length_interp = (~loc) =>
   fun
   | `Extended_length(l) => render_extended_length(~loc, l)
-  | `Interpolation(name) => render_variable(~loc, name);
+  | `Interpolation(name) => render_variable(~loc, String.concat(".", name));
 
 // css-backgrounds-3
 let render_box_shadow = (~loc, shadow) => {
@@ -1547,7 +1551,7 @@ let render_gradient = (~loc, value: Types.gradient) =>
     render_function_repeating_radial_gradient(~loc, rrg)
   | `Function_conic_gradient(angle) =>
     render_function_conic_gradient(~loc, angle)
-  | `_legacy_gradient(_) => raise(Unsupported_feature)
+  | `Legacy_gradient(_) => raise(Unsupported_feature)
   };
 
 let render_url_no_interp = (~loc, url) => [%expr
@@ -1556,7 +1560,9 @@ let render_url_no_interp = (~loc, url) => [%expr
 
 let render_url = (~loc, url: Types.url) => {
   switch (url) {
-  | `Url(v) => [%expr `url([%e render_variable(~loc, v)])]
+  | `Url(v) => [%expr
+     `url([%e render_variable(~loc, String.concat(".", v))])
+    ]
   | `Url_no_interp(v) => render_url_no_interp(~loc, v)
   };
 };
@@ -1565,7 +1571,7 @@ let render_image = (~loc, value: Types.image) =>
   switch (value) {
   | `Gradient(gradient) => render_gradient(~loc, gradient)
   | `Url(url) => render_url(~loc, url)
-  | `Interpolation(v) => render_variable(~loc, v)
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
   | `Function_element(_) => raise(Unsupported_feature)
   | `Function_paint(_) => raise(Unsupported_feature)
   | `Function_image(_) => raise(Unsupported_feature)
@@ -1978,11 +1984,11 @@ let border_width =
 let render_line_width_interp = (~loc) =>
   fun
   | `Line_width(lw) => render_line_width(~loc, lw)
-  | `Interpolation(name) => render_variable(~loc, name);
+  | `Interpolation(name) => render_variable(~loc, String.concat(".", name));
 
 let render_border_style_interp = (~loc) =>
   fun
-  | `Interpolation(name) => render_variable(~loc, name)
+  | `Interpolation(name) => render_variable(~loc, String.concat(".", name))
   | `Line_style(ls) => variant_to_expression(~loc, ls);
 
 type borderDirection =
@@ -2015,7 +2021,11 @@ let render_border = (~loc, ~direction: borderDirection, border) => {
     [[%expr CSS.unsafe([%e borderFn], {js|none|js})]];
   | `Xor(`Interpolation(name)) =>
     let borderFn = direction_to_border(~loc, direction);
-    [[%expr [%e borderFn]([%e render_variable(~loc, name)])]];
+    [
+      [%expr
+        [%e borderFn]([%e render_variable(~loc, String.concat(".", name))])
+      ],
+    ];
   /* bs-css doesn't support border: 1px; */
   | `Xor(_) => raise(Unsupported_feature)
   /* bs-css doesn't support border: 1px solid; */
@@ -2037,14 +2047,16 @@ let render_border = (~loc, ~direction: borderDirection, border) => {
 let render_outline_style_interp = (~loc) =>
   fun
   | `Auto => variant_to_expression(~loc, `Auto)
-  | `Interpolation(name) => render_variable(~loc, name)
+  | `Interpolation(name) => render_variable(~loc, String.concat(".", name))
   | `Line_style(ls) => variant_to_expression(~loc, ls);
 
 let render_outline = (~loc) =>
   fun
   | `None => [[%expr CSS.unsafe({js|outline|js}, {js|none|js})]]
   | `Property_outline_width(`Interpolation(name)) => [
-      [%expr CSS.outline([%e render_variable(~loc, name)])],
+      [%expr
+        CSS.outline([%e render_variable(~loc, String.concat(".", name))])
+      ],
     ]
   /* bs-css doesn't support outline: 1px; */
   | `Property_outline_width(_) => raise(Unsupported_feature)
@@ -2214,7 +2226,7 @@ let box_shadow =
     switch (value) {
     | `Interpolation(variable) =>
       /* Here we rely on boxShadow*s* which makes the value be an array */
-      let var = render_variable(~loc, variable);
+      let var = render_variable(~loc, String.concat(".", variable));
       [[%expr CSS.boxShadows([%e var])]];
     | `None =>
       let none = variant_to_expression(~loc, `None);
@@ -2233,7 +2245,7 @@ let overflow_x =
     (~loc) => [%expr CSS.overflowX],
     (~loc) =>
       fun
-      | `Interpolation(x) => render_variable(~loc, x)
+      | `Interpolation(x) => render_variable(~loc, String.concat(".", x))
       | (`Visible | `Hidden | `Clip | `Scroll | `Auto) as x =>
         variant_to_expression(~loc, x),
   );
@@ -2244,7 +2256,7 @@ let overflow_y =
     (~loc) => [%expr CSS.overflowY],
     (~loc) =>
       fun
-      | `Interpolation(x) => render_variable(~loc, x)
+      | `Interpolation(x) => render_variable(~loc, String.concat(".", x))
       | (`Visible | `Hidden | `Clip | `Scroll | `Auto) as x =>
         variant_to_expression(~loc, x),
   );
@@ -2253,7 +2265,9 @@ let overflow =
   polymorphic(Property_parser.property_overflow, (~loc) =>
     fun
     | `Interpolation(i) => [
-        [%expr CSS.overflow([%e render_variable(~loc, i)])],
+        [%expr
+          CSS.overflow([%e render_variable(~loc, String.concat(".", i))])
+        ],
       ]
     | `Xor([x]) => [
         [%expr CSS.overflow([%e variant_to_expression(~loc, x)])],
@@ -2265,15 +2279,15 @@ let overflow =
           |> Builder.pexp_array(~loc);
         [[%expr CSS.overflows([%e overflows])]];
       }
-    | `_non_standard_overflow(non_standard) => {
+    | `Non_standard_overflow(non_standard) => {
         switch (non_standard) {
-        | `_moz_scrollbars_none => [
+        | `Moz_scrollbars_none => [
             [%expr CSS.unsafe("overflow", "-moz-scrollbars-none")],
           ]
-        | `_moz_scrollbars_horizontal => [
+        | `Moz_scrollbars_horizontal => [
             [%expr CSS.unsafe("overflow", "-moz-scrollbars-horizontal")],
           ]
-        | `_moz_scrollbars_vertical => [
+        | `Moz_scrollbars_vertical => [
             [%expr CSS.unsafe("overflow", "-moz-scrollbars-vertical")],
           ]
         | _moz_hidden_unscrollable => [
@@ -2307,7 +2321,7 @@ let overflow_block =
     (~loc) => [%expr CSS.overflowBlock],
     (~loc) =>
       fun
-      | `Interpolation(x) => render_variable(~loc, x)
+      | `Interpolation(x) => render_variable(~loc, String.concat(".", x))
       | (`Visible | `Hidden | `Clip | `Scroll | `Auto) as x =>
         variant_to_expression(~loc, x),
   );
@@ -2318,7 +2332,7 @@ let overflow_inline =
     (~loc) => [%expr CSS.overflowInline],
     (~loc) =>
       fun
-      | `Interpolation(x) => render_variable(~loc, x)
+      | `Interpolation(x) => render_variable(~loc, String.concat(".", x))
       | (`Visible | `Hidden | `Clip | `Scroll | `Auto) as x =>
         variant_to_expression(~loc, x),
   );
@@ -2497,11 +2511,11 @@ let render_generic_family = (~loc) =>
   | `Emoji => [%expr `emoji]
   | `Math => [%expr `math]
   | `Fangsong => [%expr `fangsong]
-  | `_apple_system => [%expr `apple_system];
+  | `Apple_system => [%expr `apple_system];
 
 let render_font_family = (~loc, value) =>
   switch (value) {
-  | `Interpolation(v) => render_variable(~loc, v)
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
   | `Generic_family(v) => render_generic_family(~loc, v)
   | `Family_name(`String(str)) => [%expr
      `quoted([%e render_string(~loc, str)])
@@ -2522,7 +2536,11 @@ let font_family =
       let annotation = [%type: array(CSS.Types.FontFamilyName.t)];
       [
         [%expr
-          CSS.fontFamilies([%e render_variable(~loc, v)]: [%t annotation])
+          CSS.fontFamilies(
+            [%e render_variable(~loc, String.concat(".", v))]: [%t
+                                                                 annotation
+                                                               ],
+          )
         ],
       ];
     | `Font_families(font_families) => [
@@ -2541,7 +2559,7 @@ let font_family =
 
 let render_font_weight = (~loc) =>
   fun
-  | `Interpolation(v) => render_variable(~loc, v)
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
   | `Bolder => variant_to_expression(~loc, `Bolder)
   | `Lighter => variant_to_expression(~loc, `Lighter)
   | `Font_weight_absolute(`Normal) => variant_to_expression(~loc, `Normal)
@@ -2564,7 +2582,7 @@ let render_font_style = (~loc) =>
   | `Normal => variant_to_expression(~loc, `Normal)
   | `Italic => variant_to_expression(~loc, `Italic)
   | `Oblique => variant_to_expression(~loc, `Oblique)
-  | `Interpolation(v) => render_variable(~loc, v)
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
   | `Static(_) => raise(Unsupported_feature);
 
 let font_style =
@@ -2692,7 +2710,7 @@ let font_variant_emoji =
 
 let render_text_decoration_line = (~loc) =>
   fun
-  | `Interpolation(v) => render_variable(~loc, v)
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
   | `None => [%expr `none]
   | `Or(underline, overline, lineThrough, blink) => [%expr
       CSS.Types.TextDecorationLine.Value.make(
@@ -2930,7 +2948,11 @@ let text_shadow =
   polymorphic(Property_parser.property_text_shadow, (~loc) =>
     fun
     | `Interpolation(variable) => [
-        [%expr CSS.textShadows([%e render_variable(~loc, variable)])],
+        [%expr
+          CSS.textShadows(
+            [%e render_variable(~loc, String.concat(".", variable))],
+          )
+        ],
       ]
     | `None => [
         [%expr CSS.textShadow([%e variant_to_expression(~loc, `None)])],
@@ -3210,7 +3232,7 @@ let render_single_transition_property = (~loc, value) => {
   switch (value) {
   | #Types.single_transition_property_no_interp as x =>
     render_single_transition_property_no_interp(~loc, x)
-  | `Interpolation(v) => render_variable(~loc, v)
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
   };
 };
 
@@ -3302,7 +3324,7 @@ let render_timing_no_interp = (~loc) =>
 let render_timing = (~loc) =>
   fun
   | #Types.timing_function_no_interp as x => render_timing_no_interp(~loc, x)
-  | `Interpolation(v) => render_variable(~loc, v);
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v));
 
 let transition_timing_function =
   polymorphic(Property_parser.property_transition_timing_function, (~loc) =>
@@ -3351,7 +3373,7 @@ let render_transition_behavior_value = (~loc) =>
   fun
   | #Types.transition_behavior_value_no_interp as x =>
     render_transition_behavior_value_no_interp(~loc, x)
-  | `Interpolation(v) => render_variable(~loc, v);
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v));
 
 let transition_behavior =
   polymorphic(Property_parser.property_transition_behavior, (~loc) =>
@@ -3494,7 +3516,7 @@ let render_animation_name = (~loc) =>
        CSS.Types.AnimationName.make([%e render_keyframes_name(~loc, name)])
       ];
     }
-  | `Interpolation(v) => render_variable(~loc, v);
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v));
 
 // css-animation-1
 let animation_name =
@@ -3563,7 +3585,7 @@ let render_single_animation_iteration_count = (~loc) =>
   fun
   | #Types.single_animation_iteration_count_no_interp as x =>
     render_single_animation_iteration_count_no_interp(~loc, x)
-  | `Interpolation(v) => render_variable(~loc, v);
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v));
 
 let animation_iteration_count =
   polymorphic(Property_parser.property_animation_iteration_count, (~loc) =>
@@ -3599,7 +3621,7 @@ let render_single_animation_direction = (~loc) =>
   fun
   | #Types.single_animation_direction_no_interp as x =>
     render_single_animation_direction_no_interp(~loc, x)
-  | `Interpolation(v) => render_variable(~loc, v);
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v));
 
 let animation_direction =
   polymorphic(Property_parser.property_animation_direction, (~loc) =>
@@ -3633,7 +3655,7 @@ let render_single_animation_play_state = (~loc) =>
   fun
   | #Types.single_animation_play_state_no_interp as x =>
     render_single_animation_play_state_no_interp(~loc, x)
-  | `Interpolation(v) => render_variable(~loc, v);
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v));
 
 let animation_play_state =
   polymorphic(Property_parser.property_animation_play_state, (~loc) =>
@@ -3688,7 +3710,7 @@ let render_single_animation_fill_mode = (~loc) =>
   fun
   | #Types.single_animation_fill_mode_no_interp as x =>
     render_single_animation_fill_mode_no_interp(~loc, x)
-  | `Interpolation(v) => render_variable(~loc, v);
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v));
 
 let animation_fill_mode =
   polymorphic(Property_parser.property_animation_fill_mode, (~loc) =>
@@ -3901,7 +3923,7 @@ let animation =
 let render_ratio = (~loc, value: Types.ratio) => {
   switch (value) {
   | `Number(n) => [%expr `num([%e render_float(~loc, n)])]
-  | `Interpolation(v) => render_variable(~loc, v)
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
   | `Static(up, _, down) => [%expr
      `ratio((
        [%e render_integer(~loc, up)],
@@ -3965,7 +3987,7 @@ let order =
 let render_float_interp = (~loc, value) => {
   switch (value) {
   | `Number(n) => [%expr [%e render_float(~loc, n)]]
-  | `Interpolation(v) => render_variable(~loc, v)
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
   };
 };
 
@@ -3987,7 +4009,7 @@ let render_flex_basis = (~loc) =>
   fun
   | `Content => variant_to_expression(~loc, `Content)
   | `Property_width(value_width) => render_size(~loc, value_width)
-  | `Interpolation(v) => render_variable(~loc, v);
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v));
 
 let flex_basis =
   monomorphic(
@@ -4001,7 +4023,9 @@ let flex =
     switch (value) {
     | `None => [[%expr CSS.flex1(`none)]]
     | `Interpolation(interp) => [
-        [%expr CSS.flex1([%e render_variable(~loc, interp)])],
+        [%expr
+          CSS.flex1([%e render_variable(~loc, String.concat(".", interp))])
+        ],
       ]
     | `Or(None, None) => [[%expr CSS.flex1(`none)]]
     | `Or(Some((grow, None)), None) => [
@@ -4186,7 +4210,7 @@ let align_items =
       | `Static(Some(`Unsafe), position) => [%expr
          `unsafe([%e render_self_position(~loc, position)])
         ]
-      | `Interpolation(v) => render_variable(~loc, v)
+      | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
       }
     },
   );
@@ -4210,7 +4234,7 @@ let align_self =
       | `Static(Some(`Unsafe), position) => [%expr
          `unsafe([%e render_self_position(~loc, position)])
         ]
-      | `Interpolation(v) => render_variable(~loc, v)
+      | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
       }
     },
   );
@@ -4455,7 +4479,7 @@ let render_subgrid = (~loc, line_name_list: Types.line_name_list) => {
 
 let render_grid_template_rows_and_columns = (~loc) =>
   fun
-  | `Interpolation(v) => render_variable(~loc, v)
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
   | `None => [%expr `none]
   | `Masonry => [%expr `masonry]
   | `Track_list(track_list, line_names) => [%expr
@@ -4496,7 +4520,8 @@ let grid_template_areas =
             areas
             |> List.map(area =>
                  switch (area) {
-                 | `Interpolation(value) => render_variable(~loc, value)
+                 | `Interpolation(value) =>
+                   render_variable(~loc, String.concat(".", value))
                  | `String(value) => render_string(~loc, value)
                  }
                )
@@ -4585,7 +4610,8 @@ let grid_auto_flow =
     (~loc) => [%expr CSS.gridAutoFlow],
     (~loc) =>
       fun
-      | `Interpolation(values) => render_variable(~loc, values)
+      | `Interpolation(values) =>
+        render_variable(~loc, String.concat(".", values))
       | `Or(Some(`Row), None) => [%expr `row]
       | `Or(Some(`Column), None) => [%expr `column]
       | `Or(None, Some(_)) => [%expr `dense]
@@ -4596,7 +4622,7 @@ let grid_auto_flow =
 
 let render_grid_line = (~loc, x: Types.grid_line) =>
   switch (x) {
-  | `Interpolation(x) => render_variable(~loc, x)
+  | `Interpolation(x) => render_variable(~loc, String.concat(".", x))
   | `Auto => [%expr `auto]
   | `Custom_ident_without_span_or_auto(x) => [%expr
      `ident([%e render_string(~loc, x)])
@@ -4851,7 +4877,7 @@ let z_index =
     (~loc, value) => {
       switch (value) {
       | `Auto => [%expr `auto]
-      | `Interpolation(v) => render_variable(~loc, v)
+      | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
       | `Integer(i) => [%expr `num([%e render_integer(~loc, i)])]
       }
     },
@@ -4922,17 +4948,17 @@ let render_display = (~loc) =>
   | `Ruby_text => [%expr `rubyText]
   | `Ruby_text_container => [%expr `rubyTextContainer]
   | `Run_in => [%expr `runIn]
-  | `_moz_box => [%expr `mozBox]
-  | `_moz_inline_box => [%expr `mozInlineBox]
-  | `_moz_inline_stack => [%expr `mozInlineStack]
+  | `Moz_box => [%expr `mozBox]
+  | `Moz_inline_box => [%expr `mozInlineBox]
+  | `Moz_inline_stack => [%expr `mozInlineStack]
   | `_ms_flexbox => [%expr `msFlexbox]
   | `_ms_grid => [%expr `msGrid]
   | `_ms_inline_flexbox => [%expr `msInlineFlexbox]
   | `_ms_inline_grid => [%expr `msInlineGrid]
-  | `_webkit_box => [%expr `webkitBox]
-  | `_webkit_flex => [%expr `webkitFlex]
-  | `_webkit_inline_box => [%expr `webkitInlineBox]
-  | `_webkit_inline_flex => [%expr `webkitInlineFlex];
+  | `Webkit_box => [%expr `webkitBox]
+  | `Webkit_flex => [%expr `webkitFlex]
+  | `Webkit_inline_box => [%expr `webkitInlineBox]
+  | `Webkit_inline_flex => [%expr `webkitInlineFlex];
 
 let display =
   monomorphic(
@@ -4960,7 +4986,8 @@ let mask_image =
 let render_paint = (~loc, value: Types.paint) => {
   switch (value) {
   | `Color(c) => render_color(~loc, c)
-  | `Interpolation(variable) => render_variable(~loc, variable)
+  | `Interpolation(variable) =>
+    render_variable(~loc, String.concat(".", variable))
   | `Context_stroke => [%expr `contextStroke]
   | `Context_fill => [%expr `contextFill]
   | `Static(_, _)
@@ -5007,7 +5034,7 @@ let line_break =
       | `Normal => [%expr `normal]
       | `Strict => [%expr `strict]
       | `Anywhere => [%expr `anywhere]
-      | `Interpolation(var) => render_variable(~loc, var)
+      | `Interpolation(var) => render_variable(~loc, String.concat(".", var))
       }
     },
   );
@@ -5065,7 +5092,8 @@ let counter_set = unsupportedProperty(Property_parser.property_counter_set);
 
 let render_cursor = (~loc, value) =>
   switch (value) {
-  | `Interpolation(variable) => render_variable(~loc, variable)
+  | `Interpolation(variable) =>
+    render_variable(~loc, String.concat(".", variable))
   | `Auto => [%expr `auto]
   | `Default => [%expr `default]
   | `None => [%expr `none]
@@ -5103,14 +5131,14 @@ let render_cursor = (~loc, value) =>
   | `Zoom_in => [%expr `zoomIn]
   | `Zoom_out => [%expr `zoomOut]
   | `Hand => [%expr `hand]
-  | `_moz_grab => [%expr `_moz_grab]
-  | `_moz_grabbing => [%expr `_moz_grabbing]
-  | `_moz_zoom_in => [%expr `_moz_zoom_in]
-  | `_moz_zoom_out => [%expr `_moz_zoom_out]
-  | `_webkit_grab => [%expr `_webkit_grab]
-  | `_webkit_grabbing => [%expr `_webkit_grabbing]
-  | `_webkit_zoom_in => [%expr `_webkit_zoom_in]
-  | `_webkit_zoom_out => [%expr `_webkit_zoom_out]
+  | `Moz_grab => [%expr `Moz_grab]
+  | `Moz_grabbing => [%expr `Moz_grabbing]
+  | `Moz_zoom_in => [%expr `Moz_zoom_in]
+  | `Moz_zoom_out => [%expr `Moz_zoom_out]
+  | `Webkit_grab => [%expr `Webkit_grab]
+  | `Webkit_grabbing => [%expr `Webkit_grabbing]
+  | `Webkit_zoom_in => [%expr `Webkit_zoom_in]
+  | `Webkit_zoom_out => [%expr `Webkit_zoom_out]
   };
 
 let cursor =
@@ -5199,7 +5227,7 @@ let filter =
     (~loc, value) => {
       switch (value) {
       | `None => [%expr [|`none|]]
-      | `Interpolation(v) => render_variable(~loc, v)
+      | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
       | `Filter_function_list(ffl) => render_filter_function_list(~loc, ffl)
       }
     },
@@ -5212,7 +5240,7 @@ let backdrop_filter =
     (~loc, value) =>
       switch (value) {
       | `None => [%expr [|`none|]]
-      | `Interpolation(v) => render_variable(~loc, v)
+      | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
       | `Filter_function_list(ffl) => render_filter_function_list(~loc, ffl)
       },
   );
@@ -5648,7 +5676,9 @@ let content =
         [%expr CSS.contentRule([%e render_content_string(~loc, str)])],
       ]
     | `Interpolation(v) => [
-        [%expr CSS.contentRule([%e render_variable(~loc, v)])],
+        [%expr
+          CSS.contentRule([%e render_variable(~loc, String.concat(".", v))])
+        ],
       ]
     | `Static(`Content_list(lst), None) => [
         [%expr CSS.contentsRule([%e render_content_list(~loc, lst)], None)],
@@ -5896,7 +5926,7 @@ let user_select =
       | `Contain => [%expr `contain]
       | `All => [%expr `all]
       | `None => [%expr `none]
-      | `Interpolation(v) => render_variable(~loc, v),
+      | `Interpolation(v) => render_variable(~loc, String.concat(".", v)),
   );
 
 let zoom =
@@ -5920,7 +5950,7 @@ let visibility =
       | `Visible => [%expr `visible]
       | `Hidden => [%expr `hidden]
       | `Collapse => [%expr `collapse]
-      | `Interpolation(v) => render_variable(~loc, v),
+      | `Interpolation(v) => render_variable(~loc, String.concat(".", v)),
   );
 
 let properties = [
@@ -6352,9 +6382,12 @@ let render = (~loc: Location.t, property, value, important) =>
   if (isVariableDeclaration(property)) {
     Ok([render_variable_declaration(~loc, property, value)]);
   } else {
-    let.ok is_valid_string =
-      Property_parser.check_property(~name=property, value)
-      |> Result.map_error((`Unknown_value) => `Property_not_found);
+    let.ok () =
+      switch (Property_parser.check_property(~loc, ~name=property, value)) {
+      | Ok () => Ok()
+      | Error((_, `Invalid_value(_))) => Ok()
+      | Error((_, `Property_not_found)) => Error(`Property_not_found)
+      };
 
     switch (render_css_global_values(~loc, property, value)) {
     | Ok(value) => Ok(value)
@@ -6365,8 +6398,7 @@ let render = (~loc: Location.t, property, value, important) =>
       | exception Impossible_state => Error(`Impossible_state)
       | Error(_)
       | exception Unsupported_feature =>
-        let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));
-        Ok([render_when_unsupported_features(~loc, property, value)]);
+        Ok([render_when_unsupported_features(~loc, property, value)])
       }
     };
   };
