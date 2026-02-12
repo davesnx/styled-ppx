@@ -15,7 +15,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       switch (value) {
       | Terminal(Delim(name), _) => value_of_delimiter(name)
       | Terminal(Keyword(name), _) => keyword_to_css(name)
-      | Terminal(Data_type(name), _) => value_name_of_css(name)
+      | Terminal(Data_type(name, _), _) => value_name_of_css(name)
       | Terminal(Property_type(name), _) =>
         property_value_name(name) |> value_name_of_css
       | Group(value, _) => variant_name(value)
@@ -107,7 +107,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       let (type_, is_constructor, params) =
         switch (kind) {
         | Keyword(_name) => (type_name, false, [])
-        | Data_type(name) =>
+        | Data_type(name, _) =>
           let name = value_name_of_css(name);
           let params = [ptyp_constr(txt @@ Lident(name), [])];
           (type_name, false, params);
@@ -127,7 +127,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         switch (kind) {
         | Delim(_)
         | Keyword(_) => ptyp_constr(txt @@ Lident("unit"), [])
-        | Data_type(name) =>
+        | Data_type(name, _) =>
           let name = value_name_of_css(name);
           ptyp_constr(txt @@ Lident(name), []);
         | Property_type(name) =>
@@ -468,7 +468,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         | Delim(delim) when delim == "," => evar("comma")
         | Delim(delim) => eapply(evar("delim"), [estring(delim)])
         | Keyword(name) => eapply(evar("keyword"), [estring(name)])
-        | Data_type(name) => value_name_of_css(name) |> evar
+        | Data_type(name, _) => value_name_of_css(name) |> evar
         | Property_type(name) =>
           property_value_name(name) |> value_name_of_css |> evar
         };

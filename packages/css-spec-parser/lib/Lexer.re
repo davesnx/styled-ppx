@@ -1,12 +1,21 @@
 open Sedlexing.Utf8;
 open Tokens;
 
-// TODO: is rgb(255 255 255/0) valid?
 let whitespace = [%sedlex.regexp? Plus(' ' | '\t' | '\n')];
 let digit = [%sedlex.regexp? '0' .. '9'];
-/* let number = [%sedlex.regexp? (Opt('+' | '-'), digit | "∞")]; */
-let number = [%sedlex.regexp? (Opt('+' | '-'), digit)];
-let range_restriction = [%sedlex.regexp? ('[', number, ',', number, ']')];
+let number = [%sedlex.regexp? (Opt('+' | '-'), Plus(digit))];
+let range_restriction = [%sedlex.regexp?
+  (
+    '[',
+    Opt(' '),
+    number | 0x221E /* ∞ */ | ('-', 0x221E),
+    ',',
+    Opt(' '),
+    number | 0x221E | ('-', 0x221E),
+    Opt(' '),
+    ']',
+  )
+];
 
 let stop_literal = [%sedlex.regexp?
   ' ' | '\t' | '\n' | '?' | '!' | '*' | '+' | '#' | '{' | ']' | '(' | ')' | ','
@@ -43,6 +52,25 @@ let slice = (start, end_, string) => {
   String.sub(string, start, end_);
 };
 
+let parse_range_bound = str => {
+  let str = String.trim(str);
+  switch (str) {
+  | "∞"
+  | "+∞" => Ast.Infinity
+  | "-∞" => Ast.Neg_infinity
+  | s => Ast.Int_bound(int_of_string(s))
+  };
+};
+
+let parse_range_restriction = str => {
+  let inner = String.sub(str, 1, String.length(str) - 2);
+  switch (String.split_on_char(',', inner)) {
+  | [min_s, max_s] =>
+    Some((parse_range_bound(min_s), parse_range_bound(max_s)))
+  | _ => None
+  };
+};
+
 let eat_literal = buf => {
   switch%sedlex (buf) {
   | literal => LITERAL(lexeme(buf))
@@ -71,10 +99,25 @@ let rec tokenizer = buf =>
   | whitespace => tokenizer(buf)
   | property => PROPERTY(lexeme(buf) |> slice(2, -2))
   | data =>
-    switch (lexeme(buf) |> slice(1, -1) |> String.split_on_char(' ')) {
-    | [value, ..._] => DATA(value)
-    | [] => failwith("unreachable")
-    }
+    let content = lexeme(buf) |> slice(1, -1);
+    let (name, range) =
+      switch (String.index_opt(content, ' ')) {
+      | None => (content, None)
+      | Some(idx) =>
+        let name = String.sub(content, 0, idx);
+        let rest =
+          String.trim(
+            String.sub(content, idx, String.length(content) - idx),
+          );
+        let range =
+          if (String.length(rest) > 0 && rest.[0] == '[') {
+            parse_range_restriction(rest);
+          } else {
+            None;
+          };
+        (name, range);
+      };
+    DATA((name, range));
   | '*' => ASTERISK
   | '+' => PLUS
   | '?' => QUESTION_MARK

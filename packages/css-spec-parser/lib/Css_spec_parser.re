@@ -62,7 +62,24 @@ let rec string_of_value = value => {
         switch (kind) {
         | Delim(d) => {|'|} ++ d ++ {|'|}
         | Keyword(name) => {|'|} ++ name ++ {|'|}
-        | Data_type(name) => "<" ++ name ++ ">"
+        | Data_type(name, range) =>
+          let range_str =
+            switch (range) {
+            | None => ""
+            | Some((min, max)) =>
+              let bound_to_string = (
+                fun
+                | Int_bound(n) => Int.to_string(n)
+                | Infinity => "\xe2\x88\x9e"
+                | Neg_infinity => "-\xe2\x88\x9e"
+              );
+              " ["
+              ++ bound_to_string(min)
+              ++ ", "
+              ++ bound_to_string(max)
+              ++ "]";
+            };
+          "<" ++ name ++ range_str ++ ">";
         | Property_type(name) => "<'" ++ name ++ "'>"
         };
       (full_name, Some(multiplier));
@@ -93,9 +110,7 @@ let rec string_of_value = value => {
   };
 };
 
-exception ParseError(string);
-
 let value_of_string = string =>
   try(Sedlexing.Utf8.from_string(string) |> provider |> value_of_lex) {
-  | _ => raise(ParseError(string))
+  | _ => None
   };

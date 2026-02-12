@@ -2,7 +2,7 @@
 type token =
   // literals
   | LITERAL(string) // auto 'auto'
-  | DATA(string) // <number>
+  | DATA((string, option(Ast.range))) // <number> or <number [0, 1]>
   | PROPERTY(string) // <'color'>
   // combinators
   | DOUBLE_AMPERSAND // &&

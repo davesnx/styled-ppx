@@ -114,7 +114,7 @@ let parse_tests =
     ("A{4}", Terminal(Keyword("A"), Repeat(4, Some(4)))),
     ("A{4,5}", Terminal(Keyword("A"), Repeat(4, Some(5)))),
     ("A{4,}", Terminal(Keyword("A"), Repeat(4, None))),
-    ("A!", Terminal(Keyword("A"), At_least_one)),
+    ("[A]!", Group(Terminal(Keyword("A"), One), At_least_one)),
     // why Group exists:
     ("[A?]!", Group(Terminal(Keyword("A"), Optional), At_least_one)),
     // property name
@@ -123,7 +123,7 @@ let parse_tests =
       Combinator(
         Xor,
         [
-          Terminal(Data_type("font-weight-absolute"), One),
+          Terminal(Data_type("font-weight-absolute", None), One),
           Terminal(Keyword("bolder"), One),
           Terminal(Keyword("lighter"), One),
         ],
@@ -137,13 +137,13 @@ let parse_tests =
         Combinator(
           Static,
           [
-            Terminal(Data_type("percentage"), Repeat(3, Some(3))),
+            Terminal(Data_type("percentage", None), Repeat(3, Some(3))),
             Group(
               Combinator(
                 Static,
                 [
                   Terminal(Keyword("/"), One),
-                  Terminal(Data_type("alpha-value"), One),
+                  Terminal(Data_type("alpha-value", None), One),
                 ],
               ),
               Optional,
@@ -159,13 +159,12 @@ let parse_tests =
         Static,
         [
           Terminal(Delim("["), One),
-          Terminal(Data_type("custom-ident"), Zero_or_more),
+          Terminal(Data_type("custom-ident", None), Zero_or_more),
           Terminal(Delim("]"), One),
         ],
       ),
     ),
-    // TODO: shouldn't be a special case
-    ("<rgb()>", Terminal(Data_type("rgb()"), One)),
+    ("<rgb()>", Terminal(Data_type("rgb()", None), One)),
     // ident with number
     (
       "[ jis04 | simplified | traditional ]",
@@ -181,7 +180,21 @@ let parse_tests =
     // at keyword
     ("@stylistic", Terminal(Keyword("@stylistic"), One)),
     // range restriction
-    ("<number [1, 5]>", Terminal(Data_type("number"), One)),
+    (
+      "<number [1, 5]>",
+      Terminal(
+        Data_type("number", Some((Int_bound(1), Int_bound(5)))),
+        One,
+      ),
+    ),
+    (
+      "<integer [0, \xe2\x88\x9e]>",
+      Terminal(Data_type("integer", Some((Int_bound(0), Infinity))), One),
+    ),
+    (
+      "<number [-\xe2\x88\x9e, \xe2\x88\x9e]>",
+      Terminal(Data_type("number", Some((Neg_infinity, Infinity))), One),
+    ),
     // escaped combinator
     ("'||'", Terminal(Keyword("||"), One)),
     // function without space
@@ -214,6 +227,23 @@ let parse_tests =
       // special characters
       "','",
       Terminal(Delim(","), One),
+    ),
+    // stacked multipliers (CSS Values 4 §2.3)
+    (
+      "A+#",
+      Group(Terminal(Keyword("A"), One_or_more), Repeat_by_comma(1, None)),
+    ),
+    (
+      "A#?",
+      Group(Terminal(Keyword("A"), Repeat_by_comma(1, None)), Optional),
+    ),
+    (
+      "A{2}?",
+      Group(Terminal(Keyword("A"), Repeat(2, Some(2))), Optional),
+    ),
+    (
+      "A{2,4}?",
+      Group(Terminal(Keyword("A"), Repeat(2, Some(4))), Optional),
     ),
   ]
   |> List.mapi((_, (result, expected)) => {
@@ -259,7 +289,25 @@ let print_tests =
        test_case(show_value(result), `Quick, assertion);
      });
 
+let error_tests =
+  ["|||", "[[", "]invalid[", "A!"]
+  |> List.mapi((_index, input) => {
+       let assertion = () =>
+         check(
+           bool,
+           "Should return None for invalid input",
+           true,
+           value_of_string(input) == None,
+         );
+
+       test_case("invalid: " ++ input, `Quick, assertion);
+     });
+
 Alcotest.run(
   "CSS Spec Parser",
-  [("Parser", parse_tests), ("Printer", print_tests)],
+  [
+    ("Parser", parse_tests),
+    ("Printer", print_tests),
+    ("Error handling", error_tests),
+  ],
 );
