@@ -1,5 +1,9 @@
 # Changes
 
+## Unreleased
+
+- [INTERNAL] Refactor entire PPX to use context-free ppxlib rules, removing the global AST traverser (@davesnx)
+
 ## 0.61.0
 
 - [BREAKING] Update to ppxlib.0.36
