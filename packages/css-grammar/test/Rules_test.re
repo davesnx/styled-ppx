@@ -405,9 +405,8 @@ let pattern_helpers_test: tests = [
   }),
   test("next with no tokens as input", _ => {
     switch (Pattern.next([])) {
-    | (Error(["missing the token expected"]), []) => ()
-    | _ =>
-      Alcotest.fail("should be (Error([missing the token expected]), [])")
+    | (Error(["Unexpected end of input."]), []) => ()
+    | _ => Alcotest.fail("should be (Error([Unexpected end of input.]), [])")
     }
   }),
 ];

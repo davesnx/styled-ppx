@@ -12752,6 +12752,12 @@ let () =
       | _ -> ())
     registry
 
+let property_names () : string list =
+  Hashtbl.fold (fun name _ acc -> name :: acc) property_registry []
+
+let suggest_property_name (name : string) : string option =
+  property_names () |> Levenshtein.find_closest_match name
+
 let check_property ~loc ~name value :
   ( unit,
     Styled_ppx_css_parser.Ast.loc
@@ -12777,16 +12783,9 @@ let check_property ~loc ~name value :
           Format.sprintf "Property '%s' has an invalid value: '%s'" name value
         in
         let error_message =
-          if property_error = "" then prefix
-          else if
-            String.length property_error >= 6
-            && String.sub property_error 0 6 = "tokens"
-          then prefix
-          else if
-            String.length property_error >= 8
-            && String.sub property_error 0 8 = "Expected"
-          then prefix ^ ", " ^ property_error
-          else property_error
+          match property_error with
+          | "" -> prefix
+          | detail -> Printf.sprintf "%s, %s" prefix detail
         in
         Error (loc, `Invalid_value error_message)))
   | None -> Error (loc, `Property_not_found)
@@ -12827,11 +12826,12 @@ let parse_at_rule_prelude (rule_parser : 'a Rule.rule) input =
     (match remaining with
     | [] | [ Styled_ppx_css_parser.Tokens.EOF ] -> Ok data
     | tokens ->
-      let token_strs =
+      let humanized =
         tokens
-        |> List.map Styled_ppx_css_parser.Tokens.show_token
-        |> String.concat ", "
+        |> List.filter (fun t -> t <> Styled_ppx_css_parser.Tokens.EOF)
+        |> List.map Styled_ppx_css_parser.Tokens.humanize
+        |> String.concat " "
       in
-      Error ("tokens remaining: " ^ token_strs))
+      Error ("Unexpected trailing input '" ^ humanized ^ "'."))
   | Error (message :: _) -> Error message
-  | Error [] -> Error "unexpected parse error"
+  | Error [] -> Error "Expected a valid value."

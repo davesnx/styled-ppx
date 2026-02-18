@@ -18,5 +18,4 @@ If this test fail means that the module is not in sync with the ppx
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  
   let _className = [%ocaml.error "Parse error while reading token '2'"];

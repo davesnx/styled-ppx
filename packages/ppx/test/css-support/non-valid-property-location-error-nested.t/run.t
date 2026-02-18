@@ -14,7 +14,7 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune build
   File "input.re", line 6, characters 4-10:
-  Error: Unknown property 'colorx'
+  Error: Unknown property 'colorx'. Did you mean 'color'?
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
@@ -24,7 +24,7 @@ If this test fail means that the module is not in sync with the ppx
       CSS.color(CSS.white),
       CSS.selectorMany(
         [|{js|&:hover|js}|],
-        [|[%ocaml.error "Unknown property 'colorx'"]|],
+        [|[%ocaml.error "Unknown property 'colorx'. Did you mean 'color'?"]|],
       ),
     |]);
 

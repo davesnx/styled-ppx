@@ -38,16 +38,8 @@ let rec type_check_rule = (rule: Styled_ppx_css_parser.Ast.rule) => {
     switch (Css_grammar.Parser.check_property(~loc, ~name, value)) {
     | Ok () => [Ok()]
     | Error((loc, `Invalid_value(raw_error))) =>
-      let is_internal_error =
-        String.length(raw_error) > 0
-        && (
-          String.sub(raw_error, 0, min(6, String.length(raw_error)))
-          == "tokens"
-          || String.sub(raw_error, 0, min(8, String.length(raw_error)))
-          == "Expected"
-        );
       let msg =
-        is_internal_error
+        raw_error == ""
           ? Format.sprintf(
               "Property '%s' has an invalid value: '%s'",
               name,
@@ -55,9 +47,18 @@ let rec type_check_rule = (rule: Styled_ppx_css_parser.Ast.rule) => {
             )
           : raw_error;
       [Error((loc, `Invalid_value(msg)))];
-    | Error((loc, `Property_not_found)) => [
-        Error((loc, `Property_not_found)),
-      ]
+    | Error((loc, `Property_not_found)) =>
+      let msg =
+        switch (Css_grammar.Parser.suggest_property_name(name)) {
+        | Some(suggestion) =>
+          "Unknown property '"
+          ++ name
+          ++ "'. Did you mean '"
+          ++ suggestion
+          ++ "'?"
+        | None => "Unknown property '" ++ name ++ "'"
+        };
+      [Error((loc, `Invalid_value(msg)))];
     };
   | Style_rule(style_rule) =>
     let rule_list = style_rule.block;

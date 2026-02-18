@@ -119,7 +119,7 @@ module Pattern = {
   let next =
     fun
     | [token, ...tokens] => Match.return(token, tokens)
-    | _ => (Error(["missing the token expected"]), []);
+    | _ => (Error(["Unexpected end of input."]), []);
 
   let token = (expected, tokens) =>
     switch (tokens) {
@@ -128,7 +128,7 @@ module Pattern = {
       // if failed then keep the tokens intact
       let tokens = Result.is_ok(data) ? tokens : [token, ...tokens];
       (data, tokens);
-    | [] => (Error(["missing the token expected"]), [])
+    | [] => (Error(["Unexpected end of input."]), [])
     };
 
   let expect = expected =>
@@ -175,12 +175,15 @@ let parse_string = (rule_parser, input) => {
     | []
     | [Tokens.EOF] => Ok(data)
     | tokens =>
-      let token_strs =
-        tokens |> List.map(Tokens.show_token) |> String.concat(", ");
-      Error("tokens remaining: " ++ token_strs);
+      let humanized =
+        tokens
+        |> List.filter(t => t != Tokens.EOF)
+        |> List.map(Tokens.humanize)
+        |> String.concat(" ");
+      Error("Unexpected trailing input '" ++ humanized ++ "'.");
     };
   | Error([message, ..._]) => Error(message)
-  | Error([]) => Error("unexpected parse error")
+  | Error([]) => Error("Expected a valid value.")
   };
 };
 

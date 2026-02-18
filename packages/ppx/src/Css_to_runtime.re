@@ -283,12 +283,18 @@ and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
     )
   ) {
   | Ok(exprs) => exprs
-  | Error(`Property_not_found) => [
-      Error.expr(
-        ~loc=property_location,
-        "Unknown property '" ++ property ++ "'",
-      ),
-    ]
+  | Error(`Property_not_found) =>
+    let description =
+      switch (Css_grammar.Parser.suggest_property_name(property)) {
+      | Some(suggestion) =>
+        "Unknown property '"
+        ++ property
+        ++ "'. Did you mean '"
+        ++ suggestion
+        ++ "'?"
+      | None => "Unknown property '" ++ property ++ "'"
+      };
+    [Error.expr(~loc=property_location, description)];
   | Error(`Impossible_state) => [
       Error.expr(
         ~loc=interpolation_location,

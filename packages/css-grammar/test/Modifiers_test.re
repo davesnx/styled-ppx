@@ -119,7 +119,7 @@ let tests: tests = [
       ~__POS__,
       to_check,
       parse("30 31 32"),
-      Error("tokens remaining: (NUMBER 32.), EOF"),
+      Error("Unexpected trailing input '32'."),
     );
   }),
   test("<integer>{2} <integer>", () => {
@@ -137,7 +137,7 @@ let tests: tests = [
       ~__POS__,
       to_check,
       parse("30 31 32 33"),
-      Error("tokens remaining: (NUMBER 33.), EOF"),
+      Error("Unexpected trailing input '33'."),
     );
   }),
   test("<integer>{2,3}", () => {
@@ -152,7 +152,7 @@ let tests: tests = [
       ~__POS__,
       to_check,
       parse("39 40 41 42"),
-      Error("tokens remaining: (NUMBER 42.), EOF"),
+      Error("Unexpected trailing input '42'."),
     );
   }),
   test("<integer>{2,}", () => {
@@ -182,13 +182,13 @@ let tests: tests = [
       ~__POS__,
       to_check,
       parse("59, 60, 61,"),
-      Error("tokens remaining: COMMA, EOF"),
+      Error("Unexpected trailing input ','."),
     );
     check(
       ~__POS__,
       to_check,
       parse("59, 60, 61, 62"),
-      Error("tokens remaining: COMMA, (NUMBER 62.), EOF"),
+      Error("Unexpected trailing input ', 62'."),
     );
   }),
   test("<integer>#{2}, <integer>", () => {
@@ -221,13 +221,13 @@ let tests: tests = [
       ~__POS__,
       to_check,
       parse("59, 60, 61,"),
-      Error("tokens remaining: COMMA, EOF"),
+      Error("Unexpected trailing input ','."),
     );
     check(
       ~__POS__,
       to_check,
       parse("59, 60, 61, 62"),
-      Error("tokens remaining: COMMA, (NUMBER 62.), EOF"),
+      Error("Unexpected trailing input ', 62'."),
     );
   }),
   test("[<integer> A]{2,3}", () => {
@@ -238,12 +238,11 @@ let tests: tests = [
     check(~__POS__, to_check, parse("63"), Error("Expected an integer."));
     check(~__POS__, to_check, parse("64 65"), Ok([64, 65]));
     check(~__POS__, to_check, parse("66 67 68"), Ok([66, 67, 68]));
-    /* TODO: Remove "tokens remaining" message */
     check(
       ~__POS__,
       to_check,
       parse("69 70 71 72"),
-      Error("tokens remaining: (NUMBER 72.), EOF"),
+      Error("Unexpected trailing input '72'."),
     );
   }),
 ];
