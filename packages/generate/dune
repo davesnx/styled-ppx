@@ -1,0 +1,7 @@
+(executable
+ (name generate)
+ (public_name styled-ppx.generate)
+ (modules generate)
+ (libraries styled-ppx ppxlib ppxlib.astlib)
+ (preprocess
+  (pps ppxlib.metaquot)))

@@ -6,5 +6,6 @@ Alcotest.run(
     ("Selector", Selector_test.tests),
     ("Static", Static_test.tests),
     ("Ppx", Ppx_test.tests),
+    ("Transform", Transform_test.tests),
   ],
 );

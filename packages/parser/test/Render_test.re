@@ -16,7 +16,10 @@ let parse_exn = css =>
     )
   ) {
   | Ok(declarations) =>
-    Ok(Styled_ppx_css_parser.Render.rule_list(declarations))
+    let (rules, loc) = declarations;
+    let resolved = Styled_ppx_css_parser.Resolve.resolve_selectors(rules);
+    let (decls, sels) = Styled_ppx_css_parser.Resolve.split_by_kind(resolved);
+    Ok(Styled_ppx_css_parser.Render.rule_list((decls @ sels, loc)))
   | Error((loc, msg)) =>
     open Styled_ppx_css_parser.Ast;
     let position = loc.loc_start;
