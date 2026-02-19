@@ -48,7 +48,6 @@ let render_declarations ~buffer rules =
   |> Array.map ~f:Autoprefixer.prefix
   |> Array.flatten
   |> Array.filter_map ~f:(function
-    | Rule.Declaration ("label", _value) -> None
     | Rule.Declaration (property, value) -> Some (property, value)
     | _ -> None)
   |> Array.iteri ~f:(fun i decl ->
@@ -129,7 +128,11 @@ let print_rules ?(initial = 0) rules =
     |> Array.iter ~f:(fun rule -> print_endline (to_debug initial [| rule |]))
 
 let split_by_kind rules =
-  Array.partition ~f:(function Rule.Declaration _ -> true | _ -> false) rules
+  rules
+  |> Array.filter_map ~f:(function
+    | Rule.Declaration ("label", _) -> None
+    | rule -> Some rule)
+  |> Array.partition ~f:(function Rule.Declaration _ -> true | _ -> false)
 
 let resolve_ampersand hash selector =
   let classname = "." ^ hash in
@@ -473,17 +476,20 @@ let get_stylesheet () =
   let stylesheet = Stylesheet.get_all instance in
   let initial_size = List.length stylesheet * approximate_chars_in_rules in
   let buffer = Buffer.create initial_size in
-  List.iteri
-    (fun i (_, rule) ->
-      if i > 0 then Buffer.add_char buffer ' ';
-      match rule with
+  List.iter
+    (fun (_, rule) ->
+      let pos_before = Buffer.length buffer in
+      if pos_before > 0 then Buffer.add_char buffer ' ';
+      (match rule with
       | Globals rule ->
         let new_rule = resolve_selectors ~prefix_with_ampersand:false rule in
         Buffer.add_string buffer (rules_to_string new_rule)
       | Classnames { className; styles } ->
         render_rules ~buffer className styles
       | Keyframes { animationName; keyframes } ->
-        render_keyframes ~buffer animationName keyframes)
+        render_keyframes ~buffer animationName keyframes);
+      if pos_before > 0 && Buffer.length buffer = pos_before + 1 then
+        Buffer.truncate buffer pos_before)
     stylesheet;
   Buffer.contents buffer
 
