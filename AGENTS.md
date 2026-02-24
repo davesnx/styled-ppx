@@ -55,3 +55,28 @@ The project consists of three main components:
 - Prefer absolute paths in tool calls and explanations so transcripts remain unambiguous.
 
 Stay curious, verify assumptions, and leave the repo healthier than you found it.
+
+## Cursor Cloud specific instructions
+
+### Environment prerequisites
+
+The Cloud VM update script handles: opam dependency installation (with `--assume-depexts` since npm is provided via nvm, not apt) and `npm install`. The opam local switch at `./_opam` with OCaml 5.4.0 must already exist.
+
+### Key commands
+
+All commands are documented in the `Makefile`; run `make help` for the full list. The critical ones:
+
+- **Build**: `eval $(opam env --switch=. --set-switch) && make build`
+- **Test all**: `eval $(opam env --switch=. --set-switch) && make test`
+- **Lint/format check**: `eval $(opam env --switch=. --set-switch) && make format-check`
+- **Auto-format**: `eval $(opam env --switch=. --set-switch) && make fmt`
+- **Dev watch mode**: `eval $(opam env --switch=. --set-switch) && make dev`
+- **Individual test suites**: `make test-parser`, `make test-ppx-native`, etc. (see `testing.mdc` workspace rule)
+
+### Gotchas
+
+- **Always activate the opam switch first**: Run `eval $(opam env --switch=. --set-switch)` before any `make` or `dune` command. The `Makefile` uses `opam exec --` internally, but many shell invocations still need the environment set.
+- **Reason pin**: The `Makefile` pins `reason.3.17.3` from a GitHub branch (`fix-stackoverflow-on-Pconstraint-414`) that no longer exists. Reason 3.17.3 is now available directly on opam, so the pin step can be skipped. If the pin fails, install deps directly with `opam install . --deps-only --with-test --assume-depexts --working-dir . -y`.
+- **opam 2.1 vs 2.2+**: The `--with-dev-setup` flag in `make install` requires opam >= 2.2. On opam 2.1.x (Ubuntu 24.04 default), install dev deps manually: `opam install ocamlformat.0.28.1 ocaml-lsp-server -y`.
+- **Menhir warnings**: `Warning: 6 states have shift/reduce conflicts` during build is expected and benign.
+- **Demo executables**: `dune exec ast-renderer "<css>"` and `dune exec lexer-renderer "<css>"` are useful for quick CSS parsing checks. `dune exec demo-melange-server` runs an SSR demo rendering styled React components.
