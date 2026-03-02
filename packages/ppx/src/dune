@@ -6,12 +6,12 @@
   (:standard -w -9))
  (libraries
   styled-ppx.css-parser
-  styled-ppx.css-property-parser
+  styled-ppx.css-grammar-parser
   styled-ppx.murmur2
   styled-ppx.string-interpolation
   sedlex
-  reason
   ppxlib
+  reason
   ppxlib.astlib
   ppx_deriving_yojson.runtime
   yojson)

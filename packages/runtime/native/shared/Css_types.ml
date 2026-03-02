@@ -3473,6 +3473,9 @@ module Shadow = struct
     | #None.t -> None.toString
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
+
+  let many (arr : _ t array) : string =
+    Kloth.Array.map_and_join ~sep:{js|, |js} ~f:toString arr
 end
 
 module Gradient = struct
@@ -5216,4 +5219,411 @@ module OverflowClipMargin = struct
     | #ClipEdgeOrigin.t as ceo -> ClipEdgeOrigin.toString ceo
     | #Margin.t as m -> Margin.toString m
     | #Cascading.t as c -> Cascading.toString c
+end
+
+module BoxShadow = struct
+  type t =
+    [ `shadow of string
+    | None.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString (x : t) : string =
+    match x with
+    | `shadow _ as s -> Shadow.toString s
+    | #None.t -> None.toString
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module TextShadow = struct
+  type t =
+    [ `shadow of string
+    | None.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString (x : t) : string =
+    match x with
+    | `shadow _ as s -> Shadow.toString s
+    | #None.t -> None.toString
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module FlexGrow = struct
+  type t = [ `num of float ]
+
+  let toString x = match x with `num n -> Kloth.Float.to_string n
+end
+
+module FlexShrink = struct
+  include FlexGrow
+end
+
+module LengthPercentage = struct
+  type t =
+    [ Length.t
+    | Percentage.t
+    ]
+
+  let toString = function #Length.t as l -> Length.toString l
+end
+
+module Order = struct
+  type t = int
+
+  let toString x = Kloth.Int.to_string x
+end
+
+module BoxOrient = struct
+  type t =
+    [ `horizontal
+    | `vertical
+    | `inlineAxis
+    | `blockAxis
+    | `inherit_
+    ]
+
+  let toString x =
+    match x with
+    | `horizontal -> {js|horizontal|js}
+    | `vertical -> {js|vertical|js}
+    | `inlineAxis -> {js|inline-axis|js}
+    | `blockAxis -> {js|block-axis|js}
+    | `inherit_ -> {js|inherit|js}
+end
+
+module BorderRadius = struct
+  type t = Length.t
+
+  let toString x = Length.toString x
+end
+
+module BorderValue = struct
+  type t =
+    [ LineWidth.t
+    | BorderStyle.t
+    | Color.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #Var.t as v -> Var.toString v
+    | #Cascading.t as c -> Cascading.toString c
+    | #LineWidth.t as w -> LineWidth.toString w
+    | #BorderStyle.t as s -> BorderStyle.toString s
+    | #Color.t as color -> Color.toString color
+end
+
+module MarginBlock = struct
+  include Margin
+end
+
+module OverflowY = struct
+  include Overflow
+end
+
+module FontFamily = struct
+  type t =
+    [ FontFamilyName.t
+    | `list of FontFamilyName.t array
+    | Var.t
+    | Cascading.t
+    ]
+
+  let list (xs : FontFamilyName.t array) = `list xs
+
+  let toString x =
+    match x with
+    | #Var.t as var -> Var.toString var
+    | #Cascading.t as c -> Cascading.toString c
+    | #FontFamilyName.t as name -> FontFamilyName.toString name
+    | `list xs ->
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:FontFamilyName.toString xs
+end
+
+module FontSize = struct
+  type t =
+    [ Length.t
+    | `xxSmall
+    | `xSmall
+    | `small
+    | `medium
+    | `large
+    | `xLarge
+    | `xxLarge
+    | `xxxLarge
+    | `smaller
+    | `larger
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #Cascading.t as c -> Cascading.toString c
+    | `xxSmall -> {js|xx-small|js}
+    | `xSmall -> {js|x-small|js}
+    | `small -> {js|small|js}
+    | `medium -> {js|medium|js}
+    | `large -> {js|large|js}
+    | `xLarge -> {js|x-large|js}
+    | `xxLarge -> {js|xx-large|js}
+    | `xxxLarge -> {js|xxx-large|js}
+    | `smaller -> {js|smaller|js}
+    | `larger -> {js|larger|js}
+    | #Length.t as l -> Length.toString l
+end
+
+module Opacity = struct
+  type t = float
+
+  let toString (x : float) = Kloth.Float.to_string x
+end
+
+module Paint = struct
+  type fallback =
+    [ None.t
+    | Color.t
+    ]
+
+  type t =
+    [ None.t
+    | Color.t
+    | Url.t
+    | `urlWithFallback of string * fallback
+    | `contextFill
+    | `contextStroke
+    | Var.t
+    | Cascading.t
+    ]
+
+  let urlWithFallback (url : string) (fallback : fallback) =
+    `urlWithFallback (url, fallback)
+
+  let fallback_to_string = function
+    | #None.t -> None.toString
+    | #Color.t as c -> Color.toString c
+
+  let toString x =
+    match x with
+    | #Var.t as var -> Var.toString var
+    | #Cascading.t as c -> Cascading.toString c
+    | #None.t -> None.toString
+    | #Color.t as c -> Color.toString c
+    | #Url.t as u -> Url.toString u
+    | `contextFill -> {js|context-fill|js}
+    | `contextStroke -> {js|context-stroke|js}
+    | `urlWithFallback (url, fallback) ->
+      Url.toString (`url url) ^ {js| |js} ^ fallback_to_string fallback
+end
+
+module WebkitTextFillColor = struct
+  type t = string
+
+  let toString (x : string) = x
+end
+
+module AccentColor = struct
+  type t =
+    [ Auto.t
+    | Color.t
+    ]
+
+  let toString x =
+    match x with #Auto.t -> Auto.toString | #Color.t as c -> Color.toString c
+end
+
+module Appearance = struct
+  type t =
+    [ `none
+    | Auto.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | #Auto.t -> Auto.toString
+    | #Var.t as v -> Var.toString v
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module BlendMode = struct
+  type t =
+    [ `normal
+    | `multiply
+    | `screen
+    | `overlay
+    | `darken
+    | `lighten
+    | `colorDodge
+    | `colorBurn
+    | `hardLight
+    | `softLight
+    | `difference
+    | `exclusion
+    | `hue
+    | `saturation
+    | `color
+    | `luminosity
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `multiply -> {js|multiply|js}
+    | `screen -> {js|screen|js}
+    | `overlay -> {js|overlay|js}
+    | `darken -> {js|darken|js}
+    | `lighten -> {js|lighten|js}
+    | `colorDodge -> {js|color-dodge|js}
+    | `colorBurn -> {js|color-burn|js}
+    | `hardLight -> {js|hard-light|js}
+    | `softLight -> {js|soft-light|js}
+    | `difference -> {js|difference|js}
+    | `exclusion -> {js|exclusion|js}
+    | `hue -> {js|hue|js}
+    | `saturation -> {js|saturation|js}
+    | `color -> {js|color|js}
+    | `luminosity -> {js|luminosity|js}
+    | #Var.t as v -> Var.toString v
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module BackgroundBlendMode = struct
+  include BlendMode
+end
+
+module MixBlendMode = struct
+  include BlendMode
+end
+
+module BackgroundPositionX = struct
+  type t =
+    [ Position.X.t
+    | Length.t
+    ]
+
+  let toString x =
+    match x with
+    | #Position.X.t as pos -> Position.X.toString pos
+    | #Length.t as len -> Length.toString len
+end
+
+module BackgroundPositionY = struct
+  type t =
+    [ Position.Y.t
+    | Length.t
+    ]
+
+  let toString x =
+    match x with
+    | #Position.Y.t as pos -> Position.Y.toString pos
+    | #Length.t as len -> Length.toString len
+end
+
+module BreakBefore = struct
+  type t =
+    [ `auto
+    | `avoid
+    | `avoidPage
+    | `avoidColumn
+    | `avoidRegion
+    | `page
+    | `column
+    | `region
+    | `left
+    | `right
+    | `recto
+    | `verso
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `avoid -> {js|avoid|js}
+    | `avoidPage -> {js|avoid-page|js}
+    | `avoidColumn -> {js|avoid-column|js}
+    | `avoidRegion -> {js|avoid-region|js}
+    | `page -> {js|page|js}
+    | `column -> {js|column|js}
+    | `region -> {js|region|js}
+    | `left -> {js|left|js}
+    | `right -> {js|right|js}
+    | `recto -> {js|recto|js}
+    | `verso -> {js|verso|js}
+end
+
+module BreakAfter = struct
+  include BreakBefore
+end
+
+module BreakInside = struct
+  type t =
+    [ `auto
+    | `avoid
+    | `avoidPage
+    | `avoidColumn
+    | `avoidRegion
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `avoid -> {js|avoid|js}
+    | `avoidPage -> {js|avoid-page|js}
+    | `avoidColumn -> {js|avoid-column|js}
+    | `avoidRegion -> {js|avoid-region|js}
+end
+
+module InsetBlock = struct
+  type t =
+    [ Auto.t
+    | Length.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #Auto.t -> Auto.toString
+    | #Length.t as l -> Length.toString l
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module InsetInline = struct
+  include InsetBlock
+end
+
+module MarginInline = struct
+  include Margin
+end
+
+module MaskRepeat = struct
+  include BackgroundRepeat
+end
+
+module OverflowX = struct
+  include Overflow
+end
+
+module Padding = struct
+  type t = Length.t
+
+  let toString x = Length.toString x
+end
+
+module PaddingBlock = struct
+  include Padding
+end
+
+module PaddingInline = struct
+  include Padding
 end

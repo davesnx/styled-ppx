@@ -3,6 +3,7 @@
  (public_name styled-ppx.melange)
  (modes melange)
  (wrapped false)
+ (libraries reason-react)
  (preprocess
   (pps melange.ppx -alert -deprecated)))
 
