@@ -9,9 +9,8 @@
   styled-ppx.css-grammar-parser
   styled-ppx.murmur2
   styled-ppx.string-interpolation
-  sedlex
-  reason
-  ppxlib
+   sedlex
+   ppxlib
   ppxlib.astlib
   ppx_deriving_yojson.runtime
   yojson)
