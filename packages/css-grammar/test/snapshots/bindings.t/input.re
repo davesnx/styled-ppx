@@ -1,9 +1,9 @@
-let rec _legacy_gradient = [%value.rec
+let rec _legacy_gradient = [%spec
   "<-webkit-gradient()> | <-legacy-linear-gradient> | <-legacy-repeating-linear-gradient> | <-legacy-radial-gradient> | <-legacy-repeating-radial-gradient>"
 ]
-and _legacy_linear_gradient = [%value.rec
+and _legacy_linear_gradient = [%spec
   "-moz-linear-gradient( <-legacy-linear-gradient-arguments> ) | -webkit-linear-gradient( <-legacy-linear-gradient-arguments> ) | -o-linear-gradient( <-legacy-linear-gradient-arguments> )"
 ]
-and property_height = [%value.rec
+and property_height = [%spec
   "'auto' | <extended-length> | <extended-percentage> | 'min-content' | 'max-content' | 'fit-content' | fit-content( <extended-length> | <extended-percentage> )"
 ];

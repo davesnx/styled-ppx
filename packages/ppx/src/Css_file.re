@@ -1,3 +1,8 @@
+type var_type =
+  | Selector
+  | MediaQuery
+  | RuntimeModule(string);
+
 module Buffer = {
   type rule = (string, string);
   let accumulated_rules: ref(list(rule)) = ref([]);
@@ -69,18 +74,18 @@ module Css_transform = {
   let rec transform_component_value =
           (
             cv: component_value,
-            dynamic_vars: ref(list((string, string, string))),
+            dynamic_vars: ref(list((string, string, var_type))),
             property_name: option(string),
-            get_type_for_var: string => string,
+            get_type_for_var: string => var_type,
           )
           : component_value => {
     switch (cv) {
     | Variable(path_str, _loc) =>
       let var_name = variable_to_css_var_name(path_str);
 
-      let type_path = get_type_for_var(path_str);
+      let var_type = get_type_for_var(path_str);
       if (!List.exists(((vn, _, _)) => vn == var_name, dynamic_vars^)) {
-        dynamic_vars := [(var_name, path_str, type_path), ...dynamic_vars^];
+        dynamic_vars := [(var_name, path_str, var_type), ...dynamic_vars^];
       };
 
       Function(
@@ -155,7 +160,7 @@ module Css_transform = {
     | SimpleSelector(Variable(path_str, var_loc)) =>
       let var_name = variable_to_css_var_name(path_str);
       if (!List.exists(((vn, _, _)) => vn == var_name, dynamic_vars^)) {
-        dynamic_vars := [(var_name, path_str, "selector"), ...dynamic_vars^];
+        dynamic_vars := [(var_name, path_str, Selector), ...dynamic_vars^];
       };
       SimpleSelector(Variable(path_str, var_loc));
     | SimpleSelector(simple) => SimpleSelector(simple)
@@ -214,7 +219,7 @@ module Css_transform = {
     | Variable(path_str, var_loc) =>
       let var_name = variable_to_css_var_name(path_str);
       if (!List.exists(((vn, _, _)) => vn == var_name, dynamic_vars^)) {
-        dynamic_vars := [(var_name, path_str, "selector"), ...dynamic_vars^];
+        dynamic_vars := [(var_name, path_str, Selector), ...dynamic_vars^];
       };
       SimpleSelector(Variable(path_str, var_loc));
     | _ => SimpleSelector(simple)
@@ -227,7 +232,7 @@ module Css_transform = {
     | ClassVariable(path_str, var_loc) =>
       let var_name = variable_to_css_var_name(path_str);
       if (!List.exists(((vn, _, _)) => vn == var_name, dynamic_vars^)) {
-        dynamic_vars := [(var_name, path_str, "selector"), ...dynamic_vars^];
+        dynamic_vars := [(var_name, path_str, Selector), ...dynamic_vars^];
       };
       ClassVariable(path_str, var_loc);
     | _ => subclass
@@ -247,12 +252,16 @@ module Css_transform = {
       );
 
     let get_type_for_var = var_name => {
-      switch (
-        List.find_opt(((name, _)) => name == var_name, interpolation_types)
-      ) {
-      | Some((_, type_path)) when type_path != "" => type_path
-      | _ => property_name
-      };
+      let type_path =
+        switch (
+          List.find_opt(((name, _)) => name == var_name, interpolation_types)
+        ) {
+        | Some((_, tp)) when tp != "" => tp
+        | _ => ""
+        };
+      RuntimeModule(
+        Property_to_types.resolve_module_name(~type_path, ~property_name),
+      );
     };
 
     let transformed_values =
@@ -307,7 +316,7 @@ module Css_transform = {
   and transform_at_rule = (at_rule: at_rule, dynamic_vars) => {
     let { name, prelude, block, loc } = at_rule;
     let (prelude_values, prelude_loc) = prelude;
-    let default_type_for_var = _var => "media-query";
+    let default_type_for_var = _var => MediaQuery;
     let transformed_prelude =
       List.map(
         ((cv, cv_loc)) =>
@@ -344,7 +353,7 @@ module Css_transform = {
   and transform_variables_to_custom_properties =
       (
         rules: list(rule),
-        dynamic_vars: ref(list((string, string, string))),
+        dynamic_vars: ref(list((string, string, var_type))),
       ) => {
     List.map(r => transform_rule(r, dynamic_vars), rules);
   };

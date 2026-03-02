@@ -623,7 +623,7 @@ let render_make_call = (~loc, ~classNames, ~dynamic_vars) => {
 
   let var_list =
     dynamic_vars
-    |> List.map(((var_name, original_path, type_path)) => {
+    |> List.map(((var_name, original_path, var_type: Css_file.var_type)) => {
          let field_name = "--" ++ var_name;
          let field_name_expr =
            Helper.Exp.constant(~loc, Pconst_string(field_name, loc, None));
@@ -631,23 +631,15 @@ let render_make_call = (~loc, ~classNames, ~dynamic_vars) => {
          let var_value = render_variable_ident(~loc, original_path);
 
          let field_value =
-           if (type_path == "selector" || type_path == "media-query") {
-             [%expr fst([%e var_value])];
-           } else if (String.length(type_path) > 10
-                      && String.sub(type_path, 0, 10) == "Css_types.") {
-             let module_name =
-               String.sub(type_path, 10, String.length(type_path) - 10);
+           switch (var_type) {
+           | Selector
+           | MediaQuery => [%expr fst([%e var_value])]
+           | RuntimeModule(module_name) =>
              Property_to_types.make_to_string_call(
                ~loc,
                module_name,
                var_value,
-             );
-           } else {
-             Property_to_types.get_to_string_for_property(
-               ~loc,
-               type_path,
-               var_value,
-             );
+             )
            };
 
          Builder.pexp_tuple(~loc, [field_name_expr, field_value]);

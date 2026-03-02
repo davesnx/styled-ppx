@@ -195,6 +195,17 @@ let get_to_string_for_property = (~loc, property_name, value_expr) => {
   };
 };
 
+let resolve_module_name = (~type_path: string, ~property_name: string): string => {
+  switch (String.split_on_char('.', type_path)) {
+  | [_, module_name] => module_name
+  | _ =>
+    switch (property_to_module(property_name)) {
+    | Some(module_name) => module_name
+    | None => property_name_to_module_name(property_name)
+    }
+  };
+};
+
 type interpolation_info = {
   variable_name: string,
   to_string_path: string,
