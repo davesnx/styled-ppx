@@ -72,7 +72,7 @@ let parse_args args =
     | "-v" :: rest | "-verbose" :: rest | "--verbose" :: rest ->
       parse acc output_file true rest
     | arg :: rest -> parse (arg :: acc) output_file verbose rest
-    | [] -> (List.rev acc, output_file, verbose)
+    | [] -> List.rev acc, output_file, verbose
   in
   parse [] None false (Array.to_list args |> List.tl)
 
