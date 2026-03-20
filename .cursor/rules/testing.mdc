@@ -9,16 +9,18 @@ alwaysApply: true
 File structure and test commands for each package:
 
 packages
-├── css-property-parser
-│  └── test (to run those tests `make test-css-property-parser`)
+├── css-grammar
+│  ├── lib
+│  ├── ppx
+│  └── test (to run those tests `make test-css-grammar`)
 │      ├── Combinators_test.re
 │      ├── Modifiers_test.re
 │      ├── Rules_test.re
 │      ├── Runner.re
 │      ├── Standard_test.re
-│      ├── Types_test.re
-│      ├── dune
-│      └── snapshots
+│      ├── Parser_test.re
+│      ├── Interpolation_extraction_test.re
+│      └── dune
 ├── css-spec-parser
 │  └── test (to run those tests `make test-css-spec-parser`)
 │      ├── dune

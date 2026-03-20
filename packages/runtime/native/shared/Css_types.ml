@@ -1503,6 +1503,217 @@ module Color = struct
     ^ string_of_alpha_with_calc a
     ^ {js|)|js}
 
+  type hwb = angle_with_calc * percent_with_calc * percent_with_calc
+
+  let hwb_to_string h w b =
+    {js|hwb(|js}
+    ^ string_of_angle_with_calc h
+    ^ {js| |js}
+    ^ string_of_percent_with_calc w
+    ^ {js| |js}
+    ^ string_of_percent_with_calc b
+    ^ {js|)|js}
+
+  type hwba =
+    angle_with_calc * percent_with_calc * percent_with_calc * alpha_with_calc
+
+  let hwba_to_string h w b a =
+    {js|hwb(|js}
+    ^ string_of_angle_with_calc h
+    ^ {js| |js}
+    ^ string_of_percent_with_calc w
+    ^ {js| |js}
+    ^ string_of_percent_with_calc b
+    ^ {js| / |js}
+    ^ string_of_alpha_with_calc a
+    ^ {js|)|js}
+
+  type number_with_calc =
+    [ `num of float
+    | `num_calc of [ `num of float ] calc_min_max
+    ]
+
+  let string_of_number_with_calc = function
+    | `num x -> Kloth.Float.to_string x
+    | `num_calc x ->
+      Calc.min_max_num_to_string
+        (function `num x -> Kloth.Float.to_string x)
+        x
+
+  type lab = percent_with_calc * number_with_calc * number_with_calc
+
+  let lab_to_string l a b =
+    {js|lab(|js}
+    ^ string_of_percent_with_calc l
+    ^ {js| |js}
+    ^ string_of_number_with_calc a
+    ^ {js| |js}
+    ^ string_of_number_with_calc b
+    ^ {js|)|js}
+
+  type laba =
+    percent_with_calc * number_with_calc * number_with_calc * alpha_with_calc
+
+  let laba_to_string l a b al =
+    {js|lab(|js}
+    ^ string_of_percent_with_calc l
+    ^ {js| |js}
+    ^ string_of_number_with_calc a
+    ^ {js| |js}
+    ^ string_of_number_with_calc b
+    ^ {js| / |js}
+    ^ string_of_alpha_with_calc al
+    ^ {js|)|js}
+
+  type lch = percent_with_calc * number_with_calc * angle_with_calc
+
+  let lch_to_string l c h =
+    {js|lch(|js}
+    ^ string_of_percent_with_calc l
+    ^ {js| |js}
+    ^ string_of_number_with_calc c
+    ^ {js| |js}
+    ^ string_of_angle_with_calc h
+    ^ {js|)|js}
+
+  type lcha =
+    percent_with_calc * number_with_calc * angle_with_calc * alpha_with_calc
+
+  let lcha_to_string l c h a =
+    {js|lch(|js}
+    ^ string_of_percent_with_calc l
+    ^ {js| |js}
+    ^ string_of_number_with_calc c
+    ^ {js| |js}
+    ^ string_of_angle_with_calc h
+    ^ {js| / |js}
+    ^ string_of_alpha_with_calc a
+    ^ {js|)|js}
+
+  type oklab = percent_with_calc * number_with_calc * number_with_calc
+
+  let oklab_to_string l a b =
+    {js|oklab(|js}
+    ^ string_of_percent_with_calc l
+    ^ {js| |js}
+    ^ string_of_number_with_calc a
+    ^ {js| |js}
+    ^ string_of_number_with_calc b
+    ^ {js|)|js}
+
+  type oklaba =
+    percent_with_calc * number_with_calc * number_with_calc * alpha_with_calc
+
+  let oklaba_to_string l a b al =
+    {js|oklab(|js}
+    ^ string_of_percent_with_calc l
+    ^ {js| |js}
+    ^ string_of_number_with_calc a
+    ^ {js| |js}
+    ^ string_of_number_with_calc b
+    ^ {js| / |js}
+    ^ string_of_alpha_with_calc al
+    ^ {js|)|js}
+
+  type oklch = percent_with_calc * number_with_calc * angle_with_calc
+
+  let oklch_to_string l c h =
+    {js|oklch(|js}
+    ^ string_of_percent_with_calc l
+    ^ {js| |js}
+    ^ string_of_number_with_calc c
+    ^ {js| |js}
+    ^ string_of_angle_with_calc h
+    ^ {js|)|js}
+
+  type oklcha =
+    percent_with_calc * number_with_calc * angle_with_calc * alpha_with_calc
+
+  let oklcha_to_string l c h a =
+    {js|oklch(|js}
+    ^ string_of_percent_with_calc l
+    ^ {js| |js}
+    ^ string_of_number_with_calc c
+    ^ {js| |js}
+    ^ string_of_angle_with_calc h
+    ^ {js| / |js}
+    ^ string_of_alpha_with_calc a
+    ^ {js|)|js}
+
+  type predefined_color_space =
+    [ `srgb
+    | `srgbLinear
+    | `displayP3
+    | `a98Rgb
+    | `prophotoRgb
+    | `rec2020
+    | `xyz
+    | `xyzD50
+    | `xyzD65
+    ]
+
+  let predefined_color_space_to_string = function
+    | `srgb -> {js|srgb|js}
+    | `srgbLinear -> {js|srgb-linear|js}
+    | `displayP3 -> {js|display-p3|js}
+    | `a98Rgb -> {js|a98-rgb|js}
+    | `prophotoRgb -> {js|prophoto-rgb|js}
+    | `rec2020 -> {js|rec2020|js}
+    | `xyz -> {js|xyz|js}
+    | `xyzD50 -> {js|xyz-d50|js}
+    | `xyzD65 -> {js|xyz-d65|js}
+
+  type number_percentage_with_calc =
+    [ `num of float
+    | `num_calc of [ `num of float ] calc_min_max
+    | percent_with_calc
+    ]
+
+  let string_of_number_percentage_with_calc = function
+    | `num x -> Kloth.Float.to_string x
+    | `num_calc x ->
+      Calc.min_max_num_to_string
+        (function `num x -> Kloth.Float.to_string x)
+        x
+    | #percent_with_calc as p -> string_of_percent_with_calc p
+
+  type color_fn =
+    predefined_color_space
+    * number_percentage_with_calc
+    * number_percentage_with_calc
+    * number_percentage_with_calc
+
+  let color_fn_to_string cs c1 c2 c3 =
+    {js|color(|js}
+    ^ predefined_color_space_to_string cs
+    ^ {js| |js}
+    ^ string_of_number_percentage_with_calc c1
+    ^ {js| |js}
+    ^ string_of_number_percentage_with_calc c2
+    ^ {js| |js}
+    ^ string_of_number_percentage_with_calc c3
+    ^ {js|)|js}
+
+  type color_fna =
+    predefined_color_space
+    * number_percentage_with_calc
+    * number_percentage_with_calc
+    * number_percentage_with_calc
+    * alpha_with_calc
+
+  let color_fna_to_string cs c1 c2 c3 a =
+    {js|color(|js}
+    ^ predefined_color_space_to_string cs
+    ^ {js| |js}
+    ^ string_of_number_percentage_with_calc c1
+    ^ {js| |js}
+    ^ string_of_number_percentage_with_calc c2
+    ^ {js| |js}
+    ^ string_of_number_percentage_with_calc c3
+    ^ {js| / |js}
+    ^ string_of_alpha_with_calc a
+    ^ {js|)|js}
+
   type polar_color_space =
     [ `hsl
     | `hwb
@@ -1571,6 +1782,19 @@ module Color = struct
     | `rgba of rgba
     | `hsl of hsl
     | `hsla of hsla
+    | `hwb of hwb
+    | `hwba of hwba
+    | `lab of lab
+    | `laba of laba
+    | `lch of lch
+    | `lcha of lcha
+    | `oklab of oklab
+    | `oklaba of oklaba
+    | `oklch of oklch
+    | `oklcha of oklcha
+    | `color of color_fn
+    | `colora of color_fna
+    | `lightDark of t * t
     | `hex of string
     | `transparent
     | `currentColor
@@ -1613,6 +1837,24 @@ module Color = struct
     | `rgba (r, g, b, a) -> rgba_to_string r g b a
     | `hsl (h, s, l) -> hsl_to_string h s l
     | `hsla (h, s, l, a) -> hsla_to_string h s l a
+    | `hwb (h, w, b) -> hwb_to_string h w b
+    | `hwba (h, w, b, a) -> hwba_to_string h w b a
+    | `lab (l, a, b) -> lab_to_string l a b
+    | `laba (l, a, b, al) -> laba_to_string l a b al
+    | `lch (l, c, h) -> lch_to_string l c h
+    | `lcha (l, c, h, a) -> lcha_to_string l c h a
+    | `oklab (l, a, b) -> oklab_to_string l a b
+    | `oklaba (l, a, b, al) -> oklaba_to_string l a b al
+    | `oklch (l, c, h) -> oklch_to_string l c h
+    | `oklcha (l, c, h, a) -> oklcha_to_string l c h a
+    | `color (cs, c1, c2, c3) -> color_fn_to_string cs c1 c2 c3
+    | `colora (cs, c1, c2, c3, a) -> color_fna_to_string cs c1 c2 c3 a
+    | `lightDark (light, dark) ->
+      {js|light-dark(|js}
+      ^ toString light
+      ^ {js|, |js}
+      ^ toString dark
+      ^ {js|)|js}
     | `colorMix (method', x, y) ->
       {js|color-mix(in |js}
       ^ color_interpolation_method_to_string method'
@@ -3473,6 +3715,9 @@ module Shadow = struct
     | #None.t -> None.toString
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
+
+  let many (arr : _ t array) : string =
+    Kloth.Array.map_and_join ~sep:{js|, |js} ~f:toString arr
 end
 
 module Gradient = struct
@@ -5216,4 +5461,411 @@ module OverflowClipMargin = struct
     | #ClipEdgeOrigin.t as ceo -> ClipEdgeOrigin.toString ceo
     | #Margin.t as m -> Margin.toString m
     | #Cascading.t as c -> Cascading.toString c
+end
+
+module BoxShadow = struct
+  type t =
+    [ `shadow of string
+    | None.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString (x : t) : string =
+    match x with
+    | `shadow _ as s -> Shadow.toString s
+    | #None.t -> None.toString
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module TextShadow = struct
+  type t =
+    [ `shadow of string
+    | None.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString (x : t) : string =
+    match x with
+    | `shadow _ as s -> Shadow.toString s
+    | #None.t -> None.toString
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module FlexGrow = struct
+  type t = [ `num of float ]
+
+  let toString x = match x with `num n -> Kloth.Float.to_string n
+end
+
+module FlexShrink = struct
+  include FlexGrow
+end
+
+module LengthPercentage = struct
+  type t =
+    [ Length.t
+    | Percentage.t
+    ]
+
+  let toString = function #Length.t as l -> Length.toString l
+end
+
+module Order = struct
+  type t = int
+
+  let toString x = Kloth.Int.to_string x
+end
+
+module BoxOrient = struct
+  type t =
+    [ `horizontal
+    | `vertical
+    | `inlineAxis
+    | `blockAxis
+    | `inherit_
+    ]
+
+  let toString x =
+    match x with
+    | `horizontal -> {js|horizontal|js}
+    | `vertical -> {js|vertical|js}
+    | `inlineAxis -> {js|inline-axis|js}
+    | `blockAxis -> {js|block-axis|js}
+    | `inherit_ -> {js|inherit|js}
+end
+
+module BorderRadius = struct
+  type t = Length.t
+
+  let toString x = Length.toString x
+end
+
+module BorderValue = struct
+  type t =
+    [ LineWidth.t
+    | BorderStyle.t
+    | Color.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #Var.t as v -> Var.toString v
+    | #Cascading.t as c -> Cascading.toString c
+    | #LineWidth.t as w -> LineWidth.toString w
+    | #BorderStyle.t as s -> BorderStyle.toString s
+    | #Color.t as color -> Color.toString color
+end
+
+module MarginBlock = struct
+  include Margin
+end
+
+module OverflowY = struct
+  include Overflow
+end
+
+module FontFamily = struct
+  type t =
+    [ FontFamilyName.t
+    | `list of FontFamilyName.t array
+    | Var.t
+    | Cascading.t
+    ]
+
+  let list (xs : FontFamilyName.t array) = `list xs
+
+  let toString x =
+    match x with
+    | #Var.t as var -> Var.toString var
+    | #Cascading.t as c -> Cascading.toString c
+    | #FontFamilyName.t as name -> FontFamilyName.toString name
+    | `list xs ->
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:FontFamilyName.toString xs
+end
+
+module FontSize = struct
+  type t =
+    [ Length.t
+    | `xxSmall
+    | `xSmall
+    | `small
+    | `medium
+    | `large
+    | `xLarge
+    | `xxLarge
+    | `xxxLarge
+    | `smaller
+    | `larger
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #Cascading.t as c -> Cascading.toString c
+    | `xxSmall -> {js|xx-small|js}
+    | `xSmall -> {js|x-small|js}
+    | `small -> {js|small|js}
+    | `medium -> {js|medium|js}
+    | `large -> {js|large|js}
+    | `xLarge -> {js|x-large|js}
+    | `xxLarge -> {js|xx-large|js}
+    | `xxxLarge -> {js|xxx-large|js}
+    | `smaller -> {js|smaller|js}
+    | `larger -> {js|larger|js}
+    | #Length.t as l -> Length.toString l
+end
+
+module Opacity = struct
+  type t = float
+
+  let toString (x : float) = Kloth.Float.to_string x
+end
+
+module Paint = struct
+  type fallback =
+    [ None.t
+    | Color.t
+    ]
+
+  type t =
+    [ None.t
+    | Color.t
+    | Url.t
+    | `urlWithFallback of string * fallback
+    | `contextFill
+    | `contextStroke
+    | Var.t
+    | Cascading.t
+    ]
+
+  let urlWithFallback (url : string) (fallback : fallback) =
+    `urlWithFallback (url, fallback)
+
+  let fallback_to_string = function
+    | #None.t -> None.toString
+    | #Color.t as c -> Color.toString c
+
+  let toString x =
+    match x with
+    | #Var.t as var -> Var.toString var
+    | #Cascading.t as c -> Cascading.toString c
+    | #None.t -> None.toString
+    | #Color.t as c -> Color.toString c
+    | #Url.t as u -> Url.toString u
+    | `contextFill -> {js|context-fill|js}
+    | `contextStroke -> {js|context-stroke|js}
+    | `urlWithFallback (url, fallback) ->
+      Url.toString (`url url) ^ {js| |js} ^ fallback_to_string fallback
+end
+
+module WebkitTextFillColor = struct
+  type t = string
+
+  let toString (x : string) = x
+end
+
+module AccentColor = struct
+  type t =
+    [ Auto.t
+    | Color.t
+    ]
+
+  let toString x =
+    match x with #Auto.t -> Auto.toString | #Color.t as c -> Color.toString c
+end
+
+module Appearance = struct
+  type t =
+    [ `none
+    | Auto.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | #Auto.t -> Auto.toString
+    | #Var.t as v -> Var.toString v
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module BlendMode = struct
+  type t =
+    [ `normal
+    | `multiply
+    | `screen
+    | `overlay
+    | `darken
+    | `lighten
+    | `colorDodge
+    | `colorBurn
+    | `hardLight
+    | `softLight
+    | `difference
+    | `exclusion
+    | `hue
+    | `saturation
+    | `color
+    | `luminosity
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `multiply -> {js|multiply|js}
+    | `screen -> {js|screen|js}
+    | `overlay -> {js|overlay|js}
+    | `darken -> {js|darken|js}
+    | `lighten -> {js|lighten|js}
+    | `colorDodge -> {js|color-dodge|js}
+    | `colorBurn -> {js|color-burn|js}
+    | `hardLight -> {js|hard-light|js}
+    | `softLight -> {js|soft-light|js}
+    | `difference -> {js|difference|js}
+    | `exclusion -> {js|exclusion|js}
+    | `hue -> {js|hue|js}
+    | `saturation -> {js|saturation|js}
+    | `color -> {js|color|js}
+    | `luminosity -> {js|luminosity|js}
+    | #Var.t as v -> Var.toString v
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module BackgroundBlendMode = struct
+  include BlendMode
+end
+
+module MixBlendMode = struct
+  include BlendMode
+end
+
+module BackgroundPositionX = struct
+  type t =
+    [ Position.X.t
+    | Length.t
+    ]
+
+  let toString x =
+    match x with
+    | #Position.X.t as pos -> Position.X.toString pos
+    | #Length.t as len -> Length.toString len
+end
+
+module BackgroundPositionY = struct
+  type t =
+    [ Position.Y.t
+    | Length.t
+    ]
+
+  let toString x =
+    match x with
+    | #Position.Y.t as pos -> Position.Y.toString pos
+    | #Length.t as len -> Length.toString len
+end
+
+module BreakBefore = struct
+  type t =
+    [ `auto
+    | `avoid
+    | `avoidPage
+    | `avoidColumn
+    | `avoidRegion
+    | `page
+    | `column
+    | `region
+    | `left
+    | `right
+    | `recto
+    | `verso
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `avoid -> {js|avoid|js}
+    | `avoidPage -> {js|avoid-page|js}
+    | `avoidColumn -> {js|avoid-column|js}
+    | `avoidRegion -> {js|avoid-region|js}
+    | `page -> {js|page|js}
+    | `column -> {js|column|js}
+    | `region -> {js|region|js}
+    | `left -> {js|left|js}
+    | `right -> {js|right|js}
+    | `recto -> {js|recto|js}
+    | `verso -> {js|verso|js}
+end
+
+module BreakAfter = struct
+  include BreakBefore
+end
+
+module BreakInside = struct
+  type t =
+    [ `auto
+    | `avoid
+    | `avoidPage
+    | `avoidColumn
+    | `avoidRegion
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `avoid -> {js|avoid|js}
+    | `avoidPage -> {js|avoid-page|js}
+    | `avoidColumn -> {js|avoid-column|js}
+    | `avoidRegion -> {js|avoid-region|js}
+end
+
+module InsetBlock = struct
+  type t =
+    [ Auto.t
+    | Length.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #Auto.t -> Auto.toString
+    | #Length.t as l -> Length.toString l
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module InsetInline = struct
+  include InsetBlock
+end
+
+module MarginInline = struct
+  include Margin
+end
+
+module MaskRepeat = struct
+  include BackgroundRepeat
+end
+
+module OverflowX = struct
+  include Overflow
+end
+
+module Padding = struct
+  type t = Length.t
+
+  let toString x = Length.toString x
+end
+
+module PaddingBlock = struct
+  include Padding
+end
+
+module PaddingInline = struct
+  include Padding
 end
