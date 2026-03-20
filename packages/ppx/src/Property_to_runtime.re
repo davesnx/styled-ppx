@@ -1059,6 +1059,172 @@ let render_function_hsla = (~loc, (hue, saturation, lightness, alpha)) => {
   };
 };
 
+let render_function_hwb = (~loc, (hue, whiteness, blackness, alpha)) => {
+  let hue =
+    switch (hue) {
+    | `Number(degs) => render_angle(~loc, `Deg(degs))
+    | `Extended_angle(angle) => render_extended_angle(~loc, angle)
+    };
+
+  let whiteness = render_extended_percentage(~loc, whiteness);
+  let blackness = render_extended_percentage(~loc, blackness);
+
+  let alpha =
+    switch (alpha) {
+    | Some(((), alpha)) => Some(alpha)
+    | None => None
+    };
+
+  let alpha = Option.map(render_color_alpha(~loc), alpha);
+
+  switch (alpha) {
+  | Some(alpha) =>
+    id(
+      [%expr `hwba(([%e hue], [%e whiteness], [%e blackness], [%e alpha]))],
+    )
+  | None =>
+    id([%expr `hwb(([%e hue], [%e whiteness], [%e blackness]))])
+  };
+};
+
+let render_number_as_number_with_calc = (~loc, number) => {
+  [%expr `num([%e render_float(~loc, number)])];
+};
+
+let render_function_lab = (~loc, (lightness, a, b, alpha)) => {
+  let lightness = render_extended_percentage(~loc, lightness);
+  let a = render_number_as_number_with_calc(~loc, a);
+  let b = render_number_as_number_with_calc(~loc, b);
+
+  let alpha =
+    switch (alpha) {
+    | Some(((), alpha)) => Some(alpha)
+    | None => None
+    };
+
+  let alpha = Option.map(render_color_alpha(~loc), alpha);
+
+  switch (alpha) {
+  | Some(alpha) =>
+    id([%expr `laba(([%e lightness], [%e a], [%e b], [%e alpha]))])
+  | None => id([%expr `lab(([%e lightness], [%e a], [%e b]))])
+  };
+};
+
+let render_function_lch = (~loc, (lightness, chroma, hue, alpha)) => {
+  let lightness = render_extended_percentage(~loc, lightness);
+  let chroma = render_number_as_number_with_calc(~loc, chroma);
+  let hue =
+    switch (hue) {
+    | `Number(degs) => render_angle(~loc, `Deg(degs))
+    | `Extended_angle(angle) => render_extended_angle(~loc, angle)
+    };
+
+  let alpha =
+    switch (alpha) {
+    | Some(((), alpha)) => Some(alpha)
+    | None => None
+    };
+
+  let alpha = Option.map(render_color_alpha(~loc), alpha);
+
+  switch (alpha) {
+  | Some(alpha) =>
+    id([%expr `lcha(([%e lightness], [%e chroma], [%e hue], [%e alpha]))])
+  | None => id([%expr `lch(([%e lightness], [%e chroma], [%e hue]))])
+  };
+};
+
+let render_function_oklab = (~loc, (lightness, a, b, alpha)) => {
+  let lightness = render_extended_percentage(~loc, lightness);
+  let a = render_number_as_number_with_calc(~loc, a);
+  let b = render_number_as_number_with_calc(~loc, b);
+
+  let alpha =
+    switch (alpha) {
+    | Some(((), alpha)) => Some(alpha)
+    | None => None
+    };
+
+  let alpha = Option.map(render_color_alpha(~loc), alpha);
+
+  switch (alpha) {
+  | Some(alpha) =>
+    id([%expr `oklaba(([%e lightness], [%e a], [%e b], [%e alpha]))])
+  | None => id([%expr `oklab(([%e lightness], [%e a], [%e b]))])
+  };
+};
+
+let render_function_oklch = (~loc, (lightness, chroma, hue, alpha)) => {
+  let lightness = render_extended_percentage(~loc, lightness);
+  let chroma = render_number_as_number_with_calc(~loc, chroma);
+  let hue =
+    switch (hue) {
+    | `Number(degs) => render_angle(~loc, `Deg(degs))
+    | `Extended_angle(angle) => render_extended_angle(~loc, angle)
+    };
+
+  let alpha =
+    switch (alpha) {
+    | Some(((), alpha)) => Some(alpha)
+    | None => None
+    };
+
+  let alpha = Option.map(render_color_alpha(~loc), alpha);
+
+  switch (alpha) {
+  | Some(alpha) =>
+    id([%expr `oklcha(([%e lightness], [%e chroma], [%e hue], [%e alpha]))])
+  | None => id([%expr `oklch(([%e lightness], [%e chroma], [%e hue]))])
+  };
+};
+
+let render_predefined_color_space = (~loc, cs: Types.predefined_color_space) => {
+  switch (cs) {
+  | `Srgb => [%expr `srgb]
+  | `Srgb_linear => [%expr `srgbLinear]
+  | `Display_p3 => [%expr `displayP3]
+  | `A98_rgb => [%expr `a98Rgb]
+  | `Prophoto_rgb => [%expr `prophotoRgb]
+  | `Rec2020 => [%expr `rec2020]
+  | `Xyz => [%expr `xyz]
+  | `Xyz_d50 => [%expr `xyzD50]
+  | `Xyz_d65 => [%expr `xyzD65]
+  };
+};
+
+let render_number_percentage_with_calc = (~loc) =>
+  fun
+  | `Number(x) => [%expr `num([%e render_float(~loc, x)])]
+  | `Extended_percentage(x) => render_extended_percentage(~loc, x);
+
+let render_function_color =
+    (~loc, (cs, c1, c2, c3, alpha)) => {
+  let cs = render_predefined_color_space(~loc, cs);
+  let c1 = render_number_percentage_with_calc(~loc, c1);
+  let c2 = render_number_percentage_with_calc(~loc, c2);
+  let c3 = render_number_percentage_with_calc(~loc, c3);
+
+  let alpha =
+    switch (alpha) {
+    | Some(((), alpha)) => Some(alpha)
+    | None => None
+    };
+
+  let alpha = Option.map(render_color_alpha(~loc), alpha);
+
+  switch (alpha) {
+  | Some(alpha) =>
+    id(
+      [%expr
+       `colora(([%e cs], [%e c1], [%e c2], [%e c3], [%e alpha]))
+      ],
+    )
+  | None =>
+    id([%expr `color(([%e cs], [%e c1], [%e c2], [%e c3]))])
+  };
+};
+
 let render_var = (~loc, string) => {
   let string = render_string(~loc, string);
   [%expr `var([%e string])];
@@ -1077,6 +1243,21 @@ let rec render_color = (~loc, value) =>
   | `Function_var(v) => render_var(~loc, v)
   | `Function_hsl(`Hsl_0(hsl)) => render_function_hsl(~loc, hsl)
   | `Function_hsla(`Hsla_0(hsla)) => render_function_hsla(~loc, hsla)
+  | `Function_hwb(hwb) => render_function_hwb(~loc, hwb)
+  | `Function_lab(lab) => render_function_lab(~loc, lab)
+  | `Function_lch(lch) => render_function_lch(~loc, lch)
+  | `Function_oklab(oklab) => render_function_oklab(~loc, oklab)
+  | `Function_oklch(oklch) => render_function_oklch(~loc, oklch)
+  | `Function_color(color) => render_function_color(~loc, color)
+  | `Function_light_dark(light, (), dark) =>
+    id(
+      [%expr
+       `lightDark((
+         [%e render_color(~loc, light)],
+         [%e render_color(~loc, dark)],
+       ))
+      ],
+    )
   /* Function_hsl(a) with `Hsl(a)_1 aren't supported */
   | `Function_hsl(_)
   | `Function_hsla(_)

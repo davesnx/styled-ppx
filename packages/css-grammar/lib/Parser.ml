@@ -559,6 +559,13 @@ and color =
   | `Function_rgba of function_rgba
   | `Function_hsl of function_hsl
   | `Function_hsla of function_hsla
+  | `Function_hwb of function_hwb
+  | `Function_lab of function_lab
+  | `Function_lch of function_lch
+  | `Function_oklab of function_oklab
+  | `Function_oklch of function_oklch
+  | `Function_color of function_color
+  | `Function_light_dark of function_light_dark
   | `Hex_color of string
   | `Named_color of named_color
   | `CurrentColor
@@ -1009,6 +1016,9 @@ and function_hsla =
     * alpha_value option
   ]
 
+and function_hwb =
+  hue * extended_percentage * extended_percentage * (unit * alpha_value) option
+
 and function_hue_rotate = extended_angle
 and function_image = image_tags option * image_src option * unit * color option
 and function_image_set = image_set_option list
@@ -1022,6 +1032,33 @@ and function_inset =
 
 and function_invert = number_percentage
 and function_leader = leader_type
+
+and function_lab =
+  extended_percentage * float * float * (unit * alpha_value) option
+
+and function_lch =
+  extended_percentage * float * hue * (unit * alpha_value) option
+
+and function_light_dark = color * unit * color
+
+and predefined_color_space =
+  [ `Srgb
+  | `Srgb_linear
+  | `Display_p3
+  | `A98_rgb
+  | `Prophoto_rgb
+  | `Rec2020
+  | `Xyz
+  | `Xyz_d50
+  | `Xyz_d65
+  ]
+
+and function_color =
+  predefined_color_space
+  * number_percentage
+  * number_percentage
+  * number_percentage
+  * (unit * alpha_value) option
 
 and function_linear_gradient =
   [ `Static_0 of extended_angle * unit
@@ -1050,6 +1087,12 @@ and function_minmax =
     | `Max_content
     | `Auto
     ]
+
+and function_oklab =
+  extended_percentage * float * float * (unit * alpha_value) option
+
+and function_oklch =
+  extended_percentage * float * hue * (unit * alpha_value) option
 
 and function_opacity = number_percentage
 and function_paint = string * unit * unit option
@@ -6265,9 +6308,10 @@ let clip_source : clip_source Rule.rule = [%spec "<url>"]
 
 let color : color Rule.rule =
   [%spec
-    "<rgb()> | <rgba()> | <hsl()> | <hsla()> | <hex-color> | <named-color> | \
-     'currentColor' | <deprecated-system-color> | <interpolation> | <var()> | \
-     <color-mix()>"]
+    "<rgb()> | <rgba()> | <hsl()> | <hsla()> | <hwb()> | <lab()> | <lch()> | \
+     <oklab()> | <oklch()> | <color()> | <light-dark()> | <hex-color> | \
+     <named-color> | 'currentColor' | <deprecated-system-color> | \
+     <interpolation> | <var()> | <color-mix()>"]
 
 let color_stop : color_stop Rule.rule =
   [%spec "<color-stop-length> | <color-stop-angle>"]
@@ -6573,6 +6617,11 @@ let function_hsla : function_hsla Rule.rule =
      <alpha-value> ]? ) | hsla( <hue> ',' <extended-percentage> ',' \
      <extended-percentage> ',' [ <alpha-value> ]? )"]
 
+let function_hwb : function_hwb Rule.rule =
+  [%spec
+    "hwb( <hue> <extended-percentage> <extended-percentage> [ '/' \
+     <alpha-value> ]? )"]
+
 let function_hue_rotate : function_hue_rotate Rule.rule =
   [%spec "hue-rotate( <extended-angle> )"]
 
@@ -6592,6 +6641,26 @@ let function_invert : function_invert Rule.rule =
 
 let function_leader : function_leader Rule.rule =
   [%spec "leader( <leader-type> )"]
+
+let function_lab : function_lab Rule.rule =
+  [%spec
+    "lab( <extended-percentage> <number> <number> [ '/' <alpha-value> ]? )"]
+
+let function_lch : function_lch Rule.rule =
+  [%spec "lch( <extended-percentage> <number> <hue> [ '/' <alpha-value> ]? )"]
+
+let function_light_dark : function_light_dark Rule.rule =
+  [%spec "light-dark( <color> ',' <color> )"]
+
+let predefined_color_space : predefined_color_space Rule.rule =
+  [%spec
+    " 'srgb' | 'srgb-linear' | 'display-p3' | 'a98-rgb' | 'prophoto-rgb' | \
+     'rec2020' | 'xyz' | 'xyz-d50' | 'xyz-d65' "]
+
+let function_color : function_color Rule.rule =
+  [%spec
+    "color( <predefined-color-space> <number-percentage> <number-percentage> \
+     <number-percentage> [ '/' <alpha-value> ]? )"]
 
 let function_linear_gradient : function_linear_gradient Rule.rule =
   [%spec
@@ -6614,6 +6683,13 @@ let function_minmax : function_minmax Rule.rule =
     "minmax( [ <extended-length> | <extended-percentage> | 'min-content' | \
      'max-content' | 'auto' ] ',' [ <extended-length> | <extended-percentage> \
      | <flex-value> | 'min-content' | 'max-content' | 'auto' ] )"]
+
+let function_oklab : function_oklab Rule.rule =
+  [%spec
+    "oklab( <extended-percentage> <number> <number> [ '/' <alpha-value> ]? )"]
+
+let function_oklch : function_oklch Rule.rule =
+  [%spec "oklch( <extended-percentage> <number> <hue> [ '/' <alpha-value> ]? )"]
 
 let function_opacity : function_opacity Rule.rule =
   [%spec "opacity( <number-percentage> )"]
@@ -10468,6 +10544,13 @@ let registry : (kind * packed_rule) list =
     ( Function "var()",
       pack_rule function_var ~runtime_module_path:[%module_path Css_types.Var]
         () );
+    Function "hwb()", pack_rule function_hwb ();
+    Function "lab()", pack_rule function_lab ();
+    Function "lch()", pack_rule function_lch ();
+    Function "oklab()", pack_rule function_oklab ();
+    Function "oklch()", pack_rule function_oklch ();
+    Function "color()", pack_rule function_color ();
+    Function "light-dark()", pack_rule function_light_dark ();
     Function "color-mix()", pack_rule function_color_mix ();
     (* CSS Calc internal types *)
     ( Value "calc-product",
@@ -10687,6 +10770,7 @@ let registry : (kind * packed_rule) list =
     ( Value "polar-color-space",
       pack_rule polar_color_space
         ~runtime_module_path:[%module_path Css_types.PolarColorSpace] () );
+    Value "predefined-color-space", pack_rule predefined_color_space ();
     ( Value "quote",
       pack_rule quote ~runtime_module_path:[%module_path Css_types.Quote] () );
     ( Value "rectangular-color-space",
