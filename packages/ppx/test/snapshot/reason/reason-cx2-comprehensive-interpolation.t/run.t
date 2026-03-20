@@ -17,7 +17,7 @@ Comprehensive test for cx2 interpolation with various property types
   let test2 =
     CSS.make(
       "css-1h6gv7y css-1ojdfmn css-6oe920 css-kxyw4",
-      [("--var-yq31wd", CSS.Types.Length.toString(lengthVar))],
+      [("--var-yq31wd", CSS.Types.Margin.toString(lengthVar))],
     );
   let test3 =
     CSS.make(
@@ -57,7 +57,7 @@ Comprehensive test for cx2 interpolation with various property types
   let test9 =
     CSS.make(
       "css-1rsi5sr css-g6afgo",
-      [("--var-wag9af", CSS.Types.Length.toString(borderWidthVar))],
+      [("--var-wag9af", CSS.Types.LineWidth.toString(borderWidthVar))],
     );
   let spacingVar = CSS.px(2);
   let test10 =
