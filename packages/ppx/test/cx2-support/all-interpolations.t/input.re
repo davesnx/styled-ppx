@@ -28,15 +28,15 @@ let _fonts = [|`custom("Inter"), `sansSerif|];
 /* =============================================================================
    CSS ANIMATIONS
    ============================================================================= */
-let _foo = [%keyframe2 {|0% { opacity: 0.0 } 100% { opacity: 1.0 }|}];
-let _bar = [%keyframe2 {|0% { opacity: 0.0 } 100% { opacity: 1.0 }|}];
+let foo = [%keyframe2 {|0% { opacity: 0.0 } 100% { opacity: 1.0 }|}];
+let bar = [%keyframe2 {|0% { opacity: 0.0 } 100% { opacity: 1.0 }|}];
 
 /* Static */
 [%cx2 {|animation-name: random|}];
 [%cx2 {|animation-name: foo, bar|}];
-/* Interpolated - Note: keyframe interpolation with animation-name has type constraints */
-/* [%cx2 {|animation-name: $(foo)|}]; */
-/* [%cx2 {|animation-name: $(foo), $(bar)|}]; */
+/* Interpolated */
+[%cx2 {|animation-name: $(foo)|}];
+[%cx2 {|animation-name: $(foo), $(bar)|}];
 
 /* Static */
 [%cx2 {|animation-duration: 0s|}];

@@ -13,7 +13,7 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 0-26:
+  File "input.re", line 55, characters 24-34:
   Error: Property 'list-style-type' has an invalid value: ' 2style', Expected
          'function symbols' or 'none'. Did you mean 'function symbols'?
   [1]

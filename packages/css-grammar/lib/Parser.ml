@@ -5460,6 +5460,7 @@ and shadow =
   unit option
   * [ `Extended_length of extended_length | `Interpolation of string list ] list
   * [ `Color of color | `Interpolation of string list ] option
+  * unit option
 
 and shadow_t =
   [ `Extended_length of extended_length | `Interpolation of string list ] list
@@ -8695,7 +8696,8 @@ let property_animation_iteration_count :
 
 module Property_animation_name =
   [%spec_module
-  "[ <keyframes-name> | 'none' | <interpolation> ]#", (module Css_types.AnimationName)]
+  "[ <keyframes-name> | 'none' | <interpolation> ]#",
+  (module Css_types.AnimationName)]
 
 let property_animation_name : property_animation_name Rule.rule =
   Property_animation_name.rule
@@ -8781,7 +8783,9 @@ module Property_background_clip =
 let property_background_clip : property_background_clip Rule.rule =
   Property_background_clip.rule
 
-module Property_background_color = [%spec_module "<color>", (module Css_types.Color)]
+module Property_background_color =
+  [%spec_module
+  "<color>", (module Css_types.Color)]
 
 let property_background_color : property_background_color Rule.rule =
   Property_background_color.rule
@@ -8860,7 +8864,9 @@ module Property_block_overflow =
 let property_block_overflow : property_block_overflow Rule.rule =
   Property_block_overflow.rule
 
-module Property_block_size = [%spec_module "<'width'>", (module Css_types.Length)]
+module Property_block_size =
+  [%spec_module
+  "<'width'>", (module Css_types.Length)]
 
 let property_block_size : property_block_size Rule.rule =
   Property_block_size.rule
@@ -8870,7 +8876,8 @@ module Property_border =
   "'none' | [ <line-width> | <interpolation> ] | [ <line-width> | \
    <interpolation> ] [ <line-style> | <interpolation> ] | [ <line-width> | \
    <interpolation> ] [ <line-style> | <interpolation> ] [ <color> | \
-   <interpolation> ]", (module Css_types.Border)]
+   <interpolation> ]",
+  (module Css_types.Border)]
 
 let property_border : property_border Rule.rule = Property_border.rule
 
@@ -8971,14 +8978,17 @@ module Property_border_bottom =
 let property_border_bottom : property_border_bottom Rule.rule =
   Property_border_bottom.rule
 
-module Property_border_bottom_color = [%spec_module "<'border-top-color'>", (module Css_types.Color)]
+module Property_border_bottom_color =
+  [%spec_module
+  "<'border-top-color'>", (module Css_types.Color)]
 
 let property_border_bottom_color : property_border_bottom_color Rule.rule =
   Property_border_bottom_color.rule
 
 module Property_border_bottom_left_radius =
   [%spec_module
-  "[ <extended-length> | <extended-percentage> ]{1,2}", (module Css_types.LengthPercentage)]
+  "[ <extended-length> | <extended-percentage> ]{1,2}",
+  (module Css_types.LengthPercentage)]
 
 let property_border_bottom_left_radius :
   property_border_bottom_left_radius Rule.rule =
@@ -8986,18 +8996,23 @@ let property_border_bottom_left_radius :
 
 module Property_border_bottom_right_radius =
   [%spec_module
-  "[ <extended-length> | <extended-percentage> ]{1,2}", (module Css_types.LengthPercentage)]
+  "[ <extended-length> | <extended-percentage> ]{1,2}",
+  (module Css_types.LengthPercentage)]
 
 let property_border_bottom_right_radius :
   property_border_bottom_right_radius Rule.rule =
   Property_border_bottom_right_radius.rule
 
-module Property_border_bottom_style = [%spec_module "<line-style>", (module Css_types.BorderStyle)]
+module Property_border_bottom_style =
+  [%spec_module
+  "<line-style>", (module Css_types.BorderStyle)]
 
 let property_border_bottom_style : property_border_bottom_style Rule.rule =
   Property_border_bottom_style.rule
 
-module Property_border_bottom_width = [%spec_module "<line-width>", (module Css_types.LineWidth)]
+module Property_border_bottom_width =
+  [%spec_module
+  "<line-width>", (module Css_types.LineWidth)]
 
 let property_border_bottom_width : property_border_bottom_width Rule.rule =
   Property_border_bottom_width.rule
@@ -9009,21 +9024,25 @@ module Property_border_collapse =
 let property_border_collapse : property_border_collapse Rule.rule =
   Property_border_collapse.rule
 
-module Property_border_color = [%spec_module "[ <color> ]{1,4}", (module Css_types.Color)]
+module Property_border_color =
+  [%spec_module
+  "[ <color> ]{1,4}", (module Css_types.Color)]
 
 let property_border_color : property_border_color Rule.rule =
   Property_border_color.rule
 
 module Property_border_end_end_radius =
   [%spec_module
-  "[ <extended-length> | <extended-percentage> ]{1,2}", (module Css_types.LengthPercentage)]
+  "[ <extended-length> | <extended-percentage> ]{1,2}",
+  (module Css_types.LengthPercentage)]
 
 let property_border_end_end_radius : property_border_end_end_radius Rule.rule =
   Property_border_end_end_radius.rule
 
 module Property_border_end_start_radius =
   [%spec_module
-  "[ <extended-length> | <extended-percentage> ]{1,2}", (module Css_types.LengthPercentage)]
+  "[ <extended-length> | <extended-percentage> ]{1,2}",
+  (module Css_types.LengthPercentage)]
 
 let property_border_end_start_radius :
   property_border_end_start_radius Rule.rule =
@@ -9174,17 +9193,23 @@ module Property_border_left =
 let property_border_left : property_border_left Rule.rule =
   Property_border_left.rule
 
-module Property_border_left_color = [%spec_module "<color>", (module Css_types.Color)]
+module Property_border_left_color =
+  [%spec_module
+  "<color>", (module Css_types.Color)]
 
 let property_border_left_color : property_border_left_color Rule.rule =
   Property_border_left_color.rule
 
-module Property_border_left_style = [%spec_module "<line-style>", (module Css_types.BorderStyle)]
+module Property_border_left_style =
+  [%spec_module
+  "<line-style>", (module Css_types.BorderStyle)]
 
 let property_border_left_style : property_border_left_style Rule.rule =
   Property_border_left_style.rule
 
-module Property_border_left_width = [%spec_module "<line-width>", (module Css_types.LineWidth)]
+module Property_border_left_width =
+  [%spec_module
+  "<line-width>", (module Css_types.LineWidth)]
 
 let property_border_left_width : property_border_left_width Rule.rule =
   Property_border_left_width.rule
@@ -9204,17 +9229,23 @@ module Property_border_right =
 let property_border_right : property_border_right Rule.rule =
   Property_border_right.rule
 
-module Property_border_right_color = [%spec_module "<color>", (module Css_types.Color)]
+module Property_border_right_color =
+  [%spec_module
+  "<color>", (module Css_types.Color)]
 
 let property_border_right_color : property_border_right_color Rule.rule =
   Property_border_right_color.rule
 
-module Property_border_right_style = [%spec_module "<line-style>", (module Css_types.BorderStyle)]
+module Property_border_right_style =
+  [%spec_module
+  "<line-style>", (module Css_types.BorderStyle)]
 
 let property_border_right_style : property_border_right_style Rule.rule =
   Property_border_right_style.rule
 
-module Property_border_right_width = [%spec_module "<line-width>", (module Css_types.LineWidth)]
+module Property_border_right_width =
+  [%spec_module
+  "<line-width>", (module Css_types.LineWidth)]
 
 let property_border_right_width : property_border_right_width Rule.rule =
   Property_border_right_width.rule
@@ -9228,7 +9259,8 @@ let property_border_spacing : property_border_spacing Rule.rule =
 
 module Property_border_start_end_radius =
   [%spec_module
-  "[ <extended-length> | <extended-percentage> ]{1,2}", (module Css_types.LengthPercentage)]
+  "[ <extended-length> | <extended-percentage> ]{1,2}",
+  (module Css_types.LengthPercentage)]
 
 let property_border_start_end_radius :
   property_border_start_end_radius Rule.rule =
@@ -9236,7 +9268,8 @@ let property_border_start_end_radius :
 
 module Property_border_start_start_radius =
   [%spec_module
-  "[ <extended-length> | <extended-percentage> ]{1,2}", (module Css_types.LengthPercentage)]
+  "[ <extended-length> | <extended-percentage> ]{1,2}",
+  (module Css_types.LengthPercentage)]
 
 let property_border_start_start_radius :
   property_border_start_start_radius Rule.rule =
@@ -9257,14 +9290,17 @@ module Property_border_top =
 let property_border_top : property_border_top Rule.rule =
   Property_border_top.rule
 
-module Property_border_top_color = [%spec_module "<color>", (module Css_types.Color)]
+module Property_border_top_color =
+  [%spec_module
+  "<color>", (module Css_types.Color)]
 
 let property_border_top_color : property_border_top_color Rule.rule =
   Property_border_top_color.rule
 
 module Property_border_top_left_radius =
   [%spec_module
-  "[ <extended-length> | <extended-percentage> ]{1,2}", (module Css_types.LengthPercentage)]
+  "[ <extended-length> | <extended-percentage> ]{1,2}",
+  (module Css_types.LengthPercentage)]
 
 let property_border_top_left_radius : property_border_top_left_radius Rule.rule
     =
@@ -9272,23 +9308,30 @@ let property_border_top_left_radius : property_border_top_left_radius Rule.rule
 
 module Property_border_top_right_radius =
   [%spec_module
-  "[ <extended-length> | <extended-percentage> ]{1,2}", (module Css_types.LengthPercentage)]
+  "[ <extended-length> | <extended-percentage> ]{1,2}",
+  (module Css_types.LengthPercentage)]
 
 let property_border_top_right_radius :
   property_border_top_right_radius Rule.rule =
   Property_border_top_right_radius.rule
 
-module Property_border_top_style = [%spec_module "<line-style>", (module Css_types.BorderStyle)]
+module Property_border_top_style =
+  [%spec_module
+  "<line-style>", (module Css_types.BorderStyle)]
 
 let property_border_top_style : property_border_top_style Rule.rule =
   Property_border_top_style.rule
 
-module Property_border_top_width = [%spec_module "<line-width>", (module Css_types.LineWidth)]
+module Property_border_top_width =
+  [%spec_module
+  "<line-width>", (module Css_types.LineWidth)]
 
 let property_border_top_width : property_border_top_width Rule.rule =
   Property_border_top_width.rule
 
-module Property_border_width = [%spec_module "[ <line-width> ]{1,4}", (module Css_types.LineWidth)]
+module Property_border_width =
+  [%spec_module
+  "[ <line-width> ]{1,4}", (module Css_types.LineWidth)]
 
 let property_border_width : property_border_width Rule.rule =
   Property_border_width.rule
@@ -10232,7 +10275,9 @@ module Property_initial_letter_align =
 let property_initial_letter_align : property_initial_letter_align Rule.rule =
   Property_initial_letter_align.rule
 
-module Property_inline_size = [%spec_module "<'width'>", (module Css_types.Length)]
+module Property_inline_size =
+  [%spec_module
+  "<'width'>", (module Css_types.Length)]
 
 let property_inline_size : property_inline_size Rule.rule =
   Property_inline_size.rule
@@ -10250,12 +10295,16 @@ module Property_inset_block =
 let property_inset_block : property_inset_block Rule.rule =
   Property_inset_block.rule
 
-module Property_inset_block_end = [%spec_module "<'top'>", (module Css_types.Length)]
+module Property_inset_block_end =
+  [%spec_module
+  "<'top'>", (module Css_types.Length)]
 
 let property_inset_block_end : property_inset_block_end Rule.rule =
   Property_inset_block_end.rule
 
-module Property_inset_block_start = [%spec_module "<'top'>", (module Css_types.Length)]
+module Property_inset_block_start =
+  [%spec_module
+  "<'top'>", (module Css_types.Length)]
 
 let property_inset_block_start : property_inset_block_start Rule.rule =
   Property_inset_block_start.rule
@@ -10267,12 +10316,16 @@ module Property_inset_inline =
 let property_inset_inline : property_inset_inline Rule.rule =
   Property_inset_inline.rule
 
-module Property_inset_inline_end = [%spec_module "<'top'>", (module Css_types.Length)]
+module Property_inset_inline_end =
+  [%spec_module
+  "<'top'>", (module Css_types.Length)]
 
 let property_inset_inline_end : property_inset_inline_end Rule.rule =
   Property_inset_inline_end.rule
 
-module Property_inset_inline_start = [%spec_module "<'top'>", (module Css_types.Length)]
+module Property_inset_inline_start =
+  [%spec_module
+  "<'top'>", (module Css_types.Length)]
 
 let property_inset_inline_start : property_inset_inline_start Rule.rule =
   Property_inset_inline_start.rule
@@ -10441,19 +10494,24 @@ module Property_margin_block =
 let property_margin_block : property_margin_block Rule.rule =
   Property_margin_block.rule
 
-module Property_margin_block_end = [%spec_module "<'margin-left'>", (module Css_types.Margin)]
+module Property_margin_block_end =
+  [%spec_module
+  "<'margin-left'>", (module Css_types.Margin)]
 
 let property_margin_block_end : property_margin_block_end Rule.rule =
   Property_margin_block_end.rule
 
-module Property_margin_block_start = [%spec_module "<'margin-left'>", (module Css_types.Margin)]
+module Property_margin_block_start =
+  [%spec_module
+  "<'margin-left'>", (module Css_types.Margin)]
 
 let property_margin_block_start : property_margin_block_start Rule.rule =
   Property_margin_block_start.rule
 
 module Property_margin_bottom =
   [%spec_module
-  "<extended-length> | <extended-percentage> | 'auto'", (module Css_types.Margin)]
+  "<extended-length> | <extended-percentage> | 'auto'",
+  (module Css_types.Margin)]
 
 let property_margin_bottom : property_margin_bottom Rule.rule =
   Property_margin_bottom.rule
@@ -10465,33 +10523,40 @@ module Property_margin_inline =
 let property_margin_inline : property_margin_inline Rule.rule =
   Property_margin_inline.rule
 
-module Property_margin_inline_end = [%spec_module "<'margin-left'>", (module Css_types.Margin)]
+module Property_margin_inline_end =
+  [%spec_module
+  "<'margin-left'>", (module Css_types.Margin)]
 
 let property_margin_inline_end : property_margin_inline_end Rule.rule =
   Property_margin_inline_end.rule
 
-module Property_margin_inline_start = [%spec_module "<'margin-left'>", (module Css_types.Margin)]
+module Property_margin_inline_start =
+  [%spec_module
+  "<'margin-left'>", (module Css_types.Margin)]
 
 let property_margin_inline_start : property_margin_inline_start Rule.rule =
   Property_margin_inline_start.rule
 
 module Property_margin_left =
   [%spec_module
-  "<extended-length> | <extended-percentage> | 'auto'", (module Css_types.Margin)]
+  "<extended-length> | <extended-percentage> | 'auto'",
+  (module Css_types.Margin)]
 
 let property_margin_left : property_margin_left Rule.rule =
   Property_margin_left.rule
 
 module Property_margin_right =
   [%spec_module
-  "<extended-length> | <extended-percentage> | 'auto'", (module Css_types.Margin)]
+  "<extended-length> | <extended-percentage> | 'auto'",
+  (module Css_types.Margin)]
 
 let property_margin_right : property_margin_right Rule.rule =
   Property_margin_right.rule
 
 module Property_margin_top =
   [%spec_module
-  "<extended-length> | <extended-percentage> | 'auto'", (module Css_types.Margin)]
+  "<extended-length> | <extended-percentage> | 'auto'",
+  (module Css_types.Margin)]
 
 let property_margin_top : property_margin_top Rule.rule =
   Property_margin_top.rule
@@ -10657,7 +10722,9 @@ module Property_masonry_auto_flow =
 let property_masonry_auto_flow : property_masonry_auto_flow Rule.rule =
   Property_masonry_auto_flow.rule
 
-module Property_max_block_size = [%spec_module "<'max-width'>", (module Css_types.Length)]
+module Property_max_block_size =
+  [%spec_module
+  "<'max-width'>", (module Css_types.Length)]
 
 let property_max_block_size : property_max_block_size Rule.rule =
   Property_max_block_size.rule
@@ -10672,7 +10739,9 @@ module Property_max_height =
 let property_max_height : property_max_height Rule.rule =
   Property_max_height.rule
 
-module Property_max_inline_size = [%spec_module "<'max-width'>", (module Css_types.Length)]
+module Property_max_inline_size =
+  [%spec_module
+  "<'max-width'>", (module Css_types.Length)]
 
 let property_max_inline_size : property_max_inline_size Rule.rule =
   Property_max_inline_size.rule
@@ -10692,7 +10761,9 @@ module Property_max_width =
 
 let property_max_width : property_max_width Rule.rule = Property_max_width.rule
 
-module Property_min_block_size = [%spec_module "<'min-width'>", (module Css_types.Length)]
+module Property_min_block_size =
+  [%spec_module
+  "<'min-width'>", (module Css_types.Length)]
 
 let property_min_block_size : property_min_block_size Rule.rule =
   Property_min_block_size.rule
@@ -10707,7 +10778,9 @@ module Property_min_height =
 let property_min_height : property_min_height Rule.rule =
   Property_min_height.rule
 
-module Property_min_inline_size = [%spec_module "<'min-width'>", (module Css_types.Length)]
+module Property_min_inline_size =
+  [%spec_module
+  "<'min-width'>", (module Css_types.Length)]
 
 let property_min_inline_size : property_min_inline_size Rule.rule =
   Property_min_inline_size.rule
@@ -10978,7 +11051,9 @@ module Property_offset_rotate =
 let property_offset_rotate : property_offset_rotate Rule.rule =
   Property_offset_rotate.rule
 
-module Property_opacity = [%spec_module "<alpha-value>", (module Css_types.Opacity)]
+module Property_opacity =
+  [%spec_module
+  "<alpha-value>", (module Css_types.Opacity)]
 
 let property_opacity : property_opacity Rule.rule = Property_opacity.rule
 
@@ -10998,12 +11073,16 @@ module Property_outline =
 
 let property_outline : property_outline Rule.rule = Property_outline.rule
 
-module Property_outline_color = [%spec_module "<color>", (module Css_types.Color)]
+module Property_outline_color =
+  [%spec_module
+  "<color>", (module Css_types.Color)]
 
 let property_outline_color : property_outline_color Rule.rule =
   Property_outline_color.rule
 
-module Property_outline_offset = [%spec_module "<extended-length>", (module Css_types.Length)]
+module Property_outline_offset =
+  [%spec_module
+  "<extended-length>", (module Css_types.Length)]
 
 let property_outline_offset : property_outline_offset Rule.rule =
   Property_outline_offset.rule
@@ -11015,7 +11094,9 @@ module Property_outline_style =
 let property_outline_style : property_outline_style Rule.rule =
   Property_outline_style.rule
 
-module Property_outline_width = [%spec_module "<line-width> | <interpolation>", (module Css_types.LineWidth)]
+module Property_outline_width =
+  [%spec_module
+  "<line-width> | <interpolation>", (module Css_types.LineWidth)]
 
 let property_outline_width : property_outline_width Rule.rule =
   Property_outline_width.rule
@@ -11067,14 +11148,16 @@ let property_overflow_wrap : property_overflow_wrap Rule.rule =
 
 module Property_overflow_x =
   [%spec_module
-  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>", (module Css_types.OverflowX)]
+  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>",
+  (module Css_types.OverflowX)]
 
 let property_overflow_x : property_overflow_x Rule.rule =
   Property_overflow_x.rule
 
 module Property_overflow_y =
   [%spec_module
-  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>", (module Css_types.OverflowY)]
+  "'visible' | 'hidden' | 'clip' | 'scroll' | 'auto' | <interpolation>",
+  (module Css_types.OverflowY)]
 
 let property_overflow_y : property_overflow_y Rule.rule =
   Property_overflow_y.rule
@@ -11130,12 +11213,16 @@ module Property_padding_block =
 let property_padding_block : property_padding_block Rule.rule =
   Property_padding_block.rule
 
-module Property_padding_block_end = [%spec_module "<'padding-left'>", (module Css_types.Length)]
+module Property_padding_block_end =
+  [%spec_module
+  "<'padding-left'>", (module Css_types.Length)]
 
 let property_padding_block_end : property_padding_block_end Rule.rule =
   Property_padding_block_end.rule
 
-module Property_padding_block_start = [%spec_module "<'padding-left'>", (module Css_types.Length)]
+module Property_padding_block_start =
+  [%spec_module
+  "<'padding-left'>", (module Css_types.Length)]
 
 let property_padding_block_start : property_padding_block_start Rule.rule =
   Property_padding_block_start.rule
@@ -11154,12 +11241,16 @@ module Property_padding_inline =
 let property_padding_inline : property_padding_inline Rule.rule =
   Property_padding_inline.rule
 
-module Property_padding_inline_end = [%spec_module "<'padding-left'>", (module Css_types.Length)]
+module Property_padding_inline_end =
+  [%spec_module
+  "<'padding-left'>", (module Css_types.Length)]
 
 let property_padding_inline_end : property_padding_inline_end Rule.rule =
   Property_padding_inline_end.rule
 
-module Property_padding_inline_start = [%spec_module "<'padding-left'>", (module Css_types.Length)]
+module Property_padding_inline_start =
+  [%spec_module
+  "<'padding-left'>", (module Css_types.Length)]
 
 let property_padding_inline_start : property_padding_inline_start Rule.rule =
   Property_padding_inline_start.rule
@@ -11396,19 +11487,25 @@ module Property_scroll_margin_block =
 let property_scroll_margin_block : property_scroll_margin_block Rule.rule =
   Property_scroll_margin_block.rule
 
-module Property_scroll_margin_block_end = [%spec_module "<extended-length>", (module Css_types.Length)]
+module Property_scroll_margin_block_end =
+  [%spec_module
+  "<extended-length>", (module Css_types.Length)]
 
 let property_scroll_margin_block_end :
   property_scroll_margin_block_end Rule.rule =
   Property_scroll_margin_block_end.rule
 
-module Property_scroll_margin_block_start = [%spec_module "<extended-length>", (module Css_types.Length)]
+module Property_scroll_margin_block_start =
+  [%spec_module
+  "<extended-length>", (module Css_types.Length)]
 
 let property_scroll_margin_block_start :
   property_scroll_margin_block_start Rule.rule =
   Property_scroll_margin_block_start.rule
 
-module Property_scroll_margin_bottom = [%spec_module "<extended-length>", (module Css_types.Length)]
+module Property_scroll_margin_bottom =
+  [%spec_module
+  "<extended-length>", (module Css_types.Length)]
 
 let property_scroll_margin_bottom : property_scroll_margin_bottom Rule.rule =
   Property_scroll_margin_bottom.rule
@@ -11420,29 +11517,39 @@ module Property_scroll_margin_inline =
 let property_scroll_margin_inline : property_scroll_margin_inline Rule.rule =
   Property_scroll_margin_inline.rule
 
-module Property_scroll_margin_inline_end = [%spec_module "<extended-length>", (module Css_types.Length)]
+module Property_scroll_margin_inline_end =
+  [%spec_module
+  "<extended-length>", (module Css_types.Length)]
 
 let property_scroll_margin_inline_end :
   property_scroll_margin_inline_end Rule.rule =
   Property_scroll_margin_inline_end.rule
 
-module Property_scroll_margin_inline_start = [%spec_module "<extended-length>", (module Css_types.Length)]
+module Property_scroll_margin_inline_start =
+  [%spec_module
+  "<extended-length>", (module Css_types.Length)]
 
 let property_scroll_margin_inline_start :
   property_scroll_margin_inline_start Rule.rule =
   Property_scroll_margin_inline_start.rule
 
-module Property_scroll_margin_left = [%spec_module "<extended-length>", (module Css_types.Length)]
+module Property_scroll_margin_left =
+  [%spec_module
+  "<extended-length>", (module Css_types.Length)]
 
 let property_scroll_margin_left : property_scroll_margin_left Rule.rule =
   Property_scroll_margin_left.rule
 
-module Property_scroll_margin_right = [%spec_module "<extended-length>", (module Css_types.Length)]
+module Property_scroll_margin_right =
+  [%spec_module
+  "<extended-length>", (module Css_types.Length)]
 
 let property_scroll_margin_right : property_scroll_margin_right Rule.rule =
   Property_scroll_margin_right.rule
 
-module Property_scroll_margin_top = [%spec_module "<extended-length>", (module Css_types.Length)]
+module Property_scroll_margin_top =
+  [%spec_module
+  "<extended-length>", (module Css_types.Length)]
 
 let property_scroll_margin_top : property_scroll_margin_top Rule.rule =
   Property_scroll_margin_top.rule
@@ -11457,14 +11564,16 @@ let property_scroll_padding : property_scroll_padding Rule.rule =
 
 module Property_scroll_padding_block =
   [%spec_module
-  "[ 'auto' | <extended-length> | <extended-percentage> ]{1,2}", (module Css_types.Length)]
+  "[ 'auto' | <extended-length> | <extended-percentage> ]{1,2}",
+  (module Css_types.Length)]
 
 let property_scroll_padding_block : property_scroll_padding_block Rule.rule =
   Property_scroll_padding_block.rule
 
 module Property_scroll_padding_block_end =
   [%spec_module
-  "'auto' | <extended-length> | <extended-percentage>", (module Css_types.Length)]
+  "'auto' | <extended-length> | <extended-percentage>",
+  (module Css_types.Length)]
 
 let property_scroll_padding_block_end :
   property_scroll_padding_block_end Rule.rule =
@@ -11472,7 +11581,8 @@ let property_scroll_padding_block_end :
 
 module Property_scroll_padding_block_start =
   [%spec_module
-  "'auto' | <extended-length> | <extended-percentage>", (module Css_types.Length)]
+  "'auto' | <extended-length> | <extended-percentage>",
+  (module Css_types.Length)]
 
 let property_scroll_padding_block_start :
   property_scroll_padding_block_start Rule.rule =
@@ -11480,21 +11590,24 @@ let property_scroll_padding_block_start :
 
 module Property_scroll_padding_bottom =
   [%spec_module
-  "'auto' | <extended-length> | <extended-percentage>", (module Css_types.Length)]
+  "'auto' | <extended-length> | <extended-percentage>",
+  (module Css_types.Length)]
 
 let property_scroll_padding_bottom : property_scroll_padding_bottom Rule.rule =
   Property_scroll_padding_bottom.rule
 
 module Property_scroll_padding_inline =
   [%spec_module
-  "[ 'auto' | <extended-length> | <extended-percentage> ]{1,2}", (module Css_types.Length)]
+  "[ 'auto' | <extended-length> | <extended-percentage> ]{1,2}",
+  (module Css_types.Length)]
 
 let property_scroll_padding_inline : property_scroll_padding_inline Rule.rule =
   Property_scroll_padding_inline.rule
 
 module Property_scroll_padding_inline_end =
   [%spec_module
-  "'auto' | <extended-length> | <extended-percentage>", (module Css_types.Length)]
+  "'auto' | <extended-length> | <extended-percentage>",
+  (module Css_types.Length)]
 
 let property_scroll_padding_inline_end :
   property_scroll_padding_inline_end Rule.rule =
@@ -11502,7 +11615,8 @@ let property_scroll_padding_inline_end :
 
 module Property_scroll_padding_inline_start =
   [%spec_module
-  "'auto' | <extended-length> | <extended-percentage>", (module Css_types.Length)]
+  "'auto' | <extended-length> | <extended-percentage>",
+  (module Css_types.Length)]
 
 let property_scroll_padding_inline_start :
   property_scroll_padding_inline_start Rule.rule =
@@ -11510,21 +11624,24 @@ let property_scroll_padding_inline_start :
 
 module Property_scroll_padding_left =
   [%spec_module
-  "'auto' | <extended-length> | <extended-percentage>", (module Css_types.Length)]
+  "'auto' | <extended-length> | <extended-percentage>",
+  (module Css_types.Length)]
 
 let property_scroll_padding_left : property_scroll_padding_left Rule.rule =
   Property_scroll_padding_left.rule
 
 module Property_scroll_padding_right =
   [%spec_module
-  "'auto' | <extended-length> | <extended-percentage>", (module Css_types.Length)]
+  "'auto' | <extended-length> | <extended-percentage>",
+  (module Css_types.Length)]
 
 let property_scroll_padding_right : property_scroll_padding_right Rule.rule =
   Property_scroll_padding_right.rule
 
 module Property_scroll_padding_top =
   [%spec_module
-  "'auto' | <extended-length> | <extended-percentage>", (module Css_types.Length)]
+  "'auto' | <extended-length> | <extended-percentage>",
+  (module Css_types.Length)]
 
 let property_scroll_padding_top : property_scroll_padding_top Rule.rule =
   Property_scroll_padding_top.rule
@@ -11884,7 +12001,9 @@ module Property_text_kashida_space =
 let property_text_kashida_space : property_text_kashida_space Rule.rule =
   Property_text_kashida_space.rule
 
-module Property_text_decoration_color = [%spec_module "<color>", (module Css_types.Color)]
+module Property_text_decoration_color =
+  [%spec_module
+  "<color>", (module Css_types.Color)]
 
 let property_text_decoration_color : property_text_decoration_color Rule.rule =
   Property_text_decoration_color.rule
@@ -11979,7 +12098,9 @@ module Property_text_emphasis =
 let property_text_emphasis : property_text_emphasis Rule.rule =
   Property_text_emphasis.rule
 
-module Property_text_emphasis_color = [%spec_module "<color>", (module Css_types.Color)]
+module Property_text_emphasis_color =
+  [%spec_module
+  "<color>", (module Css_types.Color)]
 
 let property_text_emphasis_color : property_text_emphasis_color Rule.rule =
   Property_text_emphasis_color.rule
@@ -12159,7 +12280,8 @@ let property_transition_duration : property_transition_duration Rule.rule =
 
 module Property_transition_property =
   [%spec_module
-  "[ <single-transition-property> ]# | 'none'", (module Css_types.TransitionProperty)]
+  "[ <single-transition-property> ]# | 'none'",
+  (module Css_types.TransitionProperty)]
 
 let property_transition_property : property_transition_property Rule.rule =
   Property_transition_property.rule
@@ -12833,7 +12955,9 @@ module Property_stop_color = [%spec_module "<color>", (module Css_types.Color)]
 let property_stop_color : property_stop_color Rule.rule =
   Property_stop_color.rule
 
-module Property_stop_opacity = [%spec_module "<alpha-value>", (module Css_types.Opacity)]
+module Property_stop_opacity =
+  [%spec_module
+  "<alpha-value>", (module Css_types.Opacity)]
 
 let property_stop_opacity : property_stop_opacity Rule.rule =
   Property_stop_opacity.rule
@@ -12843,12 +12967,16 @@ module Property_flood_color = [%spec_module "<color>", (module Css_types.Color)]
 let property_flood_color : property_flood_color Rule.rule =
   Property_flood_color.rule
 
-module Property_flood_opacity = [%spec_module "<alpha-value>", (module Css_types.Opacity)]
+module Property_flood_opacity =
+  [%spec_module
+  "<alpha-value>", (module Css_types.Opacity)]
 
 let property_flood_opacity : property_flood_opacity Rule.rule =
   Property_flood_opacity.rule
 
-module Property_lighting_color = [%spec_module "<color>", (module Css_types.Color)]
+module Property_lighting_color =
+  [%spec_module
+  "<color>", (module Css_types.Color)]
 
 let property_lighting_color : property_lighting_color Rule.rule =
   Property_lighting_color.rule
@@ -12869,31 +12997,44 @@ let property_vector_effect : property_vector_effect Rule.rule =
   Property_vector_effect.rule
 
 (* SVG geometry properties *)
-module Property_cx = [%spec_module "<extended-length> | <extended-percentage>", (module Css_types.LengthPercentage)]
+module Property_cx =
+  [%spec_module
+  "<extended-length> | <extended-percentage>",
+  (module Css_types.LengthPercentage)]
 
 let property_cx : property_cx Rule.rule = Property_cx.rule
 
-module Property_cy = [%spec_module "<extended-length> | <extended-percentage>", (module Css_types.LengthPercentage)]
+module Property_cy =
+  [%spec_module
+  "<extended-length> | <extended-percentage>",
+  (module Css_types.LengthPercentage)]
 
 let property_cy : property_cy Rule.rule = Property_cy.rule
 
-module Property_d = [%spec_module "'none' | <string>", (module Css_types.Cascading)]
+module Property_d =
+  [%spec_module
+  "'none' | <string>", (module Css_types.Cascading)]
 
 let property_d : property_d Rule.rule = Property_d.rule
 
-module Property_r = [%spec_module "<extended-length> | <extended-percentage>", (module Css_types.LengthPercentage)]
+module Property_r =
+  [%spec_module
+  "<extended-length> | <extended-percentage>",
+  (module Css_types.LengthPercentage)]
 
 let property_r : property_r Rule.rule = Property_r.rule
 
 module Property_rx =
   [%spec_module
-  "'auto' | <extended-length> | <extended-percentage>", (module Css_types.LengthPercentage)]
+  "'auto' | <extended-length> | <extended-percentage>",
+  (module Css_types.LengthPercentage)]
 
 let property_rx : property_rx Rule.rule = Property_rx.rule
 
 module Property_ry =
   [%spec_module
-  "'auto' | <extended-length> | <extended-percentage>", (module Css_types.LengthPercentage)]
+  "'auto' | <extended-length> | <extended-percentage>",
+  (module Css_types.LengthPercentage)]
 
 let property_ry : property_ry Rule.rule = Property_ry.rule
 
@@ -13122,7 +13263,7 @@ let self_position : self_position Rule.rule = Self_position.rule
 module Shadow =
   [%spec_module
   "[ 'inset' ]? [ <extended-length> | <interpolation> ]{2,4} [ <color> | \
-   <interpolation> ]?"]
+   <interpolation> ]? [ 'inset' ]?"]
 
 let shadow : shadow Rule.rule = Shadow.rule
 
@@ -13183,6 +13324,11 @@ module Single_animation =
 
 let single_animation : single_animation Rule.rule = Single_animation.rule
 
+(* Uses || (any order) per CSS spec. The or_ combinator's match_longest
+   tie-breaking assigns the FIRST input <time> to position 3 (last matching
+   rule) and the SECOND input <time> to position 1 (first matching rule).
+   This means: tuple position 1 = delay, tuple position 3 = duration.
+   See render_single_animation_no_interp in Property_to_runtime.re. *)
 module Single_animation_no_interp =
   [%spec_module
   "[ <keyframes-name> | 'none' ] || <extended-time-no-interp> || \

@@ -3687,7 +3687,8 @@ module Shadow = struct
   let box ?(x = `zero) ?(y = `zero) ?(blur = `zero) ?(spread = `zero)
     ?(inset = false) (color : Color.t) : box t =
     `shadow
-      (Length.toString x
+      ((if inset then {js|inset |js} else {js||js})
+      ^ Length.toString x
       ^ {js| |js}
       ^ Length.toString y
       ^ {js| |js}
@@ -3695,8 +3696,7 @@ module Shadow = struct
       ^ {js| |js}
       ^ Length.toString spread
       ^ {js| |js}
-      ^ Color.toString color
-      ^ if inset then {js| inset|js} else {js||js})
+      ^ Color.toString color)
 
   let text ?(x = `zero) ?(y = `zero) ?(blur = `zero) (color : Color.t) : text t
       =

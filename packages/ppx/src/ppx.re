@@ -33,9 +33,9 @@ let rec type_check_rule = (rule: Styled_ppx_css_parser.Ast.rule) => {
       when is_css_keyword(value) => [
       Ok(),
     ]
-  | Declaration({ name: (name, _), value: (value, _), loc, _ }) =>
+  | Declaration({ name: (name, _), value: (value, value_loc), loc: _, _ }) =>
     let value = Styled_ppx_css_parser.Render.component_value_list(value);
-    switch (Css_grammar.Parser.check_property(~loc, ~name, value)) {
+    switch (Css_grammar.Parser.check_property(~loc=value_loc, ~name, value)) {
     | Ok () => [Ok()]
     | Error((loc, `Invalid_value(raw_error))) =>
       let msg =
@@ -419,8 +419,13 @@ let () = {
                   | errors =>
                     let error_messages =
                       errors
-                      |> List.map(((loc, error)) => {
-                           (loc, error_to_string(error))
+                      |> List.map(((error_loc, error)) => {
+                           let adjusted_loc =
+                             Styled_ppx_css_parser.Parser_location.adjust_to_file(
+                               ~relative_loc=error_loc,
+                               ~base_loc=loc,
+                             );
+                           (adjusted_loc, error_to_string(error));
                          });
                     switch (error_messages) {
                     | [(loc, msg)] => Error.expr(~loc, msg)

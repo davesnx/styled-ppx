@@ -4,14 +4,6 @@ type error = list(string);
 type data('a) = result('a, error);
 type rule('a) = list(Tokens.token) => (data('a), list(Tokens.token));
 
-/* Interpolation tracking - used during parsing to record found interpolations with their types */
-module Interpolations = {
-  let store: ref(list((string, string))) = ref([]);
-  let reset = () => store := [];
-  let record = (name, type_path) => store := [(name, type_path), ...store^];
-  let get = () => List.rev(store^);
-};
-
 type return('a, 'b) = 'b => rule('a);
 type bind('a, 'b, 'c) = (rule('a), 'b => rule('c)) => rule('c);
 type map('a, 'b, 'c, 'd) = (rule('a), 'b => 'c) => rule('d);
@@ -189,16 +181,14 @@ let parse_string = (rule_parser, input) => {
 
 /*
    `interpolatable` wraps a rule to make it accept interpolations.
-   When an interpolation $(var) is encountered, it records (var, type_path)
-   and returns `Interpolation. Otherwise delegates to the inner rule and
-   wraps the result in `Value.
+   When an interpolation $(var) is encountered, it returns `Interpolation.
+   Otherwise delegates to the inner rule and wraps the result in `Value.
  */
-let interpolatable = (~type_path, inner_rule, tokens) => {
+let interpolatable = (~type_path as _, inner_rule, tokens) => {
   let interp_rule =
     Pattern.token(
       fun
       | Tokens.INTERPOLATION((name, _loc)) => {
-          Interpolations.record(name, type_path);
           Ok(`Interpolation(name));
         }
       | _ => Error(["Expected value."]),

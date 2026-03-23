@@ -49,3 +49,9 @@ let bar = [%keyframe2 {|0% { opacity: 0.0 } 100% { opacity: 1.0 }|}];
 [%cx2 {|animation: foo 1s 2s infinite linear alternate both|}];
 [%cx2 "animation: 4s ease-in 1s infinite reverse both paused"];
 [%cx2 "animation: a 300ms linear 400ms infinite reverse forwards running"];
+
+/* Shorthand with interpolated name — NOT supported.
+   Interpolation in animation shorthand is typed as Animation.Value.t (the whole
+   shorthand type), so you can't interpolate just AnimationName.t within it.
+   Use the longhand animation-name property for name interpolation instead. */
+/* [%cx2 {|animation: $(foo) 1s ease-in|}]; */

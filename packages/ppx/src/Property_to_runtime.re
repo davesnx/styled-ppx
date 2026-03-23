@@ -1450,7 +1450,13 @@ let render_length_interp = (~loc) =>
 let render_box_shadow = (~loc, shadow) => {
   let (color, x, y, blur, spread, inset) =
     switch (shadow) {
-    | (inset, position, color) =>
+    | (inset_before, position, color, inset_after) =>
+      let inset =
+        switch (inset_before, inset_after) {
+        | (Some () as i, _)
+        | (_, (Some () as i)) => i
+        | (None, None) => None
+        };
       let (x, y, blur, spread) =
         switch (position) {
         | [x, y] => (x, y, None, None)
@@ -4033,6 +4039,9 @@ let render_single_animation_no_interp =
       ~loc,
       (
         name,
+        /* The || combinator's match_longest tie-breaking assigns the first
+           input <time> to tuple position 3 and the second to position 1.
+           So position 1 holds delay and position 3 holds duration. */
         delay,
         timingFunction,
         duration,

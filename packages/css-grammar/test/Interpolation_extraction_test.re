@@ -53,7 +53,7 @@ let test_text_shadow_partial_interp = () => {
   );
 };
 
-/* Phase 0: Verify [%spec_module] extract_interpolations works at runtime */
+/* Phase 0: Verify [%spec_module] generated modules work at runtime */
 let test_spec_module_runtime_module_path_none = () => {
   Alcotest.(check(option(string)))(
     "spec_module without path has runtime_module_path = None",
@@ -187,7 +187,7 @@ let test_width_full_interp = () => {
   );
 };
 
-/* Test get_interpolation_types for properties that previously lacked runtime_module_path */
+/* Test get_interpolation_types for properties with derived runtime_module_path */
 let test_background_color_full_interp = () => {
   let result =
     Parser.get_interpolation_types(~name="background-color", "$(myBg)");

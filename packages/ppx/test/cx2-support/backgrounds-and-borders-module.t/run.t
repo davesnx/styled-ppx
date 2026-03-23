@@ -13,7 +13,7 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 0-22:
+  File "input.re", line 73, characters 22-30:
   Error: Property 'border-radius' has an invalid value: ' 2px 4px', Unexpected
          trailing input '4px'.
   [1]
