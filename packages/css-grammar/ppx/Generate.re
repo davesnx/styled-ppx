@@ -26,13 +26,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       ++ String.sub(name, 1, String.length(name) - 1);
     };
 
-  let kebab_case_to_pascal_case = name =>
-    name
-    |> String.split_on_char('-')
-    |> List.filter(s => String.length(s) > 0)
-    |> List.map(first_uppercase)
-    |> String.concat("");
-
   let is_function = str => {
     open String;
     let length = length(str);
@@ -435,67 +428,8 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     };
   };
 
-  let create_variant_name = (type_name, name) =>
-    type_name ++ "__make__" ++ name;
-
-  let txt = txt => {
-    Location.loc: Builder.loc,
-    txt,
-  };
-
   let construct = (~expr=None, name) =>
     pexp_construct(txt(Lident(name)), expr);
-
-  let is_function = str => {
-    open String;
-    let length = length(str);
-    length >= 2 && sub(str, length - 2, 2) == "()";
-  };
-
-  let function_value_name = function_name => "function-" ++ function_name;
-
-  let property_value_name = property_name =>
-    is_function(property_name)
-      ? function_value_name(property_name) : "property-" ++ property_name;
-
-  let value_of_delimiter =
-    fun
-    | "+" => "cross"
-    | "-" => "dash"
-    | "*" => "asterisk"
-    | "/" => "bar"
-    | "@" => "at"
-    | "," => "comma"
-    | ";" => ""
-    | ":" => "doubledot"
-    | "." => "dot"
-    | "(" => "openparen"
-    | ")" => "closeparen"
-    | "[" => "openbracket"
-    | "]" => "closebracket"
-    | "{" => "opencurly"
-    | "}" => "closecurly"
-    | "^" => "caret"
-    | "<" => "lessthan"
-    | "=" => "equal"
-    | ">" => "biggerthan"
-    | "|" => "vbar"
-    | "||" => "doublevbar"
-    | "~" => "tilde"
-    | "$" => "dollar"
-    | _ => "unknown";
-
-  let value_name_of_css = str => {
-    open String;
-    let str =
-      if (is_function(str)) {
-        let str = sub(str, 0, length(str) - 2);
-        function_value_name(str);
-      } else {
-        str;
-      };
-    kebab_case_to_snake_case(str);
-  };
 
   let apply_modifier = {
     let option_int_to_expr =
@@ -696,18 +630,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     | Group(value, multiplier) => group_op(value, multiplier)
     | Combinator(kind, values) => combinator_op(kind, values)
     | Function_call(name, value) => function_call(name, value)
-    };
-  };
-
-  /* Check if a spec contains explicit <interpolation> terminals */
-  let rec spec_contains_interpolation = (spec: Css_spec_parser.value): bool => {
-    switch (spec) {
-    | Terminal(Data_type("interpolation", _), _) => true
-    | Terminal(_, _) => false
-    | Group(inner, _) => spec_contains_interpolation(inner)
-    | Combinator(_, values) =>
-      List.exists(spec_contains_interpolation, values)
-    | Function_call(_, inner) => spec_contains_interpolation(inner)
     };
   };
 

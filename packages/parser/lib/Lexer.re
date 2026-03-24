@@ -485,10 +485,12 @@ let consume_ident_like = (~state, lexbuf) => {
         };
       let is_property_colon =
         check(lexbuf => {
+          /* CSS allows optional whitespace before the colon (e.g. `color : red`). */
+          skip_whitespace_and_comments(lexbuf);
           switch (Sedlexing.next(lexbuf)) {
-          | Some(c1) when Uchar.to_int(c1) == 58 => scan_colon_target(0, 0)
+          | Some(c) when Uchar.to_int(c) == 58 => scan_colon_target(0, 0)
           | _ => false
-          }
+          };
         });
       if (is_property_colon(lexbuf)) {
         state.last_was_ident = true;
@@ -891,7 +893,10 @@ let rec consume = (~state, lexbuf) => {
       | Declaration_block => state.mode = Selector
       | _ => ()
       }
-    | SEMI_COLON =>
+    | SEMI_COLON
+    | IMPORTANT =>
+      /* !important may terminate a declaration even when the trailing
+         semicolon is omitted, so switch back to declaration-block mode. */
       switch (state.mode) {
       | Declaration_value => state.mode = Declaration_block
       | _ => ()
@@ -961,7 +966,7 @@ let rec consume = (~state, lexbuf) => {
     | Toplevel
     | Declaration_block => consume(~state, lexbuf)
     };
-  | important => Ok(IMPORTANT)
+  | important => Ok(handle_mode_transition(IMPORTANT))
   | interpolation_start =>
     switch (state.mode) {
     | Toplevel
