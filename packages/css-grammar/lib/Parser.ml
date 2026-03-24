@@ -5456,15 +5456,8 @@ and self_position =
   | `Flex_end
   ]
 
-and shadow =
-  unit option
-  * [ `Extended_length of extended_length | `Interpolation of string list ] list
-  * [ `Color of color | `Interpolation of string list ] option
-  * unit option
-
-and shadow_t =
-  [ `Extended_length of extended_length | `Interpolation of string list ] list
-  * [ `Color of color | `Interpolation of string list ] option
+and shadow = unit option * extended_length list * color option
+and shadow_t = extended_length list * color option
 
 and shape =
   [ `Rect_0 of top * unit * right * unit * bottom * unit * left
@@ -6048,6 +6041,7 @@ type packed_rule =
       validate : string -> (unit, string) result;
       runtime_module_path : string option;
       extract_interpolations : string -> (string * string) list;
+      extract_interpolations_from_ast : Obj.t -> (string * string) list;
     }
       -> packed_rule
 
@@ -6069,6 +6063,17 @@ let detect_whole_value_interpolation ~runtime_module_path input =
     [ String.concat "." parts, type_path ]
   | Error _ -> []
 
+(* Helper for PPX-generated extraction code: look up a type in the registry
+   and call its extract_interpolations_from_ast with a type-erased AST value.
+   Used by generated extract_interpolations functions for non-primitive
+   Data_type references that may contain interpolation internally. *)
+let extract_from_registry_ast (type_name : string) (ast_obj : Obj.t) :
+  (string * string) list =
+  match Hashtbl.find_opt registry_tbl type_name with
+  | Some (_, Pack_rule { extract_interpolations_from_ast; _ }) ->
+    extract_interpolations_from_ast ast_obj
+  | None -> []
+
 let pack_rule (type a) (rule : a Rule.rule)
   ?(runtime_module_path : string option) () : packed_rule =
   let validate input =
@@ -6079,23 +6084,43 @@ let pack_rule (type a) (rule : a Rule.rule)
   let extract_interpolations =
     detect_whole_value_interpolation ~runtime_module_path
   in
-  Pack_rule { rule; validate; runtime_module_path; extract_interpolations }
+  let extract_interpolations_from_ast (_obj : Obj.t) : (string * string) list =
+    []
+  in
+  Pack_rule
+    {
+      rule;
+      validate;
+      runtime_module_path;
+      extract_interpolations;
+      extract_interpolations_from_ast;
+    }
 
 let pack_module (module M : RULE) : packed_rule =
   let validate input =
     match M.parse input with Ok _ -> Ok () | Error msg -> Error msg
   in
   let extract_interpolations input =
-    match M.parse input with
-    | Ok ast ->
-      let result = M.extract_interpolations ast in
-      if result <> [] then result
-      else
-        detect_whole_value_interpolation
-          ~runtime_module_path:M.runtime_module_path input
-    | Error _ ->
+    (* First: check for whole-value interpolation (e.g., "$(myWidth)").
+       Use the property/module's runtime_module_path for the type.
+       This ensures full-value interpolation returns the property type
+       (e.g., Css_types.Width) rather than a sub-type (e.g., Css_types.Percentage). *)
+    let whole =
       detect_whole_value_interpolation
         ~runtime_module_path:M.runtime_module_path input
+    in
+    if whole <> [] then whole
+    else (
+      (* Not a whole-value interpolation - parse and extract.
+         Delegation to sub-types via registry handles partial interpolation. *)
+      match M.parse input with
+      | Ok ast ->
+        let result = M.extract_interpolations ast in
+        if result <> [] then result else []
+      | Error _ -> [])
+  in
+  let extract_interpolations_from_ast (obj : Obj.t) : (string * string) list =
+    M.extract_interpolations (Obj.obj obj : M.t)
   in
   Pack_rule
     {
@@ -6103,6 +6128,7 @@ let pack_module (module M : RULE) : packed_rule =
       validate;
       runtime_module_path = M.runtime_module_path;
       extract_interpolations;
+      extract_interpolations_from_ast;
     }
 
 module Legacy_linear_gradient_arguments =
@@ -9790,7 +9816,7 @@ let property_font : property_font Rule.rule = Property_font.rule
 module Font_families =
   [%spec_module
   "[ <family-name> | <generic-family> | <interpolation> ]#",
-  (module Css_types.FontFamilies)]
+  (module Css_types.FontFamily)]
 
 let font_families : font_families Rule.rule = Font_families.rule
 
@@ -13262,15 +13288,13 @@ let self_position : self_position Rule.rule = Self_position.rule
 
 module Shadow =
   [%spec_module
-  "[ 'inset' ]? [ <extended-length> | <interpolation> ]{2,4} [ <color> | \
-   <interpolation> ]? [ 'inset' ]?"]
+  "[ 'inset' ]? [ <extended-length> ]{2,4} [ <color> ]?"]
 
 let shadow : shadow Rule.rule = Shadow.rule
 
 module Shadow_t =
   [%spec_module
-  "[ <extended-length> | <interpolation> ]{2,3} [ <color> | <interpolation> ]?",
-  (module Css_types.TextShadow)]
+  "[ <extended-length> ]{2,3} [ <color> ]?", (module Css_types.TextShadow)]
 
 let shadow_t : shadow_t Rule.rule = Shadow_t.rule
 
@@ -13431,7 +13455,7 @@ let single_transition : single_transition Rule.rule = Single_transition.rule
 module Single_transition_property =
   [%spec_module
   "<custom-ident> | <interpolation> | 'all'",
-  (module Css_types.SingleTransitionProperty)]
+  (module Css_types.TransitionProperty)]
 
 let single_transition_property : single_transition_property Rule.rule =
   Single_transition_property.rule
@@ -13622,7 +13646,7 @@ module Timing_function =
   [%spec_module
   "'linear' | <cubic-bezier-timing-function> | <step-timing-function> | \
    <interpolation>",
-  (module Css_types.TimingFunction)]
+  (module Css_types.TransitionTimingFunction)]
 
 let timing_function : timing_function Rule.rule = Timing_function.rule
 
@@ -13717,7 +13741,7 @@ let transform_list : transform_list Rule.rule = Transform_list.rule
 module Transition_behavior_value =
   [%spec_module
   "'normal' | 'allow-discrete' | <interpolation>",
-  (module Css_types.TransitionBehaviorValue)]
+  (module Css_types.TransitionBehavior)]
 
 let transition_behavior_value : transition_behavior_value Rule.rule =
   Transition_behavior_value.rule

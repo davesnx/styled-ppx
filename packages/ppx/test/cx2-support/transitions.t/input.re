@@ -41,7 +41,6 @@
 
 // Interpolation
 let property = CSS.Types.TransitionProperty.make("margin-right");
-let property2 = CSS.Types.TransitionProperty.all;
 let timingFunction = `easeOut;
 let duration = `ms(200);
 let delay = `s(3);

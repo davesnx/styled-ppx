@@ -699,7 +699,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     };
   };
 
-  /* Check if a spec contains interpolation */
+  /* Check if a spec contains explicit <interpolation> terminals */
   let rec spec_contains_interpolation = (spec: Css_spec_parser.value): bool => {
     switch (spec) {
     | Terminal(Data_type("interpolation", _), _) => true
@@ -796,6 +796,40 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     };
   };
 
+  /* Check if a spec may contain interpolation - either explicit <interpolation>
+     or non-primitive/non-standard Data_type references that may internally
+     accept interpolation (e.g., <color>, <shadow>, <extended-length>). */
+  let rec spec_may_contain_interpolation =
+          (spec: Css_spec_parser.value): bool => {
+    switch (spec) {
+    | Terminal(Data_type("interpolation", _), _) => true
+    | Terminal(Data_type(name, _), _) =>
+      !is_primitive_type(name) && !is_standard_spec(name)
+    | Terminal(_, _) => false
+    | Group(inner, _) => spec_may_contain_interpolation(inner)
+    | Combinator(_, values) =>
+      List.exists(spec_may_contain_interpolation, values)
+    | Function_call(_, inner) => spec_may_contain_interpolation(inner)
+    };
+  };
+
+  /* Map CSS type names to their extraction module names.
+     Strips the "extended-" prefix from types that don't have their own Css_types
+     module but whose base types do. E.g., extended-length -> length -> Css_types.Length.
+     This is generic: any new extended-* type in Css_value_types.re is handled
+     automatically, and make_module_path_expr provides compile-time verification
+     that the resulting Css_types module exists. */
+  let type_name_for_extraction = (name: string): string => {
+    let prefix = "extended-";
+    let prefix_len = String.length(prefix);
+    let name_len = String.length(name);
+    if (name_len > prefix_len && String.sub(name, 0, prefix_len) == prefix) {
+      String.sub(name, prefix_len, name_len - prefix_len);
+    } else {
+      name;
+    };
+  };
+
   /* Helper to extract the type name from a spec for use in interpolation type tracking.
      Returns None for primitive types that don't have runtime modules. */
   let rec get_type_name_from_spec =
@@ -879,7 +913,37 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
           ]
         };
 
-      /* Other terminals - no interpolations */
+      /* Non-primitive, non-standard Data_type - delegate extraction to the
+         type's module via the registry. These types are defined as [%spec_module]
+         in Parser.ml and may contain interpolation internally.
+         Uses extract_from_registry_ast helper to look up the type's extraction
+         function and call it with a type-erased AST value. */
+      | Terminal(Data_type(name, _), modifier)
+          when !is_primitive_type(name) && !is_standard_spec(name) =>
+        let css_name = estring(name);
+        let generate_delegation = (inner_expr) => [%expr
+          extract_from_registry_ast([%e css_name], Obj.repr([%e inner_expr]))
+        ];
+        switch (modifier) {
+        | One => generate_delegation(var_expr)
+        | Optional =>
+          switch%expr ([%e var_expr]) {
+          | None => []
+          | Some(inner) => [%e generate_delegation(evar("inner"))]
+          }
+        | Zero_or_more
+        | One_or_more
+        | At_least_one
+        | Repeat(_)
+        | Repeat_by_comma(_, _) => [%expr
+            List.concat_map(
+              item => [%e generate_delegation(evar("item"))],
+              [%e var_expr],
+            )
+          ]
+        };
+
+      /* Other terminals (keywords, delims, primitives) - no interpolations */
       | Terminal(_, _) => [%expr []]
 
       /* Groups - recurse with same context */
@@ -935,7 +999,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         /* Use type-safe module path for sibling-derived types */
         let effective_context_expr =
           switch (sibling_type) {
-          | Some(t) => make_module_path_expr(t)
+          | Some(t) => make_module_path_expr(type_name_for_extraction(t))
           | None => type_context_expr
           };
 
@@ -947,14 +1011,21 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
                 | Terminal(Keyword(_), _) => false
                 | _ => true
                 };
-              if (has_content && spec_contains_interpolation(inner_spec)) {
-                /* For direct interpolation terminals, use the property's runtime_module_path
-                   (type_context_expr) instead of the sibling-derived type. This ensures that
-                   complete interpolations like $(x) use the property type (BoxShadow)
-                   rather than the sibling value type (Shadow). */
+              if (has_content && spec_may_contain_interpolation(inner_spec)) {
+                /* For direct <interpolation> terminals, prefer runtime_module_path
+                   when available — it represents the module's own type (e.g.,
+                   Css_types.Color for a Color module). Fall back to sibling type
+                   when there's no runtime_module_path.
+                   Whole-value interpolation at property level (e.g., $(x) for
+                   the entire box-shadow) is handled by pack_module before
+                   reaching AST extraction. */
                 let context_for_this_spec =
                   switch (inner_spec) {
-                  | Terminal(Data_type("interpolation", _), _) => type_context_expr
+                  | Terminal(Data_type("interpolation", _), _) =>
+                    switch (runtime_module_path) {
+                    | Some(_) => type_context_expr
+                    | None => effective_context_expr
+                    }
                   | _ => effective_context_expr
                   };
                 case(
@@ -989,12 +1060,12 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         let extractions =
           List.mapi(
             (i, inner_spec) =>
-              if (spec_contains_interpolation(inner_spec)) {
+              if (spec_may_contain_interpolation(inner_spec)) {
                 let var_name = "v" ++ string_of_int(i);
                 /* Try to get type from this position's spec - use type-safe version */
                 let pos_type_expr =
                   switch (get_type_name_from_spec(inner_spec)) {
-                  | Some(t) => make_module_path_expr(t)
+                  | Some(t) => make_module_path_expr(type_name_for_extraction(t))
                   | None => type_context_expr
                   };
                 generate_typed_extraction(
@@ -1028,12 +1099,12 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         let extractions =
           List.mapi(
             (i, inner_spec) =>
-              if (spec_contains_interpolation(inner_spec)) {
+              if (spec_may_contain_interpolation(inner_spec)) {
                 let var_name = "v" ++ string_of_int(i);
                 /* Use type-safe module path */
                 let pos_type_expr =
                   switch (get_type_name_from_spec(inner_spec)) {
-                  | Some(t) => make_module_path_expr(t)
+                  | Some(t) => make_module_path_expr(type_name_for_extraction(t))
                   | None => type_context_expr
                   };
                 switch%expr ([%e evar(var_name)]) {
@@ -1073,9 +1144,11 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       };
     };
 
-    /* Generate the function body */
+    /* Generate the function body.
+       Use spec_may_contain_interpolation to also handle types that
+       internally accept interpolation via registry delegation. */
     let body =
-      if (spec_contains_interpolation(spec)) {
+      if (spec_may_contain_interpolation(spec)) {
         generate_typed_extraction(
           spec,
           evar("value"),

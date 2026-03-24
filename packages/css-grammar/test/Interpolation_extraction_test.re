@@ -2,15 +2,17 @@ module Parser = Css_grammar.Parser;
 
 let test_box_shadow_partial_interp = () => {
   /* Test box-shadow with partial interpolation in color position.
-     TODO: Partial interpolation extraction requires architectural changes
-     to walk the parsed AST and extract interpolation types from inner positions.
-     Currently only full-value interpolations are supported. */
-  let value = "0 1px 0 0 $(myColor)";
-  let result = Parser.get_interpolation_types(~name="box-shadow", value);
+     Extraction delegates through the registry to find interpolation types
+     from inner type positions (e.g., <color> inside <shadow>). */
+  let result =
+    Parser.get_interpolation_types(
+      ~name="box-shadow",
+      "0 1px 0 0 $(myColor)",
+    );
 
   Alcotest.(check(list(pair(string, string))))(
-    "partial interpolation returns empty (not yet supported)",
-    [],
+    "partial interpolation extracts color type",
+    [("myColor", "Css_types.Color")],
     result,
   );
 };
@@ -29,26 +31,28 @@ let test_box_shadow_full_interp = () => {
 
 let test_box_shadow_length_interp = () => {
   /* Test box-shadow with interpolation in length position.
-     TODO: Partial interpolation extraction not yet supported. */
+     Extraction delegates through the registry to find interpolation types
+     from inner type positions (e.g., <extended-length> inside <shadow>). */
   let value = "$(xOffset) 1px 0 0 red";
   let result = Parser.get_interpolation_types(~name="box-shadow", value);
 
   Alcotest.(check(list(pair(string, string))))(
-    "length interpolation returns empty (not yet supported)",
-    [],
+    "length interpolation extracts Length type",
+    [("xOffset", "Css_types.Length")],
     result,
   );
 };
 
 let test_text_shadow_partial_interp = () => {
-  /* Test text-shadow with partial interpolation.
-     TODO: Partial interpolation extraction not yet supported. */
+  /* Test text-shadow with partial interpolation in color position.
+     Extraction delegates through the registry to find interpolation types
+     from inner type positions (e.g., <color> inside <shadow-t>). */
   let value = "1px 1px 2px $(myColor)";
   let result = Parser.get_interpolation_types(~name="text-shadow", value);
 
   Alcotest.(check(list(pair(string, string))))(
-    "partial interpolation returns empty (not yet supported)",
-    [],
+    "partial interpolation extracts color type",
+    [("myColor", "Css_types.Color")],
     result,
   );
 };
@@ -82,18 +86,17 @@ let test_spec_module_parse = () => {
 
 let test_spec_module_extract_on_parsed = () => {
   /* For [%spec_module "<color>"], the spec is a single terminal data type.
-     The PPX-generated extract_interpolations only finds interpolations
-     explicitly in the SPEC, not inside referenced types like <color>.
-     The <color> type itself includes <interpolation> internally, but
-     that's opaque to the spec-level extractor.
-     This is handled by the hybrid approach in pack_module. */
+     With registry delegation, extract_interpolations can now find
+     interpolations inside referenced types like <color>.
+     The <color> type itself includes <interpolation> internally,
+     and delegation via registry extracts the type from it. */
   let result = Parser.Test_with_path.parse("$(myVar)");
   switch (result) {
   | Ok(ast) =>
     let interps = Parser.Test_with_path.extract_interpolations(ast);
     Alcotest.(check(list(pair(string, string))))(
-      "extract_interpolations returns empty for opaque type reference (expected)",
-      [],
+      "extract_interpolations finds interpolation via registry delegation",
+      [("myVar", "Css_types.Color")],
       interps,
     );
   | Error(msg) =>
@@ -170,7 +173,8 @@ let test_color_full_interp = () => {
 };
 
 let test_display_full_interp = () => {
-  let result = Parser.get_interpolation_types(~name="display", "$(myDisplay)");
+  let result =
+    Parser.get_interpolation_types(~name="display", "$(myDisplay)");
   Alcotest.(check(list(pair(string, string))))(
     "display full interp returns Css_types.Display",
     [("myDisplay", "Css_types.Display")],

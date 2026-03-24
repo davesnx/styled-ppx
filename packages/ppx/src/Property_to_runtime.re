@@ -1441,22 +1441,20 @@ let render_color_interp = (~loc) =>
   | `Interpolation(name) => render_variable(~loc, String.concat(".", name))
   | `Color(ls) => render_color(~loc, ls);
 
-let render_length_interp = (~loc) =>
+let _render_length_interp = (~loc) =>
   fun
   | `Extended_length(l) => render_extended_length(~loc, l)
   | `Interpolation(name) => render_variable(~loc, String.concat(".", name));
+
+/* Shadow rendering with simplified types - color and extended_length
+   positions no longer have Xor wrappers since interpolation is handled
+   internally by each type. */
 
 // css-backgrounds-3
 let render_box_shadow = (~loc, shadow) => {
   let (color, x, y, blur, spread, inset) =
     switch (shadow) {
-    | (inset_before, position, color, inset_after) =>
-      let inset =
-        switch (inset_before, inset_after) {
-        | (Some () as i, _)
-        | (_, (Some () as i)) => i
-        | (None, None) => None
-        };
+    | (inset, position, color) =>
       let (x, y, blur, spread) =
         switch (position) {
         | [x, y] => (x, y, None, None)
@@ -1469,13 +1467,13 @@ let render_box_shadow = (~loc, shadow) => {
 
   let color =
     color
-    |> Option.value(~default=`Color(`CurrentColor))
-    |> render_color_interp(~loc);
+    |> Option.value(~default=`CurrentColor)
+    |> render_color(~loc);
 
-  let x = render_length_interp(~loc, x);
-  let y = render_length_interp(~loc, y);
-  let blur = Option.map(render_length_interp(~loc), blur);
-  let spread = Option.map(render_length_interp(~loc), spread);
+  let x = render_extended_length(~loc, x);
+  let y = render_extended_length(~loc, y);
+  let blur = Option.map(render_extended_length(~loc), blur);
+  let spread = Option.map(render_extended_length(~loc), spread);
   let inset =
     Option.map(
       () =>
@@ -3112,14 +3110,14 @@ let render_text_shadow = (~loc, shadow) => {
 
   let args =
     Ppxlib.Asttypes.[
-      (Labelled("x"), Some(render_length_interp(~loc, x))),
-      (Labelled("y"), Some(render_length_interp(~loc, y))),
-      (Labelled("blur"), Option.map(render_length_interp(~loc), blur)),
+      (Labelled("x"), Some(render_extended_length(~loc, x))),
+      (Labelled("y"), Some(render_extended_length(~loc, y))),
+      (Labelled("blur"), Option.map(render_extended_length(~loc), blur)),
       (
         Nolabel,
         Some(
           color
-          |> Option.map(render_color_interp(~loc))
+          |> Option.map(render_color(~loc))
           |> Option.value(~default=[%expr `Color(`CurrentColor)]),
         ),
       ),
