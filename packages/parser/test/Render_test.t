@@ -216,6 +216,59 @@ Declaration list descendant selector
   > EOF
   display:flex;svg path{fill:red;}
 
+Declaration list type selector pseudo
+  $ cat << "EOF" | ./Render_test.exe
+  > body:hover main {
+  >   color: blue;
+  > }
+  > EOF
+  body:hover main{color:blue;}
+
+Declaration list missing semicolon before nested selector
+  $ cat << "EOF" | ./Render_test.exe
+  > background-color: red
+  > &:nth-child(2n) {
+  >   background-color: blue;
+  > }
+  > EOF
+  background-color:red;&:nth-child(2n){background-color:blue;}
+
+Declaration list missing semicolon before nested class selector
+  $ cat << "EOF" | ./Render_test.exe
+  > color: red
+  > .child {
+  >   color: blue;
+  > }
+  > EOF
+  color:red;.child{color:blue;}
+
+Declaration list missing semicolon before nested type selector
+  $ cat << "EOF" | ./Render_test.exe
+  > color: red
+  > div {
+  >   color: blue;
+  > }
+  > EOF
+  color:red;div{color:blue;}
+
+Declaration list missing semicolon before nested id selector
+  $ cat << "EOF" | ./Render_test.exe
+  > color: red
+  > #child {
+  >   color: blue;
+  > }
+  > EOF
+  color:red;#child{color:blue;}
+
+Declaration list missing semicolon before nested descendant selector
+  $ cat << "EOF" | ./Render_test.exe
+  > color: red
+  > svg path {
+  >   fill: blue;
+  > }
+  > EOF
+  color:red;svg path{fill:blue;}
+
 Nested descendant selector from declaration list
   $ cat << "EOF" | ./Render_test.exe
   > a {
@@ -236,6 +289,14 @@ Declaration after nested block
   > margin-top: 17px;
   > EOF
   margin-top:17px;@media print {.recharts-wrapper,.recharts-surface{width:100%;}}
+
+Declaration list missing semicolon before nested media query
+  $ cat << "EOF" | ./Render_test.exe
+  > margin-bottom: 24px @media (min-width: 1024px) {
+  >   width: 50%;
+  > }
+  > EOF
+  margin-bottom:24px;@media (min-width: 1024px) {width:50%;}
 
 Media query nested
   $ cat << "EOF" | ./Render_test.exe

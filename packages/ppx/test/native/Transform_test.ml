@@ -593,6 +593,83 @@ let descendant_selector_in_declaration_list () =
   check ~pos:__POS__ ".icon{display:flex;}.icon svg path{fill:red;}"
     (render list_of_rules)
 
+let missing_semicolon_before_nested_selector_in_declaration_list () =
+  let input =
+    {|
+    background-color: red
+    &:nth-child(2n) {
+      background-color: blue;
+    }
+    |}
+  in
+  let rule_list = parse input in
+  let list_of_rules = Transform.run ~className:"stack" rule_list in
+  check ~pos:__POS__
+    ".stack{background-color:red;}.stack:nth-child(2n){background-color:blue;}"
+    (render list_of_rules)
+
+let missing_semicolon_before_nested_class_selector_in_declaration_list () =
+  let input = {|
+    color: red
+    .child {
+      color: blue;
+    }
+    |} in
+  let rule_list = parse input in
+  let list_of_rules = Transform.run ~className:"stack" rule_list in
+  check ~pos:__POS__ ".stack{color:red;}.stack .child{color:blue;}"
+    (render list_of_rules)
+
+let missing_semicolon_before_nested_type_selector_in_declaration_list () =
+  let input = {|
+    color: red
+    div {
+      color: blue;
+    }
+    |} in
+  let rule_list = parse input in
+  let list_of_rules = Transform.run ~className:"stack" rule_list in
+  check ~pos:__POS__ ".stack{color:red;}.stack div{color:blue;}"
+    (render list_of_rules)
+
+let missing_semicolon_before_nested_id_selector_in_declaration_list () =
+  let input = {|
+    color: red
+    #child {
+      color: blue;
+    }
+    |} in
+  let rule_list = parse input in
+  let list_of_rules = Transform.run ~className:"stack" rule_list in
+  check ~pos:__POS__ ".stack{color:red;}.stack #child{color:blue;}"
+    (render list_of_rules)
+
+let missing_semicolon_before_nested_descendant_selector_in_declaration_list () =
+  let input = {|
+    color: red
+    svg path {
+      fill: blue;
+    }
+    |} in
+  let rule_list = parse input in
+  let list_of_rules = Transform.run ~className:"stack" rule_list in
+  check ~pos:__POS__ ".stack{color:red;}.stack svg path{fill:blue;}"
+    (render list_of_rules)
+
+let missing_semicolon_before_nested_media_query_in_declaration_list () =
+  let input =
+    {|
+    margin-bottom: 24px @media (min-width: 1024px) {
+      width: 50%;
+    }
+    |}
+  in
+  let rule_list = parse input in
+  let list_of_rules = Transform.run ~className:"copy" rule_list in
+  check ~pos:__POS__
+    ".copy{margin-bottom:24px;}@media (min-width: 1024px) {.copy{width:50%;}}"
+    (render list_of_rules)
+
 let declaration_after_nested_block_in_declaration_list () =
   let input =
     {|
@@ -721,6 +798,19 @@ let tests =
     test "nested_without_ampersand" nested_without_ampersand;
     test "descendant_selector_in_declaration_list"
       descendant_selector_in_declaration_list;
+    test "missing_semicolon_before_nested_selector_in_declaration_list"
+      missing_semicolon_before_nested_selector_in_declaration_list;
+    test "missing_semicolon_before_nested_class_selector_in_declaration_list"
+      missing_semicolon_before_nested_class_selector_in_declaration_list;
+    test "missing_semicolon_before_nested_type_selector_in_declaration_list"
+      missing_semicolon_before_nested_type_selector_in_declaration_list;
+    test "missing_semicolon_before_nested_id_selector_in_declaration_list"
+      missing_semicolon_before_nested_id_selector_in_declaration_list;
+    test
+      "missing_semicolon_before_nested_descendant_selector_in_declaration_list"
+      missing_semicolon_before_nested_descendant_selector_in_declaration_list;
+    test "missing_semicolon_before_nested_media_query_in_declaration_list"
+      missing_semicolon_before_nested_media_query_in_declaration_list;
     test "declaration_after_nested_block_in_declaration_list"
       declaration_after_nested_block_in_declaration_list;
     test "pseudo_class_functions_complex" pseudo_class_functions_complex;

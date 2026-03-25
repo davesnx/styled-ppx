@@ -471,6 +471,253 @@ let selector_mode_tests =
            );
          },
        )
+      });
+
+let declaration_block_missing_semicolon_tests =
+  [
+    (
+      {|
+      background-color: red
+
+      &:nth-child(2n) {
+        background-color: blue;
+      }
+      |},
+      [
+        IDENT("background-color"),
+        COLON,
+        WS,
+        IDENT("red"),
+        SEMI_COLON,
+        AMPERSAND,
+        COLON,
+        NTH_FUNCTION("nth-child"),
+        DIMENSION((2., "n")),
+        RIGHT_PAREN,
+        LEFT_BRACE,
+        IDENT("background-color"),
+        COLON,
+        WS,
+        IDENT("blue"),
+        SEMI_COLON,
+        RIGHT_BRACE,
+      ],
+    ),
+    (
+      {|
+      margin-bottom: 24px @media (min-width: 1024px) {
+        width: 50%;
+      }
+      |},
+      [
+        IDENT("margin-bottom"),
+        COLON,
+        WS,
+        DIMENSION((24., "px")),
+        SEMI_COLON,
+        AT_RULE("media"),
+        WS,
+        LEFT_PAREN,
+        IDENT("min-width"),
+        COLON,
+        WS,
+        DIMENSION((1024., "px")),
+        RIGHT_PAREN,
+        WS,
+        LEFT_BRACE,
+        IDENT("width"),
+        COLON,
+        WS,
+        PERCENTAGE(50.),
+        SEMI_COLON,
+        RIGHT_BRACE,
+      ],
+    ),
+    (
+      {|
+      color: red
+      .child {
+        color: blue;
+      }
+      |},
+      [
+        IDENT("color"),
+        COLON,
+        WS,
+        IDENT("red"),
+        SEMI_COLON,
+        DOT,
+        TYPE_SELECTOR("child"),
+        LEFT_BRACE,
+        IDENT("color"),
+        COLON,
+        WS,
+        IDENT("blue"),
+        SEMI_COLON,
+        RIGHT_BRACE,
+      ],
+    ),
+    (
+      {|
+      color: red
+      div {
+        color: blue;
+      }
+      |},
+      [
+        IDENT("color"),
+        COLON,
+        WS,
+        IDENT("red"),
+        SEMI_COLON,
+        TYPE_SELECTOR("div"),
+        LEFT_BRACE,
+        IDENT("color"),
+        COLON,
+        WS,
+        IDENT("blue"),
+        SEMI_COLON,
+        RIGHT_BRACE,
+      ],
+    ),
+    (
+      {|
+      color: red
+      #child {
+        color: blue;
+      }
+      |},
+      [
+        IDENT("color"),
+        COLON,
+        WS,
+        IDENT("red"),
+        SEMI_COLON,
+        HASH(("child", `ID)),
+        LEFT_BRACE,
+        IDENT("color"),
+        COLON,
+        WS,
+        IDENT("blue"),
+        SEMI_COLON,
+        RIGHT_BRACE,
+      ],
+    ),
+    (
+      {|
+      color: red
+      svg path {
+        fill: blue;
+      }
+      |},
+      [
+        IDENT("color"),
+        COLON,
+        WS,
+        IDENT("red"),
+        SEMI_COLON,
+        TYPE_SELECTOR("svg"),
+        DESCENDANT_COMBINATOR,
+        TYPE_SELECTOR("path"),
+        LEFT_BRACE,
+        IDENT("fill"),
+        COLON,
+        WS,
+        IDENT("blue"),
+        SEMI_COLON,
+        RIGHT_BRACE,
+      ],
+    ),
+  ]
+  |> List.map(((input, expected_output)) => {
+       test_case(
+         "Declaration block implicit semicolon: " ++ String.trim(input),
+         `Quick,
+         () => {
+           let (_, values) =
+             parse_with_mode(input, Lexer_context.Declaration_block);
+           let inputTokens = list_parse_tokens_to_string(values);
+           let outputTokens = list_tokens_to_string(expected_output);
+           check(
+             string,
+             "should match: " ++ input,
+             inputTokens,
+             outputTokens,
+           );
+         },
+       )
+      });
+
+let declaration_block_selector_pseudo_tests =
+  [
+    (
+      {|body:hover main {
+          color: blue;
+        }|},
+      [
+        TYPE_SELECTOR("body"),
+        COLON,
+        TYPE_SELECTOR("hover"),
+        DESCENDANT_COMBINATOR,
+        TYPE_SELECTOR("main"),
+        LEFT_BRACE,
+        IDENT("color"),
+        COLON,
+        WS,
+        IDENT("blue"),
+        SEMI_COLON,
+        RIGHT_BRACE,
+      ],
+    ),
+    (
+      {|body:has(video, audio), body:has(video):has(audio) {
+          color: red;
+        }|},
+      [
+        TYPE_SELECTOR("body"),
+        COLON,
+        FUNCTION("has"),
+        TYPE_SELECTOR("video"),
+        COMMA,
+        TYPE_SELECTOR("audio"),
+        RIGHT_PAREN,
+        COMMA,
+        TYPE_SELECTOR("body"),
+        COLON,
+        FUNCTION("has"),
+        TYPE_SELECTOR("video"),
+        RIGHT_PAREN,
+        COLON,
+        FUNCTION("has"),
+        TYPE_SELECTOR("audio"),
+        RIGHT_PAREN,
+        LEFT_BRACE,
+        IDENT("color"),
+        COLON,
+        WS,
+        IDENT("red"),
+        SEMI_COLON,
+        RIGHT_BRACE,
+      ],
+    ),
+  ]
+  |> List.map(((input, expected_output)) => {
+       test_case(
+         "Declaration block selector pseudo: " ++ String.trim(input),
+         `Quick,
+         () => {
+           let (_, values) =
+             parse_with_mode(input, Lexer_context.Declaration_block);
+           let inputTokens = list_parse_tokens_to_string(values);
+           let outputTokens = list_tokens_to_string(expected_output);
+           check(
+             string,
+             "should match: " ++ input,
+             inputTokens,
+             outputTokens,
+           );
+         },
+       )
      });
 
 let toplevel_mode_tests =
@@ -1240,5 +1487,7 @@ let tests =
   @ error_tests
   @ test_with_location
   @ selector_mode_tests
+  @ declaration_block_missing_semicolon_tests
+  @ declaration_block_selector_pseudo_tests
   @ toplevel_mode_tests
   @ token_of_delimiter_string_tests;

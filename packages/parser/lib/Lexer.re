@@ -911,6 +911,250 @@ let unclassified_token_starts_selector =
   | Unclassified_token(_)
   | Unclassified_whitespace => false;
 
+let unclassified_token_starts_nested_block =
+  fun
+  | Unclassified_token(
+      AT_RULE(_)
+      | AT_KEYFRAMES(_)
+    ) => true
+  | Unclassified_ident(_)
+  | Unclassified_token(_)
+  | Unclassified_whitespace => false;
+
+let unclassified_token_starts_selector_prelude =
+  fun
+  | Unclassified_ident(_) => true
+  | Unclassified_token(
+      AMPERSAND
+      | DOT
+      | HASH(_)
+      | ASTERISK
+      | LEFT_BRACKET
+      | INTERPOLATION(_)
+    ) => true
+  | Unclassified_token(_)
+  | Unclassified_whitespace => false;
+
+let known_pseudo_ident =
+  fun
+  | "active"
+  | "any-link"
+  | "autofill"
+  | "checked"
+  | "defined"
+  | "disabled"
+  | "empty"
+  | "enabled"
+  | "first-child"
+  | "first-of-type"
+  | "focus"
+  | "focus-visible"
+  | "focus-within"
+  | "fullscreen"
+  | "future"
+  | "hover"
+  | "in-range"
+  | "indeterminate"
+  | "invalid"
+  | "last-child"
+  | "last-of-type"
+  | "link"
+  | "modal"
+  | "only-child"
+  | "only-of-type"
+  | "optional"
+  | "out-of-range"
+  | "past"
+  | "paused"
+  | "picture-in-picture"
+  | "placeholder-shown"
+  | "playing"
+  | "popover-open"
+  | "read-only"
+  | "read-write"
+  | "required"
+  | "root"
+  | "scope"
+  | "target"
+  | "user-invalid"
+  | "valid"
+  | "visited" => true
+  | _ => false;
+
+let known_pseudo_function =
+  fun
+  | "current"
+  | "dir"
+  | "has"
+  | "host"
+  | "host-context"
+  | "is"
+  | "lang"
+  | "not"
+  | "nth-col"
+  | "nth-last-col"
+  | "part"
+  | "slotted"
+  | "state"
+  | "where" => true
+  | _ => false;
+
+let unclassified_token_starts_selector_pseudo =
+  fun
+  | Unclassified_ident(name) => known_pseudo_ident(name)
+  | Unclassified_token(FUNCTION(name)) => known_pseudo_function(name)
+  | Unclassified_token(NTH_FUNCTION(_))
+  | Unclassified_token(COLON)
+  | Unclassified_token(DOUBLE_COLON) => true
+  | Unclassified_token(_)
+  | Unclassified_whitespace => false;
+
+let nested_block_follows = (~state, lexbuf, ~initial_paren_depth, ~initial_bracket_depth) => {
+  let read_unclassified = make_unclassified_reader(~state, lexbuf);
+
+  let rec scan = (~paren_depth, ~bracket_depth) => {
+    let unclassified = read_unclassified();
+    switch (unclassified.txt) {
+    | Ok(Unclassified_whitespace)
+    | Ok(Unclassified_ident(_)) => scan(~paren_depth, ~bracket_depth)
+    | Ok(Unclassified_token(token)) =>
+      switch (token) {
+      | FUNCTION(_)
+      | NTH_FUNCTION(_) =>
+        scan(~paren_depth=paren_depth + 1, ~bracket_depth)
+      | LEFT_PAREN => scan(~paren_depth=paren_depth + 1, ~bracket_depth)
+      | RIGHT_PAREN =>
+        let next_paren_depth = paren_depth > 0 ? paren_depth - 1 : 0;
+        scan(~paren_depth=next_paren_depth, ~bracket_depth)
+      | LEFT_BRACKET => scan(~paren_depth, ~bracket_depth=bracket_depth + 1)
+      | RIGHT_BRACKET =>
+        let next_bracket_depth = bracket_depth > 0 ? bracket_depth - 1 : 0;
+        scan(~paren_depth, ~bracket_depth=next_bracket_depth)
+      | LEFT_BRACE => paren_depth == 0 && bracket_depth == 0
+      | SEMI_COLON
+      | RIGHT_BRACE
+      | EOF => false
+      | _ => scan(~paren_depth, ~bracket_depth)
+      }
+    | Error(_) => false
+    };
+  };
+
+  scan(~paren_depth=initial_paren_depth, ~bracket_depth=initial_bracket_depth);
+};
+
+let selector_prelude_follows = (~state, lexbuf) => {
+  let read_unclassified = make_unclassified_reader(~state, lexbuf);
+
+  let rec scan = (~paren_depth, ~bracket_depth, ~saw_selector_token) => {
+    let unclassified = read_unclassified();
+    switch (unclassified.txt) {
+    | Ok(Unclassified_whitespace) =>
+      scan(~paren_depth, ~bracket_depth, ~saw_selector_token)
+    | Ok(Unclassified_ident(_)) =>
+      scan(~paren_depth, ~bracket_depth, ~saw_selector_token=true)
+    | Ok(Unclassified_token(token)) =>
+      if (paren_depth > 0 || bracket_depth > 0) {
+        switch (token) {
+        | FUNCTION(_)
+        | NTH_FUNCTION(_)
+        | LEFT_PAREN =>
+          scan(~paren_depth=paren_depth + 1, ~bracket_depth, ~saw_selector_token)
+        | RIGHT_PAREN =>
+          let next_paren_depth = paren_depth > 0 ? paren_depth - 1 : 0;
+          scan(~paren_depth=next_paren_depth, ~bracket_depth, ~saw_selector_token)
+        | LEFT_BRACKET =>
+          scan(~paren_depth, ~bracket_depth=bracket_depth + 1, ~saw_selector_token)
+        | RIGHT_BRACKET =>
+          let next_bracket_depth = bracket_depth > 0 ? bracket_depth - 1 : 0;
+          scan(~paren_depth, ~bracket_depth=next_bracket_depth, ~saw_selector_token)
+        | LEFT_BRACE
+        | RIGHT_BRACE
+        | SEMI_COLON
+        | EOF => false
+        | _ => scan(~paren_depth, ~bracket_depth, ~saw_selector_token)
+        }
+      } else {
+        switch (token) {
+        | LEFT_BRACE => saw_selector_token
+        | FUNCTION(_)
+        | NTH_FUNCTION(_) when saw_selector_token =>
+          scan(~paren_depth=paren_depth + 1, ~bracket_depth, ~saw_selector_token=true)
+        | LEFT_BRACKET =>
+          scan(~paren_depth, ~bracket_depth=bracket_depth + 1, ~saw_selector_token=true)
+        | DOT
+        | HASH(_)
+        | AMPERSAND
+        | ASTERISK
+        | COLON
+        | DOUBLE_COLON
+        | INTERPOLATION(_)
+        | GREATER_THAN
+        | PLUS
+        | TILDE
+        | COMMA =>
+          scan(~paren_depth, ~bracket_depth, ~saw_selector_token=true)
+        | SEMI_COLON
+        | RIGHT_BRACE
+        | EOF => false
+        | _ => false
+        }
+      }
+    | Error(_) => false
+    };
+  };
+
+  scan(~paren_depth=0, ~bracket_depth=0, ~saw_selector_token=false);
+};
+
+let declaration_value_starts_nested_block = (~state, lexbuf) => {
+  if (
+    state.paren_depth > 0
+    || state.bracket_depth > 0
+    || !state.declaration_value_allows_implicit_nested_terminator
+    || !state.declaration_value_has_content
+  ) {
+    false;
+  } else {
+    let read_unclassified = make_unclassified_reader(~state, lexbuf);
+    let rec read_next_significant = () => {
+      let unclassified = read_unclassified();
+      switch (unclassified.txt) {
+      | Ok(Unclassified_whitespace) => read_next_significant()
+      | _ => unclassified
+      };
+    };
+    let next_unclassified = read_next_significant();
+    switch (next_unclassified.txt) {
+    | Ok(unclassified_token)
+        when unclassified_token_starts_nested_block(unclassified_token) =>
+      let (initial_paren_depth, initial_bracket_depth) =
+        switch (unclassified_token) {
+        | Unclassified_token(LEFT_BRACKET) => (0, 1)
+        | _ => (0, 0)
+        };
+      nested_block_follows(
+        ~state,
+        lexbuf,
+        ~initial_paren_depth,
+        ~initial_bracket_depth,
+      )
+    | Ok(unclassified_token)
+        when unclassified_token_starts_selector_prelude(unclassified_token)
+             && (
+               switch (unclassified_token) {
+               | Unclassified_ident(_) =>
+                 state.declaration_value_top_level_items == 1
+                 && state.declaration_value_ident_like_prefix
+               | _ => true
+               }
+             ) =>
+      selector_prelude_follows(~state, lexbuf)
+    | _ => false
+    };
+  };
+};
+
 let identifier_starts_property = (~state, lexbuf) => {
   let read_unclassified = make_unclassified_reader(~state, lexbuf);
 
@@ -922,36 +1166,329 @@ let identifier_starts_property = (~state, lexbuf) => {
     };
   };
 
-  let rec scan_property_value = (~paren_depth, ~bracket_depth) => {
+  let rec scan_possible_nested_block = (
+    ~paren_depth,
+    ~bracket_depth,
+    ~fallback_top_level_items,
+    ~fallback_ident_like_prefix,
+    ~fallback_selector_pseudo_prefix,
+  ) => {
     let unclassified = read_unclassified();
     switch (unclassified.txt) {
-    | Ok(Unclassified_whitespace)
+    | Ok(Unclassified_whitespace) =>
+      scan_possible_nested_block(
+        ~paren_depth,
+        ~bracket_depth,
+        ~fallback_top_level_items,
+        ~fallback_ident_like_prefix,
+        ~fallback_selector_pseudo_prefix,
+      )
     | Ok(Unclassified_ident(_)) =>
-      scan_property_value(~paren_depth, ~bracket_depth)
+      scan_possible_nested_block(
+        ~paren_depth,
+        ~bracket_depth,
+        ~fallback_top_level_items,
+        ~fallback_ident_like_prefix,
+        ~fallback_selector_pseudo_prefix,
+      )
     | Ok(Unclassified_token(token)) =>
+      if (paren_depth > 0 || bracket_depth > 0) {
+        switch (token) {
+        | FUNCTION(_)
+        | NTH_FUNCTION(_)
+        | LEFT_PAREN =>
+          scan_possible_nested_block(
+            ~paren_depth=paren_depth + 1,
+            ~bracket_depth,
+            ~fallback_top_level_items,
+            ~fallback_ident_like_prefix,
+            ~fallback_selector_pseudo_prefix,
+          )
+        | RIGHT_PAREN =>
+          let next_paren_depth = paren_depth > 0 ? paren_depth - 1 : 0;
+          scan_possible_nested_block(
+            ~paren_depth=next_paren_depth,
+            ~bracket_depth,
+            ~fallback_top_level_items,
+            ~fallback_ident_like_prefix,
+            ~fallback_selector_pseudo_prefix,
+          )
+        | LEFT_BRACKET =>
+          scan_possible_nested_block(
+            ~paren_depth,
+            ~bracket_depth=bracket_depth + 1,
+            ~fallback_top_level_items,
+            ~fallback_ident_like_prefix,
+            ~fallback_selector_pseudo_prefix,
+          )
+        | RIGHT_BRACKET =>
+          let next_bracket_depth = bracket_depth > 0 ? bracket_depth - 1 : 0;
+          scan_possible_nested_block(
+            ~paren_depth,
+            ~bracket_depth=next_bracket_depth,
+            ~fallback_top_level_items,
+            ~fallback_ident_like_prefix,
+            ~fallback_selector_pseudo_prefix,
+          )
+        | LEFT_BRACE
+        | RIGHT_BRACE
+        | SEMI_COLON
+        | EOF => true
+        | _ =>
+          scan_possible_nested_block(
+            ~paren_depth,
+            ~bracket_depth,
+            ~fallback_top_level_items,
+            ~fallback_ident_like_prefix,
+            ~fallback_selector_pseudo_prefix,
+          )
+        }
+      } else {
+        switch (token) {
+        | LEFT_BRACE => true
+        | FUNCTION(_)
+        | NTH_FUNCTION(_) =>
+          scan_possible_nested_block(
+            ~paren_depth=paren_depth + 1,
+            ~bracket_depth,
+            ~fallback_top_level_items,
+            ~fallback_ident_like_prefix,
+            ~fallback_selector_pseudo_prefix,
+          )
+        | LEFT_BRACKET =>
+          scan_possible_nested_block(
+            ~paren_depth,
+            ~bracket_depth=bracket_depth + 1,
+            ~fallback_top_level_items,
+            ~fallback_ident_like_prefix,
+            ~fallback_selector_pseudo_prefix,
+          )
+        | DOT
+        | HASH(_)
+        | AMPERSAND
+        | ASTERISK
+        | COLON
+        | DOUBLE_COLON
+        | INTERPOLATION(_)
+        | GREATER_THAN
+        | PLUS
+        | TILDE
+        | COMMA =>
+          scan_possible_nested_block(
+            ~paren_depth,
+            ~bracket_depth,
+            ~fallback_top_level_items,
+            ~fallback_ident_like_prefix,
+            ~fallback_selector_pseudo_prefix,
+          )
+        | SEMI_COLON
+        | RIGHT_BRACE
+        | EOF => true
+        | _ =>
+          scan_property_value(
+            ~paren_depth,
+            ~bracket_depth,
+            ~has_value=true,
+            ~top_level_items=fallback_top_level_items,
+            ~ident_like_prefix=fallback_ident_like_prefix,
+            ~selector_pseudo_prefix=fallback_selector_pseudo_prefix,
+          )
+        }
+      }
+    | Error(_) => true
+    };
+  }
+  and scan_property_value = (
+    ~paren_depth,
+    ~bracket_depth,
+    ~has_value,
+    ~top_level_items,
+    ~ident_like_prefix,
+    ~selector_pseudo_prefix,
+  ) => {
+    let unclassified = read_unclassified();
+    let at_top_level = paren_depth == 0 && bracket_depth == 0;
+    let remember_top_level_item = (~is_ident_like) =>
+      if (at_top_level) {
+        let next_top_level_items = top_level_items + 1;
+        let next_ident_like_prefix =
+          next_top_level_items == 1 ? is_ident_like : ident_like_prefix;
+        (next_top_level_items, next_ident_like_prefix);
+      } else {
+        (top_level_items, ident_like_prefix);
+      };
+    switch (unclassified.txt) {
+    | Ok(Unclassified_whitespace) =>
+      scan_property_value(
+        ~paren_depth,
+        ~bracket_depth,
+        ~has_value,
+        ~top_level_items,
+        ~ident_like_prefix,
+        ~selector_pseudo_prefix,
+      )
+    | Ok(Unclassified_ident(name)) =>
+      let next_selector_pseudo_prefix =
+        !has_value && at_top_level && known_pseudo_ident(name)
+          ? true
+          : selector_pseudo_prefix;
+      if (
+        has_value
+        && at_top_level
+        && !next_selector_pseudo_prefix
+        && top_level_items == 1
+        && ident_like_prefix
+      ) {
+        scan_possible_nested_block(
+          ~paren_depth=0,
+          ~bracket_depth=0,
+          ~fallback_top_level_items=top_level_items + 1,
+          ~fallback_ident_like_prefix=ident_like_prefix,
+          ~fallback_selector_pseudo_prefix=next_selector_pseudo_prefix,
+        )
+      } else {
+        let (next_top_level_items, next_ident_like_prefix) =
+          remember_top_level_item(~is_ident_like=true);
+        scan_property_value(
+          ~paren_depth,
+          ~bracket_depth,
+          ~has_value=true,
+          ~top_level_items=next_top_level_items,
+          ~ident_like_prefix=next_ident_like_prefix,
+          ~selector_pseudo_prefix=next_selector_pseudo_prefix,
+        )
+      }
+    | Ok(Unclassified_token(token)) =>
+      let next_selector_pseudo_prefix =
+        !has_value && at_top_level
+        && unclassified_token_starts_selector_pseudo(Unclassified_token(token))
+          ? true
+          : selector_pseudo_prefix;
       switch (token) {
       | FUNCTION(_)
       | NTH_FUNCTION(_) =>
-        scan_property_value(~paren_depth=paren_depth + 1, ~bracket_depth)
+        let (next_top_level_items, next_ident_like_prefix) =
+          remember_top_level_item(~is_ident_like=false);
+        scan_property_value(
+          ~paren_depth=paren_depth + 1,
+          ~bracket_depth,
+          ~has_value=true,
+          ~top_level_items=next_top_level_items,
+          ~ident_like_prefix=next_ident_like_prefix,
+          ~selector_pseudo_prefix=next_selector_pseudo_prefix,
+        )
+      | token when has_value && at_top_level && !selector_pseudo_prefix
+          && unclassified_token_starts_selector_prelude(Unclassified_token(token)) =>
+        scan_possible_nested_block(
+          ~paren_depth=0,
+          ~bracket_depth=0,
+          ~fallback_top_level_items=top_level_items,
+          ~fallback_ident_like_prefix=ident_like_prefix,
+          ~fallback_selector_pseudo_prefix=selector_pseudo_prefix,
+        )
+      | NUMBER(_)
+      | PERCENTAGE(_)
+      | DIMENSION(_)
+      | HASH(_)
+      | STRING(_)
+      | URL(_)
+      | INTERPOLATION(_) =>
+        let (next_top_level_items, next_ident_like_prefix) =
+          remember_top_level_item(~is_ident_like=false);
+        scan_property_value(
+          ~paren_depth,
+          ~bracket_depth,
+          ~has_value=true,
+          ~top_level_items=next_top_level_items,
+          ~ident_like_prefix=next_ident_like_prefix,
+          ~selector_pseudo_prefix=next_selector_pseudo_prefix,
+        )
       | LEFT_PAREN =>
-        scan_property_value(~paren_depth=paren_depth + 1, ~bracket_depth)
+        scan_property_value(
+          ~paren_depth=paren_depth + 1,
+          ~bracket_depth,
+          ~has_value=true,
+          ~top_level_items,
+          ~ident_like_prefix,
+          ~selector_pseudo_prefix=next_selector_pseudo_prefix,
+        )
       | RIGHT_PAREN =>
         let next_paren_depth = paren_depth > 0 ? paren_depth - 1 : 0;
-        scan_property_value(~paren_depth=next_paren_depth, ~bracket_depth)
+        scan_property_value(
+          ~paren_depth=next_paren_depth,
+          ~bracket_depth,
+          ~has_value=true,
+          ~top_level_items,
+          ~ident_like_prefix,
+          ~selector_pseudo_prefix=next_selector_pseudo_prefix,
+        )
       | LEFT_BRACKET =>
-        scan_property_value(~paren_depth, ~bracket_depth=bracket_depth + 1)
+        scan_property_value(
+          ~paren_depth,
+          ~bracket_depth=bracket_depth + 1,
+          ~has_value=true,
+          ~top_level_items,
+          ~ident_like_prefix,
+          ~selector_pseudo_prefix=next_selector_pseudo_prefix,
+        )
       | RIGHT_BRACKET =>
         let next_bracket_depth = bracket_depth > 0 ? bracket_depth - 1 : 0;
-        scan_property_value(~paren_depth, ~bracket_depth=next_bracket_depth)
+        scan_property_value(
+          ~paren_depth,
+          ~bracket_depth=next_bracket_depth,
+          ~has_value=true,
+          ~top_level_items,
+          ~ident_like_prefix,
+          ~selector_pseudo_prefix=next_selector_pseudo_prefix,
+        )
+      | COLON
+      | DOUBLE_COLON when has_value && at_top_level =>
+        false
+      | token when has_value && at_top_level
+          && unclassified_token_starts_nested_block(Unclassified_token(token)) =>
+        nested_block_follows(~state, lexbuf, ~initial_paren_depth=0, ~initial_bracket_depth=0)
+          ? true
+          : scan_property_value(
+              ~paren_depth,
+              ~bracket_depth,
+              ~has_value=true,
+              ~top_level_items,
+              ~ident_like_prefix,
+              ~selector_pseudo_prefix,
+            )
       | LEFT_BRACE =>
-        paren_depth == 0 && bracket_depth == 0
-          ? false : scan_property_value(~paren_depth, ~bracket_depth)
+        at_top_level
+          ? false
+          : scan_property_value(
+              ~paren_depth,
+              ~bracket_depth,
+              ~has_value=true,
+              ~top_level_items,
+              ~ident_like_prefix,
+              ~selector_pseudo_prefix=next_selector_pseudo_prefix,
+            )
       | SEMI_COLON
       | RIGHT_BRACE
       | EOF =>
-        paren_depth == 0 && bracket_depth == 0
-          ? true : scan_property_value(~paren_depth, ~bracket_depth)
-      | _ => scan_property_value(~paren_depth, ~bracket_depth)
+        at_top_level
+          ? true
+          : scan_property_value(
+              ~paren_depth,
+              ~bracket_depth,
+              ~has_value=true,
+              ~top_level_items,
+              ~ident_like_prefix,
+              ~selector_pseudo_prefix=next_selector_pseudo_prefix,
+            )
+      | _ =>
+        scan_property_value(
+          ~paren_depth,
+          ~bracket_depth,
+          ~has_value=true,
+          ~top_level_items,
+          ~ident_like_prefix,
+          ~selector_pseudo_prefix=next_selector_pseudo_prefix,
+        )
       }
     | Error(_) => true
     };
@@ -959,7 +1496,14 @@ let identifier_starts_property = (~state, lexbuf) => {
 
   switch ((read_next_significant()).txt) {
   | Ok(Unclassified_token(COLON)) =>
-    scan_property_value(~paren_depth=0, ~bracket_depth=0)
+    scan_property_value(
+      ~paren_depth=0,
+      ~bracket_depth=0,
+      ~has_value=false,
+      ~top_level_items=0,
+      ~ident_like_prefix=false,
+      ~selector_pseudo_prefix=false,
+    )
   | _ => false
   };
 };
@@ -988,11 +1532,47 @@ let peek_next_significant_unclassified = (~state, lexbuf) => {
 
 let rec consume = (~state, lexbuf) => {
   let handle_mode_transition = token => {
+    let mode_before = current_mode(state);
     let is_ident =
       switch (token) {
       | IDENT(_) => true
       | _ => false
       };
+
+    if (mode_before == Declaration_value) {
+      switch (token) {
+      | WS => ()
+      | _ => {
+          state.declaration_value_has_content = true;
+          if (state.paren_depth == 0 && state.bracket_depth == 0) {
+            switch (token) {
+            | IDENT(_)
+            | TYPE_SELECTOR(_)
+            | NUMBER(_)
+            | PERCENTAGE(_)
+            | DIMENSION(_)
+            | HASH(_)
+            | STRING(_)
+            | URL(_)
+            | INTERPOLATION(_)
+            | FUNCTION(_)
+            | NTH_FUNCTION(_) =>
+              state.declaration_value_top_level_items =
+                state.declaration_value_top_level_items + 1;
+              if (state.declaration_value_top_level_items == 1) {
+                state.declaration_value_ident_like_prefix =
+                  switch (token) {
+                  | IDENT(_)
+                  | TYPE_SELECTOR(_) => true
+                  | _ => false
+                  };
+              };
+            | _ => ()
+            };
+          };
+        }
+      };
+    };
 
     state.last_was_combinator = false;
     state.last_was_delimiter = false;
@@ -1041,6 +1621,10 @@ let rec consume = (~state, lexbuf) => {
     | COLON =>
       switch (current_mode(state)) {
       | Declaration_block when state.last_was_ident =>
+        state.declaration_value_allows_implicit_nested_terminator = true;
+        state.declaration_value_has_content = false;
+        state.declaration_value_top_level_items = 0;
+        state.declaration_value_ident_like_prefix = false;
         push_mode(state, Declaration_value)
       | Declaration_block => push_mode(state, Selector)
       | _ => ()
@@ -1050,6 +1634,10 @@ let rec consume = (~state, lexbuf) => {
       switch (current_mode(state)) {
       | Declaration_value
       | At_rule_prelude =>
+        state.declaration_value_allows_implicit_nested_terminator = false;
+        state.declaration_value_has_content = false;
+        state.declaration_value_top_level_items = 0;
+        state.declaration_value_ident_like_prefix = false;
         let _ = pop_mode(state);
         ()
       | _ => ()
@@ -1087,53 +1675,60 @@ let rec consume = (~state, lexbuf) => {
     token;
   };
 
-  let unclassified = take_unclassified_token(~state, lexbuf);
-  switch (unclassified.txt) {
-  | Error(msg) => Error((msg, unclassified.start_pos, unclassified.end_pos))
-  | Ok(Unclassified_whitespace) =>
-    drop_buffered_unclassified_whitespace(~state, lexbuf);
-    switch (current_mode(state)) {
-    | Selector =>
-      if (state.last_was_combinator
-          || state.last_was_delimiter
-          || state.bracket_depth > 0) {
-        state.last_was_combinator = false;
-        state.last_was_delimiter = false;
-        consume(~state, lexbuf);
-      } else {
-        let next_unclassified = peek_next_significant_unclassified(~state, lexbuf);
-        switch (next_unclassified.txt) {
-        | Ok(unclassified_token)
-            when unclassified_token_starts_selector(unclassified_token) =>
-          Ok((
-            handle_mode_transition(DESCENDANT_COMBINATOR),
-            unclassified.start_pos,
-            unclassified.end_pos,
-          ))
-        | _ => consume(~state, lexbuf)
-        };
-      }
-    | Declaration_value
-    | At_rule_prelude =>
-      Ok((handle_mode_transition(WS), unclassified.start_pos, unclassified.end_pos))
-    | Toplevel
-    | Declaration_block => consume(~state, lexbuf)
-    }
-  | Ok(Unclassified_ident(string)) =>
-    let token =
+  if (current_mode(state) == Declaration_value
+      && declaration_value_starts_nested_block(~state, lexbuf)) {
+    let nested_start = peek_next_significant_unclassified(~state, lexbuf);
+    Ok((handle_mode_transition(SEMI_COLON), nested_start.start_pos, nested_start.start_pos));
+  } else {
+
+    let unclassified = take_unclassified_token(~state, lexbuf);
+    switch (unclassified.txt) {
+    | Error(msg) => Error((msg, unclassified.start_pos, unclassified.end_pos))
+    | Ok(Unclassified_whitespace) =>
+      drop_buffered_unclassified_whitespace(~state, lexbuf);
       switch (current_mode(state)) {
-      | Toplevel
-      | Selector => TYPE_SELECTOR(string)
-      | Declaration_block =>
-        identifier_starts_property(~state, lexbuf)
-          ? IDENT(string)
-          : TYPE_SELECTOR(string)
+      | Selector =>
+        if (state.last_was_combinator
+            || state.last_was_delimiter
+            || state.bracket_depth > 0) {
+          state.last_was_combinator = false;
+          state.last_was_delimiter = false;
+          consume(~state, lexbuf);
+        } else {
+          let next_unclassified = peek_next_significant_unclassified(~state, lexbuf);
+          switch (next_unclassified.txt) {
+          | Ok(unclassified_token)
+              when unclassified_token_starts_selector(unclassified_token) =>
+            Ok((
+              handle_mode_transition(DESCENDANT_COMBINATOR),
+              unclassified.start_pos,
+              unclassified.end_pos,
+            ))
+          | _ => consume(~state, lexbuf)
+          };
+        }
       | Declaration_value
-      | At_rule_prelude => IDENT(string)
-      };
-    Ok((handle_mode_transition(token), unclassified.start_pos, unclassified.end_pos))
-  | Ok(Unclassified_token(token)) =>
-    Ok((handle_mode_transition(token), unclassified.start_pos, unclassified.end_pos))
+      | At_rule_prelude =>
+        Ok((handle_mode_transition(WS), unclassified.start_pos, unclassified.end_pos))
+      | Toplevel
+      | Declaration_block => consume(~state, lexbuf)
+      }
+    | Ok(Unclassified_ident(string)) =>
+      let token =
+        switch (current_mode(state)) {
+        | Toplevel
+        | Selector => TYPE_SELECTOR(string)
+        | Declaration_block =>
+          identifier_starts_property(~state, lexbuf)
+            ? IDENT(string)
+            : TYPE_SELECTOR(string)
+        | Declaration_value
+        | At_rule_prelude => IDENT(string)
+        };
+      Ok((handle_mode_transition(token), unclassified.start_pos, unclassified.end_pos))
+    | Ok(Unclassified_token(token)) =>
+      Ok((handle_mode_transition(token), unclassified.start_pos, unclassified.end_pos))
+    };
   };
 };
 
@@ -1158,6 +1753,10 @@ let from_string = (~initial_mode, string) => {
     paren_depth: 0,
     brace_depth: 0,
     bracket_depth: 0,
+    declaration_value_allows_implicit_nested_terminator: false,
+    declaration_value_has_content: false,
+    declaration_value_top_level_items: 0,
+    declaration_value_ident_like_prefix: false,
     last_was_ident: false,
     last_was_combinator: false,
     last_was_delimiter: false,
