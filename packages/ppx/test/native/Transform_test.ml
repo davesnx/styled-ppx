@@ -579,6 +579,38 @@ let nested_without_ampersand () =
      span{font-size:14px;}"
     (render list_of_rules)
 
+let descendant_selector_in_declaration_list () =
+  let input =
+    {|
+    display: flex;
+    svg path {
+      fill: red;
+    }
+    |}
+  in
+  let rule_list = parse input in
+  let list_of_rules = Transform.run ~className:"icon" rule_list in
+  check ~pos:__POS__ ".icon{display:flex;}.icon svg path{fill:red;}"
+    (render list_of_rules)
+
+let declaration_after_nested_block_in_declaration_list () =
+  let input =
+    {|
+    .recharts-wrapper {
+      @media print {
+        width: 100%;
+      }
+    }
+    margin-top: 17px;
+    |}
+  in
+  let rule_list = parse input in
+  let list_of_rules = Transform.run ~className:"chart" rule_list in
+  check ~pos:__POS__
+    ".chart{margin-top:17px;}@media print {.chart \
+     .recharts-wrapper{width:100%;}}"
+    (render list_of_rules)
+
 let pseudo_class_functions_complex () =
   let input =
     {|
@@ -687,6 +719,10 @@ let tests =
     test "empty_selectors" empty_selectors;
     test "multiple_ampersands_same_selector" multiple_ampersands_same_selector;
     test "nested_without_ampersand" nested_without_ampersand;
+    test "descendant_selector_in_declaration_list"
+      descendant_selector_in_declaration_list;
+    test "declaration_after_nested_block_in_declaration_list"
+      declaration_after_nested_block_in_declaration_list;
     test "pseudo_class_functions_complex" pseudo_class_functions_complex;
     test "has_pseudo_class" has_pseudo_class;
     test "focus_within_and_focus_visible" focus_within_and_focus_visible;

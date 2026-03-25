@@ -431,6 +431,26 @@ let selector_mode_tests =
       {|&>a {}|},
       [AMPERSAND, GREATER_THAN, TYPE_SELECTOR("a"), LEFT_BRACE, RIGHT_BRACE],
     ),
+    (
+      {|svg path {}|},
+      [
+        TYPE_SELECTOR("svg"),
+        DESCENDANT_COMBINATOR,
+        TYPE_SELECTOR("path"),
+        LEFT_BRACE,
+        RIGHT_BRACE,
+      ],
+    ),
+    (
+      {|svg * {}|},
+      [
+        TYPE_SELECTOR("svg"),
+        DESCENDANT_COMBINATOR,
+        ASTERISK,
+        LEFT_BRACE,
+        RIGHT_BRACE,
+      ],
+    ),
     ({|#bar {}|}, [HASH(("bar", `ID)), LEFT_BRACE, RIGHT_BRACE]),
     ({|#bar{}|}, [HASH(("bar", `ID)), LEFT_BRACE, RIGHT_BRACE]),
   ]
@@ -1036,6 +1056,18 @@ let toplevel_mode_tests =
         WS,
         STRING("http://www.w3.org/2000/svg"),
         SEMI_COLON,
+      ],
+    ),
+    (
+      {|@import "file.css"; div {}|},
+      [
+        AT_RULE_STATEMENT("import"),
+        WS,
+        STRING("file.css"),
+        SEMI_COLON,
+        TYPE_SELECTOR("div"),
+        LEFT_BRACE,
+        RIGHT_BRACE,
       ],
     ),
     // Multiple rules

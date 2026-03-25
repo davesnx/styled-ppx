@@ -207,6 +207,36 @@ Selector nested
   > EOF
   display:flex;a{display:block;}a div{display:none;}a div span{display:none;}a div span hr{display:none;}a div span hr code{display:none;}
 
+Declaration list descendant selector
+  $ cat << "EOF" | ./Render_test.exe
+  > display: flex;
+  > svg path {
+  >   fill: red;
+  > }
+  > EOF
+  display:flex;svg path{fill:red;}
+
+Nested descendant selector from declaration list
+  $ cat << "EOF" | ./Render_test.exe
+  > a {
+  >   svg path {
+  >     fill: red;
+  >   }
+  > }
+  > EOF
+  a svg path{fill:red;}
+
+Declaration after nested block
+  $ cat << "EOF" | ./Render_test.exe
+  > .recharts-wrapper, .recharts-surface {
+  >   @media print {
+  >     width: 100%;
+  >   }
+  > }
+  > margin-top: 17px;
+  > EOF
+  margin-top:17px;@media print {.recharts-wrapper,.recharts-surface{width:100%;}}
+
 Media query nested
   $ cat << "EOF" | ./Render_test.exe
   > max-width: 800px;
