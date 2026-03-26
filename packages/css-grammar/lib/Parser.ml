@@ -6,6 +6,9 @@ module type RULE = sig
   val to_string : t -> string
   val runtime_module_path : string option
   val extract_interpolations : t -> (string * string) list
+
+  val extract_interpolations_with_context :
+    string -> t -> (string * string) list
 end
 
 type length =
@@ -6041,7 +6044,8 @@ type packed_rule =
       validate : string -> (unit, string) result;
       runtime_module_path : string option;
       extract_interpolations : string -> (string * string) list;
-      extract_interpolations_from_ast : Obj.t -> (string * string) list;
+      extract_interpolations_from_ast :
+        string -> Obj.t -> (string * string) list;
     }
       -> packed_rule
 
@@ -6063,16 +6067,20 @@ let detect_whole_value_interpolation ~runtime_module_path input =
     [ String.concat "." parts, type_path ]
   | Error _ -> []
 
-(* Helper for PPX-generated extraction code: look up a type in the registry
-   and call its extract_interpolations_from_ast with a type-erased AST value.
-   Used by generated extract_interpolations functions for non-primitive
-   Data_type references that may contain interpolation internally. *)
-let extract_from_registry_ast (type_name : string) (ast_obj : Obj.t) :
-  (string * string) list =
+let extract_from_registry_ast (type_name : string) (type_context : string)
+  (ast_obj : Obj.t) : (string * string) list =
   match Hashtbl.find_opt registry_tbl type_name with
   | Some (_, Pack_rule { extract_interpolations_from_ast; _ }) ->
-    extract_interpolations_from_ast ast_obj
+    extract_interpolations_from_ast type_context ast_obj
   | None -> []
+
+let runtime_module_path_of_registry_key (key : string) : string option =
+  match Hashtbl.find_opt registry_tbl key with
+  | Some (_, Pack_rule { runtime_module_path; _ }) -> runtime_module_path
+  | None -> None
+
+let resolve_runtime_module_path (key : string) ~(fallback : string) : string =
+  Option.value ~default:fallback (runtime_module_path_of_registry_key key)
 
 let pack_rule (type a) (rule : a Rule.rule)
   ?(runtime_module_path : string option) () : packed_rule =
@@ -6084,7 +6092,8 @@ let pack_rule (type a) (rule : a Rule.rule)
   let extract_interpolations =
     detect_whole_value_interpolation ~runtime_module_path
   in
-  let extract_interpolations_from_ast (_obj : Obj.t) : (string * string) list =
+  let extract_interpolations_from_ast (_type_context : string) (_obj : Obj.t) :
+    (string * string) list =
     []
   in
   Pack_rule
@@ -6119,8 +6128,9 @@ let pack_module (module M : RULE) : packed_rule =
         if result <> [] then result else []
       | Error _ -> [])
   in
-  let extract_interpolations_from_ast (obj : Obj.t) : (string * string) list =
-    M.extract_interpolations (Obj.obj obj : M.t)
+  let extract_interpolations_from_ast (type_context : string) (obj : Obj.t) :
+    (string * string) list =
+    M.extract_interpolations_with_context type_context (Obj.obj obj : M.t)
   in
   Pack_rule
     {
@@ -8999,7 +9009,7 @@ let property_border_block_width : property_border_block_width Rule.rule =
 
 module Property_border_bottom =
   [%spec_module
-  "<'border'>", (module Css_types.BorderBottom)]
+  "<'border'>", (module Css_types.Border)]
 
 let property_border_bottom : property_border_bottom Rule.rule =
   Property_border_bottom.rule
@@ -9214,7 +9224,7 @@ let property_border_inline_width : property_border_inline_width Rule.rule =
 
 module Property_border_left =
   [%spec_module
-  "<'border'>", (module Css_types.BorderLeft)]
+  "<'border'>", (module Css_types.Border)]
 
 let property_border_left : property_border_left Rule.rule =
   Property_border_left.rule
@@ -9250,7 +9260,7 @@ let property_border_radius : property_border_radius Rule.rule =
 
 module Property_border_right =
   [%spec_module
-  "<'border'>", (module Css_types.BorderRight)]
+  "<'border'>", (module Css_types.Border)]
 
 let property_border_right : property_border_right Rule.rule =
   Property_border_right.rule
@@ -9311,7 +9321,7 @@ let property_border_style : property_border_style Rule.rule =
 
 module Property_border_top =
   [%spec_module
-  "<'border'>", (module Css_types.BorderTop)]
+  "<'border'>", (module Css_types.Border)]
 
 let property_border_top : property_border_top Rule.rule =
   Property_border_top.rule
@@ -9430,7 +9440,7 @@ let property_box_pack : property_box_pack Rule.rule = Property_box_pack.rule
 
 module Property_box_shadow =
   [%spec_module
-  "'none' | <interpolation> | [ <shadow> ]#", (module Css_types.BoxShadow)]
+  "'none' | <interpolation> | [ <shadow> ]#", (module Css_types.BoxShadows)]
 
 let property_box_shadow : property_box_shadow Rule.rule =
   Property_box_shadow.rule
@@ -12190,7 +12200,7 @@ let property_text_rendering : property_text_rendering Rule.rule =
 
 module Property_text_shadow =
   [%spec_module
-  "'none' | <interpolation> | [ <shadow-t> ]#", (module Css_types.TextShadow)]
+  "'none' | <interpolation> | [ <shadow-t> ]#", (module Css_types.TextShadows)]
 
 let property_text_shadow : property_text_shadow Rule.rule =
   Property_text_shadow.rule

@@ -1,5 +1,3 @@
-(* TODO: Split Types and Properties from this file, types are (the rest are properties) https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Types *)
-
 module Cascading = struct
   type t =
     [ `initial
@@ -5479,6 +5477,13 @@ module BoxShadow = struct
     | #Cascading.t as c -> Cascading.toString c
 end
 
+module BoxShadows = struct
+  type t = Shadow.box Shadow.t array
+
+  let toString (x : t) : string =
+    Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Shadow.toString x
+end
+
 module TextShadow = struct
   type t =
     [ `shadow of string
@@ -5493,6 +5498,13 @@ module TextShadow = struct
     | #None.t -> None.toString
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
+end
+
+module TextShadows = struct
+  type t = Shadow.text Shadow.t array
+
+  let toString (x : t) : string =
+    Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Shadow.toString x
 end
 
 module FlexGrow = struct

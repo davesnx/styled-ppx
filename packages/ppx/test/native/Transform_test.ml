@@ -670,6 +670,39 @@ let missing_semicolon_before_nested_media_query_in_declaration_list () =
     ".copy{margin-bottom:24px;}@media (min-width: 1024px) {.copy{width:50%;}}"
     (render list_of_rules)
 
+let missing_semicolon_before_nested_selector_after_interpolation_in_declaration_list
+  () =
+  let input =
+    {|
+    border-bottom: 1px solid $(borderColor)
+    &:last-child {
+      padding-bottom: 0;
+      border-bottom-width: 0;
+    }
+    |}
+  in
+  let rule_list = parse input in
+  let list_of_rules = Transform.run ~className:"faq-item" rule_list in
+  check ~pos:__POS__
+    ".faq-item{border-bottom:1px solid \
+     $(borderColor);}.faq-item:last-child{padding-bottom:0;border-bottom-width:0;}"
+    (render list_of_rules)
+
+let missing_semicolon_before_nested_media_query_after_interpolation_in_declaration_list
+  () =
+  let input =
+    {|
+    margin-bottom: $(Size.lg) @media $(Media.wide) {
+      width: 50%;
+    }
+    |}
+  in
+  let rule_list = parse input in
+  let list_of_rules = Transform.run ~className:"copy" rule_list in
+  check ~pos:__POS__
+    ".copy{margin-bottom:$(Size.lg);}@media $(Media.wide) {.copy{width:50%;}}"
+    (render list_of_rules)
+
 let declaration_after_nested_block_in_declaration_list () =
   let input =
     {|
@@ -811,6 +844,12 @@ let tests =
       missing_semicolon_before_nested_descendant_selector_in_declaration_list;
     test "missing_semicolon_before_nested_media_query_in_declaration_list"
       missing_semicolon_before_nested_media_query_in_declaration_list;
+    test
+      "missing_semicolon_before_nested_selector_after_interpolation_in_declaration_list"
+      missing_semicolon_before_nested_selector_after_interpolation_in_declaration_list;
+    test
+      "missing_semicolon_before_nested_media_query_after_interpolation_in_declaration_list"
+      missing_semicolon_before_nested_media_query_after_interpolation_in_declaration_list;
     test "declaration_after_nested_block_in_declaration_list"
       declaration_after_nested_block_in_declaration_list;
     test "pseudo_class_functions_complex" pseudo_class_functions_complex;

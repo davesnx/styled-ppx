@@ -158,3 +158,20 @@ This test ensures declaration lists accept nested selectors and `@media` blocks 
       CSS.color(CSS.red),
       CSS.selectorMany([|{js|svg path|js}|], [|CSS.SVG.fill(CSS.blue)|]),
     |]);
+
+  let _case14 = borderColor =>
+    CSS.style([|
+      CSS.label("_case14"),
+      CSS.borderBottom(`pxFloat(1.), `solid, borderColor),
+      CSS.selectorMany(
+        [|{js|&:last-child|js}|],
+        [|CSS.paddingBottom(`zero), CSS.borderBottomWidth(`zero)|],
+      ),
+    |]);
+
+  let _case15 = (marginBottom, wide) =>
+    CSS.style([|
+      CSS.label("_case15"),
+      (CSS.marginBottom(marginBottom): CSS.rule),
+      CSS.media(wide, [|CSS.width(`percent(50.))|]),
+    |]);

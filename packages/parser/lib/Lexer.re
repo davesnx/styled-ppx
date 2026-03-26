@@ -1126,6 +1126,7 @@ let declaration_value_starts_nested_block = (~state, lexbuf) => {
     };
     let next_unclassified = read_next_significant();
     switch (next_unclassified.txt) {
+    | Ok(Unclassified_token(INTERPOLATION(_))) => false
     | Ok(unclassified_token)
         when unclassified_token_starts_nested_block(unclassified_token) =>
       let (initial_paren_depth, initial_bracket_depth) =

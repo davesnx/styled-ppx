@@ -535,6 +535,66 @@ let declaration_block_missing_semicolon_tests =
     ),
     (
       {|
+      border-bottom: 1px solid $(borderColor)
+      &:last-child {
+        padding-bottom: 0;
+        border-bottom-width: 0;
+      }
+      |},
+      [
+        IDENT("border-bottom"),
+        COLON,
+        WS,
+        DIMENSION((1., "px")),
+        WS,
+        IDENT("solid"),
+        WS,
+        INTERPOLATION(("borderColor", Ppxlib.Location.none)),
+        SEMI_COLON,
+        AMPERSAND,
+        COLON,
+        TYPE_SELECTOR("last-child"),
+        LEFT_BRACE,
+        IDENT("padding-bottom"),
+        COLON,
+        WS,
+        NUMBER(0.),
+        SEMI_COLON,
+        IDENT("border-bottom-width"),
+        COLON,
+        WS,
+        NUMBER(0.),
+        SEMI_COLON,
+        RIGHT_BRACE,
+      ],
+    ),
+    (
+      {|
+      margin-bottom: $(Size.lg) @media $(Media.wide) {
+        width: 50%;
+      }
+      |},
+      [
+        IDENT("margin-bottom"),
+        COLON,
+        WS,
+        INTERPOLATION(("Size.lg", Ppxlib.Location.none)),
+        SEMI_COLON,
+        AT_RULE("media"),
+        WS,
+        INTERPOLATION(("Media.wide", Ppxlib.Location.none)),
+        WS,
+        LEFT_BRACE,
+        IDENT("width"),
+        COLON,
+        WS,
+        PERCENTAGE(50.),
+        SEMI_COLON,
+        RIGHT_BRACE,
+      ],
+    ),
+    (
+      {|
       color: red
       .child {
         color: blue;

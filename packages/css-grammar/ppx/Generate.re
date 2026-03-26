@@ -633,29 +633,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     };
   };
 
-  /* Convert kebab-case to PascalCase: "keyframes-name" -> "KeyframesName"
-     Also handles leading hyphens: "-non-standard-overflow" -> "NonStandardOverflow" */
-  let kebab_to_pascal_case = (s: string): string => {
-    s
-    |> String.split_on_char('-')
-    |> List.filter(part => part != "")  /* Remove empty strings from leading/trailing hyphens */
-    |> List.map(String.capitalize_ascii)
-    |> String.concat("");
-  };
-
-  /* Generate a type-safe module path expression using [%module_path].
-     This generates: [%module_path Css_types.ModuleName]
-     which expands to a string but with compile-time verification that the module exists. */
-  let make_module_path_expr = (css_type_name: string): Parsetree.expression => {
-    let pascal_name = kebab_to_pascal_case(css_type_name);
-    let lid = Longident.Ldot(Longident.Lident("Css_types"), pascal_name);
-    let construct_expr = pexp_construct(txt(lid), None);
-    pexp_extension((
-      txt("module_path"),
-      PStr([pstr_eval(construct_expr, [])]),
-    ));
-  };
-
   /* Extract the module name from a full path like "Css_types.BoxShadow" -> Some("BoxShadow")
      or return None if the path is empty or invalid */
   let extract_module_name_from_path = (path: string): option(string) =>
@@ -668,12 +645,11 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       };
     };
 
-  /* Create a type expression - either type-safe via [%module_path] or fallback to string.
-     If we can parse the path as Css_types.X, we use the type-safe version. */
+  /* Create a type expression from a full runtime module path.
+     If we can parse the path as Css_types.X, we keep [%module_path] verification. */
   let make_type_path_expr = (path: string): Parsetree.expression => {
     switch (extract_module_name_from_path(path)) {
     | Some(module_name) =>
-      /* Convert PascalCase back to kebab for make_module_path_expr */
       let lid = Longident.Ldot(Longident.Lident("Css_types"), module_name);
       let construct_expr = pexp_construct(txt(lid), None);
       pexp_extension((
@@ -727,6 +703,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     | Terminal(Data_type("interpolation", _), _) => true
     | Terminal(Data_type(name, _), _) =>
       !is_primitive_type(name) && !is_standard_spec(name)
+    | Terminal(Property_type(_), _) => true
     | Terminal(_, _) => false
     | Group(inner, _) => spec_may_contain_interpolation(inner)
     | Combinator(_, values) =>
@@ -735,26 +712,11 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     };
   };
 
-  /* Map CSS type names to their extraction module names.
-     Strips the "extended-" prefix from types that don't have their own Css_types
-     module but whose base types do. E.g., extended-length -> length -> Css_types.Length.
-     This is generic: any new extended-* type in Css_value_types.re is handled
-     automatically, and make_module_path_expr provides compile-time verification
-     that the resulting Css_types module exists. */
-  let type_name_for_extraction = (name: string): string => {
-    let prefix = "extended-";
-    let prefix_len = String.length(prefix);
-    let name_len = String.length(name);
-    if (name_len > prefix_len && String.sub(name, 0, prefix_len) == prefix) {
-      String.sub(name, prefix_len, name_len - prefix_len);
-    } else {
-      name;
-    };
-  };
-
-  /* Helper to extract the type name from a spec for use in interpolation type tracking.
-     Returns None for primitive types that don't have runtime modules. */
-  let rec get_type_name_from_spec =
+  /* Helper to extract the registry key from a spec for interpolation type tracking.
+     Runtime module paths must come from the grammar registry because helper types
+     like font_families and bg-image do not necessarily match their Css_types
+     module names. */
+  let rec get_registry_key_from_spec =
           (spec: Css_spec_parser.value): option(string) => {
     switch (spec) {
     | Terminal(Data_type(name, _), _) =>
@@ -764,17 +726,17 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       } else {
         Some(name);
       }
-    | Terminal(Property_type(name), _) => Some(name)
-    | Group(inner, _) => get_type_name_from_spec(inner)
-    | Combinator(Xor, [single]) => get_type_name_from_spec(single)
+    | Terminal(Property_type(name), _) => Some("property_" ++ name)
+    | Group(inner, _) => get_registry_key_from_spec(inner)
+    | Combinator(Xor, [single]) => get_registry_key_from_spec(single)
     /* For multi-element Xor (like [ <color> | <interpolation> ]),
-       find the first non-interpolation type */
+        find the first non-interpolation type */
     | Combinator(Xor, options) =>
       List.find_map(
         opt =>
           switch (opt) {
           | Terminal(Data_type("interpolation", _), _) => None
-          | _ => get_type_name_from_spec(opt)
+          | _ => get_registry_key_from_spec(opt)
           },
         options,
       )
@@ -782,24 +744,30 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     };
   };
 
+  let resolve_context_expr =
+      (~registry_key: option(string), ~fallback_expr: Parsetree.expression) =>
+    switch (registry_key) {
+    | Some(key) => [%expr
+        resolve_runtime_module_path(
+          [%e estring(key)],
+          ~fallback=[%e fallback_expr],
+        )
+      ]
+    | None => fallback_expr
+    };
+
   /* Generate extract_interpolations function from spec.
      Returns (variable_name, type_path) pairs for partial interpolation support.
-     The type_path is determined by looking at sibling types in Xor combinators.
-     Uses [%module_path] for type-safe compile-time verification of module paths. */
+     The type_path is determined by looking at sibling types in Xor combinators
+     and resolving their runtime module paths through the parser registry. */
   let generate_extract_interpolations_function =
       (
         spec: Css_spec_parser.value,
         ~runtime_module_path: option(string),
+        ~initial_type_context_expr: Parsetree.expression,
         ~loc as _: Location.t,
       )
       : Parsetree.expression => {
-    /* Default type path expression - use type-safe version if possible */
-    let default_type_path_expr =
-      switch (runtime_module_path) {
-      | Some(path) => make_type_path_expr(path)
-      | None => estring("")
-      };
-
     /* Helper to generate extraction expression with type tracking.
        type_context_expr is an expression that evaluates to the type path string. */
     let rec generate_typed_extraction =
@@ -838,13 +806,48 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       /* Non-primitive, non-standard Data_type - delegate extraction to the
          type's module via the registry. These types are defined as [%spec_module]
          in Parser.ml and may contain interpolation internally.
-         Uses extract_from_registry_ast helper to look up the type's extraction
-         function and call it with a type-erased AST value. */
+         Pass along the current type context so generic calc/extended-* wrappers
+         can keep the enclosing property's type when extracting inner
+         interpolations. */
       | Terminal(Data_type(name, _), modifier)
           when !is_primitive_type(name) && !is_standard_spec(name) =>
         let css_name = estring(name);
         let generate_delegation = (inner_expr) => [%expr
-          extract_from_registry_ast([%e css_name], Obj.repr([%e inner_expr]))
+          extract_from_registry_ast(
+            [%e css_name],
+            [%e type_context_expr],
+            Obj.repr([%e inner_expr]),
+          )
+        ];
+        switch (modifier) {
+        | One => generate_delegation(var_expr)
+        | Optional =>
+          switch%expr ([%e var_expr]) {
+          | None => []
+          | Some(inner) => [%e generate_delegation(evar("inner"))]
+          }
+        | Zero_or_more
+        | One_or_more
+        | At_least_one
+        | Repeat(_)
+        | Repeat_by_comma(_, _) => [%expr
+            List.concat_map(
+              item => [%e generate_delegation(evar("item"))],
+              [%e var_expr],
+            )
+          ]
+        };
+
+      /* Property_type references (<'border'>, etc.) also need delegated
+         extraction so shorthand properties preserve interpolated child types. */
+      | Terminal(Property_type(name), modifier) =>
+        let css_name = estring("property_" ++ name);
+        let generate_delegation = (inner_expr) => [%expr
+          extract_from_registry_ast(
+            [%e css_name],
+            [%e type_context_expr],
+            Obj.repr([%e inner_expr]),
+          )
         ];
         switch (modifier) {
         | One => generate_delegation(var_expr)
@@ -913,17 +916,16 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
             inner_spec =>
               switch (inner_spec) {
               | Terminal(Data_type("interpolation", _), _) => None
-              | _ => get_type_name_from_spec(inner_spec)
+              | _ => get_registry_key_from_spec(inner_spec)
               },
             values,
           );
 
-        /* Use type-safe module path for sibling-derived types */
         let effective_context_expr =
-          switch (sibling_type) {
-          | Some(t) => make_module_path_expr(type_name_for_extraction(t))
-          | None => type_context_expr
-          };
+          resolve_context_expr(
+            ~registry_key=sibling_type,
+            ~fallback_expr=type_context_expr,
+          );
 
         let cases =
           List.map(
@@ -934,20 +936,21 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
                 | _ => true
                 };
               if (has_content && spec_may_contain_interpolation(inner_spec)) {
-                /* For direct <interpolation> terminals, prefer runtime_module_path
-                   when available — it represents the module's own type (e.g.,
-                   Css_types.Color for a Color module). Fall back to sibling type
-                   when there's no runtime_module_path.
-                   Whole-value interpolation at property level (e.g., $(x) for
-                   the entire box-shadow) is handled by pack_module before
-                   reaching AST extraction. */
+                /* Whole-value interpolation at property level is already handled
+                   by pack_module before AST extraction. Most direct
+                   <interpolation> branches should still use the module's own
+                   runtime type (e.g. Color -> Css_types.Color). However some
+                   shorthand runtime modules, such as Css_types.Border, don't
+                   expose a unary toString helper for cx2 dynamic vars, so those
+                   branches must keep the sibling-derived context instead. */
                 let context_for_this_spec =
-                  switch (inner_spec) {
-                  | Terminal(Data_type("interpolation", _), _) =>
-                    switch (runtime_module_path) {
-                    | Some(_) => type_context_expr
-                    | None => effective_context_expr
-                    }
+                  switch (inner_spec, runtime_module_path) {
+                  | (Terminal(Data_type("interpolation", _), _), Some("Css_types.Border")) =>
+                    effective_context_expr
+                  | (Terminal(Data_type("interpolation", _), _), Some(_)) =>
+                    type_context_expr
+                  | (Terminal(Data_type("interpolation", _), _), None) =>
+                    effective_context_expr
                   | _ => effective_context_expr
                   };
                 case(
@@ -984,12 +987,11 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
             (i, inner_spec) =>
               if (spec_may_contain_interpolation(inner_spec)) {
                 let var_name = "v" ++ string_of_int(i);
-                /* Try to get type from this position's spec - use type-safe version */
                 let pos_type_expr =
-                  switch (get_type_name_from_spec(inner_spec)) {
-                  | Some(t) => make_module_path_expr(type_name_for_extraction(t))
-                  | None => type_context_expr
-                  };
+                  resolve_context_expr(
+                    ~registry_key=get_registry_key_from_spec(inner_spec),
+                    ~fallback_expr=type_context_expr,
+                  );
                 generate_typed_extraction(
                   inner_spec,
                   evar(var_name),
@@ -1023,12 +1025,11 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
             (i, inner_spec) =>
               if (spec_may_contain_interpolation(inner_spec)) {
                 let var_name = "v" ++ string_of_int(i);
-                /* Use type-safe module path */
                 let pos_type_expr =
-                  switch (get_type_name_from_spec(inner_spec)) {
-                  | Some(t) => make_module_path_expr(type_name_for_extraction(t))
-                  | None => type_context_expr
-                  };
+                  resolve_context_expr(
+                    ~registry_key=get_registry_key_from_spec(inner_spec),
+                    ~fallback_expr=type_context_expr,
+                  );
                 switch%expr ([%e evar(var_name)]) {
                 | None => []
                 | Some(inner) => [%e
@@ -1074,13 +1075,13 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         generate_typed_extraction(
           spec,
           evar("value"),
-          default_type_path_expr,
+          initial_type_context_expr,
         );
       } else {
         [%expr []];
       };
 
-    pexp_fun(Nolabel, None, pvar("value"), body);
+    body;
   };
 
   /* Generate to_string function from spec */
@@ -1122,6 +1123,11 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
 
     let t_type = ptyp_constr(txt @@ Lident("t"), []);
     let string_type = ptyp_constr(txt @@ Lident("string"), []);
+    let default_type_path_expr =
+      switch (runtime_module_path) {
+      | Some(path) => make_type_path_expr(path)
+      | None => estring("")
+      };
 
     let rule_body = make_value(spec);
     let rule_type =
@@ -1181,6 +1187,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       generate_extract_interpolations_function(
         spec,
         ~runtime_module_path,
+        ~initial_type_context_expr=default_type_path_expr,
         ~loc,
       );
     let extract_interpolations_body =
@@ -1188,12 +1195,36 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         Nolabel,
         None,
         Ast_helper.Pat.constraint_(~loc, pvar("value"), t_type),
-        pexp_constraint(
-          pexp_apply(
-            extract_interpolations_inner,
-            [(Nolabel, evar("value"))],
+        pexp_constraint(extract_interpolations_inner, string_string_list_type),
+      );
+    let extract_interpolations_with_context_initial_type_expr = [%expr
+      if (type_context == "") {
+        [%e default_type_path_expr]
+      } else {
+        type_context
+      }
+    ];
+    let extract_interpolations_with_context_inner =
+      generate_extract_interpolations_function(
+        spec,
+        ~runtime_module_path,
+        ~initial_type_context_expr=
+          extract_interpolations_with_context_initial_type_expr,
+        ~loc,
+      );
+    let extract_interpolations_with_context_body =
+      pexp_fun(
+        Nolabel,
+        None,
+        Ast_helper.Pat.constraint_(~loc, pvar("type_context"), string_type),
+        pexp_fun(
+          Nolabel,
+          None,
+          Ast_helper.Pat.constraint_(~loc, pvar("value"), t_type),
+          pexp_constraint(
+            extract_interpolations_with_context_inner,
+            string_string_list_type,
           ),
-          string_string_list_type,
         ),
       );
     let extract_interpolations_binding =
@@ -1205,6 +1236,18 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
             ~loc,
             pvar("extract_interpolations"),
             extract_interpolations_body,
+          ),
+        ],
+      );
+    let extract_interpolations_with_context_binding =
+      Ast_helper.Str.value(
+        ~loc,
+        Nonrecursive,
+        [
+          Ast_helper.Vb.mk(
+            ~loc,
+            pvar("extract_interpolations_with_context"),
+            extract_interpolations_with_context_body,
           ),
         ],
       );
@@ -1243,6 +1286,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       parse_binding,
       to_string_binding,
       extract_interpolations_binding,
+      extract_interpolations_with_context_binding,
       runtime_module_path_binding,
     ];
   };

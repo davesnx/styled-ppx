@@ -23,8 +23,19 @@ let test_box_shadow_full_interp = () => {
   let result = Parser.get_interpolation_types(~name="box-shadow", value);
 
   Alcotest.(check(list(pair(string, string))))(
-    "full interpolation should return BoxShadow type",
-    [("shadow", "Css_types.BoxShadow")],
+    "full interpolation should return BoxShadows type",
+    [("shadow", "Css_types.BoxShadows")],
+    result,
+  );
+};
+
+let test_text_shadow_full_interp = () => {
+  let value = "$(shadow)";
+  let result = Parser.get_interpolation_types(~name="text-shadow", value);
+
+  Alcotest.(check(list(pair(string, string))))(
+    "full interpolation should return TextShadows type",
+    [("shadow", "Css_types.TextShadows")],
     result,
   );
 };
@@ -53,6 +64,65 @@ let test_text_shadow_partial_interp = () => {
   Alcotest.(check(list(pair(string, string))))(
     "partial interpolation extracts color type",
     [("myColor", "Css_types.Color")],
+    result,
+  );
+};
+
+let test_border_top_color_partial_interp = () => {
+  let result =
+    Parser.get_interpolation_types(
+      ~name="border-top",
+      "1px solid $(myColor)",
+    );
+
+  Alcotest.(check(list(pair(string, string))))(
+    "border-top partial interpolation extracts color type",
+    [("myColor", "Css_types.Color")],
+    result,
+  );
+};
+
+let test_height_calc_interp = () => {
+  let result =
+    Parser.get_interpolation_types(
+      ~name="height",
+      "calc(100vh + $(topMenuHeight))",
+    );
+
+  Alcotest.(check(list(pair(string, string))))(
+    "height calc interpolation keeps the length context",
+    [("topMenuHeight", "Css_types.Length")],
+    result,
+  );
+};
+
+let test_font_family_partial_interp = () => {
+  let result =
+    Parser.get_interpolation_types(
+      ~name="font-family",
+      "Inter, $(font)",
+    );
+
+  Alcotest.(check(list(pair(string, string))))(
+    "font-family partial interpolation keeps FontFamily context",
+    [("font", "Css_types.FontFamily")],
+    result,
+  );
+};
+
+let test_flex_duplicate_interpolation_names = () => {
+  let result =
+    Parser.get_interpolation_types(
+      ~name="flex",
+      "$(value) $(value)",
+    );
+
+  Alcotest.(check(list(pair(string, string))))(
+    "flex keeps both duplicate interpolation slots",
+    [
+      ("value", "Css_types.FlexGrow"),
+      ("value", "Css_types.FlexShrink"),
+    ],
     result,
   );
 };
@@ -292,6 +362,11 @@ let tests = [
         test_box_shadow_full_interp,
       ),
       Alcotest.test_case(
+        "text-shadow full interpolation",
+        `Quick,
+        test_text_shadow_full_interp,
+      ),
+      Alcotest.test_case(
         "box-shadow partial interp in length position",
         `Quick,
         test_box_shadow_length_interp,
@@ -300,6 +375,26 @@ let tests = [
         "text-shadow partial interp in color position",
         `Quick,
         test_text_shadow_partial_interp,
+      ),
+      Alcotest.test_case(
+        "border-top partial interp in color position",
+        `Quick,
+        test_border_top_color_partial_interp,
+      ),
+      Alcotest.test_case(
+        "height calc interpolation",
+        `Quick,
+        test_height_calc_interp,
+      ),
+      Alcotest.test_case(
+        "font-family partial interpolation",
+        `Quick,
+        test_font_family_partial_interp,
+      ),
+      Alcotest.test_case(
+        "flex duplicate interpolation names",
+        `Quick,
+        test_flex_duplicate_interpolation_names,
       ),
     ],
   ),

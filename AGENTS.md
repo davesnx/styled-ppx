@@ -36,6 +36,10 @@ The project consists of three main components:
 - **Runtimes** (`packages/runtime/native`, `.../melange`, `.../rescript`): emit CSS for native servers, JS environments, and ReScript compatibility. Shared types live in `packages/runtime/native/shared/Css_types.ml`.
 - **Extraction Pipeline**: `[%cx2]` is the only statically extracted path today; it generates CSS assets during compilation for zero runtime overhead.
 
+## Reference Documents
+- Consult `documents/design.md` before making structural changes across `packages/parser`, `packages/css-grammar`, `packages/ppx`, or the runtime pipeline.
+- Consult `documents/primitives.md` for the shared glossary and preferred terminology used by humans and agents in architecture discussions.
+
 ## Troubleshooting Tips
 - Regenerate snapshots via the appropriate dune alias if expect tests fail after legitimate changes.
 - If opam tooling appears missing, double-check the `_opam` switch integrity before troubleshooting dune.

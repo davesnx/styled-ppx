@@ -269,6 +269,24 @@ Declaration list missing semicolon before nested descendant selector
   > EOF
   color:red;svg path{fill:blue;}
 
+Declaration list missing semicolon before nested selector after interpolation
+  $ cat << "EOF" | ./Render_test.exe
+  > border-bottom: 1px solid $(borderColor)
+  > &:last-child {
+  >   padding-bottom: 0;
+  >   border-bottom-width: 0;
+  > }
+  > EOF
+  border-bottom:1px solid $(borderColor);&:last-child{padding-bottom:0;border-bottom-width:0;}
+
+Declaration list missing semicolon before nested media query after interpolation
+  $ cat << "EOF" | ./Render_test.exe
+  > margin-bottom: $(Size.lg) @media $(Media.wide) {
+  >   width: 50%;
+  > }
+  > EOF
+  margin-bottom:$(Size.lg);@media $(Media.wide) {width:50%;}
+
 Nested descendant selector from declaration list
   $ cat << "EOF" | ./Render_test.exe
   > a {

@@ -117,3 +117,21 @@ let _case13 = [%cx
   }
 |}
 ];
+
+let _case14 = borderColor => [%cx
+  {|
+  border-bottom: 1px solid $(borderColor)
+  &:last-child {
+    padding-bottom: 0;
+    border-bottom-width: 0;
+  }
+|}
+];
+
+let _case15 = (marginBottom, wide) => [%cx
+  {|
+  margin-bottom: $(marginBottom) @media $(wide) {
+    width: 50%;
+  }
+|}
+];

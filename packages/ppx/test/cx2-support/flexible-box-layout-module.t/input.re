@@ -1,5 +1,6 @@
 module X = {
   let value = 1.;
+  let value2 = 1.;
   let flex1 = `num(1.);
   let min = `px(500);
 };
@@ -25,8 +26,9 @@ module X = {
 [%cx2 {|flex: 2 2;|}];
 [%cx2 {|flex: 2 2 10%;|}];
 [%cx2 {|flex: $(X.flex1);|}];
+[%cx2 {|flex: $(X.value) $(X.value2);|}];
+[%cx2 {|flex: $(X.value) $(X.value2) $(X.min);|}];
 [%cx2 {|flex: $(X.value) $(X.value);|}];
-[%cx2 {|flex: $(X.value) $(X.value) $(X.min);|}];
 [%cx2 {|flex-basis: auto|}];
 [%cx2 {|flex-basis: content|}];
 [%cx2 {|flex-basis: 1px|}];

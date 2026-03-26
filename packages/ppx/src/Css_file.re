@@ -67,6 +67,66 @@ module Css_transform = {
     Printf.sprintf("var-%s", hash);
   };
 
+  let variable_to_css_var_name_for_occurrence =
+      (path_str: string, occurrence_index: int, total_occurrences: int) => {
+    let var_name = variable_to_css_var_name(path_str);
+    total_occurrences > 1
+      ? Printf.sprintf("%s_%d", var_name, occurrence_index)
+      : var_name;
+  };
+
+  let count_named_occurrences = names =>
+    names
+    |> List.fold_left(
+         (counts, name) => {
+           let next_count =
+             switch (List.assoc_opt(name, counts)) {
+             | Some(count) => count + 1
+             | None => 1
+             };
+           [(name, next_count), ...List.remove_assoc(name, counts)];
+         },
+         [],
+       );
+
+  let next_occurrence = (name, occurrences) => {
+    let next_count =
+      switch (List.assoc_opt(name, occurrences^)) {
+      | Some(count) => count + 1
+      | None => 1
+      };
+    occurrences := [(name, next_count), ...List.remove_assoc(name, occurrences^)];
+    next_count;
+  };
+
+  let take_first_matching_name = (name, items) => {
+    let rec loop = (before_rev, remaining) => {
+      switch (remaining) {
+      | [] => (None, List.rev(before_rev))
+      | [((item_name, value) as item), ...tail] =>
+        if (item_name == name) {
+          (Some(value), List.rev_append(before_rev, tail));
+        } else {
+          loop([item, ...before_rev], tail);
+        }
+      };
+    };
+
+    loop([], items);
+  };
+
+  let add_dynamic_var = (dynamic_vars, dynamic_var) => {
+    let (var_name, _, _) = dynamic_var;
+    if (
+      !List.exists(
+        ((existing_var_name, _, _)) => existing_var_name == var_name,
+        dynamic_vars^,
+      )
+    ) {
+      dynamic_vars := [dynamic_var, ...dynamic_vars^];
+    };
+  };
+
   let generate_class_from_content = (content: string): string => {
     Printf.sprintf("css-%s", Murmur2.default(content));
   };
@@ -75,18 +135,13 @@ module Css_transform = {
           (
             cv: component_value,
             dynamic_vars: ref(list((string, string, var_type))),
-            property_name: option(string),
-            get_type_for_var: string => var_type,
+            get_var_binding: string => (string, var_type),
           )
           : component_value => {
     switch (cv) {
     | Variable(path_str, _loc) =>
-      let var_name = variable_to_css_var_name(path_str);
-
-      let var_type = get_type_for_var(path_str);
-      if (!List.exists(((vn, _, _)) => vn == var_name, dynamic_vars^)) {
-        dynamic_vars := [(var_name, path_str, var_type), ...dynamic_vars^];
-      };
+      let (var_name, var_type) = get_var_binding(path_str);
+      add_dynamic_var(dynamic_vars, (var_name, path_str, var_type));
 
       Function(
         ("var", Ppxlib.Location.none),
@@ -104,8 +159,7 @@ module Css_transform = {
               transform_component_value(
                 value,
                 dynamic_vars,
-                property_name,
-                get_type_for_var,
+                get_var_binding,
               ),
               loc,
             ),
@@ -120,8 +174,7 @@ module Css_transform = {
               transform_component_value(
                 value,
                 dynamic_vars,
-                property_name,
-                get_type_for_var,
+                get_var_binding,
               ),
               loc,
             ),
@@ -136,8 +189,7 @@ module Css_transform = {
               transform_component_value(
                 value,
                 dynamic_vars,
-                property_name,
-                get_type_for_var,
+                get_var_binding,
               ),
               loc,
             ),
@@ -159,9 +211,7 @@ module Css_transform = {
     switch (sel) {
     | SimpleSelector(Variable(path_str, var_loc)) =>
       let var_name = variable_to_css_var_name(path_str);
-      if (!List.exists(((vn, _, _)) => vn == var_name, dynamic_vars^)) {
-        dynamic_vars := [(var_name, path_str, Selector), ...dynamic_vars^];
-      };
+      add_dynamic_var(dynamic_vars, (var_name, path_str, Selector));
       SimpleSelector(Variable(path_str, var_loc));
     | SimpleSelector(simple) => SimpleSelector(simple)
     | ComplexSelector(complex) =>
@@ -218,9 +268,7 @@ module Css_transform = {
     switch (simple) {
     | Variable(path_str, var_loc) =>
       let var_name = variable_to_css_var_name(path_str);
-      if (!List.exists(((vn, _, _)) => vn == var_name, dynamic_vars^)) {
-        dynamic_vars := [(var_name, path_str, Selector), ...dynamic_vars^];
-      };
+      add_dynamic_var(dynamic_vars, (var_name, path_str, Selector));
       SimpleSelector(Variable(path_str, var_loc));
     | _ => SimpleSelector(simple)
     };
@@ -231,9 +279,7 @@ module Css_transform = {
     switch (subclass) {
     | ClassVariable(path_str, var_loc) =>
       let var_name = variable_to_css_var_name(path_str);
-      if (!List.exists(((vn, _, _)) => vn == var_name, dynamic_vars^)) {
-        dynamic_vars := [(var_name, path_str, Selector), ...dynamic_vars^];
-      };
+      add_dynamic_var(dynamic_vars, (var_name, path_str, Selector));
       ClassVariable(path_str, var_loc);
     | _ => subclass
     };
@@ -251,17 +297,41 @@ module Css_transform = {
         value_string,
       );
 
-    let get_type_for_var = var_name => {
-      let type_path =
-        switch (
-          List.find_opt(((name, _)) => name == var_name, interpolation_types)
-        ) {
-        | Some((_, tp)) when tp != "" => tp
-        | _ => ""
+    let interpolation_occurrences =
+      interpolation_types
+      |> List.map(((name, _)) => name)
+      |> count_named_occurrences;
+    let seen_interpolations = ref([]);
+    let remaining_interpolation_types = ref(interpolation_types);
+
+    let get_var_binding = var_name => {
+      let occurrence_index = next_occurrence(var_name, seen_interpolations);
+      let total_occurrences =
+        switch (List.assoc_opt(var_name, interpolation_occurrences)) {
+        | Some(count) => count
+        | None => 1
         };
-      RuntimeModule(
-        Property_to_types.resolve_module_name(~type_path, ~property_name),
-      );
+      let css_var_name =
+        variable_to_css_var_name_for_occurrence(
+          var_name,
+          occurrence_index,
+          total_occurrences,
+        );
+      let (type_path, remaining_types) =
+        switch (
+          take_first_matching_name(var_name, remaining_interpolation_types^)
+        ) {
+        | (Some(type_path), remaining_types) => (type_path, remaining_types)
+        | (None, remaining_types) => ("", remaining_types)
+        };
+      remaining_interpolation_types := remaining_types;
+
+      let var_type =
+        RuntimeModule(
+          Property_to_types.resolve_module_name(~type_path, ~property_name),
+        );
+
+      (css_var_name, var_type);
     };
 
     let transformed_values =
@@ -271,8 +341,7 @@ module Css_transform = {
             transform_component_value(
               cv,
               dynamic_vars,
-              Some(property_name),
-              get_type_for_var,
+              get_var_binding,
             ),
             loc,
           ),
@@ -316,7 +385,8 @@ module Css_transform = {
   and transform_at_rule = (at_rule: at_rule, dynamic_vars) => {
     let { name, prelude, block, loc } = at_rule;
     let (prelude_values, prelude_loc) = prelude;
-    let default_type_for_var = _var => MediaQuery;
+    let default_var_binding = var_name =>
+      (variable_to_css_var_name(var_name), MediaQuery);
     let transformed_prelude =
       List.map(
         ((cv, cv_loc)) =>
@@ -324,8 +394,7 @@ module Css_transform = {
             transform_component_value(
               cv,
               dynamic_vars,
-              None,
-              default_type_for_var,
+              default_var_binding,
             ),
             cv_loc,
           ),
