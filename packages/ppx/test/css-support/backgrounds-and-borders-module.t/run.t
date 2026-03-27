@@ -186,6 +186,18 @@ If this test fail means that the module is not in sync with the ppx
   );
   
   CSS.boxShadows([|
+    CSS.Shadow.box(~x=`pxFloat(1.), ~y=`pxFloat(1.), `currentColor),
+  |]);
+  CSS.boxShadows([|CSS.Shadow.box(~x=`zero, ~y=`zero, CSS.black)|]);
+  CSS.boxShadows([|
+    CSS.Shadow.box(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(2.),
+      ~blur=`pxFloat(3.),
+      CSS.black,
+    ),
+  |]);
+  CSS.boxShadows([|
     CSS.Shadow.box(
       ~x=`pxFloat(1.),
       ~y=`pxFloat(2.),

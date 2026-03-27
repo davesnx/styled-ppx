@@ -169,10 +169,10 @@ module Color = {
 [%css {|border-image: url(foo.png) 10 / 10% / 10px|}];
 [%css {|border-image: url(foo.png) fill 10 / 10% / 10px|}];
 [%css {|border-image: url(foo.png) fill 10 / 10% / 10px space|}];
-/* The following shadow declarations are not supported in the CSS Parser */
-/* [%css {|box-shadow: 1px 1px|}]; */
-/* [%css {|box-shadow: 0 0 black|}]; */
-/* [%css {|box-shadow: 1px 2px 3px black|}]; */
+/* box-shadow with fewer than 4 lengths */
+[%css {|box-shadow: 1px 1px|}];
+[%css {|box-shadow: 0 0 black|}];
+[%css {|box-shadow: 1px 2px 3px black|}];
 [%css {|box-shadow: 1px 2px 3px 4px black|}];
 [%css {|box-shadow: inset 1px 2px 3px 4px black|}];
 [%css {|box-shadow: inset 1px 2px 3px 4px black, 1px 2px 3px 4px black|}];

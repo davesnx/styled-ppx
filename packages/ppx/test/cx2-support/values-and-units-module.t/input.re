@@ -1,0 +1,18 @@
+CSS.width(`rem(5.));
+CSS.width(`ch(5.));
+CSS.width(`vw(5.));
+CSS.width(`vh(5.));
+CSS.width(`vmin(5.));
+CSS.width(`vmax(5.));
+CSS.width(`calc(`add((`pxFloat(1.), `pxFloat(2.)))));
+CSS.width(`calc(`mult((`pxFloat(5.), `num(2.)))));
+CSS.width(`calc(`mult((`pxFloat(5.), `num(2.)))));
+CSS.width(`calc(`sub((`pxFloat(5.), `pxFloat(10.)))));
+CSS.width(`calc(`sub((`vw(1.), `pxFloat(1.)))));
+CSS.width(`percent(100.));
+CSS.padding(`rem(5.));
+CSS.padding(`ch(5.));
+CSS.padding(`vw(5.));
+CSS.padding(`vh(5.));
+CSS.padding(`vmin(5.));
+CSS.padding(`vmax(5.));

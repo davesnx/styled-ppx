@@ -3,10 +3,15 @@ module Location = Ppxlib.Location;
 let menhir = MenhirLib.Convert.Simplified.traditional2revised;
 
 let make_state = (~initial_mode): Lexer_context.lexer_state => {
-  mode: initial_mode,
+  mode_stack: [initial_mode],
+  unclassified_buffer: Queue.create(),
   paren_depth: 0,
   brace_depth: 0,
   bracket_depth: 0,
+  declaration_value_allows_implicit_nested_terminator: false,
+  declaration_value_has_content: false,
+  declaration_value_top_level_items: 0,
+  declaration_value_ident_like_prefix: false,
   last_was_ident: false,
   last_was_combinator: false,
   last_was_delimiter: false,
