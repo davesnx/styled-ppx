@@ -1,5 +1,5 @@
 /* CSS Frequency and Resolution Units */
-/* These types exist in Parser.ml but are missing from Css_types.ml */
+/* These types exist in Css_grammar but are missing from Css_types.ml */
 
 /* Resolution units - tested via image-set in background-image */
 [%css {|image-rendering: auto|}];

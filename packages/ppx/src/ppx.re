@@ -34,10 +34,16 @@ let rec type_check_rule = (rule: Styled_ppx_css_parser.Ast.rule) => {
       Ok(),
     ]
   | Declaration({ name: (name, _), value: (value, value_loc), loc: _, _ }) =>
-    let value = Styled_ppx_css_parser.Render.component_value_list(value);
-    switch (Css_grammar.Parser.check_property(~loc=value_loc, ~name, value)) {
+    switch (
+      Css_grammar.validate_property(
+        ~loc=value_loc,
+        ~name,
+        value,
+      )
+    ) {
     | Ok () => [Ok()]
     | Error((loc, `Invalid_value(raw_error))) =>
+      let value = Styled_ppx_css_parser.Render.component_value_list(value);
       let msg =
         raw_error == ""
           ? Format.sprintf(
@@ -49,7 +55,7 @@ let rec type_check_rule = (rule: Styled_ppx_css_parser.Ast.rule) => {
       [Error((loc, `Invalid_value(msg)))];
     | Error((loc, `Property_not_found)) =>
       let msg =
-        switch (Css_grammar.Parser.suggest_property_name(name)) {
+        switch (Css_grammar.suggest_property_name(name)) {
         | Some(suggestion) =>
           "Unknown property '"
           ++ name
@@ -234,7 +240,7 @@ let make_styled_extension = htmlTag => {
               ) {
               | Ok(declarations) =>
                 declarations
-                |> Css_to_runtime.render_declarations(~loc)
+                |> Css_to_runtime.render_declarations(~loc, ~source=str)
                 |> Css_to_runtime.addLabel(~loc, moduleName)
                 |> Builder.pexp_array(~loc)
                 |> Css_to_runtime.render_style_call(~loc)
@@ -344,7 +350,7 @@ let () = {
                 ) {
                 | Ok(declarations) =>
                   declarations
-                  |> Css_to_runtime.render_declarations(~loc)
+                  |> Css_to_runtime.render_declarations(~loc, ~source=txt)
                   |> maybe_add_label(~loc)
                   |> Builder.pexp_array(~loc)
                   |> Css_to_runtime.render_style_call(~loc)
@@ -492,7 +498,11 @@ let () = {
                 ) {
                 | Ok(declarations) =>
                   let declarationListValues =
-                    Css_to_runtime.render_declaration(~loc, declarations);
+                    Css_to_runtime.render_declaration(
+                      ~loc,
+                      ~source=txt,
+                      declarations,
+                    );
                   List.nth(declarationListValues, 0);
                 | Error((loc, msg)) => Error.expr(~loc, msg)
                 };
@@ -531,7 +541,7 @@ let () = {
                   Styled_ppx_css_parser.Driver.parse_stylesheet(~loc, txt)
                 ) {
                 | Ok(stylesheets) =>
-                  Css_to_runtime.render_global(~loc, stylesheets)
+                  Css_to_runtime.render_global(~loc, ~source=txt, stylesheets)
                 | Error((loc, msg)) => Error.expr(~loc, msg)
                 };
               | _ =>
@@ -623,7 +633,7 @@ If your intent is to apply the declaration to all elements, use the universal se
                   Styled_ppx_css_parser.Driver.parse_keyframes(~loc, txt)
                 ) {
                 | Ok(declarations) =>
-                  Css_to_runtime.render_keyframes(~loc, declarations)
+                  Css_to_runtime.render_keyframes(~loc, ~source=txt, declarations)
                 | Error((loc, msg)) => Error.expr(~loc, msg)
                 };
               | _ =>

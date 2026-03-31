@@ -3,8 +3,9 @@ module Parsetree = Ppxlib.Parsetree;
 module Builder = Ppxlib.Ast_builder.Default;
 
 module Standard = Css_grammar.Css_value_types;
-module Property_parser = Css_grammar.Parser;
+module Property_parser = Css_grammar;
 module Types = Property_parser;
+module Parser_ast = Styled_ppx_css_parser.Ast;
 
 let (let.ok) = Result.bind;
 
@@ -19,12 +20,13 @@ exception Invalid_value(string);
 
 let id = Fun.id;
 
-/* Why this type contains so much when only `string_to_expr` is used? */
 type transform('ast, 'value) = {
-  ast_of_string: string => result('ast, string),
+  ast_of_component_values:
+    Parser_ast.component_value_list => result('ast, string),
   ast_to_expr: (~loc: Location.t, 'ast) => list(Parsetree.expression),
-  string_to_expr:
-    (~loc: Location.t, string) => result(list(Parsetree.expression), string),
+  component_value_list_to_expr:
+    (~loc: Location.t, Parser_ast.component_value_list) =>
+    result(list(Parsetree.expression), string),
 };
 
 let add_CSS_rule_constraint = (~loc, expr) => {
@@ -42,30 +44,32 @@ let add_CSS_rule_constraint = (~loc, expr) => {
 
 /* TODO: emit is better to keep value_of_ast and value_to_expr in the same fn */
 let emit = (property, value_of_ast, value_to_expr) => {
-  let ast_of_string = Css_grammar.Parser.parse(property);
+  let ast_of_component_values =
+    Css_grammar.type_check(property);
   let ast_to_expr = (~loc, ast) =>
     value_of_ast(~loc, ast) |> value_to_expr(~loc);
-  let string_to_expr = (~loc, string) =>
-    ast_of_string(string) |> Result.map(ast_to_expr(~loc));
+  let component_value_list_to_expr = (~loc, values) =>
+    ast_of_component_values(values) |> Result.map(ast_to_expr(~loc));
 
   {
-    ast_of_string,
+    ast_of_component_values,
     ast_to_expr,
-    string_to_expr,
+    component_value_list_to_expr,
   };
 };
 
 let emit_shorthand = (parser, mapper, value_to_expr) => {
-  let ast_of_string = Css_grammar.Parser.parse(parser);
+  let ast_of_component_values =
+    Css_grammar.type_check(parser);
   let ast_to_expr = (~loc, ast) =>
     ast |> List.map(mapper(~loc)) |> value_to_expr(~loc);
-  let string_to_expr = (~loc, string) =>
-    ast_of_string(string) |> Result.map(ast_to_expr(~loc));
+  let component_value_list_to_expr = (~loc, values) =>
+    ast_of_component_values(values) |> Result.map(ast_to_expr(~loc));
 
   {
-    ast_of_string,
+    ast_of_component_values,
     ast_to_expr,
-    string_to_expr,
+    component_value_list_to_expr,
   };
 };
 
@@ -177,7 +181,7 @@ let to_camel_case = txt =>
 
 let render_css_global_values = (~loc, name, value) => {
   let.ok value =
-    Css_grammar.Parser.parse(
+    Css_grammar.type_check(
       Css_grammar.Css_value_types.css_wide_keywords,
       value,
     );
@@ -5227,13 +5231,12 @@ let line_break =
     },
   );
 
-let found = ({ ast_of_string, string_to_expr, _ }) => {
-  /* TODO: Why we have 'check_value' when we don't use it? */
-  let check_value = string => {
-    let.ok _ = ast_of_string(string);
+let found = ({ ast_of_component_values, component_value_list_to_expr, _ }) => {
+  let check_value = values => {
+    let.ok _ = ast_of_component_values(values);
     Ok();
   };
-  (check_value, string_to_expr);
+  (check_value, component_value_list_to_expr);
 };
 
 let caret_color = unsupportedProperty(Property_parser.property_caret_color);
@@ -6529,8 +6532,7 @@ let properties = [
 let render_when_unsupported_features = (~loc, property, value) => {
   /* Transform property name to camelCase since we bind to emotion with the Object API */
   let propertyExpr = property |> to_camel_case |> render_string(~loc);
-  let valueExpr =
-    String_interpolation.transform(~loc, ~delimiter="js", value);
+  let valueExpr = String_interpolation.transform(~loc, ~delimiter="js", value);
 
   [%expr CSS.unsafe([%e propertyExpr], [%e valueExpr])];
 };
@@ -6566,12 +6568,18 @@ let render_to_expr = (~loc, property, value, important) => {
   };
 };
 
-let render = (~loc: Location.t, property, value, important) =>
+let render = (~loc: Location.t, ~raw_value_source, property, value, important) =>
   if (isVariableDeclaration(property)) {
-    Ok([render_variable_declaration(~loc, property, value)]);
+    Ok([render_variable_declaration(~loc, property, raw_value_source)]);
   } else {
     let.ok () =
-      switch (Property_parser.check_property(~loc, ~name=property, value)) {
+      switch (
+        Property_parser.validate_property(
+          ~loc,
+          ~name=property,
+          value,
+        )
+      ) {
       | Ok () => Ok()
       | Error((_, `Invalid_value(_))) => Ok()
       | Error((_, `Property_not_found)) => Error(`Property_not_found)
@@ -6586,7 +6594,7 @@ let render = (~loc: Location.t, property, value, important) =>
       | exception Impossible_state => Error(`Impossible_state)
       | Error(_)
       | exception Unsupported_feature =>
-        Ok([render_when_unsupported_features(~loc, property, value)])
+        Ok([render_when_unsupported_features(~loc, property, raw_value_source)])
       }
     };
   };

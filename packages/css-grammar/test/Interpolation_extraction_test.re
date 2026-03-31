@@ -1,14 +1,27 @@
-module Parser = Css_grammar.Parser;
+module Parser = Css_grammar;
+module Driver = Styled_ppx_css_parser.Driver;
+module Ast = Styled_ppx_css_parser.Ast;
+
+let parse_declaration_value_component_values = (~name, value) =>
+  switch (
+    Driver.parse_declaration(~loc=Ppxlib.Location.none, name ++ ": " ++ value)
+  ) {
+  | Ok({ Ast.value: (values, _), _ }) => values
+  | Error((_, msg)) => Alcotest.fail("parser should succeed: " ++ msg)
+  };
+
+let infer_interpolation_types = (name, value) =>
+  Parser.infer_interpolation_types(
+    ~name,
+    parse_declaration_value_component_values(~name, value),
+  );
 
 let test_box_shadow_partial_interp = () => {
   /* Test box-shadow with partial interpolation in color position.
      Extraction delegates through the registry to find interpolation types
      from inner type positions (e.g., <color> inside <shadow>). */
   let result =
-    Parser.get_interpolation_types(
-      ~name="box-shadow",
-      "0 1px 0 0 $(myColor)",
-    );
+    infer_interpolation_types("box-shadow", "0 1px 0 0 $(myColor)");
 
   Alcotest.(check(list(pair(string, string))))(
     "partial interpolation extracts color type",
@@ -20,7 +33,7 @@ let test_box_shadow_partial_interp = () => {
 let test_box_shadow_full_interp = () => {
   /* Test box-shadow with full interpolation */
   let value = "$(shadow)";
-  let result = Parser.get_interpolation_types(~name="box-shadow", value);
+  let result = infer_interpolation_types("box-shadow", value);
 
   Alcotest.(check(list(pair(string, string))))(
     "full interpolation should return BoxShadows type",
@@ -31,7 +44,7 @@ let test_box_shadow_full_interp = () => {
 
 let test_text_shadow_full_interp = () => {
   let value = "$(shadow)";
-  let result = Parser.get_interpolation_types(~name="text-shadow", value);
+  let result = infer_interpolation_types("text-shadow", value);
 
   Alcotest.(check(list(pair(string, string))))(
     "full interpolation should return TextShadows type",
@@ -45,7 +58,7 @@ let test_box_shadow_length_interp = () => {
      Extraction delegates through the registry to find interpolation types
      from inner type positions (e.g., <extended-length> inside <shadow>). */
   let value = "$(xOffset) 1px 0 0 red";
-  let result = Parser.get_interpolation_types(~name="box-shadow", value);
+  let result = infer_interpolation_types("box-shadow", value);
 
   Alcotest.(check(list(pair(string, string))))(
     "length interpolation extracts Length type",
@@ -59,7 +72,7 @@ let test_text_shadow_partial_interp = () => {
      Extraction delegates through the registry to find interpolation types
      from inner type positions (e.g., <color> inside <shadow-t>). */
   let value = "1px 1px 2px $(myColor)";
-  let result = Parser.get_interpolation_types(~name="text-shadow", value);
+  let result = infer_interpolation_types("text-shadow", value);
 
   Alcotest.(check(list(pair(string, string))))(
     "partial interpolation extracts color type",
@@ -69,11 +82,7 @@ let test_text_shadow_partial_interp = () => {
 };
 
 let test_border_top_color_partial_interp = () => {
-  let result =
-    Parser.get_interpolation_types(
-      ~name="border-top",
-      "1px solid $(myColor)",
-    );
+  let result = infer_interpolation_types("border-top", "1px solid $(myColor)");
 
   Alcotest.(check(list(pair(string, string))))(
     "border-top partial interpolation extracts color type",
@@ -84,10 +93,7 @@ let test_border_top_color_partial_interp = () => {
 
 let test_height_calc_interp = () => {
   let result =
-    Parser.get_interpolation_types(
-      ~name="height",
-      "calc(100vh + $(topMenuHeight))",
-    );
+    infer_interpolation_types("height", "calc(100vh + $(topMenuHeight))");
 
   Alcotest.(check(list(pair(string, string))))(
     "height calc interpolation keeps the length context",
@@ -97,11 +103,7 @@ let test_height_calc_interp = () => {
 };
 
 let test_font_family_partial_interp = () => {
-  let result =
-    Parser.get_interpolation_types(
-      ~name="font-family",
-      "Inter, $(font)",
-    );
+  let result = infer_interpolation_types("font-family", "Inter, $(font)");
 
   Alcotest.(check(list(pair(string, string))))(
     "font-family partial interpolation keeps FontFamily context",
@@ -111,130 +113,52 @@ let test_font_family_partial_interp = () => {
 };
 
 let test_flex_duplicate_interpolation_names = () => {
-  let result =
-    Parser.get_interpolation_types(
-      ~name="flex",
-      "$(value) $(value)",
-    );
+  let result = infer_interpolation_types("flex", "$(value) $(value)");
 
   Alcotest.(check(list(pair(string, string))))(
     "flex keeps both duplicate interpolation slots",
-    [
-      ("value", "Css_types.FlexGrow"),
-      ("value", "Css_types.FlexShrink"),
-    ],
+    [("value", "Css_types.FlexGrow"), ("value", "Css_types.FlexShrink")],
     result,
   );
 };
 
-/* Phase 0: Verify [%spec_module] generated modules work at runtime */
-let test_spec_module_runtime_module_path_none = () => {
-  Alcotest.(check(option(string)))(
-    "spec_module without path has runtime_module_path = None",
-    None,
-    Parser.Test_simple.runtime_module_path,
-  );
-};
-
-let test_spec_module_runtime_module_path_some = () => {
-  Alcotest.(check(option(string)))(
-    "spec_module with path has runtime_module_path = Some",
-    Some("Css_types.Color"),
-    Parser.Test_with_path.runtime_module_path,
-  );
-};
-
-let test_spec_module_parse = () => {
-  let result = Parser.Test_with_path.parse("red");
-  switch (result) {
-  | Ok(_) =>
-    Alcotest.(check(bool))("parse succeeds for valid color", true, true)
-  | Error(msg) =>
-    Alcotest.fail("parse should succeed for 'red', got: " ++ msg)
-  };
-};
-
-let test_spec_module_extract_on_parsed = () => {
-  /* For [%spec_module "<color>"], the spec is a single terminal data type.
-     With registry delegation, extract_interpolations can now find
-     interpolations inside referenced types like <color>.
-     The <color> type itself includes <interpolation> internally,
-     and delegation via registry extracts the type from it. */
-  let result = Parser.Test_with_path.parse("$(myVar)");
-  switch (result) {
-  | Ok(ast) =>
-    let interps = Parser.Test_with_path.extract_interpolations(ast);
-    Alcotest.(check(list(pair(string, string))))(
-      "extract_interpolations finds interpolation via registry delegation",
-      [("myVar", "Css_types.Color")],
-      interps,
+let test_box_shadow_partial_interp_component_values = () => {
+  let result =
+    Parser.infer_interpolation_types(
+      ~name="box-shadow",
+      parse_declaration_value_component_values(
+        ~name="box-shadow",
+        "0 1px 0 0 $(myColor)",
+      ),
     );
-  | Error(msg) =>
-    Alcotest.fail("parse should succeed for '$(myVar)', got: " ++ msg)
-  };
-};
 
-let test_spec_module_explicit_interpolation = () => {
-  /* This spec has <interpolation> explicitly in the union.
-     extract_interpolations should find it and return the module path. */
-  let result = Parser.Test_with_interp.parse("$(myLength)");
-  switch (result) {
-  | Ok(ast) =>
-    let interps = Parser.Test_with_interp.extract_interpolations(ast);
-    Alcotest.(check(list(pair(string, string))))(
-      "extract_interpolations finds explicit interpolation with Length type path",
-      [("myLength", "Css_types.Length")],
-      interps,
-    );
-  | Error(msg) =>
-    Alcotest.fail("parse should succeed for '$(myLength)', got: " ++ msg)
-  };
-};
-
-let test_pack_module_hybrid_extraction = () => {
-  /* Verify pack_module's hybrid approach: for <color> (opaque type containing
-     interpolation internally), the module's extract_interpolations returns [],
-     but pack_module falls back to whole-value interpolation detection. */
-  let packed = Parser.pack_module((module Parser.Test_with_path));
-  let Parser.Pack_rule({ extract_interpolations, _ }) = packed;
-  let result = extract_interpolations("$(myColor)");
   Alcotest.(check(list(pair(string, string))))(
-    "pack_module hybrid: falls back to runtime_module_path for opaque types",
+    "component_value_list extraction keeps color type",
     [("myColor", "Css_types.Color")],
     result,
   );
 };
 
-let test_pack_module_rich_extraction = () => {
-  /* Verify pack_module uses the module's rich extraction when available */
-  let packed = Parser.pack_module((module Parser.Test_with_interp));
-  let Parser.Pack_rule({ extract_interpolations, _ }) = packed;
-  let result = extract_interpolations("$(myLength)");
+let test_flex_duplicate_interpolation_names_component_values = () => {
+  let result =
+    Parser.infer_interpolation_types(
+      ~name="flex",
+      parse_declaration_value_component_values(
+        ~name="flex",
+        "$(value) $(value)",
+      ),
+    );
+
   Alcotest.(check(list(pair(string, string))))(
-    "pack_module rich: uses module's extract_interpolations",
-    [("myLength", "Css_types.Length")],
+    "component_value_list keeps duplicate interpolation slots",
+    [("value", "Css_types.FlexGrow"), ("value", "Css_types.FlexShrink")],
     result,
   );
 };
 
-let test_spec_module_extract_no_interp = () => {
-  let result = Parser.Test_with_path.parse("red");
-  switch (result) {
-  | Ok(ast) =>
-    let interps = Parser.Test_with_path.extract_interpolations(ast);
-    Alcotest.(check(list(pair(string, string))))(
-      "extract_interpolations returns empty for non-interpolated value",
-      [],
-      interps,
-    );
-  | Error(msg) =>
-    Alcotest.fail("parse should succeed for 'red', got: " ++ msg)
-  };
-};
-
-/* Test get_interpolation_types for properties WITH runtime_module_path */
+/* Test infer_interpolation_types for properties WITH runtime_module_path */
 let test_color_full_interp = () => {
-  let result = Parser.get_interpolation_types(~name="color", "$(myColor)");
+  let result = infer_interpolation_types("color", "$(myColor)");
   Alcotest.(check(list(pair(string, string))))(
     "color full interp returns Css_types.Color",
     [("myColor", "Css_types.Color")],
@@ -243,8 +167,7 @@ let test_color_full_interp = () => {
 };
 
 let test_display_full_interp = () => {
-  let result =
-    Parser.get_interpolation_types(~name="display", "$(myDisplay)");
+  let result = infer_interpolation_types("display", "$(myDisplay)");
   Alcotest.(check(list(pair(string, string))))(
     "display full interp returns Css_types.Display",
     [("myDisplay", "Css_types.Display")],
@@ -253,7 +176,7 @@ let test_display_full_interp = () => {
 };
 
 let test_width_full_interp = () => {
-  let result = Parser.get_interpolation_types(~name="width", "$(myWidth)");
+  let result = infer_interpolation_types("width", "$(myWidth)");
   Alcotest.(check(list(pair(string, string))))(
     "width full interp returns Css_types.Width",
     [("myWidth", "Css_types.Width")],
@@ -261,10 +184,9 @@ let test_width_full_interp = () => {
   );
 };
 
-/* Test get_interpolation_types for properties with derived runtime_module_path */
+/* Test infer_interpolation_types for properties with derived runtime_module_path */
 let test_background_color_full_interp = () => {
-  let result =
-    Parser.get_interpolation_types(~name="background-color", "$(myBg)");
+  let result = infer_interpolation_types("background-color", "$(myBg)");
   Alcotest.(check(list(pair(string, string))))(
     "background-color full interp returns Css_types.Color",
     [("myBg", "Css_types.Color")],
@@ -273,8 +195,7 @@ let test_background_color_full_interp = () => {
 };
 
 let test_padding_top_full_interp = () => {
-  let result =
-    Parser.get_interpolation_types(~name="padding-top", "$(myPad)");
+  let result = infer_interpolation_types("padding-top", "$(myPad)");
   Alcotest.(check(list(pair(string, string))))(
     "padding-top full interp returns Css_types.Length",
     [("myPad", "Css_types.Length")],
@@ -283,8 +204,7 @@ let test_padding_top_full_interp = () => {
 };
 
 let test_opacity_full_interp = () => {
-  let result =
-    Parser.get_interpolation_types(~name="opacity", "$(myOpacity)");
+  let result = infer_interpolation_types("opacity", "$(myOpacity)");
   Alcotest.(check(list(pair(string, string))))(
     "opacity full interp returns Css_types.Opacity",
     [("myOpacity", "Css_types.Opacity")],
@@ -294,7 +214,7 @@ let test_opacity_full_interp = () => {
 
 /* Test non-interpolated values return empty */
 let test_color_no_interp = () => {
-  let result = Parser.get_interpolation_types(~name="color", "red");
+  let result = infer_interpolation_types("color", "red");
   Alcotest.(check(list(pair(string, string))))(
     "color with literal returns empty",
     [],
@@ -396,50 +316,15 @@ let tests = [
         `Quick,
         test_flex_duplicate_interpolation_names,
       ),
-    ],
-  ),
-  (
-    "spec_module verification",
-    [
       Alcotest.test_case(
-        "runtime_module_path is None without path arg",
+        "box-shadow partial interp with component_value_list",
         `Quick,
-        test_spec_module_runtime_module_path_none,
+        test_box_shadow_partial_interp_component_values,
       ),
       Alcotest.test_case(
-        "runtime_module_path is Some with path arg",
+        "flex duplicate interpolation names with component_value_list",
         `Quick,
-        test_spec_module_runtime_module_path_some,
-      ),
-      Alcotest.test_case(
-        "parse works on valid value",
-        `Quick,
-        test_spec_module_parse,
-      ),
-      Alcotest.test_case(
-        "extract_interpolations on interpolated value",
-        `Quick,
-        test_spec_module_extract_on_parsed,
-      ),
-      Alcotest.test_case(
-        "extract_interpolations with explicit <interpolation> in spec",
-        `Quick,
-        test_spec_module_explicit_interpolation,
-      ),
-      Alcotest.test_case(
-        "extract_interpolations on non-interpolated value",
-        `Quick,
-        test_spec_module_extract_no_interp,
-      ),
-      Alcotest.test_case(
-        "pack_module hybrid extraction for opaque types",
-        `Quick,
-        test_pack_module_hybrid_extraction,
-      ),
-      Alcotest.test_case(
-        "pack_module rich extraction for explicit interpolation",
-        `Quick,
-        test_pack_module_rich_extraction,
+        test_flex_duplicate_interpolation_names_component_values,
       ),
     ],
   ),

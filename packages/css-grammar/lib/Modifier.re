@@ -60,7 +60,7 @@ let repeat_by_sep = (sep, (min, max), rule) =>
 let repeat = ((min, max), rule) =>
   repeat_by_sep(identity, (min, max), rule);
 let repeat_by_comma = ((min, max), rule) =>
-  repeat_by_sep(expect(COMMA), (min, max), rule);
+  repeat_by_sep(expect_delim(Rule.Ast.Delimiter_comma), (min, max), rule);
 
 let at_least_one = rule => {
   let.bind_match values = rule;

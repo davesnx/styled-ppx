@@ -54,6 +54,7 @@
 /* CSS escape sequences are supported - \32 is hex for '2' */
 [%cx2 {|list-style-type: \32 style|}]; /* Escape sequence: "2style" */
 [%cx2 {|list-style-type: custom-counter-style|}];
+[%cx2 {|list-style-type: "\1F44D"|}];
 [%cx2 {|list-style-type: "-"|}];
 [%cx2 {|list-style-type: '-'|}];
 /* [%cx2 {|list-style-type: symbols("*" "\2020" "\2021" "\A7")|}]; */

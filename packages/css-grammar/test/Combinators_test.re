@@ -1,13 +1,25 @@
-open Css_grammar;
+module Parser = Css_grammar;
+module Driver = Styled_ppx_css_parser.Driver;
+module Ast = Styled_ppx_css_parser.Ast;
+open Parser;
+
+let parse_component_values = str =>
+  switch (Driver.parse_declaration(~loc=Ppxlib.Location.none, "x: " ++ str)) {
+  | Ok({Ast.value: (values, _), _}) => values
+  | Error((_, msg)) => Alcotest.fail("parser should succeed: " ++ msg)
+  };
+
+let parse_rule = (prop, str) =>
+  Parser.type_check(prop, parse_component_values(str));
 
 let parse_exn = (prop, str) =>
-  switch (Parser.parse(prop, str)) {
+  switch (parse_rule(prop, str)) {
   | Ok(data) => data
   | Error(message) => Alcotest.fail(message)
   };
 
 let parse_error = (prop, str) =>
-  switch (Parser.parse(prop, str)) {
+  switch (parse_rule(prop, str)) {
   | Ok(_) => Alcotest.fail("Should have failed")
   | Error(message) => message
   };
@@ -319,7 +331,7 @@ let tests = [
     };
   }),
   test("xor error handling - invalid input", _ => {
-    let output = Parser.parse([%spec "red | blue | green"], "yellow");
+    let output = parse_rule([%spec "red | blue | green"], "yellow");
     switch (output) {
     | Error(msg) =>
       let has_red = string_contains(msg, "red");
@@ -334,7 +346,7 @@ let tests = [
     };
   }),
   test("xor error handling - typo suggestion", _ => {
-    let output = Parser.parse([%spec "red | blue | green"], "gren");
+    let output = parse_rule([%spec "red | blue | green"], "gren");
     switch (output) {
     | Error(msg) =>
       if (!string_contains(msg, "Did you mean")) {

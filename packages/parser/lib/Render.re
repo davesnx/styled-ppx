@@ -160,17 +160,33 @@ and selector = (ast: Ast.selector) => {
     | Selector(s) => selector(s)
     };
   }
+  and render_selector_combinator = combinator => {
+    switch (combinator: Ast.selector_combinator) {
+    | Ast.Selector_descendant => " "
+    | Selector_child => " > "
+    | Selector_adjacent_sibling => " + "
+    | Selector_general_sibling => " ~ "
+    };
+  }
+  and render_relative_combinator = combinator => {
+    switch (combinator: Ast.selector_combinator) {
+    | Ast.Selector_descendant => ""
+    | Selector_child => "> "
+    | Selector_adjacent_sibling => "+ "
+    | Selector_general_sibling => "~ "
+    };
+  }
   and render_right_combinator = right => {
     right
-    |> List.map(((combinator, s)) => {
-         Option.fold(~none=" ", ~some=o => " " ++ o ++ " ", combinator)
-         ++ selector(s)
-       })
-    |> String.concat("");
+      |> List.map(((combinator, s)) => {
+          render_selector_combinator(combinator)
+          ++ selector(s)
+        })
+      |> String.concat("");
   }
   and render_relative_selector =
       ({ combinator, complex_selector }: Ast.relative_selector) => {
-    Option.fold(~none="", ~some=o => o ++ " ", combinator)
+    Option.fold(~none="", ~some=render_relative_combinator, combinator)
     ++ render_complex_selector(complex_selector);
   };
 
@@ -184,6 +200,40 @@ and selector = (ast: Ast.selector) => {
 and selector_list = (ast: Ast.selector_list) => {
   ast |> List.map(fst) |> List.map(selector) |> String.concat(",");
 }
+
+and dimension = ({ value, unit, _ }: Ast.dimension) => {
+  Tokens.float_to_string(value) ++ unit;
+}
+
+and delimiter = (ast: Ast.delimiter) => {
+  switch (ast) {
+  | Ast.Delimiter_colon => ":"
+  | Delimiter_double_colon => "::"
+  | Delimiter_comma => ","
+  | Delimiter_dot => "."
+  | Delimiter_asterisk => "*"
+  | Delimiter_ampersand => "&"
+  | Delimiter_plus => "+"
+  | Delimiter_minus => "-"
+  | Delimiter_tilde => "~"
+  | Delimiter_greater_than => ">"
+  | Delimiter_less_than => "<"
+  | Delimiter_equals => "="
+  | Delimiter_slash => "/"
+  | Delimiter_exclamation => "!"
+  | Delimiter_pipe => "|"
+  | Delimiter_caret => "^"
+  | Delimiter_dollar_sign => "$"
+  | Delimiter_question_mark => "?"
+  | Delimiter_hash => "#"
+  | Delimiter_at => "@"
+  | Delimiter_percent => "%"
+  | Delimiter_underscore => "_"
+  | Delimiter_gte => ">="
+  | Delimiter_lte => "<="
+  | Delimiter_other(value) => value
+  };
+}
 and component_value = (ast: Ast.component_value) => {
   switch (ast) {
   | Whitespace => " "
@@ -193,14 +243,13 @@ and component_value = (ast: Ast.component_value) => {
   | Ident(string) => string
   | String(string) => "\"" ++ string ++ "\""
   | Uri(string) => "url(\"" ++ string ++ "\")"
-  | Delim(string) => string
-  | Function(name, body) =>
-    let body = body |> fst |> component_value_list;
-    Printf.sprintf("%s(%s)", fst(name), body);
-  | Hash(string) => "#" ++ string
+  | Delim(value) => delimiter(value)
+  | Function({name: (name, _), body: (body, _), _}) =>
+    Printf.sprintf("%s(%s)", name, component_value_list(body));
+  | Hash((string, _)) => "#" ++ string
   | Number(n) => Tokens.float_to_string(n)
   | Unicode_range(string) => string
-  | Dimension((a, b)) => Tokens.float_to_string(a) ++ b
+  | Dimension(value) => dimension(value)
   | Variable(v, _) => variable(v)
   | Selector(v) => selector_list(v)
   };

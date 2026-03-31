@@ -1,6 +1,9 @@
 open Ppxlib;
 open Css_grammar;
 
+module Parser = Css_grammar;
+module Css_parser = Styled_ppx_css_parser.Driver;
+module Css_parser_ast = Styled_ppx_css_parser.Ast;
 module Helper = Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
 
@@ -8,6 +11,13 @@ exception Invalid_value(string);
 
 let loc = Location.none;
 let (let.ok) = Result.bind;
+
+let parse_component_values_string = (input: string) => {
+  switch (Css_parser.parse_declaration(~loc, "x: " ++ input)) {
+  | Ok({Css_parser_ast.value: (values, _), _}) => Ok(values)
+  | Error((_loc, msg)) => Error(msg)
+  };
+};
 
 let id = Fun.id;
 
@@ -35,7 +45,12 @@ type transform('ast, 'value) = {
 };
 
 let emit = (property, value_of_ast, value_to_expr) => {
-  let ast_of_string = Parser.parse(property);
+  let ast_of_component_values = Parser.type_check(property);
+  let ast_of_string = string =>
+    switch (parse_component_values_string(string)) {
+    | Ok(values) => ast_of_component_values(values)
+    | Error(msg) => Error(msg)
+    };
   let ast_to_expr = ast => value_of_ast(ast) |> value_to_expr;
   let string_to_expr = string =>
     ast_of_string(string) |> Result.map(ast_to_expr);
@@ -150,7 +165,7 @@ let render_length =
 
   | `Zero => render_string("0");
 
-let rec render_function_calc = (calc_sum: Css_grammar.Parser.calc_sum) => {
+let rec render_function_calc = (calc_sum: Css_grammar.calc_sum) => {
   [%expr "calc(" ++ [%e render_calc_sum(calc_sum)] ++ ")"];
 }
 and render_calc_sum = ((product, sums)) => {
@@ -283,8 +298,9 @@ let render_size =
   | `Fit_content_1(lp) => render_length_percentage(lp);
 
 let render_css_global_values = (name, value) => {
+  let.ok value = parse_component_values_string(value);
   let.ok value =
-    Parser.parse(Css_grammar.Css_value_types.css_wide_keywords, value);
+    Parser.type_check(Css_grammar.Css_value_types.css_wide_keywords, value);
 
   let value =
     switch (value) {
@@ -607,8 +623,13 @@ let render_to_expr = (property, value) => {
 };
 
 let parse_declarations = (property: string, value: string) => {
+  let.ok values =
+    switch (parse_component_values_string(value)) {
+    | Ok(values) => Ok(values)
+    | Error(_) => Error(`Property_not_found)
+    };
   let.ok _ =
-    Parser.check_property(~loc=Location.none, ~name=property, value)
+    Parser.validate_property(~loc=Location.none, ~name=property, values)
     |> Result.map_error(((_loc, _err)) => `Property_not_found);
 
   switch (render_css_global_values(property, value)) {

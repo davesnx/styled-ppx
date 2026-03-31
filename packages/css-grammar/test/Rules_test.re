@@ -1,44 +1,48 @@
 open Css_grammar;
 open Rule;
 open! Data;
+module Tokens = Styled_ppx_css_parser.Tokens;
 open Styled_ppx_css_parser.Tokens;
 
+module Ast = Styled_ppx_css_parser.Ast;
+
+let loc = Ppxlib.Location.none;
+
+let node_of_token =
+  fun
+  | COMMA => (Ast.Delim(Ast.Delimiter_comma), loc)
+  | COLON => (Ast.Delim(Ast.Delimiter_colon), loc)
+  | STRING(value) => (Ast.String(value), loc)
+  | IDENT(value) => (Ast.Ident(value), loc)
+  | NUMBER(value) => (Ast.Number(value), loc)
+  | token => failwith("Unsupported test token: " ++ Tokens.show_token(token));
+
+let nodes = tokens => List.map(node_of_token, tokens);
+
+let delim = value => (Ast.Delim(value), loc);
+let string = value => (Ast.String(value), loc);
+let ident = value => (Ast.Ident(value), loc);
+
 let data_monad_tests: tests = [
-  // TODO: check static order
   test("return with an int", _ => {
-    switch (return(Ok(1), [COMMA])) {
-    | (Ok(1), [COMMA]) => ()
-    | _ => Alcotest.fail("should be (Ok(1), [COMMA])")
+    switch (return(Ok(1), nodes([COMMA]))) {
+    | (Ok(1), values) when values == nodes([COMMA]) => ()
+    | _ => Alcotest.fail("should be (Ok(1), [comma])")
     }
   }),
-  test("return with a polymorphic variant", _ => {
-    switch (return(Ok(`Comma), [COMMA])) {
-    | (Ok(`Comma), [COMMA]) => ()
-    | _ => Alcotest.fail("Should be (Ok(`Comma), [COMMA])")
-    }
-  }),
-  test("return with a string", _ => {
-    switch (return(Ok(","), [COMMA])) {
-    | (Ok(","), [COMMA]) => ()
-    | _ => Alcotest.fail("Should be (Ok(,), [COMMA])")
-    }
-  }),
-  test("return with more then one token as inputs", _ => {
-    switch (return(Ok(1), [IDENT("decl"), COLON, IDENT("value")])) {
-    | (Ok(1), [IDENT("decl"), COLON, IDENT("value")]) => ()
-    | _ =>
-      Alcotest.fail(
-        "Should be Ok(1), [IDENT(\"decl\"), COLON, IDENT(\"value\")]",
-      )
+  test("return with more then one input node", _ => {
+    switch (return(Ok(1), nodes([IDENT("decl"), COLON, IDENT("value")]))) {
+    | (Ok(1), values) when values == nodes([IDENT("decl"), COLON, IDENT("value")]) => ()
+    | _ => Alcotest.fail("should preserve remaining nodes")
     }
   }),
   test("return with a error list", _ => {
-    switch (return(Error(["error"]), [COLON])) {
-    | (Error(["error"]), [COLON]) => ()
-    | _ => Alcotest.fail("Should be (Error([error], [COLON]))")
+    switch (return(Error(["error"]), nodes([COLON]))) {
+    | (Error(["error"]), values) when values == nodes([COLON]) => ()
+    | _ => Alcotest.fail("Should be (Error([error]), [colon])")
     }
   }),
-  test("bind", _ => {
+  test("data bind", _ => {
     let rule =
       bind(
         return(Ok(2)),
@@ -46,12 +50,12 @@ let data_monad_tests: tests = [
         | Ok(2) => return(Ok(3))
         | _ => Alcotest.fail("should be Ok(2)"),
       );
-    switch (rule([COMMA])) {
-    | (Ok(3), [COMMA]) => ()
-    | _ => Alcotest.fail("should be (Ok(3), [COMMA])")
+    switch (rule(nodes([COMMA]))) {
+    | (Ok(3), values) when values == nodes([COMMA]) => ()
+    | _ => Alcotest.fail("should be (Ok(3), [comma])")
     };
   }),
-  test("bind error", _ => {
+  test("data bind error", _ => {
     let rule =
       bind(
         return(Error([])),
@@ -60,12 +64,12 @@ let data_monad_tests: tests = [
         | Error(errs) => return(Error(["fix this", ...errs])),
       );
 
-    switch (rule([COMMA])) {
-    | (Error(["fix this"]), [COMMA]) => ()
-    | _ => Alcotest.fail("expected (Error([fix this]), [COMMA])")
+    switch (rule(nodes([COMMA]))) {
+    | (Error(["fix this"]), values) when values == nodes([COMMA]) => ()
+    | _ => Alcotest.fail("expected (Error([fix this]), [comma])")
     };
   }),
-  test("map", _ => {
+  test("data map", _ => {
     let rule =
       map(
         return(Ok(4)),
@@ -73,83 +77,32 @@ let data_monad_tests: tests = [
         | Ok(4) => Ok(5)
         | _ => Alcotest.fail("should be Ok(4)"),
       );
-    switch (rule([COMMA])) {
-    | (Ok(5), [COMMA]) => ()
-    | _ => Alcotest.fail("should be (Ok(5), [COMMA])")
+    switch (rule(nodes([COMMA]))) {
+    | (Ok(5), values) when values == nodes([COMMA]) => ()
+    | _ => Alcotest.fail("should be (Ok(5), [comma])")
     };
   }),
-  test("map error", _ => {
-    let rule =
-      map(
-        return(Error([])),
-        fun
-        | Error(errs) => Error(["new error", ...errs])
-        | Ok(_) => Alcotest.fail("should be unreachable"),
-      );
-
-    switch (rule([COMMA])) {
-    | (Error(["new error", ..._]), [COMMA]) => ()
-    | _ => Alcotest.fail("expected (Error([new error, ...], [COMMA])")
-    };
-  }),
-  test("all", _ => {
+  test("data all", _ => {
     let rule4 = return(Ok(4));
     let rule5 = return(Ok(5));
     let rule = Match.all([rule4, rule5]);
 
-    switch (rule([COMMA])) {
-    | (Ok(lst), [COMMA]) when lst == [4, 5] => ()
-    | _ => Alcotest.fail("should be (Ok(5), [COMMA])")
-    };
-
-    let rule_err = return(Error(["Missing COMMA"]));
-    let rule = Match.all([rule_err, rule4, rule5]);
-    switch (rule([COMMA])) {
-    | (Error(["Missing COMMA"]), [COMMA]) => ()
-    | _ => Alcotest.fail("should be (Error(Missing Comma), [COMMA])")
+    switch (rule(nodes([COMMA]))) {
+    | (Ok(lst), values) when lst == [4, 5] && values == nodes([COMMA]) => ()
+    | _ => Alcotest.fail("should be (Ok([4, 5]), [comma])")
     };
   }),
-  test("all with error in the beginning", _ => {
-    let rule4 = return(Ok(4));
-    let rule5 = return(Ok(5));
-    let rule_err = return(Error(["Missing COMMA"]));
-    let rule = Match.all([rule_err, rule4, rule5]);
-    switch (rule([COMMA])) {
-    | (Error(["Missing COMMA"]), [COMMA]) => ()
-    | _ => Alcotest.fail("should be (Error(Missing Comma), [COMMA])")
-    };
-  }),
-  test("all with error in the end", _ => {
-    let rule4 = return(Ok(4));
-    let rule5 = return(Ok(5));
-    let rule_err = return(Error(["Missing COMMA"]));
-    let rule = Match.all([rule4, rule5, rule_err]);
-    switch (rule([COMMA])) {
-    | (Error(["Missing COMMA"]), [COMMA]) => ()
-    | _ => Alcotest.fail("should be (Error(Missing Comma), [COMMA])")
-    };
-  }),
-  test("all with multiple errors", _ => {
-    let rule4 = return(Ok(4));
-    let rule5 = return(Ok(5));
-    let rule_err = return(Error(["Missing COMMA"]));
-    let rule_err2 = return(Error(["Unexpected token"]));
-    let rule_err3 = return(Error(["Unclosed string"]));
-    let rule = Match.all([rule_err, rule4, rule_err2, rule5, rule_err3]);
-    switch (rule([COMMA])) {
-    | (Error(["Missing COMMA"]), [COMMA]) => ()
-    | _ => Alcotest.fail("should be (Error(Missing Comma), [COMMA])")
-    };
-  }),
-  test("bind_shortest", _ => {
+  test("data bind_shortest", _ => {
     let comma =
       fun
-      | [COMMA, ...tokens] => (Ok(6), tokens)
-      | tokens => (Error([""]), tokens);
+      | [value, ...values] when value == delim(Ast.Delimiter_comma) => (Ok(6), values)
+      | values => (Error([""]), values);
     let two_comma =
       fun
-      | [COMMA, COMMA, ...tokens] => (Ok(7), tokens)
-      | tokens => (Error([""]), tokens);
+      | [value1, value2, ...values]
+          when value1 == delim(Ast.Delimiter_comma) && value2 == delim(Ast.Delimiter_comma) =>
+        (Ok(7), values)
+      | values => (Error([""]), values);
 
     let rule =
       bind_shortest(
@@ -158,58 +111,32 @@ let data_monad_tests: tests = [
         | `Right(Ok(6)) => return(Ok(8))
         | _ => Alcotest.fail("should be Ok(6)"),
       );
-    switch (rule([COMMA, COMMA])) {
-    | (Ok(8), [COMMA]) => ()
-    | _ => Alcotest.fail("should be (Ok(8), [COMMA])")
-    };
-
-    let rule =
-      bind_shortest(
-        (comma, two_comma),
-        fun
-        | `Left(Ok(6)) => return(Ok(8))
-        | _ => Alcotest.fail("should be Ok(6)"),
-      );
-
-    switch (rule([COMMA, COMMA])) {
-    | (Ok(8), [COMMA]) => ()
-    | _ => Alcotest.fail("should be (Ok(8), [COMMA])")
+    switch (rule(nodes([COMMA, COMMA]))) {
+    | (Ok(8), values) when values == nodes([COMMA]) => ()
+    | _ => Alcotest.fail("should be (Ok(8), [comma])")
     };
   }),
-  test("bind_longest", _ => {
+  test("data bind_longest", _ => {
     let comma =
       fun
-      | [COMMA, ...tokens] => (Ok(9), tokens)
-      | tokens => (Error([""]), tokens);
+      | [value, ...values] when value == delim(Ast.Delimiter_comma) => (Ok(9), values)
+      | values => (Error([""]), values);
     let two_comma =
       fun
-      | [COMMA, COMMA, ...tokens] => (Ok(10), tokens)
-      | tokens => (Error([""]), tokens);
-    let () = {
-      let rule =
-        bind_longest(
-          (two_comma, comma),
-          fun
-          | `Left(Ok(10)) => return(Ok(11))
-          | _ => Alcotest.fail("should be Ok(10)"),
-        );
-      switch (rule([COMMA, COMMA])) {
-      | (Ok(11), []) => ()
-      | _ => Alcotest.fail("should be (Ok(10), [])")
-      };
-    };
-
+      | [value1, value2, ...values]
+          when value1 == delim(Ast.Delimiter_comma) && value2 == delim(Ast.Delimiter_comma) =>
+        (Ok(10), values)
+      | values => (Error([""]), values);
     let rule =
       bind_longest(
-        (comma, two_comma),
+        (two_comma, comma),
         fun
-        | `Right(Ok(10)) => return(Ok(11))
+        | `Left(Ok(10)) => return(Ok(11))
         | _ => Alcotest.fail("should be Ok(10)"),
       );
-
-    switch (rule([COMMA, COMMA])) {
+    switch (rule(nodes([COMMA, COMMA]))) {
     | (Ok(11), []) => ()
-    | _ => Alcotest.fail("should be (Ok(10), [])")
+    | _ => Alcotest.fail("should be (Ok(11), [])")
     };
   }),
 ];
@@ -217,14 +144,13 @@ let data_monad_tests: tests = [
 open! Match;
 
 let match_monad_tests: tests = [
-  // TODO: check static order
-  test("return", _ => {
-    switch (return(1, [COMMA])) {
-    | (Ok(1), [COMMA]) => ()
-    | _ => Alcotest.fail("should be (Ok(1), [COMMA])")
+  test("match return", _ => {
+    switch (return(1, nodes([COMMA]))) {
+    | (Ok(1), values) when values == nodes([COMMA]) => ()
+    | _ => Alcotest.fail("should be (Ok(1), [comma])")
     }
   }),
-  test("bind", _ => {
+  test("match bind", _ => {
     let rule =
       bind(
         return(Ok(2)),
@@ -232,25 +158,12 @@ let match_monad_tests: tests = [
         | Ok(2) => return(3)
         | _ => Alcotest.fail("should be Ok(2)"),
       );
-    switch (rule([COMMA])) {
-    | (Ok(3), [COMMA]) => ()
-    | _ => Alcotest.fail("should be (Ok(3), [COMMA])")
+    switch (rule(nodes([COMMA]))) {
+    | (Ok(3), values) when values == nodes([COMMA]) => ()
+    | _ => Alcotest.fail("should be (Ok(3), [comma])")
     };
   }),
-  test("bind Error", _ => {
-    let rule =
-      bind(
-        Data.return(Error(["error message"])),
-        fun
-        | _ => Alcotest.fail("Should not be reachable"),
-      );
-
-    switch (rule([COMMA])) {
-    | (Error(["error message"]), [COMMA]) => ()
-    | _ => Alcotest.fail("expected (Error([error message], [COMMA])) ")
-    };
-  }),
-  test("map", _ => {
+  test("match map", _ => {
     let rule =
       map(
         return(Ok(4)),
@@ -258,84 +171,10 @@ let match_monad_tests: tests = [
         | Ok(4) => 5
         | _ => Alcotest.fail("should be Ok(4)"),
       );
-    switch (rule([COMMA])) {
-    | (Ok(5), [COMMA]) => ()
-    | _ => Alcotest.fail("should be (Ok(5), [COMMA])")
+    switch (rule(nodes([COMMA]))) {
+    | (Ok(5), values) when values == nodes([COMMA]) => ()
+    | _ => Alcotest.fail("should be (Ok(5), [comma])")
     };
-  }),
-  test("bind_shortest", _ => {
-    let comma =
-      fun
-      | [COMMA, ...tokens] => (Ok(6), tokens)
-      | tokens => (Error([""]), tokens);
-    let two_comma =
-      fun
-      | [COMMA, COMMA, ...tokens] => (Ok(7), tokens)
-      | tokens => (Error([""]), tokens);
-    let () = {
-      let rule =
-        bind_shortest(
-          (two_comma, comma),
-          fun
-          | `Right(6) => return(8)
-          | _ => Alcotest.fail("should be `Right(6)"),
-        );
-      switch (rule([COMMA, COMMA])) {
-      | (Ok(8), [COMMA]) => ()
-      | _ => Alcotest.fail("should be (Ok(8), [COMMA])")
-      };
-    };
-    let () = {
-      let rule =
-        bind_shortest(
-          (comma, two_comma),
-          fun
-          | `Left(6) => return(8)
-          | _ => Alcotest.fail("should be `Left(6)"),
-        );
-      switch (rule([COMMA, COMMA])) {
-      | (Ok(8), [COMMA]) => ()
-      | _ => Alcotest.fail("should be (Ok(8), [COMMA])")
-      };
-    };
-    ();
-  }),
-  test("bind_longest", _ => {
-    let comma =
-      fun
-      | [COMMA, ...tokens] => (Ok(9), tokens)
-      | tokens => (Error([""]), tokens);
-    let two_comma =
-      fun
-      | [COMMA, COMMA, ...tokens] => (Ok(10), tokens)
-      | tokens => (Error([""]), tokens);
-    let () = {
-      let rule =
-        bind_longest(
-          (two_comma, comma),
-          fun
-          | `Left(10) => return(11)
-          | _ => Alcotest.fail("should be `Left(10)"),
-        );
-      switch (rule([COMMA, COMMA])) {
-      | (Ok(11), []) => ()
-      | _ => Alcotest.fail("should be (Ok(10), [])")
-      };
-    };
-    let () = {
-      let rule =
-        bind_longest(
-          (comma, two_comma),
-          fun
-          | `Right(10) => return(11)
-          | _ => Alcotest.fail("should be `Right(10)"),
-        );
-      switch (rule([COMMA, COMMA])) {
-      | (Ok(11), []) => ()
-      | _ => Alcotest.fail("should be (Ok(10), [])")
-      };
-    };
-    ();
   }),
 ];
 
@@ -344,66 +183,52 @@ open! Pattern;
 
 let pattern_helpers_test: tests = [
   test("identity", _ => {
-    switch (identity([STRING("tomato")])) {
-    | (Ok (), [STRING("tomato")]) => ()
-    | _ => Alcotest.fail({|should be (Ok(), [STRING("TOMATO")]|})
+    switch (identity([string("tomato")])) {
+    | (Ok(), [value]) when value == string("tomato") => ()
+    | _ => Alcotest.fail("should preserve remaining component values")
     }
   }),
-  test("token", _ => {
+  test("component", _ => {
     let rule =
-      token(
+      component(
         fun
-        | STRING("potato") => Ok(1)
+        | (Ast.String("potato"), _) => Ok(1)
         | _ => Error([""]),
       );
-    switch (rule([STRING("potato")])) {
+    switch (rule([string("potato")])) {
     | (Ok(1), []) => ()
     | _ => Alcotest.fail("should be (Ok(1), [])")
     };
 
-    // shouldn't consume tokens
-    switch (rule([STRING("invalid")])) {
-    | (Error(_), [STRING("invalid")]) => ()
-    | _ => Alcotest.fail({|should be (Error(_), [STRING("invalid")])|})
+    switch (rule([string("invalid")])) {
+    | (Error(_), [value]) when value == string("invalid") => ()
+    | _ => Alcotest.fail("should not consume invalid input")
     };
   }),
-  test("expect", _ => {
+  test("expect_delim", _ => {
     let rule = {
-      let.bind_match () = expect(STRING("auto"));
+      let.bind_match () = expect_delim(Ast.Delimiter_colon);
       Match.return(2);
     };
-    switch (rule([STRING("auto")])) {
+    switch (rule([delim(Ast.Delimiter_colon)])) {
     | (Ok(2), []) => ()
     | _ => Alcotest.fail("should be (Ok(2), [])")
     };
-
-    // shouldn't consume tokens
-    switch (rule([STRING("invalid")])) {
-    | (Error(_), [STRING("invalid")]) => ()
-    | _ => Alcotest.fail({|should be (Error(_), [STRING("invalid")])|})
-    };
-    ();
   }),
   test("value", _ => {
-    let rule = value(3, expect(STRING("none")));
-    switch (rule([STRING("none")])) {
+    let rule = value(3, expect_delim(Ast.Delimiter_comma));
+    switch (rule([delim(Ast.Delimiter_comma)])) {
     | (Ok(3), []) => ()
     | _ => Alcotest.fail("should be (Ok(3), [])")
     };
   }),
   test("next", _ => {
-    switch (Pattern.next([COMMA, COLON])) {
-    | (Ok(COMMA), [COLON]) => ()
-    | _ => Alcotest.fail("should be (Ok(COMMA), [COLON])")
+    switch (Pattern.next([delim(Ast.Delimiter_comma), delim(Ast.Delimiter_colon)])) {
+    | (Ok(value), [remaining]) when value == delim(Ast.Delimiter_comma) && remaining == delim(Ast.Delimiter_colon) => ()
+    | _ => Alcotest.fail("should be (Ok(comma), [colon])")
     }
   }),
-  test("next with only token as input", _ => {
-    switch (Pattern.next([COLON])) {
-    | (Ok(COLON), []) => ()
-    | _ => Alcotest.fail("should be (Ok(COLON), [])")
-    }
-  }),
-  test("next with no tokens as input", _ => {
+  test("next with no input", _ => {
     switch (Pattern.next([])) {
     | (Error(["Unexpected end of input."]), []) => ()
     | _ => Alcotest.fail("should be (Error([Unexpected end of input.]), [])")
@@ -411,25 +236,23 @@ let pattern_helpers_test: tests = [
   }),
 ];
 
-open Let;
-
 let rule_tests: tests = [
-  test("Rule using expect", _ => {
-    let input = [IDENT("decl"), COLON, IDENT("value")];
+  test("Rule using expect_delim", _ => {
+    let input = [ident("decl"), delim(Ast.Delimiter_colon), ident("value")];
 
     let rule = {
       let.bind_match decl =
-        Pattern.token(
+        Pattern.component(
           fun
-          | IDENT("decl") => Ok("decl")
+          | (Ast.Ident("decl"), _) => Ok("decl")
           | _ => Error(["Expected an Ident"]),
         );
-      let.bind_match () = Pattern.expect(COLON);
+      let.bind_match () = Pattern.expect_delim(Ast.Delimiter_colon);
 
       let.bind_match value =
-        Pattern.token(
+        Pattern.component(
           fun
-          | IDENT("value") => Ok("value")
+          | (Ast.Ident("value"), _) => Ok("value")
           | _ => Error(["Expected a valid value"]),
         );
       Match.return(`Declaration((decl, value)));
@@ -443,4 +266,4 @@ let rule_tests: tests = [
 ];
 
 let tests: tests =
-  List.flatten([data_monad_tests, rule_tests, pattern_helpers_test]);
+  List.flatten([data_monad_tests, match_monad_tests, pattern_helpers_test, rule_tests]);

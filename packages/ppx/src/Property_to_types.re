@@ -22,8 +22,8 @@ let resolve_module_name = (~type_path: string, ~property_name: string): string =
   | [_, module_name] => module_name
   | _ =>
     /* type_path is empty, look up from the registry directly */
-    switch (Css_grammar.Parser.find_property(property_name)) {
-    | Some(Css_grammar.Parser.Pack_rule({runtime_module_path: Some(path), _})) =>
+    switch (Css_grammar.find_property(property_name)) {
+    | Some(Css_grammar.Pack_rule({runtime_module_path: Some(path), _})) =>
       switch (String.split_on_char('.', path)) {
       | [_, module_name] => module_name
       | _ => "Cascading"

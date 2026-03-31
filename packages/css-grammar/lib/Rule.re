@@ -1,55 +1,65 @@
-module Tokens = Styled_ppx_css_parser.Tokens;
+module Ast = Styled_ppx_css_parser.Ast;
+module Render = Styled_ppx_css_parser.Render;
 
 type error = list(string);
 type data('a) = result('a, error);
-type rule('a) = list(Tokens.token) => (data('a), list(Tokens.token));
+type input = Ast.component_value_list;
+type located_component_value = Ast.with_loc(Ast.component_value);
+type rule('a) = input => (data('a), input);
 
 type return('a, 'b) = 'b => rule('a);
 type bind('a, 'b, 'c) = (rule('a), 'b => rule('c)) => rule('c);
 type map('a, 'b, 'c, 'd) = (rule('a), 'b => 'c) => rule('d);
 type best('left_in, 'left_v, 'right_in, 'right_v, 'c) =
-  (
-    (rule('left_in), rule('right_in)),
-    [
-      | `Left('left_v)
-      | `Right('right_v)
-    ] =>
-    rule('c)
-  ) =>
+  ((rule('left_in), rule('right_in)), [ | `Left('left_v) | `Right('right_v) ] => rule('c)) =>
   rule('c);
 
-// monad to deal with tokens
+let rec drop_leading_whitespace = values =>
+  switch (values) {
+  | [(Ast.Whitespace, _), ...rest] => drop_leading_whitespace(rest)
+  | _ => values
+  };
+
+let remaining_length = values => List.length(drop_leading_whitespace(values));
+
+let render_component_value = ((value, _): located_component_value) =>
+  Render.component_value(value);
+
 module Data = {
-  let return = (data, tokens) => (data, tokens);
-  let bind = (rule, f, tokens) => {
-    let (data, remaining_tokens) = rule(tokens);
-    // TODO: maybe combinators should guarantee that
+  let return = (data, values) => (data, drop_leading_whitespace(values));
+
+  let bind = (rule, f, values) => {
+    let values = drop_leading_whitespace(values);
+    let (data, remaining_values) = rule(values);
     switch (data) {
-    | Ok(d) => f(Ok(d), remaining_tokens)
-    | Error(message) => f(Error(message), tokens)
+    | Ok(value) => f(Ok(value), remaining_values)
+    | Error(message) => f(Error(message), values)
     };
   };
+
   let map = (rule, f) => bind(rule, value => return(f(value)));
-  let bind_shortest_or_longest = (shortest, (left, right), f, tokens) => {
-    let (left_data, left_tokens) = left(tokens);
-    let (right_data, right_tokens) = right(tokens);
+
+  let bind_shortest_or_longest = (shortest, (left, right), f, values) => {
+    let values = drop_leading_whitespace(values);
+    let (left_data, left_values) = left(values);
+    let (right_data, right_values) = right(values);
     let op = shortest ? (>) : (<);
-    let use_left = op(List.length(left_tokens), List.length(right_tokens));
+    let use_left = op(remaining_length(left_values), remaining_length(right_values));
     use_left
-      ? f(`Left(left_data), left_tokens)
-      : f(`Right(right_data), right_tokens);
+      ? f(`Left(left_data), left_values)
+      : f(`Right(right_data), right_values);
   };
+
   let bind_shortest: best('a, data('a), 'b, data('b), 'c) =
-      ((left, right), f) =>
-    bind_shortest_or_longest(true, (left, right), f);
+      ((left, right), f) => bind_shortest_or_longest(true, (left, right), f);
+
   let bind_longest: best('a, data('a), 'b, data('b), 'c) =
-      ((left, right), f) =>
-    bind_shortest_or_longest(false, (left, right), f);
+      ((left, right), f) => bind_shortest_or_longest(false, (left, right), f);
 };
 
-// monad when match is successful
 module Match = {
-  let return = (value, tokens) => Data.return(Ok(value), tokens);
+  let return = (value, values) => Data.return(Ok(value), values);
+
   let bind = (rule, f) =>
     Data.bind(
       rule,
@@ -57,37 +67,41 @@ module Match = {
       | Ok(value) => f(value)
       | Error(error) => Data.return(Error(error)),
     );
+
   let map = (rule, f) => bind(rule, value => return(f(value)));
-  let bind_shortest_or_longest = (shortest, (left, right), f, tokens) => {
-    let (left_data, left_tokens) = left(tokens);
-    let (right_data, right_tokens) = right(tokens);
+
+  let bind_shortest_or_longest = (shortest, (left, right), f, values) => {
+    let values = drop_leading_whitespace(values);
+    let (left_data, left_values) = left(values);
+    let (right_data, right_values) = right(values);
     let op = shortest ? (>) : (<);
-    let use_left = op(List.length(left_tokens), List.length(right_tokens));
+    let use_left = op(remaining_length(left_values), remaining_length(right_values));
     switch (left_data, right_data) {
-    | (Ok(left_value), Error(_)) => f(`Left(left_value), left_tokens)
-    | (Error(_), Ok(right_value)) => f(`Right(right_value), right_tokens)
+    | (Ok(left_value), Error(_)) => f(`Left(left_value), left_values)
+    | (Error(_), Ok(right_value)) => f(`Right(right_value), right_values)
     | (Ok(left_value), Ok(right_value)) =>
       use_left
-        ? f(`Left(left_value), left_tokens)
-        : f(`Right(right_value), right_tokens)
-    | (Error(left_data), Error(right_data)) =>
+        ? f(`Left(left_value), left_values)
+        : f(`Right(right_value), right_values)
+    | (Error(left_error), Error(right_error)) =>
       use_left
-        ? Data.return(Error(left_data), left_tokens)
-        : Data.return(Error(right_data), right_tokens)
+        ? Data.return(Error(left_error), left_values)
+        : Data.return(Error(right_error), right_values)
     };
   };
+
   let bind_shortest = ((left, right), f) =>
     bind_shortest_or_longest(true, (left, right), f);
+
   let bind_longest = ((left, right), f) =>
     bind_shortest_or_longest(false, (left, right), f);
 
-  let rec all = rules => {
+  let rec all = rules =>
     switch (rules) {
     | [] => return([])
     | [hd_rule, ...tl_rules] =>
       bind(hd_rule, hd => {bind(all(tl_rules), tl => {return([hd, ...tl])})})
     };
-  };
 };
 
 module Let = {
@@ -105,35 +119,35 @@ module Let = {
 };
 
 module Pattern = {
-  // TODO: errors
   let identity = Match.return();
 
   let next =
     fun
-    | [token, ...tokens] => Match.return(token, tokens)
-    | _ => (Error(["Unexpected end of input."]), []);
+    | [value, ...values] => Match.return(value, drop_leading_whitespace(values))
+    | [] => (Error(["Unexpected end of input."]), []);
 
-  let token = (expected, tokens) =>
-    switch (tokens) {
-    | [token, ...tokens] =>
-      let data = expected(token);
-      // if failed then keep the tokens intact
-      let tokens = Result.is_ok(data) ? tokens : [token, ...tokens];
-      (data, tokens);
+  let component = (expected, values) =>
+    switch (drop_leading_whitespace(values)) {
+    | [value, ...remaining_values] =>
+      let data = expected(value);
+      let remaining_values =
+        Result.is_ok(data)
+          ? drop_leading_whitespace(remaining_values)
+          : drop_leading_whitespace(values);
+      (data, remaining_values);
     | [] => (Error(["Unexpected end of input."]), [])
     };
 
-  let expect = expected =>
-    token(
+  let expect_delim = expected =>
+    component(
       fun
-      | token when token == expected => Ok()
-      | token =>
+      | (Ast.Delim(actual), _) when actual == expected => Ok()
+      | value =>
         Error([
           "Expected '"
-          ++ Tokens.humanize(expected)
-          ++ "' but instead got "
-          ++ "'"
-          ++ Tokens.humanize(token)
+          ++ Render.delimiter(expected)
+          ++ "' but instead got '"
+          ++ render_component_value(value)
           ++ "'.",
         ]),
     );
@@ -141,65 +155,37 @@ module Pattern = {
   let value = (value, rule) => Match.bind(rule, () => Match.return(value));
 };
 
-module Css_lexer = Styled_ppx_css_parser.Lexer;
-
-let parse_string = (rule_parser, input) => {
-  let tokens_with_loc =
-    Css_lexer.from_string(
-      ~initial_mode=Styled_ppx_css_parser.Lexer_context.Declaration_value,
-      input,
-    );
-  let tokens =
-    tokens_with_loc
-    |> List.filter_map(({ txt, _ }: Css_lexer.token_with_location) =>
-         switch (txt) {
-         | Ok(token) => Some(token)
-         | Error(_) => None
-         }
-       )
-    |> List.rev;
-  let tokens_without_ws = tokens |> List.filter(t => t != Tokens.WS);
-  let (output, remaining_tokens) = rule_parser(tokens_without_ws);
+let run = (rule_parser, input: input) => {
+  let input = drop_leading_whitespace(input);
+  let (output, remaining_values) = rule_parser(input);
   switch (output) {
   | Ok(data) =>
-    let remaining = remaining_tokens |> List.filter(t => t != Tokens.WS);
-    switch (remaining) {
-    | []
-    | [Tokens.EOF] => Ok(data)
-    | tokens =>
-      let humanized =
-        tokens
-        |> List.filter(t => t != Tokens.EOF)
-        |> List.map(Tokens.humanize)
-        |> String.concat(" ");
-      Error("Unexpected trailing input '" ++ humanized ++ "'.");
+    let remaining_values = drop_leading_whitespace(remaining_values);
+    switch (remaining_values) {
+    | [] => Ok(data)
+    | values =>
+      let remaining = Render.component_value_list(values);
+      Error("Unexpected trailing input '" ++ remaining ++ "'.")
     };
   | Error([message, ..._]) => Error(message)
   | Error([]) => Error("Expected a valid value.")
   };
 };
 
-/*
-   `interpolatable` wraps a rule to make it accept interpolations.
-   When an interpolation $(var) is encountered, it returns `Interpolation.
-   Otherwise delegates to the inner rule and wraps the result in `Value.
- */
-let interpolatable = (~type_path as _, inner_rule, tokens) => {
+let interpolatable = (~type_path as _, inner_rule, values) => {
   let interp_rule =
-    Pattern.token(
+    Pattern.component(
       fun
-      | Tokens.INTERPOLATION((name, _loc)) => {
-          Ok(`Interpolation(name));
-        }
+      | (Ast.Variable(name, _loc), _) => Ok(`Interpolation(name))
       | _ => Error(["Expected value."]),
     );
-  switch (interp_rule(tokens)) {
+  switch (interp_rule(values)) {
   | (Ok(_) as result, rest) => (result, rest)
   | (Error(_), _) =>
-    let (result, rest) = inner_rule(tokens);
+    let (result, rest) = inner_rule(values);
     switch (result) {
     | Ok(value) => (Ok(`Value(value)), rest)
-    | Error(msgs) => (Error(msgs), tokens)
-    };
+    | Error(msgs) => (Error(msgs), values)
+    }
   };
 };

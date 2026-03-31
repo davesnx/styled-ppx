@@ -1,4 +1,4 @@
-/* CSS Missing Length Units - Units in Parser.ml but missing from Css_types.ml */
+/* CSS Missing Length Units - Units in Css_grammar but missing from Css_types.ml */
 
 /* cap - font metrics based */
 [%css {|width: 1cap|}];

@@ -7,15 +7,15 @@ let rec match_longest = ((left_key, left_rule), rules) =>
   switch (rules) {
   | [] =>
     let.bind_match value = left_rule;
-    return_match((left_key, value));
+    Rule.Match.return((left_key, value));
   | [new_left, ...rules] =>
     let.bind_longest_match value = (
       left_rule,
       match_longest(new_left, rules),
     );
     switch (value) {
-    | `Left(value) => return_match((left_key, value))
-    | `Right(value) => return_match(value)
+    | `Left(value) => Rule.Match.return((left_key, value))
+    | `Right(value) => Rule.Match.return(value)
     };
   };
 
@@ -261,7 +261,8 @@ let xor_with_expected = rules_with_expected =>
                 let (_, curr_remaining) = current;
                 /* Use <= to prefer later alternatives on tie, matching the
                    original match_longest right-biased tie-breaking behavior */
-                if (List.length(curr_remaining) <= List.length(acc_remaining)) {
+                if (Rule.remaining_length(curr_remaining)
+                    <= Rule.remaining_length(acc_remaining)) {
                   current;
                 } else {
                   acc;
@@ -324,7 +325,8 @@ let xor = rules =>
                 let (_, curr_remaining) = current;
                 /* Use <= to prefer later alternatives on tie, matching the
                    original match_longest right-biased tie-breaking behavior */
-                if (List.length(curr_remaining) <= List.length(acc_remaining)) {
+                if (Rule.remaining_length(curr_remaining)
+                    <= Rule.remaining_length(acc_remaining)) {
                   current;
                 } else {
                   acc;

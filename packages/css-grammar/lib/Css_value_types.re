@@ -1,88 +1,158 @@
-open Styled_ppx_css_parser.Tokens;
+module Ast = Styled_ppx_css_parser.Ast;
+module Render = Styled_ppx_css_parser.Render;
+module Classifier = Styled_ppx_css_parser.Component_value_classifier;
+
 open Rule.Let;
 open Rule.Pattern;
 
+let render_component = ((value, _): Rule.located_component_value) =>
+  Render.component_value(value);
+
+let render_expected_error = (expected, actual) =>
+  Error([
+    "Expected '"
+    ++ expected
+    ++ "' but instead got '"
+    ++ render_component(actual)
+    ++ "'.",
+  ]);
+
+let match_component = f => component(f);
+
+let parse_block = (~kind, ~extract, rule) => {
+  let.bind_match body =
+    match_component(
+      fun (((value, _): Rule.located_component_value) as actual) =>
+        switch (extract(value)) {
+        | Some(body) => Ok(body)
+        | None =>
+          Error([
+            "Expected "
+            ++ kind
+            ++ " but instead got '"
+            ++ render_component(actual)
+            ++ "'.",
+          ])
+        },
+    );
+  switch (Rule.run(rule, body)) {
+  | Ok(value) => Rule.Match.return(value)
+  | Error(message) => Rule.Data.return(Error([message]))
+  };
+};
+
+let paren_block = rule =>
+  parse_block(
+    ~kind="a parenthesized block",
+    ~extract=(fun
+      | Ast.Paren_block(body) => Some(body)
+      | _ => None),
+    rule,
+  );
+
+let bracket_block = rule =>
+  parse_block(
+    ~kind="a bracket block",
+    ~extract=(fun
+      | Ast.Bracket_block(body) => Some(body)
+      | _ => None),
+    rule,
+  );
+
+let delimiter_from_string = value =>
+  switch (Classifier.Delim.of_string(value)) {
+  | Some(delimiter) => Some(delimiter)
+  | None when String.length(value) == 1 => Some(Ast.Delimiter_other(value))
+  | None => None
+  };
+
 let keyword = kw =>
-  switch (kw) {
-  | ">=" => expect(GTE)
-  | "<=" => expect(LTE)
-  | ">" => expect(GREATER_THAN)
-  | "<" => expect(LESS_THAN)
-  | "=" => expect(EQUALS)
-  | "(" => expect(LEFT_PAREN)
-  | ")" => expect(RIGHT_PAREN)
-  | "[" => expect(LEFT_BRACKET)
-  | "]" => expect(RIGHT_BRACKET)
-  | _ =>
-    token(
-      fun
-      | IDENT(s) when s == kw => Ok()
-      | TYPE_SELECTOR(s) when s == kw => Ok()
-      | token =>
-        Error([
-          "Expected '"
-          ++ kw
-          ++ "' but instead got '"
-          ++ humanize(token)
-          ++ "'.",
-        ]),
+  switch (Classifier.Delim.of_string(kw)) {
+  | Some(delimiter) => expect_delim(delimiter)
+  | None =>
+    match_component(
+      fun (((value, _): Rule.located_component_value) as actual) =>
+        switch (value) {
+        | Ast.Ident(actual_kw) when actual_kw == kw => Ok()
+        | _ => render_expected_error(kw, actual)
+        },
     )
   };
 
-let comma = expect(COMMA);
+let comma = expect_delim(Ast.Delimiter_comma);
+
 let delim =
   fun
-  | "(" => expect(LEFT_PAREN)
-  | ")" => expect(RIGHT_PAREN)
-  | "[" => expect(LEFT_BRACKET)
-  | "]" => expect(RIGHT_BRACKET)
-  | ":" => expect(COLON)
-  | ";" => expect(SEMI_COLON)
-  | "*" => expect(ASTERISK)
-  | "." => expect(DOT)
-  // Combinators can appear as delimiters in value context (e.g., calc)
-  | "+" => expect(PLUS)
-  | "-" => expect(MINUS)
-  | "~" => expect(TILDE)
-  | ">" => expect(GREATER_THAN)
-  | "<" => expect(LESS_THAN)
-  | "/" => expect(SLASH)
-  | "!" => expect(EXCLAMATION)
-  | "|" => expect(PIPE)
-  | "^" => expect(CARET)
-  | "$" => expect(DOLLAR_SIGN)
-  | "=" => expect(EQUALS)
-  | "&" => expect(AMPERSAND)
-  | s when String.length(s) == 1 => expect(DELIM(s.[0]))
-  | s =>
-    token(
-      fun
-      | _ => Error(["Unexpected delimiter: " ++ s]),
+  | "," as value
+  | ":" as value
+  | "." as value
+  | "*" as value
+  | "&" as value
+  | "+" as value
+  | "-" as value
+  | "~" as value
+  | ">" as value
+  | "<" as value
+  | "/" as value
+  | "!" as value
+  | "|" as value
+  | "^" as value
+  | "$" as value
+  | "=" as value
+  | ">=" as value
+  | "<=" as value =>
+    switch (delimiter_from_string(value)) {
+    | Some(delimiter) => expect_delim(delimiter)
+    | None =>
+      match_component(actual =>
+        Error([
+          "Unexpected delimiter: "
+          ++ value
+          ++ ". Got '"
+          ++ render_component(actual)
+          ++ "'.",
+        ])
+      )
+    }
+  | "(" => paren_block(identity)
+  | "[" => bracket_block(identity)
+  | value =>
+    match_component(actual =>
+      Error([
+        "Unexpected delimiter: "
+        ++ value
+        ++ ". Got '"
+        ++ render_component(actual)
+        ++ "'.",
+      ])
     );
 
 let function_call = (name, rule) => {
-  let.bind_match () =
-    token(
-      fun
-      | FUNCTION(called_name) when name == called_name => Ok()
-      | token =>
-        Error([
-          "Expected 'function "
-          ++ name
-          ++ "'. Got '"
-          ++ humanize(token)
-          ++ "' instead.",
-        ]),
+  let.bind_match body =
+    match_component(
+      fun (((value, _): Rule.located_component_value) as actual) =>
+        switch (Classifier.Function.body_if_named(~expected=name, value)) {
+        | Some(body) => Ok(body)
+        | None =>
+          Error([
+            "Expected 'function "
+            ++ name
+            ++ "'. Got '"
+            ++ render_component(actual)
+            ++ "' instead.",
+          ])
+        },
     );
-  let.bind_match value = rule;
-  let.bind_match () = expect(RIGHT_PAREN);
-  Rule.Match.return(value);
+  switch (Rule.run(rule, body)) {
+  | Ok(value) => Rule.Match.return(value)
+  | Error(message) => Rule.Data.return(Error([message]))
+  };
 };
 
 let integer =
-  token(
+  match_component(
     fun
-    | NUMBER(n) =>
+    | (Ast.Number(n), _) =>
       Float.is_integer(n)
         ? Ok(Float.to_int(n))
         : Error(["Expected an integer, got a float instead."])
@@ -90,156 +160,172 @@ let integer =
   );
 
 let number =
-  token(
-    fun
-    | NUMBER(n) => Ok(n)
-    | token =>
-      Error(["Expected a number. Got '" ++ humanize(token) ++ "' instead."]),
+  match_component(
+    fun (((value, _): Rule.located_component_value) as actual) =>
+      switch (value) {
+      | Ast.Number(n) => Ok(n)
+      | _ =>
+        Error([
+          "Expected a number. Got '"
+          ++ render_component(actual)
+          ++ "' instead.",
+        ])
+      },
   );
 
+let invalid_dimension_unit = (kind, unit) =>
+  Error(["Invalid " ++ kind ++ " unit '" ++ unit ++ "'."]);
+
+let length_of_unit = (number, unit) =>
+  switch (unit: Ast.length_unit) {
+  | Ast.Length_unit_cap => Ok(`Cap(number))
+  | Length_unit_ch => Ok(`Ch(number))
+  | Length_unit_em => Ok(`Em(number))
+  | Length_unit_ex => Ok(`Ex(number))
+  | Length_unit_ic => Ok(`Ic(number))
+  | Length_unit_lh => Ok(`Lh(number))
+  | Length_unit_rcap => Ok(`Rcap(number))
+  | Length_unit_rch => Ok(`Rch(number))
+  | Length_unit_rem => Ok(`Rem(number))
+  | Length_unit_rex => Ok(`Rex(number))
+  | Length_unit_ric => Ok(`Ric(number))
+  | Length_unit_rlh => Ok(`Rlh(number))
+  | Length_unit_vh => Ok(`Vh(number))
+  | Length_unit_vw => Ok(`Vw(number))
+  | Length_unit_vmax => Ok(`Vmax(number))
+  | Length_unit_vmin => Ok(`Vmin(number))
+  | Length_unit_vb => Ok(`Vb(number))
+  | Length_unit_vi => Ok(`Vi(number))
+  | Length_unit_cqw => Ok(`Cqw(number))
+  | Length_unit_cqh => Ok(`Cqh(number))
+  | Length_unit_cqi => Ok(`Cqi(number))
+  | Length_unit_cqb => Ok(`Cqb(number))
+  | Length_unit_cqmin => Ok(`Cqmin(number))
+  | Length_unit_cqmax => Ok(`Cqmax(number))
+  | Length_unit_px => Ok(`Px(number))
+  | Length_unit_cm => Ok(`Cm(number))
+  | Length_unit_mm => Ok(`Mm(number))
+  | Length_unit_q => Ok(`Q(number))
+  | Length_unit_in => Ok(`In(number))
+  | Length_unit_pc => Ok(`Pc(number))
+  | Length_unit_pt => Ok(`Pt(number))
+  };
+
+let angle_of_unit = (number, unit) =>
+  switch (unit: Ast.angle_unit) {
+  | Ast.Angle_unit_deg => Ok(`Deg(number))
+  | Angle_unit_grad => Ok(`Grad(number))
+  | Angle_unit_rad => Ok(`Rad(number))
+  | Angle_unit_turn => Ok(`Turn(number))
+  };
+
+let time_of_unit = (number, unit) =>
+  switch (unit: Ast.time_unit) {
+  | Ast.Time_unit_s => Ok(`S(number))
+  | Time_unit_ms => Ok(`Ms(number))
+  };
+
+let frequency_of_unit = (number, unit) =>
+  switch (unit: Ast.frequency_unit) {
+  | Ast.Frequency_unit_hz => Ok(`Hz(number))
+  | Frequency_unit_khz => Ok(`KHz(number))
+  };
+
+let resolution_of_unit = (number, unit) =>
+  switch (unit: Ast.resolution_unit) {
+  | Ast.Resolution_unit_dpi => Ok(`Dpi(number))
+  | Resolution_unit_dpcm => Ok(`Dpcm(number))
+  | Resolution_unit_dppx => Ok(`Dppx(number))
+  };
+
 let length =
-  token(token =>
-    switch (token) {
-    | DIMENSION((number, dimension)) =>
-      switch (dimension) {
-      | "cap" => Ok(`Cap(number))
-      | "ch" => Ok(`Ch(number))
-      | "em" => Ok(`Em(number))
-      | "ex" => Ok(`Ex(number))
-      | "ic" => Ok(`Ic(number))
-      | "lh" => Ok(`Lh(number))
-      | "rcap" => Ok(`Rcap(number))
-      | "rch" => Ok(`Rch(number))
-      | "rem" => Ok(`Rem(number))
-      | "rex" => Ok(`Rex(number))
-      | "ric" => Ok(`Ric(number))
-      | "rlh" => Ok(`Rlh(number))
-      | "vh" => Ok(`Vh(number))
-      | "vw" => Ok(`Vw(number))
-      | "vmax" => Ok(`Vmax(number))
-      | "vmin" => Ok(`Vmin(number))
-      | "vb" => Ok(`Vb(number))
-      | "vi" => Ok(`Vi(number))
-      | "cqw" => Ok(`Cqw(number))
-      | "cqh" => Ok(`Cqh(number))
-      | "cqi" => Ok(`Cqi(number))
-      | "cqb" => Ok(`Cqb(number))
-      | "cqmin" => Ok(`Cqmin(number))
-      | "cqmax" => Ok(`Cqmax(number))
-      | "px" => Ok(`Px(number))
-      | "cm" => Ok(`Cm(number))
-      | "mm" => Ok(`Mm(number))
-      | "Q" => Ok(`Q(number))
-      | "in" => Ok(`In(number))
-      | "pc" => Ok(`Pc(number))
-      | "pt" => Ok(`Pt(number))
-      | dim => Error(["Invalid length unit '" ++ dim ++ "'."])
+  match_component(
+    fun
+    | (Ast.Dimension(dimension), _) =>
+      switch (dimension.kind) {
+      | Ast.Dimension_length(unit) => length_of_unit(dimension.value, unit)
+      | _ => invalid_dimension_unit("length", dimension.unit)
       }
-    | NUMBER(0.) => Ok(`Zero)
-    | _ => Error(["Expected length."])
-    }
+    | (Ast.Number(0.), _) => Ok(`Zero)
+    | _ => Error(["Expected length."]),
   );
 
 let length_runtime_module_path = "Css_types.Length";
 
-// https://drafts.csswg.org/css-values-4/#angles
 let angle =
-  token(token =>
-    switch (token) {
-    | DIMENSION((number, dimension)) =>
-      switch (dimension) {
-      | "deg" => Ok(`Deg(number))
-      | "grad" => Ok(`Grad(number))
-      | "rad" => Ok(`Rad(number))
-      | "turn" => Ok(`Turn(number))
-      | dim => Error(["Invalid angle unit '" ++ dim ++ "'."])
+  match_component(
+    fun
+    | (Ast.Dimension(dimension), _) =>
+      switch (dimension.kind) {
+      | Ast.Dimension_angle(unit) => angle_of_unit(dimension.value, unit)
+      | _ => invalid_dimension_unit("angle", dimension.unit)
       }
-    | NUMBER(0.) => Ok(`Deg(0.))
-    | _ => Error(["Expected angle."])
-    }
+    | (Ast.Number(0.), _) => Ok(`Deg(0.))
+    | _ => Error(["Expected angle."]),
   );
 
 let angle_runtime_module_path = "Css_types.Angle";
 
-// https://drafts.csswg.org/css-values-4/#time
 let time =
-  token(token =>
-    switch (token) {
-    | DIMENSION((number, dimension)) =>
-      switch (dimension) {
-      | "s" => Ok(`S(number))
-      | "ms" => Ok(`Ms(number))
-      | un => Error(["Invalid time unit '" ++ un ++ "'."])
+  match_component(
+    fun
+    | (Ast.Dimension(dimension), _) =>
+      switch (dimension.kind) {
+      | Ast.Dimension_time(unit) => time_of_unit(dimension.value, unit)
+      | _ => invalid_dimension_unit("time", dimension.unit)
       }
-    | _ => Error(["Expected time."])
-    }
+    | _ => Error(["Expected time."]),
   );
 
 let time_runtime_module_path = "Css_types.Time";
 
 module Time = {
-  type t = [
-    | `S(float)
-    | `Ms(float)
-  ];
+  type t = [ | `S(float) | `Ms(float) ];
 };
 
-// https://drafts.csswg.org/css-values-4/#frequency
 let frequency =
-  token(token =>
-    switch (token) {
-    | DIMENSION((number, dimension)) =>
-      switch (dimension |> String.lowercase_ascii) {
-      | "hz" => Ok(`Hz(number))
-      | "khz" => Ok(`KHz(number))
-      | dim => Error(["Invalid frequency unit '" ++ dim ++ "'."])
+  match_component(
+    fun
+    | (Ast.Dimension(dimension), _) =>
+      switch (dimension.kind) {
+      | Ast.Dimension_frequency(unit) => frequency_of_unit(dimension.value, unit)
+      | _ => invalid_dimension_unit("frequency", dimension.unit)
       }
-    | _ => Error(["Expected frequency."])
-    }
+    | _ => Error(["Expected frequency."]),
   );
 
 let frequency_runtime_module_path = "Css_types.Frequency";
 
-// https://drafts.csswg.org/css-values-4/#resolution
 let resolution =
-  token(token =>
-    switch (token) {
-    | DIMENSION((number, dimension)) =>
-      switch (dimension |> String.lowercase_ascii) {
-      | "dpi" => Ok(`Dpi(number))
-      | "dpcm" => Ok(`Dpcm(number))
-      | "x"
-      | "dppx" => Ok(`Dppx(number))
-      | dim => Error(["Invalid resolution unit '" ++ dim ++ "'."])
+  match_component(
+    fun
+    | (Ast.Dimension(dimension), _) =>
+      switch (dimension.kind) {
+      | Ast.Dimension_resolution(unit) =>
+        resolution_of_unit(dimension.value, unit)
+      | _ => invalid_dimension_unit("resolution", dimension.unit)
       }
-    | _ => Error(["Expected resolution."])
-    }
+    | _ => Error(["Expected resolution."]),
   );
 
 let resolution_runtime_module_path = "Css_types.Resolution";
 
-// TODO: positive numbers like <number [0,infinity]>
-let percentage = {
-  token(
+let percentage =
+  match_component(
     fun
-    | PERCENTAGE(n) => Ok(n)
+    | (Ast.Percentage(n), _) => Ok(n)
     | _ => Error(["Expected a percentage."]),
   );
-};
 
 let percentage_runtime_module_path = "Css_types.Percentage";
 
-// https://drafts.csswg.org/css-values-4/#css-identifier
-// TODO: differences between <ident> and keyword
 let ident =
-  token(
+  match_component(
     fun
-    | IDENT(string) => Ok(string)
-    | TYPE_SELECTOR(string) => Ok(string)
+    | (Ast.Ident(value), _) => Ok(value)
     | _ => Error(["Expected an indentifier."]),
   );
 
-// https://drafts.csswg.org/css-values-4/#textual-values
 let css_wide_keywords =
   Combinators.xor([
     Rule.Pattern.value(`Initial, keyword("initial")),
@@ -251,43 +337,36 @@ let css_wide_keywords =
 
 let css_wide_keywords_runtime_module_path = "Css_types.Cascading";
 
-// TODO: proper implement
-// https://drafts.csswg.org/css-values-4/#custom-idents
 let custom_ident =
-  token(
+  match_component(
     fun
-    | IDENT(string) => Ok(string)
-    | TYPE_SELECTOR(string) => Ok(string)
-    | STRING(string) => Ok(string)
+    | (Ast.Ident(value), _)
+    | (Ast.String(value), _) => Ok(value)
     | _ => Error(["Expected an identifier."]),
   );
 
-// https://drafts.csswg.org/css-values-4/#dashed-idents
 let dashed_ident =
-  token(
+  match_component(
     fun
-    | IDENT(string) when String.sub(string, 0, 2) == "--" => Ok(string)
+    | (Ast.Ident(value), _) when String.length(value) >= 2 && String.sub(value, 0, 2) == "--" =>
+      Ok(value)
     | _ => Error(["Expected a --variable."]),
   );
 
-// https://drafts.csswg.org/css-values-4/#strings
 let string_token =
-  token(
+  match_component(
     fun
-    | STRING(string) => Ok(string)
+    | (Ast.String(value), _) => Ok(value)
     | _ => Error(["Expected a string."]),
   );
 
-/* TODO: Somewhere in the generate, we point to string and some places to string_token */
 let string = string_token;
 
-// TODO: <url-modifier>
-// https://drafts.csswg.org/css-values-4/#urls
 let url_no_interp = {
   let url_token =
-    token(
+    match_component(
       fun
-      | URL(url) => Ok(url)
+      | (Ast.Uri(url), _) => Ok(url)
       | _ => Error(["Expected a url."]),
     );
   Combinators.xor([url_token, function_call("url", string_token)]);
@@ -295,183 +374,140 @@ let url_no_interp = {
 
 let url_runtime_module_path = "Css_types.Url";
 
-// css-color-4
-// https://drafts.csswg.org/css-color-4/#hex-notation
 let hex_color =
-  token(
+  match_component(
     fun
-    /* TODO: make sure hash is either 3, 4, 6, or 8 hexadecimal digits, precisely */
-    | HASH((str, _)) when String.length(str) >= 3 && String.length(str) <= 8 =>
-      Ok(str)
+    | (Ast.Hash((str, _)), _)
+      when String.length(str) >= 3 && String.length(str) <= 8 => Ok(str)
     | _ => Error(["Expected a hex-color."]),
   );
 
-/* hex_color is part of the color type, so use Color as the runtime module */
 let hex_color_runtime_module_path = "Css_types.Color";
 
-/* <interpolation>, It's not part of the spec.
-     It's the implementation/workaround to inject Reason variables into CSS definitions.
-     `$()` only supports variables and Module accessors to variables.
-     In compile-time the bs-css bindings would enforce the types of those variables.
-   */
 let interpolation =
-  token(
+  match_component(
     fun
-    | INTERPOLATION((name, _loc)) => Ok([name])
+    | (Ast.Variable(name, _loc), _) => Ok([name])
     | _ => Error(["Expected value."]),
   );
 
 let media_type =
-  token(
+  match_component(
     fun
-    | IDENT(value) => {
-        switch (value) {
-        | "only"
-        | "not"
-        | "and"
-        | "or"
-        | "layer" =>
-          Error([
-            Format.sprintf("media_type has an invalid value: '%s'", value),
-          ])
-        | _ => Ok(value)
+    | (Ast.Ident(value), _) => {
+        switch (Classifier.Keyword.media_reserved_of_string(value)) {
+        | Some(_) =>
+          Error([Format.sprintf("media_type has an invalid value: '%s'", value)])
+        | None => Ok(value)
         };
       }
-    | token =>
+    | actual =>
       Error([
         Format.sprintf(
           "expected media_type, got %s instead",
-          show_token(token),
+          render_component(actual),
         ),
       ]),
   );
 
 let container_name = {
-  open Rule.Let;
   let.bind_match name = custom_ident;
   let value = {
-    switch (name) {
-    | "none"
-    | "and"
-    | "not"
-    | "or" =>
-      Error([
-        Format.sprintf("container_name has an invalid value: '%s'", name),
-      ])
-    | _ => Ok(name)
+    switch (Classifier.Keyword.container_reserved_of_string(name)) {
+    | Some(_) =>
+      Error([Format.sprintf("container_name has an invalid value: '%s'", name)])
+    | None => Ok(name)
     };
   };
   return_data(value);
 };
 
 let flex_value =
-  token(
+  match_component(
     fun
-    | DIMENSION((number, dimension)) => {
-        switch (dimension) {
-        | "fr" => Ok(`Fr(number))
-        | _ =>
-          Error([
-            Format.sprintf(
-              "Invalid flex value %g%s, only fr is valid.",
-              number,
-              dimension,
-            ),
-          ])
-        };
+    | (Ast.Dimension(dimension), _) =>
+      switch (dimension.kind) {
+      | Ast.Dimension_flex(Ast.Flex_unit_fr) => Ok(`Fr(dimension.value))
+      | _ =>
+        Error([
+          Format.sprintf(
+            "Invalid flex value %g%s, only fr is valid.",
+            dimension.value,
+            dimension.unit,
+          ),
+        ])
       }
     | _ => Error(["Expected flex_value."]),
   );
 
 let custom_ident_without_span_or_auto =
-  token(
+  match_component(
     fun
-    | IDENT("auto")
-    | TYPE_SELECTOR("auto")
-    | STRING("auto")
-    | IDENT("span")
-    | TYPE_SELECTOR("span")
-    | STRING("span") => Error(["Custom ident cannot be span or auto."])
-    | IDENT(string) => Ok(string)
-    | TYPE_SELECTOR(string) => Ok(string)
-    | STRING(string) => Ok(string)
+    | (Ast.Ident("auto"), _)
+    | (Ast.String("auto"), _)
+    | (Ast.Ident("span"), _)
+    | (Ast.String("span"), _) => Error(["Custom ident cannot be span or auto."])
+    | (Ast.Ident(value), _)
+    | (Ast.String(value), _) => Ok(value)
     | _ => Error(["expected an identifier."]),
   );
 
 let ident_token =
-  token(
+  match_component(
     fun
-    | IDENT(string) => Ok(string)
-    | TYPE_SELECTOR(string) => Ok(string)
+    | (Ast.Ident(value), _) => Ok(value)
     | _ => Error(["expected an identifier."]),
   );
 
-// TODO: workarounds
-let invalid = expect(STRING("not-implemented"));
+let invalid =
+  match_component(
+    fun
+    | (Ast.String("not-implemented"), _) => Ok()
+    | _ => Error(["not implemented"]),
+  );
 
-/* TODO: Implement all invalid rules */
 let declaration_value = invalid;
-
 let positive_integer = integer;
-
 let function_token = invalid;
-
 let any_value = invalid;
-
 let hash_token = invalid;
-
 let zero = invalid;
-
 let custom_property_name = invalid;
-
 let declaration_list = invalid;
-
 let ratio = invalid;
-
 let an_plus_b = invalid;
-
 let declaration = invalid;
-
 let decibel = invalid;
-
 let urange = invalid;
-
 let semitones = invalid;
-
 let url_token = invalid;
 
-/* Extended types - these are defined at the top of Parser.ml and need rules */
 let extended_percentage =
   Combinators.xor([
     Rule.Match.map(percentage, p => `Percentage(p)),
     Rule.Match.map(interpolation, i => `Interpolation(i)),
-    /* TODO: calc, min, max need lazy lookups */
   ]);
 
 let extended_length =
   Combinators.xor([
     Rule.Match.map(length, l => `Length(l)),
     Rule.Match.map(interpolation, i => `Interpolation(i)),
-    /* TODO: calc, min, max need lazy lookups */
   ]);
 
 let extended_angle =
   Combinators.xor([
     Rule.Match.map(angle, a => `Angle(a)),
     Rule.Match.map(interpolation, i => `Interpolation(i)),
-    /* TODO: calc, min, max need lazy lookups */
   ]);
 
 let extended_time =
   Combinators.xor([
     Rule.Match.map(time, t => `Time(t)),
     Rule.Match.map(interpolation, i => `Interpolation(i)),
-    /* TODO: calc, min, max need lazy lookups */
   ]);
 
 let extended_frequency =
   Combinators.xor([
     Rule.Match.map(frequency, f => `Frequency(f)),
     Rule.Match.map(interpolation, i => `Interpolation(i)),
-    /* TODO: calc, min, max need lazy lookups */
   ]);

@@ -62,7 +62,7 @@ let pop_last_selector =
       let rest = right |> List.rev |> List.tl |> List.rev;
       (
         last,
-        ctor,
+        Some(ctor),
         Some(
           ComplexSelector(
             Combinator({
@@ -75,7 +75,8 @@ let pop_last_selector =
     }
   | _ as sel => (sel, None, None);
 
-let join_selector_with_combinator = (~combinator=None, a, b) => {
+let join_selector_with_combinator =
+    (~combinator=Ast.Selector_descendant, a, b) => {
   ComplexSelector(
     Combinator({
       left: a,
@@ -92,7 +93,7 @@ let join_compound_selector =
       subclass_selectors,
       pseudo_selectors,
     })
-  | (SimpleSelector(simple), ctor, Some(rest)) =>
+  | (SimpleSelector(simple), Some(ctor), Some(rest)) =>
     join_selector_with_combinator(
       ~combinator=ctor,
       rest,
@@ -122,7 +123,7 @@ let join_compound_selector =
         subclass_selectors: last_subclass_selectors,
         pseudo_selectors: last_pseudo_selectors,
       }),
-      ctor,
+      Some(ctor),
       Some(rest),
     ) =>
     join_selector_with_combinator(

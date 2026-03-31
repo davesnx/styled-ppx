@@ -71,8 +71,7 @@ module Css_transform = {
       (path_str: string, occurrence_index: int, total_occurrences: int) => {
     let var_name = variable_to_css_var_name(path_str);
     total_occurrences > 1
-      ? Printf.sprintf("%s_%d", var_name, occurrence_index)
-      : var_name;
+      ? Printf.sprintf("%s_%d", var_name, occurrence_index) : var_name;
   };
 
   let count_named_occurrences = names =>
@@ -95,7 +94,8 @@ module Css_transform = {
       | Some(count) => count + 1
       | None => 1
       };
-    occurrences := [(name, next_count), ...List.remove_assoc(name, occurrences^)];
+    occurrences :=
+      [(name, next_count), ...List.remove_assoc(name, occurrences^)];
     next_count;
   };
 
@@ -103,7 +103,7 @@ module Css_transform = {
     let rec loop = (before_rev, remaining) => {
       switch (remaining) {
       | [] => (None, List.rev(before_rev))
-      | [((item_name, value) as item), ...tail] =>
+      | [(item_name, value) as item, ...tail] =>
         if (item_name == name) {
           (Some(value), List.rev_append(before_rev, tail));
         } else {
@@ -117,12 +117,11 @@ module Css_transform = {
 
   let add_dynamic_var = (dynamic_vars, dynamic_var) => {
     let (var_name, _, _) = dynamic_var;
-    if (
-      !List.exists(
-        ((existing_var_name, _, _)) => existing_var_name == var_name,
-        dynamic_vars^,
-      )
-    ) {
+    if (!
+          List.exists(
+            ((existing_var_name, _, _)) => existing_var_name == var_name,
+            dynamic_vars^,
+          )) {
       dynamic_vars := [dynamic_var, ...dynamic_vars^];
     };
   };
@@ -143,39 +142,36 @@ module Css_transform = {
       let (var_name, var_type) = get_var_binding(path_str);
       add_dynamic_var(dynamic_vars, (var_name, path_str, var_type));
 
-      Function(
-        ("var", Ppxlib.Location.none),
-        (
+      Function({
+        name: ("var", Ppxlib.Location.none),
+        kind: Function_kind_regular,
+        body: (
           [(Ident("--" ++ var_name), Ppxlib.Location.none)],
           Ppxlib.Location.none,
         ),
-      );
-    | Function(name, body) =>
+      });
+    | Function({ name, kind, body }) =>
       let (body_values, body_loc) = body;
       let transformed_body =
         List.map(
           ((value, loc)) =>
             (
-              transform_component_value(
-                value,
-                dynamic_vars,
-                get_var_binding,
-              ),
+              transform_component_value(value, dynamic_vars, get_var_binding),
               loc,
             ),
           body_values,
         );
-      Function(name, (transformed_body, body_loc));
+      Function({
+        name,
+        kind,
+        body: (transformed_body, body_loc),
+      });
     | Paren_block(values) =>
       let transformed =
         List.map(
           ((value, loc)) =>
             (
-              transform_component_value(
-                value,
-                dynamic_vars,
-                get_var_binding,
-              ),
+              transform_component_value(value, dynamic_vars, get_var_binding),
               loc,
             ),
           values,
@@ -186,11 +182,7 @@ module Css_transform = {
         List.map(
           ((value, loc)) =>
             (
-              transform_component_value(
-                value,
-                dynamic_vars,
-                get_var_binding,
-              ),
+              transform_component_value(value, dynamic_vars, get_var_binding),
               loc,
             ),
           values,
@@ -289,12 +281,10 @@ module Css_transform = {
     let (property_name, _) = decl.name;
     let (value_list, value_loc) = decl.value;
 
-    let value_string =
-      Styled_ppx_css_parser.Render.component_value_list(value_list);
     let interpolation_types =
-      Css_grammar.Parser.get_interpolation_types(
+      Css_grammar.infer_interpolation_types(
         ~name=property_name,
-        value_string,
+        value_list,
       );
 
     let interpolation_occurrences =
@@ -338,11 +328,7 @@ module Css_transform = {
       List.map(
         ((cv, loc)) =>
           (
-            transform_component_value(
-              cv,
-              dynamic_vars,
-              get_var_binding,
-            ),
+            transform_component_value(cv, dynamic_vars, get_var_binding),
             loc,
           ),
         value_list,
@@ -385,21 +371,27 @@ module Css_transform = {
   and transform_at_rule = (at_rule: at_rule, dynamic_vars) => {
     let { name, prelude, block, loc } = at_rule;
     let (prelude_values, prelude_loc) = prelude;
-    let default_var_binding = var_name =>
-      (variable_to_css_var_name(var_name), MediaQuery);
-    let transformed_prelude =
-      List.map(
-        ((cv, cv_loc)) =>
-          (
-            transform_component_value(
-              cv,
-              dynamic_vars,
-              default_var_binding,
-            ),
-            cv_loc,
-          ),
+
+    let has_interpolation =
+      List.exists(
+        ((cv, _cv_loc)) =>
+          switch ((cv: component_value)) {
+          | Variable(_, _) => true
+          | _ => false
+          },
         prelude_values,
       );
+
+    if (has_interpolation) {
+      let (at_name, _) = name;
+      Ppxlib.Location.raise_errorf(
+        ~loc,
+        "[%%%%cx2] does not support interpolation in @%s preludes. CSS custom properties (var()) are not valid in media query conditions. Inline the value directly or use [%%%%cx] for runtime media query interpolation.",
+        at_name,
+      );
+    };
+
+    let transformed_prelude = prelude_values;
     let transformed_block =
       switch (block) {
       | Empty => Empty

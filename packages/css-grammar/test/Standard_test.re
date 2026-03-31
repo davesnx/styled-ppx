@@ -1,5 +1,15 @@
-open Css_grammar;
+module Parser = Css_grammar;
+module Driver = Styled_ppx_css_parser.Driver;
+module Ast = Styled_ppx_css_parser.Ast;
 open Parser;
+
+let parse_component_values = str =>
+  switch (Driver.parse_declaration(~loc=Ppxlib.Location.none, "x: " ++ str)) {
+  | Ok({Ast.value: (values, _), _}) => values
+  | Error((_, msg)) => Alcotest.fail("parser should succeed: " ++ msg)
+  };
+
+let parse = (prop, str) => Parser.type_check(prop, parse_component_values(str));
 
 let check = Alcotest_extra.check;
 
