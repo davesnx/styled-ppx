@@ -129,7 +129,7 @@ let tests: tests = [
       ~__POS__,
       to_check,
       parse("30 31 32"),
-      Error("Unexpected trailing input '32'."),
+      Error("Unexpected trailing input starting at '32'."),
     );
   }),
   test("<integer>{2} <integer>", () => {
@@ -147,7 +147,7 @@ let tests: tests = [
       ~__POS__,
       to_check,
       parse("30 31 32 33"),
-      Error("Unexpected trailing input '33'."),
+      Error("Unexpected trailing input starting at '33'."),
     );
   }),
   test("<integer>{2,3}", () => {
@@ -162,7 +162,7 @@ let tests: tests = [
       ~__POS__,
       to_check,
       parse("39 40 41 42"),
-      Error("Unexpected trailing input '42'."),
+      Error("Unexpected trailing input starting at '42'."),
     );
   }),
   test("<integer>{2,}", () => {
@@ -192,13 +192,13 @@ let tests: tests = [
       ~__POS__,
       to_check,
       parse("59, 60, 61,"),
-      Error("Unexpected trailing input ','."),
+      Error("Unexpected trailing input starting at ','."),
     );
     check(
       ~__POS__,
       to_check,
       parse("59, 60, 61, 62"),
-      Error("Unexpected trailing input ', 62'."),
+      Error("Unexpected trailing input starting at ','."),
     );
   }),
   test("<integer>#{2}, <integer>", () => {
@@ -231,13 +231,13 @@ let tests: tests = [
       ~__POS__,
       to_check,
       parse("59, 60, 61,"),
-      Error("Unexpected trailing input ','."),
+      Error("Unexpected trailing input starting at ','."),
     );
     check(
       ~__POS__,
       to_check,
       parse("59, 60, 61, 62"),
-      Error("Unexpected trailing input ', 62'."),
+      Error("Unexpected trailing input starting at ','."),
     );
   }),
   test("[<integer> A]{2,3}", () => {
@@ -252,7 +252,7 @@ let tests: tests = [
       ~__POS__,
       to_check,
       parse("69 70 71 72"),
-      Error("Unexpected trailing input '72'."),
+      Error("Unexpected trailing input starting at '72'."),
     );
   }),
 ];

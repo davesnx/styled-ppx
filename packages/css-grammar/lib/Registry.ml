@@ -286,17 +286,13 @@ let validate_property ~loc ~name
       (match Rule.run universal_rule value with
       | Ok _ -> Ok ()
       | Error _ ->
-        let rendered_value =
-          Styled_ppx_css_parser.Render.component_value_list value
-        in
         let prefix =
-          Format.sprintf "Property '%s' has an invalid value: '%s'" name
-            rendered_value
+          Format.sprintf "Property '%s' has an invalid value." name
         in
         let error_message =
           match property_error with
           | "" -> prefix
-          | detail -> Printf.sprintf "%s, %s" prefix detail
+          | detail -> Printf.sprintf "%s %s" prefix detail
         in
         Error (loc, `Invalid_value error_message)))
   | None -> Error (loc, `Property_not_found)

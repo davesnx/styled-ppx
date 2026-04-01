@@ -22,7 +22,6 @@ module Permissive_timeline_trigger = struct
 
   let rule : t Rule.rule = fun _ -> Ok (), []
   let type_check (_ : Styled_ppx_css_parser.Ast.component_value_list) = Ok ()
-  let to_string () = ""
   let runtime_module_path = Some "Css_types.Cascading"
   let infer_interpolation_types () = []
   let infer_interpolation_types_with_context (_ : string) (_ : t) = []

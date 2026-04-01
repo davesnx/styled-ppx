@@ -6,7 +6,6 @@ module type RULE = sig
   val type_check :
     Styled_ppx_css_parser.Ast.component_value_list -> (t, string) result
 
-  val to_string : t -> string
   val runtime_module_path : string option
   val infer_interpolation_types : t -> (string * string) list
 

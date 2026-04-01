@@ -1153,27 +1153,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     body;
   };
 
-  /* Generate to_string function from spec */
-  let generate_to_string_function =
-      (spec: Css_spec_parser.value, ~loc as _: Location.t)
-      : Parsetree.expression => {
-    /* For now, generate simple placeholder to_string */
-    let collect_cases = (_spec: Css_spec_parser.value): list(Parsetree.case) => {
-      [
-        /* Placeholder: generate a wildcard case that returns "TODO" */
-        case(~lhs=ppat_any, ~guard=None, ~rhs=estring("TODO: to_string")),
-      ];
-    };
-
-    let cases = collect_cases(spec);
-    pexp_fun(
-      Nolabel,
-      None,
-      pvar("value"),
-      pexp_match(evar("value"), cases),
-    );
-  };
-
   let generate_spec_module =
       (
         ~spec: Css_spec_parser.value,
@@ -1240,24 +1219,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         ~loc,
         Nonrecursive,
         [Ast_helper.Vb.mk(~loc, pvar("type_check"), type_check_body)],
-      );
-
-    let to_string_inner = generate_to_string_function(spec, ~loc);
-    let to_string_body =
-      pexp_fun(
-        Nolabel,
-        None,
-        Ast_helper.Pat.constraint_(~loc, pvar("value"), t_type),
-        pexp_constraint(
-          pexp_apply(to_string_inner, [(Nolabel, evar("value"))]),
-          string_type,
-        ),
-      );
-    let to_string_binding =
-      Ast_helper.Str.value(
-        ~loc,
-        Nonrecursive,
-        [Ast_helper.Vb.mk(~loc, pvar("to_string"), to_string_body)],
       );
 
     /* Generate infer_interpolation_types - returns (name, type_path) pairs */
@@ -1365,7 +1326,6 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       type_decl,
       rule_binding,
       type_check_binding,
-      to_string_binding,
       infer_interpolation_types_binding,
       infer_interpolation_types_with_context_binding,
       runtime_module_path_binding,

@@ -6,7 +6,6 @@ module Permissive_cascading = struct
 
   let rule : t Rule.rule = fun input -> Ok input, []
   let type_check input = Ok input
-  let to_string = Styled_ppx_css_parser.Render.component_value_list
   let runtime_module_path = Some "Css_types.Cascading"
 
   let infer_interpolation_types =

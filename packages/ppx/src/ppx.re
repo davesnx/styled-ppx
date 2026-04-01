@@ -43,14 +43,9 @@ let rec type_check_rule = (rule: Styled_ppx_css_parser.Ast.rule) => {
     ) {
     | Ok () => [Ok()]
     | Error((loc, `Invalid_value(raw_error))) =>
-      let value = Styled_ppx_css_parser.Render.component_value_list(value);
       let msg =
         raw_error == ""
-          ? Format.sprintf(
-              "Property '%s' has an invalid value: '%s'",
-              name,
-              value,
-            )
+          ? Format.sprintf("Property '%s' has an invalid value.", name)
           : raw_error;
       [Error((loc, `Invalid_value(msg)))];
     | Error((loc, `Property_not_found)) =>

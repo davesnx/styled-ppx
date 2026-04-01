@@ -163,9 +163,12 @@ let run = (rule_parser, input: input) => {
     let remaining_values = drop_leading_whitespace(remaining_values);
     switch (remaining_values) {
     | [] => Ok(data)
-    | values =>
-      let remaining = Render.component_value_list(values);
-      Error("Unexpected trailing input '" ++ remaining ++ "'.")
+    | [value, ..._] =>
+      Error(
+        "Unexpected trailing input starting at '"
+        ++ render_component_value(value)
+        ++ "'.",
+      )
     };
   | Error([message, ..._]) => Error(message)
   | Error([]) => Error("Expected a valid value.")

@@ -14,8 +14,8 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune build
   File "input.re", line 73, characters 22-30:
-  Error: Property 'border-radius' has an invalid value: ' 2px 4px', Unexpected
-         trailing input '4px'.
+  Error: Property 'border-radius' has an invalid value. Unexpected trailing
+         input starting at '4px'.
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
@@ -92,19 +92,19 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-qqv389", []);
   CSS.make("css-uodor8", []);
   [%ocaml.error
-    "Property 'border-radius' has an invalid value: ' 2px 4px', Unexpected trailing input '4px'."
+    "Property 'border-radius' has an invalid value. Unexpected trailing input starting at '4px'."
   ];
   [%ocaml.error
-    "Property 'border-radius' has an invalid value: ' 2px 4px 8px', Unexpected trailing input '4px 8px'."
+    "Property 'border-radius' has an invalid value. Unexpected trailing input starting at '4px'."
   ];
   [%ocaml.error
-    "Property 'border-radius' has an invalid value: ' 2px 4px 8px 16px', Unexpected trailing input '4px 8px 16px'."
+    "Property 'border-radius' has an invalid value. Unexpected trailing input starting at '4px'."
   ];
   [%ocaml.error
-    "Property 'border-radius' has an invalid value: ' 10px / 20px', Unexpected trailing input '/ 20px'."
+    "Property 'border-radius' has an invalid value. Unexpected trailing input starting at '/'."
   ];
   [%ocaml.error
-    "Property 'border-radius' has an invalid value: ' 2px 4px 8px 16px / 2px 4px 8px 16px', Unexpected trailing input '4px 8px 16px / 2px 4px 8px 16px'."
+    "Property 'border-radius' has an invalid value. Unexpected trailing input starting at '4px'."
   ];
   CSS.make("css-p167n4", []);
   CSS.make("css-u2djw", []);
