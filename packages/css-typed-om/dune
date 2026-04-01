@@ -1,0 +1,8 @@
+(library
+ (name CSS)
+ (modes melange)
+ (public_name styled-ppx.css-typed-om)
+ (flags
+  (:standard -w -32))
+ (preprocess
+  (pps melange.ppx)))
