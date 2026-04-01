@@ -205,35 +205,7 @@ and dimension = ({ value, unit, _ }: Ast.dimension) => {
   Tokens.float_to_string(value) ++ unit;
 }
 
-and delimiter = (ast: Ast.delimiter) => {
-  switch (ast) {
-  | Ast.Delimiter_colon => ":"
-  | Delimiter_double_colon => "::"
-  | Delimiter_comma => ","
-  | Delimiter_dot => "."
-  | Delimiter_asterisk => "*"
-  | Delimiter_ampersand => "&"
-  | Delimiter_plus => "+"
-  | Delimiter_minus => "-"
-  | Delimiter_tilde => "~"
-  | Delimiter_greater_than => ">"
-  | Delimiter_less_than => "<"
-  | Delimiter_equals => "="
-  | Delimiter_slash => "/"
-  | Delimiter_exclamation => "!"
-  | Delimiter_pipe => "|"
-  | Delimiter_caret => "^"
-  | Delimiter_dollar_sign => "$"
-  | Delimiter_question_mark => "?"
-  | Delimiter_hash => "#"
-  | Delimiter_at => "@"
-  | Delimiter_percent => "%"
-  | Delimiter_underscore => "_"
-  | Delimiter_gte => ">="
-  | Delimiter_lte => "<="
-  | Delimiter_other(value) => value
-  };
-}
+and delimiter = (ast: Ast.delimiter) => Ast.string_of_delimiter(ast)
 and component_value = (ast: Ast.component_value) => {
   switch (ast) {
   | Whitespace => " "

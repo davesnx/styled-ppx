@@ -1,6 +1,5 @@
 module Ast = Styled_ppx_css_parser.Ast;
 module Render = Styled_ppx_css_parser.Render;
-module Classifier = Styled_ppx_css_parser.Component_value_classifier;
 
 open Rule.Let;
 open Rule.Pattern;
@@ -59,15 +58,10 @@ let bracket_block = rule =>
     rule,
   );
 
-let delimiter_from_string = value =>
-  switch (Classifier.Delim.of_string(value)) {
-  | Some(delimiter) => Some(delimiter)
-  | None when String.length(value) == 1 => Some(Ast.Delimiter_other(value))
-  | None => None
-  };
+let delimiter_from_string = Ast.delimiter_of_string;
 
 let keyword = kw =>
-  switch (Classifier.Delim.of_string(kw)) {
+  switch (Ast.delimiter_of_string(kw)) {
   | Some(delimiter) => expect_delim(delimiter)
   | None =>
     match_component(
@@ -130,8 +124,13 @@ let delim =
 let function_call = (name, rule) => {
   let.bind_match body =
     match_component(
-      fun (((value, _): Rule.located_component_value) as actual) =>
-        switch (Classifier.Function.body_if_named(~expected=name, value)) {
+      fun (((value, _): Rule.located_component_value) as actual) => {
+        let result =
+          switch (value) {
+          | Ast.Function(f) when fst(f.name) == name => Some(fst(f.body))
+          | _ => None
+          };
+        switch (result) {
         | Some(body) => Ok(body)
         | None =>
           Error([
@@ -141,7 +140,8 @@ let function_call = (name, rule) => {
             ++ render_component(actual)
             ++ "' instead.",
           ])
-        },
+        };
+      },
     );
   switch (Rule.run(rule, body)) {
   | Ok(value) => Rule.Match.return(value)
@@ -395,10 +395,10 @@ let media_type =
   match_component(
     fun
     | (Ast.Ident(value), _) => {
-        switch (Classifier.Keyword.media_reserved_of_string(value)) {
-        | Some(_) =>
+        switch (value) {
+        | "only" | "not" | "and" | "or" | "layer" =>
           Error([Format.sprintf("media_type has an invalid value: '%s'", value)])
-        | None => Ok(value)
+        | _ => Ok(value)
         };
       }
     | actual =>
@@ -413,10 +413,10 @@ let media_type =
 let container_name = {
   let.bind_match name = custom_ident;
   let value = {
-    switch (Classifier.Keyword.container_reserved_of_string(name)) {
-    | Some(_) =>
+    switch (name) {
+    | "none" | "and" | "not" | "or" =>
       Error([Format.sprintf("container_name has an invalid value: '%s'", name)])
-    | None => Ok(name)
+    | _ => Ok(name)
     };
   };
   return_data(value);

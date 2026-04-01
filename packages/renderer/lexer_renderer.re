@@ -25,8 +25,7 @@ switch (input, help) {
     tokens
     |> List.filter_map(({ Styled_ppx_css_parser.Lexer.txt, start_pos, end_pos }) =>
          switch (txt) {
-         | Ok(token) =>
-           Some((Styled_ppx_css_parser.Lexer.raw_to_token(token), start_pos, end_pos))
+         | Ok(token) => Some((token, start_pos, end_pos))
          | Error(_) => None
          }
        )

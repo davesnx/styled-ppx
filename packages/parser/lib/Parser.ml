@@ -1,15 +1,12 @@
 open Ast
 module Lex = Lexer
-module Raw = Lexer
-module Tok = Tokens
 
 exception Parse_error of (Lexing.position * Lexing.position * string)
 
-type raw_token = Raw.raw_token
-type raw_token_with_location = Raw.raw_token_with_location
+type token_with_location = Lexer.token_with_location
 
 type stream = {
-  tokens : raw_token_with_location array;
+  tokens : Lexer.token_with_location array;
   mutable index : int;
   mutable last_end_pos : Lexing.position;
 }
@@ -23,20 +20,20 @@ type declaration_value_state = {
 let make_loc start_pos end_pos =
   Parser_location.to_ppxlib_location start_pos end_pos
 
-let component_loc (token : raw_token_with_location) =
+let component_loc (token : token_with_location) =
   make_loc token.start_pos token.end_pos
 
-let raw_text = function
-  | Raw.Raw_whitespace -> " "
-  | Raw.Raw_ident name -> name
-  | Raw.Raw_token token -> Tok.humanize token
+let token_text = function
+  | Tokens.WS -> " "
+  | Tokens.IDENT name -> name
+  | token -> Tokens.humanize token
 
-let raise_parse_error (token : raw_token_with_location) =
+let raise_parse_error (token : token_with_location) =
   let message =
     Printf.sprintf "Parse error while reading token '%s'"
       (match token.txt with
-      | Ok raw -> raw_text raw
-      | Error err -> Tok.show_error err)
+      | Ok tok -> token_text tok
+      | Error err -> Tokens.show_error err)
   in
   raise (Parse_error (token.start_pos, token.end_pos, message))
 
@@ -45,9 +42,9 @@ let current_token stream =
   let index = if stream.index > last_index then last_index else stream.index in
   stream.tokens.(index)
 
-let current_raw stream =
+let current_tok stream =
   match (current_token stream).txt with
-  | Ok raw -> raw
+  | Ok tok -> tok
   | Error _ -> assert false
 
 let advance stream =
@@ -57,15 +54,10 @@ let advance stream =
   stream.last_end_pos <- token.end_pos;
   token
 
-let token_is token expected =
-  match token with
-  | Raw.Raw_token actual when actual = expected -> true
-  | _ -> false
-
-let current_is stream expected = token_is (current_raw stream) expected
+let current_is stream expected = current_tok stream = expected
 
 let current_is_whitespace stream =
-  match current_raw stream with Raw.Raw_whitespace -> true | _ -> false
+  match current_tok stream with Tokens.WS -> true | _ -> false
 
 let skip_whitespace stream =
   while current_is_whitespace stream do
@@ -81,8 +73,8 @@ let expect_token stream expected =
   | None -> raise_parse_error (current_token stream)
 
 let accept_ident stream =
-  match current_raw stream with
-  | Raw.Raw_ident name ->
+  match current_tok stream with
+  | Tokens.IDENT name ->
     let token = advance stream in
     Some (name, token)
   | _ -> None
@@ -107,43 +99,51 @@ let with_empty_or_consumed_loc stream start_pos values =
   | [] -> values, make_loc start_pos start_pos
   | _ -> values, make_loc start_pos stream.last_end_pos
 
-let raw_at index tokens =
+let token_at index tokens =
   if index < Array.length tokens then tokens.(index)
   else tokens.(Array.length tokens - 1)
 
-let raw_value (token : raw_token_with_location) =
-  match token.txt with Ok raw -> raw | Error _ -> assert false
+let token_value (token : token_with_location) =
+  match token.txt with Ok tok -> tok | Error _ -> assert false
 
-let raw_is_whitespace token =
-  match raw_value token with Raw.Raw_whitespace -> true | _ -> false
+let token_is_whitespace token =
+  match token_value token with Tokens.WS -> true | _ -> false
 
 let next_significant_index tokens start =
   let rec loop index =
     if index >= Array.length tokens then index
-    else if raw_is_whitespace tokens.(index) then loop (index + 1)
+    else if token_is_whitespace tokens.(index) then loop (index + 1)
     else index
   in
   loop start
 
-let token_starts_selector = function
-  | Raw.Raw_ident _ -> true
-  | Raw.Raw_token
-      ( Tok.DOT | Tok.HASH _ | Tok.AMPERSAND | Tok.ASTERISK | Tok.COLON
-      | Tok.DOUBLE_COLON | Tok.LEFT_BRACKET | Tok.INTERPOLATION _ ) ->
-    true
-  | Raw.Raw_token _ | Raw.Raw_whitespace -> false
+(* -- Token set predicates (Design 3) -- *)
 
-let token_starts_nested_block = function
-  | Raw.Raw_token (Tok.AT_RULE _ | Tok.AT_KEYFRAMES _) -> true
-  | Raw.Raw_ident _ | Raw.Raw_token _ | Raw.Raw_whitespace -> false
-
-let token_starts_selector_prelude = function
-  | Raw.Raw_ident _ -> true
-  | Raw.Raw_token
-      ( Tok.AMPERSAND | Tok.DOT | Tok.HASH _ | Tok.ASTERISK | Tok.LEFT_BRACKET
-      | Tok.INTERPOLATION _ ) ->
+let is_selector_start = function
+  | Tokens.DELIM ("." | "&" | "*")
+  | Tokens.HASH _ | Tokens.LEFT_BRACKET | Tokens.INTERPOLATION _ ->
     true
-  | Raw.Raw_token _ | Raw.Raw_whitespace -> false
+  | _ -> false
+
+let is_pseudo_start = function
+  | Tokens.COLON | Tokens.DOUBLE_COLON -> true
+  | _ -> false
+
+let is_combinator_delim = function ">" | "+" | "~" -> true | _ -> false
+
+let is_at_rule_start = function
+  | Tokens.AT_RULE _ | Tokens.AT_KEYFRAMES _ -> true
+  | _ -> false
+
+(* Tokens that start a selector (ident or any selector-start or pseudo) *)
+let token_starts_selector tok =
+  match tok with
+  | Tokens.IDENT _ -> true
+  | tok -> is_selector_start tok || is_pseudo_start tok
+
+(* Tokens that start a selector prelude (ident or selector-start, no pseudo) *)
+let token_starts_selector_prelude tok =
+  match tok with Tokens.IDENT _ -> true | tok -> is_selector_start tok
 
 let known_pseudo_ident = function
   | "active" | "any-link" | "autofill" | "checked" | "defined" | "disabled"
@@ -165,38 +165,38 @@ let known_pseudo_function = function
   | _ -> false
 
 let token_starts_selector_pseudo = function
-  | Raw.Raw_ident name -> known_pseudo_ident name
-  | Raw.Raw_token (Tok.FUNCTION name) -> known_pseudo_function name
-  | Raw.Raw_token (Tok.NTH_FUNCTION _ | Tok.COLON | Tok.DOUBLE_COLON) -> true
-  | Raw.Raw_token _ | Raw.Raw_whitespace -> false
+  | Tokens.IDENT name -> known_pseudo_ident name
+  | Tokens.FUNCTION name -> known_pseudo_function name
+  | Tokens.NTH_FUNCTION _ | Tokens.COLON | Tokens.DOUBLE_COLON -> true
+  | _ -> false
 
 let nested_block_follows tokens start_index ~initial_paren_depth
   ~initial_bracket_depth =
   let index = ref start_index in
   let read () =
-    let token : raw_token_with_location = raw_at !index tokens in
+    let token : token_with_location = token_at !index tokens in
     incr index;
     token
   in
   let rec scan ~paren_depth ~bracket_depth =
     match (read ()).txt with
-    | Ok Raw.Raw_whitespace | Ok (Raw.Raw_ident _) ->
-      scan ~paren_depth ~bracket_depth
-    | Ok (Raw.Raw_token token) ->
+    | Ok Tokens.WS | Ok (Tokens.IDENT _) -> scan ~paren_depth ~bracket_depth
+    | Ok token ->
       (match token with
-      | Tok.FUNCTION _ | Tok.NTH_FUNCTION _ | Tok.LEFT_PAREN ->
+      | Tokens.FUNCTION _ | Tokens.NTH_FUNCTION _ | Tokens.LEFT_PAREN ->
         scan ~paren_depth:(paren_depth + 1) ~bracket_depth
-      | Tok.RIGHT_PAREN ->
+      | Tokens.RIGHT_PAREN ->
         let next_paren_depth = if paren_depth > 0 then paren_depth - 1 else 0 in
         scan ~paren_depth:next_paren_depth ~bracket_depth
-      | Tok.LEFT_BRACKET -> scan ~paren_depth ~bracket_depth:(bracket_depth + 1)
-      | Tok.RIGHT_BRACKET ->
+      | Tokens.LEFT_BRACKET ->
+        scan ~paren_depth ~bracket_depth:(bracket_depth + 1)
+      | Tokens.RIGHT_BRACKET ->
         let next_bracket_depth =
           if bracket_depth > 0 then bracket_depth - 1 else 0
         in
         scan ~paren_depth ~bracket_depth:next_bracket_depth
-      | Tok.LEFT_BRACE -> paren_depth = 0 && bracket_depth = 0
-      | Tok.SEMI_COLON | Tok.RIGHT_BRACE | Tok.EOF -> false
+      | Tokens.LEFT_BRACE -> paren_depth = 0 && bracket_depth = 0
+      | Tokens.SEMI_COLON | Tokens.RIGHT_BRACE | Tokens.EOF -> false
       | _ -> scan ~paren_depth ~bracket_depth)
     | Error _ -> false
   in
@@ -205,51 +205,54 @@ let nested_block_follows tokens start_index ~initial_paren_depth
 let selector_prelude_follows tokens start_index =
   let index = ref start_index in
   let read () =
-    let token : raw_token_with_location = raw_at !index tokens in
+    let token : token_with_location = token_at !index tokens in
     incr index;
     token
   in
   let rec scan ~paren_depth ~bracket_depth ~saw_selector_token =
     match (read ()).txt with
-    | Ok Raw.Raw_whitespace ->
-      scan ~paren_depth ~bracket_depth ~saw_selector_token
-    | Ok (Raw.Raw_ident _) ->
+    | Ok Tokens.WS -> scan ~paren_depth ~bracket_depth ~saw_selector_token
+    | Ok (Tokens.IDENT _) ->
       scan ~paren_depth ~bracket_depth ~saw_selector_token:true
-    | Ok (Raw.Raw_token token) ->
+    | Ok token ->
       if paren_depth > 0 || bracket_depth > 0 then (
         match token with
-        | Tok.FUNCTION _ | Tok.NTH_FUNCTION _ | Tok.LEFT_PAREN ->
+        | Tokens.FUNCTION _ | Tokens.NTH_FUNCTION _ | Tokens.LEFT_PAREN ->
           scan ~paren_depth:(paren_depth + 1) ~bracket_depth ~saw_selector_token
-        | Tok.RIGHT_PAREN ->
+        | Tokens.RIGHT_PAREN ->
           let next_paren_depth =
             if paren_depth > 0 then paren_depth - 1 else 0
           in
           scan ~paren_depth:next_paren_depth ~bracket_depth ~saw_selector_token
-        | Tok.LEFT_BRACKET ->
+        | Tokens.LEFT_BRACKET ->
           scan ~paren_depth ~bracket_depth:(bracket_depth + 1)
             ~saw_selector_token
-        | Tok.RIGHT_BRACKET ->
+        | Tokens.RIGHT_BRACKET ->
           let next_bracket_depth =
             if bracket_depth > 0 then bracket_depth - 1 else 0
           in
           scan ~paren_depth ~bracket_depth:next_bracket_depth
             ~saw_selector_token
-        | Tok.LEFT_BRACE | Tok.RIGHT_BRACE | Tok.SEMI_COLON | Tok.EOF -> false
+        | Tokens.LEFT_BRACE | Tokens.RIGHT_BRACE | Tokens.SEMI_COLON
+        | Tokens.EOF ->
+          false
         | _ -> scan ~paren_depth ~bracket_depth ~saw_selector_token)
       else (
         match token with
-        | Tok.LEFT_BRACE -> saw_selector_token
-        | (Tok.FUNCTION _ | Tok.NTH_FUNCTION _) when saw_selector_token ->
+        | Tokens.LEFT_BRACE -> saw_selector_token
+        | (Tokens.FUNCTION _ | Tokens.NTH_FUNCTION _) when saw_selector_token ->
           scan ~paren_depth:(paren_depth + 1) ~bracket_depth
             ~saw_selector_token:true
-        | Tok.LEFT_BRACKET ->
+        | Tokens.LEFT_BRACKET ->
           scan ~paren_depth ~bracket_depth:(bracket_depth + 1)
             ~saw_selector_token:true
-        | Tok.DOT | Tok.HASH _ | Tok.AMPERSAND | Tok.ASTERISK | Tok.COLON
-        | Tok.DOUBLE_COLON | Tok.INTERPOLATION _ | Tok.GREATER_THAN | Tok.PLUS
-        | Tok.TILDE | Tok.COMMA ->
+        | tok when is_selector_start tok || is_pseudo_start tok ->
           scan ~paren_depth ~bracket_depth ~saw_selector_token:true
-        | Tok.SEMI_COLON | Tok.RIGHT_BRACE | Tok.EOF -> false
+        | Tokens.DELIM s when is_combinator_delim s ->
+          scan ~paren_depth ~bracket_depth ~saw_selector_token:true
+        | Tokens.COMMA ->
+          scan ~paren_depth ~bracket_depth ~saw_selector_token:true
+        | Tokens.SEMI_COLON | Tokens.RIGHT_BRACE | Tokens.EOF -> false
         | _ -> false)
     | Error _ -> false
   in
@@ -259,17 +262,17 @@ let declaration_value_starts_nested_block tokens start_index state =
   if not state.has_content then false
   else (
     let next_index = next_significant_index tokens start_index in
-    let next_token = raw_at next_index tokens in
+    let next_token = token_at next_index tokens in
     match next_token.txt with
-    | Ok (Raw.Raw_token (Tok.INTERPOLATION _)) -> false
-    | Ok raw when token_starts_nested_block raw ->
+    | Ok (Tokens.INTERPOLATION _) -> false
+    | Ok tok when is_at_rule_start tok ->
       nested_block_follows tokens next_index ~initial_paren_depth:0
         ~initial_bracket_depth:0
-    | Ok raw
-      when token_starts_selector_prelude raw
+    | Ok tok
+      when token_starts_selector_prelude tok
            &&
-           match raw with
-           | Raw.Raw_ident _ ->
+           match tok with
+           | Tokens.IDENT _ ->
              state.top_level_items = 1 && state.ident_like_prefix
            | _ -> true ->
       selector_prelude_follows tokens next_index
@@ -278,75 +281,83 @@ let declaration_value_starts_nested_block tokens start_index state =
 let identifier_starts_property tokens start_index =
   let index = ref start_index in
   let read () =
-    let token : raw_token_with_location = raw_at !index tokens in
+    let token : token_with_location = token_at !index tokens in
     incr index;
     token
   in
   let rec read_next_significant () =
     match (read ()).txt with
-    | Ok Raw.Raw_whitespace -> read_next_significant ()
+    | Ok Tokens.WS -> read_next_significant ()
     | _ as value -> value
   in
   let rec scan_possible_nested_block ~paren_depth ~bracket_depth
     ~fallback_top_level_items ~fallback_ident_like_prefix
     ~fallback_selector_pseudo_prefix =
     match (read ()).txt with
-    | Ok Raw.Raw_whitespace ->
+    | Ok Tokens.WS ->
       scan_possible_nested_block ~paren_depth ~bracket_depth
         ~fallback_top_level_items ~fallback_ident_like_prefix
         ~fallback_selector_pseudo_prefix
-    | Ok (Raw.Raw_ident _) ->
+    | Ok (Tokens.IDENT _) ->
       scan_possible_nested_block ~paren_depth ~bracket_depth
         ~fallback_top_level_items ~fallback_ident_like_prefix
         ~fallback_selector_pseudo_prefix
-    | Ok (Raw.Raw_token token) ->
+    | Ok token ->
       if paren_depth > 0 || bracket_depth > 0 then (
         match token with
-        | Tok.FUNCTION _ | Tok.NTH_FUNCTION _ | Tok.LEFT_PAREN ->
+        | Tokens.FUNCTION _ | Tokens.NTH_FUNCTION _ | Tokens.LEFT_PAREN ->
           scan_possible_nested_block ~paren_depth:(paren_depth + 1)
             ~bracket_depth ~fallback_top_level_items ~fallback_ident_like_prefix
             ~fallback_selector_pseudo_prefix
-        | Tok.RIGHT_PAREN ->
+        | Tokens.RIGHT_PAREN ->
           let next_paren_depth =
             if paren_depth > 0 then paren_depth - 1 else 0
           in
           scan_possible_nested_block ~paren_depth:next_paren_depth
             ~bracket_depth ~fallback_top_level_items ~fallback_ident_like_prefix
             ~fallback_selector_pseudo_prefix
-        | Tok.LEFT_BRACKET ->
+        | Tokens.LEFT_BRACKET ->
           scan_possible_nested_block ~paren_depth
             ~bracket_depth:(bracket_depth + 1) ~fallback_top_level_items
             ~fallback_ident_like_prefix ~fallback_selector_pseudo_prefix
-        | Tok.RIGHT_BRACKET ->
+        | Tokens.RIGHT_BRACKET ->
           let next_bracket_depth =
             if bracket_depth > 0 then bracket_depth - 1 else 0
           in
           scan_possible_nested_block ~paren_depth
             ~bracket_depth:next_bracket_depth ~fallback_top_level_items
             ~fallback_ident_like_prefix ~fallback_selector_pseudo_prefix
-        | Tok.LEFT_BRACE | Tok.RIGHT_BRACE | Tok.SEMI_COLON | Tok.EOF -> true
+        | Tokens.LEFT_BRACE | Tokens.RIGHT_BRACE | Tokens.SEMI_COLON
+        | Tokens.EOF ->
+          true
         | _ ->
           scan_possible_nested_block ~paren_depth ~bracket_depth
             ~fallback_top_level_items ~fallback_ident_like_prefix
             ~fallback_selector_pseudo_prefix)
       else (
         match token with
-        | Tok.LEFT_BRACE -> true
-        | Tok.FUNCTION _ | Tok.NTH_FUNCTION _ ->
+        | Tokens.LEFT_BRACE -> true
+        | Tokens.FUNCTION _ | Tokens.NTH_FUNCTION _ ->
           scan_possible_nested_block ~paren_depth:(paren_depth + 1)
             ~bracket_depth ~fallback_top_level_items ~fallback_ident_like_prefix
             ~fallback_selector_pseudo_prefix
-        | Tok.LEFT_BRACKET ->
+        | Tokens.LEFT_BRACKET ->
           scan_possible_nested_block ~paren_depth
             ~bracket_depth:(bracket_depth + 1) ~fallback_top_level_items
             ~fallback_ident_like_prefix ~fallback_selector_pseudo_prefix
-        | Tok.DOT | Tok.HASH _ | Tok.AMPERSAND | Tok.ASTERISK | Tok.COLON
-        | Tok.DOUBLE_COLON | Tok.INTERPOLATION _ | Tok.GREATER_THAN | Tok.PLUS
-        | Tok.TILDE | Tok.COMMA ->
+        | tok when is_selector_start tok || is_pseudo_start tok ->
           scan_possible_nested_block ~paren_depth ~bracket_depth
             ~fallback_top_level_items ~fallback_ident_like_prefix
             ~fallback_selector_pseudo_prefix
-        | Tok.SEMI_COLON | Tok.RIGHT_BRACE | Tok.EOF -> true
+        | Tokens.DELIM s when is_combinator_delim s ->
+          scan_possible_nested_block ~paren_depth ~bracket_depth
+            ~fallback_top_level_items ~fallback_ident_like_prefix
+            ~fallback_selector_pseudo_prefix
+        | Tokens.COMMA ->
+          scan_possible_nested_block ~paren_depth ~bracket_depth
+            ~fallback_top_level_items ~fallback_ident_like_prefix
+            ~fallback_selector_pseudo_prefix
+        | Tokens.SEMI_COLON | Tokens.RIGHT_BRACE | Tokens.EOF -> true
         | _ ->
           scan_property_value ~paren_depth ~bracket_depth ~has_value:true
             ~top_level_items:fallback_top_level_items
@@ -366,10 +377,10 @@ let identifier_starts_property tokens start_index =
       else top_level_items, ident_like_prefix
     in
     match (read ()).txt with
-    | Ok Raw.Raw_whitespace ->
+    | Ok Tokens.WS ->
       scan_property_value ~paren_depth ~bracket_depth ~has_value
         ~top_level_items ~ident_like_prefix ~selector_pseudo_prefix
-    | Ok (Raw.Raw_ident name) ->
+    | Ok (Tokens.IDENT name) ->
       let next_selector_pseudo_prefix =
         ((not has_value) && at_top_level && known_pseudo_ident name)
         || selector_pseudo_prefix
@@ -393,15 +404,13 @@ let identifier_starts_property tokens start_index =
           ~top_level_items:next_top_level_items
           ~ident_like_prefix:next_ident_like_prefix
           ~selector_pseudo_prefix:next_selector_pseudo_prefix)
-    | Ok (Raw.Raw_token token) ->
+    | Ok token ->
       let next_selector_pseudo_prefix =
-        (not has_value)
-        && at_top_level
-        && token_starts_selector_pseudo (Raw.Raw_token token)
+        ((not has_value) && at_top_level && token_starts_selector_pseudo token)
         || selector_pseudo_prefix
       in
       begin match token with
-      | Tok.FUNCTION _ | Tok.NTH_FUNCTION _ ->
+      | Tokens.FUNCTION _ | Tokens.NTH_FUNCTION _ ->
         let next_top_level_items, next_ident_like_prefix =
           remember_top_level_item ~is_ident_like:false
         in
@@ -413,13 +422,14 @@ let identifier_starts_property tokens start_index =
         when has_value
              && at_top_level
              && (not selector_pseudo_prefix)
-             && token_starts_selector_prelude (Raw.Raw_token token) ->
+             && token_starts_selector_prelude token ->
         scan_possible_nested_block ~paren_depth:0 ~bracket_depth:0
           ~fallback_top_level_items:top_level_items
           ~fallback_ident_like_prefix:ident_like_prefix
           ~fallback_selector_pseudo_prefix:selector_pseudo_prefix
-      | Tok.NUMBER _ | Tok.PERCENTAGE _ | Tok.DIMENSION _ | Tok.HASH _
-      | Tok.STRING _ | Tok.URL _ | Tok.INTERPOLATION _ ->
+      | Tokens.NUMBER _ | Tokens.PERCENTAGE _ | Tokens.DIMENSION _
+      | Tokens.HASH _ | Tokens.STRING _ | Tokens.URL _ | Tokens.INTERPOLATION _
+        ->
         let next_top_level_items, next_ident_like_prefix =
           remember_top_level_item ~is_ident_like:false
         in
@@ -427,31 +437,29 @@ let identifier_starts_property tokens start_index =
           ~top_level_items:next_top_level_items
           ~ident_like_prefix:next_ident_like_prefix
           ~selector_pseudo_prefix:next_selector_pseudo_prefix
-      | Tok.LEFT_PAREN ->
+      | Tokens.LEFT_PAREN ->
         scan_property_value ~paren_depth:(paren_depth + 1) ~bracket_depth
           ~has_value:true ~top_level_items ~ident_like_prefix
           ~selector_pseudo_prefix:next_selector_pseudo_prefix
-      | Tok.RIGHT_PAREN ->
+      | Tokens.RIGHT_PAREN ->
         let next_paren_depth = if paren_depth > 0 then paren_depth - 1 else 0 in
         scan_property_value ~paren_depth:next_paren_depth ~bracket_depth
           ~has_value:true ~top_level_items ~ident_like_prefix
           ~selector_pseudo_prefix:next_selector_pseudo_prefix
-      | Tok.LEFT_BRACKET ->
+      | Tokens.LEFT_BRACKET ->
         scan_property_value ~paren_depth ~bracket_depth:(bracket_depth + 1)
           ~has_value:true ~top_level_items ~ident_like_prefix
           ~selector_pseudo_prefix:next_selector_pseudo_prefix
-      | Tok.RIGHT_BRACKET ->
+      | Tokens.RIGHT_BRACKET ->
         let next_bracket_depth =
           if bracket_depth > 0 then bracket_depth - 1 else 0
         in
         scan_property_value ~paren_depth ~bracket_depth:next_bracket_depth
           ~has_value:true ~top_level_items ~ident_like_prefix
           ~selector_pseudo_prefix:next_selector_pseudo_prefix
-      | (Tok.COLON | Tok.DOUBLE_COLON) when has_value && at_top_level -> false
-      | token
-        when has_value
-             && at_top_level
-             && token_starts_nested_block (Raw.Raw_token token) ->
+      | (Tokens.COLON | Tokens.DOUBLE_COLON) when has_value && at_top_level ->
+        false
+      | token when has_value && at_top_level && is_at_rule_start token ->
         if
           nested_block_follows tokens (!index - 1) ~initial_paren_depth:0
             ~initial_bracket_depth:0
@@ -459,13 +467,13 @@ let identifier_starts_property tokens start_index =
         else
           scan_property_value ~paren_depth ~bracket_depth ~has_value:true
             ~top_level_items ~ident_like_prefix ~selector_pseudo_prefix
-      | Tok.LEFT_BRACE ->
+      | Tokens.LEFT_BRACE ->
         if at_top_level then false
         else
           scan_property_value ~paren_depth ~bracket_depth ~has_value:true
             ~top_level_items ~ident_like_prefix
             ~selector_pseudo_prefix:next_selector_pseudo_prefix
-      | Tok.SEMI_COLON | Tok.RIGHT_BRACE | Tok.EOF ->
+      | Tokens.SEMI_COLON | Tokens.RIGHT_BRACE | Tokens.EOF ->
         if at_top_level then true
         else
           scan_property_value ~paren_depth ~bracket_depth ~has_value:true
@@ -479,45 +487,42 @@ let identifier_starts_property tokens start_index =
     | Error _ -> true
   in
   match read_next_significant () with
-  | Ok (Raw.Raw_token Tok.COLON) ->
+  | Ok Tokens.COLON ->
     scan_property_value ~paren_depth:0 ~bracket_depth:0 ~has_value:false
       ~top_level_items:0 ~ident_like_prefix:false ~selector_pseudo_prefix:false
   | _ -> false
 
-let string_of_nth_operator_token = function
-  | Tok.PLUS -> "+"
-  | Tok.MINUS -> "-"
-  | _ -> assert false
+let string_of_nth_operator op = op
 
-let selector_combinator_of_token = function
-  | Tok.PLUS -> Ast.Selector_adjacent_sibling
-  | Tok.TILDE -> Ast.Selector_general_sibling
-  | Tok.GREATER_THAN -> Ast.Selector_child
+let selector_combinator_of_delim = function
+  | "+" -> Ast.Selector_adjacent_sibling
+  | "~" -> Ast.Selector_general_sibling
+  | ">" -> Ast.Selector_child
   | _ -> assert false
 
 let parse_attr_matcher stream =
-  match current_raw stream with
-  | Raw.Raw_token Tok.TILDE ->
+  match current_tok stream with
+  | Tokens.DELIM "~" ->
     ignore (advance stream);
-    ignore (expect_token stream Tok.EQUALS);
+    ignore (expect_token stream (Tokens.DELIM "="));
     Attr_member
-  | Raw.Raw_token Tok.PIPE ->
+  | Tokens.DELIM "|" ->
     ignore (advance stream);
-    ignore (expect_token stream Tok.EQUALS);
+    ignore (expect_token stream (Tokens.DELIM "="));
     Attr_prefix_dash
-  | Raw.Raw_token Tok.CARET ->
+  | Tokens.DELIM "^" ->
     ignore (advance stream);
-    ignore (expect_token stream Tok.EQUALS);
+    ignore (expect_token stream (Tokens.DELIM "="));
     Attr_prefix
-  | Raw.Raw_token Tok.DOLLAR_SIGN ->
+  | Tokens.DELIM "$" ->
     ignore (advance stream);
-    ignore (expect_token stream Tok.EQUALS);
+    ignore (expect_token stream (Tokens.DELIM "="));
     Attr_suffix
-  | Raw.Raw_token Tok.ASTERISK ->
+  | Tokens.DELIM "*" ->
     ignore (advance stream);
-    ignore (expect_token stream Tok.EQUALS);
+    ignore (expect_token stream (Tokens.DELIM "="));
     Attr_substring
-  | Raw.Raw_token Tok.EQUALS ->
+  | Tokens.DELIM "=" ->
     ignore (advance stream);
     Attr_exact
   | _ -> raise_parse_error (current_token stream)
@@ -529,27 +534,26 @@ let parse_wq_name stream =
 let parse_nth_payload stream =
   skip_whitespace stream;
   let payload =
-    match current_raw stream with
-    | Raw.Raw_token (Tok.NUMBER a) ->
+    match current_tok stream with
+    | Tokens.NUMBER a ->
       ignore (advance stream);
       Ast.Nth (A (int_of_float a))
-    | Raw.Raw_token (Tok.DIMENSION (num, unit)) ->
+    | Tokens.DIMENSION (num, unit) ->
       ignore (advance stream);
       skip_whitespace stream;
-      begin match current_raw stream with
-      | Raw.Raw_token ((Tok.PLUS | Tok.MINUS) as op_token) ->
+      begin match current_tok stream with
+      | Tokens.DELIM (("+" | "-") as op) ->
         ignore (advance stream);
         skip_whitespace stream;
         let b =
-          match current_raw stream with
-          | Raw.Raw_token (Tok.NUMBER value) ->
+          match current_tok stream with
+          | Tokens.NUMBER value ->
             ignore (advance stream);
             int_of_float value
           | _ -> raise_parse_error (current_token stream)
         in
-        Ast.Nth
-          (ANB (int_of_float num, string_of_nth_operator_token op_token, b))
-      | Raw.Raw_token (Tok.NUMBER value) ->
+        Ast.Nth (ANB (int_of_float num, string_of_nth_operator op, b))
+      | Tokens.NUMBER value ->
         ignore (advance stream);
         let b = int_of_float value in
         let op, abs_b = if b < 0 then "-", abs b else "+", b in
@@ -560,24 +564,24 @@ let parse_nth_payload stream =
           Ast.Nth (ANB (int_of_float num, "-", b)))
         else Ast.Nth (AN (int_of_float num))
       end
-    | Raw.Raw_ident name ->
+    | Tokens.IDENT name ->
       ignore (advance stream);
       skip_whitespace stream;
-      begin match current_raw stream with
-      | Raw.Raw_token ((Tok.PLUS | Tok.MINUS) as op_token) ->
+      begin match current_tok stream with
+      | Tokens.DELIM (("+" | "-") as op) ->
         ignore (advance stream);
         skip_whitespace stream;
         let b =
-          match current_raw stream with
-          | Raw.Raw_token (Tok.NUMBER value) ->
+          match current_tok stream with
+          | Tokens.NUMBER value ->
             ignore (advance stream);
             int_of_float value
           | _ -> raise_parse_error (current_token stream)
         in
         let first_char = name.[0] in
         let a = if first_char = '-' then -1 else 1 in
-        Ast.Nth (ANB (a, string_of_nth_operator_token op_token, b))
-      | Raw.Raw_token (Tok.NUMBER value) ->
+        Ast.Nth (ANB (a, string_of_nth_operator op, b))
+      | Tokens.NUMBER value ->
         ignore (advance stream);
         let b = int_of_float value in
         let op, abs_b = if b < 0 then "-", abs b else "+", b in
@@ -601,40 +605,40 @@ let parse_nth_payload stream =
 
 let rec parse_component_value stream =
   let start_pos = (current_token stream).start_pos in
-  match current_raw stream with
-  | Raw.Raw_whitespace ->
+  match current_tok stream with
+  | Tokens.WS ->
     let token = advance stream in
     Ast.Whitespace, component_loc token
-  | Raw.Raw_ident name ->
+  | Tokens.IDENT name ->
     ignore (advance stream);
     with_loc start_pos stream.last_end_pos (Ast.Ident name)
-  | Raw.Raw_token Tok.LEFT_PAREN ->
+  | Tokens.LEFT_PAREN ->
     ignore (advance stream);
     let values, _ =
       parse_component_value_list_until stream (fun stream ->
-        current_is stream Tok.RIGHT_PAREN)
+        current_is stream Tokens.RIGHT_PAREN)
     in
-    ignore (expect_token stream Tok.RIGHT_PAREN);
+    ignore (expect_token stream Tokens.RIGHT_PAREN);
     with_loc start_pos stream.last_end_pos (Ast.Paren_block values)
-  | Raw.Raw_token Tok.LEFT_BRACKET ->
+  | Tokens.LEFT_BRACKET ->
     ignore (advance stream);
     let values, _ =
       parse_component_value_list_until stream (fun stream ->
-        current_is stream Tok.RIGHT_BRACKET)
+        current_is stream Tokens.RIGHT_BRACKET)
     in
-    ignore (expect_token stream Tok.RIGHT_BRACKET);
+    ignore (expect_token stream Tokens.RIGHT_BRACKET);
     with_loc start_pos stream.last_end_pos (Ast.Bracket_block values)
-  | Raw.Raw_token (Tok.PERCENTAGE value) ->
+  | Tokens.PERCENTAGE value ->
     ignore (advance stream);
     with_loc start_pos stream.last_end_pos
       (Ast.Percentage value : Ast.component_value)
-  | Raw.Raw_token (Tok.STRING value) ->
+  | Tokens.STRING value ->
     ignore (advance stream);
     with_loc start_pos stream.last_end_pos (Ast.String value)
-  | Raw.Raw_token (Tok.URL value) ->
+  | Tokens.URL value ->
     ignore (advance stream);
     with_loc start_pos stream.last_end_pos (Ast.Uri value)
-  | Raw.Raw_token (Tok.HASH (value, kind)) ->
+  | Tokens.HASH (value, kind) ->
     ignore (advance stream);
     let kind =
       match kind with
@@ -642,27 +646,27 @@ let rec parse_component_value stream =
       | `UNRESTRICTED -> Ast.Hash_kind_unrestricted
     in
     with_loc start_pos stream.last_end_pos (Ast.Hash (value, kind))
-  | Raw.Raw_token (Tok.NUMBER value) ->
+  | Tokens.NUMBER value ->
     ignore (advance stream);
     with_loc start_pos stream.last_end_pos (Ast.Number value)
-  | Raw.Raw_token (Tok.UNICODE_RANGE value) ->
+  | Tokens.UNICODE_RANGE value ->
     ignore (advance stream);
     with_loc start_pos stream.last_end_pos (Ast.Unicode_range value)
-  | Raw.Raw_token (Tok.DIMENSION (value, unit)) ->
+  | Tokens.DIMENSION (value, unit) ->
     ignore (advance stream);
     with_loc start_pos stream.last_end_pos
-      (Ast.Dimension (Component_value_classifier.Dimension.make (value, unit)))
-  | Raw.Raw_token (Tok.INTERPOLATION (content, loc)) ->
+      (Ast.Dimension (Ast.dimension_make (value, unit)))
+  | Tokens.INTERPOLATION (content, loc) ->
     ignore (advance stream);
     with_loc start_pos stream.last_end_pos
       (Ast.Variable (content, loc) : Ast.component_value)
-  | Raw.Raw_token (Tok.FUNCTION name) ->
+  | Tokens.FUNCTION name ->
     let token = advance stream in
     let body, body_loc =
       parse_component_value_list_until stream (fun stream ->
-        current_is stream Tok.RIGHT_PAREN)
+        current_is stream Tokens.RIGHT_PAREN)
     in
-    ignore (expect_token stream Tok.RIGHT_PAREN);
+    ignore (expect_token stream Tokens.RIGHT_PAREN);
     let name_loc = component_loc token in
     with_loc start_pos stream.last_end_pos
       (Ast.Function
@@ -673,13 +677,13 @@ let rec parse_component_value stream =
           }
            : Ast.component_function)
         : Ast.component_value)
-  | Raw.Raw_token (Tok.NTH_FUNCTION name) ->
+  | Tokens.NTH_FUNCTION name ->
     let token = advance stream in
     let body, body_loc =
       parse_component_value_list_until stream (fun stream ->
-        current_is stream Tok.RIGHT_PAREN)
+        current_is stream Tokens.RIGHT_PAREN)
     in
-    ignore (expect_token stream Tok.RIGHT_PAREN);
+    ignore (expect_token stream Tokens.RIGHT_PAREN);
     let name_loc = component_loc token in
     with_loc start_pos stream.last_end_pos
       (Ast.Function
@@ -690,43 +694,24 @@ let rec parse_component_value stream =
           }
            : Ast.component_function)
         : Ast.component_value)
-  | Raw.Raw_token token ->
-    let value =
-      match token with
-      | Tok.COLON -> Some (Ast.Delim Ast.Delimiter_colon)
-      | Tok.DOUBLE_COLON -> Some (Ast.Delim Ast.Delimiter_double_colon)
-      | Tok.COMMA -> Some (Ast.Delim Ast.Delimiter_comma)
-      | Tok.DOT -> Some (Ast.Delim Ast.Delimiter_dot)
-      | Tok.ASTERISK -> Some (Ast.Delim Ast.Delimiter_asterisk)
-      | Tok.AMPERSAND -> Some (Ast.Delim Ast.Delimiter_ampersand)
-      | Tok.PLUS -> Some (Ast.Delim Ast.Delimiter_plus)
-      | Tok.MINUS -> Some (Ast.Delim Ast.Delimiter_minus)
-      | Tok.TILDE -> Some (Ast.Delim Ast.Delimiter_tilde)
-      | Tok.GREATER_THAN -> Some (Ast.Delim Ast.Delimiter_greater_than)
-      | Tok.LESS_THAN -> Some (Ast.Delim Ast.Delimiter_less_than)
-      | Tok.EQUALS -> Some (Ast.Delim Ast.Delimiter_equals)
-      | Tok.SLASH -> Some (Ast.Delim Ast.Delimiter_slash)
-      | Tok.EXCLAMATION -> Some (Ast.Delim Ast.Delimiter_exclamation)
-      | Tok.PIPE -> Some (Ast.Delim Ast.Delimiter_pipe)
-      | Tok.CARET -> Some (Ast.Delim Ast.Delimiter_caret)
-      | Tok.DOLLAR_SIGN -> Some (Ast.Delim Ast.Delimiter_dollar_sign)
-      | Tok.QUESTION_MARK -> Some (Ast.Delim Ast.Delimiter_question_mark)
-      | Tok.GTE -> Some (Ast.Delim Ast.Delimiter_gte)
-      | Tok.LTE -> Some (Ast.Delim Ast.Delimiter_lte)
-      | Tok.DELIM '#' -> Some (Ast.Delim Ast.Delimiter_hash)
-      | Tok.DELIM '@' -> Some (Ast.Delim Ast.Delimiter_at)
-      | Tok.DELIM '%' -> Some (Ast.Delim Ast.Delimiter_percent)
-      | Tok.DELIM '_' -> Some (Ast.Delim Ast.Delimiter_underscore)
-      | Tok.DELIM ch ->
-        Some (Ast.Delim (Ast.Delimiter_other (String.make 1 ch)))
-      | _ -> None
-    in
-    begin match value with
-    | Some value ->
+  | Tokens.COLON ->
+    ignore (advance stream);
+    with_loc start_pos stream.last_end_pos (Ast.Delim Ast.Delimiter_colon)
+  | Tokens.DOUBLE_COLON ->
+    ignore (advance stream);
+    with_loc start_pos stream.last_end_pos
+      (Ast.Delim Ast.Delimiter_double_colon)
+  | Tokens.COMMA ->
+    ignore (advance stream);
+    with_loc start_pos stream.last_end_pos (Ast.Delim Ast.Delimiter_comma)
+  | Tokens.DELIM s -> begin
+    match Ast.delimiter_of_string s with
+    | Some delim ->
       ignore (advance stream);
-      with_loc start_pos stream.last_end_pos value
+      with_loc start_pos stream.last_end_pos (Ast.Delim delim)
     | None -> raise_parse_error (current_token stream)
-    end
+  end
+  | _ -> raise_parse_error (current_token stream)
 
 and parse_component_value_list_until stream stop =
   let start_pos = (current_token stream).start_pos in
@@ -740,71 +725,64 @@ and parse_component_value_list_until stream stop =
   loop []
 
 let selector_starts_non_complex stream =
-  match current_raw stream with
-  | Raw.Raw_ident _ -> true
-  | Raw.Raw_token (Tok.AMPERSAND | Tok.ASTERISK | Tok.INTERPOLATION _) -> true
-  | Raw.Raw_token
-      (Tok.DOT | Tok.HASH _ | Tok.LEFT_BRACKET | Tok.COLON | Tok.DOUBLE_COLON)
-    ->
-    true
-  | _ -> false
+  token_starts_selector (current_tok stream)
 
 let parse_selector_ident stream =
   let name, _ = expect_ident stream in
   name
 
 let parse_type_selector stream =
-  match current_raw stream with
-  | Raw.Raw_token Tok.AMPERSAND ->
+  match current_tok stream with
+  | Tokens.DELIM "&" ->
     ignore (advance stream);
     Ampersand
-  | Raw.Raw_token Tok.ASTERISK ->
+  | Tokens.DELIM "*" ->
     ignore (advance stream);
     Universal
-  | Raw.Raw_token (Tok.INTERPOLATION (content, loc)) ->
+  | Tokens.INTERPOLATION (content, loc) ->
     ignore (advance stream);
     Variable (content, loc)
-  | Raw.Raw_ident name ->
+  | Tokens.IDENT name ->
     ignore (advance stream);
     Type name
   | _ -> raise_parse_error (current_token stream)
 
 let rec parse_attribute_selector stream =
-  ignore (expect_token stream Tok.LEFT_BRACKET);
+  ignore (expect_token stream Tokens.LEFT_BRACKET);
   skip_whitespace stream;
   let name = parse_wq_name stream in
   skip_whitespace stream;
-  if current_is stream Tok.RIGHT_BRACKET then (
+  if current_is stream Tokens.RIGHT_BRACKET then (
     ignore (advance stream);
     Attr_value name)
   else (
     let kind = parse_attr_matcher stream in
     skip_whitespace stream;
     let value =
-      match current_raw stream with
-      | Raw.Raw_token (Tok.STRING value) ->
+      match current_tok stream with
+      | Tokens.STRING value ->
         ignore (advance stream);
         Attr_string value
-      | Raw.Raw_ident value ->
+      | Tokens.IDENT value ->
         ignore (advance stream);
         Attr_ident value
       | _ -> raise_parse_error (current_token stream)
     in
     skip_whitespace stream;
-    ignore (expect_token stream Tok.RIGHT_BRACKET);
+    ignore (expect_token stream Tokens.RIGHT_BRACKET);
     To_equal { name; kind; value })
 
 and parse_pseudo_class_selector stream =
-  ignore (expect_token stream Tok.COLON);
-  match current_raw stream with
-  | Raw.Raw_ident name ->
+  ignore (expect_token stream Tokens.COLON);
+  match current_tok stream with
+  | Tokens.IDENT name ->
     ignore (advance stream);
     Pseudoclass (PseudoIdent name)
-  | Raw.Raw_token (Tok.FUNCTION name) ->
+  | Tokens.FUNCTION name ->
     let start_pos = (current_token stream).start_pos in
     ignore (advance stream);
     let selectors, payload_loc = parse_relative_selector_list stream in
-    ignore (expect_token stream Tok.RIGHT_PAREN);
+    ignore (expect_token stream Tokens.RIGHT_PAREN);
     let payload_loc =
       match selectors with
       | [] -> make_loc start_pos start_pos
@@ -813,19 +791,19 @@ and parse_pseudo_class_selector stream =
     Pseudoclass
       (Ast.Function { name; payload = selectors, payload_loc }
         : Ast.pseudoclass_kind)
-  | Raw.Raw_token (Tok.NTH_FUNCTION name) ->
+  | Tokens.NTH_FUNCTION name ->
     let start_pos = (current_token stream).start_pos in
     ignore (advance stream);
     let payload = parse_nth_payload stream in
     let payload_loc = make_loc start_pos stream.last_end_pos in
-    ignore (expect_token stream Tok.RIGHT_PAREN);
+    ignore (expect_token stream Tokens.RIGHT_PAREN);
     Pseudoclass
       (Ast.NthFunction { name; payload = payload, payload_loc }
         : Ast.pseudoclass_kind)
   | _ -> raise_parse_error (current_token stream)
 
 and parse_pseudo_element_selector stream =
-  ignore (expect_token stream Tok.DOUBLE_COLON);
+  ignore (expect_token stream Tokens.DOUBLE_COLON);
   let name = parse_selector_ident stream in
   Pseudoelement name
 
@@ -833,8 +811,8 @@ and parse_pseudo_list stream =
   let first = parse_pseudo_element_selector stream in
   let rec loop acc =
     skip_whitespace stream;
-    match current_raw stream with
-    | Raw.Raw_token Tok.COLON ->
+    match current_tok stream with
+    | Tokens.COLON ->
       let pseudo = parse_pseudo_class_selector stream in
       loop (pseudo :: acc)
     | _ -> List.rev acc
@@ -842,45 +820,43 @@ and parse_pseudo_list stream =
   loop [ first ]
 
 and parse_subclass_selector stream =
-  match current_raw stream with
-  | Raw.Raw_token (Tok.HASH (value, _)) ->
+  match current_tok stream with
+  | Tokens.HASH (value, _) ->
     ignore (advance stream);
     Id value
-  | Raw.Raw_token Tok.DOT ->
+  | Tokens.DELIM "." ->
     ignore (advance stream);
-    begin match current_raw stream with
-    | Raw.Raw_ident value ->
+    begin match current_tok stream with
+    | Tokens.IDENT value ->
       ignore (advance stream);
       Class value
-    | Raw.Raw_token (Tok.INTERPOLATION (content, loc)) ->
+    | Tokens.INTERPOLATION (content, loc) ->
       ignore (advance stream);
       ClassVariable (content, loc)
     | _ -> raise_parse_error (current_token stream)
     end
-  | Raw.Raw_token Tok.LEFT_BRACKET ->
-    Attribute (parse_attribute_selector stream)
-  | Raw.Raw_token Tok.COLON -> Pseudo_class (parse_pseudo_class_selector stream)
+  | Tokens.LEFT_BRACKET -> Attribute (parse_attribute_selector stream)
+  | Tokens.COLON -> Pseudo_class (parse_pseudo_class_selector stream)
   | _ -> raise_parse_error (current_token stream)
 
 and parse_non_complex_selector stream =
   let type_selector =
-    match current_raw stream with
-    | Raw.Raw_ident _
-    | Raw.Raw_token (Tok.AMPERSAND | Tok.ASTERISK | Tok.INTERPOLATION _) ->
+    match current_tok stream with
+    | Tokens.IDENT _ | Tokens.DELIM ("&" | "*") | Tokens.INTERPOLATION _ ->
       Some (parse_type_selector stream)
     | _ -> None
   in
   let rec collect_subclasses acc =
-    match current_raw stream with
-    | Raw.Raw_token (Tok.HASH _ | Tok.DOT | Tok.LEFT_BRACKET | Tok.COLON) ->
+    match current_tok stream with
+    | Tokens.HASH _ | Tokens.DELIM "." | Tokens.LEFT_BRACKET | Tokens.COLON ->
       let subclass = parse_subclass_selector stream in
       collect_subclasses (subclass :: acc)
     | _ -> List.rev acc
   in
   let subclass_selectors = collect_subclasses [] in
   let pseudo_selectors =
-    match current_raw stream with
-    | Raw.Raw_token Tok.DOUBLE_COLON -> parse_pseudo_list stream
+    match current_tok stream with
+    | Tokens.DOUBLE_COLON -> parse_pseudo_list stream
     | _ -> []
   in
   match type_selector, subclass_selectors, pseudo_selectors with
@@ -897,12 +873,12 @@ and parse_complex_selector stream =
       saw_whitespace := true;
       ignore (advance stream)
     done;
-    match current_raw stream with
-    | Raw.Raw_token ((Tok.PLUS | Tok.TILDE | Tok.GREATER_THAN) as token) ->
+    match current_tok stream with
+    | Tokens.DELIM (("+" | "~" | ">") as s) ->
       ignore (advance stream);
       skip_whitespace stream;
       let selector = parse_non_complex_selector stream in
-      loop ((selector_combinator_of_token token, selector) :: right)
+      loop ((selector_combinator_of_delim s, selector) :: right)
     | _ when !saw_whitespace && selector_starts_non_complex stream ->
       let selector = parse_non_complex_selector stream in
       loop ((Ast.Selector_descendant, selector) :: right)
@@ -924,8 +900,8 @@ and parse_selector_list stream =
     let selector_loc = make_loc selector_start stream.last_end_pos in
     skip_whitespace stream;
     let acc = (selector, selector_loc) :: acc in
-    match current_raw stream with
-    | Raw.Raw_token Tok.COMMA ->
+    match current_tok stream with
+    | Tokens.COMMA ->
       ignore (advance stream);
       skip_whitespace stream;
       parse_one acc
@@ -942,11 +918,11 @@ and parse_selector_list stream =
 and parse_relative_selector stream =
   skip_whitespace stream;
   let combinator =
-    match current_raw stream with
-    | Raw.Raw_token ((Tok.PLUS | Tok.TILDE | Tok.GREATER_THAN) as token) ->
+    match current_tok stream with
+    | Tokens.DELIM (("+" | "~" | ">") as s) ->
       ignore (advance stream);
       skip_whitespace stream;
-      Some (selector_combinator_of_token token)
+      Some (selector_combinator_of_delim s)
     | _ -> None
   in
   let complex_selector = parse_complex_selector stream in
@@ -961,8 +937,8 @@ and parse_relative_selector_list stream =
     let selector_loc = make_loc selector_start stream.last_end_pos in
     skip_whitespace stream;
     let acc = (selector, selector_loc) :: acc in
-    match current_raw stream with
-    | Raw.Raw_token Tok.COMMA ->
+    match current_tok stream with
+    | Tokens.COMMA ->
       ignore (advance stream);
       skip_whitespace stream;
       parse_one acc
@@ -1001,9 +977,8 @@ let parse_declaration_value_list stream =
     { has_content = false; top_level_items = 0; ident_like_prefix = false }
   in
   let rec loop acc state =
-    match current_raw stream with
-    | Raw.Raw_token (Tok.EOF | Tok.RIGHT_BRACE | Tok.SEMI_COLON | Tok.IMPORTANT)
-      ->
+    match current_tok stream with
+    | Tokens.EOF | Tokens.RIGHT_BRACE | Tokens.SEMI_COLON | Tokens.IMPORTANT ->
       with_empty_or_consumed_loc stream start_pos (List.rev acc)
     | _
       when declaration_value_starts_nested_block stream.tokens stream.index
@@ -1033,18 +1008,18 @@ let parse_declaration_no_eof stream =
   let name, name_token = expect_ident stream in
   let name_loc = component_loc name_token in
   skip_whitespace stream;
-  ignore (expect_token stream Tok.COLON);
+  ignore (expect_token stream Tokens.COLON);
   let value, value_loc = parse_declaration_value_list stream in
   let important =
-    match current_raw stream with
-    | Raw.Raw_token Tok.IMPORTANT ->
+    match current_tok stream with
+    | Tokens.IMPORTANT ->
       let token = advance stream in
       true, component_loc token
     | _ ->
       let token = current_token stream in
       false, make_loc token.start_pos token.start_pos
   in
-  ignore (accept_token stream Tok.SEMI_COLON);
+  ignore (accept_token stream Tokens.SEMI_COLON);
   {
     name = name, name_loc;
     value = value, value_loc;
@@ -1069,34 +1044,34 @@ let parse_rule_list stream ~stop ~parse_one ~allow_empty =
     let rules = loop [] in
     rules, make_loc start_pos stream.last_end_pos)
 
-let parse_empty_rule_block stream (left_brace : raw_token_with_location) =
-  let right_brace : raw_token_with_location =
-    expect_token stream Tok.RIGHT_BRACE
+let parse_empty_rule_block stream (left_brace : token_with_location) =
+  let right_brace : token_with_location =
+    expect_token stream Tokens.RIGHT_BRACE
   in
-  ignore (accept_token stream Tok.SEMI_COLON);
+  ignore (accept_token stream Tokens.SEMI_COLON);
   [], make_loc left_brace.start_pos right_brace.end_pos
 
 let rec parse_keyframe_style_rule stream =
   skip_whitespace stream;
   let start_pos = (current_token stream).start_pos in
   let prelude =
-    match current_raw stream with
-    | Raw.Raw_ident name ->
+    match current_tok stream with
+    | Tokens.IDENT name ->
       let _, token = expect_ident stream in
       let selector = SimpleSelector (Type name), component_loc token in
       [ selector ], component_loc token
-    | Raw.Raw_token (Tok.PERCENTAGE _) ->
+    | Tokens.PERCENTAGE _ ->
       let rec loop acc =
         let token = current_token stream in
-        match current_raw stream with
-        | Raw.Raw_token (Tok.PERCENTAGE percent) ->
+        match current_tok stream with
+        | Tokens.PERCENTAGE percent ->
           ignore (advance stream);
           skip_whitespace stream;
           let acc =
             (SimpleSelector (Percentage percent), component_loc token) :: acc
           in
-          begin match current_raw stream with
-          | Raw.Raw_token Tok.COMMA ->
+          begin match current_tok stream with
+          | Tokens.COMMA ->
             ignore (advance stream);
             skip_whitespace stream;
             loop acc
@@ -1115,18 +1090,18 @@ let rec parse_keyframe_style_rule stream =
   in
   skip_whitespace stream;
   let block =
-    let left_brace = expect_token stream Tok.LEFT_BRACE in
+    let left_brace = expect_token stream Tokens.LEFT_BRACE in
     skip_whitespace stream;
-    if current_is stream Tok.RIGHT_BRACE then
+    if current_is stream Tokens.RIGHT_BRACE then
       parse_empty_rule_block stream left_brace
     else (
       let rules, rules_loc =
         parse_rule_list stream
-          ~stop:(fun stream -> current_is stream Tok.RIGHT_BRACE)
+          ~stop:(fun stream -> current_is stream Tokens.RIGHT_BRACE)
           ~parse_one:parse_block_rule ~allow_empty:false
       in
-      ignore (expect_token stream Tok.RIGHT_BRACE);
-      ignore (accept_token stream Tok.SEMI_COLON);
+      ignore (expect_token stream Tokens.RIGHT_BRACE);
+      ignore (accept_token stream Tokens.SEMI_COLON);
       rules, rules_loc)
   in
   Style_rule { prelude; block; loc = loc_from_start stream start_pos }
@@ -1134,30 +1109,30 @@ let rec parse_keyframe_style_rule stream =
 and parse_keyframe_rule_list stream =
   parse_rule_list stream
     ~stop:(fun stream ->
-      current_is stream Tok.RIGHT_BRACE || current_is stream Tok.EOF)
+      current_is stream Tokens.RIGHT_BRACE || current_is stream Tokens.EOF)
     ~parse_one:parse_keyframe_style_rule ~allow_empty:false
 
 and parse_at_rule stream =
   skip_whitespace stream;
   let start_pos = (current_token stream).start_pos in
-  match current_raw stream with
-  | Raw.Raw_token (Tok.AT_KEYFRAMES name) ->
+  match current_tok stream with
+  | Tokens.AT_KEYFRAMES name ->
     let at_token = advance stream in
     skip_whitespace stream;
     let keyframe_name, keyframe_token = expect_ident stream in
     let keyframe_loc = component_loc keyframe_token in
     let prelude = [ Ident keyframe_name, keyframe_loc ], keyframe_loc in
     skip_whitespace stream;
-    let left_brace = expect_token stream Tok.LEFT_BRACE in
+    let left_brace = expect_token stream Tokens.LEFT_BRACE in
     skip_whitespace stream;
     let block =
-      if current_is stream Tok.RIGHT_BRACE then (
+      if current_is stream Tokens.RIGHT_BRACE then (
         let empty_block = parse_empty_rule_block stream left_brace in
         Rule_list empty_block)
       else (
         let rules = parse_keyframe_rule_list stream in
-        ignore (expect_token stream Tok.RIGHT_BRACE);
-        ignore (accept_token stream Tok.SEMI_COLON);
+        ignore (expect_token stream Tokens.RIGHT_BRACE);
+        ignore (accept_token stream Tokens.SEMI_COLON);
         Rule_list rules)
     in
     {
@@ -1166,33 +1141,33 @@ and parse_at_rule stream =
       block;
       loc = loc_from_start stream start_pos;
     }
-  | Raw.Raw_token (Tok.AT_RULE_STATEMENT name) ->
+  | Tokens.AT_RULE_STATEMENT name ->
     let at_token = advance stream in
     let prelude, prelude_loc =
       parse_prelude_value_list_until stream (fun stream ->
-        current_is stream Tok.SEMI_COLON)
+        current_is stream Tokens.SEMI_COLON)
     in
-    ignore (expect_token stream Tok.SEMI_COLON);
+    ignore (expect_token stream Tokens.SEMI_COLON);
     {
       name = name, component_loc at_token;
       prelude = prelude, prelude_loc;
       block = Empty;
       loc = loc_from_start stream start_pos;
     }
-  | Raw.Raw_token (Tok.AT_RULE name) ->
+  | Tokens.AT_RULE name ->
     let at_token = advance stream in
     let prelude, prelude_loc =
       parse_prelude_value_list_until stream (fun stream ->
-        current_is stream Tok.LEFT_BRACE)
+        current_is stream Tokens.LEFT_BRACE)
     in
-    ignore (expect_token stream Tok.LEFT_BRACE);
+    ignore (expect_token stream Tokens.LEFT_BRACE);
     let rules =
       parse_rule_list stream
-        ~stop:(fun stream -> current_is stream Tok.RIGHT_BRACE)
+        ~stop:(fun stream -> current_is stream Tokens.RIGHT_BRACE)
         ~parse_one:parse_block_rule ~allow_empty:true
     in
-    ignore (expect_token stream Tok.RIGHT_BRACE);
-    ignore (accept_token stream Tok.SEMI_COLON);
+    ignore (expect_token stream Tokens.RIGHT_BRACE);
+    ignore (accept_token stream Tokens.SEMI_COLON);
     {
       name = name, component_loc at_token;
       prelude = prelude, prelude_loc;
@@ -1206,50 +1181,48 @@ and parse_style_rule stream =
   let start_pos = (current_token stream).start_pos in
   let prelude = parse_selector_list stream in
   skip_whitespace stream;
-  let left_brace = expect_token stream Tok.LEFT_BRACE in
+  let left_brace = expect_token stream Tokens.LEFT_BRACE in
   let block =
     skip_whitespace stream;
-    if current_is stream Tok.RIGHT_BRACE then
+    if current_is stream Tokens.RIGHT_BRACE then
       parse_empty_rule_block stream left_brace
     else (
       let rules, rules_loc =
         parse_rule_list stream
-          ~stop:(fun stream -> current_is stream Tok.RIGHT_BRACE)
+          ~stop:(fun stream -> current_is stream Tokens.RIGHT_BRACE)
           ~parse_one:parse_block_rule ~allow_empty:false
       in
-      ignore (expect_token stream Tok.RIGHT_BRACE);
-      ignore (accept_token stream Tok.SEMI_COLON);
+      ignore (expect_token stream Tokens.RIGHT_BRACE);
+      ignore (accept_token stream Tokens.SEMI_COLON);
       rules, rules_loc)
   in
   { prelude; block; loc = loc_from_start stream start_pos }
 
 and parse_block_rule stream =
   skip_whitespace stream;
-  match current_raw stream with
-  | Raw.Raw_token (Tok.AT_KEYFRAMES _ | Tok.AT_RULE _ | Tok.AT_RULE_STATEMENT _)
-    ->
+  match current_tok stream with
+  | Tokens.AT_KEYFRAMES _ | Tokens.AT_RULE _ | Tokens.AT_RULE_STATEMENT _ ->
     At_rule (parse_at_rule stream)
-  | Raw.Raw_ident _
+  | Tokens.IDENT _
     when identifier_starts_property stream.tokens (stream.index + 1) ->
     Declaration (parse_declaration_no_eof stream)
   | _ -> Style_rule (parse_style_rule stream)
 
 and parse_stylesheet_rule stream =
   skip_whitespace stream;
-  match current_raw stream with
-  | Raw.Raw_token (Tok.AT_KEYFRAMES _ | Tok.AT_RULE _ | Tok.AT_RULE_STATEMENT _)
-    ->
+  match current_tok stream with
+  | Tokens.AT_KEYFRAMES _ | Tokens.AT_RULE _ | Tokens.AT_RULE_STATEMENT _ ->
     At_rule (parse_at_rule stream)
   | _ -> Style_rule (parse_style_rule stream)
 
 let make_stream input =
   let tokens = Lex.from_string input in
   List.iter
-    (fun ({ txt; start_pos; end_pos } : raw_token_with_location) ->
+    (fun ({ txt; start_pos; end_pos } : token_with_location) ->
       match txt with
       | Ok _ -> ()
       | Error err ->
-        raise (Lexer.LexingError (start_pos, end_pos, Tok.show_error err)))
+        raise (Lexer.LexingError (start_pos, end_pos, Tokens.show_error err)))
     tokens;
   { tokens = Array.of_list tokens; index = 0; last_end_pos = Lexing.dummy_pos }
 
@@ -1257,39 +1230,39 @@ let parse_declaration_list input =
   let stream = make_stream input in
   let rules, loc =
     parse_rule_list stream
-      ~stop:(fun stream -> current_is stream Tok.EOF)
+      ~stop:(fun stream -> current_is stream Tokens.EOF)
       ~parse_one:parse_block_rule ~allow_empty:true
   in
-  ignore (expect_token stream Tok.EOF);
+  ignore (expect_token stream Tokens.EOF);
   rules, loc
 
 let parse_declaration input =
   let stream = make_stream input in
   let declaration = parse_declaration_no_eof stream in
   skip_whitespace stream;
-  ignore (expect_token stream Tok.EOF);
+  ignore (expect_token stream Tokens.EOF);
   declaration
 
 let parse_stylesheet input =
   let stream = make_stream input in
   let rules, loc =
     parse_rule_list stream
-      ~stop:(fun stream -> current_is stream Tok.EOF)
+      ~stop:(fun stream -> current_is stream Tokens.EOF)
       ~parse_one:parse_stylesheet_rule ~allow_empty:true
   in
-  ignore (expect_token stream Tok.EOF);
+  ignore (expect_token stream Tokens.EOF);
   rules, loc
 
 let parse_keyframes input =
   let stream = make_stream input in
   let rules =
-    if current_is stream Tok.LEFT_BRACE then (
+    if current_is stream Tokens.LEFT_BRACE then (
       ignore (advance stream);
       let rules = parse_keyframe_rule_list stream in
-      ignore (expect_token stream Tok.RIGHT_BRACE);
-      ignore (accept_token stream Tok.SEMI_COLON);
+      ignore (expect_token stream Tokens.RIGHT_BRACE);
+      ignore (accept_token stream Tokens.SEMI_COLON);
       rules)
     else parse_keyframe_rule_list stream
   in
-  ignore (expect_token stream Tok.EOF);
+  ignore (expect_token stream Tokens.EOF);
   rules

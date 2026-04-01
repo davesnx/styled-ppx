@@ -64,8 +64,7 @@ type delimiter =
   | Delimiter_percent
   | Delimiter_underscore
   | Delimiter_gte
-  | Delimiter_lte
-  | Delimiter_other(string);
+  | Delimiter_lte;
 
 [@deriving show({ with_path: false })]
 type length_unit =
@@ -297,3 +296,164 @@ and nth =
   | A(int)
   | AN(int)
   | ANB(int, string, int);
+
+/* --- Dimension unit classifiers --- */
+
+let length_unit_of_string =
+  fun
+  | "cap" => Some(Length_unit_cap)
+  | "ch" => Some(Length_unit_ch)
+  | "em" => Some(Length_unit_em)
+  | "ex" => Some(Length_unit_ex)
+  | "ic" => Some(Length_unit_ic)
+  | "lh" => Some(Length_unit_lh)
+  | "rcap" => Some(Length_unit_rcap)
+  | "rch" => Some(Length_unit_rch)
+  | "rem" => Some(Length_unit_rem)
+  | "rex" => Some(Length_unit_rex)
+  | "ric" => Some(Length_unit_ric)
+  | "rlh" => Some(Length_unit_rlh)
+  | "vh" => Some(Length_unit_vh)
+  | "vw" => Some(Length_unit_vw)
+  | "vmax" => Some(Length_unit_vmax)
+  | "vmin" => Some(Length_unit_vmin)
+  | "vb" => Some(Length_unit_vb)
+  | "vi" => Some(Length_unit_vi)
+  | "cqw" => Some(Length_unit_cqw)
+  | "cqh" => Some(Length_unit_cqh)
+  | "cqi" => Some(Length_unit_cqi)
+  | "cqb" => Some(Length_unit_cqb)
+  | "cqmin" => Some(Length_unit_cqmin)
+  | "cqmax" => Some(Length_unit_cqmax)
+  | "px" => Some(Length_unit_px)
+  | "cm" => Some(Length_unit_cm)
+  | "mm" => Some(Length_unit_mm)
+  | "Q" => Some(Length_unit_q)
+  | "in" => Some(Length_unit_in)
+  | "pc" => Some(Length_unit_pc)
+  | "pt" => Some(Length_unit_pt)
+  | _ => None;
+
+let angle_unit_of_string =
+  fun
+  | "deg" => Some(Angle_unit_deg)
+  | "grad" => Some(Angle_unit_grad)
+  | "rad" => Some(Angle_unit_rad)
+  | "turn" => Some(Angle_unit_turn)
+  | _ => None;
+
+let time_unit_of_string =
+  fun
+  | "s" => Some(Time_unit_s)
+  | "ms" => Some(Time_unit_ms)
+  | _ => None;
+
+let frequency_unit_of_string = unit =>
+  switch (String.lowercase_ascii(unit)) {
+  | "hz" => Some(Frequency_unit_hz)
+  | "khz" => Some(Frequency_unit_khz)
+  | _ => None
+  };
+
+let resolution_unit_of_string = unit =>
+  switch (String.lowercase_ascii(unit)) {
+  | "dpi" => Some(Resolution_unit_dpi)
+  | "dpcm" => Some(Resolution_unit_dpcm)
+  | "x"
+  | "dppx" => Some(Resolution_unit_dppx)
+  | _ => None
+  };
+
+let flex_unit_of_string =
+  fun
+  | "fr" => Some(Flex_unit_fr)
+  | _ => None;
+
+let dimension_kind_of_unit = unit =>
+  switch (length_unit_of_string(unit)) {
+  | Some(length_unit) => Dimension_length(length_unit)
+  | None =>
+    switch (angle_unit_of_string(unit)) {
+    | Some(angle_unit) => Dimension_angle(angle_unit)
+    | None =>
+      switch (time_unit_of_string(unit)) {
+      | Some(time_unit) => Dimension_time(time_unit)
+      | None =>
+        switch (frequency_unit_of_string(unit)) {
+        | Some(frequency_unit) => Dimension_frequency(frequency_unit)
+        | None =>
+          switch (resolution_unit_of_string(unit)) {
+          | Some(resolution_unit) => Dimension_resolution(resolution_unit)
+          | None =>
+            switch (flex_unit_of_string(unit)) {
+            | Some(flex_unit) => Dimension_flex(flex_unit)
+            | None => Dimension_unknown
+            }
+          }
+        }
+      }
+    }
+  };
+
+let dimension_make = ((value, unit)): dimension => {
+  value,
+  unit,
+  kind: dimension_kind_of_unit(unit),
+};
+
+/* --- Delimiter conversion functions --- */
+
+let delimiter_of_string =
+  fun
+  | ":" => Some(Delimiter_colon)
+  | "::" => Some(Delimiter_double_colon)
+  | "," => Some(Delimiter_comma)
+  | "." => Some(Delimiter_dot)
+  | "*" => Some(Delimiter_asterisk)
+  | "&" => Some(Delimiter_ampersand)
+  | "+" => Some(Delimiter_plus)
+  | "-" => Some(Delimiter_minus)
+  | "~" => Some(Delimiter_tilde)
+  | ">" => Some(Delimiter_greater_than)
+  | "<" => Some(Delimiter_less_than)
+  | "=" => Some(Delimiter_equals)
+  | "/" => Some(Delimiter_slash)
+  | "!" => Some(Delimiter_exclamation)
+  | "|" => Some(Delimiter_pipe)
+  | "^" => Some(Delimiter_caret)
+  | "$" => Some(Delimiter_dollar_sign)
+  | "?" => Some(Delimiter_question_mark)
+  | "#" => Some(Delimiter_hash)
+  | "@" => Some(Delimiter_at)
+  | "%" => Some(Delimiter_percent)
+  | "_" => Some(Delimiter_underscore)
+  | ">=" => Some(Delimiter_gte)
+  | "<=" => Some(Delimiter_lte)
+  | _ => None;
+
+let string_of_delimiter =
+  fun
+  | Delimiter_colon => ":"
+  | Delimiter_double_colon => "::"
+  | Delimiter_comma => ","
+  | Delimiter_dot => "."
+  | Delimiter_asterisk => "*"
+  | Delimiter_ampersand => "&"
+  | Delimiter_plus => "+"
+  | Delimiter_minus => "-"
+  | Delimiter_tilde => "~"
+  | Delimiter_greater_than => ">"
+  | Delimiter_less_than => "<"
+  | Delimiter_equals => "="
+  | Delimiter_slash => "/"
+  | Delimiter_exclamation => "!"
+  | Delimiter_pipe => "|"
+  | Delimiter_caret => "^"
+  | Delimiter_dollar_sign => "$"
+  | Delimiter_question_mark => "?"
+  | Delimiter_hash => "#"
+  | Delimiter_at => "@"
+  | Delimiter_percent => "%"
+  | Delimiter_underscore => "_"
+  | Delimiter_gte => ">="
+  | Delimiter_lte => "<=";
