@@ -36,7 +36,7 @@ let resolve_runtime_module_path (key : string) ~(fallback : string) : string =
 let pack_rule (type a) (rule : a Rule.rule)
   ?(runtime_module_path : string option) () : packed_rule =
   let validate input =
-    match Rule.run rule input with Ok _ -> Ok () | Error msg -> Error msg
+    match Rule.run rule input with Ok _ -> Ok () | Error info -> Error info
   in
   let infer_interpolation_types =
     detect_whole_value_interpolation ~runtime_module_path
@@ -56,7 +56,7 @@ let pack_rule (type a) (rule : a Rule.rule)
 
 let pack_module (module M : RULE) : packed_rule =
   let validate input =
-    match M.type_check input with Ok _ -> Ok () | Error msg -> Error msg
+    match M.type_check input with Ok _ -> Ok () | Error info -> Error info
   in
   let infer_interpolation_types input =
     (* First: check for whole-value interpolation (e.g., "$(myWidth)").

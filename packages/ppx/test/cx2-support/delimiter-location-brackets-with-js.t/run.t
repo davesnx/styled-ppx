@@ -13,29 +13,29 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ cat >input.re <<EOF
-  >  [%cx {|display: blocki;|}];
+  >  [%cx2 {|display: blocki;|}];
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 16-23:
+  File "input.re", line 1, characters 17-24:
   Error: Property 'display' has an invalid value: 'blocki',
          Expected 'block', 'contents', 'flex', 'flow', 'flow-root', 'grid',
-         'inline', or 'inline-block'.
+         'inline', 'inline-block', etc. Did you mean 'block'?
   [1]
 
   $ cat >input.re <<EOF
-  >  [%cx {|width: 100%; display: blocki;|}];
+  >  [%cx2 {|width: 100%; display: blocki;|}];
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 29-36:
+  File "input.re", line 1, characters 30-37:
   Error: Property 'display' has an invalid value: 'blocki',
          Expected 'block', 'contents', 'flex', 'flow', 'flow-root', 'grid',
-         'inline', or 'inline-block'.
+         'inline', 'inline-block', etc. Did you mean 'block'?
   [1]
 
   $ cat >input.re <<EOF
-  >  [%cx {|
+  >  [%cx2 {|
   >      width: 100%; display: blocki;
   >  |}];
   > EOF
@@ -44,11 +44,11 @@ If this test fail means that the module is not in sync with the ppx
   File "input.re", line 2, characters 26-33:
   Error: Property 'display' has an invalid value: 'blocki',
          Expected 'block', 'contents', 'flex', 'flow', 'flow-root', 'grid',
-         'inline', or 'inline-block'.
+         'inline', 'inline-block', etc. Did you mean 'block'?
   [1]
 
   $ cat >input.re <<EOF
-  >  [%cx {|
+  >  [%cx2 {|
   >      width: 100%;
   >      display: blocki;
   >  |}];
@@ -58,5 +58,5 @@ If this test fail means that the module is not in sync with the ppx
   File "input.re", line 3, characters 13-20:
   Error: Property 'display' has an invalid value: 'blocki',
          Expected 'block', 'contents', 'flex', 'flow', 'flow-root', 'grid',
-         'inline', or 'inline-block'.
+         'inline', 'inline-block', etc. Did you mean 'block'?
   [1]

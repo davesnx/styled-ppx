@@ -1,4 +1,5 @@
 module Parser = Css_grammar;
+module Rule = Parser.Rule;
 module Driver = Styled_ppx_css_parser.Driver;
 module Ast = Styled_ppx_css_parser.Ast;
 
@@ -27,7 +28,10 @@ let validate_property = (name, value) =>
   switch (Parser.find_property_packed(name)) {
   | None => Alcotest.fail(name ++ " property should be registered")
   | Some(prop) =>
-    prop.validate(parse_declaration_value_component_values(~name, value))
+    switch (prop.validate(parse_declaration_value_component_values(~name, value))) {
+    | Ok () => Ok()
+    | Error(info) => Error(Rule.format_error_info(info))
+    }
   };
 
 let test_flex_grow_with_interpolation = () =>
@@ -191,9 +195,9 @@ let test_media_query_prelude_with_component_values = () =>
     )
   ) {
   | Ok(_) => ()
-  | Error(msg) =>
+  | Error(info) =>
     Alcotest.fail(
-      "media query component_value_list parsing should succeed: " ++ msg,
+      "media query component_value_list parsing should succeed: " ++ Rule.format_error_info(info),
     )
   };
 
@@ -205,9 +209,9 @@ let test_container_query_prelude_with_component_values = () =>
     )
   ) {
   | Ok(_) => ()
-  | Error(msg) =>
+  | Error(info) =>
     Alcotest.fail(
-      "container query component_value_list parsing should succeed: " ++ msg,
+      "container query component_value_list parsing should succeed: " ++ Rule.format_error_info(info),
     )
   };
 

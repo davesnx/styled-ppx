@@ -4,38 +4,20 @@ module Render = Styled_ppx_css_parser.Render;
 open Rule.Let;
 open Rule.Pattern;
 
-let render_component = ((value, _): Rule.located_component_value) =>
-  Render.component_value(value);
-
 let render_expected_error = (expected, actual) =>
-  Error([
-    "Expected '"
-    ++ expected
-    ++ "' but instead got '"
-    ++ render_component(actual)
-    ++ "'.",
-  ]);
-
-let match_component = f => component(f);
+  Rule.err_keyword(expected, actual);
 
 let parse_block = (~kind, ~extract, rule) => {
   let.bind_match body =
-    match_component((((value, _): Rule.located_component_value) as actual) =>
-      switch (extract(value)) {
+    component((((_value, _): Rule.located_component_value) as actual) =>
+      switch (extract(fst(actual))) {
       | Some(body) => Ok(body)
-      | None =>
-        Error([
-          "Expected "
-          ++ kind
-          ++ " but instead got '"
-          ++ render_component(actual)
-          ++ "'.",
-        ])
+      | None => Rule.err_desc_got(kind, actual)
       }
     );
   switch (Rule.run(rule, body)) {
   | Ok(value) => Rule.Match.return(value)
-  | Error(message) => Rule.Data.return(Error([message]))
+  | Error(info) => Rule.Data.return(Error([info]))
   };
 };
 
@@ -59,15 +41,13 @@ let bracket_block = rule =>
     rule,
   );
 
-let delimiter_from_string = Ast.delimiter_of_string;
-
 let keyword = kw =>
   switch (Ast.delimiter_of_string(kw)) {
   | Some(delimiter) => expect_delim(delimiter)
   | None =>
-    match_component((((value, _): Rule.located_component_value) as actual) =>
-      switch (value) {
-      | Ast.Ident(actual_kw) when actual_kw == kw => Ok()
+    component(actual =>
+      switch (actual) {
+      | (Ast.Ident(actual_kw), _) when actual_kw == kw => Ok()
       | _ => render_expected_error(kw, actual)
       }
     )
@@ -95,81 +75,55 @@ let delim =
   | "=" as value
   | ">=" as value
   | "<=" as value =>
-    switch (delimiter_from_string(value)) {
+    switch (Ast.delimiter_of_string(value)) {
     | Some(delimiter) => expect_delim(delimiter)
     | None =>
-      match_component(actual =>
-        Error([
-          "Unexpected delimiter: "
-          ++ value
-          ++ ". Got '"
-          ++ render_component(actual)
-          ++ "'.",
-        ])
-      )
+      component(actual => Rule.err_keyword(value, actual))
     }
   | "(" => paren_block(identity)
   | "[" => bracket_block(identity)
   | value =>
-    match_component(actual =>
-      Error([
-        "Unexpected delimiter: "
-        ++ value
-        ++ ". Got '"
-        ++ render_component(actual)
-        ++ "'.",
-      ])
-    );
+    component(actual => Rule.err_keyword(value, actual));
 
 let function_call = (name, rule) => {
   let.bind_match body =
-    match_component((((value, _): Rule.located_component_value) as actual) => {
+    component(actual => {
       let result =
-        switch (value) {
-        | Ast.Function(f) when fst(f.name) == name => Some(fst(f.body))
+        switch (actual) {
+        | (Ast.Function(f), _) when fst(f.name) == name =>
+          Some(fst(f.body))
         | _ => None
         };
       switch (result) {
       | Some(body) => Ok(body)
-      | None =>
-        Error([
-          "Expected 'function "
-          ++ name
-          ++ "'. Got '"
-          ++ render_component(actual)
-          ++ "' instead.",
-        ])
+      | None => Rule.err_fn(name, actual)
       };
     });
   switch (Rule.run(rule, body)) {
   | Ok(value) => Rule.Match.return(value)
-  | Error(message) => Rule.Data.return(Error([message]))
+  | Error(info) => Rule.Data.return(Error([info]))
   };
 };
 
 let integer =
-  match_component(
+  component(
     fun
     | (Ast.Number(n), _) =>
       Float.is_integer(n)
         ? Ok(Float.to_int(n))
-        : Error(["Expected an integer, got a float instead."])
-    | _ => Error(["Expected an integer."]),
+        : Rule.err_kind("integer")
+    | actual => Rule.err_kind_got("integer", actual),
   );
 
 let number =
-  match_component((((value, _): Rule.located_component_value) as actual) =>
-    switch (value) {
-    | Ast.Number(n) => Ok(n)
-    | _ =>
-      Error([
-        "Expected a number. Got '" ++ render_component(actual) ++ "' instead.",
-      ])
-    }
+  component(
+    fun
+    | (Ast.Number(n), _) => Ok(n)
+    | actual => Rule.err_kind_got("number", actual),
   );
 
-let invalid_dimension_unit = (kind, unit) =>
-  Error(["Invalid " ++ kind ++ " unit '" ++ unit ++ "'."]);
+let invalid_dimension_unit = (kind, _unit) =>
+  Rule.err_kind(kind);
 
 let length_of_unit = (number, unit) =>
   switch ((unit: Ast.length_unit)) {
@@ -234,7 +188,7 @@ let resolution_of_unit = (number, unit) =>
   };
 
 let length =
-  match_component(
+  component(
     fun
     | (Ast.Dimension(dimension), _) =>
       switch (dimension.kind) {
@@ -242,13 +196,13 @@ let length =
       | _ => invalid_dimension_unit("length", dimension.unit)
       }
     | (Ast.Number(0.), _) => Ok(`Zero)
-    | _ => Error(["Expected length."]),
+    | _ => Rule.err_kind("length"),
   );
 
 let length_runtime_module_path = "Css_types.Length";
 
 let angle =
-  match_component(
+  component(
     fun
     | (Ast.Dimension(dimension), _) =>
       switch (dimension.kind) {
@@ -256,20 +210,20 @@ let angle =
       | _ => invalid_dimension_unit("angle", dimension.unit)
       }
     | (Ast.Number(0.), _) => Ok(`Deg(0.))
-    | _ => Error(["Expected angle."]),
+    | _ => Rule.err_kind("angle"),
   );
 
 let angle_runtime_module_path = "Css_types.Angle";
 
 let time =
-  match_component(
+  component(
     fun
     | (Ast.Dimension(dimension), _) =>
       switch (dimension.kind) {
       | Ast.Dimension_time(unit) => time_of_unit(dimension.value, unit)
       | _ => invalid_dimension_unit("time", dimension.unit)
       }
-    | _ => Error(["Expected time."]),
+    | _ => Rule.err_kind("time"),
   );
 
 let time_runtime_module_path = "Css_types.Time";
@@ -282,7 +236,7 @@ module Time = {
 };
 
 let frequency =
-  match_component(
+  component(
     fun
     | (Ast.Dimension(dimension), _) =>
       switch (dimension.kind) {
@@ -290,13 +244,13 @@ let frequency =
         frequency_of_unit(dimension.value, unit)
       | _ => invalid_dimension_unit("frequency", dimension.unit)
       }
-    | _ => Error(["Expected frequency."]),
+    | _ => Rule.err_kind("frequency"),
   );
 
 let frequency_runtime_module_path = "Css_types.Frequency";
 
 let resolution =
-  match_component(
+  component(
     fun
     | (Ast.Dimension(dimension), _) =>
       switch (dimension.kind) {
@@ -304,25 +258,25 @@ let resolution =
         resolution_of_unit(dimension.value, unit)
       | _ => invalid_dimension_unit("resolution", dimension.unit)
       }
-    | _ => Error(["Expected resolution."]),
+    | _ => Rule.err_kind("resolution"),
   );
 
 let resolution_runtime_module_path = "Css_types.Resolution";
 
 let percentage =
-  match_component(
+  component(
     fun
     | (Ast.Percentage(n), _) => Ok(n)
-    | _ => Error(["Expected a percentage."]),
+    | _ => Rule.err_kind("percentage"),
   );
 
 let percentage_runtime_module_path = "Css_types.Percentage";
 
 let ident =
-  match_component(
+  component(
     fun
     | (Ast.Ident(value), _) => Ok(value)
-    | _ => Error(["Expected an indentifier."]),
+    | _ => Rule.err_kind("identifier"),
   );
 
 let css_wide_keywords =
@@ -337,37 +291,37 @@ let css_wide_keywords =
 let css_wide_keywords_runtime_module_path = "Css_types.Cascading";
 
 let custom_ident =
-  match_component(
+  component(
     fun
     | (Ast.Ident(value), _)
     | (Ast.String(value), _) => Ok(value)
-    | _ => Error(["Expected an identifier."]),
+    | _ => Rule.err_kind("identifier"),
   );
 
 let dashed_ident =
-  match_component(
+  component(
     fun
     | (Ast.Ident(value), _)
         when String.length(value) >= 2 && String.sub(value, 0, 2) == "--" =>
       Ok(value)
-    | _ => Error(["Expected a --variable."]),
+    | _ => Rule.err_kind("--variable"),
   );
 
 let string_token =
-  match_component(
+  component(
     fun
     | (Ast.String(value), _) => Ok(value)
-    | _ => Error(["Expected a string."]),
+    | _ => Rule.err_kind("string"),
   );
 
 let string = string_token;
 
 let url_no_interp = {
   let url_token =
-    match_component(
+    component(
       fun
       | (Ast.Uri(url), _) => Ok(url)
-      | _ => Error(["Expected a url."]),
+      | _ => Rule.err_kind("url"),
     );
   Combinators.xor([url_token, function_call("url", string_token)]);
 };
@@ -375,25 +329,25 @@ let url_no_interp = {
 let url_runtime_module_path = "Css_types.Url";
 
 let hex_color =
-  match_component(
+  component(
     fun
     | (Ast.Hash((str, _)), _)
         when String.length(str) >= 3 && String.length(str) <= 8 =>
       Ok(str)
-    | _ => Error(["Expected a hex-color."]),
+    | _ => Rule.err_kind("hex-color"),
   );
 
 let hex_color_runtime_module_path = "Css_types.Color";
 
 let interpolation =
-  match_component(
+  component(
     fun
     | (Ast.Variable(name, _loc), _) => Ok([name])
-    | _ => Error(["Expected value."]),
+    | _ => Rule.err_kind("value"),
   );
 
 let media_type =
-  match_component(
+  component(
     fun
     | (Ast.Ident(value), _) => {
         switch (value) {
@@ -402,19 +356,11 @@ let media_type =
         | "and"
         | "or"
         | "layer" =>
-          Error([
-            Format.sprintf("media_type has an invalid value: '%s'", value),
-          ])
+          Rule.err_kind("media_type")
         | _ => Ok(value)
         };
       }
-    | actual =>
-      Error([
-        Format.sprintf(
-          "expected media_type, got %s instead",
-          render_component(actual),
-        ),
-      ]),
+    | actual => Rule.err_kind_got("media_type", actual),
   );
 
 let container_name = {
@@ -425,9 +371,7 @@ let container_name = {
     | "and"
     | "not"
     | "or" =>
-      Error([
-        Format.sprintf("container_name has an invalid value: '%s'", name),
-      ])
+      Rule.err_kind("container_name")
     | _ => Ok(name)
     };
   };
@@ -435,48 +379,41 @@ let container_name = {
 };
 
 let flex_value =
-  match_component(
+  component(
     fun
     | (Ast.Dimension(dimension), _) =>
       switch (dimension.kind) {
       | Ast.Dimension_flex(Ast.Flex_unit_fr) => Ok(`Fr(dimension.value))
-      | _ =>
-        Error([
-          Format.sprintf(
-            "Invalid flex value %g%s, only fr is valid.",
-            dimension.value,
-            dimension.unit,
-          ),
-        ])
+      | _ => Rule.err_kind("flex_value")
       }
-    | _ => Error(["Expected flex_value."]),
+    | _ => Rule.err_kind("flex_value"),
   );
 
 let custom_ident_without_span_or_auto =
-  match_component(
+  component(
     fun
     | (Ast.Ident("auto"), _)
     | (Ast.String("auto"), _)
     | (Ast.Ident("span"), _)
     | (Ast.String("span"), _) =>
-      Error(["Custom ident cannot be span or auto."])
+      Rule.err_kind("identifier (not span or auto)")
     | (Ast.Ident(value), _)
     | (Ast.String(value), _) => Ok(value)
-    | _ => Error(["expected an identifier."]),
+    | _ => Rule.err_kind("identifier"),
   );
 
 let ident_token =
-  match_component(
+  component(
     fun
     | (Ast.Ident(value), _) => Ok(value)
-    | _ => Error(["expected an identifier."]),
+    | _ => Rule.err_kind("identifier"),
   );
 
 let invalid =
-  match_component(
+  component(
     fun
     | (Ast.String("not-implemented"), _) => Ok()
-    | _ => Error(["not implemented"]),
+    | _ => Rule.err_desc("not implemented"),
   );
 
 let declaration_value = invalid;

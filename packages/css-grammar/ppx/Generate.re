@@ -1193,8 +1193,13 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         ],
       );
 
+    let error_info_type =
+      ptyp_constr(
+        txt @@ Ldot(Lident("Rule"), "error_info"),
+        [],
+      );
     let result_type =
-      ptyp_constr(txt @@ Lident("result"), [t_type, string_type]);
+      ptyp_constr(txt @@ Lident("result"), [t_type, error_info_type]);
     let component_value_list_type =
       ptyp_constr(
         txt @@

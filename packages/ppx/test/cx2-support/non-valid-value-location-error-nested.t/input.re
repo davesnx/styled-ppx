@@ -1,4 +1,4 @@
-let selectors = [%cx
+let selectors = [%cx2
   {|
   color: white;
 

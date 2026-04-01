@@ -1,6 +1,6 @@
 /* A non exhaustive test suite indeed */
 
-let _chart = [%cx
+let _chart = [%cx2
   {|
   user-select: none;
 

@@ -30,191 +30,40 @@ let static = rules => {
   match_everything([], rules);
 };
 
-/* Helper functions for xor error handling */
-let extract_expected_value = error_msg =>
-  /* Extract the expected value from error message like "Expected 'X' but instead got 'Y'." */
-  if (!String.contains(error_msg, '\'')) {
-    None;
-  } else {
-    try({
-      let start = String.index(error_msg, '\'') + 1;
-      let end_idx = String.index_from(error_msg, start, '\'');
-      Some(String.sub(error_msg, start, end_idx - start));
-    }) {
-    | _ => None
-    };
-  };
-
-let contains_substring = (text, pattern) => {
-  let text_len = String.length(text);
-  let pattern_len = String.length(pattern);
-  let rec loop = idx =>
-    if (idx + pattern_len > text_len) {
-      false;
-    } else if (String.sub(text, idx, pattern_len) == pattern) {
-      true;
-    } else {
-      loop(idx + 1);
-    };
-  loop(0);
-};
-
-let extract_all_quoted_values = error_msg => {
-  let rec loop = (start, acc) =>
-    try({
-      let open_idx = String.index_from(error_msg, start, '\'');
-      let close_idx = String.index_from(error_msg, open_idx + 1, '\'');
-      let value =
-        String.sub(error_msg, open_idx + 1, close_idx - open_idx - 1);
-      loop(close_idx + 1, [value, ...acc]);
-    }) {
-    | _ => List.rev(acc)
-    };
-  loop(0, []);
-};
-
-let extract_expected_values = error_msg =>
-  if (!String.contains(error_msg, '\'')) {
-    [];
-  } else {
-    let has_got =
-      contains_substring(error_msg, "got")
-      || contains_substring(error_msg, "Got");
-    has_got
-      ? switch (extract_expected_value(error_msg)) {
-        | Some(value) => [value]
-        | None => []
-        }
-      : extract_all_quoted_values(error_msg);
-  };
-
-let extract_got_value = error_msg =>
-  /* Extract what we got from error message */
-  if (!String.contains(error_msg, '\'')) {
-    "the provided value";
-  } else {
-    try({
-      let start = String.rindex(error_msg, '\'');
-      let before_quote = String.sub(error_msg, 0, start);
-      let second_last = String.rindex(before_quote, '\'') + 1;
-      String.sub(error_msg, second_last, start - second_last);
-    }) {
-    | _ => "the provided value"
-    };
-  };
-
-let max_expected_values = 8;
-
-let split_at = (count, values) => {
-  let rec loop = (count, values, acc) =>
-    if (count <= 0) {
-      (List.rev(acc), values);
-    } else {
-      switch (values) {
-      | [] => (List.rev(acc), [])
-      | [value, ...rest] => loop(count - 1, rest, [value, ...acc])
-      };
-    };
-  loop(count, values, []);
-};
-
-let format_expected_values = values => {
-  switch (values) {
-  | [] => ""
-  | values =>
-    let (shown, rest) = split_at(max_expected_values, values);
-    let shown = shown |> List.map(value => "'" ++ value ++ "'");
-    switch (rest) {
-    | [] =>
-      switch (shown) {
-      | [] => ""
-      | [single] => single
-      | [first, second] => first ++ " or " ++ second
-      | _ =>
-        let rec format_list = lst =>
-          switch (lst) {
-          | [] => ""
-          | [last] => "or " ++ last
-          | [item, ...items] => item ++ ", " ++ format_list(items)
-          };
-        format_list(shown);
-      }
-    | _ => String.concat(", ", shown) ++ ", etc."
-    };
-  };
-};
-
-let create_error_message = (got, expected_values) => {
-  switch (expected_values) {
-  | [] =>
-    /* No valid expected values to show */
-    ["Expected a valid value."]
-  | values =>
-    let expected_str = format_expected_values(values);
-    let base =
-      expected_str == ""
-        ? "Expected a valid value." : "Expected " ++ expected_str ++ ".";
-    let message =
-      switch (Levenshtein.find_closest_match(got, values)) {
-      | Some(suggestion) => base ++ " Did you mean '" ++ suggestion ++ "'?"
-      | None => base
-      };
-    [message];
-  };
-};
-
-let dedupe_preserve_order = values => {
-  let rec loop = (seen, acc, values) =>
-    switch (values) {
-    | [] => List.rev(acc)
-    | [value, ...rest] =>
-      if (List.mem(value, seen)) {
-        loop(seen, acc, rest);
-      } else {
-        loop([value, ...seen], [value, ...acc], rest);
-      }
-    };
-  loop([], [], values);
-};
-
-let process_error_messages = (~expected_from_rules=[], errors) =>
-  switch (errors) {
-  | [] => ["No alternatives matched"]
-  | errors =>
-    /* Extract expected values from all error messages */
-    let expected_values =
-      errors
-      |> List.map(error_list =>
-           error_list |> List.map(extract_expected_values) |> List.concat
+/* Merge structured errors from failed alternatives into a single error_info.
+   Collects all expected values and picks the first 'got' value. */
+let merge_errors = (errors: list(Rule.error)): Rule.error => {
+  let all_infos = errors |> List.concat;
+  let all_expected =
+    all_infos
+    |> List.concat_map((info: Rule.error_info) => info.expected)
+    |> List.filter(
+         fun
+         /* Filter out '$' from interpolation xor — not a user-facing suggestion */
+         | Rule.Keyword("$") => false
+         | _ => true,
+       )
+    |> List.sort_uniq((a, b) =>
+         String.compare(
+           Rule.expected_to_string(a),
+           Rule.expected_to_string(b),
          )
-      |> List.concat
-      /* Filter out '$' token which comes from the interpolation xor, and we don't want to render it as a valid value suggestion. A bit of a hack. */
-      |> List.filter(value => value != "$")
-      |> dedupe_preserve_order;
-
-    switch (expected_values) {
-    | [] => List.hd(errors)
-    | values =>
-      let got =
-        switch (List.hd(errors)) {
-        | [msg, ..._rest] => extract_got_value(msg)
-        | _ => "the provided value"
-        };
-      create_error_message(got, values);
-    };
-  };
+       );
+  let got = all_infos |> List.find_map((info: Rule.error_info) => info.got);
+  [{expected: all_expected, got}];
+};
 
 let xor_with_expected = rules_with_expected =>
   switch (rules_with_expected) {
   | [] => (
-      tokens => Rule.Data.return(Error(["No alternatives matched"]), tokens)
+      tokens =>
+        Rule.Data.return(
+          Error([{Rule.expected: [], got: None}]),
+          tokens,
+        )
     )
   | all_rules_with_expected => (
       tokens => {
-        let expected_from_rules =
-          all_rules_with_expected
-          |> List.filter_map(((expected, _rule)) => expected);
-
         let all_rules =
           all_rules_with_expected |> List.map(((_, rule)) => rule);
 
@@ -237,7 +86,7 @@ let xor_with_expected = rules_with_expected =>
 
         switch (successes) {
         | [] =>
-          /* All rules failed - collect errors for diagnostics */
+          /* All rules failed - merge structured errors */
           let errors =
             results
             |> List.filter_map(
@@ -245,8 +94,7 @@ let xor_with_expected = rules_with_expected =>
                  | (Error(err), _) => Some(err)
                  | (Ok(_), _) => None,
                );
-          let combined_error =
-            process_error_messages(~expected_from_rules, errors);
+          let combined_error = merge_errors(errors);
           Rule.Data.return(Error(combined_error), tokens);
         | [single] =>
           /* Exactly one match - use it directly */
@@ -302,7 +150,7 @@ let xor = rules =>
 
         switch (successes) {
         | [] =>
-          /* All rules failed - collect errors for diagnostics */
+          /* All rules failed - merge structured errors */
           let errors =
             results
             |> List.filter_map(
@@ -310,7 +158,7 @@ let xor = rules =>
                  | (Error(err), _) => Some(err)
                  | (Ok(_), _) => None,
                );
-          let combined_error = process_error_messages(errors);
+          let combined_error = merge_errors(errors);
           Rule.Data.return(Error(combined_error), tokens);
         | [single] =>
           /* Exactly one match - use it directly */

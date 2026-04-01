@@ -16,6 +16,6 @@ The error should be on line 5, not lines 3-4.
 
   $ dune build 2>&1 | head -n 30
   File "input.re", line 5, characters 10-15:
-  Error: Property 'display' has an invalid value. Expected 'block', 'contents',
-         'flex', 'flow', 'flow-root', 'grid', 'inline', 'inline-block', etc..
-         Did you mean 'flex'?
+  Error: Property 'display' has an invalid value: 'fley',
+         Expected 'block', 'contents', 'flex', 'flow', 'flow-root', 'grid',
+         'inline', 'inline-block', etc. Did you mean 'flex'?

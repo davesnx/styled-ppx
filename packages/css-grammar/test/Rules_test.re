@@ -40,8 +40,9 @@ let data_monad_tests: tests = [
     }
   }),
   test("return with a error list", _ => {
-    switch (return(Error(["error"]), nodes([COLON]))) {
-    | (Error(["error"]), values) when values == nodes([COLON]) => ()
+    let err: Rule.error = [{Rule.expected: [], got: None}];
+    switch (return(Error(err), nodes([COLON]))) {
+    | (Error([{Rule.expected: [], got: None}]), values) when values == nodes([COLON]) => ()
     | _ => Alcotest.fail("Should be (Error([error]), [colon])")
     }
   }),
@@ -59,16 +60,17 @@ let data_monad_tests: tests = [
     };
   }),
   test("data bind error", _ => {
+    let fix_err: Rule.error_info = {Rule.expected: [Description("fix this")], got: None};
     let rule =
       bind(
         return(Error([])),
         fun
         | Ok(_) => Alcotest.fail("should not be called")
-        | Error(errs) => return(Error(["fix this", ...errs])),
+        | Error(errs) => return(Error([fix_err, ...errs])),
       );
 
     switch (rule(nodes([COMMA]))) {
-    | (Error(["fix this"]), values) when values == nodes([COMMA]) => ()
+    | (Error([{Rule.expected: [Description("fix this")], got: None}]), values) when values == nodes([COMMA]) => ()
     | _ => Alcotest.fail("expected (Error([fix this]), [comma])")
     };
   }),
@@ -102,7 +104,7 @@ let data_monad_tests: tests = [
           Ok(6),
           values,
         )
-      | values => (Error([""]), values);
+      | values => (Error([{Rule.expected: [], got: None}]), values);
     let two_comma =
       fun
       | [value1, value2, ...values]
@@ -112,7 +114,7 @@ let data_monad_tests: tests = [
           Ok(7),
           values,
         )
-      | values => (Error([""]), values);
+      | values => (Error([{Rule.expected: [], got: None}]), values);
 
     let rule =
       bind_shortest(
@@ -133,7 +135,7 @@ let data_monad_tests: tests = [
           Ok(9),
           values,
         )
-      | values => (Error([""]), values);
+      | values => (Error([{Rule.expected: [], got: None}]), values);
     let two_comma =
       fun
       | [value1, value2, ...values]
@@ -143,7 +145,7 @@ let data_monad_tests: tests = [
           Ok(10),
           values,
         )
-      | values => (Error([""]), values);
+      | values => (Error([{Rule.expected: [], got: None}]), values);
     let rule =
       bind_longest(
         (two_comma, comma),
@@ -210,7 +212,7 @@ let pattern_helpers_test: tests = [
       component(
         fun
         | (Ast.String("potato"), _) => Ok(1)
-        | _ => Error([""]),
+        | _ => Error([{Rule.expected: [], got: None}]),
       );
     switch (rule([string("potato")])) {
     | (Ok(1), []) => ()
@@ -253,8 +255,8 @@ let pattern_helpers_test: tests = [
   }),
   test("next with no input", _ => {
     switch (Pattern.next([])) {
-    | (Error(["Unexpected end of input."]), []) => ()
-    | _ => Alcotest.fail("should be (Error([Unexpected end of input.]), [])")
+    | (Error(_), []) => ()
+    | _ => Alcotest.fail("should be (Error(...), [])")
     }
   }),
 ];
@@ -272,7 +274,7 @@ let rule_tests: tests = [
         Pattern.component(
           fun
           | (Ast.Ident("decl"), _) => Ok("decl")
-          | _ => Error(["Expected an Ident"]),
+          | _ => Error([{Rule.expected: [Description("Expected an Ident")], got: None}]),
         );
       let.bind_match () = Pattern.expect_delim(Ast.Delimiter_colon);
 
@@ -280,7 +282,7 @@ let rule_tests: tests = [
         Pattern.component(
           fun
           | (Ast.Ident("value"), _) => Ok("value")
-          | _ => Error(["Expected a valid value"]),
+          | _ => Error([{Rule.expected: [Description("Expected a valid value")], got: None}]),
         );
       Match.return(`Declaration((decl, value)));
     };

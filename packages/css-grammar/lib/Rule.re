@@ -1,7 +1,18 @@
 module Ast = Styled_ppx_css_parser.Ast;
 module Render = Styled_ppx_css_parser.Render;
 
-type error = list(string);
+type expected =
+  | Keyword(string)
+  | TokenKind(string)
+  | Function(string)
+  | Description(string);
+
+type error_info = {
+  expected: list(expected),
+  got: option(Ast.component_value),
+};
+
+type error = list(error_info);
 type data('a) = result('a, error);
 type input = Ast.component_value_list;
 type located_component_value = Ast.with_loc(Ast.component_value);
@@ -30,8 +41,62 @@ let rec drop_leading_whitespace = values =>
 let remaining_length = values =>
   List.length(drop_leading_whitespace(values));
 
-let render_component_value = ((value, _): located_component_value) =>
-  Render.component_value(value);
+/* Error construction helpers */
+let err = (~got=?, expected) =>
+  Error([
+    {
+      expected,
+      got,
+    },
+  ]);
+
+let err_keyword = (kw, (actual, _): located_component_value) =>
+  Error([
+    {
+      expected: [Keyword(kw)],
+      got: Some(actual),
+    },
+  ]);
+
+let err_kind = kind =>
+  Error([
+    {
+      expected: [TokenKind(kind)],
+      got: None,
+    },
+  ]);
+
+let err_kind_got = (kind, (actual, _): located_component_value) =>
+  Error([
+    {
+      expected: [TokenKind(kind)],
+      got: Some(actual),
+    },
+  ]);
+
+let err_fn = (name, (actual, _): located_component_value) =>
+  Error([
+    {
+      expected: [Function(name)],
+      got: Some(actual),
+    },
+  ]);
+
+let err_desc = desc =>
+  Error([
+    {
+      expected: [Description(desc)],
+      got: None,
+    },
+  ]);
+
+let err_desc_got = (desc, (actual, _): located_component_value) =>
+  Error([
+    {
+      expected: [Description(desc)],
+      got: Some(actual),
+    },
+  ]);
 
 module Data = {
   let return = (data, values) => (data, drop_leading_whitespace(values));
@@ -137,7 +202,7 @@ module Pattern = {
     fun
     | [value, ...values] =>
       Match.return(value, drop_leading_whitespace(values))
-    | [] => (Error(["Unexpected end of input."]), []);
+    | [] => (err_desc("more input"), []);
 
   let component = (expected, values) =>
     switch (drop_leading_whitespace(values)) {
@@ -148,24 +213,26 @@ module Pattern = {
           ? drop_leading_whitespace(remaining_values)
           : drop_leading_whitespace(values);
       (data, remaining_values);
-    | [] => (Error(["Unexpected end of input."]), [])
+    | [] => (err_desc("more input"), [])
     };
 
   let expect_delim = expected =>
     component(
       fun
       | (Ast.Delim(actual), _) when actual == expected => Ok()
-      | value =>
-        Error([
-          "Expected '"
-          ++ Render.delimiter(expected)
-          ++ "' but instead got '"
-          ++ render_component_value(value)
-          ++ "'.",
-        ]),
+      | value => err_keyword(Render.delimiter(expected), value),
     );
 
   let value = (value, rule) => Match.bind(rule, () => Match.return(value));
+};
+
+let merge_error_infos = (infos: list(error_info)): error_info => {
+  let all_expected = infos |> List.concat_map(e => e.expected);
+  let got = infos |> List.find_map(e => e.got);
+  {
+    expected: all_expected,
+    got,
+  };
 };
 
 let run = (parser, input: input) => {
@@ -176,15 +243,18 @@ let run = (parser, input: input) => {
     let remaining_values = drop_leading_whitespace(remaining_values);
     switch (remaining_values) {
     | [] => Ok(data)
-    | [value, ..._] =>
-      Error(
-        "Unexpected trailing input starting at '"
-        ++ render_component_value(value)
-        ++ "'.",
-      )
+    | [(value, _), ..._] =>
+      Error({
+        expected: [Description("no trailing input")],
+        got: Some(value),
+      })
     };
-  | Error([message, ..._]) => Error(message)
-  | Error([]) => Error("Expected a valid value.")
+  | Error([info, ...rest]) => Error(merge_error_infos([info, ...rest]))
+  | Error([]) =>
+    Error({
+      expected: [],
+      got: None,
+    })
   };
 };
 
@@ -193,7 +263,7 @@ let interpolatable = (~type_path as _, inner_rule, values) => {
     Pattern.component(
       fun
       | (Ast.Variable(name, _loc), _) => Ok(`Interpolation(name))
-      | _ => Error(["Expected value."]),
+      | _ => err_kind("value"),
     );
   switch (interp_rule(values)) {
   | (Ok(_) as result, rest) => (result, rest)
@@ -203,5 +273,109 @@ let interpolatable = (~type_path as _, inner_rule, values) => {
     | Ok(value) => (Ok(`Value(value)), rest)
     | Error(msgs) => (Error(msgs), values)
     };
+  };
+};
+
+/* === Serialization (only called at edges) === */
+
+let expected_to_string =
+  fun
+  | Keyword(s) => s
+  | TokenKind(s) => s
+  | Function(s) => s ++ "()"
+  | Description(s) => s;
+
+let max_expected_values = 8;
+
+let is_vendor_prefixed = s => String.length(s) > 0 && s.[0] == '-';
+
+let expected_priority =
+  fun
+  | TokenKind(_) => 0
+  | Function(_) => 1
+  | Keyword(s) when !is_vendor_prefixed(s) => 2
+  | Keyword(_) => 3
+  | Description(_) => 4;
+
+let compare_expected = (a, b) => {
+  let pa = expected_priority(a);
+  let pb = expected_priority(b);
+  if (pa != pb) {
+    Int.compare(pa, pb);
+  } else {
+    String.compare(expected_to_string(a), expected_to_string(b));
+  };
+};
+
+let format_expected = (expected: list(expected)) => {
+  let values =
+    expected
+    |> List.filter(
+         fun
+         | Description(_) => false
+         | _ => true,
+       )
+    |> List.sort_uniq(compare_expected)
+    |> List.map(expected_to_string);
+
+  switch (values) {
+  | [] => ""
+  | values =>
+    let count = List.length(values);
+    let (shown, has_more) =
+      if (count > max_expected_values) {
+        (List.filteri((i, _) => i < max_expected_values, values), true);
+      } else {
+        (values, false);
+      };
+    let shown = shown |> List.map(v => "'" ++ v ++ "'");
+    let joined =
+      switch (shown) {
+      | [] => ""
+      | [single] => single
+      | _ when has_more => String.concat(", ", shown) ++ ", etc."
+      | [first, second] => first ++ " or " ++ second
+      | _ =>
+        let rec format_list = lst =>
+          switch (lst) {
+          | [] => ""
+          | [last] => "or " ++ last
+          | [item, ...items] => item ++ ", " ++ format_list(items)
+          };
+        format_list(shown);
+      };
+    "Expected " ++ joined;
+  };
+};
+
+let find_suggestion = (got_str: string, expected: list(expected)) => {
+  let candidates =
+    expected
+    |> List.filter_map(
+         fun
+         | Keyword(s) => Some(s)
+         | TokenKind(s) => Some(s)
+         | Function(s) => Some("function " ++ s)
+         | Description(_) => None,
+       );
+  Levenshtein.find_closest_match(got_str, candidates);
+};
+
+let format_error_info = (info: error_info): string => {
+  let expected_str = format_expected(info.expected);
+  let got_str =
+    switch (info.got) {
+    | Some(v) => Render.component_value(v)
+    | None => "the provided value"
+    };
+  let base =
+    switch (expected_str) {
+    | "" => "Expected a valid value."
+    | s when String.ends_with(~suffix=".", s) => s
+    | s => s ++ "."
+    };
+  switch (find_suggestion(got_str, info.expected)) {
+  | Some(suggestion) => base ++ " Did you mean '" ++ suggestion ++ "'?"
+  | None => base
   };
 };

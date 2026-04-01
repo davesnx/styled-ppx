@@ -4,7 +4,8 @@ module type RULE = sig
   val rule : t Rule.rule
 
   val type_check :
-    Styled_ppx_css_parser.Ast.component_value_list -> (t, string) result
+    Styled_ppx_css_parser.Ast.component_value_list ->
+    (t, Rule.error_info) result
 
   val runtime_module_path : string option
   val infer_interpolation_types : t -> (string * string) list
@@ -6051,7 +6052,8 @@ type packed_rule =
   | Pack_rule : {
       rule : 'a Rule.rule;
       validate :
-        Styled_ppx_css_parser.Ast.component_value_list -> (unit, string) result;
+        Styled_ppx_css_parser.Ast.component_value_list ->
+        (unit, Rule.error_info) result;
       runtime_module_path : string option;
       infer_interpolation_types :
         Styled_ppx_css_parser.Ast.component_value_list -> (string * string) list;
@@ -6062,7 +6064,8 @@ type packed_rule =
 
 type packed_property = {
   validate :
-    Styled_ppx_css_parser.Ast.component_value_list -> (unit, string) result;
+    Styled_ppx_css_parser.Ast.component_value_list ->
+    (unit, Rule.error_info) result;
   infer_interpolation_types :
     Styled_ppx_css_parser.Ast.component_value_list -> (string * string) list;
   runtime_module_path : string option;

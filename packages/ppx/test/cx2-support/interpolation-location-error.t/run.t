@@ -13,7 +13,9 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 2, characters 27-31:
+  File "input.re", line 2, characters 14-37:
+  2 | let a = [%cx2 {| display: $(grid); |}];
+                    ^^^^^^^^^^^^^^^^^^^^^^^
   Error: The value grid has type [> `gri ]
          but an expression was expected of type
            [< `block
@@ -59,5 +61,10 @@ If this test fail means that the module is not in sync with the ppx
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css ".css-48ak65{display:var(--var-6w60di);}\n"];
   let grid = `gri;
-  let a = CSS.style([|CSS.label("a"), (CSS.display(grid): CSS.rule)|]);
+  let a =
+    CSS.make(
+      "css-48ak65",
+      [("--var-6w60di", CSS.Types.Display.toString(grid))],
+    );

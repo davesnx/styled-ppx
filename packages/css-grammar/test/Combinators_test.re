@@ -9,8 +9,14 @@ let parse_component_values = str =>
   | Error((_, msg)) => Alcotest.fail("parser should succeed: " ++ msg)
   };
 
-let parse_rule = (prop, str) =>
+let parse_rule_raw = (prop, str) =>
   Parser.type_check(prop, parse_component_values(str));
+
+let parse_rule = (prop, str) =>
+  switch (parse_rule_raw(prop, str)) {
+  | Ok(data) => Ok(data)
+  | Error(info) => Error(Rule.format_error_info(info))
+  };
 
 let parse_exn = (prop, str) =>
   switch (parse_rule(prop, str)) {
@@ -403,7 +409,7 @@ let tests = [
   }),
   test("xor error: no close match suggests all options", () => {
     let msg = parse_error([%spec "red | blue | green"], "yellow");
-    if (!string_contains(msg, "Expected 'red', 'blue', or 'green'.")) {
+    if (!string_contains(msg, "Expected 'blue', 'green', or 'red'.")) {
       Alcotest.fail("Error message should list options. Got: " ++ msg);
     };
     ();
@@ -417,14 +423,14 @@ let tests = [
   }),
   test("xor error: reports expected options", () => {
     let msg = parse_error([%spec "red | blue"], "yellow");
-    if (!string_contains(msg, "Expected 'red' or 'blue'.")) {
+    if (!string_contains(msg, "Expected 'blue' or 'red'.")) {
       Alcotest.fail("Error should list expected options. Got: " ++ msg);
     };
     ();
   }),
   test("xor error: handles quote extraction", () => {
     let msg = parse_error([%spec "red | blue"], "'quoted'");
-    if (!string_contains(msg, "Expected 'red' or 'blue'.")) {
+    if (!string_contains(msg, "Expected 'blue' or 'red'.")) {
       Alcotest.fail("Error should list expected options. Got: " ++ msg);
     };
     ();

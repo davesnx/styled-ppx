@@ -268,13 +268,13 @@ let validate_property ~loc ~name
   (value : Styled_ppx_css_parser.Ast.component_value_list) :
   ( unit,
     Styled_ppx_css_parser.Ast.loc
-    * [> `Invalid_value of string | `Property_not_found ] )
+    * [> `Invalid_value of Rule.error_info | `Property_not_found ] )
   result =
   match find_property_packed_with_wildcard name with
   | Some prop ->
     (match prop.validate value with
     | Ok () -> Ok ()
-    | Error property_error ->
+    | Error error_info ->
       let universal_rule =
         Combinators.xor
           [
@@ -285,16 +285,7 @@ let validate_property ~loc ~name
       in
       (match Rule.run universal_rule value with
       | Ok _ -> Ok ()
-      | Error _ ->
-        let prefix =
-          Format.sprintf "Property '%s' has an invalid value." name
-        in
-        let error_message =
-          match property_error with
-          | "" -> prefix
-          | detail -> Printf.sprintf "%s %s" prefix detail
-        in
-        Error (loc, `Invalid_value error_message)))
+      | Error _ -> Error (loc, `Invalid_value error_info)))
   | None -> Error (loc, `Property_not_found)
 
 let infer_interpolation_types ~name

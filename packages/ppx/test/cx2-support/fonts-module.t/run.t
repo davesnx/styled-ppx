@@ -12,6 +12,12 @@ If this test fail means that the module is not in sync with the ppx
   >  (preprocess (pps styled-ppx)))
   > EOF
 
+  $ dune build
+  File "input.re", line 3, characters 6-32:
+  3 | [%cx2 {|font-family: $(fonts);|}];
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  Error: Unbound value fonts
+  [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css

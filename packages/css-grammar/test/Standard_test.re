@@ -9,8 +9,14 @@ let parse_component_values = str =>
   | Error((_, msg)) => Alcotest.fail("parser should succeed: " ++ msg)
   };
 
-let parse = (prop, str) =>
+let parse_raw = (prop, str) =>
   Parser.type_check(prop, parse_component_values(str));
+
+let parse = (prop, str) =>
+  switch (parse_raw(prop, str)) {
+  | Ok(data) => Ok(data)
+  | Error(info) => Error(Rule.format_error_info(info))
+  };
 
 let check = Alcotest_extra.check;
 
@@ -37,13 +43,13 @@ let tests = [
       ~__POS__,
       Alcotest.result(Alcotest.int, Alcotest.string),
       parse("54.4"),
-      Error("Expected an integer, got a float instead."),
+      Error("Expected 'integer'."),
     );
     check(
       ~__POS__,
       Alcotest.result(Alcotest.int, Alcotest.string),
       parse("ident"),
-      Error("Expected an integer."),
+      Error("Expected 'integer'."),
     );
   }),
   test("<number>", () => {
@@ -64,7 +70,7 @@ let tests = [
       ~__POS__,
       Alcotest.result(Alcotest.float(1.), Alcotest.string),
       parse("ident"),
-      Error("Expected a number. Got 'ident' instead."),
+      Error("Expected 'number'."),
     );
   }),
   test("<length>", () => {
@@ -111,9 +117,9 @@ let tests = [
     let expect = check(~__POS__, to_check);
     expect(parse("56cm"), Ok(`Cm(56.)));
     expect(parse("57px"), Ok(`Px(57.)));
-    expect(parse("59invalid"), Error("Invalid length unit 'invalid'."));
+    expect(parse("59invalid"), Error("Expected 'length'."));
     expect(parse("0"), Ok(`Zero));
-    expect(parse("60"), Error("Expected length."));
+    expect(parse("60"), Error("Expected 'length'."));
   }),
   test("<angle>", () => {
     let parse = parse([%spec "<angle>"]);
@@ -135,7 +141,7 @@ let tests = [
       ~__POS__,
       Alcotest.result(angle, Alcotest.string),
       parse("59px"),
-      Error("Invalid angle unit 'px'."),
+      Error("Expected 'angle'."),
     );
     check(
       ~__POS__,
@@ -147,7 +153,7 @@ let tests = [
       ~__POS__,
       Alcotest.result(angle, Alcotest.string),
       parse("60"),
-      Error("Expected angle."),
+      Error("Expected 'angle'."),
     );
   }),
   test("<time>", () => {
@@ -176,19 +182,19 @@ let tests = [
       ~__POS__,
       Alcotest.result(time, Alcotest.string),
       parse("59px"),
-      Error("Invalid time unit 'px'."),
+      Error("Expected 'time'."),
     );
     check(
       ~__POS__,
       Alcotest.result(time, Alcotest.string),
       parse("0"),
-      Error("Expected time."),
+      Error("Expected 'time'."),
     );
     check(
       ~__POS__,
       Alcotest.result(time, Alcotest.string),
       parse("60"),
-      Error("Expected time."),
+      Error("Expected 'time'."),
     );
   }),
   test("<frequency>", () => {
@@ -217,19 +223,19 @@ let tests = [
       ~__POS__,
       Alcotest.result(frequency, Alcotest.string),
       parse("59px"),
-      Error("Invalid frequency unit 'px'."),
+      Error("Expected 'frequency'."),
     );
     check(
       ~__POS__,
       Alcotest.result(frequency, Alcotest.string),
       parse("0"),
-      Error("Expected frequency."),
+      Error("Expected 'frequency'."),
     );
     check(
       ~__POS__,
       Alcotest.result(frequency, Alcotest.string),
       parse("60"),
-      Error("Expected frequency."),
+      Error("Expected 'frequency'."),
     );
   }),
   test("<resolution>", () => {
@@ -259,19 +265,19 @@ let tests = [
       ~__POS__,
       Alcotest.result(resolution, Alcotest.string),
       parse("59px"),
-      Error("Invalid resolution unit 'px'."),
+      Error("Expected 'resolution'."),
     );
     check(
       ~__POS__,
       Alcotest.result(resolution, Alcotest.string),
       parse("0"),
-      Error("Expected resolution."),
+      Error("Expected 'resolution'."),
     );
     check(
       ~__POS__,
       Alcotest.result(resolution, Alcotest.string),
       parse("60"),
-      Error("Expected resolution."),
+      Error("Expected 'resolution'."),
     );
   }),
   test("<percentage>", () => {
@@ -292,7 +298,7 @@ let tests = [
       ~__POS__,
       Alcotest.result(Alcotest.float(1.), Alcotest.string),
       parse("63.4:"),
-      Error("Expected a percentage."),
+      Error("Expected 'percentage'."),
     );
   }),
   test("keyword", () => {
@@ -307,7 +313,7 @@ let tests = [
       ~__POS__,
       Alcotest.result(Alcotest.unit, Alcotest.string),
       parse("nope"),
-      Error("Expected 'gintoki' but instead got 'nope'."),
+      Error("Expected 'gintoki'."),
     );
   }),
   test("<ident>", () => {
@@ -315,7 +321,7 @@ let tests = [
     let to_check = Alcotest.result(Alcotest.string, Alcotest.string);
     let expect = check(~__POS__, to_check);
     expect(parse("test"), Ok("test"));
-    expect(parse("'ohno'"), Error("Expected an indentifier."));
+    expect(parse("'ohno'"), Error("Expected 'identifier'."));
   }),
   test("<css-wide-keywords>", () => {
     let parse = parse([%spec "<css-wide-keywords>"]);
@@ -366,7 +372,7 @@ let tests = [
       Alcotest.result(css_wide_keywords, Alcotest.string),
       parse("nope"),
       Error(
-        {|Expected 'initial', 'inherit', 'unset', 'revert', or 'revert-layer'.|},
+        {|Expected 'inherit', 'initial', 'revert', 'revert-layer', or 'unset'.|},
       ),
     );
   }),
@@ -376,8 +382,8 @@ let tests = [
     let expect = check(~__POS__, to_check);
     expect(parse({|'tuturu'|}), Ok("tuturu"));
     expect(parse({|'67.8'|}), Ok("67.8"));
-    expect(parse({|ident|}), Error("Expected a string."));
-    expect(parse({|68.9|}), Error("Expected a string."));
+    expect(parse({|ident|}), Error("Expected 'string'."));
+    expect(parse({|68.9|}), Error("Expected 'string'."));
     expect(parse({|"this is a 'string'."|}), Ok("this is a 'string'."));
     expect(parse({|""|}), Ok(""));
     expect(parse({|''|}), Ok(""));
@@ -393,7 +399,7 @@ let tests = [
     let to_check = Alcotest.result(Alcotest.string, Alcotest.string);
     let expect = check(~__POS__, to_check);
     expect(parse("--random"), Ok("--random"));
-    expect(parse("random'"), Error("Expected a --variable."));
+    expect(parse("random'"), Error("Expected '--variable'."));
   }),
   test("<url-no-interp>", () => {
     let parse = parse([%spec "<url-no-interp>"]);
@@ -412,7 +418,7 @@ let tests = [
     let expect = check(~__POS__, to_check);
     expect(parse("#abc"), Ok("abc"));
     expect(parse("#abcdefgh"), Ok("abcdefgh"));
-    expect(parse("#abcdefghi"), Error("Expected a hex-color."));
+    expect(parse("#abcdefghi"), Error("Expected 'hex-color'."));
   }),
   test("<linenames>", () => {
     let parse = parse([%spec "'[' <custom-ident>+ ']'"]);
@@ -475,6 +481,6 @@ let tests = [
     expect(parse("$(Module.value)"), Ok(["Module.value"]));
     expect(parse("$(Module'.value')"), Ok(["Module'.value'"]));
     /* TODO: Add error message into interpolation */
-    expect(parse("asd"), Error("Expected value."));
+    expect(parse("asd"), Error("Expected 'value'."));
   }),
 ];

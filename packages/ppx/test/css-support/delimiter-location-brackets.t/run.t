@@ -19,8 +19,8 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
   File "input.re", line 1, characters 18-25:
   Error: Property 'display' has an invalid value: 'blocki',
-         Expected 'block', 'contents', 'flex', 'flow', 'flow-root', 'grid',
-         'inline', or 'inline-block'.
+         Expected 'value', 'block', 'contents', 'flex', 'flow', 'flow-root',
+         'grid', 'inline', etc. Did you mean 'block'?
   [1]
 
   $ cat >input.re <<EOF
@@ -30,8 +30,8 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
   File "input.re", line 1, characters 31-38:
   Error: Property 'display' has an invalid value: 'blocki',
-         Expected 'block', 'contents', 'flex', 'flow', 'flow-root', 'grid',
-         'inline', or 'inline-block'.
+         Expected 'value', 'block', 'contents', 'flex', 'flow', 'flow-root',
+         'grid', 'inline', etc. Did you mean 'block'?
   [1]
 
   $ cat >input.re <<EOF
@@ -43,8 +43,8 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
   File "input.re", line 2, characters 26-33:
   Error: Property 'display' has an invalid value: 'blocki',
-         Expected 'block', 'contents', 'flex', 'flow', 'flow-root', 'grid',
-         'inline', or 'inline-block'.
+         Expected 'value', 'block', 'contents', 'flex', 'flow', 'flow-root',
+         'grid', 'inline', etc. Did you mean 'block'?
   [1]
 
   $ cat >input.re <<EOF
@@ -57,6 +57,6 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
   File "input.re", line 3, characters 13-20:
   Error: Property 'display' has an invalid value: 'blocki',
-         Expected 'block', 'contents', 'flex', 'flow', 'flow-root', 'grid',
-         'inline', or 'inline-block'.
+         Expected 'value', 'block', 'contents', 'flex', 'flow', 'flow-root',
+         'grid', 'inline', etc. Did you mean 'block'?
   [1]

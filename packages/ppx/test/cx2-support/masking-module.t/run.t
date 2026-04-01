@@ -12,6 +12,7 @@ If this test fail means that the module is not in sync with the ppx
   >  (preprocess (pps styled-ppx)))
   > EOF
 
+  $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css

@@ -1,6 +1,17 @@
 module Ast = Styled_ppx_css_parser.Ast;
 
-type error = list(string);
+type expected =
+  | Keyword(string)
+  | TokenKind(string)
+  | Function(string)
+  | Description(string);
+
+type error_info = {
+  expected: list(expected),
+  got: option(Ast.component_value),
+};
+
+type error = list(error_info);
 type data('a) = result('a, error);
 type input = Ast.component_value_list;
 type located_component_value = Ast.with_loc(Ast.component_value);
@@ -21,6 +32,18 @@ type best('left_in, 'left_v, 'right_in, 'right_v, 'c) =
   rule('c);
 
 let remaining_length: input => int;
+
+/* Error construction helpers */
+let err: (~got: Ast.component_value=?, list(expected)) => data('a);
+let err_keyword: (string, located_component_value) => data('a);
+let err_kind: string => data('a);
+let err_kind_got: (string, located_component_value) => data('a);
+let err_fn: (string, located_component_value) => data('a);
+let err_desc: string => data('a);
+let err_desc_got: (string, located_component_value) => data('a);
+
+/* Error merging */
+let merge_error_infos: list(error_info) => error_info;
 
 module Data: {
   let return: return('a, data('a));
@@ -61,7 +84,7 @@ module Pattern: {
   let value: ('a, rule(unit)) => rule('a);
 };
 
-let run: (rule('a), input) => result('a, string);
+let run: (rule('a), input) => result('a, error_info);
 
 let interpolatable:
   (~type_path: string, rule('a)) =>
@@ -71,3 +94,9 @@ let interpolatable:
       | `Value('a)
     ],
   );
+
+/* Serialization (only called at edges) */
+let expected_to_string: expected => string;
+let format_expected: list(expected) => string;
+let find_suggestion: (string, list(expected)) => option(string);
+let format_error_info: error_info => string;

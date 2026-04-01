@@ -13,13 +13,9 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 3, characters 2-9:
+  File "input.re", line 3, characters 10-15:
   Error: Unknown property 'heightx'. Did you mean 'height'?
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  CSS.style([|
-    CSS.display(`block),
-    [%ocaml.error "Unknown property 'heightx'. Did you mean 'height'?"],
-  |]);
-
+  [%ocaml.error "Unknown property 'heightx'. Did you mean 'height'?"];

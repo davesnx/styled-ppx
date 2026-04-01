@@ -1,12 +1,12 @@
 let cosas = `bold;
 
-[%cx
+[%cx2
   {|
     width: fit-content;
     grid-template-columns: fit-content(20px) fit-content(10%);
   |}
 ];
 
-[%cx {|
+[%cx2 {|
     text-decoration: $(cosas);
   |}];

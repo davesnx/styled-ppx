@@ -12,35 +12,12 @@ If this test fail means that the module is not in sync with the ppx
   >  (preprocess (pps styled-ppx)))
   > EOF
 
+  $ dune build
+
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css
+    ".css-9y6172{user-select:none;}\n.css-1gs5e0q:nth-last-child(1){stroke-opacity:0;}\n.css-1fqvgu0 .recharts-scatter .recharts-scatter-symbol .recharts-symbols{opacity:0.8;}\n.css-vv2q96:hover{opacity:1;}\n"
+  ];
   
   let _chart =
-    CSS.style([|
-      CSS.label("_chart"),
-      CSS.userSelect(`none),
-      CSS.selectorMany(
-        [|{js|.recharts-cartesian-grid-horizontal|js}|],
-        [|
-          CSS.selectorMany(
-            [|{js|line|js}|],
-            [|
-              CSS.selectorMany(
-                [|{js|:nth-last-child(1)|js}, {js|:nth-last-child(2)|js}|],
-                [|CSS.SVG.strokeOpacity(`num(0.))|],
-              ),
-            |],
-          ),
-        |],
-      ),
-      CSS.selectorMany(
-        [|
-          {js|.recharts-scatter .recharts-scatter-symbol .recharts-symbols|js},
-        |],
-        [|
-          CSS.opacity(0.8),
-          CSS.selectorMany([|{js|:hover|js}|], [|CSS.opacity(1.)|]),
-        |],
-      ),
-    |]);
-
-  $ dune build
+    CSS.make("css-9y6172 css-1gs5e0q css-1gs5e0q css-1fqvgu0 css-vv2q96", []);

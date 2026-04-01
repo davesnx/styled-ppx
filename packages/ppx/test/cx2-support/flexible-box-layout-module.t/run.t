@@ -12,6 +12,13 @@ If this test fail means that the module is not in sync with the ppx
   >  (preprocess (pps styled-ppx)))
   > EOF
 
+  $ dune build
+  File "input.re", line 29, characters 6-39:
+  29 | [%cx2 {|flex: $(X.value) $(X.value2);|}];
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  Error: The value X.value has type float
+         but an expression was expected of type [< `num of float ]
+  [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css

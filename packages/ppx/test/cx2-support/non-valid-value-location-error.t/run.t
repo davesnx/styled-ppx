@@ -16,19 +16,12 @@ If this test fail means that the module is not in sync with the ppx
   File "input.re", line 10, characters 10-17:
   Error: Property 'display' has an invalid value: 'blocki',
          Expected 'block', 'contents', 'flex', 'flow', 'flow-root', 'grid',
-         'inline', or 'inline-block'.
+         'inline', 'inline-block', etc. Did you mean 'block'?
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   Js.log("2000");
   
-  CSS.style([|
-    CSS.height(`percent(100.)),
-    CSS.height(`percent(100.)),
-    CSS.height(`percent(100.)),
-    CSS.height(`percent(100.)),
-    CSS.height(`percent(100.)),
-    [%ocaml.error
-      "Property 'display' has an invalid value: 'blocki',\nExpected 'block', 'contents', 'flex', 'flow', 'flow-root', 'grid', 'inline', or 'inline-block'."
-    ],
-  |]);
+  [%ocaml.error
+    "Property 'display' has an invalid value: 'blocki',\nExpected 'block', 'contents', 'flex', 'flow', 'flow-root', 'grid', 'inline', 'inline-block', etc. Did you mean 'block'?"
+  ];

@@ -12,19 +12,23 @@ If this test fail means that the module is not in sync with the ppx
   >  (preprocess (pps styled-ppx)))
   > EOF
 
-  $ dune describe pp ./input.re | sed '1,/^];$/d'
-  CSS.style([||]);
-  CSS.style([||]);
-  CSS.style([||]);
-  
-  let _a = CSS.style([|CSS.label("_a")|]);
-  let _a = CSS.style([|CSS.label("_a")|]);
-  let _a = CSS.style([|CSS.label("_a")|]);
-  
-  let _a = CSS.style([|CSS.label("_a")|]);
-  
-  let _a = CSS.style([|CSS.label("_a")|]);
-  
-  let _a = CSS.style([|CSS.label("_a")|]);
-
   $ dune build
+
+  $ dune describe pp ./input.re | sed '1,/^];$/d'
+  CSS.make("", []);
+  CSS.make("", []);
+  CSS.make("", []);
+  
+  let _a = CSS.make("", []);
+  let _a = CSS.make("", []);
+  let _a = CSS.make("", []);
+  
+  let _a = CSS.make("", []);
+  
+  let _a = CSS.make("", []);
+  
+  let _a = CSS.make("", []);
+
+
+
+

@@ -132,7 +132,8 @@ and render_media_query = (~loc, ~source, at_rule: at_rule) => {
     Css_grammar.type_check(Css_grammar.media_query_list, prelude_values)
     |> Result.map(_ =>
          source_code_of_loc(~source, at_rule_prelude_loc) |> String.trim
-       );
+       )
+    |> Result.map_error(Css_grammar.Rule.format_error_info);
   };
 
   let (delimiter, attrs) =
@@ -180,7 +181,8 @@ and render_container_query = (~loc, ~source, at_rule: at_rule) => {
     )
     |> Result.map(_ =>
          source_code_of_loc(~source, at_rule_prelude_loc) |> String.trim
-       );
+       )
+    |> Result.map_error(Css_grammar.Rule.format_error_info);
   };
 
   let (delimiter, attrs) =

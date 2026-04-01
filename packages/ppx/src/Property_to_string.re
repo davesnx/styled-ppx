@@ -48,7 +48,9 @@ let emit = (property, value_of_ast, value_to_expr) => {
   let ast_of_component_values = Parser.type_check(property);
   let ast_of_string = string =>
     switch (parse_component_values_string(string)) {
-    | Ok(values) => ast_of_component_values(values)
+    | Ok(values) =>
+      ast_of_component_values(values)
+      |> Result.map_error(Css_grammar.Rule.format_error_info)
     | Error(msg) => Error(msg)
     };
   let ast_to_expr = ast => value_of_ast(ast) |> value_to_expr;
@@ -300,7 +302,8 @@ let render_size =
 let render_css_global_values = (name, value) => {
   let.ok value = parse_component_values_string(value);
   let.ok value =
-    Parser.type_check(Css_grammar.Css_value_types.css_wide_keywords, value);
+    Parser.type_check(Css_grammar.Css_value_types.css_wide_keywords, value)
+    |> Result.map_error(Css_grammar.Rule.format_error_info);
 
   let value =
     switch (value) {

@@ -44,7 +44,10 @@ let add_CSS_rule_constraint = (~loc, expr) => {
 
 /* TODO: emit is better to keep value_of_ast and value_to_expr in the same fn */
 let emit = (property, value_of_ast, value_to_expr) => {
-  let ast_of_component_values = Css_grammar.type_check(property);
+  let type_check = Css_grammar.type_check(property);
+  let ast_of_component_values = values =>
+    type_check(values)
+    |> Result.map_error(Css_grammar.Rule.format_error_info);
   let ast_to_expr = (~loc, ast) =>
     value_of_ast(~loc, ast) |> value_to_expr(~loc);
   let component_value_list_to_expr = (~loc, values) =>
@@ -58,7 +61,10 @@ let emit = (property, value_of_ast, value_to_expr) => {
 };
 
 let emit_shorthand = (parser, mapper, value_to_expr) => {
-  let ast_of_component_values = Css_grammar.type_check(parser);
+  let type_check = Css_grammar.type_check(parser);
+  let ast_of_component_values = values =>
+    type_check(values)
+    |> Result.map_error(Css_grammar.Rule.format_error_info);
   let ast_to_expr = (~loc, ast) =>
     ast |> List.map(mapper(~loc)) |> value_to_expr(~loc);
   let component_value_list_to_expr = (~loc, values) =>
@@ -182,7 +188,8 @@ let render_css_global_values = (~loc, name, value) => {
     Css_grammar.type_check(
       Css_grammar.Css_value_types.css_wide_keywords,
       value,
-    );
+    )
+    |> Result.map_error(Css_grammar.Rule.format_error_info);
 
   let value =
     switch (value) {
