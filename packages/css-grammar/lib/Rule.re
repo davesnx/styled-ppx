@@ -11,7 +11,14 @@ type return('a, 'b) = 'b => rule('a);
 type bind('a, 'b, 'c) = (rule('a), 'b => rule('c)) => rule('c);
 type map('a, 'b, 'c, 'd) = (rule('a), 'b => 'c) => rule('d);
 type best('left_in, 'left_v, 'right_in, 'right_v, 'c) =
-  ((rule('left_in), rule('right_in)), [ | `Left('left_v) | `Right('right_v) ] => rule('c)) =>
+  (
+    (rule('left_in), rule('right_in)),
+    [
+      | `Left('left_v)
+      | `Right('right_v)
+    ] =>
+    rule('c)
+  ) =>
   rule('c);
 
 let rec drop_leading_whitespace = values =>
@@ -20,7 +27,8 @@ let rec drop_leading_whitespace = values =>
   | _ => values
   };
 
-let remaining_length = values => List.length(drop_leading_whitespace(values));
+let remaining_length = values =>
+  List.length(drop_leading_whitespace(values));
 
 let render_component_value = ((value, _): located_component_value) =>
   Render.component_value(value);
@@ -44,17 +52,20 @@ module Data = {
     let (left_data, left_values) = left(values);
     let (right_data, right_values) = right(values);
     let op = shortest ? (>) : (<);
-    let use_left = op(remaining_length(left_values), remaining_length(right_values));
+    let use_left =
+      op(remaining_length(left_values), remaining_length(right_values));
     use_left
       ? f(`Left(left_data), left_values)
       : f(`Right(right_data), right_values);
   };
 
   let bind_shortest: best('a, data('a), 'b, data('b), 'c) =
-      ((left, right), f) => bind_shortest_or_longest(true, (left, right), f);
+      ((left, right), f) =>
+    bind_shortest_or_longest(true, (left, right), f);
 
   let bind_longest: best('a, data('a), 'b, data('b), 'c) =
-      ((left, right), f) => bind_shortest_or_longest(false, (left, right), f);
+      ((left, right), f) =>
+    bind_shortest_or_longest(false, (left, right), f);
 };
 
 module Match = {
@@ -75,7 +86,8 @@ module Match = {
     let (left_data, left_values) = left(values);
     let (right_data, right_values) = right(values);
     let op = shortest ? (>) : (<);
-    let use_left = op(remaining_length(left_values), remaining_length(right_values));
+    let use_left =
+      op(remaining_length(left_values), remaining_length(right_values));
     switch (left_data, right_data) {
     | (Ok(left_value), Error(_)) => f(`Left(left_value), left_values)
     | (Error(_), Ok(right_value)) => f(`Right(right_value), right_values)
@@ -123,7 +135,8 @@ module Pattern = {
 
   let next =
     fun
-    | [value, ...values] => Match.return(value, drop_leading_whitespace(values))
+    | [value, ...values] =>
+      Match.return(value, drop_leading_whitespace(values))
     | [] => (Error(["Unexpected end of input."]), []);
 
   let component = (expected, values) =>
@@ -155,9 +168,9 @@ module Pattern = {
   let value = (value, rule) => Match.bind(rule, () => Match.return(value));
 };
 
-let run = (rule_parser, input: input) => {
+let run = (parser, input: input) => {
   let input = drop_leading_whitespace(input);
-  let (output, remaining_values) = rule_parser(input);
+  let (output, remaining_values) = parser(input);
   switch (output) {
   | Ok(data) =>
     let remaining_values = drop_leading_whitespace(remaining_values);
@@ -189,6 +202,6 @@ let interpolatable = (~type_path as _, inner_rule, values) => {
     switch (result) {
     | Ok(value) => (Ok(`Value(value)), rest)
     | Error(msgs) => (Error(msgs), values)
-    }
+    };
   };
 };

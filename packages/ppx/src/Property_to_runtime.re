@@ -44,8 +44,7 @@ let add_CSS_rule_constraint = (~loc, expr) => {
 
 /* TODO: emit is better to keep value_of_ast and value_to_expr in the same fn */
 let emit = (property, value_of_ast, value_to_expr) => {
-  let ast_of_component_values =
-    Css_grammar.type_check(property);
+  let ast_of_component_values = Css_grammar.type_check(property);
   let ast_to_expr = (~loc, ast) =>
     value_of_ast(~loc, ast) |> value_to_expr(~loc);
   let component_value_list_to_expr = (~loc, values) =>
@@ -59,8 +58,7 @@ let emit = (property, value_of_ast, value_to_expr) => {
 };
 
 let emit_shorthand = (parser, mapper, value_to_expr) => {
-  let ast_of_component_values =
-    Css_grammar.type_check(parser);
+  let ast_of_component_values = Css_grammar.type_check(parser);
   let ast_to_expr = (~loc, ast) =>
     ast |> List.map(mapper(~loc)) |> value_to_expr(~loc);
   let component_value_list_to_expr = (~loc, values) =>
@@ -1083,11 +1081,8 @@ let render_function_hwb = (~loc, (hue, whiteness, blackness, alpha)) => {
 
   switch (alpha) {
   | Some(alpha) =>
-    id(
-      [%expr `hwba(([%e hue], [%e whiteness], [%e blackness], [%e alpha]))],
-    )
-  | None =>
-    id([%expr `hwb(([%e hue], [%e whiteness], [%e blackness]))])
+    id([%expr `hwba(([%e hue], [%e whiteness], [%e blackness], [%e alpha]))])
+  | None => id([%expr `hwb(([%e hue], [%e whiteness], [%e blackness]))])
   };
 };
 
@@ -1202,8 +1197,7 @@ let render_number_percentage_with_calc = (~loc) =>
   | `Number(x) => [%expr `num([%e render_float(~loc, x)])]
   | `Extended_percentage(x) => render_extended_percentage(~loc, x);
 
-let render_function_color =
-    (~loc, (cs, c1, c2, c3, alpha)) => {
+let render_function_color = (~loc, (cs, c1, c2, c3, alpha)) => {
   let cs = render_predefined_color_space(~loc, cs);
   let c1 = render_number_percentage_with_calc(~loc, c1);
   let c2 = render_number_percentage_with_calc(~loc, c2);
@@ -1219,13 +1213,8 @@ let render_function_color =
 
   switch (alpha) {
   | Some(alpha) =>
-    id(
-      [%expr
-       `colora(([%e cs], [%e c1], [%e c2], [%e c3], [%e alpha]))
-      ],
-    )
-  | None =>
-    id([%expr `color(([%e cs], [%e c1], [%e c2], [%e c3]))])
+    id([%expr `colora(([%e cs], [%e c1], [%e c2], [%e c3], [%e alpha]))])
+  | None => id([%expr `color(([%e cs], [%e c1], [%e c2], [%e c3]))])
   };
 };
 
@@ -1256,10 +1245,10 @@ let rec render_color = (~loc, value) =>
   | `Function_light_dark(light, (), dark) =>
     id(
       [%expr
-       `lightDark((
-         [%e render_color(~loc, light)],
-         [%e render_color(~loc, dark)],
-       ))
+        `lightDark((
+          [%e render_color(~loc, light)],
+          [%e render_color(~loc, dark)],
+        ))
       ],
     )
   /* Function_hsl(a) with `Hsl(a)_1 aren't supported */
@@ -1470,9 +1459,7 @@ let render_box_shadow = (~loc, shadow) => {
     };
 
   let color =
-    color
-    |> Option.value(~default=`CurrentColor)
-    |> render_color(~loc);
+    color |> Option.value(~default=`CurrentColor) |> render_color(~loc);
 
   let x = render_extended_length(~loc, x);
   let y = render_extended_length(~loc, y);
@@ -6535,7 +6522,8 @@ let properties = [
 let render_when_unsupported_features = (~loc, property, value) => {
   /* Transform property name to camelCase since we bind to emotion with the Object API */
   let propertyExpr = property |> to_camel_case |> render_string(~loc);
-  let valueExpr = String_interpolation.transform(~loc, ~delimiter="js", value);
+  let valueExpr =
+    String_interpolation.transform(~loc, ~delimiter="js", value);
 
   [%expr CSS.unsafe([%e propertyExpr], [%e valueExpr])];
 };
@@ -6576,13 +6564,7 @@ let render = (~loc: Location.t, ~raw_value_source, property, value, important) =
     Ok([render_variable_declaration(~loc, property, raw_value_source)]);
   } else {
     let.ok () =
-      switch (
-        Property_parser.validate_property(
-          ~loc,
-          ~name=property,
-          value,
-        )
-      ) {
+      switch (Property_parser.validate_property(~loc, ~name=property, value)) {
       | Ok () => Ok()
       | Error((_, `Invalid_value(_))) => Ok()
       | Error((_, `Property_not_found)) => Error(`Property_not_found)
@@ -6597,7 +6579,9 @@ let render = (~loc: Location.t, ~raw_value_source, property, value, important) =
       | exception Impossible_state => Error(`Impossible_state)
       | Error(_)
       | exception Unsupported_feature =>
-        Ok([render_when_unsupported_features(~loc, property, raw_value_source)])
+        Ok([
+          render_when_unsupported_features(~loc, property, raw_value_source),
+        ])
       }
     };
   };

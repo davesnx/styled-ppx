@@ -10,5 +10,6 @@ let property_perspective_origin : property_perspective_origin Rule.rule =
 
 let entries : (kind * packed_rule) list =
   [
-    Property "perspective-origin", pack_module (module Property_perspective_origin);
+    ( Property "perspective-origin",
+      pack_module (module Property_perspective_origin) );
   ]

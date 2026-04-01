@@ -10,6 +10,4 @@ let property_visibility : property_visibility Rule.rule =
   Property_visibility.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "visibility", pack_module (module Property_visibility);
-  ]
+  [ Property "visibility", pack_module (module Property_visibility) ]

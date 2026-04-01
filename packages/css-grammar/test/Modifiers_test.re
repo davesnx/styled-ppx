@@ -5,11 +5,12 @@ open Parser;
 
 let parse_component_values = str =>
   switch (Driver.parse_declaration(~loc=Ppxlib.Location.none, "x: " ++ str)) {
-  | Ok({Ast.value: (values, _), _}) => values
+  | Ok({ Ast.value: (values, _), _ }) => values
   | Error((_, msg)) => Alcotest.fail("parser should succeed: " ++ msg)
   };
 
-let parse = (prop, str) => Parser.type_check(prop, parse_component_values(str));
+let parse = (prop, str) =>
+  Parser.type_check(prop, parse_component_values(str));
 
 let parse_exn = (prop, str) =>
   switch (parse(prop, str)) {
@@ -123,7 +124,12 @@ let tests: tests = [
     let to_check =
       Alcotest.result(Alcotest.list(Alcotest.int), Alcotest.string);
     check(~__POS__, to_check, parse(""), Error("Unexpected end of input."));
-    check(~__POS__, to_check, parse("27"), Error("Unexpected end of input."));
+    check(
+      ~__POS__,
+      to_check,
+      parse("27"),
+      Error("Unexpected end of input."),
+    );
     check(~__POS__, to_check, parse("28 29"), Ok([28, 29]));
     check(
       ~__POS__,
@@ -141,7 +147,12 @@ let tests: tests = [
         Alcotest.string,
       );
     check(~__POS__, to_check, parse(""), Error("Unexpected end of input."));
-    check(~__POS__, to_check, parse("27"), Error("Unexpected end of input."));
+    check(
+      ~__POS__,
+      to_check,
+      parse("27"),
+      Error("Unexpected end of input."),
+    );
     check(~__POS__, to_check, parse("28 29 30"), Ok(([28, 29], 30)));
     check(
       ~__POS__,
@@ -155,7 +166,12 @@ let tests: tests = [
     let to_check =
       Alcotest.result(Alcotest.list(Alcotest.int), Alcotest.string);
     check(~__POS__, to_check, parse(""), Error("Unexpected end of input."));
-    check(~__POS__, to_check, parse("33"), Error("Unexpected end of input."));
+    check(
+      ~__POS__,
+      to_check,
+      parse("33"),
+      Error("Unexpected end of input."),
+    );
     check(~__POS__, to_check, parse("34 35"), Ok([34, 35]));
     check(~__POS__, to_check, parse("36 37 38"), Ok([36, 37, 38]));
     check(
@@ -170,7 +186,12 @@ let tests: tests = [
     let to_check =
       Alcotest.result(Alcotest.list(Alcotest.int), Alcotest.string);
     check(~__POS__, to_check, parse(""), Error("Unexpected end of input."));
-    check(~__POS__, to_check, parse("43"), Error("Unexpected end of input."));
+    check(
+      ~__POS__,
+      to_check,
+      parse("43"),
+      Error("Unexpected end of input."),
+    );
     check(~__POS__, to_check, parse("44 45"), Ok([44, 45]));
     check(~__POS__, to_check, parse("46 47 48"), Ok([46, 47, 48]));
     check(~__POS__, to_check, parse("49 50 51 52"), Ok([49, 50, 51, 52]));
@@ -245,7 +266,12 @@ let tests: tests = [
     let to_check =
       Alcotest.result(Alcotest.list(Alcotest.int), Alcotest.string);
     check(~__POS__, to_check, parse(""), Error("Unexpected end of input."));
-    check(~__POS__, to_check, parse("63"), Error("Unexpected end of input."));
+    check(
+      ~__POS__,
+      to_check,
+      parse("63"),
+      Error("Unexpected end of input."),
+    );
     check(~__POS__, to_check, parse("64 65"), Ok([64, 65]));
     check(~__POS__, to_check, parse("66 67 68"), Ok([66, 67, 68]));
     check(

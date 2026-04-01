@@ -82,12 +82,16 @@ let entries : (kind * packed_rule) list =
   [
     Property "padding", pack_module (module Property_padding);
     Property "padding-block", pack_module (module Property_padding_block);
-    Property "padding-block-end", pack_module (module Property_padding_block_end);
-    Property "padding-block-start", pack_module (module Property_padding_block_start);
+    ( Property "padding-block-end",
+      pack_module (module Property_padding_block_end) );
+    ( Property "padding-block-start",
+      pack_module (module Property_padding_block_start) );
     Property "padding-bottom", pack_module (module Property_padding_bottom);
     Property "padding-inline", pack_module (module Property_padding_inline);
-    Property "padding-inline-end", pack_module (module Property_padding_inline_end);
-    Property "padding-inline-start", pack_module (module Property_padding_inline_start);
+    ( Property "padding-inline-end",
+      pack_module (module Property_padding_inline_end) );
+    ( Property "padding-inline-start",
+      pack_module (module Property_padding_inline_start) );
     Property "padding-left", pack_module (module Property_padding_left);
     Property "padding-right", pack_module (module Property_padding_right);
     Property "padding-top", pack_module (module Property_padding_top);

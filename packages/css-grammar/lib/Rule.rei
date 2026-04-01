@@ -10,7 +10,14 @@ type return('a, 'b) = 'b => rule('a);
 type bind('a, 'b, 'c) = (rule('a), 'b => rule('c)) => rule('c);
 type map('a, 'b, 'c, 'd) = (rule('a), 'b => 'c) => rule('d);
 type best('left_in, 'left_v, 'right_in, 'right_v, 'c) =
-  ((rule('left_in), rule('right_in)), [ | `Left('left_v) | `Right('right_v) ] => rule('c)) =>
+  (
+    (rule('left_in), rule('right_in)),
+    [
+      | `Left('left_v)
+      | `Right('right_v)
+    ] =>
+    rule('c)
+  ) =>
   rule('c);
 
 let remaining_length: input => int;

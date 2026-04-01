@@ -8,6 +8,4 @@ module Property_row_gap =
 let property_row_gap : property_row_gap Rule.rule = Property_row_gap.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "row-gap", pack_module (module Property_row_gap);
-  ]
+  [ Property "row-gap", pack_module (module Property_row_gap) ]

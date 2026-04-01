@@ -15,7 +15,8 @@ let node_of_token =
   | STRING(value) => (Ast.String(value), loc)
   | IDENT(value) => (Ast.Ident(value), loc)
   | NUMBER(value) => (Ast.Number(value), loc)
-  | token => failwith("Unsupported test token: " ++ Tokens.show_token(token));
+  | token =>
+    failwith("Unsupported test token: " ++ Tokens.show_token(token));
 
 let nodes = tokens => List.map(node_of_token, tokens);
 
@@ -32,7 +33,9 @@ let data_monad_tests: tests = [
   }),
   test("return with more then one input node", _ => {
     switch (return(Ok(1), nodes([IDENT("decl"), COLON, IDENT("value")]))) {
-    | (Ok(1), values) when values == nodes([IDENT("decl"), COLON, IDENT("value")]) => ()
+    | (Ok(1), values)
+        when values == nodes([IDENT("decl"), COLON, IDENT("value")]) =>
+      ()
     | _ => Alcotest.fail("should preserve remaining nodes")
     }
   }),
@@ -95,13 +98,20 @@ let data_monad_tests: tests = [
   test("data bind_shortest", _ => {
     let comma =
       fun
-      | [value, ...values] when value == delim(Ast.Delimiter_comma) => (Ok(6), values)
+      | [value, ...values] when value == delim(Ast.Delimiter_comma) => (
+          Ok(6),
+          values,
+        )
       | values => (Error([""]), values);
     let two_comma =
       fun
       | [value1, value2, ...values]
-          when value1 == delim(Ast.Delimiter_comma) && value2 == delim(Ast.Delimiter_comma) =>
-        (Ok(7), values)
+          when
+            value1 == delim(Ast.Delimiter_comma)
+            && value2 == delim(Ast.Delimiter_comma) => (
+          Ok(7),
+          values,
+        )
       | values => (Error([""]), values);
 
     let rule =
@@ -119,13 +129,20 @@ let data_monad_tests: tests = [
   test("data bind_longest", _ => {
     let comma =
       fun
-      | [value, ...values] when value == delim(Ast.Delimiter_comma) => (Ok(9), values)
+      | [value, ...values] when value == delim(Ast.Delimiter_comma) => (
+          Ok(9),
+          values,
+        )
       | values => (Error([""]), values);
     let two_comma =
       fun
       | [value1, value2, ...values]
-          when value1 == delim(Ast.Delimiter_comma) && value2 == delim(Ast.Delimiter_comma) =>
-        (Ok(10), values)
+          when
+            value1 == delim(Ast.Delimiter_comma)
+            && value2 == delim(Ast.Delimiter_comma) => (
+          Ok(10),
+          values,
+        )
       | values => (Error([""]), values);
     let rule =
       bind_longest(
@@ -184,7 +201,7 @@ open! Pattern;
 let pattern_helpers_test: tests = [
   test("identity", _ => {
     switch (identity([string("tomato")])) {
-    | (Ok(), [value]) when value == string("tomato") => ()
+    | (Ok (), [value]) when value == string("tomato") => ()
     | _ => Alcotest.fail("should preserve remaining component values")
     }
   }),
@@ -223,8 +240,14 @@ let pattern_helpers_test: tests = [
     };
   }),
   test("next", _ => {
-    switch (Pattern.next([delim(Ast.Delimiter_comma), delim(Ast.Delimiter_colon)])) {
-    | (Ok(value), [remaining]) when value == delim(Ast.Delimiter_comma) && remaining == delim(Ast.Delimiter_colon) => ()
+    switch (
+      Pattern.next([delim(Ast.Delimiter_comma), delim(Ast.Delimiter_colon)])
+    ) {
+    | (Ok(value), [remaining])
+        when
+          value == delim(Ast.Delimiter_comma)
+          && remaining == delim(Ast.Delimiter_colon) =>
+      ()
     | _ => Alcotest.fail("should be (Ok(comma), [colon])")
     }
   }),
@@ -238,7 +261,11 @@ let pattern_helpers_test: tests = [
 
 let rule_tests: tests = [
   test("Rule using expect_delim", _ => {
-    let input = [ident("decl"), delim(Ast.Delimiter_colon), ident("value")];
+    let input = [
+      ident("decl"),
+      delim(Ast.Delimiter_colon),
+      ident("value"),
+    ];
 
     let rule = {
       let.bind_match decl =
@@ -266,4 +293,9 @@ let rule_tests: tests = [
 ];
 
 let tests: tests =
-  List.flatten([data_monad_tests, match_monad_tests, pattern_helpers_test, rule_tests]);
+  List.flatten([
+    data_monad_tests,
+    match_monad_tests,
+    pattern_helpers_test,
+    rule_tests,
+  ]);

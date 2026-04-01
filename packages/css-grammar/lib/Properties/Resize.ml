@@ -9,6 +9,4 @@ module Property_resize =
 let property_resize : property_resize Rule.rule = Property_resize.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "resize", pack_module (module Property_resize);
-  ]
+  [ Property "resize", pack_module (module Property_resize) ]

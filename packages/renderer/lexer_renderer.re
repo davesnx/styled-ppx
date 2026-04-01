@@ -23,12 +23,13 @@ switch (input, help) {
   let tokens = Styled_ppx_css_parser.Lexer.from_string(css);
   let okInput =
     tokens
-    |> List.filter_map(({ Styled_ppx_css_parser.Lexer.txt, start_pos, end_pos }) =>
+    |> List.filter_map(
+         ({ Styled_ppx_css_parser.Lexer.txt, start_pos, end_pos }) =>
          switch (txt) {
          | Ok(token) => Some((token, start_pos, end_pos))
          | Error(_) => None
          }
-       )
+       );
   let debug = Styled_ppx_css_parser.Lexer.debug(okInput);
   print_endline(debug);
 };

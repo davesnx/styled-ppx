@@ -17,6 +17,4 @@ module Property_display =
 let property_display : property_display Rule.rule = Property_display.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "display", pack_module (module Property_display);
-  ]
+  [ Property "display", pack_module (module Property_display) ]

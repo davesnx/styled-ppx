@@ -32,7 +32,8 @@ let property_list_style_type : property_list_style_type Rule.rule =
 
 let entries : (kind * packed_rule) list =
   [
-    Property "list-style-position", pack_module (module Property_list_style_position);
+    ( Property "list-style-position",
+      pack_module (module Property_list_style_position) );
     Property "list-style-type", pack_module (module Property_list_style_type);
     Property "list-style", pack_module (module Property_list_style);
     Property "list-style-image", pack_module (module Property_list_style_image);

@@ -8,6 +8,4 @@ module Property_tab_size =
 let property_tab_size : property_tab_size Rule.rule = Property_tab_size.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "tab-size", pack_module (module Property_tab_size);
-  ]
+  [ Property "tab-size", pack_module (module Property_tab_size) ]

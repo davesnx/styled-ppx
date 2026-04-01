@@ -9,6 +9,4 @@ let property_anchor_scope : property_anchor_scope Rule.rule =
   Property_anchor_scope.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "anchor-scope", pack_module (module Property_anchor_scope);
-  ]
+  [ Property "anchor-scope", pack_module (module Property_anchor_scope) ]

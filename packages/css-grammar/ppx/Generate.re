@@ -311,7 +311,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
               [get_primitive_inner_type(snake_name)];
             } else {
               [
-             /* Direct type reference - all types are in the same recursive block */
+                /* Direct type reference - all types are in the same recursive block */
                 ptyp_constr(txt @@ Lident(snake_name), []),
               ];
             };
@@ -366,7 +366,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
             )
           };
         } else {
-                 /* Direct type reference - all types are in the same recursive block */
+          /* Direct type reference - all types are in the same recursive block */
           let t = ptyp_constr(txt @@ Lident(snake_name), []);
           apply_modifier(multiplier, t);
         };
@@ -509,22 +509,23 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         );
       let (pattern, expr) =
         switch (inner_values) {
-        | [] =>
-          (
+        | [] => (
             ppat_construct(txt(Lident("()")), None),
             pexp_tuple([unit_expr, unit_expr]),
           )
-        | [_single] => (pvar("v"), pexp_tuple([unit_expr, evar("v"), unit_expr]))
+        | [_single] => (
+            pvar("v"),
+            pexp_tuple([unit_expr, evar("v"), unit_expr]),
+          )
         | values =>
           let names =
             values |> List.mapi((index, _) => "v" ++ string_of_int(index));
-          let pattern =
-            ppat_tuple(List.map(name => pvar(name), names));
+          let pattern = ppat_tuple(List.map(name => pvar(name), names));
           let expr_values =
-            [unit_expr, ...List.map(name => evar(name), names)] @ [unit_expr];
-          let expr =
-            pexp_tuple(expr_values);
-          (pattern, expr)
+            [unit_expr, ...List.map(name => evar(name), names)]
+            @ [unit_expr];
+          let expr = pexp_tuple(expr_values);
+          (pattern, expr);
         };
       let map_fn = pexp_fun(Nolabel, None, pattern, expr);
       eapply(evar("Rule.Match.map"), [block_rule, map_fn]);
@@ -690,7 +691,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       );
     };
 
-      switch (extract_block_wrapper(value)) {
+    switch (extract_block_wrapper(value)) {
     | Some((kind, inner_values)) => wrap_block_rule(kind, inner_values)
     | None =>
       switch (value) {
@@ -766,8 +767,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
   /* Check if a spec may contain interpolation - either explicit <interpolation>
      or non-primitive/non-standard Data_type references that may internally
      accept interpolation (e.g., <color>, <shadow>, <extended-length>). */
-  let rec spec_may_contain_interpolation =
-          (spec: Css_spec_parser.value): bool => {
+  let rec spec_may_contain_interpolation = (spec: Css_spec_parser.value): bool => {
     switch (spec) {
     | Terminal(Data_type("interpolation", _), _) => true
     | Terminal(Data_type(name, _), _) =>
@@ -799,7 +799,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     | Group(inner, _) => get_registry_key_from_spec(inner)
     | Combinator(Xor, [single]) => get_registry_key_from_spec(single)
     /* For multi-element Xor (like [ <color> | <interpolation> ]),
-        find the first non-interpolation type */
+       find the first non-interpolation type */
     | Combinator(Xor, options) =>
       List.find_map(
         opt =>
@@ -817,10 +817,10 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       (~registry_key: option(string), ~fallback_expr: Parsetree.expression) =>
     switch (registry_key) {
     | Some(key) => [%expr
-        resolve_runtime_module_path(
-          [%e estring(key)],
-          ~fallback=[%e fallback_expr],
-        )
+       resolve_runtime_module_path(
+         [%e estring(key)],
+         ~fallback=[%e fallback_expr],
+       )
       ]
     | None => fallback_expr
     };
@@ -881,7 +881,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       | Terminal(Data_type(name, _), modifier)
           when !is_primitive_type(name) && !is_standard_spec(name) =>
         let css_name = estring(name);
-        let generate_delegation = (inner_expr) => [%expr
+        let generate_delegation = inner_expr => [%expr
           extract_from_registry_ast(
             [%e css_name],
             [%e type_context_expr],
@@ -900,10 +900,10 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         | At_least_one
         | Repeat(_)
         | Repeat_by_comma(_, _) => [%expr
-            List.concat_map(
-              item => [%e generate_delegation(evar("item"))],
-              [%e var_expr],
-            )
+           List.concat_map(
+             item => [%e generate_delegation(evar("item"))],
+             [%e var_expr],
+           )
           ]
         };
 
@@ -911,7 +911,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
          extraction so shorthand properties preserve interpolated child types. */
       | Terminal(Property_type(name), modifier) =>
         let css_name = estring("property_" ++ name);
-        let generate_delegation = (inner_expr) => [%expr
+        let generate_delegation = inner_expr => [%expr
           extract_from_registry_ast(
             [%e css_name],
             [%e type_context_expr],
@@ -930,10 +930,10 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         | At_least_one
         | Repeat(_)
         | Repeat_by_comma(_, _) => [%expr
-            List.concat_map(
-              item => [%e generate_delegation(evar("item"))],
-              [%e var_expr],
-            )
+           List.concat_map(
+             item => [%e generate_delegation(evar("item"))],
+             [%e var_expr],
+           )
           ]
         };
 
@@ -1014,12 +1014,12 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
                    branches must keep the sibling-derived context instead. */
                 let context_for_this_spec =
                   switch (inner_spec, runtime_module_path) {
-                  | (Terminal(Data_type("interpolation", _), _), Some("Css_types.Border")) =>
-                    effective_context_expr
-                  | (Terminal(Data_type("interpolation", _), _), Some(_)) =>
-                    type_context_expr
-                  | (Terminal(Data_type("interpolation", _), _), None) =>
-                    effective_context_expr
+                  | (
+                      Terminal(Data_type("interpolation", _), _),
+                      Some("Css_types.Border"),
+                    ) => effective_context_expr
+                  | (Terminal(Data_type("interpolation", _), _), Some(_)) => type_context_expr
+                  | (Terminal(Data_type("interpolation", _), _), None) => effective_context_expr
                   | _ => effective_context_expr
                   };
                 case(
@@ -1197,22 +1197,23 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       ptyp_constr(txt @@ Lident("result"), [t_type, string_type]);
     let component_value_list_type =
       ptyp_constr(
-        txt
-        @@ Ldot(
-             Ldot(Lident("Styled_ppx_css_parser"), "Ast"),
-             "component_value_list",
-           ),
+        txt @@
+        Ldot(
+          Ldot(Lident("Styled_ppx_css_parser"), "Ast"),
+          "component_value_list",
+        ),
         [],
       );
     let type_check_body =
       pexp_fun(
         Nolabel,
         None,
-        Ast_helper.Pat.constraint_(~loc, pvar("input"), component_value_list_type),
-        pexp_constraint(
-          [%expr Rule.run(rule, input)],
-          result_type,
+        Ast_helper.Pat.constraint_(
+          ~loc,
+          pvar("input"),
+          component_value_list_type,
         ),
+        pexp_constraint([%expr Rule.run(rule, input)], result_type),
       );
     let type_check_binding =
       Ast_helper.Str.value(
@@ -1237,21 +1238,22 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         Nolabel,
         None,
         Ast_helper.Pat.constraint_(~loc, pvar("value"), t_type),
-        pexp_constraint(extract_interpolations_inner, string_string_list_type),
+        pexp_constraint(
+          extract_interpolations_inner,
+          string_string_list_type,
+        ),
       );
-    let infer_interpolation_types_with_context_initial_type_expr = [%expr
-      if (type_context == "") {
-        [%e default_type_path_expr]
+    let infer_interpolation_types_with_context_initial_type_expr =
+      if%expr (type_context == "") {
+        [%e default_type_path_expr];
       } else {
-        type_context
-      }
-    ];
+        type_context;
+      };
     let infer_interpolation_types_with_context_inner =
       generate_extract_interpolations_function(
         spec,
         ~runtime_module_path,
-        ~initial_type_context_expr=
-          infer_interpolation_types_with_context_initial_type_expr,
+        ~initial_type_context_expr=infer_interpolation_types_with_context_initial_type_expr,
         ~loc,
       );
     let infer_interpolation_types_with_context_body =

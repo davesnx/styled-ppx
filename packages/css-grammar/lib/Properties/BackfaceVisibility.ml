@@ -10,5 +10,6 @@ let property_backface_visibility : property_backface_visibility Rule.rule =
 
 let entries : (kind * packed_rule) list =
   [
-    Property "backface-visibility", pack_module (module Property_backface_visibility);
+    ( Property "backface-visibility",
+      pack_module (module Property_backface_visibility) );
   ]

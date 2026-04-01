@@ -278,7 +278,8 @@ let property__moz_window_shadow : property__moz_window_shadow Rule.rule =
 let entries : (kind * packed_rule) list =
   [
     Property "-moz-appearance", pack_module (module Property__moz_appearance);
-    Property "-moz-background-clip", pack_module (module Property__moz_background_clip);
+    ( Property "-moz-background-clip",
+      pack_module (module Property__moz_background_clip) );
     Property "-moz-binding", pack_module (module Property__moz_binding);
     ( Property "-moz-border-bottom-colors",
       pack_module (module Property__moz_border_bottom_colors) );
@@ -294,7 +295,8 @@ let entries : (kind * packed_rule) list =
       pack_module (module Property__moz_border_radius_topright) );
     ( Property "-moz-border-right-colors",
       pack_module (module Property__moz_border_right_colors) );
-    Property "-moz-border-top-colors", pack_module (module Property__moz_border_top_colors);
+    ( Property "-moz-border-top-colors",
+      pack_module (module Property__moz_border_top_colors) );
     ( Property "-moz-context-properties",
       pack_module (module Property__moz_context_properties) );
     ( Property "-moz-control-character-visibility",
@@ -302,9 +304,11 @@ let entries : (kind * packed_rule) list =
     Property "-moz-float-edge", pack_module (module Property__moz_float_edge);
     ( Property "-moz-force-broken-image-icon",
       pack_module (module Property__moz_force_broken_image_icon) );
-    Property "-moz-image-region", pack_module (module Property__moz_image_region);
+    ( Property "-moz-image-region",
+      pack_module (module Property__moz_image_region) );
     Property "-moz-orient", pack_module (module Property__moz_orient);
-    Property "-moz-outline-radius", pack_module (module Property__moz_outline_radius);
+    ( Property "-moz-outline-radius",
+      pack_module (module Property__moz_outline_radius) );
     ( Property "-moz-outline-radius-bottomleft",
       pack_module (module Property__moz_outline_radius_bottomleft) );
     ( Property "-moz-outline-radius-bottomright",
@@ -313,14 +317,17 @@ let entries : (kind * packed_rule) list =
       pack_module (module Property__moz_outline_radius_topleft) );
     ( Property "-moz-outline-radius-topright",
       pack_module (module Property__moz_outline_radius_topright) );
-    Property "-moz-stack-sizing", pack_module (module Property__moz_stack_sizing);
+    ( Property "-moz-stack-sizing",
+      pack_module (module Property__moz_stack_sizing) );
     Property "-moz-text-blink", pack_module (module Property__moz_text_blink);
     Property "-moz-user-focus", pack_module (module Property__moz_user_focus);
     Property "-moz-user-input", pack_module (module Property__moz_user_input);
     Property "-moz-user-modify", pack_module (module Property__moz_user_modify);
     Property "-moz-user-select", pack_module (module Property__moz_user_select);
-    Property "-moz-window-dragging", pack_module (module Property__moz_window_dragging);
-    Property "-moz-window-shadow", pack_module (module Property__moz_window_shadow);
+    ( Property "-moz-window-dragging",
+      pack_module (module Property__moz_window_dragging) );
+    ( Property "-moz-window-shadow",
+      pack_module (module Property__moz_window_shadow) );
     ( Property "-moz-osx-font-smoothing",
       pack_module (module Property__moz_osx_font_smoothing) );
   ]

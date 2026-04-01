@@ -11,6 +11,4 @@ let property_vertical_align : property_vertical_align Rule.rule =
   Property_vertical_align.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "vertical-align", pack_module (module Property_vertical_align);
-  ]
+  [ Property "vertical-align", pack_module (module Property_vertical_align) ]

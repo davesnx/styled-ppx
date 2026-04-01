@@ -1508,7 +1508,10 @@ let shadow_t : shadow_t Rule.rule = Shadow_t.rule
 
 module Shape =
   [%spec_module
-  "rect( [ <extended-length> | 'auto' ] ',' [ <extended-length> | 'auto' ] ',' [ <extended-length> | 'auto' ] ',' [ <extended-length> | 'auto' ] ) | rect( [ <extended-length> | 'auto' ] [ <extended-length> | 'auto' ] [ <extended-length> | 'auto' ] [ <extended-length> | 'auto' ] )",
+  "rect( [ <extended-length> | 'auto' ] ',' [ <extended-length> | 'auto' ] ',' \
+   [ <extended-length> | 'auto' ] ',' [ <extended-length> | 'auto' ] ) | rect( \
+   [ <extended-length> | 'auto' ] [ <extended-length> | 'auto' ] [ \
+   <extended-length> | 'auto' ] [ <extended-length> | 'auto' ] )",
   (module Css_types.Shape)]
 
 let shape : shape Rule.rule = Shape.rule

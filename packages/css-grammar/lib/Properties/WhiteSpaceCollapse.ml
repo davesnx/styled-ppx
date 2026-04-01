@@ -12,5 +12,6 @@ let property_white_space_collapse : property_white_space_collapse Rule.rule =
 
 let entries : (kind * packed_rule) list =
   [
-    Property "white-space-collapse", pack_module (module Property_white_space_collapse);
+    ( Property "white-space-collapse",
+      pack_module (module Property_white_space_collapse) );
   ]

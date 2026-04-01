@@ -388,10 +388,10 @@ let scan_ident_like = lexbuf => {
         switch%sedlex (lexbuf) {
         | '\''
         | '"'
-         | interpolation_start => true
-         | _ => false
-         }
-       );
+        | interpolation_start => true
+        | _ => false
+        }
+      );
     if (is_function(lexbuf)) {
       Ok(function_token(string));
     } else {
@@ -415,8 +415,8 @@ let scan_ident_like = lexbuf => {
     let _ =
       switch%sedlex (lexbuf) {
       | '(' => ()
-       | _ => ()
-       };
+      | _ => ()
+      };
     switch (string) {
     | "url" => read_url(string)
     | _ => Ok(function_token(string))
@@ -766,14 +766,14 @@ let rec consume_token = lexbuf => {
   switch%sedlex (lexbuf) {
   | whitespace =>
     let _ = skip_whitespace_and_comments(lexbuf);
-    Ok(Tokens.WS)
+    Ok(Tokens.WS);
   | important => Ok(IMPORTANT)
   | interpolation_start => consume_interpolation(lexbuf)
   | "/*" => discard_comments(lexbuf)
   | "\"" => consume_string("\"", lexbuf)
   | "#" =>
     let.ok token = consume_hash();
-    Ok(token)
+    Ok(token);
   | "'" => consume_string("'", lexbuf)
   | "(" => Ok(LEFT_PAREN)
   | ")" => Ok(RIGHT_PAREN)
@@ -784,11 +784,11 @@ let rec consume_token = lexbuf => {
     } else {
       let _ = Sedlexing.next(lexbuf);
       emit_delim("+");
-    }
+    };
   | "," => Ok(COMMA)
   | "-" =>
     Sedlexing.rollback(lexbuf);
-    consume_minus()
+    consume_minus();
   | "." =>
     let _ = Sedlexing.backtrack(lexbuf);
     if (check_if_three_code_points_would_start_a_number(lexbuf)) {
@@ -796,7 +796,7 @@ let rec consume_token = lexbuf => {
     } else {
       let _ = Sedlexing.next(lexbuf);
       Ok(DELIM("."));
-    }
+    };
   | "::" => Ok(DOUBLE_COLON)
   | ":" => Ok(COLON)
   | ";" => Ok(SEMI_COLON)
@@ -829,18 +829,18 @@ let rec consume_token = lexbuf => {
     switch%sedlex (lexbuf) {
     | starts_with_a_valid_escape =>
       Sedlexing.rollback(lexbuf);
-      scan_ident_like(lexbuf)
+      scan_ident_like(lexbuf);
     | ('\\', any)
     | '\\' => Error(Invalid_code_point)
     | _ => unreachable(lexbuf)
-    }
+    };
   | (_u, '+', unicode_range) => Ok(UNICODE_RANGE(lexeme(lexbuf)))
   | digit =>
     let _ = Sedlexing.backtrack(lexbuf);
-    consume_numeric(lexbuf)
+    consume_numeric(lexbuf);
   | identifier_start_code_point =>
     let _ = Sedlexing.backtrack(lexbuf);
-    scan_ident_like(lexbuf)
+    scan_ident_like(lexbuf);
   | eof => Ok(EOF)
   | any => emit_delim(lexeme(lexbuf))
   | _ => unreachable(lexbuf)
@@ -851,7 +851,11 @@ let next_token_with_location = lexbuf => {
   let (_, position_start) = Sedlexing.lexing_positions(lexbuf);
   let value = consume_token(lexbuf);
   let (_, position_end) = Sedlexing.lexing_positions(lexbuf);
-  {txt: value, start_pos: position_start, end_pos: position_end};
+  {
+    txt: value,
+    start_pos: position_start,
+    end_pos: position_end,
+  };
 };
 let from_string = string => {
   let lexbuf = Sedlexing.Utf8.from_string(string);

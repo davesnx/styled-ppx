@@ -64,8 +64,10 @@ let entries : (kind * packed_rule) list =
     Property "inset-area", pack_module (module Property_inset_area);
     Property "inset-block", pack_module (module Property_inset_block);
     Property "inset-block-end", pack_module (module Property_inset_block_end);
-    Property "inset-block-start", pack_module (module Property_inset_block_start);
+    ( Property "inset-block-start",
+      pack_module (module Property_inset_block_start) );
     Property "inset-inline", pack_module (module Property_inset_inline);
     Property "inset-inline-end", pack_module (module Property_inset_inline_end);
-    Property "inset-inline-start", pack_module (module Property_inset_inline_start);
+    ( Property "inset-inline-start",
+      pack_module (module Property_inset_inline_start) );
   ]

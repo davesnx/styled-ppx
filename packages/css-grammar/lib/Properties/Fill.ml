@@ -1,6 +1,5 @@
 open Types
 open Support
-
 module Property_fill = [%spec_module "<paint>", (module Css_types.Paint)]
 
 let property_fill : property_fill Rule.rule = Property_fill.rule

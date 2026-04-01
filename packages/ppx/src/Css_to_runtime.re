@@ -129,11 +129,10 @@ let rec render_at_rule = (~loc, ~source, at_rule: at_rule) => {
 and render_media_query = (~loc, ~source, at_rule: at_rule) => {
   let (prelude_values, at_rule_prelude_loc) = at_rule.prelude;
   let parse_condition = {
-    Css_grammar.type_check(
-      Css_grammar.media_query_list,
-      prelude_values,
-    )
-    |> Result.map(_ => source_code_of_loc(~source, at_rule_prelude_loc) |> String.trim);
+    Css_grammar.type_check(Css_grammar.media_query_list, prelude_values)
+    |> Result.map(_ =>
+         source_code_of_loc(~source, at_rule_prelude_loc) |> String.trim
+       );
   };
 
   let (delimiter, attrs) =
@@ -179,7 +178,9 @@ and render_container_query = (~loc, ~source, at_rule: at_rule) => {
       Css_grammar.container_condition_list,
       prelude_values,
     )
-    |> Result.map(_ => source_code_of_loc(~source, at_rule_prelude_loc) |> String.trim);
+    |> Result.map(_ =>
+         source_code_of_loc(~source, at_rule_prelude_loc) |> String.trim
+       );
   };
 
   let (delimiter, attrs) =
@@ -327,7 +328,9 @@ and render_declarations = (~loc: Ppxlib.location, ~source, (ds, _d_loc)) => {
        switch (declaration) {
        | Declaration(decl) => render_declaration(~loc, ~source, decl)
        | At_rule(ar) => [render_at_rule(~loc, ~source, ar)]
-       | Style_rule(style_rules) => [render_style_rule(~loc, ~source, style_rules)]
+       | Style_rule(style_rules) => [
+           render_style_rule(~loc, ~source, style_rules),
+         ]
        }
      );
 }
@@ -432,7 +435,7 @@ and render_selector = (~loc, selector: selector) => {
     };
   }
   and render_selector_combinator = combinator => {
-    switch (combinator: selector_combinator) {
+    switch ((combinator: selector_combinator)) {
     | Selector_descendant => " "
     | Selector_child => " > "
     | Selector_adjacent_sibling => " + "
@@ -440,7 +443,7 @@ and render_selector = (~loc, selector: selector) => {
     };
   }
   and render_relative_combinator = combinator => {
-    switch (combinator: selector_combinator) {
+    switch ((combinator: selector_combinator)) {
     | Selector_descendant => ""
     | Selector_child => "> "
     | Selector_adjacent_sibling => "+ "
@@ -449,10 +452,10 @@ and render_selector = (~loc, selector: selector) => {
   }
   and render_right_combinator = right => {
     right
-      |> List.map(((combinator, selector)) => {
-          render_selector_combinator(combinator)
-          ++ render_selector(~loc, selector)
-        })
+    |> List.map(((combinator, selector)) => {
+         render_selector_combinator(combinator)
+         ++ render_selector(~loc, selector)
+       })
     |> String.concat("");
   }
   and render_relative_selector = ({ combinator, complex_selector }) => {
@@ -582,7 +585,7 @@ let render_keyframes = (~loc, ~source, declarations: rule_list) => {
          | Style_rule({ prelude: (prelude, _), block, loc: style_loc }) =>
            let percentages = prelude |> List.map(render_select_as_keyframe);
            let rules =
-              render_declarations(~loc, ~source, block)
+             render_declarations(~loc, ~source, block)
              |> Builder.pexp_array(~loc=declarations_loc);
            percentages
            |> List.map(p => Builder.pexp_tuple(~loc=style_loc, [p, rules]));
@@ -611,7 +614,8 @@ If your intent is to apply the declaration to all elements, use the universal se
     ruleList
     |> List.map(rule => {
          switch (rule) {
-         | Style_rule(style_rule) => render_style_rule(~loc, ~source, style_rule)
+         | Style_rule(style_rule) =>
+           render_style_rule(~loc, ~source, style_rule)
          | At_rule(at_rule) => render_at_rule(~loc, ~source, at_rule)
          | _ =>
            Error.expr(~loc=stylesheet_loc, onlyStyleRulesAndAtRulesSupported)

@@ -12,6 +12,4 @@ let property_unicode_bidi : property_unicode_bidi Rule.rule =
   Property_unicode_bidi.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "unicode-bidi", pack_module (module Property_unicode_bidi);
-  ]
+  [ Property "unicode-bidi", pack_module (module Property_unicode_bidi) ]

@@ -8,6 +8,4 @@ module Property_opacity =
 let property_opacity : property_opacity Rule.rule = Property_opacity.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "opacity", pack_module (module Property_opacity);
-  ]
+  [ Property "opacity", pack_module (module Property_opacity) ]

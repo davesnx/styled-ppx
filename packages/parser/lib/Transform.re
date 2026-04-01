@@ -7,12 +7,11 @@ let split_by_kind = Selector_nesting.split_by_kind;
 let rec unnest_selectors = (~prefix, rules) => {
   List.partition_map(
     fun
-    | Style_rule({prelude: (prelude, _), block: (rules, _), _}) => {
+    | Style_rule({ prelude: (prelude, _), block: (rules, _), _ }) => {
         let current_selector = prelude |> List.hd |> fst;
         let new_prefix =
           Selector_nesting.compute_new_prefix(~prefix, current_selector);
-        let selector_rules =
-          Selector_nesting.split_multiple_selectors(rules);
+        let selector_rules = Selector_nesting.split_multiple_selectors(rules);
         let (selectors, rest_of_declarations) =
           unnest_selectors(~prefix=Some(new_prefix), selector_rules);
         let new_selector =
@@ -56,7 +55,7 @@ let rec unnest_selectors = (~prefix, rules) => {
           }),
         );
       }
-    | At_rule({name, prelude, block, loc}) => {
+    | At_rule({ name, prelude, block, loc }) => {
         let processed_block =
           switch (block) {
           | Empty => Empty

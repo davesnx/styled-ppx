@@ -1,6 +1,5 @@
 open Types
 open Support
-
 module Property_color = [%spec_module "<color>", (module Css_types.Color)]
 
 let property_color : property_color Rule.rule = Property_color.rule
@@ -48,7 +47,8 @@ let entries : (kind * packed_rule) list =
     Property "color-scheme", pack_module (module Property_color_scheme);
     Property "color-adjust", pack_module (module Property_color_adjust);
     Property "color", pack_module (module Property_color);
-    Property "color-interpolation", pack_module (module Property_color_interpolation);
+    ( Property "color-interpolation",
+      pack_module (module Property_color_interpolation) );
     ( Property "color-interpolation-filters",
       pack_module (module Property_color_interpolation_filters) );
     Property "color-rendering", pack_module (module Property_color_rendering);

@@ -77,13 +77,15 @@ let property_box_sizing : property_box_sizing Rule.rule =
 let entries : (kind * packed_rule) list =
   [
     Property "box-sizing", pack_module (module Property_box_sizing);
-    Property "box-decoration-break", pack_module (module Property_box_decoration_break);
+    ( Property "box-decoration-break",
+      pack_module (module Property_box_decoration_break) );
     Property "box-align", pack_module (module Property_box_align);
     Property "box-direction", pack_module (module Property_box_direction);
     Property "box-flex", pack_module (module Property_box_flex);
     Property "box-flex-group", pack_module (module Property_box_flex_group);
     Property "box-lines", pack_module (module Property_box_lines);
-    Property "box-ordinal-group", pack_module (module Property_box_ordinal_group);
+    ( Property "box-ordinal-group",
+      pack_module (module Property_box_ordinal_group) );
     Property "box-orient", pack_module (module Property_box_orient);
     Property "box-pack", pack_module (module Property_box_pack);
     Property "box-shadow", pack_module (module Property_box_shadow);

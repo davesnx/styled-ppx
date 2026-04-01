@@ -11,6 +11,4 @@ module Property_width =
 let property_width : property_width Rule.rule = Property_width.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "width", pack_module (module Property_width);
-  ]
+  [ Property "width", pack_module (module Property_width) ]

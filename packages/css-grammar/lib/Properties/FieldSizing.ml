@@ -9,6 +9,4 @@ let property_field_sizing : property_field_sizing Rule.rule =
   Property_field_sizing.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "field-sizing", pack_module (module Property_field_sizing);
-  ]
+  [ Property "field-sizing", pack_module (module Property_field_sizing) ]

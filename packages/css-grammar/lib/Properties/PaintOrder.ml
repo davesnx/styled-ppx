@@ -9,6 +9,4 @@ let property_paint_order : property_paint_order Rule.rule =
   Property_paint_order.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "paint-order", pack_module (module Property_paint_order);
-  ]
+  [ Property "paint-order", pack_module (module Property_paint_order) ]

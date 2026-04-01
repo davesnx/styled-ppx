@@ -10,6 +10,4 @@ module Property_rotate =
 let property_rotate : property_rotate Rule.rule = Property_rotate.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "rotate", pack_module (module Property_rotate);
-  ]
+  [ Property "rotate", pack_module (module Property_rotate) ]

@@ -9,6 +9,4 @@ module Property_float =
 let property_float : property_float Rule.rule = Property_float.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "float", pack_module (module Property_float);
-  ]
+  [ Property "float", pack_module (module Property_float) ]

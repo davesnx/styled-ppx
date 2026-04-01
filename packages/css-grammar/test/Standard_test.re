@@ -5,11 +5,12 @@ open Parser;
 
 let parse_component_values = str =>
   switch (Driver.parse_declaration(~loc=Ppxlib.Location.none, "x: " ++ str)) {
-  | Ok({Ast.value: (values, _), _}) => values
+  | Ok({ Ast.value: (values, _), _ }) => values
   | Error((_, msg)) => Alcotest.fail("parser should succeed: " ++ msg)
   };
 
-let parse = (prop, str) => Parser.type_check(prop, parse_component_values(str));
+let parse = (prop, str) =>
+  Parser.type_check(prop, parse_component_values(str));
 
 let check = Alcotest_extra.check;
 

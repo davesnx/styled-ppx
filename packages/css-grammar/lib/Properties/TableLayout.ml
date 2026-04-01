@@ -9,6 +9,4 @@ let property_table_layout : property_table_layout Rule.rule =
   Property_table_layout.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "table-layout", pack_module (module Property_table_layout);
-  ]
+  [ Property "table-layout", pack_module (module Property_table_layout) ]

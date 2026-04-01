@@ -282,10 +282,7 @@ module Css_transform = {
     let (value_list, value_loc) = decl.value;
 
     let interpolation_types =
-      Css_grammar.infer_interpolation_types(
-        ~name=property_name,
-        value_list,
-      );
+      Css_grammar.infer_interpolation_types(~name=property_name, value_list);
 
     let interpolation_occurrences =
       interpolation_types

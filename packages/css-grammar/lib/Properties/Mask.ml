@@ -126,11 +126,16 @@ let entries : (kind * packed_rule) list =
     Property "mask-type", pack_module (module Property_mask_type);
     Property "mask", pack_module (module Property_mask);
     Property "mask-border", pack_module (module Property_mask_border);
-    Property "mask-border-outset", pack_module (module Property_mask_border_outset);
-    Property "mask-border-repeat", pack_module (module Property_mask_border_repeat);
-    Property "mask-border-slice", pack_module (module Property_mask_border_slice);
-    Property "mask-border-source", pack_module (module Property_mask_border_source);
-    Property "mask-border-width", pack_module (module Property_mask_border_width);
+    ( Property "mask-border-outset",
+      pack_module (module Property_mask_border_outset) );
+    ( Property "mask-border-repeat",
+      pack_module (module Property_mask_border_repeat) );
+    ( Property "mask-border-slice",
+      pack_module (module Property_mask_border_slice) );
+    ( Property "mask-border-source",
+      pack_module (module Property_mask_border_source) );
+    ( Property "mask-border-width",
+      pack_module (module Property_mask_border_width) );
     Property "mask-clip", pack_module (module Property_mask_clip);
     Property "mask-composite", pack_module (module Property_mask_composite);
     Property "mask-image", pack_module (module Property_mask_image);

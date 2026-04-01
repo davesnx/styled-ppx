@@ -34,13 +34,7 @@ let rec type_check_rule = (rule: Styled_ppx_css_parser.Ast.rule) => {
       Ok(),
     ]
   | Declaration({ name: (name, _), value: (value, value_loc), loc: _, _ }) =>
-    switch (
-      Css_grammar.validate_property(
-        ~loc=value_loc,
-        ~name,
-        value,
-      )
-    ) {
+    switch (Css_grammar.validate_property(~loc=value_loc, ~name, value)) {
     | Ok () => [Ok()]
     | Error((loc, `Invalid_value(raw_error))) =>
       let msg =
@@ -60,7 +54,7 @@ let rec type_check_rule = (rule: Styled_ppx_css_parser.Ast.rule) => {
         | None => "Unknown property '" ++ name ++ "'"
         };
       [Error((loc, `Invalid_value(msg)))];
-    };
+    }
   | Style_rule(style_rule) =>
     let rule_list = style_rule.block;
     type_check_rule_list(rule_list);
@@ -628,7 +622,11 @@ If your intent is to apply the declaration to all elements, use the universal se
                   Styled_ppx_css_parser.Driver.parse_keyframes(~loc, txt)
                 ) {
                 | Ok(declarations) =>
-                  Css_to_runtime.render_keyframes(~loc, ~source=txt, declarations)
+                  Css_to_runtime.render_keyframes(
+                    ~loc,
+                    ~source=txt,
+                    declarations,
+                  )
                 | Error((loc, msg)) => Error.expr(~loc, msg)
                 };
               | _ =>

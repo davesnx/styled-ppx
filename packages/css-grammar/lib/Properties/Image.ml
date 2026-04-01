@@ -27,7 +27,8 @@ let property_image_resolution : property_image_resolution Rule.rule =
 
 let entries : (kind * packed_rule) list =
   [
-    Property "image-orientation", pack_module (module Property_image_orientation);
+    ( Property "image-orientation",
+      pack_module (module Property_image_orientation) );
     Property "image-resolution", pack_module (module Property_image_resolution);
     Property "image-rendering", pack_module (module Property_image_rendering);
   ]

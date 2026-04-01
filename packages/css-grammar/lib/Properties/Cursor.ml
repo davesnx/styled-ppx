@@ -17,6 +17,4 @@ module Property_cursor =
 let property_cursor : property_cursor Rule.rule = Property_cursor.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "cursor", pack_module (module Property_cursor);
-  ]
+  [ Property "cursor", pack_module (module Property_cursor) ]

@@ -11,6 +11,4 @@ let property_vector_effect : property_vector_effect Rule.rule =
 (* SVG geometry properties *)
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "vector-effect", pack_module (module Property_vector_effect);
-  ]
+  [ Property "vector-effect", pack_module (module Property_vector_effect) ]

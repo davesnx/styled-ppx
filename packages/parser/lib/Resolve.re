@@ -6,7 +6,7 @@ let resolve_selectors = (rules: list(rule)) => {
   let rec unnest_selectors = (~prefix, rules) => {
     List.partition_map(
       fun
-      | Style_rule({prelude: (prelude, _), block: (rules, _), _}) => {
+      | Style_rule({ prelude: (prelude, _), block: (rules, _), _ }) => {
           let current_selector = prelude |> List.hd |> fst;
           let new_prefix =
             Selector_nesting.compute_new_prefix(~prefix, current_selector);

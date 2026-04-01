@@ -6,7 +6,7 @@ let render:
     ~raw_value_source: string,
     string,
     Styled_ppx_css_parser.Ast.component_value_list,
-    bool,
+    bool
   ) =>
   result(
     list(Parsetree.expression),

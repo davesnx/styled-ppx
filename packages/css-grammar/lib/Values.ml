@@ -14,7 +14,8 @@ let entries : (kind * packed_rule) list =
     Value "gender", pack_module (module Gender);
     Value "combinator", pack_module (module Combinator);
     Value "contextual-alt-values", pack_module (module Contextual_alt_values);
-    Value "east-asian-width-values", pack_module (module East_asian_width_values);
+    ( Value "east-asian-width-values",
+      pack_module (module East_asian_width_values) );
     Value "attr-modifier", pack_module (module Attr_modifier);
     Value "image-tags", pack_module (module Image_tags);
     Value "line-style", pack_module (module Line_style);
@@ -29,7 +30,8 @@ let entries : (kind * packed_rule) list =
     Value "transform-function", pack_module (module Transform_function);
     Value "image", pack_module (module Image);
     Value "font_families", pack_module (module Font_families);
-    Value "color-interpolation-method", pack_module (module Color_interpolation_method);
+    ( Value "color-interpolation-method",
+      pack_module (module Color_interpolation_method) );
     Value "family-name", pack_module (module Family_name);
     Value "keyframes-name", pack_module (module Keyframes_name);
     Value "url", pack_module (module Url);
@@ -53,13 +55,16 @@ let entries : (kind * packed_rule) list =
     Value "fixed-repeat", pack_module (module Fixed_repeat);
     Value "fixed-breadth", pack_module (module Fixed_breadth);
     Value "auto-repeat", pack_module (module Auto_repeat);
-    Value "extended-time-no-interp", pack_module (module Extended_time_no_interp);
-    Value "timing-function-no-interp", pack_module (module Timing_function_no_interp);
+    ( Value "extended-time-no-interp",
+      pack_module (module Extended_time_no_interp) );
+    ( Value "timing-function-no-interp",
+      pack_module (module Timing_function_no_interp) );
     ( Value "cubic-bezier-timing-function",
       pack_module (module Cubic_bezier_timing_function) );
     Value "step-timing-function", pack_module (module Step_timing_function);
     Value "single-animation", pack_module (module Single_animation);
-    Value "single-animation-no-interp", pack_module (module Single_animation_no_interp);
+    ( Value "single-animation-no-interp",
+      pack_module (module Single_animation_no_interp) );
     ( Value "single-animation-direction-no-interp",
       pack_module (module Single_animation_direction_no_interp) );
     ( Value "single-animation-fill-mode-no-interp",
@@ -74,7 +79,8 @@ let entries : (kind * packed_rule) list =
     Value "timing-function", pack_module (module Timing_function);
     Value "number-percentage", pack_module (module Number_percentage);
     Value "grid-line", pack_module (module Grid_line);
-    Value "single-transition-property", pack_module (module Single_transition_property);
+    ( Value "single-transition-property",
+      pack_module (module Single_transition_property) );
     Value "outline-radius", pack_module (module Outline_radius);
     Value "bg-size", pack_module (module Bg_size);
     Value "bg-position", pack_module (module Bg_position);
@@ -88,9 +94,12 @@ let entries : (kind * packed_rule) list =
     Value "relative-size", pack_module (module Relative_size);
     Value "repeat-style", pack_module (module Repeat_style);
     Value "self-position", pack_module (module Self_position);
-    Value "single-animation-direction", pack_module (module Single_animation_direction);
-    Value "single-animation-fill-mode", pack_module (module Single_animation_fill_mode);
-    Value "single-animation-play-state", pack_module (module Single_animation_play_state);
+    ( Value "single-animation-direction",
+      pack_module (module Single_animation_direction) );
+    ( Value "single-animation-fill-mode",
+      pack_module (module Single_animation_fill_mode) );
+    ( Value "single-animation-play-state",
+      pack_module (module Single_animation_play_state) );
     Value "step-position", pack_module (module Step_position);
     Value "symbols-type", pack_module (module Symbols_type);
     Value "masking-mode", pack_module (module Masking_mode);
@@ -124,7 +133,8 @@ let entries : (kind * packed_rule) list =
     Value "style-in-parens", pack_module (module Style_in_parens);
     ( Value "legacy-radial-gradient-shape",
       pack_module (module Legacy_radial_gradient_shape) );
-    Value "legacy-radial-gradient-size", pack_module (module Legacy_radial_gradient_size);
+    ( Value "legacy-radial-gradient-size",
+      pack_module (module Legacy_radial_gradient_size) );
     ( Value "legacy-radial-gradient-arguments",
       pack_module (module Legacy_radial_gradient_arguments) );
     Value "legacy-radial-gradient", pack_module (module Legacy_radial_gradient);
@@ -150,29 +160,35 @@ let entries : (kind * packed_rule) list =
     Value "composite-style", pack_module (module Composite_style);
     Value "compositing-operator", pack_module (module Compositing_operator);
     Value "content-distribution", pack_module (module Content_distribution);
-    Value "deprecated-system-color", pack_module (module Deprecated_system_color);
-    Value "discretionary-lig-values", pack_module (module Discretionary_lig_values);
+    ( Value "deprecated-system-color",
+      pack_module (module Deprecated_system_color) );
+    ( Value "discretionary-lig-values",
+      pack_module (module Discretionary_lig_values) );
     Value "display-inside", pack_module (module Display_inside);
     Value "display-internal", pack_module (module Display_internal);
     Value "display-legacy", pack_module (module Display_legacy);
-    Value "east-asian-variant-values", pack_module (module East_asian_variant_values);
+    ( Value "east-asian-variant-values",
+      pack_module (module East_asian_variant_values) );
     Value "feature-type", pack_module (module Feature_type);
     Value "font-variant-css21", pack_module (module Font_variant_css21);
     Value "generic-family", pack_module (module Generic_family);
     Value "generic-name", pack_module (module Generic_name);
     Value "historical-lig-values", pack_module (module Historical_lig_values);
-    Value "numeric-fraction-values", pack_module (module Numeric_fraction_values);
+    ( Value "numeric-fraction-values",
+      pack_module (module Numeric_fraction_values) );
     Value "overflow-position-value", pack_module (module Overflow_position);
     Value "page-margin-box-type", pack_module (module Page_margin_box_type);
     Value "polar-color-space", pack_module (module Polar_color_space);
     Value "predefined-color-space", pack_module (module Predefined_color_space);
     Value "quote", pack_module (module Quote);
-    Value "rectangular-color-space", pack_module (module Rectangular_color_space);
+    ( Value "rectangular-color-space",
+      pack_module (module Rectangular_color_space) );
     Value "shape-box", pack_module (module Shape_box);
     Value "visual-box", pack_module (module Visual_box);
     Value "angular-color-hint", pack_module (module Angular_color_hint);
     Value "angular-color-stop", pack_module (module Angular_color_stop);
-    Value "angular-color-stop-list", pack_module (module Angular_color_stop_list);
+    ( Value "angular-color-stop-list",
+      pack_module (module Angular_color_stop_list) );
     Value "animateable-feature", pack_module (module Animateable_feature);
     Value "attr-fallback", pack_module (module Attr_fallback);
     Value "attr-matcher", pack_module (module Attr_matcher);
@@ -192,7 +208,8 @@ let entries : (kind * packed_rule) list =
     Value "complex-selector-list", pack_module (module Complex_selector_list);
     Value "compound-selector", pack_module (module Compound_selector);
     Value "compound-selector-list", pack_module (module Compound_selector_list);
-    Value "container-condition-list", pack_module (module Container_condition_list);
+    ( Value "container-condition-list",
+      pack_module (module Container_condition_list) );
     Value "counter-name", pack_module (module Counter_name);
     Value "declaration", pack_module (module Declaration);
     Value "declaration-list", pack_module (module Declaration_list);
@@ -205,8 +222,10 @@ let entries : (kind * packed_rule) list =
     Value "extended-time", pack_module (module Extended_time);
     Value "feature-tag-value", pack_module (module Feature_tag_value);
     Value "feature-value-block", pack_module (module Feature_value_block);
-    Value "feature-value-block-list", pack_module (module Feature_value_block_list);
-    Value "feature-value-declaration", pack_module (module Feature_value_declaration);
+    ( Value "feature-value-block-list",
+      pack_module (module Feature_value_block_list) );
+    ( Value "feature-value-declaration",
+      pack_module (module Feature_value_declaration) );
     ( Value "feature-value-declaration-list",
       pack_module (module Feature_value_declaration_list) );
     Value "filter-function-list", pack_module (module Filter_function_list);
@@ -214,7 +233,8 @@ let entries : (kind * packed_rule) list =
     Value "font-stretch-absolute", pack_module (module Font_stretch_absolute);
     Value "general-enclosed", pack_module (module General_enclosed);
     Value "generic-voice", pack_module (module Generic_voice);
-    Value "hue-interpolation-method", pack_module (module Hue_interpolation_method);
+    ( Value "hue-interpolation-method",
+      pack_module (module Hue_interpolation_method) );
     Value "id-selector", pack_module (module Id_selector);
     Value "image-set-option", pack_module (module Image_set_option);
     Value "image-src", pack_module (module Image_src);
@@ -241,7 +261,8 @@ let entries : (kind * packed_rule) list =
     Value "paint", pack_module (module Paint);
     Value "positive-integer", pack_module (module Positive_integer);
     Value "pseudo-class-selector", pack_module (module Pseudo_class_selector);
-    Value "pseudo-element-selector", pack_module (module Pseudo_element_selector);
+    ( Value "pseudo-element-selector",
+      pack_module (module Pseudo_element_selector) );
     Value "pseudo-page", pack_module (module Pseudo_page);
     Value "radial-size", pack_module (module Radial_size);
     Value "ray-size", pack_module (module Ray_size);
@@ -250,7 +271,8 @@ let entries : (kind * packed_rule) list =
     Value "shape", pack_module (module Shape);
     Value "shape-radius", pack_module (module Shape_radius);
     Value "single-transition", pack_module (module Single_transition);
-    Value "single-transition-no-interp", pack_module (module Single_transition_no_interp);
+    ( Value "single-transition-no-interp",
+      pack_module (module Single_transition_no_interp) );
     ( Value "single-transition-property-no-interp",
       pack_module (module Single_transition_property_no_interp) );
     Value "subclass-selector", pack_module (module Subclass_selector);
@@ -264,21 +286,24 @@ let entries : (kind * packed_rule) list =
     Value "syntax-combinator", pack_module (module Syntax_combinator);
     Value "syntax-component", pack_module (module Syntax_component);
     Value "syntax-multiplier", pack_module (module Syntax_multiplier);
-    Value "syntax-single-component", pack_module (module Syntax_single_component);
+    ( Value "syntax-single-component",
+      pack_module (module Syntax_single_component) );
     Value "syntax-string", pack_module (module Syntax_string);
     Value "syntax-type-name", pack_module (module Syntax_type_name);
     Value "target", pack_module (module Target);
     Value "track-group", pack_module (module Track_group);
     Value "track-list-v0", pack_module (module Track_list_v0);
     Value "track-minmax", pack_module (module Track_minmax);
-    Value "transition-behavior-value", pack_module (module Transition_behavior_value);
+    ( Value "transition-behavior-value",
+      pack_module (module Transition_behavior_value) );
     ( Value "transition-behavior-value-no-interp",
       pack_module (module Transition_behavior_value_no_interp) );
     Value "try-tactic", pack_module (module Try_tactic);
     Value "type-or-unit", pack_module (module Type_or_unit);
     Value "type-selector", pack_module (module Type_selector);
     Value "viewport-length", pack_module (module Viewport_length);
-    Value "webkit-gradient-color-stop", pack_module (module Webkit_gradient_color_stop);
+    ( Value "webkit-gradient-color-stop",
+      pack_module (module Webkit_gradient_color_stop) );
     Value "webkit-gradient-point", pack_module (module Webkit_gradient_point);
     Value "webkit-gradient-radius", pack_module (module Webkit_gradient_radius);
     Value "wq-name", pack_module (module Wq_name);

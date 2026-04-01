@@ -10,6 +10,4 @@ let property_word_spacing : property_word_spacing Rule.rule =
   Property_word_spacing.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "word-spacing", pack_module (module Property_word_spacing);
-  ]
+  [ Property "word-spacing", pack_module (module Property_word_spacing) ]

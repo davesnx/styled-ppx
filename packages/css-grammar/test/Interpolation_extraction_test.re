@@ -82,7 +82,8 @@ let test_text_shadow_partial_interp = () => {
 };
 
 let test_border_top_color_partial_interp = () => {
-  let result = infer_interpolation_types("border-top", "1px solid $(myColor)");
+  let result =
+    infer_interpolation_types("border-top", "1px solid $(myColor)");
 
   Alcotest.(check(list(pair(string, string))))(
     "border-top partial interpolation extracts color type",

@@ -38,7 +38,7 @@ type token =
   | LEFT_PAREN // <(-token>
   | RIGHT_PAREN // <)-token>
   | LEFT_BRACE // <{-token>
-  | RIGHT_BRACE // <}-token>;
+  | RIGHT_BRACE; // <}-token>;
 
 let string_of_char = c => String.make(1, c);
 

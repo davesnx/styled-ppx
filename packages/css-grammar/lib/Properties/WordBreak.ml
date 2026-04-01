@@ -10,6 +10,4 @@ let property_word_break : property_word_break Rule.rule =
   Property_word_break.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "word-break", pack_module (module Property_word_break);
-  ]
+  [ Property "word-break", pack_module (module Property_word_break) ]

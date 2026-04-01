@@ -10,5 +10,6 @@ let property_hyphenate_character : property_hyphenate_character Rule.rule =
 
 let entries : (kind * packed_rule) list =
   [
-    Property "hyphenate-character", pack_module (module Property_hyphenate_character);
+    ( Property "hyphenate-character",
+      pack_module (module Property_hyphenate_character) );
   ]

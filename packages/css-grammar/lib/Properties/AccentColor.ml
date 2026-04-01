@@ -9,6 +9,4 @@ let property_accent_color : property_accent_color Rule.rule =
   Property_accent_color.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "accent-color", pack_module (module Property_accent_color);
-  ]
+  [ Property "accent-color", pack_module (module Property_accent_color) ]

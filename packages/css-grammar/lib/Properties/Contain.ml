@@ -57,7 +57,8 @@ let property_contain_intrinsic_inline_size :
 
 let entries : (kind * packed_rule) list =
   [
-    Property "contain-intrinsic-size", pack_module (module Property_contain_intrinsic_size);
+    ( Property "contain-intrinsic-size",
+      pack_module (module Property_contain_intrinsic_size) );
     Property "contain", pack_module (module Property_contain);
     ( Property "contain-intrinsic-block-size",
       pack_module (module Property_contain_intrinsic_block_size) );

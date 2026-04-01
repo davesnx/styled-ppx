@@ -9,6 +9,4 @@ let property_will_change : property_will_change Rule.rule =
   Property_will_change.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "will-change", pack_module (module Property_will_change);
-  ]
+  [ Property "will-change", pack_module (module Property_will_change) ]

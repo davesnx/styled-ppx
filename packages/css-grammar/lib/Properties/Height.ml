@@ -11,6 +11,4 @@ module Property_height =
 let property_height : property_height Rule.rule = Property_height.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "height", pack_module (module Property_height);
-  ]
+  [ Property "height", pack_module (module Property_height) ]

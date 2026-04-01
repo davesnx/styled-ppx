@@ -95,11 +95,14 @@ let entries : (kind * packed_rule) list =
     Property "margin", pack_module (module Property_margin);
     Property "margin-block", pack_module (module Property_margin_block);
     Property "margin-block-end", pack_module (module Property_margin_block_end);
-    Property "margin-block-start", pack_module (module Property_margin_block_start);
+    ( Property "margin-block-start",
+      pack_module (module Property_margin_block_start) );
     Property "margin-bottom", pack_module (module Property_margin_bottom);
     Property "margin-inline", pack_module (module Property_margin_inline);
-    Property "margin-inline-end", pack_module (module Property_margin_inline_end);
-    Property "margin-inline-start", pack_module (module Property_margin_inline_start);
+    ( Property "margin-inline-end",
+      pack_module (module Property_margin_inline_end) );
+    ( Property "margin-inline-start",
+      pack_module (module Property_margin_inline_start) );
     Property "margin-left", pack_module (module Property_margin_left);
     Property "margin-right", pack_module (module Property_margin_right);
     Property "margin-top", pack_module (module Property_margin_top);

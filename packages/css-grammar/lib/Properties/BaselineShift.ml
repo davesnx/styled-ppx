@@ -10,6 +10,4 @@ let property_baseline_shift : property_baseline_shift Rule.rule =
   Property_baseline_shift.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "baseline-shift", pack_module (module Property_baseline_shift);
-  ]
+  [ Property "baseline-shift", pack_module (module Property_baseline_shift) ]

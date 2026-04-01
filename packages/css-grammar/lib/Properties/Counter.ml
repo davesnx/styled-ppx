@@ -25,7 +25,8 @@ let property_counter_set : property_counter_set Rule.rule =
 
 let entries : (kind * packed_rule) list =
   [
-    Property "counter-increment", pack_module (module Property_counter_increment);
+    ( Property "counter-increment",
+      pack_module (module Property_counter_increment) );
     Property "counter-reset", pack_module (module Property_counter_reset);
     Property "counter-set", pack_module (module Property_counter_set);
   ]

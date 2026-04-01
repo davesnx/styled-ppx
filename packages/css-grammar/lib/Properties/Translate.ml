@@ -9,6 +9,4 @@ module Property_translate =
 let property_translate : property_translate Rule.rule = Property_translate.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "translate", pack_module (module Property_translate);
-  ]
+  [ Property "translate", pack_module (module Property_translate) ]

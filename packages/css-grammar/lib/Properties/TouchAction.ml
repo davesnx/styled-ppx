@@ -11,6 +11,4 @@ let property_touch_action : property_touch_action Rule.rule =
   Property_touch_action.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "touch-action", pack_module (module Property_touch_action);
-  ]
+  [ Property "touch-action", pack_module (module Property_touch_action) ]

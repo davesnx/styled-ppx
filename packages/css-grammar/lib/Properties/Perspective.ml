@@ -9,6 +9,4 @@ let property_perspective : property_perspective Rule.rule =
   Property_perspective.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "perspective", pack_module (module Property_perspective);
-  ]
+  [ Property "perspective", pack_module (module Property_perspective) ]

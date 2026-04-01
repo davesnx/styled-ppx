@@ -14,7 +14,7 @@ let (let.ok) = Result.bind;
 
 let parse_component_values_string = (input: string) => {
   switch (Css_parser.parse_declaration(~loc, "x: " ++ input)) {
-  | Ok({Css_parser_ast.value: (values, _), _}) => Ok(values)
+  | Ok({ Css_parser_ast.value: (values, _), _ }) => Ok(values)
   | Error((_loc, msg)) => Error(msg)
   };
 };

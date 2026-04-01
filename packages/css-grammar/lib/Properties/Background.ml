@@ -93,14 +93,21 @@ let entries : (kind * packed_rule) list =
   [
     Property "background-color", pack_module (module Property_background_color);
     Property "background", pack_module (module Property_background);
-    Property "background-attachment", pack_module (module Property_background_attachment);
-    Property "background-blend-mode", pack_module (module Property_background_blend_mode);
+    ( Property "background-attachment",
+      pack_module (module Property_background_attachment) );
+    ( Property "background-blend-mode",
+      pack_module (module Property_background_blend_mode) );
     Property "background-clip", pack_module (module Property_background_clip);
     Property "background-image", pack_module (module Property_background_image);
-    Property "background-origin", pack_module (module Property_background_origin);
-    Property "background-position", pack_module (module Property_background_position);
-    Property "background-position-x", pack_module (module Property_background_position_x);
-    Property "background-position-y", pack_module (module Property_background_position_y);
-    Property "background-repeat", pack_module (module Property_background_repeat);
+    ( Property "background-origin",
+      pack_module (module Property_background_origin) );
+    ( Property "background-position",
+      pack_module (module Property_background_position) );
+    ( Property "background-position-x",
+      pack_module (module Property_background_position_x) );
+    ( Property "background-position-y",
+      pack_module (module Property_background_position_y) );
+    ( Property "background-repeat",
+      pack_module (module Property_background_repeat) );
     Property "background-size", pack_module (module Property_background_size);
   ]

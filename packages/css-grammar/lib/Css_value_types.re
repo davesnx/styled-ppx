@@ -20,19 +20,18 @@ let match_component = f => component(f);
 
 let parse_block = (~kind, ~extract, rule) => {
   let.bind_match body =
-    match_component(
-      fun (((value, _): Rule.located_component_value) as actual) =>
-        switch (extract(value)) {
-        | Some(body) => Ok(body)
-        | None =>
-          Error([
-            "Expected "
-            ++ kind
-            ++ " but instead got '"
-            ++ render_component(actual)
-            ++ "'.",
-          ])
-        },
+    match_component((((value, _): Rule.located_component_value) as actual) =>
+      switch (extract(value)) {
+      | Some(body) => Ok(body)
+      | None =>
+        Error([
+          "Expected "
+          ++ kind
+          ++ " but instead got '"
+          ++ render_component(actual)
+          ++ "'.",
+        ])
+      }
     );
   switch (Rule.run(rule, body)) {
   | Ok(value) => Rule.Match.return(value)
@@ -43,18 +42,20 @@ let parse_block = (~kind, ~extract, rule) => {
 let paren_block = rule =>
   parse_block(
     ~kind="a parenthesized block",
-    ~extract=(fun
+    ~extract=
+      fun
       | Ast.Paren_block(body) => Some(body)
-      | _ => None),
+      | _ => None,
     rule,
   );
 
 let bracket_block = rule =>
   parse_block(
     ~kind="a bracket block",
-    ~extract=(fun
+    ~extract=
+      fun
       | Ast.Bracket_block(body) => Some(body)
-      | _ => None),
+      | _ => None,
     rule,
   );
 
@@ -64,12 +65,11 @@ let keyword = kw =>
   switch (Ast.delimiter_of_string(kw)) {
   | Some(delimiter) => expect_delim(delimiter)
   | None =>
-    match_component(
-      fun (((value, _): Rule.located_component_value) as actual) =>
-        switch (value) {
-        | Ast.Ident(actual_kw) when actual_kw == kw => Ok()
-        | _ => render_expected_error(kw, actual)
-        },
+    match_component((((value, _): Rule.located_component_value) as actual) =>
+      switch (value) {
+      | Ast.Ident(actual_kw) when actual_kw == kw => Ok()
+      | _ => render_expected_error(kw, actual)
+      }
     )
   };
 
@@ -123,26 +123,24 @@ let delim =
 
 let function_call = (name, rule) => {
   let.bind_match body =
-    match_component(
-      fun (((value, _): Rule.located_component_value) as actual) => {
-        let result =
-          switch (value) {
-          | Ast.Function(f) when fst(f.name) == name => Some(fst(f.body))
-          | _ => None
-          };
-        switch (result) {
-        | Some(body) => Ok(body)
-        | None =>
-          Error([
-            "Expected 'function "
-            ++ name
-            ++ "'. Got '"
-            ++ render_component(actual)
-            ++ "' instead.",
-          ])
+    match_component((((value, _): Rule.located_component_value) as actual) => {
+      let result =
+        switch (value) {
+        | Ast.Function(f) when fst(f.name) == name => Some(fst(f.body))
+        | _ => None
         };
-      },
-    );
+      switch (result) {
+      | Some(body) => Ok(body)
+      | None =>
+        Error([
+          "Expected 'function "
+          ++ name
+          ++ "'. Got '"
+          ++ render_component(actual)
+          ++ "' instead.",
+        ])
+      };
+    });
   switch (Rule.run(rule, body)) {
   | Ok(value) => Rule.Match.return(value)
   | Error(message) => Rule.Data.return(Error([message]))
@@ -160,24 +158,21 @@ let integer =
   );
 
 let number =
-  match_component(
-    fun (((value, _): Rule.located_component_value) as actual) =>
-      switch (value) {
-      | Ast.Number(n) => Ok(n)
-      | _ =>
-        Error([
-          "Expected a number. Got '"
-          ++ render_component(actual)
-          ++ "' instead.",
-        ])
-      },
+  match_component((((value, _): Rule.located_component_value) as actual) =>
+    switch (value) {
+    | Ast.Number(n) => Ok(n)
+    | _ =>
+      Error([
+        "Expected a number. Got '" ++ render_component(actual) ++ "' instead.",
+      ])
+    }
   );
 
 let invalid_dimension_unit = (kind, unit) =>
   Error(["Invalid " ++ kind ++ " unit '" ++ unit ++ "'."]);
 
 let length_of_unit = (number, unit) =>
-  switch (unit: Ast.length_unit) {
+  switch ((unit: Ast.length_unit)) {
   | Ast.Length_unit_cap => Ok(`Cap(number))
   | Length_unit_ch => Ok(`Ch(number))
   | Length_unit_em => Ok(`Em(number))
@@ -212,7 +207,7 @@ let length_of_unit = (number, unit) =>
   };
 
 let angle_of_unit = (number, unit) =>
-  switch (unit: Ast.angle_unit) {
+  switch ((unit: Ast.angle_unit)) {
   | Ast.Angle_unit_deg => Ok(`Deg(number))
   | Angle_unit_grad => Ok(`Grad(number))
   | Angle_unit_rad => Ok(`Rad(number))
@@ -220,19 +215,19 @@ let angle_of_unit = (number, unit) =>
   };
 
 let time_of_unit = (number, unit) =>
-  switch (unit: Ast.time_unit) {
+  switch ((unit: Ast.time_unit)) {
   | Ast.Time_unit_s => Ok(`S(number))
   | Time_unit_ms => Ok(`Ms(number))
   };
 
 let frequency_of_unit = (number, unit) =>
-  switch (unit: Ast.frequency_unit) {
+  switch ((unit: Ast.frequency_unit)) {
   | Ast.Frequency_unit_hz => Ok(`Hz(number))
   | Frequency_unit_khz => Ok(`KHz(number))
   };
 
 let resolution_of_unit = (number, unit) =>
-  switch (unit: Ast.resolution_unit) {
+  switch ((unit: Ast.resolution_unit)) {
   | Ast.Resolution_unit_dpi => Ok(`Dpi(number))
   | Resolution_unit_dpcm => Ok(`Dpcm(number))
   | Resolution_unit_dppx => Ok(`Dppx(number))
@@ -280,7 +275,10 @@ let time =
 let time_runtime_module_path = "Css_types.Time";
 
 module Time = {
-  type t = [ | `S(float) | `Ms(float) ];
+  type t = [
+    | `S(float)
+    | `Ms(float)
+  ];
 };
 
 let frequency =
@@ -288,7 +286,8 @@ let frequency =
     fun
     | (Ast.Dimension(dimension), _) =>
       switch (dimension.kind) {
-      | Ast.Dimension_frequency(unit) => frequency_of_unit(dimension.value, unit)
+      | Ast.Dimension_frequency(unit) =>
+        frequency_of_unit(dimension.value, unit)
       | _ => invalid_dimension_unit("frequency", dimension.unit)
       }
     | _ => Error(["Expected frequency."]),
@@ -348,7 +347,8 @@ let custom_ident =
 let dashed_ident =
   match_component(
     fun
-    | (Ast.Ident(value), _) when String.length(value) >= 2 && String.sub(value, 0, 2) == "--" =>
+    | (Ast.Ident(value), _)
+        when String.length(value) >= 2 && String.sub(value, 0, 2) == "--" =>
       Ok(value)
     | _ => Error(["Expected a --variable."]),
   );
@@ -378,7 +378,8 @@ let hex_color =
   match_component(
     fun
     | (Ast.Hash((str, _)), _)
-      when String.length(str) >= 3 && String.length(str) <= 8 => Ok(str)
+        when String.length(str) >= 3 && String.length(str) <= 8 =>
+      Ok(str)
     | _ => Error(["Expected a hex-color."]),
   );
 
@@ -396,8 +397,14 @@ let media_type =
     fun
     | (Ast.Ident(value), _) => {
         switch (value) {
-        | "only" | "not" | "and" | "or" | "layer" =>
-          Error([Format.sprintf("media_type has an invalid value: '%s'", value)])
+        | "only"
+        | "not"
+        | "and"
+        | "or"
+        | "layer" =>
+          Error([
+            Format.sprintf("media_type has an invalid value: '%s'", value),
+          ])
         | _ => Ok(value)
         };
       }
@@ -414,8 +421,13 @@ let container_name = {
   let.bind_match name = custom_ident;
   let value = {
     switch (name) {
-    | "none" | "and" | "not" | "or" =>
-      Error([Format.sprintf("container_name has an invalid value: '%s'", name)])
+    | "none"
+    | "and"
+    | "not"
+    | "or" =>
+      Error([
+        Format.sprintf("container_name has an invalid value: '%s'", name),
+      ])
     | _ => Ok(name)
     };
   };
@@ -446,7 +458,8 @@ let custom_ident_without_span_or_auto =
     | (Ast.Ident("auto"), _)
     | (Ast.String("auto"), _)
     | (Ast.Ident("span"), _)
-    | (Ast.String("span"), _) => Error(["Custom ident cannot be span or auto."])
+    | (Ast.String("span"), _) =>
+      Error(["Custom ident cannot be span or auto."])
     | (Ast.Ident(value), _)
     | (Ast.String(value), _) => Ok(value)
     | _ => Error(["expected an identifier."]),

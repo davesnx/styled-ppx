@@ -161,7 +161,7 @@ and selector = (ast: Ast.selector) => {
     };
   }
   and render_selector_combinator = combinator => {
-    switch (combinator: Ast.selector_combinator) {
+    switch ((combinator: Ast.selector_combinator)) {
     | Ast.Selector_descendant => " "
     | Selector_child => " > "
     | Selector_adjacent_sibling => " + "
@@ -169,7 +169,7 @@ and selector = (ast: Ast.selector) => {
     };
   }
   and render_relative_combinator = combinator => {
-    switch (combinator: Ast.selector_combinator) {
+    switch ((combinator: Ast.selector_combinator)) {
     | Ast.Selector_descendant => ""
     | Selector_child => "> "
     | Selector_adjacent_sibling => "+ "
@@ -178,11 +178,10 @@ and selector = (ast: Ast.selector) => {
   }
   and render_right_combinator = right => {
     right
-      |> List.map(((combinator, s)) => {
-          render_selector_combinator(combinator)
-          ++ selector(s)
-        })
-      |> String.concat("");
+    |> List.map(((combinator, s)) => {
+         render_selector_combinator(combinator) ++ selector(s)
+       })
+    |> String.concat("");
   }
   and render_relative_selector =
       ({ combinator, complex_selector }: Ast.relative_selector) => {
@@ -216,8 +215,8 @@ and component_value = (ast: Ast.component_value) => {
   | String(string) => "\"" ++ string ++ "\""
   | Uri(string) => "url(\"" ++ string ++ "\")"
   | Delim(value) => delimiter(value)
-  | Function({name: (name, _), body: (body, _), _}) =>
-    Printf.sprintf("%s(%s)", name, component_value_list(body));
+  | Function({ name: (name, _), body: (body, _), _ }) =>
+    Printf.sprintf("%s(%s)", name, component_value_list(body))
   | Hash((string, _)) => "#" ++ string
   | Number(n) => Tokens.float_to_string(n)
   | Unicode_range(string) => string

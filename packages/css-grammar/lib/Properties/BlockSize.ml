@@ -9,6 +9,4 @@ let property_block_size : property_block_size Rule.rule =
   Property_block_size.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "block-size", pack_module (module Property_block_size);
-  ]
+  [ Property "block-size", pack_module (module Property_block_size) ]

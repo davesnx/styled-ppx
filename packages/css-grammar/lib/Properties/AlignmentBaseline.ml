@@ -13,5 +13,6 @@ let property_alignment_baseline : property_alignment_baseline Rule.rule =
 
 let entries : (kind * packed_rule) list =
   [
-    Property "alignment-baseline", pack_module (module Property_alignment_baseline);
+    ( Property "alignment-baseline",
+      pack_module (module Property_alignment_baseline) );
   ]

@@ -8,6 +8,4 @@ module Property_scale =
 let property_scale : property_scale Rule.rule = Property_scale.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "scale", pack_module (module Property_scale);
-  ]
+  [ Property "scale", pack_module (module Property_scale) ]

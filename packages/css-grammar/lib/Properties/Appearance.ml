@@ -10,6 +10,4 @@ let property_appearance : property_appearance Rule.rule =
   Property_appearance.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "appearance", pack_module (module Property_appearance);
-  ]
+  [ Property "appearance", pack_module (module Property_appearance) ]

@@ -186,25 +186,38 @@ let entries : (kind * packed_rule) list =
   [
     Property "media-type", pack_module (module Property_media_type);
     Property "media-any-hover", pack_module (module Property_media_any_hover);
-    Property "media-any-pointer", pack_module (module Property_media_any_pointer);
-    Property "media-color-gamut", pack_module (module Property_media_color_gamut);
-    Property "media-color-index", pack_module (module Property_media_color_index);
-    Property "media-display-mode", pack_module (module Property_media_display_mode);
-    Property "media-forced-colors", pack_module (module Property_media_forced_colors);
+    ( Property "media-any-pointer",
+      pack_module (module Property_media_any_pointer) );
+    ( Property "media-color-gamut",
+      pack_module (module Property_media_color_gamut) );
+    ( Property "media-color-index",
+      pack_module (module Property_media_color_index) );
+    ( Property "media-display-mode",
+      pack_module (module Property_media_display_mode) );
+    ( Property "media-forced-colors",
+      pack_module (module Property_media_forced_colors) );
     Property "media-grid", pack_module (module Property_media_grid);
     Property "media-hover", pack_module (module Property_media_hover);
-    Property "media-inverted-colors", pack_module (module Property_media_inverted_colors);
-    Property "media-max-aspect-ratio", pack_module (module Property_media_max_aspect_ratio);
-    Property "media-max-resolution", pack_module (module Property_media_max_resolution);
-    Property "media-min-aspect-ratio", pack_module (module Property_media_min_aspect_ratio);
-    Property "media-min-color-index", pack_module (module Property_media_min_color_index);
-    Property "media-min-resolution", pack_module (module Property_media_min_resolution);
+    ( Property "media-inverted-colors",
+      pack_module (module Property_media_inverted_colors) );
+    ( Property "media-max-aspect-ratio",
+      pack_module (module Property_media_max_aspect_ratio) );
+    ( Property "media-max-resolution",
+      pack_module (module Property_media_max_resolution) );
+    ( Property "media-min-aspect-ratio",
+      pack_module (module Property_media_min_aspect_ratio) );
+    ( Property "media-min-color-index",
+      pack_module (module Property_media_min_color_index) );
+    ( Property "media-min-resolution",
+      pack_module (module Property_media_min_resolution) );
     Property "media-monochrome", pack_module (module Property_media_monochrome);
-    Property "media-orientation", pack_module (module Property_media_orientation);
+    ( Property "media-orientation",
+      pack_module (module Property_media_orientation) );
     Property "media-pointer", pack_module (module Property_media_pointer);
     ( Property "media-prefers-color-scheme",
       pack_module (module Property_media_prefers_color_scheme) );
-    Property "media-prefers-contrast", pack_module (module Property_media_prefers_contrast);
+    ( Property "media-prefers-contrast",
+      pack_module (module Property_media_prefers_contrast) );
     ( Property "media-prefers-reduced-motion",
       pack_module (module Property_media_prefers_reduced_motion) );
     Property "media-resolution", pack_module (module Property_media_resolution);

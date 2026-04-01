@@ -7,7 +7,7 @@ let parse = input => {
   let values = Lexer.from_string(input);
   let loc =
     switch (List.rev(values)) {
-    | [{Lexer.start_pos, end_pos, _}, ..._] => {
+    | [{ Lexer.start_pos, end_pos, _ }, ..._] => {
         Ppxlib.Location.loc_start: start_pos,
         loc_end: end_pos,
         loc_ghost: false,
@@ -15,10 +15,7 @@ let parse = input => {
     | [] => Ppxlib.Location.none
     };
   let values =
-    values
-    |> List.map(({Lexer.txt, _}: Lexer.token_with_location) =>
-         txt
-       );
+    values |> List.map(({ Lexer.txt, _ }: Lexer.token_with_location) => txt);
   (loc, values);
 };
 
@@ -201,12 +198,29 @@ let success_tests =
     (
       {|
     div /*nice*/ /* nice */   /*ice*/.b {}|},
-      [WS, IDENT("div"), WS, DELIM("."), IDENT("b"), WS, LEFT_BRACE, RIGHT_BRACE],
+      [
+        WS,
+        IDENT("div"),
+        WS,
+        DELIM("."),
+        IDENT("b"),
+        WS,
+        LEFT_BRACE,
+        RIGHT_BRACE,
+      ],
     ),
     (
       {|
     div/*nice*//* nice *//*ice*/.b {}|},
-      [WS, IDENT("div"), DELIM("."), IDENT("b"), WS, LEFT_BRACE, RIGHT_BRACE],
+      [
+        WS,
+        IDENT("div"),
+        DELIM("."),
+        IDENT("b"),
+        WS,
+        LEFT_BRACE,
+        RIGHT_BRACE,
+      ],
     ),
     ({|nth-child(|}, [NTH_FUNCTION("nth-child")]),
   ]
@@ -218,7 +232,7 @@ let success_tests =
        test_case(input, `Quick, () =>
          check(string, "should match" ++ input, inputTokens, outputTokens)
        );
-      });
+     });
 
 let lexer_error_tests =
   [("/*", "Unterminated comment at the end of the string")]
@@ -232,7 +246,7 @@ let lexer_error_tests =
            check(string, "should match" ++ input, msg, output)
          }
        )
-      });
+     });
 
 let soft_error_tests =
   [
@@ -282,7 +296,7 @@ let soft_error_tests =
            );
          },
        )
-      });
+     });
 
 let error_tests = lexer_error_tests @ soft_error_tests;
 
@@ -407,7 +421,7 @@ let test_with_location =
          );
 
        Alcotest.test_case(input, `Quick, assertion);
-      });
+     });
 
 let token_of_delimiter_string_tests = {
   let show_option_token =
@@ -464,7 +478,7 @@ let token_of_delimiter_string_tests = {
            );
          },
        )
-      });
+     });
 };
 
 let tests =

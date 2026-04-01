@@ -11,5 +11,6 @@ let property_hanging_punctuation : property_hanging_punctuation Rule.rule =
 
 let entries : (kind * packed_rule) list =
   [
-    Property "hanging-punctuation", pack_module (module Property_hanging_punctuation);
+    ( Property "hanging-punctuation",
+      pack_module (module Property_hanging_punctuation) );
   ]

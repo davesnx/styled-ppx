@@ -8,6 +8,4 @@ module Property_isolation =
 let property_isolation : property_isolation Rule.rule = Property_isolation.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "isolation", pack_module (module Property_isolation);
-  ]
+  [ Property "isolation", pack_module (module Property_isolation) ]

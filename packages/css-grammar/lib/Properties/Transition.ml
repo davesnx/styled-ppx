@@ -49,10 +49,13 @@ let property_transition_timing_function :
 let entries : (kind * packed_rule) list =
   [
     Property "transition", pack_module (module Property_transition);
-    Property "transition-behavior", pack_module (module Property_transition_behavior);
+    ( Property "transition-behavior",
+      pack_module (module Property_transition_behavior) );
     Property "transition-delay", pack_module (module Property_transition_delay);
-    Property "transition-duration", pack_module (module Property_transition_duration);
-    Property "transition-property", pack_module (module Property_transition_property);
+    ( Property "transition-duration",
+      pack_module (module Property_transition_duration) );
+    ( Property "transition-property",
+      pack_module (module Property_transition_property) );
     ( Property "transition-timing-function",
       pack_module (module Property_transition_timing_function) );
   ]

@@ -13,5 +13,6 @@ let property_dominant_baseline : property_dominant_baseline Rule.rule =
 
 let entries : (kind * packed_rule) list =
   [
-    Property "dominant-baseline", pack_module (module Property_dominant_baseline);
+    ( Property "dominant-baseline",
+      pack_module (module Property_dominant_baseline) );
   ]

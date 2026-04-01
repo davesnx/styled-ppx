@@ -8,6 +8,4 @@ module Property_right =
 let property_right : property_right Rule.rule = Property_right.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "right", pack_module (module Property_right);
-  ]
+  [ Property "right", pack_module (module Property_right) ]

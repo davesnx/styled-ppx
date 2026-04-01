@@ -3,7 +3,9 @@ module Driver = Styled_ppx_css_parser.Driver;
 module Ast = Styled_ppx_css_parser.Ast;
 
 let parse_declaration_value_component_values = (~name, value) =>
-  switch (Driver.parse_declaration(~loc=Ppxlib.Location.none, name ++ ": " ++ value)) {
+  switch (
+    Driver.parse_declaration(~loc=Ppxlib.Location.none, name ++ ": " ++ value)
+  ) {
   | Ok({ Ast.value: (values, _), _ }) => values
   | Error((_, msg)) => Alcotest.fail("parser should succeed: " ++ msg)
   };
@@ -66,8 +68,7 @@ let test_display_keywords = () => {
       | Error(msg) =>
         Alcotest.fail("parsing '" ++ keyword ++ "' should succeed: " ++ msg)
       | Ok () =>
-        let interps =
-          infer_interpolation_types("display", keyword);
+        let interps = infer_interpolation_types("display", keyword);
         Alcotest.check(
           Alcotest.int,
           "keyword " ++ keyword ++ " should have no interpolations",
@@ -177,7 +178,8 @@ let test_color_with_interpolation = () =>
 
 let test_width_with_component_values = () =>
   switch (validate_property("width", "calc(100vh + $(topMenuHeight))")) {
-  | Error(msg) => Alcotest.fail("component_value_list parsing should succeed: " ++ msg)
+  | Error(msg) =>
+    Alcotest.fail("component_value_list parsing should succeed: " ++ msg)
   | Ok () => ()
   };
 
@@ -185,23 +187,21 @@ let test_media_query_prelude_with_component_values = () =>
   switch (
     Parser.type_check(
       Parser.media_query_list,
-      parse_at_rule_prelude_values(
-        "@media screen and (min-width: 33px) {}",
-      ),
+      parse_at_rule_prelude_values("@media screen and (min-width: 33px) {}"),
     )
   ) {
   | Ok(_) => ()
   | Error(msg) =>
-    Alcotest.fail("media query component_value_list parsing should succeed: " ++ msg)
+    Alcotest.fail(
+      "media query component_value_list parsing should succeed: " ++ msg,
+    )
   };
 
 let test_container_query_prelude_with_component_values = () =>
   switch (
     Parser.type_check(
       Parser.container_condition_list,
-      parse_at_rule_prelude_values(
-        "@container name (width >= 150px) {}",
-      ),
+      parse_at_rule_prelude_values("@container name (width >= 150px) {}"),
     )
   ) {
   | Ok(_) => ()

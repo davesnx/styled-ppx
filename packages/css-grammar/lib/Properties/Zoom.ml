@@ -9,6 +9,4 @@ module Property_zoom =
 let property_zoom : property_zoom Rule.rule = Property_zoom.rule
 
 let entries : (kind * packed_rule) list =
-  [
-    Property "zoom", pack_module (module Property_zoom);
-  ]
+  [ Property "zoom", pack_module (module Property_zoom) ]

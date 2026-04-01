@@ -40,11 +40,14 @@ let property_overscroll_behavior_y : property_overscroll_behavior_y Rule.rule =
 
 let entries : (kind * packed_rule) list =
   [
-    Property "overscroll-behavior", pack_module (module Property_overscroll_behavior);
+    ( Property "overscroll-behavior",
+      pack_module (module Property_overscroll_behavior) );
     ( Property "overscroll-behavior-block",
       pack_module (module Property_overscroll_behavior_block) );
     ( Property "overscroll-behavior-inline",
       pack_module (module Property_overscroll_behavior_inline) );
-    Property "overscroll-behavior-x", pack_module (module Property_overscroll_behavior_x);
-    Property "overscroll-behavior-y", pack_module (module Property_overscroll_behavior_y);
+    ( Property "overscroll-behavior-x",
+      pack_module (module Property_overscroll_behavior_x) );
+    ( Property "overscroll-behavior-y",
+      pack_module (module Property_overscroll_behavior_y) );
   ]

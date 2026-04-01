@@ -12,5 +12,6 @@ let property_print_color_adjust : property_print_color_adjust Rule.rule =
 
 let entries : (kind * packed_rule) list =
   [
-    Property "print-color-adjust", pack_module (module Property_print_color_adjust);
+    ( Property "print-color-adjust",
+      pack_module (module Property_print_color_adjust) );
   ]
