@@ -2376,10 +2376,13 @@ let border_bottom_left_radius =
   );
 
 let border_radius =
-  monomorphic(
+  transform_with_variable(
     Property_parser.property_border_radius,
-    (~loc) => [%expr CSS.borderRadius],
-    render_length_percentage,
+    (~loc) =>
+      fun
+      | ([value], None) => render_length_percentage(~loc, value)
+      | _ => raise(Unsupported_feature),
+    (~loc, value) => [[%expr CSS.borderRadius([%e value])]],
   );
 
 let border_image_source =
