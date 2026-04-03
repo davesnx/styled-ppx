@@ -5,7 +5,6 @@ module Types = Ast;
 module Location = Ppxlib.Location;
 
 open Tokens;
-open Lexer_context;
 
 let (let.ok) = Result.bind;
 
@@ -368,6 +367,12 @@ let handle_consume_identifier =
   | Error((_, _)) => Error(Tokens.Bad_ident)
   | Ok(string) => Ok(string);
 
+type token_with_location = {
+  txt: result(Tokens.token, Tokens.error),
+  start_pos: Lexing.position,
+  end_pos: Lexing.position,
+};
+
 // https://drafts.csswg.org/css-syntax-3/#consume-ident-like-token
 let function_token: string => Tokens.token =
   fun
@@ -375,8 +380,7 @@ let function_token: string => Tokens.token =
     NTH_FUNCTION(name)
   | name => FUNCTION(name);
 
-// https://drafts.csswg.org/css-syntax-3/#consume-ident-like-token
-let consume_ident_like = (~state, lexbuf) => {
+let scan_ident_like = lexbuf => {
   let read_url = string => {
     let _ = skip_whitespace_and_comments(lexbuf);
     let is_function =
@@ -388,10 +392,16 @@ let consume_ident_like = (~state, lexbuf) => {
         | _ => false
         }
       );
-    is_function(lexbuf) ? Ok(function_token(string)) : consume_url(lexbuf);
+    if (is_function(lexbuf)) {
+      Ok(function_token(string));
+    } else {
+      switch (consume_url(lexbuf)) {
+      | Ok(token) => Ok(token)
+      | Error(error) => Error(error)
+      };
+    };
   };
 
-  // TODO: should it return IDENT() when error?
   let.ok string = consume_identifier(lexbuf) |> handle_consume_identifier;
 
   let next_is_open_paren =
@@ -407,102 +417,12 @@ let consume_ident_like = (~state, lexbuf) => {
       | '(' => ()
       | _ => ()
       };
-    state.paren_depth = state.paren_depth + 1;
     switch (string) {
     | "url" => read_url(string)
     | _ => Ok(function_token(string))
     };
   } else {
-    switch (state.mode) {
-    | Toplevel =>
-      state.mode = Selector;
-      Ok(TYPE_SELECTOR(string));
-    | Selector => Ok(TYPE_SELECTOR(string))
-    | Declaration_block =>
-      let rec scan_colon_target = (paren_depth, bracket_depth) =>
-        switch (Sedlexing.next(lexbuf)) {
-        | None => true
-        | Some(c) => scan_colon_char(c, paren_depth, bracket_depth)
-        }
-      and scan_colon_char = (c, paren_depth, bracket_depth) => {
-        let code = Uchar.to_int(c);
-        switch (code) {
-        | 34 => scan_string(34, paren_depth, bracket_depth)
-        | 39 => scan_string(39, paren_depth, bracket_depth)
-        | 40 => scan_colon_target(paren_depth + 1, bracket_depth)
-        | 41 =>
-          let next_paren_depth = paren_depth > 0 ? paren_depth - 1 : 0;
-          scan_colon_target(next_paren_depth, bracket_depth);
-        | 91 => scan_colon_target(paren_depth, bracket_depth + 1)
-        | 93 =>
-          let next_bracket_depth = bracket_depth > 0 ? bracket_depth - 1 : 0;
-          scan_colon_target(paren_depth, next_bracket_depth);
-        | 123 =>
-          paren_depth == 0 && bracket_depth == 0
-            ? false : scan_colon_target(paren_depth, bracket_depth)
-        | 59
-        | 125 =>
-          paren_depth == 0 && bracket_depth == 0
-            ? true : scan_colon_target(paren_depth, bracket_depth)
-        | 47 => scan_slash(paren_depth, bracket_depth)
-        | _ => scan_colon_target(paren_depth, bracket_depth)
-        };
-      }
-      and scan_string = (quote, paren_depth, bracket_depth) =>
-        switch (Sedlexing.next(lexbuf)) {
-        | None => true
-        | Some(c) =>
-          let code = Uchar.to_int(c);
-          if (code == quote) {
-            scan_colon_target(paren_depth, bracket_depth);
-          } else if (code == 92) {
-            let _ = Sedlexing.next(lexbuf);
-            scan_string(quote, paren_depth, bracket_depth);
-          } else {
-            scan_string(quote, paren_depth, bracket_depth);
-          };
-        }
-      and scan_slash = (paren_depth, bracket_depth) =>
-        switch (Sedlexing.next(lexbuf)) {
-        | None => true
-        | Some(c) =>
-          if (Uchar.to_int(c) == 42) {
-            scan_comment(false, paren_depth, bracket_depth);
-          } else {
-            scan_colon_char(c, paren_depth, bracket_depth);
-          }
-        }
-      and scan_comment = (prev_star, paren_depth, bracket_depth) =>
-        switch (Sedlexing.next(lexbuf)) {
-        | None => true
-        | Some(c) =>
-          let code = Uchar.to_int(c);
-          if (prev_star && code == 47) {
-            scan_colon_target(paren_depth, bracket_depth);
-          } else {
-            scan_comment(code == 42, paren_depth, bracket_depth);
-          };
-        };
-      let is_property_colon =
-        check(lexbuf => {
-          switch (Sedlexing.next(lexbuf)) {
-          | Some(c1) when Uchar.to_int(c1) == 58 => scan_colon_target(0, 0)
-          | _ => false
-          }
-        });
-      if (is_property_colon(lexbuf)) {
-        state.last_was_ident = true;
-        Ok(IDENT(string));
-      } else {
-        state.mode = Selector;
-        state.last_was_ident = false;
-        Ok(TYPE_SELECTOR(string));
-      };
-    | Declaration_value
-    | At_rule_prelude =>
-      state.last_was_ident = false;
-      Ok(IDENT(string));
-    };
+    Ok(Tokens.IDENT(string));
   };
 };
 
@@ -522,267 +442,274 @@ let consume_numeric = lexbuf => {
   };
 };
 
+type interpolation_state = {
+  buffer: Buffer.t,
+  depth: ref(int),
+  brace_depth: ref(int),
+  result_str: ref(option(string)),
+  content_end: ref(Lexing.position),
+  error_opt: ref(option(Tokens.error)),
+};
+
+let interpolation_add_char = (state, ch) => {
+  Buffer.add_utf_8_uchar(state.buffer, ch);
+};
+
+let interpolation_set_error = (state, err) => {
+  state.error_opt := Some(err);
+};
+
+let interpolation_terminal_error = state =>
+  state.brace_depth^ > 0
+    ? Tokens.Unclosed_brace_in_interpolation
+    : Tokens.Unclosed_interpolation;
+
+let interpolation_store_result = (state, end_pos) => {
+  state.content_end := end_pos;
+  state.result_str := Some(Buffer.contents(state.buffer));
+};
+
+let interpolation_finish = (state, lexbuf) => {
+  let (_, end_pos) = Sedlexing.lexing_positions(lexbuf);
+  interpolation_store_result(
+    state,
+    {
+      ...end_pos,
+      pos_cnum: end_pos.pos_cnum - 1,
+    },
+  );
+};
+
+let interpolation_track_nested_code = (state, code) => {
+  if (code == 0x0028) {
+    state.depth := state.depth^ + 1;
+  } else if (code == 0x0029) {
+    state.depth := state.depth^ - 1;
+  } else if (code == 0x007B) {
+    state.brace_depth := state.brace_depth^ + 1;
+  } else if (code == 0x007D && state.brace_depth^ > 0) {
+    state.brace_depth := state.brace_depth^ - 1;
+  };
+};
+
+let consume_interpolation_ocaml_comment = (state, lexbuf) => {
+  let cdepth = ref(1);
+  while (cdepth^ > 0 && state.error_opt^ == None) {
+    switch (Sedlexing.next(lexbuf)) {
+    | None => interpolation_set_error(state, Tokens.Unclosed_comment_in_interpolation)
+    | Some(cc) =>
+      interpolation_add_char(state, cc);
+      let c = Uchar.to_int(cc);
+      if (c == 0x0028) {
+        Sedlexing.mark(lexbuf, 0);
+        switch (Sedlexing.next(lexbuf)) {
+        | None => interpolation_set_error(state, Tokens.Unclosed_comment_in_interpolation)
+        | Some(mc) =>
+          if (Uchar.to_int(mc) == 0x002A) {
+            interpolation_add_char(state, mc);
+            cdepth := cdepth^ + 1;
+          } else {
+            let _ = Sedlexing.backtrack(lexbuf);
+            ();
+          }
+        };
+      } else if (c == 0x002A) {
+        Sedlexing.mark(lexbuf, 0);
+        switch (Sedlexing.next(lexbuf)) {
+        | None => interpolation_set_error(state, Tokens.Unclosed_comment_in_interpolation)
+        | Some(mc) =>
+          if (Uchar.to_int(mc) == 0x0029) {
+            interpolation_add_char(state, mc);
+            cdepth := cdepth^ - 1;
+          } else {
+            let _ = Sedlexing.backtrack(lexbuf);
+            ();
+          }
+        };
+      };
+    };
+  };
+};
+
+let consume_interpolation_c_style_comment = (state, lexbuf) => {
+  let rec read = prev_star =>
+    switch (Sedlexing.next(lexbuf)) {
+    | None => interpolation_set_error(state, Tokens.Unclosed_comment_in_interpolation)
+    | Some(cc) =>
+      interpolation_add_char(state, cc);
+      if (prev_star && Uchar.to_int(cc) == 0x002F) {
+        ();
+      } else {
+        read(Uchar.to_int(cc) == 0x002A);
+      }
+    };
+  read(false);
+};
+
+let consume_interpolation_double_quoted_string = (state, lexbuf) => {
+  let in_str = ref(true);
+  while (in_str^ && state.error_opt^ == None) {
+    switch (Sedlexing.next(lexbuf)) {
+    | None => interpolation_set_error(state, Tokens.Unclosed_string_in_interpolation)
+    | Some(sc) =>
+      interpolation_add_char(state, sc);
+      let s = Uchar.to_int(sc);
+      if (s == 0x0022) {
+        in_str := false;
+      } else if (s == 0x005C) {
+        switch (Sedlexing.next(lexbuf)) {
+        | None => interpolation_set_error(state, Tokens.Unclosed_string_in_interpolation)
+        | Some(ec) => interpolation_add_char(state, ec)
+        };
+      };
+    };
+  };
+};
+
+let consume_interpolation_single_quoted = (state, lexbuf) => {
+  switch (Sedlexing.next(lexbuf)) {
+  | None => interpolation_set_error(state, Tokens.Unclosed_interpolation)
+  | Some(next_ch) =>
+    let nc = Uchar.to_int(next_ch);
+    if (nc == 0x005C) {
+      interpolation_add_char(state, next_ch);
+      let in_esc = ref(true);
+      while (in_esc^ && state.error_opt^ == None) {
+        switch (Sedlexing.next(lexbuf)) {
+        | None => interpolation_set_error(state, Tokens.Unclosed_char_in_interpolation)
+        | Some(ec) =>
+          interpolation_add_char(state, ec);
+          if (Uchar.to_int(ec) == 0x0027) {
+            in_esc := false;
+          };
+        };
+      };
+    } else if (nc == 0x0027) {
+      interpolation_add_char(state, next_ch);
+    } else {
+      Sedlexing.mark(lexbuf, 0);
+      switch (Sedlexing.next(lexbuf)) {
+      | None =>
+        if (nc == 0x0029 && state.depth^ == 1 && state.brace_depth^ == 0) {
+          interpolation_finish(state, lexbuf);
+        } else {
+          interpolation_add_char(state, next_ch);
+          interpolation_track_nested_code(state, nc);
+          if (state.result_str^ == None && state.error_opt^ == None) {
+            interpolation_set_error(state, interpolation_terminal_error(state));
+          };
+        }
+      | Some(third) =>
+        let tc = Uchar.to_int(third);
+        if (tc == 0x0027) {
+          interpolation_add_char(state, next_ch);
+          interpolation_add_char(state, third);
+        } else if (nc == 0x0029 && state.depth^ == 1 && state.brace_depth^ == 0) {
+          let _ = Sedlexing.backtrack(lexbuf);
+          let (_, end_pos) = Sedlexing.lexing_positions(lexbuf);
+          interpolation_store_result(state, end_pos);
+        } else {
+          interpolation_add_char(state, next_ch);
+          interpolation_track_nested_code(state, nc);
+          interpolation_add_char(state, third);
+          interpolation_track_nested_code(state, tc);
+          if (tc == 0x0029 && state.depth^ == 0 && state.brace_depth^ == 0) {
+            interpolation_finish(state, lexbuf);
+          };
+        }
+      };
+    }
+  };
+};
+
+let consume_interpolation_open_paren = (state, lexbuf, ch) => {
+  Sedlexing.mark(lexbuf, 0);
+  switch (Sedlexing.next(lexbuf)) {
+  | None => interpolation_set_error(state, Tokens.Unclosed_interpolation)
+  | Some(next_ch) =>
+    if (Uchar.to_int(next_ch) == 0x002A) {
+      interpolation_add_char(state, ch);
+      interpolation_add_char(state, next_ch);
+      consume_interpolation_ocaml_comment(state, lexbuf);
+    } else {
+      let _ = Sedlexing.backtrack(lexbuf);
+      interpolation_add_char(state, ch);
+      state.depth := state.depth^ + 1;
+    }
+  };
+};
+
+let consume_interpolation_close_paren = (state, lexbuf, ch) => {
+  state.depth := state.depth^ - 1;
+  if (state.depth^ == 0 && state.brace_depth^ == 0) {
+    interpolation_finish(state, lexbuf);
+  } else {
+    interpolation_add_char(state, ch);
+  };
+};
+
+let consume_interpolation_slash = (state, lexbuf, ch) => {
+  Sedlexing.mark(lexbuf, 0);
+  switch (Sedlexing.next(lexbuf)) {
+  | None => interpolation_set_error(state, Tokens.Unclosed_interpolation)
+  | Some(next_ch) =>
+    if (Uchar.to_int(next_ch) == 0x002A) {
+      interpolation_add_char(state, ch);
+      interpolation_add_char(state, next_ch);
+      consume_interpolation_c_style_comment(state, lexbuf);
+    } else {
+      let _ = Sedlexing.backtrack(lexbuf);
+      interpolation_add_char(state, ch);
+    }
+  };
+};
+
 let consume_interpolation = lexbuf => {
   let (_, content_start) = Sedlexing.lexing_positions(lexbuf);
-  let buffer = Buffer.create(64);
-  let depth = ref(1);
-  let brace_depth = ref(0);
-  let result_str = ref(None);
-  let content_end = ref(content_start);
-  let error_opt: ref(option(Tokens.error)) = ref(None);
-
-  let set_error = err => {
-    error_opt := Some(err);
+  let state: interpolation_state = {
+    buffer: Buffer.create(64),
+    depth: ref(1),
+    brace_depth: ref(0),
+    result_str: ref(None),
+    content_end: ref(content_start),
+    error_opt: ref(None),
   };
 
-  let consume_ocaml_comment = () => {
-    let cdepth = ref(1);
-    while (cdepth^ > 0 && error_opt^ == None) {
-      switch (Sedlexing.next(lexbuf)) {
-      | None => set_error(Tokens.Unclosed_comment_in_interpolation)
-      | Some(cc) =>
-        Buffer.add_utf_8_uchar(buffer, cc);
-        let c = Uchar.to_int(cc);
-        if (c == 0x0028) {
-          Sedlexing.mark(lexbuf, 0);
-          switch (Sedlexing.next(lexbuf)) {
-          | None => set_error(Tokens.Unclosed_comment_in_interpolation)
-          | Some(mc) =>
-            let mc_code = Uchar.to_int(mc);
-            if (mc_code == 0x002A) {
-              Buffer.add_utf_8_uchar(buffer, mc);
-              cdepth := cdepth^ + 1;
-            } else {
-              let _ = Sedlexing.backtrack(lexbuf);
-              ();
-            };
-          };
-        } else if (c == 0x002A) {
-          Sedlexing.mark(lexbuf, 0);
-          switch (Sedlexing.next(lexbuf)) {
-          | None => set_error(Tokens.Unclosed_comment_in_interpolation)
-          | Some(mc) =>
-            let mc_code = Uchar.to_int(mc);
-            if (mc_code == 0x0029) {
-              Buffer.add_utf_8_uchar(buffer, mc);
-              cdepth := cdepth^ - 1;
-            } else {
-              let _ = Sedlexing.backtrack(lexbuf);
-              ();
-            };
-          };
-        };
-      };
-    };
-  };
-
-  let consume_c_style_comment = () => {
-    let rec read = prev_star =>
-      switch (Sedlexing.next(lexbuf)) {
-      | None => set_error(Tokens.Unclosed_comment_in_interpolation)
-      | Some(cc) =>
-        Buffer.add_utf_8_uchar(buffer, cc);
-        let c = Uchar.to_int(cc);
-        if (prev_star && c == 0x002F) {
-          ();
-        } else {
-          read(c == 0x002A);
-        };
-      };
-    read(false);
-  };
-
-  while (result_str^ == None && error_opt^ == None) {
+  while (state.result_str^ == None && state.error_opt^ == None) {
     switch (Sedlexing.next(lexbuf)) {
-    | None =>
-      set_error(
-        brace_depth^ > 0
-          ? Tokens.Unclosed_brace_in_interpolation
-          : Tokens.Unclosed_interpolation,
-      )
+    | None => interpolation_set_error(state, interpolation_terminal_error(state))
     | Some(ch) =>
-      let code = Uchar.to_int(ch);
-      switch (code) {
-      | 0x0028 =>
-        Sedlexing.mark(lexbuf, 0);
-        switch (Sedlexing.next(lexbuf)) {
-        | None => set_error(Tokens.Unclosed_interpolation)
-        | Some(next_ch) =>
-          let nc = Uchar.to_int(next_ch);
-          if (nc == 0x002A) {
-            Buffer.add_utf_8_uchar(buffer, ch);
-            Buffer.add_utf_8_uchar(buffer, next_ch);
-            consume_ocaml_comment();
-          } else {
-            let _ = Sedlexing.backtrack(lexbuf);
-            Buffer.add_utf_8_uchar(buffer, ch);
-            depth := depth^ + 1;
-          };
-        };
-      | 0x0029 =>
-        depth := depth^ - 1;
-        if (depth^ == 0 && brace_depth^ == 0) {
-          let (_, end_pos) = Sedlexing.lexing_positions(lexbuf);
-          content_end :=
-            {
-              ...end_pos,
-              pos_cnum: end_pos.pos_cnum - 1,
-            };
-          result_str := Some(Buffer.contents(buffer));
-        } else {
-          Buffer.add_utf_8_uchar(buffer, ch);
-        };
+      switch (Uchar.to_int(ch)) {
+      | 0x0028 => consume_interpolation_open_paren(state, lexbuf, ch)
+      | 0x0029 => consume_interpolation_close_paren(state, lexbuf, ch)
       | 0x007B =>
-        brace_depth := brace_depth^ + 1;
-        Buffer.add_utf_8_uchar(buffer, ch);
+        state.brace_depth := state.brace_depth^ + 1;
+        interpolation_add_char(state, ch)
       | 0x007D =>
-        if (brace_depth^ > 0) {
-          brace_depth := brace_depth^ - 1;
+        if (state.brace_depth^ > 0) {
+          state.brace_depth := state.brace_depth^ - 1;
         };
-        Buffer.add_utf_8_uchar(buffer, ch);
-      | 0x002F =>
-        Sedlexing.mark(lexbuf, 0);
-        switch (Sedlexing.next(lexbuf)) {
-        | None => set_error(Tokens.Unclosed_interpolation)
-        | Some(next_ch) =>
-          let nc = Uchar.to_int(next_ch);
-          if (nc == 0x002A) {
-            Buffer.add_utf_8_uchar(buffer, ch);
-            Buffer.add_utf_8_uchar(buffer, next_ch);
-            consume_c_style_comment();
-          } else {
-            let _ = Sedlexing.backtrack(lexbuf);
-            Buffer.add_utf_8_uchar(buffer, ch);
-          };
-        };
+        interpolation_add_char(state, ch)
+      | 0x002F => consume_interpolation_slash(state, lexbuf, ch)
       | 0x0022 =>
-        Buffer.add_utf_8_uchar(buffer, ch);
-        let in_str = ref(true);
-        while (in_str^ && error_opt^ == None) {
-          switch (Sedlexing.next(lexbuf)) {
-          | None => set_error(Tokens.Unclosed_string_in_interpolation)
-          | Some(sc) =>
-            Buffer.add_utf_8_uchar(buffer, sc);
-            let s = Uchar.to_int(sc);
-            if (s == 0x0022) {
-              in_str := false;
-            } else if (s == 0x005C) {
-              switch (Sedlexing.next(lexbuf)) {
-              | None => set_error(Tokens.Unclosed_string_in_interpolation)
-              | Some(ec) => Buffer.add_utf_8_uchar(buffer, ec)
-              };
-            };
-          };
-        };
+        interpolation_add_char(state, ch);
+        consume_interpolation_double_quoted_string(state, lexbuf)
       | 0x0027 =>
-        Buffer.add_utf_8_uchar(buffer, ch);
-        switch (Sedlexing.next(lexbuf)) {
-        | None => set_error(Tokens.Unclosed_interpolation)
-        | Some(next_ch) =>
-          let nc = Uchar.to_int(next_ch);
-          if (nc == 0x005C) {
-            Buffer.add_utf_8_uchar(buffer, next_ch);
-            let in_esc = ref(true);
-            while (in_esc^ && error_opt^ == None) {
-              switch (Sedlexing.next(lexbuf)) {
-              | None => set_error(Tokens.Unclosed_char_in_interpolation)
-              | Some(ec) =>
-                Buffer.add_utf_8_uchar(buffer, ec);
-                if (Uchar.to_int(ec) == 0x0027) {
-                  in_esc := false;
-                };
-              };
-            };
-          } else if (nc == 0x0027) {
-            Buffer.add_utf_8_uchar(buffer, next_ch);
-          } else {
-            Sedlexing.mark(lexbuf, 0);
-            switch (Sedlexing.next(lexbuf)) {
-            | None =>
-              if (nc == 0x0029 && depth^ == 1 && brace_depth^ == 0) {
-                let (_, end_pos) = Sedlexing.lexing_positions(lexbuf);
-                content_end :=
-                  {
-                    ...end_pos,
-                    pos_cnum: end_pos.pos_cnum - 1,
-                  };
-                result_str := Some(Buffer.contents(buffer));
-              } else {
-                Buffer.add_utf_8_uchar(buffer, next_ch);
-                if (nc == 0x0028) {
-                  depth := depth^ + 1;
-                } else if (nc == 0x0029) {
-                  depth := depth^ - 1;
-                } else if (nc == 0x007B) {
-                  brace_depth := brace_depth^ + 1;
-                } else if (nc == 0x007D && brace_depth^ > 0) {
-                  brace_depth := brace_depth^ - 1;
-                };
-                if (result_str^ == None && error_opt^ == None) {
-                  set_error(
-                    brace_depth^ > 0
-                      ? Tokens.Unclosed_brace_in_interpolation
-                      : Tokens.Unclosed_interpolation,
-                  );
-                };
-              }
-            | Some(third) =>
-              let tc = Uchar.to_int(third);
-              if (tc == 0x0027) {
-                Buffer.add_utf_8_uchar(buffer, next_ch);
-                Buffer.add_utf_8_uchar(buffer, third);
-              } else if (nc == 0x0029 && depth^ == 1 && brace_depth^ == 0) {
-                let _ = Sedlexing.backtrack(lexbuf);
-                let (_, end_pos) = Sedlexing.lexing_positions(lexbuf);
-                content_end := end_pos;
-                result_str := Some(Buffer.contents(buffer));
-              } else {
-                Buffer.add_utf_8_uchar(buffer, next_ch);
-                if (nc == 0x0028) {
-                  depth := depth^ + 1;
-                } else if (nc == 0x0029) {
-                  depth := depth^ - 1;
-                } else if (nc == 0x007B) {
-                  brace_depth := brace_depth^ + 1;
-                } else if (nc == 0x007D && brace_depth^ > 0) {
-                  brace_depth := brace_depth^ - 1;
-                };
-                Buffer.add_utf_8_uchar(buffer, third);
-                if (tc == 0x0028) {
-                  depth := depth^ + 1;
-                } else if (tc == 0x0029) {
-                  depth := depth^ - 1;
-                  if (depth^ == 0 && brace_depth^ == 0) {
-                    let (_, end_pos) = Sedlexing.lexing_positions(lexbuf);
-                    content_end :=
-                      {
-                        ...end_pos,
-                        pos_cnum: end_pos.pos_cnum - 1,
-                      };
-                    result_str := Some(Buffer.contents(buffer));
-                  };
-                } else if (tc == 0x007B) {
-                  brace_depth := brace_depth^ + 1;
-                } else if (tc == 0x007D && brace_depth^ > 0) {
-                  brace_depth := brace_depth^ - 1;
-                };
-              };
-            };
-          };
-        };
-      | _ => Buffer.add_utf_8_uchar(buffer, ch)
-      };
+        interpolation_add_char(state, ch);
+        consume_interpolation_single_quoted(state, lexbuf)
+      | _ => interpolation_add_char(state, ch)
+      }
     };
   };
 
-  switch (error_opt^) {
+  switch (state.error_opt^) {
   | Some(err) => Error(err)
   | None =>
-    switch (result_str^) {
+    switch (state.result_str^) {
     | Some(expr) =>
       let content_loc = {
         Ppxlib.Location.loc_start: content_start,
-        loc_end: content_end^,
+        loc_end: state.content_end^,
         loc_ghost: false,
       };
       Ok(Tokens.INTERPOLATION((expr, content_loc)));
@@ -791,7 +718,7 @@ let consume_interpolation = lexbuf => {
   };
 };
 
-let rec consume = (~state, lexbuf) => {
+let rec consume_token = lexbuf => {
   let consume_hash = () =>
     switch%sedlex (lexbuf) {
     | identifier_code_point
@@ -808,8 +735,9 @@ let rec consume = (~state, lexbuf) => {
           consume_identifier(lexbuf) |> handle_consume_identifier;
         Ok(Tokens.HASH((string, `UNRESTRICTED)));
       };
-    | _ => Ok(DELIM('#'))
+    | _ => Ok(DELIM("#"))
     };
+
   let consume_minus = () =>
     switch%sedlex (lexbuf) {
     | starts_a_number =>
@@ -817,15 +745,16 @@ let rec consume = (~state, lexbuf) => {
       consume_numeric(lexbuf);
     | starts_an_identifier =>
       Sedlexing.rollback(lexbuf);
-      consume_ident_like(~state, lexbuf);
+      scan_ident_like(lexbuf);
     | _ =>
       let _ = Sedlexing.next(lexbuf);
-      Ok(MINUS);
+      Ok(DELIM("-"));
     };
+
   let rec discard_comments = lexbuf => {
     let (start_pos, curr_pos) = Sedlexing.lexing_positions(lexbuf);
     switch%sedlex (lexbuf) {
-    | "*/" => consume(~state, lexbuf)
+    | "*/" => consume_token(lexbuf)
     | any => discard_comments(lexbuf)
     | eof =>
       raise(
@@ -835,150 +764,26 @@ let rec consume = (~state, lexbuf) => {
           "Unterminated comment at the end of the string",
         )),
       )
-    | _ => consume(~state, lexbuf)
+    | _ => consume_token(lexbuf)
     };
   };
 
-  let emit_delim = char_string => {
-    let is_combinator =
-      switch (char_string) {
-      | ">"
-      | "+"
-      | "~" => true
-      | _ => false
-      };
-    if (is_combinator && state.mode == Selector) {
-      state.last_was_combinator = true;
-    };
-    switch (Tokens.token_of_delimiter_string(char_string)) {
-    | Some(token) => Ok(token)
-    | None => Error(Tokens.Invalid_delim)
-    };
-  };
-
-  let handle_mode_transition = token => {
-    let is_ident =
-      switch (token) {
-      | IDENT(_) => true
-      | _ => false
-      };
-
-    state.last_was_combinator = false;
-    state.last_was_delimiter = false;
-
-    switch (token) {
-    | LEFT_BRACE =>
-      state.brace_depth = state.brace_depth + 1;
-      switch (state.mode) {
-      | Toplevel
-      | Selector
-      | At_rule_prelude => state.mode = Declaration_block
-      | _ => ()
-      };
-    | RIGHT_BRACE =>
-      state.brace_depth = state.brace_depth - 1;
-      state.mode = (
-        if (state.brace_depth == 0) {
-          Toplevel;
-        } else {
-          Declaration_block;
-        }
-      );
-    | COLON =>
-      switch (state.mode) {
-      | Declaration_block when state.last_was_ident =>
-        state.mode = Declaration_value
-      | Declaration_block => state.mode = Selector
-      | _ => ()
-      }
-    | SEMI_COLON =>
-      switch (state.mode) {
-      | Declaration_value => state.mode = Declaration_block
-      | _ => ()
-      }
-    | LEFT_PAREN => state.paren_depth = state.paren_depth + 1
-    | RIGHT_PAREN => state.paren_depth = state.paren_depth - 1
-    | AT_KEYFRAMES(_)
-    | AT_RULE(_)
-    | AT_RULE_STATEMENT(_) => state.mode = At_rule_prelude
-    | LEFT_BRACKET =>
-      state.bracket_depth = state.bracket_depth + 1;
-      switch (state.mode) {
-      | Toplevel
-      | Declaration_block => state.mode = Selector
-      | _ => ()
-      };
-    | RIGHT_BRACKET => state.bracket_depth = state.bracket_depth - 1
-    | DOT
-    | HASH(_)
-    | AMPERSAND
-    | ASTERISK
-    | DOUBLE_COLON =>
-      switch (state.mode) {
-      | Toplevel
-      | Declaration_block => state.mode = Selector
-      | _ => ()
-      }
-    | _ => ()
-    };
-    state.last_was_ident = is_ident;
-    token;
-  };
+  let emit_delim = s => Ok(Tokens.DELIM(s));
 
   switch%sedlex (lexbuf) {
   | whitespace =>
     let _ = skip_whitespace_and_comments(lexbuf);
-    switch (state.mode) {
-    | Selector =>
-      if (state.last_was_combinator
-          || state.last_was_delimiter
-          || state.bracket_depth > 0) {
-        state.last_was_combinator = false;
-        state.last_was_delimiter = false;
-        consume(~state, lexbuf);
-      } else {
-        let is_descendant =
-          check(lexbuf =>
-            switch%sedlex (lexbuf) {
-            | '{'
-            | ','
-            | ')'
-            | '>'
-            | '+'
-            | '~'
-            | eof => false
-            | _ => true
-            }
-          );
-        if (is_descendant(lexbuf)) {
-          Ok(Tokens.DESCENDANT_COMBINATOR);
-        } else {
-          consume(~state, lexbuf);
-        };
-      }
-    | Declaration_value
-    | At_rule_prelude => Ok(Tokens.WS)
-    | Toplevel
-    | Declaration_block => consume(~state, lexbuf)
-    };
+    Ok(Tokens.WS);
   | important => Ok(IMPORTANT)
-  | interpolation_start =>
-    switch (state.mode) {
-    | Toplevel
-    | Declaration_block => state.mode = Selector
-    | _ => ()
-    };
-    state.last_was_combinator = false;
-    state.last_was_delimiter = false;
-    consume_interpolation(lexbuf);
+  | interpolation_start => consume_interpolation(lexbuf)
   | "/*" => discard_comments(lexbuf)
   | "\"" => consume_string("\"", lexbuf)
   | "#" =>
     let.ok token = consume_hash();
-    Ok(handle_mode_transition(token));
+    Ok(token);
   | "'" => consume_string("'", lexbuf)
-  | "(" => Ok(handle_mode_transition(LEFT_PAREN))
-  | ")" => Ok(handle_mode_transition(RIGHT_PAREN))
+  | "(" => Ok(LEFT_PAREN)
+  | ")" => Ok(RIGHT_PAREN)
   | "+" =>
     let _ = Sedlexing.backtrack(lexbuf);
     if (check_if_three_code_points_would_start_a_number(lexbuf)) {
@@ -987,11 +792,7 @@ let rec consume = (~state, lexbuf) => {
       let _ = Sedlexing.next(lexbuf);
       emit_delim("+");
     };
-  | "," =>
-    if (state.mode == Selector) {
-      state.last_was_delimiter = true;
-    };
-    Ok(COMMA);
+  | "," => Ok(COMMA)
   | "-" =>
     Sedlexing.rollback(lexbuf);
     consume_minus();
@@ -1001,16 +802,16 @@ let rec consume = (~state, lexbuf) => {
       consume_numeric(lexbuf);
     } else {
       let _ = Sedlexing.next(lexbuf);
-      Ok(handle_mode_transition(DOT));
+      Ok(DELIM("."));
     };
-  | "::" => Ok(handle_mode_transition(DOUBLE_COLON))
-  | ":" => Ok(handle_mode_transition(COLON))
-  | ";" => Ok(handle_mode_transition(SEMI_COLON))
-  | "&" => Ok(handle_mode_transition(AMPERSAND))
-  | "*" => Ok(handle_mode_transition(ASTERISK))
-  | "<=" => Ok(LTE)
-  | ">=" => Ok(GTE)
-  | "<" => Ok(LESS_THAN)
+  | "::" => Ok(DOUBLE_COLON)
+  | ":" => Ok(COLON)
+  | ";" => Ok(SEMI_COLON)
+  | "&" => Ok(DELIM("&"))
+  | "*" => Ok(DELIM("*"))
+  | "<=" => Ok(DELIM("<="))
+  | ">=" => Ok(DELIM(">="))
+  | "<" => Ok(DELIM("<"))
   | "@" =>
     if (check_if_three_codepoints_would_start_an_identifier(lexbuf)) {
       let.ok string = consume_identifier(lexbuf) |> handle_consume_identifier;
@@ -1022,23 +823,20 @@ let rec consume = (~state, lexbuf) => {
         | "namespace" => Tokens.AT_RULE_STATEMENT(string)
         | _ => Tokens.AT_RULE(string)
         };
-      Ok(handle_mode_transition(token));
+      Ok(token);
     } else {
-      Ok(DELIM('@'));
+      Ok(DELIM("@"));
     }
-  | "[" => Ok(handle_mode_transition(LEFT_BRACKET))
-  | "]" => Ok(handle_mode_transition(RIGHT_BRACKET))
-  | "{" => Ok(handle_mode_transition(LEFT_BRACE))
-  | "}" => Ok(handle_mode_transition(RIGHT_BRACE))
+  | "[" => Ok(LEFT_BRACKET)
+  | "]" => Ok(RIGHT_BRACKET)
+  | "{" => Ok(LEFT_BRACE)
+  | "}" => Ok(RIGHT_BRACE)
   | "\\" =>
     Sedlexing.rollback(lexbuf);
     switch%sedlex (lexbuf) {
     | starts_with_a_valid_escape =>
       Sedlexing.rollback(lexbuf);
-      let result = consume_ident_like(~state, lexbuf);
-      state.last_was_combinator = false;
-      state.last_was_delimiter = false;
-      result;
+      scan_ident_like(lexbuf);
     | ('\\', any)
     | '\\' => Error(Invalid_code_point)
     | _ => unreachable(lexbuf)
@@ -1049,63 +847,30 @@ let rec consume = (~state, lexbuf) => {
     consume_numeric(lexbuf);
   | identifier_start_code_point =>
     let _ = Sedlexing.backtrack(lexbuf);
-    let result = consume_ident_like(~state, lexbuf);
-    // Reset flags for identifier tokens (they don't go through handle_mode_transition)
-    state.last_was_combinator = false;
-    state.last_was_delimiter = false;
-    result;
+    scan_ident_like(lexbuf);
   | eof => Ok(EOF)
   | any => emit_delim(lexeme(lexbuf))
   | _ => unreachable(lexbuf)
   };
 };
 
-let get_next_tokens_with_location = (~state, lexbuf) => {
+let next_token_with_location = lexbuf => {
   let (_, position_start) = Sedlexing.lexing_positions(lexbuf);
-  let token =
-    switch (consume(~state, lexbuf)) {
-    | Ok(token) => token
-    | Error(msg) =>
-      let (start_pos, curr_pos) = Sedlexing.lexing_positions(lexbuf);
-      raise(LexingError((start_pos, curr_pos, Tokens.show_error(msg))));
-    };
+  let value = consume_token(lexbuf);
   let (_, position_end) = Sedlexing.lexing_positions(lexbuf);
-  (token, position_start, position_end);
-};
-
-type token_with_location = {
-  txt: result(Tokens.token, Tokens.error),
-  loc: Location.t,
-};
-
-let from_string = (~initial_mode, string) => {
-  let lexbuf = Sedlexing.Utf8.from_string(string);
-  let state = {
-    mode: initial_mode,
-    paren_depth: 0,
-    brace_depth: 0,
-    bracket_depth: 0,
-    last_was_ident: false,
-    last_was_combinator: false,
-    last_was_delimiter: false,
+  {
+    txt: value,
+    start_pos: position_start,
+    end_pos: position_end,
   };
+};
+let from_string = string => {
+  let lexbuf = Sedlexing.Utf8.from_string(string);
   let rec read = acc => {
-    let (loc_start, _) = Sedlexing.lexing_positions(lexbuf);
-    let value = consume(~state, lexbuf);
-    let (_, loc_end) = Sedlexing.lexing_positions(lexbuf);
-
-    let token_with_loc: token_with_location = {
-      txt: value,
-      loc: {
-        loc_start,
-        loc_end,
-        loc_ghost: false,
-      },
-    };
-
+    let token_with_loc = next_token_with_location(lexbuf);
     let acc = [token_with_loc, ...acc];
-    switch (value) {
-    | Ok(EOF) => acc
+    switch (token_with_loc.txt) {
+    | Ok(Tokens.EOF) => List.rev(acc)
     | _ => read(acc)
     };
   };

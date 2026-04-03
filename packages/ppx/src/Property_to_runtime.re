@@ -2,9 +2,10 @@ module Location = Ppxlib.Location;
 module Parsetree = Ppxlib.Parsetree;
 module Builder = Ppxlib.Ast_builder.Default;
 
-module Standard = Css_property_parser.Standard;
-module Property_parser = Css_property_parser.Parser;
-module Types = Property_parser.Types;
+module Standard = Css_grammar.Css_value_types;
+module Property_parser = Css_grammar;
+module Types = Property_parser;
+module Parser_ast = Styled_ppx_css_parser.Ast;
 
 let (let.ok) = Result.bind;
 
@@ -12,19 +13,20 @@ let (let.ok) = Result.bind;
 /* TODO: Add payload on those exceptions */
 exception Unsupported_feature;
 
-/* This should be thrown when handling cases impossible to generate by the css property parser */
+/* This should be thrown when handling cases impossible to generate by the css grammar parser */
 exception Impossible_state;
 
 exception Invalid_value(string);
 
 let id = Fun.id;
 
-/* Why this type contains so much when only `string_to_expr` is used? */
 type transform('ast, 'value) = {
-  ast_of_string: string => result('ast, string),
+  ast_of_component_values:
+    Parser_ast.component_value_list => result('ast, string),
   ast_to_expr: (~loc: Location.t, 'ast) => list(Parsetree.expression),
-  string_to_expr:
-    (~loc: Location.t, string) => result(list(Parsetree.expression), string),
+  component_value_list_to_expr:
+    (~loc: Location.t, Parser_ast.component_value_list) =>
+    result(list(Parsetree.expression), string),
 };
 
 let add_CSS_rule_constraint = (~loc, expr) => {
@@ -42,30 +44,36 @@ let add_CSS_rule_constraint = (~loc, expr) => {
 
 /* TODO: emit is better to keep value_of_ast and value_to_expr in the same fn */
 let emit = (property, value_of_ast, value_to_expr) => {
-  let ast_of_string = Css_property_parser.Parser.parse(property);
+  let type_check = Css_grammar.type_check(property);
+  let ast_of_component_values = values =>
+    type_check(values)
+    |> Result.map_error(Css_grammar.Rule.format_error_info);
   let ast_to_expr = (~loc, ast) =>
     value_of_ast(~loc, ast) |> value_to_expr(~loc);
-  let string_to_expr = (~loc, string) =>
-    ast_of_string(string) |> Result.map(ast_to_expr(~loc));
+  let component_value_list_to_expr = (~loc, values) =>
+    ast_of_component_values(values) |> Result.map(ast_to_expr(~loc));
 
   {
-    ast_of_string,
+    ast_of_component_values,
     ast_to_expr,
-    string_to_expr,
+    component_value_list_to_expr,
   };
 };
 
 let emit_shorthand = (parser, mapper, value_to_expr) => {
-  let ast_of_string = Css_property_parser.Parser.parse(parser);
+  let type_check = Css_grammar.type_check(parser);
+  let ast_of_component_values = values =>
+    type_check(values)
+    |> Result.map_error(Css_grammar.Rule.format_error_info);
   let ast_to_expr = (~loc, ast) =>
     ast |> List.map(mapper(~loc)) |> value_to_expr(~loc);
-  let string_to_expr = (~loc, string) =>
-    ast_of_string(string) |> Result.map(ast_to_expr(~loc));
+  let component_value_list_to_expr = (~loc, values) =>
+    ast_of_component_values(values) |> Result.map(ast_to_expr(~loc));
 
   {
-    ast_of_string,
+    ast_of_component_values,
     ast_to_expr,
-    string_to_expr,
+    component_value_list_to_expr,
   };
 };
 
@@ -82,17 +90,19 @@ let render_variable = (~loc, name) =>
   };
 
 let transform_with_variable = (parser, mapper, value_to_expr) => {
-  Css_property_parser.(
+  Css_grammar.(
     emit(
-      Combinator.xor([
+      Combinators.xor([
         /* If the entire CSS value is interpolated, we treat it as a `Variable */
-        Rule.Match.map(Standard.interpolation, data => `Variable(data)),
+        Rule.Match.map(Css_value_types.interpolation, data =>
+          `Variable(data)
+        ),
         /* Otherwise it's a regular CSS `Value and match the parser */
         Rule.Match.map(parser, data => `Value(data)),
       ]),
       (~loc) =>
         fun
-        | `Variable(name) => render_variable(~loc, name)
+        | `Variable(name) => render_variable(~loc, String.concat(".", name))
         | `Value(ast) => mapper(~loc, ast),
       (~loc, expression) => {
         switch (expression) {
@@ -175,10 +185,11 @@ let to_camel_case = txt =>
 
 let render_css_global_values = (~loc, name, value) => {
   let.ok value =
-    Css_property_parser.Parser.parse(
-      Css_property_parser.Standard.css_wide_keywords,
+    Css_grammar.type_check(
+      Css_grammar.Css_value_types.css_wide_keywords,
       value,
-    );
+    )
+    |> Result.map_error(Css_grammar.Rule.format_error_info);
 
   let value =
     switch (value) {
@@ -420,7 +431,7 @@ and render_extended_angle = (~loc) =>
   fun
   | `Angle(a) => render_angle(~loc, a)
   | `Function_calc(fc) => render_function_calc(~loc, fc)
-  | `Interpolation(i) => render_variable(~loc, i)
+  | `Interpolation(i) => render_variable(~loc, String.concat(".", i))
   | `Function_min(values) => render_function_min(~loc, values)
   | `Function_max(values) => render_function_max(~loc, values)
 
@@ -449,7 +460,7 @@ and render_extended_time = (~loc) =>
   fun
   | #Types.extended_time_no_interp as x =>
     render_extended_time_no_interp(~loc, x)
-  | `Interpolation(v) => render_variable(~loc, v)
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
 
 and render_calc_value = (~loc, calc_value) => {
   switch ((calc_value: Types.calc_value)) {
@@ -467,12 +478,12 @@ and render_extended_length = (~loc) =>
   | `Function_calc(fc) => render_function_calc(~loc, fc)
   | `Function_min(values) => render_function_min(~loc, values)
   | `Function_max(values) => render_function_max(~loc, values)
-  | `Interpolation(i) => render_variable(~loc, i)
+  | `Interpolation(i) => render_variable(~loc, String.concat(".", i))
 and render_extended_percentage = (~loc) =>
   fun
   | `Percentage(p) => render_percentage(~loc, p)
   | `Function_calc(fc) => render_function_calc(~loc, fc)
-  | `Interpolation(i) => render_variable(~loc, i)
+  | `Interpolation(i) => render_variable(~loc, String.concat(".", i))
   | `Function_min(values) => render_function_min(~loc, values)
   | `Function_max(values) => render_function_max(~loc, values);
 
@@ -545,7 +556,7 @@ let render_extended_angle = (~loc) =>
   fun
   | `Angle(a) => render_angle(~loc, a)
   | `Function_calc(fc) => render_function_calc(~loc, fc)
-  | `Interpolation(i) => render_variable(~loc, i)
+  | `Interpolation(i) => render_variable(~loc, String.concat(".", i))
   | `Function_min(values) => render_function_min(~loc, values)
   | `Function_max(values) => render_function_max(~loc, values);
 
@@ -582,6 +593,20 @@ let height =
     render_size,
   );
 
+let block_size =
+  monomorphic(
+    Property_parser.property_block_size,
+    (~loc) => [%expr CSS.blockSize],
+    render_size,
+  );
+
+let inline_size =
+  monomorphic(
+    Property_parser.property_inline_size,
+    (~loc) => [%expr CSS.inlineSize],
+    render_size,
+  );
+
 let min_width =
   monomorphic(
     Property_parser.property_min_width,
@@ -593,6 +618,20 @@ let min_height =
   monomorphic(
     Property_parser.property_min_height,
     (~loc) => [%expr CSS.minHeight],
+    render_min_size,
+  );
+
+let min_block_size =
+  monomorphic(
+    Property_parser.property_min_block_size,
+    (~loc) => [%expr CSS.minBlockSize],
+    render_min_size,
+  );
+
+let min_inline_size =
+  monomorphic(
+    Property_parser.property_min_inline_size,
+    (~loc) => [%expr CSS.minInlineSize],
     render_min_size,
   );
 
@@ -608,6 +647,20 @@ let max_height =
     Property_parser.property_max_height,
     (~loc) => [%expr CSS.maxHeight],
     render_size,
+  );
+
+let max_block_size =
+  monomorphic(
+    Property_parser.property_max_block_size,
+    (~loc) => [%expr CSS.maxBlockSize],
+    render_max_width,
+  );
+
+let max_inline_size =
+  monomorphic(
+    Property_parser.property_max_inline_size,
+    (~loc) => [%expr CSS.maxInlineSize],
+    render_max_width,
   );
 
 let box_sizing =
@@ -677,7 +730,8 @@ let margin =
       | `Auto => variant_to_expression(~loc, `Auto)
       | `Extended_length(l) => render_extended_length(~loc, l)
       | `Extended_percentage(p) => render_extended_percentage(~loc, p)
-      | `Interpolation(name) => render_variable(~loc, name),
+      | `Interpolation(name) =>
+        render_variable(~loc, String.concat(".", name)),
     (~loc) =>
       fun
       | [all] => [[%expr CSS.margin([%e all])]]
@@ -697,6 +751,58 @@ let margin =
         ]
       | []
       | _ => raise(Impossible_state),
+  );
+
+let margin_block =
+  emit_shorthand(
+    Property_parser.property_margin_block,
+    render_margin,
+    (~loc) =>
+      fun
+      | [all] => [[%expr CSS.marginBlock([%e all])]]
+      | [v, h] => [[%expr CSS.marginBlock2(~v=[%e v], ~h=[%e h])]]
+      | []
+      | _ => raise(Impossible_state),
+  );
+
+let margin_block_start =
+  monomorphic(
+    Property_parser.property_margin_block_start,
+    (~loc) => [%expr CSS.marginBlockStart],
+    render_margin,
+  );
+
+let margin_block_end =
+  monomorphic(
+    Property_parser.property_margin_block_end,
+    (~loc) => [%expr CSS.marginBlockEnd],
+    render_margin,
+  );
+
+let margin_inline =
+  emit_shorthand(
+    Property_parser.property_margin_inline,
+    render_margin,
+    (~loc) =>
+      fun
+      | [all] => [[%expr CSS.marginInline([%e all])]]
+      | [v, h] => [[%expr CSS.marginInline2(~v=[%e v], ~h=[%e h])]]
+      | []
+      | _ => raise(Impossible_state),
+  );
+
+let margin_inline_start =
+  monomorphic(
+    Property_parser.property_margin_inline_start,
+    (~loc) => [%expr CSS.marginInlineStart],
+    render_margin,
+  );
+
+let margin_inline_end =
+  monomorphic(
+    Property_parser.property_margin_inline_end,
+    (~loc) => [%expr CSS.marginInlineEnd],
+    render_margin,
   );
 
 let padding_top =
@@ -734,7 +840,8 @@ let padding =
       fun
       | `Extended_length(l) => render_extended_length(~loc, l)
       | `Extended_percentage(p) => render_extended_percentage(~loc, p)
-      | `Interpolation(name) => render_variable(~loc, name),
+      | `Interpolation(name) =>
+        render_variable(~loc, String.concat(".", name)),
     (~loc) =>
       fun
       | [all] => [[%expr CSS.padding([%e all])]]
@@ -754,6 +861,58 @@ let padding =
         ]
       | []
       | _ => raise(Impossible_state),
+  );
+
+let padding_block =
+  emit_shorthand(
+    Property_parser.property_padding_block,
+    render_padding,
+    (~loc) =>
+      fun
+      | [all] => [[%expr CSS.paddingBlock([%e all])]]
+      | [v, h] => [[%expr CSS.paddingBlock2(~v=[%e v], ~h=[%e h])]]
+      | []
+      | _ => raise(Impossible_state),
+  );
+
+let padding_block_start =
+  monomorphic(
+    Property_parser.property_padding_block_start,
+    (~loc) => [%expr CSS.paddingBlockStart],
+    render_padding,
+  );
+
+let padding_block_end =
+  monomorphic(
+    Property_parser.property_padding_block_end,
+    (~loc) => [%expr CSS.paddingBlockEnd],
+    render_padding,
+  );
+
+let padding_inline =
+  emit_shorthand(
+    Property_parser.property_padding_inline,
+    render_padding,
+    (~loc) =>
+      fun
+      | [all] => [[%expr CSS.paddingInline([%e all])]]
+      | [v, h] => [[%expr CSS.paddingInline2(~v=[%e v], ~h=[%e h])]]
+      | []
+      | _ => raise(Impossible_state),
+  );
+
+let padding_inline_start =
+  monomorphic(
+    Property_parser.property_padding_inline_start,
+    (~loc) => [%expr CSS.paddingInlineStart],
+    render_padding,
+  );
+
+let padding_inline_end =
+  monomorphic(
+    Property_parser.property_padding_inline_end,
+    (~loc) => [%expr CSS.paddingInlineEnd],
+    render_padding,
   );
 
 let render_named_color = (~loc) =>
@@ -925,7 +1084,7 @@ let render_function_rgb = (~loc, ast: Types.function_rgb) => {
     // TODO: bs-css rgb(float, float, float)
     | `Percentage(pct) => color_to_float(pct *. 2.55)
     | `Function_calc(fc) => render_function_calc(~loc, fc)
-    | `Interpolation(v) => render_variable(~loc, v)
+    | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
     | `Extended_percentage(ext) => render_extended_percentage(~loc, ext)
     | `Function_min(values) => render_function_min(~loc, values)
     | `Function_max(values) => render_function_max(~loc, values);
@@ -967,7 +1126,7 @@ let render_function_rgba = (~loc, ast: Types.function_rgba) => {
     // TODO: bs-css rgb(float, float, float)
     | `Percentage(pct) => color_to_float(pct *. 2.55)
     | `Function_calc(fc) => render_function_calc(~loc, fc)
-    | `Interpolation(v) => render_variable(~loc, v)
+    | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
     | `Extended_percentage(ext) => render_extended_percentage(~loc, ext)
     | `Function_min(values) => render_function_min(~loc, values)
     | `Function_max(values) => render_function_max(~loc, values);
@@ -1055,6 +1214,163 @@ let render_function_hsla = (~loc, (hue, saturation, lightness, alpha)) => {
   };
 };
 
+let render_function_hwb = (~loc, (hue, whiteness, blackness, alpha)) => {
+  let hue =
+    switch (hue) {
+    | `Number(degs) => render_angle(~loc, `Deg(degs))
+    | `Extended_angle(angle) => render_extended_angle(~loc, angle)
+    };
+
+  let whiteness = render_extended_percentage(~loc, whiteness);
+  let blackness = render_extended_percentage(~loc, blackness);
+
+  let alpha =
+    switch (alpha) {
+    | Some(((), alpha)) => Some(alpha)
+    | None => None
+    };
+
+  let alpha = Option.map(render_color_alpha(~loc), alpha);
+
+  switch (alpha) {
+  | Some(alpha) =>
+    id([%expr `hwba(([%e hue], [%e whiteness], [%e blackness], [%e alpha]))])
+  | None => id([%expr `hwb(([%e hue], [%e whiteness], [%e blackness]))])
+  };
+};
+
+let render_number_as_number_with_calc = (~loc, number) => {
+  [%expr `num([%e render_float(~loc, number)])];
+};
+
+let render_function_lab = (~loc, (lightness, a, b, alpha)) => {
+  let lightness = render_extended_percentage(~loc, lightness);
+  let a = render_number_as_number_with_calc(~loc, a);
+  let b = render_number_as_number_with_calc(~loc, b);
+
+  let alpha =
+    switch (alpha) {
+    | Some(((), alpha)) => Some(alpha)
+    | None => None
+    };
+
+  let alpha = Option.map(render_color_alpha(~loc), alpha);
+
+  switch (alpha) {
+  | Some(alpha) =>
+    id([%expr `laba(([%e lightness], [%e a], [%e b], [%e alpha]))])
+  | None => id([%expr `lab(([%e lightness], [%e a], [%e b]))])
+  };
+};
+
+let render_function_lch = (~loc, (lightness, chroma, hue, alpha)) => {
+  let lightness = render_extended_percentage(~loc, lightness);
+  let chroma = render_number_as_number_with_calc(~loc, chroma);
+  let hue =
+    switch (hue) {
+    | `Number(degs) => render_angle(~loc, `Deg(degs))
+    | `Extended_angle(angle) => render_extended_angle(~loc, angle)
+    };
+
+  let alpha =
+    switch (alpha) {
+    | Some(((), alpha)) => Some(alpha)
+    | None => None
+    };
+
+  let alpha = Option.map(render_color_alpha(~loc), alpha);
+
+  switch (alpha) {
+  | Some(alpha) =>
+    id([%expr `lcha(([%e lightness], [%e chroma], [%e hue], [%e alpha]))])
+  | None => id([%expr `lch(([%e lightness], [%e chroma], [%e hue]))])
+  };
+};
+
+let render_function_oklab = (~loc, (lightness, a, b, alpha)) => {
+  let lightness = render_extended_percentage(~loc, lightness);
+  let a = render_number_as_number_with_calc(~loc, a);
+  let b = render_number_as_number_with_calc(~loc, b);
+
+  let alpha =
+    switch (alpha) {
+    | Some(((), alpha)) => Some(alpha)
+    | None => None
+    };
+
+  let alpha = Option.map(render_color_alpha(~loc), alpha);
+
+  switch (alpha) {
+  | Some(alpha) =>
+    id([%expr `oklaba(([%e lightness], [%e a], [%e b], [%e alpha]))])
+  | None => id([%expr `oklab(([%e lightness], [%e a], [%e b]))])
+  };
+};
+
+let render_function_oklch = (~loc, (lightness, chroma, hue, alpha)) => {
+  let lightness = render_extended_percentage(~loc, lightness);
+  let chroma = render_number_as_number_with_calc(~loc, chroma);
+  let hue =
+    switch (hue) {
+    | `Number(degs) => render_angle(~loc, `Deg(degs))
+    | `Extended_angle(angle) => render_extended_angle(~loc, angle)
+    };
+
+  let alpha =
+    switch (alpha) {
+    | Some(((), alpha)) => Some(alpha)
+    | None => None
+    };
+
+  let alpha = Option.map(render_color_alpha(~loc), alpha);
+
+  switch (alpha) {
+  | Some(alpha) =>
+    id([%expr `oklcha(([%e lightness], [%e chroma], [%e hue], [%e alpha]))])
+  | None => id([%expr `oklch(([%e lightness], [%e chroma], [%e hue]))])
+  };
+};
+
+let render_predefined_color_space = (~loc, cs: Types.predefined_color_space) => {
+  switch (cs) {
+  | `Srgb => [%expr `srgb]
+  | `Srgb_linear => [%expr `srgbLinear]
+  | `Display_p3 => [%expr `displayP3]
+  | `A98_rgb => [%expr `a98Rgb]
+  | `Prophoto_rgb => [%expr `prophotoRgb]
+  | `Rec2020 => [%expr `rec2020]
+  | `Xyz => [%expr `xyz]
+  | `Xyz_d50 => [%expr `xyzD50]
+  | `Xyz_d65 => [%expr `xyzD65]
+  };
+};
+
+let render_number_percentage_with_calc = (~loc) =>
+  fun
+  | `Number(x) => [%expr `num([%e render_float(~loc, x)])]
+  | `Extended_percentage(x) => render_extended_percentage(~loc, x);
+
+let render_function_color = (~loc, (cs, c1, c2, c3, alpha)) => {
+  let cs = render_predefined_color_space(~loc, cs);
+  let c1 = render_number_percentage_with_calc(~loc, c1);
+  let c2 = render_number_percentage_with_calc(~loc, c2);
+  let c3 = render_number_percentage_with_calc(~loc, c3);
+
+  let alpha =
+    switch (alpha) {
+    | Some(((), alpha)) => Some(alpha)
+    | None => None
+    };
+
+  let alpha = Option.map(render_color_alpha(~loc), alpha);
+
+  switch (alpha) {
+  | Some(alpha) =>
+    id([%expr `colora(([%e cs], [%e c1], [%e c2], [%e c3], [%e alpha]))])
+  | None => id([%expr `color(([%e cs], [%e c1], [%e c2], [%e c3]))])
+  };
+};
+
 let render_var = (~loc, string) => {
   let string = render_string(~loc, string);
   [%expr `var([%e string])];
@@ -1062,7 +1378,7 @@ let render_var = (~loc, string) => {
 
 let rec render_color = (~loc, value) =>
   switch ((value: Types.color)) {
-  | `Interpolation(v) => render_variable(~loc, v)
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
   | `Hex_color(hex) => id([%expr `hex([%e render_string(~loc, hex)])])
   | `Named_color(color) => render_named_color(~loc, color)
   | `CurrentColor => id([%expr `currentColor])
@@ -1073,6 +1389,21 @@ let rec render_color = (~loc, value) =>
   | `Function_var(v) => render_var(~loc, v)
   | `Function_hsl(`Hsl_0(hsl)) => render_function_hsl(~loc, hsl)
   | `Function_hsla(`Hsla_0(hsla)) => render_function_hsla(~loc, hsla)
+  | `Function_hwb(hwb) => render_function_hwb(~loc, hwb)
+  | `Function_lab(lab) => render_function_lab(~loc, lab)
+  | `Function_lch(lch) => render_function_lch(~loc, lch)
+  | `Function_oklab(oklab) => render_function_oklab(~loc, oklab)
+  | `Function_oklch(oklch) => render_function_oklch(~loc, oklch)
+  | `Function_color(color) => render_function_color(~loc, color)
+  | `Function_light_dark(light, (), dark) =>
+    id(
+      [%expr
+        `lightDark((
+          [%e render_color(~loc, light)],
+          [%e render_color(~loc, dark)],
+        ))
+      ],
+    )
   /* Function_hsl(a) with `Hsl(a)_1 aren't supported */
   | `Function_hsl(_)
   | `Function_hsla(_)
@@ -1253,13 +1584,17 @@ let image_rendering =
 
 let render_color_interp = (~loc) =>
   fun
-  | `Interpolation(name) => render_variable(~loc, name)
+  | `Interpolation(name) => render_variable(~loc, String.concat(".", name))
   | `Color(ls) => render_color(~loc, ls);
 
-let render_length_interp = (~loc) =>
+let _render_length_interp = (~loc) =>
   fun
   | `Extended_length(l) => render_extended_length(~loc, l)
-  | `Interpolation(name) => render_variable(~loc, name);
+  | `Interpolation(name) => render_variable(~loc, String.concat(".", name));
+
+/* Shadow rendering with simplified types - color and extended_length
+   positions no longer have Xor wrappers since interpolation is handled
+   internally by each type. */
 
 // css-backgrounds-3
 let render_box_shadow = (~loc, shadow) => {
@@ -1277,14 +1612,12 @@ let render_box_shadow = (~loc, shadow) => {
     };
 
   let color =
-    color
-    |> Option.value(~default=`Color(`CurrentColor))
-    |> render_color_interp(~loc);
+    color |> Option.value(~default=`CurrentColor) |> render_color(~loc);
 
-  let x = render_length_interp(~loc, x);
-  let y = render_length_interp(~loc, y);
-  let blur = Option.map(render_length_interp(~loc), blur);
-  let spread = Option.map(render_length_interp(~loc), spread);
+  let x = render_extended_length(~loc, x);
+  let y = render_extended_length(~loc, y);
+  let blur = Option.map(render_extended_length(~loc), blur);
+  let spread = Option.map(render_extended_length(~loc), spread);
   let inset =
     Option.map(
       () =>
@@ -1547,7 +1880,7 @@ let render_gradient = (~loc, value: Types.gradient) =>
     render_function_repeating_radial_gradient(~loc, rrg)
   | `Function_conic_gradient(angle) =>
     render_function_conic_gradient(~loc, angle)
-  | `_legacy_gradient(_) => raise(Unsupported_feature)
+  | `Legacy_gradient(_) => raise(Unsupported_feature)
   };
 
 let render_url_no_interp = (~loc, url) => [%expr
@@ -1556,7 +1889,9 @@ let render_url_no_interp = (~loc, url) => [%expr
 
 let render_url = (~loc, url: Types.url) => {
   switch (url) {
-  | `Url(v) => [%expr `url([%e render_variable(~loc, v)])]
+  | `Url(v) => [%expr
+     `url([%e render_variable(~loc, String.concat(".", v))])
+    ]
   | `Url_no_interp(v) => render_url_no_interp(~loc, v)
   };
 };
@@ -1565,7 +1900,7 @@ let render_image = (~loc, value: Types.image) =>
   switch (value) {
   | `Gradient(gradient) => render_gradient(~loc, gradient)
   | `Url(url) => render_url(~loc, url)
-  | `Interpolation(v) => render_variable(~loc, v)
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
   | `Function_element(_) => raise(Unsupported_feature)
   | `Function_paint(_) => raise(Unsupported_feature)
   | `Function_image(_) => raise(Unsupported_feature)
@@ -1975,14 +2310,146 @@ let border_width =
       | _ => raise(Unsupported_feature),
   );
 
+let border_block_color =
+  polymorphic(Property_parser.property_border_block_color, (~loc) =>
+    fun
+    | [color] => [[%expr CSS.borderBlockColor([%e render_color(~loc, color)])]]
+    | [first, second] => [
+        [%expr
+          CSS.borderBlockColor2(
+            [%e render_color(~loc, first)],
+            [%e render_color(~loc, second)],
+          )
+        ],
+      ]
+    | []
+    | _ => raise(Unsupported_feature)
+  );
+
+let border_block_end_color =
+  monomorphic(
+    Property_parser.property_border_block_end_color,
+    (~loc) => [%expr CSS.borderBlockEndColor],
+    render_color,
+  );
+
+let border_block_end_style =
+  variants(Property_parser.property_border_block_end_style, (~loc) =>
+    [%expr CSS.borderBlockEndStyle]
+  );
+
+let border_block_end_width =
+  monomorphic(
+    Property_parser.property_border_block_end_width,
+    (~loc) => [%expr CSS.borderBlockEndWidth],
+    render_line_width,
+  );
+
+let border_block_start_color =
+  monomorphic(
+    Property_parser.property_border_block_start_color,
+    (~loc) => [%expr CSS.borderBlockStartColor],
+    render_color,
+  );
+
+let border_block_start_style =
+  variants(Property_parser.property_border_block_start_style, (~loc) =>
+    [%expr CSS.borderBlockStartStyle]
+  );
+
+let border_block_start_width =
+  monomorphic(
+    Property_parser.property_border_block_start_width,
+    (~loc) => [%expr CSS.borderBlockStartWidth],
+    render_line_width,
+  );
+
+let border_block_style =
+  variants(Property_parser.property_border_block_style, (~loc) =>
+    [%expr CSS.borderBlockStyle]
+  );
+
+let border_block_width =
+  monomorphic(
+    Property_parser.property_border_block_width,
+    (~loc) => [%expr CSS.borderBlockWidth],
+    render_line_width,
+  );
+
+let border_inline_color =
+  polymorphic(Property_parser.property_border_inline_color, (~loc) =>
+    fun
+    | [color] => [[%expr CSS.borderInlineColor([%e render_color(~loc, color)])]]
+    | [first, second] => [
+        [%expr
+          CSS.borderInlineColor2(
+            [%e render_color(~loc, first)],
+            [%e render_color(~loc, second)],
+          )
+        ],
+      ]
+    | []
+    | _ => raise(Unsupported_feature)
+  );
+
+let border_inline_end_color =
+  monomorphic(
+    Property_parser.property_border_inline_end_color,
+    (~loc) => [%expr CSS.borderInlineEndColor],
+    render_color,
+  );
+
+let border_inline_end_style =
+  variants(Property_parser.property_border_inline_end_style, (~loc) =>
+    [%expr CSS.borderInlineEndStyle]
+  );
+
+let border_inline_end_width =
+  monomorphic(
+    Property_parser.property_border_inline_end_width,
+    (~loc) => [%expr CSS.borderInlineEndWidth],
+    render_line_width,
+  );
+
+let border_inline_start_color =
+  monomorphic(
+    Property_parser.property_border_inline_start_color,
+    (~loc) => [%expr CSS.borderInlineStartColor],
+    render_color,
+  );
+
+let border_inline_start_style =
+  variants(Property_parser.property_border_inline_start_style, (~loc) =>
+    [%expr CSS.borderInlineStartStyle]
+  );
+
+let border_inline_start_width =
+  monomorphic(
+    Property_parser.property_border_inline_start_width,
+    (~loc) => [%expr CSS.borderInlineStartWidth],
+    render_line_width,
+  );
+
+let border_inline_style =
+  variants(Property_parser.property_border_inline_style, (~loc) =>
+    [%expr CSS.borderInlineStyle]
+  );
+
+let border_inline_width =
+  monomorphic(
+    Property_parser.property_border_inline_width,
+    (~loc) => [%expr CSS.borderInlineWidth],
+    render_line_width,
+  );
+
 let render_line_width_interp = (~loc) =>
   fun
   | `Line_width(lw) => render_line_width(~loc, lw)
-  | `Interpolation(name) => render_variable(~loc, name);
+  | `Interpolation(name) => render_variable(~loc, String.concat(".", name));
 
 let render_border_style_interp = (~loc) =>
   fun
-  | `Interpolation(name) => render_variable(~loc, name)
+  | `Interpolation(name) => render_variable(~loc, String.concat(".", name))
   | `Line_style(ls) => variant_to_expression(~loc, ls);
 
 type borderDirection =
@@ -1990,7 +2457,13 @@ type borderDirection =
   | Left
   | Bottom
   | Right
-  | Top;
+  | Top
+  | Block
+  | BlockEnd
+  | BlockStart
+  | Inline
+  | InlineEnd
+  | InlineStart;
 
 let direction_to_border = (~loc) =>
   fun
@@ -1998,7 +2471,13 @@ let direction_to_border = (~loc) =>
   | Left => [%expr CSS.borderLeft]
   | Bottom => [%expr CSS.borderBottom]
   | Right => [%expr CSS.borderRight]
-  | Top => [%expr CSS.borderTop];
+  | Top => [%expr CSS.borderTop]
+  | Block => [%expr CSS.borderBlock]
+  | BlockEnd => [%expr CSS.borderBlockEnd]
+  | BlockStart => [%expr CSS.borderBlockStart]
+  | Inline => [%expr CSS.borderInline]
+  | InlineEnd => [%expr CSS.borderInlineEnd]
+  | InlineStart => [%expr CSS.borderInlineStart];
 
 let direction_to_fn_name = (~loc) =>
   fun
@@ -2006,7 +2485,13 @@ let direction_to_fn_name = (~loc) =>
   | Left => [%expr {js|borderLeft|js}]
   | Bottom => [%expr {js|borderBottom|js}]
   | Right => [%expr {js|borderRight|js}]
-  | Top => [%expr {js|borderTop|js}];
+  | Top => [%expr {js|borderTop|js}]
+  | Block => [%expr {js|borderBlock|js}]
+  | BlockEnd => [%expr {js|borderBlockEnd|js}]
+  | BlockStart => [%expr {js|borderBlockStart|js}]
+  | Inline => [%expr {js|borderInline|js}]
+  | InlineEnd => [%expr {js|borderInlineEnd|js}]
+  | InlineStart => [%expr {js|borderInlineStart|js}];
 
 let render_border = (~loc, ~direction: borderDirection, border) => {
   switch (border) {
@@ -2015,7 +2500,11 @@ let render_border = (~loc, ~direction: borderDirection, border) => {
     [[%expr CSS.unsafe([%e borderFn], {js|none|js})]];
   | `Xor(`Interpolation(name)) =>
     let borderFn = direction_to_border(~loc, direction);
-    [[%expr [%e borderFn]([%e render_variable(~loc, name)])]];
+    [
+      [%expr
+        [%e borderFn]([%e render_variable(~loc, String.concat(".", name))])
+      ],
+    ];
   /* bs-css doesn't support border: 1px; */
   | `Xor(_) => raise(Unsupported_feature)
   /* bs-css doesn't support border: 1px solid; */
@@ -2037,14 +2526,16 @@ let render_border = (~loc, ~direction: borderDirection, border) => {
 let render_outline_style_interp = (~loc) =>
   fun
   | `Auto => variant_to_expression(~loc, `Auto)
-  | `Interpolation(name) => render_variable(~loc, name)
+  | `Interpolation(name) => render_variable(~loc, String.concat(".", name))
   | `Line_style(ls) => variant_to_expression(~loc, ls);
 
 let render_outline = (~loc) =>
   fun
   | `None => [[%expr CSS.unsafe({js|outline|js}, {js|none|js})]]
   | `Property_outline_width(`Interpolation(name)) => [
-      [%expr CSS.outline([%e render_variable(~loc, name)])],
+      [%expr
+        CSS.outline([%e render_variable(~loc, String.concat(".", name))])
+      ],
     ]
   /* bs-css doesn't support outline: 1px; */
   | `Property_outline_width(_) => raise(Unsupported_feature)
@@ -2061,6 +2552,36 @@ let render_outline = (~loc) =>
     ];
 
 let outline = polymorphic(Property_parser.property_outline, render_outline);
+
+let border_block =
+  polymorphic(Property_parser.property_border_block, (~loc, value) =>
+    render_border(~loc, ~direction=Block, value)
+  );
+
+let border_block_end =
+  polymorphic(Property_parser.property_border_block_end, (~loc, value) =>
+    render_border(~loc, ~direction=BlockEnd, value)
+  );
+
+let border_block_start =
+  polymorphic(Property_parser.property_border_block_start, (~loc, value) =>
+    render_border(~loc, ~direction=BlockStart, value)
+  );
+
+let border_inline =
+  polymorphic(Property_parser.property_border_inline, (~loc, value) =>
+    render_border(~loc, ~direction=Inline, value)
+  );
+
+let border_inline_end =
+  polymorphic(Property_parser.property_border_inline_end, (~loc, value) =>
+    render_border(~loc, ~direction=InlineEnd, value)
+  );
+
+let border_inline_start =
+  polymorphic(Property_parser.property_border_inline_start, (~loc, value) =>
+    render_border(~loc, ~direction=InlineStart, value)
+  );
 
 let outline_color =
   monomorphic(
@@ -2175,10 +2696,13 @@ let border_bottom_left_radius =
   );
 
 let border_radius =
-  monomorphic(
+  transform_with_variable(
     Property_parser.property_border_radius,
-    (~loc) => [%expr CSS.borderRadius],
-    render_length_percentage,
+    (~loc) =>
+      fun
+      | ([value], None) => render_length_percentage(~loc, value)
+      | _ => raise(Unsupported_feature),
+    (~loc, value) => [[%expr CSS.borderRadius([%e value])]],
   );
 
 let border_image_source =
@@ -2214,7 +2738,7 @@ let box_shadow =
     switch (value) {
     | `Interpolation(variable) =>
       /* Here we rely on boxShadow*s* which makes the value be an array */
-      let var = render_variable(~loc, variable);
+      let var = render_variable(~loc, String.concat(".", variable));
       [[%expr CSS.boxShadows([%e var])]];
     | `None =>
       let none = variant_to_expression(~loc, `None);
@@ -2233,7 +2757,7 @@ let overflow_x =
     (~loc) => [%expr CSS.overflowX],
     (~loc) =>
       fun
-      | `Interpolation(x) => render_variable(~loc, x)
+      | `Interpolation(x) => render_variable(~loc, String.concat(".", x))
       | (`Visible | `Hidden | `Clip | `Scroll | `Auto) as x =>
         variant_to_expression(~loc, x),
   );
@@ -2244,7 +2768,7 @@ let overflow_y =
     (~loc) => [%expr CSS.overflowY],
     (~loc) =>
       fun
-      | `Interpolation(x) => render_variable(~loc, x)
+      | `Interpolation(x) => render_variable(~loc, String.concat(".", x))
       | (`Visible | `Hidden | `Clip | `Scroll | `Auto) as x =>
         variant_to_expression(~loc, x),
   );
@@ -2253,7 +2777,9 @@ let overflow =
   polymorphic(Property_parser.property_overflow, (~loc) =>
     fun
     | `Interpolation(i) => [
-        [%expr CSS.overflow([%e render_variable(~loc, i)])],
+        [%expr
+          CSS.overflow([%e render_variable(~loc, String.concat(".", i))])
+        ],
       ]
     | `Xor([x]) => [
         [%expr CSS.overflow([%e variant_to_expression(~loc, x)])],
@@ -2265,15 +2791,15 @@ let overflow =
           |> Builder.pexp_array(~loc);
         [[%expr CSS.overflows([%e overflows])]];
       }
-    | `_non_standard_overflow(non_standard) => {
+    | `Non_standard_overflow(non_standard) => {
         switch (non_standard) {
-        | `_moz_scrollbars_none => [
+        | `Moz_scrollbars_none => [
             [%expr CSS.unsafe("overflow", "-moz-scrollbars-none")],
           ]
-        | `_moz_scrollbars_horizontal => [
+        | `Moz_scrollbars_horizontal => [
             [%expr CSS.unsafe("overflow", "-moz-scrollbars-horizontal")],
           ]
-        | `_moz_scrollbars_vertical => [
+        | `Moz_scrollbars_vertical => [
             [%expr CSS.unsafe("overflow", "-moz-scrollbars-vertical")],
           ]
         | _moz_hidden_unscrollable => [
@@ -2307,7 +2833,7 @@ let overflow_block =
     (~loc) => [%expr CSS.overflowBlock],
     (~loc) =>
       fun
-      | `Interpolation(x) => render_variable(~loc, x)
+      | `Interpolation(x) => render_variable(~loc, String.concat(".", x))
       | (`Visible | `Hidden | `Clip | `Scroll | `Auto) as x =>
         variant_to_expression(~loc, x),
   );
@@ -2318,7 +2844,7 @@ let overflow_inline =
     (~loc) => [%expr CSS.overflowInline],
     (~loc) =>
       fun
-      | `Interpolation(x) => render_variable(~loc, x)
+      | `Interpolation(x) => render_variable(~loc, String.concat(".", x))
       | (`Visible | `Hidden | `Clip | `Scroll | `Auto) as x =>
         variant_to_expression(~loc, x),
   );
@@ -2497,11 +3023,11 @@ let render_generic_family = (~loc) =>
   | `Emoji => [%expr `emoji]
   | `Math => [%expr `math]
   | `Fangsong => [%expr `fangsong]
-  | `_apple_system => [%expr `apple_system];
+  | `Apple_system => [%expr `apple_system];
 
 let render_font_family = (~loc, value) =>
   switch (value) {
-  | `Interpolation(v) => render_variable(~loc, v)
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
   | `Generic_family(v) => render_generic_family(~loc, v)
   | `Family_name(`String(str)) => [%expr
      `quoted([%e render_string(~loc, str)])
@@ -2522,7 +3048,11 @@ let font_family =
       let annotation = [%type: array(CSS.Types.FontFamilyName.t)];
       [
         [%expr
-          CSS.fontFamilies([%e render_variable(~loc, v)]: [%t annotation])
+          CSS.fontFamilies(
+            [%e render_variable(~loc, String.concat(".", v))]: [%t
+                                                                 annotation
+                                                               ],
+          )
         ],
       ];
     | `Font_families(font_families) => [
@@ -2541,7 +3071,7 @@ let font_family =
 
 let render_font_weight = (~loc) =>
   fun
-  | `Interpolation(v) => render_variable(~loc, v)
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
   | `Bolder => variant_to_expression(~loc, `Bolder)
   | `Lighter => variant_to_expression(~loc, `Lighter)
   | `Font_weight_absolute(`Normal) => variant_to_expression(~loc, `Normal)
@@ -2564,7 +3094,7 @@ let render_font_style = (~loc) =>
   | `Normal => variant_to_expression(~loc, `Normal)
   | `Italic => variant_to_expression(~loc, `Italic)
   | `Oblique => variant_to_expression(~loc, `Oblique)
-  | `Interpolation(v) => render_variable(~loc, v)
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
   | `Static(_) => raise(Unsupported_feature);
 
 let font_style =
@@ -2692,7 +3222,7 @@ let font_variant_emoji =
 
 let render_text_decoration_line = (~loc) =>
   fun
-  | `Interpolation(v) => render_variable(~loc, v)
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
   | `None => [%expr `none]
   | `Or(underline, overline, lineThrough, blink) => [%expr
       CSS.Types.TextDecorationLine.Value.make(
@@ -2907,14 +3437,14 @@ let render_text_shadow = (~loc, shadow) => {
 
   let args =
     Ppxlib.Asttypes.[
-      (Labelled("x"), Some(render_length_interp(~loc, x))),
-      (Labelled("y"), Some(render_length_interp(~loc, y))),
-      (Labelled("blur"), Option.map(render_length_interp(~loc), blur)),
+      (Labelled("x"), Some(render_extended_length(~loc, x))),
+      (Labelled("y"), Some(render_extended_length(~loc, y))),
+      (Labelled("blur"), Option.map(render_extended_length(~loc), blur)),
       (
         Nolabel,
         Some(
           color
-          |> Option.map(render_color_interp(~loc))
+          |> Option.map(render_color(~loc))
           |> Option.value(~default=[%expr `Color(`CurrentColor)]),
         ),
       ),
@@ -2930,7 +3460,11 @@ let text_shadow =
   polymorphic(Property_parser.property_text_shadow, (~loc) =>
     fun
     | `Interpolation(variable) => [
-        [%expr CSS.textShadows([%e render_variable(~loc, variable)])],
+        [%expr
+          CSS.textShadows(
+            [%e render_variable(~loc, String.concat(".", variable))],
+          )
+        ],
       ]
     | `None => [
         [%expr CSS.textShadow([%e variant_to_expression(~loc, `None)])],
@@ -3210,7 +3744,7 @@ let render_single_transition_property = (~loc, value) => {
   switch (value) {
   | #Types.single_transition_property_no_interp as x =>
     render_single_transition_property_no_interp(~loc, x)
-  | `Interpolation(v) => render_variable(~loc, v)
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
   };
 };
 
@@ -3302,7 +3836,7 @@ let render_timing_no_interp = (~loc) =>
 let render_timing = (~loc) =>
   fun
   | #Types.timing_function_no_interp as x => render_timing_no_interp(~loc, x)
-  | `Interpolation(v) => render_variable(~loc, v);
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v));
 
 let transition_timing_function =
   polymorphic(Property_parser.property_transition_timing_function, (~loc) =>
@@ -3351,7 +3885,7 @@ let render_transition_behavior_value = (~loc) =>
   fun
   | #Types.transition_behavior_value_no_interp as x =>
     render_transition_behavior_value_no_interp(~loc, x)
-  | `Interpolation(v) => render_variable(~loc, v);
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v));
 
 let transition_behavior =
   polymorphic(Property_parser.property_transition_behavior, (~loc) =>
@@ -3494,7 +4028,7 @@ let render_animation_name = (~loc) =>
        CSS.Types.AnimationName.make([%e render_keyframes_name(~loc, name)])
       ];
     }
-  | `Interpolation(v) => render_variable(~loc, v);
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v));
 
 // css-animation-1
 let animation_name =
@@ -3563,7 +4097,7 @@ let render_single_animation_iteration_count = (~loc) =>
   fun
   | #Types.single_animation_iteration_count_no_interp as x =>
     render_single_animation_iteration_count_no_interp(~loc, x)
-  | `Interpolation(v) => render_variable(~loc, v);
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v));
 
 let animation_iteration_count =
   polymorphic(Property_parser.property_animation_iteration_count, (~loc) =>
@@ -3599,7 +4133,7 @@ let render_single_animation_direction = (~loc) =>
   fun
   | #Types.single_animation_direction_no_interp as x =>
     render_single_animation_direction_no_interp(~loc, x)
-  | `Interpolation(v) => render_variable(~loc, v);
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v));
 
 let animation_direction =
   polymorphic(Property_parser.property_animation_direction, (~loc) =>
@@ -3633,7 +4167,7 @@ let render_single_animation_play_state = (~loc) =>
   fun
   | #Types.single_animation_play_state_no_interp as x =>
     render_single_animation_play_state_no_interp(~loc, x)
-  | `Interpolation(v) => render_variable(~loc, v);
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v));
 
 let animation_play_state =
   polymorphic(Property_parser.property_animation_play_state, (~loc) =>
@@ -3688,7 +4222,7 @@ let render_single_animation_fill_mode = (~loc) =>
   fun
   | #Types.single_animation_fill_mode_no_interp as x =>
     render_single_animation_fill_mode_no_interp(~loc, x)
-  | `Interpolation(v) => render_variable(~loc, v);
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v));
 
 let animation_fill_mode =
   polymorphic(Property_parser.property_animation_fill_mode, (~loc) =>
@@ -3830,6 +4364,9 @@ let render_single_animation_no_interp =
       ~loc,
       (
         name,
+        /* The || combinator's match_longest tie-breaking assigns the first
+           input <time> to tuple position 3 and the second to position 1.
+           So position 1 holds delay and position 3 holds duration. */
         delay,
         timingFunction,
         duration,
@@ -3901,7 +4438,7 @@ let animation =
 let render_ratio = (~loc, value: Types.ratio) => {
   switch (value) {
   | `Number(n) => [%expr `num([%e render_float(~loc, n)])]
-  | `Interpolation(v) => render_variable(~loc, v)
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
   | `Static(up, _, down) => [%expr
      `ratio((
        [%e render_integer(~loc, up)],
@@ -3965,7 +4502,7 @@ let order =
 let render_float_interp = (~loc, value) => {
   switch (value) {
   | `Number(n) => [%expr [%e render_float(~loc, n)]]
-  | `Interpolation(v) => render_variable(~loc, v)
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
   };
 };
 
@@ -3987,7 +4524,7 @@ let render_flex_basis = (~loc) =>
   fun
   | `Content => variant_to_expression(~loc, `Content)
   | `Property_width(value_width) => render_size(~loc, value_width)
-  | `Interpolation(v) => render_variable(~loc, v);
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v));
 
 let flex_basis =
   monomorphic(
@@ -4001,7 +4538,9 @@ let flex =
     switch (value) {
     | `None => [[%expr CSS.flex1(`none)]]
     | `Interpolation(interp) => [
-        [%expr CSS.flex1([%e render_variable(~loc, interp)])],
+        [%expr
+          CSS.flex1([%e render_variable(~loc, String.concat(".", interp))])
+        ],
       ]
     | `Or(None, None) => [[%expr CSS.flex1(`none)]]
     | `Or(Some((grow, None)), None) => [
@@ -4186,7 +4725,7 @@ let align_items =
       | `Static(Some(`Unsafe), position) => [%expr
          `unsafe([%e render_self_position(~loc, position)])
         ]
-      | `Interpolation(v) => render_variable(~loc, v)
+      | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
       }
     },
   );
@@ -4210,7 +4749,7 @@ let align_self =
       | `Static(Some(`Unsafe), position) => [%expr
          `unsafe([%e render_self_position(~loc, position)])
         ]
-      | `Interpolation(v) => render_variable(~loc, v)
+      | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
       }
     },
   );
@@ -4455,7 +4994,7 @@ let render_subgrid = (~loc, line_name_list: Types.line_name_list) => {
 
 let render_grid_template_rows_and_columns = (~loc) =>
   fun
-  | `Interpolation(v) => render_variable(~loc, v)
+  | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
   | `None => [%expr `none]
   | `Masonry => [%expr `masonry]
   | `Track_list(track_list, line_names) => [%expr
@@ -4496,7 +5035,8 @@ let grid_template_areas =
             areas
             |> List.map(area =>
                  switch (area) {
-                 | `Interpolation(value) => render_variable(~loc, value)
+                 | `Interpolation(value) =>
+                   render_variable(~loc, String.concat(".", value))
                  | `String(value) => render_string(~loc, value)
                  }
                )
@@ -4585,7 +5125,8 @@ let grid_auto_flow =
     (~loc) => [%expr CSS.gridAutoFlow],
     (~loc) =>
       fun
-      | `Interpolation(values) => render_variable(~loc, values)
+      | `Interpolation(values) =>
+        render_variable(~loc, String.concat(".", values))
       | `Or(Some(`Row), None) => [%expr `row]
       | `Or(Some(`Column), None) => [%expr `column]
       | `Or(None, Some(_)) => [%expr `dense]
@@ -4596,7 +5137,7 @@ let grid_auto_flow =
 
 let render_grid_line = (~loc, x: Types.grid_line) =>
   switch (x) {
-  | `Interpolation(x) => render_variable(~loc, x)
+  | `Interpolation(x) => render_variable(~loc, String.concat(".", x))
   | `Auto => [%expr `auto]
   | `Custom_ident_without_span_or_auto(x) => [%expr
      `ident([%e render_string(~loc, x)])
@@ -4851,7 +5392,7 @@ let z_index =
     (~loc, value) => {
       switch (value) {
       | `Auto => [%expr `auto]
-      | `Interpolation(v) => render_variable(~loc, v)
+      | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
       | `Integer(i) => [%expr `num([%e render_integer(~loc, i)])]
       }
     },
@@ -4922,17 +5463,17 @@ let render_display = (~loc) =>
   | `Ruby_text => [%expr `rubyText]
   | `Ruby_text_container => [%expr `rubyTextContainer]
   | `Run_in => [%expr `runIn]
-  | `_moz_box => [%expr `mozBox]
-  | `_moz_inline_box => [%expr `mozInlineBox]
-  | `_moz_inline_stack => [%expr `mozInlineStack]
+  | `Moz_box => [%expr `mozBox]
+  | `Moz_inline_box => [%expr `mozInlineBox]
+  | `Moz_inline_stack => [%expr `mozInlineStack]
   | `_ms_flexbox => [%expr `msFlexbox]
   | `_ms_grid => [%expr `msGrid]
   | `_ms_inline_flexbox => [%expr `msInlineFlexbox]
   | `_ms_inline_grid => [%expr `msInlineGrid]
-  | `_webkit_box => [%expr `webkitBox]
-  | `_webkit_flex => [%expr `webkitFlex]
-  | `_webkit_inline_box => [%expr `webkitInlineBox]
-  | `_webkit_inline_flex => [%expr `webkitInlineFlex];
+  | `Webkit_box => [%expr `webkitBox]
+  | `Webkit_flex => [%expr `webkitFlex]
+  | `Webkit_inline_box => [%expr `webkitInlineBox]
+  | `Webkit_inline_flex => [%expr `webkitInlineFlex];
 
 let display =
   monomorphic(
@@ -4960,7 +5501,8 @@ let mask_image =
 let render_paint = (~loc, value: Types.paint) => {
   switch (value) {
   | `Color(c) => render_color(~loc, c)
-  | `Interpolation(variable) => render_variable(~loc, variable)
+  | `Interpolation(variable) =>
+    render_variable(~loc, String.concat(".", variable))
   | `Context_stroke => [%expr `contextStroke]
   | `Context_fill => [%expr `contextFill]
   | `Static(_, _)
@@ -5007,29 +5549,61 @@ let line_break =
       | `Normal => [%expr `normal]
       | `Strict => [%expr `strict]
       | `Anywhere => [%expr `anywhere]
-      | `Interpolation(var) => render_variable(~loc, var)
+      | `Interpolation(var) => render_variable(~loc, String.concat(".", var))
       }
     },
   );
 
-let found = ({ ast_of_string, string_to_expr, _ }) => {
-  /* TODO: Why we have 'check_value' when we don't use it? */
-  let check_value = string => {
-    let.ok _ = ast_of_string(string);
+let found = ({ ast_of_component_values, component_value_list_to_expr, _ }) => {
+  let check_value = values => {
+    let.ok _ = ast_of_component_values(values);
     Ok();
   };
-  (check_value, string_to_expr);
+  (check_value, component_value_list_to_expr);
 };
 
-let caret_color = unsupportedProperty(Property_parser.property_caret_color);
+let caret_color =
+  monomorphic(
+    Property_parser.property_caret_color,
+    (~loc) => [%expr CSS.caretColor],
+    (~loc, value: Types.property_caret_color) =>
+      switch (value) {
+      | `Auto => [%expr `auto]
+      | `Color(color) => render_color(~loc, color)
+      },
+  );
 
-let clear = unsupportedProperty(Property_parser.property_clear);
+let render_clear = (~loc, value: Types.property_clear) =>
+  switch (value) {
+  | `None => [%expr `none]
+  | `Left => [%expr `left]
+  | `Right => [%expr `right]
+  | `Both => [%expr `both]
+  | `Inline_start => [%expr `inlineStart]
+  | `Inline_end => [%expr `inlineEnd]
+  };
+
+let clear =
+  monomorphic(
+    Property_parser.property_clear,
+    (~loc) => [%expr CSS.clear],
+    render_clear,
+  );
 
 let clip = unsupportedProperty(Property_parser.property_clip);
 
 let clip_path = unsupportedProperty(Property_parser.property_clip_path);
 
-let column_count = unsupportedProperty(Property_parser.property_column_count);
+let column_count =
+  monomorphic(
+    Property_parser.property_column_count,
+    (~loc) => [%expr CSS.columnCount],
+    (~loc, value: Types.property_column_count) =>
+      switch (value) {
+      | `Auto => [%expr `auto]
+      | `Integer(count) => [%expr `count([%e render_integer(~loc, count)])]
+      },
+  );
 
 let column_fill = unsupportedProperty(Property_parser.property_column_fill);
 
@@ -5043,13 +5617,24 @@ let column_gap =
 let column_rule = unsupportedProperty(Property_parser.property_column_rule);
 
 let column_rule_color =
-  unsupportedProperty(Property_parser.property_column_rule_color);
+  monomorphic(
+    Property_parser.property_column_rule_color,
+    (~loc) => [%expr CSS.columnRuleColor],
+    render_color,
+  );
 
 let column_rule_style =
   unsupportedProperty(Property_parser.property_column_rule_style);
 
 let column_rule_width =
-  unsupportedProperty(Property_parser.property_column_rule_width);
+  monomorphic(
+    Property_parser.property_column_rule_width,
+    (~loc) => [%expr CSS.columnRuleWidth],
+    (~loc) =>
+      fun
+      | [width] => render_line_width(~loc, width)
+      | _ => raise(Unsupported_feature),
+  );
 
 let column_span = unsupportedProperty(Property_parser.property_column_span);
 
@@ -5065,7 +5650,8 @@ let counter_set = unsupportedProperty(Property_parser.property_counter_set);
 
 let render_cursor = (~loc, value) =>
   switch (value) {
-  | `Interpolation(variable) => render_variable(~loc, variable)
+  | `Interpolation(variable) =>
+    render_variable(~loc, String.concat(".", variable))
   | `Auto => [%expr `auto]
   | `Default => [%expr `default]
   | `None => [%expr `none]
@@ -5103,14 +5689,14 @@ let render_cursor = (~loc, value) =>
   | `Zoom_in => [%expr `zoomIn]
   | `Zoom_out => [%expr `zoomOut]
   | `Hand => [%expr `hand]
-  | `_moz_grab => [%expr `_moz_grab]
-  | `_moz_grabbing => [%expr `_moz_grabbing]
-  | `_moz_zoom_in => [%expr `_moz_zoom_in]
-  | `_moz_zoom_out => [%expr `_moz_zoom_out]
-  | `_webkit_grab => [%expr `_webkit_grab]
-  | `_webkit_grabbing => [%expr `_webkit_grabbing]
-  | `_webkit_zoom_in => [%expr `_webkit_zoom_in]
-  | `_webkit_zoom_out => [%expr `_webkit_zoom_out]
+  | `Moz_grab => [%expr `Moz_grab]
+  | `Moz_grabbing => [%expr `Moz_grabbing]
+  | `Moz_zoom_in => [%expr `Moz_zoom_in]
+  | `Moz_zoom_out => [%expr `Moz_zoom_out]
+  | `Webkit_grab => [%expr `Webkit_grab]
+  | `Webkit_grabbing => [%expr `Webkit_grabbing]
+  | `Webkit_zoom_in => [%expr `Webkit_zoom_in]
+  | `Webkit_zoom_out => [%expr `Webkit_zoom_out]
   };
 
 let cursor =
@@ -5199,7 +5785,7 @@ let filter =
     (~loc, value) => {
       switch (value) {
       | `None => [%expr [|`none|]]
-      | `Interpolation(v) => render_variable(~loc, v)
+      | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
       | `Filter_function_list(ffl) => render_filter_function_list(~loc, ffl)
       }
     },
@@ -5212,7 +5798,7 @@ let backdrop_filter =
     (~loc, value) =>
       switch (value) {
       | `None => [%expr [|`none|]]
-      | `Interpolation(v) => render_variable(~loc, v)
+      | `Interpolation(v) => render_variable(~loc, String.concat(".", v))
       | `Filter_function_list(ffl) => render_filter_function_list(~loc, ffl)
       },
   );
@@ -5251,9 +5837,35 @@ let list_style_type =
 let mix_blend_mode =
   unsupportedProperty(Property_parser.property_mix_blend_mode);
 
-let position = unsupportedProperty(Property_parser.property_position);
+let position =
+  monomorphic(
+    Property_parser.property_position,
+    (~loc) => [%expr CSS.position],
+    (~loc, value: Types.property_position) =>
+      switch (value) {
+      | `Static => [%expr `static]
+      | `Relative => [%expr `relative]
+      | `Absolute => [%expr `absolute]
+      | `Sticky => [%expr `sticky]
+      | `Fixed => [%expr `fixed]
+      | `Webkit_sticky => raise(Unsupported_feature)
+      },
+  );
 
-let resize = unsupportedProperty(Property_parser.property_resize);
+let resize =
+  monomorphic(
+    Property_parser.property_resize,
+    (~loc) => [%expr CSS.resize],
+    (~loc, value: Types.property_resize) =>
+      switch (value) {
+      | `None => [%expr `none]
+      | `Both => [%expr `both]
+      | `Horizontal => [%expr `horizontal]
+      | `Vertical => [%expr `vertical]
+      | `Block => [%expr `block]
+      | `Inline => [%expr `inline]
+      },
+  );
 
 let row_gap =
   monomorphic(
@@ -5263,13 +5875,25 @@ let row_gap =
   );
 
 let scrollbar_3dlight_color =
-  unsupportedProperty(Property_parser.property_scrollbar_3dlight_color);
+  monomorphic(
+    Property_parser.property_scrollbar_3dlight_color,
+    (~loc) => [%expr CSS.scrollbar3dlightColor],
+    render_color,
+  );
 
 let scrollbar_arrow_color =
-  unsupportedProperty(Property_parser.property_scrollbar_arrow_color);
+  monomorphic(
+    Property_parser.property_scrollbar_arrow_color,
+    (~loc) => [%expr CSS.scrollbarArrowColor],
+    render_color,
+  );
 
 let scrollbar_base_color =
-  unsupportedProperty(Property_parser.property_scrollbar_base_color);
+  monomorphic(
+    Property_parser.property_scrollbar_base_color,
+    (~loc) => [%expr CSS.scrollbarBaseColor],
+    render_color,
+  );
 
 let scrollbar_color =
   monomorphic(
@@ -5288,19 +5912,39 @@ let scrollbar_color =
   );
 
 let scrollbar_darkshadow_color =
-  unsupportedProperty(Property_parser.property_scrollbar_darkshadow_color);
+  monomorphic(
+    Property_parser.property_scrollbar_darkshadow_color,
+    (~loc) => [%expr CSS.scrollbarDarkshadowColor],
+    render_color,
+  );
 
 let scrollbar_face_color =
-  unsupportedProperty(Property_parser.property_scrollbar_face_color);
+  monomorphic(
+    Property_parser.property_scrollbar_face_color,
+    (~loc) => [%expr CSS.scrollbarFaceColor],
+    render_color,
+  );
 
 let scrollbar_highlight_color =
-  unsupportedProperty(Property_parser.property_scrollbar_highlight_color);
+  monomorphic(
+    Property_parser.property_scrollbar_highlight_color,
+    (~loc) => [%expr CSS.scrollbarHighlightColor],
+    render_color,
+  );
 
 let scrollbar_shadow_color =
-  unsupportedProperty(Property_parser.property_scrollbar_shadow_color);
+  monomorphic(
+    Property_parser.property_scrollbar_shadow_color,
+    (~loc) => [%expr CSS.scrollbarShadowColor],
+    render_color,
+  );
 
 let scrollbar_track_color =
-  unsupportedProperty(Property_parser.property_scrollbar_track_color);
+  monomorphic(
+    Property_parser.property_scrollbar_track_color,
+    (~loc) => [%expr CSS.scrollbarTrackColor],
+    render_color,
+  );
 
 let scrollbar_width =
   monomorphic(
@@ -5312,6 +5956,261 @@ let scrollbar_width =
       | `Auto => [%expr `auto]
       | `None => [%expr `none]
       },
+  );
+
+let scroll_margin =
+  emit_shorthand(
+    Property_parser.property_scroll_margin,
+    render_extended_length,
+    (~loc) =>
+      fun
+      | [all] => [[%expr CSS.scrollMargin([%e all])]]
+      | [v, h] => [[%expr CSS.scrollMargin2(~v=[%e v], ~h=[%e h])]]
+      | [top, h, bottom] => [
+          [%expr
+            CSS.scrollMargin3(~top=[%e top], ~h=[%e h], ~bottom=[%e bottom])
+          ],
+        ]
+      | [top, right, bottom, left] => [
+          [%expr
+            CSS.scrollMargin4(
+              ~top=[%e top],
+              ~right=[%e right],
+              ~bottom=[%e bottom],
+              ~left=[%e left],
+            )
+          ],
+        ]
+      | []
+      | _ => raise(Impossible_state),
+  );
+
+let scroll_margin_block =
+  emit_shorthand(
+    Property_parser.property_scroll_margin_block,
+    render_extended_length,
+    (~loc) =>
+      fun
+      | [all] => [[%expr CSS.scrollMarginBlock([%e all])]]
+      | [v, h] => [[%expr CSS.scrollMarginBlock2(~v=[%e v], ~h=[%e h])]]
+      | []
+      | _ => raise(Impossible_state),
+  );
+
+let scroll_margin_block_end =
+  monomorphic(
+    Property_parser.property_scroll_margin_block_end,
+    (~loc) => [%expr CSS.scrollMarginBlockEnd],
+    render_extended_length,
+  );
+
+let scroll_margin_block_start =
+  monomorphic(
+    Property_parser.property_scroll_margin_block_start,
+    (~loc) => [%expr CSS.scrollMarginBlockStart],
+    render_extended_length,
+  );
+
+let scroll_margin_bottom =
+  monomorphic(
+    Property_parser.property_scroll_margin_bottom,
+    (~loc) => [%expr CSS.scrollMarginBottom],
+    render_extended_length,
+  );
+
+let scroll_margin_inline =
+  emit_shorthand(
+    Property_parser.property_scroll_margin_inline,
+    render_extended_length,
+    (~loc) =>
+      fun
+      | [all] => [[%expr CSS.scrollMarginInline([%e all])]]
+      | [v, h] => [[%expr CSS.scrollMarginInline2(~v=[%e v], ~h=[%e h])]]
+      | []
+      | _ => raise(Impossible_state),
+  );
+
+let scroll_margin_inline_end =
+  monomorphic(
+    Property_parser.property_scroll_margin_inline_end,
+    (~loc) => [%expr CSS.scrollMarginInlineEnd],
+    render_extended_length,
+  );
+
+let scroll_margin_inline_start =
+  monomorphic(
+    Property_parser.property_scroll_margin_inline_start,
+    (~loc) => [%expr CSS.scrollMarginInlineStart],
+    render_extended_length,
+  );
+
+let scroll_margin_left =
+  monomorphic(
+    Property_parser.property_scroll_margin_left,
+    (~loc) => [%expr CSS.scrollMarginLeft],
+    render_extended_length,
+  );
+
+let scroll_margin_right =
+  monomorphic(
+    Property_parser.property_scroll_margin_right,
+    (~loc) => [%expr CSS.scrollMarginRight],
+    render_extended_length,
+  );
+
+let scroll_margin_top =
+  monomorphic(
+    Property_parser.property_scroll_margin_top,
+    (~loc) => [%expr CSS.scrollMarginTop],
+    render_extended_length,
+  );
+
+let render_scroll_padding_value = (~loc) =>
+  fun
+  | `Auto => [%expr `auto]
+  | `Extended_length(length) => render_extended_length(~loc, length)
+  | `Extended_percentage(percentage) => render_extended_percentage(~loc, percentage);
+
+let scroll_padding =
+  emit_shorthand(
+    Property_parser.property_scroll_padding,
+    render_scroll_padding_value,
+    (~loc) =>
+      fun
+      | [all] => [[%expr CSS.scrollPadding([%e all])]]
+      | [v, h] => [[%expr CSS.scrollPadding2(~v=[%e v], ~h=[%e h])]]
+      | [top, h, bottom] => [
+          [%expr
+            CSS.scrollPadding3(~top=[%e top], ~h=[%e h], ~bottom=[%e bottom])
+          ],
+        ]
+      | [top, right, bottom, left] => [
+          [%expr
+            CSS.scrollPadding4(
+              ~top=[%e top],
+              ~right=[%e right],
+              ~bottom=[%e bottom],
+              ~left=[%e left],
+            )
+          ],
+        ]
+      | []
+      | _ => raise(Impossible_state),
+  );
+
+let scroll_padding_block =
+  emit_shorthand(
+    Property_parser.property_scroll_padding_block,
+    render_scroll_padding_value,
+    (~loc) =>
+      fun
+      | [all] => [[%expr CSS.scrollPaddingBlock([%e all])]]
+      | [v, h] => [[%expr CSS.scrollPaddingBlock2(~v=[%e v], ~h=[%e h])]]
+      | []
+      | _ => raise(Impossible_state),
+  );
+
+let scroll_padding_block_end =
+  monomorphic(
+    Property_parser.property_scroll_padding_block_end,
+    (~loc) => [%expr CSS.scrollPaddingBlockEnd],
+    render_scroll_padding_value,
+  );
+
+let scroll_padding_block_start =
+  monomorphic(
+    Property_parser.property_scroll_padding_block_start,
+    (~loc) => [%expr CSS.scrollPaddingBlockStart],
+    render_scroll_padding_value,
+  );
+
+let scroll_padding_bottom =
+  monomorphic(
+    Property_parser.property_scroll_padding_bottom,
+    (~loc) => [%expr CSS.scrollPaddingBottom],
+    render_scroll_padding_value,
+  );
+
+let scroll_padding_inline =
+  emit_shorthand(
+    Property_parser.property_scroll_padding_inline,
+    render_scroll_padding_value,
+    (~loc) =>
+      fun
+      | [all] => [[%expr CSS.scrollPaddingInline([%e all])]]
+      | [v, h] => [[%expr CSS.scrollPaddingInline2(~v=[%e v], ~h=[%e h])]]
+      | []
+      | _ => raise(Impossible_state),
+  );
+
+let scroll_padding_inline_end =
+  monomorphic(
+    Property_parser.property_scroll_padding_inline_end,
+    (~loc) => [%expr CSS.scrollPaddingInlineEnd],
+    render_scroll_padding_value,
+  );
+
+let scroll_padding_inline_start =
+  monomorphic(
+    Property_parser.property_scroll_padding_inline_start,
+    (~loc) => [%expr CSS.scrollPaddingInlineStart],
+    render_scroll_padding_value,
+  );
+
+let scroll_padding_left =
+  monomorphic(
+    Property_parser.property_scroll_padding_left,
+    (~loc) => [%expr CSS.scrollPaddingLeft],
+    render_scroll_padding_value,
+  );
+
+let scroll_padding_right =
+  monomorphic(
+    Property_parser.property_scroll_padding_right,
+    (~loc) => [%expr CSS.scrollPaddingRight],
+    render_scroll_padding_value,
+  );
+
+let scroll_padding_top =
+  monomorphic(
+    Property_parser.property_scroll_padding_top,
+    (~loc) => [%expr CSS.scrollPaddingTop],
+    render_scroll_padding_value,
+  );
+
+let backdrop_blur =
+  monomorphic(
+    Property_parser.property_backdrop_blur,
+    (~loc) => [%expr CSS.backdropBlur],
+    render_extended_length,
+  );
+
+let shape_margin =
+  monomorphic(
+    Property_parser.property_shape_margin,
+    (~loc) => [%expr CSS.shapeMargin],
+    render_length_percentage,
+  );
+
+let webkit_tap_highlight_color =
+  monomorphic(
+    Property_parser.property__webkit_tap_highlight_color,
+    (~loc) => [%expr CSS.webkitTapHighlightColor],
+    render_color,
+  );
+
+let webkit_text_stroke_color =
+  monomorphic(
+    Property_parser.property__webkit_text_stroke_color,
+    (~loc) => [%expr CSS.webkitTextStrokeColor],
+    render_color,
+  );
+
+let webkit_text_stroke_width =
+  monomorphic(
+    Property_parser.property__webkit_text_stroke_width,
+    (~loc) => [%expr CSS.webkitTextStrokeWidth],
+    render_extended_length,
   );
 
 let stroke_dasharray =
@@ -5331,7 +6230,23 @@ let stroke_width = unsupportedProperty(Property_parser.property_stroke_width);
 let text_combine_upright =
   unsupportedProperty(Property_parser.property_text_combine_upright);
 
-let all = unsupportedProperty(Property_parser.property_all);
+let render_all = (~loc, value: Types.property_all) =>
+  switch (value) {
+  | `Initial => [%expr `initial]
+  | `Inherit => [%expr `inherit_]
+  | `Unset => [%expr `unset]
+  | `Revert => [%expr `revert]
+  };
+
+let all =
+  monomorphic(
+    Property_parser.property_all,
+    (~loc) =>
+      [%expr
+        value => CSS.unsafe({js|all|js}, CSS.Types.Cascading.toString(value))
+      ],
+    render_all,
+  );
 
 let appearance = unsupportedProperty(Property_parser.property_appearance);
 
@@ -5341,43 +6256,6 @@ let background_blend_mode =
 let baseline_shift =
   unsupportedProperty(Property_parser.property_baseline_shift);
 
-let block_size = unsupportedProperty(Property_parser.property_block_size);
-
-let border_block_color =
-  unsupportedProperty(Property_parser.property_border_block_color);
-
-let border_block_end_color =
-  unsupportedProperty(Property_parser.property_border_block_end_color);
-
-let border_block_end_style =
-  unsupportedProperty(Property_parser.property_border_block_end_style);
-
-let border_block_end_width =
-  unsupportedProperty(Property_parser.property_border_block_end_width);
-
-let border_block_end =
-  unsupportedProperty(Property_parser.property_border_block_end);
-
-let border_block_start_color =
-  unsupportedProperty(Property_parser.property_border_block_start_color);
-
-let border_block_start_style =
-  unsupportedProperty(Property_parser.property_border_block_start_style);
-
-let border_block_start_width =
-  unsupportedProperty(Property_parser.property_border_block_start_width);
-
-let border_block_start =
-  unsupportedProperty(Property_parser.property_border_block_start);
-
-let border_block_style =
-  unsupportedProperty(Property_parser.property_border_block_style);
-
-let border_block_width =
-  unsupportedProperty(Property_parser.property_border_block_width);
-
-let border_block = unsupportedProperty(Property_parser.property_border_block);
-
 let border_collapse =
   unsupportedProperty(Property_parser.property_border_collapse);
 
@@ -5386,42 +6264,6 @@ let border_end_end_radius =
 
 let border_end_start_radius =
   unsupportedProperty(Property_parser.property_border_end_start_radius);
-
-let border_inline_color =
-  unsupportedProperty(Property_parser.property_border_inline_color);
-
-let border_inline_end_color =
-  unsupportedProperty(Property_parser.property_border_inline_end_color);
-
-let border_inline_end_style =
-  unsupportedProperty(Property_parser.property_border_inline_end_style);
-
-let border_inline_end_width =
-  unsupportedProperty(Property_parser.property_border_inline_end_width);
-
-let border_inline_end =
-  unsupportedProperty(Property_parser.property_border_inline_end);
-
-let border_inline_start_color =
-  unsupportedProperty(Property_parser.property_border_inline_start_color);
-
-let border_inline_start_style =
-  unsupportedProperty(Property_parser.property_border_inline_start_style);
-
-let border_inline_start_width =
-  unsupportedProperty(Property_parser.property_border_inline_start_width);
-
-let border_inline_start =
-  unsupportedProperty(Property_parser.property_border_inline_start);
-
-let border_inline_style =
-  unsupportedProperty(Property_parser.property_border_inline_style);
-
-let border_inline_width =
-  unsupportedProperty(Property_parser.property_border_inline_width);
-
-let border_inline =
-  unsupportedProperty(Property_parser.property_border_inline);
 
 let border_spacing =
   unsupportedProperty(Property_parser.property_border_spacing);
@@ -5478,7 +6320,7 @@ let render_content_string = (~loc, str) => {
     } else if (length == 1 && get(str, 0) == '"') {
       [%expr {js|'"'|js}];
     } else if (length == 1 && get(str, 0) == ' ') {
-      [%expr {js|' '|js}];
+      [%expr {js|" "|js}];
     } else if (length == 1 && get(str, 0) == '\'') {
       [%expr {js|"'"|js}];
     } else if (length == 2 && get(str, 0) == '"' && get(str, 1) == '"') {
@@ -5648,7 +6490,9 @@ let content =
         [%expr CSS.contentRule([%e render_content_string(~loc, str)])],
       ]
     | `Interpolation(v) => [
-        [%expr CSS.contentRule([%e render_variable(~loc, v)])],
+        [%expr
+          CSS.contentRule([%e render_variable(~loc, String.concat(".", v))])
+        ],
       ]
     | `Static(`Content_list(lst), None) => [
         [%expr CSS.contentsRule([%e render_content_list(~loc, lst)], None)],
@@ -5699,25 +6543,82 @@ let initial_letter_align =
 let initial_letter =
   unsupportedProperty(Property_parser.property_initial_letter);
 
-let inline_size = unsupportedProperty(Property_parser.property_inline_size);
-
 let inset_block_end =
-  unsupportedProperty(Property_parser.property_inset_block_end);
+  monomorphic(
+    Property_parser.property_inset_block_end,
+    (~loc) => [%expr CSS.insetBlockEnd],
+    render_position_value,
+  );
 
 let inset_block_start =
-  unsupportedProperty(Property_parser.property_inset_block_start);
+  monomorphic(
+    Property_parser.property_inset_block_start,
+    (~loc) => [%expr CSS.insetBlockStart],
+    render_position_value,
+  );
 
-let inset_block = unsupportedProperty(Property_parser.property_inset_block);
+let inset_block =
+  emit_shorthand(
+    Property_parser.property_inset_block,
+    render_position_value,
+    (~loc) =>
+      fun
+      | [all] => [[%expr CSS.insetBlock([%e all])]]
+      | [v, h] => [[%expr CSS.insetBlock2(~v=[%e v], ~h=[%e h])]]
+      | []
+      | _ => raise(Impossible_state),
+  );
 
 let inset_inline_end =
-  unsupportedProperty(Property_parser.property_inset_inline_end);
+  monomorphic(
+    Property_parser.property_inset_inline_end,
+    (~loc) => [%expr CSS.insetInlineEnd],
+    render_position_value,
+  );
 
 let inset_inline_start =
-  unsupportedProperty(Property_parser.property_inset_inline_start);
+  monomorphic(
+    Property_parser.property_inset_inline_start,
+    (~loc) => [%expr CSS.insetInlineStart],
+    render_position_value,
+  );
 
-let inset_inline = unsupportedProperty(Property_parser.property_inset_inline);
+let inset_inline =
+  emit_shorthand(
+    Property_parser.property_inset_inline,
+    render_position_value,
+    (~loc) =>
+      fun
+      | [all] => [[%expr CSS.insetInline([%e all])]]
+      | [v, h] => [[%expr CSS.insetInline2(~v=[%e v], ~h=[%e h])]]
+      | []
+      | _ => raise(Impossible_state),
+  );
 
-let inset = unsupportedProperty(Property_parser.property_inset);
+let inset =
+  emit_shorthand(
+    Property_parser.property_inset,
+    render_position_value,
+    (~loc) =>
+      fun
+      | [all] => [[%expr CSS.inset([%e all])]]
+      | [v, h] => [[%expr CSS.inset2(~v=[%e v], ~h=[%e h])]]
+      | [top, h, bottom] => [
+          [%expr CSS.inset3(~top=[%e top], ~h=[%e h], ~bottom=[%e bottom])],
+        ]
+      | [top, right, bottom, left] => [
+          [%expr
+            CSS.inset4(
+              ~top=[%e top],
+              ~right=[%e right],
+              ~bottom=[%e bottom],
+              ~left=[%e left],
+            )
+          ],
+        ]
+      | []
+      | _ => raise(Impossible_state),
+  );
 
 let layout_grid_char =
   unsupportedProperty(Property_parser.property_layout_grid_char);
@@ -5783,18 +6684,6 @@ let mask_size = unsupportedProperty(Property_parser.property_mask_size);
 
 let mask_type = unsupportedProperty(Property_parser.property_mask_type);
 
-let max_block_size =
-  unsupportedProperty(Property_parser.property_max_block_size);
-
-let max_inline_size =
-  unsupportedProperty(Property_parser.property_max_inline_size);
-
-let min_block_size =
-  unsupportedProperty(Property_parser.property_min_block_size);
-
-let min_inline_size =
-  unsupportedProperty(Property_parser.property_min_inline_size);
-
 let nav_down = unsupportedProperty(Property_parser.property_nav_down);
 
 let nav_left = unsupportedProperty(Property_parser.property_nav_left);
@@ -5814,7 +6703,11 @@ let offset_anchor =
   );
 
 let offset_distance =
-  unsupportedProperty(Property_parser.property_offset_distance);
+  monomorphic(
+    Property_parser.property_offset_distance,
+    (~loc) => [%expr CSS.offsetDistance],
+    render_length_percentage,
+  );
 
 let offset_path = unsupportedProperty(Property_parser.property_offset_path);
 
@@ -5830,24 +6723,6 @@ let orphans = unsupportedProperty(Property_parser.property_orphans);
 
 let overflow_anchor =
   unsupportedProperty(Property_parser.property_overflow_anchor);
-
-let padding_block_end =
-  unsupportedProperty(Property_parser.property_padding_block_end);
-
-let padding_block_start =
-  unsupportedProperty(Property_parser.property_padding_block_start);
-
-let padding_block =
-  unsupportedProperty(Property_parser.property_padding_block);
-
-let padding_inline_end =
-  unsupportedProperty(Property_parser.property_padding_inline_end);
-
-let padding_inline_start =
-  unsupportedProperty(Property_parser.property_padding_inline_start);
-
-let padding_inline =
-  unsupportedProperty(Property_parser.property_padding_inline);
 
 let page_break_after =
   unsupportedProperty(Property_parser.property_page_break_after);
@@ -5896,7 +6771,7 @@ let user_select =
       | `Contain => [%expr `contain]
       | `All => [%expr `all]
       | `None => [%expr `none]
-      | `Interpolation(v) => render_variable(~loc, v),
+      | `Interpolation(v) => render_variable(~loc, String.concat(".", v)),
   );
 
 let zoom =
@@ -5920,7 +6795,7 @@ let visibility =
       | `Visible => [%expr `visible]
       | `Hidden => [%expr `hidden]
       | `Collapse => [%expr `collapse]
-      | `Interpolation(v) => render_variable(~loc, v),
+      | `Interpolation(v) => render_variable(~loc, String.concat(".", v)),
   );
 
 let properties = [
@@ -5939,6 +6814,7 @@ let properties = [
   ("animation", found(animation)),
   ("appearance", found(appearance)),
   ("aspect-ratio", found(aspect_ratio)),
+  ("backdrop-blur", found(backdrop_blur)),
   ("backdrop-filter", found(backdrop_filter)),
   ("backface-visibility", found(backface_visibility)),
   ("background-attachment", found(background_attachment)),
@@ -6153,6 +7029,12 @@ let properties = [
   ("list-style-type", found(list_style_type)),
   ("list-style", found(list_style)),
   ("margin-bottom", found(margin_bottom)),
+  ("margin-block", found(margin_block)),
+  ("margin-block-end", found(margin_block_end)),
+  ("margin-block-start", found(margin_block_start)),
+  ("margin-inline", found(margin_inline)),
+  ("margin-inline-end", found(margin_inline_end)),
+  ("margin-inline-start", found(margin_inline_start)),
   ("margin-left", found(margin_left)),
   ("margin-right", found(margin_right)),
   ("margin-top", found(margin_top)),
@@ -6233,6 +7115,28 @@ let properties = [
   ("rotate", found(rotate)),
   ("row-gap", found(row_gap)),
   ("scale", found(scale)),
+  ("scroll-margin", found(scroll_margin)),
+  ("scroll-margin-block", found(scroll_margin_block)),
+  ("scroll-margin-block-end", found(scroll_margin_block_end)),
+  ("scroll-margin-block-start", found(scroll_margin_block_start)),
+  ("scroll-margin-bottom", found(scroll_margin_bottom)),
+  ("scroll-margin-inline", found(scroll_margin_inline)),
+  ("scroll-margin-inline-end", found(scroll_margin_inline_end)),
+  ("scroll-margin-inline-start", found(scroll_margin_inline_start)),
+  ("scroll-margin-left", found(scroll_margin_left)),
+  ("scroll-margin-right", found(scroll_margin_right)),
+  ("scroll-margin-top", found(scroll_margin_top)),
+  ("scroll-padding", found(scroll_padding)),
+  ("scroll-padding-block", found(scroll_padding_block)),
+  ("scroll-padding-block-end", found(scroll_padding_block_end)),
+  ("scroll-padding-block-start", found(scroll_padding_block_start)),
+  ("scroll-padding-bottom", found(scroll_padding_bottom)),
+  ("scroll-padding-inline", found(scroll_padding_inline)),
+  ("scroll-padding-inline-end", found(scroll_padding_inline_end)),
+  ("scroll-padding-inline-start", found(scroll_padding_inline_start)),
+  ("scroll-padding-left", found(scroll_padding_left)),
+  ("scroll-padding-right", found(scroll_padding_right)),
+  ("scroll-padding-top", found(scroll_padding_top)),
   ("scrollbar-3dlight-color", found(scrollbar_3dlight_color)),
   ("scrollbar-arrow-color", found(scrollbar_arrow_color)),
   ("scrollbar-base-color", found(scrollbar_base_color)),
@@ -6244,6 +7148,7 @@ let properties = [
   ("scrollbar-track-color", found(scrollbar_track_color)),
   ("scrollbar-width", found(scrollbar_width)),
   ("scrollbar-gutter", found(scrollbar_gutter)),
+  ("shape-margin", found(shape_margin)),
   ("stroke-opacity", found(stroke_opacity)),
   ("stroke-width", found(stroke_width)),
   ("stroke-dasharray", found(stroke_dasharray)),
@@ -6296,6 +7201,9 @@ let properties = [
   ("user-select", found(user_select)),
   ("vertical-align", found(vertical_align)),
   ("visibility", found(visibility)),
+  ("-webkit-tap-highlight-color", found(webkit_tap_highlight_color)),
+  ("-webkit-text-stroke-color", found(webkit_text_stroke_color)),
+  ("-webkit-text-stroke-width", found(webkit_text_stroke_width)),
   ("will-change", found(will_change)),
   ("white-space", found(white_space)),
   ("widows", found(widows)),
@@ -6348,13 +7256,16 @@ let render_to_expr = (~loc, property, value, important) => {
   };
 };
 
-let render = (~loc: Location.t, property, value, important) =>
+let render = (~loc: Location.t, ~raw_value_source, property, value, important) =>
   if (isVariableDeclaration(property)) {
-    Ok([render_variable_declaration(~loc, property, value)]);
+    Ok([render_variable_declaration(~loc, property, raw_value_source)]);
   } else {
-    let.ok is_valid_string =
-      Property_parser.check_property(~name=property, value)
-      |> Result.map_error((`Unknown_value) => `Property_not_found);
+    let.ok () =
+      switch (Property_parser.validate_property(~loc, ~name=property, value)) {
+      | Ok () => Ok()
+      | Error((_, `Invalid_value(_))) => Ok()
+      | Error((_, `Property_not_found)) => Error(`Property_not_found)
+      };
 
     switch (render_css_global_values(~loc, property, value)) {
     | Ok(value) => Ok(value)
@@ -6365,8 +7276,9 @@ let render = (~loc: Location.t, property, value, important) =>
       | exception Impossible_state => Error(`Impossible_state)
       | Error(_)
       | exception Unsupported_feature =>
-        let.ok () = is_valid_string ? Ok() : Error(`Invalid_value(value));
-        Ok([render_when_unsupported_features(~loc, property, value)]);
+        Ok([
+          render_when_unsupported_features(~loc, property, raw_value_source),
+        ])
       }
     };
   };

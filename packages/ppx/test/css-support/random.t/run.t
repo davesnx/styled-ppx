@@ -35,7 +35,7 @@ If this test fail means that the module is not in sync with the ppx
   );
   CSS.unsafe({js|WebkitLineClamp|js}, {js|2|js});
   CSS.unsafe({js|WebkitOverflowScrolling|js}, {js|touch|js});
-  CSS.unsafe({js|WebkitTapHighlightColor|js}, {js|transparent|js});
+  CSS.webkitTapHighlightColor(`transparent);
   CSS.unsafe({js|WebkitTextFillColor|js}, colorTextString);
   CSS.animations([|
     CSS.Types.Animation.Value.make(
@@ -59,7 +59,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|bottom|js}, {js|unset|js});
   CSS.boxShadow(`none);
   CSS.unsafe({js|breakInside|js}, {js|avoid|js});
-  CSS.unsafe({js|caretColor|js}, {js|#e15a46|js});
+  CSS.caretColor(`hex({js|e15a46|js}));
   CSS.unsafe({js|color|js}, {js|inherit|js});
   CSS.color(`var({js|--color-link|js}));
   CSS.columnWidth(`pxFloat(125.));
@@ -103,7 +103,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|outline|js}, {js|none|js});
   CSS.unsafe({js|overflowAnchor|js}, {js|none|js});
   CSS.unsafe({js|position|js}, {js|unset|js});
-  CSS.unsafe({js|resize|js}, {js|none|js});
+  CSS.resize(`none);
   CSS.right(`calc(`sub((`percent(50.), `pxFloat(4.)))));
   CSS.unsafe({js|scrollBehavior|js}, {js|smooth|js});
   CSS.SVG.strokeOpacity(`num(0.));

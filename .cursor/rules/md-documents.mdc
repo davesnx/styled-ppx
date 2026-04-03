@@ -1,5 +1,0 @@
----
-alwaysApply: true
----
-
-All documents (markdown files) you want to write place them under .cursor/documents. Never create them at the root of the repo

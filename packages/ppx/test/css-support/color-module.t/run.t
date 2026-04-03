@@ -13,6 +13,11 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
+  File "input.re", line 72, characters 14-30:
+  Error: Property 'color' has an invalid value: 'color(.2 .4 .6)',
+         Expected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()',
+         'hwb()', 'lab()', 'lch()', etc.
+  [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
@@ -69,6 +74,72 @@ If this test fail means that the module is not in sync with the ppx
   CSS.color(`hex({js|000000FF|js}));
   CSS.color(CSS.rebeccapurple);
   
+  CSS.color(`hwb((`deg(0.), `percent(0.), `percent(0.))));
+  CSS.color(`hwba((`deg(0.), `percent(0.), `percent(0.), `num(0.5))));
+  CSS.color(`lab((`percent(0.), `num(0.), `num(0.))));
+  CSS.color(`laba((`percent(0.), `num(0.), `num(0.), `num(0.5))));
+  CSS.color(`lch((`percent(0.), `num(0.), `deg(0.))));
+  CSS.color(`lcha((`percent(0.), `num(0.), `deg(0.), `num(0.5))));
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(.2 .4 .6)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(display-p3 .2. 4 .6)',\nExpected 'hex-color', 'number', 'percentage', 'value', 'calc()', 'color-mix()', 'hsl()', 'hsla()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(foo .2 .4 .6)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(.2 .4 .6 / .5)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  CSS.color(
+    `colora((`displayP3, `num(0.2), `num(0.4), `num(0.6), `num(0.5))),
+  );
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(--foo .2 .4 .6 / .5)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(.2 .4 .6, #123456)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(display-p3 .2. 4 .6, #654321)',\nExpected 'hex-color', 'number', 'percentage', 'value', 'calc()', 'color-mix()', 'hsl()', 'hsla()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(20% 40% 60%)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  CSS.color(
+    `color((`displayP3, `percent(20.), `percent(40.), `percent(60.))),
+  );
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(foo 20% 40% 60%)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(20% 40% 60% / .5)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(image-p3 20% 40% 60%  / .5)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(--foo 20% 40% 60% / .5)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(20% 40% 60%, #123456)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value:\n'color(display-p3 20% 40% 60%, #654321)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(--mycmyk 0% 20% 30% 5%)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'device-cmyk(.2 .3 .4 .5)',\nExpected 'hex-color', 'value', 'color()', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'device-cmyk(.2 .3 .4 .5 / .5)',\nExpected 'hex-color', 'value', 'color()', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'device-cmyk(.2 .3 .4 .5 / 50%)',\nExpected 'hex-color', 'value', 'color()', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', etc."
+  ];
   CSS.backgroundColor(`rgb((0, 51, 178)));
   CSS.backgroundColor(`rgb((0, 64, 185)));
   CSS.backgroundColor(`hsl((`deg(0.), `percent(0.), `percent(0.))));

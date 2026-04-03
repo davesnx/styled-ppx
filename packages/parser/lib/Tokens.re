@@ -1,8 +1,8 @@
 [@deriving show({ with_path: false })]
 type token =
   | EOF
-  | IDENT(string) // <ident-token> - in value context
-  | TYPE_SELECTOR(string) // <type-selector-token> - in selector context (div, span, etc.)
+  | IDENT(string) // <ident-token>
+  | TYPE_SELECTOR(string) // <type-selector-token>
   | FUNCTION(string) // <function-token>
   | NTH_FUNCTION(string) // <function-token> (nth-*)
   | AT_KEYWORD(string) // <at-keyword-token>
@@ -21,28 +21,13 @@ type token =
     ) // <hash-token>
   | STRING(string) // <string-token>
   | URL(string) // <url-token>
-  | INTERPOLATION((string, [@opaque] Ppxlib.Location.t)) // <interpolation-token> (non-standard) - (content, content_location)
-  | DELIM(char) // <delim-token> for unknown single characters
-  | DOT // '.'
-  | ASTERISK // '*'
-  | AMPERSAND // '&'
-  | PLUS // '+'
-  | MINUS // '-'
-  | TILDE // '~'
-  | GREATER_THAN // '>'
-  | LESS_THAN // '<'
-  | EQUALS // '='
-  | SLASH // '/'
-  | EXCLAMATION // '!'
-  | PIPE // '|'
-  | CARET // '^'
-  | DOLLAR_SIGN // '$'
-  | QUESTION_MARK // '?'
+  | INTERPOLATION((string, [@opaque] Ppxlib.Location.t)) // <interpolation-token> (non-standard)
+  | DELIM(string) // <delim-token> for all delimiter characters
   | NUMBER(float) // <number-token>
   | PERCENTAGE(float) // <percentage-token>
   | DIMENSION((float, string)) // <dimension-token>
-  | DESCENDANT_COMBINATOR // whitespace as selector combinator (div span)
-  | WS // <whitespace-token> in value context
+  | DESCENDANT_COMBINATOR // whitespace as selector combinator
+  | WS // <whitespace-token>
   | COLON // <colon-token>
   | DOUBLE_COLON // <double-colon-token>
   | IMPORTANT // <important-token>
@@ -53,9 +38,7 @@ type token =
   | LEFT_PAREN // <(-token>
   | RIGHT_PAREN // <)-token>
   | LEFT_BRACE // <{-token>
-  | RIGHT_BRACE // <}-token>
-  | GTE
-  | LTE;
+  | RIGHT_BRACE; // <}-token>;
 
 let string_of_char = c => String.make(1, c);
 
@@ -105,6 +88,7 @@ let show_error =
 
 let token_of_delimiter_string =
   fun
+  /* Structural tokens */
   | "(" => Some(LEFT_PAREN)
   | ")" => Some(RIGHT_PAREN)
   | "[" => Some(LEFT_BRACKET)
@@ -114,24 +98,8 @@ let token_of_delimiter_string =
   | ":" => Some(COLON)
   | ";" => Some(SEMI_COLON)
   | "," => Some(COMMA)
-  | "." => Some(DOT)
-  | "*" => Some(ASTERISK)
-  | "&" => Some(AMPERSAND)
-  | "+" => Some(PLUS)
-  | "-" => Some(MINUS)
-  | "~" => Some(TILDE)
-  | ">" => Some(GREATER_THAN)
-  | "<" => Some(LESS_THAN)
-  | "=" => Some(EQUALS)
-  | "/" => Some(SLASH)
-  | "!" => Some(EXCLAMATION)
-  | "|" => Some(PIPE)
-  | "^" => Some(CARET)
-  | "$" => Some(DOLLAR_SIGN)
-  | "?" => Some(QUESTION_MARK)
-  | "#" => Some(DELIM('#'))
-  | "@" => Some(DELIM('@'))
-  | s when String.length(s) == 1 => Some(DELIM(s.[0]))
+  /* Single-character delimiters */
+  | s when String.length(s) == 1 => Some(DELIM(s))
   | _ => None;
 
 let humanize =
@@ -150,22 +118,7 @@ let humanize =
   | STRING(s) => Printf.sprintf("'%s'", s)
   | URL(url) => Printf.sprintf("url(%s)", url)
   | INTERPOLATION((v, _)) => Printf.sprintf("$(%s)", v)
-  | DELIM(c) => String.make(1, c)
-  | DOT => "."
-  | ASTERISK => "*"
-  | AMPERSAND => "&"
-  | PLUS => "+"
-  | MINUS => "-"
-  | TILDE => "~"
-  | GREATER_THAN => ">"
-  | LESS_THAN => "<"
-  | EQUALS => "="
-  | SLASH => "/"
-  | EXCLAMATION => "!"
-  | PIPE => "|"
-  | CARET => "^"
-  | DOLLAR_SIGN => "$"
-  | QUESTION_MARK => "?"
+  | DELIM(s) => s
   | NUMBER(n) => float_to_string(n)
   | PERCENTAGE(n) => Printf.sprintf("%s%%", float_to_string(n))
   | DIMENSION((n, d)) => Printf.sprintf("%s%s", float_to_string(n), d)
@@ -181,9 +134,7 @@ let humanize =
   | LEFT_PAREN => "("
   | RIGHT_PAREN => ")"
   | LEFT_BRACE => "{"
-  | RIGHT_BRACE => "}"
-  | GTE => ">="
-  | LTE => "<=";
+  | RIGHT_BRACE => "}";
 
 let to_debug =
   fun
@@ -223,23 +174,6 @@ let to_debug =
     Printf.sprintf("DIMENSION(%s, %s)", float_to_string(n), d)
   | UNICODE_RANGE(s) => Printf.sprintf("UNICODE_RANGE('%s')", s)
   | INTERPOLATION((v, _)) => Printf.sprintf("INTERPOLATION('%s')", v)
-  | DELIM(c) => Printf.sprintf("DELIM('%c')", c)
-  | DOT => "DOT"
-  | ASTERISK => "ASTERISK"
-  | AMPERSAND => "AMPERSAND"
-  | PLUS => "PLUS"
-  | MINUS => "MINUS"
-  | TILDE => "TILDE"
-  | GREATER_THAN => "GREATER_THAN"
-  | LESS_THAN => "LESS_THAN"
-  | EQUALS => "EQUALS"
-  | SLASH => "SLASH"
-  | EXCLAMATION => "EXCLAMATION"
-  | PIPE => "PIPE"
-  | CARET => "CARET"
-  | DOLLAR_SIGN => "DOLLAR_SIGN"
-  | QUESTION_MARK => "QUESTION_MARK"
+  | DELIM(s) => Printf.sprintf("DELIM('%s')", s)
   | DESCENDANT_COMBINATOR => "DESCENDANT_COMBINATOR"
-  | WS => "WS"
-  | GTE => "GTE"
-  | LTE => "LTE";
+  | WS => "WS";

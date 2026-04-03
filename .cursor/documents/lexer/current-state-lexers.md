@@ -16,7 +16,7 @@ single token system backed by `Tokens.re` and consumed via external tokens in
 | System | Lexer Function | Returns | Used By |
 |--------|---------------|---------|---------|
 | Parser.mly | `get_next_tokens_with_location` | `Tokens.token_with_location` | `driver.re`, menhir parser |
-| Tokens.re | `consume` | `Tokens.token` | `css-property-parser` |
+| Tokens.re | `consume` | `Tokens.token` | `css-grammar` |
 
 ---
 
@@ -237,9 +237,9 @@ HASH of (string * [`ID | `UNRESTRICTED])
 - Selector parsing (needs `DOT`, `COMBINATOR`, `OPERATOR`, `TAG`, etc.)
 
 ### Tokens.re tokens are used for:
-- CSS property value validation (`css-property-parser` package)
+- CSS property value validation (`css-grammar` package)
 - `Rule.re` pattern matching on token streams
-- `Standard.re` primitive extractors (`length`, `angle`, `percentage`, etc.)
+- `Css_value_types.re` primitive extractors (`length`, `angle`, `percentage`, etc.)
 
 ---
 
@@ -292,5 +292,5 @@ Merge `get_next_token` and `consume` into single function returning the unified 
 | `packages/parser/lib/Parser.mly` | Menhir grammar + token declarations |
 | `packages/parser/lib/driver.re` | Parser entry points |
 | `packages/parser/test/Lexer_test.re` | Tests for both lexers |
-| `packages/css-property-parser/lib/Rule.re` | Token stream parsing monad |
-| `packages/css-property-parser/lib/Standard.re` | Primitive value extractors |
+| `packages/css-grammar/lib/Rule.re` | Token stream parsing monad |
+| `packages/css-grammar/lib/Css_value_types.re` | Primitive value extractors |
