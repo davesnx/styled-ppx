@@ -18,7 +18,7 @@ let property_offset_anchor : property_offset_anchor Rule.rule =
 
 module Property_offset_distance =
   [%spec_module
-  "<extended-length> | <extended-percentage>", (module Css_types.OffsetDistance)]
+  "<extended-length> | <extended-percentage>", (module Css_types.Length)]
 
 let property_offset_distance : property_offset_distance Rule.rule =
   Property_offset_distance.rule

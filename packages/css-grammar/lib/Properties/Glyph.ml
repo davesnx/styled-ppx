@@ -3,7 +3,7 @@ open Support
 
 module Property_glyph_orientation_horizontal =
   [%spec_module
-  "<extended-angle>", (module Css_types.GlyphOrientationHorizontal)]
+  "<extended-angle>", (module Css_types.Angle)]
 
 let property_glyph_orientation_horizontal :
   property_glyph_orientation_horizontal Rule.rule =
@@ -11,7 +11,7 @@ let property_glyph_orientation_horizontal :
 
 module Property_glyph_orientation_vertical =
   [%spec_module
-  "<extended-angle>", (module Css_types.GlyphOrientationVertical)]
+  "<extended-angle>", (module Css_types.Angle)]
 
 let property_glyph_orientation_vertical :
   property_glyph_orientation_vertical Rule.rule =

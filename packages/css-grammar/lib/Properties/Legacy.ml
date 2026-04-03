@@ -63,7 +63,7 @@ let property_word_space_transform : property_word_space_transform Rule.rule =
 
 module Property_backdrop_blur =
   [%spec_module
-  "<extended-length>", (module Css_types.BackdropBlur)]
+  "<extended-length>", (module Css_types.Length)]
 
 let property_backdrop_blur : property_backdrop_blur Rule.rule =
   Property_backdrop_blur.rule

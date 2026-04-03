@@ -3,13 +3,13 @@ open Support
 
 module Property_x =
   [%spec_module
-  "<extended-length> | <extended-percentage>", (module Css_types.X)]
+  "<extended-length> | <extended-percentage>", (module Css_types.Length)]
 
 let property_x : property_x Rule.rule = Property_x.rule
 
 module Property_y =
   [%spec_module
-  "<extended-length> | <extended-percentage>", (module Css_types.Y)]
+  "<extended-length> | <extended-percentage>", (module Css_types.Length)]
 
 let property_y : property_y Rule.rule = Property_y.rule
 

@@ -244,7 +244,7 @@ let property__webkit_print_color_adjust :
 
 module Property__webkit_tap_highlight_color =
   [%spec_module
-  "<color>", (module Css_types.WebkitTapHighlightColor)]
+  "<color>", (module Css_types.Color)]
 
 let property__webkit_tap_highlight_color :
   property__webkit_tap_highlight_color Rule.rule =
@@ -274,7 +274,7 @@ let property__webkit_text_stroke : property__webkit_text_stroke Rule.rule =
 
 module Property__webkit_text_stroke_color =
   [%spec_module
-  "<color>", (module Css_types.WebkitTextStrokeColor)]
+  "<color>", (module Css_types.Color)]
 
 let property__webkit_text_stroke_color :
   property__webkit_text_stroke_color Rule.rule =
@@ -282,7 +282,7 @@ let property__webkit_text_stroke_color :
 
 module Property__webkit_text_stroke_width =
   [%spec_module
-  "<extended-length>", (module Css_types.WebkitTextStrokeWidth)]
+  "<extended-length>", (module Css_types.Length)]
 
 let property__webkit_text_stroke_width :
   property__webkit_text_stroke_width Rule.rule =

@@ -38,7 +38,7 @@ let property_column_rule : property_column_rule Rule.rule =
 
 module Property_column_rule_color =
   [%spec_module
-  "<color>", (module Css_types.ColumnRuleColor)]
+  "<color>", (module Css_types.Color)]
 
 let property_column_rule_color : property_column_rule_color Rule.rule =
   Property_column_rule_color.rule

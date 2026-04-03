@@ -518,53 +518,53 @@ let property__ms_scroll_translation = Property__ms_scroll_translation.rule
 
 module Property__ms_scrollbar_3dlight_color =
   [%spec_module
-  "<color>", (module Css_types.Scrollbar3dlightColor)]
+  "<color>", (module Css_types.Color)]
 
 let property__ms_scrollbar_3dlight_color =
   Property__ms_scrollbar_3dlight_color.rule
 
 module Property__ms_scrollbar_arrow_color =
   [%spec_module
-  "<color>", (module Css_types.ScrollbarArrowColor)]
+  "<color>", (module Css_types.Color)]
 
 let property__ms_scrollbar_arrow_color = Property__ms_scrollbar_arrow_color.rule
 
 module Property__ms_scrollbar_base_color =
   [%spec_module
-  "<color>", (module Css_types.ScrollbarBaseColor)]
+  "<color>", (module Css_types.Color)]
 
 let property__ms_scrollbar_base_color = Property__ms_scrollbar_base_color.rule
 
 module Property__ms_scrollbar_darkshadow_color =
   [%spec_module
-  "<color>", (module Css_types.ScrollbarDarkshadowColor)]
+  "<color>", (module Css_types.Color)]
 
 let property__ms_scrollbar_darkshadow_color =
   Property__ms_scrollbar_darkshadow_color.rule
 
 module Property__ms_scrollbar_face_color =
   [%spec_module
-  "<color>", (module Css_types.ScrollbarFaceColor)]
+  "<color>", (module Css_types.Color)]
 
 let property__ms_scrollbar_face_color = Property__ms_scrollbar_face_color.rule
 
 module Property__ms_scrollbar_highlight_color =
   [%spec_module
-  "<color>", (module Css_types.ScrollbarHighlightColor)]
+  "<color>", (module Css_types.Color)]
 
 let property__ms_scrollbar_highlight_color =
   Property__ms_scrollbar_highlight_color.rule
 
 module Property__ms_scrollbar_shadow_color =
   [%spec_module
-  "<color>", (module Css_types.ScrollbarShadowColor)]
+  "<color>", (module Css_types.Color)]
 
 let property__ms_scrollbar_shadow_color =
   Property__ms_scrollbar_shadow_color.rule
 
 module Property__ms_scrollbar_track_color =
   [%spec_module
-  "<color>", (module Css_types.ScrollbarTrackColor)]
+  "<color>", (module Css_types.Color)]
 
 let property__ms_scrollbar_track_color = Property__ms_scrollbar_track_color.rule
 
@@ -591,7 +591,7 @@ let property_scrollbar_gutter : property_scrollbar_gutter Rule.rule =
 
 module Property_scrollbar_3dlight_color =
   [%spec_module
-  "<color>", (module Css_types.Scrollbar3dlightColor)]
+  "<color>", (module Css_types.Color)]
 
 let property_scrollbar_3dlight_color :
   property_scrollbar_3dlight_color Rule.rule =
@@ -599,21 +599,21 @@ let property_scrollbar_3dlight_color :
 
 module Property_scrollbar_arrow_color =
   [%spec_module
-  "<color>", (module Css_types.ScrollbarArrowColor)]
+  "<color>", (module Css_types.Color)]
 
 let property_scrollbar_arrow_color : property_scrollbar_arrow_color Rule.rule =
   Property_scrollbar_arrow_color.rule
 
 module Property_scrollbar_base_color =
   [%spec_module
-  "<color>", (module Css_types.ScrollbarBaseColor)]
+  "<color>", (module Css_types.Color)]
 
 let property_scrollbar_base_color : property_scrollbar_base_color Rule.rule =
   Property_scrollbar_base_color.rule
 
 module Property_scrollbar_darkshadow_color =
   [%spec_module
-  "<color>", (module Css_types.ScrollbarDarkshadowColor)]
+  "<color>", (module Css_types.Color)]
 
 let property_scrollbar_darkshadow_color :
   property_scrollbar_darkshadow_color Rule.rule =
@@ -621,14 +621,14 @@ let property_scrollbar_darkshadow_color :
 
 module Property_scrollbar_face_color =
   [%spec_module
-  "<color>", (module Css_types.ScrollbarFaceColor)]
+  "<color>", (module Css_types.Color)]
 
 let property_scrollbar_face_color : property_scrollbar_face_color Rule.rule =
   Property_scrollbar_face_color.rule
 
 module Property_scrollbar_highlight_color =
   [%spec_module
-  "<color>", (module Css_types.ScrollbarHighlightColor)]
+  "<color>", (module Css_types.Color)]
 
 let property_scrollbar_highlight_color :
   property_scrollbar_highlight_color Rule.rule =
@@ -636,7 +636,7 @@ let property_scrollbar_highlight_color :
 
 module Property_scrollbar_shadow_color =
   [%spec_module
-  "<color>", (module Css_types.ScrollbarShadowColor)]
+  "<color>", (module Css_types.Color)]
 
 let property_scrollbar_shadow_color : property_scrollbar_shadow_color Rule.rule
     =
@@ -644,7 +644,7 @@ let property_scrollbar_shadow_color : property_scrollbar_shadow_color Rule.rule
 
 module Property_scrollbar_track_color =
   [%spec_module
-  "<color>", (module Css_types.ScrollbarTrackColor)]
+  "<color>", (module Css_types.Color)]
 
 let property_scrollbar_track_color : property_scrollbar_track_color Rule.rule =
   Property_scrollbar_track_color.rule

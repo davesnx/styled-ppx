@@ -34,7 +34,7 @@ let property_border_block_end : property_border_block_end Rule.rule =
 
 module Property_border_block_end_color =
   [%spec_module
-  "<'border-top-color'>", (module Css_types.BorderBlockEndColor)]
+  "<'border-top-color'>", (module Css_types.Color)]
 
 let property_border_block_end_color : property_border_block_end_color Rule.rule
     =
@@ -50,7 +50,7 @@ let property_border_block_end_style : property_border_block_end_style Rule.rule
 
 module Property_border_block_end_width =
   [%spec_module
-  "<'border-top-width'>", (module Css_types.BorderBlockEndWidth)]
+  "<'border-top-width'>", (module Css_types.LineWidth)]
 
 let property_border_block_end_width : property_border_block_end_width Rule.rule
     =
@@ -65,7 +65,7 @@ let property_border_block_start : property_border_block_start Rule.rule =
 
 module Property_border_block_start_color =
   [%spec_module
-  "<'border-top-color'>", (module Css_types.BorderBlockStartColor)]
+  "<'border-top-color'>", (module Css_types.Color)]
 
 let property_border_block_start_color :
   property_border_block_start_color Rule.rule =
@@ -81,7 +81,7 @@ let property_border_block_start_style :
 
 module Property_border_block_start_width =
   [%spec_module
-  "<'border-top-width'>", (module Css_types.BorderBlockStartWidth)]
+  "<'border-top-width'>", (module Css_types.LineWidth)]
 
 let property_border_block_start_width :
   property_border_block_start_width Rule.rule =
@@ -96,7 +96,7 @@ let property_border_block_style : property_border_block_style Rule.rule =
 
 module Property_border_block_width =
   [%spec_module
-  "<'border-top-width'>", (module Css_types.BorderBlockWidth)]
+  "<'border-top-width'>", (module Css_types.LineWidth)]
 
 let property_border_block_width : property_border_block_width Rule.rule =
   Property_border_block_width.rule
@@ -249,7 +249,7 @@ let property_border_inline_end : property_border_inline_end Rule.rule =
 
 module Property_border_inline_end_color =
   [%spec_module
-  "<'border-top-color'>", (module Css_types.BorderInlineEndColor)]
+  "<'border-top-color'>", (module Css_types.Color)]
 
 let property_border_inline_end_color :
   property_border_inline_end_color Rule.rule =
@@ -265,7 +265,7 @@ let property_border_inline_end_style :
 
 module Property_border_inline_end_width =
   [%spec_module
-  "<'border-top-width'>", (module Css_types.BorderInlineEndWidth)]
+  "<'border-top-width'>", (module Css_types.LineWidth)]
 
 let property_border_inline_end_width :
   property_border_inline_end_width Rule.rule =
@@ -280,7 +280,7 @@ let property_border_inline_start : property_border_inline_start Rule.rule =
 
 module Property_border_inline_start_color =
   [%spec_module
-  "<'border-top-color'>", (module Css_types.BorderInlineStartColor)]
+  "<'border-top-color'>", (module Css_types.Color)]
 
 let property_border_inline_start_color :
   property_border_inline_start_color Rule.rule =
@@ -296,7 +296,7 @@ let property_border_inline_start_style :
 
 module Property_border_inline_start_width =
   [%spec_module
-  "<'border-top-width'>", (module Css_types.BorderInlineStartWidth)]
+  "<'border-top-width'>", (module Css_types.LineWidth)]
 
 let property_border_inline_start_width :
   property_border_inline_start_width Rule.rule =
@@ -311,7 +311,7 @@ let property_border_inline_style : property_border_inline_style Rule.rule =
 
 module Property_border_inline_width =
   [%spec_module
-  "<'border-top-width'>", (module Css_types.BorderInlineWidth)]
+  "<'border-top-width'>", (module Css_types.LineWidth)]
 
 let property_border_inline_width : property_border_inline_width Rule.rule =
   Property_border_inline_width.rule

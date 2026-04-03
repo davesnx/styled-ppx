@@ -26,7 +26,7 @@ let property_line_height : property_line_height Rule.rule =
 
 module Property_line_height_step =
   [%spec_module
-  "<extended-length>", (module Css_types.LineHeightStep)]
+  "<extended-length>", (module Css_types.Length)]
 
 let property_line_height_step : property_line_height_step Rule.rule =
   Property_line_height_step.rule

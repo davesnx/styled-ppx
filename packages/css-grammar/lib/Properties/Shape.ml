@@ -10,7 +10,7 @@ let property_shape_image_threshold : property_shape_image_threshold Rule.rule =
 
 module Property_shape_margin =
   [%spec_module
-  "<extended-length> | <extended-percentage>", (module Css_types.ShapeMargin)]
+  "<extended-length> | <extended-percentage>", (module Css_types.Length)]
 
 let property_shape_margin : property_shape_margin Rule.rule =
   Property_shape_margin.rule

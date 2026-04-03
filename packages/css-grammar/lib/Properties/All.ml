@@ -3,7 +3,7 @@ open Support
 
 module Property_all =
   [%spec_module
-  "'initial' | 'inherit' | 'unset' | 'revert'", (module Css_types.All)]
+  "'initial' | 'inherit' | 'unset' | 'revert'", (module Css_types.Cascading)]
 
 let property_all : property_all Rule.rule = Property_all.rule
 
