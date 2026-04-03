@@ -181,6 +181,23 @@ let success_tests =
       {|$(if (x) { a } else { b })|},
       [INTERPOLATION(("if (x) { a } else { b }", Ppxlib.Location.none))],
     ),
+    (
+      {|$(f(")") + 1)|},
+      [INTERPOLATION(("f(\")\") + 1", Ppxlib.Location.none))],
+    ),
+    (
+      {|$(f(')') + 1)|},
+      [INTERPOLATION(("f(')') + 1", Ppxlib.Location.none))],
+    ),
+    (
+      {|$(switch (x) { | A => "}" | B => ")" })|},
+      [
+        INTERPOLATION((
+          "switch (x) { | A => \"}\" | B => \")\" }",
+          Ppxlib.Location.none,
+        )),
+      ],
+    ),
     ({|-moz|}, [IDENT("-moz")]),
     ({|--color-main|}, [IDENT("--color-main")]),
     (
