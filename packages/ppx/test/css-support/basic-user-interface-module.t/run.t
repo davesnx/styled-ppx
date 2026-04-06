@@ -31,10 +31,10 @@ If this test fail means that the module is not in sync with the ppx
   CSS.outlineOffset(`pxFloat(-5.));
   CSS.outlineOffset(`zero);
   CSS.outlineOffset(`pxFloat(5.));
-  CSS.unsafe({js|resize|js}, {js|none|js});
-  CSS.unsafe({js|resize|js}, {js|both|js});
-  CSS.unsafe({js|resize|js}, {js|horizontal|js});
-  CSS.unsafe({js|resize|js}, {js|vertical|js});
+  CSS.resize(`none);
+  CSS.resize(`both);
+  CSS.resize(`horizontal);
+  CSS.resize(`vertical);
   CSS.textOverflow(`clip);
   CSS.textOverflow(`ellipsis);
   
@@ -58,8 +58,8 @@ If this test fail means that the module is not in sync with the ppx
   CSS.cursor(`allScroll);
   CSS.cursor(`zoomIn);
   CSS.cursor(`zoomOut);
-  CSS.unsafe({js|caretColor|js}, {js|auto|js});
-  CSS.unsafe({js|caretColor|js}, {js|green|js});
+  CSS.caretColor(`auto);
+  CSS.caretColor(CSS.green);
   
   CSS.unsafe({js|appearance|js}, {js|auto|js});
   CSS.unsafe({js|appearance|js}, {js|none|js});

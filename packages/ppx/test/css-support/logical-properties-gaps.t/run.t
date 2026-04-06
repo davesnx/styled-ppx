@@ -16,62 +16,62 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
-  CSS.unsafe({js|marginBlockStart|js}, {js|auto|js});
-  CSS.unsafe({js|marginBlockStart|js}, {js|0|js});
-  CSS.unsafe({js|marginBlockStart|js}, {js|10%|js});
-  CSS.unsafe({js|marginBlockStart|js}, {js|calc(10px + 5%)|js});
-  CSS.unsafe({js|marginBlockEnd|js}, {js|auto|js});
-  CSS.unsafe({js|marginBlockEnd|js}, {js|0|js});
-  CSS.unsafe({js|marginBlockEnd|js}, {js|10%|js});
-  CSS.unsafe({js|marginBlockEnd|js}, {js|calc(10px + 5%)|js});
+  CSS.marginBlockStart(`auto);
+  CSS.marginBlockStart(`zero);
+  CSS.marginBlockStart(`percent(10.));
+  CSS.marginBlockStart(`calc(`add((`pxFloat(10.), `percent(5.)))));
+  CSS.marginBlockEnd(`auto);
+  CSS.marginBlockEnd(`zero);
+  CSS.marginBlockEnd(`percent(10.));
+  CSS.marginBlockEnd(`calc(`add((`pxFloat(10.), `percent(5.)))));
   
-  CSS.unsafe({js|marginInlineStart|js}, {js|auto|js});
-  CSS.unsafe({js|marginInlineStart|js}, {js|0|js});
-  CSS.unsafe({js|marginInlineStart|js}, {js|10%|js});
-  CSS.unsafe({js|marginInlineStart|js}, {js|calc(10px + 5%)|js});
-  CSS.unsafe({js|marginInlineEnd|js}, {js|auto|js});
-  CSS.unsafe({js|marginInlineEnd|js}, {js|0|js});
-  CSS.unsafe({js|marginInlineEnd|js}, {js|10%|js});
-  CSS.unsafe({js|marginInlineEnd|js}, {js|calc(10px + 5%)|js});
+  CSS.marginInlineStart(`auto);
+  CSS.marginInlineStart(`zero);
+  CSS.marginInlineStart(`percent(10.));
+  CSS.marginInlineStart(`calc(`add((`pxFloat(10.), `percent(5.)))));
+  CSS.marginInlineEnd(`auto);
+  CSS.marginInlineEnd(`zero);
+  CSS.marginInlineEnd(`percent(10.));
+  CSS.marginInlineEnd(`calc(`add((`pxFloat(10.), `percent(5.)))));
   
-  CSS.unsafe({js|paddingBlockStart|js}, {js|0|js});
-  CSS.unsafe({js|paddingBlockStart|js}, {js|10%|js});
-  CSS.unsafe({js|paddingBlockStart|js}, {js|calc(10px + 5%)|js});
-  CSS.unsafe({js|paddingBlockEnd|js}, {js|0|js});
-  CSS.unsafe({js|paddingBlockEnd|js}, {js|10%|js});
-  CSS.unsafe({js|paddingBlockEnd|js}, {js|calc(10px + 5%)|js});
+  CSS.paddingBlockStart(`zero);
+  CSS.paddingBlockStart(`percent(10.));
+  CSS.paddingBlockStart(`calc(`add((`pxFloat(10.), `percent(5.)))));
+  CSS.paddingBlockEnd(`zero);
+  CSS.paddingBlockEnd(`percent(10.));
+  CSS.paddingBlockEnd(`calc(`add((`pxFloat(10.), `percent(5.)))));
   
-  CSS.unsafe({js|paddingInlineStart|js}, {js|0|js});
-  CSS.unsafe({js|paddingInlineStart|js}, {js|10%|js});
-  CSS.unsafe({js|paddingInlineStart|js}, {js|calc(10px + 5%)|js});
-  CSS.unsafe({js|paddingInlineEnd|js}, {js|0|js});
-  CSS.unsafe({js|paddingInlineEnd|js}, {js|10%|js});
-  CSS.unsafe({js|paddingInlineEnd|js}, {js|calc(10px + 5%)|js});
+  CSS.paddingInlineStart(`zero);
+  CSS.paddingInlineStart(`percent(10.));
+  CSS.paddingInlineStart(`calc(`add((`pxFloat(10.), `percent(5.)))));
+  CSS.paddingInlineEnd(`zero);
+  CSS.paddingInlineEnd(`percent(10.));
+  CSS.paddingInlineEnd(`calc(`add((`pxFloat(10.), `percent(5.)))));
   
-  CSS.unsafe({js|marginBlock|js}, {js|auto auto|js});
-  CSS.unsafe({js|marginBlock|js}, {js|10px 20px|js});
-  CSS.unsafe({js|marginBlock|js}, {js|10% 20%|js});
-  CSS.unsafe({js|marginInline|js}, {js|auto auto|js});
-  CSS.unsafe({js|marginInline|js}, {js|10px 20px|js});
-  CSS.unsafe({js|marginInline|js}, {js|10% 20%|js});
+  CSS.marginBlock2(~v=`auto, ~h=`auto);
+  CSS.marginBlock2(~v=`pxFloat(10.), ~h=`pxFloat(20.));
+  CSS.marginBlock2(~v=`percent(10.), ~h=`percent(20.));
+  CSS.marginInline2(~v=`auto, ~h=`auto);
+  CSS.marginInline2(~v=`pxFloat(10.), ~h=`pxFloat(20.));
+  CSS.marginInline2(~v=`percent(10.), ~h=`percent(20.));
   
-  CSS.unsafe({js|paddingBlock|js}, {js|10px 20px|js});
-  CSS.unsafe({js|paddingBlock|js}, {js|10% 20%|js});
-  CSS.unsafe({js|paddingInline|js}, {js|10px 20px|js});
-  CSS.unsafe({js|paddingInline|js}, {js|10% 20%|js});
+  CSS.paddingBlock2(~v=`pxFloat(10.), ~h=`pxFloat(20.));
+  CSS.paddingBlock2(~v=`percent(10.), ~h=`percent(20.));
+  CSS.paddingInline2(~v=`pxFloat(10.), ~h=`pxFloat(20.));
+  CSS.paddingInline2(~v=`percent(10.), ~h=`percent(20.));
   
-  CSS.unsafe({js|borderBlockWidth|js}, {js|thin|js});
-  CSS.unsafe({js|borderBlockWidth|js}, {js|medium|js});
-  CSS.unsafe({js|borderBlockWidth|js}, {js|thick|js});
-  CSS.unsafe({js|borderBlockWidth|js}, {js|2px|js});
-  CSS.unsafe({js|borderInlineWidth|js}, {js|thin|js});
-  CSS.unsafe({js|borderInlineWidth|js}, {js|medium|js});
-  CSS.unsafe({js|borderInlineWidth|js}, {js|thick|js});
-  CSS.unsafe({js|borderInlineWidth|js}, {js|2px|js});
+  CSS.borderBlockWidth(`thin);
+  CSS.borderBlockWidth(`medium);
+  CSS.borderBlockWidth(`thick);
+  CSS.borderBlockWidth(`pxFloat(2.));
+  CSS.borderInlineWidth(`thin);
+  CSS.borderInlineWidth(`medium);
+  CSS.borderInlineWidth(`thick);
+  CSS.borderInlineWidth(`pxFloat(2.));
   
-  CSS.unsafe({js|borderBlockStyle|js}, {js|none|js});
-  CSS.unsafe({js|borderBlockStyle|js}, {js|solid|js});
-  CSS.unsafe({js|borderBlockStyle|js}, {js|dashed|js});
-  CSS.unsafe({js|borderInlineStyle|js}, {js|none|js});
-  CSS.unsafe({js|borderInlineStyle|js}, {js|solid|js});
-  CSS.unsafe({js|borderInlineStyle|js}, {js|dashed|js});
+  CSS.borderBlockStyle(`none);
+  CSS.borderBlockStyle(`solid);
+  CSS.borderBlockStyle(`dashed);
+  CSS.borderInlineStyle(`none);
+  CSS.borderInlineStyle(`solid);
+  CSS.borderInlineStyle(`dashed);

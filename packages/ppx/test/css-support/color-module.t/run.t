@@ -49,13 +49,13 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|textDecorationColor|js}, {js|hsl(0,0%,0%,.5)|js});
   CSS.textDecorationColor(`transparent);
   CSS.textDecorationColor(`currentColor);
-  CSS.unsafe({js|columnRuleColor|js}, {js|rgba(0,0,0,.5)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|#F06|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|#FF0066|js});
+  CSS.columnRuleColor(`rgba((0, 0, 0, `num(0.5))));
+  CSS.columnRuleColor(`hex({js|F06|js}));
+  CSS.columnRuleColor(`hex({js|FF0066|js}));
   CSS.unsafe({js|columnRuleColor|js}, {js|hsl(0,0%,0%)|js});
   CSS.unsafe({js|columnRuleColor|js}, {js|hsl(0,0%,0%,.5)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|transparent|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|currentColor|js});
+  CSS.columnRuleColor(`transparent);
+  CSS.columnRuleColor(`currentColor);
   
   CSS.color(`rgb((0, 51, 178)));
   CSS.color(`rgb((0, 64, 185)));
@@ -200,22 +200,26 @@ If this test fail means that the module is not in sync with the ppx
   CSS.textDecorationColor(`hex({js|000F|js}));
   CSS.textDecorationColor(`hex({js|000000FF|js}));
   CSS.textDecorationColor(CSS.rebeccapurple);
-  CSS.unsafe({js|columnRuleColor|js}, {js|rgb(0% 20% 70%)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|rgb(0 64 185)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|hsl(0 0% 0%)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|rgba(0% 20% 70% / 50%)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|rgba(0% 20% 70% / .5)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|rgba(0 64 185 / 50%)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|rgba(0 64 185 / .5)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|hsla(0 0% 0% /.5)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|rgb(0% 20% 70% / 50%)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|rgb(0% 20% 70% / .5)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|rgb(0 64 185 / 50%)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|rgb(0 64 185 / .5)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|hsl(0 0% 0% / .5)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|#000F|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|#000000FF|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|rebeccapurple|js});
+  CSS.columnRuleColor(`rgb((0, 51, 178)));
+  CSS.columnRuleColor(`rgb((0, 64, 185)));
+  CSS.columnRuleColor(`hsl((`deg(0.), `percent(0.), `percent(0.))));
+  CSS.columnRuleColor(`rgba((0, 51, 178, `percent(0.5))));
+  CSS.columnRuleColor(`rgba((0, 51, 178, `num(0.5))));
+  CSS.columnRuleColor(`rgba((0, 64, 185, `percent(0.5))));
+  CSS.columnRuleColor(`rgba((0, 64, 185, `num(0.5))));
+  CSS.columnRuleColor(
+    `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
+  );
+  CSS.columnRuleColor(`rgba((0, 51, 178, `percent(0.5))));
+  CSS.columnRuleColor(`rgba((0, 51, 178, `num(0.5))));
+  CSS.columnRuleColor(`rgba((0, 64, 185, `percent(0.5))));
+  CSS.columnRuleColor(`rgba((0, 64, 185, `num(0.5))));
+  CSS.columnRuleColor(
+    `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
+  );
+  CSS.columnRuleColor(`hex({js|000F|js}));
+  CSS.columnRuleColor(`hex({js|000000FF|js}));
+  CSS.columnRuleColor(CSS.rebeccapurple);
   
   CSS.color(
     `colorMix((`srgb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
@@ -384,41 +388,44 @@ If this test fail means that the module is not in sync with the ppx
     `colorMix((`lab, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
   );
   
-  CSS.unsafe(
-    {js|columnRuleColor|js},
-    {js|color-mix(in srgb, teal 65%, olive)|js},
+  CSS.columnRuleColor(
+    `colorMix((`srgb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
   );
-  CSS.unsafe(
-    {js|columnRuleColor|js},
-    {js|color-mix(in srgb, rgb(255, 0, 0, .2) 65%, olive)|js},
+  CSS.columnRuleColor(
+    `colorMix((
+      `srgb,
+      (`rgba((255, 0, 0, `num(0.2))), Some(`percent(65.))),
+      (CSS.olive, None),
+    )),
   );
-  CSS.unsafe(
-    {js|columnRuleColor|js},
-    {js|color-mix(in srgb, currentColor, rgba(0, 0, 0, .5) 65%)|js},
+  CSS.columnRuleColor(
+    `colorMix((
+      `srgb,
+      (`currentColor, None),
+      (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))),
+    )),
   );
-  CSS.unsafe(
-    {js|columnRuleColor|js},
-    {js|color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, .5) 65%)|js},
+  CSS.columnRuleColor(
+    `colorMix((
+      `srgb,
+      (`currentColor, Some(`percent(10.))),
+      (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))),
+    )),
   );
-  CSS.unsafe(
-    {js|columnRuleColor|js},
-    {js|color-mix(in lch, teal 65%, olive)|js},
+  CSS.columnRuleColor(
+    `colorMix((`lch, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
   );
-  CSS.unsafe(
-    {js|columnRuleColor|js},
-    {js|color-mix(in hsl, teal 65%, olive)|js},
+  CSS.columnRuleColor(
+    `colorMix((`hsl, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
   );
-  CSS.unsafe(
-    {js|columnRuleColor|js},
-    {js|color-mix(in hwb, teal 65%, olive)|js},
+  CSS.columnRuleColor(
+    `colorMix((`hwb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
   );
-  CSS.unsafe(
-    {js|columnRuleColor|js},
-    {js|color-mix(in xyz, teal 65%, olive)|js},
+  CSS.columnRuleColor(
+    `colorMix((`xyz, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
   );
-  CSS.unsafe(
-    {js|columnRuleColor|js},
-    {js|color-mix(in lab, teal 65%, olive)|js},
+  CSS.columnRuleColor(
+    `colorMix((`lab, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
   );
   
   CSS.color(`rgba((0, 0, 0, `calc(`num(1.)))));
