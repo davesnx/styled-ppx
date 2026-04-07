@@ -14,9 +14,9 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
-  CSS.unsafe({js|scrollBehavior|js}, {js|smooth|js});
+  CSS.scrollBehavior(`smooth);
   
-  CSS.unsafe({js|overflowAnchor|js}, {js|none|js});
+  CSS.overflowAnchor(`none);
   
   CSS.unsafe({js|MozAppearance|js}, {js|textfield|js});
   CSS.unsafe({js|WebkitAppearance|js}, {js|none|js});
@@ -50,7 +50,7 @@ If this test fail means that the module is not in sync with the ppx
       (),
     ),
   |]);
-  CSS.unsafe({js|appearance|js}, {js|none|js});
+  CSS.appearance(`none);
   CSS.aspectRatio(`ratio((21, 8)));
   
   let c = CSS.hex("e15a46");
@@ -58,7 +58,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|border|js}, {js|none|js});
   CSS.unsafe({js|bottom|js}, {js|unset|js});
   CSS.boxShadow(`none);
-  CSS.unsafe({js|breakInside|js}, {js|avoid|js});
+  CSS.breakInside(`avoid);
   CSS.caretColor(`hex({js|e15a46|js}));
   CSS.unsafe({js|color|js}, {js|inherit|js});
   CSS.color(`var({js|--color-link|js}));
@@ -101,11 +101,11 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|maskRepeat|js}, {js|no-repeat|js});
   CSS.maxWidth(`maxContent);
   CSS.unsafe({js|outline|js}, {js|none|js});
-  CSS.unsafe({js|overflowAnchor|js}, {js|none|js});
+  CSS.overflowAnchor(`none);
   CSS.unsafe({js|position|js}, {js|unset|js});
   CSS.resize(`none);
   CSS.right(`calc(`sub((`percent(50.), `pxFloat(4.)))));
-  CSS.unsafe({js|scrollBehavior|js}, {js|smooth|js});
+  CSS.scrollBehavior(`smooth);
   CSS.SVG.strokeOpacity(`num(0.));
   (CSS.SVG.stroke(Color.text): CSS.rule);
   CSS.top(`calc(`sub((`percent(50.), `pxFloat(1.)))));

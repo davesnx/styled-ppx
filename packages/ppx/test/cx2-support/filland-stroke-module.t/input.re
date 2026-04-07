@@ -4,8 +4,8 @@
   /* [%cx2 {|fill: border-box|}]; */
   /* [%cx2 {|fill: border-box padding-box|}]; */
   /* [%cx2 {|fill: url(foo.png) bottom right / cover padding-box content-box|}]; */
-  /* [%cx2 {|fill-rule: nonzero|}]; */
-  /* [%cx2 {|fill-rule: evenodd|}]; */
+  [%cx2 {|fill-rule: nonzero|}];
+  [%cx2 {|fill-rule: evenodd|}];
   /* [%cx2 {|fill-break: bounding-box|}]; */
   /* [%cx2 {|fill-break: slice|}]; */
   /* [%cx2 {|fill-break: clone|}]; */
@@ -59,32 +59,32 @@
   /* [%cx2 {|fill-repeat: space no-repeat|}]; */
   /* [%cx2 {|fill-repeat: round no-repeat|}]; */
   /* [%cx2 {|fill-repeat: no-repeat no-repeat|}]; */
-  /* [%cx2 {|fill-opacity: 0.5|}]; */
-  /* [%cx2 {|fill-opacity: 45%|}]; */
+  [%cx2 {|fill-opacity: 0.5|}];
+  [%cx2 {|fill-opacity: 45%|}];
   /* [%cx2 {|stroke: url(foo.png), url(bar.svg)|}]; */
   /* [%cx2 {|stroke: top left / 50% 60%|}]; */
   /* [%cx2 {|stroke: border-box|}]; */
   /* [%cx2 {|stroke: border-box padding-box|}]; */
   /* [%cx2 {|stroke: url(foo.png) bottom right / cover padding-box content-box|}]; */
-  /* [%cx2 {|stroke-width: 0|}]; */
-  /* [%cx2 {|stroke-width: 1px|}]; */
-  /* [%cx2 {|stroke-width: 25%|}]; */
+  [%cx2 {|stroke-width: 0|}];
+  [%cx2 {|stroke-width: 1px|}];
+  [%cx2 {|stroke-width: 25%|}];
   /* [%cx2 {|stroke-align: center|}]; */
   /* [%cx2 {|stroke-align: inset|}]; */
   /* [%cx2 {|stroke-align: outset |}]; */
-  /* [%cx2 {|stroke-linecap: butt|}]; */
-  /* [%cx2 {|stroke-linecap: round|}]; */
-  /* [%cx2 {|stroke-linecap: square |}]; */
+  [%cx2 {|stroke-linecap: butt|}];
+  [%cx2 {|stroke-linecap: round|}];
+  [%cx2 {|stroke-linecap: square |}];
   /* [%cx2 {|stroke-linejoin: crop|}]; */
   /* [%cx2 {|stroke-linejoin: arcs|}]; */
-  /* [%cx2 {|stroke-linejoin: miter|}]; */
-  /* [%cx2 {|stroke-linejoin: bevel|}]; */
-  /* [%cx2 {|stroke-linejoin: round|}]; */
+  [%cx2 {|stroke-linejoin: miter|}];
+  [%cx2 {|stroke-linejoin: bevel|}];
+  [%cx2 {|stroke-linejoin: round|}];
   /* [%cx2 {|stroke-linejoin: fallback|}]; */
   /* [%cx2 {|stroke-linejoin: crop bevel|}]; */
   /* [%cx2 {|stroke-linejoin: arcs round|}]; */
   /* [%cx2 {|stroke-linejoin: miter fallback|}]; */
-  /* [%cx2 {|stroke-miterlimit: 4|}]; */
+  [%cx2 {|stroke-miterlimit: 4|}];
   /* [%cx2 {|stroke-break: bounding-box|}]; */
   /* [%cx2 {|stroke-break: slice|}]; */
   /* [%cx2 {|stroke-break: clone |}]; */

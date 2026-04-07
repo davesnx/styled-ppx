@@ -16,8 +16,8 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
-  CSS.unsafe({js|textTransform|js}, {js|full-width|js});
-  CSS.unsafe({js|textTransform|js}, {js|full-size-kana|js});
+  CSS.textTransform(`fullWidth);
+  CSS.textTransform(`fullSizeKana);
   
   CSS.tabSize(`num(4.));
   CSS.tabSize(`em(1.));
@@ -34,10 +34,10 @@ If this test fail means that the module is not in sync with the ppx
   CSS.hyphens(`manual);
   CSS.hyphens(`none);
   CSS.overflowWrap(`normal);
-  CSS.unsafe({js|overflowWrap|js}, {js|break-word|js});
+  CSS.overflowWrap(`breakWord);
   CSS.overflowWrap(`anywhere);
   CSS.wordWrap(`normal);
-  CSS.unsafe({js|wordWrap|js}, {js|break-word|js});
+  CSS.wordWrap(`breakWord);
   CSS.wordWrap(`anywhere);
   CSS.textAlign(`start);
   CSS.textAlign(`end_);
@@ -67,15 +67,30 @@ If this test fail means that the module is not in sync with the ppx
   CSS.textJustify(`interWord);
   CSS.textJustify(`interCharacter);
   CSS.wordSpacing(`percent(50.));
-  CSS.unsafe({js|textIndent|js}, {js|1em hanging|js});
-  CSS.unsafe({js|textIndent|js}, {js|1em each-line|js});
-  CSS.unsafe({js|textIndent|js}, {js|1em hanging each-line|js});
-  CSS.unsafe({js|hangingPunctuation|js}, {js|none|js});
-  CSS.unsafe({js|hangingPunctuation|js}, {js|first|js});
-  CSS.unsafe({js|hangingPunctuation|js}, {js|last|js});
-  CSS.unsafe({js|hangingPunctuation|js}, {js|force-end|js});
-  CSS.unsafe({js|hangingPunctuation|js}, {js|allow-end|js});
-  CSS.unsafe({js|hangingPunctuation|js}, {js|first last|js});
-  CSS.unsafe({js|hangingPunctuation|js}, {js|first force-end|js});
-  CSS.unsafe({js|hangingPunctuation|js}, {js|first force-end last|js});
-  CSS.unsafe({js|hangingPunctuation|js}, {js|first allow-end last|js});
+  CSS.textIndent(
+    `value(CSS.Types.Length.toString(`em(1.)) ++ {js| hanging|js}),
+  );
+  CSS.textIndent(
+    `value(CSS.Types.Length.toString(`em(1.)) ++ {js| each-line|js}),
+  );
+  CSS.textIndent(
+    `value(CSS.Types.Length.toString(`em(1.)) ++ {js| hanging each-line|js}),
+  );
+  CSS.hangingPunctuation(`none);
+  CSS.hangingPunctuation(`first);
+  CSS.hangingPunctuation(`last);
+  CSS.hangingPunctuation(`forceEnd);
+  CSS.hangingPunctuation(`allowEnd);
+  CSS.hangingPunctuation(`value({js|first last|js}));
+  CSS.hangingPunctuation(`value({js|first force-end|js}));
+  CSS.hangingPunctuation(`value({js|first force-end last|js}));
+  CSS.hangingPunctuation(`value({js|first allow-end last|js}));
+  
+  CSS.hyphenateCharacter(`auto);
+  CSS.hyphenateLimitZone(`percent(1.));
+  CSS.hyphenateLimitZone(`em(1.));
+  CSS.hyphenateLimitChars(`auto);
+  CSS.hyphenateLimitChars(`count(5));
+  
+  CSS.hyphenateLimitLines(`noLimit);
+  CSS.hyphenateLimitLines(`int(2));

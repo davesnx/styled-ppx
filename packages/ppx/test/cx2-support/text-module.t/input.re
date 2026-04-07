@@ -101,15 +101,15 @@
 /* [%cx2 {|wrap-after: flex|}]; */
 /* [%cx2 {|wrap-inside: auto|}]; */
 /* [%cx2 {|wrap-inside: avoid|}]; */
-/* [%cx2 {|hyphenate-character: auto|}]; */
-/* [%cx2 {|hyphenate-limit-zone: 1%|}]; */
-/* [%cx2 {|hyphenate-limit-zone: 1em|}]; */
-/* [%cx2 {|hyphenate-limit-chars: auto|}]; */
-/* [%cx2 {|hyphenate-limit-chars: 5|}]; */
+[%cx2 {|hyphenate-character: auto|}];
+[%cx2 {|hyphenate-limit-zone: 1%|}];
+[%cx2 {|hyphenate-limit-zone: 1em|}];
+[%cx2 {|hyphenate-limit-chars: auto|}];
+[%cx2 {|hyphenate-limit-chars: 5|}];
 /* [%cx2 {|hyphenate-limit-chars: auto 3|}]; */
 /* [%cx2 {|hyphenate-limit-chars: 5 4 3|}]; */
-/* [%cx2 {|hyphenate-limit-lines: no-limit|}]; */
-/* [%cx2 {|hyphenate-limit-lines: 2|}]; */
+[%cx2 {|hyphenate-limit-lines: no-limit|}];
+[%cx2 {|hyphenate-limit-lines: 2|}];
 /* [%cx2 {|hyphenate-limit-last: none|}]; */
 /* [%cx2 {|hyphenate-limit-last: always|}]; */
 /* [%cx2 {|hyphenate-limit-last: column|}]; */

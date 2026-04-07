@@ -61,26 +61,26 @@ If this test fail means that the module is not in sync with the ppx
   CSS.caretColor(`auto);
   CSS.caretColor(CSS.green);
   
-  CSS.unsafe({js|appearance|js}, {js|auto|js});
-  CSS.unsafe({js|appearance|js}, {js|none|js});
+  CSS.appearance(`auto);
+  CSS.appearance(`none);
   
   CSS.textOverflow(`clip);
   CSS.textOverflow(`ellipsis);
   
   CSS.textOverflow(`string({js|foo|js}));
-  CSS.unsafe({js|textOverflow|js}, {js|clip clip|js});
-  CSS.unsafe({js|textOverflow|js}, {js|ellipsis clip|js});
+  CSS.textOverflow2(`clip, `clip);
+  CSS.textOverflow2(`ellipsis, `clip);
   
-  CSS.unsafe({js|textOverflow|js}, {js|'foo' clip|js});
-  CSS.unsafe({js|textOverflow|js}, {js|clip ellipsis|js});
-  CSS.unsafe({js|textOverflow|js}, {js|ellipsis ellipsis|js});
+  CSS.textOverflow2(`string({js|foo|js}), `clip);
+  CSS.textOverflow2(`clip, `ellipsis);
+  CSS.textOverflow2(`ellipsis, `ellipsis);
   
-  CSS.unsafe({js|textOverflow|js}, {js|'foo' ellipsis|js});
+  CSS.textOverflow2(`string({js|foo|js}), `ellipsis);
   
-  CSS.unsafe({js|textOverflow|js}, {js|clip 'foo'|js});
-  CSS.unsafe({js|textOverflow|js}, {js|ellipsis 'foo'|js});
+  CSS.textOverflow2(`clip, `string({js|foo|js}));
+  CSS.textOverflow2(`ellipsis, `string({js|foo|js}));
   
-  CSS.unsafe({js|textOverflow|js}, {js|'foo' 'foo'|js});
+  CSS.textOverflow2(`string({js|foo|js}), `string({js|foo|js}));
   CSS.userSelect(`auto);
   CSS.userSelect(`text);
   CSS.userSelect(`none);

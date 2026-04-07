@@ -16,5 +16,5 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
-  CSS.unsafe({js|scrollBehavior|js}, {js|auto|js});
-  CSS.unsafe({js|scrollBehavior|js}, {js|smooth|js});
+  CSS.scrollBehavior(`auto);
+  CSS.scrollBehavior(`smooth);
