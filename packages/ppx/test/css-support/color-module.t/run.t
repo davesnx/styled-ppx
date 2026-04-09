@@ -13,6 +13,11 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
+  File "input.re", line 72, characters 14-30:
+  Error: Property 'color' has an invalid value: 'color(.2 .4 .6)',
+         Expected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()',
+         'hwb()', 'lab()', 'lch()', etc.
+  [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
@@ -44,13 +49,13 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|textDecorationColor|js}, {js|hsl(0,0%,0%,.5)|js});
   CSS.textDecorationColor(`transparent);
   CSS.textDecorationColor(`currentColor);
-  CSS.unsafe({js|columnRuleColor|js}, {js|rgba(0,0,0,.5)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|#F06|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|#FF0066|js});
+  CSS.columnRuleColor(`rgba((0, 0, 0, `num(0.5))));
+  CSS.columnRuleColor(`hex({js|F06|js}));
+  CSS.columnRuleColor(`hex({js|FF0066|js}));
   CSS.unsafe({js|columnRuleColor|js}, {js|hsl(0,0%,0%)|js});
   CSS.unsafe({js|columnRuleColor|js}, {js|hsl(0,0%,0%,.5)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|transparent|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|currentColor|js});
+  CSS.columnRuleColor(`transparent);
+  CSS.columnRuleColor(`currentColor);
   
   CSS.color(`rgb((0, 51, 178)));
   CSS.color(`rgb((0, 64, 185)));
@@ -69,6 +74,72 @@ If this test fail means that the module is not in sync with the ppx
   CSS.color(`hex({js|000000FF|js}));
   CSS.color(CSS.rebeccapurple);
   
+  CSS.color(`hwb((`deg(0.), `percent(0.), `percent(0.))));
+  CSS.color(`hwba((`deg(0.), `percent(0.), `percent(0.), `num(0.5))));
+  CSS.color(`lab((`percent(0.), `num(0.), `num(0.))));
+  CSS.color(`laba((`percent(0.), `num(0.), `num(0.), `num(0.5))));
+  CSS.color(`lch((`percent(0.), `num(0.), `deg(0.))));
+  CSS.color(`lcha((`percent(0.), `num(0.), `deg(0.), `num(0.5))));
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(.2 .4 .6)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(display-p3 .2. 4 .6)',\nExpected 'hex-color', 'number', 'percentage', 'value', 'calc()', 'color-mix()', 'hsl()', 'hsla()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(foo .2 .4 .6)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(.2 .4 .6 / .5)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  CSS.color(
+    `colora((`displayP3, `num(0.2), `num(0.4), `num(0.6), `num(0.5))),
+  );
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(--foo .2 .4 .6 / .5)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(.2 .4 .6, #123456)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(display-p3 .2. 4 .6, #654321)',\nExpected 'hex-color', 'number', 'percentage', 'value', 'calc()', 'color-mix()', 'hsl()', 'hsla()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(20% 40% 60%)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  CSS.color(
+    `color((`displayP3, `percent(20.), `percent(40.), `percent(60.))),
+  );
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(foo 20% 40% 60%)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(20% 40% 60% / .5)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(image-p3 20% 40% 60%  / .5)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(--foo 20% 40% 60% / .5)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(20% 40% 60%, #123456)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value:\n'color(display-p3 20% 40% 60%, #654321)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'color(--mycmyk 0% 20% 30% 5%)',\nExpected 'hex-color', 'value', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'device-cmyk(.2 .3 .4 .5)',\nExpected 'hex-color', 'value', 'color()', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'device-cmyk(.2 .3 .4 .5 / .5)',\nExpected 'hex-color', 'value', 'color()', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', etc."
+  ];
+  [%ocaml.error
+    "Property 'color' has an invalid value: 'device-cmyk(.2 .3 .4 .5 / 50%)',\nExpected 'hex-color', 'value', 'color()', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', etc."
+  ];
   CSS.backgroundColor(`rgb((0, 51, 178)));
   CSS.backgroundColor(`rgb((0, 64, 185)));
   CSS.backgroundColor(`hsl((`deg(0.), `percent(0.), `percent(0.))));
@@ -129,22 +200,26 @@ If this test fail means that the module is not in sync with the ppx
   CSS.textDecorationColor(`hex({js|000F|js}));
   CSS.textDecorationColor(`hex({js|000000FF|js}));
   CSS.textDecorationColor(CSS.rebeccapurple);
-  CSS.unsafe({js|columnRuleColor|js}, {js|rgb(0% 20% 70%)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|rgb(0 64 185)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|hsl(0 0% 0%)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|rgba(0% 20% 70% / 50%)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|rgba(0% 20% 70% / .5)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|rgba(0 64 185 / 50%)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|rgba(0 64 185 / .5)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|hsla(0 0% 0% /.5)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|rgb(0% 20% 70% / 50%)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|rgb(0% 20% 70% / .5)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|rgb(0 64 185 / 50%)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|rgb(0 64 185 / .5)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|hsl(0 0% 0% / .5)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|#000F|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|#000000FF|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|rebeccapurple|js});
+  CSS.columnRuleColor(`rgb((0, 51, 178)));
+  CSS.columnRuleColor(`rgb((0, 64, 185)));
+  CSS.columnRuleColor(`hsl((`deg(0.), `percent(0.), `percent(0.))));
+  CSS.columnRuleColor(`rgba((0, 51, 178, `percent(0.5))));
+  CSS.columnRuleColor(`rgba((0, 51, 178, `num(0.5))));
+  CSS.columnRuleColor(`rgba((0, 64, 185, `percent(0.5))));
+  CSS.columnRuleColor(`rgba((0, 64, 185, `num(0.5))));
+  CSS.columnRuleColor(
+    `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
+  );
+  CSS.columnRuleColor(`rgba((0, 51, 178, `percent(0.5))));
+  CSS.columnRuleColor(`rgba((0, 51, 178, `num(0.5))));
+  CSS.columnRuleColor(`rgba((0, 64, 185, `percent(0.5))));
+  CSS.columnRuleColor(`rgba((0, 64, 185, `num(0.5))));
+  CSS.columnRuleColor(
+    `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
+  );
+  CSS.columnRuleColor(`hex({js|000F|js}));
+  CSS.columnRuleColor(`hex({js|000000FF|js}));
+  CSS.columnRuleColor(CSS.rebeccapurple);
   
   CSS.color(
     `colorMix((`srgb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
@@ -313,41 +388,44 @@ If this test fail means that the module is not in sync with the ppx
     `colorMix((`lab, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
   );
   
-  CSS.unsafe(
-    {js|columnRuleColor|js},
-    {js|color-mix(in srgb, teal 65%, olive)|js},
+  CSS.columnRuleColor(
+    `colorMix((`srgb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
   );
-  CSS.unsafe(
-    {js|columnRuleColor|js},
-    {js|color-mix(in srgb, rgb(255, 0, 0, .2) 65%, olive)|js},
+  CSS.columnRuleColor(
+    `colorMix((
+      `srgb,
+      (`rgba((255, 0, 0, `num(0.2))), Some(`percent(65.))),
+      (CSS.olive, None),
+    )),
   );
-  CSS.unsafe(
-    {js|columnRuleColor|js},
-    {js|color-mix(in srgb, currentColor, rgba(0, 0, 0, .5) 65%)|js},
+  CSS.columnRuleColor(
+    `colorMix((
+      `srgb,
+      (`currentColor, None),
+      (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))),
+    )),
   );
-  CSS.unsafe(
-    {js|columnRuleColor|js},
-    {js|color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, .5) 65%)|js},
+  CSS.columnRuleColor(
+    `colorMix((
+      `srgb,
+      (`currentColor, Some(`percent(10.))),
+      (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))),
+    )),
   );
-  CSS.unsafe(
-    {js|columnRuleColor|js},
-    {js|color-mix(in lch, teal 65%, olive)|js},
+  CSS.columnRuleColor(
+    `colorMix((`lch, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
   );
-  CSS.unsafe(
-    {js|columnRuleColor|js},
-    {js|color-mix(in hsl, teal 65%, olive)|js},
+  CSS.columnRuleColor(
+    `colorMix((`hsl, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
   );
-  CSS.unsafe(
-    {js|columnRuleColor|js},
-    {js|color-mix(in hwb, teal 65%, olive)|js},
+  CSS.columnRuleColor(
+    `colorMix((`hwb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
   );
-  CSS.unsafe(
-    {js|columnRuleColor|js},
-    {js|color-mix(in xyz, teal 65%, olive)|js},
+  CSS.columnRuleColor(
+    `colorMix((`xyz, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
   );
-  CSS.unsafe(
-    {js|columnRuleColor|js},
-    {js|color-mix(in lab, teal 65%, olive)|js},
+  CSS.columnRuleColor(
+    `colorMix((`lab, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
   );
   
   CSS.color(`rgba((0, 0, 0, `calc(`num(1.)))));

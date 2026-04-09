@@ -207,6 +207,115 @@ Selector nested
   > EOF
   display:flex;a{display:block;}a div{display:none;}a div span{display:none;}a div span hr{display:none;}a div span hr code{display:none;}
 
+Declaration list descendant selector
+  $ cat << "EOF" | ./Render_test.exe
+  > display: flex;
+  > svg path {
+  >   fill: red;
+  > }
+  > EOF
+  display:flex;svg path{fill:red;}
+
+Declaration list type selector pseudo
+  $ cat << "EOF" | ./Render_test.exe
+  > body:hover main {
+  >   color: blue;
+  > }
+  > EOF
+  body:hover main{color:blue;}
+
+Declaration list missing semicolon before nested selector
+  $ cat << "EOF" | ./Render_test.exe
+  > background-color: red
+  > &:nth-child(2n) {
+  >   background-color: blue;
+  > }
+  > EOF
+  background-color:red;&:nth-child(2n){background-color:blue;}
+
+Declaration list missing semicolon before nested class selector
+  $ cat << "EOF" | ./Render_test.exe
+  > color: red
+  > .child {
+  >   color: blue;
+  > }
+  > EOF
+  color:red;.child{color:blue;}
+
+Declaration list missing semicolon before nested type selector
+  $ cat << "EOF" | ./Render_test.exe
+  > color: red
+  > div {
+  >   color: blue;
+  > }
+  > EOF
+  color:red;div{color:blue;}
+
+Declaration list missing semicolon before nested id selector
+  $ cat << "EOF" | ./Render_test.exe
+  > color: red
+  > #child {
+  >   color: blue;
+  > }
+  > EOF
+  color:red;#child{color:blue;}
+
+Declaration list missing semicolon before nested descendant selector
+  $ cat << "EOF" | ./Render_test.exe
+  > color: red
+  > svg path {
+  >   fill: blue;
+  > }
+  > EOF
+  color:red;svg path{fill:blue;}
+
+Declaration list missing semicolon before nested selector after interpolation
+  $ cat << "EOF" | ./Render_test.exe
+  > border-bottom: 1px solid $(borderColor)
+  > &:last-child {
+  >   padding-bottom: 0;
+  >   border-bottom-width: 0;
+  > }
+  > EOF
+  border-bottom:1px solid $(borderColor);&:last-child{padding-bottom:0;border-bottom-width:0;}
+
+Declaration list missing semicolon before nested media query after interpolation
+  $ cat << "EOF" | ./Render_test.exe
+  > margin-bottom: $(Size.lg) @media $(Media.wide) {
+  >   width: 50%;
+  > }
+  > EOF
+  margin-bottom:$(Size.lg);@media $(Media.wide) {width:50%;}
+
+Nested descendant selector from declaration list
+  $ cat << "EOF" | ./Render_test.exe
+  > a {
+  >   svg path {
+  >     fill: red;
+  >   }
+  > }
+  > EOF
+  a svg path{fill:red;}
+
+Declaration after nested block
+  $ cat << "EOF" | ./Render_test.exe
+  > .recharts-wrapper, .recharts-surface {
+  >   @media print {
+  >     width: 100%;
+  >   }
+  > }
+  > margin-top: 17px;
+  > EOF
+  margin-top:17px;@media print {.recharts-wrapper,.recharts-surface{width:100%;}}
+
+Declaration list missing semicolon before nested media query
+  $ cat << "EOF" | ./Render_test.exe
+  > margin-bottom: 24px @media (min-width: 1024px) {
+  >   width: 50%;
+  > }
+  > EOF
+  margin-bottom:24px;@media (min-width: 1024px) {width:50%;}
+
 Media query nested
   $ cat << "EOF" | ./Render_test.exe
   > max-width: 800px;

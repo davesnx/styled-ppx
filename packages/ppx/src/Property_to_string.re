@@ -1,6 +1,9 @@
 open Ppxlib;
-open Css_property_parser;
+open Css_grammar;
 
+module Parser = Css_grammar;
+module Css_parser = Styled_ppx_css_parser.Driver;
+module Css_parser_ast = Styled_ppx_css_parser.Ast;
 module Helper = Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
 
@@ -8,6 +11,13 @@ exception Invalid_value(string);
 
 let loc = Location.none;
 let (let.ok) = Result.bind;
+
+let parse_component_values_string = (input: string) => {
+  switch (Css_parser.parse_declaration(~loc, "x: " ++ input)) {
+  | Ok({ Css_parser_ast.value: (values, _), _ }) => Ok(values)
+  | Error((_loc, msg)) => Error(msg)
+  };
+};
 
 let id = Fun.id;
 
@@ -35,7 +45,14 @@ type transform('ast, 'value) = {
 };
 
 let emit = (property, value_of_ast, value_to_expr) => {
-  let ast_of_string = Parser.parse(property);
+  let ast_of_component_values = Parser.type_check(property);
+  let ast_of_string = string =>
+    switch (parse_component_values_string(string)) {
+    | Ok(values) =>
+      ast_of_component_values(values)
+      |> Result.map_error(Css_grammar.Rule.format_error_info)
+    | Error(msg) => Error(msg)
+    };
   let ast_to_expr = ast => value_of_ast(ast) |> value_to_expr;
   let string_to_expr = string =>
     ast_of_string(string) |> Result.map(ast_to_expr);
@@ -150,8 +167,7 @@ let render_length =
 
   | `Zero => render_string("0");
 
-let rec render_function_calc =
-        (calc_sum: Css_property_parser.Parser.Types.calc_sum) => {
+let rec render_function_calc = (calc_sum: Css_grammar.calc_sum) => {
   [%expr "calc(" ++ [%e render_calc_sum(calc_sum)] ++ ")"];
 }
 and render_calc_sum = ((product, sums)) => {
@@ -232,7 +248,7 @@ and render_extended_time =
   fun
   | `Time(t) => render_time_as_int(t)
   | `Function_calc(fc) => render_function_calc(fc)
-  | `Interpolation(v) => render_variable(v)
+  | `Interpolation(v) => render_variable(String.concat(".", v))
   | `Function_min(values) => render_function_min(values)
   | `Function_max(values) => render_function_max(values)
 
@@ -247,7 +263,7 @@ and render_extended_angle =
   fun
   | `Angle(a) => render_angle(a)
   | `Function_calc(fc) => render_function_calc(fc)
-  | `Interpolation(i) => render_variable(i)
+  | `Interpolation(i) => render_variable(String.concat(".", i))
   | `Function_min(values) => render_function_min(values)
   | `Function_max(values) => render_function_max(values)
 
@@ -257,13 +273,13 @@ and render_extended_length =
   | `Function_calc(fc) => render_function_calc(fc)
   | `Function_min(values) => render_function_min(values)
   | `Function_max(values) => render_function_max(values)
-  | `Interpolation(i) => render_variable(i)
+  | `Interpolation(i) => render_variable(String.concat(".", i))
 
 and render_extended_percentage =
   fun
   | `Percentage(p) => render_percentage(p)
   | `Function_calc(fc) => render_function_calc(fc)
-  | `Interpolation(i) => render_variable(i)
+  | `Interpolation(i) => render_variable(String.concat(".", i))
   | `Function_min(values) => render_function_min(values)
   | `Function_max(values) => render_function_max(values);
 
@@ -284,8 +300,10 @@ let render_size =
   | `Fit_content_1(lp) => render_length_percentage(lp);
 
 let render_css_global_values = (name, value) => {
+  let.ok value = parse_component_values_string(value);
   let.ok value =
-    Parser.parse(Css_property_parser.Standard.css_wide_keywords, value);
+    Parser.type_check(Css_grammar.Css_value_types.css_wide_keywords, value)
+    |> Result.map_error(Css_grammar.Rule.format_error_info);
 
   let value =
     switch (value) {
@@ -310,15 +328,15 @@ let found = ({ ast_of_string, string_to_expr, _ }) => {
 
 let transform_with_variable = (parser, mapper, value_to_expr) =>
   emit(
-    Combinator.xor([
+    Combinators.xor([
       /* If the CSS value is an interpolation, we treat as one `
          ariable */
-      Rule.Match.map(Standard.interpolation, data => `Variable(data)),
+      Rule.Match.map(Css_value_types.interpolation, data => `Variable(data)),
       /* Otherwise it's a regular CSS `Value */
       Rule.Match.map(parser, data => `Value(data)),
     ]),
     fun
-    | `Variable(name) => render_variable(name)
+    | `Variable(name) => render_variable(String.concat(".", name))
     | `Value(ast) => mapper(ast),
     value_to_expr,
   );
@@ -348,7 +366,7 @@ let render_ratio =
       ++ [%e string_of_int(b) |> render_string]
     ]
   | `Number(i) => [%expr [%e string_of_float(i) |> render_string]]
-  | `Interpolation(v) => render_variable(v);
+  | `Interpolation(v) => render_variable(String.concat(".", v));
 
 let aspect_ratio =
   apply(
@@ -396,7 +414,7 @@ let overflow_block =
     | `Hidden => [%expr "hidden"]
     | `Scroll => [%expr "scroll"]
     | `Visible => [%expr "visible"]
-    | `Interpolation(i) => render_variable(i),
+    | `Interpolation(i) => render_variable(String.concat(".", i)),
   );
 
 let overflow_inline =
@@ -409,7 +427,7 @@ let overflow_inline =
     | `Hidden => [%expr "hidden"]
     | `Scroll => [%expr "scroll"]
     | `Visible => [%expr "visible"]
-    | `Interpolation(i) => render_variable(i),
+    | `Interpolation(i) => render_variable(String.concat(".", i)),
   );
 
 let color = apply(Parser.positive_integer, [%expr "color"], render_integer);
@@ -608,9 +626,14 @@ let render_to_expr = (property, value) => {
 };
 
 let parse_declarations = (property: string, value: string) => {
+  let.ok values =
+    switch (parse_component_values_string(value)) {
+    | Ok(values) => Ok(values)
+    | Error(_) => Error(`Property_not_found)
+    };
   let.ok _ =
-    Parser.check_property(~name=property, value)
-    |> Result.map_error((`Unknown_value) => `Property_not_found);
+    Parser.validate_property(~loc=Location.none, ~name=property, values)
+    |> Result.map_error(((_loc, _err)) => `Property_not_found);
 
   switch (render_css_global_values(property, value)) {
   | Ok(value) => Ok(value)

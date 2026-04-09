@@ -259,6 +259,9 @@ module Shadow = struct
   type box = Css_types.Shadow.box Css_types.Shadow.t
   type text = Css_types.Shadow.text Css_types.Shadow.t
 
+  (* [t] is an alias for [box] for backwards compatibility. *)
+  type t = box
+
   let box = Css_types.Shadow.box
   let text = Css_types.Shadow.text
 end
