@@ -15,12 +15,15 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-9y6172{user-select:none;}"];
-  [@css ".css-1gs5e0q:nth-last-child(1){stroke-opacity:0;}"];
+  [@css ".css-9y6172-_chart{user-select:none;}"];
+  [@css ".css-1gs5e0q-_chart:nth-last-child(1){stroke-opacity:0;}"];
   [@css
-    ".css-1fqvgu0 .recharts-scatter .recharts-scatter-symbol .recharts-symbols{opacity:0.8;}"
+    ".css-1fqvgu0-_chart .recharts-scatter .recharts-scatter-symbol .recharts-symbols{opacity:0.8;}"
   ];
-  [@css ".css-vv2q96:hover{opacity:1;}"];
+  [@css ".css-vv2q96-_chart:hover{opacity:1;}"];
   
   let _chart =
-    CSS.make("css-9y6172 css-1gs5e0q css-1gs5e0q css-1fqvgu0 css-vv2q96", []);
+    CSS.make(
+      "css-9y6172-_chart css-1gs5e0q-_chart css-1gs5e0q-_chart css-1fqvgu0-_chart css-vv2q96-_chart",
+      [],
+    );

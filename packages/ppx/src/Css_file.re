@@ -113,8 +113,12 @@ module Css_transform = {
     };
   };
 
-  let generate_class_from_content = (content: string): string => {
-    Printf.sprintf("css-%s", Murmur2.default(content));
+  let generate_class_from_content = (~label=?, content: string): string => {
+    let hash = Murmur2.default(content);
+    switch (label) {
+    | Some(name) => Printf.sprintf("css-%s-%s", hash, name)
+    | None => Printf.sprintf("css-%s", hash)
+    };
   };
 
   let rec transform_component_value =
@@ -406,12 +410,12 @@ module Css_transform = {
   let render_rule = Styled_ppx_css_parser.Render.rule;
   let render_declaration = Styled_ppx_css_parser.Render.declaration;
 
-  let atomize_rules = (rules: list(rule)): list((string, rule)) => {
+  let atomize_rules = (~label=?, rules: list(rule)): list((string, rule)) => {
     let rec extract_atomic_rules = (rule: rule): list((string, rule)) => {
       switch (rule) {
       | Declaration(decl) =>
         let decl_string = render_declaration(decl);
-        let className = generate_class_from_content(decl_string);
+        let className = generate_class_from_content(~label?, decl_string);
         [(className, Declaration(decl))];
 
       | Style_rule({ prelude, block: (rules, _), loc: _ }) =>
@@ -426,7 +430,7 @@ module Css_transform = {
                    loc: Ppxlib.Location.none,
                  });
                let rule_string = render_rule(style_rule);
-               let className = generate_class_from_content(rule_string);
+               let className = generate_class_from_content(~label?, rule_string);
                [(className, style_rule)];
              | Style_rule(_) as nested => extract_atomic_rules(nested)
              | _ => extract_atomic_rules(r)
@@ -437,7 +441,7 @@ module Css_transform = {
         switch (block) {
         | Empty =>
           let at_string = render_rule(rule);
-          let className = generate_class_from_content(at_string);
+          let className = generate_class_from_content(~label?, at_string);
           [(className, rule)];
 
         | Rule_list((rules, rule_loc)) =>
@@ -453,7 +457,7 @@ module Css_transform = {
                  });
                let wrapped_string = render_rule(wrapped);
                let new_className =
-                 generate_class_from_content(wrapped_string);
+                 generate_class_from_content(~label?, wrapped_string);
                (new_className, wrapped);
              })
 
@@ -470,7 +474,7 @@ module Css_transform = {
                  });
                let wrapped_string = render_rule(wrapped);
                let new_className =
-                 generate_class_from_content(wrapped_string);
+                 generate_class_from_content(~label?, wrapped_string);
                (new_className, wrapped);
              })
         }
@@ -480,11 +484,11 @@ module Css_transform = {
     List.concat_map(extract_atomic_rules, rules);
   };
 
-  let transform_rule_list = (rule_list: rule_list) => {
+  let transform_rule_list = (~label=?, rule_list: rule_list) => {
     let dynamic_vars = ref([]);
     let (rules, loc) = rule_list;
 
-    let atomic_rules = atomize_rules(rules);
+    let atomic_rules = atomize_rules(~label?, rules);
 
     let processed_rules =
       atomic_rules
@@ -536,11 +540,11 @@ module Css_transform = {
   };
 };
 
-let push = (declarations: Styled_ppx_css_parser.Ast.rule_list) => {
+let push = (~label=?, declarations: Styled_ppx_css_parser.Ast.rule_list) => {
   let render_rule = Styled_ppx_css_parser.Render.rule;
 
   let (atomic_classnames, dynamic_vars) =
-    Css_transform.transform_rule_list(declarations);
+    Css_transform.transform_rule_list(~label?, declarations);
 
   let classNames =
     atomic_classnames

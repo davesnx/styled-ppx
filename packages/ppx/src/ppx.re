@@ -390,12 +390,20 @@ let () = {
           ),
         ),
         Ppxlib.Context_free.Rule.extension(
-          Ppxlib.Extension.declare(
+           Ppxlib.Extension.V3.declare(
             "cx2",
             Ppxlib.Extension.Context.Expression,
-            any_payload_pattern,
-            (~loc as _, ~path, payload) => {
-              File.set(path);
+            Ppxlib.Ast_pattern.(single_expr_payload(__)),
+            (~ctxt, payload) => {
+              open Ppxlib;
+              let code_path = Expansion_context.Extension.code_path(ctxt);
+              let label =
+                if (Settings.Get.minify()) {
+                  None;
+                } else {
+                  Code_path.enclosing_value(code_path);
+                };
+              File.set(Code_path.file_path(code_path));
               switch (payload.pexp_desc) {
               | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
                 let loc =
@@ -414,7 +422,7 @@ let () = {
                   switch (get_errors(validations)) {
                   | [] =>
                     let (classNames, dynamic_vars) =
-                      Css_file.push(rule_list);
+                      Css_file.push(~label?, rule_list);
                     Css_to_runtime.render_make_call(
                       ~loc=stringLoc,
                       ~classNames,

@@ -61,10 +61,10 @@ If this test fail means that the module is not in sync with the ppx
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-48ak65{display:var(--var-6w60di);}"];
+  [@css ".css-48ak65-a{display:var(--var-6w60di);}"];
   let grid = `gri;
   let a =
     CSS.make(
-      "css-48ak65",
+      "css-48ak65-a",
       [("--var-6w60di", CSS.Types.Display.toString(grid))],
     );
