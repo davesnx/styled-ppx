@@ -15,9 +15,69 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css ".css-1cvidje{quotes:auto;}"];
+  [@css ".css-esf2ur{content:\"►\" / \"\";}"];
+  [@css ".css-1rzsdc1{content:\"\";}"];
+  [@css ".css-8szbnh{content:counter(count, decimal);}"];
+  [@css ".css-10h56qq{content:counter(count, decimal) \") \";}"];
+  [@css ".css-8wd7tk{content:unset;}"];
+  [@css ".css-jvordy{content:normal;}"];
+  [@css ".css-71zcbh{content:none;}"];
+  [@css ".css-xq1wxf{content:url(\"http://www.example.com/test.png\");}"];
+  [@css ".css-leiwy{content:linear-gradient(#e66465, #9198e5);}"];
   [@css
-    ".css-1cvidje{quotes:auto;}\n.css-esf2ur{content:\"►\" / \"\";}\n.css-1rzsdc1{content:\"\";}\n.css-8szbnh{content:counter(count, decimal);}\n.css-10h56qq{content:counter(count, decimal) \") \";}\n.css-8wd7tk{content:unset;}\n.css-jvordy{content:normal;}\n.css-71zcbh{content:none;}\n.css-xq1wxf{content:url(\"http://www.example.com/test.png\");}\n.css-leiwy{content:linear-gradient(#e66465, #9198e5);}\n.css-1synydd{content:image-set(\"image1x.png\" 1x, \"image2x.png\" 2x);}\n.css-u6u5b0{content:url(\"../img/test.png\") / \"This is the alt text\";}\n.css-1446790{content:\"unparsed text\";}\n.css-1c6n5wz{content:attr(href);}\n.css-1wl2bce{content:attr(data-width px);}\n.css-c4enc9{content:open-quote;}\n.css-1vy0d5m{content:close-quote;}\n.css-1lroxre{content:no-open-quote;}\n.css-m6yzsz{content:no-close-quote;}\n.css-10fq46n{content:\"prefix\" url(\"http://www.example.com/test.png\");}\n.css-nxt6w1{content:\"prefix\" url(\"/img/test.png\") \"suffix\" / \"Alt text\";}\n.css-19u1hfk{content:inherit;}\n.css-hqslsq{content:initial;}\n.css-1dxltxf{content:revert;}\n.css-kjtvgg{content:revert-layer;}\n.css-1ybks2k{content:\"点\";}\n.css-a9f07t{content:\"lola\";}\n.css-13bvtt9{content:\" \";}\n.css-1f06l48{content:\"'\";}\n.css-129wxr5{content:\"\"\";}\n.css-buwufj{content:attr(data-value);}\n.css-1rln7nw{content:attr(data-value raw-string);}\n.css-1vktxzt{content:attr(data-value em);}\n.css-1piebvu{content:attr(data-value px);}\n.css-1m33vis{content:\"→\";}\n.css-es8i71{content:\"←\";}\n.css-b3jm9f{content:\"↑\";}\n.css-y08ulk{content:\"↓\";}\n.css-15ni5s9{content:\"“\";}\n.css-3tb13f{content:\"‘\";}\n.css-s8n7fj{content:\"’\";}\n.css-1xb5ir8{content:\"—\";}\n.css-hk17ng{content:\"…\";}\n.css-1of8arn{content:\"♥\";}\n.css-j4gzna{content:\"✓\";}\n.css-1yay3yn{content:\"✗\";}\n.css-wlvyh0{content:\"\" attr(data-title) \"”\";}\n.css-h1nazq{content:\"→\" \" Click here\";}\n.css-1j520c{content:\"Step \" counter(step, decimal) \": \";}\n.css-1epe5sp{content:\"💡\";}\n.css-7r561c{content:\"👍\";}\n.css-1d5vc81{content:\"»\";}\n.css-uc3v3e{content:\"§\";}\n.css-wzfv9f{content:\"→ \" attr(href);}\n.css-ru4efr{content:\"• \" counter(item, decimal) \" \";}\n"
+    ".css-1synydd{content:image-set(\"image1x.png\" 1x, \"image2x.png\" 2x);}"
   ];
+  [@css
+    ".css-u6u5b0{content:url(\"../img/test.png\") / \"This is the alt text\";}"
+  ];
+  [@css ".css-1446790{content:\"unparsed text\";}"];
+  [@css ".css-1c6n5wz{content:attr(href);}"];
+  [@css ".css-1wl2bce{content:attr(data-width px);}"];
+  [@css ".css-c4enc9{content:open-quote;}"];
+  [@css ".css-1vy0d5m{content:close-quote;}"];
+  [@css ".css-1lroxre{content:no-open-quote;}"];
+  [@css ".css-m6yzsz{content:no-close-quote;}"];
+  [@css
+    ".css-10fq46n{content:\"prefix\" url(\"http://www.example.com/test.png\");}"
+  ];
+  [@css
+    ".css-nxt6w1{content:\"prefix\" url(\"/img/test.png\") \"suffix\" / \"Alt text\";}"
+  ];
+  [@css ".css-19u1hfk{content:inherit;}"];
+  [@css ".css-hqslsq{content:initial;}"];
+  [@css ".css-1dxltxf{content:revert;}"];
+  [@css ".css-kjtvgg{content:revert-layer;}"];
+  [@css ".css-1ybks2k{content:\"点\";}"];
+  [@css ".css-a9f07t{content:\"lola\";}"];
+  [@css ".css-13bvtt9{content:\" \";}"];
+  [@css ".css-1f06l48{content:\"'\";}"];
+  [@css ".css-129wxr5{content:\"\"\";}"];
+  [@css ".css-buwufj{content:attr(data-value);}"];
+  [@css ".css-1rln7nw{content:attr(data-value raw-string);}"];
+  [@css ".css-1vktxzt{content:attr(data-value em);}"];
+  [@css ".css-1piebvu{content:attr(data-value px);}"];
+  [@css ".css-1m33vis{content:\"→\";}"];
+  [@css ".css-es8i71{content:\"←\";}"];
+  [@css ".css-b3jm9f{content:\"↑\";}"];
+  [@css ".css-y08ulk{content:\"↓\";}"];
+  [@css ".css-15ni5s9{content:\"“\";}"];
+  [@css ".css-3tb13f{content:\"‘\";}"];
+  [@css ".css-s8n7fj{content:\"’\";}"];
+  [@css ".css-1xb5ir8{content:\"—\";}"];
+  [@css ".css-hk17ng{content:\"…\";}"];
+  [@css ".css-1of8arn{content:\"♥\";}"];
+  [@css ".css-j4gzna{content:\"✓\";}"];
+  [@css ".css-1yay3yn{content:\"✗\";}"];
+  [@css ".css-wlvyh0{content:\"\" attr(data-title) \"”\";}"];
+  [@css ".css-h1nazq{content:\"→\" \" Click here\";}"];
+  [@css ".css-1j520c{content:\"Step \" counter(step, decimal) \": \";}"];
+  [@css ".css-1epe5sp{content:\"💡\";}"];
+  [@css ".css-7r561c{content:\"👍\";}"];
+  [@css ".css-1d5vc81{content:\"»\";}"];
+  [@css ".css-uc3v3e{content:\"§\";}"];
+  [@css ".css-wzfv9f{content:\"→ \" attr(href);}"];
+  [@css ".css-ru4efr{content:\"• \" counter(item, decimal) \" \";}"];
   
   CSS.make("css-1cvidje", []);
   

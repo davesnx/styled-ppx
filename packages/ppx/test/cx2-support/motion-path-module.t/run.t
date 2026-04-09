@@ -15,9 +15,56 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css
-    ".css-yb08bu{offset:none;}\n.css-3s0roh{offset:auto;}\n.css-17bq43b{offset:center;}\n.css-gb2u3l{offset:200px 100px;}\n.css-bdqvfn{offset:margin-box;}\n.css-131fcn7{offset:border-box;}\n.css-1nfin4h{offset:padding-box;}\n.css-sbcd7d{offset:content-box;}\n.css-1m3b2is{offset:fill-box;}\n.css-1n2bqhs{offset:stroke-box;}\n.css-1ygeoo7{offset:view-box;}\n.css-1ub9jbl{offset:path(\"M 20 20 H 80 V 30\");}\n.css-18qkclk{offset:url(\"image.png\");}\n.css-167in5y{offset:ray(45deg closest-side);}\n.css-1y80jt4{offset:ray(45deg closest-side) 10%;}\n.css-usdq6h{offset:ray(45deg closest-side) 10% reverse;}\n.css-7lsvdf{offset:ray(45deg closest-side) reverse 10%;}\n.css-drqvtx{offset:auto / center;}\n.css-1wqh264{offset:center / 200px 100px;}\n.css-vszycc{offset:ray(45deg closest-side) / 200px 100px;}\n.css-1dt99ro{offset-path:none;}\n.css-19drnrp{offset-path:ray(45deg closest-side);}\n.css-5yyl6h{offset-path:ray(45deg farthest-side);}\n.css-1getk4n{offset-path:ray(45deg closest-corner);}\n.css-19aa34v{offset-path:ray(45deg farthest-corner);}\n.css-7zzxur{offset-path:ray(100grad closest-side contain);}\n.css-gsmbjm{offset-path:margin-box;}\n.css-4sghf5{offset-path:border-box;}\n.css-1w35ixk{offset-path:padding-box;}\n.css-1rv9k08{offset-path:content-box;}\n.css-1vy8rjx{offset-path:fill-box;}\n.css-4oee2x{offset-path:stroke-box;}\n.css-cq3loi{offset-path:view-box;}\n.css-p66ry6{offset-path:circle(60%) margin-box;}\n.css-sokto5{offset-distance:10%;}\n.css-o7ibr3{offset-position:auto;}\n.css-ioz6wa{offset-position:200px;}\n.css-623fe7{offset-position:200px 100px;}\n.css-1kqzfje{offset-position:center;}\n.css-1w008zo{offset-anchor:auto;}\n.css-2hvp1o{offset-anchor:200px;}\n.css-1d9ar84{offset-anchor:200px 100px;}\n.css-afgyzg{offset-anchor:center;}\n.css-1e6fec8{offset-rotate:auto;}\n.css-1xv6haa{offset-rotate:0deg;}\n.css-1tqrfcf{offset-rotate:reverse;}\n.css-18vu5ss{offset-rotate:-45deg;}\n.css-1p3eddq{offset-rotate:auto 180deg;}\n.css-lj3wxn{offset-rotate:reverse 45deg;}\n.css-1mhkmna{offset-rotate:2turn reverse;}\n"
-  ];
+  [@css ".css-yb08bu{offset:none;}"];
+  [@css ".css-3s0roh{offset:auto;}"];
+  [@css ".css-17bq43b{offset:center;}"];
+  [@css ".css-gb2u3l{offset:200px 100px;}"];
+  [@css ".css-bdqvfn{offset:margin-box;}"];
+  [@css ".css-131fcn7{offset:border-box;}"];
+  [@css ".css-1nfin4h{offset:padding-box;}"];
+  [@css ".css-sbcd7d{offset:content-box;}"];
+  [@css ".css-1m3b2is{offset:fill-box;}"];
+  [@css ".css-1n2bqhs{offset:stroke-box;}"];
+  [@css ".css-1ygeoo7{offset:view-box;}"];
+  [@css ".css-1ub9jbl{offset:path(\"M 20 20 H 80 V 30\");}"];
+  [@css ".css-18qkclk{offset:url(\"image.png\");}"];
+  [@css ".css-167in5y{offset:ray(45deg closest-side);}"];
+  [@css ".css-1y80jt4{offset:ray(45deg closest-side) 10%;}"];
+  [@css ".css-usdq6h{offset:ray(45deg closest-side) 10% reverse;}"];
+  [@css ".css-7lsvdf{offset:ray(45deg closest-side) reverse 10%;}"];
+  [@css ".css-drqvtx{offset:auto / center;}"];
+  [@css ".css-1wqh264{offset:center / 200px 100px;}"];
+  [@css ".css-vszycc{offset:ray(45deg closest-side) / 200px 100px;}"];
+  [@css ".css-1dt99ro{offset-path:none;}"];
+  [@css ".css-19drnrp{offset-path:ray(45deg closest-side);}"];
+  [@css ".css-5yyl6h{offset-path:ray(45deg farthest-side);}"];
+  [@css ".css-1getk4n{offset-path:ray(45deg closest-corner);}"];
+  [@css ".css-19aa34v{offset-path:ray(45deg farthest-corner);}"];
+  [@css ".css-7zzxur{offset-path:ray(100grad closest-side contain);}"];
+  [@css ".css-gsmbjm{offset-path:margin-box;}"];
+  [@css ".css-4sghf5{offset-path:border-box;}"];
+  [@css ".css-1w35ixk{offset-path:padding-box;}"];
+  [@css ".css-1rv9k08{offset-path:content-box;}"];
+  [@css ".css-1vy8rjx{offset-path:fill-box;}"];
+  [@css ".css-4oee2x{offset-path:stroke-box;}"];
+  [@css ".css-cq3loi{offset-path:view-box;}"];
+  [@css ".css-p66ry6{offset-path:circle(60%) margin-box;}"];
+  [@css ".css-sokto5{offset-distance:10%;}"];
+  [@css ".css-o7ibr3{offset-position:auto;}"];
+  [@css ".css-ioz6wa{offset-position:200px;}"];
+  [@css ".css-623fe7{offset-position:200px 100px;}"];
+  [@css ".css-1kqzfje{offset-position:center;}"];
+  [@css ".css-1w008zo{offset-anchor:auto;}"];
+  [@css ".css-2hvp1o{offset-anchor:200px;}"];
+  [@css ".css-1d9ar84{offset-anchor:200px 100px;}"];
+  [@css ".css-afgyzg{offset-anchor:center;}"];
+  [@css ".css-1e6fec8{offset-rotate:auto;}"];
+  [@css ".css-1xv6haa{offset-rotate:0deg;}"];
+  [@css ".css-1tqrfcf{offset-rotate:reverse;}"];
+  [@css ".css-18vu5ss{offset-rotate:-45deg;}"];
+  [@css ".css-1p3eddq{offset-rotate:auto 180deg;}"];
+  [@css ".css-lj3wxn{offset-rotate:reverse 45deg;}"];
+  [@css ".css-1mhkmna{offset-rotate:2turn reverse;}"];
   
   CSS.make("css-yb08bu", []);
   CSS.make("css-3s0roh", []);

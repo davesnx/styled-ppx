@@ -15,9 +15,213 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css ".css-1klg0jz{color:rgba(0,0,0,0.5);}"];
+  [@css ".css-19aau8k{color:#F06;}"];
+  [@css ".css-show2y{color:#FF0066;}"];
+  [@css ".css-12w3rs3{color:hsl(0,0%,0%);}"];
+  [@css ".css-682uz0{color:hsl(0,0%,0%,0.5);}"];
+  [@css ".css-1wq4akx{color:transparent;}"];
+  [@css ".css-thzv76{color:currentColor;}"];
+  [@css ".css-1aguouh{background-color:rgba(0,0,0,0.5);}"];
+  [@css ".css-1o97rsf{background-color:#F06;}"];
+  [@css ".css-p9u22v{background-color:#FF0066;}"];
+  [@css ".css-12vo0zw{background-color:hsl(0,0%,0%);}"];
+  [@css ".css-8rxhyp{background-color:hsl(0,0%,0%,0.5);}"];
+  [@css ".css-1rm7u2e{background-color:transparent;}"];
+  [@css ".css-dltmcs{background-color:currentColor;}"];
+  [@css ".css-1xkgeh2{border-color:rgba(0,0,0,0.5);}"];
+  [@css ".css-d8xfod{border-color:#F06;}"];
+  [@css ".css-ngwiga{border-color:#FF0066;}"];
+  [@css ".css-o1a70m{border-color:hsl(0,0%,0%);}"];
+  [@css ".css-4aeh3t{border-color:hsl(0,0%,0%,0.5);}"];
+  [@css ".css-roftna{border-color:transparent;}"];
+  [@css ".css-1hs94su{border-color:currentColor;}"];
+  [@css ".css-o5763g{text-decoration-color:rgba(0,0,0,0.5);}"];
+  [@css ".css-1sjelkb{text-decoration-color:#F06;}"];
+  [@css ".css-hy9y29{text-decoration-color:#FF0066;}"];
+  [@css ".css-1j28iw5{text-decoration-color:hsl(0,0%,0%);}"];
+  [@css ".css-1m667jc{text-decoration-color:hsl(0,0%,0%,0.5);}"];
+  [@css ".css-1ks6wvt{text-decoration-color:transparent;}"];
+  [@css ".css-1spw3fg{text-decoration-color:currentColor;}"];
+  [@css ".css-1dqtlwt{column-rule-color:rgba(0,0,0,0.5);}"];
+  [@css ".css-ey6q4n{column-rule-color:#F06;}"];
+  [@css ".css-1pel08{column-rule-color:#FF0066;}"];
+  [@css ".css-jyf49a{column-rule-color:hsl(0,0%,0%);}"];
+  [@css ".css-1hgrow3{column-rule-color:hsl(0,0%,0%,0.5);}"];
+  [@css ".css-1vyru4n{column-rule-color:transparent;}"];
+  [@css ".css-l03e1{column-rule-color:currentColor;}"];
+  [@css ".css-106elx5{color:rgb(0% 20% 70%);}"];
+  [@css ".css-169x4dj{color:rgb(0 64 185);}"];
+  [@css ".css-itsf2n{color:hsl(0 0% 0%);}"];
+  [@css ".css-10z9r5f{color:rgba(0% 20% 70% / 50%);}"];
+  [@css ".css-i8e91{color:rgba(0% 20% 70% / 0.5);}"];
+  [@css ".css-k2ko2n{color:rgba(0 64 185 / 50%);}"];
+  [@css ".css-1jq4wb0{color:rgba(0 64 185 / 0.5);}"];
+  [@css ".css-1deabkw{color:hsla(0 0% 0% /0.5);}"];
+  [@css ".css-1chilpd{color:rgb(0% 20% 70% / 50%);}"];
+  [@css ".css-cm2qa9{color:rgb(0% 20% 70% / 0.5);}"];
+  [@css ".css-tnjacv{color:rgb(0 64 185 / 50%);}"];
+  [@css ".css-1nl0tkw{color:rgb(0 64 185 / 0.5);}"];
+  [@css ".css-ikl566{color:hsl(0 0% 0% / 0.5);}"];
+  [@css ".css-1wfylgf{color:#000F;}"];
+  [@css ".css-1o5x0fw{color:#000000FF;}"];
+  [@css ".css-1j7dx2f{color:rebeccapurple;}"];
+  [@css ".css-1lzhslh{background-color:rgb(0% 20% 70%);}"];
+  [@css ".css-6ez43m{background-color:rgb(0 64 185);}"];
+  [@css ".css-2v74s8{background-color:hsl(0 0% 0%);}"];
+  [@css ".css-fqa3ju{background-color:rgba(0% 20% 70% / 50%);}"];
+  [@css ".css-1ulf2tb{background-color:rgba(0% 20% 70% / 0.5);}"];
+  [@css ".css-99atwn{background-color:rgba(0 64 185 / 50%);}"];
+  [@css ".css-1mk7sx6{background-color:rgba(0 64 185 / 0.5);}"];
+  [@css ".css-1nu3sdc{background-color:hsla(0 0% 0% /0.5);}"];
+  [@css ".css-98qi4x{background-color:rgb(0% 20% 70% / 50%);}"];
+  [@css ".css-1f60zw7{background-color:rgb(0% 20% 70% / 0.5);}"];
+  [@css ".css-1sopvf5{background-color:rgb(0 64 185 / 50%);}"];
+  [@css ".css-1xjr5yh{background-color:rgb(0 64 185 / 0.5);}"];
+  [@css ".css-ase6sp{background-color:hsl(0 0% 0% / 0.5);}"];
+  [@css ".css-131nvgj{background-color:#000F;}"];
+  [@css ".css-1xqbf4a{background-color:#000000FF;}"];
+  [@css ".css-9ss56r{background-color:rebeccapurple;}"];
+  [@css ".css-1k5i3r2{border-color:rgb(0% 20% 70%);}"];
+  [@css ".css-17269e2{border-color:rgb(0 64 185);}"];
+  [@css ".css-1kpl970{border-color:hsl(0 0% 0%);}"];
+  [@css ".css-scxvdj{border-color:rgba(0% 20% 70% / 50%);}"];
+  [@css ".css-2a1dto{border-color:rgba(0% 20% 70% / 0.5);}"];
+  [@css ".css-tvijrw{border-color:rgba(0 64 185 / 50%);}"];
+  [@css ".css-1fp9ko3{border-color:rgba(0 64 185 / 0.5);}"];
+  [@css ".css-1qn5w0z{border-color:hsla(0 0% 0% /0.5);}"];
+  [@css ".css-1hr8e0z{border-color:rgb(0% 20% 70% / 50%);}"];
+  [@css ".css-3y6gcy{border-color:rgb(0% 20% 70% / 0.5);}"];
+  [@css ".css-1ymoio{border-color:rgb(0 64 185 / 50%);}"];
+  [@css ".css-1mjjpk9{border-color:rgb(0 64 185 / 0.5);}"];
+  [@css ".css-8bj0kf{border-color:hsl(0 0% 0% / 0.5);}"];
+  [@css ".css-n5b9dq{border-color:#000F;}"];
+  [@css ".css-12wm3pc{border-color:#000000FF;}"];
+  [@css ".css-1c73fhh{border-color:rebeccapurple;}"];
+  [@css ".css-ln3bxw{text-decoration-color:rgb(0% 20% 70%);}"];
+  [@css ".css-lkgw6s{text-decoration-color:rgb(0 64 185);}"];
+  [@css ".css-14o54z6{text-decoration-color:hsl(0 0% 0%);}"];
+  [@css ".css-80it8b{text-decoration-color:rgba(0% 20% 70% / 50%);}"];
+  [@css ".css-c8v6ky{text-decoration-color:rgba(0% 20% 70% / 0.5);}"];
+  [@css ".css-pvd63l{text-decoration-color:rgba(0 64 185 / 50%);}"];
+  [@css ".css-14bmep{text-decoration-color:rgba(0 64 185 / 0.5);}"];
+  [@css ".css-17xi8yb{text-decoration-color:hsla(0 0% 0% /0.5);}"];
+  [@css ".css-kv6m7{text-decoration-color:rgb(0% 20% 70% / 50%);}"];
+  [@css ".css-135snjr{text-decoration-color:rgb(0% 20% 70% / 0.5);}"];
+  [@css ".css-tm0vqt{text-decoration-color:rgb(0 64 185 / 50%);}"];
+  [@css ".css-1bkqk8j{text-decoration-color:rgb(0 64 185 / 0.5);}"];
+  [@css ".css-68bkrk{text-decoration-color:hsl(0 0% 0% / 0.5);}"];
+  [@css ".css-40xjkw{text-decoration-color:#000F;}"];
+  [@css ".css-zlfh32{text-decoration-color:#000000FF;}"];
+  [@css ".css-18j2zim{text-decoration-color:rebeccapurple;}"];
+  [@css ".css-1oj6vui{column-rule-color:rgb(0% 20% 70%);}"];
+  [@css ".css-4i3dyf{column-rule-color:rgb(0 64 185);}"];
+  [@css ".css-1maqvl6{column-rule-color:hsl(0 0% 0%);}"];
+  [@css ".css-1wm8yii{column-rule-color:rgba(0% 20% 70% / 50%);}"];
+  [@css ".css-11jt9pq{column-rule-color:rgba(0% 20% 70% / 0.5);}"];
+  [@css ".css-sjwwr9{column-rule-color:rgba(0 64 185 / 50%);}"];
+  [@css ".css-1k0c8ch{column-rule-color:rgba(0 64 185 / 0.5);}"];
+  [@css ".css-2guu68{column-rule-color:hsla(0 0% 0% /0.5);}"];
+  [@css ".css-514t4f{column-rule-color:rgb(0% 20% 70% / 50%);}"];
+  [@css ".css-6yxjvr{column-rule-color:rgb(0% 20% 70% / 0.5);}"];
+  [@css ".css-gqmwf4{column-rule-color:rgb(0 64 185 / 50%);}"];
+  [@css ".css-11xt3by{column-rule-color:rgb(0 64 185 / 0.5);}"];
+  [@css ".css-1kkf3h2{column-rule-color:hsl(0 0% 0% / 0.5);}"];
+  [@css ".css-19rpsoy{column-rule-color:#000F;}"];
+  [@css ".css-g596r0{column-rule-color:#000000FF;}"];
+  [@css ".css-107t3it{column-rule-color:rebeccapurple;}"];
+  [@css ".css-xv7eia{color:color-mix(in srgb, teal 65%, olive);}"];
   [@css
-    ".css-1klg0jz{color:rgba(0,0,0,0.5);}\n.css-19aau8k{color:#F06;}\n.css-show2y{color:#FF0066;}\n.css-12w3rs3{color:hsl(0,0%,0%);}\n.css-682uz0{color:hsl(0,0%,0%,0.5);}\n.css-1wq4akx{color:transparent;}\n.css-thzv76{color:currentColor;}\n.css-1aguouh{background-color:rgba(0,0,0,0.5);}\n.css-1o97rsf{background-color:#F06;}\n.css-p9u22v{background-color:#FF0066;}\n.css-12vo0zw{background-color:hsl(0,0%,0%);}\n.css-8rxhyp{background-color:hsl(0,0%,0%,0.5);}\n.css-1rm7u2e{background-color:transparent;}\n.css-dltmcs{background-color:currentColor;}\n.css-1xkgeh2{border-color:rgba(0,0,0,0.5);}\n.css-d8xfod{border-color:#F06;}\n.css-ngwiga{border-color:#FF0066;}\n.css-o1a70m{border-color:hsl(0,0%,0%);}\n.css-4aeh3t{border-color:hsl(0,0%,0%,0.5);}\n.css-roftna{border-color:transparent;}\n.css-1hs94su{border-color:currentColor;}\n.css-o5763g{text-decoration-color:rgba(0,0,0,0.5);}\n.css-1sjelkb{text-decoration-color:#F06;}\n.css-hy9y29{text-decoration-color:#FF0066;}\n.css-1j28iw5{text-decoration-color:hsl(0,0%,0%);}\n.css-1m667jc{text-decoration-color:hsl(0,0%,0%,0.5);}\n.css-1ks6wvt{text-decoration-color:transparent;}\n.css-1spw3fg{text-decoration-color:currentColor;}\n.css-1dqtlwt{column-rule-color:rgba(0,0,0,0.5);}\n.css-ey6q4n{column-rule-color:#F06;}\n.css-1pel08{column-rule-color:#FF0066;}\n.css-jyf49a{column-rule-color:hsl(0,0%,0%);}\n.css-1hgrow3{column-rule-color:hsl(0,0%,0%,0.5);}\n.css-1vyru4n{column-rule-color:transparent;}\n.css-l03e1{column-rule-color:currentColor;}\n.css-106elx5{color:rgb(0% 20% 70%);}\n.css-169x4dj{color:rgb(0 64 185);}\n.css-itsf2n{color:hsl(0 0% 0%);}\n.css-10z9r5f{color:rgba(0% 20% 70% / 50%);}\n.css-i8e91{color:rgba(0% 20% 70% / 0.5);}\n.css-k2ko2n{color:rgba(0 64 185 / 50%);}\n.css-1jq4wb0{color:rgba(0 64 185 / 0.5);}\n.css-1deabkw{color:hsla(0 0% 0% /0.5);}\n.css-1chilpd{color:rgb(0% 20% 70% / 50%);}\n.css-cm2qa9{color:rgb(0% 20% 70% / 0.5);}\n.css-tnjacv{color:rgb(0 64 185 / 50%);}\n.css-1nl0tkw{color:rgb(0 64 185 / 0.5);}\n.css-ikl566{color:hsl(0 0% 0% / 0.5);}\n.css-1wfylgf{color:#000F;}\n.css-1o5x0fw{color:#000000FF;}\n.css-1j7dx2f{color:rebeccapurple;}\n.css-1lzhslh{background-color:rgb(0% 20% 70%);}\n.css-6ez43m{background-color:rgb(0 64 185);}\n.css-2v74s8{background-color:hsl(0 0% 0%);}\n.css-fqa3ju{background-color:rgba(0% 20% 70% / 50%);}\n.css-1ulf2tb{background-color:rgba(0% 20% 70% / 0.5);}\n.css-99atwn{background-color:rgba(0 64 185 / 50%);}\n.css-1mk7sx6{background-color:rgba(0 64 185 / 0.5);}\n.css-1nu3sdc{background-color:hsla(0 0% 0% /0.5);}\n.css-98qi4x{background-color:rgb(0% 20% 70% / 50%);}\n.css-1f60zw7{background-color:rgb(0% 20% 70% / 0.5);}\n.css-1sopvf5{background-color:rgb(0 64 185 / 50%);}\n.css-1xjr5yh{background-color:rgb(0 64 185 / 0.5);}\n.css-ase6sp{background-color:hsl(0 0% 0% / 0.5);}\n.css-131nvgj{background-color:#000F;}\n.css-1xqbf4a{background-color:#000000FF;}\n.css-9ss56r{background-color:rebeccapurple;}\n.css-1k5i3r2{border-color:rgb(0% 20% 70%);}\n.css-17269e2{border-color:rgb(0 64 185);}\n.css-1kpl970{border-color:hsl(0 0% 0%);}\n.css-scxvdj{border-color:rgba(0% 20% 70% / 50%);}\n.css-2a1dto{border-color:rgba(0% 20% 70% / 0.5);}\n.css-tvijrw{border-color:rgba(0 64 185 / 50%);}\n.css-1fp9ko3{border-color:rgba(0 64 185 / 0.5);}\n.css-1qn5w0z{border-color:hsla(0 0% 0% /0.5);}\n.css-1hr8e0z{border-color:rgb(0% 20% 70% / 50%);}\n.css-3y6gcy{border-color:rgb(0% 20% 70% / 0.5);}\n.css-1ymoio{border-color:rgb(0 64 185 / 50%);}\n.css-1mjjpk9{border-color:rgb(0 64 185 / 0.5);}\n.css-8bj0kf{border-color:hsl(0 0% 0% / 0.5);}\n.css-n5b9dq{border-color:#000F;}\n.css-12wm3pc{border-color:#000000FF;}\n.css-1c73fhh{border-color:rebeccapurple;}\n.css-ln3bxw{text-decoration-color:rgb(0% 20% 70%);}\n.css-lkgw6s{text-decoration-color:rgb(0 64 185);}\n.css-14o54z6{text-decoration-color:hsl(0 0% 0%);}\n.css-80it8b{text-decoration-color:rgba(0% 20% 70% / 50%);}\n.css-c8v6ky{text-decoration-color:rgba(0% 20% 70% / 0.5);}\n.css-pvd63l{text-decoration-color:rgba(0 64 185 / 50%);}\n.css-14bmep{text-decoration-color:rgba(0 64 185 / 0.5);}\n.css-17xi8yb{text-decoration-color:hsla(0 0% 0% /0.5);}\n.css-kv6m7{text-decoration-color:rgb(0% 20% 70% / 50%);}\n.css-135snjr{text-decoration-color:rgb(0% 20% 70% / 0.5);}\n.css-tm0vqt{text-decoration-color:rgb(0 64 185 / 50%);}\n.css-1bkqk8j{text-decoration-color:rgb(0 64 185 / 0.5);}\n.css-68bkrk{text-decoration-color:hsl(0 0% 0% / 0.5);}\n.css-40xjkw{text-decoration-color:#000F;}\n.css-zlfh32{text-decoration-color:#000000FF;}\n.css-18j2zim{text-decoration-color:rebeccapurple;}\n.css-1oj6vui{column-rule-color:rgb(0% 20% 70%);}\n.css-4i3dyf{column-rule-color:rgb(0 64 185);}\n.css-1maqvl6{column-rule-color:hsl(0 0% 0%);}\n.css-1wm8yii{column-rule-color:rgba(0% 20% 70% / 50%);}\n.css-11jt9pq{column-rule-color:rgba(0% 20% 70% / 0.5);}\n.css-sjwwr9{column-rule-color:rgba(0 64 185 / 50%);}\n.css-1k0c8ch{column-rule-color:rgba(0 64 185 / 0.5);}\n.css-2guu68{column-rule-color:hsla(0 0% 0% /0.5);}\n.css-514t4f{column-rule-color:rgb(0% 20% 70% / 50%);}\n.css-6yxjvr{column-rule-color:rgb(0% 20% 70% / 0.5);}\n.css-gqmwf4{column-rule-color:rgb(0 64 185 / 50%);}\n.css-11xt3by{column-rule-color:rgb(0 64 185 / 0.5);}\n.css-1kkf3h2{column-rule-color:hsl(0 0% 0% / 0.5);}\n.css-19rpsoy{column-rule-color:#000F;}\n.css-g596r0{column-rule-color:#000000FF;}\n.css-107t3it{column-rule-color:rebeccapurple;}\n.css-xv7eia{color:color-mix(in srgb, teal 65%, olive);}\n.css-1q9agm7{color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);}\n.css-rzb0m8{color:color-mix(in srgb, currentColor, rgba(0, 0, 0, 0.5) 65%);}\n.css-6hx6yd{color:color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, 0.5) 65%);}\n.css-1dr2vpr{color:color-mix(in lch, teal 65%, olive);}\n.css-i9v2e0{color:color-mix(in hsl, teal 65%, olive);}\n.css-13pap82{color:color-mix(in hwb, teal 65%, olive);}\n.css-s4rji0{color:color-mix(in xyz, teal 65%, olive);}\n.css-1imxr44{color:color-mix(in lab, teal 65%, olive);}\n.css-bvuxb0{color:color-mix(in lch longer hue, hsl(200deg 50% 80%), coral);}\n.css-vzawmn{background-color:color-mix(in srgb, teal 65%, olive);}\n.css-1bh658x{background-color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);}\n.css-xdjnak{background-color:color-mix(in srgb, currentColor, rgba(0, 0, 0, 0.5) 65%);}\n.css-z2tmhh{background-color:color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, 0.5) 65%);}\n.css-sr14q8{background-color:color-mix(in lch, teal 65%, olive);}\n.css-15xujv5{background-color:color-mix(in hsl, teal 65%, olive);}\n.css-5j5l1n{background-color:color-mix(in hwb, teal 65%, olive);}\n.css-1layqra{background-color:color-mix(in xyz, teal 65%, olive);}\n.css-iqo7xf{background-color:color-mix(in lab, teal 65%, olive);}\n.css-1dvgebh{border-color:color-mix(in srgb, teal 65%, olive);}\n.css-1cpjoz7{border-color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);}\n.css-qokah8{border-color:color-mix(in srgb, currentColor, rgba(0, 0, 0, 0.5) 65%);}\n.css-tlegxc{border-color:color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, 0.5) 65%);}\n.css-xd9u6g{border-color:color-mix(in lch, teal 65%, olive);}\n.css-19dtqog{border-color:color-mix(in hsl, teal 65%, olive);}\n.css-4czslf{border-color:color-mix(in hwb, teal 65%, olive);}\n.css-7we9z4{border-color:color-mix(in xyz, teal 65%, olive);}\n.css-15anzfj{border-color:color-mix(in lab, teal 65%, olive);}\n.css-1laj5fb{text-decoration-color:color-mix(in srgb, teal 65%, olive);}\n.css-2vgokw{text-decoration-color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);}\n.css-nnawx{text-decoration-color:color-mix(in srgb, currentColor, rgba(0, 0, 0, 0.5) 65%);}\n.css-1w9gyza{text-decoration-color:color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, 0.5) 65%);}\n.css-10gmjvl{text-decoration-color:color-mix(in lch, teal 65%, olive);}\n.css-5dhj6n{text-decoration-color:color-mix(in hsl, teal 65%, olive);}\n.css-13of0y0{text-decoration-color:color-mix(in hwb, teal 65%, olive);}\n.css-1qogihm{text-decoration-color:color-mix(in xyz, teal 65%, olive);}\n.css-1huznhc{text-decoration-color:color-mix(in lab, teal 65%, olive);}\n.css-1cbt29u{column-rule-color:color-mix(in srgb, teal 65%, olive);}\n.css-lh3exx{column-rule-color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);}\n.css-tznjzz{column-rule-color:color-mix(in srgb, currentColor, rgba(0, 0, 0, 0.5) 65%);}\n.css-bomvwj{column-rule-color:color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, 0.5) 65%);}\n.css-10mgb0{column-rule-color:color-mix(in lch, teal 65%, olive);}\n.css-64iyg8{column-rule-color:color-mix(in hsl, teal 65%, olive);}\n.css-1dpa2h1{column-rule-color:color-mix(in hwb, teal 65%, olive);}\n.css-8f641x{column-rule-color:color-mix(in xyz, teal 65%, olive);}\n.css-r6gkgb{column-rule-color:color-mix(in lab, teal 65%, olive);}\n.css-161ii5p{color:rgba(0, 0, 0, calc(1));}\n.css-1ikqmml{color:rgba(0, 0, 0, calc(10 - 1));}\n"
+    ".css-1q9agm7{color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);}"
   ];
+  [@css
+    ".css-rzb0m8{color:color-mix(in srgb, currentColor, rgba(0, 0, 0, 0.5) 65%);}"
+  ];
+  [@css
+    ".css-6hx6yd{color:color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, 0.5) 65%);}"
+  ];
+  [@css ".css-1dr2vpr{color:color-mix(in lch, teal 65%, olive);}"];
+  [@css ".css-i9v2e0{color:color-mix(in hsl, teal 65%, olive);}"];
+  [@css ".css-13pap82{color:color-mix(in hwb, teal 65%, olive);}"];
+  [@css ".css-s4rji0{color:color-mix(in xyz, teal 65%, olive);}"];
+  [@css ".css-1imxr44{color:color-mix(in lab, teal 65%, olive);}"];
+  [@css
+    ".css-bvuxb0{color:color-mix(in lch longer hue, hsl(200deg 50% 80%), coral);}"
+  ];
+  [@css ".css-vzawmn{background-color:color-mix(in srgb, teal 65%, olive);}"];
+  [@css
+    ".css-1bh658x{background-color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);}"
+  ];
+  [@css
+    ".css-xdjnak{background-color:color-mix(in srgb, currentColor, rgba(0, 0, 0, 0.5) 65%);}"
+  ];
+  [@css
+    ".css-z2tmhh{background-color:color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, 0.5) 65%);}"
+  ];
+  [@css ".css-sr14q8{background-color:color-mix(in lch, teal 65%, olive);}"];
+  [@css ".css-15xujv5{background-color:color-mix(in hsl, teal 65%, olive);}"];
+  [@css ".css-5j5l1n{background-color:color-mix(in hwb, teal 65%, olive);}"];
+  [@css ".css-1layqra{background-color:color-mix(in xyz, teal 65%, olive);}"];
+  [@css ".css-iqo7xf{background-color:color-mix(in lab, teal 65%, olive);}"];
+  [@css ".css-1dvgebh{border-color:color-mix(in srgb, teal 65%, olive);}"];
+  [@css
+    ".css-1cpjoz7{border-color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);}"
+  ];
+  [@css
+    ".css-qokah8{border-color:color-mix(in srgb, currentColor, rgba(0, 0, 0, 0.5) 65%);}"
+  ];
+  [@css
+    ".css-tlegxc{border-color:color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, 0.5) 65%);}"
+  ];
+  [@css ".css-xd9u6g{border-color:color-mix(in lch, teal 65%, olive);}"];
+  [@css ".css-19dtqog{border-color:color-mix(in hsl, teal 65%, olive);}"];
+  [@css ".css-4czslf{border-color:color-mix(in hwb, teal 65%, olive);}"];
+  [@css ".css-7we9z4{border-color:color-mix(in xyz, teal 65%, olive);}"];
+  [@css ".css-15anzfj{border-color:color-mix(in lab, teal 65%, olive);}"];
+  [@css
+    ".css-1laj5fb{text-decoration-color:color-mix(in srgb, teal 65%, olive);}"
+  ];
+  [@css
+    ".css-2vgokw{text-decoration-color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);}"
+  ];
+  [@css
+    ".css-nnawx{text-decoration-color:color-mix(in srgb, currentColor, rgba(0, 0, 0, 0.5) 65%);}"
+  ];
+  [@css
+    ".css-1w9gyza{text-decoration-color:color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, 0.5) 65%);}"
+  ];
+  [@css
+    ".css-10gmjvl{text-decoration-color:color-mix(in lch, teal 65%, olive);}"
+  ];
+  [@css
+    ".css-5dhj6n{text-decoration-color:color-mix(in hsl, teal 65%, olive);}"
+  ];
+  [@css
+    ".css-13of0y0{text-decoration-color:color-mix(in hwb, teal 65%, olive);}"
+  ];
+  [@css
+    ".css-1qogihm{text-decoration-color:color-mix(in xyz, teal 65%, olive);}"
+  ];
+  [@css
+    ".css-1huznhc{text-decoration-color:color-mix(in lab, teal 65%, olive);}"
+  ];
+  [@css ".css-1cbt29u{column-rule-color:color-mix(in srgb, teal 65%, olive);}"];
+  [@css
+    ".css-lh3exx{column-rule-color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);}"
+  ];
+  [@css
+    ".css-tznjzz{column-rule-color:color-mix(in srgb, currentColor, rgba(0, 0, 0, 0.5) 65%);}"
+  ];
+  [@css
+    ".css-bomvwj{column-rule-color:color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, 0.5) 65%);}"
+  ];
+  [@css ".css-10mgb0{column-rule-color:color-mix(in lch, teal 65%, olive);}"];
+  [@css ".css-64iyg8{column-rule-color:color-mix(in hsl, teal 65%, olive);}"];
+  [@css ".css-1dpa2h1{column-rule-color:color-mix(in hwb, teal 65%, olive);}"];
+  [@css ".css-8f641x{column-rule-color:color-mix(in xyz, teal 65%, olive);}"];
+  [@css ".css-r6gkgb{column-rule-color:color-mix(in lab, teal 65%, olive);}"];
+  [@css ".css-161ii5p{color:rgba(0, 0, 0, calc(1));}"];
+  [@css ".css-1ikqmml{color:rgba(0, 0, 0, calc(10 - 1));}"];
   
   CSS.make("css-1klg0jz", []);
   CSS.make("css-19aau8k", []);

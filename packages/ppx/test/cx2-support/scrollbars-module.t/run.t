@@ -15,9 +15,11 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css
-    ".css-1uqp1bd{scrollbar-color:auto;}\n.css-1xd6oa{scrollbar-color:red blue;}\n.css-1tn07g6{scrollbar-width:auto;}\n.css-osrmx3{scrollbar-width:thin;}\n.css-1y6rjsx{scrollbar-width:none;}\n"
-  ];
+  [@css ".css-1uqp1bd{scrollbar-color:auto;}"];
+  [@css ".css-1xd6oa{scrollbar-color:red blue;}"];
+  [@css ".css-1tn07g6{scrollbar-width:auto;}"];
+  [@css ".css-osrmx3{scrollbar-width:thin;}"];
+  [@css ".css-1y6rjsx{scrollbar-width:none;}"];
   
   CSS.make("css-1uqp1bd", []);
   CSS.make("css-1xd6oa", []);

@@ -15,9 +15,14 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css
-    ".css-1wj9eo6{vertical-align:baseline;}\n.css-c6kzuz{vertical-align:sub;}\n.css-9z1ck9{vertical-align:super;}\n.css-1hgawz4{vertical-align:top;}\n.css-ezbbe2{vertical-align:text-top;}\n.css-uk6cul{vertical-align:middle;}\n.css-1170n61{vertical-align:bottom;}\n.css-i6dzq1{vertical-align:text-bottom;}\n"
-  ];
+  [@css ".css-1wj9eo6{vertical-align:baseline;}"];
+  [@css ".css-c6kzuz{vertical-align:sub;}"];
+  [@css ".css-9z1ck9{vertical-align:super;}"];
+  [@css ".css-1hgawz4{vertical-align:top;}"];
+  [@css ".css-ezbbe2{vertical-align:text-top;}"];
+  [@css ".css-uk6cul{vertical-align:middle;}"];
+  [@css ".css-1170n61{vertical-align:bottom;}"];
+  [@css ".css-i6dzq1{vertical-align:text-bottom;}"];
   CSS.make("css-1wj9eo6", []);
   CSS.make("css-c6kzuz", []);
   CSS.make("css-9z1ck9", []);

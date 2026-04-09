@@ -15,9 +15,41 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css
-    ".css-iscixw{line-clamp:none;}\n.css-10whhy3{line-clamp:1;}\n.css-f8eyiu{max-lines:none;}\n.css-1tdkhmq{max-lines:1;}\n.css-16qbhz6{overflow-x:visible;}\n.css-1kzo3b9{overflow-x:hidden;}\n.css-1th3fel{overflow-x:clip;}\n.css-13ad1he{overflow-x:scroll;}\n.css-ayshjd{overflow-x:auto;}\n.css-ifv34m{overflow-y:visible;}\n.css-144vlu9{overflow-y:hidden;}\n.css-w43dqe{overflow-y:clip;}\n.css-15bvnbz{overflow-y:scroll;}\n.css-13v3rg8{overflow-y:auto;}\n.css-1rb7o30{overflow-inline:visible;}\n.css-7yocar{overflow-inline:hidden;}\n.css-fumbnd{overflow-inline:clip;}\n.css-1n7vnt4{overflow-inline:scroll;}\n.css-1ukl3d7{overflow-inline:auto;}\n.css-9e376w{overflow-block:visible;}\n.css-l7i9nl{overflow-block:hidden;}\n.css-174mqtl{overflow-block:clip;}\n.css-1l7b3k{overflow-block:scroll;}\n.css-gge70x{overflow-block:auto;}\n.css-1piyyg0{scrollbar-gutter:auto;}\n.css-1x6kn4i{scrollbar-gutter:stable;}\n.css-1600g5d{scrollbar-gutter:both-edges stable;}\n.css-btacsl{scrollbar-gutter:stable both-edges;}\n.css-g8w8p9{overflow-clip-margin:content-box;}\n.css-gpc69b{overflow-clip-margin:padding-box;}\n.css-16k4htk{overflow-clip-margin:border-box;}\n.css-olg26a{overflow-clip-margin:20px;}\n.css-1kiluqi{overflow-clip-margin:1em;}\n.css-15fxgse{overflow-clip-margin:content-box 5px;}\n.css-1gl8vwx{overflow-clip-margin:5px content-box;}\n"
-  ];
+  [@css ".css-iscixw{line-clamp:none;}"];
+  [@css ".css-10whhy3{line-clamp:1;}"];
+  [@css ".css-f8eyiu{max-lines:none;}"];
+  [@css ".css-1tdkhmq{max-lines:1;}"];
+  [@css ".css-16qbhz6{overflow-x:visible;}"];
+  [@css ".css-1kzo3b9{overflow-x:hidden;}"];
+  [@css ".css-1th3fel{overflow-x:clip;}"];
+  [@css ".css-13ad1he{overflow-x:scroll;}"];
+  [@css ".css-ayshjd{overflow-x:auto;}"];
+  [@css ".css-ifv34m{overflow-y:visible;}"];
+  [@css ".css-144vlu9{overflow-y:hidden;}"];
+  [@css ".css-w43dqe{overflow-y:clip;}"];
+  [@css ".css-15bvnbz{overflow-y:scroll;}"];
+  [@css ".css-13v3rg8{overflow-y:auto;}"];
+  [@css ".css-1rb7o30{overflow-inline:visible;}"];
+  [@css ".css-7yocar{overflow-inline:hidden;}"];
+  [@css ".css-fumbnd{overflow-inline:clip;}"];
+  [@css ".css-1n7vnt4{overflow-inline:scroll;}"];
+  [@css ".css-1ukl3d7{overflow-inline:auto;}"];
+  [@css ".css-9e376w{overflow-block:visible;}"];
+  [@css ".css-l7i9nl{overflow-block:hidden;}"];
+  [@css ".css-174mqtl{overflow-block:clip;}"];
+  [@css ".css-1l7b3k{overflow-block:scroll;}"];
+  [@css ".css-gge70x{overflow-block:auto;}"];
+  [@css ".css-1piyyg0{scrollbar-gutter:auto;}"];
+  [@css ".css-1x6kn4i{scrollbar-gutter:stable;}"];
+  [@css ".css-1600g5d{scrollbar-gutter:both-edges stable;}"];
+  [@css ".css-btacsl{scrollbar-gutter:stable both-edges;}"];
+  [@css ".css-g8w8p9{overflow-clip-margin:content-box;}"];
+  [@css ".css-gpc69b{overflow-clip-margin:padding-box;}"];
+  [@css ".css-16k4htk{overflow-clip-margin:border-box;}"];
+  [@css ".css-olg26a{overflow-clip-margin:20px;}"];
+  [@css ".css-1kiluqi{overflow-clip-margin:1em;}"];
+  [@css ".css-15fxgse{overflow-clip-margin:content-box 5px;}"];
+  [@css ".css-1gl8vwx{overflow-clip-margin:5px content-box;}"];
   
   CSS.make("css-iscixw", []);
   CSS.make("css-10whhy3", []);

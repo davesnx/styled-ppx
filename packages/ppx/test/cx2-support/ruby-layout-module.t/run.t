@@ -15,9 +15,11 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css
-    ".css-1g93gy9{display:ruby;}\n.css-1jsb5b1{display:ruby-base;}\n.css-7miprk{display:ruby-text;}\n.css-5ep41v{display:ruby-base-container;}\n.css-o1juuf{display:ruby-text-container;}\n"
-  ];
+  [@css ".css-1g93gy9{display:ruby;}"];
+  [@css ".css-1jsb5b1{display:ruby-base;}"];
+  [@css ".css-7miprk{display:ruby-text;}"];
+  [@css ".css-5ep41v{display:ruby-base-container;}"];
+  [@css ".css-o1juuf{display:ruby-text-container;}"];
   
   CSS.make("css-1g93gy9", []);
   CSS.make("css-1jsb5b1", []);

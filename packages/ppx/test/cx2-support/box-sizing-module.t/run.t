@@ -15,9 +15,33 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css
-    ".css-cf3le8{width:max-content;}\n.css-17hckkm{width:min-content;}\n.css-muccy6{width:fit-content(10%);}\n.css-106ktvk{min-width:max-content;}\n.css-vlreoz{min-width:min-content;}\n.css-gikswh{min-width:fit-content(10%);}\n.css-13sc9a0{max-width:max-content;}\n.css-1jonlwm{max-width:min-content;}\n.css-gszzeg{max-width:fit-content(10%);}\n.css-14x27ji{height:max-content;}\n.css-uvzl7o{height:min-content;}\n.css-giv2pj{height:fit-content(10%);}\n.css-ezyx8i{min-height:max-content;}\n.css-14fp2tk{min-height:min-content;}\n.css-1iubza9{min-height:fit-content(10%);}\n.css-1smyxes{max-height:max-content;}\n.css-rl4hk2{max-height:min-content;}\n.css-drct3b{max-height:fit-content(10%);}\n.css-1gqcmp3{aspect-ratio:auto;}\n.css-kpqo31{aspect-ratio:2;}\n.css-1amvr3s{aspect-ratio:16 / 9;}\n.css-1gtanqs{width:fit-content;}\n.css-1344rbf{min-width:fit-content;}\n.css-1fuhjh6{max-width:fit-content;}\n.css-1sy0xge{height:fit-content;}\n.css-ewx31z{min-height:fit-content;}\n.css-hse59j{max-height:fit-content;}\n"
-  ];
+  [@css ".css-cf3le8{width:max-content;}"];
+  [@css ".css-17hckkm{width:min-content;}"];
+  [@css ".css-muccy6{width:fit-content(10%);}"];
+  [@css ".css-106ktvk{min-width:max-content;}"];
+  [@css ".css-vlreoz{min-width:min-content;}"];
+  [@css ".css-gikswh{min-width:fit-content(10%);}"];
+  [@css ".css-13sc9a0{max-width:max-content;}"];
+  [@css ".css-1jonlwm{max-width:min-content;}"];
+  [@css ".css-gszzeg{max-width:fit-content(10%);}"];
+  [@css ".css-14x27ji{height:max-content;}"];
+  [@css ".css-uvzl7o{height:min-content;}"];
+  [@css ".css-giv2pj{height:fit-content(10%);}"];
+  [@css ".css-ezyx8i{min-height:max-content;}"];
+  [@css ".css-14fp2tk{min-height:min-content;}"];
+  [@css ".css-1iubza9{min-height:fit-content(10%);}"];
+  [@css ".css-1smyxes{max-height:max-content;}"];
+  [@css ".css-rl4hk2{max-height:min-content;}"];
+  [@css ".css-drct3b{max-height:fit-content(10%);}"];
+  [@css ".css-1gqcmp3{aspect-ratio:auto;}"];
+  [@css ".css-kpqo31{aspect-ratio:2;}"];
+  [@css ".css-1amvr3s{aspect-ratio:16 / 9;}"];
+  [@css ".css-1gtanqs{width:fit-content;}"];
+  [@css ".css-1344rbf{min-width:fit-content;}"];
+  [@css ".css-1fuhjh6{max-width:fit-content;}"];
+  [@css ".css-1sy0xge{height:fit-content;}"];
+  [@css ".css-ewx31z{min-height:fit-content;}"];
+  [@css ".css-hse59j{max-height:fit-content;}"];
   
   CSS.make("css-cf3le8", []);
   CSS.make("css-17hckkm", []);

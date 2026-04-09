@@ -15,9 +15,41 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css
-    ".css-106lko4{mix-blend-mode:normal;}\n.css-yyvjpz{mix-blend-mode:multiply;}\n.css-g6k0am{mix-blend-mode:screen;}\n.css-jqzyj4{mix-blend-mode:overlay;}\n.css-1hwt403{mix-blend-mode:darken;}\n.css-1ywm2bs{mix-blend-mode:lighten;}\n.css-28haz0{mix-blend-mode:color-dodge;}\n.css-1aiw6n1{mix-blend-mode:color-burn;}\n.css-1bgzgq9{mix-blend-mode:hard-light;}\n.css-183ndlc{mix-blend-mode:soft-light;}\n.css-xl54fr{mix-blend-mode:difference;}\n.css-1yabobq{mix-blend-mode:exclusion;}\n.css-1htuj9e{mix-blend-mode:hue;}\n.css-1e9qzf6{mix-blend-mode:saturation;}\n.css-1mv0k1i{mix-blend-mode:color;}\n.css-10szft{mix-blend-mode:luminosity;}\n.css-139jmn5{isolation:auto;}\n.css-13cnam7{isolation:isolate;}\n.css-qf0fcc{background-blend-mode:normal;}\n.css-10bwb0u{background-blend-mode:multiply;}\n.css-89mqbu{background-blend-mode:screen;}\n.css-129kb0h{background-blend-mode:overlay;}\n.css-vlejn3{background-blend-mode:darken;}\n.css-1gtgoey{background-blend-mode:lighten;}\n.css-1p2yjd5{background-blend-mode:color-dodge;}\n.css-cz39ay{background-blend-mode:color-burn;}\n.css-hxbqd8{background-blend-mode:hard-light;}\n.css-1fze5j0{background-blend-mode:soft-light;}\n.css-dw2r9t{background-blend-mode:difference;}\n.css-1l0nlb2{background-blend-mode:exclusion;}\n.css-1way3l6{background-blend-mode:hue;}\n.css-12toyo7{background-blend-mode:saturation;}\n.css-1o4xi8v{background-blend-mode:color;}\n.css-909g5x{background-blend-mode:luminosity;}\n.css-m4l4fq{background-blend-mode:normal, multiply;}\n"
-  ];
+  [@css ".css-106lko4{mix-blend-mode:normal;}"];
+  [@css ".css-yyvjpz{mix-blend-mode:multiply;}"];
+  [@css ".css-g6k0am{mix-blend-mode:screen;}"];
+  [@css ".css-jqzyj4{mix-blend-mode:overlay;}"];
+  [@css ".css-1hwt403{mix-blend-mode:darken;}"];
+  [@css ".css-1ywm2bs{mix-blend-mode:lighten;}"];
+  [@css ".css-28haz0{mix-blend-mode:color-dodge;}"];
+  [@css ".css-1aiw6n1{mix-blend-mode:color-burn;}"];
+  [@css ".css-1bgzgq9{mix-blend-mode:hard-light;}"];
+  [@css ".css-183ndlc{mix-blend-mode:soft-light;}"];
+  [@css ".css-xl54fr{mix-blend-mode:difference;}"];
+  [@css ".css-1yabobq{mix-blend-mode:exclusion;}"];
+  [@css ".css-1htuj9e{mix-blend-mode:hue;}"];
+  [@css ".css-1e9qzf6{mix-blend-mode:saturation;}"];
+  [@css ".css-1mv0k1i{mix-blend-mode:color;}"];
+  [@css ".css-10szft{mix-blend-mode:luminosity;}"];
+  [@css ".css-139jmn5{isolation:auto;}"];
+  [@css ".css-13cnam7{isolation:isolate;}"];
+  [@css ".css-qf0fcc{background-blend-mode:normal;}"];
+  [@css ".css-10bwb0u{background-blend-mode:multiply;}"];
+  [@css ".css-89mqbu{background-blend-mode:screen;}"];
+  [@css ".css-129kb0h{background-blend-mode:overlay;}"];
+  [@css ".css-vlejn3{background-blend-mode:darken;}"];
+  [@css ".css-1gtgoey{background-blend-mode:lighten;}"];
+  [@css ".css-1p2yjd5{background-blend-mode:color-dodge;}"];
+  [@css ".css-cz39ay{background-blend-mode:color-burn;}"];
+  [@css ".css-hxbqd8{background-blend-mode:hard-light;}"];
+  [@css ".css-1fze5j0{background-blend-mode:soft-light;}"];
+  [@css ".css-dw2r9t{background-blend-mode:difference;}"];
+  [@css ".css-1l0nlb2{background-blend-mode:exclusion;}"];
+  [@css ".css-1way3l6{background-blend-mode:hue;}"];
+  [@css ".css-12toyo7{background-blend-mode:saturation;}"];
+  [@css ".css-1o4xi8v{background-blend-mode:color;}"];
+  [@css ".css-909g5x{background-blend-mode:luminosity;}"];
+  [@css ".css-m4l4fq{background-blend-mode:normal, multiply;}"];
   
   CSS.make("css-106lko4", []);
   CSS.make("css-yyvjpz", []);

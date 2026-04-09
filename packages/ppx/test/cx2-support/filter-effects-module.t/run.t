@@ -15,9 +15,38 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css ".css-lcnm6u{filter:none;}"];
+  [@css ".css-1ifcuuo{filter:url(\"#id\");}"];
+  [@css ".css-wzp7li{filter:url(\"image.svg#id\");}"];
+  [@css ".css-enxr2q{filter:blur(5px);}"];
+  [@css ".css-ckxntt{filter:brightness(0.5);}"];
+  [@css ".css-1o440fd{filter:contrast(150%);}"];
+  [@css ".css-1xj4bqh{filter:drop-shadow(5px 5px 10px);}"];
+  [@css ".css-1arlta4{filter:drop-shadow(15px 15px 15px #123);}"];
+  [@css ".css-10pv1a9{filter:grayscale(50%);}"];
+  [@css ".css-dycrc5{filter:hue-rotate(50deg);}"];
+  [@css ".css-1vaakyf{filter:invert(50%);}"];
+  [@css ".css-nhtt82{filter:opacity(50%);}"];
+  [@css ".css-nwh2v6{filter:sepia(50%);}"];
+  [@css ".css-1e0jie{filter:saturate(150%);}"];
+  [@css ".css-vc13v6{filter:grayscale(100%) sepia(100%);}"];
+  [@css ".css-1twvds4{filter:drop-shadow(0 8px 32px rgba(0, 0, 0, 0.03));}"];
+  [@css ".css-47q0hq{backdrop-filter:none;}"];
+  [@css ".css-dj9q1s{backdrop-filter:url(\"#id\");}"];
+  [@css ".css-fhczb9{backdrop-filter:url(\"image.svg#id\");}"];
+  [@css ".css-cdpdax{backdrop-filter:blur(5px);}"];
+  [@css ".css-134smr4{backdrop-filter:brightness(0.5);}"];
+  [@css ".css-ii5lod{backdrop-filter:contrast(150%);}"];
   [@css
-    ".css-lcnm6u{filter:none;}\n.css-1ifcuuo{filter:url(\"#id\");}\n.css-wzp7li{filter:url(\"image.svg#id\");}\n.css-enxr2q{filter:blur(5px);}\n.css-ckxntt{filter:brightness(0.5);}\n.css-1o440fd{filter:contrast(150%);}\n.css-1xj4bqh{filter:drop-shadow(5px 5px 10px);}\n.css-1arlta4{filter:drop-shadow(15px 15px 15px #123);}\n.css-10pv1a9{filter:grayscale(50%);}\n.css-dycrc5{filter:hue-rotate(50deg);}\n.css-1vaakyf{filter:invert(50%);}\n.css-nhtt82{filter:opacity(50%);}\n.css-nwh2v6{filter:sepia(50%);}\n.css-1e0jie{filter:saturate(150%);}\n.css-vc13v6{filter:grayscale(100%) sepia(100%);}\n.css-1twvds4{filter:drop-shadow(0 8px 32px rgba(0, 0, 0, 0.03));}\n.css-47q0hq{backdrop-filter:none;}\n.css-dj9q1s{backdrop-filter:url(\"#id\");}\n.css-fhczb9{backdrop-filter:url(\"image.svg#id\");}\n.css-cdpdax{backdrop-filter:blur(5px);}\n.css-134smr4{backdrop-filter:brightness(0.5);}\n.css-ii5lod{backdrop-filter:contrast(150%);}\n.css-byn3bb{backdrop-filter:drop-shadow(15px 15px 15px rgba(0, 0, 0, 1));}\n.css-14pjicj{backdrop-filter:grayscale(50%);}\n.css-15xjduf{backdrop-filter:hue-rotate(50deg);}\n.css-1xysmnx{backdrop-filter:invert(50%);}\n.css-bfwhax{backdrop-filter:opacity(50%);}\n.css-e2b97y{backdrop-filter:sepia(50%);}\n.css-x1ltqs{backdrop-filter:saturate(150%);}\n.css-1t5aokm{backdrop-filter:grayscale(100%) sepia(100%);}\n"
+    ".css-byn3bb{backdrop-filter:drop-shadow(15px 15px 15px rgba(0, 0, 0, 1));}"
   ];
+  [@css ".css-14pjicj{backdrop-filter:grayscale(50%);}"];
+  [@css ".css-15xjduf{backdrop-filter:hue-rotate(50deg);}"];
+  [@css ".css-1xysmnx{backdrop-filter:invert(50%);}"];
+  [@css ".css-bfwhax{backdrop-filter:opacity(50%);}"];
+  [@css ".css-e2b97y{backdrop-filter:sepia(50%);}"];
+  [@css ".css-x1ltqs{backdrop-filter:saturate(150%);}"];
+  [@css ".css-1t5aokm{backdrop-filter:grayscale(100%) sepia(100%);}"];
   let color = CSS.hex("333");
   
   CSS.make("css-lcnm6u", []);

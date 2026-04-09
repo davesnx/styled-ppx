@@ -15,9 +15,15 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css
-    ".css-2agt40{contain:none;}\n.css-deyisx{contain:strict;}\n.css-1x07x2x{contain:content;}\n.css-eq1cha{contain:size;}\n.css-bzw7cp{contain:layout;}\n.css-52yn5q{contain:paint;}\n.css-j5jwgs{contain:size layout;}\n.css-567zd4{contain:size paint;}\n.css-1ubc7bb{contain:size layout paint;}\n"
-  ];
+  [@css ".css-2agt40{contain:none;}"];
+  [@css ".css-deyisx{contain:strict;}"];
+  [@css ".css-1x07x2x{contain:content;}"];
+  [@css ".css-eq1cha{contain:size;}"];
+  [@css ".css-bzw7cp{contain:layout;}"];
+  [@css ".css-52yn5q{contain:paint;}"];
+  [@css ".css-j5jwgs{contain:size layout;}"];
+  [@css ".css-567zd4{contain:size paint;}"];
+  [@css ".css-1ubc7bb{contain:size layout paint;}"];
   
   CSS.make("css-2agt40", []);
   CSS.make("css-deyisx", []);

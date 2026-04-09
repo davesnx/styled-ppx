@@ -301,10 +301,13 @@ let () = {
 
   let impl = (_ctx, str: Ppxlib.structure) => {
     let loc = Ppxlib.Location.none;
-    switch (Css_file.get()) {
-    | "" => str
-    | css => [[%stri [@css [%e Builder.estring(~loc, css)]]], ...str]
-    };
+    let rules = Css_file.get();
+    let rule_items =
+      List.map(
+        rule => [%stri [@css [%e Builder.estring(~loc, rule)]]],
+        rules,
+      );
+    rule_items @ str;
   };
 
   Ppxlib.Driver.V2.register_transformation(

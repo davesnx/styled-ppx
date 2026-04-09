@@ -13,9 +13,11 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css
-    ".css-hxo6vg{width:calc(50% + 4px);}\n.css-1bjj19s{width:calc(20px - 10px);}\n.css-12qo4ty{width:calc(100vh - calc(2rem + 120px));}\n.css-1g5uhfp{width:calc(100vh * 2);}\n.css-6t8hw4{width:calc(2 * 120px);}\n"
-  ];
+  [@css ".css-hxo6vg{width:calc(50% + 4px);}"];
+  [@css ".css-1bjj19s{width:calc(20px - 10px);}"];
+  [@css ".css-12qo4ty{width:calc(100vh - calc(2rem + 120px));}"];
+  [@css ".css-1g5uhfp{width:calc(100vh * 2);}"];
+  [@css ".css-6t8hw4{width:calc(2 * 120px);}"];
   CSS.make("css-hxo6vg", []);
   CSS.make("css-1bjj19s", []);
   CSS.make("css-12qo4ty", []);

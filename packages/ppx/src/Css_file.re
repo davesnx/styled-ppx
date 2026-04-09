@@ -32,25 +32,12 @@ module Buffer = {
     };
   };
 
-  let get_all_css = () => {
-    let buffer = Buffer.create(1024);
-    let separator = Settings.Get.minify() ? "" : "\n";
-
-    global_rules^
-    |> List.rev
-    |> List.iter(((_, cssText)) => {
-         Buffer.add_string(buffer, cssText);
-         Buffer.add_string(buffer, separator);
-       });
-
-    accumulated_rules^
-    |> List.rev
-    |> List.iter(((_, cssText)) => {
-         Buffer.add_string(buffer, cssText);
-         Buffer.add_string(buffer, separator);
-       });
-
-    Buffer.contents(buffer);
+  let get_rules = () => {
+    let globals =
+      global_rules^ |> List.rev |> List.map(((_, cssText)) => cssText);
+    let rules =
+      accumulated_rules^ |> List.rev |> List.map(((_, cssText)) => cssText);
+    globals @ rules;
   };
 
   let clear = () => {
@@ -618,7 +605,7 @@ let push_global = (global_rules: Styled_ppx_css_parser.Ast.rule_list) => {
 };
 
 let get = () => {
-  let css_content = Buffer.get_all_css();
+  let rules = Buffer.get_rules();
   Buffer.clear();
-  css_content;
+  rules;
 };

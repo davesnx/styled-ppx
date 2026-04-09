@@ -15,9 +15,38 @@ If this test fails, the var() and cascading support is broken
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css
-    ".css-zwn3kf{color:var(--primary-color);}\n.css-1hvfuqy{background-color:var(--bg-color);}\n.css-x8crrr{margin:var(--spacing);}\n.css-k07rr7{padding:var(--padding);}\n.css-1icykz8{font-size:var(--font-size);}\n.css-1lora93{width:var(--width);}\n.css-gmqm6h{height:var(--height);}\n.css-q2y3yl{color:inherit;}\n.css-1ed8crh{color:initial;}\n.css-1v7yg6i{color:unset;}\n.css-ppjbf2{color:revert;}\n.css-t807lq{color:revert-layer;}\n.css-1c6vscd{display:inherit;}\n.css-1msh118{display:initial;}\n.css-qxhxe5{display:unset;}\n.css-q6cx45{display:revert;}\n.css-eojml{display:revert-layer;}\n.css-vqj8z{margin:inherit;}\n.css-13bgxfx{margin:initial;}\n.css-1fyzsk3{margin:unset;}\n.css-1k42sph{margin:revert;}\n.css-ypkzq5{margin:revert-layer;}\n.css-y9nah6{flex:inherit;}\n.css-1ujc6td{flex:initial;}\n.css-1e042ms{flex:unset;}\n.css-1bh8jui{flex:revert;}\n.css-g54fps{flex:revert-layer;}\n.css-67e5f8{font-size:inherit;}\n.css-ur53xd{font-size:initial;}\n.css-rjswxq{font-size:unset;}\n.css-8zntfo{font-size:revert;}\n.css-1kcpi5f{font-size:revert-layer;}\n"
-  ];
+  [@css ".css-zwn3kf{color:var(--primary-color);}"];
+  [@css ".css-1hvfuqy{background-color:var(--bg-color);}"];
+  [@css ".css-x8crrr{margin:var(--spacing);}"];
+  [@css ".css-k07rr7{padding:var(--padding);}"];
+  [@css ".css-1icykz8{font-size:var(--font-size);}"];
+  [@css ".css-1lora93{width:var(--width);}"];
+  [@css ".css-gmqm6h{height:var(--height);}"];
+  [@css ".css-q2y3yl{color:inherit;}"];
+  [@css ".css-1ed8crh{color:initial;}"];
+  [@css ".css-1v7yg6i{color:unset;}"];
+  [@css ".css-ppjbf2{color:revert;}"];
+  [@css ".css-t807lq{color:revert-layer;}"];
+  [@css ".css-1c6vscd{display:inherit;}"];
+  [@css ".css-1msh118{display:initial;}"];
+  [@css ".css-qxhxe5{display:unset;}"];
+  [@css ".css-q6cx45{display:revert;}"];
+  [@css ".css-eojml{display:revert-layer;}"];
+  [@css ".css-vqj8z{margin:inherit;}"];
+  [@css ".css-13bgxfx{margin:initial;}"];
+  [@css ".css-1fyzsk3{margin:unset;}"];
+  [@css ".css-1k42sph{margin:revert;}"];
+  [@css ".css-ypkzq5{margin:revert-layer;}"];
+  [@css ".css-y9nah6{flex:inherit;}"];
+  [@css ".css-1ujc6td{flex:initial;}"];
+  [@css ".css-1e042ms{flex:unset;}"];
+  [@css ".css-1bh8jui{flex:revert;}"];
+  [@css ".css-g54fps{flex:revert-layer;}"];
+  [@css ".css-67e5f8{font-size:inherit;}"];
+  [@css ".css-ur53xd{font-size:initial;}"];
+  [@css ".css-rjswxq{font-size:unset;}"];
+  [@css ".css-8zntfo{font-size:revert;}"];
+  [@css ".css-1kcpi5f{font-size:revert-layer;}"];
   
   CSS.make("css-zwn3kf", []);
   CSS.make("css-1hvfuqy", []);

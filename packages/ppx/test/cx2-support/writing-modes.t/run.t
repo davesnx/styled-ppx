@@ -15,9 +15,25 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css
-    ".css-sxjqc9{direction:ltr;}\n.css-pu82ql{direction:rtl;}\n.css-1nh14px{unicode-bidi:normal;}\n.css-1dxtajz{unicode-bidi:embed;}\n.css-gthxsn{unicode-bidi:isolate;}\n.css-1f53xur{unicode-bidi:bidi-override;}\n.css-1sv30cq{unicode-bidi:isolate-override;}\n.css-3e7z6r{unicode-bidi:plaintext;}\n.css-1tyni7l{writing-mode:horizontal-tb;}\n.css-zorbdf{writing-mode:vertical-rl;}\n.css-bxuv7p{writing-mode:vertical-lr;}\n.css-1cbc989{text-orientation:mixed;}\n.css-1kcjqux{text-orientation:upright;}\n.css-ajfrh6{text-orientation:sideways;}\n.css-byubm3{text-combine-upright:none;}\n.css-16cjtzu{text-combine-upright:all;}\n.css-mpcjo4{writing-mode:sideways-rl;}\n.css-1tdq5f9{writing-mode:sideways-lr;}\n.css-6ofs5k{text-combine-upright:digits 2;}\n"
-  ];
+  [@css ".css-sxjqc9{direction:ltr;}"];
+  [@css ".css-pu82ql{direction:rtl;}"];
+  [@css ".css-1nh14px{unicode-bidi:normal;}"];
+  [@css ".css-1dxtajz{unicode-bidi:embed;}"];
+  [@css ".css-gthxsn{unicode-bidi:isolate;}"];
+  [@css ".css-1f53xur{unicode-bidi:bidi-override;}"];
+  [@css ".css-1sv30cq{unicode-bidi:isolate-override;}"];
+  [@css ".css-3e7z6r{unicode-bidi:plaintext;}"];
+  [@css ".css-1tyni7l{writing-mode:horizontal-tb;}"];
+  [@css ".css-zorbdf{writing-mode:vertical-rl;}"];
+  [@css ".css-bxuv7p{writing-mode:vertical-lr;}"];
+  [@css ".css-1cbc989{text-orientation:mixed;}"];
+  [@css ".css-1kcjqux{text-orientation:upright;}"];
+  [@css ".css-ajfrh6{text-orientation:sideways;}"];
+  [@css ".css-byubm3{text-combine-upright:none;}"];
+  [@css ".css-16cjtzu{text-combine-upright:all;}"];
+  [@css ".css-mpcjo4{writing-mode:sideways-rl;}"];
+  [@css ".css-1tdq5f9{writing-mode:sideways-lr;}"];
+  [@css ".css-6ofs5k{text-combine-upright:digits 2;}"];
   
   CSS.make("css-sxjqc9", []);
   CSS.make("css-pu82ql", []);

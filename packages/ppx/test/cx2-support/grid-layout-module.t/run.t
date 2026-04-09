@@ -15,9 +15,148 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css ".css-lgj0h8{display:grid;}"];
+  [@css ".css-19rux3o{display:inline-grid;}"];
+  [@css ".css-1xsawez{grid-template-columns:none;}"];
+  [@css ".css-mod5pp{grid-template-columns:auto;}"];
+  [@css ".css-1cmnoai{grid-template-columns:100px;}"];
+  [@css ".css-1ez2f7z{grid-template-columns:1fr;}"];
+  [@css ".css-1ey77wr{grid-template-columns:100px 1fr auto;}"];
+  [@css ".css-k831z1{grid-template-columns:repeat(2, 100px 1fr);}"];
   [@css
-    ".css-lgj0h8{display:grid;}\n.css-19rux3o{display:inline-grid;}\n.css-1xsawez{grid-template-columns:none;}\n.css-mod5pp{grid-template-columns:auto;}\n.css-1cmnoai{grid-template-columns:100px;}\n.css-1ez2f7z{grid-template-columns:1fr;}\n.css-1ey77wr{grid-template-columns:100px 1fr auto;}\n.css-k831z1{grid-template-columns:repeat(2, 100px 1fr);}\n.css-djxfq4{grid-template-columns:repeat(auto-fill, minmax(25ch, 1fr));}\n.css-gs16i{grid-template-columns:10px [col-start] 250px [col-end];}\n.css-1v52g5g{grid-template-columns:200px repeat(auto-fill, 100px) 300px;}\n.css-68fuud{grid-template-columns:var(--var-7wrrwo);}\n.css-1p5ongh{grid-template-rows:none;}\n.css-1xkhlg{grid-template-rows:auto;}\n.css-1w8gpmy{grid-template-rows:100px;}\n.css-1t6x5k1{grid-template-rows:1fr;}\n.css-blm4xw{grid-template-rows:100px 1fr auto;}\n.css-1hq639k{grid-template-rows:repeat(2, 100px 1fr);}\n.css-17zs3t3{grid-template-rows:100px 1fr max-content minmax(min-content, 1fr);}\n.css-3ev40g{grid-template-rows:10px [row-start] 250px [row-end];}\n.css-19kvbk0{grid-template-areas:none;}\n.css-hrjsxg{grid-template-areas:\"articles\";}\n.css-2debm2{grid-template-areas:\"head head\";}\n.css-iaajlc{grid-template-areas:\"head head\" \"nav main\" \"foot ....\";}\n.css-rpk02x{grid-template:none;}\n.css-vvof85{grid-template:auto 1fr auto / auto 1fr;}\n.css-fyct2f{grid-auto-columns:auto;}\n.css-na788q{grid-auto-columns:1fr;}\n.css-3wucm7{grid-auto-columns:100px;}\n.css-xmrl89{grid-auto-columns:max-content;}\n.css-mhb58e{grid-auto-columns:minmax(min-content, 1fr);}\n.css-1m0p52j{grid-auto-columns:min-content max-content auto;}\n.css-1yyetth{grid-auto-columns:100px 150px 390px;}\n.css-3sj1cp{grid-auto-rows:auto;}\n.css-4m87mn{grid-auto-rows:1fr;}\n.css-1gcjdl6{grid-auto-rows:100px;}\n.css-1ewn8ka{grid-auto-rows:100px 30%;}\n.css-xgogvi{grid-auto-rows:100px 30% 1em;}\n.css-1jrlx9{grid-auto-rows:min-content;}\n.css-a5vdaf{grid-auto-rows:minmax(min-content, 1fr);}\n.css-1bw2nfb{grid-auto-rows:min-content max-content auto;}\n.css-1x6bia0{grid-auto-flow:row;}\n.css-qdmemo{grid-auto-flow:column;}\n.css-12rrdxo{grid-auto-flow:row dense;}\n.css-o8pbhg{grid-auto-flow:column dense;}\n.css-15smumt{grid:auto-flow 1fr / 100px;}\n.css-10utfa6{grid:none / auto-flow 1fr;}\n.css-1sawvt8{grid:auto-flow / auto 1fr;}\n.css-6uqmta{grid:repeat(auto-fill, 5em) / auto-flow 1fr;}\n.css-ibqq5h{grid:auto-flow 1fr / repeat(auto-fill, 5em);}\n.css-1dx5ht4{grid:\"H    H \" \"A    B \" \"F    F \" 30px / auto 1fr;}\n.css-23zjax{grid-row-start:auto;}\n.css-3bfvhq{grid-row-start:4;}\n.css-k44rsv{grid-row-start:C;}\n.css-3zn6f3{grid-row-start:C 2;}\n.css-1mbss9{grid-row-start:span C;}\n.css-12n8pbd{grid-row-start:span 1;}\n.css-qwrk85{grid-column-start:auto;}\n.css-9s6726{grid-column-start:4;}\n.css-1v57d9e{grid-column-start:C;}\n.css-1lr72n4{grid-column-start:C 2;}\n.css-z01anm{grid-column-start:span C;}\n.css-1in4khj{grid-column-start:span 1;}\n.css-12a2lck{grid-row-end:auto;}\n.css-n8owek{grid-row-end:4;}\n.css-nmst3l{grid-row-end:C;}\n.css-1a6qjrt{grid-row-end:C 2;}\n.css-1d0f9ww{grid-row-end:span C;}\n.css-1x7g46w{grid-row-end:span 1;}\n.css-ftor5z{grid-column-end:auto;}\n.css-1gs2sxp{grid-column-end:4;}\n.css-14jg5bp{grid-column-end:C;}\n.css-3m246j{grid-column-end:C 2;}\n.css-f91mgs{grid-column-end:span C;}\n.css-1c1oa7h{grid-column-end:span 1;}\n.css-ir1t2y{grid-column:auto;}\n.css-dhy4ls{grid-column:1;}\n.css-19dz211{grid-column:-1;}\n.css-1qd5pn{grid-column:1 / 1;}\n.css-180pmo8{grid-column:1 / -1;}\n.css-1f8f0lh{grid-column:auto / auto;}\n.css-1s94k46{grid-column:2 / span 2;}\n.css-1qnrhcf{grid-row:auto;}\n.css-y1eqmj{grid-row:1;}\n.css-1j6msv3{grid-row:-1;}\n.css-bpo7kt{grid-row:1 / 1;}\n.css-lybz7i{grid-row:1 / -1;}\n.css-img6o0{grid-row:auto / auto;}\n.css-g317bb{grid-row:2 / span 2;}\n.css-1s9x97r{grid-area:1 / 1;}\n.css-98twa{grid-area:var(--var-1l7l92x);}\n.css-1furmtw{grid-area:1 / span 1;}\n.css-aq007a{grid-area:span 1 / 10 / -1;}\n.css-dat3cm{grid-column-gap:0;}\n.css-r01ss7{grid-column-gap:1em;}\n.css-1r7vwck{grid-row-gap:0;}\n.css-6se9xb{grid-row-gap:1em;}\n.css-1wuqgkd{grid-gap:0 0;}\n.css-o0qfdq{grid-gap:0 1em;}\n.css-1qb22h1{grid-gap:1em;}\n.css-phizm2{grid-gap:1em 1em;}\n.css-ncl3nx{grid-template-columns:subgrid;}\n.css-5ektzg{grid-template-columns:subgrid [sub-a];}\n.css-29qjfz{grid-template-columns:subgrid [sub-a] [sub-b];}\n.css-44ecjn{grid-template-columns:subgrid repeat(1, [sub-a]);}\n.css-1qi17e0{grid-template-columns:subgrid repeat(2, [sub-a] [sub-b]) [sub-c];}\n.css-1mh93ua{grid-template-columns:subgrid repeat(auto-fill, [sub-a] [sub-b]);}\n.css-5fdu2f{grid-template-rows:subgrid;}\n.css-1lryyt1{grid-template-rows:subgrid [sub-a];}\n.css-y4pgnt{grid-template-rows:subgrid [sub-a] [sub-b];}\n.css-1e39v9m{grid-template-rows:subgrid repeat(1, [sub-a]);}\n.css-86hys9{grid-template-rows:subgrid repeat(2, [sub-a] [sub-b]) [sub-c];}\n.css-18ot659{grid-template-rows:subgrid repeat(auto-fill, [sub-a] [sub-b]);}\n.css-1rjo398{grid-template-columns:masonry;}\n.css-9glrzf{grid-template-rows:masonry ;}\n.css-p6owej{masonry-auto-flow:pack;}\n.css-u6wgmu{masonry-auto-flow:next;}\n.css-bjtv39{masonry-auto-flow:definite-first;}\n.css-5kn96u{masonry-auto-flow:ordered;}\n.css-ysl2hz{masonry-auto-flow:pack definite-first;}\n.css-9t7ym7{masonry-auto-flow:pack ordered;}\n.css-14f2buy{masonry-auto-flow:next definite-first;}\n.css-1rxw1v0{masonry-auto-flow:next ordered;}\n.css-nt4l3r{masonry-auto-flow:ordered pack;}\n"
+    ".css-djxfq4{grid-template-columns:repeat(auto-fill, minmax(25ch, 1fr));}"
   ];
+  [@css ".css-gs16i{grid-template-columns:10px [col-start] 250px [col-end];}"];
+  [@css
+    ".css-1v52g5g{grid-template-columns:200px repeat(auto-fill, 100px) 300px;}"
+  ];
+  [@css ".css-68fuud{grid-template-columns:var(--var-7wrrwo);}"];
+  [@css ".css-1p5ongh{grid-template-rows:none;}"];
+  [@css ".css-1xkhlg{grid-template-rows:auto;}"];
+  [@css ".css-1w8gpmy{grid-template-rows:100px;}"];
+  [@css ".css-1t6x5k1{grid-template-rows:1fr;}"];
+  [@css ".css-blm4xw{grid-template-rows:100px 1fr auto;}"];
+  [@css ".css-1hq639k{grid-template-rows:repeat(2, 100px 1fr);}"];
+  [@css
+    ".css-17zs3t3{grid-template-rows:100px 1fr max-content minmax(min-content, 1fr);}"
+  ];
+  [@css ".css-3ev40g{grid-template-rows:10px [row-start] 250px [row-end];}"];
+  [@css ".css-19kvbk0{grid-template-areas:none;}"];
+  [@css ".css-hrjsxg{grid-template-areas:\"articles\";}"];
+  [@css ".css-2debm2{grid-template-areas:\"head head\";}"];
+  [@css
+    ".css-iaajlc{grid-template-areas:\"head head\" \"nav main\" \"foot ....\";}"
+  ];
+  [@css ".css-rpk02x{grid-template:none;}"];
+  [@css ".css-vvof85{grid-template:auto 1fr auto / auto 1fr;}"];
+  [@css ".css-fyct2f{grid-auto-columns:auto;}"];
+  [@css ".css-na788q{grid-auto-columns:1fr;}"];
+  [@css ".css-3wucm7{grid-auto-columns:100px;}"];
+  [@css ".css-xmrl89{grid-auto-columns:max-content;}"];
+  [@css ".css-mhb58e{grid-auto-columns:minmax(min-content, 1fr);}"];
+  [@css ".css-1m0p52j{grid-auto-columns:min-content max-content auto;}"];
+  [@css ".css-1yyetth{grid-auto-columns:100px 150px 390px;}"];
+  [@css ".css-3sj1cp{grid-auto-rows:auto;}"];
+  [@css ".css-4m87mn{grid-auto-rows:1fr;}"];
+  [@css ".css-1gcjdl6{grid-auto-rows:100px;}"];
+  [@css ".css-1ewn8ka{grid-auto-rows:100px 30%;}"];
+  [@css ".css-xgogvi{grid-auto-rows:100px 30% 1em;}"];
+  [@css ".css-1jrlx9{grid-auto-rows:min-content;}"];
+  [@css ".css-a5vdaf{grid-auto-rows:minmax(min-content, 1fr);}"];
+  [@css ".css-1bw2nfb{grid-auto-rows:min-content max-content auto;}"];
+  [@css ".css-1x6bia0{grid-auto-flow:row;}"];
+  [@css ".css-qdmemo{grid-auto-flow:column;}"];
+  [@css ".css-12rrdxo{grid-auto-flow:row dense;}"];
+  [@css ".css-o8pbhg{grid-auto-flow:column dense;}"];
+  [@css ".css-15smumt{grid:auto-flow 1fr / 100px;}"];
+  [@css ".css-10utfa6{grid:none / auto-flow 1fr;}"];
+  [@css ".css-1sawvt8{grid:auto-flow / auto 1fr;}"];
+  [@css ".css-6uqmta{grid:repeat(auto-fill, 5em) / auto-flow 1fr;}"];
+  [@css ".css-ibqq5h{grid:auto-flow 1fr / repeat(auto-fill, 5em);}"];
+  [@css
+    ".css-1dx5ht4{grid:\"H    H \" \"A    B \" \"F    F \" 30px / auto 1fr;}"
+  ];
+  [@css ".css-23zjax{grid-row-start:auto;}"];
+  [@css ".css-3bfvhq{grid-row-start:4;}"];
+  [@css ".css-k44rsv{grid-row-start:C;}"];
+  [@css ".css-3zn6f3{grid-row-start:C 2;}"];
+  [@css ".css-1mbss9{grid-row-start:span C;}"];
+  [@css ".css-12n8pbd{grid-row-start:span 1;}"];
+  [@css ".css-qwrk85{grid-column-start:auto;}"];
+  [@css ".css-9s6726{grid-column-start:4;}"];
+  [@css ".css-1v57d9e{grid-column-start:C;}"];
+  [@css ".css-1lr72n4{grid-column-start:C 2;}"];
+  [@css ".css-z01anm{grid-column-start:span C;}"];
+  [@css ".css-1in4khj{grid-column-start:span 1;}"];
+  [@css ".css-12a2lck{grid-row-end:auto;}"];
+  [@css ".css-n8owek{grid-row-end:4;}"];
+  [@css ".css-nmst3l{grid-row-end:C;}"];
+  [@css ".css-1a6qjrt{grid-row-end:C 2;}"];
+  [@css ".css-1d0f9ww{grid-row-end:span C;}"];
+  [@css ".css-1x7g46w{grid-row-end:span 1;}"];
+  [@css ".css-ftor5z{grid-column-end:auto;}"];
+  [@css ".css-1gs2sxp{grid-column-end:4;}"];
+  [@css ".css-14jg5bp{grid-column-end:C;}"];
+  [@css ".css-3m246j{grid-column-end:C 2;}"];
+  [@css ".css-f91mgs{grid-column-end:span C;}"];
+  [@css ".css-1c1oa7h{grid-column-end:span 1;}"];
+  [@css ".css-ir1t2y{grid-column:auto;}"];
+  [@css ".css-dhy4ls{grid-column:1;}"];
+  [@css ".css-19dz211{grid-column:-1;}"];
+  [@css ".css-1qd5pn{grid-column:1 / 1;}"];
+  [@css ".css-180pmo8{grid-column:1 / -1;}"];
+  [@css ".css-1f8f0lh{grid-column:auto / auto;}"];
+  [@css ".css-1s94k46{grid-column:2 / span 2;}"];
+  [@css ".css-1qnrhcf{grid-row:auto;}"];
+  [@css ".css-y1eqmj{grid-row:1;}"];
+  [@css ".css-1j6msv3{grid-row:-1;}"];
+  [@css ".css-bpo7kt{grid-row:1 / 1;}"];
+  [@css ".css-lybz7i{grid-row:1 / -1;}"];
+  [@css ".css-img6o0{grid-row:auto / auto;}"];
+  [@css ".css-g317bb{grid-row:2 / span 2;}"];
+  [@css ".css-1s9x97r{grid-area:1 / 1;}"];
+  [@css ".css-98twa{grid-area:var(--var-1l7l92x);}"];
+  [@css ".css-1furmtw{grid-area:1 / span 1;}"];
+  [@css ".css-aq007a{grid-area:span 1 / 10 / -1;}"];
+  [@css ".css-dat3cm{grid-column-gap:0;}"];
+  [@css ".css-r01ss7{grid-column-gap:1em;}"];
+  [@css ".css-1r7vwck{grid-row-gap:0;}"];
+  [@css ".css-6se9xb{grid-row-gap:1em;}"];
+  [@css ".css-1wuqgkd{grid-gap:0 0;}"];
+  [@css ".css-o0qfdq{grid-gap:0 1em;}"];
+  [@css ".css-1qb22h1{grid-gap:1em;}"];
+  [@css ".css-phizm2{grid-gap:1em 1em;}"];
+  [@css ".css-ncl3nx{grid-template-columns:subgrid;}"];
+  [@css ".css-5ektzg{grid-template-columns:subgrid [sub-a];}"];
+  [@css ".css-29qjfz{grid-template-columns:subgrid [sub-a] [sub-b];}"];
+  [@css ".css-44ecjn{grid-template-columns:subgrid repeat(1, [sub-a]);}"];
+  [@css
+    ".css-1qi17e0{grid-template-columns:subgrid repeat(2, [sub-a] [sub-b]) [sub-c];}"
+  ];
+  [@css
+    ".css-1mh93ua{grid-template-columns:subgrid repeat(auto-fill, [sub-a] [sub-b]);}"
+  ];
+  [@css ".css-5fdu2f{grid-template-rows:subgrid;}"];
+  [@css ".css-1lryyt1{grid-template-rows:subgrid [sub-a];}"];
+  [@css ".css-y4pgnt{grid-template-rows:subgrid [sub-a] [sub-b];}"];
+  [@css ".css-1e39v9m{grid-template-rows:subgrid repeat(1, [sub-a]);}"];
+  [@css
+    ".css-86hys9{grid-template-rows:subgrid repeat(2, [sub-a] [sub-b]) [sub-c];}"
+  ];
+  [@css
+    ".css-18ot659{grid-template-rows:subgrid repeat(auto-fill, [sub-a] [sub-b]);}"
+  ];
+  [@css ".css-1rjo398{grid-template-columns:masonry;}"];
+  [@css ".css-9glrzf{grid-template-rows:masonry ;}"];
+  [@css ".css-p6owej{masonry-auto-flow:pack;}"];
+  [@css ".css-u6wgmu{masonry-auto-flow:next;}"];
+  [@css ".css-bjtv39{masonry-auto-flow:definite-first;}"];
+  [@css ".css-5kn96u{masonry-auto-flow:ordered;}"];
+  [@css ".css-ysl2hz{masonry-auto-flow:pack definite-first;}"];
+  [@css ".css-9t7ym7{masonry-auto-flow:pack ordered;}"];
+  [@css ".css-14f2buy{masonry-auto-flow:next definite-first;}"];
+  [@css ".css-1rxw1v0{masonry-auto-flow:next ordered;}"];
+  [@css ".css-nt4l3r{masonry-auto-flow:ordered pack;}"];
   
   CSS.make("css-lgj0h8", []);
   CSS.make("css-19rux3o", []);

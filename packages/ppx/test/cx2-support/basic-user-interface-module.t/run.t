@@ -15,9 +15,66 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css
-    ".css-roynbj{box-sizing:border-box;}\n.css-g393ep{box-sizing:content-box;}\n.css-19ks84b{outline-style:auto;}\n.css-vqdro3{outline-style:none;}\n.css-xlynf6{outline-style:dotted;}\n.css-1hmqa57{outline-style:dashed;}\n.css-1709twl{outline-style:solid;}\n.css-1dqoq43{outline-style:double;}\n.css-1521dni{outline-style:groove;}\n.css-l7ia9n{outline-style:ridge;}\n.css-rtduzy{outline-style:inset;}\n.css-qe8noo{outline-style:outset;}\n.css-1uer6ge{outline-offset:-5px;}\n.css-1nkfqwb{outline-offset:0;}\n.css-165ch4u{outline-offset:5px;}\n.css-5d6l6w{resize:none;}\n.css-w8wl10{resize:both;}\n.css-1o40f2m{resize:horizontal;}\n.css-nwqaai{resize:vertical;}\n.css-bkj8c{text-overflow:clip;}\n.css-bmjq4j{text-overflow:ellipsis;}\n.css-1j8r2w0{cursor:default;}\n.css-bc6hmx{cursor:none;}\n.css-to4qqq{cursor:context-menu;}\n.css-17aaee9{cursor:cell;}\n.css-1vskbts{cursor:vertical-text;}\n.css-lelkeh{cursor:alias;}\n.css-1n3476y{cursor:copy;}\n.css-1cus137{cursor:no-drop;}\n.css-vdhlfv{cursor:not-allowed;}\n.css-ehba41{cursor:grab;}\n.css-m2aufq{cursor:grabbing;}\n.css-3hsboj{cursor:ew-resize;}\n.css-kqxfz0{cursor:ns-resize;}\n.css-13l8jep{cursor:nesw-resize;}\n.css-kxobzn{cursor:nwse-resize;}\n.css-fmjlp0{cursor:col-resize;}\n.css-12owrya{cursor:row-resize;}\n.css-16euxfn{cursor:all-scroll;}\n.css-vgd1sg{cursor:zoom-in;}\n.css-kmtb2g{cursor:zoom-out;}\n.css-1llpnps{caret-color:auto;}\n.css-1q51yyj{caret-color:green;}\n.css-1ndky4e{appearance:auto;}\n.css-17grcf8{appearance:none;}\n.css-1ttooc5{text-overflow:\"foo\";}\n.css-1pwfzgv{text-overflow:clip clip;}\n.css-r61axg{text-overflow:ellipsis clip;}\n.css-2w1db5{text-overflow:\"foo\" clip;}\n.css-2b9k39{text-overflow:clip ellipsis;}\n.css-1m742kz{text-overflow:ellipsis ellipsis;}\n.css-85ad1k{text-overflow:\"foo\" ellipsis;}\n.css-n09ns{text-overflow:clip \"foo\";}\n.css-9zgl00{text-overflow:ellipsis \"foo\";}\n.css-l6jnzg{text-overflow:\"foo\" \"foo\";}\n.css-99p0oo{user-select:auto;}\n.css-1mmoigx{user-select:text;}\n.css-9y6172{user-select:none;}\n.css-1rsyfv1{user-select:contain;}\n.css-1udvaqc{user-select:all;}\n"
-  ];
+  [@css ".css-roynbj{box-sizing:border-box;}"];
+  [@css ".css-g393ep{box-sizing:content-box;}"];
+  [@css ".css-19ks84b{outline-style:auto;}"];
+  [@css ".css-vqdro3{outline-style:none;}"];
+  [@css ".css-xlynf6{outline-style:dotted;}"];
+  [@css ".css-1hmqa57{outline-style:dashed;}"];
+  [@css ".css-1709twl{outline-style:solid;}"];
+  [@css ".css-1dqoq43{outline-style:double;}"];
+  [@css ".css-1521dni{outline-style:groove;}"];
+  [@css ".css-l7ia9n{outline-style:ridge;}"];
+  [@css ".css-rtduzy{outline-style:inset;}"];
+  [@css ".css-qe8noo{outline-style:outset;}"];
+  [@css ".css-1uer6ge{outline-offset:-5px;}"];
+  [@css ".css-1nkfqwb{outline-offset:0;}"];
+  [@css ".css-165ch4u{outline-offset:5px;}"];
+  [@css ".css-5d6l6w{resize:none;}"];
+  [@css ".css-w8wl10{resize:both;}"];
+  [@css ".css-1o40f2m{resize:horizontal;}"];
+  [@css ".css-nwqaai{resize:vertical;}"];
+  [@css ".css-bkj8c{text-overflow:clip;}"];
+  [@css ".css-bmjq4j{text-overflow:ellipsis;}"];
+  [@css ".css-1j8r2w0{cursor:default;}"];
+  [@css ".css-bc6hmx{cursor:none;}"];
+  [@css ".css-to4qqq{cursor:context-menu;}"];
+  [@css ".css-17aaee9{cursor:cell;}"];
+  [@css ".css-1vskbts{cursor:vertical-text;}"];
+  [@css ".css-lelkeh{cursor:alias;}"];
+  [@css ".css-1n3476y{cursor:copy;}"];
+  [@css ".css-1cus137{cursor:no-drop;}"];
+  [@css ".css-vdhlfv{cursor:not-allowed;}"];
+  [@css ".css-ehba41{cursor:grab;}"];
+  [@css ".css-m2aufq{cursor:grabbing;}"];
+  [@css ".css-3hsboj{cursor:ew-resize;}"];
+  [@css ".css-kqxfz0{cursor:ns-resize;}"];
+  [@css ".css-13l8jep{cursor:nesw-resize;}"];
+  [@css ".css-kxobzn{cursor:nwse-resize;}"];
+  [@css ".css-fmjlp0{cursor:col-resize;}"];
+  [@css ".css-12owrya{cursor:row-resize;}"];
+  [@css ".css-16euxfn{cursor:all-scroll;}"];
+  [@css ".css-vgd1sg{cursor:zoom-in;}"];
+  [@css ".css-kmtb2g{cursor:zoom-out;}"];
+  [@css ".css-1llpnps{caret-color:auto;}"];
+  [@css ".css-1q51yyj{caret-color:green;}"];
+  [@css ".css-1ndky4e{appearance:auto;}"];
+  [@css ".css-17grcf8{appearance:none;}"];
+  [@css ".css-1ttooc5{text-overflow:\"foo\";}"];
+  [@css ".css-1pwfzgv{text-overflow:clip clip;}"];
+  [@css ".css-r61axg{text-overflow:ellipsis clip;}"];
+  [@css ".css-2w1db5{text-overflow:\"foo\" clip;}"];
+  [@css ".css-2b9k39{text-overflow:clip ellipsis;}"];
+  [@css ".css-1m742kz{text-overflow:ellipsis ellipsis;}"];
+  [@css ".css-85ad1k{text-overflow:\"foo\" ellipsis;}"];
+  [@css ".css-n09ns{text-overflow:clip \"foo\";}"];
+  [@css ".css-9zgl00{text-overflow:ellipsis \"foo\";}"];
+  [@css ".css-l6jnzg{text-overflow:\"foo\" \"foo\";}"];
+  [@css ".css-99p0oo{user-select:auto;}"];
+  [@css ".css-1mmoigx{user-select:text;}"];
+  [@css ".css-9y6172{user-select:none;}"];
+  [@css ".css-1rsyfv1{user-select:contain;}"];
+  [@css ".css-1udvaqc{user-select:all;}"];
   
   CSS.make("css-roynbj", []);
   CSS.make("css-g393ep", []);

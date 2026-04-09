@@ -21,9 +21,63 @@ If this test fail means that the module is not in sync with the ppx
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css ".css-1crvgc7{align-content:flex-start;}"];
+  [@css ".css-4zx96o{align-content:flex-end;}"];
+  [@css ".css-1c5t6ef{align-content:space-between;}"];
+  [@css ".css-1okulzr{align-content:space-around;}"];
+  [@css ".css-1jfvg9w{align-items:flex-start;}"];
+  [@css ".css-y1kcm0{align-items:flex-end;}"];
+  [@css ".css-1bf7e4w{align-self:flex-start;}"];
+  [@css ".css-56sg73{align-self:flex-end;}"];
+  [@css ".css-k008qs{display:flex;}"];
+  [@css ".css-vxcmzt{display:inline-flex;}"];
+  [@css ".css-me3p27{flex:none;}"];
+  [@css ".css-yrit56{flex:5 7 10%;}"];
+  [@css ".css-kzfr2u{flex:2;}"];
+  [@css ".css-p6wv0x{flex:10em;}"];
+  [@css ".css-t6vgg1{flex:30%;}"];
+  [@css ".css-1draax7{flex:min-content;}"];
+  [@css ".css-ilthbz{flex:1 30px;}"];
+  [@css ".css-6hx0uu{flex:2 2;}"];
+  [@css ".css-1rr8a55{flex:2 2 10%;}"];
+  [@css ".css-1x4f3wz{flex:var(--var-hvez6j);}"];
+  [@css ".css-19g0la7{flex:var(--var-volh69) var(--var-1qwalu0);}"];
   [@css
-    ".css-1crvgc7{align-content:flex-start;}\n.css-4zx96o{align-content:flex-end;}\n.css-1c5t6ef{align-content:space-between;}\n.css-1okulzr{align-content:space-around;}\n.css-1jfvg9w{align-items:flex-start;}\n.css-y1kcm0{align-items:flex-end;}\n.css-1bf7e4w{align-self:flex-start;}\n.css-56sg73{align-self:flex-end;}\n.css-k008qs{display:flex;}\n.css-vxcmzt{display:inline-flex;}\n.css-me3p27{flex:none;}\n.css-yrit56{flex:5 7 10%;}\n.css-kzfr2u{flex:2;}\n.css-p6wv0x{flex:10em;}\n.css-t6vgg1{flex:30%;}\n.css-1draax7{flex:min-content;}\n.css-ilthbz{flex:1 30px;}\n.css-6hx0uu{flex:2 2;}\n.css-1rr8a55{flex:2 2 10%;}\n.css-1x4f3wz{flex:var(--var-hvez6j);}\n.css-19g0la7{flex:var(--var-volh69) var(--var-1qwalu0);}\n.css-djecpy{flex:var(--var-volh69) var(--var-1qwalu0) var(--var-1u1axvx);}\n.css-1f5dbv2{flex:var(--var-volh69_1) var(--var-volh69_2);}\n.css-1vu4n70{flex-basis:auto;}\n.css-1ibwkcj{flex-basis:content;}\n.css-71cjcr{flex-basis:1px;}\n.css-1l0z8uk{flex-direction:row;}\n.css-8kj89b{flex-direction:row-reverse;}\n.css-cgq59l{flex-direction:column;}\n.css-qpiomr{flex-direction:column-reverse;}\n.css-19a80vn{flex-flow:row;}\n.css-o5a89u{flex-flow:row-reverse;}\n.css-14pgqdn{flex-flow:column;}\n.css-1tp8tu8{flex-flow:column-reverse;}\n.css-3hl61a{flex-flow:wrap;}\n.css-3myvs8{flex-flow:wrap-reverse;}\n.css-1tshqlk{flex-flow:row wrap;}\n.css-1a1zoft{flex-flow:row-reverse nowrap;}\n.css-1bnl4v1{flex-flow:column wrap;}\n.css-1n8o660{flex-flow:column-reverse wrap-reverse;}\n.css-2uchni{flex-grow:0;}\n.css-otv6bo{flex-grow:5;}\n.css-6voltb{flex-shrink:1;}\n.css-1b75a5q{flex-shrink:10;}\n.css-1n0sxg9{flex-wrap:nowrap;}\n.css-1jkp9i7{flex-wrap:wrap;}\n.css-hp4whp{flex-wrap:wrap-reverse;}\n.css-1fn0841{justify-content:flex-start;}\n.css-1a9getn{justify-content:flex-end;}\n.css-x4dmss{justify-content:space-between;}\n.css-kp4oss{justify-content:space-around;}\n.css-127g5zj{min-height:auto;}\n.css-i9682b{min-width:auto;}\n.css-12zvlbw{order:0;}\n.css-ali80x{order:1;}\n"
+    ".css-djecpy{flex:var(--var-volh69) var(--var-1qwalu0) var(--var-1u1axvx);}"
   ];
+  [@css ".css-1f5dbv2{flex:var(--var-volh69_1) var(--var-volh69_2);}"];
+  [@css ".css-1vu4n70{flex-basis:auto;}"];
+  [@css ".css-1ibwkcj{flex-basis:content;}"];
+  [@css ".css-71cjcr{flex-basis:1px;}"];
+  [@css ".css-1l0z8uk{flex-direction:row;}"];
+  [@css ".css-8kj89b{flex-direction:row-reverse;}"];
+  [@css ".css-cgq59l{flex-direction:column;}"];
+  [@css ".css-qpiomr{flex-direction:column-reverse;}"];
+  [@css ".css-19a80vn{flex-flow:row;}"];
+  [@css ".css-o5a89u{flex-flow:row-reverse;}"];
+  [@css ".css-14pgqdn{flex-flow:column;}"];
+  [@css ".css-1tp8tu8{flex-flow:column-reverse;}"];
+  [@css ".css-3hl61a{flex-flow:wrap;}"];
+  [@css ".css-3myvs8{flex-flow:wrap-reverse;}"];
+  [@css ".css-1tshqlk{flex-flow:row wrap;}"];
+  [@css ".css-1a1zoft{flex-flow:row-reverse nowrap;}"];
+  [@css ".css-1bnl4v1{flex-flow:column wrap;}"];
+  [@css ".css-1n8o660{flex-flow:column-reverse wrap-reverse;}"];
+  [@css ".css-2uchni{flex-grow:0;}"];
+  [@css ".css-otv6bo{flex-grow:5;}"];
+  [@css ".css-6voltb{flex-shrink:1;}"];
+  [@css ".css-1b75a5q{flex-shrink:10;}"];
+  [@css ".css-1n0sxg9{flex-wrap:nowrap;}"];
+  [@css ".css-1jkp9i7{flex-wrap:wrap;}"];
+  [@css ".css-hp4whp{flex-wrap:wrap-reverse;}"];
+  [@css ".css-1fn0841{justify-content:flex-start;}"];
+  [@css ".css-1a9getn{justify-content:flex-end;}"];
+  [@css ".css-x4dmss{justify-content:space-between;}"];
+  [@css ".css-kp4oss{justify-content:space-around;}"];
+  [@css ".css-127g5zj{min-height:auto;}"];
+  [@css ".css-i9682b{min-width:auto;}"];
+  [@css ".css-12zvlbw{order:0;}"];
+  [@css ".css-ali80x{order:1;}"];
   module X = {
     let value = 1.;
     let value2 = 1.;

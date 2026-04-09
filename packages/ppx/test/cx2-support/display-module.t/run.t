@@ -15,9 +15,9 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css
-    ".css-1153jk8{display:run-in;}\n.css-lmlerk{display:flow;}\n.css-1jnposs{display:flow-root;}\n"
-  ];
+  [@css ".css-1153jk8{display:run-in;}"];
+  [@css ".css-lmlerk{display:flow;}"];
+  [@css ".css-1jnposs{display:flow-root;}"];
   
   CSS.make("css-1153jk8", []);
   CSS.make("css-lmlerk", []);

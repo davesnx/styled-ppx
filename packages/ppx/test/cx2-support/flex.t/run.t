@@ -15,9 +15,18 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css
-    ".css-ljjwvb{flex:auto;}\n.css-1ujc6td{flex:initial;}\n.css-me3p27{flex:none;}\n.css-kzfr2u{flex:2;}\n.css-p6wv0x{flex:10em;}\n.css-t6vgg1{flex:30%;}\n.css-1draax7{flex:min-content;}\n.css-ilthbz{flex:1 30px;}\n.css-6hx0uu{flex:2 2;}\n.css-1rr8a55{flex:2 2 10%;}\n.css-1hb5q0r{flex:2 2 10em;}\n.css-nj0jqd{flex:2 2 min-content;}\n"
-  ];
+  [@css ".css-ljjwvb{flex:auto;}"];
+  [@css ".css-1ujc6td{flex:initial;}"];
+  [@css ".css-me3p27{flex:none;}"];
+  [@css ".css-kzfr2u{flex:2;}"];
+  [@css ".css-p6wv0x{flex:10em;}"];
+  [@css ".css-t6vgg1{flex:30%;}"];
+  [@css ".css-1draax7{flex:min-content;}"];
+  [@css ".css-ilthbz{flex:1 30px;}"];
+  [@css ".css-6hx0uu{flex:2 2;}"];
+  [@css ".css-1rr8a55{flex:2 2 10%;}"];
+  [@css ".css-1hb5q0r{flex:2 2 10em;}"];
+  [@css ".css-nj0jqd{flex:2 2 min-content;}"];
   
   CSS.make("css-ljjwvb", []);
   CSS.make("css-1ujc6td", []);

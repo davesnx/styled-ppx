@@ -32,9 +32,11 @@ If this test fail means that the module is not in sync with the ppx
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css ".css-1gtanqs{width:fit-content;}"];
   [@css
-    ".css-1gtanqs{width:fit-content;}\n.css-1jqkbxn{grid-template-columns:fit-content(20px) fit-content(10%);}\n.css-1wxdqmz{text-decoration:var(--var-z052by);}\n"
+    ".css-1jqkbxn{grid-template-columns:fit-content(20px) fit-content(10%);}"
   ];
+  [@css ".css-1wxdqmz{text-decoration:var(--var-z052by);}"];
   let cosas = `bold;
   
   CSS.make("css-1gtanqs css-1jqkbxn", []);
