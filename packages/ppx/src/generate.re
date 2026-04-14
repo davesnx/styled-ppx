@@ -565,6 +565,107 @@ let makeFnJSX4 = (~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames) =>
   );
 };
 
+/* Generate: let makeProps = (~innerRef=?, ~as_=?, ~children=React.null, ...domProps, ...customProps, ()) =>
+     fun ?key () -> make () ?key ?innerRef ~children ?as_ ...domProps ...customProps
+   This captures all props in a thunk so server-reason-react's JSX transform
+   (Component.make(Component.makeProps(~prop, ()))) works. */
+let makePropsNative = (~loc, ~variableNames, ~styleParams) => {
+  let reactDomParams =
+    MakeProps.get(["key"] @ variableNames)
+    |> map_tr(domPropParam(~loc, ~isOptional=true));
+  let allParams =
+    [
+      makeParam(~loc, ~isOptional=true, "innerRef"),
+      makeParam(~loc, ~isOptional=true, "as_"),
+      makeParam(
+        ~loc,
+        ~isOptional=true,
+        ~default=[%expr React.null],
+        "children",
+      ),
+    ]
+    @ reactDomParams
+    @ styleParams;
+
+  let reactDomPropNames =
+    MakeProps.get(["key"] @ variableNames)
+    |> map_tr(value =>
+         switch (value) {
+         | MakeProps.Event({name, _}) => name
+         | MakeProps.Attribute({name, _}) => name
+         }
+       );
+  let propNames =
+    ["innerRef", "as_", "children"] @ reactDomPropNames @ variableNames;
+
+  /* Build the inner call: make () ?key ?innerRef ~children ... */
+  let callArgs =
+    [(Nolabel, [%expr ()])]
+    @ [(Optional("key"), Helper.Exp.ident(~loc, withLoc(Lident("key"), ~loc)))]
+    @ (
+      propNames
+      |> map_tr(name => {
+           let ident = Helper.Exp.ident(~loc, withLoc(Lident(name), ~loc));
+           if (name == "children") {
+             (Labelled("children"), ident);
+           } else {
+             (Optional(name), ident);
+           };
+         })
+    );
+
+  let callExpr =
+    Helper.Exp.apply(
+      ~loc,
+      Helper.Exp.ident(~loc, withLoc(Lident("make"), ~loc)),
+      callArgs,
+    );
+
+  /* Wrap in: fun ?key () -> callExpr */
+  let thunk =
+    Helper.Exp.fun_(
+      ~loc,
+      Optional("key"),
+      None,
+      Helper.Pat.mk(~loc, Ppat_var(withLoc("key", ~loc))),
+      Helper.Exp.fun_(~loc, Nolabel, None, [%pat? ()], callExpr),
+    );
+
+  /* Unit param is first (= innermost in fnWithLabeledArgs) so the caller's ()
+     triggers resolution of all optional args. */
+  let allParamsWithUnit =
+    [(Nolabel, None, [%pat? ()], "()", loc, None)] @ allParams;
+
+  [%stri let makeProps = [%e fnWithLabeledArgs(allParamsWithUnit, thunk)]];
+};
+
+/* Generate: let make = fun ?key f -> f ?key () */
+let makeWrapperNative = (~loc) => {
+  let body =
+    Helper.Exp.fun_(
+      ~loc,
+      Optional("key"),
+      None,
+      Helper.Pat.mk(~loc, Ppat_var(withLoc("key", ~loc))),
+      Helper.Exp.fun_(
+        ~loc,
+        Nolabel,
+        None,
+        Helper.Pat.mk(~loc, Ppat_var(withLoc("f", ~loc))),
+        Helper.Exp.apply(
+          ~loc,
+          Helper.Exp.ident(~loc, withLoc(Lident("f"), ~loc)),
+          [
+            (Optional("key"), Helper.Exp.ident(~loc, withLoc(Lident("key"), ~loc))),
+            (Nolabel, [%expr ()]),
+          ],
+        ),
+      ),
+    );
+
+  [%stri let make = [%e body]];
+};
+
 /* [@react.component] + makeFn */
 let component =
     (~loc, ~htmlTag, ~className, ~makePropTypes, ~labeledArguments) => {
