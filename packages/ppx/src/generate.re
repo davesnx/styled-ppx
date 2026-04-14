@@ -565,6 +565,119 @@ let makeFnJSX4 = (~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames) =>
   );
 };
 
+/* Generate: let makeProps = (~innerRef=?, ~as_=?, ~children=React.null, ...domProps, ...customProps, ()) =>
+     fun ?key () -> make () ?key ?innerRef ~children ?as_ ...domProps ...customProps
+   This captures all props in a thunk. */
+let makePropsNative = (~loc, ~variableNames, ~styleParams) => {
+  let reactDomParams =
+    MakeProps.get(["key"] @ variableNames)
+    |> map_tr(domPropParam(~loc, ~isOptional=true));
+  let allParams =
+    [
+      makeParam(~loc, ~isOptional=true, "innerRef"),
+      makeParam(~loc, ~isOptional=true, "as_"),
+      makeParam(
+        ~loc,
+        ~isOptional=true,
+        ~default=[%expr React.null],
+        "children",
+      ),
+    ]
+    @ reactDomParams
+    @ styleParams;
+
+  let reactDomPropNames =
+    MakeProps.get(["key"] @ variableNames)
+    |> map_tr(value =>
+         switch (value) {
+         | MakeProps.Event({name, _}) => name
+         | MakeProps.Attribute({name, _}) => name
+         }
+       );
+  let propNames =
+    ["innerRef", "as_", "children"] @ reactDomPropNames @ variableNames;
+
+  /* Build the inner call: make () ?key ?innerRef ~children ... */
+  let callArgs =
+    [(Nolabel, [%expr ()])] /* leading _ param */
+    @ [(Optional("key"), Helper.Exp.ident(~loc, withLoc(Lident("key"), ~loc)))]
+    @ (
+      propNames
+      |> map_tr(name => {
+           let ident = Helper.Exp.ident(~loc, withLoc(Lident(name), ~loc));
+           if (name == "children") {
+             (Labelled("children"), ident);
+           } else {
+             (Optional(name), ident);
+           };
+         })
+    );
+
+  let callExpr =
+    Helper.Exp.apply(
+      ~loc,
+      Helper.Exp.ident(~loc, withLoc(Lident("make"), ~loc)),
+      callArgs,
+    );
+
+  /* Wrap in: fun ?key () -> callExpr */
+  let thunk =
+    Helper.Exp.fun_(
+      ~loc,
+      Optional("key"),
+      None,
+      Helper.Pat.mk(~loc, Ppat_var(withLoc("key", ~loc))),
+      Helper.Exp.fun_(
+        ~loc,
+        Nolabel,
+        None,
+        [%pat? ()],
+        callExpr,
+      ),
+    );
+
+  /* The unit param must be first (= innermost in generated function)
+     so it comes AFTER all optional args in the type signature.
+     This way, the caller's () triggers resolution of all optional args. */
+  let allParamsWithUnit =
+    [(Nolabel, None, [%pat? ()], "()", loc, None)]
+    @ allParams;
+
+  let body = fnWithLabeledArgs(allParamsWithUnit, thunk);
+
+  [%stri let makeProps = [%e body]];
+};
+
+/* Generate: let make = fun ?key f -> f ?key () */
+let makeWrapperNative = (~loc) => {
+  let callExpr =
+    Helper.Exp.apply(
+      ~loc,
+      Helper.Exp.ident(~loc, withLoc(Lident("f"), ~loc)),
+      [
+        (Optional("key"), Helper.Exp.ident(~loc, withLoc(Lident("key"), ~loc))),
+        (Nolabel, [%expr ()]),
+      ],
+    );
+
+  let body =
+    Helper.Exp.fun_(
+      ~loc,
+      Optional("key"),
+      None,
+      Helper.Pat.mk(~loc, Ppat_var(withLoc("key", ~loc))),
+      Helper.Exp.fun_(
+        ~loc,
+        Nolabel,
+        None,
+        Helper.Pat.mk(~loc, Ppat_var(withLoc("f", ~loc))),
+        callExpr,
+      ),
+    );
+
+  [%stri let make = [%e body]];
+};
+
 /* [@react.component] + makeFn */
 let component =
     (~loc, ~htmlTag, ~className, ~makePropTypes, ~labeledArguments) => {
@@ -588,7 +701,33 @@ let component =
       makeFnJSX3(~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames)
     };
 
-  [%stri let make = [%e makeFn]];
+  if (Settings.Get.native()) {
+    let internalMake = [%stri let make = [%e makeFn]];
+    let makePropsItem =
+      makePropsNative(
+        ~loc,
+        ~variableNames,
+        ~styleParams=makeStyleParams(~labeledArguments),
+      );
+    let wrapperMake = makeWrapperNative(~loc);
+    /* Use include struct ... end to allow shadowing make */
+    [
+      Helper.Str.mk(
+        ~loc,
+        Pstr_include({
+          pincl_mod:
+            Builder.pmod_structure(
+              ~loc,
+              [internalMake, makePropsItem, wrapperMake],
+            ),
+          pincl_loc: loc,
+          pincl_attributes: [],
+        }),
+      ),
+    ];
+  } else {
+    [[%stri let make = [%e makeFn]]];
+  };
 };
 
 let optionalType = (~loc, type_) => {
@@ -1010,16 +1149,14 @@ let staticComponentCodegenSteps = (~loc, ~htmlTag, stylesExpr) => {
         defineAssign2(~loc),
       ]
   )
-  @ [
-    styles(~loc, ~name=styleVariableName, ~expr=stylesExpr),
-    component(
+  @ [styles(~loc, ~name=styleVariableName, ~expr=stylesExpr)]
+  @ component(
       ~loc,
       ~htmlTag,
       ~className=[%expr styles],
       ~makePropTypes=[],
       ~labeledArguments=[],
-    ),
-  ];
+    );
 };
 
 let staticComponent = (~loc, ~htmlTag, styles) => {
@@ -1139,14 +1276,14 @@ let dynamicComponentCodegenSteps =
     [
       defineGetOrEmptyFn(~loc),
       dynamicStyles(~loc, ~moduleName, ~functionExpr, ~labeledArguments),
-      component(
+    ]
+    @ component(
         ~loc,
         ~htmlTag,
         ~className=stylesCall(~loc, ~labeledArguments),
         ~makePropTypes=[],
         ~labeledArguments,
-      ),
-    ];
+      );
   } else {
     let variableList =
       labeledArguments
@@ -1187,14 +1324,14 @@ let dynamicComponentCodegenSteps =
       defineGetOrEmptyFn(~loc),
       defineAssign2(~loc),
       dynamicStyles(~loc, ~moduleName, ~functionExpr, ~labeledArguments),
-      component(
+    ]
+    @ component(
         ~loc,
         ~htmlTag,
         ~className=stylesCall(~loc, ~labeledArguments),
         ~makePropTypes=propsGenericParams,
         ~labeledArguments,
-      ),
-    ];
+      );
   };
 
 let dynamicComponent =
