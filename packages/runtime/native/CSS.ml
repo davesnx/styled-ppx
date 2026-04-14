@@ -518,9 +518,7 @@ let get_string_style_hashes () =
     Buffer.add_string buffer (String.trim hash));
   Buffer.contents buffer
 
-let style_tagProps ?children:(_ : React.element option) () = ()
-
-let style_tag ?key:_ () =
+let style_tag ?key:_ ?children:_ () =
   React.createElement "style"
     [
       String

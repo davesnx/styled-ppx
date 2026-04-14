@@ -701,33 +701,9 @@ let component =
       makeFnJSX3(~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames)
     };
 
-  if (Settings.Get.native()) {
-    let internalMake = [%stri let make = [%e makeFn]];
-    let makePropsItem =
-      makePropsNative(
-        ~loc,
-        ~variableNames,
-        ~styleParams=makeStyleParams(~labeledArguments),
-      );
-    let wrapperMake = makeWrapperNative(~loc);
-    /* Use include struct ... end to allow shadowing make */
-    [
-      Helper.Str.mk(
-        ~loc,
-        Pstr_include({
-          pincl_mod:
-            Builder.pmod_structure(
-              ~loc,
-              [internalMake, makePropsItem, wrapperMake],
-            ),
-          pincl_loc: loc,
-          pincl_attributes: [],
-        }),
-      ),
-    ];
-  } else {
-    [[%stri let make = [%e makeFn]]];
-  };
+  /* Native JSX uses old-style labeled arg calls (no makeProps/wrapper needed).
+     Melange JSX uses makeProps + wrapper make. */
+  [[%stri let make = [%e makeFn]]];
 };
 
 let optionalType = (~loc, type_) => {
