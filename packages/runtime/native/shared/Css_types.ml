@@ -1,5 +1,3 @@
-(* TODO: Split Types and Properties from this file, types are (the rest are properties) https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Types *)
-
 module Cascading = struct
   type t =
     [ `initial
@@ -1503,6 +1501,217 @@ module Color = struct
     ^ string_of_alpha_with_calc a
     ^ {js|)|js}
 
+  type hwb = angle_with_calc * percent_with_calc * percent_with_calc
+
+  let hwb_to_string h w b =
+    {js|hwb(|js}
+    ^ string_of_angle_with_calc h
+    ^ {js| |js}
+    ^ string_of_percent_with_calc w
+    ^ {js| |js}
+    ^ string_of_percent_with_calc b
+    ^ {js|)|js}
+
+  type hwba =
+    angle_with_calc * percent_with_calc * percent_with_calc * alpha_with_calc
+
+  let hwba_to_string h w b a =
+    {js|hwb(|js}
+    ^ string_of_angle_with_calc h
+    ^ {js| |js}
+    ^ string_of_percent_with_calc w
+    ^ {js| |js}
+    ^ string_of_percent_with_calc b
+    ^ {js| / |js}
+    ^ string_of_alpha_with_calc a
+    ^ {js|)|js}
+
+  type number_with_calc =
+    [ `num of float
+    | `num_calc of [ `num of float ] calc_min_max
+    ]
+
+  let string_of_number_with_calc = function
+    | `num x -> Kloth.Float.to_string x
+    | `num_calc x ->
+      Calc.min_max_num_to_string
+        (function `num x -> Kloth.Float.to_string x)
+        x
+
+  type lab = percent_with_calc * number_with_calc * number_with_calc
+
+  let lab_to_string l a b =
+    {js|lab(|js}
+    ^ string_of_percent_with_calc l
+    ^ {js| |js}
+    ^ string_of_number_with_calc a
+    ^ {js| |js}
+    ^ string_of_number_with_calc b
+    ^ {js|)|js}
+
+  type laba =
+    percent_with_calc * number_with_calc * number_with_calc * alpha_with_calc
+
+  let laba_to_string l a b al =
+    {js|lab(|js}
+    ^ string_of_percent_with_calc l
+    ^ {js| |js}
+    ^ string_of_number_with_calc a
+    ^ {js| |js}
+    ^ string_of_number_with_calc b
+    ^ {js| / |js}
+    ^ string_of_alpha_with_calc al
+    ^ {js|)|js}
+
+  type lch = percent_with_calc * number_with_calc * angle_with_calc
+
+  let lch_to_string l c h =
+    {js|lch(|js}
+    ^ string_of_percent_with_calc l
+    ^ {js| |js}
+    ^ string_of_number_with_calc c
+    ^ {js| |js}
+    ^ string_of_angle_with_calc h
+    ^ {js|)|js}
+
+  type lcha =
+    percent_with_calc * number_with_calc * angle_with_calc * alpha_with_calc
+
+  let lcha_to_string l c h a =
+    {js|lch(|js}
+    ^ string_of_percent_with_calc l
+    ^ {js| |js}
+    ^ string_of_number_with_calc c
+    ^ {js| |js}
+    ^ string_of_angle_with_calc h
+    ^ {js| / |js}
+    ^ string_of_alpha_with_calc a
+    ^ {js|)|js}
+
+  type oklab = percent_with_calc * number_with_calc * number_with_calc
+
+  let oklab_to_string l a b =
+    {js|oklab(|js}
+    ^ string_of_percent_with_calc l
+    ^ {js| |js}
+    ^ string_of_number_with_calc a
+    ^ {js| |js}
+    ^ string_of_number_with_calc b
+    ^ {js|)|js}
+
+  type oklaba =
+    percent_with_calc * number_with_calc * number_with_calc * alpha_with_calc
+
+  let oklaba_to_string l a b al =
+    {js|oklab(|js}
+    ^ string_of_percent_with_calc l
+    ^ {js| |js}
+    ^ string_of_number_with_calc a
+    ^ {js| |js}
+    ^ string_of_number_with_calc b
+    ^ {js| / |js}
+    ^ string_of_alpha_with_calc al
+    ^ {js|)|js}
+
+  type oklch = percent_with_calc * number_with_calc * angle_with_calc
+
+  let oklch_to_string l c h =
+    {js|oklch(|js}
+    ^ string_of_percent_with_calc l
+    ^ {js| |js}
+    ^ string_of_number_with_calc c
+    ^ {js| |js}
+    ^ string_of_angle_with_calc h
+    ^ {js|)|js}
+
+  type oklcha =
+    percent_with_calc * number_with_calc * angle_with_calc * alpha_with_calc
+
+  let oklcha_to_string l c h a =
+    {js|oklch(|js}
+    ^ string_of_percent_with_calc l
+    ^ {js| |js}
+    ^ string_of_number_with_calc c
+    ^ {js| |js}
+    ^ string_of_angle_with_calc h
+    ^ {js| / |js}
+    ^ string_of_alpha_with_calc a
+    ^ {js|)|js}
+
+  type predefined_color_space =
+    [ `srgb
+    | `srgbLinear
+    | `displayP3
+    | `a98Rgb
+    | `prophotoRgb
+    | `rec2020
+    | `xyz
+    | `xyzD50
+    | `xyzD65
+    ]
+
+  let predefined_color_space_to_string = function
+    | `srgb -> {js|srgb|js}
+    | `srgbLinear -> {js|srgb-linear|js}
+    | `displayP3 -> {js|display-p3|js}
+    | `a98Rgb -> {js|a98-rgb|js}
+    | `prophotoRgb -> {js|prophoto-rgb|js}
+    | `rec2020 -> {js|rec2020|js}
+    | `xyz -> {js|xyz|js}
+    | `xyzD50 -> {js|xyz-d50|js}
+    | `xyzD65 -> {js|xyz-d65|js}
+
+  type number_percentage_with_calc =
+    [ `num of float
+    | `num_calc of [ `num of float ] calc_min_max
+    | percent_with_calc
+    ]
+
+  let string_of_number_percentage_with_calc = function
+    | `num x -> Kloth.Float.to_string x
+    | `num_calc x ->
+      Calc.min_max_num_to_string
+        (function `num x -> Kloth.Float.to_string x)
+        x
+    | #percent_with_calc as p -> string_of_percent_with_calc p
+
+  type color_fn =
+    predefined_color_space
+    * number_percentage_with_calc
+    * number_percentage_with_calc
+    * number_percentage_with_calc
+
+  let color_fn_to_string cs c1 c2 c3 =
+    {js|color(|js}
+    ^ predefined_color_space_to_string cs
+    ^ {js| |js}
+    ^ string_of_number_percentage_with_calc c1
+    ^ {js| |js}
+    ^ string_of_number_percentage_with_calc c2
+    ^ {js| |js}
+    ^ string_of_number_percentage_with_calc c3
+    ^ {js|)|js}
+
+  type color_fna =
+    predefined_color_space
+    * number_percentage_with_calc
+    * number_percentage_with_calc
+    * number_percentage_with_calc
+    * alpha_with_calc
+
+  let color_fna_to_string cs c1 c2 c3 a =
+    {js|color(|js}
+    ^ predefined_color_space_to_string cs
+    ^ {js| |js}
+    ^ string_of_number_percentage_with_calc c1
+    ^ {js| |js}
+    ^ string_of_number_percentage_with_calc c2
+    ^ {js| |js}
+    ^ string_of_number_percentage_with_calc c3
+    ^ {js| / |js}
+    ^ string_of_alpha_with_calc a
+    ^ {js|)|js}
+
   type polar_color_space =
     [ `hsl
     | `hwb
@@ -1571,6 +1780,19 @@ module Color = struct
     | `rgba of rgba
     | `hsl of hsl
     | `hsla of hsla
+    | `hwb of hwb
+    | `hwba of hwba
+    | `lab of lab
+    | `laba of laba
+    | `lch of lch
+    | `lcha of lcha
+    | `oklab of oklab
+    | `oklaba of oklaba
+    | `oklch of oklch
+    | `oklcha of oklcha
+    | `color of color_fn
+    | `colora of color_fna
+    | `lightDark of t * t
     | `hex of string
     | `transparent
     | `currentColor
@@ -1613,6 +1835,24 @@ module Color = struct
     | `rgba (r, g, b, a) -> rgba_to_string r g b a
     | `hsl (h, s, l) -> hsl_to_string h s l
     | `hsla (h, s, l, a) -> hsla_to_string h s l a
+    | `hwb (h, w, b) -> hwb_to_string h w b
+    | `hwba (h, w, b, a) -> hwba_to_string h w b a
+    | `lab (l, a, b) -> lab_to_string l a b
+    | `laba (l, a, b, al) -> laba_to_string l a b al
+    | `lch (l, c, h) -> lch_to_string l c h
+    | `lcha (l, c, h, a) -> lcha_to_string l c h a
+    | `oklab (l, a, b) -> oklab_to_string l a b
+    | `oklaba (l, a, b, al) -> oklaba_to_string l a b al
+    | `oklch (l, c, h) -> oklch_to_string l c h
+    | `oklcha (l, c, h, a) -> oklcha_to_string l c h a
+    | `color (cs, c1, c2, c3) -> color_fn_to_string cs c1 c2 c3
+    | `colora (cs, c1, c2, c3, a) -> color_fna_to_string cs c1 c2 c3 a
+    | `lightDark (light, dark) ->
+      {js|light-dark(|js}
+      ^ toString light
+      ^ {js|, |js}
+      ^ toString dark
+      ^ {js|)|js}
     | `colorMix (method', x, y) ->
       {js|color-mix(in |js}
       ^ color_interpolation_method_to_string method'
@@ -2797,6 +3037,8 @@ module TextTransform = struct
     | `capitalize
     | `uppercase
     | `lowercase
+    | `fullWidth
+    | `fullSizeKana
     | Var.t
     | Cascading.t
     ]
@@ -2807,6 +3049,8 @@ module TextTransform = struct
     | `capitalize -> {js|capitalize|js}
     | `uppercase -> {js|uppercase|js}
     | `lowercase -> {js|lowercase|js}
+    | `fullWidth -> {js|full-width|js}
+    | `fullSizeKana -> {js|full-size-kana|js}
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
 end
@@ -3445,7 +3689,8 @@ module Shadow = struct
   let box ?(x = `zero) ?(y = `zero) ?(blur = `zero) ?(spread = `zero)
     ?(inset = false) (color : Color.t) : box t =
     `shadow
-      (Length.toString x
+      ((if inset then {js|inset |js} else {js||js})
+      ^ Length.toString x
       ^ {js| |js}
       ^ Length.toString y
       ^ {js| |js}
@@ -3453,8 +3698,7 @@ module Shadow = struct
       ^ {js| |js}
       ^ Length.toString spread
       ^ {js| |js}
-      ^ Color.toString color
-      ^ if inset then {js| inset|js} else {js||js})
+      ^ Color.toString color)
 
   let text ?(x = `zero) ?(y = `zero) ?(blur = `zero) (color : Color.t) : text t
       =
@@ -3473,6 +3717,9 @@ module Shadow = struct
     | #None.t -> None.toString
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
+
+  let many (arr : _ t array) : string =
+    Kloth.Array.map_and_join ~sep:{js|, |js} ~f:toString arr
 end
 
 module Gradient = struct
@@ -5216,4 +5463,4661 @@ module OverflowClipMargin = struct
     | #ClipEdgeOrigin.t as ceo -> ClipEdgeOrigin.toString ceo
     | #Margin.t as m -> Margin.toString m
     | #Cascading.t as c -> Cascading.toString c
+end
+
+module BoxShadow = struct
+  type t =
+    [ `shadow of string
+    | None.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString (x : t) : string =
+    match x with
+    | `shadow _ as s -> Shadow.toString s
+    | #None.t -> None.toString
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module BoxShadows = struct
+  type t = Shadow.box Shadow.t array
+
+  let toString (x : t) : string =
+    Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Shadow.toString x
+end
+
+module TextShadow = struct
+  type t =
+    [ `shadow of string
+    | None.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString (x : t) : string =
+    match x with
+    | `shadow _ as s -> Shadow.toString s
+    | #None.t -> None.toString
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module TextShadows = struct
+  type t = Shadow.text Shadow.t array
+
+  let toString (x : t) : string =
+    Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Shadow.toString x
+end
+
+module FlexGrow = struct
+  type t = [ `num of float ]
+
+  let toString x = match x with `num n -> Kloth.Float.to_string n
+end
+
+module FlexShrink = struct
+  include FlexGrow
+end
+
+module LengthPercentage = struct
+  type t =
+    [ Length.t
+    | Percentage.t
+    ]
+
+  let toString = function #Length.t as l -> Length.toString l
+end
+
+module Order = struct
+  type t = int
+
+  let toString x = Kloth.Int.to_string x
+end
+
+module BoxOrient = struct
+  type t =
+    [ `horizontal
+    | `vertical
+    | `inlineAxis
+    | `blockAxis
+    | `inherit_
+    ]
+
+  let toString x =
+    match x with
+    | `horizontal -> {js|horizontal|js}
+    | `vertical -> {js|vertical|js}
+    | `inlineAxis -> {js|inline-axis|js}
+    | `blockAxis -> {js|block-axis|js}
+    | `inherit_ -> {js|inherit|js}
+end
+
+module BorderRadius = struct
+  type t = Length.t
+
+  let toString x = Length.toString x
+end
+
+module BorderValue = struct
+  type t =
+    [ LineWidth.t
+    | BorderStyle.t
+    | Color.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #Var.t as v -> Var.toString v
+    | #Cascading.t as c -> Cascading.toString c
+    | #LineWidth.t as w -> LineWidth.toString w
+    | #BorderStyle.t as s -> BorderStyle.toString s
+    | #Color.t as color -> Color.toString color
+end
+
+module MarginBlock = struct
+  include Margin
+end
+
+module OverflowY = struct
+  include Overflow
+end
+
+module FontFamily = struct
+  type t =
+    [ FontFamilyName.t
+    | `list of FontFamilyName.t array
+    | Var.t
+    | Cascading.t
+    ]
+
+  let list (xs : FontFamilyName.t array) = `list xs
+
+  let toString x =
+    match x with
+    | #Var.t as var -> Var.toString var
+    | #Cascading.t as c -> Cascading.toString c
+    | #FontFamilyName.t as name -> FontFamilyName.toString name
+    | `list xs ->
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:FontFamilyName.toString xs
+end
+
+module FontSize = struct
+  type t =
+    [ Length.t
+    | `xxSmall
+    | `xSmall
+    | `small
+    | `medium
+    | `large
+    | `xLarge
+    | `xxLarge
+    | `xxxLarge
+    | `smaller
+    | `larger
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #Cascading.t as c -> Cascading.toString c
+    | `xxSmall -> {js|xx-small|js}
+    | `xSmall -> {js|x-small|js}
+    | `small -> {js|small|js}
+    | `medium -> {js|medium|js}
+    | `large -> {js|large|js}
+    | `xLarge -> {js|x-large|js}
+    | `xxLarge -> {js|xx-large|js}
+    | `xxxLarge -> {js|xxx-large|js}
+    | `smaller -> {js|smaller|js}
+    | `larger -> {js|larger|js}
+    | #Length.t as l -> Length.toString l
+end
+
+module Opacity = struct
+  type t = float
+
+  let toString (x : float) = Kloth.Float.to_string x
+end
+
+module Paint = struct
+  type fallback =
+    [ None.t
+    | Color.t
+    ]
+
+  type t =
+    [ None.t
+    | Color.t
+    | Url.t
+    | `urlWithFallback of string * fallback
+    | `contextFill
+    | `contextStroke
+    | Var.t
+    | Cascading.t
+    ]
+
+  let urlWithFallback (url : string) (fallback : fallback) =
+    `urlWithFallback (url, fallback)
+
+  let fallback_to_string = function
+    | #None.t -> None.toString
+    | #Color.t as c -> Color.toString c
+
+  let toString x =
+    match x with
+    | #Var.t as var -> Var.toString var
+    | #Cascading.t as c -> Cascading.toString c
+    | #None.t -> None.toString
+    | #Color.t as c -> Color.toString c
+    | #Url.t as u -> Url.toString u
+    | `contextFill -> {js|context-fill|js}
+    | `contextStroke -> {js|context-stroke|js}
+    | `urlWithFallback (url, fallback) ->
+      Url.toString (`url url) ^ {js| |js} ^ fallback_to_string fallback
+end
+
+module WebkitTextFillColor = struct
+  type t = string
+
+  let toString (x : string) = x
+end
+
+module AccentColor = struct
+  type t =
+    [ Auto.t
+    | Color.t
+    ]
+
+  let toString x =
+    match x with #Auto.t -> Auto.toString | #Color.t as c -> Color.toString c
+end
+
+module Appearance = struct
+  type t =
+    [ `none
+    | Auto.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | #Auto.t -> Auto.toString
+    | #Var.t as v -> Var.toString v
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module BlendMode = struct
+  type t =
+    [ `normal
+    | `multiply
+    | `screen
+    | `overlay
+    | `darken
+    | `lighten
+    | `colorDodge
+    | `colorBurn
+    | `hardLight
+    | `softLight
+    | `difference
+    | `exclusion
+    | `hue
+    | `saturation
+    | `color
+    | `luminosity
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `multiply -> {js|multiply|js}
+    | `screen -> {js|screen|js}
+    | `overlay -> {js|overlay|js}
+    | `darken -> {js|darken|js}
+    | `lighten -> {js|lighten|js}
+    | `colorDodge -> {js|color-dodge|js}
+    | `colorBurn -> {js|color-burn|js}
+    | `hardLight -> {js|hard-light|js}
+    | `softLight -> {js|soft-light|js}
+    | `difference -> {js|difference|js}
+    | `exclusion -> {js|exclusion|js}
+    | `hue -> {js|hue|js}
+    | `saturation -> {js|saturation|js}
+    | `color -> {js|color|js}
+    | `luminosity -> {js|luminosity|js}
+    | #Var.t as v -> Var.toString v
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module BackgroundBlendMode = struct
+  include BlendMode
+end
+
+module MixBlendMode = struct
+  include BlendMode
+end
+
+module BackgroundPositionX = struct
+  type t =
+    [ Position.X.t
+    | Length.t
+    ]
+
+  let toString x =
+    match x with
+    | #Position.X.t as pos -> Position.X.toString pos
+    | #Length.t as len -> Length.toString len
+end
+
+module BackgroundPositionY = struct
+  type t =
+    [ Position.Y.t
+    | Length.t
+    ]
+
+  let toString x =
+    match x with
+    | #Position.Y.t as pos -> Position.Y.toString pos
+    | #Length.t as len -> Length.toString len
+end
+
+module BreakBefore = struct
+  type t =
+    [ `auto
+    | `avoid
+    | `avoidPage
+    | `avoidColumn
+    | `avoidRegion
+    | `page
+    | `column
+    | `region
+    | `left
+    | `right
+    | `recto
+    | `verso
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `avoid -> {js|avoid|js}
+    | `avoidPage -> {js|avoid-page|js}
+    | `avoidColumn -> {js|avoid-column|js}
+    | `avoidRegion -> {js|avoid-region|js}
+    | `page -> {js|page|js}
+    | `column -> {js|column|js}
+    | `region -> {js|region|js}
+    | `left -> {js|left|js}
+    | `right -> {js|right|js}
+    | `recto -> {js|recto|js}
+    | `verso -> {js|verso|js}
+end
+
+module BreakAfter = struct
+  include BreakBefore
+end
+
+module BreakInside = struct
+  type t =
+    [ `auto
+    | `avoid
+    | `avoidPage
+    | `avoidColumn
+    | `avoidRegion
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `avoid -> {js|avoid|js}
+    | `avoidPage -> {js|avoid-page|js}
+    | `avoidColumn -> {js|avoid-column|js}
+    | `avoidRegion -> {js|avoid-region|js}
+end
+
+module InsetBlock = struct
+  type t =
+    [ Auto.t
+    | Length.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #Auto.t -> Auto.toString
+    | #Length.t as l -> Length.toString l
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module InsetInline = struct
+  include InsetBlock
+end
+
+module MarginInline = struct
+  include Margin
+end
+
+module MaskRepeat = struct
+  include BackgroundRepeat
+end
+
+module OverflowX = struct
+  include Overflow
+end
+
+module Padding = struct
+  type t = Length.t
+
+  let toString x = Length.toString x
+end
+
+module PaddingBlock = struct
+  include Padding
+end
+
+module PaddingInline = struct
+  include Padding
+end
+
+module AlignmentBaseline = struct
+  type t =
+    [ `auto
+    | `baseline
+    | `beforeEdge
+    | `textBeforeEdge
+    | `middle
+    | `central
+    | `afterEdge
+    | `textAfterEdge
+    | `ideographic
+    | `alphabetic
+    | `hanging
+    | `mathematical
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `baseline -> {js|baseline|js}
+    | `beforeEdge -> {js|before-edge|js}
+    | `textBeforeEdge -> {js|text-before-edge|js}
+    | `middle -> {js|middle|js}
+    | `central -> {js|central|js}
+    | `afterEdge -> {js|after-edge|js}
+    | `textAfterEdge -> {js|text-after-edge|js}
+    | `ideographic -> {js|ideographic|js}
+    | `alphabetic -> {js|alphabetic|js}
+    | `hanging -> {js|hanging|js}
+    | `mathematical -> {js|mathematical|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module AnchorName = struct
+  (* MDN syntax: 'none' | [ <dashed-ident> ]# *)
+  type t =
+    [ `none
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module AnchorScope = struct
+  (* MDN syntax: 'none' | 'all' | [ <dashed-ident> ]# *)
+  type t =
+    [ `none
+    | `all
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `all -> {js|all|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module AnimationComposition = struct
+  (* MDN syntax: [ 'replace' | 'add' | 'accumulate' ]# *)
+  type t =
+    [ `replace
+    | `add
+    | `accumulate
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `replace -> {js|replace|js}
+    | `add -> {js|add|js}
+    | `accumulate -> {js|accumulate|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module AnimationDelayEnd = AnimationDelay
+module AnimationDelayStart = AnimationDelay
+module AnimationRange = Gap
+module AnimationRangeEnd = Gap
+module AnimationRangeStart = Gap
+module AnimationTimeline = AnimationName
+
+module Azimuth = struct
+  (* MDN syntax: <extended-angle> | [ 'left-side' | 'far-left' | 'left' | 'center-left' | \ 'center' | 'center-right' | 'right' | 'far-right' | 'right-side' ] || \ 'behind' | 'leftwards' | 'rightwards' *)
+  type t =
+    [ `leftSide
+    | `farLeft
+    | `left
+    | `centerLeft
+    | `center
+    | `centerRight
+    | `right
+    | `farRight
+    | `rightSide
+    | `behind
+    | `leftwards
+    | `rightwards
+    | `value of string
+    | Angle.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `leftSide -> {js|left-side|js}
+    | `farLeft -> {js|far-left|js}
+    | `left -> {js|left|js}
+    | `centerLeft -> {js|center-left|js}
+    | `center -> {js|center|js}
+    | `centerRight -> {js|center-right|js}
+    | `right -> {js|right|js}
+    | `farRight -> {js|far-right|js}
+    | `rightSide -> {js|right-side|js}
+    | `behind -> {js|behind|js}
+    | `leftwards -> {js|leftwards|js}
+    | `rightwards -> {js|rightwards|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Angle.t as x -> Angle.toString x
+end
+
+module BaselineShift = VerticalAlign
+
+module Behavior = struct
+  type t =
+    [ `value of string
+    | Url.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Url.t as x -> Url.toString x
+end
+
+module Bleed = ColumnWidth
+module BlockOverflow = TextOverflow
+module BorderBlock = Border
+module BorderBlockColor = Color
+module BorderBlockEnd = Border
+module BorderBlockEndStyle = BorderStyle
+module BorderBlockStart = Border
+module BorderBlockStartStyle = BorderStyle
+module BorderBlockStyle = BorderStyle
+
+module BorderImage = struct
+  (* MDN syntax: <'border-image-source'> || <'border-image-slice'> [ '/' \ <'border-image-width'> | '/' [ <'border-image-width'> ]? '/' \ <'border-image-outset'> ]? || <'border-image-repeat'> *)
+  type t =
+    [ `borderImageSource
+    | `borderImageSlice
+    | `borderImageWidth
+    | `borderImageOutset
+    | `borderImageRepeat
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `borderImageSource -> {js|border-image-source|js}
+    | `borderImageSlice -> {js|border-image-slice|js}
+    | `borderImageWidth -> {js|border-image-width|js}
+    | `borderImageOutset -> {js|border-image-outset|js}
+    | `borderImageRepeat -> {js|border-image-repeat|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module BorderInline = Border
+module BorderInlineColor = Color
+module BorderInlineEnd = Border
+module BorderInlineEndStyle = BorderStyle
+module BorderInlineStart = Border
+module BorderInlineStartStyle = BorderStyle
+module BorderInlineStyle = BorderStyle
+
+module BorderSpacing = struct
+  type t =
+    [ `value of string
+    | Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Length.t as x -> Length.toString x
+end
+
+module BoxAlign = AlignItems
+
+module BoxDecorationBreak = struct
+  type t =
+    [ `slice
+    | `clone
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `slice -> {js|slice|js}
+    | `clone -> {js|clone|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module BoxDirection = struct
+  type t =
+    [ `normal
+    | `reverse
+    | `inherit_
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `reverse -> {js|reverse|js}
+    | `inherit_ -> {js|inherit|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module BoxFlex = Opacity
+module BoxFlexGroup = Order
+
+module BoxLines = struct
+  type t =
+    [ `single
+    | `multiple
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `single -> {js|single|js}
+    | `multiple -> {js|multiple|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module BoxOrdinalGroup = Order
+module BoxPack = TextAlign
+
+module CaptionSide = struct
+  type t =
+    [ `top
+    | `bottom
+    | `blockStart
+    | `blockEnd
+    | `inlineStart
+    | `inlineEnd
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `top -> {js|top|js}
+    | `bottom -> {js|bottom|js}
+    | `blockStart -> {js|block-start|js}
+    | `blockEnd -> {js|block-end|js}
+    | `inlineStart -> {js|inline-start|js}
+    | `inlineEnd -> {js|inline-end|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module Clip = struct
+  type t =
+    [ `auto
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ClipRule = struct
+  type t =
+    [ `nonzero
+    | `evenodd
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `nonzero -> {js|nonzero|js}
+    | `evenodd -> {js|evenodd|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ColorAdjust = struct
+  type t =
+    [ `economy
+    | `exact
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `economy -> {js|economy|js}
+    | `exact -> {js|exact|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ColorInterpolation = struct
+  type t =
+    [ `auto
+    | `sRGB
+    | `linearRGB
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `sRGB -> {js|sRGB|js}
+    | `linearRGB -> {js|linearRGB|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ColorInterpolationFilters = struct
+  type t =
+    [ `auto
+    | `sRGB
+    | `linearRGB
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `sRGB -> {js|sRGB|js}
+    | `linearRGB -> {js|linearRGB|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ColorRendering = struct
+  type t =
+    [ `auto
+    | `optimizeSpeed
+    | `optimizeQuality
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `optimizeSpeed -> {js|optimizeSpeed|js}
+    | `optimizeQuality -> {js|optimizeQuality|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ColorScheme = struct
+  (* MDN syntax: 'normal' | [ 'dark' | 'light' | <custom-ident> ]+ && 'only'? *)
+  type t =
+    [ `normal
+    | `dark
+    | `light
+    | `only
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `dark -> {js|dark|js}
+    | `light -> {js|light|js}
+    | `only -> {js|only|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ColumnFill = struct
+  type t =
+    [ `auto
+    | `balance
+    | `balanceAll
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `balance -> {js|balance|js}
+    | `balanceAll -> {js|balance-all|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ColumnRule = struct
+  (* MDN syntax: <'column-rule-width'> || <'column-rule-style'> || <'column-rule-color'> *)
+  type t =
+    [ `columnRuleWidth
+    | `columnRuleStyle
+    | `columnRuleColor
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `columnRuleWidth -> {js|column-rule-width|js}
+    | `columnRuleStyle -> {js|column-rule-style|js}
+    | `columnRuleColor -> {js|column-rule-color|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ColumnRuleStyle = BorderStyle
+module ColumnRuleWidth = LineWidth
+
+module ColumnSpan = struct
+  type t =
+    [ `none
+    | `all
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `all -> {js|all|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module Columns = struct
+  (* MDN syntax: <'column-width'> || <'column-count'> *)
+  type t =
+    [ `columnWidth
+    | `columnCount
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `columnWidth -> {js|column-width|js}
+    | `columnCount -> {js|column-count|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module Contain = struct
+  (* MDN syntax: 'none' | 'strict' | 'content' | 'size' || 'layout' || 'style' || 'paint' *)
+  type t =
+    [ `none
+    | `strict
+    | `content
+    | `size
+    | `layout
+    | `style
+    | `paint
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `strict -> {js|strict|js}
+    | `content -> {js|content|js}
+    | `size -> {js|size|js}
+    | `layout -> {js|layout|js}
+    | `style -> {js|style|js}
+    | `paint -> {js|paint|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ContainIntrinsicBlockSize = struct
+  type t =
+    [ `none
+    | `auto
+    | Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `auto -> {js|auto|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Length.t as x -> Length.toString x
+end
+
+module ContainIntrinsicHeight = struct
+  type t =
+    [ `none
+    | `auto
+    | Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `auto -> {js|auto|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Length.t as x -> Length.toString x
+end
+
+module ContainIntrinsicInlineSize = struct
+  type t =
+    [ `none
+    | `auto
+    | Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `auto -> {js|auto|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Length.t as x -> Length.toString x
+end
+
+module ContainIntrinsicSize = struct
+  (* MDN syntax: 'none' | [ 'auto' ]? <extended-length>{1,2} *)
+  type t =
+    [ `none
+    | `auto
+    | `value of string
+    | Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `auto -> {js|auto|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Length.t as x -> Length.toString x
+end
+
+module ContainIntrinsicWidth = struct
+  type t =
+    [ `none
+    | `auto
+    | Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `auto -> {js|auto|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Length.t as x -> Length.toString x
+end
+
+module Container = struct
+  (* MDN syntax: <'container-name'> [ '/' <'container-type'> ]? *)
+  type t =
+    [ `containerName
+    | `containerType
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `containerName -> {js|container-name|js}
+    | `containerType -> {js|container-type|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ContainerName = struct
+  (* MDN syntax: <custom-ident>+ | 'none' *)
+  type t =
+    [ `none
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ContainerNameComputed = struct
+  (* MDN syntax: 'none' | [ <custom-ident> ]# *)
+  type t =
+    [ `none
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ContainerType = struct
+  type t =
+    [ `normal
+    | `size
+    | `inlineSize
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `size -> {js|size|js}
+    | `inlineSize -> {js|inline-size|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ContentVisibility = Overflow
+
+module Cue = struct
+  (* MDN syntax: <'cue-before'> [ <'cue-after'> ]? *)
+  type t =
+    [ `cueBefore
+    | `cueAfter
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `cueBefore -> {js|cue-before|js}
+    | `cueAfter -> {js|cue-after|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module CueAfter = struct
+  (* MDN syntax: <url> [ <decibel> ]? | 'none' *)
+  type t =
+    [ `none
+    | `value of string
+    | Url.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Url.t as x -> Url.toString x
+end
+
+module CueBefore = struct
+  (* MDN syntax: <url> [ <decibel> ]? | 'none' *)
+  type t =
+    [ `none
+    | `value of string
+    | Url.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Url.t as x -> Url.toString x
+end
+
+module DominantBaseline = struct
+  type t =
+    [ `auto
+    | `useScript
+    | `noChange
+    | `resetSize
+    | `ideographic
+    | `alphabetic
+    | `hanging
+    | `mathematical
+    | `central
+    | `middle
+    | `textAfterEdge
+    | `textBeforeEdge
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `useScript -> {js|use-script|js}
+    | `noChange -> {js|no-change|js}
+    | `resetSize -> {js|reset-size|js}
+    | `ideographic -> {js|ideographic|js}
+    | `alphabetic -> {js|alphabetic|js}
+    | `hanging -> {js|hanging|js}
+    | `mathematical -> {js|mathematical|js}
+    | `central -> {js|central|js}
+    | `middle -> {js|middle|js}
+    | `textAfterEdge -> {js|text-after-edge|js}
+    | `textBeforeEdge -> {js|text-before-edge|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module EmptyCells = struct
+  type t =
+    [ `show
+    | `hide
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `show -> {js|show|js}
+    | `hide -> {js|hide|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module FieldSizing = struct
+  type t =
+    [ `content
+    | `fixed
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `content -> {js|content|js}
+    | `fixed -> {js|fixed|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module FillOpacity = AlphaValue
+
+module FillRule = struct
+  type t =
+    [ `nonzero
+    | `evenodd
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `nonzero -> {js|nonzero|js}
+    | `evenodd -> {js|evenodd|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module FlexFlow = struct
+  (* MDN syntax: <'flex-direction'> || <'flex-wrap'> *)
+  type t =
+    [ `flexDirection
+    | `flexWrap
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `flexDirection -> {js|flex-direction|js}
+    | `flexWrap -> {js|flex-wrap|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module Font = struct
+  (* MDN syntax: [ <'font-style'> || <font-variant-css21> || <'font-weight'> || \ <'font-stretch'> ]? <'font-size'> [ '/' <'line-height'> ]? <'font-family'> \ | 'caption' | 'icon' | 'menu' | 'message-box' | 'small-caption' | \ 'status-bar' *)
+  type t =
+    [ `fontStyle
+    | `fontWeight
+    | `fontStretch
+    | `fontSize
+    | `lineHeight
+    | `fontFamily
+    | `caption
+    | `icon
+    | `menu
+    | `messageBox
+    | `smallCaption
+    | `statusBar
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `fontStyle -> {js|font-style|js}
+    | `fontWeight -> {js|font-weight|js}
+    | `fontStretch -> {js|font-stretch|js}
+    | `fontSize -> {js|font-size|js}
+    | `lineHeight -> {js|line-height|js}
+    | `fontFamily -> {js|font-family|js}
+    | `caption -> {js|caption|js}
+    | `icon -> {js|icon|js}
+    | `menu -> {js|menu|js}
+    | `messageBox -> {js|message-box|js}
+    | `smallCaption -> {js|small-caption|js}
+    | `statusBar -> {js|status-bar|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module FontFeatureSettings = struct
+  (* MDN syntax: 'normal' | [ <feature-tag-value> ]# *)
+  type t =
+    [ `normal
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module FontLanguageOverride = Content
+
+module FontPalette = struct
+  type t =
+    [ `normal
+    | `light
+    | `dark
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `light -> {js|light|js}
+    | `dark -> {js|dark|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module FontSizeAdjust = struct
+  type t =
+    [ `none
+    | `num of float
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `num x -> Kloth.Float.to_string x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module FontSmooth = struct
+  type t =
+    [ `auto
+    | `never
+    | `always
+    | Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `never -> {js|never|js}
+    | `always -> {js|always|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Length.t as x -> Length.toString x
+end
+
+module FontStretch = struct
+  type t =
+    [ `value of string
+    | Percentage.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Percentage.t as x -> Percentage.toString x
+end
+
+module FontSynthesis = struct
+  (* MDN syntax: 'none' | [ 'weight' || 'style' || 'small-caps' || 'position' ] *)
+  type t =
+    [ `none
+    | `weight
+    | `style
+    | `smallCaps
+    | `position
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `weight -> {js|weight|js}
+    | `style -> {js|style|js}
+    | `smallCaps -> {js|small-caps|js}
+    | `position -> {js|position|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module FontVariantAlternates = struct
+  (* MDN syntax: 'normal' | stylistic( <feature-value-name> ) || 'historical-forms' || \ styleset( [ <feature-value-name> ]# ) || character-variant( [ \ <feature-value-name> ]# ) || swash( <feature-value-name> ) || ornaments( \ <feature-value-name> ) || annotation( <feature-value-name> ) *)
+  type t =
+    [ `normal
+    | `historicalForms
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `historicalForms -> {js|historical-forms|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module FontVariantEastAsian = struct
+  (* MDN syntax: 'normal' | <east-asian-variant-values> || <east-asian-width-values> || \ 'ruby' *)
+  type t =
+    [ `normal
+    | `ruby
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `ruby -> {js|ruby|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module FontVariantLigatures = struct
+  (* MDN syntax: 'normal' | 'none' | <common-lig-values> || <discretionary-lig-values> || \ <historical-lig-values> || <contextual-alt-values> *)
+  type t =
+    [ `normal
+    | `none
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `none -> {js|none|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module FontVariantNumeric = struct
+  (* MDN syntax: 'normal' | <numeric-figure-values> || <numeric-spacing-values> || \ <numeric-fraction-values> || 'ordinal' || 'slashed-zero' *)
+  type t =
+    [ `normal
+    | `ordinal
+    | `slashedZero
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `ordinal -> {js|ordinal|js}
+    | `slashedZero -> {js|slashed-zero|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module FontVariationSettings = struct
+  (* MDN syntax: 'normal' | [ <string> <number> ]# *)
+  type t =
+    [ `normal
+    | `num of float
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `num x -> Kloth.Float.to_string x
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ForcedColorAdjust = struct
+  type t =
+    [ `auto
+    | `none
+    | `preserveParentColor
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `none -> {js|none|js}
+    | `preserveParentColor -> {js|preserve-parent-color|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module HangingPunctuation = struct
+  (* MDN syntax: 'none' | 'first' || [ 'force-end' | 'allow-end' ] || 'last' *)
+  type t =
+    [ `none
+    | `first
+    | `forceEnd
+    | `allowEnd
+    | `last
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `first -> {js|first|js}
+    | `forceEnd -> {js|force-end|js}
+    | `allowEnd -> {js|allow-end|js}
+    | `last -> {js|last|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module HyphenateCharacter = struct
+  (* MDN syntax: 'auto' | <string-token> *)
+  type t =
+    [ `auto
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module HyphenateLimitChars = ColumnCount
+
+module HyphenateLimitLast = struct
+  type t =
+    [ `none
+    | `always
+    | `column
+    | `page
+    | `spread
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `always -> {js|always|js}
+    | `column -> {js|column|js}
+    | `page -> {js|page|js}
+    | `spread -> {js|spread|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module HyphenateLimitLines = struct
+  type t =
+    [ `noLimit
+    | `int of int
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `noLimit -> {js|no-limit|js}
+    | `int x -> Kloth.Int.to_string x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module HyphenateLimitZone = LengthPercentage
+
+module ImageResolution = struct
+  (* MDN syntax: [ 'from-image' || <resolution> ] && [ 'snap' ]? *)
+  type t =
+    [ `fromImage
+    | `snap
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `fromImage -> {js|from-image|js}
+    | `snap -> {js|snap|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ImeMode = struct
+  type t =
+    [ `auto
+    | `normal
+    | `active
+    | `inactive
+    | `disabled
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `normal -> {js|normal|js}
+    | `active -> {js|active|js}
+    | `inactive -> {js|inactive|js}
+    | `disabled -> {js|disabled|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module Inherits = struct
+  type t =
+    [ `true_
+    | `false_
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `true_ -> {js|true|js}
+    | `false_ -> {js|false|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module InitialLetter = struct
+  (* MDN syntax: 'normal' | <number> [ <integer> ]? *)
+  type t =
+    [ `normal
+    | `num of float
+    | `int of int
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `num x -> Kloth.Float.to_string x
+    | `int x -> Kloth.Int.to_string x
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module InitialLetterAlign = struct
+  type t =
+    [ `auto
+    | `alphabetic
+    | `hanging
+    | `ideographic
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `alphabetic -> {js|alphabetic|js}
+    | `hanging -> {js|hanging|js}
+    | `ideographic -> {js|ideographic|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module InitialValue = WebkitTextFillColor
+module Inset = Top
+
+module InsetArea = struct
+  (* MDN syntax: 'none' | [ 'top' | 'bottom' | 'left' | 'right' | 'center' | 'self-start' | \ 'self-end' | 'start' | 'end' ]{1,2} *)
+  type t =
+    [ `none
+    | `top
+    | `bottom
+    | `left
+    | `right
+    | `center
+    | `selfStart
+    | `selfEnd
+    | `start
+    | `end_
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `top -> {js|top|js}
+    | `bottom -> {js|bottom|js}
+    | `left -> {js|left|js}
+    | `right -> {js|right|js}
+    | `center -> {js|center|js}
+    | `selfStart -> {js|self-start|js}
+    | `selfEnd -> {js|self-end|js}
+    | `start -> {js|start|js}
+    | `end_ -> {js|end|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module InterpolateSize = struct
+  type t =
+    [ `numericOnly
+    | `allowKeywords
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `numericOnly -> {js|numeric-only|js}
+    | `allowKeywords -> {js|allow-keywords|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module Kerning = Margin
+module LayoutGrid = GridLine
+
+module LayoutGridChar = struct
+  (* MDN syntax: 'auto' | <custom-ident> | <string> *)
+  type t =
+    [ `auto
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module LayoutGridLine = struct
+  (* MDN syntax: 'auto' | <custom-ident> | <string> *)
+  type t =
+    [ `auto
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module LayoutGridMode = struct
+  (* MDN syntax: 'auto' | <custom-ident> | <string> *)
+  type t =
+    [ `auto
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module LayoutGridType = struct
+  (* MDN syntax: 'auto' | <custom-ident> | <string> *)
+  type t =
+    [ `auto
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module LineClamp = struct
+  type t =
+    [ `none
+    | `int of int
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `int x -> Kloth.Int.to_string x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ListStyle = struct
+  (* MDN syntax: <'list-style-type'> || <'list-style-position'> || <'list-style-image'> *)
+  type t =
+    [ `listStyleType
+    | `listStylePosition
+    | `listStyleImage
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `listStyleType -> {js|list-style-type|js}
+    | `listStylePosition -> {js|list-style-position|js}
+    | `listStyleImage -> {js|list-style-image|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MarginTrim = struct
+  type t =
+    [ `none
+    | `inFlow
+    | `all
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `inFlow -> {js|in-flow|js}
+    | `all -> {js|all|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module Marker = ListStyleImage
+module MarkerEnd = ListStyleImage
+module MarkerMid = ListStyleImage
+module MarkerStart = ListStyleImage
+
+module Marks = struct
+  (* MDN syntax: 'none' | 'crop' || 'cross' *)
+  type t =
+    [ `none
+    | `crop
+    | `cross
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `crop -> {js|crop|js}
+    | `cross -> {js|cross|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module Mask = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MaskBorder = struct
+  (* MDN syntax: <'mask-border-source'> || <'mask-border-slice'> [ '/' [ \ <'mask-border-width'> ]? [ '/' <'mask-border-outset'> ]? ]? || \ <'mask-border-repeat'> || <'mask-border-mode'> | [ <url> | <gradient> | 'none' ] [ [ <extended-length> | \ <extended-percentage> ]{4} [ <webkit-mask-box-repeat> ]{2} ]? *)
+  type t =
+    [ `maskBorderSource
+    | `maskBorderSlice
+    | `maskBorderWidth
+    | `maskBorderOutset
+    | `maskBorderRepeat
+    | `maskBorderMode
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `maskBorderSource -> {js|mask-border-source|js}
+    | `maskBorderSlice -> {js|mask-border-slice|js}
+    | `maskBorderWidth -> {js|mask-border-width|js}
+    | `maskBorderOutset -> {js|mask-border-outset|js}
+    | `maskBorderRepeat -> {js|mask-border-repeat|js}
+    | `maskBorderMode -> {js|mask-border-mode|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MaskBorderMode = struct
+  type t =
+    [ `luminance
+    | `alpha
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `luminance -> {js|luminance|js}
+    | `alpha -> {js|alpha|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MaskBorderOutset = BorderImageOutset
+module MaskBorderRepeat = BorderImageRepeat
+module MaskBorderSlice = BorderImageSlice
+module MaskBorderSource = BorderImageSource
+module MaskBorderWidth = BorderImageWidth
+
+module MaskClip = struct
+  (* MDN syntax: [ <box> | 'border' | 'padding' | 'content' | 'text' ]# | [ <geometry-box> | 'no-clip' ]# *)
+  type t =
+    [ `noClip
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `noClip -> {js|no-clip|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MaskComposite = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MaskMode = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MaskOrigin = GeometryBox
+module MaskSize = BackgroundSize
+
+module MaskType = struct
+  type t =
+    [ `luminance
+    | `alpha
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `luminance -> {js|luminance|js}
+    | `alpha -> {js|alpha|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MasonryAutoFlow = struct
+  (* MDN syntax: [ 'pack' | 'next' ] || [ 'definite-first' | 'ordered' ] *)
+  type t =
+    [ `pack
+    | `next
+    | `definiteFirst
+    | `ordered
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `pack -> {js|pack|js}
+    | `next -> {js|next|js}
+    | `definiteFirst -> {js|definite-first|js}
+    | `ordered -> {js|ordered|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MathDepth = struct
+  (* MDN syntax: 'auto-add' | 'add(' <integer> ')' | <integer> *)
+  type t =
+    [ `autoAdd
+    | `add
+    | `int of int
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `autoAdd -> {js|auto-add|js}
+    | `add -> {js|add(|js}
+    | `int x -> Kloth.Int.to_string x
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MathShift = struct
+  type t =
+    [ `normal
+    | `compact
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `compact -> {js|compact|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MathStyle = struct
+  type t =
+    [ `normal
+    | `compact
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `compact -> {js|compact|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MaxLines = struct
+  type t =
+    [ `none
+    | `int of int
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `int x -> Kloth.Int.to_string x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MediaAnyHover = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MediaAnyPointer = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MediaColorGamut = struct
+  type t =
+    [ `srgb
+    | `p3
+    | `rec2020
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `srgb -> {js|srgb|js}
+    | `p3 -> {js|p3|js}
+    | `rec2020 -> {js|rec2020|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MediaColorIndex = Order
+
+module MediaDisplayMode = struct
+  type t =
+    [ `fullscreen
+    | `standalone
+    | `minimalUi
+    | `browser
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `fullscreen -> {js|fullscreen|js}
+    | `standalone -> {js|standalone|js}
+    | `minimalUi -> {js|minimal-ui|js}
+    | `browser -> {js|browser|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MediaForcedColors = struct
+  type t =
+    [ `none
+    | `active
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `active -> {js|active|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MediaGrid = Order
+
+module MediaHover = struct
+  type t =
+    [ `hover
+    | `none
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `hover -> {js|hover|js}
+    | `none -> {js|none|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MediaInvertedColors = struct
+  type t =
+    [ `inverted
+    | `none
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `inverted -> {js|inverted|js}
+    | `none -> {js|none|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MediaMaxAspectRatio = AspectRatio
+
+module MediaMaxResolution = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MediaMinAspectRatio = AspectRatio
+module MediaMinColor = Order
+module MediaMinColorIndex = Order
+
+module MediaMinResolution = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MediaMonochrome = Order
+
+module MediaOrientation = struct
+  type t =
+    [ `portrait
+    | `landscape
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `portrait -> {js|portrait|js}
+    | `landscape -> {js|landscape|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MediaPointer = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MediaPrefersColorScheme = struct
+  type t =
+    [ `dark
+    | `light
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `dark -> {js|dark|js}
+    | `light -> {js|light|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MediaPrefersContrast = struct
+  type t =
+    [ `noPreference
+    | `more
+    | `less
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `noPreference -> {js|no-preference|js}
+    | `more -> {js|more|js}
+    | `less -> {js|less|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MediaPrefersReducedMotion = struct
+  type t =
+    [ `noPreference
+    | `reduce
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `noPreference -> {js|no-preference|js}
+    | `reduce -> {js|reduce|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MediaResolution = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MediaScripting = struct
+  type t =
+    [ `none
+    | `initialOnly
+    | `enabled
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `initialOnly -> {js|initial-only|js}
+    | `enabled -> {js|enabled|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MediaType = AnimationName
+
+module MediaUpdate = struct
+  type t =
+    [ `none
+    | `slow
+    | `fast
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `slow -> {js|slow|js}
+    | `fast -> {js|fast|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module Binding = struct
+  type t =
+    [ `value of string
+    | Url.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Url.t as x -> Url.toString x
+end
+
+module BorderBefore = BorderBlockStart
+module BorderBeforeColor = Color
+module BorderBeforeStyle = BorderStyle
+module BorderBeforeWidth = LineWidth
+module BorderBottomColors = Color
+module BorderLeftColors = Color
+module BorderRadiusBottomleft = BorderRadius
+module BorderRadiusBottomright = BorderRadius
+module BorderRadiusTopleft = BorderRadius
+module BorderRadiusTopright = BorderRadius
+module BorderRightColors = Color
+module BorderTopColors = Color
+
+module BoxReflect = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ColumnBreakAfter = BreakAfter
+module ColumnBreakBefore = BreakBefore
+module ColumnBreakInside = BreakInside
+
+module ContextProperties = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module FloatEdge = Float
+module FontSmoothing = FontSmooth
+module ForceBrokenImageIcon = Order
+
+module ImageRegion = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MaskAttachment = BackgroundAttachment
+module MaskBoxImage = MaskBorder
+module MaskPositionX = BackgroundPositionX
+module MaskPositionY = BackgroundPositionY
+module MaskRepeatX = BackgroundRepeat
+module MaskRepeatY = BackgroundRepeat
+module Orient = Resize
+module OsxFontSmoothing = FontSmooth
+module OutlineRadius = BorderRadius
+module OutlineRadiusBottomleft = BorderRadius
+module OutlineRadiusTopleft = BorderRadius
+module OutlineRadiusTopright = BorderRadius
+module OverflowScrolling = Overflow
+
+module StackSizing = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module TextBlink = struct
+  type t =
+    [ `none
+    | `blink
+    | `blinkAnywhere
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `blink -> {js|blink|js}
+    | `blinkAnywhere -> {js|blink-anywhere|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module TextSecurity = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module TextStroke = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module TouchCallout = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module UserDrag = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module UserFocus = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module UserInput = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module UserModify = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module WindowDragging = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module WindowShadow = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module MozAppearance = Appearance
+module MozBackgroundClip = BackgroundClip
+module MozBinding = Binding
+module MozBorderBottomColors = BorderBottomColors
+module MozBorderLeftColors = BorderLeftColors
+module MozBorderRadiusBottomleft = BorderRadiusBottomleft
+module MozBorderRadiusBottomright = BorderRadiusBottomright
+module MozBorderRadiusTopleft = BorderRadiusTopleft
+module MozBorderRadiusTopright = BorderRadiusTopright
+module MozBorderRightColors = BorderRightColors
+module MozBorderTopColors = BorderTopColors
+module MozContextProperties = ContextProperties
+module MozFloatEdge = FloatEdge
+module MozForceBrokenImageIcon = ForceBrokenImageIcon
+module MozImageRegion = ImageRegion
+module MozOrient = Orient
+module MozOsxFontSmoothing = OsxFontSmoothing
+module MozOutlineRadius = OutlineRadius
+module MozOutlineRadiusBottomleft = OutlineRadiusBottomleft
+module MozOutlineRadiusTopleft = OutlineRadiusTopleft
+module MozOutlineRadiusTopright = OutlineRadiusTopright
+module MozStackSizing = StackSizing
+module MozTextBlink = TextBlink
+module MozUserFocus = UserFocus
+module MozUserInput = UserInput
+module MozUserModify = UserModify
+module MozUserSelect = UserSelect
+module MozWindowDragging = WindowDragging
+module MozWindowShadow = WindowShadow
+module NavDown = ZIndex
+module NavLeft = ZIndex
+module NavRight = ZIndex
+module NavUp = ZIndex
+
+module Offset = struct
+  (* MDN syntax: [ <'offset-position'>? [ <'offset-path'> [ <'offset-distance'> || \ <'offset-rotate'> ]? ]? ]? [ '/' <'offset-anchor'> ]? *)
+  type t =
+    [ `offsetPosition
+    | `offsetPath
+    | `offsetDistance
+    | `offsetRotate
+    | `offsetAnchor
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `offsetPosition -> {js|offset-position|js}
+    | `offsetPath -> {js|offset-path|js}
+    | `offsetDistance -> {js|offset-distance|js}
+    | `offsetRotate -> {js|offset-rotate|js}
+    | `offsetAnchor -> {js|offset-anchor|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module OffsetPath = struct
+  (* MDN syntax: 'none' | ray( <extended-angle> && [ <ray-size> ]? && [ 'contain' ]? ) | \ <path()> | <url> | <basic-shape> || <geometry-box> *)
+  type t =
+    [ `none
+    | `contain
+    | `value of string
+    | Angle.t
+    | Url.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `contain -> {js|contain|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Angle.t as x -> Angle.toString x
+    | #Url.t as x -> Url.toString x
+end
+
+module OffsetPosition = OffsetAnchor
+
+module OffsetRotate = struct
+  (* MDN syntax: [ 'auto' | 'reverse' ] || <extended-angle> *)
+  type t =
+    [ `auto
+    | `reverse
+    | `value of string
+    | Angle.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `reverse -> {js|reverse|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Angle.t as x -> Angle.toString x
+end
+
+module Orphans = Order
+
+module Outline = struct
+  (* MDN syntax: 'none' | <'outline-width'> | [ <'outline-width'> <'outline-style'> ] | [ \ <'outline-width'> <'outline-style'> [ <color> | <interpolation> ]] *)
+  type t =
+    [ `none
+    | `outlineWidth
+    | `outlineStyle
+    | `value of string
+    | Color.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `outlineWidth -> {js|outline-width|js}
+    | `outlineStyle -> {js|outline-style|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Color.t as x -> Color.toString x
+end
+
+module Overlay = OverflowAnchor
+module OverscrollBehaviorBlock = OverscrollBehavior
+module OverscrollBehaviorInline = OverscrollBehavior
+module OverscrollBehaviorX = OverscrollBehavior
+module OverscrollBehaviorY = OverscrollBehavior
+
+module PaintOrder = struct
+  (* MDN syntax: 'normal' | 'fill' || 'stroke' || 'markers' *)
+  type t =
+    [ `normal
+    | `fill
+    | `stroke
+    | `markers
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `fill -> {js|fill|js}
+    | `stroke -> {js|stroke|js}
+    | `markers -> {js|markers|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module Page = struct
+  (* MDN syntax: 'auto' | <custom-ident> *)
+  type t =
+    [ `auto
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module PageBreakAfter = BreakAfter
+module PageBreakBefore = BreakBefore
+module PageBreakInside = BreakInside
+
+module Pause = struct
+  (* MDN syntax: <'pause-before'> [ <'pause-after'> ]? *)
+  type t =
+    [ `pauseBefore
+    | `pauseAfter
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `pauseBefore -> {js|pause-before|js}
+    | `pauseAfter -> {js|pause-after|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module PauseAfter = struct
+  type t =
+    [ `none
+    | `xWeak
+    | `weak
+    | `medium
+    | `strong
+    | `xStrong
+    | Time.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `xWeak -> {js|x-weak|js}
+    | `weak -> {js|weak|js}
+    | `medium -> {js|medium|js}
+    | `strong -> {js|strong|js}
+    | `xStrong -> {js|x-strong|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Time.t as x -> Time.toString x
+end
+
+module PauseBefore = struct
+  type t =
+    [ `none
+    | `xWeak
+    | `weak
+    | `medium
+    | `strong
+    | `xStrong
+    | Time.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `xWeak -> {js|x-weak|js}
+    | `weak -> {js|weak|js}
+    | `medium -> {js|medium|js}
+    | `strong -> {js|strong|js}
+    | `xStrong -> {js|x-strong|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Time.t as x -> Time.toString x
+end
+
+module PlaceContent = struct
+  (* MDN syntax: <'align-content'> [ <'justify-content'> ]? *)
+  type t =
+    [ `alignContent
+    | `justifyContent
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `alignContent -> {js|align-content|js}
+    | `justifyContent -> {js|justify-content|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module PlaceItems = struct
+  (* MDN syntax: <'align-items'> [ <'justify-items'> ]? *)
+  type t =
+    [ `alignItems
+    | `justifyItems
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `alignItems -> {js|align-items|js}
+    | `justifyItems -> {js|justify-items|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module PlaceSelf = AlignSelf
+
+module PositionAnchor = struct
+  (* MDN syntax: 'auto' | <dashed-ident> *)
+  type t =
+    [ `auto
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module PositionArea = struct
+  (* MDN syntax: 'none' | [ 'top' | 'bottom' | 'left' | 'right' | 'center' | 'self-start' | \ 'self-end' | 'start' | 'end' ] *)
+  type t =
+    [ `none
+    | `top
+    | `bottom
+    | `left
+    | `right
+    | `center
+    | `selfStart
+    | `selfEnd
+    | `start
+    | `end_
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `top -> {js|top|js}
+    | `bottom -> {js|bottom|js}
+    | `left -> {js|left|js}
+    | `right -> {js|right|js}
+    | `center -> {js|center|js}
+    | `selfStart -> {js|self-start|js}
+    | `selfEnd -> {js|self-end|js}
+    | `start -> {js|start|js}
+    | `end_ -> {js|end|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module PositionTry = struct
+  (* MDN syntax: 'none' | [ <dashed-ident> | <try-tactic> ]# *)
+  type t =
+    [ `none
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module PositionTryFallbacks = struct
+  (* MDN syntax: 'none' | [ <dashed-ident> | <try-tactic> ]# *)
+  type t =
+    [ `none
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module PositionTryOptions = struct
+  (* MDN syntax: 'none' | [ 'flip-block' || 'flip-inline' || 'flip-start' ] *)
+  type t =
+    [ `none
+    | `flipBlock
+    | `flipInline
+    | `flipStart
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `flipBlock -> {js|flip-block|js}
+    | `flipInline -> {js|flip-inline|js}
+    | `flipStart -> {js|flip-start|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module PositionVisibility = struct
+  type t =
+    [ `always
+    | `anchorsValid
+    | `anchorsVisible
+    | `noOverflow
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `always -> {js|always|js}
+    | `anchorsValid -> {js|anchors-valid|js}
+    | `anchorsVisible -> {js|anchors-visible|js}
+    | `noOverflow -> {js|no-overflow|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module PrintColorAdjust = struct
+  type t =
+    [ `economy
+    | `exact
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `economy -> {js|economy|js}
+    | `exact -> {js|exact|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module Quotes = struct
+  (* MDN syntax: 'none' | 'auto' | [ <string> <string> ]+ *)
+  type t =
+    [ `none
+    | `auto
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `auto -> {js|auto|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ReadingFlow = struct
+  type t =
+    [ `normal
+    | `flexVisual
+    | `flexFlow
+    | `gridRows
+    | `gridColumns
+    | `gridOrder
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `flexVisual -> {js|flex-visual|js}
+    | `flexFlow -> {js|flex-flow|js}
+    | `gridRows -> {js|grid-rows|js}
+    | `gridColumns -> {js|grid-columns|js}
+    | `gridOrder -> {js|grid-order|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module Rest = struct
+  (* MDN syntax: <'rest-before'> [ <'rest-after'> ]? *)
+  type t =
+    [ `restBefore
+    | `restAfter
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `restBefore -> {js|rest-before|js}
+    | `restAfter -> {js|rest-after|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module RestAfter = struct
+  type t =
+    [ `none
+    | `xWeak
+    | `weak
+    | `medium
+    | `strong
+    | `xStrong
+    | Time.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `xWeak -> {js|x-weak|js}
+    | `weak -> {js|weak|js}
+    | `medium -> {js|medium|js}
+    | `strong -> {js|strong|js}
+    | `xStrong -> {js|x-strong|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Time.t as x -> Time.toString x
+end
+
+module RestBefore = struct
+  type t =
+    [ `none
+    | `xWeak
+    | `weak
+    | `medium
+    | `strong
+    | `xStrong
+    | Time.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `xWeak -> {js|x-weak|js}
+    | `weak -> {js|weak|js}
+    | `medium -> {js|medium|js}
+    | `strong -> {js|strong|js}
+    | `xStrong -> {js|x-strong|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Time.t as x -> Time.toString x
+end
+
+module RubyAlign = AlignContent
+
+module RubyMerge = struct
+  type t =
+    [ `separate
+    | `collapse
+    | `auto
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `separate -> {js|separate|js}
+    | `collapse -> {js|collapse|js}
+    | `auto -> {js|auto|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module RubyOverhang = Appearance
+
+module RubyPosition = struct
+  type t =
+    [ `over
+    | `under
+    | `interCharacter
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `over -> {js|over|js}
+    | `under -> {js|under|js}
+    | `interCharacter -> {js|inter-character|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ScrollMargin = Length
+
+module ScrollMarkerGroup = struct
+  type t =
+    [ `none
+    | `before
+    | `after
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `before -> {js|before|js}
+    | `after -> {js|after|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ScrollPadding = Margin
+
+module ScrollSnapAlign = struct
+  (* MDN syntax: [ 'none' | 'start' | 'end' | 'center' ]{1,2} *)
+  type t =
+    [ `none
+    | `start
+    | `end_
+    | `center
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `start -> {js|start|js}
+    | `end_ -> {js|end|js}
+    | `center -> {js|center|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ScrollSnapCoordinate = struct
+  (* MDN syntax: 'none' | [ <position> ]# *)
+  type t =
+    [ `none
+    | `value of string
+    | Position.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Position.t as x -> Position.toString x
+end
+
+module ScrollSnapDestination = Position
+
+module ScrollSnapPointsX = struct
+  (* MDN syntax: 'none' | repeat( <extended-length> | <extended-percentage> ) | snapInterval( <length-percentage> , <length-percentage> ) | snapList( [ \ <length-percentage> ]# ) *)
+  type t =
+    [ `none
+    | `value of string
+    | Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Length.t as x -> Length.toString x
+end
+
+module ScrollSnapPointsY = struct
+  (* MDN syntax: 'none' | repeat( <extended-length> | <extended-percentage> ) | snapInterval( <length-percentage> , <length-percentage> ) | snapList( [ \ <length-percentage> ]# ) *)
+  type t =
+    [ `none
+    | `value of string
+    | Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Length.t as x -> Length.toString x
+end
+
+module ScrollSnapStop = struct
+  type t =
+    [ `normal
+    | `always
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `always -> {js|always|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ScrollSnapType = struct
+  (* MDN syntax: 'none' | [ 'x' | 'y' | 'block' | 'inline' | 'both' ] [ 'mandatory' | \ 'proximity' ]? *)
+  type t =
+    [ `none
+    | `x
+    | `y
+    | `block
+    | `inline
+    | `both
+    | `mandatory
+    | `proximity
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `x -> {js|x|js}
+    | `y -> {js|y|js}
+    | `block -> {js|block|js}
+    | `inline -> {js|inline|js}
+    | `both -> {js|both|js}
+    | `mandatory -> {js|mandatory|js}
+    | `proximity -> {js|proximity|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ScrollStart = struct
+  type t =
+    [ `auto
+    | `start
+    | `end_
+    | `center
+    | `top
+    | `bottom
+    | `left
+    | `right
+    | Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `start -> {js|start|js}
+    | `end_ -> {js|end|js}
+    | `center -> {js|center|js}
+    | `top -> {js|top|js}
+    | `bottom -> {js|bottom|js}
+    | `left -> {js|left|js}
+    | `right -> {js|right|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Length.t as x -> Length.toString x
+end
+
+module ScrollStartBlock = struct
+  type t =
+    [ `auto
+    | `start
+    | `end_
+    | `center
+    | Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `start -> {js|start|js}
+    | `end_ -> {js|end|js}
+    | `center -> {js|center|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Length.t as x -> Length.toString x
+end
+
+module ScrollStartInline = struct
+  type t =
+    [ `auto
+    | `start
+    | `end_
+    | `center
+    | Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `start -> {js|start|js}
+    | `end_ -> {js|end|js}
+    | `center -> {js|center|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Length.t as x -> Length.toString x
+end
+
+module ScrollStartTarget = Appearance
+module ScrollStartTargetBlock = Appearance
+module ScrollStartTargetInline = Appearance
+module ScrollStartTargetX = Appearance
+module ScrollStartTargetY = Appearance
+
+module ScrollStartX = struct
+  type t =
+    [ `auto
+    | `start
+    | `end_
+    | `center
+    | Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `start -> {js|start|js}
+    | `end_ -> {js|end|js}
+    | `center -> {js|center|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Length.t as x -> Length.toString x
+end
+
+module ScrollStartY = struct
+  type t =
+    [ `auto
+    | `start
+    | `end_
+    | `center
+    | Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `start -> {js|start|js}
+    | `end_ -> {js|end|js}
+    | `center -> {js|center|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Length.t as x -> Length.toString x
+end
+
+module ScrollTimeline = struct
+  (* MDN syntax: [ 'none' | <custom-ident> ]# [ 'block' | 'inline' | 'x' | 'y' ]# *)
+  type t =
+    [ `none
+    | `block
+    | `inline
+    | `x
+    | `y
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `block -> {js|block|js}
+    | `inline -> {js|inline|js}
+    | `x -> {js|x|js}
+    | `y -> {js|y|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ScrollTimelineAxis = struct
+  (* MDN syntax: [ 'block' | 'inline' | 'x' | 'y' ]# *)
+  type t =
+    [ `block
+    | `inline
+    | `x
+    | `y
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `block -> {js|block|js}
+    | `inline -> {js|inline|js}
+    | `x -> {js|x|js}
+    | `y -> {js|y|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ScrollTimelineName = AnimationName
+module ScrollbarColorLegacy = Color
+module ShapeImageThreshold = Opacity
+module ShapeMargin = Length
+
+module ShapeOutside = struct
+  (* MDN syntax: 'none' | <shape-box> || <basic-shape> | <image> *)
+  type t =
+    [ `none
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ShapeRendering = struct
+  type t =
+    [ `auto
+    | `optimizeSpeed
+    | `crispEdges
+    | `geometricPrecision
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `optimizeSpeed -> {js|optimizeSpeed|js}
+    | `crispEdges -> {js|crispEdges|js}
+    | `geometricPrecision -> {js|geometricPrecision|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module Size = struct
+  (* MDN syntax: <extended-length>{1,2} | 'auto' | [ 'A5' | 'A4' | 'A3' | 'B5' | 'B4' | \ 'JIS-B5' | 'JIS-B4' | 'letter' | 'legal' | 'ledger' ] [ 'portrait' | \ 'landscape' ]? *)
+  type t =
+    [ `auto
+    | `A5
+    | `A4
+    | `A3
+    | `B5
+    | `B4
+    | `JISB5
+    | `JISB4
+    | `letter
+    | `legal
+    | `ledger
+    | `portrait
+    | `landscape
+    | `value of string
+    | Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `A5 -> {js|A5|js}
+    | `A4 -> {js|A4|js}
+    | `A3 -> {js|A3|js}
+    | `B5 -> {js|B5|js}
+    | `B4 -> {js|B4|js}
+    | `JISB5 -> {js|JIS-B5|js}
+    | `JISB4 -> {js|JIS-B4|js}
+    | `letter -> {js|letter|js}
+    | `legal -> {js|legal|js}
+    | `ledger -> {js|ledger|js}
+    | `portrait -> {js|portrait|js}
+    | `landscape -> {js|landscape|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Length.t as x -> Length.toString x
+end
+
+module Speak = FontKerning
+
+module SpeakAs = struct
+  (* MDN syntax: 'normal' | 'spell-out' || 'digits' || [ 'literal-punctuation' | \ 'no-punctuation' ] *)
+  type t =
+    [ `normal
+    | `spellOut
+    | `digits
+    | `literalPunctuation
+    | `noPunctuation
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `spellOut -> {js|spell-out|js}
+    | `digits -> {js|digits|js}
+    | `literalPunctuation -> {js|literal-punctuation|js}
+    | `noPunctuation -> {js|no-punctuation|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module Src = struct
+  type t =
+    [ `value of string
+    | Url.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Url.t as x -> Url.toString x
+end
+
+module StrokeDashoffset = TabSize
+
+module StrokeLinecap = struct
+  type t =
+    [ `butt
+    | `round
+    | `square
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `butt -> {js|butt|js}
+    | `round -> {js|round|js}
+    | `square -> {js|square|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module StrokeLinejoin = struct
+  type t =
+    [ `miter
+    | `round
+    | `bevel
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `miter -> {js|miter|js}
+    | `round -> {js|round|js}
+    | `bevel -> {js|bevel|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module StrokeMiterlimit = FlexGrow
+module StrokeOpacity = AlphaValue
+module StrokeWidth = TabSize
+module Syntax = AnimationName
+
+module TextAnchor = struct
+  type t =
+    [ `start
+    | `middle
+    | `end_
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `start -> {js|start|js}
+    | `middle -> {js|middle|js}
+    | `end_ -> {js|end|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module TextAutospace = struct
+  type t =
+    [ `none
+    | `ideographAlpha
+    | `ideographNumeric
+    | `ideographParenthesis
+    | `ideographSpace
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `ideographAlpha -> {js|ideograph-alpha|js}
+    | `ideographNumeric -> {js|ideograph-numeric|js}
+    | `ideographParenthesis -> {js|ideograph-parenthesis|js}
+    | `ideographSpace -> {js|ideograph-space|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module TextBoxEdge = struct
+  type t =
+    [ `leading
+    | `text
+    | `cap
+    | `ex
+    | `alphabetic
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `leading -> {js|leading|js}
+    | `text -> {js|text|js}
+    | `cap -> {js|cap|js}
+    | `ex -> {js|ex|js}
+    | `alphabetic -> {js|alphabetic|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module TextBoxTrim = struct
+  type t =
+    [ `none
+    | `trimStart
+    | `trimEnd
+    | `trimBoth
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `trimStart -> {js|trim-start|js}
+    | `trimEnd -> {js|trim-end|js}
+    | `trimBoth -> {js|trim-both|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module TextCombineUpright = struct
+  (* MDN syntax: 'none' | 'all' | 'digits' [ <integer> ]? *)
+  type t =
+    [ `none
+    | `all
+    | `digits
+    | `int of int
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `all -> {js|all|js}
+    | `digits -> {js|digits|js}
+    | `int x -> Kloth.Int.to_string x
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module TextDecorationSkip = struct
+  (* MDN syntax: 'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' ] \ || 'edges' || 'box-decoration' *)
+  type t =
+    [ `none
+    | `objects
+    | `spaces
+    | `leadingSpaces
+    | `trailingSpaces
+    | `edges
+    | `boxDecoration
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `objects -> {js|objects|js}
+    | `spaces -> {js|spaces|js}
+    | `leadingSpaces -> {js|leading-spaces|js}
+    | `trailingSpaces -> {js|trailing-spaces|js}
+    | `edges -> {js|edges|js}
+    | `boxDecoration -> {js|box-decoration|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module TextDecorationSkipSelf = struct
+  (* MDN syntax: 'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' ] \ || 'edges' || 'box-decoration' *)
+  type t =
+    [ `none
+    | `objects
+    | `spaces
+    | `leadingSpaces
+    | `trailingSpaces
+    | `edges
+    | `boxDecoration
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `objects -> {js|objects|js}
+    | `spaces -> {js|spaces|js}
+    | `leadingSpaces -> {js|leading-spaces|js}
+    | `trailingSpaces -> {js|trailing-spaces|js}
+    | `edges -> {js|edges|js}
+    | `boxDecoration -> {js|box-decoration|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module TextDecorationSkipSpaces = struct
+  (* MDN syntax: 'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' ] \ || 'edges' || 'box-decoration' *)
+  type t =
+    [ `none
+    | `objects
+    | `spaces
+    | `leadingSpaces
+    | `trailingSpaces
+    | `edges
+    | `boxDecoration
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `objects -> {js|objects|js}
+    | `spaces -> {js|spaces|js}
+    | `leadingSpaces -> {js|leading-spaces|js}
+    | `trailingSpaces -> {js|trailing-spaces|js}
+    | `edges -> {js|edges|js}
+    | `boxDecoration -> {js|box-decoration|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module TextEdge = struct
+  (* MDN syntax: [ 'leading' | <'text-box-edge'> ]{1,2} *)
+  type t =
+    [ `leading
+    | `textBoxEdge
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `leading -> {js|leading|js}
+    | `textBoxEdge -> {js|text-box-edge|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module TextEmphasis = struct
+  (* MDN syntax: <'text-emphasis-style'> || <'text-emphasis-color'> *)
+  type t =
+    [ `textEmphasisStyle
+    | `textEmphasisColor
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `textEmphasisStyle -> {js|text-emphasis-style|js}
+    | `textEmphasisColor -> {js|text-emphasis-color|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module TextIndent = struct
+  (* MDN syntax: [<extended-length> | <extended-percentage>] && [ 'hanging' ]? && [ \ 'each-line' ]? *)
+  type t =
+    [ `hanging
+    | `eachLine
+    | `value of string
+    | Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `hanging -> {js|hanging|js}
+    | `eachLine -> {js|each-line|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Length.t as x -> Length.toString x
+end
+
+module TextJustifyTrim = TextDecorationSkipInk
+module TextKashida = Resize
+
+module TextKashidaSpace = struct
+  type t =
+    [ `normal
+    | `pre
+    | `post
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `pre -> {js|pre|js}
+    | `post -> {js|post|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module TextOrientation = struct
+  type t =
+    [ `mixed
+    | `upright
+    | `sideways
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `mixed -> {js|mixed|js}
+    | `upright -> {js|upright|js}
+    | `sideways -> {js|sideways|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module TextRendering = struct
+  type t =
+    [ `auto
+    | `optimizeSpeed
+    | `optimizeLegibility
+    | `geometricPrecision
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `optimizeSpeed -> {js|optimizeSpeed|js}
+    | `optimizeLegibility -> {js|optimizeLegibility|js}
+    | `geometricPrecision -> {js|geometricPrecision|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module TextSizeAdjust = struct
+  type t =
+    [ `none
+    | `auto
+    | Percentage.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `auto -> {js|auto|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Percentage.t as x -> Percentage.toString x
+end
+
+module TextSpacingTrim = struct
+  type t =
+    [ `normal
+    | `spaceAll
+    | `spaceFirst
+    | `trimStart
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `spaceAll -> {js|space-all|js}
+    | `spaceFirst -> {js|space-first|js}
+    | `trimStart -> {js|trim-start|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module TextUnderlineOffset = InsetBlock
+
+module TextUnderlinePosition = struct
+  (* MDN syntax: 'auto' | 'from-font' | 'under' || [ 'left' | 'right' ] *)
+  type t =
+    [ `auto
+    | `fromFont
+    | `under
+    | `left
+    | `right
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `fromFont -> {js|from-font|js}
+    | `under -> {js|under|js}
+    | `left -> {js|left|js}
+    | `right -> {js|right|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module TextWrap = struct
+  type t =
+    [ `wrap
+    | `nowrap
+    | `balance
+    | `stable
+    | `pretty
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `wrap -> {js|wrap|js}
+    | `nowrap -> {js|nowrap|js}
+    | `balance -> {js|balance|js}
+    | `stable -> {js|stable|js}
+    | `pretty -> {js|pretty|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module TextWrapMode = FlexWrap
+
+module TextWrapStyle = struct
+  type t =
+    [ `auto
+    | `balance
+    | `stable
+    | `pretty
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `balance -> {js|balance|js}
+    | `stable -> {js|stable|js}
+    | `pretty -> {js|pretty|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module TimelineScope = struct
+  (* MDN syntax: [ 'none' | <custom-ident> | <dashed-ident> ]# *)
+  type t =
+    [ `none
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module UnicodeBidi = struct
+  type t =
+    [ `normal
+    | `embed
+    | `isolate
+    | `bidiOverride
+    | `isolateOverride
+    | `plaintext
+    | `_mozIsolate
+    | `_mozIsolateOverride
+    | `_mozPlaintext
+    | `_webkitIsolate
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `embed -> {js|embed|js}
+    | `isolate -> {js|isolate|js}
+    | `bidiOverride -> {js|bidi-override|js}
+    | `isolateOverride -> {js|isolate-override|js}
+    | `plaintext -> {js|plaintext|js}
+    | `_mozIsolate -> {js|-moz-isolate|js}
+    | `_mozIsolateOverride -> {js|-moz-isolate-override|js}
+    | `_mozPlaintext -> {js|-moz-plaintext|js}
+    | `_webkitIsolate -> {js|-webkit-isolate|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module UnicodeRange = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module VectorEffect = struct
+  type t =
+    [ `none
+    | `nonScalingStroke
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `nonScalingStroke -> {js|non-scaling-stroke|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ViewTimeline = struct
+  (* MDN syntax: [ 'none' | <custom-ident> ]# [ 'block' | 'inline' | 'x' | 'y' ]# *)
+  type t =
+    [ `none
+    | `block
+    | `inline
+    | `x
+    | `y
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `block -> {js|block|js}
+    | `inline -> {js|inline|js}
+    | `x -> {js|x|js}
+    | `y -> {js|y|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ViewTimelineAxis = struct
+  (* MDN syntax: [ 'block' | 'inline' | 'x' | 'y' ]# *)
+  type t =
+    [ `block
+    | `inline
+    | `x
+    | `y
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `block -> {js|block|js}
+    | `inline -> {js|inline|js}
+    | `x -> {js|x|js}
+    | `y -> {js|y|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ViewTimelineInset = Margin
+module ViewTimelineName = AnimationName
+module ViewTransitionName = AnimationName
+
+module VoiceBalance = struct
+  type t =
+    [ `left
+    | `center
+    | `right
+    | `leftwards
+    | `rightwards
+    | `num of float
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `left -> {js|left|js}
+    | `center -> {js|center|js}
+    | `right -> {js|right|js}
+    | `leftwards -> {js|leftwards|js}
+    | `rightwards -> {js|rightwards|js}
+    | `num x -> Kloth.Float.to_string x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module VoiceDuration = struct
+  type t =
+    [ `auto
+    | Time.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Time.t as x -> Time.toString x
+end
+
+module VoiceFamily = struct
+  (* MDN syntax: [ [ <family-name> | <generic-voice> ] ',' ]* [ <family-name> | \ <generic-voice> ] | 'preserve' *)
+  type t =
+    [ `preserve
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `preserve -> {js|preserve|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module VoicePitch = struct
+  (* MDN syntax: <extended-frequency> && 'absolute' | [ 'x-low' | 'low' | 'medium' | 'high' \ | 'x-high' ] || [ <extended-frequency> | <semitones> | \ <extended-percentage> ] *)
+  type t =
+    [ `absolute
+    | `xLow
+    | `low
+    | `medium
+    | `high
+    | `xHigh
+    | `value of string
+    | Percentage.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `absolute -> {js|absolute|js}
+    | `xLow -> {js|x-low|js}
+    | `low -> {js|low|js}
+    | `medium -> {js|medium|js}
+    | `high -> {js|high|js}
+    | `xHigh -> {js|x-high|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Percentage.t as x -> Percentage.toString x
+end
+
+module VoiceRange = struct
+  (* MDN syntax: <extended-frequency> && 'absolute' | [ 'x-low' | 'low' | 'medium' | 'high' \ | 'x-high' ] || [ <extended-frequency> | <semitones> | \ <extended-percentage> ] *)
+  type t =
+    [ `absolute
+    | `xLow
+    | `low
+    | `medium
+    | `high
+    | `xHigh
+    | `value of string
+    | Percentage.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `absolute -> {js|absolute|js}
+    | `xLow -> {js|x-low|js}
+    | `low -> {js|low|js}
+    | `medium -> {js|medium|js}
+    | `high -> {js|high|js}
+    | `xHigh -> {js|x-high|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Percentage.t as x -> Percentage.toString x
+end
+
+module VoiceRate = struct
+  (* MDN syntax: [ 'normal' | 'x-slow' | 'slow' | 'medium' | 'fast' | 'x-fast' ] || \ <extended-percentage> *)
+  type t =
+    [ `normal
+    | `xSlow
+    | `slow
+    | `medium
+    | `fast
+    | `xFast
+    | `value of string
+    | Percentage.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `xSlow -> {js|x-slow|js}
+    | `slow -> {js|slow|js}
+    | `medium -> {js|medium|js}
+    | `fast -> {js|fast|js}
+    | `xFast -> {js|x-fast|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Percentage.t as x -> Percentage.toString x
+end
+
+module VoiceStress = struct
+  type t =
+    [ `normal
+    | `strong
+    | `moderate
+    | `none
+    | `reduced
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `strong -> {js|strong|js}
+    | `moderate -> {js|moderate|js}
+    | `none -> {js|none|js}
+    | `reduced -> {js|reduced|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module VoiceVolume = struct
+  (* MDN syntax: 'silent' | [ 'x-soft' | 'soft' | 'medium' | 'loud' | 'x-loud' ] || <decibel> *)
+  type t =
+    [ `silent
+    | `xSoft
+    | `soft
+    | `medium
+    | `loud
+    | `xLoud
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `silent -> {js|silent|js}
+    | `xSoft -> {js|x-soft|js}
+    | `soft -> {js|soft|js}
+    | `medium -> {js|medium|js}
+    | `loud -> {js|loud|js}
+    | `xLoud -> {js|x-loud|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module WebkitAppearance = Appearance
+module WebkitBackgroundClip = BackgroundClip
+module WebkitBorderBefore = BorderBefore
+module WebkitBorderBeforeColor = BorderBeforeColor
+module WebkitBorderBeforeStyle = BorderBeforeStyle
+module WebkitBorderBeforeWidth = BorderBeforeWidth
+module WebkitBoxReflect = BoxReflect
+module WebkitColumnBreakAfter = ColumnBreakAfter
+module WebkitColumnBreakBefore = ColumnBreakBefore
+module WebkitColumnBreakInside = ColumnBreakInside
+module WebkitFontSmoothing = FontSmoothing
+module WebkitLineClamp = LineClamp
+module WebkitMask = Mask
+module WebkitMaskAttachment = MaskAttachment
+module WebkitMaskBoxImage = MaskBoxImage
+module WebkitMaskClip = MaskClip
+module WebkitMaskComposite = MaskComposite
+module WebkitMaskImage = MaskImage
+module WebkitMaskOrigin = MaskOrigin
+module WebkitMaskPosition = MaskPosition
+module WebkitMaskPositionX = MaskPositionX
+module WebkitMaskPositionY = MaskPositionY
+module WebkitMaskRepeat = MaskRepeat
+module WebkitMaskRepeatX = MaskRepeatX
+module WebkitMaskRepeatY = MaskRepeatY
+module WebkitMaskSize = MaskSize
+module WebkitOverflowScrolling = OverflowScrolling
+module WebkitPrintColorAdjust = PrintColorAdjust
+module WebkitTextSecurity = TextSecurity
+module WebkitTextStroke = TextStroke
+module WebkitTouchCallout = TouchCallout
+module WebkitUserDrag = UserDrag
+module WebkitUserModify = UserModify
+module WebkitUserSelect = UserSelect
+
+module WhiteSpaceCollapse = struct
+  type t =
+    [ `collapse
+    | `preserve
+    | `preserveBreaks
+    | `preserveSpaces
+    | `breakSpaces
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `collapse -> {js|collapse|js}
+    | `preserve -> {js|preserve|js}
+    | `preserveBreaks -> {js|preserve-breaks|js}
+    | `preserveSpaces -> {js|preserve-spaces|js}
+    | `breakSpaces -> {js|break-spaces|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module Widows = Order
+
+module WillChange = struct
+  (* MDN syntax: 'auto' | [ <animateable-feature> ]# *)
+  type t =
+    [ `auto
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module WordSpaceTransform = struct
+  type t =
+    [ `none
+    | `auto
+    | `ideographAlpha
+    | `ideographNumeric
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `auto -> {js|auto|js}
+    | `ideographAlpha -> {js|ideograph-alpha|js}
+    | `ideographNumeric -> {js|ideograph-numeric|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module WordWrap = OverflowWrap
+
+module WritingMode = struct
+  type t =
+    [ `horizontalTb
+    | `verticalRl
+    | `verticalLr
+    | `sidewaysRl
+    | `sidewaysLr
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `horizontalTb -> {js|horizontal-tb|js}
+    | `verticalRl -> {js|vertical-rl|js}
+    | `verticalLr -> {js|vertical-lr|js}
+    | `sidewaysRl -> {js|sideways-rl|js}
+    | `sidewaysLr -> {js|sideways-lr|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module Zoom = struct
+  type t =
+    [ `normal
+    | `reset
+    | `num of float
+    | Percentage.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `reset -> {js|reset|js}
+    | `num x -> Kloth.Float.to_string x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Percentage.t as x -> Percentage.toString x
 end

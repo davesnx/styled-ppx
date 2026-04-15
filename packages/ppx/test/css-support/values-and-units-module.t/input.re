@@ -16,3 +16,16 @@ CSS.padding(`vw(5.));
 CSS.padding(`vh(5.));
 CSS.padding(`vmin(5.));
 CSS.padding(`vmax(5.));
+
+/* Missing length units via [%css ...] */
+[%css {|width: 1cap|}];
+[%css {|width: 1ic|}];
+[%css {|width: 1lh|}];
+[%css {|width: 1rcap|}];
+[%css {|width: 1rch|}];
+[%css {|width: 1rex|}];
+[%css {|width: 1ric|}];
+[%css {|width: 1rlh|}];
+[%css {|width: 50vb|}];
+[%css {|width: 50vi|}];
+[%css {|width: 40Q|}];

@@ -3,8 +3,6 @@ open Styled_ppx_css_parser.Ast;
 module Helper = Ppxlib.Ast_helper;
 module Builder = Ppxlib.Ast_builder.Default;
 
-exception Empty_buffer(string);
-
 module CSS = {
   /* This is the public API of the CSS module */
   let ident = (~loc, name) =>
@@ -46,18 +44,25 @@ let render_variable = (~loc, v) => {
   };
 };
 
-let source_code_of_loc = (loc: Ppxlib.Location.t) => {
-  let { loc_start, loc_end, _ } = loc;
-  switch (Styled_ppx_css_parser.Driver.last_buffer^) {
-  | Some(buffer: Sedlexing.lexbuf) =>
-    /* TODO: pos_offset is hardcoded to 0, unsure about the effects */
-    let pos_offset = 0;
-    let loc_start = loc_start.pos_cnum - pos_offset;
-    let loc_end = loc_end.pos_cnum - pos_offset;
-    Sedlexing.Latin1.sub_lexeme(buffer, loc_start, loc_end - loc_start);
-  | None => raise(Empty_buffer("last buffer not set"))
+let source_code_of_loc = (~source, loc: Ppxlib.Location.t) => {
+  let utf8_byte_offset = (source, target_chars) => {
+    let rec loop = (byte_index, char_index) =>
+      if (char_index >= target_chars || byte_index >= String.length(source)) {
+        byte_index;
+      } else {
+        let decoded = String.get_utf_8_uchar(source, byte_index);
+        let width = Uchar.utf_decode_length(decoded);
+        width <= 0 ? byte_index : loop(byte_index + width, char_index + 1);
+      };
+    loop(0, 0);
   };
+
+  let { loc_start, loc_end, _ } = loc;
+  let start_offset = utf8_byte_offset(source, loc_start.pos_cnum);
+  let end_offset = utf8_byte_offset(source, loc_end.pos_cnum);
+  String.sub(source, start_offset, end_offset - start_offset);
 };
+
 let concat = (~loc, expr, acc) => {
   let concat_fn =
     {
@@ -68,7 +73,7 @@ let concat = (~loc, expr, acc) => {
   Helper.Exp.apply(~loc, concat_fn, [(Nolabel, expr), (Nolabel, acc)]);
 };
 
-let rec render_at_rule = (~loc, at_rule: at_rule) => {
+let rec render_at_rule = (~loc, ~source, at_rule: at_rule) => {
   let (at_rule_name, at_rule_name_loc) = at_rule.name;
   let at_rule_name_loc =
     Styled_ppx_css_parser.Parser_location.update_pos_lnum(
@@ -85,8 +90,8 @@ let rec render_at_rule = (~loc, at_rule: at_rule) => {
       loc,
     );
   switch (at_rule_name) {
-  | "media" => render_media_query(~loc, at_rule)
-  | "container" => render_container_query(~loc, at_rule)
+  | "media" => render_media_query(~loc, ~source, at_rule)
+  | "container" => render_container_query(~loc, ~source, at_rule)
   | "keyframes" =>
     Error.expr(
       ~loc=at_rule_name_loc,
@@ -121,15 +126,14 @@ let rec render_at_rule = (~loc, at_rule: at_rule) => {
   | n => Error.expr(~loc=at_rule_name_loc, Printf.sprintf("Unknown @%s ", n))
   };
 }
-and render_media_query = (~loc, at_rule: at_rule) => {
-  let (_, at_rule_prelude_loc) = at_rule.prelude;
+and render_media_query = (~loc, ~source, at_rule: at_rule) => {
+  let (prelude_values, at_rule_prelude_loc) = at_rule.prelude;
   let parse_condition = {
-    let prelude = source_code_of_loc(at_rule_prelude_loc) |> String.trim;
-    Css_property_parser.Parser.parse(
-      Css_property_parser.Parser.media_query_list,
-      prelude,
-    )
-    |> Result.map(_ => prelude);
+    Css_grammar.type_check(Css_grammar.media_query_list, prelude_values)
+    |> Result.map(_ =>
+         source_code_of_loc(~source, at_rule_prelude_loc) |> String.trim
+       )
+    |> Result.map_error(Css_grammar.Rule.format_error_info);
   };
 
   let (delimiter, attrs) =
@@ -154,10 +158,10 @@ and render_media_query = (~loc, at_rule: at_rule) => {
       switch (at_rule.block) {
       | Empty => Builder.pexp_array(~loc=at_rule.loc, [])
       | Rule_list(declaration) =>
-        render_declarations(~loc, declaration)
+        render_declarations(~loc, ~source, declaration)
         |> Builder.pexp_array(~loc=at_rule.loc)
       | Stylesheet(stylesheet) =>
-        render_declarations(~loc, stylesheet)
+        render_declarations(~loc, ~source, stylesheet)
         |> Builder.pexp_array(~loc=at_rule.loc)
       };
 
@@ -168,15 +172,17 @@ and render_media_query = (~loc, at_rule: at_rule) => {
     );
   };
 }
-and render_container_query = (~loc, at_rule: at_rule) => {
-  let (_, at_rule_prelude_loc) = at_rule.prelude;
+and render_container_query = (~loc, ~source, at_rule: at_rule) => {
+  let (prelude_values, at_rule_prelude_loc) = at_rule.prelude;
   let parse_condition = {
-    let prelude = source_code_of_loc(at_rule_prelude_loc) |> String.trim;
-    Css_property_parser.Parser.parse(
-      Css_property_parser.Parser.container_condition_list,
-      prelude,
+    Css_grammar.type_check(
+      Css_grammar.container_condition_list,
+      prelude_values,
     )
-    |> Result.map(_ => prelude);
+    |> Result.map(_ =>
+         source_code_of_loc(~source, at_rule_prelude_loc) |> String.trim
+       )
+    |> Result.map_error(Css_grammar.Rule.format_error_info);
   };
 
   let (delimiter, attrs) =
@@ -208,10 +214,10 @@ and render_container_query = (~loc, at_rule: at_rule) => {
       switch (at_rule.block) {
       | Empty => Builder.pexp_array(~loc=at_rule.loc, [])
       | Rule_list(declaration) =>
-        render_declarations(~loc, declaration)
+        render_declarations(~loc, ~source, declaration)
         |> Builder.pexp_array(~loc=at_rule.loc)
       | Stylesheet(stylesheet) =>
-        render_declarations(~loc, stylesheet)
+        render_declarations(~loc, ~source, stylesheet)
         |> Builder.pexp_array(~loc=at_rule.loc)
       };
 
@@ -237,12 +243,11 @@ and find_variable_content_loc = (valueList: component_value_list, ~base_loc) => 
     | _ => None;
   find(valueList);
 }
-and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
+and render_declaration = (~loc: Ppxlib.location, ~source, d: declaration) => {
   let (property, name_loc) = d.name;
   let (valueList, value_loc) = d.value;
   let (important, _) = d.important;
-  /* String.trim is a hack, location should be correct and not contain any whitespace */
-  let value_source = source_code_of_loc(value_loc) |> String.trim;
+  let value_source = source_code_of_loc(~source, value_loc) |> String.trim;
 
   let declaration_location =
     Styled_ppx_css_parser.Parser_location.adjust_to_file(
@@ -281,18 +286,25 @@ and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
   switch (
     Property_to_runtime.render(
       ~loc=interpolation_location,
+      ~raw_value_source=value_source,
       property,
-      value_source,
+      valueList,
       important,
     )
   ) {
   | Ok(exprs) => exprs
-  | Error(`Property_not_found) => [
-      Error.expr(
-        ~loc=property_location,
-        "Unknown property '" ++ property ++ "'",
-      ),
-    ]
+  | Error(`Property_not_found) =>
+    let description =
+      switch (Css_grammar.suggest_property_name(property)) {
+      | Some(suggestion) =>
+        "Unknown property '"
+        ++ property
+        ++ "'. Did you mean '"
+        ++ suggestion
+        ++ "'?"
+      | None => "Unknown property '" ++ property ++ "'"
+      };
+    [Error.expr(~loc=property_location, description)];
   | Error(`Impossible_state) => [
       Error.expr(
         ~loc=interpolation_location,
@@ -312,13 +324,15 @@ and render_declaration = (~loc: Ppxlib.location, d: declaration) => {
     ]
   };
 }
-and render_declarations = (~loc: Ppxlib.location, (ds, _d_loc)) => {
+and render_declarations = (~loc: Ppxlib.location, ~source, (ds, _d_loc)) => {
   ds
   |> List.concat_map(declaration =>
        switch (declaration) {
-       | Declaration(decl) => render_declaration(~loc, decl)
-       | At_rule(ar) => [render_at_rule(~loc, ar)]
-       | Style_rule(style_rules) => [render_style_rule(~loc, style_rules)]
+       | Declaration(decl) => render_declaration(~loc, ~source, decl)
+       | At_rule(ar) => [render_at_rule(~loc, ~source, ar)]
+       | Style_rule(style_rules) => [
+           render_style_rule(~loc, ~source, style_rules),
+         ]
        }
      );
 }
@@ -422,16 +436,32 @@ and render_selector = (~loc, selector: selector) => {
     | Selector(selector) => render_selector(~loc, selector)
     };
   }
+  and render_selector_combinator = combinator => {
+    switch ((combinator: selector_combinator)) {
+    | Selector_descendant => " "
+    | Selector_child => " > "
+    | Selector_adjacent_sibling => " + "
+    | Selector_general_sibling => " ~ "
+    };
+  }
+  and render_relative_combinator = combinator => {
+    switch ((combinator: selector_combinator)) {
+    | Selector_descendant => ""
+    | Selector_child => "> "
+    | Selector_adjacent_sibling => "+ "
+    | Selector_general_sibling => "~ "
+    };
+  }
   and render_right_combinator = right => {
     right
     |> List.map(((combinator, selector)) => {
-         Option.fold(~none=" ", ~some=o => " " ++ o ++ " ", combinator)
+         render_selector_combinator(combinator)
          ++ render_selector(~loc, selector)
        })
     |> String.concat("");
   }
   and render_relative_selector = ({ combinator, complex_selector }) => {
-    Option.fold(~none="", ~some=o => o ++ " ", combinator)
+    Option.fold(~none="", ~some=render_relative_combinator, combinator)
     ++ render_complex_selector(complex_selector);
   };
 
@@ -446,13 +476,13 @@ and render_selectors = (~loc, selectors) => {
   selectors
   |> List.map(((selector, _loc)) => render_selector(~loc, selector));
 }
-and render_style_rule = (~loc, rule: style_rule) => {
+and render_style_rule = (~loc, ~source, rule: style_rule) => {
   let (prelude, prelude_loc) = rule.prelude;
   let selector_location =
     Styled_ppx_css_parser.Parser_location.intersection(loc, prelude_loc);
 
   let selector_expr =
-    render_declarations(~loc, rule.block)
+    render_declarations(~loc, ~source, rule.block)
     |> Builder.pexp_array(~loc=selector_location);
 
   let (delimiter, attrs) =
@@ -490,7 +520,7 @@ let render_style_call = (~loc, declaration_list) => {
   Helper.Exp.apply(~loc, CSS.style(~loc), [(Nolabel, declaration_list)]);
 };
 
-let render_keyframes = (~loc, declarations: rule_list) => {
+let render_keyframes = (~loc, ~source, declarations: rule_list) => {
   let (declarations, declarations_loc) = declarations;
   let invalid_selector = {|
     keyframe selector can be `from`, `to` or <percentage>`
@@ -557,7 +587,7 @@ let render_keyframes = (~loc, declarations: rule_list) => {
          | Style_rule({ prelude: (prelude, _), block, loc: style_loc }) =>
            let percentages = prelude |> List.map(render_select_as_keyframe);
            let rules =
-             render_declarations(~loc, block)
+             render_declarations(~loc, ~source, block)
              |> Builder.pexp_array(~loc=declarations_loc);
            percentages
            |> List.map(p => Builder.pexp_tuple(~loc=style_loc, [p, rules]));
@@ -574,7 +604,7 @@ let render_keyframes = (~loc, declarations: rule_list) => {
   );
 };
 
-let render_global = (~loc, (ruleList, stylesheet_loc): stylesheet) => {
+let render_global = (~loc, ~source, (ruleList, stylesheet_loc): stylesheet) => {
   let onlyStyleRulesAndAtRulesSupported = {|Declarations does not make sense in global styles. Global should consists of style rules or at-rules (e.g @media, @print, etc.)
 
 If your intent is to apply the declaration to all elements, use the universal selector
@@ -586,8 +616,9 @@ If your intent is to apply the declaration to all elements, use the universal se
     ruleList
     |> List.map(rule => {
          switch (rule) {
-         | Style_rule(style_rule) => render_style_rule(~loc, style_rule)
-         | At_rule(at_rule) => render_at_rule(~loc, at_rule)
+         | Style_rule(style_rule) =>
+           render_style_rule(~loc, ~source, style_rule)
+         | At_rule(at_rule) => render_at_rule(~loc, ~source, at_rule)
          | _ =>
            Error.expr(~loc=stylesheet_loc, onlyStyleRulesAndAtRulesSupported)
          }
@@ -601,4 +632,59 @@ If your intent is to apply the declaration to all elements, use the universal se
       [(Nolabel, styles)],
     );
   [%expr ignore([%e expr])];
+};
+
+let render_variable_ident = (~loc, path_str) => {
+  let txt = path_str |> Ppxlib.Longident.parse;
+  Builder.pexp_ident(
+    ~loc,
+    {
+      txt,
+      loc,
+    },
+  );
+};
+
+let render_make_call = (~loc, ~classNames, ~dynamic_vars) => {
+  let className_string = String.concat(" ", classNames);
+  let className_expr =
+    Helper.Exp.constant(~loc, Pconst_string(className_string, loc, None));
+
+  let var_list =
+    dynamic_vars
+    |> List.map(((var_name, original_path, var_type: Css_file.var_type)) => {
+         let field_name = "--" ++ var_name;
+         let field_name_expr =
+           Helper.Exp.constant(~loc, Pconst_string(field_name, loc, None));
+
+         let var_value = render_variable_ident(~loc, original_path);
+
+         let field_value =
+           switch (var_type) {
+           | Selector
+           | MediaQuery => [%expr fst([%e var_value])]
+           | RuntimeModule(module_name) =>
+             Property_to_types.make_to_string_call(
+               ~loc,
+               module_name,
+               var_value,
+             )
+           };
+
+         Builder.pexp_tuple(~loc, [field_name_expr, field_value]);
+       });
+
+  let list_expr =
+    List.fold_right(
+      (item, acc) =>
+        Builder.pexp_construct(
+          ~loc,
+          Builder.Located.lident(~loc, "::"),
+          Some(Builder.pexp_tuple(~loc, [item, acc])),
+        ),
+      var_list,
+      Builder.pexp_construct(~loc, Builder.Located.lident(~loc, "[]"), None),
+    );
+
+  [%expr CSS.make([%e className_expr], [%e list_expr])];
 };

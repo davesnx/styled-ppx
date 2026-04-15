@@ -38,12 +38,8 @@ and brace_block = ast => {
   };
 }
 and rule_list = (rule_list: Ast.rule_list) => {
-  let resolved_rule_list = {
-    let (declarations, selectors) =
-      rule_list |> fst |> Resolve.resolve_selectors |> Resolve.split_by_kind;
-    declarations @ selectors;
-  };
-  resolved_rule_list
+  rule_list
+  |> fst
   |> List.filter(
        fun
        | Ast.Style_rule({ block: (block, _), _ })
@@ -164,17 +160,32 @@ and selector = (ast: Ast.selector) => {
     | Selector(s) => selector(s)
     };
   }
+  and render_selector_combinator = combinator => {
+    switch ((combinator: Ast.selector_combinator)) {
+    | Ast.Selector_descendant => " "
+    | Selector_child => " > "
+    | Selector_adjacent_sibling => " + "
+    | Selector_general_sibling => " ~ "
+    };
+  }
+  and render_relative_combinator = combinator => {
+    switch ((combinator: Ast.selector_combinator)) {
+    | Ast.Selector_descendant => ""
+    | Selector_child => "> "
+    | Selector_adjacent_sibling => "+ "
+    | Selector_general_sibling => "~ "
+    };
+  }
   and render_right_combinator = right => {
     right
     |> List.map(((combinator, s)) => {
-         Option.fold(~none=" ", ~some=o => " " ++ o ++ " ", combinator)
-         ++ selector(s)
+         render_selector_combinator(combinator) ++ selector(s)
        })
     |> String.concat("");
   }
   and render_relative_selector =
       ({ combinator, complex_selector }: Ast.relative_selector) => {
-    Option.fold(~none="", ~some=o => o ++ " ", combinator)
+    Option.fold(~none="", ~some=render_relative_combinator, combinator)
     ++ render_complex_selector(complex_selector);
   };
 
@@ -188,6 +199,12 @@ and selector = (ast: Ast.selector) => {
 and selector_list = (ast: Ast.selector_list) => {
   ast |> List.map(fst) |> List.map(selector) |> String.concat(",");
 }
+
+and dimension = ({ value, unit, _ }: Ast.dimension) => {
+  Tokens.float_to_string(value) ++ unit;
+}
+
+and delimiter = (ast: Ast.delimiter) => Ast.string_of_delimiter(ast)
 and component_value = (ast: Ast.component_value) => {
   switch (ast) {
   | Whitespace => " "
@@ -197,14 +214,13 @@ and component_value = (ast: Ast.component_value) => {
   | Ident(string) => string
   | String(string) => "\"" ++ string ++ "\""
   | Uri(string) => "url(\"" ++ string ++ "\")"
-  | Delim(string) => string
-  | Function(name, body) =>
-    let body = body |> fst |> component_value_list;
-    Printf.sprintf("%s(%s)", fst(name), body);
-  | Hash(string) => "#" ++ string
+  | Delim(value) => delimiter(value)
+  | Function({ name: (name, _), body: (body, _), _ }) =>
+    Printf.sprintf("%s(%s)", name, component_value_list(body))
+  | Hash((string, _)) => "#" ++ string
   | Number(n) => Tokens.float_to_string(n)
   | Unicode_range(string) => string
-  | Dimension((a, b)) => Tokens.float_to_string(a) ++ b
+  | Dimension(value) => dimension(value)
   | Variable(v, _) => variable(v)
   | Selector(v) => selector_list(v)
   };
