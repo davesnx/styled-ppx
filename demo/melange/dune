@@ -20,4 +20,4 @@
   server-reason-react.reactDom
   styled-ppx.native)
  (preprocess
-  (pps styled-ppx server-reason-react.ppx)))
+  (pps styled-ppx server-reason-react.ppx server-reason-react.melange_ppx)))
