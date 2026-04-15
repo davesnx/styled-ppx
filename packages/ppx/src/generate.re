@@ -565,9 +565,22 @@ let makeFnJSX4 = (~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames) =>
   );
 };
 
-/* Generate: let makeProps = (~innerRef=?, ~as_=?, ~children=React.null, ...domProps, ...customProps, ()) =>
-     fun ?key () -> make () ?key ?innerRef ~children ?as_ ...domProps ...customProps
-   This captures all props in a thunk. */
+/* Collect all prop names for the native make function (excluding key and leading _) */
+let allNativePropNames = (~variableNames) => {
+  let reactDomPropNames =
+    MakeProps.get(["key"] @ variableNames)
+    |> map_tr(value =>
+         switch (value) {
+         | MakeProps.Event({name, _}) => name
+         | MakeProps.Attribute({name, _}) => name
+         }
+       );
+  ["innerRef", "as_", "children"] @ reactDomPropNames @ variableNames;
+};
+
+/* Generate makeProps that returns a Js.t (OCaml object) from labeled args.
+   Compatible with server-reason-react's calling convention:
+   Component.make(Component.makeProps(~prop1:v1, ~prop2:v2, ())) */
 let makePropsNative = (~loc, ~variableNames, ~styleParams) => {
   let reactDomParams =
     MakeProps.get(["key"] @ variableNames)
@@ -586,29 +599,65 @@ let makePropsNative = (~loc, ~variableNames, ~styleParams) => {
     @ reactDomParams
     @ styleParams;
 
-  let reactDomPropNames =
-    MakeProps.get(["key"] @ variableNames)
-    |> map_tr(value =>
-         switch (value) {
-         | MakeProps.Event({name, _}) => name
-         | MakeProps.Attribute({name, _}) => name
-         }
-       );
-  let propNames =
-    ["innerRef", "as_", "children"] @ reactDomPropNames @ variableNames;
+  let propNames = allNativePropNames(~variableNames);
 
-  /* Build the inner call: make () ?key ?innerRef ~children ... */
+  /* Build: (object method name1 = name1 method name2 = name2 ... end) */
+  let objectFields =
+    propNames
+    |> map_tr(name => {
+         {
+           pcf_desc:
+             Pcf_method((
+               withLoc(name, ~loc),
+               Public,
+               Cfk_concrete(
+                 Fresh,
+                 Helper.Exp.ident(~loc, withLoc(Lident(name), ~loc)),
+               ),
+             )),
+           pcf_loc: loc,
+           pcf_attributes: [],
+         }
+       });
+
+  let objectExpr =
+    Helper.Exp.object_(~loc, {
+      pcstr_self: Helper.Pat.mk(~loc, Ppat_any),
+      pcstr_fields: objectFields,
+    });
+
+  /* Unit param is first (= innermost) so it comes AFTER all optional args in the type.
+     The caller's () triggers resolution of all preceding optional args. */
+  let allParamsWithUnit =
+    [(Nolabel, None, [%pat? ()], "()", loc, None)]
+    @ allParams;
+
+  let body = fnWithLabeledArgs(allParamsWithUnit, objectExpr);
+
+  [%stri let makeProps = [%e body]];
+};
+
+/* Generate wrapper make that accepts ?key and a Js.t props object,
+   extracts fields via method access, and calls the internal make. */
+let makeWrapperNative = (~loc, ~variableNames) => {
+  let propNames = allNativePropNames(~variableNames);
+  let propsIdent = Helper.Exp.ident(~loc, withLoc(Lident("props"), ~loc));
+
   let callArgs =
-    [(Nolabel, [%expr ()])] /* leading _ param */
+    /* First arg: unit (the leading _ param of internal make) */
+    [(Nolabel, [%expr ()])]
+    /* ?key */
     @ [(Optional("key"), Helper.Exp.ident(~loc, withLoc(Lident("key"), ~loc)))]
+    /* Each prop: access via props#name */
     @ (
       propNames
       |> map_tr(name => {
-           let ident = Helper.Exp.ident(~loc, withLoc(Lident(name), ~loc));
+           let methodAccess =
+             Helper.Exp.send(~loc, propsIdent, withLoc(name, ~loc));
            if (name == "children") {
-             (Labelled("children"), ident);
+             (Labelled("children"), methodAccess);
            } else {
-             (Optional(name), ident);
+             (Optional(name), methodAccess);
            };
          })
     );
@@ -618,46 +667,6 @@ let makePropsNative = (~loc, ~variableNames, ~styleParams) => {
       ~loc,
       Helper.Exp.ident(~loc, withLoc(Lident("make"), ~loc)),
       callArgs,
-    );
-
-  /* Wrap in: fun ?key () -> callExpr */
-  let thunk =
-    Helper.Exp.fun_(
-      ~loc,
-      Optional("key"),
-      None,
-      Helper.Pat.mk(~loc, Ppat_var(withLoc("key", ~loc))),
-      Helper.Exp.fun_(
-        ~loc,
-        Nolabel,
-        None,
-        [%pat? ()],
-        callExpr,
-      ),
-    );
-
-  /* The unit param must be first (= innermost in generated function)
-     so it comes AFTER all optional args in the type signature.
-     This way, the caller's () triggers resolution of all optional args. */
-  let allParamsWithUnit =
-    [(Nolabel, None, [%pat? ()], "()", loc, None)]
-    @ allParams;
-
-  let body = fnWithLabeledArgs(allParamsWithUnit, thunk);
-
-  [%stri let makeProps = [%e body]];
-};
-
-/* Generate: let make = fun ?key f -> f ?key () */
-let makeWrapperNative = (~loc) => {
-  let callExpr =
-    Helper.Exp.apply(
-      ~loc,
-      Helper.Exp.ident(~loc, withLoc(Lident("f"), ~loc)),
-      [
-        (Optional("key"), Helper.Exp.ident(~loc, withLoc(Lident("key"), ~loc))),
-        (Nolabel, [%expr ()]),
-      ],
     );
 
   let body =
@@ -670,7 +679,7 @@ let makeWrapperNative = (~loc) => {
         ~loc,
         Nolabel,
         None,
-        Helper.Pat.mk(~loc, Ppat_var(withLoc("f", ~loc))),
+        Helper.Pat.mk(~loc, Ppat_var(withLoc("props", ~loc))),
         callExpr,
       ),
     );
@@ -701,9 +710,33 @@ let component =
       makeFnJSX3(~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames)
     };
 
-  /* Native JSX uses old-style labeled arg calls (no makeProps/wrapper needed).
-     Melange JSX uses makeProps + wrapper make. */
-  [[%stri let make = [%e makeFn]]];
+  if (Settings.Get.native()) {
+    let internalMake = [%stri let make = [%e makeFn]];
+    let makePropsItem =
+      makePropsNative(
+        ~loc,
+        ~variableNames,
+        ~styleParams=makeStyleParams(~labeledArguments),
+      );
+    let wrapperMake = makeWrapperNative(~loc, ~variableNames);
+    /* Use include struct ... end to allow shadowing make */
+    [
+      Helper.Str.mk(
+        ~loc,
+        Pstr_include({
+          pincl_mod:
+            Builder.pmod_structure(
+              ~loc,
+              [internalMake, makePropsItem, wrapperMake],
+            ),
+          pincl_loc: loc,
+          pincl_attributes: [],
+        }),
+      ),
+    ];
+  } else {
+    [[%stri let make = [%e makeFn]]];
+  };
 };
 
 let optionalType = (~loc, type_) => {
