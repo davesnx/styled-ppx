@@ -421,8 +421,22 @@ let () = {
                   let validations = type_check_rule_list(rule_list);
                   switch (get_errors(validations)) {
                   | [] =>
+                    let file = Code_path.file_path(code_path);
                     let (classNames, dynamic_vars) =
-                      Css_file.push(~label?, rule_list);
+                      Css_file.push(~file, ~label?, rule_list);
+                    /* Register this binding so that later [%cx2] blocks in
+                       the same file can resolve `$(name)` selector interps
+                       to the classNames we just minted. Anonymous bindings
+                       (`let _ = ...`) are skipped inside `register`. */
+                    switch (Code_path.enclosing_value(code_path)) {
+                    | Some(name) =>
+                      Css_file.Class_registry.register(
+                        ~file,
+                        ~name,
+                        ~classNames,
+                      )
+                    | None => ()
+                    };
                     Css_to_runtime.render_make_call(
                       ~loc=stringLoc,
                       ~classNames,
