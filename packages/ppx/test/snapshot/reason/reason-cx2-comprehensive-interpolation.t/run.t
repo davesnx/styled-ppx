@@ -29,6 +29,30 @@ Comprehensive test for cx2 interpolation with various property types
   [@css ".css-1dfkyy8-test11{width:var(--var-a9b677);}"];
   [@css ".css-73nay0-test11{height:100px;}"];
   [@css ".css-tokvmb-test11{color:red;}"];
+  [@css.bindings
+    [
+      (
+        "Output.test1",
+        "css-2v7e0k-test1 css-lbwdj4-test1 css-ur6cve-test1 css-9nbswy-test1",
+      ),
+      (
+        "Output.test2",
+        "css-1h6gv7y-test2 css-1ojdfmn-test2 css-6oe920-test2 css-kxyw4-test2",
+      ),
+      ("Output.test3", "css-1j1vt57-test3 css-16533ek-test3 css-aq5h2o-test3"),
+      ("Output.test4", "css-4bvljg-test4 css-1e9wc53-test4 css-t4dyfi-test4"),
+      ("Output.test5", "css-ycpa9s-test5"),
+      ("Output.test6", "css-en5xqq-test6 css-1vcbsia-test6"),
+      ("Output.test7", "css-rexok8-test7 css-16sky2z-test7"),
+      ("Output.test8", "css-1bkxgpr-test8"),
+      ("Output.test9", "css-1rsi5sr-test9 css-g6afgo-test9"),
+      ("Output.test10", "css-lbcu38-test10 css-1j0nnnq-test10"),
+      (
+        "Output.test11",
+        "css-1dfkyy8-test11 css-73nay0-test11 css-tokvmb-test11",
+      ),
+    ]
+  ];
   let lengthVar = CSS.px(10);
   let colorVar = CSS.red;
   let percentVar = CSS.pct(50.0);

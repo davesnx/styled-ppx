@@ -29,13 +29,13 @@ let is_css_keyword = (value: Styled_ppx_css_parser.Ast.component_value) => {
 
 let rec type_check_rule = (rule: Styled_ppx_css_parser.Ast.rule) => {
   switch (rule) {
-  | Declaration({name: _, value: ([(value, _)], _), _})
+  | Declaration({ name: _, value: ([(value, _)], _), _ })
       when is_css_keyword(value) => [
       Ok(),
     ]
-  | Declaration({name: (name, _), value: (value, value_loc), loc: _, _}) =>
+  | Declaration({ name: (name, _), value: (value, value_loc), loc: _, _ }) =>
     switch (Css_grammar.validate_property(~loc=value_loc, ~name, value)) {
-    | Ok() => [Ok()]
+    | Ok () => [Ok()]
     | Error((loc, `Invalid_value(detail))) =>
       let value_source =
         Styled_ppx_css_parser.Render.component_value_list(value)
@@ -284,7 +284,92 @@ let make_styled_extension = htmlTag => {
   );
 };
 
-let styled_rules = List.map(make_styled_extension, html_tags);
+/* Build a top-level floating attribute `[@@@<name> <expr>]`. The
+   metaquot dialect around floating attributes is awkward in Reason
+   syntax, so we go via the explicit Ast_builder constructors. */
+let make_list_attribute = (~name: string, expr: Ppxlib.expression) => {
+  let loc = Ppxlib.Location.none;
+  let payload = Ppxlib.PStr([Builder.pstr_eval(~loc, expr, [])]);
+  let attr =
+    Builder.attribute(
+      ~loc,
+      ~name={
+        Ppxlib.Location.txt: name,
+        loc,
+      },
+      ~payload,
+    );
+  Builder.pstr_attribute(~loc, attr);
+};
+
+/* Build [@@@css.refs [(longident, file, line, scol, ecol); ...]]. The
+   aggregator uses this list to format errors with original source
+   locations when cross-module sentinels cannot be resolved. */
+let make_refs_attribute = (entries: list(Cross_module_refs.entry)) => {
+  let loc = Ppxlib.Location.none;
+  let entry_to_expr = (entry: Cross_module_refs.entry) => {
+    let pos_start = entry.loc.loc_start;
+    let pos_end = entry.loc.loc_end;
+    let col = (pos: Lexing.position) =>
+      Builder.eint(~loc, pos.pos_cnum - pos.pos_bol);
+    Builder.pexp_tuple(
+      ~loc,
+      [
+        Builder.estring(~loc, entry.longident),
+        Builder.estring(~loc, pos_start.pos_fname),
+        Builder.eint(~loc, pos_start.pos_lnum),
+        col(pos_start),
+        col(pos_end),
+      ],
+    );
+  };
+  let list_expr = Builder.elist(~loc, List.map(entry_to_expr, entries));
+  make_list_attribute(~name="css.refs", list_expr);
+};
+
+/* Build [@@@css.bindings [(longident, class_string); ...]]. Every named
+   [%cx2] binding contributes one pair so the aggregator can index it
+   directly without re-parsing CSS.make calls out of the post-PPX AST. */
+let make_bindings_attribute = (entries: list(Css_bindings.entry)) => {
+  let loc = Ppxlib.Location.none;
+  let entry_to_expr = (entry: Css_bindings.entry) =>
+    Builder.pexp_tuple(
+      ~loc,
+      [
+        Builder.estring(~loc, entry.longident),
+        Builder.estring(~loc, entry.class_string),
+      ],
+    );
+  let list_expr = Builder.elist(~loc, List.map(entry_to_expr, entries));
+  make_list_attribute(~name="css.bindings", list_expr);
+};
+
+let make_synthetic_dep = ((longident_str: string, loc: Ppxlib.Location.t)) => {
+  let lid = Ppxlib.Longident.parse(longident_str);
+  let ident_expr =
+    Builder.pexp_ident(
+      ~loc,
+      {
+        Ppxlib.Location.txt: lid,
+        loc,
+      },
+    );
+  /* `let _ = M.Css.marker` â purely for ocamldep + early type errors.
+     Carrying the original [%cx2] location through here means
+     "Unbound module" / "Unbound value" errors point at the user's
+     selector ref rather than at [_none_]. */
+  Builder.pstr_value(
+    ~loc,
+    Nonrecursive,
+    [
+      Builder.value_binding(
+        ~loc,
+        ~pat=Builder.ppat_any(~loc),
+        ~expr=ident_expr,
+      ),
+    ],
+  );
+};
 
 let () = {
   Ppxlib.Driver.add_arg(
@@ -313,13 +398,33 @@ let () = {
         rule => [%stri [@css [%e Builder.estring(~loc, rule)]]],
         rules,
       );
-    rule_items @ str;
+    let binding_entries = Css_bindings.drain();
+    let bindings_items =
+      switch (binding_entries) {
+      | [] => []
+      | _ => [make_bindings_attribute(binding_entries)]
+      };
+    let (cross_module_entries, cross_module_longidents) =
+      Cross_module_refs.drain();
+    let refs_items =
+      switch (cross_module_entries) {
+      | [] => []
+      | _ => [make_refs_attribute(cross_module_entries)]
+      };
+    let dep_items = List.map(make_synthetic_dep, cross_module_longidents);
+    /* Order:
+       - extracted CSS rules
+       - binding exports
+       - cross-module refs descriptor
+       - dep-tracking synthetic lets
+       - user's source. */
+    rule_items @ bindings_items @ refs_items @ dep_items @ str;
   };
 
   Ppxlib.Driver.V2.register_transformation(
     ~impl,
     ~rules=
-      styled_rules
+      List.map(make_styled_extension, html_tags)
       @ [
         Ppxlib.Context_free.Rule.extension(
           Ppxlib.Extension.V3.declare(
@@ -396,7 +501,7 @@ let () = {
           ),
         ),
         Ppxlib.Context_free.Rule.extension(
-           Ppxlib.Extension.V3.declare(
+          Ppxlib.Extension.V3.declare(
             "cx2",
             Ppxlib.Extension.Context.Expression,
             Ppxlib.Ast_pattern.(single_expr_payload(__)),
@@ -432,14 +537,29 @@ let () = {
                     /* Register this binding so that later [%cx2] blocks in
                        the same file can resolve `$(name)` selector interps
                        to the classNames we just minted. Anonymous bindings
-                       (`let _ = ...`) are skipped inside `register`. */
+                       (`let _ = ...`) are skipped inside `register`.
+
+                       We also record the fully-qualified longident in
+                       [Css_bindings] so the impl transformer can emit it as
+                       a [@@@css.bindings ...] attribute for the aggregator's
+                       cross-module index. */
                     switch (binding_name) {
                     | Some(name) =>
                       Css_file.Class_registry.register(
                         ~file,
                         ~name,
                         ~classNames,
-                      )
+                      );
+                      let main_module = Code_path.main_module_name(code_path);
+                      let submodule_path =
+                        Code_path.submodule_path(code_path);
+                      let longident =
+                        String.concat(
+                          ".",
+                          [main_module, ...submodule_path] @ [name],
+                        );
+                      let class_string = String.concat(" ", classNames);
+                      Css_bindings.record(~longident, ~class_string);
                     | None => ()
                     };
                     /* Marker shares `binding_name` with the registry above

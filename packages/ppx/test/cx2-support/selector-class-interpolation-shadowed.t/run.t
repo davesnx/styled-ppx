@@ -16,6 +16,9 @@ Shadowing follows OCaml semantics: `&.$(foo)` resolves to the second
   [@css ".css-tokvmb-foo{color:red;}"];
   [@css ".css-14ksm7b-foo{color:blue;}"];
   [@css ".css-191lhl1-bar.css-14ksm7b-foo{font-weight:bold;}"];
+  [@css.bindings
+    [("Input.foo", "css-14ksm7b-foo"), ("Input.bar", "css-191lhl1-bar")]
+  ];
   
   let foo = CSS.make("css-tokvmb-foo", []);
   let _ = foo;

@@ -21,6 +21,14 @@ If this test fail means that the module is not in sync with the ppx
     ".css-1fqvgu0-_chart .recharts-scatter .recharts-scatter-symbol .recharts-symbols{opacity:0.8;}"
   ];
   [@css ".css-vv2q96-_chart:hover{opacity:1;}"];
+  [@css.bindings
+    [
+      (
+        "Input._chart",
+        "css-9y6172-_chart css-1gs5e0q-_chart css-1gs5e0q-_chart css-1fqvgu0-_chart css-vv2q96-_chart",
+      ),
+    ]
+  ];
   
   let _chart =
     CSS.make(

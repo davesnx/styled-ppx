@@ -23,6 +23,17 @@ and the runtime `CSS.make` call must carry an empty list (no phantom
   [@css
     ".css-1eo9rnb-colorAccent:disabled:not(.css-1eo9rnb-colorAccent.css-1vf0mg9-buttonLoadingAnimation.css-rj3gnv-buttonLoadingAnimation){background-color:gray;}"
   ];
+  [@css.bindings
+    [
+      ("Input.foo", "css-tokvmb-foo"),
+      ("Input.bar", "css-11o9qin-bar"),
+      (
+        "Input.buttonLoadingAnimation",
+        "css-1vf0mg9-buttonLoadingAnimation css-rj3gnv-buttonLoadingAnimation",
+      ),
+      ("Input.colorAccent", "css-f9xk9e-colorAccent css-1eo9rnb-colorAccent"),
+    ]
+  ];
   
   let foo = CSS.make("css-tokvmb-foo", []);
   

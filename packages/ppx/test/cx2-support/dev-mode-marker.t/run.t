@@ -18,6 +18,12 @@ a CSS rule.
   [@css ".css-k008qs-layout{display:flex;}"];
   [@css ".css-38zrbw-layout{padding:12px;}"];
   [@css ".css-tokvmb-button{color:red;}"];
+  [@css.bindings
+    [
+      ("Input.layout", "css-k008qs-layout css-38zrbw-layout"),
+      ("Input.button", "css-tokvmb-button"),
+    ]
+  ];
   
   let layout = CSS.make("cx-layout css-k008qs-layout css-38zrbw-layout", []);
   

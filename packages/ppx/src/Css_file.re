@@ -119,19 +119,26 @@ module Css_transform = {
     };
   };
 
-  /* Resolve a `$(name)` selector interpolation against the per-file
-     [%cx2] class registry. Same-module references substitute the resolved
-     class names directly into the CSS AST so no literal `$(...)` ever
-     reaches the extracted CSS, and no phantom CSS custom property is
-     emitted onto the runtime tuple. Cross-module and unresolved refs raise
-     a clear PPX error. */
+  /* Resolve a `$(name)` selector interpolation.
+
+     Same-module references (`$(local)`) look up the per-file [%cx2] class
+     registry and substitute actual class names directly into the CSS AST.
+     No literal `$(...)` reaches extracted CSS and no phantom CSS custom
+     property is emitted onto the runtime tuple.
+
+     Cross-module references (`$(M.binding)`) cannot be resolved at PPX
+     time â module M compiles separately. We record the reference
+     in [Cross_module_refs] and substitute a NUL-delimited sentinel "class
+     name" that survives CSS rendering verbatim. The post-build aggregator
+     ([styled-ppx.generate]) scans rendered rules for these sentinels and
+     replaces them with the real class chains it indexed from every
+     module's post-PPX [.ml] file.
+
+     Unresolved same-module refs still raise at PPX time. */
   let resolve_selector_class_ref = (~file: string, ~loc, path_str: string) => {
     if (String.contains(path_str, '.')) {
-      Ppxlib.Location.raise_errorf(
-        ~loc,
-        "[%%cx2] selector interpolation `$(%s)` references another module.\nStatic CSS extraction can only resolve same-module bindings.\nInline the rules into this [%%cx2] block, or use [%%cx] for runtime substitution.",
-        path_str,
-      );
+      Cross_module_refs.record(~file, ~longident=path_str, ~loc);
+      [Cross_module_refs.sentinel(path_str)];
     } else {
       switch (Class_registry.lookup(~file, ~name=path_str)) {
       | Some(classNames) => classNames

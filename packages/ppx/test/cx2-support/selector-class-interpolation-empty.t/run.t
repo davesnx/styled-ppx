@@ -33,6 +33,17 @@ on the element.
   [@css ".css-17nqvvb-card.css-0-highlighted{background:yellow;}"];
   [@css ".css-k008qs-panel{display:flex;}"];
   [@css ".css-62yfsj-panel .css-0-actionButton{color:black;}"];
+  [@css.bindings
+    [
+      ("Input.active", "css-0-active"),
+      ("Input.container", "css-1443u2l-container css-g57662-container"),
+      ("Input.selected", "css-0-selected"),
+      ("Input.highlighted", "css-0-highlighted"),
+      ("Input.card", "css-q5fqw0-card css-19ehxda-card css-17nqvvb-card"),
+      ("Input.actionButton", "css-0-actionButton"),
+      ("Input.panel", "css-k008qs-panel css-62yfsj-panel"),
+    ]
+  ];
   
   let active = CSS.make("css-0-active", []);
   

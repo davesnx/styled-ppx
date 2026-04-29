@@ -48,6 +48,28 @@
   [@@@css ".css-16610y9-gridCss{gap:20px;}"]
   [@@@css ".css-pdjuhq-scrollCss{scroll-behavior:smooth;}"]
   [@@@css ".css-13v3rg8-scrollCss{overflow-y:auto;}"]
+  [@@@css.bindings
+    [("Input.staticCss", "css-k008qs-staticCss css-1tyndxa-staticCss");
+    ("Input.dynamicCss", "css-kusjgz-dynamicCss css-k008qs-dynamicCss");
+    ("Input.logicalProps",
+      "css-15ikb3s-logicalProps css-1io86c2-logicalProps css-bcg5v8-logicalProps css-1ifadwg-logicalProps css-kdjpx-logicalProps");
+    ("Input.nestedCss",
+      "css-k008qs-nestedCss css-zqnfaz-nestedCss css-osffsa-nestedCss");
+    ("Input.responsiveCss",
+      "css-k008qs-responsiveCss css-1ruz0a1-responsiveCss");
+    ("Input.multipleMediaQueries",
+      "css-6xix1i-multipleMediaQueries css-1l3vtdj-multipleMediaQueries css-2b7vub-multipleMediaQueries");
+    ("Input.mediaWithSelector",
+      "css-k008qs-mediaWithSelector css-5ivle1-mediaWithSelector css-1cemfq6-mediaWithSelector css-1l7frkw-mediaWithSelector");
+    ("Input.complexMedia",
+      "css-lgj0h8-complexMedia css-mhiow9-complexMedia css-1nm9mde-complexMedia");
+    ("Input.mediaWithInterpolation",
+      "css-kusjgz-mediaWithInterpolation css-11qknlj-mediaWithInterpolation");
+    ("Input.multiVar",
+      "css-b6lny7-multiVar css-12udlbg-multiVar css-u661at-multiVar css-nk32ej-multiVar");
+    ("Input.gridCss",
+      "css-lgj0h8-gridCss css-bghlac-gridCss css-16610y9-gridCss");
+    ("Input.scrollCss", "css-pdjuhq-scrollCss css-13v3rg8-scrollCss")]]
   let staticCss = CSS.make "css-k008qs-staticCss css-1tyndxa-staticCss" []
   let dynamicCss color =
     CSS.make "css-kusjgz-dynamicCss css-k008qs-dynamicCss"

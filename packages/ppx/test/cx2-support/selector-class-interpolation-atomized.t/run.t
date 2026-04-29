@@ -18,6 +18,12 @@ A multi-declaration source binding fans out into a compound chain
   [@css
     ".css-1ez0qm9-user.css-k008qs-composed.css-1p7q77g-composed{color:red;}"
   ];
+  [@css.bindings
+    [
+      ("Input.composed", "css-k008qs-composed css-1p7q77g-composed"),
+      ("Input.user", "css-1ez0qm9-user"),
+    ]
+  ];
   
   let composed = CSS.make("css-k008qs-composed css-1p7q77g-composed", []);
   

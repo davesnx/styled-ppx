@@ -16,6 +16,9 @@ extracted CSS, and resolved selectors are byte-identical between
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css ".css-tokvmb-foo{color:red;}"];
   [@css ".css-11o9qin-bar.css-tokvmb-foo{color:blue;}"];
+  [@css.bindings
+    [("Input.foo", "css-tokvmb-foo"), ("Input.bar", "css-11o9qin-bar")]
+  ];
   
   let foo = CSS.make("cx-foo css-tokvmb-foo", []);
   

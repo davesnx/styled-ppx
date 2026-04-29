@@ -1,0 +1,4 @@
+(cram
+ (alias test-aggregator)
+ (deps
+  (package styled-ppx)))
