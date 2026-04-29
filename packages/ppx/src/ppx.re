@@ -299,6 +299,12 @@ let () = {
     Arg.Unit(_ => Settings.Update.minify(true)),
   );
 
+  Ppxlib.Driver.add_arg(
+    ~doc=Settings.dev.doc,
+    Settings.dev.flag,
+    Arg.Unit(_ => Settings.Update.dev(true)),
+  );
+
   let impl = (_ctx, str: Ppxlib.structure) => {
     let loc = Ppxlib.Location.none;
     let rules = Css_file.get();
@@ -397,13 +403,13 @@ let () = {
             (~ctxt, payload) => {
               open Ppxlib;
               let code_path = Expansion_context.Extension.code_path(ctxt);
-              let label =
-                if (Settings.Get.minify()) {
-                  None;
-                } else {
-                  Code_path.enclosing_value(code_path);
-                };
-              File.set(Code_path.file_path(code_path));
+              let file = Code_path.file_path(code_path);
+              let binding_name = Code_path.enclosing_value(code_path);
+              /* Under --minify, suppress the label-suffix that personalizes
+                 atom hashes (`css-<hash>-<binding>`); plain hashes still
+                 dedupe correctly. */
+              let label = Settings.Get.minify() ? None : binding_name;
+              File.set(file);
               switch (payload.pexp_desc) {
               | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
                 let loc =
@@ -421,14 +427,13 @@ let () = {
                   let validations = type_check_rule_list(rule_list);
                   switch (get_errors(validations)) {
                   | [] =>
-                    let file = Code_path.file_path(code_path);
                     let (classNames, dynamic_vars) =
                       Css_file.push(~file, ~label?, rule_list);
                     /* Register this binding so that later [%cx2] blocks in
                        the same file can resolve `$(name)` selector interps
                        to the classNames we just minted. Anonymous bindings
                        (`let _ = ...`) are skipped inside `register`. */
-                    switch (Code_path.enclosing_value(code_path)) {
+                    switch (binding_name) {
                     | Some(name) =>
                       Css_file.Class_registry.register(
                         ~file,
@@ -437,8 +442,12 @@ let () = {
                       )
                     | None => ()
                     };
+                    /* Marker shares `binding_name` with the registry above
+                       so the DOM `cx-<name>` matches `$(name)` selector refs. */
+                    let marker = Dev_mode.marker(binding_name);
                     Css_to_runtime.render_make_call(
                       ~loc=stringLoc,
+                      ~marker,
                       ~classNames,
                       ~dynamic_vars,
                     );

@@ -645,8 +645,13 @@ let render_variable_ident = (~loc, path_str) => {
   );
 };
 
-let render_make_call = (~loc, ~classNames, ~dynamic_vars) => {
-  let className_string = String.concat(" ", classNames);
+let render_make_call = (~loc, ~marker: option(string), ~classNames, ~dynamic_vars) => {
+  let class_string = String.concat(" ", classNames);
+  let className_string =
+    switch (marker) {
+    | Some(m) => m ++ " " ++ class_string
+    | None => class_string
+    };
   let className_expr =
     Helper.Exp.constant(~loc, Pconst_string(className_string, loc, None));
 
@@ -674,17 +679,5 @@ let render_make_call = (~loc, ~classNames, ~dynamic_vars) => {
          Builder.pexp_tuple(~loc, [field_name_expr, field_value]);
        });
 
-  let list_expr =
-    List.fold_right(
-      (item, acc) =>
-        Builder.pexp_construct(
-          ~loc,
-          Builder.Located.lident(~loc, "::"),
-          Some(Builder.pexp_tuple(~loc, [item, acc])),
-        ),
-      var_list,
-      Builder.pexp_construct(~loc, Builder.Located.lident(~loc, "[]"), None),
-    );
-
-  [%expr CSS.make([%e className_expr], [%e list_expr])];
+  [%expr CSS.make([%e className_expr], [%e Builder.elist(~loc, var_list)])];
 };

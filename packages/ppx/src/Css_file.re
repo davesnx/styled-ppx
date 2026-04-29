@@ -3,6 +3,9 @@ type var_type =
   | MediaQuery
   | RuntimeModule(string);
 
+let render_rule = Styled_ppx_css_parser.Render.rule;
+let render_declaration = Styled_ppx_css_parser.Render.declaration;
+
 /* Per-compilation-unit registry mapping the enclosing `let` binding name of a
    [%cx2] expansion to the list of atomized class names it minted. Selector
    interpolation in later [%cx2] blocks resolves `$(name)` against this
@@ -31,36 +34,17 @@ module Buffer = {
   let accumulated_rules: ref(list(rule)) = ref([]);
   let global_rules: ref(list(rule)) = ref([]);
 
-  let add_rule = (className: string, cssText: string) => {
-    let already_exists =
-      List.exists(
-        ((existingClass, _)) => existingClass == className,
-        accumulated_rules^,
-      );
-
-    if (!already_exists) {
-      accumulated_rules := [(className, cssText), ...accumulated_rules^];
+  let add_to = (target, className, cssText) =>
+    if (!List.exists(((existing, _)) => existing == className, target^)) {
+      target := [(className, cssText), ...target^];
     };
-  };
 
-  let add_global_rule = (className: string, cssText: string) => {
-    let already_exists =
-      List.exists(
-        ((existingClass, _)) => existingClass == className,
-        global_rules^,
-      );
-
-    if (!already_exists) {
-      global_rules := [(className, cssText), ...global_rules^];
-    };
-  };
+  let add_rule = add_to(accumulated_rules);
+  let add_global_rule = add_to(global_rules);
 
   let get_rules = () => {
-    let globals =
-      global_rules^ |> List.rev |> List.map(((_, cssText)) => cssText);
-    let rules =
-      accumulated_rules^ |> List.rev |> List.map(((_, cssText)) => cssText);
-    globals @ rules;
+    let dump = target => List.rev_map(((_, cssText)) => cssText, target^);
+    dump(global_rules) @ dump(accumulated_rules);
   };
 
   let clear = () => {
@@ -84,29 +68,20 @@ module Css_transform = {
       ? Printf.sprintf("%s_%d", var_name, occurrence_index) : var_name;
   };
 
+  /* Increment the count for [name] in an assoc list, returning the new
+     count and the updated list. */
+  let bump = (name, counts) => {
+    let next = 1 + Option.value(List.assoc_opt(name, counts), ~default=0);
+    (next, [(name, next), ...List.remove_assoc(name, counts)]);
+  };
+
   let count_named_occurrences = names =>
-    names
-    |> List.fold_left(
-         (counts, name) => {
-           let next_count =
-             switch (List.assoc_opt(name, counts)) {
-             | Some(count) => count + 1
-             | None => 1
-             };
-           [(name, next_count), ...List.remove_assoc(name, counts)];
-         },
-         [],
-       );
+    List.fold_left((counts, name) => snd(bump(name, counts)), [], names);
 
   let next_occurrence = (name, occurrences) => {
-    let next_count =
-      switch (List.assoc_opt(name, occurrences^)) {
-      | Some(count) => count + 1
-      | None => 1
-      };
-    occurrences :=
-      [(name, next_count), ...List.remove_assoc(name, occurrences^)];
-    next_count;
+    let (next, updated) = bump(name, occurrences^);
+    occurrences := updated;
+    next;
   };
 
   let take_first_matching_name = (name, items) => {
@@ -180,6 +155,10 @@ module Css_transform = {
             get_var_binding: string => (string, var_type),
           )
           : component_value => {
+    let recurse = ((v, loc)) => (
+      transform_component_value(~file, v, dynamic_vars, get_var_binding),
+      loc,
+    );
     switch (cv) {
     | Variable(path_str, _loc) =>
       let (var_name, var_type) = get_var_binding(path_str);
@@ -193,66 +172,20 @@ module Css_transform = {
           Ppxlib.Location.none,
         ),
       });
-    | Function({ name, kind, body }) =>
-      let (body_values, body_loc) = body;
-      let transformed_body =
-        List.map(
-          ((value, loc)) =>
-            (
-              transform_component_value(
-                ~file,
-                value,
-                dynamic_vars,
-                get_var_binding,
-              ),
-              loc,
-            ),
-          body_values,
-        );
+    | Function({ name, kind, body: (body_values, body_loc) }) =>
       Function({
         name,
         kind,
-        body: (transformed_body, body_loc),
-      });
-    | Paren_block(values) =>
-      let transformed =
-        List.map(
-          ((value, loc)) =>
-            (
-              transform_component_value(
-                ~file,
-                value,
-                dynamic_vars,
-                get_var_binding,
-              ),
-              loc,
-            ),
-          values,
-        );
-      Paren_block(transformed);
-    | Bracket_block(values) =>
-      let transformed =
-        List.map(
-          ((value, loc)) =>
-            (
-              transform_component_value(
-                ~file,
-                value,
-                dynamic_vars,
-                get_var_binding,
-              ),
-              loc,
-            ),
-          values,
-        );
-      Bracket_block(transformed);
+        body: (List.map(recurse, body_values), body_loc),
+      })
+    | Paren_block(values) => Paren_block(List.map(recurse, values))
+    | Bracket_block(values) => Bracket_block(List.map(recurse, values))
     | Selector(selector_list) =>
-      let transformed_selectors =
-        List.map(
-          ((sel, loc)) => (transform_selector(~file, sel, dynamic_vars), loc),
-          selector_list,
-        );
-      Selector(transformed_selectors);
+      let recurse_sel = ((sel, loc)) => (
+        transform_selector(~file, sel, dynamic_vars),
+        loc,
+      );
+      Selector(List.map(recurse_sel, selector_list));
     | _ => cv
     };
   }
@@ -329,7 +262,9 @@ module Css_transform = {
     };
   }
 
-  /* In-place rewrite of a `simple_selector` for use inside a compound. */
+  /* Rewrite a `simple_selector` in compound-internal position (slotted
+     into `type_selector`). The selector-wrapping variant below is
+     `transform_simple_selector_to_selector`. */
   and transform_simple_selector =
       (~file, simple: simple_selector, _dynamic_vars): simple_selector => {
     switch (simple) {
@@ -547,43 +482,23 @@ module Css_transform = {
       );
     };
 
-    let transformed_prelude = prelude_values;
+    let map_payload = ((rules, rule_loc)) => (
+      List.map(r => transform_rule(~file, r, dynamic_vars), rules),
+      rule_loc,
+    );
     let transformed_block =
       switch (block) {
       | Empty => Empty
-      | Rule_list((rule_list, rule_loc)) =>
-        let transformed_rules =
-          List.map(
-            rule => transform_rule(~file, rule, dynamic_vars),
-            rule_list,
-          );
-        Rule_list((transformed_rules, rule_loc));
-      | Stylesheet((rule_list, rule_loc)) =>
-        let transformed_rules =
-          List.map(
-            rule => transform_rule(~file, rule, dynamic_vars),
-            rule_list,
-          );
-        Stylesheet((transformed_rules, rule_loc));
+      | Rule_list(payload) => Rule_list(map_payload(payload))
+      | Stylesheet(payload) => Stylesheet(map_payload(payload))
       };
     {
       name,
-      prelude: (transformed_prelude, prelude_loc),
+      prelude: (prelude_values, prelude_loc),
       block: transformed_block,
       loc,
     };
-  }
-  and transform_variables_to_custom_properties =
-      (
-        ~file,
-        rules: list(rule),
-        dynamic_vars: ref(list((string, string, var_type))),
-      ) => {
-    List.map(r => transform_rule(~file, r, dynamic_vars), rules);
   };
-
-  let render_rule = Styled_ppx_css_parser.Render.rule;
-  let render_declaration = Styled_ppx_css_parser.Render.declaration;
 
   let atomize_rules = (~label=?, rules: list(rule)): list((string, rule)) => {
     let rec extract_atomic_rules = (rule: rule): list((string, rule)) => {
@@ -619,23 +534,11 @@ module Css_transform = {
           let className = generate_class_from_content(~label?, at_string);
           [(className, rule)];
 
-        | Rule_list((rules, rule_loc)) =>
-          rules
-          |> List.concat_map(extract_atomic_rules)
-          |> List.map(((_className, inner_rule)) => {
-               let wrapped =
-                 At_rule({
-                   name,
-                   prelude,
-                   block: Rule_list(([inner_rule], rule_loc)),
-                   loc,
-                 });
-               let wrapped_string = render_rule(wrapped);
-               let new_className =
-                 generate_class_from_content(~label?, wrapped_string);
-               (new_className, wrapped);
-             })
-
+        /* Both Rule_list and Stylesheet payloads are atomized the same way:
+           recurse into the inner rules, then re-wrap each atom in a fresh
+           `At_rule(... Rule_list ...)`. We normalize Stylesheet → Rule_list
+           on output because each atom carries exactly one inner rule. */
+        | Rule_list((rules, rule_loc))
         | Stylesheet((rules, rule_loc)) =>
           rules
           |> List.concat_map(extract_atomic_rules)
@@ -701,14 +604,9 @@ module Css_transform = {
                )
              };
 
-           let final_rules =
-             transform_variables_to_custom_properties(
-               ~file,
-               transformed,
-               dynamic_vars,
-             );
-
-           List.map(r => (className, r), final_rules);
+           transformed
+           |> List.map(r => transform_rule(~file, r, dynamic_vars))
+           |> List.map(r => (className, r));
          })
       |> List.concat;
 
@@ -717,8 +615,6 @@ module Css_transform = {
 };
 
 let push = (~file, ~label=?, declarations: Styled_ppx_css_parser.Ast.rule_list) => {
-  let render_rule = Styled_ppx_css_parser.Render.rule;
-
   let (atomic_classnames, dynamic_vars) =
     Css_transform.transform_rule_list(~file, ~label?, declarations);
 
@@ -736,13 +632,9 @@ let push = (~file, ~label=?, declarations: Styled_ppx_css_parser.Ast.rule_list) 
 let push_keyframe = (keyframe_rules: Styled_ppx_css_parser.Ast.rule_list) => {
   open Styled_ppx_css_parser.Ast;
 
-  let render_rule = Styled_ppx_css_parser.Render.rule;
-
   let (rules, _) = keyframe_rules;
   let rendered_body =
-    rules
-    |> List.map(Styled_ppx_css_parser.Render.rule)
-    |> String.concat(" ");
+    rules |> List.map(render_rule) |> String.concat(" ");
 
   let keyframe_name =
     Printf.sprintf("keyframe-%s", Murmur2.default(rendered_body));
@@ -766,8 +658,6 @@ let push_keyframe = (keyframe_rules: Styled_ppx_css_parser.Ast.rule_list) => {
 
 let push_global = (global_rules: Styled_ppx_css_parser.Ast.rule_list) => {
   open Styled_ppx_css_parser.Ast;
-
-  let render_rule = Styled_ppx_css_parser.Render.rule;
 
   let (rules, _) = global_rules;
 
