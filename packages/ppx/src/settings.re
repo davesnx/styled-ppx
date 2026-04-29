@@ -5,13 +5,6 @@ type flag('a) = {
   defaultValue: 'a,
 };
 
-let production = {
-  flag: "--production",
-  doc: "*doesn't do anything*",
-  value: None,
-  defaultValue: false,
-};
-
 let jsxVersion = {
   flag: "--jsx-version",
   doc: "Configure the version of JSX to use (3 or 4)",
@@ -33,20 +26,46 @@ let native = {
   defaultValue: false,
 };
 
+let debug = {
+  flag: "--debug",
+  doc: "Enable debug logging",
+  value: None,
+  defaultValue: false,
+};
+
+let minify = {
+  flag: "--minify",
+  doc: "Minify generated CSS by removing unnecessary whitespace",
+  value: None,
+  defaultValue: false,
+};
+
+let dev = {
+  flag: "--dev",
+  doc: "Emit dev-mode marker classes (e.g. cx-layout) on [%cx2] output to make atomized class lists greppable in DOM inspectors. No effect on extracted CSS or atom hashes.",
+  value: None,
+  defaultValue: false,
+};
+
 type settings = {
   jsxVersion: flag(int),
   jsxMode: flag(string),
-  production: flag(bool),
   native: flag(bool),
-};
-let settings = {
-  jsxVersion,
-  jsxMode,
-  production,
-  native,
+  debug: flag(bool),
+  minify: flag(bool),
+  dev: flag(bool),
 };
 
-let currentSettings = ref(settings);
+let currentSettings =
+  ref({
+    jsxVersion,
+    jsxMode,
+    native,
+    debug,
+    minify,
+    dev,
+  });
+
 let updateSettings = newSettings => currentSettings := newSettings;
 
 module Get = {
@@ -56,12 +75,18 @@ module Get = {
   let jsxMode = () =>
     currentSettings.contents.jsxMode.value
     |> Option.value(~default=currentSettings.contents.jsxMode.defaultValue);
-  let production = () =>
-    currentSettings.contents.production.value
-    |> Option.value(~default=currentSettings.contents.production.defaultValue);
   let native = () =>
     currentSettings.contents.native.value
     |> Option.value(~default=currentSettings.contents.native.defaultValue);
+  let debug = () =>
+    currentSettings.contents.debug.value
+    |> Option.value(~default=currentSettings.contents.debug.defaultValue);
+  let minify = () =>
+    currentSettings.contents.minify.value
+    |> Option.value(~default=currentSettings.contents.minify.defaultValue);
+  let dev = () =>
+    currentSettings.contents.dev.value
+    |> Option.value(~default=currentSettings.contents.dev.defaultValue);
 };
 
 module Update = {
@@ -81,19 +106,35 @@ module Update = {
         value,
       },
     });
-  let production = value =>
-    updateSettings({
-      ...currentSettings.contents,
-      production: {
-        ...currentSettings.contents.production,
-        value: Some(value),
-      },
-    });
   let native = value =>
     updateSettings({
       ...currentSettings.contents,
       native: {
         ...currentSettings.contents.native,
+        value: Some(value),
+      },
+    });
+  let debug = value =>
+    updateSettings({
+      ...currentSettings.contents,
+      debug: {
+        ...currentSettings.contents.debug,
+        value: Some(value),
+      },
+    });
+  let minify = value =>
+    updateSettings({
+      ...currentSettings.contents,
+      minify: {
+        ...currentSettings.contents.minify,
+        value: Some(value),
+      },
+    });
+  let dev = value =>
+    updateSettings({
+      ...currentSettings.contents,
+      dev: {
+        ...currentSettings.contents.dev,
         value: Some(value),
       },
     });

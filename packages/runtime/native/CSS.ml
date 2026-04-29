@@ -456,6 +456,21 @@ let style (styles : rule array) =
     Stylesheet.push instance (hash, Classnames { className; styles });
     className
 
+type styles = string * ReactDOM.Style.t
+
+let make className vars : styles =
+  let style =
+    List.fold_left
+      (fun style (key, value) -> ReactDOM.Style.unsafeAddProp style key value)
+      (ReactDOM.Style.make ()) vars
+  in
+  className, style
+
+let merge (styles1 : styles) (styles2 : styles) : styles =
+  let className = Printf.sprintf "%s %s" (fst styles1) (fst styles2) in
+  let style = ReactDOM.Style.combine (snd styles1) (snd styles2) in
+  String.trim className, style
+
 let global (styles : rule array) =
   match styles with
   | [||] -> ()
@@ -503,7 +518,9 @@ let get_string_style_hashes () =
     Buffer.add_string buffer (String.trim hash));
   Buffer.contents buffer
 
-let style_tag ?key:_ ?children:_ () =
+let style_tagProps ?children:(_ : React.element option) () = ()
+
+let style_tag ?key:_ () =
   React.createElement "style"
     [
       String

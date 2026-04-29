@@ -49,7 +49,19 @@ extraction:
 2. Type-check declarations against `packages/css-grammar`
 3. Atomize declarations in `packages/ppx/src/Css_file.re`
 4. Extract interpolation types with `Css_grammar.Parser.get_interpolation_types`
-5. Generate `CSS.make(...)` calls and emit `[@css ...]` attributes
+5. Resolve class-name interpolation in selectors against the per-file
+   `Class_registry` (see `packages/ppx/src/Css_file.re`) so `$(name)` is
+   replaced with the actual minted class names before the CSS AST is rendered
+6. Generate `CSS.make(...)` calls and emit `[@css ...]` attributes
+
+The `Class_registry` is populated as each `[%cx2]` extension expands: the
+enclosing `let`-binding name (from `Code_path.enclosing_value`) is mapped to
+the list of class names that atomization produced. Later `[%cx2]` blocks in
+the same file resolve `&.$(name)` and similar selector interpolations against
+that table, fanning a multi-declaration source binding into a chained compound
+selector (`&.cssA.cssB`). Cross-module and unresolved references raise a
+clear PPX error rather than emitting a literal `$(...)` placeholder into the
+extracted CSS.
 
 This path still depends on reparsing value strings when interpolation typing or
 property validation is needed.

@@ -87,91 +87,219 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.borderImageSource(`none);
   CSS.borderImageSource(`url({js|foo.png|js}));
-  CSS.unsafe({js|borderImageSlice|js}, {js|10|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|30%|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|10 10|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|30% 10|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|10 30%|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|30% 30%|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|10 10 10|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|30% 10 10|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|10 30% 10|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|30% 30% 10|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|10 10 30%|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|30% 10 30%|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|10 30% 30%|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|30% 30% 30%|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|10 10 10 10|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|30% 10 10 10|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|10 30% 10 10|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|30% 30% 10 10|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|10 10 30% 10|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|30% 10 30% 10|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|10 30% 30% 10|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|30% 30% 30% 10|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|10 10 10 30%|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|30% 10 10 30%|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|10 30% 10 30%|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|30% 30% 10 30%|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|10 10 30% 30%|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|30% 10 30% 30%|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|10 30% 30% 30%|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|30% 30% 30% 30%|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|fill 30%|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|fill 10|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|fill 2 4 8% 16%|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|30% fill|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|10 fill|js});
-  CSS.unsafe({js|borderImageSlice|js}, {js|2 4 8% 16% fill|js});
-  CSS.unsafe({js|borderImageWidth|js}, {js|10px|js});
-  CSS.unsafe({js|borderImageWidth|js}, {js|5%|js});
-  CSS.unsafe({js|borderImageWidth|js}, {js|28|js});
-  CSS.unsafe({js|borderImageWidth|js}, {js|auto|js});
-  CSS.unsafe({js|borderImageWidth|js}, {js|10px 10px|js});
-  CSS.unsafe({js|borderImageWidth|js}, {js|5% 10px|js});
-  CSS.unsafe({js|borderImageWidth|js}, {js|28 10px|js});
-  CSS.unsafe({js|borderImageWidth|js}, {js|auto 10px|js});
-  CSS.unsafe({js|borderImageWidth|js}, {js|10px 5%|js});
-  CSS.unsafe({js|borderImageWidth|js}, {js|5% 5%|js});
-  CSS.unsafe({js|borderImageWidth|js}, {js|28 5%|js});
-  CSS.unsafe({js|borderImageWidth|js}, {js|auto 5%|js});
-  CSS.unsafe({js|borderImageWidth|js}, {js|10px 28|js});
-  CSS.unsafe({js|borderImageWidth|js}, {js|5% 28|js});
-  CSS.unsafe({js|borderImageWidth|js}, {js|28 28|js});
-  CSS.unsafe({js|borderImageWidth|js}, {js|auto 28|js});
-  CSS.unsafe({js|borderImageWidth|js}, {js|10px auto|js});
-  CSS.unsafe({js|borderImageWidth|js}, {js|5% auto|js});
-  CSS.unsafe({js|borderImageWidth|js}, {js|28 auto|js});
-  CSS.unsafe({js|borderImageWidth|js}, {js|auto auto|js});
-  CSS.unsafe({js|borderImageWidth|js}, {js|10px 10% 10|js});
-  CSS.unsafe({js|borderImageWidth|js}, {js|5% 10px 20 auto|js});
-  CSS.unsafe({js|borderImageOutset|js}, {js|10px|js});
-  CSS.unsafe({js|borderImageOutset|js}, {js|20|js});
-  CSS.unsafe({js|borderImageOutset|js}, {js|10px 20|js});
-  CSS.unsafe({js|borderImageOutset|js}, {js|10px 20px|js});
-  CSS.unsafe({js|borderImageOutset|js}, {js|20 30|js});
-  CSS.unsafe({js|borderImageOutset|js}, {js|2px 3px 4|js});
-  CSS.unsafe({js|borderImageOutset|js}, {js|1 2px 3px 4|js});
-  CSS.unsafe({js|borderImageRepeat|js}, {js|stretch|js});
-  CSS.unsafe({js|borderImageRepeat|js}, {js|repeat|js});
-  CSS.unsafe({js|borderImageRepeat|js}, {js|round|js});
-  CSS.unsafe({js|borderImageRepeat|js}, {js|space|js});
-  CSS.unsafe({js|borderImageRepeat|js}, {js|stretch stretch|js});
-  CSS.unsafe({js|borderImageRepeat|js}, {js|repeat stretch|js});
-  CSS.unsafe({js|borderImageRepeat|js}, {js|round stretch|js});
-  CSS.unsafe({js|borderImageRepeat|js}, {js|space stretch|js});
-  CSS.unsafe({js|borderImageRepeat|js}, {js|stretch repeat|js});
-  CSS.unsafe({js|borderImageRepeat|js}, {js|repeat repeat|js});
-  CSS.unsafe({js|borderImageRepeat|js}, {js|round repeat|js});
-  CSS.unsafe({js|borderImageRepeat|js}, {js|space repeat|js});
-  CSS.unsafe({js|borderImageRepeat|js}, {js|stretch round|js});
-  CSS.unsafe({js|borderImageRepeat|js}, {js|repeat round|js});
-  CSS.unsafe({js|borderImageRepeat|js}, {js|round round|js});
-  CSS.unsafe({js|borderImageRepeat|js}, {js|space round|js});
-  CSS.unsafe({js|borderImageRepeat|js}, {js|stretch space|js});
-  CSS.unsafe({js|borderImageRepeat|js}, {js|repeat space|js});
-  CSS.unsafe({js|borderImageRepeat|js}, {js|round space|js});
-  CSS.unsafe({js|borderImageRepeat|js}, {js|space space|js});
+  CSS.borderImageSlice1(~fill=false, `num(10.));
+  CSS.borderImageSlice1(~fill=false, `percent(30.));
+  CSS.borderImageSlice2(~fill=false, `num(10.), `num(10.));
+  CSS.borderImageSlice2(~fill=false, `percent(30.), `num(10.));
+  CSS.borderImageSlice2(~fill=false, `num(10.), `percent(30.));
+  CSS.borderImageSlice2(~fill=false, `percent(30.), `percent(30.));
+  CSS.borderImageSlice3(~fill=false, `num(10.), `num(10.), `num(10.));
+  CSS.borderImageSlice3(~fill=false, `percent(30.), `num(10.), `num(10.));
+  CSS.borderImageSlice3(~fill=false, `num(10.), `percent(30.), `num(10.));
+  CSS.borderImageSlice3(
+    ~fill=false,
+    `percent(30.),
+    `percent(30.),
+    `num(10.),
+  );
+  CSS.borderImageSlice3(~fill=false, `num(10.), `num(10.), `percent(30.));
+  CSS.borderImageSlice3(
+    ~fill=false,
+    `percent(30.),
+    `num(10.),
+    `percent(30.),
+  );
+  CSS.borderImageSlice3(
+    ~fill=false,
+    `num(10.),
+    `percent(30.),
+    `percent(30.),
+  );
+  CSS.borderImageSlice3(
+    ~fill=false,
+    `percent(30.),
+    `percent(30.),
+    `percent(30.),
+  );
+  CSS.borderImageSlice4(
+    ~fill=false,
+    `num(10.),
+    `num(10.),
+    `num(10.),
+    `num(10.),
+  );
+  CSS.borderImageSlice4(
+    ~fill=false,
+    `percent(30.),
+    `num(10.),
+    `num(10.),
+    `num(10.),
+  );
+  CSS.borderImageSlice4(
+    ~fill=false,
+    `num(10.),
+    `percent(30.),
+    `num(10.),
+    `num(10.),
+  );
+  CSS.borderImageSlice4(
+    ~fill=false,
+    `percent(30.),
+    `percent(30.),
+    `num(10.),
+    `num(10.),
+  );
+  CSS.borderImageSlice4(
+    ~fill=false,
+    `num(10.),
+    `num(10.),
+    `percent(30.),
+    `num(10.),
+  );
+  CSS.borderImageSlice4(
+    ~fill=false,
+    `percent(30.),
+    `num(10.),
+    `percent(30.),
+    `num(10.),
+  );
+  CSS.borderImageSlice4(
+    ~fill=false,
+    `num(10.),
+    `percent(30.),
+    `percent(30.),
+    `num(10.),
+  );
+  CSS.borderImageSlice4(
+    ~fill=false,
+    `percent(30.),
+    `percent(30.),
+    `percent(30.),
+    `num(10.),
+  );
+  CSS.borderImageSlice4(
+    ~fill=false,
+    `num(10.),
+    `num(10.),
+    `num(10.),
+    `percent(30.),
+  );
+  CSS.borderImageSlice4(
+    ~fill=false,
+    `percent(30.),
+    `num(10.),
+    `num(10.),
+    `percent(30.),
+  );
+  CSS.borderImageSlice4(
+    ~fill=false,
+    `num(10.),
+    `percent(30.),
+    `num(10.),
+    `percent(30.),
+  );
+  CSS.borderImageSlice4(
+    ~fill=false,
+    `percent(30.),
+    `percent(30.),
+    `num(10.),
+    `percent(30.),
+  );
+  CSS.borderImageSlice4(
+    ~fill=false,
+    `num(10.),
+    `num(10.),
+    `percent(30.),
+    `percent(30.),
+  );
+  CSS.borderImageSlice4(
+    ~fill=false,
+    `percent(30.),
+    `num(10.),
+    `percent(30.),
+    `percent(30.),
+  );
+  CSS.borderImageSlice4(
+    ~fill=false,
+    `num(10.),
+    `percent(30.),
+    `percent(30.),
+    `percent(30.),
+  );
+  CSS.borderImageSlice4(
+    ~fill=false,
+    `percent(30.),
+    `percent(30.),
+    `percent(30.),
+    `percent(30.),
+  );
+  CSS.borderImageSlice1(~fill=true, `percent(30.));
+  CSS.borderImageSlice1(~fill=true, `num(10.));
+  CSS.borderImageSlice4(
+    ~fill=true,
+    `num(2.),
+    `num(4.),
+    `percent(8.),
+    `percent(16.),
+  );
+  CSS.borderImageSlice1(~fill=true, `percent(30.));
+  CSS.borderImageSlice1(~fill=true, `num(10.));
+  CSS.borderImageSlice4(
+    ~fill=true,
+    `num(2.),
+    `num(4.),
+    `percent(8.),
+    `percent(16.),
+  );
+  CSS.borderImageWidth(`pxFloat(10.));
+  CSS.borderImageWidth(`percent(5.));
+  CSS.borderImageWidth(`num(28.));
+  CSS.borderImageWidth(`auto);
+  CSS.borderImageWidth2(`pxFloat(10.), `pxFloat(10.));
+  CSS.borderImageWidth2(`percent(5.), `pxFloat(10.));
+  CSS.borderImageWidth2(`num(28.), `pxFloat(10.));
+  CSS.borderImageWidth2(`auto, `pxFloat(10.));
+  CSS.borderImageWidth2(`pxFloat(10.), `percent(5.));
+  CSS.borderImageWidth2(`percent(5.), `percent(5.));
+  CSS.borderImageWidth2(`num(28.), `percent(5.));
+  CSS.borderImageWidth2(`auto, `percent(5.));
+  CSS.borderImageWidth2(`pxFloat(10.), `num(28.));
+  CSS.borderImageWidth2(`percent(5.), `num(28.));
+  CSS.borderImageWidth2(`num(28.), `num(28.));
+  CSS.borderImageWidth2(`auto, `num(28.));
+  CSS.borderImageWidth2(`pxFloat(10.), `auto);
+  CSS.borderImageWidth2(`percent(5.), `auto);
+  CSS.borderImageWidth2(`num(28.), `auto);
+  CSS.borderImageWidth2(`auto, `auto);
+  CSS.borderImageWidth3(`pxFloat(10.), `percent(10.), `num(10.));
+  CSS.borderImageWidth4(`percent(5.), `pxFloat(10.), `num(20.), `auto);
+  CSS.borderImageOutset(`pxFloat(10.));
+  CSS.borderImageOutset(`num(20.));
+  CSS.borderImageOutset2(`pxFloat(10.), `num(20.));
+  CSS.borderImageOutset2(`pxFloat(10.), `pxFloat(20.));
+  CSS.borderImageOutset2(`num(20.), `num(30.));
+  CSS.borderImageOutset3(`pxFloat(2.), `pxFloat(3.), `num(4.));
+  CSS.borderImageOutset4(`num(1.), `pxFloat(2.), `pxFloat(3.), `num(4.));
+  CSS.borderImageRepeat(`stretch);
+  CSS.borderImageRepeat(`repeat);
+  CSS.borderImageRepeat(`round);
+  CSS.borderImageRepeat(`space);
+  CSS.borderImageRepeat2(`stretch, `stretch);
+  CSS.borderImageRepeat2(`repeat, `stretch);
+  CSS.borderImageRepeat2(`round, `stretch);
+  CSS.borderImageRepeat2(`space, `stretch);
+  CSS.borderImageRepeat2(`stretch, `repeat);
+  CSS.borderImageRepeat2(`repeat, `repeat);
+  CSS.borderImageRepeat2(`round, `repeat);
+  CSS.borderImageRepeat2(`space, `repeat);
+  CSS.borderImageRepeat2(`stretch, `round);
+  CSS.borderImageRepeat2(`repeat, `round);
+  CSS.borderImageRepeat2(`round, `round);
+  CSS.borderImageRepeat2(`space, `round);
+  CSS.borderImageRepeat2(`stretch, `space);
+  CSS.borderImageRepeat2(`repeat, `space);
+  CSS.borderImageRepeat2(`round, `space);
+  CSS.borderImageRepeat2(`space, `space);
   CSS.unsafe({js|borderImage|js}, {js|url(foo.png) 10|js});
   CSS.unsafe({js|borderImage|js}, {js|url(foo.png) 10%|js});
   CSS.unsafe({js|borderImage|js}, {js|url(foo.png) 10% fill|js});
@@ -185,6 +313,18 @@ If this test fail means that the module is not in sync with the ppx
     {js|url(foo.png) fill 10 / 10% / 10px space|js},
   );
   
+  CSS.boxShadows([|
+    CSS.Shadow.box(~x=`pxFloat(1.), ~y=`pxFloat(1.), `currentColor),
+  |]);
+  CSS.boxShadows([|CSS.Shadow.box(~x=`zero, ~y=`zero, CSS.black)|]);
+  CSS.boxShadows([|
+    CSS.Shadow.box(
+      ~x=`pxFloat(1.),
+      ~y=`pxFloat(2.),
+      ~blur=`pxFloat(3.),
+      CSS.black,
+    ),
+  |]);
   CSS.boxShadows([|
     CSS.Shadow.box(
       ~x=`pxFloat(1.),
@@ -691,4 +831,3 @@ If this test fail means that the module is not in sync with the ppx
       (0, [|CSS.backgroundPosition(`hv((`zero, `zero)))|]),
       (100, [|CSS.backgroundPosition(`hv((`rem(1.), `zero)))|]),
     |]);
-

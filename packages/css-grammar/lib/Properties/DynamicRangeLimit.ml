@@ -1,0 +1,18 @@
+open Types
+open Support
+
+module Permissive_cascading = struct
+  type t = Styled_ppx_css_parser.Ast.component_value_list
+
+  let rule : t Rule.rule = fun input -> Ok input, []
+  let type_check input = Ok input
+  let runtime_module_path = Some "Css_types.Cascading"
+
+  let infer_interpolation_types =
+    detect_whole_value_interpolation ~runtime_module_path
+
+  let infer_interpolation_types_with_context _ = infer_interpolation_types
+end
+
+let entries : (kind * packed_rule) list =
+  [ Property "dynamic-range-limit", pack_module (module Permissive_cascading) ]

@@ -5,6 +5,8 @@ let label label = Rule.declaration ({js|label|js}, label)
 let aspectRatio x =
   Rule.declaration ({js|aspectRatio|js}, AspectRatio.toString x)
 
+let appearance x = Rule.declaration ({js|appearance|js}, Appearance.toString x)
+
 let alignContent x =
   Rule.declaration ({js|alignContent|js}, AlignContent.toString x)
 
@@ -85,6 +87,15 @@ let backgroundAttachment x =
   Rule.declaration
     ({js|backgroundAttachment|js}, BackgroundAttachment.toString x)
 
+let backgroundBlendMode x =
+  Rule.declaration ({js|backgroundBlendMode|js}, BackgroundBlendMode.toString x)
+
+let backgroundBlendModes xs =
+  Rule.declaration
+    ( {js|backgroundBlendMode|js},
+      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:BackgroundBlendMode.toString
+        xs )
+
 let backgroundColor x =
   Rule.declaration ({js|backgroundColor|js}, Color.toString x)
 
@@ -112,6 +123,9 @@ let maskImage x = Rule.declaration ({js|maskImage|js}, MaskImage.toString x)
 (* https://developer.mozilla.org/en-US/docs/Web/CSS/image-rendering *)
 let imageRendering x =
   Rule.declaration ({js|imageRendering|js}, ImageRendering.toString x)
+
+let imageResolution x =
+  Rule.declaration ({js|imageResolution|js}, ImageResolution.toString x)
 
 let imageOrientation x =
   Rule.declaration ({js|imageOrientation|js}, ImageOrientation.toString x)
@@ -184,6 +198,46 @@ let borderBottomRightRadius x =
 let borderBottomWidth x =
   Rule.declaration ({js|borderBottomWidth|js}, LineWidth.toString x)
 
+let borderBlock px style color =
+  Rule.declaration ({js|borderBlock|js}, Border.toString px style color)
+
+let borderBlockColor x =
+  Rule.declaration ({js|borderBlockColor|js}, Color.toString x)
+
+let borderBlockColor2 x y =
+  Rule.declaration
+    ({js|borderBlockColor|js}, Color.toString x ^ {js| |js} ^ Color.toString y)
+
+let borderBlockEnd px style color =
+  Rule.declaration ({js|borderBlockEnd|js}, Border.toString px style color)
+
+let borderBlockEndColor x =
+  Rule.declaration ({js|borderBlockEndColor|js}, Color.toString x)
+
+let borderBlockEndStyle x =
+  Rule.declaration ({js|borderBlockEndStyle|js}, BorderStyle.toString x)
+
+let borderBlockEndWidth x =
+  Rule.declaration ({js|borderBlockEndWidth|js}, LineWidth.toString x)
+
+let borderBlockStart px style color =
+  Rule.declaration ({js|borderBlockStart|js}, Border.toString px style color)
+
+let borderBlockStartColor x =
+  Rule.declaration ({js|borderBlockStartColor|js}, Color.toString x)
+
+let borderBlockStartStyle x =
+  Rule.declaration ({js|borderBlockStartStyle|js}, BorderStyle.toString x)
+
+let borderBlockStartWidth x =
+  Rule.declaration ({js|borderBlockStartWidth|js}, LineWidth.toString x)
+
+let borderBlockStyle x =
+  Rule.declaration ({js|borderBlockStyle|js}, BorderStyle.toString x)
+
+let borderBlockWidth x =
+  Rule.declaration ({js|borderBlockWidth|js}, LineWidth.toString x)
+
 let borderCollapse x =
   Rule.declaration ({js|borderCollapse|js}, BorderCollapse.toString x)
 
@@ -197,6 +251,46 @@ let borderLeftWidth x =
 
 let borderSpacing x = Rule.declaration ({js|borderSpacing|js}, Length.toString x)
 let borderRadius x = Rule.declaration ({js|borderRadius|js}, Length.toString x)
+
+let borderInline px style color =
+  Rule.declaration ({js|borderInline|js}, Border.toString px style color)
+
+let borderInlineColor x =
+  Rule.declaration ({js|borderInlineColor|js}, Color.toString x)
+
+let borderInlineColor2 x y =
+  Rule.declaration
+    ({js|borderInlineColor|js}, Color.toString x ^ {js| |js} ^ Color.toString y)
+
+let borderInlineEnd px style color =
+  Rule.declaration ({js|borderInlineEnd|js}, Border.toString px style color)
+
+let borderInlineEndColor x =
+  Rule.declaration ({js|borderInlineEndColor|js}, Color.toString x)
+
+let borderInlineEndStyle x =
+  Rule.declaration ({js|borderInlineEndStyle|js}, BorderStyle.toString x)
+
+let borderInlineEndWidth x =
+  Rule.declaration ({js|borderInlineEndWidth|js}, LineWidth.toString x)
+
+let borderInlineStart px style color =
+  Rule.declaration ({js|borderInlineStart|js}, Border.toString px style color)
+
+let borderInlineStartColor x =
+  Rule.declaration ({js|borderInlineStartColor|js}, Color.toString x)
+
+let borderInlineStartStyle x =
+  Rule.declaration ({js|borderInlineStartStyle|js}, BorderStyle.toString x)
+
+let borderInlineStartWidth x =
+  Rule.declaration ({js|borderInlineStartWidth|js}, LineWidth.toString x)
+
+let borderInlineStyle x =
+  Rule.declaration ({js|borderInlineStyle|js}, BorderStyle.toString x)
+
+let borderInlineWidth x =
+  Rule.declaration ({js|borderInlineWidth|js}, LineWidth.toString x)
 
 let borderRadius4 ~topLeft ~topRight ~bottomLeft ~bottomRight =
   Rule.declaration
@@ -227,19 +321,54 @@ let borderTopRightRadius x =
 let borderTopWidth x =
   Rule.declaration ({js|borderTopWidth|js}, LineWidth.toString x)
 
+let breakBefore x =
+  Rule.declaration ({js|breakBefore|js}, BreakBefore.toString x)
+
+let breakAfter x = Rule.declaration ({js|breakAfter|js}, BreakAfter.toString x)
+
+let breakInside x =
+  Rule.declaration ({js|breakInside|js}, BreakInside.toString x)
+
+let boxDecorationBreak x =
+  Rule.declaration ({js|boxDecorationBreak|js}, BoxDecorationBreak.toString x)
+
 let borderWidth x = Rule.declaration ({js|borderWidth|js}, LineWidth.toString x)
 let bottom x = Rule.declaration ({js|bottom|js}, Bottom.toString x)
+let blockSize x = Rule.declaration ({js|blockSize|js}, Width.toString x)
 let boxSizing x = Rule.declaration ({js|boxSizing|js}, BoxSizing.toString x)
+
+let captionSide x =
+  Rule.declaration ({js|captionSide|js}, CaptionSide.toString x)
+
 let clear x = Rule.declaration ({js|clear|js}, Clear.toString x)
 let clipPath x = Rule.declaration ({js|clipPath|js}, ClipPath.toString x)
 let color x = Rule.declaration ({js|color|js}, Color.toString x)
 
+let colorAdjust x =
+  Rule.declaration ({js|colorAdjust|js}, ColorAdjust.toString x)
+
+let colorScheme x =
+  Rule.declaration ({js|colorScheme|js}, ColorScheme.toString x)
+
 let columnCount x =
   Rule.declaration ({js|columnCount|js}, ColumnCount.toString x)
 
+let columnFill x = Rule.declaration ({js|columnFill|js}, ColumnFill.toString x)
+
+let columnRuleColor x =
+  Rule.declaration ({js|columnRuleColor|js}, Color.toString x)
+
+let columnRuleWidth x =
+  Rule.declaration ({js|columnRuleWidth|js}, LineWidth.toString x)
+
+let columnRuleStyle x =
+  Rule.declaration ({js|columnRuleStyle|js}, ColumnRuleStyle.toString x)
+
+let columnSpan x = Rule.declaration ({js|columnSpan|js}, ColumnSpan.toString x)
 let rowGap x = Rule.declaration ({js|rowGap|js}, Gap.toString x)
 let columnGap x = Rule.declaration ({js|columnGap|js}, Gap.toString x)
 let contentRule x = Rule.declaration ({js|content|js}, Content.toString x)
+let emptyCells x = Rule.declaration ({js|emptyCells|js}, EmptyCells.toString x)
 
 let contentsRule xs alt =
   match alt with
@@ -331,6 +460,12 @@ let fontWeight x = Rule.declaration ({js|fontWeight|js}, FontWeight.toString x)
 let fontDisplay x =
   Rule.declaration ({js|fontDisplay|js}, FontDisplay.toString x)
 
+let fieldSizing x =
+  Rule.declaration ({js|fieldSizing|js}, FieldSizing.toString x)
+
+let forcedColorAdjust x =
+  Rule.declaration ({js|forcedColorAdjust|js}, ForcedColorAdjust.toString x)
+
 let sizeAdjust x = Rule.declaration ({js|sizeAdjust|js}, Percentage.toString x)
 let gridProperty x = Rule.declaration ({js|grid|js}, Grid.toString x)
 
@@ -362,6 +497,9 @@ let gridRow2 start end' =
 let gap x = Rule.declaration ({js|gap|js}, Gap.toString x)
 let gridGap x = Rule.declaration ({js|gridGap|js}, Gap.toString x)
 
+let hangingPunctuation x =
+  Rule.declaration ({js|hangingPunctuation|js}, HangingPunctuation.toString x)
+
 let gap2 ~rowGap ~columnGap =
   Rule.declaration
     ({js|gap|js}, Gap.toString rowGap ^ {js| |js} ^ Gap.toString columnGap)
@@ -377,6 +515,65 @@ let gridRowStart n =
   Rule.declaration ({js|gridRowStart|js}, GridRowStart.toString n)
 
 let height x = Rule.declaration ({js|height|js}, Height.toString x)
+let inlineSize x = Rule.declaration ({js|inlineSize|js}, Width.toString x)
+let inset x = Rule.declaration ({js|inset|js}, Top.toString x)
+
+let inset2 ~v ~h =
+  Rule.declaration ({js|inset|js}, Top.toString v ^ {js| |js} ^ Top.toString h)
+
+let inset3 ~top ~h ~bottom =
+  Rule.declaration
+    ( {js|inset|js},
+      Top.toString top
+      ^ {js| |js}
+      ^ Top.toString h
+      ^ {js| |js}
+      ^ Top.toString bottom )
+
+let inset4 ~top ~right ~bottom ~left =
+  Rule.declaration
+    ( {js|inset|js},
+      Top.toString top
+      ^ {js| |js}
+      ^ Top.toString right
+      ^ {js| |js}
+      ^ Top.toString bottom
+      ^ {js| |js}
+      ^ Top.toString left )
+
+let insetBlock x = Rule.declaration ({js|insetBlock|js}, InsetBlock.toString x)
+
+let insetBlock2 ~v ~h =
+  Rule.declaration
+    ( {js|insetBlock|js},
+      InsetBlock.toString v ^ {js| |js} ^ InsetBlock.toString h )
+
+let insetBlockStart x =
+  Rule.declaration ({js|insetBlockStart|js}, Top.toString x)
+
+let insetBlockEnd x = Rule.declaration ({js|insetBlockEnd|js}, Top.toString x)
+
+let insetInline x =
+  Rule.declaration ({js|insetInline|js}, InsetInline.toString x)
+
+let insetInline2 ~v ~h =
+  Rule.declaration
+    ( {js|insetInline|js},
+      InsetInline.toString v ^ {js| |js} ^ InsetInline.toString h )
+
+let insetInlineStart x =
+  Rule.declaration ({js|insetInlineStart|js}, Top.toString x)
+
+let insetInlineEnd x = Rule.declaration ({js|insetInlineEnd|js}, Top.toString x)
+
+let interpolateSize x =
+  Rule.declaration ({js|interpolateSize|js}, InterpolateSize.toString x)
+
+let initialLetter x =
+  Rule.declaration ({js|initialLetter|js}, InitialLetter.toString x)
+
+let initialLetterAlign x =
+  Rule.declaration ({js|initialLetterAlign|js}, InitialLetterAlign.toString x)
 
 let textEmphasisStyle x =
   Rule.declaration ({js|textEmphasisStyle|js}, TextEmphasisStyle.toString x)
@@ -411,6 +608,7 @@ let letterSpacing x =
   Rule.declaration ({js|letterSpacing|js}, LetterSpacing.toString x)
 
 let lineHeight x = Rule.declaration ({js|lineHeight|js}, LineHeight.toString x)
+let lineClamp x = Rule.declaration ({js|lineClamp|js}, LineClamp.toString x)
 
 let listStyle style position image =
   Rule.declaration
@@ -461,11 +659,54 @@ let marginLeft x = Rule.declaration ({js|marginLeft|js}, Margin.toString x)
 let marginRight x = Rule.declaration ({js|marginRight|js}, Margin.toString x)
 let marginTop x = Rule.declaration ({js|marginTop|js}, Margin.toString x)
 let marginBottom x = Rule.declaration ({js|marginBottom|js}, Margin.toString x)
+let marginBlock x = Rule.declaration ({js|marginBlock|js}, Margin.toString x)
+
+let marginBlock2 ~v ~h =
+  Rule.declaration
+    ({js|marginBlock|js}, Margin.toString v ^ {js| |js} ^ Margin.toString h)
+
+let marginBlockStart x =
+  Rule.declaration ({js|marginBlockStart|js}, Margin.toString x)
+
+let marginBlockEnd x =
+  Rule.declaration ({js|marginBlockEnd|js}, Margin.toString x)
+
+let marginInline x = Rule.declaration ({js|marginInline|js}, Margin.toString x)
+
+let marginInline2 ~v ~h =
+  Rule.declaration
+    ({js|marginInline|js}, Margin.toString v ^ {js| |js} ^ Margin.toString h)
+
+let marginInlineStart x =
+  Rule.declaration ({js|marginInlineStart|js}, Margin.toString x)
+
+let marginInlineEnd x =
+  Rule.declaration ({js|marginInlineEnd|js}, Margin.toString x)
+
 let maxHeight x = Rule.declaration ({js|maxHeight|js}, MaxHeight.toString x)
+let maxBlockSize x = Rule.declaration ({js|maxBlockSize|js}, MaxWidth.toString x)
+
+let maxInlineSize x =
+  Rule.declaration ({js|maxInlineSize|js}, MaxWidth.toString x)
+
 let maxWidth x = Rule.declaration ({js|maxWidth|js}, MaxWidth.toString x)
+let maxLines x = Rule.declaration ({js|maxLines|js}, MaxLines.toString x)
+
+let masonryAutoFlow x =
+  Rule.declaration ({js|masonryAutoFlow|js}, MasonryAutoFlow.toString x)
+
+let orphans x = Rule.declaration ({js|orphans|js}, Orphans.toString x)
 let minHeight x = Rule.declaration ({js|minHeight|js}, MinHeight.toString x)
+let minBlockSize x = Rule.declaration ({js|minBlockSize|js}, MinWidth.toString x)
+
+let minInlineSize x =
+  Rule.declaration ({js|minInlineSize|js}, MinWidth.toString x)
+
 let minWidth x = Rule.declaration ({js|minWidth|js}, MinWidth.toString x)
 let objectFit x = Rule.declaration ({js|objectFit|js}, ObjectFit.toString x)
+
+let mixBlendMode x =
+  Rule.declaration ({js|mixBlendMode|js}, MixBlendMode.toString x)
 
 let objectPosition x =
   Rule.declaration ({js|objectPosition|js}, ObjectPosition.toString x)
@@ -522,6 +763,30 @@ let overflowWrap x =
   Rule.declaration ({js|overflowWrap|js}, OverflowWrap.toString x)
 
 let padding x = Rule.declaration ({js|padding|js}, Length.toString x)
+let paddingBlock x = Rule.declaration ({js|paddingBlock|js}, Padding.toString x)
+
+let paddingBlock2 ~v ~h =
+  Rule.declaration
+    ({js|paddingBlock|js}, Padding.toString v ^ {js| |js} ^ Padding.toString h)
+
+let paddingBlockStart x =
+  Rule.declaration ({js|paddingBlockStart|js}, Padding.toString x)
+
+let paddingBlockEnd x =
+  Rule.declaration ({js|paddingBlockEnd|js}, Padding.toString x)
+
+let paddingInline x =
+  Rule.declaration ({js|paddingInline|js}, Padding.toString x)
+
+let paddingInline2 ~v ~h =
+  Rule.declaration
+    ({js|paddingInline|js}, Padding.toString v ^ {js| |js} ^ Padding.toString h)
+
+let paddingInlineStart x =
+  Rule.declaration ({js|paddingInlineStart|js}, Padding.toString x)
+
+let paddingInlineEnd x =
+  Rule.declaration ({js|paddingInlineEnd|js}, Padding.toString x)
 
 let padding2 ~v ~h =
   Rule.declaration
@@ -554,6 +819,9 @@ let paddingTop x = Rule.declaration ({js|paddingTop|js}, Length.toString x)
 
 let perspectiveProperty x =
   Rule.declaration ({js|perspective|js}, Perspective.toString x)
+
+let offsetDistance x =
+  Rule.declaration ({js|offsetDistance|js}, Length.toString x)
 
 let perspectiveOrigin x =
   Rule.declaration ({js|perspectiveOrigin|js}, PerspectiveOrigin.toString x)
@@ -634,10 +902,21 @@ let textDecorationSkipInset x =
   Rule.declaration
     ({js|textDecorationSkipInset|js}, TextDecorationSkipInset.toString x)
 
-let textIndent x = Rule.declaration ({js|textIndent|js}, Length.toString x)
+let textIndent x = Rule.declaration ({js|textIndent|js}, TextIndent.toString x)
 
 let textOverflow x =
   Rule.declaration ({js|textOverflow|js}, TextOverflow.toString x)
+
+let textOverflow2 x y =
+  Rule.declaration
+    ( {js|textOverflow|js},
+      TextOverflow.toString x ^ {js| |js} ^ TextOverflow.toString y )
+
+let textCombineUpright x =
+  Rule.declaration ({js|textCombineUpright|js}, TextCombineUpright.toString x)
+
+let textOrientation x =
+  Rule.declaration ({js|textOrientation|js}, TextOrientation.toString x)
 
 let textTransform x =
   Rule.declaration ({js|textTransform|js}, TextTransform.toString x)
@@ -672,12 +951,33 @@ let verticalAlign x =
   Rule.declaration ({js|verticalAlign|js}, VerticalAlign.toString x)
 
 let visibility x = Rule.declaration ({js|visibility|js}, Visibility.toString x)
+let widows x = Rule.declaration ({js|widows|js}, Widows.toString x)
 
 let scrollBehavior x =
   Rule.declaration ({js|scrollBehavior|js}, ScrollBehavior.toString x)
 
 let overscrollBehavior x =
   Rule.declaration ({js|overscrollBehavior|js}, OverscrollBehavior.toString x)
+
+let overscrollBehavior2 v h =
+  Rule.declaration
+    ( {js|overscrollBehavior|js},
+      OverscrollBehavior.toString v ^ {js| |js} ^ OverscrollBehavior.toString h
+    )
+
+let overscrollBehaviorBlock x =
+  Rule.declaration
+    ({js|overscrollBehaviorBlock|js}, OverscrollBehaviorBlock.toString x)
+
+let overscrollBehaviorInline x =
+  Rule.declaration
+    ({js|overscrollBehaviorInline|js}, OverscrollBehaviorInline.toString x)
+
+let overscrollBehaviorX x =
+  Rule.declaration ({js|overscrollBehaviorX|js}, OverscrollBehaviorX.toString x)
+
+let overscrollBehaviorY x =
+  Rule.declaration ({js|overscrollBehaviorY|js}, OverscrollBehaviorY.toString x)
 
 let overflowAnchor x =
   Rule.declaration ({js|overflowAnchor|js}, OverflowAnchor.toString x)
@@ -688,6 +988,10 @@ let columnWidth x =
 let caretColor x = Rule.declaration ({js|caretColor|js}, CaretColor.toString x)
 let width x = Rule.declaration ({js|width|js}, Width.toString x)
 let whiteSpace x = Rule.declaration ({js|whiteSpace|js}, WhiteSpace.toString x)
+
+let writingMode x =
+  Rule.declaration ({js|writingMode|js}, WritingMode.toString x)
+
 let wordBreak x = Rule.declaration ({js|wordBreak|js}, WordBreak.toString x)
 
 let wordSpacing x =
@@ -916,7 +1220,7 @@ module SVG = struct
   let fill x = Rule.declaration ({js|fill|js}, SVG.Fill.toString x)
 
   let fillOpacity opacity =
-    Rule.declaration ({js|fillOpacity|js}, Kloth.Float.to_string opacity)
+    Rule.declaration ({js|fillOpacity|js}, AlphaValue.toString opacity)
 
   (* ??? *)
   let fillRule x =
@@ -938,7 +1242,8 @@ module SVG = struct
       )
 
   (* ??? *)
-  let strokeWidth x = Rule.declaration ({js|strokeWidth|js}, Length.toString x)
+  let strokeWidth x =
+    Rule.declaration ({js|strokeWidth|js}, StrokeWidth.toString x)
 
   (* ??? *)
   let strokeOpacity opacity =
@@ -979,6 +1284,18 @@ let textEmphasisColor x =
 
 let lineBreak x = Rule.declaration ({js|lineBreak|js}, LineBreak.toString x)
 let hyphens x = Rule.declaration ({js|hyphens|js}, Hyphens.toString x)
+
+let hyphenateCharacter x =
+  Rule.declaration ({js|hyphenateCharacter|js}, HyphenateCharacter.toString x)
+
+let hyphenateLimitChars x =
+  Rule.declaration ({js|hyphenateLimitChars|js}, HyphenateLimitChars.toString x)
+
+let hyphenateLimitLines x =
+  Rule.declaration ({js|hyphenateLimitLines|js}, HyphenateLimitLines.toString x)
+
+let hyphenateLimitZone x =
+  Rule.declaration ({js|hyphenateLimitZone|js}, HyphenateLimitZone.toString x)
 
 let textJustify x =
   Rule.declaration ({js|textJustify|js}, TextJustify.toString x)
@@ -1163,6 +1480,23 @@ let borderImageRepeat2 v h =
 
 let unicodeRange x = Rule.declaration ({js|unicodeRange|js}, URange.toString x)
 
+let unicodeBidi x =
+  Rule.declaration ({js|unicodeBidi|js}, UnicodeBidi.toString x)
+
+let scrollSnapAlign x =
+  Rule.declaration ({js|scrollSnapAlign|js}, ScrollSnapAlign.toString x)
+
+let scrollSnapAlign2 v h =
+  Rule.declaration
+    ( {js|scrollSnapAlign|js},
+      ScrollSnapAlign.toString v ^ {js| |js} ^ ScrollSnapAlign.toString h )
+
+let scrollSnapStop x =
+  Rule.declaration ({js|scrollSnapStop|js}, ScrollSnapStop.toString x)
+
+let scrollSnapType x =
+  Rule.declaration ({js|scrollSnapType|js}, ScrollSnapType.toString x)
+
 let scrollbarWidth x =
   Rule.declaration ({js|scrollbarWidth|js}, ScrollbarWidth.toString x)
 
@@ -1176,3 +1510,181 @@ let scrollbarColor2 ~thumbColor ~trackColor =
   Rule.declaration
     ( {js|scrollbarColor|js},
       ScrollbarColor.toString @@ `thumbTrackColor (thumbColor, trackColor) )
+
+let scrollbar3dlightColor x =
+  Rule.declaration ({js|scrollbar3dlightColor|js}, Color.toString x)
+
+let scrollbarArrowColor x =
+  Rule.declaration ({js|scrollbarArrowColor|js}, Color.toString x)
+
+let scrollbarBaseColor x =
+  Rule.declaration ({js|scrollbarBaseColor|js}, Color.toString x)
+
+let scrollbarDarkshadowColor x =
+  Rule.declaration ({js|scrollbarDarkshadowColor|js}, Color.toString x)
+
+let scrollbarFaceColor x =
+  Rule.declaration ({js|scrollbarFaceColor|js}, Color.toString x)
+
+let scrollbarHighlightColor x =
+  Rule.declaration ({js|scrollbarHighlightColor|js}, Color.toString x)
+
+let scrollbarShadowColor x =
+  Rule.declaration ({js|scrollbarShadowColor|js}, Color.toString x)
+
+let scrollbarTrackColor x =
+  Rule.declaration ({js|scrollbarTrackColor|js}, Color.toString x)
+
+let scrollMargin x = Rule.declaration ({js|scrollMargin|js}, Length.toString x)
+
+let scrollMargin2 ~v ~h =
+  Rule.declaration
+    ({js|scrollMargin|js}, Length.toString v ^ {js| |js} ^ Length.toString h)
+
+let scrollMargin3 ~top ~h ~bottom =
+  Rule.declaration
+    ( {js|scrollMargin|js},
+      Length.toString top
+      ^ {js| |js}
+      ^ Length.toString h
+      ^ {js| |js}
+      ^ Length.toString bottom )
+
+let scrollMargin4 ~top ~right ~bottom ~left =
+  Rule.declaration
+    ( {js|scrollMargin|js},
+      Length.toString top
+      ^ {js| |js}
+      ^ Length.toString right
+      ^ {js| |js}
+      ^ Length.toString bottom
+      ^ {js| |js}
+      ^ Length.toString left )
+
+let scrollMarginBlock x =
+  Rule.declaration ({js|scrollMarginBlock|js}, Length.toString x)
+
+let scrollMarginBlock2 ~v ~h =
+  Rule.declaration
+    ( {js|scrollMarginBlock|js},
+      Length.toString v ^ {js| |js} ^ Length.toString h )
+
+let scrollMarginBlockStart x =
+  Rule.declaration ({js|scrollMarginBlockStart|js}, Length.toString x)
+
+let scrollMarginBlockEnd x =
+  Rule.declaration ({js|scrollMarginBlockEnd|js}, Length.toString x)
+
+let scrollMarginInline x =
+  Rule.declaration ({js|scrollMarginInline|js}, Length.toString x)
+
+let scrollMarginInline2 ~v ~h =
+  Rule.declaration
+    ( {js|scrollMarginInline|js},
+      Length.toString v ^ {js| |js} ^ Length.toString h )
+
+let scrollMarginInlineStart x =
+  Rule.declaration ({js|scrollMarginInlineStart|js}, Length.toString x)
+
+let scrollMarginInlineEnd x =
+  Rule.declaration ({js|scrollMarginInlineEnd|js}, Length.toString x)
+
+let scrollMarginTop x =
+  Rule.declaration ({js|scrollMarginTop|js}, Length.toString x)
+
+let scrollMarginRight x =
+  Rule.declaration ({js|scrollMarginRight|js}, Length.toString x)
+
+let scrollMarginBottom x =
+  Rule.declaration ({js|scrollMarginBottom|js}, Length.toString x)
+
+let scrollMarginLeft x =
+  Rule.declaration ({js|scrollMarginLeft|js}, Length.toString x)
+
+let scrollPaddingValueToString x = InsetBlock.toString x
+
+let scrollPadding x =
+  Rule.declaration ({js|scrollPadding|js}, scrollPaddingValueToString x)
+
+let scrollPadding2 ~v ~h =
+  Rule.declaration
+    ( {js|scrollPadding|js},
+      scrollPaddingValueToString v ^ {js| |js} ^ scrollPaddingValueToString h )
+
+let scrollPadding3 ~top ~h ~bottom =
+  Rule.declaration
+    ( {js|scrollPadding|js},
+      scrollPaddingValueToString top
+      ^ {js| |js}
+      ^ scrollPaddingValueToString h
+      ^ {js| |js}
+      ^ scrollPaddingValueToString bottom )
+
+let scrollPadding4 ~top ~right ~bottom ~left =
+  Rule.declaration
+    ( {js|scrollPadding|js},
+      scrollPaddingValueToString top
+      ^ {js| |js}
+      ^ scrollPaddingValueToString right
+      ^ {js| |js}
+      ^ scrollPaddingValueToString bottom
+      ^ {js| |js}
+      ^ scrollPaddingValueToString left )
+
+let scrollPaddingBlock x =
+  Rule.declaration ({js|scrollPaddingBlock|js}, scrollPaddingValueToString x)
+
+let scrollPaddingBlock2 ~v ~h =
+  Rule.declaration
+    ( {js|scrollPaddingBlock|js},
+      scrollPaddingValueToString v ^ {js| |js} ^ scrollPaddingValueToString h )
+
+let scrollPaddingBlockStart x =
+  Rule.declaration
+    ({js|scrollPaddingBlockStart|js}, scrollPaddingValueToString x)
+
+let scrollPaddingBlockEnd x =
+  Rule.declaration ({js|scrollPaddingBlockEnd|js}, scrollPaddingValueToString x)
+
+let scrollPaddingInline x =
+  Rule.declaration ({js|scrollPaddingInline|js}, scrollPaddingValueToString x)
+
+let scrollPaddingInline2 ~v ~h =
+  Rule.declaration
+    ( {js|scrollPaddingInline|js},
+      scrollPaddingValueToString v ^ {js| |js} ^ scrollPaddingValueToString h )
+
+let scrollPaddingInlineStart x =
+  Rule.declaration
+    ({js|scrollPaddingInlineStart|js}, scrollPaddingValueToString x)
+
+let scrollPaddingInlineEnd x =
+  Rule.declaration ({js|scrollPaddingInlineEnd|js}, scrollPaddingValueToString x)
+
+let scrollPaddingTop x =
+  Rule.declaration ({js|scrollPaddingTop|js}, scrollPaddingValueToString x)
+
+let scrollPaddingRight x =
+  Rule.declaration ({js|scrollPaddingRight|js}, scrollPaddingValueToString x)
+
+let scrollPaddingBottom x =
+  Rule.declaration ({js|scrollPaddingBottom|js}, scrollPaddingValueToString x)
+
+let scrollPaddingLeft x =
+  Rule.declaration ({js|scrollPaddingLeft|js}, scrollPaddingValueToString x)
+
+let shapeMargin x = Rule.declaration ({js|shapeMargin|js}, Length.toString x)
+
+let lineHeightStep x =
+  Rule.declaration ({js|lineHeightStep|js}, Length.toString x)
+
+let backdropBlur x = Rule.declaration ({js|backdropBlur|js}, Length.toString x)
+
+let webkitTapHighlightColor x =
+  Rule.declaration ({js|WebkitTapHighlightColor|js}, Color.toString x)
+
+let webkitTextStrokeColor x =
+  Rule.declaration ({js|WebkitTextStrokeColor|js}, Color.toString x)
+
+let webkitTextStrokeWidth x =
+  Rule.declaration ({js|WebkitTextStrokeWidth|js}, Length.toString x)
