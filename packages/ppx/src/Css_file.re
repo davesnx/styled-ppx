@@ -614,17 +614,35 @@ module Css_transform = {
   };
 };
 
+/* Empty `[%cx2 {||}]` bound to a named `let` mints a deterministic
+   class handle (`css-<hash-of-empty>-<label>`) so consumers can
+   resolve `&.$(name)` against it. No `[@@@css ...]` is emitted —
+   there's no rule to write. Anonymous (`_`) and statement-position
+   bindings return `[]`, preserving the historical `CSS.make("", [])`
+   shape. */
+let mint_empty_class = (~label) =>
+  switch (label) {
+  | Some(name) when name != "_" => [
+      Css_transform.generate_class_from_content(~label=name, ""),
+    ]
+  | _ => []
+  };
+
 let push = (~file, ~label=?, declarations: Styled_ppx_css_parser.Ast.rule_list) => {
   let (atomic_classnames, dynamic_vars) =
     Css_transform.transform_rule_list(~file, ~label?, declarations);
 
   let classNames =
-    atomic_classnames
-    |> List.map(((className, rule)) => {
-         let rendered_css = render_rule(rule);
-         Buffer.add_rule(className, rendered_css);
-         className;
-       });
+    switch (atomic_classnames) {
+    | [] => mint_empty_class(~label)
+    | _ =>
+      atomic_classnames
+      |> List.map(((className, rule)) => {
+           let rendered_css = render_rule(rule);
+           Buffer.add_rule(className, rendered_css);
+           className;
+         })
+    };
 
   (classNames, dynamic_vars);
 };
