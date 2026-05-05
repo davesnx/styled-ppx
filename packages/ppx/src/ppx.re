@@ -706,13 +706,24 @@ let () = {
             },
           ),
         ),
+        /* New shape: `module ThemeVars = [%styled.global2 {| ... |}]`.
+           Expands to a module structure with `to_string`, `to_buffer`,
+           and `make` members. Static parts of the rule list extract to
+           the aggregated stylesheet via the existing [@@@css ...] path;
+           rules that contain $(expr) interpolations also produce a
+           `var(--hash)` declaration on the static side AND a runtime
+           string-builder that emits the actual value at evaluation
+           time (see documents/global2-interpolation.md). */
         Ppxlib.Context_free.Rule.extension(
-          Ppxlib.Extension.declare(
+          Ppxlib.Extension.V3.declare(
             "styled.global2",
-            Ppxlib.Extension.Context.Expression,
-            any_payload_pattern,
-            (~loc as _, ~path, payload) => {
-              File.set(path);
+            Ppxlib.Extension.Context.Module_expr,
+            Ppxlib.Ast_pattern.(single_expr_payload(__)),
+            (~ctxt, payload) => {
+              open Ppxlib;
+              let code_path = Expansion_context.Extension.code_path(ctxt);
+              let file = Code_path.file_path(code_path);
+              File.set(file);
               switch (payload.pexp_desc) {
               | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
                 let loc =
@@ -736,29 +747,59 @@ let () = {
                       rules,
                     );
                   if (has_invalid_rules) {
-                    Error.expr(
+                    Builder.pmod_extension(
                       ~loc=rule_loc,
-                      {|Declarations does not make sense in global styles. Global should consists of style rules or at-rules (e.g @media, @print, etc.)
-
-If your intent is to apply the declaration to all elements, use the universal selector
-* {
-  /* Your declarations here */
-}|},
+                      Location.error_extensionf(
+                        ~loc=rule_loc,
+                        "Declarations does not make sense in global styles. Global should consists of style rules or at-rules (e.g @media, @print, etc.)\n\nIf your intent is to apply the declaration to all elements, use the universal selector\n* {\n  /* Your declarations here */\n}",
+                      ),
                     );
                   } else {
-                    Css_file.push_global(rule_list);
-                    Builder.eunit(~loc=stringLoc);
+                    let dynamic_vars =
+                      Css_file.push_global(~file, rule_list);
+                    /* Build the structure of the generated module.
+
+                       The runtime's contract here is narrow: supply
+                       values for the custom properties the static rule
+                       (already extracted via [@@@css ...]) references
+                       through `var()`. So `to_string` is a single
+                       `:root { --var-h: <value>; ... }` block, one
+                       declaration per dynamic_var. The user's
+                       selectors and non-interpolated declarations are
+                       NOT re-emitted at runtime. */
+                    let to_string_body =
+                      Css_global_to_string.render_root_block(
+                        ~loc=stringLoc,
+                        dynamic_vars,
+                      );
+                    let to_string_decl = [%stri
+                      let to_string = () => [%e to_string_body]
+                    ];
+                    let to_buffer_decl = [%stri
+                      let to_buffer = buf =>
+                        Buffer.add_string(buf, to_string())
+                    ];
+                    let make_decl = [%stri
+                      let make = () => CSS.global_style_tag(to_string())
+                    ];
+                    Builder.pmod_structure(
+                      ~loc=stringLoc,
+                      [to_string_decl, to_buffer_decl, make_decl],
+                    );
                   };
-                | Error((loc, msg)) => Error.expr(~loc, msg)
+                | Error((loc, msg)) =>
+                  Builder.pmod_extension(
+                    ~loc,
+                    Location.error_extensionf(~loc, "%s", msg),
+                  )
                 };
               | _ =>
-                Error.expr(
+                Builder.pmod_extension(
                   ~loc=payload.pexp_loc,
-                  ~examples=[
-                    "[%styled.global2 \"body { margin: 0; } .container { padding: 20px; }\"]",
-                  ],
-                  ~link="https://styled-ppx.vercel.app/reference/global",
-                  "[%styled.global2] expects a string of CSS with selectors that apply to the whole document.",
+                  Location.error_extensionf(
+                    ~loc=payload.pexp_loc,
+                    "[%%styled.global2] expects a string of CSS with selectors that apply to the whole document.\n\nExample:\n  module Reset = [%%styled.global2 \"body { margin: 0; }\"]",
+                  ),
                 )
               };
             },

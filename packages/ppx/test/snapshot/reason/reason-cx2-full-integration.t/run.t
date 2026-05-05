@@ -101,7 +101,12 @@
       [("--var-sj55zd", (CSS.Types.Color.toString color))]
   let fadeIn = CSS.Types.AnimationName.make "keyframe-jw9oix"
   let slideUp = CSS.Types.AnimationName.make "keyframe-waibjx"
-  let () = ()
+  module GlobalReset =
+    struct
+      let to_string () = ""
+      let to_buffer buf = Buffer.add_string buf (to_string ())
+      let make () = CSS.global_style_tag (to_string ())
+    end
   let multiVar primary secondary size =
     CSS.make
       "css-b6lny7-multiVar css-12udlbg-multiVar css-u661at-multiVar css-nk32ej-multiVar"

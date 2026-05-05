@@ -52,7 +52,7 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-a9f07t{content:\"lola\";}"];
   [@css ".css-13bvtt9{content:\" \";}"];
   [@css ".css-1f06l48{content:\"'\";}"];
-  [@css ".css-129wxr5{content:\"\"\";}"];
+  [@css ".css-64u917{content:\"\\\"\";}"];
   [@css ".css-buwufj{content:attr(data-value);}"];
   [@css ".css-1rln7nw{content:attr(data-value raw-string);}"];
   [@css ".css-1vktxzt{content:attr(data-value em);}"];
@@ -64,6 +64,7 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-15ni5s9{content:\"“\";}"];
   [@css ".css-3tb13f{content:\"‘\";}"];
   [@css ".css-s8n7fj{content:\"’\";}"];
+  [@css ".css-129wxr5{content:\"•\";}"];
   [@css ".css-1xb5ir8{content:\"—\";}"];
   [@css ".css-hk17ng{content:\"…\";}"];
   [@css ".css-1of8arn{content:\"♥\";}"];
@@ -127,7 +128,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-13bvtt9", []);
   CSS.make("css-1rzsdc1", []);
   CSS.make("css-1f06l48", []);
-  CSS.make("css-129wxr5", []);
+  CSS.make("css-64u917", []);
   
   CSS.make("css-1c6n5wz", []);
   CSS.make("css-buwufj", []);
@@ -171,8 +172,8 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-129wxr5", []);
   CSS.make("css-1xb5ir8", []);
   CSS.make("css-hk17ng", []);
-  CSS.make("css-129wxr5", []);
-  CSS.make("css-129wxr5", []);
+  CSS.make("css-64u917", []);
+  CSS.make("css-64u917", []);
   CSS.make("css-j4gzna", []);
   CSS.make("css-1of8arn", []);
   CSS.make("css-wzfv9f", []);

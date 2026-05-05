@@ -42,9 +42,7 @@ and rule_list = (rule_list: Ast.rule_list) => {
   |> fst
   |> List.filter(
        fun
-       | Ast.Style_rule({ block: (block, _), _ })
-           when List.length(block) == 0 =>
-         false
+       | Ast.Style_rule({ block: ([], _), _ }) => false
        | _ => true,
      )
   |> List.map(rule)
@@ -96,7 +94,7 @@ and selector = (ast: Ast.selector) => {
   and render_attr_value =
     fun
     | Ast.Attr_ident(i) => i
-    | Attr_string(str) => "\"" ++ str ++ "\""
+    | Attr_string(str) => Tokens.serialize_string(str)
   and render_nth =
     fun
     | Ast.Even => "even"
@@ -212,8 +210,8 @@ and component_value = (ast: Ast.component_value) => {
   | Bracket_block(block) => "[" ++ component_value_list(block) ++ "]"
   | Percentage(value) => Tokens.float_to_string(value) ++ "%"
   | Ident(string) => string
-  | String(string) => "\"" ++ string ++ "\""
-  | Uri(string) => "url(\"" ++ string ++ "\")"
+  | String(string) => Tokens.serialize_string(string)
+  | Uri(string) => Tokens.serialize_uri(string)
   | Delim(value) => delimiter(value)
   | Function({ name: (name, _), body: (body, _), _ }) =>
     Printf.sprintf("%s(%s)", name, component_value_list(body))

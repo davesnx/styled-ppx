@@ -367,7 +367,8 @@ and render_selector = (~loc, selector: selector) => {
         let value =
           switch (value) {
           | Attr_ident(ident) => ident
-          | Attr_string(ident) => {|"|} ++ ident ++ {|"|}
+          | Attr_string(ident) =>
+            Styled_ppx_css_parser.Tokens.serialize_string(ident)
           };
         Printf.sprintf("[%s%s%s]", name, kind_str, value);
       }

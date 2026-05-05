@@ -93,7 +93,7 @@ let slideUp = [%keyframe2 {|
 |}]
 
 (* Test 7: styled.global2 *)
-let () = [%styled.global2 {|
+module GlobalReset = [%styled.global2 {|
   :root {
     --primary-color: blue;
   }

@@ -21,3 +21,17 @@ let merge (styles1 : styles) (styles2 : styles) =
   let className = fst styles1 ^ " " ^ fst styles2 in
   let style = ReactDOM.Style.combine (snd styles1) (snd styles2) in
   String.trim className, style
+
+(* Construct a <style dangerouslySetInnerHTML={"__html": css}/> element from a
+   raw CSS string. Used by [%styled.global2] modules to inject runtime values
+   for `:root` custom properties without touching the runtime stylesheet
+   (statics still ship via the extracted .css file). *)
+external dangerously_inner_html : __html:string -> < __html : string > Js.t = ""
+[@@mel.obj]
+
+let global_style_tag (css : string) =
+  ReactDOM.createElement "style"
+    ~props:
+      (ReactDOM.domProps
+         ~dangerouslySetInnerHTML:(dangerously_inner_html ~__html:css) ())
+    [||]

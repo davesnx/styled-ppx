@@ -42,7 +42,7 @@ PPX expansion (per compilation unit)
   │
   ▼
 PPX impl transformer (end of CU)
-  ─ drain Css_file.Buffer    → emit [@@@css "..."]            (one per rule)
+  ─ drain Css_file.Buffer     → emit [@@@css "..."]            (one per rule)
   ─ drain Css_bindings        → emit [@@@css.bindings [...]]   (binding exports)
   ─ drain Cross_module_refs   → emit [@@@css.refs [...]]       (cross-module refs)
                               → emit `let _ = M.x` synthetic deps

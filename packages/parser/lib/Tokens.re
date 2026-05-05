@@ -42,6 +42,103 @@ type token =
 
 let string_of_char = c => String.make(1, c);
 
+// Re-encode lexer-decoded byte strings into the canonical CSS
+// double-quoted form. The lexer (consume_string) decodes source
+// escapes and stores raw bytes; the renderer must re-encode them or
+// the emitted CSS will be malformed.
+//
+// CSS Syntax serialization rules require the following bytes to be
+// escaped inside a <string-token>:
+//   - U+0000 NUL          -> replaced with U+FFFD REPLACEMENT CHARACTER
+//   - U+0001..U+001F      -> hex escape (e.g. \A for LF, \D for CR)
+//   - U+007F DEL          -> hex escape \7F
+//   - U+0022 double-quote -> \"
+//   - U+005C backslash    -> \\
+//
+// Hex escapes are emitted with a trailing space so the next character
+// is not consumed as another hex digit (CSS hex escapes are 1-6 hex
+// digits and consume an optional trailing whitespace as terminator).
+//
+// String.iter walks bytes, not codepoints, which is correct here: the
+// only escapable bytes are ASCII, and UTF-8 continuation/lead bytes
+// (>= 0x80) fall through the catch-all and pass through verbatim,
+// preserving multi-byte sequences.
+//
+// We always emit double quotes -- CSS treats single- and double-quoted
+// strings as equivalent, so this is observably identical for any
+// conforming consumer.
+
+// Whether [c] requires escaping in a CSS <string-token>'s output.
+let needs_string_escape = c =>
+  c == '"'
+  || c == '\\'
+  || Char.code(c) < 0x20
+  || Char.code(c) == 0x7F
+  || Char.code(c) == 0x00;
+
+// Append the escaped form of [c] (which must satisfy [needs_string_escape])
+// to [buf]. The two-digit hex form is enough for U+007F and below.
+let add_escaped_char = (buf, c) =>
+  switch (c) {
+  | '"' => Buffer.add_string(buf, "\\\"")
+  | '\\' => Buffer.add_string(buf, "\\\\")
+  | '\000' => Buffer.add_string(buf, "\xEF\xBF\xBD") // U+FFFD
+  | c => Buffer.add_string(buf, Printf.sprintf("\\%X ", Char.code(c)))
+  };
+
+// Append the escaped contents of [s] (without surrounding quotes) to [buf].
+let add_escaped_string = (buf, s) =>
+  for (i in 0 to String.length(s) - 1) {
+    let c = String.unsafe_get(s, i);
+    if (needs_string_escape(c)) {
+      add_escaped_char(buf, c);
+    } else {
+      Buffer.add_char(buf, c);
+    };
+  };
+
+// Whether [s] contains any byte that needs escaping. Fast-path for the
+// common case (no escaping needed) avoids the buffer allocation.
+let needs_string_serialization = s => {
+  let len = String.length(s);
+  let rec scan = i =>
+    if (i >= len) {
+      false;
+    } else if (needs_string_escape(String.unsafe_get(s, i))) {
+      true;
+    } else {
+      scan(i + 1);
+    };
+  scan(0);
+};
+
+let serialize_string = s =>
+  if (!needs_string_serialization(s)) {
+    "\"" ++ s ++ "\"";
+  } else {
+    let buf = Buffer.create(String.length(s) + 4);
+    Buffer.add_char(buf, '"');
+    add_escaped_string(buf, s);
+    Buffer.add_char(buf, '"');
+    Buffer.contents(buf);
+  };
+
+// Serialize a URI value as url("..."). CSS allows unquoted url()
+// tokens, but the renderer never emits them, and the quoted form is
+// safe for arbitrary bytes once the inner string is properly escaped.
+// Single-pass into one buffer to avoid the intermediate allocations of
+// "url(" ++ serialize_string(s) ++ ")".
+let serialize_uri = s =>
+  if (!needs_string_serialization(s)) {
+    "url(\"" ++ s ++ "\")";
+  } else {
+    let buf = Buffer.create(String.length(s) + 8);
+    Buffer.add_string(buf, "url(\"");
+    add_escaped_string(buf, s);
+    Buffer.add_string(buf, "\")");
+    Buffer.contents(buf);
+  };
+
 let float_to_string = value => {
   let raw = string_of_float(value);
   let has_dot = String.contains(raw, '.');

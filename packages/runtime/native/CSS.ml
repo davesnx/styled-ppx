@@ -530,6 +530,13 @@ let style_tag ?key:_ () =
     ]
     []
 
+(* Construct a <style dangerouslySetInnerHTML={"__html": css}/> element from a
+   raw CSS string. Used by [%styled.global2] modules to inject runtime values
+   for `:root` custom properties without touching the runtime stylesheet
+   (statics still ship via the extracted .css file). *)
+let global_style_tag (css : string) =
+  React.createElement "style" [ DangerouslyInnerHtml css ] []
+
 (* This method is a Css_type function, but with side-effects. It pushes the fontFace as global style *)
 let fontFace ~fontFamily ~src ?fontStyle ?fontWeight ?fontDisplay ?sizeAdjust
   ?unicodeRange () =

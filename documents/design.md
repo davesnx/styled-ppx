@@ -6,8 +6,13 @@ code generation, and static extraction in `styled-ppx`.
 It consolidates and supersedes the pipeline notes in
 `.cursor/rules/cx-pipeline.mdc` and `.cursor/rules/cx2-pipeline.mdc`.
 
-See also `documents/primitives.md` for the shared glossary used in this
-document.
+See also:
+
+- `documents/primitives.md` — shared glossary used in this document.
+- `documents/css-extraction.md` — wire protocol and aggregator for
+  the static-extraction family (`[%cx2]`, `[%styled.global2]`,
+  `[%keyframe2]`), including cross-module selector resolution
+  (sentinel format and aggregator behavior).
 
 ## Status
 
@@ -65,6 +70,252 @@ extracted CSS.
 
 This path still depends on reparsing value strings when interpolation typing or
 property validation is needed.
+
+### `[%styled.global2]`
+
+Shares the cx2 front-end (parsing + interpolation typing) and reuses
+`Css_file.transform_rule` for both value-interpolation and
+selector-interpolation walks. Differs from `[%cx2]` in two ways:
+
+- Registered as a **Module_expr-context** extension (`module Foo =
+  [%styled.global2 ...]`), not Expression. The Expression-context
+  registration exists only to fire a migration error for the legacy
+  `let () = [%styled.global2 ...]` shape.
+- Splits each interpolated rule into two complementary outputs:
+  the static rule with `var(--var-<hash>)` substituted in value
+  positions and resolved class chains substituted in selector
+  positions (extracted via `Buffer.add_global_rule` like a static
+  global) plus a generated module containing
+  `to_string`/`to_buffer`/`make` that emit a single
+  `:root { --var-<hash>: <value>; ... }` block at runtime to supply
+  the values. Selector interpolation has no runtime side; class
+  names resolve fully at PPX time (same module) or aggregator time
+  (cross-module).
+
+#### What it produces
+
+```reason
+let themeColor = CSS.red;
+
+module ThemeStyles = [%styled.global2 {|
+  body {
+    color: $(themeColor);
+    margin: 0;
+  }
+|}];
+```
+
+Expands to:
+
+```ocaml
+[@@@css "body{color:var(--var-nkdt8w);margin:0;}"]
+let themeColor = CSS.red
+module ThemeStyles = struct
+  let to_string () =
+    ":root{--var-nkdt8w:" ^ CSS.Types.Color.toString themeColor ^ ";}"
+  let to_buffer buf = Buffer.add_string buf (to_string ())
+  let make () = CSS.global_style_tag (to_string ())
+end
+```
+
+The static rule extracts via the existing `[@@@css ...]` channel
+(see `css-extraction.md`). The generated `module ThemeStyles` is
+the only new artifact.
+
+#### Two halves
+
+| Half    | Shape                                                                                | Where it lives                                                                  |
+| ------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| Static  | The user's rule, with `var(--var-<hash>)` in interpolation positions                 | Aggregated `styles.css` via `[@@@css ...]`                                      |
+| Dynamic | A single `:root { --var-<hash>: <value>; ... }` block, one declaration per value var | Generated module's `to_string`, mounted via `make` or spliced via `to_buffer`   |
+
+The dynamic side does **not** re-emit the user's selectors or
+non-interpolated declarations. Those live in the static stylesheet.
+The runtime's only job is to supply values for the custom properties
+the static rule references via `var()`.
+
+When `<ThemeStyles />` mounts, the browser sees the static rule loaded
+first and the `<style>{:root{...}}</style>` from `make` second. The
+cascade resolves the custom properties; multiple mounts update them
+and every `var()` reference re-resolves.
+
+For static-only blocks, `to_string` returns `""` and `make` produces
+an empty `<style>`. All CSS lives in the static stylesheet.
+
+#### Pipeline
+
+```
+module Foo = [%styled.global2 {| ... |}]
+  │
+  ▼
+Css_file.push_global ~file rule_list:
+  for each Style_rule / At_rule:
+    transform_rule ($(path) → var(--var-<hash>); collect dynamic_vars)
+    render and push to Buffer.add_global_rule
+  return dynamic_vars
+  │
+  ▼
+build module structure (in ppx.re):
+  to_string  = Css_global_to_string.render_root_block(dynamic_vars)
+               (emits ":root{--var-h:<call expr>;...}" or "" if no vars)
+  to_buffer  = buf => Buffer.add_string(buf, to_string())
+  make       = () => CSS.global_style_tag(to_string())
+  │
+  ▼
+return Pmod_structure([to_string; to_buffer; make])
+```
+
+The end-of-CU impl transformer is unchanged; the aggregator gains no
+new responsibilities.
+
+#### Generated module
+
+Three items, always in this order:
+
+- **`to_string : unit -> string`** — `""` for static-only blocks; otherwise
+  `":root{" ^ "--<var>:" ^ CSS.Types.<Mod>.toString <expr> ^ ";" ^ ... ^ "}"`.
+  One `:root` block per call regardless of how many source rules; one
+  declaration per `dynamic_vars` entry. Module name from
+  `Property_to_types.resolve_module_name`; call from
+  `Property_to_types.make_to_string_call`.
+- **`to_buffer : Buffer.t -> unit`** — always
+  `buf => Buffer.add_string(buf, to_string())`.
+- **`make : unit -> React.element`** — always
+  `() => CSS.global_style_tag(to_string())`.
+
+All three take `unit` and capture interpolated bindings from the
+surrounding lexical scope at call time, exactly like `[%cx2]`. No
+synthesized labeled arguments. **Trade-off:** per-request SSR themes
+need a user-defined wrapping function or a switch back to
+`[%styled.global]`.
+
+`make` returns a `<style dangerouslySetInnerHTML>` element via
+`CSS.global_style_tag : string -> React.element`, provided by both
+native (`server-reason-react`) and Melange (`reason-react`) runtimes.
+The helper has no side effects and does not touch the runtime
+stylesheet. `dangerouslySetInnerHTML` is safe by construction: the
+PPX controls the entire CSS string and only typed CSS values from
+typed OCaml expressions are interpolated.
+
+#### Hashing
+
+`var-<murmur2(path_str)>`, inherited from `[%cx2]`. Keyed on the
+OCaml expression source. Same expression across blocks shares a var
+(harmless: same value either way).
+
+#### Selector interpolation
+
+`[%styled.global2]` reuses `Css_transform.transform_rule` from
+`[%cx2]`, so every selector form `[%cx2]` supports works inside a
+global block too:
+
+```reason
+let card = [%cx2 "padding: 10px;"];
+let active = [%cx2 "border: 1px solid;"];
+
+module Theme = [%styled.global2 {|
+  /* Bare $(name) - resolves to a class type-selector */
+  body $(card) { line-height: 1.5; }
+
+  /* .$(name) - class-position; multi-decl bindings fan out into a
+     compound chain (.atom1.atom2). */
+  .$(card).$(active) { color: white; }
+
+  /* Combinators, pseudo, attribute selectors, comma lists, nesting,
+     :not(.$(card)) etc. all work via the recursive walk. */
+  body:not(.$(card)) { margin: 0; }
+
+  /* Cross-module $(M.binding) emits a NUL-delimited sentinel that
+     the post-build aggregator (styled-ppx.generate) substitutes
+     using the index it harvests from M's post-PPX file. */
+  body .$(OtherModule.marker) { background: red; }
+
+  /* Selector interp inside @media / @supports works the same way -
+     the recursive walk descends into at-rule bodies. */
+  @media (max-width: 640px) {
+    .$(card) { font-size: 14px; }
+  }
+|}];
+```
+
+Resolution rules (identical to `[%cx2]`):
+
+- Same-module `$(name)` looks up `Css_file.Class_registry`. If the
+  binding hasn't been seen yet (forward ref) or doesn't exist, the
+  PPX raises a clear diagnostic at the interpolation's source
+  location.
+- Cross-module `$(M.binding)` is recorded in `Cross_module_refs` and
+  embedded as a sentinel string; the aggregator resolves it at link
+  time. If `M.binding` isn't a `[%cx2]` binding the aggregator fails
+  with `Unbound module` / `Unbound value` at the original source
+  location (via the synthetic `let _ = M.binding` line the PPX emits
+  alongside `[@@@css.refs ...]`).
+- Bare `$(name)` (no leading dot) in selector position resolves the
+  binding and emits a `.classname` type-selector. Multi-class bindings
+  are rejected here (use `.$(name)` for the chain instead).
+
+Selector interpolation has no effect on the generated module's
+`to_string`: `dynamic_vars` only collects value-position
+interpolations. `to_string` is empty when a global block uses only
+selector interpolation.
+
+#### Custom-property typing limitation
+
+`Property_to_types.resolve_module_name` falls back to `"Cascading"`
+for unknown properties. `--my-prop: $(value)` therefore fails to
+type-check because `Cascading.toString` only handles
+`inherit`/`initial`/`unset`. **Pre-existing in `[%cx2]`**, out of scope
+here.
+
+Workaround:
+
+```reason
+let primaryStr = CSS.Types.Color.toString(CSS.red);
+module ThemeStyles = [%styled.global2 {|
+  :root { --primary: $(primaryStr); }
+|}];
+```
+
+#### Failure modes
+
+| Input                                                                     | Reaction                                                                                                                                  |
+| ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Top-level `Declaration` (e.g. `margin: 0` outside a selector)             | `Pmod_extension` with the universal-selector hint.                                                                                        |
+| Parse error from `Driver.parse_declaration_list`                          | `Pmod_extension` carrying the parser's location and message.                                                                              |
+| Non-string payload                                                        | `Pmod_extension` pointing at the payload, with the correct-form example.                                                                  |
+| Legacy `let () =` shape                                                   | `Error.expr` diagnostic from the Expression-context extension.                                                                            |
+| Selector interp `$(name)` references undefined or forward local binding   | `raise_errorf` from `Css_file.resolve_selector_class_ref` pointing at the interpolation.                                                  |
+| Bare `$(name)` (no `.` prefix) resolves to multiple classes               | `raise_errorf` instructing the user to switch to `.$(name)` for chain semantics.                                                          |
+| Cross-module `$(M.x)` where `M.x` doesn't exist at link time              | `Unbound module` / `Unbound value` from OCaml typechecker via the synthetic `let _ = M.x`; aggregator also reports a missing-binding error using the location stored in `[@@@css.refs ...]`. |
+
+#### Code map
+
+| File                                            | Role                                                                                                                                                                                                                                |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/ppx/src/ppx.re`                       | Two extensions: Module_expr-context (does the work) and Expression-context (migration error).                                                                                                                                       |
+| `packages/ppx/src/Css_file.re`                  | `push_global ~file rule_list` returns the list of `dynamic_vars` collected across all rules; pushes the static rules (with `var(--var-<hash>)` already substituted) into the global buffer.                                         |
+| `packages/ppx/src/Css_global_to_string.re`      | `render_root_block ~loc dynamic_vars` builds the `to_string` body: a single `:root { ... }` rule with one declaration per entry, or `""` when `dynamic_vars` is empty.                                                              |
+| `packages/runtime/{native,melange}/CSS.ml`      | `CSS.global_style_tag : string -> React.element`.                                                                                                                                                                                   |
+
+#### Intentionally not done
+
+- **No new wire-protocol attribute.** The static side is a finished
+  CSS rule already; the aggregator needs nothing else.
+- **No target branching in the PPX.** Same module on every target;
+  both runtimes provide `CSS.global_style_tag`.
+- **No backward-compat for the legacy shape.** Hard error on
+  `let () = [%styled.global2 ...]`.
+- **No labeled-arg synthesis on `make`.** In-scope capture matches
+  `[%cx2]`.
+- **No `--*` typing fix.** Pre-existing gap, separate change.
+- **No `CSS.global` from inside `make`.** That would route through
+  the runtime stylesheet, defeating the `*2` family's contract.
+
+### `[%keyframe2]`
+
+Shares the cx2 front-end and extracts `@keyframes` blocks named by
+content hash. No interpolation support today. Covered briefly in
+`documents/css-extraction.md`.
 
 ## Direction
 

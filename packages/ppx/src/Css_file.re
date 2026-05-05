@@ -145,7 +145,7 @@ module Css_transform = {
       | None =>
         Ppxlib.Location.raise_errorf(
           ~loc,
-          "[%%cx2] selector interpolation `$(%s)` does not refer to a [%%cx2] binding earlier in this module.\n- If `%s` is bound to a [%%cx2] later in the file, reorder the bindings.\n- If `%s` is a plain string, inline the class name literally.\n- Otherwise, use [%%cx] for runtime substitution.",
+          "Selector interpolation `$(%s)` does not refer to a [%%cx2] binding earlier in this module.\n- If `%s` is bound to a [%%cx2] later in the file, reorder the bindings.\n- If `%s` is a plain string, inline the class name literally.\n- Otherwise, use [%%cx] for runtime substitution.",
           path_str,
           path_str,
           path_str,
@@ -291,7 +291,7 @@ module Css_transform = {
       | _ =>
         Ppxlib.Location.raise_errorf(
           ~loc=var_loc,
-          "[%%cx2] bare `$(%s)` selector interpolation expanded to %d class names; this position only accepts a single class. Prefix with `.` to use a class chain instead: `.$(%s)`.",
+          "Bare `$(%s)` selector interpolation expanded to %d class names; this position only accepts a single class. Prefix with `.` to use a class chain instead: `.$(%s)`.",
           path_str,
           List.length(resolved),
           path_str,
@@ -484,7 +484,7 @@ module Css_transform = {
       let (at_name, _) = name;
       Ppxlib.Location.raise_errorf(
         ~loc,
-        "[%%%%cx2] does not support interpolation in @%s preludes. CSS custom properties (var()) are not valid in media query conditions. Inline the value directly or use [%%%%cx] for runtime media query interpolation.",
+        "Interpolation in @%s preludes is not supported during static extraction. CSS custom properties (var()) are not valid in media query conditions. Inline the value directly, or use [%%cx] / [%%styled.global] (runtime) instead of [%%cx2] / [%%styled.global2] for runtime media query interpolation.",
         at_name,
       );
     };
@@ -681,22 +681,53 @@ let push_keyframe = (keyframe_rules: Styled_ppx_css_parser.Ast.rule_list) => {
   keyframe_name;
 };
 
-let push_global = (global_rules: Styled_ppx_css_parser.Ast.rule_list) => {
+/* Walk every rule in a [%styled.global2] block, substitute
+   `$(expr)` interpolations with `var(--var-<hash>)` on the static
+   side, and accumulate the corresponding dynamic_vars.
+
+   Each rule (whether or not it contains interpolation) is pushed to
+   `Buffer.add_global_rule` so it ships through the existing
+   `[@@@css ...]` channel. The returned dynamic_vars feeds the
+   generated module's `to_string`, which emits a single
+   `:root { --var-<hash>: <value>; ... }` block at runtime; one
+   declaration per dynamic_var entry (already deduplicated by
+   `Css_transform.add_dynamic_var`).
+
+   Static-only blocks return an empty dynamic_vars list, which makes
+   `to_string` emit `""`. */
+let push_global =
+    (~file, global_rules: Styled_ppx_css_parser.Ast.rule_list)
+    : list((string, string, var_type)) => {
   open Styled_ppx_css_parser.Ast;
 
   let (rules, _) = global_rules;
+  let all_dynamic_vars = ref([]);
 
+  /* transform_rule walks the rule, replacing every Variable(path) in
+     declaration values with var(--hash) and appending (var_name, path,
+     var_type) to all_dynamic_vars.
+
+     The caller in [ppx.re] pre-checks the rule list for top-level
+     Declaration nodes and bails before invoking this function, so the
+     Declaration arm here is unreachable in practice. We keep it as a
+     defensive no-op rather than partial-matching, so a future caller
+     bypassing the pre-check still produces well-formed CSS instead of
+     raising. */
   rules
-  |> List.iter(rule => {
+  |> List.iter(rule =>
        switch (rule) {
        | Style_rule(_)
        | At_rule(_) =>
-         let rendered = render_rule(rule);
+         let transformed =
+           Css_transform.transform_rule(~file, rule, all_dynamic_vars);
+         let rendered = render_rule(transformed);
          let key = Printf.sprintf("global-%s", Murmur2.default(rendered));
          Buffer.add_global_rule(key, rendered);
        | Declaration(_) => ()
        }
-     });
+     );
+
+  List.rev(all_dynamic_vars^);
 };
 
 let get = () => {

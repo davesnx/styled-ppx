@@ -1232,8 +1232,34 @@ let attribute_selector () =
     "[list]:not([type=date]):not([type=datetime-local]):not([type=month]):not([type=week]):not([type=time])::-webkit-calendar-picker-indicator{display:none \
      !important;}button{-webkit-appearance:button;}[type=button]{-webkit-appearance:button;}[type=reset]{-webkit-appearance:button;}[type=submit]{-webkit-appearance:button;}button:not(:disabled){cursor:pointer;}[type=button]:not(:disabled){cursor:pointer;}[type=reset]:not(:disabled){cursor:pointer;}[type=submit]:not(:disabled){cursor:pointer;}"
 
+(* [%styled.global2] runtime helper. Each generated module's `make`
+   function calls CSS.global_style_tag with the rendered :root block.
+   This tests the helper directly; the PPX→helper integration is
+   covered by the snapshot tests under test/snapshot/reason. *)
+let global_style_tag_basic () =
+  let css = ":root{--theme-color:red;}" in
+  let html = CSS.global_style_tag css |> ReactDOM.renderToString in
+  assert_string html "<style>:root{--theme-color:red;}</style>"
+
+let global_style_tag_empty () =
+  let html = CSS.global_style_tag "" |> ReactDOM.renderToString in
+  assert_string html "<style></style>"
+
+let global_style_tag_does_not_escape () =
+  (* dangerouslySetInnerHTML must NOT HTML-escape the CSS payload.
+     `>` and `&` survive verbatim. The PPX never produces these
+     characters in practice, but the helper's contract is that
+     `<style>` content is passed through unchanged. *)
+  let css = "a > b{color:red;} .c[d=\"&\"]{margin:0;}" in
+  let html = CSS.global_style_tag css |> ReactDOM.renderToString in
+  assert_string html
+    "<style>a > b{color:red;} .c[d=\"&\"]{margin:0;}</style>"
+
 let tests =
   [
+    test "global_style_tag_basic" global_style_tag_basic;
+    test "global_style_tag_empty" global_style_tag_empty;
+    test "global_style_tag_does_not_escape" global_style_tag_does_not_escape;
     test "one_property" one_property;
     test "multiple_properties" multiple_properties;
     test "multiple_declarations" multiple_declarations;
