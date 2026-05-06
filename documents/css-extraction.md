@@ -16,7 +16,7 @@ runtime calls that mint CSS strings on first use:
 | Extension              | What it extracts                                                       |
 | ---------------------- | ---------------------------------------------------------------------- |
 | `[%cx2]`               | Class-scoped declaration lists, one atomized rule per declaration       |
-| `[%styled.global2]`    | Top-level global rules and at-rules (no class scoping)                 |
+| `[%styled.global2]`    | Top-level global rules and at-rules: `@font-face`, `@media`, `:root` custom properties, and any document-level selectors (no class scoping) |
 | `[%keyframe2]`         | `@keyframes` blocks, named by content hash                             |
 
 For all three, the PPX renders the resulting CSS to a string at compile
@@ -158,6 +158,31 @@ transformer.
 `[%styled.global2]` writes through `Buffer.add_global_rule`; the global
 rules are kept separate so they always sort before per-class rules in
 the final stylesheet (see `Buffer.get_rules`).
+
+#### `@font-face`
+
+`@font-face` is a global at-rule and belongs in `[%styled.global2]`.
+The runtime `CSS.fontFace` helper exists for the dynamic path (it
+mutates the runtime stylesheet on first call) but for static
+extraction the canonical form is:
+
+```reason
+module Fonts = [%styled.global2 {|
+  @font-face {
+    font-family: "Inter";
+    src: url("/fonts/inter.woff2") format("woff2");
+    font-display: swap;
+  }
+|}];
+```
+
+Each `@font-face` block ships through `[@@@css ...]` like any other
+global rule, so the font registers when the extracted `.css`
+loads — no runtime side-effects required. Interpolated `src` URLs
+work too: `src: url($(font_url)) format("woff2")` produces
+`src: url(var(--var-<hash>))` on the static side and a matching
+`:root { --var-<hash>: <font_url>; }` from the generated module's
+`to_string()`.
 
 ### `Css_bindings`
 
