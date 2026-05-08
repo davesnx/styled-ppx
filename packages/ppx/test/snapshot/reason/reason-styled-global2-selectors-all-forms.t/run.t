@@ -21,9 +21,13 @@
   [@css "q::before{content:\"\\\"\";}"];
   [@css ":is(h1,h2,h3){margin:0;}"];
   [@css ":where(article,section) > p{line-height:1.6;}"];
-  [@css "h1,h2,h3{font-family:serif;}"];
+  [@css "h1{font-family:serif;}"];
+  [@css "h2{font-family:serif;}"];
+  [@css "h3{font-family:serif;}"];
   [@css "form input[type=\"submit\"]:hover{background:var(--var-p73s17);}"];
-  [@css "*,*::before,*::after{box-sizing:inherit;}"];
+  [@css "*{box-sizing:inherit;}"];
+  [@css "*::before{box-sizing:inherit;}"];
+  [@css "*::after{box-sizing:inherit;}"];
   let accent = CSS.red;
   module AllSelectors = {
     let to_string = () =>

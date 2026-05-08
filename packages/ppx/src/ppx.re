@@ -510,6 +510,17 @@ let () = {
               let code_path = Expansion_context.Extension.code_path(ctxt);
               let file = Code_path.file_path(code_path);
               let binding_name = Code_path.enclosing_value(code_path);
+              /* `Code_path.value` is the strict top-level form: it returns
+                 `Some(name)` only when the [%cx2] is the direct rhs of a
+                 module-level `let name = ...`, and `None` for any nested
+                 expression (a `let inner = ...` body, an `if ... then`
+                 branch, a function arg, etc.). We register the cross-module
+                 bindings index off this — never off `enclosing_value` —
+                 so a local `let inner = [%cx2 ...] in inner` doesn't leak
+                 `inner` into the index. The looser `enclosing_value` is
+                 still used for the label suffix and DOM marker, which are
+                 only observed within the expansion site. */
+              let toplevel_binding_name = Code_path.value(code_path);
               /* Under --minify, suppress the label-suffix that personalizes
                  atom hashes (`css-<hash>-<binding>`); plain hashes still
                  dedupe correctly. */
@@ -542,8 +553,15 @@ let () = {
                        We also record the fully-qualified longident in
                        [Css_bindings] so the impl transformer can emit it as
                        a [@@@css.bindings ...] attribute for the aggregator's
-                       cross-module index. */
-                    switch (binding_name) {
+                       cross-module index.
+
+                       Both registrations use `toplevel_binding_name`, not
+                       the looser `binding_name`. Nested `let inner = ...`
+                       inside a function body, branches of `if/match`, etc.
+                       still emit CSS, but they don't pollute the cross-
+                       module index with names that aren't part of the
+                       module's surface API. */
+                    switch (toplevel_binding_name) {
                     | Some(name) =>
                       Css_file.Class_registry.register(
                         ~file,
@@ -562,8 +580,13 @@ let () = {
                       Css_bindings.record(~longident, ~class_string);
                     | None => ()
                     };
-                    /* Marker shares `binding_name` with the registry above
-                       so the DOM `cx-<name>` matches `$(name)` selector refs. */
+                    /* The DOM marker uses the looser `binding_name`
+                       (i.e. `Code_path.enclosing_value`) so a [%cx2] inside
+                       a nested `let` body still gets a `cx-<name>` marker
+                       reflecting its immediate binding. The cross-module
+                       registry above intentionally uses the stricter
+                       `toplevel_binding_name`; the two are only divergent
+                       for nested-expression cx2 sites. */
                     let marker = Dev_mode.marker(binding_name);
                     Css_to_runtime.render_make_call(
                       ~loc=stringLoc,

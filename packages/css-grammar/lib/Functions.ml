@@ -445,7 +445,9 @@ module Function_translateZ = [%spec_module "translateZ( <extended-length> )"]
 let function_translateZ : function_translateZ Rule.rule =
   Function_translateZ.rule
 
-module Function_var = [%spec_module "var( <ident> )", (module Css_types.Var)]
+module Function_var =
+  [%spec_module
+  "var( <ident> [ ',' <declaration-value> ]? )", (module Css_types.Var)]
 
 let function_var : function_var Rule.rule = Function_var.rule
 

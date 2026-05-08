@@ -416,7 +416,30 @@ let invalid =
     | _ => Rule.err_desc("not implemented"),
   );
 
-let declaration_value = invalid;
+/* `<declaration-value>` is the spec primitive for "any sequence of tokens
+   that could legally appear as the value side of a CSS declaration". It's
+   used for fallback values inside `var()`, `env()`, `paint()`, `attr()`
+   and similar functions where the inner content is opaque to the outer
+   grammar. We capture it as the rendered string so the renderer can spit
+   it back out verbatim when the surrounding rule emits.
+
+   This parser is total: it consumes whatever is left of the current
+   parser input, which (in practice) is the body of an enclosing
+   paren_block or bracket_block. End-of-input ends the capture.
+
+   At least one non-whitespace token is required — otherwise an
+   `[ ',' <declaration-value> ]?` group could match a trailing comma with
+   nothing after it and silently produce an empty fallback. */
+let declaration_value: Rule.rule(string) =
+  values => {
+    let trimmed = Render.strip_leading_whitespace(values);
+    switch (trimmed) {
+    | [] => (Rule.err_desc("a fallback value"), values)
+    | _ =>
+      let rendered = Render.component_value_list(trimmed) |> String.trim;
+      (Ok(rendered), []);
+    };
+  };
 let positive_integer = integer;
 let function_token = invalid;
 let any_value = invalid;

@@ -743,7 +743,7 @@ and cubic_bezier_timing_function =
   | `Cubic_bezier of float * unit * float * unit * float * unit * float
   ]
 
-and declaration = string * unit * unit option * (unit * unit) option
+and declaration = string * unit * string option * (unit * unit) option
 and declaration_list = (declaration option * unit) list * declaration option
 
 and deprecated_system_color =
@@ -982,7 +982,7 @@ and function_drop_shadow =
 
 and function_element = id_selector
 and function_ellipse = shape_radius list option * (unit * position) option
-and function_env = string * unit * unit option
+and function_env = string * unit * string option
 
 and function_fit_content =
   [ `Extended_length of extended_length
@@ -1101,7 +1101,7 @@ and function_oklch =
   extended_percentage * float * hue * (unit * alpha_value) option
 
 and function_opacity = number_percentage
-and function_paint = string * unit * unit option
+and function_paint = string * unit * string option
 and function_path = string
 and function_perspective = property_perspective
 
@@ -1248,7 +1248,7 @@ and function_translateY =
   ]
 
 and function_translateZ = extended_length
-and function_var = string
+and function_var = string * (unit * string) option
 
 and gender =
   [ `Male

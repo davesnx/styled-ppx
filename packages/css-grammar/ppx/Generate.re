@@ -203,9 +203,9 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     ("resolution", Valid),
     ("flex-value", Valid),
     ("css-wide-keywords", Valid),
+    ("declaration-value", Primitive),
     /* Invalid/unimplemented types - return unit placeholder */
     ("any-value", Invalid),
-    ("declaration-value", Invalid),
     ("function-token", Invalid),
     ("hash-token", Invalid),
     ("custom-property-name", Invalid),
@@ -249,6 +249,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
     | "ident_token"
     | "string_token"
     | "string" /* string is an alias to string_token */ => [%type: string]
+    | "declaration_value" => [%type: string]
     | _ => failwith("Not a primitive wrapper type")
     };
   };
@@ -1194,10 +1195,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
       );
 
     let error_info_type =
-      ptyp_constr(
-        txt @@ Ldot(Lident("Rule"), "error_info"),
-        [],
-      );
+      ptyp_constr(txt @@ Ldot(Lident("Rule"), "error_info"), []);
     let result_type =
       ptyp_constr(txt @@ Lident("result"), [t_type, error_info_type]);
     let component_value_list_type =

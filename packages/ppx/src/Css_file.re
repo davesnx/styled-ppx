@@ -470,15 +470,28 @@ module Css_transform = {
     let { name, prelude, block, loc } = at_rule;
     let (prelude_values, prelude_loc) = prelude;
 
-    let has_interpolation =
-      List.exists(
-        ((cv, _cv_loc)) =>
-          switch ((cv: component_value)) {
-          | Variable(_, _) => true
-          | _ => false
-          },
-        prelude_values,
-      );
+    /* Detect any `$(name)` interpolation anywhere in the at-rule prelude.
+       The naive check (top-level only) misses interpolations nested inside
+       `Paren_block`, `Bracket_block`, or `Function` — e.g. the canonical
+       `@media (max-width: $(bp))` form, where `$(bp)` lives inside a
+       `Paren_block` of the `(max-width: $(bp))` group.
+
+       Static extraction can't bind `var(--x)` into a media query (CSS
+       custom properties are not valid in media-query conditions), so we
+       reject the whole shape with a hard error and steer users at [%cx] /
+       [%styled.global] for runtime media-query interpolation. */
+    let rec component_has_interpolation = (cv: component_value) =>
+      switch (cv) {
+      | Variable(_, _) => true
+      | Paren_block(values)
+      | Bracket_block(values) => list_has_interpolation(values)
+      | Function({ body: (values, _), _ }) => list_has_interpolation(values)
+      | _ => false
+      }
+    and list_has_interpolation = values =>
+      List.exists(((cv, _loc)) => component_has_interpolation(cv), values);
+
+    let has_interpolation = list_has_interpolation(prelude_values);
 
     if (has_interpolation) {
       let (at_name, _) = name;
@@ -508,31 +521,100 @@ module Css_transform = {
   };
 
   let atomize_rules = (~label=?, rules: list(rule)): list((string, rule)) => {
-    let rec extract_atomic_rules = (rule: rule): list((string, rule)) => {
-      switch (rule) {
-      | Declaration(decl) =>
+    /* Merge a child selector-list prelude under a parent selector-list prelude.
+       For each (parent, child) pair, run `compute_new_prefix` so `&`,
+       `::pseudo`, and descendant combinators all resolve correctly. The
+       Cartesian product matches CSS-nesting semantics:
+       `a, b { c, d { ... } }` desugars to `a c, a d, b c, b d`.
+
+       Folded with prepend then reversed once at the end — equivalent
+       output to the prior `concat_map`/`map` combination but avoids the
+       per-parent intermediate list and the final concat pass. */
+    let merge_preludes =
+        (
+          ~parent: list((selector, Ppxlib.Location.t)),
+          ~child: list((selector, Ppxlib.Location.t)),
+        ) => {
+      List.fold_left(
+        (acc, (parent_sel, _parent_loc)) =>
+          List.fold_left(
+            (acc, (child_sel, child_loc)) => {
+              let merged =
+                Styled_ppx_css_parser.Selector_nesting.compute_new_prefix(
+                  ~prefix=Some(parent_sel),
+                  child_sel,
+                );
+              [(merged, child_loc), ...acc];
+            },
+            acc,
+            child,
+          ),
+        [],
+        parent,
+      )
+      |> List.rev;
+    };
+
+    /* Wrap a `Declaration` atom under an accumulated selector chain. With no
+       parent we leave it bare so `Transform.run` later attaches the binding's
+       className. With a parent, we emit one atom per parent selector — each
+       atom is a `Style_rule` carrying that single selector as its prelude.
+       `Transform.run` will then prefix it with the className correctly, so
+       the chain survives even through enclosing at-rules.
+
+       Splitting one atom per parent selector matches CSS-nesting semantics
+       (`a, b { c: d }` desugars to `a { c: d } b { c: d }`) and works
+       around the fact that the downstream `Transform.unnest_selectors` /
+       `Resolve.unnest_selectors` only consume the first selector of a
+       prelude list. */
+    let wrap_declaration_under_parent = (~parent_prelude=?, decl) => {
+      switch (parent_prelude) {
+      | None =>
         let decl_string = render_declaration(decl);
         let className = generate_class_from_content(~label?, decl_string);
         [(className, Declaration(decl))];
+      | Some(parent_selectors) =>
+        List.map(
+          ((parent_sel, parent_loc)) => {
+            let style_rule =
+              Style_rule({
+                prelude: ([(parent_sel, parent_loc)], parent_loc),
+                block: ([Declaration(decl)], Ppxlib.Location.none),
+                loc: Ppxlib.Location.none,
+              });
+            let rule_string = render_rule(style_rule);
+            let className =
+              generate_class_from_content(~label?, rule_string);
+            (className, style_rule);
+          },
+          parent_selectors,
+        )
+      };
+    };
 
-      | Style_rule({ prelude, block: (rules, _), loc: _ }) =>
+    let rec extract_atomic_rules =
+            (~parent_prelude=?, rule: rule): list((string, rule)) => {
+      switch (rule) {
+      | Declaration(decl) =>
+        wrap_declaration_under_parent(~parent_prelude?, decl)
+
+      | Style_rule({
+          prelude: (child_selectors, _),
+          block: (rules, _),
+          loc: _,
+        }) =>
+        /* Merge any accumulated parent prelude into this Style_rule's
+           selector list. At the top level (no parent) this preserves the
+           original prelude verbatim, including multi-selector lists. */
+        let effective_selectors =
+          switch (parent_prelude) {
+          | None => child_selectors
+          | Some(parent) => merge_preludes(~parent, ~child=child_selectors)
+          };
         rules
-        |> List.concat_map(r => {
-             switch (r) {
-             | Declaration(decl) =>
-               let style_rule =
-                 Style_rule({
-                   prelude,
-                   block: ([Declaration(decl)], Ppxlib.Location.none),
-                   loc: Ppxlib.Location.none,
-                 });
-               let rule_string = render_rule(style_rule);
-               let className = generate_class_from_content(~label?, rule_string);
-               [(className, style_rule)];
-             | Style_rule(_) as nested => extract_atomic_rules(nested)
-             | _ => extract_atomic_rules(r)
-             }
-           })
+        |> List.concat_map(
+             extract_atomic_rules(~parent_prelude=effective_selectors),
+           );
 
       | At_rule({ name, prelude, block, loc }) =>
         switch (block) {
@@ -544,11 +626,18 @@ module Css_transform = {
         /* Both Rule_list and Stylesheet payloads are atomized the same way:
            recurse into the inner rules, then re-wrap each atom in a fresh
            `At_rule(... Rule_list ...)`. We normalize Stylesheet → Rule_list
-           on output because each atom carries exactly one inner rule. */
+           on output because each atom carries exactly one inner rule.
+
+           The accumulated parent prelude is threaded through so that any
+           Style_rule (or bare Declaration) nested inside an at-rule still
+           carries the full selector chain. The Declaration arm above turns
+           a bare Declaration with a parent into a Style_rule, which is what
+           lets `.a .b { @media (...) { color: red } }` render correctly as
+           `@media (...) { .css-X .a .b { color:red } }`. */
         | Rule_list((rules, rule_loc))
         | Stylesheet((rules, rule_loc)) =>
           rules
-          |> List.concat_map(extract_atomic_rules)
+          |> List.concat_map(extract_atomic_rules(~parent_prelude?))
           |> List.map(((_className, inner_rule)) => {
                let wrapped =
                  At_rule({
@@ -566,7 +655,7 @@ module Css_transform = {
       };
     };
 
-    List.concat_map(extract_atomic_rules, rules);
+    List.concat_map(extract_atomic_rules(~parent_prelude=?None), rules);
   };
 
   let transform_rule_list = (~file, ~label=?, rule_list: rule_list) => {
@@ -703,6 +792,19 @@ let push_global =
   let (rules, _) = global_rules;
   let all_dynamic_vars = ref([]);
 
+  /* Flatten CSS-nesting before rendering. `[%styled.global2]` previously
+     emitted literal nesting (`body { .child { ... } }`), which only
+     resolves correctly in modern browsers and is not always polyfilled
+     by build chains. `Resolve.resolve_selectors` is the same pipeline
+     `[%cx]` uses to lower nested rules into flat selectors
+     (`body .child { ... }`) — strict superset of nesting's browser
+     support, semantically identical for the shapes the parser admits.
+
+     Multi-selector preludes Cartesian-product correctly (`a, b { c {...} }`
+     -> `a c { ... } b c { ... }`) because `resolve_selectors` calls
+     `split_multiple_selectors` before unnesting. */
+  let flattened_rules = Styled_ppx_css_parser.Resolve.resolve_selectors(rules);
+
   /* transform_rule walks the rule, replacing every Variable(path) in
      declaration values with var(--hash) and appending (var_name, path,
      var_type) to all_dynamic_vars.
@@ -713,7 +815,7 @@ let push_global =
      defensive no-op rather than partial-matching, so a future caller
      bypassing the pre-check still produces well-formed CSS instead of
      raising. */
-  rules
+  flattened_rules
   |> List.iter(rule =>
        switch (rule) {
        | Style_rule(_)

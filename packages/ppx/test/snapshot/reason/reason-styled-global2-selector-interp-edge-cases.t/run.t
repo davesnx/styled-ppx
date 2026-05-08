@@ -4,7 +4,7 @@
   [@css "body:not(.css-nk32ej-card){margin:0;}"];
   [@css ".css-nk32ej-card{background:var(--var-ivms5p);}"];
   [@css ".css-b7rhyr-active.css-nk32ej-card{color:white;}"];
-  [@css ".container{.css-nk32ej-card{color:var(--var-ivms5p);}}"];
+  [@css ".container .css-nk32ej-card{color:var(--var-ivms5p);}"];
   [@css ".css-nk32ej-card{padding:10px;}"];
   [@css ".css-b7rhyr-active{border:1px solid;}"];
   [@css.bindings

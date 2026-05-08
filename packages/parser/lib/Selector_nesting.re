@@ -54,24 +54,38 @@ and rule_contain_media =
   | Style_rule(_) => false
   | At_rule({ name: (name, _), _ }) => name == "media";
 
+/* `pop_last_selector` peels the trailing combinator+selector pair off a
+   `ComplexSelector(Combinator{...})`. The AST type admits `right: []`,
+   so although the parser doesn't currently emit that shape, the
+   explicit empty-right arm keeps the function total: an empty-right
+   combinator is semantically the `left` selector alone, which is more
+   informative than the catchall fallback (which would return the whole
+   `ComplexSelector(Combinator)` wrapper).
+
+   The non-empty arm reverses `right` exactly once and pattern-matches
+   the head off, then reverses the tail back. The previous shape called
+   `List.rev` three times for the same logical operation. */
 let pop_last_selector =
   fun
   | ComplexSelector(Selector(sel)) => (sel, None, None)
-  | ComplexSelector(Combinator({ left, right })) => {
-      let (ctor, last) = right |> List.rev |> List.hd;
-      let rest = right |> List.rev |> List.tl |> List.rev;
-      (
+  | ComplexSelector(Combinator({ left, right: [] })) => (left, None, None)
+  | ComplexSelector(Combinator({ left, right })) =>
+    switch (List.rev(right)) {
+    | [] =>
+      /* Unreachable: the `right: []` arm above shadows it. */
+      (left, None, None)
+    | [(ctor, last), ...rest_rev] => (
         last,
         Some(ctor),
         Some(
           ComplexSelector(
             Combinator({
               left,
-              right: rest,
+              right: List.rev(rest_rev),
             }),
           ),
         ),
-      );
+      )
     }
   | _ as sel => (sel, None, None);
 
@@ -85,9 +99,24 @@ let join_selector_with_combinator =
   );
 };
 
+/* Flatten a redundant `ComplexSelector(Selector(s))` wrapper that
+   `pop_last_selector` may return when the `right` side of a `Combinator`
+   carries the parser's identity form. Other selector shapes
+   (`RelativeSelector`, raw `Combinator`) pass through unchanged — they
+   are not expected from `pop_last_selector` and would still surface in
+   the catch-all `assert(false)` of `join_compound_selector`.
+
+   Non-recursive: the parser doesn't produce `Selector(Selector(...))`
+   chains, so a single unwrap is sufficient. */
+let unwrap_complex_selector =
+  fun
+  | ComplexSelector(Selector(s)) => s
+  | s => s;
+
 let join_compound_selector =
     (selector, { subclass_selectors, pseudo_selectors, _ }) => {
-  switch (pop_last_selector(selector)) {
+  let (popped, ctor_opt, rest_opt) = pop_last_selector(selector);
+  switch (unwrap_complex_selector(popped), ctor_opt, rest_opt) {
   | (SimpleSelector(simple), None, None) =>
     CompoundSelector({
       type_selector: Some(simple),

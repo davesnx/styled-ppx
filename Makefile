@@ -3,6 +3,8 @@ project_name = styled-ppx
 OPAM_EXEC = opam exec --
 DUNE = $(OPAM_EXEC) dune
 opam_file = $(project_name).opam
+DUNE_JOBS ?= 8
+export DUNE_JOBS
 
 .PHONY: help
 help: ## Print this help message

@@ -4,11 +4,20 @@ let loc_none = Ppxlib.Location.none;
 
 let split_by_kind = Selector_nesting.split_by_kind;
 
+/* Like `Resolve.unnest_selectors`, every `Style_rule` arriving here has
+   already been split to a single-selector prelude. The empty-prelude arm
+   is defensive: if a future caller forgets `split_multiple_selectors`,
+   the malformed rule passes through on the declarations side rather
+   than crashing on `List.hd`. */
 let rec unnest_selectors = (~prefix, rules) => {
   List.partition_map(
     fun
-    | Style_rule({ prelude: (prelude, _), block: (rules, _), _ }) => {
-        let current_selector = prelude |> List.hd |> fst;
+    | Style_rule({ prelude: ([], _), _ }) as rule => Left(rule)
+    | Style_rule({
+        prelude: ([(current_selector, _), ..._], _),
+        block: (rules, _),
+        _,
+      }) => {
         let new_prefix =
           Selector_nesting.compute_new_prefix(~prefix, current_selector);
         let selector_rules = Selector_nesting.split_multiple_selectors(rules);

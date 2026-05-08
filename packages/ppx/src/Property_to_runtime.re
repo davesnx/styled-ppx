@@ -1371,9 +1371,24 @@ let render_function_color = (~loc, (cs, c1, c2, c3, alpha)) => {
   };
 };
 
-let render_var = (~loc, string) => {
-  let string = render_string(~loc, string);
-  [%expr `var([%e string])];
+/* `var(--name)` becomes ``var(name)`` — the runtime adds the `--` prefix.
+   `var(--name, fallback)` becomes ``varDefault(name, fallback)`` so the
+   runtime emits `var(--name, fallback)` verbatim. The fallback is captured
+   by the spec's `<declaration-value>` parser as a rendered string and we
+   trust it round-trips: the renderer that produced it is the same one the
+   runtime will use to format any subsequent rule containing the var.
+
+   The `_` in the inner tuple is the `,` separator captured by the spec
+   `[ ',' <declaration-value> ]?` group; only its presence is meaningful. */
+let render_var = (~loc, value: Types.function_var) => {
+  let (name, fallback_opt) = value;
+  let name_expr = render_string(~loc, name);
+  switch (fallback_opt) {
+  | None => [%expr `var([%e name_expr])]
+  | Some((_, fallback)) =>
+    let fallback_expr = render_string(~loc, fallback);
+    [%expr `varDefault(([%e name_expr], [%e fallback_expr]))];
+  };
 };
 
 let rec render_color = (~loc, value) =>
