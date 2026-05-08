@@ -178,11 +178,27 @@ module Fonts = [%styled.global2 {|
 
 Each `@font-face` block ships through `[@@@css ...]` like any other
 global rule, so the font registers when the extracted `.css`
-loads — no runtime side-effects required. Interpolated `src` URLs
-work too: `src: url($(font_url)) format("woff2")` produces
-`src: url(var(--var-<hash>))` on the static side and a matching
-`:root { --var-<hash>: <font_url>; }` from the generated module's
-`to_string()`.
+loads — no runtime side-effects required.
+
+Interpolation **inside `url(...)`** is rejected at PPX time. CSS does
+not perform `var()` substitution inside the `url()` token: browsers
+consume the body as a literal string, so `url(var(--x))` would
+resolve to the string `"var(--x)"` and the resource would never load.
+The static extractor refuses to emit that shape and asks the user to
+either:
+
+1. Inline the URL as a literal string:
+   `src: url("/fonts/inter.woff2") format("woff2")`.
+2. Move the **whole** declaration value behind a single
+   interpolation:
+   ```reason
+   let font_src = {|url("/fonts/inter.woff2") format("woff2")|};
+   /* ... */
+   src: $(font_src);
+   ```
+   The static side renders `src: var(--var-<hash>)` (which is valid:
+   `src` does substitute `var()` at the value level), and `to_string`
+   emits `:root { --var-<hash>: url("/fonts/inter.woff2") format("woff2"); }`.
 
 ### `Css_bindings`
 

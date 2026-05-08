@@ -179,6 +179,37 @@ module Css_transform = {
           Ppxlib.Location.none,
         ),
       });
+    | Function({ name: (fn_name, _), body: (body_values, body_loc), _ } as fn)
+        when fn_name == "url" =>
+      /* CSS `url()` does not perform `var()` substitution: browsers consume
+         the body as a literal token, so `url(var(--x))` resolves to the
+         string "var(--x)" not the value the custom property holds. Allowing
+         the recursive rewrite below would silently emit broken CSS (see
+         documents/css-extraction.md). When the body contains an
+         interpolation, reject with a clear error pointing the user at
+         literal-string alternatives the static extractor can serialize
+         correctly; otherwise fall through to the generic Function rewrite. */
+      let interp_loc =
+        List.find_map(
+          ((inner: component_value, loc)) =>
+            switch (inner) {
+            | Variable(_, _) => Some(loc)
+            | _ => None
+            },
+          body_values,
+        );
+      switch (interp_loc) {
+      | Some(loc) =>
+        Ppxlib.Location.raise_errorf(
+          ~loc,
+          "Interpolation inside `url(...)` is not supported: browsers don't substitute `var()` there.\n- Inline the URL: `url(\"/path/to/asset\")`.\n- Or interpolate the whole value: `src: $(font_src)`.",
+        )
+      | None =>
+        Function({
+          ...fn,
+          body: (List.map(recurse, body_values), body_loc),
+        })
+      };
     | Function({ name, kind, body: (body_values, body_loc) }) =>
       Function({
         name,
