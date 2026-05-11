@@ -2165,7 +2165,7 @@ let data = [
     type_: Media,
   }),
   Event({
-    name: "onEncrypted",
+    name: "onEncrypetd",
     type_: Media,
   }),
   Event({
