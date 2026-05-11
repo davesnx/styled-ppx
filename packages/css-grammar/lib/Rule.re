@@ -3,7 +3,7 @@ module Render = Styled_ppx_css_parser.Render;
 
 type expected =
   | Keyword(string)
-  | TokenKind(string)
+  | Token_kind(string)
   | Function(string)
   | Description(string);
 
@@ -13,24 +13,26 @@ type error_info = {
 };
 
 type error = list(error_info);
-type data('a) = result('a, error);
+type data('value) = result('value, error);
 type input = Ast.component_value_list;
 type located_component_value = Ast.with_loc(Ast.component_value);
-type rule('a) = input => (data('a), input);
+type rule('value) = input => (data('value), input);
 
-type return('a, 'b) = 'b => rule('a);
-type bind('a, 'b, 'c) = (rule('a), 'b => rule('c)) => rule('c);
-type map('a, 'b, 'c, 'd) = (rule('a), 'b => 'c) => rule('d);
-type best('left_in, 'left_v, 'right_in, 'right_v, 'c) =
+type return('output, 'from) = 'from => rule('output);
+type bind('first, 'cont, 'next) =
+  (rule('first), 'cont => rule('next)) => rule('next);
+type map('first, 'map_in, 'map_out, 'rule_out) =
+  (rule('first), 'map_in => 'map_out) => rule('rule_out);
+type best('left_in, 'left_ok, 'right_in, 'right_ok, 'out) =
   (
     (rule('left_in), rule('right_in)),
     [
-      | `Left('left_v)
-      | `Right('right_v)
+      | `Left('left_ok)
+      | `Right('right_ok)
     ] =>
-    rule('c)
+    rule('out)
   ) =>
-  rule('c);
+  rule('out);
 
 let rec drop_leading_whitespace = values =>
   switch (values) {
@@ -61,7 +63,7 @@ let err_keyword = (kw, (actual, _): located_component_value) =>
 let err_kind = kind =>
   Error([
     {
-      expected: [TokenKind(kind)],
+      expected: [Token_kind(kind)],
       got: None,
     },
   ]);
@@ -69,7 +71,7 @@ let err_kind = kind =>
 let err_kind_got = (kind, (actual, _): located_component_value) =>
   Error([
     {
-      expected: [TokenKind(kind)],
+      expected: [Token_kind(kind)],
       got: Some(actual),
     },
   ]);
@@ -124,11 +126,11 @@ module Data = {
       : f(`Right(right_data), right_values);
   };
 
-  let bind_shortest: best('a, data('a), 'b, data('b), 'c) =
+  let bind_shortest: best('left, data('left), 'right, data('right), 'out) =
       ((left, right), f) =>
     bind_shortest_or_longest(true, (left, right), f);
 
-  let bind_longest: best('a, data('a), 'b, data('b), 'c) =
+  let bind_longest: best('left, data('left), 'right, data('right), 'out) =
       ((left, right), f) =>
     bind_shortest_or_longest(false, (left, right), f);
 };
@@ -263,7 +265,12 @@ let interpolatable = (~type_path as _, inner_rule, values) => {
     Pattern.component(
       fun
       | (Ast.Variable(name, _loc), _) => Ok(`Interpolation(name))
-      | _ => err_kind("value"),
+      /* Use Description here so the grammar-internal "value" alternative
+         doesn't leak into user-facing "Expected ..." suggestion lists.
+         Description entries are filtered out of suggestions in
+         [format_expected]; only the inner rule's specific keyword/token
+         expectations make it to the user. */
+      | _ => err([Description("a CSS value or `$(interpolation)`")]),
     );
   switch (interp_rule(values)) {
   | (Ok(_) as result, rest) => (result, rest)
@@ -281,7 +288,7 @@ let interpolatable = (~type_path as _, inner_rule, values) => {
 let expected_to_string =
   fun
   | Keyword(s) => s
-  | TokenKind(s) => s
+  | Token_kind(s) => s
   | Function(s) => s ++ "()"
   | Description(s) => s;
 
@@ -291,7 +298,7 @@ let is_vendor_prefixed = s => String.length(s) > 0 && s.[0] == '-';
 
 let expected_priority =
   fun
-  | TokenKind(_) => 0
+  | Token_kind(_) => 0
   | Function(_) => 1
   | Keyword(s) when !is_vendor_prefixed(s) => 2
   | Keyword(_) => 3
@@ -354,7 +361,7 @@ let find_suggestion = (got_str: string, expected: list(expected)) => {
     |> List.filter_map(
          fun
          | Keyword(s) => Some(s)
-         | TokenKind(s) => Some(s)
+         | Token_kind(s) => Some(s)
          | Function(s) => Some("function " ++ s)
          | Description(_) => None,
        );

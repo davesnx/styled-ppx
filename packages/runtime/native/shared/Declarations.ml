@@ -13,6 +13,18 @@ let alignContent x =
 let alignItems x = Rule.declaration ({js|alignItems|js}, AlignItems.toString x)
 let alignSelf x = Rule.declaration ({js|alignSelf|js}, AlignSelf.toString x)
 
+(* place-* shorthands. Two-value forms are decomposed at PPX time into
+   separate align-* / justify-* declarations, mirroring the flex-flow
+   precedent. The unary functions below cover the single-value form for
+   users writing OCaml/Reason directly. *)
+let placeContent x =
+  Rule.declaration ({js|placeContent|js}, PlaceContent.toString x)
+
+let placeItems x =
+  Rule.declaration ({js|placeItems|js}, PlaceItems.toString x)
+
+let placeSelf x = Rule.declaration ({js|placeSelf|js}, PlaceSelf.toString x)
+
 let animationDelay x =
   Rule.declaration ({js|animationDelay|js}, AnimationDelay.toString x)
 
@@ -986,6 +998,10 @@ let columnWidth x =
   Rule.declaration ({js|columnWidth|js}, ColumnWidth.toString x)
 
 let caretColor x = Rule.declaration ({js|caretColor|js}, CaretColor.toString x)
+
+let accentColor x =
+  Rule.declaration ({js|accentColor|js}, AccentColor.toString x)
+
 let width x = Rule.declaration ({js|width|js}, Width.toString x)
 let whiteSpace x = Rule.declaration ({js|whiteSpace|js}, WhiteSpace.toString x)
 

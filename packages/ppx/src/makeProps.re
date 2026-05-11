@@ -726,11 +726,6 @@ let data = [
     alias: None,
   }),
   Attribute({
-    name: "fomat",
-    type_: String,
-    alias: None,
-  }),
-  Attribute({
     name: "fontFamily",
     type_: String,
     alias: None,
@@ -2170,7 +2165,7 @@ let data = [
     type_: Media,
   }),
   Event({
-    name: "onEncrypetd",
+    name: "onEncrypted",
     type_: Media,
   }),
   Event({

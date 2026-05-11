@@ -756,6 +756,43 @@ let focus_within_and_focus_visible () =
      solid orange;}"
     (render list_of_rules)
 
+(* Per CSS Nesting Level 1 §3.1, a bare nested pseudo selector
+   descendant-joins with the parent. The PPX's `[%cx2]` extraction path
+   rejects these with a clear error, but the runtime `Transform.run`
+   path accepts them and emits the spec-correct descendant form. *)
+let bare_leading_pseudo_descendant_joins () =
+  let input = {| :hover { color: red; } |} in
+  let rule_list = parse input in
+  let list_of_rules = Transform.run ~className:"box" rule_list in
+  check ~pos:__POS__ ".box :hover{color:red;}" (render list_of_rules)
+
+let bare_leading_pseudo_element_descendant_joins () =
+  let input = {| ::after { content: "*"; } |} in
+  let rule_list = parse input in
+  let list_of_rules = Transform.run ~className:"box" rule_list in
+  check ~pos:__POS__ ".box ::after{content:\"*\";}" (render list_of_rules)
+
+let bare_leading_pseudo_nested_under_class () =
+  let input = {| .outer { :hover { color: red; } } |} in
+  let rule_list = parse input in
+  let list_of_rules = Transform.run ~className:"box" rule_list in
+  check ~pos:__POS__ ".box .outer :hover{color:red;}" (render list_of_rules)
+
+let amp_pseudo_inside_amp_pseudo_compound_chain () =
+  (* Spec-correct: `&:hover { &::after }` -> `&:hover::after`. The two
+     compounds merge because each side carries an explicit `&`. *)
+  let input = {| &:hover { &::after { content: "*"; } } |} in
+  let rule_list = parse input in
+  let list_of_rules = Transform.run ~className:"box" rule_list in
+  check ~pos:__POS__ ".box:hover::after{content:\"*\";}" (render list_of_rules)
+
+let amp_pseudo_with_descendant_inner () =
+  (* `&:hover { .child }` -> `&:hover .child` (descendant). *)
+  let input = {| &:hover { .child { color: red; } } |} in
+  let rule_list = parse input in
+  let list_of_rules = Transform.run ~className:"box" rule_list in
+  check ~pos:__POS__ ".box:hover .child{color:red;}" (render list_of_rules)
+
 let nested_at_rules_priority () =
   let input =
     {|
@@ -858,4 +895,13 @@ let tests =
     test "nested_at_rules_priority" nested_at_rules_priority;
     test "ampersand_space_ampersand" ampersand_space_ampersand;
     test "ampersand_ampersand" ampersand_ampersand;
+    test "bare_leading_pseudo_descendant_joins"
+      bare_leading_pseudo_descendant_joins;
+    test "bare_leading_pseudo_element_descendant_joins"
+      bare_leading_pseudo_element_descendant_joins;
+    test "bare_leading_pseudo_nested_under_class"
+      bare_leading_pseudo_nested_under_class;
+    test "amp_pseudo_inside_amp_pseudo_compound_chain"
+      amp_pseudo_inside_amp_pseudo_compound_chain;
+    test "amp_pseudo_with_descendant_inner" amp_pseudo_with_descendant_inner;
   ]

@@ -10,8 +10,8 @@ same shape.
 
   $ styled-ppx.generate m.ml n.ml
   File "n.ml", line 2, characters 6-14:
-  Error: cross-library [%cx2] selector references are not supported.
-  The reference `M.marker` resolves to module `M` which is not part of the
-  current library. Move the [%cx2] binding into the current library, or
-  inline the class chain literally.
+  Error: cross-module [%cx2] selector reference `M.marker` does not resolve.
+  The target binding is missing from module `M`, or the binding is not
+  a [%cx2] expression. Define `M.marker` with [%cx2 "..."], or remove the
+  reference.
   [1]

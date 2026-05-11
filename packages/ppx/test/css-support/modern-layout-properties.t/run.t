@@ -16,43 +16,43 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
-  CSS.unsafe({js|placeContent|js}, {js|center|js});
-  CSS.unsafe({js|placeContent|js}, {js|start|js});
-  CSS.unsafe({js|placeContent|js}, {js|end|js});
-  CSS.unsafe({js|placeContent|js}, {js|space-between|js});
-  CSS.unsafe({js|placeContent|js}, {js|space-around|js});
-  CSS.unsafe({js|placeContent|js}, {js|space-evenly|js});
-  CSS.unsafe({js|placeContent|js}, {js|stretch|js});
-  CSS.unsafe({js|placeContent|js}, {js|center start|js});
-  CSS.unsafe({js|placeContent|js}, {js|start end|js});
-  CSS.unsafe({js|placeContent|js}, {js|space-between center|js});
+  CSS.placeContent(`center);
+  CSS.placeContent(`start);
+  CSS.placeContent(`end_);
+  CSS.placeContent(`spaceBetween);
+  CSS.placeContent(`spaceAround);
+  CSS.placeContent(`spaceEvenly);
+  CSS.placeContent(`stretch);
+  CSS.alignContent(`center);
+  CSS.alignContent(`start);
+  CSS.alignContent(`spaceBetween);
   
-  CSS.unsafe({js|placeItems|js}, {js|center|js});
-  CSS.unsafe({js|placeItems|js}, {js|start|js});
-  CSS.unsafe({js|placeItems|js}, {js|end|js});
-  CSS.unsafe({js|placeItems|js}, {js|stretch|js});
-  CSS.unsafe({js|placeItems|js}, {js|baseline|js});
-  CSS.unsafe({js|placeItems|js}, {js|center start|js});
-  CSS.unsafe({js|placeItems|js}, {js|start end|js});
+  CSS.placeItems(`center);
+  CSS.placeItems(`start);
+  CSS.placeItems(`end_);
+  CSS.placeItems(`stretch);
+  CSS.placeItems(`baseline);
+  CSS.alignItems(`center);
+  CSS.alignItems(`start);
   
-  CSS.unsafe({js|placeSelf|js}, {js|auto|js});
-  CSS.unsafe({js|placeSelf|js}, {js|center|js});
-  CSS.unsafe({js|placeSelf|js}, {js|start|js});
-  CSS.unsafe({js|placeSelf|js}, {js|end|js});
-  CSS.unsafe({js|placeSelf|js}, {js|stretch|js});
-  CSS.unsafe({js|placeSelf|js}, {js|center start|js});
-  CSS.unsafe({js|placeSelf|js}, {js|start end|js});
+  CSS.placeSelf(`auto);
+  CSS.placeSelf(`center);
+  CSS.placeSelf(`start);
+  CSS.placeSelf(`end_);
+  CSS.placeSelf(`stretch);
+  CSS.alignSelf(`center);
+  CSS.alignSelf(`start);
   
-  CSS.unsafe({js|accentColor|js}, {js|auto|js});
-  CSS.unsafe({js|accentColor|js}, {js|red|js});
-  CSS.unsafe({js|accentColor|js}, {js|#ff0000|js});
-  CSS.unsafe({js|accentColor|js}, {js|rgb(255, 0, 0)|js});
+  CSS.accentColor(`auto);
+  CSS.accentColor(CSS.red);
+  CSS.accentColor(`hex({js|ff0000|js}));
+  CSS.accentColor(`rgb((255, 0, 0)));
   
-  CSS.unsafe({js|touchAction|js}, {js|auto|js});
-  CSS.unsafe({js|touchAction|js}, {js|none|js});
-  CSS.unsafe({js|touchAction|js}, {js|pan-x|js});
-  CSS.unsafe({js|touchAction|js}, {js|pan-y|js});
-  CSS.unsafe({js|touchAction|js}, {js|manipulation|js});
+  CSS.touchAction(`auto);
+  CSS.touchAction(`none);
+  CSS.touchAction(`panX);
+  CSS.touchAction(`panY);
+  CSS.touchAction(`manipulation);
   CSS.unsafe({js|touchAction|js}, {js|pan-x pan-y|js});
   
   CSS.aspectRatio(`auto);

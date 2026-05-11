@@ -17,7 +17,7 @@ let single = [%cx2 {|
 let twoLevel = [%cx2 {|
   color: red;
   &:focus-visible {
-    ::after {
+    &::after {
       content: "";
     }
   }

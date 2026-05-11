@@ -15,11 +15,11 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
   File "input.re", line 6, characters 10-18:
   Error: Property 'color' has an invalid value: 'cositas',
-         Expected 'hex-color', 'value', 'color()', 'color-mix()', 'hsl()',
-         'hsla()', 'hwb()', 'lab()', etc.
+         Expected 'hex-color', 'color()', 'color-mix()', 'hsl()', 'hsla()',
+         'hwb()', 'lab()', 'lch()', etc.
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   let selectors = [%ocaml.error
-    "Property 'color' has an invalid value: 'cositas',\nExpected 'hex-color', 'value', 'color()', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', etc."
+    "Property 'color' has an invalid value: 'cositas',\nExpected 'hex-color', 'color()', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
   ];

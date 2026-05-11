@@ -13,11 +13,6 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 3, characters 6-32:
-  3 | [%cx2 {|font-family: $(fonts);|}];
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  Error: Unbound value fonts
-  [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css ".css-1l2838t{font-family:\"Inter Semi Bold\";}"];
@@ -135,6 +130,10 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-1jurtd8{font-feature-settings:\"smcp\" on;}"];
   [@css ".css-1ucpmmf{font-feature-settings:\"liga\" off;}"];
   [@css ".css-180vt2s{font-feature-settings:\"smcp\", \"swsh\" 2;}"];
+  
+  let fonts: CSS.Types.FontFamily.t =
+    `list([|`quoted("Inter"), `quoted("Sans")|]);
+  let font: CSS.Types.FontFamily.t = `quoted("Inter");
   
   CSS.make("css-1l2838t", []);
   CSS.make(

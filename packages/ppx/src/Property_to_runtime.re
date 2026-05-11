@@ -570,8 +570,11 @@ let render_side_or_corner = (~loc, value: Types.side_or_corner) => {
   | (Some(`Right), Some(`Top)) => [%expr `TopRight]
   | (Some(`Left), Some(`Bottom)) => [%expr `BottomLeft]
   | (Some(`Right), Some(`Bottom)) => [%expr `BottomRight]
-  /* by ast, that can't be possible */
-  | (None, None) => assert(false)
+  /* The grammar for `side-or-corner` requires at least one of
+     left/right or top/bottom, so this case is unreachable from valid
+     parsed input. Default to `Top` rather than crash if a future
+     parser change introduces an empty payload. */
+  | (None, None) => [%expr `Top]
   };
 };
 
@@ -5093,6 +5096,72 @@ let align_content =
     },
   );
 
+/* place-* shorthands. Single-value form maps to the typed unary
+   `CSS.place*` declaration; two-value form is decomposed into separate
+   align-* + justify-* declarations (mirroring `flex_flow`). The
+   single-value path preserves the original `place-*:` property name
+   in emitted CSS rather than collapsing to `align-*:`. */
+let place_content =
+  polymorphic(
+    Property_parser.property_place_content,
+    (~loc, (align_ast, justify_ast)) =>
+      switch (justify_ast) {
+      | None =>
+        align_content.ast_to_expr(~loc, `Value(align_ast))
+        |> List.map(value =>
+             switch (value.Parsetree.pexp_desc) {
+             | Pexp_apply(_, [(_, arg)]) => [%expr CSS.placeContent([%e arg])]
+             | _ => value
+             }
+           )
+      | Some(justify_ast) =>
+        let align = align_content.ast_to_expr(~loc, `Value(align_ast));
+        let justify =
+          justify_content.ast_to_expr(~loc, `Value(justify_ast));
+        align @ justify;
+      },
+  );
+
+let place_items =
+  polymorphic(
+    Property_parser.property_place_items,
+    (~loc, (align_ast, justify_ast)) =>
+      switch (justify_ast) {
+      | None =>
+        align_items.ast_to_expr(~loc, `Value(align_ast))
+        |> List.map(value =>
+             switch (value.Parsetree.pexp_desc) {
+             | Pexp_apply(_, [(_, arg)]) => [%expr CSS.placeItems([%e arg])]
+             | _ => value
+             }
+           )
+      | Some(justify_ast) =>
+        let align = align_items.ast_to_expr(~loc, `Value(align_ast));
+        let justify = justify_items.ast_to_expr(~loc, `Value(justify_ast));
+        align @ justify;
+      },
+  );
+
+let place_self =
+  polymorphic(
+    Property_parser.property_place_self,
+    (~loc, (align_ast, justify_ast)) =>
+      switch (justify_ast) {
+      | None =>
+        align_self.ast_to_expr(~loc, `Value(align_ast))
+        |> List.map(value =>
+             switch (value.Parsetree.pexp_desc) {
+             | Pexp_apply(_, [(_, arg)]) => [%expr CSS.placeSelf([%e arg])]
+             | _ => value
+             }
+           )
+      | Some(justify_ast) =>
+        let align = align_self.ast_to_expr(~loc, `Value(align_ast));
+        let justify = justify_self.ast_to_expr(~loc, `Value(justify_ast));
+        align @ justify;
+      },
+  );
+
 let render_line_names = (~loc, value: Types.line_names) => {
   let ((), line_names, ()) = value;
   line_names
@@ -5883,6 +5952,17 @@ let caret_color =
     Property_parser.property_caret_color,
     (~loc) => [%expr CSS.caretColor],
     (~loc, value: Types.property_caret_color) =>
+      switch (value) {
+      | `Auto => [%expr `auto]
+      | `Color(color) => render_color(~loc, color)
+      },
+  );
+
+let accent_color =
+  monomorphic(
+    Property_parser.property_accent_color,
+    (~loc) => [%expr CSS.accentColor],
+    (~loc, value: Types.property_accent_color) =>
       switch (value) {
       | `Auto => [%expr `auto]
       | `Color(color) => render_color(~loc, color)
@@ -7739,7 +7819,27 @@ let text_orientation =
       },
   );
 
-let touch_action = unsupportedProperty(Property_parser.property_touch_action);
+let touch_action =
+  monomorphic(
+    Property_parser.property_touch_action,
+    (~loc) => [%expr CSS.touchAction],
+    (~loc, value: Types.property_touch_action) =>
+      switch (value) {
+      | `Auto => [%expr `auto]
+      | `None => [%expr `none]
+      | `Manipulation => [%expr `manipulation]
+      | `Or(Some(`Pan_x), None, None) => [%expr `panX]
+      | `Or(Some(`Pan_left), None, None) => [%expr `panLeft]
+      | `Or(Some(`Pan_right), None, None) => [%expr `panRight]
+      | `Or(None, Some(`Pan_y), None) => [%expr `panY]
+      | `Or(None, Some(`Pan_up), None) => [%expr `panUp]
+      | `Or(None, Some(`Pan_down), None) => [%expr `panDown]
+      | `Or(None, None, Some ()) => [%expr `pinchZoom]
+      /* Combinations like `pan-x pan-y` cannot be expressed as a
+         single TouchAction.t variant; fall through to CSS.unsafe. */
+      | `Or(_, _, _) => raise(Unsupported_feature)
+      },
+  );
 
 let user_select =
   monomorphic(
@@ -7780,6 +7880,7 @@ let visibility =
   );
 
 let properties = [
+  ("accent-color", found(accent_color)),
   ("align-content", found(align_content)),
   ("align-items", found(align_items)),
   ("align-self", found(align_self)),
@@ -8098,6 +8199,9 @@ let properties = [
   ("page-break-inside", found(page_break_inside)),
   ("perspective-origin", found(perspective_origin)),
   ("perspective", found(perspective)),
+  ("place-content", found(place_content)),
+  ("place-items", found(place_items)),
+  ("place-self", found(place_self)),
   ("pointer-events", found(pointer_events)),
   ("position", found(position)),
   ("resize", found(resize)),

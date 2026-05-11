@@ -254,19 +254,36 @@ let format_location (r : Refs.ref_loc) : string =
   Printf.sprintf "File %S, line %d, characters %d-%d:" r.file r.start_line
     r.start_col r.end_col
 
-(** Detect cross-library references: a longident whose root module isn't
-    the prefix of any [%cx2] binding the aggregator indexed. The aggregator
+(** Derive the module name from a file path the way dune/OCaml does:
+    take the basename, strip the [.ml] / [.re] / [.pp.ml] extension,
+    and capitalize the first letter. This matches how a user writes
+    [M.foo] when the source file is [m.re]. *)
+let module_of_filename filename =
+  let base = Filename.basename filename in
+  let stem =
+    if String.ends_with base ~suffix:".pp.ml" then
+      String.sub base 0 (String.length base - String.length ".pp.ml")
+    else Filename.remove_extension base
+  in
+  if stem = "" then stem else String.capitalize_ascii stem
+
+(** Detect cross-library references: a longident whose root module is
+    NOT one of the input files passed to the aggregator. The aggregator
     only sees files from the current library invocation, so any longident
-    whose root segment doesn't appear in the index must point outside it. *)
-let is_cross_library ~idx longident =
+    whose root segment doesn't correspond to one of those files must
+    point outside the library. Note: we check the input file set rather
+    than [idx] (the [%cx2] binding index), because a file may be
+    in-library yet contain no [%cx2] bindings at all (and therefore
+    contribute nothing to [idx]). Conflating those two cases would
+    produce a misleading "not part of the current library" error for
+    a reference whose target module IS in the library, just not as a
+    [%cx2]. *)
+let is_cross_library ~in_library_modules longident =
   match String.split_on_char '.' longident with
   | [] | [ _ ] -> false (* No dot — single-segment, can't be cross-anything. *)
   | _ ->
     let head = longident_head longident in
-    not
-      (Hashtbl.fold
-         (fun key _ acc -> acc || longident_head key = head)
-         idx false)
+    not (List.mem head in_library_modules)
 
 let cross_library_message ~longident ~head ~ref_loc =
   Printf.sprintf
@@ -277,9 +294,9 @@ let cross_library_message ~longident ~head ~ref_loc =
      inline the class chain literally."
     (format_location ref_loc) longident head
 
-let unresolved_message ~longident ~ref_loc ~idx =
+let unresolved_message ~longident ~ref_loc ~in_library_modules =
   let head = longident_head longident in
-  if is_cross_library ~idx longident then
+  if is_cross_library ~in_library_modules longident then
     cross_library_message ~longident ~head ~ref_loc
   else
     Printf.sprintf
@@ -294,6 +311,7 @@ let unresolved_message ~longident ~ref_loc ~idx =
 let run ~verbose ~minify ~output_file input_files =
   if verbose then Printf.eprintf "Input files: %d\n" (List.length input_files);
   let idx = Index.create () in
+  let in_library_modules = List.map module_of_filename input_files in
   let harvests =
     List.filter_map
       (fun filename ->
@@ -329,7 +347,9 @@ let run ~verbose ~minify ~output_file input_files =
                   end_col = 0;
                 }
             in
-            let msg = unresolved_message ~longident ~ref_loc ~idx in
+            let msg =
+              unresolved_message ~longident ~ref_loc ~in_library_modules
+            in
             errors := msg :: !errors
           in
           let resolved = resolve_sentinels ~idx ~on_error rule in

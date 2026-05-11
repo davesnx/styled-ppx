@@ -551,6 +551,65 @@ module Css_transform = {
     };
   };
 
+  /* Detect whether `selector` starts with a pseudo-only compound and
+     contains no `&` anywhere. Such selectors are spec-correct (per
+     CSS Nesting Level 1 §3.1 they descendant-join with the parent),
+     but the descendant interpretation almost never matches author
+     intent at the top of an atomization context: `.X :hover` matches
+     descendants of `.X` when hovered, not `.X` itself when hovered.
+
+     Walks past `ComplexSelector(Selector(_))` wrappers and the `left`
+     of `Combinator`s to find the leading compound. Returns `true`
+     iff the leading compound has `type_selector = None`, every
+     subclass selector is a `Pseudo_class`, and the compound has at
+     least one pseudo (subclass or pseudo-element). Mixed compounds
+     like `:hover.foo` (which contain a `Class`) are not flagged
+     because the author has clearly written a more specific selector.
+
+     `&:hover`, `&[disabled]`, `& :hover`, etc. all contain `&` and
+     so are accepted unchanged via the `replace_ampersand` path. */
+  let rec leading_compound = sel =>
+    switch (sel) {
+    | CompoundSelector(c) => Some(c)
+    | ComplexSelector(Selector(inner)) => leading_compound(inner)
+    | ComplexSelector(Combinator({ left, _ })) => leading_compound(left)
+    | _ => None
+    };
+
+  let is_bare_leading_pseudo = (sel: selector): bool => {
+    if (Styled_ppx_css_parser.Selector_nesting.contains_ampersand(sel)) {
+      false;
+    } else {
+      switch (leading_compound(sel)) {
+      | Some({ type_selector: None, subclass_selectors, pseudo_selectors }) =>
+        let all_pseudo_class =
+          List.for_all(
+            fun
+            | Pseudo_class(_) => true
+            | _ => false,
+            subclass_selectors,
+          );
+        let has_some_pseudo =
+          subclass_selectors != [] || pseudo_selectors != [];
+        all_pseudo_class && has_some_pseudo;
+      | _ => false
+      };
+    };
+  };
+
+  let raise_bare_leading_pseudo_error = (~loc, sel) => {
+    let rendered = Styled_ppx_css_parser.Render.selector(sel);
+    Ppxlib.Location.raise_errorf(
+      ~loc,
+      "Bare leading pseudo selector `%s` is ambiguous in nested CSS. Per CSS Nesting Level 1 §3.1 it descendant-joins with the enclosing selector (producing `<parent> %s`), which matches descendants rather than the element itself. Write `&%s` for compound (`<parent>%s`, the usual intent), or `& %s` to opt into the explicit descendant form.",
+      rendered,
+      rendered,
+      rendered,
+      rendered,
+      rendered,
+    );
+  };
+
   let atomize_rules = (~label=?, rules: list(rule)): list((string, rule)) => {
     /* Merge a child selector-list prelude under a parent selector-list prelude.
        For each (parent, child) pair, run `compute_new_prefix` so `&`,
@@ -634,6 +693,24 @@ module Css_transform = {
           block: (rules, _),
           loc: _,
         }) =>
+        /* CSS Nesting Level 1 §3.1 desugars a bare leading pseudo
+           selector via descendant combinator, so `:hover { ... }` and
+           `::after { ... }` produce `<parent> :hover` / `<parent>
+           ::after`. That's almost never what authors want; the typical
+           intent is the compound form (`<parent>:hover` / `<parent>::after`).
+           Reject these with a precise location and steer authors toward
+           `&:hover` (compound) or `& :hover` (explicit descendant).
+
+           The check runs at every nesting level (with or without a
+           parent prelude) because the same footgun applies whether the
+           parent is the implicit className or another selector. */
+        List.iter(
+          ((sel, sel_loc)) =>
+            if (is_bare_leading_pseudo(sel)) {
+              raise_bare_leading_pseudo_error(~loc=sel_loc, sel);
+            },
+          child_selectors,
+        );
         /* Merge any accumulated parent prelude into this Style_rule's
            selector list. At the top level (no parent) this preserves the
            original prelude verbatim, including multi-selector lists. */

@@ -2,7 +2,7 @@ module Ast = Styled_ppx_css_parser.Ast;
 
 type expected =
   | Keyword(string)
-  | TokenKind(string)
+  | Token_kind(string)
   | Function(string)
   | Description(string);
 
@@ -12,86 +12,90 @@ type error_info = {
 };
 
 type error = list(error_info);
-type data('a) = result('a, error);
+type data('value) = result('value, error);
 type input = Ast.component_value_list;
 type located_component_value = Ast.with_loc(Ast.component_value);
-type rule('a) = input => (data('a), input);
+type rule('value) = input => (data('value), input);
 
-type return('a, 'b) = 'b => rule('a);
-type bind('a, 'b, 'c) = (rule('a), 'b => rule('c)) => rule('c);
-type map('a, 'b, 'c, 'd) = (rule('a), 'b => 'c) => rule('d);
-type best('left_in, 'left_v, 'right_in, 'right_v, 'c) =
+type return('output, 'from) = 'from => rule('output);
+type bind('first, 'cont, 'next) =
+  (rule('first), 'cont => rule('next)) => rule('next);
+type map('first, 'map_in, 'map_out, 'rule_out) =
+  (rule('first), 'map_in => 'map_out) => rule('rule_out);
+type best('left_in, 'left_ok, 'right_in, 'right_ok, 'out) =
   (
     (rule('left_in), rule('right_in)),
     [
-      | `Left('left_v)
-      | `Right('right_v)
+      | `Left('left_ok)
+      | `Right('right_ok)
     ] =>
-    rule('c)
+    rule('out)
   ) =>
-  rule('c);
+  rule('out);
 
 let remaining_length: input => int;
 
 /* Error construction helpers */
-let err: (~got: Ast.component_value=?, list(expected)) => data('a);
-let err_keyword: (string, located_component_value) => data('a);
-let err_kind: string => data('a);
-let err_kind_got: (string, located_component_value) => data('a);
-let err_fn: (string, located_component_value) => data('a);
-let err_desc: string => data('a);
-let err_desc_got: (string, located_component_value) => data('a);
+let err: (~got: Ast.component_value=?, list(expected)) => data('ignored);
+let err_keyword: (string, located_component_value) => data('ignored);
+let err_kind: string => data('ignored);
+let err_kind_got: (string, located_component_value) => data('ignored);
+let err_fn: (string, located_component_value) => data('ignored);
+let err_desc: string => data('ignored);
+let err_desc_got: (string, located_component_value) => data('ignored);
 
 /* Error merging */
 let merge_error_infos: list(error_info) => error_info;
 
 module Data: {
-  let return: return('a, data('a));
-  let bind: bind('a, data('a), 'b);
-  let map: map('a, data('a), data('b), 'b);
-  let bind_shortest: best('a, data('a), 'b, data('b), 'c);
-  let bind_longest: best('a, data('a), 'b, data('b), 'c);
+  let return: return('value, data('value));
+  let bind: bind('first, data('first), 'next);
+  let map: map('first, data('first), data('next), 'next);
+  let bind_shortest: best('left, data('left), 'right, data('right), 'out);
+  let bind_longest: best('left, data('left), 'right, data('right), 'out);
 };
 
 module Match: {
-  let return: return('a, 'a);
-  let bind: bind('a, 'a, 'b);
-  let map: map('a, 'a, 'b, 'b);
-  let bind_shortest: best('a, 'a, 'b, 'b, 'c);
-  let bind_longest: best('a, 'a, 'b, 'b, 'c);
-  let all: list(rule('a)) => rule(list('a));
+  let return: return('value, 'value);
+  let bind: bind('first, 'first, 'next);
+  let map: map('first, 'first, 'next, 'next);
+  let bind_shortest: best('left, 'left, 'right, 'right, 'out);
+  let bind_longest: best('left, 'left, 'right, 'right, 'out);
+  let all: list(rule('element)) => rule(list('element));
 };
 
 module Let: {
-  let return_data: return('a, data('a));
-  let (let.bind_data): bind('a, data('a), 'b);
-  let (let.map_data): map('a, data('a), data('b), 'b);
-  let (let.bind_shortest_data): best('a, data('a), 'b, data('b), 'c);
-  let (let.bind_longest_data): best('a, data('a), 'b, data('b), 'c);
+  let return_data: return('value, data('value));
+  let (let.bind_data): bind('first, data('first), 'next);
+  let (let.map_data): map('first, data('first), data('next), 'next);
+  let (let.bind_shortest_data):
+    best('left, data('left), 'right, data('right), 'out);
+  let (let.bind_longest_data):
+    best('left, data('left), 'right, data('right), 'out);
 
-  let return_match: return('a, 'a);
-  let (let.bind_match): bind('a, 'a, 'b);
-  let (let.map_match): map('a, 'a, 'b, 'b);
-  let (let.bind_shortest_match): best('a, 'a, 'b, 'b, 'c);
-  let (let.bind_longest_match): best('a, 'a, 'b, 'b, 'c);
+  let return_match: return('value, 'value);
+  let (let.bind_match): bind('first, 'first, 'next);
+  let (let.map_match): map('first, 'first, 'next, 'next);
+  let (let.bind_shortest_match): best('left, 'left, 'right, 'right, 'out);
+  let (let.bind_longest_match): best('left, 'left, 'right, 'right, 'out);
 };
 
 module Pattern: {
   let identity: rule(unit);
   let next: rule(located_component_value);
-  let component: (located_component_value => data('a)) => rule('a);
+  let component: (located_component_value => data('value)) => rule('value);
   let expect_delim: Ast.delimiter => rule(unit);
-  let value: ('a, rule(unit)) => rule('a);
+  let value: ('literal, rule(unit)) => rule('literal);
 };
 
-let run: (rule('a), input) => result('a, error_info);
+let run: (rule('value), input) => result('value, error_info);
 
 let interpolatable:
-  (~type_path: string, rule('a)) =>
+  (~type_path: string, rule('inner)) =>
   rule(
     [>
       | `Interpolation(string)
-      | `Value('a)
+      | `Value('inner)
     ],
   );
 

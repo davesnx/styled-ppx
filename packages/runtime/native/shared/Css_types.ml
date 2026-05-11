@@ -8407,44 +8407,32 @@ module PauseBefore = struct
 end
 
 module PlaceContent = struct
-  (* MDN syntax: <'align-content'> [ <'justify-content'> ]? *)
-  type t =
-    [ `alignContent
-    | `justifyContent
-    | `value of string
-    | Var.t
-    | Cascading.t
-    ]
+  (* MDN syntax: <'align-content'> [ <'justify-content'> ]?
+     The single-value form is just an align-content value applied to both
+     axes; the two-value form is decomposed at PPX time into separate
+     align-content + justify-content declarations. *)
+  type t = AlignContent.t
 
-  let toString x =
-    match x with
-    | `alignContent -> {js|align-content|js}
-    | `justifyContent -> {js|justify-content|js}
-    | `value x -> x
-    | #Var.t as x -> Var.toString x
-    | #Cascading.t as x -> Cascading.toString x
+  let toString = AlignContent.toString
 end
 
 module PlaceItems = struct
-  (* MDN syntax: <'align-items'> [ <'justify-items'> ]? *)
-  type t =
-    [ `alignItems
-    | `justifyItems
-    | `value of string
-    | Var.t
-    | Cascading.t
-    ]
+  (* MDN syntax: <'align-items'> [ <'justify-items'> ]?
+     Single-value form mirrors align-items; two-value form is decomposed
+     at PPX time. *)
+  type t = AlignItems.t
 
-  let toString x =
-    match x with
-    | `alignItems -> {js|align-items|js}
-    | `justifyItems -> {js|justify-items|js}
-    | `value x -> x
-    | #Var.t as x -> Var.toString x
-    | #Cascading.t as x -> Cascading.toString x
+  let toString = AlignItems.toString
 end
 
-module PlaceSelf = AlignSelf
+module PlaceSelf = struct
+  (* MDN syntax: <'align-self'> [ <'justify-self'> ]?
+     Single-value form mirrors align-self; two-value form is decomposed
+     at PPX time. *)
+  type t = AlignSelf.t
+
+  let toString = AlignSelf.toString
+end
 
 module PositionAnchor = struct
   (* MDN syntax: 'auto' | <dashed-ident> *)

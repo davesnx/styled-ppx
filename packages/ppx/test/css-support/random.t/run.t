@@ -110,7 +110,7 @@ If this test fail means that the module is not in sync with the ppx
   (CSS.SVG.stroke(Color.text): CSS.rule);
   CSS.top(`calc(`sub((`percent(50.), `pxFloat(1.)))));
   CSS.unsafe({js|top|js}, {js|unset|js});
-  CSS.unsafe({js|touchAction|js}, {js|none|js});
+  CSS.touchAction(`none);
   CSS.unsafe({js|touchAction|js}, {js|pan-x pan-y|js});
   
   CSS.transformOrigin(`hv((`left, `center)));

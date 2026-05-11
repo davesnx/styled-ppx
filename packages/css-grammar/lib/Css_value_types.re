@@ -77,13 +77,11 @@ let delim =
   | "<=" as value =>
     switch (Ast.delimiter_of_string(value)) {
     | Some(delimiter) => expect_delim(delimiter)
-    | None =>
-      component(actual => Rule.err_keyword(value, actual))
+    | None => component(actual => Rule.err_keyword(value, actual))
     }
   | "(" => paren_block(identity)
   | "[" => bracket_block(identity)
-  | value =>
-    component(actual => Rule.err_keyword(value, actual));
+  | value => component(actual => Rule.err_keyword(value, actual));
 
 let function_call = (name, rule) => {
   let.bind_match body =
@@ -109,9 +107,7 @@ let integer =
   component(
     fun
     | (Ast.Number(n), _) =>
-      Float.is_integer(n)
-        ? Ok(Float.to_int(n))
-        : Rule.err_kind("integer")
+      Float.is_integer(n) ? Ok(Float.to_int(n)) : Rule.err_kind("integer")
     | actual => Rule.err_kind_got("integer", actual),
   );
 
@@ -122,8 +118,7 @@ let number =
     | actual => Rule.err_kind_got("number", actual),
   );
 
-let invalid_dimension_unit = (kind, _unit) =>
-  Rule.err_kind(kind);
+let invalid_dimension_unit = (kind, _unit) => Rule.err_kind(kind);
 
 let length_of_unit = (number, unit) =>
   switch ((unit: Ast.length_unit)) {
@@ -199,7 +194,7 @@ let length =
     | _ => Rule.err_kind("length"),
   );
 
-let length_runtime_module_path = "Css_types.Length";
+let length_runtime_module_path = [%module_path Css_types.Length];
 
 let angle =
   component(
@@ -213,7 +208,7 @@ let angle =
     | _ => Rule.err_kind("angle"),
   );
 
-let angle_runtime_module_path = "Css_types.Angle";
+let angle_runtime_module_path = [%module_path Css_types.Angle];
 
 let time =
   component(
@@ -226,14 +221,7 @@ let time =
     | _ => Rule.err_kind("time"),
   );
 
-let time_runtime_module_path = "Css_types.Time";
-
-module Time = {
-  type t = [
-    | `S(float)
-    | `Ms(float)
-  ];
-};
+let time_runtime_module_path = [%module_path Css_types.Time];
 
 let frequency =
   component(
@@ -247,7 +235,7 @@ let frequency =
     | _ => Rule.err_kind("frequency"),
   );
 
-let frequency_runtime_module_path = "Css_types.Frequency";
+let frequency_runtime_module_path = [%module_path Css_types.Frequency];
 
 let resolution =
   component(
@@ -261,7 +249,7 @@ let resolution =
     | _ => Rule.err_kind("resolution"),
   );
 
-let resolution_runtime_module_path = "Css_types.Resolution";
+let resolution_runtime_module_path = [%module_path Css_types.Resolution];
 
 let percentage =
   component(
@@ -270,7 +258,7 @@ let percentage =
     | _ => Rule.err_kind("percentage"),
   );
 
-let percentage_runtime_module_path = "Css_types.Percentage";
+let percentage_runtime_module_path = [%module_path Css_types.Percentage];
 
 let ident =
   component(
@@ -288,7 +276,7 @@ let css_wide_keywords =
     Rule.Pattern.value(`RevertLayer, keyword("revert-layer")),
   ]);
 
-let css_wide_keywords_runtime_module_path = "Css_types.Cascading";
+let css_wide_keywords_runtime_module_path = [%module_path Css_types.Cascading];
 
 let custom_ident =
   component(
@@ -326,7 +314,7 @@ let url_no_interp = {
   Combinators.xor([url_token, function_call("url", string_token)]);
 };
 
-let url_runtime_module_path = "Css_types.Url";
+let url_runtime_module_path = [%module_path Css_types.Url];
 
 let hex_color =
   component(
@@ -337,13 +325,13 @@ let hex_color =
     | _ => Rule.err_kind("hex-color"),
   );
 
-let hex_color_runtime_module_path = "Css_types.Color";
+let hex_color_runtime_module_path = [%module_path Css_types.Color];
 
 let interpolation =
   component(
     fun
     | (Ast.Variable(name, _loc), _) => Ok([name])
-    | _ => Rule.err_kind("value"),
+    | _ => Rule.err([Rule.Description("a CSS value or `$(interpolation)`")]),
   );
 
 let media_type =
@@ -355,8 +343,7 @@ let media_type =
         | "not"
         | "and"
         | "or"
-        | "layer" =>
-          Rule.err_kind("media_type")
+        | "layer" => Rule.err_kind("media_type")
         | _ => Ok(value)
         };
       }
@@ -370,8 +357,7 @@ let container_name = {
     | "none"
     | "and"
     | "not"
-    | "or" =>
-      Rule.err_kind("container_name")
+    | "or" => Rule.err_kind("container_name")
     | _ => Ok(name)
     };
   };
@@ -430,16 +416,15 @@ let invalid =
    At least one non-whitespace token is required — otherwise an
    `[ ',' <declaration-value> ]?` group could match a trailing comma with
    nothing after it and silently produce an empty fallback. */
-let declaration_value: Rule.rule(string) =
-  values => {
-    let trimmed = Render.strip_leading_whitespace(values);
-    switch (trimmed) {
-    | [] => (Rule.err_desc("a fallback value"), values)
-    | _ =>
-      let rendered = Render.component_value_list(trimmed) |> String.trim;
-      (Ok(rendered), []);
-    };
+let declaration_value: Rule.rule(string) = values => {
+  let trimmed = Render.strip_leading_whitespace(values);
+  switch (trimmed) {
+  | [] => (Rule.err_desc("a fallback value"), values)
+  | _ =>
+    let rendered = Render.component_value_list(trimmed) |> String.trim;
+    (Ok(rendered), []);
   };
+};
 let positive_integer = integer;
 let function_token = invalid;
 let any_value = invalid;

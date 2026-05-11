@@ -102,7 +102,7 @@ Resolve nested pseudo class and pseudo element
   >   ::first-line { color: red; }
   > }
   > EOF
-  h3.foo#baz[data-foo=bar]:hover{color:red;}h3.foo#baz[data-foo=bar]:nth-child(even){color:red;}h3.foo#baz[data-foo=bar]::first-line{color:red;}
+  h3.foo#baz[data-foo=bar] :hover{color:red;}h3.foo#baz[data-foo=bar] :nth-child(even){color:red;}h3.foo#baz[data-foo=bar] ::first-line{color:red;}
 
 Resolve nested other than pseudo class and pseudo element
   $ cat << "EOF" | ./Render_test.exe
@@ -142,7 +142,7 @@ Nested with media query
   >   }
   > }
   > EOF
-  li{list-style-type:none;}li::before{position:absolute;left:-20px;content:"check";}@media screen and (min-width: 600px) {li{position:relative;}}
+  li{list-style-type:none;}li ::before{position:absolute;left:-20px;content:"check";}@media screen and (min-width: 600px) {li{position:relative;}}
 
 Nested pseudo class and selector
   $ cat << "EOF" | ./Render_test.exe
@@ -155,7 +155,7 @@ Nested pseudo class and selector
   >   }
   > }
   > EOF
-  li{position:relative;}li:hover::after{top:50px;}
+  li{position:relative;}li :hover ::after{top:50px;}
 
 Nested pseduo class and selector with ampersand
   $ cat << "EOF" | ./Render_test.exe

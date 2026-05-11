@@ -113,8 +113,38 @@ let unwrap_complex_selector =
   | ComplexSelector(Selector(s)) => s
   | s => s;
 
+/* `join_compound_selector(selector, { subclass_selectors,
+   pseudo_selectors, _ })` extends the last compound of `selector` with
+   the given subclass/pseudo lists. Used by `replace_ampersand` when
+   substituting a compound `&`-bearing rhs into the prefix.
+
+   The four reachable shapes of `pop_last_selector` after
+   `unwrap_complex_selector`:
+
+   1. `(SimpleSelector(simple), None, None)` — prefix was bare
+      `SimpleSelector` (e.g. top-level `&`). Promote `simple` to a
+      `type_selector` in the new compound.
+   2. `(SimpleSelector(simple), Some(ctor), Some(rest))` — prefix was a
+      `Combinator` chain whose last segment is a SimpleSelector. Wrap.
+   3-4. Same two arms for `CompoundSelector(_)` last segments.
+
+   Any other shape (e.g. `RelativeSelector`,
+   `ComplexSelector(Combinator(_))` slipping past the unwrap) means the
+   caller passed a prefix this function isn't shaped to handle. Rather
+   than crash, fall back to a descendant join: emit `<popped> <new
+   compound>`. This preserves user CSS as something parseable and
+   reasonable, and lets the higher layers report a clearer error if
+   needed. The catch-all is intentionally permissive because
+   `Selector_nesting` is in the parser layer with no access to
+   `Ppxlib.Location.raise_errorf`. */
 let join_compound_selector =
     (selector, { subclass_selectors, pseudo_selectors, _ }) => {
+  let new_compound =
+    CompoundSelector({
+      type_selector: None,
+      subclass_selectors,
+      pseudo_selectors,
+    });
   let (popped, ctor_opt, rest_opt) = pop_last_selector(selector);
   switch (unwrap_complex_selector(popped), ctor_opt, rest_opt) {
   | (SimpleSelector(simple), None, None) =>
@@ -165,7 +195,20 @@ let join_compound_selector =
         pseudo_selectors: last_pseudo_selectors @ pseudo_selectors,
       }),
     )
-  | _ => assert(false)
+  /* Defensive fallback — see comment above. */
+  | (other, None, None) => join_selector_with_combinator(other, new_compound)
+  | (other, Some(ctor), Some(rest)) =>
+    join_selector_with_combinator(
+      ~combinator=ctor,
+      rest,
+      join_selector_with_combinator(other, new_compound),
+    )
+  /* The other inconsistent (Some/None) mixes are unreachable by
+     construction in `pop_last_selector`, but matching them keeps the
+     compiler's exhaustiveness check happy without a wildcard. */
+  | (_, Some(_), None)
+  | (_, None, Some(_)) =>
+    join_selector_with_combinator(selector, new_compound)
   };
 };
 
@@ -220,12 +263,18 @@ let rec replace_ampersand = (replaced_with: selector, selector: selector) => {
       })
     };
   | RelativeSelector({ combinator, complex_selector }) =>
+    /* `replace_ampersand` preserves the outer `ComplexSelector` wrapper
+       on every recursive arm that handles a `ComplexSelector` input,
+       so the result is always `ComplexSelector(_)`. The fallback
+       `Selector(_)` rewrap is defensive: if a future arm is added that
+       returns a bare selector, we keep the `RelativeSelector`
+       structure intact rather than crashing. */
     let complex_selector =
       switch (
         replace_ampersand(replaced_with, ComplexSelector(complex_selector))
       ) {
       | ComplexSelector(v) => v
-      | _ => assert(false)
+      | other => Selector(other)
       };
     RelativeSelector({
       combinator,
@@ -256,6 +305,10 @@ and pseudo_selector_replace_ampersand = (replaced_with: selector, selector) => {
         payload: (NthSelector(complex_selector_list), payload_loc),
       }),
     ) =>
+    /* See the parallel `RelativeSelector` arm above for why the result
+       of `replace_ampersand` on a `ComplexSelector(_)` is always a
+       `ComplexSelector(_)`. The `Selector(other)` rewrap is defensive
+       against future arms that might return a bare selector. */
     let complex_selector_list =
       complex_selector_list
       |> List.map(complex_selector =>
@@ -267,7 +320,7 @@ and pseudo_selector_replace_ampersand = (replaced_with: selector, selector) => {
       |> List.map(
            fun
            | ComplexSelector(complex_selector) => complex_selector
-           | _ => assert(false),
+           | other => Selector(other),
          );
     Pseudoclass(
       NthFunction({
@@ -302,20 +355,6 @@ let split_multiple_selectors = (rules: list(rule)) => {
     rules,
   );
 };
-
-let rec starts_with_double_dot =
-  fun
-  | CompoundSelector({ type_selector: None, subclass_selectors, _ }) => {
-      List.for_all(
-        fun
-        | Pseudo_class(_) => true
-        | _ => false,
-        subclass_selectors,
-      );
-    }
-  | ComplexSelector(Selector(selector)) => starts_with_double_dot(selector)
-  | ComplexSelector(Combinator({ left, _ })) => starts_with_double_dot(left)
-  | _ => false;
 
 let trim_right = (vs: component_value_list) => {
   let rec go = (vs, acc) =>
@@ -470,28 +509,27 @@ and swap = ({ prelude: swap_prelude, block, loc, _ }: at_rule) => {
   move_media_at_top(resolved_media_selectors);
 };
 
-/** Compute the merged prefix when nesting a selector under a parent. */
+/** Compute the merged prefix when nesting a selector under a parent.
+
+    Per CSS Nesting Level 1 §3.1, a nested selector that does not
+    contain the nesting selector (`&`) and does not start with a
+    combinator desugars by descendant-combinator-joining with the
+    parent. Selectors that do contain `&` resolve via literal
+    substitution. The two arms below implement exactly those rules.
+
+    Selectors that start with a combinator are accepted as relative
+    (e.g. `> .child` desugars to `& > .child`) when the parser supports
+    them in nested position. The current parser only accepts leading
+    combinators inside pseudo-class payloads (`:has(> img)`); a leading
+    `>` after `{` is rejected at parse time, so this function never
+    sees that shape. Users must write `& > .child` until the parser
+    grows nested-relative-selector support. */
 let compute_new_prefix = (~prefix, current_selector) => {
   switch (prefix) {
   | None => current_selector
   | Some(prefix) =>
     if (contains_ampersand(current_selector)) {
       replace_ampersand(prefix, current_selector);
-    } else if (starts_with_double_dot(current_selector)) {
-      switch (current_selector) {
-      | ComplexSelector(Selector(CompoundSelector(selector))) =>
-        ComplexSelector(Selector(join_compound_selector(prefix, selector)))
-      | ComplexSelector(
-          Combinator({ left: CompoundSelector(selector), right }),
-        ) =>
-        ComplexSelector(
-          Combinator({
-            left: join_compound_selector(prefix, selector),
-            right,
-          }),
-        )
-      | _ => assert(false)
-      };
     } else {
       join_selector_with_combinator(prefix, current_selector);
     }

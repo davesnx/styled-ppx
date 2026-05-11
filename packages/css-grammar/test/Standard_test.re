@@ -480,7 +480,11 @@ let tests = [
     let expect = check(~__POS__, to_check);
     expect(parse("$(Module.value)"), Ok(["Module.value"]));
     expect(parse("$(Module'.value')"), Ok(["Module'.value'"]));
-    /* TODO: Add error message into interpolation */
-    expect(parse("asd"), Error("Expected 'value'."));
+    /* When the interpolation parser doesn't match a `$(...)` token, it
+       contributes only a Description to the expected set. Description
+       entries are filtered out of user-facing suggestion lists, so the
+       fallback message is the generic one rather than the leaky
+       "Expected 'value'." pre-fix output. */
+    expect(parse("asd"), Error("Expected a valid value."));
   }),
 ];
