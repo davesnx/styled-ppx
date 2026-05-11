@@ -1,0 +1,54 @@
+This test ensures the ppx generates the correct output against styled-ppx.native
+If this test fail means that the module is not in sync with the ppx
+
+  $ cat > dune-project << EOF
+  > (lang dune 3.10)
+  > EOF
+
+  $ cat > dune << EOF
+  > (executable
+  >  (name input)
+  >  (libraries styled-ppx.native)
+  >  (preprocess (pps styled-ppx)))
+  > EOF
+
+  $ dune build
+
+  $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css ".css-h9mhzu{width:5rem;}"];
+  [@css ".css-1ipmtw2{width:5ch;}"];
+  [@css ".css-1l9qw8v{width:5vw;}"];
+  [@css ".css-1ikjpn0{width:5vh;}"];
+  [@css ".css-ygyuy0{width:5vmin;}"];
+  [@css ".css-1aojkyq{width:5vmax;}"];
+  [@css ".css-tsqvys{width:calc(1px + 2px);}"];
+  [@css ".css-1ssfuw8{width:calc(5px * 2);}"];
+  [@css ".css-1823oae{width:calc(5px - 10px);}"];
+  [@css ".css-1faodca{width:calc(1vw - 1px);}"];
+  [@css ".css-8atqhb{width:100%;}"];
+  [@css ".css-1g01t7g{padding:5rem;}"];
+  [@css ".css-b58q7f{padding:5ch;}"];
+  [@css ".css-thw8ry{padding:5vw;}"];
+  [@css ".css-18hvl0f{padding:5vh;}"];
+  [@css ".css-6wnbv5{padding:5vmin;}"];
+  [@css ".css-hrtnlf{padding:5vmax;}"];
+  
+  CSS.make("css-h9mhzu", []);
+  CSS.make("css-1ipmtw2", []);
+  CSS.make("css-1l9qw8v", []);
+  CSS.make("css-1ikjpn0", []);
+  CSS.make("css-ygyuy0", []);
+  CSS.make("css-1aojkyq", []);
+  CSS.make("css-tsqvys", []);
+  CSS.make("css-1ssfuw8", []);
+  CSS.make("css-1ssfuw8", []);
+  CSS.make("css-1823oae", []);
+  CSS.make("css-1faodca", []);
+  CSS.make("css-8atqhb", []);
+  CSS.make("css-1g01t7g", []);
+  CSS.make("css-b58q7f", []);
+  CSS.make("css-thw8ry", []);
+  CSS.make("css-18hvl0f", []);
+  CSS.make("css-6wnbv5", []);
+  CSS.make("css-hrtnlf", []);
+

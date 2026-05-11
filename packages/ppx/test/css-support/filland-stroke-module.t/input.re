@@ -4,8 +4,8 @@
   /* [%css {|fill: border-box|}]; */
   /* [%css {|fill: border-box padding-box|}]; */
   /* [%css {|fill: url(foo.png) bottom right / cover padding-box content-box|}]; */
-  /* [%css {|fill-rule: nonzero|}]; */
-  /* [%css {|fill-rule: evenodd|}]; */
+  [%css {|fill-rule: nonzero|}];
+  [%css {|fill-rule: evenodd|}];
   /* [%css {|fill-break: bounding-box|}]; */
   /* [%css {|fill-break: slice|}]; */
   /* [%css {|fill-break: clone|}]; */
@@ -59,32 +59,32 @@
   /* [%css {|fill-repeat: space no-repeat|}]; */
   /* [%css {|fill-repeat: round no-repeat|}]; */
   /* [%css {|fill-repeat: no-repeat no-repeat|}]; */
-  /* [%css {|fill-opacity: 0.5|}]; */
-  /* [%css {|fill-opacity: 45%|}]; */
+  [%css {|fill-opacity: 0.5|}];
+  [%css {|fill-opacity: 45%|}];
   /* [%css {|stroke: url(foo.png), url(bar.svg)|}]; */
   /* [%css {|stroke: top left / 50% 60%|}]; */
   /* [%css {|stroke: border-box|}]; */
   /* [%css {|stroke: border-box padding-box|}]; */
   /* [%css {|stroke: url(foo.png) bottom right / cover padding-box content-box|}]; */
-  /* [%css {|stroke-width: 0|}]; */
-  /* [%css {|stroke-width: 1px|}]; */
-  /* [%css {|stroke-width: 25%|}]; */
+  [%css {|stroke-width: 0|}];
+  [%css {|stroke-width: 1px|}];
+  [%css {|stroke-width: 25%|}];
   /* [%css {|stroke-align: center|}]; */
   /* [%css {|stroke-align: inset|}]; */
   /* [%css {|stroke-align: outset |}]; */
-  /* [%css {|stroke-linecap: butt|}]; */
-  /* [%css {|stroke-linecap: round|}]; */
-  /* [%css {|stroke-linecap: square |}]; */
+  [%css {|stroke-linecap: butt|}];
+  [%css {|stroke-linecap: round|}];
+  [%css {|stroke-linecap: square |}];
   /* [%css {|stroke-linejoin: crop|}]; */
   /* [%css {|stroke-linejoin: arcs|}]; */
-  /* [%css {|stroke-linejoin: miter|}]; */
-  /* [%css {|stroke-linejoin: bevel|}]; */
-  /* [%css {|stroke-linejoin: round|}]; */
+  [%css {|stroke-linejoin: miter|}];
+  [%css {|stroke-linejoin: bevel|}];
+  [%css {|stroke-linejoin: round|}];
   /* [%css {|stroke-linejoin: fallback|}]; */
   /* [%css {|stroke-linejoin: crop bevel|}]; */
   /* [%css {|stroke-linejoin: arcs round|}]; */
   /* [%css {|stroke-linejoin: miter fallback|}]; */
-  /* [%css {|stroke-miterlimit: 4|}]; */
+  [%css {|stroke-miterlimit: 4|}];
   /* [%css {|stroke-break: bounding-box|}]; */
   /* [%css {|stroke-break: slice|}]; */
   /* [%css {|stroke-break: clone |}]; */

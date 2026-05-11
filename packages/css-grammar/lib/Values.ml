@@ -1,0 +1,310 @@
+open Types
+open Support
+open Shared
+
+let entries : (kind * packed_rule) list =
+  [
+    Value "age", pack_module (module Age);
+    Value "attachment", pack_module (module Attachment);
+    Value "box", pack_module (module Box);
+    Value "display-box", pack_module (module Display_box);
+    Value "display-outside", pack_module (module Display_outside);
+    Value "ending-shape", pack_module (module Ending_shape);
+    Value "zero", pack_module (module Zero);
+    Value "gender", pack_module (module Gender);
+    Value "combinator", pack_module (module Combinator);
+    Value "contextual-alt-values", pack_module (module Contextual_alt_values);
+    ( Value "east-asian-width-values",
+      pack_module (module East_asian_width_values) );
+    Value "attr-modifier", pack_module (module Attr_modifier);
+    Value "image-tags", pack_module (module Image_tags);
+    Value "line-style", pack_module (module Line_style);
+    Value "line-width", pack_module (module Line_width);
+    Value "named-color", pack_module (module Named_color);
+    Value "color", pack_module (module Color);
+    Value "alpha-value", pack_module (module Alpha_value);
+    Value "hue", pack_module (module Hue);
+    Value "bg-image", pack_module (module Bg_image);
+    Value "content-replacement", pack_module (module Content_replacement);
+    Value "transform-list", pack_module (module Transform_list);
+    Value "transform-function", pack_module (module Transform_function);
+    Value "image", pack_module (module Image);
+    Value "font_families", pack_module (module Font_families);
+    ( Value "color-interpolation-method",
+      pack_module (module Color_interpolation_method) );
+    Value "family-name", pack_module (module Family_name);
+    Value "keyframes-name", pack_module (module Keyframes_name);
+    Value "url", pack_module (module Url);
+    Value "gradient", pack_module (module Gradient);
+    Value "shadow", pack_module (module Shadow);
+    Value "track-list", pack_module (module Track_list);
+    Value "line-names", pack_module (module Line_names);
+    Value "side-or-corner", pack_module (module Side_or_corner);
+    Value "track-size", pack_module (module Track_size);
+    Value "track-breadth", pack_module (module Track_breadth);
+    Value "track-repeat", pack_module (module Track_repeat);
+    Value "content-list", pack_module (module Content_list);
+    Value "mask-reference", pack_module (module Mask_reference);
+    Value "color-stop-list", pack_module (module Color_stop_list);
+    Value "mask-source", pack_module (module Mask_source);
+    Value "length-percentage", pack_module (module Length_percentage);
+    Value "auto-track-list", pack_module (module Auto_track_list);
+    Value "counter-style", pack_module (module Counter_style);
+    Value "counter-style-name", pack_module (module Counter_style_name);
+    Value "fixed-size", pack_module (module Fixed_size);
+    Value "fixed-repeat", pack_module (module Fixed_repeat);
+    Value "fixed-breadth", pack_module (module Fixed_breadth);
+    Value "auto-repeat", pack_module (module Auto_repeat);
+    ( Value "extended-time-no-interp",
+      pack_module (module Extended_time_no_interp) );
+    ( Value "timing-function-no-interp",
+      pack_module (module Timing_function_no_interp) );
+    ( Value "cubic-bezier-timing-function",
+      pack_module (module Cubic_bezier_timing_function) );
+    Value "step-timing-function", pack_module (module Step_timing_function);
+    Value "single-animation", pack_module (module Single_animation);
+    ( Value "single-animation-no-interp",
+      pack_module (module Single_animation_no_interp) );
+    ( Value "single-animation-direction-no-interp",
+      pack_module (module Single_animation_direction_no_interp) );
+    ( Value "single-animation-fill-mode-no-interp",
+      pack_module (module Single_animation_fill_mode_no_interp) );
+    ( Value "single-animation-iteration-count-no-interp",
+      pack_module (module Single_animation_iteration_count_no_interp) );
+    ( Value "single-animation-play-state-no-interp",
+      pack_module (module Single_animation_play_state_no_interp) );
+    Value "shadow-t", pack_module (module Shadow_t);
+    Value "font-weight-absolute", pack_module (module Font_weight_absolute);
+    Value "position", pack_module (module Position);
+    Value "timing-function", pack_module (module Timing_function);
+    Value "number-percentage", pack_module (module Number_percentage);
+    Value "grid-line", pack_module (module Grid_line);
+    ( Value "single-transition-property",
+      pack_module (module Single_transition_property) );
+    Value "outline-radius", pack_module (module Outline_radius);
+    Value "bg-size", pack_module (module Bg_size);
+    Value "bg-position", pack_module (module Bg_position);
+    Value "feature-value-name", pack_module (module Feature_value_name);
+    Value "svg-length", pack_module (module Svg_length);
+    ( Value "single-animation-iteration-count",
+      pack_module (module Single_animation_iteration_count) );
+    Value "basic-shape", pack_module (module Basic_shape);
+    Value "filter-function", pack_module (module Filter_function);
+    Value "overflow-position", pack_module (module Overflow_position);
+    Value "relative-size", pack_module (module Relative_size);
+    Value "repeat-style", pack_module (module Repeat_style);
+    Value "self-position", pack_module (module Self_position);
+    ( Value "single-animation-direction",
+      pack_module (module Single_animation_direction) );
+    ( Value "single-animation-fill-mode",
+      pack_module (module Single_animation_fill_mode) );
+    ( Value "single-animation-play-state",
+      pack_module (module Single_animation_play_state) );
+    Value "step-position", pack_module (module Step_position);
+    Value "symbols-type", pack_module (module Symbols_type);
+    Value "masking-mode", pack_module (module Masking_mode);
+    Value "numeric-figure-values", pack_module (module Numeric_figure_values);
+    Value "numeric-spacing-values", pack_module (module Numeric_spacing_values);
+    Value "absolute-size", pack_module (module Absolute_size);
+    Value "content-position", pack_module (module Content_position);
+    Value "baseline-position", pack_module (module Baseline_position);
+    Value "blend-mode", pack_module (module Blend_mode);
+    Value "geometry-box", pack_module (module Geometry_box);
+    Value "calc-product", pack_module (module Calc_product);
+    Value "calc-sum", pack_module (module Calc_sum);
+    Value "calc-value", pack_module (module Calc_value);
+    Value "mf-eq", pack_module (module Mf_eq);
+    Value "mf-gt", pack_module (module Mf_gt);
+    Value "mf-lt", pack_module (module Mf_lt);
+    Value "dimension", pack_module (module Dimension);
+    Value "ratio", pack_module (module Ratio);
+    Value "mf-name", pack_module (module Mf_name);
+    Value "mf-value", pack_module (module Mf_value);
+    Value "mf-boolean", pack_module (module Mf_boolean);
+    Value "mf-plain", pack_module (module Mf_plain);
+    Value "mf-comparison", pack_module (module Mf_comparison);
+    Value "mf-range", pack_module (module Mf_range);
+    Value "container-query", pack_module (module Container_query);
+    Value "container-condition", pack_module (module Container_condition);
+    Value "query-in-parens", pack_module (module Query_in_parens);
+    Value "size-feature", pack_module (module Size_feature);
+    Value "style-query", pack_module (module Style_query);
+    Value "style-feature", pack_module (module Style_feature);
+    Value "style-in-parens", pack_module (module Style_in_parens);
+    ( Value "legacy-radial-gradient-shape",
+      pack_module (module Legacy_radial_gradient_shape) );
+    ( Value "legacy-radial-gradient-size",
+      pack_module (module Legacy_radial_gradient_size) );
+    ( Value "legacy-radial-gradient-arguments",
+      pack_module (module Legacy_radial_gradient_arguments) );
+    Value "legacy-radial-gradient", pack_module (module Legacy_radial_gradient);
+    ( Value "legacy-repeating-radial-gradient",
+      pack_module (module Legacy_repeating_radial_gradient) );
+    Value "legacy-linear-gradient", pack_module (module Legacy_linear_gradient);
+    ( Value "legacy-linear-gradient-arguments",
+      pack_module (module Legacy_linear_gradient_arguments) );
+    ( Value "legacy-repeating-linear-gradient",
+      pack_module (module Legacy_repeating_linear_gradient) );
+    Value "legacy-gradient", pack_module (module Legacy_gradient);
+    Value "-non-standard-color", pack_module (module Non_standard_color);
+    Value "-non-standard-font", pack_module (module Non_standard_font);
+    ( Value "-non-standard-image-rendering",
+      pack_module (module Non_standard_image_rendering) );
+    Value "-non-standard-overflow", pack_module (module Non_standard_overflow);
+    Value "-non-standard-width", pack_module (module Non_standard_width);
+    Value "-webkit-gradient-type", pack_module (module Webkit_gradient_type);
+    Value "-webkit-mask-box-repeat", pack_module (module Webkit_mask_box_repeat);
+    Value "-webkit-mask-clip-style", pack_module (module Webkit_mask_clip_style);
+    Value "common-lig-values", pack_module (module Common_lig_values);
+    Value "compat-auto", pack_module (module Compat_auto);
+    Value "composite-style", pack_module (module Composite_style);
+    Value "compositing-operator", pack_module (module Compositing_operator);
+    Value "content-distribution", pack_module (module Content_distribution);
+    ( Value "deprecated-system-color",
+      pack_module (module Deprecated_system_color) );
+    ( Value "discretionary-lig-values",
+      pack_module (module Discretionary_lig_values) );
+    Value "display-inside", pack_module (module Display_inside);
+    Value "display-internal", pack_module (module Display_internal);
+    Value "display-legacy", pack_module (module Display_legacy);
+    ( Value "east-asian-variant-values",
+      pack_module (module East_asian_variant_values) );
+    Value "feature-type", pack_module (module Feature_type);
+    Value "font-variant-css21", pack_module (module Font_variant_css21);
+    Value "generic-family", pack_module (module Generic_family);
+    Value "generic-name", pack_module (module Generic_name);
+    Value "historical-lig-values", pack_module (module Historical_lig_values);
+    ( Value "numeric-fraction-values",
+      pack_module (module Numeric_fraction_values) );
+    Value "overflow-position-value", pack_module (module Overflow_position);
+    Value "page-margin-box-type", pack_module (module Page_margin_box_type);
+    Value "polar-color-space", pack_module (module Polar_color_space);
+    Value "predefined-color-space", pack_module (module Predefined_color_space);
+    Value "quote", pack_module (module Quote);
+    ( Value "rectangular-color-space",
+      pack_module (module Rectangular_color_space) );
+    Value "shape-box", pack_module (module Shape_box);
+    Value "visual-box", pack_module (module Visual_box);
+    Value "angular-color-hint", pack_module (module Angular_color_hint);
+    Value "angular-color-stop", pack_module (module Angular_color_stop);
+    ( Value "angular-color-stop-list",
+      pack_module (module Angular_color_stop_list) );
+    Value "animateable-feature", pack_module (module Animateable_feature);
+    Value "attr-fallback", pack_module (module Attr_fallback);
+    Value "attr-matcher", pack_module (module Attr_matcher);
+    Value "attr-name", pack_module (module Attr_name);
+    Value "attr-type", pack_module (module Attr_type);
+    Value "attr-unit", pack_module (module Attr_unit);
+    Value "attribute-selector", pack_module (module Attribute_selector);
+    Value "bg-layer", pack_module (module Bg_layer);
+    Value "cf-final-image", pack_module (module Cf_final_image);
+    Value "cf-mixing-image", pack_module (module Cf_mixing_image);
+    Value "class-selector", pack_module (module Class_selector);
+    Value "clip-source", pack_module (module Clip_source);
+    Value "color-stop", pack_module (module Color_stop);
+    Value "color-stop-angle", pack_module (module Color_stop_angle);
+    Value "color-stop-length", pack_module (module Color_stop_length);
+    Value "complex-selector", pack_module (module Complex_selector);
+    Value "complex-selector-list", pack_module (module Complex_selector_list);
+    Value "compound-selector", pack_module (module Compound_selector);
+    Value "compound-selector-list", pack_module (module Compound_selector_list);
+    ( Value "container-condition-list",
+      pack_module (module Container_condition_list) );
+    Value "counter-name", pack_module (module Counter_name);
+    Value "declaration", pack_module (module Declaration);
+    Value "declaration-list", pack_module (module Declaration_list);
+    Value "display-listitem", pack_module (module Display_listitem);
+    Value "explicit-track-list", pack_module (module Explicit_track_list);
+    Value "extended-angle", pack_module (module Extended_angle);
+    Value "extended-frequency", pack_module (module Extended_frequency);
+    Value "extended-length", pack_module (module Extended_length);
+    Value "extended-percentage", pack_module (module Extended_percentage);
+    Value "extended-time", pack_module (module Extended_time);
+    Value "feature-tag-value", pack_module (module Feature_tag_value);
+    Value "feature-value-block", pack_module (module Feature_value_block);
+    ( Value "feature-value-block-list",
+      pack_module (module Feature_value_block_list) );
+    ( Value "feature-value-declaration",
+      pack_module (module Feature_value_declaration) );
+    ( Value "feature-value-declaration-list",
+      pack_module (module Feature_value_declaration_list) );
+    Value "filter-function-list", pack_module (module Filter_function_list);
+    Value "final-bg-layer", pack_module (module Final_bg_layer);
+    Value "font-stretch-absolute", pack_module (module Font_stretch_absolute);
+    Value "general-enclosed", pack_module (module General_enclosed);
+    Value "generic-voice", pack_module (module Generic_voice);
+    ( Value "hue-interpolation-method",
+      pack_module (module Hue_interpolation_method) );
+    Value "id-selector", pack_module (module Id_selector);
+    Value "image-set-option", pack_module (module Image_set_option);
+    Value "image-src", pack_module (module Image_src);
+    Value "inflexible-breadth", pack_module (module Inflexible_breadth);
+    Value "keyframe-block", pack_module (module Keyframe_block);
+    Value "keyframe-block-list", pack_module (module Keyframe_block_list);
+    Value "keyframe-selector", pack_module (module Keyframe_selector);
+    Value "leader-type", pack_module (module Leader_type);
+    Value "line-name-list", pack_module (module Line_name_list);
+    Value "linear-color-hint", pack_module (module Linear_color_hint);
+    Value "linear-color-stop", pack_module (module Linear_color_stop);
+    Value "mask-layer", pack_module (module Mask_layer);
+    Value "name-repeat", pack_module (module Name_repeat);
+    Value "namespace-prefix", pack_module (module Namespace_prefix);
+    Value "ns-prefix", pack_module (module Ns_prefix);
+    Value "nth", pack_module (module Nth);
+    Value "number-one-or-greater", pack_module (module Number_one_or_greater);
+    Value "number-zero-one", pack_module (module Number_zero_one);
+    Value "one-bg-size", pack_module (module One_bg_size);
+    Value "page-body", pack_module (module Page_body);
+    Value "page-margin-box", pack_module (module Page_margin_box);
+    Value "page-selector", pack_module (module Page_selector);
+    Value "page-selector-list", pack_module (module Page_selector_list);
+    Value "paint", pack_module (module Paint);
+    Value "positive-integer", pack_module (module Positive_integer);
+    Value "pseudo-class-selector", pack_module (module Pseudo_class_selector);
+    ( Value "pseudo-element-selector",
+      pack_module (module Pseudo_element_selector) );
+    Value "pseudo-page", pack_module (module Pseudo_page);
+    Value "radial-size", pack_module (module Radial_size);
+    Value "ray-size", pack_module (module Ray_size);
+    Value "relative-selector", pack_module (module Relative_selector);
+    Value "relative-selector-list", pack_module (module Relative_selector_list);
+    Value "shape", pack_module (module Shape);
+    Value "shape-radius", pack_module (module Shape_radius);
+    Value "single-transition", pack_module (module Single_transition);
+    ( Value "single-transition-no-interp",
+      pack_module (module Single_transition_no_interp) );
+    ( Value "single-transition-property-no-interp",
+      pack_module (module Single_transition_property_no_interp) );
+    Value "subclass-selector", pack_module (module Subclass_selector);
+    Value "supports-condition", pack_module (module Supports_condition);
+    Value "supports-decl", pack_module (module Supports_decl);
+    Value "supports-feature", pack_module (module Supports_feature);
+    Value "supports-in-parens", pack_module (module Supports_in_parens);
+    Value "supports-selector-fn", pack_module (module Supports_selector_fn);
+    Value "svg-writing-mode", pack_module (module Svg_writing_mode);
+    Value "symbol", pack_module (module Symbol);
+    Value "syntax-combinator", pack_module (module Syntax_combinator);
+    Value "syntax-component", pack_module (module Syntax_component);
+    Value "syntax-multiplier", pack_module (module Syntax_multiplier);
+    ( Value "syntax-single-component",
+      pack_module (module Syntax_single_component) );
+    Value "syntax-string", pack_module (module Syntax_string);
+    Value "syntax-type-name", pack_module (module Syntax_type_name);
+    Value "target", pack_module (module Target);
+    Value "track-group", pack_module (module Track_group);
+    Value "track-list-v0", pack_module (module Track_list_v0);
+    Value "track-minmax", pack_module (module Track_minmax);
+    ( Value "transition-behavior-value",
+      pack_module (module Transition_behavior_value) );
+    ( Value "transition-behavior-value-no-interp",
+      pack_module (module Transition_behavior_value_no_interp) );
+    Value "try-tactic", pack_module (module Try_tactic);
+    Value "type-or-unit", pack_module (module Type_or_unit);
+    Value "type-selector", pack_module (module Type_selector);
+    Value "viewport-length", pack_module (module Viewport_length);
+    ( Value "webkit-gradient-color-stop",
+      pack_module (module Webkit_gradient_color_stop) );
+    Value "webkit-gradient-point", pack_module (module Webkit_gradient_point);
+    Value "webkit-gradient-radius", pack_module (module Webkit_gradient_radius);
+    Value "wq-name", pack_module (module Wq_name);
+  ]

@@ -268,79 +268,9 @@ let getLabel = str =>
   | Nolabel => ""
   };
 
-let makeParam =
-    (
-      ~loc,
-      ~default: option(expression)=?,
-      ~isOptional=false,
-      ~wrapOption=isOptional,
-      ~discard=false,
-      ~coreType=?,
-      label,
-    ) => {
-  let labelPattern =
-    Helper.Pat.mk(
-      ~loc,
-      discard ? Ppat_any : Ppat_var(withLoc(label, ~loc)),
-    );
-
-  (
-    isOptional ? Optional(label) : Labelled(label),
-    default,
-    switch (coreType) {
-    | Some(typ) =>
-      Helper.Pat.mk(
-        ~loc,
-        Ppat_constraint(
-          labelPattern,
-          wrapOption ? [%type: option([%t typ])] : typ,
-        ),
-      )
-    | None => labelPattern
-    },
-    label,
-    loc,
-    None,
-  );
-};
-
-let domPropParam = (~loc, ~isOptional, domProp) => {
-  switch (domProp) {
-  | MakeProps.Event({ name, type_ }) =>
-    makeParam(
-      ~loc,
-      ~isOptional,
-      ~coreType=
-        Helper.Typ.arrow(
-          ~loc,
-          Nolabel,
-          Helper.Typ.constr(
-            ~loc,
-            withLoc(~loc, MakeProps.eventTypeToIdent(type_)),
-            [],
-          ),
-          Helper.Typ.constr(~loc, withLoc(Lident("unit"), ~loc), []),
-        ),
-      name,
-    )
-  | MakeProps.Attribute({ name, type_, _ }) =>
-    makeParam(
-      ~loc,
-      ~isOptional,
-      ~coreType=
-        Helper.Typ.constr(
-          ~loc,
-          withLoc(~loc, MakeProps.attributeTypeToIdent(type_)),
-          [],
-        ),
-      name,
-    )
-  };
-};
-
 let serverCreateElement = (~loc, ~htmlTag, ~variableNames) => {
   let finalHtmlTag =
-    switch%expr ([%e Helper.Exp.ident(~loc, withLoc(~loc, Lident("as_")))]) {
+    switch%expr ([%e propItem(~loc, "as_")]) {
     | Some(v) => v
     | None => [%e Builder.estring(~loc, htmlTag)]
     };
@@ -349,14 +279,14 @@ let serverCreateElement = (~loc, ~htmlTag, ~variableNames) => {
     MakeProps.get(["key", "ref", "className"] @ variableNames)
     |> map_tr(value =>
          switch (value) {
-         | MakeProps.Event({ name, _ }) => name
-         | MakeProps.Attribute({ name, _ }) => name
+         | MakeProps.Event({name, _}) => name
+         | MakeProps.Attribute({name, _}) => name
          }
        )
     |> map_tr(label =>
          (
            Optional(label),
-           Helper.Exp.ident(~loc, withLoc(~loc, Lident(label))),
+           propItem(~loc, label),
          )
        );
 
@@ -365,13 +295,20 @@ let serverCreateElement = (~loc, ~htmlTag, ~variableNames) => {
       [%expr ReactDOM.domProps],
       [
         (Labelled("className"), [%expr className]),
-        (Optional("ref"), [%expr innerRef]),
+        (Optional("ref"), propItem(~loc, "innerRef")),
       ]
       @ params
       @ [(Nolabel, [%expr ()])],
     );
 
-  [%expr React.createElement([%e finalHtmlTag], [%e domProps], [children])];
+  let childrenExpr = propItem(~loc, "children");
+  let children = [%expr
+    switch ([%e childrenExpr]) {
+    | Some(c) => c
+    | None => React.null
+    }
+  ];
+  [%expr React.createElement([%e finalHtmlTag], [%e domProps], [[%e children]])];
 };
 
 /* let stylesObject = { "className": className, "ref": props.ref }; */
@@ -458,67 +395,27 @@ let getIsOptional = str =>
   | _ => false
   };
 
-let makeStyleParams = (~labeledArguments) => {
-  labeledArguments
-  |> List.map(((arg, defaultExpr, _, _, loc, type_)) => {
-       let (kind, type_) =
-         switch (type_) {
-         | Some(type_) => (`Typed, type_)
-         | None => (`Open, typeVariable(~loc, getLabel(arg)))
-         };
 
-       (loc, arg, defaultExpr, kind, type_);
-     })
-  |> List.map(((loc, arg, _, kind, type_)) => {
-       makeParam(
-         ~loc,
-         ~isOptional=getIsOptional(arg),
-         ~wrapOption=false,
-         ~coreType=?
-           switch (kind) {
-           | `Open => None
-           | `Typed => Some(type_)
-           },
-         getLabel(arg),
-       )
-     });
-};
-
-/* let make = (~key, ~innerRef, ~as_, ~children, ...reactDomParams, ()) => + makeBody */
+/* let make = (props: makeProps) => + makeBodyServer */
 let makeFnJSXServer =
-    (~loc, ~htmlTag, ~className, ~styleParams, ~variableNames) => {
-  fnWithLabeledArgs(
-    {
-      let reactDomParams =
-        MakeProps.get(["key"] @ variableNames)
-        |> map_tr(domPropParam(~loc, ~isOptional=true));
-      [
-        (Nolabel, None, Builder.ppat_any(~loc), "_", Location.none, None),
-        makeParam(
-          ~loc,
-          ~isOptional=true,
-          ~discard=true,
-          ~coreType=[%type: string],
-          "key",
-        ),
-        makeParam(~loc, ~isOptional=true, "innerRef"),
-        makeParam(~loc, ~isOptional=true, "as_"),
-        makeParam(
-          ~loc,
-          ~isOptional=true,
-          ~default=[%expr React.null],
-          "children",
-        ),
-      ]
-      @ reactDomParams
-      @ styleParams;
-    },
-    makeBodyServer(
+    (~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames) => {
+  let className = [%expr [%e className] ++ getOrEmpty(classNameGet(props))];
+
+  Helper.Exp.fun_(
+    ~loc,
+    Nolabel,
+    None,
+    /* props: makeProps */
+    Helper.Pat.constraint_(
       ~loc,
-      ~htmlTag,
-      ~className=[%expr [%e className] ++ getOrEmpty(className)],
-      ~variableNames,
+      Helper.Pat.mk(~loc, Ppat_var(withLoc("props", ~loc))),
+      Helper.Typ.constr(
+        ~loc,
+        withLoc(Lident("makeProps"), ~loc),
+        makePropTypes,
+      ),
     ),
+    makeBodyServer(~loc, ~htmlTag, ~className, ~variableNames),
   );
 };
 
@@ -565,119 +462,6 @@ let makeFnJSX4 = (~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames) =>
   );
 };
 
-/* Generate: let makeProps = (~innerRef=?, ~as_=?, ~children=React.null, ...domProps, ...customProps, ()) =>
-     fun ?key () -> make () ?key ?innerRef ~children ?as_ ...domProps ...customProps
-   This captures all props in a thunk. */
-let makePropsNative = (~loc, ~variableNames, ~styleParams) => {
-  let reactDomParams =
-    MakeProps.get(["key"] @ variableNames)
-    |> map_tr(domPropParam(~loc, ~isOptional=true));
-  let allParams =
-    [
-      makeParam(~loc, ~isOptional=true, "innerRef"),
-      makeParam(~loc, ~isOptional=true, "as_"),
-      makeParam(
-        ~loc,
-        ~isOptional=true,
-        ~default=[%expr React.null],
-        "children",
-      ),
-    ]
-    @ reactDomParams
-    @ styleParams;
-
-  let reactDomPropNames =
-    MakeProps.get(["key"] @ variableNames)
-    |> map_tr(value =>
-         switch (value) {
-         | MakeProps.Event({name, _}) => name
-         | MakeProps.Attribute({name, _}) => name
-         }
-       );
-  let propNames =
-    ["innerRef", "as_", "children"] @ reactDomPropNames @ variableNames;
-
-  /* Build the inner call: make () ?key ?innerRef ~children ... */
-  let callArgs =
-    [(Nolabel, [%expr ()])] /* leading _ param */
-    @ [(Optional("key"), Helper.Exp.ident(~loc, withLoc(Lident("key"), ~loc)))]
-    @ (
-      propNames
-      |> map_tr(name => {
-           let ident = Helper.Exp.ident(~loc, withLoc(Lident(name), ~loc));
-           if (name == "children") {
-             (Labelled("children"), ident);
-           } else {
-             (Optional(name), ident);
-           };
-         })
-    );
-
-  let callExpr =
-    Helper.Exp.apply(
-      ~loc,
-      Helper.Exp.ident(~loc, withLoc(Lident("make"), ~loc)),
-      callArgs,
-    );
-
-  /* Wrap in: fun ?key () -> callExpr */
-  let thunk =
-    Helper.Exp.fun_(
-      ~loc,
-      Optional("key"),
-      None,
-      Helper.Pat.mk(~loc, Ppat_var(withLoc("key", ~loc))),
-      Helper.Exp.fun_(
-        ~loc,
-        Nolabel,
-        None,
-        [%pat? ()],
-        callExpr,
-      ),
-    );
-
-  /* The unit param must be first (= innermost in generated function)
-     so it comes AFTER all optional args in the type signature.
-     This way, the caller's () triggers resolution of all optional args. */
-  let allParamsWithUnit =
-    [(Nolabel, None, [%pat? ()], "()", loc, None)]
-    @ allParams;
-
-  let body = fnWithLabeledArgs(allParamsWithUnit, thunk);
-
-  [%stri let makeProps = [%e body]];
-};
-
-/* Generate: let make = fun ?key f -> f ?key () */
-let makeWrapperNative = (~loc) => {
-  let callExpr =
-    Helper.Exp.apply(
-      ~loc,
-      Helper.Exp.ident(~loc, withLoc(Lident("f"), ~loc)),
-      [
-        (Optional("key"), Helper.Exp.ident(~loc, withLoc(Lident("key"), ~loc))),
-        (Nolabel, [%expr ()]),
-      ],
-    );
-
-  let body =
-    Helper.Exp.fun_(
-      ~loc,
-      Optional("key"),
-      None,
-      Helper.Pat.mk(~loc, Ppat_var(withLoc("key", ~loc))),
-      Helper.Exp.fun_(
-        ~loc,
-        Nolabel,
-        None,
-        Helper.Pat.mk(~loc, Ppat_var(withLoc("f", ~loc))),
-        callExpr,
-      ),
-    );
-
-  [%stri let make = [%e body]];
-};
-
 /* [@react.component] + makeFn */
 let component =
     (~loc, ~htmlTag, ~className, ~makePropTypes, ~labeledArguments) => {
@@ -694,40 +478,14 @@ let component =
         ~loc,
         ~htmlTag,
         ~className,
-        ~styleParams=makeStyleParams(~labeledArguments),
+        ~makePropTypes,
         ~variableNames,
       )
     | _ =>
       makeFnJSX3(~loc, ~htmlTag, ~className, ~makePropTypes, ~variableNames)
     };
 
-  if (Settings.Get.native()) {
-    let internalMake = [%stri let make = [%e makeFn]];
-    let makePropsItem =
-      makePropsNative(
-        ~loc,
-        ~variableNames,
-        ~styleParams=makeStyleParams(~labeledArguments),
-      );
-    let wrapperMake = makeWrapperNative(~loc);
-    /* Use include struct ... end to allow shadowing make */
-    [
-      Helper.Str.mk(
-        ~loc,
-        Pstr_include({
-          pincl_mod:
-            Builder.pmod_structure(
-              ~loc,
-              [internalMake, makePropsItem, wrapperMake],
-            ),
-          pincl_loc: loc,
-          pincl_attributes: [],
-        }),
-      ),
-    ];
-  } else {
-    [[%stri let make = [%e makeFn]]];
-  };
+  [[%stri let make = [%e makeFn]]];
 };
 
 let optionalType = (~loc, type_) => {
@@ -1140,7 +898,7 @@ let styleVariableName = "styles";
 let staticComponentCodegenSteps = (~loc, ~htmlTag, stylesExpr) => {
   (
     Settings.Get.native()
-      ? [defineGetOrEmptyFn(~loc)]
+      ? [makeProps(~loc, None), defineGetOrEmptyFn(~loc)]
       : [
         makeProps(~loc, None),
         bindingCreateVariadicElement(~loc),
@@ -1180,7 +938,7 @@ let dynamicStyles = (~loc, ~moduleName, ~functionExpr, ~labeledArguments) => {
       switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, str)) {
       | Ok(declarations) =>
         declarations
-        |> Css_to_runtime.render_declarations(~loc)
+        |> Css_to_runtime.render_declarations(~loc, ~source=str)
         |> Css_to_runtime.addLabel(~loc, moduleName)
         |> Builder.pexp_array(~loc)
         |> Css_to_runtime.render_style_call(~loc)
@@ -1243,13 +1001,7 @@ let stylesCall = (~loc, ~labeledArguments) => {
   let styledArguments =
     List.map(
       ((argumentName, _defaultValue, _, _, loc, _)) => {
-        let value =
-          Settings.Get.native()
-            ? Builder.pexp_ident(
-                ~loc,
-                withLoc(Lident(getLabel(argumentName)), ~loc),
-              )
-            : propItem(~loc, getLabel(argumentName));
+        let value = propItem(~loc, getLabel(argumentName));
         (argumentName, value);
       },
       labeledArguments,
@@ -1271,68 +1023,65 @@ let stylesCall = (~loc, ~labeledArguments) => {
 };
 
 let dynamicComponentCodegenSteps =
-    (~loc, ~htmlTag, ~moduleName, ~functionExpr, ~labeledArguments) =>
-  if (Settings.Get.native()) {
-    [
-      defineGetOrEmptyFn(~loc),
-      dynamicStyles(~loc, ~moduleName, ~functionExpr, ~labeledArguments),
-    ]
-    @ component(
-        ~loc,
-        ~htmlTag,
-        ~className=stylesCall(~loc, ~labeledArguments),
-        ~makePropTypes=[],
-        ~labeledArguments,
-      );
-  } else {
-    let variableList =
-      labeledArguments
-      |> List.map(((arg, defaultExpr, _, _, loc, type_)) => {
-           let (kind, type_) =
-             switch (type_) {
-             | Some(type_) => (`Typed, type_)
-             | None => (`Open, typeVariable(~loc, getLabel(arg)))
-             };
+    (~loc, ~htmlTag, ~moduleName, ~functionExpr, ~labeledArguments) => {
+  let variableList =
+    labeledArguments
+    |> List.map(((arg, defaultExpr, _, _, loc, type_)) => {
+         let (kind, type_) =
+           switch (type_) {
+           | Some(type_) => (`Typed, type_)
+           | None => (`Open, typeVariable(~loc, getLabel(arg)))
+           };
 
-           (arg, defaultExpr, kind, type_);
-         });
+         (arg, defaultExpr, kind, type_);
+       });
 
-    let propsGenericParams: list(core_type) =
-      variableList
-      |> List.filter_map(
-           fun
-           | (_, _, `Open, type_) => Some(type_)
-           | _ => None,
-         );
+  let propsGenericParams: list(core_type) =
+    variableList
+    |> List.filter_map(
+         fun
+         | (_, _, `Open, type_) => Some(type_)
+         | _ => None,
+       );
 
-    /* type makeProps('a) = { a: 'a } */
-    let propGenericFields =
-      variableList
-      |> List.map(((arg, defaultValue, _, type_)) =>
-           customPropLabel(
-             ~loc,
-             ~optional=Option.is_some(defaultValue),
-             getLabel(arg),
-             type_,
-           )
-         );
+  /* type makeProps('a) = { a: 'a } */
+  let propGenericFields =
+    variableList
+    |> List.map(((arg, defaultValue, _, type_)) =>
+         customPropLabel(
+           ~loc,
+           ~optional=Option.is_some(defaultValue),
+           getLabel(arg),
+           type_,
+         )
+       );
 
-    [
-      makeProps(~loc, Some((propsGenericParams, propGenericFields))),
-      bindingCreateVariadicElement(~loc),
-      defineDeletePropFn(~loc),
-      defineGetOrEmptyFn(~loc),
-      defineAssign2(~loc),
-      dynamicStyles(~loc, ~moduleName, ~functionExpr, ~labeledArguments),
-    ]
-    @ component(
-        ~loc,
-        ~htmlTag,
-        ~className=stylesCall(~loc, ~labeledArguments),
-        ~makePropTypes=propsGenericParams,
-        ~labeledArguments,
-      );
-  };
+  (
+    if (Settings.Get.native()) {
+      [
+        makeProps(~loc, Some((propsGenericParams, propGenericFields))),
+        defineGetOrEmptyFn(~loc),
+        dynamicStyles(~loc, ~moduleName, ~functionExpr, ~labeledArguments),
+      ];
+    } else {
+      [
+        makeProps(~loc, Some((propsGenericParams, propGenericFields))),
+        bindingCreateVariadicElement(~loc),
+        defineDeletePropFn(~loc),
+        defineGetOrEmptyFn(~loc),
+        defineAssign2(~loc),
+        dynamicStyles(~loc, ~moduleName, ~functionExpr, ~labeledArguments),
+      ];
+    }
+  )
+  @ component(
+      ~loc,
+      ~htmlTag,
+      ~className=stylesCall(~loc, ~labeledArguments),
+      ~makePropTypes=propsGenericParams,
+      ~labeledArguments,
+    );
+};
 
 let dynamicComponent =
     (~loc, ~htmlTag, ~label, ~moduleName, ~defaultValue, ~param, ~body) => {

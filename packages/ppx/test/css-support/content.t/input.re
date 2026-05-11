@@ -4,7 +4,8 @@
 [%css {|content: "\25BA" / ""|}];
 
 [%css {|content: "";|}];
-/* [%css {|content: counter(ol);|}]; */
+/* counter() — single-argument form (Gap 4) */
+[%css {|content: counter(ol);|}];
 [%css {|content: counter(count, decimal);|}];
 [%css {|content: counter(count, decimal) ") ";|}];
 [%css {|content: unset;|}];
@@ -24,11 +25,12 @@
 /* <string> value */
 [%css {|content: "unparsed text";|}];
 
-/* <counter> values, optionally with <list-style-type> */
-/* [%css {|content: counter(chapter_counter);|}]; */
-/* [%css {|content: counter(chapter_counter, upper-roman);|}]; */
-/* [%css {|content: counters(section_counter, ".");|}]; */
-/* [%css {|content: counters(section_counter, ".", decimal-leading-zero);|}]; */
+/* <counter> values, with and without a <counter-style> (Gap 4) */
+[%css {|content: counter(chapter_counter);|}];
+[%css {|content: counter(chapter_counter, upper-roman);|}];
+/* <counters()> values, with and without a <counter-style> (Gap 3) */
+[%css {|content: counters(section_counter, ".");|}];
+[%css {|content: counters(section_counter, ".", decimal-leading-zero);|}];
 
 /* attr() value linked to the HTML attribute value */
 [%css {|content: attr(href);|}];
@@ -46,7 +48,8 @@
    Several values can be used simultaneously */
 [%css {|content: "prefix" url(http://www.example.com/test.png);|}];
 [%css {|content: "prefix" url("/img/test.png") "suffix" / "Alt text";|}];
-/* [%css {|content: open-quote counter(chapter_counter);|}]; */
+/* Mixing quotes and counters in a content-list (Gap 3 + Gap 4) */
+[%css {|content: open-quote counter(chapter_counter);|}];
 
 /* Global values */
 [%css {|content: inherit;|}];

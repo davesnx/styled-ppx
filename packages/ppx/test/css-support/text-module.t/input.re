@@ -93,15 +93,15 @@
 /* [%css {|wrap-after: flex|}]; */
 /* [%css {|wrap-inside: auto|}]; */
 /* [%css {|wrap-inside: avoid|}]; */
-/* [%css {|hyphenate-character: auto|}]; */
-/* [%css {|hyphenate-limit-zone: 1%|}]; */
-/* [%css {|hyphenate-limit-zone: 1em|}]; */
-/* [%css {|hyphenate-limit-chars: auto|}]; */
-/* [%css {|hyphenate-limit-chars: 5|}]; */
+[%css {|hyphenate-character: auto|}];
+[%css {|hyphenate-limit-zone: 1%|}];
+[%css {|hyphenate-limit-zone: 1em|}];
+[%css {|hyphenate-limit-chars: auto|}];
+[%css {|hyphenate-limit-chars: 5|}];
 /* [%css {|hyphenate-limit-chars: auto 3|}]; */
 /* [%css {|hyphenate-limit-chars: 5 4 3|}]; */
-/* [%css {|hyphenate-limit-lines: no-limit|}]; */
-/* [%css {|hyphenate-limit-lines: 2|}]; */
+[%css {|hyphenate-limit-lines: no-limit|}];
+[%css {|hyphenate-limit-lines: 2|}];
 /* [%css {|hyphenate-limit-last: none|}]; */
 /* [%css {|hyphenate-limit-last: always|}]; */
 /* [%css {|hyphenate-limit-last: column|}]; */

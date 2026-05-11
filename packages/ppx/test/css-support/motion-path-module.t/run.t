@@ -58,7 +58,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.unsafe({js|offsetPath|js}, {js|view-box|js});
   CSS.unsafe({js|offsetPath|js}, {js|circle(60%) margin-box|js});
   
-  CSS.unsafe({js|offsetDistance|js}, {js|10%|js});
+  CSS.offsetDistance(`percent(10.));
   CSS.unsafe({js|offsetPosition|js}, {js|auto|js});
   CSS.unsafe({js|offsetPosition|js}, {js|200px|js});
   CSS.unsafe({js|offsetPosition|js}, {js|200px 100px|js});

@@ -22,15 +22,10 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.contentsRule([|`text({js|''|js})|], None);
   
+  CSS.contentsRule([|`counter({js|ol|js})|], None);
+  CSS.contentsRule([|`counterWithStyle(({js|count|js}, `decimal))|], None);
   CSS.contentsRule(
-    [|`counter(({js|count|js}, Some(`Custom({js|decimal|js}))))|],
-    None,
-  );
-  CSS.contentsRule(
-    [|
-      `counter(({js|count|js}, Some(`Custom({js|decimal|js})))),
-      `text({js|) |js}),
-    |],
+    [|`counterWithStyle(({js|count|js}, `decimal)), `text({js|) |js})|],
     None,
   );
   CSS.unsafe({js|content|js}, {js|unset|js});
@@ -60,6 +55,24 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.contentsRule([|`text({js|unparsed text|js})|], None);
   
+  CSS.contentsRule([|`counter({js|chapter_counter|js})|], None);
+  CSS.contentsRule(
+    [|`counterWithStyle(({js|chapter_counter|js}, `upperRoman))|],
+    None,
+  );
+  
+  CSS.contentsRule([|`counters(({js|section_counter|js}, {js|.|js}))|], None);
+  CSS.contentsRule(
+    [|
+      `countersWithStyle((
+        {js|section_counter|js},
+        {js|.|js},
+        `decimalLeadingZero,
+      )),
+    |],
+    None,
+  );
+  
   CSS.contentsRule([|`attr({js|href|js})|], None);
   CSS.contentsRule([|`attrWithType(({js|data-width|js}, {js|px|js}))|], None);
   
@@ -81,6 +94,8 @@ If this test fail means that the module is not in sync with the ppx
     Some({js|Alt text|js}),
   );
   
+  CSS.contentsRule([|`openQuote, `counter({js|chapter_counter|js})|], None);
+  
   CSS.unsafe({js|content|js}, {js|inherit|js});
   CSS.unsafe({js|content|js}, {js|initial|js});
   CSS.unsafe({js|content|js}, {js|revert|js});
@@ -93,8 +108,8 @@ If this test fail means that the module is not in sync with the ppx
   CSS.contentsRule([|`text({js|lola|js})|], None);
   CSS.contentsRule([|`text({js|lola|js})|], None);
   CSS.contentsRule([|`text({js|''|js})|], None);
-  CSS.contentsRule([|`text({js|' '|js})|], None);
-  CSS.contentsRule([|`text({js|' '|js})|], None);
+  CSS.contentsRule([|`text({js|" "|js})|], None);
+  CSS.contentsRule([|`text({js|" "|js})|], None);
   CSS.contentsRule([|`text({js|''|js})|], None);
   CSS.contentsRule([|`text({js|"'"|js})|], None);
   CSS.contentsRule([|`text({js|'"'|js})|], None);

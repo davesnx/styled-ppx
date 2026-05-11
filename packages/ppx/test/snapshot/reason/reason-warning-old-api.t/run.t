@@ -1,3 +1,8 @@
+A dynamic component declared without any props is rejected as a
+hard error: such a component carries no information beyond a static
+one, and the legacy API silently accepted it. The fix is either to
+add props or to use the static form `[%styled.span ...]` directly.
+
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   File "output.ml", line 1, characters 29-31:
