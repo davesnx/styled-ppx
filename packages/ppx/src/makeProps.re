@@ -2165,7 +2165,7 @@ let data = [
     type_: Media,
   }),
   Event({
-    name: "onEncrypetd",
+    name: "onEncrypetd", /* TODO: fix this misspelling after https://github.com/reasonml/reason-react/pull/930 */
     type_: Media,
   }),
   Event({

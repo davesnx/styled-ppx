@@ -1,6 +1,14 @@
 type var_type =
   | Selector
   | MediaQuery
+  /* Passthrough string interpolation for `--*: $(expr)` declarations in
+     [%cx2] / [%styled.global2]. `expr` is required to be a [string] and is
+     emitted verbatim in the value position - no `toString` wrap, no
+     validation. This is the unsafe escape hatch for custom properties;
+     when we later support typed custom properties (e.g. via
+     `@property` / a codec registry) a new variant will sit next to this
+     one and this one remains the "unknown / unsafe" fallback. */
+  | CustomProperty
   | RuntimeModule(string);
 
 let render_rule = Styled_ppx_css_parser.Render.rule;
@@ -439,10 +447,18 @@ module Css_transform = {
         };
       remaining_interpolation_types := remaining_types;
 
+      let is_custom_property =
+        String.length(property_name) >= 2
+        && String.sub(property_name, 0, 2) == "--";
+
       let var_type =
-        RuntimeModule(
-          Property_to_types.resolve_module_name(~type_path, ~property_name),
-        );
+        if (is_custom_property) {
+          CustomProperty;
+        } else {
+          RuntimeModule(
+            Property_to_types.resolve_module_name(~type_path, ~property_name),
+          );
+        };
 
       (css_var_name, var_type);
     };

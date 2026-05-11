@@ -708,7 +708,8 @@ and content_list =
   | `Url of url
   | `Quote of quote
   | `Function_attr of function_attr
-  | `Counter of string * unit * property_list_style_type option
+  | `Function_counter of function_counter
+  | `Function_counters of function_counters
   ]
   list
 
@@ -973,8 +974,19 @@ and function_conic_gradient =
   * angular_color_stop_list
 
 and function_contrast = number_percentage
-and function_counter = counter_name * unit * counter_style option
-and function_counters = string * unit * string * unit * counter_style option
+and function_counter =
+  [ `Counter_name of counter_name | `Interpolation of string list ]
+  * (unit
+    * [ `Counter_style of counter_style | `Interpolation of string list ])
+    option
+
+and function_counters =
+  [ `Counter_name of counter_name | `Interpolation of string list ]
+  * unit
+  * [ `String of string | `Interpolation of string list ]
+  * (unit
+    * [ `Counter_style of counter_style | `Interpolation of string list ])
+    option
 and function_cross_fade = cf_mixing_image * unit * cf_final_image option
 
 and function_drop_shadow =

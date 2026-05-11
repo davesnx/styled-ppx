@@ -563,8 +563,8 @@ let content_distribution : content_distribution Rule.rule =
 
 module Content_list =
   [%spec_module
-  "[ <string> | 'contents' | <url> | <quote> | <attr()> | counter( <ident> ',' \
-   [ <'list-style-type'> ]? ) ]+",
+  "[ <string> | 'contents' | <url> | <quote> | <attr()> | <counter()> | \
+   <counters()> ]+",
   (module Css_types.ContentList)]
 
 let content_list : content_list Rule.rule = Content_list.rule

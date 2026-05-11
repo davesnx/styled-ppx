@@ -4,7 +4,8 @@
 [%cx2 {|content: "\25BA" / ""|}];
 
 [%cx2 {|content: "";|}];
-/* [%cx2 {|content: counter(ol);|}]; */
+/* counter() — single-argument form (Gap 4) */
+[%cx2 {|content: counter(ol);|}];
 [%cx2 {|content: counter(count, decimal);|}];
 [%cx2 {|content: counter(count, decimal) ") ";|}];
 [%cx2 {|content: unset;|}];
@@ -24,11 +25,12 @@
 /* <string> value */
 [%cx2 {|content: "unparsed text";|}];
 
-/* <counter> values, optionally with <list-style-type> */
-/* [%cx2 {|content: counter(chapter_counter);|}]; */
-/* [%cx2 {|content: counter(chapter_counter, upper-roman);|}]; */
-/* [%cx2 {|content: counters(section_counter, ".");|}]; */
-/* [%cx2 {|content: counters(section_counter, ".", decimal-leading-zero);|}]; */
+/* <counter> values, with and without a <counter-style> (Gap 4) */
+[%cx2 {|content: counter(chapter_counter);|}];
+[%cx2 {|content: counter(chapter_counter, upper-roman);|}];
+/* <counters()> values, with and without a <counter-style> (Gap 3) */
+[%cx2 {|content: counters(section_counter, ".");|}];
+[%cx2 {|content: counters(section_counter, ".", decimal-leading-zero);|}];
 
 /* attr() value linked to the HTML attribute value */
 [%cx2 {|content: attr(href);|}];
@@ -46,7 +48,8 @@
    Several values can be used simultaneously */
 [%cx2 {|content: "prefix" url(http://www.example.com/test.png);|}];
 [%cx2 {|content: "prefix" url("/img/test.png") "suffix" / "Alt text";|}];
-/* [%cx2 {|content: open-quote counter(chapter_counter);|}]; */
+/* Mixing quotes and counters in a content-list (Gap 3 + Gap 4) */
+[%cx2 {|content: open-quote counter(chapter_counter);|}];
 
 /* Global values */
 [%cx2 {|content: inherit;|}];

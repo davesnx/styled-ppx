@@ -41,9 +41,15 @@ let render_root_block =
     let decl_parts =
       dynamic_vars
       |> List.concat_map(((var_name, path_str, var_type)) => {
-           let module_name =
+           let value_expr = Css_to_runtime.render_variable(~loc, path_str);
+           let stringified_value =
              switch (var_type) {
-             | Css_file.RuntimeModule(name) => name
+             | Css_file.RuntimeModule(name) =>
+               Property_to_types.make_to_string_call(~loc, name, value_expr)
+             /* `--foo: $(expr)` - expr is already a [string], pass it
+                through verbatim. Type error here means the user supplied a
+                non-string to a custom-property interpolation. */
+             | Css_file.CustomProperty => value_expr
              /* Selector and MediaQuery var_types are populated only
                 from selector / @media-prelude positions, never from
                 declaration values. They cannot reach this code path
@@ -63,16 +69,9 @@ let render_root_block =
                  path_str,
                )
              };
-           let value_expr = Css_to_runtime.render_variable(~loc, path_str);
-           let to_string_call =
-             Property_to_types.make_to_string_call(
-               ~loc,
-               module_name,
-               value_expr,
-             );
            [
              estring(~loc, "--" ++ var_name ++ ":"),
-             to_string_call,
+             stringified_value,
              estring(~loc, ";"),
            ];
          });

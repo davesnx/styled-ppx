@@ -669,6 +669,11 @@ let render_make_call = (~loc, ~marker: option(string), ~classNames, ~dynamic_var
            switch (var_type) {
            | Selector
            | MediaQuery => [%expr fst([%e var_value])]
+           | CustomProperty =>
+             /* `--foo: $(expr)` - expr is already a [string], pass it
+                through verbatim. Type error here means the user supplied a
+                non-string to a custom-property interpolation. */
+             var_value
            | RuntimeModule(module_name) =>
              Property_to_types.make_to_string_call(
                ~loc,

@@ -59,13 +59,16 @@ let function_contrast : function_contrast Rule.rule = Function_contrast.rule
 
 module Function_counter =
   [%spec_module
-  "counter( <counter-name> , <counter-style>? )", (module Css_types.Counter)]
+  "counter( [ <counter-name> | <interpolation> ] [ ',' [ <counter-style> | \
+   <interpolation> ] ]? )",
+  (module Css_types.Counter)]
 
 let function_counter : function_counter Rule.rule = Function_counter.rule
 
 module Function_counters =
   [%spec_module
-  "counters( <custom-ident> ',' <string> ',' [ <counter-style> ]? )",
+  "counters( [ <counter-name> | <interpolation> ] ',' [ <string> | \
+   <interpolation> ] [ ',' [ <counter-style> | <interpolation> ] ]? )",
   (module Css_types.Counters)]
 
 let function_counters : function_counters Rule.rule = Function_counters.rule

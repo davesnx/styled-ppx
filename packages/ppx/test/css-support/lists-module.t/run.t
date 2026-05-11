@@ -16,61 +16,61 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
-  CSS.listStyleType(`Custom({js|disclosure-closed|js}));
-  CSS.listStyleType(`Custom({js|disclosure-open|js}));
-  CSS.listStyleType(`Custom({js|hebrew|js}));
-  CSS.listStyleType(`Custom({js|cjk-decimal|js}));
-  CSS.listStyleType(`Custom({js|cjk-ideographic|js}));
-  CSS.listStyleType(`Custom({js|hiragana|js}));
-  CSS.listStyleType(`Custom({js|katakana|js}));
-  CSS.listStyleType(`Custom({js|hiragana-iroha|js}));
-  CSS.listStyleType(`Custom({js|katakana-iroha|js}));
-  CSS.listStyleType(`Custom({js|japanese-informal|js}));
-  CSS.listStyleType(`Custom({js|japanese-formal|js}));
-  CSS.listStyleType(`Custom({js|korean-hangul-formal|js}));
-  CSS.listStyleType(`Custom({js|korean-hanja-informal|js}));
-  CSS.listStyleType(`Custom({js|korean-hanja-formal|js}));
-  CSS.listStyleType(`Custom({js|simp-chinese-informal|js}));
-  CSS.listStyleType(`Custom({js|simp-chinese-formal|js}));
-  CSS.listStyleType(`Custom({js|trad-chinese-informal|js}));
-  CSS.listStyleType(`Custom({js|trad-chinese-formal|js}));
-  CSS.listStyleType(`Custom({js|cjk-heavenly-stem|js}));
-  CSS.listStyleType(`Custom({js|cjk-earthly-branch|js}));
-  CSS.listStyleType(`Custom({js|trad-chinese-informal|js}));
-  CSS.listStyleType(`Custom({js|trad-chinese-formal|js}));
-  CSS.listStyleType(`Custom({js|simp-chinese-informal|js}));
-  CSS.listStyleType(`Custom({js|simp-chinese-formal|js}));
-  CSS.listStyleType(`Custom({js|japanese-informal|js}));
-  CSS.listStyleType(`Custom({js|japanese-formal|js}));
-  CSS.listStyleType(`Custom({js|arabic-indic|js}));
-  CSS.listStyleType(`Custom({js|persian|js}));
-  CSS.listStyleType(`Custom({js|urdu|js}));
-  CSS.listStyleType(`Custom({js|devanagari|js}));
-  CSS.listStyleType(`Custom({js|gurmukhi|js}));
-  CSS.listStyleType(`Custom({js|gujarati|js}));
-  CSS.listStyleType(`Custom({js|oriya|js}));
-  CSS.listStyleType(`Custom({js|kannada|js}));
-  CSS.listStyleType(`Custom({js|malayalam|js}));
-  CSS.listStyleType(`Custom({js|bengali|js}));
-  CSS.listStyleType(`Custom({js|tamil|js}));
-  CSS.listStyleType(`Custom({js|telugu|js}));
-  CSS.listStyleType(`Custom({js|thai|js}));
-  CSS.listStyleType(`Custom({js|lao|js}));
-  CSS.listStyleType(`Custom({js|myanmar|js}));
-  CSS.listStyleType(`Custom({js|khmer|js}));
-  CSS.listStyleType(`Custom({js|hangul|js}));
-  CSS.listStyleType(`Custom({js|hangul-consonant|js}));
-  CSS.listStyleType(`Custom({js|ethiopic-halehame|js}));
-  CSS.listStyleType(`Custom({js|ethiopic-numeric|js}));
-  CSS.listStyleType(`Custom({js|ethiopic-halehame-am|js}));
-  CSS.listStyleType(`Custom({js|ethiopic-halehame-ti-er|js}));
-  CSS.listStyleType(`Custom({js|ethiopic-halehame-ti-et|js}));
+  CSS.listStyleType(`disclosureClosed);
+  CSS.listStyleType(`disclosureOpen);
+  CSS.listStyleType(`hebrew);
+  CSS.listStyleType(`cjkDecimal);
+  CSS.listStyleType(`cjkIdeographic);
+  CSS.listStyleType(`hiragana);
+  CSS.listStyleType(`katakana);
+  CSS.listStyleType(`hiraganaIroha);
+  CSS.listStyleType(`katakanaIroha);
+  CSS.listStyleType(`japaneseInformal);
+  CSS.listStyleType(`japaneseFormal);
+  CSS.listStyleType(`koreanHangulFormal);
+  CSS.listStyleType(`koreanHanjaInformal);
+  CSS.listStyleType(`koreanHanjaFormal);
+  CSS.listStyleType(`simpChineseInformal);
+  CSS.listStyleType(`simpChineseFormal);
+  CSS.listStyleType(`tradChineseInformal);
+  CSS.listStyleType(`tradChineseFormal);
+  CSS.listStyleType(`cjkHeavenlyStem);
+  CSS.listStyleType(`cjkEarthlyBranch);
+  CSS.listStyleType(`tradChineseInformal);
+  CSS.listStyleType(`tradChineseFormal);
+  CSS.listStyleType(`simpChineseInformal);
+  CSS.listStyleType(`simpChineseFormal);
+  CSS.listStyleType(`japaneseInformal);
+  CSS.listStyleType(`japaneseFormal);
+  CSS.listStyleType(`arabicIndic);
+  CSS.listStyleType(`persian);
+  CSS.listStyleType(`urdu);
+  CSS.listStyleType(`devanagari);
+  CSS.listStyleType(`gurmukhi);
+  CSS.listStyleType(`gujarati);
+  CSS.listStyleType(`oriya);
+  CSS.listStyleType(`kannada);
+  CSS.listStyleType(`malayalam);
+  CSS.listStyleType(`bengali);
+  CSS.listStyleType(`tamil);
+  CSS.listStyleType(`telugu);
+  CSS.listStyleType(`thai);
+  CSS.listStyleType(`lao);
+  CSS.listStyleType(`myanmar);
+  CSS.listStyleType(`khmer);
+  CSS.listStyleType(`hangul);
+  CSS.listStyleType(`hangulConsonant);
+  CSS.listStyleType(`ethiopicHalehame);
+  CSS.listStyleType(`ethiopicNumeric);
+  CSS.listStyleType(`ethiopicHalehameAm);
+  CSS.listStyleType(`ethiopicHalehameTiEr);
+  CSS.listStyleType(`ethiopicHalehameTiEt);
   CSS.listStyleType(`Custom({js|other-style|js}));
   CSS.listStyleType(`Custom({js|inside|js}));
   CSS.listStyleType(`Custom({js|outside|js}));
   CSS.listStyleType(`Custom({js|2style|js}));
-  CSS.listStyleType(`Custom({js|-|js}));
-  CSS.listStyleType(`Custom({js|-|js}));
+  CSS.listStyleType(`text({js|-|js}));
+  CSS.listStyleType(`text({js|-|js}));
   
   CSS.counterReset(`reset(({js|foo|js}, 0)));
   CSS.counterReset(`reset(({js|foo|js}, 1)));
@@ -93,3 +93,41 @@ If this test fail means that the module is not in sync with the ppx
     `increment(({js|bar|js}, 2)),
   |]);
   CSS.counterIncrement(`none);
+  CSS.contentsRule(
+    [|`counterWithStyle(({js|chno|js}, `upperLatin)), `text({js|. |js})|],
+    None,
+  );
+  CSS.contentsRule(
+    [|`counterWithStyle(({js|section|js}, `upperRoman)), `text({js| - |js})|],
+    None,
+  );
+  CSS.contentsRule(
+    [|
+      `text({js| [|js}),
+      `counterWithStyle(({js|bq|js}, `decimal)),
+      `text({js|]|js}),
+    |],
+    None,
+  );
+  CSS.contentsRule(
+    [|`counterWithStyle(({js|notecntr|js}, `disc)), `text({js|" "|js})|],
+    None,
+  );
+  
+  CSS.contentsRule(
+    [|
+      `counterWithStyle(({js|h1|js}, `upperAlpha)),
+      `text({js|.|js}),
+      `counterWithStyle(({js|h2|js}, `decimal)),
+      `text({js|" "|js}),
+    |],
+    None,
+  );
+  CSS.contentsRule(
+    [|
+      `text({js|(|js}),
+      `counters(({js|list-item|js}, {js|.|js})),
+      `text({js|) |js}),
+    |],
+    None,
+  );

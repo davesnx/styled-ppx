@@ -6357,6 +6357,125 @@ let list_style_position =
       },
   );
 
+let render_symbols_type = (~loc, symbols_type: Types.symbols_type) => {
+  switch (symbols_type) {
+  | `Cyclic => [%expr `cyclic]
+  | `Numeric => [%expr `numeric]
+  | `Alphabetic => [%expr `alphabetic]
+  | `Symbolic => [%expr `symbolic]
+  | `Fixed => [%expr `fixed]
+  };
+};
+
+let render_list_image_or_string = (~loc, list_image_or_string) => {
+  list_image_or_string
+  |> List.map(image_or_string =>
+       switch (image_or_string) {
+       | `Image(image) => render_image(~loc, image)
+       | `String(str) => render_string(~loc, str)
+       }
+     )
+  |> Builder.pexp_array(~loc);
+};
+
+let render_symbols =
+    (~loc, symbols_type: option(Types.symbols_type), list_image_or_string) => {
+  switch (symbols_type) {
+  | Some(symbols_type) => [%expr
+     `symbols((
+       [%e render_symbols_type(~loc, symbols_type)],
+       [%e render_list_image_or_string(~loc, list_image_or_string)],
+     ))
+    ]
+  | None => [%expr
+     `symbols((
+       None,
+       [%e render_list_image_or_string(~loc, list_image_or_string)],
+     ))
+    ]
+  };
+};
+
+/* Predefined <counter-style-name> values per CSS Counter Styles Level 3 §6
+   and the additional names CSS Lists Level 3 registers. Unknown names fall
+   back to `Custom name`, which is the @counter-style escape hatch. */
+let render_counter_style_name = (~loc, label: string) => {
+  switch (label) {
+  | "decimal" => [%expr `decimal]
+  | "decimal-leading-zero" => [%expr `decimalLeadingZero]
+  | "arabic-indic" => [%expr `arabicIndic]
+  | "armenian" => [%expr `armenian]
+  | "upper-armenian" => [%expr `upperArmenian]
+  | "lower-armenian" => [%expr `lowerArmenian]
+  | "bengali" => [%expr `bengali]
+  | "cambodian" => [%expr `cambodian]
+  | "khmer" => [%expr `khmer]
+  | "cjk-decimal" => [%expr `cjkDecimal]
+  | "devanagari" => [%expr `devanagari]
+  | "georgian" => [%expr `georgian]
+  | "gujarati" => [%expr `gujarati]
+  | "gurmukhi" => [%expr `gurmukhi]
+  | "hebrew" => [%expr `hebrew]
+  | "kannada" => [%expr `kannada]
+  | "lao" => [%expr `lao]
+  | "malayalam" => [%expr `malayalam]
+  | "mongolian" => [%expr `mongolian]
+  | "myanmar" => [%expr `myanmar]
+  | "oriya" => [%expr `oriya]
+  | "persian" => [%expr `persian]
+  | "lower-roman" => [%expr `lowerRoman]
+  | "upper-roman" => [%expr `upperRoman]
+  | "tamil" => [%expr `tamil]
+  | "telugu" => [%expr `telugu]
+  | "thai" => [%expr `thai]
+  | "tibetan" => [%expr `tibetan]
+  | "lower-alpha" => [%expr `lowerAlpha]
+  | "lower-latin" => [%expr `lowerLatin]
+  | "upper-alpha" => [%expr `upperAlpha]
+  | "upper-latin" => [%expr `upperLatin]
+  | "cjk-earthly-branch" => [%expr `cjkEarthlyBranch]
+  | "cjk-heavenly-stem" => [%expr `cjkHeavenlyStem]
+  | "lower-greek" => [%expr `lowerGreek]
+  | "hiragana" => [%expr `hiragana]
+  | "hiragana-iroha" => [%expr `hiraganaIroha]
+  | "katakana" => [%expr `katakana]
+  | "katakana-iroha" => [%expr `katakanaIroha]
+  | "disc" => [%expr `disc]
+  | "circle" => [%expr `circle]
+  | "square" => [%expr `square]
+  | "disclosure-open" => [%expr `disclosureOpen]
+  | "disclosure-closed" => [%expr `disclosureClosed]
+  | "cjk-ideographic" => [%expr `cjkIdeographic]
+  | "hangul" => [%expr `hangul]
+  | "hangul-consonant" => [%expr `hangulConsonant]
+  | "urdu" => [%expr `urdu]
+  | "ethiopic-halehame" => [%expr `ethiopicHalehame]
+  | "ethiopic-numeric" => [%expr `ethiopicNumeric]
+  | "ethiopic-halehame-am" => [%expr `ethiopicHalehameAm]
+  | "ethiopic-halehame-ti-er" => [%expr `ethiopicHalehameTiEr]
+  | "ethiopic-halehame-ti-et" => [%expr `ethiopicHalehameTiEt]
+  | "japanese-informal" => [%expr `japaneseInformal]
+  | "japanese-formal" => [%expr `japaneseFormal]
+  | "korean-hangul-formal" => [%expr `koreanHangulFormal]
+  | "korean-hanja-informal" => [%expr `koreanHanjaInformal]
+  | "korean-hanja-formal" => [%expr `koreanHanjaFormal]
+  | "simp-chinese-informal" => [%expr `simpChineseInformal]
+  | "simp-chinese-formal" => [%expr `simpChineseFormal]
+  | "trad-chinese-informal" => [%expr `tradChineseInformal]
+  | "trad-chinese-formal" => [%expr `tradChineseFormal]
+  | _ => [%expr `Custom([%e render_string(~loc, label)])]
+  };
+};
+
+let render_counter_style = (~loc, counter_style: Types.counter_style) => {
+  switch (counter_style) {
+  | `Counter_style_name(label) => render_counter_style_name(~loc, label)
+  | `Function_symbols(symbols_type, list_image_or_string) => [%expr
+     [%e render_symbols(~loc, symbols_type, list_image_or_string)]
+    ]
+  };
+};
+
 let list_style_type =
   monomorphic(
     Property_parser.property_list_style_type,
@@ -6364,11 +6483,8 @@ let list_style_type =
     (~loc, value: Types.property_list_style_type) =>
       switch (value) {
       | `None => [%expr `none]
-      | `Counter_style(`Counter_style_name(name)) => [%expr
-          `Custom([%e render_string(~loc, name)])
-        ]
-      | `String(str) => [%expr `Custom([%e render_string(~loc, str)])]
-      | `Counter_style(`Function_symbols(_)) => raise(Unsupported_feature)
+      | `Counter_style(cs) => render_counter_style(~loc, cs)
+      | `String(str) => [%expr `text([%e render_string(~loc, str)])]
       },
   );
 
@@ -7167,68 +7283,74 @@ let render_function_attr =
   };
 };
 
-let render_symbols_type = (~loc, symbols_type: Types.symbols_type) => {
-  switch (symbols_type) {
-  | `Cyclic => [%expr `cyclic]
-  | `Numeric => [%expr `numeric]
-  | `Alphabetic => [%expr `alphabetic]
-  | `Symbolic => [%expr `symbolic]
-  | `Fixed => [%expr `fixed]
+/* Lower a parsed counter-name to a string-valued OCaml expression. Either a
+   literal <custom-ident> like "list-item", or an interpolated value: in the
+   interpolation case the user-supplied expression must be of type [string]. */
+let render_counter_name_expr =
+    (~loc, name: [ | `Counter_name(string) | `Interpolation(list(string))]) => {
+  switch (name) {
+  | `Counter_name(s) => render_string(~loc, s)
+  | `Interpolation(path) => render_variable(~loc, String.concat(".", path))
   };
 };
 
-let render_list_image_or_string = (~loc, list_image_or_string) => {
-  list_image_or_string
-  |> List.map(image_or_string =>
-       switch (image_or_string) {
-       | `Image(image) => render_image(~loc, image)
-       | `String(str) => render_string(~loc, str)
-       }
-     )
-  |> Builder.pexp_array(~loc);
-};
-
-let render_symbols =
-    (~loc, symbols_type: option(Types.symbols_type), list_image_or_string) => {
-  switch (symbols_type) {
-  | Some(symbols_type) => [%expr
-     `symbols((
-       [%e render_symbols_type(~loc, symbols_type)],
-       [%e render_list_image_or_string(~loc, list_image_or_string)],
-     ))
-    ]
-  | None => [%expr
-     `symbols((
-       None,
-       [%e render_list_image_or_string(~loc, list_image_or_string)],
-     ))
-    ]
+/* Like [render_counter_name_expr] for the <string> separator argument of
+   counters(). Interpolated value must be of type [string]. */
+let render_counters_string_expr =
+    (~loc, sep: [ | `String(string) | `Interpolation(list(string))]) => {
+  switch (sep) {
+  | `String(s) => render_string(~loc, s)
+  | `Interpolation(path) => render_variable(~loc, String.concat(".", path))
   };
 };
 
-let render_counter_style = (~loc, counter_style: Types.counter_style) => {
-  switch (counter_style) {
-  | `Counter_style_name(label) => [%expr
-     `Custom([%e render_string(~loc, label)])
-    ]
-  | `Function_symbols(symbols_type, list_image_or_string) => [%expr
-     [%e render_symbols(~loc, symbols_type, list_image_or_string)]
-    ]
-  };
-};
-
-let render_counter =
-    (~loc, label: string, style: option(Types.counter_style)) => {
+/* Lower a counter-style argument. Either a parsed <counter-style> like
+   `lower-alpha`, or an interpolation whose runtime value is a
+   [CSS.Types.CounterStyle.t]. */
+let render_counter_style_arg =
+    (
+      ~loc,
+      style:
+        [
+          | `Counter_style(Types.counter_style)
+          | `Interpolation(list(string))
+        ],
+    ) => {
   switch (style) {
-  | Some(counter_style) => [%expr
-     `counter((
-       [%e render_string(~loc, label)],
-       Some([%e render_counter_style(~loc, counter_style)]),
-     ))
-    ]
-  | None => [%expr `counter(([%e render_string(~loc, label)], None))]
+  | `Counter_style(cs) => render_counter_style(~loc, cs)
+  | `Interpolation(path) => render_variable(~loc, String.concat(".", path))
   };
 };
+
+/* Render the runtime [`counter] / [`counterWithStyle] constructor depending
+   on whether a [<counter-style>] was supplied. Same split convention as the
+   existing [`attr] / [`attrWithType] pair. */
+let render_function_counter =
+    (~loc, (name, comma_style): Types.function_counter) => {
+  let name_expr = render_counter_name_expr(~loc, name);
+  switch (comma_style) {
+  | Some(((), style)) =>
+    let style_expr = render_counter_style_arg(~loc, style);
+    [%expr `counterWithStyle(([%e name_expr], [%e style_expr]))];
+  | None => [%expr `counter([%e name_expr])]
+  };
+};
+
+let render_function_counters =
+    (~loc, (name, _comma, sep, comma_style): Types.function_counters) => {
+  let name_expr = render_counter_name_expr(~loc, name);
+  let sep_expr = render_counters_string_expr(~loc, sep);
+  switch (comma_style) {
+  | Some(((), style)) =>
+    let style_expr = render_counter_style_arg(~loc, style);
+    [%expr
+     `countersWithStyle(([%e name_expr], [%e sep_expr], [%e style_expr]))
+    ];
+  | None => [%expr `counters(([%e name_expr], [%e sep_expr]))]
+  };
+};
+
+
 
 let render_content_list = (~loc, content_list: Types.content_list) => {
   content_list
@@ -7238,14 +7360,8 @@ let render_content_list = (~loc, content_list: Types.content_list) => {
        | `Quote(quote) => render_quote(~loc, quote)
        | `String(str) => render_content_string(~loc, str)
        | `Url(u) => render_url(~loc, u)
-       | `Counter(counter_name, _, list_style_type_opt) =>
-         let counter_style_opt =
-           switch (list_style_type_opt) {
-           | Some(`Counter_style(cs)) => Some(cs)
-           | Some(`None | `String(_)) => None
-           | None => None
-           };
-         render_counter(~loc, counter_name, counter_style_opt);
+       | `Function_counter(fc) => render_function_counter(~loc, fc)
+       | `Function_counters(fcs) => render_function_counters(~loc, fcs)
        | `Function_attr((attr_name, attr_type): Types.function_attr) =>
          render_function_attr(~loc, attr_name, attr_type)
        }

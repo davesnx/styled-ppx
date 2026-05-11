@@ -18,6 +18,7 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-1cvidje{quotes:auto;}"];
   [@css ".css-esf2ur{content:\"►\" / \"\";}"];
   [@css ".css-1rzsdc1{content:\"\";}"];
+  [@css ".css-x7dhko{content:counter(ol);}"];
   [@css ".css-8szbnh{content:counter(count, decimal);}"];
   [@css ".css-10h56qq{content:counter(count, decimal) \") \";}"];
   [@css ".css-8wd7tk{content:unset;}"];
@@ -32,6 +33,12 @@ If this test fail means that the module is not in sync with the ppx
     ".css-u6u5b0{content:url(\"../img/test.png\") / \"This is the alt text\";}"
   ];
   [@css ".css-1446790{content:\"unparsed text\";}"];
+  [@css ".css-1pr3ui{content:counter(chapter_counter);}"];
+  [@css ".css-14exuxw{content:counter(chapter_counter, upper-roman);}"];
+  [@css ".css-18nwggo{content:counters(section_counter, \".\");}"];
+  [@css
+    ".css-1a914i9{content:counters(section_counter, \".\", decimal-leading-zero);}"
+  ];
   [@css ".css-1c6n5wz{content:attr(href);}"];
   [@css ".css-1wl2bce{content:attr(data-width px);}"];
   [@css ".css-c4enc9{content:open-quote;}"];
@@ -44,6 +51,7 @@ If this test fail means that the module is not in sync with the ppx
   [@css
     ".css-nxt6w1{content:\"prefix\" url(\"/img/test.png\") \"suffix\" / \"Alt text\";}"
   ];
+  [@css ".css-36wmef{content:open-quote counter(chapter_counter);}"];
   [@css ".css-19u1hfk{content:inherit;}"];
   [@css ".css-hqslsq{content:initial;}"];
   [@css ".css-1dxltxf{content:revert;}"];
@@ -86,6 +94,7 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.make("css-1rzsdc1", []);
   
+  CSS.make("css-x7dhko", []);
   CSS.make("css-8szbnh", []);
   CSS.make("css-10h56qq", []);
   CSS.make("css-8wd7tk", []);
@@ -101,6 +110,12 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.make("css-1446790", []);
   
+  CSS.make("css-1pr3ui", []);
+  CSS.make("css-14exuxw", []);
+  
+  CSS.make("css-18nwggo", []);
+  CSS.make("css-1a914i9", []);
+  
   CSS.make("css-1c6n5wz", []);
   CSS.make("css-1wl2bce", []);
   
@@ -111,6 +126,8 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.make("css-10fq46n", []);
   CSS.make("css-nxt6w1", []);
+  
+  CSS.make("css-36wmef", []);
   
   CSS.make("css-19u1hfk", []);
   CSS.make("css-hqslsq", []);

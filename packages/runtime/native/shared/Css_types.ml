@@ -714,21 +714,10 @@ module EasingFunction = struct
     | `jumpBoth -> {js|jump-both|js}
 end
 
-module ListStyleType = struct
-  type t =
-    [ `Custom of string
-    | None.t
-    | Var.t
-    | Cascading.t
-    ]
-
-  let toString x =
-    match x with
-    | `Custom o -> o
-    | #None.t -> None.toString
-    | #Var.t as va -> Var.toString va
-    | #Cascading.t as c -> Cascading.toString c
-end
+(* ListStyleType is defined later, after CounterStyle, because per the CSS Lists
+   Level 3 spec [list-style-type = <counter-style> | <string> | none] depends on
+   <counter-style>, which in turn depends on <counter-style-name>. See the
+   block near the Counter modules below. *)
 
 module ListStylePosition = struct
   type t =
@@ -4286,61 +4275,259 @@ module Symbols = struct
       ^ {js|)|js}
 end
 
+(* === CSS Counter Styles Level 3 + CSS Lists Level 3 ======================
+   The runtime hierarchy mirrors the spec:
+
+     <counter-style-name>  CounterStyleName.t  predefined idents + `Custom`
+     <counter-style>       CounterStyle.t      name | symbols()
+     <counter-name>        CounterName.t       <custom-ident>
+     counter()             Counter.t           consumer of CounterStyle
+     counters()            Counters.t          consumer of CounterStyle
+     list-style-type       ListStyleType.t     CounterStyle | <string> | none
+   ============================================================================ *)
+
+module CounterStyleName = struct
+  (* Predefined counter-style names from CSS Counter Styles Level 3 §6
+     plus the additional ready-made names CSS Lists Level 3 registers. The
+     `Custom` constructor preserves the @counter-style escape hatch for user
+     defined names. *)
+  type t =
+    [ (* Numeric *)
+      `decimal
+    | `decimalLeadingZero
+    | `arabicIndic
+    | `armenian
+    | `upperArmenian
+    | `lowerArmenian
+    | `bengali
+    | `cambodian
+    | `khmer
+    | `cjkDecimal
+    | `devanagari
+    | `georgian
+    | `gujarati
+    | `gurmukhi
+    | `hebrew
+    | `kannada
+    | `lao
+    | `malayalam
+    | `mongolian
+    | `myanmar
+    | `oriya
+    | `persian
+    | `lowerRoman
+    | `upperRoman
+    | `tamil
+    | `telugu
+    | `thai
+    | `tibetan
+      (* Alphabetic *)
+    | `lowerAlpha
+    | `lowerLatin
+    | `upperAlpha
+    | `upperLatin
+    | `cjkEarthlyBranch
+    | `cjkHeavenlyStem
+    | `lowerGreek
+    | `hiragana
+    | `hiraganaIroha
+    | `katakana
+    | `katakanaIroha
+      (* Symbolic *)
+    | `disc
+    | `circle
+    | `square
+    | `disclosureOpen
+    | `disclosureClosed
+      (* Complex / additional predefined names commonly available in browsers *)
+    | `cjkIdeographic
+    | `hangul
+    | `hangulConsonant
+    | `urdu
+    | `ethiopicHalehame
+    | `ethiopicNumeric
+    | `ethiopicHalehameAm
+    | `ethiopicHalehameTiEr
+    | `ethiopicHalehameTiEt
+    | `japaneseInformal
+    | `japaneseFormal
+    | `koreanHangulFormal
+    | `koreanHanjaInformal
+    | `koreanHanjaFormal
+    | `simpChineseInformal
+    | `simpChineseFormal
+    | `tradChineseInformal
+    | `tradChineseFormal
+      (* Escape hatch for @counter-style user-defined names *)
+    | `Custom of string
+    ]
+
+  let toString (x : t) =
+    match x with
+    | `decimal -> {js|decimal|js}
+    | `decimalLeadingZero -> {js|decimal-leading-zero|js}
+    | `arabicIndic -> {js|arabic-indic|js}
+    | `armenian -> {js|armenian|js}
+    | `upperArmenian -> {js|upper-armenian|js}
+    | `lowerArmenian -> {js|lower-armenian|js}
+    | `bengali -> {js|bengali|js}
+    | `cambodian -> {js|cambodian|js}
+    | `khmer -> {js|khmer|js}
+    | `cjkDecimal -> {js|cjk-decimal|js}
+    | `devanagari -> {js|devanagari|js}
+    | `georgian -> {js|georgian|js}
+    | `gujarati -> {js|gujarati|js}
+    | `gurmukhi -> {js|gurmukhi|js}
+    | `hebrew -> {js|hebrew|js}
+    | `kannada -> {js|kannada|js}
+    | `lao -> {js|lao|js}
+    | `malayalam -> {js|malayalam|js}
+    | `mongolian -> {js|mongolian|js}
+    | `myanmar -> {js|myanmar|js}
+    | `oriya -> {js|oriya|js}
+    | `persian -> {js|persian|js}
+    | `lowerRoman -> {js|lower-roman|js}
+    | `upperRoman -> {js|upper-roman|js}
+    | `tamil -> {js|tamil|js}
+    | `telugu -> {js|telugu|js}
+    | `thai -> {js|thai|js}
+    | `tibetan -> {js|tibetan|js}
+    | `lowerAlpha -> {js|lower-alpha|js}
+    | `lowerLatin -> {js|lower-latin|js}
+    | `upperAlpha -> {js|upper-alpha|js}
+    | `upperLatin -> {js|upper-latin|js}
+    | `cjkEarthlyBranch -> {js|cjk-earthly-branch|js}
+    | `cjkHeavenlyStem -> {js|cjk-heavenly-stem|js}
+    | `lowerGreek -> {js|lower-greek|js}
+    | `hiragana -> {js|hiragana|js}
+    | `hiraganaIroha -> {js|hiragana-iroha|js}
+    | `katakana -> {js|katakana|js}
+    | `katakanaIroha -> {js|katakana-iroha|js}
+    | `disc -> {js|disc|js}
+    | `circle -> {js|circle|js}
+    | `square -> {js|square|js}
+    | `disclosureOpen -> {js|disclosure-open|js}
+    | `disclosureClosed -> {js|disclosure-closed|js}
+    | `cjkIdeographic -> {js|cjk-ideographic|js}
+    | `hangul -> {js|hangul|js}
+    | `hangulConsonant -> {js|hangul-consonant|js}
+    | `urdu -> {js|urdu|js}
+    | `ethiopicHalehame -> {js|ethiopic-halehame|js}
+    | `ethiopicNumeric -> {js|ethiopic-numeric|js}
+    | `ethiopicHalehameAm -> {js|ethiopic-halehame-am|js}
+    | `ethiopicHalehameTiEr -> {js|ethiopic-halehame-ti-er|js}
+    | `ethiopicHalehameTiEt -> {js|ethiopic-halehame-ti-et|js}
+    | `japaneseInformal -> {js|japanese-informal|js}
+    | `japaneseFormal -> {js|japanese-formal|js}
+    | `koreanHangulFormal -> {js|korean-hangul-formal|js}
+    | `koreanHanjaInformal -> {js|korean-hanja-informal|js}
+    | `koreanHanjaFormal -> {js|korean-hanja-formal|js}
+    | `simpChineseInformal -> {js|simp-chinese-informal|js}
+    | `simpChineseFormal -> {js|simp-chinese-formal|js}
+    | `tradChineseInformal -> {js|trad-chinese-informal|js}
+    | `tradChineseFormal -> {js|trad-chinese-formal|js}
+    | `Custom name -> name
+end
+
+module CounterName = struct
+  (* <counter-name> = <custom-ident>. A counter instance name like "chapter"
+     or "list-item". Modeled as a bare string so users can interpolate a name
+     directly: [content: counter($(name))] with [let name = "chapter"]. *)
+  type t = string
+
+  let toString (x : t) = x
+end
+
+module CounterStyle = struct
+  (* <counter-style> = <counter-style-name> | <symbols()> *)
+  type t =
+    [ CounterStyleName.t
+    | `Symbols of Symbols.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | #CounterStyleName.t as n -> CounterStyleName.toString n
+    | `Symbols s -> Symbols.toString s
+end
+
+(* Deprecated alias: pre-existing name from before the counter modules were
+   aligned with the spec. New code should use [CounterStyle.t] directly. The
+   alias additionally allows [`unset], which is what [counters()] historically
+   used as a sentinel for "no explicit style supplied". *)
 module CounterStyleType = struct
   type t =
-    [ ListStyleType.t
-    | `Symbols of Symbols.t
+    [ CounterStyle.t
     | `unset
     ]
 
   let toString (x : t) =
-    match (x : t) with
-    | #ListStyleType.t as c -> ListStyleType.toString c
-    | `Symbols s -> Symbols.toString s
+    match x with
+    | #CounterStyle.t as c -> CounterStyle.toString c
+    | `unset -> {js|unset|js}
 end
 
 module Counter = struct
-  type t = [ `counter of string * CounterStyleType.t option ]
-
-  let counter ?(style = None) name = `counter (name, style)
+  (* counter() = counter( <counter-name> [, <counter-style>]? ).
+     Two surface forms map to two constructors, mirroring how [attr] and
+     [attrWithType] split the optional argument: [`counter "x"] for the
+     style-less form, [`counterWithStyle ("x", style)] for the styled form.
+     This keeps call sites free of [None]/[Some] noise. *)
+  type t =
+    [ `counter of string
+    | `counterWithStyle of string * CounterStyle.t
+    ]
 
   let toString x =
     match x with
-    | `counter (counter, style) ->
-      (match style with
-      | None -> ({js|counter(|js} ^ counter) ^ {js|)|js}
-      | Some s ->
-        {js|counter(|js}
-        ^ counter
-        ^ {js|,|js}
-        ^ CounterStyleType.toString s
-        ^ {js|)|js})
+    | `counter name -> {js|counter(|js} ^ name ^ {js|)|js}
+    | `counterWithStyle (name, style) ->
+      {js|counter(|js} ^ name ^ {js|,|js} ^ CounterStyle.toString style
+      ^ {js|)|js}
 end
 
 module Counters = struct
-  type style =
-    [ CounterStyleType.t
-    | `unset
+  (* counters() = counters( <counter-name>, <string> [, <counter-style>]? ).
+     Same split-by-arity convention as [Counter]. *)
+  type t =
+    [ `counters of string * string
+    | `countersWithStyle of string * string * CounterStyle.t
     ]
-
-  type t = [ `counters of string * string * style ]
-
-  let counters ?(style = `unset) ?(separator = {js||js}) name =
-    `counters (name, separator, style)
 
   let toString x =
     match x with
-    | `counters (name, separator, style) ->
-      (match style with
-      | `unset -> {js|counters(|js} ^ name ^ {js|,"|js} ^ separator ^ {js|")|js}
-      | #CounterStyleType.t as s ->
-        {js|counters(|js}
-        ^ name
-        ^ {js|,"|js}
-        ^ separator
-        ^ {js|",|js}
-        ^ CounterStyleType.toString s
-        ^ {js|)|js})
+    | `counters (name, separator) ->
+      {js|counters(|js} ^ name ^ {js|,"|js} ^ separator ^ {js|")|js}
+    | `countersWithStyle (name, separator, style) ->
+      {js|counters(|js} ^ name ^ {js|,"|js} ^ separator ^ {js|",|js}
+      ^ CounterStyle.toString style ^ {js|)|js}
+end
+
+module ListStyleType = struct
+  (* list-style-type = <counter-style> | <string> | none.
+     `text` carries the <string> alternative so the constructor matches how the
+     Content module spells the same primitive. *)
+  type t =
+    [ CounterStyle.t
+    | `text of string
+    | None.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString (x : t) =
+    match x with
+    | #CounterStyle.t as c -> CounterStyle.toString c
+    | `text s ->
+      (* Wrap in double quotes if not already quoted *)
+      let len = Kloth.String.length s in
+      if len >= 2
+         && (Kloth.String.get s 0 = '"' || Kloth.String.get s 0 = '\'')
+      then s
+      else {js|"|js} ^ s ^ {js|"|js}
+    | #None.t -> None.toString
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module CounterIncrement = struct
@@ -4398,7 +4585,8 @@ module CounterSet = struct
 end
 
 module Content = struct
-  type t =
+  (* A single content token, per <content-list> element in CSS GCM L3. *)
+  type one =
     [ None.t
     | `normal
     | `openQuote
@@ -4406,12 +4594,21 @@ module Content = struct
     | `noOpenQuote
     | `noCloseQuote
     | `attr of string
+    | `attrWithType of string * string
     | `text of string
     | Counter.t
     | Counters.t
     | Image.t
     | Var.t
     | Cascading.t
+    ]
+
+  (* The user-facing content value. Accepts either a single token (most common)
+     or a sequence — `multi [| ... |]` — when the value is a content-list with
+     multiple tokens such as [counter(list-item) "."]. *)
+  type t =
+    [ one
+    | `multi of one array
     ]
 
   let text_to_string value =
@@ -4430,7 +4627,7 @@ module Content = struct
       | '\'' | '"' -> value
       | _ -> {js|"|js} ^ value ^ {js|"|js})
 
-  let toString x =
+  let oneToString (x : one) =
     match x with
     | #None.t -> None.toString
     | `normal -> {js|normal|js}
@@ -4447,6 +4644,12 @@ module Content = struct
     | #Counters.t as c -> Counters.toString c
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
+
+  let toString (x : t) =
+    match x with
+    | `multi items ->
+      Kloth.Array.map_and_join ~sep:{js| |js} ~f:oneToString items
+    | #one as one -> oneToString one
 end
 
 module SVG = struct
