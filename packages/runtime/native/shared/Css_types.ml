@@ -5012,14 +5012,20 @@ module Translate = struct
     | #Cascading.t as x -> Cascading.toString x
 end
 
+(* The CSS `rotate` property (CSS Transforms Module Level 2).
+
+   Grammar (https://drafts.csswg.org/css-transforms-2/#propdef-rotate):
+     none | <angle> | [ x | y | z | <number>{3} ] && <angle>
+
+   Note: the variant tags here describe the `rotate` *property*, not the
+   `rotate()` / `rotateX()` / `rotate3d()` *transform functions* used inside
+   the `transform` property. *)
 module Rotate = struct
   type t =
     [ None.t
-    | `rotate of Angle.t
-    | `rotateX of Angle.t
-    | `rotateY of Angle.t
-    | `rotateZ of Angle.t
-    | `rotate3d of float * float * float * Angle.t
+    | Angle.t
+    | `axis of [ `x | `y | `z ] * Angle.t
+    | `vector of float * float * float * Angle.t
     | Cascading.t
     | Var.t
     ]
@@ -5027,11 +5033,11 @@ module Rotate = struct
   let toString x =
     match x with
     | #None.t -> None.toString
-    | `rotate v -> Angle.toString v
-    | `rotateX v -> {js|x |js} ^ Angle.toString v
-    | `rotateY v -> {js|y |js} ^ Angle.toString v
-    | `rotateZ v -> {js|z |js} ^ Angle.toString v
-    | `rotate3d (x, y, z, a) ->
+    | #Angle.t as a -> Angle.toString a
+    | `axis (`x, a) -> {js|x |js} ^ Angle.toString a
+    | `axis (`y, a) -> {js|y |js} ^ Angle.toString a
+    | `axis (`z, a) -> {js|z |js} ^ Angle.toString a
+    | `vector (x, y, z, a) ->
       Kloth.Float.to_string x
       ^ {js| |js}
       ^ Kloth.Float.to_string y

@@ -3965,20 +3965,18 @@ let rotate =
     (~loc) =>
       fun
       | `None => [%expr `none]
-      | `Extended_angle(x) => [%expr
-          `rotate([%e render_extended_angle(~loc, x)])
-        ]
+      | `Extended_angle(x) => render_extended_angle(~loc, x)
       | `And(`X, angle) => [%expr
-          `rotateX([%e render_extended_angle(~loc, angle)])
+          `axis((`x, [%e render_extended_angle(~loc, angle)]))
         ]
       | `And(`Y, angle) => [%expr
-          `rotateY([%e render_extended_angle(~loc, angle)])
+          `axis((`y, [%e render_extended_angle(~loc, angle)]))
         ]
       | `And(`Z, angle) => [%expr
-          `rotateZ([%e render_extended_angle(~loc, angle)])
+          `axis((`z, [%e render_extended_angle(~loc, angle)]))
         ]
       | `And(`Number([x, y, z, ..._]), angle) => [%expr
-          `rotate3d((
+          `vector((
             [%e render_float(~loc, x)],
             [%e render_float(~loc, y)],
             [%e render_float(~loc, z)],
