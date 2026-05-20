@@ -3,6 +3,7 @@
  (libraries
   alcotest
   styled-ppx
+  styled-ppx.css-parser
   styled-ppx.native
   ppxlib
   ppxlib.astlib

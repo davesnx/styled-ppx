@@ -288,8 +288,6 @@
       [@mel.optional]
       focusable: option(string),
       [@mel.optional]
-      fomat: option(string),
-      [@mel.optional]
       fontFamily: option(string),
       [@mel.optional]
       fontSize: option(string),

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- [BREAKING] [FIX] `[%cx2]` class-name interpolation in selectors (e.g. `&.$(other)`, `:not(&.$(other))`, `:has(.$(other))`) is now resolved at extraction time. Previously the literal `$(name)` text was emitted into the extracted CSS, breaking the selector at runtime, and a phantom `--var-XXX: <className>` was leaked onto every consumer's inline `style=`. Same-module references now substitute the actual class names (chained for multi-declaration source bindings, e.g. `&.cssA.cssB`); cross-module and unresolved references raise a clear PPX error.
 - [INTERNAL] Refactor entire PPX to use context-free ppxlib rules, removing the global AST traverser (@davesnx)
 
 ## 0.61.0

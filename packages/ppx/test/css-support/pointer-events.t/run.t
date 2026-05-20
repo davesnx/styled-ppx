@@ -16,20 +16,20 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
-  CSS.unsafe({js|touchAction|js}, {js|auto|js});
-  CSS.unsafe({js|touchAction|js}, {js|none|js});
-  CSS.unsafe({js|touchAction|js}, {js|pan-x|js});
-  CSS.unsafe({js|touchAction|js}, {js|pan-y|js});
+  CSS.touchAction(`auto);
+  CSS.touchAction(`none);
+  CSS.touchAction(`panX);
+  CSS.touchAction(`panY);
   CSS.unsafe({js|touchAction|js}, {js|pan-x pan-y|js});
-  CSS.unsafe({js|touchAction|js}, {js|manipulation|js});
+  CSS.touchAction(`manipulation);
   
-  CSS.unsafe({js|touchAction|js}, {js|pan-left|js});
-  CSS.unsafe({js|touchAction|js}, {js|pan-right|js});
-  CSS.unsafe({js|touchAction|js}, {js|pan-up|js});
-  CSS.unsafe({js|touchAction|js}, {js|pan-down|js});
+  CSS.touchAction(`panLeft);
+  CSS.touchAction(`panRight);
+  CSS.touchAction(`panUp);
+  CSS.touchAction(`panDown);
   CSS.unsafe({js|touchAction|js}, {js|pan-left pan-up|js});
   
-  CSS.unsafe({js|touchAction|js}, {js|pinch-zoom|js});
+  CSS.touchAction(`pinchZoom);
   CSS.unsafe({js|touchAction|js}, {js|pan-x pinch-zoom|js});
   CSS.unsafe({js|touchAction|js}, {js|pan-y pinch-zoom|js});
   CSS.unsafe({js|touchAction|js}, {js|pan-x pan-y pinch-zoom|js});

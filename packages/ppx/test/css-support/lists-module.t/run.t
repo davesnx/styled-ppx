@@ -16,74 +16,118 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
-  CSS.unsafe({js|listStyleType|js}, {js|disclosure-closed|js});
-  CSS.unsafe({js|listStyleType|js}, {js|disclosure-open|js});
-  CSS.unsafe({js|listStyleType|js}, {js|hebrew|js});
-  CSS.unsafe({js|listStyleType|js}, {js|cjk-decimal|js});
-  CSS.unsafe({js|listStyleType|js}, {js|cjk-ideographic|js});
-  CSS.unsafe({js|listStyleType|js}, {js|hiragana|js});
-  CSS.unsafe({js|listStyleType|js}, {js|katakana|js});
-  CSS.unsafe({js|listStyleType|js}, {js|hiragana-iroha|js});
-  CSS.unsafe({js|listStyleType|js}, {js|katakana-iroha|js});
-  CSS.unsafe({js|listStyleType|js}, {js|japanese-informal|js});
-  CSS.unsafe({js|listStyleType|js}, {js|japanese-formal|js});
-  CSS.unsafe({js|listStyleType|js}, {js|korean-hangul-formal|js});
-  CSS.unsafe({js|listStyleType|js}, {js|korean-hanja-informal|js});
-  CSS.unsafe({js|listStyleType|js}, {js|korean-hanja-formal|js});
-  CSS.unsafe({js|listStyleType|js}, {js|simp-chinese-informal|js});
-  CSS.unsafe({js|listStyleType|js}, {js|simp-chinese-formal|js});
-  CSS.unsafe({js|listStyleType|js}, {js|trad-chinese-informal|js});
-  CSS.unsafe({js|listStyleType|js}, {js|trad-chinese-formal|js});
-  CSS.unsafe({js|listStyleType|js}, {js|cjk-heavenly-stem|js});
-  CSS.unsafe({js|listStyleType|js}, {js|cjk-earthly-branch|js});
-  CSS.unsafe({js|listStyleType|js}, {js|trad-chinese-informal|js});
-  CSS.unsafe({js|listStyleType|js}, {js|trad-chinese-formal|js});
-  CSS.unsafe({js|listStyleType|js}, {js|simp-chinese-informal|js});
-  CSS.unsafe({js|listStyleType|js}, {js|simp-chinese-formal|js});
-  CSS.unsafe({js|listStyleType|js}, {js|japanese-informal|js});
-  CSS.unsafe({js|listStyleType|js}, {js|japanese-formal|js});
-  CSS.unsafe({js|listStyleType|js}, {js|arabic-indic|js});
-  CSS.unsafe({js|listStyleType|js}, {js|persian|js});
-  CSS.unsafe({js|listStyleType|js}, {js|urdu|js});
-  CSS.unsafe({js|listStyleType|js}, {js|devanagari|js});
-  CSS.unsafe({js|listStyleType|js}, {js|gurmukhi|js});
-  CSS.unsafe({js|listStyleType|js}, {js|gujarati|js});
-  CSS.unsafe({js|listStyleType|js}, {js|oriya|js});
-  CSS.unsafe({js|listStyleType|js}, {js|kannada|js});
-  CSS.unsafe({js|listStyleType|js}, {js|malayalam|js});
-  CSS.unsafe({js|listStyleType|js}, {js|bengali|js});
-  CSS.unsafe({js|listStyleType|js}, {js|tamil|js});
-  CSS.unsafe({js|listStyleType|js}, {js|telugu|js});
-  CSS.unsafe({js|listStyleType|js}, {js|thai|js});
-  CSS.unsafe({js|listStyleType|js}, {js|lao|js});
-  CSS.unsafe({js|listStyleType|js}, {js|myanmar|js});
-  CSS.unsafe({js|listStyleType|js}, {js|khmer|js});
-  CSS.unsafe({js|listStyleType|js}, {js|hangul|js});
-  CSS.unsafe({js|listStyleType|js}, {js|hangul-consonant|js});
-  CSS.unsafe({js|listStyleType|js}, {js|ethiopic-halehame|js});
-  CSS.unsafe({js|listStyleType|js}, {js|ethiopic-numeric|js});
-  CSS.unsafe({js|listStyleType|js}, {js|ethiopic-halehame-am|js});
-  CSS.unsafe({js|listStyleType|js}, {js|ethiopic-halehame-ti-er|js});
-  CSS.unsafe({js|listStyleType|js}, {js|ethiopic-halehame-ti-et|js});
-  CSS.unsafe({js|listStyleType|js}, {js|other-style|js});
-  CSS.unsafe({js|listStyleType|js}, {js|inside|js});
-  CSS.unsafe({js|listStyleType|js}, {js|outside|js});
-  CSS.unsafe({js|listStyleType|js}, {js|\32 style|js});
-  CSS.unsafe({js|listStyleType|js}, {js|"-"|js});
-  CSS.unsafe({js|listStyleType|js}, {js|'-'|js});
+  CSS.listStyleType(`disclosureClosed);
+  CSS.listStyleType(`disclosureOpen);
+  CSS.listStyleType(`hebrew);
+  CSS.listStyleType(`cjkDecimal);
+  CSS.listStyleType(`cjkIdeographic);
+  CSS.listStyleType(`hiragana);
+  CSS.listStyleType(`katakana);
+  CSS.listStyleType(`hiraganaIroha);
+  CSS.listStyleType(`katakanaIroha);
+  CSS.listStyleType(`japaneseInformal);
+  CSS.listStyleType(`japaneseFormal);
+  CSS.listStyleType(`koreanHangulFormal);
+  CSS.listStyleType(`koreanHanjaInformal);
+  CSS.listStyleType(`koreanHanjaFormal);
+  CSS.listStyleType(`simpChineseInformal);
+  CSS.listStyleType(`simpChineseFormal);
+  CSS.listStyleType(`tradChineseInformal);
+  CSS.listStyleType(`tradChineseFormal);
+  CSS.listStyleType(`cjkHeavenlyStem);
+  CSS.listStyleType(`cjkEarthlyBranch);
+  CSS.listStyleType(`tradChineseInformal);
+  CSS.listStyleType(`tradChineseFormal);
+  CSS.listStyleType(`simpChineseInformal);
+  CSS.listStyleType(`simpChineseFormal);
+  CSS.listStyleType(`japaneseInformal);
+  CSS.listStyleType(`japaneseFormal);
+  CSS.listStyleType(`arabicIndic);
+  CSS.listStyleType(`persian);
+  CSS.listStyleType(`urdu);
+  CSS.listStyleType(`devanagari);
+  CSS.listStyleType(`gurmukhi);
+  CSS.listStyleType(`gujarati);
+  CSS.listStyleType(`oriya);
+  CSS.listStyleType(`kannada);
+  CSS.listStyleType(`malayalam);
+  CSS.listStyleType(`bengali);
+  CSS.listStyleType(`tamil);
+  CSS.listStyleType(`telugu);
+  CSS.listStyleType(`thai);
+  CSS.listStyleType(`lao);
+  CSS.listStyleType(`myanmar);
+  CSS.listStyleType(`khmer);
+  CSS.listStyleType(`hangul);
+  CSS.listStyleType(`hangulConsonant);
+  CSS.listStyleType(`ethiopicHalehame);
+  CSS.listStyleType(`ethiopicNumeric);
+  CSS.listStyleType(`ethiopicHalehameAm);
+  CSS.listStyleType(`ethiopicHalehameTiEr);
+  CSS.listStyleType(`ethiopicHalehameTiEt);
+  CSS.listStyleType(`Custom({js|other-style|js}));
+  CSS.listStyleType(`Custom({js|inside|js}));
+  CSS.listStyleType(`Custom({js|outside|js}));
+  CSS.listStyleType(`Custom({js|2style|js}));
+  CSS.listStyleType(`text({js|-|js}));
+  CSS.listStyleType(`text({js|-|js}));
   
-  CSS.unsafe({js|counterReset|js}, {js|foo|js});
-  CSS.unsafe({js|counterReset|js}, {js|foo 1|js});
-  CSS.unsafe({js|counterReset|js}, {js|foo 1 bar|js});
-  CSS.unsafe({js|counterReset|js}, {js|foo 1 bar 2|js});
-  CSS.unsafe({js|counterReset|js}, {js|none|js});
-  CSS.unsafe({js|counterSet|js}, {js|foo|js});
-  CSS.unsafe({js|counterSet|js}, {js|foo 1|js});
-  CSS.unsafe({js|counterSet|js}, {js|foo 1 bar|js});
-  CSS.unsafe({js|counterSet|js}, {js|foo 1 bar 2|js});
-  CSS.unsafe({js|counterSet|js}, {js|none|js});
-  CSS.unsafe({js|counterIncrement|js}, {js|foo|js});
-  CSS.unsafe({js|counterIncrement|js}, {js|foo 1|js});
-  CSS.unsafe({js|counterIncrement|js}, {js|foo 1 bar|js});
-  CSS.unsafe({js|counterIncrement|js}, {js|foo 1 bar 2|js});
-  CSS.unsafe({js|counterIncrement|js}, {js|none|js});
+  CSS.counterReset(`reset(({js|foo|js}, 0)));
+  CSS.counterReset(`reset(({js|foo|js}, 1)));
+  CSS.countersReset([|`reset(({js|foo|js}, 1)), `reset(({js|bar|js}, 0))|]);
+  CSS.countersReset([|`reset(({js|foo|js}, 1)), `reset(({js|bar|js}, 2))|]);
+  CSS.counterReset(`none);
+  CSS.counterSet(`set(({js|foo|js}, 0)));
+  CSS.counterSet(`set(({js|foo|js}, 1)));
+  CSS.countersSet([|`set(({js|foo|js}, 1)), `set(({js|bar|js}, 0))|]);
+  CSS.countersSet([|`set(({js|foo|js}, 1)), `set(({js|bar|js}, 2))|]);
+  CSS.counterSet(`none);
+  CSS.counterIncrement(`increment(({js|foo|js}, 1)));
+  CSS.counterIncrement(`increment(({js|foo|js}, 1)));
+  CSS.countersIncrement([|
+    `increment(({js|foo|js}, 1)),
+    `increment(({js|bar|js}, 1)),
+  |]);
+  CSS.countersIncrement([|
+    `increment(({js|foo|js}, 1)),
+    `increment(({js|bar|js}, 2)),
+  |]);
+  CSS.counterIncrement(`none);
+  CSS.contentsRule(
+    [|`counterWithStyle(({js|chno|js}, `upperLatin)), `text({js|. |js})|],
+    None,
+  );
+  CSS.contentsRule(
+    [|`counterWithStyle(({js|section|js}, `upperRoman)), `text({js| - |js})|],
+    None,
+  );
+  CSS.contentsRule(
+    [|
+      `text({js| [|js}),
+      `counterWithStyle(({js|bq|js}, `decimal)),
+      `text({js|]|js}),
+    |],
+    None,
+  );
+  CSS.contentsRule(
+    [|`counterWithStyle(({js|notecntr|js}, `disc)), `text({js|" "|js})|],
+    None,
+  );
+  
+  CSS.contentsRule(
+    [|
+      `counterWithStyle(({js|h1|js}, `upperAlpha)),
+      `text({js|.|js}),
+      `counterWithStyle(({js|h2|js}, `decimal)),
+      `text({js|" "|js}),
+    |],
+    None,
+  );
+  CSS.contentsRule(
+    [|
+      `text({js|(|js}),
+      `counters(({js|list-item|js}, {js|.|js})),
+      `text({js|) |js}),
+    |],
+    None,
+  );

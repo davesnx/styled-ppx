@@ -33,3 +33,15 @@ If this test fail means that the module is not in sync with the ppx
   CSS.padding(`vh(5.));
   CSS.padding(`vmin(5.));
   CSS.padding(`vmax(5.));
+  
+  CSS.unsafe({js|width|js}, {js|1cap|js});
+  CSS.unsafe({js|width|js}, {js|1ic|js});
+  CSS.unsafe({js|width|js}, {js|1lh|js});
+  CSS.unsafe({js|width|js}, {js|1rcap|js});
+  CSS.unsafe({js|width|js}, {js|1rch|js});
+  CSS.unsafe({js|width|js}, {js|1rex|js});
+  CSS.unsafe({js|width|js}, {js|1ric|js});
+  CSS.unsafe({js|width|js}, {js|1rlh|js});
+  CSS.unsafe({js|width|js}, {js|50vb|js});
+  CSS.unsafe({js|width|js}, {js|50vi|js});
+  CSS.unsafe({js|width|js}, {js|40Q|js});

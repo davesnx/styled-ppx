@@ -73,10 +73,14 @@
 [%css {|counter-increment: foo 1 bar|}];
 [%css {|counter-increment: foo 1 bar 2|}];
 [%css {|counter-increment: none|}];
-/* [%css {|content: counter(chno, upper-latin) '. '|}]; */
-/* [%css {|content: counter(section, upper-roman) ' - '|}]; */
-/* [%css {|content: ' [' counter(bq, decimal) ']'|}]; */
-/* [%css {|content: counter(notecntr, disc) ' '|}]; */
+[%css {|content: counter(chno, upper-latin) '. '|}];
+[%css {|content: counter(section, upper-roman) ' - '|}];
+[%css {|content: ' [' counter(bq, decimal) ']'|}];
+[%css {|content: counter(notecntr, disc) ' '|}];
+/* counter(name, none) — none is not a <counter-style-name>, and the spec
+   allows it via list-style-type but not via counter()'s second argument.
+   Browsers treat unknown idents as `decimal` fallback, so we keep this case
+   commented as a documented gap. */
 /* [%css {|content: counter(p, none)|}]; */
-/* [%css {|content: counter(h1, upper-alpha) '.' counter(h2, decimal) ' '|}]; */
-/* [%css {|content: '(' counters(list-item, '.') ') '|}]; */
+[%css {|content: counter(h1, upper-alpha) '.' counter(h2, decimal) ' '|}];
+[%css {|content: '(' counters(list-item, '.') ') '|}];

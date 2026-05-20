@@ -18,7 +18,9 @@
 [%css {|transition-timing-function: step-end|}];
 [%css {|transition-timing-function: steps(3, start)|}];
 [%css {|transition-timing-function: steps(5, end)|}];
-[%css {|transition-timing-function: ease, step-start, cubic-bezier(0.1, 0.7, 1, 0.1)|}];
+[%css
+  {|transition-timing-function: ease, step-start, cubic-bezier(0.1, 0.7, 1, 0.1)|}
+];
 [%css {|transition-delay: 1s|}];
 [%css {|transition-delay: -1s|}];
 [%css {|transition-delay: 2s, 4ms|}];
@@ -49,7 +51,9 @@ let behavior = `allowDiscrete;
 [%css {|transition: $(property)|}];
 [%css {|transition: $(property2)|}];
 // This is the order of interpolation, from left to right.
-[%css {|transition: $(property) $(duration) $(timingFunction) $(delay) $(behavior)|}];
+[%css
+  {|transition: $(property) $(duration) $(timingFunction) $(delay) $(behavior)|}
+];
 [%css
   {|transition: $(property) $(duration) $(timingFunction) $(delay), $(property3) 0s|}
 ];

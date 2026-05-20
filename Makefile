@@ -3,6 +3,8 @@ project_name = styled-ppx
 OPAM_EXEC = opam exec --
 DUNE = $(OPAM_EXEC) dune
 opam_file = $(project_name).opam
+DUNE_JOBS ?= 8
+export DUNE_JOBS
 
 .PHONY: help
 help: ## Print this help message
@@ -51,7 +53,7 @@ install: ## Install project dependencies
 
 .PHONY: pin
 pin: ## pin
-	opam pin add reason.3.17.3 "https://github.com/reasonml/reason.git#fix-stackoverflow-on-Pconstraint-414" -y
+	opam pin add server-reason-react.0.4.1 "https://github.com/ml-in-barcelona/server-reason-react.git#c9ab81197425d31a3deb03491871bab9dce5cb07" -y
 
 .PHONY: init
 init: setup-githooks create-switch pin install ## Create a local dev enviroment
@@ -70,7 +72,7 @@ release-static:
 
 # Testing commands
 
-TEST_TARGETS := test-parser test-css-property-parser test-ppx-native test-ppx-snapshot-reason test-css-support test-css-spec-types test-runtime test-murmur2 test-css-spec-parser test-string-interpolation
+TEST_TARGETS := test-parser test-css-grammar test-ppx-native test-ppx-snapshot-reason test-css-support test-cx2-support test-runtime test-murmur2 test-css-spec-parser test-string-interpolation
 
 # test-ppx-snapshot-rescript
 

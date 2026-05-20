@@ -16,11 +16,11 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   
-  CSS.unsafe({js|lineClamp|js}, {js|none|js});
-  CSS.unsafe({js|lineClamp|js}, {js|1|js});
+  CSS.lineClamp(`none);
+  CSS.lineClamp(`int(1));
   
-  CSS.unsafe({js|maxLines|js}, {js|none|js});
-  CSS.unsafe({js|maxLines|js}, {js|1|js});
+  CSS.maxLines(`none);
+  CSS.maxLines(`int(1));
   CSS.overflowX(`visible);
   CSS.overflowX(`hidden);
   CSS.overflowX(`clip);

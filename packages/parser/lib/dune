@@ -1,13 +1,8 @@
-(menhir
- (modules Parser)
- (flags --explain --unused-tokens --external-tokens Tokens))
-
 (library
  (name styled_ppx_css_parser)
  (public_name styled-ppx.css-parser)
  (libraries
   sedlex
-  menhirLib
   ppxlib
   (re_export ppx_deriving.runtime) ; We expose show_token from ppx_deriving
   )
