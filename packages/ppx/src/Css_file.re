@@ -14,140 +14,6 @@ type var_type =
 let render_rule = Styled_ppx_css_parser.Render.rule;
 let render_declaration = Styled_ppx_css_parser.Render.declaration;
 
-/* Per-compilation-unit registry mapping each named [%cx2] expansion's lexical
-   path to the list of atomized class names it minted. Selector interpolation in
-   later [%cx2] blocks resolves `$(name)` against this registry so the literal
-   placeholder never reaches the extracted CSS.
-
-   The registry is keyed on (file_path, lexical_path); shadowing is handled by
-   last-write-wins via Hashtbl.replace. Anonymous bindings (`let _ = ...`) are
-   intentionally not registered. The registry is cleared whenever the
-   accumulated CSS buffer is cleared (see `get` at the bottom of this file).
-
-   This is intentionally a small PPX-time resolver, not a replacement for the
-   compiler's typed environment. We model same-file module aliases, opens,
-   includes, and literal string selectors seen earlier in the file; external
-   opens/includes still require explicit module paths. */
-module Class_registry = {
-  let table: Hashtbl.t((string, string), list(string)) =
-    Hashtbl.create(64);
-  let local_modules: Hashtbl.t((string, string), unit) = Hashtbl.create(64);
-  let aliases: Hashtbl.t((string, string), list(string)) =
-    Hashtbl.create(32);
-
-  let join_path = (segments: list(string)): string =>
-    String.concat(".", segments);
-
-  let prefixes = segments => {
-    let rec loop = (current_rev, remaining, acc) =>
-      switch (remaining) {
-      | [] => List.rev(acc)
-      | [segment, ...tail] =>
-        let current = List.rev([segment, ...current_rev]);
-        loop([segment, ...current_rev], tail, [current, ...acc]);
-      };
-    loop([], segments, []);
-  };
-
-  let register_module = (~file: string, ~path: list(string)) =>
-    switch (path) {
-    | [] => ()
-    | _ => Hashtbl.replace(local_modules, (file, join_path(path)), ())
-    };
-
-  let register_alias =
-      (
-        ~file: string,
-        ~scope: list(string),
-        ~name: string,
-        ~target: list(string),
-      ) => {
-    register_module(~file, ~path=scope @ [name]);
-    Hashtbl.replace(aliases, (file, join_path(scope @ [name])), target);
-  };
-
-  let register =
-      (
-        ~file: string,
-        ~scope: list(string),
-        ~name: string,
-        ~classNames: list(string),
-      ) =>
-    if (name != "_") {
-      List.iter(path => register_module(~file, ~path), prefixes(scope));
-      Hashtbl.replace(
-        table,
-        (file, join_path(scope @ [name])),
-        classNames,
-      );
-    };
-
-  let lookup = (~file: string, ~path: list(string)): option(list(string)) =>
-    Hashtbl.find_opt(table, (file, join_path(path)));
-
-  let module_exists = (~file: string, ~path: list(string)): bool =>
-    Hashtbl.mem(local_modules, (file, join_path(path)));
-
-  let alias_target =
-      (~file: string, ~path: list(string)): option(list(string)) =>
-    Hashtbl.find_opt(aliases, (file, join_path(path)));
-
-  let include_module =
-      (~file: string, ~scope: list(string), ~module_path: list(string)) => {
-    let module_prefix = join_path(module_path);
-    let module_prefix_with_dot = module_prefix ++ ".";
-    let current_prefix = join_path(scope);
-    let copied = ref([]);
-    Hashtbl.iter(
-      ((entry_file, entry_path), classNames) =>
-        if (entry_file == file) {
-          let suffix =
-            if (entry_path == module_prefix) {
-              Some("");
-            } else if (String.length(entry_path)
-                       > String.length(module_prefix_with_dot)
-                       && String.sub(
-                            entry_path,
-                            0,
-                            String.length(module_prefix_with_dot),
-                          )
-                       == module_prefix_with_dot) {
-              Some(
-                String.sub(
-                  entry_path,
-                  String.length(module_prefix_with_dot),
-                  String.length(entry_path)
-                  - String.length(module_prefix_with_dot),
-                ),
-              );
-            } else {
-              None;
-            };
-          switch (suffix) {
-          | Some("") => ()
-          | Some(suffix) =>
-            let included_path =
-              current_prefix == "" ? suffix : current_prefix ++ "." ++ suffix;
-            copied := [(included_path, classNames), ...copied^];
-          | None => ()
-          };
-        },
-      table,
-    );
-    List.iter(
-      ((included_path, classNames)) =>
-        Hashtbl.replace(table, (file, included_path), classNames),
-      copied^,
-    );
-  };
-
-  let clear = () => {
-    Hashtbl.clear(table);
-    Hashtbl.clear(local_modules);
-    Hashtbl.clear(aliases);
-  };
-};
-
 module Buffer = {
   type rule = (string, string);
   let accumulated_rules: ref(list(rule)) = ref([]);
@@ -235,159 +101,6 @@ module Css_transform = {
     switch (label) {
     | Some(name) => Printf.sprintf("css-%s-%s", hash, name)
     | None => Printf.sprintf("css-%s", hash)
-    };
-  };
-
-  let path_segments = (path_str: string): list(string) =>
-    String.split_on_char('.', path_str);
-
-  let enclosing_scopes = (scope: list(string)): list(list(string)) => {
-    let rec loop = (current, acc) =>
-      switch (current) {
-      | [] => List.rev([[], ...acc])
-      | _ =>
-        let parent = List.rev(List.tl(List.rev(current)));
-        loop(parent, [current, ...acc]);
-      };
-    loop(scope, []);
-  };
-
-  let module_path_of_ref = segments =>
-    switch (List.rev(segments)) {
-    | []
-    | [_] => None
-    | [_binding, ...module_rev] => Some(List.rev(module_rev))
-    };
-
-  let expand_alias = (~file, ~path) =>
-    switch (Class_registry.alias_target(~file, ~path)) {
-    | Some(target) => target
-    | None => path
-    };
-
-  let is_self_module_ref = (~file, ~scope, ~base_scope, segments) =>
-    switch (module_path_of_ref(segments)) {
-    | None => false
-    | Some(module_path) =>
-      expand_alias(~file, ~path=base_scope @ module_path) == scope
-    };
-
-  let candidate_with_alias = (~file, path) =>
-    switch (module_path_of_ref(path)) {
-    | None => path
-    | Some(module_path) =>
-      switch (List.rev(path)) {
-      | [] => path
-      | [binding, ..._] =>
-        expand_alias(~file, ~path=module_path) @ [binding]
-      }
-    };
-
-  let local_candidates = (~file, ~scope, ~opens, segments) => {
-    let lexical_candidates =
-      enclosing_scopes(scope)
-      |> List.filter_map(base_scope =>
-           is_self_module_ref(~file, ~scope, ~base_scope, segments)
-             ? None
-             : Some(candidate_with_alias(~file, base_scope @ segments))
-         );
-    let open_candidates =
-      opens
-      |> List.map(open_path =>
-           candidate_with_alias(
-             ~file,
-             expand_alias(~file, ~path=open_path) @ segments,
-           )
-         );
-    lexical_candidates @ open_candidates;
-  };
-
-  let lookup_local_class_ref = (~file, ~scope, ~opens, path_str) => {
-    let segments = path_segments(path_str);
-    local_candidates(~file, ~scope, ~opens, segments)
-    |> List.find_map(path => Class_registry.lookup(~file, ~path));
-  };
-
-  let ref_matches_local_module = (~file, ~scope, ~opens, path_str) => {
-    let segments = path_segments(path_str);
-    switch (module_path_of_ref(segments)) {
-    | None => false
-    | Some(module_path) =>
-      let lexical_paths =
-        enclosing_scopes(scope)
-        |> List.map(base_scope =>
-             expand_alias(~file, ~path=base_scope @ module_path)
-           );
-      let open_paths =
-        opens
-        |> List.map(open_path =>
-             expand_alias(
-               ~file,
-               ~path=expand_alias(~file, ~path=open_path) @ module_path,
-             )
-           );
-      lexical_paths
-      @ open_paths
-      |> List.exists(path =>
-           path != scope && Class_registry.module_exists(~file, ~path)
-         );
-    };
-  };
-
-  /* Resolve a `$(name)` selector interpolation.
-
-     Same-module references (`$(local)`) look up the per-file [%cx2] class
-     registry and substitute actual class names directly into the CSS AST.
-     No literal `$(...)` reaches extracted CSS and no phantom CSS custom
-     property is emitted onto the runtime tuple.
-
-     Dotted local references (`$(Css.marker)`) are resolved by walking the
-     current lexical scope outward, matching the useful subset of OCaml's
-     expression lookup that is available before typing.
-
-     Cross-module references (`$(M.binding)`) cannot be resolved at PPX
-     time â module M compiles separately. We record the reference
-     in [Cross_module_refs] and substitute a NUL-delimited sentinel "class
-     name" that survives CSS rendering verbatim. The post-build aggregator
-     ([styled-ppx.generate]) scans rendered rules for these sentinels and
-     replaces them with the real class chains it indexed from every
-     module's post-PPX [.ml] file.
-
-     Unresolved same-module refs still raise at PPX time. */
-  let resolve_selector_class_ref =
-      (
-        ~file: string,
-        ~scope: list(string),
-        ~opens: list(list(string)),
-        ~loc,
-        path_str: string,
-      ) => {
-    switch (lookup_local_class_ref(~file, ~scope, ~opens, path_str)) {
-    | Some(classNames) => classNames
-    | None
-        when
-          String.contains(path_str, '.')
-          && !ref_matches_local_module(~file, ~scope, ~opens, path_str) =>
-      let segments = path_segments(path_str);
-      let longident =
-        switch (module_path_of_ref(segments), List.rev(segments)) {
-        | (Some(module_path), [binding, ..._]) =>
-          String.concat(
-            ".",
-            expand_alias(~file, ~path=module_path) @ [binding],
-          )
-        | _ => path_str
-        };
-      Cross_module_refs.record(~file, ~longident, ~loc);
-      [Cross_module_refs.sentinel(longident)];
-    | None =>
-      Ppxlib.Location.raise_errorf(
-        ~loc,
-        "Selector interpolation `$(%s)` does not refer to a [%%cx2] binding or string literal earlier in this module.\n- If `%s` is bound to a [%%cx2] or string literal later in the file, reorder the bindings.\n- If `%s` is a computed string, inline the class name literally.\n- Otherwise, use [%%cx] for runtime substitution.",
-        path_str,
-        path_str,
-        path_str,
-      )
     };
   };
 
@@ -609,7 +322,7 @@ module Css_transform = {
          caller (`transform_compound_selector`) only places this in the
          `type_selector` slot, never in `subclass_selectors`. */
       let resolved =
-        resolve_selector_class_ref(
+        Local_selector_environment.resolve_selector_class_ref(
           ~file,
           ~scope,
           ~opens,
@@ -660,7 +373,7 @@ module Css_transform = {
     switch (subclass) {
     | ClassVariable(path_str, var_loc) =>
       let classNames =
-        resolve_selector_class_ref(
+        Local_selector_environment.resolve_selector_class_ref(
           ~file,
           ~scope,
           ~opens,
@@ -1343,6 +1056,6 @@ let push_global =
 let get = () => {
   let rules = Buffer.get_rules();
   Buffer.clear();
-  Class_registry.clear();
+  Local_selector_environment.clear();
   rules;
 };

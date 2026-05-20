@@ -8534,17 +8534,6 @@ let findProperty = name => {
   properties |> List.find_opt(((key, _)) => key == name);
 };
 
-let isVariableDeclaration = name => String.sub(name, 0, 2) == "--";
-
-let render_variable_declaration = (~loc, property, value) => {
-  [%expr
-   CSS.unsafe(
-     [%e render_string(~loc, property)],
-     [%e render_string(~loc, value)],
-   )
-  ];
-};
-
 let render_to_expr = (~loc, property, value, important) => {
   let.ok expr_of_string =
     switch (findProperty(property)) {
@@ -8562,8 +8551,14 @@ let render_to_expr = (~loc, property, value, important) => {
 };
 
 let render = (~loc: Location.t, ~raw_value_source, property, value, important) =>
-  if (isVariableDeclaration(property)) {
-    Ok([render_variable_declaration(~loc, property, raw_value_source)]);
+  if (Custom_property_runtime.is_name(property)) {
+    Ok([
+      Custom_property_runtime.render_declaration(
+        ~loc,
+        ~property,
+        ~raw_value_source,
+      ),
+    ]);
   } else {
     let.ok () =
       switch (Property_parser.validate_property(~loc, ~name=property, value)) {

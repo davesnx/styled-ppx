@@ -24,44 +24,6 @@
 
     See [documents/cross-module-selector-interpolation.md]. *)
 
-(** [\x00] is the only byte we use as a sentinel delimiter. It cannot appear in
-    valid CSS, in user [%cx2] source, or in OCaml string literals as plain text,
-    so collisions are impossible by construction. *)
-let sentinel_byte = '\x00'
-
-(** Decode an OCaml expression that's a string literal back to its value. Used
-    to read string fields out of the various [[\@\@\@css.* ...]] attribute
-    payloads. *)
-let string_of_const_expr (e : Ppxlib.expression) : string option =
-  match e.pexp_desc with
-  | Pexp_constant (Pconst_string (s, _, _)) -> Some s
-  | _ -> None
-
-(** Decode an OCaml expression that's an int literal back to its value. Used to
-    read line/column fields out of [[\@\@\@css.refs ...]] payloads. *)
-let int_of_const_expr (e : Ppxlib.expression) : int option =
-  match e.pexp_desc with
-  | Pexp_constant (Pconst_integer (s, _)) -> Some (int_of_string s)
-  | _ -> None
-
-(** Walk a list expression like [[a; b; c]] and decode each element via
-    [decode]. Decoded entries are returned in source order; elements that fail
-    to decode are silently skipped (they shouldn't exist in well-formed PPX
-    output). *)
-let decode_list ~decode (e : Ppxlib.expression) =
-  let rec loop (e : Ppxlib.expression) acc =
-    match e.pexp_desc with
-    | Pexp_construct ({ txt = Lident "[]"; _ }, None) -> List.rev acc
-    | Pexp_construct
-        ({ txt = Lident "::"; _ }, Some { pexp_desc = Pexp_tuple [ hd; tl ]; _ })
-      ->
-      (match decode hd with
-      | Some v -> loop tl (v :: acc)
-      | None -> loop tl acc)
-    | _ -> List.rev acc
-  in
-  loop e []
-
 (** Root module segment of a dotted longident. [["M.Css.marker"]] -> [["M"]];
     [["foo"]] -> [["foo"]]. *)
 let longident_head longident =
@@ -78,19 +40,15 @@ module Index = struct
 
   let create () : t = Hashtbl.create 64
 
-  (** Decode a single [(longident, class_string)] tuple. *)
-  let decode_binding (e : Ppxlib.expression) : (string * string) option =
-    match e.pexp_desc with
-    | Pexp_tuple [ longident_e; class_e ] ->
-      (match string_of_const_expr longident_e, string_of_const_expr class_e with
-      | Some longident, Some class_string -> Some (longident, class_string)
-      | _ -> None)
-    | _ -> None
-
   let add_from_payload (idx : t) payload =
-    decode_list ~decode:decode_binding payload
-    |> List.iter (fun (longident, class_string) ->
-      Hashtbl.replace idx longident class_string)
+    match Css_extraction.decode_bindings_payload payload with
+    | Error msg -> Error msg
+    | Ok entries ->
+      List.iter
+        (fun (entry : Css_extraction.binding) ->
+          Hashtbl.replace idx entry.longident entry.class_string)
+        entries;
+      Ok ()
 end
 
 (** Every
@@ -98,32 +56,9 @@ end
     attribute decoded into a list of records. The aggregator uses these
     locations when reporting unresolvable refs. *)
 module Refs = struct
-  type ref_loc = {
-    longident : string;
-    file : string;
-    start_line : int;
-    start_col : int;
-    end_col : int;
-  }
+  type ref_loc = Css_extraction.ref_loc
 
-  (** Decode a single tuple expression like [("M.Css.marker", "n.re", 5, 6, 18)]
-      into a [ref_loc]. *)
-  let decode_ref (e : Ppxlib.expression) : ref_loc option =
-    match e.pexp_desc with
-    | Pexp_tuple [ longident_e; file_e; sl_e; sc_e; ec_e ] ->
-      (match
-         ( string_of_const_expr longident_e,
-           string_of_const_expr file_e,
-           int_of_const_expr sl_e,
-           int_of_const_expr sc_e,
-           int_of_const_expr ec_e )
-       with
-      | Some longident, Some file, Some sl, Some sc, Some ec ->
-        Some { longident; file; start_line = sl; start_col = sc; end_col = ec }
-      | _ -> None)
-    | _ -> None
-
-  let of_list_expr = decode_list ~decode:decode_ref
+  let of_list_expr = Css_extraction.decode_refs_payload
 end
 
 (** Per-file harvest: rules with potential sentinels, plus all cross-module ref
@@ -133,25 +68,42 @@ type harvest = {
   filename : string;
   rules : string list;
   refs : Refs.ref_loc list;
+  protocol_errors : string list;
 }
 
 let harvest_structure ~filename ~idx structure : harvest =
   let rules = ref [] in
   let refs = ref [] in
+  let protocol_errors = ref [] in
+  let add_protocol_error attribute msg =
+    protocol_errors :=
+      Printf.sprintf "%s: malformed [@@@%s]: %s" filename attribute msg
+      :: !protocol_errors
+  in
   List.iter
     (fun item ->
       match item with
       | [%stri [@@@css [%e? value]]] ->
-        (match string_of_const_expr value with
-        | Some v -> rules := v :: !rules
-        | None -> ())
+        (match Css_extraction.decode_css_payload value with
+        | Ok v -> rules := v :: !rules
+        | Error msg -> add_protocol_error Css_extraction.css_attribute_name msg)
       | [%stri [@@@css.refs [%e? value]]] ->
-        refs := Refs.of_list_expr value @ !refs
+        (match Refs.of_list_expr value with
+        | Ok entries -> refs := entries @ !refs
+        | Error msg -> add_protocol_error Css_extraction.refs_attribute_name msg)
       | [%stri [@@@css.bindings [%e? value]]] ->
-        Index.add_from_payload idx value
+        (match Index.add_from_payload idx value with
+        | Ok () -> ()
+        | Error msg ->
+          add_protocol_error Css_extraction.bindings_attribute_name msg)
       | _ -> ())
     structure;
-  { filename; rules = List.rev !rules; refs = List.rev !refs }
+  {
+    filename;
+    rules = List.rev !rules;
+    refs = List.rev !refs;
+    protocol_errors = List.rev !protocol_errors;
+  }
 
 (** Read a post-PPX [.ml] file or its serialized [.pp.ml] AST into a ppxlib
     structure. File-read and parse errors are surfaced unconditionally (not
@@ -184,64 +136,6 @@ let read_structure filename : Ppxlib.structure option =
     Printf.eprintf "styled-ppx aggregator: cannot parse %s: %s\n" filename
       (Printexc.to_string exn);
     None
-
-(** Resolve every [\x00LONGIDENT\x00] sentinel in [rule] against [idx].
-    Multi-class bindings yield space-separated class strings — we convert those
-    to dot-chains, since sentinels appear inside CSS selectors where the chain
-    form is required.
-
-    On unresolved longident, calls [on_error] with the offending longident.
-    [on_error] decides whether to raise or accumulate; we use a callback so the
-    caller can collect all errors before bailing. *)
-let resolve_sentinels ~idx ~on_error (rule : string) : string =
-  let buf = Buffer.create (String.length rule) in
-  let len = String.length rule in
-  let i = ref 0 in
-  while !i < len do
-    let c = rule.[!i] in
-    if c = sentinel_byte then begin
-      (* Find the closing sentinel byte. *)
-      let start = !i + 1 in
-      let stop =
-        let rec find j =
-          if j >= len then None
-          else if rule.[j] = sentinel_byte then Some j
-          else find (j + 1)
-        in
-        find start
-      in
-      match stop with
-      | None ->
-        (* Unterminated sentinel — preserve as-is. Should never happen
-           for well-formed PPX output. *)
-        Buffer.add_char buf c;
-        incr i
-      | Some j ->
-        let longident = String.sub rule start (j - start) in
-        (match Hashtbl.find_opt idx longident with
-        | Some class_string ->
-          (* "css-A css-B" → "css-A.css-B" so it slots into selector chains. *)
-          let chain =
-            String.split_on_char ' ' class_string
-            |> List.filter (fun s -> s <> "")
-            |> String.concat "."
-          in
-          Buffer.add_string buf chain
-        | None ->
-          on_error longident;
-          (* Preserve the sentinel literally so the final CSS is
-             obviously broken if errors are non-fatal. *)
-          Buffer.add_char buf c;
-          Buffer.add_string buf longident;
-          Buffer.add_char buf c);
-        i := j + 1
-    end
-    else begin
-      Buffer.add_char buf c;
-      incr i
-    end
-  done;
-  Buffer.contents buf
 
 (** Format an aggregator error in the OCaml [File "..."] convention so editors
     pick it up the same way they pick up compiler errors. *)
@@ -317,7 +211,9 @@ let run ~verbose ~minify ~output_file input_files =
   in
 
   (* Resolve all rules across all harvests, collecting errors with locations. *)
-  let errors = ref [] in
+  let errors =
+    ref (List.concat_map (fun harvest -> harvest.protocol_errors) harvests)
+  in
   let resolved_rules = ref [] in
   List.iter
     (fun harvest ->
@@ -332,20 +228,24 @@ let run ~verbose ~minify ~output_file input_files =
               with
               | Some r -> r
               | None ->
-                {
-                  Refs.longident;
-                  file = harvest.filename;
-                  start_line = 1;
-                  start_col = 0;
-                  end_col = 0;
-                }
+                Css_extraction.ref_loc ~longident ~file:harvest.filename
+                  ~start_line:1 ~start_col:0 ~end_col:0
             in
             let msg =
               unresolved_message ~longident ~ref_loc ~in_library_modules
             in
             errors := msg :: !errors
           in
-          let resolved = resolve_sentinels ~idx ~on_error rule in
+          let on_malformed msg =
+            errors :=
+              Printf.sprintf "%s: malformed [@@@%s]: %s" harvest.filename
+                Css_extraction.css_attribute_name msg
+              :: !errors
+          in
+          let resolved =
+            Css_extraction.resolve_sentinels ~lookup:(Hashtbl.find_opt idx)
+              ~on_unresolved:on_error ~on_malformed rule
+          in
           resolved_rules := resolved :: !resolved_rules)
         harvest.rules)
     harvests;

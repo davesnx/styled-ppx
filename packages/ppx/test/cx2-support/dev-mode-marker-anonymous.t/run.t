@@ -1,6 +1,6 @@
 Anonymous bindings (`let _ = ...`) and statement-position [%cx2] (no
 enclosing let) get no marker even with --dev. The `_` filter inside
-`Dev_mode.marker` matches `Class_registry.register`'s anonymous-binding
+`Dev_mode.marker` matches `Local_selector_environment.register`'s anonymous-binding
 behavior; this keeps the two debug affordances symmetric.
 
   $ cat > dune-project << EOF

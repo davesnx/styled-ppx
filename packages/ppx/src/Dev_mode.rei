@@ -8,7 +8,7 @@
 
     The marker is filtered out for anonymous bindings ([None]) and for
     bindings explicitly named [_], matching the behavior of
-    {!Css_file.Class_registry.register}. This keeps the two debug
+    {!Local_selector_environment.register}. This keeps the two debug
     affordances (DOM marker and selector interpolation [$(name)]) in
     sync. */;
 

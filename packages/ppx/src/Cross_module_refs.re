@@ -3,13 +3,8 @@ type entry = {
   loc: Ppxlib.Location.t,
 };
 
-/* NUL byte — cannot appear in valid CSS, in user [%cx2] source, or in OCaml
-   string literals as plain text. The aggregator scans for `\x00LONGIDENT\x00`
-   pairs in [@@@css ...] payloads and substitutes resolved class chains. */
-let sentinel_byte = "\x00";
-
 let sentinel = (longident: string): string =>
-  sentinel_byte ++ longident ++ sentinel_byte;
+  Css_extraction.sentinel(longident);
 
 /* Insertion-ordered list of entries; reversed on drain. The companion
    [seen] hashtable dedups by [(longident, file, cnum)] so [record] runs

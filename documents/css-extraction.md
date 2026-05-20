@@ -139,10 +139,10 @@ transformer at end-of-CU:
 | Buffer                              | Source                         | Sink                              |
 | ----------------------------------- | ------------------------------ | --------------------------------- |
 | `Css_file.Buffer`                   | atomized rules during expansion | `[@@@css "..."]` attributes       |
-| `Css_bindings` (new module)         | each named `[%cx2]` expansion  | `[@@@css.bindings ...]` attribute |
-| `Cross_module_refs` (new module)    | each unresolved `$(M.x)` in selector position | `[@@@css.refs ...]` attribute + synthetic `let _ = M.x` |
+| `Css_bindings`                      | each named `[%cx2]` expansion  | `[@@@css.bindings ...]` attribute |
+| `Cross_module_refs`                 | each unresolved `$(M.x)` in selector position | `[@@@css.refs ...]` attribute + synthetic `let _ = M.x` |
 
-`Css_file.Class_registry` is a fourth piece of state, distinct from the
+`Local_selector_environment` is a fourth piece of state, distinct from the
 three above: it serves same-file selector interpolation before cross-module
 fallback. It is keyed by `(file, lexical_path)` and never escapes the CU.
 It tracks named `[%cx2]` bindings, same-file module aliases, same-file
@@ -207,17 +207,17 @@ Per-CU buffer of `(longident, class_string)` exports. The ordered `[%cx2]`
 structure pass computes the longident from the compilation unit name + current
 submodule path + the enclosing top-level value name, then calls
 `Css_bindings.record`. Last-write-wins on duplicates within a CU (matches
-`Class_registry` shadowing semantics).
+`Local_selector_environment` shadowing semantics).
 
 ### `Cross_module_refs`
 
-Per-CU buffer populated by `Css_file.resolve_selector_class_ref` when the
-requested dotted `$(name)` cannot be resolved against a same-file `[%cx2]`
-binding, same-file module alias, same-file open/include, or earlier string
-literal. Records `(longident, location)` and produces a NUL-delimited sentinel
-string that gets baked into the rule the PPX is currently rendering. The
-sentinel survives CSS rendering verbatim and is resolved later by the
-aggregator.
+Per-CU buffer populated by
+`Local_selector_environment.resolve_selector_class_ref` when the requested
+dotted `$(name)` cannot be resolved against a same-file `[%cx2]` binding,
+same-file module alias, same-file open/include, or earlier string literal.
+Records `(longident, location)` and produces a NUL-delimited sentinel string
+that gets baked into the rule the PPX is currently rendering. The sentinel
+survives CSS rendering verbatim and is resolved later by the aggregator.
 
 ## Aggregator responsibilities
 

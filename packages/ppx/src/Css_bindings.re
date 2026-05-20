@@ -7,7 +7,7 @@ type entry = {
    [seen] hashtable suppresses duplicate longidents from late writes
    (e.g. shadowing within the same CU) so [record] runs in amortized
    O(1) and the drained list is a sane index export. Last-write-wins
-   semantics match [Class_registry]'s same-module behavior. */
+   semantics match [Local_selector_environment]'s same-module behavior. */
 let entries: ref(list(entry)) = ref([]);
 let seen: Hashtbl.t(string, unit) = Hashtbl.create(16);
 

@@ -5,6 +5,7 @@
  (flags
   (:standard -w -9))
  (libraries
+  styled-ppx.css-extraction
   styled-ppx.css-parser
   styled-ppx.css-grammar-parser
   styled-ppx.murmur2

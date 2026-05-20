@@ -284,65 +284,25 @@ let make_styled_extension = htmlTag => {
   );
 };
 
-/* Build a top-level floating attribute `[@@@<name> <expr>]`. The
-   metaquot dialect around floating attributes is awkward in Reason
-   syntax, so we go via the explicit Ast_builder constructors. */
-let make_list_attribute = (~name: string, expr: Ppxlib.expression) => {
-  let loc = Ppxlib.Location.none;
-  let payload = Ppxlib.PStr([Builder.pstr_eval(~loc, expr, [])]);
-  let attr =
-    Builder.attribute(
-      ~loc,
-      ~name={
-        Ppxlib.Location.txt: name,
-        loc,
-      },
-      ~payload,
-    );
-  Builder.pstr_attribute(~loc, attr);
-};
+let make_refs_attribute = (entries: list(Cross_module_refs.entry)) =>
+  entries
+  |> List.map((entry: Cross_module_refs.entry) =>
+       Css_extraction.ref_loc_of_location(
+         ~longident=entry.longident,
+         entry.loc,
+       )
+     )
+  |> Css_extraction.refs_attribute;
 
-/* Build [@@@css.refs [(longident, file, line, scol, ecol); ...]]. The
-   aggregator uses this list to format errors with original source
-   locations when cross-module sentinels cannot be resolved. */
-let make_refs_attribute = (entries: list(Cross_module_refs.entry)) => {
-  let loc = Ppxlib.Location.none;
-  let entry_to_expr = (entry: Cross_module_refs.entry) => {
-    let pos_start = entry.loc.loc_start;
-    let pos_end = entry.loc.loc_end;
-    let col = (pos: Lexing.position) =>
-      Builder.eint(~loc, pos.pos_cnum - pos.pos_bol);
-    Builder.pexp_tuple(
-      ~loc,
-      [
-        Builder.estring(~loc, entry.longident),
-        Builder.estring(~loc, pos_start.pos_fname),
-        Builder.eint(~loc, pos_start.pos_lnum),
-        col(pos_start),
-        col(pos_end),
-      ],
-    );
-  };
-  let list_expr = Builder.elist(~loc, List.map(entry_to_expr, entries));
-  make_list_attribute(~name="css.refs", list_expr);
-};
-
-/* Build [@@@css.bindings [(longident, class_string); ...]]. Every named
-   [%cx2] binding contributes one pair so the aggregator can index it
-   directly without re-parsing CSS.make calls out of the post-PPX AST. */
-let make_bindings_attribute = (entries: list(Css_bindings.entry)) => {
-  let loc = Ppxlib.Location.none;
-  let entry_to_expr = (entry: Css_bindings.entry) =>
-    Builder.pexp_tuple(
-      ~loc,
-      [
-        Builder.estring(~loc, entry.longident),
-        Builder.estring(~loc, entry.class_string),
-      ],
-    );
-  let list_expr = Builder.elist(~loc, List.map(entry_to_expr, entries));
-  make_list_attribute(~name="css.bindings", list_expr);
-};
+let make_bindings_attribute = (entries: list(Css_bindings.entry)) =>
+  entries
+  |> List.map((entry: Css_bindings.entry) =>
+       Css_extraction.binding(
+         ~longident=entry.longident,
+         ~class_string=entry.class_string,
+       )
+     )
+  |> Css_extraction.bindings_attribute;
 
 let make_synthetic_dep = ((longident_str: string, loc: Ppxlib.Location.t)) => {
   let lid = Ppxlib.Longident.parse(longident_str);
@@ -422,7 +382,7 @@ let cx2_error_expr = (~payload_loc) => {
 };
 
 let record_cx2_binding = (~file, ~main_module, ~scope, ~name, ~classNames) => {
-  Css_file.Class_registry.register(~file, ~scope, ~name, ~classNames);
+  Local_selector_environment.register(~file, ~scope, ~name, ~classNames);
   let longident = String.concat(".", [main_module, ...scope] @ [name]);
   let class_string = String.concat(" ", classNames);
   Css_bindings.record(~longident, ~class_string);
@@ -638,7 +598,7 @@ let binding_name_from_pat = (pat: Ppxlib.pattern): option(string) =>
 let register_string_binding = (~file, ~scope, ~name, expr: Ppxlib.expression) =>
   switch (expr.pexp_desc) {
   | Pexp_constant(Pconst_string(value, _, _)) =>
-    Css_file.Class_registry.register(
+    Local_selector_environment.register(
       ~file,
       ~scope,
       ~name,
@@ -716,40 +676,6 @@ let module_path_from_expr = (expr: Ppxlib.module_expr): option(list(string)) =>
   switch (expr.pmod_desc) {
   | Pmod_ident({ txt: lid, _ }) => Some(longident_segments(lid))
   | _ => None
-  };
-
-let enclosing_scopes = (scope: list(string)): list(list(string)) => {
-  let rec loop = (current, acc) =>
-    switch (current) {
-    | [] => List.rev([[], ...acc])
-    | _ =>
-      let parent = List.rev(List.tl(List.rev(current)));
-      loop(parent, [current, ...acc]);
-    };
-  loop(scope, []);
-};
-
-let canonical_local_absolute_module_path = (~file, path) =>
-  switch (Css_file.Class_registry.alias_target(~file, ~path)) {
-  | Some(target)
-      when Css_file.Class_registry.module_exists(~file, ~path=target) =>
-    Some(target)
-  | Some(_) => None
-  | None when Css_file.Class_registry.module_exists(~file, ~path) =>
-    Some(path)
-  | None => None
-  };
-
-let canonical_local_module_path = (~file, ~scope, path) =>
-  enclosing_scopes(scope)
-  |> List.find_map(base_scope =>
-       canonical_local_absolute_module_path(~file, base_scope @ path)
-     );
-
-let module_alias_target = (~file, ~scope, path) =>
-  switch (canonical_local_module_path(~file, ~scope, path)) {
-  | Some(local_path) => local_path
-  | None => path
   };
 
 let rec map_ordered_module_expr =
@@ -831,14 +757,22 @@ and map_ordered_structure = (~file, ~main_module, ~scope, items) => {
         let module_scope = scope @ [name];
         switch (module_path_from_expr(binding.pmb_expr)) {
         | Some(target) =>
-          Css_file.Class_registry.register_alias(
+          Local_selector_environment.register_alias(
             ~file,
             ~scope,
             ~name,
-            ~target=module_alias_target(~file, ~scope, target),
+            ~target=
+              Local_selector_environment.module_alias_target(
+                ~file,
+                ~scope,
+                target,
+              ),
           )
         | None =>
-          Css_file.Class_registry.register_module(~file, ~path=module_scope)
+          Local_selector_environment.register_module(
+            ~file,
+            ~path=module_scope,
+          )
         };
         let expr =
           map_ordered_module_expr(
@@ -861,7 +795,13 @@ and map_ordered_structure = (~file, ~main_module, ~scope, items) => {
     | Pstr_open(open_decl) =>
       switch (module_path_from_expr(open_decl.popen_expr)) {
       | Some(path) =>
-        switch (canonical_local_module_path(~file, ~scope, path)) {
+        switch (
+          Local_selector_environment.resolve_local_module_path(
+            ~file,
+            ~scope,
+            path,
+          )
+        ) {
         | Some(path) => opens := [path, ...opens^]
         | None => ()
         }
@@ -871,9 +811,15 @@ and map_ordered_structure = (~file, ~main_module, ~scope, items) => {
     | Pstr_include(include_decl) =>
       switch (module_path_from_expr(include_decl.pincl_mod)) {
       | Some(path) =>
-        switch (canonical_local_module_path(~file, ~scope, path)) {
+        switch (
+          Local_selector_environment.resolve_local_module_path(
+            ~file,
+            ~scope,
+            path,
+          )
+        ) {
         | Some(path) =>
-          Css_file.Class_registry.include_module(
+          Local_selector_environment.include_module(
             ~file,
             ~scope,
             ~module_path=path,
@@ -890,7 +836,7 @@ and map_ordered_structure = (~file, ~main_module, ~scope, items) => {
             switch (binding.pmb_name.txt) {
             | Some(name) =>
               let module_scope = scope @ [name];
-              Css_file.Class_registry.register_module(
+              Local_selector_environment.register_module(
                 ~file,
                 ~path=module_scope,
               );
@@ -954,7 +900,6 @@ let () = {
   );
 
   let impl = (_ctx, str: Ppxlib.structure) => {
-    let loc = Ppxlib.Location.none;
     let file =
       switch (str) {
       | [first, ..._] => first.pstr_loc.loc_start.pos_fname
@@ -963,11 +908,7 @@ let () = {
     let main_module = module_name_of_file(file);
     let str = map_ordered_structure(~file, ~main_module, ~scope=[], str);
     let rules = Css_file.get();
-    let rule_items =
-      List.map(
-        rule => [%stri [@css [%e Builder.estring(~loc, rule)]]],
-        rules,
-      );
+    let rule_items = List.map(Css_extraction.css_attribute, rules);
     let binding_entries = Css_bindings.drain();
     let bindings_items =
       switch (binding_entries) {

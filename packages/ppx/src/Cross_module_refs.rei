@@ -9,7 +9,8 @@
     let the post-build aggregator ([styled-ppx.generate]) substitute the
     real class names once every module's post-PPX [.ml] file is available.
 
-    The buffer is populated by [Css_file.resolve_selector_class_ref]'s
+    The buffer is populated by
+    [Local_selector_environment.resolve_selector_class_ref]'s
     cross-module branch and drained by [ppx.re]'s impl transformer. The
     drain emits two structure items per CU with cross-module refs:
 

@@ -1,0 +1,4 @@
+(library
+ (name css_extraction)
+ (public_name styled-ppx.css-extraction)
+ (libraries ppxlib ppxlib.astlib))

@@ -13,6 +13,9 @@ See also:
   the static-extraction family (`[%cx2]`, `[%styled.global2]`,
   `[%keyframe2]`), including cross-module selector resolution
   (sentinel format and aggregator behavior).
+- `documents/runtime-lowering-and-interpolation-identity.md` — migration
+  design for property-centered runtime lowering and safer static
+  interpolation identity.
 
 ## Status
 
@@ -55,18 +58,18 @@ extraction:
 3. Atomize declarations in `packages/ppx/src/Css_file.re`
 4. Extract interpolation types with `Css_grammar.Parser.get_interpolation_types`
 5. Resolve class-name interpolation in selectors against the per-file
-   `Class_registry` (see `packages/ppx/src/Css_file.re`) so `$(name)` is
+   `Local_selector_environment` so `$(name)` is
    replaced with the actual minted class names before the CSS AST is rendered
 6. Generate `CSS.make(...)` calls and emit `[@css ...]` attributes
 
-The `Class_registry` is populated as each `[%cx2]` extension expands: the
-enclosing `let`-binding name (from `Code_path.enclosing_value`) is mapped to
-the list of class names that atomization produced. Later `[%cx2]` blocks in
-the same file resolve `&.$(name)` and similar selector interpolations against
-that table, fanning a multi-declaration source binding into a chained compound
-selector (`&.cssA.cssB`). Cross-module and unresolved references raise a
-clear PPX error rather than emitting a literal `$(...)` placeholder into the
-extracted CSS.
+`Local_selector_environment` is populated as each `[%cx2]` extension expands:
+the enclosing `let`-binding name (from `Code_path.enclosing_value`) is mapped to
+the list of class names that atomization produced. Later `[%cx2]` blocks in the
+same file resolve `&.$(name)` and similar selector interpolations against that
+environment, fanning a multi-declaration source binding into a chained compound
+selector (`&.cssA.cssB`). Cross-module and unresolved references raise a clear
+PPX error rather than emitting a literal `$(...)` placeholder into the extracted
+CSS.
 
 This path still depends on reparsing value strings when interpolation typing or
 property validation is needed.
@@ -240,7 +243,7 @@ module Theme = [%styled.global2 {|
 
 Resolution rules (identical to `[%cx2]`):
 
-- Same-module `$(name)` looks up `Css_file.Class_registry`. Dotted
+- Same-module `$(name)` looks up `Local_selector_environment`. Dotted
   same-file refs such as `$(Css.marker)` search from the current
   submodule scope outward before falling back to cross-module handling.
   Same-file aliases, opens, includes, and earlier string literals are
@@ -288,7 +291,7 @@ module ThemeStyles = [%styled.global2 {|
 | Parse error from `Driver.parse_declaration_list`                          | `Pmod_extension` carrying the parser's location and message.                                                                              |
 | Non-string payload                                                        | `Pmod_extension` pointing at the payload, with the correct-form example.                                                                  |
 | Legacy `let () =` shape                                                   | `Error.expr` diagnostic from the Expression-context extension.                                                                            |
-| Selector interp `$(name)` references undefined or forward local binding   | `raise_errorf` from `Css_file.resolve_selector_class_ref` pointing at the interpolation.                                                  |
+| Selector interp `$(name)` references undefined or forward local binding   | `raise_errorf` from `Local_selector_environment.resolve_selector_class_ref` pointing at the interpolation.                                                  |
 | Bare `$(name)` (no `.` prefix) resolves to multiple classes               | `raise_errorf` instructing the user to switch to `.$(name)` for chain semantics.                                                          |
 | Cross-module `$(M.x)` where `M.x` doesn't exist at link time              | `Unbound module` / `Unbound value` from OCaml typechecker via the synthetic `let _ = M.x`; aggregator also reports a missing-binding error using the location stored in `[@@@css.refs ...]`. |
 
@@ -298,6 +301,7 @@ module ThemeStyles = [%styled.global2 {|
 | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `packages/ppx/src/ppx.re`                       | Two extensions: Module_expr-context (does the work) and Expression-context (migration error).                                                                                                                                       |
 | `packages/ppx/src/Css_file.re`                  | `push_global ~file rule_list` returns the list of `dynamic_vars` collected across all rules; pushes the static rules (with `var(--var-<hash>)` already substituted) into the global buffer.                                         |
+| `packages/ppx/src/Local_selector_environment.re` | Per-CU selector environment used by `[%cx2]` and `[%styled.global2]` for same-file selector interpolation, module aliases, opens/includes, and cross-module fallback.                                                               |
 | `packages/ppx/src/Css_global_to_string.re`      | `render_root_block ~loc dynamic_vars` builds the `to_string` body: a single `:root { ... }` rule with one declaration per entry, or `""` when `dynamic_vars` is empty.                                                              |
 | `packages/runtime/{native,melange}/CSS.ml`      | `CSS.global_style_tag : string -> React.element`.                                                                                                                                                                                   |
 
