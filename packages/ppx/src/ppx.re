@@ -778,37 +778,70 @@ let () = {
                       ),
                     );
                   } else {
-                    let dynamic_vars =
-                      Css_file.push_global(~file, rule_list);
-                    /* Build the structure of the generated module.
+                    let validations = type_check_rule_list(rule_list);
+                    switch (get_errors(validations)) {
+                    | [] =>
+                      let dynamic_vars =
+                        Css_file.push_global(~file, rule_list);
+                      /* Build the structure of the generated module.
 
-                       The runtime's contract here is narrow: supply
-                       values for the custom properties the static rule
-                       (already extracted via [@@@css ...]) references
-                       through `var()`. So `to_string` is a single
-                       `:root { --var-h: <value>; ... }` block, one
-                       declaration per dynamic_var. The user's
-                       selectors and non-interpolated declarations are
-                       NOT re-emitted at runtime. */
-                    let to_string_body =
-                      Css_global_to_string.render_root_block(
+                         The runtime's contract here is narrow: supply
+                         values for the custom properties the static rule
+                         (already extracted via [@@@css ...]) references
+                         through `var()`. So `to_string` is a single
+                         `:root { --var-h: <value>; ... }` block, one
+                         declaration per dynamic_var. The user's
+                         selectors and non-interpolated declarations are
+                         NOT re-emitted at runtime. */
+                      let to_string_body =
+                        Css_global_to_string.render_root_block(
+                          ~loc=stringLoc,
+                          dynamic_vars,
+                        );
+                      let to_string_decl = [%stri
+                        let to_string = () => [%e to_string_body]
+                      ];
+                      let to_buffer_decl = [%stri
+                        let to_buffer = buf =>
+                          Buffer.add_string(buf, to_string())
+                      ];
+                      let make_decl = [%stri
+                        let make = () => CSS.global_style_tag(to_string())
+                      ];
+                      Builder.pmod_structure(
                         ~loc=stringLoc,
-                        dynamic_vars,
+                        [to_string_decl, to_buffer_decl, make_decl],
                       );
-                    let to_string_decl = [%stri
-                      let to_string = () => [%e to_string_body]
-                    ];
-                    let to_buffer_decl = [%stri
-                      let to_buffer = buf =>
-                        Buffer.add_string(buf, to_string())
-                    ];
-                    let make_decl = [%stri
-                      let make = () => CSS.global_style_tag(to_string())
-                    ];
-                    Builder.pmod_structure(
-                      ~loc=stringLoc,
-                      [to_string_decl, to_buffer_decl, make_decl],
-                    );
+                    | errors =>
+                      let error_messages =
+                        errors
+                        |> List.map(((error_loc, error)) => {
+                             let adjusted_loc =
+                               Styled_ppx_css_parser.Parser_location.adjust_to_file(
+                                 ~relative_loc=error_loc,
+                                 ~base_loc=loc,
+                               );
+                             (adjusted_loc, error_to_string(error));
+                           });
+                      switch (error_messages) {
+                      | [(loc, msg)] =>
+                        Builder.pmod_extension(
+                          ~loc,
+                          Location.error_extensionf(~loc, "%s", msg),
+                        )
+                      | _ =>
+                        Builder.pmod_extension(
+                          ~loc=stringLoc,
+                          Ppxlib.Location.Error.to_extension(
+                            Ppxlib.Location.Error.make(
+                              ~loc=stringLoc,
+                              ~sub=error_messages,
+                              "Multiple errors on styled.global2 definition",
+                            ),
+                          ),
+                        )
+                      };
+                    };
                   };
                 | Error((loc, msg)) =>
                   Builder.pmod_extension(
