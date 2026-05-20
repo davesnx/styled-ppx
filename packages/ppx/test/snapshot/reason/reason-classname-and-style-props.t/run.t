@@ -1,7 +1,7 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  module SelectorsMediaQueries = {
+  module Box = {
     [@deriving (jsProperties, getSet)]
     type makeProps = {
       [@mel.optional]
@@ -960,22 +960,7 @@
     let deleteProp = [%mel.raw "(newProps, key) => delete newProps[key]"];
     external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
       "Object.assign";
-    let styles =
-      CSS.style([|
-        CSS.label("SelectorsMediaQueries"),
-        CSS.media(
-          {js|(min-width: 600px)|js},
-          [|CSS.backgroundColor(CSS.blue)|],
-        ),
-        CSS.selectorMany(
-          [|{js|&:hover|js}|],
-          [|CSS.backgroundColor(CSS.green)|],
-        ),
-        CSS.selectorMany(
-          [|{js|& > p|js}|],
-          [|CSS.color(CSS.pink), CSS.fontSize(`pxFloat(24.))|],
-        ),
-      |]);
+    let styles = CSS.style([|CSS.label("Box"), CSS.color(CSS.red)|]);
     let make = (props: makeProps) => {
       let className = styles ++ getOrEmpty(classNameGet(props));
       let stylesObject = {

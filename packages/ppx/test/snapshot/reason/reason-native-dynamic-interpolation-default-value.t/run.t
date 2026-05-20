@@ -283,8 +283,6 @@
       [@mel.optional]
       focusable: option(string),
       [@mel.optional]
-      fomat: option(string),
-      [@mel.optional]
       fontFamily: option(string),
       [@mel.optional]
       fontSize: option(string),
@@ -1110,7 +1108,6 @@
           ~floodColor=?floodColorGet(props),
           ~floodOpacity=?floodOpacityGet(props),
           ~focusable=?focusableGet(props),
-          ~fomat=?fomatGet(props),
           ~fontFamily=?fontFamilyGet(props),
           ~fontSize=?fontSizeGet(props),
           ~fontSizeAdjust=?fontSizeAdjustGet(props),
