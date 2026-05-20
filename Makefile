@@ -53,7 +53,6 @@ install: ## Install project dependencies
 
 .PHONY: pin
 pin: ## pin
-	opam pin add reason.3.17.3 "https://github.com/reasonml/reason.git#fix-stackoverflow-on-Pconstraint-414" -y
 	opam pin add server-reason-react.0.4.1 "https://github.com/ml-in-barcelona/server-reason-react.git#c9ab81197425d31a3deb03491871bab9dce5cb07" -y
 
 .PHONY: init
