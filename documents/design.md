@@ -240,9 +240,13 @@ module Theme = [%styled.global2 {|
 
 Resolution rules (identical to `[%cx2]`):
 
-- Same-module `$(name)` looks up `Css_file.Class_registry`. If the
-  binding hasn't been seen yet (forward ref) or doesn't exist, the
-  PPX raises a clear diagnostic at the interpolation's source
+- Same-module `$(name)` looks up `Css_file.Class_registry`. Dotted
+  same-file refs such as `$(Css.marker)` search from the current
+  submodule scope outward before falling back to cross-module handling.
+  Same-file aliases, opens, includes, and earlier string literals are
+  resolved by the ordered structure pass. If the binding hasn't been
+  seen yet (forward ref) or doesn't exist in a known local selector
+  path, the PPX raises a clear diagnostic at the interpolation's source
   location.
 - Cross-module `$(M.binding)` is recorded in `Cross_module_refs` and
   embedded as a sentinel string; the aggregator resolves it at link

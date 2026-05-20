@@ -143,10 +143,11 @@ transformer at end-of-CU:
 | `Cross_module_refs` (new module)    | each unresolved `$(M.x)` in selector position | `[@@@css.refs ...]` attribute + synthetic `let _ = M.x` |
 
 `Css_file.Class_registry` is a fourth piece of state, distinct from the
-three above: it serves only **same-module** `$(name)` selector
-interpolation. It is keyed by `(file, name)` and never escapes the CU.
-Cross-module references skip it entirely and go through
-`Cross_module_refs` instead.
+three above: it serves same-file selector interpolation before cross-module
+fallback. It is keyed by `(file, lexical_path)` and never escapes the CU.
+It tracks named `[%cx2]` bindings, same-file module aliases, same-file
+opens/includes, and earlier string literals. Cross-module references only go
+through `Cross_module_refs` after this local resolver fails.
 
 ### `Css_file.Buffer`
 
@@ -202,21 +203,21 @@ either:
 
 ### `Css_bindings`
 
-Per-CU buffer of `(longident, class_string)` exports. The `[%cx2]`
-handler computes the longident from
-`Code_path.main_module_name` + `Code_path.submodule_path` + the
-enclosing value name, then calls `Css_bindings.record`. Last-write-wins
-on duplicates within a CU (matches `Class_registry` shadowing
-semantics).
+Per-CU buffer of `(longident, class_string)` exports. The ordered `[%cx2]`
+structure pass computes the longident from the compilation unit name + current
+submodule path + the enclosing top-level value name, then calls
+`Css_bindings.record`. Last-write-wins on duplicates within a CU (matches
+`Class_registry` shadowing semantics).
 
 ### `Cross_module_refs`
 
-Per-CU buffer populated by `Css_file.resolve_selector_class_ref` when
-the requested `$(name)` contains a `.` (i.e. a longident, not a bare
-name). Records `(longident, location)` and produces a NUL-delimited
-sentinel string that gets baked into the rule the PPX is currently
-rendering. The sentinel survives CSS rendering verbatim and is resolved
-later by the aggregator.
+Per-CU buffer populated by `Css_file.resolve_selector_class_ref` when the
+requested dotted `$(name)` cannot be resolved against a same-file `[%cx2]`
+binding, same-file module alias, same-file open/include, or earlier string
+literal. Records `(longident, location)` and produces a NUL-delimited sentinel
+string that gets baked into the rule the PPX is currently rendering. The
+sentinel survives CSS rendering verbatim and is resolved later by the
+aggregator.
 
 ## Aggregator responsibilities
 
