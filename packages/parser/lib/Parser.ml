@@ -410,8 +410,8 @@ let parse_nth_payload stream =
         let first_char = name.[0] in
         let a = if first_char = '-' then -1 else 1 in
         Ast.Nth (ANB (a, op, abs_b))
-      | _ -> begin
-        match name with
+      | _ ->
+        begin match name with
         | "even" -> Ast.Nth Even
         | "odd" -> Ast.Nth Odd
         | "n" -> Ast.Nth (AN 1)
@@ -419,7 +419,7 @@ let parse_nth_payload stream =
           let first_char = name.[0] in
           let a = if first_char = '-' then -1 else 1 in
           Ast.Nth (AN a)
-      end
+        end
       end
     | _ -> raise_parse_error (current_token stream)
   in
@@ -526,13 +526,13 @@ let rec parse_component_value stream =
   | Tokens.COMMA ->
     let _ = advance stream in
     with_loc start_pos stream.last_end_pos (Ast.Delim Ast.Delimiter_comma)
-  | Tokens.DELIM s -> begin
-    match Ast.delimiter_of_string s with
+  | Tokens.DELIM s ->
+    begin match Ast.delimiter_of_string s with
     | Some delim ->
       let _ = advance stream in
       with_loc start_pos stream.last_end_pos (Ast.Delim delim)
     | None -> raise_parse_error (current_token stream)
-  end
+    end
   | _ -> raise_parse_error (current_token stream)
 
 and parse_component_value_list_until stream stop =

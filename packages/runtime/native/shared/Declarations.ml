@@ -20,9 +20,7 @@ let alignSelf x = Rule.declaration ({js|alignSelf|js}, AlignSelf.toString x)
 let placeContent x =
   Rule.declaration ({js|placeContent|js}, PlaceContent.toString x)
 
-let placeItems x =
-  Rule.declaration ({js|placeItems|js}, PlaceItems.toString x)
-
+let placeItems x = Rule.declaration ({js|placeItems|js}, PlaceItems.toString x)
 let placeSelf x = Rule.declaration ({js|placeSelf|js}, PlaceSelf.toString x)
 
 let animationDelay x =

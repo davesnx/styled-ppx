@@ -1,62 +1,60 @@
 (** styled-ppx aggregator: walk every post-PPX [.ml] file in a dune library,
-    collect [\[\@\@\@css ...\]] CSS rules and any cross-module references
-    embedded as NUL-delimited sentinels, resolve those sentinels against
-    a global index of [%cx2] bindings, and emit the final stylesheet.
+    collect [[\@\@\@css ...]] CSS rules and any cross-module references embedded
+    as NUL-delimited sentinels, resolve those sentinels against a global index
+    of [%cx2] bindings, and emit the final stylesheet.
 
-    The aggregator runs once per `dune build` invocation, after the PPX
-    has produced the post-PPX [.ml] files for every module in the library.
+    The aggregator runs once per `dune build` invocation, after the PPX has
+    produced the post-PPX [.ml] files for every module in the library.
 
     Two-pass design:
 
-    Pass 1 — Collect every [\[\@\@\@css.bindings ...\]] attribute payload
-    into a global index mapping [longident -> class_string]. The PPX itself
-    populates these payloads with the fully-qualified longident
-    ([\["M.Css.marker"\]]) and the space-separated class names it minted,
-    so the aggregator only has to read them — it does not re-derive module
-    names from filenames or pattern-match [CSS.make] calls.
+    Pass 1 — Collect every [[\@\@\@css.bindings ...]] attribute payload into a
+    global index mapping [longident -> class_string]. The PPX itself populates
+    these payloads with the fully-qualified longident ([["M.Css.marker"]]) and
+    the space-separated class names it minted, so the aggregator only has to
+    read them — it does not re-derive module names from filenames or
+    pattern-match [CSS.make] calls.
 
-    Pass 2 — For each rule string in [\[\@\@\@css ...\]], scan for
-    NUL-delimited sentinels [\x00LONGIDENT\x00]. Look the longident up
-    in the index and substitute its class chain (multi-class bindings
-    produce a dot-chain like [cssA.cssB], a valid CSS compound selector).
-    Resolution failures emit a hard error pointing at the original
-    [.re]/[.ml] source via the location descriptors in
-    [\[\@\@\@css.refs ...\]] attributes.
+    Pass 2 — For each rule string in [[\@\@\@css ...]], scan for NUL-delimited
+    sentinels [\x00LONGIDENT\x00]. Look the longident up in the index and
+    substitute its class chain (multi-class bindings produce a dot-chain like
+    [cssA.cssB], a valid CSS compound selector). Resolution failures emit a hard
+    error pointing at the original [.re]/[.ml] source via the location
+    descriptors in [[\@\@\@css.refs ...]] attributes.
 
     See [documents/cross-module-selector-interpolation.md]. *)
 
-(** [\x00] is the only byte we use as a sentinel delimiter. It cannot
-    appear in valid CSS, in user [%cx2] source, or in OCaml string
-    literals as plain text, so collisions are impossible by construction. *)
+(** [\x00] is the only byte we use as a sentinel delimiter. It cannot appear in
+    valid CSS, in user [%cx2] source, or in OCaml string literals as plain text,
+    so collisions are impossible by construction. *)
 let sentinel_byte = '\x00'
 
-(** Decode an OCaml expression that's a string literal back to its value.
-    Used to read string fields out of the various [\[\@\@\@css.* ...\]]
-    attribute payloads. *)
+(** Decode an OCaml expression that's a string literal back to its value. Used
+    to read string fields out of the various [[\@\@\@css.* ...]] attribute
+    payloads. *)
 let string_of_const_expr (e : Ppxlib.expression) : string option =
   match e.pexp_desc with
   | Pexp_constant (Pconst_string (s, _, _)) -> Some s
   | _ -> None
 
-(** Decode an OCaml expression that's an int literal back to its value.
-    Used to read line/column fields out of [\[\@\@\@css.refs ...\]]
-    payloads. *)
+(** Decode an OCaml expression that's an int literal back to its value. Used to
+    read line/column fields out of [[\@\@\@css.refs ...]] payloads. *)
 let int_of_const_expr (e : Ppxlib.expression) : int option =
   match e.pexp_desc with
   | Pexp_constant (Pconst_integer (s, _)) -> Some (int_of_string s)
   | _ -> None
 
-(** Walk a list expression like [\[a; b; c\]] and decode each element
-    via [decode]. Decoded entries are returned in source order; elements
-    that fail to decode are silently skipped (they shouldn't exist in
-    well-formed PPX output). *)
+(** Walk a list expression like [[a; b; c]] and decode each element via
+    [decode]. Decoded entries are returned in source order; elements that fail
+    to decode are silently skipped (they shouldn't exist in well-formed PPX
+    output). *)
 let decode_list ~decode (e : Ppxlib.expression) =
   let rec loop (e : Ppxlib.expression) acc =
     match e.pexp_desc with
     | Pexp_construct ({ txt = Lident "[]"; _ }, None) -> List.rev acc
     | Pexp_construct
-        ( { txt = Lident "::"; _ },
-          Some { pexp_desc = Pexp_tuple [ hd; tl ]; _ } ) ->
+        ({ txt = Lident "::"; _ }, Some { pexp_desc = Pexp_tuple [ hd; tl ]; _ })
+      ->
       (match decode hd with
       | Some v -> loop tl (v :: acc)
       | None -> loop tl acc)
@@ -64,17 +62,17 @@ let decode_list ~decode (e : Ppxlib.expression) =
   in
   loop e []
 
-(** Root module segment of a dotted longident.
-    [["M.Css.marker"]] -> [["M"]]; [["foo"]] -> [["foo"]]. *)
+(** Root module segment of a dotted longident. [["M.Css.marker"]] -> [["M"]];
+    [["foo"]] -> [["foo"]]. *)
 let longident_head longident =
   match String.split_on_char '.' longident with
   | head :: _ -> head
   | [] -> longident
 
-(** Global index of [%cx2] bindings, populated from [\[\@\@\@css.bindings ...\]]
-    attribute payloads. Keyed by the dotted longident exactly as users
-    write it in their [%cx2] selector refs (e.g. [["M.Css.marker"]]) so
-    resolution is a direct [Hashtbl.find_opt]. *)
+(** Global index of [%cx2] bindings, populated from [[\@\@\@css.bindings ...]]
+    attribute payloads. Keyed by the dotted longident exactly as users write it
+    in their [%cx2] selector refs (e.g. [["M.Css.marker"]]) so resolution is a
+    direct [Hashtbl.find_opt]. *)
 module Index = struct
   type t = (string, string) Hashtbl.t
 
@@ -92,10 +90,11 @@ module Index = struct
   let add_from_payload (idx : t) payload =
     decode_list ~decode:decode_binding payload
     |> List.iter (fun (longident, class_string) ->
-        Hashtbl.replace idx longident class_string)
+      Hashtbl.replace idx longident class_string)
 end
 
-(** Every [\[\@\@\@css.refs \[(longident, file, start_line, start_col, end_col); ...\]\]]
+(** Every
+    [[\@\@\@css.refs [(longident, file, start_line, start_col, end_col); ...]]]
     attribute decoded into a list of records. The aggregator uses these
     locations when reporting unresolvable refs. *)
 module Refs = struct
@@ -107,8 +106,8 @@ module Refs = struct
     end_col : int;
   }
 
-  (** Decode a single tuple expression like
-      [("M.Css.marker", "n.re", 5, 6, 18)] into a [ref_loc]. *)
+  (** Decode a single tuple expression like [("M.Css.marker", "n.re", 5, 6, 18)]
+      into a [ref_loc]. *)
   let decode_ref (e : Ppxlib.expression) : ref_loc option =
     match e.pexp_desc with
     | Pexp_tuple [ longident_e; file_e; sl_e; sc_e; ec_e ] ->
@@ -127,9 +126,9 @@ module Refs = struct
   let of_list_expr = decode_list ~decode:decode_ref
 end
 
-(** Per-file harvest: rules with potential sentinels, plus all
-    cross-module ref descriptors seen in this file. The bindings attribute
-    is consumed directly into the global [Index] during the same walk. *)
+(** Per-file harvest: rules with potential sentinels, plus all cross-module ref
+    descriptors seen in this file. The bindings attribute is consumed directly
+    into the global [Index] during the same walk. *)
 type harvest = {
   filename : string;
   rules : string list;
@@ -155,49 +154,45 @@ let harvest_structure ~filename ~idx structure : harvest =
   { filename; rules = List.rev !rules; refs = List.rev !refs }
 
 (** Read a post-PPX [.ml] file or its serialized [.pp.ml] AST into a ppxlib
-    structure. File-read and parse errors are surfaced unconditionally
-    (not gated on [~verbose]) so a mistyped path produces a clear
-    aggregator-level diagnostic instead of silent empty output. *)
+    structure. File-read and parse errors are surfaced unconditionally (not
+    gated on [~verbose]) so a mistyped path produces a clear aggregator-level
+    diagnostic instead of silent empty output. *)
 let read_structure filename : Ppxlib.structure option =
   try
-    if String.ends_with filename ~suffix:".pp.ml" then
+    if String.ends_with filename ~suffix:".pp.ml" then (
       match Ppxlib.Ast_io.read_binary filename with
       | Error msg ->
-        Printf.eprintf "styled-ppx aggregator: cannot read %s: %s\n"
-          filename msg;
+        Printf.eprintf "styled-ppx aggregator: cannot read %s: %s\n" filename
+          msg;
         None
       | Ok t ->
-        (match Ppxlib.Ast_io.get_ast t with
-        | Impl s -> Some s
-        | Intf _ -> None)
-    else if String.ends_with filename ~suffix:".ml" then
+        (match Ppxlib.Ast_io.get_ast t with Impl s -> Some s | Intf _ -> None))
+    else if String.ends_with filename ~suffix:".ml" then (
       let ic = open_in filename in
       let len = in_channel_length ic in
       let content = really_input_string ic len in
       close_in ic;
       let lexbuf = Lexing.from_string content in
       lexbuf.lex_curr_p <- { lexbuf.lex_curr_p with pos_fname = filename };
-      Some (Ppxlib.Parse.implementation lexbuf)
-    else
-      failwith ("Expected .ml or .pp.ml file, got: " ^ filename)
+      Some (Ppxlib.Parse.implementation lexbuf))
+    else failwith ("Expected .ml or .pp.ml file, got: " ^ filename)
   with
   | Sys_error msg ->
-    Printf.eprintf "styled-ppx aggregator: cannot read %s: %s\n"
-      filename msg;
+    Printf.eprintf "styled-ppx aggregator: cannot read %s: %s\n" filename msg;
     None
   | exn ->
-    Printf.eprintf "styled-ppx aggregator: cannot parse %s: %s\n"
-      filename (Printexc.to_string exn);
+    Printf.eprintf "styled-ppx aggregator: cannot parse %s: %s\n" filename
+      (Printexc.to_string exn);
     None
 
 (** Resolve every [\x00LONGIDENT\x00] sentinel in [rule] against [idx].
-    Multi-class bindings yield space-separated class strings — we convert
-    those to dot-chains, since sentinels appear inside CSS selectors where
-    the chain form is required.
+    Multi-class bindings yield space-separated class strings — we convert those
+    to dot-chains, since sentinels appear inside CSS selectors where the chain
+    form is required.
 
     On unresolved longident, calls [on_error] with the offending longident.
-    [on_error] decides whether to raise or accumulate; we use a callback
-    so the caller can collect all errors before bailing. *)
+    [on_error] decides whether to raise or accumulate; we use a callback so the
+    caller can collect all errors before bailing. *)
 let resolve_sentinels ~idx ~on_error (rule : string) : string =
   let buf = Buffer.create (String.length rule) in
   let len = String.length rule in
@@ -254,10 +249,10 @@ let format_location (r : Refs.ref_loc) : string =
   Printf.sprintf "File %S, line %d, characters %d-%d:" r.file r.start_line
     r.start_col r.end_col
 
-(** Derive the module name from a file path the way dune/OCaml does:
-    take the basename, strip the [.ml] / [.re] / [.pp.ml] extension,
-    and capitalize the first letter. This matches how a user writes
-    [M.foo] when the source file is [m.re]. *)
+(** Derive the module name from a file path the way dune/OCaml does: take the
+    basename, strip the [.ml] / [.re] / [.pp.ml] extension, and capitalize the
+    first letter. This matches how a user writes [M.foo] when the source file is
+    [m.re]. *)
 let module_of_filename filename =
   let base = Filename.basename filename in
   let stem =
@@ -267,17 +262,15 @@ let module_of_filename filename =
   in
   if stem = "" then stem else String.capitalize_ascii stem
 
-(** Detect cross-library references: a longident whose root module is
-    NOT one of the input files passed to the aggregator. The aggregator
-    only sees files from the current library invocation, so any longident
-    whose root segment doesn't correspond to one of those files must
-    point outside the library. Note: we check the input file set rather
-    than [idx] (the [%cx2] binding index), because a file may be
-    in-library yet contain no [%cx2] bindings at all (and therefore
-    contribute nothing to [idx]). Conflating those two cases would
-    produce a misleading "not part of the current library" error for
-    a reference whose target module IS in the library, just not as a
-    [%cx2]. *)
+(** Detect cross-library references: a longident whose root module is NOT one of
+    the input files passed to the aggregator. The aggregator only sees files
+    from the current library invocation, so any longident whose root segment
+    doesn't correspond to one of those files must point outside the library.
+    Note: we check the input file set rather than [idx] (the [%cx2] binding
+    index), because a file may be in-library yet contain no [%cx2] bindings at
+    all (and therefore contribute nothing to [idx]). Conflating those two cases
+    would produce a misleading "not part of the current library" error for a
+    reference whose target module IS in the library, just not as a [%cx2]. *)
 let is_cross_library ~in_library_modules longident =
   match String.split_on_char '.' longident with
   | [] | [ _ ] -> false (* No dot — single-segment, can't be cross-anything. *)
@@ -384,11 +377,11 @@ let run ~verbose ~minify ~output_file input_files =
     let seen = Hashtbl.create 64 in
     List.rev !resolved_rules
     |> List.filter (fun rule ->
-        if Hashtbl.mem seen rule then false
-        else begin
-          Hashtbl.add seen rule ();
-          true
-        end)
+      if Hashtbl.mem seen rule then false
+      else begin
+        Hashtbl.add seen rule ();
+        true
+      end)
   in
 
   let out_channel =

@@ -1252,8 +1252,7 @@ let global_style_tag_does_not_escape () =
      `<style>` content is passed through unchanged. *)
   let css = "a > b{color:red;} .c[d=\"&\"]{margin:0;}" in
   let html = CSS.global_style_tag css |> ReactDOM.renderToString in
-  assert_string html
-    "<style>a > b{color:red;} .c[d=\"&\"]{margin:0;}</style>"
+  assert_string html "<style>a > b{color:red;} .c[d=\"&\"]{margin:0;}</style>"
 
 let tests =
   [

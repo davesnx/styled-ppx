@@ -33,5 +33,6 @@ let global_style_tag (css : string) =
   ReactDOM.createElement "style"
     ~props:
       (ReactDOM.domProps
-         ~dangerouslySetInnerHTML:(dangerously_inner_html ~__html:css) ())
+         ~dangerouslySetInnerHTML:(dangerously_inner_html ~__html:css)
+         ())
     [||]

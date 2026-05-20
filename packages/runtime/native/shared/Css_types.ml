@@ -4320,8 +4320,7 @@ module CounterStyleName = struct
     | `tamil
     | `telugu
     | `thai
-    | `tibetan
-      (* Alphabetic *)
+    | `tibetan (* Alphabetic *)
     | `lowerAlpha
     | `lowerLatin
     | `upperAlpha
@@ -4332,8 +4331,7 @@ module CounterStyleName = struct
     | `hiragana
     | `hiraganaIroha
     | `katakana
-    | `katakanaIroha
-      (* Symbolic *)
+    | `katakanaIroha (* Symbolic *)
     | `disc
     | `circle
     | `square
@@ -4482,7 +4480,10 @@ module Counter = struct
     match x with
     | `counter name -> {js|counter(|js} ^ name ^ {js|)|js}
     | `counterWithStyle (name, style) ->
-      {js|counter(|js} ^ name ^ {js|,|js} ^ CounterStyle.toString style
+      {js|counter(|js}
+      ^ name
+      ^ {js|,|js}
+      ^ CounterStyle.toString style
       ^ {js|)|js}
 end
 
@@ -4499,8 +4500,13 @@ module Counters = struct
     | `counters (name, separator) ->
       {js|counters(|js} ^ name ^ {js|,"|js} ^ separator ^ {js|")|js}
     | `countersWithStyle (name, separator, style) ->
-      {js|counters(|js} ^ name ^ {js|,"|js} ^ separator ^ {js|",|js}
-      ^ CounterStyle.toString style ^ {js|)|js}
+      {js|counters(|js}
+      ^ name
+      ^ {js|,"|js}
+      ^ separator
+      ^ {js|",|js}
+      ^ CounterStyle.toString style
+      ^ {js|)|js}
 end
 
 module ListStyleType = struct
@@ -4521,8 +4527,7 @@ module ListStyleType = struct
     | `text s ->
       (* Wrap in double quotes if not already quoted *)
       let len = Kloth.String.length s in
-      if len >= 2
-         && (Kloth.String.get s 0 = '"' || Kloth.String.get s 0 = '\'')
+      if len >= 2 && (Kloth.String.get s 0 = '"' || Kloth.String.get s 0 = '\'')
       then s
       else {js|"|js} ^ s ^ {js|"|js}
     | #None.t -> None.toString
