@@ -279,16 +279,11 @@ let serverCreateElement = (~loc, ~htmlTag, ~variableNames) => {
     MakeProps.get(["key", "ref", "className"] @ variableNames)
     |> map_tr(value =>
          switch (value) {
-         | MakeProps.Event({name, _}) => name
-         | MakeProps.Attribute({name, _}) => name
+         | MakeProps.Event({ name, _ }) => name
+         | MakeProps.Attribute({ name, _ }) => name
          }
        )
-    |> map_tr(label =>
-         (
-           Optional(label),
-           propItem(~loc, label),
-         )
-       );
+    |> map_tr(label => (Optional(label), propItem(~loc, label)));
 
   let domProps =
     Helper.Exp.apply(
@@ -302,13 +297,14 @@ let serverCreateElement = (~loc, ~htmlTag, ~variableNames) => {
     );
 
   let childrenExpr = propItem(~loc, "children");
-  let children = [%expr
-    switch ([%e childrenExpr]) {
+  let children =
+    switch%expr ([%e childrenExpr]) {
     | Some(c) => c
     | None => React.null
-    }
+    };
+  [%expr
+   React.createElement([%e finalHtmlTag], [%e domProps], [[%e children]])
   ];
-  [%expr React.createElement([%e finalHtmlTag], [%e domProps], [[%e children]])];
 };
 
 /* let stylesObject = { "className": className, "ref": props.ref }; */
@@ -394,7 +390,6 @@ let getIsOptional = str =>
   | Optional(_) => true
   | _ => false
   };
-
 
 /* let make = (props: makeProps) => + makeBodyServer */
 let makeFnJSXServer =

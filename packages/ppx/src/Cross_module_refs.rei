@@ -61,5 +61,4 @@ let record:
 
     Returning both views in a single call avoids a second dedup pass at
     the call site. */
-let drain:
-  unit => (list(entry), list((string, Ppxlib.Location.t)));
+let drain: unit => (list(entry), list((string, Ppxlib.Location.t)));

@@ -50,7 +50,12 @@ let merge_errors = (errors: list(Rule.error)): Rule.error => {
          )
        );
   let got = all_infos |> List.find_map((info: Rule.error_info) => info.got);
-  [{expected: all_expected, got}];
+  [
+    {
+      expected: all_expected,
+      got,
+    },
+  ];
 };
 
 let xor_with_expected = rules_with_expected =>
@@ -58,7 +63,12 @@ let xor_with_expected = rules_with_expected =>
   | [] => (
       tokens =>
         Rule.Data.return(
-          Error([{Rule.expected: [], got: None}]),
+          Error([
+            {
+              Rule.expected: [],
+              got: None,
+            },
+          ]),
           tokens,
         )
     )

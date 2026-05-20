@@ -30,10 +30,7 @@ let concat_exprs = (~loc, parts) => {
    empty (static-only block), returns the literal `""` so the generated
    module still has a well-formed `to_string` function. */
 let render_root_block =
-    (
-      ~loc,
-      dynamic_vars: list((string, string, Css_file.var_type)),
-    )
+    (~loc, dynamic_vars: list((string, string, Css_file.var_type)))
     : Ppxlib.expression => {
   switch (dynamic_vars) {
   | [] => estring(~loc, "")

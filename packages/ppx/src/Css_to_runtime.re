@@ -646,7 +646,8 @@ let render_variable_ident = (~loc, path_str) => {
   );
 };
 
-let render_make_call = (~loc, ~marker: option(string), ~classNames, ~dynamic_vars) => {
+let render_make_call =
+    (~loc, ~marker: option(string), ~classNames, ~dynamic_vars) => {
   let class_string = String.concat(" ", classNames);
   let className_string =
     switch (marker) {

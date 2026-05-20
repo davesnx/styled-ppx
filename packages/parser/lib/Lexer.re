@@ -461,8 +461,7 @@ let interpolation_set_error = (state, err) => {
 
 let interpolation_terminal_error = state =>
   state.brace_depth^ > 0
-    ? Tokens.Unclosed_brace_in_interpolation
-    : Tokens.Unclosed_interpolation;
+    ? Tokens.Unclosed_brace_in_interpolation : Tokens.Unclosed_interpolation;
 
 let interpolation_store_result = (state, end_pos) => {
   state.content_end := end_pos;
@@ -480,7 +479,7 @@ let interpolation_finish = (state, lexbuf) => {
   );
 };
 
-let interpolation_track_nested_code = (state, code) => {
+let interpolation_track_nested_code = (state, code) =>
   if (code == 0x0028) {
     state.depth := state.depth^ + 1;
   } else if (code == 0x0029) {
@@ -490,20 +489,24 @@ let interpolation_track_nested_code = (state, code) => {
   } else if (code == 0x007D && state.brace_depth^ > 0) {
     state.brace_depth := state.brace_depth^ - 1;
   };
-};
 
 let consume_interpolation_ocaml_comment = (state, lexbuf) => {
   let cdepth = ref(1);
   while (cdepth^ > 0 && state.error_opt^ == None) {
     switch (Sedlexing.next(lexbuf)) {
-    | None => interpolation_set_error(state, Tokens.Unclosed_comment_in_interpolation)
+    | None =>
+      interpolation_set_error(state, Tokens.Unclosed_comment_in_interpolation)
     | Some(cc) =>
       interpolation_add_char(state, cc);
       let c = Uchar.to_int(cc);
       if (c == 0x0028) {
         Sedlexing.mark(lexbuf, 0);
         switch (Sedlexing.next(lexbuf)) {
-        | None => interpolation_set_error(state, Tokens.Unclosed_comment_in_interpolation)
+        | None =>
+          interpolation_set_error(
+            state,
+            Tokens.Unclosed_comment_in_interpolation,
+          )
         | Some(mc) =>
           if (Uchar.to_int(mc) == 0x002A) {
             interpolation_add_char(state, mc);
@@ -516,7 +519,11 @@ let consume_interpolation_ocaml_comment = (state, lexbuf) => {
       } else if (c == 0x002A) {
         Sedlexing.mark(lexbuf, 0);
         switch (Sedlexing.next(lexbuf)) {
-        | None => interpolation_set_error(state, Tokens.Unclosed_comment_in_interpolation)
+        | None =>
+          interpolation_set_error(
+            state,
+            Tokens.Unclosed_comment_in_interpolation,
+          )
         | Some(mc) =>
           if (Uchar.to_int(mc) == 0x0029) {
             interpolation_add_char(state, mc);
@@ -534,14 +541,15 @@ let consume_interpolation_ocaml_comment = (state, lexbuf) => {
 let consume_interpolation_c_style_comment = (state, lexbuf) => {
   let rec read = prev_star =>
     switch (Sedlexing.next(lexbuf)) {
-    | None => interpolation_set_error(state, Tokens.Unclosed_comment_in_interpolation)
+    | None =>
+      interpolation_set_error(state, Tokens.Unclosed_comment_in_interpolation)
     | Some(cc) =>
       interpolation_add_char(state, cc);
       if (prev_star && Uchar.to_int(cc) == 0x002F) {
         ();
       } else {
         read(Uchar.to_int(cc) == 0x002A);
-      }
+      };
     };
   read(false);
 };
@@ -550,7 +558,8 @@ let consume_interpolation_double_quoted_string = (state, lexbuf) => {
   let in_str = ref(true);
   while (in_str^ && state.error_opt^ == None) {
     switch (Sedlexing.next(lexbuf)) {
-    | None => interpolation_set_error(state, Tokens.Unclosed_string_in_interpolation)
+    | None =>
+      interpolation_set_error(state, Tokens.Unclosed_string_in_interpolation)
     | Some(sc) =>
       interpolation_add_char(state, sc);
       let s = Uchar.to_int(sc);
@@ -558,7 +567,11 @@ let consume_interpolation_double_quoted_string = (state, lexbuf) => {
         in_str := false;
       } else if (s == 0x005C) {
         switch (Sedlexing.next(lexbuf)) {
-        | None => interpolation_set_error(state, Tokens.Unclosed_string_in_interpolation)
+        | None =>
+          interpolation_set_error(
+            state,
+            Tokens.Unclosed_string_in_interpolation,
+          )
         | Some(ec) => interpolation_add_char(state, ec)
         };
       };
@@ -576,7 +589,11 @@ let consume_interpolation_single_quoted = (state, lexbuf) => {
       let in_esc = ref(true);
       while (in_esc^ && state.error_opt^ == None) {
         switch (Sedlexing.next(lexbuf)) {
-        | None => interpolation_set_error(state, Tokens.Unclosed_char_in_interpolation)
+        | None =>
+          interpolation_set_error(
+            state,
+            Tokens.Unclosed_char_in_interpolation,
+          )
         | Some(ec) =>
           interpolation_add_char(state, ec);
           if (Uchar.to_int(ec) == 0x0027) {
@@ -596,7 +613,10 @@ let consume_interpolation_single_quoted = (state, lexbuf) => {
           interpolation_add_char(state, next_ch);
           interpolation_track_nested_code(state, nc);
           if (state.result_str^ == None && state.error_opt^ == None) {
-            interpolation_set_error(state, interpolation_terminal_error(state));
+            interpolation_set_error(
+              state,
+              interpolation_terminal_error(state),
+            );
           };
         }
       | Some(third) =>
@@ -616,9 +636,9 @@ let consume_interpolation_single_quoted = (state, lexbuf) => {
           if (tc == 0x0029 && state.depth^ == 0 && state.brace_depth^ == 0) {
             interpolation_finish(state, lexbuf);
           };
-        }
+        };
       };
-    }
+    };
   };
 };
 
@@ -677,26 +697,27 @@ let consume_interpolation = lexbuf => {
 
   while (state.result_str^ == None && state.error_opt^ == None) {
     switch (Sedlexing.next(lexbuf)) {
-    | None => interpolation_set_error(state, interpolation_terminal_error(state))
+    | None =>
+      interpolation_set_error(state, interpolation_terminal_error(state))
     | Some(ch) =>
       switch (Uchar.to_int(ch)) {
       | 0x0028 => consume_interpolation_open_paren(state, lexbuf, ch)
       | 0x0029 => consume_interpolation_close_paren(state, lexbuf, ch)
       | 0x007B =>
         state.brace_depth := state.brace_depth^ + 1;
-        interpolation_add_char(state, ch)
+        interpolation_add_char(state, ch);
       | 0x007D =>
         if (state.brace_depth^ > 0) {
           state.brace_depth := state.brace_depth^ - 1;
         };
-        interpolation_add_char(state, ch)
+        interpolation_add_char(state, ch);
       | 0x002F => consume_interpolation_slash(state, lexbuf, ch)
       | 0x0022 =>
         interpolation_add_char(state, ch);
-        consume_interpolation_double_quoted_string(state, lexbuf)
+        consume_interpolation_double_quoted_string(state, lexbuf);
       | 0x0027 =>
         interpolation_add_char(state, ch);
-        consume_interpolation_single_quoted(state, lexbuf)
+        consume_interpolation_single_quoted(state, lexbuf);
       | _ => interpolation_add_char(state, ch)
       }
     };

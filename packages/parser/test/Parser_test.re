@@ -29,7 +29,8 @@ let parse = input => {
 let parse_declaration_list_exn = input => {
   switch (Driver.parse_declaration_list(~loc, input)) {
   | Ok(value) => value
-  | Error((_, msg)) => fail("expected declaration list parse success: " ++ msg)
+  | Error((_, msg)) =>
+    fail("expected declaration list parse success: " ++ msg)
   };
 };
 
@@ -239,65 +240,52 @@ let selector_combinator_ast_tests = [
 
 let ambiguity_regression_tests = [
   test_case(
-    "declaration list stops before nested descendant selector",
-    `Quick,
-    () => {
-      switch (
-        parse_declaration_list_exn(
-          "color: red\nsvg path { fill: blue; }",
-        )
-      ) {
-      | ([Ast.Declaration({name: ("color", _), _}), Ast.Style_rule(_)], _) =>
-        ()
-      | _ => fail("expected declaration followed by nested descendant selector")
-      }
-    },
-  ),
+    "declaration list stops before nested descendant selector", `Quick, () => {
+    switch (
+      parse_declaration_list_exn("color: red\nsvg path { fill: blue; }")
+    ) {
+    | ([Ast.Declaration({ name: ("color", _), _ }), Ast.Style_rule(_)], _) =>
+      ()
+    | _ => fail("expected declaration followed by nested descendant selector")
+    }
+  }),
   test_case(
     "declaration list stops before nested media rule after interpolation",
     `Quick,
     () => {
-      switch (
-        parse_declaration_list_exn(
-          "margin-bottom: $(Size.lg) @media (min-width: 1024px) { width: 50%; }",
-        )
-      ) {
-      | (
-          [
-            Ast.Declaration({name: ("margin-bottom", _), _}),
-            Ast.At_rule({name: ("media", _), _}),
-          ],
-          _,
-        ) =>
-        ()
-      | _ => fail("expected declaration followed by nested media rule")
-      }
-    },
-  ),
+    switch (
+      parse_declaration_list_exn(
+        "margin-bottom: $(Size.lg) @media (min-width: 1024px) { width: 50%; }",
+      )
+    ) {
+    | (
+        [
+          Ast.Declaration({ name: ("margin-bottom", _), _ }),
+          Ast.At_rule({ name: ("media", _), _ }),
+        ],
+        _,
+      ) =>
+      ()
+    | _ => fail("expected declaration followed by nested media rule")
+    }
+  }),
+  test_case("selector head with pseudo parses as style rule", `Quick, () => {
+    switch (Driver.parse_declaration_list(~loc, "a:hover { color: blue; }")) {
+    | Ok(([Ast.Style_rule(_)], _)) => ()
+    | Ok(_) => fail("expected style rule")
+    | Error((_, msg)) => fail("expected style rule parse success: " ++ msg)
+    }
+  }),
   test_case(
-    "selector head with pseudo parses as style rule",
-    `Quick,
-    () => {
-      switch (Driver.parse_declaration_list(~loc, "a:hover { color: blue; }")) {
-      | Ok(([Ast.Style_rule(_)], _)) => ()
-      | Ok(_) => fail("expected style rule")
-      | Error((_, msg)) => fail("expected style rule parse success: " ++ msg)
-      }
-    },
-  ),
-  test_case(
-    "selector head with unknown pseudo parses as style rule",
-    `Quick,
-    () => {
-      switch (
-        Driver.parse_declaration_list(~loc, "a:future-state { color: blue; }")
-      ) {
-      | Ok(([Ast.Style_rule(_)], _)) => ()
-      | Ok(_) => fail("expected style rule")
-      | Error((_, msg)) => fail("expected style rule parse success: " ++ msg)
-      }
-    },
-  ),
+    "selector head with unknown pseudo parses as style rule", `Quick, () => {
+    switch (
+      Driver.parse_declaration_list(~loc, "a:future-state { color: blue; }")
+    ) {
+    | Ok(([Ast.Style_rule(_)], _)) => ()
+    | Ok(_) => fail("expected style rule")
+    | Error((_, msg)) => fail("expected style rule parse success: " ++ msg)
+    }
+  }),
 ];
 
 let tests =

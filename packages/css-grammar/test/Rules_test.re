@@ -40,11 +40,18 @@ let data_monad_tests: tests = [
     }
   }),
   test("return with a error list", _ => {
-    let err: Rule.error = [{Rule.expected: [], got: None}];
+    let err: Rule.error = [
+      {
+        Rule.expected: [],
+        got: None,
+      },
+    ];
     switch (return(Error(err), nodes([COLON]))) {
-    | (Error([{Rule.expected: [], got: None}]), values) when values == nodes([COLON]) => ()
+    | (Error([{ Rule.expected: [], got: None }]), values)
+        when values == nodes([COLON]) =>
+      ()
     | _ => Alcotest.fail("Should be (Error([error]), [colon])")
-    }
+    };
   }),
   test("data bind", _ => {
     let rule =
@@ -60,7 +67,10 @@ let data_monad_tests: tests = [
     };
   }),
   test("data bind error", _ => {
-    let fix_err: Rule.error_info = {Rule.expected: [Description("fix this")], got: None};
+    let fix_err: Rule.error_info = {
+      Rule.expected: [Description("fix this")],
+      got: None,
+    };
     let rule =
       bind(
         return(Error([])),
@@ -70,7 +80,12 @@ let data_monad_tests: tests = [
       );
 
     switch (rule(nodes([COMMA]))) {
-    | (Error([{Rule.expected: [Description("fix this")], got: None}]), values) when values == nodes([COMMA]) => ()
+    | (
+        Error([{ Rule.expected: [Description("fix this")], got: None }]),
+        values,
+      )
+        when values == nodes([COMMA]) =>
+      ()
     | _ => Alcotest.fail("expected (Error([fix this]), [comma])")
     };
   }),
@@ -104,7 +119,15 @@ let data_monad_tests: tests = [
           Ok(6),
           values,
         )
-      | values => (Error([{Rule.expected: [], got: None}]), values);
+      | values => (
+          Error([
+            {
+              Rule.expected: [],
+              got: None,
+            },
+          ]),
+          values,
+        );
     let two_comma =
       fun
       | [value1, value2, ...values]
@@ -114,7 +137,15 @@ let data_monad_tests: tests = [
           Ok(7),
           values,
         )
-      | values => (Error([{Rule.expected: [], got: None}]), values);
+      | values => (
+          Error([
+            {
+              Rule.expected: [],
+              got: None,
+            },
+          ]),
+          values,
+        );
 
     let rule =
       bind_shortest(
@@ -135,7 +166,15 @@ let data_monad_tests: tests = [
           Ok(9),
           values,
         )
-      | values => (Error([{Rule.expected: [], got: None}]), values);
+      | values => (
+          Error([
+            {
+              Rule.expected: [],
+              got: None,
+            },
+          ]),
+          values,
+        );
     let two_comma =
       fun
       | [value1, value2, ...values]
@@ -145,7 +184,15 @@ let data_monad_tests: tests = [
           Ok(10),
           values,
         )
-      | values => (Error([{Rule.expected: [], got: None}]), values);
+      | values => (
+          Error([
+            {
+              Rule.expected: [],
+              got: None,
+            },
+          ]),
+          values,
+        );
     let rule =
       bind_longest(
         (two_comma, comma),
@@ -212,7 +259,13 @@ let pattern_helpers_test: tests = [
       component(
         fun
         | (Ast.String("potato"), _) => Ok(1)
-        | _ => Error([{Rule.expected: [], got: None}]),
+        | _ =>
+          Error([
+            {
+              Rule.expected: [],
+              got: None,
+            },
+          ]),
       );
     switch (rule([string("potato")])) {
     | (Ok(1), []) => ()
@@ -274,7 +327,13 @@ let rule_tests: tests = [
         Pattern.component(
           fun
           | (Ast.Ident("decl"), _) => Ok("decl")
-          | _ => Error([{Rule.expected: [Description("Expected an Ident")], got: None}]),
+          | _ =>
+            Error([
+              {
+                Rule.expected: [Description("Expected an Ident")],
+                got: None,
+              },
+            ]),
         );
       let.bind_match () = Pattern.expect_delim(Ast.Delimiter_colon);
 
@@ -282,7 +341,13 @@ let rule_tests: tests = [
         Pattern.component(
           fun
           | (Ast.Ident("value"), _) => Ok("value")
-          | _ => Error([{Rule.expected: [Description("Expected a valid value")], got: None}]),
+          | _ =>
+            Error([
+              {
+                Rule.expected: [Description("Expected a valid value")],
+                got: None,
+              },
+            ]),
         );
       Match.return(`Declaration((decl, value)));
     };

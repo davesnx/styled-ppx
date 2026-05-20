@@ -14,27 +14,138 @@ type var_type =
 let render_rule = Styled_ppx_css_parser.Render.rule;
 let render_declaration = Styled_ppx_css_parser.Render.declaration;
 
-/* Per-compilation-unit registry mapping the enclosing `let` binding name of a
-   [%cx2] expansion to the list of atomized class names it minted. Selector
-   interpolation in later [%cx2] blocks resolves `$(name)` against this
-   registry so the literal placeholder never reaches the extracted CSS.
+/* Per-compilation-unit registry mapping each named [%cx2] expansion's lexical
+   path to the list of atomized class names it minted. Selector interpolation in
+   later [%cx2] blocks resolves `$(name)` against this registry so the literal
+   placeholder never reaches the extracted CSS.
 
-   The registry is keyed on (file_path, binding_name); shadowing is handled by
+   The registry is keyed on (file_path, lexical_path); shadowing is handled by
    last-write-wins via Hashtbl.replace. Anonymous bindings (`let _ = ...`) are
    intentionally not registered. The registry is cleared whenever the
-   accumulated CSS buffer is cleared (see `get` at the bottom of this file). */
-module Class_registry = {
-  let table: Hashtbl.t((string, string), list(string)) = Hashtbl.create(64);
+   accumulated CSS buffer is cleared (see `get` at the bottom of this file).
 
-  let register = (~file: string, ~name: string, ~classNames: list(string)) =>
-    if (name != "_") {
-      Hashtbl.replace(table, (file, name), classNames);
+   This is intentionally a small PPX-time resolver, not a replacement for the
+   compiler's typed environment. We model same-file module aliases, opens,
+   includes, and literal string selectors seen earlier in the file; external
+   opens/includes still require explicit module paths. */
+module Class_registry = {
+  let table: Hashtbl.t((string, string), list(string)) =
+    Hashtbl.create(64);
+  let local_modules: Hashtbl.t((string, string), unit) = Hashtbl.create(64);
+  let aliases: Hashtbl.t((string, string), list(string)) =
+    Hashtbl.create(32);
+
+  let join_path = (segments: list(string)): string =>
+    String.concat(".", segments);
+
+  let prefixes = segments => {
+    let rec loop = (current_rev, remaining, acc) =>
+      switch (remaining) {
+      | [] => List.rev(acc)
+      | [segment, ...tail] =>
+        let current = List.rev([segment, ...current_rev]);
+        loop([segment, ...current_rev], tail, [current, ...acc]);
+      };
+    loop([], segments, []);
+  };
+
+  let register_module = (~file: string, ~path: list(string)) =>
+    switch (path) {
+    | [] => ()
+    | _ => Hashtbl.replace(local_modules, (file, join_path(path)), ())
     };
 
-  let lookup = (~file: string, ~name: string): option(list(string)) =>
-    Hashtbl.find_opt(table, (file, name));
+  let register_alias =
+      (
+        ~file: string,
+        ~scope: list(string),
+        ~name: string,
+        ~target: list(string),
+      ) => {
+    register_module(~file, ~path=scope @ [name]);
+    Hashtbl.replace(aliases, (file, join_path(scope @ [name])), target);
+  };
 
-  let clear = () => Hashtbl.clear(table);
+  let register =
+      (
+        ~file: string,
+        ~scope: list(string),
+        ~name: string,
+        ~classNames: list(string),
+      ) =>
+    if (name != "_") {
+      List.iter(path => register_module(~file, ~path), prefixes(scope));
+      Hashtbl.replace(
+        table,
+        (file, join_path(scope @ [name])),
+        classNames,
+      );
+    };
+
+  let lookup = (~file: string, ~path: list(string)): option(list(string)) =>
+    Hashtbl.find_opt(table, (file, join_path(path)));
+
+  let module_exists = (~file: string, ~path: list(string)): bool =>
+    Hashtbl.mem(local_modules, (file, join_path(path)));
+
+  let alias_target =
+      (~file: string, ~path: list(string)): option(list(string)) =>
+    Hashtbl.find_opt(aliases, (file, join_path(path)));
+
+  let include_module =
+      (~file: string, ~scope: list(string), ~module_path: list(string)) => {
+    let module_prefix = join_path(module_path);
+    let module_prefix_with_dot = module_prefix ++ ".";
+    let current_prefix = join_path(scope);
+    let copied = ref([]);
+    Hashtbl.iter(
+      ((entry_file, entry_path), classNames) =>
+        if (entry_file == file) {
+          let suffix =
+            if (entry_path == module_prefix) {
+              Some("");
+            } else if (String.length(entry_path)
+                       > String.length(module_prefix_with_dot)
+                       && String.sub(
+                            entry_path,
+                            0,
+                            String.length(module_prefix_with_dot),
+                          )
+                       == module_prefix_with_dot) {
+              Some(
+                String.sub(
+                  entry_path,
+                  String.length(module_prefix_with_dot),
+                  String.length(entry_path)
+                  - String.length(module_prefix_with_dot),
+                ),
+              );
+            } else {
+              None;
+            };
+          switch (suffix) {
+          | Some("") => ()
+          | Some(suffix) =>
+            let included_path =
+              current_prefix == "" ? suffix : current_prefix ++ "." ++ suffix;
+            copied := [(included_path, classNames), ...copied^];
+          | None => ()
+          };
+        },
+      table,
+    );
+    List.iter(
+      ((included_path, classNames)) =>
+        Hashtbl.replace(table, (file, included_path), classNames),
+      copied^,
+    );
+  };
+
+  let clear = () => {
+    Hashtbl.clear(table);
+    Hashtbl.clear(local_modules);
+    Hashtbl.clear(aliases);
+  };
 };
 
 module Buffer = {
@@ -127,12 +238,112 @@ module Css_transform = {
     };
   };
 
+  let path_segments = (path_str: string): list(string) =>
+    String.split_on_char('.', path_str);
+
+  let enclosing_scopes = (scope: list(string)): list(list(string)) => {
+    let rec loop = (current, acc) =>
+      switch (current) {
+      | [] => List.rev([[], ...acc])
+      | _ =>
+        let parent = List.rev(List.tl(List.rev(current)));
+        loop(parent, [current, ...acc]);
+      };
+    loop(scope, []);
+  };
+
+  let module_path_of_ref = segments =>
+    switch (List.rev(segments)) {
+    | []
+    | [_] => None
+    | [_binding, ...module_rev] => Some(List.rev(module_rev))
+    };
+
+  let expand_alias = (~file, ~path) =>
+    switch (Class_registry.alias_target(~file, ~path)) {
+    | Some(target) => target
+    | None => path
+    };
+
+  let is_self_module_ref = (~file, ~scope, ~base_scope, segments) =>
+    switch (module_path_of_ref(segments)) {
+    | None => false
+    | Some(module_path) =>
+      expand_alias(~file, ~path=base_scope @ module_path) == scope
+    };
+
+  let candidate_with_alias = (~file, path) =>
+    switch (module_path_of_ref(path)) {
+    | None => path
+    | Some(module_path) =>
+      switch (List.rev(path)) {
+      | [] => path
+      | [binding, ..._] =>
+        expand_alias(~file, ~path=module_path) @ [binding]
+      }
+    };
+
+  let local_candidates = (~file, ~scope, ~opens, segments) => {
+    let lexical_candidates =
+      enclosing_scopes(scope)
+      |> List.filter_map(base_scope =>
+           is_self_module_ref(~file, ~scope, ~base_scope, segments)
+             ? None
+             : Some(candidate_with_alias(~file, base_scope @ segments))
+         );
+    let open_candidates =
+      opens
+      |> List.map(open_path =>
+           candidate_with_alias(
+             ~file,
+             expand_alias(~file, ~path=open_path) @ segments,
+           )
+         );
+    lexical_candidates @ open_candidates;
+  };
+
+  let lookup_local_class_ref = (~file, ~scope, ~opens, path_str) => {
+    let segments = path_segments(path_str);
+    local_candidates(~file, ~scope, ~opens, segments)
+    |> List.find_map(path => Class_registry.lookup(~file, ~path));
+  };
+
+  let ref_matches_local_module = (~file, ~scope, ~opens, path_str) => {
+    let segments = path_segments(path_str);
+    switch (module_path_of_ref(segments)) {
+    | None => false
+    | Some(module_path) =>
+      let lexical_paths =
+        enclosing_scopes(scope)
+        |> List.map(base_scope =>
+             expand_alias(~file, ~path=base_scope @ module_path)
+           );
+      let open_paths =
+        opens
+        |> List.map(open_path =>
+             expand_alias(
+               ~file,
+               ~path=expand_alias(~file, ~path=open_path) @ module_path,
+             )
+           );
+      lexical_paths
+      @ open_paths
+      |> List.exists(path =>
+           path != scope && Class_registry.module_exists(~file, ~path)
+         );
+    };
+  };
+
   /* Resolve a `$(name)` selector interpolation.
 
      Same-module references (`$(local)`) look up the per-file [%cx2] class
      registry and substitute actual class names directly into the CSS AST.
      No literal `$(...)` reaches extracted CSS and no phantom CSS custom
      property is emitted onto the runtime tuple.
+
+     Dotted local references (`$(Css.marker)`) are resolved by walking the
+     current lexical scope outward, matching the useful subset of OCaml's
+     expression lookup that is available before typing.
 
      Cross-module references (`$(M.binding)`) cannot be resolved at PPX
      time â module M compiles separately. We record the reference
@@ -143,35 +354,62 @@ module Css_transform = {
      module's post-PPX [.ml] file.
 
      Unresolved same-module refs still raise at PPX time. */
-  let resolve_selector_class_ref = (~file: string, ~loc, path_str: string) => {
-    if (String.contains(path_str, '.')) {
-      Cross_module_refs.record(~file, ~longident=path_str, ~loc);
-      [Cross_module_refs.sentinel(path_str)];
-    } else {
-      switch (Class_registry.lookup(~file, ~name=path_str)) {
-      | Some(classNames) => classNames
-      | None =>
-        Ppxlib.Location.raise_errorf(
-          ~loc,
-          "Selector interpolation `$(%s)` does not refer to a [%%cx2] binding earlier in this module.\n- If `%s` is bound to a [%%cx2] later in the file, reorder the bindings.\n- If `%s` is a plain string, inline the class name literally.\n- Otherwise, use [%%cx] for runtime substitution.",
-          path_str,
-          path_str,
-          path_str,
-        )
-      };
+  let resolve_selector_class_ref =
+      (
+        ~file: string,
+        ~scope: list(string),
+        ~opens: list(list(string)),
+        ~loc,
+        path_str: string,
+      ) => {
+    switch (lookup_local_class_ref(~file, ~scope, ~opens, path_str)) {
+    | Some(classNames) => classNames
+    | None
+        when
+          String.contains(path_str, '.')
+          && !ref_matches_local_module(~file, ~scope, ~opens, path_str) =>
+      let segments = path_segments(path_str);
+      let longident =
+        switch (module_path_of_ref(segments), List.rev(segments)) {
+        | (Some(module_path), [binding, ..._]) =>
+          String.concat(
+            ".",
+            expand_alias(~file, ~path=module_path) @ [binding],
+          )
+        | _ => path_str
+        };
+      Cross_module_refs.record(~file, ~longident, ~loc);
+      [Cross_module_refs.sentinel(longident)];
+    | None =>
+      Ppxlib.Location.raise_errorf(
+        ~loc,
+        "Selector interpolation `$(%s)` does not refer to a [%%cx2] binding or string literal earlier in this module.\n- If `%s` is bound to a [%%cx2] or string literal later in the file, reorder the bindings.\n- If `%s` is a computed string, inline the class name literally.\n- Otherwise, use [%%cx] for runtime substitution.",
+        path_str,
+        path_str,
+        path_str,
+      )
     };
   };
 
   let rec transform_component_value =
           (
             ~file: string,
+            ~scope: list(string),
+            ~opens: list(list(string)),
             cv: component_value,
             dynamic_vars: ref(list((string, string, var_type))),
             get_var_binding: string => (string, var_type),
           )
           : component_value => {
     let recurse = ((v, loc)) => (
-      transform_component_value(~file, v, dynamic_vars, get_var_binding),
+      transform_component_value(
+        ~file,
+        ~scope,
+        ~opens,
+        v,
+        dynamic_vars,
+        get_var_binding,
+      ),
       loc,
     );
     switch (cv) {
@@ -187,7 +425,9 @@ module Css_transform = {
           Ppxlib.Location.none,
         ),
       });
-    | Function({ name: (fn_name, _), body: (body_values, body_loc), _ } as fn)
+    | Function(
+        { name: (fn_name, _), body: (body_values, body_loc), _ } as fn,
+      )
         when fn_name == "url" =>
       /* CSS `url()` does not perform `var()` substitution: browsers consume
          the body as a literal token, so `url(var(--x))` resolves to the
@@ -228,7 +468,7 @@ module Css_transform = {
     | Bracket_block(values) => Bracket_block(List.map(recurse, values))
     | Selector(selector_list) =>
       let recurse_sel = ((sel, loc)) => (
-        transform_selector(~file, sel, dynamic_vars),
+        transform_selector(~file, ~scope, ~opens, sel, dynamic_vars),
         loc,
       );
       Selector(List.map(recurse_sel, selector_list));
@@ -236,15 +476,36 @@ module Css_transform = {
     };
   }
 
-  and transform_selector = (~file, sel: selector, dynamic_vars) => {
+  and transform_selector =
+      (~file, ~scope, ~opens, sel: selector, dynamic_vars) => {
     switch (sel) {
     | SimpleSelector(simple) =>
-      transform_simple_selector_to_selector(~file, simple, dynamic_vars)
+      transform_simple_selector_to_selector(
+        ~file,
+        ~scope,
+        ~opens,
+        simple,
+        dynamic_vars,
+      )
     | ComplexSelector(complex) =>
-      ComplexSelector(transform_complex_selector(~file, complex, dynamic_vars))
+      ComplexSelector(
+        transform_complex_selector(
+          ~file,
+          ~scope,
+          ~opens,
+          complex,
+          dynamic_vars,
+        ),
+      )
     | CompoundSelector(compound) =>
       CompoundSelector(
-        transform_compound_selector(~file, compound, dynamic_vars),
+        transform_compound_selector(
+          ~file,
+          ~scope,
+          ~opens,
+          compound,
+          dynamic_vars,
+        ),
       )
     | RelativeSelector(relative) =>
       RelativeSelector({
@@ -252,6 +513,8 @@ module Css_transform = {
         complex_selector:
           transform_complex_selector(
             ~file,
+            ~scope,
+            ~opens,
             relative.complex_selector,
             dynamic_vars,
           ),
@@ -260,16 +523,20 @@ module Css_transform = {
   }
 
   and transform_complex_selector =
-      (~file, complex: complex_selector, dynamic_vars) => {
+      (~file, ~scope, ~opens, complex: complex_selector, dynamic_vars) => {
     switch (complex) {
-    | Selector(sel) => Selector(transform_selector(~file, sel, dynamic_vars))
+    | Selector(sel) =>
+      Selector(transform_selector(~file, ~scope, ~opens, sel, dynamic_vars))
     | Combinator({ left, right }) =>
       Combinator({
-        left: transform_selector(~file, left, dynamic_vars),
+        left: transform_selector(~file, ~scope, ~opens, left, dynamic_vars),
         right:
           List.map(
             ((combinator, sel)) =>
-              (combinator, transform_selector(~file, sel, dynamic_vars)),
+              (
+                combinator,
+                transform_selector(~file, ~scope, ~opens, sel, dynamic_vars),
+              ),
             right,
           ),
       })
@@ -283,10 +550,17 @@ module Css_transform = {
      "AND" semantics: every consumer of the referenced binding has all of
      its atomized classes applied to the same element. */
   and transform_compound_selector =
-      (~file, compound: compound_selector, dynamic_vars) => {
+      (~file, ~scope, ~opens, compound: compound_selector, dynamic_vars) => {
     let transformed_type_selector =
       Option.map(
-        simple => transform_simple_selector(~file, simple, dynamic_vars),
+        simple =>
+          transform_simple_selector(
+            ~file,
+            ~scope,
+            ~opens,
+            simple,
+            dynamic_vars,
+          ),
         compound.type_selector,
       );
     let transformed_subclasses =
@@ -294,13 +568,23 @@ module Css_transform = {
       |> List.concat_map(subclass =>
            transform_subclass_selector_to_list(
              ~file,
+             ~scope,
+             ~opens,
              subclass,
              dynamic_vars,
            )
          );
     let transformed_pseudos =
       compound.pseudo_selectors
-      |> List.map(pseudo => transform_pseudo_selector(~file, pseudo, dynamic_vars));
+      |> List.map(pseudo =>
+           transform_pseudo_selector(
+             ~file,
+             ~scope,
+             ~opens,
+             pseudo,
+             dynamic_vars,
+           )
+         );
     {
       type_selector: transformed_type_selector,
       subclass_selectors: transformed_subclasses,
@@ -312,7 +596,8 @@ module Css_transform = {
      into `type_selector`). The selector-wrapping variant below is
      `transform_simple_selector_to_selector`. */
   and transform_simple_selector =
-      (~file, simple: simple_selector, _dynamic_vars): simple_selector => {
+      (~file, ~scope, ~opens, simple: simple_selector, _dynamic_vars)
+      : simple_selector => {
     switch (simple) {
     | Variable(path_str, var_loc) =>
       /* Bare `$(name)` (no `.` prefix) in selector position. We treat it
@@ -324,7 +609,13 @@ module Css_transform = {
          caller (`transform_compound_selector`) only places this in the
          `type_selector` slot, never in `subclass_selectors`. */
       let resolved =
-        resolve_selector_class_ref(~file, ~loc=var_loc, path_str);
+        resolve_selector_class_ref(
+          ~file,
+          ~scope,
+          ~opens,
+          ~loc=var_loc,
+          path_str,
+        );
       switch (resolved) {
       | [single] => Type("." ++ single)
       | _ =>
@@ -344,10 +635,18 @@ module Css_transform = {
      `SimpleSelector(...)` whole-selector wrapping it), we still need to
      express the resolution. Same lookup, wraps the result. */
   and transform_simple_selector_to_selector =
-      (~file, simple: simple_selector, dynamic_vars): selector => {
+      (~file, ~scope, ~opens, simple: simple_selector, dynamic_vars): selector => {
     switch (simple) {
     | Variable(_, _) =>
-      SimpleSelector(transform_simple_selector(~file, simple, dynamic_vars))
+      SimpleSelector(
+        transform_simple_selector(
+          ~file,
+          ~scope,
+          ~opens,
+          simple,
+          dynamic_vars,
+        ),
+      )
     | _ => SimpleSelector(simple)
     };
   }
@@ -356,15 +655,29 @@ module Css_transform = {
      selectors so `ClassVariable` can fan out into a compound chain
      (`.cssA.cssB`) for multi-declaration source bindings. */
   and transform_subclass_selector_to_list =
-      (~file, subclass: subclass_selector, dynamic_vars)
+      (~file, ~scope, ~opens, subclass: subclass_selector, dynamic_vars)
       : list(subclass_selector) => {
     switch (subclass) {
     | ClassVariable(path_str, var_loc) =>
       let classNames =
-        resolve_selector_class_ref(~file, ~loc=var_loc, path_str);
+        resolve_selector_class_ref(
+          ~file,
+          ~scope,
+          ~opens,
+          ~loc=var_loc,
+          path_str,
+        );
       List.map(c => Class(c), classNames);
     | Pseudo_class(pseudo) => [
-        Pseudo_class(transform_pseudo_selector(~file, pseudo, dynamic_vars)),
+        Pseudo_class(
+          transform_pseudo_selector(
+            ~file,
+            ~scope,
+            ~opens,
+            pseudo,
+            dynamic_vars,
+          ),
+        ),
       ]
     | _ => [subclass]
     };
@@ -375,26 +688,36 @@ module Css_transform = {
      Recurse into the payload so `:not(&.$(foo))` resolves the same way as
      a top-level `&.$(foo)`. */
   and transform_pseudo_selector =
-      (~file, pseudo: pseudo_selector, dynamic_vars): pseudo_selector => {
+      (~file, ~scope, ~opens, pseudo: pseudo_selector, dynamic_vars)
+      : pseudo_selector => {
     switch (pseudo) {
     | Pseudoelement(_) => pseudo
     | Pseudoclass(kind) =>
-      Pseudoclass(transform_pseudoclass_kind(~file, kind, dynamic_vars))
+      Pseudoclass(
+        transform_pseudoclass_kind(~file, ~scope, ~opens, kind, dynamic_vars),
+      )
     };
   }
 
   and transform_pseudoclass_kind =
-      (~file, kind: pseudoclass_kind, dynamic_vars): pseudoclass_kind => {
+      (~file, ~scope, ~opens, kind: pseudoclass_kind, dynamic_vars)
+      : pseudoclass_kind => {
     switch (kind) {
     | PseudoIdent(_) => kind
     | Function({ name, payload: (selector_list, payload_loc) }) =>
       let transformed =
         List.map(
           ((sel, sel_loc)) =>
-            (transform_selector(~file, sel, dynamic_vars), sel_loc),
+            (
+              transform_selector(~file, ~scope, ~opens, sel, dynamic_vars),
+              sel_loc,
+            ),
           selector_list,
         );
-      Function({ name, payload: (transformed, payload_loc) });
+      Function({
+        name,
+        payload: (transformed, payload_loc),
+      });
     | NthFunction({ name, payload: (nth_payload, payload_loc) }) =>
       let transformed_payload =
         switch (nth_payload) {
@@ -402,16 +725,27 @@ module Css_transform = {
         | NthSelector(complex_selectors) =>
           NthSelector(
             List.map(
-              c => transform_complex_selector(~file, c, dynamic_vars),
+              c =>
+                transform_complex_selector(
+                  ~file,
+                  ~scope,
+                  ~opens,
+                  c,
+                  dynamic_vars,
+                ),
               complex_selectors,
             ),
           )
         };
-      NthFunction({ name, payload: (transformed_payload, payload_loc) });
+      NthFunction({
+        name,
+        payload: (transformed_payload, payload_loc),
+      });
     };
   };
 
-  let transform_declaration = (~file, decl: declaration, dynamic_vars) => {
+  let transform_declaration =
+      (~file, ~scope, ~opens, decl: declaration, dynamic_vars) => {
     let (property_name, _) = decl.name;
     let (value_list, value_loc) = decl.value;
 
@@ -469,6 +803,8 @@ module Css_transform = {
           (
             transform_component_value(
               ~file,
+              ~scope,
+              ~opens,
               cv,
               dynamic_vars,
               get_var_binding,
@@ -483,29 +819,42 @@ module Css_transform = {
     };
   };
 
-  let rec transform_rule = (~file, rule: rule, dynamic_vars) => {
+  let rec transform_rule = (~file, ~scope, ~opens, rule: rule, dynamic_vars) => {
     switch (rule) {
     | Declaration(decl) =>
-      Declaration(transform_declaration(~file, decl, dynamic_vars))
+      Declaration(
+        transform_declaration(~file, ~scope, ~opens, decl, dynamic_vars),
+      )
     | Style_rule(style_rule) =>
-      Style_rule(transform_style_rule(~file, style_rule, dynamic_vars))
+      Style_rule(
+        transform_style_rule(~file, ~scope, ~opens, style_rule, dynamic_vars),
+      )
     | At_rule(at_rule) =>
-      At_rule(transform_at_rule(~file, at_rule, dynamic_vars))
+      At_rule(
+        transform_at_rule(~file, ~scope, ~opens, at_rule, dynamic_vars),
+      )
     };
   }
 
-  and transform_style_rule = (~file, style_rule: style_rule, dynamic_vars) => {
+  and transform_style_rule =
+      (~file, ~scope, ~opens, style_rule: style_rule, dynamic_vars) => {
     let { prelude, block, loc } = style_rule;
     let (selector_list, selector_loc) = prelude;
     let transformed_selectors =
       List.map(
         ((sel, sel_loc)) =>
-          (transform_selector(~file, sel, dynamic_vars), sel_loc),
+          (
+            transform_selector(~file, ~scope, ~opens, sel, dynamic_vars),
+            sel_loc,
+          ),
         selector_list,
       );
     let (rule_list, rule_loc) = block;
     let transformed_rules =
-      List.map(rule => transform_rule(~file, rule, dynamic_vars), rule_list);
+      List.map(
+        rule => transform_rule(~file, ~scope, ~opens, rule, dynamic_vars),
+        rule_list,
+      );
     {
       prelude: (transformed_selectors, selector_loc),
       block: (transformed_rules, rule_loc),
@@ -513,7 +862,8 @@ module Css_transform = {
     };
   }
 
-  and transform_at_rule = (~file, at_rule: at_rule, dynamic_vars) => {
+  and transform_at_rule =
+      (~file, ~scope, ~opens, at_rule: at_rule, dynamic_vars) => {
     let { name, prelude, block, loc } = at_rule;
     let (prelude_values, prelude_loc) = prelude;
 
@@ -550,7 +900,10 @@ module Css_transform = {
     };
 
     let map_payload = ((rules, rule_loc)) => (
-      List.map(r => transform_rule(~file, r, dynamic_vars), rules),
+      List.map(
+        r => transform_rule(~file, ~scope, ~opens, r, dynamic_vars),
+        rules,
+      ),
       rule_loc,
     );
     let transformed_block =
@@ -592,7 +945,7 @@ module Css_transform = {
     | _ => None
     };
 
-  let is_bare_leading_pseudo = (sel: selector): bool => {
+  let is_bare_leading_pseudo = (sel: selector): bool =>
     if (Styled_ppx_css_parser.Selector_nesting.contains_ampersand(sel)) {
       false;
     } else {
@@ -611,7 +964,6 @@ module Css_transform = {
       | _ => false
       };
     };
-  };
 
   let raise_bare_leading_pseudo_error = (~loc, sel) => {
     let rendered = Styled_ppx_css_parser.Render.selector(sel);
@@ -689,8 +1041,7 @@ module Css_transform = {
                 loc: Ppxlib.Location.none,
               });
             let rule_string = render_rule(style_rule);
-            let className =
-              generate_class_from_content(~label?, rule_string);
+            let className = generate_class_from_content(~label?, rule_string);
             (className, style_rule);
           },
           parent_selectors,
@@ -782,7 +1133,14 @@ module Css_transform = {
     List.concat_map(extract_atomic_rules(~parent_prelude=?None), rules);
   };
 
-  let transform_rule_list = (~file, ~label=?, rule_list: rule_list) => {
+  let transform_rule_list =
+      (
+        ~file,
+        ~scope: list(string),
+        ~opens: list(list(string)),
+        ~label=?,
+        rule_list: rule_list,
+      ) => {
     let dynamic_vars = ref([]);
     let (rules, loc) = rule_list;
 
@@ -825,7 +1183,9 @@ module Css_transform = {
              };
 
            transformed
-           |> List.map(r => transform_rule(~file, r, dynamic_vars))
+           |> List.map(r =>
+                transform_rule(~file, ~scope, ~opens, r, dynamic_vars)
+              )
            |> List.map(r => (className, r));
          })
       |> List.concat;
@@ -848,9 +1208,22 @@ let mint_empty_class = (~label) =>
   | _ => []
   };
 
-let push = (~file, ~label=?, declarations: Styled_ppx_css_parser.Ast.rule_list) => {
+let push =
+    (
+      ~file,
+      ~scope: list(string),
+      ~opens: list(list(string)),
+      ~label=?,
+      declarations: Styled_ppx_css_parser.Ast.rule_list,
+    ) => {
   let (atomic_classnames, dynamic_vars) =
-    Css_transform.transform_rule_list(~file, ~label?, declarations);
+    Css_transform.transform_rule_list(
+      ~file,
+      ~scope,
+      ~opens,
+      ~label?,
+      declarations,
+    );
 
   let classNames =
     switch (atomic_classnames) {
@@ -871,8 +1244,7 @@ let push_keyframe = (keyframe_rules: Styled_ppx_css_parser.Ast.rule_list) => {
   open Styled_ppx_css_parser.Ast;
 
   let (rules, _) = keyframe_rules;
-  let rendered_body =
-    rules |> List.map(render_rule) |> String.concat(" ");
+  let rendered_body = rules |> List.map(render_rule) |> String.concat(" ");
 
   let keyframe_name =
     Printf.sprintf("keyframe-%s", Murmur2.default(rendered_body));
@@ -909,7 +1281,12 @@ let push_keyframe = (keyframe_rules: Styled_ppx_css_parser.Ast.rule_list) => {
    Static-only blocks return an empty dynamic_vars list, which makes
    `to_string` emit `""`. */
 let push_global =
-    (~file, global_rules: Styled_ppx_css_parser.Ast.rule_list)
+    (
+      ~file,
+      ~scope: list(string),
+      ~opens: list(list(string)),
+      global_rules: Styled_ppx_css_parser.Ast.rule_list,
+    )
     : list((string, string, var_type)) => {
   open Styled_ppx_css_parser.Ast;
 
@@ -927,7 +1304,8 @@ let push_global =
      Multi-selector preludes Cartesian-product correctly (`a, b { c {...} }`
      -> `a c { ... } b c { ... }`) because `resolve_selectors` calls
      `split_multiple_selectors` before unnesting. */
-  let flattened_rules = Styled_ppx_css_parser.Resolve.resolve_selectors(rules);
+  let flattened_rules =
+    Styled_ppx_css_parser.Resolve.resolve_selectors(rules);
 
   /* transform_rule walks the rule, replacing every Variable(path) in
      declaration values with var(--hash) and appending (var_name, path,
@@ -945,7 +1323,13 @@ let push_global =
        | Style_rule(_)
        | At_rule(_) =>
          let transformed =
-           Css_transform.transform_rule(~file, rule, all_dynamic_vars);
+           Css_transform.transform_rule(
+             ~file,
+             ~scope,
+             ~opens,
+             rule,
+             all_dynamic_vars,
+           );
          let rendered = render_rule(transformed);
          let key = Printf.sprintf("global-%s", Murmur2.default(rendered));
          Buffer.add_global_rule(key, rendered);

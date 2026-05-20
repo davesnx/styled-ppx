@@ -28,9 +28,19 @@ let reset = () => {
    attach it here so the aggregator can later format errors against the
    original source. */
 let with_filename = (~file: string, loc: Ppxlib.Location.t): Ppxlib.Location.t => {
-  let loc_start = {...loc.loc_start, pos_fname: file};
-  let loc_end = {...loc.loc_end, pos_fname: file};
-  {...loc, loc_start, loc_end};
+  let loc_start = {
+    ...loc.loc_start,
+    pos_fname: file,
+  };
+  let loc_end = {
+    ...loc.loc_end,
+    pos_fname: file,
+  };
+  {
+    ...loc,
+    loc_start,
+    loc_end,
+  };
 };
 
 let record = (~file: string, ~longident: string, ~loc: Ppxlib.Location.t) => {
@@ -38,7 +48,14 @@ let record = (~file: string, ~longident: string, ~loc: Ppxlib.Location.t) => {
   let key = (longident, loc.loc_start.pos_fname, loc.loc_start.pos_cnum);
   if (!Hashtbl.mem(seen, key)) {
     Hashtbl.add(seen, key, ());
-    entries := [{longident, loc}, ...entries^];
+    entries :=
+      [
+        {
+          longident,
+          loc,
+        },
+        ...entries^,
+      ];
   };
 };
 
@@ -47,7 +64,7 @@ let drain = (): (list(entry), list((string, Ppxlib.Location.t))) => {
   let seen_longidents = Hashtbl.create(8);
   let unique =
     List.filter_map(
-      ({longident, loc}) =>
+      ({ longident, loc }) =>
         if (Hashtbl.mem(seen_longidents, longident)) {
           None;
         } else {

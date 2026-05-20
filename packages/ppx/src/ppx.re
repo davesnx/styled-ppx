@@ -371,6 +371,569 @@ let make_synthetic_dep = ((longident_str: string, loc: Ppxlib.Location.t)) => {
   );
 };
 
+let module_name_of_file = file =>
+  file
+  |> Filename.basename
+  |> Filename.remove_extension
+  |> String.capitalize_ascii;
+
+let longident_segments = (lid: Ppxlib.Longident.t): list(string) => {
+  let rec loop = lid =>
+    switch (lid) {
+    | Ppxlib.Longident.Lident(name) => [name]
+    | Ppxlib.Longident.Ldot(parent, name) => loop(parent) @ [name]
+    | Ppxlib.Longident.Lapply(_, _) => []
+    };
+  loop(lid);
+};
+
+let payload_expr = payload =>
+  switch (payload) {
+  | Ppxlib.PStr([{ pstr_desc: Pstr_eval(expr, _), _ }]) => Some(expr)
+  | _ => None
+  };
+
+let cx2_error_expr = (~payload_loc) => {
+  let examples =
+    switch (File.get()) {
+    | Some(Reason) =>
+      Some([
+        "[%cx2 \"display: block; color: red\"]",
+        "[%cx2 [|CSS.display(`block), CSS.color(CSS.red)|]]",
+      ])
+    | Some(ReScript) =>
+      Some([
+        "[%cx2 \"display: block; color: red\"]",
+        "[%cx2 [CSS.display(#block), CSS.color(#red)]]",
+      ])
+    | Some(OCaml) =>
+      Some([
+        "[%cx2 \"display: block; color: red\"]",
+        "[%cx2 [|CSS.display `block, CSS.color CSS.red |]]",
+      ])
+    | None => None
+    };
+  Error.raise(
+    ~loc=payload_loc,
+    ~examples?,
+    ~link="https://styled-ppx.vercel.app/reference/cx",
+    "[%cx2] expects either a string of CSS or an array of CSS rules.",
+  );
+};
+
+let record_cx2_binding = (~file, ~main_module, ~scope, ~name, ~classNames) => {
+  Css_file.Class_registry.register(~file, ~scope, ~name, ~classNames);
+  let longident = String.concat(".", [main_module, ...scope] @ [name]);
+  let class_string = String.concat(" ", classNames);
+  Css_bindings.record(~longident, ~class_string);
+};
+
+let expand_cx2_expression =
+    (
+      ~file,
+      ~main_module,
+      ~scope,
+      ~opens,
+      ~label_name,
+      ~registry_name,
+      payload,
+    ) => {
+  open Ppxlib;
+  File.set(file);
+  let label = Settings.Get.minify() ? None : label_name;
+  switch (payload.pexp_desc) {
+  | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
+    let loc =
+      Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+        stringLoc,
+        delimiter,
+      );
+    switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, txt)) {
+    | Ok(rule_list) =>
+      let validations = type_check_rule_list(rule_list);
+      switch (get_errors(validations)) {
+      | [] =>
+        let (classNames, dynamic_vars) =
+          Css_file.push(~file, ~scope, ~opens, ~label?, rule_list);
+        switch (registry_name) {
+        | Some(name) =>
+          record_cx2_binding(~file, ~main_module, ~scope, ~name, ~classNames)
+        | None => ()
+        };
+        let marker = Dev_mode.marker(label_name);
+        Css_to_runtime.render_make_call(
+          ~loc=stringLoc,
+          ~marker,
+          ~classNames,
+          ~dynamic_vars,
+        );
+      | errors =>
+        let error_messages =
+          errors
+          |> List.map(((error_loc, error)) => {
+               let adjusted_loc =
+                 Styled_ppx_css_parser.Parser_location.adjust_to_file(
+                   ~relative_loc=error_loc,
+                   ~base_loc=loc,
+                 );
+               (adjusted_loc, error_to_string(error));
+             });
+        switch (error_messages) {
+        | [(loc, msg)] => Error.expr(~loc, msg)
+        | _ =>
+          Error.expressions(
+            ~loc=stringLoc,
+            ~description="Multiple errors on cx2 definition",
+            error_messages,
+          )
+        };
+      };
+    | Error((loc, msg)) => Error.expr(~loc, msg)
+    };
+  | Pexp_array(arr) =>
+    arr
+    |> Builder.pexp_array(~loc=payload.pexp_loc)
+    |> Css_to_runtime.render_style_call(~loc=payload.pexp_loc)
+  | _ => cx2_error_expr(~payload_loc=payload.pexp_loc)
+  };
+};
+
+let expand_global2_module = (~file, ~scope, ~opens, payload) => {
+  open Ppxlib;
+  File.set(file);
+  switch (payload.pexp_desc) {
+  | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
+    let loc =
+      Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+        stringLoc,
+        delimiter,
+      );
+    switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, txt)) {
+    | Ok(rule_list) =>
+      let (rules, rule_loc) = rule_list;
+      let has_invalid_rules =
+        List.exists(
+          fun
+          | Styled_ppx_css_parser.Ast.Declaration(_) => true
+          | _ => false,
+          rules,
+        );
+      if (has_invalid_rules) {
+        Builder.pmod_extension(
+          ~loc=rule_loc,
+          Location.error_extensionf(
+            ~loc=rule_loc,
+            "Declarations does not make sense in global styles. Global should consists of style rules or at-rules (e.g @media, @print, etc.)\n\nIf your intent is to apply the declaration to all elements, use the universal selector\n* {\n  /* Your declarations here */\n}",
+          ),
+        );
+      } else {
+        let validations = type_check_rule_list(rule_list);
+        switch (get_errors(validations)) {
+        | [] =>
+          let dynamic_vars =
+            Css_file.push_global(~file, ~scope, ~opens, rule_list);
+          let to_string_body =
+            Css_global_to_string.render_root_block(
+              ~loc=stringLoc,
+              dynamic_vars,
+            );
+          let to_string_decl = [%stri
+            let to_string = () => [%e to_string_body]
+          ];
+          let to_buffer_decl = [%stri
+            let to_buffer = buf => Buffer.add_string(buf, to_string())
+          ];
+          let make_decl = [%stri
+            let make = () => CSS.global_style_tag(to_string())
+          ];
+          Builder.pmod_structure(
+            ~loc=stringLoc,
+            [to_string_decl, to_buffer_decl, make_decl],
+          );
+        | errors =>
+          let error_messages =
+            errors
+            |> List.map(((error_loc, error)) => {
+                 let adjusted_loc =
+                   Styled_ppx_css_parser.Parser_location.adjust_to_file(
+                     ~relative_loc=error_loc,
+                     ~base_loc=loc,
+                   );
+                 (adjusted_loc, error_to_string(error));
+               });
+          switch (error_messages) {
+          | [(loc, msg)] =>
+            Builder.pmod_extension(
+              ~loc,
+              Location.error_extensionf(~loc, "%s", msg),
+            )
+          | _ =>
+            Builder.pmod_extension(
+              ~loc=stringLoc,
+              Ppxlib.Location.Error.to_extension(
+                Ppxlib.Location.Error.make(
+                  ~loc=stringLoc,
+                  ~sub=error_messages,
+                  "Multiple errors on styled.global2 definition",
+                ),
+              ),
+            )
+          };
+        };
+      };
+    | Error((loc, msg)) =>
+      Builder.pmod_extension(
+        ~loc,
+        Location.error_extensionf(~loc, "%s", msg),
+      )
+    };
+  | _ =>
+    Builder.pmod_extension(
+      ~loc=payload.pexp_loc,
+      Location.error_extensionf(
+        ~loc=payload.pexp_loc,
+        "[%%styled.global2] expects a string of CSS with selectors that apply to the whole document.\n\nExample:\n  module Reset = [%%styled.global2 \"body { margin: 0; }\"]",
+      ),
+    )
+  };
+};
+
+let expand_keyframe2_expression = (~file, payload: Ppxlib.expression) => {
+  open Ppxlib;
+  File.set(file);
+  switch (payload.pexp_desc) {
+  | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
+    let loc =
+      Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+        stringLoc,
+        delimiter,
+      );
+    switch (Styled_ppx_css_parser.Driver.parse_keyframes(~loc, txt)) {
+    | Ok(declarations) =>
+      let keyframe_name = Css_file.push_keyframe(declarations);
+      let loc = stringLoc;
+      [%expr
+       CSS.Types.AnimationName.make(
+         [%e Builder.estring(~loc, keyframe_name)],
+       )
+      ];
+    | Error((loc, msg)) => Error.expr(~loc, msg)
+    };
+  | _ =>
+    Error.raise(
+      ~loc=payload.pexp_loc,
+      ~examples=["[%keyframe2 \"0% { opacity: 0; } 100% { opacity: 1; }\"]"],
+      ~link="https://styled-ppx.vercel.app/reference/keyframe",
+      "[%keyframe2] expects a string of CSS with keyframe definitions.",
+    )
+  };
+};
+
+let binding_name_from_pat = (pat: Ppxlib.pattern): option(string) =>
+  switch (pat.ppat_desc) {
+  | Ppat_var({ txt: name, _ }) => Some(name)
+  | _ => None
+  };
+
+let register_string_binding = (~file, ~scope, ~name, expr: Ppxlib.expression) =>
+  switch (expr.pexp_desc) {
+  | Pexp_constant(Pconst_string(value, _, _)) =>
+    Css_file.Class_registry.register(
+      ~file,
+      ~scope,
+      ~name,
+      ~classNames=[value],
+    )
+  | _ => ()
+  };
+
+let map_cx2_expressions =
+    (~file, ~main_module, ~scope, ~opens, ~top_binding, expr) => {
+  let rec map_with_label = (~label_name, expr) => {
+    let mapper = {
+      as self;
+      inherit class Ppxlib.Ast_traverse.map as super;
+      pub! expression = expr =>
+        switch (expr.Ppxlib.pexp_desc) {
+        | Pexp_extension(({ txt: "cx2", _ }, payload)) =>
+          switch (payload_expr(payload)) {
+          | Some(payload) =>
+            expand_cx2_expression(
+              ~file,
+              ~main_module,
+              ~scope,
+              ~opens,
+              ~label_name,
+              ~registry_name=top_binding,
+              payload,
+            )
+          | None => cx2_error_expr(~payload_loc=expr.pexp_loc)
+          }
+        | Pexp_extension(({ txt: "keyframe2", _ }, payload)) =>
+          switch (payload_expr(payload)) {
+          | Some(payload) => expand_keyframe2_expression(~file, payload)
+          | None =>
+            Error.raise(
+              ~loc=expr.pexp_loc,
+              ~examples=[
+                "[%keyframe2 \"0% { opacity: 0; } 100% { opacity: 1; }\"]",
+              ],
+              ~link="https://styled-ppx.vercel.app/reference/keyframe",
+              "[%keyframe2] expects a string of CSS with keyframe definitions.",
+            )
+          }
+        | Pexp_let(rec_flag, bindings, body) =>
+          let bindings =
+            List.map(
+              (binding: Ppxlib.value_binding) => {
+                let label_name = binding_name_from_pat(binding.pvb_pat);
+                let expr =
+                  switch (label_name) {
+                  | Some(name) =>
+                    map_with_label(~label_name=Some(name), binding.pvb_expr)
+                  | None => self#expression(binding.pvb_expr)
+                  };
+                {
+                  ...binding,
+                  pvb_expr: expr,
+                };
+              },
+              bindings,
+            );
+          {
+            ...expr,
+            pexp_desc: Pexp_let(rec_flag, bindings, self#expression(body)),
+          };
+        | _ => super#expression(expr)
+        }
+    };
+    mapper#expression(expr);
+  };
+  map_with_label(~label_name=top_binding, expr);
+};
+
+let module_path_from_expr = (expr: Ppxlib.module_expr): option(list(string)) =>
+  switch (expr.pmod_desc) {
+  | Pmod_ident({ txt: lid, _ }) => Some(longident_segments(lid))
+  | _ => None
+  };
+
+let enclosing_scopes = (scope: list(string)): list(list(string)) => {
+  let rec loop = (current, acc) =>
+    switch (current) {
+    | [] => List.rev([[], ...acc])
+    | _ =>
+      let parent = List.rev(List.tl(List.rev(current)));
+      loop(parent, [current, ...acc]);
+    };
+  loop(scope, []);
+};
+
+let canonical_local_absolute_module_path = (~file, path) =>
+  switch (Css_file.Class_registry.alias_target(~file, ~path)) {
+  | Some(target)
+      when Css_file.Class_registry.module_exists(~file, ~path=target) =>
+    Some(target)
+  | Some(_) => None
+  | None when Css_file.Class_registry.module_exists(~file, ~path) =>
+    Some(path)
+  | None => None
+  };
+
+let canonical_local_module_path = (~file, ~scope, path) =>
+  enclosing_scopes(scope)
+  |> List.find_map(base_scope =>
+       canonical_local_absolute_module_path(~file, base_scope @ path)
+     );
+
+let module_alias_target = (~file, ~scope, path) =>
+  switch (canonical_local_module_path(~file, ~scope, path)) {
+  | Some(local_path) => local_path
+  | None => path
+  };
+
+let rec map_ordered_module_expr =
+        (~file, ~main_module, ~scope, ~opens, expr: Ppxlib.module_expr) => {
+  switch (expr.pmod_desc) {
+  | Pmod_structure(items) =>
+    let items = map_ordered_structure(~file, ~main_module, ~scope, items);
+    {
+      ...expr,
+      pmod_desc: Pmod_structure(items),
+    };
+  | Pmod_constraint(inner, module_type) =>
+    let inner =
+      map_ordered_module_expr(~file, ~main_module, ~scope, ~opens, inner);
+    {
+      ...expr,
+      pmod_desc: Pmod_constraint(inner, module_type),
+    };
+  | Pmod_functor(param, body) =>
+    let body =
+      map_ordered_module_expr(~file, ~main_module, ~scope, ~opens, body);
+    {
+      ...expr,
+      pmod_desc: Pmod_functor(param, body),
+    };
+  | Pmod_extension(({ txt: "styled.global2", _ }, payload)) =>
+    switch (payload_expr(payload)) {
+    | Some(payload) => expand_global2_module(~file, ~scope, ~opens, payload)
+    | None =>
+      Builder.pmod_extension(
+        ~loc=expr.pmod_loc,
+        Ppxlib.Location.error_extensionf(
+          ~loc=expr.pmod_loc,
+          "[%%styled.global2] expects a string of CSS with selectors that apply to the whole document.\n\nExample:\n  module Reset = [%%styled.global2 \"body { margin: 0; }\"]",
+        ),
+      )
+    }
+  | _ => expr
+  };
+}
+
+and map_ordered_structure = (~file, ~main_module, ~scope, items) => {
+  let opens = ref([]);
+  let map_item = (item: Ppxlib.structure_item) =>
+    switch (item.pstr_desc) {
+    | Pstr_value(rec_flag, bindings) =>
+      let bindings =
+        List.map(
+          (binding: Ppxlib.value_binding) => {
+            let name = binding_name_from_pat(binding.pvb_pat);
+            let expr =
+              map_cx2_expressions(
+                ~file,
+                ~main_module,
+                ~scope,
+                ~opens=opens^,
+                ~top_binding=name,
+                binding.pvb_expr,
+              );
+            switch (name) {
+            | Some(name) =>
+              register_string_binding(~file, ~scope, ~name, binding.pvb_expr)
+            | None => ()
+            };
+            {
+              ...binding,
+              pvb_expr: expr,
+            };
+          },
+          bindings,
+        );
+      {
+        ...item,
+        pstr_desc: Pstr_value(rec_flag, bindings),
+      };
+    | Pstr_module(binding) =>
+      switch (binding.pmb_name.txt) {
+      | Some(name) =>
+        let module_scope = scope @ [name];
+        switch (module_path_from_expr(binding.pmb_expr)) {
+        | Some(target) =>
+          Css_file.Class_registry.register_alias(
+            ~file,
+            ~scope,
+            ~name,
+            ~target=module_alias_target(~file, ~scope, target),
+          )
+        | None =>
+          Css_file.Class_registry.register_module(~file, ~path=module_scope)
+        };
+        let expr =
+          map_ordered_module_expr(
+            ~file,
+            ~main_module,
+            ~scope=module_scope,
+            ~opens=[],
+            binding.pmb_expr,
+          );
+        {
+          ...item,
+          pstr_desc:
+            Pstr_module({
+              ...binding,
+              pmb_expr: expr,
+            }),
+        };
+      | None => item
+      }
+    | Pstr_open(open_decl) =>
+      switch (module_path_from_expr(open_decl.popen_expr)) {
+      | Some(path) =>
+        switch (canonical_local_module_path(~file, ~scope, path)) {
+        | Some(path) => opens := [path, ...opens^]
+        | None => ()
+        }
+      | None => ()
+      };
+      item;
+    | Pstr_include(include_decl) =>
+      switch (module_path_from_expr(include_decl.pincl_mod)) {
+      | Some(path) =>
+        switch (canonical_local_module_path(~file, ~scope, path)) {
+        | Some(path) =>
+          Css_file.Class_registry.include_module(
+            ~file,
+            ~scope,
+            ~module_path=path,
+          )
+        | None => ()
+        }
+      | None => ()
+      };
+      item;
+    | Pstr_recmodule(bindings) =>
+      let bindings =
+        List.map(
+          (binding: Ppxlib.module_binding) => {
+            switch (binding.pmb_name.txt) {
+            | Some(name) =>
+              let module_scope = scope @ [name];
+              Css_file.Class_registry.register_module(
+                ~file,
+                ~path=module_scope,
+              );
+              let expr =
+                map_ordered_module_expr(
+                  ~file,
+                  ~main_module,
+                  ~scope=module_scope,
+                  ~opens=[],
+                  binding.pmb_expr,
+                );
+              {
+                ...binding,
+                pmb_expr: expr,
+              };
+            | None => binding
+            }
+          },
+          bindings,
+        );
+      {
+        ...item,
+        pstr_desc: Pstr_recmodule(bindings),
+      };
+    | Pstr_eval(expr, attrs) =>
+      let expr =
+        map_cx2_expressions(
+          ~file,
+          ~main_module,
+          ~scope,
+          ~opens=opens^,
+          ~top_binding=None,
+          expr,
+        );
+      {
+        ...item,
+        pstr_desc: Pstr_eval(expr, attrs),
+      };
+    | _ => item
+    };
+  List.map(map_item, items);
+};
+
 let () = {
   Ppxlib.Driver.add_arg(
     ~doc=Settings.debug.doc,
@@ -392,6 +955,13 @@ let () = {
 
   let impl = (_ctx, str: Ppxlib.structure) => {
     let loc = Ppxlib.Location.none;
+    let file =
+      switch (str) {
+      | [first, ..._] => first.pstr_loc.loc_start.pos_fname
+      | [] => ""
+      };
+    let main_module = module_name_of_file(file);
+    let str = map_ordered_structure(~file, ~main_module, ~scope=[], str);
     let rules = Css_file.get();
     let rule_items =
       List.map(
@@ -501,157 +1071,6 @@ let () = {
           ),
         ),
         Ppxlib.Context_free.Rule.extension(
-          Ppxlib.Extension.V3.declare(
-            "cx2",
-            Ppxlib.Extension.Context.Expression,
-            Ppxlib.Ast_pattern.(single_expr_payload(__)),
-            (~ctxt, payload) => {
-              open Ppxlib;
-              let code_path = Expansion_context.Extension.code_path(ctxt);
-              let file = Code_path.file_path(code_path);
-              let binding_name = Code_path.enclosing_value(code_path);
-              /* `Code_path.value` is the strict top-level form: it returns
-                 `Some(name)` only when the [%cx2] is the direct rhs of a
-                 module-level `let name = ...`, and `None` for any nested
-                 expression (a `let inner = ...` body, an `if ... then`
-                 branch, a function arg, etc.). We register the cross-module
-                 bindings index off this — never off `enclosing_value` —
-                 so a local `let inner = [%cx2 ...] in inner` doesn't leak
-                 `inner` into the index. The looser `enclosing_value` is
-                 still used for the label suffix and DOM marker, which are
-                 only observed within the expansion site. */
-              let toplevel_binding_name = Code_path.value(code_path);
-              /* Under --minify, suppress the label-suffix that personalizes
-                 atom hashes (`css-<hash>-<binding>`); plain hashes still
-                 dedupe correctly. */
-              let label = Settings.Get.minify() ? None : binding_name;
-              File.set(file);
-              switch (payload.pexp_desc) {
-              | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-                let loc =
-                  Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-                    stringLoc,
-                    delimiter,
-                  );
-                switch (
-                  Styled_ppx_css_parser.Driver.parse_declaration_list(
-                    ~loc,
-                    txt,
-                  )
-                ) {
-                | Ok(rule_list) =>
-                  let validations = type_check_rule_list(rule_list);
-                  switch (get_errors(validations)) {
-                  | [] =>
-                    let (classNames, dynamic_vars) =
-                      Css_file.push(~file, ~label?, rule_list);
-                    /* Register this binding so that later [%cx2] blocks in
-                       the same file can resolve `$(name)` selector interps
-                       to the classNames we just minted. Anonymous bindings
-                       (`let _ = ...`) are skipped inside `register`.
-
-                       We also record the fully-qualified longident in
-                       [Css_bindings] so the impl transformer can emit it as
-                       a [@@@css.bindings ...] attribute for the aggregator's
-                       cross-module index.
-
-                       Both registrations use `toplevel_binding_name`, not
-                       the looser `binding_name`. Nested `let inner = ...`
-                       inside a function body, branches of `if/match`, etc.
-                       still emit CSS, but they don't pollute the cross-
-                       module index with names that aren't part of the
-                       module's surface API. */
-                    switch (toplevel_binding_name) {
-                    | Some(name) =>
-                      Css_file.Class_registry.register(
-                        ~file,
-                        ~name,
-                        ~classNames,
-                      );
-                      let main_module = Code_path.main_module_name(code_path);
-                      let submodule_path =
-                        Code_path.submodule_path(code_path);
-                      let longident =
-                        String.concat(
-                          ".",
-                          [main_module, ...submodule_path] @ [name],
-                        );
-                      let class_string = String.concat(" ", classNames);
-                      Css_bindings.record(~longident, ~class_string);
-                    | None => ()
-                    };
-                    /* The DOM marker uses the looser `binding_name`
-                       (i.e. `Code_path.enclosing_value`) so a [%cx2] inside
-                       a nested `let` body still gets a `cx-<name>` marker
-                       reflecting its immediate binding. The cross-module
-                       registry above intentionally uses the stricter
-                       `toplevel_binding_name`; the two are only divergent
-                       for nested-expression cx2 sites. */
-                    let marker = Dev_mode.marker(binding_name);
-                    Css_to_runtime.render_make_call(
-                      ~loc=stringLoc,
-                      ~marker,
-                      ~classNames,
-                      ~dynamic_vars,
-                    );
-                  | errors =>
-                    let error_messages =
-                      errors
-                      |> List.map(((error_loc, error)) => {
-                           let adjusted_loc =
-                             Styled_ppx_css_parser.Parser_location.adjust_to_file(
-                               ~relative_loc=error_loc,
-                               ~base_loc=loc,
-                             );
-                           (adjusted_loc, error_to_string(error));
-                         });
-                    switch (error_messages) {
-                    | [(loc, msg)] => Error.expr(~loc, msg)
-                    | _ =>
-                      Error.expressions(
-                        ~loc=stringLoc,
-                        ~description="Multiple errors on cx2 definition",
-                        error_messages,
-                      )
-                    };
-                  };
-                | Error((loc, msg)) => Error.expr(~loc, msg)
-                };
-              | Pexp_array(arr) =>
-                arr
-                |> Builder.pexp_array(~loc=payload.pexp_loc)
-                |> Css_to_runtime.render_style_call(~loc=payload.pexp_loc)
-              | _ =>
-                let examples =
-                  switch (File.get()) {
-                  | Some(Reason) =>
-                    Some([
-                      "[%cx2 \"display: block; color: red\"]",
-                      "[%cx2 [|CSS.display(`block), CSS.color(CSS.red)|]]",
-                    ])
-                  | Some(ReScript) =>
-                    Some([
-                      "[%cx2 \"display: block; color: red\"]",
-                      "[%cx2 [CSS.display(#block), CSS.color(#red)]]",
-                    ])
-                  | Some(OCaml) =>
-                    Some([
-                      "[%cx2 \"display: block; color: red\"]",
-                      "[%cx2 [|CSS.display `block, CSS.color CSS.red |]]",
-                    ])
-                  | None => None
-                  };
-                Error.raise(
-                  ~loc=payload.pexp_loc,
-                  ~examples?,
-                  ~link="https://styled-ppx.vercel.app/reference/cx",
-                  "[%cx2] expects either a string of CSS or an array of CSS rules.",
-                );
-              };
-            },
-          ),
-        ),
-        Ppxlib.Context_free.Rule.extension(
           Ppxlib.Extension.declare(
             "css",
             Ppxlib.Extension.Context.Expression,
@@ -729,138 +1148,6 @@ let () = {
             },
           ),
         ),
-        /* New shape: `module ThemeVars = [%styled.global2 {| ... |}]`.
-           Expands to a module structure with `to_string`, `to_buffer`,
-           and `make` members. Static parts of the rule list extract to
-           the aggregated stylesheet via the existing [@@@css ...] path;
-           rules that contain $(expr) interpolations also produce a
-           `var(--hash)` declaration on the static side AND a runtime
-           string-builder that emits the actual value at evaluation
-           time (see documents/global2-interpolation.md). */
-        Ppxlib.Context_free.Rule.extension(
-          Ppxlib.Extension.V3.declare(
-            "styled.global2",
-            Ppxlib.Extension.Context.Module_expr,
-            Ppxlib.Ast_pattern.(single_expr_payload(__)),
-            (~ctxt, payload) => {
-              open Ppxlib;
-              let code_path = Expansion_context.Extension.code_path(ctxt);
-              let file = Code_path.file_path(code_path);
-              File.set(file);
-              switch (payload.pexp_desc) {
-              | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-                let loc =
-                  Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-                    stringLoc,
-                    delimiter,
-                  );
-                switch (
-                  Styled_ppx_css_parser.Driver.parse_declaration_list(
-                    ~loc,
-                    txt,
-                  )
-                ) {
-                | Ok(rule_list) =>
-                  let (rules, rule_loc) = rule_list;
-                  let has_invalid_rules =
-                    List.exists(
-                      fun
-                      | Styled_ppx_css_parser.Ast.Declaration(_) => true
-                      | _ => false,
-                      rules,
-                    );
-                  if (has_invalid_rules) {
-                    Builder.pmod_extension(
-                      ~loc=rule_loc,
-                      Location.error_extensionf(
-                        ~loc=rule_loc,
-                        "Declarations does not make sense in global styles. Global should consists of style rules or at-rules (e.g @media, @print, etc.)\n\nIf your intent is to apply the declaration to all elements, use the universal selector\n* {\n  /* Your declarations here */\n}",
-                      ),
-                    );
-                  } else {
-                    let validations = type_check_rule_list(rule_list);
-                    switch (get_errors(validations)) {
-                    | [] =>
-                      let dynamic_vars =
-                        Css_file.push_global(~file, rule_list);
-                      /* Build the structure of the generated module.
-
-                         The runtime's contract here is narrow: supply
-                         values for the custom properties the static rule
-                         (already extracted via [@@@css ...]) references
-                         through `var()`. So `to_string` is a single
-                         `:root { --var-h: <value>; ... }` block, one
-                         declaration per dynamic_var. The user's
-                         selectors and non-interpolated declarations are
-                         NOT re-emitted at runtime. */
-                      let to_string_body =
-                        Css_global_to_string.render_root_block(
-                          ~loc=stringLoc,
-                          dynamic_vars,
-                        );
-                      let to_string_decl = [%stri
-                        let to_string = () => [%e to_string_body]
-                      ];
-                      let to_buffer_decl = [%stri
-                        let to_buffer = buf =>
-                          Buffer.add_string(buf, to_string())
-                      ];
-                      let make_decl = [%stri
-                        let make = () => CSS.global_style_tag(to_string())
-                      ];
-                      Builder.pmod_structure(
-                        ~loc=stringLoc,
-                        [to_string_decl, to_buffer_decl, make_decl],
-                      );
-                    | errors =>
-                      let error_messages =
-                        errors
-                        |> List.map(((error_loc, error)) => {
-                             let adjusted_loc =
-                               Styled_ppx_css_parser.Parser_location.adjust_to_file(
-                                 ~relative_loc=error_loc,
-                                 ~base_loc=loc,
-                               );
-                             (adjusted_loc, error_to_string(error));
-                           });
-                      switch (error_messages) {
-                      | [(loc, msg)] =>
-                        Builder.pmod_extension(
-                          ~loc,
-                          Location.error_extensionf(~loc, "%s", msg),
-                        )
-                      | _ =>
-                        Builder.pmod_extension(
-                          ~loc=stringLoc,
-                          Ppxlib.Location.Error.to_extension(
-                            Ppxlib.Location.Error.make(
-                              ~loc=stringLoc,
-                              ~sub=error_messages,
-                              "Multiple errors on styled.global2 definition",
-                            ),
-                          ),
-                        )
-                      };
-                    };
-                  };
-                | Error((loc, msg)) =>
-                  Builder.pmod_extension(
-                    ~loc,
-                    Location.error_extensionf(~loc, "%s", msg),
-                  )
-                };
-              | _ =>
-                Builder.pmod_extension(
-                  ~loc=payload.pexp_loc,
-                  Location.error_extensionf(
-                    ~loc=payload.pexp_loc,
-                    "[%%styled.global2] expects a string of CSS with selectors that apply to the whole document.\n\nExample:\n  module Reset = [%%styled.global2 \"body { margin: 0; }\"]",
-                  ),
-                )
-              };
-            },
-          ),
-        ),
         Ppxlib.Context_free.Rule.extension(
           Ppxlib.Extension.declare(
             "keyframe",
@@ -894,46 +1181,6 @@ let () = {
                   ],
                   ~link="https://styled-ppx.vercel.app/reference/keyframe",
                   "[%keyframe] expects a string of CSS with keyframe definitions.",
-                )
-              };
-            },
-          ),
-        ),
-        Ppxlib.Context_free.Rule.extension(
-          Ppxlib.Extension.declare(
-            "keyframe2",
-            Ppxlib.Extension.Context.Expression,
-            any_payload_pattern,
-            (~loc as _, ~path, payload) => {
-              File.set(path);
-              switch (payload.pexp_desc) {
-              | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-                let loc =
-                  Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-                    stringLoc,
-                    delimiter,
-                  );
-                switch (
-                  Styled_ppx_css_parser.Driver.parse_keyframes(~loc, txt)
-                ) {
-                | Ok(declarations) =>
-                  let keyframe_name = Css_file.push_keyframe(declarations);
-                  let loc = stringLoc;
-                  [%expr
-                   CSS.Types.AnimationName.make(
-                     [%e Builder.estring(~loc, keyframe_name)],
-                   )
-                  ];
-                | Error((loc, msg)) => Error.expr(~loc, msg)
-                };
-              | _ =>
-                Error.raise(
-                  ~loc=payload.pexp_loc,
-                  ~examples=[
-                    "[%keyframe2 \"0% { opacity: 0; } 100% { opacity: 1; }\"]",
-                  ],
-                  ~link="https://styled-ppx.vercel.app/reference/keyframe",
-                  "[%keyframe2] expects a string of CSS with keyframe definitions.",
                 )
               };
             },

@@ -14,15 +14,15 @@ current site) error cleanly. Users can fix by reordering bindings.
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   File "input.re", line 2, characters 6-7:
-  Error: Selector interpolation `$(b)` does not refer to a [%cx2] binding earlier in this module.
-  - If `b` is bound to a [%cx2] later in the file, reorder the bindings.
-  - If `b` is a plain string, inline the class name literally.
+  Error: Selector interpolation `$(b)` does not refer to a [%cx2] binding or string literal earlier in this module.
+  - If `b` is bound to a [%cx2] or string literal later in the file, reorder the bindings.
+  - If `b` is a computed string, inline the class name literally.
   - Otherwise, use [%cx] for runtime substitution.
 
   $ dune build
   File "input.re", line 2, characters 6-7:
-  Error: Selector interpolation `$(b)` does not refer to a [%cx2] binding earlier in this module.
-  - If `b` is bound to a [%cx2] later in the file, reorder the bindings.
-  - If `b` is a plain string, inline the class name literally.
+  Error: Selector interpolation `$(b)` does not refer to a [%cx2] binding or string literal earlier in this module.
+  - If `b` is bound to a [%cx2] or string literal later in the file, reorder the bindings.
+  - If `b` is a computed string, inline the class name literally.
   - Otherwise, use [%cx] for runtime substitution.
   [1]

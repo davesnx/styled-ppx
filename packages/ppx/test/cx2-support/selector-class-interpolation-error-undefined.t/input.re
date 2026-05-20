@@ -1,6 +1,4 @@
-/* `$(name)` in selector position requires `name` to be a [%cx2] binding
-   in the same module. A plain string binding doesn't qualify and must
-   error clearly. */
+/* Earlier string literal bindings are valid static selector refs. */
 
 let undefined = "css-foo";
 

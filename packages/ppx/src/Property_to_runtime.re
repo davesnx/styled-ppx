@@ -757,15 +757,12 @@ let margin =
   );
 
 let margin_block =
-  emit_shorthand(
-    Property_parser.property_margin_block,
-    render_margin,
-    (~loc) =>
-      fun
-      | [all] => [[%expr CSS.marginBlock([%e all])]]
-      | [v, h] => [[%expr CSS.marginBlock2(~v=[%e v], ~h=[%e h])]]
-      | []
-      | _ => raise(Impossible_state),
+  emit_shorthand(Property_parser.property_margin_block, render_margin, (~loc) =>
+    fun
+    | [all] => [[%expr CSS.marginBlock([%e all])]]
+    | [v, h] => [[%expr CSS.marginBlock2(~v=[%e v], ~h=[%e h])]]
+    | []
+    | _ => raise(Impossible_state)
   );
 
 let margin_block_start =
@@ -784,14 +781,12 @@ let margin_block_end =
 
 let margin_inline =
   emit_shorthand(
-    Property_parser.property_margin_inline,
-    render_margin,
-    (~loc) =>
-      fun
-      | [all] => [[%expr CSS.marginInline([%e all])]]
-      | [v, h] => [[%expr CSS.marginInline2(~v=[%e v], ~h=[%e h])]]
-      | []
-      | _ => raise(Impossible_state),
+    Property_parser.property_margin_inline, render_margin, (~loc) =>
+    fun
+    | [all] => [[%expr CSS.marginInline([%e all])]]
+    | [v, h] => [[%expr CSS.marginInline2(~v=[%e v], ~h=[%e h])]]
+    | []
+    | _ => raise(Impossible_state)
   );
 
 let margin_inline_start =
@@ -868,14 +863,12 @@ let padding =
 
 let padding_block =
   emit_shorthand(
-    Property_parser.property_padding_block,
-    render_padding,
-    (~loc) =>
-      fun
-      | [all] => [[%expr CSS.paddingBlock([%e all])]]
-      | [v, h] => [[%expr CSS.paddingBlock2(~v=[%e v], ~h=[%e h])]]
-      | []
-      | _ => raise(Impossible_state),
+    Property_parser.property_padding_block, render_padding, (~loc) =>
+    fun
+    | [all] => [[%expr CSS.paddingBlock([%e all])]]
+    | [v, h] => [[%expr CSS.paddingBlock2(~v=[%e v], ~h=[%e h])]]
+    | []
+    | _ => raise(Impossible_state)
   );
 
 let padding_block_start =
@@ -894,14 +887,12 @@ let padding_block_end =
 
 let padding_inline =
   emit_shorthand(
-    Property_parser.property_padding_inline,
-    render_padding,
-    (~loc) =>
-      fun
-      | [all] => [[%expr CSS.paddingInline([%e all])]]
-      | [v, h] => [[%expr CSS.paddingInline2(~v=[%e v], ~h=[%e h])]]
-      | []
-      | _ => raise(Impossible_state),
+    Property_parser.property_padding_inline, render_padding, (~loc) =>
+    fun
+    | [all] => [[%expr CSS.paddingInline([%e all])]]
+    | [v, h] => [[%expr CSS.paddingInline2(~v=[%e v], ~h=[%e h])]]
+    | []
+    | _ => raise(Impossible_state)
   );
 
 let padding_inline_start =
@@ -1593,13 +1584,16 @@ let image_resolution =
   monomorphic(
     Property_parser.property_image_resolution,
     (~loc) => [%expr CSS.imageResolution],
-    (~loc, ((from_image, resolution), snap): Types.property_image_resolution) => {
+    (
+      ~loc,
+      ((from_image, resolution), snap): Types.property_image_resolution,
+    ) => {
       let float_to_css_string = n => {
         let s = string_of_float(n);
-        if (String.length(s) > 0 && String.get(s, String.length(s) - 1) == '.') {
-          String.sub(s, 0, String.length(s) - 1)
+        if (String.length(s) > 0 && s.[String.length(s) - 1] == '.') {
+          String.sub(s, 0, String.length(s) - 1);
         } else {
-          s
+          s;
         };
       };
       let resolution_to_string = resolution =>
@@ -1609,25 +1603,30 @@ let image_resolution =
         | `Dpcm(v) => float_to_css_string(v) ++ {js|dpcm|js}
         };
       let parts = [];
-      let parts = switch (from_image) {
-      | Some(_) => [{js|from-image|js}, ...parts]
-      | None => parts
-      };
-      let parts = switch (resolution) {
-      | Some(value) => [resolution_to_string(value), ...parts]
-      | None => parts
-      };
-      let parts = switch (snap) {
-      | Some(_) => [{js|snap|js}, ...parts]
-      | None => parts
-      };
+      let parts =
+        switch (from_image) {
+        | Some(_) => [{js|from-image|js}, ...parts]
+        | None => parts
+        };
+      let parts =
+        switch (resolution) {
+        | Some(value) => [resolution_to_string(value), ...parts]
+        | None => parts
+        };
+      let parts =
+        switch (snap) {
+        | Some(_) => [{js|snap|js}, ...parts]
+        | None => parts
+        };
       let parts = List.rev(parts);
       switch (parts) {
       | [{js|from-image|js}] => [%expr `fromImage]
       | [{js|snap|js}] => [%expr `snap]
       | [] => raise(Unsupported_feature)
-      | parts => [%expr `value([%e render_string(~loc, String.concat({js| |js}, parts))])]
-      }
+      | parts => [%expr
+         `value([%e render_string(~loc, String.concat({js| |js}, parts))])
+        ]
+      };
     },
   );
 
@@ -2392,7 +2391,9 @@ let border_width =
 let border_block_color =
   polymorphic(Property_parser.property_border_block_color, (~loc) =>
     fun
-    | [color] => [[%expr CSS.borderBlockColor([%e render_color(~loc, color)])]]
+    | [color] => [
+        [%expr CSS.borderBlockColor([%e render_color(~loc, color)])],
+      ]
     | [first, second] => [
         [%expr
           CSS.borderBlockColor2(
@@ -2458,7 +2459,9 @@ let border_block_width =
 let border_inline_color =
   polymorphic(Property_parser.property_border_inline_color, (~loc) =>
     fun
-    | [color] => [[%expr CSS.borderInlineColor([%e render_color(~loc, color)])]]
+    | [color] => [
+        [%expr CSS.borderInlineColor([%e render_color(~loc, color)])],
+      ]
     | [first, second] => [
         [%expr
           CSS.borderInlineColor2(
@@ -2807,7 +2810,11 @@ let border_image_slice =
     | ([v], fill) => [
         [%expr
           CSS.borderImageSlice1(
-            ~fill=[%e switch (fill) { | Some(_) => [%expr true] | None => [%expr false] }],
+            ~fill=
+              switch%e (fill) {
+              | Some(_) => [%expr true]
+              | None => [%expr false]
+              },
             [%e render_border_image_slice_value(~loc, v)],
           )
         ],
@@ -2815,7 +2822,11 @@ let border_image_slice =
     | ([v, h], fill) => [
         [%expr
           CSS.borderImageSlice2(
-            ~fill=[%e switch (fill) { | Some(_) => [%expr true] | None => [%expr false] }],
+            ~fill=
+              switch%e (fill) {
+              | Some(_) => [%expr true]
+              | None => [%expr false]
+              },
             [%e render_border_image_slice_value(~loc, v)],
             [%e render_border_image_slice_value(~loc, h)],
           )
@@ -2824,7 +2835,11 @@ let border_image_slice =
     | ([t, h, b], fill) => [
         [%expr
           CSS.borderImageSlice3(
-            ~fill=[%e switch (fill) { | Some(_) => [%expr true] | None => [%expr false] }],
+            ~fill=
+              switch%e (fill) {
+              | Some(_) => [%expr true]
+              | None => [%expr false]
+              },
             [%e render_border_image_slice_value(~loc, t)],
             [%e render_border_image_slice_value(~loc, h)],
             [%e render_border_image_slice_value(~loc, b)],
@@ -2834,7 +2849,11 @@ let border_image_slice =
     | ([t, r, b, l], fill) => [
         [%expr
           CSS.borderImageSlice4(
-            ~fill=[%e switch (fill) { | Some(_) => [%expr true] | None => [%expr false] }],
+            ~fill=
+              switch%e (fill) {
+              | Some(_) => [%expr true]
+              | None => [%expr false]
+              },
             [%e render_border_image_slice_value(~loc, t)],
             [%e render_border_image_slice_value(~loc, r)],
             [%e render_border_image_slice_value(~loc, b)],
@@ -2858,17 +2877,15 @@ let border_image_width =
     Property_parser.property_border_image_width,
     render_border_image_width_value,
     (~loc) =>
-      fun
-      | [all] => [[%expr CSS.borderImageWidth([%e all])]]
-      | [v, h] => [[%expr CSS.borderImageWidth2([%e v], [%e h])]]
-      | [t, h, b] => [
-          [%expr CSS.borderImageWidth3([%e t], [%e h], [%e b])],
-        ]
-      | [t, r, b, l] => [
-          [%expr CSS.borderImageWidth4([%e t], [%e r], [%e b], [%e l])],
-        ]
-      | []
-      | _ => raise(Impossible_state),
+    fun
+    | [all] => [[%expr CSS.borderImageWidth([%e all])]]
+    | [v, h] => [[%expr CSS.borderImageWidth2([%e v], [%e h])]]
+    | [t, h, b] => [[%expr CSS.borderImageWidth3([%e t], [%e h], [%e b])]]
+    | [t, r, b, l] => [
+        [%expr CSS.borderImageWidth4([%e t], [%e r], [%e b], [%e l])],
+      ]
+    | []
+    | _ => raise(Impossible_state)
   );
 
 let render_border_image_outset_value = (~loc) =>
@@ -2881,17 +2898,15 @@ let border_image_outset =
     Property_parser.property_border_image_outset,
     render_border_image_outset_value,
     (~loc) =>
-      fun
-      | [all] => [[%expr CSS.borderImageOutset([%e all])]]
-      | [v, h] => [[%expr CSS.borderImageOutset2([%e v], [%e h])]]
-      | [t, h, b] => [
-          [%expr CSS.borderImageOutset3([%e t], [%e h], [%e b])],
-        ]
-      | [t, r, b, l] => [
-          [%expr CSS.borderImageOutset4([%e t], [%e r], [%e b], [%e l])],
-        ]
-      | []
-      | _ => raise(Impossible_state),
+    fun
+    | [all] => [[%expr CSS.borderImageOutset([%e all])]]
+    | [v, h] => [[%expr CSS.borderImageOutset2([%e v], [%e h])]]
+    | [t, h, b] => [[%expr CSS.borderImageOutset3([%e t], [%e h], [%e b])]]
+    | [t, r, b, l] => [
+        [%expr CSS.borderImageOutset4([%e t], [%e r], [%e b], [%e l])],
+      ]
+    | []
+    | _ => raise(Impossible_state)
   );
 
 let render_border_image_repeat_value = (~loc, value) =>
@@ -2907,11 +2922,11 @@ let border_image_repeat =
     Property_parser.property_border_image_repeat,
     render_border_image_repeat_value,
     (~loc) =>
-      fun
-      | [all] => [[%expr CSS.borderImageRepeat([%e all])]]
-      | [v, h] => [[%expr CSS.borderImageRepeat2([%e v], [%e h])]]
-      | []
-      | _ => raise(Impossible_state),
+    fun
+    | [all] => [[%expr CSS.borderImageRepeat([%e all])]]
+    | [v, h] => [[%expr CSS.borderImageRepeat2([%e v], [%e h])]]
+    | []
+    | _ => raise(Impossible_state)
   );
 
 let border_image = unsupportedProperty(Property_parser.property_border_image);
@@ -3048,18 +3063,22 @@ let scrollbar_gutter =
   );
 
 let text_overflow =
-  Css_grammar.((
+  Css_grammar.(
     emit(
       Combinators.xor([
-        Rule.Match.map(Css_value_types.interpolation, data => `Variable(data)),
-        Rule.Match.map(Property_parser.property_text_overflow, data => `Value(data)),
+        Rule.Match.map(Css_value_types.interpolation, data =>
+          `Variable(data)
+        ),
+        Rule.Match.map(Property_parser.property_text_overflow, data =>
+          `Value(data)
+        ),
       ]),
-      (~loc) =>
-        value =>
-          switch (value) {
-          | `Variable(name) => `Variable(render_variable(~loc, String.concat(".", name)))
-          | `Value(ast) => `Value(ast)
-          },
+      (~loc, value) =>
+        switch (value) {
+        | `Variable(name) =>
+          `Variable(render_variable(~loc, String.concat(".", name)))
+        | `Value(ast) => `Value(ast)
+        },
       (~loc, value) => {
         let render = value =>
           switch (value) {
@@ -3069,25 +3088,31 @@ let text_overflow =
           };
         let static_rules =
           switch (value) {
-          | `Variable(exp) => {
-              let mk = exp => [[%expr CSS.textOverflow([%e exp])]];
-              switch (exp) {
-              | {pexp_desc: Pexp_ident({txt: Ldot(Lident("CSS"), _), _}), _} as exp =>
-                mk(exp)
-              | {pexp_desc: Pexp_ident(_), pexp_loc: _, _} as exp =>
-                mk(exp) |> List.map(add_CSS_rule_constraint(~loc))
-              | exp => mk(exp)
-              }
-            }
+          | `Variable(exp) =>
+            let mk = exp => [[%expr CSS.textOverflow([%e exp])]];
+            switch (exp) {
+            | {
+                pexp_desc: Pexp_ident({ txt: Ldot(Lident("CSS"), _), _ }),
+                _,
+              } as exp =>
+              mk(exp)
+            | { pexp_desc: Pexp_ident(_), pexp_loc: _, _ } as exp =>
+              mk(exp) |> List.map(add_CSS_rule_constraint(~loc))
+            | exp => mk(exp)
+            };
           | `Value([one]) => [[%expr CSS.textOverflow([%e render(one)])]]
-          | `Value([left, right]) => [[%expr CSS.textOverflow2([%e render(left)], [%e render(right)])]]
+          | `Value([left, right]) => [
+              [%expr
+                CSS.textOverflow2([%e render(left)], [%e render(right)])
+              ],
+            ]
           | `Value([])
           | `Value(_) => raise(Unsupported_feature)
           };
         static_rules;
       },
     )
-  ));
+  );
 // let block_ellipsis = unsupportedProperty(Property_parser.property_block_ellipsis);
 
 let max_lines =
@@ -3111,22 +3136,27 @@ let masonry_auto_flow =
       | (Some(`Next), None) => [%expr `next]
       | (None, Some(`Definite_first)) => [%expr `definiteFirst]
       | (None, Some(`Ordered)) => [%expr `ordered]
-      | (first, second) => {
-          let parts = [];
-          let parts =
-            switch (first) {
-            | Some(`Pack) => [{js|pack|js}, ...parts]
-            | Some(`Next) => [{js|next|js}, ...parts]
-            | None => parts
-            };
-          let parts =
-            switch (second) {
-            | Some(`Definite_first) => [{js|definite-first|js}, ...parts]
-            | Some(`Ordered) => [{js|ordered|js}, ...parts]
-            | None => parts
-            };
-          [%expr `value([%e render_string(~loc, String.concat({js| |js}, List.rev(parts)))])]
-        }
+      | (first, second) =>
+        let parts = [];
+        let parts =
+          switch (first) {
+          | Some(`Pack) => [{js|pack|js}, ...parts]
+          | Some(`Next) => [{js|next|js}, ...parts]
+          | None => parts
+          };
+        let parts =
+          switch (second) {
+          | Some(`Definite_first) => [{js|definite-first|js}, ...parts]
+          | Some(`Ordered) => [{js|ordered|js}, ...parts]
+          | None => parts
+          };
+        [%expr
+         `value(
+           [%e
+             render_string(~loc, String.concat({js| |js}, List.rev(parts)))
+           ],
+         )
+        ];
       },
   );
 // let continue = unsupportedProperty(Property_parser.property_continue);
@@ -3280,22 +3310,27 @@ let text_indent =
             };
           switch (hanging, each_line) {
           | (None, None) => base
-          | _ => {
-              let suffix =
-                (switch (hanging) {
+          | _ =>
+            let suffix =
+              (
+                switch (hanging) {
                 | Some(_) => {js| hanging|js}
                 | None => {js||js}
-                })
-                ++
-                (switch (each_line) {
+                }
+              )
+              ++ (
+                switch (each_line) {
                 | Some(_) => {js| each-line|js}
                 | None => {js||js}
-                });
-              [%expr
-                `value(CSS.Types.Length.toString([%e base]) ++ [%e render_string(~loc, suffix)])
-              ]
-            }
-          }
+                }
+              );
+            [%expr
+             `value(
+               CSS.Types.Length.toString([%e base])
+               ++ [%e render_string(~loc, suffix)],
+             )
+            ];
+          };
         },
   );
 
@@ -3306,24 +3341,34 @@ let hanging_punctuation =
     (~loc, value: Types.property_hanging_punctuation) =>
       switch (value) {
       | `None => [%expr `none]
-      | `Or(first, middle, last) => {
-          let parts = [];
-          let parts = switch (first) { | Some(_) => ["first", ...parts] | None => parts };
-          let parts = switch (middle) {
+      | `Or(first, middle, last) =>
+        let parts = [];
+        let parts =
+          switch (first) {
+          | Some(_) => ["first", ...parts]
+          | None => parts
+          };
+        let parts =
+          switch (middle) {
           | Some(`Force_end) => ["force-end", ...parts]
           | Some(`Allow_end) => ["allow-end", ...parts]
           | None => parts
           };
-          let parts = switch (last) { | Some(_) => ["last", ...parts] | None => parts };
-          let parts = List.rev(parts);
-          switch (parts) {
-          | ["first"] => [%expr `first]
-          | ["force-end"] => [%expr `forceEnd]
-          | ["allow-end"] => [%expr `allowEnd]
-          | ["last"] => [%expr `last]
-          | parts => [%expr `value([%e render_string(~loc, String.concat(" ", parts))])]
-          }
-        }
+        let parts =
+          switch (last) {
+          | Some(_) => ["last", ...parts]
+          | None => parts
+          };
+        let parts = List.rev(parts);
+        switch (parts) {
+        | ["first"] => [%expr `first]
+        | ["force-end"] => [%expr `forceEnd]
+        | ["allow-end"] => [%expr `allowEnd]
+        | ["last"] => [%expr `last]
+        | parts => [%expr
+           `value([%e render_string(~loc, String.concat(" ", parts))])
+          ]
+        };
       },
   );
 
@@ -5101,63 +5146,61 @@ let align_content =
    in emitted CSS rather than collapsing to `align-*:`. */
 let place_content =
   polymorphic(
-    Property_parser.property_place_content,
-    (~loc, (align_ast, justify_ast)) =>
-      switch (justify_ast) {
-      | None =>
-        align_content.ast_to_expr(~loc, `Value(align_ast))
-        |> List.map(value =>
-             switch (value.Parsetree.pexp_desc) {
-             | Pexp_apply(_, [(_, arg)]) => [%expr CSS.placeContent([%e arg])]
-             | _ => value
-             }
-           )
-      | Some(justify_ast) =>
-        let align = align_content.ast_to_expr(~loc, `Value(align_ast));
-        let justify =
-          justify_content.ast_to_expr(~loc, `Value(justify_ast));
-        align @ justify;
-      },
+    Property_parser.property_place_content, (~loc, (align_ast, justify_ast)) =>
+    switch (justify_ast) {
+    | None =>
+      align_content.ast_to_expr(~loc, `Value(align_ast))
+      |> List.map(value =>
+           switch (value.Parsetree.pexp_desc) {
+           | Pexp_apply(_, [(_, arg)]) => [%expr
+              CSS.placeContent([%e arg])
+             ]
+           | _ => value
+           }
+         )
+    | Some(justify_ast) =>
+      let align = align_content.ast_to_expr(~loc, `Value(align_ast));
+      let justify = justify_content.ast_to_expr(~loc, `Value(justify_ast));
+      align @ justify;
+    }
   );
 
 let place_items =
   polymorphic(
-    Property_parser.property_place_items,
-    (~loc, (align_ast, justify_ast)) =>
-      switch (justify_ast) {
-      | None =>
-        align_items.ast_to_expr(~loc, `Value(align_ast))
-        |> List.map(value =>
-             switch (value.Parsetree.pexp_desc) {
-             | Pexp_apply(_, [(_, arg)]) => [%expr CSS.placeItems([%e arg])]
-             | _ => value
-             }
-           )
-      | Some(justify_ast) =>
-        let align = align_items.ast_to_expr(~loc, `Value(align_ast));
-        let justify = justify_items.ast_to_expr(~loc, `Value(justify_ast));
-        align @ justify;
-      },
+    Property_parser.property_place_items, (~loc, (align_ast, justify_ast)) =>
+    switch (justify_ast) {
+    | None =>
+      align_items.ast_to_expr(~loc, `Value(align_ast))
+      |> List.map(value =>
+           switch (value.Parsetree.pexp_desc) {
+           | Pexp_apply(_, [(_, arg)]) => [%expr CSS.placeItems([%e arg])]
+           | _ => value
+           }
+         )
+    | Some(justify_ast) =>
+      let align = align_items.ast_to_expr(~loc, `Value(align_ast));
+      let justify = justify_items.ast_to_expr(~loc, `Value(justify_ast));
+      align @ justify;
+    }
   );
 
 let place_self =
   polymorphic(
-    Property_parser.property_place_self,
-    (~loc, (align_ast, justify_ast)) =>
-      switch (justify_ast) {
-      | None =>
-        align_self.ast_to_expr(~loc, `Value(align_ast))
-        |> List.map(value =>
-             switch (value.Parsetree.pexp_desc) {
-             | Pexp_apply(_, [(_, arg)]) => [%expr CSS.placeSelf([%e arg])]
-             | _ => value
-             }
-           )
-      | Some(justify_ast) =>
-        let align = align_self.ast_to_expr(~loc, `Value(align_ast));
-        let justify = justify_self.ast_to_expr(~loc, `Value(justify_ast));
-        align @ justify;
-      },
+    Property_parser.property_place_self, (~loc, (align_ast, justify_ast)) =>
+    switch (justify_ast) {
+    | None =>
+      align_self.ast_to_expr(~loc, `Value(align_ast))
+      |> List.map(value =>
+           switch (value.Parsetree.pexp_desc) {
+           | Pexp_apply(_, [(_, arg)]) => [%expr CSS.placeSelf([%e arg])]
+           | _ => value
+           }
+         )
+    | Some(justify_ast) =>
+      let align = align_self.ast_to_expr(~loc, `Value(align_ast));
+      let justify = justify_self.ast_to_expr(~loc, `Value(justify_ast));
+      align @ justify;
+    }
   );
 
 let render_line_names = (~loc, value: Types.line_names) => {
@@ -6056,76 +6099,112 @@ let column_span =
 let columns = unsupportedProperty(Property_parser.property_columns);
 
 let counter_increment =
-  polymorphic(Property_parser.property_counter_increment, (~loc, value) => {
-    let render_item = ((name, value_opt)) => {
-      let value = switch (value_opt) { | Some(value) => value | None => 1 };
-      [%expr
-        `increment(([%e render_string(~loc, name)], [%e render_integer(~loc, value)]))
-      ];
-    };
-    switch (value) {
-    | `None => [[%expr CSS.counterIncrement(`none)]]
-    | `Static(items) =>
-      switch (items) {
-      | [item] => [[%expr CSS.counterIncrement([%e render_item(item)])]]
-      | items => [
-          [%expr
-            CSS.countersIncrement(
-              [%e items |> List.map(render_item) |> Builder.pexp_array(~loc)],
-            )
-          ],
-        ]
-      }
-    }
-  });
+  polymorphic(
+    Property_parser.property_counter_increment,
+    (~loc, value) => {
+      let render_item = ((name, value_opt)) => {
+        let value =
+          switch (value_opt) {
+          | Some(value) => value
+          | None => 1
+          };
+        [%expr
+         `increment((
+           [%e render_string(~loc, name)],
+           [%e render_integer(~loc, value)],
+         ))
+        ];
+      };
+      switch (value) {
+      | `None => [[%expr CSS.counterIncrement(`none)]]
+      | `Static(items) =>
+        switch (items) {
+        | [item] => [[%expr CSS.counterIncrement([%e render_item(item)])]]
+        | items => [
+            [%expr
+              CSS.countersIncrement(
+                [%e
+                  items |> List.map(render_item) |> Builder.pexp_array(~loc)
+                ],
+              )
+            ],
+          ]
+        }
+      };
+    },
+  );
 
 let counter_reset =
-  polymorphic(Property_parser.property_counter_reset, (~loc, value) => {
-    let render_item = ((name, value_opt)) => {
-      let value = switch (value_opt) { | Some(value) => value | None => 0 };
-      [%expr
-        `reset(([%e render_string(~loc, name)], [%e render_integer(~loc, value)]))
-      ];
-    };
-    switch (value) {
-    | `None => [[%expr CSS.counterReset(`none)]]
-    | `Static(items) =>
-      switch (items) {
-      | [item] => [[%expr CSS.counterReset([%e render_item(item)])]]
-      | items => [
-          [%expr
-            CSS.countersReset(
-              [%e items |> List.map(render_item) |> Builder.pexp_array(~loc)],
-            )
-          ],
-        ]
-      }
-    }
-  });
+  polymorphic(
+    Property_parser.property_counter_reset,
+    (~loc, value) => {
+      let render_item = ((name, value_opt)) => {
+        let value =
+          switch (value_opt) {
+          | Some(value) => value
+          | None => 0
+          };
+        [%expr
+         `reset((
+           [%e render_string(~loc, name)],
+           [%e render_integer(~loc, value)],
+         ))
+        ];
+      };
+      switch (value) {
+      | `None => [[%expr CSS.counterReset(`none)]]
+      | `Static(items) =>
+        switch (items) {
+        | [item] => [[%expr CSS.counterReset([%e render_item(item)])]]
+        | items => [
+            [%expr
+              CSS.countersReset(
+                [%e
+                  items |> List.map(render_item) |> Builder.pexp_array(~loc)
+                ],
+              )
+            ],
+          ]
+        }
+      };
+    },
+  );
 
 let counter_set =
-  polymorphic(Property_parser.property_counter_set, (~loc, value) => {
-    let render_item = ((name, value_opt)) => {
-      let value = switch (value_opt) { | Some(value) => value | None => 0 };
-      [%expr
-        `set(([%e render_string(~loc, name)], [%e render_integer(~loc, value)]))
-      ];
-    };
-    switch (value) {
-    | `None => [[%expr CSS.counterSet(`none)]]
-    | `Static(items) =>
-      switch (items) {
-      | [item] => [[%expr CSS.counterSet([%e render_item(item)])]]
-      | items => [
-          [%expr
-            CSS.countersSet(
-              [%e items |> List.map(render_item) |> Builder.pexp_array(~loc)],
-            )
-          ],
-        ]
-      }
-    }
-  });
+  polymorphic(
+    Property_parser.property_counter_set,
+    (~loc, value) => {
+      let render_item = ((name, value_opt)) => {
+        let value =
+          switch (value_opt) {
+          | Some(value) => value
+          | None => 0
+          };
+        [%expr
+         `set((
+           [%e render_string(~loc, name)],
+           [%e render_integer(~loc, value)],
+         ))
+        ];
+      };
+      switch (value) {
+      | `None => [[%expr CSS.counterSet(`none)]]
+      | `Static(items) =>
+        switch (items) {
+        | [item] => [[%expr CSS.counterSet([%e render_item(item)])]]
+        | items => [
+            [%expr
+              CSS.countersSet(
+                [%e
+                  items |> List.map(render_item) |> Builder.pexp_array(~loc)
+                ],
+              )
+            ],
+          ]
+        }
+      };
+    },
+  );
 
 let render_cursor = (~loc, value) =>
   switch (value) {
@@ -6636,29 +6715,27 @@ let scrollbar_width =
 
 let scroll_margin =
   emit_shorthand(
-    Property_parser.property_scroll_margin,
-    render_extended_length,
-    (~loc) =>
-      fun
-      | [all] => [[%expr CSS.scrollMargin([%e all])]]
-      | [v, h] => [[%expr CSS.scrollMargin2(~v=[%e v], ~h=[%e h])]]
-      | [top, h, bottom] => [
-          [%expr
-            CSS.scrollMargin3(~top=[%e top], ~h=[%e h], ~bottom=[%e bottom])
-          ],
-        ]
-      | [top, right, bottom, left] => [
-          [%expr
-            CSS.scrollMargin4(
-              ~top=[%e top],
-              ~right=[%e right],
-              ~bottom=[%e bottom],
-              ~left=[%e left],
-            )
-          ],
-        ]
-      | []
-      | _ => raise(Impossible_state),
+    Property_parser.property_scroll_margin, render_extended_length, (~loc) =>
+    fun
+    | [all] => [[%expr CSS.scrollMargin([%e all])]]
+    | [v, h] => [[%expr CSS.scrollMargin2(~v=[%e v], ~h=[%e h])]]
+    | [top, h, bottom] => [
+        [%expr
+          CSS.scrollMargin3(~top=[%e top], ~h=[%e h], ~bottom=[%e bottom])
+        ],
+      ]
+    | [top, right, bottom, left] => [
+        [%expr
+          CSS.scrollMargin4(
+            ~top=[%e top],
+            ~right=[%e right],
+            ~bottom=[%e bottom],
+            ~left=[%e left],
+          )
+        ],
+      ]
+    | []
+    | _ => raise(Impossible_state)
   );
 
 let scroll_margin_block =
@@ -6666,11 +6743,11 @@ let scroll_margin_block =
     Property_parser.property_scroll_margin_block,
     render_extended_length,
     (~loc) =>
-      fun
-      | [all] => [[%expr CSS.scrollMarginBlock([%e all])]]
-      | [v, h] => [[%expr CSS.scrollMarginBlock2(~v=[%e v], ~h=[%e h])]]
-      | []
-      | _ => raise(Impossible_state),
+    fun
+    | [all] => [[%expr CSS.scrollMarginBlock([%e all])]]
+    | [v, h] => [[%expr CSS.scrollMarginBlock2(~v=[%e v], ~h=[%e h])]]
+    | []
+    | _ => raise(Impossible_state)
   );
 
 let scroll_margin_block_end =
@@ -6699,11 +6776,11 @@ let scroll_margin_inline =
     Property_parser.property_scroll_margin_inline,
     render_extended_length,
     (~loc) =>
-      fun
-      | [all] => [[%expr CSS.scrollMarginInline([%e all])]]
-      | [v, h] => [[%expr CSS.scrollMarginInline2(~v=[%e v], ~h=[%e h])]]
-      | []
-      | _ => raise(Impossible_state),
+    fun
+    | [all] => [[%expr CSS.scrollMarginInline([%e all])]]
+    | [v, h] => [[%expr CSS.scrollMarginInline2(~v=[%e v], ~h=[%e h])]]
+    | []
+    | _ => raise(Impossible_state)
   );
 
 let scroll_margin_inline_end =
@@ -6745,33 +6822,34 @@ let render_scroll_padding_value = (~loc) =>
   fun
   | `Auto => [%expr `auto]
   | `Extended_length(length) => render_extended_length(~loc, length)
-  | `Extended_percentage(percentage) => render_extended_percentage(~loc, percentage);
+  | `Extended_percentage(percentage) =>
+    render_extended_percentage(~loc, percentage);
 
 let scroll_padding =
   emit_shorthand(
     Property_parser.property_scroll_padding,
     render_scroll_padding_value,
     (~loc) =>
-      fun
-      | [all] => [[%expr CSS.scrollPadding([%e all])]]
-      | [v, h] => [[%expr CSS.scrollPadding2(~v=[%e v], ~h=[%e h])]]
-      | [top, h, bottom] => [
-          [%expr
-            CSS.scrollPadding3(~top=[%e top], ~h=[%e h], ~bottom=[%e bottom])
-          ],
-        ]
-      | [top, right, bottom, left] => [
-          [%expr
-            CSS.scrollPadding4(
-              ~top=[%e top],
-              ~right=[%e right],
-              ~bottom=[%e bottom],
-              ~left=[%e left],
-            )
-          ],
-        ]
-      | []
-      | _ => raise(Impossible_state),
+    fun
+    | [all] => [[%expr CSS.scrollPadding([%e all])]]
+    | [v, h] => [[%expr CSS.scrollPadding2(~v=[%e v], ~h=[%e h])]]
+    | [top, h, bottom] => [
+        [%expr
+          CSS.scrollPadding3(~top=[%e top], ~h=[%e h], ~bottom=[%e bottom])
+        ],
+      ]
+    | [top, right, bottom, left] => [
+        [%expr
+          CSS.scrollPadding4(
+            ~top=[%e top],
+            ~right=[%e right],
+            ~bottom=[%e bottom],
+            ~left=[%e left],
+          )
+        ],
+      ]
+    | []
+    | _ => raise(Impossible_state)
   );
 
 let scroll_padding_block =
@@ -6779,11 +6857,11 @@ let scroll_padding_block =
     Property_parser.property_scroll_padding_block,
     render_scroll_padding_value,
     (~loc) =>
-      fun
-      | [all] => [[%expr CSS.scrollPaddingBlock([%e all])]]
-      | [v, h] => [[%expr CSS.scrollPaddingBlock2(~v=[%e v], ~h=[%e h])]]
-      | []
-      | _ => raise(Impossible_state),
+    fun
+    | [all] => [[%expr CSS.scrollPaddingBlock([%e all])]]
+    | [v, h] => [[%expr CSS.scrollPaddingBlock2(~v=[%e v], ~h=[%e h])]]
+    | []
+    | _ => raise(Impossible_state)
   );
 
 let scroll_padding_block_end =
@@ -6812,11 +6890,11 @@ let scroll_padding_inline =
     Property_parser.property_scroll_padding_inline,
     render_scroll_padding_value,
     (~loc) =>
-      fun
-      | [all] => [[%expr CSS.scrollPaddingInline([%e all])]]
-      | [v, h] => [[%expr CSS.scrollPaddingInline2(~v=[%e v], ~h=[%e h])]]
-      | []
-      | _ => raise(Impossible_state),
+    fun
+    | [all] => [[%expr CSS.scrollPaddingInline([%e all])]]
+    | [v, h] => [[%expr CSS.scrollPaddingInline2(~v=[%e v], ~h=[%e h])]]
+    | []
+    | _ => raise(Impossible_state)
   );
 
 let scroll_padding_inline_end =
@@ -6946,7 +7024,11 @@ let text_combine_upright =
       | `None => [%expr `none]
       | `All => [%expr `all]
       | `Static(_, None) => [%expr `digits]
-      | `Static(_, Some(count)) => [%expr `value([%e render_string(~loc, {js|digits |js} ++ string_of_int(count))])]
+      | `Static(_, Some(count)) => [%expr
+         `value(
+           [%e render_string(~loc, {js|digits |js} ++ string_of_int(count))],
+         )
+        ]
       },
   );
 
@@ -6963,7 +7045,7 @@ let all =
     Property_parser.property_all,
     (~loc) =>
       [%expr
-        value => CSS.unsafe({js|all|js}, CSS.Types.Cascading.toString(value))
+       value => CSS.unsafe({js|all|js}, CSS.Types.Cascading.toString(value))
       ],
     render_all,
   );
@@ -6984,37 +7066,40 @@ let appearance =
   );
 
 let background_blend_mode =
-  polymorphic(Property_parser.property_background_blend_mode, (~loc, values) => {
-    let render = value =>
-      switch (value) {
-      | `Normal => [%expr `normal]
-      | `Multiply => [%expr `multiply]
-      | `Screen => [%expr `screen]
-      | `Overlay => [%expr `overlay]
-      | `Darken => [%expr `darken]
-      | `Lighten => [%expr `lighten]
-      | `Color_dodge => [%expr `colorDodge]
-      | `Color_burn => [%expr `colorBurn]
-      | `Hard_light => [%expr `hardLight]
-      | `Soft_light => [%expr `softLight]
-      | `Difference => [%expr `difference]
-      | `Exclusion => [%expr `exclusion]
-      | `Hue => [%expr `hue]
-      | `Saturation => [%expr `saturation]
-      | `Color => [%expr `color]
-      | `Luminosity => [%expr `luminosity]
+  polymorphic(
+    Property_parser.property_background_blend_mode,
+    (~loc, values) => {
+      let render = value =>
+        switch (value) {
+        | `Normal => [%expr `normal]
+        | `Multiply => [%expr `multiply]
+        | `Screen => [%expr `screen]
+        | `Overlay => [%expr `overlay]
+        | `Darken => [%expr `darken]
+        | `Lighten => [%expr `lighten]
+        | `Color_dodge => [%expr `colorDodge]
+        | `Color_burn => [%expr `colorBurn]
+        | `Hard_light => [%expr `hardLight]
+        | `Soft_light => [%expr `softLight]
+        | `Difference => [%expr `difference]
+        | `Exclusion => [%expr `exclusion]
+        | `Hue => [%expr `hue]
+        | `Saturation => [%expr `saturation]
+        | `Color => [%expr `color]
+        | `Luminosity => [%expr `luminosity]
+        };
+      switch (values) {
+      | [value] => [[%expr CSS.backgroundBlendMode([%e render(value)])]]
+      | values => [
+          [%expr
+            CSS.backgroundBlendModes(
+              [%e values |> List.map(render) |> Builder.pexp_array(~loc)],
+            )
+          ],
+        ]
       };
-    switch (values) {
-    | [value] => [[%expr CSS.backgroundBlendMode([%e render(value)])]]
-    | values => [
-        [%expr
-          CSS.backgroundBlendModes(
-            [%e values |> List.map(render) |> Builder.pexp_array(~loc)],
-          )
-        ],
-      ]
-    }
-  });
+    },
+  );
 
 let baseline_shift =
   unsupportedProperty(Property_parser.property_baseline_shift);
@@ -7149,27 +7234,28 @@ let color_scheme =
     (~loc, value: Types.property_color_scheme) =>
       switch (value) {
       | `Normal => [%expr `normal]
-      | `And(values, only_kw) => {
-          let parts =
-            values
-            |> List.map(item =>
-                 switch (item) {
-                 | `Dark => {js|dark|js}
-                 | `Light => {js|light|js}
-                 | `Custom_ident(x) => x
-                 }
-               );
-          let parts =
-            switch (only_kw) {
-            | Some(_) => List.append(parts, [{js|only|js}])
-            | None => parts
-            };
-          switch (parts) {
-          | [{js|dark|js}] => [%expr `dark]
-          | [{js|light|js}] => [%expr `light]
-          | parts => [%expr `value([%e render_string(~loc, String.concat({js| |js}, parts))])]
-          }
-        }
+      | `And(values, only_kw) =>
+        let parts =
+          values
+          |> List.map(item =>
+               switch (item) {
+               | `Dark => {js|dark|js}
+               | `Light => {js|light|js}
+               | `Custom_ident(x) => x
+               }
+             );
+        let parts =
+          switch (only_kw) {
+          | Some(_) => List.append(parts, [{js|only|js}])
+          | None => parts
+          };
+        switch (parts) {
+        | [{js|dark|js}] => [%expr `dark]
+        | [{js|light|js}] => [%expr `light]
+        | parts => [%expr
+           `value([%e render_string(~loc, String.concat({js| |js}, parts))])
+          ]
+        };
       },
   );
 
@@ -7287,7 +7373,13 @@ let render_function_attr =
    literal <custom-ident> like "list-item", or an interpolated value: in the
    interpolation case the user-supplied expression must be of type [string]. */
 let render_counter_name_expr =
-    (~loc, name: [ | `Counter_name(string) | `Interpolation(list(string))]) => {
+    (
+      ~loc,
+      name: [
+        | `Counter_name(string)
+        | `Interpolation(list(string))
+      ],
+    ) => {
   switch (name) {
   | `Counter_name(s) => render_string(~loc, s)
   | `Interpolation(path) => render_variable(~loc, String.concat(".", path))
@@ -7297,7 +7389,13 @@ let render_counter_name_expr =
 /* Like [render_counter_name_expr] for the <string> separator argument of
    counters(). Interpolated value must be of type [string]. */
 let render_counters_string_expr =
-    (~loc, sep: [ | `String(string) | `Interpolation(list(string))]) => {
+    (
+      ~loc,
+      sep: [
+        | `String(string)
+        | `Interpolation(list(string))
+      ],
+    ) => {
   switch (sep) {
   | `String(s) => render_string(~loc, s)
   | `Interpolation(path) => render_variable(~loc, String.concat(".", path))
@@ -7310,11 +7408,10 @@ let render_counters_string_expr =
 let render_counter_style_arg =
     (
       ~loc,
-      style:
-        [
-          | `Counter_style(Types.counter_style)
-          | `Interpolation(list(string))
-        ],
+      style: [
+        | `Counter_style(Types.counter_style)
+        | `Interpolation(list(string))
+      ],
     ) => {
   switch (style) {
   | `Counter_style(cs) => render_counter_style(~loc, cs)
@@ -7349,8 +7446,6 @@ let render_function_counters =
   | None => [%expr `counters(([%e name_expr], [%e sep_expr]))]
   };
 };
-
-
 
 let render_content_list = (~loc, content_list: Types.content_list) => {
   content_list
@@ -7496,29 +7591,30 @@ let initial_letter =
     (~loc, value: Types.property_initial_letter) =>
       switch (value) {
       | `Normal => [%expr `normal]
-      | `Static(number, None) => [%expr `num([%e render_float(~loc, number)])]
-      | `Static(number, Some(lines)) => {
-          let float_to_css_string = n => {
-            let s = string_of_float(n);
-            if (String.length(s) > 0 && String.get(s, String.length(s) - 1) == '.') {
-              String.sub(s, 0, String.length(s) - 1)
-            } else {
-              s
-            };
+      | `Static(number, None) => [%expr
+         `num([%e render_float(~loc, number)])
+        ]
+      | `Static(number, Some(lines)) =>
+        let float_to_css_string = n => {
+          let s = string_of_float(n);
+          if (String.length(s) > 0 && s.[String.length(s) - 1] == '.') {
+            String.sub(s, 0, String.length(s) - 1);
+          } else {
+            s;
           };
-          [%expr
-            `value(
-              [%e
-                render_string(
-                  ~loc,
-                  float_to_css_string(number)
-                  ++ {js| |js}
-                  ++ string_of_int(lines),
-                )
-              ],
-            )
-          ]
-        }
+        };
+        [%expr
+         `value(
+           [%e
+             render_string(
+               ~loc,
+               float_to_css_string(number)
+               ++ {js| |js}
+               ++ string_of_int(lines),
+             )
+           ],
+         )
+        ];
       },
   );
 
@@ -7538,14 +7634,12 @@ let inset_block_start =
 
 let inset_block =
   emit_shorthand(
-    Property_parser.property_inset_block,
-    render_position_value,
-    (~loc) =>
-      fun
-      | [all] => [[%expr CSS.insetBlock([%e all])]]
-      | [v, h] => [[%expr CSS.insetBlock2(~v=[%e v], ~h=[%e h])]]
-      | []
-      | _ => raise(Impossible_state),
+    Property_parser.property_inset_block, render_position_value, (~loc) =>
+    fun
+    | [all] => [[%expr CSS.insetBlock([%e all])]]
+    | [v, h] => [[%expr CSS.insetBlock2(~v=[%e v], ~h=[%e h])]]
+    | []
+    | _ => raise(Impossible_state)
   );
 
 let inset_inline_end =
@@ -7564,39 +7658,35 @@ let inset_inline_start =
 
 let inset_inline =
   emit_shorthand(
-    Property_parser.property_inset_inline,
-    render_position_value,
-    (~loc) =>
-      fun
-      | [all] => [[%expr CSS.insetInline([%e all])]]
-      | [v, h] => [[%expr CSS.insetInline2(~v=[%e v], ~h=[%e h])]]
-      | []
-      | _ => raise(Impossible_state),
+    Property_parser.property_inset_inline, render_position_value, (~loc) =>
+    fun
+    | [all] => [[%expr CSS.insetInline([%e all])]]
+    | [v, h] => [[%expr CSS.insetInline2(~v=[%e v], ~h=[%e h])]]
+    | []
+    | _ => raise(Impossible_state)
   );
 
 let inset =
   emit_shorthand(
-    Property_parser.property_inset,
-    render_position_value,
-    (~loc) =>
-      fun
-      | [all] => [[%expr CSS.inset([%e all])]]
-      | [v, h] => [[%expr CSS.inset2(~v=[%e v], ~h=[%e h])]]
-      | [top, h, bottom] => [
-          [%expr CSS.inset3(~top=[%e top], ~h=[%e h], ~bottom=[%e bottom])],
-        ]
-      | [top, right, bottom, left] => [
-          [%expr
-            CSS.inset4(
-              ~top=[%e top],
-              ~right=[%e right],
-              ~bottom=[%e bottom],
-              ~left=[%e left],
-            )
-          ],
-        ]
-      | []
-      | _ => raise(Impossible_state),
+    Property_parser.property_inset, render_position_value, (~loc) =>
+    fun
+    | [all] => [[%expr CSS.inset([%e all])]]
+    | [v, h] => [[%expr CSS.inset2(~v=[%e v], ~h=[%e h])]]
+    | [top, h, bottom] => [
+        [%expr CSS.inset3(~top=[%e top], ~h=[%e h], ~bottom=[%e bottom])],
+      ]
+    | [top, right, bottom, left] => [
+        [%expr
+          CSS.inset4(
+            ~top=[%e top],
+            ~right=[%e right],
+            ~bottom=[%e bottom],
+            ~left=[%e left],
+          )
+        ],
+      ]
+    | []
+    | _ => raise(Impossible_state)
   );
 
 let layout_grid_char =
@@ -7728,11 +7818,11 @@ let overscroll_behavior =
     Property_parser.property_overscroll_behavior,
     render_overscroll_behavior_value,
     (~loc) =>
-      fun
-      | [all] => [[%expr CSS.overscrollBehavior([%e all])]]
-      | [v, h] => [[%expr CSS.overscrollBehavior2([%e v], [%e h])]]
-      | []
-      | _ => raise(Impossible_state),
+    fun
+    | [all] => [[%expr CSS.overscrollBehavior([%e all])]]
+    | [v, h] => [[%expr CSS.overscrollBehavior2([%e v], [%e h])]]
+    | []
+    | _ => raise(Impossible_state)
   );
 
 let overscroll_behavior_block =
@@ -7776,11 +7866,11 @@ let scroll_snap_align =
     Property_parser.property_scroll_snap_align,
     render_scroll_snap_align_value,
     (~loc) =>
-      fun
-      | [all] => [[%expr CSS.scrollSnapAlign([%e all])]]
-      | [v, h] => [[%expr CSS.scrollSnapAlign2([%e v], [%e h])]]
-      | []
-      | _ => raise(Impossible_state),
+    fun
+    | [all] => [[%expr CSS.scrollSnapAlign([%e all])]]
+    | [v, h] => [[%expr CSS.scrollSnapAlign2([%e v], [%e h])]]
+    | []
+    | _ => raise(Impossible_state)
   );
 
 let scroll_snap_stop =
@@ -7812,29 +7902,31 @@ let scroll_snap_type =
           };
         switch (strictness) {
         | None => axis_expr
-        | Some(`Mandatory) => {
-            let axis =
-              switch (axis) {
-              | `X => {js|x|js}
-              | `Y => {js|y|js}
-              | `Block => {js|block|js}
-              | `Inline => {js|inline|js}
-              | `Both => {js|both|js}
-              };
-            [%expr `value([%e render_string(~loc, axis ++ {js| mandatory|js})])]
-          }
-        | Some(`Proximity) => {
-            let axis =
-              switch (axis) {
-              | `X => {js|x|js}
-              | `Y => {js|y|js}
-              | `Block => {js|block|js}
-              | `Inline => {js|inline|js}
-              | `Both => {js|both|js}
-              };
-            [%expr `value([%e render_string(~loc, axis ++ {js| proximity|js})])]
-          }
-        }
+        | Some(`Mandatory) =>
+          let axis =
+            switch (axis) {
+            | `X => {js|x|js}
+            | `Y => {js|y|js}
+            | `Block => {js|block|js}
+            | `Inline => {js|inline|js}
+            | `Both => {js|both|js}
+            };
+          [%expr
+           `value([%e render_string(~loc, axis ++ {js| mandatory|js})])
+          ];
+        | Some(`Proximity) =>
+          let axis =
+            switch (axis) {
+            | `X => {js|x|js}
+            | `Y => {js|y|js}
+            | `Block => {js|block|js}
+            | `Inline => {js|inline|js}
+            | `Both => {js|both|js}
+            };
+          [%expr
+           `value([%e render_string(~loc, axis ++ {js| proximity|js})])
+          ];
+        };
       },
   );
 

@@ -23,12 +23,25 @@ let record = (~longident: string, ~class_string: string) =>
          emitting two index keys for the same longident. */
       entries :=
         List.map(
-          e => e.longident == longident ? {longident, class_string} : e,
+          e =>
+            e.longident == longident
+              ? {
+                longident,
+                class_string,
+              }
+              : e,
           entries^,
         );
     } else {
       Hashtbl.add(seen, longident, ());
-      entries := [{longident, class_string}, ...entries^];
+      entries :=
+        [
+          {
+            longident,
+            class_string,
+          },
+          ...entries^,
+        ];
     };
   };
 
