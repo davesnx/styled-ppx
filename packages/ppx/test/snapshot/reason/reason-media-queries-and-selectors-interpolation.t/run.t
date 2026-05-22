@@ -3,7 +3,10 @@
   $ refmt --parse ml --print re output.ml
   let width = "120px";
   let orientation = "landscape";
-  module SelectorWithInterpolation = {
+  module SelectorWithInterpolation: {
+    type makeProps;
+    let make: makeProps => React.element;
+  } = {
     [@deriving (jsProperties, getSet)]
     type makeProps = {
       [@mel.optional]

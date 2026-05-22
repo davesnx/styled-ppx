@@ -1,7 +1,10 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  module SequenceDynamicComponent = {
+  module SequenceDynamicComponent: {
+    type makeProps('size);
+    let make: makeProps(_) => React.element;
+  } = {
     [@deriving (jsProperties, getSet)]
     type makeProps('size) = {
       [@mel.optional]
@@ -984,7 +987,10 @@
       );
     };
   };
-  module DynamicComponentWithSequence = {
+  module DynamicComponentWithSequence: {
+    type makeProps('variant);
+    let make: makeProps(_) => React.element;
+  } = {
     [@deriving (jsProperties, getSet)]
     type makeProps('variant) = {
       [@mel.optional]

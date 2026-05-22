@@ -8,7 +8,10 @@
     };
   };
   let black = CSS.hex("000");
-  module StringInterpolation = {
+  module StringInterpolation: {
+    type makeProps;
+    let make: makeProps => React.element;
+  } = {
     [@deriving (jsProperties, getSet)]
     type makeProps = {
       [@mel.optional]

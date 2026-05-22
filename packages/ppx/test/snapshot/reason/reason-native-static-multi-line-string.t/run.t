@@ -1,7 +1,10 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --native --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  module MultiLineStrings = {
+  module MultiLineStrings: {
+    type makeProps;
+    let make: makeProps => React.element;
+  } = {
     [@deriving (jsProperties, getSet)]
     type makeProps = {
       [@mel.optional]

@@ -1,7 +1,10 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  module DynamicComponentWithArray = {
+  module DynamicComponentWithArray: {
+    type makeProps('color, 'size);
+    let make: makeProps(_, _) => React.element;
+  } = {
     [@deriving (jsProperties, getSet)]
     type makeProps('color, 'size) = {
       [@mel.optional]

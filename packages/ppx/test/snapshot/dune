@@ -9,13 +9,3 @@
    %{bin:standalone}
    %{bin:refmt}
    (package styled-ppx))))
-
-(subdir
- rescript
- (cram
-  (alias test-ppx-snapshot-rescript)
-  (enabled_if
-   (= %{env:OPAM_REPO_CI=false} false))
-  (deps
-   %{bin:rewriter}
-   (package styled-ppx))))

@@ -3,7 +3,10 @@
   $ refmt --parse ml --print re output.ml
   let sharedStylesBetweenDynamicComponents = (color): CSS.rule =>
     CSS.color(color);
-  module DynamicCompnentWithLetIn = {
+  module DynamicCompnentWithLetIn: {
+    type makeProps('color);
+    let make: makeProps(_) => React.element;
+  } = {
     [@deriving (jsProperties, getSet)]
     type makeProps('color) = {
       [@mel.optional]

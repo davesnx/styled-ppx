@@ -6,7 +6,10 @@
       (0, [|CSS.opacity(0.)|]),
       (100, [|CSS.opacity(1.)|]),
     |]);
-  module FadeIn = {
+  module FadeIn: {
+    type makeProps;
+    let make: makeProps => React.element;
+  } = {
     [@deriving (jsProperties, getSet)]
     type makeProps = {
       [@mel.optional]
