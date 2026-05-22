@@ -1,6 +1,6 @@
 Js.log("2000");
 
-[%cx
+[%css
   "
   height: 100%;
   height: 100%;

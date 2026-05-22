@@ -18,8 +18,8 @@ let reset = () => {
 };
 
 /* Rewrite [loc]'s pos_fname to [file] on both ends. The CSS parser produces
-   locations relative to the [%cx2] string payload with an empty pos_fname;
-   the surrounding [%cx2] knows the actual file via Code_path.file_path. We
+   locations relative to the [%css] string payload with an empty pos_fname;
+   the surrounding [%css] knows the actual file via Code_path.file_path. We
    attach it here so the aggregator can later format errors against the
    original source. */
 let with_filename = (~file: string, loc: Ppxlib.Location.t): Ppxlib.Location.t => {

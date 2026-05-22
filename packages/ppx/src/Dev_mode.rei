@@ -1,8 +1,8 @@
-/** Dev-mode marker class support for [%cx2].
+/** Dev-mode marker class support for [%css].
 
-    When the PPX is invoked with [--dev], every [%cx2] binding gets a
+    When the PPX is invoked with [--dev], every [%css] binding gets a
     leading marker class derived from its enclosing [let] binding name
-    (e.g. [let layout = [%cx2 ...]] yields [class="cx-layout c-..."]).
+    (e.g. [let layout = [%css ...]] yields [class="cx-layout c-..."]).
     The marker has no associated CSS rule; it exists purely as a
     grep-target in DOM inspectors.
 

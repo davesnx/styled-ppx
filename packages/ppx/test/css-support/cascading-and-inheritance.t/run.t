@@ -15,8 +15,12 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css ".css-1v7yg6i{color:unset;}"];
+  [@css ".css-1uehh2p{font-weight:unset;}"];
+  [@css ".css-kh6y3o{background-image:unset;}"];
+  [@css ".css-1oovyp6{width:unset;}"];
   
-  CSS.unsafe({js|color|js}, {js|unset|js});
-  CSS.unsafe({js|fontWeight|js}, {js|unset|js});
-  CSS.unsafe({js|backgroundImage|js}, {js|unset|js});
-  CSS.unsafe({js|width|js}, {js|unset|js});
+  CSS.make("css-1v7yg6i", []);
+  CSS.make("css-1uehh2p", []);
+  CSS.make("css-kh6y3o", []);
+  CSS.make("css-1oovyp6", []);

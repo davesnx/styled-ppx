@@ -2,8 +2,8 @@
 
 ## Status
 
-- Implementation reference for the static-extraction pipeline (`[%cx2]`,
-  `[%styled.global2]`, `[%keyframe2]`)
+- Implementation reference for the static-extraction pipeline (`[%css]`,
+  `[%styled.global2]`, `[%keyframe]`)
 - Companion to `documents/design.md` (high-level CSS pipeline) and
   `documents/cross-module-selector-interpolation.md` (the cross-module
   resolution layer)
@@ -15,9 +15,9 @@ runtime calls that mint CSS strings on first use:
 
 | Extension              | What it extracts                                                       |
 | ---------------------- | ---------------------------------------------------------------------- |
-| `[%cx2]`               | Class-scoped declaration lists, one atomized rule per declaration       |
+| `[%css]`               | Class-scoped declaration lists, one atomized rule per declaration       |
 | `[%styled.global2]`    | Top-level global rules and at-rules: `@font-face`, `@media`, `:root` custom properties, and any document-level selectors (no class scoping) |
-| `[%keyframe2]`         | `@keyframes` blocks, named by content hash                             |
+| `[%keyframe]`         | `@keyframes` blocks, named by content hash                             |
 
 For all three, the PPX renders the resulting CSS to a string at compile
 time and parks it in a top-level floating attribute on the post-PPX `.ml`
@@ -35,7 +35,7 @@ emit runtime `CSS.*` calls instead, and are not covered by this document.
   │
   ▼
 PPX expansion (per compilation unit)
-  ─ parse [%cx2 "..."] / [%styled.global2 "..."] / [%keyframe2 "..."]
+  ─ parse [%css "..."] / [%styled.global2 "..."] / [%keyframe "..."]
   ─ atomize, hash, mint class names
   ─ resolve same-module $(name) selector interpolations
   ─ buffer rendered rules; record cross-module refs as sentinels
@@ -91,7 +91,7 @@ resolve time. See
 
 ### `[@@@css.bindings [(longident, class_string); ...]]` — binding exports
 
-One attribute per CU, listing every named `[%cx2]` binding the CU minted.
+One attribute per CU, listing every named `[%css]` binding the CU minted.
 The longident is the fully-qualified path users would write to reference
 the binding from another module; the class string is the
 space-separated list of atomized class names the PPX produced.
@@ -108,7 +108,7 @@ The aggregator folds every payload into a flat
 AST walking, no `CSS.make` pattern matching, no filename-to-module
 inference.
 
-Anonymous bindings (`let _ = [%cx2 ...]`) are not exported because they
+Anonymous bindings (`let _ = [%css ...]`) are not exported because they
 cannot be referenced from another module.
 
 ### `[@@@css.refs [(longident, file, line, scol, ecol); ...]]` — cross-module references
@@ -139,13 +139,13 @@ transformer at end-of-CU:
 | Buffer                              | Source                         | Sink                              |
 | ----------------------------------- | ------------------------------ | --------------------------------- |
 | `Css_file.Buffer`                   | atomized rules during expansion | `[@@@css "..."]` attributes       |
-| `Css_bindings`                      | each named `[%cx2]` expansion  | `[@@@css.bindings ...]` attribute |
+| `Css_bindings`                      | each named `[%css]` expansion  | `[@@@css.bindings ...]` attribute |
 | `Cross_module_refs`                 | each unresolved `$(M.x)` in selector position | `[@@@css.refs ...]` attribute + synthetic `let _ = M.x` |
 
 `Local_selector_environment` is a fourth piece of state, distinct from the
 three above: it serves same-file selector interpolation before cross-module
 fallback. It is keyed by `(file, lexical_path)` and never escapes the CU.
-It tracks named `[%cx2]` bindings, same-file module aliases, same-file
+It tracks named `[%css]` bindings, same-file module aliases, same-file
 opens/includes, and earlier string literals. Cross-module references only go
 through `Cross_module_refs` after this local resolver fails.
 
@@ -203,7 +203,7 @@ either:
 
 ### `Css_bindings`
 
-Per-CU buffer of `(longident, class_string)` exports. The ordered `[%cx2]`
+Per-CU buffer of `(longident, class_string)` exports. The ordered `[%css]`
 structure pass computes the longident from the compilation unit name + current
 submodule path + the enclosing top-level value name, then calls
 `Css_bindings.record`. Last-write-wins on duplicates within a CU (matches
@@ -213,7 +213,7 @@ submodule path + the enclosing top-level value name, then calls
 
 Per-CU buffer populated by
 `Local_selector_environment.resolve_selector_class_ref` when the requested
-dotted `$(name)` cannot be resolved against a same-file `[%cx2]` binding,
+dotted `$(name)` cannot be resolved against a same-file `[%css]` binding,
 same-file module alias, same-file open/include, or earlier string literal.
 Records `(longident, location)` and produces a NUL-delimited sentinel string
 that gets baked into the rule the PPX is currently rendering. The sentinel
@@ -266,7 +266,7 @@ channel with optional `--minify` (no inter-rule newlines).
 
 ## Atomization
 
-Every declaration produced by `[%cx2]` becomes its own atom:
+Every declaration produced by `[%css]` becomes its own atom:
 `{ display: flex; color: red; }` produces two rules, two class names,
 two `[@@@css ...]` attributes. The runtime `CSS.make` call carries the
 space-separated concatenation of those class names, so consumers apply
@@ -278,7 +278,7 @@ cosmetic — atom hashes are deduplication-safe even when labels differ.
 
 Two consequences worth knowing:
 
-1. **One `[%cx2]` binding maps to N class names.** This is what the
+1. **One `[%css]` binding maps to N class names.** This is what the
    space-separated `class_string` in `[@@@css.bindings ...]` captures.
 2. **Cross-module `$(M.marker)` resolves to a chained compound** (e.g.
    `.cssA.cssB`) not a single class. The aggregator does the
@@ -303,7 +303,7 @@ Two consequences worth knowing:
   PPX writes the index directly into `[@@@css.bindings ...]`.
 - **Runtime resolution via `var(--xyz)` indirection.** Selector
   interpolation is resolved statically; this is a load-bearing choice
-  that distinguishes `[%cx2]` from `[%cx]` and is what makes the
+  that distinguishes `[%css]` from `[%cx]` and is what makes the
   aggregator necessary in the first place.
 
 ## See also

@@ -1,7 +1,7 @@
 /** Per-compilation-unit buffer of cross-module class references encountered
-    during [%cx2] expansion.
+    during [%css] expansion.
 
-    When a [%cx2] selector contains an interpolation like [$(M.x)] whose
+    When a [%css] selector contains an interpolation like [$(M.x)] whose
     target lives in another module, the PPX cannot resolve it locally —
     module M compiles separately and we have no access to its bindings.
     Rather than emit an error, we record the reference here, embed an
@@ -41,9 +41,9 @@ let sentinel: string => string;
 /** Record a cross-module class reference.
 
     The [~file] argument gives the source file path of the enclosing
-    [%cx2] block (e.g. ["packages/foo/src/n.re"]) and is used to populate
+    [%css] block (e.g. ["packages/foo/src/n.re"]) and is used to populate
     [pos_fname] on the recorded location. The CSS parser produces
-    locations relative to the [%cx2] string payload with an empty
+    locations relative to the [%css] string payload with an empty
     [pos_fname]; without this rewrite the aggregator could not point at
     the original [.re]/[.ml] file when reporting resolution errors.
 

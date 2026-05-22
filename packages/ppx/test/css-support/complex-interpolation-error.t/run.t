@@ -12,6 +12,9 @@ Test what happens with complex expressions in interpolation
   > EOF
 
   $ dune build 2>&1 | head -30
-  File "input.re", line 9, characters 11-57:
+  File "input.re", lines 8-10, characters 2-2:
+   8 | ..{|
+   9 |   color: $(match prop with | Big -> `red | Small -> `blue);
+  10 | |}
   Error: Invalid interpolation expression: syntax error, consider adding a `;'
          before

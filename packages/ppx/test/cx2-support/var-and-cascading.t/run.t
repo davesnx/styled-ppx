@@ -37,11 +37,11 @@ If this test fails, the var() and cascading support is broken
   [@css ".css-1fyzsk3{margin:unset;}"];
   [@css ".css-1k42sph{margin:revert;}"];
   [@css ".css-ypkzq5{margin:revert-layer;}"];
-  [@css ".css-y9nah6{flex:inherit;}"];
-  [@css ".css-1ujc6td{flex:initial;}"];
-  [@css ".css-1e042ms{flex:unset;}"];
-  [@css ".css-1bh8jui{flex:revert;}"];
-  [@css ".css-g54fps{flex:revert-layer;}"];
+  [@css ".css-y9nah6{-webkit-flex:inherit;-ms-flex:inherit;flex:inherit;}"];
+  [@css ".css-1ujc6td{-webkit-flex:initial;-ms-flex:initial;flex:initial;}"];
+  [@css ".css-1e042ms{-webkit-flex:unset;-ms-flex:unset;flex:unset;}"];
+  [@css ".css-1bh8jui{-webkit-flex:revert;-ms-flex:revert;flex:revert;}"];
+  [@css ".css-g54fps{-webkit-flex:revert-layer;-ms-flex:revert-layer;flex:revert-layer;}"];
   [@css ".css-67e5f8{font-size:inherit;}"];
   [@css ".css-ur53xd{font-size:initial;}"];
   [@css ".css-rjswxq{font-size:unset;}"];
@@ -85,4 +85,3 @@ If this test fails, the var() and cascading support is broken
   CSS.make("css-rjswxq", []);
   CSS.make("css-8zntfo", []);
   CSS.make("css-1kcpi5f", []);
-

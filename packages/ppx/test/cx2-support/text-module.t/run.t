@@ -17,8 +17,8 @@ If this test fail means that the module is not in sync with the ppx
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css ".css-kmzs7t{text-transform:full-width;}"];
   [@css ".css-1xpcm01{text-transform:full-size-kana;}"];
-  [@css ".css-y1d4rk{tab-size:4;}"];
-  [@css ".css-17xseav{tab-size:1em;}"];
+  [@css ".css-y1d4rk{-moz-tab-size:4;-o-tab-size:4;tab-size:4;}"];
+  [@css ".css-17xseav{-moz-tab-size:1em;-o-tab-size:1em;tab-size:1em;}"];
   [@css ".css-1i9f57d{line-break:auto;}"];
   [@css ".css-1jpu21a{line-break:loose;}"];
   [@css ".css-n4txm8{line-break:normal;}"];
@@ -28,9 +28,9 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-1nw2x84{word-break:keep-all;}"];
   [@css ".css-1hg9omi{word-break:break-all;}"];
   [@css ".css-1vw5a1r{white-space:break-spaces;}"];
-  [@css ".css-y8yffq{hyphens:auto;}"];
-  [@css ".css-16qmz35{hyphens:manual;}"];
-  [@css ".css-1oys3eu{hyphens:none;}"];
+  [@css ".css-y8yffq{-webkit-hyphens:auto;-moz-hyphens:auto;-ms-hyphens:auto;hyphens:auto;}"];
+  [@css ".css-16qmz35{-webkit-hyphens:manual;-moz-hyphens:manual;-ms-hyphens:manual;hyphens:manual;}"];
+  [@css ".css-1oys3eu{-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none;}"];
   [@css ".css-kilw6e{overflow-wrap:normal;}"];
   [@css ".css-1wekrze{overflow-wrap:break-word;}"];
   [@css ".css-9x4jlj{overflow-wrap:anywhere;}"];

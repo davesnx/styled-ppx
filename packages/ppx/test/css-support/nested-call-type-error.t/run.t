@@ -12,6 +12,8 @@ This test ensures nested call type errors inside interpolation are reported
   > EOF
 
   $ dune build 2>&1 | head -30
-  File "input.re", line 4, characters 22-29:
+  File "input.re", line 3, characters 29-36:
+  2 | ......................
+  3 | ......lor: $(...................
   Error: This constant has type string but an expression was expected of type
            int

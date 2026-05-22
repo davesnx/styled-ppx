@@ -1,2 +1,2 @@
 let grid = `gri;
-let a = [%cx {| display: $(grid); |}];
+let a = [%css {| display: $(grid); |}];

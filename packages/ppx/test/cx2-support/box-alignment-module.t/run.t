@@ -176,9 +176,9 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-1m20ra0{gap:0 1em;}"];
   [@css ".css-bd6cki{gap:1em;}"];
   [@css ".css-f0kubh{gap:1em 1em;}"];
-  [@css ".css-zqzqln{column-gap:0;}"];
-  [@css ".css-602mee{column-gap:1em;}"];
-  [@css ".css-mz5ixr{column-gap:normal;}"];
+  [@css ".css-zqzqln{-webkit-column-gap:0;column-gap:0;}"];
+  [@css ".css-602mee{-webkit-column-gap:1em;column-gap:1em;}"];
+  [@css ".css-mz5ixr{-webkit-column-gap:normal;column-gap:normal;}"];
   [@css ".css-1j42sqe{row-gap:0;}"];
   [@css ".css-28i0al{row-gap:1em;}"];
   [@css ".css-xyx8z6{margin-trim:none;}"];

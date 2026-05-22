@@ -7,95 +7,9 @@ let _ =
     ~doc=Settings.native.doc,
   );
 
-let (version, mode) = Bsconfig.getJSX();
-
-switch (version) {
-| Some(version) =>
-  Settings.Update.jsxVersion(version);
-  Settings.Update.jsxMode(mode);
-| None => ()
-};
-
-let is_css_keyword = (value: Styled_ppx_css_parser.Ast.component_value) => {
-  switch (value) {
-  | Ident("inherit")
-  | Ident("unset")
-  | Ident("initial")
-  | Ident("revert")
-  | Ident("revert-layer") => true
-  | _ => false
-  };
-};
-
-let rec type_check_rule = (rule: Styled_ppx_css_parser.Ast.rule) => {
-  switch (rule) {
-  | Declaration({ name: _, value: ([(value, _)], _), _ })
-      when is_css_keyword(value) => [
-      Ok(),
-    ]
-  | Declaration({ name: (name, _), value: (value, value_loc), loc: _, _ }) =>
-    switch (Css_grammar.validate_property(~loc=value_loc, ~name, value)) {
-    | Ok () => [Ok()]
-    | Error((loc, `Invalid_value(detail))) =>
-      let value_source =
-        Styled_ppx_css_parser.Render.component_value_list(value)
-        |> String.trim;
-      let msg =
-        Format.sprintf(
-          "@[Property@ '%s'@ has@ an@ invalid@ value:@ '%s',@ %s@]",
-          name,
-          value_source,
-          Css_grammar.Rule.format_error_info(detail),
-        );
-      [Error((loc, `Invalid_value(msg)))];
-    | Error((loc, `Property_not_found)) =>
-      let msg =
-        switch (Css_grammar.suggest_property_name(name)) {
-        | Some(suggestion) =>
-          "Unknown property '"
-          ++ name
-          ++ "'. Did you mean '"
-          ++ suggestion
-          ++ "'?"
-        | None => "Unknown property '" ++ name ++ "'"
-        };
-      [Error((loc, `Invalid_value(msg)))];
-    }
-  | Style_rule(style_rule) =>
-    let rule_list = style_rule.block;
-    type_check_rule_list(rule_list);
-  | At_rule(at_rule) =>
-    switch (at_rule.block) {
-    | Empty => [Ok()]
-    | Rule_list(rule_list) => type_check_rule_list(rule_list)
-    | Stylesheet(rule_list) => type_check_rule_list(rule_list)
-    }
-  };
-}
-
-and type_check_rule_list =
-    ((rule_list, _): Styled_ppx_css_parser.Ast.rule_list) => {
-  rule_list |> List.concat_map(rule => type_check_rule(rule));
-};
-
-let get_errors = validations => {
-  validations
-  |> List.filter_map(result =>
-       switch (result) {
-       | Error((loc, error)) => Some((loc, error))
-       | Ok(_) => None
-       }
-     );
-};
-
-let error_to_string = error => {
-  switch (error) {
-  | `Invalid_value(string) => string
-  | `Property_not_found => "Property not found"
-  };
-};
-
-let any_payload_pattern = Ppxlib.Ast_pattern.(single_expr_payload(__));
+let type_check_rule_list = Css_validation.type_check_rule_list;
+let get_errors = Css_validation.get_errors;
+let error_to_string = Css_validation.error_to_string;
 
 let any_module_payload_pattern =
   Ppxlib.Ast_pattern.(pstr(pstr_eval(__, nil) ^:: nil));
@@ -315,7 +229,7 @@ let make_synthetic_dep = ((longident_str: string, loc: Ppxlib.Location.t)) => {
       },
     );
   /* `let _ = M.Css.marker` â purely for ocamldep + early type errors.
-     Carrying the original [%cx2] location through here means
+     Carrying the original [%css] location through here means
      "Unbound module" / "Unbound value" errors point at the user's
      selector ref rather than at [_none_]. */
   Builder.pstr_value(
@@ -353,23 +267,16 @@ let payload_expr = payload =>
   | _ => None
   };
 
-let cx2_error_expr = (~payload_loc) => {
+let css_error_expr = (~payload_loc) => {
   let examples =
     switch (File.get()) {
     | Some(Reason) =>
       Some([
-        "[%cx2 \"display: block; color: red\"]",
-        "[%cx2 [|CSS.display(`block), CSS.color(CSS.red)|]]",
-      ])
-    | Some(ReScript) =>
-      Some([
-        "[%cx2 \"display: block; color: red\"]",
-        "[%cx2 [CSS.display(#block), CSS.color(#red)]]",
+        "[%css \"display: block; color: red\"]",
       ])
     | Some(OCaml) =>
       Some([
-        "[%cx2 \"display: block; color: red\"]",
-        "[%cx2 [|CSS.display `block, CSS.color CSS.red |]]",
+        "[%css \"display: block; color: red\"]",
       ])
     | None => None
     };
@@ -377,18 +284,18 @@ let cx2_error_expr = (~payload_loc) => {
     ~loc=payload_loc,
     ~examples?,
     ~link="https://styled-ppx.vercel.app/reference/cx",
-    "[%cx2] expects either a string of CSS or an array of CSS rules.",
+    "[%css] expects a string of CSS for static extraction.",
   );
 };
 
-let record_cx2_binding = (~file, ~main_module, ~scope, ~name, ~classNames) => {
+let record_css_binding = (~file, ~main_module, ~scope, ~name, ~classNames) => {
   Local_selector_environment.register(~file, ~scope, ~name, ~classNames);
   let longident = String.concat(".", [main_module, ...scope] @ [name]);
   let class_string = String.concat(" ", classNames);
   Css_bindings.record(~longident, ~class_string);
 };
 
-let expand_cx2_expression =
+let expand_css_expression =
     (
       ~file,
       ~main_module,
@@ -417,7 +324,7 @@ let expand_cx2_expression =
           Css_file.push(~file, ~scope, ~opens, ~label?, rule_list);
         switch (registry_name) {
         | Some(name) =>
-          record_cx2_binding(~file, ~main_module, ~scope, ~name, ~classNames)
+          record_css_binding(~file, ~main_module, ~scope, ~name, ~classNames)
         | None => ()
         };
         let marker = Dev_mode.marker(label_name);
@@ -443,22 +350,18 @@ let expand_cx2_expression =
         | _ =>
           Error.expressions(
             ~loc=stringLoc,
-            ~description="Multiple errors on cx2 definition",
+            ~description="Multiple errors on css definition",
             error_messages,
           )
         };
       };
     | Error((loc, msg)) => Error.expr(~loc, msg)
     };
-  | Pexp_array(arr) =>
-    arr
-    |> Builder.pexp_array(~loc=payload.pexp_loc)
-    |> Css_to_runtime.render_style_call(~loc=payload.pexp_loc)
-  | _ => cx2_error_expr(~payload_loc=payload.pexp_loc)
+    | _ => css_error_expr(~payload_loc=payload.pexp_loc)
   };
 };
 
-let expand_global2_module = (~file, ~scope, ~opens, payload) => {
+let expand_global_module = (~file, ~scope, ~opens, payload) => {
   open Ppxlib;
   File.set(file);
   switch (payload.pexp_desc) {
@@ -503,12 +406,9 @@ let expand_global2_module = (~file, ~scope, ~opens, payload) => {
           let to_buffer_decl = [%stri
             let to_buffer = buf => Buffer.add_string(buf, to_string())
           ];
-          let make_decl = [%stri
-            let make = () => CSS.global_style_tag(to_string())
-          ];
           Builder.pmod_structure(
             ~loc=stringLoc,
-            [to_string_decl, to_buffer_decl, make_decl],
+            [to_string_decl, to_buffer_decl],
           );
         | errors =>
           let error_messages =
@@ -534,7 +434,7 @@ let expand_global2_module = (~file, ~scope, ~opens, payload) => {
                 Ppxlib.Location.Error.make(
                   ~loc=stringLoc,
                   ~sub=error_messages,
-                  "Multiple errors on styled.global2 definition",
+                  "Multiple errors on styled.global definition",
                 ),
               ),
             )
@@ -552,13 +452,13 @@ let expand_global2_module = (~file, ~scope, ~opens, payload) => {
       ~loc=payload.pexp_loc,
       Location.error_extensionf(
         ~loc=payload.pexp_loc,
-        "[%%styled.global2] expects a string of CSS with selectors that apply to the whole document.\n\nExample:\n  module Reset = [%%styled.global2 \"body { margin: 0; }\"]",
+        "[%%styled.global] expects a string of CSS with selectors that apply to the whole document.\n\nExample:\n  module Reset = [%%styled.global \"body { margin: 0; }\"]",
       ),
     )
   };
 };
 
-let expand_keyframe2_expression = (~file, payload: Ppxlib.expression) => {
+let expand_keyframe_expression = (~file, payload: Ppxlib.expression) => {
   open Ppxlib;
   File.set(file);
   switch (payload.pexp_desc) {
@@ -582,10 +482,132 @@ let expand_keyframe2_expression = (~file, payload: Ppxlib.expression) => {
   | _ =>
     Error.raise(
       ~loc=payload.pexp_loc,
-      ~examples=["[%keyframe2 \"0% { opacity: 0; } 100% { opacity: 1; }\"]"],
+      ~examples=["[%keyframe \"0% { opacity: 0; } 100% { opacity: 1; }\"]"],
       ~link="https://styled-ppx.vercel.app/reference/keyframe",
-      "[%keyframe2] expects a string of CSS with keyframe definitions.",
+      "[%keyframe] expects a string of CSS with keyframe definitions.",
     )
+  };
+};
+
+let styled_tag = name => {
+  let prefix = "styled.";
+  let prefix_len = String.length(prefix);
+  let name_len = String.length(name);
+
+  if (name_len > prefix_len
+      && String.sub(name, 0, prefix_len) == prefix
+      && name != "styled.global") {
+    let htmlTag = String.sub(name, prefix_len, name_len - prefix_len);
+    List.mem(htmlTag, html_tags) ? Some(htmlTag) : None;
+  } else {
+    None;
+  };
+};
+
+let styled_payload = (expr: Ppxlib.module_expr) =>
+  switch (expr.pmod_desc) {
+  | Pmod_extension(({ txt: extension_name, _ }, payload)) =>
+    switch (styled_tag(extension_name), payload_expr(payload)) {
+    | (Some(htmlTag), Some(payload)) => Some((htmlTag, payload))
+    | _ => None
+    }
+  | _ => None
+  };
+
+let styled_error_module = (~loc, ~htmlTag) =>
+  Builder.pmod_extension(
+    ~loc,
+    Ppxlib.Location.error_extensionf(
+      ~loc,
+      "[%%styled.%s] expects a string of CSS or a function returning a CSS string for static extraction.",
+      htmlTag,
+    ),
+  );
+
+let expand_styled_module =
+    (~file, ~main_module, ~scope, ~opens, ~name, ~htmlTag, payload) => {
+  open Ppxlib;
+  File.set(file);
+  let record_component_binding = classNames =>
+    record_css_binding(~file, ~main_module, ~scope, ~name, ~classNames);
+
+  switch (payload.pexp_desc) {
+  | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
+    let loc =
+      Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+        stringLoc,
+        delimiter,
+      );
+    switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, txt)) {
+    | Ok(rule_list) =>
+      switch (get_errors(type_check_rule_list(rule_list))) {
+      | [] =>
+        let (classNames, dynamic_vars) =
+          Css_file.push(~file, ~scope, ~opens, ~label=name, rule_list);
+        record_component_binding(classNames);
+        let styles =
+          Css_to_runtime.render_make_call(
+            ~loc=stringLoc,
+            ~marker=None,
+            ~classNames,
+            ~dynamic_vars,
+          );
+        Generate.staticComponent(~loc=stringLoc, ~htmlTag, styles);
+      | errors =>
+        let error_messages =
+          errors
+          |> List.map(((error_loc, error)) => {
+               let adjusted_loc =
+                 Styled_ppx_css_parser.Parser_location.adjust_to_file(
+                   ~relative_loc=error_loc,
+                   ~base_loc=loc,
+                 );
+               (adjusted_loc, error_to_string(error));
+             });
+        switch (error_messages) {
+        | [(loc, msg)] =>
+          Builder.pmod_extension(
+            ~loc,
+            Location.error_extensionf(~loc, "%s", msg),
+          )
+        | _ =>
+          Builder.pmod_extension(
+            ~loc=stringLoc,
+            Ppxlib.Location.Error.to_extension(
+              Ppxlib.Location.Error.make(
+                ~loc=stringLoc,
+                ~sub=error_messages,
+                "Multiple errors on styled component definition",
+              ),
+            ),
+          )
+        };
+      }
+    | Error((loc, msg)) =>
+      Builder.pmod_extension(
+        ~loc,
+        Location.error_extensionf(~loc, "%s", msg),
+      )
+    };
+  | Pexp_function(
+      [{ pparam_desc: Pparam_val(fnLabel, defaultValue, param), _ }],
+      _,
+      Pfunction_body(expression),
+    ) =>
+    Generate.dynamicExtractedComponent(
+      ~loc=payload.pexp_loc,
+      ~file,
+      ~scope,
+      ~opens,
+      ~htmlTag,
+      ~label=fnLabel,
+      ~moduleName=name,
+      ~defaultValue,
+      ~param,
+      ~body=expression,
+      ~onClassNames=record_component_binding,
+    )
+  | _ => styled_error_module(~loc=payload.pexp_loc, ~htmlTag)
   };
 };
 
@@ -607,7 +629,18 @@ let register_string_binding = (~file, ~scope, ~name, expr: Ppxlib.expression) =>
   | _ => ()
   };
 
-let map_cx2_expressions =
+let lower_styles_prop = (~loc, expr) => [
+  (Ppxlib.Asttypes.Labelled("className"), [%expr fst([%e expr])]),
+  (Ppxlib.Asttypes.Labelled("style"), [%expr snd([%e expr])]),
+];
+
+let lower_styles_arg = (~loc, (label, expr)) =>
+  switch (label) {
+  | Ppxlib.Asttypes.Labelled("styles") => lower_styles_prop(~loc, expr)
+  | _ => [(label, expr)]
+  };
+
+let map_css_expressions =
     (~file, ~main_module, ~scope, ~opens, ~top_binding, expr) => {
   let rec map_with_label = (~label_name, expr) => {
     let mapper = {
@@ -615,10 +648,20 @@ let map_cx2_expressions =
       inherit class Ppxlib.Ast_traverse.map as super;
       pub! expression = expr =>
         switch (expr.Ppxlib.pexp_desc) {
-        | Pexp_extension(({ txt: "cx2", _ }, payload)) =>
+        | Pexp_apply(fn, args) =>
+          let fn = self#expression(fn);
+          let args =
+            args
+            |> List.map(((label, arg)) => (label, self#expression(arg)))
+            |> List.concat_map(lower_styles_arg(~loc=expr.pexp_loc));
+          {
+            ...expr,
+            pexp_desc: Pexp_apply(fn, args),
+          };
+        | Pexp_extension(({ txt: "css", _ }, payload)) =>
           switch (payload_expr(payload)) {
           | Some(payload) =>
-            expand_cx2_expression(
+            expand_css_expression(
               ~file,
               ~main_module,
               ~scope,
@@ -627,19 +670,19 @@ let map_cx2_expressions =
               ~registry_name=top_binding,
               payload,
             )
-          | None => cx2_error_expr(~payload_loc=expr.pexp_loc)
+          | None => css_error_expr(~payload_loc=expr.pexp_loc)
           }
-        | Pexp_extension(({ txt: "keyframe2", _ }, payload)) =>
+        | Pexp_extension(({ txt: "keyframe", _ }, payload)) =>
           switch (payload_expr(payload)) {
-          | Some(payload) => expand_keyframe2_expression(~file, payload)
+          | Some(payload) => expand_keyframe_expression(~file, payload)
           | None =>
             Error.raise(
               ~loc=expr.pexp_loc,
               ~examples=[
-                "[%keyframe2 \"0% { opacity: 0; } 100% { opacity: 1; }\"]",
+                "[%keyframe \"0% { opacity: 0; } 100% { opacity: 1; }\"]",
               ],
               ~link="https://styled-ppx.vercel.app/reference/keyframe",
-              "[%keyframe2] expects a string of CSS with keyframe definitions.",
+              "[%keyframe] expects a string of CSS with keyframe definitions.",
             )
           }
         | Pexp_let(rec_flag, bindings, body) =>
@@ -701,15 +744,15 @@ let rec map_ordered_module_expr =
       ...expr,
       pmod_desc: Pmod_functor(param, body),
     };
-  | Pmod_extension(({ txt: "styled.global2", _ }, payload)) =>
+  | Pmod_extension(({ txt: "styled.global", _ }, payload)) =>
     switch (payload_expr(payload)) {
-    | Some(payload) => expand_global2_module(~file, ~scope, ~opens, payload)
+    | Some(payload) => expand_global_module(~file, ~scope, ~opens, payload)
     | None =>
       Builder.pmod_extension(
         ~loc=expr.pmod_loc,
         Ppxlib.Location.error_extensionf(
           ~loc=expr.pmod_loc,
-          "[%%styled.global2] expects a string of CSS with selectors that apply to the whole document.\n\nExample:\n  module Reset = [%%styled.global2 \"body { margin: 0; }\"]",
+          "[%%styled.global] expects a string of CSS with selectors that apply to the whole document.\n\nExample:\n  module Reset = [%%styled.global \"body { margin: 0; }\"]",
         ),
       )
     }
@@ -727,7 +770,7 @@ and map_ordered_structure = (~file, ~main_module, ~scope, items) => {
           (binding: Ppxlib.value_binding) => {
             let name = binding_name_from_pat(binding.pvb_pat);
             let expr =
-              map_cx2_expressions(
+              map_css_expressions(
                 ~file,
                 ~main_module,
                 ~scope,
@@ -755,33 +798,46 @@ and map_ordered_structure = (~file, ~main_module, ~scope, items) => {
       switch (binding.pmb_name.txt) {
       | Some(name) =>
         let module_scope = scope @ [name];
-        switch (module_path_from_expr(binding.pmb_expr)) {
-        | Some(target) =>
-          Local_selector_environment.register_alias(
-            ~file,
-            ~scope,
-            ~name,
-            ~target=
-              Local_selector_environment.module_alias_target(
+        let expr =
+            switch (styled_payload(binding.pmb_expr)) {
+            | Some((htmlTag, payload)) =>
+            expand_styled_module(
+              ~file,
+              ~main_module,
+              ~scope,
+              ~opens=opens^,
+              ~name,
+              ~htmlTag,
+              payload,
+            )
+          | None =>
+            switch (module_path_from_expr(binding.pmb_expr)) {
+            | Some(target) =>
+              Local_selector_environment.register_alias(
                 ~file,
                 ~scope,
-                target,
-              ),
-          )
-        | None =>
-          Local_selector_environment.register_module(
-            ~file,
-            ~path=module_scope,
-          )
-        };
-        let expr =
-          map_ordered_module_expr(
-            ~file,
-            ~main_module,
-            ~scope=module_scope,
-            ~opens=[],
-            binding.pmb_expr,
-          );
+                ~name,
+                ~target=
+                  Local_selector_environment.module_alias_target(
+                    ~file,
+                    ~scope,
+                    target,
+                  ),
+              )
+            | None =>
+              Local_selector_environment.register_module(
+                ~file,
+                ~path=module_scope,
+              )
+            };
+            map_ordered_module_expr(
+              ~file,
+              ~main_module,
+              ~scope=module_scope,
+              ~opens=[],
+              binding.pmb_expr,
+            );
+          };
         {
           ...item,
           pstr_desc:
@@ -863,7 +919,7 @@ and map_ordered_structure = (~file, ~main_module, ~scope, items) => {
       };
     | Pstr_eval(expr, attrs) =>
       let expr =
-        map_cx2_expressions(
+          map_css_expressions(
           ~file,
           ~main_module,
           ~scope,
@@ -935,198 +991,7 @@ let () = {
   Ppxlib.Driver.V2.register_transformation(
     ~impl,
     ~rules=
-      List.map(make_styled_extension, html_tags)
-      @ [
-        Ppxlib.Context_free.Rule.extension(
-          Ppxlib.Extension.V3.declare(
-            "cx",
-            Ppxlib.Extension.Context.Expression,
-            Ppxlib.Ast_pattern.(single_expr_payload(__)),
-            (~ctxt, payload) => {
-              open Ppxlib;
-              let code_path = Expansion_context.Extension.code_path(ctxt);
-              let label = Code_path.enclosing_value(code_path);
-              File.set(Code_path.file_path(code_path));
-
-              let maybe_add_label = (~loc, declarations) =>
-                switch (label) {
-                | Some(name) =>
-                  Css_to_runtime.addLabel(~loc, name, declarations)
-                | None => declarations
-                };
-
-              switch (payload.pexp_desc) {
-              | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-                let loc =
-                  Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-                    stringLoc,
-                    delimiter,
-                  );
-                switch (
-                  Styled_ppx_css_parser.Driver.parse_declaration_list(
-                    ~loc,
-                    txt,
-                  )
-                ) {
-                | Ok(declarations) =>
-                  declarations
-                  |> Css_to_runtime.render_declarations(~loc, ~source=txt)
-                  |> maybe_add_label(~loc)
-                  |> Builder.pexp_array(~loc)
-                  |> Css_to_runtime.render_style_call(~loc)
-                | Error((loc, msg)) => Error.expr(~loc, msg)
-                };
-              | Pexp_array(arr) =>
-                arr
-                |> maybe_add_label(~loc=payload.pexp_loc)
-                |> Builder.pexp_array(~loc=payload.pexp_loc)
-                |> Css_to_runtime.render_style_call(~loc=payload.pexp_loc)
-              | _ =>
-                let examples =
-                  switch (File.get()) {
-                  | Some(Reason) =>
-                    Some([
-                      "[%cx \"display: block; color: red\"]",
-                      "[%cx [|CSS.display(`block), CSS.color(CSS.red)|]]",
-                    ])
-                  | Some(ReScript) =>
-                    Some([
-                      "[%cx \"display: block; color: red\"]",
-                      "[%cx [CSS.display(#block), CSS.color(#red)]]",
-                    ])
-                  | Some(OCaml) =>
-                    Some([
-                      "[%cx \"display: block; color: red\"]",
-                      "[%cx [|CSS.display `block, CSS.color CSS.red |]]",
-                    ])
-                  | None => None
-                  };
-                Error.raise(
-                  ~loc=payload.pexp_loc,
-                  ~examples?,
-                  ~link="https://styled-ppx.vercel.app/reference/cx",
-                  "[%cx] expects either a string of CSS or an array of CSS rules.",
-                );
-              };
-            },
-          ),
-        ),
-        Ppxlib.Context_free.Rule.extension(
-          Ppxlib.Extension.declare(
-            "css",
-            Ppxlib.Extension.Context.Expression,
-            any_payload_pattern,
-            (~loc as _, ~path, payload) => {
-              File.set(path);
-              switch (payload.pexp_desc) {
-              | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-                let loc =
-                  Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-                    stringLoc,
-                    delimiter,
-                  );
-                switch (
-                  Styled_ppx_css_parser.Driver.parse_declaration(~loc, txt)
-                ) {
-                | Ok(declarations) =>
-                  let declarationListValues =
-                    Css_to_runtime.render_declaration(
-                      ~loc,
-                      ~source=txt,
-                      declarations,
-                    );
-                  List.nth(declarationListValues, 0);
-                | Error((loc, msg)) => Error.expr(~loc, msg)
-                };
-              /* TODO: Instead of getting the first element,
-                   fail when there's more than one declaration or
-                 make a mechanism to flatten all the properties */
-              | _ =>
-                Error.expr(
-                  ~loc=payload.pexp_loc,
-                  ~examples=[
-                    "[%css \"color: red\"]",
-                    "[%css \"display: block\"]",
-                  ],
-                  ~link="https://styled-ppx.vercel.app/reference/css",
-                  "[%css] expects a string of CSS with a single rule (a property-value pair).",
-                )
-              };
-            },
-          ),
-        ),
-        Ppxlib.Context_free.Rule.extension(
-          Ppxlib.Extension.declare(
-            "styled.global",
-            Ppxlib.Extension.Context.Expression,
-            any_payload_pattern,
-            (~loc as _, ~path, payload) => {
-              File.set(path);
-              switch (payload.pexp_desc) {
-              | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-                let loc =
-                  Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-                    stringLoc,
-                    delimiter,
-                  );
-                switch (
-                  Styled_ppx_css_parser.Driver.parse_stylesheet(~loc, txt)
-                ) {
-                | Ok(stylesheets) =>
-                  Css_to_runtime.render_global(~loc, ~source=txt, stylesheets)
-                | Error((loc, msg)) => Error.expr(~loc, msg)
-                };
-              | _ =>
-                Error.expr(
-                  ~loc=payload.pexp_loc,
-                  ~examples=[
-                    "[%styled.global \"body { margin: 0; } .container { padding: 20px; }\"]",
-                  ],
-                  ~link="https://styled-ppx.vercel.app/reference/global",
-                  "[%styled.global] expects a string of CSS with selectors that apply to the whole document.",
-                )
-              };
-            },
-          ),
-        ),
-        Ppxlib.Context_free.Rule.extension(
-          Ppxlib.Extension.declare(
-            "keyframe",
-            Ppxlib.Extension.Context.Expression,
-            any_payload_pattern,
-            (~loc as _, ~path, payload) => {
-              File.set(path);
-              switch (payload.pexp_desc) {
-              | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-                let loc =
-                  Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-                    stringLoc,
-                    delimiter,
-                  );
-                switch (
-                  Styled_ppx_css_parser.Driver.parse_keyframes(~loc, txt)
-                ) {
-                | Ok(declarations) =>
-                  Css_to_runtime.render_keyframes(
-                    ~loc,
-                    ~source=txt,
-                    declarations,
-                  )
-                | Error((loc, msg)) => Error.expr(~loc, msg)
-                };
-              | _ =>
-                Error.raise(
-                  ~loc=payload.pexp_loc,
-                  ~examples=[
-                    "[%keyframe \"0% { opacity: 0; } 100% { opacity: 1; }\"]",
-                  ],
-                  ~link="https://styled-ppx.vercel.app/reference/keyframe",
-                  "[%keyframe] expects a string of CSS with keyframe definitions.",
-                )
-              };
-            },
-          ),
-        ),
+      [
         Ppxlib.Context_free.Rule.extension(
           Ppxlib.Extension.declare(
             "styled",

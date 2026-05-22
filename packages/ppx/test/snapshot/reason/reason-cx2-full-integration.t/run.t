@@ -13,7 +13,7 @@
   [@@@css ".css-kdjpx-logicalProps{inset-block-start:var(--var-m7rmhk);}"]
   [@@@css ".css-k008qs-nestedCss{display:flex;}"]
   [@@@css ".css-zqnfaz-nestedCss:hover{opacity:0.8;}"]
-  [@@@css ".css-osffsa-nestedCss .child{flex:1;}"]
+  [@@@css ".css-osffsa-nestedCss .child{-webkit-flex:1;-ms-flex:1;flex:1;}"]
   [@@@css ".css-k008qs-responsiveCss{display:flex;}"]
   [@@@css
     "@media (max-width: 768px) {.css-1ruz0a1-responsiveCss{display:block;}}"]
@@ -23,11 +23,11 @@
   [@@@css
     "@media (max-width: 480px) {.css-2b7vub-multipleMediaQueries{font-size:12px;}}"]
   [@@@css ".css-k008qs-mediaWithSelector{display:flex;}"]
-  [@@@css ".css-5ivle1-mediaWithSelector .item{flex:1;}"]
+  [@@@css ".css-5ivle1-mediaWithSelector .item{-webkit-flex:1;-ms-flex:1;flex:1;}"]
   [@@@css
-    "@media (max-width: 768px) {.css-1cemfq6-mediaWithSelector{flex-direction:column;}}"]
+    "@media (max-width: 768px) {.css-1cemfq6-mediaWithSelector{-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;}}"]
   [@@@css
-    "@media (max-width: 768px) {.css-1l7frkw-mediaWithSelector .item{flex:none;}}"]
+    "@media (max-width: 768px) {.css-1l7frkw-mediaWithSelector .item{-webkit-flex:none;-ms-flex:none;flex:none;}}"]
   [@@@css ".css-lgj0h8-complexMedia{display:grid;}"]
   [@@@css
     "@media screen and (min-width: 768px) and (max-width: 1024px) {.css-mhiow9-complexMedia{display:flex;}}"]
@@ -38,7 +38,7 @@
     "@media (max-width: 768px) {.css-11qknlj-mediaWithInterpolation{opacity:0.8;}}"]
   [@@@css "@keyframes keyframe-jw9oix{from{opacity:0;}to{opacity:1;}}"]
   [@@@css
-    "@keyframes keyframe-waibjx{0%{transform:translateY(100%);}100%{transform:translateY(0);}}"]
+    "@keyframes keyframe-waibjx{0%{-webkit-transform:translateY(100%);-moz-transform:translateY(100%);-ms-transform:translateY(100%);transform:translateY(100%);}100%{-webkit-transform:translateY(0);-moz-transform:translateY(0);-ms-transform:translateY(0);transform:translateY(0);}}"]
   [@@@css ".css-b6lny7-multiVar{color:var(--var-bxenxf);}"]
   [@@@css ".css-12udlbg-multiVar{background-color:var(--var-1czls49);}"]
   [@@@css ".css-u661at-multiVar{font-size:var(--var-1kwx24p);}"]
@@ -156,23 +156,23 @@
   .css-kdjpx-logicalProps{inset-block-start:var(--var-m7rmhk);}
   .css-k008qs-nestedCss{display:flex;}
   .css-zqnfaz-nestedCss:hover{opacity:0.8;}
-  .css-osffsa-nestedCss .child{flex:1;}
+  .css-osffsa-nestedCss .child{-webkit-flex:1;-ms-flex:1;flex:1;}
   .css-k008qs-responsiveCss{display:flex;}
   @media (max-width: 768px) {.css-1ruz0a1-responsiveCss{display:block;}}
   .css-6xix1i-multipleMediaQueries{font-size:16px;}
   @media (max-width: 768px) {.css-1l3vtdj-multipleMediaQueries{font-size:14px;}}
   @media (max-width: 480px) {.css-2b7vub-multipleMediaQueries{font-size:12px;}}
   .css-k008qs-mediaWithSelector{display:flex;}
-  .css-5ivle1-mediaWithSelector .item{flex:1;}
-  @media (max-width: 768px) {.css-1cemfq6-mediaWithSelector{flex-direction:column;}}
-  @media (max-width: 768px) {.css-1l7frkw-mediaWithSelector .item{flex:none;}}
+  .css-5ivle1-mediaWithSelector .item{-webkit-flex:1;-ms-flex:1;flex:1;}
+  @media (max-width: 768px) {.css-1cemfq6-mediaWithSelector{-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;}}
+  @media (max-width: 768px) {.css-1l7frkw-mediaWithSelector .item{-webkit-flex:none;-ms-flex:none;flex:none;}}
   .css-lgj0h8-complexMedia{display:grid;}
   @media screen and (min-width: 768px) and (max-width: 1024px) {.css-mhiow9-complexMedia{display:flex;}}
   @media (prefers-color-scheme: dark) {.css-1nm9mde-complexMedia{background-color:#1a1a1a;}}
   .css-kusjgz-mediaWithInterpolation{color:var(--var-sj55zd);}
   @media (max-width: 768px) {.css-11qknlj-mediaWithInterpolation{opacity:0.8;}}
   @keyframes keyframe-jw9oix{from{opacity:0;}to{opacity:1;}}
-  @keyframes keyframe-waibjx{0%{transform:translateY(100%);}100%{transform:translateY(0);}}
+  @keyframes keyframe-waibjx{0%{-webkit-transform:translateY(100%);-moz-transform:translateY(100%);-ms-transform:translateY(100%);transform:translateY(100%);}100%{-webkit-transform:translateY(0);-moz-transform:translateY(0);-ms-transform:translateY(0);transform:translateY(0);}}
   .css-b6lny7-multiVar{color:var(--var-bxenxf);}
   .css-12udlbg-multiVar{background-color:var(--var-1czls49);}
   .css-u661at-multiVar{font-size:var(--var-1kwx24p);}
@@ -182,4 +182,3 @@
   .css-16610y9-gridCss{gap:20px;}
   .css-pdjuhq-scrollCss{scroll-behavior:smooth;}
   .css-13v3rg8-scrollCss{overflow-y:auto;}
-

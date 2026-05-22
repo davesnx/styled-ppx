@@ -7,6 +7,12 @@ let color = CSS.hex("333");
 [%css {|filter: blur(5px)|}];
 [%css {|filter: brightness(0.5)|}];
 [%css {|filter: contrast(150%)|}];
+/* drop-shadow: <offset-x> <offset-y> <blur-radius>? <color>?
+   Note: In styled-ppx, drop-shadow requires blur-radius (x y blur [color])
+   x y alone or x y color don't work */
+/* x y blur (no color - uses currentColor) */
+[%css {|filter: drop-shadow(5px 5px 10px)|}];
+/* x y blur color (all parts) */
 [%css {|filter: drop-shadow(15px 15px 15px #123)|}];
 [%css {|filter: grayscale(50%)|}];
 [%css {|filter: hue-rotate(50deg)|}];

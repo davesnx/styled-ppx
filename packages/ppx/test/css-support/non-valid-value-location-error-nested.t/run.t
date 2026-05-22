@@ -20,18 +20,6 @@ If this test fail means that the module is not in sync with the ppx
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  let selectors =
-    CSS.style([|
-      CSS.label("selectors"),
-      CSS.color(CSS.white),
-      CSS.selectorMany(
-        [|{js|&:hover|js}|],
-        [|
-          [%ocaml.error
-            "Property 'color' has an invalid value: 'cositas',\nExpected 'hex-color', 'color()', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
-          ],
-        |],
-      ),
-    |]);
-
-[%cx {js|display: blocki;              width: 10px; |js}];
+  let selectors = [%ocaml.error
+    "Property 'color' has an invalid value: 'cositas',\nExpected 'hex-color', 'color()', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
+  ];

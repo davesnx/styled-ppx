@@ -1,6 +1,6 @@
 Source declaration order must be preserved through the aggregator.
 
-When [%cx2] atomizes `margin: 10px; margin-top: 20px;` into two rules,
+When [%css] atomizes `margin: 10px; margin-top: 20px;` into two rules,
 the longhand override must be emitted *after* the shorthand so the cascade
 picks the user's intended winner. Previously, the aggregator deduped
 through `Set.Make(String)`, which sorted by the rendered rule's hash

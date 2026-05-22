@@ -13,8 +13,6 @@
   sedlex
   ppxlib
   reason
-  ppxlib.astlib
-  ppx_deriving_yojson.runtime
-  yojson)
+  ppxlib.astlib)
  (preprocess
-  (pps ppxlib.metaquot ppx_deriving_yojson)))
+  (pps ppxlib.metaquot)))

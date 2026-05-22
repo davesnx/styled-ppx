@@ -1,12 +1,12 @@
-let cosas = `underlin;
+let cosas = `bold;
 
-[%cx
+[%css
   {|
     width: fit-content;
     grid-template-columns: fit-content(20px) fit-content(10%);
   |}
 ];
 
-[%cx {|
+[%css {|
     text-decoration: $(cosas);
   |}];

@@ -31,28 +31,28 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-56sg73{align-self:flex-end;}"];
   [@css ".css-k008qs{display:flex;}"];
   [@css ".css-vxcmzt{display:inline-flex;}"];
-  [@css ".css-me3p27{flex:none;}"];
-  [@css ".css-yrit56{flex:5 7 10%;}"];
-  [@css ".css-kzfr2u{flex:2;}"];
-  [@css ".css-p6wv0x{flex:10em;}"];
-  [@css ".css-t6vgg1{flex:30%;}"];
-  [@css ".css-1draax7{flex:min-content;}"];
-  [@css ".css-ilthbz{flex:1 30px;}"];
-  [@css ".css-6hx0uu{flex:2 2;}"];
-  [@css ".css-1rr8a55{flex:2 2 10%;}"];
-  [@css ".css-1x4f3wz{flex:var(--var-hvez6j);}"];
-  [@css ".css-19g0la7{flex:var(--var-volh69) var(--var-1qwalu0);}"];
+  [@css ".css-me3p27{-webkit-flex:none;-ms-flex:none;flex:none;}"];
+  [@css ".css-yrit56{-webkit-flex:5 7 10%;-ms-flex:5 7 10%;flex:5 7 10%;}"];
+  [@css ".css-kzfr2u{-webkit-flex:2;-ms-flex:2;flex:2;}"];
+  [@css ".css-p6wv0x{-webkit-flex:10em;-ms-flex:10em;flex:10em;}"];
+  [@css ".css-t6vgg1{-webkit-flex:30%;-ms-flex:30%;flex:30%;}"];
+  [@css ".css-1draax7{-webkit-flex:min-content;-ms-flex:min-content;flex:min-content;}"];
+  [@css ".css-ilthbz{-webkit-flex:1 30px;-ms-flex:1 30px;flex:1 30px;}"];
+  [@css ".css-6hx0uu{-webkit-flex:2 2;-ms-flex:2 2;flex:2 2;}"];
+  [@css ".css-1rr8a55{-webkit-flex:2 2 10%;-ms-flex:2 2 10%;flex:2 2 10%;}"];
+  [@css ".css-1x4f3wz{-webkit-flex:var(--var-hvez6j);-ms-flex:var(--var-hvez6j);flex:var(--var-hvez6j);}"];
+  [@css ".css-19g0la7{-webkit-flex:var(--var-volh69) var(--var-1qwalu0);-ms-flex:var(--var-volh69) var(--var-1qwalu0);flex:var(--var-volh69) var(--var-1qwalu0);}"];
   [@css
-    ".css-djecpy{flex:var(--var-volh69) var(--var-1qwalu0) var(--var-1u1axvx);}"
+    ".css-djecpy{-webkit-flex:var(--var-volh69) var(--var-1qwalu0) var(--var-1u1axvx);-ms-flex:var(--var-volh69) var(--var-1qwalu0) var(--var-1u1axvx);flex:var(--var-volh69) var(--var-1qwalu0) var(--var-1u1axvx);}"
   ];
-  [@css ".css-1f5dbv2{flex:var(--var-volh69_1) var(--var-volh69_2);}"];
+  [@css ".css-1f5dbv2{-webkit-flex:var(--var-volh69_1) var(--var-volh69_2);-ms-flex:var(--var-volh69_1) var(--var-volh69_2);flex:var(--var-volh69_1) var(--var-volh69_2);}"];
   [@css ".css-1vu4n70{flex-basis:auto;}"];
   [@css ".css-1ibwkcj{flex-basis:content;}"];
   [@css ".css-71cjcr{flex-basis:1px;}"];
-  [@css ".css-1l0z8uk{flex-direction:row;}"];
-  [@css ".css-8kj89b{flex-direction:row-reverse;}"];
-  [@css ".css-cgq59l{flex-direction:column;}"];
-  [@css ".css-qpiomr{flex-direction:column-reverse;}"];
+  [@css ".css-1l0z8uk{-webkit-flex-direction:row;-ms-flex-direction:row;flex-direction:row;}"];
+  [@css ".css-8kj89b{-webkit-flex-direction:row-reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse;}"];
+  [@css ".css-cgq59l{-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;}"];
+  [@css ".css-qpiomr{-webkit-flex-direction:column-reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse;}"];
   [@css ".css-19a80vn{flex-flow:row;}"];
   [@css ".css-o5a89u{flex-flow:row-reverse;}"];
   [@css ".css-14pgqdn{flex-flow:column;}"];

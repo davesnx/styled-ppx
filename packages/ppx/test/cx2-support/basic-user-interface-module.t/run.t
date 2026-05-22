@@ -45,8 +45,8 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-1n3476y{cursor:copy;}"];
   [@css ".css-1cus137{cursor:no-drop;}"];
   [@css ".css-vdhlfv{cursor:not-allowed;}"];
-  [@css ".css-ehba41{cursor:grab;}"];
-  [@css ".css-m2aufq{cursor:grabbing;}"];
+  [@css ".css-ehba41{cursor:-webkit-grab;cursor:grab;}"];
+  [@css ".css-m2aufq{cursor:-webkit-grabbing;cursor:grabbing;}"];
   [@css ".css-3hsboj{cursor:ew-resize;}"];
   [@css ".css-kqxfz0{cursor:ns-resize;}"];
   [@css ".css-13l8jep{cursor:nesw-resize;}"];
@@ -58,8 +58,8 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-kmtb2g{cursor:zoom-out;}"];
   [@css ".css-1llpnps{caret-color:auto;}"];
   [@css ".css-1q51yyj{caret-color:green;}"];
-  [@css ".css-1ndky4e{appearance:auto;}"];
-  [@css ".css-17grcf8{appearance:none;}"];
+  [@css ".css-1ndky4e{-webkit-appearance:auto;-moz-appearance:auto;-ms-appearance:auto;appearance:auto;}"];
+  [@css ".css-17grcf8{-webkit-appearance:none;-moz-appearance:none;-ms-appearance:none;appearance:none;}"];
   [@css ".css-1ttooc5{text-overflow:\"foo\";}"];
   [@css ".css-1pwfzgv{text-overflow:clip clip;}"];
   [@css ".css-r61axg{text-overflow:ellipsis clip;}"];
@@ -70,11 +70,11 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-n09ns{text-overflow:clip \"foo\";}"];
   [@css ".css-9zgl00{text-overflow:ellipsis \"foo\";}"];
   [@css ".css-l6jnzg{text-overflow:\"foo\" \"foo\";}"];
-  [@css ".css-99p0oo{user-select:auto;}"];
-  [@css ".css-1mmoigx{user-select:text;}"];
-  [@css ".css-9y6172{user-select:none;}"];
-  [@css ".css-1rsyfv1{user-select:contain;}"];
-  [@css ".css-1udvaqc{user-select:all;}"];
+  [@css ".css-99p0oo{-webkit-user-select:auto;-moz-user-select:auto;-ms-user-select:auto;user-select:auto;}"];
+  [@css ".css-1mmoigx{-webkit-user-select:text;-moz-user-select:text;-ms-user-select:text;user-select:text;}"];
+  [@css ".css-9y6172{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}"];
+  [@css ".css-1rsyfv1{-webkit-user-select:contain;-moz-user-select:contain;-ms-user-select:contain;user-select:contain;}"];
+  [@css ".css-1udvaqc{-webkit-user-select:all;-moz-user-select:all;-ms-user-select:all;user-select:all;}"];
   
   CSS.make("css-roynbj", []);
   CSS.make("css-g393ep", []);

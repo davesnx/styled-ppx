@@ -15,48 +15,77 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css ".css-11usyq5{color:hwb(0 0% 0%);}"];
+  [@css ".css-1gt1qgw{color:hwb(0 0% 0% / 0.5);}"];
+  [@css ".css-1vzzea3{color:hwb(120 30% 50%);}"];
+  [@css ".css-10x3fh9{color:hwb(120 30% 50% / 0.8);}"];
+  [@css ".css-14i2e9t{color:lab(0% 0 0);}"];
+  [@css ".css-1jn3erw{color:lab(0% 0 0 / 0.5);}"];
+  [@css ".css-103n9r5{color:lab(50% 20 -30);}"];
+  [@css ".css-1l0699s{color:lab(50% 20 -30 / 0.8);}"];
+  [@css ".css-mw2dh3{color:lch(0% 0 0);}"];
+  [@css ".css-84j1zh{color:lch(0% 0 0 / 0.5);}"];
+  [@css ".css-1v1aqt7{color:lch(50% 30 120);}"];
+  [@css ".css-j9zfou{color:lch(50% 30 120 / 0.8);}"];
+  [@css ".css-195nil4{color:oklab(0% 0 0);}"];
+  [@css ".css-17r00n7{color:oklab(0% 0 0 / 0.5);}"];
+  [@css ".css-1pwxkis{color:oklab(50% 0.1 -0.1);}"];
+  [@css ".css-1kvm1az{color:oklab(50% 0.1 -0.1 / 0.8);}"];
+  [@css ".css-17sqt74{color:oklch(0% 0 0);}"];
+  [@css ".css-12as7y3{color:oklch(0% 0 0 / 0.5);}"];
+  [@css ".css-171zyac{color:oklch(50% 0.15 120);}"];
+  [@css ".css-1s6hrqn{color:oklch(50% 0.15 120 / 0.8);}"];
+  [@css ".css-1cj9bfd{color:light-dark(white, black);}"];
+  [@css ".css-mnxrra{color:light-dark(#fff, #000);}"];
+  [@css ".css-kjd5hk{color:light-dark(rgb(255, 255, 255), rgb(0, 0, 0));}"];
+  [@css ".css-1h376db{background-color:light-dark(#f0f0f0, #1a1a1a);}"];
+  [@css ".css-o4q67q{color:color(srgb 1 0.5 0);}"];
+  [@css ".css-1exvn4u{color:color(srgb 1 0.5 0 / 0.5);}"];
+  [@css ".css-rj4vx0{color:color(display-p3 1 0.5 0);}"];
+  [@css ".css-q4h8l1{color:color(display-p3 1 0.5 0 / 0.5);}"];
+  [@css ".css-p2jf25{background-color:hwb(0 0% 0%);}"];
+  [@css ".css-1pp6psj{background-color:lab(50% 20 -30);}"];
+  [@css ".css-46qziw{background-color:lch(50% 30 120);}"];
+  [@css ".css-iml9l2{background-color:oklab(50% 0.1 -0.1);}"];
+  [@css ".css-l7ibmj{background-color:oklch(50% 0.15 120);}"];
   
-  CSS.color(`hwb((`deg(0.), `percent(0.), `percent(0.))));
-  CSS.color(`hwba((`deg(0.), `percent(0.), `percent(0.), `num(0.5))));
-  CSS.color(`hwb((`deg(120.), `percent(30.), `percent(50.))));
-  CSS.color(`hwba((`deg(120.), `percent(30.), `percent(50.), `num(0.8))));
+  CSS.make("css-11usyq5", []);
+  CSS.make("css-1gt1qgw", []);
+  CSS.make("css-1vzzea3", []);
+  CSS.make("css-10x3fh9", []);
   
-  CSS.color(`lab((`percent(0.), `num(0.), `num(0.))));
-  CSS.color(`laba((`percent(0.), `num(0.), `num(0.), `num(0.5))));
-  CSS.color(`lab((`percent(50.), `num(20.), `num(-30.))));
-  CSS.color(`laba((`percent(50.), `num(20.), `num(-30.), `num(0.8))));
+  CSS.make("css-14i2e9t", []);
+  CSS.make("css-1jn3erw", []);
+  CSS.make("css-103n9r5", []);
+  CSS.make("css-1l0699s", []);
   
-  CSS.color(`lch((`percent(0.), `num(0.), `deg(0.))));
-  CSS.color(`lcha((`percent(0.), `num(0.), `deg(0.), `num(0.5))));
-  CSS.color(`lch((`percent(50.), `num(30.), `deg(120.))));
-  CSS.color(`lcha((`percent(50.), `num(30.), `deg(120.), `num(0.8))));
+  CSS.make("css-mw2dh3", []);
+  CSS.make("css-84j1zh", []);
+  CSS.make("css-1v1aqt7", []);
+  CSS.make("css-j9zfou", []);
   
-  CSS.color(`oklab((`percent(0.), `num(0.), `num(0.))));
-  CSS.color(`oklaba((`percent(0.), `num(0.), `num(0.), `num(0.5))));
-  CSS.color(`oklab((`percent(50.), `num(0.1), `num(-0.1))));
-  CSS.color(`oklaba((`percent(50.), `num(0.1), `num(-0.1), `num(0.8))));
+  CSS.make("css-195nil4", []);
+  CSS.make("css-17r00n7", []);
+  CSS.make("css-1pwxkis", []);
+  CSS.make("css-1kvm1az", []);
   
-  CSS.color(`oklch((`percent(0.), `num(0.), `deg(0.))));
-  CSS.color(`oklcha((`percent(0.), `num(0.), `deg(0.), `num(0.5))));
-  CSS.color(`oklch((`percent(50.), `num(0.15), `deg(120.))));
-  CSS.color(`oklcha((`percent(50.), `num(0.15), `deg(120.), `num(0.8))));
+  CSS.make("css-17sqt74", []);
+  CSS.make("css-12as7y3", []);
+  CSS.make("css-171zyac", []);
+  CSS.make("css-1s6hrqn", []);
   
-  CSS.color(`lightDark((CSS.white, CSS.black)));
-  CSS.color(`lightDark((`hex({js|fff|js}), `hex({js|000|js}))));
-  CSS.color(`lightDark((`rgb((255, 255, 255)), `rgb((0, 0, 0)))));
-  CSS.backgroundColor(
-    `lightDark((`hex({js|f0f0f0|js}), `hex({js|1a1a1a|js}))),
-  );
+  CSS.make("css-1cj9bfd", []);
+  CSS.make("css-mnxrra", []);
+  CSS.make("css-kjd5hk", []);
+  CSS.make("css-1h376db", []);
   
-  CSS.color(`color((`srgb, `num(1.), `num(0.5), `num(0.))));
-  CSS.color(`colora((`srgb, `num(1.), `num(0.5), `num(0.), `num(0.5))));
-  CSS.color(`color((`displayP3, `num(1.), `num(0.5), `num(0.))));
-  CSS.color(
-    `colora((`displayP3, `num(1.), `num(0.5), `num(0.), `num(0.5))),
-  );
+  CSS.make("css-o4q67q", []);
+  CSS.make("css-1exvn4u", []);
+  CSS.make("css-rj4vx0", []);
+  CSS.make("css-q4h8l1", []);
   
-  CSS.backgroundColor(`hwb((`deg(0.), `percent(0.), `percent(0.))));
-  CSS.backgroundColor(`lab((`percent(50.), `num(20.), `num(-30.))));
-  CSS.backgroundColor(`lch((`percent(50.), `num(30.), `deg(120.))));
-  CSS.backgroundColor(`oklab((`percent(50.), `num(0.1), `num(-0.1))));
-  CSS.backgroundColor(`oklch((`percent(50.), `num(0.15), `deg(120.))));
+  CSS.make("css-p2jf25", []);
+  CSS.make("css-1pp6psj", []);
+  CSS.make("css-46qziw", []);
+  CSS.make("css-iml9l2", []);
+  CSS.make("css-l7ibmj", []);

@@ -4,3 +4,8 @@
   (>= %{ocaml_version} 5.4.0))
  (deps
   (package styled-ppx)))
+
+(alias
+ (name test-cx2-support)
+ (deps
+  (alias test-css-support)))

@@ -4,12 +4,12 @@ alwaysApply: false
 
 # cx2 Pipeline - Static CSS Extraction
 
-This document explains how `[%cx2]` works—the statically extracted CSS path. Unlike `[%cx]` which generates runtime CSS-in-JS code, `[%cx2]` extracts CSS at compile-time into a separate `.css` file with zero runtime CSS generation overhead.
+This document explains how `[%css]` works—the statically extracted CSS path. Unlike `[%cx]` which generates runtime CSS-in-JS code, `[%css]` extracts CSS at compile-time into a separate `.css` file with zero runtime CSS generation overhead.
 
 ## Overview
 
 ```reason
-let css = color => [%cx2 "display: flex; color: $(color)"];
+let css = color => [%css "display: flex; color: $(color)"];
 ```
 
 Gets transformed into:
@@ -35,7 +35,7 @@ The key differences from `[%cx]`:
 Same as `[%cx]` - the CSS string is parsed by `Styled_ppx_css_parser.Driver.parse_declaration_list`.
 
 ```reason
-[%cx2 "display: flex; color: $(myColor)"]
+[%css "display: flex; color: $(myColor)"]
 ```
 
 Produces an AST representing:
@@ -44,7 +44,7 @@ Produces an AST representing:
 
 ### Stage 2: Type Checking
 
-Before extraction, `[%cx2]` validates all properties against the CSS spec using `type_check_rule_list`:
+Before extraction, `[%css]` validates all properties against the CSS spec using `type_check_rule_list`:
 
 ```reason
 let validations = type_check_rule_list(rule_list);
@@ -205,7 +205,7 @@ Returns a tuple of:
 ### Usage in JSX
 
 ```reason
-let css = color => [%cx2 "display: flex; color: $(color)"];
+let css = color => [%css "display: flex; color: $(color)"];
 
 /* Expanded by styles prop rewriter */
 <div className={fst(css(CSS.red))} style={snd(css(CSS.red))} />
@@ -250,12 +250,12 @@ Each interpolation gets the correct `Margin.toString` because the grammar knows 
 
 ## Related Extensions
 
-### `[%keyframe2]`
+### `[%keyframe]`
 
 Similar extraction for keyframes:
 
 ```reason
-let fadeIn = [%keyframe2 {|
+let fadeIn = [%keyframe {|
   from { opacity: 0; }
   to { opacity: 1; }
 |}];
@@ -312,7 +312,7 @@ When `Settings.Get.minify()` returns `true`:
 
 ## Comparison: cx vs cx2
 
-| Aspect | `[%cx]` | `[%cx2]` |
+| Aspect | `[%cx]` | `[%css]` |
 |--------|---------|----------|
 | CSS Generation | Runtime (emotion.sh) | Compile-time extraction |
 | Interpolation | Direct value substitution | CSS custom properties + toString |

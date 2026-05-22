@@ -15,34 +15,53 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css ".css-6tuveb{width:1cap;}"];
+  [@css ".css-xh6gk5{width:2.5cap;}"];
+  [@css ".css-1auf708{width:1ic;}"];
+  [@css ".css-1muf374{width:3.5ic;}"];
+  [@css ".css-1tdwc7t{width:1lh;}"];
+  [@css ".css-d4qnkz{width:2lh;}"];
+  [@css ".css-1z04gax{width:1rcap;}"];
+  [@css ".css-13ynmih{width:1rch;}"];
+  [@css ".css-1joy0pg{width:1rex;}"];
+  [@css ".css-151mfob{width:1ric;}"];
+  [@css ".css-1xmnp92{width:1rlh;}"];
+  [@css ".css-16nrh49{width:50vb;}"];
+  [@css ".css-cgijca{width:50vi;}"];
+  [@css ".css-1ef0vtm{width:40Q;}"];
+  [@css ".css-1b38f82{height:10lh;}"];
+  [@css ".css-z3igma{margin:2cap;}"];
+  [@css ".css-1xmh56p{padding:5ic;}"];
+  [@css ".css-1pesmpm{font-size:1.5lh;}"];
+  [@css ".css-1nt3fhm{line-height:2rlh;}"];
   
-  CSS.unsafe({js|width|js}, {js|1cap|js});
-  CSS.unsafe({js|width|js}, {js|2.5cap|js});
+  CSS.make("css-6tuveb", []);
+  CSS.make("css-xh6gk5", []);
   
-  CSS.unsafe({js|width|js}, {js|1ic|js});
-  CSS.unsafe({js|width|js}, {js|3.5ic|js});
+  CSS.make("css-1auf708", []);
+  CSS.make("css-1muf374", []);
   
-  CSS.unsafe({js|width|js}, {js|1lh|js});
-  CSS.unsafe({js|width|js}, {js|2lh|js});
+  CSS.make("css-1tdwc7t", []);
+  CSS.make("css-d4qnkz", []);
   
-  CSS.unsafe({js|width|js}, {js|1rcap|js});
+  CSS.make("css-1z04gax", []);
   
-  CSS.unsafe({js|width|js}, {js|1rch|js});
+  CSS.make("css-13ynmih", []);
   
-  CSS.unsafe({js|width|js}, {js|1rex|js});
+  CSS.make("css-1joy0pg", []);
   
-  CSS.unsafe({js|width|js}, {js|1ric|js});
+  CSS.make("css-151mfob", []);
   
-  CSS.unsafe({js|width|js}, {js|1rlh|js});
+  CSS.make("css-1xmnp92", []);
   
-  CSS.unsafe({js|width|js}, {js|50vb|js});
+  CSS.make("css-16nrh49", []);
   
-  CSS.unsafe({js|width|js}, {js|50vi|js});
+  CSS.make("css-cgijca", []);
   
-  CSS.unsafe({js|width|js}, {js|40Q|js});
+  CSS.make("css-1ef0vtm", []);
   
-  CSS.unsafe({js|height|js}, {js|10lh|js});
-  CSS.unsafe({js|margin|js}, {js|2cap|js});
-  CSS.unsafe({js|padding|js}, {js|5ic|js});
-  CSS.unsafe({js|fontSize|js}, {js|1.5lh|js});
-  CSS.unsafe({js|lineHeight|js}, {js|2rlh|js});
+  CSS.make("css-1b38f82", []);
+  CSS.make("css-z3igma", []);
+  CSS.make("css-1xmh56p", []);
+  CSS.make("css-1pesmpm", []);
+  CSS.make("css-1nt3fhm", []);

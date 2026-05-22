@@ -4,7 +4,7 @@ type size =
 
 let prop = Big;
 
-let _styles = [%cx
+let _styles = [%css
   {|
     color: $(switch (prop) {
       | Big => `re

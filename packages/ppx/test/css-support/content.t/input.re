@@ -88,3 +88,54 @@
 /* [%css {|content: attr(data-value type(string), "fallback");|}]; */
 /* [%css {|content: attr(data-value type(color), red);|}]; */
 /* [%css {|content: attr(href type(url), "#");|}]; */
+
+/* Unicode escape sequences in content property */
+[%css {|content: "\2192";|}]; /* Right arrow → */
+[%css {|content: "\2190";|}]; /* Left arrow ← */
+[%css {|content: "\2191";|}]; /* Up arrow ↑ */
+[%css {|content: "\2193";|}]; /* Down arrow ↓ */
+
+/* Quotation marks */
+[%css {|content: "\201C";|}]; /* Left double quotation mark " */
+[%css {|content: "\201D";|}]; /* Right double quotation mark " */
+
+[%css {|content: "\2018";|}]; /* Left single quotation mark ' */
+[%css {|content: "\2019";|}]; /* Right single quotation mark ' */
+
+/* Special symbols */
+[%css {|content: "\2022";|}]; /* Bullet • */
+[%css {|content: "\2014";|}]; /* Em dash — */
+[%css {|content: "\2026";|}]; /* Horizontal ellipsis … */
+[%css {|content: "\2665";|}]; /* Black heart suit ♥ */
+[%css {|content: "\2713";|}]; /* Check mark ✓ */
+[%css {|content: "\2717";|}]; /* Ballot X ✗ */
+[%css {|content: "\2726";|}]; /* Black four pointed star ✦ */
+
+/* Multiple Unicode escapes combined */
+[%css {|content: "" attr(data-title) "\201D";|}];
+[%css {|content: "\2192" " Click here";|}];
+[%css {|content: "Step " counter(step, decimal) ": ";|}];
+
+/* Emoji with Unicode escapes (using surrogate pairs where needed) */
+[%css {|content: "\1F4A1";|}]; /* Light bulb emoji 💡 */
+[%css {|content: "\1F44D";|}]; /* Thumbs up emoji 👍 */
+
+/* Combined with pseudo-elements (these would typically be in selectors) */
+[%css {|content: "\00BB";|}]; /* Right-pointing double angle quotation mark » */
+[%css {|content: "\00A7";|}]; /* Section sign § */
+
+/* Testing different formats of Unicode escapes */
+[%css {|content: "\002192";|}]; /* 6-digit format for arrow */
+[%css {|content: "\000020";|}]; /* Space character */
+
+/* Testing with actual Unicode characters directly */
+[%css {|content: "→";|}]; /* Direct arrow character */
+[%css {|content: "•";|}]; /* Direct bullet */
+[%css {|content: "—";|}]; /* Direct em dash */
+[%css {|content: "…";|}]; /* Direct ellipsis */
+[%css {|content: '"';|}]; /* Direct left double quote */
+[%css {|content: '"';|}]; /* Direct right double quote */
+[%css {|content: "✓";|}]; /* Direct check mark */
+[%css {|content: "♥";|}]; /* Direct heart */
+[%css {|content: "→ " attr(href);|}]; /* Combining direct character with attr */
+[%css {|content: "• " counter(item, decimal) " ";|}]; /* Direct bullet with counter */

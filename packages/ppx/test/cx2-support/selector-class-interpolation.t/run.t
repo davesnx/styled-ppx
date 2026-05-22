@@ -18,7 +18,7 @@ and the runtime `CSS.make` call must carry an empty list (no phantom
   [@css ".css-tokvmb-foo{color:red;}"];
   [@css ".css-11o9qin-bar.css-tokvmb-foo{color:blue;}"];
   [@css ".css-1vf0mg9-buttonLoadingAnimation{background-size:1rem 1rem;}"];
-  [@css ".css-rj3gnv-buttonLoadingAnimation{animation-duration:1000ms;}"];
+  [@css ".css-rj3gnv-buttonLoadingAnimation{-webkit-animation-duration:1000ms;animation-duration:1000ms;}"];
   [@css ".css-f9xk9e-colorAccent{background-color:blue;}"];
   [@css
     ".css-1eo9rnb-colorAccent:disabled:not(.css-1eo9rnb-colorAccent.css-1vf0mg9-buttonLoadingAnimation.css-rj3gnv-buttonLoadingAnimation){background-color:gray;}"

@@ -17,8 +17,8 @@ error message.
 
   $ styled-ppx.generate a.ml b.ml
   File "src/b.re", line 3, characters 4-21:
-  Error: cross-library [%cx2] selector references are not supported.
+  Error: cross-library [%css] selector references are not supported.
   The reference `Foreign.lib.thing` resolves to module `Foreign` which is not part of the
-  current library. Move the [%cx2] binding into the current library, or
+  current library. Move the [%css] binding into the current library, or
   inline the class chain literally.
   [1]

@@ -5,20 +5,6 @@ type flag('a) = {
   defaultValue: 'a,
 };
 
-let jsxVersion = {
-  flag: "--jsx-version",
-  doc: "Configure the version of JSX to use (3 or 4)",
-  value: None,
-  defaultValue: 3,
-};
-
-let jsxMode = {
-  flag: "--jsx-mode",
-  doc: "When --jsx-version is set to 4, this option can be used to specify the JSX mode (classic or automatic)",
-  value: None,
-  defaultValue: "classic",
-};
-
 let native = {
   flag: "--native",
   doc: "Generate code for server-reason-react",
@@ -42,14 +28,12 @@ let minify = {
 
 let dev = {
   flag: "--dev",
-  doc: "Emit dev-mode marker classes (e.g. cx-layout) on [%cx2] output to make atomized class lists greppable in DOM inspectors. No effect on extracted CSS or atom hashes.",
+  doc: "Emit dev-mode marker classes (e.g. cx-layout) on [%css] output to make atomized class lists greppable in DOM inspectors. No effect on extracted CSS or atom hashes.",
   value: None,
   defaultValue: false,
 };
 
 type settings = {
-  jsxVersion: flag(int),
-  jsxMode: flag(string),
   native: flag(bool),
   debug: flag(bool),
   minify: flag(bool),
@@ -58,8 +42,6 @@ type settings = {
 
 let currentSettings =
   ref({
-    jsxVersion,
-    jsxMode,
     native,
     debug,
     minify,
@@ -69,12 +51,6 @@ let currentSettings =
 let updateSettings = newSettings => currentSettings := newSettings;
 
 module Get = {
-  let jsxVersion = () =>
-    currentSettings.contents.jsxVersion.value
-    |> Option.value(~default=currentSettings.contents.jsxVersion.defaultValue);
-  let jsxMode = () =>
-    currentSettings.contents.jsxMode.value
-    |> Option.value(~default=currentSettings.contents.jsxMode.defaultValue);
   let native = () =>
     currentSettings.contents.native.value
     |> Option.value(~default=currentSettings.contents.native.defaultValue);
@@ -90,22 +66,6 @@ module Get = {
 };
 
 module Update = {
-  let jsxVersion = value =>
-    updateSettings({
-      ...currentSettings.contents,
-      jsxVersion: {
-        ...currentSettings.contents.jsxVersion,
-        value: Some(value),
-      },
-    });
-  let jsxMode = value =>
-    updateSettings({
-      ...currentSettings.contents,
-      jsxMode: {
-        ...currentSettings.contents.jsxMode,
-        value,
-      },
-    });
   let native = value =>
     updateSettings({
       ...currentSettings.contents,

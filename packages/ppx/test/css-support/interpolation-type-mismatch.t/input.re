@@ -1,5 +1,5 @@
 let size = 42;
 
-let _styles = [%cx {|
+let _styles = [%css {|
     color: $(size);
   |}];

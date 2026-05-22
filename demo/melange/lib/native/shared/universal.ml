@@ -3,20 +3,20 @@ module Media = struct
 end
 
 let languageIcon = "languageIcon"
-let headerMenuOpened = [%cx {||}]
+let headerMenuOpened = [%css {||}]
 
-let icon = [%cx {|
+let icon = [%css {|
   position: relative;
   top: 3px;
   padding-left: 4px;
 |}]
 
 let classname =
-  [%cx
+  [%css
     {|
     cursor: pointer;
 
-    @media $(Media.mobile) {
+    @media (min-width: 768px) {
       position: relative;
 
       .$(icon) {
@@ -26,11 +26,11 @@ let classname =
       }
     }
 
-    :hover, &.$(headerMenuOpened) {
+    &:hover, &.$(headerMenuOpened) {
       opacity: 1;
       color: #ace;
 
-      @media $(Media.mobile) {
+      @media (min-width: 768px) {
         color: #eca;
       }
     }

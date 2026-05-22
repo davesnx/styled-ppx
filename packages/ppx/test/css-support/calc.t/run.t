@@ -13,53 +13,15 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  CSS.width(`calc(`add((`percent(50.), `pxFloat(4.)))));
-  CSS.width(`calc(`sub((`pxFloat(20.), `pxFloat(10.)))));
-  CSS.width(
-    `calc(`sub((`vh(100.), `calc(`add((`rem(2.), `pxFloat(120.))))))),
-  );
-  CSS.width(`calc(`mult((`vh(100.), `num(2.)))));
-  CSS.width(`calc(`mult((`num(2.), `pxFloat(120.)))));
-  CSS.width(
-    `calc(
-      `sub((
-        `vh(100.),
-        `calc(
-          `add((
-            `rem(2.),
-            `calc(
-              `add((
-                `rem(2.),
-                `calc(
-                  `add((
-                    `rem(2.),
-                    `calc(`add((`rem(2.), `pxFloat(120.)))),
-                  )),
-                ),
-              )),
-            ),
-          )),
-        ),
-      )),
-    ),
-  );
-  CSS.width(
-    `calc(
-      `mult((
-        `vh(100.),
-        `calc(
-          `sub((
-            `rem(2.),
-            `calc(
-              `mult((
-                `rem(2.),
-                `calc(`mult((`rem(2.), `calc(`div((`rem(2.), 4.)))))),
-              )),
-            ),
-          )),
-        ),
-      )),
-    ),
-  );
+  [@css ".css-hxo6vg{width:calc(50% + 4px);}"];
+  [@css ".css-1bjj19s{width:calc(20px - 10px);}"];
+  [@css ".css-12qo4ty{width:calc(100vh - calc(2rem + 120px));}"];
+  [@css ".css-1g5uhfp{width:calc(100vh * 2);}"];
+  [@css ".css-6t8hw4{width:calc(2 * 120px);}"];
+  CSS.make("css-hxo6vg", []);
+  CSS.make("css-1bjj19s", []);
+  CSS.make("css-12qo4ty", []);
+  CSS.make("css-1g5uhfp", []);
+  CSS.make("css-6t8hw4", []);
 
   $ dune build

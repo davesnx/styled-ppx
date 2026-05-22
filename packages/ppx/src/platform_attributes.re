@@ -1,4 +1,4 @@
-/* This file aims at abstracing away the differences between Melange and ReScript attributes. */
+/* This file centralizes attributes emitted for Reason/Melange output. */
 
 open Ppxlib;
 
@@ -21,95 +21,25 @@ module ReasonAttributes = {
     );
 };
 
-module BuckleScriptAttributes = {
-  let optional = (~loc) =>
-    Helper.Attr.mk(withLoc("bs.optional", ~loc), PStr([]));
-};
-
-module ReScriptAttributes = {
-  let optional = (~loc) =>
-    Helper.Attr.mk(withLoc("ns.optional", ~loc), PStr([]));
-  let template = (~loc) =>
-    Helper.Attr.mk(withLoc("res.template", ~loc), PStr([]));
-  let uncurried = (~loc) =>
-    Builder.attribute(~name=withLoc(~loc, "bs"), ~loc, ~payload=PStr([]));
-  let val_ = (~loc) => Helper.Attr.mk(withLoc("bs.val", ~loc), PStr([]));
-
-  /* [@bs.deriving abstract] */
-  let derivingAbstract = (~loc) =>
-    Helper.Attr.mk(
-      withLoc("bs.deriving", ~loc),
-      PStr([
-        Helper.Str.mk(
-          ~loc,
-          Pstr_eval(
-            Helper.Exp.ident(~loc, withLoc(Lident("abstract"), ~loc)),
-            [],
-          ),
-        ),
-      ]),
-    );
-
-  /* [bs.as ""] */
-  let alias = (~loc, alias) =>
-    Helper.Attr.mk(
-      withLoc("bs.as", ~loc),
-      PStr([
-        Helper.Str.mk(
-          ~loc,
-          Pstr_eval(
-            Helper.Exp.constant(
-              ~loc,
-              ~attrs=[],
-              Pconst_string(alias, loc, None),
-            ),
-            [],
-          ),
-        ),
-      ]),
-    );
-
-  let obj = (~loc, record) => {
-    Helper.Exp.extension(
-      ~loc,
-      (
-        withLoc("bs.obj", ~loc),
-        PStr([Helper.Str.mk(~loc, Pstr_eval(record, []))]),
-      ),
-    );
-  };
-  let module_ = (~loc, structure_item) =>
-    Helper.Attr.mk(withLoc("bs.module", ~loc), PStr([structure_item]));
-};
-
 module MelangeAttributes = {
-  /* [@mel.optional] */
+  /* [@optional] */
   let optional = (~loc) =>
-    Helper.Attr.mk(withLoc("mel.optional", ~loc), PStr([]));
+    Helper.Attr.mk(withLoc("optional", ~loc), PStr([]));
 
   /* fn(. ) */
   let uncurried = (~loc) => {
     Builder.attribute(~name=withLoc(~loc, "u"), ~loc, ~payload=PStr([]));
   };
 
-  /* [@deriving jsProperties, getSet] */
-  let derivingJsPropertiesGetSet = (~loc) =>
+  /* [@deriving abstract] */
+  let derivingAbstract = (~loc) =>
     Helper.Attr.mk(
       withLoc("deriving", ~loc),
       PStr([
         Helper.Str.mk(
           ~loc,
           Pstr_eval(
-            Helper.Exp.tuple(
-              ~loc,
-              [
-                Helper.Exp.ident(
-                  ~loc,
-                  withLoc(Lident("jsProperties"), ~loc),
-                ),
-                Helper.Exp.ident(~loc, withLoc(Lident("getSet"), ~loc)),
-              ],
-            ),
+            Helper.Exp.ident(~loc, withLoc(Lident("abstract"), ~loc)),
             [],
           ),
         ),
@@ -145,95 +75,63 @@ module MelangeAttributes = {
     );
   };
 
+  let objExternal = (~loc) =>
+    Helper.Attr.mk(withLoc("mel.obj", ~loc), PStr([]));
+
+  let get = (~loc) => Helper.Attr.mk(withLoc("mel.get", ~loc), PStr([]));
+
   let module_ = (~loc, structure_item) =>
     Helper.Attr.mk(withLoc("mel.module", ~loc), PStr([structure_item]));
 };
 
 let optional = (~loc) => {
-  switch (File.get()) {
-  | Some(ReScript) when Settings.Get.jsxVersion() == 4 =>
-    ReScriptAttributes.optional(~loc)
-  | Some(ReScript) => BuckleScriptAttributes.optional(~loc)
-  | Some(Reason)
-  | _ => MelangeAttributes.optional(~loc)
-  };
+  MelangeAttributes.optional(~loc);
 };
 
 let alias = (~loc) => {
-  switch (File.get()) {
-  | Some(ReScript) => ReScriptAttributes.alias(~loc)
-  | Some(Reason)
-  | _ => MelangeAttributes.alias(~loc)
-  };
+  MelangeAttributes.alias(~loc);
 };
 
 let module_ = (~loc) => {
-  switch (File.get()) {
-  | Some(ReScript) => ReScriptAttributes.module_(~loc)
-  | Some(Reason)
-  | _ => MelangeAttributes.module_(~loc)
-  };
+  MelangeAttributes.module_(~loc);
 };
 
 let obj = (~loc) => {
-  switch (File.get()) {
-  | Some(ReScript) => ReScriptAttributes.obj(~loc)
-  | Some(Reason)
-  | _ => MelangeAttributes.obj(~loc)
-  };
+  MelangeAttributes.obj(~loc);
+};
+
+let objExternal = (~loc) => {
+  MelangeAttributes.objExternal(~loc);
+};
+
+let get = (~loc) => {
+  MelangeAttributes.get(~loc);
 };
 
 let derivingAbstract = (~loc) => {
-  switch (File.get()) {
-  | Some(ReScript) => ReScriptAttributes.derivingAbstract(~loc)
-  | Some(Reason)
-  | _ => MelangeAttributes.derivingJsPropertiesGetSet(~loc)
-  };
+  MelangeAttributes.derivingAbstract(~loc);
 };
 
 let uncurried = (~loc) => {
-  switch (File.get()) {
-  | Some(ReScript) => ReScriptAttributes.uncurried(~loc)
-  | Some(Reason)
-  | _ => MelangeAttributes.uncurried(~loc)
-  };
+  MelangeAttributes.uncurried(~loc);
 };
 
 let rawLiteral = (~loc, structure_item) => {
-  switch (File.get()) {
-  | Some(ReScript) => []
-  | Some(Reason)
-  | _ => [ReasonAttributes.rawLiteral(~loc, structure_item)]
-  };
+  [ReasonAttributes.rawLiteral(~loc, structure_item)];
 };
 
 let preserveBraces = (~loc) => {
-  switch (File.get()) {
-  | Some(ReScript) => []
-  | Some(Reason)
-  | _ => [ReasonAttributes.preserveBraces(~loc)]
-  };
+  [ReasonAttributes.preserveBraces(~loc)];
 };
 
-let template = (~loc) => {
-  switch (File.get()) {
-  | Some(ReScript) => [ReScriptAttributes.template(~loc)]
-  | Some(Reason)
-  | _ => []
-  };
+let template = (~loc as _) => {
+  [];
 };
 
-let string_delimiter = (~loc) => {
-  switch (File.get()) {
-  | Some(ReScript) => ("*j", template(~loc))
-  | _ => ("js", [])
-  };
+let string_delimiter = (~loc as _) => {
+  ("js", []);
 };
 
-let val_ = (~loc) => {
-  switch (File.get()) {
-  | Some(ReScript) => [ReScriptAttributes.val_(~loc)]
-  | Some(Reason)
-  | _ => []
-  };
+let val_ = (~loc as _) => {
+  [];
 };

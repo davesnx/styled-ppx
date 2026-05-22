@@ -1,4 +1,4 @@
-/* Build the `to_string` body for a [%styled.global2] generated module.
+/* Build the `to_string` body for a [%styled.global] generated module.
 
    The static rule (with `var(--var-<hash>)` already substituted in
    value positions) lives in the extracted stylesheet via [@@@css ...].
@@ -57,7 +57,7 @@ let render_root_block =
              | Css_file.MediaQuery =>
                Ppxlib.Location.raise_errorf(
                  ~loc,
-                 "Internal: %s var_type leaked into [%%styled.global2] value interpolation for `$(%s)`. Please report this as a styled-ppx bug.",
+                 "Internal: %s var_type leaked into [%%styled.global] value interpolation for `$(%s)`. Please report this as a styled-ppx bug.",
                  switch (var_type) {
                  | Css_file.Selector => "Selector"
                  | Css_file.MediaQuery => "MediaQuery"

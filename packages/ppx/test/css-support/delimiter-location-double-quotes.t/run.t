@@ -13,29 +13,29 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ cat >input.re <<EOF
-  >  [%cx "display: blocki;"];
+  >  [%css "display: blocki;"];
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 15-22:
+  File "input.re", line 1, characters 16-23:
   Error: Property 'display' has an invalid value: 'blocki',
          Expected 'block', 'contents', 'flex', 'flow', 'flow-root', 'grid',
          'inline', 'inline-block', etc. Did you mean 'block'?
   [1]
 
   $ cat >input.re <<EOF
-  >  [%cx "width: 100%; display: blocki;"];
+  >  [%css "width: 100%; display: blocki;"];
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 28-35:
+  File "input.re", line 1, characters 29-36:
   Error: Property 'display' has an invalid value: 'blocki',
          Expected 'block', 'contents', 'flex', 'flow', 'flow-root', 'grid',
          'inline', 'inline-block', etc. Did you mean 'block'?
   [1]
 
   $ cat >input.re <<EOF
-  >  [%cx "
+  >  [%css "
   >      width: 100%; display: blocki;
   >  "];
   > EOF
@@ -48,7 +48,7 @@ If this test fail means that the module is not in sync with the ppx
   [1]
 
   $ cat >input.re <<EOF
-  >  [%cx "
+  >  [%css "
   >      width: 100%;
   >      display: blocki;
   >  "];

@@ -4,7 +4,7 @@ type size =
 
 let prop = Big
 
-let color = [%cx
+let color = [%css
   {|
   color: $(match prop with | Big -> `red | Small -> `blue);
 |}

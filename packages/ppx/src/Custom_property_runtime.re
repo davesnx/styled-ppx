@@ -4,12 +4,7 @@ let is_name = (name: string): bool =>
   String.length(name) >= 2 && String.sub(name, 0, 2) == "--";
 
 let render_string = (~loc, s) => {
-  switch (File.get()) {
-  | Some(ReScript) =>
-    Builder.pexp_constant(~loc, Pconst_string(s, loc, Some("*j")))
-  | Some(Reason)
-  | _ => Builder.pexp_constant(~loc, Pconst_string(s, loc, Some("js")))
-  };
+  Builder.pexp_constant(~loc, Pconst_string(s, loc, Some("js")));
 };
 
 let render_declaration = (~loc, ~property, ~raw_value_source) => {

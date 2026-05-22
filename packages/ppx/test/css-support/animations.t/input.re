@@ -22,7 +22,9 @@ let bar = [%keyframe {|0% { opacity: 0.0 } 100% { opacity: 1.0 }|}];
 [%css {|animation-timing-function: step-end|}];
 [%css {|animation-timing-function: steps(3, start)|}];
 [%css {|animation-timing-function: steps(5, end)|}];
-[%css {|animation-timing-function: ease, step-start, cubic-bezier(0.1, 0.7, 1, 0.1)|}];
+[%css
+  {|animation-timing-function: ease, step-start, cubic-bezier(0.1, 0.7, 1, 0.1)|}
+];
 [%css {|animation-iteration-count: infinite|}];
 [%css {|animation-iteration-count: 8|}];
 [%css {|animation-iteration-count: 4.35|}];
@@ -47,3 +49,9 @@ let bar = [%keyframe {|0% { opacity: 0.0 } 100% { opacity: 1.0 }|}];
 [%css {|animation: foo 1s 2s infinite linear alternate both|}];
 [%css "animation: 4s ease-in 1s infinite reverse both paused"];
 [%css "animation: a 300ms linear 400ms infinite reverse forwards running"];
+
+/* Shorthand with interpolated name — NOT supported.
+   Interpolation in animation shorthand is typed as Animation.Value.t (the whole
+   shorthand type), so you can't interpolate just AnimationName.t within it.
+   Use the longhand animation-name property for name interpolation instead. */
+/* [%css {|animation: $(foo) 1s ease-in|}]; */

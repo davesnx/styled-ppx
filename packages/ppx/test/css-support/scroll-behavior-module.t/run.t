@@ -15,6 +15,8 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css ".css-89hc5w{scroll-behavior:auto;}"];
+  [@css ".css-pdjuhq{scroll-behavior:smooth;}"];
   
-  CSS.scrollBehavior(`auto);
-  CSS.scrollBehavior(`smooth);
+  CSS.make("css-89hc5w", []);
+  CSS.make("css-pdjuhq", []);

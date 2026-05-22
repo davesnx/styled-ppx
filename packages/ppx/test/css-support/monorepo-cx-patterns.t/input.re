@@ -12,25 +12,25 @@ module Color = {
 };
 
 /* Test 1: space before colon (BulkEditTab.re pattern) */
-let _spaceBeforeColon = [%cx
+let _spaceBeforeColon = [%css
   {|
   width: 30px;
   color : $(Color.Text.tertiary);
 |}
 ];
 
-/* Test 2: box-shadow with !important in [%cx] */
-let _tabInnerFirst = [%cx {|
+/* Test 2: box-shadow with !important in [%css] */
+let _tabInnerFirst = [%css {|
   box-shadow: inset 1px 0 0 0 transparent !important;
 |}];
 
 /* Test 3: multi-value box-shadow with !important inline */
-let _multiShadowImportant = [%cx {|
+let _multiShadowImportant = [%css {|
   box-shadow: 1px 0 0 0 $(Color.Border.line), inset 0 -1px 0 0 $(Color.Border.line) !important;
 |}];
 
 /* Test 4: multi box-shadow with !important in nested selector - no trailing semicolon */
-let _tabTextFirst = [%cx
+let _tabTextFirst = [%css
   {|
   box-shadow: inset 0 0 0 0 transparent;
 
@@ -43,7 +43,7 @@ let _tabTextFirst = [%cx
 ];
 
 /* Test 5: multi box-shadow in nested selector WITHOUT !important */
-let _tabText = [%cx
+let _tabText = [%css
   {|
   color: $(Color.Text.secondary);
 
@@ -57,10 +57,10 @@ let _tabText = [%cx
 |}
 ];
 
-/* Test 6: transition shorthand in [%cx] with nested selectors */
-let sidebarClosed = [%cx ""];
+/* Test 6: transition shorthand in [%css] with nested selectors */
+let sidebarClosed = [%css ""];
 
-let _sidebar = [%cx
+let _sidebar = [%css
   {|
   flex-grow: 1;
   z-index: 1;
@@ -76,10 +76,10 @@ let _sidebar = [%cx
 ];
 
 /* Test 7: transition with !important */
-let _checkbox = [%cx {|transition: transform 0.3s !important;|}];
+let _checkbox = [%css {|transition: transform 0.3s !important;|}];
 
-/* Test 8: multiple transitions in [%cx] */
-let _transitions = [%cx
+/* Test 8: multiple transitions in [%css] */
+let _transitions = [%css
   {|
   transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
 |}

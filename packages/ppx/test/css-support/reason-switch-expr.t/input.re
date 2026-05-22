@@ -5,7 +5,7 @@ type size =
 let prop = Big;
 let _unused = Small;
 
-let _styles = [%cx
+let _styles = [%css
   {|
     color: $(switch (prop) {
       | Big => CSS.red

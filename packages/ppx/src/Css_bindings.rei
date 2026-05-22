@@ -1,6 +1,6 @@
-/** Per-compilation-unit buffer of [%cx2] binding exports.
+/** Per-compilation-unit buffer of [%css] binding exports.
 
-    Every named [%cx2] binding records a [(longident, class_string)] entry
+    Every named [%css] binding records a [(longident, class_string)] entry
     here. The longident is the fully-qualified path users would write to
     reference the binding from another module (e.g. ["M.Css.marker"]); the
     class string is the space-separated list of atomized class names the
@@ -20,7 +20,7 @@ type entry = {
   class_string: string,
 };
 
-/** Record a [%cx2] binding's resolved class string under its
+/** Record a [%css] binding's resolved class string under its
     fully-qualified longident. No-op if [longident] is empty (anonymous
     binding). Last-write-wins for duplicate longidents within a CU. */
 let record: (~longident: string, ~class_string: string) => unit;

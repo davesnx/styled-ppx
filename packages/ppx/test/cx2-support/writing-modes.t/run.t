@@ -23,16 +23,16 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-1f53xur{unicode-bidi:bidi-override;}"];
   [@css ".css-1sv30cq{unicode-bidi:isolate-override;}"];
   [@css ".css-3e7z6r{unicode-bidi:plaintext;}"];
-  [@css ".css-1tyni7l{writing-mode:horizontal-tb;}"];
-  [@css ".css-zorbdf{writing-mode:vertical-rl;}"];
-  [@css ".css-bxuv7p{writing-mode:vertical-lr;}"];
+  [@css ".css-1tyni7l{-webkit-writing-mode:horizontal-tb;-ms-writing-mode:horizontal-tb;writing-mode:horizontal-tb;}"];
+  [@css ".css-zorbdf{-webkit-writing-mode:vertical-rl;-ms-writing-mode:vertical-rl;writing-mode:vertical-rl;}"];
+  [@css ".css-bxuv7p{-webkit-writing-mode:vertical-lr;-ms-writing-mode:vertical-lr;writing-mode:vertical-lr;}"];
   [@css ".css-1cbc989{text-orientation:mixed;}"];
   [@css ".css-1kcjqux{text-orientation:upright;}"];
   [@css ".css-ajfrh6{text-orientation:sideways;}"];
   [@css ".css-byubm3{text-combine-upright:none;}"];
   [@css ".css-16cjtzu{text-combine-upright:all;}"];
-  [@css ".css-mpcjo4{writing-mode:sideways-rl;}"];
-  [@css ".css-1tdq5f9{writing-mode:sideways-lr;}"];
+  [@css ".css-mpcjo4{-webkit-writing-mode:sideways-rl;-ms-writing-mode:sideways-rl;writing-mode:sideways-rl;}"];
+  [@css ".css-1tdq5f9{-webkit-writing-mode:sideways-lr;-ms-writing-mode:sideways-lr;writing-mode:sideways-lr;}"];
   [@css ".css-6ofs5k{text-combine-upright:digits 2;}"];
   
   CSS.make("css-sxjqc9", []);

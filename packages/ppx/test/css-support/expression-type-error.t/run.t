@@ -12,6 +12,8 @@ This test ensures type errors inside interpolation expressions are reported
   > EOF
 
   $ dune build 2>&1 | head -30
-  File "input.re", line 2, characters 15-23:
+  File "input.re", line 1, characters 24-32:
+  0 | ......................
+  1 | . color: ................
   Error: This constant has type string but an expression was expected of type
            int

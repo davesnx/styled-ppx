@@ -31,10 +31,10 @@ The project consists of three main components:
 
 ## Architecture Orientation
 - **Parser & Type Checker** (`packages/parser`, `packages/css-grammar`): builds the CSS AST, validates properties via generated combinators (`[%spec ...]`), and produces rich error messages for invalid CSS.
-- **PPX Transformer** (`packages/ppx/src/ppx.re`): exposes interfaces like `[%styled.tag]`, `[%cx]`, `[%css]`, `[%cx2]`, and `[%keyframes]`; orchestrates parsing, validation, and code generation.
+- **PPX Transformer** (`packages/ppx/src/ppx.re`): exposes interfaces like `[%styled.tag]`, `[%cx]`, `[%css]`, `[%css]`, and `[%keyframes]`; orchestrates parsing, validation, and code generation.
 - **Property → Runtime Bridge** (`packages/ppx/src/Property_to_runtime.re`): maps validated properties to runtime constructors, preserves interpolations, and decides extraction vs runtime emission.
 - **Runtimes** (`packages/runtime/native`, `.../melange`, `.../rescript`): emit CSS for native servers, JS environments, and ReScript compatibility. Shared types live in `packages/runtime/native/shared/Css_types.ml`.
-- **Extraction Pipeline**: `[%cx2]` is the only statically extracted path today; it generates CSS assets during compilation for zero runtime overhead.
+- **Extraction Pipeline**: `[%css]` is the only statically extracted path today; it generates CSS assets during compilation for zero runtime overhead.
 
 ## Reference Documents
 - Consult `documents/design.md` before making structural changes across `packages/parser`, `packages/css-grammar`, `packages/ppx`, or the runtime pipeline.

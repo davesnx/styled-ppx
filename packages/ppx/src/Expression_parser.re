@@ -45,8 +45,7 @@ let parse_reason = source => {
 let parse_expression = (~loc, ~source) => {
   let result =
     switch (File.get()) {
-    | Some(Reason)
-    | Some(ReScript) => parse_reason(source)
+    | Some(Reason) => parse_reason(source)
     | Some(OCaml)
     | None => parse_ocaml(source)
     };

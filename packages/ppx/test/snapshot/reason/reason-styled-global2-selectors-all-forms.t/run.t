@@ -5,7 +5,7 @@
   [@css "*{box-sizing:border-box;}"];
   [@css "div.container#main{padding:0;}"];
   [@css ".btn.primary.large{font-weight:bold;}"];
-  [@css "nav a{text-decoration:none;}"];
+  [@css "nav a{-webkit-text-decoration:none;text-decoration:none;}"];
   [@css "ul > li{list-style:none;}"];
   [@css "h1 + p{margin-top:0;}"];
   [@css "h2 ~ p{color:gray;}"];

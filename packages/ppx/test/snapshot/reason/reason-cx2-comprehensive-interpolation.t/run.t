@@ -12,7 +12,7 @@ Comprehensive test for cx2 interpolation with various property types
   [@css ".css-kxyw4-test2{padding-right:var(--var-yq31wd);}"];
   [@css ".css-1j1vt57-test3{gap:var(--var-yq31wd);}"];
   [@css ".css-16533ek-test3{row-gap:var(--var-yq31wd);}"];
-  [@css ".css-aq5h2o-test3{column-gap:var(--var-yq31wd);}"];
+  [@css ".css-aq5h2o-test3{-webkit-column-gap:var(--var-yq31wd);column-gap:var(--var-yq31wd);}"];
   [@css ".css-4bvljg-test4{color:var(--var-15252qs);}"];
   [@css ".css-1e9wc53-test4{background-color:var(--var-15252qs);}"];
   [@css ".css-t4dyfi-test4{border-top-color:var(--var-15252qs);}"];
@@ -118,4 +118,3 @@ Comprehensive test for cx2 interpolation with various property types
       "css-1dfkyy8-test11 css-73nay0-test11 css-tokvmb-test11",
       [("--var-a9b677", CSS.Types.Width.toString(width))],
     );
-

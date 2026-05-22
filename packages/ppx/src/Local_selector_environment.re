@@ -1,6 +1,6 @@
-/* Per-compilation-unit selector environment for [%cx2] and
-   [%styled.global2]. It models the subset of OCaml name lookup available
-   before typing: same-file modules, aliases, opens/includes, named [%cx2]
+/* Per-compilation-unit selector environment for [%css] and
+   [%styled.global]. It models the subset of OCaml name lookup available
+   before typing: same-file modules, aliases, opens/includes, named [%css]
    bindings, and literal string selectors seen earlier in the file. */
 
 let table: Hashtbl.t((string, string), list(string)) = Hashtbl.create(64);
@@ -253,7 +253,7 @@ let resolve_selector_class_ref =
   | None =>
     Ppxlib.Location.raise_errorf(
       ~loc,
-      "Selector interpolation `$(%s)` does not refer to a [%%cx2] binding or string literal earlier in this module.\n- If `%s` is bound to a [%%cx2] or string literal later in the file, reorder the bindings.\n- If `%s` is a computed string, inline the class name literally.\n- Otherwise, use [%%cx] for runtime substitution.",
+      "Selector interpolation `$(%s)` does not refer to a [%%css] binding or string literal earlier in this module.\n- If `%s` is bound to a [%%css] or string literal later in the file, reorder the bindings.\n- If `%s` is a computed string, inline the class name literally.\n- Otherwise, use [%%cx] for runtime substitution.",
       path_str,
       path_str,
       path_str,

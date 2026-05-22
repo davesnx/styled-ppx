@@ -32,11 +32,11 @@ If this test fail means that the module is not in sync with the ppx
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1gtanqs{width:fit-content;}"];
+  [@css ".css-1gtanqs{width:-webkit-fit-content;width:-moz-fit-content;width:fit-content;}"];
   [@css
     ".css-1jqkbxn{grid-template-columns:fit-content(20px) fit-content(10%);}"
   ];
-  [@css ".css-1wxdqmz{text-decoration:var(--var-z052by);}"];
+  [@css ".css-1wxdqmz{-webkit-text-decoration:var(--var-z052by);text-decoration:var(--var-z052by);}"];
   let cosas = `bold;
   
   CSS.make("css-1gtanqs css-1jqkbxn", []);
@@ -45,5 +45,3 @@ If this test fail means that the module is not in sync with the ppx
     "css-1wxdqmz",
     [("--var-z052by", CSS.Types.TextDecoration.toString(cosas))],
   );
-
-

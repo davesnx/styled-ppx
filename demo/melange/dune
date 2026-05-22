@@ -4,7 +4,7 @@
  (modules :standard \ server)
  (libraries lib_js styled-ppx.melange reason-react)
  (preprocess
-  (pps melange.ppx styled-ppx reason-react-ppx))
+  (pps styled-ppx melange.ppx reason-react-ppx))
  (module_systems
   (commonjs bs.js)))
 

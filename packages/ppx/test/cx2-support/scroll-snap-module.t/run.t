@@ -82,17 +82,17 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-1pbkijw{scroll-snap-align:center center;}"];
   [@css ".css-1ljahur{scroll-snap-stop:normal;}"];
   [@css ".css-tvqcsf{scroll-snap-stop:always;}"];
-  [@css ".css-17nu1g1{scroll-snap-type:none;}"];
-  [@css ".css-1i6igf3{scroll-snap-type:x mandatory;}"];
-  [@css ".css-sj8bwf{scroll-snap-type:y mandatory;}"];
-  [@css ".css-b4yx25{scroll-snap-type:block mandatory;}"];
-  [@css ".css-vwe0h2{scroll-snap-type:inline mandatory;}"];
-  [@css ".css-1262jo5{scroll-snap-type:both mandatory;}"];
-  [@css ".css-bsl9bg{scroll-snap-type:x proximity;}"];
-  [@css ".css-yei18o{scroll-snap-type:y proximity;}"];
-  [@css ".css-vjeyk4{scroll-snap-type:block proximity;}"];
-  [@css ".css-xxr31t{scroll-snap-type:inline proximity;}"];
-  [@css ".css-sfvwfl{scroll-snap-type:both proximity;}"];
+  [@css ".css-17nu1g1{-webkit-scroll-snap-type:none;-ms-scroll-snap-type:none;scroll-snap-type:none;}"];
+  [@css ".css-1i6igf3{-webkit-scroll-snap-type:x mandatory;-ms-scroll-snap-type:x mandatory;scroll-snap-type:x mandatory;}"];
+  [@css ".css-sj8bwf{-webkit-scroll-snap-type:y mandatory;-ms-scroll-snap-type:y mandatory;scroll-snap-type:y mandatory;}"];
+  [@css ".css-b4yx25{-webkit-scroll-snap-type:block mandatory;-ms-scroll-snap-type:block mandatory;scroll-snap-type:block mandatory;}"];
+  [@css ".css-vwe0h2{-webkit-scroll-snap-type:inline mandatory;-ms-scroll-snap-type:inline mandatory;scroll-snap-type:inline mandatory;}"];
+  [@css ".css-1262jo5{-webkit-scroll-snap-type:both mandatory;-ms-scroll-snap-type:both mandatory;scroll-snap-type:both mandatory;}"];
+  [@css ".css-bsl9bg{-webkit-scroll-snap-type:x proximity;-ms-scroll-snap-type:x proximity;scroll-snap-type:x proximity;}"];
+  [@css ".css-yei18o{-webkit-scroll-snap-type:y proximity;-ms-scroll-snap-type:y proximity;scroll-snap-type:y proximity;}"];
+  [@css ".css-vjeyk4{-webkit-scroll-snap-type:block proximity;-ms-scroll-snap-type:block proximity;scroll-snap-type:block proximity;}"];
+  [@css ".css-xxr31t{-webkit-scroll-snap-type:inline proximity;-ms-scroll-snap-type:inline proximity;scroll-snap-type:inline proximity;}"];
+  [@css ".css-sfvwfl{-webkit-scroll-snap-type:both proximity;-ms-scroll-snap-type:both proximity;scroll-snap-type:both proximity;}"];
   
   CSS.make("css-1dmoiv8", []);
   CSS.make("css-37qcuf", []);

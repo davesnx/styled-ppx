@@ -1,3 +1,3 @@
-let _styles = [%cx {|
+let _styles = [%css {|
   color: $(1 + "string");
 |}];

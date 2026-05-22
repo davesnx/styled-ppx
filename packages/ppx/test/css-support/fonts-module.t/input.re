@@ -1,3 +1,11 @@
+/* Bindings used by the interpolated font-family declarations below.
+   Without these, `dune build` would fail with "Unbound value fonts"
+   while `dune describe pp` would still produce codegen referencing
+   them — leaving the snapshot internally contradictory. */
+let fonts: CSS.Types.FontFamily.t =
+  `list([|`quoted("Inter"), `quoted("Sans")|]);
+let font: CSS.Types.FontFamily.t = `quoted("Inter");
+
 /* CSS Fonts Module Level 2 */
 [%css {|font-family: "Inter Semi Bold";|}];
 [%css {|font-family: $(fonts);|}];

@@ -10,8 +10,8 @@ See also:
 
 - `documents/primitives.md` — shared glossary used in this document.
 - `documents/css-extraction.md` — wire protocol and aggregator for
-  the static-extraction family (`[%cx2]`, `[%styled.global2]`,
-  `[%keyframe2]`), including cross-module selector resolution
+  the static-extraction family (`[%css]`, `[%styled.global2]`,
+  `[%keyframe]`), including cross-module selector resolution
   (sentinel format and aggregator behavior).
 - `documents/runtime-lowering-and-interpolation-identity.md` — migration
   design for property-centered runtime lowering and safer static
@@ -48,9 +48,9 @@ The same declaration value can therefore be:
 - lexed again by `css-grammar`
 - parsed again for runtime generation
 
-### `[%cx2]`
+### `[%css]`
 
-`[%cx2]` shares the same front-end parser path, then diverges into static
+`[%css]` shares the same front-end parser path, then diverges into static
 extraction:
 
 1. Parse declaration lists with `packages/parser`
@@ -62,9 +62,9 @@ extraction:
    replaced with the actual minted class names before the CSS AST is rendered
 6. Generate `CSS.make(...)` calls and emit `[@css ...]` attributes
 
-`Local_selector_environment` is populated as each `[%cx2]` extension expands:
+`Local_selector_environment` is populated as each `[%css]` extension expands:
 the enclosing `let`-binding name (from `Code_path.enclosing_value`) is mapped to
-the list of class names that atomization produced. Later `[%cx2]` blocks in the
+the list of class names that atomization produced. Later `[%css]` blocks in the
 same file resolve `&.$(name)` and similar selector interpolations against that
 environment, fanning a multi-declaration source binding into a chained compound
 selector (`&.cssA.cssB`). Cross-module and unresolved references raise a clear
@@ -78,7 +78,7 @@ property validation is needed.
 
 Shares the cx2 front-end (parsing + interpolation typing) and reuses
 `Css_file.transform_rule` for both value-interpolation and
-selector-interpolation walks. Differs from `[%cx2]` in two ways:
+selector-interpolation walks. Differs from `[%css]` in two ways:
 
 - Registered as a **Module_expr-context** extension (`module Foo =
   [%styled.global2 ...]`), not Expression. The Expression-context
@@ -187,7 +187,7 @@ Three items, always in this order:
   `() => CSS.global_style_tag(to_string())`.
 
 All three take `unit` and capture interpolated bindings from the
-surrounding lexical scope at call time, exactly like `[%cx2]`. No
+surrounding lexical scope at call time, exactly like `[%css]`. No
 synthesized labeled arguments. **Trade-off:** per-request SSR themes
 need a user-defined wrapping function or a switch back to
 `[%styled.global]`.
@@ -202,19 +202,19 @@ typed OCaml expressions are interpolated.
 
 #### Hashing
 
-`var-<murmur2(path_str)>`, inherited from `[%cx2]`. Keyed on the
+`var-<murmur2(path_str)>`, inherited from `[%css]`. Keyed on the
 OCaml expression source. Same expression across blocks shares a var
 (harmless: same value either way).
 
 #### Selector interpolation
 
 `[%styled.global2]` reuses `Css_transform.transform_rule` from
-`[%cx2]`, so every selector form `[%cx2]` supports works inside a
+`[%css]`, so every selector form `[%css]` supports works inside a
 global block too:
 
 ```reason
-let card = [%cx2 "padding: 10px;"];
-let active = [%cx2 "border: 1px solid;"];
+let card = [%css "padding: 10px;"];
+let active = [%css "border: 1px solid;"];
 
 module Theme = [%styled.global2 {|
   /* Bare $(name) - resolves to a class type-selector */
@@ -241,7 +241,7 @@ module Theme = [%styled.global2 {|
 |}];
 ```
 
-Resolution rules (identical to `[%cx2]`):
+Resolution rules (identical to `[%css]`):
 
 - Same-module `$(name)` looks up `Local_selector_environment`. Dotted
   same-file refs such as `$(Css.marker)` search from the current
@@ -253,7 +253,7 @@ Resolution rules (identical to `[%cx2]`):
   location.
 - Cross-module `$(M.binding)` is recorded in `Cross_module_refs` and
   embedded as a sentinel string; the aggregator resolves it at link
-  time. If `M.binding` isn't a `[%cx2]` binding the aggregator fails
+  time. If `M.binding` isn't a `[%css]` binding the aggregator fails
   with `Unbound module` / `Unbound value` at the original source
   location (via the synthetic `let _ = M.binding` line the PPX emits
   alongside `[@@@css.refs ...]`).
@@ -271,7 +271,7 @@ selector interpolation.
 `Property_to_types.resolve_module_name` falls back to `"Cascading"`
 for unknown properties. `--my-prop: $(value)` therefore fails to
 type-check because `Cascading.toString` only handles
-`inherit`/`initial`/`unset`. **Pre-existing in `[%cx2]`**, out of scope
+`inherit`/`initial`/`unset`. **Pre-existing in `[%css]`**, out of scope
 here.
 
 Workaround:
@@ -301,7 +301,7 @@ module ThemeStyles = [%styled.global2 {|
 | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `packages/ppx/src/ppx.re`                       | Two extensions: Module_expr-context (does the work) and Expression-context (migration error).                                                                                                                                       |
 | `packages/ppx/src/Css_file.re`                  | `push_global ~file rule_list` returns the list of `dynamic_vars` collected across all rules; pushes the static rules (with `var(--var-<hash>)` already substituted) into the global buffer.                                         |
-| `packages/ppx/src/Local_selector_environment.re` | Per-CU selector environment used by `[%cx2]` and `[%styled.global2]` for same-file selector interpolation, module aliases, opens/includes, and cross-module fallback.                                                               |
+| `packages/ppx/src/Local_selector_environment.re` | Per-CU selector environment used by `[%css]` and `[%styled.global2]` for same-file selector interpolation, module aliases, opens/includes, and cross-module fallback.                                                               |
 | `packages/ppx/src/Css_global_to_string.re`      | `render_root_block ~loc dynamic_vars` builds the `to_string` body: a single `:root { ... }` rule with one declaration per entry, or `""` when `dynamic_vars` is empty.                                                              |
 | `packages/runtime/{native,melange}/CSS.ml`      | `CSS.global_style_tag : string -> React.element`.                                                                                                                                                                                   |
 
@@ -314,12 +314,12 @@ module ThemeStyles = [%styled.global2 {|
 - **No backward-compat for the legacy shape.** Hard error on
   `let () = [%styled.global2 ...]`.
 - **No labeled-arg synthesis on `make`.** In-scope capture matches
-  `[%cx2]`.
+  `[%css]`.
 - **No `--*` typing fix.** Pre-existing gap, separate change.
 - **No `CSS.global` from inside `make`.** That would route through
   the runtime stylesheet, defeating the `*2` family's contract.
 
-### `[%keyframe2]`
+### `[%keyframe]`
 
 Shares the cx2 front-end and extracts `@keyframes` blocks named by
 content hash. No interpolation support today. Covered briefly in

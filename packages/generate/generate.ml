@@ -1,7 +1,7 @@
 (** styled-ppx aggregator: walk every post-PPX [.ml] file in a dune library,
     collect [[\@\@\@css ...]] CSS rules and any cross-module references embedded
     as NUL-delimited sentinels, resolve those sentinels against a global index
-    of [%cx2] bindings, and emit the final stylesheet.
+    of [%css] bindings, and emit the final stylesheet.
 
     The aggregator runs once per `dune build` invocation, after the PPX has
     produced the post-PPX [.ml] files for every module in the library.
@@ -31,9 +31,9 @@ let longident_head longident =
   | head :: _ -> head
   | [] -> longident
 
-(** Global index of [%cx2] bindings, populated from [[\@\@\@css.bindings ...]]
+(** Global index of [%css] bindings, populated from [[\@\@\@css.bindings ...]]
     attribute payloads. Keyed by the dotted longident exactly as users write it
-    in their [%cx2] selector refs (e.g. [["M.Css.marker"]]) so resolution is a
+    in their [%css] selector refs (e.g. [["M.Css.marker"]]) so resolution is a
     direct [Hashtbl.find_opt]. *)
 module Index = struct
   type t = (string, string) Hashtbl.t
@@ -160,11 +160,11 @@ let module_of_filename filename =
     the input files passed to the aggregator. The aggregator only sees files
     from the current library invocation, so any longident whose root segment
     doesn't correspond to one of those files must point outside the library.
-    Note: we check the input file set rather than [idx] (the [%cx2] binding
-    index), because a file may be in-library yet contain no [%cx2] bindings at
+    Note: we check the input file set rather than [idx] (the [%css] binding
+    index), because a file may be in-library yet contain no [%css] bindings at
     all (and therefore contribute nothing to [idx]). Conflating those two cases
     would produce a misleading "not part of the current library" error for a
-    reference whose target module IS in the library, just not as a [%cx2]. *)
+    reference whose target module IS in the library, just not as a [%css]. *)
 let is_cross_library ~in_library_modules longident =
   match String.split_on_char '.' longident with
   | [] | [ _ ] -> false (* No dot — single-segment, can't be cross-anything. *)

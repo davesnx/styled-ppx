@@ -43,13 +43,13 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-1m667jc{text-decoration-color:hsl(0,0%,0%,0.5);}"];
   [@css ".css-1ks6wvt{text-decoration-color:transparent;}"];
   [@css ".css-1spw3fg{text-decoration-color:currentColor;}"];
-  [@css ".css-1dqtlwt{column-rule-color:rgba(0,0,0,0.5);}"];
-  [@css ".css-ey6q4n{column-rule-color:#F06;}"];
-  [@css ".css-1pel08{column-rule-color:#FF0066;}"];
-  [@css ".css-jyf49a{column-rule-color:hsl(0,0%,0%);}"];
-  [@css ".css-1hgrow3{column-rule-color:hsl(0,0%,0%,0.5);}"];
-  [@css ".css-1vyru4n{column-rule-color:transparent;}"];
-  [@css ".css-l03e1{column-rule-color:currentColor;}"];
+  [@css ".css-1dqtlwt{-webkit-column-rule-color:rgba(0,0,0,0.5);column-rule-color:rgba(0,0,0,0.5);}"];
+  [@css ".css-ey6q4n{-webkit-column-rule-color:#F06;column-rule-color:#F06;}"];
+  [@css ".css-1pel08{-webkit-column-rule-color:#FF0066;column-rule-color:#FF0066;}"];
+  [@css ".css-jyf49a{-webkit-column-rule-color:hsl(0,0%,0%);column-rule-color:hsl(0,0%,0%);}"];
+  [@css ".css-1hgrow3{-webkit-column-rule-color:hsl(0,0%,0%,0.5);column-rule-color:hsl(0,0%,0%,0.5);}"];
+  [@css ".css-1vyru4n{-webkit-column-rule-color:transparent;column-rule-color:transparent;}"];
+  [@css ".css-l03e1{-webkit-column-rule-color:currentColor;column-rule-color:currentColor;}"];
   [@css ".css-106elx5{color:rgb(0% 20% 70%);}"];
   [@css ".css-169x4dj{color:rgb(0 64 185);}"];
   [@css ".css-itsf2n{color:hsl(0 0% 0%);}"];
@@ -114,22 +114,22 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-40xjkw{text-decoration-color:#000F;}"];
   [@css ".css-zlfh32{text-decoration-color:#000000FF;}"];
   [@css ".css-18j2zim{text-decoration-color:rebeccapurple;}"];
-  [@css ".css-1oj6vui{column-rule-color:rgb(0% 20% 70%);}"];
-  [@css ".css-4i3dyf{column-rule-color:rgb(0 64 185);}"];
-  [@css ".css-1maqvl6{column-rule-color:hsl(0 0% 0%);}"];
-  [@css ".css-1wm8yii{column-rule-color:rgba(0% 20% 70% / 50%);}"];
-  [@css ".css-11jt9pq{column-rule-color:rgba(0% 20% 70% / 0.5);}"];
-  [@css ".css-sjwwr9{column-rule-color:rgba(0 64 185 / 50%);}"];
-  [@css ".css-1k0c8ch{column-rule-color:rgba(0 64 185 / 0.5);}"];
-  [@css ".css-2guu68{column-rule-color:hsla(0 0% 0% /0.5);}"];
-  [@css ".css-514t4f{column-rule-color:rgb(0% 20% 70% / 50%);}"];
-  [@css ".css-6yxjvr{column-rule-color:rgb(0% 20% 70% / 0.5);}"];
-  [@css ".css-gqmwf4{column-rule-color:rgb(0 64 185 / 50%);}"];
-  [@css ".css-11xt3by{column-rule-color:rgb(0 64 185 / 0.5);}"];
-  [@css ".css-1kkf3h2{column-rule-color:hsl(0 0% 0% / 0.5);}"];
-  [@css ".css-19rpsoy{column-rule-color:#000F;}"];
-  [@css ".css-g596r0{column-rule-color:#000000FF;}"];
-  [@css ".css-107t3it{column-rule-color:rebeccapurple;}"];
+  [@css ".css-1oj6vui{-webkit-column-rule-color:rgb(0% 20% 70%);column-rule-color:rgb(0% 20% 70%);}"];
+  [@css ".css-4i3dyf{-webkit-column-rule-color:rgb(0 64 185);column-rule-color:rgb(0 64 185);}"];
+  [@css ".css-1maqvl6{-webkit-column-rule-color:hsl(0 0% 0%);column-rule-color:hsl(0 0% 0%);}"];
+  [@css ".css-1wm8yii{-webkit-column-rule-color:rgba(0% 20% 70% / 50%);column-rule-color:rgba(0% 20% 70% / 50%);}"];
+  [@css ".css-11jt9pq{-webkit-column-rule-color:rgba(0% 20% 70% / 0.5);column-rule-color:rgba(0% 20% 70% / 0.5);}"];
+  [@css ".css-sjwwr9{-webkit-column-rule-color:rgba(0 64 185 / 50%);column-rule-color:rgba(0 64 185 / 50%);}"];
+  [@css ".css-1k0c8ch{-webkit-column-rule-color:rgba(0 64 185 / 0.5);column-rule-color:rgba(0 64 185 / 0.5);}"];
+  [@css ".css-2guu68{-webkit-column-rule-color:hsla(0 0% 0% /0.5);column-rule-color:hsla(0 0% 0% /0.5);}"];
+  [@css ".css-514t4f{-webkit-column-rule-color:rgb(0% 20% 70% / 50%);column-rule-color:rgb(0% 20% 70% / 50%);}"];
+  [@css ".css-6yxjvr{-webkit-column-rule-color:rgb(0% 20% 70% / 0.5);column-rule-color:rgb(0% 20% 70% / 0.5);}"];
+  [@css ".css-gqmwf4{-webkit-column-rule-color:rgb(0 64 185 / 50%);column-rule-color:rgb(0 64 185 / 50%);}"];
+  [@css ".css-11xt3by{-webkit-column-rule-color:rgb(0 64 185 / 0.5);column-rule-color:rgb(0 64 185 / 0.5);}"];
+  [@css ".css-1kkf3h2{-webkit-column-rule-color:hsl(0 0% 0% / 0.5);column-rule-color:hsl(0 0% 0% / 0.5);}"];
+  [@css ".css-19rpsoy{-webkit-column-rule-color:#000F;column-rule-color:#000F;}"];
+  [@css ".css-g596r0{-webkit-column-rule-color:#000000FF;column-rule-color:#000000FF;}"];
+  [@css ".css-107t3it{-webkit-column-rule-color:rebeccapurple;column-rule-color:rebeccapurple;}"];
   [@css ".css-xv7eia{color:color-mix(in srgb, teal 65%, olive);}"];
   [@css
     ".css-1q9agm7{color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);}"
@@ -205,21 +205,21 @@ If this test fail means that the module is not in sync with the ppx
   [@css
     ".css-1huznhc{text-decoration-color:color-mix(in lab, teal 65%, olive);}"
   ];
-  [@css ".css-1cbt29u{column-rule-color:color-mix(in srgb, teal 65%, olive);}"];
+  [@css ".css-1cbt29u{-webkit-column-rule-color:color-mix(in srgb, teal 65%, olive);column-rule-color:color-mix(in srgb, teal 65%, olive);}"];
   [@css
-    ".css-lh3exx{column-rule-color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);}"
+    ".css-lh3exx{-webkit-column-rule-color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);column-rule-color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);}"
   ];
   [@css
-    ".css-tznjzz{column-rule-color:color-mix(in srgb, currentColor, rgba(0, 0, 0, 0.5) 65%);}"
+    ".css-tznjzz{-webkit-column-rule-color:color-mix(in srgb, currentColor, rgba(0, 0, 0, 0.5) 65%);column-rule-color:color-mix(in srgb, currentColor, rgba(0, 0, 0, 0.5) 65%);}"
   ];
   [@css
-    ".css-bomvwj{column-rule-color:color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, 0.5) 65%);}"
+    ".css-bomvwj{-webkit-column-rule-color:color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, 0.5) 65%);column-rule-color:color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, 0.5) 65%);}"
   ];
-  [@css ".css-10mgb0{column-rule-color:color-mix(in lch, teal 65%, olive);}"];
-  [@css ".css-64iyg8{column-rule-color:color-mix(in hsl, teal 65%, olive);}"];
-  [@css ".css-1dpa2h1{column-rule-color:color-mix(in hwb, teal 65%, olive);}"];
-  [@css ".css-8f641x{column-rule-color:color-mix(in xyz, teal 65%, olive);}"];
-  [@css ".css-r6gkgb{column-rule-color:color-mix(in lab, teal 65%, olive);}"];
+  [@css ".css-10mgb0{-webkit-column-rule-color:color-mix(in lch, teal 65%, olive);column-rule-color:color-mix(in lch, teal 65%, olive);}"];
+  [@css ".css-64iyg8{-webkit-column-rule-color:color-mix(in hsl, teal 65%, olive);column-rule-color:color-mix(in hsl, teal 65%, olive);}"];
+  [@css ".css-1dpa2h1{-webkit-column-rule-color:color-mix(in hwb, teal 65%, olive);column-rule-color:color-mix(in hwb, teal 65%, olive);}"];
+  [@css ".css-8f641x{-webkit-column-rule-color:color-mix(in xyz, teal 65%, olive);column-rule-color:color-mix(in xyz, teal 65%, olive);}"];
+  [@css ".css-r6gkgb{-webkit-column-rule-color:color-mix(in lab, teal 65%, olive);column-rule-color:color-mix(in lab, teal 65%, olive);}"];
   [@css ".css-161ii5p{color:rgba(0, 0, 0, calc(1));}"];
   [@css ".css-1ikqmml{color:rgba(0, 0, 0, calc(10 - 1));}"];
   

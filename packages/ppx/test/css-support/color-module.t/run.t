@@ -13,420 +13,440 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 72, characters 14-30:
-  Error: Property 'color' has an invalid value: 'color(.2 .4 .6)',
-         Expected 'hex-color', 'color-mix()', 'hsl()', 'hsla()', 'hwb()',
-         'lab()', 'lch()', 'light-dark()', etc.
-  [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css ".css-1klg0jz{color:rgba(0,0,0,0.5);}"];
+  [@css ".css-19aau8k{color:#F06;}"];
+  [@css ".css-show2y{color:#FF0066;}"];
+  [@css ".css-12w3rs3{color:hsl(0,0%,0%);}"];
+  [@css ".css-682uz0{color:hsl(0,0%,0%,0.5);}"];
+  [@css ".css-1wq4akx{color:transparent;}"];
+  [@css ".css-thzv76{color:currentColor;}"];
+  [@css ".css-1aguouh{background-color:rgba(0,0,0,0.5);}"];
+  [@css ".css-1o97rsf{background-color:#F06;}"];
+  [@css ".css-p9u22v{background-color:#FF0066;}"];
+  [@css ".css-12vo0zw{background-color:hsl(0,0%,0%);}"];
+  [@css ".css-8rxhyp{background-color:hsl(0,0%,0%,0.5);}"];
+  [@css ".css-1rm7u2e{background-color:transparent;}"];
+  [@css ".css-dltmcs{background-color:currentColor;}"];
+  [@css ".css-1xkgeh2{border-color:rgba(0,0,0,0.5);}"];
+  [@css ".css-d8xfod{border-color:#F06;}"];
+  [@css ".css-ngwiga{border-color:#FF0066;}"];
+  [@css ".css-o1a70m{border-color:hsl(0,0%,0%);}"];
+  [@css ".css-4aeh3t{border-color:hsl(0,0%,0%,0.5);}"];
+  [@css ".css-roftna{border-color:transparent;}"];
+  [@css ".css-1hs94su{border-color:currentColor;}"];
+  [@css ".css-o5763g{text-decoration-color:rgba(0,0,0,0.5);}"];
+  [@css ".css-1sjelkb{text-decoration-color:#F06;}"];
+  [@css ".css-hy9y29{text-decoration-color:#FF0066;}"];
+  [@css ".css-1j28iw5{text-decoration-color:hsl(0,0%,0%);}"];
+  [@css ".css-1m667jc{text-decoration-color:hsl(0,0%,0%,0.5);}"];
+  [@css ".css-1ks6wvt{text-decoration-color:transparent;}"];
+  [@css ".css-1spw3fg{text-decoration-color:currentColor;}"];
+  [@css
+    ".css-1dqtlwt{-webkit-column-rule-color:rgba(0,0,0,0.5);column-rule-color:rgba(0,0,0,0.5);}"
+  ];
+  [@css ".css-ey6q4n{-webkit-column-rule-color:#F06;column-rule-color:#F06;}"];
+  [@css
+    ".css-1pel08{-webkit-column-rule-color:#FF0066;column-rule-color:#FF0066;}"
+  ];
+  [@css
+    ".css-jyf49a{-webkit-column-rule-color:hsl(0,0%,0%);column-rule-color:hsl(0,0%,0%);}"
+  ];
+  [@css
+    ".css-1hgrow3{-webkit-column-rule-color:hsl(0,0%,0%,0.5);column-rule-color:hsl(0,0%,0%,0.5);}"
+  ];
+  [@css
+    ".css-1vyru4n{-webkit-column-rule-color:transparent;column-rule-color:transparent;}"
+  ];
+  [@css
+    ".css-l03e1{-webkit-column-rule-color:currentColor;column-rule-color:currentColor;}"
+  ];
+  [@css ".css-106elx5{color:rgb(0% 20% 70%);}"];
+  [@css ".css-169x4dj{color:rgb(0 64 185);}"];
+  [@css ".css-itsf2n{color:hsl(0 0% 0%);}"];
+  [@css ".css-10z9r5f{color:rgba(0% 20% 70% / 50%);}"];
+  [@css ".css-i8e91{color:rgba(0% 20% 70% / 0.5);}"];
+  [@css ".css-k2ko2n{color:rgba(0 64 185 / 50%);}"];
+  [@css ".css-1jq4wb0{color:rgba(0 64 185 / 0.5);}"];
+  [@css ".css-1deabkw{color:hsla(0 0% 0% /0.5);}"];
+  [@css ".css-1chilpd{color:rgb(0% 20% 70% / 50%);}"];
+  [@css ".css-cm2qa9{color:rgb(0% 20% 70% / 0.5);}"];
+  [@css ".css-tnjacv{color:rgb(0 64 185 / 50%);}"];
+  [@css ".css-1nl0tkw{color:rgb(0 64 185 / 0.5);}"];
+  [@css ".css-ikl566{color:hsl(0 0% 0% / 0.5);}"];
+  [@css ".css-1wfylgf{color:#000F;}"];
+  [@css ".css-1o5x0fw{color:#000000FF;}"];
+  [@css ".css-1j7dx2f{color:rebeccapurple;}"];
+  [@css ".css-1lzhslh{background-color:rgb(0% 20% 70%);}"];
+  [@css ".css-6ez43m{background-color:rgb(0 64 185);}"];
+  [@css ".css-2v74s8{background-color:hsl(0 0% 0%);}"];
+  [@css ".css-fqa3ju{background-color:rgba(0% 20% 70% / 50%);}"];
+  [@css ".css-1ulf2tb{background-color:rgba(0% 20% 70% / 0.5);}"];
+  [@css ".css-99atwn{background-color:rgba(0 64 185 / 50%);}"];
+  [@css ".css-1mk7sx6{background-color:rgba(0 64 185 / 0.5);}"];
+  [@css ".css-1nu3sdc{background-color:hsla(0 0% 0% /0.5);}"];
+  [@css ".css-98qi4x{background-color:rgb(0% 20% 70% / 50%);}"];
+  [@css ".css-1f60zw7{background-color:rgb(0% 20% 70% / 0.5);}"];
+  [@css ".css-1sopvf5{background-color:rgb(0 64 185 / 50%);}"];
+  [@css ".css-1xjr5yh{background-color:rgb(0 64 185 / 0.5);}"];
+  [@css ".css-ase6sp{background-color:hsl(0 0% 0% / 0.5);}"];
+  [@css ".css-131nvgj{background-color:#000F;}"];
+  [@css ".css-1xqbf4a{background-color:#000000FF;}"];
+  [@css ".css-9ss56r{background-color:rebeccapurple;}"];
+  [@css ".css-1k5i3r2{border-color:rgb(0% 20% 70%);}"];
+  [@css ".css-17269e2{border-color:rgb(0 64 185);}"];
+  [@css ".css-1kpl970{border-color:hsl(0 0% 0%);}"];
+  [@css ".css-scxvdj{border-color:rgba(0% 20% 70% / 50%);}"];
+  [@css ".css-2a1dto{border-color:rgba(0% 20% 70% / 0.5);}"];
+  [@css ".css-tvijrw{border-color:rgba(0 64 185 / 50%);}"];
+  [@css ".css-1fp9ko3{border-color:rgba(0 64 185 / 0.5);}"];
+  [@css ".css-1qn5w0z{border-color:hsla(0 0% 0% /0.5);}"];
+  [@css ".css-1hr8e0z{border-color:rgb(0% 20% 70% / 50%);}"];
+  [@css ".css-3y6gcy{border-color:rgb(0% 20% 70% / 0.5);}"];
+  [@css ".css-1ymoio{border-color:rgb(0 64 185 / 50%);}"];
+  [@css ".css-1mjjpk9{border-color:rgb(0 64 185 / 0.5);}"];
+  [@css ".css-8bj0kf{border-color:hsl(0 0% 0% / 0.5);}"];
+  [@css ".css-n5b9dq{border-color:#000F;}"];
+  [@css ".css-12wm3pc{border-color:#000000FF;}"];
+  [@css ".css-1c73fhh{border-color:rebeccapurple;}"];
+  [@css ".css-ln3bxw{text-decoration-color:rgb(0% 20% 70%);}"];
+  [@css ".css-lkgw6s{text-decoration-color:rgb(0 64 185);}"];
+  [@css ".css-14o54z6{text-decoration-color:hsl(0 0% 0%);}"];
+  [@css ".css-80it8b{text-decoration-color:rgba(0% 20% 70% / 50%);}"];
+  [@css ".css-c8v6ky{text-decoration-color:rgba(0% 20% 70% / 0.5);}"];
+  [@css ".css-pvd63l{text-decoration-color:rgba(0 64 185 / 50%);}"];
+  [@css ".css-14bmep{text-decoration-color:rgba(0 64 185 / 0.5);}"];
+  [@css ".css-17xi8yb{text-decoration-color:hsla(0 0% 0% /0.5);}"];
+  [@css ".css-kv6m7{text-decoration-color:rgb(0% 20% 70% / 50%);}"];
+  [@css ".css-135snjr{text-decoration-color:rgb(0% 20% 70% / 0.5);}"];
+  [@css ".css-tm0vqt{text-decoration-color:rgb(0 64 185 / 50%);}"];
+  [@css ".css-1bkqk8j{text-decoration-color:rgb(0 64 185 / 0.5);}"];
+  [@css ".css-68bkrk{text-decoration-color:hsl(0 0% 0% / 0.5);}"];
+  [@css ".css-40xjkw{text-decoration-color:#000F;}"];
+  [@css ".css-zlfh32{text-decoration-color:#000000FF;}"];
+  [@css ".css-18j2zim{text-decoration-color:rebeccapurple;}"];
+  [@css
+    ".css-1oj6vui{-webkit-column-rule-color:rgb(0% 20% 70%);column-rule-color:rgb(0% 20% 70%);}"
+  ];
+  [@css
+    ".css-4i3dyf{-webkit-column-rule-color:rgb(0 64 185);column-rule-color:rgb(0 64 185);}"
+  ];
+  [@css
+    ".css-1maqvl6{-webkit-column-rule-color:hsl(0 0% 0%);column-rule-color:hsl(0 0% 0%);}"
+  ];
+  [@css
+    ".css-1wm8yii{-webkit-column-rule-color:rgba(0% 20% 70% / 50%);column-rule-color:rgba(0% 20% 70% / 50%);}"
+  ];
+  [@css
+    ".css-11jt9pq{-webkit-column-rule-color:rgba(0% 20% 70% / 0.5);column-rule-color:rgba(0% 20% 70% / 0.5);}"
+  ];
+  [@css
+    ".css-sjwwr9{-webkit-column-rule-color:rgba(0 64 185 / 50%);column-rule-color:rgba(0 64 185 / 50%);}"
+  ];
+  [@css
+    ".css-1k0c8ch{-webkit-column-rule-color:rgba(0 64 185 / 0.5);column-rule-color:rgba(0 64 185 / 0.5);}"
+  ];
+  [@css
+    ".css-2guu68{-webkit-column-rule-color:hsla(0 0% 0% /0.5);column-rule-color:hsla(0 0% 0% /0.5);}"
+  ];
+  [@css
+    ".css-514t4f{-webkit-column-rule-color:rgb(0% 20% 70% / 50%);column-rule-color:rgb(0% 20% 70% / 50%);}"
+  ];
+  [@css
+    ".css-6yxjvr{-webkit-column-rule-color:rgb(0% 20% 70% / 0.5);column-rule-color:rgb(0% 20% 70% / 0.5);}"
+  ];
+  [@css
+    ".css-gqmwf4{-webkit-column-rule-color:rgb(0 64 185 / 50%);column-rule-color:rgb(0 64 185 / 50%);}"
+  ];
+  [@css
+    ".css-11xt3by{-webkit-column-rule-color:rgb(0 64 185 / 0.5);column-rule-color:rgb(0 64 185 / 0.5);}"
+  ];
+  [@css
+    ".css-1kkf3h2{-webkit-column-rule-color:hsl(0 0% 0% / 0.5);column-rule-color:hsl(0 0% 0% / 0.5);}"
+  ];
+  [@css
+    ".css-19rpsoy{-webkit-column-rule-color:#000F;column-rule-color:#000F;}"
+  ];
+  [@css
+    ".css-g596r0{-webkit-column-rule-color:#000000FF;column-rule-color:#000000FF;}"
+  ];
+  [@css
+    ".css-107t3it{-webkit-column-rule-color:rebeccapurple;column-rule-color:rebeccapurple;}"
+  ];
+  [@css ".css-xv7eia{color:color-mix(in srgb, teal 65%, olive);}"];
+  [@css
+    ".css-1q9agm7{color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);}"
+  ];
+  [@css
+    ".css-rzb0m8{color:color-mix(in srgb, currentColor, rgba(0, 0, 0, 0.5) 65%);}"
+  ];
+  [@css
+    ".css-6hx6yd{color:color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, 0.5) 65%);}"
+  ];
+  [@css ".css-1dr2vpr{color:color-mix(in lch, teal 65%, olive);}"];
+  [@css ".css-i9v2e0{color:color-mix(in hsl, teal 65%, olive);}"];
+  [@css ".css-13pap82{color:color-mix(in hwb, teal 65%, olive);}"];
+  [@css ".css-s4rji0{color:color-mix(in xyz, teal 65%, olive);}"];
+  [@css ".css-1imxr44{color:color-mix(in lab, teal 65%, olive);}"];
+  [@css
+    ".css-bvuxb0{color:color-mix(in lch longer hue, hsl(200deg 50% 80%), coral);}"
+  ];
+  [@css ".css-vzawmn{background-color:color-mix(in srgb, teal 65%, olive);}"];
+  [@css
+    ".css-1bh658x{background-color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);}"
+  ];
+  [@css
+    ".css-xdjnak{background-color:color-mix(in srgb, currentColor, rgba(0, 0, 0, 0.5) 65%);}"
+  ];
+  [@css
+    ".css-z2tmhh{background-color:color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, 0.5) 65%);}"
+  ];
+  [@css ".css-sr14q8{background-color:color-mix(in lch, teal 65%, olive);}"];
+  [@css ".css-15xujv5{background-color:color-mix(in hsl, teal 65%, olive);}"];
+  [@css ".css-5j5l1n{background-color:color-mix(in hwb, teal 65%, olive);}"];
+  [@css ".css-1layqra{background-color:color-mix(in xyz, teal 65%, olive);}"];
+  [@css ".css-iqo7xf{background-color:color-mix(in lab, teal 65%, olive);}"];
+  [@css ".css-1dvgebh{border-color:color-mix(in srgb, teal 65%, olive);}"];
+  [@css
+    ".css-1cpjoz7{border-color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);}"
+  ];
+  [@css
+    ".css-qokah8{border-color:color-mix(in srgb, currentColor, rgba(0, 0, 0, 0.5) 65%);}"
+  ];
+  [@css
+    ".css-tlegxc{border-color:color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, 0.5) 65%);}"
+  ];
+  [@css ".css-xd9u6g{border-color:color-mix(in lch, teal 65%, olive);}"];
+  [@css ".css-19dtqog{border-color:color-mix(in hsl, teal 65%, olive);}"];
+  [@css ".css-4czslf{border-color:color-mix(in hwb, teal 65%, olive);}"];
+  [@css ".css-7we9z4{border-color:color-mix(in xyz, teal 65%, olive);}"];
+  [@css ".css-15anzfj{border-color:color-mix(in lab, teal 65%, olive);}"];
+  [@css
+    ".css-1laj5fb{text-decoration-color:color-mix(in srgb, teal 65%, olive);}"
+  ];
+  [@css
+    ".css-2vgokw{text-decoration-color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);}"
+  ];
+  [@css
+    ".css-nnawx{text-decoration-color:color-mix(in srgb, currentColor, rgba(0, 0, 0, 0.5) 65%);}"
+  ];
+  [@css
+    ".css-1w9gyza{text-decoration-color:color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, 0.5) 65%);}"
+  ];
+  [@css
+    ".css-10gmjvl{text-decoration-color:color-mix(in lch, teal 65%, olive);}"
+  ];
+  [@css
+    ".css-5dhj6n{text-decoration-color:color-mix(in hsl, teal 65%, olive);}"
+  ];
+  [@css
+    ".css-13of0y0{text-decoration-color:color-mix(in hwb, teal 65%, olive);}"
+  ];
+  [@css
+    ".css-1qogihm{text-decoration-color:color-mix(in xyz, teal 65%, olive);}"
+  ];
+  [@css
+    ".css-1huznhc{text-decoration-color:color-mix(in lab, teal 65%, olive);}"
+  ];
+  [@css
+    ".css-1cbt29u{-webkit-column-rule-color:color-mix(in srgb, teal 65%, olive);column-rule-color:color-mix(in srgb, teal 65%, olive);}"
+  ];
+  [@css
+    ".css-lh3exx{-webkit-column-rule-color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);column-rule-color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);}"
+  ];
+  [@css
+    ".css-tznjzz{-webkit-column-rule-color:color-mix(in srgb, currentColor, rgba(0, 0, 0, 0.5) 65%);column-rule-color:color-mix(in srgb, currentColor, rgba(0, 0, 0, 0.5) 65%);}"
+  ];
+  [@css
+    ".css-bomvwj{-webkit-column-rule-color:color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, 0.5) 65%);column-rule-color:color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, 0.5) 65%);}"
+  ];
+  [@css
+    ".css-10mgb0{-webkit-column-rule-color:color-mix(in lch, teal 65%, olive);column-rule-color:color-mix(in lch, teal 65%, olive);}"
+  ];
+  [@css
+    ".css-64iyg8{-webkit-column-rule-color:color-mix(in hsl, teal 65%, olive);column-rule-color:color-mix(in hsl, teal 65%, olive);}"
+  ];
+  [@css
+    ".css-1dpa2h1{-webkit-column-rule-color:color-mix(in hwb, teal 65%, olive);column-rule-color:color-mix(in hwb, teal 65%, olive);}"
+  ];
+  [@css
+    ".css-8f641x{-webkit-column-rule-color:color-mix(in xyz, teal 65%, olive);column-rule-color:color-mix(in xyz, teal 65%, olive);}"
+  ];
+  [@css
+    ".css-r6gkgb{-webkit-column-rule-color:color-mix(in lab, teal 65%, olive);column-rule-color:color-mix(in lab, teal 65%, olive);}"
+  ];
+  [@css ".css-161ii5p{color:rgba(0, 0, 0, calc(1));}"];
+  [@css ".css-1ikqmml{color:rgba(0, 0, 0, calc(10 - 1));}"];
   
-  CSS.color(`rgba((0, 0, 0, `num(0.5))));
-  CSS.color(`hex({js|F06|js}));
-  CSS.color(`hex({js|FF0066|js}));
-  CSS.unsafe({js|color|js}, {js|hsl(0,0%,0%)|js});
-  CSS.unsafe({js|color|js}, {js|hsl(0,0%,0%,.5)|js});
-  CSS.color(`transparent);
-  CSS.color(`currentColor);
-  CSS.backgroundColor(`rgba((0, 0, 0, `num(0.5))));
-  CSS.backgroundColor(`hex({js|F06|js}));
-  CSS.backgroundColor(`hex({js|FF0066|js}));
-  CSS.unsafe({js|backgroundColor|js}, {js|hsl(0,0%,0%)|js});
-  CSS.unsafe({js|backgroundColor|js}, {js|hsl(0,0%,0%,.5)|js});
-  CSS.backgroundColor(`transparent);
-  CSS.backgroundColor(`currentColor);
-  CSS.borderColor(`rgba((0, 0, 0, `num(0.5))));
-  CSS.borderColor(`hex({js|F06|js}));
-  CSS.borderColor(`hex({js|FF0066|js}));
-  CSS.unsafe({js|borderColor|js}, {js|hsl(0,0%,0%)|js});
-  CSS.unsafe({js|borderColor|js}, {js|hsl(0,0%,0%,.5)|js});
-  CSS.borderColor(`transparent);
-  CSS.borderColor(`currentColor);
-  CSS.textDecorationColor(`rgba((0, 0, 0, `num(0.5))));
-  CSS.textDecorationColor(`hex({js|F06|js}));
-  CSS.textDecorationColor(`hex({js|FF0066|js}));
-  CSS.unsafe({js|textDecorationColor|js}, {js|hsl(0,0%,0%)|js});
-  CSS.unsafe({js|textDecorationColor|js}, {js|hsl(0,0%,0%,.5)|js});
-  CSS.textDecorationColor(`transparent);
-  CSS.textDecorationColor(`currentColor);
-  CSS.columnRuleColor(`rgba((0, 0, 0, `num(0.5))));
-  CSS.columnRuleColor(`hex({js|F06|js}));
-  CSS.columnRuleColor(`hex({js|FF0066|js}));
-  CSS.unsafe({js|columnRuleColor|js}, {js|hsl(0,0%,0%)|js});
-  CSS.unsafe({js|columnRuleColor|js}, {js|hsl(0,0%,0%,.5)|js});
-  CSS.columnRuleColor(`transparent);
-  CSS.columnRuleColor(`currentColor);
+  CSS.make("css-1klg0jz", []);
+  CSS.make("css-19aau8k", []);
+  CSS.make("css-show2y", []);
+  CSS.make("css-12w3rs3", []);
+  CSS.make("css-682uz0", []);
+  CSS.make("css-1wq4akx", []);
+  CSS.make("css-thzv76", []);
+  CSS.make("css-1aguouh", []);
+  CSS.make("css-1o97rsf", []);
+  CSS.make("css-p9u22v", []);
+  CSS.make("css-12vo0zw", []);
+  CSS.make("css-8rxhyp", []);
+  CSS.make("css-1rm7u2e", []);
+  CSS.make("css-dltmcs", []);
+  CSS.make("css-1xkgeh2", []);
+  CSS.make("css-d8xfod", []);
+  CSS.make("css-ngwiga", []);
+  CSS.make("css-o1a70m", []);
+  CSS.make("css-4aeh3t", []);
+  CSS.make("css-roftna", []);
+  CSS.make("css-1hs94su", []);
+  CSS.make("css-o5763g", []);
+  CSS.make("css-1sjelkb", []);
+  CSS.make("css-hy9y29", []);
+  CSS.make("css-1j28iw5", []);
+  CSS.make("css-1m667jc", []);
+  CSS.make("css-1ks6wvt", []);
+  CSS.make("css-1spw3fg", []);
+  CSS.make("css-1dqtlwt", []);
+  CSS.make("css-ey6q4n", []);
+  CSS.make("css-1pel08", []);
+  CSS.make("css-jyf49a", []);
+  CSS.make("css-1hgrow3", []);
+  CSS.make("css-1vyru4n", []);
+  CSS.make("css-l03e1", []);
   
-  CSS.color(`rgb((0, 51, 178)));
-  CSS.color(`rgb((0, 64, 185)));
-  CSS.color(`hsl((`deg(0.), `percent(0.), `percent(0.))));
-  CSS.color(`rgba((0, 51, 178, `percent(0.5))));
-  CSS.color(`rgba((0, 51, 178, `num(0.5))));
-  CSS.color(`rgba((0, 64, 185, `percent(0.5))));
-  CSS.color(`rgba((0, 64, 185, `num(0.5))));
-  CSS.color(`hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))));
-  CSS.color(`rgba((0, 51, 178, `percent(0.5))));
-  CSS.color(`rgba((0, 51, 178, `num(0.5))));
-  CSS.color(`rgba((0, 64, 185, `percent(0.5))));
-  CSS.color(`rgba((0, 64, 185, `num(0.5))));
-  CSS.color(`hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))));
-  CSS.color(`hex({js|000F|js}));
-  CSS.color(`hex({js|000000FF|js}));
-  CSS.color(CSS.rebeccapurple);
+  CSS.make("css-106elx5", []);
+  CSS.make("css-169x4dj", []);
+  CSS.make("css-itsf2n", []);
+  CSS.make("css-10z9r5f", []);
+  CSS.make("css-i8e91", []);
+  CSS.make("css-k2ko2n", []);
+  CSS.make("css-1jq4wb0", []);
+  CSS.make("css-1deabkw", []);
+  CSS.make("css-1chilpd", []);
+  CSS.make("css-cm2qa9", []);
+  CSS.make("css-tnjacv", []);
+  CSS.make("css-1nl0tkw", []);
+  CSS.make("css-ikl566", []);
+  CSS.make("css-1wfylgf", []);
+  CSS.make("css-1o5x0fw", []);
+  CSS.make("css-1j7dx2f", []);
   
-  CSS.color(`hwb((`deg(0.), `percent(0.), `percent(0.))));
-  CSS.color(`hwba((`deg(0.), `percent(0.), `percent(0.), `num(0.5))));
-  CSS.color(`lab((`percent(0.), `num(0.), `num(0.))));
-  CSS.color(`laba((`percent(0.), `num(0.), `num(0.), `num(0.5))));
-  CSS.color(`lch((`percent(0.), `num(0.), `deg(0.))));
-  CSS.color(`lcha((`percent(0.), `num(0.), `deg(0.), `num(0.5))));
-  [%ocaml.error
-    "Property 'color' has an invalid value: 'color(.2 .4 .6)',\nExpected 'hex-color', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', 'light-dark()', etc."
-  ];
-  [%ocaml.error
-    "Property 'color' has an invalid value: 'color(display-p3 .2. 4 .6)',\nExpected 'hex-color', 'number', 'percentage', 'calc()', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', etc."
-  ];
-  [%ocaml.error
-    "Property 'color' has an invalid value: 'color(foo .2 .4 .6)',\nExpected 'hex-color', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', 'light-dark()', etc."
-  ];
-  [%ocaml.error
-    "Property 'color' has an invalid value: 'color(.2 .4 .6 / .5)',\nExpected 'hex-color', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', 'light-dark()', etc."
-  ];
-  CSS.color(
-    `colora((`displayP3, `num(0.2), `num(0.4), `num(0.6), `num(0.5))),
-  );
-  [%ocaml.error
-    "Property 'color' has an invalid value: 'color(--foo .2 .4 .6 / .5)',\nExpected 'hex-color', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', 'light-dark()', etc."
-  ];
-  [%ocaml.error
-    "Property 'color' has an invalid value: 'color(.2 .4 .6, #123456)',\nExpected 'hex-color', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', 'light-dark()', etc."
-  ];
-  [%ocaml.error
-    "Property 'color' has an invalid value: 'color(display-p3 .2. 4 .6, #654321)',\nExpected 'hex-color', 'number', 'percentage', 'calc()', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', etc."
-  ];
-  [%ocaml.error
-    "Property 'color' has an invalid value: 'color(20% 40% 60%)',\nExpected 'hex-color', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', 'light-dark()', etc."
-  ];
-  CSS.color(
-    `color((`displayP3, `percent(20.), `percent(40.), `percent(60.))),
-  );
-  [%ocaml.error
-    "Property 'color' has an invalid value: 'color(foo 20% 40% 60%)',\nExpected 'hex-color', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', 'light-dark()', etc."
-  ];
-  [%ocaml.error
-    "Property 'color' has an invalid value: 'color(20% 40% 60% / .5)',\nExpected 'hex-color', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', 'light-dark()', etc."
-  ];
-  [%ocaml.error
-    "Property 'color' has an invalid value: 'color(image-p3 20% 40% 60%  / .5)',\nExpected 'hex-color', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', 'light-dark()', etc."
-  ];
-  [%ocaml.error
-    "Property 'color' has an invalid value: 'color(--foo 20% 40% 60% / .5)',\nExpected 'hex-color', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', 'light-dark()', etc."
-  ];
-  [%ocaml.error
-    "Property 'color' has an invalid value: 'color(20% 40% 60%, #123456)',\nExpected 'hex-color', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', 'light-dark()', etc."
-  ];
-  [%ocaml.error
-    "Property 'color' has an invalid value:\n'color(display-p3 20% 40% 60%, #654321)',\nExpected 'hex-color', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', 'light-dark()', etc."
-  ];
-  [%ocaml.error
-    "Property 'color' has an invalid value: 'color(--mycmyk 0% 20% 30% 5%)',\nExpected 'hex-color', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', 'light-dark()', etc."
-  ];
-  [%ocaml.error
-    "Property 'color' has an invalid value: 'device-cmyk(.2 .3 .4 .5)',\nExpected 'hex-color', 'color()', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
-  ];
-  [%ocaml.error
-    "Property 'color' has an invalid value: 'device-cmyk(.2 .3 .4 .5 / .5)',\nExpected 'hex-color', 'color()', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
-  ];
-  [%ocaml.error
-    "Property 'color' has an invalid value: 'device-cmyk(.2 .3 .4 .5 / 50%)',\nExpected 'hex-color', 'color()', 'color-mix()', 'hsl()', 'hsla()', 'hwb()', 'lab()', 'lch()', etc."
-  ];
-  CSS.backgroundColor(`rgb((0, 51, 178)));
-  CSS.backgroundColor(`rgb((0, 64, 185)));
-  CSS.backgroundColor(`hsl((`deg(0.), `percent(0.), `percent(0.))));
-  CSS.backgroundColor(`rgba((0, 51, 178, `percent(0.5))));
-  CSS.backgroundColor(`rgba((0, 51, 178, `num(0.5))));
-  CSS.backgroundColor(`rgba((0, 64, 185, `percent(0.5))));
-  CSS.backgroundColor(`rgba((0, 64, 185, `num(0.5))));
-  CSS.backgroundColor(
-    `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
-  );
-  CSS.backgroundColor(`rgba((0, 51, 178, `percent(0.5))));
-  CSS.backgroundColor(`rgba((0, 51, 178, `num(0.5))));
-  CSS.backgroundColor(`rgba((0, 64, 185, `percent(0.5))));
-  CSS.backgroundColor(`rgba((0, 64, 185, `num(0.5))));
-  CSS.backgroundColor(
-    `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
-  );
-  CSS.backgroundColor(`hex({js|000F|js}));
-  CSS.backgroundColor(`hex({js|000000FF|js}));
-  CSS.backgroundColor(CSS.rebeccapurple);
-  CSS.borderColor(`rgb((0, 51, 178)));
-  CSS.borderColor(`rgb((0, 64, 185)));
-  CSS.borderColor(`hsl((`deg(0.), `percent(0.), `percent(0.))));
-  CSS.borderColor(`rgba((0, 51, 178, `percent(0.5))));
-  CSS.borderColor(`rgba((0, 51, 178, `num(0.5))));
-  CSS.borderColor(`rgba((0, 64, 185, `percent(0.5))));
-  CSS.borderColor(`rgba((0, 64, 185, `num(0.5))));
-  CSS.borderColor(
-    `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
-  );
-  CSS.borderColor(`rgba((0, 51, 178, `percent(0.5))));
-  CSS.borderColor(`rgba((0, 51, 178, `num(0.5))));
-  CSS.borderColor(`rgba((0, 64, 185, `percent(0.5))));
-  CSS.borderColor(`rgba((0, 64, 185, `num(0.5))));
-  CSS.borderColor(
-    `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
-  );
-  CSS.borderColor(`hex({js|000F|js}));
-  CSS.borderColor(`hex({js|000000FF|js}));
-  CSS.borderColor(CSS.rebeccapurple);
-  CSS.textDecorationColor(`rgb((0, 51, 178)));
-  CSS.textDecorationColor(`rgb((0, 64, 185)));
-  CSS.textDecorationColor(`hsl((`deg(0.), `percent(0.), `percent(0.))));
-  CSS.textDecorationColor(`rgba((0, 51, 178, `percent(0.5))));
-  CSS.textDecorationColor(`rgba((0, 51, 178, `num(0.5))));
-  CSS.textDecorationColor(`rgba((0, 64, 185, `percent(0.5))));
-  CSS.textDecorationColor(`rgba((0, 64, 185, `num(0.5))));
-  CSS.textDecorationColor(
-    `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
-  );
-  CSS.textDecorationColor(`rgba((0, 51, 178, `percent(0.5))));
-  CSS.textDecorationColor(`rgba((0, 51, 178, `num(0.5))));
-  CSS.textDecorationColor(`rgba((0, 64, 185, `percent(0.5))));
-  CSS.textDecorationColor(`rgba((0, 64, 185, `num(0.5))));
-  CSS.textDecorationColor(
-    `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
-  );
-  CSS.textDecorationColor(`hex({js|000F|js}));
-  CSS.textDecorationColor(`hex({js|000000FF|js}));
-  CSS.textDecorationColor(CSS.rebeccapurple);
-  CSS.columnRuleColor(`rgb((0, 51, 178)));
-  CSS.columnRuleColor(`rgb((0, 64, 185)));
-  CSS.columnRuleColor(`hsl((`deg(0.), `percent(0.), `percent(0.))));
-  CSS.columnRuleColor(`rgba((0, 51, 178, `percent(0.5))));
-  CSS.columnRuleColor(`rgba((0, 51, 178, `num(0.5))));
-  CSS.columnRuleColor(`rgba((0, 64, 185, `percent(0.5))));
-  CSS.columnRuleColor(`rgba((0, 64, 185, `num(0.5))));
-  CSS.columnRuleColor(
-    `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
-  );
-  CSS.columnRuleColor(`rgba((0, 51, 178, `percent(0.5))));
-  CSS.columnRuleColor(`rgba((0, 51, 178, `num(0.5))));
-  CSS.columnRuleColor(`rgba((0, 64, 185, `percent(0.5))));
-  CSS.columnRuleColor(`rgba((0, 64, 185, `num(0.5))));
-  CSS.columnRuleColor(
-    `hsla((`deg(0.), `percent(0.), `percent(0.), `num(0.5))),
-  );
-  CSS.columnRuleColor(`hex({js|000F|js}));
-  CSS.columnRuleColor(`hex({js|000000FF|js}));
-  CSS.columnRuleColor(CSS.rebeccapurple);
+  CSS.make("css-1lzhslh", []);
+  CSS.make("css-6ez43m", []);
+  CSS.make("css-2v74s8", []);
+  CSS.make("css-fqa3ju", []);
+  CSS.make("css-1ulf2tb", []);
+  CSS.make("css-99atwn", []);
+  CSS.make("css-1mk7sx6", []);
+  CSS.make("css-1nu3sdc", []);
+  CSS.make("css-98qi4x", []);
+  CSS.make("css-1f60zw7", []);
+  CSS.make("css-1sopvf5", []);
+  CSS.make("css-1xjr5yh", []);
+  CSS.make("css-ase6sp", []);
+  CSS.make("css-131nvgj", []);
+  CSS.make("css-1xqbf4a", []);
+  CSS.make("css-9ss56r", []);
+  CSS.make("css-1k5i3r2", []);
+  CSS.make("css-17269e2", []);
+  CSS.make("css-1kpl970", []);
+  CSS.make("css-scxvdj", []);
+  CSS.make("css-2a1dto", []);
+  CSS.make("css-tvijrw", []);
+  CSS.make("css-1fp9ko3", []);
+  CSS.make("css-1qn5w0z", []);
+  CSS.make("css-1hr8e0z", []);
+  CSS.make("css-3y6gcy", []);
+  CSS.make("css-1ymoio", []);
+  CSS.make("css-1mjjpk9", []);
+  CSS.make("css-8bj0kf", []);
+  CSS.make("css-n5b9dq", []);
+  CSS.make("css-12wm3pc", []);
+  CSS.make("css-1c73fhh", []);
+  CSS.make("css-ln3bxw", []);
+  CSS.make("css-lkgw6s", []);
+  CSS.make("css-14o54z6", []);
+  CSS.make("css-80it8b", []);
+  CSS.make("css-c8v6ky", []);
+  CSS.make("css-pvd63l", []);
+  CSS.make("css-14bmep", []);
+  CSS.make("css-17xi8yb", []);
+  CSS.make("css-kv6m7", []);
+  CSS.make("css-135snjr", []);
+  CSS.make("css-tm0vqt", []);
+  CSS.make("css-1bkqk8j", []);
+  CSS.make("css-68bkrk", []);
+  CSS.make("css-40xjkw", []);
+  CSS.make("css-zlfh32", []);
+  CSS.make("css-18j2zim", []);
+  CSS.make("css-1oj6vui", []);
+  CSS.make("css-4i3dyf", []);
+  CSS.make("css-1maqvl6", []);
+  CSS.make("css-1wm8yii", []);
+  CSS.make("css-11jt9pq", []);
+  CSS.make("css-sjwwr9", []);
+  CSS.make("css-1k0c8ch", []);
+  CSS.make("css-2guu68", []);
+  CSS.make("css-514t4f", []);
+  CSS.make("css-6yxjvr", []);
+  CSS.make("css-gqmwf4", []);
+  CSS.make("css-11xt3by", []);
+  CSS.make("css-1kkf3h2", []);
+  CSS.make("css-19rpsoy", []);
+  CSS.make("css-g596r0", []);
+  CSS.make("css-107t3it", []);
   
-  CSS.color(
-    `colorMix((`srgb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.color(
-    `colorMix((
-      `srgb,
-      (`rgba((255, 0, 0, `num(0.2))), Some(`percent(65.))),
-      (CSS.olive, None),
-    )),
-  );
-  CSS.color(
-    `colorMix((
-      `srgb,
-      (`currentColor, None),
-      (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))),
-    )),
-  );
-  CSS.color(
-    `colorMix((
-      `srgb,
-      (`currentColor, Some(`percent(10.))),
-      (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))),
-    )),
-  );
-  CSS.color(
-    `colorMix((`lch, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.color(
-    `colorMix((`hsl, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.color(
-    `colorMix((`hwb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.color(
-    `colorMix((`xyz, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.color(
-    `colorMix((`lab, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.color(
-    `colorMix((
-      `polar_with_hue((`lch, `longer)),
-      (`hsl((`deg(200.), `percent(50.), `percent(80.))), None),
-      (CSS.coral, None),
-    )),
-  );
+  CSS.make("css-xv7eia", []);
+  CSS.make("css-1q9agm7", []);
+  CSS.make("css-rzb0m8", []);
+  CSS.make("css-6hx6yd", []);
+  CSS.make("css-1dr2vpr", []);
+  CSS.make("css-i9v2e0", []);
+  CSS.make("css-13pap82", []);
+  CSS.make("css-s4rji0", []);
+  CSS.make("css-1imxr44", []);
+  CSS.make("css-bvuxb0", []);
   
-  CSS.backgroundColor(
-    `colorMix((`srgb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.backgroundColor(
-    `colorMix((
-      `srgb,
-      (`rgba((255, 0, 0, `num(0.2))), Some(`percent(65.))),
-      (CSS.olive, None),
-    )),
-  );
-  CSS.backgroundColor(
-    `colorMix((
-      `srgb,
-      (`currentColor, None),
-      (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))),
-    )),
-  );
-  CSS.backgroundColor(
-    `colorMix((
-      `srgb,
-      (`currentColor, Some(`percent(10.))),
-      (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))),
-    )),
-  );
-  CSS.backgroundColor(
-    `colorMix((`lch, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.backgroundColor(
-    `colorMix((`hsl, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.backgroundColor(
-    `colorMix((`hwb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.backgroundColor(
-    `colorMix((`xyz, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.backgroundColor(
-    `colorMix((`lab, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
+  CSS.make("css-vzawmn", []);
+  CSS.make("css-1bh658x", []);
+  CSS.make("css-xdjnak", []);
+  CSS.make("css-z2tmhh", []);
+  CSS.make("css-sr14q8", []);
+  CSS.make("css-15xujv5", []);
+  CSS.make("css-5j5l1n", []);
+  CSS.make("css-1layqra", []);
+  CSS.make("css-iqo7xf", []);
   
-  CSS.borderColor(
-    `colorMix((`srgb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.borderColor(
-    `colorMix((
-      `srgb,
-      (`rgba((255, 0, 0, `num(0.2))), Some(`percent(65.))),
-      (CSS.olive, None),
-    )),
-  );
-  CSS.borderColor(
-    `colorMix((
-      `srgb,
-      (`currentColor, None),
-      (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))),
-    )),
-  );
-  CSS.borderColor(
-    `colorMix((
-      `srgb,
-      (`currentColor, Some(`percent(10.))),
-      (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))),
-    )),
-  );
-  CSS.borderColor(
-    `colorMix((`lch, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.borderColor(
-    `colorMix((`hsl, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.borderColor(
-    `colorMix((`hwb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.borderColor(
-    `colorMix((`xyz, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.borderColor(
-    `colorMix((`lab, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
+  CSS.make("css-1dvgebh", []);
+  CSS.make("css-1cpjoz7", []);
+  CSS.make("css-qokah8", []);
+  CSS.make("css-tlegxc", []);
+  CSS.make("css-xd9u6g", []);
+  CSS.make("css-19dtqog", []);
+  CSS.make("css-4czslf", []);
+  CSS.make("css-7we9z4", []);
+  CSS.make("css-15anzfj", []);
   
-  CSS.textDecorationColor(
-    `colorMix((`srgb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.textDecorationColor(
-    `colorMix((
-      `srgb,
-      (`rgba((255, 0, 0, `num(0.2))), Some(`percent(65.))),
-      (CSS.olive, None),
-    )),
-  );
-  CSS.textDecorationColor(
-    `colorMix((
-      `srgb,
-      (`currentColor, None),
-      (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))),
-    )),
-  );
-  CSS.textDecorationColor(
-    `colorMix((
-      `srgb,
-      (`currentColor, Some(`percent(10.))),
-      (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))),
-    )),
-  );
-  CSS.textDecorationColor(
-    `colorMix((`lch, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.textDecorationColor(
-    `colorMix((`hsl, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.textDecorationColor(
-    `colorMix((`hwb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.textDecorationColor(
-    `colorMix((`xyz, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.textDecorationColor(
-    `colorMix((`lab, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
+  CSS.make("css-1laj5fb", []);
+  CSS.make("css-2vgokw", []);
+  CSS.make("css-nnawx", []);
+  CSS.make("css-1w9gyza", []);
+  CSS.make("css-10gmjvl", []);
+  CSS.make("css-5dhj6n", []);
+  CSS.make("css-13of0y0", []);
+  CSS.make("css-1qogihm", []);
+  CSS.make("css-1huznhc", []);
   
-  CSS.columnRuleColor(
-    `colorMix((`srgb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.columnRuleColor(
-    `colorMix((
-      `srgb,
-      (`rgba((255, 0, 0, `num(0.2))), Some(`percent(65.))),
-      (CSS.olive, None),
-    )),
-  );
-  CSS.columnRuleColor(
-    `colorMix((
-      `srgb,
-      (`currentColor, None),
-      (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))),
-    )),
-  );
-  CSS.columnRuleColor(
-    `colorMix((
-      `srgb,
-      (`currentColor, Some(`percent(10.))),
-      (`rgba((0, 0, 0, `num(0.5))), Some(`percent(65.))),
-    )),
-  );
-  CSS.columnRuleColor(
-    `colorMix((`lch, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.columnRuleColor(
-    `colorMix((`hsl, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.columnRuleColor(
-    `colorMix((`hwb, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.columnRuleColor(
-    `colorMix((`xyz, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
-  CSS.columnRuleColor(
-    `colorMix((`lab, (CSS.teal, Some(`percent(65.))), (CSS.olive, None))),
-  );
+  CSS.make("css-1cbt29u", []);
+  CSS.make("css-lh3exx", []);
+  CSS.make("css-tznjzz", []);
+  CSS.make("css-bomvwj", []);
+  CSS.make("css-10mgb0", []);
+  CSS.make("css-64iyg8", []);
+  CSS.make("css-1dpa2h1", []);
+  CSS.make("css-8f641x", []);
+  CSS.make("css-r6gkgb", []);
   
-  CSS.color(`rgba((0, 0, 0, `calc(`num(1.)))));
-  CSS.color(`rgba((0, 0, 0, `calc(`sub((`num(10.), `num(1.)))))));
+  CSS.make("css-161ii5p", []);
+  CSS.make("css-1ikqmml", []);

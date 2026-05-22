@@ -21,20 +21,10 @@ module CSS = {
 };
 
 let string_to_const = (~loc, s) => {
-  switch (File.get()) {
-  | Some(ReScript) =>
-    Helper.Exp.constant(
-      ~loc,
-      ~attrs=Platform_attributes.template(~loc),
-      Helper.Const.string(~quotation_delimiter="*j", s),
-    )
-  | Some(Reason)
-  | _ =>
-    Helper.Exp.constant(
-      ~loc,
-      Helper.Const.string(~quotation_delimiter="js", s),
-    )
-  };
+  Helper.Exp.constant(
+    ~loc,
+    Helper.Const.string(~quotation_delimiter="js", s),
+  );
 };
 let render_variable = (~loc, v) => {
   switch (Expression_parser.parse_expression(~loc, ~source=v)) {
@@ -635,17 +625,6 @@ If your intent is to apply the declaration to all elements, use the universal se
   [%expr ignore([%e expr])];
 };
 
-let render_variable_ident = (~loc, path_str) => {
-  let txt = path_str |> Ppxlib.Longident.parse;
-  Builder.pexp_ident(
-    ~loc,
-    {
-      txt,
-      loc,
-    },
-  );
-};
-
 let render_make_call =
     (~loc, ~marker: option(string), ~classNames, ~dynamic_vars) => {
   let class_string = String.concat(" ", classNames);
@@ -664,7 +643,7 @@ let render_make_call =
          let field_name_expr =
            Helper.Exp.constant(~loc, Pconst_string(field_name, loc, None));
 
-         let var_value = render_variable_ident(~loc, original_path);
+          let var_value = render_variable(~loc, original_path);
 
          let field_value =
            switch (var_type) {

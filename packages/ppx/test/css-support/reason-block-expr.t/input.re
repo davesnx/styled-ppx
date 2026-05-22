@@ -1,4 +1,4 @@
-let _styles = [%cx
+let _styles = [%css
   {|
     color: $({
       let base = CSS.red;

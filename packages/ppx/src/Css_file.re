@@ -2,7 +2,7 @@ type var_type =
   | Selector
   | MediaQuery
   /* Passthrough string interpolation for `--*: $(expr)` declarations in
-     [%cx2] / [%styled.global2]. `expr` is required to be a [string] and is
+     [%css] / [%styled.global]. `expr` is required to be a [string] and is
      emitted verbatim in the value position - no `toString` wrap, no
      validation. This is the unsafe escape hatch for custom properties;
      when we later support typed custom properties (e.g. via
@@ -12,6 +12,7 @@ type var_type =
   | RuntimeModule(string);
 
 let render_rule = Styled_ppx_css_parser.Render.rule;
+let render_prefixed_rule = Css_autoprefixer.render_rule;
 let render_declaration = Styled_ppx_css_parser.Render.declaration;
 
 module Buffer = {
@@ -258,7 +259,7 @@ module Css_transform = {
 
   /* Resolve `ClassVariable(name)` (i.e. `.$(name)`) by replacing it with
      the chain of `Class(c)` subclass selectors corresponding to the
-     classNames the referenced [%cx2] binding minted. Multi-declaration
+     classNames the referenced [%css] binding minted. Multi-declaration
      bindings expand to a compound chain (`&.cssA.cssB`) which matches the
      "AND" semantics: every consumer of the referenced binding has all of
      its atomized classes applied to the same element. */
@@ -586,10 +587,9 @@ module Css_transform = {
        `@media (max-width: $(bp))` form, where `$(bp)` lives inside a
        `Paren_block` of the `(max-width: $(bp))` group.
 
-       Static extraction can't bind `var(--x)` into a media query (CSS
-       custom properties are not valid in media-query conditions), so we
-       reject the whole shape with a hard error and steer users at [%cx] /
-       [%styled.global] for runtime media-query interpolation. */
+        Static extraction can't bind `var(--x)` into a media query (CSS
+        custom properties are not valid in media-query conditions), so we
+        reject the whole shape with a hard error. */
     let rec component_has_interpolation = (cv: component_value) =>
       switch (cv) {
       | Variable(_, _) => true
@@ -607,7 +607,7 @@ module Css_transform = {
       let (at_name, _) = name;
       Ppxlib.Location.raise_errorf(
         ~loc,
-        "Interpolation in @%s preludes is not supported during static extraction. CSS custom properties (var()) are not valid in media query conditions. Inline the value directly, or use [%%cx] / [%%styled.global] (runtime) instead of [%%cx2] / [%%styled.global2] for runtime media query interpolation.",
+        "Interpolation in @%s preludes is not supported during static extraction. CSS custom properties (var()) are not valid in media query conditions. Inline the value directly.",
         at_name,
       );
     };
@@ -907,7 +907,7 @@ module Css_transform = {
   };
 };
 
-/* Empty `[%cx2 {||}]` bound to a named `let` mints a deterministic
+/* Empty `[%css {||}]` bound to a named `let` mints a deterministic
    class handle (`css-<hash-of-empty>-<label>`) so consumers can
    resolve `&.$(name)` against it. No `[@@@css ...]` is emitted —
    there's no rule to write. Anonymous (`_`) and statement-position
@@ -944,7 +944,7 @@ let push =
     | _ =>
       atomic_classnames
       |> List.map(((className, rule)) => {
-           let rendered_css = render_rule(rule);
+           let rendered_css = render_prefixed_rule(rule);
            Buffer.add_rule(className, rendered_css);
            className;
          })
@@ -972,14 +972,14 @@ let push_keyframe = (keyframe_rules: Styled_ppx_css_parser.Ast.rule_list) => {
     loc: Ppxlib.Location.none,
   };
 
-  let rendered_keyframe = render_rule(At_rule(at_rule));
+  let rendered_keyframe = render_prefixed_rule(At_rule(at_rule));
 
   Buffer.add_rule(keyframe_name, rendered_keyframe);
 
   keyframe_name;
 };
 
-/* Walk every rule in a [%styled.global2] block, substitute
+/* Walk every rule in a [%styled.global] block, substitute
    `$(expr)` interpolations with `var(--var-<hash>)` on the static
    side, and accumulate the corresponding dynamic_vars.
 
@@ -987,9 +987,9 @@ let push_keyframe = (keyframe_rules: Styled_ppx_css_parser.Ast.rule_list) => {
    `Buffer.add_global_rule` so it ships through the existing
    `[@@@css ...]` channel. The returned dynamic_vars feeds the
    generated module's `to_string`, which emits a single
-   `:root { --var-<hash>: <value>; ... }` block at runtime; one
-   declaration per dynamic_var entry (already deduplicated by
-   `Css_transform.add_dynamic_var`).
+    `:root { --var-<hash>: <value>; ... }` block for callers that explicitly
+    request the dynamic custom-property CSS; one declaration per dynamic_var
+    entry (already deduplicated by `Css_transform.add_dynamic_var`).
 
    Static-only blocks return an empty dynamic_vars list, which makes
    `to_string` emit `""`. */
@@ -1006,11 +1006,11 @@ let push_global =
   let (rules, _) = global_rules;
   let all_dynamic_vars = ref([]);
 
-  /* Flatten CSS-nesting before rendering. `[%styled.global2]` previously
+  /* Flatten CSS-nesting before rendering. `[%styled.global]` previously
      emitted literal nesting (`body { .child { ... } }`), which only
      resolves correctly in modern browsers and is not always polyfilled
      by build chains. `Resolve.resolve_selectors` is the same pipeline
-     `[%cx]` uses to lower nested rules into flat selectors
+     `[%css]` uses to lower nested rules into flat selectors
      (`body .child { ... }`) — strict superset of nesting's browser
      support, semantically identical for the shapes the parser admits.
 
@@ -1043,9 +1043,12 @@ let push_global =
              rule,
              all_dynamic_vars,
            );
-         let rendered = render_rule(transformed);
-         let key = Printf.sprintf("global-%s", Murmur2.default(rendered));
-         Buffer.add_global_rule(key, rendered);
+         let key =
+           Printf.sprintf(
+             "global-%s",
+             Murmur2.default(render_rule(transformed)),
+           );
+         Buffer.add_global_rule(key, render_prefixed_rule(transformed));
        | Declaration(_) => ()
        }
      );

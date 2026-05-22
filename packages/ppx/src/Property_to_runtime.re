@@ -152,12 +152,7 @@ let unsupportedProperty = parser =>
   );
 
 let render_string = (~loc, s) => {
-  switch (File.get()) {
-  | Some(ReScript) =>
-    Builder.pexp_constant(~loc, Pconst_string(s, loc, Some("*j")))
-  | Some(Reason)
-  | _ => Builder.pexp_constant(~loc, Pconst_string(s, loc, Some("js")))
-  };
+  Builder.pexp_constant(~loc, Pconst_string(s, loc, Some("js")));
 };
 
 let render_integer = (~loc, integer) => {

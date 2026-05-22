@@ -1,5 +1,6 @@
 module X = {
   let value = 1.;
+  let value2 = 1.;
   let flex1 = `num(1.);
   let min = `px(500);
 };
@@ -25,8 +26,9 @@ module X = {
 [%css {|flex: 2 2;|}];
 [%css {|flex: 2 2 10%;|}];
 [%css {|flex: $(X.flex1);|}];
+[%css {|flex: $(X.value) $(X.value2);|}];
+[%css {|flex: $(X.value) $(X.value2) $(X.min);|}];
 [%css {|flex: $(X.value) $(X.value);|}];
-[%css {|flex: $(X.value) $(X.value) $(X.min);|}];
 [%css {|flex-basis: auto|}];
 [%css {|flex-basis: content|}];
 [%css {|flex-basis: 1px|}];
@@ -40,6 +42,10 @@ module X = {
 [%css {|flex-flow: column-reverse|}];
 [%css {|flex-flow: wrap|}];
 [%css {|flex-flow: wrap-reverse|}];
+[%css {|flex-flow: row wrap|}];
+[%css {|flex-flow: row-reverse nowrap|}];
+[%css {|flex-flow: column wrap|}];
+[%css {|flex-flow: column-reverse wrap-reverse|}];
 [%css {|flex-grow: 0|}];
 [%css {|flex-grow: 5|}];
 [%css {|flex-shrink: 1|}];

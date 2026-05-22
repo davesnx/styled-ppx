@@ -1,5 +1,16 @@
-This test ensures the ppx generates the correct output against styled-ppx.native
-If this test fail means that the module is not in sync with the ppx
+[%css ""] / [%css {||}] semantics. Two cases:
+
+(1) Statement position (no enclosing `let`) and `let _ = ...` (the
+fully anonymous binding) produce `CSS.make("", [])`. There is no name
+to register, so no consumer can reference them via `$(...)`.
+
+(2) A named `let` binding — including `let _a = ...`, where the
+leading underscore only suppresses unused-variable warnings — mints a
+deterministic synthetic class `css-<hash-of-empty>-<binding>` so
+`let m = [%css {||}]` produces a real handle that a sibling [%css]
+block can target via `&.$(m)`. No `[@@@css ...]` rule is emitted
+because there's nothing to write. See
+selector-class-interpolation-empty.t for the full end-to-end behavior.
 
   $ cat > dune-project << EOF
   > (lang dune 3.10)
@@ -12,19 +23,26 @@ If this test fail means that the module is not in sync with the ppx
   >  (preprocess (pps styled-ppx)))
   > EOF
 
-  $ dune describe pp ./input.re | sed '1,/^];$/d'
-  CSS.style([||]);
-  CSS.style([||]);
-  CSS.style([||]);
-  
-  let _a = CSS.style([|CSS.label("_a")|]);
-  let _a = CSS.style([|CSS.label("_a")|]);
-  let _a = CSS.style([|CSS.label("_a")|]);
-  
-  let _a = CSS.style([|CSS.label("_a")|]);
-  
-  let _a = CSS.style([|CSS.label("_a")|]);
-  
-  let _a = CSS.style([|CSS.label("_a")|]);
-
   $ dune build
+
+  $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css.bindings [("Input._a", "css-0-_a")]];
+  CSS.make("", []);
+  CSS.make("", []);
+  CSS.make("", []);
+  
+  let _ = CSS.make("", []);
+  
+  let _a = CSS.make("css-0-_a", []);
+  let _a = CSS.make("css-0-_a", []);
+  let _a = CSS.make("css-0-_a", []);
+  
+  let _a = CSS.make("css-0-_a", []);
+  
+  let _a = CSS.make("css-0-_a", []);
+  
+  let _a = CSS.make("css-0-_a", []);
+
+
+
+

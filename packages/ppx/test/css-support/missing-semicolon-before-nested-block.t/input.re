@@ -1,4 +1,4 @@
-let _case1 = [%cx
+let _case1 = [%css
   {|
   background-color: red
 
@@ -8,7 +8,7 @@ let _case1 = [%cx
 |}
 ];
 
-let _case2 = [%cx
+let _case2 = [%css
   {|
   transition: max-height 400ms ease-in-out 0ms & > * {
     opacity: 0;
@@ -17,7 +17,7 @@ let _case2 = [%cx
 |}
 ];
 
-let _case3 = [%cx
+let _case3 = [%css
   {|
   margin-bottom: 24px @media (min-width: 1024px) {
     width: 50%;
@@ -25,7 +25,7 @@ let _case3 = [%cx
 |}
 ];
 
-let _case4 = [%cx
+let _case4 = [%css
   {|
   transition: transform 200ms ease-in-out 0ms /* Need to use selectSelf. */
     &.contentAfterOpen {
@@ -34,7 +34,7 @@ let _case4 = [%cx
 |}
 ];
 
-let _case5 = [%cx
+let _case5 = [%css
   {|
   border-bottom: 1px solid black
 
@@ -45,7 +45,7 @@ let _case5 = [%cx
 |}
 ];
 
-let _case6 = [%cx
+let _case6 = [%css
   {|
   justify-content: space-between @media (min-width: 768px) {
     justify-content: center;
@@ -53,7 +53,7 @@ let _case6 = [%cx
 |}
 ];
 
-let _case7 = [%cx
+let _case7 = [%css
   {|
   width: min-content @media (min-width: 1200px) {
     padding-top: 8px;
@@ -61,7 +61,7 @@ let _case7 = [%cx
 |}
 ];
 
-let _case8 = [%cx
+let _case8 = [%css
   {|
   height: 100% & h4 {
     padding: 0;
@@ -69,7 +69,7 @@ let _case8 = [%cx
 |}
 ];
 
-let _case9 = [%cx
+let _case9 = [%css
   {|
   transition: all 200ms ease 0ms &.sidebarClosed {
     min-width: 0;
@@ -82,7 +82,7 @@ let _case9 = [%cx
 |}
 ];
 
-let _case10 = [%cx
+let _case10 = [%css
   {|
   color: red
   .child {
@@ -91,7 +91,7 @@ let _case10 = [%cx
 |}
 ];
 
-let _case11 = [%cx
+let _case11 = [%css
   {|
   color: red
   div {
@@ -100,7 +100,7 @@ let _case11 = [%cx
 |}
 ];
 
-let _case12 = [%cx
+let _case12 = [%css
   {|
   color: red
   #child {
@@ -109,7 +109,7 @@ let _case12 = [%cx
 |}
 ];
 
-let _case13 = [%cx
+let _case13 = [%css
   {|
   color: red
   svg path {
@@ -118,7 +118,7 @@ let _case13 = [%cx
 |}
 ];
 
-let _case14 = borderColor => [%cx
+let _case14 = borderColor => [%css
   {|
   border-bottom: 1px solid $(borderColor)
   &:last-child {
@@ -128,7 +128,7 @@ let _case14 = borderColor => [%cx
 |}
 ];
 
-let _case15 = (marginBottom, wide) => [%cx
+let _case15 = (marginBottom, wide) => [%css
   {|
   margin-bottom: $(marginBottom) @media $(wide) {
     width: 50%;

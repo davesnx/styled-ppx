@@ -1,12 +1,11 @@
 type extension =
   | Reason
-  | OCaml
-  | ReScript;
+  | OCaml;
 
 let detectFileSuffix = (path): result(extension, string) => {
   switch (Filename.extension(path)) {
   | ".re" => Ok(Reason)
-  | ".res" => Ok(ReScript)
+  | ".res" => Error("ReScript source files are no longer supported")
   | ".ml" => Ok(OCaml)
   | _ => Ok(Reason)
   };

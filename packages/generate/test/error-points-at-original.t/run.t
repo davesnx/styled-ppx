@@ -1,4 +1,4 @@
-Resolution errors carry the original `[%cx2]` source location through
+Resolution errors carry the original `[%css]` source location through
 the `[@@@css.refs ...]` attribute, so editors and CI surface them in the
 familiar `File "..."` OCaml diagnostic format.
 
@@ -15,8 +15,8 @@ familiar `File "..."` OCaml diagnostic format.
 
   $ styled-ppx.generate a.ml b.ml
   File "src/n.re", line 7, characters 12-25:
-  Error: cross-module [%cx2] selector reference `A.missing` does not resolve.
+  Error: cross-module [%css] selector reference `A.missing` does not resolve.
   The target binding is missing from module `A`, or the binding is not
-  a [%cx2] expression. Define `A.missing` with [%cx2 "..."], or remove the
+  a [%css] expression. Define `A.missing` with [%css "..."], or remove the
   reference.
   [1]

@@ -1,4 +1,4 @@
-let _className = [%cx {|
+let _className = [%css {|
   .lolaso :-nthchil(2) {
     color: red;
   }

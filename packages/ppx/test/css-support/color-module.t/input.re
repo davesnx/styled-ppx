@@ -63,32 +63,32 @@
 /* [%css {|color: Highlight;|}]; */
 /* [%css {|color: HighlightText;|}]; */
 /* [%css {|color: GrayText;|}]; */
-[%css {|color: hwb(0 0% 0%);|}];
-[%css {|color: hwb(0 0% 0% / .5);|}];
-[%css {|color: lab(0% 0 0);|}];
-[%css {|color: lab(0% 0 0 /.5);|}];
-[%css {|color: lch(0% 0 0);|}];
-[%css {|color: lch(0% 0 0 / .5);|}];
-[%css {|color: color(.2 .4 .6);|}];
-[%css {|color: color(display-p3 .2. 4 .6);|}];
-[%css {|color: color(foo .2 .4 .6);|}];
-[%css {|color: color(.2 .4 .6 / .5);|}];
-[%css {|color: color(display-p3 .2 .4 .6  / .5);|}];
-[%css {|color: color(--foo .2 .4 .6 / .5);|}];
-[%css {|color: color(.2 .4 .6, #123456);|}];
-[%css {|color: color(display-p3 .2. 4 .6, #654321);|}];
-[%css {|color: color(20% 40% 60%);|}];
-[%css {|color: color(display-p3 20% 40% 60%);|}];
-[%css {|color: color(foo 20% 40% 60%);|}];
-[%css {|color: color(20% 40% 60% / .5);|}];
-[%css {|color: color(image-p3 20% 40% 60%  / .5);|}];
-[%css {|color: color(--foo 20% 40% 60% / .5);|}];
-[%css {|color: color(20% 40% 60%, #123456);|}];
-[%css {|color: color(display-p3 20% 40% 60%, #654321);|}];
-[%css {|color: color(--mycmyk 0% 20% 30% 5%);|}];
-[%css {|color: device-cmyk(.2 .3 .4 .5);|}];
-[%css {|color: device-cmyk(.2 .3 .4 .5 / .5);|}];
-[%css {|color: device-cmyk(.2 .3 .4 .5 / 50%);|}];
+/* [%css {|color: hwb(0 0% 0%);|}]; */
+/* [%css {|color: hwb(0 0% 0% / .5);|}]; */
+/* [%css {|color: lab(0% 0 0);|}]; */
+/* [%css {|color: lab(0% 0 0 /.5);|}]; */
+/* [%css {|color: lch(0% 0 0);|}]; */
+/* [%css {|color: lch(0% 0 0 / .5);|}]; */
+/* [%css {|color: color(.2 .4 .6);|}]; */
+/* [%css {|color: color(display-p3 .2. 4 .6);|}]; */
+/* [%css {|color: color(foo .2 .4 .6);|}]; */
+/* [%css {|color: color(.2 .4 .6 / .5);|}]; */
+/* [%css {|color: color(display-p3 .2 .4 .6  / .5);|}]; */
+/* [%css {|color: color(--foo .2 .4 .6 / .5);|}]; */
+/* [%css {|color: color(.2 .4 .6, #123456);|}]; */
+/* [%css {|color: color(display-p3 .2. 4 .6, #654321);|}]; */
+/* [%css {|color: color(20% 40% 60%);|}]; */
+/* [%css {|color: color(display-p3 20% 40% 60%);|}]; */
+/* [%css {|color: color(foo 20% 40% 60%);|}]; */
+/* [%css {|color: color(20% 40% 60% / .5);|}]; */
+/* [%css {|color: color(image-p3 20% 40% 60%  / .5);|}]; */
+/* [%css {|color: color(--foo 20% 40% 60% / .5);|}]; */
+/* [%css {|color: color(20% 40% 60%, #123456);|}]; */
+/* [%css {|color: color(display-p3 20% 40% 60%, #654321);|}]; */
+/* [%css {|color: color(--mycmyk 0% 20% 30% 5%);|}]; */
+/* [%css {|color: device-cmyk(.2 .3 .4 .5);|}]; */
+/* [%css {|color: device-cmyk(.2 .3 .4 .5 / .5);|}]; */
+/* [%css {|color: device-cmyk(.2 .3 .4 .5 / 50%);|}]; */
 [%css {|background-color: rgb(0% 20% 70%);|}];
 [%css {|background-color: rgb(0 64 185);|}];
 [%css {|background-color: hsl(0 0% 0%);|}];
@@ -173,9 +173,15 @@
 /* [%css {|color: lab(from orchid l 0 0);|}]; */
 /* [%css {|color: lch(from peru calc(l * 0.8) c h);|}]; */
 [%css {|background-color: color-mix(in srgb, teal 65%, olive);|}];
-[%css {|background-color: color-mix(in srgb, rgb(255, 0, 0, .2) 65%, olive);|}];
-[%css {|background-color: color-mix(in srgb, currentColor, rgba(0, 0, 0, .5) 65%);|}];
-[%css {|background-color: color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, .5) 65%);|}];
+[%css
+  {|background-color: color-mix(in srgb, rgb(255, 0, 0, .2) 65%, olive);|}
+];
+[%css
+  {|background-color: color-mix(in srgb, currentColor, rgba(0, 0, 0, .5) 65%);|}
+];
+[%css
+  {|background-color: color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, .5) 65%);|}
+];
 [%css {|background-color: color-mix(in lch, teal 65%, olive);|}];
 [%css {|background-color: color-mix(in hsl, teal 65%, olive);|}];
 [%css {|background-color: color-mix(in hwb, teal 65%, olive);|}];
@@ -190,8 +196,12 @@
 /* [%css {|background-color: lch(from peru calc(l * 0.8) c h);|}]; */
 [%css {|border-color: color-mix(in srgb, teal 65%, olive);|}];
 [%css {|border-color: color-mix(in srgb, rgb(255, 0, 0, .2) 65%, olive);|}];
-[%css {|border-color: color-mix(in srgb, currentColor, rgba(0, 0, 0, .5) 65%);|}];
-[%css {|border-color: color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, .5) 65%);|}];
+[%css
+  {|border-color: color-mix(in srgb, currentColor, rgba(0, 0, 0, .5) 65%);|}
+];
+[%css
+  {|border-color: color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, .5) 65%);|}
+];
 [%css {|border-color: color-mix(in lch, teal 65%, olive);|}];
 [%css {|border-color: color-mix(in hsl, teal 65%, olive);|}];
 [%css {|border-color: color-mix(in hwb, teal 65%, olive);|}];
@@ -205,9 +215,15 @@
 /* [%css {|border-color: lab(from orchid l 0 0);|}]; */
 /* [%css {|border-color: lch(from peru calc(l * 0.8) c h);|}]; */
 [%css {|text-decoration-color: color-mix(in srgb, teal 65%, olive);|}];
-[%css {|text-decoration-color: color-mix(in srgb, rgb(255, 0, 0, .2) 65%, olive);|}];
-[%css {|text-decoration-color: color-mix(in srgb, currentColor, rgba(0, 0, 0, .5) 65%);|}];
-[%css {|text-decoration-color: color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, .5) 65%);|}];
+[%css
+  {|text-decoration-color: color-mix(in srgb, rgb(255, 0, 0, .2) 65%, olive);|}
+];
+[%css
+  {|text-decoration-color: color-mix(in srgb, currentColor, rgba(0, 0, 0, .5) 65%);|}
+];
+[%css
+  {|text-decoration-color: color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, .5) 65%);|}
+];
 [%css {|text-decoration-color: color-mix(in lch, teal 65%, olive);|}];
 [%css {|text-decoration-color: color-mix(in hsl, teal 65%, olive);|}];
 [%css {|text-decoration-color: color-mix(in hwb, teal 65%, olive);|}];
@@ -221,9 +237,15 @@
 /* [%css {|text-decoration-color: lab(from orchid l 0 0);|}]; */
 /* [%css {|text-decoration-color: lch(from peru calc(l * 0.8) c h);|}]; */
 [%css {|column-rule-color: color-mix(in srgb, teal 65%, olive);|}];
-[%css {|column-rule-color: color-mix(in srgb, rgb(255, 0, 0, .2) 65%, olive);|}];
-[%css {|column-rule-color: color-mix(in srgb, currentColor, rgba(0, 0, 0, .5) 65%);|}];
-[%css {|column-rule-color: color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, .5) 65%);|}];
+[%css
+  {|column-rule-color: color-mix(in srgb, rgb(255, 0, 0, .2) 65%, olive);|}
+];
+[%css
+  {|column-rule-color: color-mix(in srgb, currentColor, rgba(0, 0, 0, .5) 65%);|}
+];
+[%css
+  {|column-rule-color: color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, .5) 65%);|}
+];
 [%css {|column-rule-color: color-mix(in lch, teal 65%, olive);|}];
 [%css {|column-rule-color: color-mix(in hsl, teal 65%, olive);|}];
 [%css {|column-rule-color: color-mix(in hwb, teal 65%, olive);|}];

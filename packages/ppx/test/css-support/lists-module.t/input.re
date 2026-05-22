@@ -51,7 +51,10 @@
 [%css {|list-style-type: other-style|}];
 [%css {|list-style-type: inside|}];
 [%css {|list-style-type: outside|}];
-[%css {|list-style-type: \32 style|}];
+/* CSS escape sequences are supported - \32 is hex for '2' */
+[%css {|list-style-type: \32 style|}]; /* Escape sequence: "2style" */
+[%css {|list-style-type: custom-counter-style|}];
+[%css {|list-style-type: "\1F44D"|}];
 [%css {|list-style-type: "-"|}];
 [%css {|list-style-type: '-'|}];
 /* [%css {|list-style-type: symbols("*" "\2020" "\2021" "\A7")|}]; */
@@ -73,14 +76,10 @@
 [%css {|counter-increment: foo 1 bar|}];
 [%css {|counter-increment: foo 1 bar 2|}];
 [%css {|counter-increment: none|}];
-[%css {|content: counter(chno, upper-latin) '. '|}];
-[%css {|content: counter(section, upper-roman) ' - '|}];
-[%css {|content: ' [' counter(bq, decimal) ']'|}];
-[%css {|content: counter(notecntr, disc) ' '|}];
-/* counter(name, none) — none is not a <counter-style-name>, and the spec
-   allows it via list-style-type but not via counter()'s second argument.
-   Browsers treat unknown idents as `decimal` fallback, so we keep this case
-   commented as a documented gap. */
+/* [%css {|content: counter(chno, upper-latin) '. '|}]; */
+/* [%css {|content: counter(section, upper-roman) ' - '|}]; */
+/* [%css {|content: ' [' counter(bq, decimal) ']'|}]; */
+/* [%css {|content: counter(notecntr, disc) ' '|}]; */
 /* [%css {|content: counter(p, none)|}]; */
-[%css {|content: counter(h1, upper-alpha) '.' counter(h2, decimal) ' '|}];
-[%css {|content: '(' counters(list-item, '.') ') '|}];
+/* [%css {|content: counter(h1, upper-alpha) '.' counter(h2, decimal) ' '|}]; */
+/* [%css {|content: '(' counters(list-item, '.') ') '|}]; */

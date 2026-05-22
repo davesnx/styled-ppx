@@ -1,4 +1,4 @@
-[%styled.global
+module GlobalStyles = [%styled.global
   {|
   div {
     background-color: green;
@@ -12,18 +12,18 @@
 |}
 ];
 
-let stack = [%cx "display: flex; flex-direction: column"];
-let stackGap = gap => [%cx "gap: $(gap)"];
+let stack = [%css "display: flex; flex-direction: column"];
 
+/* TODO: styled.div doesn't generate makeProps, so when used as <Cositas as_="section" lola={CSS.px(10)}> it doesn't compile */
 module Cositas = [%styled.div
   (~lola=CSS.px(0)) => {|
-  display: flex;
+    display: flex;
   flex-direction: column;
   gap: $(lola);
 |}
 ];
 
-let selectors = [%cx {|
+let selectors = [%css {|
   color: red;
 
   &:hover {
@@ -47,24 +47,20 @@ let bounce = [%keyframe
 |}
 ];
 
-let code = [|`quoted("Menlo"), `quoted("monospace")|];
-let lola = `auto;
-
-let clx = [%cx
+let clx = [%css
   {|
-  animation-name: $(bounce);
-  font-family: $(code);
-  cursor: $(lola);
+  font-family: "Menlo", "monospace";
+  cursor: auto;
   grid-template-columns: auto 40%;
 |}
 ];
 
-let post = [%cx {|
+let post = [%css {|
   border: 2px solid;
   container-type: inline-size;
 |}];
 
-let card = [%cx
+let card = [%css
   {|
   margin: 10px;
   border: 2px dotted;
@@ -72,7 +68,7 @@ let card = [%cx
   |}
 ];
 
-let container = [%cx
+let container = [%css
   {|
   @container (width < 650px) {
     width: 50%;
@@ -86,34 +82,32 @@ let container = [%cx
 |}
 ];
 
-let color = `hex("333");
-
-let gradiend = [%cx
+let gradiend = [%css
   {|
     background-image:
       repeating-linear-gradient(
         45deg,
-        $(color) 0px,
-        $(color) 4px,
-        $(color) 5px,
-        $(color) 9px
+        #333 0px,
+        #333 4px,
+        #333 5px,
+        #333 9px
       )
     |}
 ];
 
 [@react.component]
 let make = () =>
-  <main className=gradiend>
-    <div className=Universal.classname>
-      <div className=post>
-        <div className={card ++ " " ++ container}>
+  <main styles=gradiend>
+    <div styles=Universal.classname>
+      <div styles=post>
+        <div styles={CSS.merge(card, container)}>
           <h2> {React.string("Card title")} </h2>
           <p> {React.string("Card content")} </p>
         </div>
       </div>
-      <Cositas as_="section" lola={CSS.px(10)}>
-        <div className=clx> {React.string("code everywhere!")} </div>
-        <div className=selectors> {React.string("Red text")} </div>
-      </Cositas>
+      <section styles=stack>
+        <div styles=clx> {React.string("code everywhere!")} </div>
+        <div styles=selectors> {React.string("Red text")} </div>
+      </section>
     </div>
   </main>;

@@ -1,4 +1,4 @@
-/** Ordered, per-compilation-unit selector environment for [%cx2]. */;
+/** Ordered, per-compilation-unit selector environment for [%css]. */;
 
 let register_module: (~file: string, ~path: list(string)) => unit;
 

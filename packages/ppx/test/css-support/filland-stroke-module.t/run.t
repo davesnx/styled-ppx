@@ -15,23 +15,37 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css ".css-1er335o{fill-rule:nonzero;}"];
+  [@css ".css-1uqje6q{fill-rule:evenodd;}"];
+  [@css ".css-h01axr{fill-opacity:0.5;}"];
+  [@css ".css-1p4mbij{fill-opacity:45%;}"];
+  [@css ".css-stfno8{stroke-width:0;}"];
+  [@css ".css-7hbqje{stroke-width:1px;}"];
+  [@css ".css-11bssim{stroke-width:25%;}"];
+  [@css ".css-16f3u6b{stroke-linecap:butt;}"];
+  [@css ".css-1me96vv{stroke-linecap:round;}"];
+  [@css ".css-hs62tc{stroke-linecap:square ;}"];
+  [@css ".css-8vbou6{stroke-linejoin:miter;}"];
+  [@css ".css-1t1cl19{stroke-linejoin:bevel;}"];
+  [@css ".css-8mzojx{stroke-linejoin:round;}"];
+  [@css ".css-1a477up{stroke-miterlimit:4;}"];
   
-  CSS.SVG.fillRule(`nonzero);
-  CSS.SVG.fillRule(`evenodd);
+  CSS.make("css-1er335o", []);
+  CSS.make("css-1uqje6q", []);
   
-  CSS.SVG.fillOpacity(`num(0.5));
-  CSS.SVG.fillOpacity(`percent(45.));
+  CSS.make("css-h01axr", []);
+  CSS.make("css-1p4mbij", []);
   
-  CSS.SVG.strokeWidth(`num(0.));
-  CSS.SVG.strokeWidth(`pxFloat(1.));
-  CSS.SVG.strokeWidth(`percent(25.));
+  CSS.make("css-stfno8", []);
+  CSS.make("css-7hbqje", []);
+  CSS.make("css-11bssim", []);
   
-  CSS.SVG.strokeLinecap(`butt);
-  CSS.SVG.strokeLinecap(`round);
-  CSS.SVG.strokeLinecap(`square);
+  CSS.make("css-16f3u6b", []);
+  CSS.make("css-1me96vv", []);
+  CSS.make("css-hs62tc", []);
   
-  CSS.SVG.strokeLinejoin(`miter);
-  CSS.SVG.strokeLinejoin(`bevel);
-  CSS.SVG.strokeLinejoin(`round);
+  CSS.make("css-8vbou6", []);
+  CSS.make("css-1t1cl19", []);
+  CSS.make("css-8mzojx", []);
   
-  CSS.SVG.strokeMiterlimit(4.);
+  CSS.make("css-1a477up", []);

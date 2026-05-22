@@ -41,16 +41,30 @@
 
 // Interpolation
 let property = CSS.Types.TransitionProperty.make("margin-right");
-let property2 = CSS.Types.TransitionProperty.all;
 let timingFunction = `easeOut;
 let duration = `ms(200);
 let delay = `s(3);
 let property3 = CSS.Types.TransitionProperty.make("opacity");
 let behavior = `allowDiscrete;
 
-[%css {|transition: $(property)|}];
-[%css {|transition: $(property2)|}];
-// This is the order of interpolation, from left to right.
+// Complete transition interpolation using Transition.Value.make
+// For standalone transition interpolation, use Transition.Value.t (not TransitionProperty.t directly)
+let fullTransition =
+  CSS.Types.Transition.Value.make(
+    ~property=CSS.Types.TransitionProperty.make("margin-right"),
+    ~duration=`ms(200),
+    (),
+  );
+[%css {|transition: $(fullTransition)|}];
+
+let fullTransition2 =
+  CSS.Types.Transition.Value.make(
+    ~property=CSS.Types.TransitionProperty.all,
+    (),
+  );
+[%css {|transition: $(fullTransition2)|}];
+
+// Multiple components interpolation (uses individual types for each position)
 [%css
   {|transition: $(property) $(duration) $(timingFunction) $(delay) $(behavior)|}
 ];

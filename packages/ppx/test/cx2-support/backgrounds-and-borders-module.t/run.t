@@ -35,12 +35,12 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-rfr6kt{background-repeat:no-repeat no-repeat;}"];
   [@css ".css-1kobp5t{background-repeat:repeat-x, repeat-y;}"];
   [@css ".css-wfp2j1{background-attachment:local;}"];
-  [@css ".css-1h94kwg{background-clip:border-box;}"];
-  [@css ".css-1ie5w5o{background-clip:padding-box;}"];
-  [@css ".css-15p50rv{background-clip:content-box;}"];
-  [@css ".css-1mb8734{background-clip:text;}"];
-  [@css ".css-pm5rmj{background-clip:border-area;}"];
-  [@css ".css-11w45y6{background-clip:text, border-area;}"];
+  [@css ".css-1h94kwg{-webkit-background-clip:border-box;background-clip:border-box;}"];
+  [@css ".css-1ie5w5o{-webkit-background-clip:padding-box;background-clip:padding-box;}"];
+  [@css ".css-15p50rv{-webkit-background-clip:content-box;background-clip:content-box;}"];
+  [@css ".css-1mb8734{-webkit-background-clip:text;background-clip:text;}"];
+  [@css ".css-pm5rmj{-webkit-background-clip:border-area;background-clip:border-area;}"];
+  [@css ".css-11w45y6{-webkit-background-clip:text, border-area;background-clip:text, border-area;}"];
   [@css ".css-1eckwyo{background-origin:border-box;}"];
   [@css ".css-1k5r9hb{background-origin:padding-box;}"];
   [@css ".css-1agwo89{background-origin:content-box;}"];
@@ -794,4 +794,3 @@ If this test fail means that the module is not in sync with the ppx
       (0, [|CSS.backgroundPosition(`hv((`zero, `zero)))|]),
       (100, [|CSS.backgroundPosition(`hv((`rem(1.), `zero)))|]),
     |]);
-

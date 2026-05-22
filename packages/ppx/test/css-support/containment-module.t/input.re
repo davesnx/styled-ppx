@@ -19,20 +19,20 @@
 /* [%css {|content-visibility: hidden|}]; */
 
 /* CSS Containment Module Level 3 */
-[%cx {|width: 5cqw;|}];
-[%cx {|width: 5cqh;|}];
-[%cx {|width: 5cqi;|}];
-[%cx {|width: 5cqb;|}];
-[%cx {|width: 5cqmin;|}];
-[%cx {|width: 5cqmax;|}];
-[%cx {|container-type: normal|}];
-[%cx {|container-type: size|}];
-[%cx {|container-type: inline-size|}];
-[%cx {|container-name: none|}];
-[%cx {|container-name: x|}];
-[%cx {|container-name: x y|}];
-[%cx {|container: none|}];
-[%cx {|container: x / normal|}];
-[%cx {|container: x / size|}];
-[%cx {|container: x / inline-size|}];
-[%cx {|container: x y / size|}];
+[%css {|width: 5cqw;|}];
+[%css {|width: 5cqh;|}];
+[%css {|width: 5cqi;|}];
+[%css {|width: 5cqb;|}];
+[%css {|width: 5cqmin;|}];
+[%css {|width: 5cqmax;|}];
+[%css {|container-type: normal|}];
+[%css {|container-type: size|}];
+[%css {|container-type: inline-size|}];
+[%css {|container-name: none|}];
+[%css {|container-name: x|}];
+[%css {|container-name: x y|}];
+[%css {|container: none|}];
+[%css {|container: x / normal|}];
+[%css {|container: x / size|}];
+[%css {|container: x / inline-size|}];
+[%css {|container: x y / size|}];

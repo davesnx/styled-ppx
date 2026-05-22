@@ -22,13 +22,6 @@ If this test fail means that the module is not in sync with the ppx
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   Js.log("2000");
   
-  CSS.style([|
-    CSS.height(`percent(100.)),
-    CSS.height(`percent(100.)),
-    CSS.height(`percent(100.)),
-    CSS.height(`percent(100.)),
-    CSS.height(`percent(100.)),
-    [%ocaml.error
-      "Property 'display' has an invalid value: 'blocki',\nExpected 'block', 'contents', 'flex', 'flow', 'flow-root', 'grid', 'inline', 'inline-block', etc. Did you mean 'block'?"
-    ],
-  |]);
+  [%ocaml.error
+    "Property 'display' has an invalid value: 'blocki',\nExpected 'block', 'contents', 'flex', 'flow', 'flow-root', 'grid', 'inline', 'inline-block', etc. Did you mean 'block'?"
+  ];

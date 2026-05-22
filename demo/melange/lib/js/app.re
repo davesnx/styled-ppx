@@ -1,2 +1,2 @@
 [@react.component]
-let make = () => <div className=Universal.classname />;
+let make = () => <div styles=Universal.classname />;

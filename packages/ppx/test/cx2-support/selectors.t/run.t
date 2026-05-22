@@ -15,7 +15,7 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-9y6172-_chart{user-select:none;}"];
+  [@css ".css-9y6172-_chart{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}"];
   [@css
     ".css-wdylr4-_chart .recharts-cartesian-grid-horizontal line:nth-last-child(1){stroke-opacity:0;}"
   ];

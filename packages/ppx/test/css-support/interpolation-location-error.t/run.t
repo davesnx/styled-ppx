@@ -12,9 +12,10 @@ If this test fail means that the module is not in sync with the ppx
   >  (preprocess (pps styled-ppx)))
   > EOF
 
-This test ensures the location of the error is correct
   $ dune build
-  File "input.re", line 2, characters 27-31:
+  File "input.re", line 2, characters 14-18:
+  2 | let a = [%css {| display: $(grid); |}];
+                    ^^^^
   Error: The value grid has type [> `gri ]
          but an expression was expected of type
            [< `block
@@ -60,5 +61,11 @@ This test ensures the location of the error is correct
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css ".css-48ak65-a{display:var(--var-6w60di);}"];
+  [@css.bindings [("Input.a", "css-48ak65-a")]];
   let grid = `gri;
-  let a = CSS.style([|CSS.label("a"), (CSS.display(grid): CSS.rule)|]);
+  let a =
+    CSS.make(
+      "css-48ak65-a",
+      [("--var-6w60di", CSS.Types.Display.toString(grid))],
+    );
