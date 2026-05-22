@@ -1,6 +1,6 @@
 Regression test for cx2 deep-nested selector atomization.
 
-When a [%cx2 ...] block contains a Style_rule nested inside another
+When a [%css ...] block contains a Style_rule nested inside another
 Style_rule (depth >= 2 of selector nesting), every parent prelude must
 be merged into the inner selector when atomizing for static extraction.
 

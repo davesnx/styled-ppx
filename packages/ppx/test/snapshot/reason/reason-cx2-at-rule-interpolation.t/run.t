@@ -17,4 +17,4 @@ CSS custom properties into media-query conditions; users should use
 
   $ dune build 2>&1 | head -n 5
   File "input.re", lines 2-4, characters 2-3:
-  Error: Interpolation in @media preludes is not supported during static extraction. CSS custom properties (var()) are not valid in media query conditions. Inline the value directly, or use [%cx] / [%styled.global] (runtime) instead of [%cx2] / [%styled.global2] for runtime media query interpolation.
+  Error: Interpolation in @media preludes is not supported during static extraction. CSS custom properties (var()) are not valid in media query conditions. Inline the value directly, or use [%cx] / [%styled.global] (runtime) instead of [%css] / [%styled.global2] for runtime media query interpolation.

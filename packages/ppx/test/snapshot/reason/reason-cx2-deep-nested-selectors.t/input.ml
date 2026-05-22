@@ -6,7 +6,7 @@
    selector survives in the emitted CSS. *)
 
 (* Control: single-level nesting -- works correctly *)
-let single = [%cx2 {|
+let single = [%css {|
   color: red;
   &:hover {
     color: blue;
@@ -14,7 +14,9 @@ let single = [%cx2 {|
 |}]
 
 (* Bug 1: pseudo-element nested under pseudo-class *)
-let twoLevel = [%cx2 {|
+let twoLevel =
+  [%css
+    {|
   color: red;
   &:focus-visible {
     &::after {
@@ -24,7 +26,9 @@ let twoLevel = [%cx2 {|
 |}]
 
 (* Bug 2: pseudo-class nested under pseudo-class *)
-let twoLevelPseudoClass = [%cx2 {|
+let twoLevelPseudoClass =
+  [%css
+    {|
   color: red;
   &:hover {
     &:focus {
@@ -34,7 +38,9 @@ let twoLevelPseudoClass = [%cx2 {|
 |}]
 
 (* Bug 3: three levels deep mixing combinators *)
-let threeLevel = [%cx2 {|
+let threeLevel =
+  [%css
+    {|
   color: red;
   &:hover {
     & .child {
@@ -46,7 +52,9 @@ let threeLevel = [%cx2 {|
 |}]
 
 (* Bug 4: descendant selector under pseudo-class *)
-let descendantUnderPseudo = [%cx2 {|
+let descendantUnderPseudo =
+  [%css
+    {|
   color: red;
   &:hover {
     .child {

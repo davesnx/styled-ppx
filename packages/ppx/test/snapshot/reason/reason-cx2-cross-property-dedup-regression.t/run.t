@@ -1,5 +1,5 @@
 REGRESSION TEST — pins KNOWN-BROKEN cross-property dedup in
-[%cx2]. See input.re for the full rationale. A future fix MUST
+[%css]. See input.re for the full rationale. A future fix MUST
 update this snapshot intentionally.
 
   $ refmt --parse re --print ml input.re > output.ml

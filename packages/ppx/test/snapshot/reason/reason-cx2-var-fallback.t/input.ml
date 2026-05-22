@@ -5,14 +5,13 @@
    nested `var(--theme, var(--fallback, red))` form all reach the
    stylesheet untouched. *)
 
-let plain = [%cx2 {| color: var(--theme); |}]
+let plain = [%css {| color: var(--theme); |}]
+let withFallback = [%css {| color: var(--theme-color, blue); |}]
+let lengthFallback = [%css {| margin: var(--gap, 16px); |}]
 
-let withFallback = [%cx2 {| color: var(--theme-color, blue); |}]
-
-let lengthFallback = [%cx2 {| margin: var(--gap, 16px); |}]
-
-let complexFallback = [%cx2 {|
+let complexFallback =
+  [%css {|
   background: var(--bg, linear-gradient(0deg, red, blue));
 |}]
 
-let nested = [%cx2 {| color: var(--theme, var(--fallback, red)); |}]
+let nested = [%css {| color: var(--theme, var(--fallback, red)); |}]

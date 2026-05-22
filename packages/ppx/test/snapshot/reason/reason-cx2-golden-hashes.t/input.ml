@@ -9,17 +9,17 @@
    Update it deliberately and document the reason. *)
 
 (* Single declaration. *)
-let solid = [%cx2 {| color: red; |}]
+let solid = [%css {| color: red; |}]
 
 (* Multiple declarations on one binding. *)
-let multi = [%cx2 {|
+let multi = [%css {|
   margin: 10px;
   padding: 20px;
   color: blue;
 |}]
 
 (* Pseudo-class joining onto the binding class. *)
-let hovered = [%cx2 {|
+let hovered = [%css {|
   color: black;
   &:hover {
     color: white;
@@ -27,14 +27,16 @@ let hovered = [%cx2 {|
 |}]
 
 (* Multi-selector parent fanning out to one atom per selector. *)
-let multiSel = [%cx2 {|
+let multiSel = [%css {|
   .a, .b {
     color: green;
   }
 |}]
 
 (* @media nested under a selector — at-rule wraps the per-binding chain. *)
-let withMedia = [%cx2 {|
+let withMedia =
+  [%css
+    {|
   .a {
     @media (min-width: 768px) {
       color: red;
@@ -43,12 +45,12 @@ let withMedia = [%cx2 {|
 |}]
 
 (* Numeric value with units that exercise float formatting. *)
-let units = [%cx2 {|
+let units = [%css {|
   width: 1.5rem;
   opacity: 0.5;
 |}]
 
 (* var() with fallback exercises the declaration-value capture path. *)
-let withFallback = [%cx2 {|
+let withFallback = [%css {|
   color: var(--theme, blue);
 |}]

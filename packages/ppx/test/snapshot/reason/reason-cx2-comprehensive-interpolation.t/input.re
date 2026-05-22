@@ -6,7 +6,7 @@ let percentVar = CSS.pct(50.0);
 let autoVar = `auto;
 
 /* Test 1: Basic length properties */
-let test1 = [%cx2
+let test1 = [%css
   {|
   width: $(lengthVar);
   height: $(lengthVar);
@@ -16,7 +16,7 @@ let test1 = [%cx2
 ];
 
 /* Test 2: Margin and padding */
-let test2 = [%cx2
+let test2 = [%css
   {|
   margin-top: $(lengthVar);
   margin-bottom: $(lengthVar);
@@ -26,7 +26,7 @@ let test2 = [%cx2
 ];
 
 /* Test 3: Gap properties */
-let test3 = [%cx2
+let test3 = [%css
   {|
   gap: $(lengthVar);
   row-gap: $(lengthVar);
@@ -35,7 +35,7 @@ let test3 = [%cx2
 ];
 
 /* Test 4: Color properties */
-let test4 = [%cx2
+let test4 = [%css
   {|
   color: $(colorVar);
   background-color: $(colorVar);
@@ -45,13 +45,13 @@ let test4 = [%cx2
 
 /* Test 5: Flex properties */
 let flexBasisVar = CSS.px(100);
-let test5 = [%cx2 {|
+let test5 = [%css {|
   flex-basis: $(flexBasisVar);
 |}];
 
 /* Test 6: Grid properties */
 let gridLineVar = `auto;
-let test6 = [%cx2
+let test6 = [%css
   {|
   grid-row-start: $(gridLineVar);
   grid-column-end: $(gridLineVar);
@@ -60,20 +60,20 @@ let test6 = [%cx2
 
 /* Test 7: Positioning (top/bottom/left/right accept length values) */
 let topVar = CSS.px(20);
-let test7 = [%cx2 {|
+let test7 = [%css {|
   top: $(topVar);
   bottom: $(topVar);
 |}];
 
 /* Test 8: Z-index */
 let zIndexVar = `num(10);
-let test8 = [%cx2 {|
+let test8 = [%css {|
   z-index: $(zIndexVar);
 |}];
 
 /* Test 9: Border width (LineWidth) */
 let borderWidthVar = `medium;
-let test9 = [%cx2
+let test9 = [%css
   {|
   border-top-width: $(borderWidthVar);
   border-width: $(borderWidthVar);
@@ -82,7 +82,7 @@ let test9 = [%cx2
 
 /* Test 10: Text spacing properties (accept length values) */
 let spacingVar = CSS.px(2);
-let test10 = [%cx2
+let test10 = [%css
   {|
   letter-spacing: $(spacingVar);
   word-spacing: $(spacingVar);
@@ -90,7 +90,7 @@ let test10 = [%cx2
 ];
 
 /* Test 11: Mixed static and interpolated */
-let test11 = width => [%cx2
+let test11 = width => [%css
   {|
   width: $(width);
   height: 100px;

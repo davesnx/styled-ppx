@@ -5,9 +5,10 @@
    Mirrors `reason-styled-global2-at-rule-interpolation.t` but for
    selector interp instead of value interp. */
 
-let card = [%cx2 "padding: 8px;"];
+let card = [%css "padding: 8px;"];
 
-module ResponsiveGlobals = [%styled.global2 {|
+module ResponsiveGlobals = [%styled.global2
+  {|
   .$(card) {
     color: black;
   }
@@ -17,4 +18,5 @@ module ResponsiveGlobals = [%styled.global2 {|
       color: gray;
     }
   }
-|}];
+|}
+];

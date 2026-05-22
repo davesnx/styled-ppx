@@ -9,14 +9,15 @@
      selector chain into the at-rule's contents, not drop it. *)
 
 (* Multi-selector at top: produces two atoms (one per selector). *)
-let multiTop = [%cx2 {|
+let multiTop = [%css {|
   .a, .b {
     color: red;
   }
 |}]
 
 (* Multi-selector in nested position. *)
-let multiNested = [%cx2 {|
+let multiNested =
+  [%css {|
   .parent {
     .a, .b {
       color: blue;
@@ -26,7 +27,8 @@ let multiNested = [%cx2 {|
 
 (* Cartesian product of nested multi-selector preludes:
    `.a, .b` x `.c, .d` -> 4 atoms covering `.a .c`, `.a .d`, `.b .c`, `.b .d`. *)
-let cartesian = [%cx2 {|
+let cartesian =
+  [%css {|
   .a, .b {
     .c, .d {
       color: green;
@@ -36,7 +38,9 @@ let cartesian = [%cx2 {|
 
 (* Multi-selector with mixed declaration + nested rule.
    Decls fan out per selector; nested rule fans out per (parent, child) pair. *)
-let multiMixed = [%cx2 {|
+let multiMixed =
+  [%css
+    {|
   .a, .b {
     color: red;
     &:hover {
@@ -47,7 +51,9 @@ let multiMixed = [%cx2 {|
 
 (* @media nested under a single Style_rule: the parent prelude must
    appear inside the @media block, not be dropped. *)
-let mediaUnderSelector = [%cx2 {|
+let mediaUnderSelector =
+  [%css
+    {|
   .a {
     @media (min-width: 768px) {
       color: red;
@@ -56,7 +62,9 @@ let mediaUnderSelector = [%cx2 {|
 |}]
 
 (* @media nested under deeper Style_rule chain: full chain must survive. *)
-let mediaDeep = [%cx2 {|
+let mediaDeep =
+  [%css
+    {|
   .a {
     .b {
       @media (max-width: 600px) {
@@ -68,7 +76,9 @@ let mediaDeep = [%cx2 {|
 
 (* @media nested under a Style_rule containing a mix of declarations and
    nested rules: declarations inside the @media still get the parent. *)
-let mediaWithNested = [%cx2 {|
+let mediaWithNested =
+  [%css
+    {|
   .a {
     color: black;
     @media (max-width: 600px) {

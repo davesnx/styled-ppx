@@ -1,4 +1,4 @@
-Custom-property declarations in [%cx2] accept any string interpolation
+Custom-property declarations in [%css] accept any string interpolation
 verbatim - no Cascading.toString wrap.
 
   $ refmt --parse re --print ml input.re > output.ml

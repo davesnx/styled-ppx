@@ -1,4 +1,4 @@
-/* Custom-property declarations in [%cx2] accept any string interpolation
+/* Custom-property declarations in [%css] accept any string interpolation
    verbatim - no Cascading.toString wrap, no validation, just passthrough.
    The expression must be a [string]; whatever it contains is the
    responsibility of the caller (matches the contract of CSS.unsafe).
@@ -11,18 +11,20 @@ let colorStr = CSS.Types.Color.toString(`hex("3A57FC"));
 let plainStr = "10px";
 
 /* Whole-value interpolation: the canonical case from the bug report. */
-let row = [%cx2 {|
+let row = [%css {|
   --color-link: $(colorStr);
 |}];
 
 /* Multiple custom-property declarations sharing one block. */
-let theme = [%cx2 {|
+let theme = [%css
+  {|
   --color-link: $(colorStr);
   --spacing: $(plainStr);
-|}];
+|}
+];
 
 /* Function param: the [string] requirement is enforced through normal
    type inference. */
-let dyn = (value) => [%cx2 {|
+let dyn = value => [%css {|
   --token: $(value);
 |}];

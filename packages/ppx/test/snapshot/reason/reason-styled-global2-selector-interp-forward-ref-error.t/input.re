@@ -4,4 +4,4 @@ module Globals = [%styled.global2 {|
   }
 |}];
 
-let later = [%cx2 "padding: 0;"];
+let later = [%css "padding: 0;"];

@@ -1,16 +1,18 @@
 (* Full integration test for cx2 extraction pipeline *)
 
 (* Test 1: Basic static cx2 *)
-let staticCss = [%cx2 "display: flex; justify-content: center;"]
+let staticCss = [%css "display: flex; justify-content: center;"]
 
 (* Test 2: cx2 with interpolation *)
-let dynamicCss color = [%cx2 {|
+let dynamicCss color = [%css {|
   color: $(color);
   display: flex;
 |}]
 
 (* Test 3: Logical properties (new mappings) *)
-let logicalProps spacing = [%cx2 {|
+let logicalProps spacing =
+  [%css
+    {|
   margin-block: $(spacing);
   margin-inline: $(spacing);
   padding-block-start: $(spacing);
@@ -19,7 +21,9 @@ let logicalProps spacing = [%cx2 {|
 |}]
 
 (* Test 4: Nested selectors *)
-let nestedCss = [%cx2 {|
+let nestedCss =
+  [%css
+    {|
   display: flex;
   &:hover {
     opacity: 0.8;
@@ -30,7 +34,9 @@ let nestedCss = [%cx2 {|
 |}]
 
 (* Test 5: Basic media query *)
-let responsiveCss = [%cx2 {|
+let responsiveCss =
+  [%css
+    {|
   display: flex;
   @media (max-width: 768px) {
     display: block;
@@ -38,7 +44,9 @@ let responsiveCss = [%cx2 {|
 |}]
 
 (* Test 5b: Multiple media queries *)
-let multipleMediaQueries = [%cx2 {|
+let multipleMediaQueries =
+  [%css
+    {|
   font-size: 16px;
   @media (max-width: 768px) {
     font-size: 14px;
@@ -49,7 +57,9 @@ let multipleMediaQueries = [%cx2 {|
 |}]
 
 (* Test 5c: Media query with nested selector *)
-let mediaWithSelector = [%cx2 {|
+let mediaWithSelector =
+  [%css
+    {|
   display: flex;
   .item {
     flex: 1;
@@ -63,7 +73,9 @@ let mediaWithSelector = [%cx2 {|
 |}]
 
 (* Test 5d: Complex media query conditions *)
-let complexMedia = [%cx2 {|
+let complexMedia =
+  [%css
+    {|
   display: grid;
   @media screen and (min-width: 768px) and (max-width: 1024px) {
     display: flex;
@@ -74,7 +86,9 @@ let complexMedia = [%cx2 {|
 |}]
 
 (* Test 5e: Media query with interpolation *)
-let mediaWithInterpolation color = [%cx2 {|
+let mediaWithInterpolation color =
+  [%css
+    {|
   color: $(color);
   @media (max-width: 768px) {
     opacity: 0.8;
@@ -82,18 +96,22 @@ let mediaWithInterpolation color = [%cx2 {|
 |}]
 
 (* Test 6: keyframe2 extraction *)
-let fadeIn = [%keyframe2 {|
+let fadeIn = [%keyframe {|
   from { opacity: 0; }
   to { opacity: 1; }
 |}]
 
-let slideUp = [%keyframe2 {|
+let slideUp =
+  [%keyframe
+    {|
   0% { transform: translateY(100%); }
   100% { transform: translateY(0); }
 |}]
 
 (* Test 7: styled.global2 *)
-module GlobalReset = [%styled.global2 {|
+module GlobalReset =
+  [%styled.global2
+  {|
   :root {
     --primary-color: blue;
   }
@@ -105,7 +123,9 @@ module GlobalReset = [%styled.global2 {|
 |}]
 
 (* Test 8: Multiple variables in one cx2 *)
-let multiVar primary secondary size = [%cx2 {|
+let multiVar primary secondary size =
+  [%css
+    {|
   color: $(primary);
   background-color: $(secondary);
   font-size: $(size);
@@ -113,22 +133,48 @@ let multiVar primary secondary size = [%cx2 {|
 |}]
 
 (* Test 9: Grid properties *)
-let gridCss = [%cx2 {|
+let gridCss =
+  [%css
+    {|
   display: grid;
   grid-template-columns: 1fr 2fr 1fr;
   gap: 20px;
 |}]
 
 (* Test 10: Scroll properties *)
-let scrollCss = [%cx2 "scroll-behavior: smooth; overflow-y: auto;"]
+let scrollCss = [%css "scroll-behavior: smooth; overflow-y: auto;"]
 
 (* Usage examples to verify the generated code compiles *)
 let _ = ReactDOM.jsx "div" (ReactDOM.domProps ~className:(fst staticCss) ())
-let _ = ReactDOM.jsx "div" (ReactDOM.domProps ~className:(fst (dynamicCss CSS.red)) ~style:(snd (dynamicCss CSS.red)) ())
-let _ = ReactDOM.jsx "div" (ReactDOM.domProps ~className:(fst (logicalProps (CSS.px 20))) ~style:(snd (logicalProps (CSS.px 20))) ())
-let _ = ReactDOM.jsx "div" (ReactDOM.domProps ~className:(fst responsiveCss) ())
-let _ = ReactDOM.jsx "div" (ReactDOM.domProps ~className:(fst multipleMediaQueries) ())
-let _ = ReactDOM.jsx "div" (ReactDOM.domProps ~className:(fst mediaWithSelector) ())
-let _ = ReactDOM.jsx "div" (ReactDOM.domProps ~className:(fst complexMedia) ())
-let _ = ReactDOM.jsx "div" (ReactDOM.domProps ~className:(fst (mediaWithInterpolation CSS.blue)) ~style:(snd (mediaWithInterpolation CSS.blue)) ())
 
+let _ =
+  ReactDOM.jsx "div"
+    (ReactDOM.domProps
+       ~className:(fst (dynamicCss CSS.red))
+       ~style:(snd (dynamicCss CSS.red))
+       ())
+
+let _ =
+  ReactDOM.jsx "div"
+    (ReactDOM.domProps
+       ~className:(fst (logicalProps (CSS.px 20)))
+       ~style:(snd (logicalProps (CSS.px 20)))
+       ())
+
+let _ = ReactDOM.jsx "div" (ReactDOM.domProps ~className:(fst responsiveCss) ())
+
+let _ =
+  ReactDOM.jsx "div"
+    (ReactDOM.domProps ~className:(fst multipleMediaQueries) ())
+
+let _ =
+  ReactDOM.jsx "div" (ReactDOM.domProps ~className:(fst mediaWithSelector) ())
+
+let _ = ReactDOM.jsx "div" (ReactDOM.domProps ~className:(fst complexMedia) ())
+
+let _ =
+  ReactDOM.jsx "div"
+    (ReactDOM.domProps
+       ~className:(fst (mediaWithInterpolation CSS.blue))
+       ~style:(snd (mediaWithInterpolation CSS.blue))
+       ())

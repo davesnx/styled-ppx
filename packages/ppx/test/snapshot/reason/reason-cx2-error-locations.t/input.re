@@ -1,4 +1,4 @@
-let css = main => [%cx2
+let css = main => [%css
   {|
   color: $(main);
   background-color: $(CSS.black);

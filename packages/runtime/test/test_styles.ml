@@ -3,30 +3,92 @@ let make_static_carrier () =
   Alcotest.(check string) "className" "card title" (fst styles);
   Alcotest.(check (list (triple string string string))) "vars" [] (snd styles)
 
+let make_preserves_class_string () =
+  let styles = CSS.make "  card   title  " [] in
+  Alcotest.(check string) "className" "  card   title  " (fst styles)
+
 let make_dynamic_carrier () =
-  let styles = CSS.make "card" [ ("--gap", "8px"); ("--color", "red") ] in
+  let styles = CSS.make "card" [ "--gap", "8px"; "--color", "red" ] in
   Alcotest.(check string) "className" "card" (fst styles);
-  Alcotest.(check (list (triple string string string))) "vars"
-    [ ("--color", "--color", "red"); ("--gap", "--gap", "8px") ]
+  Alcotest.(check (list (triple string string string)))
+    "vars"
+    [ "--color", "--color", "red"; "--gap", "--gap", "8px" ]
+    (snd styles)
+
+let make_allows_duplicate_variables () =
+  let styles = CSS.make "card" [ "--gap", "8px"; "--gap", "12px" ] in
+  Alcotest.(check (list (triple string string string)))
+    "vars"
+    [ "--gap", "--gap", "12px"; "--gap", "--gap", "8px" ]
     (snd styles)
 
 let merge_carriers () =
-  let left = CSS.make "card" [ ("--gap", "8px") ] in
-  let right = CSS.make "active" [ ("--color", "red") ] in
+  let left = CSS.make "card" [ "--gap", "8px" ] in
+  let right = CSS.make "active" [ "--color", "red" ] in
   let styles = CSS.merge left right in
   Alcotest.(check string) "className" "card active" (fst styles);
-  Alcotest.(check (list (triple string string string))) "vars"
-    [ ("--gap", "--gap", "8px"); ("--color", "--color", "red") ]
+  Alcotest.(check (list (triple string string string)))
+    "vars"
+    [ "--gap", "--gap", "8px"; "--color", "--color", "red" ]
     (snd styles)
+
+let merge_preserves_duplicate_variables () =
+  let left = CSS.make "card" [ "--gap", "8px" ] in
+  let right = CSS.make "active" [ "--gap", "12px" ] in
+  let styles = CSS.merge left right in
+  Alcotest.(check (list (triple string string string)))
+    "vars"
+    [ "--gap", "--gap", "8px"; "--gap", "--gap", "12px" ]
+    (snd styles)
+
+let merge_keeps_left_to_right_style_order () =
+  let one = CSS.make "one" [ "--one", "1" ] in
+  let two = CSS.make "two" [ "--two", "2" ] in
+  let three = CSS.make "three" [ "--three", "3" ] in
+  let styles = CSS.merge (CSS.merge one two) three in
+  Alcotest.(check string) "className" "one two three" (fst styles);
+  Alcotest.(check (list (triple string string string)))
+    "vars"
+    [
+      "--one", "--one", "1";
+      "--two", "--two", "2";
+      "--three", "--three", "3";
+    ]
+    (snd styles)
+
+let merge_trims_outer_whitespace_only () =
+  let styles = CSS.merge (CSS.make "  card" []) (CSS.make "active  " []) in
+  Alcotest.(check string) "className" "card active" (fst styles)
 
 let trim_empty_merge_class () =
   let styles = CSS.merge (CSS.make "" []) (CSS.make "active" []) in
   Alcotest.(check string) "className" "active" (fst styles)
 
+let trim_empty_merge_class_2 () =
+  let styles = CSS.merge (CSS.make "    " []) (CSS.make "active" []) in
+  Alcotest.(check string) "className" "active" (fst styles)
+
+let trim_empty_merge_class_3 () =
+  let styles = CSS.merge (CSS.make "active" []) (CSS.make "" []) in
+  Alcotest.(check string) "className" "active" (fst styles)
+
+let merge_empty_carriers () =
+  let styles = CSS.merge (CSS.make "" []) (CSS.make "" []) in
+  Alcotest.(check string) "className" "" (fst styles);
+  Alcotest.(check (list (triple string string string))) "vars" [] (snd styles)
+
 let tests =
   [
     test "make static carrier" make_static_carrier;
+    test "make preserves class string" make_preserves_class_string;
     test "make dynamic carrier" make_dynamic_carrier;
+    test "make allows duplicate variables" make_allows_duplicate_variables;
     test "merge carriers" merge_carriers;
+    test "merge preserves duplicate variables" merge_preserves_duplicate_variables;
+    test "merge keeps left-to-right style order" merge_keeps_left_to_right_style_order;
+    test "merge trims outer whitespace only" merge_trims_outer_whitespace_only;
     test "trim empty merge class" trim_empty_merge_class;
+    test "trim empty merge class 2" trim_empty_merge_class_2;
+    test "trim empty merge class 3" trim_empty_merge_class_3;
+    test "merge empty carriers" merge_empty_carriers;
   ]

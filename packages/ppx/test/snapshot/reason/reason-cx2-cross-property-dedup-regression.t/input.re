@@ -26,7 +26,9 @@
 
 let lengthVar = CSS.px(10);
 
-let layout = [%cx2 {|
+let layout = [%css
+  {|
   margin-left: $(lengthVar);
   padding-left: $(lengthVar);
-|}];
+|}
+];

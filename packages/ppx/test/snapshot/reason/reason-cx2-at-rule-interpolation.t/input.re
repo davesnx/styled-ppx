@@ -1,4 +1,4 @@
-let x = bp => [%cx2 {|
+let x = bp => [%css {|
   @media (max-width: $(bp)) {
     color: red;
   }

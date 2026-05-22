@@ -1,5 +1,6 @@
-(test
+(executable
  (name Runner)
+ (public_name ppx-native-test-runner)
  (libraries
   alcotest
   styled-ppx
@@ -13,8 +14,9 @@
  (preprocess
   (pps ppxlib.metaquot styled-ppx -- -no-merge)))
 
-(rule
+(cram
  (alias test-ppx-native)
- (deps Runner.exe)
- (action
-  (run %{deps})))
+ (deps
+  %{bin:ppx-native-test-runner}
+  %{bin:refmt}
+  %{bin:standalone}))

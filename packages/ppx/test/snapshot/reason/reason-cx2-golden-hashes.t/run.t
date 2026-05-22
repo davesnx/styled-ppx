@@ -1,5 +1,5 @@
 Golden hashes: a stable pin on the classNames produced for representative
-[%cx2] shapes. Hashes are derived from the rendered rule text via Murmur2,
+[%css] shapes. Hashes are derived from the rendered rule text via Murmur2,
 so any change to `Render` (whitespace, escaping, numeric formatting),
 to atomization, or to Murmur2 cascades into every emitted className.
 
