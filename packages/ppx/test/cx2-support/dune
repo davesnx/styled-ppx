@@ -1,4 +1,0 @@
-(cram
- (alias test-cx2-support)
- (deps
-  (package styled-ppx)))
