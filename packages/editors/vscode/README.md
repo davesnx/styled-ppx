@@ -1,6 +1,6 @@
 # vscode-styled-ppx
 
-Syntax highlighting for [styled-ppx](https://github.com/davesnx/styled-ppx) in ReScript, Reason and OCaml.
+Syntax highlighting for [styled-ppx](https://github.com/davesnx/styled-ppx) in Reason and OCaml.
 
 ## Credits
 

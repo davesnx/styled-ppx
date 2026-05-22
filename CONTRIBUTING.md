@@ -57,13 +57,10 @@ There are some end-to-end tests to ensure all the ppx generation is working as e
 $ tree -L 1 demo
 demo
 ├── melange
-├── rescript-v10-JSX4
-└── rescript-v9-JSX3
 ```
 
 ```bash
 make build
-make test_demo_rescript_v10
 ```
 
 ## Release process

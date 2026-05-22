@@ -39,7 +39,7 @@ const styledPpxCssGrammar = {
       Path.join(editors, "vscode/syntaxes/css.styled-ppx.json"),
       "utf8"
   )),
-  injectTo: ["source.ocaml", "source.reason", "source.rescript"],
+  injectTo: ["source.ocaml", "source.reason"],
 };
 
 const styledPpxOCamlGrammar = {
@@ -50,16 +50,6 @@ const styledPpxOCamlGrammar = {
     )
   ),
   injectTo: ["source.ocaml"],
-};
-
-const styledPpxReScriptGrammar = {
-  ...JSON.parse(
-    Fs.readFileSync(
-      Path.join(editors, "vscode/syntaxes/styled-ppx-rescript.json"),
-      "utf8"
-    )
-  ),
-  injectTo: ["source.rescript"],
 };
 
 const styledPpxReasonGrammar = {
@@ -94,7 +84,6 @@ const withNextra = Nextra({
             ocamlGrammar,
             styledPpxCssGrammar,
             styledPpxOCamlGrammar,
-            styledPpxReScriptGrammar,
             styledPpxReasonGrammar,
             duneGrammar,
           ],

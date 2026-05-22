@@ -659,8 +659,7 @@
           "contentName": "variable.interpolation.css.styled-ppx",
           "patterns": [
             { "include": "source.ocaml" },
-            { "include": "source.reason" },
-            { "include": "source.rescript" }
+            { "include": "source.reason" }
           ]
         },
         {

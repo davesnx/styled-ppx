@@ -74,8 +74,6 @@ release-static:
 
 TEST_TARGETS := test-parser test-css-grammar test-ppx-native test-ppx-snapshot-reason test-css-support test-cx2-support test-runtime test-murmur2 test-css-spec-parser test-string-interpolation
 
-# test-ppx-snapshot-rescript
-
 # Create targets with the format "test-{{target_name}}-{{ "watch" | "promote" }}"
 define create-test
 .PHONY: $(1)
@@ -99,34 +97,6 @@ $(foreach target,$(TEST_TARGETS), $(eval $(call create-test,$(target))))
 $(foreach target,$(TEST_TARGETS), $(eval $(call create-test-watch,$(target))))
 $(foreach target,$(TEST_TARGETS), $(eval $(call create-test-promote,$(target))))
 
-.PHONY: test-demo-rescript-v9
-test-demo-rescript-v9: ## Run End-to-end tests for JSX3
-	npm --prefix 'demo/rescript-v9-JSX3' install
-	npm --prefix 'demo/rescript-v9-JSX3' run build
-	npm --prefix 'demo/rescript-v9-JSX3' run test
-
-.PHONY: test-demo-rescript-v9-watch
-test-demo-rescript-v9-watch: ## Run End-to-end tests for JSX3
-	npm --prefix 'demo/rescript-v9-JSX3' run test-watch
-
-.PHONY: test-demo-rescript-v9-promote
-test-demo-rescript-v9-promote: ## Run End-to-end tests for JSX3
-	npm --prefix 'demo/rescript-v9-JSX3' run test-promote
-
-.PHONY: test-demo-rescript-v10
-test-demo-rescript-v10: ## Run End-to-end tests for JSX4
-	npm --prefix 'demo/rescript-v10-JSX4' install
-	npm --prefix 'demo/rescript-v10-JSX4' run build
-	npm --prefix 'demo/rescript-v10-JSX4' run test
-
-.PHONY: test-demo-rescript-v10-watch
-test-demo-rescript-v10-watch: ## Run End-to-end tests for JSX4
-	npm --prefix 'demo/rescript-v10-JSX4' run test-watch
-
-.PHONY: test-demo-rescript-v10-promote
-test-demo-rescript-v10-promote: ## Run End-to-end tests for JSX4
-	npm --prefix 'demo/rescript-v10-JSX4' run test-promote
-
 .PHONY: test
 test: build
 	@for target in $(TEST_TARGETS); do \
@@ -137,15 +107,7 @@ test: build
 		fi \
 	done
 
-.PHONY: test-demo
-test-demo: build test-demo-rescript-v9 test-demo-rescript-v10 ## Run demo tests
-
 # Demo
-
-.PHONY: demo-demo-rescript-v10
-demo-demo-rescript-v10: build ## Run the ReScript v10 demo with JSX4
-	npm --prefix 'demo/rescript-v10-JSX4' install
-	npm --prefix 'demo/rescript-v10-JSX4' run start
 
 .PHONY: demo-demo-melange-server
 demo-demo-melange-server: ## Run the melange server demo

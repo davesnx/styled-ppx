@@ -22,15 +22,14 @@
 
 (package
  (name styled-ppx)
- (synopsis "Type-safe styled components for ReScript and Melange")
+ (synopsis "Type-safe styled components for Reason, Melange, and OCaml")
  (description
-  "styled-ppx is a ppx and a library that brings styled components to ReScript, Melange and OCaml. Create React Components or simply `className` with type-safe style definitions with only CSS.")
+  "styled-ppx is a ppx and a library that brings styled components to Reason, Melange, and OCaml. Create React Components or simply `className` with type-safe style definitions with only CSS.")
   (depends
    (ocaml (>= 4.14))
    (reason (>= 3.17.3))
    (menhir (>= 20220210))
-   (ppx_deriving (>= 5.0))
-   (ppx_deriving_yojson (>= 3.7.0))
+    (ppx_deriving (>= 5.0))
    (ppxlib (>= 0.36.0))
    (sedlex (>= 3.5))
    (melange (>= 3.0.0))

@@ -1,12 +1,11 @@
 {
   "name": "@davesnx/styled-ppx",
   "version": "0.0.0",
-  "description": "Typed styled components in ReScript",
+  "description": "Typed styled components in Reason, Melange, and OCaml",
   "author": "David Sancho <dsnxmoreno@gmail.com>",
   "license": "BSD-2",
   "homepage": "https://styled-ppx.vercel.app",
   "keywords": [
-    "rescript",
     "reason",
     "ocaml",
     "melange",
@@ -25,11 +24,5 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/davesnx/styled-ppx.git"
-  },
-  "peerDependencies": {
-    "rescript": "9.x || 10.x"
-  },
-  "devDependencies": {
-    "rescript": "10.1.4"
   }
 }
