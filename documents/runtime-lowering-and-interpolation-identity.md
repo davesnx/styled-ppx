@@ -19,7 +19,7 @@ Static extraction has a related locality problem. `[%css]` and
 `[%styled.global]` deduplicate interpolated values by the generated CSS custom
 property name. That name is derived from the OCaml expression source, not from the
 CSS property context or resolved runtime type. The checked-in regression tests
-`reason-cx2-cross-property-dedup-regression.t` and
+`reason-cx-cross-property-dedup-regression.t` and
 `reason-styled-global2-cross-property-dedup-regression.t` pin the resulting
 known-broken behavior: the same OCaml binding can be interpolated into two CSS
 properties with different accepted value spaces, and the first property decides
