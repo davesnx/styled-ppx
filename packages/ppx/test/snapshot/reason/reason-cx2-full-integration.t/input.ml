@@ -108,9 +108,9 @@ let slideUp =
   100% { transform: translateY(0); }
 |}]
 
-(* Test 7: styled.global2 *)
+(* Test 7: styled.global *)
 module GlobalReset =
-  [%styled.global2
+  [%styled.global
   {|
   :root {
     --primary-color: blue;

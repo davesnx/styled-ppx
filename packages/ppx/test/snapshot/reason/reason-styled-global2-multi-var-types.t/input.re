@@ -1,5 +1,5 @@
 /* Multiple interpolations of different var_types in a single
-   styled.global2 block.
+   styled.global block.
 
    Each $(...) must lower to the right CSS.Types.<Mod>.toString call:
    - color  -> CSS.Types.Color.toString
@@ -16,11 +16,13 @@ let bodyWidth = CSS.px(960);
 let mainOpacity = 0.95;
 let layerIndex = 10;
 
-module ThemeStyles = [%styled.global2 {|
+module ThemeStyles = [%styled.global
+  {|
   body {
     color: $(textColor);
     width: $(bodyWidth);
     opacity: $(mainOpacity);
     z-index: $(layerIndex);
   }
-|}];
+|}
+];

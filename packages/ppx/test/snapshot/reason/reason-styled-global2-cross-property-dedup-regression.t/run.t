@@ -1,5 +1,5 @@
 REGRESSION TEST — pins KNOWN-BROKEN cross-property dedup in
-[%styled.global2]. See input.re for the full rationale. A future
+[%styled.global]. See input.re for the full rationale. A future
 fix MUST update this snapshot intentionally.
 
   $ refmt --parse re --print ml input.re > output.ml
@@ -15,5 +15,4 @@ fix MUST update this snapshot intentionally.
       )
       ++ "}";
     let to_buffer = buf => Buffer.add_string(buf, to_string());
-    let make = () => CSS.global_style_tag(to_string());
   };

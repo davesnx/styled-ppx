@@ -1,4 +1,4 @@
-[%styled.global2] flattens CSS-nesting at PPX time, lowering nested
+[%styled.global] flattens CSS-nesting at PPX time, lowering nested
 rules to flat descendant selectors. Multi-selector preludes
 Cartesian-product correctly; pseudo-classes splice onto the parent
 without an intervening space.
@@ -19,23 +19,19 @@ without an intervening space.
     struct
       let to_string () = ""
       let to_buffer buf = Buffer.add_string buf (to_string ())
-      let make () = CSS.global_style_tag (to_string ())
     end
   module Multi =
     struct
       let to_string () = ""
       let to_buffer buf = Buffer.add_string buf (to_string ())
-      let make () = CSS.global_style_tag (to_string ())
     end
   module Cartesian =
     struct
       let to_string () = ""
       let to_buffer buf = Buffer.add_string buf (to_string ())
-      let make () = CSS.global_style_tag (to_string ())
     end
   module PseudoJoin =
     struct
       let to_string () = ""
       let to_buffer buf = Buffer.add_string buf (to_string ())
-      let make () = CSS.global_style_tag (to_string ())
     end

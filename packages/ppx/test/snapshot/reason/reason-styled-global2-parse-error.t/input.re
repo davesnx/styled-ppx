@@ -4,7 +4,7 @@
    and message; the PPX wraps that into a Pmod_extension carrying the
    parser's diagnostic so the location surfaces at the right column. */
 
-module BadCss = [%styled.global2 {|
+module BadCss = [%styled.global {|
   body {
     color: red;
 |}];

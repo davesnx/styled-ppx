@@ -1,6 +1,6 @@
 /* REGRESSION TEST — pins KNOWN-BROKEN behavior.
 
-   `[%styled.global2]` deduplicates value interpolations by binding
+   `[%styled.global]` deduplicates value interpolations by binding
    identity. When the same binding is used in two properties of
    different CSS types, only ONE toString conversion is emitted —
    the type from the FIRST declaration site. Other sites silently
@@ -25,9 +25,11 @@
 
 let bg: CSS.Types.Background.t = `color(CSS.red);
 
-module Theme = [%styled.global2 {|
+module Theme = [%styled.global
+  {|
   body {
     background: $(bg);
     color: $(bg);
   }
-|}];
+|}
+];

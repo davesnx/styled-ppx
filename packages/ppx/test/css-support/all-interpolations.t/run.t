@@ -13,9 +13,4 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 31, characters 12-21:
-  31 | let foo = [%keyframe {|0% { opacity: 0.0 } 100% { opacity: 1.0 }|}];
-                   ^^^^^^^^^
-  Error: Uninterpreted extension 'keyframe2'.
-  [1]
 

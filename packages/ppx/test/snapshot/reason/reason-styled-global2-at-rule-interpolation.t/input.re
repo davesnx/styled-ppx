@@ -1,4 +1,4 @@
-/* Interpolation inside an @media block within styled.global2.
+/* Interpolation inside an @media block within styled.global.
 
    transform_rule walks recursively into at-rule bodies, so $(...)
    inside a nested style rule should be substituted with var(...) on
@@ -9,7 +9,8 @@
 let mobileColor = CSS.red;
 let desktopColor = CSS.blue;
 
-module ResponsiveStyles = [%styled.global2 {|
+module ResponsiveStyles = [%styled.global
+  {|
   body {
     color: $(mobileColor);
   }
@@ -18,4 +19,5 @@ module ResponsiveStyles = [%styled.global2 {|
       color: $(desktopColor);
     }
   }
-|}];
+|}
+];

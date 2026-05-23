@@ -1,4 +1,4 @@
-/* Multiple rules in one styled.global2 block, where some are purely
+/* Multiple rules in one styled.global block, where some are purely
    static and some contain interpolation.
 
    - All rules go through the static [@@@css ...] channel.
@@ -9,7 +9,8 @@
 
 let primary = CSS.red;
 
-module MixedStyles = [%styled.global2 {|
+module MixedStyles = [%styled.global
+  {|
   html {
     box-sizing: border-box;
   }
@@ -20,4 +21,5 @@ module MixedStyles = [%styled.global2 {|
   a {
     text-decoration: none;
   }
-|}];
+|}
+];

@@ -6,7 +6,7 @@ let multi = [%css {|
   margin: 10px;
 |}];
 
-module Globals = [%styled.global2
+module Globals = [%styled.global
   {|
   body .$(multi) {
     font-weight: bold;

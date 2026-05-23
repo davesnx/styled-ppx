@@ -272,12 +272,12 @@ And adds to the CSS buffer:
 @keyframes keyframe-85bkd1 { from { opacity: 0; } to { opacity: 1; } }
 ```
 
-### `[%styled.global2]`
+### `[%styled.global]`
 
 Global styles without className prefixing:
 
 ```reason
-[%styled.global2 {|
+[%styled.global {|
   body { margin: 0; }
   * { box-sizing: border-box; }
 |}];

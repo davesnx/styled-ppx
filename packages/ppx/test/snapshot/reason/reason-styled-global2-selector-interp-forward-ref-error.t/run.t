@@ -7,7 +7,7 @@
   - Otherwise, use [%cx] for runtime substitution.
   [1]
   $ refmt --parse ml --print re output.ml
-  module Globals = [%styled.global2 {|
+  module Globals = [%styled.global {|
     .$(later) {
       color: red;
     }

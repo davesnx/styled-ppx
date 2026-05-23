@@ -16,12 +16,10 @@ Testing improved error message for list syntax with %cx
   File "input.re", line 3, characters 24-27:
   3 | let invalid_css = [%css 123];
                               ^^^
-  Error: [%css] expects a string of CSS with a single rule (a property-value
-         pair).
-         
-         Example:
-           [%css "color: red"]
-           [%css "display: block"]
-         
-         More info: https://styled-ppx.vercel.app/reference/css
+  Error: [%css] expects a string of CSS for static extraction.
+  
+  Example:
+    [%css "display: block; color: red"]
+  
+  More info: https://styled-ppx.vercel.app/reference/cx
   [1]

@@ -1,15 +1,18 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  let className = CSS.style([|CSS.label("className"), CSS.display(`block)|]);
-  let classNameWithMultiLine =
-    CSS.style([|CSS.label("classNameWithMultiLine"), CSS.display(`block)|]);
-  let classNameWithArray =
-    CSS.style([|CSS.label("classNameWithArray"), cssProperty|]);
-  let cssRule = CSS.color(CSS.blue);
-  let classNameWithCss =
-    CSS.style([|
-      CSS.label("classNameWithCss"),
-      cssRule,
-      CSS.backgroundColor(CSS.green),
-    |]);
+  [@css ".css-14ksm7b-cssRule{color:blue;}"];
+  [@css ".css-ggod7l-classNameWithCss{background-color:green;}"];
+  [@css.bindings
+    [
+      ("Output.cssRule", "css-14ksm7b-cssRule"),
+      ("Output.classNameWithCss", "css-ggod7l-classNameWithCss"),
+    ]
+  ];
+  let className = [%cx "display: block;"];
+  let classNameWithMultiLine = [%cx {| display: block; |}];
+  let classNameWithArray = [%cx [|cssProperty|]];
+  let cssRule = CSS.make("css-14ksm7b-cssRule", []);
+  let classNameWithCss = [%cx
+    [|cssRule, CSS.make("css-ggod7l-classNameWithCss", [])|]
+  ];

@@ -9,7 +9,8 @@
   [@@@css ".css-15ikb3s-logicalProps{margin-block:var(--var-m7rmhk);}"]
   [@@@css ".css-1io86c2-logicalProps{margin-inline:var(--var-m7rmhk);}"]
   [@@@css ".css-bcg5v8-logicalProps{padding-block-start:var(--var-m7rmhk);}"]
-  [@@@css ".css-1ifadwg-logicalProps{padding-inline-end:var(--var-m7rmhk);}"]
+  [@@@css
+    ".css-1ifadwg-logicalProps{-webkit-padding-inline-end:var(--var-m7rmhk);padding-inline-end:var(--var-m7rmhk);}"]
   [@@@css ".css-kdjpx-logicalProps{inset-block-start:var(--var-m7rmhk);}"]
   [@@@css ".css-k008qs-nestedCss{display:flex;}"]
   [@@@css ".css-zqnfaz-nestedCss:hover{opacity:0.8;}"]
@@ -23,7 +24,8 @@
   [@@@css
     "@media (max-width: 480px) {.css-2b7vub-multipleMediaQueries{font-size:12px;}}"]
   [@@@css ".css-k008qs-mediaWithSelector{display:flex;}"]
-  [@@@css ".css-5ivle1-mediaWithSelector .item{-webkit-flex:1;-ms-flex:1;flex:1;}"]
+  [@@@css
+    ".css-5ivle1-mediaWithSelector .item{-webkit-flex:1;-ms-flex:1;flex:1;}"]
   [@@@css
     "@media (max-width: 768px) {.css-1cemfq6-mediaWithSelector{-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;}}"]
   [@@@css
@@ -105,7 +107,6 @@
     struct
       let to_string () = ""
       let to_buffer buf = Buffer.add_string buf (to_string ())
-      let make () = CSS.global_style_tag (to_string ())
     end
   let multiVar primary secondary size =
     CSS.make
@@ -152,7 +153,7 @@
   .css-15ikb3s-logicalProps{margin-block:var(--var-m7rmhk);}
   .css-1io86c2-logicalProps{margin-inline:var(--var-m7rmhk);}
   .css-bcg5v8-logicalProps{padding-block-start:var(--var-m7rmhk);}
-  .css-1ifadwg-logicalProps{padding-inline-end:var(--var-m7rmhk);}
+  .css-1ifadwg-logicalProps{-webkit-padding-inline-end:var(--var-m7rmhk);padding-inline-end:var(--var-m7rmhk);}
   .css-kdjpx-logicalProps{inset-block-start:var(--var-m7rmhk);}
   .css-k008qs-nestedCss{display:flex;}
   .css-zqnfaz-nestedCss:hover{opacity:0.8;}

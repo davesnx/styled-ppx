@@ -13,13 +13,9 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 12-21:
-  1 | let foo = [%keyframe {|0% { opacity: 0.0 } 100% { opacity: 1.0 }|}];
-                  ^^^^^^^^^
-  Error: Uninterpreted extension 'keyframe2'.
-  [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css "@keyframes keyframe-c958s{0%{opacity:0 ;}100%{opacity:1 ;}}"];
   [@css ".css-13g9u50{-webkit-animation-name:random;animation-name:random;}"];
   [@css
     ".css-1b4du2s{-webkit-animation-name:foo, bar;animation-name:foo, bar;}"
@@ -145,8 +141,8 @@ If this test fail means that the module is not in sync with the ppx
   [@css
     ".css-1e29gym{-webkit-animation:a 300ms linear 400ms infinite reverse forwards running;animation:a 300ms linear 400ms infinite reverse forwards running;}"
   ];
-  let foo = [%keyframe {|0% { opacity: 0.0 } 100% { opacity: 1.0 }|}];
-  let bar = [%keyframe {|0% { opacity: 0.0 } 100% { opacity: 1.0 }|}];
+  let foo = CSS.Types.AnimationName.make("keyframe-c958s");
+  let bar = CSS.Types.AnimationName.make("keyframe-c958s");
   
   CSS.make("css-13g9u50", []);
   CSS.make("css-1b4du2s", []);

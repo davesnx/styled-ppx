@@ -1,984 +1,1013 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  module SingleQuoteStrings: {
-    type makeProps;
-    let make: makeProps => React.element;
-  } = {
-    [@deriving (jsProperties, getSet)]
+  [@css ".css-k008qs-SingleQuoteStrings{display:flex;}"];
+  [@css ".css-1tyndxa-SingleQuoteStrings{justify-content:center;}"];
+  [@css.bindings
+    [
+      (
+        "Output.SingleQuoteStrings",
+        "css-k008qs-SingleQuoteStrings css-1tyndxa-SingleQuoteStrings",
+      ),
+    ]
+  ];
+  module SingleQuoteStrings = {
+    [@deriving abstract]
+    [@warning "-69"]
     type makeProps = {
-      [@mel.optional]
+      [@optional]
       innerRef: option(ReactDOM.domRef),
-      [@mel.optional]
+      [@optional]
       children: option(React.element),
-      [@mel.optional] [@mel.as "as"]
+      [@optional] [@mel.as "as"]
       as_: option(string),
-      [@mel.optional]
+      [@optional]
       about: option(string),
-      [@mel.optional]
+      [@optional]
       accentHeight: option(string),
-      [@mel.optional]
+      [@optional]
       accept: option(string),
-      [@mel.optional]
+      [@optional]
       acceptCharset: option(string),
-      [@mel.optional]
+      [@optional]
       accessKey: option(string),
-      [@mel.optional]
+      [@optional]
       accumulate: option(string),
-      [@mel.optional]
+      [@optional]
       action: option(string),
-      [@mel.optional]
+      [@optional]
       additive: option(string),
-      [@mel.optional]
+      [@optional]
       alignmentBaseline: option(string),
-      [@mel.optional]
+      [@optional]
       allowFullScreen: option(bool),
-      [@mel.optional]
+      [@optional]
       allowReorder: option(string),
-      [@mel.optional]
+      [@optional]
       alphabetic: option(string),
-      [@mel.optional]
+      [@optional]
       alt: option(string),
-      [@mel.optional]
+      [@optional]
       amplitude: option(string),
-      [@mel.optional]
+      [@optional]
       arabicForm: option(string),
-      [@mel.optional] [@mel.as "aria-activedescendant"]
+      [@optional] [@mel.as "aria-activedescendant"]
       ariaActivedescendant: option(string),
-      [@mel.optional] [@mel.as "aria-atomic"]
+      [@optional] [@mel.as "aria-atomic"]
       ariaAtomic: option(bool),
-      [@mel.optional] [@mel.as "aria-busy"]
+      [@optional] [@mel.as "aria-busy"]
       ariaBusy: option(bool),
-      [@mel.optional] [@mel.as "aria-colcount"]
+      [@optional] [@mel.as "aria-colcount"]
       ariaColcount: option(int),
-      [@mel.optional] [@mel.as "aria-colindex"]
+      [@optional] [@mel.as "aria-colindex"]
       ariaColindex: option(int),
-      [@mel.optional] [@mel.as "aria-colspan"]
+      [@optional] [@mel.as "aria-colspan"]
       ariaColspan: option(int),
-      [@mel.optional] [@mel.as "aria-controls"]
+      [@optional] [@mel.as "aria-controls"]
       ariaControls: option(string),
-      [@mel.optional] [@mel.as "aria-describedby"]
+      [@optional] [@mel.as "aria-describedby"]
       ariaDescribedby: option(string),
-      [@mel.optional] [@mel.as "aria-details"]
+      [@optional] [@mel.as "aria-details"]
       ariaDetails: option(string),
-      [@mel.optional] [@mel.as "aria-disabled"]
+      [@optional] [@mel.as "aria-disabled"]
       ariaDisabled: option(bool),
-      [@mel.optional] [@mel.as "aria-errormessage"]
+      [@optional] [@mel.as "aria-errormessage"]
       ariaErrormessage: option(string),
-      [@mel.optional] [@mel.as "aria-expanded"]
+      [@optional] [@mel.as "aria-expanded"]
       ariaExpanded: option(bool),
-      [@mel.optional] [@mel.as "aria-flowto"]
+      [@optional] [@mel.as "aria-flowto"]
       ariaFlowto: option(string),
-      [@mel.optional] [@mel.as "aria-grabbed"]
+      [@optional] [@mel.as "aria-grabbed"]
       ariaGrabbed: option(bool),
-      [@mel.optional] [@mel.as "aria-hidden"]
+      [@optional] [@mel.as "aria-hidden"]
       ariaHidden: option(bool),
-      [@mel.optional] [@mel.as "aria-keyshortcuts"]
+      [@optional] [@mel.as "aria-keyshortcuts"]
       ariaKeyshortcuts: option(string),
-      [@mel.optional] [@mel.as "aria-label"]
+      [@optional] [@mel.as "aria-label"]
       ariaLabel: option(string),
-      [@mel.optional] [@mel.as "aria-labelledby"]
+      [@optional] [@mel.as "aria-labelledby"]
       ariaLabelledby: option(string),
-      [@mel.optional] [@mel.as "aria-level"]
+      [@optional] [@mel.as "aria-level"]
       ariaLevel: option(int),
-      [@mel.optional] [@mel.as "aria-modal"]
+      [@optional] [@mel.as "aria-modal"]
       ariaModal: option(bool),
-      [@mel.optional] [@mel.as "aria-multiline"]
+      [@optional] [@mel.as "aria-multiline"]
       ariaMultiline: option(bool),
-      [@mel.optional] [@mel.as "aria-multiselectable"]
+      [@optional] [@mel.as "aria-multiselectable"]
       ariaMultiselectable: option(bool),
-      [@mel.optional] [@mel.as "aria-owns"]
+      [@optional] [@mel.as "aria-owns"]
       ariaOwns: option(string),
-      [@mel.optional] [@mel.as "aria-placeholder"]
+      [@optional] [@mel.as "aria-placeholder"]
       ariaPlaceholder: option(string),
-      [@mel.optional] [@mel.as "aria-posinset"]
+      [@optional] [@mel.as "aria-posinset"]
       ariaPosinset: option(int),
-      [@mel.optional] [@mel.as "aria-readonly"]
+      [@optional] [@mel.as "aria-readonly"]
       ariaReadonly: option(bool),
-      [@mel.optional] [@mel.as "aria-relevant"]
+      [@optional] [@mel.as "aria-relevant"]
       ariaRelevant: option(string),
-      [@mel.optional] [@mel.as "aria-required"]
+      [@optional] [@mel.as "aria-required"]
       ariaRequired: option(bool),
-      [@mel.optional] [@mel.as "aria-roledescription"]
+      [@optional] [@mel.as "aria-roledescription"]
       ariaRoledescription: option(string),
-      [@mel.optional] [@mel.as "aria-rowcount"]
+      [@optional] [@mel.as "aria-rowcount"]
       ariaRowcount: option(int),
-      [@mel.optional] [@mel.as "aria-rowindex"]
+      [@optional] [@mel.as "aria-rowindex"]
       ariaRowindex: option(int),
-      [@mel.optional] [@mel.as "aria-rowspan"]
+      [@optional] [@mel.as "aria-rowspan"]
       ariaRowspan: option(int),
-      [@mel.optional] [@mel.as "aria-selected"]
+      [@optional] [@mel.as "aria-selected"]
       ariaSelected: option(bool),
-      [@mel.optional] [@mel.as "aria-setsize"]
+      [@optional] [@mel.as "aria-setsize"]
       ariaSetsize: option(int),
-      [@mel.optional] [@mel.as "aria-sort"]
+      [@optional] [@mel.as "aria-sort"]
       ariaSort: option(string),
-      [@mel.optional] [@mel.as "aria-valuemax"]
+      [@optional] [@mel.as "aria-valuemax"]
       ariaValuemax: option(float),
-      [@mel.optional] [@mel.as "aria-valuemin"]
+      [@optional] [@mel.as "aria-valuemin"]
       ariaValuemin: option(float),
-      [@mel.optional] [@mel.as "aria-valuenow"]
+      [@optional] [@mel.as "aria-valuenow"]
       ariaValuenow: option(float),
-      [@mel.optional] [@mel.as "aria-valuetext"]
+      [@optional] [@mel.as "aria-valuetext"]
       ariaValuetext: option(string),
-      [@mel.optional]
+      [@optional]
       ascent: option(string),
-      [@mel.optional]
+      [@optional]
       async: option(bool),
-      [@mel.optional]
+      [@optional]
       attributeName: option(string),
-      [@mel.optional]
+      [@optional]
       attributeType: option(string),
-      [@mel.optional]
+      [@optional]
       autoComplete: option(string),
-      [@mel.optional]
+      [@optional]
       autoFocus: option(bool),
-      [@mel.optional]
+      [@optional]
       autoPlay: option(bool),
-      [@mel.optional]
+      [@optional]
       autoReverse: option(string),
-      [@mel.optional]
+      [@optional]
       azimuth: option(string),
-      [@mel.optional]
+      [@optional]
       baseFrequency: option(string),
-      [@mel.optional]
+      [@optional]
       baselineShift: option(string),
-      [@mel.optional]
+      [@optional]
       baseProfile: option(string),
-      [@mel.optional]
+      [@optional]
       bbox: option(string),
-      [@mel.optional]
+      [@optional]
       begin_: option(string),
-      [@mel.optional]
+      [@optional]
       bias: option(string),
-      [@mel.optional]
+      [@optional]
       by: option(string),
-      [@mel.optional]
+      [@optional]
       calcMode: option(string),
-      [@mel.optional]
+      [@optional]
       capHeight: option(string),
-      [@mel.optional]
+      [@optional]
       challenge: option(string),
-      [@mel.optional]
+      [@optional]
       charSet: option(string),
-      [@mel.optional]
+      [@optional]
       checked: option(bool),
-      [@mel.optional]
+      [@optional]
       cite: option(string),
-      [@mel.optional]
+      [@optional]
       className: option(string),
-      [@mel.optional]
+      [@optional]
       clip: option(string),
-      [@mel.optional]
+      [@optional]
       clipPath: option(string),
-      [@mel.optional]
+      [@optional]
       clipPathUnits: option(string),
-      [@mel.optional]
+      [@optional]
       clipRule: option(string),
-      [@mel.optional]
+      [@optional]
       colorInterpolation: option(string),
-      [@mel.optional]
+      [@optional]
       colorInterpolationFilters: option(string),
-      [@mel.optional]
+      [@optional]
       colorProfile: option(string),
-      [@mel.optional]
+      [@optional]
       colorRendering: option(string),
-      [@mel.optional]
+      [@optional]
       cols: option(int),
-      [@mel.optional]
+      [@optional]
       colSpan: option(int),
-      [@mel.optional]
+      [@optional]
       content: option(string),
-      [@mel.optional]
+      [@optional]
       contentEditable: option(bool),
-      [@mel.optional]
+      [@optional]
       contentScriptType: option(string),
-      [@mel.optional]
+      [@optional]
       contentStyleType: option(string),
-      [@mel.optional]
+      [@optional]
       contextMenu: option(string),
-      [@mel.optional]
+      [@optional]
       controls: option(bool),
-      [@mel.optional]
+      [@optional]
       coords: option(string),
-      [@mel.optional]
+      [@optional]
       crossOrigin: option(string),
-      [@mel.optional]
+      [@optional]
       cursor: option(string),
-      [@mel.optional]
+      [@optional]
       cx: option(string),
-      [@mel.optional]
+      [@optional]
       cy: option(string),
-      [@mel.optional]
+      [@optional]
       d: option(string),
-      [@mel.optional]
+      [@optional]
       data: option(string),
-      [@mel.optional]
+      [@optional]
       datatype: option(string),
-      [@mel.optional]
+      [@optional]
       dateTime: option(string),
-      [@mel.optional]
+      [@optional]
       decelerate: option(string),
-      [@mel.optional]
+      [@optional]
       default: option(bool),
-      [@mel.optional]
+      [@optional]
       defaultChecked: option(bool),
-      [@mel.optional]
+      [@optional]
       defaultValue: option(string),
-      [@mel.optional]
+      [@optional]
       defer: option(bool),
-      [@mel.optional]
+      [@optional]
       descent: option(string),
-      [@mel.optional]
+      [@optional]
       diffuseConstant: option(string),
-      [@mel.optional]
+      [@optional]
       dir: option(string),
-      [@mel.optional]
+      [@optional]
       direction: option(string),
-      [@mel.optional]
+      [@optional]
       disabled: option(bool),
-      [@mel.optional]
+      [@optional]
       display: option(string),
-      [@mel.optional]
+      [@optional]
       divisor: option(string),
-      [@mel.optional]
+      [@optional]
       dominantBaseline: option(string),
-      [@mel.optional]
+      [@optional]
       download: option(string),
-      [@mel.optional]
+      [@optional]
       draggable: option(bool),
-      [@mel.optional]
+      [@optional]
       dur: option(string),
-      [@mel.optional]
+      [@optional]
       dx: option(string),
-      [@mel.optional]
+      [@optional]
       dy: option(string),
-      [@mel.optional]
+      [@optional]
       edgeMode: option(string),
-      [@mel.optional]
+      [@optional]
       elevation: option(string),
-      [@mel.optional]
+      [@optional]
       enableBackground: option(string),
-      [@mel.optional]
+      [@optional]
       encType: option(string),
-      [@mel.optional]
+      [@optional]
       end_: option(string),
-      [@mel.optional]
+      [@optional]
       exponent: option(string),
-      [@mel.optional]
+      [@optional]
       externalResourcesRequired: option(string),
-      [@mel.optional]
+      [@optional]
       fill: option(string),
-      [@mel.optional]
+      [@optional]
       fillOpacity: option(string),
-      [@mel.optional]
+      [@optional]
       fillRule: option(string),
-      [@mel.optional]
+      [@optional]
       filter: option(string),
-      [@mel.optional]
+      [@optional]
       filterRes: option(string),
-      [@mel.optional]
+      [@optional]
       filterUnits: option(string),
-      [@mel.optional]
+      [@optional]
       floodColor: option(string),
-      [@mel.optional]
+      [@optional]
       floodOpacity: option(string),
-      [@mel.optional]
+      [@optional]
       focusable: option(string),
-      [@mel.optional]
+      [@optional]
       fontFamily: option(string),
-      [@mel.optional]
+      [@optional]
       fontSize: option(string),
-      [@mel.optional]
+      [@optional]
       fontSizeAdjust: option(string),
-      [@mel.optional]
+      [@optional]
       fontStretch: option(string),
-      [@mel.optional]
+      [@optional]
       fontStyle: option(string),
-      [@mel.optional]
+      [@optional]
       fontVariant: option(string),
-      [@mel.optional]
+      [@optional]
       fontWeight: option(string),
-      [@mel.optional]
+      [@optional]
       form: option(string),
-      [@mel.optional]
+      [@optional]
       formAction: option(string),
-      [@mel.optional]
+      [@optional]
       formMethod: option(string),
-      [@mel.optional]
+      [@optional]
       formTarget: option(string),
-      [@mel.optional]
+      [@optional]
       from: option(string),
-      [@mel.optional]
+      [@optional]
       fx: option(string),
-      [@mel.optional]
+      [@optional]
       fy: option(string),
-      [@mel.optional]
+      [@optional]
       g1: option(string),
-      [@mel.optional]
+      [@optional]
       g2: option(string),
-      [@mel.optional]
+      [@optional]
       glyphName: option(string),
-      [@mel.optional]
+      [@optional]
       glyphOrientationHorizontal: option(string),
-      [@mel.optional]
+      [@optional]
       glyphOrientationVertical: option(string),
-      [@mel.optional]
+      [@optional]
       glyphRef: option(string),
-      [@mel.optional]
+      [@optional]
       gradientTransform: option(string),
-      [@mel.optional]
+      [@optional]
       gradientUnits: option(string),
-      [@mel.optional]
+      [@optional]
       hanging: option(string),
-      [@mel.optional]
+      [@optional]
       headers: option(string),
-      [@mel.optional]
+      [@optional]
       height: option(string),
-      [@mel.optional]
+      [@optional]
       hidden: option(bool),
-      [@mel.optional]
+      [@optional]
       high: option(int),
-      [@mel.optional]
+      [@optional]
       horizAdvX: option(string),
-      [@mel.optional]
+      [@optional]
       horizOriginX: option(string),
-      [@mel.optional]
+      [@optional]
       href: option(string),
-      [@mel.optional]
+      [@optional]
       hrefLang: option(string),
-      [@mel.optional]
+      [@optional]
       htmlFor: option(string),
-      [@mel.optional]
+      [@optional]
       httpEquiv: option(string),
-      [@mel.optional]
+      [@optional]
       icon: option(string),
-      [@mel.optional]
+      [@optional]
       id: option(string),
-      [@mel.optional]
+      [@optional]
       ideographic: option(string),
-      [@mel.optional]
+      [@optional]
       imageRendering: option(string),
-      [@mel.optional]
+      [@optional]
       in_: option(string),
-      [@mel.optional]
+      [@optional]
       in2: option(string),
-      [@mel.optional]
+      [@optional]
       inlist: option(string),
-      [@mel.optional]
+      [@optional]
       inputMode: option(string),
-      [@mel.optional]
+      [@optional]
       integrity: option(string),
-      [@mel.optional]
+      [@optional]
       intercept: option(string),
-      [@mel.optional]
+      [@optional]
       itemID: option(string),
-      [@mel.optional]
+      [@optional]
       itemProp: option(string),
-      [@mel.optional]
+      [@optional]
       itemRef: option(string),
-      [@mel.optional]
+      [@optional]
       itemScope: option(bool),
-      [@mel.optional]
+      [@optional]
       itemType: option(string),
-      [@mel.optional]
+      [@optional]
       k: option(string),
-      [@mel.optional]
+      [@optional]
       k1: option(string),
-      [@mel.optional]
+      [@optional]
       k2: option(string),
-      [@mel.optional]
+      [@optional]
       k3: option(string),
-      [@mel.optional]
+      [@optional]
       k4: option(string),
-      [@mel.optional]
+      [@optional]
       kernelMatrix: option(string),
-      [@mel.optional]
+      [@optional]
       kernelUnitLength: option(string),
-      [@mel.optional]
+      [@optional]
       kerning: option(string),
-      [@mel.optional]
+      [@optional]
       key: option(string),
-      [@mel.optional]
+      [@optional]
       keyPoints: option(string),
-      [@mel.optional]
+      [@optional]
       keySplines: option(string),
-      [@mel.optional]
+      [@optional]
       keyTimes: option(string),
-      [@mel.optional]
+      [@optional]
       keyType: option(string),
-      [@mel.optional]
+      [@optional]
       kind: option(string),
-      [@mel.optional]
+      [@optional]
       label: option(string),
-      [@mel.optional]
+      [@optional]
       lang: option(string),
-      [@mel.optional]
+      [@optional]
       lengthAdjust: option(string),
-      [@mel.optional]
+      [@optional]
       letterSpacing: option(string),
-      [@mel.optional]
+      [@optional]
       lightingColor: option(string),
-      [@mel.optional]
+      [@optional]
       limitingConeAngle: option(string),
-      [@mel.optional]
+      [@optional]
       list: option(string),
-      [@mel.optional]
+      [@optional]
       local: option(string),
-      [@mel.optional]
+      [@optional]
       loop: option(bool),
-      [@mel.optional]
+      [@optional]
       low: option(int),
-      [@mel.optional]
+      [@optional]
       manifest: option(string),
-      [@mel.optional]
+      [@optional]
       markerEnd: option(string),
-      [@mel.optional]
+      [@optional]
       markerHeight: option(string),
-      [@mel.optional]
+      [@optional]
       markerMid: option(string),
-      [@mel.optional]
+      [@optional]
       markerStart: option(string),
-      [@mel.optional]
+      [@optional]
       markerUnits: option(string),
-      [@mel.optional]
+      [@optional]
       markerWidth: option(string),
-      [@mel.optional]
+      [@optional]
       mask: option(string),
-      [@mel.optional]
+      [@optional]
       maskContentUnits: option(string),
-      [@mel.optional]
+      [@optional]
       maskUnits: option(string),
-      [@mel.optional]
+      [@optional]
       mathematical: option(string),
-      [@mel.optional]
+      [@optional]
       max: option(string),
-      [@mel.optional]
+      [@optional]
       maxLength: option(int),
-      [@mel.optional]
+      [@optional]
       media: option(string),
-      [@mel.optional]
+      [@optional]
       mediaGroup: option(string),
-      [@mel.optional]
+      [@optional]
       min: option(string),
-      [@mel.optional]
+      [@optional]
       minLength: option(int),
-      [@mel.optional]
+      [@optional]
       mode: option(string),
-      [@mel.optional]
+      [@optional]
       multiple: option(bool),
-      [@mel.optional]
+      [@optional]
       muted: option(bool),
-      [@mel.optional]
+      [@optional]
       name: option(string),
-      [@mel.optional]
+      [@optional]
       nonce: option(string),
-      [@mel.optional]
+      [@optional]
       noValidate: option(bool),
-      [@mel.optional]
+      [@optional]
       numOctaves: option(string),
-      [@mel.optional]
+      [@optional]
       offset: option(string),
-      [@mel.optional]
+      [@optional]
       opacity: option(string),
-      [@mel.optional]
+      [@optional]
       open_: option(bool),
-      [@mel.optional]
+      [@optional]
       operator: option(string),
-      [@mel.optional]
+      [@optional]
       optimum: option(int),
-      [@mel.optional]
+      [@optional]
       order: option(string),
-      [@mel.optional]
+      [@optional]
       orient: option(string),
-      [@mel.optional]
+      [@optional]
       orientation: option(string),
-      [@mel.optional]
+      [@optional]
       origin: option(string),
-      [@mel.optional]
+      [@optional]
       overflow: option(string),
-      [@mel.optional]
+      [@optional]
       overflowX: option(string),
-      [@mel.optional]
+      [@optional]
       overflowY: option(string),
-      [@mel.optional]
+      [@optional]
       overlinePosition: option(string),
-      [@mel.optional]
+      [@optional]
       overlineThickness: option(string),
-      [@mel.optional]
+      [@optional]
       paintOrder: option(string),
-      [@mel.optional]
+      [@optional]
       panose1: option(string),
-      [@mel.optional]
+      [@optional]
       pathLength: option(string),
-      [@mel.optional]
+      [@optional]
       pattern: option(string),
-      [@mel.optional]
+      [@optional]
       patternContentUnits: option(string),
-      [@mel.optional]
+      [@optional]
       patternTransform: option(string),
-      [@mel.optional]
+      [@optional]
       patternUnits: option(string),
-      [@mel.optional]
+      [@optional]
       placeholder: option(string),
-      [@mel.optional]
+      [@optional]
       pointerEvents: option(string),
-      [@mel.optional]
+      [@optional]
       points: option(string),
-      [@mel.optional]
+      [@optional]
       pointsAtX: option(string),
-      [@mel.optional]
+      [@optional]
       pointsAtY: option(string),
-      [@mel.optional]
+      [@optional]
       pointsAtZ: option(string),
-      [@mel.optional]
+      [@optional]
       poster: option(string),
-      [@mel.optional]
+      [@optional]
       prefix: option(string),
-      [@mel.optional]
+      [@optional]
       preload: option(string),
-      [@mel.optional]
+      [@optional]
       preserveAlpha: option(string),
-      [@mel.optional]
+      [@optional]
       preserveAspectRatio: option(string),
-      [@mel.optional]
+      [@optional]
       primitiveUnits: option(string),
-      [@mel.optional]
+      [@optional]
       property: option(string),
-      [@mel.optional]
+      [@optional]
       r: option(string),
-      [@mel.optional]
+      [@optional]
       radioGroup: option(string),
-      [@mel.optional]
+      [@optional]
       radius: option(string),
-      [@mel.optional]
+      [@optional]
       readOnly: option(bool),
-      [@mel.optional]
+      [@optional]
       refX: option(string),
-      [@mel.optional]
+      [@optional]
       refY: option(string),
-      [@mel.optional]
+      [@optional]
       rel: option(string),
-      [@mel.optional]
+      [@optional]
       renderingIntent: option(string),
-      [@mel.optional]
+      [@optional]
       repeatCount: option(string),
-      [@mel.optional]
+      [@optional]
       repeatDur: option(string),
-      [@mel.optional]
+      [@optional]
       required: option(bool),
-      [@mel.optional]
+      [@optional]
       requiredExtensions: option(string),
-      [@mel.optional]
+      [@optional]
       requiredFeatures: option(string),
-      [@mel.optional]
+      [@optional]
       resource: option(string),
-      [@mel.optional]
+      [@optional]
       restart: option(string),
-      [@mel.optional]
+      [@optional]
       result: option(string),
-      [@mel.optional]
+      [@optional]
       reversed: option(bool),
-      [@mel.optional]
+      [@optional]
       role: option(string),
-      [@mel.optional]
+      [@optional]
       rotate: option(string),
-      [@mel.optional]
+      [@optional]
       rows: option(int),
-      [@mel.optional]
+      [@optional]
       rowSpan: option(int),
-      [@mel.optional]
+      [@optional]
       rx: option(string),
-      [@mel.optional]
+      [@optional]
       ry: option(string),
-      [@mel.optional]
+      [@optional]
       sandbox: option(string),
-      [@mel.optional]
+      [@optional]
       scale: option(string),
-      [@mel.optional]
+      [@optional]
       scope: option(string),
-      [@mel.optional]
+      [@optional]
       scoped: option(bool),
-      [@mel.optional]
+      [@optional]
       scrolling: option(string),
-      [@mel.optional]
+      [@optional]
       seed: option(string),
-      [@mel.optional]
+      [@optional]
       selected: option(bool),
-      [@mel.optional]
+      [@optional]
       shape: option(string),
-      [@mel.optional]
+      [@optional]
       shapeRendering: option(string),
-      [@mel.optional]
+      [@optional]
       size: option(int),
-      [@mel.optional]
+      [@optional]
       sizes: option(string),
-      [@mel.optional]
+      [@optional]
       slope: option(string),
-      [@mel.optional]
+      [@optional]
       spacing: option(string),
-      [@mel.optional]
+      [@optional]
       span: option(int),
-      [@mel.optional]
+      [@optional]
       specularConstant: option(string),
-      [@mel.optional]
+      [@optional]
       specularExponent: option(string),
-      [@mel.optional]
+      [@optional]
       speed: option(string),
-      [@mel.optional]
+      [@optional]
       spellCheck: option(bool),
-      [@mel.optional]
+      [@optional]
       spreadMethod: option(string),
-      [@mel.optional]
+      [@optional]
       src: option(string),
-      [@mel.optional]
+      [@optional]
       srcDoc: option(string),
-      [@mel.optional]
+      [@optional]
       srcLang: option(string),
-      [@mel.optional]
+      [@optional]
       srcSet: option(string),
-      [@mel.optional]
+      [@optional]
       start: option(int),
-      [@mel.optional]
+      [@optional]
       startOffset: option(string),
-      [@mel.optional]
+      [@optional]
       stdDeviation: option(string),
-      [@mel.optional]
+      [@optional]
       stemh: option(string),
-      [@mel.optional]
+      [@optional]
       stemv: option(string),
-      [@mel.optional]
+      [@optional]
       step: option(float),
-      [@mel.optional]
+      [@optional]
       stitchTiles: option(string),
-      [@mel.optional]
+      [@optional]
       stopColor: option(string),
-      [@mel.optional]
+      [@optional]
       stopOpacity: option(string),
-      [@mel.optional]
+      [@optional]
       strikethroughPosition: option(string),
-      [@mel.optional]
+      [@optional]
       strikethroughThickness: option(string),
-      [@mel.optional]
+      [@optional]
       stroke: option(string),
-      [@mel.optional]
+      [@optional]
       strokeDasharray: option(string),
-      [@mel.optional]
+      [@optional]
       strokeDashoffset: option(string),
-      [@mel.optional]
+      [@optional]
       strokeLinecap: option(string),
-      [@mel.optional]
+      [@optional]
       strokeLinejoin: option(string),
-      [@mel.optional]
+      [@optional]
       strokeMiterlimit: option(string),
-      [@mel.optional]
+      [@optional]
       strokeOpacity: option(string),
-      [@mel.optional]
+      [@optional]
       strokeWidth: option(string),
-      [@mel.optional]
+      [@optional]
       style: option(ReactDOM.Style.t),
-      [@mel.optional]
+      [@optional]
       summary: option(string),
-      [@mel.optional]
+      [@optional]
       suppressContentEditableWarning: option(bool),
-      [@mel.optional]
+      [@optional]
       surfaceScale: option(string),
-      [@mel.optional]
+      [@optional]
       systemLanguage: option(string),
-      [@mel.optional]
+      [@optional]
       tabIndex: option(int),
-      [@mel.optional]
+      [@optional]
       tableValues: option(string),
-      [@mel.optional]
+      [@optional]
       target: option(string),
-      [@mel.optional]
+      [@optional]
       targetX: option(string),
-      [@mel.optional]
+      [@optional]
       targetY: option(string),
-      [@mel.optional]
+      [@optional]
       textAnchor: option(string),
-      [@mel.optional]
+      [@optional]
       textDecoration: option(string),
-      [@mel.optional]
+      [@optional]
       textLength: option(string),
-      [@mel.optional]
+      [@optional]
       textRendering: option(string),
-      [@mel.optional]
+      [@optional]
       title: option(string),
-      [@mel.optional]
+      [@optional]
       to_: option(string),
-      [@mel.optional]
+      [@optional]
       transform: option(string),
-      [@mel.optional] [@mel.as "type"]
+      [@optional] [@mel.as "type"]
       type_: option(string),
-      [@mel.optional]
+      [@optional]
       typeof: option(string),
-      [@mel.optional]
+      [@optional]
       u1: option(string),
-      [@mel.optional]
+      [@optional]
       u2: option(string),
-      [@mel.optional]
+      [@optional]
       underlinePosition: option(string),
-      [@mel.optional]
+      [@optional]
       underlineThickness: option(string),
-      [@mel.optional]
+      [@optional]
       unicode: option(string),
-      [@mel.optional]
+      [@optional]
       unicodeBidi: option(string),
-      [@mel.optional]
+      [@optional]
       unicodeRange: option(string),
-      [@mel.optional]
+      [@optional]
       unitsPerEm: option(string),
-      [@mel.optional]
+      [@optional]
       useMap: option(string),
-      [@mel.optional]
+      [@optional]
       vAlphabetic: option(string),
-      [@mel.optional]
+      [@optional]
       value: option(string),
-      [@mel.optional]
+      [@optional]
       values: option(string),
-      [@mel.optional]
+      [@optional]
       vectorEffect: option(string),
-      [@mel.optional]
+      [@optional]
       version: option(string),
-      [@mel.optional]
+      [@optional]
       vertAdvX: option(string),
-      [@mel.optional]
+      [@optional]
       vertAdvY: option(string),
-      [@mel.optional]
+      [@optional]
       vertOriginX: option(string),
-      [@mel.optional]
+      [@optional]
       vertOriginY: option(string),
-      [@mel.optional]
+      [@optional]
       vHanging: option(string),
-      [@mel.optional]
+      [@optional]
       vIdeographic: option(string),
-      [@mel.optional]
+      [@optional]
       viewBox: option(string),
-      [@mel.optional]
+      [@optional]
       viewTarget: option(string),
-      [@mel.optional]
+      [@optional]
       visibility: option(string),
-      [@mel.optional]
+      [@optional]
       vMathematical: option(string),
-      [@mel.optional]
+      [@optional]
       vocab: option(string),
-      [@mel.optional]
+      [@optional]
       width: option(string),
-      [@mel.optional]
+      [@optional]
       widths: option(string),
-      [@mel.optional]
+      [@optional]
       wordSpacing: option(string),
-      [@mel.optional]
+      [@optional]
       wrap: option(string),
-      [@mel.optional]
+      [@optional]
       writingMode: option(string),
-      [@mel.optional]
+      [@optional]
       x: option(string),
-      [@mel.optional]
+      [@optional]
       x1: option(string),
-      [@mel.optional]
+      [@optional]
       x2: option(string),
-      [@mel.optional]
+      [@optional]
       xChannelSelector: option(string),
-      [@mel.optional]
+      [@optional]
       xHeight: option(string),
-      [@mel.optional]
+      [@optional]
       xlinkActuate: option(string),
-      [@mel.optional]
+      [@optional]
       xlinkArcrole: option(string),
-      [@mel.optional]
+      [@optional]
       xlinkHref: option(string),
-      [@mel.optional]
+      [@optional]
       xlinkRole: option(string),
-      [@mel.optional]
+      [@optional]
       xlinkShow: option(string),
-      [@mel.optional]
+      [@optional]
       xlinkTitle: option(string),
-      [@mel.optional]
+      [@optional]
       xlinkType: option(string),
-      [@mel.optional]
+      [@optional]
       xmlBase: option(string),
-      [@mel.optional]
+      [@optional]
       xmlLang: option(string),
-      [@mel.optional]
+      [@optional]
       xmlns: option(string),
-      [@mel.optional]
+      [@optional]
       xmlnsXlink: option(string),
-      [@mel.optional]
+      [@optional]
       xmlSpace: option(string),
-      [@mel.optional]
+      [@optional]
       y: option(string),
-      [@mel.optional]
+      [@optional]
       y1: option(string),
-      [@mel.optional]
+      [@optional]
       y2: option(string),
-      [@mel.optional]
+      [@optional]
       yChannelSelector: option(string),
-      [@mel.optional]
+      [@optional]
       z: option(string),
-      [@mel.optional]
+      [@optional]
       zoomAndPan: option(string),
-      [@mel.optional]
+      [@optional]
       onAbort: option(React.Event.Media.t => unit),
-      [@mel.optional]
+      [@optional]
       onAnimationEnd: option(React.Event.Animation.t => unit),
-      [@mel.optional]
+      [@optional]
       onAnimationIteration: option(React.Event.Animation.t => unit),
-      [@mel.optional]
+      [@optional]
       onAnimationStart: option(React.Event.Animation.t => unit),
-      [@mel.optional]
+      [@optional]
       onBlur: option(React.Event.Focus.t => unit),
-      [@mel.optional]
+      [@optional]
       onCanPlay: option(React.Event.Media.t => unit),
-      [@mel.optional]
+      [@optional]
       onCanPlayThrough: option(React.Event.Media.t => unit),
-      [@mel.optional]
+      [@optional]
       onChange: option(React.Event.Form.t => unit),
-      [@mel.optional]
+      [@optional]
       onClick: option(React.Event.Mouse.t => unit),
-      [@mel.optional]
+      [@optional]
       onCompositionEnd: option(React.Event.Composition.t => unit),
-      [@mel.optional]
+      [@optional]
       onCompositionStart: option(React.Event.Composition.t => unit),
-      [@mel.optional]
+      [@optional]
       onCompositionUpdate: option(React.Event.Composition.t => unit),
-      [@mel.optional]
+      [@optional]
       onContextMenu: option(React.Event.Mouse.t => unit),
-      [@mel.optional]
+      [@optional]
       onCopy: option(React.Event.Clipboard.t => unit),
-      [@mel.optional]
+      [@optional]
       onCut: option(React.Event.Clipboard.t => unit),
-      [@mel.optional]
+      [@optional]
       onDoubleClick: option(React.Event.Mouse.t => unit),
-      [@mel.optional]
+      [@optional]
       onDrag: option(React.Event.Mouse.t => unit),
-      [@mel.optional]
+      [@optional]
       onDragEnd: option(React.Event.Mouse.t => unit),
-      [@mel.optional]
+      [@optional]
       onDragEnter: option(React.Event.Mouse.t => unit),
-      [@mel.optional]
+      [@optional]
       onDragExit: option(React.Event.Mouse.t => unit),
-      [@mel.optional]
+      [@optional]
       onDragLeave: option(React.Event.Mouse.t => unit),
-      [@mel.optional]
+      [@optional]
       onDragOver: option(React.Event.Mouse.t => unit),
-      [@mel.optional]
+      [@optional]
       onDragStart: option(React.Event.Mouse.t => unit),
-      [@mel.optional]
+      [@optional]
       onDrop: option(React.Event.Mouse.t => unit),
-      [@mel.optional]
+      [@optional]
       onDurationChange: option(React.Event.Media.t => unit),
-      [@mel.optional]
+      [@optional]
       onEmptied: option(React.Event.Media.t => unit),
-      [@mel.optional]
+      [@optional]
       onEncrypetd: option(React.Event.Media.t => unit),
-      [@mel.optional]
+      [@optional]
       onEnded: option(React.Event.Media.t => unit),
-      [@mel.optional]
+      [@optional]
       onError: option(React.Event.Media.t => unit),
-      [@mel.optional]
+      [@optional]
       onFocus: option(React.Event.Focus.t => unit),
-      [@mel.optional]
+      [@optional]
       onInput: option(React.Event.Form.t => unit),
-      [@mel.optional]
+      [@optional]
       onKeyDown: option(React.Event.Keyboard.t => unit),
-      [@mel.optional]
+      [@optional]
       onKeyPress: option(React.Event.Keyboard.t => unit),
-      [@mel.optional]
+      [@optional]
       onKeyUp: option(React.Event.Keyboard.t => unit),
-      [@mel.optional]
+      [@optional]
       onLoadedData: option(React.Event.Media.t => unit),
-      [@mel.optional]
+      [@optional]
       onLoadedMetadata: option(React.Event.Media.t => unit),
-      [@mel.optional]
+      [@optional]
       onLoadStart: option(React.Event.Media.t => unit),
-      [@mel.optional]
+      [@optional]
       onMouseDown: option(React.Event.Mouse.t => unit),
-      [@mel.optional]
+      [@optional]
       onMouseEnter: option(React.Event.Mouse.t => unit),
-      [@mel.optional]
+      [@optional]
       onMouseLeave: option(React.Event.Mouse.t => unit),
-      [@mel.optional]
+      [@optional]
       onMouseMove: option(React.Event.Mouse.t => unit),
-      [@mel.optional]
+      [@optional]
       onMouseOut: option(React.Event.Mouse.t => unit),
-      [@mel.optional]
+      [@optional]
       onMouseOver: option(React.Event.Mouse.t => unit),
-      [@mel.optional]
+      [@optional]
       onMouseUp: option(React.Event.Mouse.t => unit),
-      [@mel.optional]
+      [@optional]
       onPaste: option(React.Event.Clipboard.t => unit),
-      [@mel.optional]
+      [@optional]
       onPause: option(React.Event.Media.t => unit),
-      [@mel.optional]
+      [@optional]
       onPlay: option(React.Event.Media.t => unit),
-      [@mel.optional]
+      [@optional]
       onPlaying: option(React.Event.Media.t => unit),
-      [@mel.optional]
+      [@optional]
       onProgress: option(React.Event.Media.t => unit),
-      [@mel.optional]
+      [@optional]
       onRateChange: option(React.Event.Media.t => unit),
-      [@mel.optional]
+      [@optional]
       onScroll: option(React.Event.UI.t => unit),
-      [@mel.optional]
+      [@optional]
       onSeeked: option(React.Event.Media.t => unit),
-      [@mel.optional]
+      [@optional]
       onSeeking: option(React.Event.Media.t => unit),
-      [@mel.optional]
+      [@optional]
       onSelect: option(React.Event.Selection.t => unit),
-      [@mel.optional]
+      [@optional]
       onStalled: option(React.Event.Media.t => unit),
-      [@mel.optional]
+      [@optional]
       onSubmit: option(React.Event.Form.t => unit),
-      [@mel.optional]
+      [@optional]
       onSuspend: option(React.Event.Media.t => unit),
-      [@mel.optional]
+      [@optional]
       onTimeUpdate: option(React.Event.Media.t => unit),
-      [@mel.optional]
+      [@optional]
       onTouchCancel: option(React.Event.Touch.t => unit),
-      [@mel.optional]
+      [@optional]
       onTouchEnd: option(React.Event.Touch.t => unit),
-      [@mel.optional]
+      [@optional]
       onTouchMove: option(React.Event.Touch.t => unit),
-      [@mel.optional]
+      [@optional]
       onTouchStart: option(React.Event.Touch.t => unit),
-      [@mel.optional]
+      [@optional]
       onTransitionEnd: option(React.Event.Transition.t => unit),
-      [@mel.optional]
+      [@optional]
       onVolumeChange: option(React.Event.Media.t => unit),
-      [@mel.optional]
+      [@optional]
       onWaiting: option(React.Event.Media.t => unit),
-      [@mel.optional]
+      [@optional]
       onWheel: option(React.Event.Wheel.t => unit),
     };
+    [@mel.obj]
+    external makeProps:
+      (
+        ~children: React.element=?,
+        ~as_: string=?,
+        ~innerRef: ReactDOM.domRef=?,
+        ~className: string,
+        unit
+      ) =>
+      makeProps;
     [@mel.module "react"]
     external createVariadicElement: (string, Js.t({..})) => React.element =
       "createElement";
+    [@mel.obj]
+    external makeStylesObject:
+      (
+        ~className: string,
+        ~style: ReactDOM.Style.t,
+        ~ref: option(ReactDOM.domRef)
+      ) =>
+      Js.t({..});
+    [@mel.get] external classNameGet: makeProps => option(string) = "className";
+    [@mel.get]
+    external innerRefGet: makeProps => option(ReactDOM.domRef) = "innerRef";
+    [@mel.get] external as_Get: makeProps => option(string) = "as";
     let getOrEmpty = str =>
       switch (str) {
       | Some(str) => " " ++ str
       | None => ""
       };
-    let deleteProp = [%mel.raw "(newProps, key) => delete newProps[key]"];
-    external assign2: (Js.t({..}), Js.t({..}), Js.t({..})) => Js.t({..}) =
+    external deleteProp: (Js.t({..}), string) => bool =
+      "Reflect.deleteProperty";
+    external assign2: (Js.t({..}), makeProps, Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles =
-      CSS.style([|
-        CSS.label("SingleQuoteStrings"),
-        CSS.display(`flex),
-        CSS.justifyContent(`center),
-      |]);
+      CSS.make(
+        "css-k008qs-SingleQuoteStrings css-1tyndxa-SingleQuoteStrings",
+        [],
+      );
     let make = (props: makeProps) => {
-      let className = styles ++ getOrEmpty(classNameGet(props));
-      let stylesObject = {
-        "className": className,
-        "ref": innerRefGet(props),
-      };
-      let newProps = assign2(Js.Obj.empty(), Obj.magic(props), stylesObject);
-      ignore(deleteProp(. newProps, "innerRef"));
+      let className = fst(styles) ++ getOrEmpty(classNameGet(props))
+      and style = snd(styles);
+      let stylesObject =
+        makeStylesObject(~className, ~style, ~ref=innerRefGet(props));
+      let newProps = assign2(Js.Obj.empty(), props, stylesObject);
+      ignore(deleteProp(newProps, "innerRef"));
       let asTag = as_Get(props);
-      ignore(deleteProp(. newProps, "as"));
+      ignore(deleteProp(newProps, "as"));
       createVariadicElement(
         switch (asTag) {
         | Some(as_) => as_

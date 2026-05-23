@@ -1,4 +1,4 @@
-/* Probe: edge cases of selector interpolation in styled.global2.
+/* Probe: edge cases of selector interpolation in styled.global.
       - Bare $(name) (no leading dot) in type selector position
       - Class interp inside :not(...)
       - Multi-class binding fanning into a chain
@@ -10,7 +10,7 @@ let card = [%css "padding: 10px;"];
 let active = [%css "border: 1px solid;"];
 let bg = CSS.red;
 
-module CardGlobals = [%styled.global2
+module CardGlobals = [%styled.global
   {|
   /* Inside :not */
   body:not(.$(card)) {

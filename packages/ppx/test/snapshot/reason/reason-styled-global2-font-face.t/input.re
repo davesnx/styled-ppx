@@ -1,11 +1,12 @@
-/* @font-face inside [%styled.global2].
+/* @font-face inside [%styled.global].
 
    @font-face is a global at-rule and belongs in the global extraction
    channel. Each @font-face block ships through [@@@css ...] just like
    any other global rule. No runtime side-effects, no global stylesheet
    mutation - the font registers when the extracted .css loads. */
 
-module Fonts = [%styled.global2 {|
+module Fonts = [%styled.global
+  {|
   @font-face {
     font-family: "Inter";
     src: url("/fonts/inter.woff2") format("woff2");
@@ -21,4 +22,5 @@ module Fonts = [%styled.global2 {|
     font-weight: 700;
     font-style: normal;
   }
-|}];
+|}
+];

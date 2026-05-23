@@ -13,14 +13,13 @@ This test ensures the ppx generates improved error messages for invalid payloads
 
 Testing improved error message for list syntax with %cx
   $ dune build
-  File "input.re", line 3, characters 23-25:
-  3 | let invalid_css = [%cx []];
-                             ^^
-  Error: [%cx] expects either a string of CSS or an array of CSS rules.
+  File "input.re", line 3, characters 24-26:
+  3 | let invalid_css = [%css []];
+                              ^^
+  Error: [%css] expects a string of CSS for static extraction.
   
   Example:
-    [%cx "display: block; color: red"]
-    [%cx [|CSS.display(`block), CSS.color(CSS.red)|]]
+    [%css "display: block; color: red"]
   
   More info: https://styled-ppx.vercel.app/reference/cx
   [1]

@@ -1,4 +1,4 @@
-/* Single value interpolation in styled.global2.
+/* Single value interpolation in styled.global.
 
    The static rule extracts as `body{color:var(--var-...)}` (the
    self-reference half). The generated module's `to_string` builds the
@@ -12,9 +12,11 @@
 
 let themeColor = CSS.red;
 
-module ThemeStyles = [%styled.global2 {|
+module ThemeStyles = [%styled.global
+  {|
   body {
     color: $(themeColor);
     margin: 0;
   }
-|}];
+|}
+];

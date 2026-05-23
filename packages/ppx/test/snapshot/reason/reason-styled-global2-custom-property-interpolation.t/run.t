@@ -1,4 +1,4 @@
-Custom-property declarations in [%styled.global2] accept any string
+Custom-property declarations in [%styled.global] accept any string
 interpolation verbatim - no Cascading.toString wrap.
 
   $ refmt --parse re --print ml input.re > output.ml
@@ -18,5 +18,4 @@ interpolation verbatim - no Cascading.toString wrap.
       )
       ++ "}";
     let to_buffer = buf => Buffer.add_string(buf, to_string());
-    let make = () => CSS.global_style_tag(to_string());
   };

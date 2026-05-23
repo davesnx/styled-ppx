@@ -1,4 +1,4 @@
-/* Two styled.global2 modules in one file using the same expression.
+/* Two styled.global modules in one file using the same expression.
 
    Hashing is content-addressed on the OCaml source `accent`, so the
    same `var(--var-<hash>)` is minted in both modules. Each module has
@@ -8,14 +8,18 @@
 
 let accent = CSS.blue;
 
-module HeaderStyles = [%styled.global2 {|
+module HeaderStyles = [%styled.global
+  {|
   header {
     color: $(accent);
   }
-|}];
+|}
+];
 
-module FooterStyles = [%styled.global2 {|
+module FooterStyles = [%styled.global
+  {|
   footer {
     background-color: $(accent);
   }
-|}];
+|}
+];

@@ -1,4 +1,4 @@
-styled.global2 must reject `$(name)` interpolation inside a `url()`
+styled.global must reject `$(name)` interpolation inside a `url()`
 function. CSS does not substitute `var()` inside `url()`, so allowing
 the rewrite would silently emit broken CSS that fails to load the
 resource at runtime. Users should inline the URL as a literal string

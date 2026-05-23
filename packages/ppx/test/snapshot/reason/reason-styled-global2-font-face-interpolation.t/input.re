@@ -8,10 +8,12 @@
 
 let inter_url = "https://cdn.example.com/fonts/inter.woff2";
 
-module Fonts = [%styled.global2 {|
+module Fonts = [%styled.global
+  {|
   @font-face {
     font-family: "Inter";
     src: url($(inter_url)) format("woff2");
     font-display: swap;
   }
-|}];
+|}
+];

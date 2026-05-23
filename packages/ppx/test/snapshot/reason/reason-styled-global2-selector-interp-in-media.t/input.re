@@ -7,7 +7,7 @@
 
 let card = [%css "padding: 8px;"];
 
-module ResponsiveGlobals = [%styled.global2
+module ResponsiveGlobals = [%styled.global
   {|
   .$(card) {
     color: black;

@@ -1,7 +1,7 @@
-/* Invalid property values inside [%styled.global2] should fail before
+/* Invalid property values inside [%styled.global] should fail before
    extraction, matching the [%css] validation path. */
 
-module Global = [%styled.global2 {|
+module Global = [%styled.global {|
   body {
     display: blocki;
   }

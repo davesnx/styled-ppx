@@ -3,7 +3,7 @@
 ## Status
 
 - Implementation reference for the static-extraction pipeline (`[%css]`,
-  `[%styled.global2]`, `[%keyframe]`)
+  `[%styled.global]`, `[%keyframe]`)
 - Companion to `documents/design.md` (high-level CSS pipeline) and
   `documents/cross-module-selector-interpolation.md` (the cross-module
   resolution layer)
@@ -16,7 +16,7 @@ runtime calls that mint CSS strings on first use:
 | Extension              | What it extracts                                                       |
 | ---------------------- | ---------------------------------------------------------------------- |
 | `[%css]`               | Class-scoped declaration lists, one atomized rule per declaration       |
-| `[%styled.global2]`    | Top-level global rules and at-rules: `@font-face`, `@media`, `:root` custom properties, and any document-level selectors (no class scoping) |
+| `[%styled.global]`    | Top-level global rules and at-rules: `@font-face`, `@media`, `:root` custom properties, and any document-level selectors (no class scoping) |
 | `[%keyframe]`         | `@keyframes` blocks, named by content hash                             |
 
 For all three, the PPX renders the resulting CSS to a string at compile
@@ -35,7 +35,7 @@ emit runtime `CSS.*` calls instead, and are not covered by this document.
   │
   ▼
 PPX expansion (per compilation unit)
-  ─ parse [%css "..."] / [%styled.global2 "..."] / [%keyframe "..."]
+  ─ parse [%css "..."] / [%styled.global "..."] / [%keyframe "..."]
   ─ atomize, hash, mint class names
   ─ resolve same-module $(name) selector interpolations
   ─ buffer rendered rules; record cross-module refs as sentinels
@@ -156,19 +156,19 @@ entry per declaration (each declaration becomes its own class). Cleared
 at end-of-CU when `Css_file.get()` returns the rules to the impl
 transformer.
 
-`[%styled.global2]` writes through `Buffer.add_global_rule`; the global
+`[%styled.global]` writes through `Buffer.add_global_rule`; the global
 rules are kept separate so they always sort before per-class rules in
 the final stylesheet (see `Buffer.get_rules`).
 
 #### `@font-face`
 
-`@font-face` is a global at-rule and belongs in `[%styled.global2]`.
+`@font-face` is a global at-rule and belongs in `[%styled.global]`.
 The runtime `CSS.fontFace` helper exists for the dynamic path (it
 mutates the runtime stylesheet on first call) but for static
 extraction the canonical form is:
 
 ```reason
-module Fonts = [%styled.global2 {|
+module Fonts = [%styled.global {|
   @font-face {
     font-family: "Inter";
     src: url("/fonts/inter.woff2") format("woff2");

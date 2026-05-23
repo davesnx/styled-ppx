@@ -16,7 +16,7 @@ property parsing, runtime expression generation, unsupported fallback behavior,
 custom property escape handling, and property dispatch all live in one Module.
 
 Static extraction has a related locality problem. `[%css]` and
-`[%styled.global2]` deduplicate interpolated values by the generated CSS custom
+`[%styled.global]` deduplicate interpolated values by the generated CSS custom
 property name. That name is derived from the OCaml expression source, not from the
 CSS property context or resolved runtime type. The checked-in regression tests
 `reason-cx2-cross-property-dedup-regression.t` and
@@ -29,7 +29,7 @@ The same CSS concept therefore leaks across several seams:
 
 - `packages/css-grammar/lib/Properties/*.ml` validates and infers interpolation types.
 - `packages/ppx/src/Css_file.re` chooses static custom property names and records dynamic vars.
-- `packages/ppx/src/Css_global_to_string.re` emits runtime `toString` calls for `[%styled.global2]`.
+- `packages/ppx/src/Css_global_to_string.re` emits runtime `toString` calls for `[%styled.global]`.
 - `packages/ppx/src/Css_to_runtime.re` emits runtime values for `[%css]`.
 - `packages/ppx/src/Property_to_runtime.re` lowers `%css` values to runtime declarations.
 - `packages/runtime/native/shared/Css_types.ml` and `Declarations.ml` define the runtime value and declaration surface.
@@ -161,7 +161,7 @@ For `[%css]`:
 - Same binding in `margin-left` and `padding-left` should produce separate CSS custom properties or a shared identity only if the resolved runtime type is proven compatible.
 - Generated runtime code should call the correct `toString` for each context.
 
-For `[%styled.global2]`:
+For `[%styled.global]`:
 
 - Same binding in `background` and `color` should not reuse a single `Background.toString` result for both declarations.
 - Generated `to_string` should emit one declaration per distinct interpolation identity.
@@ -172,7 +172,7 @@ Use layered tests, with the Interface as the test surface:
 
 - Property family tests: validate grammar, interpolation type inference, runtime lowering, and unsupported fallback decisions together.
 - Static extraction identity tests: assert identity construction and deduplication without requiring full snapshot output.
-- PPX snapshots: keep representative `[%css]`, `[%styled.global2]`, and `%css` snapshots for generated code compatibility.
+- PPX snapshots: keep representative `[%css]`, `[%styled.global]`, and `%css` snapshots for generated code compatibility.
 - Aggregator tests: keep protocol and sentinel tests in `packages/generate/test` focused on cross-module resolution, not property typing.
 
 ## Non-Goals

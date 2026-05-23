@@ -10,7 +10,7 @@ See also:
 
 - `documents/primitives.md` — shared glossary used in this document.
 - `documents/css-extraction.md` — wire protocol and aggregator for
-  the static-extraction family (`[%css]`, `[%styled.global2]`,
+  the static-extraction family (`[%css]`, `[%styled.global]`,
   `[%keyframe]`), including cross-module selector resolution
   (sentinel format and aggregator behavior).
 - `documents/runtime-lowering-and-interpolation-identity.md` — migration
@@ -74,16 +74,16 @@ CSS.
 This path still depends on reparsing value strings when interpolation typing or
 property validation is needed.
 
-### `[%styled.global2]`
+### `[%styled.global]`
 
 Shares the cx2 front-end (parsing + interpolation typing) and reuses
 `Css_file.transform_rule` for both value-interpolation and
 selector-interpolation walks. Differs from `[%css]` in two ways:
 
 - Registered as a **Module_expr-context** extension (`module Foo =
-  [%styled.global2 ...]`), not Expression. The Expression-context
+  [%styled.global ...]`), not Expression. The Expression-context
   registration exists only to fire a migration error for the legacy
-  `let () = [%styled.global2 ...]` shape.
+  `let () = [%styled.global ...]` shape.
 - Splits each interpolated rule into two complementary outputs:
   the static rule with `var(--var-<hash>)` substituted in value
   positions and resolved class chains substituted in selector
@@ -100,7 +100,7 @@ selector-interpolation walks. Differs from `[%css]` in two ways:
 ```reason
 let themeColor = CSS.red;
 
-module ThemeStyles = [%styled.global2 {|
+module ThemeStyles = [%styled.global {|
   body {
     color: $(themeColor);
     margin: 0;
@@ -148,7 +148,7 @@ an empty `<style>`. All CSS lives in the static stylesheet.
 #### Pipeline
 
 ```
-module Foo = [%styled.global2 {| ... |}]
+module Foo = [%styled.global {| ... |}]
   │
   ▼
 Css_file.push_global ~file rule_list:
@@ -208,7 +208,7 @@ OCaml expression source. Same expression across blocks shares a var
 
 #### Selector interpolation
 
-`[%styled.global2]` reuses `Css_transform.transform_rule` from
+`[%styled.global]` reuses `Css_transform.transform_rule` from
 `[%css]`, so every selector form `[%css]` supports works inside a
 global block too:
 
@@ -216,7 +216,7 @@ global block too:
 let card = [%css "padding: 10px;"];
 let active = [%css "border: 1px solid;"];
 
-module Theme = [%styled.global2 {|
+module Theme = [%styled.global {|
   /* Bare $(name) - resolves to a class type-selector */
   body $(card) { line-height: 1.5; }
 
@@ -278,7 +278,7 @@ Workaround:
 
 ```reason
 let primaryStr = CSS.Types.Color.toString(CSS.red);
-module ThemeStyles = [%styled.global2 {|
+module ThemeStyles = [%styled.global {|
   :root { --primary: $(primaryStr); }
 |}];
 ```
@@ -301,7 +301,7 @@ module ThemeStyles = [%styled.global2 {|
 | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `packages/ppx/src/ppx.re`                       | Two extensions: Module_expr-context (does the work) and Expression-context (migration error).                                                                                                                                       |
 | `packages/ppx/src/Css_file.re`                  | `push_global ~file rule_list` returns the list of `dynamic_vars` collected across all rules; pushes the static rules (with `var(--var-<hash>)` already substituted) into the global buffer.                                         |
-| `packages/ppx/src/Local_selector_environment.re` | Per-CU selector environment used by `[%css]` and `[%styled.global2]` for same-file selector interpolation, module aliases, opens/includes, and cross-module fallback.                                                               |
+| `packages/ppx/src/Local_selector_environment.re` | Per-CU selector environment used by `[%css]` and `[%styled.global]` for same-file selector interpolation, module aliases, opens/includes, and cross-module fallback.                                                               |
 | `packages/ppx/src/Css_global_to_string.re`      | `render_root_block ~loc dynamic_vars` builds the `to_string` body: a single `:root { ... }` rule with one declaration per entry, or `""` when `dynamic_vars` is empty.                                                              |
 | `packages/runtime/{native,melange}/CSS.ml`      | `CSS.global_style_tag : string -> React.element`.                                                                                                                                                                                   |
 
@@ -312,7 +312,7 @@ module ThemeStyles = [%styled.global2 {|
 - **No target branching in the PPX.** Same module on every target;
   both runtimes provide `CSS.global_style_tag`.
 - **No backward-compat for the legacy shape.** Hard error on
-  `let () = [%styled.global2 ...]`.
+  `let () = [%styled.global ...]`.
 - **No labeled-arg synthesis on `make`.** In-scope capture matches
   `[%css]`.
 - **No `--*` typing fix.** Pre-existing gap, separate change.

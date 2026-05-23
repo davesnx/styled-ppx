@@ -1,4 +1,4 @@
-/* styled.global2 with no interpolations.
+/* styled.global with no interpolations.
 
    Pure static block: every rule rides on the [@@@css ...] channel,
    to_string returns "" (no dynamic_rules to render), and make produces
@@ -6,7 +6,8 @@
    still call ThemeStyles.to_string () or mount <ThemeStyles.make />,
    they'll just get an empty CSS string back. */
 
-module ResetStyles = [%styled.global2 {|
+module ResetStyles = [%styled.global
+  {|
   html {
     box-sizing: border-box;
   }
@@ -17,4 +18,5 @@ module ResetStyles = [%styled.global2 {|
   *, *::before, *::after {
     box-sizing: inherit;
   }
-|}];
+|}
+];

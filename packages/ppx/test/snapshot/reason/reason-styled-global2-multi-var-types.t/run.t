@@ -46,5 +46,4 @@
       )
       ++ "}";
     let to_buffer = buf => Buffer.add_string(buf, to_string());
-    let make = () => CSS.global_style_tag(to_string());
   };

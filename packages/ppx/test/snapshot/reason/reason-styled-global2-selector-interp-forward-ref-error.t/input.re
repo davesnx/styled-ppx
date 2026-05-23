@@ -1,4 +1,4 @@
-module Globals = [%styled.global2 {|
+module Globals = [%styled.global {|
   .$(later) {
     color: red;
   }

@@ -1,9 +1,10 @@
 /* Probe: every selector form supported by the parser, in
-   styled.global2 context. Used to capture current behavior. */
+   styled.global context. Used to capture current behavior. */
 
 let accent = CSS.red;
 
-module AllSelectors = [%styled.global2 {|
+module AllSelectors = [%styled.global
+  {|
   /* Type */
   body { color: $(accent); }
 
@@ -56,4 +57,5 @@ module AllSelectors = [%styled.global2 {|
 
   /* Universal + complex */
   *, *::before, *::after { box-sizing: inherit; }
-|}];
+|}
+];
