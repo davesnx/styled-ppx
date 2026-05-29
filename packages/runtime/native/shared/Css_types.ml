@@ -934,15 +934,19 @@ end
 module AnimationName : sig
   type t
 
-  val make : string -> t
+  val make : ?vars:(string * string) list -> string -> t
   val none : t
   val toString : t -> string
+  val vars : t -> (string * string) list
+  val toStyleVars : string -> t -> (string * string) list
 end = struct
-  type t = string
+  type t = { name : string; vars : (string * string) list }
 
-  let make x = x
-  let none = {js|none|js}
-  let toString x = x
+  let make ?(vars = []) name = { name; vars }
+  let none = make {js|none|js}
+  let toString x = x.name
+  let vars x = x.vars
+  let toStyleVars property_name x = (property_name, toString x) :: vars x
 end
 
 module AnimationDirection = struct

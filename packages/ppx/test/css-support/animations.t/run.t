@@ -141,6 +141,15 @@ If this test fail means that the module is not in sync with the ppx
   [@css
     ".css-1e29gym{-webkit-animation:a 300ms linear 400ms infinite reverse forwards running;animation:a 300ms linear 400ms infinite reverse forwards running;}"
   ];
+  [@css
+    "@keyframes keyframe-1oa7t9p{0%{height:var(--var-osa9cs) ;}100%{height:var(--var-1oc54wd) ;}}"
+  ];
+  [@css
+    ".css-1h7bkao{-webkit-animation-name:var(--var-13rzk8w);animation-name:var(--var-13rzk8w);}"
+  ];
+  [@css
+    ".css-1bi7afk{-webkit-animation:var(--var-13rzk8w) 180ms ease-out 0s 1 normal both;animation:var(--var-13rzk8w) 180ms ease-out 0s 1 normal both;}"
+  ];
   let foo = CSS.Types.AnimationName.make("keyframe-c958s");
   let bar = CSS.Types.AnimationName.make("keyframe-c958s");
   
@@ -148,14 +157,12 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-1b4du2s", []);
   CSS.make(
     "css-ixbkch",
-    [("--var-13g64p", CSS.Types.AnimationName.toString(foo))],
+    CSS.Types.AnimationName.toStyleVars("--var-13g64p", foo),
   );
   CSS.make(
     "css-bcfqed",
-    [
-      ("--var-13g64p", CSS.Types.AnimationName.toString(foo)),
-      ("--var-rgjxtb", CSS.Types.AnimationName.toString(bar)),
-    ],
+    CSS.Types.AnimationName.toStyleVars("--var-13g64p", foo)
+    @ CSS.Types.AnimationName.toStyleVars("--var-rgjxtb", bar),
   );
   CSS.make("css-k2nfq1", []);
   CSS.make("css-kniaw8", []);
@@ -198,3 +205,25 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-bshgs5", []);
   CSS.make("css-1jo1me1", []);
   CSS.make("css-1e29gym", []);
+  
+  let previousHeight = 20;
+  let currentHeight = 80;
+  let previous = `px(previousHeight);
+  let current = `px(currentHeight);
+  let resize =
+    CSS.Types.AnimationName.make(
+      ~vars=[
+        ("--var-osa9cs", CSS.Types.Height.toString(previous)),
+        ("--var-1oc54wd", CSS.Types.Height.toString(current)),
+      ],
+      "keyframe-1oa7t9p",
+    );
+  
+  CSS.make(
+    "css-1h7bkao",
+    CSS.Types.AnimationName.toStyleVars("--var-13rzk8w", resize),
+  );
+  CSS.make(
+    "css-1bi7afk",
+    CSS.Types.AnimationName.toStyleVars("--var-13rzk8w", resize),
+  );

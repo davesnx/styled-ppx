@@ -993,7 +993,7 @@
     let styles =
       CSS.make(
         "css-dy0iev-FadeIn",
-        [("--var-1a009jy", CSS.Types.AnimationName.toString(animation))],
+        CSS.Types.AnimationName.toStyleVars("--var-1a009jy", animation),
       );
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(classNameGet(props))

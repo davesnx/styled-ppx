@@ -34,6 +34,102 @@ let render_variable = (~loc, v) => {
   };
 };
 
+let list_append = (~loc, left, right) => {
+  let append_fn =
+    {
+      txt: Lident("@"),
+      loc,
+    }
+    |> Helper.Exp.ident(~loc);
+  Helper.Exp.apply(~loc, append_fn, [(Nolabel, left), (Nolabel, right)]);
+};
+
+let concat_list_exprs = (~loc, chunks) =>
+  switch (chunks) {
+  | [] => Builder.elist(~loc, [])
+  | [single] => single
+  | [head, ...tail] =>
+    List.fold_left((acc, chunk) => list_append(~loc, acc, chunk), head, tail)
+  };
+
+let animation_name_to_style_vars = (~loc) =>
+  Builder.pexp_ident(
+    ~loc,
+    {
+      txt:
+        Ldot(
+          Ldot(Ldot(Lident("CSS"), "Types"), "AnimationName"),
+          "toStyleVars",
+        ),
+      loc,
+    },
+  );
+
+let is_animation_name_var = ((_, _, var_type: Css_file.var_type)) =>
+  switch (var_type) {
+  | RuntimeModule("AnimationName") => true
+  | _ => false
+  };
+
+let render_dynamic_var_tuple =
+    (~loc, (var_name, original_path, var_type: Css_file.var_type)) => {
+  let field_name = "--" ++ var_name;
+  let field_name_expr =
+    Helper.Exp.constant(~loc, Pconst_string(field_name, loc, None));
+
+  let var_value = render_variable(~loc, original_path);
+
+  let field_value =
+    switch (var_type) {
+    | Selector
+    | MediaQuery => [%expr fst([%e var_value])]
+    | CustomProperty =>
+      /* `--foo: $(expr)` - expr is already a [string], pass it
+         through verbatim. Type error here means the user supplied a
+         non-string to a custom-property interpolation. */
+      var_value
+    | RuntimeModule(module_name) =>
+      Property_to_types.make_to_string_call(~loc, module_name, var_value)
+    };
+
+  Builder.pexp_tuple(~loc, [field_name_expr, field_value]);
+};
+
+let render_dynamic_var_chunk =
+    (~loc, (var_name, original_path, var_type: Css_file.var_type)) => {
+  switch (var_type) {
+  | RuntimeModule("AnimationName") =>
+    let field_name = "--" ++ var_name;
+    let field_name_expr =
+      Helper.Exp.constant(~loc, Pconst_string(field_name, loc, None));
+    let var_value = render_variable(~loc, original_path);
+    Helper.Exp.apply(
+      ~loc,
+      animation_name_to_style_vars(~loc),
+      [(Nolabel, field_name_expr), (Nolabel, var_value)],
+    )
+  | Selector
+  | MediaQuery
+  | CustomProperty
+  | RuntimeModule(_) =>
+    Builder.elist(
+      ~loc,
+      [render_dynamic_var_tuple(~loc, (var_name, original_path, var_type))],
+    );
+  };
+};
+
+let render_dynamic_var_list = (~loc, dynamic_vars) =>
+  if (!List.exists(is_animation_name_var, dynamic_vars)) {
+    dynamic_vars
+    |> List.map(dynamic_var => render_dynamic_var_tuple(~loc, dynamic_var))
+    |> Builder.elist(~loc);
+  } else {
+    dynamic_vars
+    |> List.map(dynamic_var => render_dynamic_var_chunk(~loc, dynamic_var))
+    |> concat_list_exprs(~loc);
+  };
+
 let source_code_of_loc = (~source, loc: Ppxlib.Location.t) => {
   let utf8_byte_offset = (source, target_chars) => {
     let rec loop = (byte_index, char_index) =>
@@ -636,34 +732,7 @@ let render_make_call =
   let className_expr =
     Helper.Exp.constant(~loc, Pconst_string(className_string, loc, None));
 
-  let var_list =
-    dynamic_vars
-    |> List.map(((var_name, original_path, var_type: Css_file.var_type)) => {
-         let field_name = "--" ++ var_name;
-         let field_name_expr =
-           Helper.Exp.constant(~loc, Pconst_string(field_name, loc, None));
+  let var_list = render_dynamic_var_list(~loc, dynamic_vars);
 
-          let var_value = render_variable(~loc, original_path);
-
-         let field_value =
-           switch (var_type) {
-           | Selector
-           | MediaQuery => [%expr fst([%e var_value])]
-           | CustomProperty =>
-             /* `--foo: $(expr)` - expr is already a [string], pass it
-                through verbatim. Type error here means the user supplied a
-                non-string to a custom-property interpolation. */
-             var_value
-           | RuntimeModule(module_name) =>
-             Property_to_types.make_to_string_call(
-               ~loc,
-               module_name,
-               var_value,
-             )
-           };
-
-         Builder.pexp_tuple(~loc, [field_name_expr, field_value]);
-       });
-
-  [%expr CSS.make([%e className_expr], [%e Builder.elist(~loc, var_list)])];
+  [%expr CSS.make([%e className_expr], [%e var_list])];
 };

@@ -50,8 +50,18 @@ let bar = [%keyframe {|0% { opacity: 0.0 } 100% { opacity: 1.0 }|}];
 [%css "animation: 4s ease-in 1s infinite reverse both paused"];
 [%css "animation: a 300ms linear 400ms infinite reverse forwards running"];
 
-/* Shorthand with interpolated name — NOT supported.
-   Interpolation in animation shorthand is typed as Animation.Value.t (the whole
-   shorthand type), so you can't interpolate just AnimationName.t within it.
-   Use the longhand animation-name property for name interpolation instead. */
+/* Shorter shorthand forms with interpolated names are not supported yet. Use the
+   explicit leading-name form below when keyframes need runtime variables. */
 /* [%css {|animation: $(foo) 1s ease-in|}]; */
+
+let previousHeight = 20;
+let currentHeight = 80;
+let previous = `px(previousHeight);
+let current = `px(currentHeight);
+let resize = [%keyframe {|
+  0% { height: $(previous) }
+  100% { height: $(current) }
+|}];
+
+[%css {|animation-name: $(resize)|}];
+[%css {|animation: $(resize) 180ms ease-out 0s 1 normal both|}];

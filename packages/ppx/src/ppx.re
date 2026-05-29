@@ -458,7 +458,7 @@ let expand_global_module = (~file, ~scope, ~opens, payload) => {
   };
 };
 
-let expand_keyframe_expression = (~file, payload: Ppxlib.expression) => {
+let expand_keyframe_expression = (~file, ~scope, ~opens, payload: Ppxlib.expression) => {
   open Ppxlib;
   File.set(file);
   switch (payload.pexp_desc) {
@@ -470,13 +470,18 @@ let expand_keyframe_expression = (~file, payload: Ppxlib.expression) => {
       );
     switch (Styled_ppx_css_parser.Driver.parse_keyframes(~loc, txt)) {
     | Ok(declarations) =>
-      let keyframe_name = Css_file.push_keyframe(declarations);
+      let (keyframe_name, dynamic_vars) =
+        Css_file.push_keyframe(~file, ~scope, ~opens, declarations);
       let loc = stringLoc;
-      [%expr
-       CSS.Types.AnimationName.make(
-         [%e Builder.estring(~loc, keyframe_name)],
-       )
-      ];
+      let keyframe_name_expr = Builder.estring(~loc, keyframe_name);
+      switch (dynamic_vars) {
+      | [] => [%expr CSS.Types.AnimationName.make([%e keyframe_name_expr])]
+      | _ =>
+        let var_list = Css_to_runtime.render_dynamic_var_list(~loc, dynamic_vars);
+        [%expr
+         CSS.Types.AnimationName.make(~vars=[%e var_list], [%e keyframe_name_expr])
+        ];
+      };
     | Error((loc, msg)) => Error.expr(~loc, msg)
     };
   | _ =>
@@ -629,17 +634,6 @@ let register_string_binding = (~file, ~scope, ~name, expr: Ppxlib.expression) =>
   | _ => ()
   };
 
-let lower_styles_prop = (~loc, expr) => [
-  (Ppxlib.Asttypes.Labelled("className"), [%expr fst([%e expr])]),
-  (Ppxlib.Asttypes.Labelled("style"), [%expr snd([%e expr])]),
-];
-
-let lower_styles_arg = (~loc, (label, expr)) =>
-  switch (label) {
-  | Ppxlib.Asttypes.Labelled("styles") => lower_styles_prop(~loc, expr)
-  | _ => [(label, expr)]
-  };
-
 let map_css_expressions =
     (~file, ~main_module, ~scope, ~opens, ~top_binding, expr) => {
   let rec map_with_label = (~label_name, expr) => {
@@ -652,11 +646,18 @@ let map_css_expressions =
           let fn = self#expression(fn);
           let args =
             args
-            |> List.map(((label, arg)) => (label, self#expression(arg)))
-            |> List.concat_map(lower_styles_arg(~loc=expr.pexp_loc));
+            |> List.map(((label, arg)) => (label, self#expression(arg)));
           {
             ...expr,
-            pexp_desc: Pexp_apply(fn, args),
+            pexp_desc:
+              Pexp_apply(
+                fn,
+                Expand_styles_attribute.make(
+                  ~loc=expr.pexp_loc,
+                  ~apply_expr=expr,
+                  args,
+                ),
+              ),
           };
         | Pexp_extension(({ txt: "css", _ }, payload)) =>
           switch (payload_expr(payload)) {
@@ -674,7 +675,8 @@ let map_css_expressions =
           }
         | Pexp_extension(({ txt: "keyframe", _ }, payload)) =>
           switch (payload_expr(payload)) {
-          | Some(payload) => expand_keyframe_expression(~file, payload)
+          | Some(payload) =>
+            expand_keyframe_expression(~file, ~scope, ~opens, payload)
           | None =>
             Error.raise(
               ~loc=expr.pexp_loc,

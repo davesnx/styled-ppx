@@ -953,11 +953,24 @@ let push =
   (classNames, dynamic_vars);
 };
 
-let push_keyframe = (keyframe_rules: Styled_ppx_css_parser.Ast.rule_list) => {
+let push_keyframe =
+    (
+      ~file,
+      ~scope: list(string),
+      ~opens: list(list(string)),
+      keyframe_rules: Styled_ppx_css_parser.Ast.rule_list,
+    ) => {
   open Styled_ppx_css_parser.Ast;
 
-  let (rules, _) = keyframe_rules;
-  let rendered_body = rules |> List.map(render_rule) |> String.concat(" ");
+  let (rules, rule_loc) = keyframe_rules;
+  let dynamic_vars = ref([]);
+  let transformed_rules =
+    rules
+    |> List.map(rule =>
+         Css_transform.transform_rule(~file, ~scope, ~opens, rule, dynamic_vars)
+       );
+  let rendered_body =
+    transformed_rules |> List.map(render_rule) |> String.concat(" ");
 
   let keyframe_name =
     Printf.sprintf("keyframe-%s", Murmur2.default(rendered_body));
@@ -968,7 +981,7 @@ let push_keyframe = (keyframe_rules: Styled_ppx_css_parser.Ast.rule_list) => {
       [(Ident(keyframe_name), Ppxlib.Location.none)],
       Ppxlib.Location.none,
     ),
-    block: Rule_list(keyframe_rules),
+    block: Rule_list((transformed_rules, rule_loc)),
     loc: Ppxlib.Location.none,
   };
 
@@ -976,7 +989,7 @@ let push_keyframe = (keyframe_rules: Styled_ppx_css_parser.Ast.rule_list) => {
 
   Buffer.add_rule(keyframe_name, rendered_keyframe);
 
-  keyframe_name;
+  (keyframe_name, List.rev(dynamic_vars^));
 };
 
 /* Walk every rule in a [%styled.global] block, substitute

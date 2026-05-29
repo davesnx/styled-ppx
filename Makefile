@@ -53,7 +53,7 @@ install: ## Install project dependencies
 
 .PHONY: pin
 pin: ## pin
-	opam pin add server-reason-react.0.4.1 "https://github.com/ml-in-barcelona/server-reason-react.git#c9ab81197425d31a3deb03491871bab9dce5cb07" -y
+	opam pin add server-reason-react.0.4.1 "https://github.com/ml-in-barcelona/server-reason-react.git#030128b2245dbc4775c0355ff5225f371e2a9395" -y
 
 .PHONY: init
 init: setup-githooks create-switch pin install ## Create a local dev enviroment

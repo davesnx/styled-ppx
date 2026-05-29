@@ -322,8 +322,13 @@ module ThemeStyles = [%styled.global {|
 ### `[%keyframe]`
 
 Shares the cx2 front-end and extracts `@keyframes` blocks named by
-content hash. No interpolation support today. Covered briefly in
-`documents/css-extraction.md`.
+content hash. Value interpolation in keyframe declarations is lowered to
+CSS custom properties in the extracted `@keyframes` rule, while the generated
+`AnimationName.t` carries the runtime custom-property bindings that
+`animation-name` and supported leading-name `animation` shorthand interpolation
+merge into the consuming element's `CSS.make` vars. Covered briefly in
+`documents/css-extraction.md` and in more detail in
+`documents/keyframe-static-extraction.md`.
 
 ## Direction
 

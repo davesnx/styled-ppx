@@ -95,10 +95,60 @@ let gradiend = [%css
     |}
 ];
 
+let keyframeDemoShell = [%css
+  {|
+    margin: 24px 10px;
+    padding: 24px;
+    border: 2px solid #141414;
+    border-radius: 18px;
+    background: #f6f1e8;
+    color: #141414;
+    font-family: "Menlo", "monospace";
+  |}
+];
+
+let keyframeDemoCard = {
+  let previousHeight = 72;
+  let currentHeight = 172;
+  let previous = `px(previousHeight);
+  let current = `px(currentHeight);
+  let resize = [%keyframe {|
+    0% { height: $(previous); }
+    100% { height: $(current); }
+  |}];
+
+  [%css {|
+    animation-name: $(resize);
+    animation-duration: 1200ms;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: both;
+    width: 280px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #101828 0%, #364152 100%);
+    color: white;
+    box-shadow: 0 20px 40px rgba(16, 24, 40, 0.22);
+  |}];
+};
+
 [@react.component]
 let make = () =>
   <main styles=gradiend>
     <div styles=Universal.classname>
+      <section styles=keyframeDemoShell>
+        <h2> {React.string("Interpolated keyframe demo")} </h2>
+        <p>
+          {React.string(
+             "The keyframe is extracted globally, while previous/current heights are applied as element-scoped CSS variables.",
+           )}
+        </p>
+        <div styles=keyframeDemoCard>
+          {React.string("height: 72px -> 172px")}
+        </div>
+      </section>
       <div styles=post>
         <div styles={CSS.merge(card, container)}>
           <h2> {React.string("Card title")} </h2>
