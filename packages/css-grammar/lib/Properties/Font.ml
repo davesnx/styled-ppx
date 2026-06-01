@@ -13,7 +13,7 @@ let property_font : property_font Rule.rule = Property_font.rule
 
 module Property_font_family =
   [%spec_module
-  "<font_families> | <interpolation>", (module Css_types.FontFamily)]
+  "<font_families> | <interpolation>", (module Css_types.FontFamilies)]
 
 let property_font_family : property_font_family Rule.rule =
   Property_font_family.rule

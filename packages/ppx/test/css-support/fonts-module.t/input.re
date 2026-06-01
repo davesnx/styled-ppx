@@ -2,15 +2,18 @@
    Without these, `dune build` would fail with "Unbound value fonts"
    while `dune describe pp` would still produce codegen referencing
    them — leaving the snapshot internally contradictory. */
-let fonts: CSS.Types.FontFamily.t =
-  `list([|`quoted("Inter"), `quoted("Sans")|]);
+let fonts: array(CSS.Types.FontFamilyName.t) = [|
+  `quoted("Inter"),
+  `quoted("Sans"),
+|];
+let fontStack: array(CSS.Types.FontFamilyName.t) = [|`quoted("Inter")|];
 let font: CSS.Types.FontFamily.t = `quoted("Inter");
 
 /* CSS Fonts Module Level 2 */
 [%css {|font-family: "Inter Semi Bold";|}];
 [%css {|font-family: $(fonts);|}];
 [%css {|font-family: Inter;|}];
-[%css {|font-family: $(font);|}];
+[%css {|font-family: $(fontStack);|}];
 [%css {|font-family: Inter, Sans;|}];
 [%css {|font-family: Inter, $(font);|}];
 [%css {|font-family: "Gill Sans Extrabold", sans-serif;|}];

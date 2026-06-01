@@ -4209,6 +4209,13 @@ module FontFamilyName = struct
       | _ -> ({js|"|js} ^ s) ^ {js|"|js})
 end
 
+module FontFamilies = struct
+  type t = FontFamilyName.t array
+
+  let toString xs =
+    Kloth.Array.map_and_join ~sep:{js|, |js} ~f:FontFamilyName.toString xs
+end
+
 module FontDisplay = struct
   type t =
     [ Auto.t
@@ -5807,7 +5814,7 @@ end
 module FontFamily = struct
   type t =
     [ FontFamilyName.t
-    | `list of FontFamilyName.t array
+    | `list of FontFamilies.t
     | Var.t
     | Cascading.t
     ]
@@ -5819,8 +5826,7 @@ module FontFamily = struct
     | #Var.t as var -> Var.toString var
     | #Cascading.t as c -> Cascading.toString c
     | #FontFamilyName.t as name -> FontFamilyName.toString name
-    | `list xs ->
-      Kloth.Array.map_and_join ~sep:{js|, |js} ~f:FontFamilyName.toString xs
+    | `list xs -> FontFamilies.toString xs
 end
 
 module FontSize = struct

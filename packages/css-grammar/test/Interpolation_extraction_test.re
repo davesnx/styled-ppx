@@ -113,6 +113,16 @@ let test_font_family_partial_interp = () => {
   );
 };
 
+let test_font_family_full_interp = () => {
+  let result = infer_interpolation_types("font-family", "$(fonts)");
+
+  Alcotest.(check(list(pair(string, string))))(
+    "font-family full interpolation uses FontFamilies context",
+    [("fonts", "Css_types.FontFamilies")],
+    result,
+  );
+};
+
 let test_flex_duplicate_interpolation_names = () => {
   let result = infer_interpolation_types("flex", "$(value) $(value)");
 
@@ -311,6 +321,11 @@ let tests = [
         "font-family partial interpolation",
         `Quick,
         test_font_family_partial_interp,
+      ),
+      Alcotest.test_case(
+        "font-family full interpolation",
+        `Quick,
+        test_font_family_full_interp,
       ),
       Alcotest.test_case(
         "flex duplicate interpolation names",

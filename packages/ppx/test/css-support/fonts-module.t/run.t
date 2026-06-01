@@ -18,7 +18,7 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-1l2838t{font-family:\"Inter Semi Bold\";}"];
   [@css ".css-1wpww9k{font-family:var(--var-rwkopp);}"];
   [@css ".css-13c8hy8{font-family:Inter;}"];
-  [@css ".css-1rli4v6{font-family:var(--var-1kuyir6);}"];
+  [@css ".css-1sbj23c{font-family:var(--var-zty1s5);}"];
   [@css ".css-38zhkv{font-family:Inter, Sans;}"];
   [@css ".css-e4l4c9{font-family:Inter, var(--var-1kuyir6);}"];
   [@css ".css-zpvvt7{font-family:\"Gill Sans Extrabold\", sans-serif;}"];
@@ -146,19 +146,22 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-1ucpmmf{font-feature-settings:\"liga\" off;}"];
   [@css ".css-180vt2s{font-feature-settings:\"smcp\", \"swsh\" 2;}"];
   
-  let fonts: CSS.Types.FontFamily.t =
-    `list([|`quoted("Inter"), `quoted("Sans")|]);
+  let fonts: array(CSS.Types.FontFamilyName.t) = [|
+    `quoted("Inter"),
+    `quoted("Sans"),
+  |];
+  let fontStack: array(CSS.Types.FontFamilyName.t) = [|`quoted("Inter")|];
   let font: CSS.Types.FontFamily.t = `quoted("Inter");
   
   CSS.make("css-1l2838t", []);
   CSS.make(
     "css-1wpww9k",
-    [("--var-rwkopp", CSS.Types.FontFamily.toString(fonts))],
+    [("--var-rwkopp", CSS.Types.FontFamilies.toString(fonts))],
   );
   CSS.make("css-13c8hy8", []);
   CSS.make(
-    "css-1rli4v6",
-    [("--var-1kuyir6", CSS.Types.FontFamily.toString(font))],
+    "css-1sbj23c",
+    [("--var-zty1s5", CSS.Types.FontFamilies.toString(fontStack))],
   );
   CSS.make("css-38zhkv", []);
   CSS.make(

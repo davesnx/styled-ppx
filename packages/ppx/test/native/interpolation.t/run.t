@@ -89,7 +89,7 @@ Interpolation native PPX transformations are checked as a cram snapshot.
   let height = `px(80);
   let border = `px(4);
   let font = `px(16);
-  let mono: CSS.Types.FontFamily.t = `quoted("Mono");
+  let mono: array(CSS.Types.FontFamilyName.t) = [|`quoted("Mono")|];
   let lh = `abs(1.5);
   let zLevel = `num(10);
   let left = `px(12);
@@ -171,7 +171,7 @@ Interpolation native PPX transformations are checked as a cram snapshot.
   let _ =
     CSS.make(
       "css-16nszir",
-      [("--var-le3b27", CSS.Types.FontFamily.toString(mono))],
+      [("--var-le3b27", CSS.Types.FontFamilies.toString(mono))],
     );
   let _ =
     CSS.make(
