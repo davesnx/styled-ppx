@@ -10,7 +10,7 @@
   styled-ppx.css-grammar-parser
   styled-ppx.murmur2
   styled-ppx.string-interpolation
-  server-reason-react.expand-styles-attribute
+  server-reason-react.styles-attribute
   sedlex
   ppxlib
   reason

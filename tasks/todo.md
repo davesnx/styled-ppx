@@ -27,10 +27,10 @@
 
 ## Border Interpolation Fix
 
-- [x] Reproduce the `border-top` cx2 interpolation regression.
+- [x] Reproduce the `border-top` css interpolation regression.
 - [x] Trace the generated extraction path through `[%spec_module]` alias properties.
 - [x] Fix `packages/css-grammar/ppx/Generate.re` so property references are treated as interpolation-capable.
-- [x] Run targeted `css-grammar` and cx2 regression tests.
+- [x] Run targeted `css-grammar` and css regression tests.
 
 ### Review
 
@@ -38,19 +38,19 @@
 - Result: `border-top` partial interpolations fell back to the property runtime module (`Css_types.Border`) instead of delegating to the nested `color` position.
 - Fix: treat `Property_type` nodes as interpolation-capable so generated extractors delegate through the registry and preserve nested type context.
 
-## Duplicate cx2 interpolation vars
+## Duplicate css interpolation vars
 
-- [x] Inspect the `flex` cx2 fixture and confirm how duplicate interpolation names are collapsed.
-- [x] Update cx2 variable naming so repeated interpolation names are preserved with numbered CSS vars.
+- [x] Inspect the `flex` css fixture and confirm how duplicate interpolation names are collapsed.
+- [x] Update css variable naming so repeated interpolation names are preserved with numbered CSS vars.
 - [x] Add regression coverage for duplicate interpolation names.
-- [x] Run targeted `css-grammar` and `cx2-support` verification.
+- [x] Run targeted `css-grammar` and `css-support` verification.
 
 ### Review
 
 - Root cause: `Css_file.transform_declaration` matched interpolation metadata by variable name only, so repeated `$(X.value)` slots reused one CSS custom property and one inferred runtime module.
 - Fix: consume interpolation metadata in occurrence order and suffix duplicate CSS custom property names as `_1`, `_2`, etc. so each slot keeps its own inferred type.
-- Coverage: added a `Css_grammar.Parser.get_interpolation_types` regression for duplicate `flex` interpolation names and updated the cx2 cram expectation.
-- Verification: `make test-css-grammar` and `make test-cx2-support` both pass.
+- Coverage: added a `Css_grammar.Parser.get_interpolation_types` regression for duplicate `flex` interpolation names and updated the css cram expectation.
+- Verification: `make test-css-grammar` and `make test-css-support` both pass.
 
 ## Step 1 - Handwritten parser front-end
 
@@ -133,7 +133,7 @@
 
 - [x] Add a `component_value_list` -> grammar input bridge so css-grammar can parse parser AST values without going through rendered strings.
 - [x] Add css-grammar entrypoints for property validation, interpolation extraction, and at-rule prelude parsing over `component_value_list`.
-- [x] Rewire PPX typechecking, cx2 extraction, and runtime lowering to pass parser AST values directly into css-grammar.
+- [x] Rewire PPX typechecking, css extraction, and runtime lowering to pass parser AST values directly into css-grammar.
 - [x] Stop using declaration value source slicing as the semantic input to runtime lowering.
 - [x] Preserve pipeline behavior with parser, css-grammar, PPX, runtime, and css-support verification.
 
@@ -190,7 +190,7 @@
 - Landed shape: `packages/css-grammar` now exposes AST-native `parse`, `check_property`, `get_interpolation_types`, and `parse_at_rule_prelude` directly over `component_value_list`; the old string wrappers were deleted instead of preserved under `*_component_values` aliases.
 - Generator/runtime alignment: generated `[%spec_module]` modules now emit only AST-native `parse`, handwritten permissive property modules were updated to the same contract, and PPX callers were renamed to the short AST-only entrypoints.
 - Test strategy: `css-grammar` tests now build `component_value_list` inputs with local parser-driver helpers, so the library keeps one semantic parse path while the tests still cover string-originating scenarios.
-- Verification: `make test-css-grammar`, `make test-parser`, `make test-ppx-native`, `make test-cx2-support`, `make test-css-support`, and `make test-runtime` all pass.
+- Verification: `make test-css-grammar`, `make test-parser`, `make test-ppx-native`, `make test-css-support`, `make test-css-support`, and `make test-runtime` all pass.
 
 ## css-grammar API vocabulary cleanup
 
@@ -206,7 +206,7 @@
 - Landed shape: `Rule.run`, `Css_grammar.type_check`, `Css_grammar.validate_property`, and `Css_grammar.infer_interpolation_types` are now the canonical public names. The old `parse_at_rule_prelude` wrapper was removed in favor of `type_check` with the appropriate at-rule grammar.
 - Generator/runtime alignment: the `RULE` contract now exposes `type_check` plus `infer_interpolation_types*`, handwritten permissive property modules match that contract, and PPX/runtime callers were renamed accordingly.
 - Verification: `make test-css-grammar`, `make test-parser`, `make test-ppx-native`, and `make test-runtime` pass after the rename.
-- Verification gap: `@test-cx2-support` repeatedly failed in this environment with `Thread.create: Resource temporarily unavailable`, `vfork(): Resource temporarily unavailable`, and linker `fork` failures during cram/PPX subprocess startup, even when rerun with `-j1`. `@test-css-support` also exceeded the available execution window when forced serially.
+- Verification gap: `@test-css-support` repeatedly failed in this environment with `Thread.create: Resource temporarily unavailable`, `vfork(): Resource temporarily unavailable`, and linker `fork` failures during cram/PPX subprocess startup, even when rerun with `-j1`. `@test-css-support` also exceeded the available execution window when forced serially.
 
 ## Primitive runtime reuse batch
 
@@ -214,7 +214,7 @@
 - [x] Add runtime declarations for logical size, logical spacing, logical inset, logical border, and scrollbar leaf color properties that can render through existing primitive printers.
 - [x] Replace `Property_to_runtime.re` unsafe fallbacks for the first logical-property batch with typed lowerings that reuse existing renderers.
 - [x] Add shorthand/lists support for `scroll-margin`, `scroll-padding`, and `inset` using declaration helpers instead of new runtime type modules.
-- [x] Run targeted `css-support`, `cx2-support`, and runtime verification for the touched property groups.
+- [x] Run targeted `css-support`, `css-support`, and runtime verification for the touched property groups.
 
 ### Review
 
@@ -222,7 +222,7 @@
 - Guardrail for this batch: only retarget grammar `runtime_module_path` when the whole property value is an exact match for the reused runtime type; list/shorthand properties can still get typed `%css` lowering through declaration helpers without inventing a new `Css_types` module.
 - Landed grammar retargets: exact-match missing modules now point at existing `Css_types` primitives for `all`, logical single border colors/widths, column-rule color, glyph angles, `backdrop-blur`, `line-height-step`, `offset-distance`, `shape-margin`, scrollbar leaf colors, selected WebKit color/width properties, and `x`/`y`.
 - Landed runtime lowering: `%css` now emits typed calls for logical sizes, logical margin/padding families, logical inset families, several logical border leaves/shorthands, `column-count`, `column-rule-color`, `column-rule-width`, scrollbar leaf colors, `caret-color`, `clear`, `resize`, `offset-distance`, `scroll-margin`, `scroll-padding`, `shape-margin`, and `-webkit-tap-highlight-color`.
-- Verification: `opam exec -- dune build -j1`, `opam exec -- dune runtest -j1 packages/runtime/test`, `opam exec -- dune runtest -j1 packages/css-grammar/test`, and focused `css-support`/`cx2-support` cram runs for `logical-propertiesand-values.t`, `scroll-snap-module.t`, `multi-column-layout-module.t`, and `random.t` all pass.
+- Verification: `opam exec -- dune build -j1`, `opam exec -- dune runtest -j1 packages/runtime/test`, `opam exec -- dune runtest -j1 packages/css-grammar/test`, and focused `css-support`/`css-support` cram runs for `logical-propertiesand-values.t`, `scroll-snap-module.t`, `multi-column-layout-module.t`, and `random.t` all pass.
 - Intentionally left out of this batch: value spaces that still need true property-specific runtime modules or broader API decisions, including multi-value interpolation typing for wrappers like `border-block-color`, `border-inline-color`, `column-rule-width`, and the not-yet-modeled families such as `view-timeline-inset`.
 
 ## Existing Runtime Batch
@@ -239,19 +239,19 @@
 - Guardrail: keep partial support acceptable when the current runtime type is narrower than the grammar. For example, `appearance` can type `auto` / `none` in this batch and still leave rarer widget-specific values unsupported until the runtime type grows.
 - Landed lowering: `%css` now emits typed runtime calls for `direction`, `float`, `isolation`, `scroll-behavior`, `overflow-anchor`, `table-layout`, `appearance` (`auto` / `none`), `break-before`, `break-after`, `break-inside`, `counter-increment`, `counter-reset`, `counter-set`, `list-style-type`, `list-style-position`, `mix-blend-mode`, and `background-blend-mode`.
 - Landed runtime surface: added declaration helpers for `appearance`, `breakBefore`, `breakAfter`, `breakInside`, `mixBlendMode`, `backgroundBlendMode`, and `backgroundBlendModes` in `Declarations.ml`.
-- Verification: `opam exec -- dune build -j1`, focused `%css`/`%cx2` cram runs for `basic-user-interface-module`, `compositingand-blending`, `fragmentation-module`, `lists-module`, `logical-propertiesand-values`, `random`, `scroll-behavior-module`, and `writing-modes`, plus `opam exec -- dune runtest -j1 packages/runtime/test`, all pass.
+- Verification: `opam exec -- dune build -j1`, focused `%css`/`%css` cram runs for `basic-user-interface-module`, `compositingand-blending`, `fragmentation-module`, `lists-module`, `logical-propertiesand-values`, `random`, `scroll-behavior-module`, and `writing-modes`, plus `opam exec -- dune runtest -j1 packages/runtime/test`, all pass.
 
 ## Border Image Batch
 
 - [x] Implement typed lowering for `border-image-slice`, `border-image-width`, `border-image-outset`, and `border-image-repeat` using existing runtime declarations.
 - [x] Update `%css` `backgrounds-and-borders-module` expectations for the new typed output.
-- [x] Verify `%css`/`%cx2` `backgrounds-and-borders-module` and refresh the unsupported runtime audit document.
+- [x] Verify `%css`/`%css` `backgrounds-and-borders-module` and refresh the unsupported runtime audit document.
 
 ### Review
 
 - Batch goal: convert the `border-image-*` leaf properties that already have `Css_types` and `Declarations` support, while leaving the full `border-image` shorthand for a later pass.
 - Landed lowering: `%css` now emits typed runtime calls for `borderImageSlice1..4`, `borderImageWidth[1..4]`, `borderImageOutset[1..4]`, and `borderImageRepeat[1..2]` through the existing runtime surface.
-- Verification: `opam exec -- dune build -j1`, `opam exec -- dune runtest -j1 packages/ppx/test/css-support/backgrounds-and-borders-module.t packages/ppx/test/cx2-support/backgrounds-and-borders-module.t`, and a regenerated `documents/unsupported-runtime-audit.md` all completed successfully.
+- Verification: `opam exec -- dune build -j1`, `opam exec -- dune runtest -j1 packages/ppx/test/css-support/backgrounds-and-borders-module.t packages/ppx/test/css-support/backgrounds-and-borders-module.t`, and a regenerated `documents/unsupported-runtime-audit.md` all completed successfully.
 
 ## Scroll Runtime Batch
 
@@ -265,7 +265,7 @@
 - Batch goal: remove the remaining checked-in scroll-related `CSS.unsafe` cases that already had runtime value modules, without starting the larger timeline/anchor families.
 - Landed runtime surface: added `overscrollBehavior2`, `overscrollBehaviorX`, `overscrollBehaviorY`, `overscrollBehaviorInline`, `overscrollBehaviorBlock`, `scrollSnapAlign`, `scrollSnapAlign2`, `scrollSnapStop`, and `scrollSnapType` to `Declarations.ml`.
 - Landed lowering: `%css` now emits typed calls for `overscroll-behavior*`, `scroll-snap-align`, `scroll-snap-stop`, and `scroll-snap-type` using existing `OverscrollBehavior` and `ScrollSnap*` runtime types.
-- Verification: `opam exec -- dune build -j1`, `opam exec -- dune runtest -j1 packages/ppx/test/css-support/overscroll-behavior-module.t packages/ppx/test/css-support/scroll-snap-module.t packages/ppx/test/cx2-support/overscroll-behavior-module.t packages/ppx/test/cx2-support/scroll-snap-module.t`, and a regenerated `documents/unsupported-runtime-audit.md` all completed successfully.
+- Verification: `opam exec -- dune build -j1`, `opam exec -- dune runtest -j1 packages/ppx/test/css-support/overscroll-behavior-module.t packages/ppx/test/css-support/scroll-snap-module.t packages/ppx/test/css-support/overscroll-behavior-module.t packages/ppx/test/css-support/scroll-snap-module.t`, and a regenerated `documents/unsupported-runtime-audit.md` all completed successfully.
 
 ## Writing Modes Runtime Batch
 
@@ -289,21 +289,21 @@
 
 ### Review
 
-- Batch goal: remove the remaining direct `CSS.unsafe` calls for the simple overflow leaf properties already covered by `%css`/`%cx2` fixtures.
+- Batch goal: remove the remaining direct `CSS.unsafe` calls for the simple overflow leaf properties already covered by `%css`/`%css` fixtures.
 - Landed lowering: `%css` now emits `CSS.lineClamp(`none|`int(_))` and `CSS.maxLines(`none|`int(_))` instead of unsafe raw declarations.
-- Verification: `opam exec -- dune build -j1`, `opam exec -- dune runtest -j1 packages/ppx/test/css-support/overflow-module.t packages/ppx/test/cx2-support/overflow-module.t`, and a regenerated `documents/unsupported-runtime-audit.md` all completed successfully.
+- Verification: `opam exec -- dune build -j1`, `opam exec -- dune runtest -j1 packages/ppx/test/css-support/overflow-module.t packages/ppx/test/css-support/overflow-module.t`, and a regenerated `documents/unsupported-runtime-audit.md` all completed successfully.
 
 ## Simple Leaf Coverage Batch
 
 - [x] Add runtime declarations and typed lowering for `empty-cells`, `field-sizing`, `interpolate-size`, and the simple `hyphenate-*` properties.
-- [x] Add fixture coverage in `text-module` and a new `simple-runtime-leaves` cram fixture for `%css` and `%cx2`.
+- [x] Add fixture coverage in `text-module` and a new `simple-runtime-leaves` cram fixture for `%css` and `%css`.
 - [x] Re-run targeted text/simple-leaf verification and refresh the unsupported runtime audit.
 
 ### Review
 
 - Batch goal: convert the remaining exact-match uncovered leaves into checked-in coverage instead of leaving them represented only in the audit probe.
 - Landed lowering: `%css` now emits typed calls for `emptyCells`, `fieldSizing`, `interpolateSize`, `hyphenateCharacter`, `hyphenateLimitChars`, `hyphenateLimitLines`, and `hyphenateLimitZone`.
-- Verification: `opam exec -- dune build -j1`, `opam exec -- dune runtest -j1 packages/ppx/test/css-support/text-module.t packages/ppx/test/cx2-support/text-module.t packages/ppx/test/css-support/simple-runtime-leaves.t packages/ppx/test/cx2-support/simple-runtime-leaves.t`, and a regenerated `documents/unsupported-runtime-audit.md` all completed successfully.
+- Verification: `opam exec -- dune build -j1`, `opam exec -- dune runtest -j1 packages/ppx/test/css-support/text-module.t packages/ppx/test/css-support/text-module.t packages/ppx/test/css-support/simple-runtime-leaves.t packages/ppx/test/css-support/simple-runtime-leaves.t`, and a regenerated `documents/unsupported-runtime-audit.md` all completed successfully.
 
 ## Fragmentation/Text Unsafe Reduction Batch
 
@@ -315,31 +315,31 @@
 
 - Batch goal: reduce checked-in `CSS.unsafe` usage in the already-covered `%css` fixtures without expanding runtime architecture.
 - Landed lowering: `%css` now emits typed calls for `boxDecorationBreak`, `orphans`, `widows`, `hangingPunctuation`, `overflowWrap(`breakWord)`, `wordWrap(`breakWord)`, and `captionSide` logical values.
-- Verification: `opam exec -- dune build -j1`, focused `%css`/`%cx2` runs for `fragmentation-module`, `text-module`, and `logical-propertiesand-values`, plus a regenerated `documents/unsupported-runtime-audit.md`, all completed successfully.
+- Verification: `opam exec -- dune build -j1`, focused `%css`/`%css` runs for `fragmentation-module`, `text-module`, and `logical-propertiesand-values`, plus a regenerated `documents/unsupported-runtime-audit.md`, all completed successfully.
 
 ## SVG Leaf Batch
 
 - [x] Implement typed lowering for `fill-rule`, `fill-opacity`, `stroke-width`, `stroke-linecap`, `stroke-linejoin`, and `stroke-miterlimit` through `CSS.SVG.*`.
-- [x] Add `%css` / `%cx2` coverage for those leaves in `filland-stroke-module`.
+- [x] Add `%css` / `%css` coverage for those leaves in `filland-stroke-module`.
 - [x] Re-run targeted verification and refresh the unsupported runtime audit.
 
 ### Review
 
 - Batch goal: wire the straightforward SVG leaf properties that already had runtime value support but no `%css` lowering.
 - Landed lowering: `%css` now emits typed `CSS.SVG.fillRule`, `CSS.SVG.fillOpacity`, `CSS.SVG.strokeWidth`, `CSS.SVG.strokeLinecap`, `CSS.SVG.strokeLinejoin`, and `CSS.SVG.strokeMiterlimit` calls.
-- Verification: `opam exec -- dune build -j1`, `opam exec -- dune runtest -j1 packages/ppx/test/css-support/filland-stroke-module.t packages/ppx/test/cx2-support/filland-stroke-module.t`, and a regenerated `documents/unsupported-runtime-audit.md` all completed successfully.
+- Verification: `opam exec -- dune build -j1`, `opam exec -- dune runtest -j1 packages/ppx/test/css-support/filland-stroke-module.t packages/ppx/test/css-support/filland-stroke-module.t`, and a regenerated `documents/unsupported-runtime-audit.md` all completed successfully.
 
 ## Initial Letter And Resolution Batch
 
 - [x] Add runtime declarations and typed lowering for `initial-letter`, `initial-letter-align`, and `image-resolution`.
-- [x] Extend `simple-runtime-leaves` `%css` / `%cx2` coverage with initial-letter and image-resolution cases.
+- [x] Extend `simple-runtime-leaves` `%css` / `%css` coverage with initial-letter and image-resolution cases.
 - [x] Re-run focused verification and refresh the unsupported runtime audit.
 
 ### Review
 
-- Batch goal: convert the next runtime-backed uncovered leaves into checked-in `%css` / `%cx2` coverage without widening the runtime module surface.
+- Batch goal: convert the next runtime-backed uncovered leaves into checked-in `%css` / `%css` coverage without widening the runtime module surface.
 - Landed lowering: `%css` now emits typed `CSS.initialLetter`, `CSS.initialLetterAlign`, and `CSS.imageResolution` calls. The pair form of `initial-letter` and the combined forms of `image-resolution` use the existing `value(...)` branch on the current runtime types.
-- Verification: `opam exec -- dune build -j1`, `opam exec -- dune runtest -j1 packages/ppx/test/css-support/simple-runtime-leaves.t packages/ppx/test/cx2-support/simple-runtime-leaves.t`, and a regenerated `documents/unsupported-runtime-audit.md` all completed successfully.
+- Verification: `opam exec -- dune build -j1`, `opam exec -- dune runtest -j1 packages/ppx/test/css-support/simple-runtime-leaves.t packages/ppx/test/css-support/simple-runtime-leaves.t`, and a regenerated `documents/unsupported-runtime-audit.md` all completed successfully.
 
 ## Text Transform Batch
 
@@ -351,7 +351,7 @@
 
 - Batch goal: remove the remaining checked-in `CSS.unsafe` cases for `text-transform` without changing the parser grammar.
 - Landed lowering: `%css` now emits `CSS.textTransform(`fullWidth)` and `CSS.textTransform(`fullSizeKana)` instead of unsafe raw declarations.
-- Verification: `opam exec -- dune build -j1`, `opam exec -- dune runtest -j1 packages/ppx/test/css-support/text-module.t packages/ppx/test/cx2-support/text-module.t`, and a regenerated `documents/unsupported-runtime-audit.md` all completed successfully.
+- Verification: `opam exec -- dune build -j1`, `opam exec -- dune runtest -j1 packages/ppx/test/css-support/text-module.t packages/ppx/test/css-support/text-module.t`, and a regenerated `documents/unsupported-runtime-audit.md` all completed successfully.
 
 ## Multi Column Leaf Batch
 
@@ -363,7 +363,7 @@
 
 - Batch goal: remove the next cheap checked-in `CSS.unsafe` leaves from `multi-column-layout-module` while leaving the larger `columns` and `column-rule` shorthands for a later pass.
 - Landed lowering: `%css` now emits `CSS.columnFill(...)`, `CSS.columnRuleStyle(...)`, and `CSS.columnSpan(...)` instead of unsafe raw declarations.
-- Verification: `opam exec -- dune build -j1`, `opam exec -- dune runtest -j1 packages/ppx/test/css-support/multi-column-layout-module.t packages/ppx/test/cx2-support/multi-column-layout-module.t`, and a regenerated `documents/unsupported-runtime-audit.md` all completed successfully.
+- Verification: `opam exec -- dune build -j1`, `opam exec -- dune runtest -j1 packages/ppx/test/css-support/multi-column-layout-module.t packages/ppx/test/css-support/multi-column-layout-module.t`, and a regenerated `documents/unsupported-runtime-audit.md` all completed successfully.
 
 ## Color Adjustment Batch
 
@@ -375,7 +375,7 @@
 
 - Batch goal: remove a full checked-in `CSS.unsafe` cluster from `color-adjustments-module` using the existing runtime value modules.
 - Landed lowering: `%css` now emits `CSS.colorAdjust(...)`, `CSS.forcedColorAdjust(...)`, and `CSS.colorScheme(...)`. `color-scheme` uses the existing `value(...)` branch for multi-token/custom-ident cases.
-- Verification: `opam exec -- dune build -j1`, `opam exec -- dune runtest -j1 packages/ppx/test/css-support/color-adjustments-module.t packages/ppx/test/cx2-support/color-adjustments-module.t`, and a regenerated `documents/unsupported-runtime-audit.md` all completed successfully.
+- Verification: `opam exec -- dune build -j1`, `opam exec -- dune runtest -j1 packages/ppx/test/css-support/color-adjustments-module.t packages/ppx/test/css-support/color-adjustments-module.t`, and a regenerated `documents/unsupported-runtime-audit.md` all completed successfully.
 
 ## Clip And Masonry Batch
 
@@ -387,7 +387,7 @@
 
 - Batch goal: convert the next direct checked-in enum/value clusters without changing the larger masking or grid shorthand architecture.
 - Landed lowering: `%css` now emits `CSS.clipRule(...)` and `CSS.masonryAutoFlow(...)`; the mixed `masonry-auto-flow` forms use the existing `value(...)` runtime branch.
-- Verification: `opam exec -- dune build -j1`, `opam exec -- dune runtest -j1 packages/ppx/test/css-support/masking-module.t packages/ppx/test/cx2-support/masking-module.t packages/ppx/test/css-support/grid-layout-module.t packages/ppx/test/cx2-support/grid-layout-module.t`, and a regenerated `documents/unsupported-runtime-audit.md` all completed successfully.
+- Verification: `opam exec -- dune build -j1`, `opam exec -- dune runtest -j1 packages/ppx/test/css-support/masking-module.t packages/ppx/test/css-support/masking-module.t packages/ppx/test/css-support/grid-layout-module.t packages/ppx/test/css-support/grid-layout-module.t`, and a regenerated `documents/unsupported-runtime-audit.md` all completed successfully.
 
 ## Text Indent Batch
 
@@ -399,7 +399,7 @@
 
 - Batch goal: remove the checked-in `CSS.unsafe` cases for the `text-indent` modifier combinations without introducing another helper API.
 - Landed lowering: `%css` now emits `CSS.textIndent(...)` with `TextIndent.value(...)` for the `hanging` / `each-line` combinations, while preserving the direct length/percentage path for the simple form.
-- Verification: `opam exec -- dune build -j1`, `opam exec -- dune runtest -j1 packages/ppx/test/css-support/text-module.t packages/ppx/test/cx2-support/text-module.t`, and a regenerated `documents/unsupported-runtime-audit.md` all completed successfully.
+- Verification: `opam exec -- dune build -j1`, `opam exec -- dune runtest -j1 packages/ppx/test/css-support/text-module.t packages/ppx/test/css-support/text-module.t`, and a regenerated `documents/unsupported-runtime-audit.md` all completed successfully.
 
 ## Parser lexing/parsing simplification
 

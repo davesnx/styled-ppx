@@ -647,18 +647,10 @@ let map_css_expressions =
           let args =
             args
             |> List.map(((label, arg)) => (label, self#expression(arg)));
-          {
+          Styles_attribute.expand({
             ...expr,
-            pexp_desc:
-              Pexp_apply(
-                fn,
-                Expand_styles_attribute.make(
-                  ~loc=expr.pexp_loc,
-                  ~apply_expr=expr,
-                  args,
-                ),
-              ),
-          };
+            pexp_desc: Pexp_apply(fn, args),
+          });
         | Pexp_extension(({ txt: "css", _ }, payload)) =>
           switch (payload_expr(payload)) {
           | Some(payload) =>

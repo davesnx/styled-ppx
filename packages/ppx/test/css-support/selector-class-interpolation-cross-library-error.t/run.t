@@ -7,8 +7,8 @@ module's file isn't in that set, the reference is by definition cross-library.
 
   $ styled-ppx.generate n.ml
   File "n.ml", line 2, characters 6-21:
-  Error: cross-library [%cx2] selector references are not supported.
+  Error: cross-library [%css] selector references are not supported.
   The reference `OtherLib.marker` resolves to module `OtherLib` which is not part of the
-  current library. Move the [%cx2] binding into the current library, or
+  current library. Move the [%css] binding into the current library, or
   inline the class chain literally.
   [1]

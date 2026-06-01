@@ -11,8 +11,8 @@ missing binding.
 
   $ styled-ppx.generate m.ml n.ml
   File "n.ml", line 2, characters 6-14:
-  Error: cross-module [%cx2] selector reference `M.marker` does not resolve.
+  Error: cross-module [%css] selector reference `M.marker` does not resolve.
   The target binding is missing from module `M`, or the binding is not
-  a [%cx2] expression. Define `M.marker` with [%cx2 "..."], or remove the
+  a [%css] expression. Define `M.marker` with [%css "..."], or remove the
   reference.
   [1]

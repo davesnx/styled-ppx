@@ -175,9 +175,9 @@ let is_cross_library ~in_library_modules longident =
 let cross_library_message ~longident ~head ~ref_loc =
   Printf.sprintf
     "%s\n\
-     Error: cross-library [%%cx2] selector references are not supported.\n\
+     Error: cross-library [%%css] selector references are not supported.\n\
      The reference `%s` resolves to module `%s` which is not part of the\n\
-     current library. Move the [%%cx2] binding into the current library, or\n\
+     current library. Move the [%%css] binding into the current library, or\n\
      inline the class chain literally."
     (format_location ref_loc) longident head
 
@@ -188,9 +188,9 @@ let unresolved_message ~longident ~ref_loc ~in_library_modules =
   else
     Printf.sprintf
       "%s\n\
-       Error: cross-module [%%cx2] selector reference `%s` does not resolve.\n\
+       Error: cross-module [%%css] selector reference `%s` does not resolve.\n\
        The target binding is missing from module `%s`, or the binding is not\n\
-       a [%%cx2] expression. Define `%s` with [%%cx2 \"...\"], or remove the\n\
+       a [%%css] expression. Define `%s` with [%%css \"...\"], or remove the\n\
        reference."
       (format_location ref_loc) longident head longident
 

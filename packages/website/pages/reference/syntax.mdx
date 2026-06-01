@@ -8,7 +8,7 @@ styled-ppx parses string CSS in three different modes, depending on the extensio
 
 | API | Mode | What it accepts |
 | --- | --- | --- |
-| `%cx`, `%cx2`, `%styled.tag` | Declaration block | Declarations plus nested selectors and nested at-rules |
+| `%cx`, `%css`, `%styled.tag` | Declaration block | Declarations plus nested selectors and nested at-rules |
 | `%styled.global` | Stylesheet | Top-level rules and at-rules exactly as in CSS |
 | `%css` | Single declaration | One `property: value` rule |
 
@@ -16,7 +16,7 @@ This page describes the string syntax. If you need arbitrary control flow, unsup
 
 ## Declaration blocks
 
-`%cx`, `%cx2`, and `%styled.tag` all use the same declaration-block grammar.
+`%cx`, `%css`, and `%styled.tag` all use the same declaration-block grammar.
 
 You write the body of a rule, not the outer selector. styled-ppx generates the class selector for you and scopes nested rules to it.
 
@@ -251,7 +251,7 @@ Avoid embedding large expressions directly inside `$(...)` in string CSS.
 
 ## Examples by API
 
-### `%cx` / `%cx2` / `%styled.tag`
+### `%cx` / `%css` / `%styled.tag`
 
 ```css
 padding: 16px;

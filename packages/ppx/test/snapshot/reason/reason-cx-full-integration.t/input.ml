@@ -95,7 +95,7 @@ let mediaWithInterpolation color =
   }
 |}]
 
-(* Test 6: keyframe2 extraction *)
+(* Test 6: keyframe extraction *)
 let fadeIn = [%keyframe {|
   from { opacity: 0; }
   to { opacity: 1; }
