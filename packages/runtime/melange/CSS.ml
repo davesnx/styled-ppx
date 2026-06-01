@@ -18,3 +18,17 @@ let merge (styles1 : styles) (styles2 : styles) =
   let className = String.trim (fst styles1 ^ " " ^ fst styles2) in
   let style = ReactDOM.Style.combine (snd styles1) (snd styles2) in
   className, style
+
+external create_style_element : string -> < .. > Js.t -> React.element
+  = "createElement"
+[@@mel.module "react"]
+
+external inner_html : __html:string -> unit -> < .. > Js.t = "" [@@mel.obj]
+
+external style_props : dangerouslySetInnerHTML:< .. > Js.t -> unit -> < .. > Js.t
+  = ""
+[@@mel.obj]
+
+let global_style_tag css =
+  create_style_element "style"
+    (style_props ~dangerouslySetInnerHTML:(inner_html ~__html:css ()) ())

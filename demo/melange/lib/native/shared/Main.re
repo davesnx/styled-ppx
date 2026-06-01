@@ -1,7 +1,9 @@
+let globalBackground = CSS.green;
+
 module GlobalStyles = [%styled.global
   {|
   div {
-    background-color: green;
+    background-color: $(globalBackground);
   }
 
   @media (min-width: 400px) {
@@ -137,6 +139,7 @@ let keyframeDemoCard = {
 [@react.component]
 let make = () =>
   <main styles=gradiend>
+    <GlobalStyles />
     <div styles=Universal.classname>
       <section styles=keyframeDemoShell>
         <h2> {React.string("Interpolated keyframe demo")} </h2>

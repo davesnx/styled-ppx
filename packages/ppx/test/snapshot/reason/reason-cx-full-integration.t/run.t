@@ -107,6 +107,8 @@
     struct
       let to_string () = ""
       let to_buffer buf = Buffer.add_string buf (to_string ())
+      let makeProps ?key () = ()[@@warning "-27-32"]
+      let make _props = CSS.global_style_tag (to_string ())
     end
   let multiVar primary secondary size =
     CSS.make

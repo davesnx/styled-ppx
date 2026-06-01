@@ -23,13 +23,11 @@ Same-file submodule selector interpolation resolves locally in
   module Globals = {
     let to_string = () => "";
     let to_buffer = buf => Buffer.add_string(buf, to_string());
+    [@warning "-27-32"]
+    let makeProps = (~key=?, ()) => ();
+    let make = _props => CSS.global_style_tag(to_string());
   };
   
   let _ = (Css.marker, Globals.to_string, Globals.to_buffer, Globals.make);
 
   $ dune build
-  File "input.re", line 13, characters 59-71:
-  13 | let _ = (Css.marker, Globals.to_string, Globals.to_buffer, Globals.make);
-                                                                  ^^^^^^^^^^^^
-  Error: Unbound value Globals.make
-  [1]
