@@ -77,6 +77,19 @@ let merge_empty_carriers () =
   Alcotest.(check string) "className" "" (fst styles);
   Alcotest.(check (list (triple string string string))) "vars" [] (snd styles)
 
+let font_families_single_font () =
+  Alcotest.(check string)
+    "single font family"
+    {js|"Mono"|js}
+    (CSS.Types.FontFamilies.toString [| `quoted {js|Mono|js} |])
+
+let font_families_multiple_fonts () =
+  Alcotest.(check string)
+    "font family stack"
+    {js|"Inter", system-ui, sans-serif|js}
+    (CSS.Types.FontFamilies.toString
+       [| `quoted {js|Inter|js}; `system_ui; `sans_serif |])
+
 let tests =
   [
     test "make static carrier" make_static_carrier;
@@ -91,4 +104,6 @@ let tests =
     test "trim empty merge class 2" trim_empty_merge_class_2;
     test "trim empty merge class 3" trim_empty_merge_class_3;
     test "merge empty carriers" merge_empty_carriers;
+    test "font families single font" font_families_single_font;
+    test "font families multiple fonts" font_families_multiple_fonts;
   ]

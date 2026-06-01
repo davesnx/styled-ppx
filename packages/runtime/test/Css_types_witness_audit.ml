@@ -404,6 +404,7 @@ let _all_witness_modules : (module Witness) list =
     (module Css_types.FlexWrap);
     (module Css_types.Float);
     (module Css_types.Font);
+    (module Css_types.FontFamilies);
     (module Css_types.FontFamily);
     (module Css_types.FontFeatureSettings);
     (module Css_types.FontDisplay);
