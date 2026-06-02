@@ -10,4 +10,4 @@ module Globals = [%styled.global
 |}
 ];
 
-let _ = (Css.marker, Globals.to_string, Globals.to_buffer, Globals.make);
+let _ = (Css.marker, Globals.to_string, Globals.make);

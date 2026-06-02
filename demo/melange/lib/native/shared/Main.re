@@ -114,12 +114,15 @@ let keyframeDemoCard = {
   let currentHeight = 172;
   let previous = `px(previousHeight);
   let current = `px(currentHeight);
-  let resize = [%keyframe {|
+  let resize = [%keyframe
+    {|
     0% { height: $(previous); }
     100% { height: $(current); }
-  |}];
+  |}
+  ];
 
-  [%css {|
+  [%css
+   {|
     animation-name: $(resize);
     animation-duration: 1200ms;
     animation-timing-function: ease-in-out;
@@ -133,7 +136,8 @@ let keyframeDemoCard = {
     background: linear-gradient(135deg, #101828 0%, #364152 100%);
     color: white;
     box-shadow: 0 20px 40px rgba(16, 24, 40, 0.22);
-  |}];
+  |}
+  ];
 };
 
 [@react.component]

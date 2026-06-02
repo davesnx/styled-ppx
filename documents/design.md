@@ -89,7 +89,7 @@ selector-interpolation walks. Differs from `[%css]` in two ways:
   positions and resolved class chains substituted in selector
   positions (extracted via `Buffer.add_global_rule` like a static
   global) plus a generated module containing
-  `to_string`/`to_buffer`/`make` that emit a single
+  `to_string`/`makeProps`/`make` that emit a single
   `:root { --var-<hash>: <value>; ... }` block at runtime to supply
   the values. Selector interpolation has no runtime side; class
   names resolve fully at PPX time (same module) or aggregator time
@@ -116,8 +116,8 @@ let themeColor = CSS.red
 module ThemeStyles = struct
   let to_string () =
     ":root{--var-nkdt8w:" ^ CSS.Types.Color.toString themeColor ^ ";}"
-  let to_buffer buf = Buffer.add_string buf (to_string ())
-  let make () = CSS.global_style_tag (to_string ())
+  let makeProps ?key () = ()
+  let make _props = CSS.global_style_tag (to_string ())
 end
 ```
 
@@ -130,7 +130,7 @@ the only new artifact.
 | Half    | Shape                                                                                | Where it lives                                                                  |
 | ------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
 | Static  | The user's rule, with `var(--var-<hash>)` in interpolation positions                 | Aggregated `styles.css` via `[@@@css ...]`                                      |
-| Dynamic | A single `:root { --var-<hash>: <value>; ... }` block, one declaration per value var | Generated module's `to_string`, mounted via `make` or spliced via `to_buffer`   |
+| Dynamic | A single `:root { --var-<hash>: <value>; ... }` block, one declaration per value var | Generated module's `to_string`, mounted via `make`                              |
 
 The dynamic side does **not** re-emit the user's selectors or
 non-interpolated declarations. Those live in the static stylesheet.
@@ -161,11 +161,11 @@ Css_file.push_global ~file rule_list:
 build module structure (in ppx.re):
   to_string  = Css_global_to_string.render_root_block(dynamic_vars)
                (emits ":root{--var-h:<call expr>;...}" or "" if no vars)
-  to_buffer  = buf => Buffer.add_string(buf, to_string())
-  make       = () => CSS.global_style_tag(to_string())
+  makeProps  = (~key=?, ()) => ()
+  make       = _props => CSS.global_style_tag(to_string())
   │
   ▼
-return Pmod_structure([to_string; to_buffer; make])
+return Pmod_structure([to_string; makeProps; make])
 ```
 
 The end-of-CU impl transformer is unchanged; the aggregator gains no
@@ -181,10 +181,9 @@ Three items, always in this order:
   declaration per `dynamic_vars` entry. Module name from
   `Property_to_types.resolve_module_name`; call from
   `Property_to_types.make_to_string_call`.
-- **`to_buffer : Buffer.t -> unit`** — always
-  `buf => Buffer.add_string(buf, to_string())`.
+- **`makeProps : (?key: string, unit) -> unit`** — generated for JSX component compatibility.
 - **`make : unit -> React.element`** — always
-  `() => CSS.global_style_tag(to_string())`.
+  `_props => CSS.global_style_tag(to_string())`.
 
 All three take `unit` and capture interpolated bindings from the
 surrounding lexical scope at call time, exactly like `[%css]`. No

@@ -8,7 +8,6 @@
   [@css "*::after{box-sizing:inherit;}"];
   module ResetStyles = {
     let to_string = () => "";
-    let to_buffer = buf => Buffer.add_string(buf, to_string());
     [@warning "-27-32"]
     let makeProps = (~key=?, ()) => ();
     let make = _props => CSS.global_style_tag(to_string());

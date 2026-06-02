@@ -403,9 +403,6 @@ let expand_global_module = (~file, ~scope, ~opens, payload) => {
           let to_string_decl = [%stri
             let to_string = () => [%e to_string_body]
           ];
-          let to_buffer_decl = [%stri
-            let to_buffer = buf => Buffer.add_string(buf, to_string())
-          ];
           let make_props_decl = [%stri
             [@warning "-27-32"]
             let makeProps = (~key=?, ()) => ()
@@ -415,7 +412,7 @@ let expand_global_module = (~file, ~scope, ~opens, payload) => {
           ];
           Builder.pmod_structure(
             ~loc=stringLoc,
-            [to_string_decl, to_buffer_decl, make_props_decl, make_decl],
+            [to_string_decl, make_props_decl, make_decl],
           );
         | errors =>
           let error_messages =
