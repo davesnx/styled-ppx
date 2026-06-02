@@ -885,7 +885,22 @@ and map_ordered_structure = (~file, ~main_module, ~scope, items) => {
         }
       | None => ()
       };
-      item;
+      let incl_mod =
+        map_ordered_module_expr(
+          ~file,
+          ~main_module,
+          ~scope,
+          ~opens=[],
+          include_decl.pincl_mod,
+        );
+      {
+        ...item,
+        pstr_desc:
+          Pstr_include({
+            ...include_decl,
+            pincl_mod: incl_mod,
+          }),
+      };
     | Pstr_recmodule(bindings) =>
       let bindings =
         List.map(
