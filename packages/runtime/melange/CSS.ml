@@ -6,6 +6,12 @@ module Types = Css_types
 
 type styles = string * ReactDOM.Style.t
 
+let empty : styles = "", ReactDOM.Style.make ()
+
+let styles (styles : styles) : ReactDOM.Style.t = snd styles
+
+let className (styles : styles) : string = fst styles
+
 let make className vars : styles =
   let style =
     List.fold_left

@@ -3,6 +3,19 @@ let make_static_carrier () =
   Alcotest.(check string) "className" "card title" (fst styles);
   Alcotest.(check (list (triple string string string))) "vars" [] (snd styles)
 
+let empty_carrier () =
+  Alcotest.(check string) "className" "" (CSS.className CSS.empty);
+  Alcotest.(check (list (triple string string string)))
+    "styles" [] (CSS.styles CSS.empty)
+
+let accessors_return_carrier_parts () =
+  let styles = CSS.make "card" [ "--gap", "8px" ] in
+  Alcotest.(check string) "className" "card" (CSS.className styles);
+  Alcotest.(check (list (triple string string string)))
+    "styles"
+    [ "--gap", "--gap", "8px" ]
+    (CSS.styles styles)
+
 let make_preserves_class_string () =
   let styles = CSS.make "  card   title  " [] in
   Alcotest.(check string) "className" "  card   title  " (fst styles)
@@ -92,6 +105,8 @@ let font_families_multiple_fonts () =
 
 let tests =
   [
+    test "empty carrier" empty_carrier;
+    test "accessors return carrier parts" accessors_return_carrier_parts;
     test "make static carrier" make_static_carrier;
     test "make preserves class string" make_preserves_class_string;
     test "make dynamic carrier" make_dynamic_carrier;
