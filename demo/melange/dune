@@ -8,6 +8,22 @@
  (module_systems
   (commonjs bs.js)))
 
+(alias
+ (name demo-melange)
+ (deps public/styles.css))
+
+(subdir
+ public
+ ; Generate the promoted demo stylesheet from PPX output produced by the
+ ; melange/server build targets.
+ (rule
+  (target styles.css)
+  (mode promote)
+  (deps
+   (glob_files_rec ../**.pp.ml))
+  (action
+   (run styled-ppx.generate --output %{target} %{deps}))))
+
 (executable
  (name server)
  (public_name demo-melange-server)
