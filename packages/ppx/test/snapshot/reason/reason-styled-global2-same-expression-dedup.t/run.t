@@ -2,13 +2,13 @@
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css
-    "body{color:var(--var-nkdt8w);background-color:var(--var-nkdt8w);border-color:var(--var-nkdt8w);}"
+    "body{color:var(--var-1genhr4);background-color:var(--var-1genhr4);border-color:var(--var-1genhr4);}"
   ];
   let themeColor = CSS.red;
   module ThemeStyles = {
     let to_string = () =>
       (
-        ((":root{" ++ "--var-nkdt8w:") ++ CSS.Types.Color.toString(themeColor))
+        ((":root{" ++ "--var-1genhr4:") ++ CSS.Types.Color.toString(themeColor))
         ++ ";"
       )
       ++ "}";

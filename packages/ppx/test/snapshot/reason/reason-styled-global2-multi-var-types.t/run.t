@@ -2,7 +2,7 @@
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css
-    "body{color:var(--var-gwbr8b);width:var(--var-bik0dd);opacity:var(--var-5j7fdd);z-index:var(--var-1iq36s8);}"
+    "body{color:var(--var-fd4uw2);width:var(--var-14iqkam);opacity:var(--var-i54r13);z-index:var(--var-14m30q4);}"
   ];
   let textColor = CSS.red;
   let bodyWidth = CSS.px(960);
@@ -21,24 +21,24 @@
                       (
                         (
                           (
-                            (":root{" ++ "--var-gwbr8b:")
+                            (":root{" ++ "--var-fd4uw2:")
                             ++ CSS.Types.Color.toString(textColor)
                           )
                           ++ ";"
                         )
-                        ++ "--var-bik0dd:"
+                        ++ "--var-14iqkam:"
                       )
                       ++ CSS.Types.Width.toString(bodyWidth)
                     )
                     ++ ";"
                   )
-                  ++ "--var-5j7fdd:"
+                  ++ "--var-i54r13:"
                 )
                 ++ CSS.Types.Opacity.toString(mainOpacity)
               )
               ++ ";"
             )
-            ++ "--var-1iq36s8:"
+            ++ "--var-14m30q4:"
           )
           ++ CSS.Types.ZIndex.toString(layerIndex)
         )

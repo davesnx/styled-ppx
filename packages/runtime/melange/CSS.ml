@@ -8,9 +8,9 @@ type styles = string * ReactDOM.Style.t
 
 let empty : styles = "", ReactDOM.Style.make ()
 
-let styles (styles : styles) : ReactDOM.Style.t = snd styles
+let styles (carrier : styles) : ReactDOM.Style.t = snd carrier
 
-let className (styles : styles) : string = fst styles
+let className (carrier : styles) : string = fst carrier
 
 let make className vars : styles =
   let style =

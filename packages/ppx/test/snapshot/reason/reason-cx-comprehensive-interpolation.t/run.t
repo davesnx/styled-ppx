@@ -2,33 +2,33 @@ Comprehensive test for cx2 interpolation with various property types
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-2v7e0k-test1{width:var(--var-yq31wd);}"];
-  [@css ".css-lbwdj4-test1{height:var(--var-yq31wd);}"];
-  [@css ".css-ur6cve-test1{min-width:var(--var-yq31wd);}"];
-  [@css ".css-9nbswy-test1{max-width:var(--var-yq31wd);}"];
-  [@css ".css-1h6gv7y-test2{margin-top:var(--var-yq31wd);}"];
-  [@css ".css-1ojdfmn-test2{margin-bottom:var(--var-yq31wd);}"];
-  [@css ".css-6oe920-test2{padding-left:var(--var-yq31wd);}"];
-  [@css ".css-kxyw4-test2{padding-right:var(--var-yq31wd);}"];
-  [@css ".css-1j1vt57-test3{gap:var(--var-yq31wd);}"];
-  [@css ".css-16533ek-test3{row-gap:var(--var-yq31wd);}"];
+  [@css ".css-2v7e0k-test1{width:var(--var-aqc6lp);}"];
+  [@css ".css-lbwdj4-test1{height:var(--var-139xm85);}"];
+  [@css ".css-ur6cve-test1{min-width:var(--var-c1psoh);}"];
+  [@css ".css-9nbswy-test1{max-width:var(--var-11mzts2);}"];
+  [@css ".css-1h6gv7y-test2{margin-top:var(--var-16uswae);}"];
+  [@css ".css-1ojdfmn-test2{margin-bottom:var(--var-16uswae);}"];
+  [@css ".css-6oe920-test2{padding-left:var(--var-nbi1qk);}"];
+  [@css ".css-kxyw4-test2{padding-right:var(--var-nbi1qk);}"];
+  [@css ".css-1j1vt57-test3{gap:var(--var-1gzxlw5);}"];
+  [@css ".css-16533ek-test3{row-gap:var(--var-1gzxlw5);}"];
   [@css
-    ".css-aq5h2o-test3{-webkit-column-gap:var(--var-yq31wd);column-gap:var(--var-yq31wd);}"
+    ".css-aq5h2o-test3{-webkit-column-gap:var(--var-1gzxlw5);column-gap:var(--var-1gzxlw5);}"
   ];
-  [@css ".css-4bvljg-test4{color:var(--var-15252qs);}"];
-  [@css ".css-1e9wc53-test4{background-color:var(--var-15252qs);}"];
-  [@css ".css-t4dyfi-test4{border-top-color:var(--var-15252qs);}"];
-  [@css ".css-ycpa9s-test5{flex-basis:var(--var-x7fhjg);}"];
-  [@css ".css-en5xqq-test6{grid-row-start:var(--var-4ff4w4);}"];
-  [@css ".css-1vcbsia-test6{grid-column-end:var(--var-4ff4w4);}"];
-  [@css ".css-rexok8-test7{top:var(--var-1n3wsy);}"];
-  [@css ".css-16sky2z-test7{bottom:var(--var-1n3wsy);}"];
-  [@css ".css-1bkxgpr-test8{z-index:var(--var-fd7qxc);}"];
-  [@css ".css-1rsi5sr-test9{border-top-width:var(--var-wag9af);}"];
-  [@css ".css-g6afgo-test9{border-width:var(--var-wag9af);}"];
-  [@css ".css-lbcu38-test10{letter-spacing:var(--var-apx1x0);}"];
-  [@css ".css-1j0nnnq-test10{word-spacing:var(--var-apx1x0);}"];
-  [@css ".css-1dfkyy8-test11{width:var(--var-a9b677);}"];
+  [@css ".css-4bvljg-test4{color:var(--var-1tvg99e);}"];
+  [@css ".css-1e9wc53-test4{background-color:var(--var-1tvg99e);}"];
+  [@css ".css-t4dyfi-test4{border-top-color:var(--var-1tvg99e);}"];
+  [@css ".css-ycpa9s-test5{flex-basis:var(--var-16e100v);}"];
+  [@css ".css-en5xqq-test6{grid-row-start:var(--var-kr1plb);}"];
+  [@css ".css-1vcbsia-test6{grid-column-end:var(--var-1xfcck0);}"];
+  [@css ".css-rexok8-test7{top:var(--var-1p3ko5s);}"];
+  [@css ".css-16sky2z-test7{bottom:var(--var-1ybll94);}"];
+  [@css ".css-1bkxgpr-test8{z-index:var(--var-jtirbh);}"];
+  [@css ".css-1rsi5sr-test9{border-top-width:var(--var-oqesbw);}"];
+  [@css ".css-g6afgo-test9{border-width:var(--var-oqesbw);}"];
+  [@css ".css-lbcu38-test10{letter-spacing:var(--var-vumj2y);}"];
+  [@css ".css-1j0nnnq-test10{word-spacing:var(--var-1ket55n);}"];
+  [@css ".css-1dfkyy8-test11{width:var(--var-6xfk5x);}"];
   [@css ".css-73nay0-test11{height:100px;}"];
   [@css ".css-tokvmb-test11{color:red;}"];
   [@css.bindings
@@ -62,61 +62,78 @@ Comprehensive test for cx2 interpolation with various property types
   let test1 =
     CSS.make(
       "css-2v7e0k-test1 css-lbwdj4-test1 css-ur6cve-test1 css-9nbswy-test1",
-      [("--var-yq31wd", CSS.Types.Width.toString(lengthVar))],
+      [
+        ("--var-aqc6lp", CSS.Types.Width.toString(lengthVar)),
+        ("--var-139xm85", CSS.Types.Height.toString(lengthVar)),
+        ("--var-c1psoh", CSS.Types.MinWidth.toString(lengthVar)),
+        ("--var-11mzts2", CSS.Types.MaxWidth.toString(lengthVar)),
+      ],
     );
   let test2 =
     CSS.make(
       "css-1h6gv7y-test2 css-1ojdfmn-test2 css-6oe920-test2 css-kxyw4-test2",
-      [("--var-yq31wd", CSS.Types.Margin.toString(lengthVar))],
+      [
+        ("--var-16uswae", CSS.Types.Margin.toString(lengthVar)),
+        ("--var-nbi1qk", CSS.Types.Length.toString(lengthVar)),
+      ],
     );
   let test3 =
     CSS.make(
       "css-1j1vt57-test3 css-16533ek-test3 css-aq5h2o-test3",
-      [("--var-yq31wd", CSS.Types.Gap.toString(lengthVar))],
+      [("--var-1gzxlw5", CSS.Types.Gap.toString(lengthVar))],
     );
   let test4 =
     CSS.make(
       "css-4bvljg-test4 css-1e9wc53-test4 css-t4dyfi-test4",
-      [("--var-15252qs", CSS.Types.Color.toString(colorVar))],
+      [("--var-1tvg99e", CSS.Types.Color.toString(colorVar))],
     );
   let flexBasisVar = CSS.px(100);
   let test5 =
     CSS.make(
       "css-ycpa9s-test5",
-      [("--var-x7fhjg", CSS.Types.FlexBasis.toString(flexBasisVar))],
+      [("--var-16e100v", CSS.Types.FlexBasis.toString(flexBasisVar))],
     );
   let gridLineVar = `auto;
   let test6 =
     CSS.make(
       "css-en5xqq-test6 css-1vcbsia-test6",
-      [("--var-4ff4w4", CSS.Types.GridRowStart.toString(gridLineVar))],
+      [
+        ("--var-kr1plb", CSS.Types.GridRowStart.toString(gridLineVar)),
+        ("--var-1xfcck0", CSS.Types.GridColumnEnd.toString(gridLineVar)),
+      ],
     );
   let topVar = CSS.px(20);
   let test7 =
     CSS.make(
       "css-rexok8-test7 css-16sky2z-test7",
-      [("--var-1n3wsy", CSS.Types.Top.toString(topVar))],
+      [
+        ("--var-1p3ko5s", CSS.Types.Top.toString(topVar)),
+        ("--var-1ybll94", CSS.Types.Bottom.toString(topVar)),
+      ],
     );
   let zIndexVar = `num(10);
   let test8 =
     CSS.make(
       "css-1bkxgpr-test8",
-      [("--var-fd7qxc", CSS.Types.ZIndex.toString(zIndexVar))],
+      [("--var-jtirbh", CSS.Types.ZIndex.toString(zIndexVar))],
     );
   let borderWidthVar = `medium;
   let test9 =
     CSS.make(
       "css-1rsi5sr-test9 css-g6afgo-test9",
-      [("--var-wag9af", CSS.Types.LineWidth.toString(borderWidthVar))],
+      [("--var-oqesbw", CSS.Types.LineWidth.toString(borderWidthVar))],
     );
   let spacingVar = CSS.px(2);
   let test10 =
     CSS.make(
       "css-lbcu38-test10 css-1j0nnnq-test10",
-      [("--var-apx1x0", CSS.Types.LetterSpacing.toString(spacingVar))],
+      [
+        ("--var-vumj2y", CSS.Types.LetterSpacing.toString(spacingVar)),
+        ("--var-1ket55n", CSS.Types.WordSpacing.toString(spacingVar)),
+      ],
     );
   let test11 = width =>
     CSS.make(
       "css-1dfkyy8-test11 css-73nay0-test11 css-tokvmb-test11",
-      [("--var-a9b677", CSS.Types.Width.toString(width))],
+      [("--var-6xfk5x", CSS.Types.Width.toString(width))],
     );

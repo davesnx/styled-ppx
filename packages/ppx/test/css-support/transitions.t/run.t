@@ -58,34 +58,38 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-1i5ed1j{transition:1s 0.5s linear margin-right;}"];
   [@css ".css-1c2e7j{transition:display 4s allow-discrete;}"];
   [@css ".css-1c8vjvi{transition:all 0.5s ease-out allow-discrete;}"];
-  [@css ".css-1s53f4o{transition:var(--var-mzypqe);}"];
-  [@css ".css-7av9kq{transition:var(--var-tbzsda);}"];
+  [@css ".css-1s53f4o{transition:var(--var-ahh0or);}"];
+  [@css ".css-7av9kq{transition:var(--var-ezh8oo);}"];
   [@css
-    ".css-vo6ojv{transition:var(--var-fefko6) var(--var-7p0nz0) var(--var-ml3rsq) var(--var-h43taz) var(--var-vo645f);}"
+    ".css-vo6ojv{transition:var(--var-18qplnj) var(--var-1iddlz) var(--var-vob4pv) var(--var-cibt83) var(--var-108fus4);}"
   ];
   [@css
-    ".css-7fw6lg{transition:var(--var-fefko6) var(--var-7p0nz0) var(--var-ml3rsq) var(--var-h43taz), var(--var-1hhkbxv) 0s;}"
+    ".css-7fw6lg{transition:var(--var-14kilfb) var(--var-1ejdhyh) var(--var-1j1h4k7) var(--var-pqgx10), var(--var-s110ja) 0s;}"
   ];
-  [@css ".css-mpxtlc{transition:var(--var-fefko6) 0.2s ease-out 3s;}"];
-  [@css ".css-1inf0xc{transition:var(--var-fefko6) 0.2s var(--var-ml3rsq) 3s;}"];
+  [@css ".css-mpxtlc{transition:var(--var-h7mj8c) 0.2s ease-out 3s;}"];
   [@css
-    ".css-g7n3fb{transition:var(--var-fefko6) var(--var-7p0nz0) var(--var-ml3rsq) 3s;}"
-  ];
-  [@css
-    ".css-exsj4v{transition:margin-right var(--var-7p0nz0) ease-out var(--var-h43taz);}"
+    ".css-1inf0xc{transition:var(--var-1skeegy) 0.2s var(--var-1ftkhfa) 3s;}"
   ];
   [@css
-    ".css-5zoj59{transition:var(--var-fefko6) var(--var-7p0nz0) ease-out var(--var-h43taz);}"
+    ".css-g7n3fb{transition:var(--var-ivu2ul) var(--var-kgrecx) var(--var-1p09x3l) 3s;}"
   ];
-  [@css ".css-1bqhenj{transition:margin-right 0.2s var(--var-ml3rsq) 3s;}"];
-  [@css ".css-9qix23{transition:margin-right 0.2s ease-out var(--var-h43taz);}"];
-  [@css ".css-13ygdrt{transition:var(--var-fefko6) 0.2s ease-in;}"];
-  [@css ".css-1ytrew9{transition:var(--var-fefko6) 0.2s var(--var-ml3rsq);}"];
-  [@css ".css-usxeae{transition:margin-right var(--var-7p0nz0) ease-in;}"];
-  [@css ".css-zo5bqb{transition:var(--var-fefko6) var(--var-7p0nz0) ease-in;}"];
-  [@css ".css-1np81bt{transition:margin-right 0.2s var(--var-ml3rsq);}"];
-  [@css ".css-2kvqcx{transition:var(--var-fefko6) 0.2s;}"];
-  [@css ".css-sw4q0n{transition:margin-right var(--var-7p0nz0);}"];
+  [@css
+    ".css-exsj4v{transition:margin-right var(--var-oa45ow) ease-out var(--var-dgz948);}"
+  ];
+  [@css
+    ".css-5zoj59{transition:var(--var-1fgs2tm) var(--var-1n1s912) ease-out var(--var-1ba13bw);}"
+  ];
+  [@css ".css-1bqhenj{transition:margin-right 0.2s var(--var-1tn5ly2) 3s;}"];
+  [@css
+    ".css-9qix23{transition:margin-right 0.2s ease-out var(--var-16ruk7g);}"
+  ];
+  [@css ".css-13ygdrt{transition:var(--var-11bcg03) 0.2s ease-in;}"];
+  [@css ".css-1ytrew9{transition:var(--var-dpf9r8) 0.2s var(--var-5iq5eh);}"];
+  [@css ".css-usxeae{transition:margin-right var(--var-sueb4i) ease-in;}"];
+  [@css ".css-zo5bqb{transition:var(--var-87e7ig) var(--var-1rwycv) ease-in;}"];
+  [@css ".css-1np81bt{transition:margin-right 0.2s var(--var-7aarh0);}"];
+  [@css ".css-2kvqcx{transition:var(--var-1f94jkq) 0.2s;}"];
+  [@css ".css-sw4q0n{transition:margin-right var(--var-fvn1cf);}"];
   
   CSS.make("css-3elsnu", []);
   CSS.make("css-1827oni", []);
@@ -140,7 +144,7 @@ If this test fail means that the module is not in sync with the ppx
     );
   CSS.make(
     "css-1s53f4o",
-    [("--var-mzypqe", CSS.Types.Transition.toString(fullTransition))],
+    [("--var-ahh0or", CSS.Types.Transition.toString(fullTransition))],
   );
   
   let fullTransition2 =
@@ -150,45 +154,45 @@ If this test fail means that the module is not in sync with the ppx
     );
   CSS.make(
     "css-7av9kq",
-    [("--var-tbzsda", CSS.Types.Transition.toString(fullTransition2))],
+    [("--var-ezh8oo", CSS.Types.Transition.toString(fullTransition2))],
   );
   
   CSS.make(
     "css-vo6ojv",
     [
-      ("--var-fefko6", CSS.Types.TransitionProperty.toString(property)),
-      ("--var-7p0nz0", CSS.Types.Time.toString(duration)),
+      ("--var-18qplnj", CSS.Types.TransitionProperty.toString(property)),
+      ("--var-1iddlz", CSS.Types.Time.toString(duration)),
       (
-        "--var-ml3rsq",
+        "--var-vob4pv",
         CSS.Types.TransitionTimingFunction.toString(timingFunction),
       ),
-      ("--var-h43taz", CSS.Types.Time.toString(delay)),
-      ("--var-vo645f", CSS.Types.TransitionBehavior.toString(behavior)),
+      ("--var-cibt83", CSS.Types.Time.toString(delay)),
+      ("--var-108fus4", CSS.Types.TransitionBehavior.toString(behavior)),
     ],
   );
   CSS.make(
     "css-7fw6lg",
     [
-      ("--var-fefko6", CSS.Types.TransitionProperty.toString(property)),
-      ("--var-7p0nz0", CSS.Types.Time.toString(duration)),
+      ("--var-14kilfb", CSS.Types.TransitionProperty.toString(property)),
+      ("--var-1ejdhyh", CSS.Types.Time.toString(duration)),
       (
-        "--var-ml3rsq",
+        "--var-1j1h4k7",
         CSS.Types.TransitionTimingFunction.toString(timingFunction),
       ),
-      ("--var-h43taz", CSS.Types.Time.toString(delay)),
-      ("--var-1hhkbxv", CSS.Types.TransitionProperty.toString(property3)),
+      ("--var-pqgx10", CSS.Types.Time.toString(delay)),
+      ("--var-s110ja", CSS.Types.TransitionProperty.toString(property3)),
     ],
   );
   CSS.make(
     "css-mpxtlc",
-    [("--var-fefko6", CSS.Types.TransitionProperty.toString(property))],
+    [("--var-h7mj8c", CSS.Types.TransitionProperty.toString(property))],
   );
   CSS.make(
     "css-1inf0xc",
     [
-      ("--var-fefko6", CSS.Types.TransitionProperty.toString(property)),
+      ("--var-1skeegy", CSS.Types.TransitionProperty.toString(property)),
       (
-        "--var-ml3rsq",
+        "--var-1ftkhfa",
         CSS.Types.TransitionTimingFunction.toString(timingFunction),
       ),
     ],
@@ -196,10 +200,10 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make(
     "css-g7n3fb",
     [
-      ("--var-fefko6", CSS.Types.TransitionProperty.toString(property)),
-      ("--var-7p0nz0", CSS.Types.Time.toString(duration)),
+      ("--var-ivu2ul", CSS.Types.TransitionProperty.toString(property)),
+      ("--var-kgrecx", CSS.Types.Time.toString(duration)),
       (
-        "--var-ml3rsq",
+        "--var-1p09x3l",
         CSS.Types.TransitionTimingFunction.toString(timingFunction),
       ),
     ],
@@ -207,84 +211,87 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make(
     "css-exsj4v",
     [
-      ("--var-7p0nz0", CSS.Types.Time.toString(duration)),
-      ("--var-h43taz", CSS.Types.Time.toString(delay)),
+      ("--var-oa45ow", CSS.Types.Time.toString(duration)),
+      ("--var-dgz948", CSS.Types.Time.toString(delay)),
     ],
   );
   CSS.make(
     "css-5zoj59",
     [
-      ("--var-fefko6", CSS.Types.TransitionProperty.toString(property)),
-      ("--var-7p0nz0", CSS.Types.Time.toString(duration)),
-      ("--var-h43taz", CSS.Types.Time.toString(delay)),
+      ("--var-1fgs2tm", CSS.Types.TransitionProperty.toString(property)),
+      ("--var-1n1s912", CSS.Types.Time.toString(duration)),
+      ("--var-1ba13bw", CSS.Types.Time.toString(delay)),
     ],
   );
   CSS.make(
     "css-1bqhenj",
     [
       (
-        "--var-ml3rsq",
+        "--var-1tn5ly2",
         CSS.Types.TransitionTimingFunction.toString(timingFunction),
       ),
     ],
   );
-  CSS.make("css-9qix23", [("--var-h43taz", CSS.Types.Time.toString(delay))]);
+  CSS.make(
+    "css-9qix23",
+    [("--var-16ruk7g", CSS.Types.Time.toString(delay))],
+  );
   CSS.make(
     "css-13ygdrt",
-    [("--var-fefko6", CSS.Types.TransitionProperty.toString(property))],
+    [("--var-11bcg03", CSS.Types.TransitionProperty.toString(property))],
   );
   CSS.make(
     "css-1ytrew9",
     [
-      ("--var-fefko6", CSS.Types.TransitionProperty.toString(property)),
+      ("--var-dpf9r8", CSS.Types.TransitionProperty.toString(property)),
       (
-        "--var-ml3rsq",
+        "--var-5iq5eh",
         CSS.Types.TransitionTimingFunction.toString(timingFunction),
       ),
     ],
   );
   CSS.make(
     "css-usxeae",
-    [("--var-7p0nz0", CSS.Types.Time.toString(duration))],
+    [("--var-sueb4i", CSS.Types.Time.toString(duration))],
   );
   CSS.make(
     "css-zo5bqb",
     [
-      ("--var-fefko6", CSS.Types.TransitionProperty.toString(property)),
-      ("--var-7p0nz0", CSS.Types.Time.toString(duration)),
+      ("--var-87e7ig", CSS.Types.TransitionProperty.toString(property)),
+      ("--var-1rwycv", CSS.Types.Time.toString(duration)),
     ],
   );
   CSS.make(
     "css-1np81bt",
     [
       (
-        "--var-ml3rsq",
+        "--var-7aarh0",
         CSS.Types.TransitionTimingFunction.toString(timingFunction),
       ),
     ],
   );
   CSS.make(
     "css-13ygdrt",
-    [("--var-fefko6", CSS.Types.TransitionProperty.toString(property))],
+    [("--var-11bcg03", CSS.Types.TransitionProperty.toString(property))],
   );
   CSS.make(
     "css-usxeae",
-    [("--var-7p0nz0", CSS.Types.Time.toString(duration))],
+    [("--var-sueb4i", CSS.Types.Time.toString(duration))],
   );
   CSS.make(
     "css-1np81bt",
     [
       (
-        "--var-ml3rsq",
+        "--var-7aarh0",
         CSS.Types.TransitionTimingFunction.toString(timingFunction),
       ),
     ],
   );
   CSS.make(
     "css-2kvqcx",
-    [("--var-fefko6", CSS.Types.TransitionProperty.toString(property))],
+    [("--var-1f94jkq", CSS.Types.TransitionProperty.toString(property))],
   );
   CSS.make(
     "css-sw4q0n",
-    [("--var-7p0nz0", CSS.Types.Time.toString(duration))],
+    [("--var-fvn1cf", CSS.Types.Time.toString(duration))],
   );

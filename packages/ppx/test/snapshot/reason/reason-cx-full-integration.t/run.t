@@ -4,14 +4,14 @@
   [@@@css "body{margin:0;font-family:system-ui, sans-serif;}"]
   [@@@css ".css-k008qs-staticCss{display:flex;}"]
   [@@@css ".css-1tyndxa-staticCss{justify-content:center;}"]
-  [@@@css ".css-kusjgz-dynamicCss{color:var(--var-sj55zd);}"]
+  [@@@css ".css-kusjgz-dynamicCss{color:var(--var-bqu3o1);}"]
   [@@@css ".css-k008qs-dynamicCss{display:flex;}"]
-  [@@@css ".css-15ikb3s-logicalProps{margin-block:var(--var-m7rmhk);}"]
-  [@@@css ".css-1io86c2-logicalProps{margin-inline:var(--var-m7rmhk);}"]
-  [@@@css ".css-bcg5v8-logicalProps{padding-block-start:var(--var-m7rmhk);}"]
+  [@@@css ".css-15ikb3s-logicalProps{margin-block:var(--var-q8xcvb);}"]
+  [@@@css ".css-1io86c2-logicalProps{margin-inline:var(--var-1j3g66a);}"]
+  [@@@css ".css-bcg5v8-logicalProps{padding-block-start:var(--var-1sssyxq);}"]
   [@@@css
-    ".css-1ifadwg-logicalProps{-webkit-padding-inline-end:var(--var-m7rmhk);padding-inline-end:var(--var-m7rmhk);}"]
-  [@@@css ".css-kdjpx-logicalProps{inset-block-start:var(--var-m7rmhk);}"]
+    ".css-1ifadwg-logicalProps{-webkit-padding-inline-end:var(--var-1sssyxq);padding-inline-end:var(--var-1sssyxq);}"]
+  [@@@css ".css-kdjpx-logicalProps{inset-block-start:var(--var-1sssyxq);}"]
   [@@@css ".css-k008qs-nestedCss{display:flex;}"]
   [@@@css ".css-zqnfaz-nestedCss:hover{opacity:0.8;}"]
   [@@@css ".css-osffsa-nestedCss .child{-webkit-flex:1;-ms-flex:1;flex:1;}"]
@@ -35,15 +35,15 @@
     "@media screen and (min-width: 768px) and (max-width: 1024px) {.css-mhiow9-complexMedia{display:flex;}}"]
   [@@@css
     "@media (prefers-color-scheme: dark) {.css-1nm9mde-complexMedia{background-color:#1a1a1a;}}"]
-  [@@@css ".css-kusjgz-mediaWithInterpolation{color:var(--var-sj55zd);}"]
+  [@@@css ".css-kusjgz-mediaWithInterpolation{color:var(--var-8sbf2v);}"]
   [@@@css
     "@media (max-width: 768px) {.css-11qknlj-mediaWithInterpolation{opacity:0.8;}}"]
   [@@@css "@keyframes keyframe-jw9oix{from{opacity:0;}to{opacity:1;}}"]
   [@@@css
     "@keyframes keyframe-waibjx{0%{-webkit-transform:translateY(100%);-moz-transform:translateY(100%);-ms-transform:translateY(100%);transform:translateY(100%);}100%{-webkit-transform:translateY(0);-moz-transform:translateY(0);-ms-transform:translateY(0);transform:translateY(0);}}"]
-  [@@@css ".css-b6lny7-multiVar{color:var(--var-bxenxf);}"]
-  [@@@css ".css-12udlbg-multiVar{background-color:var(--var-1czls49);}"]
-  [@@@css ".css-u661at-multiVar{font-size:var(--var-1kwx24p);}"]
+  [@@@css ".css-b6lny7-multiVar{color:var(--var-188leyp);}"]
+  [@@@css ".css-12udlbg-multiVar{background-color:var(--var-m54oxt);}"]
+  [@@@css ".css-u661at-multiVar{font-size:var(--var-1py677p);}"]
   [@@@css ".css-nk32ej-multiVar{padding:10px;}"]
   [@@@css ".css-lgj0h8-gridCss{display:grid;}"]
   [@@@css ".css-bghlac-gridCss{grid-template-columns:1fr 2fr 1fr;}"]
@@ -75,11 +75,13 @@
   let staticCss = CSS.make "css-k008qs-staticCss css-1tyndxa-staticCss" []
   let dynamicCss color =
     CSS.make "css-kusjgz-dynamicCss css-k008qs-dynamicCss"
-      [("--var-sj55zd", (CSS.Types.Color.toString color))]
+      [("--var-bqu3o1", (CSS.Types.Color.toString color))]
   let logicalProps spacing =
     CSS.make
       "css-15ikb3s-logicalProps css-1io86c2-logicalProps css-bcg5v8-logicalProps css-1ifadwg-logicalProps css-kdjpx-logicalProps"
-      [("--var-m7rmhk", (CSS.Types.MarginBlock.toString spacing))]
+      [("--var-q8xcvb", (CSS.Types.MarginBlock.toString spacing));
+      ("--var-1j3g66a", (CSS.Types.MarginInline.toString spacing));
+      ("--var-1sssyxq", (CSS.Types.Length.toString spacing))]
   let nestedCss =
     CSS.make "css-k008qs-nestedCss css-zqnfaz-nestedCss css-osffsa-nestedCss"
       []
@@ -100,7 +102,7 @@
   let mediaWithInterpolation color =
     CSS.make
       "css-kusjgz-mediaWithInterpolation css-11qknlj-mediaWithInterpolation"
-      [("--var-sj55zd", (CSS.Types.Color.toString color))]
+      [("--var-8sbf2v", (CSS.Types.Color.toString color))]
   let fadeIn = CSS.Types.AnimationName.make "keyframe-jw9oix"
   let slideUp = CSS.Types.AnimationName.make "keyframe-waibjx"
   module GlobalReset =
@@ -112,9 +114,9 @@
   let multiVar primary secondary size =
     CSS.make
       "css-b6lny7-multiVar css-12udlbg-multiVar css-u661at-multiVar css-nk32ej-multiVar"
-      [("--var-bxenxf", (CSS.Types.Color.toString primary));
-      ("--var-1czls49", (CSS.Types.Color.toString secondary));
-      ("--var-1kwx24p", (CSS.Types.FontSize.toString size))]
+      [("--var-188leyp", (CSS.Types.Color.toString primary));
+      ("--var-m54oxt", (CSS.Types.Color.toString secondary));
+      ("--var-1py677p", (CSS.Types.FontSize.toString size))]
   let gridCss =
     CSS.make "css-lgj0h8-gridCss css-bghlac-gridCss css-16610y9-gridCss" []
   let scrollCss = CSS.make "css-pdjuhq-scrollCss css-13v3rg8-scrollCss" []
@@ -149,13 +151,13 @@
   body{margin:0;font-family:system-ui, sans-serif;}
   .css-k008qs-staticCss{display:flex;}
   .css-1tyndxa-staticCss{justify-content:center;}
-  .css-kusjgz-dynamicCss{color:var(--var-sj55zd);}
+  .css-kusjgz-dynamicCss{color:var(--var-bqu3o1);}
   .css-k008qs-dynamicCss{display:flex;}
-  .css-15ikb3s-logicalProps{margin-block:var(--var-m7rmhk);}
-  .css-1io86c2-logicalProps{margin-inline:var(--var-m7rmhk);}
-  .css-bcg5v8-logicalProps{padding-block-start:var(--var-m7rmhk);}
-  .css-1ifadwg-logicalProps{-webkit-padding-inline-end:var(--var-m7rmhk);padding-inline-end:var(--var-m7rmhk);}
-  .css-kdjpx-logicalProps{inset-block-start:var(--var-m7rmhk);}
+  .css-15ikb3s-logicalProps{margin-block:var(--var-q8xcvb);}
+  .css-1io86c2-logicalProps{margin-inline:var(--var-1j3g66a);}
+  .css-bcg5v8-logicalProps{padding-block-start:var(--var-1sssyxq);}
+  .css-1ifadwg-logicalProps{-webkit-padding-inline-end:var(--var-1sssyxq);padding-inline-end:var(--var-1sssyxq);}
+  .css-kdjpx-logicalProps{inset-block-start:var(--var-1sssyxq);}
   .css-k008qs-nestedCss{display:flex;}
   .css-zqnfaz-nestedCss:hover{opacity:0.8;}
   .css-osffsa-nestedCss .child{-webkit-flex:1;-ms-flex:1;flex:1;}
@@ -171,13 +173,13 @@
   .css-lgj0h8-complexMedia{display:grid;}
   @media screen and (min-width: 768px) and (max-width: 1024px) {.css-mhiow9-complexMedia{display:flex;}}
   @media (prefers-color-scheme: dark) {.css-1nm9mde-complexMedia{background-color:#1a1a1a;}}
-  .css-kusjgz-mediaWithInterpolation{color:var(--var-sj55zd);}
+  .css-kusjgz-mediaWithInterpolation{color:var(--var-8sbf2v);}
   @media (max-width: 768px) {.css-11qknlj-mediaWithInterpolation{opacity:0.8;}}
   @keyframes keyframe-jw9oix{from{opacity:0;}to{opacity:1;}}
   @keyframes keyframe-waibjx{0%{-webkit-transform:translateY(100%);-moz-transform:translateY(100%);-ms-transform:translateY(100%);transform:translateY(100%);}100%{-webkit-transform:translateY(0);-moz-transform:translateY(0);-ms-transform:translateY(0);transform:translateY(0);}}
-  .css-b6lny7-multiVar{color:var(--var-bxenxf);}
-  .css-12udlbg-multiVar{background-color:var(--var-1czls49);}
-  .css-u661at-multiVar{font-size:var(--var-1kwx24p);}
+  .css-b6lny7-multiVar{color:var(--var-188leyp);}
+  .css-12udlbg-multiVar{background-color:var(--var-m54oxt);}
+  .css-u661at-multiVar{font-size:var(--var-1py677p);}
   .css-nk32ej-multiVar{padding:10px;}
   .css-lgj0h8-gridCss{display:grid;}
   .css-bghlac-gridCss{grid-template-columns:1fr 2fr 1fr;}

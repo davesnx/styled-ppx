@@ -16,11 +16,11 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css ".css-1l2838t{font-family:\"Inter Semi Bold\";}"];
-  [@css ".css-1wpww9k{font-family:var(--var-rwkopp);}"];
+  [@css ".css-1wpww9k{font-family:var(--var-qhzb1y);}"];
   [@css ".css-13c8hy8{font-family:Inter;}"];
-  [@css ".css-1sbj23c{font-family:var(--var-zty1s5);}"];
+  [@css ".css-1sbj23c{font-family:var(--var-q2u8nj);}"];
   [@css ".css-38zhkv{font-family:Inter, Sans;}"];
-  [@css ".css-e4l4c9{font-family:Inter, var(--var-1kuyir6);}"];
+  [@css ".css-e4l4c9{font-family:Inter, var(--var-165jgna);}"];
   [@css ".css-zpvvt7{font-family:\"Gill Sans Extrabold\", sans-serif;}"];
   [@css ".css-1nch51u{font-synthesis-weight:none;}"];
   [@css ".css-4qo3g2{font-synthesis-style:auto;}"];
@@ -156,17 +156,17 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-1l2838t", []);
   CSS.make(
     "css-1wpww9k",
-    [("--var-rwkopp", CSS.Types.FontFamilies.toString(fonts))],
+    [("--var-qhzb1y", CSS.Types.FontFamilies.toString(fonts))],
   );
   CSS.make("css-13c8hy8", []);
   CSS.make(
     "css-1sbj23c",
-    [("--var-zty1s5", CSS.Types.FontFamilies.toString(fontStack))],
+    [("--var-q2u8nj", CSS.Types.FontFamilies.toString(fontStack))],
   );
   CSS.make("css-38zhkv", []);
   CSS.make(
     "css-e4l4c9",
-    [("--var-1kuyir6", CSS.Types.FontFamily.toString(font))],
+    [("--var-165jgna", CSS.Types.FontFamily.toString(font))],
   );
   CSS.make("css-zpvvt7", []);
   

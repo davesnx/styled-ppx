@@ -207,7 +207,7 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-ce85p6{box-shadow:1px 1px, inset 2px 2px red;}"];
   [@css ".css-1q5q314{box-shadow:0 0 5px, inset 0 0 10px black;}"];
   [@css
-    ".css-1cg0xa4{box-shadow:-1px 1px 0px 0px var(--var-p8dwuy_1), 1px 1px 0px 0px var(--var-p8dwuy_2), 0px -1px 0px 0px var(--var-p8dwuy_3);}"
+    ".css-1cg0xa4{box-shadow:-1px 1px 0px 0px var(--var-xawwdw_1), 1px 1px 0px 0px var(--var-xawwdw_2), 0px -1px 0px 0px var(--var-xawwdw_3);}"
   ];
   [@css ".css-1jv2nfr{background-position-x:right;}"];
   [@css ".css-1fivq06{background-position-x:center;}"];
@@ -279,13 +279,13 @@ If this test fail means that the module is not in sync with the ppx
     ".css-e4fmes{background-image:linear-gradient(45deg, blue, red), linear-gradient(red -50px, white calc(-25px + 50%), blue 100%), linear-gradient(45deg, blue, red);}"
   ];
   [@css
-    ".css-rv0dwh{background-image:linear-gradient(45deg, var(--var-sj55zd_1) 25%, transparent 0%, transparent 50%, var(--var-sj55zd_2) 0%, var(--var-sj55zd_3) 75%, transparent 0%, transparent 100% ) ;}"
+    ".css-rv0dwh{background-image:linear-gradient(45deg, var(--var-udj66h_1) 25%, transparent 0%, transparent 50%, var(--var-udj66h_2) 0%, var(--var-udj66h_3) 75%, transparent 0%, transparent 100% ) ;}"
   ];
   [@css
-    ".css-1x2lx26{background-image:repeating-linear-gradient( 45deg, var(--var-sj55zd_1) 0px, var(--var-sj55zd_2) 4px, var(--var-sj55zd_3) 5px, var(--var-sj55zd_4) 9px ) ;}"
+    ".css-1x2lx26{background-image:repeating-linear-gradient( 45deg, var(--var-139ljoj_1) 0px, var(--var-139ljoj_2) 4px, var(--var-139ljoj_3) 5px, var(--var-139ljoj_4) 9px ) ;}"
   ];
   [@css
-    ".css-1mgigxz{background-image:linear-gradient(45deg, var(--var-znr2m3) 25%, transparent 25%), linear-gradient(red -50px, white calc(-25px + 50%), blue 100%), linear-gradient(45deg, blue, red);}"
+    ".css-1mgigxz{background-image:linear-gradient(45deg, var(--var-17ffdav) 25%, transparent 25%), linear-gradient(red -50px, white calc(-25px + 50%), blue 100%), linear-gradient(45deg, blue, red);}"
   ];
   [@css ".css-1y1fodl{background-image:radial-gradient(white, black);}"];
   [@css ".css-1bm5i1d{background-image:radial-gradient(circle, white, black);}"];
@@ -566,9 +566,9 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make(
     "css-1cg0xa4",
     [
-      ("--var-p8dwuy_1", CSS.Types.Color.toString(Color.Shadow.elevation1)),
-      ("--var-p8dwuy_2", CSS.Types.Color.toString(Color.Shadow.elevation1)),
-      ("--var-p8dwuy_3", CSS.Types.Color.toString(Color.Shadow.elevation1)),
+      ("--var-xawwdw_1", CSS.Types.Color.toString(Color.Shadow.elevation1)),
+      ("--var-xawwdw_2", CSS.Types.Color.toString(Color.Shadow.elevation1)),
+      ("--var-xawwdw_3", CSS.Types.Color.toString(Color.Shadow.elevation1)),
     ],
   );
   
@@ -638,24 +638,24 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make(
     "css-rv0dwh",
     [
-      ("--var-sj55zd_1", CSS.Types.Color.toString(color)),
-      ("--var-sj55zd_2", CSS.Types.Color.toString(color)),
-      ("--var-sj55zd_3", CSS.Types.Color.toString(color)),
+      ("--var-udj66h_1", CSS.Types.Color.toString(color)),
+      ("--var-udj66h_2", CSS.Types.Color.toString(color)),
+      ("--var-udj66h_3", CSS.Types.Color.toString(color)),
     ],
   );
   CSS.make(
     "css-1x2lx26",
     [
-      ("--var-sj55zd_1", CSS.Types.Color.toString(color)),
-      ("--var-sj55zd_2", CSS.Types.Color.toString(color)),
-      ("--var-sj55zd_3", CSS.Types.Color.toString(color)),
-      ("--var-sj55zd_4", CSS.Types.Color.toString(color)),
+      ("--var-139ljoj_1", CSS.Types.Color.toString(color)),
+      ("--var-139ljoj_2", CSS.Types.Color.toString(color)),
+      ("--var-139ljoj_3", CSS.Types.Color.toString(color)),
+      ("--var-139ljoj_4", CSS.Types.Color.toString(color)),
     ],
   );
   
   CSS.make(
     "css-1mgigxz",
-    [("--var-znr2m3", CSS.Types.Color.toString(Color.Background.boxDark))],
+    [("--var-17ffdav", CSS.Types.Color.toString(Color.Background.boxDark))],
   );
   
   CSS.make("css-1y1fodl", []);

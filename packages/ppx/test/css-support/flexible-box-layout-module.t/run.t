@@ -43,16 +43,16 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-6hx0uu{-webkit-flex:2 2;-ms-flex:2 2;flex:2 2;}"];
   [@css ".css-1rr8a55{-webkit-flex:2 2 10%;-ms-flex:2 2 10%;flex:2 2 10%;}"];
   [@css
-    ".css-1x4f3wz{-webkit-flex:var(--var-hvez6j);-ms-flex:var(--var-hvez6j);flex:var(--var-hvez6j);}"
+    ".css-1x4f3wz{-webkit-flex:var(--var-3keqbf);-ms-flex:var(--var-3keqbf);flex:var(--var-3keqbf);}"
   ];
   [@css
-    ".css-19g0la7{-webkit-flex:var(--var-volh69) var(--var-1qwalu0);-ms-flex:var(--var-volh69) var(--var-1qwalu0);flex:var(--var-volh69) var(--var-1qwalu0);}"
+    ".css-19g0la7{-webkit-flex:var(--var-bdy3z7) var(--var-1p309rg);-ms-flex:var(--var-bdy3z7) var(--var-1p309rg);flex:var(--var-bdy3z7) var(--var-1p309rg);}"
   ];
   [@css
-    ".css-djecpy{-webkit-flex:var(--var-volh69) var(--var-1qwalu0) var(--var-1u1axvx);-ms-flex:var(--var-volh69) var(--var-1qwalu0) var(--var-1u1axvx);flex:var(--var-volh69) var(--var-1qwalu0) var(--var-1u1axvx);}"
+    ".css-djecpy{-webkit-flex:var(--var-1g8t0wn) var(--var-dmenma) var(--var-e3h4r0);-ms-flex:var(--var-1g8t0wn) var(--var-dmenma) var(--var-e3h4r0);flex:var(--var-1g8t0wn) var(--var-dmenma) var(--var-e3h4r0);}"
   ];
   [@css
-    ".css-1f5dbv2{-webkit-flex:var(--var-volh69_1) var(--var-volh69_2);-ms-flex:var(--var-volh69_1) var(--var-volh69_2);flex:var(--var-volh69_1) var(--var-volh69_2);}"
+    ".css-1f5dbv2{-webkit-flex:var(--var-1g7nd20_1) var(--var-fet175_2);-ms-flex:var(--var-1g7nd20_1) var(--var-fet175_2);flex:var(--var-1g7nd20_1) var(--var-fet175_2);}"
   ];
   [@css ".css-1vu4n70{flex-basis:auto;}"];
   [@css ".css-1ibwkcj{flex-basis:content;}"];
@@ -122,28 +122,28 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-1rr8a55", []);
   CSS.make(
     "css-1x4f3wz",
-    [("--var-hvez6j", CSS.Types.Flex.toString(X.flex1))],
+    [("--var-3keqbf", CSS.Types.Flex.toString(X.flex1))],
   );
   CSS.make(
     "css-19g0la7",
     [
-      ("--var-volh69", CSS.Types.FlexGrow.toString(X.value)),
-      ("--var-1qwalu0", CSS.Types.FlexShrink.toString(X.value2)),
+      ("--var-bdy3z7", CSS.Types.FlexGrow.toString(X.value)),
+      ("--var-1p309rg", CSS.Types.FlexShrink.toString(X.value2)),
     ],
   );
   CSS.make(
     "css-djecpy",
     [
-      ("--var-volh69", CSS.Types.FlexGrow.toString(X.value)),
-      ("--var-1qwalu0", CSS.Types.FlexShrink.toString(X.value2)),
-      ("--var-1u1axvx", CSS.Types.FlexBasis.toString(X.min)),
+      ("--var-1g8t0wn", CSS.Types.FlexGrow.toString(X.value)),
+      ("--var-dmenma", CSS.Types.FlexShrink.toString(X.value2)),
+      ("--var-e3h4r0", CSS.Types.FlexBasis.toString(X.min)),
     ],
   );
   CSS.make(
     "css-1f5dbv2",
     [
-      ("--var-volh69_1", CSS.Types.FlexGrow.toString(X.value)),
-      ("--var-volh69_2", CSS.Types.FlexShrink.toString(X.value)),
+      ("--var-1g7nd20_1", CSS.Types.FlexGrow.toString(X.value)),
+      ("--var-fet175_2", CSS.Types.FlexShrink.toString(X.value)),
     ],
   );
   CSS.make("css-1vu4n70", []);

@@ -29,11 +29,11 @@
   .css-1bxstvc-buttonBase{border:2px solid #3b82f6;}
   .css-1vuar9w-buttonBase{box-shadow:0px 0px 0px 0px rgba(59, 130, 246, 0.5);}
   .css-rl6otz-buttonBase{border-radius:8px;}
-  .css-hfzctv-borderColorInterp{border:1px solid var(--var-1eesnn6);}
-  .css-9fu3s3-shadowInterp{box-shadow:var(--var-gdn5sz) var(--var-104d914) var(--var-dk37bb) var(--var-11b5qtb) var(--var-b6ajx9);}
-  .css-fkjemk-shadowFullInterp{box-shadow:var(--var-w6cvnd);}
-  .css-11hdrfm-borderWidthInterp{border:var(--var-1b2z9tl) solid black;}
-  .css-v2pvpe-mixedCard{background-color:var(--var-1aw7857);}
-  .css-hfzctv-mixedCard{border:1px solid var(--var-1eesnn6);}
-  .css-phae1x-mixedCard{box-shadow:var(--var-19o14xv);}
+  .css-hfzctv-borderColorInterp{border:1px solid var(--var-n18ysi);}
+  .css-9fu3s3-shadowInterp{box-shadow:var(--var-pat18a) var(--var-qx15c3) var(--var-1kkg6g2) var(--var-1wyrwcc) var(--var-12k2pr8);}
+  .css-fkjemk-shadowFullInterp{box-shadow:var(--var-1kiyke4);}
+  .css-11hdrfm-borderWidthInterp{border:var(--var-1b1exnn) solid black;}
+  .css-v2pvpe-mixedCard{background-color:var(--var-16nna3);}
+  .css-hfzctv-mixedCard{border:1px solid var(--var-w0mvl2);}
+  .css-phae1x-mixedCard{box-shadow:var(--var-1xyi5y6);}
   .css-1yfkn84-mixedCard{border-radius:12px;}

@@ -1,7 +1,7 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "body{color:var(--var-p73s17);}"];
+  [@css "body{color:var(--var-x73s9w);}"];
   [@css "*{box-sizing:border-box;}"];
   [@css "div.container#main{padding:0;}"];
   [@css ".btn.primary.large{font-weight:bold;}"];
@@ -13,7 +13,7 @@
   [@css "[data-state]{opacity:0.5;}"];
   [@css "[href^=\"https\"]{color:green;}"];
   [@css "a[target=\"_blank\"]::after{content:\" ↗\";}"];
-  [@css "a:hover{color:var(--var-p73s17);}"];
+  [@css "a:hover{color:var(--var-x73s9w);}"];
   [@css "input:focus-visible{outline:2px solid blue;}"];
   [@css "li:nth-child(2n){background:#eee;}"];
   [@css "button:not(:disabled){cursor:pointer;}"];
@@ -24,7 +24,7 @@
   [@css "h1{font-family:serif;}"];
   [@css "h2{font-family:serif;}"];
   [@css "h3{font-family:serif;}"];
-  [@css "form input[type=\"submit\"]:hover{background:var(--var-p73s17);}"];
+  [@css "form input[type=\"submit\"]:hover{background:var(--var-76odrx);}"];
   [@css "*{box-sizing:inherit;}"];
   [@css "*::before{box-sizing:inherit;}"];
   [@css "*::after{box-sizing:inherit;}"];
@@ -32,7 +32,16 @@
   module AllSelectors = {
     let to_string = () =>
       (
-        ((":root{" ++ "--var-p73s17:") ++ CSS.Types.Color.toString(accent))
+        (
+          (
+            (
+              ((":root{" ++ "--var-x73s9w:") ++ CSS.Types.Color.toString(accent))
+              ++ ";"
+            )
+            ++ "--var-76odrx:"
+          )
+          ++ CSS.Types.Background.toString(accent)
+        )
         ++ ";"
       )
       ++ "}";

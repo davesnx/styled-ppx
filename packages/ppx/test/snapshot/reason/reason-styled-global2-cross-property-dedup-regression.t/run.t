@@ -1,16 +1,27 @@
-REGRESSION TEST — pins KNOWN-BROKEN cross-property dedup in
-[%styled.global]. See input.re for the full rationale. A future
-fix MUST update this snapshot intentionally.
+REGRESSION TEST — [%styled.global] does not deduplicate one binding across
+different CSS runtime types. See input.re for the full rationale.
 
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "body{background:var(--var-ivms5p);color:var(--var-ivms5p);}"];
+  [@css "body{background:var(--var-7p3efj);color:var(--var-18pexj3);}"];
   let bg: CSS.Types.Background.t = `color(CSS.red);
   module Theme = {
     let to_string = () =>
       (
-        ((":root{" ++ "--var-ivms5p:") ++ CSS.Types.Background.toString(bg))
+        (
+          (
+            (
+              (
+                (":root{" ++ "--var-7p3efj:")
+                ++ CSS.Types.Background.toString(bg)
+              )
+              ++ ";"
+            )
+            ++ "--var-18pexj3:"
+          )
+          ++ CSS.Types.Color.toString(bg)
+        )
         ++ ";"
       )
       ++ "}";

@@ -8,8 +8,9 @@
    `dynamic_vars` entry.
 
    `dynamic_vars` is already deduplicated by [Css_file.add_dynamic_var]
-   on `var_name`, so the same OCaml expression interpolated multiple
-   times produces a single declaration here. */
+   on `var_name`. The name includes the owning style namespace and runtime
+   type, so repeated same-type interpolations share one declaration while
+   cross-type interpolations stay distinct. */
 
 module Helper = Ppxlib.Ast_helper;
 

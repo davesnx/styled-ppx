@@ -42,14 +42,31 @@ module Buffer = {
 module Css_transform = {
   open Styled_ppx_css_parser.Ast;
 
-  let variable_to_css_var_name = (path_str: string) => {
-    let hash = Murmur2.default(path_str);
+  let var_type_key = (var_type: var_type) =>
+    switch (var_type) {
+    | Selector => "selector"
+    | MediaQuery => "media-query"
+    | CustomProperty => "custom-property"
+    | RuntimeModule(name) => "runtime:" ++ name
+    };
+
+  let variable_to_css_var_name = (~namespace, ~var_type, path_str: string) => {
+    let hash =
+      Murmur2.default(
+        String.concat("\000", [namespace, path_str, var_type_key(var_type)]),
+      );
     Printf.sprintf("var-%s", hash);
   };
 
   let variable_to_css_var_name_for_occurrence =
-      (path_str: string, occurrence_index: int, total_occurrences: int) => {
-    let var_name = variable_to_css_var_name(path_str);
+      (
+        ~namespace,
+        ~var_type,
+        path_str: string,
+        occurrence_index: int,
+        total_occurrences: int,
+      ) => {
+    let var_name = variable_to_css_var_name(~namespace, ~var_type, path_str);
     total_occurrences > 1
       ? Printf.sprintf("%s_%d", var_name, occurrence_index) : var_name;
   };
@@ -103,6 +120,15 @@ module Css_transform = {
     | Some(name) => Printf.sprintf("css-%s-%s", hash, name)
     | None => Printf.sprintf("css-%s", hash)
     };
+  };
+
+  let namespace_from_rules = (~kind, ~file, ~scope, rules) => {
+    let scope_key = String.concat(".", scope);
+    let rules_key = rules |> List.map(render_rule) |> String.concat("\n");
+    String.concat(
+      "\000",
+      [kind, file, scope_key, Murmur2.default(rules_key)],
+    );
   };
 
   let rec transform_component_value =
@@ -459,7 +485,7 @@ module Css_transform = {
   };
 
   let transform_declaration =
-      (~file, ~scope, ~opens, decl: declaration, dynamic_vars) => {
+      (~file, ~scope, ~opens, ~var_namespace, decl: declaration, dynamic_vars) => {
     let (property_name, _) = decl.name;
     let (value_list, value_loc) = decl.value;
 
@@ -480,12 +506,6 @@ module Css_transform = {
         | Some(count) => count
         | None => 1
         };
-      let css_var_name =
-        variable_to_css_var_name_for_occurrence(
-          var_name,
-          occurrence_index,
-          total_occurrences,
-        );
       let (type_path, remaining_types) =
         switch (
           take_first_matching_name(var_name, remaining_interpolation_types^)
@@ -507,6 +527,14 @@ module Css_transform = {
             Property_to_types.resolve_module_name(~type_path, ~property_name),
           );
         };
+      let css_var_name =
+        variable_to_css_var_name_for_occurrence(
+          ~namespace=var_namespace,
+          ~var_type,
+          var_name,
+          occurrence_index,
+          total_occurrences,
+        );
 
       (css_var_name, var_type);
     };
@@ -533,25 +561,47 @@ module Css_transform = {
     };
   };
 
-  let rec transform_rule = (~file, ~scope, ~opens, rule: rule, dynamic_vars) => {
+  let rec transform_rule =
+      (~file, ~scope, ~opens, ~var_namespace, rule: rule, dynamic_vars) => {
     switch (rule) {
     | Declaration(decl) =>
       Declaration(
-        transform_declaration(~file, ~scope, ~opens, decl, dynamic_vars),
+        transform_declaration(
+          ~file,
+          ~scope,
+          ~opens,
+          ~var_namespace,
+          decl,
+          dynamic_vars,
+        ),
       )
     | Style_rule(style_rule) =>
       Style_rule(
-        transform_style_rule(~file, ~scope, ~opens, style_rule, dynamic_vars),
+        transform_style_rule(
+          ~file,
+          ~scope,
+          ~opens,
+          ~var_namespace,
+          style_rule,
+          dynamic_vars,
+        ),
       )
     | At_rule(at_rule) =>
       At_rule(
-        transform_at_rule(~file, ~scope, ~opens, at_rule, dynamic_vars),
+        transform_at_rule(
+          ~file,
+          ~scope,
+          ~opens,
+          ~var_namespace,
+          at_rule,
+          dynamic_vars,
+        ),
       )
     };
   }
 
   and transform_style_rule =
-      (~file, ~scope, ~opens, style_rule: style_rule, dynamic_vars) => {
+      (~file, ~scope, ~opens, ~var_namespace, style_rule: style_rule, dynamic_vars) => {
     let { prelude, block, loc } = style_rule;
     let (selector_list, selector_loc) = prelude;
     let transformed_selectors =
@@ -566,7 +616,15 @@ module Css_transform = {
     let (rule_list, rule_loc) = block;
     let transformed_rules =
       List.map(
-        rule => transform_rule(~file, ~scope, ~opens, rule, dynamic_vars),
+        rule =>
+          transform_rule(
+            ~file,
+            ~scope,
+            ~opens,
+            ~var_namespace,
+            rule,
+            dynamic_vars,
+          ),
         rule_list,
       );
     {
@@ -577,7 +635,7 @@ module Css_transform = {
   }
 
   and transform_at_rule =
-      (~file, ~scope, ~opens, at_rule: at_rule, dynamic_vars) => {
+      (~file, ~scope, ~opens, ~var_namespace, at_rule: at_rule, dynamic_vars) => {
     let { name, prelude, block, loc } = at_rule;
     let (prelude_values, prelude_loc) = prelude;
 
@@ -614,7 +672,15 @@ module Css_transform = {
 
     let map_payload = ((rules, rule_loc)) => (
       List.map(
-        r => transform_rule(~file, ~scope, ~opens, r, dynamic_vars),
+        r =>
+          transform_rule(
+            ~file,
+            ~scope,
+            ~opens,
+            ~var_namespace,
+            r,
+            dynamic_vars,
+          ),
         rules,
       ),
       rule_loc,
@@ -858,6 +924,8 @@ module Css_transform = {
     let (rules, loc) = rule_list;
 
     let atomic_rules = atomize_rules(~label?, rules);
+    let var_namespace =
+      atomic_rules |> List.map(((className, _rule)) => className) |> String.concat(" ");
 
     let processed_rules =
       atomic_rules
@@ -895,12 +963,19 @@ module Css_transform = {
                )
              };
 
-           transformed
-           |> List.map(r =>
-                transform_rule(~file, ~scope, ~opens, r, dynamic_vars)
-              )
-           |> List.map(r => (className, r));
-         })
+            transformed
+            |> List.map(r =>
+                 transform_rule(
+                   ~file,
+                   ~scope,
+                   ~opens,
+                   ~var_namespace,
+                   r,
+                   dynamic_vars,
+                 )
+               )
+            |> List.map(r => (className, r));
+          })
       |> List.concat;
 
     (processed_rules, List.rev(dynamic_vars^));
@@ -964,10 +1039,19 @@ let push_keyframe =
 
   let (rules, rule_loc) = keyframe_rules;
   let dynamic_vars = ref([]);
+  let var_namespace =
+    Css_transform.namespace_from_rules(~kind="keyframes", ~file, ~scope, rules);
   let transformed_rules =
     rules
     |> List.map(rule =>
-         Css_transform.transform_rule(~file, ~scope, ~opens, rule, dynamic_vars)
+         Css_transform.transform_rule(
+           ~file,
+           ~scope,
+           ~opens,
+           ~var_namespace,
+           rule,
+           dynamic_vars,
+         )
        );
   let rendered_body =
     transformed_rules |> List.map(render_rule) |> String.concat(" ");
@@ -993,14 +1077,14 @@ let push_keyframe =
 };
 
 /* Walk every rule in a [%styled.global] block, substitute
-   `$(expr)` interpolations with `var(--var-<hash>)` on the static
+   `$(expr)` interpolations with scoped `var(--var-<hash>)` names on the static
    side, and accumulate the corresponding dynamic_vars.
 
    Each rule (whether or not it contains interpolation) is pushed to
    `Buffer.add_global_rule` so it ships through the existing
    `[@@@css ...]` channel. The returned dynamic_vars feeds the
    generated module's `to_string`, which emits a single
-    `:root { --var-<hash>: <value>; ... }` block for callers that explicitly
+   `:root { --var-<hash>: <value>; ... }` block for callers that explicitly
     request the dynamic custom-property CSS; one declaration per dynamic_var
     entry (already deduplicated by `Css_transform.add_dynamic_var`).
 
@@ -1032,10 +1116,17 @@ let push_global =
      `split_multiple_selectors` before unnesting. */
   let flattened_rules =
     Styled_ppx_css_parser.Resolve.resolve_selectors(rules);
+  let var_namespace =
+    Css_transform.namespace_from_rules(
+      ~kind="global",
+      ~file,
+      ~scope,
+      flattened_rules,
+    );
 
   /* transform_rule walks the rule, replacing every Variable(path) in
-     declaration values with var(--hash) and appending (var_name, path,
-     var_type) to all_dynamic_vars.
+     declaration values with a namespace/type-scoped var(--hash) and appending
+     (var_name, path, var_type) to all_dynamic_vars.
 
      The caller in [ppx.re] pre-checks the rule list for top-level
      Declaration nodes and bails before invoking this function, so the
@@ -1053,6 +1144,7 @@ let push_global =
              ~file,
              ~scope,
              ~opens,
+             ~var_namespace,
              rule,
              all_dynamic_vars,
            );

@@ -38,7 +38,7 @@ If this test fail means that the module is not in sync with the ppx
     ".css-1jqkbxn{grid-template-columns:fit-content(20px) fit-content(10%);}"
   ];
   [@css
-    ".css-1wxdqmz{-webkit-text-decoration:var(--var-z052by);text-decoration:var(--var-z052by);}"
+    ".css-1wxdqmz{-webkit-text-decoration:var(--var-112i897);text-decoration:var(--var-112i897);}"
   ];
   let cosas = `bold;
   
@@ -46,5 +46,5 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.make(
     "css-1wxdqmz",
-    [("--var-z052by", CSS.Types.TextDecoration.toString(cosas))],
+    [("--var-112i897", CSS.Types.TextDecoration.toString(cosas))],
   );

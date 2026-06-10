@@ -1,8 +1,8 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "body{color:var(--var-xec4w7);}"];
-  [@css "@media (min-width: 768px) {body{color:var(--var-1st71j9);}}"];
+  [@css "body{color:var(--var-t4is5w);}"];
+  [@css "@media (min-width: 768px) {body{color:var(--var-igf9t7);}}"];
   let mobileColor = CSS.red;
   let desktopColor = CSS.blue;
   module ResponsiveStyles = {
@@ -12,12 +12,12 @@
           (
             (
               (
-                (":root{" ++ "--var-xec4w7:")
+                (":root{" ++ "--var-t4is5w:")
                 ++ CSS.Types.Color.toString(mobileColor)
               )
               ++ ";"
             )
-            ++ "--var-1st71j9:"
+            ++ "--var-igf9t7:"
           )
           ++ CSS.Types.Color.toString(desktopColor)
         )

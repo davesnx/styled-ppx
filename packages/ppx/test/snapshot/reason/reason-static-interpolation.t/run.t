@@ -1,9 +1,9 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-1xk9vey-StringInterpolation{color:var(--var-1f198fc);}"];
-  [@css ".css-4cn5y8-StringInterpolation{background-color:var(--var-pg76o6);}"];
-  [@css ".css-q3gxfp-StringInterpolation{border-color:var(--var-57cmfh);}"];
+  [@css ".css-1xk9vey-StringInterpolation{color:var(--var-vm8jfh);}"];
+  [@css ".css-4cn5y8-StringInterpolation{background-color:var(--var-i5vaoh);}"];
+  [@css ".css-q3gxfp-StringInterpolation{border-color:var(--var-6ffftt);}"];
   [@css ".css-13o7eu2-StringInterpolation{display:block;}"];
   [@css.bindings
     [
@@ -1007,9 +1007,9 @@
       CSS.make(
         "css-1xk9vey-StringInterpolation css-4cn5y8-StringInterpolation css-q3gxfp-StringInterpolation css-13o7eu2-StringInterpolation",
         [
-          ("--var-1f198fc", CSS.Types.Color.toString(Theme.var)),
-          ("--var-pg76o6", CSS.Types.Color.toString(black)),
-          ("--var-57cmfh", CSS.Types.Color.toString(Theme.Border.black)),
+          ("--var-vm8jfh", CSS.Types.Color.toString(Theme.var)),
+          ("--var-i5vaoh", CSS.Types.Color.toString(black)),
+          ("--var-6ffftt", CSS.Types.Color.toString(Theme.Border.black)),
         ],
       );
     let make = (props: makeProps) => {

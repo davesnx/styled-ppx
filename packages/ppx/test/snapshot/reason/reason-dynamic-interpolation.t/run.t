@@ -1,7 +1,7 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-u97bjx-DynamicComponent{color:var(--var-9ma4tn);}"];
+  [@css ".css-u97bjx-DynamicComponent{color:var(--var-xzastg);}"];
   [@css ".css-13o7eu2-DynamicComponent{display:block;}"];
   [@css.bindings
     [
@@ -1001,7 +1001,7 @@
     let styles = (~var, _) =>
       CSS.make(
         "css-u97bjx-DynamicComponent css-13o7eu2-DynamicComponent",
-        [("--var-9ma4tn", CSS.Types.Color.toString(var))],
+        [("--var-xzastg", CSS.Types.Color.toString(var))],
       );
     let make = (props: makeProps('var)) => {
       let className =

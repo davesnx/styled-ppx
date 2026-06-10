@@ -2,13 +2,13 @@
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css "html{box-sizing:border-box;}"];
-  [@css "body{margin:0;color:var(--var-bxenxf);}"];
+  [@css "body{margin:0;color:var(--var-a0ieir);}"];
   [@css "a{-webkit-text-decoration:none;text-decoration:none;}"];
   let primary = CSS.red;
   module MixedStyles = {
     let to_string = () =>
       (
-        ((":root{" ++ "--var-bxenxf:") ++ CSS.Types.Color.toString(primary))
+        ((":root{" ++ "--var-a0ieir:") ++ CSS.Types.Color.toString(primary))
         ++ ";"
       )
       ++ "}";

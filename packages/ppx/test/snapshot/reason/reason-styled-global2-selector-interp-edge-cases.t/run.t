@@ -2,9 +2,9 @@
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css "body:not(.css-nk32ej-card){margin:0;}"];
-  [@css ".css-nk32ej-card{background:var(--var-ivms5p);}"];
+  [@css ".css-nk32ej-card{background:var(--var-eqk9ul);}"];
   [@css ".css-b7rhyr-active.css-nk32ej-card{color:white;}"];
-  [@css ".container .css-nk32ej-card{color:var(--var-ivms5p);}"];
+  [@css ".container .css-nk32ej-card{color:var(--var-l5qn5v);}"];
   [@css ".css-nk32ej-card{padding:10px;}"];
   [@css ".css-b7rhyr-active{border:1px solid;}"];
   [@css.bindings
@@ -19,7 +19,19 @@
   module CardGlobals = {
     let to_string = () =>
       (
-        ((":root{" ++ "--var-ivms5p:") ++ CSS.Types.Background.toString(bg))
+        (
+          (
+            (
+              (
+                (":root{" ++ "--var-eqk9ul:")
+                ++ CSS.Types.Background.toString(bg)
+              )
+              ++ ";"
+            )
+            ++ "--var-l5qn5v:"
+          )
+          ++ CSS.Types.Color.toString(bg)
+        )
         ++ ";"
       )
       ++ "}";
