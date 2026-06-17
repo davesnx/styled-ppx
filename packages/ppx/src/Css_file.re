@@ -42,6 +42,13 @@ module Buffer = {
 module Css_transform = {
   open Styled_ppx_css_parser.Ast;
 
+  /* Maps an interpolation's resolved kind to the stable [type_key] string
+     that `Hash_class.variable` mixes into the custom-property hash, so two
+     interpolations differing only by target type get distinct variables.
+     Kept here rather than in `Hash_class` because `var_type` is a domain
+     type that also drives runtime emission (`Css_to_runtime`,
+     `Css_global_to_string`); `Hash_class` stays free of that coupling and
+     consumes the opaque [type_key] string. */
   let var_type_key = (var_type: var_type) =>
     switch (var_type) {
     | Selector => "selector"
@@ -49,27 +56,6 @@ module Css_transform = {
     | CustomProperty => "custom-property"
     | RuntimeModule(name) => "runtime:" ++ name
     };
-
-  let variable_to_css_var_name = (~namespace, ~var_type, path_str: string) => {
-    let hash =
-      Murmur2.default(
-        String.concat("\000", [namespace, path_str, var_type_key(var_type)]),
-      );
-    Printf.sprintf("var-%s", hash);
-  };
-
-  let variable_to_css_var_name_for_occurrence =
-      (
-        ~namespace,
-        ~var_type,
-        path_str: string,
-        occurrence_index: int,
-        total_occurrences: int,
-      ) => {
-    let var_name = variable_to_css_var_name(~namespace, ~var_type, path_str);
-    total_occurrences > 1
-      ? Printf.sprintf("%s_%d", var_name, occurrence_index) : var_name;
-  };
 
   /* Increment the count for [name] in an assoc list, returning the new
      count and the updated list. */
@@ -112,40 +98,6 @@ module Css_transform = {
           )) {
       dynamic_vars := [dynamic_var, ...dynamic_vars^];
     };
-  };
-
-  /* An atom's identity, derived from a single content hash: the
-     label-independent namespace (`css-<content-hash>`) and the full class
-     name (`<namespace>-<label>`).
-
-     The namespace is the seed for interpolation `var(--...)` names, so a
-     substituted variable becomes a pure function of the atom's declaration
-     content - the exact same input that backs the class name - independent
-     of the binding's label, its sibling declarations, the file and the
-     scope. This keeps the atomic-CSS invariant "one class name <=> one exact
-     declaration body" true for the variable baked inside the atom as well as
-     for the class name itself: identical declarations emit identical class
-     names AND identical variables across labels, bindings and modules. */
-  let class_and_namespace = (~label=?, content: string): (string, string) => {
-    let namespace = Printf.sprintf("css-%s", Murmur2.default(content));
-    let className =
-      switch (label) {
-      | Some(name) => Printf.sprintf("%s-%s", namespace, name)
-      | None => namespace
-      };
-    (className, namespace);
-  };
-
-  let generate_class_from_content = (~label=?, content: string): string =>
-    fst(class_and_namespace(~label?, content));
-
-  let namespace_from_rules = (~kind, ~file, ~scope, rules) => {
-    let scope_key = String.concat(".", scope);
-    let rules_key = rules |> List.map(render_rule) |> String.concat("\n");
-    String.concat(
-      "\000",
-      [kind, file, scope_key, Murmur2.default(rules_key)],
-    );
   };
 
   let rec transform_component_value =
@@ -545,12 +497,12 @@ module Css_transform = {
           );
         };
       let css_var_name =
-        variable_to_css_var_name_for_occurrence(
+        Hash_class.variable_for_occurrence(
           ~namespace=var_namespace,
-          ~var_type,
+          ~type_key=var_type_key(var_type),
+          ~occurrence=occurrence_index,
+          ~total=total_occurrences,
           var_name,
-          occurrence_index,
-          total_occurrences,
         );
 
       (css_var_name, var_type);
@@ -827,7 +779,7 @@ module Css_transform = {
       | None =>
         let decl_string = render_declaration(decl);
         let (className, namespace) =
-          class_and_namespace(~label?, decl_string);
+          Hash_class.class_and_namespace(~label?, decl_string);
         [(className, namespace, Declaration(decl))];
       | Some(parent_selectors) =>
         List.map(
@@ -840,7 +792,7 @@ module Css_transform = {
               });
             let rule_string = render_rule(style_rule);
             let (className, namespace) =
-              class_and_namespace(~label?, rule_string);
+              Hash_class.class_and_namespace(~label?, rule_string);
             (className, namespace, style_rule);
           },
           parent_selectors,
@@ -895,7 +847,7 @@ module Css_transform = {
         | Empty =>
           let at_string = render_rule(rule);
           let (className, namespace) =
-            class_and_namespace(~label?, at_string);
+            Hash_class.class_and_namespace(~label?, at_string);
           [(className, namespace, rule)];
 
         /* Both Rule_list and Stylesheet payloads are atomized the same way:
@@ -923,7 +875,7 @@ module Css_transform = {
                  });
                let wrapped_string = render_rule(wrapped);
                let (new_className, new_namespace) =
-                 class_and_namespace(~label?, wrapped_string);
+                 Hash_class.class_and_namespace(~label?, wrapped_string);
                (new_className, new_namespace, wrapped);
              })
         }
@@ -1009,9 +961,7 @@ module Css_transform = {
    shape. */
 let mint_empty_class = (~label) =>
   switch (label) {
-  | Some(name) when name != "_" => [
-      Css_transform.generate_class_from_content(~label=name, ""),
-    ]
+  | Some(name) when name != "_" => [Hash_class.class_name(~label=name, "")]
   | _ => []
   };
 
@@ -1059,7 +1009,12 @@ let push_keyframe =
   let (rules, rule_loc) = keyframe_rules;
   let dynamic_vars = ref([]);
   let var_namespace =
-    Css_transform.namespace_from_rules(~kind="keyframes", ~file, ~scope, rules);
+    Hash_class.scoped_namespace(
+      ~kind="keyframes",
+      ~file,
+      ~scope,
+      ~rendered_rules=List.map(render_rule, rules),
+    );
   let transformed_rules =
     rules
     |> List.map(rule =>
@@ -1075,8 +1030,7 @@ let push_keyframe =
   let rendered_body =
     transformed_rules |> List.map(render_rule) |> String.concat(" ");
 
-  let keyframe_name =
-    Printf.sprintf("keyframe-%s", Murmur2.default(rendered_body));
+  let keyframe_name = Hash_class.keyframe_name(rendered_body);
 
   let at_rule: at_rule = {
     name: ("keyframes", Ppxlib.Location.none),
@@ -1136,11 +1090,11 @@ let push_global =
   let flattened_rules =
     Styled_ppx_css_parser.Resolve.resolve_selectors(rules);
   let var_namespace =
-    Css_transform.namespace_from_rules(
+    Hash_class.scoped_namespace(
       ~kind="global",
       ~file,
       ~scope,
-      flattened_rules,
+      ~rendered_rules=List.map(render_rule, flattened_rules),
     );
 
   /* transform_rule walks the rule, replacing every Variable(path) in
@@ -1167,11 +1121,7 @@ let push_global =
              rule,
              all_dynamic_vars,
            );
-         let key =
-           Printf.sprintf(
-             "global-%s",
-             Murmur2.default(render_rule(transformed)),
-           );
+         let key = Hash_class.global_key(render_rule(transformed));
          Buffer.add_global_rule(key, render_prefixed_rule(transformed));
        | Declaration(_) => ()
        }
