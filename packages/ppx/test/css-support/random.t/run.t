@@ -128,8 +128,8 @@ If this test fail means that the module is not in sync with the ppx
     ".css-p2a0mj{background-image:linear-gradient(84deg, #F80 0%, rgba(255, 255, 255, 0.8) 50%, #2A97FF 100%);}"
   ];
   [@css ".css-1amvr3s{aspect-ratio:16 / 9;}"];
-  [@css ".css-14nb9wm{right:var(--var-ibbo5i);}"];
-  [@css ".css-1j2fdnr{bottom:var(--var-6gl9oa);}"];
+  [@css ".css-14nb9wm{right:var(--var-1woy9u6);}"];
+  [@css ".css-1j2fdnr{bottom:var(--var-12mtkm);}"];
   
   CSS.make("css-89hc5w", []);
   CSS.make("css-pdjuhq", []);
@@ -283,8 +283,8 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make(
     "css-14nb9wm css-1j2fdnr",
     [
-      ("--var-ibbo5i", CSS.Types.Right.toString(interpolation)),
-      ("--var-6gl9oa", CSS.Types.Bottom.toString(interpolation)),
+      ("--var-1woy9u6", CSS.Types.Right.toString(interpolation)),
+      ("--var-12mtkm", CSS.Types.Bottom.toString(interpolation)),
     ],
   );
 

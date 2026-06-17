@@ -2,9 +2,11 @@
 
    When a single OCaml binding is interpolated into multiple CSS
    properties whose types differ, static extraction must not deduplicate
-   them to one custom property. The custom-property name includes the
-   binding source, owning style namespace, and resolved runtime type, so
-   each distinct serializer gets its own variable.
+   them to one custom property. Each atomized declaration owns its
+   variable, whose name is a pure function of that declaration's content
+   (the same input that backs the atom's class name), the interpolation
+   path, and the resolved runtime type, so each distinct serializer gets
+   its own variable.
 
    Concretely below: `lengthVar` is interpolated into both
    `margin-left:` (Margin.t accepts `auto`) and `padding-left:`
@@ -12,8 +14,9 @@
    `--var-...` names and separate `Margin.toString` / `Length.toString`
    calls, so a fully type-checked build rejects invalid cross-type reuse.
 
-   Same binding + same runtime type still deduplicates within one owning
-   style expression; only cross-type reuse receives distinct variables. */
+   Because the variable is keyed to the atom's own declaration content,
+   the same binding reused across different properties always receives a
+   distinct variable per property, even when the runtime type matches. */
 
 let lengthVar = CSS.px(10);
 

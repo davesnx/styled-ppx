@@ -114,13 +114,30 @@ module Css_transform = {
     };
   };
 
-  let generate_class_from_content = (~label=?, content: string): string => {
-    let hash = Murmur2.default(content);
-    switch (label) {
-    | Some(name) => Printf.sprintf("css-%s-%s", hash, name)
-    | None => Printf.sprintf("css-%s", hash)
-    };
+  /* An atom's identity, derived from a single content hash: the
+     label-independent namespace (`css-<content-hash>`) and the full class
+     name (`<namespace>-<label>`).
+
+     The namespace is the seed for interpolation `var(--...)` names, so a
+     substituted variable becomes a pure function of the atom's declaration
+     content - the exact same input that backs the class name - independent
+     of the binding's label, its sibling declarations, the file and the
+     scope. This keeps the atomic-CSS invariant "one class name <=> one exact
+     declaration body" true for the variable baked inside the atom as well as
+     for the class name itself: identical declarations emit identical class
+     names AND identical variables across labels, bindings and modules. */
+  let class_and_namespace = (~label=?, content: string): (string, string) => {
+    let namespace = Printf.sprintf("css-%s", Murmur2.default(content));
+    let className =
+      switch (label) {
+      | Some(name) => Printf.sprintf("%s-%s", namespace, name)
+      | None => namespace
+      };
+    (className, namespace);
   };
+
+  let generate_class_from_content = (~label=?, content: string): string =>
+    fst(class_and_namespace(~label?, content));
 
   let namespace_from_rules = (~kind, ~file, ~scope, rules) => {
     let scope_key = String.concat(".", scope);
@@ -757,7 +774,8 @@ module Css_transform = {
     );
   };
 
-  let atomize_rules = (~label=?, rules: list(rule)): list((string, rule)) => {
+  let atomize_rules =
+      (~label=?, rules: list(rule)): list((string, string, rule)) => {
     /* Merge a child selector-list prelude under a parent selector-list prelude.
        For each (parent, child) pair, run `compute_new_prefix` so `&`,
        `::pseudo`, and descendant combinators all resolve correctly. The
@@ -808,8 +826,9 @@ module Css_transform = {
       switch (parent_prelude) {
       | None =>
         let decl_string = render_declaration(decl);
-        let className = generate_class_from_content(~label?, decl_string);
-        [(className, Declaration(decl))];
+        let (className, namespace) =
+          class_and_namespace(~label?, decl_string);
+        [(className, namespace, Declaration(decl))];
       | Some(parent_selectors) =>
         List.map(
           ((parent_sel, parent_loc)) => {
@@ -820,8 +839,9 @@ module Css_transform = {
                 loc: Ppxlib.Location.none,
               });
             let rule_string = render_rule(style_rule);
-            let className = generate_class_from_content(~label?, rule_string);
-            (className, style_rule);
+            let (className, namespace) =
+              class_and_namespace(~label?, rule_string);
+            (className, namespace, style_rule);
           },
           parent_selectors,
         )
@@ -829,7 +849,7 @@ module Css_transform = {
     };
 
     let rec extract_atomic_rules =
-            (~parent_prelude=?, rule: rule): list((string, rule)) => {
+            (~parent_prelude=?, rule: rule): list((string, string, rule)) => {
       switch (rule) {
       | Declaration(decl) =>
         wrap_declaration_under_parent(~parent_prelude?, decl)
@@ -874,8 +894,9 @@ module Css_transform = {
         switch (block) {
         | Empty =>
           let at_string = render_rule(rule);
-          let className = generate_class_from_content(~label?, at_string);
-          [(className, rule)];
+          let (className, namespace) =
+            class_and_namespace(~label?, at_string);
+          [(className, namespace, rule)];
 
         /* Both Rule_list and Stylesheet payloads are atomized the same way:
            recurse into the inner rules, then re-wrap each atom in a fresh
@@ -892,7 +913,7 @@ module Css_transform = {
         | Stylesheet((rules, rule_loc)) =>
           rules
           |> List.concat_map(extract_atomic_rules(~parent_prelude?))
-          |> List.map(((_className, inner_rule)) => {
+          |> List.map(((_className, _namespace, inner_rule)) => {
                let wrapped =
                  At_rule({
                    name,
@@ -901,9 +922,9 @@ module Css_transform = {
                    loc,
                  });
                let wrapped_string = render_rule(wrapped);
-               let new_className =
-                 generate_class_from_content(~label?, wrapped_string);
-               (new_className, wrapped);
+               let (new_className, new_namespace) =
+                 class_and_namespace(~label?, wrapped_string);
+               (new_className, new_namespace, wrapped);
              })
         }
       };
@@ -924,12 +945,10 @@ module Css_transform = {
     let (rules, loc) = rule_list;
 
     let atomic_rules = atomize_rules(~label?, rules);
-    let var_namespace =
-      atomic_rules |> List.map(((className, _rule)) => className) |> String.concat(" ");
 
     let processed_rules =
       atomic_rules
-      |> List.map(((className, rule)) => {
+      |> List.map(((className, var_namespace, rule)) => {
            let single_rule_list = ([rule], loc);
 
            let transformed =

@@ -1,9 +1,9 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --native --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-u97bjx-DynamicComponent{color:var(--var-1b63kqi);}"];
+  [@css ".css-u97bjx-DynamicComponent{color:var(--var-17zksex);}"];
   [@css ".css-k008qs-DynamicComponent{display:flex;}"];
-  [@css ".css-v2g7ti-DynamicComponent{background-color:var(--var-oz5hzc);}"];
+  [@css ".css-v2g7ti-DynamicComponent{background-color:var(--var-1s0m1fr);}"];
   [@css.bindings
     [
       (
@@ -973,8 +973,8 @@
       CSS.make(
         "css-u97bjx-DynamicComponent css-k008qs-DynamicComponent css-v2g7ti-DynamicComponent",
         [
-          ("--var-1b63kqi", CSS.Types.Color.toString(var)),
-          ("--var-oz5hzc", CSS.Types.Color.toString(id)),
+          ("--var-17zksex", CSS.Types.Color.toString(var)),
+          ("--var-1s0m1fr", CSS.Types.Color.toString(id)),
         ],
       );
     let make = (props: makeProps('id, 'var)) => {

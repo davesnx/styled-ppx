@@ -5,7 +5,7 @@ div{background-color:var(--var-1txab6e);}
 .css-cgq59l-stack{-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;}
 .css-k008qs-Cositas{display:flex;}
 .css-cgq59l-Cositas{-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;}
-.css-r0vq9t-Cositas{gap:var(--var-xz2dbm);}
+.css-r0vq9t-Cositas{gap:var(--var-8erbae);}
 .css-tokvmb-selectors{color:red;}
 .css-12qnfjo-selectors:hover{color:blue;}
 @keyframes keyframe-deb5ee{40%{-webkit-transform:translate3d(0, -30px, 0);-moz-transform:translate3d(0, -30px, 0);-ms-transform:translate3d(0, -30px, 0);transform:translate3d(0, -30px, 0);}70%{-webkit-transform:translate3d(0, -15px, 0);-moz-transform:translate3d(0, -15px, 0);-ms-transform:translate3d(0, -15px, 0);transform:translate3d(0, -15px, 0);}90%{-webkit-transform:translate3d(0,-4px,0);-moz-transform:translate3d(0,-4px,0);-ms-transform:translate3d(0,-4px,0);transform:translate3d(0,-4px,0);}}
@@ -30,7 +30,7 @@ div{background-color:var(--var-1txab6e);}
 .css-13ow3bs-keyframeDemoShell{color:#141414;}
 .css-1e8vzlw-keyframeDemoShell{font-family:"Menlo", "monospace";}
 @keyframes keyframe-18iulix{0%{height:var(--var-srgumu);}100%{height:var(--var-1haumwf);}}
-.css-1h7bkao-keyframeDemoCard{-webkit-animation-name:var(--var-hqxg7q);animation-name:var(--var-hqxg7q);}
+.css-1h7bkao-keyframeDemoCard{-webkit-animation-name:var(--var-1jz21hk);animation-name:var(--var-1jz21hk);}
 .css-65ee5x-keyframeDemoCard{-webkit-animation-duration:1200ms;animation-duration:1200ms;}
 .css-3pa72f-keyframeDemoCard{-webkit-animation-timing-function:ease-in-out;animation-timing-function:ease-in-out;}
 .css-iovuyg-keyframeDemoCard{-webkit-animation-fill-mode:both;animation-fill-mode:both;}

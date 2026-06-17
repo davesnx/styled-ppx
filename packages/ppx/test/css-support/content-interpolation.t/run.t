@@ -15,7 +15,7 @@ counter().
   .css-ffxo1r{content:var(--var-jvqeh9);}
   .css-e7wury{content:var(--var-16oxrf4);}
   .css-16jow5p{content:var(--var-1vvjf8x);}
-  .css-8nx65k-getListItemDecorationContent{content:var(--var-hcwhm2);}
+  .css-8nx65k-getListItemDecorationContent{content:var(--var-jr2773);}
   .css-ymi9m2{content:counter(var(--var-dew6fb), lower-alpha);}
   .css-1hqoizr{content:counter(chapter, var(--var-o4ly7x));}
   .css-1uqb9bz{content:counter(var(--var-1re0z52), var(--var-1lfdsp0));}
