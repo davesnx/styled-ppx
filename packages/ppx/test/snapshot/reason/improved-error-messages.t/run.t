@@ -11,7 +11,7 @@ This test ensures the ppx generates improved error messages for invalid payloads
   >  (preprocess (pps styled-ppx)))
   > EOF
 
-Testing improved error message for list syntax with %cx
+Testing improved error message for non-string payload with %css
   $ dune build
   File "input.re", line 3, characters 24-27:
   3 | let invalid_css = [%css 123];

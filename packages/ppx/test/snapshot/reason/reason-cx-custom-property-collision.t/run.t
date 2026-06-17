@@ -1,6 +1,9 @@
-Custom-property names are scoped to the owning [%css] expression and runtime
-type, so equal local interpolation names in separately merged styles cannot
-overwrite each other.
+Custom-property names are keyed to atom declaration content (selector context +
+property + resolved type), not to the owning [%css] expression. Two atoms
+collide or share the same generated var only when their declaration content is
+identical; the two atoms below differ in selector context (top-level vs :hover),
+so they get distinct var names and equal local interpolation names in separately
+merged styles cannot overwrite each other.
 
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml

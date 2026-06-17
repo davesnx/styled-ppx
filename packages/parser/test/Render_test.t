@@ -65,12 +65,6 @@ Split multiple selectors
   > EOF
   .foo{color:red;}.bar{color:red;}
 
-Split multiple selectors
-  $ cat << "EOF" | ./Render_test.exe
-  > .foo, .bar { color: red; }
-  > EOF
-  .foo{color:red;}.bar{color:red;}
-
 Resolve ampersand
   $ cat << "EOF" | ./Render_test.exe
   > .foo {

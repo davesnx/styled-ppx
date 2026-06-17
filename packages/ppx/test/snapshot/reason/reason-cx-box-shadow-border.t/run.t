@@ -37,3 +37,139 @@
   .css-hfzctv-mixedCard{border:1px solid var(--var-1on39sz);}
   .css-phae1x-mixedCard{box-shadow:var(--var-giamln);}
   .css-1yfkn84-mixedCard{border-radius:12px;}
+
+Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
+
+  $ refmt --parse re --print ml input.re > output.ml
+  $ standalone --impl output.ml -o output.ml
+  $ cat output.ml
+  [@@@css
+    ".css-12b85tv-simpleShadow{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1);}"]
+  [@@@css
+    ".css-bh2iep-multipleShadows{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1), 0px 4px 8px 0px rgba(0, 0, 0, 0.2);}"]
+  [@@@css
+    ".css-1r1fme5-insetShadow{box-shadow:inset 0px 2px 4px 0px rgba(0, 0, 0, 0.1);}"]
+  [@@@css ".css-gokeqi-noShadow{box-shadow:none;}"]
+  [@@@css
+    ".css-1wp2o9n-spreadShadow{box-shadow:0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -2px rgba(0, 0, 0, 0.1);}"]
+  [@@@css ".css-e42auv-simpleBorder{border:1px solid black;}"]
+  [@@@css ".css-1h02qc1-borderWithColor{border:2px dashed #ff0000;}"]
+  [@@@css ".css-kujkge-borderTransparent{border:1px solid transparent;}"]
+  [@@@css ".css-10ganm4-noBorder{border:none;}"]
+  [@@@css ".css-iqmzmu-borderStyles{border-top:1px solid red;}"]
+  [@@@css ".css-dw79q1-borderStyles{border-right:2px dashed blue;}"]
+  [@@@css ".css-9o79gh-borderStyles{border-bottom:3px dotted green;}"]
+  [@@@css ".css-41wvke-borderStyles{border-left:4px double orange;}"]
+  [@@@css ".css-djq43j-borderSeparate{border-width:2px;}"]
+  [@@@css ".css-xp8w2v-borderSeparate{border-style:solid;}"]
+  [@@@css ".css-1jzkaed-borderSeparate{border-color:#333;}"]
+  [@@@css ".css-1k7257i-borderWithRadius{border:1px solid #ccc;}"]
+  [@@@css ".css-rl6otz-borderWithRadius{border-radius:8px;}"]
+  [@@@css
+    ".css-1465761-shadowAndBorder{box-shadow:0px 4px 6px 0px rgba(0, 0, 0, 0.1);}"]
+  [@@@css ".css-19uwm2g-shadowAndBorder{border:1px solid #e5e7eb;}"]
+  [@@@css ".css-1yfkn84-shadowAndBorder{border-radius:12px;}"]
+  [@@@css
+    ".css-y239qm-cardStyle{box-shadow:0px 1px 3px 0px rgba(0, 0, 0, 0.1), 0px 1px 2px -1px rgba(0, 0, 0, 0.1);}"]
+  [@@@css ".css-11ixi5p-cardStyle{border:1px solid rgba(0, 0, 0, 0.05);}"]
+  [@@@css ".css-1ebezfo-cardStyle{border-radius:16px;}"]
+  [@@@css ".css-1bxstvc-buttonBase{border:2px solid #3b82f6;}"]
+  [@@@css
+    ".css-1vuar9w-buttonBase{box-shadow:0px 0px 0px 0px rgba(59, 130, 246, 0.5);}"]
+  [@@@css ".css-rl6otz-buttonBase{border-radius:8px;}"]
+  [@@@css
+    ".css-hfzctv-borderColorInterp{border:1px solid var(--var-1on39sz);}"]
+  [@@@css
+    ".css-9fu3s3-shadowInterp{box-shadow:var(--var-11ljgmp) var(--var-1qn6d0z) var(--var-1bcbjmk) var(--var-xxpef3) var(--var-1sod13t);}"]
+  [@@@css ".css-fkjemk-shadowFullInterp{box-shadow:var(--var-af5fmc);}"]
+  [@@@css
+    ".css-11hdrfm-borderWidthInterp{border:var(--var-apl5wd) solid black;}"]
+  [@@@css ".css-v2pvpe-mixedCard{background-color:var(--var-vilhl2);}"]
+  [@@@css ".css-hfzctv-mixedCard{border:1px solid var(--var-1on39sz);}"]
+  [@@@css ".css-phae1x-mixedCard{box-shadow:var(--var-giamln);}"]
+  [@@@css ".css-1yfkn84-mixedCard{border-radius:12px;}"]
+  [@@@css.bindings
+    [("Output.simpleShadow", "css-12b85tv-simpleShadow");
+    ("Output.multipleShadows", "css-bh2iep-multipleShadows");
+    ("Output.insetShadow", "css-1r1fme5-insetShadow");
+    ("Output.noShadow", "css-gokeqi-noShadow");
+    ("Output.spreadShadow", "css-1wp2o9n-spreadShadow");
+    ("Output.simpleBorder", "css-e42auv-simpleBorder");
+    ("Output.borderWithColor", "css-1h02qc1-borderWithColor");
+    ("Output.borderTransparent", "css-kujkge-borderTransparent");
+    ("Output.noBorder", "css-10ganm4-noBorder");
+    ("Output.borderStyles",
+      "css-iqmzmu-borderStyles css-dw79q1-borderStyles css-9o79gh-borderStyles css-41wvke-borderStyles");
+    ("Output.borderSeparate",
+      "css-djq43j-borderSeparate css-xp8w2v-borderSeparate css-1jzkaed-borderSeparate");
+    ("Output.borderWithRadius",
+      "css-1k7257i-borderWithRadius css-rl6otz-borderWithRadius");
+    ("Output.shadowAndBorder",
+      "css-1465761-shadowAndBorder css-19uwm2g-shadowAndBorder css-1yfkn84-shadowAndBorder");
+    ("Output.cardStyle",
+      "css-y239qm-cardStyle css-11ixi5p-cardStyle css-1ebezfo-cardStyle");
+    ("Output.buttonBase",
+      "css-1bxstvc-buttonBase css-1vuar9w-buttonBase css-rl6otz-buttonBase");
+    ("Output.borderColorInterp", "css-hfzctv-borderColorInterp");
+    ("Output.shadowInterp", "css-9fu3s3-shadowInterp");
+    ("Output.shadowFullInterp", "css-fkjemk-shadowFullInterp");
+    ("Output.borderWidthInterp", "css-11hdrfm-borderWidthInterp");
+    ("Output.mixedCard",
+      "css-v2pvpe-mixedCard css-hfzctv-mixedCard css-phae1x-mixedCard css-1yfkn84-mixedCard")]]
+  let simpleShadow = CSS.make "css-12b85tv-simpleShadow" []
+  let multipleShadows = CSS.make "css-bh2iep-multipleShadows" []
+  let insetShadow = CSS.make "css-1r1fme5-insetShadow" []
+  let noShadow = CSS.make "css-gokeqi-noShadow" []
+  let spreadShadow = CSS.make "css-1wp2o9n-spreadShadow" []
+  let simpleBorder = CSS.make "css-e42auv-simpleBorder" []
+  let borderWithColor = CSS.make "css-1h02qc1-borderWithColor" []
+  let borderTransparent = CSS.make "css-kujkge-borderTransparent" []
+  let noBorder = CSS.make "css-10ganm4-noBorder" []
+  let borderStyles =
+    CSS.make
+      "css-iqmzmu-borderStyles css-dw79q1-borderStyles css-9o79gh-borderStyles css-41wvke-borderStyles"
+      []
+  let borderSeparate =
+    CSS.make
+      "css-djq43j-borderSeparate css-xp8w2v-borderSeparate css-1jzkaed-borderSeparate"
+      []
+  let borderWithRadius =
+    CSS.make "css-1k7257i-borderWithRadius css-rl6otz-borderWithRadius" []
+  let shadowAndBorder =
+    CSS.make
+      "css-1465761-shadowAndBorder css-19uwm2g-shadowAndBorder css-1yfkn84-shadowAndBorder"
+      []
+  let cardStyle =
+    CSS.make "css-y239qm-cardStyle css-11ixi5p-cardStyle css-1ebezfo-cardStyle"
+      []
+  let buttonBase =
+    CSS.make
+      "css-1bxstvc-buttonBase css-1vuar9w-buttonBase css-rl6otz-buttonBase" []
+  let borderColorInterp borderColor =
+    CSS.make "css-hfzctv-borderColorInterp"
+      [("--var-1on39sz", (CSS.Types.Color.toString borderColor))]
+  let shadowInterp shadowX =
+    fun shadowY ->
+      fun blur ->
+        fun spread ->
+          fun shadowColor ->
+            CSS.make "css-9fu3s3-shadowInterp"
+              [("--var-11ljgmp", (CSS.Types.Length.toString shadowX));
+              ("--var-1qn6d0z", (CSS.Types.Length.toString shadowY));
+              ("--var-1bcbjmk", (CSS.Types.Length.toString blur));
+              ("--var-xxpef3", (CSS.Types.Length.toString spread));
+              ("--var-1sod13t", (CSS.Types.Color.toString shadowColor))]
+  let shadowFullInterp myShadow =
+    CSS.make "css-fkjemk-shadowFullInterp"
+      [("--var-af5fmc", (CSS.Types.BoxShadows.toString myShadow))]
+  let borderWidthInterp borderWidth =
+    CSS.make "css-11hdrfm-borderWidthInterp"
+      [("--var-apl5wd", (CSS.Types.LineWidth.toString borderWidth))]
+  let mixedCard bgColor =
+    fun borderColor ->
+      fun shadow ->
+        CSS.make
+          "css-v2pvpe-mixedCard css-hfzctv-mixedCard css-phae1x-mixedCard css-1yfkn84-mixedCard"
+          [("--var-vilhl2", (CSS.Types.Color.toString bgColor));
+          ("--var-1on39sz", (CSS.Types.Color.toString borderColor));
+          ("--var-giamln", (CSS.Types.BoxShadows.toString shadow))]

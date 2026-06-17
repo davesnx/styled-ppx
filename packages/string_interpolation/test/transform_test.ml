@@ -45,7 +45,7 @@ let concat_more_than_one_variable_with_middle () =
     (transform "$(name) hello $(name)")
     [%expr name ^ {js| hello |js} ^ name]
 
-let empty_variable () =
+let two_variables_with_text_segments () =
   assert_equal
     (transform "$(name) hello $(name) world")
     [%expr name ^ {js| hello |js} ^ name ^ {js| world|js}]
@@ -77,7 +77,7 @@ let simply_a_dollar_sign_with_after () =
 let simply_a_dollar_sign_with_both () =
   assert_equal (transform {|before$after|}) [%expr {js|before$after|js}]
 
-let doble_dollar_sign () =
+let double_dollar_sign () =
   assert_equal (transform {|$ a $|}) [%expr {js|$ a $|js}]
 
 let empty_dollar_sign () = assert_equal (transform {|$()|}) [%expr {js|$()|js}]
@@ -114,7 +114,7 @@ let () =
       test "concat_more_than_one_variable" concat_more_than_one_variable;
       test "concat_more_than_one_variable_with_middle"
         concat_more_than_one_variable_with_middle;
-      test "empty_variable" empty_variable;
+      test "two_variables_with_text_segments" two_variables_with_text_segments;
       test "random_test" random_test;
       test "module_access" module_access;
       test "module_access_with_text" module_access_with_text;
@@ -124,7 +124,7 @@ let () =
         simply_a_dollar_sign_with_before_space;
       test "simply_a_dollar_sign_with_after" simply_a_dollar_sign_with_after;
       test "simply_a_dollar_sign_with_both" simply_a_dollar_sign_with_both;
-      test "doble_dollar_sign" doble_dollar_sign;
+      test "double_dollar_sign" double_dollar_sign;
       test "empty_dollar_sign" empty_dollar_sign;
       test "half_dollar_sign" half_dollar_sign;
       (* Interpolation with spaces tests *)

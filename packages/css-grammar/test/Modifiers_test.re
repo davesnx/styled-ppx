@@ -268,22 +268,35 @@ let tests: tests = [
     );
   }),
   test("[<integer> A]{2,3}", () => {
-    let parse = parse([%spec "<integer>{2,3}"]);
+    let parse = parse([%spec "[<integer> A]{2,3}"]);
     let to_check =
-      Alcotest.result(Alcotest.list(Alcotest.int), Alcotest.string);
+      Alcotest.result(
+        Alcotest.list(Alcotest.pair(Alcotest.int, Alcotest.unit)),
+        Alcotest.string,
+      );
     check(~__POS__, to_check, parse(""), Error("Expected a valid value."));
     check(
       ~__POS__,
       to_check,
-      parse("63"),
+      parse("63 A"),
       Error("Expected a valid value."),
     );
-    check(~__POS__, to_check, parse("64 65"), Ok([64, 65]));
-    check(~__POS__, to_check, parse("66 67 68"), Ok([66, 67, 68]));
     check(
       ~__POS__,
       to_check,
-      parse("69 70 71 72"),
+      parse("64 A 65 A"),
+      Ok([(64, ()), (65, ())]),
+    );
+    check(
+      ~__POS__,
+      to_check,
+      parse("66 A 67 A 68 A"),
+      Ok([(66, ()), (67, ()), (68, ())]),
+    );
+    check(
+      ~__POS__,
+      to_check,
+      parse("69 A 70 A 71 A 72 A"),
       Error("Expected a valid value."),
     );
   }),
