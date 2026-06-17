@@ -17,7 +17,7 @@ let check ~pos expected actual =
     let file, line, _, _ = pos in
     Alcotest.failf "Expected %S, received %S at %s:%d" expected actual file line)
 
-let test name fn = Alcotest.test_case name `Quick fn
+let test name fn = (name, fn)
 
 let split_by_kind () =
   let rules = parse "color: red; margin: 0; .test { display: block; }" in
@@ -910,94 +910,4 @@ let cases =
     test "amp_pseudo_with_descendant_inner" amp_pseudo_with_descendant_inner;
   ]
 
-let run_all () =
-  List.iter
-    (fun (_name, fn) -> fn ())
-    [
-      "split_by_kind", split_by_kind;
-      "selector", selector;
-      "selector_with_ampersand", selector_with_ampersand;
-      "selector_with_class", selector_with_class;
-      "mediaqueries", mediaqueries;
-      "mediaqueries_and_selectors", mediaqueries_and_selectors;
-      "nested_mediaqueries_and_selectors", nested_mediaqueries_and_selectors;
-      "ampersand_with_classname", ampersand_with_classname;
-      "nested_ampersand_with_classname", nested_ampersand_with_classname;
-      "ampersand_with_hover_and_classname", ampersand_with_hover_and_classname;
-      ( "ampersand_with_child_selector_and_classname",
-        ampersand_with_child_selector_and_classname );
-      ( "multiple_nested_ampersands_with_classname",
-        multiple_nested_ampersands_with_classname );
-      ( "media_query_with_ampersand_and_classname",
-        media_query_with_ampersand_and_classname );
-      "ampersand_with_adjacent_sibling", ampersand_with_adjacent_sibling;
-      "ampersand_with_general_sibling", ampersand_with_general_sibling;
-      "ampersand_with_descendant_selector", ampersand_with_descendant_selector;
-      "nested_combinators", nested_combinators;
-      "ampersand_with_pseudo_elements", ampersand_with_pseudo_elements;
-      "nested_pseudo_elements", nested_pseudo_elements;
-      "ampersand_with_attribute_selectors", ampersand_with_attribute_selectors;
-      "nested_attribute_selectors", nested_attribute_selectors;
-      "ampersand_with_not_pseudo_class", ampersand_with_not_pseudo_class;
-      "ampersand_with_is_pseudo_class", ampersand_with_is_pseudo_class;
-      "ampersand_with_where_pseudo_class", ampersand_with_where_pseudo_class;
-      "ampersand_with_nth_child", ampersand_with_nth_child;
-      "multiple_pseudo_classes", multiple_pseudo_classes;
-      "pseudo_classes_with_pseudo_elements", pseudo_classes_with_pseudo_elements;
-      "id_selector", id_selector;
-      "universal_selector", universal_selector;
-      "multiple_selectors_in_rule", multiple_selectors_in_rule;
-      "multiple_selectors_with_ampersand", multiple_selectors_with_ampersand;
-      "supports_rule", supports_rule;
-      "nested_supports_and_media", nested_supports_and_media;
-      "deeply_nested_structure", deeply_nested_structure;
-      ( "media_query_with_nested_selectors_and_pseudo",
-        media_query_with_nested_selectors_and_pseudo );
-      "mixed_combinators_and_pseudo", mixed_combinators_and_pseudo;
-      "media_with_nested_selectors", media_with_nested_selectors;
-      "multiple_media_queries", multiple_media_queries;
-      "supports_with_declarations", supports_with_declarations;
-      "empty_selectors", empty_selectors;
-      "multiple_ampersands_same_selector", multiple_ampersands_same_selector;
-      "nested_without_ampersand", nested_without_ampersand;
-      ( "descendant_selector_in_declaration_list",
-        descendant_selector_in_declaration_list );
-      ( "missing_semicolon_before_nested_selector_in_declaration_list",
-        missing_semicolon_before_nested_selector_in_declaration_list );
-      ( "missing_semicolon_before_nested_class_selector_in_declaration_list",
-        missing_semicolon_before_nested_class_selector_in_declaration_list );
-      ( "missing_semicolon_before_nested_type_selector_in_declaration_list",
-        missing_semicolon_before_nested_type_selector_in_declaration_list );
-      ( "missing_semicolon_before_nested_id_selector_in_declaration_list",
-        missing_semicolon_before_nested_id_selector_in_declaration_list );
-      ( "missing_semicolon_before_nested_descendant_selector_in_declaration_list",
-        missing_semicolon_before_nested_descendant_selector_in_declaration_list
-      );
-      ( "missing_semicolon_before_nested_media_query_in_declaration_list",
-        missing_semicolon_before_nested_media_query_in_declaration_list );
-      ( "missing_semicolon_before_nested_selector_after_interpolation_in_declaration_list",
-        missing_semicolon_before_nested_selector_after_interpolation_in_declaration_list
-      );
-      ( "missing_semicolon_before_nested_media_query_after_interpolation_in_declaration_list",
-        missing_semicolon_before_nested_media_query_after_interpolation_in_declaration_list
-      );
-      ( "declaration_after_nested_block_in_declaration_list",
-        declaration_after_nested_block_in_declaration_list );
-      "pseudo_class_functions_complex", pseudo_class_functions_complex;
-      "has_pseudo_class", has_pseudo_class;
-      "focus_within_and_focus_visible", focus_within_and_focus_visible;
-      "nested_at_rules_priority", nested_at_rules_priority;
-      "ampersand_space_ampersand", ampersand_space_ampersand;
-      "ampersand_ampersand", ampersand_ampersand;
-      ( "bare_leading_pseudo_descendant_joins",
-        bare_leading_pseudo_descendant_joins );
-      ( "bare_leading_pseudo_element_descendant_joins",
-        bare_leading_pseudo_element_descendant_joins );
-      ( "bare_leading_pseudo_nested_under_class",
-        bare_leading_pseudo_nested_under_class );
-      ( "amp_pseudo_inside_amp_pseudo_compound_chain",
-        amp_pseudo_inside_amp_pseudo_compound_chain );
-      "amp_pseudo_with_descendant_inner", amp_pseudo_with_descendant_inner;
-    ]
-
-let tests = cases
+let run_all () = List.iter (fun (_name, fn) -> fn ()) cases

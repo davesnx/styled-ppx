@@ -5,7 +5,7 @@ let loc = Location.none;
 let printExpression = (prefix, expression) =>
   Printf.printf("%s%S\n", prefix, Pprintast.string_of_expression(expression));
 
-let printCase = ((title, input, _expected)) => {
+let printCase = ((title, input)) => {
   Printf.printf("- %s\n", title);
   printExpression("  ", input);
 };
