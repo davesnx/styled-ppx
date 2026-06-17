@@ -2,9 +2,9 @@
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css "body:not(.css-nk32ej-card){margin:0;}"];
-  [@css ".css-nk32ej-card{background:var(--var-eqk9ul);}"];
+  [@css ".css-nk32ej-card{background:var(--var-1rdts9a);}"];
   [@css ".css-b7rhyr-active.css-nk32ej-card{color:white;}"];
-  [@css ".container .css-nk32ej-card{color:var(--var-l5qn5v);}"];
+  [@css ".container .css-nk32ej-card{color:var(--var-raax3p);}"];
   [@css ".css-nk32ej-card{padding:10px;}"];
   [@css ".css-b7rhyr-active{border:1px solid;}"];
   [@css.bindings
@@ -23,12 +23,12 @@
           (
             (
               (
-                (":root{" ++ "--var-eqk9ul:")
+                (":root{" ++ "--var-1rdts9a:")
                 ++ CSS.Types.Background.toString(bg)
               )
               ++ ";"
             )
-            ++ "--var-l5qn5v:"
+            ++ "--var-raax3p:"
           )
           ++ CSS.Types.Color.toString(bg)
         )

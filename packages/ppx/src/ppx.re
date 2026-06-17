@@ -361,7 +361,7 @@ let expand_css_expression =
   };
 };
 
-let expand_global_module = (~file, ~scope, ~opens, payload) => {
+let expand_global_module = (~file, ~main_module, ~scope, ~opens, payload) => {
   open Ppxlib;
   File.set(file);
   switch (payload.pexp_desc) {
@@ -394,7 +394,7 @@ let expand_global_module = (~file, ~scope, ~opens, payload) => {
         switch (get_errors(validations)) {
         | [] =>
           let dynamic_vars =
-            Css_file.push_global(~file, ~scope, ~opens, rule_list);
+            Css_file.push_global(~file, ~main_module, ~scope, ~opens, rule_list);
           let to_string_body =
             Css_global_to_string.render_root_block(
               ~loc=stringLoc,
@@ -462,7 +462,7 @@ let expand_global_module = (~file, ~scope, ~opens, payload) => {
   };
 };
 
-let expand_keyframe_expression = (~file, ~scope, ~opens, payload: Ppxlib.expression) => {
+let expand_keyframe_expression = (~file, ~main_module, ~scope, ~opens, payload: Ppxlib.expression) => {
   open Ppxlib;
   File.set(file);
   switch (payload.pexp_desc) {
@@ -475,7 +475,7 @@ let expand_keyframe_expression = (~file, ~scope, ~opens, payload: Ppxlib.express
     switch (Styled_ppx_css_parser.Driver.parse_keyframes(~loc, txt)) {
     | Ok(declarations) =>
       let (keyframe_name, dynamic_vars) =
-        Css_file.push_keyframe(~file, ~scope, ~opens, declarations);
+        Css_file.push_keyframe(~file, ~main_module, ~scope, ~opens, declarations);
       let loc = stringLoc;
       let keyframe_name_expr = Builder.estring(~loc, keyframe_name);
       switch (dynamic_vars) {
@@ -672,7 +672,7 @@ let map_css_expressions =
         | Pexp_extension(({ txt: "keyframe", _ }, payload)) =>
           switch (payload_expr(payload)) {
           | Some(payload) =>
-            expand_keyframe_expression(~file, ~scope, ~opens, payload)
+            expand_keyframe_expression(~file, ~main_module, ~scope, ~opens, payload)
           | None =>
             Error.raise(
               ~loc=expr.pexp_loc,
@@ -744,7 +744,7 @@ let rec map_ordered_module_expr =
     };
   | Pmod_extension(({ txt: "styled.global", _ }, payload)) =>
     switch (payload_expr(payload)) {
-    | Some(payload) => expand_global_module(~file, ~scope, ~opens, payload)
+    | Some(payload) => expand_global_module(~file, ~main_module, ~scope, ~opens, payload)
     | None =>
       Builder.pmod_extension(
         ~loc=expr.pmod_loc,

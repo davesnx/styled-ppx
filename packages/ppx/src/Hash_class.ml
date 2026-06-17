@@ -38,7 +38,7 @@
      occurrence   `<variable>_<n>` when a name repeats in one declaration
      keyframes    `keyframe-<hash(body)>`                  (keyframe_name)
      global key   `global-<hash(rule)>`                    (global_key)
-     scoped ns    `<kind> \0 <file> \0 <scope> \0 <hash(rules)>` (scoped_namespace)
+     scoped ns    `<kind> \0 <module> \0 <scope> \0 <hash(rules)>` (scoped_namespace)
 
    The atomic invariant this module protects
    ------------------------------------------
@@ -61,13 +61,28 @@
    [scoped_namespace] is the deliberate exception. Keyframes and
    [%styled.global] blocks are not atomized: they carry their own explicit
    names / selectors, so their variables are namespaced by
-   kind + file + scope + rendered-rules instead of by a single atom's content.
-   They are therefore not subject to the cross-module class/var collision
-   above. (Audit note: identical keyframe/global content in two different
-   files still receives different variable names because of the file/scope
-   component. Lower risk, since the keyframe name and global selectors are
-   explicit rather than content-hashed, but worth revisiting if a cross-file
-   collision ever surfaces there.)
+   kind + module + scope + rendered-rules instead of by a single atom's
+   content. They are therefore not subject to the cross-module class/var
+   collision above.
+
+   The [module] component is the compilation-unit module name (the source
+   file's basename, capitalized - see [ppx.re]'s [module_name_of_file]), NOT
+   the physical file path. This is what protects the cross-BUILD invariant:
+   one module is routinely compiled twice from different paths - Dune
+   `copy_files` into a Melange build dir, vendoring, or a native (SSR) build
+   and a Melange (client) build of the same shared stylesheet. When this was
+   keyed on the path, those builds minted DIFFERENT `var(--...)` names for the
+   same global/keyframe declaration: the static rule extracted by one build
+   referenced a custom property the other build's runtime `:root{}` binding
+   never defined, so the declaration silently fell back to its initial value.
+   The module name is identical across all of those paths (`copy_files`
+   preserves the basename, and the name is taken from the source filename, so
+   it ignores Dune library wrapping), so both builds now agree. [scope] (the
+   enclosing submodule path) and [hash(rendered_rules)] keep distinct blocks
+   apart within a project. Two distinct compilation units that share a
+   basename would share a namespace; that is benign - identical content
+   *should* yield identical variables (that is the cross-build invariant we
+   want), and differing content is already separated by the rules hash.
 
    Stability contract
    ------------------
@@ -130,15 +145,19 @@ let variable_for_occurrence ~namespace ~type_key ~occurrence ~total path =
 (* -- Scoped namespaces, keyframes and globals -------------------------- *)
 
 (* The variable namespace for the non-atomized emitters (keyframes,
-   [%styled.global]). Unlike an atom namespace this is file- and
+   [%styled.global]). Unlike an atom namespace this is module- and
    scope-sensitive:
-     `<kind> \0 <file> \0 <scope-dotted> \0 <hash(rendered rules)>`.
-   [rendered_rules] are the already-serialized rule strings; [scope] is the
-   enclosing module path. *)
-let scoped_namespace ~kind ~file ~scope ~rendered_rules =
+     `<kind> \0 <module> \0 <scope-dotted> \0 <hash(rendered rules)>`.
+   [module_name] is the compilation-unit module name, which is path-
+   independent - the same module compiled from two different paths produces
+   the same namespace, so a static rule and the runtime `:root{}` binding it
+   relies on agree across builds (see the header note). [rendered_rules] are
+   the already-serialized rule strings; [scope] is the enclosing submodule
+   path. *)
+let scoped_namespace ~kind ~module_name ~scope ~rendered_rules =
   let scope_key = String.concat "." scope in
   let rules_key = String.concat "\n" rendered_rules in
-  nul_join [ kind; file; scope_key; hash rules_key ]
+  nul_join [ kind; module_name; scope_key; hash rules_key ]
 
 (* `@keyframes` name from its rendered body: `keyframe-<hash(body)>`. *)
 let keyframe_name rendered_body =

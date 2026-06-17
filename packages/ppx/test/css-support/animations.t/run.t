@@ -142,7 +142,7 @@ If this test fail means that the module is not in sync with the ppx
     ".css-1e29gym{-webkit-animation:a 300ms linear 400ms infinite reverse forwards running;animation:a 300ms linear 400ms infinite reverse forwards running;}"
   ];
   [@css
-    "@keyframes keyframe-1on76ua{0%{height:var(--var-1dtvk82) ;}100%{height:var(--var-j7hm9k) ;}}"
+    "@keyframes keyframe-tsl3zg{0%{height:var(--var-j37xwe) ;}100%{height:var(--var-1t6n3q3) ;}}"
   ];
   [@css
     ".css-1h7bkao{-webkit-animation-name:var(--var-1jz21hk);animation-name:var(--var-1jz21hk);}"
@@ -213,10 +213,10 @@ If this test fail means that the module is not in sync with the ppx
   let resize =
     CSS.Types.AnimationName.make(
       ~vars=[
-        ("--var-1dtvk82", CSS.Types.Height.toString(previous)),
-        ("--var-j7hm9k", CSS.Types.Height.toString(current)),
+        ("--var-j37xwe", CSS.Types.Height.toString(previous)),
+        ("--var-1t6n3q3", CSS.Types.Height.toString(current)),
       ],
-      "keyframe-1on76ua",
+      "keyframe-tsl3zg",
     );
   
   CSS.make(

@@ -1000,6 +1000,7 @@ let push =
 let push_keyframe =
     (
       ~file,
+      ~main_module,
       ~scope: list(string),
       ~opens: list(list(string)),
       keyframe_rules: Styled_ppx_css_parser.Ast.rule_list,
@@ -1011,7 +1012,7 @@ let push_keyframe =
   let var_namespace =
     Hash_class.scoped_namespace(
       ~kind="keyframes",
-      ~file,
+      ~module_name=main_module,
       ~scope,
       ~rendered_rules=List.map(render_rule, rules),
     );
@@ -1066,6 +1067,7 @@ let push_keyframe =
 let push_global =
     (
       ~file,
+      ~main_module,
       ~scope: list(string),
       ~opens: list(list(string)),
       global_rules: Styled_ppx_css_parser.Ast.rule_list,
@@ -1092,7 +1094,7 @@ let push_global =
   let var_namespace =
     Hash_class.scoped_namespace(
       ~kind="global",
-      ~file,
+      ~module_name=main_module,
       ~scope,
       ~rendered_rules=List.map(render_rule, flattened_rules),
     );

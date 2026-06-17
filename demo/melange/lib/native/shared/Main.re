@@ -14,6 +14,45 @@ module GlobalStyles = [%styled.global
 |}
 ];
 
+/* A document-level [%styled.global] showcase.
+
+   Static rules (the reset and box-sizing declarations) are extracted into
+   public/styles.css at build time, so they cost nothing at runtime. The
+   interpolated values ($(pageBackground), $(textColor)) are emitted as `:root`
+   custom properties by the generated `AppGlobalStyles.make`, which renders a
+   <style> tag. That is why the component must be rendered entirely below via
+   <AppGlobalStyles /> — without mounting it, the dynamic variables are never
+   injected and the interpolated declarations resolve to nothing. */
+let pageBackground = CSS.hex("faf7f2");
+let textColor = CSS.hex("141414");
+
+module AppGlobalStyles = [%styled.global
+  {|
+  html {
+    box-sizing: border-box;
+  }
+
+  *, *::before, *::after {
+    box-sizing: inherit;
+  }
+
+  body {
+    margin: 0;
+    padding: 16px;
+    background-color: $(pageBackground);
+    color: $(textColor);
+    font-family: "Menlo", "monospace";
+    line-height: 1.5;
+  }
+
+  @media (min-width: 768px) {
+    body {
+      padding: 32px;
+    }
+  }
+|}
+];
+
 let stack = [%css "display: flex; flex-direction: column"];
 
 /* TODO: styled.div doesn't generate makeProps, so when used as <Cositas as_="section" lola={CSS.px(10)}> it doesn't compile */
@@ -144,6 +183,7 @@ let keyframeDemoCard = {
 let make = () =>
   <main styles=gradiend>
     <GlobalStyles />
+    <AppGlobalStyles />
     <div styles=Universal.classname>
       <section styles=keyframeDemoShell>
         <h2> {React.string("Interpolated keyframe demo")} </h2>
