@@ -1,6 +1,6 @@
 module X = {
-  let value = 1.;
-  let value2 = 1.;
+  let value = `num(1.);
+  let value2 = `num(1.);
   let flex1 = `num(1.);
   let min = `px(500);
 };

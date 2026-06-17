@@ -13,12 +13,6 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 29, characters 6-13:
-  29 | [%css {|flex: $(X.value) $(X.value2);|}];
-             ^^^^^^^
-  Error: The value X.value has type float
-         but an expression was expected of type [< `num of float ]
-  [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css ".css-1crvgc7{align-content:flex-start;}"];
@@ -95,8 +89,8 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-12zvlbw{order:0;}"];
   [@css ".css-ali80x{order:1;}"];
   module X = {
-    let value = 1.;
-    let value2 = 1.;
+    let value = `num(1.);
+    let value2 = `num(1.);
     let flex1 = `num(1.);
     let min = `px(500);
   };

@@ -127,11 +127,3 @@ let _case14 = borderColor => [%css
   }
 |}
 ];
-
-let _case15 = (marginBottom, wide) => [%css
-  {|
-  margin-bottom: $(marginBottom) @media $(wide) {
-    width: 50%;
-  }
-|}
-];

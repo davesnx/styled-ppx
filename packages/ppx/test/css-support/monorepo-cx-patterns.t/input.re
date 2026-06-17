@@ -34,7 +34,7 @@ let _tabTextFirst = [%css
   {|
   box-shadow: inset 0 0 0 0 transparent;
 
-  :hover {
+  &:hover {
     box-shadow:
       1px 0 0 0 $(Color.Border.line),
       inset 0 -1px 0 0 $(Color.Border.line) !important
@@ -47,7 +47,7 @@ let _tabText = [%css
   {|
   color: $(Color.Text.secondary);
 
-  :hover {
+  &:hover {
     background-color: $(Color.Background.box_);
     box-shadow:
       1px 0 0 0 $(Color.Border.line),
@@ -58,7 +58,7 @@ let _tabText = [%css
 ];
 
 /* Test 6: transition shorthand in [%css] with nested selectors */
-let sidebarClosed = [%css ""];
+let _sidebarClosed = [%css ""];
 
 let _sidebar = [%css
   {|
@@ -66,7 +66,7 @@ let _sidebar = [%css
   z-index: 1;
   transition: all 200ms ease 0ms;
 
-  &.$(sidebarClosed) {
+  &.$(_sidebarClosed) {
     min-width: 0;
     max-width: 0;
     opacity: 0;
