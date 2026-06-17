@@ -321,7 +321,7 @@ let expand_css_expression =
       switch (get_errors(validations)) {
       | [] =>
         let (classNames, dynamic_vars) =
-          Css_file.push(~file, ~scope, ~opens, ~label?, rule_list);
+          Css_file.push(~file, ~scope, ~opens, ~base_loc=loc, ~label?, rule_list);
         switch (registry_name) {
         | Some(name) =>
           record_css_binding(~file, ~main_module, ~scope, ~name, ~classNames)
@@ -394,7 +394,7 @@ let expand_global_module = (~file, ~main_module, ~scope, ~opens, payload) => {
         switch (get_errors(validations)) {
         | [] =>
           let dynamic_vars =
-            Css_file.push_global(~file, ~main_module, ~scope, ~opens, rule_list);
+            Css_file.push_global(~file, ~main_module, ~scope, ~opens, ~base_loc=loc, rule_list);
           let to_string_body =
             Css_global_to_string.render_root_block(
               ~loc=stringLoc,
@@ -475,7 +475,7 @@ let expand_keyframe_expression = (~file, ~main_module, ~scope, ~opens, payload: 
     switch (Styled_ppx_css_parser.Driver.parse_keyframes(~loc, txt)) {
     | Ok(declarations) =>
       let (keyframe_name, dynamic_vars) =
-        Css_file.push_keyframe(~file, ~main_module, ~scope, ~opens, declarations);
+        Css_file.push_keyframe(~file, ~main_module, ~scope, ~opens, ~base_loc=loc, declarations);
       let loc = stringLoc;
       let keyframe_name_expr = Builder.estring(~loc, keyframe_name);
       switch (dynamic_vars) {
@@ -552,7 +552,7 @@ let expand_styled_module =
       switch (get_errors(type_check_rule_list(rule_list))) {
       | [] =>
         let (classNames, dynamic_vars) =
-          Css_file.push(~file, ~scope, ~opens, ~label=name, rule_list);
+          Css_file.push(~file, ~scope, ~opens, ~base_loc=loc, ~label=name, rule_list);
         record_component_binding(classNames);
         let styles =
           Css_to_runtime.render_make_call(

@@ -1285,7 +1285,7 @@ let extractedDynamicStyles =
     ) {
     | [] =>
       let (classNames, dynamic_vars) =
-        Css_file.push(~file, ~scope, ~opens, ~label=moduleName, rule_list);
+        Css_file.push(~file, ~scope, ~opens, ~base_loc=loc, ~label=moduleName, rule_list);
       onClassNames(classNames);
       Css_to_runtime.render_make_call(
         ~loc,

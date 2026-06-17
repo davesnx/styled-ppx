@@ -531,7 +531,7 @@ module Css_transform = {
   };
 
   let rec transform_rule =
-      (~file, ~scope, ~opens, ~var_namespace, rule: rule, dynamic_vars) => {
+      (~file, ~scope, ~opens, ~base_loc, ~var_namespace, rule: rule, dynamic_vars) => {
     switch (rule) {
     | Declaration(decl) =>
       Declaration(
@@ -550,6 +550,7 @@ module Css_transform = {
           ~file,
           ~scope,
           ~opens,
+          ~base_loc,
           ~var_namespace,
           style_rule,
           dynamic_vars,
@@ -561,6 +562,7 @@ module Css_transform = {
           ~file,
           ~scope,
           ~opens,
+          ~base_loc,
           ~var_namespace,
           at_rule,
           dynamic_vars,
@@ -570,7 +572,7 @@ module Css_transform = {
   }
 
   and transform_style_rule =
-      (~file, ~scope, ~opens, ~var_namespace, style_rule: style_rule, dynamic_vars) => {
+      (~file, ~scope, ~opens, ~base_loc, ~var_namespace, style_rule: style_rule, dynamic_vars) => {
     let { prelude, block, loc } = style_rule;
     let (selector_list, selector_loc) = prelude;
     let transformed_selectors =
@@ -590,6 +592,7 @@ module Css_transform = {
             ~file,
             ~scope,
             ~opens,
+            ~base_loc,
             ~var_namespace,
             rule,
             dynamic_vars,
@@ -604,7 +607,7 @@ module Css_transform = {
   }
 
   and transform_at_rule =
-      (~file, ~scope, ~opens, ~var_namespace, at_rule: at_rule, dynamic_vars) => {
+      (~file, ~scope, ~opens, ~base_loc, ~var_namespace, at_rule: at_rule, dynamic_vars) => {
     let { name, prelude, block, loc } = at_rule;
     let (prelude_values, prelude_loc) = prelude;
 
@@ -633,7 +636,11 @@ module Css_transform = {
     if (has_interpolation) {
       let (at_name, _) = name;
       Ppxlib.Location.raise_errorf(
-        ~loc,
+        ~loc=
+          Styled_ppx_css_parser.Parser_location.adjust_to_file(
+            ~relative_loc=loc,
+            ~base_loc,
+          ),
         "Interpolation in @%s preludes is not supported during static extraction. CSS custom properties (var()) are not valid in media query conditions. Inline the value directly.",
         at_name,
       );
@@ -646,6 +653,7 @@ module Css_transform = {
             ~file,
             ~scope,
             ~opens,
+            ~base_loc,
             ~var_namespace,
             r,
             dynamic_vars,
@@ -713,10 +721,14 @@ module Css_transform = {
       };
     };
 
-  let raise_bare_leading_pseudo_error = (~loc, sel) => {
+  let raise_bare_leading_pseudo_error = (~loc, ~base_loc, sel) => {
     let rendered = Styled_ppx_css_parser.Render.selector(sel);
     Ppxlib.Location.raise_errorf(
-      ~loc,
+      ~loc=
+        Styled_ppx_css_parser.Parser_location.adjust_to_file(
+          ~relative_loc=loc,
+          ~base_loc,
+        ),
       "Bare leading pseudo selector `%s` is ambiguous in nested CSS. Per CSS Nesting Level 1 §3.1 it descendant-joins with the enclosing selector (producing `<parent> %s`), which matches descendants rather than the element itself. Write `&%s` for compound (`<parent>%s`, the usual intent), or `& %s` to opt into the explicit descendant form.",
       rendered,
       rendered,
@@ -727,7 +739,7 @@ module Css_transform = {
   };
 
   let atomize_rules =
-      (~label=?, rules: list(rule)): list((string, string, rule)) => {
+      (~base_loc, ~label=?, rules: list(rule)): list((string, string, rule)) => {
     /* Merge a child selector-list prelude under a parent selector-list prelude.
        For each (parent, child) pair, run `compute_new_prefix` so `&`,
        `::pseudo`, and descendant combinators all resolve correctly. The
@@ -825,7 +837,7 @@ module Css_transform = {
         List.iter(
           ((sel, sel_loc)) =>
             if (is_bare_leading_pseudo(sel)) {
-              raise_bare_leading_pseudo_error(~loc=sel_loc, sel);
+              raise_bare_leading_pseudo_error(~loc=sel_loc, ~base_loc, sel);
             },
           child_selectors,
         );
@@ -890,13 +902,14 @@ module Css_transform = {
         ~file,
         ~scope: list(string),
         ~opens: list(list(string)),
+        ~base_loc,
         ~label=?,
         rule_list: rule_list,
       ) => {
     let dynamic_vars = ref([]);
     let (rules, loc) = rule_list;
 
-    let atomic_rules = atomize_rules(~label?, rules);
+    let atomic_rules = atomize_rules(~base_loc, ~label?, rules);
 
     let processed_rules =
       atomic_rules
@@ -940,6 +953,7 @@ module Css_transform = {
                    ~file,
                    ~scope,
                    ~opens,
+                   ~base_loc,
                    ~var_namespace,
                    r,
                    dynamic_vars,
@@ -970,6 +984,7 @@ let push =
       ~file,
       ~scope: list(string),
       ~opens: list(list(string)),
+      ~base_loc,
       ~label=?,
       declarations: Styled_ppx_css_parser.Ast.rule_list,
     ) => {
@@ -978,6 +993,7 @@ let push =
       ~file,
       ~scope,
       ~opens,
+      ~base_loc,
       ~label?,
       declarations,
     );
@@ -1003,6 +1019,7 @@ let push_keyframe =
       ~main_module,
       ~scope: list(string),
       ~opens: list(list(string)),
+      ~base_loc,
       keyframe_rules: Styled_ppx_css_parser.Ast.rule_list,
     ) => {
   open Styled_ppx_css_parser.Ast;
@@ -1023,6 +1040,7 @@ let push_keyframe =
            ~file,
            ~scope,
            ~opens,
+           ~base_loc,
            ~var_namespace,
            rule,
            dynamic_vars,
@@ -1070,6 +1088,7 @@ let push_global =
       ~main_module,
       ~scope: list(string),
       ~opens: list(list(string)),
+      ~base_loc,
       global_rules: Styled_ppx_css_parser.Ast.rule_list,
     )
     : list((string, string, var_type)) => {
@@ -1119,6 +1138,7 @@ let push_global =
              ~file,
              ~scope,
              ~opens,
+             ~base_loc,
              ~var_namespace,
              rule,
              all_dynamic_vars,
