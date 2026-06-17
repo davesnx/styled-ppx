@@ -107,25 +107,26 @@ Special chars
   $ ./compare.sh 'ᵖ'
   Hashes match: 18p4nib
 
-UTF-16 Code Units
-  $ ./compare.sh '\u{FFFF}'
-  Hashes match: gjbtx8
-  $ ./compare.sh '\u{10000}'
-  Hashes match: 1jnazj1
-  $ ./compare.sh '\u{FFFF}\u{10000}'
-  Hashes match: hesjam
+UTF-16 Code Units (real code points U+FFFF and astral U+10000, via raw UTF-8 bytes)
+  $ ./compare.sh "$(printf '\357\277\277')"
+  Hashes match: 1mh24mp
+  $ ./compare.sh "$(printf '\360\220\200\200')"
+  Hashes match: 0
+  $ ./compare.sh "$(printf '\357\277\277\360\220\200\200')"
+  Hashes match: 1mh24mp
 
-Surrogate Pair Ranges
-  $ ./compare.sh '\u{D800}'
-  Hashes match: 1fnu2h4
-  $ ./compare.sh '\u{DC00}'
-  Hashes match: hqb3mb
+Surrogate pairs (astral U+1D11E and U+10FFFF). Lone surrogates are not representable
+in valid UTF-8 and cannot pass through argv, so only paired code points are exercised.
+  $ ./compare.sh "$(printf '\360\235\204\236')"
+  Hashes match: hynuwk
+  $ ./compare.sh "$(printf '\364\217\277\277')"
+  Hashes match: k5acwm
 
-Combining Marks
-  $ ./compare.sh 'e\u0301'
-  Hashes match: 14y1ft9
-  $ ./compare.sh 'n\u0303o\u0301'
-  Hashes match: 1mz7ewt
+Combining Marks (real combining acute U+0301 and tilde U+0303, via raw UTF-8 bytes)
+  $ ./compare.sh "$(printf 'e\314\201')"
+  Hashes match: 1a78bpn
+  $ ./compare.sh "$(printf 'n\314\203o\314\201')"
+  Hashes match: k2d7qz
 
 Mixed BMP and non-BMP
   $ ./compare.sh 'a𐍈z'
@@ -145,11 +146,11 @@ Chinese and Hindi characters
   $ ./compare.sh 'content: "हिन्दी"'
   Hashes match: 1jqc061
 
-Non-Printable ASCII and Control Characters
-  $ ./compare.sh 'Line1\nLine2'
-  Hashes match: 1dow2q7
-  $ ./compare.sh 'Tab\tSpace'
-  Hashes match: kxc8sq
+Non-Printable ASCII and Control Characters (real newline and tab, via printf)
+  $ ./compare.sh "$(printf 'Line1\nLine2')"
+  Hashes match: xqjxd9
+  $ ./compare.sh "$(printf 'Tab\tSpace')"
+  Hashes match: d2gg3s
 
 Long strings
   $ ./compare.sh "$(head -c 1000 < /dev/zero | tr '\0' 'a')"
@@ -163,6 +164,8 @@ The following two rule sets produced the same hash (see https://github.com/daves
   $ ./compare.sh "display:flex;:before, :after{content:'';flex:0 0 16px;}"
   Hashes match: ab0yh7
 
-Malformed UTF-8
+Malformed UTF-8. Coverage is limited to leading-byte-only sequences, where native's
+whole-string replacement coincides with Node's. A valid-prefix malformed input (e.g.
+'a' + 0xC0) diverges (native drops the prefix, Node keeps it) and is not asserted here.
   $ ./compare-malformed.sh
   Hashes match: z68v9f (2 bytes) - c4jucd (3 bytes) - c4jucd (4 bytes)
