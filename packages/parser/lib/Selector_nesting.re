@@ -37,6 +37,81 @@ and pseudo_selector_contains_ampersand =
     csl |> List.exists(cs => contains_ampersand(ComplexSelector(cs)))
   | _ => false;
 
+let is_sibling_combinator =
+  fun
+  | Selector_adjacent_sibling
+  | Selector_general_sibling => true
+  | Selector_descendant
+  | Selector_child => false;
+
+/* A segment denotes the styled element itself when it is a bare `&` or a
+   compound whose type position is `&` (`&:hover`, `&:not(.x)`, `&.foo`). */
+let rec selector_is_ampersand = (sel: selector) =>
+  switch (sel) {
+  | SimpleSelector(Ampersand) => true
+  | CompoundSelector({ type_selector: Some(Ampersand), _ }) => true
+  | ComplexSelector(Selector(inner)) => selector_is_ampersand(inner)
+  | _ => false
+  };
+
+/* Flatten a complex selector into a left-to-right list of
+   `(combinator_before, segment)` pairs; the head carries `None`. So
+   `& + .a .b` becomes [(None, &), (Some(+), .a), (Some(descendant), .b)].
+   A leading-combinator `RelativeSelector` (`+ .x`) has an implicit `&` on
+   its left, which we synthesise as the head. */
+let rec flatten_selector_chain =
+        (sel: selector): list((option(selector_combinator), selector)) => {
+  let with_lead = (combinator, chain) =>
+    switch (chain) {
+    | [] => []
+    | [(_, head), ...rest] => [(Some(combinator), head), ...rest]
+    };
+  switch (sel) {
+  | ComplexSelector(Selector(inner)) => flatten_selector_chain(inner)
+  | ComplexSelector(Combinator({ left, right })) =>
+    flatten_selector_chain(left)
+    @ List.concat_map(
+        ((combinator, segment)) =>
+          with_lead(combinator, flatten_selector_chain(segment)),
+        right,
+      )
+  | RelativeSelector({ combinator: Some(combinator), complex_selector }) =>
+    let inner = flatten_selector_chain(ComplexSelector(complex_selector));
+    [(None, SimpleSelector(Ampersand)), ...with_lead(combinator, inner)];
+  | RelativeSelector({ combinator: None, complex_selector }) =>
+    flatten_selector_chain(ComplexSelector(complex_selector))
+  | other => [(None, other)]
+  };
+};
+
+/* The subject (rightmost compound) is contained in `&`'s subtree when it
+   is itself `&`, or when some `&` segment is immediately followed by a
+   descendant/child step — once inside `&`, any later sibling stays inside. */
+let rec subject_inside_ampersand = segments =>
+  switch (segments) {
+  | [] => false
+  | [(_, subject)] => selector_is_ampersand(subject)
+  | [(_, segment), (Some(combinator), _) as next, ...rest] =>
+    selector_is_ampersand(segment)
+    && !is_sibling_combinator(combinator)
+    || subject_inside_ampersand([next, ...rest])
+  | [_, ...rest] => subject_inside_ampersand(rest)
+  };
+
+/* Does the subject sit *outside* `&`'s subtree, reachable only through a
+   sibling combinator (`+`/`~`)? `[%css]` lowers a value interpolation to a
+   custom property set inline on `&` and read back with `var(--…)`; since
+   custom properties inherit only down to `&` and its descendants, such a
+   subject can't read it. Selectors with no `&` are never flagged: the
+   className is prepended via a descendant combinator, keeping the chain
+   inside the styled element. */
+let subject_escapes_ampersand_subtree = (sel: selector): bool => {
+  let segments = flatten_selector_chain(sel);
+  let has_ampersand =
+    List.exists(((_, segment)) => selector_is_ampersand(segment), segments);
+  has_ampersand && !subject_inside_ampersand(segments);
+};
+
 let rec brace_block_contain_media =
   fun
   | Empty => false

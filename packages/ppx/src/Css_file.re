@@ -100,6 +100,32 @@ module Css_transform = {
     };
   };
 
+  /* Detect a `$(name)` interpolation anywhere in a component-value list,
+     recursing into `Paren_block`, `Bracket_block`, and `Function` bodies.
+     The naive top-level check misses interpolations nested inside those
+     groupings (e.g. `calc($(a) + 1px)` or `(max-width: $(bp))`). */
+  let rec component_value_has_interpolation = (cv: component_value) =>
+    switch (cv) {
+    | Variable(_, _) => true
+    | Paren_block(values)
+    | Bracket_block(values) => component_value_list_has_interpolation(values)
+    | Function({ body: (values, _), _ }) =>
+      component_value_list_has_interpolation(values)
+    | _ => false
+    }
+  and component_value_list_has_interpolation = values =>
+    List.exists(
+      ((cv, _loc)) => component_value_has_interpolation(cv),
+      values,
+    );
+
+  /* A declaration hoists a custom property iff its *value* carries a
+     `$(…)` interpolation. Selector-position interpolations (`.$(name)`)
+     are resolved statically and never hoisted, so they are irrelevant
+     here — we only inspect the declaration value. */
+  let declaration_has_value_interpolation = (decl: declaration) =>
+    component_value_list_has_interpolation(fst(decl.value));
+
   let rec transform_component_value =
           (
             ~file: string,
@@ -611,27 +637,15 @@ module Css_transform = {
     let { name, prelude, block, loc } = at_rule;
     let (prelude_values, prelude_loc) = prelude;
 
-    /* Detect any `$(name)` interpolation anywhere in the at-rule prelude.
-       The naive check (top-level only) misses interpolations nested inside
-       `Paren_block`, `Bracket_block`, or `Function` — e.g. the canonical
-       `@media (max-width: $(bp))` form, where `$(bp)` lives inside a
-       `Paren_block` of the `(max-width: $(bp))` group.
+    /* Detect any `$(name)` interpolation anywhere in the at-rule prelude
+       (recursing into nested groupings — see `component_value_has_interpolation`)
+       — e.g. the canonical `@media (max-width: $(bp))` form, where `$(bp)`
+       lives inside a `Paren_block` of the `(max-width: $(bp))` group.
 
         Static extraction can't bind `var(--x)` into a media query (CSS
         custom properties are not valid in media-query conditions), so we
         reject the whole shape with a hard error. */
-    let rec component_has_interpolation = (cv: component_value) =>
-      switch (cv) {
-      | Variable(_, _) => true
-      | Paren_block(values)
-      | Bracket_block(values) => list_has_interpolation(values)
-      | Function({ body: (values, _), _ }) => list_has_interpolation(values)
-      | _ => false
-      }
-    and list_has_interpolation = values =>
-      List.exists(((cv, _loc)) => component_has_interpolation(cv), values);
-
-    let has_interpolation = list_has_interpolation(prelude_values);
+    let has_interpolation = component_value_list_has_interpolation(prelude_values);
 
     if (has_interpolation) {
       let (at_name, _) = name;
@@ -738,6 +752,24 @@ module Css_transform = {
     );
   };
 
+  /* Mirrors the `@media`-prelude rejection: a value interpolation under a
+     subtree-escaping selector cannot be reached by the `var(--…)`
+     indirection, so reject it instead of emitting silently-broken CSS. */
+  let raise_subtree_escaping_interpolation_error =
+      (~loc, ~base_loc, ~property, sel) => {
+    let rendered = Styled_ppx_css_parser.Render.selector(sel);
+    Ppxlib.Location.raise_errorf(
+      ~loc=
+        Styled_ppx_css_parser.Parser_location.adjust_to_file(
+          ~relative_loc=loc,
+          ~base_loc,
+        ),
+      "Cannot interpolate into the value of `%s` under `%s`: the selector targets an element outside `&`'s subtree (via a sibling combinator `+`/`~`). Static extraction passes interpolations as a custom property set inline on `&`, which only `&` and its descendants inherit, so a sibling can't read it and the declaration would be dropped. Instead, target `&` or a descendant, or write a literal value or a globally-inherited theme `var(--...)` directly.",
+      property,
+      rendered,
+    );
+  };
+
   let atomize_rules =
       (~base_loc, ~label=?, rules: list(rule)): list((string, string, rule)) => {
     /* Merge a child selector-list prelude under a parent selector-list prelude.
@@ -794,8 +826,22 @@ module Css_transform = {
           Hash_class.class_and_namespace(~label?, decl_string);
         [(className, namespace, Declaration(decl))];
       | Some(parent_selectors) =>
+        /* Computed once: depends on the declaration, not on which parent
+           selector it pairs with. */
+        let value_interpolated = declaration_has_value_interpolation(decl);
         List.map(
           ((parent_sel, parent_loc)) => {
+            if (value_interpolated
+                && Styled_ppx_css_parser.Selector_nesting.subject_escapes_ampersand_subtree(
+                     parent_sel,
+                   )) {
+              raise_subtree_escaping_interpolation_error(
+                ~loc=parent_loc,
+                ~base_loc,
+                ~property=fst(decl.name),
+                parent_sel,
+              );
+            };
             let style_rule =
               Style_rule({
                 prelude: ([(parent_sel, parent_loc)], parent_loc),

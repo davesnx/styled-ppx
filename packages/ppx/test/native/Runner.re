@@ -28,6 +28,15 @@ let printTransformSuite = () => {
   Printf.printf("- %d runtime transform assertions passed\n", List.length(Transform_test.cases));
 };
 
+let printSubtreeEscapeSuite = () => {
+  Printf.printf("## SubtreeEscape\n");
+  Subtree_escape_test.run_all();
+  Printf.printf(
+    "- %d subtree-escape assertions passed\n",
+    List.length(Subtree_escape_test.cases),
+  );
+};
+
 let printSelectorSuites = () => {
   printSuite("Selector/simple", Selector_test.simple_tests);
   printSuite("Selector/compound", Selector_test.compound_tests);
@@ -42,11 +51,12 @@ let printAll = () => {
   printSuite("Whitespace", Whitespace_test.cases);
   printPpxSuite();
   printTransformSuite();
+  printSubtreeEscapeSuite();
 };
 
 let printUsage = () => {
   Printf.eprintf(
-    "Usage: ppx-native-test-runner [all|selector|whitespace|ppx|transform]\n",
+    "Usage: ppx-native-test-runner [all|selector|whitespace|ppx|transform|subtree-escape]\n",
   );
   exit(2);
 };
@@ -58,6 +68,7 @@ let runSuite = name =>
   | "whitespace" => printSuite("Whitespace", Whitespace_test.cases)
   | "ppx" => printPpxSuite()
   | "transform" => printTransformSuite()
+  | "subtree-escape" => printSubtreeEscapeSuite()
   | _ => printUsage()
   };
 
