@@ -17,6 +17,8 @@ top-level interpolation does. If the inline list is empty `[]` for the
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css "@property --c-dq4mhq{syntax:\"*\";inherits:false;}"];
+  [@css "@property --c-11hlefi{syntax:\"*\";inherits:false;}"];
   [@css ".css-1b5xvk3-topLevel{color:var(--c-dq4mhq);}"];
   [@css ".css-1orh0hp-hover:hover{color:var(--c-11hlefi);}"];
   [@css ".css-zjac4l-placeholder::placeholder{color:var(--c-gzgct8);}"];

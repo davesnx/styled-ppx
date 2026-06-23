@@ -7,6 +7,8 @@ body{margin:0;padding:0;}
 html{margin:0;padding:0;}
 #root{margin:0;padding:0;}
 body{background-color:var(--pageBackground-171dvmc);color:var(--textColor-a4prc9);font-family:"Menlo", "monospace";line-height:1.5;}
+@property --lola-8erbae{syntax:"*";inherits:false;}
+@property --color-1a279q8{syntax:"*";inherits:false;}
 .css-k008qs-stack{display:flex;}
 .css-cgq59l-stack{-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;}
 .css-k008qs-Cositas{display:flex;}

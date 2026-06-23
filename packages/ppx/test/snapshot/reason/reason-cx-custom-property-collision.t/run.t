@@ -8,6 +8,8 @@ merged styles cannot overwrite each other.
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
+  [@css "@property --backgroundColor-ov3le6{syntax:\"*\";inherits:false;}"];
+  [@css "@property --backgroundColor-7yjmr3{syntax:\"*\";inherits:false;}"];
   [@css ".css-160vrad-common{background-color:var(--backgroundColor-ov3le6);}"];
   [@css
     ".css-10a6meq-clickable:hover{background-color:var(--backgroundColor-7yjmr3);}"

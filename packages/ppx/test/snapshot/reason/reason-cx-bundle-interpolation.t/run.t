@@ -4,6 +4,11 @@ var per (source-path, runtime-type) across base / :hover / @media variants.
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
+  [@css "@property --color-3f9mj1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-13vjntp{syntax:\"*\";inherits:false;}"];
+  [@css "@property --width-1v9ua{syntax:\"*\";inherits:false;}"];
+  [@css "@property --width-c62vcf{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-4uzv5u{syntax:\"*\";inherits:false;}"];
   [@css ".css-1kbzua4-multiVariant{color:var(--color-3f9mj1);}"];
   [@css ".css-1kbzua4-multiVariant:hover{color:var(--color-3f9mj1);}"];
   [@css

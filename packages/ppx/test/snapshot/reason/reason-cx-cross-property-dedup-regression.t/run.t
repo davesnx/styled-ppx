@@ -4,6 +4,8 @@ CSS runtime types. See input.re for the full rationale.
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
+  [@css "@property --lengthVar-12br693{syntax:\"*\";inherits:false;}"];
+  [@css "@property --lengthVar-8edltm{syntax:\"*\";inherits:false;}"];
   [@css ".css-1mfmiq8-layout{margin-left:var(--lengthVar-12br693);}"];
   [@css ".css-1mfmiq8-layout{padding-left:var(--lengthVar-8edltm);}"];
   [@css.bindings [("Output.layout", "css-1mfmiq8-layout")]];

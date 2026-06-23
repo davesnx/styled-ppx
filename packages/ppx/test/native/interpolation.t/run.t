@@ -14,6 +14,43 @@ Interpolation native PPX transformations are checked as a cram snapshot.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css "@property --mono100-mn2jt5{syntax:\"*\";inherits:false;}"];
+  [@css "@property --big-1c1caa8{syntax:\"*\";inherits:false;}"];
+  [@css "@property --small-1tsw5sh{syntax:\"*\";inherits:false;}"];
+  [@css "@property --small-1d5k27v{syntax:\"*\";inherits:false;}"];
+  [@css "@property --alpha-vlpuld{syntax:\"*\";inherits:false;}"];
+  [@css "@property --alpha-1ftvcb4{syntax:\"*\";inherits:false;}"];
+  [@css "@property --alpha-1y5ijmp{syntax:\"*\";inherits:false;}"];
+  [@css "@property --width-18c1xss{syntax:\"*\";inherits:false;}"];
+  [@css "@property --max-1yrxnfd{syntax:\"*\";inherits:false;}"];
+  [@css "@property --height-1n9troi{syntax:\"*\";inherits:false;}"];
+  [@css "@property --border-8yt3ey{syntax:\"*\";inherits:false;}"];
+  [@css "@property --font-10lt5gt{syntax:\"*\";inherits:false;}"];
+  [@css "@property --mono-e5legw{syntax:\"*\";inherits:false;}"];
+  [@css "@property --lh-uai7u3{syntax:\"*\";inherits:false;}"];
+  [@css "@property --zLevel-vut76j{syntax:\"*\";inherits:false;}"];
+  [@css "@property --left-1s2hr3z{syntax:\"*\";inherits:false;}"];
+  [@css "@property --decorationColor-seqvqc{syntax:\"*\";inherits:false;}"];
+  [@css "@property --wat-tevp0f{syntax:\"*\";inherits:false;}"];
+  [@css "@property --externalImageUrl-75mq6y{syntax:\"*\";inherits:false;}"];
+  [@css "@property --h-ulszyz{syntax:\"*\";inherits:false;}"];
+  [@css "@property --v-1rucg2y{syntax:\"*\";inherits:false;}"];
+  [@css "@property --blur-n5ddfa{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-1jwocqc{syntax:\"*\";inherits:false;}"];
+  [@css "@property --blue-uz6p3q{syntax:\"*\";inherits:false;}"];
+  [@css "@property --h-1cxj5q6{syntax:\"*\";inherits:false;}"];
+  [@css "@property --v-1p9ysn0{syntax:\"*\";inherits:false;}"];
+  [@css "@property --blur-1rsz8mu{syntax:\"*\";inherits:false;}"];
+  [@css "@property --spread-1icix4c{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-1eos5hw{syntax:\"*\";inherits:false;}"];
+  [@css "@property --spread-wd13u2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-3xubcm{syntax:\"*\";inherits:false;}"];
+  [@css "@property --elevation-jhhehb{syntax:\"*\";inherits:false;}"];
+  [@css "@property --clip-1go0jdu{syntax:\"*\";inherits:false;}"];
+  [@css "@property --duration-i5tvzn{syntax:\"*\";inherits:false;}"];
+  [@css "@property --state-1yj1w6c{syntax:\"*\";inherits:false;}"];
+  [@css "@property --px30-cc29mn{syntax:\"*\";inherits:false;}"];
+  [@css "@property --red-w69rb9{syntax:\"*\";inherits:false;}"];
   [@css ".css-vtnh4f{color:var(--mono100-mn2jt5);}"];
   [@css ".css-j1itjj{margin:var(--big-1c1caa8) var(--small-1tsw5sh);}"];
   [@css ".css-pupp3j{padding:var(--small-1d5k27v) 0px;}"];

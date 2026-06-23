@@ -15,6 +15,8 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css "@property --value-lltij1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --area-a9otef{syntax:\"*\";inherits:false;}"];
   [@css ".css-lgj0h8{display:grid;}"];
   [@css ".css-19rux3o{display:inline-grid;}"];
   [@css ".css-1xsawez{grid-template-columns:none;}"];

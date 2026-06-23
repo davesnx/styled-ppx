@@ -74,6 +74,55 @@ let rec flatten_selector_chain =
   };
 };
 
+/* Pseudo-elements are separate boxes that receive custom properties
+   from their originating element via *inheritance* — a
+   `@property{inherits:false}` var set inline on `&` is invisible to
+   `&::before`/`&::placeholder`. Both `::x` and the CSS2 legacy
+   single-colon spellings (`:before`, `:after`, `:first-line`,
+   `:first-letter`, parsed as pseudo-classes) count. */
+let pseudo_selector_is_element =
+  fun
+  | Pseudoelement(_) => true
+  | Pseudoclass(PseudoIdent(name)) =>
+    switch (String.lowercase_ascii(name)) {
+    | "before"
+    | "after"
+    | "first-line"
+    | "first-letter" => true
+    | _ => false
+    }
+  | Pseudoclass(_) => false;
+
+/* Segment matches the styled element's OWN box and nothing else: a bare
+   `&` or a compound whose type position is `&`, restricted only by
+   pseudo-classes/subclasses (`&:hover`, `&.foo`) — never by a
+   pseudo-element (`&::before` styles a separate box that reads vars via
+   inheritance). Strictly stronger than `subject_within_ampersand`
+   below, which also accepts elements merely *inside* `&`'s subtree
+   (e.g. `:is(& .child)`) — those too read inline custom properties via
+   inheritance. Callers deciding whether a var may register
+   `@property{inherits:false}` must use this strict form. `:is(&)`-style
+   proofs are conservatively rejected (false only misses an
+   optimization, never breaks a style). */
+let rec selector_is_ampersand_own_box = (sel: selector) =>
+  switch (sel) {
+  | SimpleSelector(Ampersand) => true
+  | CompoundSelector({
+      type_selector: Some(Ampersand),
+      subclass_selectors,
+      pseudo_selectors,
+    }) =>
+    !List.exists(pseudo_selector_is_element, pseudo_selectors)
+    && !List.exists(
+         fun
+         | Pseudo_class(pseudo) => pseudo_selector_is_element(pseudo)
+         | _ => false,
+         subclass_selectors,
+       )
+  | ComplexSelector(Selector(inner)) => selector_is_ampersand_own_box(inner)
+  | _ => false
+  };
+
 /* Segment provably denotes an element inside `&`'s subtree: `&`,
    `&`-typed compounds, or `:is()`/`:where()` whose every branch stays
    inside. `:not()`/`:has()` prove nothing — conservatively ignored. */

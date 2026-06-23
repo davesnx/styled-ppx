@@ -15,6 +15,16 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css "@property --tertiary-1cttnp6{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-p27yoa_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-p27yoa_2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-c1zhnk_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-c1zhnk_2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --secondary-fn5pf1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --box_-1n37ehb{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-zrm9xj_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-zrm9xj_2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-zrm9xj_3{syntax:\"*\";inherits:false;}"];
   [@css ".css-34k09d-_spaceBeforeColon{width:30px;}"];
   [@css ".css-1cx090v-_spaceBeforeColon{color:var(--tertiary-1cttnp6);}"];
   [@css

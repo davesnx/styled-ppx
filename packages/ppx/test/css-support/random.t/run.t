@@ -13,6 +13,17 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css "@property --colorTextString-1or9u9e{syntax:\"*\";inherits:false;}"];
+  [@css "@property --c-17nwon4{syntax:\"*\";inherits:false;}"];
+  [@css "@property --c-1729nrm{syntax:\"*\";inherits:false;}"];
+  [@css "@property --maskedImageUrl-q8tx22{syntax:\"*\";inherits:false;}"];
+  [@css "@property --text-1dckpp2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --lola-1i7n24a{syntax:\"*\";inherits:false;}"];
+  [@css "@property --lola-s8vp25{syntax:\"*\";inherits:false;}"];
+  [@css "@property --value-d1jms4{syntax:\"*\";inherits:false;}"];
+  [@css "@property --value-4g8iss{syntax:\"*\";inherits:false;}"];
+  [@css "@property --interpolation-it7nat{syntax:\"*\";inherits:false;}"];
+  [@css "@property --interpolation-h66riu{syntax:\"*\";inherits:false;}"];
   [@css ".css-89hc5w{scroll-behavior:auto;}"];
   [@css ".css-pdjuhq{scroll-behavior:smooth;}"];
   [@css ".css-1fsnuue{overflow-anchor:none;}"];

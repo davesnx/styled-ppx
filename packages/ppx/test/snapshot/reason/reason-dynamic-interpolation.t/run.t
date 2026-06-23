@@ -1,6 +1,7 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
+  [@css "@property --var-17zksex{syntax:\"*\";inherits:false;}"];
   [@css ".css-u97bjx-DynamicComponent{color:var(--var-17zksex);}"];
   [@css ".css-13o7eu2-DynamicComponent{display:block;}"];
   [@css.bindings

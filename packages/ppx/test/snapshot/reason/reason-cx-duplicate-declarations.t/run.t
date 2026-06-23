@@ -13,6 +13,7 @@ atom shape and hash.
 
   $ standalone --impl input.ml -o output.ml
   $ cat output.ml
+  [@@@css "@property --c-kv4uq2{syntax:\"*\";inherits:false;}"]
   [@@@css ".css-ztpkbn-dup{color:blue;color:red;color:blue;}"]
   [@@@css ".css-17ax8u2-fallback{display:-webkit-box;display:flex;}"]
   [@@@css ".css-1uk1gs8-interleaved{margin:0;}"]
