@@ -126,6 +126,38 @@ module Css_transform = {
   let declaration_has_value_interpolation = (decl: declaration) =>
     component_value_list_has_interpolation(fst(decl.value));
 
+  /* The single declaration an atom carries: bare (top-level), nested under a
+     selector (`Style_rule`), or under an at-rule. None for an atom with no
+     declaration body (e.g. an empty at-rule). */
+  let rec atom_declaration = (rule: rule): option(declaration) =>
+    switch (rule) {
+    | Declaration(decl) => Some(decl)
+    | Style_rule({ block: (rules, _), _ }) =>
+      switch (rules) {
+      | [inner] => atom_declaration(inner)
+      | _ => None
+      }
+    | At_rule({ block, _ }) =>
+      switch (block) {
+      | Rule_list((rules, _))
+      | Stylesheet((rules, _)) =>
+        switch (rules) {
+        | [inner] => atom_declaration(inner)
+        | _ => None
+        }
+      | Empty => None
+      }
+    };
+
+  /* True when the atom's declaration interpolates a runtime value. Such atoms
+     are bundled (one shared class + var namespace) rather than atomized, so the
+     same value across base/`:hover`/`@media` collapses to one custom property. */
+  let atom_has_value_interpolation = (rule: rule): bool =>
+    switch (atom_declaration(rule)) {
+    | Some(decl) => declaration_has_value_interpolation(decl)
+    | None => false
+    };
+
   let rec transform_component_value =
           (
             ~file: string,
@@ -1100,6 +1132,59 @@ module Css_transform = {
     extract_atomic_rules_from_block(~parent_prelude=?None, rules);
   };
 
+  /* Lower a single atom into its concrete CSS rules, resolving `&` /
+     descendant nesting against [effective_class] and substituting
+     interpolations under [effective_namespace]. A bare `Declaration` atom is
+     wrapped under `.effective_class`; nested / at-rule atoms run through
+     `Transform.run`. */
+  let lower_atom =
+      (~file, ~scope, ~opens, ~base_loc, ~effective_class, ~effective_namespace, ~loc, rule, dynamic_vars) => {
+    let single_rule_list = ([rule], loc);
+    let transformed =
+      switch (rule) {
+      | Declaration(decl) =>
+        let wrapped =
+          Style_rule({
+            prelude: (
+              [
+                (
+                  CompoundSelector({
+                    type_selector: None,
+                    subclass_selectors: [Class(effective_class)],
+                    pseudo_selectors: [],
+                  }),
+                  Ppxlib.Location.none,
+                ),
+              ],
+              Ppxlib.Location.none,
+            ),
+            block: ([Declaration(decl)], Ppxlib.Location.none),
+            loc: Ppxlib.Location.none,
+          });
+        [wrapped];
+
+      | Style_rule(_)
+      | At_rule(_) =>
+        Styled_ppx_css_parser.Transform.run(
+          ~className=effective_class,
+          single_rule_list,
+        )
+      };
+
+    transformed
+    |> List.map(r =>
+         transform_rule(
+           ~file,
+           ~scope,
+           ~opens,
+           ~base_loc,
+           ~var_namespace=effective_namespace,
+           r,
+           dynamic_vars,
+         )
+       );
+  };
+
   let transform_rule_list =
       (
         ~file,
@@ -1114,59 +1199,68 @@ module Css_transform = {
 
     let atomic_rules = atomize_rules(~base_loc, ~label?, rules);
 
-    let processed_rules =
-      atomic_rules
-      |> List.map(((className, var_namespace, rule)) => {
-           let single_rule_list = ([rule], loc);
+    /* Selective atomization: the block's interpolating declarations become one
+       content-addressed bundle, with class `css-<B>-<label>` and var namespace
+       `css-<B>` (label-free) shared across base/`:hover`/`@media`. Both derive
+       from the same bundle content, so identical bundles dedup to identical
+       rules + vars and different bundles never collide, preserving the
+       cross-module atomic invariant (see Hash_class.ml) and `CSS.merge`.
 
-           let transformed =
-             switch (rule) {
-             | Declaration(decl) =>
-               let wrapped =
-                 Style_rule({
-                   prelude: (
-                     [
-                       (
-                         CompoundSelector({
-                           type_selector: None,
-                           subclass_selectors: [Class(className)],
-                           pseudo_selectors: [],
-                         }),
-                         Ppxlib.Location.none,
-                       ),
-                     ],
-                     Ppxlib.Location.none,
-                   ),
-                   block: ([Declaration(decl)], Ppxlib.Location.none),
-                   loc: Ppxlib.Location.none,
-                 });
-               [wrapped];
+       Static declarations keep their own per-content atom class (still shared
+       across blocks). A block with no interpolation produces no bundle and is
+       byte-for-byte identical to the pre-bundle output. */
+    let bundle =
+      switch (
+        atomic_rules
+        |> List.filter_map(((_cn, _ns, rule)) =>
+             atom_has_value_interpolation(rule)
+               ? Some(render_rule(rule)) : None
+           )
+      ) {
+      | [] => None
+      | seeds =>
+        Some(Hash_class.class_and_namespace(~label?, String.concat("", seeds)))
+      };
 
-             | Style_rule(_)
-             | At_rule(_) =>
-               Styled_ppx_css_parser.Transform.run(
-                 ~className,
-                 single_rule_list,
-               )
-             };
-
-           transformed
-           |> List.map(r =>
-                transform_rule(
-                  ~file,
-                  ~scope,
-                  ~opens,
-                  ~base_loc,
-                  ~var_namespace,
-                  r,
-                  dynamic_vars,
-                )
+    let (shipped_rev, classes_rev) =
+      List.fold_left(
+        ((shipped_acc, classes_acc), (className, var_namespace, rule)) => {
+          let (effective_class, effective_namespace, dedup_key) =
+            switch (bundle) {
+            | Some((bundle_class, bundle_namespace))
+                when atom_has_value_interpolation(rule) => (
+                bundle_class,
+                bundle_namespace,
+                None /* content-keyed: many bundle rules share one class */,
               )
-           |> List.map(r => (className, r));
-         })
-      |> List.concat;
+            | _ => (className, var_namespace, Some(className))
+            };
 
-    (processed_rules, List.rev(dynamic_vars^));
+          let processed =
+            lower_atom(
+              ~file,
+              ~scope,
+              ~opens,
+              ~base_loc,
+              ~effective_class,
+              ~effective_namespace,
+              ~loc,
+              rule,
+              dynamic_vars,
+            )
+            |> List.map(r => (dedup_key, r));
+
+          let classes_acc =
+            List.mem(effective_class, classes_acc)
+              ? classes_acc : [effective_class, ...classes_acc];
+
+          (List.rev_append(processed, shipped_acc), classes_acc);
+        },
+        ([], []),
+        atomic_rules,
+      );
+
+    (List.rev(shipped_rev), List.rev(classes_rev), List.rev(dynamic_vars^));
   };
 };
 
@@ -1191,7 +1285,7 @@ let push =
       ~label=?,
       declarations: Styled_ppx_css_parser.Ast.rule_list,
     ) => {
-  let (atomic_classnames, dynamic_vars) =
+  let (shipped_rules, binding_classes, dynamic_vars) =
     Css_transform.transform_rule_list(
       ~file,
       ~scope,
@@ -1201,28 +1295,28 @@ let push =
       declarations,
     );
 
-  /* Identical atoms would repeat the class token (`"css-A css-A"`);
-     keep the first occurrence. */
-  let dedup_preserving_order = classNames =>
-    List.fold_left(
-      (acc, className) =>
-        List.mem(className, acc) ? acc : [className, ...acc],
-      [],
-      classNames,
-    )
-    |> List.rev;
+  /* Ship every rule, deduped by its key. Static atoms key by class name (class
+     and content are 1:1). Bundle rules carry `None` and key by rendered content,
+     since many share one bundle class and class-name keying would drop all but
+     the first. */
+  List.iter(
+    ((dedup_key, rule)) => {
+      let rendered_css = render_prefixed_rule(rule);
+      let key =
+        switch (dedup_key) {
+        | Some(className) => className
+        | None => rendered_css
+        };
+      Buffer.add_rule(key, rendered_css);
+    },
+    shipped_rules,
+  );
+
 
   let classNames =
-    switch (atomic_classnames) {
+    switch (binding_classes) {
     | [] => mint_empty_class(~label)
-    | _ =>
-      atomic_classnames
-      |> List.map(((className, rule)) => {
-           let rendered_css = render_prefixed_rule(rule);
-           Buffer.add_rule(className, rendered_css);
-           className;
-         })
-      |> dedup_preserving_order
+    | _ => binding_classes
     };
 
   (classNames, dynamic_vars);
