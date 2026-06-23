@@ -15,6 +15,14 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css "@property --flex1-3keqbf{syntax:\"*\";inherits:false;}"];
+  [@css "@property --value-bdy3z7{syntax:\"*\";inherits:false;}"];
+  [@css "@property --value2-1p309rg{syntax:\"*\";inherits:false;}"];
+  [@css "@property --value-1g8t0wn{syntax:\"*\";inherits:false;}"];
+  [@css "@property --value2-dmenma{syntax:\"*\";inherits:false;}"];
+  [@css "@property --min-e3h4r0{syntax:\"*\";inherits:false;}"];
+  [@css "@property --value-1g7nd20_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --value-fet175_2{syntax:\"*\";inherits:false;}"];
   [@css ".css-1crvgc7{align-content:flex-start;}"];
   [@css ".css-4zx96o{align-content:flex-end;}"];
   [@css ".css-1c5t6ef{align-content:space-between;}"];

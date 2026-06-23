@@ -7,6 +7,7 @@ html{box-sizing:border-box;}
 *::after{box-sizing:inherit;}
 body{margin:0;padding:16px;background-color:var(--pageBackground-nt9asn);color:var(--textColor-b0258c);font-family:"Menlo", "monospace";line-height:1.5;}
 @media (min-width: 768px) {body{padding:32px;}}
+@property --lola-8erbae{syntax:"*";inherits:false;}
 .css-k008qs-stack{display:flex;}
 .css-cgq59l-stack{-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;}
 .css-k008qs-Cositas{display:flex;}

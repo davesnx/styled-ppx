@@ -4,6 +4,8 @@ interpolation as a custom property (subject is `&` or a descendant of `&`).
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
+  [@css "@property --color-17hzlne{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-4fgdvo{syntax:\"*\";inherits:false;}"];
   [@css
     ".css-3pj70v-selfSibling + .css-3pj70v-selfSibling{color:var(--color-17hzlne);}"
   ];

@@ -31,6 +31,7 @@ If this test fail means that the module is not in sync with the ppx
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css "@property --cosas-112i897{syntax:\"*\";inherits:false;}"];
   [@css
     ".css-1gtanqs{width:-webkit-fit-content;width:-moz-fit-content;width:fit-content;}"
   ];

@@ -158,6 +158,87 @@ module Css_transform = {
     | None => false
     };
 
+  /* @property{inherits:false} support for `&`-local interpolation vars. A
+     non-inheriting custom property does not reach descendants, so changing it
+     invalidates only the element, not its subtree. Safe only when the var is
+     read on `&` itself, never by a descendant via inheritance.
+
+     [selector_subject_is_ampersand]: the subject (rightmost compound) of [sel]
+     is `&`, so the rule matches the styled element, not a descendant. `&:hover`,
+     `&.foo`, `.ancestor &` qualify; `& .child`, `& > .x` do not. */
+  let selector_subject_is_ampersand = (sel: selector): bool =>
+    switch (
+      List.rev(Styled_ppx_css_parser.Selector_nesting.flatten_selector_chain(sel))
+    ) {
+    | [] => false
+    | [(_combinator, subject), ..._] =>
+      Styled_ppx_css_parser.Selector_nesting.selector_is_ampersand(subject)
+    };
+
+  /* True when every declaration in an atom is read on `&` itself, so its
+     interpolation vars need not inherit. A bare declaration is on `&`; a nested
+     rule iff its subject is `&`; an at-rule defers to its inner rule. Unknown
+     shapes default to false (keep inherits:true). */
+  let rec atom_is_ampersand_local = (rule: rule): bool =>
+    switch (rule) {
+    | Declaration(_) => true
+    | Style_rule({ prelude: (selectors, _), _ }) =>
+      List.for_all(
+        ((sel, _loc)) => selector_subject_is_ampersand(sel),
+        selectors,
+      )
+    | At_rule({ block, _ }) =>
+      switch (block) {
+      | Rule_list((rules, _))
+      | Stylesheet((rules, _)) => List.for_all(atom_is_ampersand_local, rules)
+      | Empty => true
+      }
+    };
+
+  let is_var_name_char = c =>
+    (c >= 'a' && c <= 'z')
+    || (c >= 'A' && c <= 'Z')
+    || (c >= '0' && c <= '9')
+    || c == '_'
+    || c == '-';
+
+  /* The `--<name>` tokens in rendered CSS, without the leading `--`. Finds which
+     dynamic vars an atom reads even when cross-atom dedup hides a reference, so
+     a var read by any descendant atom can be excluded from inherits:false. */
+  let custom_property_names_in_text = (text: string): list(string) => {
+    let n = String.length(text);
+    let names = ref([]);
+    let i = ref(0);
+    while (i^ < n - 1) {
+      if (text.[i^] == '-' && text.[i^ + 1] == '-') {
+        let start = i^ + 2;
+        let j = ref(start);
+        while (j^ < n && is_var_name_char(text.[j^])) {
+          incr(j);
+        };
+        if (j^ > start) {
+          names := [String.sub(text, start, j^ - start), ...names^];
+        };
+        i := j^;
+      } else {
+        incr(i);
+      };
+    };
+    names^;
+  };
+
+  /* A var may register @property{inherits:false} only if it is a declaration
+     value (a `RuntimeModule` serializer or a `--custom: $(...)` feeder), not an
+     animation-name or a selector/media-prelude var. */
+  let var_type_supports_inherits_false = (var_type: var_type): bool =>
+    switch (var_type) {
+    | RuntimeModule("AnimationName") => false
+    | RuntimeModule(_)
+    | CustomProperty => true
+    | Selector
+    | MediaQuery => false
+    };
+
   let rec transform_component_value =
           (
             ~file: string,
@@ -1065,9 +1146,12 @@ module Css_transform = {
         Some(Hash_class.class_and_namespace(~label?, String.concat("", seeds)))
       };
 
-    let (shipped_rev, classes_rev) =
+    let (shipped_rev, classes_rev, atom_infos_rev) =
       List.fold_left(
-        ((shipped_acc, classes_acc), (className, var_namespace, rule)) => {
+        (
+          (shipped_acc, classes_acc, atom_infos_acc),
+          (className, var_namespace, rule),
+        ) => {
           let (effective_class, effective_namespace, dedup_key) =
             switch (bundle) {
             | Some((bundle_class, bundle_namespace))
@@ -1097,13 +1181,52 @@ module Css_transform = {
             List.mem(effective_class, classes_acc)
               ? classes_acc : [effective_class, ...classes_acc];
 
-          (List.rev_append(processed, shipped_acc), classes_acc);
+          /* Record the atom's `&`-locality and the vars it references (scanned
+             from rendered text so cross-atom dedup can't hide a reference), for
+             the inherits:false decision below. */
+          let atom_local = atom_is_ampersand_local(rule);
+          let referenced =
+            processed
+            |> List.concat_map(((_key, r)) =>
+                 custom_property_names_in_text(render_rule(r))
+               );
+
+          (
+            List.rev_append(processed, shipped_acc),
+            classes_acc,
+            [(atom_local, referenced), ...atom_infos_acc],
+          );
         },
-        ([], []),
+        ([], [], []),
         atomic_rules,
       );
 
-    (List.rev(shipped_rev), List.rev(classes_rev), List.rev(dynamic_vars^));
+    let atom_infos = atom_infos_rev;
+    let dynamic_vars_final = List.rev(dynamic_vars^);
+
+    /* A var registers @property{inherits:false} iff its type supports it and
+       every atom that reads it is `&`-local. */
+    let safe_inherits_false_vars =
+      dynamic_vars_final
+      |> List.filter_map(((var_name, _path, var_type)) =>
+           if (var_type_supports_inherits_false(var_type)
+               && List.for_all(
+                    ((atom_local, referenced)) =>
+                      atom_local || !List.mem(var_name, referenced),
+                    atom_infos,
+                  )) {
+             Some(var_name);
+           } else {
+             None;
+           }
+         );
+
+    (
+      List.rev(shipped_rev),
+      List.rev(classes_rev),
+      dynamic_vars_final,
+      safe_inherits_false_vars,
+    );
   };
 };
 
@@ -1128,7 +1251,7 @@ let push =
       ~label=?,
       declarations: Styled_ppx_css_parser.Ast.rule_list,
     ) => {
-  let (shipped_rules, binding_classes, dynamic_vars) =
+  let (shipped_rules, binding_classes, dynamic_vars, safe_inherits_false_vars) =
     Css_transform.transform_rule_list(
       ~file,
       ~scope,
@@ -1153,6 +1276,20 @@ let push =
       Buffer.add_rule(key, rendered_css);
     },
     shipped_rules,
+  );
+
+  /* Register each `&`-local var with @property{inherits:false} so a value change
+     invalidates only the element, not its subtree. `syntax:"*"` accepts any
+     value and needs no `initial-value`; the var is always set inline by
+     `CSS.make`, so it is never unset. Deduped by content here and across units
+     by `generate`, so a name reused N times ships one registration. */
+  List.iter(
+    var_name =>
+      Buffer.add_global_rule(
+        "@property --" ++ var_name,
+        "@property --" ++ var_name ++ "{syntax:\"*\";inherits:false;}",
+      ),
+    safe_inherits_false_vars,
   );
 
   let classNames =

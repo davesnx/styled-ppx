@@ -15,6 +15,40 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css "@property --fullTransition-ahh0or{syntax:\"*\";inherits:false;}"];
+  [@css "@property --fullTransition2-ezh8oo{syntax:\"*\";inherits:false;}"];
+  [@css "@property --property-18qplnj{syntax:\"*\";inherits:false;}"];
+  [@css "@property --duration-1iddlz{syntax:\"*\";inherits:false;}"];
+  [@css "@property --timingFunction-vob4pv{syntax:\"*\";inherits:false;}"];
+  [@css "@property --delay-cibt83{syntax:\"*\";inherits:false;}"];
+  [@css "@property --behavior-108fus4{syntax:\"*\";inherits:false;}"];
+  [@css "@property --property-14kilfb{syntax:\"*\";inherits:false;}"];
+  [@css "@property --duration-1ejdhyh{syntax:\"*\";inherits:false;}"];
+  [@css "@property --timingFunction-1j1h4k7{syntax:\"*\";inherits:false;}"];
+  [@css "@property --delay-pqgx10{syntax:\"*\";inherits:false;}"];
+  [@css "@property --property3-s110ja{syntax:\"*\";inherits:false;}"];
+  [@css "@property --property-h7mj8c{syntax:\"*\";inherits:false;}"];
+  [@css "@property --property-1skeegy{syntax:\"*\";inherits:false;}"];
+  [@css "@property --timingFunction-1ftkhfa{syntax:\"*\";inherits:false;}"];
+  [@css "@property --property-ivu2ul{syntax:\"*\";inherits:false;}"];
+  [@css "@property --duration-kgrecx{syntax:\"*\";inherits:false;}"];
+  [@css "@property --timingFunction-1p09x3l{syntax:\"*\";inherits:false;}"];
+  [@css "@property --duration-oa45ow{syntax:\"*\";inherits:false;}"];
+  [@css "@property --delay-dgz948{syntax:\"*\";inherits:false;}"];
+  [@css "@property --property-1fgs2tm{syntax:\"*\";inherits:false;}"];
+  [@css "@property --duration-1n1s912{syntax:\"*\";inherits:false;}"];
+  [@css "@property --delay-1ba13bw{syntax:\"*\";inherits:false;}"];
+  [@css "@property --timingFunction-1tn5ly2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --delay-16ruk7g{syntax:\"*\";inherits:false;}"];
+  [@css "@property --property-11bcg03{syntax:\"*\";inherits:false;}"];
+  [@css "@property --property-dpf9r8{syntax:\"*\";inherits:false;}"];
+  [@css "@property --timingFunction-5iq5eh{syntax:\"*\";inherits:false;}"];
+  [@css "@property --duration-sueb4i{syntax:\"*\";inherits:false;}"];
+  [@css "@property --property-87e7ig{syntax:\"*\";inherits:false;}"];
+  [@css "@property --duration-1rwycv{syntax:\"*\";inherits:false;}"];
+  [@css "@property --timingFunction-7aarh0{syntax:\"*\";inherits:false;}"];
+  [@css "@property --property-1f94jkq{syntax:\"*\";inherits:false;}"];
+  [@css "@property --duration-fvn1cf{syntax:\"*\";inherits:false;}"];
   [@css ".css-3elsnu{transition-property:none;}"];
   [@css ".css-1827oni{transition-property:all;}"];
   [@css ".css-rf2vzd{transition-property:width;}"];

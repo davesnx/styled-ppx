@@ -2,6 +2,24 @@ Comprehensive test for cx2 interpolation with various property types
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
+  [@css "@property --lengthVar-1fwod6p{syntax:\"*\";inherits:false;}"];
+  [@css "@property --lengthVar-5g6bk9{syntax:\"*\";inherits:false;}"];
+  [@css "@property --lengthVar-1qqvx43{syntax:\"*\";inherits:false;}"];
+  [@css "@property --lengthVar-11faw47{syntax:\"*\";inherits:false;}"];
+  [@css "@property --lengthVar-oy21bt{syntax:\"*\";inherits:false;}"];
+  [@css "@property --lengthVar-1lpa833{syntax:\"*\";inherits:false;}"];
+  [@css "@property --lengthVar-vh1osb{syntax:\"*\";inherits:false;}"];
+  [@css "@property --colorVar-14sye4i{syntax:\"*\";inherits:false;}"];
+  [@css "@property --flexBasisVar-16vl5bp{syntax:\"*\";inherits:false;}"];
+  [@css "@property --gridLineVar-1qxvc00{syntax:\"*\";inherits:false;}"];
+  [@css "@property --gridLineVar-175omdk{syntax:\"*\";inherits:false;}"];
+  [@css "@property --topVar-1iqysbe{syntax:\"*\";inherits:false;}"];
+  [@css "@property --topVar-10dkp5m{syntax:\"*\";inherits:false;}"];
+  [@css "@property --zIndexVar-osv02l{syntax:\"*\";inherits:false;}"];
+  [@css "@property --borderWidthVar-1nwhzbd{syntax:\"*\";inherits:false;}"];
+  [@css "@property --spacingVar-15s0ecx{syntax:\"*\";inherits:false;}"];
+  [@css "@property --spacingVar-1m50b62{syntax:\"*\";inherits:false;}"];
+  [@css "@property --width-18c1xss{syntax:\"*\";inherits:false;}"];
   [@css ".css-b8f0pi-test1{width:var(--lengthVar-1fwod6p);}"];
   [@css ".css-b8f0pi-test1{height:var(--lengthVar-5g6bk9);}"];
   [@css ".css-b8f0pi-test1{min-width:var(--lengthVar-1qqvx43);}"];

@@ -15,6 +15,17 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css "@property --elevation1-xawwdw_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --elevation1-xawwdw_2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --elevation1-xawwdw_3{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-udj66h_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-udj66h_2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-udj66h_3{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-139ljoj_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-139ljoj_2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-139ljoj_3{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-139ljoj_4{syntax:\"*\";inherits:false;}"];
+  [@css "@property --boxDark-17ffdav{syntax:\"*\";inherits:false;}"];
   [@css ".css-1eddbzm{background-repeat:space;}"];
   [@css ".css-kbwgys{background-repeat:round;}"];
   [@css ".css-yppiw6{background-repeat:repeat repeat;}"];

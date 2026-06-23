@@ -15,6 +15,9 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css "@property --fonts-qhzb1y{syntax:\"*\";inherits:false;}"];
+  [@css "@property --fontStack-q2u8nj{syntax:\"*\";inherits:false;}"];
+  [@css "@property --font-165jgna{syntax:\"*\";inherits:false;}"];
   [@css ".css-1l2838t{font-family:\"Inter Semi Bold\";}"];
   [@css ".css-1wpww9k{font-family:var(--fonts-qhzb1y);}"];
   [@css ".css-13c8hy8{font-family:Inter;}"];

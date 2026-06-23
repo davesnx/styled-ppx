@@ -1,6 +1,9 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
+  [@css "@property --var-16tzllb{syntax:\"*\";inherits:false;}"];
+  [@css "@property --black-11zsw44{syntax:\"*\";inherits:false;}"];
+  [@css "@property --black-1e15k1a{syntax:\"*\";inherits:false;}"];
   [@css ".css-1oz3n15-StringInterpolation{color:var(--var-16tzllb);}"];
   [@css
     ".css-1oz3n15-StringInterpolation{background-color:var(--black-11zsw44);}"

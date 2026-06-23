@@ -15,6 +15,34 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css "@property --lineAlpha-14x2350{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-16iaxxw{syntax:\"*\";inherits:false;}"];
+  [@css "@property --selectedMuted-coapl4{syntax:\"*\";inherits:false;}"];
+  [@css "@property --flag-r97mq{syntax:\"*\";inherits:false;}"];
+  [@css "@property --elevation1-10w4q1l{syntax:\"*\";inherits:false;}"];
+  [@css "@property --elevation1Bottom-1jgyvpw{syntax:\"*\";inherits:false;}"];
+  [@css "@property --border-16e6nb4{syntax:\"*\";inherits:false;}"];
+  [@css "@property --elevation2-a9z6ve{syntax:\"*\";inherits:false;}"];
+  [@css "@property --border-1pvcfai{syntax:\"*\";inherits:false;}"];
+  [@css "@property --elevation3-u89uz4{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-1fm6v6v_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-1fm6v6v_2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-1fm6v6v_3{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-110y8m6_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-110y8m6_2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --elevation1-s7j1om{syntax:\"*\";inherits:false;}"];
+  [@css "@property --elevation3-1tt1uog{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-10u4hbk{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-17j5in5{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-jfym6t{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-2dnuub{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-doha9t{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-uf1ggy{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-1i61so0{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-18cgk19{syntax:\"*\";inherits:false;}"];
+  [@css "@property --accent-1w0inj7{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-p27yoa_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-p27yoa_2{syntax:\"*\";inherits:false;}"];
   [@css ".css-tjsoaq{transition:all 200ms ease 0ms;}"];
   [@css ".css-9an52v{transition:all 300ms ease-in-out 0ms;}"];
   [@css ".css-9gb0kb{transition:opacity 300ms ease-in-out 0ms;}"];
