@@ -33,9 +33,9 @@
   .css-9fu3s3-shadowInterp{box-shadow:var(--var-11ljgmp) var(--var-1qn6d0z) var(--var-1bcbjmk) var(--var-xxpef3) var(--var-1sod13t);}
   .css-fkjemk-shadowFullInterp{box-shadow:var(--var-af5fmc);}
   .css-11hdrfm-borderWidthInterp{border:var(--var-apl5wd) solid black;}
-  .css-v2pvpe-mixedCard{background-color:var(--var-vilhl2);}
-  .css-hfzctv-mixedCard{border:1px solid var(--var-1on39sz);}
-  .css-phae1x-mixedCard{box-shadow:var(--var-giamln);}
+  .css-zwhmn0-mixedCard{background-color:var(--var-zk5xjv);}
+  .css-zwhmn0-mixedCard{border:1px solid var(--var-rm89ze);}
+  .css-zwhmn0-mixedCard{box-shadow:var(--var-2tj34g);}
   .css-1yfkn84-mixedCard{border-radius:12px;}
 
 Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
@@ -84,9 +84,9 @@ Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
   [@@@css ".css-fkjemk-shadowFullInterp{box-shadow:var(--var-af5fmc);}"]
   [@@@css
     ".css-11hdrfm-borderWidthInterp{border:var(--var-apl5wd) solid black;}"]
-  [@@@css ".css-v2pvpe-mixedCard{background-color:var(--var-vilhl2);}"]
-  [@@@css ".css-hfzctv-mixedCard{border:1px solid var(--var-1on39sz);}"]
-  [@@@css ".css-phae1x-mixedCard{box-shadow:var(--var-giamln);}"]
+  [@@@css ".css-zwhmn0-mixedCard{background-color:var(--var-zk5xjv);}"]
+  [@@@css ".css-zwhmn0-mixedCard{border:1px solid var(--var-rm89ze);}"]
+  [@@@css ".css-zwhmn0-mixedCard{box-shadow:var(--var-2tj34g);}"]
   [@@@css ".css-1yfkn84-mixedCard{border-radius:12px;}"]
   [@@@css.bindings
     [("Output.simpleShadow", "css-12b85tv-simpleShadow");
@@ -114,8 +114,7 @@ Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
     ("Output.shadowInterp", "css-9fu3s3-shadowInterp");
     ("Output.shadowFullInterp", "css-fkjemk-shadowFullInterp");
     ("Output.borderWidthInterp", "css-11hdrfm-borderWidthInterp");
-    ("Output.mixedCard",
-      "css-v2pvpe-mixedCard css-hfzctv-mixedCard css-phae1x-mixedCard css-1yfkn84-mixedCard")]]
+    ("Output.mixedCard", "css-zwhmn0-mixedCard css-1yfkn84-mixedCard")]]
   let simpleShadow = CSS.make "css-12b85tv-simpleShadow" []
   let multipleShadows = CSS.make "css-bh2iep-multipleShadows" []
   let insetShadow = CSS.make "css-1r1fme5-insetShadow" []
@@ -168,8 +167,7 @@ Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
   let mixedCard bgColor =
     fun borderColor ->
       fun shadow ->
-        CSS.make
-          "css-v2pvpe-mixedCard css-hfzctv-mixedCard css-phae1x-mixedCard css-1yfkn84-mixedCard"
-          [("--var-vilhl2", (CSS.Types.Color.toString bgColor));
-          ("--var-1on39sz", (CSS.Types.Color.toString borderColor));
-          ("--var-giamln", (CSS.Types.BoxShadows.toString shadow))]
+        CSS.make "css-zwhmn0-mixedCard css-1yfkn84-mixedCard"
+          [("--var-zk5xjv", (CSS.Types.Color.toString bgColor));
+          ("--var-rm89ze", (CSS.Types.Color.toString borderColor));
+          ("--var-2tj34g", (CSS.Types.BoxShadows.toString shadow))]

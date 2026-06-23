@@ -1,14 +1,14 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-u97bjx-DynamicComponent{color:var(--var-17zksex);}"];
+  [@css ".css-fhnx1u-DynamicComponent{color:var(--var-1uix7by);}"];
   [@css ".css-k008qs-DynamicComponent{display:flex;}"];
-  [@css ".css-v2g7ti-DynamicComponent{background-color:var(--var-1s0m1fr);}"];
+  [@css ".css-fhnx1u-DynamicComponent{background-color:var(--var-1ks2xuv);}"];
   [@css.bindings
     [
       (
         "Output.DynamicComponent",
-        "css-u97bjx-DynamicComponent css-k008qs-DynamicComponent css-v2g7ti-DynamicComponent",
+        "css-fhnx1u-DynamicComponent css-k008qs-DynamicComponent",
       ),
     ]
   ];
@@ -1003,10 +1003,10 @@
       "Object.assign";
     let styles = (~var, ~id, _) =>
       CSS.make(
-        "css-u97bjx-DynamicComponent css-k008qs-DynamicComponent css-v2g7ti-DynamicComponent",
+        "css-fhnx1u-DynamicComponent css-k008qs-DynamicComponent",
         [
-          ("--var-17zksex", CSS.Types.Color.toString(var)),
-          ("--var-1s0m1fr", CSS.Types.Color.toString(id)),
+          ("--var-1uix7by", CSS.Types.Color.toString(var)),
+          ("--var-1ks2xuv", CSS.Types.Color.toString(id)),
         ],
       );
     let make = (props: makeProps('id, 'var)) => {

@@ -27,10 +27,10 @@ If this test fail means that the module is not in sync with the ppx
   [@css
     ".css-u38k1n-_tabTextFirst:hover{box-shadow:1px 0 0 0 var(--var-c1zhnk_1), inset 0 -1px 0 0 var(--var-c1zhnk_2)  !important;}"
   ];
-  [@css ".css-1g8yeca-_tabText{color:var(--var-hfvj8d);}"];
-  [@css ".css-8wkqt8-_tabText:hover{background-color:var(--var-1n2q0et);}"];
+  [@css ".css-15h1qzw-_tabText{color:var(--var-fn5pf1);}"];
+  [@css ".css-15h1qzw-_tabText:hover{background-color:var(--var-1n37ehb);}"];
   [@css
-    ".css-f52zq8-_tabText:hover{box-shadow:1px 0 0 0 var(--var-171fmba_1), inset 1px 0 0 0 var(--var-171fmba_2), inset 0 -1px 0 0 var(--var-171fmba_3) ;}"
+    ".css-15h1qzw-_tabText:hover{box-shadow:1px 0 0 0 var(--var-zrm9xj_1), inset 1px 0 0 0 var(--var-zrm9xj_2), inset 0 -1px 0 0 var(--var-zrm9xj_3) ;}"
   ];
   [@css ".css-i9gxme-_sidebar{flex-grow:1;}"];
   [@css ".css-r6z5ec-_sidebar{z-index:1;}"];
@@ -55,10 +55,7 @@ If this test fail means that the module is not in sync with the ppx
         "Input._tabTextFirst",
         "css-1mx0ppg-_tabTextFirst css-u38k1n-_tabTextFirst",
       ),
-      (
-        "Input._tabText",
-        "css-1g8yeca-_tabText css-8wkqt8-_tabText css-f52zq8-_tabText",
-      ),
+      ("Input._tabText", "css-15h1qzw-_tabText"),
       ("Input._sidebarClosed", "css-0-_sidebarClosed"),
       (
         "Input._sidebar",
@@ -109,13 +106,13 @@ If this test fail means that the module is not in sync with the ppx
   
   let _tabText =
     CSS.make(
-      "css-1g8yeca-_tabText css-8wkqt8-_tabText css-f52zq8-_tabText",
+      "css-15h1qzw-_tabText",
       [
-        ("--var-hfvj8d", CSS.Types.Color.toString(Color.Text.secondary)),
-        ("--var-1n2q0et", CSS.Types.Color.toString(Color.Background.box_)),
-        ("--var-171fmba_1", CSS.Types.Color.toString(Color.Border.line)),
-        ("--var-171fmba_2", CSS.Types.Color.toString(Color.Border.line)),
-        ("--var-171fmba_3", CSS.Types.Color.toString(Color.Border.line)),
+        ("--var-fn5pf1", CSS.Types.Color.toString(Color.Text.secondary)),
+        ("--var-1n37ehb", CSS.Types.Color.toString(Color.Background.box_)),
+        ("--var-zrm9xj_1", CSS.Types.Color.toString(Color.Border.line)),
+        ("--var-zrm9xj_2", CSS.Types.Color.toString(Color.Border.line)),
+        ("--var-zrm9xj_3", CSS.Types.Color.toString(Color.Border.line)),
       ],
     );
   
