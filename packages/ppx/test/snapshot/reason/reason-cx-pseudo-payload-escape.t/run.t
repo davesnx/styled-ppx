@@ -21,8 +21,8 @@ subject is outside `&`'s subtree — slipped through and shipped a dead
   [1]
   $ standalone --impl input_is_ok.ml -o output.ml
   $ cat output.ml
-  [@@@css ":is(.css-1ptjfl7-ok div){color:var(--var-qdrabr);}"]
+  [@@@css ":is(.css-1ptjfl7-ok div){color:var(--c-qdrabr);}"]
   [@@@css.bindings [("Input_is_ok.ok", "css-1ptjfl7-ok")]]
   let c = "red"
   let ok =
-    CSS.make "css-1ptjfl7-ok" [("--var-qdrabr", (CSS.Types.Color.toString c))]
+    CSS.make "css-1ptjfl7-ok" [("--c-qdrabr", (CSS.Types.Color.toString c))]

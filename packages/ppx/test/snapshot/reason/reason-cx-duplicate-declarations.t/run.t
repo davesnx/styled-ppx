@@ -28,7 +28,7 @@ atom shape and hash.
   [@@@css ".css-1r75vyo-custom{--foo:2px;}"]
   [@@@css ".css-tokvmb-x{color:red;}"]
   [@@@css ".css-dhb7kq-x{color:blue;color:red;}"]
-  [@@@css ".css-zwzjs7-vars{margin:0;margin:var(--var-kv4uq2);}"]
+  [@@@css ".css-zwzjs7-vars{margin:0;margin:var(--c-kv4uq2);}"]
   [@@@css.bindings
     [("Input.dup", "css-ztpkbn-dup");
     ("Input.fallback", "css-17ax8u2-fallback");
@@ -58,5 +58,4 @@ atom shape and hash.
   module B = struct let x = CSS.make "css-dhb7kq-x" [] end
   let c = "10px"
   let vars =
-    CSS.make "css-zwzjs7-vars"
-      [("--var-kv4uq2", (CSS.Types.Margin.toString c))]
+    CSS.make "css-zwzjs7-vars" [("--c-kv4uq2", (CSS.Types.Margin.toString c))]

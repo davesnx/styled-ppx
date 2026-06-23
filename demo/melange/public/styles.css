@@ -6,12 +6,12 @@ html{box-sizing:border-box;}
 body{margin:0;padding:0;}
 html{margin:0;padding:0;}
 #root{margin:0;padding:0;}
-body{background-color:var(--var-171dvmc);color:var(--var-a4prc9);font-family:"Menlo", "monospace";line-height:1.5;}
+body{background-color:var(--pageBackground-171dvmc);color:var(--textColor-a4prc9);font-family:"Menlo", "monospace";line-height:1.5;}
 .css-k008qs-stack{display:flex;}
 .css-cgq59l-stack{-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;}
 .css-k008qs-Cositas{display:flex;}
 .css-cgq59l-Cositas{-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;}
-.css-r0vq9t-Cositas{gap:var(--var-8erbae);}
+.css-r0vq9t-Cositas{gap:var(--lola-8erbae);}
 .css-tokvmb-selectors{color:red;}
 .css-12qnfjo-selectors:hover{color:blue;}
 @keyframes keyframe-deb5ee{40%{-webkit-transform:translate3d(0, -30px, 0);-moz-transform:translate3d(0, -30px, 0);-ms-transform:translate3d(0, -30px, 0);transform:translate3d(0, -30px, 0);}70%{-webkit-transform:translate3d(0, -15px, 0);-moz-transform:translate3d(0, -15px, 0);-ms-transform:translate3d(0, -15px, 0);transform:translate3d(0, -15px, 0);}90%{-webkit-transform:translate3d(0,-4px,0);-moz-transform:translate3d(0,-4px,0);-ms-transform:translate3d(0,-4px,0);transform:translate3d(0,-4px,0);}}
@@ -34,10 +34,10 @@ body{background-color:var(--var-171dvmc);color:var(--var-a4prc9);font-family:"Me
 .css-3kft4e-keyframeDemoShell{border:2px solid #141414;}
 .css-1fi1jeb-keyframeDemoShell{border-radius:18px;}
 .css-205zh2-keyframeDemoShell{background:#f6f1e8;}
-.css-kusjgz-keyframeDemoShell{color:var(--var-1a279q8);}
+.css-kusjgz-keyframeDemoShell{color:var(--color-1a279q8);}
 .css-1e8vzlw-keyframeDemoShell{font-family:"Menlo", "monospace";}
-@keyframes keyframe-1vbo1tz{0%{height:var(--var-1lvxfkr);}100%{height:var(--var-hx3drb);}}
-.css-1h7bkao-keyframeDemoCard{-webkit-animation-name:var(--var-1jz21hk);animation-name:var(--var-1jz21hk);}
+@keyframes keyframe-1kt58w0{0%{height:var(--previous-1lvxfkr);}100%{height:var(--current-hx3drb);}}
+.css-1h7bkao-keyframeDemoCard{-webkit-animation-name:var(--resize-1jz21hk);animation-name:var(--resize-1jz21hk);}
 .css-65ee5x-keyframeDemoCard{-webkit-animation-duration:1200ms;animation-duration:1200ms;}
 .css-3pa72f-keyframeDemoCard{-webkit-animation-timing-function:ease-in-out;animation-timing-function:ease-in-out;}
 .css-iovuyg-keyframeDemoCard{-webkit-animation-fill-mode:both;animation-fill-mode:both;}

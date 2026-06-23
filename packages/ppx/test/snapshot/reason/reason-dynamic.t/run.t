@@ -3,7 +3,7 @@
   $ refmt --parse ml --print re output.ml
   [@css ".css-fhnx1u-DynamicComponent{color:var(--var-1uix7by);}"];
   [@css ".css-k008qs-DynamicComponent{display:flex;}"];
-  [@css ".css-fhnx1u-DynamicComponent{background-color:var(--var-1ks2xuv);}"];
+  [@css ".css-fhnx1u-DynamicComponent{background-color:var(--id-1ks2xuv);}"];
   [@css.bindings
     [
       (
@@ -1006,7 +1006,7 @@
         "css-fhnx1u-DynamicComponent css-k008qs-DynamicComponent",
         [
           ("--var-1uix7by", CSS.Types.Color.toString(var)),
-          ("--var-1ks2xuv", CSS.Types.Color.toString(id)),
+          ("--id-1ks2xuv", CSS.Types.Color.toString(id)),
         ],
       );
     let make = (props: makeProps('id, 'var)) => {

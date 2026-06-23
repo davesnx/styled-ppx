@@ -3,9 +3,9 @@
   $ refmt --parse ml --print re output.ml
   [@css ".css-1oz3n15-StringInterpolation{color:var(--var-16tzllb);}"];
   [@css
-    ".css-1oz3n15-StringInterpolation{background-color:var(--var-11zsw44);}"
+    ".css-1oz3n15-StringInterpolation{background-color:var(--black-11zsw44);}"
   ];
-  [@css ".css-1oz3n15-StringInterpolation{border-color:var(--var-1e15k1a);}"];
+  [@css ".css-1oz3n15-StringInterpolation{border-color:var(--black-1e15k1a);}"];
   [@css ".css-13o7eu2-StringInterpolation{display:block;}"];
   [@css.bindings
     [
@@ -1010,8 +1010,8 @@
         "css-1oz3n15-StringInterpolation css-13o7eu2-StringInterpolation",
         [
           ("--var-16tzllb", CSS.Types.Color.toString(Theme.var)),
-          ("--var-11zsw44", CSS.Types.Color.toString(black)),
-          ("--var-1e15k1a", CSS.Types.Color.toString(Theme.Border.black)),
+          ("--black-11zsw44", CSS.Types.Color.toString(black)),
+          ("--black-1e15k1a", CSS.Types.Color.toString(Theme.Border.black)),
         ],
       );
     let make = (props: makeProps) => {

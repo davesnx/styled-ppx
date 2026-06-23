@@ -16,21 +16,21 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css ".css-34k09d-_spaceBeforeColon{width:30px;}"];
-  [@css ".css-1cx090v-_spaceBeforeColon{color:var(--var-1cttnp6);}"];
+  [@css ".css-1cx090v-_spaceBeforeColon{color:var(--tertiary-1cttnp6);}"];
   [@css
     ".css-qg0an3-_tabInnerFirst{box-shadow:inset 1px 0 0 0 transparent  !important;}"
   ];
   [@css
-    ".css-96uk0n-_multiShadowImportant{box-shadow:1px 0 0 0 var(--var-p27yoa_1), inset 0 -1px 0 0 var(--var-p27yoa_2)  !important;}"
+    ".css-96uk0n-_multiShadowImportant{box-shadow:1px 0 0 0 var(--line-p27yoa_1), inset 0 -1px 0 0 var(--line-p27yoa_2)  !important;}"
   ];
   [@css ".css-1mx0ppg-_tabTextFirst{box-shadow:inset 0 0 0 0 transparent;}"];
   [@css
-    ".css-u38k1n-_tabTextFirst:hover{box-shadow:1px 0 0 0 var(--var-c1zhnk_1), inset 0 -1px 0 0 var(--var-c1zhnk_2)  !important;}"
+    ".css-u38k1n-_tabTextFirst:hover{box-shadow:1px 0 0 0 var(--line-c1zhnk_1), inset 0 -1px 0 0 var(--line-c1zhnk_2)  !important;}"
   ];
-  [@css ".css-15h1qzw-_tabText{color:var(--var-fn5pf1);}"];
-  [@css ".css-15h1qzw-_tabText:hover{background-color:var(--var-1n37ehb);}"];
+  [@css ".css-15h1qzw-_tabText{color:var(--secondary-fn5pf1);}"];
+  [@css ".css-15h1qzw-_tabText:hover{background-color:var(--box_-1n37ehb);}"];
   [@css
-    ".css-15h1qzw-_tabText:hover{box-shadow:1px 0 0 0 var(--var-zrm9xj_1), inset 1px 0 0 0 var(--var-zrm9xj_2), inset 0 -1px 0 0 var(--var-zrm9xj_3) ;}"
+    ".css-15h1qzw-_tabText:hover{box-shadow:1px 0 0 0 var(--line-zrm9xj_1), inset 1px 0 0 0 var(--line-zrm9xj_2), inset 0 -1px 0 0 var(--line-zrm9xj_3) ;}"
   ];
   [@css ".css-i9gxme-_sidebar{flex-grow:1;}"];
   [@css ".css-r6z5ec-_sidebar{z-index:1;}"];
@@ -81,7 +81,7 @@ If this test fail means that the module is not in sync with the ppx
   let _spaceBeforeColon =
     CSS.make(
       "css-34k09d-_spaceBeforeColon css-1cx090v-_spaceBeforeColon",
-      [("--var-1cttnp6", CSS.Types.Color.toString(Color.Text.tertiary))],
+      [("--tertiary-1cttnp6", CSS.Types.Color.toString(Color.Text.tertiary))],
     );
   
   let _tabInnerFirst = CSS.make("css-qg0an3-_tabInnerFirst", []);
@@ -90,8 +90,8 @@ If this test fail means that the module is not in sync with the ppx
     CSS.make(
       "css-96uk0n-_multiShadowImportant",
       [
-        ("--var-p27yoa_1", CSS.Types.Color.toString(Color.Border.line)),
-        ("--var-p27yoa_2", CSS.Types.Color.toString(Color.Border.line)),
+        ("--line-p27yoa_1", CSS.Types.Color.toString(Color.Border.line)),
+        ("--line-p27yoa_2", CSS.Types.Color.toString(Color.Border.line)),
       ],
     );
   
@@ -99,8 +99,8 @@ If this test fail means that the module is not in sync with the ppx
     CSS.make(
       "css-1mx0ppg-_tabTextFirst css-u38k1n-_tabTextFirst",
       [
-        ("--var-c1zhnk_1", CSS.Types.Color.toString(Color.Border.line)),
-        ("--var-c1zhnk_2", CSS.Types.Color.toString(Color.Border.line)),
+        ("--line-c1zhnk_1", CSS.Types.Color.toString(Color.Border.line)),
+        ("--line-c1zhnk_2", CSS.Types.Color.toString(Color.Border.line)),
       ],
     );
   
@@ -108,11 +108,11 @@ If this test fail means that the module is not in sync with the ppx
     CSS.make(
       "css-15h1qzw-_tabText",
       [
-        ("--var-fn5pf1", CSS.Types.Color.toString(Color.Text.secondary)),
-        ("--var-1n37ehb", CSS.Types.Color.toString(Color.Background.box_)),
-        ("--var-zrm9xj_1", CSS.Types.Color.toString(Color.Border.line)),
-        ("--var-zrm9xj_2", CSS.Types.Color.toString(Color.Border.line)),
-        ("--var-zrm9xj_3", CSS.Types.Color.toString(Color.Border.line)),
+        ("--secondary-fn5pf1", CSS.Types.Color.toString(Color.Text.secondary)),
+        ("--box_-1n37ehb", CSS.Types.Color.toString(Color.Background.box_)),
+        ("--line-zrm9xj_1", CSS.Types.Color.toString(Color.Border.line)),
+        ("--line-zrm9xj_2", CSS.Types.Color.toString(Color.Border.line)),
+        ("--line-zrm9xj_3", CSS.Types.Color.toString(Color.Border.line)),
       ],
     );
   
