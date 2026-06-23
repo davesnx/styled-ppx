@@ -8,8 +8,10 @@ merged styles cannot overwrite each other.
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-160vrad-common{background-color:var(--var-ov3le6);}"];
-  [@css ".css-10a6meq-clickable:hover{background-color:var(--var-7yjmr3);}"];
+  [@css ".css-160vrad-common{background-color:var(--backgroundColor-ov3le6);}"];
+  [@css
+    ".css-10a6meq-clickable:hover{background-color:var(--backgroundColor-7yjmr3);}"
+  ];
   [@css.bindings
     [
       ("Output.common", "css-160vrad-common"),
@@ -19,10 +21,14 @@ merged styles cannot overwrite each other.
   let common = backgroundColor =>
     CSS.make(
       "css-160vrad-common",
-      [("--var-ov3le6", CSS.Types.Color.toString(backgroundColor))],
+      [
+        ("--backgroundColor-ov3le6", CSS.Types.Color.toString(backgroundColor)),
+      ],
     );
   let clickable = backgroundColor =>
     CSS.make(
       "css-10a6meq-clickable",
-      [("--var-7yjmr3", CSS.Types.Color.toString(backgroundColor))],
+      [
+        ("--backgroundColor-7yjmr3", CSS.Types.Color.toString(backgroundColor)),
+      ],
     );

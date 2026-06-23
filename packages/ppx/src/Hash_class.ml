@@ -123,15 +123,57 @@ let class_name ?label content = fst (class_and_namespace ?label content)
 
 (* -- Interpolation variables ------------------------------------------- *)
 
-(* The custom-property name for an interpolation: `var-<hash>`, where the hash
-   mixes the owning [namespace], the interpolation [path] (the source text of
-   the `$(...)` expression) and a [type_key] discriminator. The caller derives
-   [type_key] from the interpolation's resolved runtime type so that two
-   interpolations differing only by target type get distinct variables and
-   distinct serializers. The leading `--` is added by the caller when it
-   writes `var(--<name>)`. *)
+(* A readable, CSS-identifier-safe prefix for an interpolation's source path.
+   Keeps `[A-Za-z0-9_]`, collapses other runs to one `-`, truncates to 40, and
+   falls back to "var" when nothing identifier-like survives. The hash suffix
+   owns uniqueness, so the prefix is cosmetic.
+     color           -> "color"
+     Theme.spacing.md -> "spacing-md"   (leading module qualifiers dropped)
+     Color.Border.line -> "line"
+     props.x          -> "props-x"      (lowercase head is not a module)  *)
+let interpolation_name_prefix path =
+  (* Drop contiguous leading module segments (uppercase head), keeping the last
+     segment. The hash uses the full path, so this never affects identity. *)
+  let path =
+    let rec drop = function
+      | [ last ] -> [ last ]
+      | seg :: rest
+        when String.length seg > 0 && seg.[0] >= 'A' && seg.[0] <= 'Z' ->
+        drop rest
+      | segs -> segs
+    in
+    String.concat "." (drop (String.split_on_char '.' path))
+  in
+  let buf = Buffer.create (String.length path) in
+  let pending_dash = ref false in
+  String.iter
+    (fun c ->
+      let ident =
+        (c >= 'a' && c <= 'z')
+        || (c >= 'A' && c <= 'Z')
+        || (c >= '0' && c <= '9')
+        || c = '_'
+      in
+      if ident then (
+        if !pending_dash && Buffer.length buf > 0 then Buffer.add_char buf '-';
+        pending_dash := false;
+        Buffer.add_char buf c)
+      else pending_dash := true)
+    path;
+  let s = Buffer.contents buf in
+  let s = if String.length s > 40 then String.sub s 0 40 else s in
+  if s = "" then "var" else s
+
+(* The custom-property name for an interpolation: `<prefix>-<hash>`. [prefix] is
+   readable (see [interpolation_name_prefix]); the hash over [namespace], [path]
+   and [type_key] owns uniqueness and cross-module identity. Both derive only
+   from the source, so the name is identical in dev and prod. [type_key] comes
+   from the resolved runtime type, so interpolations differing only by target
+   type get distinct variables and serializers. Caller adds the leading `--`. *)
 let variable ~namespace ~type_key path =
-  Printf.sprintf "var-%s" (hash (nul_join [ namespace; path; type_key ]))
+  Printf.sprintf "%s-%s"
+    (interpolation_name_prefix path)
+    (hash (nul_join [ namespace; path; type_key ]))
 
 (* As [variable], but when the same interpolation name appears more than once
    within a single declaration each occurrence gets a `_<index>` suffix, so N

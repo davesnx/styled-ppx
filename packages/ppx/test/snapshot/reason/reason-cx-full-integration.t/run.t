@@ -4,14 +4,15 @@
   [@@@css "body{margin:0;font-family:system-ui, sans-serif;}"]
   [@@@css ".css-k008qs-staticCss{display:flex;}"]
   [@@@css ".css-1tyndxa-staticCss{justify-content:center;}"]
-  [@@@css ".css-kusjgz-dynamicCss{color:var(--var-1a279q8);}"]
+  [@@@css ".css-kusjgz-dynamicCss{color:var(--color-1a279q8);}"]
   [@@@css ".css-k008qs-dynamicCss{display:flex;}"]
-  [@@@css ".css-15a4g54-logicalProps{margin-block:var(--var-y96o3b);}"]
-  [@@@css ".css-15a4g54-logicalProps{margin-inline:var(--var-vh5lkd);}"]
-  [@@@css ".css-15a4g54-logicalProps{padding-block-start:var(--var-f3qjr);}"]
+  [@@@css ".css-15a4g54-logicalProps{margin-block:var(--spacing-y96o3b);}"]
+  [@@@css ".css-15a4g54-logicalProps{margin-inline:var(--spacing-vh5lkd);}"]
   [@@@css
-    ".css-15a4g54-logicalProps{-webkit-padding-inline-end:var(--var-f3qjr);padding-inline-end:var(--var-f3qjr);}"]
-  [@@@css ".css-15a4g54-logicalProps{inset-block-start:var(--var-f3qjr);}"]
+    ".css-15a4g54-logicalProps{padding-block-start:var(--spacing-f3qjr);}"]
+  [@@@css
+    ".css-15a4g54-logicalProps{-webkit-padding-inline-end:var(--spacing-f3qjr);padding-inline-end:var(--spacing-f3qjr);}"]
+  [@@@css ".css-15a4g54-logicalProps{inset-block-start:var(--spacing-f3qjr);}"]
   [@@@css ".css-k008qs-nestedCss{display:flex;}"]
   [@@@css ".css-zqnfaz-nestedCss:hover{opacity:0.8;}"]
   [@@@css ".css-osffsa-nestedCss .child{-webkit-flex:1;-ms-flex:1;flex:1;}"]
@@ -35,15 +36,15 @@
     "@media screen and (min-width: 768px) and (max-width: 1024px) {.css-mhiow9-complexMedia{display:flex;}}"]
   [@@@css
     "@media (prefers-color-scheme: dark) {.css-1nm9mde-complexMedia{background-color:#1a1a1a;}}"]
-  [@@@css ".css-kusjgz-mediaWithInterpolation{color:var(--var-1a279q8);}"]
+  [@@@css ".css-kusjgz-mediaWithInterpolation{color:var(--color-1a279q8);}"]
   [@@@css
     "@media (max-width: 768px) {.css-11qknlj-mediaWithInterpolation{opacity:0.8;}}"]
   [@@@css "@keyframes keyframe-jw9oix{from{opacity:0;}to{opacity:1;}}"]
   [@@@css
     "@keyframes keyframe-waibjx{0%{-webkit-transform:translateY(100%);-moz-transform:translateY(100%);-ms-transform:translateY(100%);transform:translateY(100%);}100%{-webkit-transform:translateY(0);-moz-transform:translateY(0);-ms-transform:translateY(0);transform:translateY(0);}}"]
-  [@@@css ".css-1sq1nk7-multiVar{color:var(--var-19vrfgr);}"]
-  [@@@css ".css-1sq1nk7-multiVar{background-color:var(--var-1dc81fi);}"]
-  [@@@css ".css-1sq1nk7-multiVar{font-size:var(--var-3mc4ty);}"]
+  [@@@css ".css-1sq1nk7-multiVar{color:var(--primary-19vrfgr);}"]
+  [@@@css ".css-1sq1nk7-multiVar{background-color:var(--secondary-1dc81fi);}"]
+  [@@@css ".css-1sq1nk7-multiVar{font-size:var(--size-3mc4ty);}"]
   [@@@css ".css-nk32ej-multiVar{padding:10px;}"]
   [@@@css ".css-lgj0h8-gridCss{display:grid;}"]
   [@@@css ".css-bghlac-gridCss{grid-template-columns:1fr 2fr 1fr;}"]
@@ -73,12 +74,12 @@
   let staticCss = CSS.make "css-k008qs-staticCss css-1tyndxa-staticCss" []
   let dynamicCss color =
     CSS.make "css-kusjgz-dynamicCss css-k008qs-dynamicCss"
-      [("--var-1a279q8", (CSS.Types.Color.toString color))]
+      [("--color-1a279q8", (CSS.Types.Color.toString color))]
   let logicalProps spacing =
     CSS.make "css-15a4g54-logicalProps"
-      [("--var-y96o3b", (CSS.Types.MarginBlock.toString spacing));
-      ("--var-vh5lkd", (CSS.Types.MarginInline.toString spacing));
-      ("--var-f3qjr", (CSS.Types.Length.toString spacing))]
+      [("--spacing-y96o3b", (CSS.Types.MarginBlock.toString spacing));
+      ("--spacing-vh5lkd", (CSS.Types.MarginInline.toString spacing));
+      ("--spacing-f3qjr", (CSS.Types.Length.toString spacing))]
   let nestedCss =
     CSS.make "css-k008qs-nestedCss css-zqnfaz-nestedCss css-osffsa-nestedCss"
       []
@@ -99,7 +100,7 @@
   let mediaWithInterpolation color =
     CSS.make
       "css-kusjgz-mediaWithInterpolation css-11qknlj-mediaWithInterpolation"
-      [("--var-1a279q8", (CSS.Types.Color.toString color))]
+      [("--color-1a279q8", (CSS.Types.Color.toString color))]
   let fadeIn = CSS.Types.AnimationName.make "keyframe-jw9oix"
   let slideUp = CSS.Types.AnimationName.make "keyframe-waibjx"
   module GlobalReset =
@@ -110,9 +111,9 @@
     end
   let multiVar primary secondary size =
     CSS.make "css-1sq1nk7-multiVar css-nk32ej-multiVar"
-      [("--var-19vrfgr", (CSS.Types.Color.toString primary));
-      ("--var-1dc81fi", (CSS.Types.Color.toString secondary));
-      ("--var-3mc4ty", (CSS.Types.FontSize.toString size))]
+      [("--primary-19vrfgr", (CSS.Types.Color.toString primary));
+      ("--secondary-1dc81fi", (CSS.Types.Color.toString secondary));
+      ("--size-3mc4ty", (CSS.Types.FontSize.toString size))]
   let gridCss =
     CSS.make "css-lgj0h8-gridCss css-bghlac-gridCss css-16610y9-gridCss" []
   let scrollCss = CSS.make "css-pdjuhq-scrollCss css-13v3rg8-scrollCss" []
@@ -147,13 +148,13 @@
   body{margin:0;font-family:system-ui, sans-serif;}
   .css-k008qs-staticCss{display:flex;}
   .css-1tyndxa-staticCss{justify-content:center;}
-  .css-kusjgz-dynamicCss{color:var(--var-1a279q8);}
+  .css-kusjgz-dynamicCss{color:var(--color-1a279q8);}
   .css-k008qs-dynamicCss{display:flex;}
-  .css-15a4g54-logicalProps{margin-block:var(--var-y96o3b);}
-  .css-15a4g54-logicalProps{margin-inline:var(--var-vh5lkd);}
-  .css-15a4g54-logicalProps{padding-block-start:var(--var-f3qjr);}
-  .css-15a4g54-logicalProps{-webkit-padding-inline-end:var(--var-f3qjr);padding-inline-end:var(--var-f3qjr);}
-  .css-15a4g54-logicalProps{inset-block-start:var(--var-f3qjr);}
+  .css-15a4g54-logicalProps{margin-block:var(--spacing-y96o3b);}
+  .css-15a4g54-logicalProps{margin-inline:var(--spacing-vh5lkd);}
+  .css-15a4g54-logicalProps{padding-block-start:var(--spacing-f3qjr);}
+  .css-15a4g54-logicalProps{-webkit-padding-inline-end:var(--spacing-f3qjr);padding-inline-end:var(--spacing-f3qjr);}
+  .css-15a4g54-logicalProps{inset-block-start:var(--spacing-f3qjr);}
   .css-k008qs-nestedCss{display:flex;}
   .css-zqnfaz-nestedCss:hover{opacity:0.8;}
   .css-osffsa-nestedCss .child{-webkit-flex:1;-ms-flex:1;flex:1;}
@@ -169,13 +170,13 @@
   .css-lgj0h8-complexMedia{display:grid;}
   @media screen and (min-width: 768px) and (max-width: 1024px) {.css-mhiow9-complexMedia{display:flex;}}
   @media (prefers-color-scheme: dark) {.css-1nm9mde-complexMedia{background-color:#1a1a1a;}}
-  .css-kusjgz-mediaWithInterpolation{color:var(--var-1a279q8);}
+  .css-kusjgz-mediaWithInterpolation{color:var(--color-1a279q8);}
   @media (max-width: 768px) {.css-11qknlj-mediaWithInterpolation{opacity:0.8;}}
   @keyframes keyframe-jw9oix{from{opacity:0;}to{opacity:1;}}
   @keyframes keyframe-waibjx{0%{-webkit-transform:translateY(100%);-moz-transform:translateY(100%);-ms-transform:translateY(100%);transform:translateY(100%);}100%{-webkit-transform:translateY(0);-moz-transform:translateY(0);-ms-transform:translateY(0);transform:translateY(0);}}
-  .css-1sq1nk7-multiVar{color:var(--var-19vrfgr);}
-  .css-1sq1nk7-multiVar{background-color:var(--var-1dc81fi);}
-  .css-1sq1nk7-multiVar{font-size:var(--var-3mc4ty);}
+  .css-1sq1nk7-multiVar{color:var(--primary-19vrfgr);}
+  .css-1sq1nk7-multiVar{background-color:var(--secondary-1dc81fi);}
+  .css-1sq1nk7-multiVar{font-size:var(--size-3mc4ty);}
   .css-nk32ej-multiVar{padding:10px;}
   .css-lgj0h8-gridCss{display:grid;}
   .css-bghlac-gridCss{grid-template-columns:1fr 2fr 1fr;}

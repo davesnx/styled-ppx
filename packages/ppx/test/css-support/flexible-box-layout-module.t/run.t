@@ -37,16 +37,16 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-6hx0uu{-webkit-flex:2 2;-ms-flex:2 2;flex:2 2;}"];
   [@css ".css-1rr8a55{-webkit-flex:2 2 10%;-ms-flex:2 2 10%;flex:2 2 10%;}"];
   [@css
-    ".css-1x4f3wz{-webkit-flex:var(--var-3keqbf);-ms-flex:var(--var-3keqbf);flex:var(--var-3keqbf);}"
+    ".css-1x4f3wz{-webkit-flex:var(--flex1-3keqbf);-ms-flex:var(--flex1-3keqbf);flex:var(--flex1-3keqbf);}"
   ];
   [@css
-    ".css-19g0la7{-webkit-flex:var(--var-bdy3z7) var(--var-1p309rg);-ms-flex:var(--var-bdy3z7) var(--var-1p309rg);flex:var(--var-bdy3z7) var(--var-1p309rg);}"
+    ".css-19g0la7{-webkit-flex:var(--value-bdy3z7) var(--value2-1p309rg);-ms-flex:var(--value-bdy3z7) var(--value2-1p309rg);flex:var(--value-bdy3z7) var(--value2-1p309rg);}"
   ];
   [@css
-    ".css-djecpy{-webkit-flex:var(--var-1g8t0wn) var(--var-dmenma) var(--var-e3h4r0);-ms-flex:var(--var-1g8t0wn) var(--var-dmenma) var(--var-e3h4r0);flex:var(--var-1g8t0wn) var(--var-dmenma) var(--var-e3h4r0);}"
+    ".css-djecpy{-webkit-flex:var(--value-1g8t0wn) var(--value2-dmenma) var(--min-e3h4r0);-ms-flex:var(--value-1g8t0wn) var(--value2-dmenma) var(--min-e3h4r0);flex:var(--value-1g8t0wn) var(--value2-dmenma) var(--min-e3h4r0);}"
   ];
   [@css
-    ".css-1f5dbv2{-webkit-flex:var(--var-1g7nd20_1) var(--var-fet175_2);-ms-flex:var(--var-1g7nd20_1) var(--var-fet175_2);flex:var(--var-1g7nd20_1) var(--var-fet175_2);}"
+    ".css-1f5dbv2{-webkit-flex:var(--value-1g7nd20_1) var(--value-fet175_2);-ms-flex:var(--value-1g7nd20_1) var(--value-fet175_2);flex:var(--value-1g7nd20_1) var(--value-fet175_2);}"
   ];
   [@css ".css-1vu4n70{flex-basis:auto;}"];
   [@css ".css-1ibwkcj{flex-basis:content;}"];
@@ -116,28 +116,28 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-1rr8a55", []);
   CSS.make(
     "css-1x4f3wz",
-    [("--var-3keqbf", CSS.Types.Flex.toString(X.flex1))],
+    [("--flex1-3keqbf", CSS.Types.Flex.toString(X.flex1))],
   );
   CSS.make(
     "css-19g0la7",
     [
-      ("--var-bdy3z7", CSS.Types.FlexGrow.toString(X.value)),
-      ("--var-1p309rg", CSS.Types.FlexShrink.toString(X.value2)),
+      ("--value-bdy3z7", CSS.Types.FlexGrow.toString(X.value)),
+      ("--value2-1p309rg", CSS.Types.FlexShrink.toString(X.value2)),
     ],
   );
   CSS.make(
     "css-djecpy",
     [
-      ("--var-1g8t0wn", CSS.Types.FlexGrow.toString(X.value)),
-      ("--var-dmenma", CSS.Types.FlexShrink.toString(X.value2)),
-      ("--var-e3h4r0", CSS.Types.FlexBasis.toString(X.min)),
+      ("--value-1g8t0wn", CSS.Types.FlexGrow.toString(X.value)),
+      ("--value2-dmenma", CSS.Types.FlexShrink.toString(X.value2)),
+      ("--min-e3h4r0", CSS.Types.FlexBasis.toString(X.min)),
     ],
   );
   CSS.make(
     "css-1f5dbv2",
     [
-      ("--var-1g7nd20_1", CSS.Types.FlexGrow.toString(X.value)),
-      ("--var-fet175_2", CSS.Types.FlexShrink.toString(X.value)),
+      ("--value-1g7nd20_1", CSS.Types.FlexGrow.toString(X.value)),
+      ("--value-fet175_2", CSS.Types.FlexShrink.toString(X.value)),
     ],
   );
   CSS.make("css-1vu4n70", []);

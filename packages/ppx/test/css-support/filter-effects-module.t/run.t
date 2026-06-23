@@ -44,7 +44,7 @@ If this test fail means that the module is not in sync with the ppx
     ".css-1twvds4{-webkit-filter:drop-shadow(0 8px 32px rgba(0, 0, 0, 0.03));filter:drop-shadow(0 8px 32px rgba(0, 0, 0, 0.03));}"
   ];
   [@css
-    ".css-sjla48{-webkit-filter:drop-shadow(0 1px 0 var(--var-qfwu7a_1)) drop-shadow(0 1px 0 var(--var-qfwu7a_2)) drop-shadow(0 1px 0 var(--var-qfwu7a_3)) drop-shadow(0 32px 48px rgba(0, 0, 0, 0.075)) drop-shadow(0 8px 32px rgba(0, 0, 0, 0.03));filter:drop-shadow(0 1px 0 var(--var-qfwu7a_1)) drop-shadow(0 1px 0 var(--var-qfwu7a_2)) drop-shadow(0 1px 0 var(--var-qfwu7a_3)) drop-shadow(0 32px 48px rgba(0, 0, 0, 0.075)) drop-shadow(0 8px 32px rgba(0, 0, 0, 0.03));}"
+    ".css-sjla48{-webkit-filter:drop-shadow(0 1px 0 var(--color-qfwu7a_1)) drop-shadow(0 1px 0 var(--color-qfwu7a_2)) drop-shadow(0 1px 0 var(--color-qfwu7a_3)) drop-shadow(0 32px 48px rgba(0, 0, 0, 0.075)) drop-shadow(0 8px 32px rgba(0, 0, 0, 0.03));filter:drop-shadow(0 1px 0 var(--color-qfwu7a_1)) drop-shadow(0 1px 0 var(--color-qfwu7a_2)) drop-shadow(0 1px 0 var(--color-qfwu7a_3)) drop-shadow(0 32px 48px rgba(0, 0, 0, 0.075)) drop-shadow(0 8px 32px rgba(0, 0, 0, 0.03));}"
   ];
   [@css ".css-47q0hq{-webkit-backdrop-filter:none;backdrop-filter:none;}"];
   [@css
@@ -109,9 +109,9 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make(
     "css-sjla48",
     [
-      ("--var-qfwu7a_1", CSS.Types.Color.toString(color)),
-      ("--var-qfwu7a_2", CSS.Types.Color.toString(color)),
-      ("--var-qfwu7a_3", CSS.Types.Color.toString(color)),
+      ("--color-qfwu7a_1", CSS.Types.Color.toString(color)),
+      ("--color-qfwu7a_2", CSS.Types.Color.toString(color)),
+      ("--color-qfwu7a_3", CSS.Types.Color.toString(color)),
     ],
   );
   

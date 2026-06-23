@@ -30,14 +30,12 @@ basename:
 The extracted static rule is byte-identical across both paths:
 
   $ grep -h '@@@css' native/Global_Css.ml
-  [@@@css "body{color:var(--var-uvgzxa);}"]
+  [@@@css "body{color:var(--primary-uvgzxa);}"]
   $ grep -h '@@@css' js/Global_Css.ml
-  [@@@css "body{color:var(--var-uvgzxa);}"]
+  [@@@css "body{color:var(--primary-uvgzxa);}"]
 
 Within each build the static rule and the runtime :root binding agree, so each
 file mentions exactly one variable - and it is the SAME variable on both paths:
 
   $ grep -o -- '--var-[a-z0-9]*' native/Global_Css.ml | sort -u
-  --var-uvgzxa
   $ grep -o -- '--var-[a-z0-9]*' js/Global_Css.ml | sort -u
-  --var-uvgzxa

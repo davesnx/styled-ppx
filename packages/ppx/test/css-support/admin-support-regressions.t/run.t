@@ -14,17 +14,27 @@ This test captures the admin-support cx2 regressions from the monorepo: border-s
   let _borderTop =
     CSS.make(
       "css-11h9vd4-_borderTop",
-      [("--var-17j5in5", CSS.Types.Color.toString(Color.Border.line))],
+      [("--line-17j5in5", CSS.Types.Color.toString(Color.Border.line))],
     );
   let _borderBottom =
     CSS.make(
       "css-epkb5g-_borderBottom",
-      [("--var-1tmd8aq", CSS.Types.Color.toString(Color.Border.lineAlpha))],
+      [
+        (
+          "--lineAlpha-1tmd8aq",
+          CSS.Types.Color.toString(Color.Border.lineAlpha),
+        ),
+      ],
     );
   let _borderLeft =
     CSS.make(
       "css-ob4w3j-_borderLeft",
-      [("--var-k1tpqj", CSS.Types.Color.toString(Color.Border.lineAlpha))],
+      [
+        (
+          "--lineAlpha-k1tpqj",
+          CSS.Types.Color.toString(Color.Border.lineAlpha),
+        ),
+      ],
     );
   
   let _boxShadow1 =
@@ -32,7 +42,7 @@ This test captures the admin-support cx2 regressions from the monorepo: border-s
       "css-1070dz6-_boxShadow1",
       [
         (
-          "--var-1jpikyl",
+          "--deprecated__elevation1-1jpikyl",
           CSS.Types.BoxShadows.toString(BoxShadow.deprecated__elevation1),
         ),
       ],
@@ -41,7 +51,7 @@ This test captures the admin-support cx2 regressions from the monorepo: border-s
   let _heightPlus =
     CSS.make(
       "css-1y8ttxg-_heightPlus",
-      [("--var-10ob2p1", CSS.Types.Length.toString(topMenuHeight))],
+      [("--topMenuHeight-10ob2p1", CSS.Types.Length.toString(topMenuHeight))],
     );
 
   $ dune build
