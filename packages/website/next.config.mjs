@@ -2,7 +2,7 @@ import Path from "node:path";
 import URL from "node:url";
 import Fs from "node:fs";
 import Nextra from "nextra";
-import * as Shiki from "shiki";
+import { createHighlighter } from "shiki";
 import { bundledLanguages } from "shiki/langs";
 
 const __dirname = Path.dirname(URL.fileURLToPath(import.meta.url));
@@ -38,7 +38,8 @@ const styledPpxCssGrammar = {
     Fs.readFileSync(
       Path.join(editors, "vscode/syntaxes/css.styled-ppx.json"),
       "utf8"
-  )),
+    )
+  ),
   injectTo: ["source.ocaml", "source.reason"],
 };
 
@@ -69,32 +70,31 @@ const duneGrammar = {
   name: "dune",
 };
 
+const customLangs = [
+  ...Object.keys(bundledLanguages),
+  rescriptGrammar,
+  reasonGrammar,
+  ocamlGrammar,
+  styledPpxCssGrammar,
+  styledPpxOCamlGrammar,
+  styledPpxReasonGrammar,
+  duneGrammar,
+];
+
 const withNextra = Nextra({
-  theme: "./src/index.tsx",
   mdxOptions: {
     rehypePrettyCodeOptions: {
       theme: { light: "github-light", dark: "github-dark-dimmed" },
       getHighlighter: (options) =>
-        Shiki.getHighlighter({
+        createHighlighter({
           ...options,
-          langs: [
-            ...Object.keys(bundledLanguages),
-            rescriptGrammar,
-            reasonGrammar,
-            ocamlGrammar,
-            styledPpxCssGrammar,
-            styledPpxOCamlGrammar,
-            styledPpxReasonGrammar,
-            duneGrammar,
-          ],
+          langs: customLangs,
         }),
     },
   },
 });
 
-/**
- * @type {import('next').Config}
- */
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
