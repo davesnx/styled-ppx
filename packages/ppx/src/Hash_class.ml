@@ -105,18 +105,42 @@ let nul_join parts = String.concat "\000" parts
    (see the invariant in the header). *)
 let namespace_of_content content = Printf.sprintf "css-%s" (hash content)
 
+(* A CSS identifier admits only `[A-Za-z0-9_-]` (ignoring escapes and
+   non-ASCII). OCaml binding names are wider - notably the trailing prime in
+   idiomatic names like [inputView'] - so embedding the label verbatim can
+   emit an unmatchable selector (`.css-<hash>-inputView'`, where the `'` is an
+   illegal identifier character). We drop every CSS-unsafe character rather
+   than backslash-escape it: the returned string backs BOTH the emitted
+   `.css-...-label{}` selector AND the runtime `className`, and an escape
+   (`'` -> `\'`) would land literally in the `class` attribute while the
+   selector matched the unescaped `'`, so the two would never meet. The label
+   is a purely cosmetic debug suffix, so stripping loses nothing structural. *)
+let css_safe_label name =
+  let buffer = Buffer.create (String.length name) in
+  String.iter
+    (fun c ->
+      match c with
+      | 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' | '-' ->
+        Buffer.add_char buffer c
+      | _ -> ())
+    name;
+  Buffer.contents buffer
+
 (* An atom's class name and its namespace, from a single content hash. The
    class name is `<namespace>-<label>` (or just the namespace for an
-   anonymous binding); the namespace is label-free on purpose. Returns
-   [(class_name, namespace)]. *)
+   anonymous binding, or a label that is empty once sanitized); the namespace
+   is label-free on purpose. Returns [(class_name, namespace)]. *)
 let class_and_namespace ?label content =
   let namespace = namespace_of_content content in
   let class_name =
     match label with
-    | Some name -> Printf.sprintf "%s-%s" namespace name
+    | Some name ->
+      (match css_safe_label name with
+      | "" -> namespace
+      | safe -> Printf.sprintf "%s-%s" namespace safe)
     | None -> namespace
   in
-  (class_name, namespace)
+  class_name, namespace
 
 (* Just the class name: `css-<hash(content)>[-<label>]`. *)
 let class_name ?label content = fst (class_and_namespace ?label content)
