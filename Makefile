@@ -109,13 +109,21 @@ test: build
 
 # Demo
 
-.PHONY: demo-demo-melange-server
-demo-demo-melange-server: ## Run the melange server demo
-	$(DUNE) exec demo-melange-server
+.PHONY: demo-static
+demo-static: ## Build the melange demo (esbuild bundle + stylesheet via dune)
+	$(DUNE) build @demo/melange/static
 
-.PHONY: demo-demo-melange-server-watch
-demo-demo-melange-server-watch: ## Run (and watch) the melange server demo
-	$(DUNE) exec demo-melange-server --watch
+.PHONY: demo-static-watch
+demo-static-watch: ## Build the melange demo (esbuild bundle + stylesheet via dune)
+	$(DUNE) build @demo/melange/static --watch
+
+.PHONY: demo-exe
+demo-exe: ## Run the melange demo native executable (prints SSR markup to stdout)
+	$(DUNE) exec demo-exe
+
+.PHONY: demo-exe-watch
+demo-exe-watch: ## Run (and watch) the melange demo native executable
+	$(DUNE) exec demo-exe --watch
 
 # Debug commands
 

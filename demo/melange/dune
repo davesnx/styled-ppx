@@ -1,21 +1,33 @@
+(alias
+ (name static)
+ (deps public/main.js public/styles.css))
+
 (melange.emit
- (alias demo-melange)
  (target demo-melange)
- (modules :standard \ server)
+ (modules :standard \ print)
  (libraries lib_js styled-ppx.melange reason-react)
  (preprocess
   (pps styled-ppx melange.ppx reason-react-ppx))
  (module_systems
   (commonjs bs.js)))
 
-(alias
- (name demo-melange)
- (deps public/styles.css))
-
 (subdir
  public
+ ; Bundle the Melange client output into `public/main.js` with esbuild,
+ ; run as part of the dune build (mirrors server-reason-react's demo).
+ (rule
+  (target main.js)
+  (mode promote)
+  (deps
+   (:script ../build.mjs)
+   (:entry ../demo-melange/demo/melange/client.bs.js)
+   (alias ../melange)
+   (source_tree ../node_modules)
+   (file ../package.json))
+  (action
+   (run node %{script} %{entry} --output %{target} --env development)))
  ; Generate the promoted demo stylesheet from PPX output produced by the
- ; melange/server build targets.
+ ; melange/print build targets.
  (rule
   (target styles.css)
   (mode promote)
@@ -25,8 +37,9 @@
    (run styled-ppx.generate --output %{target} %{deps}))))
 
 (executable
- (name server)
- (public_name demo-melange-server)
+ ; Prints the App component markup to stdout
+ (name print)
+ (public_name demo-exe)
  (modules :standard \ client)
  (libraries
   lib_native

@@ -1,28 +1,3 @@
-let globalBackground = CSS.green;
-
-module GlobalStyles = [%styled.global
-  {|
-  div {
-    background-color: $(globalBackground);
-  }
-
-  @media (min-width: 400px) {
-    div {
-      background-color: red;
-    }
-  }
-|}
-];
-
-/* A document-level [%styled.global] showcase.
-
-   Static rules (the reset and box-sizing declarations) are extracted into
-   public/styles.css at build time, so they cost nothing at runtime. The
-   interpolated values ($(pageBackground), $(textColor)) are emitted as `:root`
-   custom properties by the generated `AppGlobalStyles.make`, which renders a
-   <style> tag. That is why the component must be rendered entirely below via
-   <AppGlobalStyles /> — without mounting it, the dynamic variables are never
-   injected and the interpolated declarations resolve to nothing. */
 let pageBackground = CSS.hex("faf7f2");
 let textColor = CSS.hex("141414");
 
@@ -36,26 +11,21 @@ module AppGlobalStyles = [%styled.global
     box-sizing: inherit;
   }
 
+  body, html, #root {
+    margin: 0; padding:0;
+  }
+
   body {
-    margin: 0;
-    padding: 16px;
     background-color: $(pageBackground);
     color: $(textColor);
     font-family: "Menlo", "monospace";
     line-height: 1.5;
-  }
-
-  @media (min-width: 768px) {
-    body {
-      padding: 32px;
-    }
   }
 |}
 ];
 
 let stack = [%css "display: flex; flex-direction: column"];
 
-/* TODO: styled.div doesn't generate makeProps, so when used as <Cositas as_="section" lola={CSS.px(10)}> it doesn't compile */
 module Cositas = [%styled.div
   (~lola=CSS.px(0)) => {|
     display: flex;
@@ -125,25 +95,22 @@ let container = [%css
 
 let gradiend = [%css
   {|
+    padding: 36px;
     background-image:
-      repeating-linear-gradient(
-        45deg,
-        #333 0px,
-        #333 4px,
-        #333 5px,
-        #333 9px
-      )
+      repeating-linear-gradient(45deg, #333 0px, #333 4px, #f60808)
     |}
 ];
 
-let keyframeDemoShell = [%css
+let primary = CSS.hex("141414");
+
+let keyframeDemoShell = color => [%css
   {|
-    margin: 24px 10px;
     padding: 24px;
+    margin-bottom: 24px;
     border: 2px solid #141414;
     border-radius: 18px;
     background: #f6f1e8;
-    color: #141414;
+    color: $(color);
     font-family: "Menlo", "monospace";
   |}
 ];
@@ -153,12 +120,10 @@ let keyframeDemoCard = {
   let currentHeight = 172;
   let previous = `px(previousHeight);
   let current = `px(currentHeight);
-  let resize = [%keyframe
-    {|
+  let resize = [%keyframe {|
     0% { height: $(previous); }
     100% { height: $(current); }
-  |}
-  ];
+  |}];
 
   [%css
    {|
@@ -182,29 +147,26 @@ let keyframeDemoCard = {
 [@react.component]
 let make = () =>
   <main styles=gradiend>
-    <GlobalStyles />
     <AppGlobalStyles />
-    <div styles=Universal.classname>
-      <section styles=keyframeDemoShell>
-        <h2> {React.string("Interpolated keyframe demo")} </h2>
-        <p>
-          {React.string(
-             "The keyframe is extracted globally, while previous/current heights are applied as element-scoped CSS variables.",
-           )}
-        </p>
-        <div styles=keyframeDemoCard>
-          {React.string("height: 72px -> 172px")}
-        </div>
-      </section>
-      <div styles=post>
-        <div styles={CSS.merge(card, container)}>
-          <h2> {React.string("Card title")} </h2>
-          <p> {React.string("Card content")} </p>
-        </div>
+    <section styles={keyframeDemoShell(primary)}>
+      <h2> {React.string("Interpolated keyframe demo")} </h2>
+      <p>
+        {React.string(
+           "The keyframe is extracted globally, while previous/current heights are applied as element-scoped CSS variables.",
+         )}
+      </p>
+      <div styles=keyframeDemoCard>
+        {React.string("height: 72px -> 172px")}
       </div>
-      <section styles=stack>
-        <div styles=clx> {React.string("code everywhere!")} </div>
-        <div styles=selectors> {React.string("Red text")} </div>
-      </section>
+    </section>
+    <div styles=post>
+      <div styles={CSS.merge(card, container)}>
+        <h2> {React.string("Card title")} </h2>
+        <p> {React.string("Card content")} </p>
+      </div>
     </div>
+    <section styles=stack>
+      <div styles=clx> {React.string("code everywhere!")} </div>
+      <div styles=selectors> {React.string("Red text")} </div>
+    </section>
   </main>;
