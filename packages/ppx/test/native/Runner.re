@@ -3,7 +3,11 @@ open Ppxlib;
 let loc = Location.none;
 
 let printExpression = (prefix, expression) =>
-  Printf.printf("%s%S\n", prefix, Pprintast.string_of_expression(expression));
+  Printf.printf(
+    "%s%S\n",
+    prefix,
+    Pprintast.string_of_expression(expression),
+  );
 
 let printCase = ((title, input)) => {
   Printf.printf("- %s\n", title);
@@ -25,7 +29,10 @@ let printPpxSuite = () => {
 let printTransformSuite = () => {
   Printf.printf("## Transform\n");
   Transform_test.run_all();
-  Printf.printf("- %d runtime transform assertions passed\n", List.length(Transform_test.cases));
+  Printf.printf(
+    "- %d runtime transform assertions passed\n",
+    List.length(Transform_test.cases),
+  );
 };
 
 let printSubtreeEscapeSuite = () => {

@@ -62,11 +62,7 @@ let merge_keeps_left_to_right_style_order () =
   Alcotest.(check string) "className" "one two three" (fst styles);
   Alcotest.(check (list (triple string string string)))
     "vars"
-    [
-      "--one", "--one", "1";
-      "--two", "--two", "2";
-      "--three", "--three", "3";
-    ]
+    [ "--one", "--one", "1"; "--two", "--two", "2"; "--three", "--three", "3" ]
     (snd styles)
 
 let merge_trims_outer_whitespace_only () =
@@ -92,14 +88,12 @@ let merge_empty_carriers () =
 
 let font_families_single_font () =
   Alcotest.(check string)
-    "single font family"
-    {js|"Mono"|js}
+    "single font family" {js|"Mono"|js}
     (CSS.Types.FontFamilies.toString [| `quoted {js|Mono|js} |])
 
 let font_families_multiple_fonts () =
   Alcotest.(check string)
-    "font family stack"
-    {js|"Inter", system-ui, sans-serif|js}
+    "font family stack" {js|"Inter", system-ui, sans-serif|js}
     (CSS.Types.FontFamilies.toString
        [| `quoted {js|Inter|js}; `system_ui; `sans_serif |])
 
@@ -112,8 +106,10 @@ let tests =
     test "make dynamic carrier" make_dynamic_carrier;
     test "make allows duplicate variables" make_allows_duplicate_variables;
     test "merge carriers" merge_carriers;
-    test "merge preserves duplicate variables" merge_preserves_duplicate_variables;
-    test "merge keeps left-to-right style order" merge_keeps_left_to_right_style_order;
+    test "merge preserves duplicate variables"
+      merge_preserves_duplicate_variables;
+    test "merge keeps left-to-right style order"
+      merge_keeps_left_to_right_style_order;
     test "merge trims outer whitespace only" merge_trims_outer_whitespace_only;
     test "trim empty merge class" trim_empty_merge_class;
     test "trim empty merge class 2" trim_empty_merge_class_2;

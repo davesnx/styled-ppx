@@ -16,7 +16,4 @@
 
 (cram
  (alias test-ppx-native)
- (deps
-  %{bin:ppx-native-test-runner}
-  %{bin:refmt}
-  %{bin:standalone}))
+ (deps %{bin:ppx-native-test-runner} %{bin:refmt} %{bin:standalone}))

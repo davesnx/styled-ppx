@@ -557,7 +557,15 @@ module Css_transform = {
   };
 
   let rec transform_rule =
-      (~file, ~scope, ~opens, ~base_loc, ~var_namespace, rule: rule, dynamic_vars) => {
+          (
+            ~file,
+            ~scope,
+            ~opens,
+            ~base_loc,
+            ~var_namespace,
+            rule: rule,
+            dynamic_vars,
+          ) => {
     switch (rule) {
     | Declaration(decl) =>
       Declaration(
@@ -598,7 +606,15 @@ module Css_transform = {
   }
 
   and transform_style_rule =
-      (~file, ~scope, ~opens, ~base_loc, ~var_namespace, style_rule: style_rule, dynamic_vars) => {
+      (
+        ~file,
+        ~scope,
+        ~opens,
+        ~base_loc,
+        ~var_namespace,
+        style_rule: style_rule,
+        dynamic_vars,
+      ) => {
     let { prelude, block, loc } = style_rule;
     let (selector_list, selector_loc) = prelude;
     let transformed_selectors =
@@ -633,7 +649,15 @@ module Css_transform = {
   }
 
   and transform_at_rule =
-      (~file, ~scope, ~opens, ~base_loc, ~var_namespace, at_rule: at_rule, dynamic_vars) => {
+      (
+        ~file,
+        ~scope,
+        ~opens,
+        ~base_loc,
+        ~var_namespace,
+        at_rule: at_rule,
+        dynamic_vars,
+      ) => {
     let { name, prelude, block, loc } = at_rule;
     let (prelude_values, prelude_loc) = prelude;
 
@@ -645,7 +669,8 @@ module Css_transform = {
         Static extraction can't bind `var(--x)` into a media query (CSS
         custom properties are not valid in media-query conditions), so we
         reject the whole shape with a hard error. */
-    let has_interpolation = component_value_list_has_interpolation(prelude_values);
+    let has_interpolation =
+      component_value_list_has_interpolation(prelude_values);
 
     if (has_interpolation) {
       let (at_name, _) = name;
@@ -771,7 +796,8 @@ module Css_transform = {
   };
 
   let atomize_rules =
-      (~base_loc, ~label=?, rules: list(rule)): list((string, string, rule)) => {
+      (~base_loc, ~label=?, rules: list(rule))
+      : list((string, string, rule)) => {
     /* Merge a child selector-list prelude under a parent selector-list prelude.
        For each (parent, child) pair, run `compute_new_prefix` so `&`,
        `::pseudo`, and descendant combinators all resolve correctly. The
@@ -854,7 +880,7 @@ module Css_transform = {
             (className, namespace, style_rule);
           },
           parent_selectors,
-        )
+        );
       };
     };
 
@@ -993,20 +1019,20 @@ module Css_transform = {
                )
              };
 
-            transformed
-            |> List.map(r =>
-                 transform_rule(
-                   ~file,
-                   ~scope,
-                   ~opens,
-                   ~base_loc,
-                   ~var_namespace,
-                   r,
-                   dynamic_vars,
-                 )
-               )
-            |> List.map(r => (className, r));
-          })
+           transformed
+           |> List.map(r =>
+                transform_rule(
+                  ~file,
+                  ~scope,
+                  ~opens,
+                  ~base_loc,
+                  ~var_namespace,
+                  r,
+                  dynamic_vars,
+                )
+              )
+           |> List.map(r => (className, r));
+         })
       |> List.concat;
 
     (processed_rules, List.rev(dynamic_vars^));

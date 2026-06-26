@@ -108,7 +108,10 @@ let rec subject_inside_ampersand = segments =>
 let subject_escapes_ampersand_subtree = (sel: selector): bool => {
   let segments = flatten_selector_chain(sel);
   let has_ampersand =
-    List.exists(((_, segment)) => selector_is_ampersand(segment), segments);
+    List.exists(
+      ((_, segment)) => selector_is_ampersand(segment),
+      segments,
+    );
   has_ampersand && !subject_inside_ampersand(segments);
 };
 

@@ -940,7 +940,10 @@ module AnimationName : sig
   val vars : t -> (string * string) list
   val toStyleVars : string -> t -> (string * string) list
 end = struct
-  type t = { name : string; vars : (string * string) list }
+  type t = {
+    name : string;
+    vars : (string * string) list;
+  }
 
   let make ?(vars = []) name = { name; vars }
   let none = make {js|none|js}

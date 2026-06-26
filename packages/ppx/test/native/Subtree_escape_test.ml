@@ -78,8 +78,7 @@ let sibling_before_ampersand () =
   check ~pos:__POS__ ~expected:false ".x + & { color: red; }"
 
 (* `& + &` — the next instance carries the same binding's inline var. *)
-let self_sibling () =
-  check ~pos:__POS__ ~expected:false "& + & { color: red; }"
+let self_sibling () = check ~pos:__POS__ ~expected:false "& + & { color: red; }"
 
 (* Subject is the trailing `&`, regardless of intermediate siblings. *)
 let sibling_chain_ending_in_ampersand () =
@@ -114,7 +113,7 @@ let sibling_without_ampersand () =
 let type_sibling_without_ampersand () =
   check ~pos:__POS__ ~expected:false "input + div { color: red; }"
 
-let test name fn = (name, fn)
+let test name fn = name, fn
 
 let cases =
   [

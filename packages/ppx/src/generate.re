@@ -141,7 +141,7 @@ let applyIgnore = (~loc, expr) => {
   );
 };
 
-let abstractGetProp = (~loc, name) => {
+let abstractGetProp = (~loc, name) =>
   if (Settings.Get.native()) {
     /* props.propName */
     Helper.Exp.field(
@@ -157,7 +157,6 @@ let abstractGetProp = (~loc, name) => {
       [(Nolabel, Helper.Exp.ident(~loc, withLoc(Lident("props"), ~loc)))],
     );
   };
-};
 
 let propItem = (~loc, name) => {
   abstractGetProp(~loc, name);
@@ -320,9 +319,7 @@ let stylesAndRefObject = (~loc) => {
 /* let newProps = Object.assign({}, props, stylesObject); */
 let newProps = (~loc) => {
   let valueName = Helper.Pat.mk(~loc, Ppat_var(withLoc("newProps", ~loc)));
-  let value = [%expr
-    assign2(Js.Obj.empty(), props, stylesObject)
-  ];
+  let value = [%expr assign2(Js.Obj.empty(), props, stylesObject)];
 
   Helper.Vb.mk(~loc, valueName, value);
 };
@@ -622,9 +619,8 @@ let makeMakeProps = (~loc, ~areAllFieldsOptional, customProps) => {
             Builder.attribute(
               ~loc,
               ~name=withLoc(~loc, "warning"),
-              ~payload=PStr([
-                Helper.Str.eval(~loc, Builder.estring(~loc, "-69")),
-              ]),
+              ~payload=
+                PStr([Helper.Str.eval(~loc, Builder.estring(~loc, "-69"))]),
             ),
           ],
           ~kind=Ptype_record(reactProps),
@@ -651,12 +647,7 @@ let defineDeletePropFn = (~loc) => {
         ~loc,
         Nolabel,
         [%type: Js.t({..})],
-        Helper.Typ.arrow(
-          ~loc,
-          Nolabel,
-          [%type: string],
-          [%type: bool],
-        ),
+        Helper.Typ.arrow(~loc, Nolabel, [%type: string], [%type: bool]),
       ),
     pval_prim: ["Reflect.deleteProperty"],
     pval_attributes: Platform_attributes.val_(~loc),
@@ -705,8 +696,10 @@ let optionInnerType = type_ =>
 let makePropsArg = (~loc, field: label_declaration, returnType) => {
   let label = field.pld_name.txt;
   switch (optionInnerType(field.pld_type)) {
-  | Some(inner) => Helper.Typ.arrow(~loc, Optional(label), inner, returnType)
-  | None => Helper.Typ.arrow(~loc, Labelled(label), field.pld_type, returnType)
+  | Some(inner) =>
+    Helper.Typ.arrow(~loc, Optional(label), inner, returnType)
+  | None =>
+    Helper.Typ.arrow(~loc, Labelled(label), field.pld_type, returnType)
   };
 };
 
@@ -1285,7 +1278,14 @@ let extractedDynamicStyles =
     ) {
     | [] =>
       let (classNames, dynamic_vars) =
-        Css_file.push(~file, ~scope, ~opens, ~base_loc=loc, ~label=moduleName, rule_list);
+        Css_file.push(
+          ~file,
+          ~scope,
+          ~opens,
+          ~base_loc=loc,
+          ~label=moduleName,
+          rule_list,
+        );
       onClassNames(classNames);
       Css_to_runtime.render_make_call(
         ~loc,

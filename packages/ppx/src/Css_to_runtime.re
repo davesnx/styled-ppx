@@ -49,7 +49,11 @@ let concat_list_exprs = (~loc, chunks) =>
   | [] => Builder.elist(~loc, [])
   | [single] => single
   | [head, ...tail] =>
-    List.fold_left((acc, chunk) => list_append(~loc, acc, chunk), head, tail)
+    List.fold_left(
+      (acc, chunk) => list_append(~loc, acc, chunk),
+      head,
+      tail,
+    )
   };
 
 let animation_name_to_style_vars = (~loc) =>
@@ -107,7 +111,7 @@ let render_dynamic_var_chunk =
       ~loc,
       animation_name_to_style_vars(~loc),
       [(Nolabel, field_name_expr), (Nolabel, var_value)],
-    )
+    );
   | Selector
   | MediaQuery
   | CustomProperty
@@ -115,7 +119,7 @@ let render_dynamic_var_chunk =
     Builder.elist(
       ~loc,
       [render_dynamic_var_tuple(~loc, (var_name, original_path, var_type))],
-    );
+    )
   };
 };
 

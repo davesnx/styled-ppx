@@ -17,7 +17,7 @@ let check ~pos expected actual =
     let file, line, _, _ = pos in
     Alcotest.failf "Expected %S, received %S at %s:%d" expected actual file line)
 
-let test name fn = (name, fn)
+let test name fn = name, fn
 
 let split_by_kind () =
   let rules = parse "color: red; margin: 0; .test { display: block; }" in

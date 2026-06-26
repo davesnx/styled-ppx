@@ -55,7 +55,10 @@ let complex_tests = [
   ("& .bar", [%expr [%cx {js|& .bar {}|js}]]),
   ("& div", [%expr [%cx {js|& div {}|js}]]),
   ("& :first-child", [%expr [%cx {js|& :first-child {}|js}]]),
-  ("& > div > div > div > div", [%expr [%cx "& > div > div > div > div { }"]]),
+  (
+    "& > div > div > div > div",
+    [%expr [%cx "& > div > div > div > div { }"]],
+  ),
   ("& div > .class", [%expr [%cx "& div > .class {}"]]),
   ("& + &", [%expr [%cx "& + & {}"]]),
   ("& span", [%expr [%cx "& span {}"]]),
