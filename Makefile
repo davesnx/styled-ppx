@@ -50,6 +50,7 @@ create-switch: ## Create opam switch
 install: ## Install project dependencies
 	opam install . --deps-only --with-test --with-dev-setup --working-dir . -y
 	npm install
+	cd demo/melange && npm install
 
 .PHONY: pin
 pin: ## pin
