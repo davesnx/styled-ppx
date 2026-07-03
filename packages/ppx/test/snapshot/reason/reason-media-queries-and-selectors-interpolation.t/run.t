@@ -1,6 +1,6 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
-  File "output.ml", lines 6-8, characters 2-3:
+  File "output.ml", line 6, characters 8-47:
   Error: Interpolation in @media preludes is not supported during static extraction. CSS custom properties (var()) are not valid in media query conditions. Inline the value directly.
   [1]
   $ refmt --parse ml --print re output.ml

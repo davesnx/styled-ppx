@@ -16,5 +16,5 @@ CSS custom properties into media-query conditions; users should use
   > EOF
 
   $ dune build 2>&1 | head -n 5
-  File "input.re", lines 2-4, characters 2-3:
+  File "input.re", line 2, characters 8-28:
   Error: Interpolation in @media preludes is not supported during static extraction. CSS custom properties (var()) are not valid in media query conditions. Inline the value directly.

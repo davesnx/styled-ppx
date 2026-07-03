@@ -300,7 +300,7 @@ Declaration after nested block
   > }
   > margin-top: 17px;
   > EOF
-  margin-top:17px;@media print {.recharts-wrapper,.recharts-surface{width:100%;}}
+  margin-top:17px;@media print {.recharts-wrapper{width:100%;}.recharts-surface{width:100%;}}
 
 Declaration list missing semicolon before nested media query
   $ cat << "EOF" | ./Render_test.exe
@@ -363,6 +363,259 @@ Ampersand on root
   > }
   > EOF
   color:green;& .test{color:white;}
+
+Ampersand list nested two levels deep compounds with the last segment of a
+multi-segment parent selector (regression: `&` used to resolve with a
+descendant space, `td :first-child`)
+  $ cat << "EOF" | ./Render_test.exe
+  > tbody {
+  >   tr:first-child td {
+  >     &:first-child, &:last-child {
+  >       color: red;
+  >     }
+  >   }
+  > }
+  > EOF
+  tbody tr:first-child td:first-child{color:red;}tbody tr:first-child td:last-child{color:red;}
+
+Single ampersand at the same depth
+  $ cat << "EOF" | ./Render_test.exe
+  > tbody {
+  >   tr:first-child td {
+  >     &:first-child {
+  >       color: red;
+  >     }
+  >   }
+  > }
+  > EOF
+  tbody tr:first-child td:first-child{color:red;}
+
+Ampersand list where the parent's last segment is a compound with pseudo
+  $ cat << "EOF" | ./Render_test.exe
+  > ul {
+  >   li:hover {
+  >     &::before, &::after {
+  >       content: "";
+  >     }
+  >   }
+  > }
+  > EOF
+  ul li:hover::before{content:"";}ul li:hover::after{content:"";}
+
+Ampersand compound under a pseudo-element parent keeps literal substitution
+order: the pseudo-class renders after the pseudo-element (`:hover` of the
+`::before`), not before it (regression: used to produce `.a:hover::before`,
+the `::before` of a hovered `.a` — a different selector)
+  $ cat << "EOF" | ./Render_test.exe
+  > .a::before {
+  >   &:hover {
+  >     color: red;
+  >   }
+  > }
+  > EOF
+  .a::before:hover{color:red;}
+
+Non-pseudo subclasses under a pseudo-element parent stay in subclass position
+(`::before.foo` is invalid CSS and unrepresentable; `.a.foo::before` is the
+only sensible reading)
+  $ cat << "EOF" | ./Render_test.exe
+  > .a::before {
+  >   &.foo {
+  >     color: red;
+  >   }
+  > }
+  > EOF
+  .a.foo::before{color:red;}
+
+Ampersand compound under a trailing-ampersand parent (nesting introduced by
+substitution rather than descendant join)
+  $ cat << "EOF" | ./Render_test.exe
+  > tbody {
+  >   tr {
+  >     td & {
+  >       &:hover {
+  >         color: red;
+  >       }
+  >     }
+  >   }
+  > }
+  > EOF
+  td tbody tr:hover{color:red;}
+
+Style rules and non-media at-rules survive next to a nested media query
+(regression: `swap` used to silently drop them)
+  $ cat << "EOF" | ./Render_test.exe
+  > @media (min-width: 100px) {
+  >   .x { color: red; }
+  >   @media (min-width: 200px) {
+  >     color: blue;
+  >   }
+  >   @supports (display: grid) {
+  >     display: grid;
+  >   }
+  > }
+  > EOF
+  @media (min-width: 100px) {.x{color:red;}}@media (min-width: 100px) and (min-width: 200px) {color:blue;}@media (min-width: 100px) {@supports (display: grid) {display:grid;}}
+
+Outer media declarations are emitted once with multiple nested media queries
+(regression: they used to duplicate once per nested media)
+  $ cat << "EOF" | ./Render_test.exe
+  > @media (min-width: 100px) {
+  >   color: red;
+  >   @media (min-width: 200px) { color: blue; }
+  >   @media (min-width: 300px) { color: green; }
+  > }
+  > EOF
+  @media (min-width: 100px) {color:red;}@media (min-width: 100px) and (min-width: 200px) {color:blue;}@media (min-width: 100px) and (min-width: 300px) {color:green;}
+
+Nested media with a comma-list prelude stays literally nested: `and`-joining
+would bind tighter than the comma and drop the constraint for one alternative
+  $ cat << "EOF" | ./Render_test.exe
+  > @media screen, print {
+  >   @media (min-width: 100px) { color: red; }
+  > }
+  > EOF
+  @media screen, print {@media (min-width: 100px) {color:red;}}
+
+Nested media under a `not` prelude stays literally nested: appending `and`
+conditions would change what the `not` negates
+  $ cat << "EOF" | ./Render_test.exe
+  > @media not screen {
+  >   @media (min-width: 100px) { color: red; }
+  > }
+  > EOF
+  @media not screen {@media (min-width: 100px) {color:red;}}
+
+Nested media with a media-type-headed inner prelude stays literally nested:
+a `<media-type>` may only appear at the head of a query, so
+`(min-width: 5px) and screen` would fail the media-query grammar and
+evaluate as `not all` — silently dead CSS
+  $ cat << "EOF" | ./Render_test.exe
+  > .a {
+  >   @media (min-width: 5px) {
+  >     @media screen { color: red; }
+  >     @media only print { color: blue; }
+  >   }
+  > }
+  > EOF
+  @media (min-width: 5px) {@media screen {.a{color:red;}}@media only print {.a{color:blue;}}}
+
+Nested media with a top-level `or` in either prelude stays literally nested:
+mixing `and`/`or` at one level fails the media-query grammar
+  $ cat << "EOF" | ./Render_test.exe
+  > .a {
+  >   @media (min-width: 5px) {
+  >     @media (color) or (min-width: 10px) { color: red; }
+  >   }
+  >   @media (color) or (min-width: 10px) {
+  >     @media (min-width: 5px) { color: blue; }
+  >   }
+  > }
+  > EOF
+  @media (min-width: 5px) {@media (color) or (min-width: 10px) {.a{color:red;}}}@media (color) or (min-width: 10px) {@media (min-width: 5px) {.a{color:blue;}}}
+
+Media-type-headed OUTER preludes still combine with condition-only inner
+preludes (`screen and (mw)` extends fine on the right)
+  $ cat << "EOF" | ./Render_test.exe
+  > .a {
+  >   @media screen and (min-width: 5px) {
+  >     @media (min-width: 10px) and (min-height: 3px) { color: red; }
+  >   }
+  > }
+  > EOF
+  @media screen and (min-width: 5px) and (min-width: 10px) and (min-height: 3px) {.a{color:red;}}
+
+Nested media with an interpolated prelude stays literally nested: the
+interpolation may expand to a comma list or `not` query at runtime
+  $ cat << "EOF" | ./Render_test.exe
+  > @media $(Media.wide) {
+  >   @media (min-width: 100px) { color: red; }
+  > }
+  > EOF
+  @media $(Media.wide) {@media (min-width: 100px) {color:red;}}
+
+Declarations keep their source position around a nested media query
+(regression: trailing declarations used to hoist above the media,
+flipping the cascade)
+  $ cat << "EOF" | ./Render_test.exe
+  > @media (min-width: 1px) {
+  >   color: red;
+  >   @media (min-width: 2px) { color: blue; }
+  >   color: green;
+  > }
+  > EOF
+  @media (min-width: 1px) {color:red;}@media (min-width: 1px) and (min-width: 2px) {color:blue;}@media (min-width: 1px) {color:green;}
+
+Top-level source order between style rules and media queries is preserved
+(regression: media used to hoist after all style rules, flipping the cascade)
+  $ cat << "EOF" | ./Render_test.exe
+  > @media print {
+  >   body { color: red; }
+  > }
+  > body { color: blue; }
+  > EOF
+  @media print {body{color:red;}}body{color:blue;}
+
+Nesting inside at-rule blocks is flattened
+(regression: `&:hover` used to ship literally inside hoisted @media blocks)
+  $ cat << "EOF" | ./Render_test.exe
+  > .a {
+  >   @media print {
+  >     &:hover { color: blue; }
+  >   }
+  > }
+  > EOF
+  @media print {.a:hover{color:blue;}}
+
+Nesting two levels deep inside a hoisted media query
+  $ cat << "EOF" | ./Render_test.exe
+  > .a {
+  >   .b {
+  >     @media print {
+  >       &:hover { color: red; }
+  >     }
+  >   }
+  > }
+  > EOF
+  @media print {.a .b:hover{color:red;}}
+
+Media nested through a style rule inside another media combines both preludes
+  $ cat << "EOF" | ./Render_test.exe
+  > .a {
+  >   @media (min-width: 100px) {
+  >     @media (min-width: 200px) { color: red; }
+  >   }
+  > }
+  > EOF
+  @media (min-width: 100px) and (min-width: 200px) {.a{color:red;}}
+
+Nesting inside @supports blocks is flattened and @supports keeps its position
+  $ cat << "EOF" | ./Render_test.exe
+  > .a {
+  >   @supports (display: grid) {
+  >     &:hover { display: grid; }
+  >   }
+  > }
+  > EOF
+  @supports (display: grid) {.a:hover{display:grid;}}
+
+Blockless at-rules pass through verbatim
+(regression: `@import` used to vanish silently)
+  $ cat << "EOF" | ./Render_test.exe
+  > @import "foo.css";
+  > body { margin: 0; }
+  > EOF
+  @import "foo.css";body{margin:0;}
+
+@font-face passes through verbatim with its descriptors intact
+  $ cat << "EOF" | ./Render_test.exe
+  > @font-face {
+  >   font-family: "Inter";
+  >   src: url("/fonts/inter.woff2") format("woff2");
+  > }
+  > body { margin: 0; }
+  > EOF
+  @font-face {font-family:"Inter";src:url("/fonts/inter.woff2") format("woff2");}body{margin:0;}
 
 Multiple selectors
   $ cat << "EOF" | ./Render_test.exe

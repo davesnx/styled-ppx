@@ -26,6 +26,6 @@ different CSS runtime types. See input.re for the full rationale.
       )
       ++ "}";
     [@warning "-27-32"]
-    let makeProps = (~key=?, ()) => ();
+    let makeProps = (~key=?, ()) => Js.Obj.empty();
     let make = _props => CSS.global_style_tag(to_string());
   };

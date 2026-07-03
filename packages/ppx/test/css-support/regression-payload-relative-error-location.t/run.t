@@ -48,6 +48,6 @@ when the [%css] block sits several lines below the top of the file.
   [1]
 
   $ dune build ./media.exe
-  File "media.re", lines 7-9, characters 2-3:
+  File "media.re", line 7, characters 8-23:
   Error: Interpolation in @media preludes is not supported during static extraction. CSS custom properties (var()) are not valid in media query conditions. Inline the value directly.
   [1]

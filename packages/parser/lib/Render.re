@@ -23,12 +23,24 @@ and style_rule = ({ prelude, block, _ }: Ast.style_rule) => {
   );
 }
 and at_rule = ({ name, prelude, block, _ }: Ast.at_rule) => {
-  Printf.sprintf(
-    "@%s %s{%s}",
-    name |> fst,
-    prelude |> fst |> strip_leading_whitespace |> component_value_list,
-    brace_block(block),
-  );
+  switch (block) {
+  /* Statement at-rules (`@import`, `@charset`, `@layer a, b;`) have no
+     block and terminate with a semicolon; `{}` would be invalid CSS. */
+  | Empty =>
+    Printf.sprintf(
+      "@%s %s;",
+      name |> fst,
+      prelude |> fst |> strip_leading_whitespace |> component_value_list,
+    )
+  | Rule_list(_)
+  | Stylesheet(_) =>
+    Printf.sprintf(
+      "@%s %s{%s}",
+      name |> fst,
+      prelude |> fst |> strip_leading_whitespace |> component_value_list,
+      brace_block(block),
+    )
+  };
 }
 and brace_block = ast => {
   switch ((ast: Ast.brace_block)) {

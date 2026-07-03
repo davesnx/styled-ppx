@@ -18,6 +18,6 @@ interpolation verbatim - no Cascading.toString wrap.
       )
       ++ "}";
     [@warning "-27-32"]
-    let makeProps = (~key=?, ()) => ();
+    let makeProps = (~key=?, ()) => Js.Obj.empty();
     let make = _props => CSS.global_style_tag(to_string());
   };

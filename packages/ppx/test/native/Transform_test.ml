@@ -110,6 +110,8 @@ let mediaqueries_and_selectors () =
      .test{display:block;}}"
     (render list_of_rules)
 
+(* Adjacent `@media` blocks with an identical prelude merge into one;
+   contents keep their relative order, so the cascade is unchanged. *)
 let nested_mediaqueries_and_selectors () =
   let input =
     "margin: 10px; @media (min-width: 768px) { display: block; .test { \
@@ -120,8 +122,7 @@ let nested_mediaqueries_and_selectors () =
   let list_of_rules = Transform.run ~className:"hash" rule_list in
   check ~pos:__POS__
     ".hash{margin:10px;}@media (min-width: 768px) {.hash{display:block;}.hash \
-     .test{display:block;}}@media (min-width: 768px) \
-     {.hash{display:block;}.hash .test{display:block;}}"
+     .test{display:block;}.hash{display:block;}.hash .test{display:block;}}"
     (render list_of_rules)
 
 let ampersand_with_classname () =
@@ -707,6 +708,11 @@ let missing_semicolon_before_nested_media_query_after_interpolation_in_declarati
     ".copy{margin-bottom:$(Size.lg);}@media $(Media.wide) {.copy{width:50%;}}"
     (render list_of_rules)
 
+(* Source order is preserved: the declaration written *after* the nested
+   block flushes after it, so the cascade matches what a nesting-capable
+   browser computes for the input. (The old pipeline hoisted all
+   declarations above the hoisted media blocks, inverting the cascade
+   when both targeted the same subject.) *)
 let declaration_after_nested_block_in_declaration_list () =
   let input =
     {|
@@ -721,8 +727,7 @@ let declaration_after_nested_block_in_declaration_list () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"chart" rule_list in
   check ~pos:__POS__
-    ".chart{margin-top:17px;}@media print {.chart \
-     .recharts-wrapper{width:100%;}}"
+    "@media print {.chart .recharts-wrapper{width:100%;}}.chart{margin-top:17px;}"
     (render list_of_rules)
 
 let pseudo_class_functions_complex () =

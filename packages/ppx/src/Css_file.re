@@ -789,10 +789,69 @@ module Css_transform = {
           ~relative_loc=loc,
           ~base_loc,
         ),
-      "Cannot interpolate into the value of `%s` under `%s`: the selector targets an element outside `&`'s subtree (via a sibling combinator `+`/`~`). Static extraction passes interpolations as a custom property set inline on `&`, which only `&` and its descendants inherit, so a sibling can't read it and the declaration would be dropped. Instead, target `&` or a descendant, or write a literal value or a globally-inherited theme `var(--...)` directly.",
+      "Cannot interpolate into the value of `%s` under `%s`: the selector targets an element outside `&`'s subtree (via a sibling combinator `+`/`~`, or a pseudo-class like `:not(&)`/`:has(&)` whose subject isn't `&` or a descendant of it). Static extraction passes interpolations as a custom property set inline on `&`, which only `&` and its descendants inherit, so an element outside that subtree can't read it and the declaration would be dropped. Instead, target `&` or a descendant, or write a literal value or a globally-inherited theme `var(--...)` directly.",
       property,
       rendered,
     );
+  };
+
+  /* Same-property declarations of a block group into ONE atom so the
+     winner is decided by intra-atom source order (emotion parity) —
+     fallback pairs like `display: -webkit-box; display: flex` stay
+     together; splitting them would let stylesheet position pick the
+     winner. Groups anchor at the LAST occurrence (a group cascades like
+     its last member; first-anchoring would hoist duplicates past
+     intervening rules). Singletons keep the historical atom shape and
+     hash. */
+  type block_item =
+    | Declaration_group(list(declaration))
+    | Nested_rule(rule);
+
+  /* Property names are case-insensitive; custom properties (`--*`) are
+     case-sensitive. */
+  let declaration_group_key = ({ name: (name, _), _ }: declaration) =>
+    if (String.length(name) >= 2 && String.sub(name, 0, 2) == "--") {
+      name;
+    } else {
+      String.lowercase_ascii(name);
+    };
+
+  let group_declarations_by_property = (rules: list(rule)): list(block_item) => {
+    /* Pass 1: collect declarations per key + each key's last index. */
+    let decls_by_key: Hashtbl.t(string, ref(list(declaration))) =
+      Hashtbl.create(8);
+    let last_index_by_key: Hashtbl.t(string, int) = Hashtbl.create(8);
+    List.iteri(
+      (index, rule) =>
+        switch (rule) {
+        | Declaration(decl) =>
+          let key = declaration_group_key(decl);
+          switch (Hashtbl.find_opt(decls_by_key, key)) {
+          | Some(group) => group := [decl, ...group^]
+          | None => Hashtbl.add(decls_by_key, key, ref([decl]))
+          };
+          Hashtbl.replace(last_index_by_key, key, index);
+        | _ => ()
+        },
+      rules,
+    );
+    /* Pass 2: emit each group at its last occurrence. */
+    List.mapi(
+      (index, rule) =>
+        switch (rule) {
+        | Declaration(decl) =>
+          let key = declaration_group_key(decl);
+          if (Hashtbl.find(last_index_by_key, key) == index) {
+            let group = Hashtbl.find(decls_by_key, key);
+            [Declaration_group(List.rev(group^))];
+          } else {
+            [];
+          };
+        | rule => [Nested_rule(rule)]
+        },
+      rules,
+    )
+    |> List.concat;
   };
 
   let atomize_rules =
@@ -832,46 +891,70 @@ module Css_transform = {
       |> List.rev;
     };
 
-    /* Wrap a `Declaration` atom under an accumulated selector chain. With no
-       parent we leave it bare so `Transform.run` later attaches the binding's
-       className. With a parent, we emit one atom per parent selector — each
-       atom is a `Style_rule` carrying that single selector as its prelude.
-       `Transform.run` will then prefix it with the className correctly, so
-       the chain survives even through enclosing at-rules.
-
-       Splitting one atom per parent selector matches CSS-nesting semantics
-       (`a, b { c: d }` desugars to `a { c: d } b { c: d }`) and works
-       around the fact that the downstream `Transform.unnest_selectors` /
-       `Resolve.unnest_selectors` only consume the first selector of a
-       prelude list. */
-    let wrap_declaration_under_parent = (~parent_prelude=?, decl) => {
+    /* Wrap a same-property `Declaration` group (see
+       `group_declarations_by_property`) as one atom. No parent:
+       singleton keeps the historical bare `Declaration` atom (hash
+       stability); a group becomes `& { ... }` (`&` resolves to the
+       className). With a parent: one `Style_rule(parent){group}` atom
+       per parent selector. */
+    let wrap_declaration_group_under_parent = (~parent_prelude=?, decls) => {
       switch (parent_prelude) {
       | None =>
-        let decl_string = render_declaration(decl);
-        let (className, namespace) =
-          Hash_class.class_and_namespace(~label?, decl_string);
-        [(className, namespace, Declaration(decl))];
+        switch (decls) {
+        | [decl] =>
+          let decl_string = render_declaration(decl);
+          let (className, namespace) =
+            Hash_class.class_and_namespace(~label?, decl_string);
+          [(className, namespace, Declaration(decl))];
+        | decls =>
+          let group_string =
+            decls |> List.map(render_declaration) |> String.concat("");
+          let (className, namespace) =
+            Hash_class.class_and_namespace(~label?, group_string);
+          let style_rule =
+            Style_rule({
+              prelude: (
+                [(SimpleSelector(Ampersand), Ppxlib.Location.none)],
+                Ppxlib.Location.none,
+              ),
+              block: (
+                List.map(decl => Declaration(decl), decls),
+                Ppxlib.Location.none,
+              ),
+              loc: Ppxlib.Location.none,
+            });
+          [(className, namespace, style_rule)];
+        }
       | Some(parent_selectors) =>
-        /* Computed once: depends on the declaration, not on which parent
-           selector it pairs with. */
-        let value_interpolated = declaration_has_value_interpolation(decl);
+        /* Computed once: depends on the declarations, not on which parent
+           selector they pair with. */
+        let interpolated_property =
+          decls
+          |> List.find_opt(declaration_has_value_interpolation)
+          |> Option.map((decl: declaration) => fst(decl.name));
         List.map(
           ((parent_sel, parent_loc)) => {
-            if (value_interpolated
-                && Styled_ppx_css_parser.Selector_nesting.subject_escapes_ampersand_subtree(
-                     parent_sel,
-                   )) {
+            switch (interpolated_property) {
+            | Some(property)
+                when
+                  Styled_ppx_css_parser.Selector_nesting.subject_escapes_ampersand_subtree(
+                    parent_sel,
+                  ) =>
               raise_subtree_escaping_interpolation_error(
                 ~loc=parent_loc,
                 ~base_loc,
-                ~property=fst(decl.name),
+                ~property,
                 parent_sel,
-              );
+              )
+            | _ => ()
             };
             let style_rule =
               Style_rule({
                 prelude: ([(parent_sel, parent_loc)], parent_loc),
-                block: ([Declaration(decl)], Ppxlib.Location.none),
+                block: (
+                  List.map(decl => Declaration(decl), decls),
+                  Ppxlib.Location.none,
+                ),
                 loc: Ppxlib.Location.none,
               });
             let rule_string = render_rule(style_rule);
@@ -884,11 +967,25 @@ module Css_transform = {
       };
     };
 
-    let rec extract_atomic_rules =
-            (~parent_prelude=?, rule: rule): list((string, string, rule)) => {
+    /* Atomize one block's rules: same-property declarations group into a
+       single atom (see `group_declarations_by_property`); everything
+       else atomizes rule by rule. */
+    let rec extract_atomic_rules_from_block =
+            (~parent_prelude=?, rules: list(rule))
+            : list((string, string, rule)) =>
+      rules
+      |> group_declarations_by_property
+      |> List.concat_map(
+           fun
+           | Declaration_group(decls) =>
+             wrap_declaration_group_under_parent(~parent_prelude?, decls)
+           | Nested_rule(rule) => extract_atomic_rules(~parent_prelude?, rule),
+         )
+    and extract_atomic_rules =
+        (~parent_prelude=?, rule: rule): list((string, string, rule)) => {
       switch (rule) {
       | Declaration(decl) =>
-        wrap_declaration_under_parent(~parent_prelude?, decl)
+        wrap_declaration_group_under_parent(~parent_prelude?, [decl])
 
       | Style_rule({
           prelude: (child_selectors, _),
@@ -921,18 +1018,53 @@ module Css_transform = {
           | None => child_selectors
           | Some(parent) => merge_preludes(~parent, ~child=child_selectors)
           };
-        rules
-        |> List.concat_map(
-             extract_atomic_rules(~parent_prelude=effective_selectors),
-           );
+        extract_atomic_rules_from_block(
+          ~parent_prelude=effective_selectors,
+          rules,
+        );
 
-      | At_rule({ name, prelude, block, loc }) =>
+      | At_rule({ name: (name, name_loc), prelude, block, loc }) =>
+        /* Only conditional group rules can be atomized (the condition
+           distributes over the block). Everything else errors like the
+           runtime path — splitting @font-face/@keyframes/@property or
+           @layer produces broken CSS. Accepted set is a deliberate
+           superset of the runtime's (@supports/@starting-style are
+           extraction-only). */
+        let raise_at_rule_error = message =>
+          Ppxlib.Location.raise_errorf(
+            ~loc=
+              Styled_ppx_css_parser.Parser_location.adjust_to_file(
+                ~relative_loc=name_loc,
+                ~base_loc,
+              ),
+            "%s",
+            message,
+          );
+        let is_conditional_group_rule =
+          switch (String.lowercase_ascii(name)) {
+          | "media"
+          | "supports"
+          | "container"
+          | "starting-style" => true
+          | _ => false
+          };
         switch (block) {
+        | _ when String.lowercase_ascii(name) == "keyframes" =>
+          raise_at_rule_error(
+            "@keyframes should be defined with %keyframe(...)",
+          )
+        | _ when !is_conditional_group_rule =>
+          raise_at_rule_error(
+            Printf.sprintf("At-rule @%s is not supported in styled-ppx", name),
+          )
         | Empty =>
-          let at_string = render_rule(rule);
-          let (className, namespace) =
-            Hash_class.class_and_namespace(~label?, at_string);
-          [(className, namespace, rule)];
+          raise_at_rule_error(
+            Printf.sprintf(
+              "At-rule @%s requires a block (`@%s ... { ... }`)",
+              name,
+              name,
+            ),
+          )
 
         /* Both Rule_list and Stylesheet payloads are atomized the same way:
            recurse into the inner rules, then re-wrap each atom in a fresh
@@ -947,12 +1079,11 @@ module Css_transform = {
            `@media (...) { .css-X .a .b { color:red } }`. */
         | Rule_list((rules, rule_loc))
         | Stylesheet((rules, rule_loc)) =>
-          rules
-          |> List.concat_map(extract_atomic_rules(~parent_prelude?))
+          extract_atomic_rules_from_block(~parent_prelude?, rules)
           |> List.map(((_className, _namespace, inner_rule)) => {
                let wrapped =
                  At_rule({
-                   name,
+                   name: (name, name_loc),
                    prelude,
                    block: Rule_list(([inner_rule], rule_loc)),
                    loc,
@@ -962,11 +1093,11 @@ module Css_transform = {
                  Hash_class.class_and_namespace(~label?, wrapped_string);
                (new_className, new_namespace, wrapped);
              })
-        }
+        };
       };
     };
 
-    List.concat_map(extract_atomic_rules(~parent_prelude=?None), rules);
+    extract_atomic_rules_from_block(~parent_prelude=?None, rules);
   };
 
   let transform_rule_list =
@@ -1070,6 +1201,17 @@ let push =
       declarations,
     );
 
+  /* Identical atoms would repeat the class token (`"css-A css-A"`);
+     keep the first occurrence. */
+  let dedup_preserving_order = classNames =>
+    List.fold_left(
+      (acc, className) =>
+        List.mem(className, acc) ? acc : [className, ...acc],
+      [],
+      classNames,
+    )
+    |> List.rev;
+
   let classNames =
     switch (atomic_classnames) {
     | [] => mint_empty_class(~label)
@@ -1080,6 +1222,7 @@ let push =
            Buffer.add_rule(className, rendered_css);
            className;
          })
+      |> dedup_preserving_order
     };
 
   (classNames, dynamic_vars);
@@ -1169,17 +1312,39 @@ let push_global =
   let (rules, _) = global_rules;
   let all_dynamic_vars = ref([]);
 
-  /* Flatten CSS-nesting before rendering. `[%styled.global]` previously
-     emitted literal nesting (`body { .child { ... } }`), which only
-     resolves correctly in modern browsers and is not always polyfilled
-     by build chains. `Resolve.resolve_selectors` is the same pipeline
-     `[%css]` uses to lower nested rules into flat selectors
-     (`body .child { ... }`) — strict superset of nesting's browser
-     support, semantically identical for the shapes the parser admits.
+  /* Reject `&` with no parent selector: top level, or inside at-rule
+     blocks not below a style rule (at-rules don't contribute a
+     selector). Recursion stops at style rules — nested `&` is fine. */
+  let rec reject_parentless_ampersand = rule =>
+    switch (rule) {
+    | Style_rule({ prelude: (selectors, _), _ }) =>
+      List.iter(
+        ((selector, selector_loc)) =>
+          if (Styled_ppx_css_parser.Selector_nesting.contains_ampersand(
+                selector,
+              )) {
+            Ppxlib.Location.raise_errorf(
+              ~loc=
+                Styled_ppx_css_parser.Parser_location.adjust_to_file(
+                  ~relative_loc=selector_loc,
+                  ~base_loc,
+                ),
+              "The nesting selector `&` has no parent selector to resolve against here in [%%styled.global] (at-rules like @media don't provide one). Write a concrete selector instead.",
+            );
+          },
+        selectors,
+      )
+    | At_rule({ block: Rule_list((inner, _)), _ })
+    | At_rule({ block: Stylesheet((inner, _)), _ }) =>
+      List.iter(reject_parentless_ampersand, inner)
+    | At_rule({ block: Empty, _ })
+    | Declaration(_) => ()
+    };
+  List.iter(reject_parentless_ampersand, rules);
 
-     Multi-selector preludes Cartesian-product correctly (`a, b { c {...} }`
-     -> `a c { ... } b c { ... }`) because `resolve_selectors` calls
-     `split_multiple_selectors` before unnesting. */
+  /* Flatten CSS-nesting before rendering (literal nesting only works in
+     modern browsers). Same order-preserving flattener as `[%css]`;
+     @font-face/@keyframes/@import pass through verbatim. */
   let flattened_rules =
     Styled_ppx_css_parser.Resolve.resolve_selectors(rules);
   let var_namespace =

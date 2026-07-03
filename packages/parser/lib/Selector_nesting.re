@@ -44,16 +44,6 @@ let is_sibling_combinator =
   | Selector_descendant
   | Selector_child => false;
 
-/* A segment denotes the styled element itself when it is a bare `&` or a
-   compound whose type position is `&` (`&:hover`, `&:not(.x)`, `&.foo`). */
-let rec selector_is_ampersand = (sel: selector) =>
-  switch (sel) {
-  | SimpleSelector(Ampersand) => true
-  | CompoundSelector({ type_selector: Some(Ampersand), _ }) => true
-  | ComplexSelector(Selector(inner)) => selector_is_ampersand(inner)
-  | _ => false
-  };
-
 /* Flatten a complex selector into a left-to-right list of
    `(combinator_before, segment)` pairs; the head carries `None`. So
    `& + .a .b` becomes [(None, &), (Some(+), .a), (Some(descendant), .b)].
@@ -84,88 +74,103 @@ let rec flatten_selector_chain =
   };
 };
 
-/* The subject (rightmost compound) is contained in `&`'s subtree when it
-   is itself `&`, or when some `&` segment is immediately followed by a
-   descendant/child step — once inside `&`, any later sibling stays inside. */
-let rec subject_inside_ampersand = segments =>
+/* Segment provably denotes an element inside `&`'s subtree: `&`,
+   `&`-typed compounds, or `:is()`/`:where()` whose every branch stays
+   inside. `:not()`/`:has()` prove nothing — conservatively ignored. */
+let rec subject_within_ampersand = (sel: selector) =>
+  switch (sel) {
+  | SimpleSelector(Ampersand) => true
+  | ComplexSelector(Selector(inner)) => subject_within_ampersand(inner)
+  | CompoundSelector({ type_selector: Some(Ampersand), _ }) => true
+  | CompoundSelector({ subclass_selectors, pseudo_selectors, _ }) =>
+    List.exists(
+      fun
+      | Pseudo_class(pseudo) => pseudo_proves_within_ampersand(pseudo)
+      | _ => false,
+      subclass_selectors,
+    )
+    || List.exists(pseudo_proves_within_ampersand, pseudo_selectors)
+  | _ => false
+  }
+and pseudo_proves_within_ampersand = pseudo =>
+  switch (pseudo) {
+  | Pseudoclass(Function({ name, payload: (selector_list, _) }))
+      when
+        String.lowercase_ascii(name) == "is"
+        || String.lowercase_ascii(name) == "where" =>
+    selector_list != []
+    && List.for_all(
+         ((branch, _)) =>
+           subject_inside_ampersand(flatten_selector_chain(branch)),
+         selector_list,
+       )
+  | _ => false
+  }
+/* Subject is inside `&`'s subtree when itself within `&`, or after a
+   within-`&` segment followed by a descendant/child step. */
+and subject_inside_ampersand = segments =>
   switch (segments) {
   | [] => false
-  | [(_, subject)] => selector_is_ampersand(subject)
+  | [(_, subject)] => subject_within_ampersand(subject)
   | [(_, segment), (Some(combinator), _) as next, ...rest] =>
-    selector_is_ampersand(segment)
+    subject_within_ampersand(segment)
     && !is_sibling_combinator(combinator)
     || subject_inside_ampersand([next, ...rest])
   | [_, ...rest] => subject_inside_ampersand(rest)
   };
 
-/* Does the subject sit *outside* `&`'s subtree, reachable only through a
-   sibling combinator (`+`/`~`)? `[%css]` lowers a value interpolation to a
-   custom property set inline on `&` and read back with `var(--…)`; since
-   custom properties inherit only down to `&` and its descendants, such a
-   subject can't read it. Selectors with no `&` are never flagged: the
-   className is prepended via a descendant combinator, keeping the chain
-   inside the styled element. */
+/* Subject sits outside `&`'s subtree (sibling combinator, `div:not(&)`,
+   `:has(& + div)`, ...) — it can't read the custom property `[%css]`
+   sets inline on `&`. `contains_ampersand` sees inside pseudo payloads,
+   so payload-only `&` is analyzed, not silently accepted. */
 let subject_escapes_ampersand_subtree = (sel: selector): bool => {
-  let segments = flatten_selector_chain(sel);
-  let has_ampersand =
-    List.exists(
-      ((_, segment)) => selector_is_ampersand(segment),
-      segments,
-    );
-  has_ampersand && !subject_inside_ampersand(segments);
+  contains_ampersand(sel)
+  && !subject_inside_ampersand(flatten_selector_chain(sel));
 };
 
-let rec brace_block_contain_media =
-  fun
-  | Empty => false
-  | Rule_list(rule_list) => rule_list_contain_media(rule_list)
-  | Stylesheet(stylesheet) => stylesheet_contain_media(stylesheet)
-and stylesheet_contain_media = ((stylesheet, _): stylesheet) => {
-  List.exists(rule_contain_media, stylesheet);
-}
-and rule_list_contain_media = ((rule_list, _): rule_list) => {
-  List.exists(rule_contain_media, rule_list);
-}
-and rule_contain_media =
-  fun
-  | Declaration(_) => false
-  | Style_rule(_) => false
-  | At_rule({ name: (name, _), _ }) => name == "media";
-
-/* `pop_last_selector` peels the trailing combinator+selector pair off a
-   `ComplexSelector(Combinator{...})`. The AST type admits `right: []`,
-   so although the parser doesn't currently emit that shape, the
-   explicit empty-right arm keeps the function total: an empty-right
-   combinator is semantically the `left` selector alone, which is more
-   informative than the catchall fallback (which would return the whole
-   `ComplexSelector(Combinator)` wrapper).
-
-   The non-empty arm reverses `right` exactly once and pattern-matches
-   the head off, then reverses the tail back. The previous shape called
-   `List.rev` three times for the same logical operation. */
-let pop_last_selector =
-  fun
-  | ComplexSelector(Selector(sel)) => (sel, None, None)
-  | ComplexSelector(Combinator({ left, right: [] })) => (left, None, None)
+/* Flatten nested combinator trees into head + flat segment steps.
+   Purely structural (no `&` synthesis, unlike `flatten_selector_chain`);
+   nested trees arise from joins/substitutions of complex selectors. */
+let rec flatten_combinator_tree =
+        (sel: selector): (selector, list((selector_combinator, selector))) =>
+  switch (sel) {
+  | ComplexSelector(Selector(inner)) => flatten_combinator_tree(inner)
   | ComplexSelector(Combinator({ left, right })) =>
-    switch (List.rev(right)) {
-    | [] =>
-      /* Unreachable: the `right: []` arm above shadows it. */
-      (left, None, None)
-    | [(ctor, last), ...rest_rev] => (
-        last,
-        Some(ctor),
-        Some(
-          ComplexSelector(
-            Combinator({
-              left,
-              right: List.rev(rest_rev),
-            }),
-          ),
+    let (head, left_tail) = flatten_combinator_tree(left);
+    let right_tail =
+      List.concat_map(
+        ((combinator, segment)) => {
+          let (segment_head, segment_tail) = flatten_combinator_tree(segment);
+          [(combinator, segment_head), ...segment_tail];
+        },
+        right,
+      );
+    (head, left_tail @ right_tail);
+  | other => (other, [])
+  };
+
+/* Pop the rightmost compound off a complex selector (flattens first so
+   the popped segment is never a whole subtree). Returns
+   `(last, combinator_before_last, rest)`. */
+let pop_last_selector = (selector: selector) => {
+  let (head, segments) = flatten_combinator_tree(selector);
+  switch (List.rev(segments)) {
+  | [] => (head, None, None)
+  | [(ctor, last)] => (last, Some(ctor), Some(head))
+  | [(ctor, last), ...rest_rev] => (
+      last,
+      Some(ctor),
+      Some(
+        ComplexSelector(
+          Combinator({
+            left: head,
+            right: List.rev(rest_rev),
+          }),
         ),
-      )
-    }
-  | _ as sel => (sel, None, None);
+      ),
+    )
+  };
+};
 
 let join_selector_with_combinator =
     (~combinator=Ast.Selector_descendant, a, b) => {
@@ -177,54 +182,56 @@ let join_selector_with_combinator =
   );
 };
 
-/* Flatten a redundant `ComplexSelector(Selector(s))` wrapper that
-   `pop_last_selector` may return when the `right` side of a `Combinator`
-   carries the parser's identity form. Other selector shapes
-   (`RelativeSelector`, raw `Combinator`) pass through unchanged — they
-   are not expected from `pop_last_selector` and would still surface in
-   the catch-all `assert(false)` of `join_compound_selector`.
+/* Extend a prefix compound preserving literal-substitution order: the
+   nested compound renders *after* the prefix. When the prefix ends in
+   pseudo selectors, nested pseudo-classes append to the pseudo chain
+   (`.a::before { &:hover }` -> `.a::before:hover`, not
+   `.a:hover::before`). Non-pseudo subclasses stay in subclass position
+   (`::before.foo` is invalid and unrepresentable). */
+let merge_compound_selectors =
+    (
+      ~last_type_selector,
+      ~last_subclass_selectors,
+      ~last_pseudo_selectors,
+      { subclass_selectors, pseudo_selectors, _ },
+    ) =>
+  switch (last_pseudo_selectors) {
+  | [] =>
+    CompoundSelector({
+      type_selector: last_type_selector,
+      subclass_selectors: last_subclass_selectors @ subclass_selectors,
+      pseudo_selectors,
+    })
+  | last_pseudo_selectors =>
+    let (plain_subclasses, pseudo_class_subclasses) =
+      List.partition_map(
+        fun
+        | Pseudo_class(pseudo) => Either.Right(pseudo)
+        | subclass => Either.Left(subclass),
+        subclass_selectors,
+      );
+    CompoundSelector({
+      type_selector: last_type_selector,
+      subclass_selectors: last_subclass_selectors @ plain_subclasses,
+      pseudo_selectors:
+        last_pseudo_selectors @ pseudo_class_subclasses @ pseudo_selectors,
+    });
+  };
 
-   Non-recursive: the parser doesn't produce `Selector(Selector(...))`
-   chains, so a single unwrap is sufficient. */
-let unwrap_complex_selector =
-  fun
-  | ComplexSelector(Selector(s)) => s
-  | s => s;
-
-/* `join_compound_selector(selector, { subclass_selectors,
-   pseudo_selectors, _ })` extends the last compound of `selector` with
-   the given subclass/pseudo lists. Used by `replace_ampersand` when
-   substituting a compound `&`-bearing rhs into the prefix.
-
-   The four reachable shapes of `pop_last_selector` after
-   `unwrap_complex_selector`:
-
-   1. `(SimpleSelector(simple), None, None)` — prefix was bare
-      `SimpleSelector` (e.g. top-level `&`). Promote `simple` to a
-      `type_selector` in the new compound.
-   2. `(SimpleSelector(simple), Some(ctor), Some(rest))` — prefix was a
-      `Combinator` chain whose last segment is a SimpleSelector. Wrap.
-   3-4. Same two arms for `CompoundSelector(_)` last segments.
-
-   Any other shape (e.g. `RelativeSelector`,
-   `ComplexSelector(Combinator(_))` slipping past the unwrap) means the
-   caller passed a prefix this function isn't shaped to handle. Rather
-   than crash, fall back to a descendant join: emit `<popped> <new
-   compound>`. This preserves user CSS as something parseable and
-   reasonable, and lets the higher layers report a clearer error if
-   needed. The catch-all is intentionally permissive because
-   `Selector_nesting` is in the parser layer with no access to
-   `Ppxlib.Location.raise_errorf`. */
+/* Extend the last compound of `selector` with `compound`'s
+   subclass/pseudo lists (used by `replace_ampersand` for `&:hover`-style
+   substitution). Unhandled shapes (e.g. `RelativeSelector`) fall back to
+   a descendant join rather than crashing — the parser layer can't
+   raise. */
 let join_compound_selector =
-    (selector, { subclass_selectors, pseudo_selectors, _ }) => {
+    (selector, { subclass_selectors, pseudo_selectors, _ } as compound) => {
   let new_compound =
     CompoundSelector({
       type_selector: None,
       subclass_selectors,
       pseudo_selectors,
     });
-  let (popped, ctor_opt, rest_opt) = pop_last_selector(selector);
-  switch (unwrap_complex_selector(popped), ctor_opt, rest_opt) {
+  switch (pop_last_selector(selector)) {
   | (SimpleSelector(simple), None, None) =>
     CompoundSelector({
       type_selector: Some(simple),
@@ -250,11 +257,12 @@ let join_compound_selector =
       None,
       None,
     ) =>
-    CompoundSelector({
-      type_selector: last_type_selector,
-      subclass_selectors: last_subclass_selectors @ subclass_selectors,
-      pseudo_selectors: last_pseudo_selectors @ pseudo_selectors,
-    })
+    merge_compound_selectors(
+      ~last_type_selector,
+      ~last_subclass_selectors,
+      ~last_pseudo_selectors,
+      compound,
+    )
   | (
       CompoundSelector({
         type_selector: last_type_selector,
@@ -267,11 +275,12 @@ let join_compound_selector =
     join_selector_with_combinator(
       ~combinator=ctor,
       rest,
-      CompoundSelector({
-        type_selector: last_type_selector,
-        subclass_selectors: last_subclass_selectors @ subclass_selectors,
-        pseudo_selectors: last_pseudo_selectors @ pseudo_selectors,
-      }),
+      merge_compound_selectors(
+        ~last_type_selector,
+        ~last_subclass_selectors,
+        ~last_pseudo_selectors,
+        compound,
+      ),
     )
   /* Defensive fallback — see comment above. */
   | (other, None, None) => join_selector_with_combinator(other, new_compound)
@@ -410,30 +419,6 @@ and pseudo_selector_replace_ampersand = (replaced_with: selector, selector) => {
   };
 };
 
-let split_multiple_selectors = (rules: list(rule)) => {
-  List.fold_left(
-    (acc, rule) => {
-      switch (rule) {
-      | Style_rule({ prelude: (selector_list, prelude_loc), block, loc }) =>
-        let new_rules =
-          List.map(
-            selector =>
-              Style_rule({
-                prelude: ([selector], prelude_loc),
-                block,
-                loc,
-              }),
-            selector_list,
-          );
-        acc @ new_rules;
-      | _ => acc @ [rule]
-      }
-    },
-    [],
-    rules,
-  );
-};
-
 let trim_right = (vs: component_value_list) => {
   let rec go = (vs, acc) =>
     switch (vs) {
@@ -443,6 +428,12 @@ let trim_right = (vs: component_value_list) => {
     };
   go(vs, []);
 };
+
+let rec trim_left = (vs: component_value_list) =>
+  switch (vs) {
+  | [(Whitespace, _), ...rest] => trim_left(rest)
+  | vs => vs
+  };
 
 let join_media =
     (
@@ -457,9 +448,60 @@ let join_media =
       (Ident("and"), loc_none),
       (Whitespace, loc_none),
     ]
-    @ right,
+    @ trim_left(right),
     new_loc,
   );
+};
+
+/* `join_media` builds `LEFT and RIGHT`, only sound for single
+   conjunctive queries: top-level comma/`or`/`not`/`$()` (and, on the
+   right, media types like `screen`) would change meaning or fail the
+   media-query grammar. Rejected preludes nest literally instead. */
+let media_prelude_meaningful_values =
+    ((values, _loc): with_loc(component_value_list)) =>
+  List.filter_map(
+    ((value, _)) => value == Whitespace ? None : Some(value),
+    values,
+  );
+
+/* LEFT operand: single conjunctive query (media-type head is fine). */
+let media_prelude_is_combinable = prelude => {
+  let meaningful = media_prelude_meaningful_values(prelude);
+  let conjunctive_only =
+    List.for_all(
+      value =>
+        switch (value) {
+        | Delim(Delimiter_comma)
+        | Variable(_) => false
+        | Ident(ident) => String.lowercase_ascii(ident) != "or"
+        | _ => true
+        },
+      meaningful,
+    );
+  switch (meaningful) {
+  | [] => false
+  | [Ident(first), ..._] when String.lowercase_ascii(first) == "not" => false
+  | _ => conjunctive_only
+  };
+};
+
+/* RIGHT operand: pure `(...)` condition chain — it follows an `and`. */
+let media_prelude_is_condition_only = prelude => {
+  let meaningful = media_prelude_meaningful_values(prelude);
+  let condition_chain =
+    List.for_all(
+      value =>
+        switch (value) {
+        | Paren_block(_) => true
+        | Ident(ident) => String.lowercase_ascii(ident) == "and"
+        | _ => false
+        },
+      meaningful,
+    );
+  switch (meaningful) {
+  | [Paren_block(_), ..._] => condition_chain
+  | _ => false
+  };
 };
 
 let split_by_kind = (rules: list(rule)) => {
@@ -469,122 +511,6 @@ let split_by_kind = (rules: list(rule)) => {
     | _ => false,
     rules,
   );
-};
-
-let rec move_media_at_top = (rules: list(rule)) => {
-  List.fold_left(
-    (acc, rule) => {
-      switch (rule) {
-      | At_rule({ name: (name, _), block, _ } as at_rule)
-          when name == "media" && brace_block_contain_media(block) =>
-        let new_rules = swap(at_rule);
-        acc @ new_rules;
-      | Style_rule({ block: (block, _) as block_with_loc, prelude, loc })
-          when rule_list_contain_media(block_with_loc) =>
-        let (declarations, selectors) = split_by_kind(block);
-        let (media_selectors, non_media_selectors) =
-          List.partition(
-            fun
-            | At_rule({ name: (name, _), _ }) => name == "media"
-            | _ => false,
-            selectors,
-          );
-        let new_media_rules =
-          List.map(
-            fun
-            | At_rule({
-                name: ("media", _) as name_with_loc,
-                prelude: nested_media_selector,
-                block,
-                _,
-              }) => {
-                let nested_media_rule_list =
-                  switch (block) {
-                  | Empty => []
-                  | Rule_list((block, _)) => block
-                  | Stylesheet((block, _)) => block
-                  };
-                [
-                  At_rule({
-                    name: name_with_loc,
-                    prelude: nested_media_selector,
-                    block:
-                      Rule_list((
-                        [
-                          Style_rule({
-                            prelude,
-                            block: (nested_media_rule_list, loc_none),
-                            loc,
-                          }),
-                        ],
-                        loc_none,
-                      )),
-                    loc,
-                  }),
-                ];
-              }
-            | _ => [],
-            media_selectors,
-          )
-          |> List.flatten;
-        let selector_without_media = [
-          Style_rule({
-            prelude,
-            block: (declarations @ non_media_selectors, loc_none),
-            loc,
-          }),
-        ];
-        acc @ selector_without_media @ new_media_rules;
-      | Style_rule({ block: (block, _), _ }) when block != [] =>
-        acc @ [rule]
-      | At_rule({ block: Rule_list((block, _)), _ }) when block != [] =>
-        acc @ [rule]
-      | At_rule({ block: Stylesheet((block, _)), _ }) when block != [] =>
-        acc @ [rule]
-      | Declaration(_) => acc @ [rule]
-      | _ => acc
-      }
-    },
-    [],
-    rules,
-  );
-}
-and swap = ({ prelude: swap_prelude, block, loc, _ }: at_rule) => {
-  let rules =
-    switch (block) {
-    | Empty => []
-    | Rule_list((rule_list, _)) => rule_list
-    | Stylesheet((stylesheet, _)) => stylesheet
-    };
-  let (media_declarations, media_rules_selectors) = split_by_kind(rules);
-  let resolved_media_selectors =
-    List.map(
-      fun
-      | At_rule({
-          name: (name, _) as nested_name,
-          prelude: nested_prelude,
-          block: nested_block,
-          _,
-        })
-          when name == "media" => [
-          At_rule({
-            name: nested_name,
-            prelude: swap_prelude,
-            block: Rule_list((media_declarations, loc_none)),
-            loc,
-          }),
-          At_rule({
-            name: nested_name,
-            prelude: join_media(swap_prelude, nested_prelude),
-            block: nested_block,
-            loc,
-          }),
-        ]
-      | _ => [],
-      media_rules_selectors,
-    )
-    |> List.flatten;
-  move_media_at_top(resolved_media_selectors);
 };
 
 /** Compute the merged prefix when nesting a selector under a parent.

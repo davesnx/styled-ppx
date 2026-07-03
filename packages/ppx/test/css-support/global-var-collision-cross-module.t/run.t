@@ -36,7 +36,7 @@ bug. (The `:root` blocks are supplied at runtime by mounting each
         (((":root{" ^ "--var-xeebq:") ^ (CSS.Types.Color.toString primary)) ^
            ";")
           ^ "}"
-      let makeProps ?key () = ()[@@warning "-27-32"]
+      let makeProps ?key () = Js.Obj.empty ()[@@warning "-27-32"]
       let make _props = CSS.global_style_tag (to_string ())
     end
   $ cat b.ml
@@ -48,7 +48,7 @@ bug. (The `:root` blocks are supplied at runtime by mounting each
         (((":root{" ^ "--var-t1uddx:") ^ (CSS.Types.Color.toString primary)) ^
            ";")
           ^ "}"
-      let makeProps ?key () = ()[@@warning "-27-32"]
+      let makeProps ?key () = Js.Obj.empty ()[@@warning "-27-32"]
       let make _props = CSS.global_style_tag (to_string ())
     end
   $ styled-ppx.generate a.ml b.ml > styles.css
