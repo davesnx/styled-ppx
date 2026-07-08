@@ -17,25 +17,36 @@ let render_declaration = Styled_ppx_css_parser.Render.declaration;
 
 module Buffer = {
   type rule = (string, string);
-  let accumulated_rules: ref(list(rule)) = ref([]);
-  let global_rules: ref(list(rule)) = ref([]);
+  /* Rules are deduped by className on insert. [seen] mirrors the
+     classNames present in [rules] so membership is amortized O(1)
+     instead of an O(n) [List.exists] scan per call, which made rule
+     accumulation quadratic in the number of [%css] atoms per file. */
+  type target = {
+    mutable rules: list(rule),
+    seen: Hashtbl.t(string, unit),
+  };
+  let accumulated_rules: target = { rules: [], seen: Hashtbl.create(256) };
+  let global_rules: target = { rules: [], seen: Hashtbl.create(64) };
 
   let add_to = (target, className, cssText) =>
-    if (!List.exists(((existing, _)) => existing == className, target^)) {
-      target := [(className, cssText), ...target^];
+    if (!Hashtbl.mem(target.seen, className)) {
+      Hashtbl.add(target.seen, className, ());
+      target.rules = [(className, cssText), ...target.rules];
     };
 
   let add_rule = add_to(accumulated_rules);
   let add_global_rule = add_to(global_rules);
 
   let get_rules = () => {
-    let dump = target => List.rev_map(((_, cssText)) => cssText, target^);
+    let dump = target => List.rev_map(((_, cssText)) => cssText, target.rules);
     dump(global_rules) @ dump(accumulated_rules);
   };
 
   let clear = () => {
-    accumulated_rules := [];
-    global_rules := [];
+    accumulated_rules.rules = [];
+    global_rules.rules = [];
+    Hashtbl.reset(accumulated_rules.seen);
+    Hashtbl.reset(global_rules.seen);
   };
 };
 
