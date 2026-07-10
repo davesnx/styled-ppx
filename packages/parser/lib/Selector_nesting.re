@@ -489,7 +489,7 @@ let join_media =
       (left, left_loc): with_loc(component_value_list),
       (right, right_loc): with_loc(component_value_list),
     ) => {
-  let new_loc = Parser_location.intersection(left_loc, right_loc);
+  let new_loc = Parser_location.span(left_loc, right_loc);
   (
     trim_right(left)
     @ [

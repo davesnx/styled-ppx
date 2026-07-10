@@ -2,30 +2,13 @@ let to_ppxlib_location ?(loc_ghost = false) (start_pos : Lexing.position)
   (end_pos : Lexing.position) : Ppxlib.location =
   { loc_start = start_pos; loc_end = end_pos; loc_ghost }
 
-let intersection (loc1 : Ppxlib.location) (loc2 : Ppxlib.location) :
-  Ppxlib.location =
-  let start_pos =
-    Lexing.
-      {
-        pos_fname = loc1.loc_start.pos_fname;
-        pos_lnum = loc1.loc_start.pos_lnum + loc2.loc_start.pos_lnum - 1;
-        pos_bol = loc1.loc_start.pos_bol + loc2.loc_start.pos_bol;
-        pos_cnum = loc1.loc_start.pos_cnum + loc2.loc_start.pos_cnum;
-      }
-  in
-  let end_pos =
-    Lexing.
-      {
-        pos_fname = loc1.loc_end.pos_fname;
-        pos_lnum = loc1.loc_start.pos_lnum + loc2.loc_end.pos_lnum - 1;
-        pos_bol = loc1.loc_start.pos_bol + loc2.loc_end.pos_bol;
-        pos_cnum = loc1.loc_start.pos_cnum + loc2.loc_end.pos_cnum;
-      }
-  in
+(* Location covering both inputs, for AST nodes synthesized by merging two
+   source-adjacent nodes (e.g. nested @media preludes joined with `and`). *)
+let span (loc1 : Ppxlib.location) (loc2 : Ppxlib.location) : Ppxlib.location =
   {
-    Ppxlib.Location.loc_start = start_pos;
-    loc_end = end_pos;
-    loc_ghost = false;
+    loc_start = loc1.loc_start;
+    loc_end = loc2.loc_end;
+    loc_ghost = loc1.loc_ghost || loc2.loc_ghost;
   }
 
 (* Given the location of a string constant (which starts at the opening
