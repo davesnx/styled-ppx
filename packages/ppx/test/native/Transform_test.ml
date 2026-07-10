@@ -3,7 +3,7 @@ module Transform = Styled_ppx_css_parser.Transform
 let parse input =
   match
     Styled_ppx_css_parser.Driver.parse_declaration_list
-      ~loc:Ppxlib.Location.none input
+      ~source_position_start:(Styled_ppx_css_parser.Parser_location.file_start ()) input
   with
   | Ok rule_list -> rule_list
   | Error (_loc, error) -> Alcotest.fail error

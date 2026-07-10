@@ -11,7 +11,7 @@ let lines = read_and_print([]) |> String.concat("\n");
 let parse_exn = css =>
   switch (
     Styled_ppx_css_parser.Driver.parse_declaration_list(
-      ~loc=Ppxlib.Location.none,
+      ~source_position_start=Styled_ppx_css_parser.Parser_location.file_start(),
       css,
     )
   ) {

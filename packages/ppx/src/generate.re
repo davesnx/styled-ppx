@@ -1014,14 +1014,14 @@ let staticComponent = (~loc, ~htmlTag, styles) => {
   |> constrainPublicApi(~loc, ~customProps=None);
 };
 
-let validationErrorExpr = (~loc, ~base_loc, ~description, errors) => {
+let validationErrorExpr = (~loc, ~source_position_start, ~description, errors) => {
   let error_messages =
     errors
     |> List.map(((error_loc, error)) => {
          let adjusted_loc =
-           Styled_ppx_css_parser.Parser_location.adjust_to_file(
-             ~relative_loc=error_loc,
-             ~base_loc,
+           Styled_ppx_css_parser.Parser_location.to_file_location(
+             ~source_position_start,
+             error_loc,
            );
          (adjusted_loc, Css_validation.error_to_string(error));
        });
@@ -1111,7 +1111,7 @@ let extractedDynamicStyles =
       ~functionExpr,
       ~labeledArguments,
     ) => {
-  let render_extracted_styles = (~loc, rule_list) => {
+  let render_extracted_styles = (~loc, ~source_position_start, rule_list) => {
     switch (
       Css_validation.get_errors(
         Css_validation.type_check_rule_list(rule_list),
@@ -1123,7 +1123,7 @@ let extractedDynamicStyles =
           ~file,
           ~scope,
           ~opens,
-          ~base_loc=loc,
+          ~source_position_start,
           ~label=moduleName,
           rule_list,
         );
@@ -1137,7 +1137,7 @@ let extractedDynamicStyles =
     | errors =>
       validationErrorExpr(
         ~loc,
-        ~base_loc=loc,
+        ~source_position_start,
         ~description="Multiple errors on styled component definition",
         errors,
       )
@@ -1147,13 +1147,19 @@ let extractedDynamicStyles =
   let styles =
     switch (functionExpr.pexp_desc) {
     | Pexp_constant(Pconst_string(str, stringLoc, delimiter)) =>
-      let loc =
-        Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+      let source_position_start =
+        Styled_ppx_css_parser.Parser_location.source_position_start(
+          ~delimiter,
           stringLoc,
-          delimiter,
         );
-      switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, str)) {
-      | Ok(rule_list) => render_extracted_styles(~loc=stringLoc, rule_list)
+      switch (
+        Styled_ppx_css_parser.Driver.parse_declaration_list(
+          ~source_position_start,
+          str,
+        )
+      ) {
+      | Ok(rule_list) =>
+        render_extracted_styles(~loc=stringLoc, ~source_position_start, rule_list)
       | Error((loc, msg)) => Error.expr(~loc, msg)
       };
     | _ =>

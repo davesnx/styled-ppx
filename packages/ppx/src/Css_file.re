@@ -13,10 +13,10 @@ type var_type =
 
 /* A `$(expr)` value interpolation hoisted to a CSS custom property. */
 type dynamic_var = {
-  name: string, /* hashed custom-property name, without the leading `--` */
-  path: string, /* interpolated OCaml expression source, e.g. "Theme.color" */
+  name: string, /* hashed custom-property name, without `--` */
+  path: string, /* the expression's source, e.g. "Theme.color" */
   var_type,
-  loc: Ppxlib.Location.t, /* file location of the `$( ... )` payload */
+  loc: Ppxlib.Location.t, /* file location of the expression inside `$()` */
 };
 
 let render_rule = Styled_ppx_css_parser.Render.rule;
@@ -108,22 +108,21 @@ module Css_transform = {
     loop([], items);
   };
 
-  /* Everything the transform walk threads unchanged through every node:
-     resolution inputs (file/scope/opens), the payload's file location for
-     rebasing payload-relative AST locations, and the accumulator for
-     hoisted interpolations. */
+  /* Threaded unchanged through the whole transform walk: resolution
+     inputs, the position AST locations are rebased against, and the
+     accumulator for hoisted interpolations. */
   type ctx = {
     file: string,
     scope: list(string),
     opens: list(list(string)),
-    base_loc: Ppxlib.Location.t,
+    source_position_start: Lexing.position,
     dynamic_vars: ref(list(dynamic_var)),
   };
 
   let to_file_loc = (ctx, relative_loc) =>
-    Styled_ppx_css_parser.Parser_location.adjust_to_file(
-      ~relative_loc,
-      ~base_loc=ctx.base_loc,
+    Styled_ppx_css_parser.Parser_location.to_file_location(
+      ~source_position_start=ctx.source_position_start,
+      relative_loc,
     );
 
   let add_dynamic_var = (ctx, dynamic_var: dynamic_var) =>
@@ -720,13 +719,13 @@ module Css_transform = {
       };
     };
 
-  let raise_bare_leading_pseudo_error = (~loc, ~base_loc, sel) => {
+  let raise_bare_leading_pseudo_error = (~loc, ~source_position_start, sel) => {
     let rendered = Styled_ppx_css_parser.Render.selector(sel);
     Ppxlib.Location.raise_errorf(
       ~loc=
-        Styled_ppx_css_parser.Parser_location.adjust_to_file(
-          ~relative_loc=loc,
-          ~base_loc,
+        Styled_ppx_css_parser.Parser_location.to_file_location(
+          ~source_position_start,
+          loc,
         ),
       "Bare leading pseudo selector `%s` is ambiguous in nested CSS. Per CSS Nesting Level 1 §3.1 it descendant-joins with the enclosing selector (producing `<parent> %s`), which matches descendants rather than the element itself. Write `&%s` for compound (`<parent>%s`, the usual intent), or `& %s` to opt into the explicit descendant form.",
       rendered,
@@ -741,13 +740,13 @@ module Css_transform = {
      subtree-escaping selector cannot be reached by the `var(--…)`
      indirection, so reject it instead of emitting silently-broken CSS. */
   let raise_subtree_escaping_interpolation_error =
-      (~loc, ~base_loc, ~property, sel) => {
+      (~loc, ~source_position_start, ~property, sel) => {
     let rendered = Styled_ppx_css_parser.Render.selector(sel);
     Ppxlib.Location.raise_errorf(
       ~loc=
-        Styled_ppx_css_parser.Parser_location.adjust_to_file(
-          ~relative_loc=loc,
-          ~base_loc,
+        Styled_ppx_css_parser.Parser_location.to_file_location(
+          ~source_position_start,
+          loc,
         ),
       "Cannot interpolate into the value of `%s` under `%s`: the selector targets an element outside `&`'s subtree (via a sibling combinator `+`/`~`, or a pseudo-class like `:not(&)`/`:has(&)` whose subject isn't `&` or a descendant of it). Static extraction passes interpolations as a custom property set inline on `&`, which only `&` and its descendants inherit, so an element outside that subtree can't read it and the declaration would be dropped. Instead, target `&` or a descendant, or write a literal value or a globally-inherited theme `var(--...)` directly.",
       property,
@@ -815,7 +814,7 @@ module Css_transform = {
   };
 
   let atomize_rules =
-      (~base_loc, ~label=?, rules: list(rule))
+      (~source_position_start, ~label=?, rules: list(rule))
       : list((string, string, rule)) => {
     /* Merge a child selector-list prelude under a parent selector-list prelude.
        For each (parent, child) pair, run `compute_new_prefix` so `&`,
@@ -902,7 +901,7 @@ module Css_transform = {
                   ) =>
               raise_subtree_escaping_interpolation_error(
                 ~loc=parent_loc,
-                ~base_loc,
+                ~source_position_start,
                 ~property,
                 parent_sel,
               )
@@ -966,7 +965,7 @@ module Css_transform = {
         List.iter(
           ((sel, sel_loc)) =>
             if (is_bare_leading_pseudo(sel)) {
-              raise_bare_leading_pseudo_error(~loc=sel_loc, ~base_loc, sel);
+              raise_bare_leading_pseudo_error(~loc=sel_loc, ~source_position_start, sel);
             },
           child_selectors,
         );
@@ -993,9 +992,9 @@ module Css_transform = {
         let raise_at_rule_error = message =>
           Ppxlib.Location.raise_errorf(
             ~loc=
-              Styled_ppx_css_parser.Parser_location.adjust_to_file(
-          ~relative_loc=name_loc,
-          ~base_loc,
+              Styled_ppx_css_parser.Parser_location.to_file_location(
+          ~source_position_start,
+          name_loc,
         ),
             "%s",
             message,
@@ -1110,14 +1109,14 @@ module Css_transform = {
         ~file,
         ~scope: list(string),
         ~opens: list(list(string)),
-        ~base_loc,
+        ~source_position_start,
         ~label=?,
         rule_list: rule_list,
       ) => {
-    let ctx = { file, scope, opens, base_loc, dynamic_vars: ref([]) };
+    let ctx = { file, scope, opens, source_position_start, dynamic_vars: ref([]) };
     let (rules, loc) = rule_list;
 
-    let atomic_rules = atomize_rules(~base_loc, ~label?, rules);
+    let atomic_rules = atomize_rules(~source_position_start, ~label?, rules);
 
     /* Selective atomization: the block's interpolating declarations become one
        content-addressed bundle, with class `css-<B>-<label>` and var namespace
@@ -1233,7 +1232,7 @@ let push =
       ~file,
       ~scope: list(string),
       ~opens: list(list(string)),
-      ~base_loc,
+      ~source_position_start,
       ~label=?,
       declarations: Styled_ppx_css_parser.Ast.rule_list,
     ) => {
@@ -1242,7 +1241,7 @@ let push =
       ~file,
       ~scope,
       ~opens,
-      ~base_loc,
+      ~source_position_start,
       ~label?,
       declarations,
     );
@@ -1293,14 +1292,14 @@ let push_keyframe =
       ~main_module,
       ~scope: list(string),
       ~opens: list(list(string)),
-      ~base_loc,
+      ~source_position_start,
       keyframe_rules: Styled_ppx_css_parser.Ast.rule_list,
     ) => {
   open Styled_ppx_css_parser.Ast;
 
   let (rules, rule_loc) = keyframe_rules;
   let ctx =
-    Css_transform.{ file, scope, opens, base_loc, dynamic_vars: ref([]) };
+    Css_transform.{ file, scope, opens, source_position_start, dynamic_vars: ref([]) };
   let var_namespace =
     Hash_class.scoped_namespace(
       ~kind="keyframes",
@@ -1353,7 +1352,7 @@ let push_global =
       ~main_module,
       ~scope: list(string),
       ~opens: list(list(string)),
-      ~base_loc,
+      ~source_position_start,
       global_rules: Styled_ppx_css_parser.Ast.rule_list,
     )
     : list(dynamic_var) => {
@@ -1361,7 +1360,7 @@ let push_global =
 
   let (rules, _) = global_rules;
   let ctx =
-    Css_transform.{ file, scope, opens, base_loc, dynamic_vars: ref([]) };
+    Css_transform.{ file, scope, opens, source_position_start, dynamic_vars: ref([]) };
 
   /* Reject `&` with no parent selector: top level, or inside at-rule
      blocks not below a style rule (at-rules don't contribute a
@@ -1376,9 +1375,9 @@ let push_global =
               )) {
             Ppxlib.Location.raise_errorf(
               ~loc=
-                Styled_ppx_css_parser.Parser_location.adjust_to_file(
-          ~relative_loc=selector_loc,
-          ~base_loc,
+                Styled_ppx_css_parser.Parser_location.to_file_location(
+          ~source_position_start,
+          selector_loc,
         ),
               "The nesting selector `&` has no parent selector to resolve against here in [%%styled.global] (at-rules like @media don't provide one). Write a concrete selector instead.",
             );

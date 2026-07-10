@@ -50,9 +50,8 @@ let is_animation_name_var = (var: Css_file.dynamic_var) =>
   | _ => false
   };
 
-/* The interpolated expression is re-parsed from its source and rebased onto
-   [var.loc] (the file location of the `$( ... )` payload), so type errors on
-   the interpolation point at the variable, not at the CSS string. */
+/* [var.path] is re-parsed at [var.loc], so type errors on the
+   interpolation point at the `$()` expression, not at the CSS string. */
 let render_dynamic_var_tuple = (~loc, var: Css_file.dynamic_var) => {
   let field_name = "--" ++ var.name;
   let field_name_expr =

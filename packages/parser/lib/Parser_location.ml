@@ -11,55 +11,44 @@ let span (loc1 : Ppxlib.location) (loc2 : Ppxlib.location) : Ppxlib.location =
     loc_ghost = loc1.loc_ghost || loc2.loc_ghost;
   }
 
-(* Given the location of a string constant (which starts at the opening
-   quote), return a location whose start points at the first character of
-   the payload: one character for a plain quoted string, [String.length d
-   + 2] for a delimited string (skipping the opening brace, delimiter and
-   pipe). The result is the [base_loc] every payload-relative location is
-   rebased against. *)
-let update_loc_with_delimiter (loc : Ppxlib.location) delimiter :
-  Ppxlib.location =
+(* Position of a file's first character. Rebasing against it is the
+   identity; [Location.none] is not ([pos_cnum] is [-1]). *)
+let file_start ?(filename = "") () : Lexing.position =
+  { pos_fname = filename; pos_lnum = 1; pos_bol = 0; pos_cnum = 0 }
+
+(* File position of a string constant's first content character: skips the
+   opening quote, or brace + delimiter + pipe for delimited strings. All
+   source-relative locations are rebased against it. *)
+let source_position_start ~delimiter (loc : Ppxlib.location) :
+  Lexing.position =
   let offset =
-    match delimiter with None -> 1 | Some s -> String.length s + 2
+    match delimiter with None -> 1 | Some d -> String.length d + 2
   in
-  let loc_start =
-    { loc.loc_start with pos_cnum = loc.loc_start.pos_cnum + offset }
-  and loc_end = { loc.loc_end with pos_cnum = loc.loc_end.pos_cnum + offset } in
-  { loc_start; loc_end; loc_ghost = false }
+  { loc.loc_start with pos_cnum = loc.loc_start.pos_cnum + offset }
 
-(* Rebase a payload-relative position (as produced by the CSS lexer, or by
-   re-parsing an interpolation expression: line 1, column 0 = payload
-   start) onto [payload_start], the file position of the payload's first
-   character.
-
-   The payload occupies a contiguous byte range of the file starting at
-   [payload_start.pos_cnum], so every payload-relative offset maps to a
-   file offset by adding it. Line 1 of the payload continues
-   [payload_start]'s file line (same [pos_bol]); every later payload line
-   begins at a fresh file line whose [pos_bol] is itself a payload offset.
-
-   Known approximation: escape sequences in regular quoted strings occupy
-   more file bytes than payload bytes, shifting positions after them. *)
-let to_file_position ~(payload_start : Lexing.position)
+(* Rebase a source-relative position (line 1, column 0 = first parsed
+   character) onto [source_position_start]. The source is a contiguous
+   byte range of the file, so offsets shift by [pos_cnum]; line 1
+   continues [source_position_start]'s file line, later lines start their
+   own. Escape sequences in quoted strings break the 1:1 byte mapping and
+   shift positions after them. *)
+let to_file_position ~(source_position_start : Lexing.position)
   (pos : Lexing.position) : Lexing.position =
   {
-    pos_fname = payload_start.pos_fname;
-    pos_lnum = payload_start.pos_lnum + pos.pos_lnum - 1;
+    pos_fname = source_position_start.pos_fname;
+    pos_lnum = source_position_start.pos_lnum + pos.pos_lnum - 1;
     pos_bol =
-      (if pos.pos_lnum = 1 then payload_start.pos_bol
-       else pos.pos_bol + payload_start.pos_cnum);
-    pos_cnum = pos.pos_cnum + payload_start.pos_cnum;
+      (if pos.pos_lnum = 1 then source_position_start.pos_bol
+       else pos.pos_bol + source_position_start.pos_cnum);
+    pos_cnum = pos.pos_cnum + source_position_start.pos_cnum;
   }
 
-(* Rebase a payload-relative location onto the file location of the
-   payload. [base_loc]'s start must point at the payload's first character
-   (see [update_loc_with_delimiter]). *)
-let adjust_to_file ~(relative_loc : Ppxlib.location)
-  ~(base_loc : Ppxlib.location) : Ppxlib.location =
-  let payload_start = base_loc.loc_start in
+(* Rebase a source-relative location onto the file. *)
+let to_file_location ~(source_position_start : Lexing.position)
+  (relative_loc : Ppxlib.location) : Ppxlib.location =
   {
-    Ppxlib.loc_start = to_file_position ~payload_start relative_loc.loc_start;
-    loc_end = to_file_position ~payload_start relative_loc.loc_end;
+    Ppxlib.loc_start =
+      to_file_position ~source_position_start relative_loc.loc_start;
+    loc_end = to_file_position ~source_position_start relative_loc.loc_end;
     loc_ghost = relative_loc.loc_ghost;
   }
-

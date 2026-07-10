@@ -4,18 +4,11 @@ module Ast = Styled_ppx_css_parser.Ast;
 module Driver = Styled_ppx_css_parser.Driver;
 module Parser_location = Styled_ppx_css_parser.Parser_location;
 
-/* Parse as if the input were a whole file: payload starts at line 1,
-   column 0, so error locations come back unshifted. */
-let zero_pos: Lexing.position = {
-  pos_fname: "",
-  pos_lnum: 1,
-  pos_bol: 0,
-  pos_cnum: 0,
-};
-let loc = Parser_location.to_ppxlib_location(zero_pos, zero_pos);
+/* Parse the input as a whole file, so error positions come back unshifted. */
+let source_position_start = Parser_location.file_start();
 
 let parse = input => {
-  switch (Driver.parse_stylesheet(~loc, input)) {
+  switch (Driver.parse_stylesheet(~source_position_start, input)) {
   | Ok(ast) => Ok(ast)
   | Error((loc, msg)) =>
     let pos = loc.loc_start;
@@ -31,7 +24,7 @@ let parse = input => {
 };
 
 let parse_declaration_list_exn = input => {
-  switch (Driver.parse_declaration_list(~loc, input)) {
+  switch (Driver.parse_declaration_list(~source_position_start, input)) {
   | Ok(value) => value
   | Error((_, msg)) =>
     fail("expected declaration list parse success: " ++ msg)
@@ -70,7 +63,7 @@ let error_tests_data =
 
 let declaration_ast_tests = [
   test_case("declaration preserves id-like hash kind", `Quick, () => {
-    switch (Driver.parse_declaration(~loc, "color:#abc;")) {
+    switch (Driver.parse_declaration(~source_position_start, "color:#abc;")) {
     | Ok({ value: ([(Ast.Hash((value, kind)), _)], _), _ }) =>
       check(string, "preserves hash text", "abc", value);
       check(bool, "preserves id hash kind", true, kind == Ast.Hash_kind_id);
@@ -78,7 +71,7 @@ let declaration_ast_tests = [
     }
   }),
   test_case("declaration preserves unrestricted hash kind", `Quick, () => {
-    switch (Driver.parse_declaration(~loc, "color:#2;")) {
+    switch (Driver.parse_declaration(~source_position_start, "color:#2;")) {
     | Ok({ value: ([(Ast.Hash((value, kind)), _)], _), _ }) =>
       check(string, "preserves hash text", "2", value);
       check(
@@ -94,7 +87,7 @@ let declaration_ast_tests = [
 
 let function_ast_tests = [
   test_case("declaration preserves regular function kind", `Quick, () => {
-    switch (Driver.parse_declaration(~loc, "color:calc(1px);")) {
+    switch (Driver.parse_declaration(~source_position_start, "color:calc(1px);")) {
     | Ok({
         value: ([(Ast.Function({ name: (name, _), kind, _ }), _)], _),
         _,
@@ -110,7 +103,7 @@ let function_ast_tests = [
     }
   }),
   test_case("declaration preserves nth function kind", `Quick, () => {
-    switch (Driver.parse_declaration(~loc, "color:nth-child(2n+1);")) {
+    switch (Driver.parse_declaration(~source_position_start, "color:nth-child(2n+1);")) {
     | Ok({
         value: ([(Ast.Function({ name: (name, _), kind, _ }), _)], _),
         _,
@@ -129,7 +122,7 @@ let function_ast_tests = [
 
 let selector_combinator_ast_tests = [
   test_case("stylesheet preserves child combinator", `Quick, () => {
-    switch (Driver.parse_stylesheet(~loc, "a > b {}")) {
+    switch (Driver.parse_stylesheet(~source_position_start, "a > b {}")) {
     | Ok((
         [
           Ast.Style_rule({
@@ -164,7 +157,7 @@ let selector_combinator_ast_tests = [
     }
   }),
   test_case("stylesheet preserves descendant combinator", `Quick, () => {
-    switch (Driver.parse_stylesheet(~loc, "a b {}")) {
+    switch (Driver.parse_stylesheet(~source_position_start, "a b {}")) {
     | Ok((
         [
           Ast.Style_rule({
@@ -200,7 +193,7 @@ let selector_combinator_ast_tests = [
   }),
   test_case(
     "selector function payload preserves relative combinator", `Quick, () => {
-    switch (Driver.parse_stylesheet(~loc, "div:has(> span) {}")) {
+    switch (Driver.parse_stylesheet(~source_position_start, "div:has(> span) {}")) {
     | Ok(([Ast.Style_rule({ prelude: ([(selector, _)], _), _ })], _)) =>
       switch (selector) {
       | Ast.ComplexSelector(
@@ -274,7 +267,7 @@ let ambiguity_regression_tests = [
     }
   }),
   test_case("selector head with pseudo parses as style rule", `Quick, () => {
-    switch (Driver.parse_declaration_list(~loc, "a:hover { color: blue; }")) {
+    switch (Driver.parse_declaration_list(~source_position_start, "a:hover { color: blue; }")) {
     | Ok(([Ast.Style_rule(_)], _)) => ()
     | Ok(_) => fail("expected style rule")
     | Error((_, msg)) => fail("expected style rule parse success: " ++ msg)
@@ -283,7 +276,7 @@ let ambiguity_regression_tests = [
   test_case(
     "selector head with unknown pseudo parses as style rule", `Quick, () => {
     switch (
-      Driver.parse_declaration_list(~loc, "a:future-state { color: blue; }")
+      Driver.parse_declaration_list(~source_position_start, "a:future-state { color: blue; }")
     ) {
     | Ok(([Ast.Style_rule(_)], _)) => ()
     | Ok(_) => fail("expected style rule")

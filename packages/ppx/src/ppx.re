@@ -230,12 +230,12 @@ let expand_css_expression =
   let label = Settings.Get.minify() ? None : label_name;
   switch (payload.pexp_desc) {
   | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-    let loc =
-      Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+    let source_position_start =
+      Styled_ppx_css_parser.Parser_location.source_position_start(
+        ~delimiter,
         stringLoc,
-        delimiter,
       );
-    switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, txt)) {
+    switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~source_position_start, txt)) {
     | Ok(rule_list) =>
       let validations = type_check_rule_list(rule_list);
       switch (get_errors(validations)) {
@@ -245,7 +245,7 @@ let expand_css_expression =
             ~file,
             ~scope,
             ~opens,
-            ~base_loc=loc,
+            ~source_position_start,
             ~label?,
             rule_list,
           );
@@ -266,9 +266,9 @@ let expand_css_expression =
           errors
           |> List.map(((error_loc, error)) => {
                let adjusted_loc =
-                 Styled_ppx_css_parser.Parser_location.adjust_to_file(
-                   ~relative_loc=error_loc,
-                   ~base_loc=loc,
+                 Styled_ppx_css_parser.Parser_location.to_file_location(
+                   ~source_position_start,
+                   error_loc,
                    );
                (adjusted_loc, error_to_string(error));
              });
@@ -293,12 +293,12 @@ let expand_global_module = (~file, ~main_module, ~scope, ~opens, payload) => {
   File.set(file);
   switch (payload.pexp_desc) {
   | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-    let loc =
-      Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+    let source_position_start =
+      Styled_ppx_css_parser.Parser_location.source_position_start(
+        ~delimiter,
         stringLoc,
-        delimiter,
       );
-    switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, txt)) {
+    switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~source_position_start, txt)) {
     | Ok(rule_list) =>
       let (rules, rule_loc) = rule_list;
       let has_invalid_rules =
@@ -326,14 +326,12 @@ let expand_global_module = (~file, ~main_module, ~scope, ~opens, payload) => {
               ~main_module,
               ~scope,
               ~opens,
-              ~base_loc=loc,
+              ~source_position_start,
               rule_list,
             );
+          let loc = stringLoc;
           let to_string_body =
-            Css_global_to_string.render_root_block(
-              ~loc=stringLoc,
-              dynamic_vars,
-            );
+            Css_global_to_string.render_root_block(~loc, dynamic_vars);
           let to_string_decl = [%stri
             let to_string = () => [%e to_string_body]
           ];
@@ -353,9 +351,9 @@ let expand_global_module = (~file, ~main_module, ~scope, ~opens, payload) => {
             errors
             |> List.map(((error_loc, error)) => {
                  let adjusted_loc =
-                   Styled_ppx_css_parser.Parser_location.adjust_to_file(
-                     ~relative_loc=error_loc,
-                     ~base_loc=loc,
+                   Styled_ppx_css_parser.Parser_location.to_file_location(
+                     ~source_position_start,
+                     error_loc,
                      );
                  (adjusted_loc, error_to_string(error));
                });
@@ -402,12 +400,12 @@ let expand_keyframe_expression =
   File.set(file);
   switch (payload.pexp_desc) {
   | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-    let loc =
-      Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+    let source_position_start =
+      Styled_ppx_css_parser.Parser_location.source_position_start(
+        ~delimiter,
         stringLoc,
-        delimiter,
       );
-    switch (Styled_ppx_css_parser.Driver.parse_keyframes(~loc, txt)) {
+    switch (Styled_ppx_css_parser.Driver.parse_keyframes(~source_position_start, txt)) {
     | Ok(declarations) =>
       let (keyframe_name, dynamic_vars) =
         Css_file.push_keyframe(
@@ -415,7 +413,7 @@ let expand_keyframe_expression =
           ~main_module,
           ~scope,
           ~opens,
-          ~base_loc=loc,
+          ~source_position_start,
           declarations,
         );
       let loc = stringLoc;
@@ -488,12 +486,12 @@ let expand_styled_module =
 
   switch (payload.pexp_desc) {
   | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
-    let loc =
-      Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+    let source_position_start =
+      Styled_ppx_css_parser.Parser_location.source_position_start(
+        ~delimiter,
         stringLoc,
-        delimiter,
       );
-    switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, txt)) {
+    switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~source_position_start, txt)) {
     | Ok(rule_list) =>
       switch (get_errors(type_check_rule_list(rule_list))) {
       | [] =>
@@ -502,7 +500,7 @@ let expand_styled_module =
             ~file,
             ~scope,
             ~opens,
-            ~base_loc=loc,
+            ~source_position_start,
             ~label=name,
             rule_list,
           );
@@ -520,9 +518,9 @@ let expand_styled_module =
           errors
           |> List.map(((error_loc, error)) => {
                let adjusted_loc =
-                 Styled_ppx_css_parser.Parser_location.adjust_to_file(
-                   ~relative_loc=error_loc,
-                   ~base_loc=loc,
+                 Styled_ppx_css_parser.Parser_location.to_file_location(
+                   ~source_position_start,
+                   error_loc,
                    );
                (adjusted_loc, error_to_string(error));
              });

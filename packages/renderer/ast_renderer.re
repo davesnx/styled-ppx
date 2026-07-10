@@ -11,11 +11,7 @@ let help =
     args,
   );
 
-let loc =
-  Styled_ppx_css_parser.Parser_location.to_ppxlib_location(
-    Lexing.dummy_pos,
-    Lexing.dummy_pos,
-  );
+let source_position_start = Styled_ppx_css_parser.Parser_location.file_start();
 
 switch (input, help) {
 | (Some(_), true)
@@ -26,7 +22,7 @@ switch (input, help) {
   EXAMPLE: dune exec ast-renderer \".a { color: red }\"\n",
   )
 | (Some(css), _) =>
-  switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, css)) {
+  switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~source_position_start, css)) {
   | Ok(declarations) =>
     print_endline(Styled_ppx_css_parser.Ast.show_rule_list(declarations))
   | Error((loc, msg)) =>
