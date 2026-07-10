@@ -3,94 +3,120 @@
 This document records the intended architecture for CSS parsing, validation,
 code generation, and static extraction in `styled-ppx`.
 
-It consolidates and supersedes the pipeline notes in
-`.cursor/rules/cx-pipeline.mdc` and `.cursor/rules/cx2-pipeline.mdc`.
-
 See also:
 
-- `documents/primitives.md` — shared glossary used in this document.
 - `documents/css-extraction.md` — wire protocol and aggregator for
-  the static-extraction family (`[%css]`, `[%styled.global]`,
-  `[%keyframe]`), including cross-module selector resolution
-  (sentinel format and aggregator behavior).
+  the static-extraction family (`[%css]`, `[%styled.<tag>]`,
+  `[%styled.global]`, `[%keyframe]`), including cross-module selector
+  resolution (sentinel format and aggregator behavior).
+- `documents/keyframe-static-extraction.md` — `[%keyframe]` extraction
+  in depth.
 - `documents/runtime-lowering-and-interpolation-identity.md` — migration
   design for property-centered runtime lowering and safer static
   interpolation identity.
 
 ## Status
 
-- Draft
-- Intended as the working design for the parser/css-grammar integration cleanup
+- Working design for the parser/css-grammar integration cleanup
+- Migration steps 1 and 2 are complete; step 3 is partially complete
+  (see "Three-Step Migration Plan" below)
 
 ## Current Pipeline
 
-### `[%cx]`
+### Extension surface
 
-1. The PPX parses CSS through `Styled_ppx_css_parser.Driver.parse_declaration_list`.
-2. `packages/parser` builds a stylesheet AST in `packages/parser/lib/Ast.re`.
-   Declaration values and at-rule preludes are currently represented as generic
-   `component_value_list` values.
-3. The PPX type-checks declarations in `packages/ppx/src/ppx.re` by rendering a
-   declaration value back into a string with
-   `Styled_ppx_css_parser.Render.component_value_list`.
-4. `packages/css-grammar` lexes and parses that string again in
-   `packages/css-grammar/lib/Rule.re` and `packages/css-grammar/lib/Parser.ml`.
-5. Runtime generation later slices the original source again with
-   `source_code_of_loc` in `packages/ppx/src/Css_to_runtime.re` and passes a
-   string into `packages/ppx/src/Property_to_runtime.re`.
-6. `Property_to_runtime` then parses the value again through generated property
-   parsers before producing `CSS.*` runtime expressions.
+The PPX exposes four live extension points, all statically extracting:
 
-The same declaration value can therefore be:
+| Extension           | Context      | Expansion entrypoint (`packages/ppx/src/ppx.re`) |
+| ------------------- | ------------ | ------------------------------------------------ |
+| `[%css]`            | expression   | `expand_css_expression`                          |
+| `[%keyframe]`       | expression   | `expand_keyframe_expression`                     |
+| `[%styled.<tag>]`   | module expr  | `expand_styled_module`                           |
+| `[%styled.global]`  | module expr  | `expand_global_module`                           |
 
-- tokenized by the stylesheet lexer
-- rendered back into a string
-- lexed again by `css-grammar`
-- parsed again for runtime generation
+There is no `[%cx]` and no separate runtime-only family. Apart from an
+error-only `[%styled]` stub registered through ppxlib's rule system,
+expansion is driven by the whole-structure `~impl` transformer
+(`map_ordered_structure`), which walks the CU in source order so that
+`Local_selector_environment` and `Css_bindings` observe bindings in
+lexical order.
+
+### Shared front end
+
+Every extension shares one parse-once front end:
+
+1. `Styled_ppx_css_parser.Driver.parse_declaration_list` builds a
+   stylesheet AST (`packages/parser/lib/Ast.re`). Declaration values and
+   at-rule preludes are represented as `component_value_list` values.
+2. `packages/ppx/src/Css_validation.re` type-checks declarations by
+   passing the AST value directly to `Css_grammar.validate_property`
+   (`packages/css-grammar/lib/Registry.ml`). No string round-trip:
+   `Render.component_value_list` is used only to build error messages.
+3. Interpolation types are read directly from the AST with
+   `Css_grammar.infer_interpolation_types`.
+4. Raw source slicing (`source_code_of_loc` in
+   `packages/ppx/src/Css_to_runtime.re`) survives only for error
+   messages and `unsafe` fallback strings; it is never the semantic
+   input to validation or lowering.
 
 ### `[%css]`
 
-`[%css]` shares the same front-end parser path, then diverges into static
+`[%css]` runs the shared front end, then diverges into static
 extraction:
 
 1. Parse declaration lists with `packages/parser`
 2. Type-check declarations against `packages/css-grammar`
-3. Atomize declarations in `packages/ppx/src/Css_file.re`
-4. Extract interpolation types with `Css_grammar.Parser.get_interpolation_types`
+3. Atomize declarations in `packages/ppx/src/Css_file.re` (`Css_file.push`)
+4. Lower value interpolation `$(expr)` to CSS custom properties,
+   collecting `dynamic_vars`
 5. Resolve class-name interpolation in selectors against the per-file
    `Local_selector_environment` so `$(name)` is
    replaced with the actual minted class names before the CSS AST is rendered
-6. Generate `CSS.make(...)` calls and emit `[@css ...]` attributes
+6. Generate `CSS.make(...)` calls (carrying the class names and the
+   dynamic vars) and record the extracted rules for the end-of-CU
+   `[@@@css ...]` attributes
 
 `Local_selector_environment` is populated as each `[%css]` extension expands:
-the enclosing `let`-binding name (from `Code_path.enclosing_value`) is mapped to
-the list of class names that atomization produced. Later `[%css]` blocks in the
-same file resolve `&.$(name)` and similar selector interpolations against that
-environment, fanning a multi-declaration source binding into a chained compound
-selector (`&.cssA.cssB`). Cross-module and unresolved references raise a clear
-PPX error rather than emitting a literal `$(...)` placeholder into the extracted
-CSS.
+the enclosing `let`-binding name (recovered by the ordered structure pass in
+`ppx.re`, which walks bindings in source order) is mapped to the list of class
+names that atomization produced. Later `[%css]` blocks in the same file resolve
+`&.$(name)` and similar selector interpolations against that environment,
+fanning a multi-declaration source binding into a chained compound selector
+(`&.cssA.cssB`). Unresolved local references (undefined or forward) raise a
+clear PPX error; cross-module references are recorded in `Cross_module_refs`
+and resolved by the aggregator (see `documents/css-extraction.md`).
 
-This path still depends on reparsing value strings when interpolation typing or
-property validation is needed.
+### `[%styled.<tag>]`
+
+`module Button = [%styled.button "..."]` runs the same extraction path as
+`[%css]` (`Css_file.push`, same atomization and interpolation lowering) and
+wraps the resulting `CSS.make` call in a generated React component for the
+given HTML tag (`Generate.staticComponent`). Function payloads
+(`[%styled.div (~color) => "color: $(color)"]`) also extract: the CSS string
+body is pushed through `Css_file.push` and the labeled arguments become
+component props feeding the dynamic vars
+(`Generate.dynamicExtractedComponent`). Non-string function bodies are
+rejected with a PPX error.
 
 ### `[%styled.global]`
 
-Shares the cx2 front-end (parsing + interpolation typing) and reuses
-`Css_file.transform_rule` for both value-interpolation and
+Shares the same front end (parsing + interpolation typing) and reuses
+`Css_file.Css_transform.transform_rule` for both value-interpolation and
 selector-interpolation walks. Differs from `[%css]` in two ways:
 
-- Registered as a **Module_expr-context** extension (`module Foo =
-  [%styled.global ...]`), not Expression. The Expression-context
-  registration exists only to fire a migration error for the legacy
-  `let () = [%styled.global ...]` shape.
+- Expanded in **module-expr position only** (`module Foo =
+  [%styled.global ...]`). It is not registered through ppxlib's
+  extension rules; the whole-structure `~impl` transformer matches
+  `Pmod_extension` nodes named `styled.global` directly
+  (`map_ordered_module_expr` in `ppx.re`). Uses in other positions are
+  left unexpanded (no dedicated migration diagnostic exists today).
 - Splits each interpolated rule into two complementary outputs:
-  the static rule with `var(--var-<hash>)` substituted in value
+  the static rule with `var(--<prefix>-<hash>)` substituted in value
   positions and resolved class chains substituted in selector
   positions (extracted via `Buffer.add_global_rule` like a static
   global) plus a generated module containing
   `to_string`/`makeProps`/`make` that emit a single
-  `:root { --var-<hash>: <value>; ... }` block at runtime to supply
+  `:root { --<prefix>-<hash>: <value>; ... }` block at runtime to supply
   the values. Selector interpolation has no runtime side; class
   names resolve fully at PPX time (same module) or aggregator time
   (cross-module).
@@ -111,15 +137,17 @@ module ThemeStyles = [%styled.global {|
 Expands to:
 
 ```ocaml
-[@@@css "body{color:var(--var-nkdt8w);margin:0;}"]
+[@@@css "body{color:var(--themeColor-1ppd0ds);margin:0;}"]
 let themeColor = CSS.red
 module ThemeStyles = struct
   let to_string () =
-    ":root{--var-nkdt8w:" ^ CSS.Types.Color.toString themeColor ^ ";}"
-  let makeProps ?key () = ()
+    ":root{--themeColor-1ppd0ds:" ^ CSS.Types.Color.toString themeColor ^ ";}"
+  let makeProps ?key () = Js.Obj.empty ()
   let make _props = CSS.global_style_tag (to_string ())
 end
 ```
+
+(Snapshot: `packages/ppx/test/snapshot/reason/reason-styled-global2-interpolation.t`.)
 
 The static rule extracts via the existing `[@@@css ...]` channel
 (see `css-extraction.md`). The generated `module ThemeStyles` is
@@ -129,8 +157,8 @@ the only new artifact.
 
 | Half    | Shape                                                                                | Where it lives                                                                  |
 | ------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
-| Static  | The user's rule, with `var(--var-<hash>)` in interpolation positions                 | Aggregated `styles.css` via `[@@@css ...]`                                      |
-| Dynamic | A single `:root { --var-<hash>: <value>; ... }` block, one declaration per value var | Generated module's `to_string`, mounted via `make`                              |
+| Static  | The user's rule, with `var(--<prefix>-<hash>)` in interpolation positions            | Aggregated `styles.css` via `[@@@css ...]`                                      |
+| Dynamic | A single `:root { --<prefix>-<hash>: <value>; ... }` block, one declaration per value var | Generated module's `to_string`, mounted via `make`                              |
 
 The dynamic side does **not** re-emit the user's selectors or
 non-interpolated declarations. Those live in the static stylesheet.
@@ -152,16 +180,17 @@ module Foo = [%styled.global {| ... |}]
   │
   ▼
 Css_file.push_global ~file rule_list:
+  reject parentless `&`; flatten nesting (Resolve.resolve_selectors)
   for each Style_rule / At_rule:
-    transform_rule ($(path) → var(--var-<hash>); collect dynamic_vars)
+    Css_transform.transform_rule ($(path) → var(--<prefix>-<hash>); collect dynamic_vars)
     render and push to Buffer.add_global_rule
   return dynamic_vars
   │
   ▼
 build module structure (in ppx.re):
   to_string  = Css_global_to_string.render_root_block(dynamic_vars)
-               (emits ":root{--var-h:<call expr>;...}" or "" if no vars)
-  makeProps  = (~key=?, ()) => ()
+               (emits ":root{--<prefix>-<hash>:<call expr>;...}" or "" if no vars)
+  makeProps  = (~key=?, ()) => Js.Obj.empty()
   make       = _props => CSS.global_style_tag(to_string())
   │
   ▼
@@ -181,7 +210,8 @@ Three items, always in this order:
   declaration per `dynamic_vars` entry. Module name from
   `Property_to_types.resolve_module_name`; call from
   `Property_to_types.make_to_string_call`.
-- **`makeProps : (?key: string, unit) -> unit`** — generated for JSX component compatibility.
+- **`makeProps`** — `(~key=?, ()) => Js.Obj.empty()`, generated for JSX
+  component compatibility.
 - **`make : unit -> React.element`** — always
   `_props => CSS.global_style_tag(to_string())`.
 
@@ -201,9 +231,17 @@ typed OCaml expressions are interpolated.
 
 #### Hashing
 
-`var-<murmur2(path_str)>`, inherited from `[%css]`. Keyed on the
-OCaml expression source. Same expression across blocks shares a var
-(harmless: same value either way).
+Custom-property names are `--<prefix>-<hash>` (e.g.
+`--themeColor-1ppd0ds`), minted in `packages/ppx/src/Hash_class.ml`.
+The prefix is a readable, CSS-identifier-safe rendering of the
+interpolation's source path (falling back to `var` when nothing
+identifier-like survives); it is purely cosmetic. The murmur2 hash owns
+uniqueness and covers the scoped namespace
+(`Hash_class.scoped_namespace`: kind, module name, submodule scope,
+rendered rules), the expression path, and the resolved runtime type, so
+the same expression interpolated at two different target types gets two
+distinct variables. Names derive only from source, so dev and prod
+builds agree.
 
 #### Selector interpolation
 
@@ -289,7 +327,9 @@ module ThemeStyles = [%styled.global {|
 | Top-level `Declaration` (e.g. `margin: 0` outside a selector)             | `Pmod_extension` with the universal-selector hint.                                                                                        |
 | Parse error from `Driver.parse_declaration_list`                          | `Pmod_extension` carrying the parser's location and message.                                                                              |
 | Non-string payload                                                        | `Pmod_extension` pointing at the payload, with the correct-form example.                                                                  |
-| Legacy `let () =` shape                                                   | `Error.expr` diagnostic from the Expression-context extension.                                                                            |
+| Interpolation inside `url(...)`                                           | `raise_errorf`: browsers don't substitute `var()` inside `url()`.                                                                          |
+| Interpolation in an at-rule prelude (e.g. `@media (max-width: $(bp))`)   | `raise_errorf` pointing at the interpolation.                                                                                             |
+| Parentless `&` (top level, or under an at-rule with no style rule above)  | `raise_errorf`: `&` has no parent selector to resolve against.                                                                            |
 | Selector interp `$(name)` references undefined or forward local binding   | `raise_errorf` from `Local_selector_environment.resolve_selector_class_ref` pointing at the interpolation.                                                  |
 | Bare `$(name)` (no `.` prefix) resolves to multiple classes               | `raise_errorf` instructing the user to switch to `.$(name)` for chain semantics.                                                          |
 | Cross-module `$(M.x)` where `M.x` doesn't exist at link time              | `Unbound module` / `Unbound value` from OCaml typechecker via the synthetic `let _ = M.x`; aggregator also reports a missing-binding error using the location stored in `[@@@css.refs ...]`. |
@@ -298,8 +338,8 @@ module ThemeStyles = [%styled.global {|
 
 | File                                            | Role                                                                                                                                                                                                                                |
 | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `packages/ppx/src/ppx.re`                       | Two extensions: Module_expr-context (does the work) and Expression-context (migration error).                                                                                                                                       |
-| `packages/ppx/src/Css_file.re`                  | `push_global ~file rule_list` returns the list of `dynamic_vars` collected across all rules; pushes the static rules (with `var(--var-<hash>)` already substituted) into the global buffer.                                         |
+| `packages/ppx/src/ppx.re`                       | `map_ordered_module_expr` matches `Pmod_extension` nodes named `styled.global`; `expand_global_module` does the work.                                                                                                              |
+| `packages/ppx/src/Css_file.re`                  | `push_global ~file rule_list` returns the list of `dynamic_vars` collected across all rules; pushes the static rules (with `var(--<prefix>-<hash>)` already substituted) into the global buffer. Also hosts the `Css_transform` submodule doing the interpolation walks. |
 | `packages/ppx/src/Local_selector_environment.re` | Per-CU selector environment used by `[%css]` and `[%styled.global]` for same-file selector interpolation, module aliases, opens/includes, and cross-module fallback.                                                               |
 | `packages/ppx/src/Css_global_to_string.re`      | `render_root_block ~loc dynamic_vars` builds the `to_string` body: a single `:root { ... }` rule with one declaration per entry, or `""` when `dynamic_vars` is empty.                                                              |
 | `packages/runtime/{native,melange}/CSS.ml`      | `CSS.global_style_tag : string -> React.element`.                                                                                                                                                                                   |
@@ -310,18 +350,20 @@ module ThemeStyles = [%styled.global {|
   CSS rule already; the aggregator needs nothing else.
 - **No target branching in the PPX.** Same module on every target;
   both runtimes provide `CSS.global_style_tag`.
-- **No backward-compat for the legacy shape.** Hard error on
-  `let () = [%styled.global ...]`.
+- **No expression-context registration.** `[%styled.global]` only means
+  something as a module expression; other positions are left
+  unexpanded rather than given a dedicated migration diagnostic.
 - **No labeled-arg synthesis on `make`.** In-scope capture matches
   `[%css]`.
 - **No `--*` typing fix.** Pre-existing gap, separate change.
 - **No `CSS.global` from inside `make`.** That would route through
-  the runtime stylesheet, defeating the `*2` family's contract.
+  the runtime stylesheet, defeating the static-extraction contract.
 
 ### `[%keyframe]`
 
-Shares the cx2 front-end and extracts `@keyframes` blocks named by
-content hash. Value interpolation in keyframe declarations is lowered to
+Shares the same front end and extracts `@keyframes` blocks named by
+content hash (`keyframe-<murmur2(body)>`, via `Css_file.push_keyframe`).
+Value interpolation in keyframe declarations is lowered to
 CSS custom properties in the extracted `@keyframes` rule, while the generated
 `AnimationName.t` carries the runtime custom-property bindings that
 `animation-name` and supported leading-name `animation` shorthand interpolation
@@ -338,8 +380,9 @@ The redesign should move the pipeline toward three explicit goals:
 3. Co-locate property grammar, typed AST, and printing so parse/print share one
    source of truth.
 
-`documents/current-design.md` remains the descriptive snapshot of the current
-pipeline. This document describes the intended direction from that baseline.
+The "Current Pipeline" section above is the descriptive snapshot of the
+current pipeline. The rest of this document describes the intended direction
+from that baseline.
 
 ## Three-Step Migration Plan
 
@@ -404,14 +447,15 @@ Completed in the current branch with these concrete outcomes:
 - `packages/css-grammar/lib/Css_value_types.re`, `Modifier.re`, and
   `Combinators.re` now run on the AST-native rule substrate.
 - `packages/css-grammar/ppx/Generate.re` and generated `[%spec_module]` modules
-  now emit AST-native rules and `parse_component_values` entrypoints, while
-  keeping `parse` as a compatibility wrapper outside `Rule.re`.
-- `packages/css-grammar/lib/Parser.ml` now exposes AST-based entrypoints for
-  property validation, interpolation extraction, generic parsing, and at-rule
-  prelude parsing.
-- PPX type checking in `packages/ppx/src/ppx.re` now validates declarations
-  directly from parser AST values.
-- cx2 interpolation extraction in `packages/ppx/src/Css_file.re` now reads
+  now emit AST-native rules with `type_check`, `infer_interpolation_types`
+  (plus `_with_context`), and `runtime_module_path` entrypoints.
+- The old central `packages/css-grammar/lib/Parser.ml` has been dissolved;
+  `packages/css-grammar/lib/Registry.ml` now exposes the AST-based
+  entrypoints (`validate_property`, `infer_interpolation_types`,
+  `type_check`), re-exported through the `Css_grammar.re` facade.
+- PPX type checking (`packages/ppx/src/Css_validation.re`, called from
+  `ppx.re`) now validates declarations directly from parser AST values.
+- Interpolation extraction in `packages/ppx/src/Css_file.re` now reads
   interpolation types directly from `component_value_list`.
 - Runtime lowering in `packages/ppx/src/Property_to_runtime.re` now parses typed
   property values from `component_value_list` instead of reparsing declaration
@@ -421,19 +465,19 @@ Completed in the current branch with these concrete outcomes:
 
 Compatibility note:
 
-- String-based css-grammar entrypoints still exist as compatibility wrappers for
-  tests and older callers, but they parse to parser AST outside `Rule.re` before
-  invoking the grammar.
+- No string-based entrypoints remain in the css-grammar library; test suites
+  that want to feed strings parse to parser AST themselves via the parser
+  Driver before invoking the grammar.
 - Raw source slicing is still used in `Css_to_runtime` when emitting unsafe
   fallback strings and preserving user-authored formatting, but that source is
   now passed explicitly through PPX/runtime call sites rather than coming from a
   global parser buffer. It is no longer the semantic input to css-grammar
   validation or typed runtime lowering.
 
-### Step 3 - Split css-grammar and runtime by property modules
+### Step 3 - Split css-grammar and runtime by property modules (Partially done)
 
-Replace the giant central `packages/css-grammar/lib/Parser.ml` file with a
-property-centered module layout.
+Replace the giant central css-grammar parser file with a property-centered
+module layout.
 
 - Introduce a folder structure where each property or shared value family owns
   its `[%spec_module]`, typed value definition, interpolation extraction, and
@@ -447,6 +491,19 @@ property-centered module layout.
 
 The end state should be that changing one property mostly touches one local
 module, not a giant registry file plus a separate runtime types file.
+
+Status:
+
+- **Done:** the css-grammar side of the split. The central parser file is
+  gone; `packages/css-grammar/lib/Properties/` holds ~163 per-property
+  modules, each owning its `[%spec_module]` declarations, with
+  `Registry.ml` as the dispatch layer and `Css_grammar.re` as the facade.
+  (Caveat: `Types.ml` and `Shared.ml` inside css-grammar are still large
+  shared files.)
+- **Not done:** the runtime side. `packages/runtime/native/shared/Css_types.ml`
+  is still a single ~10k-line source of truth that the property modules
+  reference into (`(module Css_types.Color)`), the reverse of the facade
+  direction proposed above.
 
 ## Testing And Compatibility Requirements
 

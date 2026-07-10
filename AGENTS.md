@@ -22,23 +22,23 @@ The project consists of three main components:
 - If the user requests a “review”, switch to code-review tone: findings first, severity ordered, cite files/lines, then residual risks.
 
 ## Testing & Quality Assurance
-- Consult `testing.mdc` (see workspace testing rules) for the authoritative testing matrix and command catalogue.
-- Typical commands (run with the project dune path):
-  - Unit/expect tests: `/Users/davesnx/Code/github/davesnx/styled-ppx/_opam/bin/dune test`
-  - PPX snapshots: relevant dune aliases exist per package; confirm via `dune --help` or `dune describe`.
+- Consult `documents/testing.md` for the authoritative testing matrix and command catalogue.
+- Typical commands (use the local switch, `_opam/bin/dune`):
+  - Everything: `make test` (or `_opam/bin/dune test`).
+  - Per package: `make test-<package>` targets with `-watch`/`-promote` variants; see `documents/testing.md`.
 - When tests are skipped (time, platform, or request), call out the gap and suggest how the user can validate.
 - Record observed failures with enough context (command, exit code, snippet of output) for reproducibility.
 
 ## Architecture Orientation
 - **Parser & Type Checker** (`packages/parser`, `packages/css-grammar`): builds the CSS AST, validates properties via generated combinators (`[%spec ...]`), and produces rich error messages for invalid CSS.
-- **PPX Transformer** (`packages/ppx/src/ppx.re`): exposes interfaces like `[%styled.tag]`, `[%cx]`, `[%css]`, `[%css]`, and `[%keyframes]`; orchestrates parsing, validation, and code generation.
+- **PPX Transformer** (`packages/ppx/src/ppx.re`): exposes `[%css]`, `[%styled.<tag>]`, `[%styled.global]`, and `[%keyframe]`; orchestrates parsing, validation, and code generation.
 - **Property → Runtime Bridge** (`packages/ppx/src/Property_to_runtime.re`): maps validated properties to runtime constructors, preserves interpolations, and decides extraction vs runtime emission.
 - **Runtimes** (`packages/runtime/native`, `.../melange`, `.../rescript`): emit CSS for native servers, JS environments, and ReScript compatibility. Shared types live in `packages/runtime/native/shared/Css_types.ml`.
-- **Extraction Pipeline**: `[%css]` is the only statically extracted path today; it generates CSS assets during compilation for zero runtime overhead.
+- **Extraction Pipeline**: all live extensions (`[%css]`, `[%styled.<tag>]`, `[%styled.global]`, `[%keyframe]`) are statically extracted; the PPX emits `[@@@css ...]` attributes that the `styled-ppx.generate` aggregator collects into CSS assets during compilation for zero runtime overhead.
 
 ## Reference Documents
 - Consult `documents/design.md` before making structural changes across `packages/parser`, `packages/css-grammar`, `packages/ppx`, or the runtime pipeline.
-- Consult `documents/primitives.md` for the shared glossary and preferred terminology used by humans and agents in architecture discussions.
+- Consult `documents/css-extraction.md` for the extraction wire protocol (`[@@@css ...]`, `[@@@css.bindings ...]`, `[@@@css.refs ...]`) and the aggregator.
 
 ## Troubleshooting Tips
 - Regenerate snapshots via the appropriate dune alias if expect tests fail after legitimate changes.
