@@ -909,26 +909,6 @@ let getLabeledArgs = (label, defaultValue, param, expr) => {
   getArgs(expr, [firstArg]);
 };
 
-let getLastSequence = expr => {
-  let rec inner = expr =>
-    switch (expr.pexp_desc) {
-    | Pexp_sequence(_, sequence) => inner(sequence)
-    | _ => expr
-    };
-
-  inner(expr);
-};
-
-let getLastExpression = expr => {
-  let rec inner = expr =>
-    switch (expr.pexp_desc) {
-    | Pexp_let(_, _, expression) => inner(expression)
-    | _ => expr
-    };
-
-  inner(expr);
-};
-
 let styleVariableName = "styles";
 
 let propsTypeDeclarations = (~loc, customProps) =>
@@ -1051,77 +1031,6 @@ let validationErrorExpr = (~loc, ~base_loc, ~description, errors) => {
   };
 };
 
-let dynamicStyles = (~loc, ~moduleName, ~functionExpr, ~labeledArguments) => {
-  let styles =
-    switch (functionExpr.pexp_desc) {
-    /* styled.div () => "string" */
-    | Pexp_constant(Pconst_string(str, loc, delimiter)) =>
-      let loc =
-        Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-          loc,
-          delimiter,
-        );
-
-      switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, str)) {
-      | Ok(declarations) =>
-        declarations
-        |> Css_to_runtime.render_declarations(~loc, ~source=str)
-        |> Css_to_runtime.addLabel(~loc, moduleName)
-        |> Builder.pexp_array(~loc)
-        |> Css_to_runtime.render_style_call(~loc)
-      | Error((loc, msg)) => Error.expr(~loc, msg)
-      };
-
-    /* styled.div () => "[||]" */
-    | Pexp_array(arr) =>
-      arr
-      |> List.rev
-      |> Css_to_runtime.addLabel(~loc, moduleName)
-      |> Builder.pexp_array(~loc)
-      |> Css_to_runtime.render_style_call(~loc)
-
-    /* styled.div () => {
-         ...
-         ...
-         ...
-       } */
-    | Pexp_sequence(expr, sequence) =>
-      /* Generate a new sequence where the last expression is
-         wrapped in render_style_call and render the other expressions. */
-      let styles =
-        sequence |> getLastSequence |> Css_to_runtime.render_style_call(~loc);
-      Builder.pexp_sequence(~loc, expr, styles);
-
-    /* styled.div () => {
-         let styles = sharedStyles
-         styles
-       } */
-    | Pexp_let(Nonrecursive, value_binding, expression) =>
-      /* Generate a new `let in` where the last expression is
-         wrapped in render_style_call */
-      let styles =
-        expression
-        |> getLastExpression
-        |> Css_to_runtime.render_style_call(~loc);
-      Builder.pexp_let(~loc, Nonrecursive, value_binding, styles);
-
-    /* styled.div () => { styles } */
-    | Pexp_ident(ident) =>
-      Builder.pexp_ident(~loc, ident)
-      |> Css_to_runtime.render_style_call(~loc)
-    /* TODO: With this default case we support all expressions here.
-       Users might find this confusing, we could give some warnings before the type-checker does. */
-    | _ => functionExpr
-    };
-
-  dynamicStylesDecl(
-    ~loc,
-    ~name=styleVariableName,
-    ~args=labeledArguments,
-    ~expr=styles,
-  );
-};
-
 let stylesCall = (~loc, ~labeledArguments) => {
   /* native: (~arg1, ~arg2, ...) */
   /* client: (~arg1=props.arg1, ~arg2=props.arg2, ...) */
@@ -1190,74 +1099,6 @@ let hasUntypedDefault = labeledArguments =>
   |> List.exists(((_, defaultValue, _, _, _, type_)) =>
        Option.is_some(defaultValue) && Option.is_none(type_)
      );
-
-let dynamicComponentCodegenSteps =
-    (~loc, ~htmlTag, ~moduleName, ~functionExpr, ~labeledArguments) => {
-  let (propsGenericParams, propGenericFields) =
-    customPropsFromLabeledArguments(~loc, labeledArguments);
-
-  (
-    if (Settings.Get.native()) {
-      [
-        makeProps(~loc, Some((propsGenericParams, propGenericFields))),
-        defineGetOrEmptyFn(~loc),
-        dynamicStyles(~loc, ~moduleName, ~functionExpr, ~labeledArguments),
-      ];
-    } else {
-      [
-        makeProps(~loc, Some((propsGenericParams, propGenericFields))),
-        defineMakePropsFn(
-          ~loc,
-          ~makePropTypes=propsGenericParams,
-          ~customProps=propGenericFields,
-        ),
-        bindingCreateVariadicElement(~loc),
-        defineMakeStylesObject(~loc),
-      ]
-      @ defineGetterFns(
-          ~loc,
-          ~makePropTypes=propsGenericParams,
-          ~customProps=propGenericFields,
-        )
-      @ [
-        defineDeletePropFn(~loc),
-        defineGetOrEmptyFn(~loc),
-        defineAssign2(~loc, ~makePropTypes=propsGenericParams),
-        dynamicStyles(~loc, ~moduleName, ~functionExpr, ~labeledArguments),
-      ];
-    }
-  )
-  @ component(
-      ~loc,
-      ~htmlTag,
-      ~className=stylesCall(~loc, ~labeledArguments),
-      ~makePropTypes=propsGenericParams,
-      ~labeledArguments,
-    );
-};
-
-let dynamicComponent =
-    (~loc, ~htmlTag, ~label, ~moduleName, ~defaultValue, ~param, ~body) => {
-  let (functionExpr, labeledArguments) =
-    getLabeledArgs(label, defaultValue, param, body);
-  let customProps =
-    Some(customPropsFromLabeledArguments(~loc, labeledArguments));
-
-  let implementation =
-    Builder.pmod_structure(
-      ~loc,
-      dynamicComponentCodegenSteps(
-        ~loc,
-        ~htmlTag,
-        ~moduleName,
-        ~functionExpr,
-        ~labeledArguments,
-      ),
-    );
-
-  hasUntypedDefault(labeledArguments)
-    ? implementation : constrainPublicApi(~loc, ~customProps, implementation);
-};
 
 let extractedDynamicStyles =
     (

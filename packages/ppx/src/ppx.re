@@ -124,80 +124,6 @@ let html_tags = [
   "wbr",
 ];
 
-let make_styled_extension = htmlTag => {
-  Ppxlib.(
-    Context_free.Rule.extension(
-      Extension.V3.declare(
-        "styled." ++ htmlTag,
-        Extension.Context.Module_expr,
-        Ppxlib.Ast_pattern.(single_expr_payload(__)),
-        (~ctxt, payload) => {
-          let code_path = Expansion_context.Extension.code_path(ctxt);
-          let moduleName = Code_path.enclosing_module(code_path);
-          File.set(Code_path.file_path(code_path));
-
-          switch (payload.pexp_desc) {
-          | Pexp_constant(Pconst_string(str, stringLoc, delimiter)) =>
-            let loc =
-              Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-                stringLoc,
-                delimiter,
-              );
-            let styles =
-              switch (
-                Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, str)
-              ) {
-              | Ok(declarations) =>
-                declarations
-                |> Css_to_runtime.render_declarations(~loc, ~source=str)
-                |> Css_to_runtime.addLabel(~loc, moduleName)
-                |> Builder.pexp_array(~loc)
-                |> Css_to_runtime.render_style_call(~loc)
-              | Error((loc, msg)) => Error.expr(~loc, msg)
-              };
-            Generate.staticComponent(~loc, ~htmlTag, styles);
-
-          | Pexp_array(arr) =>
-            let styles =
-              arr
-              |> Css_to_runtime.addLabel(~loc=payload.pexp_loc, moduleName)
-              |> Builder.pexp_array(~loc=payload.pexp_loc)
-              |> Css_to_runtime.render_style_call(~loc=payload.pexp_loc);
-            Generate.staticComponent(~loc=payload.pexp_loc, ~htmlTag, styles);
-
-          | Pexp_function(
-              [
-                { pparam_desc: Pparam_val(fnLabel, defaultValue, param), _ },
-              ],
-              _,
-              Pfunction_body(expression),
-            ) =>
-            Generate.dynamicComponent(
-              ~loc=payload.pexp_loc,
-              ~htmlTag,
-              ~label=fnLabel,
-              ~moduleName,
-              ~defaultValue,
-              ~param,
-              ~body=expression,
-            )
-
-          | _ =>
-            Error.raise(
-              ~loc=payload.pexp_loc,
-              ~examples=["[%styled." ++ htmlTag ++ " \"color: red\"]"],
-              ~link="https://styled-ppx.vercel.app/reference/styled",
-              "[%styled."
-              ++ htmlTag
-              ++ "] expects a string of CSS, an array of CSS rules, or a function returning CSS.",
-            )
-          };
-        },
-      ),
-    )
-  );
-};
-
 let make_refs_attribute = (entries: list(Cross_module_refs.entry)) =>
   entries
   |> List.map((entry: Cross_module_refs.entry) =>
@@ -343,7 +269,7 @@ let expand_css_expression =
                  Styled_ppx_css_parser.Parser_location.adjust_to_file(
                    ~relative_loc=error_loc,
                    ~base_loc=loc,
-                 );
+                   );
                (adjusted_loc, error_to_string(error));
              });
         switch (error_messages) {
@@ -430,7 +356,7 @@ let expand_global_module = (~file, ~main_module, ~scope, ~opens, payload) => {
                    Styled_ppx_css_parser.Parser_location.adjust_to_file(
                      ~relative_loc=error_loc,
                      ~base_loc=loc,
-                   );
+                     );
                  (adjusted_loc, error_to_string(error));
                });
           switch (error_messages) {
@@ -597,7 +523,7 @@ let expand_styled_module =
                  Styled_ppx_css_parser.Parser_location.adjust_to_file(
                    ~relative_loc=error_loc,
                    ~base_loc=loc,
-                 );
+                   );
                (adjusted_loc, error_to_string(error));
              });
         switch (error_messages) {
