@@ -36,7 +36,7 @@ async function build(entryPoints, { output, env }) {
 			outfile: output,
 			platform: "browser",
 			format: "esm",
-			logLevel: "info",
+			logLevel: "silent",
 			treeShaking: !isDev,
 			minify: !isDev,
 			define: {

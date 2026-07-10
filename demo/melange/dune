@@ -13,6 +13,15 @@
 
 (subdir
  public
+ ; Generate the promoted demo stylesheet from PPX output produced by the
+ ; melange/print build targets.
+ (rule
+  (mode promote)
+  (target styles.css)
+  (deps
+   (glob_files_rec ../client.re.pp.ml))
+  (action
+   (run styled-ppx.generate --output %{target} --log info %{deps})))
  ; Bundle the Melange client output into `public/main.js` with esbuild,
  ; run as part of the dune build (mirrors server-reason-react's demo).
  (rule
@@ -25,16 +34,7 @@
    (source_tree ../node_modules)
    (file ../package.json))
   (action
-   (run node %{script} %{entry} --output %{target} --env development)))
- ; Generate the promoted demo stylesheet from PPX output produced by the
- ; melange/print build targets.
- (rule
-  (target styles.css)
-  (mode promote)
-  (deps
-   (glob_files_rec ../**.pp.ml))
-  (action
-   (run styled-ppx.generate --output %{target} %{deps}))))
+   (run node %{script} %{entry} --output %{target} --env development))))
 
 (executable
  ; Prints the App component markup to stdout
