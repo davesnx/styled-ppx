@@ -22,7 +22,7 @@ as an external path unless another enclosing `Css` module exists.
       ("Input.Css.wrapper", "css-59bkuc-wrapper"),
     ]
   ];
-  [@css.refs [("Css.marker", "input.re", 2, 8, 18)]];
+  [@css.refs [("Css.marker", "input.re", 5, 8, 18)]];
   
   let _ = Css.marker;
   module Css = {
@@ -34,8 +34,8 @@ as an external path unless another enclosing `Css` module exists.
   let _ = (Css.marker, Css.wrapper);
 
   $ dune build
-  File "input.re", line 2, characters 8-18:
-  2 | ........s = {
-  2 |   le....................................
+  File "input.re", line 5, characters 8-18:
+  5 |     &.$(Css.marker) { color: blue; }
+              ^^^^^^^^^^
   Error: Unbound module Css
   [1]

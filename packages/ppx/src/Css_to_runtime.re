@@ -44,22 +44,24 @@ let animation_name_to_style_vars = (~loc) =>
     },
   );
 
-let is_animation_name_var = ((_, _, var_type: Css_file.var_type)) =>
-  switch (var_type) {
+let is_animation_name_var = (var: Css_file.dynamic_var) =>
+  switch (var.var_type) {
   | RuntimeModule("AnimationName") => true
   | _ => false
   };
 
-let render_dynamic_var_tuple =
-    (~loc, (var_name, original_path, var_type: Css_file.var_type)) => {
-  let field_name = "--" ++ var_name;
+/* The interpolated expression is re-parsed from its source and rebased onto
+   [var.loc] (the file location of the `$( ... )` payload), so type errors on
+   the interpolation point at the variable, not at the CSS string. */
+let render_dynamic_var_tuple = (~loc, var: Css_file.dynamic_var) => {
+  let field_name = "--" ++ var.name;
   let field_name_expr =
     Helper.Exp.constant(~loc, Pconst_string(field_name, loc, None));
 
-  let var_value = render_variable(~loc, original_path);
+  let var_value = render_variable(~loc=var.loc, var.path);
 
   let field_value =
-    switch (var_type) {
+    switch (var.var_type) {
     | Selector
     | MediaQuery => [%expr fst([%e var_value])]
     | CustomProperty =>
@@ -74,14 +76,13 @@ let render_dynamic_var_tuple =
   Builder.pexp_tuple(~loc, [field_name_expr, field_value]);
 };
 
-let render_dynamic_var_chunk =
-    (~loc, (var_name, original_path, var_type: Css_file.var_type)) => {
-  switch (var_type) {
+let render_dynamic_var_chunk = (~loc, var: Css_file.dynamic_var) => {
+  switch (var.var_type) {
   | RuntimeModule("AnimationName") =>
-    let field_name = "--" ++ var_name;
+    let field_name = "--" ++ var.name;
     let field_name_expr =
       Helper.Exp.constant(~loc, Pconst_string(field_name, loc, None));
-    let var_value = render_variable(~loc, original_path);
+    let var_value = render_variable(~loc=var.loc, var.path);
     Helper.Exp.apply(
       ~loc,
       animation_name_to_style_vars(~loc),
@@ -90,11 +91,7 @@ let render_dynamic_var_chunk =
   | Selector
   | MediaQuery
   | CustomProperty
-  | RuntimeModule(_) =>
-    Builder.elist(
-      ~loc,
-      [render_dynamic_var_tuple(~loc, (var_name, original_path, var_type))],
-    )
+  | RuntimeModule(_) => Builder.elist(~loc, [render_dynamic_var_tuple(~loc, var)])
   };
 };
 

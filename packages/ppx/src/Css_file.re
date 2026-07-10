@@ -11,6 +11,14 @@ type var_type =
   | CustomProperty
   | RuntimeModule(string);
 
+/* A `$(expr)` value interpolation hoisted to a CSS custom property. */
+type dynamic_var = {
+  name: string, /* hashed custom-property name, without the leading `--` */
+  path: string, /* interpolated OCaml expression source, e.g. "Theme.color" */
+  var_type,
+  loc: Ppxlib.Location.t, /* file location of the `$( ... )` payload */
+};
+
 let render_rule = Styled_ppx_css_parser.Render.rule;
 let render_prefixed_rule = Css_autoprefixer.render_rule;
 let render_declaration = Styled_ppx_css_parser.Render.declaration;
@@ -100,16 +108,32 @@ module Css_transform = {
     loop([], items);
   };
 
-  let add_dynamic_var = (dynamic_vars, dynamic_var) => {
-    let (var_name, _, _) = dynamic_var;
+  /* Everything the transform walk threads unchanged through every node:
+     resolution inputs (file/scope/opens), the payload's file location for
+     rebasing payload-relative AST locations, and the accumulator for
+     hoisted interpolations. */
+  type ctx = {
+    file: string,
+    scope: list(string),
+    opens: list(list(string)),
+    base_loc: Ppxlib.Location.t,
+    dynamic_vars: ref(list(dynamic_var)),
+  };
+
+  let to_file_loc = (ctx, relative_loc) =>
+    Styled_ppx_css_parser.Parser_location.adjust_to_file(
+      ~relative_loc,
+      ~base_loc=ctx.base_loc,
+    );
+
+  let add_dynamic_var = (ctx, dynamic_var: dynamic_var) =>
     if (!
           List.exists(
-            ((existing_var_name, _, _)) => existing_var_name == var_name,
-            dynamic_vars^,
+            (existing: dynamic_var) => existing.name == dynamic_var.name,
+            ctx.dynamic_vars^,
           )) {
-      dynamic_vars := [dynamic_var, ...dynamic_vars^];
+      ctx.dynamic_vars := [dynamic_var, ...ctx.dynamic_vars^];
     };
-  };
 
   /* Detect a `$(name)` interpolation anywhere in a component-value list,
      recursing into `Paren_block`, `Bracket_block`, and `Function` bodies.
@@ -259,29 +283,27 @@ module Css_transform = {
 
   let rec transform_component_value =
           (
-            ~file: string,
-            ~scope: list(string),
-            ~opens: list(list(string)),
+            ctx,
             cv: component_value,
-            dynamic_vars: ref(list((string, string, var_type))),
             get_var_binding: string => (string, var_type),
           )
           : component_value => {
     let recurse = ((v, loc)) => (
-      transform_component_value(
-        ~file,
-        ~scope,
-        ~opens,
-        v,
-        dynamic_vars,
-        get_var_binding,
-      ),
+      transform_component_value(ctx, v, get_var_binding),
       loc,
     );
     switch (cv) {
-    | Variable(path_str, _loc) =>
+    | Variable(path_str, var_loc) =>
       let (var_name, var_type) = get_var_binding(path_str);
-      add_dynamic_var(dynamic_vars, (var_name, path_str, var_type));
+      add_dynamic_var(
+        ctx,
+        {
+          name: var_name,
+          path: path_str,
+          var_type,
+          loc: to_file_loc(ctx, var_loc),
+        },
+      );
 
       Function({
         name: ("var", Ppxlib.Location.none),
@@ -315,7 +337,7 @@ module Css_transform = {
       switch (interp_loc) {
       | Some(loc) =>
         Ppxlib.Location.raise_errorf(
-          ~loc,
+          ~loc=to_file_loc(ctx, loc),
           "Interpolation inside `url(...)` is not supported: browsers don't substitute `var()` there.\n- Inline the URL: `url(\"/path/to/asset\")`.\n- Or interpolate the whole value: `src: $(font_src)`.",
         )
       | None =>
@@ -333,76 +355,38 @@ module Css_transform = {
     | Paren_block(values) => Paren_block(List.map(recurse, values))
     | Bracket_block(values) => Bracket_block(List.map(recurse, values))
     | Selector(selector_list) =>
-      let recurse_sel = ((sel, loc)) => (
-        transform_selector(~file, ~scope, ~opens, sel, dynamic_vars),
-        loc,
-      );
+      let recurse_sel = ((sel, loc)) => (transform_selector(ctx, sel), loc);
       Selector(List.map(recurse_sel, selector_list));
     | _ => cv
     };
   }
 
-  and transform_selector =
-      (~file, ~scope, ~opens, sel: selector, dynamic_vars) => {
+  and transform_selector = (ctx, sel: selector) => {
     switch (sel) {
     | SimpleSelector(simple) =>
-      transform_simple_selector_to_selector(
-        ~file,
-        ~scope,
-        ~opens,
-        simple,
-        dynamic_vars,
-      )
+      transform_simple_selector_to_selector(ctx, simple)
     | ComplexSelector(complex) =>
-      ComplexSelector(
-        transform_complex_selector(
-          ~file,
-          ~scope,
-          ~opens,
-          complex,
-          dynamic_vars,
-        ),
-      )
+      ComplexSelector(transform_complex_selector(ctx, complex))
     | CompoundSelector(compound) =>
-      CompoundSelector(
-        transform_compound_selector(
-          ~file,
-          ~scope,
-          ~opens,
-          compound,
-          dynamic_vars,
-        ),
-      )
+      CompoundSelector(transform_compound_selector(ctx, compound))
     | RelativeSelector(relative) =>
       RelativeSelector({
         ...relative,
         complex_selector:
-          transform_complex_selector(
-            ~file,
-            ~scope,
-            ~opens,
-            relative.complex_selector,
-            dynamic_vars,
-          ),
+          transform_complex_selector(ctx, relative.complex_selector),
       })
     };
   }
 
-  and transform_complex_selector =
-      (~file, ~scope, ~opens, complex: complex_selector, dynamic_vars) => {
+  and transform_complex_selector = (ctx, complex: complex_selector) => {
     switch (complex) {
-    | Selector(sel) =>
-      Selector(transform_selector(~file, ~scope, ~opens, sel, dynamic_vars))
+    | Selector(sel) => Selector(transform_selector(ctx, sel))
     | Combinator({ left, right }) =>
       Combinator({
-        left: transform_selector(~file, ~scope, ~opens, left, dynamic_vars),
+        left: transform_selector(ctx, left),
         right:
           List.map(
-            ((combinator, sel)) =>
-              (
-                combinator,
-                transform_selector(~file, ~scope, ~opens, sel, dynamic_vars),
-              ),
+            ((combinator, sel)) => (combinator, transform_selector(ctx, sel)),
             right,
           ),
       })
@@ -415,42 +399,20 @@ module Css_transform = {
      bindings expand to a compound chain (`&.cssA.cssB`) which matches the
      "AND" semantics: every consumer of the referenced binding has all of
      its atomized classes applied to the same element. */
-  and transform_compound_selector =
-      (~file, ~scope, ~opens, compound: compound_selector, dynamic_vars) => {
+  and transform_compound_selector = (ctx, compound: compound_selector) => {
     let transformed_type_selector =
       Option.map(
-        simple =>
-          transform_simple_selector(
-            ~file,
-            ~scope,
-            ~opens,
-            simple,
-            dynamic_vars,
-          ),
+        simple => transform_simple_selector(ctx, simple),
         compound.type_selector,
       );
     let transformed_subclasses =
       compound.subclass_selectors
       |> List.concat_map(subclass =>
-           transform_subclass_selector_to_list(
-             ~file,
-             ~scope,
-             ~opens,
-             subclass,
-             dynamic_vars,
-           )
+           transform_subclass_selector_to_list(ctx, subclass)
          );
     let transformed_pseudos =
       compound.pseudo_selectors
-      |> List.map(pseudo =>
-           transform_pseudo_selector(
-             ~file,
-             ~scope,
-             ~opens,
-             pseudo,
-             dynamic_vars,
-           )
-         );
+      |> List.map(pseudo => transform_pseudo_selector(ctx, pseudo));
     {
       type_selector: transformed_type_selector,
       subclass_selectors: transformed_subclasses,
@@ -461,11 +423,11 @@ module Css_transform = {
   /* Rewrite a `simple_selector` in compound-internal position (slotted
      into `type_selector`). The selector-wrapping variant below is
      `transform_simple_selector_to_selector`. */
-  and transform_simple_selector =
-      (~file, ~scope, ~opens, simple: simple_selector, _dynamic_vars)
+  and transform_simple_selector = (ctx, simple: simple_selector)
       : simple_selector => {
     switch (simple) {
     | Variable(path_str, var_loc) =>
+      let var_loc = to_file_loc(ctx, var_loc);
       /* Bare `$(name)` (no `.` prefix) in selector position. We treat it
          like an implicit class reference and resolve to the first minted
          className as a `Type` selector if there's exactly one; otherwise
@@ -476,9 +438,9 @@ module Css_transform = {
          `type_selector` slot, never in `subclass_selectors`. */
       let resolved =
         Local_selector_environment.resolve_selector_class_ref(
-          ~file,
-          ~scope,
-          ~opens,
+          ~file=ctx.file,
+          ~scope=ctx.scope,
+          ~opens=ctx.opens,
           ~loc=var_loc,
           path_str,
         );
@@ -501,18 +463,9 @@ module Css_transform = {
      `SimpleSelector(...)` whole-selector wrapping it), we still need to
      express the resolution. Same lookup, wraps the result. */
   and transform_simple_selector_to_selector =
-      (~file, ~scope, ~opens, simple: simple_selector, dynamic_vars): selector => {
+      (ctx, simple: simple_selector): selector => {
     switch (simple) {
-    | Variable(_, _) =>
-      SimpleSelector(
-        transform_simple_selector(
-          ~file,
-          ~scope,
-          ~opens,
-          simple,
-          dynamic_vars,
-        ),
-      )
+    | Variable(_, _) => SimpleSelector(transform_simple_selector(ctx, simple))
     | _ => SimpleSelector(simple)
     };
   }
@@ -521,29 +474,20 @@ module Css_transform = {
      selectors so `ClassVariable` can fan out into a compound chain
      (`.cssA.cssB`) for multi-declaration source bindings. */
   and transform_subclass_selector_to_list =
-      (~file, ~scope, ~opens, subclass: subclass_selector, dynamic_vars)
-      : list(subclass_selector) => {
+      (ctx, subclass: subclass_selector): list(subclass_selector) => {
     switch (subclass) {
     | ClassVariable(path_str, var_loc) =>
       let classNames =
         Local_selector_environment.resolve_selector_class_ref(
-          ~file,
-          ~scope,
-          ~opens,
-          ~loc=var_loc,
+          ~file=ctx.file,
+          ~scope=ctx.scope,
+          ~opens=ctx.opens,
+          ~loc=to_file_loc(ctx, var_loc),
           path_str,
         );
       List.map(c => Class(c), classNames);
     | Pseudo_class(pseudo) => [
-        Pseudo_class(
-          transform_pseudo_selector(
-            ~file,
-            ~scope,
-            ~opens,
-            pseudo,
-            dynamic_vars,
-          ),
-        ),
+        Pseudo_class(transform_pseudo_selector(ctx, pseudo)),
       ]
     | _ => [subclass]
     };
@@ -554,30 +498,21 @@ module Css_transform = {
      Recurse into the payload so `:not(&.$(foo))` resolves the same way as
      a top-level `&.$(foo)`. */
   and transform_pseudo_selector =
-      (~file, ~scope, ~opens, pseudo: pseudo_selector, dynamic_vars)
-      : pseudo_selector => {
+      (ctx, pseudo: pseudo_selector): pseudo_selector => {
     switch (pseudo) {
     | Pseudoelement(_) => pseudo
-    | Pseudoclass(kind) =>
-      Pseudoclass(
-        transform_pseudoclass_kind(~file, ~scope, ~opens, kind, dynamic_vars),
-      )
+    | Pseudoclass(kind) => Pseudoclass(transform_pseudoclass_kind(ctx, kind))
     };
   }
 
   and transform_pseudoclass_kind =
-      (~file, ~scope, ~opens, kind: pseudoclass_kind, dynamic_vars)
-      : pseudoclass_kind => {
+      (ctx, kind: pseudoclass_kind): pseudoclass_kind => {
     switch (kind) {
     | PseudoIdent(_) => kind
     | Function({ name, payload: (selector_list, payload_loc) }) =>
       let transformed =
         List.map(
-          ((sel, sel_loc)) =>
-            (
-              transform_selector(~file, ~scope, ~opens, sel, dynamic_vars),
-              sel_loc,
-            ),
+          ((sel, sel_loc)) => (transform_selector(ctx, sel), sel_loc),
           selector_list,
         );
       Function({
@@ -591,14 +526,7 @@ module Css_transform = {
         | NthSelector(complex_selectors) =>
           NthSelector(
             List.map(
-              c =>
-                transform_complex_selector(
-                  ~file,
-                  ~scope,
-                  ~opens,
-                  c,
-                  dynamic_vars,
-                ),
+              c => transform_complex_selector(ctx, c),
               complex_selectors,
             ),
           )
@@ -610,8 +538,7 @@ module Css_transform = {
     };
   };
 
-  let transform_declaration =
-      (~file, ~scope, ~opens, ~var_namespace, decl: declaration, dynamic_vars) => {
+  let transform_declaration = (ctx, ~var_namespace, decl: declaration) => {
     let (property_name, _) = decl.name;
     let (value_list, value_loc) = decl.value;
 
@@ -668,17 +595,7 @@ module Css_transform = {
     let transformed_values =
       List.map(
         ((cv, loc)) =>
-          (
-            transform_component_value(
-              ~file,
-              ~scope,
-              ~opens,
-              cv,
-              dynamic_vars,
-              get_var_binding,
-            ),
-            loc,
-          ),
+          (transform_component_value(ctx, cv, get_var_binding), loc),
         value_list,
       );
     {
@@ -687,91 +604,28 @@ module Css_transform = {
     };
   };
 
-  let rec transform_rule =
-          (
-            ~file,
-            ~scope,
-            ~opens,
-            ~base_loc,
-            ~var_namespace,
-            rule: rule,
-            dynamic_vars,
-          ) => {
+  let rec transform_rule = (ctx, ~var_namespace, rule: rule) => {
     switch (rule) {
     | Declaration(decl) =>
-      Declaration(
-        transform_declaration(
-          ~file,
-          ~scope,
-          ~opens,
-          ~var_namespace,
-          decl,
-          dynamic_vars,
-        ),
-      )
+      Declaration(transform_declaration(ctx, ~var_namespace, decl))
     | Style_rule(style_rule) =>
-      Style_rule(
-        transform_style_rule(
-          ~file,
-          ~scope,
-          ~opens,
-          ~base_loc,
-          ~var_namespace,
-          style_rule,
-          dynamic_vars,
-        ),
-      )
+      Style_rule(transform_style_rule(ctx, ~var_namespace, style_rule))
     | At_rule(at_rule) =>
-      At_rule(
-        transform_at_rule(
-          ~file,
-          ~scope,
-          ~opens,
-          ~base_loc,
-          ~var_namespace,
-          at_rule,
-          dynamic_vars,
-        ),
-      )
+      At_rule(transform_at_rule(ctx, ~var_namespace, at_rule))
     };
   }
 
-  and transform_style_rule =
-      (
-        ~file,
-        ~scope,
-        ~opens,
-        ~base_loc,
-        ~var_namespace,
-        style_rule: style_rule,
-        dynamic_vars,
-      ) => {
+  and transform_style_rule = (ctx, ~var_namespace, style_rule: style_rule) => {
     let { prelude, block, loc } = style_rule;
     let (selector_list, selector_loc) = prelude;
     let transformed_selectors =
       List.map(
-        ((sel, sel_loc)) =>
-          (
-            transform_selector(~file, ~scope, ~opens, sel, dynamic_vars),
-            sel_loc,
-          ),
+        ((sel, sel_loc)) => (transform_selector(ctx, sel), sel_loc),
         selector_list,
       );
     let (rule_list, rule_loc) = block;
     let transformed_rules =
-      List.map(
-        rule =>
-          transform_rule(
-            ~file,
-            ~scope,
-            ~opens,
-            ~base_loc,
-            ~var_namespace,
-            rule,
-            dynamic_vars,
-          ),
-        rule_list,
-      );
+      List.map(rule => transform_rule(ctx, ~var_namespace, rule), rule_list);
     {
       prelude: (transformed_selectors, selector_loc),
       block: (transformed_rules, rule_loc),
@@ -779,16 +633,7 @@ module Css_transform = {
     };
   }
 
-  and transform_at_rule =
-      (
-        ~file,
-        ~scope,
-        ~opens,
-        ~base_loc,
-        ~var_namespace,
-        at_rule: at_rule,
-        dynamic_vars,
-      ) => {
+  and transform_at_rule = (ctx, ~var_namespace, at_rule: at_rule) => {
     let { name, prelude, block, loc } = at_rule;
     let (prelude_values, prelude_loc) = prelude;
 
@@ -806,30 +651,14 @@ module Css_transform = {
     if (has_interpolation) {
       let (at_name, _) = name;
       Ppxlib.Location.raise_errorf(
-        ~loc=
-          Styled_ppx_css_parser.Parser_location.adjust_to_file(
-            ~relative_loc=loc,
-            ~base_loc,
-          ),
+        ~loc=to_file_loc(ctx, loc),
         "Interpolation in @%s preludes is not supported during static extraction. CSS custom properties (var()) are not valid in media query conditions. Inline the value directly.",
         at_name,
       );
     };
 
     let map_payload = ((rules, rule_loc)) => (
-      List.map(
-        r =>
-          transform_rule(
-            ~file,
-            ~scope,
-            ~opens,
-            ~base_loc,
-            ~var_namespace,
-            r,
-            dynamic_vars,
-          ),
-        rules,
-      ),
+      List.map(r => transform_rule(ctx, ~var_namespace, r), rules),
       rule_loc,
     );
     let transformed_block =
@@ -1165,9 +994,9 @@ module Css_transform = {
           Ppxlib.Location.raise_errorf(
             ~loc=
               Styled_ppx_css_parser.Parser_location.adjust_to_file(
-                ~relative_loc=name_loc,
-                ~base_loc,
-              ),
+          ~relative_loc=name_loc,
+          ~base_loc,
+        ),
             "%s",
             message,
           );
@@ -1237,7 +1066,7 @@ module Css_transform = {
      wrapped under `.effective_class`; nested / at-rule atoms run through
      `Transform.run`. */
   let lower_atom =
-      (~file, ~scope, ~opens, ~base_loc, ~effective_class, ~effective_namespace, ~loc, rule, dynamic_vars) => {
+      (ctx, ~effective_class, ~effective_namespace, ~loc, rule) => {
     let single_rule_list = ([rule], loc);
     let transformed =
       switch (rule) {
@@ -1272,15 +1101,7 @@ module Css_transform = {
 
     transformed
     |> List.map(r =>
-         transform_rule(
-           ~file,
-           ~scope,
-           ~opens,
-           ~base_loc,
-           ~var_namespace=effective_namespace,
-           r,
-           dynamic_vars,
-         )
+         transform_rule(ctx, ~var_namespace=effective_namespace, r)
        );
   };
 
@@ -1293,7 +1114,7 @@ module Css_transform = {
         ~label=?,
         rule_list: rule_list,
       ) => {
-    let dynamic_vars = ref([]);
+    let ctx = { file, scope, opens, base_loc, dynamic_vars: ref([]) };
     let (rules, loc) = rule_list;
 
     let atomic_rules = atomize_rules(~base_loc, ~label?, rules);
@@ -1339,17 +1160,7 @@ module Css_transform = {
             };
 
           let processed =
-            lower_atom(
-              ~file,
-              ~scope,
-              ~opens,
-              ~base_loc,
-              ~effective_class,
-              ~effective_namespace,
-              ~loc,
-              rule,
-              dynamic_vars,
-            )
+            lower_atom(ctx, ~effective_class, ~effective_namespace, ~loc, rule)
             |> List.map(r => (dedup_key, r));
 
           let classes_acc =
@@ -1377,20 +1188,20 @@ module Css_transform = {
       );
 
     let atom_infos = atom_infos_rev;
-    let dynamic_vars_final = List.rev(dynamic_vars^);
+    let dynamic_vars_final = List.rev(ctx.dynamic_vars^);
 
     /* A var registers @property{inherits:false} iff its type supports it and
        every atom that reads it is `&`-local. */
     let safe_inherits_false_vars =
       dynamic_vars_final
-      |> List.filter_map(((var_name, _path, var_type)) =>
+      |> List.filter_map(({ name, var_type, _ }) =>
            if (var_type_supports_inherits_false(var_type)
                && List.for_all(
                     ((atom_local, referenced)) =>
-                      atom_local || !List.mem(var_name, referenced),
+                      atom_local || !List.mem(name, referenced),
                     atom_infos,
                   )) {
-             Some(var_name);
+             Some(name);
            } else {
              None;
            }
@@ -1488,7 +1299,8 @@ let push_keyframe =
   open Styled_ppx_css_parser.Ast;
 
   let (rules, rule_loc) = keyframe_rules;
-  let dynamic_vars = ref([]);
+  let ctx =
+    Css_transform.{ file, scope, opens, base_loc, dynamic_vars: ref([]) };
   let var_namespace =
     Hash_class.scoped_namespace(
       ~kind="keyframes",
@@ -1498,17 +1310,7 @@ let push_keyframe =
     );
   let transformed_rules =
     rules
-    |> List.map(rule =>
-         Css_transform.transform_rule(
-           ~file,
-           ~scope,
-           ~opens,
-           ~base_loc,
-           ~var_namespace,
-           rule,
-           dynamic_vars,
-         )
-       );
+    |> List.map(rule => Css_transform.transform_rule(ctx, ~var_namespace, rule));
   let rendered_body =
     transformed_rules |> List.map(render_rule) |> String.concat(" ");
 
@@ -1528,7 +1330,7 @@ let push_keyframe =
 
   Buffer.add_rule(keyframe_name, rendered_keyframe);
 
-  (keyframe_name, List.rev(dynamic_vars^));
+  (keyframe_name, List.rev(ctx.dynamic_vars^));
 };
 
 /* Walk every rule in a [%styled.global] block, substitute
@@ -1554,11 +1356,12 @@ let push_global =
       ~base_loc,
       global_rules: Styled_ppx_css_parser.Ast.rule_list,
     )
-    : list((string, string, var_type)) => {
+    : list(dynamic_var) => {
   open Styled_ppx_css_parser.Ast;
 
   let (rules, _) = global_rules;
-  let all_dynamic_vars = ref([]);
+  let ctx =
+    Css_transform.{ file, scope, opens, base_loc, dynamic_vars: ref([]) };
 
   /* Reject `&` with no parent selector: top level, or inside at-rule
      blocks not below a style rule (at-rules don't contribute a
@@ -1574,9 +1377,9 @@ let push_global =
             Ppxlib.Location.raise_errorf(
               ~loc=
                 Styled_ppx_css_parser.Parser_location.adjust_to_file(
-                  ~relative_loc=selector_loc,
-                  ~base_loc,
-                ),
+          ~relative_loc=selector_loc,
+          ~base_loc,
+        ),
               "The nesting selector `&` has no parent selector to resolve against here in [%%styled.global] (at-rules like @media don't provide one). Write a concrete selector instead.",
             );
           },
@@ -1605,7 +1408,7 @@ let push_global =
 
   /* transform_rule walks the rule, replacing every Variable(path) in
      declaration values with a namespace/type-scoped var(--hash) and appending
-     (var_name, path, var_type) to all_dynamic_vars.
+     the corresponding dynamic_var to the context accumulator.
 
      The caller in [ppx.re] pre-checks the rule list for top-level
      Declaration nodes and bails before invoking this function, so the
@@ -1619,22 +1422,14 @@ let push_global =
        | Style_rule(_)
        | At_rule(_) =>
          let transformed =
-           Css_transform.transform_rule(
-             ~file,
-             ~scope,
-             ~opens,
-             ~base_loc,
-             ~var_namespace,
-             rule,
-             all_dynamic_vars,
-           );
+           Css_transform.transform_rule(ctx, ~var_namespace, rule);
          let key = Hash_class.global_key(render_rule(transformed));
          Buffer.add_global_rule(key, render_prefixed_rule(transformed));
        | Declaration(_) => ()
        }
      );
 
-  List.rev(all_dynamic_vars^);
+  List.rev(ctx.dynamic_vars^);
 };
 
 let get = () => {

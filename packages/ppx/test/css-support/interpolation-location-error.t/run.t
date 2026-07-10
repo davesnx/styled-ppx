@@ -13,9 +13,9 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 2, characters 14-18:
+  File "input.re", line 2, characters 28-32:
   2 | let a = [%css {| display: $(grid); |}];
-                    ^^^^
+                                  ^^^^
   Error: The value grid has type [> `gri ]
          but an expression was expected of type
            [< `block

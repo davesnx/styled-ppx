@@ -10,7 +10,7 @@ can resolve it against M's exported [@@@css.bindings].
   $ cat n.ml
   [@@@css ".css-155k9s5-wrapper.\000M.Css.marker\000{color:blue;}"]
   [@@@css.bindings [("N.wrapper", "css-155k9s5-wrapper")]]
-  [@@@css.refs [("M.Css.marker", "n.ml", 2, 6, 19)]]
+  [@@@css.refs [("M.Css.marker", "n.ml", 3, 6, 19)]]
   let _ = M.Css.marker
   module Styles = M.Css
   let wrapper = CSS.make "css-155k9s5-wrapper" []

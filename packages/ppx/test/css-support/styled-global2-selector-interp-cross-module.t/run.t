@@ -17,7 +17,7 @@ synthetic dep markers. The styled.global module shell is preserved.
   $ cat n.ml
   [@@@css "body .\000M.marker\000{color:red;}"]
   [@@@css ".\000M.card\000:hover{cursor:pointer;}"]
-  [@@@css.refs [("M.marker", "n.ml", 2, 10, 18); ("M.card", "n.ml", 6, 5, 11)]]
+  [@@@css.refs [("M.marker", "n.ml", 4, 10, 18); ("M.card", "n.ml", 8, 5, 11)]]
   let _ = M.marker
   let _ = M.card
   module Globals =

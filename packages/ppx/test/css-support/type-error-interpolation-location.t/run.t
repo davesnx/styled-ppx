@@ -13,9 +13,9 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 10, characters 6-11:
-  10 | ......{|
-  10 |   ............................
+  File "input.re", line 11, characters 23-28:
+  11 |     text-decoration: $(cosas);
+                              ^^^^^
   Error: The value cosas has type [> `bold ]
          but an expression was expected of type
            [< `inherit_

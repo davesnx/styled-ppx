@@ -4,23 +4,27 @@ module Ast = Styled_ppx_css_parser.Ast;
 module Driver = Styled_ppx_css_parser.Driver;
 module Parser_location = Styled_ppx_css_parser.Parser_location;
 
-let dummy_pos = Lexing.dummy_pos;
-let loc = Parser_location.to_ppxlib_location(dummy_pos, dummy_pos);
+/* Parse as if the input were a whole file: payload starts at line 1,
+   column 0, so error locations come back unshifted. */
+let zero_pos: Lexing.position = {
+  pos_fname: "",
+  pos_lnum: 1,
+  pos_bol: 0,
+  pos_cnum: 0,
+};
+let loc = Parser_location.to_ppxlib_location(zero_pos, zero_pos);
 
 let parse = input => {
   switch (Driver.parse_stylesheet(~loc, input)) {
   | Ok(ast) => Ok(ast)
   | Error((loc, msg)) =>
     let pos = loc.loc_start;
-    let curr_pos = pos.pos_cnum;
-    let lnum = pos.pos_lnum + 1;
-    let pos_bol = pos.pos_bol;
     let err =
       Printf.sprintf(
         "%s on line %i at position %i",
         msg,
-        lnum,
-        curr_pos - pos_bol,
+        pos.pos_lnum,
+        pos.pos_cnum - pos.pos_bol,
       );
     Error(err);
   };

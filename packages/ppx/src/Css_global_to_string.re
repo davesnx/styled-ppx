@@ -31,15 +31,15 @@ let concat_exprs = (~loc, parts) => {
    empty (static-only block), returns the literal `""` so the generated
    module still has a well-formed `to_string` function. */
 let render_root_block =
-    (~loc, dynamic_vars: list((string, string, Css_file.var_type)))
-    : Ppxlib.expression => {
+    (~loc, dynamic_vars: list(Css_file.dynamic_var)): Ppxlib.expression => {
   switch (dynamic_vars) {
   | [] => estring(~loc, "")
   | _ =>
     let decl_parts =
       dynamic_vars
-      |> List.concat_map(((var_name, path_str, var_type)) => {
-           let value_expr = Css_to_runtime.render_variable(~loc, path_str);
+      |> List.concat_map(({ name: var_name, path, var_type, loc: var_loc }: Css_file.dynamic_var) => {
+           let value_expr =
+             Css_to_runtime.render_variable(~loc=var_loc, path);
            let stringified_value =
              switch (var_type) {
              | Css_file.RuntimeModule(name) =>
@@ -64,7 +64,7 @@ let render_root_block =
                  | Css_file.MediaQuery => "MediaQuery"
                  | _ => "Unknown"
                  },
-                 path_str,
+                 path,
                )
              };
            [

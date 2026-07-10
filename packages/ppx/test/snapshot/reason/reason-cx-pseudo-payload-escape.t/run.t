@@ -13,10 +13,14 @@ subject is outside `&`'s subtree — slipped through and shipped a dead
 
   $ standalone --impl input_has.ml -o output.ml
   File "input_has.ml", line 6, characters 18-32:
+  6 | let esc = [%css ":has(& + div) { color: $(c); }"]
+                        ^^^^^^^^^^^^^^
   Error: Cannot interpolate into the value of `color` under `:has(& + div)`: the selector targets an element outside `&`'s subtree (via a sibling combinator `+`/`~`, or a pseudo-class like `:not(&)`/`:has(&)` whose subject isn't `&` or a descendant of it). Static extraction passes interpolations as a custom property set inline on `&`, which only `&` and its descendants inherit, so an element outside that subtree can't read it and the declaration would be dropped. Instead, target `&` or a descendant, or write a literal value or a globally-inherited theme `var(--...)` directly.
   [1]
   $ standalone --impl input_not.ml -o output.ml
   File "input_not.ml", line 4, characters 18-29:
+  4 | let esc = [%css "div:not(&) { color: $(c); }"]
+                        ^^^^^^^^^^^
   Error: Cannot interpolate into the value of `color` under `div:not(&)`: the selector targets an element outside `&`'s subtree (via a sibling combinator `+`/`~`, or a pseudo-class like `:not(&)`/`:has(&)` whose subject isn't `&` or a descendant of it). Static extraction passes interpolations as a custom property set inline on `&`, which only `&` and its descendants inherit, so an element outside that subtree can't read it and the declaration would be dropped. Instead, target `&` or a descendant, or write a literal value or a globally-inherited theme `var(--...)` directly.
   [1]
   $ standalone --impl input_is_ok.ml -o output.ml
