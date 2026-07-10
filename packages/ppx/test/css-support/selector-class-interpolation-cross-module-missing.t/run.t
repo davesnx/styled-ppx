@@ -10,7 +10,7 @@ diagnostic format.
   $ standalone --impl n.ml -o n.ml
 
   $ styled-ppx.generate m.ml n.ml
-  File "n.ml", line 2, characters 6-14:
+  styled-ppx: File "n.ml", line 2, characters 6-14:
   Error: cross-module [%css] selector reference `M.marker` does not resolve.
   The target binding is missing from module `M`, or the binding is not
   a [%css] expression. Define `M.marker` with [%css "..."], or remove the
