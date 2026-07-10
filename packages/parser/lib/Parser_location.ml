@@ -80,21 +80,3 @@ let adjust_to_file ~(relative_loc : Ppxlib.location)
     loc_ghost = relative_loc.loc_ghost;
   }
 
-(* Rebase every location of a re-parsed interpolation expression (parsed
-   from scratch, so positions are relative to the expression source) onto
-   [base_loc], the file location of the interpolation payload. *)
-let relocate_expression (base_loc : Ppxlib.location) expr =
-  let payload_start = base_loc.loc_start in
-  let mapper =
-    object
-      inherit Ppxlib.Ast_traverse.map
-
-      method! location loc =
-        {
-          Ppxlib.loc_start = to_file_position ~payload_start loc.loc_start;
-          loc_end = to_file_position ~payload_start loc.loc_end;
-          loc_ghost = loc.loc_ghost;
-        }
-    end
-  in
-  mapper#expression expr
