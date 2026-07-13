@@ -95,7 +95,7 @@ A few details worth knowing:
 
 ## Class references in selectors
 
-Interpolating a *binding* in selector position (`&.$(active)`, `:has(.$(other))`) is resolved **statically** — the actual class names are substituted into the extracted CSS, with no `var()` indirection. Same-file references resolve during ppx expansion; references to bindings in *other modules* are resolved by the aggregator at stylesheet-generation time — one of the reasons the aggregator exists. Syntax, rules, and errors are documented in [Class references in selectors](/reference/syntax#class-references-in-selectors).
+Interpolating a *binding* in selector position (`&.$(active)`, `:has(.$(other))`) is resolved **statically** — the actual class names are substituted into the extracted CSS, with no `var()` indirection. Same-file references resolve during ppx expansion; references to bindings in *other modules* are resolved by the aggregator at stylesheet-generation time — one of the reasons the aggregator exists. Syntax, rules, and errors are documented in [Class references in selectors](/reference/selectors#class-references-in-selectors).
 
 ## The aggregator: `styled-ppx.generate`
 

@@ -13,12 +13,6 @@ export default {
       "breadcrumb": false
     }
   },
-  "migrate-to-v062": {
-    "title": "Migrate to 0.62",
-    "theme": {
-      "breadcrumb": false
-    }
-  },
   "editor-support": "Editor Support",
   "reference": "API Reference",
   "about": {

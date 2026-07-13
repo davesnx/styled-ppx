@@ -34,7 +34,7 @@ let app = <div styles=layout />
 
 ## Features
 
-- **Full declaration lists**: multiple declarations, [nested selectors](./syntax#selectors-and-nesting) (`&:hover { ... }{:styled-ppx-css}`), and [at-rules](./syntax#media-queries-and-other-at-rules) (`@media`, `@container`) are all valid — the same grammar as `[%styled.<tag>]{:reason}`.
+- **Full declaration lists**: multiple declarations, [nested selectors](./selectors) (`&:hover { ... }{:styled-ppx-css}`), and [at-rules](./media-queries) (`@media`, `@container`) are all valid — the same grammar as `[%styled.<tag>]{:reason}`.
 - **[Interpolation](./interpolation)**: `$( ... ){:styled-ppx-css}` accepts any OCaml/Reason expression, type-checked against the property it's used in.
 - **Atomic extraction**: each declaration becomes its own content-addressed class; identical declarations anywhere in your project share one rule. See [How it works](/how-it-works#atomization-one-declaration-one-class).
 - The trailing semi-colon is optional; surrounding curly braces aren't allowed (`{ display: block }{:styled-ppx-css}` isn't valid).
@@ -98,4 +98,4 @@ Since all extracted rules are atomic single-class selectors, which declaration w
 
 ## Referencing styles in selectors
 
-A named `[%css]{:reason}` binding can be referenced from another block's selector with `$(name){:styled-ppx-css}` — resolved statically into real class names. See [selector interpolation](./syntax#class-references-in-selectors).
+A named `[%css]{:reason}` binding can be referenced from another block's selector with `$(name){:styled-ppx-css}` — resolved statically into real class names. See [selector interpolation](./selectors#class-references-in-selectors).

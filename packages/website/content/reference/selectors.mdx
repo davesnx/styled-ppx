@@ -1,0 +1,140 @@
+---
+title: Selectors
+---
+
+# Selectors
+
+Declaration blocks (`[%css]{:reason}`, `[%styled.<tag>]{:reason}`) support nested selectors. The parser accepts both `&`-based nesting and bare nested selectors.
+
+## `&` means "the current generated selector"
+
+Use `&` when you want to append to, combine with, or reposition the current selector.
+
+```css
+&:hover { color: red; }
+&::before { content: ""; }
+&.active { opacity: 1; }
+&#hero { scroll-margin-top: 80px; }
+& > span { display: inline-block; }
+& + & { margin-top: 8px; }
+div & { margin-left: auto; }
+```
+
+Typical expansions look like:
+
+- `&:hover` -> `.generated:hover`
+- `&.active` -> `.generated.active`
+- `div &` -> `div .generated`
+- `& + &` -> `.generated + .generated`
+
+## Bare nested selectors become descendants
+
+You do not need `&` for every nested selector.
+
+```css
+.child { color: blue; }
+#selected { font-weight: 600; }
+div { padding: 0; }
+svg path { fill: currentColor; }
+svg * { vector-effect: non-scaling-stroke; }
+[data-open] { opacity: 1; }
+```
+
+These become descendant selectors relative to the generated class, for example:
+
+- `.child` -> `.generated .child`
+- `div` -> `.generated div`
+- `svg path` -> `.generated svg path`
+
+One exception: a nested selector cannot *start* with a bare pseudo-class or pseudo-element (`:hover { ... }` without `&`). Per CSS Nesting semantics that would be a descendant selector, which is rarely what you mean — styled-ppx rejects it:
+
+```
+Bare leading pseudo selector `:hover` is ambiguous in nested CSS. Per CSS
+Nesting Level 1 §3.1 it descendant-joins with the enclosing selector
+(producing `<parent> :hover`), which matches descendants rather than the
+element itself. Write `&:hover` for compound (`<parent>:hover`, the usual
+intent), or `& :hover` to opt into the explicit descendant form.
+```
+
+## Supported selector features
+
+The supported syntax includes the usual selector building blocks:
+
+- type selectors: `div`, `button`, `svg path`
+- class, id, and universal selectors: `.child`, `#main`, `*`
+- attribute selectors: `[disabled]`, `[type="text"]`, `[href^="https"]`
+- pseudo-classes: `:hover`, `:focus`, `:target`, `:not(...)`, `:is(...)`, `:where(...)`, `:has(...)`
+- pseudo-elements: `::before`, `::after`, `::first-line`, `::first-letter`
+- combinators: descendant, `>`, `+`, `~`
+- comma-separated selector lists
+
+## Class references in selectors
+
+Interpolating a **binding** in selector position references another `[%css]` value's generated classes. The reference is resolved statically — the actual class names are substituted into the extracted stylesheet:
+
+```reason
+let outlined = [%css "border: 1px solid"];
+
+let button = [%css {|
+  padding: 8px;
+
+  &.$(outlined) {
+    padding: 7px;
+  }
+
+  & .$(outlined) {
+    margin: 4px;
+  }
+|}];
+```
+
+```mlx
+let outlined = [%css "border: 1px solid"]
+
+let button = [%css {|
+  padding: 8px;
+
+  &.$(outlined) {
+    padding: 7px;
+  }
+|}]
+```
+
+- `.$(name)` splices the binding's classes as a compound (`.cssA.cssB` when the binding has several atoms). Bare `$(name)` (no leading `.`) is accepted only when the binding has a single atom — otherwise the ppx raises ``Bare `$(name)` selector interpolation expanded to N class names; this position only accepts a single class. Prefix with `.` to use a class chain instead: `.$(name)`.``
+- References work inside combinators, pseudo-classes (`:not(&.$(other))`, `:has(.$(other))`), comma lists, and inside nested `@media` / `@supports` bodies.
+- Same-file bindings resolve during ppx expansion; **cross-module** references (`$(Card.container)`) resolve when [the stylesheet is generated](/how-it-works#class-references-in-selectors). Referencing a binding that doesn't exist is a compile error; references across *library* boundaries are unsupported (see the [build errors](/getting-started/dune-setup#troubleshooting) they produce).
+
+## Limitation: value interpolation and sibling selectors
+
+Selectors that target an element **outside `&`'s subtree** — a sibling combinator (`+`, `~`), or a pseudo-class whose subject isn't `&` or a descendant (`:not(&)`, `:has(&)`) — cannot contain interpolated *values*:
+
+```reason
+/* 🔴 Compile error */
+let card = (~accent) => [%css {|
+  border-color: $(accent);
+
+  & + .sibling {
+    color: $(accent);
+  }
+|}];
+```
+
+The reason is inheritance: interpolated values ship as CSS custom properties set inline on `&`'s own element, and custom properties only inherit **downward**. A sibling (or any element outside the subtree) can never read them, so the declaration would silently never apply — the ppx rejects it instead:
+
+```
+Cannot interpolate into the value of `color` under `& + .sibling`: the
+selector targets an element outside `&`'s subtree (via a sibling
+combinator `+`/`~`, or a pseudo-class like `:not(&)`/`:has(&)` whose
+subject isn't `&` or a descendant of it). Static extraction passes
+interpolations as a custom property set inline on `&`, which only `&`
+and its descendants inherit, so an element outside that subtree can't
+read it and the declaration would be dropped. Instead, target `&` or a
+descendant, or write a literal value or a globally-inherited theme
+`var(--...)` directly.
+```
+
+What works instead:
+
+- **Static declarations under sibling selectors are fine** — `& + & { margin-top: 8px; }{:styled-ppx-css}` and `& ~ .row { border-top: 1px solid; }{:styled-ppx-css}` extract normally; the limitation only concerns `$( ... )` values.
+- **Move the interpolated declaration onto the sibling's own styles**, where the value is set on the element that reads it.
+- **Use a globally-inherited token**: `color: var(--accent){:styled-ppx-css}` with the value supplied from a [`:root` theme](./theming) reaches every element, siblings included.
