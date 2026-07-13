@@ -50,14 +50,18 @@ let hidden = `hidden
 let visible = `visible
 let scroll = `scroll
 let rgb (r : int) (g : int) (b : int) = `rgb (r, g, b)
+
 let rgba (r : int) (g : int) (b : int) (a : Color.alpha_with_calc) =
   `rgba (r, g, b, a)
+
 let hsl (h : Color.angle_with_calc) (s : Color.percent_with_calc)
   (l : Color.percent_with_calc) =
   `hsl (h, s, l)
+
 let hsla (h : Color.angle_with_calc) (s : Color.percent_with_calc)
   (l : Color.percent_with_calc) (a : Color.angle_with_calc) =
   `hsla (h, s, l, a)
+
 let hex (x : string) = `hex x
 let currentColor = `currentColor
 let transparent = `transparent
@@ -69,15 +73,19 @@ let easeOut = `easeOut
 let stepStart = `stepStart
 let stepEnd = `stepEnd
 let steps (i : int) (dir : [ `start | `end_ ]) = `steps (i, dir)
+
 let cubicBezier (a : float) (b : float) (c : float) (d : float) =
   `cubicBezier (a, b, c, d)
+
 let marginBox = `marginBox
 let fillBox = `fillBox
 let strokeBox = `strokeBox
 let viewBox = `viewBox
 let translate (x : Length.t) (y : Length.t) = `translate (x, y)
+
 let translate3d (x : Length.t) (y : Length.t) (z : Length.t) =
   `translate3d (x, y, z)
+
 let translateX (x : Length.t) = `translateX x
 let translateY (y : Length.t) = `translateY y
 let translateZ (z : Length.t) = `translateZ z
@@ -101,6 +109,7 @@ let bold = `bold
 let extraBold = `extraBold
 let lighter = `lighter
 let bolder = `bolder
+
 let linearGradient (direction : Gradient.direction option)
   (stops : Gradient.color_stop_list) =
   `linearGradient (Some direction, stops)
@@ -121,6 +130,7 @@ let repeatingRadialGradient (shape : Gradient.shape)
 let conicGradient (angle : Gradient.direction option)
   (stops : Gradient.color_stop_list) =
   `conicGradient (Some angle, stops)
+
 let area (x : string) = `area x
 let areas (x : string array) = `areas x
 let trackSizes (x : TrackSize.t array) = `trackSizes x
@@ -128,8 +138,10 @@ let tracks (x : Track.t array) = `tracks x
 let numInt (x : int) = `num x
 let ident (x : string) = `ident x
 let numIdent (x : int) (y : string) = `numIdent (x, y)
+
 let span (x : [ `num of int | `ident of string | `numIdent of int * string ]) =
   `span x
+
 let contextMenu = `contextMenu
 let help = `help
 let pointer = `pointer
@@ -221,8 +233,10 @@ let minmax (x : InflexibleBreadth.t) (y : TrackBreadth.t) = `minmax (x, y)
 let repeatX = `repeatX
 let repeatY = `repeatY
 let rotate (a : Angle.t) = `rotate a
+
 let rotate3d (x : float) (y : float) (z : float) (a : Angle.t) =
   `rotate3d (x, y, z, a)
+
 let row = `row
 let rowReverse = `rowReverse
 let running = `running
@@ -294,8 +308,8 @@ end
 
 module Animation = struct
   (* backwards compatibility *)
-  let shorthand ?duration ?delay ?direction ?timingFunction ?fillMode
-    ?playState ?iterationCount ?name () =
+  let shorthand ?duration ?delay ?direction ?timingFunction ?fillMode ?playState
+    ?iterationCount ?name () =
     Css_types.Animation.Value.make ?duration ?delay ?direction ?timingFunction
       ?fillMode ?playState ?iterationCount ?name ()
 end
