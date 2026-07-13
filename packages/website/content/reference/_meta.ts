@@ -6,6 +6,7 @@ export default {
   "interpolation": "Interpolation",
   "keyframe": "Keyframe",
   "globals": "Global styles",
+  "theming": "Theming",
   "runtime": "Runtime: CSS",
   "react-ref": "React's Ref"
 }

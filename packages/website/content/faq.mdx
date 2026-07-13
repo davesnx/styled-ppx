@@ -16,7 +16,7 @@ Not anymore. ReScript support was removed in 0.62.0 — the last release support
 
 ## Where is my CSS? My app renders unstyled
 
-styled-ppx extracts all CSS at compile time into a static stylesheet — nothing injects styles at runtime. You need a `styled-ppx.generate` dune rule producing `styles.css`, and a `<link rel="stylesheet">` loading it. See [Setting up the dune rules](/getting-started/dune-setup).
+All CSS lives in the generated static stylesheet. You need a `styled-ppx.generate` dune rule producing `styles.css`, and a `<link rel="stylesheet">` loading it. See [Setting up the dune rules](/getting-started/dune-setup).
 
 ## Why do my elements have an inline `style` attribute?
 
@@ -52,7 +52,7 @@ Yes, through the generate rule's `deps`: the stylesheet contains exactly the rul
 
 ## Does styled-ppx autoprefix?
 
-Yes, for a fixed set of properties where prefixes still matter: the `animation-*` family, `text-decoration`, `filter`, `clip-path`, `mask-*`, `column-*`, `background-clip` (`-webkit-`); `transform`, `user-select`, `appearance`, `hyphens` (`-webkit-`, `-moz-`, `-ms-`); `flex`, `flex-direction`, `scroll-snap-type`, `writing-mode` (`-webkit-`, `-ms-`); intrinsic sizing keywords; and a few more. Prefixes are added to the extracted CSS at compile time — nothing happens at runtime. The general stance: write standard CSS and target evergreen browsers.
+Yes, for a fixed set of properties where prefixes still matter: the `animation-*` family, `text-decoration`, `filter`, `clip-path`, `mask-*`, `column-*`, `background-clip` (`-webkit-`); `transform`, `user-select`, `appearance`, `hyphens` (`-webkit-`, `-moz-`, `-ms-`); `flex`, `flex-direction`, `scroll-snap-type`, `writing-mode` (`-webkit-`, `-ms-`); intrinsic sizing keywords; and a few more. Prefixes are added to the extracted CSS at compile time. The general stance: write standard CSS and target evergreen browsers.
 
 ## Is there a playground?
 

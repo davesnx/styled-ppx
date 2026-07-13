@@ -35,107 +35,9 @@ let app = <body> <Reset /> </body>
 
 The rules themselves are [statically extracted](/how-it-works) into your `styles.css` — rendering `<Reset />{:reason}` does **not** inject them. The component exists to supply runtime *values*: when the block interpolates expressions, `<Reset />{:reason}` renders a `<style>` element with a single `:root { --var: value; }{:styled-ppx-css}` block (and an empty one otherwise).
 
-## Design tokens
+## CSS variables
 
-There are two complementary ways to define your design tokens, and no ThemeProvider to configure — the language and CSS custom properties cover both halves.
-
-### Compile-time tokens: plain modules
-
-Tokens are ordinary OCaml values, interpolated where needed:
-
-```reason
-module Theme = {
-  let brand = CSS.hex("667eea");
-  let spacingMd = CSS.px(16);
-};
-
-let button = [%css {|
-  background-color: $(Theme.brand);
-  padding: $(Theme.spacingMd);
-|}];
-```
-
-```mlx
-module Theme = struct
-  let brand = CSS.hex "667eea"
-  let spacing_md = CSS.px 16
-end
-
-let button = [%css {|
-  background-color: $(Theme.brand);
-  padding: $(Theme.spacing_md);
-|}]
-```
-
-Because tokens are typed (`CSS.Types.Color.t`, `Length.t`, ...), using a spacing token where a color belongs is a **compile error** — a guarantee string-based token systems can't give you. The custom-property names derived from them are readable and stable (`--brand-<hash>`). Tokens live in an ordinary library and can be interpolated from any other library (only *selector* class references are library-scoped; values are just code).
-
-### Runtime tokens: `:root` custom properties
-
-Define tokens as CSS variables when their values should be runtime data — inspectable in DevTools, readable by third-party CSS:
-
-```reason
-module Theme = [%styled.global {|
-  :root {
-    --brand: #667eea;
-    --spacing: 8px;
-  }
-|}];
-
-let button = [%css {|
-  background-color: var(--brand);
-  padding: var(--spacing);
-|}];
-```
-
-```mlx
-module Theme = [%styled.global {|
-  :root {
-    --brand: #667eea;
-    --spacing: 8px;
-  }
-|}]
-
-let button = [%css {|
-  background-color: var(--brand);
-  padding: var(--spacing);
-|}]
-```
-
-The trade-off versus module tokens: `var(--brand)` usage is validated syntactically, not against the token's type. `var()` fallbacks are fully supported (`var(--spacing, 16px){:styled-ppx-css}`, including nested `var()` in the fallback slot) — handy for component-level knobs a consumer may override.
-
-Interpolation works in global values too — `--brand: $(brandColor){:styled-ppx-css}` keeps the token name and stylesheet static while the *value* is supplied at render time through the component's `:root` block.
-
-### Light and dark
-
-For color schemes, prefer the CSS-native mechanism over any switching machinery — `color-scheme` and `light-dark()` are fully supported by the type-checker:
-
-```reason
-module Scheme = [%styled.global {|
-  :root {
-    color-scheme: light dark;
-  }
-|}];
-
-let card = [%css {|
-  background-color: light-dark(#ffffff, #1a1a2e);
-  color: light-dark(#1a1a2e, #eaeaea);
-|}];
-```
-
-```mlx
-module Scheme = [%styled.global {|
-  :root {
-    color-scheme: light dark;
-  }
-|}]
-
-let card = [%css {|
-  background-color: light-dark(#ffffff, #1a1a2e);
-  color: light-dark(#1a1a2e, #eaeaea);
-|}]
-```
-
-The browser picks the value from the user's preference; there is nothing to toggle, re-render, or store, and everything stays in the static stylesheet.
+`:root` custom properties defined in a global block are the natural home for design tokens — see [Theming](./theming) for the full guide (module tokens vs `:root` tokens, `var()` fallbacks, and light/dark schemes).
 
 ## `@font-face`
 
@@ -161,7 +63,7 @@ module Fonts = [%styled.global {|
 |}]
 ```
 
-Because extraction is static, the rule ships in `styles.css` and the font is discovered as soon as the stylesheet loads — there is no runtime injection delaying the fetch, and no [Flash of Unstyled Text](https://css-tricks.com/fout-foit-foft/) caused by the library. (Font URLs must be literal: interpolation inside `url(...){:styled-ppx-css}` is rejected, since browsers don't substitute `var()` there.)
+The rule ships in `styles.css`, so the font is discovered as soon as the stylesheet loads. (Font URLs must be literal: interpolation inside `url(...){:styled-ppx-css}` is rejected, since browsers don't substitute `var()` there.)
 
 ## Notes
 

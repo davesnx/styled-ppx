@@ -169,29 +169,7 @@ Since `Size.small` is `` `px(int){:reason} ``, the type-checker allows it. Inter
 
 ## How it works: CSS custom properties
 
-Interpolation does not generate CSS at runtime. The extracted rule references a CSS custom property, and the runtime only supplies its value through the element's inline `style` attribute:
-
-```reason
-let title = (~color) => [%css "color: $(color)"];
-```
-
-```mlx
-let title ~color = [%css "color: $(color)"]
-```
-
-extracts to:
-
-```css
-.css-abc123-title { color: var(--color-xk29fh); }
-```
-
-and rendering `<h1 styles={title(~color=CSS.hex("667eea"))} />{:reason}` produces:
-
-```html
-<h1 class="css-abc123-title" style="--color-xk29fh: #667eea">
-```
-
-Variable names are derived from your source (`$(Theme.spacing.md)` becomes `--spacing-md-<hash>`) and are stable between builds. See [How it works](/how-it-works#dynamic-values-css-custom-properties) for the details, including where interpolation is rejected (at-rule preludes, `url()`, subtree-escaping selectors).
+The extracted rule references a CSS custom property (`color: var(--color-<hash>)`), and the element supplies its *value* through the inline `style` attribute. Variable names are derived from your source and stable between builds. The full mechanics — naming, scoping, `@property` registration, and the positions where interpolation is rejected — live in [How it works](/how-it-works#dynamic-values-css-custom-properties).
 
 ## A note about the polymorphism of CSS
 

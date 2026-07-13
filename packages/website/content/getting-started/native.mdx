@@ -4,7 +4,6 @@ showAllLanguage: true
 ---
 
 import { Callout } from "nextra/components";
-import Link from "next/link";
 
 # OCaml (native)
 
@@ -16,15 +15,9 @@ This guide assumes that you'll use [opam](https://github.com/ocaml/opam) and [du
 opam install styled-ppx
 ```
 
-### Packages available
+### Setup
 
-- `styled-ppx` is the ppx that transforms `[%css ""]`, `[%styled.div ""]`, `[%styled.global ""]` and `[%keyframe ""]`
-- `styled-ppx.native` is the runtime library for server-reason-react
-- `styled-ppx.generate` is the CLI that writes the extracted stylesheet
-
-### Usage
-
-Add `styled-ppx` with the `--native` flag under dune's preprocess pps for any library or executable, and add `styled-ppx.native` as a library:
+Add `styled-ppx` with the `--native` flag under dune's preprocess pps (it switches the generated component code to target server-reason-react), and `styled-ppx.native` as a library:
 
 ```diff
 (library
@@ -41,11 +34,7 @@ Add `styled-ppx` with the `--native` flag under dune's preprocess pps for any li
     server-reason-react.melange_ppx)))
 ```
 
-The `--native` flag tells the ppx to generate code targeting server-reason-react instead of Melange.
-
-### Generate the stylesheet
-
-All CSS is extracted at compile time. Add a dune rule that collects it into a `styles.css`:
+Then add one rule that collects the extracted CSS into a stylesheet:
 
 ```dune
 (rule
@@ -54,73 +43,22 @@ All CSS is extracted at compile time. Add a dune rule that collects it into a `s
  (deps
   (glob_files_rec *.pp.ml))
  (action
-  (run styled-ppx.generate --output %{target} --log info %{deps})))
+  (run styled-ppx.generate --output %{target} %{deps})))
 ```
 
-Serve the file from your server like any static asset and link it in the document you render:
-
-```reason
-<head>
-  <link rel="stylesheet" href="/styles.css" />
-</head>
-```
-
-<Callout type="info">
-  Because styles are extracted at build time, there is **no runtime
-  stylesheet, registry, or render-order concern**: you don't need to render
-  your app before collecting styles, and there's nothing to flush or hydrate.
-  Link the file and render. See
-  [Setting up the dune rules](/getting-started/dune-setup) for the full guide.
+<Callout type="warning">
+  Without this rule your pages render unstyled — all CSS lives in the
+  generated stylesheet. See
+  [Setting up the dune rules](/getting-started/dune-setup) for the full
+  reference: rule placement, the CLI, sharing UI with a Melange client, and
+  production configuration.
 </Callout>
 
 ### Example
 
-```reason
-/* This is a server-reason-react component with those styles applied */
-module Link = [%styled.a (~color=CSS.hex("4299E1")) => {|
-  font-size: 1.875rem;
-  line-height: 1.5;
-  text-decoration: none;
-  margin: 0px;
-  padding: 10px 0px;
-  color: $(color);
-|}];
-
-/* This is a CSS.styles value carrying the generated classNames */
-let layout = [%css {|
-  display: flex;
-  width: 100%;
-  height: 100%;
-  justify-content: center;
-  align-items: center
-|}];
-
-/* Later in a component: pass it via the `styles` attribute */
-let app =
-  <div styles=layout>
-    <Link
-      color={CSS.hex("333333")}
-      href="https://sancho.dev"
-      rel="noopener noreferrer">
-      {React.string("sancho.dev")}
-    </Link>
-  </div>;
-```
-
-The `styles` attribute is rewritten by the ppx into `className` (and `style`, when the block interpolates values). If you need the raw strings, use `CSS.className(layout)` and `CSS.styles(layout)`.
-
-### Global styles
-
-`[%styled.global]` defines document-level rules (resets, `@font-face`, `:root` variables). The generated module is a React component — render it once in your document:
+Serve `styles.css` like any static asset and link it in the document you render:
 
 ```reason
-module Reset = [%styled.global {|
-  * {
-    margin: 0;
-    box-sizing: border-box;
-  }
-|}];
-
 module Document = {
   [@react.component]
   let make = (~children) => {
@@ -129,8 +67,9 @@ module Document = {
         <link rel="stylesheet" href="/styles.css" />
       </head>
       <body>
-        <Reset />
-        children
+        <main styles=[%css "max-width: 60ch; margin: 0 auto"]>
+          children
+        </main>
       </body>
     </html>;
   };
@@ -142,8 +81,6 @@ let some_server_side_handler = _request => {
 };
 ```
 
-The static rules themselves live in the extracted `styles.css`; the rendered `<Reset />` element only supplies `:root` custom-property values when the global block interpolates runtime values (and renders an empty `<style>` otherwise).
 
-### Sharing styles with a Melange client
 
-If your UI code compiles for both native (SSR) and Melange (client), preprocess each build with the matching runtime (`styled-ppx.native` + `--native` vs `styled-ppx.melange`). The extracted CSS is identical for both targets, so a single `styled-ppx.generate` rule and a single `styles.css` serve both.
+Learn more about [`[%css]`](/reference/css), [global styles](/reference/globals) (`@font-face`, resets, `:root` variables), and [sharing UI with a Melange client](/getting-started/dune-setup#sharing-ui-between-client-and-server).

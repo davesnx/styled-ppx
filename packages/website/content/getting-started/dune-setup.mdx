@@ -7,16 +7,42 @@ import { Callout } from "nextra/components";
 
 # Setting up the dune rules
 
+This page is the single reference for wiring styled-ppx into a dune build: the extraction rule, the Melange and native setups, sharing UI code between both targets, the CLI, and production configuration.
+
 styled-ppx needs two things from your build:
 
 1. **The ppx** on your libraries' `preprocess` field — this validates your CSS and embeds the extracted rules in the compiled files.
 2. **One `rule` running `styled-ppx.generate`** — this collects the extracted CSS from your whole project and writes `styles.css`.
 
-This page shows the full dune configuration for both Melange and native projects. If you want to understand *why* the build is shaped this way, read [How it works](/how-it-works) first.
+If you want to understand *why* the build is shaped this way, read [How it works](/how-it-works) first.
+
+## The stylesheet rule
+
+The ppx leaves the extracted CSS inside the **post-ppx files** (`*.pp.ml`) that dune produces in its build tree. One rule feeds them to `styled-ppx.generate`:
+
+```dune
+(rule
+ (mode promote)
+ (target styles.css)
+ (deps
+  (glob_files_rec *.pp.ml))
+ (action
+  (run styled-ppx.generate --output %{target} --log info %{deps})))
+```
+
+- `(glob_files_rec *.pp.ml)` picks up every preprocessed file below the rule's directory — place the rule at (or above) the root of the code that uses styled-ppx, or point the glob at it (e.g. `(glob_files_rec lib/*.pp.ml)`). Reason sources produce `<name>.re.pp.ml`.
+- `(mode promote)` copies `styles.css` back into your source tree so your dev server / bundler can serve it. Drop it if you consume the file straight from `_build`.
+- `--log info` prints the output path on every run; use `--log error` (the default) for silence.
+
+The result is a plain static asset. Reference it from your HTML (or the document your server renders):
+
+```html
+<link rel="stylesheet" href="/styles.css" />
+```
+
+The [demo in the repository](https://github.com/davesnx/styled-ppx/tree/main/demo/melange) is a complete working setup, promoting the stylesheet into a `public/` directory next to the bundled JS.
 
 ## Melange
-
-### 1. Preprocess your libraries with the ppx
 
 Every library that uses `[%css]` / `[%styled.<tag>]` needs `styled-ppx` in its `pps` and `styled-ppx.melange` in its `libraries`:
 
@@ -37,55 +63,20 @@ And the same on your `melange.emit` stanza:
  (libraries ui styled-ppx.melange reason-react)
  (preprocess
   (pps styled-ppx melange.ppx reason-react-ppx))
- (module_systems
-  (commonjs bs.js)))
+ (module_systems (es6 mjs)))
 ```
 
-### 2. Generate the stylesheet
+<Callout type="info">
+  Prefer `(module_systems (es6 mjs))`: bundlers can only tree-shake ES
+  modules. With CommonJS output the entire runtime — including the large
+  typed-values module — ships un-shaken.
+</Callout>
 
-The ppx leaves the extracted CSS inside the **post-ppx files** (`*.pp.ml`) that dune produces in its build tree. Add a rule that feeds them to `styled-ppx.generate`:
-
-```dune
-(rule
- (mode promote)
- (target styles.css)
- (deps
-  (glob_files_rec *.pp.ml))
- (action
-  (run styled-ppx.generate --output %{target} --log info %{deps})))
-```
-
-- `(glob_files_rec *.pp.ml)` picks up every preprocessed file below the rule's directory — place the rule at (or above) the root of the code that uses styled-ppx, or point the glob at it (e.g. `(glob_files_rec lib/*.pp.ml)`).
-- `(mode promote)` copies `styles.css` back into your source tree so your dev server / bundler can serve it. Drop it if you consume the file straight from `_build`.
-- `--log info` prints the output path on every run; use `--log error` (the default) for silence.
-
-As a reference, the [demo in the repository](https://github.com/davesnx/styled-ppx/tree/main/demo/melange) promotes the stylesheet into a `public/` directory next to the bundled JS:
-
-```dune
-(subdir
- public
- (rule
-  (mode promote)
-  (target styles.css)
-  (deps
-   (glob_files_rec ../client.re.pp.ml))
-  (action
-   (run styled-ppx.generate --output %{target} --log info %{deps}))))
-```
-
-### 3. Link it
-
-`styles.css` is a plain static asset. Reference it from your HTML:
-
-```html
-<link rel="stylesheet" href="/styles.css" />
-```
-
-or import it through your bundler if that's how you ship CSS.
+Note: `reason-react-ppx` is only needed if you write JSX; the `styled-ppx.melange` runtime itself depends on `reason-react`.
 
 ## Native (server-reason-react)
 
-Native libraries use the `styled-ppx.native` runtime and pass the `--native` flag to the ppx so the generated components target server-reason-react:
+Native libraries use the `styled-ppx.native` runtime and pass the `--native` flag to the ppx, which switches the generated component code to target server-reason-react instead of Melange:
 
 ```dune
 (library
@@ -102,44 +93,59 @@ Native libraries use the `styled-ppx.native` runtime and pass the `--native` fla
    server-reason-react.melange_ppx)))
 ```
 
-The stylesheet rule is identical — `styled-ppx.generate` doesn't care which runtime produced the files:
+The stylesheet rule is [the same one](#the-stylesheet-rule) — `styled-ppx.generate` doesn't care which runtime produced the files.
 
-```dune
-(rule
- (mode promote)
- (target styles.css)
- (deps
-  (glob_files_rec *.pp.ml))
- (action
-  (run styled-ppx.generate --output %{target} --log info %{deps})))
+## Sharing UI between client and server
+
+The same Reason/OCaml UI sources can compile twice — natively for server rendering and to JavaScript for the browser — sharing one `styles.css` and rendering identical markup on both sides.
+
+This works because of one invariant: the ppx extracts **identical CSS regardless of target**. Class names are content-addressed hashes of the CSS itself, and `--native` only changes the generated component *code*, never the extracted rules. Both builds agree on every class name in the markup.
+
+### Project layout
+
+Shared UI sources are owned by one directory and copied into the other target's library at build time — the same convention server-reason-react's own demos use:
+
+```
+lib/
+  native/
+    dune            # ui_native: server build
+    app.re          # native entrypoint wrapper
+    shared/
+      Main.re       # ← the shared UI, owned here
+  js/
+    dune            # ui: Melange build (copies shared/*.re in)
+    app.re          # client entrypoint wrapper
 ```
 
-Serve the file from your server and link it in the document `<head>` you render:
+The native library compiles `shared/` as part of itself by adding `(include_subdirs unqualified)` above the [native stanza](#native-server-reason-react), and the Melange library copies the shared sources in, compiling them a second time with the Melange toolchain:
 
-```reason
-<head>
-  <link rel="stylesheet" href="/styles.css" />
-</head>
+```dune
+(copy_files
+ (files ../native/shared/*.re))
 ```
 
 <Callout type="info">
-  **Sharing styles between client and server?** If the same source files are
-  built for both Melange and native (shared UI code), you only need **one**
-  generate rule: the extracted CSS is identical for both targets.
+  A single dual-mode library stanza can't do this: `preprocess` is
+  per-stanza, and the two targets need different pps (`--native` +
+  server-reason-react vs `melange.ppx` + `reason-react-ppx`). Copying the
+  sources into two libraries is the supported pattern.
 </Callout>
 
-## Flags
+Code inside `shared/` must only use APIs that exist on both sides (`CSS`, `React`, markup). Target-specific code — DOM access, fetch, filesystem — lives in the thin per-target wrappers (`app.re` above), or behind an interface implemented per target.
 
-### ppx flags (in `(pps styled-ppx <flags>)`)
+### One stylesheet for both
 
-| Flag | Effect |
-| --- | --- |
-| `--native` | Generate code for server-reason-react (native/SSR) instead of Melange |
-| `--minify` | Minify the generated CSS and drop the readable `-<label>` suffix from class names (`css-1tyndxa` instead of `css-1tyndxa-layout`) |
-| `--dev` | Add greppable marker classes (`cx-<binding>`) to classNames in development; no effect on the extracted CSS |
-| `--debug` | Verbose ppx logging |
+Because extraction is target-independent, **one `styled-ppx.generate` rule produces the stylesheet for both builds**. Globbing both build trees is harmless — rules are content-deduplicated — but pointing the glob at one is enough. The client bundle imports no CSS; the server links `/styles.css` in the document it renders.
 
-### `styled-ppx.generate` flags
+The [repository demo](https://github.com/davesnx/styled-ppx/tree/main/demo/melange) is exactly this setup: `lib/native/shared/Main.re` renders in the browser through `lib_js` and to a string through the native `print` executable, with one promoted `public/styles.css` serving both.
+
+## The CLI: `styled-ppx.generate`
+
+```
+styled-ppx.generate [flags] <files...>
+```
+
+Positional arguments are the post-ppx `.ml` / `.pp.ml` files to harvest.
 
 | Flag | Effect |
 | --- | --- |
@@ -148,38 +154,47 @@ Serve the file from your server and link it in the document `<head>` you render:
 | `--debug` | Shorthand for `--log debug` |
 | `--minify` | Strip inter-rule newlines from the output |
 
+## ppx flags
+
+Passed inside `(pps styled-ppx <flags> ...)`:
+
+| Flag | Effect |
+| --- | --- |
+| `--native` | Generate code for server-reason-react (native/SSR) instead of Melange |
+| `--minify` | Minify the generated CSS and drop the readable `-<label>` suffix from class names (`css-1tyndxa` instead of `css-1tyndxa-layout`) |
+| `--dev` | Add greppable marker classes (`cx-<binding>`) to classNames in development; no effect on the extracted CSS |
+| `--debug` | Verbose ppx logging |
+
 <Callout type="warning">
-  The ppx `--minify` and the aggregator `--minify` are different flags: the
-  first shortens class names and minifies rule bodies at extraction time, the
-  second only removes newlines between rules in the final file. For production
-  you typically want both.
+  The ppx `--minify` and the CLI `--minify` are different flags: the first
+  shortens class names and minifies rule bodies at extraction time, the
+  second only removes newlines between rules in the final file. For
+  production you typically want both.
 </Callout>
 
 ## Production setup
 
-For a release build you want three things: minified class names (ppx `--minify`), a minified stylesheet (aggregator `--minify`), and `--dev` off. Minification never changes the hashes — `css-1tyndxa-layout` in dev and `css-1tyndxa` in prod are the same atom, so a class seen in production can be looked up in a dev build.
+For a release build: ppx `--minify` on, CLI `--minify` on, `--dev` off. Minification never changes the hashes — `css-1tyndxa-layout` in dev and `css-1tyndxa` in prod are the same atom, so a class seen in production can be looked up in a dev build.
 
-Dune has no conditional pps flags (variables aren't allowed in `pps` arguments), so the supported pattern is duplicating the stanza under mutually-exclusive `enabled_if` guards:
+Dune has no conditional pps flags (variables aren't allowed in `pps` arguments), so the supported pattern is duplicating the library stanza under mutually-exclusive `enabled_if` guards — same fields, different flags:
 
 ```dune
 (library
  (name ui)
- (modes melange)
- (libraries styled-ppx.melange reason-react)
+ ; ... as above ...
  (preprocess
   (pps styled-ppx melange.ppx reason-react-ppx))
  (enabled_if (= %{profile} dev)))
 
 (library
  (name ui)
- (modes melange)
- (libraries styled-ppx.melange reason-react)
+ ; ... as above ...
  (preprocess
   (pps styled-ppx --minify melange.ppx reason-react-ppx))
  (enabled_if (= %{profile} release)))
 ```
 
-and the release stylesheet rule:
+and the release stylesheet action becomes:
 
 ```dune
 (action
@@ -188,8 +203,7 @@ and the release stylesheet rule:
 
 A few more production notes:
 
-- **Emit ES modules for Melange.** Use `(module_systems (es6 mjs))` on your `melange.emit` stanza: bundlers can only tree-shake ES modules, and with CommonJS output the entire runtime (including the large typed-values module) ships un-shaken.
-- **Cache the stylesheet aggressively.** `styles.css` only changes when styles change; serve it with long-lived cache headers behind a content-hashed filename (your bundler's asset pipeline, or a small dune rule renaming it by checksum). It can also be `<link rel="preload" as="style">`-ed — its content doesn't depend on which components render.
+- **Cache the stylesheet aggressively.** `styles.css` only changes when styles change; serve it with long-lived cache headers behind a content-hashed filename. It can also be `<link rel="preload" as="style">`-ed — its content doesn't depend on which components render.
 - **Theme values don't bust the cache.** `[%styled.global]`-supplied `:root` values render inline in the document, not in the file.
 - **Generate in CI.** Build the stylesheet as part of the release pipeline rather than relying on `(mode promote)` artifacts checked into the repo.
 
@@ -217,6 +231,6 @@ part of the current library. Move the [%css] binding into the current
 library, or inline the class chain literally.
 ```
 
-Selector references can't cross dune library boundaries — co-locate the coupled styles in one library.
+Selector references can't cross dune library boundaries — co-locate the coupled styles in one library. See [class references in selectors](/reference/syntax#class-references-in-selectors).
 
-**Styles apply in the wrong order.** All atomic classes have equal specificity, so the cascade tiebreaker is stylesheet order — and the aggregator preserves your *source* order. If an override doesn't stick, make sure the overriding declaration is defined after the base one in your source. Note that with atomic CSS the order of class names on an element does **not** matter, only the order of rules in `styles.css`.
+**Styles apply in the wrong order.** With atomic CSS the tiebreaker is stylesheet source order, not class-name order or merge order — see [Which declaration wins](/reference/runtime#which-declaration-wins).

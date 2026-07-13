@@ -39,17 +39,7 @@ All the rules from [Interpolation](./interpolation) apply here. In the example, 
 
 ### How dynamic values render
 
-The styles — including the dynamic ones — are extracted at compile time. Each interpolated declaration references a CSS custom property, and the component supplies the values through its inline `style` attribute:
-
-```html
-<div
-  class="css-abc123-Dynamic css-def456-Dynamic"
-  style="--color-x1: #EB5757; --background-x2: #516CF0">
-  Hello!
-</div>
-```
-
-No CSS is generated at runtime; only the variable values change per instance.
+The styles — including the dynamic ones — are [extracted at compile time](/how-it-works#dynamic-values-css-custom-properties). Each interpolated declaration references a CSS custom property, and the component supplies the values through its inline `style` attribute.
 
 ### Name collision
 

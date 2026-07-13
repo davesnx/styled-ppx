@@ -32,7 +32,7 @@ your .re / .ml source
 styles.css — a plain, static asset you link like any stylesheet
 ```
 
-Your components never construct CSS at runtime. They only carry the class names the ppx minted at step ①, plus — when you use interpolation — the values of a few CSS custom properties.
+Your components carry the class names the ppx minted at step ①, plus — when you use interpolation — the values of a few CSS custom properties.
 
 See [Setting up the dune rules](/getting-started/dune-setup) for the concrete build configuration.
 
@@ -56,7 +56,7 @@ extracts to:
 
 and `layout`'s className is the space-separated list: `"css-k008qs-layout css-1tyndxa-layout"`.
 
-Class names are **content-addressed**: the hash is derived from the CSS text itself. Two components declaring `display: flex` anywhere in your project share the exact same rule, and the aggregator emits it once. On large apps this makes the stylesheet grow with the number of *distinct declarations*, not the number of components — the same effect utility-CSS frameworks achieve, without you maintaining a naming convention.
+Class names are **content-addressed**: the hash is derived from the CSS text itself (for interpolation variables, the source path and main module name feed the hash too, so names stay stable across builds). Two components declaring `display: flex` anywhere in your project share the exact same rule, and the aggregator emits it once. On large apps this makes the stylesheet grow with the number of *distinct declarations*, not the number of components — the same effect utility-CSS frameworks achieve, without you maintaining a naming convention.
 
 Repeated fallback declarations for the same property (e.g. `display: -webkit-box; display: flex;`) are kept together in a single atom, so their intra-rule order — which the fallback depends on — is preserved.
 
@@ -66,16 +66,7 @@ The format is `css-<hash>-<label>`, where the label is the `let` binding or modu
 
 ### Cascade and ordering
 
-All atoms have the same specificity (a single class). The tiebreaker is stylesheet order — later wins — and the aggregator preserves your source order exactly. Writing
-
-```reason
-let spaced = [%css {|
-  margin: 10px;
-  margin-top: 20px;
-|}];
-```
-
-guarantees the `margin-top` atom appears after the `margin` atom in `styles.css`, so the override behaves like it would in a plain stylesheet.
+All atoms have the same specificity (a single class). The tiebreaker is stylesheet order — later wins — and the aggregator preserves your source order exactly, so an override written after its base declaration stays after it in `styles.css`. The full rules and composition patterns live in [Which declaration wins](/reference/runtime#which-declaration-wins).
 
 ## Dynamic values: CSS custom properties
 
@@ -104,23 +95,7 @@ A few details worth knowing:
 
 ## Class references in selectors
 
-Interpolating a *binding* in selector position (`&.$(active)`, `:has(.$(other))`) is resolved **statically** — the actual class names are substituted into the extracted CSS, with no `var()` indirection:
-
-```reason
-let active = [%css "color: red"];
-let button = [%css {|
-  opacity: 0.8;
-  &.$(active) { opacity: 1; }
-|}];
-```
-
-```css
-.css-xxx-active { color: red; }
-.css-yyy-button { opacity: 0.8; }
-.css-yyy-button.css-xxx-active { opacity: 1; }
-```
-
-Same-file references resolve during ppx expansion. References to bindings in *other modules* are resolved by the aggregator at stylesheet-generation time — this is one of the reasons the aggregator exists. Referencing a binding that doesn't exist is a hard error with the original source location, and cross-*library* references are rejected.
+Interpolating a *binding* in selector position (`&.$(active)`, `:has(.$(other))`) is resolved **statically** — the actual class names are substituted into the extracted CSS, with no `var()` indirection. Same-file references resolve during ppx expansion; references to bindings in *other modules* are resolved by the aggregator at stylesheet-generation time — one of the reasons the aggregator exists. Syntax, rules, and errors are documented in [Class references in selectors](/reference/syntax#class-references-in-selectors).
 
 ## The aggregator: `styled-ppx.generate`
 
@@ -132,21 +107,10 @@ The ppx runs one file at a time and cannot see the rest of your project, so each
 4. deduplicates rules (order-preserving), and
 5. writes the final stylesheet.
 
-```
-styled-ppx.generate --output styles.css --log info <files...>
-```
-
-| Flag | Effect |
-| --- | --- |
-| `-o`, `--output <file>` | write the stylesheet to a file (default: stdout) |
-| `--log error\|warning\|info\|debug` | diagnostic verbosity (default: `error`) |
-| `--minify` | strip inter-rule newlines |
-
-You wire it up once as a dune rule — see the [dune setup guide](/getting-started/dune-setup).
+You wire it up once as a dune rule; the rule, CLI flags, and troubleshooting live in [Setting up the dune rules](/getting-started/dune-setup).
 
 ## What this buys you
 
-- **No runtime style injection.** Nothing writes `<style>` tags as components render (the single exception: `[%styled.global]` renders one `<style>` element for `:root` variable *values*, when you interpolate in globals).
-- **No SSR ordering problems.** There is no runtime style registry to flush, so server rendering needs no special orchestration: link `styles.css` in your `<head>` and render.
+- **Server rendering is just rendering.** Link `styles.css` in your `<head>` and render — no orchestration needed. (`[%styled.global]` renders one `<style>` element for `:root` variable *values* when you interpolate in globals.)
 - **Cacheable CSS.** `styles.css` is a static asset with a stable content — it caches like any other file and can be served from a CDN.
 - **Smaller JS.** Your bundle carries class-name strings, not a CSS engine.

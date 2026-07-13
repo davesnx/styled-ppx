@@ -40,13 +40,13 @@ styled-ppx ships its own CSS parser and type-checker. Every property and value i
 
 ## Zero runtime: static extraction
 
-Unlike CSS-in-JS libraries, styled-ppx does **not** generate styles at runtime. All CSS is extracted while your project compiles:
+All CSS is extracted while your project compiles:
 
 1. The ppx parses and validates your CSS, splits it into **atomic rules** (one class per declaration), and hashes each one into a content-addressed class name.
 2. A build step ([`styled-ppx.generate`](/how-it-works#the-aggregator-styled-ppxgenerate)) collects every rule in your project and writes a single, deduplicated `styles.css`.
 3. At runtime, your components only carry class names. Dynamic values (`$(expr)` interpolations) become CSS custom properties supplied through the `style` attribute.
 
-No style injection, no hashing at runtime, no flash of unstyled content, no double-rendering for SSR. Read more in [How it works](/how-it-works).
+Read more in [How it works](/how-it-works).
 
 ## Features
 
