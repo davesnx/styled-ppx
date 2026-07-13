@@ -93,16 +93,6 @@ Globbing both build trees is harmless — rules are content-deduplicated — but
 
 The client bundle imports no CSS.
 
-## Hydration
-
-React hydration requires server and client markup to match. styled-ppx holds up its side by construction:
-
-- **Class attributes match** — both builds derive them from the same CSS content.
-- **Inline custom-property values match**, provided interpolated values are computed from the same props on both sides (which shared code guarantees).
-- Render any `[%styled.global]` component in the server document so its `:root` values are present at first paint.
-
-The usual hydration-mismatch suspects (locale-dependent strings, random ids, dates) are unrelated to styling and apply as in any SSR setup.
-
 ## Working example
 
 The [repository demo](https://github.com/davesnx/styled-ppx/tree/main/demo/melange) is exactly this setup: `lib/native/shared/Main.re` renders in the browser through `lib_js` and to a string through the native `print` executable, with one promoted `public/styles.css` serving both. Use it as the reference when wiring your own project.
