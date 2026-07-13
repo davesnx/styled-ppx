@@ -20,7 +20,7 @@ let make className vars : styles =
   className, loop (ReactDOM.Style.make ()) vars
 
 let merge (styles1 : styles) (styles2 : styles) =
-  let className = String.trim (fst styles1 ^ " " ^ fst styles2) in
+  let className = Js.String.trim (fst styles1 ^ " " ^ fst styles2) in
   let style = ReactDOM.Style.combine (snd styles1) (snd styles2) in
   className, style
 
