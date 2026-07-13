@@ -37,7 +37,10 @@ let render_root_block =
   | _ =>
     let decl_parts =
       dynamic_vars
-      |> List.concat_map(({ name: var_name, path, var_type, loc: var_loc }: Css_file.dynamic_var) => {
+      |> List.concat_map(
+           (
+             { name: var_name, path, var_type, loc: var_loc }: Css_file.dynamic_var,
+           ) => {
            let value_expr =
              Css_to_runtime.render_variable(~loc=var_loc, path);
            let stringified_value =

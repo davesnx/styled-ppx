@@ -5,14 +5,24 @@ module Ast = Styled_ppx_css_parser.Ast;
 
 let parse_declaration_value_component_values = (~name, value) =>
   switch (
-    Driver.parse_declaration(~source_position_start=Styled_ppx_css_parser.Parser_location.file_start(), name ++ ": " ++ value)
+    Driver.parse_declaration(
+      ~source_position_start=
+        Styled_ppx_css_parser.Parser_location.file_start(),
+      name ++ ": " ++ value,
+    )
   ) {
   | Ok({ Ast.value: (values, _), _ }) => values
   | Error((_, msg)) => Alcotest.fail("parser should succeed: " ++ msg)
   };
 
 let parse_at_rule_prelude_values = css =>
-  switch (Driver.parse_stylesheet(~source_position_start=Styled_ppx_css_parser.Parser_location.file_start(), css)) {
+  switch (
+    Driver.parse_stylesheet(
+      ~source_position_start=
+        Styled_ppx_css_parser.Parser_location.file_start(),
+      css,
+    )
+  ) {
   | Ok(([Ast.At_rule({ prelude: (values, _), _ })], _)) => values
   | Ok(_) => Alcotest.fail("expected a single at-rule")
   | Error((_, msg)) => Alcotest.fail("parser should succeed: " ++ msg)

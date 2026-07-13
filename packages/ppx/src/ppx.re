@@ -235,7 +235,12 @@ let expand_css_expression =
         ~delimiter,
         stringLoc,
       );
-    switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~source_position_start, txt)) {
+    switch (
+      Styled_ppx_css_parser.Driver.parse_declaration_list(
+        ~source_position_start,
+        txt,
+      )
+    ) {
     | Ok(rule_list) =>
       let validations = type_check_rule_list(rule_list);
       switch (get_errors(validations)) {
@@ -269,7 +274,7 @@ let expand_css_expression =
                  Styled_ppx_css_parser.Parser_location.to_file_location(
                    ~source_position_start,
                    error_loc,
-                   );
+                 );
                (adjusted_loc, error_to_string(error));
              });
         switch (error_messages) {
@@ -298,7 +303,12 @@ let expand_global_module = (~file, ~main_module, ~scope, ~opens, payload) => {
         ~delimiter,
         stringLoc,
       );
-    switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~source_position_start, txt)) {
+    switch (
+      Styled_ppx_css_parser.Driver.parse_declaration_list(
+        ~source_position_start,
+        txt,
+      )
+    ) {
     | Ok(rule_list) =>
       let (rules, rule_loc) = rule_list;
       let has_invalid_rules =
@@ -354,7 +364,7 @@ let expand_global_module = (~file, ~main_module, ~scope, ~opens, payload) => {
                    Styled_ppx_css_parser.Parser_location.to_file_location(
                      ~source_position_start,
                      error_loc,
-                     );
+                   );
                  (adjusted_loc, error_to_string(error));
                });
           switch (error_messages) {
@@ -405,7 +415,12 @@ let expand_keyframe_expression =
         ~delimiter,
         stringLoc,
       );
-    switch (Styled_ppx_css_parser.Driver.parse_keyframes(~source_position_start, txt)) {
+    switch (
+      Styled_ppx_css_parser.Driver.parse_keyframes(
+        ~source_position_start,
+        txt,
+      )
+    ) {
     | Ok(declarations) =>
       let (keyframe_name, dynamic_vars) =
         Css_file.push_keyframe(
@@ -491,7 +506,12 @@ let expand_styled_module =
         ~delimiter,
         stringLoc,
       );
-    switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~source_position_start, txt)) {
+    switch (
+      Styled_ppx_css_parser.Driver.parse_declaration_list(
+        ~source_position_start,
+        txt,
+      )
+    ) {
     | Ok(rule_list) =>
       switch (get_errors(type_check_rule_list(rule_list))) {
       | [] =>
@@ -521,7 +541,7 @@ let expand_styled_module =
                  Styled_ppx_css_parser.Parser_location.to_file_location(
                    ~source_position_start,
                    error_loc,
-                   );
+                 );
                (adjusted_loc, error_to_string(error));
              });
         switch (error_messages) {

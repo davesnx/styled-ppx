@@ -113,12 +113,13 @@ let rec selector_is_ampersand_own_box = (sel: selector) =>
       pseudo_selectors,
     }) =>
     !List.exists(pseudo_selector_is_element, pseudo_selectors)
-    && !List.exists(
-         fun
-         | Pseudo_class(pseudo) => pseudo_selector_is_element(pseudo)
-         | _ => false,
-         subclass_selectors,
-       )
+    && !
+         List.exists(
+           fun
+           | Pseudo_class(pseudo) => pseudo_selector_is_element(pseudo)
+           | _ => false,
+           subclass_selectors,
+         )
   | ComplexSelector(Selector(inner)) => selector_is_ampersand_own_box(inner)
   | _ => false
   };
@@ -189,7 +190,8 @@ let rec flatten_combinator_tree =
     let right_tail =
       List.concat_map(
         ((combinator, segment)) => {
-          let (segment_head, segment_tail) = flatten_combinator_tree(segment);
+          let (segment_head, segment_tail) =
+            flatten_combinator_tree(segment);
           [(combinator, segment_head), ...segment_tail];
         },
         right,
@@ -529,7 +531,8 @@ let media_prelude_is_combinable = prelude => {
     );
   switch (meaningful) {
   | [] => false
-  | [Ident(first), ..._] when String.lowercase_ascii(first) == "not" => false
+  | [Ident(first), ..._] when String.lowercase_ascii(first) == "not" =>
+    false
   | _ => conjunctive_only
   };
 };

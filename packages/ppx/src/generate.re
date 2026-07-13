@@ -1159,7 +1159,11 @@ let extractedDynamicStyles =
         )
       ) {
       | Ok(rule_list) =>
-        render_extracted_styles(~loc=stringLoc, ~source_position_start, rule_list)
+        render_extracted_styles(
+          ~loc=stringLoc,
+          ~source_position_start,
+          rule_list,
+        )
       | Error((loc, msg)) => Error.expr(~loc, msg)
       };
     | _ =>

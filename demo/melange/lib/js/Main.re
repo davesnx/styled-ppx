@@ -120,10 +120,12 @@ let keyframeDemoCard = {
   let currentHeight = 172;
   let previous = `px(previousHeight);
   let current = `px(currentHeight);
-  let resize = [%keyframe {|
+  let resize = [%keyframe
+    {|
     0% { height: $(previous); }
     100% { height: $(current); }
-  |}];
+  |}
+  ];
 
   [%css
    {|

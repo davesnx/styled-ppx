@@ -16,7 +16,7 @@ type dynamic_var = {
   name: string, /* hashed custom-property name, without `--` */
   path: string, /* the expression's source, e.g. "Theme.color" */
   var_type,
-  loc: Ppxlib.Location.t, /* file location of the expression inside `$()` */
+  loc: Ppxlib.Location.t /* file location of the expression inside `$()` */
 };
 
 let render_rule = Styled_ppx_css_parser.Render.rule;
@@ -33,8 +33,14 @@ module Buffer = {
     mutable rules: list(rule),
     seen: Hashtbl.t(string, unit),
   };
-  let accumulated_rules: target = { rules: [], seen: Hashtbl.create(256) };
-  let global_rules: target = { rules: [], seen: Hashtbl.create(64) };
+  let accumulated_rules: target = {
+    rules: [],
+    seen: Hashtbl.create(256),
+  };
+  let global_rules: target = {
+    rules: [],
+    seen: Hashtbl.create(64),
+  };
 
   let add_to = (target, className, cssText) =>
     if (!Hashtbl.mem(target.seen, className)) {
@@ -46,7 +52,8 @@ module Buffer = {
   let add_global_rule = add_to(global_rules);
 
   let get_rules = () => {
-    let dump = target => List.rev_map(((_, cssText)) => cssText, target.rules);
+    let dump = target =>
+      List.rev_map(((_, cssText)) => cssText, target.rules);
     dump(global_rules) @ dump(accumulated_rules);
   };
 
@@ -207,7 +214,9 @@ module Css_transform = {
      `&:after` do not. */
   let selector_subject_is_ampersand = (sel: selector): bool =>
     switch (
-      List.rev(Styled_ppx_css_parser.Selector_nesting.flatten_selector_chain(sel))
+      List.rev(
+        Styled_ppx_css_parser.Selector_nesting.flatten_selector_chain(sel),
+      )
     ) {
     | [] => false
     | [(_combinator, subject), ..._] =>
@@ -231,15 +240,19 @@ module Css_transform = {
     | At_rule({ block, _ }) =>
       switch (block) {
       | Rule_list((rules, _))
-      | Stylesheet((rules, _)) => List.for_all(atom_is_ampersand_local, rules)
+      | Stylesheet((rules, _)) =>
+        List.for_all(atom_is_ampersand_local, rules)
       | Empty => true
       }
     };
 
   let is_var_name_char = c =>
-    (c >= 'a' && c <= 'z')
-    || (c >= 'A' && c <= 'Z')
-    || (c >= '0' && c <= '9')
+    c >= 'a'
+    && c <= 'z'
+    || c >= 'A'
+    && c <= 'Z'
+    || c >= '0'
+    && c <= '9'
     || c == '_'
     || c == '-';
 
@@ -354,7 +367,10 @@ module Css_transform = {
     | Paren_block(values) => Paren_block(List.map(recurse, values))
     | Bracket_block(values) => Bracket_block(List.map(recurse, values))
     | Selector(selector_list) =>
-      let recurse_sel = ((sel, loc)) => (transform_selector(ctx, sel), loc);
+      let recurse_sel = ((sel, loc)) => (
+        transform_selector(ctx, sel),
+        loc,
+      );
       Selector(List.map(recurse_sel, selector_list));
     | _ => cv
     };
@@ -385,7 +401,8 @@ module Css_transform = {
         left: transform_selector(ctx, left),
         right:
           List.map(
-            ((combinator, sel)) => (combinator, transform_selector(ctx, sel)),
+            ((combinator, sel)) =>
+              (combinator, transform_selector(ctx, sel)),
             right,
           ),
       })
@@ -422,8 +439,8 @@ module Css_transform = {
   /* Rewrite a `simple_selector` in compound-internal position (slotted
      into `type_selector`). The selector-wrapping variant below is
      `transform_simple_selector_to_selector`. */
-  and transform_simple_selector = (ctx, simple: simple_selector)
-      : simple_selector => {
+  and transform_simple_selector =
+      (ctx, simple: simple_selector): simple_selector => {
     switch (simple) {
     | Variable(path_str, var_loc) =>
       let var_loc = to_file_loc(ctx, var_loc);
@@ -464,7 +481,8 @@ module Css_transform = {
   and transform_simple_selector_to_selector =
       (ctx, simple: simple_selector): selector => {
     switch (simple) {
-    | Variable(_, _) => SimpleSelector(transform_simple_selector(ctx, simple))
+    | Variable(_, _) =>
+      SimpleSelector(transform_simple_selector(ctx, simple))
     | _ => SimpleSelector(simple)
     };
   }
@@ -500,7 +518,8 @@ module Css_transform = {
       (ctx, pseudo: pseudo_selector): pseudo_selector => {
     switch (pseudo) {
     | Pseudoelement(_) => pseudo
-    | Pseudoclass(kind) => Pseudoclass(transform_pseudoclass_kind(ctx, kind))
+    | Pseudoclass(kind) =>
+      Pseudoclass(transform_pseudoclass_kind(ctx, kind))
     };
   }
 
@@ -938,7 +957,8 @@ module Css_transform = {
            fun
            | Declaration_group(decls) =>
              wrap_declaration_group_under_parent(~parent_prelude?, decls)
-           | Nested_rule(rule) => extract_atomic_rules(~parent_prelude?, rule),
+           | Nested_rule(rule) =>
+             extract_atomic_rules(~parent_prelude?, rule),
          )
     and extract_atomic_rules =
         (~parent_prelude=?, rule: rule): list((string, string, rule)) => {
@@ -965,7 +985,11 @@ module Css_transform = {
         List.iter(
           ((sel, sel_loc)) =>
             if (is_bare_leading_pseudo(sel)) {
-              raise_bare_leading_pseudo_error(~loc=sel_loc, ~source_position_start, sel);
+              raise_bare_leading_pseudo_error(
+                ~loc=sel_loc,
+                ~source_position_start,
+                sel,
+              );
             },
           child_selectors,
         );
@@ -993,9 +1017,9 @@ module Css_transform = {
           Ppxlib.Location.raise_errorf(
             ~loc=
               Styled_ppx_css_parser.Parser_location.to_file_location(
-          ~source_position_start,
-          name_loc,
-        ),
+                ~source_position_start,
+                name_loc,
+              ),
             "%s",
             message,
           );
@@ -1014,7 +1038,10 @@ module Css_transform = {
           )
         | _ when !is_conditional_group_rule =>
           raise_at_rule_error(
-            Printf.sprintf("At-rule @%s is not supported in styled-ppx", name),
+            Printf.sprintf(
+              "At-rule @%s is not supported in styled-ppx",
+              name,
+            ),
           )
         | Empty =>
           raise_at_rule_error(
@@ -1064,8 +1091,7 @@ module Css_transform = {
      interpolations under [effective_namespace]. A bare `Declaration` atom is
      wrapped under `.effective_class`; nested / at-rule atoms run through
      `Transform.run`. */
-  let lower_atom =
-      (ctx, ~effective_class, ~effective_namespace, ~loc, rule) => {
+  let lower_atom = (ctx, ~effective_class, ~effective_namespace, ~loc, rule) => {
     let single_rule_list = ([rule], loc);
     let transformed =
       switch (rule) {
@@ -1113,7 +1139,13 @@ module Css_transform = {
         ~label=?,
         rule_list: rule_list,
       ) => {
-    let ctx = { file, scope, opens, source_position_start, dynamic_vars: ref([]) };
+    let ctx = {
+      file,
+      scope,
+      opens,
+      source_position_start,
+      dynamic_vars: ref([]),
+    };
     let (rules, loc) = rule_list;
 
     let atomic_rules = atomize_rules(~source_position_start, ~label?, rules);
@@ -1138,7 +1170,9 @@ module Css_transform = {
       ) {
       | [] => None
       | seeds =>
-        Some(Hash_class.class_and_namespace(~label?, String.concat("", seeds)))
+        Some(
+          Hash_class.class_and_namespace(~label?, String.concat("", seeds)),
+        )
       };
 
     let (shipped_rev, classes_rev, atom_infos_rev) =
@@ -1159,7 +1193,13 @@ module Css_transform = {
             };
 
           let processed =
-            lower_atom(ctx, ~effective_class, ~effective_namespace, ~loc, rule)
+            lower_atom(
+              ctx,
+              ~effective_class,
+              ~effective_namespace,
+              ~loc,
+              rule,
+            )
             |> List.map(r => (dedup_key, r));
 
           let classes_acc =
@@ -1299,7 +1339,13 @@ let push_keyframe =
 
   let (rules, rule_loc) = keyframe_rules;
   let ctx =
-    Css_transform.{ file, scope, opens, source_position_start, dynamic_vars: ref([]) };
+    Css_transform.{
+      file,
+      scope,
+      opens,
+      source_position_start,
+      dynamic_vars: ref([]),
+    };
   let var_namespace =
     Hash_class.scoped_namespace(
       ~kind="keyframes",
@@ -1309,7 +1355,9 @@ let push_keyframe =
     );
   let transformed_rules =
     rules
-    |> List.map(rule => Css_transform.transform_rule(ctx, ~var_namespace, rule));
+    |> List.map(rule =>
+         Css_transform.transform_rule(ctx, ~var_namespace, rule)
+       );
   let rendered_body =
     transformed_rules |> List.map(render_rule) |> String.concat(" ");
 
@@ -1360,7 +1408,13 @@ let push_global =
 
   let (rules, _) = global_rules;
   let ctx =
-    Css_transform.{ file, scope, opens, source_position_start, dynamic_vars: ref([]) };
+    Css_transform.{
+      file,
+      scope,
+      opens,
+      source_position_start,
+      dynamic_vars: ref([]),
+    };
 
   /* Reject `&` with no parent selector: top level, or inside at-rule
      blocks not below a style rule (at-rules don't contribute a
@@ -1376,9 +1430,9 @@ let push_global =
             Ppxlib.Location.raise_errorf(
               ~loc=
                 Styled_ppx_css_parser.Parser_location.to_file_location(
-          ~source_position_start,
-          selector_loc,
-        ),
+                  ~source_position_start,
+                  selector_loc,
+                ),
               "The nesting selector `&` has no parent selector to resolve against here in [%%styled.global] (at-rules like @media don't provide one). Write a concrete selector instead.",
             );
           },

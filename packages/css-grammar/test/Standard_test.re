@@ -4,7 +4,13 @@ module Ast = Styled_ppx_css_parser.Ast;
 open Parser;
 
 let parse_component_values = str =>
-  switch (Driver.parse_declaration(~source_position_start=Styled_ppx_css_parser.Parser_location.file_start(), "x: " ++ str)) {
+  switch (
+    Driver.parse_declaration(
+      ~source_position_start=
+        Styled_ppx_css_parser.Parser_location.file_start(),
+      "x: " ++ str,
+    )
+  ) {
   | Ok({ Ast.value: (values, _), _ }) => values
   | Error((_, msg)) => Alcotest.fail("parser should succeed: " ++ msg)
   };

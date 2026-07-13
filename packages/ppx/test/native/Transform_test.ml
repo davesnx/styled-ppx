@@ -3,7 +3,9 @@ module Transform = Styled_ppx_css_parser.Transform
 let parse input =
   match
     Styled_ppx_css_parser.Driver.parse_declaration_list
-      ~source_position_start:(Styled_ppx_css_parser.Parser_location.file_start ()) input
+      ~source_position_start:
+        (Styled_ppx_css_parser.Parser_location.file_start ())
+      input
   with
   | Ok rule_list -> rule_list
   | Error (_loc, error) -> Alcotest.fail error
@@ -727,7 +729,8 @@ let declaration_after_nested_block_in_declaration_list () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"chart" rule_list in
   check ~pos:__POS__
-    "@media print {.chart .recharts-wrapper{width:100%;}}.chart{margin-top:17px;}"
+    "@media print {.chart \
+     .recharts-wrapper{width:100%;}}.chart{margin-top:17px;}"
     (render list_of_rules)
 
 let pseudo_class_functions_complex () =

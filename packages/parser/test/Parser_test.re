@@ -87,7 +87,9 @@ let declaration_ast_tests = [
 
 let function_ast_tests = [
   test_case("declaration preserves regular function kind", `Quick, () => {
-    switch (Driver.parse_declaration(~source_position_start, "color:calc(1px);")) {
+    switch (
+      Driver.parse_declaration(~source_position_start, "color:calc(1px);")
+    ) {
     | Ok({
         value: ([(Ast.Function({ name: (name, _), kind, _ }), _)], _),
         _,
@@ -103,7 +105,12 @@ let function_ast_tests = [
     }
   }),
   test_case("declaration preserves nth function kind", `Quick, () => {
-    switch (Driver.parse_declaration(~source_position_start, "color:nth-child(2n+1);")) {
+    switch (
+      Driver.parse_declaration(
+        ~source_position_start,
+        "color:nth-child(2n+1);",
+      )
+    ) {
     | Ok({
         value: ([(Ast.Function({ name: (name, _), kind, _ }), _)], _),
         _,
@@ -193,7 +200,9 @@ let selector_combinator_ast_tests = [
   }),
   test_case(
     "selector function payload preserves relative combinator", `Quick, () => {
-    switch (Driver.parse_stylesheet(~source_position_start, "div:has(> span) {}")) {
+    switch (
+      Driver.parse_stylesheet(~source_position_start, "div:has(> span) {}")
+    ) {
     | Ok(([Ast.Style_rule({ prelude: ([(selector, _)], _), _ })], _)) =>
       switch (selector) {
       | Ast.ComplexSelector(
@@ -267,7 +276,12 @@ let ambiguity_regression_tests = [
     }
   }),
   test_case("selector head with pseudo parses as style rule", `Quick, () => {
-    switch (Driver.parse_declaration_list(~source_position_start, "a:hover { color: blue; }")) {
+    switch (
+      Driver.parse_declaration_list(
+        ~source_position_start,
+        "a:hover { color: blue; }",
+      )
+    ) {
     | Ok(([Ast.Style_rule(_)], _)) => ()
     | Ok(_) => fail("expected style rule")
     | Error((_, msg)) => fail("expected style rule parse success: " ++ msg)
@@ -276,7 +290,10 @@ let ambiguity_regression_tests = [
   test_case(
     "selector head with unknown pseudo parses as style rule", `Quick, () => {
     switch (
-      Driver.parse_declaration_list(~source_position_start, "a:future-state { color: blue; }")
+      Driver.parse_declaration_list(
+        ~source_position_start,
+        "a:future-state { color: blue; }",
+      )
     ) {
     | Ok(([Ast.Style_rule(_)], _)) => ()
     | Ok(_) => fail("expected style rule")

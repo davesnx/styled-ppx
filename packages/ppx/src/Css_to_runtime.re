@@ -90,7 +90,8 @@ let render_dynamic_var_chunk = (~loc, var: Css_file.dynamic_var) => {
   | Selector
   | MediaQuery
   | CustomProperty
-  | RuntimeModule(_) => Builder.elist(~loc, [render_dynamic_var_tuple(~loc, var)])
+  | RuntimeModule(_) =>
+    Builder.elist(~loc, [render_dynamic_var_tuple(~loc, var)])
   };
 };
 

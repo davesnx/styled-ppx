@@ -48,12 +48,14 @@ let media_preludes_equal = ((left, _), (right, _)) =>
 let rec merge_adjacent_media = (rules: list(rule)) =>
   switch (rules) {
   | [
-      At_rule({
-        name: ("media", _),
-        prelude: left_prelude,
-        block: Rule_list((left_rules, _)),
-        _,
-      } as left),
+      At_rule(
+        {
+          name: ("media", _),
+          prelude: left_prelude,
+          block: Rule_list((left_rules, _)),
+          _,
+        } as left,
+      ),
       At_rule({
         name: ("media", _),
         prelude: right_prelude,
