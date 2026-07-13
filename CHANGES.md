@@ -1,10 +1,27 @@
 # Changes
 
-## Unreleased
+## 0.62.0
 
-- [BREAKING] [FIX] `[%css]` class-name interpolation in selectors (e.g. `&.$(other)`, `:not(&.$(other))`, `:has(.$(other))`) is now resolved at extraction time. Previously the literal `$(name)` text was emitted into the extracted CSS, breaking the selector at runtime, and a phantom `--var-XXX: <className>` was leaked onto every consumer's inline `style=`. Same-module references now substitute the actual class names (chained for multi-declaration source bindings, e.g. `&.cssA.cssB`); cross-module and unresolved references raise a clear PPX error.
-- [INTERNAL] Refactor entire PPX to use context-free ppxlib rules, removing the global AST traverser (@davesnx)
+- [BREAKING] [FEATURE] CSS static extraction and atomization: all extensions (`[%css]`, `[%styled.<tag>]`, `[%styled.global]`, `[%keyframe]`) are now statically extracted at compile time. The PPX emits `[@@@css ...]` attributes that the `styled-ppx.generate` aggregator collects into CSS assets, with declarations atomized into content-addressed classes for zero runtime overhead (#573) (@davesnx)
+- [BREAKING] Remove the ReScript runtime (`styled-ppx.rescript`), along with its tests, demo, and VSCode syntax (@davesnx)
+- [BREAKING] `[%styled.global]` now returns a `React.element` instead of writing to a buffer; `to_buffer` is removed (@davesnx)
+- [BREAKING] Remove `cx2` (@davesnx)
+- [BREAKING] [FIX] `[%css]` class-name interpolation in selectors (e.g. `&.$(other)`, `:not(&.$(other))`, `:has(.$(other))`) is now resolved at extraction time. Previously the literal `$(name)` text was emitted into the extracted CSS, breaking the selector at runtime, and a phantom `--var-XXX: <className>` was leaked onto every consumer's inline `style=`. Same-module references now substitute the actual class names (chained for multi-declaration source bindings, e.g. `&.cssA.cssB`); cross-module and unresolved references raise a clear PPX error (@davesnx)
+- [BREAKING] Sibling selectors with interpolation that escape the component's subtree (e.g. `& + .$(other)`) now raise a PPX error instead of generating broken CSS (@davesnx)
+- [FEATURE] Allow any OCaml/Reason expression inside `$(...)` interpolation, not just identifiers and module paths (#572) (@davesnx)
+- [FEATURE] Add `CSS.empty`, `CSS.styles` and `CSS.className` (@davesnx)
+- [FEATURE] Support `font-family` interpolation with arrays of font families (@davesnx)
+- [FEATURE] Add log levels to `styled-ppx.generate` (`--log error|warning|info|debug`, `--debug`), prefixing all diagnostics with `styled-ppx:` (@davesnx)
+- [PERF] Register `&`-local interpolation vars with `@property { syntax: "*"; inherits: false }`, so changing an inline custom property invalidates only the element instead of its whole subtree (up to 25x median style-recalc win on token-heavy pages; degrades gracefully on unsupported browsers) (@davesnx)
+- [PERF] Bundle a block's interpolating declarations into a single content-addressed atom, so a value shared across base/`:hover`/`@media` mints one var set once inline instead of one per variant (@davesnx)
 - [PERF] Fix quadratic CSS rule accumulation in `[%css]` extraction: rule dedup used an O(n) list scan per emitted rule, making files with many `[%css]` blocks superlinearly slow (~43% faster on a file with 1600 declarations, ~12% on realistic heavy files). Now uses O(1) hash-based membership (@davesnx)
+- [FIX] Report interpolation, bare-pseudo, and `@media` prelude errors at their exact source location, with the compiler rendering source excerpts and carets on the offending token (@davesnx)
+- [FIX] Generate `makeProps` and a public `make` wrapper for native mode components, fixing `Unbound value X.makeProps` with the new server-reason-react JSX transform (@davesnx)
+- [FIX] Ensure `[%css]` works inside `include struct ... end` (@davesnx)
+- [FIX] Strip CSS-unsafe characters from atomic class labels: binding names ending in a prime (e.g. `inputView'`) produced unmatchable selectors (@davesnx)
+- [FIX] Name interpolation custom properties after their source (`Theme.spacing.md` -> `--spacing-md-<hash>`) instead of the opaque `--var-<hash>` (@davesnx)
+- [FIX] Hash atomic classes by main module name instead of file path, so class names are stable across build contexts (@davesnx)
+- [DOCS] Rework the documentation website for static extraction: new introduction, "How it works", dune setup guide, and 0.62 migration guide; reference pages rewritten around `[%css]`/`CSS.styles`; ReScript pages replaced with a deprecation notice; OCaml examples use mlx syntax (@davesnx)
 
 ## 0.61.0
 
