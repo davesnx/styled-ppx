@@ -11,12 +11,13 @@ let styles (carrier : styles) : ReactDOM.Style.t = snd carrier
 let className (carrier : styles) : string = fst carrier
 
 let make className vars : styles =
-  let style =
-    List.fold_left
-      (fun style (key, value) -> ReactDOM.Style.unsafeAddProp style key value)
-      (ReactDOM.Style.make ()) vars
+  let rec loop style vars =
+    match vars with
+    | [] -> style
+    | (key, value) :: rest ->
+      loop (ReactDOM.Style.unsafeAddProp style key value) rest
   in
-  className, style
+  className, loop (ReactDOM.Style.make ()) vars
 
 let merge (styles1 : styles) (styles2 : styles) =
   let className = String.trim (fst styles1 ^ " " ^ fst styles2) in
