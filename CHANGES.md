@@ -21,7 +21,7 @@
 - [FIX] Strip CSS-unsafe characters from atomic class labels: binding names ending in a prime (e.g. `inputView'`) produced unmatchable selectors (@davesnx)
 - [FIX] Name interpolation custom properties after their source (`Theme.spacing.md` -> `--spacing-md-<hash>`) instead of the opaque `--var-<hash>` (@davesnx)
 - [FIX] Hash atomic classes by main module name instead of file path, so class names are stable across build contexts (@davesnx)
-- [DOCS] Rework the documentation website for static extraction: new introduction, "How it works", dune setup guide, and 0.62 migration guide; reference pages rewritten around `[%css]`/`CSS.styles`; ReScript pages replaced with a deprecation notice; OCaml examples use mlx syntax (@davesnx)
+- [DOCS] Rework the documentation website for static extraction: new introduction, "How it works", and dune setup guide; reference pages rewritten around `[%css]`/`CSS.styles`; ReScript pages replaced with a deprecation notice; OCaml examples use mlx syntax (@davesnx)
 
 ## 0.61.0
 
