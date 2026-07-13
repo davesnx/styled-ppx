@@ -9,7 +9,7 @@
  (preprocess
   (pps styled-ppx melange.ppx reason-react-ppx))
  (module_systems
-  (commonjs bs.js)))
+  (es6 mjs)))
 
 (subdir
  public
@@ -19,7 +19,7 @@
   (mode promote)
   (target styles.css)
   (deps
-   (glob_files_rec ../client.re.pp.ml))
+   (glob_files_rec ../*.pp.ml))
   (action
    (run styled-ppx.generate --output %{target} --log info %{deps})))
  ; Bundle the Melange client output into `public/main.js` with esbuild,
@@ -29,7 +29,7 @@
   (mode promote)
   (deps
    (:script ../build.mjs)
-   (:entry ../demo-melange/demo/melange/client.bs.js)
+   (:entry ../demo-melange/demo/melange/client.mjs)
    (alias ../melange)
    (source_tree ../node_modules)
    (file ../package.json))
