@@ -9,6 +9,6 @@ export default {
   "keyframe": "Keyframe",
   "globals": "Global styles",
   "theming": "Theming",
-  "runtime": "Runtime: CSS",
+  "runtime": "The CSS module",
   "react-ref": "React's Ref"
 }

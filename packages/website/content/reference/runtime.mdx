@@ -1,12 +1,12 @@
 ---
-title: Runtime
+title: The CSS module
 ---
 
 import { Re, Ml } from "../../src/components/language-content";
 
-# Runtime: `CSS`
+# The `CSS` module
 
-styled-ppx's runtime is intentionally tiny: since all CSS is [extracted at compile time](/how-it-works), the `CSS` module only carries class names around, supplies custom-property values, and provides typed value constructors for [interpolation](./interpolation).
+`CSS` is the runtime module you interact with. It is intentionally tiny: since all CSS is [extracted at compile time](/how-it-works), it only carries class names around, supplies custom-property values, and provides typed value constructors for [interpolation](./interpolation).
 
 It's available as a dune library:
 
