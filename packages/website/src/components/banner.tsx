@@ -3,7 +3,7 @@ import { Button } from 'nextra/components'
 import { XIcon } from 'nextra/icons'
 import type { ReactElement } from 'react'
 import { useThemeConfig } from '../contexts'
-import { renderComponent } from '../git-url'
+import { renderComponent } from '../render'
 
 export function Banner(): ReactElement | null {
   const { banner } = useThemeConfig()

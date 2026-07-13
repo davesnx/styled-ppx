@@ -1,5 +1,5 @@
 import { addBasePath } from 'next/dist/client/add-base-path'
-import { useRouter } from 'nextra/hooks'
+import { usePathname } from 'next/navigation'
 import { GlobeIcon } from 'nextra/icons'
 import type { ReactElement } from 'react'
 import { useThemeConfig } from '../contexts'
@@ -18,7 +18,8 @@ export function LocaleSwitch({
 }: LocaleSwitchProps): ReactElement | null {
   const themeConfig = useThemeConfig()
 
-  const { locale, asPath } = useRouter()
+  const asPath = usePathname()
+  const locale = ''
 
   const options = themeConfig.i18n
   if (!options.length) return null

@@ -1,15 +1,16 @@
-import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
 import { useMounted } from 'nextra/hooks'
 import type { ReactElement } from 'react'
 import { useThemeConfig } from '../contexts'
-import { getGitIssueUrl, renderComponent } from '../git-url'
+import { getGitIssueUrl } from '../git-url'
+import { renderComponent } from '../render'
 import { Anchor } from './anchor'
 
 export function NotFoundPage(): ReactElement | null {
   const themeConfig = useThemeConfig()
 
   const mounted = useMounted()
-  const { asPath } = useRouter()
+  const asPath = usePathname()
   const { content, labels } = themeConfig.notFound
   if (!content) {
     return null

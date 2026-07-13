@@ -1,3 +1,5 @@
+"use client";
+
 import { useLanguage } from "../contexts/use-language";
 
 export function LanguageContent({ language, children }) {

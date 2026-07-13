@@ -3,10 +3,12 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 @import './code-block.css';
-@import 'nextra/styles/subheading-anchor.css';
-@import 'nextra/styles/scrollbar.css';
-@import 'nextra/styles/steps.css';
-@import 'nextra/styles/cards.css';
+/* Vendored from nextra v3: v4 ships Tailwind-v4 sources incompatible
+   with this custom theme's Tailwind v3 pipeline. */
+@import './nextra/subheading-anchor.css';
+@import './nextra/scrollbar.css';
+@import './nextra/steps.css';
+@import './nextra/cards.css';
 @import './hamburger.css';
 @import './typesetting-article.css';
 

@@ -1,7 +1,6 @@
-import { useRouter } from 'nextra/hooks'
 import { DiscordIcon, GitHubIcon } from 'nextra/icons'
 import type { z } from 'zod'
-import { Flexsearch } from './components/flexsearch'
+import { Search } from 'nextra/components'
 import { ThemeSwitch } from './components/theme-switch'
 import { TOC } from './components/toc'
 import type { publicThemeSchema, themeSchema } from './schemas'
@@ -57,7 +56,7 @@ export const DEFAULT_THEME: DocsThemeConfig = {
     }
   },
   gitTimestamp: function GitTimestamp({ timestamp }) {
-    const { locale = DEFAULT_LOCALE } = useRouter()
+    const locale = DEFAULT_LOCALE
     return (
       <>
         Last updated on{' '}
@@ -86,7 +85,7 @@ export const DEFAULT_THEME: DocsThemeConfig = {
     )
   },
   search: {
-    component: Flexsearch,
+    component: () => <Search placeholder="Search documentation…" />,
     emptyResult: (
       <span className="_block _select-none _p-8 _text-center _text-sm _text-gray-400">
         No results found.

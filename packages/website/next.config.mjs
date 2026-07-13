@@ -1,3 +1,4 @@
+import Os from "node:os";
 import Path from "node:path";
 import URL from "node:url";
 import Fs from "node:fs";
@@ -36,7 +37,7 @@ const ocamlGrammar = {
 const styledPpxCssGrammar = {
   ...JSON.parse(
     Fs.readFileSync(
-      Path.join(editors, "vscode/syntaxes/css.styled-ppx.json"),
+      Path.join(editors, "vscode/syntaxes/css-styled-ppx.json"),
       "utf8"
     )
   ),
@@ -98,6 +99,11 @@ const withNextra = Nextra({
 const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
+  },
+  experimental: {
+    // Cap static-generation workers: Next spawns one per CPU, which
+    // explodes on many-core machines (25 pages don't need 512 workers).
+    cpus: Math.min(8, Os.cpus().length),
   },
 };
 

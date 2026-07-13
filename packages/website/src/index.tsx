@@ -1,3 +1,5 @@
+"use client";
+
 import { ThemeProvider } from "next-themes";
 import type { PageMapItem } from "nextra";
 import { normalizePages } from "nextra/normalize-pages";
