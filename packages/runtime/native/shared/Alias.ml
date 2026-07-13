@@ -2,143 +2,178 @@
 
 open Css_types
 
-let initial = Cascading.initial
-let inherit_ = Cascading.inherit_
-let unset = Cascading.unset
+let initial = `initial
+let inherit_ = `inherit_
+let unset = `unset
 
 let var ?default (x : string) : [> Var.t ] =
   match default with None -> `var x | Some default -> `varDefault (x, default)
 
-let auto = Auto.auto
-let none = None.none
+let auto = `auto
+let none = `none
 let text = `text
-let pct = Percentage.pct
-let num = Length.num
-let ch = Length.ch
-let cm = Length.cm
-let em = Length.em
-let ex = Length.ex
-let mm = Length.mm
-let pt = Length.pt
-let px = Length.px
-let pxFloat = Length.pxFloat
-let rem = Length.rem
-let vh = Length.vh
-let vw = Length.vw
-let vmin = Length.vmin
-let vmax = Length.vmax
-let zero = Length.zero
-let fr = TrackBreadth.fr
-let deg = Angle.deg
-let rad = Angle.rad
-let grad = Angle.grad
-let turn = Angle.turn
-let ltr = Direction.ltr
-let rtl = Direction.rtl
-let absolute = PropertyPosition.absolute
-let relative = PropertyPosition.relative
-let static = PropertyPosition.static
-let fixed = PropertyPosition.fixed
-let sticky = PropertyPosition.sticky
-let isolate = Isolation.isolate
-let horizontal = Resize.horizontal
-let vertical = Resize.vertical
-let smallCaps = FontVariant.smallCaps
-let italic = FontStyle.italic
-let oblique = FontStyle.oblique
+let pct (x : float) = `percent x
+let num (x : float) = `num x
+let ch (x : float) = `ch x
+let cm (x : float) = `cm x
+let em (x : float) = `em x
+let ex (x : float) = `ex x
+let mm (x : float) = `mm x
+let pt (x : int) = `pt x
+let px (x : int) = `px x
+let pxFloat (x : float) = `pxFloat x
+let rem (x : float) = `rem x
+let vh (x : float) = `vh x
+let vw (x : float) = `vw x
+let vmin (x : float) = `vmin x
+let vmax (x : float) = `vmax x
+let zero = `zero
+let fr (x : float) = `fr x
+let deg (x : float) = `deg x
+let rad (x : float) = `rad x
+let grad (x : float) = `grad x
+let turn (x : float) = `turn x
+let ltr = `ltr
+let rtl = `rtl
+let absolute = `absolute
+let relative = `relative
+let static = `static
+let fixed = `fixed
+let sticky = `sticky
+let isolate = `isolate
+let horizontal = `horizontal
+let vertical = `vertical
+let smallCaps = `smallCaps
+let italic = `italic
+let oblique = `oblique
 let hidden = `hidden
 let visible = `visible
 let scroll = `scroll
-let rgb = Color.rgb
-let rgba = Color.rgba
-let hsl = Color.hsl
-let hsla = Color.hsla
-let hex = Color.hex
-let currentColor = Color.currentColor
-let transparent = Color.transparent
-let linear = EasingFunction.linear
-let ease = EasingFunction.ease
-let easeIn = EasingFunction.easeIn
-let easeInOut = EasingFunction.easeInOut
-let easeOut = EasingFunction.easeOut
-let stepStart = EasingFunction.stepStart
-let stepEnd = EasingFunction.stepEnd
-let steps = EasingFunction.steps
-let cubicBezier = EasingFunction.cubicBezier
-let marginBox = GeometryBox.marginBox
-let fillBox = GeometryBox.fillBox
-let strokeBox = GeometryBox.strokeBox
-let viewBox = GeometryBox.viewBox
-let translate = Transform.translate
-let translate3d = Transform.translate3d
-let translateX = Transform.translateX
-let translateY = Transform.translateY
-let translateZ = Transform.translateZ
-let scaleX = Transform.scaleX
-let scaleY = Transform.scaleY
-let scaleZ = Transform.scaleZ
-let rotateX = Transform.rotateX
-let rotateY = Transform.rotateY
-let rotateZ = Transform.rotateZ
-let scale = Transform.scale
-let scale3d = Transform.scale3d
-let skew = Transform.skew
-let skewX = Transform.skewX
-let skewY = Transform.skewY
-let thin = FontWeight.thin
-let extraLight = FontWeight.extraLight
-let light = FontWeight.light
-let medium = FontWeight.medium
-let semiBold = FontWeight.semiBold
-let bold = FontWeight.bold
-let extraBold = FontWeight.extraBold
-let lighter = FontWeight.lighter
-let bolder = FontWeight.bolder
-let linearGradient = Gradient.linearGradient
-let repeatingLinearGradient = Gradient.repeatingLinearGradient
-let radialGradient = Gradient.radialGradient
-let repeatingRadialGradient = Gradient.repeatingRadialGradient
-let conicGradient = Gradient.conicGradient
-let area = ExplicitTrackWithArea.area
-let areas = GridTemplateAreas.areas
-let trackSizes = GridAutoColumns.trackSizes
-let tracks = GridTemplateRows.Value.tracks
-let numInt = GridLine.num
-let ident = GridLine.ident
-let numIdent = GridLine.numIdent
-let span = GridLine.span
-let contextMenu = Cursor.contextMenu
-let help = Cursor.help
-let pointer = Cursor.pointer
-let progress = Cursor.progress
-let wait = Cursor.wait
-let cell = Cursor.cell
-let crosshair = Cursor.crosshair
-let verticalText = Cursor.verticalText
-let alias = Cursor.alias
-let copy = Cursor.copy
-let move = Cursor.move
-let noDrop = Cursor.noDrop
-let notAllowed = Cursor.notAllowed
-let grab = Cursor.grab
-let grabbing = Cursor.grabbing
-let allScroll = Cursor.allScroll
-let colResize = Cursor.colResize
-let rowResize = Cursor.rowResize
-let nResize = Cursor.nResize
-let eResize = Cursor.eResize
-let sResize = Cursor.sResize
-let wResize = Cursor.wResize
-let neResize = Cursor.neResize
-let nwResize = Cursor.nwResize
-let seResize = Cursor.seResize
-let swResize = Cursor.swResize
-let ewResize = Cursor.ewResize
-let nsResize = Cursor.nsResize
-let neswResize = Cursor.neswResize
-let nwseResize = Cursor.nwseResize
-let zoomIn = Cursor.zoomIn
-let zoomOut = Cursor.zoomOut
+let rgb (r : int) (g : int) (b : int) = `rgb (r, g, b)
+
+let rgba (r : int) (g : int) (b : int) (a : Color.alpha_with_calc) =
+  `rgba (r, g, b, a)
+
+let hsl (h : Color.angle_with_calc) (s : Color.percent_with_calc)
+  (l : Color.percent_with_calc) =
+  `hsl (h, s, l)
+
+let hsla (h : Color.angle_with_calc) (s : Color.percent_with_calc)
+  (l : Color.percent_with_calc) (a : Color.angle_with_calc) =
+  `hsla (h, s, l, a)
+
+let hex (x : string) = `hex x
+let currentColor = `currentColor
+let transparent = `transparent
+let linear = `linear
+let ease = `ease
+let easeIn = `easeIn
+let easeInOut = `easeInOut
+let easeOut = `easeOut
+let stepStart = `stepStart
+let stepEnd = `stepEnd
+let steps (i : int) (dir : [ `start | `end_ ]) = `steps (i, dir)
+
+let cubicBezier (a : float) (b : float) (c : float) (d : float) =
+  `cubicBezier (a, b, c, d)
+
+let marginBox = `marginBox
+let fillBox = `fillBox
+let strokeBox = `strokeBox
+let viewBox = `viewBox
+let translate (x : Length.t) (y : Length.t) = `translate (x, y)
+
+let translate3d (x : Length.t) (y : Length.t) (z : Length.t) =
+  `translate3d (x, y, z)
+
+let translateX (x : Length.t) = `translateX x
+let translateY (y : Length.t) = `translateY y
+let translateZ (z : Length.t) = `translateZ z
+let scaleX (x : float) = `scaleX x
+let scaleY (x : float) = `scaleY x
+let scaleZ (x : float) = `scaleZ x
+let rotateX (a : Angle.t) = `rotateX a
+let rotateY (a : Angle.t) = `rotateY a
+let rotateZ (a : Angle.t) = `rotateZ a
+let scale (x : float) (y : float) = `scale (x, y)
+let scale3d (x : float) (y : float) (z : float) = `scale3d (x, y, z)
+let skew (a : Angle.t) (a' : float) = `skew (a, a')
+let skewX (a : Angle.t) = `skewX a
+let skewY (a : Angle.t) = `skewY a
+let thin = `thin
+let extraLight = `extraLight
+let light = `light
+let medium = `medium
+let semiBold = `semiBold
+let bold = `bold
+let extraBold = `extraBold
+let lighter = `lighter
+let bolder = `bolder
+
+let linearGradient (direction : Gradient.direction option)
+  (stops : Gradient.color_stop_list) =
+  `linearGradient (Some direction, stops)
+
+let repeatingLinearGradient (direction : Gradient.direction option)
+  (stops : Gradient.color_stop_list) =
+  `repeatingLinearGradient (Some direction, stops)
+
+let radialGradient (shape : Gradient.shape) (size : Gradient.radial_size)
+  (position : Position.t) (stops : Gradient.color_stop_list) =
+  `radialGradient (Some shape, Some size, Some position, stops)
+
+let repeatingRadialGradient (shape : Gradient.shape)
+  (size : Gradient.radial_size) (position : Position.t)
+  (stops : Gradient.color_stop_list) =
+  `repeatingRadialGradient (Some shape, Some size, Some position, stops)
+
+let conicGradient (angle : Gradient.direction option)
+  (stops : Gradient.color_stop_list) =
+  `conicGradient (Some angle, stops)
+
+let area (x : string) = `area x
+let areas (x : string array) = `areas x
+let trackSizes (x : TrackSize.t array) = `trackSizes x
+let tracks (x : Track.t array) = `tracks x
+let numInt (x : int) = `num x
+let ident (x : string) = `ident x
+let numIdent (x : int) (y : string) = `numIdent (x, y)
+
+let span (x : [ `num of int | `ident of string | `numIdent of int * string ]) =
+  `span x
+
+let contextMenu = `contextMenu
+let help = `help
+let pointer = `pointer
+let progress = `progress
+let wait = `wait
+let cell = `cell
+let crosshair = `crosshair
+let verticalText = `verticalText
+let alias = `alias
+let copy = `copy
+let move = `move
+let noDrop = `noDrop
+let notAllowed = `notAllowed
+let grab = `grab
+let grabbing = `grabbing
+let allScroll = `allScroll
+let colResize = `colResize
+let rowResize = `rowResize
+let nResize = `nResize
+let eResize = `eResize
+let sResize = `sResize
+let wResize = `wResize
+let neResize = `neResize
+let nwResize = `nwResize
+let seResize = `seResize
+let swResize = `swResize
+let ewResize = `ewResize
+let nsResize = `nsResize
+let neswResize = `neswResize
+let nwseResize = `nwseResize
+let zoomIn = `zoomIn
+let zoomOut = `zoomOut
 
 module Calc = struct
   let ( - ) a b = `calc (`sub (a, b))
@@ -146,7 +181,7 @@ module Calc = struct
   let ( * ) a b = `calc (`mult (a, b))
 end
 
-let size = BackgroundSize.Value.size
+let size (x : [ Length.t | Auto.t ]) (y : [ Length.t | Auto.t ]) = `size (x, y)
 let all = `all
 let backwards = `backwards
 let baseline = `baseline
@@ -192,13 +227,16 @@ let space = `space
 let nowrap = `nowrap
 let paddingBox = `paddingBox
 let paused = `paused
-let repeatFn = Repeat.repeat
+let repeatFn (x : RepeatValue.t) (y : RepeatTrack.t array) = `repeat (x, y)
 let repeat = `repeat
-let minmax = MinMax.minmax
+let minmax (x : InflexibleBreadth.t) (y : TrackBreadth.t) = `minmax (x, y)
 let repeatX = `repeatX
 let repeatY = `repeatY
-let rotate = Transform.rotate
-let rotate3d = Transform.rotate3d
+let rotate (a : Angle.t) = `rotate a
+
+let rotate3d (x : float) (y : float) (z : float) (a : Angle.t) =
+  `rotate3d (x, y, z, a)
+
 let row = `row
 let rowReverse = `rowReverse
 let running = `running
@@ -207,7 +245,7 @@ let spaceAround = `spaceAround
 let spaceBetween = `spaceBetween
 let spaceEvenly = `spaceEvenly
 let stretch = `stretch
-let url = Url.url
+let url (x : string) = `url x
 let wrap = `wrap
 let wrapReverse = `wrapReverse
 let inside = `inside
@@ -238,7 +276,7 @@ let fill = `fill
 let maxContent = `maxContent
 let minContent = `minContent
 let fitContent = `fitContent
-let fitContentFn = TrackSize.fitContent
+let fitContentFn (x : Length.t) = `fitContent x
 let round = `round
 let miter = `miter
 let bevel = `bevel
@@ -252,8 +290,8 @@ let panUp = `panUp
 let panDown = `panDown
 let pinchZoom = `pinchZoom
 let manipulation = `manipulation
-let subgrid = Track.subgrid
-let lineNames = Track.lineNames
+let subgrid = `subgrid
+let lineNames (x : string) = `lineNames x
 
 module Shadow = struct
   type box = Css_types.Shadow.box Css_types.Shadow.t
@@ -262,18 +300,25 @@ module Shadow = struct
   (* [t] is an alias for [box] for backwards compatibility. *)
   type t = box
 
-  let box = Css_types.Shadow.box
-  let text = Css_types.Shadow.text
+  let box ?x ?y ?blur ?spread ?inset color =
+    Css_types.Shadow.box ?x ?y ?blur ?spread ?inset color
+
+  let text ?x ?y ?blur color = Css_types.Shadow.text ?x ?y ?blur color
 end
 
 module Animation = struct
   (* backwards compatibility *)
-  let shorthand = Css_types.Animation.Value.make
+  let shorthand ?duration ?delay ?direction ?timingFunction ?fillMode ?playState
+    ?iterationCount ?name () =
+    Css_types.Animation.Value.make ?duration ?delay ?direction ?timingFunction
+      ?fillMode ?playState ?iterationCount ?name ()
 end
 
 module Transition = struct
   (* backwards compatibility *)
-  let shorthand = Css_types.Transition.Value.make
+  let shorthand ?behavior ?duration ?delay ?timingFunction ?property () =
+    Css_types.Transition.Value.make ?behavior ?duration ?delay ?timingFunction
+      ?property ()
 end
 
 type animationName = AnimationName.t
