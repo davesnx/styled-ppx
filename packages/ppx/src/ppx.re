@@ -203,7 +203,7 @@ let css_error_expr = (~payload_loc) => {
   Error.raise(
     ~loc=payload_loc,
     ~examples?,
-    ~link="https://styled-ppx.vercel.app/reference/cx",
+    ~link="https://styled-ppx.vercel.app/reference/css",
     "[%css] expects a string of CSS for static extraction.",
   );
 };
