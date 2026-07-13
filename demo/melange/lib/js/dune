@@ -5,3 +5,8 @@
  (libraries melange.belt styled-ppx.melange reason-react)
  (preprocess
   (pps styled-ppx melange.ppx reason-react-ppx)))
+
+; Shared UI sources are owned by lib/native/shared and compiled a second
+; time here for the Melange target.
+(copy_files
+ (files ../native/shared/*.re))
