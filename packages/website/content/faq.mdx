@@ -4,11 +4,56 @@ title: Frequently asked questions
 
 # Frequently asked questions
 
-## Does it support ReScript, Reason and OCaml syntax?
+## Which languages does styled-ppx support?
 
-Yes, all are supported. Since the ppx transformation operates on the AST and all of those languages share the majority of the AST, it's possible to support all of them. Note that, ReScript has been challenging since they are exploring new patterns of the language and are diverging from the OCaml AST.
+**Reason and OCaml.** Since the ppx transformation operates on the AST and both languages share it, both syntaxes are fully supported — targeting [Melange](https://melange.re) for the browser and [server-reason-react](https://github.com/ml-in-barcelona/server-reason-react) for native.
 
-You can use the language selector in the sidebar to switch between the different syntaxes. All snippets on this page are written in Reason and ReScript.
+You can use the language selector in the sidebar to switch between the syntaxes. The OCaml examples use [mlx](https://github.com/ocaml-mlx/mlx), the OCaml syntax dialect that adds JSX expressions — plain OCaml works the same, minus the JSX sugar.
 
-As well, our [VSCode extension](https://marketplace.visualstudio.com/items?itemName=davesnx.vscode-styled-ppx) supports ReScript, Reason, and OCaml syntaxes.
+## Does it support ReScript?
 
+Not anymore. ReScript support was removed in 0.62.0 — the last release supporting it was 0.61.0. See the [ReScript page](/getting-started/rescript) for details and options.
+
+## Where is my CSS? My app renders unstyled
+
+styled-ppx extracts all CSS at compile time into a static stylesheet — nothing injects styles at runtime. You need a `styled-ppx.generate` dune rule producing `styles.css`, and a `<link rel="stylesheet">` loading it. See [Setting up the dune rules](/getting-started/dune-setup).
+
+## Why do my elements have an inline `style` attribute?
+
+When a block interpolates values (`color: $(c)`), the extracted CSS references a CSS custom property, and the element supplies its *value* through the inline `style` attribute (`style="--color-xk29fh: #f00"`). Only variable definitions live there, never declarations. See [How it works](/how-it-works#dynamic-values-css-custom-properties).
+
+## Do I need `@emotion/css` or any JavaScript dependency?
+
+No. Since 0.62.0 there is no CSS-in-JS runtime: the runtime library only carries class names and custom-property values. Your bundle ships no CSS engine.
+
+## Why do my components have several class names?
+
+Styles are atomic: each declaration becomes its own content-addressed class, so identical declarations across your app share one rule. Treat the class list as opaque. See [How it works](/how-it-works#atomization-one-declaration-one-class).
+
+## Can I use it without React?
+
+Partially. The extraction pipeline and `[%css]` work anywhere, and `CSS.className` gives you a plain string you can render from any HTML templating. But the runtime pairs class names with a `ReactDOM.Style.t` (and `[%styled.<tag>]` / `[%styled.global]` generate React components), so the React-shaped dependency (`reason-react` or `server-reason-react`) links regardless. A runtime without that dependency isn't supported today.
+
+## Does it work with Dream (or any OCaml web server)?
+
+Yes — server-reason-react renders your components to an HTML string, and your server serves it plus the static `styles.css`. See the [native guide](/getting-started/native) for a Dream handler example.
+
+## How do I set up mlx?
+
+The OCaml examples on this site use [mlx](https://github.com/ocaml-mlx/mlx), the OCaml syntax dialect with JSX. In your own project: depend on the `mlx` package, declare the dialect in `dune-project`, and use the `.mlx` file extension — the [OCaml Platform VSCode extension](https://marketplace.visualstudio.com/items?itemName=ocamllabs.ocaml-platform) (≥ 2.0) highlights it out of the box. See the mlx README for details. mlx is optional: everything works in plain OCaml, minus the JSX sugar.
+
+## Why did my class names change between builds?
+
+They shouldn't have, unless something real changed: hashes are content-addressed from the CSS text (plus the main module name for interpolation variables). Names change exactly when the styles change, when a binding is renamed (the cosmetic `-label` suffix only), or when the ppx `--minify` flag differs between the builds you're comparing — dev and prod names differ only by that label suffix, the hash is identical.
+
+## Can I extract the CSS for only part of my project?
+
+Yes, through the generate rule's `deps`: the stylesheet contains exactly the rules found in the files you glob. The caveat is cross-module selector references — they must resolve within the files passed to the rule. Per-route CSS splitting is not built in.
+
+## Does styled-ppx autoprefix?
+
+Yes, for a fixed set of properties where prefixes still matter: the `animation-*` family, `text-decoration`, `filter`, `clip-path`, `mask-*`, `column-*`, `background-clip` (`-webkit-`); `transform`, `user-select`, `appearance`, `hyphens` (`-webkit-`, `-moz-`, `-ms-`); `flex`, `flex-direction`, `scroll-snap-type`, `writing-mode` (`-webkit-`, `-ms-`); intrinsic sizing keywords; and a few more. Prefixes are added to the extracted CSS at compile time — nothing happens at runtime. The general stance: write standard CSS and target evergreen browsers.
+
+## Is there a playground?
+
+Not currently. The fastest way to try styled-ppx is cloning the [demo](https://github.com/davesnx/styled-ppx/tree/main/demo/melange) — it's a complete Melange + native setup with extraction wired up.

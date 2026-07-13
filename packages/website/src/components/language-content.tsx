@@ -11,6 +11,6 @@ export function Re({ children }) {
   return <LanguageContent language="reason">{children}</LanguageContent>;
 }
 
-export function Res({ children }) {
-  return <LanguageContent language="rescript">{children}</LanguageContent>;
+export function Ml({ children }) {
+  return <LanguageContent language="ocaml">{children}</LanguageContent>;
 }

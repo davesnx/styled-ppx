@@ -1,0 +1,133 @@
+---
+title: Migrate to 0.62
+showAllLanguage: true
+---
+
+import { Callout } from "nextra/components";
+
+# Migrating to 0.62
+
+0.62.0 replaces the emotion-style runtime with **compile-time static extraction**: all CSS now lands in a static `styles.css` generated during the build, and components only carry class names. This page walks through every breaking change.
+
+<Callout type="info">
+  Read [How it works](/how-it-works) first if you want the mental model behind
+  these changes.
+</Callout>
+
+## 1. Add the stylesheet generation rule (required)
+
+Previously, styles were injected at runtime (browser) or collected from a runtime registry (server). Neither exists anymore: if you don't generate and link the stylesheet, your app renders unstyled.
+
+```dune
+(rule
+ (mode promote)
+ (target styles.css)
+ (deps
+  (glob_files_rec *.pp.ml))
+ (action
+  (run styled-ppx.generate --output %{target} --log info %{deps})))
+```
+
+```html
+<link rel="stylesheet" href="/styles.css" />
+```
+
+See [Setting up the dune rules](/getting-started/dune-setup).
+
+## 2. `[%cx]` is removed
+
+`[%css]` is the replacement. It now accepts full declaration lists (multiple declarations, selectors, media queries) and returns a `CSS.styles` value instead of a string:
+
+```reason
+/* Before */
+let layout = [%cx {|
+  display: flex;
+  align-items: center;
+|}];
+<div className=layout />;
+
+/* After */
+let layout = [%css {|
+  display: flex;
+  align-items: center;
+|}];
+<div styles=layout />;
+```
+
+The `styles` JSX attribute is rewritten by the ppx into `className` (and `style` when values are interpolated). Outside JSX, use `CSS.className(layout)` to get the class-name string.
+
+String concatenation of classNames becomes [`CSS.merge`](/reference/runtime):
+
+```reason
+/* Before */
+let both = layout ++ " " ++ spaced;
+
+/* After */
+let both = CSS.merge(layout, spaced);
+```
+
+## 3. The Array API and `Css.rule` are removed
+
+Passing arrays of `Css.rule` values (`[%styled.div [| CSS.display(`flex) |]]`) is no longer supported, and the `Css.rule` type is gone. Write the CSS directly — interpolation now accepts **any OCaml/Reason expression**, which covers the composition cases the Array API existed for:
+
+```reason
+/* Before */
+let rules = [| CSS.display(`flex), CSS.alignItems(`center) |];
+
+/* After */
+let styles = [%css {|
+  display: flex;
+  align-items: center;
+|}];
+```
+
+For conditional styling, compose `CSS.styles` values:
+
+```reason
+let button = [%css "padding: 8px 16px"];
+let danger = [%css "background: red"];
+
+let styles = active ? CSS.merge(button, danger) : button;
+```
+
+## 4. `CSS.get_stylesheet` and `CSS.style_tag` are removed (native)
+
+There is no runtime stylesheet registry anymore. Delete the collection code — including any `renderToString`-before-`<head>` orchestration and emotion hydration (`data-emotion`, `CSS.get_string_style_hashes`) — and link the generated `styles.css` instead:
+
+```reason
+/* Before */
+<head> <CSS.style_tag /> </head>
+
+/* After */
+<head> <link rel="stylesheet" href="/styles.css" /> </head>
+```
+
+## 5. `[%styled.global]` returns a React component
+
+Global styles used to register as a side effect. Now the generated module is a component you render once (it supplies `:root` custom-property values when the block interpolates; the static rules live in `styles.css`):
+
+```reason
+module Reset = [%styled.global {|
+  * { margin: 0; }
+|}];
+
+/* Render it in your tree */
+<body>
+  <Reset />
+  ...
+</body>;
+```
+
+`to_buffer` is removed. Also, the old advice against `@font-face` in globals no longer applies — `@font-face` belongs in `[%styled.global]` and ships as static CSS with no runtime cost.
+
+## 6. ReScript support is removed
+
+The `styled-ppx.rescript` runtime and the npm-based ReScript workflow are gone. See the [ReScript page](/getting-started/rescript) for options. The last release with ReScript support is 0.61.0.
+
+## 7. Behavior changes to be aware of
+
+- **Elements gain a small inline `style` attribute** when their CSS interpolates values: it carries CSS custom-property *values* (`--color-xk29fh: #667eea`), never declarations. This is expected.
+- **Class names are atomic.** One `[%css]` binding maps to several class names (one per declaration), space-separated. Don't parse or compare class names; treat them as opaque.
+- **Selector interpolation is resolved statically.** `&.$(other)` substitutes the referenced binding's actual classes into the stylesheet. Cross-module references work within a library; cross-library references are a build error.
+- **Sibling selectors that escape the subtree** (e.g. `& + .$(other)` combined with value interpolation) are now compile errors instead of silently broken CSS: inline custom properties only inherit downward, so such rules could never see the interpolated value.
+- **Interpolation in `@media` preludes and `url()`** is rejected (custom properties are invalid there). Media-query breakpoints must be literal CSS.

@@ -10,14 +10,6 @@ const __dirname = Path.dirname(URL.fileURLToPath(import.meta.url));
 const syntaxes = Path.join(__dirname, "syntaxes");
 const editors = Path.join(__dirname, "..", "editors");
 
-const rescriptGrammar = {
-  ...JSON.parse(
-    Fs.readFileSync(Path.join(syntaxes, "rescript.tmLanguage.json"), "utf8")
-  ),
-  sourceName: "rescript",
-  name: "rescript",
-};
-
 const reasonGrammar = {
   ...JSON.parse(
     Fs.readFileSync(Path.join(syntaxes, "reason.tmLanguage.json"), "utf8")
@@ -34,6 +26,15 @@ const ocamlGrammar = {
   name: "ocaml",
 };
 
+// OCaml syntax dialect with JSX support (https://github.com/ocaml-mlx/mlx)
+const mlxGrammar = {
+  ...JSON.parse(
+    Fs.readFileSync(Path.join(syntaxes, "mlx.tmLanguage.json"), "utf8")
+  ),
+  sourceName: "mlx",
+  name: "mlx",
+};
+
 const styledPpxCssGrammar = {
   ...JSON.parse(
     Fs.readFileSync(
@@ -41,7 +42,7 @@ const styledPpxCssGrammar = {
       "utf8"
     )
   ),
-  injectTo: ["source.ocaml", "source.reason"],
+  injectTo: ["source.ocaml", "source.ocaml.mlx", "source.reason"],
 };
 
 const styledPpxOCamlGrammar = {
@@ -51,7 +52,7 @@ const styledPpxOCamlGrammar = {
       "utf8"
     )
   ),
-  injectTo: ["source.ocaml"],
+  injectTo: ["source.ocaml", "source.ocaml.mlx"],
 };
 
 const styledPpxReasonGrammar = {
@@ -73,9 +74,9 @@ const duneGrammar = {
 
 const customLangs = [
   ...Object.keys(bundledLanguages),
-  rescriptGrammar,
   reasonGrammar,
   ocamlGrammar,
+  mlxGrammar,
   styledPpxCssGrammar,
   styledPpxOCamlGrammar,
   styledPpxReasonGrammar,

@@ -6,18 +6,8 @@ title: Dynamic components
 
 Dynamic components are components that generate styles based on their props. You can derive styles from props, apply a variant conditionally, or any other logic.
 
-`styled.{{tag}}` can be defined by a function, where it should return a string. This function is going to be available via the props API for that component, including all props from the element. Like following:
+`styled.{{tag}}` can be defined by a function returning the CSS string. The function's labelled arguments become props on the component, on top of all the props from the element:
 
-```rescript
-module Dynamic = %styled.div( (~color, ~background) => `
-  color: $(color);
-  background-color: $(background);
-`)
-
-<Dynamic color=CSS.hex("#EB5757") background=CSS.hex("#516CF0")>
-  {React.string("Hello!")}
-</Dynamic>
-```
 ```reason
 module Dynamic = [%styled.div (~color, ~background) => {|
   color: $(color);
@@ -29,12 +19,40 @@ module Dynamic = [%styled.div (~color, ~background) => {|
 </Dynamic>;
 ```
 
-Note: The returned expression (the last expression of the function) needs to be an string (it can't be a reference or a function call). This is a limitation of ppxes where it needs to check the current AST to know which type it is.
+```mlx
+module Dynamic = [%styled.div fun ~color ~background -> {|
+  color: $(color);
+  background-color: $(background);
+|}]
 
-All the rules from [Interpolation](./interpolation) are applied here. In the example, `color` and `background` are `CSS.Color.t{:rescript}` `CSS.Color.t{:reason}`  since it gets inferred from the CSS property. It's called type holes https://twitter.com/davesnx/status/1552305210558742528
+let app =
+  <Dynamic color=(CSS.hex "#EB5757") background=(CSS.hex "#516CF0")>
+    (React.string "Hello!")
+  </Dynamic>
+```
+
+Note: The returned expression (the last expression of the function) needs to be a string literal (it can't be a reference or a function call). The CSS must be visible to the ppx at compile time for [static extraction](/how-it-works) to work — otherwise the ppx fails with `Extracted dynamic styled components require a CSS string body.`
+
+A function payload with no labelled arguments is also rejected (`A dynamic component without props doesn't make much sense. This component should be static.`) — use the plain string form instead.
+
+All the rules from [Interpolation](./interpolation) apply here. In the example, `color` and `background` are `CSS.Types.Color.t{:reason}` since it gets inferred from the CSS property. It's called type holes: https://twitter.com/davesnx/status/1552305210558742528
+
+### How dynamic values render
+
+The styles — including the dynamic ones — are extracted at compile time. Each interpolated declaration references a CSS custom property, and the component supplies the values through its inline `style` attribute:
+
+```html
+<div
+  class="css-abc123-Dynamic css-def456-Dynamic"
+  style="--color-x1: #EB5757; --background-x2: #516CF0">
+  Hello!
+</div>
+```
+
+No CSS is generated at runtime; only the variable values change per instance.
 
 ### Name collision
 
 If you create a dynamic component with a prop with the same name as a `makeProp` it will collide and styled-ppx will override it (and would replace the prop entirely).
 
-For example, if your dynamic component is defined with a prop "size" it will override [`size`](https://github.com/rescript-lang/rescript-react/blob/master/src/ReactDOM.res#L367) from makeProps.
+For example, if your dynamic component is defined with a prop "size" it will override `size` from the element's props.

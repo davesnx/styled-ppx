@@ -6,36 +6,6 @@ title: React's Ref
 
 All styled components expose a prop `innerRef` that will be forwarded to its internal element. This is useful for accessing the underlying DOM node.
 
-```rescript
-module Input = %styled.input(`
-  border: 1px solid #cccccc;
-  border-radius: 4px;
-  padding: 8px;
-  font-size: 16px;
-  outline: none;
-
-  &:focus {
-    border-color: #aaaaaa;
-  }
-`)
-
-@react.component
-let make = () => {
-  let input = React.useRef(Js.Nullable.null)
-
-  let focusInput = () =>
-    input.current
-    ->Js.Nullable.toOption
-    ->Belt.Option.forEach(input => focus(input))
-
-  let onClick = _ => focusInput()
-
-  <div>
-    <Input innerRef={ReactDOM.Ref.domRef(input)} />
-    <button onClick> {React.string("Click to focus")} </button>
-  </div>
-}
-```
 ```reason
 module Input = [%styled.input {|
   border: 1px solid #cccccc;
@@ -70,4 +40,31 @@ let make = () =>
   };
 ```
 
-All information related to React's Ref is explained in the [rescript's docs](https://rescript-lang.org/docs/react/latest/forwarding-refs).
+```mlx
+module Input = [%styled.input {|
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 16px;
+  outline: none;
+
+  &:focus {
+    border-color: #aaaaaa;
+  }
+|}]
+
+let%component make () =
+  let input = React.useRef Js.Nullable.null in
+  let focus_input () =
+    input.current
+    |> Js.Nullable.toOption
+    |> Option.iter Webapi.Dom.HtmlElement.focus
+  in
+  let on_click _ = focus_input () in
+  <div>
+    <Input innerRef=(ReactDOM.Ref.domRef input) />
+    <button onClick=on_click> (React.string "Click to focus") </button>
+  </div>
+```
+
+All information related to React's Ref is explained in the [React docs](https://react.dev/learn/manipulating-the-dom-with-refs).

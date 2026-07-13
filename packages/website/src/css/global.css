@@ -308,8 +308,8 @@
 
   :root {
 
-    .syntax__rescript:not(.show-all-language) :is([data-language="reason"], .nextra-code [data-language="reason"]),
-    .syntax__reason:not(.show-all-language) :is([data-language="rescript"], .nextra-code [data-language="rescript"]) {
+    .syntax__ocaml:not(.show-all-language) :is([data-language="reason"], .nextra-code [data-language="reason"]),
+    .syntax__reason:not(.show-all-language) :is([data-language="ocaml"], .nextra-code [data-language="ocaml"], [data-language="mlx"], .nextra-code [data-language="mlx"]) {
       display: none;
     }
 

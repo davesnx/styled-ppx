@@ -1,22 +1,101 @@
 ---
-title: Rule `css` extension
+title: Styles `css` extension
 ---
 
-# Rule: `css` extension
+# Styles: `css` extension
 
-Generates a `Css.rule{:rescript}` `Css.rule{:reason}` given a single CSS rule as string. The `%css{:rescript}` `[%css]{:reason}` extension is useful in combination with the [Array API](./array) to compose and re-use rules.
+`[%css]{:reason}` is the core extension: it takes CSS declarations as a string and returns a [`CSS.styles`](./runtime) value carrying the generated class names — extracted to the stylesheet at [compile time](/how-it-works).
 
 ## Example
 
-```rescript
-let rule: Css.rule = %css("display: block")
-```
 ```reason
-let rule: Css.rule = [%css "display: block"];
+let layout = [%css {|
+  display: flex;
+  align-items: center;
+|}];
+```
+
+```mlx
+let layout = [%css {|
+  display: flex;
+  align-items: center;
+|}]
+```
+
+Apply it to an element with the [`styles` attribute](#the-styles-attribute):
+
+```reason
+<div styles=layout />;
+```
+
+```mlx
+let app = <div styles=layout />
 ```
 
 ## Features
 
-- Only single properties are allowed, e.g., `color: blue{:styled-ppx-css}`, and multiple declarations, e.g., `:hover { color: blue }{:styled-ppx-css}` or `color: blue; background-color: red{:styled-ppx-css}`, are not allowed. If you need to use a selector or use more than one rule, use `%cx{:rescript}` `[%cx]{:reason}` instead.
-- The semi-colon in the last position is optional. `display: block;{:styled-ppx-css}` and `display: block{:styled-ppx-css}` are the same.
-- Curly braces aren't allowed. `{ display: block }{:styled-ppx-css}` isn't valid.
+- **Full declaration lists**: multiple declarations, [nested selectors](./syntax#selectors-and-nesting) (`&:hover { ... }{:styled-ppx-css}`), and [at-rules](./syntax#media-queries-and-other-at-rules) (`@media`, `@container`) are all valid — the same grammar as `[%styled.<tag>]{:reason}`.
+- **[Interpolation](./interpolation)**: `$( ... ){:styled-ppx-css}` accepts any OCaml/Reason expression, type-checked against the property it's used in.
+- **Atomic extraction**: each declaration becomes its own content-addressed class; identical declarations anywhere in your project share one rule. See [How it works](/how-it-works#atomization-one-declaration-one-class).
+- The trailing semi-colon is optional; surrounding curly braces aren't allowed (`{ display: block }{:styled-ppx-css}` isn't valid).
+
+## Validation
+
+Every property and value is checked against the CSS grammar at compile time. Unknown properties fail with a suggestion:
+
+```
+Error: Unknown property 'colorx'. Did you mean 'color'?
+```
+
+and invalid values fail with the expected grammar. CSS-wide keywords (`inherit`, `initial`, `unset`, `revert`) are always accepted. If a property is genuinely unsupported by the checker, the escape hatch is a [custom property](./interpolation#what-if-a-property-isnt-supported).
+
+The payload itself must be a string literal — `[%css]{:reason}` with a variable or function reference fails with `[%css] expects a string of CSS for static extraction.`, because the CSS must be readable at compile time to be [extracted](/how-it-works).
+
+## The `styles` attribute
+
+`styles` is a JSX attribute the ppx understands on **host elements** (lowercase tags: `<div>`, `<span>`, ...). It takes a `CSS.styles` value and expands, at compile time, into the underlying props:
+
+```reason
+<div styles=layout />;
+/* becomes */
+<div className={CSS.className(layout)} style={CSS.styles(layout)} />;
+```
+
+```mlx
+let a = <div styles=layout />
+(* becomes *)
+let a = <div className=(CSS.className layout) style=(CSS.styles layout) />
+```
+
+Details worth knowing:
+
+- **Any expression works**: `styles={CSS.merge(a, b)}` or `styles={active ? on : off}` — the attribute takes an arbitrary `CSS.styles`-typed expression.
+- **It merges with explicit props.** If the element also has a `className` or `style` prop, both are kept: class names are concatenated, and styles combine through `ReactDOM.Style.combine`. Optional props (`?className`, `?style`, `?styles`) are handled too.
+- **Host elements only.** Component elements (`<MyComponent styles=... />`) are *not* rewritten — the attribute passes through as a regular prop. For components, accept a `~styles: CSS.styles` prop (default `CSS.empty`) and apply it to your root element; see the [style-props pattern](./runtime#patterns).
+- **Clean output.** When the block interpolates no values, the expanded `style` carries no properties (rendered as an empty — or, on the client, omitted — `style` attribute). Class names are identical on server and client, so hydration sees no styling mismatch.
+
+If you need the raw strings outside JSX, use `CSS.className(layout)` and `CSS.styles(layout)` directly.
+
+## Composition
+
+Combine styles with [`CSS.merge`](./runtime#the-styles-type):
+
+```reason
+let button = [%css "padding: 8px 16px"];
+let danger = [%css "background-color: red"];
+
+let styles = isDangerous ? CSS.merge(button, danger) : button;
+```
+
+```mlx
+let button = [%css "padding: 8px 16px"]
+let danger = [%css "background-color: red"]
+
+let styles = if is_dangerous then CSS.merge button danger else button
+```
+
+Since all extracted rules are atomic single-class selectors, which declaration wins is decided by stylesheet order (later in your source wins), not by the order of arguments to `CSS.merge`. See [Composition](./runtime#composition) for the full rules, patterns, and anti-patterns.
+
+## Referencing styles in selectors
+
+A named `[%css]{:reason}` binding can be referenced from another block's selector with `$(name){:styled-ppx-css}` — resolved statically into real class names. See [selector interpolation](./syntax#class-references-in-selectors).

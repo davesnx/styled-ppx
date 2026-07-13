@@ -2,92 +2,228 @@
 title: Runtime
 ---
 
-import { Re, Res } from "../../src/components/language-content";
+import { Re, Ml } from "../../src/components/language-content";
 
-# CSS
+# Runtime: `CSS`
 
-Since [v0.40](https://github.com/davesnx/styled-ppx/releases/tag/0.40.0) styled-ppx exposes a module with the runtime called `CSS`.
+styled-ppx's runtime is intentionally tiny: since all CSS is [extracted at compile time](/how-it-works), the `CSS` module only carries class names around, supplies custom-property values, and provides typed value constructors for [interpolation](./interpolation).
 
-It's used by the ppx transformation, but it's use to construct values for CSS properties.
+It's available as a dune library:
 
-The library is available<Res> as a rescript packages `@davesnx/syled-ppx/css` and `@davesnx/syled-ppx/emotion`.</Res><Re>:</Re>
-<Re>
-- for Melange users, as dune library with `(modes melange)`: **`styled-ppx.melange`**
-- for native users, as dune library: **`styled-ppx.native`**
-</Re>
+- for Melange users (with `(modes melange)`): **`styled-ppx.melange`**
+- for native users: **`styled-ppx.native`**
 
-## Usage
+## The `styles` type
+
+Every `[%css]{:reason}` block evaluates to a `CSS.styles` value: the generated class names plus, when the block interpolates values, the inline custom-property definitions.
+
+| Function | Type | Description |
+| --- | --- | --- |
+| `CSS.className` | `styles => string{:reason}` | The space-separated class names, for a `className` attribute |
+| `CSS.styles` | `styles => ReactDOM.Style.t{:reason}` | The inline custom-property values, for a `style` attribute |
+| `CSS.merge` | `(styles, styles) => styles{:reason}` | Combine two values: concatenates classNames, merges vars |
+| `CSS.empty` | `styles{:reason}` | The neutral element — no classes, no vars |
+
+In JSX you rarely need `className`/`styles` directly: the `styles` attribute is rewritten by the ppx into both.
+
+```reason
+let card = [%css "padding: 16px; border-radius: 8px"];
+let elevated = [%css "box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15)"];
+
+/* idiomatic */
+<div styles={CSS.merge(card, elevated)} />;
+
+/* manual */
+<div className={CSS.className(card)} style={CSS.styles(card)} />;
+```
+
+```mlx
+let card = [%css "padding: 16px; border-radius: 8px"]
+let elevated = [%css "box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15)"]
+
+(* idiomatic *)
+let app = <div styles=(CSS.merge card elevated) />
+
+(* manual *)
+let app' = <div className=(CSS.className card) style=(CSS.styles card) />
+```
+
+`CSS.make` also exists — it's what the ppx-generated code calls to construct `styles` values; you shouldn't need it directly.
+
+## Composition
+
+`CSS.styles` values are ordinary values: store them in records, return them from functions, pattern match over them. Composition is just programming — there is no styling DSL to learn.
+
+`CSS.merge(a, b)` concatenates the class names of both sides and combines their custom-property vars. It is associative, and `CSS.empty` is its neutral element, which makes it the natural "no styles" branch of a conditional:
+
+```reason
+let button = [%css "padding: 8px 16px"];
+let highlight = [%css "outline: 2px solid"];
+
+let styles = active ? CSS.merge(button, highlight) : button;
+/* or equivalently: */
+let styles = CSS.merge(button, active ? highlight : CSS.empty);
+```
+
+```mlx
+let button = [%css "padding: 8px 16px"]
+let highlight = [%css "outline: 2px solid"]
+
+let styles = CSS.merge button (if active then highlight else CSS.empty)
+```
+
+### Which declaration wins
+
+If you come from emotion or styled-components, this is the one semantic to relearn: **`CSS.merge` argument order does not decide which declaration wins.**
+
+Every extracted rule is atomic — a single class, so all rules have the same specificity. When two atoms set the same property, the CSS cascade breaks the tie by **stylesheet order**: later wins. And the stylesheet preserves the order your `[%css]` blocks appear in your source. In emotion, `cx(base, override)` guarantees the override wins because emotion re-serializes at runtime; here `CSS.merge(base, override)` and `CSS.merge(override, base)` render identically — only source position matters.
+
+```reason
+let danger = [%css "background-color: red"];  /* defined FIRST */
+let button = [%css "background-color: gray"]; /* defined second */
+
+/* Both of these render a GRAY background: button's atom
+   comes later in the stylesheet, so it wins the tie. */
+<div styles={CSS.merge(button, danger)} />;
+<div styles={CSS.merge(danger, button)} />;
+```
+
+```mlx
+let danger = [%css "background-color: red"]  (* defined FIRST *)
+let button = [%css "background-color: gray"] (* defined second *)
+
+(* Both of these render a GRAY background: button's atom
+   comes later in the stylesheet, so it wins the tie. *)
+let a = <div styles=(CSS.merge button danger) />
+let b = <div styles=(CSS.merge danger button) />
+```
+
+The convention to follow: **define base styles before the styles that override them** — within a module, and for cross-module overrides, in a module compiled later. When an override doesn't stick, check the definition order first; the binding labels in class names (`css-<hash>-danger`) show in DevTools exactly which binding each winning declaration came from.
+
+### Patterns
+
+**Variant switch** — one block per arm, replacing emotion-style object merging:
+
+```reason
+let kind = fun
+  | `Primary => [%css "background-color: #667eea; color: white"]
+  | `Secondary => [%css "background-color: transparent; color: #667eea"]
+  | `Ghost => [%css "background-color: transparent; border: none"];
+
+<button styles={CSS.merge(base, kind(variant))} />;
+```
+
+```mlx
+let kind = function
+  | `Primary -> [%css "background-color: #667eea; color: white"]
+  | `Secondary -> [%css "background-color: transparent; color: #667eea"]
+  | `Ghost -> [%css "background-color: transparent; border: none"]
+
+let b = <button styles=(CSS.merge base (kind variant)) />
+```
+
+**Record of parts** — a component exposing its styleable pieces:
+
+```reason
+type parts = {
+  container: CSS.styles,
+  label: CSS.styles,
+  icon: CSS.styles,
+};
+
+let styles = {
+  container: [%css "display: flex; gap: 8px"],
+  label: [%css "font-weight: 600"],
+  icon: [%css "width: 16px; height: 16px"],
+};
+```
+
+```mlx
+type parts = {
+  container : CSS.styles;
+  label : CSS.styles;
+  icon : CSS.styles;
+}
+
+let styles = {
+  container = [%css "display: flex; gap: 8px"];
+  label = [%css "font-weight: 600"];
+  icon = [%css "width: 16px; height: 16px"];
+}
+```
+
+**Style props** — let callers extend a component:
+
+```reason
+[@react.component]
+let make = (~styles=CSS.empty, ~children) =>
+  <div styles={CSS.merge(baseStyles, styles)}> children </div>;
+```
+
+```mlx
+let%component make ?(styles = CSS.empty) ~children () =
+  <div styles=(CSS.merge base_styles styles)> children </div>
+```
+
+Merging the caller's value combines its vars and class names; remember that for *conflicting properties* the caller's declarations win only if they're defined later in source than `baseStyles` (see above), or if they target different properties.
+
+### Anti-patterns
+
+- **Don't concatenate class names by hand.** `CSS.className(a) ++ " " ++ CSS.className(b)` silently drops the custom-property vars that `CSS.merge` would carry — interpolated values stop applying.
+- **Don't rely on merge order for overrides.** See "Which declaration wins".
+
+## Values
+
+CSS values are available as typed constructors, valid on any property that accepts them:
 
 ```reason
 let small = CSS.px(10);
-// Creates a CSS.length type, valid on any CSS property that accepts a length value
+let brand = CSS.hex("667eea");
 
-// Now, `small` can be interpolated in `[%cx ..]`, `[%css ..]` or `[%styled.tag ..]` annotation
-let classname = [%cx {|margin: $(small)|}];
-```
-```rescript
-let small = CSS.px(10)
-// Creates a CSS.length type, valid on any CSS property that accepts a length value
-
-// Now, `small` can be interpolated in `[%cx ..]`, `[%css ..]` or `[%styled.tag ..]` annotation
-let classname = %cx(`margin: $(small)`)
+let button = [%css {|
+  padding: $(small);
+  background-color: $(brand);
+|}];
 ```
 
-## API
+```mlx
+let small = CSS.px 10
+let brand = CSS.hex "667eea"
 
-### Values
-
-All CSS values are available as <Res>ReScript</Res><Re>Reason</Re> values
-
-```reason
-let ten = CSS.px(10);
-let position = CSS.block;
-```
-```rescript
-let ten = CSS.px(10)
-let position = CSS.block
+let button = [%css {|
+  padding: $(small);
+  background-color: $(brand);
+|}]
 ```
 
-but also as polymorphic variants and both are interchangeable
+Among others: lengths (`px`, `pxFloat`, `em`, `rem`, `pct`, `vh`, `vw`, `fr`, `ch`, ...), angles (`deg`, `rad`, `turn`), colors (`rgb`, `rgba`, `hsl`, `hsla`, `hex`, `currentColor`, plus all named colors like `CSS.red`), and keywords (`auto`, `none`, `zero`, `initial`, `unset`).
+
+Values are also available as polymorphic variants, and both are interchangeable:
 
 ```reason
 let ten = `px(10); // or CSS.px(10), they are aliases
 let position = `block; // or CSS.block, they are aliases
 ```
-```rescript
-let ten = #px(10) // or CSS.px(10), they are aliases
-let position = #block // or CSS.block, they are aliases
+
+```mlx
+let ten = `px 10 (* or CSS.px 10, they are aliases *)
+let position = `block (* or CSS.block, they are aliases *)
 ```
 
-### Properties
+## Typed value modules: `CSS.Types`
 
-All CSS properties are available as camelCased functions.
-
-When using the [Array API](/reference/array) can be handy to manually create properties. If you are using the ppx transformation, there's no need, since the ppx generates them under the hood.
+Every CSS value type lives in `CSS.Types` (e.g. `CSS.Types.Color.t`, `CSS.Types.Length.t`, `CSS.Types.AnimationName.t`), each with a `toString`. These are the types the ppx infers for [interpolations](./interpolation), and the ones to use in your function signatures:
 
 ```reason
-let faded = CSS.opacity(0.9);
-```
-```rescript
-let faded = CSS.opacity(0.9)
-```
-
-Some properties accept just a float, like `CSS.opacity` but there are many properties that accept more complex values, like `CSS.flex`.
-
-```reason
-let basic = CSS.flex(1.0, 1.0, `px(100));
-```
-```rescript
-let basic = CSS.flex(1.0, 1.0, #px(100))
+let title = (~color: CSS.Types.Color.t) => [%css {|
+  font-size: 2rem;
+  color: $(color);
+|}];
 ```
 
-or simply a polyvariant
-
-```reason
-let row = CSS.display(`flex);
+```mlx
+let title ~(color : CSS.Types.Color.t) = [%css {|
+  font-size: 2rem;
+  color: $(color);
+|}]
 ```
-```rescript
-let row = CSS.display(#flex)
-```
-
-###

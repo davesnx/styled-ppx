@@ -1,0 +1,108 @@
+---
+title: Getting Started - Client + Server
+showAllLanguage: true
+---
+
+import { Callout } from "nextra/components";
+
+# Sharing UI between client and server
+
+The same Reason/OCaml UI sources can compile twice — natively for server rendering with [server-reason-react](https://github.com/ml-in-barcelona/server-reason-react), and to JavaScript with [Melange](https://melange.re) for the browser — sharing one `styles.css` and rendering identical markup on both sides.
+
+This works because of one invariant: the ppx extracts **identical CSS regardless of target**. Class names are content-addressed hashes of the CSS itself, and the [`--native` flag](/getting-started/native) only changes the generated component *code*, never the extracted rules. Both builds agree on every class name in the markup.
+
+## Project layout
+
+Shared UI sources are owned by one directory and copied into the other target's library at build time — the same convention server-reason-react's own demos use:
+
+```
+lib/
+  native/
+    dune            # lib_native: server build
+    app.re          # native entrypoint wrapper
+    shared/
+      Main.re       # ← the shared UI, owned here
+  js/
+    dune            # lib_js: Melange build (copies shared/*.re in)
+    app.re          # client entrypoint wrapper
+```
+
+The native library compiles `shared/` as part of itself:
+
+```dune
+(include_subdirs unqualified)
+
+(library
+ (name lib_native)
+ (libraries
+  styled-ppx.native
+  server-reason-react.react
+  server-reason-react.reactDom)
+ (preprocess
+  (pps
+   styled-ppx
+   --native
+   server-reason-react.ppx
+   server-reason-react.melange_ppx)))
+```
+
+and the Melange library copies the shared sources in, compiling them a second time with the Melange toolchain:
+
+```dune
+(library
+ (name lib_js)
+ (modes melange)
+ (libraries styled-ppx.melange reason-react)
+ (preprocess
+  (pps styled-ppx melange.ppx reason-react-ppx)))
+
+(copy_files
+ (files ../native/shared/*.re))
+```
+
+<Callout type="info">
+  A single dual-mode library stanza can't do this: `preprocess` is
+  per-stanza, and the two targets need different pps (`--native` +
+  server-reason-react vs `melange.ppx` + `reason-react-ppx`). Copying the
+  sources into two libraries is the supported pattern.
+</Callout>
+
+Code inside `shared/` must only use APIs that exist on both sides (`CSS`, `React`, markup). Target-specific code — DOM access, fetch, filesystem — lives in the thin per-target wrappers (`app.re` above), or behind an interface implemented per target.
+
+## Styles: one rule, one file
+
+Because extraction is target-independent, **one `styled-ppx.generate` rule produces the stylesheet for both builds**:
+
+```dune
+(rule
+ (mode promote)
+ (target styles.css)
+ (deps
+  (glob_files_rec ../*.pp.ml))
+ (action
+  (run styled-ppx.generate --output %{target} --log info %{deps})))
+```
+
+Globbing both build trees is harmless — rules are content-deduplicated — but pointing the glob at one is enough. Serve the file from your server and link it in the document you render:
+
+```reason
+<head>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+```
+
+The client bundle imports no CSS.
+
+## Hydration
+
+React hydration requires server and client markup to match. styled-ppx holds up its side by construction:
+
+- **Class attributes match** — both builds derive them from the same CSS content.
+- **Inline custom-property values match**, provided interpolated values are computed from the same props on both sides (which shared code guarantees).
+- Render any `[%styled.global]` component in the server document so its `:root` values are present at first paint.
+
+The usual hydration-mismatch suspects (locale-dependent strings, random ids, dates) are unrelated to styling and apply as in any SSR setup.
+
+## Working example
+
+The [repository demo](https://github.com/davesnx/styled-ppx/tree/main/demo/melange) is exactly this setup: `lib/native/shared/Main.re` renders in the browser through `lib_js` and to a string through the native `print` executable, with one promoted `public/styles.css` serving both. Use it as the reference when wiring your own project.

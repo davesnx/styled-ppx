@@ -6,23 +6,6 @@ title: Keyframe animations
 
 **Generates keyframes**, method to create keyframe animations in CSS
 
-```rescript
-let fadeIn = %keyframe(`
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-`)
-
-module Component = %styled.div(`
-  animation-name: $(fadeIn);
-  width: 100px;
-  height: 100px;
-`)
-```
 ```reason
 let fadeIn = [%keyframe {|
   0% {
@@ -41,6 +24,138 @@ module Component = [%styled.div {|
 |}];
 ```
 
-- Brackets inside the keyframe declaration are optional. `%keyframe('{ ... }'){:rescript}` `[%keyframe {| { ... } |}]{:reason}` and `%keyframe('...'){:rescript}` `[%keyframe {| ... |}]{:reason}`  are the same.
-- The keyframe name is defined with the same method as classNames, using a hash.
-- The type of the keyframe is an [opaque type](https://reasonml.github.io/docs/en/type#opaque-types). The internal representations is a `string`.
+```mlx
+let fade_in = [%keyframe {|
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+|}]
+
+module Component = [%styled.div {|
+  animation-name: $(fade_in);
+  width: 100px;
+  height: 100px;
+|}]
+```
+
+- Brackets inside the keyframe declaration are optional. `[%keyframe {| { ... } |}]{:reason}` and `[%keyframe {| ... |}]{:reason}` are the same.
+- The `@keyframes` block is [extracted at compile time](/how-it-works) into your stylesheet, named by a hash of its content — identical keyframes anywhere in your project dedupe into one block.
+- The value is a `CSS.Types.AnimationName.t{:reason}`, an [opaque type](https://reasonml.github.io/docs/en/type#opaque-types): the name is a content hash owned by the build, so it can't be concatenated or invented at runtime. Interpolate it into `animation-name: $(fadeIn){:styled-ppx-css}` or as the leading name of the `animation{:styled-ppx-css}` shorthand: `animation: $(fadeIn) 300ms ease-in{:styled-ppx-css}`.
+
+## The `animation` shorthand
+
+The shorthand is what you'll usually write, and it composes: multiple animations on one element are comma-separated, each with its own interpolated name:
+
+```reason
+let entrance = [%css {|
+  animation: $(fadeIn) 300ms ease-out, $(slideIn) 200ms linear;
+|}];
+```
+
+```mlx
+let entrance = [%css {|
+  animation: $(fade_in) 300ms ease-out, $(slide_in) 200ms linear;
+|}]
+```
+
+Vendor prefixes (`-webkit-animation`, ...) are added automatically to the extracted rules.
+
+## Parameterized keyframes
+
+Keyframe steps support [value interpolation](./interpolation) — the animation itself can take parameters:
+
+```reason
+let slideIn = (~offset) => [%keyframe {|
+  from { transform: translateX($(offset)); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+|}];
+
+let card = (~anim) => [%css {|
+  animation: $(anim) 300ms ease-out both;
+|}];
+
+/* different offsets, same extracted @keyframes block */
+<div styles={card(~anim=slideIn(~offset=CSS.px(-8)))} />;
+<div styles={card(~anim=slideIn(~offset=CSS.px(-24)))} />;
+```
+
+```mlx
+let slide_in ~offset = [%keyframe {|
+  from { transform: translateX($(offset)); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+|}]
+
+let card ~anim = [%css {|
+  animation: $(anim) 300ms ease-out both;
+|}]
+
+(* different offsets, same extracted @keyframes block *)
+let a = <div styles=(card ~anim:(slide_in ~offset:(CSS.px (-8)))) />
+let b = <div styles=(card ~anim:(slide_in ~offset:(CSS.px (-24)))) />
+```
+
+The extracted `@keyframes` uses `var(...)` for the interpolated step values; the values ride on the `AnimationName.t{:reason}` and merge into the inline custom properties of the element whose styles reference the animation. That's why the same keyframe block can run with different parameters on different elements simultaneously.
+
+One constraint: the step *selectors* (`from` / `50%` / `to`) cannot be interpolated — define separate keyframes for different timing variants.
+
+## Patterns
+
+**Conditional animation** — `CSS.Types.AnimationName.none{:reason}` disables an animation without branching the whole block:
+
+```reason
+let anim = shouldAnimate ? fadeIn : CSS.Types.AnimationName.none;
+```
+
+```mlx
+let anim = if should_animate then fade_in else CSS.Types.AnimationName.none
+```
+
+**Respecting reduced motion** — nest the media query in the same block:
+
+```reason
+let entrance = [%css {|
+  animation: $(fadeIn) 300ms ease-out;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+|}];
+```
+
+```mlx
+let entrance = [%css {|
+  animation: $(fade_in) 300ms ease-out;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+|}]
+```
+
+**Transitions** — for state-driven motion (hover, focus), `transition` is the lighter tool and needs no keyframe machinery; it's an ordinary declaration, interpolation included:
+
+```reason
+let button = [%css {|
+  transition: opacity $(duration) ease-out;
+  opacity: 0.8;
+
+  &:hover {
+    opacity: 1;
+  }
+|}];
+```
+
+```mlx
+let button = [%css {|
+  transition: opacity $(duration) ease-out;
+  opacity: 0.8;
+
+  &:hover {
+    opacity: 1;
+  }
+|}]
+```
