@@ -17,7 +17,7 @@ location and a synthetic dep-tracking `let`.
   [@@@css ".css-z7z9b9-container.\000M.marker\000{background:blue;}"]
   [@@@css.bindings
     [("N.container", "css-1443u2l-container css-z7z9b9-container")]]
-  [@@@css.refs [("M.marker", "n.ml", 4, 6, 14)]]
+  [@@@css.refs [("M.marker", "n.ml", 6, 6, 14)]]
   let _ = M.marker
   let container = CSS.make "css-1443u2l-container css-z7z9b9-container" []
 

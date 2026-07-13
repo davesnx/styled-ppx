@@ -44,10 +44,14 @@ when the [%css] block sits several lines below the top of the file.
 
   $ dune build ./pseudo.exe
   File "pseudo.re", line 6, characters 2-9:
+  6 |   :hover { color: red; }
+        ^^^^^^^
   Error: Bare leading pseudo selector `:hover` is ambiguous in nested CSS. Per CSS Nesting Level 1 §3.1 it descendant-joins with the enclosing selector (producing `<parent> :hover`), which matches descendants rather than the element itself. Write `&:hover` for compound (`<parent>:hover`, the usual intent), or `& :hover` to opt into the explicit descendant form.
   [1]
 
   $ dune build ./media.exe
-  File "media.re", lines 7-9, characters 2-3:
+  File "media.re", line 7, characters 8-23:
+  7 |   @media $(breakpoint) {
+              ^^^^^^^^^^^^^^^
   Error: Interpolation in @media preludes is not supported during static extraction. CSS custom properties (var()) are not valid in media query conditions. Inline the value directly.
   [1]

@@ -1,6 +1,6 @@
 Resolution errors carry the original `[%css]` source location through
-the `[@@@css.refs ...]` attribute, so editors and CI surface them in the
-familiar `File "..."` OCaml diagnostic format.
+the `[@@@css.refs ...]` attribute, surfaced in the OCaml `File "..."`
+diagnostic format with a `styled-ppx:` prefix.
 
   $ cat > a.ml <<EOF
   > [@@@css.bindings [("A.exists", "klass-existing")]]
@@ -14,7 +14,7 @@ familiar `File "..."` OCaml diagnostic format.
   > EOF
 
   $ styled-ppx.generate a.ml b.ml
-  File "src/n.re", line 7, characters 12-25:
+  styled-ppx: File "src/n.re", line 7, characters 12-25:
   Error: cross-module [%css] selector reference `A.missing` does not resolve.
   The target binding is missing from module `A`, or the binding is not
   a [%css] expression. Define `A.missing` with [%css "..."], or remove the

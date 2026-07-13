@@ -4,12 +4,14 @@ interpolation as a custom property (subject is `&` or a descendant of `&`).
   $ refmt --parse re --print ml input.re > output.ml
   $ standalone --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
+  [@css "@property --color-17hzlne{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-4fgdvo{syntax:\"*\";inherits:false;}"];
   [@css
-    ".css-3pj70v-selfSibling + .css-3pj70v-selfSibling{color:var(--var-17hzlne);}"
+    ".css-3pj70v-selfSibling + .css-3pj70v-selfSibling{color:var(--color-17hzlne);}"
   ];
-  [@css ".x + .css-c001uz-siblingBeforeAmpersand{color:var(--var-4fgdvo);}"];
-  [@css ".css-zcel0e-childThenSibling > * + *{color:var(--var-tqid89);}"];
-  [@css ".css-v0ydxg-descendant .child{border-color:var(--var-133cflr);}"];
+  [@css ".x + .css-c001uz-siblingBeforeAmpersand{color:var(--color-4fgdvo);}"];
+  [@css ".css-zcel0e-childThenSibling > * + *{color:var(--color-tqid89);}"];
+  [@css ".css-v0ydxg-descendant .child{border-color:var(--color-133cflr);}"];
   [@css ".css-1w5oqj4-literalSibling + .x{color:red;}"];
   [@css.bindings
     [
@@ -24,21 +26,21 @@ interpolation as a custom property (subject is `&` or a descendant of `&`).
   let selfSibling =
     CSS.make(
       "css-3pj70v-selfSibling",
-      [("--var-17hzlne", CSS.Types.Color.toString(color))],
+      [("--color-17hzlne", CSS.Types.Color.toString(color))],
     );
   let siblingBeforeAmpersand =
     CSS.make(
       "css-c001uz-siblingBeforeAmpersand",
-      [("--var-4fgdvo", CSS.Types.Color.toString(color))],
+      [("--color-4fgdvo", CSS.Types.Color.toString(color))],
     );
   let childThenSibling =
     CSS.make(
       "css-zcel0e-childThenSibling",
-      [("--var-tqid89", CSS.Types.Color.toString(color))],
+      [("--color-tqid89", CSS.Types.Color.toString(color))],
     );
   let descendant =
     CSS.make(
       "css-v0ydxg-descendant",
-      [("--var-133cflr", CSS.Types.Color.toString(color))],
+      [("--color-133cflr", CSS.Types.Color.toString(color))],
     );
   let literalSibling = CSS.make("css-1w5oqj4-literalSibling", []);

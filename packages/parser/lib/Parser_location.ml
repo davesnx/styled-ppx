@@ -2,116 +2,52 @@ let to_ppxlib_location ?(loc_ghost = false) (start_pos : Lexing.position)
   (end_pos : Lexing.position) : Ppxlib.location =
   { loc_start = start_pos; loc_end = end_pos; loc_ghost }
 
-let print_location label ({ loc_start; loc_end; _ } : Ppxlib.location) =
-  let loc_start_column = loc_start.pos_cnum - loc_start.pos_bol in
-  let loc_end_column = loc_end.pos_cnum - loc_end.pos_bol in
-  Printf.sprintf "%s start %d %d %d (L:%d c:%d) end %d %d %d (L:%d c:%d)" label
-    loc_start.pos_lnum loc_start.pos_bol loc_start.pos_cnum loc_start.pos_lnum
-    loc_start_column loc_end.pos_lnum loc_end.pos_bol loc_end.pos_cnum
-    loc_end.pos_lnum loc_end_column
-
-let intersection (loc1 : Ppxlib.location) (loc2 : Ppxlib.location) :
-  Ppxlib.location =
-  let start_pos =
-    Lexing.
-      {
-        pos_fname = loc1.loc_start.pos_fname;
-        pos_lnum = loc1.loc_start.pos_lnum + loc2.loc_start.pos_lnum - 1;
-        pos_bol = loc1.loc_start.pos_bol + loc2.loc_start.pos_bol;
-        pos_cnum = loc1.loc_start.pos_cnum + loc2.loc_start.pos_cnum;
-      }
-  in
-  let end_pos =
-    Lexing.
-      {
-        pos_fname = loc1.loc_end.pos_fname;
-        pos_lnum = loc1.loc_start.pos_lnum + loc2.loc_end.pos_lnum - 1;
-        pos_bol = loc1.loc_start.pos_bol + loc2.loc_end.pos_bol;
-        pos_cnum = loc1.loc_start.pos_cnum + loc2.loc_end.pos_cnum;
-      }
-  in
+(* Location covering both inputs, for AST nodes synthesized by merging two
+   source-adjacent nodes (e.g. nested @media preludes joined with `and`). *)
+let span (loc1 : Ppxlib.location) (loc2 : Ppxlib.location) : Ppxlib.location =
   {
-    Ppxlib.Location.loc_start = start_pos;
-    loc_end = end_pos;
-    loc_ghost = false;
+    loc_start = loc1.loc_start;
+    loc_end = loc2.loc_end;
+    loc_ghost = loc1.loc_ghost || loc2.loc_ghost;
   }
 
-let update_loc_with_delimiter (loc : Ppxlib.location) delimiter :
-  Ppxlib.location =
+(* Position of a file's first character. Rebasing against it is the
+   identity; [Location.none] is not ([pos_cnum] is [-1]). *)
+let file_start ?(filename = "") () : Lexing.position =
+  { pos_fname = filename; pos_lnum = 1; pos_bol = 0; pos_cnum = 0 }
+
+(* File position of a string constant's first content character: skips the
+   opening quote, or brace + delimiter + pipe for delimited strings. All
+   source-relative locations are rebased against it. *)
+let source_position_start ~delimiter (loc : Ppxlib.location) : Lexing.position =
   let offset =
-    match delimiter with None -> 0 | Some s -> String.length s + 1
+    match delimiter with None -> 1 | Some d -> String.length d + 2
   in
-  let loc_start =
-    { loc.loc_start with pos_cnum = loc.loc_start.pos_cnum + offset }
-  and loc_end = { loc.loc_end with pos_cnum = loc.loc_end.pos_cnum + offset } in
-  { loc_start; loc_end; loc_ghost = false }
+  { loc.loc_start with pos_cnum = loc.loc_start.pos_cnum + offset }
 
-let make_loc_from_loc ~string_loc ~delimiter loc =
-  let loc = update_loc_with_delimiter loc delimiter in
-  intersection string_loc loc
+(* Rebase a source-relative position (line 1, column 0 = first parsed
+   character) onto [source_position_start]. The source is a contiguous
+   byte range of the file, so offsets shift by [pos_cnum]; line 1
+   continues [source_position_start]'s file line, later lines start their
+   own. Escape sequences in quoted strings break the 1:1 byte mapping and
+   shift positions after them. *)
+let to_file_position ~(source_position_start : Lexing.position)
+  (pos : Lexing.position) : Lexing.position =
+  {
+    pos_fname = source_position_start.pos_fname;
+    pos_lnum = source_position_start.pos_lnum + pos.pos_lnum - 1;
+    pos_bol =
+      (if pos.pos_lnum = 1 then source_position_start.pos_bol
+       else pos.pos_bol + source_position_start.pos_cnum);
+    pos_cnum = pos.pos_cnum + source_position_start.pos_cnum;
+  }
 
-let update_pos_lnum (a : Ppxlib.location) (b : Ppxlib.location) =
-  let loc_start =
-    {
-      a.loc_start with
-      pos_lnum = a.loc_start.pos_lnum + b.loc_start.pos_lnum - 1;
-    }
-  in
-  let loc_end =
-    { a.loc_end with pos_lnum = a.loc_end.pos_lnum + b.loc_start.pos_lnum - 1 }
-  in
-  { a with loc_start; loc_end }
-
-let adjust_to_file ~(relative_loc : Ppxlib.location)
-  ~(base_loc : Ppxlib.location) : Ppxlib.location =
-  let offset =
-    if relative_loc.loc_start.pos_lnum = 1 then
-      base_loc.loc_start.pos_cnum - base_loc.loc_start.pos_bol + 1
-    else 0
-  in
-  let with_offset =
-    {
-      relative_loc with
-      loc_start =
-        {
-          relative_loc.loc_start with
-          pos_cnum = relative_loc.loc_start.pos_cnum + offset;
-        };
-      loc_end =
-        {
-          relative_loc.loc_end with
-          pos_cnum = relative_loc.loc_end.pos_cnum + offset;
-        };
-    }
-  in
-  update_pos_lnum with_offset base_loc
-
-class expression_mapper base_loc =
-  let offset_cnum = base_loc.Ppxlib.loc_start.pos_cnum in
-  let offset_lnum = base_loc.loc_start.pos_lnum - 1 in
-  let base_bol = base_loc.loc_start.pos_bol in
-  let base_fname = base_loc.loc_start.pos_fname in
-
-  let relocate_position pos =
-    {
-      Lexing.pos_fname = base_fname;
-      pos_lnum = pos.Lexing.pos_lnum + offset_lnum;
-      pos_bol = base_bol;
-      pos_cnum = pos.Lexing.pos_cnum + offset_cnum;
-    }
-  in
-
-  object
-    inherit Ppxlib.Ast_traverse.map
-
-    method! location loc =
-      {
-        Ppxlib.loc_start = relocate_position loc.loc_start;
-        loc_end = relocate_position loc.loc_end;
-        loc_ghost = loc.loc_ghost;
-      }
-  end
-
-let relocate_expression base_loc expr =
-  let mapper = new expression_mapper base_loc in
-  mapper#expression expr
+(* Rebase a source-relative location onto the file. *)
+let to_file_location ~(source_position_start : Lexing.position)
+  (relative_loc : Ppxlib.location) : Ppxlib.location =
+  {
+    Ppxlib.loc_start =
+      to_file_position ~source_position_start relative_loc.loc_start;
+    loc_end = to_file_position ~source_position_start relative_loc.loc_end;
+    loc_ghost = relative_loc.loc_ghost;
+  }

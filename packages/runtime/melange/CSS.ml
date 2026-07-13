@@ -7,9 +7,7 @@ module Types = Css_types
 type styles = string * ReactDOM.Style.t
 
 let empty : styles = "", ReactDOM.Style.make ()
-
 let styles (carrier : styles) : ReactDOM.Style.t = snd carrier
-
 let className (carrier : styles) : string = fst carrier
 
 let make className vars : styles =
@@ -31,8 +29,8 @@ external create_style_element : string -> < .. > Js.t -> React.element
 
 external inner_html : __html:string -> unit -> < .. > Js.t = "" [@@mel.obj]
 
-external style_props : dangerouslySetInnerHTML:< .. > Js.t -> unit -> < .. > Js.t
-  = ""
+external style_props :
+  dangerouslySetInnerHTML:< .. > Js.t -> unit -> < .. > Js.t = ""
 [@@mel.obj]
 
 let global_style_tag css =

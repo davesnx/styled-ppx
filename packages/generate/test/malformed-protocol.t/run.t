@@ -5,7 +5,7 @@ Malformed extraction attributes are protocol errors, not silent skips.
   > EOF
 
   $ styled-ppx.generate malformed_css.ml
-  malformed_css.ml: malformed [@@@css]: expected [@@@css] payload to be a string literal
+  styled-ppx: malformed_css.ml: malformed [@@@css]: expected [@@@css] payload to be a string literal
   [1]
 
   $ cat > malformed_bindings.ml <<EOF
@@ -13,7 +13,7 @@ Malformed extraction attributes are protocol errors, not silent skips.
   > EOF
 
   $ styled-ppx.generate malformed_bindings.ml
-  malformed_bindings.ml: malformed [@@@css.bindings]: malformed css.bindings payload at entry 0: expected (longident, class_string) string tuple
+  styled-ppx: malformed_bindings.ml: malformed [@@@css.bindings]: malformed css.bindings payload at entry 0: expected (longident, class_string) string tuple
   [1]
 
   $ cat > malformed_refs.ml <<EOF
@@ -21,7 +21,7 @@ Malformed extraction attributes are protocol errors, not silent skips.
   > EOF
 
   $ styled-ppx.generate malformed_refs.ml
-  malformed_refs.ml: malformed [@@@css.refs]: malformed css.refs payload at entry 0: expected (longident, file, start_line, start_col, end_col) tuple
+  styled-ppx: malformed_refs.ml: malformed [@@@css.refs]: malformed css.refs payload at entry 0: expected (longident, file, start_line, start_col, end_col) tuple
   [1]
 
   $ cat > unterminated_sentinel.ml <<EOF
@@ -29,5 +29,5 @@ Malformed extraction attributes are protocol errors, not silent skips.
   > EOF
 
   $ styled-ppx.generate unterminated_sentinel.ml
-  unterminated_sentinel.ml: malformed [@@@css]: unterminated cross-module selector sentinel
+  styled-ppx: unterminated_sentinel.ml: malformed [@@@css]: unterminated cross-module selector sentinel
   [1]

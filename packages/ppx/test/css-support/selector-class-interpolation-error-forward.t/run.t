@@ -13,14 +13,18 @@ current site) error cleanly. Users can fix by reordering bindings.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  File "input.re", line 2, characters 6-7:
+  File "input.re", line 8, characters 6-7:
+  8 |   &.$(b) { color: red; }
+            ^
   Error: Selector interpolation `$(b)` does not refer to a [%css] binding or string literal earlier in this module.
   - If `b` is bound to a [%css] or string literal later in the file, reorder the bindings.
   - If `b` is a computed string, inline the class name literally.
   - Otherwise, use [%cx] for runtime substitution.
 
   $ dune build
-  File "input.re", line 2, characters 6-7:
+  File "input.re", line 8, characters 6-7:
+  8 |   &.$(b) { color: red; }
+            ^
   Error: Selector interpolation `$(b)` does not refer to a [%css] binding or string literal earlier in this module.
   - If `b` is bound to a [%css] or string literal later in the file, reorder the bindings.
   - If `b` is a computed string, inline the class name literally.

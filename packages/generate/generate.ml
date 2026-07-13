@@ -1,9 +1,9 @@
-(** styled-ppx aggregator: walk every post-PPX [.ml] file in a dune library,
+(** styled-ppx generator: walk every post-PPX [.ml] file in a dune library,
     collect [[\@\@\@css ...]] CSS rules and any cross-module references embedded
     as NUL-delimited sentinels, resolve those sentinels against a global index
     of [%css] bindings, and emit the final stylesheet.
 
-    The aggregator runs once per `dune build` invocation, after the PPX has
+    The generator runs once per `dune build` invocation, after the PPX has
     produced the post-PPX [.ml] files for every module in the library.
 
     Two-pass design:
@@ -11,9 +11,9 @@
     Pass 1 — Collect every [[\@\@\@css.bindings ...]] attribute payload into a
     global index mapping [longident -> class_string]. The PPX itself populates
     these payloads with the fully-qualified longident ([["M.Css.marker"]]) and
-    the space-separated class names it minted, so the aggregator only has to
-    read them — it does not re-derive module names from filenames or
-    pattern-match [CSS.make] calls.
+    the space-separated class names it minted, so the generator only has to read
+    them — it does not re-derive module names from filenames or pattern-match
+    [CSS.make] calls.
 
     Pass 2 — For each rule string in [[\@\@\@css ...]], scan for NUL-delimited
     sentinels [\x00LONGIDENT\x00]. Look the longident up in the index and
@@ -23,6 +23,44 @@
     descriptors in [[\@\@\@css.refs ...]] attributes.
 
     See [documents/cross-module-selector-interpolation.md]. *)
+
+(** All generator diagnostics go through this module. Every message is written
+    to stderr prefixed with ["styled-ppx:"] and gated on the current log level:
+
+    - [Error] (default): resolution/protocol/IO errors only.
+    - [Warning]: same as [Error] plus warnings.
+    - [Info] ([--log info]): additionally prints the output file.
+    - [Debug] ([--debug] or [--log debug]): additionally prints the whole
+      generated stylesheet. *)
+module Logger = struct
+  type level =
+    | Error
+    | Warning
+    | Info
+    | Debug
+
+  let severity = function Error -> 0 | Warning -> 1 | Info -> 2 | Debug -> 3
+  let current_level = ref Error
+  let set_level level = current_level := level
+
+  let level_of_string = function
+    | "error" -> Some Error
+    | "warning" | "warn" -> Some Warning
+    | "info" -> Some Info
+    | "debug" -> Some Debug
+    | _ -> None
+
+  let log level fmt =
+    Printf.ksprintf
+      (fun message ->
+        if severity level <= severity !current_level then
+          Printf.eprintf "styled-ppx: %s\n%!" message)
+      fmt
+
+  let error fmt = log Error fmt
+  let info fmt = log Info fmt
+  let debug fmt = log Debug fmt
+end
 
 (** Root module segment of a dotted longident. [["M.Css.marker"]] -> [["M"]];
     [["foo"]] -> [["foo"]]. *)
@@ -53,8 +91,8 @@ end
 
 (** Every
     [[\@\@\@css.refs [(longident, file, start_line, start_col, end_col); ...]]]
-    attribute decoded into a list of records. The aggregator uses these
-    locations when reporting unresolvable refs. *)
+    attribute decoded into a list of records. The generator uses these locations
+    when reporting unresolvable refs. *)
 module Refs = struct
   type ref_loc = Css_extraction.ref_loc
 
@@ -106,16 +144,15 @@ let harvest_structure ~filename ~idx structure : harvest =
   }
 
 (** Read a post-PPX [.ml] file or its serialized [.pp.ml] AST into a ppxlib
-    structure. File-read and parse errors are surfaced unconditionally (not
-    gated on [~verbose]) so a mistyped path produces a clear aggregator-level
-    diagnostic instead of silent empty output. *)
+    structure. File-read and parse errors are surfaced at [Error] level (always
+    printed) so a mistyped path produces a clear generator-level diagnostic
+    instead of silent empty output. *)
 let read_structure filename : Ppxlib.structure option =
   try
     if String.ends_with filename ~suffix:".pp.ml" then (
       match Ppxlib.Ast_io.read_binary filename with
       | Error msg ->
-        Printf.eprintf "styled-ppx aggregator: cannot read %s: %s\n" filename
-          msg;
+        Logger.error "cannot read %s: %s" filename msg;
         None
       | Ok t ->
         (match Ppxlib.Ast_io.get_ast t with Impl s -> Some s | Intf _ -> None))
@@ -130,15 +167,15 @@ let read_structure filename : Ppxlib.structure option =
     else failwith ("Expected .ml or .pp.ml file, got: " ^ filename)
   with
   | Sys_error msg ->
-    Printf.eprintf "styled-ppx aggregator: cannot read %s: %s\n" filename msg;
+    Logger.error "cannot read %s: %s" filename msg;
     None
   | exn ->
-    Printf.eprintf "styled-ppx aggregator: cannot parse %s: %s\n" filename
-      (Printexc.to_string exn);
+    Logger.error "cannot parse %s: %s" filename (Printexc.to_string exn);
     None
 
-(** Format an aggregator error in the OCaml [File "..."] convention so editors
-    pick it up the same way they pick up compiler errors. *)
+(** Format a generator error in the OCaml [File "..."] convention (prefixed with
+    ["styled-ppx:"] by {!Logger} when printed) so the original source location
+    is easy to locate. *)
 let format_location (r : Refs.ref_loc) : string =
   Printf.sprintf "File %S, line %d, characters %d-%d:" r.file r.start_line
     r.start_col r.end_col
@@ -157,14 +194,14 @@ let module_of_filename filename =
   if stem = "" then stem else String.capitalize_ascii stem
 
 (** Detect cross-library references: a longident whose root module is NOT one of
-    the input files passed to the aggregator. The aggregator only sees files
-    from the current library invocation, so any longident whose root segment
-    doesn't correspond to one of those files must point outside the library.
-    Note: we check the input file set rather than [idx] (the [%css] binding
-    index), because a file may be in-library yet contain no [%css] bindings at
-    all (and therefore contribute nothing to [idx]). Conflating those two cases
-    would produce a misleading "not part of the current library" error for a
-    reference whose target module IS in the library, just not as a [%css]. *)
+    the input files passed to the generator. The generator only sees files from
+    the current library invocation, so any longident whose root segment doesn't
+    correspond to one of those files must point outside the library. Note: we
+    check the input file set rather than [idx] (the [%css] binding index),
+    because a file may be in-library yet contain no [%css] bindings at all (and
+    therefore contribute nothing to [idx]). Conflating those two cases would
+    produce a misleading "not part of the current library" error for a reference
+    whose target module IS in the library, just not as a [%css]. *)
 let is_cross_library ~in_library_modules longident =
   match String.split_on_char '.' longident with
   | [] | [ _ ] -> false (* No dot — single-segment, can't be cross-anything. *)
@@ -195,8 +232,9 @@ let unresolved_message ~longident ~ref_loc ~in_library_modules =
       (format_location ref_loc) longident head longident
 
 (** Collect, index, resolve, dedup, output. *)
-let run ~verbose ~minify ~output_file input_files =
-  if verbose then Printf.eprintf "Input files: %d\n" (List.length input_files);
+let run ~minify ~output_file input_files =
+  Logger.info "output file: %s"
+    (match output_file with Some file -> file | None -> "stdout");
   let idx = Index.create () in
   let in_library_modules = List.map module_of_filename input_files in
   let harvests =
@@ -253,7 +291,7 @@ let run ~verbose ~minify ~output_file input_files =
   (match !errors with
   | [] -> ()
   | _ ->
-    List.iter prerr_endline (List.rev !errors);
+    List.iter (fun msg -> Logger.error "%s" msg) (List.rev !errors);
     exit 1);
 
   (* Dedup the resolved CSS rules while preserving source order.
@@ -284,34 +322,50 @@ let run ~verbose ~minify ~output_file input_files =
       end)
   in
 
+  let stylesheet =
+    let separator = if minify then "" else "\n" in
+    let buffer = Buffer.create 1024 in
+    Buffer.add_string buffer
+      "/* This file is generated by styled-ppx, do not edit manually */\n";
+    List.iter
+      (fun rule ->
+        Buffer.add_string buffer rule;
+        Buffer.add_string buffer separator)
+      ordered_rules;
+    Buffer.contents buffer
+  in
+  Logger.debug "stylesheet:\n%s" stylesheet;
   let out_channel =
     match output_file with Some file -> open_out file | None -> Stdlib.stdout
   in
-  let separator = if minify then "" else "\n" in
-  output_string out_channel
-    "/* This file is generated by styled-ppx, do not edit manually */\n";
-  List.iter
-    (fun rule ->
-      output_string out_channel rule;
-      output_string out_channel separator)
-    ordered_rules;
+  output_string out_channel stylesheet;
   match output_file with Some _ -> close_out out_channel | None -> ()
 
 let parse_args args =
-  let rec parse acc ~output_file ~verbose ~minify = function
+  let rec parse acc ~output_file ~log_level ~minify = function
     | "-o" :: file :: rest
     | "-output" :: file :: rest
     | "--output" :: file :: rest ->
-      parse acc ~output_file:(Some file) ~verbose ~minify rest
-    | "-v" :: rest | "-verbose" :: rest | "--verbose" :: rest ->
-      parse acc ~output_file ~verbose:true ~minify rest
-    | "--minify" :: rest -> parse acc ~output_file ~verbose ~minify:true rest
-    | arg :: rest -> parse (arg :: acc) ~output_file ~verbose ~minify rest
-    | [] -> List.rev acc, output_file, verbose, minify
+      parse acc ~output_file:(Some file) ~log_level ~minify rest
+    | "--log" :: level :: rest ->
+      (match Logger.level_of_string level with
+      | Some log_level -> parse acc ~output_file ~log_level ~minify rest
+      | None ->
+        Logger.error
+          "invalid --log level %S (expected \"error\", \"warning\", \"info\" \
+           or \"debug\")"
+          level;
+        exit 2)
+    | "--debug" :: rest ->
+      parse acc ~output_file ~log_level:Logger.Debug ~minify rest
+    | "--minify" :: rest -> parse acc ~output_file ~log_level ~minify:true rest
+    | arg :: rest -> parse (arg :: acc) ~output_file ~log_level ~minify rest
+    | [] -> List.rev acc, output_file, log_level, minify
   in
   let tail = match Array.to_list args with [] -> [] | _ :: t -> t in
-  parse [] ~output_file:None ~verbose:false ~minify:false tail
+  parse [] ~output_file:None ~log_level:Logger.Error ~minify:false tail
 
 let () =
-  let input_files, output_file, verbose, minify = parse_args Sys.argv in
-  run ~verbose ~minify ~output_file input_files
+  let input_files, output_file, log_level, minify = parse_args Sys.argv in
+  Logger.set_level log_level;
+  run ~minify ~output_file input_files

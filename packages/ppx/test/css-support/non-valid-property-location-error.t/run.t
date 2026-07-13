@@ -14,6 +14,8 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune build
   File "input.re", line 3, characters 10-15:
+  3 |   heightx: 100%;
+                ^^^^^
   Error: Unknown property 'heightx'. Did you mean 'height'?
   [1]
 

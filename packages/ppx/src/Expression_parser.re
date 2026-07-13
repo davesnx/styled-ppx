@@ -1,7 +1,13 @@
 open Ppxlib;
 
-let parse_ocaml = source => {
+/* `$( ... )` interpolations are re-parsed from source. The lexbufs are
+   seeded with [start], the expression's file position, so every location
+   in the resulting AST is file-correct from birth - no remapping pass. */
+
+let parse_ocaml = (~start: Lexing.position, source) => {
   let lexbuf = Lexing.from_string(source);
+  Lexing.set_filename(lexbuf, start.pos_fname);
+  Lexing.set_position(lexbuf, start);
   try(Ok(Parse.expression(lexbuf))) {
   | exn => Error(Printexc.to_string(exn))
   };
@@ -10,16 +16,13 @@ let parse_ocaml = source => {
 module Reason_single_parser = Reason.Reason_single_parser;
 module Reason_parser_explain = Reason.Reason_parser_explain;
 
-let parse_reason = source => {
+let parse_reason = (~start: Lexing.position, source) => {
   let lexbuf = Lexing.from_string(source);
-  let init_pos = {
-    Lexing.pos_fname: "",
-    pos_lnum: 1,
-    pos_bol: 0,
-    pos_cnum: 0,
-  };
-  lexbuf.Lexing.lex_start_p = init_pos;
-  lexbuf.Lexing.lex_curr_p = init_pos;
+  Lexing.set_filename(lexbuf, start.pos_fname);
+  /* [set_position] also sets [lex_abs_pos], which the engine uses to
+     derive [pos_cnum]; assigning [lex_curr_p] alone would not. */
+  Lexing.set_position(lexbuf, start);
+  lexbuf.Lexing.lex_start_p = start;
   let lexer = Reason.Reason_lexer.init(lexbuf);
 
   let rec loop = parser => {
@@ -42,15 +45,11 @@ let parse_reason = source => {
   loop(parser);
 };
 
-let parse_expression = (~loc, ~source) => {
-  let result =
-    switch (File.get()) {
-    | Some(Reason) => parse_reason(source)
-    | Some(OCaml)
-    | None => parse_ocaml(source)
-    };
-  Result.map(
-    Styled_ppx_css_parser.Parser_location.relocate_expression(loc),
-    result,
-  );
+let parse_expression = (~loc: Ppxlib.location, ~source) => {
+  let start = loc.loc_start;
+  switch (File.get()) {
+  | Some(Reason) => parse_reason(~start, source)
+  | Some(OCaml)
+  | None => parse_ocaml(~start, source)
+  };
 };

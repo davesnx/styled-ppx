@@ -13,9 +13,9 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 10, characters 6-11:
-  10 | ......{|
-  10 |   ............................
+  File "input.re", line 11, characters 23-28:
+  11 |     text-decoration: $(cosas);
+                              ^^^^^
   Error: The value cosas has type [> `bold ]
          but an expression was expected of type
            [< `inherit_
@@ -31,6 +31,7 @@ If this test fail means that the module is not in sync with the ppx
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css "@property --cosas-112i897{syntax:\"*\";inherits:false;}"];
   [@css
     ".css-1gtanqs{width:-webkit-fit-content;width:-moz-fit-content;width:fit-content;}"
   ];
@@ -38,7 +39,7 @@ If this test fail means that the module is not in sync with the ppx
     ".css-1jqkbxn{grid-template-columns:fit-content(20px) fit-content(10%);}"
   ];
   [@css
-    ".css-1wxdqmz{-webkit-text-decoration:var(--var-112i897);text-decoration:var(--var-112i897);}"
+    ".css-1wxdqmz{-webkit-text-decoration:var(--cosas-112i897);text-decoration:var(--cosas-112i897);}"
   ];
   let cosas = `bold;
   
@@ -46,5 +47,5 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.make(
     "css-1wxdqmz",
-    [("--var-112i897", CSS.Types.TextDecoration.toString(cosas))],
+    [("--cosas-112i897", CSS.Types.TextDecoration.toString(cosas))],
   );

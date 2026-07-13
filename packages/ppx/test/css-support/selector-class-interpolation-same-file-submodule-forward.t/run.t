@@ -35,7 +35,7 @@ referenced submodule binding above the selector interpolation.
 
   $ dune build
   File "input.re", line 2, characters 6-16:
-  2 | et wrapper = [%css {|
+  2 |   &.$(Css.marker) { color: blue; }
             ^^^^^^^^^^
   Error: Unbound module Css
   [1]

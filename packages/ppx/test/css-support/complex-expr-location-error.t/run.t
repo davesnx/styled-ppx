@@ -12,10 +12,9 @@ This test ensures error locations are correct in complex interpolation expressio
   > EOF
 
   $ dune build 2>&1 | head -30
-  File "input.re", line 9, characters 33-36:
-  7 | ....
-  8 | ............................
-  9 |   ................
+  File "input.re", line 10, characters 15-18:
+  10 |       | Big => `re
+                      ^^^
   Error: The constructor `re has type [> `re ]
          but an expression was expected of type Css_types.Color.t
          The second variant type does not allow tag(s) `re

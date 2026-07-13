@@ -4,6 +4,7 @@
 
 - [BREAKING] [FIX] `[%css]` class-name interpolation in selectors (e.g. `&.$(other)`, `:not(&.$(other))`, `:has(.$(other))`) is now resolved at extraction time. Previously the literal `$(name)` text was emitted into the extracted CSS, breaking the selector at runtime, and a phantom `--var-XXX: <className>` was leaked onto every consumer's inline `style=`. Same-module references now substitute the actual class names (chained for multi-declaration source bindings, e.g. `&.cssA.cssB`); cross-module and unresolved references raise a clear PPX error.
 - [INTERNAL] Refactor entire PPX to use context-free ppxlib rules, removing the global AST traverser (@davesnx)
+- [PERF] Fix quadratic CSS rule accumulation in `[%css]` extraction: rule dedup used an O(n) list scan per emitted rule, making files with many `[%css]` blocks superlinearly slow (~43% faster on a file with 1600 declarations, ~12% on realistic heavy files). Now uses O(1) hash-based membership (@davesnx)
 
 ## 0.61.0
 

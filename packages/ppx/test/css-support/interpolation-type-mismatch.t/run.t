@@ -12,8 +12,8 @@ This test ensures type mismatches between interpolation result and CSS types
   > EOF
 
   $ dune build 2>&1 | head -30
-  File "input.re", line 3, characters 20-24:
-  3 | ....................{|
-  3 |  ..................
+  File "input.re", line 4, characters 13-17:
+  4 |     color: $(size);
+                   ^^^^
   Error: The value size has type int but an expression was expected of type
            Css_types.Color.t

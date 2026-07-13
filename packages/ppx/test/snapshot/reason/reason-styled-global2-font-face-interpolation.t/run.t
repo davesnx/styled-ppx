@@ -16,7 +16,8 @@ or move the entire declaration value behind a single interpolation.
   > EOF
 
   $ dune build 2>&1 | head -n 5
-  File "input.re", line 4, characters 13-25:
+  File "input.re", line 15, characters 13-25:
+  15 |     src: url($(inter_url)) format("woff2");
+                    ^^^^^^^^^^^^
   Error: Interpolation inside `url(...)` is not supported: browsers don't substitute `var()` there.
   - Inline the URL: `url("/path/to/asset")`.
-  - Or interpolate the whole value: `src: $(font_src)`.

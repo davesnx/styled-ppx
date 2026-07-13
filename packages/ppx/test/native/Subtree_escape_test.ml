@@ -7,7 +7,9 @@
 let parse input =
   match
     Styled_ppx_css_parser.Driver.parse_declaration_list
-      ~loc:Ppxlib.Location.none input
+      ~source_position_start:
+        (Styled_ppx_css_parser.Parser_location.file_start ())
+      input
   with
   | Ok (rule_list, _) -> rule_list
   | Error (_loc, error) -> Alcotest.fail error
@@ -71,6 +73,71 @@ let pseudo_element_ampersand_left_of_sibling () =
 let double_ampersand_then_sibling_subject () =
   check ~pos:__POS__ ~expected:true "& + & + .x { color: red; }"
 
+(* --- Escaping: `&` only inside pseudo-class payloads that prove nothing
+   about the subject's position relative to `&` --- *)
+
+(* The `:has()` subject is an ancestor/earlier-sibling probe: it matches
+   elements *outside* `&`'s subtree. *)
+let has_with_sibling_ampersand () =
+  check ~pos:__POS__ ~expected:true ":has(& + div) { color: red; }"
+
+(* `:has(&)` matches an ancestor of `&`; ancestors don't inherit from `&`. *)
+let has_ampersand () =
+  check ~pos:__POS__ ~expected:true ":has(&) { color: red; }"
+
+(* `div:not(&)` matches every div that is NOT the styled element. *)
+let not_ampersand () =
+  check ~pos:__POS__ ~expected:true "div:not(&) { color: red; }"
+
+(* `:is(& + div)` is `& + div`: the subject is a sibling. *)
+let is_with_sibling_branch () =
+  check ~pos:__POS__ ~expected:true ":is(& + div) { color: red; }"
+
+(* One branch without `&` matches unrelated elements, so the whole `:is`
+   proves nothing. *)
+let is_with_unrelated_branch () =
+  check ~pos:__POS__ ~expected:true ":is(& div, .foo) { color: red; }"
+
+(* --- `:is()`/`:where()` proofs of containment: must NOT be flagged --- *)
+
+(* `:is(& div)` is `& div`: the subject is a descendant of `&`. *)
+let is_with_descendant_branch () =
+  check ~pos:__POS__ ~expected:false ":is(& div) { color: red; }"
+
+(* `div:is(&)` is `&` restricted to div: the subject IS `&`. *)
+let is_exactly_ampersand () =
+  check ~pos:__POS__ ~expected:false "div:is(&) { color: red; }"
+
+(* All branches inside `&` prove the compound inside. *)
+let is_with_all_branches_inside () =
+  check ~pos:__POS__ ~expected:false ":is(& .x, & .y) { color: red; }"
+
+(* A descendant of a within-`&` `:is()` segment stays inside. *)
+let descendant_of_is_segment () =
+  check ~pos:__POS__ ~expected:false ":is(& div) span { color: red; }"
+
+(* `:where` behaves like `:is` for containment. *)
+let where_with_descendant_branch () =
+  check ~pos:__POS__ ~expected:false ":where(& div) { color: red; }"
+
+(* --- Documented conservative behavior: the analysis may reject a few
+   valid shapes (raising the interpolation error on CSS that would
+   actually work), but must never accept a broken one. These tests pin
+   the conservative choice so a future refinement is a deliberate,
+   visible change. --- *)
+
+(* `:is(& div) + .x` — the subject is a sibling of a *strict descendant*
+   of `&`, which stays inside `&`'s subtree and could read the custom
+   property. The analysis doesn't track descendant depth through `:is`
+   segments, so it conservatively flags this as escaping. *)
+let sibling_of_is_descendant_conservative () =
+  check ~pos:__POS__ ~expected:true ":is(& div) + .x { color: red; }"
+
+(* `:is(&) + .x` — genuinely a sibling of `&`; must escape. The case
+   above must not be "fixed" in a way that lets this one through. *)
+let sibling_of_is_ampersand () =
+  check ~pos:__POS__ ~expected:true ":is(&) + .x { color: red; }"
+
 (* --- Safe look-alikes: must NOT be flagged --- *)
 
 (* `X + &` — the subject is `&`, which carries its own inline var. *)
@@ -78,8 +145,7 @@ let sibling_before_ampersand () =
   check ~pos:__POS__ ~expected:false ".x + & { color: red; }"
 
 (* `& + &` — the next instance carries the same binding's inline var. *)
-let self_sibling () =
-  check ~pos:__POS__ ~expected:false "& + & { color: red; }"
+let self_sibling () = check ~pos:__POS__ ~expected:false "& + & { color: red; }"
 
 (* Subject is the trailing `&`, regardless of intermediate siblings. *)
 let sibling_chain_ending_in_ampersand () =
@@ -114,7 +180,7 @@ let sibling_without_ampersand () =
 let type_sibling_without_ampersand () =
   check ~pos:__POS__ ~expected:false "input + div { color: red; }"
 
-let test name fn = (name, fn)
+let test name fn = name, fn
 
 let cases =
   [
@@ -129,6 +195,19 @@ let cases =
       pseudo_element_ampersand_left_of_sibling;
     test "double_ampersand_then_sibling_subject"
       double_ampersand_then_sibling_subject;
+    test "has_with_sibling_ampersand" has_with_sibling_ampersand;
+    test "has_ampersand" has_ampersand;
+    test "not_ampersand" not_ampersand;
+    test "is_with_sibling_branch" is_with_sibling_branch;
+    test "is_with_unrelated_branch" is_with_unrelated_branch;
+    test "is_with_descendant_branch" is_with_descendant_branch;
+    test "is_exactly_ampersand" is_exactly_ampersand;
+    test "is_with_all_branches_inside" is_with_all_branches_inside;
+    test "descendant_of_is_segment" descendant_of_is_segment;
+    test "where_with_descendant_branch" where_with_descendant_branch;
+    test "sibling_of_is_descendant_conservative"
+      sibling_of_is_descendant_conservative;
+    test "sibling_of_is_ampersand" sibling_of_is_ampersand;
     test "sibling_before_ampersand" sibling_before_ampersand;
     test "self_sibling" self_sibling;
     test "sibling_chain_ending_in_ampersand" sibling_chain_ending_in_ampersand;

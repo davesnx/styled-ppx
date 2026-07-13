@@ -1,4 +1,4 @@
 (cram
- (alias test-aggregator)
+ (alias test-generate)
  (deps
   (package styled-ppx)))

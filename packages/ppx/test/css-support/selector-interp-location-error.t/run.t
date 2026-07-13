@@ -14,6 +14,8 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune build
   File "input.re", line 8, characters 20-21:
+  8 |   .lolaso :nth-chil(2) {
+                          ^
   Error: Parse error while reading token '2'
   [1]
 

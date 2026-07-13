@@ -6,8 +6,8 @@ compiled twice under different paths - Dune `copy_files` into a Melange build
 dir, vendoring, or a native (SSR) build plus a Melange (client) build of one
 file. The interpolation variable is namespaced on the compilation-unit module
 name (`Global_Css`), not the physical path, so both builds agree: the
-statically extracted `body{color:var(--var-X)}` rule and the
-`:root{--var-X:…}` binding emitted by the runtime `to_string` reference the
+statically extracted `body{color:var(--X)}` rule and the
+`:root{--X:…}` binding emitted by the runtime `to_string` reference the
 same custom property.
 
 Before the fix the physical path was folded into the namespace, so
@@ -30,14 +30,14 @@ basename:
 The extracted static rule is byte-identical across both paths:
 
   $ grep -h '@@@css' native/Global_Css.ml
-  [@@@css "body{color:var(--var-uvgzxa);}"]
+  [@@@css "body{color:var(--primary-uvgzxa);}"]
   $ grep -h '@@@css' js/Global_Css.ml
-  [@@@css "body{color:var(--var-uvgzxa);}"]
+  [@@@css "body{color:var(--primary-uvgzxa);}"]
 
 Within each build the static rule and the runtime :root binding agree, so each
 file mentions exactly one variable - and it is the SAME variable on both paths:
 
-  $ grep -o -- '--var-[a-z0-9]*' native/Global_Css.ml | sort -u
-  --var-uvgzxa
-  $ grep -o -- '--var-[a-z0-9]*' js/Global_Css.ml | sort -u
-  --var-uvgzxa
+  $ grep -o -- '--[A-Za-z0-9_-]*' native/Global_Css.ml | sort -u
+  --primary-uvgzxa
+  $ grep -o -- '--[A-Za-z0-9_-]*' js/Global_Css.ml | sort -u
+  --primary-uvgzxa

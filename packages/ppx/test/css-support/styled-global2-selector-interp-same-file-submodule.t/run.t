@@ -23,7 +23,7 @@ Same-file submodule selector interpolation resolves locally in
   module Globals = {
     let to_string = () => "";
     [@warning "-27-32"]
-    let makeProps = (~key=?, ()) => ();
+    let makeProps = (~key=?, ()) => Js.Obj.empty();
     let make = _props => CSS.global_style_tag(to_string());
   };
   

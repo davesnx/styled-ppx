@@ -1,9 +1,0 @@
----
-alwaysApply: true
----
-
-Make sure you have the right opam switch loaded. `echo $OPAMSWITCH` should point to the current directory.
-
-Before running any build script, you should run `eval $(opam env --switch=. --set-switch)` so all opam switch dependencies are loaded.
-
-Run "make help" to see the list of commands to run

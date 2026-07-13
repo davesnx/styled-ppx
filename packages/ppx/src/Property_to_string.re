@@ -10,10 +10,13 @@ module Builder = Ppxlib.Ast_builder.Default;
 exception Invalid_value(string);
 
 let loc = Location.none;
+let source_position_start = Styled_ppx_css_parser.Parser_location.file_start();
 let (let.ok) = Result.bind;
 
 let parse_component_values_string = (input: string) => {
-  switch (Css_parser.parse_declaration(~loc, "x: " ++ input)) {
+  switch (
+    Css_parser.parse_declaration(~source_position_start, "x: " ++ input)
+  ) {
   | Ok({ Css_parser_ast.value: (values, _), _ }) => Ok(values)
   | Error((_loc, msg)) => Error(msg)
   };

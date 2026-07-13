@@ -7,9 +7,7 @@ module Types = Css_types
 type styles = string * ReactDOM.Style.t
 
 let empty : styles = "", ReactDOM.Style.make ()
-
 let styles (carrier : styles) : ReactDOM.Style.t = snd carrier
-
 let className (carrier : styles) : string = fst carrier
 
 let make className vars : styles =
@@ -30,8 +28,8 @@ let global_style_tag css =
     ~props:
       (ReactDOM.domProps
          ~dangerouslySetInnerHTML:
-           (object
+           object
              method __html = css
-           end)
+           end
          ())
     [||]

@@ -15,6 +15,17 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
+  [@css "@property --elevation1-xawwdw_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --elevation1-xawwdw_2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --elevation1-xawwdw_3{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-udj66h_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-udj66h_2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-udj66h_3{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-139ljoj_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-139ljoj_2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-139ljoj_3{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-139ljoj_4{syntax:\"*\";inherits:false;}"];
+  [@css "@property --boxDark-17ffdav{syntax:\"*\";inherits:false;}"];
   [@css ".css-1eddbzm{background-repeat:space;}"];
   [@css ".css-kbwgys{background-repeat:round;}"];
   [@css ".css-yppiw6{background-repeat:repeat repeat;}"];
@@ -207,7 +218,7 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-ce85p6{box-shadow:1px 1px, inset 2px 2px red;}"];
   [@css ".css-1q5q314{box-shadow:0 0 5px, inset 0 0 10px black;}"];
   [@css
-    ".css-1cg0xa4{box-shadow:-1px 1px 0px 0px var(--var-xawwdw_1), 1px 1px 0px 0px var(--var-xawwdw_2), 0px -1px 0px 0px var(--var-xawwdw_3);}"
+    ".css-1cg0xa4{box-shadow:-1px 1px 0px 0px var(--elevation1-xawwdw_1), 1px 1px 0px 0px var(--elevation1-xawwdw_2), 0px -1px 0px 0px var(--elevation1-xawwdw_3);}"
   ];
   [@css ".css-1jv2nfr{background-position-x:right;}"];
   [@css ".css-1fivq06{background-position-x:center;}"];
@@ -279,13 +290,13 @@ If this test fail means that the module is not in sync with the ppx
     ".css-e4fmes{background-image:linear-gradient(45deg, blue, red), linear-gradient(red -50px, white calc(-25px + 50%), blue 100%), linear-gradient(45deg, blue, red);}"
   ];
   [@css
-    ".css-rv0dwh{background-image:linear-gradient(45deg, var(--var-udj66h_1) 25%, transparent 0%, transparent 50%, var(--var-udj66h_2) 0%, var(--var-udj66h_3) 75%, transparent 0%, transparent 100% ) ;}"
+    ".css-rv0dwh{background-image:linear-gradient(45deg, var(--color-udj66h_1) 25%, transparent 0%, transparent 50%, var(--color-udj66h_2) 0%, var(--color-udj66h_3) 75%, transparent 0%, transparent 100% ) ;}"
   ];
   [@css
-    ".css-1x2lx26{background-image:repeating-linear-gradient( 45deg, var(--var-139ljoj_1) 0px, var(--var-139ljoj_2) 4px, var(--var-139ljoj_3) 5px, var(--var-139ljoj_4) 9px ) ;}"
+    ".css-1x2lx26{background-image:repeating-linear-gradient( 45deg, var(--color-139ljoj_1) 0px, var(--color-139ljoj_2) 4px, var(--color-139ljoj_3) 5px, var(--color-139ljoj_4) 9px ) ;}"
   ];
   [@css
-    ".css-1mgigxz{background-image:linear-gradient(45deg, var(--var-17ffdav) 25%, transparent 25%), linear-gradient(red -50px, white calc(-25px + 50%), blue 100%), linear-gradient(45deg, blue, red);}"
+    ".css-1mgigxz{background-image:linear-gradient(45deg, var(--boxDark-17ffdav) 25%, transparent 25%), linear-gradient(red -50px, white calc(-25px + 50%), blue 100%), linear-gradient(45deg, blue, red);}"
   ];
   [@css ".css-1y1fodl{background-image:radial-gradient(white, black);}"];
   [@css ".css-1bm5i1d{background-image:radial-gradient(circle, white, black);}"];
@@ -566,9 +577,18 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make(
     "css-1cg0xa4",
     [
-      ("--var-xawwdw_1", CSS.Types.Color.toString(Color.Shadow.elevation1)),
-      ("--var-xawwdw_2", CSS.Types.Color.toString(Color.Shadow.elevation1)),
-      ("--var-xawwdw_3", CSS.Types.Color.toString(Color.Shadow.elevation1)),
+      (
+        "--elevation1-xawwdw_1",
+        CSS.Types.Color.toString(Color.Shadow.elevation1),
+      ),
+      (
+        "--elevation1-xawwdw_2",
+        CSS.Types.Color.toString(Color.Shadow.elevation1),
+      ),
+      (
+        "--elevation1-xawwdw_3",
+        CSS.Types.Color.toString(Color.Shadow.elevation1),
+      ),
     ],
   );
   
@@ -638,24 +658,26 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make(
     "css-rv0dwh",
     [
-      ("--var-udj66h_1", CSS.Types.Color.toString(color)),
-      ("--var-udj66h_2", CSS.Types.Color.toString(color)),
-      ("--var-udj66h_3", CSS.Types.Color.toString(color)),
+      ("--color-udj66h_1", CSS.Types.Color.toString(color)),
+      ("--color-udj66h_2", CSS.Types.Color.toString(color)),
+      ("--color-udj66h_3", CSS.Types.Color.toString(color)),
     ],
   );
   CSS.make(
     "css-1x2lx26",
     [
-      ("--var-139ljoj_1", CSS.Types.Color.toString(color)),
-      ("--var-139ljoj_2", CSS.Types.Color.toString(color)),
-      ("--var-139ljoj_3", CSS.Types.Color.toString(color)),
-      ("--var-139ljoj_4", CSS.Types.Color.toString(color)),
+      ("--color-139ljoj_1", CSS.Types.Color.toString(color)),
+      ("--color-139ljoj_2", CSS.Types.Color.toString(color)),
+      ("--color-139ljoj_3", CSS.Types.Color.toString(color)),
+      ("--color-139ljoj_4", CSS.Types.Color.toString(color)),
     ],
   );
   
   CSS.make(
     "css-1mgigxz",
-    [("--var-17ffdav", CSS.Types.Color.toString(Color.Background.boxDark))],
+    [
+      ("--boxDark-17ffdav", CSS.Types.Color.toString(Color.Background.boxDark)),
+    ],
   );
   
   CSS.make("css-1y1fodl", []);

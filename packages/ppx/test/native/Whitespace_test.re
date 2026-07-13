@@ -14,7 +14,10 @@ let cases = [
   ("ignore in declaration", [%expr [%cx " display : block ; "]]),
   ("ignore in declaration", [%expr [%cx "display:block;"]]),
   ("ignore in at_rule inside declarations", [%expr [%cx "@media all {  }"]]),
-  ("ignore in at_rule inside declarations", [%expr [%cx "@media all  {  } "]]),
+  (
+    "ignore in at_rule inside declarations",
+    [%expr [%cx "@media all  {  } "]],
+  ),
   (
     "ignore in at_rule inside declarations",
     [%expr [%cx "@media(min-width: 30px) {}"]],

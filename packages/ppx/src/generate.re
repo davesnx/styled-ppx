@@ -141,7 +141,7 @@ let applyIgnore = (~loc, expr) => {
   );
 };
 
-let abstractGetProp = (~loc, name) => {
+let abstractGetProp = (~loc, name) =>
   if (Settings.Get.native()) {
     /* props.propName */
     Helper.Exp.field(
@@ -157,7 +157,6 @@ let abstractGetProp = (~loc, name) => {
       [(Nolabel, Helper.Exp.ident(~loc, withLoc(Lident("props"), ~loc)))],
     );
   };
-};
 
 let propItem = (~loc, name) => {
   abstractGetProp(~loc, name);
@@ -320,9 +319,7 @@ let stylesAndRefObject = (~loc) => {
 /* let newProps = Object.assign({}, props, stylesObject); */
 let newProps = (~loc) => {
   let valueName = Helper.Pat.mk(~loc, Ppat_var(withLoc("newProps", ~loc)));
-  let value = [%expr
-    assign2(Js.Obj.empty(), props, stylesObject)
-  ];
+  let value = [%expr assign2(Js.Obj.empty(), props, stylesObject)];
 
   Helper.Vb.mk(~loc, valueName, value);
 };
@@ -622,9 +619,8 @@ let makeMakeProps = (~loc, ~areAllFieldsOptional, customProps) => {
             Builder.attribute(
               ~loc,
               ~name=withLoc(~loc, "warning"),
-              ~payload=PStr([
-                Helper.Str.eval(~loc, Builder.estring(~loc, "-69")),
-              ]),
+              ~payload=
+                PStr([Helper.Str.eval(~loc, Builder.estring(~loc, "-69"))]),
             ),
           ],
           ~kind=Ptype_record(reactProps),
@@ -651,12 +647,7 @@ let defineDeletePropFn = (~loc) => {
         ~loc,
         Nolabel,
         [%type: Js.t({..})],
-        Helper.Typ.arrow(
-          ~loc,
-          Nolabel,
-          [%type: string],
-          [%type: bool],
-        ),
+        Helper.Typ.arrow(~loc, Nolabel, [%type: string], [%type: bool]),
       ),
     pval_prim: ["Reflect.deleteProperty"],
     pval_attributes: Platform_attributes.val_(~loc),
@@ -705,8 +696,10 @@ let optionInnerType = type_ =>
 let makePropsArg = (~loc, field: label_declaration, returnType) => {
   let label = field.pld_name.txt;
   switch (optionInnerType(field.pld_type)) {
-  | Some(inner) => Helper.Typ.arrow(~loc, Optional(label), inner, returnType)
-  | None => Helper.Typ.arrow(~loc, Labelled(label), field.pld_type, returnType)
+  | Some(inner) =>
+    Helper.Typ.arrow(~loc, Optional(label), inner, returnType)
+  | None =>
+    Helper.Typ.arrow(~loc, Labelled(label), field.pld_type, returnType)
   };
 };
 
@@ -916,26 +909,6 @@ let getLabeledArgs = (label, defaultValue, param, expr) => {
   getArgs(expr, [firstArg]);
 };
 
-let getLastSequence = expr => {
-  let rec inner = expr =>
-    switch (expr.pexp_desc) {
-    | Pexp_sequence(_, sequence) => inner(sequence)
-    | _ => expr
-    };
-
-  inner(expr);
-};
-
-let getLastExpression = expr => {
-  let rec inner = expr =>
-    switch (expr.pexp_desc) {
-    | Pexp_let(_, _, expression) => inner(expression)
-    | _ => expr
-    };
-
-  inner(expr);
-};
-
 let styleVariableName = "styles";
 
 let propsTypeDeclarations = (~loc, customProps) =>
@@ -1041,14 +1014,14 @@ let staticComponent = (~loc, ~htmlTag, styles) => {
   |> constrainPublicApi(~loc, ~customProps=None);
 };
 
-let validationErrorExpr = (~loc, ~base_loc, ~description, errors) => {
+let validationErrorExpr = (~loc, ~source_position_start, ~description, errors) => {
   let error_messages =
     errors
     |> List.map(((error_loc, error)) => {
          let adjusted_loc =
-           Styled_ppx_css_parser.Parser_location.adjust_to_file(
-             ~relative_loc=error_loc,
-             ~base_loc,
+           Styled_ppx_css_parser.Parser_location.to_file_location(
+             ~source_position_start,
+             error_loc,
            );
          (adjusted_loc, Css_validation.error_to_string(error));
        });
@@ -1056,77 +1029,6 @@ let validationErrorExpr = (~loc, ~base_loc, ~description, errors) => {
   | [(loc, msg)] => Error.expr(~loc, msg)
   | _ => Error.expressions(~loc, ~description, error_messages)
   };
-};
-
-let dynamicStyles = (~loc, ~moduleName, ~functionExpr, ~labeledArguments) => {
-  let styles =
-    switch (functionExpr.pexp_desc) {
-    /* styled.div () => "string" */
-    | Pexp_constant(Pconst_string(str, loc, delimiter)) =>
-      let loc =
-        Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
-          loc,
-          delimiter,
-        );
-
-      switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, str)) {
-      | Ok(declarations) =>
-        declarations
-        |> Css_to_runtime.render_declarations(~loc, ~source=str)
-        |> Css_to_runtime.addLabel(~loc, moduleName)
-        |> Builder.pexp_array(~loc)
-        |> Css_to_runtime.render_style_call(~loc)
-      | Error((loc, msg)) => Error.expr(~loc, msg)
-      };
-
-    /* styled.div () => "[||]" */
-    | Pexp_array(arr) =>
-      arr
-      |> List.rev
-      |> Css_to_runtime.addLabel(~loc, moduleName)
-      |> Builder.pexp_array(~loc)
-      |> Css_to_runtime.render_style_call(~loc)
-
-    /* styled.div () => {
-         ...
-         ...
-         ...
-       } */
-    | Pexp_sequence(expr, sequence) =>
-      /* Generate a new sequence where the last expression is
-         wrapped in render_style_call and render the other expressions. */
-      let styles =
-        sequence |> getLastSequence |> Css_to_runtime.render_style_call(~loc);
-      Builder.pexp_sequence(~loc, expr, styles);
-
-    /* styled.div () => {
-         let styles = sharedStyles
-         styles
-       } */
-    | Pexp_let(Nonrecursive, value_binding, expression) =>
-      /* Generate a new `let in` where the last expression is
-         wrapped in render_style_call */
-      let styles =
-        expression
-        |> getLastExpression
-        |> Css_to_runtime.render_style_call(~loc);
-      Builder.pexp_let(~loc, Nonrecursive, value_binding, styles);
-
-    /* styled.div () => { styles } */
-    | Pexp_ident(ident) =>
-      Builder.pexp_ident(~loc, ident)
-      |> Css_to_runtime.render_style_call(~loc)
-    /* TODO: With this default case we support all expressions here.
-       Users might find this confusing, we could give some warnings before the type-checker does. */
-    | _ => functionExpr
-    };
-
-  dynamicStylesDecl(
-    ~loc,
-    ~name=styleVariableName,
-    ~args=labeledArguments,
-    ~expr=styles,
-  );
 };
 
 let stylesCall = (~loc, ~labeledArguments) => {
@@ -1198,74 +1100,6 @@ let hasUntypedDefault = labeledArguments =>
        Option.is_some(defaultValue) && Option.is_none(type_)
      );
 
-let dynamicComponentCodegenSteps =
-    (~loc, ~htmlTag, ~moduleName, ~functionExpr, ~labeledArguments) => {
-  let (propsGenericParams, propGenericFields) =
-    customPropsFromLabeledArguments(~loc, labeledArguments);
-
-  (
-    if (Settings.Get.native()) {
-      [
-        makeProps(~loc, Some((propsGenericParams, propGenericFields))),
-        defineGetOrEmptyFn(~loc),
-        dynamicStyles(~loc, ~moduleName, ~functionExpr, ~labeledArguments),
-      ];
-    } else {
-      [
-        makeProps(~loc, Some((propsGenericParams, propGenericFields))),
-        defineMakePropsFn(
-          ~loc,
-          ~makePropTypes=propsGenericParams,
-          ~customProps=propGenericFields,
-        ),
-        bindingCreateVariadicElement(~loc),
-        defineMakeStylesObject(~loc),
-      ]
-      @ defineGetterFns(
-          ~loc,
-          ~makePropTypes=propsGenericParams,
-          ~customProps=propGenericFields,
-        )
-      @ [
-        defineDeletePropFn(~loc),
-        defineGetOrEmptyFn(~loc),
-        defineAssign2(~loc, ~makePropTypes=propsGenericParams),
-        dynamicStyles(~loc, ~moduleName, ~functionExpr, ~labeledArguments),
-      ];
-    }
-  )
-  @ component(
-      ~loc,
-      ~htmlTag,
-      ~className=stylesCall(~loc, ~labeledArguments),
-      ~makePropTypes=propsGenericParams,
-      ~labeledArguments,
-    );
-};
-
-let dynamicComponent =
-    (~loc, ~htmlTag, ~label, ~moduleName, ~defaultValue, ~param, ~body) => {
-  let (functionExpr, labeledArguments) =
-    getLabeledArgs(label, defaultValue, param, body);
-  let customProps =
-    Some(customPropsFromLabeledArguments(~loc, labeledArguments));
-
-  let implementation =
-    Builder.pmod_structure(
-      ~loc,
-      dynamicComponentCodegenSteps(
-        ~loc,
-        ~htmlTag,
-        ~moduleName,
-        ~functionExpr,
-        ~labeledArguments,
-      ),
-    );
-
-  hasUntypedDefault(labeledArguments)
-    ? implementation : constrainPublicApi(~loc, ~customProps, implementation);
-};
-
 let extractedDynamicStyles =
     (
       ~loc,
@@ -1277,7 +1111,7 @@ let extractedDynamicStyles =
       ~functionExpr,
       ~labeledArguments,
     ) => {
-  let render_extracted_styles = (~loc, rule_list) => {
+  let render_extracted_styles = (~loc, ~source_position_start, rule_list) => {
     switch (
       Css_validation.get_errors(
         Css_validation.type_check_rule_list(rule_list),
@@ -1285,7 +1119,14 @@ let extractedDynamicStyles =
     ) {
     | [] =>
       let (classNames, dynamic_vars) =
-        Css_file.push(~file, ~scope, ~opens, ~base_loc=loc, ~label=moduleName, rule_list);
+        Css_file.push(
+          ~file,
+          ~scope,
+          ~opens,
+          ~source_position_start,
+          ~label=moduleName,
+          rule_list,
+        );
       onClassNames(classNames);
       Css_to_runtime.render_make_call(
         ~loc,
@@ -1296,7 +1137,7 @@ let extractedDynamicStyles =
     | errors =>
       validationErrorExpr(
         ~loc,
-        ~base_loc=loc,
+        ~source_position_start,
         ~description="Multiple errors on styled component definition",
         errors,
       )
@@ -1306,13 +1147,23 @@ let extractedDynamicStyles =
   let styles =
     switch (functionExpr.pexp_desc) {
     | Pexp_constant(Pconst_string(str, stringLoc, delimiter)) =>
-      let loc =
-        Styled_ppx_css_parser.Parser_location.update_loc_with_delimiter(
+      let source_position_start =
+        Styled_ppx_css_parser.Parser_location.source_position_start(
+          ~delimiter,
           stringLoc,
-          delimiter,
         );
-      switch (Styled_ppx_css_parser.Driver.parse_declaration_list(~loc, str)) {
-      | Ok(rule_list) => render_extracted_styles(~loc=stringLoc, rule_list)
+      switch (
+        Styled_ppx_css_parser.Driver.parse_declaration_list(
+          ~source_position_start,
+          str,
+        )
+      ) {
+      | Ok(rule_list) =>
+        render_extracted_styles(
+          ~loc=stringLoc,
+          ~source_position_start,
+          rule_list,
+        )
       | Error((loc, msg)) => Error.expr(~loc, msg)
       };
     | _ =>

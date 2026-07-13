@@ -21,10 +21,10 @@ If this test fail means that the module is not in sync with the ppx
     ".css-1b4du2s{-webkit-animation-name:foo, bar;animation-name:foo, bar;}"
   ];
   [@css
-    ".css-ixbkch{-webkit-animation-name:var(--var-ucoxjj);animation-name:var(--var-ucoxjj);}"
+    ".css-ixbkch{-webkit-animation-name:var(--foo-ucoxjj);animation-name:var(--foo-ucoxjj);}"
   ];
   [@css
-    ".css-bcfqed{-webkit-animation-name:var(--var-qnewyj), var(--var-1nj9014);animation-name:var(--var-qnewyj), var(--var-1nj9014);}"
+    ".css-bcfqed{-webkit-animation-name:var(--foo-qnewyj), var(--bar-1nj9014);animation-name:var(--foo-qnewyj), var(--bar-1nj9014);}"
   ];
   [@css ".css-k2nfq1{-webkit-animation-duration:0s;animation-duration:0s;}"];
   [@css ".css-kniaw8{-webkit-animation-duration:1s;animation-duration:1s;}"];
@@ -142,13 +142,13 @@ If this test fail means that the module is not in sync with the ppx
     ".css-1e29gym{-webkit-animation:a 300ms linear 400ms infinite reverse forwards running;animation:a 300ms linear 400ms infinite reverse forwards running;}"
   ];
   [@css
-    "@keyframes keyframe-tsl3zg{0%{height:var(--var-j37xwe) ;}100%{height:var(--var-1t6n3q3) ;}}"
+    "@keyframes keyframe-1muclhj{0%{height:var(--previous-j37xwe) ;}100%{height:var(--current-1t6n3q3) ;}}"
   ];
   [@css
-    ".css-1h7bkao{-webkit-animation-name:var(--var-1jz21hk);animation-name:var(--var-1jz21hk);}"
+    ".css-1h7bkao{-webkit-animation-name:var(--resize-1jz21hk);animation-name:var(--resize-1jz21hk);}"
   ];
   [@css
-    ".css-1bi7afk{-webkit-animation:var(--var-1aiquq7) 180ms ease-out 0s 1 normal both;animation:var(--var-1aiquq7) 180ms ease-out 0s 1 normal both;}"
+    ".css-1bi7afk{-webkit-animation:var(--resize-1aiquq7) 180ms ease-out 0s 1 normal both;animation:var(--resize-1aiquq7) 180ms ease-out 0s 1 normal both;}"
   ];
   let foo = CSS.Types.AnimationName.make("keyframe-c958s");
   let bar = CSS.Types.AnimationName.make("keyframe-c958s");
@@ -157,12 +157,12 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-1b4du2s", []);
   CSS.make(
     "css-ixbkch",
-    CSS.Types.AnimationName.toStyleVars("--var-ucoxjj", foo),
+    CSS.Types.AnimationName.toStyleVars("--foo-ucoxjj", foo),
   );
   CSS.make(
     "css-bcfqed",
-    CSS.Types.AnimationName.toStyleVars("--var-qnewyj", foo)
-    @ CSS.Types.AnimationName.toStyleVars("--var-1nj9014", bar),
+    CSS.Types.AnimationName.toStyleVars("--foo-qnewyj", foo)
+    @ CSS.Types.AnimationName.toStyleVars("--bar-1nj9014", bar),
   );
   CSS.make("css-k2nfq1", []);
   CSS.make("css-kniaw8", []);
@@ -213,17 +213,17 @@ If this test fail means that the module is not in sync with the ppx
   let resize =
     CSS.Types.AnimationName.make(
       ~vars=[
-        ("--var-j37xwe", CSS.Types.Height.toString(previous)),
-        ("--var-1t6n3q3", CSS.Types.Height.toString(current)),
+        ("--previous-j37xwe", CSS.Types.Height.toString(previous)),
+        ("--current-1t6n3q3", CSS.Types.Height.toString(current)),
       ],
-      "keyframe-tsl3zg",
+      "keyframe-1muclhj",
     );
   
   CSS.make(
     "css-1h7bkao",
-    CSS.Types.AnimationName.toStyleVars("--var-1jz21hk", resize),
+    CSS.Types.AnimationName.toStyleVars("--resize-1jz21hk", resize),
   );
   CSS.make(
     "css-1bi7afk",
-    CSS.Types.AnimationName.toStyleVars("--var-1aiquq7", resize),
+    CSS.Types.AnimationName.toStyleVars("--resize-1aiquq7", resize),
   );

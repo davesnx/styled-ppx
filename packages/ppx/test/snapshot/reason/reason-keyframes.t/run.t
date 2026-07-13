@@ -3,7 +3,7 @@
   $ refmt --parse ml --print re output.ml
   [@css "@keyframes keyframe-c958s{0%{opacity:0 ;}100%{opacity:1 ;}}"];
   [@css
-    ".css-dy0iev-FadeIn{-webkit-animation-name:var(--var-1sd4kiq);animation-name:var(--var-1sd4kiq);}"
+    ".css-dy0iev-FadeIn{-webkit-animation-name:var(--animation-1sd4kiq);animation-name:var(--animation-1sd4kiq);}"
   ];
   [@css.bindings [("Output.FadeIn", "css-dy0iev-FadeIn")]];
   let animation = CSS.Types.AnimationName.make("keyframe-c958s");
@@ -993,7 +993,7 @@
     let styles =
       CSS.make(
         "css-dy0iev-FadeIn",
-        CSS.Types.AnimationName.toStyleVars("--var-1sd4kiq", animation),
+        CSS.Types.AnimationName.toStyleVars("--animation-1sd4kiq", animation),
       );
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(classNameGet(props))

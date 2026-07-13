@@ -105,33 +105,99 @@ let nul_join parts = String.concat "\000" parts
    (see the invariant in the header). *)
 let namespace_of_content content = Printf.sprintf "css-%s" (hash content)
 
+(* A CSS identifier admits only `[A-Za-z0-9_-]` (ignoring escapes and
+   non-ASCII). OCaml binding names are wider - notably the trailing prime in
+   idiomatic names like [inputView'] - so embedding the label verbatim can
+   emit an unmatchable selector (`.css-<hash>-inputView'`, where the `'` is an
+   illegal identifier character). We drop every CSS-unsafe character rather
+   than backslash-escape it: the returned string backs BOTH the emitted
+   `.css-...-label{}` selector AND the runtime `className`, and an escape
+   (`'` -> `\'`) would land literally in the `class` attribute while the
+   selector matched the unescaped `'`, so the two would never meet. The label
+   is a purely cosmetic debug suffix, so stripping loses nothing structural. *)
+let css_safe_label name =
+  let buffer = Buffer.create (String.length name) in
+  String.iter
+    (fun c ->
+      match c with
+      | 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' | '-' ->
+        Buffer.add_char buffer c
+      | _ -> ())
+    name;
+  Buffer.contents buffer
+
 (* An atom's class name and its namespace, from a single content hash. The
    class name is `<namespace>-<label>` (or just the namespace for an
-   anonymous binding); the namespace is label-free on purpose. Returns
-   [(class_name, namespace)]. *)
+   anonymous binding, or a label that is empty once sanitized); the namespace
+   is label-free on purpose. Returns [(class_name, namespace)]. *)
 let class_and_namespace ?label content =
   let namespace = namespace_of_content content in
   let class_name =
     match label with
-    | Some name -> Printf.sprintf "%s-%s" namespace name
+    | Some name ->
+      (match css_safe_label name with
+      | "" -> namespace
+      | safe -> Printf.sprintf "%s-%s" namespace safe)
     | None -> namespace
   in
-  (class_name, namespace)
+  class_name, namespace
 
 (* Just the class name: `css-<hash(content)>[-<label>]`. *)
 let class_name ?label content = fst (class_and_namespace ?label content)
 
 (* -- Interpolation variables ------------------------------------------- *)
 
-(* The custom-property name for an interpolation: `var-<hash>`, where the hash
-   mixes the owning [namespace], the interpolation [path] (the source text of
-   the `$(...)` expression) and a [type_key] discriminator. The caller derives
-   [type_key] from the interpolation's resolved runtime type so that two
-   interpolations differing only by target type get distinct variables and
-   distinct serializers. The leading `--` is added by the caller when it
-   writes `var(--<name>)`. *)
+(* A readable, CSS-identifier-safe prefix for an interpolation's source path.
+   Keeps `[A-Za-z0-9_]`, collapses other runs to one `-`, truncates to 40, and
+   falls back to "var" when nothing identifier-like survives. The hash suffix
+   owns uniqueness, so the prefix is cosmetic.
+     color           -> "color"
+     Theme.spacing.md -> "spacing-md"   (leading module qualifiers dropped)
+     Color.Border.line -> "line"
+     props.x          -> "props-x"      (lowercase head is not a module)  *)
+let interpolation_name_prefix path =
+  (* Drop contiguous leading module segments (uppercase head), keeping the last
+     segment. The hash uses the full path, so this never affects identity. *)
+  let path =
+    let rec drop = function
+      | [ last ] -> [ last ]
+      | seg :: rest
+        when String.length seg > 0 && seg.[0] >= 'A' && seg.[0] <= 'Z' ->
+        drop rest
+      | segs -> segs
+    in
+    String.concat "." (drop (String.split_on_char '.' path))
+  in
+  let buf = Buffer.create (String.length path) in
+  let pending_dash = ref false in
+  String.iter
+    (fun c ->
+      let ident =
+        (c >= 'a' && c <= 'z')
+        || (c >= 'A' && c <= 'Z')
+        || (c >= '0' && c <= '9')
+        || c = '_'
+      in
+      if ident then (
+        if !pending_dash && Buffer.length buf > 0 then Buffer.add_char buf '-';
+        pending_dash := false;
+        Buffer.add_char buf c)
+      else pending_dash := true)
+    path;
+  let s = Buffer.contents buf in
+  let s = if String.length s > 40 then String.sub s 0 40 else s in
+  if s = "" then "var" else s
+
+(* The custom-property name for an interpolation: `<prefix>-<hash>`. [prefix] is
+   readable (see [interpolation_name_prefix]); the hash over [namespace], [path]
+   and [type_key] owns uniqueness and cross-module identity. Both derive only
+   from the source, so the name is identical in dev and prod. [type_key] comes
+   from the resolved runtime type, so interpolations differing only by target
+   type get distinct variables and serializers. Caller adds the leading `--`. *)
 let variable ~namespace ~type_key path =
-  Printf.sprintf "var-%s" (hash (nul_join [ namespace; path; type_key ]))
+  Printf.sprintf "%s-%s"
+    (interpolation_name_prefix path)
+    (hash (nul_join [ namespace; path; type_key ]))
 
 (* As [variable], but when the same interpolation name appears more than once
    within a single declaration each occurrence gets a `_<index>` suffix, so N
