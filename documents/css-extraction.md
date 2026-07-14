@@ -47,6 +47,7 @@ PPX expansion (per compilation unit)
   │
   ▼
 PPX impl transformer (end of CU)
+  ─ production mode           → emit [@@@css.config [...]]     (environment marker)
   ─ drain Css_file.Buffer     → emit [@@@css "..."]            (one per rule)
   ─ drain Css_bindings        → emit [@@@css.bindings [...]]   (binding exports)
   ─ drain Cross_module_refs   → emit [@@@css.refs [...]]       (cross-module refs)
@@ -61,20 +62,21 @@ dune builds the library normally (.cmi, .cmx, executables)
   ▼
 styled-ppx.generate (post-build aggregator)
   ─ walk every .ml / .pp.ml in the library
-  ─ harvest [@@@css ...], [@@@css.bindings ...], [@@@css.refs ...]
+  ─ harvest [@@@css ...], [@@@css.bindings ...], [@@@css.refs ...], [@@@css.config ...]
   ─ resolve NUL-delimited cross-module sentinels against the bindings index
-  ─ deduplicate rules, emit final stylesheet
+  ─ deduplicate rules, emit final stylesheet (minified when the configs say production)
   │
   ▼
 styles.css
 ```
 
-## Wire protocol: three attributes
+## Wire protocol: four attributes
 
-Everything the aggregator needs to know is conveyed by three top-level
+Everything the aggregator needs to know is conveyed by four top-level
 floating attributes that the PPX appends to the post-PPX file. They are
 the entire interface between PPX expansion and the aggregator — the
-aggregator never re-parses `CSS.make` calls or infers facts from filenames.
+aggregator never re-parses `CSS.make` calls or infers facts from filenames,
+and it takes no mode flags: the build environment travels in-band.
 
 ### `[@@@css "..."]` — extracted CSS rule
 
@@ -136,6 +138,30 @@ The accompanying synthetic `let _ = M.marker` lines exist so that:
 - the OCaml type checker produces a clear "Unbound module" /
   "Unbound value" diagnostic with the original source location
   before the aggregator even runs
+
+### `[@@@css.config [(key, value); ...]]` — extraction settings
+
+Emitted when the PPX runs with production settings (`--minify` or
+`--env production`) and the CU contributes extraction items. Carries
+PPX-side settings the aggregator must honor, as string key/value pairs.
+The only key today is `env`:
+
+```ocaml
+[@@@css.config [("env", "production")]]
+```
+
+Absence means development — the attribute is not emitted in dev builds,
+so dev output stays clean. Unknown keys are ignored by the aggregator
+(forward compatibility).
+
+The aggregator minifies its output (drops inter-rule newlines) only when
+**every** contributing input file — every file with harvested rules or an
+explicit config — declares `env=production`. Mixed inputs mean some
+library stanzas ran the PPX with production settings and some did not;
+the aggregator warns (visible by default) and falls back to readable
+output. This is why `styled-ppx.generate` has no `--minify`/`--env` flag:
+the environment is declared once, on the `(pps styled-ppx ...)` stanza,
+and everything downstream follows.
 
 ## PPX-side state
 
@@ -227,12 +253,13 @@ parse args → harvest_each_file → resolve_sentinels → dedup → write
 ### Harvest
 
 For each input file, walk its top-level structure once and dispatch on
-the four attributes:
+the five attribute shapes:
 
 ```ocaml
 [@@@css "..."]            → push rule string
 [@@@css.bindings [...]]   → fold (longident, class_string) into Index
 [@@@css.refs [...]]       → push (longident, location) into per-file refs
+[@@@css.config [...]]     → record the file's declared environment
 _                         → ignore
 ```
 
@@ -270,8 +297,10 @@ emitted stylesheet. An earlier version deduped through
 destroyed declaration order (regression test:
 `packages/generate/test/source-order.t`).
 
-The deduplicated list is then written to the output channel with
-optional `--minify` (no inter-rule newlines).
+The deduplicated list is then written to the output channel. Inter-rule
+newlines are dropped when every contributing input file declared
+`env=production` in its `[@@@css.config ...]` (see the wire protocol
+section above); there is no CLI flag for this.
 
 ## Atomization
 
@@ -282,11 +311,19 @@ space-separated concatenation of those class names, so consumers apply
 all atoms by setting one `className` attribute.
 
 Class names follow `css-<murmur2 hash of CSS>-<binding label>` format
-(or bare `css-<hash>` when the PPX driver runs with `--minify` — note
-this is the PPX flag, distinct from the aggregator's `--minify`, which
-only strips inter-rule newlines). The binding label is purely
-cosmetic — atom hashes are deduplication-safe even when labels differ.
-Minting lives in `packages/ppx/src/Hash_class.ml`.
+(or bare `css-<hash>` when the PPX driver runs with production
+settings). The binding label is purely cosmetic — atom hashes are
+deduplication-safe even when labels differ. Minting lives in
+`packages/ppx/src/Hash_class.ml`.
+
+The environment is a PPX concern, set once per `(pps styled-ppx ...)`
+stanza: `--env production` (alias for `--minify`) drops label suffixes
+and minifies rule bodies; `--env development` (alias for `--dev`) keeps
+readable labels and adds `cx-<binding>` marker classes. Labels are baked
+into class names at PPX time — in both the compiled `className` and the
+extracted `[@@@css ...]` payload — so no downstream tool could change
+them without desyncing the two. The aggregator learns the environment
+from `[@@@css.config ...]` and adjusts its whitespace accordingly.
 
 Two consequences worth knowing:
 

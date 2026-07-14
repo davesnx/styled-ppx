@@ -24,6 +24,14 @@ Malformed extraction attributes are protocol errors, not silent skips.
   styled-ppx: malformed_refs.ml: malformed [@@@css.refs]: malformed css.refs payload at entry 0: expected (longident, file, start_line, start_col, end_col) tuple
   [1]
 
+  $ cat > malformed_config.ml <<EOF
+  > [@@@css.config [("env", 1)]]
+  > EOF
+
+  $ styled-ppx.generate malformed_config.ml
+  styled-ppx: malformed_config.ml: malformed [@@@css.config]: malformed css.config payload at entry 0: expected (key, value) string tuple
+  [1]
+
   $ cat > unterminated_sentinel.ml <<EOF
   > [@@@css ".target.\000A.x{color:red;}"]
   > EOF

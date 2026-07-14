@@ -946,6 +946,17 @@ let () = {
     Arg.Unit(_ => Settings.Update.dev(true)),
   );
 
+  Ppxlib.Driver.add_arg(
+    ~doc=Settings.env.doc,
+    Settings.env.flag,
+    Arg.Symbol(
+      ["development", "production"],
+      fun
+      | "production" => Settings.Update.env(`Production)
+      | _ => Settings.Update.env(`Development),
+    ),
+  );
+
   let impl = (_ctx, str: Ppxlib.structure) => {
     let file =
       switch (str) {
@@ -970,13 +981,24 @@ let () = {
       | _ => [make_refs_attribute(cross_module_entries)]
       };
     let dep_items = List.map(make_synthetic_dep, cross_module_longidents);
+    /* Declares production mode in the wire protocol so the aggregator can
+       minify without a flag of its own; absence means development. */
+    let config_items =
+      switch (rule_items, bindings_items) {
+      | ([], []) => []
+      | _ when Settings.Get.minify() => [
+          Css_extraction.config_attribute([("env", "production")]),
+        ]
+      | _ => []
+      };
     /* Order:
+       - extraction config (production marker)
        - extracted CSS rules
        - binding exports
        - cross-module refs descriptor
        - dep-tracking synthetic lets
        - user's source. */
-    rule_items @ bindings_items @ refs_items @ dep_items @ str;
+    config_items @ rule_items @ bindings_items @ refs_items @ dep_items @ str;
   };
 
   Ppxlib.Driver.V2.register_transformation(

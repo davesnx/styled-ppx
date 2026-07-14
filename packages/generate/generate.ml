@@ -27,8 +27,9 @@
 (** All generator diagnostics go through this module. Every message is written
     to stderr prefixed with ["styled-ppx:"] and gated on the current log level:
 
-    - [Error] (default): resolution/protocol/IO errors only.
-    - [Warning]: same as [Error] plus warnings.
+    - [Error] ([--log error]): resolution/protocol/IO errors only.
+    - [Warning] (default): same as [Error] plus warnings (e.g. input files
+      disagreeing on their [[@@@css.config]] environment).
     - [Info] ([--log info]): additionally prints the output file.
     - [Debug] ([--debug] or [--log debug]): additionally prints the whole
       generated stylesheet. *)
@@ -40,7 +41,7 @@ module Logger = struct
     | Debug
 
   let severity = function Error -> 0 | Warning -> 1 | Info -> 2 | Debug -> 3
-  let current_level = ref Error
+  let current_level = ref Warning
   let set_level level = current_level := level
 
   let level_of_string = function
@@ -58,6 +59,7 @@ module Logger = struct
       fmt
 
   let error fmt = log Error fmt
+  let warning fmt = log Warning fmt
   let info fmt = log Info fmt
   let debug fmt = log Debug fmt
 end
@@ -99,19 +101,23 @@ module Refs = struct
   let of_list_expr = Css_extraction.decode_refs_payload
 end
 
-(** Per-file harvest: rules with potential sentinels, plus all cross-module ref
-    descriptors seen in this file. The bindings attribute is consumed directly
-    into the global [Index] during the same walk. *)
+(** Per-file harvest: rules with potential sentinels, all cross-module ref
+    descriptors seen in this file, and the file's declared environment from
+    [[@@@css.config]] ([None] when absent, i.e. development). The bindings
+    attribute is consumed directly into the global [Index] during the same walk.
+*)
 type harvest = {
   filename : string;
   rules : string list;
   refs : Refs.ref_loc list;
+  env : string option;
   protocol_errors : string list;
 }
 
 let harvest_structure ~filename ~idx structure : harvest =
   let rules = ref [] in
   let refs = ref [] in
+  let env = ref None in
   let protocol_errors = ref [] in
   let add_protocol_error attribute msg =
     protocol_errors :=
@@ -134,12 +140,21 @@ let harvest_structure ~filename ~idx structure : harvest =
         | Ok () -> ()
         | Error msg ->
           add_protocol_error Css_extraction.bindings_attribute_name msg)
+      | [%stri [@@@css.config [%e? value]]] ->
+        (match Css_extraction.decode_config_payload value with
+        | Ok entries ->
+          (match List.assoc_opt Css_extraction.config_env_key entries with
+          | Some _ as declared -> env := declared
+          | None -> ())
+        | Error msg ->
+          add_protocol_error Css_extraction.config_attribute_name msg)
       | _ -> ())
     structure;
   {
     filename;
     rules = List.rev !rules;
     refs = List.rev !refs;
+    env = !env;
     protocol_errors = List.rev !protocol_errors;
   }
 
@@ -231,8 +246,37 @@ let unresolved_message ~longident ~ref_loc ~in_library_modules =
        reference."
       (format_location ref_loc) longident head longident
 
+(** Decide the output mode from the harvested [[@@@css.config]] attributes.
+
+    The PPX declares [("env", "production")] in every file it processes with
+    production settings and omits the attribute in development, so the
+    aggregator needs no mode flag of its own. Output is minified (inter-rule
+    newlines dropped) only when every contributing input file — every file with
+    harvested rules or an explicit config — was compiled for production. Mixed
+    inputs mean some library stanzas ran the PPX with production settings and
+    some did not: warn and emit readable output. *)
+let production_mode harvests =
+  let contributing =
+    List.filter (fun h -> h.rules <> [] || h.env <> None) harvests
+  in
+  let production, development =
+    List.partition
+      (fun h -> h.env = Some Css_extraction.config_env_production)
+      contributing
+  in
+  match production, development with
+  | [], _ -> false
+  | _ :: _, [] -> true
+  | prod :: _, dev :: _ ->
+    Logger.warning
+      "input files disagree on their [@@@%s] environment: %s was compiled for \
+       production but %s was not; emitting non-minified output. Pass the same \
+       environment to every (pps styled-ppx ...) stanza."
+      Css_extraction.config_attribute_name prod.filename dev.filename;
+    false
+
 (** Collect, index, resolve, dedup, output. *)
-let run ~minify ~output_file input_files =
+let run ~output_file input_files =
   Logger.info "output file: %s"
     (match output_file with Some file -> file | None -> "stdout");
   let idx = Index.create () in
@@ -322,6 +366,9 @@ let run ~minify ~output_file input_files =
       end)
   in
 
+  let minify = production_mode harvests in
+  Logger.info "environment: %s"
+    (if minify then "production (from [@@@css.config])" else "development");
   let stylesheet =
     let separator = if minify then "" else "\n" in
     let buffer = Buffer.create 1024 in
@@ -341,31 +388,38 @@ let run ~minify ~output_file input_files =
   output_string out_channel stylesheet;
   match output_file with Some _ -> close_out out_channel | None -> ()
 
+(** The aggregator deliberately has no mode flag: output minification follows
+    the [[@@@css.config]] attributes the PPX embeds in its input files, so the
+    environment is declared exactly once, on the (pps styled-ppx ...) stanza. *)
 let parse_args args =
-  let rec parse acc ~output_file ~log_level ~minify = function
+  let rec parse acc ~output_file ~log_level = function
     | "-o" :: file :: rest
     | "-output" :: file :: rest
     | "--output" :: file :: rest ->
-      parse acc ~output_file:(Some file) ~log_level ~minify rest
+      parse acc ~output_file:(Some file) ~log_level rest
     | "--log" :: level :: rest ->
       (match Logger.level_of_string level with
-      | Some log_level -> parse acc ~output_file ~log_level ~minify rest
+      | Some log_level -> parse acc ~output_file ~log_level rest
       | None ->
         Logger.error
           "invalid --log level %S (expected \"error\", \"warning\", \"info\" \
            or \"debug\")"
           level;
         exit 2)
-    | "--debug" :: rest ->
-      parse acc ~output_file ~log_level:Logger.Debug ~minify rest
-    | "--minify" :: rest -> parse acc ~output_file ~log_level ~minify:true rest
-    | arg :: rest -> parse (arg :: acc) ~output_file ~log_level ~minify rest
-    | [] -> List.rev acc, output_file, log_level, minify
+    | "--debug" :: rest -> parse acc ~output_file ~log_level:Logger.Debug rest
+    | [ (("-o" | "-output" | "--output" | "--log") as flag) ] ->
+      Logger.error "missing value for flag %S" flag;
+      exit 2
+    | arg :: _ when String.length arg > 0 && arg.[0] = '-' ->
+      Logger.error "unknown flag %S" arg;
+      exit 2
+    | arg :: rest -> parse (arg :: acc) ~output_file ~log_level rest
+    | [] -> List.rev acc, output_file, log_level
   in
   let tail = match Array.to_list args with [] -> [] | _ :: t -> t in
-  parse [] ~output_file:None ~log_level:Logger.Error ~minify:false tail
+  parse [] ~output_file:None ~log_level:Logger.Warning tail
 
 let () =
-  let input_files, output_file, log_level, minify = parse_args Sys.argv in
+  let input_files, output_file, log_level = parse_args Sys.argv in
   Logger.set_level log_level;
-  run ~minify ~output_file input_files
+  run ~output_file input_files

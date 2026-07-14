@@ -33,6 +33,13 @@ let dev = {
   defaultValue: false,
 };
 
+let env = {
+  flag: "--env",
+  doc: " Preset over the individual flags: \"development\" enables --dev marker classes and keeps the readable -<label> suffix on class names; \"production\" enables --minify (drops label suffixes and minifies CSS) and disables dev markers.",
+  value: None,
+  defaultValue: "development",
+};
+
 type settings = {
   native: flag(bool),
   debug: flag(bool),
@@ -98,6 +105,17 @@ module Update = {
         value: Some(value),
       },
     });
+
+  let env =
+    fun
+    | `Development => {
+        dev(true);
+        minify(false);
+      }
+    | `Production => {
+        dev(false);
+        minify(true);
+      };
 };
 
 let find = (key, args) => {

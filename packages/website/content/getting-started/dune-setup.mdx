@@ -152,7 +152,8 @@ Positional arguments are the post-ppx `.ml` / `.pp.ml` files to harvest.
 | `-o`, `--output <file>` | Write the stylesheet to `<file>` (default: stdout) |
 | `--log error\|warning\|info\|debug` | Diagnostic verbosity (default: `error`). `info` prints the output file; `debug` prints the entire stylesheet |
 | `--debug` | Shorthand for `--log debug` |
-| `--minify` | Strip inter-rule newlines from the output |
+
+The CLI has no mode flag on purpose: the build environment travels in-band. When the ppx runs with `--env production` it embeds `[@@@css.config [("env", "production")]]` in every post-ppx file, and the CLI minifies its output (drops inter-rule newlines) when every input file declares it. Mixed inputs — some stanzas built for production, some not — produce a warning and readable output.
 
 ## ppx flags
 
@@ -163,18 +164,20 @@ Passed inside `(pps styled-ppx <flags> ...)`:
 | `--native` | Generate code for server-reason-react (native/SSR) instead of Melange |
 | `--minify` | Minify the generated CSS and drop the readable `-<label>` suffix from class names (`css-1tyndxa` instead of `css-1tyndxa-layout`) |
 | `--dev` | Add greppable marker classes (`cx-<binding>`) to classNames in development; no effect on the extracted CSS |
+| `--env development\|production` | Preset over the flags above: `development` = `--dev` (markers + readable labels), `production` = `--minify` (no labels, minified CSS) |
 | `--debug` | Verbose ppx logging |
 
-<Callout type="warning">
-  The ppx `--minify` and the CLI `--minify` are different flags: the first
-  shortens class names and minifies rule bodies at extraction time, the
-  second only removes newlines between rules in the final file. For
-  production you typically want both.
+<Callout type="default">
+  The environment is declared once, on the ppx. `styled-ppx.generate` reads
+  the `[@@@css.config ...]` marker the ppx embeds and minifies its own output
+  automatically — there is nothing to keep in sync between the two.
 </Callout>
 
 ## Production setup
 
-For a release build: ppx `--minify` on, CLI `--minify` on, `--dev` off. Minification never changes the hashes — `css-1tyndxa-layout` in dev and `css-1tyndxa` in prod are the same atom, so a class seen in production can be looked up in a dev build.
+For a release build, pass `--env production` to the ppx. It enables `--minify` (drops the `-<label>` suffix, minifies rule bodies), disables `--dev`, and declares the environment in the extraction protocol so `styled-ppx.generate` minifies the final stylesheet on its own. Minification never changes the hashes — `css-1tyndxa-layout` in dev and `css-1tyndxa` in prod are the same atom, so a class seen in production can be looked up in a dev build.
+
+The label switch lives on the **ppx** because labels are baked into the class names at compile time, in both the `className` your components carry and the extracted CSS — no downstream tool could drop them without desyncing the two.
 
 Dune has no conditional pps flags (variables aren't allowed in `pps` arguments), so the supported pattern is duplicating the library stanza under mutually-exclusive `enabled_if` guards — same fields, different flags:
 
@@ -183,22 +186,22 @@ Dune has no conditional pps flags (variables aren't allowed in `pps` arguments),
  (name ui)
  ; ... as above ...
  (preprocess
-  (pps styled-ppx melange.ppx reason-react-ppx))
+  (pps styled-ppx --env development melange.ppx reason-react-ppx))
  (enabled_if (= %{profile} dev)))
 
 (library
  (name ui)
  ; ... as above ...
  (preprocess
-  (pps styled-ppx --minify melange.ppx reason-react-ppx))
+  (pps styled-ppx --env production melange.ppx reason-react-ppx))
  (enabled_if (= %{profile} release)))
 ```
 
-and the release stylesheet action becomes:
+The stylesheet action is identical in both profiles — the CLI follows the ppx's declared environment:
 
 ```dune
 (action
- (run styled-ppx.generate --minify --output %{target} %{deps}))
+ (run styled-ppx.generate --output %{target} %{deps}))
 ```
 
 A few more production notes:
