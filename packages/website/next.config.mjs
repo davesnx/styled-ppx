@@ -1,29 +1,59 @@
+import Fs from "node:fs";
 import Os from "node:os";
 import Path from "node:path";
 import URL from "node:url";
 import Nextra from "nextra";
+import { bundledLanguages, createHighlighter } from "shiki";
 
 const __dirname = Path.dirname(URL.fileURLToPath(import.meta.url));
 
+const loadGrammar = (relativePath, metadata) => ({
+  ...JSON.parse(Fs.readFileSync(Path.join(__dirname, relativePath), "utf8")),
+  ...metadata,
+});
+
+const customLanguages = [
+  ...Object.keys(bundledLanguages),
+  loadGrammar("syntaxes/reason.tmLanguage.json", {
+    sourceName: "reason",
+    name: "reason",
+  }),
+  loadGrammar("syntaxes/ocaml.tmLanguage.json", {
+    sourceName: "ocaml",
+    name: "ocaml",
+  }),
+  loadGrammar("syntaxes/mlx.tmLanguage.json", {
+    sourceName: "mlx",
+    name: "mlx",
+  }),
+  loadGrammar("../editors/vscode/syntaxes/css-styled-ppx.json", {
+    injectTo: ["source.ocaml", "source.ocaml.mlx", "source.reason"],
+  }),
+  loadGrammar("../editors/vscode/syntaxes/styled-ppx-ocaml.json", {
+    injectTo: ["source.ocaml", "source.ocaml.mlx"],
+  }),
+  loadGrammar("../editors/vscode/syntaxes/styled-ppx-reason.json", {
+    injectTo: ["source.reason"],
+  }),
+  loadGrammar("syntaxes/dune.tmLanguage.json", { name: "dune" }),
+];
+
 const withNextra = Nextra({
   mdxOptions: {
-    // Only JSON-serializable options can live here: Turbopack passes them to
-    // the loader as data. The custom highlighter (Reason/OCaml/mlx/dune
-    // grammars) is injected at runtime by ./nextra-loader.cjs instead.
     rehypePrettyCodeOptions: {
       theme: { light: "github-light", dark: "github-dark-dimmed" },
+      getHighlighter: (options) =>
+        createHighlighter({ ...options, langs: customLanguages }),
     },
   },
 });
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "standalone",
   // This package is a standalone app with its own lockfile; without this,
   // Next infers the repository root (which also has a package-lock.json).
   outputFileTracingRoot: __dirname,
-  turbopack: {
-    root: __dirname,
-  },
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -34,17 +64,4 @@ const nextConfig = {
   },
 };
 
-const config = withNextra(nextConfig);
-
-// Remap nextra's loader to our wrapper, which injects the non-serializable
-// highlighter options (see ./nextra-loader.cjs).
-const customLoader = Path.join(__dirname, "nextra-loader.cjs");
-for (const rule of Object.values(config.turbopack.rules)) {
-  for (const entry of rule.loaders ?? []) {
-    if (entry.loader.endsWith(`nextra${Path.sep}loader.cjs`)) {
-      entry.loader = customLoader;
-    }
-  }
-}
-
-export default config;
+export default withNextra(nextConfig);
