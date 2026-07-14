@@ -3479,7 +3479,7 @@ module TextDecoration = struct
   let toString x =
     match x with
     | `value x ->
-      String.trim
+      Kloth.String.trim
         (match x.line with
         | Some line -> TextDecorationLine.Value.toString line ^ {js| |js}
         | None -> {js||js})
@@ -4206,7 +4206,7 @@ module FontFamilyName = struct
     | `fangsong -> {js|fangsong|js}
     | `apple_system -> {js|-apple-system|js}
     | `quoted s ->
-      (match String.get s 0 with
+      (match Kloth.String.get s 0 with
       | '\'' -> s
       | '"' -> s
       | _ -> ({js|"|js} ^ s) ^ {js|"|js})
