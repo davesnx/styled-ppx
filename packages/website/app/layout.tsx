@@ -1,9 +1,16 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { FC, ReactNode } from "react";
 import { getPageMap } from "nextra/page-map";
 import { Layout } from "../src/index";
 import "../src/css/fonts.css";
 import "../src/css/global.css";
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fff" },
+    { media: "(prefers-color-scheme: dark)", color: "#111" },
+  ],
+};
 
 export const metadata: Metadata = {
   title: {
@@ -15,8 +22,10 @@ export const metadata: Metadata = {
 
 const RootLayout: FC<{ children: ReactNode }> = async ({ children }) => {
   const pageMap = await getPageMap();
+  // `dir` is required: the theme's ltr:/rtl: Tailwind variants compile to
+  // `[dir="ltr"] &` selectors, which never match without it.
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" dir="ltr" suppressHydrationWarning>
       <head>
         <link
           rel="apple-touch-icon"

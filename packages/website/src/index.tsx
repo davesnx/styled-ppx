@@ -1,3 +1,5 @@
+"use client";
+
 import { ThemeProvider } from "next-themes";
 import type { PageMapItem } from "nextra";
 import { normalizePages } from "nextra/normalize-pages";
@@ -7,7 +9,6 @@ import { Banner } from "./components/banner";
 import { Footer } from "./components/footer";
 import { Navbar } from "./components/navbar";
 import { ActiveAnchorProvider, ConfigProvider } from "./contexts";
-import { getComponents } from "./mdx-components";
 
 type LayoutProps = {
   pageMap: PageMapItem[];
@@ -19,11 +20,6 @@ function InnerLayout({ children, pageMap }: LayoutProps): ReactElement {
   const normalizePagesResult = normalizePages({ list: pageMap, route: pathname });
   const { activeThemeContext: themeContext, topLevelNavbarItems } =
     normalizePagesResult;
-
-  const components = getComponents({
-    isRawLayout: themeContext.layout === "raw",
-    components: {},
-  });
 
   const hideSidebar =
     !themeContext.sidebar ||

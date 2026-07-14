@@ -21,5 +21,5 @@ Testing improved error message for non-string payload with %css
   Example:
     [%css "display: block; color: red"]
   
-  More info: https://styled-ppx.vercel.app/reference/cx
+  More info: https://styled-ppx.vercel.app/reference/css
   [1]

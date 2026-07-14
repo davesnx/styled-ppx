@@ -2,17 +2,14 @@ import { useTheme } from 'next-themes'
 import { useMounted } from 'nextra/hooks'
 import { MoonIcon, SunIcon } from 'nextra/icons'
 import type { ReactElement } from 'react'
-import type { z } from 'zod'
 import { useThemeConfig } from '../contexts'
-import type { themeOptionsSchema } from '../schemas'
+import type { ThemeOptions } from '../schemas'
 import { Select } from './select'
 
 type ThemeSwitchProps = {
   lite?: boolean
   className?: string
 }
-
-type ThemeOptions = z.infer<typeof themeOptionsSchema>
 
 export function ThemeSwitch({
   lite,
@@ -44,7 +41,7 @@ export function ThemeSwitch({
         key: theme,
         name: (
           <div className="_flex _items-center _gap-2 _capitalize">
-            <IconToUse />
+            <IconToUse className="_w-3" />
             <span className={lite ? 'md:_hidden' : ''}>
               {mounted ? options[theme as keyof typeof options] : options.light}
             </span>

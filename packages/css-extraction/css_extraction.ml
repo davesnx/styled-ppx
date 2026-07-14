@@ -17,6 +17,9 @@ type ref_loc = {
 let css_attribute_name = "css"
 let bindings_attribute_name = "css.bindings"
 let refs_attribute_name = "css.refs"
+let config_attribute_name = "css.config"
+let config_env_key = "env"
+let config_env_production = "production"
 let sentinel_byte = '\x00'
 
 let sentinel longident =
@@ -65,6 +68,15 @@ let bindings_attribute entries =
       ]
   in
   make_list_attribute ~name:bindings_attribute_name
+    (Builder.elist ~loc (List.map entry_to_expr entries))
+
+let config_attribute entries =
+  let loc = Ppxlib.Location.none in
+  let entry_to_expr (key, value) =
+    Builder.pexp_tuple ~loc
+      [ Builder.estring ~loc key; Builder.estring ~loc value ]
+  in
+  make_list_attribute ~name:config_attribute_name
     (Builder.elist ~loc (List.map entry_to_expr entries))
 
 let refs_attribute entries =
@@ -141,8 +153,19 @@ let decode_ref (e : Ppxlib.expression) =
   | _ ->
     Error "expected (longident, file, start_line, start_col, end_col) tuple"
 
+let decode_config_entry (e : Ppxlib.expression) =
+  match e.pexp_desc with
+  | Pexp_tuple [ key_e; value_e ] ->
+    (match string_of_const_expr key_e, string_of_const_expr value_e with
+    | Some key, Some value -> Ok (key, value)
+    | _ -> Error "expected (key, value) string tuple")
+  | _ -> Error "expected (key, value) tuple"
+
 let decode_bindings_payload =
   decode_list ~attribute:bindings_attribute_name ~decode:decode_binding
+
+let decode_config_payload =
+  decode_list ~attribute:config_attribute_name ~decode:decode_config_entry
 
 let decode_refs_payload =
   decode_list ~attribute:refs_attribute_name ~decode:decode_ref

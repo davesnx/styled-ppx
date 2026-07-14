@@ -1,2 +1,2 @@
 [@react.component]
-let make = () => <div />;
+let make = () => <Main />;

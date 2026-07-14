@@ -6,7 +6,7 @@ import {
 } from '@headlessui/react'
 import cn from 'clsx'
 import NextLink from 'next/link'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { useMounted } from 'nextra/hooks'
 import { InformationCircleIcon, SpinnerIcon } from 'nextra/icons'
 import type { FocusEventHandler, ReactElement, SyntheticEvent } from 'react'
@@ -21,7 +21,7 @@ type SearchProps = {
   onChange: (newValue: string) => void
   onActive?: () => void
   loading?: boolean
-  error?: boolean
+  error?: ReactElement | string | boolean
   results: SearchResult[]
 }
 
@@ -111,24 +111,18 @@ export function Search({
   )
 
   const handleSelect = useCallback(
-    async (searchResult: SearchResult | null) => {
+    (searchResult: SearchResult | null) => {
       if (!searchResult) return
       // Calling before navigation so selector `html:not(:has(*:focus))` in styles.css will work,
       // and we'll have padding top since input is not focused
       inputRef.current?.blur()
-      await router.push(searchResult.route)
+      router.push(searchResult.route)
       // Clear input after navigation completes
       setMenu(false)
       onChange('')
     },
     [router, setMenu, onChange]
   )
-
-  // const [selected, setSelected] = useState<SearchResult | null>(null)
-  //
-  // useEffect(() => {
-  //   setSelected(results[0] || null)
-  // }, [results])
 
   return (
     <Combobox onChange={handleSelect}>
@@ -191,12 +185,14 @@ export function Search({
       >
         {error ? (
           <span className="_flex _select-none _justify-center _gap-2 _p-8 _text-center _text-sm _text-red-500">
-            <InformationCircleIcon className="_size-5" />
-            {renderString(themeConfig.search.error)}
+            <InformationCircleIcon height="20" className="_shrink-0" />
+            <span className="_text-left">
+              {error === true ? renderString(themeConfig.search.error) : error}
+            </span>
           </span>
         ) : loading ? (
           <span className="_flex _select-none _justify-center _gap-2 _p-8 _text-center _text-sm _text-gray-400">
-            <SpinnerIcon className="_size-5 _animate-spin" />
+            <SpinnerIcon height="20" className="_shrink-0 _animate-spin" />
             {renderComponent(themeConfig.search.loading)}
           </span>
         ) : results.length ? (

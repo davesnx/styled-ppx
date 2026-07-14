@@ -9,7 +9,7 @@
   Example:
     [%styled.div (~color) => "color: $(color);"]
   
-  More info: https://styled-ppx.vercel.app/reference/styled
+  More info: https://styled-ppx.vercel.app/reference/dynamic-components
   [1]
   $ refmt --parse ml --print re output.ml
   module ArrayDynamicComponent = [%styled.div

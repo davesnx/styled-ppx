@@ -1,16 +1,13 @@
-import { useRouter } from 'nextra/hooks'
 import { DiscordIcon, GitHubIcon } from 'nextra/icons'
-import type { z } from 'zod'
-import { Flexsearch } from './components/flexsearch'
+import { PagefindSearch } from './components/pagefind-search'
 import { ThemeSwitch } from './components/theme-switch'
 import { TOC } from './components/toc'
-import type { publicThemeSchema, themeSchema } from './schemas'
 import { getGitIssueUrl } from './git-url'
+import type { DocsThemeConfig } from './schemas'
 
 export const DEFAULT_LOCALE = 'en-US'
 
-export type DocsThemeConfig = z.infer<typeof themeSchema>
-export type PartialDocsThemeConfig = z.infer<typeof publicThemeSchema>
+export type { DocsThemeConfig, PartialDocsThemeConfig } from './schemas'
 
 export const repoLink = 'https://github.com/davesnx/styled-ppx';
 
@@ -38,7 +35,8 @@ export const DEFAULT_THEME: DocsThemeConfig = {
   chat: {
     icon: (
       <>
-        <DiscordIcon />
+        {/* nextra v4 icons ship without intrinsic dimensions */}
+        <DiscordIcon height="24" />
         <span className="_sr-only">Discord</span>
       </>
     )
@@ -57,7 +55,7 @@ export const DEFAULT_THEME: DocsThemeConfig = {
     }
   },
   gitTimestamp: function GitTimestamp({ timestamp }) {
-    const { locale = DEFAULT_LOCALE } = useRouter()
+    const locale = DEFAULT_LOCALE
     return (
       <>
         Last updated on{' '}
@@ -80,13 +78,14 @@ export const DEFAULT_THEME: DocsThemeConfig = {
     link: repoLink,
     icon: (
       <>
-        <GitHubIcon />
+        {/* nextra v4 icons ship without intrinsic dimensions */}
+        <GitHubIcon height="24" />
         <span className="_sr-only">GitHub</span>
       </>
     )
   },
   search: {
-    component: Flexsearch,
+    component: PagefindSearch,
     emptyResult: (
       <span className="_block _select-none _p-8 _text-center _text-sm _text-gray-400">
         No results found.

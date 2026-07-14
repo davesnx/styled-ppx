@@ -1,9 +1,10 @@
+'use client'
+
 import cn from 'clsx'
-import type { NextraMDXContent } from 'nextra'
-import { Table, Td, Th, Tr } from 'nextra/components'
+import type { MDXWrapper } from 'nextra'
+import { Table } from 'nextra/components'
 import { useMounted } from 'nextra/hooks'
 import { ArrowRightIcon } from 'nextra/icons'
-import type { MDXComponents } from 'nextra/mdx'
 import type { ComponentProps, ReactElement, ReactNode } from 'react'
 import {
   Children,
@@ -20,7 +21,6 @@ import { NavLinks } from './components/nav-links'
 import { Sidebar } from './components/sidebar'
 import { SkipNavContent } from './components/skip-nav'
 import type { AnchorProps } from './components/anchor'
-import type { DocsThemeConfig } from './constants'
 import { useConfig, useSetActiveAnchor, useThemeConfig } from './contexts'
 import { useIntersectionObserver, useSlugs } from './contexts/active-anchor'
 import { renderComponent } from './render'
@@ -292,10 +292,6 @@ export const Link = ({ href = '', className, ...props }: AnchorProps) => (
   />
 )
 
-const A = ({ href = '', ...props }) => (
-  <Anchor href={href} newWindow={EXTERNAL_HREF_REGEX.test(href)} {...props} />
-)
-
 const classes = {
   toc: cn(
     'nextra-toc _order-last max-xl:_hidden _w-64 _shrink-0 print:_hidden'
@@ -394,128 +390,121 @@ function Body({ children }: { children: ReactNode }): ReactElement {
   )
 }
 
-const DEFAULT_COMPONENTS: MDXComponents = {
-  h1: props => (
-    <h1
-      className="_mt-2 _text-4xl _font-bold _tracking-tight _text-slate-900 dark:_text-slate-100"
-      {...props}
-    />
-  ),
-  ul: props => (
-    <ul
-      className="[:is(ol,ul)_&]:_my-3 [&:not(:first-child)]:_mt-6 _list-disc ltr:_ml-6 rtl:_mr-6"
-      {...props}
-    />
-  ),
-  ol: props => (
-    <ol
-      className="[:is(ol,ul)_&]:_my-3 [&:not(:first-child)]:_mt-6 _list-decimal ltr:_ml-6 rtl:_mr-6"
-      {...props}
-    />
-  ),
-  li: props => <li className="_my-2" {...props} />,
-  blockquote: props => (
-    <blockquote
-      className={cn(
-        '[&:not(:first-child)]:_mt-6 _border-gray-300 _italic _text-gray-700 dark:_border-gray-700 dark:_text-gray-400',
-        'ltr:_border-l-2 ltr:_pl-6 rtl:_border-r-2 rtl:_pr-6'
-      )}
-      {...props}
-    />
-  ),
-  hr: props => (
-    <hr
-      className="_my-8 _border-neutral-200/70 contrast-more:_border-neutral-400 dark:_border-primary-100/10 contrast-more:dark:_border-neutral-400"
-      {...props}
-    />
-  ),
-  a: Link,
-  table: props => (
-    <Table
-      {...props}
-      className={cn(
-        'nextra-scrollbar [&:not(:first-child)]:_mt-6 _p-0',
-        props.className
-      )}
-    />
-  ),
-  p: props => (
-    <p className="[&:not(:first-child)]:_mt-6 _leading-7" {...props} />
-  ),
-  tr: Tr,
-  th: Th,
-  td: Td,
-  details: Details,
-  summary: Summary,
-  pre: Pre,
-  code: Code,
-  wrapper: function NextraWrapper({ toc, children }) {
-    const config = useConfig()
-    const themeConfig = useThemeConfig()
-    const {
-      activeType,
-      activeThemeContext: themeContext,
-      docsDirectories,
-      directories
-    } = config.normalizePagesResult
+export const H1 = (props: ComponentProps<'h1'>) => (
+  <h1
+    className="_mt-2 _text-4xl _font-bold _tracking-tight _text-slate-900 dark:_text-slate-100"
+    {...props}
+  />
+)
 
-    const tocEl =
-      activeType === 'page' ||
-        !themeContext.toc ||
-        themeContext.layout !== 'default' ? (
-        themeContext.layout !== 'full' &&
-        themeContext.layout !== 'raw' && (
-          <nav className={classes.toc} aria-label="table of contents" />
-        )
-      ) : (
-        <nav className={classes.toc} aria-label="table of contents">
-          {renderComponent(themeConfig.toc.component, {
-            toc: themeConfig.toc.float ? toc : [],
-            filePath: config.filePath
-          })}
-        </nav>
+// Shared, monotonically increasing counter: the active-anchor logic only
+// compares heading indexes relatively, so it survives client navigations.
+const headingContext = { index: 0 }
+export const H2 = createHeading('h2', headingContext)
+export const H3 = createHeading('h3', headingContext)
+export const H4 = createHeading('h4', headingContext)
+export const H5 = createHeading('h5', headingContext)
+export const H6 = createHeading('h6', headingContext)
+
+export const Ul = (props: ComponentProps<'ul'>) => (
+  <ul
+    className="[:is(ol,ul)_&]:_my-3 [&:not(:first-child)]:_mt-6 _list-disc ltr:_ml-6 rtl:_mr-6"
+    {...props}
+  />
+)
+
+export const Ol = (props: ComponentProps<'ol'>) => (
+  <ol
+    className="[:is(ol,ul)_&]:_my-3 [&:not(:first-child)]:_mt-6 _list-decimal ltr:_ml-6 rtl:_mr-6"
+    {...props}
+  />
+)
+
+export const Li = (props: ComponentProps<'li'>) => (
+  <li className="_my-2" {...props} />
+)
+
+export const Blockquote = (props: ComponentProps<'blockquote'>) => (
+  <blockquote
+    className={cn(
+      '[&:not(:first-child)]:_mt-6 _border-gray-300 _italic _text-gray-700 dark:_border-gray-700 dark:_text-gray-400',
+      'ltr:_border-l-2 ltr:_pl-6 rtl:_border-r-2 rtl:_pr-6'
+    )}
+    {...props}
+  />
+)
+
+export const Hr = (props: ComponentProps<'hr'>) => (
+  <hr
+    className="_my-8 _border-neutral-200/70 contrast-more:_border-neutral-400 dark:_border-primary-100/10 contrast-more:dark:_border-neutral-400"
+    {...props}
+  />
+)
+
+export const ThemedTable = (props: ComponentProps<typeof Table>) => (
+  <Table
+    {...props}
+    className={cn(
+      'nextra-scrollbar [&:not(:first-child)]:_mt-6 _p-0',
+      props.className
+    )}
+  />
+)
+
+export const P = (props: ComponentProps<'p'>) => (
+  <p className="[&:not(:first-child)]:_mt-6 _leading-7" {...props} />
+)
+
+// nextra v4 exposes table sub-elements as properties of `Table`
+export const Tr = Table.Tr
+export const Th = Table.Th
+export const Td = Table.Td
+
+export { Details, Summary, Pre, Code }
+
+export const Wrapper: MDXWrapper = function NextraWrapper({ toc, children }) {
+  const config = useConfig()
+  const themeConfig = useThemeConfig()
+  const {
+    activeType,
+    activeThemeContext: themeContext,
+    docsDirectories,
+    directories
+  } = config.normalizePagesResult
+
+  const tocEl =
+    activeType === 'page' ||
+      !themeContext.toc ||
+      themeContext.layout !== 'default' ? (
+      themeContext.layout !== 'full' &&
+      themeContext.layout !== 'raw' && (
+        <nav className={classes.toc} aria-label="table of contents" />
       )
-    return (
-      <div
-        className={cn(
-          '_mx-auto _flex',
-          themeContext.layout !== 'raw' && '_max-w-[90rem]'
-        )}
-      >
-        <Sidebar
-          docsDirectories={docsDirectories}
-          fullDirectories={directories}
-          toc={toc}
-          asPopover={config.hideSidebar}
-          includePlaceholder={themeContext.layout === 'default'}
-        />
-        {tocEl}
-        <SkipNavContent />
-        <Body>{children}</Body>
-      </div>
+    ) : (
+      <nav className={classes.toc} aria-label="table of contents">
+        {renderComponent(themeConfig.toc.component, {
+          toc: themeConfig.toc.float ? toc : [],
+          filePath: config.filePath
+        })}
+      </nav>
     )
-  } satisfies NextraMDXContent
-}
-
-export function getComponents({
-  isRawLayout,
-  components
-}: {
-  isRawLayout?: boolean
-  components?: DocsThemeConfig['components']
-}): MDXComponents {
-  if (isRawLayout) {
-    return { a: A, wrapper: DEFAULT_COMPONENTS.wrapper }
-  }
-
-  const context = { index: 0 }
-  return {
-    ...DEFAULT_COMPONENTS,
-    h2: createHeading('h2', context),
-    h3: createHeading('h3', context),
-    h4: createHeading('h4', context),
-    h5: createHeading('h5', context),
-    h6: createHeading('h6', context),
-    ...components
-  }
+  return (
+    <div
+      className={cn(
+        '_mx-auto _flex',
+        themeContext.layout !== 'raw' && '_max-w-[90rem]'
+      )}
+    >
+      <Sidebar
+        docsDirectories={docsDirectories}
+        fullDirectories={directories}
+        toc={toc}
+        asPopover={config.hideSidebar}
+        includePlaceholder={themeContext.layout === 'default'}
+      />
+      {tocEl}
+      <SkipNavContent />
+      <Body>{children}</Body>
+    </div>
+  )
 }

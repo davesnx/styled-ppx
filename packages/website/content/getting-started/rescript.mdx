@@ -1,80 +1,23 @@
 ---
-title: Getting Started - ReScript
+title: Getting Started - ReScript (unsupported)
 showAllLanguage: true
 ---
 
-import { Callout } from 'nextra/components'
-import Link from 'next/link'
+import { Callout } from "nextra/components";
 
 # ReScript
 
-**Supported versions**: ReScript v9 and v10
+<Callout type="error">
+  **ReScript is no longer supported.** The ReScript runtime was removed in
+  styled-ppx 0.62.0, together with the `@davesnx/styled-ppx` npm package
+  workflow.
+</Callout>
 
-ReScript v11 support is currently in development ([track progress here](https://github.com/davesnx/styled-ppx/pull/482)).
+styled-ppx focuses on **OCaml and Reason**, targeting [Melange](https://melange.re) for the browser and [server-reason-react](https://github.com/ml-in-barcelona/server-reason-react) for native server rendering. Maintaining a third compiler target with a diverging language and build system wasn't sustainable, and the static-extraction architecture introduced in 0.62.0 relies on dune.
 
-For organizations requiring support for specific ReScript versions, we offer sponsored development options. Please reach out to discuss sponsorship arrangements for prioritized compatibility implementation.
+## What are my options?
 
-### Install
+- **Migrate to Melange.** Melange compiles OCaml/Reason to JavaScript with first-class React support and is styled-ppx's primary target. See [Getting started with Melange](/getting-started/melange).
+- **Stay on ReScript.** The last release with ReScript support was **0.61.0**, installable from npm as `@davesnx/styled-ppx`. It keeps working, but won't receive updates and predates static extraction.
 
-```bash
-yarn add @davesnx/styled-ppx
-# Or
-npm install @davesnx/styled-ppx
-```
-
-### Packages available
-
-- `@davesnx/styled-ppx/ppx` is the ppx as a binary, transforms `%styled.div("")`, `%cx("")` and `%css("")`
-- `@davesnx/styled-ppx/rescript` is library with the runtime (expose the CSS module)
-
-### Update `bsconfig.json`
-
-Add `"@davesnx/styled-ppx/ppx"{:json}` under bsconfig `"ppx-flags"{:json}`.
-The diff on `bsconfig.json` should contain the following:
-
-```diff
-{
-  "bs-dependencies": [
-    "@rescript/react",
-+   "@davesnx/styled-ppx/rescript",
-  ],
-+ "ppx-flags": ["@davesnx/styled-ppx/ppx"]
-}
-```
-
-Note: `@rescript/react` is optional, and only needed if you use styled components (`%styled.div(``)`).
-
-### Example
-
-```rescript
-module Link = %styled.a((~color=CSS.hex("4299E1")) => `
-  font-size: 1.875rem;
-  line-height: 1.5;
-  text-decoration: none;
-  margin: 0px;
-  padding: 10px 0px;
-  color: $(color);
-`)
-
-/* This is a unique className pointing to those styles */
-let layout = %cx(`
-  display: flex;
-  width: 100%;
-  height: 100%;
-  justify-content: center;
-  align-items: center
-`)
-
-/* Later in a component */
-<div className=layout>
-  <Link
-    color={CSS.hex("333333")}
-    href="https://sancho.dev"
-    rel="noopener noreferrer">
-    {React.string("sancho.dev")}
-  </Link>
-</div>
-```
-
-### Playground
-If you want to try it out, just fork https://github.com/davesnx/try-styled-ppx and follow the installation instructions there.
+If you have questions, reach out on [GitHub issues](https://github.com/davesnx/styled-ppx/issues).

@@ -1,0 +1,116 @@
+---
+title: How it works
+showAllLanguage: true
+---
+
+# How it works
+
+styled-ppx is a **compile-time** CSS system. This page explains what happens between writing `[%css "display: flex"]` and a browser painting your page.
+
+## The pipeline at a glance
+
+```
+your .re / .ml source
+  │
+  ▼
+① ppx expansion (while compiling each file)
+   ─ parse & type-check the CSS
+   ─ split into atomic rules, one class per declaration
+   ─ lower $(expr) interpolations to CSS custom properties
+   ─ park the rendered CSS in [@@@css "..."] attributes
+  │
+  ▼
+② dune builds your project normally
+  │
+  ▼
+③ styled-ppx.generate (a dune rule you add once)
+   ─ harvests the [@@@css ...] attributes from every compiled file
+   ─ resolves cross-module class references
+   ─ deduplicates and writes a single styles.css
+  │
+  ▼
+styles.css — a plain, static asset you link like any stylesheet
+```
+
+Your components carry the class names the ppx minted at step ①, plus — when you use interpolation — the values of a few CSS custom properties.
+
+See [Setting up the dune rules](/getting-started/dune-setup) for the concrete build configuration.
+
+## Atomization: one declaration, one class
+
+Every declaration inside a `[%css]` or `[%styled.<tag>]` block becomes its own rule with its own class:
+
+```reason
+let layout = [%css {|
+  display: flex;
+  align-items: center;
+|}];
+```
+
+extracts to:
+
+```css
+.css-k008qs-layout { display: flex; }
+.css-1tyndxa-layout { align-items: center; }
+```
+
+and `layout`'s className is the space-separated list: `"css-k008qs-layout css-1tyndxa-layout"`.
+
+Class names are **content-addressed**: the hash is derived from the CSS text itself (for interpolation variables, the source path and main module name feed the hash too, so names stay stable across builds). Two components declaring `display: flex` anywhere in your project share the exact same rule, and the aggregator emits it once. On large apps this makes the stylesheet grow with the number of *distinct declarations*, not the number of components — the same effect utility-CSS frameworks achieve, without you maintaining a naming convention.
+
+Repeated fallback declarations for the same property (e.g. `display: -webkit-box; display: flex;`) are kept together in a single atom, so their intra-rule order — which the fallback depends on — is preserved.
+
+### Class names
+
+The format is `css-<hash>-<label>`, where the label is the `let` binding or module name (`layout` above). The label is purely cosmetic, for debuggability: hashes alone determine identity and deduplication. Running the ppx with the `--minify` flag drops the label, emitting bare `css-<hash>` names for production.
+
+### Cascade and ordering
+
+All atoms have the same specificity (a single class). The tiebreaker is stylesheet order — later wins — and the aggregator preserves your source order exactly, so an override written after its base declaration stays after it in `styles.css`. The full rules and composition patterns live in [Which declaration wins](/reference/runtime#which-declaration-wins).
+
+## Dynamic values: CSS custom properties
+
+Interpolating a value does **not** opt a block out of extraction. The ppx lowers `$(expr)` to a CSS custom property in the extracted rule:
+
+```reason
+let title = (~color) => [%css {|
+  font-size: 2rem;
+  color: $(color);
+|}];
+```
+
+```css
+.css-abc123-title { font-size: 2rem; }
+.css-def456-title { color: var(--color-xk29fh); }
+```
+
+The runtime side only supplies the property's *value*, through the element's inline `style` attribute (`style="--color-xk29fh: #667eea"`). That's why elements styled with interpolations carry a small `style` attribute: it holds variable definitions, never declarations.
+
+A few details worth knowing:
+
+- Variable names are readable and stable: `--<source-name>-<hash>`, identical in dev and prod, so `$(Theme.spacing.md)` becomes `--spacing-md-<hash>`.
+- The expression is wrapped in the typed `toString` for the property it's used in, so a `Color.t` where a length is expected is a compile error.
+- Variables scoped to the element itself are registered with `@property { inherits: false }`, so updating one only recalculates that element's style, not its whole subtree.
+- In `[%styled.global]`, interpolated values are supplied through a `:root { ... }` block rendered by the generated component instead of inline styles.
+
+## Class references in selectors
+
+Interpolating a *binding* in selector position (`&.$(active)`, `:has(.$(other))`) is resolved **statically** — the actual class names are substituted into the extracted CSS, with no `var()` indirection. Same-file references resolve during ppx expansion; references to bindings in *other modules* are resolved by the aggregator at stylesheet-generation time — one of the reasons the aggregator exists. Syntax, rules, and errors are documented in [Class references in selectors](/reference/selectors#class-references-in-selectors).
+
+## The aggregator: `styled-ppx.generate`
+
+The ppx runs one file at a time and cannot see the rest of your project, so each compiled file carries its extracted CSS in top-level attributes (`[@@@css "..."]`) that ride along in the build artifacts. `styled-ppx.generate` is a small CLI that:
+
+1. walks the post-ppx `.ml`/`.pp.ml` files you point it at,
+2. harvests every extracted rule and binding export,
+3. resolves cross-module selector references,
+4. deduplicates rules (order-preserving), and
+5. writes the final stylesheet.
+
+You wire it up once as a dune rule; the rule, CLI flags, and troubleshooting live in [Setting up the dune rules](/getting-started/dune-setup).
+
+## What this buys you
+
+- **Server rendering is just rendering.** Link `styles.css` in your `<head>` and render — no orchestration needed. (`[%styled.global]` renders one `<style>` element for `:root` variable *values* when you interpolate in globals.)
+- **Cacheable CSS.** `styles.css` is a static asset with a stable content — it caches like any other file and can be served from a CDN.
+- **Smaller JS.** Your bundle carries class-name strings, not a CSS engine.

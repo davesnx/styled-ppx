@@ -8,11 +8,17 @@ import { MenuProvider } from "./menu";
 type Config = {
   hideSidebar: boolean;
   normalizePagesResult: ReturnType<typeof normalizePages>;
+  /** Front matter of the active page, from the page map. */
+  frontMatter: Record<string, unknown>;
+  filePath: string;
+  timestamp?: number;
 };
 
 const ConfigContext = createContext<Config>({
   hideSidebar: false,
   normalizePagesResult: {} as ReturnType<typeof normalizePages>,
+  frontMatter: {},
+  filePath: "",
 });
 ConfigContext.displayName = "Config";
 
@@ -35,7 +41,11 @@ export function ConfigProvider({
     [pageMap, pathname]
   );
 
-  const { activeType, activeThemeContext: themeContext } = normalizePagesResult;
+  const {
+    activeType,
+    activeThemeContext: themeContext,
+    activeMetadata,
+  } = normalizePagesResult;
 
   const config: Config = {
     hideSidebar:
@@ -43,6 +53,9 @@ export function ConfigProvider({
       themeContext.layout === "raw" ||
       activeType === "page",
     normalizePagesResult,
+    frontMatter: activeMetadata ?? {},
+    filePath: activeMetadata?.filePath ?? "",
+    timestamp: activeMetadata?.timestamp,
   };
 
   useEffect(() => {

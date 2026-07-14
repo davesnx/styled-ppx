@@ -5,3 +5,6 @@
  (libraries melange.belt styled-ppx.melange reason-react)
  (preprocess
   (pps styled-ppx melange.ppx reason-react-ppx)))
+
+(copy_files
+ (files ../native/shared/*.re))

@@ -1,5 +1,6 @@
 export default {
-  "rescript": "ReScript",
   "melange": "Melange",
-  "native": "Native"
+  "native": "Native",
+  "dune-setup": "Dune Setup",
+  "rescript": "ReScript (unsupported)"
 }

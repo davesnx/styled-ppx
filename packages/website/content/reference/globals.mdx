@@ -1,28 +1,71 @@
 ---
-title: Inject global styles
+title: Global styles
 ---
 
-# Inject global styles
+# Global styles
 
-`%styled.global{:rescript}` `[%styled.global]{:reason}` is the method to apply general styles to your website.
+`[%styled.global]{:reason}` defines document-level styles: resets, element selectors, `@font-face{:styled-ppx-css}`, `:root{:styled-ppx-css}` custom properties. It's a *module* extension — the generated module is a React component you render once in your tree.
 
-```rescript
-%styled.global(`
-  html, body {
-    margin: 0;
-    padding: 0;
-  }
-`)
-```
 ```reason
-[%styled.global {|
+module Reset = [%styled.global {|
   html, body {
     margin: 0;
     padding: 0;
   }
 |}];
+
+/* somewhere in your app */
+<body>
+  <Reset />
+  ...
+</body>;
 ```
 
-Recommend to not add `@font-face{:styled-ppx-css}` definitions as globals. Consider adding the font directly to the HTML or in a `style.css` file. [More](https://andydavies.me/blog/2019/02/12/preloading-fonts-and-the-puzzle-of-priorities/).
+```mlx
+module Reset = [%styled.global {|
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+|}]
 
-Since [emotion](https://emotion.sh) has a small run-time for those global styles to be applied to the DOM. In a regular style file this isn't an issue. Keeping `@fonts-face{:styled-ppx-css}` or other `@imports{:styled-ppx-css}` inside emotion will delay a bit their fetching and will cause a [Flash of Unstyled Text](https://css-tricks.com/fout-foit-foft/).
+(* somewhere in your app *)
+let app = <body> <Reset /> </body>
+```
+
+The rules themselves are [statically extracted](/how-it-works) into your `styles.css` — rendering `<Reset />{:reason}` does **not** inject them. The component exists to supply runtime *values*: when the block interpolates expressions, `<Reset />{:reason}` renders a `<style>` element with a single `:root { --var: value; }{:styled-ppx-css}` block (and an empty one otherwise).
+
+## CSS variables
+
+`:root` custom properties defined in a global block are the natural home for design tokens — see [Theming](./theming) for the full guide (module tokens vs `:root` tokens, `var()` fallbacks, and light/dark schemes).
+
+## `@font-face`
+
+`@font-face{:styled-ppx-css}` belongs in `[%styled.global]{:reason}`:
+
+```reason
+module Fonts = [%styled.global {|
+  @font-face {
+    font-family: "Inter";
+    src: url("/fonts/inter.woff2") format("woff2");
+    font-display: swap;
+  }
+|}];
+```
+
+```mlx
+module Fonts = [%styled.global {|
+  @font-face {
+    font-family: "Inter";
+    src: url("/fonts/inter.woff2") format("woff2");
+    font-display: swap;
+  }
+|}]
+```
+
+The rule ships in `styles.css`, so the font is discovered as soon as the stylesheet loads. (Font URLs must be literal: interpolation inside `url(...){:styled-ppx-css}` is rejected, since browsers don't substitute `var()` there.)
+
+## Notes
+
+- Top-level *bare declarations* are rejected — global styles must live under a selector. Use `* { ... }{:styled-ppx-css}` if you really want to target everything.
+- Global rules always sort before class rules in the generated stylesheet, so component styles can override them.

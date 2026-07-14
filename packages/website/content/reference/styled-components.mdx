@@ -9,19 +9,6 @@ import { Callout } from 'nextra/components'
 `styled.{{tag}}` is the extension that allows you to create React Components from the styles of the element.
 All HTML Elements are available under `styled.{{tag}}`. An example of it will be:
 
-```rescript
-module StyledComponent = %styled.div(`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  width: 100vw;
-`)
-
-<StyledComponent>
-  {React.string("Hello from the style")}
-</StyledComponent>
-```
 ```reason
 module StyledComponent = [%styled.div {|
   display: flex;
@@ -34,28 +21,24 @@ module StyledComponent = [%styled.div {|
 <StyledComponent> {React.string("Hello from the style")} </StyledComponent>;
 ```
 
+```mlx
+module StyledComponent = [%styled.div {|
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+|}]
+
+let app = <StyledComponent> (React.string "Hello from the style") </StyledComponent>
+```
+
+The styles are [extracted at compile time](/how-it-works) like any other block: the component simply renders the given tag with the generated class names applied.
+
 ### React props (makeProps)
 
 Styled components expose all the React component props within their API. For example, an input will expose all the props of the input element:
 
-```rescript
-module Input = %styled.input(`
-  border: 1px solid #cccccc;
-  border-radius: 4px;
-  padding: 8px;
-
-  &:focus {
-    border-color: #aaaaaa;
-  }
-`)
-
-<Input
-  placeholder="Enter your name..."
-  maxLength=255
-  onChange={_ => ()}
-  onBlur={_ => ()}
-/>
-```
 ```reason
 module Input = [%styled.input {|
   border: 1px solid #cccccc;
@@ -75,6 +58,26 @@ module Input = [%styled.input {|
 />;
 ```
 
+```mlx
+module Input = [%styled.input {|
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  padding: 8px;
+
+  &:focus {
+    border-color: #aaaaaa;
+  }
+|}]
+
+let app =
+  <Input
+    placeholder="Enter your name..."
+    maxLength=255
+    onChange=(fun _ -> ())
+    onBlur=(fun _ -> ())
+  />
+```
+
 <Callout>
   You can extend the styles from a component via the `className` prop.
 </Callout>
@@ -84,15 +87,6 @@ module Input = [%styled.input {|
 Following the example above, you can extend the styles of the input component by passing the `className` prop.
 It's not recommended to use `className` prop to extend the styles of a component, but it's useful when you need to extend the styles of a component from a third-party library.
 
-```rescript {6}
-<Input
-  placeholder="Enter your name..."
-  maxLength=255
-  onChange={_ => ()}
-  onBlur={_ => ()}
-  className="extra-classname"
-/>
-```
 ```reason {6}
 <Input
   placeholder="Enter your name..."
@@ -103,7 +97,19 @@ It's not recommended to use `className` prop to extend the styles of a component
 />
 ```
 
-The resultant HTML will be: first the generated className by emotion plus the className passed by props.
+```mlx {6}
+let app =
+  <Input
+    placeholder="Enter your name..."
+    maxLength=255
+    onChange=(fun _ -> ())
+    onBlur=(fun _ -> ())
+    className="extra-classname"
+  />
+```
+
+The resultant HTML contains the generated atomic class names (one per declaration) plus the className passed by props:
+
 ```html
-<input class="css-fl09o-Input extra-classname" maxlength="255" placeholder="Enter your name...">
+<input class="css-1qbcma3-Input css-tokvmb-Input css-8i02mp-Input css-1ru12dh-Input extra-classname" maxlength="255" placeholder="Enter your name...">
 ```

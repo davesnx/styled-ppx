@@ -4,19 +4,19 @@ title: CSS syntax
 
 # CSS syntax
 
-styled-ppx parses string CSS in three different modes, depending on the extension you use.
+styled-ppx parses string CSS in different modes, depending on the extension you use.
 
 | API | Mode | What it accepts |
 | --- | --- | --- |
-| `%cx`, `%css`, `%styled.tag` | Declaration block | Declarations plus nested selectors and nested at-rules |
+| `%css`, `%styled.tag` | Declaration block | Declarations plus nested selectors and nested at-rules |
 | `%styled.global` | Stylesheet | Top-level rules and at-rules exactly as in CSS |
-| `%css` | Single declaration | One `property: value` rule |
+| `%keyframe` | Keyframes | `from` / `to` / percentage step blocks |
 
-This page describes the string syntax. If you need arbitrary control flow, unsupported properties, or runtime-generated rules, use the [Array API](./array).
+Every mode is parsed, validated and type-checked at compile time: unknown properties and invalid values are compile errors (with "did you mean" suggestions for typos).
 
 ## Declaration blocks
 
-`%cx`, `%css`, and `%styled.tag` all use the same declaration-block grammar.
+`%css` and `%styled.tag` use the same declaration-block grammar.
 
 You write the body of a rule, not the outer selector. styled-ppx generates the class selector for you and scopes nested rules to it.
 
@@ -64,194 +64,52 @@ html, body {
 }
 ```
 
-Use this mode for global resets, document-level selectors, and top-level at-rules.
-
-## Single declarations
-
-`%css` is intentionally smaller: it accepts one declaration only.
-
-```css
-display: block
-```
-
-These are valid in `%css`:
-
-- `display: block`
-- `display: block;`
-
-These are not:
-
-- `color: red; background: blue;`
-- `&:hover { color: red; }`
-- `@media (...) { ... }`
-
-If you need selectors, media queries, or more than one declaration, use `%cx` or `%styled.tag` instead.
+Use this mode for global resets, document-level selectors, `@font-face`, and top-level at-rules. Bare declarations at the top level are rejected — they must live under a selector. See [Global styles](./globals).
 
 ## Selectors and nesting
 
-Declaration blocks support nested selectors. The parser accepts both `&`-based nesting and bare nested selectors.
-
-### `&` means "the current generated selector"
-
-Use `&` when you want to append to, combine with, or reposition the current selector.
-
-```css
-&:hover { color: red; }
-&::before { content: ""; }
-&.active { opacity: 1; }
-&#hero { scroll-margin-top: 80px; }
-& > span { display: inline-block; }
-& + & { margin-top: 8px; }
-div & { margin-left: auto; }
-```
-
-Typical expansions look like:
-
-- `&:hover` -> `.generated:hover`
-- `&.active` -> `.generated.active`
-- `div &` -> `div .generated`
-- `& + &` -> `.generated + .generated`
-
-### Bare nested selectors become descendants
-
-You do not need `&` for every nested selector.
-
-```css
-.child { color: blue; }
-#selected { font-weight: 600; }
-div { padding: 0; }
-svg path { fill: currentColor; }
-svg * { vector-effect: non-scaling-stroke; }
-[data-open] { opacity: 1; }
-```
-
-These become descendant selectors relative to the generated class, for example:
-
-- `.child` -> `.generated .child`
-- `div` -> `.generated div`
-- `svg path` -> `.generated svg path`
-
-### Supported selector features
-
-The supported syntax includes the usual selector building blocks:
-
-- type selectors: `div`, `button`, `svg path`
-- class, id, and universal selectors: `.child`, `#main`, `*`
-- attribute selectors: `[disabled]`, `[type="text"]`, `[href^="https"]`
-- pseudo-classes: `:hover`, `:focus`, `:target`, `:not(...)`, `:is(...)`, `:where(...)`, `:has(...)`
-- pseudo-elements: `::before`, `::after`, `::first-line`, `::first-letter`
-- combinators: descendant, `>`, `+`, `~`
-- comma-separated selector lists
-
-## Selector interpolation
-
-Interpolation also works inside selectors.
-
-```css
-& .$(outlined) {
-  padding: 0;
-}
-
-&.$(stateClass) {
-  opacity: 1;
-}
-
-:is(h1, $(headingSelector), h3) {
-  margin-top: 0;
-}
-```
-
-Inside selectors, interpolation behaves like string splicing. It is useful for referencing other generated class names and selector fragments.
+Declaration blocks support nested selectors: `&`-based nesting (`&:hover`, `&.active`, `& > span`), bare nested selectors as descendants (`.child`, `svg path`), the full building blocks (attribute selectors, `:not()`/`:is()`/`:has()`, pseudo-elements, combinators, comma lists), and static class references to other bindings (`&.$(outlined)`). The complete reference — including the bare-leading-pseudo rule and the sibling-selector interpolation limitation — lives in [Selectors](./selectors).
 
 ## Media queries and other at-rules
 
-Declaration blocks support nested at-rules, especially:
+Declaration blocks support nested `@media`, `@supports`, and `@container`, correctly scoped under selectors. Preludes must be literal (no interpolation). See [Media queries](./media-queries).
 
-- `@media`
-- `@supports`
-- `@container`
+## Interpolation placement
 
-Example:
+`$(...)` accepts any OCaml/Reason expression and is supported in two places:
 
-```css
-display: grid;
+- **declaration values** — type-checked from the property it appears in, lowered to a CSS custom property:
 
-@media (min-width: 768px) {
-  grid-template-columns: repeat(2, 1fr);
-}
+  ```css
+  color: $(textColor);
+  border-bottom: 1px solid $(borderColor);
+  height: calc(100vh - $(topMenuHeight));
+  ```
 
-@supports (display: grid) {
-  gap: 16px;
-}
+- **selectors** — a static [class reference](./selectors#class-references-in-selectors) to another binding:
 
-@container card (width >= 400px) {
-  padding: 24px;
-}
-```
+  ```css
+  &.$(activeClass) { opacity: 1; }
+  ```
 
-Interpolation works in at-rule preludes too:
+Not supported (compile errors with an explanation):
 
-```css
-@media $(Media.mobileDown) {
-  display: block;
-}
+- at-rule preludes: `@media (max-width: $(bp))` — see [Media queries](./media-queries#limitation-no-interpolation-in-preludes)
+- inside `url(...)` — the error reads: ``Interpolation inside `url(...)` is not supported: browsers don't substitute `var()` there. Inline the URL: `url("/path/to/asset")`. Or interpolate the whole value: `src: $(font_src)`.``
+- value interpolation under selectors that escape the element's subtree (e.g. `& + .sibling { color: $(c) }`) — see [Selectors](./selectors#limitation-value-interpolation-and-sibling-selectors)
 
-@media screen and $(Media.desktopDown) {
-  display: none;
-}
-```
-
-If you need keyframes, use the dedicated keyframe extension instead of writing them inline in a declaration block.
-
-## Interpolation rules
-
-`$(...)` is supported in three main places:
-
-- declaration values
-- selectors
-- media queries and other at-rule preludes
-
-In declaration values, interpolation is type-checked from its position:
-
-```css
-color: $(textColor);
-border-bottom: 1px solid $(borderColor);
-height: calc(100vh - $(topMenuHeight));
-```
-
-In selectors and media queries, interpolation is string-like rather than property-typed:
-
-```css
-&.$(activeClass) { opacity: 1; }
-@media $(Media.tablet) { display: flex; }
-```
-
-Interpolation must still be simple enough for the PPX to read from the AST. In practice, bind complex logic first and interpolate the resulting identifier.
-
-Good:
-
-```reason
-let color = switch (kind) {
-| `Primary => CSS.red
-| `Secondary => CSS.blue
-};
-
-let className = [%cx {|color: $(color);|}];
-```
-
-Avoid embedding large expressions directly inside `$(...)` in string CSS.
+See [Interpolation](./interpolation) for the type-checking rules.
 
 ## Edge cases and caveats
 
 - The final semicolon is optional for the last declaration.
 - Declaration blocks also recover many missing semicolons before nested selectors or nested `@media` blocks, including after interpolated values, but explicit semicolons are still recommended.
-- `%css` does not accept selectors, braces, or multiple declarations.
-- Declaration-block APIs do not need an outer wrapper like `.foo { ... }`; stylesheet APIs do.
-- If a property is unsupported, the best escape hatch is the [Array API](./array) with `CSS.unsafe(...)`.
+- Declaration-block APIs do not need an outer wrapper like `.foo { ... }`; stylesheet APIs (`%styled.global`) do.
+- If a property is unsupported by the type-checker, the escape hatch is a custom property: `--my-value: $(expr)` passes through unvalidated (the expression must be a `string`), and you can consume it with `var(--my-value)`.
 
 ## Examples by API
 
-### `%cx` / `%css` / `%styled.tag`
+### `%css` / `%styled.tag`
 
 ```css
 padding: 16px;
@@ -277,8 +135,9 @@ html, body {
 }
 ```
 
-### `%css`
+### `%keyframe`
 
 ```css
-padding: 16px;
+from { opacity: 0; }
+to { opacity: 1; }
 ```

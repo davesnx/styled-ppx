@@ -7,6 +7,12 @@ export default {
     }
   },
   "getting-started": "Getting Started",
+  "how-it-works": {
+    "title": "How It Works",
+    "theme": {
+      "breadcrumb": false
+    }
+  },
   "editor-support": "Editor Support",
   "reference": "API Reference",
   "about": {
