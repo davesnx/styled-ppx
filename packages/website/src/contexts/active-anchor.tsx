@@ -45,9 +45,11 @@ export const ActiveAnchorProvider = ({
 
   useEffect(() => {
     const navbarHeight =
-      getComputedStyle(document.body)
-        .getPropertyValue('--nextra-navbar-height')
-        .trim() || '0px'
+      Number.parseFloat(
+        getComputedStyle(document.body).getPropertyValue(
+          '--nextra-navbar-height'
+        )
+      ) || 0
     observerRef.current = new IntersectionObserver(
       entries => {
         setActiveAnchor(f => {
@@ -95,7 +97,7 @@ export const ActiveAnchorProvider = ({
         })
       },
       {
-        rootMargin: `-${navbarHeight} 0px -50%`,
+        rootMargin: `-${navbarHeight}px 0px -50%`,
         threshold: [0, 1]
       }
     )
