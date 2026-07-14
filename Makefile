@@ -52,7 +52,6 @@ install: ## Install project dependencies
 	npm install
 	npm install --prefix demo/melange
 
-
 .PHONY: pin
 pin: ## pin
 	opam pin add server-reason-react.0.4.1 "https://github.com/ml-in-barcelona/server-reason-react.git#56bbe2c3d9bcfad46ce491e110bc963899d33c51" -y
