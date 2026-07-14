@@ -7,8 +7,8 @@
   "license": "ISC",
   "description": "",
   "scripts": {
-    "dev": "TOKIO_WORKER_THREADS=8 UV_THREADPOOL_SIZE=8 next dev -p 8080",
-    "build": "TOKIO_WORKER_THREADS=8 UV_THREADPOOL_SIZE=8 next build",
+    "dev": "next dev -p 8080",
+    "build": "next build",
     "postbuild": "pagefind --site .next/server/app --output-path public/_pagefind",
     "start": "next start"
   },
