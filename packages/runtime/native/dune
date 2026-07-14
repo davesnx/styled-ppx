@@ -3,5 +3,8 @@
 (library
  (name styled_ppx_runtime_native)
  (public_name styled-ppx.native)
- (libraries server-reason-react.reactDom)
+ (libraries styled-ppx.stdlib-ban server-reason-react.reactDom)
+ ; Ban direct Stdlib usage: everything must go through Kloth. See
+ ; packages/runtime/stdlib-ban/Styled_ppx_stdlib_ban.mli.
+ (flags (:standard -open Styled_ppx_stdlib_ban -alert @banned))
  (wrapped false))

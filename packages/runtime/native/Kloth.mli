@@ -5,6 +5,10 @@ module Array : sig
   val map_and_join : sep:string -> f:('a -> string) -> 'a array -> string
 end
 
+module List : sig
+  val reduce : init:'b -> f:('b -> 'a -> 'b) -> 'a list -> 'b
+end
+
 module String : sig
   val get : string -> int -> char
   val length : string -> int

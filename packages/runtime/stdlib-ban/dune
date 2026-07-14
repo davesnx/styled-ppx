@@ -1,0 +1,4 @@
+(library
+ (name styled_ppx_stdlib_ban)
+ (public_name styled-ppx.stdlib-ban)
+ (modes :standard melange))

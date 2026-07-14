@@ -1,3 +1,8 @@
+(* Kloth is the runtime's stdlib shim: the only module allowed to reach into
+   Stdlib directly. Everything else must go through Kloth (enforced by the
+   [banned] alert from Styled_ppx_stdlib_ban, disabled here on purpose). *)
+[@@@alert "-banned"]
+
 module Array = struct
   external array_unsafe_get : 'a array -> int -> 'a = "%array_unsafe_get"
 
@@ -47,6 +52,13 @@ module Array = struct
       else run (i + 1) (acc ^ f strings.(i) ^ sep)
     in
     run 0 ""
+end
+
+module List = struct
+  (* Hand-rolled to avoid pulling melange's Stdlib.List runtime into JS
+     bundles. *)
+  let rec reduce ~init ~f t =
+    match t with [] -> init | x :: rest -> reduce ~init:(f init x) ~f rest
 end
 
 module String = struct

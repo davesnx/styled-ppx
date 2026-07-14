@@ -3093,8 +3093,8 @@ module GridLine = struct
     match x with
     | #Auto.t -> Auto.toString
     | `ident s -> s
-    | `num i -> string_of_int i
-    | `numIdent (i, s) -> (string_of_int i ^ {js| |js}) ^ s
+    | `num i -> Kloth.Int.to_string i
+    | `numIdent (i, s) -> (Kloth.Int.to_string i ^ {js| |js}) ^ s
     | `span e -> {js|span |js} ^ toString (e :> t)
 end
 
@@ -3479,7 +3479,7 @@ module TextDecoration = struct
   let toString x =
     match x with
     | `value x ->
-      String.trim
+      Kloth.String.trim
         (match x.line with
         | Some line -> TextDecorationLine.Value.toString line ^ {js| |js}
         | None -> {js||js})
@@ -4206,7 +4206,7 @@ module FontFamilyName = struct
     | `fangsong -> {js|fangsong|js}
     | `apple_system -> {js|-apple-system|js}
     | `quoted s ->
-      (match String.get s 0 with
+      (match Kloth.String.get s 0 with
       | '\'' -> s
       | '"' -> s
       | _ -> ({js|"|js} ^ s) ^ {js|"|js})
@@ -4562,7 +4562,7 @@ module CounterIncrement = struct
   let toString x =
     match x with
     | #None.t -> None.toString
-    | `increment (name, value) -> (name ^ {js| |js}) ^ string_of_int value
+    | `increment (name, value) -> (name ^ {js| |js}) ^ Kloth.Int.to_string value
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
 end
@@ -4579,7 +4579,7 @@ module CounterReset = struct
 
   let toString x =
     match x with
-    | `reset (name, value) -> (name ^ {js| |js}) ^ string_of_int value
+    | `reset (name, value) -> (name ^ {js| |js}) ^ Kloth.Int.to_string value
     | #None.t -> None.toString
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
@@ -4598,7 +4598,7 @@ module CounterSet = struct
   let toString x =
     match x with
     | #None.t -> None.toString
-    | `set (name, value) -> (name ^ {js| |js}) ^ string_of_int value
+    | `set (name, value) -> (name ^ {js| |js}) ^ Kloth.Int.to_string value
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
 end

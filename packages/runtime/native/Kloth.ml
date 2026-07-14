@@ -1,3 +1,8 @@
+(* Kloth is the runtime's stdlib shim: the only module allowed to reach into
+   Stdlib directly. Everything else must go through Kloth (enforced by the
+   [banned] alert from Styled_ppx_stdlib_ban, disabled here on purpose). *)
+[@@@alert "-banned"]
+
 module Array = struct
   (* Taken from https://github.com/janestreet/base *)
 
@@ -46,6 +51,10 @@ module Array = struct
       else run (i + 1) (acc ^ f strings.(i) ^ sep)
     in
     run 0 ""
+end
+
+module List = struct
+  let reduce ~init ~f t = Stdlib.List.fold_left f init t
 end
 
 module String = struct

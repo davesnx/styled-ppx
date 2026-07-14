@@ -3,7 +3,10 @@
  (public_name styled-ppx.melange)
  (modes melange)
  (wrapped false)
- (libraries reason-react)
+ (libraries styled-ppx.stdlib-ban reason-react)
+ ; Ban direct Stdlib usage: everything must go through Kloth. See
+ ; packages/runtime/stdlib-ban/Styled_ppx_stdlib_ban.mli.
+ (flags (:standard -open Styled_ppx_stdlib_ban -alert @banned))
  (preprocess
   (pps melange.ppx -alert -deprecated)))
 
