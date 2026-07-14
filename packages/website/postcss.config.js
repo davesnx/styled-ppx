@@ -4,8 +4,6 @@ module.exports = {
     'postcss-import': {},
     'tailwindcss/nesting': {},
     tailwindcss: {},
-    'postcss-lightningcss': {
-      browsers: '>= .25% and not dead'
-    }
+    autoprefixer: {}
   }
 }

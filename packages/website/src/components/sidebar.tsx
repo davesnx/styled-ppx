@@ -412,11 +412,9 @@ export function Sidebar({
         )}
         ref={containerRef}
       >
-        {process.env.NEXTRA_SEARCH && (
-          <div className="_px-4 _pt-4 md:_hidden">
-            {renderComponent(themeConfig.search.component)}
-          </div>
-        )}
+        <div className="_px-4 _pt-4 md:_hidden">
+          {renderComponent(themeConfig.search.component)}
+        </div>
         <FocusedItemContext.Provider value={focused}>
           <OnFocusItemContext.Provider value={setFocused}>
             <div

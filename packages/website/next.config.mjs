@@ -1,103 +1,29 @@
 import Os from "node:os";
 import Path from "node:path";
 import URL from "node:url";
-import Fs from "node:fs";
 import Nextra from "nextra";
-import { createHighlighter } from "shiki";
-import { bundledLanguages } from "shiki/langs";
 
 const __dirname = Path.dirname(URL.fileURLToPath(import.meta.url));
-const syntaxes = Path.join(__dirname, "syntaxes");
-const editors = Path.join(__dirname, "..", "editors");
-
-const reasonGrammar = {
-  ...JSON.parse(
-    Fs.readFileSync(Path.join(syntaxes, "reason.tmLanguage.json"), "utf8")
-  ),
-  sourceName: "reason",
-  name: "reason",
-};
-
-const ocamlGrammar = {
-  ...JSON.parse(
-    Fs.readFileSync(Path.join(syntaxes, "ocaml.tmLanguage.json"), "utf8")
-  ),
-  sourceName: "ocaml",
-  name: "ocaml",
-};
-
-// OCaml syntax dialect with JSX support (https://github.com/ocaml-mlx/mlx)
-const mlxGrammar = {
-  ...JSON.parse(
-    Fs.readFileSync(Path.join(syntaxes, "mlx.tmLanguage.json"), "utf8")
-  ),
-  sourceName: "mlx",
-  name: "mlx",
-};
-
-const styledPpxCssGrammar = {
-  ...JSON.parse(
-    Fs.readFileSync(
-      Path.join(editors, "vscode/syntaxes/css-styled-ppx.json"),
-      "utf8"
-    )
-  ),
-  injectTo: ["source.ocaml", "source.ocaml.mlx", "source.reason"],
-};
-
-const styledPpxOCamlGrammar = {
-  ...JSON.parse(
-    Fs.readFileSync(
-      Path.join(editors, "vscode/syntaxes/styled-ppx-ocaml.json"),
-      "utf8"
-    )
-  ),
-  injectTo: ["source.ocaml", "source.ocaml.mlx"],
-};
-
-const styledPpxReasonGrammar = {
-  ...JSON.parse(
-    Fs.readFileSync(
-      Path.join(editors, "vscode/syntaxes/styled-ppx-reason.json"),
-      "utf8"
-    )
-  ),
-  injectTo: ["source.reason"],
-};
-
-const duneGrammar = {
-  ...JSON.parse(
-    Fs.readFileSync(Path.join(syntaxes, "dune.tmLanguage.json"), "utf8")
-  ),
-  name: "dune",
-};
-
-const customLangs = [
-  ...Object.keys(bundledLanguages),
-  reasonGrammar,
-  ocamlGrammar,
-  mlxGrammar,
-  styledPpxCssGrammar,
-  styledPpxOCamlGrammar,
-  styledPpxReasonGrammar,
-  duneGrammar,
-];
 
 const withNextra = Nextra({
   mdxOptions: {
+    // Only JSON-serializable options can live here: Turbopack passes them to
+    // the loader as data. The custom highlighter (Reason/OCaml/mlx/dune
+    // grammars) is injected at runtime by ./nextra-loader.cjs instead.
     rehypePrettyCodeOptions: {
       theme: { light: "github-light", dark: "github-dark-dimmed" },
-      getHighlighter: (options) =>
-        createHighlighter({
-          ...options,
-          langs: customLangs,
-        }),
     },
   },
 });
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // This package is a standalone app with its own lockfile; without this,
+  // Next infers the repository root (which also has a package-lock.json).
+  outputFileTracingRoot: __dirname,
+  turbopack: {
+    root: __dirname,
+  },
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -108,4 +34,17 @@ const nextConfig = {
   },
 };
 
-export default withNextra(nextConfig);
+const config = withNextra(nextConfig);
+
+// Remap nextra's loader to our wrapper, which injects the non-serializable
+// highlighter options (see ./nextra-loader.cjs).
+const customLoader = Path.join(__dirname, "nextra-loader.cjs");
+for (const rule of Object.values(config.turbopack.rules)) {
+  for (const entry of rule.loaders ?? []) {
+    if (entry.loader.endsWith(`nextra${Path.sep}loader.cjs`)) {
+      entry.loader = customLoader;
+    }
+  }
+}
+
+export default config;

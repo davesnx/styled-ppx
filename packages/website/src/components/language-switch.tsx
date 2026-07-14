@@ -1,6 +1,5 @@
 import { useMounted } from "nextra/hooks";
 import type { ReactElement } from "react";
-import { z } from "zod";
 import { useLanguage } from "../contexts/use-language";
 import { useConfig } from "../contexts/config";
 import { Select } from "./select";
@@ -47,12 +46,10 @@ type ThemeSwitchProps = {
   className?: string;
 };
 
-export const themeOptionsSchema = z.strictObject({
-  reason: z.string(),
-  ocaml: z.string(),
-});
-
-type ThemeOptions = z.infer<typeof themeOptionsSchema>;
+type ThemeOptions = {
+  reason: string;
+  ocaml: string;
+};
 
 export function LanguageSwitch({
   lite,
