@@ -50,10 +50,6 @@ const withNextra = Nextra({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "standalone",
-  // This package is a standalone app with its own lockfile; without this,
-  // Next infers the repository root (which also has a package-lock.json).
-  outputFileTracingRoot: __dirname,
   typescript: {
     ignoreBuildErrors: true,
   },

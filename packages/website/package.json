@@ -7,9 +7,8 @@
   "license": "ISC",
   "description": "",
   "scripts": {
-    "dev": "next dev --webpack -p 8080",
-    "prebuild": "node scripts/link-vercel-output.mjs",
-    "build": "next build --webpack",
+    "dev": "next dev -p 8080",
+    "build": "next build",
     "postbuild": "pagefind --site .next/server/app --output-path public/_pagefind",
     "start": "next start"
   },
@@ -18,7 +17,7 @@
     "@popperjs/core": "^2.11.8",
     "clsx": "^2.1.1",
     "escape-string-regexp": "^5.0.0",
-    "next": "^16.2.10",
+    "next": "15.5.20",
     "next-themes": "^0.4.6",
     "nextra": "^4.6.1",
     "react": "^19.2.7",
