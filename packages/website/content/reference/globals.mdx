@@ -4,7 +4,7 @@ title: Global styles
 
 # Global styles
 
-`[%styled.global]{:reason}` defines document-level styles: resets, element selectors, `@font-face{:styled-ppx-css}`, `:root{:styled-ppx-css}` custom properties. It's a *module* extension — the generated module is a React component you render once in your tree.
+`[%styled.global]{:reason}` defines document-level styles: resets, element selectors, `@font-face{:styled-ppx-css}`, `:root{:styled-ppx-css}` custom properties. It's a *module* extension: the generated module is a React component you render once in your tree.
 
 ```reason
 module Reset = [%styled.global {|
@@ -33,11 +33,11 @@ module Reset = [%styled.global {|
 let app = <body> <Reset /> </body>
 ```
 
-The rules themselves are [statically extracted](/how-it-works) into your `styles.css` — rendering `<Reset />{:reason}` does **not** inject them. The component exists to supply runtime *values*: when the block interpolates expressions, `<Reset />{:reason}` renders a `<style>` element with a single `:root { --var: value; }{:styled-ppx-css}` block (and an empty one otherwise).
+The rules themselves are [statically extracted](/how-it-works) into your `styles.css`. Rendering `<Reset />{:reason}` does **not** inject them. The component exists to supply runtime *values*: when the block interpolates expressions, `<Reset />{:reason}` renders a `<style>` element with a single `:root { --var: value; }{:styled-ppx-css}` block (and an empty one otherwise).
 
 ## CSS variables
 
-`:root` custom properties defined in a global block are the natural home for design tokens — see [Theming](./theming) for the full guide (module tokens vs `:root` tokens, `var()` fallbacks, and light/dark schemes).
+`:root` custom properties defined in a global block are the natural home for design tokens. See [Theming](./theming) for the full guide (module tokens vs `:root` tokens, `var()` fallbacks, and light/dark schemes).
 
 ## `@font-face`
 
@@ -67,5 +67,5 @@ The rule ships in `styles.css`, so the font is discovered as soon as the stylesh
 
 ## Notes
 
-- Top-level *bare declarations* are rejected — global styles must live under a selector. Use `* { ... }{:styled-ppx-css}` if you really want to target everything.
+- Top-level *bare declarations* are rejected: global styles must live under a selector. Use `* { ... }{:styled-ppx-css}` if you really want to target everything.
 - Global rules always sort before class rules in the generated stylesheet, so component styles can override them.

@@ -26,7 +26,7 @@ display: grid;
 }
 ```
 
-At-rules nest under selectors (and vice versa) and render correctly scoped — `&:hover` inside `@media` becomes `@media (...) { .generated:hover { ... } }{:styled-ppx-css}`.
+At-rules nest under selectors (and vice versa) and render correctly scoped: `&:hover` inside `@media` becomes `@media (...) { .generated:hover { ... } }{:styled-ppx-css}`.
 
 In [`[%styled.global]`](./globals), top-level at-rules work exactly as in a plain stylesheet (`@media (prefers-reduced-motion: reduce) { * { animation: none; } }{:styled-ppx-css}`).
 
@@ -34,7 +34,7 @@ If you need keyframes, use the dedicated [keyframe extension](./keyframe) instea
 
 ## Limitation: no interpolation in preludes
 
-The at-rule **prelude** — the condition part — must be literal CSS. `@media (max-width: $(breakpoint)){:styled-ppx-css}` is a compile error:
+The at-rule **prelude** (the condition part) must be literal CSS. `@media (max-width: $(breakpoint)){:styled-ppx-css}` is a compile error:
 
 ```
 Interpolation in @media preludes is not supported during static extraction.
@@ -42,7 +42,7 @@ CSS custom properties (var()) are not valid in media query conditions.
 Inline the value directly.
 ```
 
-Interpolated values become CSS custom properties in the extracted stylesheet, and per the CSS spec `var()` cannot appear inside media-query conditions — so there is no mechanism to supply the value at runtime. This applies to `@media`, `@supports`, and `@container` preludes alike. (Interpolation inside the at-rule's *body* is fine: `@media (min-width: 768px) { gap: $(spacing); }{:styled-ppx-css}`.)
+Interpolated values become CSS custom properties in the extracted stylesheet, and per the CSS spec `var()` cannot appear inside media-query conditions. So there is no mechanism to supply the value at runtime. This applies to `@media`, `@supports`, and `@container` preludes alike. (Interpolation inside the at-rule's *body* is fine: `@media (min-width: 768px) { gap: $(spacing); }{:styled-ppx-css}`.)
 
 What works instead:
 

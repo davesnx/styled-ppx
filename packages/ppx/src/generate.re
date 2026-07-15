@@ -891,7 +891,7 @@ let getLabeledArgs = (label, defaultValue, param, expr) => {
   if (getIsEmpty(param)) {
     Error.raise(
       ~loc=param.ppat_loc,
-      ~link="https://styled-ppx.vercel.app/reference/dynamic-components",
+      ~link="https://styled-ppx.vercel.app/reference/styled-components#derive-styles-from-props",
       "A dynamic component without props doesn't make much sense. This component should be static.",
     );
   };
@@ -1170,7 +1170,7 @@ let extractedDynamicStyles =
       Error.raise(
         ~loc=functionExpr.pexp_loc,
         ~examples=["[%styled.div (~color) => \"color: $(color);\"]"],
-        ~link="https://styled-ppx.vercel.app/reference/dynamic-components",
+        ~link="https://styled-ppx.vercel.app/reference/styled-components#derive-styles-from-props",
         "Extracted dynamic styled components require a CSS string body.",
       )
     };

@@ -19,7 +19,7 @@ opam install styled-ppx
 
 ### Setup
 
-Add `styled-ppx` under dune's preprocess pps and `styled-ppx.melange` under libraries — in your library with `(modes melange)` and in the `melange.emit` stanza:
+Add `styled-ppx` under dune's preprocess pps and `styled-ppx.melange` under libraries, both in your library with `(modes melange)` and in the `melange.emit` stanza:
 
 ```diff
 (library
@@ -48,7 +48,7 @@ Then add one rule that collects the extracted CSS into a stylesheet, and link it
 ```
 
 <Callout type="warning">
-  Without this rule your app compiles fine but renders unstyled — all CSS
+  Without this rule your app compiles fine but renders unstyled: all CSS
   lives in the generated stylesheet. See
   [Setting up the dune rules](/getting-started/dune-setup) for the full
   reference: rule placement, the `melange.emit` stanza, the CLI, sharing code

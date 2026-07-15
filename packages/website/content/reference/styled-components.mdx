@@ -84,8 +84,7 @@ let app =
 
 #### Extend styles with `className`
 
-Following the example above, you can extend the styles of the input component by passing the `className` prop.
-It's not recommended to use `className` prop to extend the styles of a component, but it's useful when you need to extend the styles of a component from a third-party library.
+Styled components also accept a `className` prop, appended after the generated classes. Prefer composing with [`CSS.merge`](./runtime#composition); `className` is the escape hatch for classes coming from outside styled-ppx (third-party CSS, integration code).
 
 ```reason {6}
 <Input
@@ -113,3 +112,45 @@ The resultant HTML contains the generated atomic class names (one per declaratio
 ```html
 <input class="css-1qbcma3-Input css-tokvmb-Input css-8i02mp-Input css-1ru12dh-Input extra-classname" maxlength="255" placeholder="Enter your name...">
 ```
+
+### Derive styles from props
+
+`styled.{{tag}}` can also be defined by a function returning the CSS string. The function's labelled arguments become props on the component, on top of all the props from the element:
+
+```reason
+module Dynamic = [%styled.div (~color, ~background) => {|
+  color: $(color);
+  background-color: $(background);
+|}];
+
+<Dynamic color={CSS.hex("#EB5757")} background={CSS.hex("#516CF0")}>
+  {React.string("Hello!")}
+</Dynamic>;
+```
+
+```mlx
+module Dynamic = [%styled.div fun ~color ~background -> {|
+  color: $(color);
+  background-color: $(background);
+|}]
+
+let app =
+  <Dynamic color=(CSS.hex "#EB5757") background=(CSS.hex "#516CF0")>
+    (React.string "Hello!")
+  </Dynamic>
+```
+
+All the rules from [Interpolation](./interpolation) apply here. In the example, `color` and `background` are `CSS.Types.Color.t{:reason}` since it gets inferred from the CSS property. It's called type holes: https://twitter.com/davesnx/status/1552305210558742528
+
+The styles (including the interpolated ones) are [extracted at compile time](/how-it-works#dynamic-values-css-custom-properties) like any other block. Each interpolated declaration references a CSS custom property, and the component supplies the values through its inline `style` attribute.
+
+A few constraints:
+
+- The returned expression (the last expression of the function) needs to be a string literal: it can't be a reference or a function call. The CSS must be visible to the ppx at compile time, otherwise it fails with `Extracted dynamic styled components require a CSS string body.`
+- A function payload with no labelled arguments is rejected (`A dynamic component without props doesn't make much sense. This component should be static.`). Use the plain string form instead.
+
+#### Name collision
+
+If a labelled argument has the same name as one of the element's props (`makeProps`), styled-ppx overrides it and the prop is replaced entirely.
+
+For example, a component defined with a `~size` argument overrides `size` from the element's props.

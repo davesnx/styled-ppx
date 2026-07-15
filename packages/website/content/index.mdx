@@ -6,7 +6,7 @@ import { Ml } from "../src/components/language-content";
 
 ### Type-safe, zero-runtime styled components for OCaml and Reason.
 
-**styled-ppx** is a [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) and a library that brings styled components to OCaml and Reason, for both [Melange](https://melange.re) and native ([server-reason-react](https://github.com/ml-in-barcelona/server-reason-react)). Write plain CSS inside your components and get **React components** or **class names** back — parsed, validated and type-checked at compile time.
+**styled-ppx** is a [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) and a library that brings styled components to OCaml and Reason, for both [Melange](https://melange.re) and native ([server-reason-react](https://github.com/ml-in-barcelona/server-reason-react)). Write plain CSS inside your components and get **React components** or **class names** back: parsed, validated and type-checked at compile time.
 
 ```reason
 module Center = [%styled.div {|
@@ -34,43 +34,28 @@ let app = <Center> (React.string "Hello from the future!") </Center>
 
 <Ml>The OCaml examples use [mlx](https://github.com/ocaml-mlx/mlx), the OCaml syntax dialect with JSX support.</Ml>
 
-## Type-safe CSS
+## Catch CSS errors at compile time
 
-styled-ppx ships its own CSS parser and type-checker. Every property and value is validated against the CSS spec while you compile: a typo in a property name, an invalid value, or a wrongly-typed interpolation is a **compile error**, not a broken page. This is a **huge** time-saver when working with CSS at scale.
+styled-ppx ships its own CSS parser and type-checker. Every property and value is validated against the CSS spec while you compile: a typo in a property name, an invalid value, or a wrongly-typed interpolation is a **compile error**, not a broken page.
 
-## Zero runtime: static extraction
+Dynamic values are welcome: any OCaml or Reason expression goes inside `$( ... )`, [type-checked](/reference/interpolation) against the property it's used in.
+
+## Ship zero runtime
 
 All CSS is extracted while your project compiles:
 
-1. The ppx parses and validates your CSS, splits it into **atomic rules** (one class per declaration), and hashes each one into a content-addressed class name.
+1. The ppx splits your CSS into **atomic rules** (one class per declaration) and hashes each one into a content-addressed class name, so repeated declarations across your app dedupe into one rule.
 2. A build step ([`styled-ppx.generate`](/how-it-works#the-aggregator-styled-ppxgenerate)) collects every rule in your project and writes a single, deduplicated `styles.css`.
-3. At runtime, your components only carry class names. Dynamic values (`$(expr)` interpolations) become CSS custom properties supplied through the `style` attribute.
+3. At runtime, your components only carry class names. Interpolated values become CSS custom properties supplied through the `style` attribute.
 
-Read more in [How it works](/how-it-works).
+Class names are human-readable in development (`css-<hash>-<binding>`) and minified in production. Read more in [How it works](/how-it-works).
 
-## Features
+## Compose styles as code
 
-- **Zero abstraction over CSS**: paste CSS in, get components out
-- **Zero runtime**: styles are extracted to a static `.css` asset at build time
-- **Atomic CSS**: repeated declarations across your app dedupe into one rule
-- **Component-based styling** with the power of the underlying language: pattern-matching, composition, labelled arguments, static type-safety
-- **Interpolation**: any OCaml or Reason expression inside `$( ... )`, type-checked against the property it's used in
-- Supports [Melange](https://melange.re) with [`reason-react`](https://reasonml.github.io/reason-react/) and native OCaml with [`server-reason-react`](https://github.com/ml-in-barcelona/server-reason-react)
-- Human-readable class names in development (`css-<hash>-<binding>`), minified in production
+Styles are ordinary values of the language: pattern match over them, merge them, pass them as labelled arguments. There is no styling DSL, no ThemeProvider, and no CSS engine in your bundle.
 
-## How the ppx fits in
+## Start here
 
-Generally speaking, a ppx is OCaml's system for macros, similar to [babel plugins](https://babeljs.io/docs/en/plugins/): a small program that runs before compilation and transforms your source code.
-
-styled-ppx expands four extensions:
-
-| Extension | What you get |
-| --- | --- |
-| `[%css "..."]` | a [`CSS.styles`](/reference/runtime) value: class names plus (optionally) inline custom-property values |
-| `[%styled.<tag> "..."]` | a React component for the given HTML tag |
-| `[%styled.global "..."]` | global styles as a React component (`@font-face`, resets, `:root` variables) |
-| `[%keyframe "..."]` | a typed `@keyframes` animation name |
-
-If you are curious about the actual transformation, check the [snapshot tests](https://github.com/davesnx/styled-ppx/tree/main/packages/ppx/test/snapshot).
-
-You can learn more about ppxes in [Tarides blog: Introduction to OCaml ppx ecosystem](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem).
+- [Getting started with Melange](/getting-started/melange) for the browser
+- [Getting started native](/getting-started/native) for server rendering
+- [How it works](/how-it-works) for the full pipeline

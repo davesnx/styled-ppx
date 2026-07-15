@@ -4,7 +4,7 @@ title: Keyframe animations
 
 # Define keyframes
 
-**Generates keyframes**, method to create keyframe animations in CSS
+`[%keyframe]{:reason}` takes a `@keyframes` body and returns a typed animation name, ready to interpolate into `animation` properties:
 
 ```reason
 let fadeIn = [%keyframe {|
@@ -43,7 +43,7 @@ module Component = [%styled.div {|
 ```
 
 - Brackets inside the keyframe declaration are optional. `[%keyframe {| { ... } |}]{:reason}` and `[%keyframe {| ... |}]{:reason}` are the same.
-- The `@keyframes` block is [extracted at compile time](/how-it-works) into your stylesheet, named by a hash of its content — identical keyframes anywhere in your project dedupe into one block.
+- The `@keyframes` block is [extracted at compile time](/how-it-works) into your stylesheet, named by a hash of its content. Identical keyframes anywhere in your project dedupe into one block.
 - The value is a `CSS.Types.AnimationName.t{:reason}`, an [opaque type](https://reasonml.github.io/docs/en/type#opaque-types): the name is a content hash owned by the build, so it can't be concatenated or invented at runtime. Interpolate it into `animation-name: $(fadeIn){:styled-ppx-css}` or as the leading name of the `animation{:styled-ppx-css}` shorthand: `animation: $(fadeIn) 300ms ease-in{:styled-ppx-css}`.
 
 ## The `animation` shorthand
@@ -66,7 +66,7 @@ Vendor prefixes (`-webkit-animation`, ...) are added automatically to the extrac
 
 ## Parameterized keyframes
 
-Keyframe steps support [value interpolation](./interpolation) — the animation itself can take parameters:
+Keyframe steps support [value interpolation](./interpolation), so the animation itself can take parameters:
 
 ```reason
 let slideIn = (~offset) => [%keyframe {|
@@ -100,11 +100,11 @@ let b = <div styles=(card ~anim:(slide_in ~offset:(CSS.px (-24)))) />
 
 The extracted `@keyframes` uses `var(...)` for the interpolated step values; the values ride on the `AnimationName.t{:reason}` and merge into the inline custom properties of the element whose styles reference the animation. That's why the same keyframe block can run with different parameters on different elements simultaneously.
 
-One constraint: the step *selectors* (`from` / `50%` / `to`) cannot be interpolated — define separate keyframes for different timing variants.
+One constraint: the step *selectors* (`from` / `50%` / `to`) cannot be interpolated. Define separate keyframes for different timing variants.
 
 ## Patterns
 
-**Conditional animation** — `CSS.Types.AnimationName.none{:reason}` disables an animation without branching the whole block:
+**Conditional animation**: `CSS.Types.AnimationName.none{:reason}` disables an animation without branching the whole block:
 
 ```reason
 let anim = shouldAnimate ? fadeIn : CSS.Types.AnimationName.none;
@@ -114,7 +114,7 @@ let anim = shouldAnimate ? fadeIn : CSS.Types.AnimationName.none;
 let anim = if should_animate then fade_in else CSS.Types.AnimationName.none
 ```
 
-**Respecting reduced motion** — nest the media query in the same block:
+**Respecting reduced motion**: nest the media query in the same block:
 
 ```reason
 let entrance = [%css {|
@@ -136,7 +136,7 @@ let entrance = [%css {|
 |}]
 ```
 
-**Transitions** — for state-driven motion (hover, focus), `transition` is the lighter tool and needs no keyframe machinery; it's an ordinary declaration, interpolation included:
+**Transitions**: for state-driven motion (hover, focus), `transition` is the lighter tool and needs no keyframe machinery; it's an ordinary declaration, interpolation included:
 
 ```reason
 let button = [%css {|

@@ -8,7 +8,7 @@
   Example:
     [%styled.div (~color) => "color: $(color);"]
   
-  More info: https://styled-ppx.vercel.app/reference/dynamic-components
+  More info: https://styled-ppx.vercel.app/reference/styled-components#derive-styles-from-props
   [1]
   $ refmt --parse ml --print re output.ml
   module DynamicCompnentWithIdent = [%styled.div (~a as _) => cssRule];

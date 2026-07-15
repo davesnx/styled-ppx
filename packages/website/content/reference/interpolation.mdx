@@ -11,8 +11,6 @@ Interpolation is one of the most powerful and useful patterns in styled-ppx. You
 
 ```reason
 let maxWidth = CSS.px(100);
-// CSS comes from the library called "styled-ppx" and it exposes all CSS values
-// More information in "The CSS module" section
 
 module Theme = {
   let black = CSS.black;
@@ -44,14 +42,6 @@ module Component = [%styled.div
   Don't confuse interpolation with [String Interpolation from Reason](https://reasonml.github.io/docs/en/primitives)
 </Callout>
 
-## Features
-
-- Any OCaml/Reason expression inside `$( ... )`
-- Type-safety: the expected type is inferred from the property and position
-- Support for properties and shorthand properties
-- Support for [class references in selectors](./selectors#class-references-in-selectors)
-- Zero runtime CSS: interpolated values become [CSS custom properties](#how-it-works-css-custom-properties)
-
 ## Rules
 
 `$( ... )` accepts **any expression**: identifiers, module accessors (`$(Theme.black)`), function calls (`$(darken(color, 0.2))`), or inline computations. The expression is type-checked at the interpolation site, so errors point at your source.
@@ -74,7 +64,7 @@ module Component = [%styled.div {|
 
 It's not allowed to interpolate entire properties or half-properties, which might be slightly different from SASS/Less and JavaScript-based solutions (such as styled-components or emotion), whose string-based interpolation can be used everywhere.
 
-**styled-ppx** forces you to be more rigid, with the promise of always being type-safe — the same trade-off Reason and OCaml make ❤️. Here's a valid JavaScript example `` `margin-${whatever}: 10px`{:js} `` from styled-components, which isn't valid in **styled-ppx**. The solution is simple: handle the property based on the dynamic value:
+**styled-ppx** forces you to be more rigid, with the promise of always being type-safe. It's the same trade-off Reason and OCaml make ❤️. Here's a valid JavaScript example `` `margin-${whatever}: 10px`{:js} `` from styled-components, which isn't valid in **styled-ppx**. The solution is simple: handle the property based on the dynamic value:
 
 ```reason
 let margin = direction =>
@@ -169,7 +159,7 @@ Since `Size.small` is `` `px(int){:reason} ``, the type-checker allows it. Inter
 
 ## How it works: CSS custom properties
 
-The extracted rule references a CSS custom property (`color: var(--color-<hash>)`), and the element supplies its *value* through the inline `style` attribute. Variable names are derived from your source and stable between builds. The full mechanics — naming, scoping, `@property` registration, and the positions where interpolation is rejected — live in [How it works](/how-it-works#dynamic-values-css-custom-properties).
+The extracted rule references a CSS custom property (`color: var(--color-<hash>)`), and the element supplies its *value* through the inline `style` attribute. Variable names are derived from your source and stable between builds. The full mechanics (naming, scoping, `@property` registration, and the positions where interpolation is rejected) live in [How it works](/how-it-works#dynamic-values-css-custom-properties).
 
 ## A note about the polymorphism of CSS
 
@@ -216,19 +206,7 @@ For a general overview of property support, take a look at [support for CSS](/cs
 
 ## Not valid interpolation
 
-The extension payload itself must be a string literal — you can't abstract it into a variable or a function:
-
-```reason
-/* 🔴 Can't pass a function */
-let fn = (~kind, ~big) => /* ... */
-module X = [%styled.div fn];
-```
-
-```mlx
-(* 🔴 Can't pass a function *)
-let fn ~kind ~big = (* ... *)
-module X = [%styled.div fn]
-```
+The extension payload itself must be a [string literal](./css#validation): the CSS has to be known at compile time for [static extraction](/how-it-works) to parse, validate, and extract it.
 
 ```reason
 /* 🔴 Can't pass a variable reference */
@@ -242,4 +220,4 @@ let value = "display: block"
 module X = [%styled.div value]
 ```
 
-The CSS must be known at compile time for [static extraction](/how-it-works) to parse, validate, and extract it. Dynamic *values* go through `$( ... )` interpolation; dynamic *structure* goes through the language (pattern matching to different `[%css]` blocks, composition with `CSS.merge`).
+Dynamic *values* go through `$( ... )` interpolation; dynamic *structure* goes through the language: pattern matching to different `[%css]` blocks, composition with `CSS.merge`.

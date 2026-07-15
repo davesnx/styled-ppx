@@ -11,8 +11,8 @@ This page is the single reference for wiring styled-ppx into a dune build: the e
 
 styled-ppx needs two things from your build:
 
-1. **The ppx** on your libraries' `preprocess` field — this validates your CSS and embeds the extracted rules in the compiled files.
-2. **One `rule` running `styled-ppx.generate`** — this collects the extracted CSS from your whole project and writes `styles.css`.
+1. **The ppx** on your libraries' `preprocess` field: it validates your CSS and embeds the extracted rules in the compiled files.
+2. **One `rule` running `styled-ppx.generate`**: it collects the extracted CSS from your whole project and writes `styles.css`.
 
 If you want to understand *why* the build is shaped this way, read [How it works](/how-it-works) first.
 
@@ -30,7 +30,7 @@ The ppx leaves the extracted CSS inside the **post-ppx files** (`*.pp.ml`) that 
   (run styled-ppx.generate --output %{target} --log info %{deps})))
 ```
 
-- `(glob_files_rec *.pp.ml)` picks up every preprocessed file below the rule's directory — place the rule at (or above) the root of the code that uses styled-ppx, or point the glob at it (e.g. `(glob_files_rec lib/*.pp.ml)`). Reason sources produce `<name>.re.pp.ml`.
+- `(glob_files_rec *.pp.ml)` picks up every preprocessed file below the rule's directory. Place the rule at (or above) the root of the code that uses styled-ppx, or point the glob at it (e.g. `(glob_files_rec lib/*.pp.ml)`). Reason sources produce `<name>.re.pp.ml`.
 - `(mode promote)` copies `styles.css` back into your source tree so your dev server / bundler can serve it. Drop it if you consume the file straight from `_build`.
 - `--log info` prints the output path on every run; use `--log error` (the default) for silence.
 
@@ -68,8 +68,8 @@ And the same on your `melange.emit` stanza:
 
 <Callout type="info">
   Prefer `(module_systems (es6 mjs))`: bundlers can only tree-shake ES
-  modules. With CommonJS output the entire runtime — including the large
-  typed-values module — ships un-shaken.
+  modules. With CommonJS output the entire runtime (including the large
+  typed-values module) ships un-shaken.
 </Callout>
 
 Note: `reason-react-ppx` is only needed if you write JSX; the `styled-ppx.melange` runtime itself depends on `reason-react`.
@@ -93,17 +93,17 @@ Native libraries use the `styled-ppx.native` runtime and pass the `--native` fla
    server-reason-react.melange_ppx)))
 ```
 
-The stylesheet rule is [the same one](#the-stylesheet-rule) — `styled-ppx.generate` doesn't care which runtime produced the files.
+The stylesheet rule is [the same one](#the-stylesheet-rule): `styled-ppx.generate` doesn't care which runtime produced the files.
 
 ## Sharing UI between client and server
 
-The same Reason/OCaml UI sources can compile twice — natively for server rendering and to JavaScript for the browser — sharing one `styles.css` and rendering identical markup on both sides.
+The same Reason/OCaml UI sources can compile twice (natively for server rendering and to JavaScript for the browser), sharing one `styles.css` and rendering identical markup on both sides.
 
 This works because of one invariant: the ppx extracts **identical CSS regardless of target**. Class names are content-addressed hashes of the CSS itself, and `--native` only changes the generated component *code*, never the extracted rules. Both builds agree on every class name in the markup.
 
 ### Project layout
 
-Shared UI sources are owned by one directory and copied into the other target's library at build time — the same convention server-reason-react's own demos use:
+Shared UI sources are owned by one directory and copied into the other target's library at build time, the same convention server-reason-react's own demos use:
 
 ```
 lib/
@@ -131,11 +131,11 @@ The native library compiles `shared/` as part of itself by adding `(include_subd
   sources into two libraries is the supported pattern.
 </Callout>
 
-Code inside `shared/` must only use APIs that exist on both sides (`CSS`, `React`, markup). Target-specific code — DOM access, fetch, filesystem — lives in the thin per-target wrappers (`app.re` above), or behind an interface implemented per target.
+Code inside `shared/` must only use APIs that exist on both sides (`CSS`, `React`, markup). Target-specific code, like DOM access, fetch, or filesystem, lives in the thin per-target wrappers (`app.re` above), or behind an interface implemented per target.
 
 ### One stylesheet for both
 
-Because extraction is target-independent, **one `styled-ppx.generate` rule produces the stylesheet for both builds**. Globbing both build trees is harmless — rules are content-deduplicated — but pointing the glob at one is enough. The client bundle imports no CSS; the server links `/styles.css` in the document it renders.
+Because extraction is target-independent, **one `styled-ppx.generate` rule produces the stylesheet for both builds**. Globbing both build trees is harmless (rules are content-deduplicated), but pointing the glob at one is enough. The client bundle imports no CSS; the server links `/styles.css` in the document it renders.
 
 The [repository demo](https://github.com/davesnx/styled-ppx/tree/main/demo/melange) is exactly this setup: `lib/native/shared/Main.re` renders in the browser through `lib_js` and to a string through the native `print` executable, with one promoted `public/styles.css` serving both.
 
@@ -153,7 +153,7 @@ Positional arguments are the post-ppx `.ml` / `.pp.ml` files to harvest.
 | `--log error\|warning\|info\|debug` | Diagnostic verbosity (default: `error`). `info` prints the output file; `debug` prints the entire stylesheet |
 | `--debug` | Shorthand for `--log debug` |
 
-The CLI has no mode flag on purpose: the build environment travels in-band. When the ppx runs with `--env production` it embeds `[@@@css.config [("env", "production")]]` in every post-ppx file, and the CLI minifies its output (drops inter-rule newlines) when every input file declares it. Mixed inputs — some stanzas built for production, some not — produce a warning and readable output.
+The CLI has no mode flag on purpose: the build environment travels in-band. When the ppx runs with `--env production` it embeds `[@@@css.config [("env", "production")]]` in every post-ppx file, and the CLI minifies its output (drops inter-rule newlines) when every input file declares it. Mixed inputs (some stanzas built for production, some not) produce a warning and readable output.
 
 ## ppx flags
 
@@ -170,16 +170,16 @@ Passed inside `(pps styled-ppx <flags> ...)`:
 <Callout type="default">
   The environment is declared once, on the ppx. `styled-ppx.generate` reads
   the `[@@@css.config ...]` marker the ppx embeds and minifies its own output
-  automatically — there is nothing to keep in sync between the two.
+  automatically. There is nothing to keep in sync between the two.
 </Callout>
 
 ## Production setup
 
-For a release build, pass `--env production` to the ppx. It enables `--minify` (drops the `-<label>` suffix, minifies rule bodies), disables `--dev`, and declares the environment in the extraction protocol so `styled-ppx.generate` minifies the final stylesheet on its own. Minification never changes the hashes — `css-1tyndxa-layout` in dev and `css-1tyndxa` in prod are the same atom, so a class seen in production can be looked up in a dev build.
+For a release build, pass `--env production` to the ppx. It enables `--minify` (drops the `-<label>` suffix, minifies rule bodies), disables `--dev`, and declares the environment in the extraction protocol so `styled-ppx.generate` minifies the final stylesheet on its own. Minification never changes the hashes: `css-1tyndxa-layout` in dev and `css-1tyndxa` in prod are the same atom, so a class seen in production can be looked up in a dev build.
 
-The label switch lives on the **ppx** because labels are baked into the class names at compile time, in both the `className` your components carry and the extracted CSS — no downstream tool could drop them without desyncing the two.
+The label switch lives on the **ppx** because labels are baked into the class names at compile time, in both the `className` your components carry and the extracted CSS. No downstream tool could drop them without desyncing the two.
 
-Dune has no conditional pps flags (variables aren't allowed in `pps` arguments), so the supported pattern is duplicating the library stanza under mutually-exclusive `enabled_if` guards — same fields, different flags:
+Dune has no conditional pps flags (variables aren't allowed in `pps` arguments), so the supported pattern is duplicating the library stanza under mutually-exclusive `enabled_if` guards (same fields, different flags):
 
 ```dune
 (library
@@ -197,7 +197,7 @@ Dune has no conditional pps flags (variables aren't allowed in `pps` arguments),
  (enabled_if (= %{profile} release)))
 ```
 
-The stylesheet action is identical in both profiles — the CLI follows the ppx's declared environment:
+The stylesheet action is identical in both profiles; the CLI follows the ppx's declared environment:
 
 ```dune
 (action
@@ -206,7 +206,7 @@ The stylesheet action is identical in both profiles — the CLI follows the ppx'
 
 A few more production notes:
 
-- **Cache the stylesheet aggressively.** `styles.css` only changes when styles change; serve it with long-lived cache headers behind a content-hashed filename. It can also be `<link rel="preload" as="style">`-ed — its content doesn't depend on which components render.
+- **Cache the stylesheet aggressively.** `styles.css` only changes when styles change; serve it with long-lived cache headers behind a content-hashed filename. It can also be `<link rel="preload" as="style">`-ed, since its content doesn't depend on which components render.
 - **Theme values don't bust the cache.** `[%styled.global]`-supplied `:root` values render inline in the document, not in the file.
 - **Generate in CI.** Build the stylesheet as part of the release pipeline rather than relying on `(mode promote)` artifacts checked into the repo.
 
@@ -225,7 +225,7 @@ a [%css] expression. Define `A.missing` with [%css "..."], or remove the
 reference.
 ```
 
-Either the binding doesn't exist, or its file wasn't passed to the rule — extend the `deps` glob. And:
+Either the binding doesn't exist, or its file wasn't passed to the rule: extend the `deps` glob. And:
 
 ```
 Error: cross-library [%css] selector references are not supported.
@@ -234,6 +234,6 @@ part of the current library. Move the [%css] binding into the current
 library, or inline the class chain literally.
 ```
 
-Selector references can't cross dune library boundaries — co-locate the coupled styles in one library. See [class references in selectors](/reference/selectors#class-references-in-selectors).
+Selector references can't cross dune library boundaries. Co-locate the coupled styles in one library, and see [class references in selectors](/reference/selectors#class-references-in-selectors).
 
-**Styles apply in the wrong order.** With atomic CSS the tiebreaker is stylesheet source order, not class-name order or merge order — see [Which declaration wins](/reference/runtime#which-declaration-wins).
+**Styles apply in the wrong order.** With atomic CSS the tiebreaker is stylesheet source order, not class-name order or merge order. See [Which declaration wins](/reference/runtime#which-declaration-wins).

@@ -46,7 +46,7 @@ These become descendant selectors relative to the generated class, for example:
 - `div` -> `.generated div`
 - `svg path` -> `.generated svg path`
 
-One exception: a nested selector cannot *start* with a bare pseudo-class or pseudo-element (`:hover { ... }` without `&`). Per CSS Nesting semantics that would be a descendant selector, which is rarely what you mean — styled-ppx rejects it:
+One exception: a nested selector cannot *start* with a bare pseudo-class or pseudo-element (`:hover { ... }` without `&`). Per CSS Nesting semantics that would be a descendant selector, which is rarely what you mean, so styled-ppx rejects it:
 
 ```
 Bare leading pseudo selector `:hover` is ambiguous in nested CSS. Per CSS
@@ -70,7 +70,7 @@ The supported syntax includes the usual selector building blocks:
 
 ## Class references in selectors
 
-Interpolating a **binding** in selector position references another `[%css]` value's generated classes. The reference is resolved statically — the actual class names are substituted into the extracted stylesheet:
+Interpolating a **binding** in selector position references another `[%css]` value's generated classes. The reference is resolved statically: the actual class names are substituted into the extracted stylesheet:
 
 ```reason
 let outlined = [%css "border: 1px solid"];
@@ -100,13 +100,13 @@ let button = [%css {|
 |}]
 ```
 
-- `.$(name)` splices the binding's classes as a compound (`.cssA.cssB` when the binding has several atoms). Bare `$(name)` (no leading `.`) is accepted only when the binding has a single atom — otherwise the ppx raises ``Bare `$(name)` selector interpolation expanded to N class names; this position only accepts a single class. Prefix with `.` to use a class chain instead: `.$(name)`.``
+- `.$(name)` splices the binding's classes as a compound (`.cssA.cssB` when the binding has several atoms). Bare `$(name)` (no leading `.`) is accepted only when the binding has a single atom. Otherwise the ppx raises ``Bare `$(name)` selector interpolation expanded to N class names; this position only accepts a single class. Prefix with `.` to use a class chain instead: `.$(name)`.``
 - References work inside combinators, pseudo-classes (`:not(&.$(other))`, `:has(.$(other))`), comma lists, and inside nested `@media` / `@supports` bodies.
 - Same-file bindings resolve during ppx expansion; **cross-module** references (`$(Card.container)`) resolve when [the stylesheet is generated](/how-it-works#class-references-in-selectors). Referencing a binding that doesn't exist is a compile error; references across *library* boundaries are unsupported (see the [build errors](/getting-started/dune-setup#troubleshooting) they produce).
 
 ## Limitation: value interpolation and sibling selectors
 
-Selectors that target an element **outside `&`'s subtree** — a sibling combinator (`+`, `~`), or a pseudo-class whose subject isn't `&` or a descendant (`:not(&)`, `:has(&)`) — cannot contain interpolated *values*:
+Selectors that target an element **outside `&`'s subtree** cannot contain interpolated *values*. That covers sibling combinators (`+`, `~`) and pseudo-classes whose subject isn't `&` or a descendant (`:not(&)`, `:has(&)`):
 
 ```reason
 /* 🔴 Compile error */
@@ -119,7 +119,7 @@ let card = (~accent) => [%css {|
 |}];
 ```
 
-The reason is inheritance: interpolated values ship as CSS custom properties set inline on `&`'s own element, and custom properties only inherit **downward**. A sibling (or any element outside the subtree) can never read them, so the declaration would silently never apply — the ppx rejects it instead:
+The reason is inheritance: interpolated values ship as CSS custom properties set inline on `&`'s own element, and custom properties only inherit **downward**. A sibling (or any element outside the subtree) can never read them, so the declaration would silently never apply. The ppx rejects it instead:
 
 ```
 Cannot interpolate into the value of `color` under `& + .sibling`: the
@@ -135,6 +135,6 @@ descendant, or write a literal value or a globally-inherited theme
 
 What works instead:
 
-- **Static declarations under sibling selectors are fine** — `& + & { margin-top: 8px; }{:styled-ppx-css}` and `& ~ .row { border-top: 1px solid; }{:styled-ppx-css}` extract normally; the limitation only concerns `$( ... )` values.
+- **Static declarations under sibling selectors are fine**: `& + & { margin-top: 8px; }{:styled-ppx-css}` and `& ~ .row { border-top: 1px solid; }{:styled-ppx-css}` extract normally; the limitation only concerns `$( ... )` values.
 - **Move the interpolated declaration onto the sibling's own styles**, where the value is set on the element that reads it.
 - **Use a globally-inherited token**: `color: var(--accent){:styled-ppx-css}` with the value supplied from a [`:root` theme](./theming) reaches every element, siblings included.

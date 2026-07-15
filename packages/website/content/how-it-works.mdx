@@ -7,6 +7,23 @@ showAllLanguage: true
 
 styled-ppx is a **compile-time** CSS system. This page explains what happens between writing `[%css "display: flex"]` and a browser painting your page.
 
+## How the ppx fits in
+
+Generally speaking, a ppx is OCaml's system for macros, similar to [babel plugins](https://babeljs.io/docs/en/plugins/): a small program that runs before compilation and transforms your source code.
+
+styled-ppx expands four extensions:
+
+| Extension | What you get |
+| --- | --- |
+| `[%css "..."]` | a [`CSS.styles`](/reference/runtime) value: class names plus (optionally) inline custom-property values |
+| `[%styled.<tag> "..."]` | a React component for the given HTML tag |
+| `[%styled.global "..."]` | global styles as a React component (`@font-face`, resets, `:root` variables) |
+| `[%keyframe "..."]` | a typed `@keyframes` animation name |
+
+If you are curious about the actual transformation, check the [snapshot tests](https://github.com/davesnx/styled-ppx/tree/main/packages/ppx/test/snapshot).
+
+You can learn more about ppxes in [Tarides blog: Introduction to OCaml ppx ecosystem](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem).
+
 ## The pipeline at a glance
 
 ```
@@ -24,15 +41,12 @@ your .re / .ml source
   │
   ▼
 ③ styled-ppx.generate (a dune rule you add once)
-   ─ harvests the [@@@css ...] attributes from every compiled file
-   ─ resolves cross-module class references
-   ─ deduplicates and writes a single styles.css
   │
   ▼
-styles.css — a plain, static asset you link like any stylesheet
+styles.css: a plain, static asset you link like any stylesheet
 ```
 
-Your components carry the class names the ppx minted at step ①, plus — when you use interpolation — the values of a few CSS custom properties.
+Your components carry the class names the ppx minted at step ①, plus, when you use interpolation, the values of a few CSS custom properties.
 
 See [Setting up the dune rules](/getting-started/dune-setup) for the concrete build configuration.
 
@@ -56,9 +70,9 @@ extracts to:
 
 and `layout`'s className is the space-separated list: `"css-k008qs-layout css-1tyndxa-layout"`.
 
-Class names are **content-addressed**: the hash is derived from the CSS text itself (for interpolation variables, the source path and main module name feed the hash too, so names stay stable across builds). Two components declaring `display: flex` anywhere in your project share the exact same rule, and the aggregator emits it once. On large apps this makes the stylesheet grow with the number of *distinct declarations*, not the number of components — the same effect utility-CSS frameworks achieve, without you maintaining a naming convention.
+Class names are **content-addressed**: the hash is derived from the CSS text itself (for interpolation variables, the source path and main module name feed the hash too, so names stay stable across builds). Two components declaring `display: flex` anywhere in your project share the exact same rule, and the aggregator emits it once. On large apps this makes the stylesheet grow with the number of *distinct declarations*, not the number of components. That's the same effect utility-CSS frameworks achieve, without you maintaining a naming convention.
 
-Repeated fallback declarations for the same property (e.g. `display: -webkit-box; display: flex;`) are kept together in a single atom, so their intra-rule order — which the fallback depends on — is preserved.
+Repeated fallback declarations for the same property (e.g. `display: -webkit-box; display: flex;`) are kept together in a single atom, so their intra-rule order, which the fallback depends on, is preserved.
 
 ### Class names
 
@@ -66,7 +80,7 @@ The format is `css-<hash>-<label>`, where the label is the `let` binding or modu
 
 ### Cascade and ordering
 
-All atoms have the same specificity (a single class). The tiebreaker is stylesheet order — later wins — and the aggregator preserves your source order exactly, so an override written after its base declaration stays after it in `styles.css`. The full rules and composition patterns live in [Which declaration wins](/reference/runtime#which-declaration-wins).
+All atoms have the same specificity (a single class). The tiebreaker is stylesheet order (later wins), and the aggregator preserves your source order exactly, so an override written after its base declaration stays after it in `styles.css`. The full rules and composition patterns live in [Which declaration wins](/reference/runtime#which-declaration-wins).
 
 ## Dynamic values: CSS custom properties
 
@@ -95,7 +109,7 @@ A few details worth knowing:
 
 ## Class references in selectors
 
-Interpolating a *binding* in selector position (`&.$(active)`, `:has(.$(other))`) is resolved **statically** — the actual class names are substituted into the extracted CSS, with no `var()` indirection. Same-file references resolve during ppx expansion; references to bindings in *other modules* are resolved by the aggregator at stylesheet-generation time — one of the reasons the aggregator exists. Syntax, rules, and errors are documented in [Class references in selectors](/reference/selectors#class-references-in-selectors).
+Interpolating a *binding* in selector position (`&.$(active)`, `:has(.$(other))`) is resolved **statically**: the actual class names are substituted into the extracted CSS, with no `var()` indirection. Same-file references resolve during ppx expansion; references to bindings in *other modules* are resolved by the aggregator at stylesheet-generation time (one of the reasons the aggregator exists). Syntax, rules, and errors are documented in [Class references in selectors](/reference/selectors#class-references-in-selectors).
 
 ## The aggregator: `styled-ppx.generate`
 
@@ -111,6 +125,6 @@ You wire it up once as a dune rule; the rule, CLI flags, and troubleshooting liv
 
 ## What this buys you
 
-- **Server rendering is just rendering.** Link `styles.css` in your `<head>` and render — no orchestration needed. (`[%styled.global]` renders one `<style>` element for `:root` variable *values* when you interpolate in globals.)
-- **Cacheable CSS.** `styles.css` is a static asset with a stable content — it caches like any other file and can be served from a CDN.
+- **Server rendering is just rendering.** Link `styles.css` in your `<head>` and render. No orchestration needed.
+- **Cacheable CSS.** `styles.css` is a static asset with a stable content: it caches like any other file and can be served from a CDN.
 - **Smaller JS.** Your bundle carries class-name strings, not a CSS engine.
