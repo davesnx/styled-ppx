@@ -58,9 +58,8 @@ const RootLayout: FC<{ children: ReactNode }> = async ({ children }) => {
           href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap"
           rel="stylesheet"
         />
-        <script async src="https://cdn.splitbee.io/sb.js" />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <Layout pageMap={pageMap}>{children}</Layout>
       </body>
     </html>
