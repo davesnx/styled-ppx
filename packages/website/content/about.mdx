@@ -33,7 +33,7 @@ Using CSS enables all sorts of integrations: Editors, DevTools, prototyping tool
 ### It can be more powerful than the JavaScript equivalents
 Enabling type-safety in CSS is a nice to have, rather than a hard requirement, but nevertheless useful. styled-ppx brings an entire CSS compiler and type-checker. This enables features from SASS (like supporting future CSS version features) with the ergonomics of emotion, inlining your styles and code together.
 
-Since 0.62.0 this vision is complete: all CSS is [statically extracted](/how-it-works) at compile time into atomic, content-addressed rules. Your styles ship as a plain `.css` asset with **zero runtime**, something the JavaScript-based equivalents can only approximate.
+Since 0.62.0 this vision is complete: all CSS is [statically extracted](/how-it-works) at compile time into atomic, content-addressed rules. Your styles ship as a plain css file and a minimal runtime for interpolation, something the JavaScript-based equivalents can only approximate.
 
 To know more about how it works or what are the benefits I recommend you watch [my talk at ReasonSTHLM Meetup](https://www.youtube.com/watch?v=ekHCBZiCviM).
 

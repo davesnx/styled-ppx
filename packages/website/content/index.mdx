@@ -4,7 +4,7 @@ title: Introduction to styled-ppx
 
 import { Ml } from "../src/components/language-content";
 
-### Type-safe, zero-runtime styled components for OCaml and Reason.
+### Type-safe styled components for OCaml and Reason. Compile-time CSS, minimal runtime.
 
 **styled-ppx** is a [ppx](https://tarides.com/blog/2019-05-09-an-introduction-to-ocaml-ppx-ecosystem) and a library that brings styled components to OCaml and Reason, for both [Melange](https://melange.re) and native ([server-reason-react](https://github.com/ml-in-barcelona/server-reason-react)). Write plain CSS inside your components and get **React components** or **class names** back: parsed, validated and type-checked at compile time.
 
@@ -40,7 +40,7 @@ styled-ppx ships its own CSS parser and type-checker. Every property and value i
 
 Dynamic values are welcome: any OCaml or Reason expression goes inside `$( ... )`, [type-checked](/reference/interpolation) against the property it's used in.
 
-## Ship zero runtime
+## Ship a static stylesheet
 
 All CSS is extracted while your project compiles:
 
@@ -48,11 +48,13 @@ All CSS is extracted while your project compiles:
 2. A build step ([`styled-ppx.generate`](/how-it-works#the-aggregator-styled-ppxgenerate)) collects every rule in your project and writes a single, deduplicated `styles.css`.
 3. At runtime, your components only carry class names. Interpolated values become CSS custom properties supplied through the `style` attribute.
 
+The runtime is minimal: it only carries class names and supplies variable values.
+
 Class names are human-readable in development (`css-<hash>-<binding>`) and minified in production. Read more in [How it works](/how-it-works).
 
 ## Compose styles as code
 
-Styles are ordinary values of the language: pattern match over them, merge them, pass them as labelled arguments. There is no styling DSL, no ThemeProvider, and no CSS engine in your bundle.
+Styles are ordinary values of the language: pattern match over them, merge them, pass them as labelled arguments. There is no styling DSL to learn, and your bundle carries the minimum runtime.
 
 ## Start here
 
