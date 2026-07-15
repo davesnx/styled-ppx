@@ -8,8 +8,9 @@
   "description": "",
   "scripts": {
     "dev": "next dev --webpack -p 8080",
+    "prebuild": "node scripts/link-vercel-output.mjs",
     "build": "next build --webpack",
-    "postbuild": "pagefind --site .next/server/app --output-path public/_pagefind && node scripts/link-vercel-output.mjs",
+    "postbuild": "pagefind --site .next/server/app --output-path public/_pagefind",
     "start": "next start"
   },
   "dependencies": {
