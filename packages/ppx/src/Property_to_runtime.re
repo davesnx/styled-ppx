@@ -394,6 +394,9 @@ and render_function_min = (~loc, calc_sums) => {
 and render_function_max = (~loc, calc_sums) => {
   [%expr `max([%e render_function_min_or_max(~loc, calc_sums)])];
 }
+and render_function_clamp = (~loc, calc_sums) => {
+  [%expr `clamp([%e render_function_min_or_max(~loc, calc_sums)])];
+}
 and render_calc_product = (~loc, (value, products): Types.calc_product) => {
   let rec go = (left, rest) => {
     switch (rest) {
@@ -473,6 +476,7 @@ and render_extended_length = (~loc) =>
   | `Function_calc(fc) => render_function_calc(~loc, fc)
   | `Function_min(values) => render_function_min(~loc, values)
   | `Function_max(values) => render_function_max(~loc, values)
+  | `Function_clamp(values) => render_function_clamp(~loc, values)
   | `Interpolation(i) => render_variable(~loc, String.concat(".", i))
 and render_extended_percentage = (~loc) =>
   fun

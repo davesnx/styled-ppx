@@ -208,6 +208,9 @@ and render_function_min = calc_sums => {
 and render_function_max = calc_sums => {
   render_function_min_or_max(calc_sums);
 }
+and render_function_clamp = calc_sums => {
+  render_function_min_or_max(calc_sums);
+}
 and render_product = ((value, products)) => {
   let rec go = (left, rest) => {
     switch (rest) {
@@ -276,6 +279,7 @@ and render_extended_length =
   | `Function_calc(fc) => render_function_calc(fc)
   | `Function_min(values) => render_function_min(values)
   | `Function_max(values) => render_function_max(values)
+  | `Function_clamp(values) => render_function_clamp(values)
   | `Interpolation(i) => render_variable(String.concat(".", i))
 
 and render_extended_percentage =

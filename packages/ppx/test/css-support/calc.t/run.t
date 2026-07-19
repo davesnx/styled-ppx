@@ -18,10 +18,12 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-12qo4ty{width:calc(100vh - calc(2rem + 120px));}"];
   [@css ".css-1g5uhfp{width:calc(100vh * 2);}"];
   [@css ".css-6t8hw4{width:calc(2 * 120px);}"];
+  [@css ".css-5ikc61{width:clamp(1rem, 2vw, 3rem);}"];
   CSS.make("css-hxo6vg", []);
   CSS.make("css-1bjj19s", []);
   CSS.make("css-12qo4ty", []);
   CSS.make("css-1g5uhfp", []);
   CSS.make("css-6t8hw4", []);
+  CSS.make("css-5ikc61", []);
 
   $ dune build

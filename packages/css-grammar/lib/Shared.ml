@@ -1795,7 +1795,7 @@ let url : url Rule.rule = Url.rule
 (* https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/length-percentage#use_in_calc *)
 module Extended_length =
   [%spec_module
-  "<length> | <calc()> | <interpolation> | <min()> | <max()>",
+  "<length> | <calc()> | <interpolation> | <min()> | <max()> | <clamp()>",
   (module Css_types.Length)]
 
 let extended_length : extended_length Rule.rule = Extended_length.rule

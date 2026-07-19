@@ -199,6 +199,12 @@ let test_width_with_component_values = () =>
   | Ok () => ()
   };
 
+let test_width_with_clamp = () =>
+  switch (validate_property("width", "clamp(1rem, 2vw, 3rem)")) {
+  | Error(msg) => Alcotest.fail("clamp should validate: " ++ msg)
+  | Ok () => ()
+  };
+
 let test_media_query_prelude_with_component_values = () =>
   switch (
     Parser.type_check(
@@ -279,6 +285,7 @@ let tests = [
         `Quick,
         test_width_with_component_values,
       ),
+      Alcotest.test_case("width with clamp", `Quick, test_width_with_clamp),
       Alcotest.test_case(
         "media query prelude with component_value_list",
         `Quick,
