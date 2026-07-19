@@ -2,6 +2,7 @@
 
 ## 0.62.0
 
+- [FIX] Accept `clamp()` as a value for length properties (`width`, `height`, `padding`, `margin`, `font-size`, `gap`, `inset`, ...). It was registered as a function but never listed in the `extended-length` value rule, so `width: clamp(1rem, 2vw, 3rem)` failed to validate (@Atlas07)
 - [FEATURE] Add `--env development|production` to the PPX as a preset over the individual flags: `development` = `--dev` (marker classes + readable label suffixes), `production` = `--minify` (no labels, minified CSS) (@davesnx)
 - [BREAKING] [FEATURE] `styled-ppx.generate` no longer takes a mode flag (`--minify` removed): the PPX embeds `[@@@css.config [("env", "production")]]` in production builds and the aggregator minifies its output automatically when every input file declares it, warning on mixed dev/production inputs. The environment is declared once, on the `(pps styled-ppx ...)` stanza (@davesnx)
 - [BREAKING] [FEATURE] CSS static extraction and atomization: all extensions (`[%css]`, `[%styled.<tag>]`, `[%styled.global]`, `[%keyframe]`) are now statically extracted at compile time. The PPX emits `[@@@css ...]` attributes that the `styled-ppx.generate` aggregator collects into CSS assets, with declarations atomized into content-addressed classes for zero runtime overhead (#573) (@davesnx)

@@ -120,6 +120,7 @@ and extended_length =
   | `Interpolation of string list
   | `Function_min of calc_sum list
   | `Function_max of calc_sum list
+  | `Function_clamp of calc_sum list
   ]
 
 and calc_sum =

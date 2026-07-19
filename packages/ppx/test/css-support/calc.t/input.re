@@ -3,6 +3,7 @@
 [%css {|width: calc(100vh - calc(2rem + 120px))|}];
 [%css {|width: calc(100vh * 2)|}];
 [%css {|width: calc(2 * 120px)|}];
+[%css {|width: clamp(1rem, 2vw, 3rem)|}];
 /* Test froze a bit with this expression */
 /* [%css
      {|width: calc(100vh - calc(2rem + calc(2rem + calc(2rem + calc(2rem + 120px)))))|}
