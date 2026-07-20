@@ -1,5 +1,9 @@
 # Changes
 
+## Unreleased
+
+- [BREAKING] Remove the `styled-ppx.string-interpolation` library and the dead PPX modules from the pre-extraction runtime path (`Property_to_runtime`, `Property_to_string`, `Custom_property_runtime`) (@davesnx)
+
 ## 0.62.0
 
 - [FEATURE] Add `--env development|production` to the PPX as a preset over the individual flags: `development` = `--dev` (marker classes + readable label suffixes), `production` = `--minify` (no labels, minified CSS) (@davesnx)

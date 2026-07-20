@@ -73,7 +73,7 @@ release-static:
 
 # Testing commands
 
-TEST_TARGETS := test-parser test-css-grammar test-ppx-native test-ppx-snapshot-reason test-css-support test-runtime test-murmur2 test-css-spec-parser test-string-interpolation test-generate
+TEST_TARGETS := test-parser test-css-grammar test-ppx-native test-ppx-snapshot-reason test-css-support test-runtime test-murmur2 test-css-spec-parser test-generate
 
 # Create targets with the format "test-{{target_name}}-{{ "watch" | "promote" }}"
 define create-test

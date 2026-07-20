@@ -1562,7 +1562,7 @@ let single_animation : single_animation Rule.rule = Single_animation.rule
    tie-breaking assigns the FIRST input <time> to position 3 (last matching
    rule) and the SECOND input <time> to position 1 (first matching rule).
    This means: tuple position 1 = delay, tuple position 3 = duration.
-   See render_single_animation_no_interp in Property_to_runtime.re. *)
+   Consumers rendering this tuple must respect that ordering. *)
 module Single_animation_no_interp =
   [%spec_module
   "[ <keyframes-name> | 'none' ] || <extended-time-no-interp> || \

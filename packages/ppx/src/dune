@@ -9,7 +9,6 @@
   styled-ppx.css-parser
   styled-ppx.css-grammar-parser
   styled-ppx.murmur2
-  styled-ppx.string-interpolation
   server-reason-react.styles-attribute
   sedlex
   ppxlib

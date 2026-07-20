@@ -23,7 +23,6 @@ target also has `-watch` and `-promote` variants (e.g. `make test-parser-watch`,
 | `make test-runtime` | Runtime hash/styles unit tests | `packages/runtime/test` |
 | `make test-murmur2` | Murmur2 hash parity with emotion (cram + scripts) | `packages/murmur2/test` |
 | `make test-css-spec-parser` | CSS value-definition spec parser | `packages/css-spec-parser/test` |
-| `make test-string-interpolation` | String interpolation transform | `packages/string_interpolation/test` |
 | `make test-generate` | CSS extraction aggregator (cram) | `packages/generate/test` |
 
 ## Cram tests

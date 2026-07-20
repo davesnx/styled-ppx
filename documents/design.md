@@ -457,9 +457,10 @@ Completed in the current branch with these concrete outcomes:
   `ppx.re`) now validates declarations directly from parser AST values.
 - Interpolation extraction in `packages/ppx/src/Css_file.re` now reads
   interpolation types directly from `component_value_list`.
-- Runtime lowering in `packages/ppx/src/Property_to_runtime.re` now parses typed
-  property values from `component_value_list` instead of reparsing declaration
-  value strings.
+- Runtime lowering parses typed property values from `component_value_list`
+  instead of reparsing declaration value strings. (The historical
+  `Property_to_runtime.re` module that pioneered this has since been removed;
+  `Css_to_runtime.re` owns runtime emission now.)
 - `@media` and `@container` validation in `packages/ppx/src/Css_to_runtime.re`
   now parses preludes from parser AST values rather than reparsing source text.
 
@@ -528,7 +529,6 @@ these suites:
 - `make test-ppx-native`
 - `make test-ppx-snapshot-reason`
 - `make test-runtime`
-- `make test-string-interpolation`
 
 When a step changes only one layer, targeted suites are acceptable during local
 iteration, but every milestone should re-run the broader pipeline-facing suites.
