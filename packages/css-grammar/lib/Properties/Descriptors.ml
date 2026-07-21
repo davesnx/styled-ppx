@@ -164,8 +164,7 @@ let property_suffix : property_suffix Rule.rule = Property_suffix.rule
 
 module Property_additive_symbols =
   [%spec_module
-  "[ <integer> && <symbol> ]#",
-  (module Css_types.CounterStyleAdditiveSymbols)]
+  "[ <integer> && <symbol> ]#", (module Css_types.CounterStyleAdditiveSymbols)]
 
 let property_additive_symbols : property_additive_symbols Rule.rule =
   Property_additive_symbols.rule
@@ -198,6 +197,5 @@ let entries : (kind * packed_rule) list =
     Property "fallback", pack_module (module Property_fallback);
     Property "prefix", pack_module (module Property_prefix);
     Property "suffix", pack_module (module Property_suffix);
-    ( Property "additive-symbols",
-      pack_module (module Property_additive_symbols) );
+    Property "additive-symbols", pack_module (module Property_additive_symbols);
   ]

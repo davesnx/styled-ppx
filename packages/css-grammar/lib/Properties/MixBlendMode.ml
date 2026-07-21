@@ -3,7 +3,7 @@ open Support
 
 module Property_mix_blend_mode =
   [%spec_module
-  "<blend-mode>", (module Css_types.MixBlendMode)]
+  "<blend-mode> | 'plus-lighter'", (module Css_types.MixBlendMode)]
 
 let property_mix_blend_mode : property_mix_blend_mode Rule.rule =
   Property_mix_blend_mode.rule

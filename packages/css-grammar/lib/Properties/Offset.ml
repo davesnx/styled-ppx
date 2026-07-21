@@ -34,7 +34,7 @@ let property_offset_path : property_offset_path Rule.rule =
 
 module Property_offset_position =
   [%spec_module
-  "'auto' | <position>", (module Css_types.OffsetPosition)]
+  "'normal' | 'auto' | <position>", (module Css_types.OffsetPosition)]
 
 let property_offset_position : property_offset_position Rule.rule =
   Property_offset_position.rule

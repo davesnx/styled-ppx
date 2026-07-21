@@ -24,6 +24,7 @@ let () =
     let class_tag =
       match (classification : Css_grammar.At_rules.classification) with
       | Atomized -> "atomized"
+      | Atomized_block_only -> "atomized-block-only"
       | Keyframe_extension -> "keyframe-extension"
       | Descriptor_passthrough -> "descriptor-passthrough"
       | Global_passthrough -> "global-passthrough"

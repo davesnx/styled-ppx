@@ -116,8 +116,27 @@ type feature_block =
   | Boolean of string * Ast.loc (* (monochrome) *)
   | Plain of string * Ast.loc * Ast.component_value_list
     (* (min-width: 768px) *)
-  | Range of (string * Ast.loc) list (* (500px <= width): the bare idents *)
+  | Range of Ast.component_value_list list
+    (* (500px <= width <= 700px): the operand segments between comparison
+       operators, one of which is the feature name *)
   | Opaque
+
+(* Split a range-form block into its operand segments: everything between
+   comparison operators, whitespace already stripped. *)
+let split_on_comparisons (values : Ast.component_value_list) :
+  Ast.component_value_list list =
+  let flush segment segments =
+    match segment with [] -> segments | s -> List.rev s :: segments
+  in
+  let segments, last =
+    List.fold_left
+      (fun (segments, segment) ((v, _) as value : _ Ast.with_loc) ->
+        match (v : Ast.component_value) with
+        | Delim d when is_comparison_delim d -> flush segment segments, []
+        | _ -> segments, value :: segment)
+      ([], []) values
+  in
+  List.rev (flush last segments)
 
 let classify_block (inner : Ast.component_value_list) : feature_block =
   match significant inner with
@@ -131,13 +150,7 @@ let classify_block (inner : Ast.component_value_list) : feature_block =
              | Delim d -> is_comparison_delim d
              | _ -> false)
            inner_values ->
-    Range
-      (List.filter_map
-         (fun ((v, loc) : _ Ast.with_loc) ->
-           match (v : Ast.component_value) with
-           | Ident name -> Some (name, loc)
-           | _ -> None)
-         inner_values)
+    Range (split_on_comparisons inner_values)
   | _ -> Opaque
 
 (* Collect the feature-shaped paren blocks of a condition; opaque blocks
@@ -162,6 +175,37 @@ let rec collect_feature_blocks acc (values : Ast.component_value_list) =
       | _ -> acc)
     acc values
 
+(* Validate one feature value against the feature's registered grammar
+   (keyed `media-<name>`; @container size features share the namespace).
+   Values nesting functions (`calc()`, `env()`) skip value validation: the
+   feature grammars only model literal values. Features without a grammar
+   stay name-checked only. *)
+let validate_feature_value ~at_rule_name ~name ~error_loc
+  (value : Ast.component_value_list) :
+  (unit, Ast.loc * [> `Invalid_prelude of string ]) result =
+  let has_function =
+    List.exists
+      (fun ((v, _) : _ Ast.with_loc) ->
+        match (v : Ast.component_value) with Function _ -> true | _ -> false)
+      value
+  in
+  if has_function then Ok ()
+  else (
+    match
+      Registry.find_by_key ("property_media-" ^ String.lowercase_ascii name)
+    with
+    | Some (Pack_rule { validate; _ }) ->
+      (match validate value with
+      | Ok () -> Ok ()
+      | Error error_info ->
+        Error
+          ( error_loc,
+            `Invalid_prelude
+              (Printf.sprintf "Invalid value for @%s feature '%s', %s"
+                 at_rule_name name
+                 (Rule.format_error_info error_info)) ))
+    | None -> Ok ())
+
 let validate_feature_names ~at_rule_name ~inventory
   (prelude : Ast.component_value_list) :
   (unit, Ast.loc * [> `Invalid_prelude of string ]) result =
@@ -180,38 +224,43 @@ let validate_feature_names ~at_rule_name ~inventory
     | Boolean (name, name_loc) ->
       if known name then Ok () else unknown_error name name_loc
     | Plain (name, name_loc, value) ->
-      (* Values nesting functions (`calc()`, `env()`) skip value
-         validation: the feature grammars only model literal values. *)
-      let has_function =
-        List.exists
-          (fun ((v, _) : _ Ast.with_loc) ->
-            match (v : Ast.component_value) with
-            | Function _ -> true
-            | _ -> false)
-          value
-      in
       if not (known name) then unknown_error name name_loc
-      else if has_function then Ok ()
-      else (
-        match
-          Registry.find_by_key ("property_media-" ^ String.lowercase_ascii name)
-        with
-        | Some (Pack_rule { validate; _ }) ->
-          (match validate value with
-          | Ok () -> Ok ()
-          | Error error_info ->
-            Error
-              ( name_loc,
-                `Invalid_prelude
-                  (Printf.sprintf "Invalid value for @%s feature '%s', %s"
-                     at_rule_name name
-                     (Rule.format_error_info error_info)) ))
-        | None -> Ok ())
-    | Range idents ->
-      (match idents with
-      | [] -> Ok ()
-      | idents when List.exists (fun (name, _) -> known name) idents -> Ok ()
-      | (name, loc) :: _ -> unknown_error name loc)
+      else validate_feature_value ~at_rule_name ~name ~error_loc:name_loc value
+    | Range segments ->
+      (* A segment that is exactly one known ident is the feature name;
+         the remaining segments are its comparison operands and validate
+         against the same grammar as colon-form values. *)
+      let feature_of segment =
+        match (segment : Ast.component_value_list) with
+        | [ (Ident name, loc) ] when known name -> Some (name, loc)
+        | _ -> None
+      in
+      (match List.filter_map feature_of segments with
+      | [ (name, _) ] ->
+        List.fold_left
+          (fun acc segment ->
+            match acc, feature_of segment, segment with
+            | Ok (), None, (_, error_loc) :: _ ->
+              validate_feature_value ~at_rule_name ~name ~error_loc segment
+            | acc, _, _ -> acc)
+          (Ok ()) segments
+      | _ :: _ ->
+        (* Several known names ((width < height)): structure checked only. *)
+        Ok ()
+      | [] ->
+        (* No identifiable feature: keep the historical name check over the
+           bare idents. *)
+        let idents =
+          List.concat segments
+          |> List.filter_map (fun ((v, loc) : _ Ast.with_loc) ->
+            match (v : Ast.component_value) with
+            | Ident name -> Some (name, loc)
+            | _ -> None)
+        in
+        (match idents with
+        | [] -> Ok ()
+        | idents when List.exists (fun (name, _) -> known name) idents -> Ok ()
+        | (name, loc) :: _ -> unknown_error name loc))
     | Opaque -> Ok ()
   in
   collect_feature_blocks [] prelude

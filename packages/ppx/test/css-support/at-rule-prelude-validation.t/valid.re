@@ -26,3 +26,41 @@ let _webkit_dpr = [%css
 let _moz_dpr = [%css
   "@media (min--moz-device-pixel-ratio: 2) { color: red; }"
 ];
+let _webkit_dpr_fractional = [%css
+  "@media (-webkit-device-pixel-ratio: 1.5) { color: red; }"
+];
+/* Feature values are validated per value class: <extended-length>,
+   <ratio>, <resolution>, <integer>, and discrete keyword sets. */
+let _length_value = [%css "@media (device-width: 320px) { color: red; }"];
+let _ratio_value = [%css "@media (aspect-ratio: 16/9) { color: red; }"];
+let _ratio_number = [%css "@media (device-aspect-ratio: 1.777) { color: red; }"];
+let _resolution_value = [%css "@media (min-resolution: 2dppx) { color: red; }"];
+/* MQ4: 'infinite' for media without resolution limits. */
+let _resolution_infinite = [%css "@media (resolution: infinite) { color: red; }"];
+let _integer_value = [%css "@media (color: 8) { color: red; }"];
+let _integer_segments = [%css
+  "@media (horizontal-viewport-segments: 2) { color: red; }"
+];
+/* grid takes 0 | 1 per spec; any <integer> is accepted here. */
+let _grid_value = [%css "@media (grid: 1) { color: red; }"];
+let _keyword_scan = [%css "@media (scan: interlace) { color: red; }"];
+let _keyword_overflow = [%css
+  "@media (overflow-block: paged) and (overflow-inline: scroll) { color: red; }"
+];
+let _keyword_reduced_data = [%css
+  "@media (prefers-reduced-data: reduce) { color: red; }"
+];
+let _keyword_dynamic_range = [%css
+  "@media (video-dynamic-range: high) { color: red; }"
+];
+/* Range forms validate their comparison operands against the same
+   grammars as colon-form values. */
+let _range_operand = [%css "@media (width >= 400px) { color: red; }"];
+let _range_ratio = [%css "@media (aspect-ratio > 4/3) { color: red; }"];
+/* @container size features share the media grammars (plus the
+   container-only inline-size/block-size). */
+let _container_plain = [%css "@container (inline-size: 400px) { color: red; }"];
+let _container_range = [%css "@container (block-size < 650px) { color: red; }"];
+let _container_orientation = [%css
+  "@container (orientation: landscape) { color: red; }"
+];

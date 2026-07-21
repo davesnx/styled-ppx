@@ -11,7 +11,7 @@ let property_outline : property_outline Rule.rule = Property_outline.rule
 
 module Property_outline_color =
   [%spec_module
-  "<color>", (module Css_types.Color)]
+  "'auto' | <color>", (module Css_types.Color)]
 
 let property_outline_color : property_outline_color Rule.rule =
   Property_outline_color.rule

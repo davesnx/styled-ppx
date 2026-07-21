@@ -173,6 +173,10 @@ include At_rule_prelude;
    lives next to the flattener in the parser package. */
 module At_rules = Styled_ppx_css_parser.At_rules;
 
+/* Re-exported so the ppx can offer "did you mean" suggestions for at-rule
+   names with the same matcher the property/feature suggestions use. */
+module Levenshtein = Levenshtein;
+
 module Rule = Rule;
 module Css_value_types = Css_value_types;
 module Combinators = Combinators;

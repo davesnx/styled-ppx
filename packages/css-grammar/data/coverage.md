@@ -350,48 +350,48 @@ None.
 | `@annotation` | **not supported** |
 | `@apply` | **not supported** |
 | `@character-variant` | **not supported** |
-| `@charset` | passthrough in [%styled.global] (no position enforcement) |
+| `@charset` | passthrough in `[%styled.global]` (no position enforcement) |
 | `@color-profile` | **not supported** |
-| `@container` | supported in [%css] and [%styled.global] |
+| `@container` | supported in `[%css]` and `[%styled.global]` |
 | `@contents` | **not supported** |
-| `@counter-style` | passthrough in [%styled.global] (descriptors unvalidated) |
+| `@counter-style` | passthrough in `[%styled.global]` |
 | `@custom-media` | **not supported** |
 | `@custom-selector` | **not supported** |
 | `@else` | **not supported** |
-| `@font-face` | passthrough in [%styled.global] |
-| `@font-feature-values` | passthrough in [%styled.global] (descriptors unvalidated) |
-| `@font-palette-values` | passthrough in [%styled.global] |
+| `@font-face` | passthrough in `[%styled.global]` |
+| `@font-feature-values` | passthrough in `[%styled.global]` (descriptors unvalidated) |
+| `@font-palette-values` | passthrough in `[%styled.global]` |
 | `@function` | **not supported** |
 | `@historical-forms` | **not supported** |
-| `@import` | passthrough in [%styled.global] (no position enforcement) |
-| `@keyframes` | first-class via [%keyframe] |
-| `@layer` | passthrough in [%styled.global] (block form flattened) |
+| `@import` | passthrough in `[%styled.global]` (no position enforcement) |
+| `@keyframes` | first-class via `[%keyframe]` |
+| `@layer` | block form supported in `[%css]` and `[%styled.global]` (statement form `[%styled.global]`-only) |
 | `@macro` | **not supported** |
-| `@media` | supported in [%css] and [%styled.global] |
+| `@media` | supported in `[%css]` and `[%styled.global]` |
 | `@mixin` | **not supported** |
-| `@namespace` | passthrough in [%styled.global] (no position enforcement) |
+| `@namespace` | passthrough in `[%styled.global]` (no position enforcement) |
 | `@navigation` | **not supported** |
 | `@ornaments` | **not supported** |
-| `@page` | passthrough in [%styled.global] |
+| `@page` | passthrough in `[%styled.global]` |
 | `@position-try` | **not supported** |
-| `@property` | passthrough in [%styled.global] (auto-emitted by the pipeline) |
+| `@property` | passthrough in `[%styled.global]` (auto-emitted by the pipeline) |
 | `@result` | **not supported** |
 | `@route` | **not supported** |
-| `@scope` | passthrough in [%styled.global] (flattened) |
-| `@starting-style` | supported in [%css] and [%styled.global] |
+| `@scope` | passthrough in `[%styled.global]` (flattened) |
+| `@starting-style` | supported in `[%css]` and `[%styled.global]` |
 | `@styleset` | **not supported** |
 | `@stylistic` | **not supported** |
-| `@supports` | supported in [%css] and [%styled.global] |
+| `@supports` | supported in `[%css]` and `[%styled.global]` |
 | `@supports-condition` | **not supported** |
 | `@swash` | **not supported** |
-| `@view-transition` | passthrough in [%styled.global] |
+| `@view-transition` | passthrough in `[%styled.global]` |
 | `@when` | **not supported** |
 
 Page-margin at-rules (16, e.g. `@top-left`) and vendor-prefixed at-rules are grouped out of the table; see documents/at-rules.md.
 
 ## Registry extras
 
-179 registered names are not in the spec inventory (vendor-prefixed properties, at-rule descriptors registered as properties, and legacy/compat entries). They are listed for audit only; they do not count against coverage.
+188 registered names are not in the spec inventory (vendor-prefixed properties, at-rule descriptors registered as properties, and legacy/compat entries). They are listed for audit only; they do not count against coverage.
 
 <details><summary>Show</summary>
 
@@ -495,6 +495,7 @@ Page-margin at-rules (16, e.g. `@top-left`) and vendor-prefixed at-rules are gro
 - `-webkit-touch-callout`
 - `-webkit-user-drag`
 - `-webkit-user-modify`
+- `additive-symbols`
 - `align-tracks`
 - `animation-delay-end`
 - `animation-delay-start`
@@ -516,6 +517,7 @@ Page-margin at-rules (16, e.g. `@top-left`) and vendor-prefixed at-rules are gro
 - `color-rendering`
 - `container-name-computed`
 - `descent-override`
+- `fallback`
 - `font-display`
 - `font-smooth`
 - `glyph-orientation-horizontal`
@@ -534,9 +536,13 @@ Page-margin at-rules (16, e.g. `@top-left`) and vendor-prefixed at-rules are gro
 - `marks`
 - `masonry-auto-flow`
 - `navigation`
+- `negative`
 - `overflow-clip-box`
 - `override-colors`
+- `pad`
 - `position-try-options`
+- `prefix`
+- `range`
 - `scroll-snap-coordinate`
 - `scroll-snap-destination`
 - `scroll-snap-points-x`
@@ -565,7 +571,10 @@ Page-margin at-rules (16, e.g. `@top-left`) and vendor-prefixed at-rules are gro
 - `size`
 - `size-adjust`
 - `src`
+- `suffix`
+- `symbols`
 - `syntax`
+- `system`
 - `text-blink`
 - `text-decoration-skip-inset`
 - `text-edge`

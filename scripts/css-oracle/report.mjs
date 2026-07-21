@@ -1,70 +1,23 @@
 /**
- * Generates the CSS coverage report by diffing the css-grammar registry
- * (registry_dump.exe) against the vendored @webref/css spec inventory.
+ * Generates the CSS coverage report (maintainer-facing: explicit missing
+ * lists) by diffing the css-grammar registry (registry_dump.exe) against
+ * the vendored @webref/css spec inventory. Data loading and derivations
+ * live in scripts/css-oracle/data.mjs, shared with support-page.mjs.
  *
  * Usage: node scripts/css-oracle/report.mjs <registry-dump-file>
  * Output: packages/css-grammar/data/coverage.md (committed; CI checks it is
- * in sync via `make css-oracle` + git diff).
+ * in sync via `make css-oracle-check`).
  */
-import { readFileSync, writeFileSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { writeFileSync } from "node:fs";
+import { loadOracle, pageMargin, coveragePath } from "./data.mjs";
 
-const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
-const dataDir = join(root, "packages", "css-grammar", "data");
-const webref = JSON.parse(readFileSync(join(dataDir, "webref-css.json"), "utf8"));
-
-const dump = readFileSync(process.argv[2], "utf8")
-  .trim()
-  .split("\n")
-  .map((line) => line.split("\t"));
-const registered = (kind) =>
-  new Set(dump.filter(([k]) => k === kind).map(([, name]) => name));
-
-const properties = registered("property");
-const functions = registered("function");
-const mediaFeatures = registered("media-feature");
-
-/* At-rule classification comes from the registry dump (single source of
-   truth: packages/parser/lib/At_rules.re, dumped via registry_dump.ml).
-   Everything below is presentation only: class → status text, plus
-   per-name notes that add nuance without affecting the classification. */
-const atRuleClasses = new Map(
-  dump.filter(([k]) => k === "at-rule").map(([, name, cls]) => [name, cls]),
-);
-const atRuleClassStatus = {
-  atomized: "supported in [%css] and [%styled.global]",
-  "keyframe-extension": "first-class via [%keyframe]",
-  "descriptor-passthrough": "passthrough in [%styled.global]",
-  "global-passthrough": "passthrough in [%styled.global]",
-};
-const atRuleNotes = {
-  "@property": "auto-emitted by the pipeline",
-  "@import": "no position enforcement",
-  "@charset": "no position enforcement",
-  "@namespace": "no position enforcement",
-  "@layer": "block form flattened",
-  "@scope": "flattened",
-  "@counter-style": "descriptors unvalidated",
-  "@font-feature-values": "descriptors unvalidated",
-};
-const atRuleStatus = (name) => {
-  const cls = atRuleClasses.get(name);
-  if (cls === undefined) return "**not supported**";
-  const status = atRuleClassStatus[cls];
-  if (status === undefined) {
-    throw new Error(`unknown at-rule class '${cls}' in registry dump`);
-  }
-  const note = atRuleNotes[name];
-  return note ? `${status} (${note})` : status;
-};
-const pageMargin = new Set([
-  "@top-left-corner", "@top-left", "@top-center", "@top-right",
-  "@top-right-corner", "@bottom-left-corner", "@bottom-left",
-  "@bottom-center", "@bottom-right", "@bottom-right-corner",
-  "@left-top", "@left-middle", "@left-bottom",
-  "@right-top", "@right-middle", "@right-bottom",
-]);
+const {
+  webref, atRuleStatus,
+  stdProps, aliasProps, missing, missingAliases, extra,
+  fnNames, missingFns,
+  specMediaFeatures, missingMedia,
+  specAtRules, handledAtRules,
+} = loadOracle(process.argv[2]);
 
 const lines = [];
 const put = (s = "") => lines.push(s);
@@ -80,19 +33,6 @@ put("`make css-oracle`; refresh the vendored spec data with");
 put("`make css-oracle-update`.");
 put();
 
-/* ---- Properties ---- */
-const specProps = Object.entries(webref.properties);
-const stdProps = specProps.filter(([, v]) => !v.legacyAliasOf);
-const aliasProps = specProps.filter(([, v]) => v.legacyAliasOf);
-const missing = stdProps.filter(([name]) => !properties.has(name));
-const missingAliases = aliasProps.filter(([name]) => !properties.has(name));
-const extra = [...properties].filter(
-  (name) =>
-    !Object.hasOwn(webref.properties, name) &&
-    !name.startsWith("media-") &&
-    name !== "--*",
-);
-
 put("## Summary");
 put();
 put("| Category | Spec | Covered | Missing |");
@@ -107,24 +47,16 @@ put(
     aliasProps.length - missingAliases.length
   } | ${missingAliases.length} |`,
 );
-const fnNames = webref.functions;
-const missingFns = fnNames.filter((f) => !functions.has(f));
 put(
   `| Functions | ${fnNames.length} | ${fnNames.length - missingFns.length} | ${
     missingFns.length
   } |`,
 );
-const specMediaFeatures = (webref.atrules["@media"]?.descriptors ?? []).sort();
-const missingMedia = specMediaFeatures.filter((f) => !mediaFeatures.has(f));
 put(
   `| Media features (name inventory) | ${specMediaFeatures.length} | ${
     specMediaFeatures.length - missingMedia.length
   } | ${missingMedia.length} |`,
 );
-const specAtRules = Object.keys(webref.atrules).filter(
-  (a) => !pageMargin.has(a) && !a.startsWith("@-"),
-);
-const handledAtRules = specAtRules.filter((a) => atRuleClasses.has(a));
 put(
   `| At-rules | ${specAtRules.length} | ${handledAtRules.length} | ${
     specAtRules.length - handledAtRules.length
@@ -165,7 +97,7 @@ put("## At-rules");
 put();
 put("| At-rule | Status |");
 put("|---|---|");
-for (const name of specAtRules.sort()) {
+for (const name of specAtRules) {
   put(`| \`${name}\` | ${atRuleStatus(name)} |`);
 }
 put();
@@ -186,7 +118,7 @@ for (const name of extra.sort()) put(`- \`${name}\``);
 put();
 put("</details>");
 
-writeFileSync(join(dataDir, "coverage.md"), lines.join("\n") + "\n");
+writeFileSync(coveragePath, lines.join("\n") + "\n");
 console.log(
   `coverage: ${stdProps.length - missing.length}/${stdProps.length} standard properties, ` +
     `${missing.length} missing; report at packages/css-grammar/data/coverage.md`,

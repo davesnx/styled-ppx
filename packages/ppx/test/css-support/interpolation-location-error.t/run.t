@@ -24,10 +24,12 @@ If this test fail means that the module is not in sync with the ppx
             | `flow
             | `flowRoot
             | `grid
+            | `gridLanes
             | `inline
             | `inlineBlock
             | `inlineFlex
             | `inlineGrid
+            | `inlineGridLanes
             | `inlineTable
             | `listItem
             | `mozBox

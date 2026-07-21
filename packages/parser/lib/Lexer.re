@@ -744,8 +744,8 @@ let rec consume_token = lexbuf => {
     | starts_with_a_valid_escape =>
       Sedlexing.rollback(lexbuf);
       /* CSS Syntax 3, 4.3.1: the hash is type "id" if the next code points
-         would start an identifier -- this includes escapes (`#\31 a`) and
-         leading hyphens (`#-a`), not just identifier-start code points. */
+         would start an identifier. Escapes (`#\31 a`) and leading hyphens
+         (`#-a`) count, in addition to identifier-start code points. */
       let kind =
         check_if_three_codepoints_would_start_an_identifier(lexbuf)
           ? `ID : `UNRESTRICTED;

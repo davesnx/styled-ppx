@@ -3,8 +3,9 @@ open Support
 
 module Property_vertical_align =
   [%spec_module
-  "'baseline' | 'sub' | 'super' | 'text-top' | 'text-bottom' | 'middle' | \
-   'top' | 'bottom' | <extended-percentage> | <extended-length>",
+  "'first' | 'last' | 'baseline' | 'sub' | 'super' | 'text-top' | \
+   'text-bottom' | 'middle' | 'top' | 'bottom' | <extended-percentage> | \
+   <extended-length>",
   (module Css_types.VerticalAlign)]
 
 let property_vertical_align : property_vertical_align Rule.rule =
