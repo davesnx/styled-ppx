@@ -9,15 +9,15 @@ merged styles cannot overwrite each other.
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css "@property --backgroundColor-ov3le6{syntax:\"*\";inherits:false;}"];
-  [@css "@property --backgroundColor-7yjmr3{syntax:\"*\";inherits:false;}"];
-  [@css ".css-160vrad-common{background-color:var(--backgroundColor-ov3le6);}"];
+  [@css "@property --backgroundColor-1de3e3m{syntax:\"*\";inherits:false;}"];
+  [@css ".css-160vrad-common{background-color:var(--backgroundColor-ov3le6)}"];
   [@css
-    ".css-10a6meq-clickable:hover{background-color:var(--backgroundColor-7yjmr3);}"
+    ".css-6rmg3n-clickable:hover{background-color:var(--backgroundColor-1de3e3m)}"
   ];
   [@css.bindings
     [
       ("Output.common", "css-160vrad-common"),
-      ("Output.clickable", "css-10a6meq-clickable"),
+      ("Output.clickable", "css-6rmg3n-clickable"),
     ]
   ];
   let common = backgroundColor =>
@@ -29,8 +29,11 @@ merged styles cannot overwrite each other.
     );
   let clickable = backgroundColor =>
     CSS.make(
-      "css-10a6meq-clickable",
+      "css-6rmg3n-clickable",
       [
-        ("--backgroundColor-7yjmr3", CSS.Types.Color.toString(backgroundColor)),
+        (
+          "--backgroundColor-1de3e3m",
+          CSS.Types.Color.toString(backgroundColor),
+        ),
       ],
     );

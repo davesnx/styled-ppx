@@ -141,24 +141,7 @@ module Css_transform = {
       ctx.dynamic_vars := [dynamic_var, ...ctx.dynamic_vars^];
     };
 
-  /* Detect a `$(name)` interpolation anywhere in a component-value list,
-     recursing into `Paren_block`, `Bracket_block`, and `Function` bodies.
-     The naive top-level check misses interpolations nested inside those
-     groupings (e.g. `calc($(a) + 1px)` or `(max-width: $(bp))`). */
-  let rec component_value_has_interpolation = (cv: component_value) =>
-    switch (cv) {
-    | Variable(_, _) => true
-    | Paren_block(values)
-    | Bracket_block(values) => component_value_list_has_interpolation(values)
-    | Function({ body: (values, _), _ }) =>
-      component_value_list_has_interpolation(values)
-    | _ => false
-    }
-  and component_value_list_has_interpolation = values =>
-    List.exists(
-      ((cv, _loc)) => component_value_has_interpolation(cv),
-      values,
-    );
+  let component_value_list_has_interpolation = Styled_ppx_css_parser.Ast.component_value_list_has_interpolation;
 
   /* A declaration hoists a custom property iff its *value* carries a
      `$(…)` interpolation. Selector-position interpolations (`.$(name)`)
@@ -518,6 +501,16 @@ module Css_transform = {
       (ctx, pseudo: pseudo_selector): pseudo_selector => {
     switch (pseudo) {
     | Pseudoelement(_) => pseudo
+    | PseudoelementFunction({ name, payload: (selector_list, payload_loc) }) =>
+      let transformed =
+        List.map(
+          ((sel, sel_loc)) => (transform_selector(ctx, sel), sel_loc),
+          selector_list,
+        );
+      PseudoelementFunction({
+        name,
+        payload: (transformed, payload_loc),
+      });
     | Pseudoclass(kind) =>
       Pseudoclass(transform_pseudoclass_kind(ctx, kind))
     };
@@ -543,6 +536,14 @@ module Css_transform = {
         | Nth(_) => nth_payload
         | NthSelector(complex_selectors) =>
           NthSelector(
+            List.map(
+              c => transform_complex_selector(ctx, c),
+              complex_selectors,
+            ),
+          )
+        | NthOf(nth, complex_selectors) =>
+          NthOf(
+            nth,
             List.map(
               c => transform_complex_selector(ctx, c),
               complex_selectors,
@@ -1024,13 +1025,7 @@ module Css_transform = {
             message,
           );
         let is_conditional_group_rule =
-          switch (String.lowercase_ascii(name)) {
-          | "media"
-          | "supports"
-          | "container"
-          | "starting-style" => true
-          | _ => false
-          };
+          Styled_ppx_css_parser.At_rules.is_conditional_group(name);
         switch (block) {
         | _ when String.lowercase_ascii(name) == "keyframes" =>
           raise_at_rule_error(
@@ -1445,6 +1440,33 @@ let push_global =
     | Declaration(_) => ()
     };
   List.iter(reject_parentless_ampersand, rules);
+
+  /* A conditional group rule without a block (`@media (...);`) is invalid
+     CSS that browsers drop silently; mirror the `[%css]` error instead of
+     shipping dead output. Statement at-rules that ARE valid without a
+     block (`@import`, `@layer a, b;`, ...) pass through. */
+  let rec reject_blockless_conditional = rule =>
+    switch (rule) {
+    | At_rule({ name: (name, name_loc), block: Empty, _ })
+        when Styled_ppx_css_parser.At_rules.is_conditional_group(name) =>
+      Ppxlib.Location.raise_errorf(
+        ~loc=
+          Styled_ppx_css_parser.Parser_location.to_file_location(
+            ~source_position_start,
+            name_loc,
+          ),
+        "At-rule @%s requires a block (`@%s ... { ... }`)",
+        name,
+        name,
+      )
+    | At_rule({ block: Rule_list((inner, _)), _ })
+    | At_rule({ block: Stylesheet((inner, _)), _ })
+    | Style_rule({ block: (inner, _), _ }) =>
+      List.iter(reject_blockless_conditional, inner)
+    | At_rule({ block: Empty, _ })
+    | Declaration(_) => ()
+    };
+  List.iter(reject_blockless_conditional, rules);
 
   /* Flatten CSS-nesting before rendering (literal nesting only works in
      modern browsers). Same order-preserving flattener as `[%css]`;

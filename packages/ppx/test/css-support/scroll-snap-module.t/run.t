@@ -15,105 +15,105 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1dmoiv8{scroll-margin:0px;}"];
-  [@css ".css-37qcuf{scroll-margin:6px 5px;}"];
-  [@css ".css-1gcxymj{scroll-margin:10px 20px 30px;}"];
-  [@css ".css-1uau2fa{scroll-margin:10px 20px 30px 40px;}"];
-  [@css ".css-14b13tb{scroll-margin:20px 3em 1in 5rem;}"];
-  [@css ".css-1l59mki{scroll-margin:calc(2px);}"];
-  [@css ".css-sz3nfx{scroll-margin:calc(3 * 25px);}"];
-  [@css ".css-s1600i{scroll-margin:calc(3 * 25px) 5px 10em calc(1vw - 5px);}"];
-  [@css ".css-lbu6my{scroll-margin-block:10px;}"];
-  [@css ".css-ej4sq4{scroll-margin-block:10px 10px;}"];
-  [@css ".css-1n715zm{scroll-margin-block-end:10px;}"];
-  [@css ".css-1x04bj5{scroll-margin-block-start:10px;}"];
-  [@css ".css-jgvqxc{scroll-margin-bottom:10px;}"];
-  [@css ".css-1y612qs{scroll-margin-inline:10px;}"];
-  [@css ".css-1l5mvdw{scroll-margin-inline:10px 10px;}"];
-  [@css ".css-14fsnad{scroll-margin-inline-start:10px;}"];
-  [@css ".css-789xfm{scroll-margin-inline-end:10px;}"];
-  [@css ".css-17lfvv1{scroll-margin-left:10px;}"];
-  [@css ".css-osla2e{scroll-margin-right:10px;}"];
-  [@css ".css-1c0aols{scroll-margin-top:10px;}"];
-  [@css ".css-825nxv{scroll-padding:auto;}"];
-  [@css ".css-mjhj9v{scroll-padding:0px;}"];
-  [@css ".css-15b5af6{scroll-padding:6px 5px;}"];
-  [@css ".css-h1ms3y{scroll-padding:10px 20px 30px;}"];
-  [@css ".css-a8alk9{scroll-padding:10px 20px 30px 40px;}"];
-  [@css ".css-1gl7x4v{scroll-padding:10px auto 30px auto;}"];
-  [@css ".css-odywb5{scroll-padding:10%;}"];
-  [@css ".css-1a3doub{scroll-padding:20% 3em 1in 5rem;}"];
-  [@css ".css-1jaicma{scroll-padding:calc(2px);}"];
-  [@css ".css-mps866{scroll-padding:calc(50%);}"];
-  [@css ".css-in6ps6{scroll-padding:calc(3 * 25px);}"];
-  [@css ".css-1g6m7if{scroll-padding:calc(3 * 25px) 5px 10% calc(10% - 5px);}"];
-  [@css ".css-1d13npc{scroll-padding-block:10px;}"];
-  [@css ".css-13l7n61{scroll-padding-block:50%;}"];
-  [@css ".css-1cvn72y{scroll-padding-block:10px 50%;}"];
-  [@css ".css-1aibmh3{scroll-padding-block:50% 50%;}"];
-  [@css ".css-4na4an{scroll-padding-block-end:10px;}"];
-  [@css ".css-1i4wq8b{scroll-padding-block-end:50%;}"];
-  [@css ".css-ihtyb1{scroll-padding-block-start:10px;}"];
-  [@css ".css-vrkly5{scroll-padding-block-start:50%;}"];
-  [@css ".css-qh568d{scroll-padding-bottom:10px;}"];
-  [@css ".css-tsczmj{scroll-padding-bottom:50%;}"];
-  [@css ".css-7dhvee{scroll-padding-inline:10px;}"];
-  [@css ".css-196178e{scroll-padding-inline:50%;}"];
-  [@css ".css-4qfqw4{scroll-padding-inline:10px 50%;}"];
-  [@css ".css-84jitd{scroll-padding-inline:50% 50%;}"];
-  [@css ".css-1txxv1o{scroll-padding-inline-end:10px;}"];
-  [@css ".css-p4ybsb{scroll-padding-inline-end:50%;}"];
-  [@css ".css-17p21xl{scroll-padding-inline-start:10px;}"];
-  [@css ".css-1mws74z{scroll-padding-inline-start:50%;}"];
-  [@css ".css-1d2mm5y{scroll-padding-left:10px;}"];
-  [@css ".css-b6jsh3{scroll-padding-left:50%;}"];
-  [@css ".css-c83z1d{scroll-padding-right:10px;}"];
-  [@css ".css-1p9pbq8{scroll-padding-right:50%;}"];
-  [@css ".css-1ri05tp{scroll-padding-top:10px;}"];
-  [@css ".css-1njo8nm{scroll-padding-top:50%;}"];
-  [@css ".css-6xhsyj{scroll-snap-align:none;}"];
-  [@css ".css-1pgpqsp{scroll-snap-align:start;}"];
-  [@css ".css-niic9p{scroll-snap-align:end;}"];
-  [@css ".css-alf1ss{scroll-snap-align:center;}"];
-  [@css ".css-e0kzni{scroll-snap-align:none start;}"];
-  [@css ".css-zivewf{scroll-snap-align:end center;}"];
-  [@css ".css-xwgzch{scroll-snap-align:center start;}"];
-  [@css ".css-zo5icl{scroll-snap-align:end none;}"];
-  [@css ".css-1pbkijw{scroll-snap-align:center center;}"];
-  [@css ".css-1ljahur{scroll-snap-stop:normal;}"];
-  [@css ".css-tvqcsf{scroll-snap-stop:always;}"];
+  [@css ".css-1dmoiv8{scroll-margin:0px}"];
+  [@css ".css-37qcuf{scroll-margin:6px 5px}"];
+  [@css ".css-1gcxymj{scroll-margin:10px 20px 30px}"];
+  [@css ".css-1uau2fa{scroll-margin:10px 20px 30px 40px}"];
+  [@css ".css-14b13tb{scroll-margin:20px 3em 1in 5rem}"];
+  [@css ".css-1l59mki{scroll-margin:calc(2px)}"];
+  [@css ".css-sz3nfx{scroll-margin:calc(3 * 25px)}"];
+  [@css ".css-s1600i{scroll-margin:calc(3 * 25px) 5px 10em calc(1vw - 5px)}"];
+  [@css ".css-lbu6my{scroll-margin-block:10px}"];
+  [@css ".css-ej4sq4{scroll-margin-block:10px 10px}"];
+  [@css ".css-1n715zm{scroll-margin-block-end:10px}"];
+  [@css ".css-1x04bj5{scroll-margin-block-start:10px}"];
+  [@css ".css-jgvqxc{scroll-margin-bottom:10px}"];
+  [@css ".css-1y612qs{scroll-margin-inline:10px}"];
+  [@css ".css-1l5mvdw{scroll-margin-inline:10px 10px}"];
+  [@css ".css-14fsnad{scroll-margin-inline-start:10px}"];
+  [@css ".css-789xfm{scroll-margin-inline-end:10px}"];
+  [@css ".css-17lfvv1{scroll-margin-left:10px}"];
+  [@css ".css-osla2e{scroll-margin-right:10px}"];
+  [@css ".css-1c0aols{scroll-margin-top:10px}"];
+  [@css ".css-825nxv{scroll-padding:auto}"];
+  [@css ".css-mjhj9v{scroll-padding:0px}"];
+  [@css ".css-15b5af6{scroll-padding:6px 5px}"];
+  [@css ".css-h1ms3y{scroll-padding:10px 20px 30px}"];
+  [@css ".css-a8alk9{scroll-padding:10px 20px 30px 40px}"];
+  [@css ".css-1gl7x4v{scroll-padding:10px auto 30px auto}"];
+  [@css ".css-odywb5{scroll-padding:10%}"];
+  [@css ".css-1a3doub{scroll-padding:20% 3em 1in 5rem}"];
+  [@css ".css-1jaicma{scroll-padding:calc(2px)}"];
+  [@css ".css-mps866{scroll-padding:calc(50%)}"];
+  [@css ".css-in6ps6{scroll-padding:calc(3 * 25px)}"];
+  [@css ".css-1g6m7if{scroll-padding:calc(3 * 25px) 5px 10% calc(10% - 5px)}"];
+  [@css ".css-1d13npc{scroll-padding-block:10px}"];
+  [@css ".css-13l7n61{scroll-padding-block:50%}"];
+  [@css ".css-1cvn72y{scroll-padding-block:10px 50%}"];
+  [@css ".css-1aibmh3{scroll-padding-block:50% 50%}"];
+  [@css ".css-4na4an{scroll-padding-block-end:10px}"];
+  [@css ".css-1i4wq8b{scroll-padding-block-end:50%}"];
+  [@css ".css-ihtyb1{scroll-padding-block-start:10px}"];
+  [@css ".css-vrkly5{scroll-padding-block-start:50%}"];
+  [@css ".css-qh568d{scroll-padding-bottom:10px}"];
+  [@css ".css-tsczmj{scroll-padding-bottom:50%}"];
+  [@css ".css-7dhvee{scroll-padding-inline:10px}"];
+  [@css ".css-196178e{scroll-padding-inline:50%}"];
+  [@css ".css-4qfqw4{scroll-padding-inline:10px 50%}"];
+  [@css ".css-84jitd{scroll-padding-inline:50% 50%}"];
+  [@css ".css-1txxv1o{scroll-padding-inline-end:10px}"];
+  [@css ".css-p4ybsb{scroll-padding-inline-end:50%}"];
+  [@css ".css-17p21xl{scroll-padding-inline-start:10px}"];
+  [@css ".css-1mws74z{scroll-padding-inline-start:50%}"];
+  [@css ".css-1d2mm5y{scroll-padding-left:10px}"];
+  [@css ".css-b6jsh3{scroll-padding-left:50%}"];
+  [@css ".css-c83z1d{scroll-padding-right:10px}"];
+  [@css ".css-1p9pbq8{scroll-padding-right:50%}"];
+  [@css ".css-1ri05tp{scroll-padding-top:10px}"];
+  [@css ".css-1njo8nm{scroll-padding-top:50%}"];
+  [@css ".css-6xhsyj{scroll-snap-align:none}"];
+  [@css ".css-1pgpqsp{scroll-snap-align:start}"];
+  [@css ".css-niic9p{scroll-snap-align:end}"];
+  [@css ".css-alf1ss{scroll-snap-align:center}"];
+  [@css ".css-e0kzni{scroll-snap-align:none start}"];
+  [@css ".css-zivewf{scroll-snap-align:end center}"];
+  [@css ".css-xwgzch{scroll-snap-align:center start}"];
+  [@css ".css-zo5icl{scroll-snap-align:end none}"];
+  [@css ".css-1pbkijw{scroll-snap-align:center center}"];
+  [@css ".css-1ljahur{scroll-snap-stop:normal}"];
+  [@css ".css-tvqcsf{scroll-snap-stop:always}"];
   [@css
-    ".css-17nu1g1{-webkit-scroll-snap-type:none;-ms-scroll-snap-type:none;scroll-snap-type:none;}"
+    ".css-17nu1g1{-webkit-scroll-snap-type:none;-ms-scroll-snap-type:none;scroll-snap-type:none}"
   ];
   [@css
-    ".css-1i6igf3{-webkit-scroll-snap-type:x mandatory;-ms-scroll-snap-type:x mandatory;scroll-snap-type:x mandatory;}"
+    ".css-1i6igf3{-webkit-scroll-snap-type:x mandatory;-ms-scroll-snap-type:x mandatory;scroll-snap-type:x mandatory}"
   ];
   [@css
-    ".css-sj8bwf{-webkit-scroll-snap-type:y mandatory;-ms-scroll-snap-type:y mandatory;scroll-snap-type:y mandatory;}"
+    ".css-sj8bwf{-webkit-scroll-snap-type:y mandatory;-ms-scroll-snap-type:y mandatory;scroll-snap-type:y mandatory}"
   ];
   [@css
-    ".css-b4yx25{-webkit-scroll-snap-type:block mandatory;-ms-scroll-snap-type:block mandatory;scroll-snap-type:block mandatory;}"
+    ".css-b4yx25{-webkit-scroll-snap-type:block mandatory;-ms-scroll-snap-type:block mandatory;scroll-snap-type:block mandatory}"
   ];
   [@css
-    ".css-vwe0h2{-webkit-scroll-snap-type:inline mandatory;-ms-scroll-snap-type:inline mandatory;scroll-snap-type:inline mandatory;}"
+    ".css-vwe0h2{-webkit-scroll-snap-type:inline mandatory;-ms-scroll-snap-type:inline mandatory;scroll-snap-type:inline mandatory}"
   ];
   [@css
-    ".css-1262jo5{-webkit-scroll-snap-type:both mandatory;-ms-scroll-snap-type:both mandatory;scroll-snap-type:both mandatory;}"
+    ".css-1262jo5{-webkit-scroll-snap-type:both mandatory;-ms-scroll-snap-type:both mandatory;scroll-snap-type:both mandatory}"
   ];
   [@css
-    ".css-bsl9bg{-webkit-scroll-snap-type:x proximity;-ms-scroll-snap-type:x proximity;scroll-snap-type:x proximity;}"
+    ".css-bsl9bg{-webkit-scroll-snap-type:x proximity;-ms-scroll-snap-type:x proximity;scroll-snap-type:x proximity}"
   ];
   [@css
-    ".css-yei18o{-webkit-scroll-snap-type:y proximity;-ms-scroll-snap-type:y proximity;scroll-snap-type:y proximity;}"
+    ".css-yei18o{-webkit-scroll-snap-type:y proximity;-ms-scroll-snap-type:y proximity;scroll-snap-type:y proximity}"
   ];
   [@css
-    ".css-vjeyk4{-webkit-scroll-snap-type:block proximity;-ms-scroll-snap-type:block proximity;scroll-snap-type:block proximity;}"
+    ".css-vjeyk4{-webkit-scroll-snap-type:block proximity;-ms-scroll-snap-type:block proximity;scroll-snap-type:block proximity}"
   ];
   [@css
-    ".css-xxr31t{-webkit-scroll-snap-type:inline proximity;-ms-scroll-snap-type:inline proximity;scroll-snap-type:inline proximity;}"
+    ".css-xxr31t{-webkit-scroll-snap-type:inline proximity;-ms-scroll-snap-type:inline proximity;scroll-snap-type:inline proximity}"
   ];
   [@css
-    ".css-sfvwfl{-webkit-scroll-snap-type:both proximity;-ms-scroll-snap-type:both proximity;scroll-snap-type:both proximity;}"
+    ".css-sfvwfl{-webkit-scroll-snap-type:both proximity;-ms-scroll-snap-type:both proximity;scroll-snap-type:both proximity}"
   ];
   
   CSS.make("css-1dmoiv8", []);

@@ -31,9 +31,11 @@ let rec contains_ampersand = (selector: selector) => {
 }
 and pseudo_selector_contains_ampersand =
   fun
-  | Pseudoclass(Function({ payload: (selector_list, _), _ })) =>
+  | Pseudoclass(Function({ payload: (selector_list, _), _ }))
+  | PseudoelementFunction({ payload: (selector_list, _), _ }) =>
     selector_list |> List.map(fst) |> List.exists(contains_ampersand)
-  | Pseudoclass(NthFunction({ payload: (NthSelector(csl), _), _ })) =>
+  | Pseudoclass(NthFunction({ payload: (NthSelector(csl), _), _ }))
+  | Pseudoclass(NthFunction({ payload: (NthOf(_, csl), _), _ })) =>
     csl |> List.exists(cs => contains_ampersand(ComplexSelector(cs)))
   | _ => false;
 
@@ -41,6 +43,9 @@ let is_sibling_combinator =
   fun
   | Selector_adjacent_sibling
   | Selector_general_sibling => true
+  /* `||` targets a column, a different element from the cell subject, so
+     it escapes the `&` subtree the same way sibling combinators do. */
+  | Selector_column => true
   | Selector_descendant
   | Selector_child => false;
 
@@ -83,6 +88,7 @@ let rec flatten_selector_chain =
 let pseudo_selector_is_element =
   fun
   | Pseudoelement(_) => true
+  | PseudoelementFunction(_) => true
   | Pseudoclass(PseudoIdent(name)) =>
     switch (String.lowercase_ascii(name)) {
     | "before"
@@ -437,6 +443,19 @@ and pseudo_selector_replace_ampersand = (replaced_with: selector, selector) => {
         payload: (selector_list, selector_list_loc),
       }),
     );
+  | PseudoelementFunction({
+      name,
+      payload: (selector_list, selector_list_loc),
+    }) =>
+    let selector_list =
+      selector_list
+      |> List.map(((selector, loc)) =>
+           (replace_ampersand(replaced_with, selector), loc)
+         );
+    PseudoelementFunction({
+      name,
+      payload: (selector_list, selector_list_loc),
+    });
   | Pseudoclass(
       NthFunction({
         name,
@@ -464,6 +483,31 @@ and pseudo_selector_replace_ampersand = (replaced_with: selector, selector) => {
       NthFunction({
         name,
         payload: (NthSelector(complex_selector_list), payload_loc),
+      }),
+    );
+  | Pseudoclass(
+      NthFunction({
+        name,
+        payload: (NthOf(nth, complex_selector_list), payload_loc),
+      }),
+    ) =>
+    let complex_selector_list =
+      complex_selector_list
+      |> List.map(complex_selector =>
+           replace_ampersand(
+             replaced_with,
+             ComplexSelector(complex_selector),
+           )
+         )
+      |> List.map(
+           fun
+           | ComplexSelector(complex_selector) => complex_selector
+           | other => Selector(other),
+         );
+    Pseudoclass(
+      NthFunction({
+        name,
+        payload: (NthOf(nth, complex_selector_list), payload_loc),
       }),
     );
   | sel => sel

@@ -20,35 +20,35 @@ Comprehensive test for cx2 interpolation with various property types
   [@css "@property --spacingVar-15s0ecx{syntax:\"*\";inherits:false;}"];
   [@css "@property --spacingVar-1m50b62{syntax:\"*\";inherits:false;}"];
   [@css "@property --width-18c1xss{syntax:\"*\";inherits:false;}"];
-  [@css ".css-b8f0pi-test1{width:var(--lengthVar-1fwod6p);}"];
-  [@css ".css-b8f0pi-test1{height:var(--lengthVar-5g6bk9);}"];
-  [@css ".css-b8f0pi-test1{min-width:var(--lengthVar-1qqvx43);}"];
-  [@css ".css-b8f0pi-test1{max-width:var(--lengthVar-11faw47);}"];
-  [@css ".css-1swajk7-test2{margin-top:var(--lengthVar-oy21bt);}"];
-  [@css ".css-1swajk7-test2{margin-bottom:var(--lengthVar-oy21bt);}"];
-  [@css ".css-1swajk7-test2{padding-left:var(--lengthVar-1lpa833);}"];
-  [@css ".css-1swajk7-test2{padding-right:var(--lengthVar-1lpa833);}"];
-  [@css ".css-1i6vyy6-test3{gap:var(--lengthVar-vh1osb);}"];
-  [@css ".css-1i6vyy6-test3{row-gap:var(--lengthVar-vh1osb);}"];
+  [@css ".css-b8f0pi-test1{width:var(--lengthVar-1fwod6p)}"];
+  [@css ".css-b8f0pi-test1{height:var(--lengthVar-5g6bk9)}"];
+  [@css ".css-b8f0pi-test1{min-width:var(--lengthVar-1qqvx43)}"];
+  [@css ".css-b8f0pi-test1{max-width:var(--lengthVar-11faw47)}"];
+  [@css ".css-1swajk7-test2{margin-top:var(--lengthVar-oy21bt)}"];
+  [@css ".css-1swajk7-test2{margin-bottom:var(--lengthVar-oy21bt)}"];
+  [@css ".css-1swajk7-test2{padding-left:var(--lengthVar-1lpa833)}"];
+  [@css ".css-1swajk7-test2{padding-right:var(--lengthVar-1lpa833)}"];
+  [@css ".css-1i6vyy6-test3{gap:var(--lengthVar-vh1osb)}"];
+  [@css ".css-1i6vyy6-test3{row-gap:var(--lengthVar-vh1osb)}"];
   [@css
-    ".css-1i6vyy6-test3{-webkit-column-gap:var(--lengthVar-vh1osb);column-gap:var(--lengthVar-vh1osb);}"
+    ".css-1i6vyy6-test3{-webkit-column-gap:var(--lengthVar-vh1osb);column-gap:var(--lengthVar-vh1osb)}"
   ];
-  [@css ".css-1vzwmoy-test4{color:var(--colorVar-14sye4i);}"];
-  [@css ".css-1vzwmoy-test4{background-color:var(--colorVar-14sye4i);}"];
-  [@css ".css-1vzwmoy-test4{border-top-color:var(--colorVar-14sye4i);}"];
-  [@css ".css-ycpa9s-test5{flex-basis:var(--flexBasisVar-16vl5bp);}"];
-  [@css ".css-1knt7y9-test6{grid-row-start:var(--gridLineVar-1qxvc00);}"];
-  [@css ".css-1knt7y9-test6{grid-column-end:var(--gridLineVar-175omdk);}"];
-  [@css ".css-1d6x35p-test7{top:var(--topVar-1iqysbe);}"];
-  [@css ".css-1d6x35p-test7{bottom:var(--topVar-10dkp5m);}"];
-  [@css ".css-1bkxgpr-test8{z-index:var(--zIndexVar-osv02l);}"];
-  [@css ".css-1bezkxi-test9{border-top-width:var(--borderWidthVar-1nwhzbd);}"];
-  [@css ".css-1bezkxi-test9{border-width:var(--borderWidthVar-1nwhzbd);}"];
-  [@css ".css-zoi7e9-test10{letter-spacing:var(--spacingVar-15s0ecx);}"];
-  [@css ".css-zoi7e9-test10{word-spacing:var(--spacingVar-1m50b62);}"];
-  [@css ".css-1dfkyy8-test11{width:var(--width-18c1xss);}"];
-  [@css ".css-73nay0-test11{height:100px;}"];
-  [@css ".css-tokvmb-test11{color:red;}"];
+  [@css ".css-1vzwmoy-test4{color:var(--colorVar-14sye4i)}"];
+  [@css ".css-1vzwmoy-test4{background-color:var(--colorVar-14sye4i)}"];
+  [@css ".css-1vzwmoy-test4{border-top-color:var(--colorVar-14sye4i)}"];
+  [@css ".css-ycpa9s-test5{flex-basis:var(--flexBasisVar-16vl5bp)}"];
+  [@css ".css-1knt7y9-test6{grid-row-start:var(--gridLineVar-1qxvc00)}"];
+  [@css ".css-1knt7y9-test6{grid-column-end:var(--gridLineVar-175omdk)}"];
+  [@css ".css-1d6x35p-test7{top:var(--topVar-1iqysbe)}"];
+  [@css ".css-1d6x35p-test7{bottom:var(--topVar-10dkp5m)}"];
+  [@css ".css-1bkxgpr-test8{z-index:var(--zIndexVar-osv02l)}"];
+  [@css ".css-1bezkxi-test9{border-top-width:var(--borderWidthVar-1nwhzbd)}"];
+  [@css ".css-1bezkxi-test9{border-width:var(--borderWidthVar-1nwhzbd)}"];
+  [@css ".css-zoi7e9-test10{letter-spacing:var(--spacingVar-15s0ecx)}"];
+  [@css ".css-zoi7e9-test10{word-spacing:var(--spacingVar-1m50b62)}"];
+  [@css ".css-1dfkyy8-test11{width:var(--width-18c1xss)}"];
+  [@css ".css-73nay0-test11{height:100px}"];
+  [@css ".css-tokvmb-test11{color:red}"];
   [@css.bindings
     [
       ("Output.test1", "css-b8f0pi-test1"),

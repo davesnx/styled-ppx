@@ -240,6 +240,81 @@ let success_tests =
       ],
     ),
     ({|nth-child(|}, [NTH_FUNCTION("nth-child")]),
+    /* Spec-derived vectors (CSS Syntax 3). Inputs adapted from the cascade
+       project (https://github.com/samoht/cascade, ISC License); expected
+       tokens are styled-ppx's own. */
+    /* 2.1: escapes are 1-6 hex digits plus one optional whitespace */
+    ({|\26 B|}, [IDENT("&B")]),
+    ({|\000026B|}, [IDENT("&B")]),
+    ({|\31 0|}, [IDENT("10")]),
+    ({|\0000310|}, [IDENT("10")]),
+    ({|\26#id|}, [IDENT("&"), HASH(("id", `ID))]),
+    ({|\26 #id|}, [IDENT("&"), HASH(("id", `ID))]),
+    ({|\!|}, [IDENT("!")]),
+    ({|-\!|}, [IDENT("-!")]),
+    ({|a\ b|}, [IDENT("a b")]),
+    /* 4.3.1: hash type is "id" when the next code points would start an
+       identifier, including escapes and leading hyphens */
+    ({|#\31 a|}, [HASH(("1a", `ID))]),
+    ({|#-abc|}, [HASH(("-abc", `ID))]),
+    ({|#--x|}, [HASH(("--x", `ID))]),
+    /* 4.1, 4.3.11: unicode-range */
+    ({|u+0-7f|}, [UNICODE_RANGE("u+0-7f")]),
+    ({|U+4??|}, [UNICODE_RANGE("U+4??")]),
+    ({|U+10????|}, [UNICODE_RANGE("U+10????")]),
+    ({|U+??????|}, [UNICODE_RANGE("U+??????")]),
+    ({|U+1234567|}, [UNICODE_RANGE("U+123456"), NUMBER(7.)]),
+    ({|u+???????|}, [UNICODE_RANGE("u+??????"), DELIM("?")]),
+    ({|u+-1|}, [IDENT("u"), DELIM("+"), NUMBER(-1.)]),
+    ({|u+|}, [IDENT("u"), DELIM("+")]),
+    ({|u+g|}, [IDENT("u"), DELIM("+"), IDENT("g")]),
+    /* 4.3.3: numeric tokens, incl. signed fractions without a leading digit */
+    ({|+10|}, [NUMBER(10.)]),
+    ({|+.5|}, [NUMBER(0.5)]),
+    ({|-.5|}, [NUMBER(-0.5)]),
+    ({|10.0|}, [NUMBER(10.)]),
+    ({|1e+2|}, [NUMBER(100.)]),
+    ({|1e-2|}, [NUMBER(0.01)]),
+    ({|4e5px|}, [DIMENSION((400000., "px"))]),
+    ({|1e|}, [DIMENSION((1., "e"))]),
+    ({|1e+|}, [DIMENSION((1., "e")), DELIM("+")]),
+    ({|.e1|}, [DELIM("."), IDENT("e1")]),
+    /* 4.3.2: comments are consumed between tokens without synthesizing
+       whitespace */
+    ({|a/*x*/b|}, [IDENT("a"), IDENT("b")]),
+    ({|1/**/2|}, [NUMBER(1.), NUMBER(2.)]),
+    ({|1px/**/solid|}, [DIMENSION((1., "px")), IDENT("solid")]),
+    ({|/* one *//* two */a|}, [IDENT("a")]),
+    /* 9.4: token boundary edges */
+    ({|@media@supports|}, [AT_RULE("media"), AT_RULE("supports")]),
+    ({|#id.class|}, [HASH(("id", `ID)), DELIM("."), IDENT("class")]),
+    ({|--|}, [IDENT("--")]),
+    ({|--x|}, [IDENT("--x")]),
+    /* 4.3: CDO/CDC tokens */
+    ({|<!--|}, [CDO]),
+    ({|-->|}, [CDC]),
+    ({|<!---->|}, [CDO, CDC]),
+    ({|-->--|}, [CDC, IDENT("--")]),
+    (
+      {|a<!--b-->c|},
+      [IDENT("a"), CDO, IDENT("b--"), DELIM(">"), IDENT("c")],
+    ),
+    /* Selectors 4: column combinator */
+    ({|a||b|}, [IDENT("a"), DELIM("||"), IDENT("b")]),
+    ({|foo|=bar|}, [IDENT("foo"), DELIM("|"), DELIM("="), IDENT("bar")]),
+    /* 4.3.1: hash names keep a leading dash (`check` backtrack regression:
+       a nested switch%sedlex used to clobber the mark and eat the `-`) */
+    ({|#-5|}, [HASH(("-5", `UNRESTRICTED))]),
+    ({|#-|}, [HASH(("-", `UNRESTRICTED))]),
+    /* 4.3.6: url tokens */
+    ({|url(  a.png  )|}, [URL("a.png")]),
+    ({|url(a\ b.png)|}, [URL("a b.png")]),
+    ({|url(a)url(b)|}, [URL("a"), URL("b")]),
+    ({|url(foo)/**/url(bar)|}, [URL("foo"), URL("bar")]),
+    /* 4.3.5: string tokens */
+    ({|"a\26 b"|}, [STRING("a&b")]),
+    ({|'a"b'|}, [STRING("a\"b")]),
+    ({|"a\\b"|}, [STRING("a\\b")]),
   ]
   |> List.map(((input, output)) => {
        let (_, values) = parse(input);
@@ -297,6 +372,13 @@ let soft_error_tests =
     ),
     ({|$({ let x = 1;|}, "Error(Unclosed brace inside interpolation)"),
     ({|$(f(x) /* unclosed|}, "Error(Unclosed comment inside interpolation)"),
+    /* Spec-derived error vectors: bad urls and non-scalar escape code
+       points (null, surrogates, > U+10FFFF) are lexing errors. */
+    ({|url(a b)|}, "Error(Invalid URL)"),
+    ({|url(a"b)|}, "Error(Invalid URL)"),
+    ("\\0 x", "Error(Invalid identifier) (IDENT \"x\")"),
+    ("\\D800 x", "Error(Invalid identifier) (IDENT \"x\")"),
+    ("\\110000 x", "Error(Invalid identifier) (IDENT \"x\")"),
   ]
   |> List.map(((input, expected_output)) => {
        test_case(

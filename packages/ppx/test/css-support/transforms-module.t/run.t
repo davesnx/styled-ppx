@@ -16,159 +16,159 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css
-    ".css-1l0uucg{-webkit-transform:none;-moz-transform:none;-ms-transform:none;transform:none;}"
+    ".css-1l0uucg{-webkit-transform:none;-moz-transform:none;-ms-transform:none;transform:none}"
   ];
   [@css
-    ".css-1bxlsr6{-webkit-transform:translate(5px);-moz-transform:translate(5px);-ms-transform:translate(5px);transform:translate(5px);}"
+    ".css-1bxlsr6{-webkit-transform:translate(5px);-moz-transform:translate(5px);-ms-transform:translate(5px);transform:translate(5px)}"
   ];
   [@css
-    ".css-14phdak{-webkit-transform:translate(5px, 10px);-moz-transform:translate(5px, 10px);-ms-transform:translate(5px, 10px);transform:translate(5px, 10px);}"
+    ".css-1jtc6zq{-webkit-transform:translate(5px,10px);-moz-transform:translate(5px,10px);-ms-transform:translate(5px,10px);transform:translate(5px,10px)}"
   ];
   [@css
-    ".css-19ffbzo{-webkit-transform:translateY(5px);-moz-transform:translateY(5px);-ms-transform:translateY(5px);transform:translateY(5px);}"
+    ".css-19ffbzo{-webkit-transform:translateY(5px);-moz-transform:translateY(5px);-ms-transform:translateY(5px);transform:translateY(5px)}"
   ];
   [@css
-    ".css-yagj3z{-webkit-transform:translateX(5px);-moz-transform:translateX(5px);-ms-transform:translateX(5px);transform:translateX(5px);}"
+    ".css-yagj3z{-webkit-transform:translateX(5px);-moz-transform:translateX(5px);-ms-transform:translateX(5px);transform:translateX(5px)}"
   ];
   [@css
-    ".css-246llm{-webkit-transform:translateY(5%);-moz-transform:translateY(5%);-ms-transform:translateY(5%);transform:translateY(5%);}"
+    ".css-246llm{-webkit-transform:translateY(5%);-moz-transform:translateY(5%);-ms-transform:translateY(5%);transform:translateY(5%)}"
   ];
   [@css
-    ".css-191bqi7{-webkit-transform:translateX(5%);-moz-transform:translateX(5%);-ms-transform:translateX(5%);transform:translateX(5%);}"
+    ".css-191bqi7{-webkit-transform:translateX(5%);-moz-transform:translateX(5%);-ms-transform:translateX(5%);transform:translateX(5%)}"
   ];
   [@css
-    ".css-1gsmep6{-webkit-transform:scale(2);-moz-transform:scale(2);-ms-transform:scale(2);transform:scale(2);}"
+    ".css-1gsmep6{-webkit-transform:scale(2);-moz-transform:scale(2);-ms-transform:scale(2);transform:scale(2)}"
   ];
   [@css
-    ".css-1hihuo{-webkit-transform:scale(2, -1);-moz-transform:scale(2, -1);-ms-transform:scale(2, -1);transform:scale(2, -1);}"
+    ".css-10qfpua{-webkit-transform:scale(2,-1);-moz-transform:scale(2,-1);-ms-transform:scale(2,-1);transform:scale(2,-1)}"
   ];
   [@css
-    ".css-1lz7wl3{-webkit-transform:scaleX(2);-moz-transform:scaleX(2);-ms-transform:scaleX(2);transform:scaleX(2);}"
+    ".css-1lz7wl3{-webkit-transform:scaleX(2);-moz-transform:scaleX(2);-ms-transform:scaleX(2);transform:scaleX(2)}"
   ];
   [@css
-    ".css-wowczw{-webkit-transform:scaleY(2.5);-moz-transform:scaleY(2.5);-ms-transform:scaleY(2.5);transform:scaleY(2.5);}"
+    ".css-wowczw{-webkit-transform:scaleY(2.5);-moz-transform:scaleY(2.5);-ms-transform:scaleY(2.5);transform:scaleY(2.5)}"
   ];
   [@css
-    ".css-envhbk{-webkit-transform:rotate(45deg);-moz-transform:rotate(45deg);-ms-transform:rotate(45deg);transform:rotate(45deg);}"
+    ".css-envhbk{-webkit-transform:rotate(45deg);-moz-transform:rotate(45deg);-ms-transform:rotate(45deg);transform:rotate(45deg)}"
   ];
   [@css
-    ".css-iko84h{-webkit-transform:skew(45deg);-moz-transform:skew(45deg);-ms-transform:skew(45deg);transform:skew(45deg);}"
+    ".css-iko84h{-webkit-transform:skew(45deg);-moz-transform:skew(45deg);-ms-transform:skew(45deg);transform:skew(45deg)}"
   ];
   [@css
-    ".css-148btt1{-webkit-transform:skew(45deg, 15deg);-moz-transform:skew(45deg, 15deg);-ms-transform:skew(45deg, 15deg);transform:skew(45deg, 15deg);}"
+    ".css-6qvk49{-webkit-transform:skew(45deg,15deg);-moz-transform:skew(45deg,15deg);-ms-transform:skew(45deg,15deg);transform:skew(45deg,15deg)}"
   ];
   [@css
-    ".css-jugqd2{-webkit-transform:skewX(45deg);-moz-transform:skewX(45deg);-ms-transform:skewX(45deg);transform:skewX(45deg);}"
+    ".css-jugqd2{-webkit-transform:skewX(45deg);-moz-transform:skewX(45deg);-ms-transform:skewX(45deg);transform:skewX(45deg)}"
   ];
   [@css
-    ".css-k6rlxt{-webkit-transform:skewY(45deg);-moz-transform:skewY(45deg);-ms-transform:skewY(45deg);transform:skewY(45deg);}"
+    ".css-k6rlxt{-webkit-transform:skewY(45deg);-moz-transform:skewY(45deg);-ms-transform:skewY(45deg);transform:skewY(45deg)}"
   ];
   [@css
-    ".css-1aizqc7{-webkit-transform:translate(50px, -24px) skew(0, 22.5deg);-moz-transform:translate(50px, -24px) skew(0, 22.5deg);-ms-transform:translate(50px, -24px) skew(0, 22.5deg);transform:translate(50px, -24px) skew(0, 22.5deg);}"
+    ".css-1ew1z1u{-webkit-transform:translate(50px,-24px) skew(0,22.5deg);-moz-transform:translate(50px,-24px) skew(0,22.5deg);-ms-transform:translate(50px,-24px) skew(0,22.5deg);transform:translate(50px,-24px) skew(0,22.5deg)}"
   ];
   [@css
-    ".css-1jwv2u5{-webkit-transform:translate3d(0, 0, 5px);-moz-transform:translate3d(0, 0, 5px);-ms-transform:translate3d(0, 0, 5px);transform:translate3d(0, 0, 5px);}"
+    ".css-qqdmem{-webkit-transform:translate3d(0,0,5px);-moz-transform:translate3d(0,0,5px);-ms-transform:translate3d(0,0,5px);transform:translate3d(0,0,5px)}"
   ];
   [@css
-    ".css-ngdcmy{-webkit-transform:translateZ(5px);-moz-transform:translateZ(5px);-ms-transform:translateZ(5px);transform:translateZ(5px);}"
+    ".css-ngdcmy{-webkit-transform:translateZ(5px);-moz-transform:translateZ(5px);-ms-transform:translateZ(5px);transform:translateZ(5px)}"
   ];
   [@css
-    ".css-ko4av4{-webkit-transform:scale3d(1, 0, -1);-moz-transform:scale3d(1, 0, -1);-ms-transform:scale3d(1, 0, -1);transform:scale3d(1, 0, -1);}"
+    ".css-7kpn4{-webkit-transform:scale3d(1,0,-1);-moz-transform:scale3d(1,0,-1);-ms-transform:scale3d(1,0,-1);transform:scale3d(1,0,-1)}"
   ];
   [@css
-    ".css-59eyuw{-webkit-transform:scaleZ(1.5);-moz-transform:scaleZ(1.5);-ms-transform:scaleZ(1.5);transform:scaleZ(1.5);}"
+    ".css-59eyuw{-webkit-transform:scaleZ(1.5);-moz-transform:scaleZ(1.5);-ms-transform:scaleZ(1.5);transform:scaleZ(1.5)}"
   ];
   [@css
-    ".css-rymph4{-webkit-transform:rotate3d(1, 1, 1, 45deg);-moz-transform:rotate3d(1, 1, 1, 45deg);-ms-transform:rotate3d(1, 1, 1, 45deg);transform:rotate3d(1, 1, 1, 45deg);}"
+    ".css-1dv4btg{-webkit-transform:rotate3d(1,1,1,45deg);-moz-transform:rotate3d(1,1,1,45deg);-ms-transform:rotate3d(1,1,1,45deg);transform:rotate3d(1,1,1,45deg)}"
   ];
   [@css
-    ".css-12a4lr2{-webkit-transform:rotateX(-45deg);-moz-transform:rotateX(-45deg);-ms-transform:rotateX(-45deg);transform:rotateX(-45deg);}"
+    ".css-12a4lr2{-webkit-transform:rotateX(-45deg);-moz-transform:rotateX(-45deg);-ms-transform:rotateX(-45deg);transform:rotateX(-45deg)}"
   ];
   [@css
-    ".css-i4stga{-webkit-transform:rotateY(-45deg);-moz-transform:rotateY(-45deg);-ms-transform:rotateY(-45deg);transform:rotateY(-45deg);}"
+    ".css-i4stga{-webkit-transform:rotateY(-45deg);-moz-transform:rotateY(-45deg);-ms-transform:rotateY(-45deg);transform:rotateY(-45deg)}"
   ];
   [@css
-    ".css-1ht78v3{-webkit-transform:rotateZ(-45deg);-moz-transform:rotateZ(-45deg);-ms-transform:rotateZ(-45deg);transform:rotateZ(-45deg);}"
+    ".css-1ht78v3{-webkit-transform:rotateZ(-45deg);-moz-transform:rotateZ(-45deg);-ms-transform:rotateZ(-45deg);transform:rotateZ(-45deg)}"
   ];
   [@css
-    ".css-1k57g01{-webkit-transform:translate3d(50px, -24px, 5px) rotate3d(1, 2, 3, 180deg) scale3d(-1, 0, 0.5);-moz-transform:translate3d(50px, -24px, 5px) rotate3d(1, 2, 3, 180deg) scale3d(-1, 0, 0.5);-ms-transform:translate3d(50px, -24px, 5px) rotate3d(1, 2, 3, 180deg) scale3d(-1, 0, 0.5);transform:translate3d(50px, -24px, 5px) rotate3d(1, 2, 3, 180deg) scale3d(-1, 0, 0.5);}"
+    ".css-xkdh7h{-webkit-transform:translate3d(50px,-24px,5px) rotate3d(1,2,3,180deg) scale3d(-1,0,0.5);-moz-transform:translate3d(50px,-24px,5px) rotate3d(1,2,3,180deg) scale3d(-1,0,0.5);-ms-transform:translate3d(50px,-24px,5px) rotate3d(1,2,3,180deg) scale3d(-1,0,0.5);transform:translate3d(50px,-24px,5px) rotate3d(1,2,3,180deg) scale3d(-1,0,0.5)}"
   ];
   [@css
-    ".css-bu1n2j{-webkit-transform:perspective(600px);-moz-transform:perspective(600px);-ms-transform:perspective(600px);transform:perspective(600px);}"
+    ".css-bu1n2j{-webkit-transform:perspective(600px);-moz-transform:perspective(600px);-ms-transform:perspective(600px);transform:perspective(600px)}"
   ];
-  [@css ".css-uqz1s7{transform-origin:10px;}"];
-  [@css ".css-z1z8dm{transform-origin:top;}"];
-  [@css ".css-a7enzb{transform-origin:top left;}"];
-  [@css ".css-5xpis9{transform-origin:50% 100%;}"];
-  [@css ".css-mw0na3{transform-origin:left 0%;}"];
-  [@css ".css-19ocb2r{transform-origin:left 50% 0;}"];
-  [@css ".css-18j3lnu{transform-box:border-box;}"];
-  [@css ".css-1q0d6y7{transform-box:fill-box;}"];
-  [@css ".css-1y1oond{transform-box:view-box;}"];
-  [@css ".css-pejedl{transform-box:content-box;}"];
-  [@css ".css-16oocfm{transform-box:stroke-box;}"];
-  [@css ".css-1lba84j{translate:none;}"];
-  [@css ".css-1vljzei{translate:50%;}"];
-  [@css ".css-g7hr71{translate:50% 50%;}"];
-  [@css ".css-117aizz{translate:50% 50% 10px;}"];
-  [@css ".css-8512yp{scale:none;}"];
-  [@css ".css-9ekjw9{scale:2;}"];
-  [@css ".css-19t9brl{scale:2 2;}"];
-  [@css ".css-n5etf0{scale:2 2 2;}"];
-  [@css ".css-q9r8a8{rotate:none;}"];
-  [@css ".css-bl2vtg{rotate:45deg;}"];
-  [@css ".css-1o56584{rotate:x 45deg;}"];
-  [@css ".css-11kscq1{rotate:y 45deg;}"];
-  [@css ".css-pos2ae{rotate:z 45deg;}"];
-  [@css ".css-1t3zkti{rotate:-1 0 2 45deg;}"];
-  [@css ".css-n90z7z{rotate:45deg x;}"];
-  [@css ".css-17ih22e{rotate:45deg y;}"];
-  [@css ".css-nrc7zu{rotate:45deg z;}"];
-  [@css ".css-7nat92{rotate:45deg -1 0 2;}"];
-  [@css ".css-178mzai{transform-style:flat;}"];
-  [@css ".css-f9drg4{transform-style:preserve-3d;}"];
-  [@css ".css-1n3xu8o{perspective:none;}"];
-  [@css ".css-1rnuytb{perspective:600px;}"];
-  [@css ".css-1tcvvta{perspective-origin:10px;}"];
-  [@css ".css-1g837vq{perspective-origin:top;}"];
-  [@css ".css-16ul0kj{perspective-origin:top left;}"];
-  [@css ".css-16g0ds0{perspective-origin:50% 100%;}"];
-  [@css ".css-wskl0e{perspective-origin:left 0%;}"];
+  [@css ".css-uqz1s7{transform-origin:10px}"];
+  [@css ".css-z1z8dm{transform-origin:top}"];
+  [@css ".css-a7enzb{transform-origin:top left}"];
+  [@css ".css-5xpis9{transform-origin:50% 100%}"];
+  [@css ".css-mw0na3{transform-origin:left 0%}"];
+  [@css ".css-19ocb2r{transform-origin:left 50% 0}"];
+  [@css ".css-18j3lnu{transform-box:border-box}"];
+  [@css ".css-1q0d6y7{transform-box:fill-box}"];
+  [@css ".css-1y1oond{transform-box:view-box}"];
+  [@css ".css-pejedl{transform-box:content-box}"];
+  [@css ".css-16oocfm{transform-box:stroke-box}"];
+  [@css ".css-1lba84j{translate:none}"];
+  [@css ".css-1vljzei{translate:50%}"];
+  [@css ".css-g7hr71{translate:50% 50%}"];
+  [@css ".css-117aizz{translate:50% 50% 10px}"];
+  [@css ".css-8512yp{scale:none}"];
+  [@css ".css-9ekjw9{scale:2}"];
+  [@css ".css-19t9brl{scale:2 2}"];
+  [@css ".css-n5etf0{scale:2 2 2}"];
+  [@css ".css-q9r8a8{rotate:none}"];
+  [@css ".css-bl2vtg{rotate:45deg}"];
+  [@css ".css-1o56584{rotate:x 45deg}"];
+  [@css ".css-11kscq1{rotate:y 45deg}"];
+  [@css ".css-pos2ae{rotate:z 45deg}"];
+  [@css ".css-1t3zkti{rotate:-1 0 2 45deg}"];
+  [@css ".css-n90z7z{rotate:45deg x}"];
+  [@css ".css-17ih22e{rotate:45deg y}"];
+  [@css ".css-nrc7zu{rotate:45deg z}"];
+  [@css ".css-7nat92{rotate:45deg -1 0 2}"];
+  [@css ".css-178mzai{transform-style:flat}"];
+  [@css ".css-f9drg4{transform-style:preserve-3d}"];
+  [@css ".css-1n3xu8o{perspective:none}"];
+  [@css ".css-1rnuytb{perspective:600px}"];
+  [@css ".css-1tcvvta{perspective-origin:10px}"];
+  [@css ".css-1g837vq{perspective-origin:top}"];
+  [@css ".css-16ul0kj{perspective-origin:top left}"];
+  [@css ".css-16g0ds0{perspective-origin:50% 100%}"];
+  [@css ".css-wskl0e{perspective-origin:left 0%}"];
   [@css
-    ".css-1ycdtzq{-webkit-backface-visibility:visible;backface-visibility:visible;}"
+    ".css-1ycdtzq{-webkit-backface-visibility:visible;backface-visibility:visible}"
   ];
   [@css
-    ".css-1hmgmgm{-webkit-backface-visibility:hidden;backface-visibility:hidden;}"
+    ".css-1hmgmgm{-webkit-backface-visibility:hidden;backface-visibility:hidden}"
   ];
   
   CSS.make("css-1l0uucg", []);
   CSS.make("css-1bxlsr6", []);
-  CSS.make("css-14phdak", []);
+  CSS.make("css-1jtc6zq", []);
   CSS.make("css-19ffbzo", []);
   CSS.make("css-yagj3z", []);
   CSS.make("css-246llm", []);
   CSS.make("css-191bqi7", []);
   CSS.make("css-1gsmep6", []);
-  CSS.make("css-1hihuo", []);
+  CSS.make("css-10qfpua", []);
   CSS.make("css-1lz7wl3", []);
   CSS.make("css-wowczw", []);
   CSS.make("css-envhbk", []);
   CSS.make("css-iko84h", []);
-  CSS.make("css-148btt1", []);
+  CSS.make("css-6qvk49", []);
   CSS.make("css-jugqd2", []);
   CSS.make("css-k6rlxt", []);
   
-  CSS.make("css-1aizqc7", []);
-  CSS.make("css-1jwv2u5", []);
+  CSS.make("css-1ew1z1u", []);
+  CSS.make("css-qqdmem", []);
   CSS.make("css-ngdcmy", []);
-  CSS.make("css-ko4av4", []);
+  CSS.make("css-7kpn4", []);
   CSS.make("css-59eyuw", []);
-  CSS.make("css-rymph4", []);
+  CSS.make("css-1dv4btg", []);
   CSS.make("css-12a4lr2", []);
   CSS.make("css-i4stga", []);
   CSS.make("css-1ht78v3", []);
   
-  CSS.make("css-1k57g01", []);
+  CSS.make("css-xkdh7h", []);
   CSS.make("css-bu1n2j", []);
   CSS.make("css-uqz1s7", []);
   CSS.make("css-z1z8dm", []);

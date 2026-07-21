@@ -1,7 +1,7 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-13o7eu2-OneSingleProperty{display:block;}"];
+  [@css ".css-13o7eu2-OneSingleProperty{display:block}"];
   [@css.bindings
     [("Output.OneSingleProperty", "css-13o7eu2-OneSingleProperty")]
   ];

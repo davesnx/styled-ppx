@@ -36,7 +36,7 @@ let selector () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"parent" rule_list in
   check ~pos:__POS__
-    ".parent{margin:10px;}.parent a{display:block;}.parent a div{display:none;}"
+    ".parent{margin:10px}.parent a{display:block}.parent a div{display:none}"
     (render list_of_rules)
 
 let selector_with_ampersand () =
@@ -54,7 +54,7 @@ let selector_with_ampersand () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"hash" rule_list in
   check ~pos:__POS__
-    ".hash{margin:10px;}.hash > a{margin:11px;}.hash > a > div{margin:12px;}"
+    ".hash{margin:10px}.hash>a{margin:11px}.hash>a>div{margin:12px}"
     (render list_of_rules)
 
 let ampersand_space_ampersand () =
@@ -68,7 +68,7 @@ let ampersand_space_ampersand () =
   in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"hash" rule_list in
-  check ~pos:__POS__ ".hash{margin:10px;}.hash .hash > a{margin:11px;}"
+  check ~pos:__POS__ ".hash{margin:10px}.hash .hash>a{margin:11px}"
     (render list_of_rules)
 
 let ampersand_ampersand () =
@@ -82,14 +82,14 @@ let ampersand_ampersand () =
   in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"hash" rule_list in
-  check ~pos:__POS__ ".hash{margin:10px;}.hash.extra > a{margin:11px;}"
+  check ~pos:__POS__ ".hash{margin:10px}.hash.extra>a{margin:11px}"
     (render list_of_rules)
 
 let selector_with_class () =
   let input = "margin: 10px; .test { display: block; }" in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"hash" rule_list in
-  check ~pos:__POS__ ".hash{margin:10px;}.hash .test{display:block;}"
+  check ~pos:__POS__ ".hash{margin:10px}.hash .test{display:block}"
     (render list_of_rules)
 
 let mediaqueries () =
@@ -97,7 +97,7 @@ let mediaqueries () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"hash" rule_list in
   check ~pos:__POS__
-    ".hash{margin:10px;}@media (min-width: 768px) {.hash{display:block;}}"
+    ".hash{margin:10px}@media (min-width:768px){.hash{display:block}}"
     (render list_of_rules)
 
 let mediaqueries_and_selectors () =
@@ -108,8 +108,8 @@ let mediaqueries_and_selectors () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"hash" rule_list in
   check ~pos:__POS__
-    ".hash{margin:10px;}@media (min-width: 768px) {.hash{display:block;}.hash \
-     .test{display:block;}}"
+    ".hash{margin:10px}@media (min-width:768px){.hash{display:block}.hash \
+     .test{display:block}}"
     (render list_of_rules)
 
 (* Adjacent `@media` blocks with an identical prelude merge into one;
@@ -123,15 +123,15 @@ let nested_mediaqueries_and_selectors () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"hash" rule_list in
   check ~pos:__POS__
-    ".hash{margin:10px;}@media (min-width: 768px) {.hash{display:block;}.hash \
-     .test{display:block;}.hash{display:block;}.hash .test{display:block;}}"
+    ".hash{margin:10px}@media (min-width:768px){.hash{display:block}.hash \
+     .test{display:block}.hash{display:block}.hash .test{display:block}}"
     (render list_of_rules)
 
 let ampersand_with_classname () =
   let input = "margin: 10px; & { display: block; }" in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"my-class" rule_list in
-  check ~pos:__POS__ ".my-class{margin:10px;}.my-class{display:block;}"
+  check ~pos:__POS__ ".my-class{margin:10px}.my-class{display:block}"
     (render list_of_rules)
 
 let nested_ampersand_with_classname () =
@@ -141,21 +141,21 @@ let nested_ampersand_with_classname () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"my-class" rule_list in
   check ~pos:__POS__
-    ".my-class{margin:10px;}.my-class div{display:block;}.my-class div \
-     span{color:red;}"
+    ".my-class{margin:10px}.my-class div{display:block}.my-class div \
+     span{color:red}"
     (render list_of_rules)
 
 let ampersand_with_hover_and_classname () =
   let input = "&:hover { background: blue; }" in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"btn" rule_list in
-  check ~pos:__POS__ ".btn:hover{background:blue;}" (render list_of_rules)
+  check ~pos:__POS__ ".btn:hover{background:blue}" (render list_of_rules)
 
 let ampersand_with_child_selector_and_classname () =
   let input = "& > a { color: green; }" in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"nav" rule_list in
-  check ~pos:__POS__ ".nav > a{color:green;}" (render list_of_rules)
+  check ~pos:__POS__ ".nav>a{color:green}" (render list_of_rules)
 
 let multiple_nested_ampersands_with_classname () =
   let input =
@@ -177,8 +177,8 @@ let multiple_nested_ampersands_with_classname () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"container" rule_list in
   check ~pos:__POS__
-    ".container{margin:10px;}.container:hover{background:blue;}.container > \
-     div{padding:5px;}.container > div span{color:red;}"
+    ".container{margin:10px}.container:hover{background:blue}.container>div{padding:5px}.container>div \
+     span{color:red}"
     (render list_of_rules)
 
 let media_query_with_ampersand_and_classname () =
@@ -193,26 +193,26 @@ let media_query_with_ampersand_and_classname () =
   in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"responsive" rule_list in
-  check ~pos:__POS__ "@media (min-width: 768px) {.responsive{display:flex;}}"
+  check ~pos:__POS__ "@media (min-width:768px){.responsive{display:flex}}"
     (render list_of_rules)
 
 let ampersand_with_adjacent_sibling () =
   let input = "& + div { margin-top: 20px; }" in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"element" rule_list in
-  check ~pos:__POS__ ".element + div{margin-top:20px;}" (render list_of_rules)
+  check ~pos:__POS__ ".element+div{margin-top:20px}" (render list_of_rules)
 
 let ampersand_with_general_sibling () =
   let input = "& ~ span { color: gray; }" in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"section" rule_list in
-  check ~pos:__POS__ ".section ~ span{color:gray;}" (render list_of_rules)
+  check ~pos:__POS__ ".section~span{color:gray}" (render list_of_rules)
 
 let ampersand_with_descendant_selector () =
   let input = "& div { padding: 10px; }" in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"wrapper" rule_list in
-  check ~pos:__POS__ ".wrapper div{padding:10px;}" (render list_of_rules)
+  check ~pos:__POS__ ".wrapper div{padding:10px}" (render list_of_rules)
 
 let nested_combinators () =
   let input =
@@ -231,8 +231,7 @@ let nested_combinators () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"box" rule_list in
   check ~pos:__POS__
-    ".box > div{color:blue;}.box > div + span{margin-left:5px;}.box > div + \
-     span ~ p{opacity:0.8;}"
+    ".box>div{color:blue}.box>div+span{margin-left:5px}.box>div+span~p{opacity:0.8}"
     (render list_of_rules)
 
 let ampersand_with_pseudo_elements () =
@@ -247,7 +246,7 @@ let ampersand_with_pseudo_elements () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"text" rule_list in
   check ~pos:__POS__
-    {|.text::before{content:"lol";}.text::after{content:"lel";}.text::first-line{text-transform:uppercase;}.text::first-letter{font-size:2em;}|}
+    ".text::before{content:\"lol\"}.text::after{content:\"lel\"}.text::first-line{text-transform:uppercase}.text::first-letter{font-size:2em}"
     (render list_of_rules)
 
 let nested_pseudo_elements () =
@@ -263,7 +262,7 @@ let nested_pseudo_elements () =
   in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"item" rule_list in
-  check ~pos:__POS__ ".item div::before{content:\"lol\";position:absolute;}"
+  check ~pos:__POS__ ".item div::before{content:\"lol\";position:absolute}"
     (render list_of_rules)
 
 let ampersand_with_attribute_selectors () =
@@ -278,8 +277,8 @@ let ampersand_with_attribute_selectors () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"input" rule_list in
   check ~pos:__POS__
-    ".input[disabled]{opacity:0.5;}.input[type=\"text\"]{border:1px solid \
-     gray;}.input[href^=\"https\"]{color:green;}.input[class*=\"active\"]{font-weight:bold;}"
+    ".input[disabled]{opacity:0.5}.input[type=text]{border:1px solid \
+     gray}.input[href^=https]{color:green}.input[class*=active]{font-weight:bold}"
     (render list_of_rules)
 
 let nested_attribute_selectors () =
@@ -294,34 +293,34 @@ let nested_attribute_selectors () =
   in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"container" rule_list in
-  check ~pos:__POS__ ".container form input[required]{border-color:red;}"
+  check ~pos:__POS__ ".container form input[required]{border-color:red}"
     (render list_of_rules)
 
 let ampersand_with_not_pseudo_class () =
   let input = "&:not(:last-child) { margin-bottom: 10px; }" in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"list-item" rule_list in
-  check ~pos:__POS__ ".list-item:not(:last-child){margin-bottom:10px;}"
+  check ~pos:__POS__ ".list-item:not(:last-child){margin-bottom:10px}"
     (render list_of_rules)
 
 let ampersand_with_is_pseudo_class () =
   let input = "&:is(h1, h2, h3) { color: navy; }" in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"heading" rule_list in
-  check ~pos:__POS__ ".heading:is(h1,h2,h3){color:navy;}" (render list_of_rules)
+  check ~pos:__POS__ ".heading:is(h1,h2,h3){color:navy}" (render list_of_rules)
 
 let ampersand_with_where_pseudo_class () =
   let input = "&:where(.active, .selected) { outline: 2px solid; }" in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"item" rule_list in
-  check ~pos:__POS__ ".item:where(.active,.selected){outline:2px solid;}"
+  check ~pos:__POS__ ".item:where(.active,.selected){outline:2px solid}"
     (render list_of_rules)
 
 let ampersand_with_nth_child () =
   let input = "&:nth-child(2n+1) { background: #eee; }" in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"row" rule_list in
-  check ~pos:__POS__ ".row:nth-child(2n+1){background:#eee;}"
+  check ~pos:__POS__ ".row:nth-child(2n+1){background:#eee}"
     (render list_of_rules)
 
 let multiple_pseudo_classes () =
@@ -334,8 +333,8 @@ let multiple_pseudo_classes () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"button" rule_list in
   check ~pos:__POS__
-    ".button:hover:not(:disabled){cursor:pointer;}.button:focus:not(:active){box-shadow:0 \
-     0 3px blue;}"
+    ".button:hover:not(:disabled){cursor:pointer}.button:focus:not(:active){box-shadow:0 \
+     0 3px blue}"
     (render list_of_rules)
 
 let pseudo_classes_with_pseudo_elements () =
@@ -348,34 +347,34 @@ let pseudo_classes_with_pseudo_elements () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"tooltip" rule_list in
   check ~pos:__POS__
-    ".tooltip:hover::after{content:\"hovered\";}.tooltip:focus::before{content:\"focused\";}"
+    ".tooltip:hover::after{content:\"hovered\"}.tooltip:focus::before{content:\"focused\"}"
     (render list_of_rules)
 
 let id_selector () =
   let input = "&#main { font-weight: bold; }" in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"page" rule_list in
-  check ~pos:__POS__ ".page#main{font-weight:bold;}" (render list_of_rules)
+  check ~pos:__POS__ ".page#main{font-weight:bold}" (render list_of_rules)
 
 let universal_selector () =
   let input = "& * { box-sizing: border-box; }" in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"reset" rule_list in
-  check ~pos:__POS__ ".reset *{box-sizing:border-box;}" (render list_of_rules)
+  check ~pos:__POS__ ".reset *{box-sizing:border-box}" (render list_of_rules)
 
 let multiple_selectors_in_rule () =
   let input = "h1, h2, h3 { margin: 0; }" in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"heading" rule_list in
   check ~pos:__POS__
-    ".heading h1{margin:0;}.heading h2{margin:0;}.heading h3{margin:0;}"
+    ".heading h1{margin:0}.heading h2{margin:0}.heading h3{margin:0}"
     (render list_of_rules)
 
 let multiple_selectors_with_ampersand () =
   let input = "&:hover, &:focus { color: blue; }" in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"link" rule_list in
-  check ~pos:__POS__ ".link:hover{color:blue;}.link:focus{color:blue;}"
+  check ~pos:__POS__ ".link:hover{color:blue}.link:focus{color:blue}"
     (render list_of_rules)
 
 let supports_rule () =
@@ -392,7 +391,7 @@ let supports_rule () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"layout" rule_list in
   check ~pos:__POS__
-    "@supports (display: grid) {.layout{display:grid;}.layout .item{flex:1;}}"
+    "@supports (display:grid){.layout{display:grid}.layout .item{flex:1}}"
     (render list_of_rules)
 
 let nested_supports_and_media () =
@@ -409,8 +408,8 @@ let nested_supports_and_media () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"flex-container" rule_list in
   check ~pos:__POS__
-    "@supports (display: flex) {.flex-container{display:flex;}@media \
-     (min-width: 768px) {.flex-container{flex-direction:row;}}}"
+    "@supports (display:flex){.flex-container{display:flex}@media \
+     (min-width:768px){.flex-container{flex-direction:row}}}"
     (render list_of_rules)
 
 let deeply_nested_structure () =
@@ -440,10 +439,10 @@ let deeply_nested_structure () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"page" rule_list in
   check ~pos:__POS__
-    ".page{color:red;}.page > .header{padding:20px;}.page > .header \
-     h1{font-size:24px;}.page > .header h1:hover{color:blue;}.page > .header \
-     nav{display:flex;}.page > .header nav a{text-decoration:none;}.page > \
-     .header nav a:visited{color:purple;}"
+    ".page{color:red}.page>.header{padding:20px}.page>.header \
+     h1{font-size:24px}.page>.header h1:hover{color:blue}.page>.header \
+     nav{display:flex}.page>.header nav a{text-decoration:none}.page>.header \
+     nav a:visited{color:purple}"
     (render list_of_rules)
 
 let media_query_with_nested_selectors_and_pseudo () =
@@ -464,9 +463,9 @@ let media_query_with_nested_selectors_and_pseudo () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"layout" rule_list in
   check ~pos:__POS__
-    ".layout{display:flex;}@media (max-width: 600px) \
-     {.layout{display:block;}.layout \
-     .sidebar{display:none;}.layout:hover{background:#f0f0f0;}}"
+    ".layout{display:flex}@media \
+     (max-width:600px){.layout{display:block}.layout \
+     .sidebar{display:none}.layout:hover{background:#f0f0f0}}"
     (render list_of_rules)
 
 let mixed_combinators_and_pseudo () =
@@ -493,10 +492,9 @@ let mixed_combinators_and_pseudo () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"grid" rule_list in
   check ~pos:__POS__
-    ".grid{display:grid;}.grid > .card{border:1px solid;}.grid > \
-     .card:hover{box-shadow:0 4px 8px rgba(0,0,0,0.1);}.grid > .card:hover + \
-     .card{transform:translateX(5px);}.grid > .card ~ \
-     .info{display:none;}.grid > .card ~ .info:target{display:block;}"
+    ".grid{display:grid}.grid>.card{border:1px \
+     solid}.grid>.card:hover{box-shadow:0 4px 8px \
+     rgba(0,0,0,0.1)}.grid>.card:hover+.card{transform:translateX(5px)}.grid>.card~.info{display:none}.grid>.card~.info:target{display:block}"
     (render list_of_rules)
 
 let media_with_nested_selectors () =
@@ -514,8 +512,9 @@ let media_with_nested_selectors () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"responsive" rule_list in
   check ~pos:__POS__
-    ".responsive{display:flex;}@media (max-width: 480px) \
-     {.responsive{display:block;}.responsive .child{padding:10px;}}"
+    ".responsive{display:flex}@media \
+     (max-width:480px){.responsive{display:block}.responsive \
+     .child{padding:10px}}"
     (render list_of_rules)
 
 let supports_with_declarations () =
@@ -531,8 +530,8 @@ let supports_with_declarations () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"grid-layout" rule_list in
   check ~pos:__POS__
-    ".grid-layout{color:red;}@supports (display: grid) \
-     {.grid-layout{display:grid;gap:10px;}}"
+    ".grid-layout{color:red}@supports \
+     (display:grid){.grid-layout{display:grid;gap:10px}}"
     (render list_of_rules)
 
 let multiple_media_queries () =
@@ -550,9 +549,9 @@ let multiple_media_queries () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"text" rule_list in
   check ~pos:__POS__
-    ".text{font-size:16px;}@media (min-width: 768px) \
-     {.text{font-size:18px;}}@media (min-width: 1024px) \
-     {.text{font-size:20px;}}"
+    ".text{font-size:16px}@media \
+     (min-width:768px){.text{font-size:18px}}@media \
+     (min-width:1024px){.text{font-size:20px}}"
     (render list_of_rules)
 
 let empty_selectors () =
@@ -565,7 +564,7 @@ let multiple_ampersands_same_selector () =
   let input = "&.double { font-weight: bold; }" in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"double" rule_list in
-  check ~pos:__POS__ ".double.double{font-weight:bold;}" (render list_of_rules)
+  check ~pos:__POS__ ".double.double{font-weight:bold}" (render list_of_rules)
 
 let nested_without_ampersand () =
   let input =
@@ -582,8 +581,8 @@ let nested_without_ampersand () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"parent" rule_list in
   check ~pos:__POS__
-    ".parent{color:blue;}.parent div{padding:10px;}.parent div \
-     span{font-size:14px;}"
+    ".parent{color:blue}.parent div{padding:10px}.parent div \
+     span{font-size:14px}"
     (render list_of_rules)
 
 let descendant_selector_in_declaration_list () =
@@ -597,7 +596,7 @@ let descendant_selector_in_declaration_list () =
   in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"icon" rule_list in
-  check ~pos:__POS__ ".icon{display:flex;}.icon svg path{fill:red;}"
+  check ~pos:__POS__ ".icon{display:flex}.icon svg path{fill:red}"
     (render list_of_rules)
 
 let missing_semicolon_before_nested_selector_in_declaration_list () =
@@ -612,7 +611,7 @@ let missing_semicolon_before_nested_selector_in_declaration_list () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"stack" rule_list in
   check ~pos:__POS__
-    ".stack{background-color:red;}.stack:nth-child(2n){background-color:blue;}"
+    ".stack{background-color:red}.stack:nth-child(2n){background-color:blue}"
     (render list_of_rules)
 
 let missing_semicolon_before_nested_class_selector_in_declaration_list () =
@@ -624,7 +623,7 @@ let missing_semicolon_before_nested_class_selector_in_declaration_list () =
     |} in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"stack" rule_list in
-  check ~pos:__POS__ ".stack{color:red;}.stack .child{color:blue;}"
+  check ~pos:__POS__ ".stack{color:red}.stack .child{color:blue}"
     (render list_of_rules)
 
 let missing_semicolon_before_nested_type_selector_in_declaration_list () =
@@ -636,7 +635,7 @@ let missing_semicolon_before_nested_type_selector_in_declaration_list () =
     |} in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"stack" rule_list in
-  check ~pos:__POS__ ".stack{color:red;}.stack div{color:blue;}"
+  check ~pos:__POS__ ".stack{color:red}.stack div{color:blue}"
     (render list_of_rules)
 
 let missing_semicolon_before_nested_id_selector_in_declaration_list () =
@@ -648,7 +647,7 @@ let missing_semicolon_before_nested_id_selector_in_declaration_list () =
     |} in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"stack" rule_list in
-  check ~pos:__POS__ ".stack{color:red;}.stack #child{color:blue;}"
+  check ~pos:__POS__ ".stack{color:red}.stack #child{color:blue}"
     (render list_of_rules)
 
 let missing_semicolon_before_nested_descendant_selector_in_declaration_list () =
@@ -660,7 +659,7 @@ let missing_semicolon_before_nested_descendant_selector_in_declaration_list () =
     |} in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"stack" rule_list in
-  check ~pos:__POS__ ".stack{color:red;}.stack svg path{fill:blue;}"
+  check ~pos:__POS__ ".stack{color:red}.stack svg path{fill:blue}"
     (render list_of_rules)
 
 let missing_semicolon_before_nested_media_query_in_declaration_list () =
@@ -674,7 +673,7 @@ let missing_semicolon_before_nested_media_query_in_declaration_list () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"copy" rule_list in
   check ~pos:__POS__
-    ".copy{margin-bottom:24px;}@media (min-width: 1024px) {.copy{width:50%;}}"
+    ".copy{margin-bottom:24px}@media (min-width:1024px){.copy{width:50%}}"
     (render list_of_rules)
 
 let missing_semicolon_before_nested_selector_after_interpolation_in_declaration_list
@@ -692,7 +691,7 @@ let missing_semicolon_before_nested_selector_after_interpolation_in_declaration_
   let list_of_rules = Transform.run ~className:"faq-item" rule_list in
   check ~pos:__POS__
     ".faq-item{border-bottom:1px solid \
-     $(borderColor);}.faq-item:last-child{padding-bottom:0;border-bottom-width:0;}"
+     $(borderColor)}.faq-item:last-child{padding-bottom:0;border-bottom-width:0}"
     (render list_of_rules)
 
 let missing_semicolon_before_nested_media_query_after_interpolation_in_declaration_list
@@ -707,7 +706,7 @@ let missing_semicolon_before_nested_media_query_after_interpolation_in_declarati
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"copy" rule_list in
   check ~pos:__POS__
-    ".copy{margin-bottom:$(Size.lg);}@media $(Media.wide) {.copy{width:50%;}}"
+    ".copy{margin-bottom:$(Size.lg)}@media $(Media.wide){.copy{width:50%}}"
     (render list_of_rules)
 
 (* Source order is preserved: the declaration written *after* the nested
@@ -729,8 +728,7 @@ let declaration_after_nested_block_in_declaration_list () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"chart" rule_list in
   check ~pos:__POS__
-    "@media print {.chart \
-     .recharts-wrapper{width:100%;}}.chart{margin-top:17px;}"
+    "@media print{.chart .recharts-wrapper{width:100%}}.chart{margin-top:17px}"
     (render list_of_rules)
 
 let pseudo_class_functions_complex () =
@@ -744,14 +742,14 @@ let pseudo_class_functions_complex () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"grid-item" rule_list in
   check ~pos:__POS__
-    ".grid-item:nth-of-type(3n+1){grid-column:1;}.grid-item:nth-last-child(2){margin-bottom:0;}.grid-item:nth-last-of-type(odd){background:#f0f0f0;}"
+    ".grid-item:nth-of-type(3n+1){grid-column:1}.grid-item:nth-last-child(2){margin-bottom:0}.grid-item:nth-last-of-type(odd){background:#f0f0f0}"
     (render list_of_rules)
 
 let has_pseudo_class () =
   let input = "&:has(> img) { display: flex; align-items: center; }" in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"card" rule_list in
-  check ~pos:__POS__ ".card:has(> img){display:flex;align-items:center;}"
+  check ~pos:__POS__ ".card:has(>img){display:flex;align-items:center}"
     (render list_of_rules)
 
 let focus_within_and_focus_visible () =
@@ -764,8 +762,8 @@ let focus_within_and_focus_visible () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"form" rule_list in
   check ~pos:__POS__
-    ".form:focus-within{border-color:blue;}.form:focus-visible{outline:2px \
-     solid orange;}"
+    ".form:focus-within{border-color:blue}.form:focus-visible{outline:2px \
+     solid orange}"
     (render list_of_rules)
 
 (* Per CSS Nesting Level 1 §3.1, a bare nested pseudo selector
@@ -776,19 +774,19 @@ let bare_leading_pseudo_descendant_joins () =
   let input = {| :hover { color: red; } |} in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"box" rule_list in
-  check ~pos:__POS__ ".box :hover{color:red;}" (render list_of_rules)
+  check ~pos:__POS__ ".box :hover{color:red}" (render list_of_rules)
 
 let bare_leading_pseudo_element_descendant_joins () =
   let input = {| ::after { content: "*"; } |} in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"box" rule_list in
-  check ~pos:__POS__ ".box ::after{content:\"*\";}" (render list_of_rules)
+  check ~pos:__POS__ ".box ::after{content:\"*\"}" (render list_of_rules)
 
 let bare_leading_pseudo_nested_under_class () =
   let input = {| .outer { :hover { color: red; } } |} in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"box" rule_list in
-  check ~pos:__POS__ ".box .outer :hover{color:red;}" (render list_of_rules)
+  check ~pos:__POS__ ".box .outer :hover{color:red}" (render list_of_rules)
 
 let amp_pseudo_inside_amp_pseudo_compound_chain () =
   (* Spec-correct: `&:hover { &::after }` -> `&:hover::after`. The two
@@ -796,14 +794,14 @@ let amp_pseudo_inside_amp_pseudo_compound_chain () =
   let input = {| &:hover { &::after { content: "*"; } } |} in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"box" rule_list in
-  check ~pos:__POS__ ".box:hover::after{content:\"*\";}" (render list_of_rules)
+  check ~pos:__POS__ ".box:hover::after{content:\"*\"}" (render list_of_rules)
 
 let amp_pseudo_with_descendant_inner () =
   (* `&:hover { .child }` -> `&:hover .child` (descendant). *)
   let input = {| &:hover { .child { color: red; } } |} in
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"box" rule_list in
-  check ~pos:__POS__ ".box:hover .child{color:red;}" (render list_of_rules)
+  check ~pos:__POS__ ".box:hover .child{color:red}" (render list_of_rules)
 
 let nested_at_rules_priority () =
   let input =
@@ -823,10 +821,10 @@ let nested_at_rules_priority () =
   let rule_list = parse input in
   let list_of_rules = Transform.run ~className:"complex" rule_list in
   check ~pos:__POS__
-    ".complex{color:red;}@media (min-width: 768px) \
-     {.complex{color:green;}@supports (display: grid) \
-     {.complex{display:grid;}@media (min-width: 1024px) \
-     {.complex{grid-template-columns:repeat(3, 1fr);}}}}"
+    ".complex{color:red}@media \
+     (min-width:768px){.complex{color:green}@supports \
+     (display:grid){.complex{display:grid}@media \
+     (min-width:1024px){.complex{grid-template-columns:repeat(3,1fr)}}}}"
     (render list_of_rules)
 
 let cases =

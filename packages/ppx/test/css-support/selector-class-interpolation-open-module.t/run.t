@@ -13,12 +13,12 @@ Same-file open statements participate in selector interpolation. After
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb-marker{color:red;}"];
-  [@css ".css-ik1kdg-wrapper.css-tokvmb-marker{color:blue;}"];
+  [@css ".css-tokvmb-marker{color:red}"];
+  [@css ".css-d0tg92-wrapper.css-tokvmb-marker{color:blue}"];
   [@css.bindings
     [
       ("Input.Css.marker", "css-tokvmb-marker"),
-      ("Input.wrapper", "css-ik1kdg-wrapper"),
+      ("Input.wrapper", "css-d0tg92-wrapper"),
     ]
   ];
   module Css = {
@@ -28,7 +28,7 @@ Same-file open statements participate in selector interpolation. After
   open Css;
   let _ = marker;
   
-  let wrapper = CSS.make("css-ik1kdg-wrapper", []);
+  let wrapper = CSS.make("css-d0tg92-wrapper", []);
   
   let _ = (Css.marker, wrapper);
 

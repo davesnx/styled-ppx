@@ -28,23 +28,23 @@ basename:
 The extracted @keyframes rule is byte-identical across both paths:
 
   $ grep -h 'keyframes' native/Anim_Css.ml
-    "@keyframes keyframe-t5c4er{0%{height:var(--h0-hftwzv);}100%{height:var(--h1-14y9cfq);}}"]
+    "@keyframes keyframe-1loixtz{0%{height:var(--h0-ad110c)}100%{height:var(--h1-b4b3am)}}"]
   $ grep -h 'keyframes' js/Anim_Css.ml
-    "@keyframes keyframe-t5c4er{0%{height:var(--h0-hftwzv);}100%{height:var(--h1-14y9cfq);}}"]
+    "@keyframes keyframe-1loixtz{0%{height:var(--h0-ad110c)}100%{height:var(--h1-b4b3am)}}"]
 
 The keyframe name matches across paths:
 
   $ grep -o -- 'keyframe-[a-z0-9]*' native/Anim_Css.ml | sort -u
-  keyframe-t5c4er
+  keyframe-1loixtz
   $ grep -o -- 'keyframe-[a-z0-9]*' js/Anim_Css.ml | sort -u
-  keyframe-t5c4er
+  keyframe-1loixtz
 
 And the internal vars match across paths (the runtime `~vars` list references
 the same names the static @keyframes block defines):
 
   $ grep -o -- '--[A-Za-z0-9_-]*' native/Anim_Css.ml | sort -u
-  --h0-hftwzv
-  --h1-14y9cfq
+  --h0-ad110c
+  --h1-b4b3am
   $ grep -o -- '--[A-Za-z0-9_-]*' js/Anim_Css.ml | sort -u
-  --h0-hftwzv
-  --h1-14y9cfq
+  --h0-ad110c
+  --h1-b4b3am
