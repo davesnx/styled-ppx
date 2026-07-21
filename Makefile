@@ -145,3 +145,21 @@ interpreter: ## Run menhir as interpret
 .PHONY: website-watch
 website-watch: ## Run the website locally
 	@cd packages/website && npm run dev
+
+.PHONY: css-oracle
+css-oracle: ## Regenerate the CSS spec coverage report from the vendored oracle
+	@$(DUNE) build packages/css-grammar/bin/registry_dump.exe
+	@_build/default/packages/css-grammar/bin/registry_dump.exe > _build/registry-dump.txt
+	@node scripts/css-oracle/report.mjs _build/registry-dump.txt
+
+.PHONY: css-oracle-update
+css-oracle-update: ## Refresh the vendored @webref/css spec inventory (network)
+	@node scripts/css-oracle/update.mjs
+	@$(MAKE) css-oracle
+
+.PHONY: css-oracle-check
+css-oracle-check: css-oracle ## Fail if the coverage report is out of sync
+	@git ls-files --error-unmatch packages/css-grammar/data/coverage.md > /dev/null 2>&1 \
+	  || (echo "coverage.md is not tracked by git: the oracle gate would pass vacuously" && exit 1)
+	@git diff --exit-code packages/css-grammar/data/coverage.md \
+	  || (echo "coverage.md is out of sync: run 'make css-oracle' and commit the result" && exit 1)

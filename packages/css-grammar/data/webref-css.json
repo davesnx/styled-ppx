@@ -1,0 +1,4560 @@
+{
+ "source": "@webref/css",
+ "version": "8.7.0",
+ "license": "MIT (data machine-extracted from W3C specifications)",
+ "updated": "2026-07-21",
+ "properties": {
+  "-webkit-align-content": {
+   "syntax": "normal | <baseline-position> | <content-distribution> | <overflow-position>? <content-position>",
+   "legacyAliasOf": "align-content",
+   "spec": "compat"
+  },
+  "-webkit-align-items": {
+   "syntax": "normal | stretch | <baseline-position> | <overflow-position>? <self-position>",
+   "legacyAliasOf": "align-items",
+   "spec": "compat"
+  },
+  "-webkit-align-self": {
+   "syntax": "auto | <overflow-position>? [ normal | <self-position> ]| stretch | <baseline-position>",
+   "legacyAliasOf": "align-self",
+   "spec": "compat"
+  },
+  "-webkit-animation": {
+   "syntax": "<single-animation>#",
+   "legacyAliasOf": "animation",
+   "spec": "compat"
+  },
+  "-webkit-animation-delay": {
+   "syntax": "<time>#",
+   "legacyAliasOf": "animation-delay",
+   "spec": "compat"
+  },
+  "-webkit-animation-direction": {
+   "syntax": "<single-animation-direction>#",
+   "legacyAliasOf": "animation-direction",
+   "spec": "compat"
+  },
+  "-webkit-animation-duration": {
+   "syntax": "<time [0s,∞]>#",
+   "legacyAliasOf": "animation-duration",
+   "spec": "compat"
+  },
+  "-webkit-animation-fill-mode": {
+   "syntax": "<single-animation-fill-mode>#",
+   "legacyAliasOf": "animation-fill-mode",
+   "spec": "compat"
+  },
+  "-webkit-animation-iteration-count": {
+   "syntax": "<single-animation-iteration-count>#",
+   "legacyAliasOf": "animation-iteration-count",
+   "spec": "compat"
+  },
+  "-webkit-animation-name": {
+   "syntax": "[ none | <keyframes-name> ]#",
+   "legacyAliasOf": "animation-name",
+   "spec": "compat"
+  },
+  "-webkit-animation-play-state": {
+   "syntax": "<single-animation-play-state>#",
+   "legacyAliasOf": "animation-play-state",
+   "spec": "compat"
+  },
+  "-webkit-animation-timing-function": {
+   "syntax": "<easing-function>#",
+   "legacyAliasOf": "animation-timing-function",
+   "spec": "compat"
+  },
+  "-webkit-appearance": {
+   "syntax": "none | auto | base | base-select | <compat-auto> | <compat-special> | base",
+   "legacyAliasOf": "appearance",
+   "spec": "css-ui-4"
+  },
+  "-webkit-backface-visibility": {
+   "syntax": "visible | hidden",
+   "legacyAliasOf": "backface-visibility",
+   "spec": "compat"
+  },
+  "-webkit-background-clip": {
+   "syntax": "<visual-box>#",
+   "legacyAliasOf": "background-clip",
+   "spec": "compat"
+  },
+  "-webkit-background-origin": {
+   "syntax": "<visual-box>#",
+   "legacyAliasOf": "background-origin",
+   "spec": "compat"
+  },
+  "-webkit-background-size": {
+   "syntax": "<bg-size>#",
+   "legacyAliasOf": "background-size",
+   "spec": "compat"
+  },
+  "-webkit-border-bottom-left-radius": {
+   "syntax": "<border-radius>",
+   "legacyAliasOf": "border-bottom-left-radius",
+   "spec": "compat"
+  },
+  "-webkit-border-bottom-right-radius": {
+   "syntax": "<border-radius>",
+   "legacyAliasOf": "border-bottom-right-radius",
+   "spec": "compat"
+  },
+  "-webkit-border-radius": {
+   "syntax": "<length-percentage [0,∞]>{1,4} [ / <length-percentage [0,∞]>{1,4} ]?",
+   "legacyAliasOf": "border-radius",
+   "spec": "compat"
+  },
+  "-webkit-border-top-left-radius": {
+   "syntax": "<border-radius>",
+   "legacyAliasOf": "border-top-left-radius",
+   "spec": "compat"
+  },
+  "-webkit-border-top-right-radius": {
+   "syntax": "<border-radius>",
+   "legacyAliasOf": "border-top-right-radius",
+   "spec": "compat"
+  },
+  "-webkit-box-align": {
+   "spec": "compat"
+  },
+  "-webkit-box-flex": {
+   "spec": "compat"
+  },
+  "-webkit-box-ordinal-group": {
+   "spec": "compat"
+  },
+  "-webkit-box-orient": {
+   "spec": "compat"
+  },
+  "-webkit-box-pack": {
+   "spec": "compat"
+  },
+  "-webkit-box-shadow": {
+   "syntax": "<spread-shadow>#",
+   "legacyAliasOf": "box-shadow",
+   "spec": "compat"
+  },
+  "-webkit-box-sizing": {
+   "syntax": "content-box | border-box",
+   "legacyAliasOf": "box-sizing",
+   "spec": "compat"
+  },
+  "-webkit-filter": {
+   "syntax": "none | <filter-value-list>",
+   "legacyAliasOf": "filter",
+   "spec": "compat"
+  },
+  "-webkit-flex": {
+   "syntax": "none | [ <'flex-grow'> <'flex-shrink'>? || <'flex-basis'> ]",
+   "legacyAliasOf": "flex",
+   "spec": "compat"
+  },
+  "-webkit-flex-basis": {
+   "syntax": "content | <'width'>",
+   "legacyAliasOf": "flex-basis",
+   "spec": "compat"
+  },
+  "-webkit-flex-direction": {
+   "syntax": "row | row-reverse | column | column-reverse",
+   "legacyAliasOf": "flex-direction",
+   "spec": "compat"
+  },
+  "-webkit-flex-flow": {
+   "syntax": "<'flex-direction'> || <'flex-wrap'>",
+   "legacyAliasOf": "flex-flow",
+   "spec": "compat"
+  },
+  "-webkit-flex-grow": {
+   "syntax": "<number [0,∞]>",
+   "legacyAliasOf": "flex-grow",
+   "spec": "compat"
+  },
+  "-webkit-flex-shrink": {
+   "syntax": "<number [0,∞]>",
+   "legacyAliasOf": "flex-shrink",
+   "spec": "compat"
+  },
+  "-webkit-flex-wrap": {
+   "syntax": "nowrap | [ wrap | wrap-reverse ] || balance",
+   "legacyAliasOf": "flex-wrap",
+   "spec": "compat"
+  },
+  "-webkit-justify-content": {
+   "syntax": "normal | <content-distribution> | <overflow-position>? [ <content-position> | left | right ]",
+   "legacyAliasOf": "justify-content",
+   "spec": "compat"
+  },
+  "-webkit-line-clamp": {
+   "syntax": "none | <integer [1,∞]>",
+   "spec": "css-overflow-4"
+  },
+  "-webkit-mask": {
+   "syntax": "<mask-layer>#",
+   "legacyAliasOf": "mask",
+   "spec": "compat"
+  },
+  "-webkit-mask-box-image": {
+   "syntax": "<'mask-border-source'> || <'mask-border-slice'> [ / <'mask-border-width'>? [ / <'mask-border-outset'> ]? ]? || <'mask-border-repeat'> || <'mask-border-mode'>",
+   "legacyAliasOf": "mask-border",
+   "spec": "compat"
+  },
+  "-webkit-mask-box-image-outset": {
+   "syntax": "<'border-image-outset'>",
+   "legacyAliasOf": "mask-border-outset",
+   "spec": "compat"
+  },
+  "-webkit-mask-box-image-repeat": {
+   "syntax": "<'border-image-repeat'>",
+   "legacyAliasOf": "mask-border-repeat",
+   "spec": "compat"
+  },
+  "-webkit-mask-box-image-slice": {
+   "syntax": "<'border-image-slice'>",
+   "legacyAliasOf": "mask-border-slice",
+   "spec": "compat"
+  },
+  "-webkit-mask-box-image-source": {
+   "syntax": "<'border-image-source'>",
+   "legacyAliasOf": "mask-border-source",
+   "spec": "compat"
+  },
+  "-webkit-mask-box-image-width": {
+   "syntax": "<'border-image-width'>",
+   "legacyAliasOf": "mask-border-width",
+   "spec": "compat"
+  },
+  "-webkit-mask-clip": {
+   "syntax": "[ <coord-box> | no-clip ]#",
+   "legacyAliasOf": "mask-clip",
+   "spec": "compat"
+  },
+  "-webkit-mask-composite": {
+   "syntax": "<compositing-operator>#",
+   "legacyAliasOf": "mask-composite",
+   "spec": "compat"
+  },
+  "-webkit-mask-image": {
+   "syntax": "<mask-reference>#",
+   "legacyAliasOf": "mask-image",
+   "spec": "compat"
+  },
+  "-webkit-mask-origin": {
+   "syntax": "<coord-box>#",
+   "legacyAliasOf": "mask-origin",
+   "spec": "compat"
+  },
+  "-webkit-mask-position": {
+   "syntax": "<position>#",
+   "legacyAliasOf": "mask-position",
+   "spec": "compat"
+  },
+  "-webkit-mask-repeat": {
+   "syntax": "<repeat-style>#",
+   "legacyAliasOf": "mask-repeat",
+   "spec": "compat"
+  },
+  "-webkit-mask-size": {
+   "syntax": "<bg-size>#",
+   "legacyAliasOf": "mask-size",
+   "spec": "compat"
+  },
+  "-webkit-order": {
+   "syntax": "<integer>",
+   "legacyAliasOf": "order",
+   "spec": "compat"
+  },
+  "-webkit-perspective": {
+   "syntax": "none | <length [0,∞]>",
+   "legacyAliasOf": "perspective",
+   "spec": "compat"
+  },
+  "-webkit-perspective-origin": {
+   "syntax": "<position>",
+   "legacyAliasOf": "perspective-origin",
+   "spec": "compat"
+  },
+  "-webkit-text-fill-color": {
+   "syntax": "<color>",
+   "spec": "compat"
+  },
+  "-webkit-text-size-adjust": {
+   "syntax": "auto | none | <percentage [0,∞]>",
+   "legacyAliasOf": "text-size-adjust",
+   "spec": "compat"
+  },
+  "-webkit-text-stroke": {
+   "syntax": "<line-width> || <color>",
+   "spec": "compat"
+  },
+  "-webkit-text-stroke-color": {
+   "syntax": "<color>",
+   "spec": "compat"
+  },
+  "-webkit-text-stroke-width": {
+   "syntax": "<line-width>",
+   "spec": "compat"
+  },
+  "-webkit-transform": {
+   "syntax": "none | <transform-list>",
+   "legacyAliasOf": "transform",
+   "spec": "compat"
+  },
+  "-webkit-transform-origin": {
+   "syntax": "[ left | center | right | top | bottom | <length-percentage> ] | [ left | center | right | <length-percentage> ] [ top | center | bottom | <length-percentage> ] <length>? | [ [ center | left | right ] && [ center | top | bottom ] ] <length>?",
+   "legacyAliasOf": "transform-origin",
+   "spec": "compat"
+  },
+  "-webkit-transform-style": {
+   "syntax": "flat | preserve-3d",
+   "legacyAliasOf": "transform-style",
+   "spec": "compat"
+  },
+  "-webkit-transition": {
+   "syntax": "<single-transition>#",
+   "legacyAliasOf": "transition",
+   "spec": "compat"
+  },
+  "-webkit-transition-delay": {
+   "syntax": "<time>#",
+   "legacyAliasOf": "transition-delay",
+   "spec": "compat"
+  },
+  "-webkit-transition-duration": {
+   "syntax": "<time [0s,∞]>#",
+   "legacyAliasOf": "transition-duration",
+   "spec": "compat"
+  },
+  "-webkit-transition-property": {
+   "syntax": "none | <single-transition-property>#",
+   "legacyAliasOf": "transition-property",
+   "spec": "compat"
+  },
+  "-webkit-transition-timing-function": {
+   "syntax": "<easing-function>#",
+   "legacyAliasOf": "transition-timing-function",
+   "spec": "compat"
+  },
+  "-webkit-user-select": {
+   "syntax": "auto | text | none | contain | all",
+   "spec": "css-ui-4"
+  },
+  "accent-color": {
+   "syntax": "auto | <color>",
+   "spec": "css-ui-4"
+  },
+  "align-content": {
+   "syntax": "normal | <baseline-position> | <content-distribution> | <overflow-position>? <content-position>",
+   "spec": "css-align-3"
+  },
+  "align-items": {
+   "syntax": "normal | stretch | <baseline-position> | <overflow-position>? <self-position>",
+   "spec": "css-align-3"
+  },
+  "align-self": {
+   "syntax": "auto | <overflow-position>? [ normal | <self-position> ]| stretch | <baseline-position> | anchor-center",
+   "spec": "css-align-3"
+  },
+  "alignment-baseline": {
+   "syntax": "baseline | <baseline-metric>",
+   "spec": "css-inline-3"
+  },
+  "all": {
+   "syntax": "initial | inherit | unset | revert | revert-layer | revert-rule",
+   "spec": "css-cascade-5"
+  },
+  "anchor-name": {
+   "syntax": "none | <anchor-name>#",
+   "spec": "css-anchor-position-1"
+  },
+  "anchor-scope": {
+   "syntax": "none | all | <anchor-name>#",
+   "spec": "css-anchor-position-1"
+  },
+  "animation": {
+   "syntax": "<single-animation>#",
+   "spec": "css-animations-1"
+  },
+  "animation-composition": {
+   "syntax": "<single-animation-composition>#",
+   "spec": "css-animations-2"
+  },
+  "animation-delay": {
+   "syntax": "<time>#",
+   "spec": "css-animations-1"
+  },
+  "animation-direction": {
+   "syntax": "<single-animation-direction>#",
+   "spec": "css-animations-1"
+  },
+  "animation-duration": {
+   "syntax": "[ auto | <time [0s,∞]> ]#",
+   "spec": "css-animations-2"
+  },
+  "animation-fill-mode": {
+   "syntax": "<single-animation-fill-mode>#",
+   "spec": "css-animations-1"
+  },
+  "animation-iteration-count": {
+   "syntax": "<single-animation-iteration-count>#",
+   "spec": "css-animations-1"
+  },
+  "animation-name": {
+   "syntax": "[ none | <keyframes-name> ]#",
+   "spec": "css-animations-1"
+  },
+  "animation-play-state": {
+   "syntax": "<single-animation-play-state>#",
+   "spec": "css-animations-1"
+  },
+  "animation-range": {
+   "syntax": "[ <'animation-range-start'> <'animation-range-end'>? ]#",
+   "spec": "scroll-animations-1"
+  },
+  "animation-range-center": {
+   "syntax": "[ normal | [ <length-percentage> | <timeline-range-center-subject> <length-percentage>? ] ]#",
+   "spec": "pointer-animations-1"
+  },
+  "animation-range-end": {
+   "syntax": "[ normal | <length-percentage> | <timeline-range-name> <length-percentage>? ]#",
+   "spec": "scroll-animations-1"
+  },
+  "animation-range-start": {
+   "syntax": "[ normal | <length-percentage> | <timeline-range-name> <length-percentage>? ]#",
+   "spec": "scroll-animations-1"
+  },
+  "animation-timeline": {
+   "syntax": "<single-animation-timeline>#",
+   "spec": "css-animations-2"
+  },
+  "animation-timing-function": {
+   "syntax": "<easing-function>#",
+   "spec": "css-animations-1"
+  },
+  "animation-trigger": {
+   "syntax": "[ none | [ <dashed-ident> <animation-action>+ ]+ ]#",
+   "spec": "animation-triggers-1"
+  },
+  "appearance": {
+   "syntax": "none | auto | base | base-select | <compat-auto> | <compat-special> | base",
+   "spec": "css-ui-4"
+  },
+  "aspect-ratio": {
+   "syntax": "auto || <ratio>",
+   "spec": "css-sizing-4"
+  },
+  "backdrop-filter": {
+   "syntax": "none | <filter-value-list>",
+   "spec": "filter-effects-2"
+  },
+  "backface-visibility": {
+   "syntax": "visible | hidden",
+   "spec": "css-transforms-2"
+  },
+  "background": {
+   "syntax": "<bg-layer>#? , <final-bg-layer>",
+   "spec": "css-backgrounds-4"
+  },
+  "background-attachment": {
+   "syntax": "<attachment>#",
+   "spec": "css-backgrounds-4"
+  },
+  "background-blend-mode": {
+   "syntax": "<'mix-blend-mode'>#",
+   "spec": "compositing-2"
+  },
+  "background-clip": {
+   "syntax": "<bg-clip>#",
+   "spec": "css-backgrounds-4"
+  },
+  "background-color": {
+   "syntax": "<color>",
+   "spec": "css-backgrounds-4"
+  },
+  "background-image": {
+   "syntax": "<bg-image>#",
+   "spec": "css-backgrounds-4"
+  },
+  "background-origin": {
+   "syntax": "<visual-box>#",
+   "spec": "css-backgrounds-4"
+  },
+  "background-position": {
+   "syntax": "<bg-position>#",
+   "spec": "css-backgrounds-4"
+  },
+  "background-position-block": {
+   "syntax": "[ center | [ [ start | end ]? <length-percentage>? ]! ]#",
+   "spec": "css-backgrounds-4"
+  },
+  "background-position-inline": {
+   "syntax": "[ center | [ [ start | end ]? <length-percentage>? ]! ]#",
+   "spec": "css-backgrounds-4"
+  },
+  "background-position-x": {
+   "syntax": "[ center | [ [ left | right | x-start | x-end ]? <length-percentage>? ]! ]#",
+   "spec": "css-backgrounds-4"
+  },
+  "background-position-y": {
+   "syntax": "[ center | [ [ top | bottom | y-start | y-end ]? <length-percentage>? ]! ]#",
+   "spec": "css-backgrounds-4"
+  },
+  "background-repeat": {
+   "syntax": "<repeat-style>#",
+   "spec": "css-backgrounds-4"
+  },
+  "background-repeat-block": {
+   "syntax": "<repetition>#",
+   "spec": "css-backgrounds-4"
+  },
+  "background-repeat-inline": {
+   "syntax": "<repetition>#",
+   "spec": "css-backgrounds-4"
+  },
+  "background-repeat-x": {
+   "syntax": "<repetition>#",
+   "spec": "css-backgrounds-4"
+  },
+  "background-repeat-y": {
+   "syntax": "<repetition>#",
+   "spec": "css-backgrounds-4"
+  },
+  "background-size": {
+   "syntax": "<bg-size>#",
+   "spec": "css-backgrounds-4"
+  },
+  "background-tbd": {
+   "syntax": "<bg-layer>#",
+   "spec": "css-backgrounds-4"
+  },
+  "baseline-shift": {
+   "syntax": "<length-percentage> | sub | super | top | center | bottom",
+   "spec": "css-inline-3"
+  },
+  "baseline-source": {
+   "syntax": "auto | first | last",
+   "spec": "css-inline-3"
+  },
+  "block-ellipsis": {
+   "syntax": "no-ellipsis | auto | <string>",
+   "spec": "css-overflow-4"
+  },
+  "block-size": {
+   "syntax": "<'width'>",
+   "spec": "css-logical-1"
+  },
+  "block-step": {
+   "syntax": "<'block-step-size'> || <'block-step-insert'> || <'block-step-align'> || <'block-step-round'>",
+   "spec": "css-rhythm-1"
+  },
+  "block-step-align": {
+   "syntax": "auto | center | start | end",
+   "spec": "css-rhythm-1"
+  },
+  "block-step-insert": {
+   "syntax": "margin-box | padding-box | content-box",
+   "spec": "css-rhythm-1"
+  },
+  "block-step-round": {
+   "syntax": "up | down | nearest",
+   "spec": "css-rhythm-1"
+  },
+  "block-step-size": {
+   "syntax": "none | <length [0,∞]>",
+   "spec": "css-rhythm-1"
+  },
+  "bookmark-label": {
+   "syntax": "<content-list>",
+   "spec": "css-content-3"
+  },
+  "bookmark-level": {
+   "syntax": "none | <integer [1,∞]>",
+   "spec": "css-content-3"
+  },
+  "bookmark-state": {
+   "syntax": "open | closed",
+   "spec": "css-content-3"
+  },
+  "border": {
+   "syntax": "<line-width> || <line-style> || <color>",
+   "spec": "css-borders-4"
+  },
+  "border-block": {
+   "syntax": "<'border-block-start'>",
+   "spec": "css-borders-4"
+  },
+  "border-block-clip": {
+   "syntax": "<'border-top-clip'>",
+   "spec": "css-borders-4"
+  },
+  "border-block-color": {
+   "syntax": "<'border-top-color'>{1,2}",
+   "spec": "css-borders-4"
+  },
+  "border-block-end": {
+   "syntax": "<line-width> || <line-style> || <color>",
+   "spec": "css-borders-4"
+  },
+  "border-block-end-clip": {
+   "syntax": "none | [ <length-percentage [0,∞]> | <flex> ]+",
+   "spec": "css-borders-4"
+  },
+  "border-block-end-color": {
+   "syntax": "<color> | <image-1D>",
+   "spec": "css-borders-4"
+  },
+  "border-block-end-radius": {
+   "syntax": "<length-percentage [0,∞]>{1,2} [ / <length-percentage [0,∞]>{1,2} ]?",
+   "spec": "css-borders-4"
+  },
+  "border-block-end-style": {
+   "syntax": "<line-style>",
+   "spec": "css-borders-4"
+  },
+  "border-block-end-width": {
+   "syntax": "<line-width>",
+   "spec": "css-borders-4"
+  },
+  "border-block-start": {
+   "syntax": "<line-width> || <line-style> || <color>",
+   "spec": "css-borders-4"
+  },
+  "border-block-start-clip": {
+   "syntax": "none | [ <length-percentage [0,∞]> | <flex> ]+",
+   "spec": "css-borders-4"
+  },
+  "border-block-start-color": {
+   "syntax": "<color> | <image-1D>",
+   "spec": "css-borders-4"
+  },
+  "border-block-start-radius": {
+   "syntax": "<length-percentage [0,∞]>{1,2} [ / <length-percentage [0,∞]>{1,2} ]?",
+   "spec": "css-borders-4"
+  },
+  "border-block-start-style": {
+   "syntax": "<line-style>",
+   "spec": "css-borders-4"
+  },
+  "border-block-start-width": {
+   "syntax": "<line-width>",
+   "spec": "css-borders-4"
+  },
+  "border-block-style": {
+   "syntax": "<'border-top-style'>{1,2}",
+   "spec": "css-borders-4"
+  },
+  "border-block-width": {
+   "syntax": "<'border-top-width'>{1,2}",
+   "spec": "css-borders-4"
+  },
+  "border-bottom": {
+   "syntax": "<line-width> || <line-style> || <color>",
+   "spec": "css-borders-4"
+  },
+  "border-bottom-clip": {
+   "syntax": "none | [ <length-percentage [0,∞]> | <flex> ]+",
+   "spec": "css-borders-4"
+  },
+  "border-bottom-color": {
+   "syntax": "<color> | <image-1D>",
+   "spec": "css-borders-4"
+  },
+  "border-bottom-left-radius": {
+   "syntax": "<border-radius>",
+   "spec": "css-borders-4"
+  },
+  "border-bottom-radius": {
+   "syntax": "<length-percentage [0,∞]>{1,2} [ / <length-percentage [0,∞]>{1,2} ]?",
+   "spec": "css-borders-4"
+  },
+  "border-bottom-right-radius": {
+   "syntax": "<border-radius>",
+   "spec": "css-borders-4"
+  },
+  "border-bottom-style": {
+   "syntax": "<line-style>",
+   "spec": "css-borders-4"
+  },
+  "border-bottom-width": {
+   "syntax": "<line-width>",
+   "spec": "css-borders-4"
+  },
+  "border-boundary": {
+   "syntax": "none | parent | display",
+   "spec": "css-round-display-1"
+  },
+  "border-clip": {
+   "syntax": "<'border-top-clip'>",
+   "spec": "css-borders-4"
+  },
+  "border-collapse": {
+   "syntax": "separate | collapse",
+   "spec": "css-tables-3"
+  },
+  "border-color": {
+   "syntax": "[ <color> | <image-1D> ]{1,4}",
+   "spec": "css-borders-4"
+  },
+  "border-end-end-radius": {
+   "syntax": "<border-radius>",
+   "spec": "css-borders-4"
+  },
+  "border-end-start-radius": {
+   "syntax": "<border-radius>",
+   "spec": "css-borders-4"
+  },
+  "border-image": {
+   "syntax": "<'border-image-source'> || <'border-image-slice'> [ / <'border-image-width'> | / <'border-image-width'>? / <'border-image-outset'> ]? || <'border-image-repeat'>",
+   "spec": "css-borders-4"
+  },
+  "border-image-outset": {
+   "syntax": "[ <length [0,∞]> | <number [0,∞]> ]{1,4}",
+   "spec": "css-borders-4"
+  },
+  "border-image-repeat": {
+   "syntax": "[ stretch | repeat | round | space ]{1,2}",
+   "spec": "css-borders-4"
+  },
+  "border-image-slice": {
+   "syntax": "[<number [0,∞]> | <percentage [0,∞]>]{1,4} && fill?",
+   "spec": "css-borders-4"
+  },
+  "border-image-source": {
+   "syntax": "none | <image>",
+   "spec": "css-borders-4"
+  },
+  "border-image-width": {
+   "syntax": "[ <length-percentage [0,∞]> | <number [0,∞]> | auto ]{1,4}",
+   "spec": "css-borders-4"
+  },
+  "border-inline": {
+   "syntax": "<'border-block-start'>",
+   "spec": "css-borders-4"
+  },
+  "border-inline-clip": {
+   "syntax": "<'border-top-clip'>",
+   "spec": "css-borders-4"
+  },
+  "border-inline-color": {
+   "syntax": "<'border-top-color'>{1,2}",
+   "spec": "css-borders-4"
+  },
+  "border-inline-end": {
+   "syntax": "<line-width> || <line-style> || <color>",
+   "spec": "css-borders-4"
+  },
+  "border-inline-end-clip": {
+   "syntax": "none | [ <length-percentage [0,∞]> | <flex> ]+",
+   "spec": "css-borders-4"
+  },
+  "border-inline-end-color": {
+   "syntax": "<color> | <image-1D>",
+   "spec": "css-borders-4"
+  },
+  "border-inline-end-radius": {
+   "syntax": "<length-percentage [0,∞]>{1,2} [ / <length-percentage [0,∞]>{1,2} ]?",
+   "spec": "css-borders-4"
+  },
+  "border-inline-end-style": {
+   "syntax": "<line-style>",
+   "spec": "css-borders-4"
+  },
+  "border-inline-end-width": {
+   "syntax": "<line-width>",
+   "spec": "css-borders-4"
+  },
+  "border-inline-start": {
+   "syntax": "<line-width> || <line-style> || <color>",
+   "spec": "css-borders-4"
+  },
+  "border-inline-start-clip": {
+   "syntax": "none | [ <length-percentage [0,∞]> | <flex> ]+",
+   "spec": "css-borders-4"
+  },
+  "border-inline-start-color": {
+   "syntax": "<color> | <image-1D>",
+   "spec": "css-borders-4"
+  },
+  "border-inline-start-radius": {
+   "syntax": "<length-percentage [0,∞]>{1,2} [ / <length-percentage [0,∞]>{1,2} ]?",
+   "spec": "css-borders-4"
+  },
+  "border-inline-start-style": {
+   "syntax": "<line-style>",
+   "spec": "css-borders-4"
+  },
+  "border-inline-start-width": {
+   "syntax": "<line-width>",
+   "spec": "css-borders-4"
+  },
+  "border-inline-style": {
+   "syntax": "<'border-top-style'>{1,2}",
+   "spec": "css-borders-4"
+  },
+  "border-inline-width": {
+   "syntax": "<'border-top-width'>{1,2}",
+   "spec": "css-borders-4"
+  },
+  "border-left": {
+   "syntax": "<line-width> || <line-style> || <color>",
+   "spec": "css-borders-4"
+  },
+  "border-left-clip": {
+   "syntax": "none | [ <length-percentage [0,∞]> | <flex> ]+",
+   "spec": "css-borders-4"
+  },
+  "border-left-color": {
+   "syntax": "<color> | <image-1D>",
+   "spec": "css-borders-4"
+  },
+  "border-left-radius": {
+   "syntax": "<length-percentage [0,∞]>{1,2} [ / <length-percentage [0,∞]>{1,2} ]?",
+   "spec": "css-borders-4"
+  },
+  "border-left-style": {
+   "syntax": "<line-style>",
+   "spec": "css-borders-4"
+  },
+  "border-left-width": {
+   "syntax": "<line-width>",
+   "spec": "css-borders-4"
+  },
+  "border-limit": {
+   "syntax": "all | [ sides | corners ] <length-percentage [0,∞]>? | [ top | right | bottom | left ] <length-percentage [0,∞]>",
+   "spec": "css-borders-4"
+  },
+  "border-radius": {
+   "syntax": "<length-percentage [0,∞]>{1,4} [ / <length-percentage [0,∞]>{1,4} ]?",
+   "spec": "css-borders-4"
+  },
+  "border-right": {
+   "syntax": "<line-width> || <line-style> || <color>",
+   "spec": "css-borders-4"
+  },
+  "border-right-clip": {
+   "syntax": "none | [ <length-percentage [0,∞]> | <flex> ]+",
+   "spec": "css-borders-4"
+  },
+  "border-right-color": {
+   "syntax": "<color> | <image-1D>",
+   "spec": "css-borders-4"
+  },
+  "border-right-radius": {
+   "syntax": "<length-percentage [0,∞]>{1,2} [ / <length-percentage [0,∞]>{1,2} ]?",
+   "spec": "css-borders-4"
+  },
+  "border-right-style": {
+   "syntax": "<line-style>",
+   "spec": "css-borders-4"
+  },
+  "border-right-width": {
+   "syntax": "<line-width>",
+   "spec": "css-borders-4"
+  },
+  "border-shape": {
+   "syntax": "none | [ <basic-shape> <geometry-box>?]{1,2}",
+   "spec": "css-borders-4"
+  },
+  "border-spacing": {
+   "syntax": "<length [0,∞]>{1,2}",
+   "spec": "css-tables-3"
+  },
+  "border-start-end-radius": {
+   "syntax": "<border-radius>",
+   "spec": "css-borders-4"
+  },
+  "border-start-start-radius": {
+   "syntax": "<border-radius>",
+   "spec": "css-borders-4"
+  },
+  "border-style": {
+   "syntax": "<'border-top-style'>{1,4}",
+   "spec": "css-borders-4"
+  },
+  "border-top": {
+   "syntax": "<line-width> || <line-style> || <color>",
+   "spec": "css-borders-4"
+  },
+  "border-top-clip": {
+   "syntax": "none | [ <length-percentage [0,∞]> | <flex> ]+",
+   "spec": "css-borders-4"
+  },
+  "border-top-color": {
+   "syntax": "<color> | <image-1D>",
+   "spec": "css-borders-4"
+  },
+  "border-top-left-radius": {
+   "syntax": "<border-radius>",
+   "spec": "css-borders-4"
+  },
+  "border-top-radius": {
+   "syntax": "<length-percentage [0,∞]>{1,2} [ / <length-percentage [0,∞]>{1,2} ]?",
+   "spec": "css-borders-4"
+  },
+  "border-top-right-radius": {
+   "syntax": "<border-radius>",
+   "spec": "css-borders-4"
+  },
+  "border-top-style": {
+   "syntax": "<line-style>",
+   "spec": "css-borders-4"
+  },
+  "border-top-width": {
+   "syntax": "<line-width>",
+   "spec": "css-borders-4"
+  },
+  "border-width": {
+   "syntax": "<'border-top-width'>{1,4}",
+   "spec": "css-borders-4"
+  },
+  "bottom": {
+   "syntax": "auto | <length-percentage> | <anchor()> | <anchor-size()>",
+   "spec": "css-position-3"
+  },
+  "box-decoration-break": {
+   "syntax": "slice | clone",
+   "spec": "css-break-4"
+  },
+  "box-shadow": {
+   "syntax": "<spread-shadow>#",
+   "spec": "css-borders-4"
+  },
+  "box-shadow-blur": {
+   "syntax": "<length [0,∞]>#",
+   "spec": "css-borders-4"
+  },
+  "box-shadow-color": {
+   "syntax": "<color>#",
+   "spec": "css-borders-4"
+  },
+  "box-shadow-offset": {
+   "syntax": "[ none | <length>{1,2} ]#",
+   "spec": "css-borders-4"
+  },
+  "box-shadow-position": {
+   "syntax": "[ outset | inset ]#",
+   "spec": "css-borders-4"
+  },
+  "box-shadow-spread": {
+   "syntax": "<length>#",
+   "spec": "css-borders-4"
+  },
+  "box-sizing": {
+   "syntax": "content-box | border-box",
+   "spec": "css-sizing-3"
+  },
+  "box-snap": {
+   "syntax": "none | block-start | block-end | center | baseline | last-baseline",
+   "spec": "css-line-grid-1"
+  },
+  "break-after": {
+   "syntax": "auto | avoid | always | all | avoid-page | page | left | right | recto | verso | avoid-column | column | avoid-region | region",
+   "spec": "css-break-4"
+  },
+  "break-before": {
+   "syntax": "auto | avoid | always | all | avoid-page | page | left | right | recto | verso | avoid-column | column | avoid-region | region",
+   "spec": "css-break-4"
+  },
+  "break-inside": {
+   "syntax": "auto | avoid | avoid-page | avoid-column | avoid-region",
+   "spec": "css-break-4"
+  },
+  "caption-side": {
+   "syntax": "top | bottom",
+   "spec": "css-tables-3"
+  },
+  "caret": {
+   "syntax": "<'caret-color'> || <'caret-animation'> || <'caret-shape'>",
+   "spec": "css-ui-4"
+  },
+  "caret-animation": {
+   "syntax": "auto | manual",
+   "spec": "css-ui-4"
+  },
+  "caret-color": {
+   "syntax": "auto | <color> [auto | <color>]?",
+   "spec": "css-ui-4"
+  },
+  "caret-shape": {
+   "syntax": "auto | bar | block | underscore",
+   "spec": "css-ui-4"
+  },
+  "clear": {
+   "syntax": "inline-start | inline-end | block-start | block-end | left | right | top | bottom | both-inline | both-block | both | none",
+   "spec": "css-page-floats-3"
+  },
+  "clip": {
+   "syntax": "<rect()> | auto",
+   "spec": "css-masking-1"
+  },
+  "clip-path": {
+   "syntax": "<clip-source> | [ <basic-shape> || <geometry-box> ] | none",
+   "spec": "css-masking-1"
+  },
+  "clip-rule": {
+   "syntax": "nonzero | evenodd",
+   "spec": "css-masking-1"
+  },
+  "color": {
+   "syntax": "<color>",
+   "spec": "css-color-4"
+  },
+  "color-adjust": {
+   "syntax": "<'print-color-adjust'>",
+   "spec": "css-color-adjust-1"
+  },
+  "color-interpolation": {
+   "syntax": "auto | sRGB | linearRGB",
+   "spec": "unknown"
+  },
+  "color-interpolation-filters": {
+   "syntax": "auto | sRGB | linearRGB",
+   "spec": "filter-effects-1"
+  },
+  "color-scheme": {
+   "syntax": "normal | [ light | dark | <custom-ident> ]+ && only?",
+   "spec": "css-color-adjust-1"
+  },
+  "column-count": {
+   "syntax": "auto | <integer [1,∞]>",
+   "spec": "css-multicol-2"
+  },
+  "column-fill": {
+   "syntax": "auto | balance | balance-all",
+   "spec": "css-multicol-2"
+  },
+  "column-gap": {
+   "syntax": "normal | <length-percentage [0,∞]> | <line-width>",
+   "spec": "css-gaps-1"
+  },
+  "column-height": {
+   "syntax": "auto | <length [0,∞]>",
+   "spec": "css-multicol-2"
+  },
+  "column-rule": {
+   "syntax": "<gap-rule-list> | <gap-auto-rule-list>",
+   "spec": "css-gaps-1"
+  },
+  "column-rule-break": {
+   "syntax": "none | normal | intersection",
+   "spec": "css-gaps-1"
+  },
+  "column-rule-color": {
+   "syntax": "<line-color-list> | <auto-line-color-list>",
+   "spec": "css-gaps-1"
+  },
+  "column-rule-inset": {
+   "syntax": "<'column-rule-inset-cap'> [ / <'column-rule-inset-junction'> ]?",
+   "spec": "css-gaps-1"
+  },
+  "column-rule-inset-cap": {
+   "syntax": "<inset-value> <inset-value>?",
+   "spec": "css-gaps-1"
+  },
+  "column-rule-inset-cap-end": {
+   "syntax": "<inset-value>",
+   "spec": "css-gaps-1"
+  },
+  "column-rule-inset-cap-start": {
+   "syntax": "<inset-value>",
+   "spec": "css-gaps-1"
+  },
+  "column-rule-inset-end": {
+   "syntax": "<inset-value>",
+   "spec": "css-gaps-1"
+  },
+  "column-rule-inset-junction": {
+   "syntax": "<inset-value> <inset-value>?",
+   "spec": "css-gaps-1"
+  },
+  "column-rule-inset-junction-end": {
+   "syntax": "<inset-value>",
+   "spec": "css-gaps-1"
+  },
+  "column-rule-inset-junction-start": {
+   "syntax": "<inset-value>",
+   "spec": "css-gaps-1"
+  },
+  "column-rule-inset-start": {
+   "syntax": "<inset-value>",
+   "spec": "css-gaps-1"
+  },
+  "column-rule-style": {
+   "syntax": "<line-style-list> | <auto-line-style-list>",
+   "spec": "css-gaps-1"
+  },
+  "column-rule-visibility-items": {
+   "syntax": "all | around | between | normal",
+   "spec": "css-gaps-1"
+  },
+  "column-rule-width": {
+   "syntax": "<line-width-list> | <auto-line-width-list>",
+   "spec": "css-gaps-1"
+  },
+  "column-span": {
+   "syntax": "none | <integer [1,∞]> | all | auto",
+   "spec": "css-multicol-2"
+  },
+  "column-width": {
+   "syntax": "auto | <length [0,∞]> | min-content | max-content | fit-content(<length-percentage>)",
+   "spec": "css-multicol-2"
+  },
+  "column-wrap": {
+   "syntax": "auto | nowrap | wrap",
+   "spec": "css-multicol-2"
+  },
+  "columns": {
+   "syntax": "[ <'column-width'> || <'column-count'> ] [ / <'column-height'> ]?",
+   "spec": "css-multicol-2"
+  },
+  "contain": {
+   "syntax": "none | strict | content | [ [size | inline-size] || layout || style || paint ]",
+   "spec": "css-contain-2"
+  },
+  "contain-intrinsic-block-size": {
+   "syntax": "auto? [ none | <length [0,∞]> ]",
+   "spec": "css-sizing-4"
+  },
+  "contain-intrinsic-height": {
+   "syntax": "auto? [ none | <length [0,∞]> ]",
+   "spec": "css-sizing-4"
+  },
+  "contain-intrinsic-inline-size": {
+   "syntax": "auto? [ none | <length [0,∞]> ]",
+   "spec": "css-sizing-4"
+  },
+  "contain-intrinsic-size": {
+   "syntax": "[ auto? [ none | <length [0,∞]> ] ]{1,2}",
+   "spec": "css-sizing-4"
+  },
+  "contain-intrinsic-width": {
+   "syntax": "auto? [ none | <length [0,∞]> ]",
+   "spec": "css-sizing-4"
+  },
+  "container": {
+   "syntax": "<'container-name'> [ / <'container-type'> ]?",
+   "spec": "css-conditional-5"
+  },
+  "container-name": {
+   "syntax": "none | <custom-ident>+",
+   "spec": "css-conditional-5"
+  },
+  "container-type": {
+   "syntax": "normal | [ [ size | inline-size ] || scroll-state ]",
+   "spec": "css-conditional-5"
+  },
+  "content": {
+   "syntax": "normal | none | [ <content-replacement> | <content-list> ] [/ [ <string> | <counter> | <attr()> ]+ ]? | <element()>",
+   "spec": "css-content-3"
+  },
+  "content-visibility": {
+   "syntax": "visible | auto | hidden",
+   "spec": "css-contain-2"
+  },
+  "continue": {
+   "syntax": "auto | discard | collapse | -webkit-legacy | overflow | paginate | fragments",
+   "spec": "css-overflow-4"
+  },
+  "copy-into": {
+   "syntax": "none | [ [ <custom-ident> <content-level>] [, <custom-ident> <content-level>]* ]?",
+   "spec": "css-gcpm-4"
+  },
+  "corner": {
+   "syntax": "<'border-radius'> || <'corner-shape'>",
+   "spec": "css-borders-4"
+  },
+  "corner-block-end": {
+   "syntax": "<'border-top-radius'> || <'corner-top-shape'>",
+   "spec": "css-borders-4"
+  },
+  "corner-block-end-shape": {
+   "syntax": "<'corner-top-left-shape'>{1,2}",
+   "spec": "css-borders-4"
+  },
+  "corner-block-start": {
+   "syntax": "<'border-top-radius'> || <'corner-top-shape'>",
+   "spec": "css-borders-4"
+  },
+  "corner-block-start-shape": {
+   "syntax": "<'corner-top-left-shape'>{1,2}",
+   "spec": "css-borders-4"
+  },
+  "corner-bottom": {
+   "syntax": "<'border-top-radius'> || <'corner-top-shape'>",
+   "spec": "css-borders-4"
+  },
+  "corner-bottom-left": {
+   "syntax": "<'border-top-left-radius'> || <'corner-top-left-shape'>",
+   "spec": "css-borders-4"
+  },
+  "corner-bottom-left-shape": {
+   "syntax": "<corner-shape-value>",
+   "spec": "css-borders-4"
+  },
+  "corner-bottom-right": {
+   "syntax": "<'border-top-left-radius'> || <'corner-top-left-shape'>",
+   "spec": "css-borders-4"
+  },
+  "corner-bottom-right-shape": {
+   "syntax": "<corner-shape-value>",
+   "spec": "css-borders-4"
+  },
+  "corner-bottom-shape": {
+   "syntax": "<'corner-top-left-shape'>{1,2}",
+   "spec": "css-borders-4"
+  },
+  "corner-end-end": {
+   "syntax": "<'border-top-left-radius'> || <'corner-top-left-shape'>",
+   "spec": "css-borders-4"
+  },
+  "corner-end-end-shape": {
+   "syntax": "<corner-shape-value>",
+   "spec": "css-borders-4"
+  },
+  "corner-end-start": {
+   "syntax": "<'border-top-left-radius'> || <'corner-top-left-shape'>",
+   "spec": "css-borders-4"
+  },
+  "corner-end-start-shape": {
+   "syntax": "<corner-shape-value>",
+   "spec": "css-borders-4"
+  },
+  "corner-inline-end": {
+   "syntax": "<'border-top-radius'> || <'corner-top-shape'>",
+   "spec": "css-borders-4"
+  },
+  "corner-inline-end-shape": {
+   "syntax": "<'corner-top-left-shape'>{1,2}",
+   "spec": "css-borders-4"
+  },
+  "corner-inline-start": {
+   "syntax": "<'border-top-radius'> || <'corner-top-shape'>",
+   "spec": "css-borders-4"
+  },
+  "corner-inline-start-shape": {
+   "syntax": "<'corner-top-left-shape'>{1,2}",
+   "spec": "css-borders-4"
+  },
+  "corner-left": {
+   "syntax": "<'border-top-radius'> || <'corner-top-shape'>",
+   "spec": "css-borders-4"
+  },
+  "corner-left-shape": {
+   "syntax": "<'corner-top-left-shape'>{1,2}",
+   "spec": "css-borders-4"
+  },
+  "corner-right": {
+   "syntax": "<'border-top-radius'> || <'corner-top-shape'>",
+   "spec": "css-borders-4"
+  },
+  "corner-right-shape": {
+   "syntax": "<'corner-top-left-shape'>{1,2}",
+   "spec": "css-borders-4"
+  },
+  "corner-shape": {
+   "syntax": "<'corner-top-left-shape'>{1,4}",
+   "spec": "css-borders-4"
+  },
+  "corner-start-end": {
+   "syntax": "<'border-top-left-radius'> || <'corner-top-left-shape'>",
+   "spec": "css-borders-4"
+  },
+  "corner-start-end-shape": {
+   "syntax": "<corner-shape-value>",
+   "spec": "css-borders-4"
+  },
+  "corner-start-start": {
+   "syntax": "<'border-top-left-radius'> || <'corner-top-left-shape'>",
+   "spec": "css-borders-4"
+  },
+  "corner-start-start-shape": {
+   "syntax": "<corner-shape-value>",
+   "spec": "css-borders-4"
+  },
+  "corner-top": {
+   "syntax": "<'border-top-radius'> || <'corner-top-shape'>",
+   "spec": "css-borders-4"
+  },
+  "corner-top-left": {
+   "syntax": "<'border-top-left-radius'> || <'corner-top-left-shape'>",
+   "spec": "css-borders-4"
+  },
+  "corner-top-left-shape": {
+   "syntax": "<corner-shape-value>",
+   "spec": "css-borders-4"
+  },
+  "corner-top-right": {
+   "syntax": "<'border-top-left-radius'> || <'corner-top-left-shape'>",
+   "spec": "css-borders-4"
+  },
+  "corner-top-right-shape": {
+   "syntax": "<corner-shape-value>",
+   "spec": "css-borders-4"
+  },
+  "corner-top-shape": {
+   "syntax": "<'corner-top-left-shape'>{1,2}",
+   "spec": "css-borders-4"
+  },
+  "counter-increment": {
+   "syntax": "[ <counter-name> <integer>? ]+ | none",
+   "spec": "css-lists-3"
+  },
+  "counter-reset": {
+   "syntax": "[ <counter-name> <integer>? | <reversed-counter-name> <integer>? ]+ | none",
+   "spec": "css-lists-3"
+  },
+  "counter-set": {
+   "syntax": "[ <counter-name> <integer>? ]+ | none",
+   "spec": "css-lists-3"
+  },
+  "cue": {
+   "syntax": "<'cue-before'> <'cue-after'>?",
+   "spec": "css-speech-1"
+  },
+  "cue-after": {
+   "syntax": "<url> <decibel>? | none",
+   "spec": "css-speech-1"
+  },
+  "cue-before": {
+   "syntax": "<url> <decibel>? | none",
+   "spec": "css-speech-1"
+  },
+  "cursor": {
+   "syntax": "[<cursor-image>,]* <cursor-predefined>",
+   "spec": "css-ui-4"
+  },
+  "cx": {
+   "syntax": "<length-percentage>",
+   "spec": "unknown"
+  },
+  "cy": {
+   "syntax": "<length-percentage>",
+   "spec": "unknown"
+  },
+  "d": {
+   "syntax": "none | <string>",
+   "spec": "unknown"
+  },
+  "direction": {
+   "syntax": "ltr | rtl",
+   "spec": "css-writing-modes-4"
+  },
+  "display": {
+   "syntax": "[ <display-outside> || <display-inside> ] | <display-listitem> | <display-internal> | <display-box> | <display-legacy> | grid-lanes | inline-grid-lanes | <display-outside> || [ <display-inside> | math ]",
+   "spec": "css-display-4"
+  },
+  "dominant-baseline": {
+   "syntax": "auto | <baseline-metric>",
+   "spec": "css-inline-3"
+  },
+  "dynamic-range-limit": {
+   "syntax": "standard | no-limit | constrained | <dynamic-range-limit-mix()>",
+   "spec": "css-color-hdr-1"
+  },
+  "empty-cells": {
+   "syntax": "show | hide",
+   "spec": "css-tables-3"
+  },
+  "event-trigger": {
+   "syntax": "none | [ <'event-trigger-name'> <'event-trigger-source'> ]#",
+   "spec": "animation-triggers-1"
+  },
+  "event-trigger-name": {
+   "syntax": "none | <dashed-ident>#",
+   "spec": "animation-triggers-1"
+  },
+  "event-trigger-source": {
+   "syntax": "[ none | <event-trigger-event>+ [ / <event-trigger-event>+ ]? ]#",
+   "spec": "animation-triggers-1"
+  },
+  "field-sizing": {
+   "syntax": "fixed | content",
+   "spec": "css-forms-1"
+  },
+  "fill": {
+   "syntax": "<paint>",
+   "spec": "unknown"
+  },
+  "fill-break": {
+   "syntax": "bounding-box | slice | clone",
+   "spec": "fill-stroke-3"
+  },
+  "fill-color": {
+   "syntax": "<color>",
+   "spec": "fill-stroke-3"
+  },
+  "fill-image": {
+   "syntax": "<paint>#",
+   "spec": "fill-stroke-3"
+  },
+  "fill-opacity": {
+   "syntax": "<'opacity'>",
+   "spec": "fill-stroke-3"
+  },
+  "fill-origin": {
+   "syntax": "match-parent | fill-box | stroke-box | content-box | padding-box | border-box",
+   "spec": "fill-stroke-3"
+  },
+  "fill-position": {
+   "syntax": "<position>#",
+   "spec": "fill-stroke-3"
+  },
+  "fill-repeat": {
+   "syntax": "<repeat-style>#",
+   "spec": "fill-stroke-3"
+  },
+  "fill-rule": {
+   "syntax": "nonzero | evenodd",
+   "spec": "fill-stroke-3"
+  },
+  "fill-size": {
+   "syntax": "<bg-size>#",
+   "spec": "fill-stroke-3"
+  },
+  "filter": {
+   "syntax": "none | <filter-value-list>",
+   "spec": "filter-effects-1"
+  },
+  "flex": {
+   "syntax": "none | [ <'flex-grow'> <'flex-shrink'>? || <'flex-basis'> ]",
+   "spec": "css-flexbox-2"
+  },
+  "flex-basis": {
+   "syntax": "content | <'width'>",
+   "spec": "css-flexbox-2"
+  },
+  "flex-direction": {
+   "syntax": "row | row-reverse | column | column-reverse",
+   "spec": "css-flexbox-2"
+  },
+  "flex-flow": {
+   "syntax": "<'flex-direction'> || <'flex-wrap'>",
+   "spec": "css-flexbox-2"
+  },
+  "flex-grow": {
+   "syntax": "<number [0,∞]>",
+   "spec": "css-flexbox-2"
+  },
+  "flex-line-count": {
+   "syntax": "<integer [1,∞]>",
+   "spec": "css-flexbox-2"
+  },
+  "flex-shrink": {
+   "syntax": "<number [0,∞]>",
+   "spec": "css-flexbox-2"
+  },
+  "flex-wrap": {
+   "syntax": "nowrap | [ wrap | wrap-reverse ] || balance",
+   "spec": "css-flexbox-2"
+  },
+  "float": {
+   "syntax": "block-start | block-end | inline-start | inline-end | snap-block | <snap-block()> | snap-inline | <snap-inline()> | left | right | top | bottom | none | footnote",
+   "spec": "css-page-floats-3"
+  },
+  "float-defer": {
+   "syntax": "<integer> | last | none",
+   "spec": "css-page-floats-3"
+  },
+  "float-offset": {
+   "syntax": "<length-percentage>",
+   "spec": "css-page-floats-3"
+  },
+  "float-reference": {
+   "syntax": "inline | column | region | page",
+   "spec": "css-page-floats-3"
+  },
+  "flood-color": {
+   "syntax": "<color>",
+   "spec": "filter-effects-1"
+  },
+  "flood-opacity": {
+   "syntax": "<'opacity'>",
+   "spec": "filter-effects-1"
+  },
+  "flow-from": {
+   "syntax": "<custom-ident> | none",
+   "spec": "css-regions-1"
+  },
+  "flow-into": {
+   "syntax": "none | <custom-ident> [element | content]?",
+   "spec": "css-regions-1"
+  },
+  "flow-tolerance": {
+   "syntax": "normal | <length-percentage [0,∞]> | infinite",
+   "spec": "css-grid-3"
+  },
+  "font": {
+   "syntax": "[ [ <'font-style'> || <font-variant-css2> || <'font-weight'> || <font-width-css3> ]? <'font-size'> [ / <'line-height'> ]? <'font-family'># ] | <system-font-family-name>",
+   "spec": "css-fonts-4"
+  },
+  "font-family": {
+   "syntax": "[ <font-family-name> | <generic-font-family> ]#",
+   "spec": "css-fonts-4"
+  },
+  "font-feature-settings": {
+   "syntax": "normal | <feature-tag-value>#",
+   "spec": "css-fonts-4"
+  },
+  "font-kerning": {
+   "syntax": "auto | normal | none",
+   "spec": "css-fonts-4"
+  },
+  "font-language-override": {
+   "syntax": "normal | <string>",
+   "spec": "css-fonts-4"
+  },
+  "font-optical-sizing": {
+   "syntax": "auto | none",
+   "spec": "css-fonts-4"
+  },
+  "font-palette": {
+   "syntax": "normal | light | dark | <palette-identifier> | <palette-mix()>",
+   "spec": "css-fonts-4"
+  },
+  "font-size": {
+   "syntax": "<absolute-size> | <relative-size> | <length-percentage [0,∞]> | math",
+   "spec": "css-fonts-4"
+  },
+  "font-size-adjust": {
+   "syntax": "none | [ ex-height | cap-height | ch-width | ic-width | ic-height ]? [ from-font | <number [0,∞]> ]",
+   "spec": "css-fonts-5"
+  },
+  "font-stretch": {
+   "syntax": "normal | <percentage [0,∞]> | ultra-condensed | extra-condensed | condensed | semi-condensed | semi-expanded | expanded | extra-expanded | ultra-expanded",
+   "legacyAliasOf": "font-width",
+   "spec": "css-fonts-4"
+  },
+  "font-style": {
+   "syntax": "normal | italic | left | right | oblique <angle [-90deg,90deg]>?",
+   "spec": "css-fonts-4"
+  },
+  "font-synthesis": {
+   "syntax": "none | [ weight || style || small-caps || position]",
+   "spec": "css-fonts-4"
+  },
+  "font-synthesis-position": {
+   "syntax": "auto | none",
+   "spec": "css-fonts-4"
+  },
+  "font-synthesis-small-caps": {
+   "syntax": "auto | none",
+   "spec": "css-fonts-4"
+  },
+  "font-synthesis-style": {
+   "syntax": "auto | none | oblique-only",
+   "spec": "css-fonts-4"
+  },
+  "font-synthesis-weight": {
+   "syntax": "auto | none",
+   "spec": "css-fonts-4"
+  },
+  "font-variant": {
+   "syntax": "normal | none | [ [ <common-lig-values> || <discretionary-lig-values> || <historical-lig-values> || <contextual-alt-values> ] || [ small-caps | all-small-caps | petite-caps | all-petite-caps | unicase | titling-caps ] || [ stylistic(<font-feature-value-name>) || historical-forms || styleset(<font-feature-value-name>#) || character-variant(<font-feature-value-name>#) || swash(<font-feature-value-name>) || ornaments(<font-feature-value-name>) || annotation(<font-feature-value-name>) ] || [ <numeric-figure-values> || <numeric-spacing-values> || <numeric-fraction-values> || ordinal || slashed-zero ] || [ <east-asian-variant-values> || <east-asian-width-values> || ruby ] || [ sub | super ] || [ text | emoji | unicode ] ]",
+   "spec": "css-fonts-4"
+  },
+  "font-variant-alternates": {
+   "syntax": "normal | [ stylistic(<font-feature-value-name>) || historical-forms || styleset(<font-feature-value-name>#) || character-variant(<font-feature-value-name>#) || swash(<font-feature-value-name>) || ornaments(<font-feature-value-name>) || annotation(<font-feature-value-name>) ]",
+   "spec": "css-fonts-4"
+  },
+  "font-variant-caps": {
+   "syntax": "normal | small-caps | all-small-caps | petite-caps | all-petite-caps | unicase | titling-caps",
+   "spec": "css-fonts-4"
+  },
+  "font-variant-east-asian": {
+   "syntax": "normal | [ <east-asian-variant-values> || <east-asian-width-values> || ruby ]",
+   "spec": "css-fonts-4"
+  },
+  "font-variant-emoji": {
+   "syntax": "normal | text | emoji | unicode",
+   "spec": "css-fonts-4"
+  },
+  "font-variant-ligatures": {
+   "syntax": "normal | none | [ <common-lig-values> || <discretionary-lig-values> || <historical-lig-values> || <contextual-alt-values> ]",
+   "spec": "css-fonts-4"
+  },
+  "font-variant-numeric": {
+   "syntax": "normal | [ <numeric-figure-values> || <numeric-spacing-values> || <numeric-fraction-values> || ordinal || slashed-zero ]",
+   "spec": "css-fonts-4"
+  },
+  "font-variant-position": {
+   "syntax": "normal | sub | super",
+   "spec": "css-fonts-4"
+  },
+  "font-variation-settings": {
+   "syntax": "normal | [ <opentype-tag> <number> ]#",
+   "spec": "css-fonts-4"
+  },
+  "font-weight": {
+   "syntax": "<font-weight-absolute> | bolder | lighter",
+   "spec": "css-fonts-4"
+  },
+  "font-width": {
+   "syntax": "normal | <percentage [0,∞]> | ultra-condensed | extra-condensed | condensed | semi-condensed | semi-expanded | expanded | extra-expanded | ultra-expanded",
+   "spec": "css-fonts-4"
+  },
+  "footnote-display": {
+   "syntax": "block | inline | compact",
+   "spec": "css-gcpm-3"
+  },
+  "footnote-policy": {
+   "syntax": "auto | line | block",
+   "spec": "css-gcpm-3"
+  },
+  "forced-color-adjust": {
+   "syntax": "auto | none | preserve-parent-color",
+   "spec": "css-color-adjust-1"
+  },
+  "frame-sizing": {
+   "syntax": "auto | content-width | content-height | content-block-size | content-inline-size",
+   "spec": "css-sizing-4"
+  },
+  "gap": {
+   "syntax": "<'row-gap'> <'column-gap'>?",
+   "spec": "css-gaps-1"
+  },
+  "glyph-orientation-vertical": {
+   "syntax": "auto | 0deg | 90deg | 0 | 90",
+   "spec": "css-writing-modes-4"
+  },
+  "grid": {
+   "syntax": "<'grid-template'> | <'grid-template-rows'> / [ auto-flow && dense? ] <'grid-auto-columns'>? | [ auto-flow && dense? ] <'grid-auto-rows'>? / <'grid-template-columns'>",
+   "spec": "css-grid-2"
+  },
+  "grid-area": {
+   "syntax": "<grid-line> [ / <grid-line> ]{0,3}",
+   "spec": "css-grid-2"
+  },
+  "grid-auto-columns": {
+   "syntax": "<track-size>+",
+   "spec": "css-grid-2"
+  },
+  "grid-auto-flow": {
+   "syntax": "[ row | column ] || dense",
+   "spec": "css-grid-2"
+  },
+  "grid-auto-rows": {
+   "syntax": "<track-size>+",
+   "spec": "css-grid-2"
+  },
+  "grid-column": {
+   "syntax": "<grid-line> [ / <grid-line> ]?",
+   "spec": "css-grid-2"
+  },
+  "grid-column-end": {
+   "syntax": "<grid-line>",
+   "spec": "css-grid-2"
+  },
+  "grid-column-gap": {
+   "syntax": "normal | <length-percentage [0,∞]> | <line-width>",
+   "legacyAliasOf": "column-gap",
+   "spec": "css-gaps-1"
+  },
+  "grid-column-start": {
+   "syntax": "<grid-line>",
+   "spec": "css-grid-2"
+  },
+  "grid-gap": {
+   "syntax": "<'row-gap'> <'column-gap'>?",
+   "legacyAliasOf": "gap",
+   "spec": "css-gaps-1"
+  },
+  "grid-row": {
+   "syntax": "<grid-line> [ / <grid-line> ]?",
+   "spec": "css-grid-2"
+  },
+  "grid-row-end": {
+   "syntax": "<grid-line>",
+   "spec": "css-grid-2"
+  },
+  "grid-row-gap": {
+   "syntax": "normal | <length-percentage [0,∞]> | <line-width>",
+   "legacyAliasOf": "row-gap",
+   "spec": "css-gaps-1"
+  },
+  "grid-row-start": {
+   "syntax": "<grid-line>",
+   "spec": "css-grid-2"
+  },
+  "grid-template": {
+   "syntax": "none | [ <'grid-template-rows'> / <'grid-template-columns'> ] | [ <line-names>? <string> <track-size>? <line-names>? ]+ [ / <explicit-track-list> ]?",
+   "spec": "css-grid-2"
+  },
+  "grid-template-areas": {
+   "syntax": "none | <string>+",
+   "spec": "css-grid-2"
+  },
+  "grid-template-columns": {
+   "syntax": "none | <track-list> | <auto-track-list> | subgrid <line-name-list>?",
+   "spec": "css-grid-2"
+  },
+  "grid-template-rows": {
+   "syntax": "none | <track-list> | <auto-track-list> | subgrid <line-name-list>?",
+   "spec": "css-grid-2"
+  },
+  "hanging-punctuation": {
+   "syntax": "none | [ first || [ force-end | allow-end ] || last ]",
+   "spec": "css-text-4"
+  },
+  "height": {
+   "syntax": "auto | <length-percentage [0,∞]> | min-content | max-content | fit-content(<length-percentage [0,∞]>) | <calc-size()> | <anchor-size()> | stretch | fit-content | contain",
+   "spec": "css-sizing-3"
+  },
+  "hyphenate-character": {
+   "syntax": "auto | <string>",
+   "spec": "css-text-4"
+  },
+  "hyphenate-limit-chars": {
+   "syntax": "[ auto | <integer> ]{1,3}",
+   "spec": "css-text-4"
+  },
+  "hyphenate-limit-last": {
+   "syntax": "none | always | column | page | spread",
+   "spec": "css-text-4"
+  },
+  "hyphenate-limit-lines": {
+   "syntax": "no-limit | <integer>",
+   "spec": "css-text-4"
+  },
+  "hyphenate-limit-zone": {
+   "syntax": "<length-percentage>",
+   "spec": "css-text-4"
+  },
+  "hyphens": {
+   "syntax": "none | manual | auto",
+   "spec": "css-text-4"
+  },
+  "image-animation": {
+   "syntax": "normal | paused | stopped | running",
+   "spec": "css-image-animation-1"
+  },
+  "image-orientation": {
+   "syntax": "from-image | none | [ <angle> || flip ]",
+   "spec": "css-images-3"
+  },
+  "image-rendering": {
+   "syntax": "auto | smooth | high-quality | pixelated | crisp-edges",
+   "spec": "css-images-3"
+  },
+  "image-resolution": {
+   "syntax": "[ from-image || <resolution> ] && snap?",
+   "spec": "css-images-4"
+  },
+  "initial-letter": {
+   "syntax": "normal | <number [1,∞]> <integer [1,∞]> | <number [1,∞]> && [ drop | raise ]?",
+   "spec": "css-inline-3"
+  },
+  "initial-letter-align": {
+   "syntax": "[ border-box? [ alphabetic | ideographic | hanging | leading ]? ]!",
+   "spec": "css-inline-3"
+  },
+  "initial-letter-wrap": {
+   "syntax": "none | first | all | grid | <length-percentage>",
+   "spec": "css-inline-3"
+  },
+  "inline-size": {
+   "syntax": "<'width'>",
+   "spec": "css-logical-1"
+  },
+  "inline-sizing": {
+   "syntax": "normal | stretch",
+   "spec": "css-inline-3"
+  },
+  "input-security": {
+   "syntax": "auto | none",
+   "spec": "css-forms-1"
+  },
+  "inset": {
+   "syntax": "<'top'>{1,4}",
+   "spec": "css-position-3"
+  },
+  "inset-block": {
+   "syntax": "<'top'>{1,2}",
+   "spec": "css-position-3"
+  },
+  "inset-block-end": {
+   "syntax": "auto | <length-percentage>",
+   "spec": "css-position-3"
+  },
+  "inset-block-start": {
+   "syntax": "auto | <length-percentage>",
+   "spec": "css-position-3"
+  },
+  "inset-inline": {
+   "syntax": "<'top'>{1,2}",
+   "spec": "css-position-3"
+  },
+  "inset-inline-end": {
+   "syntax": "auto | <length-percentage>",
+   "spec": "css-position-3"
+  },
+  "inset-inline-start": {
+   "syntax": "auto | <length-percentage>",
+   "spec": "css-position-3"
+  },
+  "interactivity": {
+   "syntax": "auto | inert",
+   "spec": "css-ui-4"
+  },
+  "interest-delay": {
+   "syntax": "<'interest-delay-start'>{1,2}",
+   "spec": "css-ui-4"
+  },
+  "interest-delay-end": {
+   "syntax": "normal | <time>",
+   "spec": "css-ui-4"
+  },
+  "interest-delay-start": {
+   "syntax": "normal | <time>",
+   "spec": "css-ui-4"
+  },
+  "interpolate-size": {
+   "syntax": "numeric-only | allow-keywords",
+   "spec": "css-values-5"
+  },
+  "isolation": {
+   "syntax": "<isolation-mode>",
+   "spec": "compositing-2"
+  },
+  "justify-content": {
+   "syntax": "normal | <content-distribution> | <overflow-position>? [ <content-position> | left | right ]",
+   "spec": "css-align-3"
+  },
+  "justify-items": {
+   "syntax": "normal | stretch | <baseline-position> | <overflow-position>? [ <self-position> | left | right ] | legacy | legacy && [ left | right | center ]",
+   "spec": "css-align-3"
+  },
+  "justify-self": {
+   "syntax": "auto | <overflow-position>? [ normal | <self-position> | left | right ] | stretch | <baseline-position> | anchor-center",
+   "spec": "css-align-3"
+  },
+  "left": {
+   "syntax": "auto | <length-percentage> | <anchor()> | <anchor-size()>",
+   "spec": "css-position-3"
+  },
+  "letter-spacing": {
+   "syntax": "normal | <length-percentage>",
+   "spec": "css-text-4"
+  },
+  "lighting-color": {
+   "syntax": "<color>",
+   "spec": "filter-effects-1"
+  },
+  "line-break": {
+   "syntax": "auto | loose | normal | strict | anywhere",
+   "spec": "css-text-4"
+  },
+  "line-clamp": {
+   "syntax": "none | [<integer [1,∞]> || <'block-ellipsis'>] -webkit-legacy?",
+   "spec": "css-overflow-4"
+  },
+  "line-fit-edge": {
+   "syntax": "leading | <text-edge>",
+   "spec": "css-inline-3"
+  },
+  "line-grid": {
+   "syntax": "match-parent | create",
+   "spec": "css-line-grid-1"
+  },
+  "line-height": {
+   "syntax": "normal | <number [0,∞]> | <length-percentage [0,∞]>",
+   "spec": "css-inline-3"
+  },
+  "line-height-step": {
+   "syntax": "<length [0,∞]>",
+   "spec": "css-rhythm-1"
+  },
+  "line-padding": {
+   "syntax": "<length>",
+   "spec": "css-text-4"
+  },
+  "line-snap": {
+   "syntax": "none | baseline | contain",
+   "spec": "css-line-grid-1"
+  },
+  "link-parameters": {
+   "syntax": "none | <param()>#",
+   "spec": "css-link-params-1"
+  },
+  "list-style": {
+   "syntax": "<'list-style-position'> || <'list-style-image'> || <'list-style-type'>",
+   "spec": "css-lists-3"
+  },
+  "list-style-image": {
+   "syntax": "<image> | none",
+   "spec": "css-lists-3"
+  },
+  "list-style-position": {
+   "syntax": "inside | outside",
+   "spec": "css-lists-3"
+  },
+  "list-style-type": {
+   "syntax": "<counter-style> | <string> | none",
+   "spec": "css-lists-3"
+  },
+  "margin": {
+   "syntax": "<'margin-top'>{1,4}",
+   "spec": "css-box-4"
+  },
+  "margin-block": {
+   "syntax": "<'margin-top'>{1,2}",
+   "spec": "css-logical-1"
+  },
+  "margin-block-end": {
+   "syntax": "<'margin-top'>",
+   "spec": "css-logical-1"
+  },
+  "margin-block-start": {
+   "syntax": "<'margin-top'>",
+   "spec": "css-logical-1"
+  },
+  "margin-bottom": {
+   "syntax": "<length-percentage> | auto | <anchor-size()>",
+   "spec": "css-box-4"
+  },
+  "margin-break": {
+   "syntax": "auto | keep | discard",
+   "spec": "css-break-4"
+  },
+  "margin-inline": {
+   "syntax": "<'margin-top'>{1,2}",
+   "spec": "css-logical-1"
+  },
+  "margin-inline-end": {
+   "syntax": "<'margin-top'>",
+   "spec": "css-logical-1"
+  },
+  "margin-inline-start": {
+   "syntax": "<'margin-top'>",
+   "spec": "css-logical-1"
+  },
+  "margin-left": {
+   "syntax": "<length-percentage> | auto | <anchor-size()>",
+   "spec": "css-box-4"
+  },
+  "margin-right": {
+   "syntax": "<length-percentage> | auto | <anchor-size()>",
+   "spec": "css-box-4"
+  },
+  "margin-top": {
+   "syntax": "<length-percentage> | auto | <anchor-size()>",
+   "spec": "css-box-4"
+  },
+  "margin-trim": {
+   "syntax": "none | [ block || inline ] | [ block-start || inline-start || block-end || inline-end ]",
+   "spec": "css-box-4"
+  },
+  "marker": {
+   "syntax": "none | <marker-ref>",
+   "spec": "unknown"
+  },
+  "marker-end": {
+   "syntax": "none | <marker-ref>",
+   "spec": "unknown"
+  },
+  "marker-mid": {
+   "syntax": "none | <marker-ref>",
+   "spec": "unknown"
+  },
+  "marker-side": {
+   "syntax": "match-self | match-parent",
+   "spec": "css-lists-3"
+  },
+  "marker-start": {
+   "syntax": "none | <marker-ref>",
+   "spec": "unknown"
+  },
+  "mask": {
+   "syntax": "<mask-layer>#",
+   "spec": "css-masking-1"
+  },
+  "mask-border": {
+   "syntax": "<'mask-border-source'> || <'mask-border-slice'> [ / <'mask-border-width'>? [ / <'mask-border-outset'> ]? ]? || <'mask-border-repeat'> || <'mask-border-mode'>",
+   "spec": "css-masking-1"
+  },
+  "mask-border-mode": {
+   "syntax": "luminance | alpha",
+   "spec": "css-masking-1"
+  },
+  "mask-border-outset": {
+   "syntax": "<'border-image-outset'>",
+   "spec": "css-masking-1"
+  },
+  "mask-border-repeat": {
+   "syntax": "<'border-image-repeat'>",
+   "spec": "css-masking-1"
+  },
+  "mask-border-slice": {
+   "syntax": "<'border-image-slice'>",
+   "spec": "css-masking-1"
+  },
+  "mask-border-source": {
+   "syntax": "<'border-image-source'>",
+   "spec": "css-masking-1"
+  },
+  "mask-border-width": {
+   "syntax": "<'border-image-width'>",
+   "spec": "css-masking-1"
+  },
+  "mask-clip": {
+   "syntax": "[ <coord-box> | no-clip ]#",
+   "spec": "css-masking-1"
+  },
+  "mask-composite": {
+   "syntax": "<compositing-operator>#",
+   "spec": "css-masking-1"
+  },
+  "mask-image": {
+   "syntax": "<mask-reference>#",
+   "spec": "css-masking-1"
+  },
+  "mask-mode": {
+   "syntax": "<masking-mode>#",
+   "spec": "css-masking-1"
+  },
+  "mask-origin": {
+   "syntax": "<coord-box>#",
+   "spec": "css-masking-1"
+  },
+  "mask-position": {
+   "syntax": "<position>#",
+   "spec": "css-masking-1"
+  },
+  "mask-repeat": {
+   "syntax": "<repeat-style>#",
+   "spec": "css-masking-1"
+  },
+  "mask-size": {
+   "syntax": "<bg-size>#",
+   "spec": "css-masking-1"
+  },
+  "mask-type": {
+   "syntax": "luminance | alpha",
+   "spec": "css-masking-1"
+  },
+  "math-depth": {
+   "syntax": "auto-add | add(<integer>) | <integer>",
+   "spec": "unknown"
+  },
+  "math-shift": {
+   "syntax": "normal | compact",
+   "spec": "unknown"
+  },
+  "math-style": {
+   "syntax": "normal | compact",
+   "spec": "unknown"
+  },
+  "max-block-size": {
+   "syntax": "<'max-width'>",
+   "spec": "css-logical-1"
+  },
+  "max-height": {
+   "syntax": "none | <length-percentage [0,∞]> | min-content | max-content | fit-content(<length-percentage [0,∞]>) | <calc-size()> | <anchor-size()> | stretch | fit-content | contain",
+   "spec": "css-sizing-3"
+  },
+  "max-inline-size": {
+   "syntax": "<'max-width'>",
+   "spec": "css-logical-1"
+  },
+  "max-lines": {
+   "syntax": "none | <integer [1,∞]>",
+   "spec": "css-overflow-4"
+  },
+  "max-width": {
+   "syntax": "none | <length-percentage [0,∞]> | min-content | max-content | fit-content(<length-percentage [0,∞]>) | <calc-size()> | <anchor-size()> | stretch | fit-content | contain",
+   "spec": "css-sizing-3"
+  },
+  "min-block-size": {
+   "syntax": "<'min-width'>",
+   "spec": "css-logical-1"
+  },
+  "min-height": {
+   "syntax": "auto | <length-percentage [0,∞]> | min-content | max-content | fit-content(<length-percentage [0,∞]>) | <calc-size()> | <anchor-size()> | stretch | fit-content | contain",
+   "spec": "css-sizing-3"
+  },
+  "min-inline-size": {
+   "syntax": "<'min-width'>",
+   "spec": "css-logical-1"
+  },
+  "min-intrinsic-sizing": {
+   "syntax": "legacy | zero-if-scroll || zero-if-extrinsic",
+   "spec": "css-sizing-4"
+  },
+  "min-width": {
+   "syntax": "auto | <length-percentage [0,∞]> | min-content | max-content | fit-content(<length-percentage [0,∞]>) | <calc-size()> | <anchor-size()> | stretch | fit-content | contain",
+   "spec": "css-sizing-3"
+  },
+  "mix-blend-mode": {
+   "syntax": "<blend-mode> | plus-lighter",
+   "spec": "compositing-2"
+  },
+  "nav-down": {
+   "syntax": "auto | <id> [ current | root | <target-name> ]?",
+   "spec": "css-ui-4"
+  },
+  "nav-left": {
+   "syntax": "auto | <id> [ current | root | <target-name> ]?",
+   "spec": "css-ui-4"
+  },
+  "nav-right": {
+   "syntax": "auto | <id> [ current | root | <target-name> ]?",
+   "spec": "css-ui-4"
+  },
+  "nav-up": {
+   "syntax": "auto | <id> [ current | root | <target-name> ]?",
+   "spec": "css-ui-4"
+  },
+  "object-fit": {
+   "syntax": "fill | none | [contain | cover] || scale-down",
+   "spec": "css-images-4"
+  },
+  "object-position": {
+   "syntax": "<position>",
+   "spec": "css-images-3"
+  },
+  "object-view-box": {
+   "syntax": "none | <basic-shape-rect>",
+   "spec": "css-images-5"
+  },
+  "offset": {
+   "syntax": "[ <'offset-position'>? [ <'offset-path'> [ <'offset-distance'> || <'offset-rotate'> ]? ]? ]! [ / <'offset-anchor'> ]?",
+   "spec": "motion-1"
+  },
+  "offset-anchor": {
+   "syntax": "auto | <position>",
+   "spec": "motion-1"
+  },
+  "offset-distance": {
+   "syntax": "<length-percentage>",
+   "spec": "motion-1"
+  },
+  "offset-path": {
+   "syntax": "none | <offset-path> || <coord-box>",
+   "spec": "motion-1"
+  },
+  "offset-position": {
+   "syntax": "normal | auto | <position>",
+   "spec": "motion-1"
+  },
+  "offset-rotate": {
+   "syntax": "[ auto | reverse ] || <angle>",
+   "spec": "motion-1"
+  },
+  "opacity": {
+   "syntax": "<opacity-value>",
+   "spec": "css-color-4"
+  },
+  "order": {
+   "syntax": "<integer>",
+   "spec": "css-display-4"
+  },
+  "orphans": {
+   "syntax": "<integer [1,∞]>",
+   "spec": "css-break-4"
+  },
+  "outline": {
+   "syntax": "<'outline-width'> || <'outline-style'> || <'outline-color'>",
+   "spec": "css-ui-4"
+  },
+  "outline-color": {
+   "syntax": "auto | <'border-top-color'>",
+   "spec": "css-ui-4"
+  },
+  "outline-offset": {
+   "syntax": "<length>",
+   "spec": "css-ui-4"
+  },
+  "outline-style": {
+   "syntax": "auto | <outline-line-style>",
+   "spec": "css-ui-4"
+  },
+  "outline-width": {
+   "syntax": "<line-width>",
+   "spec": "css-ui-4"
+  },
+  "overflow": {
+   "syntax": "<'overflow-block'>{1,2}",
+   "spec": "css-overflow-3"
+  },
+  "overflow-anchor": {
+   "syntax": "auto | none",
+   "spec": "css-scroll-anchoring-1"
+  },
+  "overflow-block": {
+   "syntax": "visible | hidden | clip | scroll | auto",
+   "spec": "css-overflow-3"
+  },
+  "overflow-clip-margin": {
+   "syntax": "<visual-box> || <length>",
+   "spec": "css-overflow-4"
+  },
+  "overflow-clip-margin-block": {
+   "syntax": "<visual-box> || <length>",
+   "spec": "css-overflow-4"
+  },
+  "overflow-clip-margin-block-end": {
+   "syntax": "<visual-box> || <length>",
+   "spec": "css-overflow-4"
+  },
+  "overflow-clip-margin-block-start": {
+   "syntax": "<visual-box> || <length>",
+   "spec": "css-overflow-4"
+  },
+  "overflow-clip-margin-bottom": {
+   "syntax": "<visual-box> || <length>",
+   "spec": "css-overflow-4"
+  },
+  "overflow-clip-margin-inline": {
+   "syntax": "<visual-box> || <length>",
+   "spec": "css-overflow-4"
+  },
+  "overflow-clip-margin-inline-end": {
+   "syntax": "<visual-box> || <length>",
+   "spec": "css-overflow-4"
+  },
+  "overflow-clip-margin-inline-start": {
+   "syntax": "<visual-box> || <length>",
+   "spec": "css-overflow-4"
+  },
+  "overflow-clip-margin-left": {
+   "syntax": "<visual-box> || <length>",
+   "spec": "css-overflow-4"
+  },
+  "overflow-clip-margin-right": {
+   "syntax": "<visual-box> || <length>",
+   "spec": "css-overflow-4"
+  },
+  "overflow-clip-margin-top": {
+   "syntax": "<visual-box> || <length>",
+   "spec": "css-overflow-4"
+  },
+  "overflow-inline": {
+   "syntax": "visible | hidden | clip | scroll | auto",
+   "spec": "css-overflow-3"
+  },
+  "overflow-wrap": {
+   "syntax": "normal | break-word | anywhere",
+   "spec": "css-text-4"
+  },
+  "overflow-x": {
+   "syntax": "visible | hidden | clip | scroll | auto",
+   "spec": "css-overflow-3"
+  },
+  "overflow-y": {
+   "syntax": "visible | hidden | clip | scroll | auto",
+   "spec": "css-overflow-3"
+  },
+  "overlay": {
+   "syntax": "none | auto",
+   "spec": "css-position-4"
+  },
+  "overscroll-behavior": {
+   "syntax": "[ contain | none | auto | chain ]{1,2}",
+   "spec": "css-overscroll-1"
+  },
+  "overscroll-behavior-block": {
+   "syntax": "contain | none | auto | chain",
+   "spec": "css-overscroll-1"
+  },
+  "overscroll-behavior-inline": {
+   "syntax": "contain | none | auto | chain",
+   "spec": "css-overscroll-1"
+  },
+  "overscroll-behavior-x": {
+   "syntax": "contain | none | auto | chain",
+   "spec": "css-overscroll-1"
+  },
+  "overscroll-behavior-y": {
+   "syntax": "contain | none | auto | chain",
+   "spec": "css-overscroll-1"
+  },
+  "padding": {
+   "syntax": "<'padding-top'>{1,4}",
+   "spec": "css-box-4"
+  },
+  "padding-block": {
+   "syntax": "<'padding-top'>{1,2}",
+   "spec": "css-logical-1"
+  },
+  "padding-block-end": {
+   "syntax": "<'padding-top'>",
+   "spec": "css-logical-1"
+  },
+  "padding-block-start": {
+   "syntax": "<'padding-top'>",
+   "spec": "css-logical-1"
+  },
+  "padding-bottom": {
+   "syntax": "<length-percentage [0,∞]>",
+   "spec": "css-box-4"
+  },
+  "padding-inline": {
+   "syntax": "<'padding-top'>{1,2}",
+   "spec": "css-logical-1"
+  },
+  "padding-inline-end": {
+   "syntax": "<'padding-top'>",
+   "spec": "css-logical-1"
+  },
+  "padding-inline-start": {
+   "syntax": "<'padding-top'>",
+   "spec": "css-logical-1"
+  },
+  "padding-left": {
+   "syntax": "<length-percentage [0,∞]>",
+   "spec": "css-box-4"
+  },
+  "padding-right": {
+   "syntax": "<length-percentage [0,∞]>",
+   "spec": "css-box-4"
+  },
+  "padding-top": {
+   "syntax": "<length-percentage [0,∞]>",
+   "spec": "css-box-4"
+  },
+  "page": {
+   "syntax": "auto | <custom-ident>",
+   "spec": "css-page-3"
+  },
+  "page-break-after": {
+   "syntax": "auto | always | avoid | left | right | inherit",
+   "spec": "css2"
+  },
+  "page-break-before": {
+   "syntax": "auto | always | avoid | left | right | inherit",
+   "spec": "css2"
+  },
+  "page-break-inside": {
+   "syntax": "avoid | auto | inherit",
+   "spec": "css2"
+  },
+  "paint-order": {
+   "syntax": "normal | [ fill || stroke || markers ]",
+   "spec": "unknown"
+  },
+  "path-length": {
+   "syntax": "none | <length> [0,∞]",
+   "spec": "unknown"
+  },
+  "pause": {
+   "syntax": "<'pause-before'> <'pause-after'>?",
+   "spec": "css-speech-1"
+  },
+  "pause-after": {
+   "syntax": "<time [0s,∞]> | none | x-weak | weak | medium | strong | x-strong",
+   "spec": "css-speech-1"
+  },
+  "pause-before": {
+   "syntax": "<time [0s,∞]> | none | x-weak | weak | medium | strong | x-strong",
+   "spec": "css-speech-1"
+  },
+  "perspective": {
+   "syntax": "none | <length [0,∞]>",
+   "spec": "css-transforms-2"
+  },
+  "perspective-origin": {
+   "syntax": "<position>",
+   "spec": "css-transforms-2"
+  },
+  "place-content": {
+   "syntax": "<'align-content'> <'justify-content'>?",
+   "spec": "css-align-3"
+  },
+  "place-items": {
+   "syntax": "<'align-items'> <'justify-items'>?",
+   "spec": "css-align-3"
+  },
+  "place-self": {
+   "syntax": "<'align-self'> <'justify-self'>?",
+   "spec": "css-align-3"
+  },
+  "pointer-events": {
+   "syntax": "auto | bounding-box | visiblePainted | visibleFill | visibleStroke | visible | painted | fill | stroke | all | none",
+   "spec": "unknown"
+  },
+  "pointer-timeline": {
+   "syntax": "[ <'pointer-timeline-name'> <'pointer-timeline-axis'>? ]#",
+   "spec": "pointer-animations-1"
+  },
+  "pointer-timeline-axis": {
+   "syntax": "[ block | inline | x | y ]#",
+   "spec": "pointer-animations-1"
+  },
+  "pointer-timeline-name": {
+   "syntax": "[ none | <dashed-ident> ]#",
+   "spec": "pointer-animations-1"
+  },
+  "position": {
+   "syntax": "static | relative | absolute | sticky | fixed | <running()>",
+   "spec": "css-position-3"
+  },
+  "position-anchor": {
+   "syntax": "normal | none | auto | <anchor-name> | match-parent",
+   "spec": "css-anchor-position-1"
+  },
+  "position-area": {
+   "syntax": "none | <position-area>",
+   "spec": "css-anchor-position-1"
+  },
+  "position-try": {
+   "syntax": "<'position-try-order'>? <'position-try-fallbacks'>",
+   "spec": "css-anchor-position-1"
+  },
+  "position-try-fallbacks": {
+   "syntax": "none | [ [<dashed-ident> || <try-tactic>] | <position-area> ]#",
+   "spec": "css-anchor-position-1"
+  },
+  "position-try-order": {
+   "syntax": "normal | <try-size>",
+   "spec": "css-anchor-position-1"
+  },
+  "position-visibility": {
+   "syntax": "always | [ anchor-valid || anchor-visible || no-overflow ]",
+   "spec": "css-anchor-position-1"
+  },
+  "print-color-adjust": {
+   "syntax": "economy | exact",
+   "spec": "css-color-adjust-1"
+  },
+  "quotes": {
+   "syntax": "auto | none | match-parent | [ <string> <string> ]+",
+   "spec": "css-content-3"
+  },
+  "r": {
+   "syntax": "<length-percentage>",
+   "spec": "unknown"
+  },
+  "reading-flow": {
+   "syntax": "normal | source-order | flex-visual | flex-flow | grid-rows | grid-columns | grid-order",
+   "spec": "css-display-4"
+  },
+  "reading-order": {
+   "syntax": "<integer>",
+   "spec": "css-display-4"
+  },
+  "region-fragment": {
+   "syntax": "auto | break",
+   "spec": "css-regions-1"
+  },
+  "resize": {
+   "syntax": "none | both | horizontal | vertical | block | inline",
+   "spec": "css-ui-4"
+  },
+  "rest": {
+   "syntax": "<'rest-before'> <'rest-after'>?",
+   "spec": "css-speech-1"
+  },
+  "rest-after": {
+   "syntax": "<time [0s,∞]> | none | x-weak | weak | medium | strong | x-strong",
+   "spec": "css-speech-1"
+  },
+  "rest-before": {
+   "syntax": "<time [0s,∞]> | none | x-weak | weak | medium | strong | x-strong",
+   "spec": "css-speech-1"
+  },
+  "right": {
+   "syntax": "auto | <length-percentage> | <anchor()> | <anchor-size()>",
+   "spec": "css-position-3"
+  },
+  "rotate": {
+   "syntax": "none | <angle> | [ x | y | z | <number>{3} ] && <angle>",
+   "spec": "css-transforms-2"
+  },
+  "row-gap": {
+   "syntax": "normal | <length-percentage [0,∞]> | <line-width>",
+   "spec": "css-gaps-1"
+  },
+  "row-rule": {
+   "syntax": "<gap-rule-list> | <gap-auto-rule-list>",
+   "spec": "css-gaps-1"
+  },
+  "row-rule-break": {
+   "syntax": "none | normal | intersection",
+   "spec": "css-gaps-1"
+  },
+  "row-rule-color": {
+   "syntax": "<line-color-list> | <auto-line-color-list>",
+   "spec": "css-gaps-1"
+  },
+  "row-rule-inset": {
+   "syntax": "<'column-rule-inset-cap'> [ / <'column-rule-inset-junction'> ]?",
+   "spec": "css-gaps-1"
+  },
+  "row-rule-inset-cap": {
+   "syntax": "<inset-value> <inset-value>?",
+   "spec": "css-gaps-1"
+  },
+  "row-rule-inset-cap-end": {
+   "syntax": "<inset-value>",
+   "spec": "css-gaps-1"
+  },
+  "row-rule-inset-cap-start": {
+   "syntax": "<inset-value>",
+   "spec": "css-gaps-1"
+  },
+  "row-rule-inset-end": {
+   "syntax": "<inset-value>",
+   "spec": "css-gaps-1"
+  },
+  "row-rule-inset-junction": {
+   "syntax": "<inset-value> <inset-value>?",
+   "spec": "css-gaps-1"
+  },
+  "row-rule-inset-junction-end": {
+   "syntax": "<inset-value>",
+   "spec": "css-gaps-1"
+  },
+  "row-rule-inset-junction-start": {
+   "syntax": "<inset-value>",
+   "spec": "css-gaps-1"
+  },
+  "row-rule-inset-start": {
+   "syntax": "<inset-value>",
+   "spec": "css-gaps-1"
+  },
+  "row-rule-style": {
+   "syntax": "<line-style-list> | <auto-line-style-list>",
+   "spec": "css-gaps-1"
+  },
+  "row-rule-visibility-items": {
+   "syntax": "all | around | between | normal",
+   "spec": "css-gaps-1"
+  },
+  "row-rule-width": {
+   "syntax": "<line-width-list> | <auto-line-width-list>",
+   "spec": "css-gaps-1"
+  },
+  "ruby-align": {
+   "syntax": "start | center | space-between | space-around",
+   "spec": "css-ruby-1"
+  },
+  "ruby-merge": {
+   "syntax": "separate | merge | auto",
+   "spec": "css-ruby-1"
+  },
+  "ruby-overhang": {
+   "syntax": "auto | spaces",
+   "spec": "css-ruby-1"
+  },
+  "ruby-position": {
+   "syntax": "[ alternate || [ over | under ] ] | inter-character",
+   "spec": "css-ruby-1"
+  },
+  "rule": {
+   "syntax": "<'column-rule'>",
+   "spec": "css-gaps-1"
+  },
+  "rule-break": {
+   "syntax": "<'column-rule-break'>",
+   "spec": "css-gaps-1"
+  },
+  "rule-color": {
+   "syntax": "<'column-rule-color'>",
+   "spec": "css-gaps-1"
+  },
+  "rule-inset": {
+   "syntax": "<'column-rule-inset'>",
+   "spec": "css-gaps-1"
+  },
+  "rule-inset-cap": {
+   "syntax": "<'column-rule-inset-cap'>",
+   "spec": "css-gaps-1"
+  },
+  "rule-inset-end": {
+   "syntax": "<'column-rule-inset-end'>",
+   "spec": "css-gaps-1"
+  },
+  "rule-inset-junction": {
+   "syntax": "<'column-rule-inset-junction'>",
+   "spec": "css-gaps-1"
+  },
+  "rule-inset-start": {
+   "syntax": "<'column-rule-inset-start'>",
+   "spec": "css-gaps-1"
+  },
+  "rule-overlap": {
+   "syntax": "row-over-column | column-over-row",
+   "spec": "css-gaps-1"
+  },
+  "rule-style": {
+   "syntax": "<'column-rule-style'>",
+   "spec": "css-gaps-1"
+  },
+  "rule-visibility-items": {
+   "syntax": "<'column-rule-visibility-items'>",
+   "spec": "css-gaps-1"
+  },
+  "rule-width": {
+   "syntax": "<'column-rule-width'>",
+   "spec": "css-gaps-1"
+  },
+  "rx": {
+   "syntax": "<length-percentage> | auto",
+   "spec": "unknown"
+  },
+  "ry": {
+   "syntax": "<length-percentage> | auto",
+   "spec": "unknown"
+  },
+  "scale": {
+   "syntax": "none | [ <number> | <percentage> ]{1,3}",
+   "spec": "css-transforms-2"
+  },
+  "scroll-behavior": {
+   "syntax": "auto | smooth",
+   "spec": "css-overflow-3"
+  },
+  "scroll-initial-target": {
+   "syntax": "none | nearest",
+   "spec": "css-scroll-snap-2"
+  },
+  "scroll-margin": {
+   "syntax": "<length>{1,4}",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-margin-block": {
+   "syntax": "<length>{1,2}",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-margin-block-end": {
+   "syntax": "<length>",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-margin-block-start": {
+   "syntax": "<length>",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-margin-bottom": {
+   "syntax": "<length>",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-margin-inline": {
+   "syntax": "<length>{1,2}",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-margin-inline-end": {
+   "syntax": "<length>",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-margin-inline-start": {
+   "syntax": "<length>",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-margin-left": {
+   "syntax": "<length>",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-margin-right": {
+   "syntax": "<length>",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-margin-top": {
+   "syntax": "<length>",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-marker-group": {
+   "syntax": "none | [ [ before | after ] || [ links | tabs ] ]",
+   "spec": "css-overflow-5"
+  },
+  "scroll-padding": {
+   "syntax": "[ auto | <length-percentage [0,∞]> ]{1,4}",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-padding-block": {
+   "syntax": "[ auto | <length-percentage [0,∞]> ]{1,2}",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-padding-block-end": {
+   "syntax": "auto | <length-percentage [0,∞]>",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-padding-block-start": {
+   "syntax": "auto | <length-percentage [0,∞]>",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-padding-bottom": {
+   "syntax": "auto | <length-percentage [0,∞]>",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-padding-inline": {
+   "syntax": "[ auto | <length-percentage [0,∞]> ]{1,2}",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-padding-inline-end": {
+   "syntax": "auto | <length-percentage [0,∞]>",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-padding-inline-start": {
+   "syntax": "auto | <length-percentage [0,∞]>",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-padding-left": {
+   "syntax": "auto | <length-percentage [0,∞]>",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-padding-right": {
+   "syntax": "auto | <length-percentage [0,∞]>",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-padding-top": {
+   "syntax": "auto | <length-percentage [0,∞]>",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-snap-align": {
+   "syntax": "[ none | start | end | center ]{1,2}",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-snap-stop": {
+   "syntax": "normal | always",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-snap-type": {
+   "syntax": "none | [ x | y | block | inline | both ] [ mandatory | proximity ]?",
+   "spec": "css-scroll-snap-1"
+  },
+  "scroll-target-group": {
+   "syntax": "none | auto",
+   "spec": "css-overflow-5"
+  },
+  "scroll-timeline": {
+   "syntax": "[ <'scroll-timeline-name'> <'scroll-timeline-axis'>? ]#",
+   "spec": "scroll-animations-1"
+  },
+  "scroll-timeline-axis": {
+   "syntax": "[ block | inline | x | y ]#",
+   "spec": "scroll-animations-1"
+  },
+  "scroll-timeline-name": {
+   "syntax": "[ none | <dashed-ident> ]#",
+   "spec": "scroll-animations-1"
+  },
+  "scrollbar-color": {
+   "syntax": "auto | <color>{2}",
+   "spec": "css-scrollbars-1"
+  },
+  "scrollbar-gutter": {
+   "syntax": "auto | stable && both-edges?",
+   "spec": "css-overflow-3"
+  },
+  "scrollbar-width": {
+   "syntax": "auto | thin | none",
+   "spec": "css-scrollbars-1"
+  },
+  "shape-image-threshold": {
+   "syntax": "<opacity-value>",
+   "spec": "css-shapes-1"
+  },
+  "shape-inside": {
+   "syntax": "auto | outside-shape | [ <basic-shape> || shape-box ] | <image> | display",
+   "spec": "css-shapes-2"
+  },
+  "shape-margin": {
+   "syntax": "<length-percentage [0,∞]>",
+   "spec": "css-shapes-1"
+  },
+  "shape-outside": {
+   "syntax": "none | [ <basic-shape> || <shape-box> ] | <image>",
+   "spec": "css-shapes-1"
+  },
+  "shape-padding": {
+   "syntax": "<length-percentage [0,∞]>",
+   "spec": "css-shapes-2"
+  },
+  "shape-rendering": {
+   "syntax": "auto | optimizeSpeed | crispEdges | geometricPrecision",
+   "spec": "unknown"
+  },
+  "slider-orientation": {
+   "syntax": "auto | left-to-right | right-to-left | top-to-bottom | bottom-to-top",
+   "spec": "css-forms-1"
+  },
+  "spatial-navigation-action": {
+   "syntax": "auto | focus | scroll",
+   "spec": "css-spatial-nav-1"
+  },
+  "spatial-navigation-contain": {
+   "syntax": "auto | contain",
+   "spec": "css-spatial-nav-1"
+  },
+  "spatial-navigation-function": {
+   "syntax": "normal | grid",
+   "spec": "css-spatial-nav-1"
+  },
+  "speak": {
+   "syntax": "auto | never | always",
+   "spec": "css-speech-1"
+  },
+  "speak-as": {
+   "syntax": "normal | spell-out || digits || [ literal-punctuation | no-punctuation ]",
+   "spec": "css-speech-1"
+  },
+  "stop-color": {
+   "syntax": "<'color'>",
+   "spec": "unknown"
+  },
+  "stop-opacity": {
+   "syntax": "<'opacity'>",
+   "spec": "unknown"
+  },
+  "string-set": {
+   "syntax": "none | [ <custom-ident> <string>+ ]#",
+   "spec": "css-content-3"
+  },
+  "stroke": {
+   "syntax": "<paint>",
+   "spec": "unknown"
+  },
+  "stroke-align": {
+   "syntax": "center | inset | outset",
+   "spec": "fill-stroke-3"
+  },
+  "stroke-alignment": {
+   "syntax": "center | inner | outer",
+   "spec": "unknown"
+  },
+  "stroke-break": {
+   "syntax": "bounding-box | slice | clone",
+   "spec": "fill-stroke-3"
+  },
+  "stroke-color": {
+   "syntax": "<color>#",
+   "spec": "fill-stroke-3"
+  },
+  "stroke-dash-corner": {
+   "syntax": "none | <length>",
+   "spec": "fill-stroke-3"
+  },
+  "stroke-dash-justify": {
+   "syntax": "none | [ stretch | compress ] || [ dashes || gaps ]",
+   "spec": "fill-stroke-3"
+  },
+  "stroke-dashadjust": {
+   "syntax": "none | [stretch | compress] [dashes | gaps]?",
+   "spec": "unknown"
+  },
+  "stroke-dasharray": {
+   "syntax": "none | [<length-percentage> | <number>]+#",
+   "spec": "fill-stroke-3"
+  },
+  "stroke-dashcorner": {
+   "syntax": "none | <length>",
+   "spec": "unknown"
+  },
+  "stroke-dashoffset": {
+   "syntax": "<length-percentage> | <number>",
+   "spec": "fill-stroke-3"
+  },
+  "stroke-image": {
+   "syntax": "<paint>#",
+   "spec": "fill-stroke-3"
+  },
+  "stroke-linecap": {
+   "syntax": "butt | round | square",
+   "spec": "fill-stroke-3"
+  },
+  "stroke-linejoin": {
+   "syntax": "[ crop | arcs | miter ] || [ bevel | round | fallback ]",
+   "spec": "fill-stroke-3"
+  },
+  "stroke-miterlimit": {
+   "syntax": "<number>",
+   "spec": "fill-stroke-3"
+  },
+  "stroke-opacity": {
+   "syntax": "<'opacity'>",
+   "spec": "fill-stroke-3"
+  },
+  "stroke-origin": {
+   "syntax": "match-parent | fill-box | stroke-box | content-box | padding-box | border-box",
+   "spec": "fill-stroke-3"
+  },
+  "stroke-position": {
+   "syntax": "<position>#",
+   "spec": "fill-stroke-3"
+  },
+  "stroke-repeat": {
+   "syntax": "<repeat-style>#",
+   "spec": "fill-stroke-3"
+  },
+  "stroke-size": {
+   "syntax": "<bg-size>#",
+   "spec": "fill-stroke-3"
+  },
+  "stroke-width": {
+   "syntax": "[ <length-percentage> | <line-width> | <number> ]#",
+   "spec": "fill-stroke-3"
+  },
+  "tab-size": {
+   "syntax": "<number [0,∞]> | <length [0,∞]>",
+   "spec": "css-text-4"
+  },
+  "table-layout": {
+   "syntax": "auto | fixed",
+   "spec": "css-tables-3"
+  },
+  "text-align": {
+   "syntax": "start | end | left | right | center | <string> | justify | match-parent | justify-all",
+   "spec": "css-text-4"
+  },
+  "text-align-all": {
+   "syntax": "start | end | left | right | center | <string> | justify | match-parent",
+   "spec": "css-text-4"
+  },
+  "text-align-last": {
+   "syntax": "auto | start | end | left | right | center | justify | match-parent",
+   "spec": "css-text-4"
+  },
+  "text-anchor": {
+   "syntax": "start | middle | end",
+   "spec": "unknown"
+  },
+  "text-autospace": {
+   "syntax": "normal | <autospace> | auto",
+   "spec": "css-text-4"
+  },
+  "text-box": {
+   "syntax": "normal | <'text-box-trim'> || <'text-box-edge'>",
+   "spec": "css-inline-3"
+  },
+  "text-box-edge": {
+   "syntax": "auto | <text-edge>",
+   "spec": "css-inline-3"
+  },
+  "text-box-trim": {
+   "syntax": "none | trim-start | trim-end | trim-both",
+   "spec": "css-inline-3"
+  },
+  "text-combine-upright": {
+   "syntax": "none | all | [ digits <integer [2,4]>? ]",
+   "spec": "css-writing-modes-4"
+  },
+  "text-decoration": {
+   "syntax": "<'text-decoration-line'> || <'text-decoration-thickness'> || <'text-decoration-style'> || <'text-decoration-color'>",
+   "spec": "css-text-decor-4"
+  },
+  "text-decoration-color": {
+   "syntax": "<color>",
+   "spec": "css-text-decor-4"
+  },
+  "text-decoration-inset": {
+   "syntax": "<length>{1,2} | auto",
+   "spec": "css-text-decor-4"
+  },
+  "text-decoration-line": {
+   "syntax": "none | [ underline || overline || line-through || blink ] | spelling-error | grammar-error",
+   "spec": "css-text-decor-4"
+  },
+  "text-decoration-skip": {
+   "syntax": "none | auto",
+   "spec": "css-text-decor-4"
+  },
+  "text-decoration-skip-box": {
+   "syntax": "none | all",
+   "spec": "css-text-decor-4"
+  },
+  "text-decoration-skip-ink": {
+   "syntax": "auto | none | all",
+   "spec": "css-text-decor-4"
+  },
+  "text-decoration-skip-self": {
+   "syntax": "auto | skip-all | [ skip-underline || skip-overline || skip-line-through ] | no-skip",
+   "spec": "css-text-decor-4"
+  },
+  "text-decoration-skip-spaces": {
+   "syntax": "none | all | [ start || end ]",
+   "spec": "css-text-decor-4"
+  },
+  "text-decoration-style": {
+   "syntax": "solid | double | dotted | dashed | wavy",
+   "spec": "css-text-decor-4"
+  },
+  "text-decoration-thickness": {
+   "syntax": "auto | from-font | <length-percentage> | <line-width>",
+   "spec": "css-text-decor-4"
+  },
+  "text-emphasis": {
+   "syntax": "<'text-emphasis-style'> || <'text-emphasis-color'>",
+   "spec": "css-text-decor-4"
+  },
+  "text-emphasis-color": {
+   "syntax": "<color>",
+   "spec": "css-text-decor-4"
+  },
+  "text-emphasis-position": {
+   "syntax": "[ over | under ] && [ right | left ]?",
+   "spec": "css-text-decor-4"
+  },
+  "text-emphasis-skip": {
+   "syntax": "spaces || punctuation || symbols || narrow",
+   "spec": "css-text-decor-4"
+  },
+  "text-emphasis-style": {
+   "syntax": "none | [ [ filled | open ] || [ dot | circle | double-circle | triangle | sesame ] ] | <string>",
+   "spec": "css-text-decor-4"
+  },
+  "text-fit": {
+   "syntax": "[ none | grow | shrink ] [consistent | per-line | per-line-all]? <percentage>?",
+   "spec": "css-text-5"
+  },
+  "text-group-align": {
+   "syntax": "none | start | end | left | right | center",
+   "spec": "css-text-4"
+  },
+  "text-indent": {
+   "syntax": "[ <length-percentage> ] && hanging? && each-line?",
+   "spec": "css-text-4"
+  },
+  "text-justify": {
+   "syntax": "[ auto | none | inter-word | inter-character | ruby ] || no-compress",
+   "spec": "css-text-4"
+  },
+  "text-orientation": {
+   "syntax": "mixed | upright | sideways",
+   "spec": "css-writing-modes-4"
+  },
+  "text-overflow": {
+   "syntax": "[ clip | ellipsis | <string> | fade | <fade()> ]{1,2}",
+   "spec": "css-overflow-4"
+  },
+  "text-rendering": {
+   "syntax": "auto | optimizeSpeed | optimizeLegibility | geometricPrecision",
+   "spec": "unknown"
+  },
+  "text-shadow": {
+   "syntax": "none | <shadow>#",
+   "spec": "css-text-decor-4"
+  },
+  "text-size-adjust": {
+   "syntax": "auto | none | <percentage [0,∞]>",
+   "spec": "css-size-adjust-1"
+  },
+  "text-spacing": {
+   "syntax": "none | auto | <spacing-trim> || <autospace>",
+   "spec": "css-text-4"
+  },
+  "text-spacing-trim": {
+   "syntax": "<spacing-trim> | auto",
+   "spec": "css-text-4"
+  },
+  "text-transform": {
+   "syntax": "none | [capitalize | uppercase | lowercase ] || full-width || full-size-kana | math-auto",
+   "spec": "css-text-4"
+  },
+  "text-underline-offset": {
+   "syntax": "auto | <length-percentage>",
+   "spec": "css-text-decor-4"
+  },
+  "text-underline-position": {
+   "syntax": "auto | [ from-font | under ] || [ left | right ]",
+   "spec": "css-text-decor-4"
+  },
+  "text-wrap": {
+   "syntax": "<'text-wrap-mode'> || <'text-wrap-style'>",
+   "spec": "css-text-4"
+  },
+  "text-wrap-mode": {
+   "syntax": "wrap | nowrap",
+   "spec": "css-text-4"
+  },
+  "text-wrap-style": {
+   "syntax": "auto | balance | stable | pretty | avoid-orphans",
+   "spec": "css-text-4"
+  },
+  "timeline-scope": {
+   "syntax": "none | all | <dashed-ident>#",
+   "spec": "scroll-animations-1"
+  },
+  "timeline-trigger": {
+   "syntax": "none | [ <'timeline-trigger-name'> <'timeline-trigger-source'> <'timeline-trigger-activation-range'> [ / <'timeline-trigger-active-range'> ]? ]#",
+   "spec": "animation-triggers-1"
+  },
+  "timeline-trigger-activation-range": {
+   "syntax": "[ <'timeline-trigger-activation-range-start'> <'timeline-trigger-activation-range-end'>? ]#",
+   "spec": "animation-triggers-1"
+  },
+  "timeline-trigger-activation-range-end": {
+   "syntax": "[ normal | <length-percentage> | <timeline-range-name> <length-percentage>? ]#",
+   "spec": "animation-triggers-1"
+  },
+  "timeline-trigger-activation-range-start": {
+   "syntax": "[ normal | <length-percentage> | <timeline-range-name> <length-percentage>? ]#",
+   "spec": "animation-triggers-1"
+  },
+  "timeline-trigger-active-range": {
+   "syntax": "[ <'timeline-trigger-active-range-start'> <'timeline-trigger-active-range-end'>? ]#",
+   "spec": "animation-triggers-1"
+  },
+  "timeline-trigger-active-range-end": {
+   "syntax": "[ auto | normal | <length-percentage> | <timeline-range-name> <length-percentage>? ]#",
+   "spec": "animation-triggers-1"
+  },
+  "timeline-trigger-active-range-start": {
+   "syntax": "[ auto | normal | <length-percentage> | <timeline-range-name> <length-percentage>? ]#",
+   "spec": "animation-triggers-1"
+  },
+  "timeline-trigger-name": {
+   "syntax": "none | <dashed-ident>#",
+   "spec": "animation-triggers-1"
+  },
+  "timeline-trigger-source": {
+   "syntax": "<single-animation-timeline>#",
+   "spec": "animation-triggers-1"
+  },
+  "top": {
+   "syntax": "auto | <length-percentage> | <anchor()> | <anchor-size()>",
+   "spec": "css-position-3"
+  },
+  "touch-action": {
+   "syntax": "auto | none | [ [ pan-x | pan-left | pan-right ] || [ pan-y | pan-up | pan-down ] || pinch-zoom ] | manipulation",
+   "spec": "compat"
+  },
+  "transform": {
+   "syntax": "none | <transform-list>",
+   "spec": "css-transforms-1"
+  },
+  "transform-box": {
+   "syntax": "content-box | border-box | fill-box | stroke-box | view-box",
+   "spec": "css-transforms-1"
+  },
+  "transform-origin": {
+   "syntax": "[ left | center | right | top | bottom | <length-percentage> ] | [ left | center | right | <length-percentage> ] [ top | center | bottom | <length-percentage> ] <length>? | [ [ center | left | right ] && [ center | top | bottom ] ] <length>?",
+   "spec": "css-transforms-1"
+  },
+  "transform-style": {
+   "syntax": "flat | preserve-3d",
+   "spec": "css-transforms-2"
+  },
+  "transition": {
+   "syntax": "<single-transition>#",
+   "spec": "css-transitions-1"
+  },
+  "transition-behavior": {
+   "syntax": "<transition-behavior-value>#",
+   "spec": "css-transitions-2"
+  },
+  "transition-delay": {
+   "syntax": "<time>#",
+   "spec": "css-transitions-1"
+  },
+  "transition-duration": {
+   "syntax": "<time [0s,∞]>#",
+   "spec": "css-transitions-1"
+  },
+  "transition-property": {
+   "syntax": "none | <single-transition-property>#",
+   "spec": "css-transitions-1"
+  },
+  "transition-timing-function": {
+   "syntax": "<easing-function>#",
+   "spec": "css-transitions-1"
+  },
+  "translate": {
+   "syntax": "none | <length-percentage> [ <length-percentage> <length>? ]?",
+   "spec": "css-transforms-2"
+  },
+  "trigger-scope": {
+   "syntax": "none | all | <dashed-ident>#",
+   "spec": "animation-triggers-1"
+  },
+  "unicode-bidi": {
+   "syntax": "normal | embed | isolate | bidi-override | isolate-override | plaintext",
+   "spec": "css-writing-modes-4"
+  },
+  "user-select": {
+   "syntax": "auto | text | none | contain | all",
+   "spec": "css-ui-4"
+  },
+  "vector-effect": {
+   "syntax": "none | non-scaling-stroke | non-scaling-size | non-rotation | fixed-position",
+   "spec": "unknown"
+  },
+  "vertical-align": {
+   "syntax": "[ first | last] || <'alignment-baseline'> || <'baseline-shift'>",
+   "spec": "css-inline-3"
+  },
+  "view-timeline": {
+   "syntax": "[ <'view-timeline-name'> [ <'view-timeline-axis'> || <'view-timeline-inset'> ]? ]#",
+   "spec": "scroll-animations-1"
+  },
+  "view-timeline-axis": {
+   "syntax": "[ block | inline | x | y ]#",
+   "spec": "scroll-animations-1"
+  },
+  "view-timeline-inset": {
+   "syntax": "[ [ auto | <length-percentage> ]{1,2} ]#",
+   "spec": "scroll-animations-1"
+  },
+  "view-timeline-name": {
+   "syntax": "[ none | <dashed-ident> ]#",
+   "spec": "scroll-animations-1"
+  },
+  "view-transition-class": {
+   "syntax": "none | <custom-ident>+",
+   "spec": "css-view-transitions-2"
+  },
+  "view-transition-group": {
+   "syntax": "normal | contain | nearest | <custom-ident>",
+   "spec": "css-view-transitions-2"
+  },
+  "view-transition-name": {
+   "syntax": "none | <custom-ident>",
+   "spec": "css-view-transitions-2"
+  },
+  "view-transition-scope": {
+   "syntax": "none | all",
+   "spec": "css-view-transitions-2"
+  },
+  "visibility": {
+   "syntax": "visible | hidden | force-hidden | collapse",
+   "spec": "css-display-4"
+  },
+  "voice-balance": {
+   "syntax": "<number> | left | center | right | leftwards | rightwards",
+   "spec": "css-speech-1"
+  },
+  "voice-duration": {
+   "syntax": "auto | <time [0s,∞]>",
+   "spec": "css-speech-1"
+  },
+  "voice-family": {
+   "syntax": "[ <voice-family-name> | <generic-voice> ]# | preserve",
+   "spec": "css-speech-1"
+  },
+  "voice-pitch": {
+   "syntax": "<frequency [0Hz,∞]> && absolute | [ [ x-low | low | medium | high | x-high ] || [ <frequency [0Hz,∞]> | <semitones> | <percentage> ] ]",
+   "spec": "css-speech-1"
+  },
+  "voice-range": {
+   "syntax": "<frequency [0Hz,∞]> && absolute | [ [ x-low | low | medium | high | x-high ] || [ <frequency [0Hz,∞]> | <semitones> | <percentage> ] ]",
+   "spec": "css-speech-1"
+  },
+  "voice-rate": {
+   "syntax": "[ normal | x-slow | slow | medium | fast | x-fast ] || <percentage [0,∞]>",
+   "spec": "css-speech-1"
+  },
+  "voice-stress": {
+   "syntax": "normal | strong | moderate | none | reduced",
+   "spec": "css-speech-1"
+  },
+  "voice-volume": {
+   "syntax": "silent | [ [ x-soft | soft | medium | loud | x-loud ] || <decibel> ]",
+   "spec": "css-speech-1"
+  },
+  "white-space": {
+   "syntax": "normal | pre | pre-wrap | pre-line | <'white-space-collapse'> || <'text-wrap-mode'> || <'white-space-trim'>",
+   "spec": "css-text-4"
+  },
+  "white-space-collapse": {
+   "syntax": "collapse | discard | preserve | preserve-breaks | preserve-spaces | break-spaces",
+   "spec": "css-text-4"
+  },
+  "white-space-trim": {
+   "syntax": "none | discard-before || discard-after || discard-inner",
+   "spec": "css-text-4"
+  },
+  "widows": {
+   "syntax": "<integer [1,∞]>",
+   "spec": "css-break-4"
+  },
+  "width": {
+   "syntax": "auto | <length-percentage [0,∞]> | min-content | max-content | fit-content(<length-percentage [0,∞]>) | <calc-size()> | <anchor-size()> | stretch | fit-content | contain",
+   "spec": "css-sizing-3"
+  },
+  "will-change": {
+   "syntax": "auto | <animateable-feature>#",
+   "spec": "css-will-change-1"
+  },
+  "window-drag": {
+   "syntax": "none | move",
+   "spec": "css-ui-4"
+  },
+  "word-break": {
+   "syntax": "normal | break-all | keep-all | manual | auto-phrase | break-word",
+   "spec": "css-text-4"
+  },
+  "word-space-transform": {
+   "syntax": "none | [ space | ideographic-space ] && auto-phrase?",
+   "spec": "css-text-4"
+  },
+  "word-spacing": {
+   "syntax": "normal | <length-percentage>",
+   "spec": "css-text-4"
+  },
+  "word-wrap": {
+   "syntax": "normal | break-word | anywhere",
+   "legacyAliasOf": "overflow-wrap",
+   "spec": "css-text-4"
+  },
+  "wrap-after": {
+   "syntax": "auto | avoid | avoid-line | avoid-flex | line | flex",
+   "spec": "css-text-4"
+  },
+  "wrap-before": {
+   "syntax": "auto | avoid | avoid-line | avoid-flex | line | flex",
+   "spec": "css-text-4"
+  },
+  "wrap-flow": {
+   "syntax": "auto | both | start | end | minimum | maximum | clear",
+   "spec": "css-exclusions-1"
+  },
+  "wrap-inside": {
+   "syntax": "auto | avoid",
+   "spec": "css-text-4"
+  },
+  "wrap-through": {
+   "syntax": "wrap | none",
+   "spec": "css-exclusions-1"
+  },
+  "writing-mode": {
+   "syntax": "horizontal-tb | vertical-rl | vertical-lr | sideways-rl | sideways-lr",
+   "spec": "css-writing-modes-4"
+  },
+  "x": {
+   "syntax": "<length-percentage>",
+   "spec": "unknown"
+  },
+  "y": {
+   "syntax": "<length-percentage>",
+   "spec": "unknown"
+  },
+  "z-index": {
+   "syntax": "auto | <integer> | inherit",
+   "spec": "css2"
+  },
+  "zoom": {
+   "syntax": "<number [0,∞]> | <percentage [0,∞]>",
+   "spec": "css-viewport"
+  }
+ },
+ "atrules": {
+  "@-webkit-keyframes": {
+   "spec": "compat",
+   "descriptors": []
+  },
+  "@annotation": {
+   "syntax": "@annotation { <declaration-list> }",
+   "spec": "css-fonts-4",
+   "descriptors": []
+  },
+  "@apply": {
+   "syntax": "@apply [ <dashed-ident> | <dashed-function> ] [ { <declaration-list> } ]?;",
+   "spec": "css-mixins-1",
+   "descriptors": []
+  },
+  "@bottom-center": {
+   "syntax": "@bottom-center { <declaration-list> };",
+   "spec": "css-page-3",
+   "descriptors": []
+  },
+  "@bottom-left": {
+   "syntax": "@bottom-left { <declaration-list> };",
+   "spec": "css-page-3",
+   "descriptors": []
+  },
+  "@bottom-left-corner": {
+   "syntax": "@bottom-left-corner { <declaration-list> };",
+   "spec": "css-page-3",
+   "descriptors": []
+  },
+  "@bottom-right": {
+   "syntax": "@bottom-right { <declaration-list> };",
+   "spec": "css-page-3",
+   "descriptors": []
+  },
+  "@bottom-right-corner": {
+   "syntax": "@bottom-right-corner { <declaration-list> };",
+   "spec": "css-page-3",
+   "descriptors": []
+  },
+  "@character-variant": {
+   "syntax": "@character-variant { <declaration-list> }",
+   "spec": "css-fonts-4",
+   "descriptors": []
+  },
+  "@charset": {
+   "spec": "css-syntax-3",
+   "descriptors": []
+  },
+  "@color-profile": {
+   "syntax": "@color-profile [<dashed-ident> | device-cmyk] { <declaration-list> }",
+   "spec": "css-color-5",
+   "descriptors": [
+    "components",
+    "rendering-intent",
+    "src"
+   ]
+  },
+  "@container": {
+   "syntax": "@container <container-condition># { <rule-list> }",
+   "spec": "css-conditional-5",
+   "descriptors": [
+    "aspect-ratio",
+    "block-size",
+    "fallback",
+    "height",
+    "inline-size",
+    "orientation",
+    "scrollable",
+    "scrolled",
+    "snapped",
+    "stuck",
+    "width"
+   ]
+  },
+  "@contents": {
+   "syntax": "@contents [ { <declaration-list> } ]?",
+   "spec": "css-mixins-1",
+   "descriptors": []
+  },
+  "@counter-style": {
+   "syntax": "@counter-style <counter-style-name> { <declaration-list> }",
+   "spec": "css-counter-styles-3",
+   "descriptors": [
+    "additive-symbols",
+    "fallback",
+    "negative",
+    "pad",
+    "prefix",
+    "range",
+    "speak-as",
+    "suffix",
+    "symbols",
+    "system"
+   ]
+  },
+  "@custom-media": {
+   "syntax": "@custom-media <extension-name> [ <media-query-list> | true | false ] ;",
+   "spec": "mediaqueries-5",
+   "descriptors": []
+  },
+  "@custom-selector": {
+   "syntax": "@custom-selector <custom-selector> <selector-list> ;",
+   "spec": "css-extensions-1",
+   "descriptors": []
+  },
+  "@else": {
+   "syntax": "@else <boolean-condition>? { <rule-list> }",
+   "spec": "css-conditional-5",
+   "descriptors": []
+  },
+  "@font-face": {
+   "syntax": "@font-face { <declaration-list> }",
+   "spec": "css-fonts-4",
+   "descriptors": [
+    "ascent-override",
+    "descent-override",
+    "font-display",
+    "font-family",
+    "font-feature-settings",
+    "font-language-override",
+    "font-named-instance",
+    "font-size",
+    "font-style",
+    "font-variation-settings",
+    "font-weight",
+    "font-width",
+    "line-gap-override",
+    "size-adjust",
+    "src",
+    "subscript-position-override",
+    "subscript-size-override",
+    "superscript-position-override",
+    "superscript-size-override",
+    "unicode-range"
+   ]
+  },
+  "@font-feature-values": {
+   "syntax": "@font-feature-values <font-family-name># { <declaration-rule-list> }",
+   "spec": "css-fonts-4",
+   "descriptors": [
+    "font-display"
+   ]
+  },
+  "@font-palette-values": {
+   "syntax": "@font-palette-values <dashed-ident> { <declaration-list> }",
+   "spec": "css-fonts-4",
+   "descriptors": [
+    "base-palette",
+    "font-family",
+    "override-colors"
+   ]
+  },
+  "@function": {
+   "syntax": "@function <function-token> <function-parameter>#? ) [ returns <css-type> ]? { <declaration-rule-list> }",
+   "spec": "css-mixins-1",
+   "descriptors": [
+    "result"
+   ]
+  },
+  "@historical-forms": {
+   "syntax": "@historical-forms { <declaration-list> }",
+   "spec": "css-fonts-4",
+   "descriptors": []
+  },
+  "@import": {
+   "syntax": "@import [ <url> | <string> ] [[ layer | layer( <layer-name> ) ] || [ scope | scope( <scope-start> | <scope-boundaries> ) ] || <supports-import-condition>]? <media-import-condition> ;",
+   "spec": "css-cascade-6",
+   "descriptors": []
+  },
+  "@keyframes": {
+   "syntax": "@keyframes <keyframes-name> { <qualified-rule-list> }",
+   "spec": "css-animations-1",
+   "descriptors": []
+  },
+  "@layer": {
+   "syntax": "@layer <layer-name>? { <rule-list> } | @layer <layer-name>#;",
+   "spec": "css-cascade-5",
+   "descriptors": []
+  },
+  "@left-bottom": {
+   "syntax": "@left-bottom { <declaration-list> };",
+   "spec": "css-page-3",
+   "descriptors": []
+  },
+  "@left-middle": {
+   "syntax": "@left-middle { <declaration-list> };",
+   "spec": "css-page-3",
+   "descriptors": []
+  },
+  "@left-top": {
+   "syntax": "@left-top { <declaration-list> };",
+   "spec": "css-page-3",
+   "descriptors": []
+  },
+  "@macro": {
+   "syntax": "@macro <dashed-ident> { <declaration-rule-list> }",
+   "spec": "css-mixins-1",
+   "descriptors": []
+  },
+  "@media": {
+   "syntax": "@media <media-query-list> { <rule-list> }",
+   "spec": "css-conditional-3",
+   "descriptors": [
+    "-webkit-device-pixel-ratio",
+    "-webkit-transform-3d",
+    "any-hover",
+    "any-pointer",
+    "aspect-ratio",
+    "color",
+    "color-gamut",
+    "color-index",
+    "device-aspect-ratio",
+    "device-height",
+    "device-width",
+    "display-mode",
+    "display-state",
+    "dynamic-range",
+    "environment-blending",
+    "forced-colors",
+    "grid",
+    "height",
+    "horizontal-viewport-segments",
+    "hover",
+    "inverted-colors",
+    "monochrome",
+    "nav-controls",
+    "orientation",
+    "overflow-block",
+    "overflow-inline",
+    "pointer",
+    "prefers-color-scheme",
+    "prefers-contrast",
+    "prefers-reduced-data",
+    "prefers-reduced-motion",
+    "prefers-reduced-transparency",
+    "resizable",
+    "resolution",
+    "scan",
+    "scripting",
+    "shape",
+    "ua-color-scheme",
+    "update",
+    "vertical-viewport-segments",
+    "video-color-gamut",
+    "video-dynamic-range",
+    "width"
+   ]
+  },
+  "@mixin": {
+   "syntax": "@mixin <function-token> <function-parameter>#? ) { <declaration-rule-list> }",
+   "spec": "css-mixins-1",
+   "descriptors": []
+  },
+  "@namespace": {
+   "syntax": "@namespace <namespace-prefix>? [ <string> | <url> ] ;",
+   "spec": "css-namespaces-3",
+   "descriptors": []
+  },
+  "@navigation": {
+   "syntax": "@navigation <navigation-condition> { <rule-list> }",
+   "spec": "css-navigation-1",
+   "descriptors": []
+  },
+  "@ornaments": {
+   "syntax": "@ornaments { <declaration-list> }",
+   "spec": "css-fonts-4",
+   "descriptors": []
+  },
+  "@page": {
+   "syntax": "@page <page-selector-list>? { <declaration-rule-list> }",
+   "spec": "css-page-3",
+   "descriptors": [
+    "bleed",
+    "marks",
+    "page-margin-safety",
+    "page-orientation",
+    "size"
+   ]
+  },
+  "@position-try": {
+   "syntax": "@position-try <dashed-ident> { <declaration-list> }",
+   "spec": "css-anchor-position-1",
+   "descriptors": []
+  },
+  "@property": {
+   "syntax": "@property <custom-property-name> { <declaration-list> }",
+   "spec": "unknown",
+   "descriptors": [
+    "inherits",
+    "initial-value",
+    "syntax"
+   ]
+  },
+  "@result": {
+   "syntax": "@result { <declaration-rule-list> }",
+   "spec": "css-mixins-1",
+   "descriptors": []
+  },
+  "@right-bottom": {
+   "syntax": "@right-bottom { <declaration-list> };",
+   "spec": "css-page-3",
+   "descriptors": []
+  },
+  "@right-middle": {
+   "syntax": "@right-middle { <declaration-list> };",
+   "spec": "css-page-3",
+   "descriptors": []
+  },
+  "@right-top": {
+   "syntax": "@right-top { <declaration-list> };",
+   "spec": "css-page-3",
+   "descriptors": []
+  },
+  "@route": {
+   "syntax": "<route-rule>",
+   "spec": "css-navigation-1",
+   "descriptors": []
+  },
+  "@scope": {
+   "syntax": "@scope <scope-boundaries>? { <block-contents> }",
+   "spec": "css-cascade-6",
+   "descriptors": []
+  },
+  "@starting-style": {
+   "spec": "css-transitions-2",
+   "descriptors": []
+  },
+  "@styleset": {
+   "syntax": "@styleset { <declaration-list> }",
+   "spec": "css-fonts-4",
+   "descriptors": []
+  },
+  "@stylistic": {
+   "syntax": "@stylistic { <declaration-list> }",
+   "spec": "css-fonts-4",
+   "descriptors": []
+  },
+  "@supports": {
+   "syntax": "@supports <supports-condition> { <rule-list> }",
+   "spec": "css-conditional-3",
+   "descriptors": []
+  },
+  "@supports-condition": {
+   "syntax": "@supports-condition <supports-condition-name> { <block-contents> }",
+   "spec": "css-conditional-5",
+   "descriptors": []
+  },
+  "@swash": {
+   "syntax": "@swash { <declaration-list> }",
+   "spec": "css-fonts-4",
+   "descriptors": []
+  },
+  "@top-center": {
+   "syntax": "@top-center { <declaration-list> };",
+   "spec": "css-page-3",
+   "descriptors": []
+  },
+  "@top-left": {
+   "syntax": "@top-left { <declaration-list> };",
+   "spec": "css-page-3",
+   "descriptors": []
+  },
+  "@top-left-corner": {
+   "syntax": "@top-left-corner { <declaration-list> };",
+   "spec": "css-page-3",
+   "descriptors": []
+  },
+  "@top-right": {
+   "syntax": "@top-right { <declaration-list> };",
+   "spec": "css-page-3",
+   "descriptors": []
+  },
+  "@top-right-corner": {
+   "syntax": "@top-right-corner { <declaration-list> };",
+   "spec": "css-page-3",
+   "descriptors": []
+  },
+  "@view-transition": {
+   "syntax": "@view-transition { <declaration-list> }",
+   "spec": "css-view-transitions-2",
+   "descriptors": [
+    "navigation",
+    "types"
+   ]
+  },
+  "@when": {
+   "syntax": "@when <boolean-condition> { <rule-list> }",
+   "spec": "css-conditional-5",
+   "descriptors": []
+  }
+ },
+ "selectors": [
+  "&",
+  "+",
+  "::after",
+  "::backdrop",
+  "::before",
+  "::checkmark",
+  "::clear-icon",
+  "::color-swatch",
+  "::column",
+  "::cue",
+  "::cue()",
+  "::cue-region",
+  "::cue-region()",
+  "::details-content",
+  "::field-component",
+  "::field-separator",
+  "::field-text",
+  "::file-selector-button",
+  "::first-letter",
+  "::first-line",
+  "::grammar-error",
+  "::highlight()",
+  "::marker",
+  "::nth-fragment()",
+  "::part()",
+  "::picker()",
+  "::picker-icon",
+  "::placeholder",
+  "::reveal-icon",
+  "::scroll-button()",
+  "::scroll-marker",
+  "::scroll-marker-group",
+  "::search-text",
+  "::selection",
+  "::slider-fill",
+  "::slider-thumb",
+  "::slider-track",
+  "::slotted()",
+  "::spelling-error",
+  "::step-control",
+  "::step-down",
+  "::step-up",
+  "::target-text",
+  "::view-transition",
+  "::view-transition-group()",
+  "::view-transition-group-children()",
+  "::view-transition-image-pair()",
+  "::view-transition-new()",
+  "::view-transition-old()",
+  ":active",
+  ":active-view-transition",
+  ":active-view-transition-type()",
+  ":after",
+  ":animated-image",
+  ":any-link",
+  ":autofill",
+  ":before",
+  ":blank",
+  ":buffering",
+  ":checked",
+  ":current",
+  ":current()",
+  ":default",
+  ":defined",
+  ":dir()",
+  ":disabled",
+  ":empty",
+  ":enabled",
+  ":first",
+  ":first-child",
+  ":first-letter",
+  ":first-line",
+  ":first-of-page",
+  ":first-of-type",
+  ":focus",
+  ":focus-visible",
+  ":focus-within",
+  ":fullscreen",
+  ":future",
+  ":has()",
+  ":has-slotted",
+  ":heading",
+  ":heading()",
+  ":high-value",
+  ":host",
+  ":host()",
+  ":host-context()",
+  ":hover",
+  ":in-range",
+  ":indeterminate",
+  ":interest-source",
+  ":interest-target",
+  ":invalid",
+  ":is()",
+  ":lang()",
+  ":last-child",
+  ":last-of-page",
+  ":last-of-type",
+  ":left",
+  ":link",
+  ":link-to()",
+  ":local-link",
+  ":low-value",
+  ":matches()",
+  ":modal",
+  ":muted",
+  ":nav-source",
+  ":not()",
+  ":nth()",
+  ":nth-child()",
+  ":nth-col()",
+  ":nth-last-child()",
+  ":nth-last-col()",
+  ":nth-last-of-type()",
+  ":nth-of-page()",
+  ":nth-of-type()",
+  ":only-child",
+  ":only-of-type",
+  ":open",
+  ":optimal-value",
+  ":optional",
+  ":out-of-range",
+  ":past",
+  ":paused",
+  ":picture-in-picture",
+  ":placeholder-shown",
+  ":playing",
+  ":popover-open",
+  ":read-only",
+  ":read-write",
+  ":required",
+  ":right",
+  ":root",
+  ":scope",
+  ":seeking",
+  ":snapped",
+  ":snapped-block",
+  ":snapped-inline",
+  ":snapped-x",
+  ":snapped-y",
+  ":stalled",
+  ":start-of-page",
+  ":state()",
+  ":target",
+  ":target-after",
+  ":target-before",
+  ":target-current",
+  ":unchecked",
+  ":user-invalid",
+  ":user-valid",
+  ":valid",
+  ":visited",
+  ":volume-locked",
+  ":where()",
+  ":xr-overlay",
+  ">",
+  "||",
+  "~"
+ ],
+ "functions": [
+  "-webkit-image-set()",
+  "abs()",
+  "acos()",
+  "alpha()",
+  "anchor()",
+  "anchor-size()",
+  "asin()",
+  "atan()",
+  "atan2()",
+  "attr()",
+  "blur()",
+  "brightness()",
+  "calc()",
+  "calc-interpolate()",
+  "calc-mix()",
+  "calc-size()",
+  "circle()",
+  "clamp()",
+  "color()",
+  "color-interpolate()",
+  "color-layers()",
+  "color-mix()",
+  "conic-gradient()",
+  "content()",
+  "contrast()",
+  "contrast-color()",
+  "control-value()",
+  "cos()",
+  "counter()",
+  "counters()",
+  "cross-fade()",
+  "cross-origin()",
+  "cubic-bezier()",
+  "device-cmyk()",
+  "drop-shadow()",
+  "dynamic-range-limit-mix()",
+  "element()",
+  "ellipse()",
+  "env()",
+  "exp()",
+  "fade()",
+  "filter()",
+  "first-valid()",
+  "fit-content()",
+  "grayscale()",
+  "hdr-color()",
+  "hsl()",
+  "hsla()",
+  "hue-rotate()",
+  "hwb()",
+  "hypot()",
+  "ictcp()",
+  "ident()",
+  "if()",
+  "image()",
+  "image-set()",
+  "inherit()",
+  "inset()",
+  "integrity()",
+  "interpolate()",
+  "invert()",
+  "jzazbz()",
+  "jzczhz()",
+  "lab()",
+  "lch()",
+  "leader()",
+  "light-dark()",
+  "linear()",
+  "linear-gradient()",
+  "log()",
+  "matrix()",
+  "matrix3d()",
+  "max()",
+  "media()",
+  "min()",
+  "minmax()",
+  "mod()",
+  "oklab()",
+  "oklch()",
+  "opacity()",
+  "paint()",
+  "palette-mix()",
+  "param()",
+  "path()",
+  "perspective()",
+  "pointer()",
+  "polygon()",
+  "pow()",
+  "progress()",
+  "radial-gradient()",
+  "random()",
+  "random-item()",
+  "ray()",
+  "rect()",
+  "referrer-policy()",
+  "rem()",
+  "repeat()",
+  "repeating-conic-gradient()",
+  "repeating-linear-gradient()",
+  "repeating-radial-gradient()",
+  "rgb()",
+  "rgba()",
+  "rotate()",
+  "rotate3d()",
+  "rotateX()",
+  "rotateY()",
+  "rotateZ()",
+  "round()",
+  "running()",
+  "saturate()",
+  "scale()",
+  "scale3d()",
+  "scaleX()",
+  "scaleY()",
+  "scaleZ()",
+  "scroll()",
+  "sepia()",
+  "shape()",
+  "sibling-count()",
+  "sibling-index()",
+  "sign()",
+  "sin()",
+  "skew()",
+  "skewX()",
+  "skewY()",
+  "snap-block()",
+  "snap-inline()",
+  "sqrt()",
+  "src()",
+  "steps()",
+  "string()",
+  "stripes()",
+  "superellipse()",
+  "supports()",
+  "symbols()",
+  "tan()",
+  "target-counter()",
+  "target-counters()",
+  "target-text()",
+  "toggle()",
+  "transform-interpolate()",
+  "transform-mix()",
+  "translate()",
+  "translate3d()",
+  "translateX()",
+  "translateY()",
+  "translateZ()",
+  "type()",
+  "url()",
+  "url-pattern()",
+  "var()",
+  "view()",
+  "wcag2()",
+  "xywh()"
+ ],
+ "types": [
+  "(-token",
+  ")-token",
+  "CDC-token",
+  "CDO-token",
+  "[-token",
+  "]-token",
+  "a-n-plus-b",
+  "absolute-size",
+  "age",
+  "alpha-value",
+  "anchor-name",
+  "anchor-side",
+  "anchor-size",
+  "anchored-in-parens",
+  "anchored-query",
+  "angle",
+  "angle-percentage",
+  "angular-color-hint",
+  "angular-color-stop",
+  "angular-color-stop-list",
+  "animateable-feature",
+  "animation-action",
+  "any-value",
+  "arc-command",
+  "arc-size",
+  "arc-sweep",
+  "at-keyword-token",
+  "at-rule-list",
+  "attachment",
+  "attr-args",
+  "attr-matcher",
+  "attr-modifier",
+  "attr-name",
+  "attr-type",
+  "attr-unit",
+  "attribute-selector",
+  "auto-line-color-list",
+  "auto-line-style-list",
+  "auto-line-width-list",
+  "auto-repeat",
+  "auto-repeat-line-color",
+  "auto-repeat-line-style",
+  "auto-repeat-line-width",
+  "auto-track-list",
+  "autospace",
+  "axis",
+  "bad-string-token",
+  "bad-url-token",
+  "base-descriptor",
+  "baseline-metric",
+  "baseline-position",
+  "basic-shape",
+  "basic-shape-rect",
+  "bg-clip",
+  "bg-image",
+  "bg-layer",
+  "bg-position",
+  "bg-size",
+  "blend-mode",
+  "block-contents",
+  "boolean-condition",
+  "boolean-expr",
+  "border-radius",
+  "border-style",
+  "border-width",
+  "bottom",
+  "box",
+  "calc-keyword",
+  "calc-product",
+  "calc-size-basis",
+  "calc-sum",
+  "calc-value",
+  "cf-image",
+  "class-selector",
+  "clip-source",
+  "cmyk-component",
+  "colon-token",
+  "color",
+  "color-base",
+  "color-font-tech",
+  "color-function",
+  "color-interpolation-method",
+  "color-space",
+  "color-stop",
+  "color-stop-angle",
+  "color-stop-length",
+  "color-stop-list",
+  "color-stripe",
+  "colorspace-params",
+  "combinator",
+  "comma-token",
+  "command-end-point",
+  "common-lig-values",
+  "compat-auto",
+  "compat-special",
+  "complex-real-selector",
+  "complex-real-selector-list",
+  "complex-selector",
+  "complex-selector-list",
+  "complex-selector-unit",
+  "composite-mode",
+  "compositing-operator",
+  "compound-selector",
+  "compound-selector-list",
+  "conic-gradient-syntax",
+  "container-condition",
+  "container-name",
+  "container-query",
+  "content-distribution",
+  "content-level",
+  "content-list",
+  "content-position",
+  "content-replacement",
+  "contextual-alt-values",
+  "control-point",
+  "coord-box",
+  "coordinate-pair",
+  "corner-shape-value",
+  "counter",
+  "counter-name",
+  "counter-style",
+  "counter-style-name",
+  "cross-origin-modifier",
+  "css-type",
+  "cubic-bezier-easing-function",
+  "cursor-image",
+  "cursor-predefined",
+  "curve-command",
+  "custom-arg",
+  "custom-color-space",
+  "custom-ident",
+  "custom-params",
+  "custom-property-name",
+  "custom-selector",
+  "dasharray",
+  "dashed-function",
+  "dashed-ident",
+  "dashndashdigit-ident",
+  "decibel",
+  "declaration",
+  "declaration-list",
+  "declaration-rule-list",
+  "declaration-value",
+  "default-value",
+  "delim-token",
+  "deprecated-color",
+  "dimension",
+  "dimension-token",
+  "discretionary-lig-values",
+  "display-box",
+  "display-inside",
+  "display-internal",
+  "display-legacy",
+  "display-listitem",
+  "display-outside",
+  "easing-function",
+  "east-asian-variant-values",
+  "east-asian-width-values",
+  "env-args",
+  "eof-token",
+  "event-trigger-event",
+  "explicit-track-list",
+  "extension-name",
+  "family-name",
+  "feature-tag-value",
+  "filter-function",
+  "filter-value-list",
+  "final-bg-layer",
+  "fixed-breadth",
+  "fixed-repeat",
+  "fixed-size",
+  "flex",
+  "font-family-name",
+  "font-feature-index",
+  "font-feature-value-name",
+  "font-feature-value-type",
+  "font-features-tech",
+  "font-format",
+  "font-src",
+  "font-src-list",
+  "font-tech",
+  "font-variant-css2",
+  "font-weight-absolute",
+  "font-width-css3",
+  "forgiving-selector-list",
+  "form-control-identifier",
+  "frequency",
+  "frequency-percentage",
+  "function-parameter",
+  "function-token",
+  "gap-auto-repeat-rule",
+  "gap-auto-rule-list",
+  "gap-repeat-rule",
+  "gap-rule",
+  "gap-rule-list",
+  "gap-rule-or-repeat",
+  "gender",
+  "general-enclosed",
+  "generic-family",
+  "generic-font-complete",
+  "generic-font-family",
+  "generic-font-incomplete",
+  "generic-font-script-specific",
+  "generic-voice",
+  "geometry-box",
+  "gradient",
+  "grid-line",
+  "hash-token",
+  "hex-color",
+  "historical-lig-values",
+  "horizontal-line-command",
+  "hue",
+  "hue-interpolation-method",
+  "id",
+  "id-selector",
+  "ident",
+  "ident-arg",
+  "ident-token",
+  "identifier",
+  "if-args",
+  "if-args-branch",
+  "if-branch",
+  "if-condition",
+  "if-test",
+  "image",
+  "image-1D",
+  "image-set-option",
+  "image-src",
+  "image-tags",
+  "import-conditions",
+  "inflexible-breadth",
+  "inherit-args",
+  "init-descriptor",
+  "init-descriptor-name",
+  "input-position",
+  "inset-value",
+  "integer",
+  "integrity-modifier",
+  "isolation-mode",
+  "keyframe-block",
+  "keyframe-selector",
+  "keyframes-name",
+  "layer-name",
+  "layout-box",
+  "leader-type",
+  "left",
+  "legacy-border-radius-syntax",
+  "legacy-device-cmyk-syntax",
+  "legacy-hsl-syntax",
+  "legacy-hsla-syntax",
+  "legacy-pseudo-element-selector",
+  "legacy-rgb-syntax",
+  "legacy-rgba-syntax",
+  "length",
+  "length-percentage",
+  "level",
+  "light-dark-color",
+  "light-dark-image",
+  "line-color-list",
+  "line-color-or-repeat",
+  "line-command",
+  "line-name-list",
+  "line-names",
+  "line-style",
+  "line-style-list",
+  "line-style-or-repeat",
+  "line-width",
+  "line-width-list",
+  "line-width-or-repeat",
+  "linear-color-hint",
+  "linear-color-stop",
+  "linear-easing-function",
+  "linear-gradient-syntax",
+  "margin-width",
+  "marker-ref",
+  "mask-layer",
+  "mask-reference",
+  "mask-source",
+  "masking-mode",
+  "media-and",
+  "media-condition",
+  "media-condition-without-or",
+  "media-feature",
+  "media-import-condition",
+  "media-in-parens",
+  "media-not",
+  "media-or",
+  "media-query",
+  "media-query-list",
+  "media-type",
+  "mf-boolean",
+  "mf-comparison",
+  "mf-eq",
+  "mf-gt",
+  "mf-lt",
+  "mf-name",
+  "mf-plain",
+  "mf-range",
+  "mf-value",
+  "modern-device-cmyk-syntax",
+  "modern-hsl-syntax",
+  "modern-hsla-syntax",
+  "modern-rgb-syntax",
+  "modern-rgba-syntax",
+  "move-command",
+  "mq-boolean",
+  "n-dimension",
+  "name-repeat",
+  "named-color",
+  "namespace-prefix",
+  "navigation-condition",
+  "navigation-in-parens",
+  "navigation-location-between-test",
+  "navigation-location-test",
+  "navigation-phase-keyword",
+  "navigation-phase-test",
+  "navigation-relation",
+  "navigation-test",
+  "navigation-type-keyword",
+  "navigation-type-test",
+  "ndash-dimension",
+  "ndashdigit-dimension",
+  "ndashdigit-ident",
+  "ns-prefix",
+  "number",
+  "number-optional-number",
+  "number-token",
+  "numeric-figure-values",
+  "numeric-fraction-values",
+  "numeric-spacing-values",
+  "offset-path",
+  "opacity-value",
+  "opentype-tag",
+  "outline-line-style",
+  "overflow-position",
+  "padding-width",
+  "page-selector",
+  "page-selector-list",
+  "page-size",
+  "paint",
+  "paint-box",
+  "palette-identifier",
+  "pattern-descriptor",
+  "percentage",
+  "percentage-token",
+  "pointer-axis",
+  "pointer-source",
+  "points",
+  "polar-color-space",
+  "position",
+  "position-area",
+  "position-area-query",
+  "position-four",
+  "position-one",
+  "position-three",
+  "position-two",
+  "predefined-rgb",
+  "predefined-rgb-params",
+  "progress-source",
+  "pseudo-class-selector",
+  "pseudo-compound-selector",
+  "pseudo-element-selector",
+  "pseudo-page",
+  "pt-class-selector",
+  "pt-name-and-class-selector",
+  "pt-name-selector",
+  "qualified-rule-list",
+  "query-in-parens",
+  "quirky-color",
+  "quirky-length",
+  "quote",
+  "radial-extent",
+  "radial-gradient-syntax",
+  "radial-shape",
+  "radial-size",
+  "random-cache-key",
+  "random-item-args",
+  "random-key",
+  "random-ua-ident",
+  "ratio",
+  "ray-size",
+  "rectangular-color-space",
+  "referrer-policy-modifier",
+  "relative-control-point",
+  "relative-real-selector",
+  "relative-real-selector-list",
+  "relative-selector",
+  "relative-selector-list",
+  "relative-size",
+  "repeat-line-color",
+  "repeat-line-style",
+  "repeat-line-width",
+  "repeat-style",
+  "repetition",
+  "request-url-modifier",
+  "resolution",
+  "reversed-counter-name",
+  "right",
+  "rounding-strategy",
+  "route-descriptor",
+  "route-location",
+  "route-name",
+  "route-rule",
+  "rule-list",
+  "safe-printable-inset",
+  "scope-boundaries",
+  "scope-end",
+  "scope-start",
+  "scroll-button-direction",
+  "scroll-state-feature",
+  "scroll-state-in-parens",
+  "scroll-state-query",
+  "scroller",
+  "segment-options",
+  "selector-list",
+  "self-position",
+  "semicolon-token",
+  "semitones",
+  "shadow",
+  "shape",
+  "shape-box",
+  "shape-command",
+  "side-or-corner",
+  "signed-integer",
+  "signless-integer",
+  "simple-selector",
+  "simple-selector-list",
+  "single-animation",
+  "single-animation-composition",
+  "single-animation-direction",
+  "single-animation-fill-mode",
+  "single-animation-iteration-count",
+  "single-animation-play-state",
+  "single-animation-timeline",
+  "single-transition",
+  "single-transition-property",
+  "size-feature",
+  "size-keyword",
+  "slash-separated-border-radius-syntax",
+  "smooth-command",
+  "source-size",
+  "source-size-list",
+  "source-size-value",
+  "spacing-trim",
+  "spread-shadow",
+  "step-easing-function",
+  "step-position",
+  "string",
+  "string-token",
+  "style-feature",
+  "style-feature-boolean",
+  "style-feature-name",
+  "style-feature-plain",
+  "style-feature-value",
+  "style-in-parens",
+  "style-query",
+  "style-range",
+  "style-range-value",
+  "subclass-selector",
+  "supports-at-rule-fn",
+  "supports-condition",
+  "supports-condition-name",
+  "supports-decl",
+  "supports-env-fn",
+  "supports-feature",
+  "supports-font-format-fn",
+  "supports-font-tech-fn",
+  "supports-import-condition",
+  "supports-in-parens",
+  "supports-named-feature-fn",
+  "supports-selector-fn",
+  "svg-paint",
+  "symbol",
+  "symbols-type",
+  "syntax",
+  "syntax-combinator",
+  "syntax-component",
+  "syntax-multiplier",
+  "syntax-single-component",
+  "syntax-string",
+  "syntax-type-name",
+  "system-color",
+  "system-font-family-name",
+  "target",
+  "target-contrast",
+  "target-name",
+  "text-edge",
+  "time",
+  "time-percentage",
+  "timeline-range-center-subject",
+  "timeline-range-name",
+  "top",
+  "track-breadth",
+  "track-list",
+  "track-repeat",
+  "track-size",
+  "transform-function",
+  "transform-list",
+  "transition-behavior-value",
+  "try-size",
+  "try-tactic",
+  "type",
+  "type-selector",
+  "unicode-range-token",
+  "uri",
+  "url",
+  "url-modifier",
+  "url-set",
+  "url-token",
+  "var-args",
+  "vertical-line-command",
+  "view-transition-type",
+  "visual-box",
+  "voice-family-name",
+  "wcag2",
+  "whitespace-token",
+  "whole-value",
+  "wq-name",
+  "xyz-params",
+  "xyz-space",
+  "zero",
+  "{-token",
+  "}-token"
+ ]
+}
