@@ -3115,6 +3115,7 @@ and property_font_palette =
   [ `Normal
   | `Light
   | `Dark
+  | `Dashed_ident of string
   ]
 
 and property_font_size =
@@ -5298,6 +5299,65 @@ and property_bleed =
   [ `Auto
   | `Extended_length of extended_length
   ]
+
+and property_ascent_override =
+  [ `Normal
+  | `Extended_percentage of extended_percentage
+  ]
+
+and property_descent_override =
+  [ `Normal
+  | `Extended_percentage of extended_percentage
+  ]
+
+and property_line_gap_override =
+  [ `Normal
+  | `Extended_percentage of extended_percentage
+  ]
+
+and property_size_adjust = extended_percentage
+
+and property_navigation =
+  [ `Auto
+  | `None
+  ]
+
+and property_types =
+  [ `None
+  | `Custom_ident of string list
+  ]
+
+and property_base_palette =
+  [ `Light
+  | `Dark
+  | `Integer of int
+  ]
+
+and property_override_colors = (int * color) list
+
+and property_system =
+  [ `Cyclic
+  | `Numeric
+  | `Alphabetic
+  | `Symbolic
+  | `Additive
+  | `Static_0 of unit * int option
+  | `Static_1 of unit * counter_style_name
+  ]
+
+and property_symbols = symbol list
+and property_negative = symbol * symbol option
+
+and property_range =
+  [ `Static of ([ `Integer of int | `Infinite ] * [ `Integer of int | `Infinite ]) list
+  | `Auto
+  ]
+
+and property_pad = int * symbol
+and property_fallback = counter_style_name
+and property_prefix = symbol
+and property_suffix = symbol
+and property_additive_symbols = (int * symbol) list
 
 and property_backdrop_blur = extended_length
 and property_scrollbar_color_legacy = color

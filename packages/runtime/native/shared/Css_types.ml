@@ -4470,6 +4470,56 @@ module CounterStyleType = struct
     | `unset -> {js|unset|js}
 end
 
+(* @counter-style descriptors (css-counter-styles-3) *)
+module CounterStyleSystem = struct
+  type t =
+    [ `cyclic
+    | `numeric
+    | `alphabetic
+    | `symbolic
+    | `additive
+    | `fixed of int option
+    | `extends of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `cyclic -> {js|cyclic|js}
+    | `numeric -> {js|numeric|js}
+    | `alphabetic -> {js|alphabetic|js}
+    | `symbolic -> {js|symbolic|js}
+    | `additive -> {js|additive|js}
+    | `fixed None -> {js|fixed|js}
+    | `fixed (Some n) -> {js|fixed |js} ^ string_of_int n
+    | `extends name -> {js|extends |js} ^ name
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module CounterStyleSymbols = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module CounterStyleNegative = CounterStyleSymbols
+module CounterStyleRange = CounterStyleSymbols
+module CounterStylePad = CounterStyleSymbols
+module CounterStyleFallback = CounterName
+module CounterStylePrefix = CounterStyleSymbols
+module CounterStyleSuffix = CounterStyleSymbols
+module CounterStyleAdditiveSymbols = CounterStyleSymbols
+
 module Counter = struct
   (* counter() = counter( <counter-name> [, <counter-style>]? ).
      Two surface forms map to two constructors, mirroring how [attr] and
@@ -7024,6 +7074,7 @@ module FontPalette = struct
     [ `normal
     | `light
     | `dark
+    | `dashedIdent of string
     | Var.t
     | Cascading.t
     ]
@@ -7033,6 +7084,7 @@ module FontPalette = struct
     | `normal -> {js|normal|js}
     | `light -> {js|light|js}
     | `dark -> {js|dark|js}
+    | `dashedIdent x -> x
     | #Var.t as x -> Var.toString x
     | #Cascading.t as x -> Cascading.toString x
 end
@@ -7049,6 +7101,105 @@ module FontSizeAdjust = struct
     match x with
     | `none -> {js|none|js}
     | `num x -> Kloth.Float.to_string x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module AscentOverride = struct
+  type t =
+    [ `normal
+    | Percentage.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | #Percentage.t as x -> Percentage.toString x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module DescentOverride = AscentOverride
+module LineGapOverride = AscentOverride
+
+module SizeAdjust = struct
+  type t =
+    [ Percentage.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #Percentage.t as x -> Percentage.toString x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+(* @view-transition descriptors (css-view-transitions-2) *)
+module ViewTransitionNavigation = struct
+  type t =
+    [ `auto
+    | `none
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `none -> {js|none|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ViewTransitionTypes = struct
+  type t =
+    [ `none
+    | `types of string list
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `types xs -> String.concat {js| |js} xs
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+(* @font-palette-values descriptors (css-fonts-4) *)
+module BasePalette = struct
+  type t =
+    [ `light
+    | `dark
+    | `num of int
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `light -> {js|light|js}
+    | `dark -> {js|dark|js}
+    | `num x -> string_of_int x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module OverrideColors = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
     | #Var.t as x -> Var.toString x
     | #Cascading.t as x -> Cascading.toString x
 end
