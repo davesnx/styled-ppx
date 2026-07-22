@@ -7064,8 +7064,8 @@ var require_react_dom_development = __commonJS({
             var map2 = /* @__PURE__ */ new Map();
             var lane = 1;
             for (var index2 = 0; index2 < TotalLanes; index2++) {
-              var label = getLabelForLane(lane);
-              map2.set(lane, label);
+              var label2 = getLabelForLane(lane);
+              map2.set(lane, label2);
               lane *= 2;
             }
             return map2;
@@ -37237,7 +37237,8 @@ var React = __toESM(require_react(), 1);
 var empty_1 = {};
 var empty = [
   "",
-  empty_1
+  empty_1,
+  void 0
 ];
 function styles(carrier) {
   return carrier[1];
@@ -37245,32 +37246,59 @@ function styles(carrier) {
 function className(carrier) {
   return carrier[0];
 }
-function make4(className2, vars2) {
-  const loop = function(_style, _vars) {
-    while (true) {
-      const vars3 = _vars;
-      const style = _style;
-      if (!vars3) {
-        return style;
-      }
-      const match = vars3.hd;
-      _vars = vars3.tl;
-      _style = Style.unsafeAddProp(style, match[0], match[1]);
-      continue;
+function label(carrier) {
+  return carrier[2];
+}
+function inline_vars(vars2) {
+  let _style = {};
+  let _vars = vars2;
+  while (true) {
+    const vars$12 = _vars;
+    const style = _style;
+    if (!vars$12) {
+      return style;
     }
-    ;
-  };
+    const match = vars$12.hd;
+    _vars = vars$12.tl;
+    _style = Style.unsafeAddProp(style, match[0], match[1]);
+    continue;
+  }
+  ;
+}
+function make4(className2, vars2) {
   return [
     className2,
-    loop({}, vars2)
+    inline_vars(vars2),
+    void 0
   ];
 }
-function merge(styles1, styles22) {
-  const className2 = (styles1[0] + (" " + styles22[0])).trim();
-  const style = Object.assign({}, styles1[1], styles22[1]);
+function make_labeled(label2, className2, vars2) {
   return [
     className2,
-    style
+    inline_vars(vars2),
+    label2
+  ];
+}
+function merge_labels(left, right) {
+  if (left !== void 0) {
+    if (right !== void 0) {
+      return left + (" " + right);
+    } else {
+      return left;
+    }
+  } else if (right !== void 0) {
+    return right;
+  } else {
+    return;
+  }
+}
+function merge(styles1, styles22) {
+  const merged_className = (className(styles1) + (" " + className(styles22))).trim();
+  const style = Object.assign({}, styles(styles1), styles(styles22));
+  return [
+    merged_className,
+    style,
+    merge_labels(label(styles1), label(styles22))
   ];
 }
 function global_style_tag(css) {
@@ -37720,8 +37748,8 @@ function styles2(lolaOpt, param) {
   });
 }
 function make$12(props) {
-  const className2 = styles2(props.lola, void 0)[0] + getOrEmpty(props.className);
-  const style = styles2(props.lola, void 0)[1];
+  const className2 = className(styles2(props.lola, void 0)) + getOrEmpty(props.className);
+  const style = styles(styles2(props.lola, void 0));
   const stylesObject = {
     className: className2,
     style,
@@ -37842,12 +37870,12 @@ function Main(Props) {
           }),
           JsxRuntime.jsx("div", {
             children: "height: 72px -> 172px",
-            className: keyframeDemoCard[0],
-            style: keyframeDemoCard[1]
+            className: className(keyframeDemoCard),
+            style: styles(keyframeDemoCard)
           })
         ],
-        className: keyframeDemoShell(primary)[0],
-        style: keyframeDemoShell(primary)[1]
+        className: className(keyframeDemoShell(primary)),
+        style: styles(keyframeDemoShell(primary))
       }),
       JsxRuntime.jsx("div", {
         children: JsxRuntime.jsxs("div", {
@@ -37859,27 +37887,27 @@ function Main(Props) {
               children: "Card content"
             })
           ],
-          className: merge(card, container)[0],
-          style: merge(card, container)[1]
+          className: className(merge(card, container)),
+          style: styles(merge(card, container))
         }),
-        className: post[0],
-        style: post[1]
+        className: className(post),
+        style: styles(post)
       }),
       JsxRuntime.jsxs("section", {
         children: [
           JsxRuntime.jsx("div", {
             children: "code everywhere!",
-            className: clx[0],
-            style: clx[1]
+            className: className(clx),
+            style: styles(clx)
           }),
           JsxRuntime.jsx("div", {
             children: "Red text",
-            className: selectors[0],
-            style: selectors[1]
+            className: className(selectors),
+            style: styles(selectors)
           })
         ],
-        className: stack[0],
-        style: stack[1]
+        className: className(stack),
+        style: styles(stack)
       }),
       JsxRuntime.jsxs("section", {
         children: [
@@ -37888,17 +37916,17 @@ function Main(Props) {
           }),
           JsxRuntime.jsx("p", {
             children: "media -> container -> supports (source order)",
-            className: queryOrder[0],
-            style: queryOrder[1]
+            className: className(queryOrder),
+            style: styles(queryOrder)
           }),
           JsxRuntime.jsx("p", {
             children: "supports -> container -> media (reversed source)",
-            className: queryOrderReversed[0],
-            style: queryOrderReversed[1]
+            className: className(queryOrderReversed),
+            style: styles(queryOrderReversed)
           })
         ],
-        className: post[0],
-        style: post[1]
+        className: className(post),
+        style: styles(post)
       }),
       JsxRuntime.jsxs("section", {
         children: [
@@ -37912,8 +37940,8 @@ function Main(Props) {
                 href: "#"
               })
             }),
-            className: linkFirst[0],
-            style: linkFirst[1]
+            className: className(linkFirst),
+            style: styles(linkFirst)
           }),
           JsxRuntime.jsx("ul", {
             children: JsxRuntime.jsx("li", {
@@ -37922,14 +37950,14 @@ function Main(Props) {
                 href: "#"
               })
             }),
-            className: nthFirst[0],
-            style: nthFirst[1]
+            className: className(nthFirst),
+            style: styles(nthFirst)
           })
         ]
       })
     ],
-    className: gradiend[0],
-    style: gradiend[1]
+    className: className(gradiend),
+    style: styles(gradiend)
   });
 }
 var make$22 = Main;

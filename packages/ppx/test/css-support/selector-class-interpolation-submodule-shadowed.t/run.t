@@ -24,13 +24,13 @@ Same-file submodule binding shadowing follows structure order: a later
     ]
   ];
   module Css = {
-    let marker = CSS.make("css-tokvmb-marker", []);
+    let marker = CSS.make_labeled("marker", "css-tokvmb-marker", []);
     let _ = marker;
   
-    let marker = CSS.make("css-bjcoli-marker", []);
+    let marker = CSS.make_labeled("marker", "css-bjcoli-marker", []);
   };
   
-  let wrapper = CSS.make("css-59bkuc-wrapper", []);
+  let wrapper = CSS.make_labeled("wrapper", "css-59bkuc-wrapper", []);
   
   let _ = (Css.marker, wrapper);
 

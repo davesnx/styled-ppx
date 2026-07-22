@@ -150,6 +150,15 @@ that mechanism without replacing it. Therefore:
   Dropping label suffixes (dev/prod parity) also fully lands here, since
   first-occurrence order is what labels perturb.
 
+  Groundwork already landed: the `styles` carrier is
+  `(className, vars, label)` with `CSS.label`/`CSS.make_labeled`
+  accessors, generated code and the `styles=` JSX expansion go through
+  `CSS.className`/`CSS.styles` instead of `fst`/`snd` (including
+  server-reason-react's copy of the expansion), so the carrier
+  representation is free to evolve — dropping the `-<label>` class-name
+  suffix in dev only requires moving DevTools attribution onto the
+  carrier label / `cx-` marker.
+
 ### `@media` breakpoint sorting
 
 Within bucket 14, parse the condition for a single `min-width`/`max-width`

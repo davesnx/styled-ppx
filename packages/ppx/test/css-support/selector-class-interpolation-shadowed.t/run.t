@@ -20,12 +20,12 @@ Shadowing follows OCaml semantics: `&.$(foo)` resolves to the second
     [("Input.foo", "css-14ksm7b-foo"), ("Input.bar", "css-191lhl1-bar")]
   ];
   
-  let foo = CSS.make("css-tokvmb-foo", []);
+  let foo = CSS.make_labeled("foo", "css-tokvmb-foo", []);
   let _ = foo;
   
-  let foo = CSS.make("css-14ksm7b-foo", []);
+  let foo = CSS.make_labeled("foo", "css-14ksm7b-foo", []);
   
-  let bar = CSS.make("css-191lhl1-bar", []);
+  let bar = CSS.make_labeled("bar", "css-191lhl1-bar", []);
   
   let _ = (foo, bar);
 

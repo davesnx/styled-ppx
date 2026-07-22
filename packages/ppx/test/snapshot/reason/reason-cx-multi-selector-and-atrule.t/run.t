@@ -38,20 +38,23 @@ selector chain into the at-rule's contents instead of dropping it.
     ("Input.mediaDeep", "css-godogz-mediaDeep");
     ("Input.mediaWithNested",
       "css-1c0hjb1-mediaWithNested css-1x7bng1-mediaWithNested css-pjtxwe-mediaWithNested")]]
-  let multiTop = CSS.make "css-rmy2q8-multiTop css-alyv6j-multiTop" []
+  let multiTop =
+    CSS.make_labeled "multiTop" "css-rmy2q8-multiTop css-alyv6j-multiTop" []
   let multiNested =
-    CSS.make "css-xuam0t-multiNested css-1400cim-multiNested" []
+    CSS.make_labeled "multiNested"
+      "css-xuam0t-multiNested css-1400cim-multiNested" []
   let cartesian =
-    CSS.make
+    CSS.make_labeled "cartesian"
       "css-1v5vtx3-cartesian css-1hhu78w-cartesian css-1ehtzuk-cartesian css-1nvjsnn-cartesian"
       []
   let multiMixed =
-    CSS.make
+    CSS.make_labeled "multiMixed"
       "css-rmy2q8-multiMixed css-alyv6j-multiMixed css-bij269-multiMixed css-1k1r9ux-multiMixed"
       []
-  let mediaUnderSelector = CSS.make "css-14bi921-mediaUnderSelector" []
-  let mediaDeep = CSS.make "css-godogz-mediaDeep" []
+  let mediaUnderSelector =
+    CSS.make_labeled "mediaUnderSelector" "css-14bi921-mediaUnderSelector" []
+  let mediaDeep = CSS.make_labeled "mediaDeep" "css-godogz-mediaDeep" []
   let mediaWithNested =
-    CSS.make
+    CSS.make_labeled "mediaWithNested"
       "css-1c0hjb1-mediaWithNested css-1x7bng1-mediaWithNested css-pjtxwe-mediaWithNested"
       []

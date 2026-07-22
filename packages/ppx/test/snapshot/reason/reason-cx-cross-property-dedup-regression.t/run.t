@@ -11,7 +11,8 @@ CSS runtime types. See input.re for the full rationale.
   [@css.bindings [("Output.layout", "css-1mfmiq8-layout")]];
   let lengthVar = CSS.px(10);
   let layout =
-    CSS.make(
+    CSS.make_labeled(
+      "layout",
       "css-1mfmiq8-layout",
       [
         ("--lengthVar-12br693", CSS.Types.Margin.toString(lengthVar)),

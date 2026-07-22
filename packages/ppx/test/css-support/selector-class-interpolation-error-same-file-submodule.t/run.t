@@ -22,11 +22,11 @@ submodule instead of being emitted as a cross-module sentinel.
     ]
   ];
   module Css = {
-    let marker = CSS.make("css-tokvmb-marker", []);
+    let marker = CSS.make_labeled("marker", "css-tokvmb-marker", []);
     let notCx2 = "plain-string-selector";
   };
   
-  let wrapper = CSS.make("css-e9zk30-wrapper", []);
+  let wrapper = CSS.make_labeled("wrapper", "css-e9zk30-wrapper", []);
   
   let _ = (Css.marker, Css.notCx2, wrapper);
 

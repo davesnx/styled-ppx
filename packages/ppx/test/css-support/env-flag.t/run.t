@@ -18,8 +18,8 @@ emitted (absence means development).
   .css-38zrbw-layout{padding:12px;}
   .css-tokvmb-button{color:red;}
   $ grep "CSS.make" dev.ml
-  let layout = CSS.make "cx-layout css-k008qs-layout css-38zrbw-layout" []
-  let button = CSS.make "cx-button css-tokvmb-button" []
+    CSS.make_labeled "layout" "cx-layout css-k008qs-layout css-38zrbw-layout"
+  let button = CSS.make_labeled "button" "cx-button css-tokvmb-button" []
 
 With --env production, the same hashes appear without label suffixes and
 without markers, and the PPX declares the environment in the wire

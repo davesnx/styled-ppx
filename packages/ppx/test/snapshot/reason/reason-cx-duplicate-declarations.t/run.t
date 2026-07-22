@@ -44,19 +44,24 @@ atom shape and hash.
     ("Input.A.x", "css-tokvmb-x");
     ("Input.B.x", "css-dhb7kq-x");
     ("Input.vars", "css-zwzjs7-vars")]]
-  let dup = CSS.make "css-ztpkbn-dup" []
-  let fallback = CSS.make "css-17ax8u2-fallback" []
+  let dup = CSS.make_labeled "dup" "css-ztpkbn-dup" []
+  let fallback = CSS.make_labeled "fallback" "css-17ax8u2-fallback" []
   let interleaved =
-    CSS.make "css-1uk1gs8-interleaved css-dhb7kq-interleaved" []
+    CSS.make_labeled "interleaved"
+      "css-1uk1gs8-interleaved css-dhb7kq-interleaved" []
   let mediaInterleaved =
-    CSS.make "css-1g5p0x6-mediaInterleaved css-dhb7kq-mediaInterleaved" []
+    CSS.make_labeled "mediaInterleaved"
+      "css-1g5p0x6-mediaInterleaved css-dhb7kq-mediaInterleaved" []
   let shorthandReset =
-    CSS.make "css-odz94x-shorthandReset css-19xrixt-shorthandReset" []
-  let nested = CSS.make "css-1e7bukr-nested" []
-  let twice = CSS.make "css-mngo80-twice" []
-  let custom = CSS.make "css-zkbrel-custom css-1r75vyo-custom" []
-  module A = struct let x = CSS.make "css-tokvmb-x" [] end
-  module B = struct let x = CSS.make "css-dhb7kq-x" [] end
+    CSS.make_labeled "shorthandReset"
+      "css-odz94x-shorthandReset css-19xrixt-shorthandReset" []
+  let nested = CSS.make_labeled "nested" "css-1e7bukr-nested" []
+  let twice = CSS.make_labeled "twice" "css-mngo80-twice" []
+  let custom =
+    CSS.make_labeled "custom" "css-zkbrel-custom css-1r75vyo-custom" []
+  module A = struct let x = CSS.make_labeled "x" "css-tokvmb-x" [] end
+  module B = struct let x = CSS.make_labeled "x" "css-dhb7kq-x" [] end
   let c = "10px"
   let vars =
-    CSS.make "css-zwzjs7-vars" [("--c-kv4uq2", (CSS.Types.Margin.toString c))]
+    CSS.make_labeled "vars" "css-zwzjs7-vars"
+      [("--c-kv4uq2", (CSS.Types.Margin.toString c))]

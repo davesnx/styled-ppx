@@ -76,25 +76,57 @@ deep nesting, and mixed compound/descendant inner chains.
   ];
   
   let _amp_pseudo_with_class_descendant =
-    CSS.make("css-1i2mold-_amp_pseudo_with_class_descendant", []);
+    CSS.make_labeled(
+      "_amp_pseudo_with_class_descendant",
+      "css-1i2mold-_amp_pseudo_with_class_descendant",
+      [],
+    );
   
   let _amp_pseudo_with_type_descendant =
-    CSS.make("css-1pw74wv-_amp_pseudo_with_type_descendant", []);
+    CSS.make_labeled(
+      "_amp_pseudo_with_type_descendant",
+      "css-1pw74wv-_amp_pseudo_with_type_descendant",
+      [],
+    );
   
   let _amp_pseudo_with_explicit_ampersand_descendant =
-    CSS.make("css-5tdg3s-_amp_pseudo_with_explicit_ampersand_descendant", []);
+    CSS.make_labeled(
+      "_amp_pseudo_with_explicit_ampersand_descendant",
+      "css-5tdg3s-_amp_pseudo_with_explicit_ampersand_descendant",
+      [],
+    );
   
   let _amp_pseudo_with_compound_inner =
-    CSS.make("css-1pzj0cc-_amp_pseudo_with_compound_inner", []);
+    CSS.make_labeled(
+      "_amp_pseudo_with_compound_inner",
+      "css-1pzj0cc-_amp_pseudo_with_compound_inner",
+      [],
+    );
   
   let _amp_pseudo_with_pseudo_element_inner =
-    CSS.make("css-1cghiyt-_amp_pseudo_with_pseudo_element_inner", []);
+    CSS.make_labeled(
+      "_amp_pseudo_with_pseudo_element_inner",
+      "css-1cghiyt-_amp_pseudo_with_pseudo_element_inner",
+      [],
+    );
   
   let _amp_pseudo_three_levels =
-    CSS.make("css-15g1xle-_amp_pseudo_three_levels", []);
+    CSS.make_labeled(
+      "_amp_pseudo_three_levels",
+      "css-15g1xle-_amp_pseudo_three_levels",
+      [],
+    );
   
   let _amp_pseudo_five_levels =
-    CSS.make("css-v719o0-_amp_pseudo_five_levels", []);
+    CSS.make_labeled(
+      "_amp_pseudo_five_levels",
+      "css-v719o0-_amp_pseudo_five_levels",
+      [],
+    );
   
   let _amp_pseudo_mixed_inner =
-    CSS.make("css-1d0scwj-_amp_pseudo_mixed_inner", []);
+    CSS.make_labeled(
+      "_amp_pseudo_mixed_inner",
+      "css-1d0scwj-_amp_pseudo_mixed_inner",
+      [],
+    );
