@@ -21,8 +21,9 @@ Every `[%css]{:reason}` block evaluates to a `CSS.styles` value: the generated c
 | --- | --- | --- |
 | `CSS.className` | `styles => string{:reason}` | The space-separated class names, for a `className` attribute |
 | `CSS.styles` | `styles => ReactDOM.Style.t{:reason}` | The inline custom-property values, for a `style` attribute |
-| `CSS.merge` | `(styles, styles) => styles{:reason}` | Combine two values: concatenates classNames, merges vars |
-| `CSS.empty` | `styles{:reason}` | The neutral element: no classes, no vars |
+| `CSS.merge` | `(styles, styles) => styles{:reason}` | Combine two values: concatenates classNames, merges vars, joins labels |
+| `CSS.empty` | `styles{:reason}` | The neutral element: no classes, no vars, no label |
+| `CSS.label` | `styles => option(string){:reason}` | The debug label: the `let` binding or module name the styles came from. `Some("card")` in development, `None` under `--env production`/`--minify` (zero prod cost). Merged values join labels with a space |
 
 In JSX you rarely need `className`/`styles` directly: the `styles` attribute is rewritten by the ppx into both.
 
@@ -48,7 +49,7 @@ let app = <div styles=(CSS.merge card elevated) />
 let app' = <div className=(CSS.className card) style=(CSS.styles card) />
 ```
 
-`CSS.make` also exists: it's what the ppx-generated code calls to construct `styles` values. You shouldn't need it directly.
+`CSS.make` (and its dev-mode sibling `CSS.make_labeled`) also exists: it's what the ppx-generated code calls to construct `styles` values. You shouldn't need it directly. The `styles` representation is an internal detail shared between the ppx and the runtime — always go through the accessors above rather than destructuring it.
 
 ## Composition
 
@@ -76,7 +77,12 @@ let styles = CSS.merge button (if active then highlight else CSS.empty)
 
 If you come from emotion or styled-components, this is the one semantic to relearn: **`CSS.merge` argument order does not decide which declaration wins.**
 
-Every extracted rule is atomic (a single class), so all rules have the same specificity. When two atoms set the same property, the CSS cascade breaks the tie by **stylesheet order**: later wins. And the stylesheet preserves the order your `[%css]` blocks appear in your source. In emotion, `cx(base, override)` guarantees the override wins because emotion re-serializes at runtime; here `CSS.merge(base, override)` and `CSS.merge(override, base)` render identically, because only source position matters.
+Every extracted rule is atomic (a single class), so all rules have the same specificity. When two atoms set the same property, the CSS cascade breaks the tie by **stylesheet order**: later wins. In emotion, `cx(base, override)` guarantees the override wins because emotion re-serializes at runtime; here `CSS.merge(base, override)` and `CSS.merge(override, base)` render identically, because only stylesheet position matters.
+
+Stylesheet position follows two rules:
+
+1. **Buckets**: rules are grouped by kind, in a fixed order — base declarations, then pseudo-classes (structural, then `:link` → `:visited` → `:focus-within` → `:hover` → `:focus` → `:focus-visible` → `:active`), then pseudo-elements, then `@supports`, `@media` (sorted `min-width` ascending, `max-width` descending), `@container`, `@starting-style`. So `&:hover` always overrides the rest state, and a wider `min-width` always overrides a narrower one, regardless of where they're written.
+2. **Source order within a bucket**: two rules of the same kind (e.g. two plain `background-color` atoms) keep the order your `[%css]` blocks appear in your source.
 
 ```reason
 let danger = [%css "background-color: red"];  /* defined FIRST */
@@ -98,7 +104,7 @@ let a = <div styles=(CSS.merge button danger) />
 let b = <div styles=(CSS.merge danger button) />
 ```
 
-The convention to follow: **define base styles before the styles that override them**. That applies within a module, and for cross-module overrides, in a module compiled later. When an override doesn't stick, check the definition order first; the binding labels in class names (`css-<hash>-danger`) show in DevTools exactly which binding each winning declaration came from.
+The convention to follow: **define base styles before the styles that override them**. That applies within a module, and for cross-module overrides, in a module compiled later. It only matters for rules in the same bucket — at-rule and pseudo-class precedence is fixed by the bucket order above. When an override doesn't stick, check the definition order first; the binding labels in class names (`css-<hash>-danger`) show in DevTools exactly which binding each winning declaration came from.
 
 ### Patterns
 

@@ -72,7 +72,8 @@ Comprehensive test for cx2 interpolation with various property types
   let percentVar = CSS.pct(50.0);
   let autoVar = `auto;
   let test1 =
-    CSS.make(
+    CSS.make_labeled(
+      "test1",
       "css-b8f0pi-test1",
       [
         ("--lengthVar-1fwod6p", CSS.Types.Width.toString(lengthVar)),
@@ -82,7 +83,8 @@ Comprehensive test for cx2 interpolation with various property types
       ],
     );
   let test2 =
-    CSS.make(
+    CSS.make_labeled(
+      "test2",
       "css-1swajk7-test2",
       [
         ("--lengthVar-oy21bt", CSS.Types.Margin.toString(lengthVar)),
@@ -90,18 +92,21 @@ Comprehensive test for cx2 interpolation with various property types
       ],
     );
   let test3 =
-    CSS.make(
+    CSS.make_labeled(
+      "test3",
       "css-1i6vyy6-test3",
       [("--lengthVar-vh1osb", CSS.Types.Gap.toString(lengthVar))],
     );
   let test4 =
-    CSS.make(
+    CSS.make_labeled(
+      "test4",
       "css-1vzwmoy-test4",
       [("--colorVar-14sye4i", CSS.Types.Color.toString(colorVar))],
     );
   let flexBasisVar = CSS.px(100);
   let test5 =
-    CSS.make(
+    CSS.make_labeled(
+      "test5",
       "css-ycpa9s-test5",
       [
         ("--flexBasisVar-16vl5bp", CSS.Types.FlexBasis.toString(flexBasisVar)),
@@ -109,7 +114,8 @@ Comprehensive test for cx2 interpolation with various property types
     );
   let gridLineVar = `auto;
   let test6 =
-    CSS.make(
+    CSS.make_labeled(
+      "test6",
       "css-1knt7y9-test6",
       [
         ("--gridLineVar-1qxvc00", CSS.Types.GridRowStart.toString(gridLineVar)),
@@ -121,7 +127,8 @@ Comprehensive test for cx2 interpolation with various property types
     );
   let topVar = CSS.px(20);
   let test7 =
-    CSS.make(
+    CSS.make_labeled(
+      "test7",
       "css-1d6x35p-test7",
       [
         ("--topVar-1iqysbe", CSS.Types.Top.toString(topVar)),
@@ -130,13 +137,15 @@ Comprehensive test for cx2 interpolation with various property types
     );
   let zIndexVar = `num(10);
   let test8 =
-    CSS.make(
+    CSS.make_labeled(
+      "test8",
       "css-1bkxgpr-test8",
       [("--zIndexVar-osv02l", CSS.Types.ZIndex.toString(zIndexVar))],
     );
   let borderWidthVar = `medium;
   let test9 =
-    CSS.make(
+    CSS.make_labeled(
+      "test9",
       "css-1bezkxi-test9",
       [
         (
@@ -147,7 +156,8 @@ Comprehensive test for cx2 interpolation with various property types
     );
   let spacingVar = CSS.px(2);
   let test10 =
-    CSS.make(
+    CSS.make_labeled(
+      "test10",
       "css-zoi7e9-test10",
       [
         ("--spacingVar-15s0ecx", CSS.Types.LetterSpacing.toString(spacingVar)),
@@ -155,7 +165,8 @@ Comprehensive test for cx2 interpolation with various property types
       ],
     );
   let test11 = width =>
-    CSS.make(
+    CSS.make_labeled(
+      "test11",
       "css-1dfkyy8-test11 css-73nay0-test11 css-tokvmb-test11",
       [("--width-18c1xss", CSS.Types.Width.toString(width))],
     );

@@ -152,6 +152,7 @@ Positional arguments are the post-ppx `.ml` / `.pp.ml` files to harvest.
 | `-o`, `--output <file>` | Write the stylesheet to `<file>` (default: stdout) |
 | `--log error\|warning\|info\|debug` | Diagnostic verbosity (default: `error`). `info` prints the output file; `debug` prints the entire stylesheet |
 | `--debug` | Shorthand for `--log debug` |
+| `--sort buckets\|source` | Rule ordering (default: `buckets`). `buckets` groups rules deterministically — base, pseudo-classes, pseudo-elements, `@supports`, `@media` (by breakpoint), `@container` — keeping source order within each group. `source` is the legacy first-occurrence order, kept for one release as an escape hatch |
 
 The CLI has no mode flag on purpose: the build environment travels in-band. When the ppx runs with `--env production` it embeds `[@@@css.config [("env", "production")]]` in every post-ppx file, and the CLI minifies its output (drops inter-rule newlines) when every input file declares it. Mixed inputs (some stanzas built for production, some not) produce a warning and readable output.
 

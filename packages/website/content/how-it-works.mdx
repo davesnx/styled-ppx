@@ -80,7 +80,7 @@ The format is `css-<hash>-<label>`, where the label is the `let` binding or modu
 
 ### Cascade and ordering
 
-All atoms have the same specificity (a single class). The tiebreaker is stylesheet order (later wins), and the aggregator preserves your source order exactly, so an override written after its base declaration stays after it in `styles.css`. The full rules and composition patterns live in [Which declaration wins](/reference/runtime#which-declaration-wins).
+All atoms have the same specificity (a single class). The tiebreaker is stylesheet order (later wins). The aggregator emits rules in **deterministic buckets** — base declarations, pseudo-classes (in `:link` → `:active` order), pseudo-elements, then `@supports`/`@media`/`@container` (media queries sorted by breakpoint) — and preserves your source order within each bucket, so an override written after its base declaration stays after it, and `&:hover` beats the rest state no matter which file declared it first. The full rules and composition patterns live in [Which declaration wins](/reference/runtime#which-declaration-wins).
 
 ## Dynamic values: CSS custom properties
 

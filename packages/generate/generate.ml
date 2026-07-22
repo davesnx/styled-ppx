@@ -275,8 +275,8 @@ let production_mode harvests =
       Css_extraction.config_attribute_name prod.filename dev.filename;
     false
 
-(** Collect, index, resolve, dedup, output. *)
-let run ~output_file input_files =
+(** Collect, index, resolve, dedup, sort, output. *)
+let run ~output_file ~sort_mode input_files =
   Logger.info "output file: %s"
     (match output_file with Some file -> file | None -> "stdout");
   let idx = Index.create () in
@@ -366,6 +366,21 @@ let run ~output_file input_files =
       end)
   in
 
+  (* Bucket sort (the default): stylesheet position becomes a function of
+     the rule itself — at-rule kind, pseudo-class rank, breakpoint — rather
+     than of which file dune compiled first. The sort is stable, so rules
+     with equal keys (e.g. the shorthand/longhand pair above, or two plain
+     `color` atoms) keep their first-occurrence order and the documented
+     "define base styles before overrides" convention still holds within a
+     bucket. See css_bucket.ml and documents/atomic-css-ordering.md.
+     [--sort source] preserves the legacy order for one release as an
+     escape hatch for bisecting rendering regressions. *)
+  let ordered_rules =
+    match sort_mode with
+    | Css_bucket.Source -> ordered_rules
+    | Css_bucket.Buckets -> Css_bucket.sort ordered_rules
+  in
+
   let minify = production_mode harvests in
   Logger.info "environment: %s"
     (if minify then "production (from [@@@css.config])" else "development");
@@ -392,34 +407,43 @@ let run ~output_file input_files =
     the [[@@@css.config]] attributes the PPX embeds in its input files, so the
     environment is declared exactly once, on the (pps styled-ppx ...) stanza. *)
 let parse_args args =
-  let rec parse acc ~output_file ~log_level = function
+  let rec parse acc ~output_file ~log_level ~sort_mode = function
     | "-o" :: file :: rest
     | "-output" :: file :: rest
     | "--output" :: file :: rest ->
-      parse acc ~output_file:(Some file) ~log_level rest
+      parse acc ~output_file:(Some file) ~log_level ~sort_mode rest
     | "--log" :: level :: rest ->
       (match Logger.level_of_string level with
-      | Some log_level -> parse acc ~output_file ~log_level rest
+      | Some log_level -> parse acc ~output_file ~log_level ~sort_mode rest
       | None ->
         Logger.error
           "invalid --log level %S (expected \"error\", \"warning\", \"info\" \
            or \"debug\")"
           level;
         exit 2)
-    | "--debug" :: rest -> parse acc ~output_file ~log_level:Logger.Debug rest
-    | [ (("-o" | "-output" | "--output" | "--log") as flag) ] ->
+    | "--sort" :: mode :: rest ->
+      (match Css_bucket.sort_mode_of_string mode with
+      | Some sort_mode -> parse acc ~output_file ~log_level ~sort_mode rest
+      | None ->
+        Logger.error
+          "invalid --sort mode %S (expected \"buckets\" or \"source\")" mode;
+        exit 2)
+    | "--debug" :: rest ->
+      parse acc ~output_file ~log_level:Logger.Debug ~sort_mode rest
+    | [ (("-o" | "-output" | "--output" | "--log" | "--sort") as flag) ] ->
       Logger.error "missing value for flag %S" flag;
       exit 2
     | arg :: _ when String.length arg > 0 && arg.[0] = '-' ->
       Logger.error "unknown flag %S" arg;
       exit 2
-    | arg :: rest -> parse (arg :: acc) ~output_file ~log_level rest
-    | [] -> List.rev acc, output_file, log_level
+    | arg :: rest -> parse (arg :: acc) ~output_file ~log_level ~sort_mode rest
+    | [] -> List.rev acc, output_file, log_level, sort_mode
   in
   let tail = match Array.to_list args with [] -> [] | _ :: t -> t in
-  parse [] ~output_file:None ~log_level:Logger.Warning tail
+  parse [] ~output_file:None ~log_level:Logger.Warning
+    ~sort_mode:Css_bucket.Buckets tail
 
 let () =
-  let input_files, output_file, log_level = parse_args Sys.argv in
+  let input_files, output_file, log_level, sort_mode = parse_args Sys.argv in
   Logger.set_level log_level;
-  run ~output_file input_files
+  run ~output_file ~sort_mode input_files

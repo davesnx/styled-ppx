@@ -101,6 +101,87 @@ let gradiend = [%css
     |}
 ];
 
+/* --- Atomic ordering experiments ------------------------------------- */
+
+/* The same `color` declaration under @media, @container and @supports
+   produces three independent atoms. All of them have the same specificity
+   (single class), so stylesheet order decides the winner when several
+   queries match at once. The aggregator emits deterministic buckets
+   (@supports < @media < @container — see
+   documents/atomic-css-ordering.md), so the declaration order below does
+   not affect the output. */
+let queryOrder = [%css
+  {|
+  color: black;
+
+  @media (min-width: 400px) {
+    color: red;
+  }
+
+  @container (width > 400px) {
+    color: green;
+  }
+
+  @supports (display: flex) {
+    color: blue;
+  }
+|}
+];
+
+/* Exactly the same atoms, declared in the opposite order. Both bindings
+   dedup to the same classes and converge on the same bucket order: when
+   all three conditions match, @container wins for both elements. Atomic
+   CSS cannot express per-binding at-rule precedence — predictability over
+   expressiveness. */
+let queryOrderReversed = [%css
+  {|
+  color: black;
+
+  @supports (display: flex) {
+    color: blue;
+  }
+
+  @container (width > 400px) {
+    color: green;
+  }
+
+  @media (min-width: 400px) {
+    color: red;
+  }
+|}
+];
+
+/* `a:link` vs `a:nth-child(odd)`: both selectors have specificity (0,2,1)
+   once prefixed with the atomic class, so for the first <a> (an odd child
+   that is also an unvisited link) stylesheet order is the tie-breaker.
+   Buckets rank structural pseudos before LVFHA, so :link wins — in both
+   declaration orders. */
+let linkFirst = [%css
+  {|
+  & a:link {
+    color: orange;
+  }
+
+  & a:nth-child(odd) {
+    color: teal;
+  }
+|}
+];
+
+/* Same two selector atoms, reversed. Both bindings share the same classes
+   and the same bucket order, so both lists render identically. */
+let nthFirst = [%css
+  {|
+  & a:nth-child(odd) {
+    color: teal;
+  }
+
+  & a:link {
+    color: orange;
+  }
+|}
+];
+
 let primary = CSS.hex("141414");
 
 let keyframeDemoShell = color => [%css
@@ -170,5 +251,23 @@ let make = () =>
     <section styles=stack>
       <div styles=clx> {React.string("code everywhere!")} </div>
       <div styles=selectors> {React.string("Red text")} </div>
+    </section>
+    <section styles=post>
+      <h2> {React.string("Atomic ordering: at-rules")} </h2>
+      <p styles=queryOrder>
+        {React.string("media -> container -> supports (source order)")}
+      </p>
+      <p styles=queryOrderReversed>
+        {React.string("supports -> container -> media (reversed source)")}
+      </p>
+    </section>
+    <section>
+      <h2> {React.string("Atomic ordering: selectors")} </h2>
+      <ul styles=linkFirst>
+        <li> <a href="#"> {React.string("a:link then a:nth-child")} </a> </li>
+      </ul>
+      <ul styles=nthFirst>
+        <li> <a href="#"> {React.string("a:nth-child then a:link")} </a> </li>
+      </ul>
     </section>
   </main>;

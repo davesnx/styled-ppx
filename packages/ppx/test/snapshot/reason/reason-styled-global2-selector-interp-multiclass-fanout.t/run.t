@@ -11,7 +11,11 @@
     [("Output.multi", "css-k008qs-multi css-tokvmb-multi css-eaeacs-multi")]
   ];
   let multi =
-    CSS.make("css-k008qs-multi css-tokvmb-multi css-eaeacs-multi", []);
+    CSS.make_labeled(
+      "multi",
+      "css-k008qs-multi css-tokvmb-multi css-eaeacs-multi",
+      [],
+    );
   module Globals = {
     let to_string = () => "";
     [@warning "-27-32"]

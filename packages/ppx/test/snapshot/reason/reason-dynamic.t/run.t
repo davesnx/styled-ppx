@@ -1004,7 +1004,8 @@
     external assign2: (Js.t({..}), makeProps(_, _), Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles = (~var, ~id, _) =>
-      CSS.make(
+      CSS.make_labeled(
+        "DynamicComponent",
         "css-fhnx1u-DynamicComponent css-k008qs-DynamicComponent",
         [
           ("--var-1uix7by", CSS.Types.Color.toString(var)),
@@ -1013,9 +1014,10 @@
       );
     let make = (props: makeProps('id, 'var)) => {
       let className =
-        fst(styles(~id=idGet(props), ~var=varGet(props), ()))
+        CSS.className(styles(~id=idGet(props), ~var=varGet(props), ()))
         ++ getOrEmpty(classNameGet(props))
-      and style = snd(styles(~id=idGet(props), ~var=varGet(props), ()));
+      and style =
+        CSS.styles(styles(~id=idGet(props), ~var=varGet(props), ()));
       let stylesObject =
         makeStylesObject(~className, ~style, ~ref=innerRefGet(props));
       let newProps = assign2(Js.Obj.empty(), props, stylesObject);

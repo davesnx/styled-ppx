@@ -5,7 +5,7 @@
   [@css "@media (max-width: 640px) {.css-hpgf8j-card{color:gray;}}"];
   [@css ".css-hpgf8j-card{padding:8px;}"];
   [@css.bindings [("Output.card", "css-hpgf8j-card")]];
-  let card = CSS.make("css-hpgf8j-card", []);
+  let card = CSS.make_labeled("card", "css-hpgf8j-card", []);
   module ResponsiveGlobals = {
     let to_string = () => "";
     [@warning "-27-32"]

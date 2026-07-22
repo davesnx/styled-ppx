@@ -9,7 +9,6 @@
   styled_ppx_css_parser
   Css_grammar
   murmur2
-  server-reason-react.styles-attribute
   sedlex
   ppxlib
   reason

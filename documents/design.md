@@ -11,6 +11,9 @@ See also:
   resolution (sentinel format and aggregator behavior).
 - `documents/keyframe-static-extraction.md` — `[%keyframe]` extraction
   in depth.
+- `documents/atomic-css-ordering.md` — proposal: deterministic buckets
+  for atomic rule ordering, and why `CSS.merge` needs property-keyed
+  conflict resolution (not "sortable hashes").
 - `documents/runtime-lowering-and-interpolation-identity.md` — migration
   design for property-centered runtime lowering and safer static
   interpolation identity.

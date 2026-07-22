@@ -7,7 +7,7 @@
  (modules :standard \ print)
  (libraries lib_js styled-ppx.melange reason-react)
  (preprocess
-  (pps styled-ppx melange.ppx reason-react-ppx))
+  (pps styled-ppx --minify melange.ppx reason-react-ppx))
  (module_systems
   (es6 mjs)))
 
@@ -48,4 +48,4 @@
   server-reason-react.reactDom
   styled-ppx.native)
  (preprocess
-  (pps styled-ppx server-reason-react.ppx server-reason-react.melange_ppx)))
+  (pps styled-ppx --minify server-reason-react.ppx server-reason-react.melange_ppx)))

@@ -25,9 +25,14 @@ a CSS rule.
     ]
   ];
   
-  let layout = CSS.make("cx-layout css-k008qs-layout css-38zrbw-layout", []);
+  let layout =
+    CSS.make_labeled(
+      "layout",
+      "cx-layout css-k008qs-layout css-38zrbw-layout",
+      [],
+    );
   
-  let button = CSS.make("cx-button css-tokvmb-button", []);
+  let button = CSS.make_labeled("button", "cx-button css-tokvmb-button", []);
   
   let _ = (layout, button);
 

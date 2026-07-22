@@ -78,34 +78,37 @@
     ("Input.gridCss",
       "css-lgj0h8-gridCss css-bghlac-gridCss css-16610y9-gridCss");
     ("Input.scrollCss", "css-pdjuhq-scrollCss css-13v3rg8-scrollCss")]]
-  let staticCss = CSS.make "css-k008qs-staticCss css-1tyndxa-staticCss" []
+  let staticCss =
+    CSS.make_labeled "staticCss" "css-k008qs-staticCss css-1tyndxa-staticCss"
+      []
   let dynamicCss color =
-    CSS.make "css-kusjgz-dynamicCss css-k008qs-dynamicCss"
+    CSS.make_labeled "dynamicCss" "css-kusjgz-dynamicCss css-k008qs-dynamicCss"
       [("--color-1a279q8", (CSS.Types.Color.toString color))]
   let logicalProps spacing =
-    CSS.make "css-15a4g54-logicalProps"
+    CSS.make_labeled "logicalProps" "css-15a4g54-logicalProps"
       [("--spacing-y96o3b", (CSS.Types.MarginBlock.toString spacing));
       ("--spacing-vh5lkd", (CSS.Types.MarginInline.toString spacing));
       ("--spacing-f3qjr", (CSS.Types.Length.toString spacing))]
   let nestedCss =
-    CSS.make "css-k008qs-nestedCss css-zqnfaz-nestedCss css-osffsa-nestedCss"
-      []
+    CSS.make_labeled "nestedCss"
+      "css-k008qs-nestedCss css-zqnfaz-nestedCss css-osffsa-nestedCss" []
   let responsiveCss =
-    CSS.make "css-k008qs-responsiveCss css-1ruz0a1-responsiveCss" []
+    CSS.make_labeled "responsiveCss"
+      "css-k008qs-responsiveCss css-1ruz0a1-responsiveCss" []
   let multipleMediaQueries =
-    CSS.make
+    CSS.make_labeled "multipleMediaQueries"
       "css-6xix1i-multipleMediaQueries css-1l3vtdj-multipleMediaQueries css-2b7vub-multipleMediaQueries"
       []
   let mediaWithSelector =
-    CSS.make
+    CSS.make_labeled "mediaWithSelector"
       "css-k008qs-mediaWithSelector css-5ivle1-mediaWithSelector css-1cemfq6-mediaWithSelector css-1l7frkw-mediaWithSelector"
       []
   let complexMedia =
-    CSS.make
+    CSS.make_labeled "complexMedia"
       "css-lgj0h8-complexMedia css-mhiow9-complexMedia css-1nm9mde-complexMedia"
       []
   let mediaWithInterpolation color =
-    CSS.make
+    CSS.make_labeled "mediaWithInterpolation"
       "css-kusjgz-mediaWithInterpolation css-11qknlj-mediaWithInterpolation"
       [("--color-1a279q8", (CSS.Types.Color.toString color))]
   let fadeIn = CSS.Types.AnimationName.make "keyframe-jw9oix"
@@ -117,13 +120,16 @@
       let make _props = CSS.global_style_tag (to_string ())
     end
   let multiVar primary secondary size =
-    CSS.make "css-1sq1nk7-multiVar css-nk32ej-multiVar"
+    CSS.make_labeled "multiVar" "css-1sq1nk7-multiVar css-nk32ej-multiVar"
       [("--primary-19vrfgr", (CSS.Types.Color.toString primary));
       ("--secondary-1dc81fi", (CSS.Types.Color.toString secondary));
       ("--size-3mc4ty", (CSS.Types.FontSize.toString size))]
   let gridCss =
-    CSS.make "css-lgj0h8-gridCss css-bghlac-gridCss css-16610y9-gridCss" []
-  let scrollCss = CSS.make "css-pdjuhq-scrollCss css-13v3rg8-scrollCss" []
+    CSS.make_labeled "gridCss"
+      "css-lgj0h8-gridCss css-bghlac-gridCss css-16610y9-gridCss" []
+  let scrollCss =
+    CSS.make_labeled "scrollCss" "css-pdjuhq-scrollCss css-13v3rg8-scrollCss"
+      []
   let _ = ReactDOM.jsx "div" (ReactDOM.domProps ~className:(fst staticCss) ())
   let _ =
     ReactDOM.jsx "div"
@@ -155,11 +161,13 @@
   @property --spacing-y96o3b{syntax:"*";inherits:false;}
   @property --spacing-vh5lkd{syntax:"*";inherits:false;}
   @property --spacing-f3qjr{syntax:"*";inherits:false;}
-  :root{--primary-color:blue;}
-  body{margin:0;font-family:system-ui, sans-serif;}
   @property --primary-19vrfgr{syntax:"*";inherits:false;}
   @property --secondary-1dc81fi{syntax:"*";inherits:false;}
   @property --size-3mc4ty{syntax:"*";inherits:false;}
+  @keyframes keyframe-jw9oix{from{opacity:0;}to{opacity:1;}}
+  @keyframes keyframe-waibjx{0%{-webkit-transform:translateY(100%);-moz-transform:translateY(100%);-ms-transform:translateY(100%);transform:translateY(100%);}100%{-webkit-transform:translateY(0);-moz-transform:translateY(0);-ms-transform:translateY(0);transform:translateY(0);}}
+  :root{--primary-color:blue;}
+  body{margin:0;font-family:system-ui, sans-serif;}
   .css-k008qs-staticCss{display:flex;}
   .css-1tyndxa-staticCss{justify-content:center;}
   .css-kusjgz-dynamicCss{color:var(--color-1a279q8);}
@@ -170,24 +178,13 @@
   .css-15a4g54-logicalProps{-webkit-padding-inline-end:var(--spacing-f3qjr);padding-inline-end:var(--spacing-f3qjr);}
   .css-15a4g54-logicalProps{inset-block-start:var(--spacing-f3qjr);}
   .css-k008qs-nestedCss{display:flex;}
-  .css-zqnfaz-nestedCss:hover{opacity:0.8;}
   .css-osffsa-nestedCss .child{-webkit-flex:1;-ms-flex:1;flex:1;}
   .css-k008qs-responsiveCss{display:flex;}
-  @media (max-width: 768px) {.css-1ruz0a1-responsiveCss{display:block;}}
   .css-6xix1i-multipleMediaQueries{font-size:16px;}
-  @media (max-width: 768px) {.css-1l3vtdj-multipleMediaQueries{font-size:14px;}}
-  @media (max-width: 480px) {.css-2b7vub-multipleMediaQueries{font-size:12px;}}
   .css-k008qs-mediaWithSelector{display:flex;}
   .css-5ivle1-mediaWithSelector .item{-webkit-flex:1;-ms-flex:1;flex:1;}
-  @media (max-width: 768px) {.css-1cemfq6-mediaWithSelector{-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;}}
-  @media (max-width: 768px) {.css-1l7frkw-mediaWithSelector .item{-webkit-flex:none;-ms-flex:none;flex:none;}}
   .css-lgj0h8-complexMedia{display:grid;}
-  @media screen and (min-width: 768px) and (max-width: 1024px) {.css-mhiow9-complexMedia{display:flex;}}
-  @media (prefers-color-scheme: dark) {.css-1nm9mde-complexMedia{background-color:#1a1a1a;}}
   .css-kusjgz-mediaWithInterpolation{color:var(--color-1a279q8);}
-  @media (max-width: 768px) {.css-11qknlj-mediaWithInterpolation{opacity:0.8;}}
-  @keyframes keyframe-jw9oix{from{opacity:0;}to{opacity:1;}}
-  @keyframes keyframe-waibjx{0%{-webkit-transform:translateY(100%);-moz-transform:translateY(100%);-ms-transform:translateY(100%);transform:translateY(100%);}100%{-webkit-transform:translateY(0);-moz-transform:translateY(0);-ms-transform:translateY(0);transform:translateY(0);}}
   .css-1sq1nk7-multiVar{color:var(--primary-19vrfgr);}
   .css-1sq1nk7-multiVar{background-color:var(--secondary-1dc81fi);}
   .css-1sq1nk7-multiVar{font-size:var(--size-3mc4ty);}
@@ -197,3 +194,12 @@
   .css-16610y9-gridCss{gap:20px;}
   .css-pdjuhq-scrollCss{scroll-behavior:smooth;}
   .css-13v3rg8-scrollCss{overflow-y:auto;}
+  .css-zqnfaz-nestedCss:hover{opacity:0.8;}
+  @media screen and (min-width: 768px) and (max-width: 1024px) {.css-mhiow9-complexMedia{display:flex;}}
+  @media (max-width: 768px) {.css-1ruz0a1-responsiveCss{display:block;}}
+  @media (max-width: 768px) {.css-1l3vtdj-multipleMediaQueries{font-size:14px;}}
+  @media (max-width: 768px) {.css-1cemfq6-mediaWithSelector{-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;}}
+  @media (max-width: 768px) {.css-1l7frkw-mediaWithSelector .item{-webkit-flex:none;-ms-flex:none;flex:none;}}
+  @media (max-width: 768px) {.css-11qknlj-mediaWithInterpolation{opacity:0.8;}}
+  @media (max-width: 480px) {.css-2b7vub-multipleMediaQueries{font-size:12px;}}
+  @media (prefers-color-scheme: dark) {.css-1nm9mde-complexMedia{background-color:#1a1a1a;}}
