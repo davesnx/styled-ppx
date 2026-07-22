@@ -15,23 +15,23 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-h9mhzu{width:5rem;}"];
-  [@css ".css-1ipmtw2{width:5ch;}"];
-  [@css ".css-1l9qw8v{width:5vw;}"];
-  [@css ".css-1ikjpn0{width:5vh;}"];
-  [@css ".css-ygyuy0{width:5vmin;}"];
-  [@css ".css-1aojkyq{width:5vmax;}"];
-  [@css ".css-tsqvys{width:calc(1px + 2px);}"];
-  [@css ".css-1ssfuw8{width:calc(5px * 2);}"];
-  [@css ".css-1823oae{width:calc(5px - 10px);}"];
-  [@css ".css-1faodca{width:calc(1vw - 1px);}"];
-  [@css ".css-8atqhb{width:100%;}"];
-  [@css ".css-1g01t7g{padding:5rem;}"];
-  [@css ".css-b58q7f{padding:5ch;}"];
-  [@css ".css-thw8ry{padding:5vw;}"];
-  [@css ".css-18hvl0f{padding:5vh;}"];
-  [@css ".css-6wnbv5{padding:5vmin;}"];
-  [@css ".css-hrtnlf{padding:5vmax;}"];
+  [@css ".css-h9mhzu{width:5rem}"];
+  [@css ".css-1ipmtw2{width:5ch}"];
+  [@css ".css-1l9qw8v{width:5vw}"];
+  [@css ".css-1ikjpn0{width:5vh}"];
+  [@css ".css-ygyuy0{width:5vmin}"];
+  [@css ".css-1aojkyq{width:5vmax}"];
+  [@css ".css-tsqvys{width:calc(1px + 2px)}"];
+  [@css ".css-1ssfuw8{width:calc(5px * 2)}"];
+  [@css ".css-1823oae{width:calc(5px - 10px)}"];
+  [@css ".css-1faodca{width:calc(1vw - 1px)}"];
+  [@css ".css-8atqhb{width:100%}"];
+  [@css ".css-1g01t7g{padding:5rem}"];
+  [@css ".css-b58q7f{padding:5ch}"];
+  [@css ".css-thw8ry{padding:5vw}"];
+  [@css ".css-18hvl0f{padding:5vh}"];
+  [@css ".css-6wnbv5{padding:5vmin}"];
+  [@css ".css-hrtnlf{padding:5vmax}"];
   
   CSS.make("css-h9mhzu", []);
   CSS.make("css-1ipmtw2", []);

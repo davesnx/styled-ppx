@@ -510,6 +510,429 @@ let invalid_utf8_tests = [
   }),
 ];
 
+let spec_feature_tests = [
+  test_case("empty forgiving selector list in :is()", `Quick, () => {
+    switch (Driver.parse_stylesheet(~source_position_start, ":is() {}")) {
+    | Ok((
+        [
+          Ast.Style_rule({
+            prelude:
+              ([(Ast.ComplexSelector(Ast.Selector(selector)), _)], _),
+            _,
+          }),
+        ],
+        _,
+      )) =>
+      switch (selector) {
+      | Ast.CompoundSelector({
+          type_selector: None,
+          subclass_selectors:
+            [
+              Ast.Pseudo_class(
+                Ast.Pseudoclass(
+                  Ast.Function({ name: "is", payload: ([], _) }),
+                ),
+              ),
+            ],
+          _,
+        }) =>
+        ()
+      | _ => fail("expected empty :is() payload")
+      }
+    | _ => fail("expected style rule with empty :is()")
+    }
+  }),
+  test_case("empty forgiving selector list in :where()", `Quick, () => {
+    switch (Driver.parse_stylesheet(~source_position_start, ":where() {}")) {
+    | Ok(([Ast.Style_rule(_)], _)) => ()
+    | _ => fail("expected style rule with empty :where()")
+    }
+  }),
+  test_case(
+    "empty non-forgiving selector lists stay errors",
+    `Quick,
+    () => {
+      let rejects = input =>
+        switch (Driver.parse_stylesheet(~source_position_start, input)) {
+        | Error(_) => ()
+        | Ok(_) => fail("expected parse error for " ++ input)
+        };
+      rejects(":not() {}");
+      rejects(":has() {}");
+      rejects("a:not() { color: red }");
+    },
+  ),
+  test_case("@layer statement form has an empty block", `Quick, () => {
+    switch (
+      Driver.parse_stylesheet(
+        ~source_position_start,
+        "@layer reset, base, components;",
+      )
+    ) {
+    | Ok(([Ast.At_rule({ name: ("layer", _), block: Ast.Empty, _ })], _)) =>
+      ()
+    | _ => fail("expected statement @layer with empty block")
+    }
+  }),
+  test_case("@layer block form keeps its block", `Quick, () => {
+    switch (
+      Driver.parse_stylesheet(
+        ~source_position_start,
+        "@layer theme { a { color: red } }",
+      )
+    ) {
+    | Ok((
+        [Ast.At_rule({ name: ("layer", _), block: Ast.Stylesheet(_), _ })],
+        _,
+      )) =>
+      ()
+    | _ => fail("expected block @layer with stylesheet block")
+    }
+  }),
+  test_case("at-keyword tokens are preserved component values", `Quick, () => {
+    switch (
+      Driver.parse_stylesheet(
+        ~source_position_start,
+        "@supports at-rule(@container) { a { color: red } }",
+      )
+    ) {
+    | Ok(([Ast.At_rule({ name: ("supports", _), prelude, _ })], _)) =>
+      let is_container_at_keyword =
+          ((value, _): Ast.with_loc(Ast.component_value)) =>
+        switch (value) {
+        | Ast.At_keyword("container") => true
+        | _ => false
+        };
+      let has_at_keyword =
+        prelude
+        |> fst
+        |> List.exists(((value, _): Ast.with_loc(Ast.component_value)) =>
+             switch (value) {
+             | Ast.Function({ body: (body, _), _ }) =>
+               List.exists(is_container_at_keyword, body)
+             | _ => false
+             }
+           );
+      check(bool, "prelude contains @container", true, has_at_keyword);
+    | _ => fail("expected @supports at-rule")
+    }
+  }),
+  test_case("namespaced type selector", `Quick, () => {
+    switch (Driver.parse_stylesheet(~source_position_start, "svg|circle {}")) {
+    | Ok((
+        [
+          Ast.Style_rule({
+            prelude:
+              (
+                [
+                  (
+                    Ast.ComplexSelector(
+                      Ast.Selector(
+                        Ast.SimpleSelector(Ast.Type("svg|circle")),
+                      ),
+                    ),
+                    _,
+                  ),
+                ],
+                _,
+              ),
+            _,
+          }),
+        ],
+        _,
+      )) =>
+      ()
+    | _ => fail("expected namespaced type selector AST")
+    }
+  }),
+  test_case(
+    "namespaced universal and no-namespace selectors",
+    `Quick,
+    () => {
+      let type_of = input =>
+        switch (Driver.parse_stylesheet(~source_position_start, input)) {
+        | Ok((
+            [
+              Ast.Style_rule({
+                prelude:
+                  (
+                    [
+                      (
+                        Ast.ComplexSelector(
+                          Ast.Selector(Ast.SimpleSelector(Ast.Type(name))),
+                        ),
+                        _,
+                      ),
+                    ],
+                    _,
+                  ),
+                _,
+              }),
+            ],
+            _,
+          )) => name
+        | _ => fail("expected type selector AST for " ++ input)
+        };
+      check(string, "*|circle", "*|circle", type_of("*|circle {}"));
+      check(string, "|circle", "|circle", type_of("|circle {}"));
+      check(string, "svg|*", "svg|*", type_of("svg|* {}"));
+      check(string, "|*", "|*", type_of("|* {}"));
+      check(string, "*|*", "*|*", type_of("*|* {}"));
+    },
+  ),
+  test_case("attribute matcher wins over namespace separator", `Quick, () => {
+    switch (Driver.parse_stylesheet(~source_position_start, "[lang|=en] {}")) {
+    | Ok((
+        [
+          Ast.Style_rule({
+            prelude:
+              (
+                [
+                  (
+                    Ast.ComplexSelector(
+                      Ast.Selector(
+                        Ast.CompoundSelector({
+                          subclass_selectors:
+                            [
+                              Ast.Attribute(
+                                Ast.To_equal({
+                                  name: "lang",
+                                  kind: Ast.Attr_prefix_dash,
+                                  value: Ast.Attr_ident("en"),
+                                  case_sensitivity: None,
+                                }),
+                              ),
+                            ],
+                          _,
+                        }),
+                      ),
+                    ),
+                    _,
+                  ),
+                ],
+                _,
+              ),
+            _,
+          }),
+        ],
+        _,
+      )) =>
+      ()
+    | _ => fail("expected |= attribute matcher AST")
+    }
+  }),
+  test_case("CDO/CDC are discarded at the stylesheet top level", `Quick, () => {
+    switch (
+      Driver.parse_stylesheet(
+        ~source_position_start,
+        "<!-- a { color: red } -->",
+      )
+    ) {
+    | Ok(([Ast.Style_rule(_)], _)) => ()
+    | _ => fail("expected CDO/CDC to be skipped around the rule")
+    }
+  }),
+  test_case(
+    "attribute selector case-sensitivity flags",
+    `Quick,
+    () => {
+      let flag_of = input =>
+        switch (Driver.parse_stylesheet(~source_position_start, input)) {
+        | Ok((
+            [
+              Ast.Style_rule({
+                prelude:
+                  (
+                    [
+                      (
+                        Ast.ComplexSelector(
+                          Ast.Selector(
+                            Ast.CompoundSelector({
+                              subclass_selectors:
+                                [
+                                  Ast.Attribute(
+                                    Ast.To_equal({ case_sensitivity, _ }),
+                                  ),
+                                ],
+                              _,
+                            }),
+                          ),
+                        ),
+                        _,
+                      ),
+                    ],
+                    _,
+                  ),
+                _,
+              }),
+            ],
+            _,
+          )) => case_sensitivity
+        | _ => fail("expected attribute selector AST for " ++ input)
+        };
+      check(
+        bool,
+        "i flag",
+        true,
+        flag_of("[type=text i] {}") == Some(Ast.Attr_case_insensitive),
+      );
+      check(
+        bool,
+        "s flag",
+        true,
+        flag_of("[type=text s] {}") == Some(Ast.Attr_case_sensitive),
+      );
+      check(bool, "no flag", true, flag_of("[type=text] {}") == None);
+    },
+  ),
+  test_case("nth payload with of <selector-list>", `Quick, () => {
+    switch (
+      Driver.parse_stylesheet(
+        ~source_position_start,
+        ":nth-child(2n of .highlighted) {}",
+      )
+    ) {
+    | Ok((
+        [
+          Ast.Style_rule({
+            prelude:
+              (
+                [
+                  (
+                    Ast.ComplexSelector(
+                      Ast.Selector(
+                        Ast.CompoundSelector({
+                          subclass_selectors:
+                            [
+                              Ast.Pseudo_class(
+                                Ast.Pseudoclass(
+                                  Ast.NthFunction({
+                                    name: "nth-child",
+                                    payload: (Ast.NthOf(Ast.AN(2), [_]), _),
+                                  }),
+                                ),
+                              ),
+                            ],
+                          _,
+                        }),
+                      ),
+                    ),
+                    _,
+                  ),
+                ],
+                _,
+              ),
+            _,
+          }),
+        ],
+        _,
+      )) =>
+      ()
+    | _ => fail("expected NthOf payload AST")
+    }
+  }),
+  test_case("column combinator", `Quick, () => {
+    switch (Driver.parse_stylesheet(~source_position_start, ".grid || td {}")) {
+    | Ok((
+        [
+          Ast.Style_rule({
+            prelude:
+              (
+                [
+                  (
+                    Ast.ComplexSelector(
+                      Ast.Combinator({
+                        right: [(Ast.Selector_column, _)],
+                        _,
+                      }),
+                    ),
+                    _,
+                  ),
+                ],
+                _,
+              ),
+            _,
+          }),
+        ],
+        _,
+      )) =>
+      ()
+    | _ => fail("expected column combinator AST")
+    }
+  }),
+  test_case("functional pseudo-elements", `Quick, () => {
+    switch (
+      Driver.parse_stylesheet(~source_position_start, "::part(button) {}")
+    ) {
+    | Ok((
+        [
+          Ast.Style_rule({
+            prelude:
+              (
+                [
+                  (
+                    Ast.ComplexSelector(
+                      Ast.Selector(
+                        Ast.CompoundSelector({
+                          pseudo_selectors:
+                            [
+                              Ast.PseudoelementFunction({
+                                name: "part",
+                                payload: ([_], _),
+                              }),
+                            ],
+                          _,
+                        }),
+                      ),
+                    ),
+                    _,
+                  ),
+                ],
+                _,
+              ),
+            _,
+          }),
+        ],
+        _,
+      )) =>
+      ()
+    | _ => fail("expected functional pseudo-element AST")
+    }
+  }),
+  test_case("namespaced attribute name", `Quick, () => {
+    switch (Driver.parse_stylesheet(~source_position_start, "[svg|href] {}")) {
+    | Ok((
+        [
+          Ast.Style_rule({
+            prelude:
+              (
+                [
+                  (
+                    Ast.ComplexSelector(
+                      Ast.Selector(
+                        Ast.CompoundSelector({
+                          subclass_selectors:
+                            [Ast.Attribute(Ast.Attr_value("svg|href"))],
+                          _,
+                        }),
+                      ),
+                    ),
+                    _,
+                  ),
+                ],
+                _,
+              ),
+            _,
+          }),
+        ],
+        _,
+      )) =>
+      ()
+    | _ => fail("expected namespaced attribute AST")
+    }
+  }),
+];
+
 let tests =
   List.concat([
     error_tests_data,
@@ -520,4 +943,5 @@ let tests =
     selector_combinator_ast_tests,
     ambiguity_regression_tests,
     invalid_utf8_tests,
+    spec_feature_tests,
   ]);

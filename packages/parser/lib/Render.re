@@ -5,8 +5,73 @@ let rec strip_leading_whitespace = (ast: Ast.component_value_list) =>
   | xs => xs
   };
 
+let strip_trailing_whitespace = (ast: Ast.component_value_list) =>
+  ast |> List.rev |> strip_leading_whitespace |> List.rev;
+
+let strip_whitespace = (ast: Ast.component_value_list) =>
+  ast |> strip_leading_whitespace |> strip_trailing_whitespace;
+
+/* Only whitespace next to `,` or `:` is dropped; elsewhere it can be
+   semantic (`calc(1px + 2px)`, `1px 2px`). */
+let is_comma_or_colon = (value: Ast.component_value) =>
+  switch (value) {
+  | Delim(Delimiter_comma)
+  | Delim(Delimiter_colon) => true
+  | _ => false
+  };
+
+let rec drop_whitespace_around_commas = (ast: Ast.component_value_list) =>
+  switch (ast) {
+  | [] => []
+  | [(Whitespace, _), (next, next_loc), ...rest]
+      when is_comma_or_colon(next) =>
+    drop_whitespace_around_commas([(next, next_loc), ...rest])
+  | [(value, loc), (Whitespace, _), ...rest] when is_comma_or_colon(value) => [
+      (value, loc),
+      ...drop_whitespace_around_commas(rest),
+    ]
+  | [value, ...rest] => [value, ...drop_whitespace_around_commas(rest)]
+  };
+
+/* Minification is a pure AST pass, applied before the (always verbatim)
+   renderer: edge whitespace is stripped and comma/colon-adjacent whitespace
+   dropped, recursively through block and function bodies. Custom property
+   values skip this pass entirely (see `declaration`). */
+let rec minify_component_values = (ast: Ast.component_value_list) =>
+  ast
+  |> strip_whitespace
+  |> drop_whitespace_around_commas
+  |> List.map(((value, loc): Ast.with_loc(Ast.component_value)) =>
+       (minify_component_value(value), loc)
+     )
+and minify_component_value = (value: Ast.component_value) =>
+  switch (value) {
+  | Ast.Paren_block(block) =>
+    Ast.Paren_block(minify_component_values(block))
+  | Ast.Bracket_block(block) =>
+    Ast.Bracket_block(minify_component_values(block))
+  | Ast.Function({ name, kind, body: (body, body_loc) }) =>
+    Ast.Function({
+      name,
+      kind,
+      body: (minify_component_values(body), body_loc),
+    })
+  | other => other
+  };
+
 let rec stylesheet = (ast: Ast.stylesheet) => {
-  ast |> fst |> List.map(rule) |> String.concat("");
+  ast |> fst |> rules;
+}
+/* The semicolon after the last declaration of a block is a separator, not a
+   terminator: `.a{color:red}` is valid, so the minified output drops it.
+   Statement at-rules keep theirs -- our parser requires it on re-parse. */
+and rules = items => {
+  let rec render_all =
+    fun
+    | [] => []
+    | [Ast.Declaration(d)] => [declaration(~last=true, d)]
+    | [r, ...rest] => [rule(r), ...render_all(rest)];
+  items |> render_all |> String.concat("");
 }
 and rule = (ast: Ast.rule) => {
   switch (ast) {
@@ -23,23 +88,25 @@ and style_rule = ({ prelude, block, _ }: Ast.style_rule) => {
   );
 }
 and at_rule = ({ name, prelude, block, _ }: Ast.at_rule) => {
+  let name = name |> fst |> Tokens.serialize_identifier;
+  let prelude =
+    prelude |> fst |> minify_component_values |> component_value_list;
+  /* The separating space can be dropped when the prelude starts with a code
+     point that cannot continue the at-keyword (`@page:left`). */
+  let header =
+    if (prelude == "") {
+      "@" ++ name;
+    } else if (prelude.[0] == ':') {
+      "@" ++ name ++ prelude;
+    } else {
+      "@" ++ name ++ " " ++ prelude;
+    };
   switch (block) {
   /* Statement at-rules (`@import`, `@charset`, `@layer a, b;`) have no
      block and terminate with a semicolon; `{}` would be invalid CSS. */
-  | Empty =>
-    Printf.sprintf(
-      "@%s %s;",
-      name |> fst,
-      prelude |> fst |> strip_leading_whitespace |> component_value_list,
-    )
+  | Empty => header ++ ";"
   | Rule_list(_)
-  | Stylesheet(_) =>
-    Printf.sprintf(
-      "@%s %s{%s}",
-      name |> fst,
-      prelude |> fst |> strip_leading_whitespace |> component_value_list,
-      brace_block(block),
-    )
+  | Stylesheet(_) => Printf.sprintf("%s{%s}", header, brace_block(block))
   };
 }
 and brace_block = ast => {
@@ -57,15 +124,26 @@ and rule_list = (rule_list: Ast.rule_list) => {
        | Ast.Style_rule({ block: ([], _), _ }) => false
        | _ => true,
      )
-  |> List.map(rule)
-  |> String.concat("");
+  |> rules;
 }
-and declaration = ({ name, value, important, _ }: Ast.declaration) => {
+and declaration =
+    (~last=false, { name, value, important, _ }: Ast.declaration) => {
+  let name = fst(name);
+  /* A custom property's value is an observable token stream
+     (css-variables: `getPropertyValue`, non-CSS `var()` consumers), so it
+     only gets edge-trimmed, never minified. */
+  let is_custom_property =
+    String.length(name) >= 2 && name.[0] == '-' && name.[1] == '-';
+  let rendered_value =
+    is_custom_property
+      ? value |> fst |> strip_whitespace |> component_value_list
+      : value |> fst |> minify_component_values |> component_value_list;
   Printf.sprintf(
-    "%s:%s%s;",
-    name |> fst,
-    value |> fst |> strip_leading_whitespace |> component_value_list,
-    important |> fst ? " !important" : "",
+    "%s:%s%s%s",
+    Tokens.serialize_identifier(name),
+    rendered_value,
+    important |> fst ? "!important" : "",
+    last ? "" : ";",
   );
 }
 and component_value_list = (ast: Ast.component_value_list) => {
@@ -75,18 +153,38 @@ and component_value_list = (ast: Ast.component_value_list) => {
 and variable = v => "$(" ++ v ++ ")"
 
 and selector = (ast: Ast.selector) => {
+  /* Type selectors may carry a namespace prefix (`svg|circle`, `*|circle`,
+     `|circle`); each segment around the `|` separator is escaped on its
+     own so the separator itself survives. Known limitation: the prefix is
+     stored flat in the `Type` string, so an element name containing an
+     escaped pipe (`foo\|bar`) is indistinguishable from a namespaced one
+     and re-renders as namespace syntax. */
+  let render_type_selector = v =>
+    v
+    |> String.split_on_char('|')
+    |> List.map(segment =>
+         segment == "*" ? "*" : Tokens.serialize_identifier(segment)
+       )
+    |> String.concat("|");
+  /* Cross-module selector references travel through rendered CSS as
+     NUL-delimited sentinels (`\x00LONGIDENT\x00`, see
+     documents/css-extraction.md). The aggregator substitutes them with
+     already-minted class names, so they must survive rendering verbatim:
+     escaping would corrupt the wire protocol and break resolution. */
+  let render_class_name = v =>
+    String.contains(v, '\000') ? v : Tokens.serialize_identifier(v);
   let rec render_simple_selector =
     fun
     | Ast.Universal => "*"
     | Ampersand => "&"
-    | Type(v) => v
+    | Type(v) => render_type_selector(v)
     | Subclass(v) => render_subclass_selector(v)
     | Variable(v, _) => variable(v)
     | Percentage(p) => Tokens.float_to_string(p) ++ "%"
   and render_subclass_selector: Ast.subclass_selector => string =
     fun
-    | Ast.Id(v) => Printf.sprintf("#%s", v)
-    | Class(v) => Printf.sprintf(".%s", v)
+    | Ast.Id(v) => "#" ++ Tokens.serialize_identifier(v)
+    | Class(v) => "." ++ render_class_name(v)
     | Attribute(attr) => Printf.sprintf("[%s]", render_attribute(attr))
     | Pseudo_class(psc) => render_pseudo_selector(psc)
     | ClassVariable(v, _) => "." ++ variable(v)
@@ -100,12 +198,23 @@ and selector = (ast: Ast.selector) => {
     | Attr_substring => "*="
   and render_attribute =
     fun
-    | Ast.Attr_value(v) => v
-    | To_equal({ name, kind, value }) =>
-      name ++ render_attr_matcher(kind) ++ render_attr_value(value)
+    | Ast.Attr_value(v) => render_type_selector(v)
+    | To_equal({ name, kind, value, case_sensitivity }) =>
+      render_type_selector(name)
+      ++ render_attr_matcher(kind)
+      ++ render_attr_value(value)
+      ++ render_attr_case(case_sensitivity)
+  and render_attr_case =
+    fun
+    | None => ""
+    | Some(Ast.Attr_case_insensitive) => " i"
+    | Some(Ast.Attr_case_sensitive) => " s"
   and render_attr_value =
     fun
-    | Ast.Attr_ident(i) => i
+    | Ast.Attr_ident(i) => Tokens.serialize_identifier(i)
+    /* `[type="text"]` and `[type=text]` match the same. */
+    | Attr_string(str)
+        when str != "" && !Tokens.needs_ident_serialization(str) => str
     | Attr_string(str) => Tokens.serialize_string(str)
   and render_nth =
     fun
@@ -134,25 +243,50 @@ and selector = (ast: Ast.selector) => {
     fun
     | Ast.Nth(nth) => render_nth(nth)
     | NthSelector(v) =>
-      v |> List.map(render_complex_selector) |> String.concat(", ")
+      v |> List.map(render_complex_selector) |> String.concat(",")
+    | NthOf(nth, v) =>
+      render_nth(nth)
+      ++ " of "
+      ++ (v |> List.map(render_complex_selector) |> String.concat(","))
   and render_pseudo_class =
     fun
-    | Ast.PseudoIdent(i) => ":" ++ i
+    | Ast.PseudoIdent(i) => ":" ++ Tokens.serialize_identifier(i)
     | Function({ name, payload: (sl, _) }) =>
-      ":" ++ name ++ "(" ++ selector_list(sl) ++ ")"
+      ":"
+      ++ Tokens.serialize_identifier(name)
+      ++ "("
+      ++ selector_list(sl)
+      ++ ")"
     | NthFunction({ name, payload: (selector, _) }) =>
-      ":" ++ name ++ "(" ++ render_nth_payload(selector) ++ ")"
+      ":"
+      ++ Tokens.serialize_identifier(name)
+      ++ "("
+      ++ render_nth_payload(selector)
+      ++ ")"
   and render_pseudo_selector =
     fun
-    | Ast.Pseudoelement(v) => "::" ++ v
+    | Ast.Pseudoelement(v) => "::" ++ Tokens.serialize_identifier(v)
+    | PseudoelementFunction({ name, payload: (sl, _) }) =>
+      "::"
+      ++ Tokens.serialize_identifier(name)
+      ++ "("
+      ++ selector_list(sl)
+      ++ ")"
     | Pseudoclass(pc) => render_pseudo_class(pc)
   and render_compound_selector = (compound_selector: Ast.compound_selector) => {
+    /* Selectors 4 (SS 3.5): `*` in a compound with other simple selectors
+       is redundant -- `*[href]` is `[href]`. */
+    let type_selector =
+      switch (compound_selector.type_selector) {
+      | Some(Ast.Universal)
+          when
+            compound_selector.subclass_selectors != []
+            || compound_selector.pseudo_selectors != [] =>
+        None
+      | other => other
+      };
     let simple_selector =
-      Option.fold(
-        ~none="",
-        ~some=render_simple_selector,
-        compound_selector.type_selector,
-      );
+      Option.fold(~none="", ~some=render_simple_selector, type_selector);
     let subclass_selectors =
       List.map(render_subclass_selector, compound_selector.subclass_selectors)
       |> String.concat("");
@@ -173,17 +307,19 @@ and selector = (ast: Ast.selector) => {
   and render_selector_combinator = combinator => {
     switch ((combinator: Ast.selector_combinator)) {
     | Ast.Selector_descendant => " "
-    | Selector_child => " > "
-    | Selector_adjacent_sibling => " + "
-    | Selector_general_sibling => " ~ "
+    | Selector_child => ">"
+    | Selector_adjacent_sibling => "+"
+    | Selector_general_sibling => "~"
+    | Selector_column => "||"
     };
   }
   and render_relative_combinator = combinator => {
     switch ((combinator: Ast.selector_combinator)) {
     | Ast.Selector_descendant => ""
-    | Selector_child => "> "
-    | Selector_adjacent_sibling => "+ "
-    | Selector_general_sibling => "~ "
+    | Selector_child => ">"
+    | Selector_adjacent_sibling => "+"
+    | Selector_general_sibling => "~"
+    | Selector_column => "||"
     };
   }
   and render_right_combinator = right => {
@@ -211,7 +347,7 @@ and selector_list = (ast: Ast.selector_list) => {
 }
 
 and dimension = ({ value, unit, _ }: Ast.dimension) => {
-  Tokens.float_to_string(value) ++ unit;
+  Tokens.float_to_string(value) ++ Tokens.serialize_identifier(unit);
 }
 
 and delimiter = (ast: Ast.delimiter) => Ast.string_of_delimiter(ast)
@@ -221,17 +357,25 @@ and component_value = (ast: Ast.component_value) => {
   | Paren_block(block) => "(" ++ component_value_list(block) ++ ")"
   | Bracket_block(block) => "[" ++ component_value_list(block) ++ "]"
   | Percentage(value) => Tokens.float_to_string(value) ++ "%"
-  | Ident(string) => string
+  | Ident(string) => Tokens.serialize_identifier(string)
   | String(string) => Tokens.serialize_string(string)
   | Uri(string) => Tokens.serialize_uri(string)
   | Delim(value) => delimiter(value)
   | Function({ name: (name, _), body: (body, _), _ }) =>
-    Printf.sprintf("%s(%s)", name, component_value_list(body))
+    Printf.sprintf(
+      "%s(%s)",
+      Tokens.serialize_identifier(name),
+      component_value_list(body),
+    )
+  /* Hash tokens are not identifiers: `#0f0` must stay untouched. */
   | Hash((string, _)) => "#" ++ string
   | Number(n) => Tokens.float_to_string(n)
   | Unicode_range(string) => string
   | Dimension(value) => dimension(value)
   | Variable(v, _) => variable(v)
   | Selector(v) => selector_list(v)
+  | At_keyword(name) => "@" ++ Tokens.serialize_identifier(name)
+  | Cdo => "<!--"
+  | Cdc => "-->"
   };
 };

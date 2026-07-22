@@ -132,22 +132,17 @@ let important = [%sedlex.regexp?
   ("!", whitespaces, _i, _m, _p, _o, _r, _t, _a, _n, _t)
 ];
 
-// https://drafts.csswg.org/css-syntax-3/#starts-with-a-valid-escape
-let check_if_two_code_points_are_a_valid_escape = lexbuf =>
-  switch%sedlex (lexbuf) {
-  | ("\\", '\n') => false
-  | ("\\", any) => true
-  | _ => false
-  };
-
 // https://drafts.csswg.org/css-syntax-3/#would-start-an-identifier
+// Single switch%sedlex on purpose: the `check` wrapper below relies on
+// mark/backtrack, and a nested switch would move the mark, committing
+// consumed input (e.g. `#-5` losing its `-`).
 let check_if_three_codepoints_would_start_an_identifier = lexbuf => {
   switch%sedlex (lexbuf) {
   | ('-', identifier_start_code_point | '-') => true
-  // TODO: test the code_points case
-  | '-' => check_if_two_code_points_are_a_valid_escape(lexbuf)
+  | ('-', starts_with_a_valid_escape) => true
   | identifier_start_code_point => true
-  | _ => check_if_two_code_points_are_a_valid_escape(lexbuf)
+  | starts_with_a_valid_escape => true
+  | _ => false
   };
 };
 
@@ -213,11 +208,13 @@ let consume_escaped = lexbuf => {
   | Rep(hex_digit, 1 .. 6) =>
     let hex_string = "0x" ++ lexeme(lexbuf);
     let char_code = int_of_string(hex_string);
-    let char = uchar_of_int(char_code);
     let _ = skip_whitespace_after_escape(lexbuf);
-    char_code == 0 || is_surrogate(char_code)
+    /* Null, surrogates and out-of-range code points are not Unicode scalar
+       values; check before Uchar.of_int, which raises on them. */
+    char_code == 0 || is_surrogate(char_code) || char_code > 0x10FFFF
       // U+FFFD is a character used as a substitute for an uninterpretable character from another encoding
-      ? Error(("U+FFFD", Tokens.Invalid_code_point)) : Ok(char);
+      ? Error(("U+FFFD", Tokens.Invalid_code_point))
+      : Ok(uchar_of_int(char_code));
   | eof => Error(("U+FFFD", Tokens.Eof))
   | any => Ok(lexeme(lexbuf))
   | _ => unreachable(lexbuf)
@@ -264,15 +261,16 @@ let skip_whitespace_and_comments = lexbuf =>
   | _ => ()
   };
 
-// TODO: check 5. without the 0 or .5 without the 0
 let consume_number = lexbuf => {
   let append = repr => repr ++ lexeme(lexbuf);
 
   let kind = `Integer; // 1
   let repr = "";
+  /* `Star`, not `Plus`: `+.5` has no digits before the dot, and a failed
+     match drops the sign, leaving an empty repr (`float_of_string` crash). */
   let repr =
     switch%sedlex (lexbuf) {
-    | (Opt("+" | "-"), Plus(digit)) => append(repr)
+    | (Opt("+" | "-"), Star(digit)) => append(repr)
     | _ => repr
     }; // 2 - 3
   let (kind, repr) =
@@ -745,17 +743,14 @@ let rec consume_token = lexbuf => {
     | identifier_code_point
     | starts_with_a_valid_escape =>
       Sedlexing.rollback(lexbuf);
-      switch%sedlex (lexbuf) {
-      | identifier_start_code_point =>
-        Sedlexing.rollback(lexbuf);
-        let.ok string =
-          consume_identifier(lexbuf) |> handle_consume_identifier;
-        Ok(Tokens.HASH((string, `ID)));
-      | _ =>
-        let.ok string =
-          consume_identifier(lexbuf) |> handle_consume_identifier;
-        Ok(Tokens.HASH((string, `UNRESTRICTED)));
-      };
+      /* CSS Syntax 3, 4.3.1: the hash is type "id" if the next code points
+         would start an identifier. Escapes (`#\31 a`) and leading hyphens
+         (`#-a`) count, in addition to identifier-start code points. */
+      let kind =
+        check_if_three_codepoints_would_start_an_identifier(lexbuf)
+          ? `ID : `UNRESTRICTED;
+      let.ok string = consume_identifier(lexbuf) |> handle_consume_identifier;
+      Ok(Tokens.HASH((string, kind)));
     | _ => Ok(DELIM("#"))
     };
 
@@ -830,6 +825,9 @@ let rec consume_token = lexbuf => {
   | ";" => Ok(SEMI_COLON)
   | "&" => Ok(DELIM("&"))
   | "*" => Ok(DELIM("*"))
+  | "<!--" => Ok(CDO)
+  | "-->" => Ok(CDC)
+  | "||" => Ok(DELIM("||"))
   | "<=" => Ok(DELIM("<="))
   | ">=" => Ok(DELIM(">="))
   | "<" => Ok(DELIM("<"))

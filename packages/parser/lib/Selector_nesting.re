@@ -31,9 +31,11 @@ let rec contains_ampersand = (selector: selector) => {
 }
 and pseudo_selector_contains_ampersand =
   fun
-  | Pseudoclass(Function({ payload: (selector_list, _), _ })) =>
+  | Pseudoclass(Function({ payload: (selector_list, _), _ }))
+  | PseudoelementFunction({ payload: (selector_list, _), _ }) =>
     selector_list |> List.map(fst) |> List.exists(contains_ampersand)
-  | Pseudoclass(NthFunction({ payload: (NthSelector(csl), _), _ })) =>
+  | Pseudoclass(NthFunction({ payload: (NthSelector(csl), _), _ }))
+  | Pseudoclass(NthFunction({ payload: (NthOf(_, csl), _), _ })) =>
     csl |> List.exists(cs => contains_ampersand(ComplexSelector(cs)))
   | _ => false;
 
@@ -41,6 +43,9 @@ let is_sibling_combinator =
   fun
   | Selector_adjacent_sibling
   | Selector_general_sibling => true
+  /* `||` targets a column, a different element from the cell subject, so
+     it escapes the `&` subtree the same way sibling combinators do. */
+  | Selector_column => true
   | Selector_descendant
   | Selector_child => false;
 
@@ -74,15 +79,15 @@ let rec flatten_selector_chain =
   };
 };
 
-/* Pseudo-elements are separate boxes that receive custom properties
-   from their originating element via *inheritance* — a
-   `@property{inherits:false}` var set inline on `&` is invisible to
-   `&::before`/`&::placeholder`. Both `::x` and the CSS2 legacy
-   single-colon spellings (`:before`, `:after`, `:first-line`,
-   `:first-letter`, parsed as pseudo-classes) count. */
+/* A pseudo-element is a separate box that reads the originating
+   element's custom properties through inheritance, so an
+   `@property{inherits:false}` var set inline on `&` never reaches it.
+   The CSS2 single-colon spellings parse as pseudo-classes but name
+   pseudo-elements, hence the explicit name list. */
 let pseudo_selector_is_element =
   fun
   | Pseudoelement(_) => true
+  | PseudoelementFunction(_) => true
   | Pseudoclass(PseudoIdent(name)) =>
     switch (String.lowercase_ascii(name)) {
     | "before"
@@ -93,17 +98,14 @@ let pseudo_selector_is_element =
     }
   | Pseudoclass(_) => false;
 
-/* Segment matches the styled element's OWN box and nothing else: a bare
-   `&` or a compound whose type position is `&`, restricted only by
-   pseudo-classes/subclasses (`&:hover`, `&.foo`) — never by a
-   pseudo-element (`&::before` styles a separate box that reads vars via
-   inheritance). Strictly stronger than `subject_within_ampersand`
-   below, which also accepts elements merely *inside* `&`'s subtree
-   (e.g. `:is(& .child)`) — those too read inline custom properties via
-   inheritance. Callers deciding whether a var may register
-   `@property{inherits:false}` must use this strict form. `:is(&)`-style
-   proofs are conservatively rejected (false only misses an
-   optimization, never breaks a style). */
+/* True only when the segment matches the styled element's OWN box.
+   This predicate gates `@property{inherits:false}` registration, and a
+   non-inheriting var never reaches boxes styled through inheritance
+   (pseudo-elements, descendants), so those must not count. Strictly
+   stronger than `subject_within_ampersand` below, which also accepts
+   subjects merely inside `&`'s subtree. `:is(&)`-style proofs are
+   rejected: a false negative only misses an optimization, a false
+   positive would break styles. */
 let rec selector_is_ampersand_own_box = (sel: selector) =>
   switch (sel) {
   | SimpleSelector(Ampersand) => true
@@ -126,7 +128,8 @@ let rec selector_is_ampersand_own_box = (sel: selector) =>
 
 /* Segment provably denotes an element inside `&`'s subtree: `&`,
    `&`-typed compounds, or `:is()`/`:where()` whose every branch stays
-   inside. `:not()`/`:has()` prove nothing — conservatively ignored. */
+   inside. `:not()`/`:has()` prove nothing about the subject's position,
+   so they are ignored. */
 let rec subject_within_ampersand = (sel: selector) =>
   switch (sel) {
   | SimpleSelector(Ampersand) => true
@@ -169,10 +172,10 @@ and subject_inside_ampersand = segments =>
   | [_, ...rest] => subject_inside_ampersand(rest)
   };
 
-/* Subject sits outside `&`'s subtree (sibling combinator, `div:not(&)`,
-   `:has(& + div)`, ...) — it can't read the custom property `[%css]`
-   sets inline on `&`. `contains_ampersand` sees inside pseudo payloads,
-   so payload-only `&` is analyzed, not silently accepted. */
+/* True when the subject sits outside `&`'s subtree and therefore can't
+   read the custom property `[%css]` sets inline on `&`.
+   `contains_ampersand` sees inside pseudo payloads, so a payload-only
+   `&` is analyzed rather than silently accepted. */
 let subject_escapes_ampersand_subtree = (sel: selector): bool => {
   contains_ampersand(sel)
   && !subject_inside_ampersand(flatten_selector_chain(sel));
@@ -270,10 +273,8 @@ let merge_compound_selectors =
   };
 
 /* Extend the last compound of `selector` with `compound`'s
-   subclass/pseudo lists (used by `replace_ampersand` for `&:hover`-style
-   substitution). Unhandled shapes (e.g. `RelativeSelector`) fall back to
-   a descendant join rather than crashing — the parser layer can't
-   raise. */
+   subclass/pseudo lists. Unhandled shapes fall back to a descendant
+   join because the parser layer can't raise. */
 let join_compound_selector =
     (selector, { subclass_selectors, pseudo_selectors, _ } as compound) => {
   let new_compound =
@@ -333,7 +334,7 @@ let join_compound_selector =
         compound,
       ),
     )
-  /* Defensive fallback — see comment above. */
+  /* Defensive fallback, see the comment above. */
   | (other, None, None) => join_selector_with_combinator(other, new_compound)
   | (other, Some(ctor), Some(rest)) =>
     join_selector_with_combinator(
@@ -437,6 +438,19 @@ and pseudo_selector_replace_ampersand = (replaced_with: selector, selector) => {
         payload: (selector_list, selector_list_loc),
       }),
     );
+  | PseudoelementFunction({
+      name,
+      payload: (selector_list, selector_list_loc),
+    }) =>
+    let selector_list =
+      selector_list
+      |> List.map(((selector, loc)) =>
+           (replace_ampersand(replaced_with, selector), loc)
+         );
+    PseudoelementFunction({
+      name,
+      payload: (selector_list, selector_list_loc),
+    });
   | Pseudoclass(
       NthFunction({
         name,
@@ -464,6 +478,31 @@ and pseudo_selector_replace_ampersand = (replaced_with: selector, selector) => {
       NthFunction({
         name,
         payload: (NthSelector(complex_selector_list), payload_loc),
+      }),
+    );
+  | Pseudoclass(
+      NthFunction({
+        name,
+        payload: (NthOf(nth, complex_selector_list), payload_loc),
+      }),
+    ) =>
+    let complex_selector_list =
+      complex_selector_list
+      |> List.map(complex_selector =>
+           replace_ampersand(
+             replaced_with,
+             ComplexSelector(complex_selector),
+           )
+         )
+      |> List.map(
+           fun
+           | ComplexSelector(complex_selector) => complex_selector
+           | other => Selector(other),
+         );
+    Pseudoclass(
+      NthFunction({
+        name,
+        payload: (NthOf(nth, complex_selector_list), payload_loc),
       }),
     );
   | sel => sel
@@ -537,7 +576,7 @@ let media_prelude_is_combinable = prelude => {
   };
 };
 
-/* RIGHT operand: pure `(...)` condition chain — it follows an `and`. */
+/* RIGHT operand of an `and`: must be a pure `(...)` condition chain. */
 let media_prelude_is_condition_only = prelude => {
   let meaningful = media_prelude_meaningful_values(prelude);
   let condition_chain =

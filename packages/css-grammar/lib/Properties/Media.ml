@@ -135,7 +135,8 @@ let property_media_prefers_reduced_motion :
 
 module Property_media_resolution =
   [%spec_module
-  "<resolution>", (module Css_types.MediaResolution)]
+  (* MQ4 adds 'infinite' for media without resolution limits. *)
+  "<resolution> | 'infinite'", (module Css_types.MediaResolution)]
 
 let property_media_resolution : property_media_resolution Rule.rule =
   Property_media_resolution.rule
@@ -182,6 +183,89 @@ module Property_media_type =
 let property_media_type : property_media_type Rule.rule =
   Property_media_type.rule
 
+(* The grammars below exist only so At_rule_prelude can validate @media /
+   @container feature values; the values never reach runtime emission, so
+   the modules carry no runtime type. One module covers each value class
+   and is registered under every feature name sharing it. *)
+
+module Property_media_length_feature = [%spec_module "<extended-length>"]
+
+let property_media_length_feature : property_media_length_feature Rule.rule =
+  Property_media_length_feature.rule
+
+module Property_media_ratio_feature = [%spec_module "<ratio>"]
+
+let property_media_ratio_feature : property_media_ratio_feature Rule.rule =
+  Property_media_ratio_feature.rule
+
+module Property_media_integer_feature = [%spec_module "<integer>"]
+
+let property_media_integer_feature : property_media_integer_feature Rule.rule =
+  Property_media_integer_feature.rule
+
+(* Compat device-pixel-ratio spellings take a bare <number> (e.g. 1.5). *)
+module Property_media_number_feature = [%spec_module "<number>"]
+
+let property_media_number_feature : property_media_number_feature Rule.rule =
+  Property_media_number_feature.rule
+
+module Property_media_scan = [%spec_module "'interlace' | 'progressive'"]
+
+let property_media_scan : property_media_scan Rule.rule =
+  Property_media_scan.rule
+
+module Property_media_overflow_block =
+  [%spec_module
+  "'none' | 'scroll' | 'paged'"]
+
+let property_media_overflow_block : property_media_overflow_block Rule.rule =
+  Property_media_overflow_block.rule
+
+module Property_media_overflow_inline = [%spec_module "'none' | 'scroll'"]
+
+let property_media_overflow_inline : property_media_overflow_inline Rule.rule =
+  Property_media_overflow_inline.rule
+
+(* Shared by dynamic-range and video-dynamic-range. *)
+module Property_media_dynamic_range = [%spec_module "'standard' | 'high'"]
+
+let property_media_dynamic_range : property_media_dynamic_range Rule.rule =
+  Property_media_dynamic_range.rule
+
+(* Shared by prefers-reduced-transparency and prefers-reduced-data. *)
+module Property_media_prefers_reduced =
+  [%spec_module
+  "'no-preference' | 'reduce'"]
+
+let property_media_prefers_reduced : property_media_prefers_reduced Rule.rule =
+  Property_media_prefers_reduced.rule
+
+module Property_media_nav_controls = [%spec_module "'none' | 'back'"]
+
+let property_media_nav_controls : property_media_nav_controls Rule.rule =
+  Property_media_nav_controls.rule
+
+module Property_media_environment_blending =
+  [%spec_module
+  "'opaque' | 'additive' | 'subtractive'"]
+
+let property_media_environment_blending :
+  property_media_environment_blending Rule.rule =
+  Property_media_environment_blending.rule
+
+module Property_media_device_posture = [%spec_module "'continuous' | 'folded'"]
+
+let property_media_device_posture : property_media_device_posture Rule.rule =
+  Property_media_device_posture.rule
+
+module Property_media_video_color_gamut =
+  [%spec_module
+  "'srgb' | 'p3' | 'rec2020'"]
+
+let property_media_video_color_gamut :
+  property_media_video_color_gamut Rule.rule =
+  Property_media_video_color_gamut.rule
+
 let entries : (kind * packed_rule) list =
   [
     Property "media-type", pack_module (module Property_media_type);
@@ -224,4 +308,111 @@ let entries : (kind * packed_rule) list =
     Property "media-scripting", pack_module (module Property_media_scripting);
     Property "media-update", pack_module (module Property_media_update);
     Property "media-min-color", pack_module (module Property_media_min_color);
+    (* Length features: <extended-length>. media-inline-size and
+       media-block-size are @container-only size features; the media- key
+       prefix is just the registry namespace At_rule_prelude looks up. *)
+    Property "media-width", pack_module (module Property_media_length_feature);
+    ( Property "media-min-width",
+      pack_module (module Property_media_length_feature) );
+    ( Property "media-max-width",
+      pack_module (module Property_media_length_feature) );
+    Property "media-height", pack_module (module Property_media_length_feature);
+    ( Property "media-min-height",
+      pack_module (module Property_media_length_feature) );
+    ( Property "media-max-height",
+      pack_module (module Property_media_length_feature) );
+    ( Property "media-device-width",
+      pack_module (module Property_media_length_feature) );
+    ( Property "media-min-device-width",
+      pack_module (module Property_media_length_feature) );
+    ( Property "media-max-device-width",
+      pack_module (module Property_media_length_feature) );
+    ( Property "media-device-height",
+      pack_module (module Property_media_length_feature) );
+    ( Property "media-min-device-height",
+      pack_module (module Property_media_length_feature) );
+    ( Property "media-max-device-height",
+      pack_module (module Property_media_length_feature) );
+    ( Property "media-inline-size",
+      pack_module (module Property_media_length_feature) );
+    ( Property "media-min-inline-size",
+      pack_module (module Property_media_length_feature) );
+    ( Property "media-max-inline-size",
+      pack_module (module Property_media_length_feature) );
+    ( Property "media-block-size",
+      pack_module (module Property_media_length_feature) );
+    ( Property "media-min-block-size",
+      pack_module (module Property_media_length_feature) );
+    ( Property "media-max-block-size",
+      pack_module (module Property_media_length_feature) );
+    (* Ratio features: <ratio> (min/max-aspect-ratio predate these and keep
+       their own modules above). *)
+    ( Property "media-aspect-ratio",
+      pack_module (module Property_media_ratio_feature) );
+    ( Property "media-device-aspect-ratio",
+      pack_module (module Property_media_ratio_feature) );
+    ( Property "media-min-device-aspect-ratio",
+      pack_module (module Property_media_ratio_feature) );
+    ( Property "media-max-device-aspect-ratio",
+      pack_module (module Property_media_ratio_feature) );
+    (* Integer features: <integer>. *)
+    Property "media-color", pack_module (module Property_media_integer_feature);
+    ( Property "media-max-color",
+      pack_module (module Property_media_integer_feature) );
+    ( Property "media-max-color-index",
+      pack_module (module Property_media_integer_feature) );
+    ( Property "media-min-monochrome",
+      pack_module (module Property_media_integer_feature) );
+    ( Property "media-max-monochrome",
+      pack_module (module Property_media_integer_feature) );
+    ( Property "media-horizontal-viewport-segments",
+      pack_module (module Property_media_integer_feature) );
+    ( Property "media-min-horizontal-viewport-segments",
+      pack_module (module Property_media_integer_feature) );
+    ( Property "media-max-horizontal-viewport-segments",
+      pack_module (module Property_media_integer_feature) );
+    ( Property "media-vertical-viewport-segments",
+      pack_module (module Property_media_integer_feature) );
+    ( Property "media-min-vertical-viewport-segments",
+      pack_module (module Property_media_integer_feature) );
+    ( Property "media-max-vertical-viewport-segments",
+      pack_module (module Property_media_integer_feature) );
+    (* -webkit-transform-3d probes with 0/1 per the compat spec. *)
+    ( Property "media--webkit-transform-3d",
+      pack_module (module Property_media_integer_feature) );
+    (* Compat device-pixel-ratio features: <number>. *)
+    ( Property "media--moz-device-pixel-ratio",
+      pack_module (module Property_media_number_feature) );
+    ( Property "media-min--moz-device-pixel-ratio",
+      pack_module (module Property_media_number_feature) );
+    ( Property "media-max--moz-device-pixel-ratio",
+      pack_module (module Property_media_number_feature) );
+    ( Property "media--webkit-device-pixel-ratio",
+      pack_module (module Property_media_number_feature) );
+    ( Property "media--webkit-min-device-pixel-ratio",
+      pack_module (module Property_media_number_feature) );
+    ( Property "media--webkit-max-device-pixel-ratio",
+      pack_module (module Property_media_number_feature) );
+    (* Discrete keyword features (MQ5, Device Posture API). *)
+    Property "media-scan", pack_module (module Property_media_scan);
+    ( Property "media-overflow-block",
+      pack_module (module Property_media_overflow_block) );
+    ( Property "media-overflow-inline",
+      pack_module (module Property_media_overflow_inline) );
+    ( Property "media-dynamic-range",
+      pack_module (module Property_media_dynamic_range) );
+    ( Property "media-video-dynamic-range",
+      pack_module (module Property_media_dynamic_range) );
+    ( Property "media-prefers-reduced-transparency",
+      pack_module (module Property_media_prefers_reduced) );
+    ( Property "media-prefers-reduced-data",
+      pack_module (module Property_media_prefers_reduced) );
+    ( Property "media-nav-controls",
+      pack_module (module Property_media_nav_controls) );
+    ( Property "media-environment-blending",
+      pack_module (module Property_media_environment_blending) );
+    ( Property "media-device-posture",
+      pack_module (module Property_media_device_posture) );
+    ( Property "media-video-color-gamut",
+      pack_module (module Property_media_video_color_gamut) );
   ]

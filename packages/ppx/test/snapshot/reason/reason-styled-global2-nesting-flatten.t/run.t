@@ -5,16 +5,16 @@ without an intervening space.
 
   $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
-  [@@@css "body{color:red;}"]
-  [@@@css "body .child{color:blue;}"]
-  [@@@css "body .child{color:red;}"]
-  [@@@css "html .child{color:red;}"]
-  [@@@css ".a .c{color:green;}"]
-  [@@@css ".a .d{color:green;}"]
-  [@@@css ".b .c{color:green;}"]
-  [@@@css ".b .d{color:green;}"]
-  [@@@css ".button{color:black;}"]
-  [@@@css ".button:hover{color:white;}"]
+  [@@@css "body{color:red}"]
+  [@@@css "body .child{color:blue}"]
+  [@@@css "body .child{color:red}"]
+  [@@@css "html .child{color:red}"]
+  [@@@css ".a .c{color:green}"]
+  [@@@css ".a .d{color:green}"]
+  [@@@css ".b .c{color:green}"]
+  [@@@css ".b .d{color:green}"]
+  [@@@css ".button{color:black}"]
+  [@@@css ".button:hover{color:white}"]
   module Single =
     struct
       let to_string () = ""

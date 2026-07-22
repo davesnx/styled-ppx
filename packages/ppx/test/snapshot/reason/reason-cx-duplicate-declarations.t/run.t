@@ -14,32 +14,32 @@ atom shape and hash.
   $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
   [@@@css "@property --c-kv4uq2{syntax:\"*\";inherits:false;}"]
-  [@@@css ".css-ztpkbn-dup{color:blue;color:red;color:blue;}"]
-  [@@@css ".css-17ax8u2-fallback{display:-webkit-box;display:flex;}"]
-  [@@@css ".css-1uk1gs8-interleaved{margin:0;}"]
-  [@@@css ".css-dhb7kq-interleaved{color:blue;color:red;}"]
+  [@@@css ".css-ztpkbn-dup{color:blue;color:red;color:blue}"]
+  [@@@css ".css-17ax8u2-fallback{display:-webkit-box;display:flex}"]
+  [@@@css ".css-1uk1gs8-interleaved{margin:0}"]
+  [@@@css ".css-dhb7kq-interleaved{color:blue;color:red}"]
   [@@@css
-    "@media (min-width: 600px) {.css-1g5p0x6-mediaInterleaved{color:green;}}"]
-  [@@@css ".css-dhb7kq-mediaInterleaved{color:blue;color:red;}"]
-  [@@@css ".css-odz94x-shorthandReset{margin-top:5px;}"]
-  [@@@css ".css-19xrixt-shorthandReset{margin:0;margin:10px;}"]
-  [@@@css ".css-1e7bukr-nested:hover{color:blue;color:red;}"]
-  [@@@css ".css-mngo80-twice:hover{color:red;}"]
-  [@@@css ".css-zkbrel-custom{--Foo:1px;}"]
-  [@@@css ".css-1r75vyo-custom{--foo:2px;}"]
-  [@@@css ".css-tokvmb-x{color:red;}"]
-  [@@@css ".css-dhb7kq-x{color:blue;color:red;}"]
-  [@@@css ".css-zwzjs7-vars{margin:0;margin:var(--c-kv4uq2);}"]
+    "@media (min-width:600px){.css-1rqnzay-mediaInterleaved{color:green}}"]
+  [@@@css ".css-dhb7kq-mediaInterleaved{color:blue;color:red}"]
+  [@@@css ".css-odz94x-shorthandReset{margin-top:5px}"]
+  [@@@css ".css-19xrixt-shorthandReset{margin:0;margin:10px}"]
+  [@@@css ".css-1jpr8ie-nested:hover{color:blue;color:red}"]
+  [@@@css ".css-nsjhb2-twice:hover{color:red}"]
+  [@@@css ".css-zkbrel-custom{--Foo:1px}"]
+  [@@@css ".css-1r75vyo-custom{--foo:2px}"]
+  [@@@css ".css-tokvmb-x{color:red}"]
+  [@@@css ".css-dhb7kq-x{color:blue;color:red}"]
+  [@@@css ".css-zwzjs7-vars{margin:0;margin:var(--c-kv4uq2)}"]
   [@@@css.bindings
     [("Input.dup", "css-ztpkbn-dup");
     ("Input.fallback", "css-17ax8u2-fallback");
     ("Input.interleaved", "css-1uk1gs8-interleaved css-dhb7kq-interleaved");
     ("Input.mediaInterleaved",
-      "css-1g5p0x6-mediaInterleaved css-dhb7kq-mediaInterleaved");
+      "css-1rqnzay-mediaInterleaved css-dhb7kq-mediaInterleaved");
     ("Input.shorthandReset",
       "css-odz94x-shorthandReset css-19xrixt-shorthandReset");
-    ("Input.nested", "css-1e7bukr-nested");
-    ("Input.twice", "css-mngo80-twice");
+    ("Input.nested", "css-1jpr8ie-nested");
+    ("Input.twice", "css-nsjhb2-twice");
     ("Input.custom", "css-zkbrel-custom css-1r75vyo-custom");
     ("Input.A.x", "css-tokvmb-x");
     ("Input.B.x", "css-dhb7kq-x");
@@ -49,11 +49,11 @@ atom shape and hash.
   let interleaved =
     CSS.make "css-1uk1gs8-interleaved css-dhb7kq-interleaved" []
   let mediaInterleaved =
-    CSS.make "css-1g5p0x6-mediaInterleaved css-dhb7kq-mediaInterleaved" []
+    CSS.make "css-1rqnzay-mediaInterleaved css-dhb7kq-mediaInterleaved" []
   let shorthandReset =
     CSS.make "css-odz94x-shorthandReset css-19xrixt-shorthandReset" []
-  let nested = CSS.make "css-1e7bukr-nested" []
-  let twice = CSS.make "css-mngo80-twice" []
+  let nested = CSS.make "css-1jpr8ie-nested" []
+  let twice = CSS.make "css-nsjhb2-twice" []
   let custom = CSS.make "css-zkbrel-custom css-1r75vyo-custom" []
   module A = struct let x = CSS.make "css-tokvmb-x" [] end
   module B = struct let x = CSS.make "css-dhb7kq-x" [] end

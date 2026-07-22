@@ -15,15 +15,15 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1e77ccc{container-type:normal;}"];
-  [@css ".css-14f6sj7{container-type:size;}"];
-  [@css ".css-3qzm71{container-type:inline-size;}"];
-  [@css ".css-glnlpx{container-name:none;}"];
-  [@css ".css-6zbaxz{container-name:sidebar;}"];
-  [@css ".css-1ctqxl0{container-name:sidebar main;}"];
-  [@css ".css-1use1gg{container:sidebar / inline-size;}"];
-  [@css ".css-vubl4h{container:sidebar / size;}"];
-  [@css ".css-hs1iko{container:none;}"];
+  [@css ".css-1e77ccc{container-type:normal}"];
+  [@css ".css-14f6sj7{container-type:size}"];
+  [@css ".css-3qzm71{container-type:inline-size}"];
+  [@css ".css-glnlpx{container-name:none}"];
+  [@css ".css-6zbaxz{container-name:sidebar}"];
+  [@css ".css-1ctqxl0{container-name:sidebar main}"];
+  [@css ".css-1use1gg{container:sidebar / inline-size}"];
+  [@css ".css-vubl4h{container:sidebar / size}"];
+  [@css ".css-hs1iko{container:none}"];
   
   CSS.make("css-1e77ccc", []);
   CSS.make("css-14f6sj7", []);

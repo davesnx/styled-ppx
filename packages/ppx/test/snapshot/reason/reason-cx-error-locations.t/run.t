@@ -20,4 +20,4 @@ The error should be on line 5, not lines 3-4.
                 ^^^^^
   Error: Property 'display' has an invalid value: 'fley',
          Expected 'block', 'contents', 'flex', 'flow', 'flow-root', 'grid',
-         'inline', 'inline-block', etc. Did you mean 'flex'?
+         'grid-lanes', 'inline', etc. Did you mean 'flex'?

@@ -19,30 +19,30 @@ Selectors covered here:
 
   $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
-  [@@@css ".css-tokvmb-single{color:red;}"]
-  [@@@css ".css-12qnfjo-single:hover{color:blue;}"]
-  [@@@css ".css-tokvmb-twoLevel{color:red;}"]
-  [@@@css ".css-11jzudz-twoLevel:focus-visible::after{content:\"\";}"]
-  [@@@css ".css-tokvmb-twoLevelPseudoClass{color:red;}"]
-  [@@@css ".css-1srf6vm-twoLevelPseudoClass:hover:focus{color:green;}"]
-  [@@@css ".css-tokvmb-threeLevel{color:red;}"]
-  [@@@css ".css-1tfmvqw-threeLevel:hover .child:focus{color:green;}"]
-  [@@@css ".css-tokvmb-descendantUnderPseudo{color:red;}"]
-  [@@@css ".css-nqbkm2-descendantUnderPseudo:hover .child{color:blue;}"]
+  [@@@css ".css-tokvmb-single{color:red}"]
+  [@@@css ".css-k2yaf8-single:hover{color:blue}"]
+  [@@@css ".css-tokvmb-twoLevel{color:red}"]
+  [@@@css ".css-1ueespv-twoLevel:focus-visible::after{content:\"\"}"]
+  [@@@css ".css-tokvmb-twoLevelPseudoClass{color:red}"]
+  [@@@css ".css-13xk8fv-twoLevelPseudoClass:hover:focus{color:green}"]
+  [@@@css ".css-tokvmb-threeLevel{color:red}"]
+  [@@@css ".css-jdr47x-threeLevel:hover .child:focus{color:green}"]
+  [@@@css ".css-tokvmb-descendantUnderPseudo{color:red}"]
+  [@@@css ".css-f3fdep-descendantUnderPseudo:hover .child{color:blue}"]
   [@@@css.bindings
-    [("Input.single", "css-tokvmb-single css-12qnfjo-single");
-    ("Input.twoLevel", "css-tokvmb-twoLevel css-11jzudz-twoLevel");
+    [("Input.single", "css-tokvmb-single css-k2yaf8-single");
+    ("Input.twoLevel", "css-tokvmb-twoLevel css-1ueespv-twoLevel");
     ("Input.twoLevelPseudoClass",
-      "css-tokvmb-twoLevelPseudoClass css-1srf6vm-twoLevelPseudoClass");
-    ("Input.threeLevel", "css-tokvmb-threeLevel css-1tfmvqw-threeLevel");
+      "css-tokvmb-twoLevelPseudoClass css-13xk8fv-twoLevelPseudoClass");
+    ("Input.threeLevel", "css-tokvmb-threeLevel css-jdr47x-threeLevel");
     ("Input.descendantUnderPseudo",
-      "css-tokvmb-descendantUnderPseudo css-nqbkm2-descendantUnderPseudo")]]
-  let single = CSS.make "css-tokvmb-single css-12qnfjo-single" []
-  let twoLevel = CSS.make "css-tokvmb-twoLevel css-11jzudz-twoLevel" []
+      "css-tokvmb-descendantUnderPseudo css-f3fdep-descendantUnderPseudo")]]
+  let single = CSS.make "css-tokvmb-single css-k2yaf8-single" []
+  let twoLevel = CSS.make "css-tokvmb-twoLevel css-1ueespv-twoLevel" []
   let twoLevelPseudoClass =
-    CSS.make "css-tokvmb-twoLevelPseudoClass css-1srf6vm-twoLevelPseudoClass"
+    CSS.make "css-tokvmb-twoLevelPseudoClass css-13xk8fv-twoLevelPseudoClass"
       []
-  let threeLevel = CSS.make "css-tokvmb-threeLevel css-1tfmvqw-threeLevel" []
+  let threeLevel = CSS.make "css-tokvmb-threeLevel css-jdr47x-threeLevel" []
   let descendantUnderPseudo =
     CSS.make
-      "css-tokvmb-descendantUnderPseudo css-nqbkm2-descendantUnderPseudo" []
+      "css-tokvmb-descendantUnderPseudo css-f3fdep-descendantUnderPseudo" []

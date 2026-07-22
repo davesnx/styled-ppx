@@ -3,8 +3,8 @@ open Support
 
 module Property_text_autospace =
   [%spec_module
-  "'none' | 'ideograph-alpha' | 'ideograph-numeric' | 'ideograph-parenthesis' \
-   | 'ideograph-space'",
+  "'normal' | 'auto' | 'none' | 'ideograph-alpha' | 'ideograph-numeric' | \
+   'ideograph-parenthesis' | 'ideograph-space'",
   (module Css_types.TextAutospace)]
 
 let property_text_autospace : property_text_autospace Rule.rule =
@@ -127,8 +127,8 @@ let property_text_decoration_skip : property_text_decoration_skip Rule.rule =
 
 module Property_text_decoration_skip_self =
   [%spec_module
-  "'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' ] \
-   || 'edges' || 'box-decoration'",
+  "'auto' | 'none' | 'objects' || [ 'spaces' | 'leading-spaces' || \
+   'trailing-spaces' ] || 'edges' || 'box-decoration'",
   (module Css_types.TextDecorationSkipSelf)]
 
 let property_text_decoration_skip_self :
@@ -307,7 +307,7 @@ let property_text_wrap : property_text_wrap Rule.rule = Property_text_wrap.rule
 
 module Property_text_spacing_trim =
   [%spec_module
-  "'normal' | 'space-all' | 'space-first' | 'trim-start'",
+  "'auto' | 'normal' | 'space-all' | 'space-first' | 'trim-start'",
   (module Css_types.TextSpacingTrim)]
 
 let property_text_spacing_trim : property_text_spacing_trim Rule.rule =
@@ -337,7 +337,7 @@ let property_text_box_trim : property_text_box_trim Rule.rule =
 
 module Property_text_box_edge =
   [%spec_module
-  "'leading' | 'text' | 'cap' | 'ex' | 'alphabetic'",
+  "'auto' | 'leading' | 'text' | 'cap' | 'ex' | 'alphabetic'",
   (module Css_types.TextBoxEdge)]
 
 let property_text_box_edge : property_text_box_edge Rule.rule =

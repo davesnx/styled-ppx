@@ -18,15 +18,15 @@ top-level interpolation does. If the inline list is empty `[]` for the
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css "@property --c-dq4mhq{syntax:\"*\";inherits:false;}"];
-  [@css "@property --c-11hlefi{syntax:\"*\";inherits:false;}"];
-  [@css ".css-1b5xvk3-topLevel{color:var(--c-dq4mhq);}"];
-  [@css ".css-1orh0hp-hover:hover{color:var(--c-11hlefi);}"];
-  [@css ".css-zjac4l-placeholder::placeholder{color:var(--c-gzgct8);}"];
+  [@css "@property --c-cbbqtk{syntax:\"*\";inherits:false;}"];
+  [@css ".css-1b5xvk3-topLevel{color:var(--c-dq4mhq)}"];
+  [@css ".css-17lhwln-hover:hover{color:var(--c-cbbqtk)}"];
+  [@css ".css-1fg4cp1-placeholder::placeholder{color:var(--c-1x784aw)}"];
   [@css.bindings
     [
       ("Input.topLevel", "css-1b5xvk3-topLevel"),
-      ("Input.hover", "css-1orh0hp-hover"),
-      ("Input.placeholder", "css-zjac4l-placeholder"),
+      ("Input.hover", "css-17lhwln-hover"),
+      ("Input.placeholder", "css-1fg4cp1-placeholder"),
     ]
   ];
   
@@ -40,14 +40,14 @@ top-level interpolation does. If the inline list is empty `[]` for the
   
   let hover =
     CSS.make(
-      "css-1orh0hp-hover",
-      [("--c-11hlefi", CSS.Types.Color.toString(c))],
+      "css-17lhwln-hover",
+      [("--c-cbbqtk", CSS.Types.Color.toString(c))],
     );
   
   let placeholder =
     CSS.make(
-      "css-zjac4l-placeholder",
-      [("--c-gzgct8", CSS.Types.Color.toString(c))],
+      "css-1fg4cp1-placeholder",
+      [("--c-1x784aw", CSS.Types.Color.toString(c))],
     );
   
   let _ = (topLevel, hover, placeholder);

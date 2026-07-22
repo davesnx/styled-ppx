@@ -19,19 +19,19 @@ If this test fail means that the module is not in sync with the ppx
   [@css "@property --line-16iaxxw{syntax:\"*\";inherits:false;}"];
   [@css "@property --selectedMuted-coapl4{syntax:\"*\";inherits:false;}"];
   [@css "@property --flag-r97mq{syntax:\"*\";inherits:false;}"];
-  [@css "@property --elevation1-10w4q1l{syntax:\"*\";inherits:false;}"];
-  [@css "@property --elevation1Bottom-1jgyvpw{syntax:\"*\";inherits:false;}"];
-  [@css "@property --border-16e6nb4{syntax:\"*\";inherits:false;}"];
-  [@css "@property --elevation2-a9z6ve{syntax:\"*\";inherits:false;}"];
-  [@css "@property --border-1pvcfai{syntax:\"*\";inherits:false;}"];
-  [@css "@property --elevation3-u89uz4{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-1fm6v6v_1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-1fm6v6v_2{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-1fm6v6v_3{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-110y8m6_1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-110y8m6_2{syntax:\"*\";inherits:false;}"];
-  [@css "@property --elevation1-s7j1om{syntax:\"*\";inherits:false;}"];
-  [@css "@property --elevation3-1tt1uog{syntax:\"*\";inherits:false;}"];
+  [@css "@property --elevation1-e14iwu{syntax:\"*\";inherits:false;}"];
+  [@css "@property --elevation1Bottom-p0fi15{syntax:\"*\";inherits:false;}"];
+  [@css "@property --border-1ay7772{syntax:\"*\";inherits:false;}"];
+  [@css "@property --elevation2-87fmuj{syntax:\"*\";inherits:false;}"];
+  [@css "@property --border-1ytjbex{syntax:\"*\";inherits:false;}"];
+  [@css "@property --elevation3-1h0xx09{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-gau1ff_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-gau1ff_2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-gau1ff_3{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-1s3q6bg_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-1s3q6bg_2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --elevation1-clddp6{syntax:\"*\";inherits:false;}"];
+  [@css "@property --elevation3-hlqmnb{syntax:\"*\";inherits:false;}"];
   [@css "@property --line-10u4hbk{syntax:\"*\";inherits:false;}"];
   [@css "@property --line-17j5in5{syntax:\"*\";inherits:false;}"];
   [@css "@property --line-jfym6t{syntax:\"*\";inherits:false;}"];
@@ -41,77 +41,77 @@ If this test fail means that the module is not in sync with the ppx
   [@css "@property --line-1i61so0{syntax:\"*\";inherits:false;}"];
   [@css "@property --line-18cgk19{syntax:\"*\";inherits:false;}"];
   [@css "@property --accent-1w0inj7{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-p27yoa_1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-p27yoa_2{syntax:\"*\";inherits:false;}"];
-  [@css ".css-tjsoaq{transition:all 200ms ease 0ms;}"];
-  [@css ".css-9an52v{transition:all 300ms ease-in-out 0ms;}"];
-  [@css ".css-9gb0kb{transition:opacity 300ms ease-in-out 0ms;}"];
-  [@css ".css-1d2ga4{transition:left 0.15s;}"];
-  [@css ".css-9lk53a{transition:opacity 0.5s ease-in-out;}"];
+  [@css "@property --line-k71me3_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-k71me3_2{syntax:\"*\";inherits:false;}"];
+  [@css ".css-tjsoaq{transition:all 200ms ease 0ms}"];
+  [@css ".css-9an52v{transition:all 300ms ease-in-out 0ms}"];
+  [@css ".css-9gb0kb{transition:opacity 300ms ease-in-out 0ms}"];
+  [@css ".css-1d2ga4{transition:left 0.15s}"];
+  [@css ".css-9lk53a{transition:opacity 0.5s ease-in-out}"];
   [@css
-    ".css-1hwm8mm{transition:opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;}"
+    ".css-23e693{transition:opacity 0.2s ease-in-out,visibility 0.2s ease-in-out}"
   ];
   [@css
-    ".css-1dfmtix{transition:width 200ms ease, height 200ms ease, background-color 200ms ease;}"
+    ".css-glrh9f{transition:width 200ms ease,height 200ms ease,background-color 200ms ease}"
   ];
-  [@css ".css-2jhocq{transition:transform 0.3s;}"];
-  [@css ".css-z1xaab{box-shadow:inset 0 -1px 0 0 var(--lineAlpha-14x2350);}"];
-  [@css ".css-k42oj0{box-shadow:inset 1px 0 0 0 var(--line-16iaxxw);}"];
+  [@css ".css-2jhocq{transition:transform 0.3s}"];
+  [@css ".css-z1xaab{box-shadow:inset 0 -1px 0 0 var(--lineAlpha-14x2350)}"];
+  [@css ".css-k42oj0{box-shadow:inset 1px 0 0 0 var(--line-16iaxxw)}"];
   [@css
-    ".css-jfxwmt{box-shadow:inset 0 0 0 1000px var(--selectedMuted-coapl4);}"
+    ".css-jfxwmt{box-shadow:inset 0 0 0 1000px var(--selectedMuted-coapl4)}"
   ];
-  [@css ".css-lirt76{box-shadow:inset 0 0 0 0.5px var(--flag-r97mq);}"];
+  [@css ".css-lirt76{box-shadow:inset 0 0 0 0.5px var(--flag-r97mq)}"];
   [@css
-    ".css-1iayzvr{box-shadow:0 0 0 1px var(--elevation1-10w4q1l), 0 1px 0 0 var(--elevation1Bottom-1jgyvpw);}"
-  ];
-  [@css
-    ".css-13ydyrw{box-shadow:0 0 0 1px var(--border-16e6nb4), 0 2px 4px 0 var(--elevation2-a9z6ve);}"
+    ".css-1ubuobr{box-shadow:0 0 0 1px var(--elevation1-e14iwu),0 1px 0 0 var(--elevation1Bottom-p0fi15)}"
   ];
   [@css
-    ".css-1ga3v0v{box-shadow:0 0 0 1px var(--border-1pvcfai), 0 3px 18px 0 var(--elevation3-u89uz4);}"
+    ".css-wby94f{box-shadow:0 0 0 1px var(--border-1ay7772),0 2px 4px 0 var(--elevation2-87fmuj)}"
   ];
   [@css
-    ".css-w2f2bw{box-shadow:1px 0 0 0 var(--line-1fm6v6v_1), inset 1px 0 0 0 var(--line-1fm6v6v_2), inset 0 -1px 0 0 var(--line-1fm6v6v_3);}"
+    ".css-z27hzh{box-shadow:0 0 0 1px var(--border-1ytjbex),0 3px 18px 0 var(--elevation3-1h0xx09)}"
   ];
   [@css
-    ".css-uatfq{box-shadow:inset 0 1px 0 0 var(--line-110y8m6_1), inset 0 -1px 0 0 var(--line-110y8m6_2);}"
-  ];
-  [@css ".css-k4sr4i{box-shadow:0 1px 3px 0 rgba(0, 0, 0, 0.1);}"];
-  [@css ".css-2ptrw{box-shadow:0px 0px 1px 0 rgba(255, 255, 255, 0.5);}"];
-  [@css
-    ".css-itknjr{box-shadow:0px 1px 1px 0px rgba(49, 46, 29, 0.06), 0px 2px 2px 0px rgba(49, 46, 29, 0.04), 0px 4px 3px 0px rgba(49, 46, 29, 0.02);}"
+    ".css-1l1hnh4{box-shadow:1px 0 0 0 var(--line-gau1ff_1),inset 1px 0 0 0 var(--line-gau1ff_2),inset 0 -1px 0 0 var(--line-gau1ff_3)}"
   ];
   [@css
-    ".css-x09jpc{box-shadow:0 0 0 1px var(--elevation1-s7j1om), 0 3px 18px 0 var(--elevation3-1tt1uog);}"
+    ".css-18f4ma7{box-shadow:inset 0 1px 0 0 var(--line-1s3q6bg_1),inset 0 -1px 0 0 var(--line-1s3q6bg_2)}"
   ];
-  [@css ".css-1q2o3yi{border:1px solid var(--line-10u4hbk);}"];
-  [@css ".css-192yc9x{border:0px none transparent;}"];
-  [@css ".css-11h9vd4{border-top:1px solid var(--line-17j5in5);}"];
-  [@css ".css-pkcjyn{border-bottom:1px solid var(--line-jfym6t);}"];
-  [@css ".css-1ry65jw{border-left:1px solid var(--line-2dnuub);}"];
-  [@css ".css-ypjvaq{border-right:1px solid var(--line-doha9t);}"];
-  [@css ".css-1ismcmj{border:1px dashed var(--line-uf1ggy);}"];
-  [@css ".css-150towz{border:1px none var(--line-1i61so0);}"];
-  [@css ".css-188ct1l{outline:1px solid var(--line-18cgk19);}"];
-  [@css ".css-1xnyi32{outline:2px solid var(--accent-1w0inj7);}"];
+  [@css ".css-1gk5tvq{box-shadow:0 1px 3px 0 rgba(0,0,0,0.1)}"];
+  [@css ".css-lmfvxb{box-shadow:0px 0px 1px 0 rgba(255,255,255,0.5)}"];
   [@css
-    ".css-w1ep28{-webkit-animation:helpMenuFadeIn 0.18s ease-in-out forwards;animation:helpMenuFadeIn 0.18s ease-in-out forwards;}"
+    ".css-ampzek{box-shadow:0px 1px 1px 0px rgba(49,46,29,0.06),0px 2px 2px 0px rgba(49,46,29,0.04),0px 4px 3px 0px rgba(49,46,29,0.02)}"
   ];
   [@css
-    ".css-d9hwlt{-webkit-animation:helpMenuFadeOut 0.08s ease-out forwards;animation:helpMenuFadeOut 0.08s ease-out forwards;}"
+    ".css-10ubr3p{box-shadow:0 0 0 1px var(--elevation1-clddp6),0 3px 18px 0 var(--elevation3-hlqmnb)}"
+  ];
+  [@css ".css-1q2o3yi{border:1px solid var(--line-10u4hbk)}"];
+  [@css ".css-192yc9x{border:0px none transparent}"];
+  [@css ".css-11h9vd4{border-top:1px solid var(--line-17j5in5)}"];
+  [@css ".css-pkcjyn{border-bottom:1px solid var(--line-jfym6t)}"];
+  [@css ".css-1ry65jw{border-left:1px solid var(--line-2dnuub)}"];
+  [@css ".css-ypjvaq{border-right:1px solid var(--line-doha9t)}"];
+  [@css ".css-1ismcmj{border:1px dashed var(--line-uf1ggy)}"];
+  [@css ".css-150towz{border:1px none var(--line-1i61so0)}"];
+  [@css ".css-188ct1l{outline:1px solid var(--line-18cgk19)}"];
+  [@css ".css-1xnyi32{outline:2px solid var(--accent-1w0inj7)}"];
+  [@css
+    ".css-w1ep28{-webkit-animation:helpMenuFadeIn 0.18s ease-in-out forwards;animation:helpMenuFadeIn 0.18s ease-in-out forwards}"
   ];
   [@css
-    ".css-1ir9788{transition:height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);}"
+    ".css-d9hwlt{-webkit-animation:helpMenuFadeOut 0.08s ease-out forwards;animation:helpMenuFadeOut 0.08s ease-out forwards}"
   ];
   [@css
-    ".css-fwdrfx{transition:height 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);}"
+    ".css-1qtqgil{transition:height 0.5s cubic-bezier(0.25,0.46,0.45,0.94),opacity 0.5s cubic-bezier(0.25,0.46,0.45,0.94)}"
   ];
-  [@css ".css-qg0an3{box-shadow:inset 1px 0 0 0 transparent  !important;}"];
-  [@css ".css-etybat{box-shadow:1px 0 0 0 black  !important;}"];
   [@css
-    ".css-96uk0n{box-shadow:1px 0 0 0 var(--line-p27yoa_1), inset 0 -1px 0 0 var(--line-p27yoa_2)  !important;}"
+    ".css-1bp63cu{transition:height 0.6s cubic-bezier(0.4,0,0.2,1),opacity 0.6s cubic-bezier(0.4,0,0.2,1)}"
   ];
-  [@css ".css-1vsc0qv{transition:transform 0.3s  !important;}"];
+  [@css ".css-1imssjd{box-shadow:inset 1px 0 0 0 transparent!important}"];
+  [@css ".css-mqj167{box-shadow:1px 0 0 0 black!important}"];
+  [@css
+    ".css-cyxgg6{box-shadow:1px 0 0 0 var(--line-k71me3_1),inset 0 -1px 0 0 var(--line-k71me3_2)!important}"
+  ];
+  [@css ".css-7e6ar4{transition:transform 0.3s!important}"];
   module Color = {
     module Border = {
       let line = `rgba((0, 0, 0, `num(0.1)));
@@ -137,8 +137,8 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.make("css-1d2ga4", []);
   CSS.make("css-9lk53a", []);
-  CSS.make("css-1hwm8mm", []);
-  CSS.make("css-1dfmtix", []);
+  CSS.make("css-23e693", []);
+  CSS.make("css-glrh9f", []);
   CSS.make("css-2jhocq", []);
   
   CSS.make(
@@ -166,67 +166,67 @@ If this test fail means that the module is not in sync with the ppx
   );
   
   CSS.make(
-    "css-1iayzvr",
+    "css-1ubuobr",
     [
       (
-        "--elevation1-10w4q1l",
+        "--elevation1-e14iwu",
         CSS.Types.Color.toString(Color.Shadow.elevation1),
       ),
       (
-        "--elevation1Bottom-1jgyvpw",
+        "--elevation1Bottom-p0fi15",
         CSS.Types.Color.toString(Color.Shadow.elevation1Bottom),
       ),
     ],
   );
   CSS.make(
-    "css-13ydyrw",
+    "css-wby94f",
     [
-      ("--border-16e6nb4", CSS.Types.Color.toString(Color.Shadow.border)),
+      ("--border-1ay7772", CSS.Types.Color.toString(Color.Shadow.border)),
       (
-        "--elevation2-a9z6ve",
+        "--elevation2-87fmuj",
         CSS.Types.Color.toString(Color.Shadow.elevation2),
       ),
     ],
   );
   CSS.make(
-    "css-1ga3v0v",
+    "css-z27hzh",
     [
-      ("--border-1pvcfai", CSS.Types.Color.toString(Color.Shadow.border)),
+      ("--border-1ytjbex", CSS.Types.Color.toString(Color.Shadow.border)),
       (
-        "--elevation3-u89uz4",
+        "--elevation3-1h0xx09",
         CSS.Types.Color.toString(Color.Shadow.elevation3),
       ),
     ],
   );
   
   CSS.make(
-    "css-w2f2bw",
+    "css-1l1hnh4",
     [
-      ("--line-1fm6v6v_1", CSS.Types.Color.toString(Color.Border.line)),
-      ("--line-1fm6v6v_2", CSS.Types.Color.toString(Color.Border.line)),
-      ("--line-1fm6v6v_3", CSS.Types.Color.toString(Color.Border.line)),
+      ("--line-gau1ff_1", CSS.Types.Color.toString(Color.Border.line)),
+      ("--line-gau1ff_2", CSS.Types.Color.toString(Color.Border.line)),
+      ("--line-gau1ff_3", CSS.Types.Color.toString(Color.Border.line)),
     ],
   );
   CSS.make(
-    "css-uatfq",
+    "css-18f4ma7",
     [
-      ("--line-110y8m6_1", CSS.Types.Color.toString(Color.Border.line)),
-      ("--line-110y8m6_2", CSS.Types.Color.toString(Color.Border.line)),
+      ("--line-1s3q6bg_1", CSS.Types.Color.toString(Color.Border.line)),
+      ("--line-1s3q6bg_2", CSS.Types.Color.toString(Color.Border.line)),
     ],
   );
   
-  CSS.make("css-k4sr4i", []);
-  CSS.make("css-2ptrw", []);
-  CSS.make("css-itknjr", []);
+  CSS.make("css-1gk5tvq", []);
+  CSS.make("css-lmfvxb", []);
+  CSS.make("css-ampzek", []);
   CSS.make(
-    "css-x09jpc",
+    "css-10ubr3p",
     [
       (
-        "--elevation1-s7j1om",
+        "--elevation1-clddp6",
         CSS.Types.Color.toString(Color.Shadow.elevation1),
       ),
       (
-        "--elevation3-1tt1uog",
+        "--elevation3-hlqmnb",
         CSS.Types.Color.toString(Color.Shadow.elevation3),
       ),
     ],
@@ -274,20 +274,20 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-w1ep28", []);
   CSS.make("css-d9hwlt", []);
   
-  CSS.make("css-1ir9788", []);
-  CSS.make("css-fwdrfx", []);
+  CSS.make("css-1qtqgil", []);
+  CSS.make("css-1bp63cu", []);
   
-  CSS.make("css-qg0an3", []);
-  CSS.make("css-etybat", []);
+  CSS.make("css-1imssjd", []);
+  CSS.make("css-mqj167", []);
   CSS.make(
-    "css-96uk0n",
+    "css-cyxgg6",
     [
-      ("--line-p27yoa_1", CSS.Types.Color.toString(Color.Border.line)),
-      ("--line-p27yoa_2", CSS.Types.Color.toString(Color.Border.line)),
+      ("--line-k71me3_1", CSS.Types.Color.toString(Color.Border.line)),
+      ("--line-k71me3_2", CSS.Types.Color.toString(Color.Border.line)),
     ],
   );
   
-  CSS.make("css-1vsc0qv", []);
+  CSS.make("css-7e6ar4", []);
   
   let _shadow1: CSS.Shadow.box =
     CSS.Shadow.box(~blur=`px(100), `hex("000000"), ~inset=true);

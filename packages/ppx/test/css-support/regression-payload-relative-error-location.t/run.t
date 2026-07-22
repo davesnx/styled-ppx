@@ -53,5 +53,5 @@ when the [%css] block sits several lines below the top of the file.
   File "media.re", line 7, characters 8-23:
   7 |   @media $(breakpoint) {
               ^^^^^^^^^^^^^^^
-  Error: Interpolation in @media preludes is not supported during static extraction. CSS custom properties (var()) are not valid in media query conditions. Inline the value directly.
+  Error: Interpolation is not supported in @media preludes: `$(x)` compiles to a CSS custom property (var(--x)), and var() is not valid in @media conditions. Write the value literally.
   [1]

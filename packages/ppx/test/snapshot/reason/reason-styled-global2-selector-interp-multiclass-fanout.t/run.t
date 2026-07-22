@@ -2,11 +2,11 @@
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css
-    "body .css-k008qs-multi.css-tokvmb-multi.css-eaeacs-multi{font-weight:bold;}"
+    "body .css-k008qs-multi.css-tokvmb-multi.css-eaeacs-multi{font-weight:bold}"
   ];
-  [@css ".css-k008qs-multi{display:flex;}"];
-  [@css ".css-tokvmb-multi{color:red;}"];
-  [@css ".css-eaeacs-multi{margin:10px;}"];
+  [@css ".css-k008qs-multi{display:flex}"];
+  [@css ".css-tokvmb-multi{color:red}"];
+  [@css ".css-eaeacs-multi{margin:10px}"];
   [@css.bindings
     [("Output.multi", "css-k008qs-multi css-tokvmb-multi css-eaeacs-multi")]
   ];

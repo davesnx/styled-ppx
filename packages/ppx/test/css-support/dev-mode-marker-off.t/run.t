@@ -14,9 +14,9 @@ the flag omitted, locking in that the marker is purely opt-in.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-k008qs-layout{display:flex;}"];
-  [@css ".css-38zrbw-layout{padding:12px;}"];
-  [@css ".css-tokvmb-button{color:red;}"];
+  [@css ".css-k008qs-layout{display:flex}"];
+  [@css ".css-38zrbw-layout{padding:12px}"];
+  [@css ".css-tokvmb-button{color:red}"];
   [@css.bindings
     [
       ("Input.layout", "css-k008qs-layout css-38zrbw-layout"),

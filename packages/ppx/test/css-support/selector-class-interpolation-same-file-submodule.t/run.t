@@ -13,27 +13,27 @@ emitted as a cross-module sentinel.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb-marker{color:red;}"];
-  [@css ".css-3qknr-wrapper.css-tokvmb-marker{color:orange;}"];
-  [@css ".css-cb06ec-wrapper.css-tokvmb-marker{font-weight:bold;}"];
-  [@css ".css-bjcoli-marker{color:green;}"];
-  [@css ".css-59bkuc-wrapper.css-bjcoli-marker{color:blue;}"];
+  [@css ".css-tokvmb-marker{color:red}"];
+  [@css ".css-1d10kse-wrapper.css-tokvmb-marker{color:orange}"];
+  [@css ".css-r94a22-wrapper.css-tokvmb-marker{font-weight:bold}"];
+  [@css ".css-bjcoli-marker{color:green}"];
+  [@css ".css-1qkp8g0-wrapper.css-bjcoli-marker{color:blue}"];
   [@css.bindings
     [
       ("Input.Css.marker", "css-tokvmb-marker"),
-      ("Input.Css.wrapper", "css-3qknr-wrapper"),
-      ("Input.wrapper", "css-cb06ec-wrapper"),
+      ("Input.Css.wrapper", "css-1d10kse-wrapper"),
+      ("Input.wrapper", "css-r94a22-wrapper"),
       ("Input.Theme.Css.marker", "css-bjcoli-marker"),
-      ("Input.Theme.Components.wrapper", "css-59bkuc-wrapper"),
+      ("Input.Theme.Components.wrapper", "css-1qkp8g0-wrapper"),
     ]
   ];
   module Css = {
     let marker = CSS.make("css-tokvmb-marker", []);
   
-    let wrapper = CSS.make("css-3qknr-wrapper", []);
+    let wrapper = CSS.make("css-1d10kse-wrapper", []);
   };
   
-  let wrapper = CSS.make("css-cb06ec-wrapper", []);
+  let wrapper = CSS.make("css-r94a22-wrapper", []);
   
   module Theme = {
     module Css = {
@@ -41,7 +41,7 @@ emitted as a cross-module sentinel.
     };
   
     module Components = {
-      let wrapper = CSS.make("css-59bkuc-wrapper", []);
+      let wrapper = CSS.make("css-1qkp8g0-wrapper", []);
     };
   };
   

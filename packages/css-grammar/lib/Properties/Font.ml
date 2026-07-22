@@ -55,9 +55,11 @@ module Property_font_optical_sizing =
 let property_font_optical_sizing : property_font_optical_sizing Rule.rule =
   Property_font_optical_sizing.rule
 
+(* TODO(#585): the spec also allows <palette-mix()>; add it once the
+   function type exists in the grammar. *)
 module Property_font_palette =
   [%spec_module
-  "'normal' | 'light' | 'dark'", (module Css_types.FontPalette)]
+  "'normal' | 'light' | 'dark' | <dashed-ident>", (module Css_types.FontPalette)]
 
 let property_font_palette : property_font_palette Rule.rule =
   Property_font_palette.rule
@@ -65,7 +67,7 @@ let property_font_palette : property_font_palette Rule.rule =
 module Property_font_size =
   [%spec_module
   "<absolute-size> | <relative-size> | <extended-length> | \
-   <extended-percentage>",
+   <extended-percentage> | 'math'",
   (module Css_types.FontSize)]
 
 let property_font_size : property_font_size Rule.rule = Property_font_size.rule
