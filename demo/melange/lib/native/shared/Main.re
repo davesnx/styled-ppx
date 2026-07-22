@@ -101,6 +101,81 @@ let gradiend = [%css
     |}
 ];
 
+/* --- Atomic ordering experiments ------------------------------------- */
+
+/* The same `color` declaration under @media, @container and @supports
+   produces three independent atoms. All of them have the same specificity
+   (single class), so the order they end up in the stylesheet decides the
+   winner when several queries match at once. */
+let queryOrder = [%css
+  {|
+  color: black;
+
+  @media (min-width: 400px) {
+    color: red;
+  }
+
+  @container (width > 400px) {
+    color: green;
+  }
+
+  @supports (display: flex) {
+    color: blue;
+  }
+|}
+];
+
+/* Exactly the same atoms, declared in the opposite order. Atomic dedup
+   keeps only the FIRST occurrence of each rule, so this binding cannot
+   express "media should win over supports": it resolves to the same
+   classes, in `queryOrder`'s stylesheet order. */
+let queryOrderReversed = [%css
+  {|
+  color: black;
+
+  @supports (display: flex) {
+    color: blue;
+  }
+
+  @container (width > 400px) {
+    color: green;
+  }
+
+  @media (min-width: 400px) {
+    color: red;
+  }
+|}
+];
+
+/* `a:link` vs `a:nth-child(odd)`: both selectors have specificity (0,2,1)
+   once prefixed with the atomic class, so for the first <a> (an odd child
+   that is also an unvisited link) the stylesheet order is the tie-breaker. */
+let linkFirst = [%css
+  {|
+  & a:link {
+    color: orange;
+  }
+
+  & a:nth-child(odd) {
+    color: teal;
+  }
+|}
+];
+
+/* Same two selector atoms, reversed. After dedup both bindings share the
+   same classes, so the intended "link wins" ordering here is lost. */
+let nthFirst = [%css
+  {|
+  & a:nth-child(odd) {
+    color: teal;
+  }
+
+  & a:link {
+    color: orange;
+  }
+|}
+];
+
 let primary = CSS.hex("141414");
 
 let keyframeDemoShell = color => [%css
@@ -170,5 +245,23 @@ let make = () =>
     <section styles=stack>
       <div styles=clx> {React.string("code everywhere!")} </div>
       <div styles=selectors> {React.string("Red text")} </div>
+    </section>
+    <section styles=post>
+      <h2> {React.string("Atomic ordering: at-rules")} </h2>
+      <p styles=queryOrder>
+        {React.string("media -> container -> supports (source order)")}
+      </p>
+      <p styles=queryOrderReversed>
+        {React.string("supports -> container -> media (reversed source)")}
+      </p>
+    </section>
+    <section>
+      <h2> {React.string("Atomic ordering: selectors")} </h2>
+      <ul styles=linkFirst>
+        <li> <a href="#"> {React.string("a:link then a:nth-child")} </a> </li>
+      </ul>
+      <ul styles=nthFirst>
+        <li> <a href="#"> {React.string("a:nth-child then a:link")} </a> </li>
+      </ul>
     </section>
   </main>;
