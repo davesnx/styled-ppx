@@ -77,7 +77,12 @@ let styles = CSS.merge button (if active then highlight else CSS.empty)
 
 If you come from emotion or styled-components, this is the one semantic to relearn: **`CSS.merge` argument order does not decide which declaration wins.**
 
-Every extracted rule is atomic (a single class), so all rules have the same specificity. When two atoms set the same property, the CSS cascade breaks the tie by **stylesheet order**: later wins. And the stylesheet preserves the order your `[%css]` blocks appear in your source. In emotion, `cx(base, override)` guarantees the override wins because emotion re-serializes at runtime; here `CSS.merge(base, override)` and `CSS.merge(override, base)` render identically, because only source position matters.
+Every extracted rule is atomic (a single class), so all rules have the same specificity. When two atoms set the same property, the CSS cascade breaks the tie by **stylesheet order**: later wins. In emotion, `cx(base, override)` guarantees the override wins because emotion re-serializes at runtime; here `CSS.merge(base, override)` and `CSS.merge(override, base)` render identically, because only stylesheet position matters.
+
+Stylesheet position follows two rules:
+
+1. **Buckets**: rules are grouped by kind, in a fixed order — base declarations, then pseudo-classes (structural, then `:link` → `:visited` → `:focus-within` → `:hover` → `:focus` → `:focus-visible` → `:active`), then pseudo-elements, then `@supports`, `@media` (sorted `min-width` ascending, `max-width` descending), `@container`, `@starting-style`. So `&:hover` always overrides the rest state, and a wider `min-width` always overrides a narrower one, regardless of where they're written.
+2. **Source order within a bucket**: two rules of the same kind (e.g. two plain `background-color` atoms) keep the order your `[%css]` blocks appear in your source.
 
 ```reason
 let danger = [%css "background-color: red"];  /* defined FIRST */
@@ -99,7 +104,7 @@ let a = <div styles=(CSS.merge button danger) />
 let b = <div styles=(CSS.merge danger button) />
 ```
 
-The convention to follow: **define base styles before the styles that override them**. That applies within a module, and for cross-module overrides, in a module compiled later. When an override doesn't stick, check the definition order first; the binding labels in class names (`css-<hash>-danger`) show in DevTools exactly which binding each winning declaration came from.
+The convention to follow: **define base styles before the styles that override them**. That applies within a module, and for cross-module overrides, in a module compiled later. It only matters for rules in the same bucket — at-rule and pseudo-class precedence is fixed by the bucket order above. When an override doesn't stick, check the definition order first; the binding labels in class names (`css-<hash>-danger`) show in DevTools exactly which binding each winning declaration came from.
 
 ### Patterns
 

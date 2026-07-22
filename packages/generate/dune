@@ -1,7 +1,7 @@
 (executable
  (name generate)
  (public_name styled-ppx.generate)
- (modules generate)
+ (modules generate css_bucket)
  (libraries styled-ppx css_extraction ppxlib ppxlib.astlib)
  (preprocess
   (pps ppxlib.metaquot)))

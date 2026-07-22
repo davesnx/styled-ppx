@@ -15,7 +15,13 @@ See also:
 
 ## Status
 
-- Proposal. Not implemented.
+- **Phase 1 implemented**: bucket classification + stable sort live in
+  `packages/generate/css_bucket.ml`, on by default (`--sort source` is the
+  one-release escape hatch). Within-bucket order is first-occurrence.
+  Tests: `packages/generate/test/bucket-*.t`.
+- Phase 2 (property-keyed merge, label removal, hash tiebreak, sealed
+  carrier) is design-complete but not implemented; groundwork landed (see
+  "Phase 2 direction").
 - Evidence gathered from `demo/melange` (bindings `queryOrder`,
   `queryOrderReversed`, `linkFirst`, `nthFirst` in
   `demo/melange/lib/native/shared/Main.re`).
@@ -167,7 +173,9 @@ Within bucket 14, parse the condition for a single `min-width`/`max-width`
 - `min-width` atoms sort ascending (mobile-first: wider wins),
 - `max-width` atoms sort *after* min-width atoms, descending
   (desktop-first: narrower wins),
-- unparseable/mixed conditions sort last, by raw condition string.
+- unparseable/mixed conditions (e.g. `print`, `orientation`, non-length
+  units) sort last, keeping first-occurrence order among themselves
+  (phase 1 keeps ties author-ordered; see "Within-bucket ordering").
 
 This is the `postcss-sort-media-queries` convention. Same scheme applies to
 `@container` with `width`-based conditions.

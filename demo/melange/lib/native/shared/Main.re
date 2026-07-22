@@ -105,8 +105,11 @@ let gradiend = [%css
 
 /* The same `color` declaration under @media, @container and @supports
    produces three independent atoms. All of them have the same specificity
-   (single class), so the order they end up in the stylesheet decides the
-   winner when several queries match at once. */
+   (single class), so stylesheet order decides the winner when several
+   queries match at once. The aggregator emits deterministic buckets
+   (@supports < @media < @container — see
+   documents/atomic-css-ordering.md), so the declaration order below does
+   not affect the output. */
 let queryOrder = [%css
   {|
   color: black;
@@ -125,10 +128,11 @@ let queryOrder = [%css
 |}
 ];
 
-/* Exactly the same atoms, declared in the opposite order. Atomic dedup
-   keeps only the FIRST occurrence of each rule, so this binding cannot
-   express "media should win over supports": it resolves to the same
-   classes, in `queryOrder`'s stylesheet order. */
+/* Exactly the same atoms, declared in the opposite order. Both bindings
+   dedup to the same classes and converge on the same bucket order: when
+   all three conditions match, @container wins for both elements. Atomic
+   CSS cannot express per-binding at-rule precedence — predictability over
+   expressiveness. */
 let queryOrderReversed = [%css
   {|
   color: black;
@@ -149,7 +153,9 @@ let queryOrderReversed = [%css
 
 /* `a:link` vs `a:nth-child(odd)`: both selectors have specificity (0,2,1)
    once prefixed with the atomic class, so for the first <a> (an odd child
-   that is also an unvisited link) the stylesheet order is the tie-breaker. */
+   that is also an unvisited link) stylesheet order is the tie-breaker.
+   Buckets rank structural pseudos before LVFHA, so :link wins — in both
+   declaration orders. */
 let linkFirst = [%css
   {|
   & a:link {
@@ -162,8 +168,8 @@ let linkFirst = [%css
 |}
 ];
 
-/* Same two selector atoms, reversed. After dedup both bindings share the
-   same classes, so the intended "link wins" ordering here is lost. */
+/* Same two selector atoms, reversed. Both bindings share the same classes
+   and the same bucket order, so both lists render identically. */
 let nthFirst = [%css
   {|
   & a:nth-child(odd) {
