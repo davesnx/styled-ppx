@@ -1,5 +1,3 @@
-/* Invalid UTF-8 in a CSS payload must produce a located error, not a
-   compiler crash. The \xe9 escape puts a raw non-UTF-8 byte in the payload
-   while this file itself stays valid ASCII. */
+/* \xe9 inserts one invalid UTF-8 byte into the CSS payload. */
 
 let broken = [%css "content: \"caf\xe9\""];

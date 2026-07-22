@@ -1,6 +1,4 @@
 (library
  (name murmur2)
- ; Package-private: installed with styled-ppx (the ppx links it) but not
- ; exposed as a findlib library. The hash is an implementation detail of
- ; class-name generation, not public API.
+ ; Private PPX dependency used for class-name generation.
  (package styled-ppx))

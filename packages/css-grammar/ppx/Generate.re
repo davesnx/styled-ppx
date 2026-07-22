@@ -284,15 +284,9 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
   /* Check if a name is a standard spec. */
   let is_standard_spec = name => List.mem_assoc(name, spec_names);
 
-  /* The registry prefix for <'property'> reference keys. */
   let property_registry_prefix = "property_";
 
-  /* The runtime registry key a terminal resolves through at parse time, or
-     [None] when it compiles to a direct [Css_value_types] reference and never
-     touches the registry. Single source of truth for which lookups generated
-     parsers can perform: [terminal_op] emits from it and
-     bin/registry_closure_check re-derives keys with it, so the checker cannot
-     drift from the codegen. */
+  /* Return the key used by generated lookups and the closure check, if any. */
   let registry_key_of_terminal = kind =>
     switch (kind) {
     | Data_type(name, _) =>
@@ -566,10 +560,7 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
         | Data_type(name, _)
         | Property_type(name) =>
           switch (registry_key_of_terminal(kind)) {
-          | Some(key) =>
-            // Runtime lookup by registry key: CSS-style hyphenated names for
-            // data types, "property_"-prefixed keys for property references
-            eapply(evar("lookup"), [estring(key)])
+          | Some(key) => eapply(evar("lookup"), [estring(key)])
           | None => "Css_value_types." ++ value_name_of_css(name) |> evar
           }
         };

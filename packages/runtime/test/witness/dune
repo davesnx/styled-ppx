@@ -1,11 +1,5 @@
-; Runtime witness conformance check.
-;
-; gen_css_types_witnesses.exe walks the css-grammar registry and prints
-; css_types_witnesses.ml, which references every property-level runtime
-; witness path (Css_types.<Module>) declared via [%spec_module]. Compiling
-; the generated file against styled-ppx.native is the check itself: a stale
-; or missing witness path becomes a compile error under @runtest, @check and
-; @test-runtime.
+; Generate and compile property-level runtime witness references. Missing
+; modules and incompatible unary toString functions fail the build.
 
 (executable
  (name gen_css_types_witnesses)

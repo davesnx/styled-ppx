@@ -356,17 +356,15 @@ let parse_wq_name stream =
 (* -- An+B microsyntax (nth payloads) -- *)
 
 type nth_suffix =
-  | Nth_suffix_n (* "n" *)
-  | Nth_suffix_n_dash (* "n-", must be followed by a signless integer *)
-  | Nth_suffix_n_dash_digits of int (* "n-<digits>", carries b *)
+  | Nth_suffix_n
+  | Nth_suffix_n_dash (* requires a following integer *)
+  | Nth_suffix_n_dash_digits of int (* b from n-<digits> *)
 
 let raise_invalid_nth function_name (token : token_with_location) =
   let message = Printf.sprintf "Invalid an+b value in :%s()" function_name in
   raise (Parse_error (token.start_pos, token.end_pos, message))
 
-(* an+b coefficients are integers, but the lexer produces floats. Reject
-   values that are not integral or are too large for floats to represent
-   integers exactly, instead of silently truncating with [int_of_float]. *)
+(* Reject fractional or inexact float coefficients before converting to int. *)
 let nth_int_of_number function_name (token : token_with_location) value =
   let max_exact_float_int =
     9007199254740992.
@@ -378,9 +376,7 @@ let nth_int_of_number function_name (token : token_with_location) value =
 
 let is_ascii_digit = function '0' .. '9' -> true | _ -> false
 
-(* Parse the "<digits>" of an "n-<digits>" unit or ident. [int_of_string]
-   alone would also accept signs, underscores and hex ("0x10"); CSS only
-   allows ASCII digits. [int_of_string_opt] still guards against overflow. *)
+(* Accept only non-empty ASCII digits; [int_of_string_opt] handles overflow. *)
 let nth_int_of_digits function_name (token : token_with_location) digits =
   if String.length digits > 0 && String.for_all is_ascii_digit digits then (
     match int_of_string_opt digits with
@@ -388,10 +384,7 @@ let nth_int_of_digits function_name (token : token_with_location) digits =
     | None -> raise_invalid_nth function_name token)
   else raise_invalid_nth function_name token
 
-(* Classify the ident part of an an+b payload after the optional leading
-   '-': "n", "n-" or "n-<digits>" (ASCII case-insensitive; only the leading
-   'n' is cased, '-' and digits are not). Anything else (e.g. the unit of
-   "2px" or the ident "n-abc") is invalid. *)
+(* Accept "n", "n-", or "n-<digits>", with ASCII-case-insensitive "n". *)
 let classify_nth_suffix function_name (token : token_with_location) suffix =
   let length = String.length suffix in
   if length = 0 || (suffix.[0] <> 'n' && suffix.[0] <> 'N') then
@@ -405,14 +398,11 @@ let classify_nth_suffix function_name (token : token_with_location) suffix =
 
 let parse_nth_payload ~function_name stream =
   skip_whitespace stream;
-  (* Parses the optional b part once [a] and its "n"-ish suffix are known,
-     from either a DIMENSION unit ("2n", "2n-", "2n-3") or an IDENT ("n",
-     "-n", "n-", "n-3", ...). *)
   let parse_after_n a suffix =
     match suffix with
     | Nth_suffix_n_dash_digits b -> Ast.Nth (ANB (a, "-", b))
     | Nth_suffix_n_dash ->
-      (* "an-" must be followed by a signless integer: b is negative. *)
+      (* "an-" followed by a signless integer represents a negative b. *)
       skip_whitespace stream;
       begin match current_tok stream with
       | Tokens.NUMBER value ->

@@ -2,10 +2,7 @@
  (names registry_dump registry_closure_check)
  (libraries Css_grammar css_spec_parser css_grammar_ppx_generate ppxlib))
 
-; Registry closure check: every <data-type>/<'property'> reference in the
-; grammar sources must resolve in the rule registry. A dangling reference
-; compiles fine but crashes the compiler at parse time with
-; "Rule not found in registry", so catch it here instead.
+; Fail if a grammar spec references a missing registry key.
 
 (rule
  (aliases runtest test-css-grammar)

@@ -875,11 +875,7 @@ let rec consume_token = lexbuf => {
   };
 };
 
-/* Sedlex decodes the UTF-8 input lazily while lexing and raises [MalFormed]
-   on the first byte that is not valid UTF-8 (or [InvalidCodepoint] for
-   out-of-range code points). At that moment the current position is exactly
-   the offending byte, so surface it as a located [LexingError] instead of
-   letting the exception crash the caller. */
+/* Convert sedlex UTF-8 failures into located lexer errors. */
 let invalid_utf8 = lexbuf => {
   let (_, error_pos) = Sedlexing.lexing_positions(lexbuf);
   let error_end = {

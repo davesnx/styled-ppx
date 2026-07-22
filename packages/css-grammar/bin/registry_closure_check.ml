@@ -1,29 +1,12 @@
-(* Registry closure check.
-
-   The css-grammar ppx compiles <data-type> and <'property'> references inside
-   [%spec]/[%spec_module] payloads into runtime registry lookups
-   (Support.lookup). A reference whose key is missing from the registry
-   compiles fine and only crashes later, at parse time, with
-   "Rule not found in registry: <key>" - an unlocated compiler crash for
-   whoever writes CSS that exercises the branch (see the historic
-   <webkit-gradient-type> vs "-webkit-gradient-type" mismatch).
-
-   This binary re-derives every lookup key the generated parsers can request
-   and asserts each one resolves in the registry, turning that bug class into
-   a CI failure. It takes the grammar sources as arguments, extracts every
-   [%spec]/[%spec_module] payload, and applies the exact key derivation the
-   ppx applies (reusing Generate.Make, so the check cannot drift from it).
+(* Checks that registry-backed references in [%spec] and [%spec_module]
+   payloads resolve.
 
    Usage: registry_closure_check <file.ml|file.re>... *)
 
-(* Instantiate the ppx code generator to reuse [registry_key_of_terminal],
-   the same key derivation [terminal_op] emits lookups from. No code is
-   generated. *)
+(* Reuse the key derivation used by generated parser lookups. *)
 module G = Generate.Make ((val Ppxlib.Ast_builder.make Ppxlib.Location.none))
 
-(* Referencing [Css_grammar.registry] (re-exported from Registry) forces
-   linkage of the Registry module, whose top-level initializers populate
-   [registry_tbl]. *)
+(* Force [Registry] initialization before reading [registry_tbl]. *)
 let () = assert (Css_grammar.registry <> [])
 let errors = ref 0
 let specs_checked = ref 0
@@ -37,9 +20,6 @@ let report fmt =
       prerr_endline message)
     fmt
 
-(* Key derivation is shared with the ppx: [G.registry_key_of_terminal] is
-   exactly what [Generate.terminal_op] emits [lookup] calls from, so the
-   check cannot drift from the codegen. *)
 let rec required_keys (spec : Css_spec_parser.value) : string list =
   match spec with
   | Terminal (kind, _) -> Option.to_list (G.registry_key_of_terminal kind)
@@ -51,9 +31,7 @@ let spec_string_of_payload (payload : Ppxlib.payload) : string option =
   match payload with
   | PStr [ { pstr_desc = Pstr_eval (expr, _); _ } ] ->
     (match expr.pexp_desc with
-    (* [%spec_module "..."] and [%spec "..."] *)
     | Pexp_constant (Pconst_string (spec, _, _)) -> Some spec
-    (* [%spec_module "...", (module M)] *)
     | Pexp_tuple
         ({ pexp_desc = Pexp_constant (Pconst_string (spec, _, _)); _ } :: _) ->
       Some spec
@@ -73,8 +51,7 @@ let collect_specs (structure : Ppxlib.structure) ~path : (int * string) list =
           (match spec_string_of_payload payload with
           | Some spec -> specs := (line, spec) :: !specs
           | None ->
-            (* Fail closed: a payload this check cannot read is a hole in the
-               closure guarantee. *)
+            (* Reject unsupported payload shapes instead of skipping them. *)
             report
               "%s:%d: unrecognized [%%%s] payload; extend \
                registry_closure_check"
@@ -122,9 +99,7 @@ let check_ocaml_file path =
   in
   List.iter (check_spec ~path) (collect_specs structure ~path)
 
-(* The grammar is written in OCaml syntax today. If a spec ever lands in a
-   Reason source this check cannot parse it, so fail loudly instead of
-   silently shrinking the closure guarantee. *)
+(* Reject Reason sources containing [%spec]; this checker only parses OCaml. *)
 let check_reason_file path =
   let contents = In_channel.with_open_text path In_channel.input_all in
   if contains_substring contents "[%spec" then
@@ -134,8 +109,6 @@ let check_reason_file path =
        Reason syntax."
       path
 
-(* The rule in ./dune passes the whole lib source tree; only grammar sources
-   can carry [%spec]/[%spec_module] payloads. *)
 let check_file path =
   if Filename.check_suffix path ".ml" then check_ocaml_file path
   else if Filename.check_suffix path ".re" then check_reason_file path

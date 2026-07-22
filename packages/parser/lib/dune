@@ -1,6 +1,5 @@
 (library
  (name styled_ppx_css_parser)
- ; Package-private: internal machinery of the PPX, not public API.
  (package styled-ppx)
  (libraries
   sedlex

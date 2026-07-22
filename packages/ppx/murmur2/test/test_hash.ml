@@ -53,5 +53,5 @@ let tests =
     data
 
 let () =
-  Alcotest.run ~show_errors:true ~compact:true ~tail_errors:`Unlimited
-    "murmur2" tests
+  Alcotest.run ~show_errors:true ~compact:true ~tail_errors:`Unlimited "murmur2"
+    tests

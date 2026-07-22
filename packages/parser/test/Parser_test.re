@@ -108,19 +108,17 @@ let parse_nth_payload_exn = input => {
   };
 };
 
-/* An+B microsyntax: valid payloads and their parsed representation. */
 let nth_payload_tests_data =
   [
     ("li:nth-child(2n+1) { color: red; }", Ast.ANB(2, "+", 1)),
     ("li:nth-child(-n+6) { color: red; }", Ast.ANB(-1, "+", 6)),
     ("li:nth-child(3n-6) { color: red; }", Ast.ANB(3, "-", 6)),
-    /* "n-<digits>" idents carry b, it must not be dropped */
+    /* Preserve b from "n-<digits>" idents. */
     ("li:nth-child(n-3) { color: red; }", Ast.ANB(1, "-", 3)),
     ("li:nth-child(-n-3) { color: red; }", Ast.ANB(-1, "-", 3)),
-    /* "an-" followed by a signless integer means b is negative */
     ("li:nth-child(2n- 3) { color: red; }", Ast.ANB(2, "-", 3)),
     ("li:nth-child(n- 3) { color: red; }", Ast.ANB(1, "-", 3)),
-    /* CSS is ASCII case-insensitive */
+    /* "n", "odd", and "even" are ASCII-case-insensitive. */
     ("li:nth-child(2N) { color: red; }", Ast.AN(2)),
     ("li:nth-child(2N-1) { color: red; }", Ast.ANB(2, "-", 1)),
     ("li:nth-child(-N+3) { color: red; }", Ast.ANB(-1, "+", 3)),
@@ -143,8 +141,7 @@ let nth_payload_tests_data =
        test_case(input, `Quick, assertion);
      });
 
-/* An+B microsyntax: invalid payloads must produce a located parse error,
-   never an exception (int_of_string used to escape as Failure). */
+/* Invalid An+B regression cases return located parse errors. */
 let nth_error_tests_data =
   [
     (
@@ -175,7 +172,6 @@ let nth_error_tests_data =
       "li:nth-child(2.5) { color: red; }",
       "Invalid an+b value in :nth-child() on line 1 at position 13",
     ),
-    /* int_of_string would silently accept hex and underscores */
     (
       "li:nth-child(3n-0x10) { color: red; }",
       "Invalid an+b value in :nth-child() on line 1 at position 13",
@@ -184,7 +180,7 @@ let nth_error_tests_data =
       "li:nth-child(3n-1_0) { color: red; }",
       "Invalid an+b value in :nth-child() on line 1 at position 13",
     ),
-    /* "an-" requires a signless integer after it */
+    /* "an-" requires a signless integer after it. */
     (
       "li:nth-child(2n-) { color: red; }",
       "Parse error while reading token ')' on line 1 at position 16",
@@ -441,10 +437,7 @@ let ambiguity_regression_tests = [
   }),
 ];
 
-/* Invalid UTF-8 bytes must produce a located Error, never an exception:
-   sedlex raises [MalFormed] on the first malformed byte and the lexer turns
-   it into a [LexingError] pointing at that byte. Regression test for the
-   crash `Fatal error: exception Sedlexing.MalFormed`. */
+/* Malformed UTF-8 is reported at the offending byte. */
 let invalid_utf8_tests = [
   test_case("stylesheet with invalid UTF-8 in a string errors", `Quick, () => {
     check(

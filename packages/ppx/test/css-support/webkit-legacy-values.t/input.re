@@ -1,8 +1,4 @@
-/* Non-standard legacy webkit values.
-   Regression test: the registry keys for these value types are dash-prefixed
-   (-webkit-gradient-type, -webkit-mask-box-repeat). The specs referencing them
-   used to omit the dash, crashing the compiler with
-   "Rule not found in registry: webkit-gradient-type". */
+/* Regression coverage for dash-prefixed legacy WebKit registry keys. */
 
 /* <-webkit-gradient-type>: 'linear' | 'radial' */
 [%css
