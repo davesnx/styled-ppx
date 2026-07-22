@@ -1,14 +1,14 @@
 (executable
  (name ast_renderer)
  (modules ast_renderer)
- (libraries styled-ppx.css-parser ppx_deriving.runtime ppxlib))
+ (libraries styled_ppx_css_parser ppx_deriving.runtime ppxlib))
 
 (executable
  (name lexer_renderer)
  (modules lexer_renderer)
- (libraries styled-ppx.css-parser))
+ (libraries styled_ppx_css_parser))
 
 (executable
  (name spec_renderer)
  (modules spec_renderer)
- (libraries styled-ppx.css-spec-parser))
+ (libraries css_spec_parser))

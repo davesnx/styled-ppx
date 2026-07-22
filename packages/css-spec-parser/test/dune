@@ -1,6 +1,6 @@
 (test
  (name test)
- (libraries styled-ppx.css-spec-parser ppx_deriving.runtime alcotest))
+ (libraries css_spec_parser ppx_deriving.runtime alcotest))
 
 (rule
  (alias test-css-spec-parser)

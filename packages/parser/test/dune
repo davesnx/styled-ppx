@@ -3,7 +3,7 @@
  (modules Lexer_test Parser_test Runner)
  (libraries
   sedlex
-  styled-ppx.css-parser
+  styled_ppx_css_parser
   alcotest
   ppxlib
   ppxlib.astlib
@@ -18,7 +18,7 @@
 (executable
  (name Render_test)
  (modules Render_test)
- (libraries styled-ppx.css-parser ppxlib))
+ (libraries styled_ppx_css_parser ppxlib))
 
 (cram
  (alias test-parser)

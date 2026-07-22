@@ -2,7 +2,7 @@
  (name css_grammar_ppx_generate)
  (wrapped false)
  (modules Generate)
- (libraries ppxlib ppxlib.astlib styled-ppx.css-spec-parser)
+ (libraries ppxlib ppxlib.astlib css_spec_parser)
  (preprocess
   (pps ppxlib.metaquot)))
 
@@ -11,10 +11,6 @@
  (kind ppx_rewriter)
  (wrapped false)
  (modules Css_grammar_ppx)
- (libraries
-  styled-ppx.css-spec-parser
-  ppxlib
-  ppxlib.astlib
-  css_grammar_ppx_generate)
+ (libraries css_spec_parser ppxlib ppxlib.astlib css_grammar_ppx_generate)
  (preprocess
   (pps ppxlib.metaquot)))

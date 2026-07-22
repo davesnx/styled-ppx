@@ -13,9 +13,9 @@
  (libraries
   alcotest
   alcotest_extra
-  styled-ppx.css-grammar-parser
+  Css_grammar
   css_grammar_ppx_generate
-  styled-ppx.css-parser
+  styled_ppx_css_parser
   ppxlib
   ppxlib.astlib
   fmt)

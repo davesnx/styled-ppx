@@ -5,10 +5,10 @@
  (flags
   (:standard -w -9))
  (libraries
-  styled-ppx.css-extraction
-  styled-ppx.css-parser
-  styled-ppx.css-grammar-parser
-  styled-ppx.murmur2
+  css_extraction
+  styled_ppx_css_parser
+  Css_grammar
+  murmur2
   server-reason-react.styles-attribute
   sedlex
   ppxlib

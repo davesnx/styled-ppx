@@ -2,6 +2,6 @@
  (name generate)
  (public_name styled-ppx.generate)
  (modules generate)
- (libraries styled-ppx styled-ppx.css-extraction ppxlib ppxlib.astlib)
+ (libraries styled-ppx css_extraction ppxlib ppxlib.astlib)
  (preprocess
   (pps ppxlib.metaquot)))

@@ -46,8 +46,12 @@ let tests =
   List.map
     (fun (input, expected) ->
       let quoted = Printf.sprintf "%S" input in
-      test quoted (fun () ->
+      Alcotest_extra.test quoted (fun () ->
         (Alcotest.check Alcotest.string)
           ("hash " ^ quoted ^ " should be")
           expected (Murmur2.default input)))
     data
+
+let () =
+  Alcotest.run ~show_errors:true ~compact:true ~tail_errors:`Unlimited
+    "murmur2" tests

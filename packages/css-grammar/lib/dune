@@ -2,8 +2,9 @@
 
 (library
  (name Css_grammar)
- (public_name styled-ppx.css-grammar-parser)
- (libraries sedlex styled-ppx.css-parser)
+ ; Package-private: internal machinery of the PPX, not public API.
+ (package styled-ppx)
+ (libraries sedlex styled_ppx_css_parser)
  (preprocess
   (pps css_grammar_ppx))
  (flags

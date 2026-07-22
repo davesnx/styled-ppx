@@ -1,10 +1,6 @@
 (executables
  (names registry_dump registry_closure_check)
- (libraries
-  styled-ppx.css-grammar-parser
-  styled-ppx.css-spec-parser
-  css_grammar_ppx_generate
-  ppxlib))
+ (libraries Css_grammar css_spec_parser css_grammar_ppx_generate ppxlib))
 
 ; Registry closure check: every <data-type>/<'property'> reference in the
 ; grammar sources must resolve in the rule registry. A dangling reference
