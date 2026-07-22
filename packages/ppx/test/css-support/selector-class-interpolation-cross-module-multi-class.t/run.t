@@ -4,9 +4,9 @@ to a chained compound `.cssA.cssB` so the consumer's rule fires only when
 every atom of `M.marker` is present on the element.
 
   $ refmt --parse re --print ml m.re > m.ml
-  $ standalone --impl m.ml -o m.ml
+  $ ../../standalone.exe --impl m.ml -o m.ml
   $ refmt --parse re --print ml n.re > n.ml
-  $ standalone --impl n.ml -o n.ml
+  $ ../../standalone.exe --impl n.ml -o n.ml
 
   $ styled-ppx.generate m.ml n.ml > styles.css
   $ cat styles.css

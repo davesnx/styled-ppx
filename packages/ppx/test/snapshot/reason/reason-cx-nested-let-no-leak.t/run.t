@@ -3,7 +3,7 @@ into the cross-module bindings index. Only the top-level `let` whose rhs
 contains the cx2 gets registered — local `let inner = ... in` bindings,
 function args, and other inner expressions stay private.
 
-  $ standalone --impl input.ml -o output.ml
+  $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
   [@@@css "@property --active-f7rv17{syntax:\"*\";inherits:false;}"]
   [@@@css ".css-tokvmb-inner{color:red;}"]

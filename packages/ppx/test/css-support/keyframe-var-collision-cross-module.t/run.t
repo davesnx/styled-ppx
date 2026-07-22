@@ -26,9 +26,9 @@ per-module divergence lives in the keyframe NAME (a value), never in a shared
 class pointing at a missing variable.
 
   $ refmt --parse re --print ml a.re > a.ml
-  $ standalone --impl a.ml -o a.ml
+  $ ../../standalone.exe --impl a.ml -o a.ml
   $ refmt --parse re --print ml b.re > b.ml
-  $ standalone --impl b.ml -o b.ml
+  $ ../../standalone.exe --impl b.ml -o b.ml
   $ cat a.ml
   [@@@css
     "@keyframes keyframe-1h1i3op{0%{height:var(--h0-9tm5yy);}100%{height:var(--h1-mjt56l);}}"]

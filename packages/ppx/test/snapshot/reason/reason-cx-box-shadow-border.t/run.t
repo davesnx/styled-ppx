@@ -52,7 +52,7 @@
 Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
 
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml
+  $ ../../../standalone.exe --impl output.ml -o output.ml
   $ cat output.ml
   [@@@css "@property --borderColor-1on39sz{syntax:\"*\";inherits:false;}"]
   [@@@css "@property --shadowX-11ljgmp{syntax:\"*\";inherits:false;}"]

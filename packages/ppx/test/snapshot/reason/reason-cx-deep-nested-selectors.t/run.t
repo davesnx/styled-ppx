@@ -17,7 +17,7 @@ Selectors covered here:
 - threeLevel            -> :hover .child:focus    (three levels with descendant)
 - descendantUnderPseudo -> :hover .child          (descendant under pseudo-class)
 
-  $ standalone --impl input.ml -o output.ml
+  $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
   [@@@css ".css-tokvmb-single{color:red;}"]
   [@@@css ".css-12qnfjo-single:hover{color:blue;}"]

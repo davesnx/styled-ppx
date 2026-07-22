@@ -3,7 +3,7 @@ through the static extraction pipeline. They also register selector bindings so
 `[%css]` can reference the component module names.
 
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml
+  $ ../../standalone.exe --impl output.ml -o output.ml
 
   $ styled-ppx.generate output.ml > styles.css
   $ cat styles.css

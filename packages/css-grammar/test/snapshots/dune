@@ -1,6 +1,5 @@
 (executable
  (name as_standalone)
- (public_name as_standalone)
  (libraries ppxlib css_grammar_ppx css_grammar_ppx_generate))
 
 (cram

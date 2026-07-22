@@ -1,5 +1,5 @@
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml
+  $ ../../../standalone.exe --impl output.ml -o output.ml
   File "output.ml", lines 5-7, characters 8-34:
   5 | ........[|([%css "width: $(size)"]);([%css "color: $(color)"]);([%css
   6 |                                                                   "display: block;"]);(

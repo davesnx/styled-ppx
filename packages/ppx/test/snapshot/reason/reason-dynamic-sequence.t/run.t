@@ -1,5 +1,5 @@
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml
+  $ ../../../standalone.exe --impl output.ml -o output.ml
   File "output.ml", lines 4-5, characters 6-62:
   4 | ......Js.log "Logging when render";
   5 |       [|([%css "width: $(size)"]);([%css "display: block;"])|].

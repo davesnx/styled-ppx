@@ -3,9 +3,9 @@ The canonical empty-marker idiom: cross-module refs to bindings whose
 they only serve as "tags" that consumers chain into selectors.
 
   $ refmt --parse re --print ml m.re > m.ml
-  $ standalone --impl m.ml -o m.ml
+  $ ../../standalone.exe --impl m.ml -o m.ml
   $ refmt --parse re --print ml n.re > n.ml
-  $ standalone --impl n.ml -o n.ml
+  $ ../../standalone.exe --impl n.ml -o n.ml
 
 The PPX records two distinct cross-module refs and one synthetic dep per
 distinct longident.

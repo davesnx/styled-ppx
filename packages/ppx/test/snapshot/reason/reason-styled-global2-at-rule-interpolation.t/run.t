@@ -1,5 +1,5 @@
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml
+  $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css "body{color:var(--mobileColor-1odltmt);}"];
   [@css "@media (min-width: 768px) {body{color:var(--desktopColor-1kb79vz);}}"];

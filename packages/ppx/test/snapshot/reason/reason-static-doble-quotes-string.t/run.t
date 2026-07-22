@@ -1,5 +1,5 @@
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml
+  $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css ".css-k008qs-SingleQuoteStrings{display:flex;}"];
   [@css ".css-1tyndxa-SingleQuoteStrings{justify-content:center;}"];

@@ -6,6 +6,6 @@
  (cram
   (alias test-ppx-snapshot-reason)
   (deps
-   %{bin:standalone}
+   %{exe:../../standalone.exe}
    %{bin:refmt}
    (package styled-ppx))))

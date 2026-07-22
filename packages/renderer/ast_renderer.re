@@ -19,7 +19,7 @@ switch (input, help) {
   print_endline(
     "\n  `ast-renderer` pretty-prints the CSS AST of the input string.
 
-  EXAMPLE: dune exec ast-renderer \".a { color: red }\"\n",
+  EXAMPLE: dune exec packages/renderer/ast_renderer.exe \".a { color: red }\"\n",
   )
 | (Some(css), _) =>
   switch (

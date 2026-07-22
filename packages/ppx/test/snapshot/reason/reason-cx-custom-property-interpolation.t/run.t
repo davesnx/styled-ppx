@@ -2,7 +2,7 @@ Custom-property declarations in [%css] accept any string interpolation
 verbatim - no Cascading.toString wrap.
 
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml
+  $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css "@property --colorStr-t58soe{syntax:\"*\";inherits:false;}"];
   [@css "@property --colorStr-11d7je1{syntax:\"*\";inherits:false;}"];

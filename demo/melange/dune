@@ -39,7 +39,6 @@
 (executable
  ; Prints the App component markup to stdout
  (name print)
- (public_name demo-exe)
  (modules :standard \ client)
  (libraries
   lib_native

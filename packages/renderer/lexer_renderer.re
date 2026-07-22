@@ -17,7 +17,7 @@ switch (input, help) {
   print_endline(
     "\n  `lexer-renderer` pretty-prints the result of CSS lexering of the input string.
 
-  EXAMPLE: dune exec lexer-renderer \".a { color: red }\"\n",
+  EXAMPLE: dune exec packages/renderer/lexer_renderer.exe \".a { color: red }\"\n",
   )
 | (Some(css), _) =>
   let tokens = Styled_ppx_css_parser.Lexer.from_string(css);

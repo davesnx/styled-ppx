@@ -2,7 +2,7 @@ Custom-property declarations in [%styled.global] accept any string
 interpolation verbatim - no Cascading.toString wrap.
 
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml
+  $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css
     ":root{--color-primary:var(--primary-eweeub);--gutter:var(--gutter-nbps89);}"

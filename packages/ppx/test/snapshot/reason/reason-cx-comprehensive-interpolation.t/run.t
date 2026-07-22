@@ -1,6 +1,6 @@
 Comprehensive test for cx2 interpolation with various property types
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml
+  $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css "@property --lengthVar-1fwod6p{syntax:\"*\";inherits:false;}"];
   [@css "@property --lengthVar-5g6bk9{syntax:\"*\";inherits:false;}"];

@@ -2,7 +2,7 @@ Plan 3b: a block's interpolating declarations share one bundle class and one
 var per (source-path, runtime-type) across base / :hover / @media variants.
 
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml
+  $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css "@property --color-3f9mj1{syntax:\"*\";inherits:false;}"];
   [@css "@property --color-13vjntp{syntax:\"*\";inherits:false;}"];

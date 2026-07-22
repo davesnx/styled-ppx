@@ -1,5 +1,5 @@
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml
+  $ ../../../standalone.exe --impl output.ml -o output.ml
   File "output.ml", lines 4-6, characters 6-76:
   4 | ......[|((match var with
   5 |           | `Black -> [%css "color: #999999"]

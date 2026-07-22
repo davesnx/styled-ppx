@@ -1,11 +1,9 @@
 (executables
  (names standalone)
- (public_names standalone)
  (modules standalone)
  (libraries styled-ppx ppxlib))
 
 (executables
  (names rewriter)
- (public_names rewriter)
  (modules rewriter)
  (libraries styled-ppx ppxlib))

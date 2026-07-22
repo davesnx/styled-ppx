@@ -2,7 +2,7 @@ CSS3 `var(--name, fallback)` is admitted by the cx2 parser. The fallback
 round-trips verbatim through the rendered stylesheet (linear-gradient,
 nested `var()`, length values — anything goes inside the fallback slot).
 
-  $ standalone --impl input.ml -o output.ml
+  $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
   [@@@css ".css-51tc9m-plain{color:var(--theme);}"]
   [@@@css ".css-1c6bdk9-withFallback{color:var(--theme-color, blue);}"]

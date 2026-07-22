@@ -4,9 +4,9 @@ into the nested selector position, and the aggregator's substitution
 pass operates on rendered strings so it doesn't care about CSS structure.
 
   $ refmt --parse re --print ml m.re > m.ml
-  $ standalone --impl m.ml -o m.ml
+  $ ../../standalone.exe --impl m.ml -o m.ml
   $ refmt --parse re --print ml n.re > n.ml
-  $ standalone --impl n.ml -o n.ml
+  $ ../../standalone.exe --impl n.ml -o n.ml
 
   $ styled-ppx.generate m.ml n.ml > styles.css
   $ cat styles.css

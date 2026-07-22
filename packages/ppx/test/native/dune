@@ -1,6 +1,5 @@
 (executable
  (name Runner)
- (public_name ppx-native-test-runner)
  (libraries
   alcotest
   styled-ppx
@@ -9,11 +8,10 @@
   ppxlib
   ppxlib.astlib
   server-reason-react.belt
-  server-reason-react.js
-  fmt)
+  server-reason-react.js)
  (preprocess
   (pps ppxlib.metaquot styled-ppx -- -no-merge)))
 
 (cram
  (alias test-ppx-native)
- (deps %{bin:ppx-native-test-runner} %{bin:refmt} %{bin:standalone}))
+ (deps %{exe:Runner.exe} %{bin:refmt}))

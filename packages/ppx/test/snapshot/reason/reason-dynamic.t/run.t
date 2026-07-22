@@ -1,5 +1,5 @@
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml
+  $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css "@property --var-1uix7by{syntax:\"*\";inherits:false;}"];
   [@css "@property --id-1ks2xuv{syntax:\"*\";inherits:false;}"];

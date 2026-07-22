@@ -1,6 +1,6 @@
 Native PPX passthrough behavior is checked as a cram snapshot.
 
-  $ ppx-native-test-runner ppx
+  $ ../Runner.exe ppx
   ## Ppx
   - passthrough extension
     "module X = [%graphql ]"

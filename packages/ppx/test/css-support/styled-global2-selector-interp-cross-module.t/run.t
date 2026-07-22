@@ -7,9 +7,9 @@ ocamldep tracking. The aggregator harvests the index from M's post-PPX
 file and substitutes the sentinels with the real class chains.
 
   $ refmt --parse re --print ml m.re > m.ml
-  $ standalone --impl m.ml -o m.ml
+  $ ../../standalone.exe --impl m.ml -o m.ml
   $ refmt --parse re --print ml n.re > n.ml
-  $ standalone --impl n.ml -o n.ml
+  $ ../../standalone.exe --impl n.ml -o n.ml
 
 The post-PPX `n.ml` carries unresolved sentinels in [@@@css ...] and the
 synthetic dep markers. The styled.global module shell is preserved.

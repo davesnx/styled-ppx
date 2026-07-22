@@ -8,7 +8,7 @@ className downstream — browser caches, CDN caches, persisted DOM
 identifiers all break. Update this test only when the change is intended;
 the diff IS the blast radius.
 
-  $ standalone --impl input.ml -o output.ml
+  $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
   [@@@css ".css-tokvmb-solid{color:red;}"]
   [@@@css ".css-eaeacs-multi{margin:10px;}"]

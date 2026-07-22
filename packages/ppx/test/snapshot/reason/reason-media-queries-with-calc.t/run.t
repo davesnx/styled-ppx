@@ -1,5 +1,5 @@
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml
+  $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css
     "@media (min-width: calc(2px + 1px)) {.css-1gk5m2e-MediaQueryCalc{color:red;}}"

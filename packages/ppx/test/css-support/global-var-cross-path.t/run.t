@@ -23,9 +23,9 @@ basename:
   $ cp Global_Css.re native/Global_Css.re
   $ cp Global_Css.re js/Global_Css.re
   $ refmt --parse re --print ml native/Global_Css.re > native/Global_Css.ml
-  $ standalone --impl native/Global_Css.ml -o native/Global_Css.ml
+  $ ../../standalone.exe --impl native/Global_Css.ml -o native/Global_Css.ml
   $ refmt --parse re --print ml js/Global_Css.re > js/Global_Css.ml
-  $ standalone --impl js/Global_Css.ml -o js/Global_Css.ml
+  $ ../../standalone.exe --impl js/Global_Css.ml -o js/Global_Css.ml
 
 The extracted static rule is byte-identical across both paths:
 

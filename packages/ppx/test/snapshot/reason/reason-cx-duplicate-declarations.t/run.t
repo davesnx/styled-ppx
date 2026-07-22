@@ -11,7 +11,7 @@ atom makes the winner an intra-atom decision, immune to position, dedup,
 and cross-binding hash sharing. Single declarations keep the historical
 atom shape and hash.
 
-  $ standalone --impl input.ml -o output.ml
+  $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
   [@@@css "@property --c-kv4uq2{syntax:\"*\";inherits:false;}"]
   [@@@css ".css-ztpkbn-dup{color:blue;color:red;color:blue;}"]

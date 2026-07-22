@@ -24,9 +24,9 @@ bug. (The `:root` blocks are supplied at runtime by mounting each
 `<Theme />`; they are deliberately absent from styles.css.)
 
   $ refmt --parse re --print ml a.re > a.ml
-  $ standalone --impl a.ml -o a.ml
+  $ ../../standalone.exe --impl a.ml -o a.ml
   $ refmt --parse re --print ml b.re > b.ml
-  $ standalone --impl b.ml -o b.ml
+  $ ../../standalone.exe --impl b.ml -o b.ml
   $ cat a.ml
   [@@@css "body{color:var(--primary-xeebq);}"]
   let primary = CSS.red

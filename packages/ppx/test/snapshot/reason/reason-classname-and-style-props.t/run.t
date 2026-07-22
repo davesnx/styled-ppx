@@ -1,5 +1,5 @@
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml
+  $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css ".css-tokvmb-Box{color:red;}"];
   [@css.bindings [("Output.Box", "css-tokvmb-Box")]];

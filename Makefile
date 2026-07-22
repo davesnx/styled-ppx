@@ -120,23 +120,23 @@ demo-static-watch: ## Build the melange demo (esbuild bundle + stylesheet via du
 
 .PHONY: demo-exe
 demo-exe: ## Run the melange demo native executable (prints SSR markup to stdout)
-	$(DUNE) exec demo-exe
+	$(DUNE) exec demo/melange/print.exe
 
 .PHONY: demo-exe-watch
 demo-exe-watch: ## Run (and watch) the melange demo native executable
-	$(DUNE) exec demo-exe --watch
+	$(DUNE) exec demo/melange/print.exe --watch
 
 # Debug commands
 
 .PHONY: ast
 ast: ## Print the command to debug the ast
 	@echo "Run the following command to debug the AST"
-	@echo "  $(DUNE) exec ast-renderer"
+	@echo "  $(DUNE) exec packages/renderer/ast_renderer.exe"
 
 .PHONY: lexer
 lexer: ## Print the command to debug the lexer
 	@echo "Run the following command to debug the AST"
-	@echo "  $(DUNE) exec lexer-renderer"
+	@echo "  $(DUNE) exec packages/renderer/lexer_renderer.exe"
 
 .PHONY: interpreter
 interpreter: ## Run menhir as interpret

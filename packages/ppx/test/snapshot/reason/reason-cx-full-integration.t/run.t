@@ -1,4 +1,4 @@
-  $ standalone --impl input.ml -o output.ml
+  $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
   [@@@css "@property --color-1a279q8{syntax:\"*\";inherits:false;}"]
   [@@@css "@property --spacing-y96o3b{syntax:\"*\";inherits:false;}"]

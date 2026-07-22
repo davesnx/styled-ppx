@@ -2,7 +2,7 @@ REGRESSION TEST — [%css] does not deduplicate one binding across different
 CSS runtime types. See input.re for the full rationale.
 
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml
+  $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css "@property --lengthVar-12br693{syntax:\"*\";inherits:false;}"];
   [@css "@property --lengthVar-8edltm{syntax:\"*\";inherits:false;}"];

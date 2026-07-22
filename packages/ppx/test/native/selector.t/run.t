@@ -1,6 +1,6 @@
 Selector native PPX transformations are checked as a cram snapshot.
 
-  $ ppx-native-test-runner selector
+  $ ../Runner.exe selector
   ## Selector/simple
   - :before { display: none; }
     "[%cx \":before { display: none; }\"]"

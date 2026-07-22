@@ -4,9 +4,9 @@ dependency. The aggregator builds an index across both modules and resolves
 the sentinel to the real class chain that `M.marker` minted.
 
   $ refmt --parse re --print ml m.re > m.ml
-  $ standalone --impl m.ml -o m.ml
+  $ ../../standalone.exe --impl m.ml -o m.ml
   $ refmt --parse re --print ml n.re > n.ml
-  $ standalone --impl n.ml -o n.ml
+  $ ../../standalone.exe --impl n.ml -o n.ml
 
 The post-PPX `n.ml` carries the unresolved sentinel as an opaque NUL-delimited
 string in `[@@@css ...]`, plus a `[@@@css.refs ...]` attribute with the

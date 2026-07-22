@@ -21,9 +21,9 @@ basename:
   $ cp Anim_Css.re native/Anim_Css.re
   $ cp Anim_Css.re js/Anim_Css.re
   $ refmt --parse re --print ml native/Anim_Css.re > native/Anim_Css.ml
-  $ standalone --impl native/Anim_Css.ml -o native/Anim_Css.ml
+  $ ../../standalone.exe --impl native/Anim_Css.ml -o native/Anim_Css.ml
   $ refmt --parse re --print ml js/Anim_Css.re > js/Anim_Css.ml
-  $ standalone --impl js/Anim_Css.ml -o js/Anim_Css.ml
+  $ ../../standalone.exe --impl js/Anim_Css.ml -o js/Anim_Css.ml
 
 The extracted @keyframes rule is byte-identical across both paths:
 

@@ -1,6 +1,6 @@
 Whitespace native PPX transformations are checked as a cram snapshot.
 
-  $ ppx-native-test-runner whitespace
+  $ ../Runner.exe whitespace
   ## Whitespace
   - ignore in empty
     "[%cx \" \"]"

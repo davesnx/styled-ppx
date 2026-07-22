@@ -1,5 +1,5 @@
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml
+  $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css
     "body{color:var(--textColor-1ltpo4o);width:var(--bodyWidth-xjb6x5);opacity:var(--mainOpacity-tdbeio);z-index:var(--layerIndex-vll3e5);}"

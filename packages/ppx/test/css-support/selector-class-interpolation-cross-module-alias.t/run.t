@@ -3,9 +3,9 @@ External module aliases are canonicalized for aggregator lookup. The user writes
 can resolve it against M's exported [@@@css.bindings].
 
   $ refmt --parse re --print ml m.re > m.ml
-  $ standalone --impl m.ml -o m.ml
+  $ ../../standalone.exe --impl m.ml -o m.ml
   $ refmt --parse re --print ml n.re > n.ml
-  $ standalone --impl n.ml -o n.ml
+  $ ../../standalone.exe --impl n.ml -o n.ml
 
   $ cat n.ml
   [@@@css ".css-155k9s5-wrapper.\000M.Css.marker\000{color:blue;}"]

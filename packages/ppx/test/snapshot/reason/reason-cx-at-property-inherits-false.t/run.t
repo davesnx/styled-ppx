@@ -2,7 +2,7 @@ Plan 4: @property{syntax:"*";inherits:false} is emitted for &-local interpolatio
 vars (top-level / &:hover / @media) and withheld for descendant-read vars.
 
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml
+  $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css "@property --color-qqxh28{syntax:\"*\";inherits:false;}"];
   [@css "@property --color-1g10n3y{syntax:\"*\";inherits:false;}"];

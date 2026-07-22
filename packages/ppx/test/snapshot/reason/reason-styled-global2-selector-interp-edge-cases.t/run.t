@@ -1,5 +1,5 @@
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml
+  $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css "body:not(.css-nk32ej-card){margin:0;}"];
   [@css ".css-nk32ej-card{background:var(--bg-1rdts9a);}"];

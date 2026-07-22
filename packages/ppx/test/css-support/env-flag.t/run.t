@@ -9,7 +9,7 @@ With --env development, classNames carry a cx-<binding> marker, the
 extracted rules keep the -<label> suffix, and no [@@@css.config] is
 emitted (absence means development).
 
-  $ standalone --env development --impl input.ml -o dev.ml
+  $ ../../standalone.exe --env development --impl input.ml -o dev.ml
   $ grep "css.config" dev.ml
   [1]
   $ styled-ppx.generate dev.ml
@@ -25,7 +25,7 @@ With --env production, the same hashes appear without label suffixes and
 without markers, and the PPX declares the environment in the wire
 protocol so styled-ppx.generate minifies its output without any flag.
 
-  $ standalone --env production --impl input.ml -o prod.ml
+  $ ../../standalone.exe --env production --impl input.ml -o prod.ml
   $ grep "css.config" prod.ml
   [@@@css.config [("env", "production")]]
   $ styled-ppx.generate prod.ml
@@ -37,5 +37,5 @@ protocol so styled-ppx.generate minifies its output without any flag.
 
 An unknown environment is rejected by the driver.
 
-  $ standalone --env staging --impl input.ml -o out.ml 2>&1 | grep -o "wrong argument.*"
+  $ ../../standalone.exe --env staging --impl input.ml -o out.ml 2>&1 | grep -o "wrong argument.*"
   wrong argument 'staging'; option '--env' expects one of: development production.

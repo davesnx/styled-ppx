@@ -2,7 +2,7 @@ Safe look-alikes for the subtree-escaping guard still extract their
 interpolation as a custom property (subject is `&` or a descendant of `&`).
 
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml
+  $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css "@property --color-17hzlne{syntax:\"*\";inherits:false;}"];
   [@css "@property --color-4fgdvo{syntax:\"*\";inherits:false;}"];

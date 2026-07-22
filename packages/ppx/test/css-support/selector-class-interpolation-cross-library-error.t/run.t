@@ -3,7 +3,7 @@ sees only files from the current library invocation; if the referenced
 module's file isn't in that set, the reference is by definition cross-library.
 
   $ refmt --parse re --print ml n.re > n.ml
-  $ standalone --impl n.ml -o n.ml
+  $ ../../standalone.exe --impl n.ml -o n.ml
 
   $ styled-ppx.generate n.ml
   styled-ppx: File "n.ml", line 2, characters 6-21:

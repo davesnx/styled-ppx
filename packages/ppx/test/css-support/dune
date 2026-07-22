@@ -3,4 +3,5 @@
  (enabled_if
   (>= %{ocaml_version} 5.4.0))
  (deps
+  %{exe:../standalone.exe}
   (package styled-ppx)))

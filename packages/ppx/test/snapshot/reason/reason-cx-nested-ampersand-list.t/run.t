@@ -11,7 +11,7 @@ only the extracted stylesheet was wrong.
 `Selector_nesting.pop_last_selector` now flattens nested combinator trees
 before popping, so the popped segment is always the rightmost compound.
 
-  $ standalone --impl input.ml -o output.ml
+  $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
   [@@@css
     ".css-1meebco-table tbody tr:first-child td{border-top:1px solid gray;}"]

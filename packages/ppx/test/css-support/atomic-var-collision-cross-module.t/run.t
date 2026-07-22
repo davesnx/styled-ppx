@@ -16,9 +16,9 @@ from the sibling class-name join, so the two modules disagreed on the
 variable baked into that identical atom -> a class/var mismatch.
 
   $ refmt --parse re --print ml a.re > a.ml
-  $ standalone --impl a.ml -o a.ml
+  $ ../../standalone.exe --impl a.ml -o a.ml
   $ refmt --parse re --print ml b.re > b.ml
-  $ standalone --impl b.ml -o b.ml
+  $ ../../standalone.exe --impl b.ml -o b.ml
 
 The background-color atom has the SAME class name in both modules AND the
 same `var(--...)` target despite the differing sibling. These two lines

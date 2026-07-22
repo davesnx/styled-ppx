@@ -14,7 +14,7 @@ namespace was the label-bearing class-name join, so `header` and `bar`
 hashed to different variables for the same declaration.
 
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml
+  $ ../../standalone.exe --impl output.ml -o output.ml
   $ styled-ppx.generate output.ml > styles.css
 
 The same declaration body resolves to a single variable across both labels:

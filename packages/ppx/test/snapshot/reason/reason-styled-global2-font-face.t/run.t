@@ -1,5 +1,5 @@
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml
+  $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css
     "@font-face {font-family:\"Inter\";src:url(\"/fonts/inter.woff2\") format(\"woff2\");font-display:swap;font-weight:400;font-style:normal;}"

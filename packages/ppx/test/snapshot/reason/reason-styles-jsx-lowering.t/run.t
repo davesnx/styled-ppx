@@ -1,7 +1,7 @@
 Default mode expands `styles` on lowercase JSX and leaves other calls alone.
 
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml
+  $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml | grep -E '@css|passthrough|className|style|Foo'
   [@css ".css-h5fkc8{margin-top:32px;}"];
   let passthrough = (~styles) => styles;
@@ -17,7 +17,7 @@ Default mode expands `styles` on lowercase JSX and leaves other calls alone.
 Native mode keeps the same `styles` expansion contract before native JSX lowering.
 
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --native --impl output.ml -o output.ml
+  $ ../../../standalone.exe --native --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml | grep -E '@css|passthrough|className|style|Foo'
   [@css ".css-h5fkc8{margin-top:32px;}"];
   let passthrough = (~styles) => styles;

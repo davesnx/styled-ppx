@@ -8,7 +8,7 @@ The label is sanitized to the CSS-safe set `[A-Za-z0-9_-]`, so the trailing
 prime is dropped and the emitted selector is valid CSS.
 
   $ refmt --parse re --print ml input.re > output.ml
-  $ standalone --impl output.ml -o output.ml
+  $ ../../standalone.exe --impl output.ml -o output.ml
   $ styled-ppx.generate output.ml > styles.css
 
   $ cat styles.css

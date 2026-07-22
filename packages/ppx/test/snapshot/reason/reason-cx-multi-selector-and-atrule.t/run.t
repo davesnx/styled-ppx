@@ -4,7 +4,7 @@ Multi-selector preludes must split into one atom per selector at every depth
 (CSS-nesting Cartesian semantics). Nested at-rules must carry the parent
 selector chain into the at-rule's contents instead of dropping it.
 
-  $ standalone --impl input.ml -o output.ml
+  $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
   [@@@css ".css-rmy2q8-multiTop .a{color:red;}"]
   [@@@css ".css-alyv6j-multiTop .b{color:red;}"]

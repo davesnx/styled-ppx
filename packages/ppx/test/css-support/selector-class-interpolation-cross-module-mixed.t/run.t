@@ -4,9 +4,9 @@ literally into the rendered CSS. Cross-module refs (`$(M.marker)`)
 remain as sentinels until aggregation.
 
   $ refmt --parse re --print ml m.re > m.ml
-  $ standalone --impl m.ml -o m.ml
+  $ ../../standalone.exe --impl m.ml -o m.ml
   $ refmt --parse re --print ml n.re > n.ml
-  $ standalone --impl n.ml -o n.ml
+  $ ../../standalone.exe --impl n.ml -o n.ml
 
 The post-PPX `n.ml` shows only the cross-module ref as a sentinel — the
 same-module `localFlag` is already resolved to its class.

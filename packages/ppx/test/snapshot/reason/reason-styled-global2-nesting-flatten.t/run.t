@@ -3,7 +3,7 @@ rules to flat descendant selectors. Multi-selector preludes
 Cartesian-product correctly; pseudo-classes splice onto the parent
 without an intervening space.
 
-  $ standalone --impl input.ml -o output.ml
+  $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
   [@@@css "body{color:red;}"]
   [@@@css "body .child{color:blue;}"]
