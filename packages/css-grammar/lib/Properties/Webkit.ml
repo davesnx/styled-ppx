@@ -133,7 +133,7 @@ let property__webkit_mask_attachment :
 module Property__webkit_mask_box_image =
   [%spec_module
   "[ <url> | <gradient> | 'none' ] [ [ <extended-length> | \
-   <extended-percentage> ]{4} [ <webkit-mask-box-repeat> ]{2} ]?",
+   <extended-percentage> ]{4} [ <-webkit-mask-box-repeat> ]{2} ]?",
   (module Css_types.WebkitMaskBoxImage)]
 
 let property__webkit_mask_box_image : property__webkit_mask_box_image Rule.rule

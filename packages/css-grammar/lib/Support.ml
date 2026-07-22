@@ -6,7 +6,12 @@ let lookup (name : string) : _ Rule.rule =
  fun tokens ->
   match Hashtbl.find_opt registry_tbl name with
   | Some (_, Pack_rule { rule; _ }) -> (Obj.magic rule : _ Rule.rule) tokens
-  | None -> failwith ("Rule not found in registry: " ^ name)
+  | None ->
+    failwith
+      ("Rule not found in registry: "
+      ^ name
+      ^ ". This is a styled-ppx internal bug, please report it at \
+         https://github.com/davesnx/styled-ppx/issues")
 
 let detect_whole_value_interpolation ~runtime_module_path input =
   let interp_rule =

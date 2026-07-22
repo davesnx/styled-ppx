@@ -10,7 +10,7 @@ let function_color_mix : function_color_mix Rule.rule = Function_color_mix.rule
 
 module Function__webkit_gradient =
   [%spec_module
-  "-webkit-gradient( <webkit-gradient-type> ',' <webkit-gradient-point> [ ',' \
+  "-webkit-gradient( <-webkit-gradient-type> ',' <webkit-gradient-point> [ ',' \
    <webkit-gradient-point> | ',' <webkit-gradient-radius> ',' \
    <webkit-gradient-point> ] [ ',' <webkit-gradient-radius> ]? [ ',' \
    <webkit-gradient-color-stop> ]* )"]

@@ -7641,7 +7641,7 @@ module Mask = struct
 end
 
 module MaskBorder = struct
-  (* MDN syntax: <'mask-border-source'> || <'mask-border-slice'> [ '/' [ \ <'mask-border-width'> ]? [ '/' <'mask-border-outset'> ]? ]? || \ <'mask-border-repeat'> || <'mask-border-mode'> | [ <url> | <gradient> | 'none' ] [ [ <extended-length> | \ <extended-percentage> ]{4} [ <webkit-mask-box-repeat> ]{2} ]? *)
+  (* MDN syntax: <'mask-border-source'> || <'mask-border-slice'> [ '/' [ \ <'mask-border-width'> ]? [ '/' <'mask-border-outset'> ]? ]? || \ <'mask-border-repeat'> || <'mask-border-mode'> | [ <url> | <gradient> | 'none' ] [ [ <extended-length> | \ <extended-percentage> ]{4} [ <-webkit-mask-box-repeat> ]{2} ]? *)
   type t =
     [ `maskBorderSource
     | `maskBorderSlice

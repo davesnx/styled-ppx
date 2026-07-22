@@ -1,0 +1,19 @@
+(executables
+ (names registry_dump registry_closure_check)
+ (libraries
+  styled-ppx.css-grammar-parser
+  styled-ppx.css-spec-parser
+  css_grammar_ppx_generate
+  ppxlib))
+
+; Registry closure check: every <data-type>/<'property'> reference in the
+; grammar sources must resolve in the rule registry. A dangling reference
+; compiles fine but crashes the compiler at parse time with
+; "Rule not found in registry", so catch it here instead.
+
+(rule
+ (aliases runtest test-css-grammar)
+ (deps
+  (source_tree ../lib))
+ (action
+  (run %{exe:registry_closure_check.exe} %{deps})))

@@ -284,6 +284,29 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
   /* Check if a name is a standard spec. */
   let is_standard_spec = name => List.mem_assoc(name, spec_names);
 
+  /* The registry prefix for <'property'> reference keys. */
+  let property_registry_prefix = "property_";
+
+  /* The runtime registry key a terminal resolves through at parse time, or
+     [None] when it compiles to a direct [Css_value_types] reference and never
+     touches the registry. Single source of truth for which lookups generated
+     parsers can perform: [terminal_op] emits from it and
+     bin/registry_closure_check re-derives keys with it, so the checker cannot
+     drift from the codegen. */
+  let registry_key_of_terminal = kind =>
+    switch (kind) {
+    | Data_type(name, _) =>
+      if (is_primitive_wrapper_type(value_name_of_css(name))
+          || is_standard_spec(name)) {
+        None;
+      } else {
+        Some(name);
+      }
+    | Property_type(name) => Some(property_registry_prefix ++ name)
+    | Delim(_)
+    | Keyword(_) => None
+    };
+
   let create_type_parser = value => {
     let rec create_type =
       fun
@@ -540,23 +563,15 @@ module Make = (Builder: Ppxlib.Ast_builder.S) => {
           eapply(evar("Css_value_types.delim"), [estring(delim)])
         | Keyword(name) =>
           eapply(evar("Css_value_types.keyword"), [estring(name)])
-        | Data_type(name, _) =>
-          let snake_name = value_name_of_css(name);
-          if (is_primitive_wrapper_type(snake_name)) {
-            "Css_value_types." ++ snake_name |> evar;
-          } else if (is_standard_spec(name)) {
-            "Css_value_types." ++ snake_name |> evar;
-          } else {
-            // Runtime lookup by CSS name (registry uses CSS-style names with hyphens)
-            eapply(
-              evar("lookup"),
-              [estring(name)],
-            );
-          };
+        | Data_type(name, _)
         | Property_type(name) =>
-          // Runtime lookup for property references (properties use prefixed keys)
-          let key = "property_" ++ name;
-          eapply(evar("lookup"), [estring(key)]);
+          switch (registry_key_of_terminal(kind)) {
+          | Some(key) =>
+            // Runtime lookup by registry key: CSS-style hyphenated names for
+            // data types, "property_"-prefixed keys for property references
+            eapply(evar("lookup"), [estring(key)])
+          | None => "Css_value_types." ++ value_name_of_css(name) |> evar
+          }
         };
       apply_modifier(modifier, rule);
     };
