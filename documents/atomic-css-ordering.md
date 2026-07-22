@@ -19,9 +19,15 @@ See also:
   `packages/generate/css_bucket.ml`, on by default (`--sort source` is the
   one-release escape hatch). Within-bucket order is first-occurrence.
   Tests: `packages/generate/test/bucket-*.t`.
-- Phase 2 (property-keyed merge, label removal, hash tiebreak, sealed
-  carrier) is design-complete but not implemented; groundwork landed (see
-  "Phase 2 direction").
+- Phase 2 (property-keyed merge, label removal, hash tiebreak) is
+  design-complete but not implemented. **All prerequisites landed**: the
+  carrier is a 3-tuple behind an abstract interface (`CSS.mli` in both
+  runtimes), every consumer — generated code, the vendored `styles=`
+  expansion, the server-reason-react pin, runtime tests — goes through
+  accessors, and the representation can now change without any API break.
+  Preliminary size measurement for the structured-keys carrier (option B)
+  on `demo/melange`: +14 bytes/atom raw, **+0.18% gzipped** — supports
+  choosing B, pending confirmation on a larger app.
 - Evidence gathered from `demo/melange` (bindings `queryOrder`,
   `queryOrderReversed`, `linkFirst`, `nthFirst` in
   `demo/melange/lib/native/shared/Main.re`).
@@ -306,20 +312,27 @@ two places outside the runtime: our own generator
 user code for the `styles=` JSX prop on both platforms — invoked from
 `ppx.re:628` on melange). Both can migrate to the `CSS.className` /
 `CSS.styles` accessors, which exist in every shipped runtime, so the
-migration is compatible in both directions and needs no flag day:
+migration is compatible in both directions and needs no flag day. Status:
 
-1. server-reason-react PR: `styles_attribute.ml` emits `CSS.className` /
-   `CSS.styles` (user-scope identifiers, like it already does for
-   `ReactDOM.Style.combine`). Works with all existing styled-ppx versions.
-2. styled-ppx: `generate.re` swaps its own `fst`/`snd` for the accessors.
-3. Later: bump the pin, add a `server-reason-react >= <next>` bound, add an
-   `.mli` sealing `styles`. From then on A vs B is an internal, reversible
-   choice.
+1. **Done** — the `styles=` expansion is vendored (`Styles_prop.ml`) and
+   emits accessors; server-reason-react's own copy is patched on the local
+   pin (branch `styles-attribute-accessors`, to be upstreamed — its
+   `~preprocess_impl` runs before ours on native, so sealing cannot ship
+   to users until that lands in a release and the opam bound is bumped).
+2. **Done** — `generate.re` and `Css_to_runtime.re` use the accessors;
+   dev-mode codegen calls `CSS.make_labeled`, production `CSS.make`.
+3. **Done** — `CSS.mli` (melange + native) makes `styles` abstract. The
+   full build and test suite pass against the sealed interface, so the
+   representation is now internal and the phase-2 change is non-breaking.
+
+Measurement (option B key cost, `demo/melange`, 53 atom references):
++14 bytes/atom raw, +0.18% gzipped bundle. The demo is small; confirm on a
+real app before final commitment, but the expectation stands: **B wins**.
 
 Recommendation: treat property-keyed atoms + conflict-resolving `merge` as
-**phase 2**, independent of buckets. Steps 1–2 are riskless prep and ship
-with phase 1; the A-vs-B decision waits for the bundle-size measurement
-(expectation: B wins unless the number is surprising).
+**phase 2**, independent of buckets. All prep is landed; what remains is
+the bundle-class decision below, longhand conflict groups, and the merge
+implementation itself.
 
 ### Open problem: bundle classes (blocking for phase 2)
 
