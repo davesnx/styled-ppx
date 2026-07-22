@@ -1124,7 +1124,10 @@ let extractedDynamicStyles =
           ~scope,
           ~opens,
           ~source_position_start,
-          ~label=moduleName,
+          /* Same gate as [%css]: the -<label> suffix is dev-only sugar.
+             Keeping it in minify/production would fork atoms per binding
+             name and break cross-binding dedup. */
+          ~label=?{Settings.Get.minify() ? None : Some(moduleName)},
           rule_list,
         );
       onClassNames(classNames);
