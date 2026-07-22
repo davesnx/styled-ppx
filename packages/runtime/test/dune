@@ -9,8 +9,7 @@
   server-reason-react.belt
   server-reason-react.reactDom
   alcotest_extra
-  styled-ppx.native
-  styled-ppx.murmur2)
+  styled-ppx.native)
  (preprocess
   (pps styled-ppx)))
 

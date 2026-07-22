@@ -2176,37 +2176,28 @@ module TextEmphasisStyle = struct
 end
 
 module TextEmphasisPosition = struct
-  module LeftRightAlignment = struct
-    type t =
-      [ `left
-      | `right
-      | Var.t
-      | Cascading.t
-      ]
+  (* MDN syntax: [ 'over' | 'under' ] && [ 'right' | 'left' ]? *)
+  type t =
+    [ `over
+    | `under
+    | `overRight
+    | `overLeft
+    | `underRight
+    | `underLeft
+    | Var.t
+    | Cascading.t
+    ]
 
-    let toString x =
-      match x with
-      | `left -> {js|left|js}
-      | `right -> {js|right|js}
-      | #Var.t as va -> Var.toString va
-      | #Cascading.t as c -> Cascading.toString c
-  end
-
-  module OverOrUnder = struct
-    type t =
-      [ `over
-      | `under
-      | Var.t
-      | Cascading.t
-      ]
-
-    let toString x =
-      match x with
-      | `over -> {js|over|js}
-      | `under -> {js|under|js}
-      | #Var.t as va -> Var.toString va
-      | #Cascading.t as c -> Cascading.toString c
-  end
+  let toString x =
+    match x with
+    | `over -> {js|over|js}
+    | `under -> {js|under|js}
+    | `overRight -> {js|over right|js}
+    | `overLeft -> {js|over left|js}
+    | `underRight -> {js|under right|js}
+    | `underLeft -> {js|under left|js}
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
 end
 
 module Position = struct
