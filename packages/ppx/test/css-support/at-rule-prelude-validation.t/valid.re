@@ -64,3 +64,20 @@ let _container_range = [%css "@container (block-size < 650px) { color: red; }"];
 let _container_orientation = [%css
   "@container (orientation: landscape) { color: red; }"
 ];
+/* Range-type container size features also accept their min-/max- prefixed
+   spellings (css-contain-3 follows media-feature conventions). */
+let _container_named_min_width = [%css
+  "@container sidebar (min-width: 400px) { color: red; }"
+];
+let _container_max_width = [%css
+  "@container (max-width: 600px) { color: red; }"
+];
+let _container_min_inline_size = [%css
+  "@container (min-inline-size: 20em) { color: red; }"
+];
+let _container_max_aspect_ratio = [%css
+  "@container (max-aspect-ratio: 16/9) { color: red; }"
+];
+let _container_open_range = [%css
+  "@container (400px <= width) { color: red; }"
+];

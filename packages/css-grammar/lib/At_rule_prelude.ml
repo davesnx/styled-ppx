@@ -88,16 +88,20 @@ let media_feature_inventory =
   @ media_discrete_features
 
 (* Containment 3 size features (style()/scroll-state() queries are function
-   blocks and are not name-checked here). *)
+   blocks and are not name-checked here). Range-type features also accept
+   their legacy `min-`/`max-` prefixed spellings, derived below;
+   `orientation` is discrete and takes none. *)
+let container_range_features =
+  [ "width"; "height"; "inline-size"; "block-size"; "aspect-ratio" ]
+
+let container_discrete_features = [ "orientation" ]
+
 let container_feature_inventory =
-  [
-    "width";
-    "height";
-    "inline-size";
-    "block-size";
-    "aspect-ratio";
-    "orientation";
-  ]
+  container_range_features
+  @ List.concat_map
+      (fun name -> [ "min-" ^ name; "max-" ^ name ])
+      container_range_features
+  @ container_discrete_features
 
 let is_comparison_delim = function
   | Ast.Delimiter_less_than | Delimiter_greater_than | Delimiter_equals

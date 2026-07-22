@@ -139,6 +139,76 @@ A discrete keyword feature rejects an unknown keyword:
   Error: Invalid value for @container feature 'block-size', Expected 'length',
          'calc()', 'max()', or 'min()'.
 
+Range-type @container size features accept their min-/max- spellings
+(see valid.re) and enforce the same value grammars. A keyword is not a
+length:
+
+  $ cat > dune << EOF
+  > (executable
+  >  (name invalid_container_min_value)
+  >  (modules invalid_container_min_value)
+  >  (libraries styled-ppx.native)
+  >  (preprocess (pps styled-ppx)))
+  > EOF
+
+  $ dune build 2>&1 | head -6
+  File "invalid_container_min_value.re", line 3, characters 14-23:
+  3 |   @container (min-width: portrait) {
+                    ^^^^^^^^^
+  Error: Invalid value for @container feature 'min-width', Expected 'length',
+         'calc()', 'max()', or 'min()'.
+
+The container-only logical size features validate values through their
+min-/max- spellings too:
+
+  $ cat > dune << EOF
+  > (executable
+  >  (name invalid_container_min_logical)
+  >  (modules invalid_container_min_logical)
+  >  (libraries styled-ppx.native)
+  >  (preprocess (pps styled-ppx)))
+  > EOF
+
+  $ dune build 2>&1 | head -6
+  File "invalid_container_min_logical.re", line 3, characters 14-29:
+  3 |   @container (min-inline-size: 10) {
+                    ^^^^^^^^^^^^^^^
+  Error: Invalid value for @container feature 'min-inline-size', Expected
+         'length', 'calc()', 'max()', or 'min()'.
+
+orientation is a discrete feature, so it gets no min-/max- variants:
+
+  $ cat > dune << EOF
+  > (executable
+  >  (name container_min_orientation)
+  >  (modules container_min_orientation)
+  >  (libraries styled-ppx.native)
+  >  (preprocess (pps styled-ppx)))
+  > EOF
+
+  $ dune build 2>&1 | head -6
+  File "container_min_orientation.re", line 3, characters 14-29:
+  3 |   @container (min-orientation: portrait) {
+                    ^^^^^^^^^^^^^^^
+  Error: Unknown @container feature 'min-orientation'. Did you mean
+         'orientation'?
+
+A typo in a min- prefixed container feature gets a suggestion:
+
+  $ cat > dune << EOF
+  > (executable
+  >  (name container_min_typo)
+  >  (modules container_min_typo)
+  >  (libraries styled-ppx.native)
+  >  (preprocess (pps styled-ppx)))
+  > EOF
+
+  $ dune build 2>&1 | head -6
+  File "container_min_typo.re", line 3, characters 14-23:
+  3 |   @container (min-widht: 400px) {
+                    ^^^^^^^^^
+  Error: Unknown @container feature 'min-widht'. Did you mean 'min-width'?
+
 Compat features take <number>, not keywords:
 
   $ cat > dune << EOF

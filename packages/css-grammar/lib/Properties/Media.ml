@@ -335,7 +335,15 @@ let entries : (kind * packed_rule) list =
       pack_module (module Property_media_length_feature) );
     ( Property "media-inline-size",
       pack_module (module Property_media_length_feature) );
+    ( Property "media-min-inline-size",
+      pack_module (module Property_media_length_feature) );
+    ( Property "media-max-inline-size",
+      pack_module (module Property_media_length_feature) );
     ( Property "media-block-size",
+      pack_module (module Property_media_length_feature) );
+    ( Property "media-min-block-size",
+      pack_module (module Property_media_length_feature) );
+    ( Property "media-max-block-size",
       pack_module (module Property_media_length_feature) );
     (* Ratio features: <ratio> (min/max-aspect-ratio predate these and keep
        their own modules above). *)
