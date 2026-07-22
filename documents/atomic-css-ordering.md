@@ -163,10 +163,12 @@ Within bucket 14, parse the condition for a single `min-width`/`max-width`
 This is the `postcss-sort-media-queries` convention. Same scheme applies to
 `@container` with `width`-based conditions.
 
-### Label suffixes must go (dev/prod parity)
+### Label suffixes must go (dev/prod parity — phase 2)
 
 Buckets fix ordering *between* rules, but dev labels still fork one atom
-into N rules. To make dev and prod structurally identical:
+into N rules. This lands in phase 2 together with the hash tiebreak (both
+change which rule wins first-occurrence ties). To make dev and prod
+structurally identical:
 
 - stop appending `-<label>` to class names entirely,
 - keep binding identity in the DOM via the existing `--dev` marker classes
@@ -264,10 +266,94 @@ is the real fix for merge. Costs, in order of severity:
    first time `merge` does per-class work.
 4. **Class name length** grows by one hash segment (~7 chars/atom).
 
+### Where the key lives: class string vs structured data
+
+Encoding the key in the class *name* (above) is one of two carriers:
+
+- **A — token classes**: `css-<keyHash>-<valueHash>`; `merge` parses class
+  strings. Keeps `styles = (string, Style.t)` unchanged, but tokens must
+  survive into production HTML (SSR payload + DOM bytes roughly double),
+  hashed keys are opaque at runtime (no shorthand conflict groups), and
+  bundle classes (one class, many declarations) cannot be represented.
+- **B — structured data** (StyleX model): `styles` carries
+  `array((key, className))`; `merge` is a right-biased union. No parsing,
+  clean class names, key *sets* for bundles, structured keys enable
+  shorthand conflict groups. Cost: the `styles` representation changes and
+  JS bundles grow by one key per atom (measurable; must be benchmarked on
+  `demo/melange` before committing).
+
+B requires sealing the `styles` type. The tuple is destructured in exactly
+two places outside the runtime: our own generator
+(`packages/ppx/src/generate.re:333,341`) and server-reason-react's
+`styles-attribute` ppx (`styles_attribute.ml:44`, emits `fst`/`snd` into
+user code for the `styles=` JSX prop on both platforms — invoked from
+`ppx.re:628` on melange). Both can migrate to the `CSS.className` /
+`CSS.styles` accessors, which exist in every shipped runtime, so the
+migration is compatible in both directions and needs no flag day:
+
+1. server-reason-react PR: `styles_attribute.ml` emits `CSS.className` /
+   `CSS.styles` (user-scope identifiers, like it already does for
+   `ReactDOM.Style.combine`). Works with all existing styled-ppx versions.
+2. styled-ppx: `generate.re` swaps its own `fst`/`snd` for the accessors.
+3. Later: bump the pin, add a `server-reason-react >= <next>` bound, add an
+   `.mli` sealing `styles`. From then on A vs B is an internal, reversible
+   choice.
+
 Recommendation: treat property-keyed atoms + conflict-resolving `merge` as
-**phase 2**, independent of buckets. Buckets are a pure output change with
-no API impact; phase 2 changes class-name shape and `merge` semantics and
-deserves its own design pass (especially shorthand expansion).
+**phase 2**, independent of buckets. Steps 1–2 are riskless prep and ship
+with phase 1; the A-vs-B decision waits for the bundle-size measurement
+(expectation: B wins unless the number is surprising).
+
+### Open problem: bundle classes (blocking for phase 2)
+
+Interpolated blocks share one class covering *several* declarations
+(`Css_file.re` bundle classes). If a bundle sets `{color, padding}` and a
+merge overrides `color`, key-based eviction cannot work: removing the
+bundle class would drop `padding`; keeping it leaves a stylesheet rule
+that still declares `color`, so both rules apply and the tie falls back to
+stylesheet order. Candidate resolutions, none decided:
+
+- **Un-bundle**: one class per interpolated declaration. Exact semantics;
+  re-opens the var-count/`@property`-count cost that motivated bundling.
+  Needs measurement on a real app.
+- **All-or-nothing keys**: a bundle claims all its keys; a partial conflict
+  is documented UB (warn in dev via the runtime when a merge partially
+  overlaps a bundle).
+- **Hybrid**: un-bundle only multi-property bundles; single-declaration
+  bundles (the common case) already have exact keys.
+
+Phase 2 must resolve this before it ships; it is the one place where the
+design is not yet closed.
+
+## Guarantees and non-guarantees
+
+What the full plan (phase 1 + phase 2) does and does not fix:
+
+**Fixed outright**: dev/prod cascade divergence; refactor/file-order
+flipping winners; breakpoint ordering; LVFHA ordering; `merge` conflicts on
+the same property in the same context (including interpolated values —
+keys are per-property, vars are inline per element).
+
+**Fixed by fiat**: cross-context conflicts. `merge(a, b)` where `a` has
+`@media print { color }` and `b` has base `color` keeps both atoms
+(different keys); the *bucket policy* decides (media wins in print),
+regardless of merge order. Deterministic and documented, but a caller can
+never express "my base override beats their media query" through `merge`.
+Same semantics as StyleX.
+
+**Fixed only with extra work**: shorthand vs longhand across merges
+(conflict-groups table); bundle classes (open problem above).
+
+**Not fixable by any ordering/merge scheme**:
+
+- Specificity: `.css-x li:nth-child(odd) a` beats `.css-x a:link` by
+  weight at any stylesheet position.
+- Selector equivalence: `& .child` vs `& div.child` are different keys
+  forever; bucket/hash decides.
+- Bypassing `merge`: hand-concatenated `className` strings and external
+  classes (global CSS, other libraries) never participate in conflict
+  resolution.
+- Inheritance and cross-element cascade.
 
 ## Alternatives considered
 
@@ -286,23 +372,25 @@ deserves its own design pass (especially shorthand expansion).
 Breaking change to stylesheet output order (not to selectors, hashes, or
 class names). Plan:
 
-1. Implement bucket classification + stable sort in `generate.ml` behind a
-   `--sort=buckets` flag; default stays `source` for one release.
-2. Drop label suffixes from class names (all modes); keep `cx-<label>`
-   markers gated by `--dev`. This changes dev class names only.
+1. Implement bucket classification + stable sort in `generate.ml`.
+   Buckets are the default; `--sort=source` is a one-release escape hatch
+   (pre-1.0, no compatibility shims by policy).
+2. Prep for phase 2 (riskless, ships alongside): `generate.re` and
+   server-reason-react's `styles_attribute.ml` migrate from `fst`/`snd` to
+   the `CSS.className`/`CSS.styles` accessors.
 3. Promote snapshot/cram tests (`packages/generate/test/*.t`,
    `packages/ppx/test/css-support/*.t`); add:
    - a bucket-order test asserting the full taxonomy order from a single
      module that declares them shuffled;
-   - a cross-file test asserting two files with reversed declaration order
-     produce byte-identical stylesheets;
+   - a cross-file test asserting reversed declaration order across files
+     converges on the same stylesheet order for shared atoms;
    - a breakpoint-sort test (`min-width` asc, `max-width` desc, mixed);
-   - a dev-vs-prod test asserting rule-for-rule identical output modulo
-     whitespace.
-4. Flip the default to `buckets`, keep `--sort=source` one more release as
-   an escape hatch, then remove it.
-5. Update `demo/melange` — `queryOrder` vs `queryOrderReversed` becomes a
+   - a globals test asserting `[%styled.global]` rules keep source order.
+4. Update `demo/melange` — `queryOrder` vs `queryOrderReversed` becomes a
    demonstration that both orders converge on the same (bucketed) result.
+5. Phase 2 (separate pass): label suffix removal everywhere + hash
+   tiebreak + sealed `styles` + property-keyed merge; add the dev-vs-prod
+   parity test (rule-for-rule identical output modulo whitespace) there.
 
 ## Open questions
 
