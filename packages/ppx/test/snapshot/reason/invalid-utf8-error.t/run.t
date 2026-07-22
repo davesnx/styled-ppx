@@ -15,8 +15,8 @@ produces a located error instead of crashing the compiler with
 
 Testing located error for a raw \xe9 byte inside the CSS payload
   $ dune build
-  File "input.re", line 5, characters 33-34:
-  5 | let broken = [%css "content: \"caf\xe9\""];
+  File "input.re", line 3, characters 33-34:
+  3 | let broken = [%css "content: \"caf\xe9\""];
                                        ^
   Error: This CSS is not valid UTF-8
   [1]
