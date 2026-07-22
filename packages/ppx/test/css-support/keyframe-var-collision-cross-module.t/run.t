@@ -43,7 +43,7 @@ class pointing at a missing variable.
       ~vars:[("--h0-9tm5yy", (CSS.Types.Height.toString h0));
             ("--h1-mjt56l", (CSS.Types.Height.toString h1))] "keyframe-1h1i3op"
   let box =
-    CSS.make "css-14rjjsz-box css-k008qs-box"
+    CSS.make_labeled "box" "css-14rjjsz-box css-k008qs-box"
       (CSS.Types.AnimationName.toStyleVars "--grow-1ugf6s8" grow)
   $ cat b.ml
   [@@@css
@@ -60,7 +60,7 @@ class pointing at a missing variable.
             ("--h1-1oxv8aa", (CSS.Types.Height.toString h1))]
       "keyframe-1arknxa"
   let box =
-    CSS.make "css-14rjjsz-box css-hpgf8j-box"
+    CSS.make_labeled "box" "css-14rjjsz-box css-hpgf8j-box"
       (CSS.Types.AnimationName.toStyleVars "--grow-1ugf6s8" grow)
   $ styled-ppx.generate a.ml b.ml > styles.css
   $ cat styles.css

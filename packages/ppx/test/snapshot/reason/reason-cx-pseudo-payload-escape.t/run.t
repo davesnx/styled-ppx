@@ -29,4 +29,5 @@ subject is outside `&`'s subtree — slipped through and shipped a dead
   [@@@css.bindings [("Input_is_ok.ok", "css-1ptjfl7-ok")]]
   let c = "red"
   let ok =
-    CSS.make "css-1ptjfl7-ok" [("--c-qdrabr", (CSS.Types.Color.toString c))]
+    CSS.make_labeled "ok" "css-1ptjfl7-ok"
+      [("--c-qdrabr", (CSS.Types.Color.toString c))]

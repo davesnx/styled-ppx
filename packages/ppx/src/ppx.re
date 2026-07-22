@@ -263,6 +263,7 @@ let expand_css_expression =
         Css_to_runtime.render_make_call(
           ~loc=stringLoc,
           ~marker,
+          ~label,
           ~classNames,
           ~dynamic_vars,
         );
@@ -515,16 +516,17 @@ let expand_styled_module =
     | Ok(rule_list) =>
       switch (get_errors(type_check_rule_list(rule_list))) {
       | [] =>
+        /* Same gate as [%css]: the -<label> suffix is dev-only sugar.
+           Keeping it in minify/production would fork atoms per binding
+           name and break cross-binding dedup. */
+        let label = Settings.Get.minify() ? None : Some(name);
         let (classNames, dynamic_vars) =
           Css_file.push(
             ~file,
             ~scope,
             ~opens,
             ~source_position_start,
-            /* Same gate as [%css]: the -<label> suffix is dev-only sugar.
-               Keeping it in minify/production would fork atoms per binding
-               name and break cross-binding dedup. */
-            ~label=?{Settings.Get.minify() ? None : Some(name)},
+            ~label?,
             rule_list,
           );
         record_component_binding(classNames);
@@ -532,6 +534,7 @@ let expand_styled_module =
           Css_to_runtime.render_make_call(
             ~loc=stringLoc,
             ~marker=None,
+            ~label,
             ~classNames,
             ~dynamic_vars,
           );
@@ -625,7 +628,7 @@ let map_css_expressions =
           let args =
             args
             |> List.map(((label, arg)) => (label, self#expression(arg)));
-          Styles_attribute.expand({
+          Styles_prop.expand({
             ...expr,
             pexp_desc: Pexp_apply(fn, args),
           });

@@ -26,9 +26,9 @@ as an external path unless another enclosing `Css` module exists.
   
   let _ = Css.marker;
   module Css = {
-    let marker = CSS.make("css-tokvmb-marker", []);
+    let marker = CSS.make_labeled("marker", "css-tokvmb-marker", []);
   
-    let wrapper = CSS.make("css-59bkuc-wrapper", []);
+    let wrapper = CSS.make_labeled("wrapper", "css-59bkuc-wrapper", []);
   };
   
   let _ = (Css.marker, Css.wrapper);
