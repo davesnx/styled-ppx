@@ -521,7 +521,10 @@ let expand_styled_module =
             ~scope,
             ~opens,
             ~source_position_start,
-            ~label=name,
+            /* Same gate as [%css]: the -<label> suffix is dev-only sugar.
+               Keeping it in minify/production would fork atoms per binding
+               name and break cross-binding dedup. */
+            ~label=?{Settings.Get.minify() ? None : Some(name)},
             rule_list,
           );
         record_component_binding(classNames);
