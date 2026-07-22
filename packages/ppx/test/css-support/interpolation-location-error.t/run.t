@@ -66,7 +66,8 @@ If this test fail means that the module is not in sync with the ppx
   [@css.bindings [("Input.a", "css-48ak65-a")]];
   let grid = `gri;
   let a =
-    CSS.make(
+    CSS.make_labeled(
+      "a",
       "css-48ak65-a",
       [("--grid-1sb4gse", CSS.Types.Display.toString(grid))],
     );

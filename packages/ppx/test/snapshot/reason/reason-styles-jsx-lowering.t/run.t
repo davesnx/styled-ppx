@@ -6,11 +6,12 @@ Default mode expands `styles` on lowercase JSX and leaves other calls alone.
   [@css ".css-h5fkc8{margin-top:32px;}"];
   let passthrough = (~styles) => styles;
   let _ = passthrough(~styles=buttonStyles);
-  let _ = <div className={fst(buttonStyles)} style={snd(buttonStyles)} />;
-      className={fst(Cn2.(Css.bodyLg +++ CSS.make("css-h5fkc8", [])))}
-      style={snd(Cn2.(Css.bodyLg +++ CSS.make("css-h5fkc8", [])))}
-      className={fst(buttonStyles) ++ " " ++ "base"}
-      style={ReactDOM.Style.combine(baseStyle, snd(buttonStyles))}
+      className={CSS.className(buttonStyles)}
+      style={CSS.styles(buttonStyles)}
+      className={CSS.className(
+      style={CSS.styles(Cn2.(Css.bodyLg +++ CSS.make("css-h5fkc8", [])))}
+      className={CSS.className(buttonStyles) ++ " " ++ "base"}
+      style={ReactDOM.Style.combine(baseStyle, CSS.styles(buttonStyles))}
   let _ = <Foo styles=buttonStyles />;
   let _ = <Foo.Bar styles=buttonStyles />;
 
@@ -22,10 +23,11 @@ Native mode keeps the same `styles` expansion contract before native JSX lowerin
   [@css ".css-h5fkc8{margin-top:32px;}"];
   let passthrough = (~styles) => styles;
   let _ = passthrough(~styles=buttonStyles);
-  let _ = <div className={fst(buttonStyles)} style={snd(buttonStyles)} />;
-      className={fst(Cn2.(Css.bodyLg +++ CSS.make("css-h5fkc8", [])))}
-      style={snd(Cn2.(Css.bodyLg +++ CSS.make("css-h5fkc8", [])))}
-      className={fst(buttonStyles) ++ " " ++ "base"}
-      style={ReactDOM.Style.combine(baseStyle, snd(buttonStyles))}
+      className={CSS.className(buttonStyles)}
+      style={CSS.styles(buttonStyles)}
+      className={CSS.className(
+      style={CSS.styles(Cn2.(Css.bodyLg +++ CSS.make("css-h5fkc8", [])))}
+      className={CSS.className(buttonStyles) ++ " " ++ "base"}
+      style={ReactDOM.Style.combine(baseStyle, CSS.styles(buttonStyles))}
   let _ = <Foo styles=buttonStyles />;
   let _ = <Foo.Bar styles=buttonStyles />;

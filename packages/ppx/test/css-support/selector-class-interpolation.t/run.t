@@ -37,18 +37,23 @@ and the runtime `CSS.make` call must carry an empty list (no phantom
     ]
   ];
   
-  let foo = CSS.make("css-tokvmb-foo", []);
+  let foo = CSS.make_labeled("foo", "css-tokvmb-foo", []);
   
-  let bar = CSS.make("css-11o9qin-bar", []);
+  let bar = CSS.make_labeled("bar", "css-11o9qin-bar", []);
   
   let buttonLoadingAnimation =
-    CSS.make(
+    CSS.make_labeled(
+      "buttonLoadingAnimation",
       "css-1vf0mg9-buttonLoadingAnimation css-rj3gnv-buttonLoadingAnimation",
       [],
     );
   
   let colorAccent =
-    CSS.make("css-f9xk9e-colorAccent css-1eo9rnb-colorAccent", []);
+    CSS.make_labeled(
+      "colorAccent",
+      "css-f9xk9e-colorAccent css-1eo9rnb-colorAccent",
+      [],
+    );
   
   let _ = (foo, bar, buttonLoadingAnimation, colorAccent);
 

@@ -24,9 +24,10 @@ the flag omitted, locking in that the marker is purely opt-in.
     ]
   ];
   
-  let layout = CSS.make("css-k008qs-layout css-38zrbw-layout", []);
+  let layout =
+    CSS.make_labeled("layout", "css-k008qs-layout css-38zrbw-layout", []);
   
-  let button = CSS.make("css-tokvmb-button", []);
+  let button = CSS.make_labeled("button", "css-tokvmb-button", []);
   
   let _ = (layout, button);
 

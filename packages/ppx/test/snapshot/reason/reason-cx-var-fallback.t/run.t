@@ -16,8 +16,11 @@ nested `var()`, length values — anything goes inside the fallback slot).
     ("Input.lengthFallback", "css-11h5tjf-lengthFallback");
     ("Input.complexFallback", "css-chb3vj-complexFallback");
     ("Input.nested", "css-1cn5a9q-nested")]]
-  let plain = CSS.make "css-51tc9m-plain" []
-  let withFallback = CSS.make "css-1c6bdk9-withFallback" []
-  let lengthFallback = CSS.make "css-11h5tjf-lengthFallback" []
-  let complexFallback = CSS.make "css-chb3vj-complexFallback" []
-  let nested = CSS.make "css-1cn5a9q-nested" []
+  let plain = CSS.make_labeled "plain" "css-51tc9m-plain" []
+  let withFallback =
+    CSS.make_labeled "withFallback" "css-1c6bdk9-withFallback" []
+  let lengthFallback =
+    CSS.make_labeled "lengthFallback" "css-11h5tjf-lengthFallback" []
+  let complexFallback =
+    CSS.make_labeled "complexFallback" "css-chb3vj-complexFallback" []
+  let nested = CSS.make_labeled "nested" "css-1cn5a9q-nested" []

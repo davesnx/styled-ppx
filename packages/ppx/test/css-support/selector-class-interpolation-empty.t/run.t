@@ -45,18 +45,29 @@ on the element.
     ]
   ];
   
-  let active = CSS.make("css-0-active", []);
+  let active = CSS.make_labeled("active", "css-0-active", []);
   
-  let container = CSS.make("css-1443u2l-container css-g57662-container", []);
+  let container =
+    CSS.make_labeled(
+      "container",
+      "css-1443u2l-container css-g57662-container",
+      [],
+    );
   
-  let selected = CSS.make("css-0-selected", []);
-  let highlighted = CSS.make("css-0-highlighted", []);
+  let selected = CSS.make_labeled("selected", "css-0-selected", []);
+  let highlighted = CSS.make_labeled("highlighted", "css-0-highlighted", []);
   
-  let card = CSS.make("css-q5fqw0-card css-19ehxda-card css-17nqvvb-card", []);
+  let card =
+    CSS.make_labeled(
+      "card",
+      "css-q5fqw0-card css-19ehxda-card css-17nqvvb-card",
+      [],
+    );
   
-  let actionButton = CSS.make("css-0-actionButton", []);
+  let actionButton = CSS.make_labeled("actionButton", "css-0-actionButton", []);
   
-  let panel = CSS.make("css-k008qs-panel css-62yfsj-panel", []);
+  let panel =
+    CSS.make_labeled("panel", "css-k008qs-panel css-62yfsj-panel", []);
   
   let _ = (active, container, selected, highlighted, card, actionButton, panel);
 
