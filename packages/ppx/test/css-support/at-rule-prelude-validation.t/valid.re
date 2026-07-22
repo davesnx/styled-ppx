@@ -64,8 +64,7 @@ let _container_range = [%css "@container (block-size < 650px) { color: red; }"];
 let _container_orientation = [%css
   "@container (orientation: landscape) { color: red; }"
 ];
-/* Range-type container size features also accept their min-/max- prefixed
-   spellings (css-contain-3 follows media-feature conventions). */
+/* min-/max- forms for range-type container size features. */
 let _container_named_min_width = [%css
   "@container sidebar (min-width: 400px) { color: red; }"
 ];

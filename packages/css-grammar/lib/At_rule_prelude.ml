@@ -87,10 +87,8 @@ let media_feature_inventory =
       media_range_features
   @ media_discrete_features
 
-(* Containment 3 size features (style()/scroll-state() queries are function
-   blocks and are not name-checked here). Range-type features also accept
-   their legacy `min-`/`max-` prefixed spellings, derived below;
-   `orientation` is discrete and takes none. *)
+(* Containment 3 size features. Range features also accept min-/max- names;
+   style() and scroll-state() queries are not checked here. *)
 let container_range_features =
   [ "width"; "height"; "inline-size"; "block-size"; "aspect-ratio" ]
 
