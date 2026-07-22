@@ -353,76 +353,120 @@ let parse_wq_name stream =
   let name, _ = expect_ident stream in
   name
 
-let parse_nth_payload stream =
+(* -- An+B microsyntax (nth payloads) -- *)
+
+type nth_suffix =
+  | Nth_suffix_n (* "n" *)
+  | Nth_suffix_n_dash (* "n-", must be followed by a signless integer *)
+  | Nth_suffix_n_dash_digits of int (* "n-<digits>", carries b *)
+
+let raise_invalid_nth function_name (token : token_with_location) =
+  let message = Printf.sprintf "Invalid an+b value in :%s()" function_name in
+  raise (Parse_error (token.start_pos, token.end_pos, message))
+
+(* an+b coefficients are integers, but the lexer produces floats. Reject
+   values that are not integral or are too large for floats to represent
+   integers exactly, instead of silently truncating with [int_of_float]. *)
+let nth_int_of_number function_name (token : token_with_location) value =
+  let max_exact_float_int =
+    9007199254740992.
+    (* 2^53 *)
+  in
+  if Float.is_integer value && Float.abs value <= max_exact_float_int then
+    int_of_float value
+  else raise_invalid_nth function_name token
+
+let is_ascii_digit = function '0' .. '9' -> true | _ -> false
+
+(* Parse the "<digits>" of an "n-<digits>" unit or ident. [int_of_string]
+   alone would also accept signs, underscores and hex ("0x10"); CSS only
+   allows ASCII digits. [int_of_string_opt] still guards against overflow. *)
+let nth_int_of_digits function_name (token : token_with_location) digits =
+  if String.length digits > 0 && String.for_all is_ascii_digit digits then (
+    match int_of_string_opt digits with
+    | Some value -> value
+    | None -> raise_invalid_nth function_name token)
+  else raise_invalid_nth function_name token
+
+(* Classify the ident part of an an+b payload after the optional leading
+   '-': "n", "n-" or "n-<digits>" (ASCII case-insensitive; only the leading
+   'n' is cased, '-' and digits are not). Anything else (e.g. the unit of
+   "2px" or the ident "n-abc") is invalid. *)
+let classify_nth_suffix function_name (token : token_with_location) suffix =
+  let length = String.length suffix in
+  if length = 0 || (suffix.[0] <> 'n' && suffix.[0] <> 'N') then
+    raise_invalid_nth function_name token
+  else if length = 1 then Nth_suffix_n
+  else if suffix.[1] <> '-' then raise_invalid_nth function_name token
+  else if length = 2 then Nth_suffix_n_dash
+  else
+    Nth_suffix_n_dash_digits
+      (nth_int_of_digits function_name token (String.sub suffix 2 (length - 2)))
+
+let parse_nth_payload ~function_name stream =
   skip_whitespace stream;
+  (* Parses the optional b part once [a] and its "n"-ish suffix are known,
+     from either a DIMENSION unit ("2n", "2n-", "2n-3") or an IDENT ("n",
+     "-n", "n-", "n-3", ...). *)
+  let parse_after_n a suffix =
+    match suffix with
+    | Nth_suffix_n_dash_digits b -> Ast.Nth (ANB (a, "-", b))
+    | Nth_suffix_n_dash ->
+      (* "an-" must be followed by a signless integer: b is negative. *)
+      skip_whitespace stream;
+      begin match current_tok stream with
+      | Tokens.NUMBER value ->
+        let token = advance stream in
+        let b = nth_int_of_number function_name token value in
+        if b < 0 then raise_invalid_nth function_name token
+        else Ast.Nth (ANB (a, "-", b))
+      | _ -> raise_parse_error (current_token stream)
+      end
+    | Nth_suffix_n ->
+      skip_whitespace stream;
+      begin match current_tok stream with
+      | Tokens.DELIM (("+" | "-") as op) ->
+        let _ = advance stream in
+        skip_whitespace stream;
+        begin match current_tok stream with
+        | Tokens.NUMBER value ->
+          let token = advance stream in
+          Ast.Nth (ANB (a, op, nth_int_of_number function_name token value))
+        | _ -> raise_parse_error (current_token stream)
+        end
+      | Tokens.NUMBER value ->
+        let token = advance stream in
+        let b = nth_int_of_number function_name token value in
+        let op, abs_b = if b < 0 then "-", abs b else "+", b in
+        Ast.Nth (ANB (a, op, abs_b))
+      | _ -> Ast.Nth (AN a)
+      end
+  in
   let payload =
     match current_tok stream with
-    | Tokens.NUMBER a ->
-      let _ = advance stream in
-      Ast.Nth (A (int_of_float a))
+    | Tokens.NUMBER value ->
+      let token = advance stream in
+      Ast.Nth (A (nth_int_of_number function_name token value))
     | Tokens.DIMENSION (num, unit) ->
-      let _ = advance stream in
-      skip_whitespace stream;
-      begin match current_tok stream with
-      | Tokens.DELIM (("+" | "-") as op) ->
-        let _ = advance stream in
-        skip_whitespace stream;
-        let b =
-          match current_tok stream with
-          | Tokens.NUMBER value ->
-            let _ = advance stream in
-            int_of_float value
-          | _ -> raise_parse_error (current_token stream)
+      let token = advance stream in
+      let a = nth_int_of_number function_name token num in
+      parse_after_n a (classify_nth_suffix function_name token unit)
+    | Tokens.IDENT ident ->
+      let token = advance stream in
+      begin match String.lowercase_ascii ident with
+      | "even" -> Ast.Nth Even
+      | "odd" -> Ast.Nth Odd
+      | lowercase ->
+        let a, suffix =
+          if String.length lowercase > 0 && lowercase.[0] = '-' then
+            -1, String.sub lowercase 1 (String.length lowercase - 1)
+          else 1, lowercase
         in
-        Ast.Nth (ANB (int_of_float num, op, b))
-      | Tokens.NUMBER value ->
-        let _ = advance stream in
-        let b = int_of_float value in
-        let op, abs_b = if b < 0 then "-", abs b else "+", b in
-        Ast.Nth (ANB (int_of_float num, op, abs_b))
-      | _ ->
-        if String.length unit > 2 && unit.[0] = 'n' && unit.[1] = '-' then (
-          let b = int_of_string (String.sub unit 2 (String.length unit - 2)) in
-          Ast.Nth (ANB (int_of_float num, "-", b)))
-        else Ast.Nth (AN (int_of_float num))
-      end
-    | Tokens.IDENT name ->
-      let _ = advance stream in
-      skip_whitespace stream;
-      begin match current_tok stream with
-      | Tokens.DELIM (("+" | "-") as op) ->
-        let _ = advance stream in
-        skip_whitespace stream;
-        let b =
-          match current_tok stream with
-          | Tokens.NUMBER value ->
-            let _ = advance stream in
-            int_of_float value
-          | _ -> raise_parse_error (current_token stream)
-        in
-        let first_char = name.[0] in
-        let a = if first_char = '-' then -1 else 1 in
-        Ast.Nth (ANB (a, op, b))
-      | Tokens.NUMBER value ->
-        let _ = advance stream in
-        let b = int_of_float value in
-        let op, abs_b = if b < 0 then "-", abs b else "+", b in
-        let first_char = name.[0] in
-        let a = if first_char = '-' then -1 else 1 in
-        Ast.Nth (ANB (a, op, abs_b))
-      | _ ->
-        begin match name with
-        | "even" -> Ast.Nth Even
-        | "odd" -> Ast.Nth Odd
-        | "n" -> Ast.Nth (AN 1)
-        | _ ->
-          let first_char = name.[0] in
-          let a = if first_char = '-' then -1 else 1 in
-          Ast.Nth (AN a)
-        end
+        parse_after_n a (classify_nth_suffix function_name token suffix)
       end
     | _ -> raise_parse_error (current_token stream)
   in
+  skip_whitespace stream;
   payload
 
 let rec parse_component_value stream =
@@ -616,7 +660,7 @@ and parse_pseudo_class_selector stream =
   | Tokens.NTH_FUNCTION name ->
     let start_pos = (current_token stream).start_pos in
     let _ = advance stream in
-    let payload = parse_nth_payload stream in
+    let payload = parse_nth_payload ~function_name:name stream in
     let payload_loc = make_loc start_pos stream.last_end_pos in
     let _ = expect_token stream Tokens.RIGHT_PAREN in
     Pseudoclass

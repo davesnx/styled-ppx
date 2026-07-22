@@ -50,6 +50,32 @@ An+B microsyntax
   > EOF
   li:nth-child(even){foo:bar;}li:nth-child(odd){foo:bar;}li:nth-child(5){foo:bar;}li:nth-child(n){foo:bar;}li:nth-child(-4n+10){foo:bar;}li:nth-child(3n-6){foo:bar;}li:nth-child(3n-6){foo:bar;}li:nth-child(3n+1){foo:bar;}li:nth-child(-n+6){foo:bar;}
 
+An+B microsyntax is ASCII case-insensitive, "n-<digits>" idents and
+"an- <signless-integer>" carry a negative b
+  $ cat << "EOF" | ./Render_test.exe
+  > li:nth-child(EVEN) { foo: bar; }
+  > li:nth-child(2N) { foo: bar; }
+  > li:nth-child(2N-1) { foo: bar; }
+  > li:nth-child(-N+3) { foo: bar; }
+  > li:nth-child(n-3) { foo: bar; }
+  > li:nth-child(-n-3) { foo: bar; }
+  > li:nth-child(2n- 3) { foo: bar; }
+  > li:nth-child(n- 3) { foo: bar; }
+  > EOF
+  li:nth-child(even){foo:bar;}li:nth-child(2n){foo:bar;}li:nth-child(2n-1){foo:bar;}li:nth-child(-n+3){foo:bar;}li:nth-child(n-3){foo:bar;}li:nth-child(-n-3){foo:bar;}li:nth-child(2n-3){foo:bar;}li:nth-child(n-3){foo:bar;}
+
+Invalid An+B payloads are located parse errors, not crashes
+  $ echo "li:nth-child(3n-abc) { foo: bar; }" | ./Render_test.exe
+  Error parsing CSS: Invalid an+b value in :nth-child() on line 1 at position 13
+  $ echo "li:nth-child(3n-99999999999999999999) { foo: bar; }" | ./Render_test.exe
+  Error parsing CSS: Invalid an+b value in :nth-child() on line 1 at position 13
+  $ echo "li:nth-child(99999999999999999999n) { foo: bar; }" | ./Render_test.exe
+  Error parsing CSS: Invalid an+b value in :nth-child() on line 1 at position 13
+  $ echo "li:nth-child(2px) { foo: bar; }" | ./Render_test.exe
+  Error parsing CSS: Invalid an+b value in :nth-child() on line 1 at position 13
+  $ echo "li:nth-child(n-abc) { foo: bar; }" | ./Render_test.exe
+  Error parsing CSS: Invalid an+b value in :nth-child() on line 1 at position 13
+
 Remove empty rules
   $ cat << "EOF" | ./Render_test.exe
   > /* .foo rule will be discarded */

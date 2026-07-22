@@ -875,9 +875,27 @@ let rec consume_token = lexbuf => {
   };
 };
 
+/* Sedlex decodes the UTF-8 input lazily while lexing and raises [MalFormed]
+   on the first byte that is not valid UTF-8 (or [InvalidCodepoint] for
+   out-of-range code points). At that moment the current position is exactly
+   the offending byte, so surface it as a located [LexingError] instead of
+   letting the exception crash the caller. */
+let invalid_utf8 = lexbuf => {
+  let (_, error_pos) = Sedlexing.lexing_positions(lexbuf);
+  let error_end = {
+    ...error_pos,
+    Lexing.pos_cnum: error_pos.pos_cnum + 1,
+  };
+  raise(LexingError((error_pos, error_end, "This CSS is not valid UTF-8")));
+};
+
 let next_token_with_location = lexbuf => {
   let (_, position_start) = Sedlexing.lexing_positions(lexbuf);
-  let value = consume_token(lexbuf);
+  let value =
+    try(consume_token(lexbuf)) {
+    | Sedlexing.MalFormed
+    | Sedlexing.InvalidCodepoint(_) => invalid_utf8(lexbuf)
+    };
   let (_, position_end) = Sedlexing.lexing_positions(lexbuf);
   {
     txt: value,
