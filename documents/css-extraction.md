@@ -141,18 +141,27 @@ The accompanying synthetic `let _ = M.marker` lines exist so that:
 
 ### `[@@@css.config [(key, value); ...]]` — extraction settings
 
-Emitted when the PPX runs with production settings (`--minify` or
-`--env production`) and the CU contributes extraction items. Carries
-PPX-side settings the aggregator must honor, as string key/value pairs.
-The only key today is `env`:
+Emitted when the CU contributes extraction items (rules or bindings) and
+at least one config key applies. Carries PPX-side settings the aggregator
+must honor, as string key/value pairs. Two keys today:
+
+- `env`: set to `"production"` when the PPX runs with production settings
+  (`--minify` or `--env production`), and the aggregator minifies its
+  output accordingly.
+- `library`: the value of the `library-name` cookie dune passes to every
+  ppx run inside a `(library ...)` stanza, read via
+  `Ppxlib.Driver.Cookies.add_simple_handler`. Absent when the module isn't
+  compiled as part of a library (for example an `(executable ...)`
+  stanza) or the cookie wasn't set.
 
 ```ocaml
-[@@@css.config [("env", "production")]]
+[@@@css.config [("env", "production"); ("library", "my_lib")]]
 ```
 
-Absence means development — the attribute is not emitted in dev builds,
-so dev output stays clean. Unknown keys are ignored by the aggregator
-(forward compatibility).
+When both apply, `env` comes first, then `library`. Absence of every key
+means the attribute is omitted entirely — dev output with no library
+cookie stays exactly as before this key was added. Unknown keys are
+ignored by the aggregator (forward compatibility).
 
 The aggregator minifies its output (drops inter-rule newlines) only when
 **every** contributing input file — every file with harvested rules or an
