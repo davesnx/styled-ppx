@@ -21,7 +21,8 @@ prints the edge that caused the reorder.
 
   $ styled-ppx.generate --log debug --output out.css a_consumer.ml z_base.ml
   styled-ppx: output file: out.css
-  styled-ppx: order: Z_base, A_consumer
+  styled-ppx: library order: .
+  styled-ppx: order: .: Z_base, A_consumer
   styled-ppx: edge: A_consumer -> Z_base
   styled-ppx: environment: development
   styled-ppx: stylesheet:
