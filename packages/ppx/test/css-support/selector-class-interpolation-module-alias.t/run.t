@@ -27,21 +27,21 @@ chain as `$(Css.marker)` without emitting a cross-module sentinel.
     ]
   ];
   module Css = {
-    let marker = CSS.make("css-tokvmb-marker", []);
+    let marker = CSS.make_labeled("marker", "css-tokvmb-marker", []);
   };
   
   module Styles = Css;
   
-  let wrapper = CSS.make("css-155k9s5-wrapper", []);
+  let wrapper = CSS.make_labeled("wrapper", "css-155k9s5-wrapper", []);
   
   module Theme = {
     module Css = {
-      let marker = CSS.make("css-bjcoli-marker", []);
+      let marker = CSS.make_labeled("marker", "css-bjcoli-marker", []);
     };
   
     module Styles = Css;
   
-    let wrapper = CSS.make("css-1ejq12w-wrapper", []);
+    let wrapper = CSS.make_labeled("wrapper", "css-1ejq12w-wrapper", []);
   };
   
   let _ = (Css.marker, wrapper, Theme.Css.marker, Theme.wrapper);

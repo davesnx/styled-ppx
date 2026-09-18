@@ -28,20 +28,20 @@ emitted as a cross-module sentinel.
     ]
   ];
   module Css = {
-    let marker = CSS.make("css-tokvmb-marker", []);
+    let marker = CSS.make_labeled("marker", "css-tokvmb-marker", []);
   
-    let wrapper = CSS.make("css-3qknr-wrapper", []);
+    let wrapper = CSS.make_labeled("wrapper", "css-3qknr-wrapper", []);
   };
   
-  let wrapper = CSS.make("css-cb06ec-wrapper", []);
+  let wrapper = CSS.make_labeled("wrapper", "css-cb06ec-wrapper", []);
   
   module Theme = {
     module Css = {
-      let marker = CSS.make("css-bjcoli-marker", []);
+      let marker = CSS.make_labeled("marker", "css-bjcoli-marker", []);
     };
   
     module Components = {
-      let wrapper = CSS.make("css-59bkuc-wrapper", []);
+      let wrapper = CSS.make_labeled("wrapper", "css-59bkuc-wrapper", []);
     };
   };
   

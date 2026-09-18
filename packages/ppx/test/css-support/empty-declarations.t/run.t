@@ -33,15 +33,15 @@ selector-class-interpolation-empty.t for the full end-to-end behavior.
   
   let _ = CSS.make("", []);
   
-  let _a = CSS.make("css-0-_a", []);
-  let _a = CSS.make("css-0-_a", []);
-  let _a = CSS.make("css-0-_a", []);
+  let _a = CSS.make_labeled("_a", "css-0-_a", []);
+  let _a = CSS.make_labeled("_a", "css-0-_a", []);
+  let _a = CSS.make_labeled("_a", "css-0-_a", []);
   
-  let _a = CSS.make("css-0-_a", []);
+  let _a = CSS.make_labeled("_a", "css-0-_a", []);
   
-  let _a = CSS.make("css-0-_a", []);
+  let _a = CSS.make_labeled("_a", "css-0-_a", []);
   
-  let _a = CSS.make("css-0-_a", []);
+  let _a = CSS.make_labeled("_a", "css-0-_a", []);
 
 
 

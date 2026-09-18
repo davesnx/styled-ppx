@@ -40,7 +40,8 @@ If this test fail means that the module is not in sync with the ppx
   ];
   
   let _chart =
-    CSS.make(
+    CSS.make_labeled(
+      "_chart",
       "css-9y6172-_chart css-wdylr4-_chart css-3xax0l-_chart css-1fqvgu0-_chart css-o0c7xs-_chart",
       [],
     );

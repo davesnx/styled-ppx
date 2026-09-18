@@ -33,19 +33,22 @@ top-level interpolation does. If the inline list is empty `[]` for the
   let c = CSS.hex("ff0000");
   
   let topLevel =
-    CSS.make(
+    CSS.make_labeled(
+      "topLevel",
       "css-1b5xvk3-topLevel",
       [("--c-dq4mhq", CSS.Types.Color.toString(c))],
     );
   
   let hover =
-    CSS.make(
+    CSS.make_labeled(
+      "hover",
       "css-1orh0hp-hover",
       [("--c-11hlefi", CSS.Types.Color.toString(c))],
     );
   
   let placeholder =
-    CSS.make(
+    CSS.make_labeled(
+      "placeholder",
       "css-zjac4l-placeholder",
       [("--c-gzgct8", CSS.Types.Color.toString(c))],
     );

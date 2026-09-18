@@ -78,34 +78,37 @@
     ("Input.gridCss",
       "css-lgj0h8-gridCss css-bghlac-gridCss css-16610y9-gridCss");
     ("Input.scrollCss", "css-pdjuhq-scrollCss css-13v3rg8-scrollCss")]]
-  let staticCss = CSS.make "css-k008qs-staticCss css-1tyndxa-staticCss" []
+  let staticCss =
+    CSS.make_labeled "staticCss" "css-k008qs-staticCss css-1tyndxa-staticCss"
+      []
   let dynamicCss color =
-    CSS.make "css-kusjgz-dynamicCss css-k008qs-dynamicCss"
+    CSS.make_labeled "dynamicCss" "css-kusjgz-dynamicCss css-k008qs-dynamicCss"
       [("--color-1a279q8", (CSS.Types.Color.toString color))]
   let logicalProps spacing =
-    CSS.make "css-15a4g54-logicalProps"
+    CSS.make_labeled "logicalProps" "css-15a4g54-logicalProps"
       [("--spacing-y96o3b", (CSS.Types.MarginBlock.toString spacing));
       ("--spacing-vh5lkd", (CSS.Types.MarginInline.toString spacing));
       ("--spacing-f3qjr", (CSS.Types.Length.toString spacing))]
   let nestedCss =
-    CSS.make "css-k008qs-nestedCss css-zqnfaz-nestedCss css-osffsa-nestedCss"
-      []
+    CSS.make_labeled "nestedCss"
+      "css-k008qs-nestedCss css-zqnfaz-nestedCss css-osffsa-nestedCss" []
   let responsiveCss =
-    CSS.make "css-k008qs-responsiveCss css-1ruz0a1-responsiveCss" []
+    CSS.make_labeled "responsiveCss"
+      "css-k008qs-responsiveCss css-1ruz0a1-responsiveCss" []
   let multipleMediaQueries =
-    CSS.make
+    CSS.make_labeled "multipleMediaQueries"
       "css-6xix1i-multipleMediaQueries css-1l3vtdj-multipleMediaQueries css-2b7vub-multipleMediaQueries"
       []
   let mediaWithSelector =
-    CSS.make
+    CSS.make_labeled "mediaWithSelector"
       "css-k008qs-mediaWithSelector css-5ivle1-mediaWithSelector css-1cemfq6-mediaWithSelector css-1l7frkw-mediaWithSelector"
       []
   let complexMedia =
-    CSS.make
+    CSS.make_labeled "complexMedia"
       "css-lgj0h8-complexMedia css-mhiow9-complexMedia css-1nm9mde-complexMedia"
       []
   let mediaWithInterpolation color =
-    CSS.make
+    CSS.make_labeled "mediaWithInterpolation"
       "css-kusjgz-mediaWithInterpolation css-11qknlj-mediaWithInterpolation"
       [("--color-1a279q8", (CSS.Types.Color.toString color))]
   let fadeIn = CSS.Types.AnimationName.make "keyframe-jw9oix"
@@ -117,13 +120,16 @@
       let make _props = CSS.global_style_tag (to_string ())
     end
   let multiVar primary secondary size =
-    CSS.make "css-1sq1nk7-multiVar css-nk32ej-multiVar"
+    CSS.make_labeled "multiVar" "css-1sq1nk7-multiVar css-nk32ej-multiVar"
       [("--primary-19vrfgr", (CSS.Types.Color.toString primary));
       ("--secondary-1dc81fi", (CSS.Types.Color.toString secondary));
       ("--size-3mc4ty", (CSS.Types.FontSize.toString size))]
   let gridCss =
-    CSS.make "css-lgj0h8-gridCss css-bghlac-gridCss css-16610y9-gridCss" []
-  let scrollCss = CSS.make "css-pdjuhq-scrollCss css-13v3rg8-scrollCss" []
+    CSS.make_labeled "gridCss"
+      "css-lgj0h8-gridCss css-bghlac-gridCss css-16610y9-gridCss" []
+  let scrollCss =
+    CSS.make_labeled "scrollCss" "css-pdjuhq-scrollCss css-13v3rg8-scrollCss"
+      []
   let _ = ReactDOM.jsx "div" (ReactDOM.domProps ~className:(fst staticCss) ())
   let _ =
     ReactDOM.jsx "div"

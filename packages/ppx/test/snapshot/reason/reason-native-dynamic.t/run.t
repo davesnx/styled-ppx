@@ -972,7 +972,8 @@
       | None => ""
       };
     let styles = (~var, ~id, _) =>
-      CSS.make(
+      CSS.make_labeled(
+        "DynamicComponent",
         "css-fhnx1u-DynamicComponent css-k008qs-DynamicComponent",
         [
           ("--var-1uix7by", CSS.Types.Color.toString(var)),
@@ -981,9 +982,9 @@
       );
     let make = (props: makeProps('id, 'var)) => {
       let className =
-        fst(styles(~id=props.id, ~var=props.var, ()))
+        CSS.className(styles(~id=props.id, ~var=props.var, ()))
         ++ getOrEmpty(props.className)
-      and style = snd(styles(~id=props.id, ~var=props.var, ()));
+      and style = CSS.styles(styles(~id=props.id, ~var=props.var, ()));
       React.createElement(
         switch (props.as_) {
         | Some(v) => v

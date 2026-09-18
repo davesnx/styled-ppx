@@ -61,8 +61,11 @@ let render_dynamic_var_tuple = (~loc, var: Css_file.dynamic_var) => {
 
   let field_value =
     switch (var.var_type) {
+    /* Selector/media-prelude interpolations receive a `styles` value;
+       go through the accessor instead of destructuring the tuple so the
+       representation can be sealed (documents/atomic-css-ordering.md). */
     | Selector
-    | MediaQuery => [%expr fst([%e var_value])]
+    | MediaQuery => [%expr CSS.className([%e var_value])]
     | CustomProperty =>
       /* `--foo: $(expr)` - expr is already a [string], pass it
          through verbatim. Type error here means the user supplied a
@@ -107,7 +110,13 @@ let render_dynamic_var_list = (~loc, dynamic_vars) =>
   };
 
 let render_make_call =
-    (~loc, ~marker: option(string), ~classNames, ~dynamic_vars) => {
+    (
+      ~loc,
+      ~marker: option(string),
+      ~label: option(string),
+      ~classNames,
+      ~dynamic_vars,
+    ) => {
   let class_string = String.concat(" ", classNames);
   let className_string =
     switch (marker) {
@@ -119,5 +128,17 @@ let render_make_call =
 
   let var_list = render_dynamic_var_list(~loc, dynamic_vars);
 
-  [%expr CSS.make([%e className_expr], [%e var_list])];
+  /* The label rides along as dev-only carrier metadata (`CSS.label`).
+     `None` (minify/production) emits the plain `CSS.make` call so prod
+     bundles carry no label bytes; `make_labeled` is a separate
+     constructor because an optional argument would be saturated with
+     `undefined` at every melange call site. */
+  switch (label) {
+  | Some(label) =>
+    let label_expr =
+      Helper.Exp.constant(~loc, Pconst_string(label, loc, None));
+    [%expr
+     CSS.make_labeled([%e label_expr], [%e className_expr], [%e var_list])];
+  | None => [%expr CSS.make([%e className_expr], [%e var_list])]
+  };
 };

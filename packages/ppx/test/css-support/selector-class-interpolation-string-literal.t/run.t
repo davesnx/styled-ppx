@@ -20,7 +20,7 @@ only indexes [%css] class handles.
     let marker = "external-marker";
   };
   
-  let wrapper = CSS.make("css-59bkuc-wrapper", []);
+  let wrapper = CSS.make_labeled("wrapper", "css-59bkuc-wrapper", []);
   
   let _ = (Css.marker, wrapper);
 

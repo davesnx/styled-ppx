@@ -12,12 +12,14 @@ This test captures the admin-support cx2 regressions from the monorepo: border-s
 
   $ dune describe pp ./input.re | sed -n '/let _borderTop/,$p'
   let _borderTop =
-    CSS.make(
+    CSS.make_labeled(
+      "_borderTop",
       "css-11h9vd4-_borderTop",
       [("--line-17j5in5", CSS.Types.Color.toString(Color.Border.line))],
     );
   let _borderBottom =
-    CSS.make(
+    CSS.make_labeled(
+      "_borderBottom",
       "css-epkb5g-_borderBottom",
       [
         (
@@ -27,7 +29,8 @@ This test captures the admin-support cx2 regressions from the monorepo: border-s
       ],
     );
   let _borderLeft =
-    CSS.make(
+    CSS.make_labeled(
+      "_borderLeft",
       "css-ob4w3j-_borderLeft",
       [
         (
@@ -38,7 +41,8 @@ This test captures the admin-support cx2 regressions from the monorepo: border-s
     );
   
   let _boxShadow1 =
-    CSS.make(
+    CSS.make_labeled(
+      "_boxShadow1",
       "css-1070dz6-_boxShadow1",
       [
         (
@@ -49,7 +53,8 @@ This test captures the admin-support cx2 regressions from the monorepo: border-s
     );
   
   let _heightPlus =
-    CSS.make(
+    CSS.make_labeled(
+      "_heightPlus",
       "css-1y8ttxg-_heightPlus",
       [("--topMenuHeight-10ob2p1", CSS.Types.Length.toString(topMenuHeight))],
     );

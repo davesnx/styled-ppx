@@ -11,7 +11,8 @@ function args, and other inner expressions stay private.
   [@@@css.bindings
     [("Input.outer", "css-tokvmb-inner");
     ("Input.make_button", "css-ythpkc-make_button")]]
-  let outer = let inner = CSS.make "css-tokvmb-inner" [] in inner
+  let outer =
+    let inner = CSS.make_labeled "inner" "css-tokvmb-inner" [] in inner
   let make_button active =
-    CSS.make "css-ythpkc-make_button"
+    CSS.make_labeled "make_button" "css-ythpkc-make_button"
       [("--active-f7rv17", (CSS.Types.Color.toString active))]

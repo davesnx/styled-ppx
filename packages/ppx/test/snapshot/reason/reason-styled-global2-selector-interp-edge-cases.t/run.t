@@ -13,8 +13,8 @@
       ("Output.active", "css-b7rhyr-active"),
     ]
   ];
-  let card = CSS.make("css-nk32ej-card", []);
-  let active = CSS.make("css-b7rhyr-active", []);
+  let card = CSS.make_labeled("card", "css-nk32ej-card", []);
+  let active = CSS.make_labeled("active", "css-b7rhyr-active", []);
   let bg = CSS.red;
   module CardGlobals = {
     let to_string = () =>

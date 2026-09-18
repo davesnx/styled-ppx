@@ -30,11 +30,15 @@ the diff IS the blast radius.
     ("Input.withMedia", "css-14bi921-withMedia");
     ("Input.units", "css-137pweu-units css-1tzeee1-units");
     ("Input.withFallback", "css-1j744k-withFallback")]]
-  let solid = CSS.make "css-tokvmb-solid" []
+  let solid = CSS.make_labeled "solid" "css-tokvmb-solid" []
   let multi =
-    CSS.make "css-eaeacs-multi css-1ruxp1v-multi css-14ksm7b-multi" []
-  let hovered = CSS.make "css-1xu3tth-hovered css-1rwx7to-hovered" []
-  let multiSel = CSS.make "css-1r10myy-multiSel css-ltb45t-multiSel" []
-  let withMedia = CSS.make "css-14bi921-withMedia" []
-  let units = CSS.make "css-137pweu-units css-1tzeee1-units" []
-  let withFallback = CSS.make "css-1j744k-withFallback" []
+    CSS.make_labeled "multi"
+      "css-eaeacs-multi css-1ruxp1v-multi css-14ksm7b-multi" []
+  let hovered =
+    CSS.make_labeled "hovered" "css-1xu3tth-hovered css-1rwx7to-hovered" []
+  let multiSel =
+    CSS.make_labeled "multiSel" "css-1r10myy-multiSel css-ltb45t-multiSel" []
+  let withMedia = CSS.make_labeled "withMedia" "css-14bi921-withMedia" []
+  let units = CSS.make_labeled "units" "css-137pweu-units css-1tzeee1-units" []
+  let withFallback =
+    CSS.make_labeled "withFallback" "css-1j744k-withFallback" []

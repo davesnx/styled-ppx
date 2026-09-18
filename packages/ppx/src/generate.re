@@ -324,13 +324,18 @@ let newProps = (~loc) => {
   Helper.Vb.mk(~loc, valueName, value);
 };
 
-/* let className = fst(styles) ++ props.className; */
+/* let className = CSS.className(styles) ++ props.className;
+
+   Generated code goes through the CSS accessors instead of destructuring
+   the tuple, so the `styles` representation stays an internal detail of
+   the runtime (a prerequisite for sealing the type — see
+   documents/atomic-css-ordering.md, "Phase 2 direction"). */
 let className = (~loc, expr) => {
   let classNameProp = propItem(~loc, "className");
   Helper.Vb.mk(
     ~loc,
     Helper.Pat.mk(~loc, Ppat_var(withLoc("className", ~loc))),
-    [%expr fst([%e expr]) ++ getOrEmpty([%e classNameProp])],
+    [%expr CSS.className([%e expr]) ++ getOrEmpty([%e classNameProp])],
   );
 };
 
@@ -338,7 +343,7 @@ let style = (~loc, expr) =>
   Helper.Vb.mk(
     ~loc,
     Helper.Pat.mk(~loc, Ppat_var(withLoc("style", ~loc))),
-    [%expr snd([%e expr])],
+    [%expr CSS.styles([%e expr])],
   );
 
 /*
@@ -1118,19 +1123,24 @@ let extractedDynamicStyles =
       )
     ) {
     | [] =>
+      /* Same gate as [%css]: the -<label> suffix is dev-only sugar.
+         Keeping it in minify/production would fork atoms per binding
+         name and break cross-binding dedup. */
+      let label = Settings.Get.minify() ? None : Some(moduleName);
       let (classNames, dynamic_vars) =
         Css_file.push(
           ~file,
           ~scope,
           ~opens,
           ~source_position_start,
-          ~label=moduleName,
+          ~label?,
           rule_list,
         );
       onClassNames(classNames);
       Css_to_runtime.render_make_call(
         ~loc,
         ~marker=None,
+        ~label,
         ~classNames,
         ~dynamic_vars,
       );

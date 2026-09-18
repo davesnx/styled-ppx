@@ -24,7 +24,7 @@ behavior; this keeps the two debug affordances symmetric.
   
   CSS.make("css-14ksm7b", []);
   
-  let named = CSS.make("cx-named css-bjcoli-named", []);
+  let named = CSS.make_labeled("named", "cx-named css-bjcoli-named", []);
   
   let _ = named;
 

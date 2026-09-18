@@ -37,12 +37,16 @@ Selectors covered here:
     ("Input.threeLevel", "css-tokvmb-threeLevel css-1tfmvqw-threeLevel");
     ("Input.descendantUnderPseudo",
       "css-tokvmb-descendantUnderPseudo css-nqbkm2-descendantUnderPseudo")]]
-  let single = CSS.make "css-tokvmb-single css-12qnfjo-single" []
-  let twoLevel = CSS.make "css-tokvmb-twoLevel css-11jzudz-twoLevel" []
+  let single =
+    CSS.make_labeled "single" "css-tokvmb-single css-12qnfjo-single" []
+  let twoLevel =
+    CSS.make_labeled "twoLevel" "css-tokvmb-twoLevel css-11jzudz-twoLevel" []
   let twoLevelPseudoClass =
-    CSS.make "css-tokvmb-twoLevelPseudoClass css-1srf6vm-twoLevelPseudoClass"
-      []
-  let threeLevel = CSS.make "css-tokvmb-threeLevel css-1tfmvqw-threeLevel" []
+    CSS.make_labeled "twoLevelPseudoClass"
+      "css-tokvmb-twoLevelPseudoClass css-1srf6vm-twoLevelPseudoClass" []
+  let threeLevel =
+    CSS.make_labeled "threeLevel"
+      "css-tokvmb-threeLevel css-1tfmvqw-threeLevel" []
   let descendantUnderPseudo =
-    CSS.make
+    CSS.make_labeled "descendantUnderPseudo"
       "css-tokvmb-descendantUnderPseudo css-nqbkm2-descendantUnderPseudo" []

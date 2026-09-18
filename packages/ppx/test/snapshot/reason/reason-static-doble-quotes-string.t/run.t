@@ -995,13 +995,14 @@
     external assign2: (Js.t({..}), makeProps, Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles =
-      CSS.make(
+      CSS.make_labeled(
+        "SingleQuoteStrings",
         "css-k008qs-SingleQuoteStrings css-1tyndxa-SingleQuoteStrings",
         [],
       );
     let make = (props: makeProps) => {
-      let className = fst(styles) ++ getOrEmpty(classNameGet(props))
-      and style = snd(styles);
+      let className = CSS.className(styles) ++ getOrEmpty(classNameGet(props))
+      and style = CSS.styles(styles);
       let stylesObject =
         makeStylesObject(~className, ~style, ~ref=innerRefGet(props));
       let newProps = assign2(Js.Obj.empty(), props, stylesObject);

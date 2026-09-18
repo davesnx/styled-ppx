@@ -32,17 +32,20 @@ var per (source-path, runtime-type) across base / :hover / @media variants.
   let color = CSS.Types.Color.toString(`hex("3A57FC"));
   let width = CSS.px(10);
   let multiVariant =
-    CSS.make(
+    CSS.make_labeled(
+      "multiVariant",
       "css-1kbzua4-multiVariant",
       [("--color-3f9mj1", CSS.Types.Color.toString(color))],
     );
   let mixed =
-    CSS.make(
+    CSS.make_labeled(
+      "mixed",
       "css-k008qs-mixed css-1upqar2-mixed",
       [("--color-13vjntp", CSS.Types.Color.toString(color))],
     );
   let twoTypes =
-    CSS.make(
+    CSS.make_labeled(
+      "twoTypes",
       "css-e286e6-twoTypes",
       [
         ("--width-1v9ua", CSS.Types.Width.toString(width)),

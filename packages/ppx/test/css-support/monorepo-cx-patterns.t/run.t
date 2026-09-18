@@ -89,15 +89,18 @@ If this test fail means that the module is not in sync with the ppx
   };
   
   let _spaceBeforeColon =
-    CSS.make(
+    CSS.make_labeled(
+      "_spaceBeforeColon",
       "css-34k09d-_spaceBeforeColon css-1cx090v-_spaceBeforeColon",
       [("--tertiary-1cttnp6", CSS.Types.Color.toString(Color.Text.tertiary))],
     );
   
-  let _tabInnerFirst = CSS.make("css-qg0an3-_tabInnerFirst", []);
+  let _tabInnerFirst =
+    CSS.make_labeled("_tabInnerFirst", "css-qg0an3-_tabInnerFirst", []);
   
   let _multiShadowImportant =
-    CSS.make(
+    CSS.make_labeled(
+      "_multiShadowImportant",
       "css-96uk0n-_multiShadowImportant",
       [
         ("--line-p27yoa_1", CSS.Types.Color.toString(Color.Border.line)),
@@ -106,7 +109,8 @@ If this test fail means that the module is not in sync with the ppx
     );
   
   let _tabTextFirst =
-    CSS.make(
+    CSS.make_labeled(
+      "_tabTextFirst",
       "css-1mx0ppg-_tabTextFirst css-u38k1n-_tabTextFirst",
       [
         ("--line-c1zhnk_1", CSS.Types.Color.toString(Color.Border.line)),
@@ -115,7 +119,8 @@ If this test fail means that the module is not in sync with the ppx
     );
   
   let _tabText =
-    CSS.make(
+    CSS.make_labeled(
+      "_tabText",
       "css-15h1qzw-_tabText",
       [
         ("--secondary-fn5pf1", CSS.Types.Color.toString(Color.Text.secondary)),
@@ -126,17 +131,20 @@ If this test fail means that the module is not in sync with the ppx
       ],
     );
   
-  let _sidebarClosed = CSS.make("css-0-_sidebarClosed", []);
+  let _sidebarClosed =
+    CSS.make_labeled("_sidebarClosed", "css-0-_sidebarClosed", []);
   
   let _sidebar =
-    CSS.make(
+    CSS.make_labeled(
+      "_sidebar",
       "css-i9gxme-_sidebar css-r6z5ec-_sidebar css-tjsoaq-_sidebar css-145l4ca-_sidebar css-1oluo0q-_sidebar css-2io1ml-_sidebar css-1k938xr-_sidebar",
       [],
     );
   
-  let _checkbox = CSS.make("css-1vsc0qv-_checkbox", []);
+  let _checkbox = CSS.make_labeled("_checkbox", "css-1vsc0qv-_checkbox", []);
   
-  let _transitions = CSS.make("css-1hwm8mm-_transitions", []);
+  let _transitions =
+    CSS.make_labeled("_transitions", "css-1hwm8mm-_transitions", []);
   
   let _shadow1: CSS.Shadow.t =
     CSS.Shadow.box(~blur=`px(100), `hex("000000"), ~inset=true);

@@ -12,7 +12,10 @@
   let className = [%cx "display: block;"];
   let classNameWithMultiLine = [%cx {| display: block; |}];
   let classNameWithArray = [%cx [|cssProperty|]];
-  let cssRule = CSS.make("css-14ksm7b-cssRule", []);
+  let cssRule = CSS.make_labeled("cssRule", "css-14ksm7b-cssRule", []);
   let classNameWithCss = [%cx
-    [|cssRule, CSS.make("css-ggod7l-classNameWithCss", [])|]
+    [|
+      cssRule,
+      CSS.make_labeled("classNameWithCss", "css-ggod7l-classNameWithCss", []),
+    |]
   ];

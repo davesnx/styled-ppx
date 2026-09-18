@@ -42,49 +42,62 @@ vars (top-level / &:hover / @media) and withheld for descendant-read vars.
   let color = CSS.Types.Color.toString(`hex("3A57FC"));
   let str = "literal";
   let topLevel =
-    CSS.make(
+    CSS.make_labeled(
+      "topLevel",
       "css-1p250wn-topLevel",
       [("--color-qqxh28", CSS.Types.Color.toString(color))],
     );
   let hover =
-    CSS.make(
+    CSS.make_labeled(
+      "hover",
       "css-66gnkb-hover",
       [("--color-1g10n3y", CSS.Types.Color.toString(color))],
     );
   let media =
-    CSS.make(
+    CSS.make_labeled(
+      "media",
       "css-kesuu8-media",
       [("--color-7zzrwb", CSS.Types.Color.toString(color))],
     );
   let descendant =
-    CSS.make(
+    CSS.make_labeled(
+      "descendant",
       "css-l90awb-descendant",
       [("--color-1bmfpl7", CSS.Types.Color.toString(color))],
     );
   let bundleSpan =
-    CSS.make(
+    CSS.make_labeled(
+      "bundleSpan",
       "css-1s0cn0c-bundleSpan",
       [("--color-168gc9v", CSS.Types.Color.toString(color))],
     );
   let customFeeder =
-    CSS.make("css-1s7c43s-customFeeder", [("--str-k9lkg9", str)]);
+    CSS.make_labeled(
+      "customFeeder",
+      "css-1s7c43s-customFeeder",
+      [("--str-k9lkg9", str)],
+    );
   let pseudoElement =
-    CSS.make(
+    CSS.make_labeled(
+      "pseudoElement",
       "css-1uu31vv-pseudoElement",
       [("--color-s2338j", CSS.Types.Color.toString(color))],
     );
   let legacyPseudoElement =
-    CSS.make(
+    CSS.make_labeled(
+      "legacyPseudoElement",
       "css-drvy9e-legacyPseudoElement",
       [("--color-9jv993", CSS.Types.Color.toString(color))],
     );
   let mixedPseudo =
-    CSS.make(
+    CSS.make_labeled(
+      "mixedPseudo",
       "css-1ngjc2o-mixedPseudo",
       [("--color-1p3gcae", CSS.Types.Color.toString(color))],
     );
   let pseudoClassOnly =
-    CSS.make(
+    CSS.make_labeled(
+      "pseudoClassOnly",
       "css-r782y4-pseudoClassOnly",
       [("--color-5xa71m", CSS.Types.Color.toString(color))],
     );

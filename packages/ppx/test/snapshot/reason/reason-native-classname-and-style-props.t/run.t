@@ -960,10 +960,10 @@
       | Some(str) => " " ++ str
       | None => ""
       };
-    let styles = CSS.make("css-tokvmb-Box", []);
+    let styles = CSS.make_labeled("Box", "css-tokvmb-Box", []);
     let make = (props: makeProps) => {
-      let className = fst(styles) ++ getOrEmpty(props.className)
-      and style = snd(styles);
+      let className = CSS.className(styles) ++ getOrEmpty(props.className)
+      and style = CSS.styles(styles);
       React.createElement(
         switch (props.as_) {
         | Some(v) => v

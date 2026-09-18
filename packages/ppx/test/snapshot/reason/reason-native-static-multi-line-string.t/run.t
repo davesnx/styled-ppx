@@ -969,10 +969,14 @@
       | None => ""
       };
     let styles =
-      CSS.make("css-k008qs-MultiLineStrings css-1tyndxa-MultiLineStrings", []);
+      CSS.make_labeled(
+        "MultiLineStrings",
+        "css-k008qs-MultiLineStrings css-1tyndxa-MultiLineStrings",
+        [],
+      );
     let make = (props: makeProps) => {
-      let className = fst(styles) ++ getOrEmpty(props.className)
-      and style = snd(styles);
+      let className = CSS.className(styles) ++ getOrEmpty(props.className)
+      and style = CSS.styles(styles);
       React.createElement(
         switch (props.as_) {
         | Some(v) => v

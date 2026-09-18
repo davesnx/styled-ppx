@@ -20,9 +20,9 @@ extracted CSS, and resolved selectors are byte-identical between
     [("Input.foo", "css-tokvmb-foo"), ("Input.bar", "css-11o9qin-bar")]
   ];
   
-  let foo = CSS.make("cx-foo css-tokvmb-foo", []);
+  let foo = CSS.make_labeled("foo", "cx-foo css-tokvmb-foo", []);
   
-  let bar = CSS.make("cx-bar css-11o9qin-bar", []);
+  let bar = CSS.make_labeled("bar", "cx-bar css-11o9qin-bar", []);
   
   let _ = (foo, bar);
 
