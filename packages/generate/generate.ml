@@ -517,17 +517,14 @@ let sanitize_layer_name key =
     blocks into one layer; warn once per colliding name so the merge isn't a
     silent surprise. *)
 let warn_layer_name_collisions layer_names =
-  let by_name : (string, string list ref) Hashtbl.t = Hashtbl.create 8 in
-  List.iter
-    (fun (key, name) ->
-      match Hashtbl.find_opt by_name name with
-      | Some acc -> acc := key :: !acc
-      | None -> Hashtbl.add by_name name (ref [ key ]))
-    layer_names;
-  Hashtbl.fold (fun name keys acc -> (name, List.rev !keys) :: acc) by_name []
-  |> List.sort (fun (a, _) (b, _) -> String.compare a b)
-  |> List.iter (fun (name, keys) ->
-    match keys with
+  let by_name : (string, string) Hashtbl.t = Hashtbl.create 8 in
+  List.iter (fun (key, name) -> Hashtbl.add by_name name key) layer_names;
+  List.map snd layer_names
+  |> List.sort_uniq String.compare
+  |> List.iter (fun name ->
+    (* [Hashtbl.find_all] returns the most-recently-added key first; reverse
+       to report libraries in the order they were declared. *)
+    match List.rev (Hashtbl.find_all by_name name) with
     | [] | [ _ ] -> ()
     | many ->
       Logger.warning
@@ -777,14 +774,7 @@ let parse_args args =
       exit 2
     | arg :: rest ->
       parse (arg :: acc) ~output_file ~log_level ~order ~layers rest
-    | [] ->
-      if layers && order = Order_source then begin
-        Logger.error
-          "--layers requires --order dependency: source order has no library \
-           groups to layer";
-        exit 2
-      end;
-      List.rev acc, output_file, log_level, order, layers
+    | [] -> List.rev acc, output_file, log_level, order, layers
   in
   let tail = match Array.to_list args with [] -> [] | _ :: t -> t in
   parse [] ~output_file:None ~log_level:Logger.Warning ~order:Order_dependency
@@ -794,5 +784,11 @@ let () =
   let input_files, output_file, log_level, order, layers =
     parse_args Sys.argv
   in
+  if layers && order = Order_source then begin
+    Logger.error
+      "--layers requires --order dependency: source order has no library \
+       groups to layer";
+    exit 2
+  end;
   Logger.set_level log_level;
   run ~output_file ~order ~layers input_files
