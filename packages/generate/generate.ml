@@ -110,14 +110,17 @@ type order_mode =
 (** What the generator extracts from one input file: rules with potential
     sentinels, all cross-module ref descriptors seen in this file, the file's
     declared environment from [[@@@css.config]] ([None] when absent, i.e.
-    development), and the module names the file references
-    ({!Order.references}), for {!order_by_dependency}. The bindings attribute is
-    consumed directly into the global [Index] during the same walk. *)
+    development), the module names the file references ({!Order.references}),
+    and its declared [@@@css.config] [library] key ([None] when absent: such a
+    file groups with its sibling files by directory, see {!group_key}). The
+    bindings attribute is consumed directly into the global [Index] during the
+    same walk. *)
 type input = {
   filename : string;
   rules : string list;
   refs : Refs.ref_loc list;
   env : string option;
+  library : string option;
   protocol_errors : string list;
   references : string list;
 }
@@ -126,6 +129,7 @@ let extract_structure ~filename ~idx structure : input =
   let rules = ref [] in
   let refs = ref [] in
   let env = ref None in
+  let library = ref None in
   let protocol_errors = ref [] in
   let add_protocol_error attribute msg =
     protocol_errors :=
@@ -153,6 +157,9 @@ let extract_structure ~filename ~idx structure : input =
         | Ok entries ->
           (match List.assoc_opt Css_extraction.config_env_key entries with
           | Some _ as declared -> env := declared
+          | None -> ());
+          (match List.assoc_opt Css_extraction.config_library_key entries with
+          | Some _ as declared -> library := declared
           | None -> ())
         | Error msg ->
           add_protocol_error Css_extraction.config_attribute_name msg)
@@ -163,6 +170,7 @@ let extract_structure ~filename ~idx structure : input =
     rules = List.rev !rules;
     refs = List.rev !refs;
     env = !env;
+    library = !library;
     protocol_errors = List.rev !protocol_errors;
     references = Order.references structure;
   }
@@ -284,17 +292,23 @@ let production_mode inputs =
       Css_extraction.config_attribute_name prod.filename dev.filename;
     false
 
-(** Order inputs so each file comes after the files it references
-    ({!Order.sort}). A referenced module name resolves to the input file with
-    that module name; when several match, the one sharing the longest directory
-    prefix with the referrer wins, and a tie means no edge. This generator sees
-    one library at a time, so a same-named-module tie can't be broken from paths
-    alone; PR 2 resolves by library membership instead. *)
-let order_by_dependency (inputs : input list) : input list =
-  let by_module_name = Hashtbl.create (List.length inputs) in
+(** A file's ordering group: its declared [@@@css.config] [library] key, or
+    (when absent) the directory of its input path. Two files agree on their
+    group either by naming the same library or by sharing a directory. *)
+let group_key (h : input) : string =
+  match h.library with Some lib -> lib | None -> Filename.dirname h.filename
+
+(** Order [scope] so each file comes after the files in [scope] it references
+    ({!Order.sort}), and return the [edges] lookup so the caller can log them. A
+    referenced module name resolves to the file in [scope] with that module
+    name; when several match, the one sharing the longest directory prefix with
+    the referrer wins, and a tie means no edge. *)
+let order_modules_within_scope (scope : input list) :
+  input list * (input -> input list) =
+  let by_module_name = Hashtbl.create (List.length scope) in
   List.iter
     (fun h -> Hashtbl.add by_module_name (module_of_filename h.filename) h)
-    inputs;
+    scope;
   let dirs filename =
     String.split_on_char '/' (Filename.dirname filename)
     |> List.filter (fun s -> s <> "" && s <> ".")
@@ -322,16 +336,127 @@ let order_by_dependency (inputs : input list) : input list =
       None
   in
   let edges h = List.filter_map (resolve h) h.references in
-  let ordered = Order.sort ~nodes:inputs ~edges ~key:(fun h -> h.filename) in
-  let name h = module_of_filename h.filename in
-  Logger.info "order: %s" (String.concat ", " (List.map name ordered));
+  Order.sort ~nodes:scope ~edges ~key:(fun h -> h.filename), edges
+
+(** One ordering group: every input that shares a {!group_key}. Returned in
+    Hashtbl order, which {!Order.sort} downstream ties-break by key anyway, so
+    the group order here never reaches the output. *)
+type library_group = {
+  key : string;
+  inputs : input list;
+}
+
+let group_by_library (inputs : input list) : library_group list =
+  let members : (string, input list ref) Hashtbl.t = Hashtbl.create 16 in
   List.iter
     (fun h ->
-      List.iter
-        (fun dep -> Logger.debug "edge: %s -> %s" (name h) (name dep))
-        (edges h))
+      let k = group_key h in
+      match Hashtbl.find_opt members k with
+      | Some acc -> acc := h :: !acc
+      | None -> Hashtbl.add members k (ref [ h ]))
     inputs;
-  ordered
+  Hashtbl.fold
+    (fun key hs acc -> { key; inputs = List.rev !hs } :: acc)
+    members []
+
+(** Collapse module references into library edges: a reference [X] from a file
+    in [self] is a same-library reference — left to
+    {!order_modules_within_scope} — whenever [self] itself has a module named
+    [X]. Otherwise, [X] names the library dependency directly: a module named
+    [X] in exactly one other group (the unwrapped case), or else [X] equal to
+    the capitalized library name of exactly one other group (the wrapped case,
+    referenced through its alias module). Anything else is not a library
+    reference at all (a stdlib/external module, for instance) and contributes no
+    edge. *)
+let library_edge_target ~(groups_with_module : string -> library_group list)
+  ~(groups_with_alias : string -> library_group list) ~(self : library_group)
+  (referenced_name : string) : library_group option =
+  let single = function [ only ] -> Some only | _ -> None in
+  let holders = groups_with_module referenced_name in
+  if List.exists (fun g -> g.key = self.key) holders then None
+  else (
+    match single holders with
+    | Some target -> Some target
+    | None ->
+      groups_with_alias referenced_name
+      |> List.filter (fun g -> g.key <> self.key)
+      |> single)
+
+(** Two-level order: libraries first (by the dependency graph collapsed from
+    module references), then, within each library, {!order_modules_within_scope}
+    unchanged from PR 1. Both levels reuse {!Order.sort}, so the alphabetical
+    tiebreak and the never-fail cycle policy apply at both levels for free. *)
+let order_by_dependency (inputs : input list) : input list =
+  let groups = group_by_library inputs in
+  (* Indexed once: scanning every group for every raw reference measured 2 s
+     extra on a 5,824-file input with 246 groups. *)
+  let groups_with_module : (string, library_group) Hashtbl.t =
+    Hashtbl.create (List.length inputs)
+  in
+  let groups_with_alias : (string, library_group) Hashtbl.t =
+    Hashtbl.create (List.length groups)
+  in
+  List.iter
+    (fun g ->
+      g.inputs
+      |> List.map (fun h -> module_of_filename h.filename)
+      |> List.sort_uniq String.compare
+      |> List.iter (fun name -> Hashtbl.add groups_with_module name g);
+      Hashtbl.add groups_with_alias (String.capitalize_ascii g.key) g)
+    groups;
+  let library_edges_by_key : (string, library_group list) Hashtbl.t =
+    Hashtbl.create (List.length groups)
+  in
+  List.iter
+    (fun g ->
+      let targets =
+        g.inputs
+        |> List.concat_map (fun h -> h.references)
+        |> List.sort_uniq String.compare
+        |> List.filter_map
+             (library_edge_target
+                ~groups_with_module:(Hashtbl.find_all groups_with_module)
+                ~groups_with_alias:(Hashtbl.find_all groups_with_alias)
+                ~self:g)
+        |> List.sort_uniq (fun a b -> String.compare a.key b.key)
+      in
+      Hashtbl.replace library_edges_by_key g.key targets)
+    groups;
+  let library_edges g = Hashtbl.find library_edges_by_key g.key in
+  let sorted_groups =
+    Order.sort ~nodes:groups ~edges:library_edges ~key:(fun g -> g.key)
+  in
+  Logger.info "library order: %s"
+    (String.concat ", " (List.map (fun g -> g.key) sorted_groups));
+  let ordered_groups =
+    List.map
+      (fun g ->
+        let ordered, edges = order_modules_within_scope g.inputs in
+        Logger.info "order: %s: %s" g.key
+          (String.concat ", "
+             (List.map (fun h -> module_of_filename h.filename) ordered));
+        g, ordered, edges)
+      sorted_groups
+  in
+  List.iter
+    (fun g ->
+      List.iter
+        (fun dep -> Logger.debug "library edge: %s -> %s" g.key dep.key)
+        (library_edges g))
+    sorted_groups;
+  List.iter
+    (fun (_, ordered, edges) ->
+      List.iter
+        (fun h ->
+          List.iter
+            (fun dep ->
+              Logger.debug "edge: %s -> %s"
+                (module_of_filename h.filename)
+                (module_of_filename dep.filename))
+            (edges h))
+        ordered)
+    ordered_groups;
+  List.concat_map (fun (_, ordered, _) -> ordered) ordered_groups
 
 (** Collect, index, resolve, dedup, output. *)
 let run ~output_file ~order input_files =
