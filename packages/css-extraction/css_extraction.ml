@@ -20,6 +20,7 @@ let refs_attribute_name = "css.refs"
 let config_attribute_name = "css.config"
 let config_env_key = "env"
 let config_env_production = "production"
+let config_library_key = "library"
 let sentinel_byte = '\x00'
 
 let sentinel longident =
