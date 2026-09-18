@@ -152,7 +152,8 @@ must honor, as string key/value pairs. Two keys today:
   ppx run inside a `(library ...)` stanza, read via
   `Ppxlib.Driver.Cookies.add_simple_handler`. Absent when the module isn't
   compiled as part of a library (for example an `(executable ...)`
-  stanza) or the cookie wasn't set.
+  stanza) or the cookie wasn't set. The aggregator reads this key to group
+  and order rules by owning library; see Order below.
 
 ```ocaml
 [@@@css.config [("env", "production"); ("library", "my_lib")]]
@@ -279,42 +280,56 @@ references (see Order below) — the last thing the AST is used for.
 
 ### Order
 
-Implemented in `packages/generate/order.ml`. Runs between extract and
-resolve, reordering the inputs before dedup picks which
-occurrence of a repeated rule survives.
+Implemented in `packages/generate/order.ml` (the pure `sort`/`references`
+primitives) and `packages/generate/generate.ml` (`order_by_dependency`,
+which applies them). Runs between extract and resolve, reordering the
+inputs before dedup picks which occurrence of a repeated rule
+survives.
 
-By default (`--order dependency`) a file's rules come after the rules of
-every file it depends on. "Depends on" means: the input file's
-structure references a module name (via the same free-name analysis
-`ocamldep -modules` uses), and among the input files whose derived module
-name matches, one is chosen as the target —
+By default (`--order dependency`) the order is two levels: libraries
+first, then, inside each library, files.
 
-- if exactly one input file has that module name, it's the target;
-- otherwise the candidate sharing the longest directory-path prefix with
-  the referencing file wins;
-- a tie, or no candidate at all, means no edge — this generator sees one
-  library's files at a time, so it can't always tell which same-named file
-  a reference actually meant. Logged at `--log debug`.
+**Library level.** Every input file belongs to a group: its declared
+`library` key from `[@@@css.config]` (see above), or, when that key is
+absent, the directory of its input path. A library's rules come after the
+rules of every library it depends on. A raw module reference `X` from a
+file in library `L1` becomes a library edge `L1 -> L2` when:
 
-Files with no dependency relation keep their input order (dune's own file
-order, alphabetical for a typical `(glob_files *.pp.ml)` deps stanza): the
-sort (Kahn's algorithm) always advances the alphabetically smallest ready
-file, so an edge is the only thing that can move a file out of that order.
+- `L1` itself has no module named `X` (otherwise it's a same-library
+  reference, resolved at the module level below, and contributes no
+  library edge), and
+- exactly one other library has a module named `X` (the `(wrapped false)`
+  case — dune exposes every module of an unwrapped library at top level);
+  or, failing that, exactly one other library's name capitalizes
+  (`String.capitalize_ascii`) to `X` (the default `(wrapped true)` case —
+  a wrapped library is referenced through its alias module, e.g. `Zlib.Inner.x`
+  for a library named `zlib`).
 
-A dependency cycle can't come from a real OCaml build (dune won't compile
-a genuine circular module dependency), so one only appears when the
-same-named-module resolution above picks an edge a real build wouldn't
-have. The aggregator never fails the build over an ordering problem: it
-warns once naming the cycle's files, drops the blocking edge whose
-dependent file sorts alphabetically last, and keeps going. The result
-stays deterministic.
+Anything else (zero or multiple candidates either way) means no edge.
 
-`--order source` restores the file order dune passes on the command line,
-unconditionally, ignoring dependencies, with no order/edge logging or cycle
-handling. It exists as an escape hatch for one release and to compare
+**Module level.** Inside a library, a file's rules come after the rules of
+every file in the *same* library it depends on — module resolution now
+never crosses a library boundary. Candidates for a referenced name are the
+files in that one library whose module name matches; the one sharing the
+longest directory-path prefix with the referencing file wins a tie. No
+same-library candidate at all means no module edge (the library edge above
+already ordered the two libraries relative to each other).
+
+Both levels call the same `Order.sort` (Kahn's algorithm, always advancing
+the alphabetically smallest ready key), so both get the same guarantees:
+files or libraries with no dependency relation keep their input order, and
+a cycle — which can't come from a real dune graph, only from this
+heuristic picking an edge a real build wouldn't have — never fails the
+build. The aggregator warns once naming the cycle's members, drops the
+blocking edge whose source sorts alphabetically last, and keeps going.
+
+`--order source` skips all of this, ignoring references and `library`
+keys, and keeps the file order dune passes on the command line. It exists
+as an escape hatch for one release and to compare
 against the old behavior. Under the default `--order dependency`, `--log
-info` prints the resolved module order and `--log debug` additionally
-prints every resolved edge.
+info` prints the library order and then each library's module order;
+`--log debug` additionally prints every library edge and every module
+edge.
 
 ### Resolve
 
@@ -335,9 +350,11 @@ compiler convention, so editors pick them up) and exits 1.
 
 Resolved rule strings are deduplicated with an order-preserving
 `Hashtbl` filter: walk the rules in the order established by Order above
-(dependency order by default, `--order source` otherwise) and keep the
-first occurrence of each string. This removes duplicates produced by the
-same rule appearing in multiple files (common for shared helpers).
+(library, then module, then source — or the plain file order under
+`--order source`) and keep the first occurrence of each string. This
+removes duplicates produced by the same rule appearing in multiple files
+(common for shared helpers, and for a native/melange pair of the same
+library compiled twice).
 
 Order preservation is load-bearing: every atomized rule has the same
 specificity (one class, no qualifiers), so the cascade tiebreaker is
