@@ -10,10 +10,7 @@ let property_max_block_size : property_max_block_size Rule.rule =
 
 module Property_max_height =
   [%spec_module
-  "'auto' | <extended-length> | <extended-percentage> | 'min-content' | \
-   'max-content' | 'fit-content' | fit-content( <extended-length> | \
-   <extended-percentage> )",
-  (module Css_types.MaxHeight)]
+  "<'max-width'>", (module Css_types.MaxHeight)]
 
 let property_max_height : property_max_height Rule.rule =
   Property_max_height.rule

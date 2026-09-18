@@ -64,7 +64,8 @@ type delimiter =
   | Delimiter_percent
   | Delimiter_underscore
   | Delimiter_gte
-  | Delimiter_lte;
+  | Delimiter_lte
+  | Delimiter_column;
 
 [@deriving show({ with_path: false })]
 type length_unit =
@@ -145,7 +146,8 @@ type selector_combinator =
   | Selector_descendant
   | Selector_child
   | Selector_adjacent_sibling
-  | Selector_general_sibling;
+  | Selector_general_sibling
+  | Selector_column;
 
 [@deriving show({ with_path: false })]
 type declaration = {
@@ -180,6 +182,13 @@ and component_value =
   | Unicode_range(string)
   | Dimension(dimension)
   | Variable(string, loc)
+  /* At-keyword tokens are preserved component values per CSS Syntax 3,
+     e.g. the `@container` in `@supports at-rule(@container)`. */
+  | At_keyword(string)
+  /* CDO/CDC are preserved component values outside the stylesheet top
+     level; `<declaration-value>` admits them (custom properties). */
+  | Cdo
+  | Cdc
 [@deriving show({ with_path: false })]
 and brace_block =
   | Empty
@@ -265,7 +274,12 @@ and attribute_selector =
       name: string,
       kind: attr_matcher,
       value: attr_value,
+      case_sensitivity: option(attr_case),
     })
+[@deriving show({ with_path: false })]
+and attr_case =
+  | Attr_case_insensitive
+  | Attr_case_sensitive
 [@deriving show({ with_path: false })]
 and attr_value =
   | Attr_ident(string)
@@ -273,6 +287,10 @@ and attr_value =
 [@deriving show({ with_path: false })]
 and pseudo_selector =
   | Pseudoelement(string)
+  | PseudoelementFunction({
+      name: string,
+      payload: with_loc(selector_list),
+    })
   | Pseudoclass(pseudoclass_kind)
 [@deriving show({ with_path: false })]
 and pseudoclass_kind =
@@ -289,6 +307,7 @@ and pseudoclass_kind =
 and nth_payload =
   | Nth(nth)
   | NthSelector(list(complex_selector))
+  | NthOf(nth, list(complex_selector))
 [@deriving show({ with_path: false })]
 and nth =
   | Even
@@ -429,6 +448,7 @@ let delimiter_of_string =
   | "_" => Some(Delimiter_underscore)
   | ">=" => Some(Delimiter_gte)
   | "<=" => Some(Delimiter_lte)
+  | "||" => Some(Delimiter_column)
   | _ => None;
 
 let string_of_delimiter =
@@ -456,4 +476,24 @@ let string_of_delimiter =
   | Delimiter_percent => "%"
   | Delimiter_underscore => "_"
   | Delimiter_gte => ">="
-  | Delimiter_lte => "<=";
+  | Delimiter_lte => "<="
+  | Delimiter_column => "||";
+
+/* Detect a `$(name)` interpolation anywhere in a component-value list,
+   recursing into `Paren_block`, `Bracket_block`, and `Function` bodies. A
+   top-level-only check misses interpolations nested inside groupings
+   (e.g. `calc($(a) + 1px)` or `(max-width: $(bp))`). */
+let rec component_value_has_interpolation = (value: component_value) =>
+  switch (value) {
+  | Variable(_, _) => true
+  | Paren_block(values)
+  | Bracket_block(values) => component_value_list_has_interpolation(values)
+  | Function({ body: (values, _), _ }) =>
+    component_value_list_has_interpolation(values)
+  | _ => false
+  }
+and component_value_list_has_interpolation = (values: component_value_list) =>
+  List.exists(
+    ((value, _)) => component_value_has_interpolation(value),
+    values,
+  );

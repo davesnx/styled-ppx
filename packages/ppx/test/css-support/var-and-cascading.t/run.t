@@ -15,40 +15,40 @@ If this test fails, the var() and cascading support is broken
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-zwn3kf{color:var(--primary-color);}"];
-  [@css ".css-1hvfuqy{background-color:var(--bg-color);}"];
-  [@css ".css-x8crrr{margin:var(--spacing);}"];
-  [@css ".css-k07rr7{padding:var(--padding);}"];
-  [@css ".css-1icykz8{font-size:var(--font-size);}"];
-  [@css ".css-1lora93{width:var(--width);}"];
-  [@css ".css-gmqm6h{height:var(--height);}"];
-  [@css ".css-q2y3yl{color:inherit;}"];
-  [@css ".css-1ed8crh{color:initial;}"];
-  [@css ".css-1v7yg6i{color:unset;}"];
-  [@css ".css-ppjbf2{color:revert;}"];
-  [@css ".css-t807lq{color:revert-layer;}"];
-  [@css ".css-1c6vscd{display:inherit;}"];
-  [@css ".css-1msh118{display:initial;}"];
-  [@css ".css-qxhxe5{display:unset;}"];
-  [@css ".css-q6cx45{display:revert;}"];
-  [@css ".css-eojml{display:revert-layer;}"];
-  [@css ".css-vqj8z{margin:inherit;}"];
-  [@css ".css-13bgxfx{margin:initial;}"];
-  [@css ".css-1fyzsk3{margin:unset;}"];
-  [@css ".css-1k42sph{margin:revert;}"];
-  [@css ".css-ypkzq5{margin:revert-layer;}"];
-  [@css ".css-y9nah6{-webkit-flex:inherit;-ms-flex:inherit;flex:inherit;}"];
-  [@css ".css-1ujc6td{-webkit-flex:initial;-ms-flex:initial;flex:initial;}"];
-  [@css ".css-1e042ms{-webkit-flex:unset;-ms-flex:unset;flex:unset;}"];
-  [@css ".css-1bh8jui{-webkit-flex:revert;-ms-flex:revert;flex:revert;}"];
+  [@css ".css-zwn3kf{color:var(--primary-color)}"];
+  [@css ".css-1hvfuqy{background-color:var(--bg-color)}"];
+  [@css ".css-x8crrr{margin:var(--spacing)}"];
+  [@css ".css-k07rr7{padding:var(--padding)}"];
+  [@css ".css-1icykz8{font-size:var(--font-size)}"];
+  [@css ".css-1lora93{width:var(--width)}"];
+  [@css ".css-gmqm6h{height:var(--height)}"];
+  [@css ".css-q2y3yl{color:inherit}"];
+  [@css ".css-1ed8crh{color:initial}"];
+  [@css ".css-1v7yg6i{color:unset}"];
+  [@css ".css-ppjbf2{color:revert}"];
+  [@css ".css-t807lq{color:revert-layer}"];
+  [@css ".css-1c6vscd{display:inherit}"];
+  [@css ".css-1msh118{display:initial}"];
+  [@css ".css-qxhxe5{display:unset}"];
+  [@css ".css-q6cx45{display:revert}"];
+  [@css ".css-eojml{display:revert-layer}"];
+  [@css ".css-vqj8z{margin:inherit}"];
+  [@css ".css-13bgxfx{margin:initial}"];
+  [@css ".css-1fyzsk3{margin:unset}"];
+  [@css ".css-1k42sph{margin:revert}"];
+  [@css ".css-ypkzq5{margin:revert-layer}"];
+  [@css ".css-y9nah6{-webkit-flex:inherit;-ms-flex:inherit;flex:inherit}"];
+  [@css ".css-1ujc6td{-webkit-flex:initial;-ms-flex:initial;flex:initial}"];
+  [@css ".css-1e042ms{-webkit-flex:unset;-ms-flex:unset;flex:unset}"];
+  [@css ".css-1bh8jui{-webkit-flex:revert;-ms-flex:revert;flex:revert}"];
   [@css
-    ".css-g54fps{-webkit-flex:revert-layer;-ms-flex:revert-layer;flex:revert-layer;}"
+    ".css-g54fps{-webkit-flex:revert-layer;-ms-flex:revert-layer;flex:revert-layer}"
   ];
-  [@css ".css-67e5f8{font-size:inherit;}"];
-  [@css ".css-ur53xd{font-size:initial;}"];
-  [@css ".css-rjswxq{font-size:unset;}"];
-  [@css ".css-8zntfo{font-size:revert;}"];
-  [@css ".css-1kcpi5f{font-size:revert-layer;}"];
+  [@css ".css-67e5f8{font-size:inherit}"];
+  [@css ".css-ur53xd{font-size:initial}"];
+  [@css ".css-rjswxq{font-size:unset}"];
+  [@css ".css-8zntfo{font-size:revert}"];
+  [@css ".css-1kcpi5f{font-size:revert-layer}"];
   
   CSS.make("css-zwn3kf", []);
   CSS.make("css-1hvfuqy", []);

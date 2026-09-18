@@ -15,20 +15,20 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1er335o{fill-rule:nonzero;}"];
-  [@css ".css-1uqje6q{fill-rule:evenodd;}"];
-  [@css ".css-h01axr{fill-opacity:0.5;}"];
-  [@css ".css-1p4mbij{fill-opacity:45%;}"];
-  [@css ".css-stfno8{stroke-width:0;}"];
-  [@css ".css-7hbqje{stroke-width:1px;}"];
-  [@css ".css-11bssim{stroke-width:25%;}"];
-  [@css ".css-16f3u6b{stroke-linecap:butt;}"];
-  [@css ".css-1me96vv{stroke-linecap:round;}"];
-  [@css ".css-hs62tc{stroke-linecap:square ;}"];
-  [@css ".css-8vbou6{stroke-linejoin:miter;}"];
-  [@css ".css-1t1cl19{stroke-linejoin:bevel;}"];
-  [@css ".css-8mzojx{stroke-linejoin:round;}"];
-  [@css ".css-1a477up{stroke-miterlimit:4;}"];
+  [@css ".css-1er335o{fill-rule:nonzero}"];
+  [@css ".css-1uqje6q{fill-rule:evenodd}"];
+  [@css ".css-h01axr{fill-opacity:0.5}"];
+  [@css ".css-1p4mbij{fill-opacity:45%}"];
+  [@css ".css-stfno8{stroke-width:0}"];
+  [@css ".css-7hbqje{stroke-width:1px}"];
+  [@css ".css-11bssim{stroke-width:25%}"];
+  [@css ".css-16f3u6b{stroke-linecap:butt}"];
+  [@css ".css-1me96vv{stroke-linecap:round}"];
+  [@css ".css-1j4dlez{stroke-linecap:square}"];
+  [@css ".css-8vbou6{stroke-linejoin:miter}"];
+  [@css ".css-1t1cl19{stroke-linejoin:bevel}"];
+  [@css ".css-8mzojx{stroke-linejoin:round}"];
+  [@css ".css-1a477up{stroke-miterlimit:4}"];
   
   CSS.make("css-1er335o", []);
   CSS.make("css-1uqje6q", []);
@@ -42,7 +42,7 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.make("css-16f3u6b", []);
   CSS.make("css-1me96vv", []);
-  CSS.make("css-hs62tc", []);
+  CSS.make("css-1j4dlez", []);
   
   CSS.make("css-8vbou6", []);
   CSS.make("css-1t1cl19", []);

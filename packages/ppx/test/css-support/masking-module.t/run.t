@@ -16,191 +16,185 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css
-    ".css-8mcpnl{-webkit-clip-path:url(\"#clip\");clip-path:url(\"#clip\");}"
+    ".css-8mcpnl{-webkit-clip-path:url(\"#clip\");clip-path:url(\"#clip\")}"
   ];
-  [@css ".css-182dshe{-webkit-clip-path:inset(50%);clip-path:inset(50%);}"];
+  [@css ".css-182dshe{-webkit-clip-path:inset(50%);clip-path:inset(50%)}"];
   [@css
-    ".css-1mglbca{-webkit-clip-path:path(\"M 20 20 H 80 V 30\");clip-path:path(\"M 20 20 H 80 V 30\");}"
-  ];
-  [@css
-    ".css-1wl8b54{-webkit-clip-path:polygon(50% 100%, 0 0, 100% 0);clip-path:polygon(50% 100%, 0 0, 100% 0);}"
+    ".css-1mglbca{-webkit-clip-path:path(\"M 20 20 H 80 V 30\");clip-path:path(\"M 20 20 H 80 V 30\")}"
   ];
   [@css
-    ".css-23yasd{-webkit-clip-path:polygon(evenodd, 0% 0%, 50% 50%, 0% 100%);clip-path:polygon(evenodd, 0% 0%, 50% 50%, 0% 100%);}"
+    ".css-1w1h0r2{-webkit-clip-path:polygon(50% 100%,0 0,100% 0);clip-path:polygon(50% 100%,0 0,100% 0)}"
   ];
   [@css
-    ".css-tyz3kz{-webkit-clip-path:polygon(nonzero, 0% 0%, 50% 50%, 0% 100%);clip-path:polygon(nonzero, 0% 0%, 50% 50%, 0% 100%);}"
-  ];
-  [@css ".css-9wq8iu{-webkit-clip-path:border-box;clip-path:border-box;}"];
-  [@css ".css-1pbivbf{-webkit-clip-path:padding-box;clip-path:padding-box;}"];
-  [@css ".css-n54dpx{-webkit-clip-path:content-box;clip-path:content-box;}"];
-  [@css ".css-1up8q0p{-webkit-clip-path:margin-box;clip-path:margin-box;}"];
-  [@css ".css-12t3bw4{-webkit-clip-path:fill-box;clip-path:fill-box;}"];
-  [@css ".css-iuww8a{-webkit-clip-path:stroke-box;clip-path:stroke-box;}"];
-  [@css ".css-115ivni{-webkit-clip-path:view-box;clip-path:view-box;}"];
-  [@css ".css-1ivaqcy{-webkit-clip-path:none;clip-path:none;}"];
-  [@css ".css-1snszcd{clip-rule:nonzero;}"];
-  [@css ".css-1q46lnx{clip-rule:evenodd;}"];
-  [@css ".css-130lv46{-webkit-mask-image:none;mask-image:none;}"];
-  [@css
-    ".css-191xpd6{-webkit-mask-image:linear-gradient(45deg, #333, #000);mask-image:linear-gradient(45deg, #333, #000);}"
+    ".css-1t1xk7i{-webkit-clip-path:polygon(evenodd,0% 0%,50% 50%,0% 100%);clip-path:polygon(evenodd,0% 0%,50% 50%,0% 100%)}"
   ];
   [@css
-    ".css-dulaft{-webkit-mask-image:url(\"image.png\");mask-image:url(\"image.png\");}"
+    ".css-1p81d38{-webkit-clip-path:polygon(nonzero,0% 0%,50% 50%,0% 100%);clip-path:polygon(nonzero,0% 0%,50% 50%,0% 100%)}"
   ];
-  [@css ".css-1avdp5t{-webkit-mask-mode:alpha;mask-mode:alpha;}"];
-  [@css ".css-1qwhtsi{-webkit-mask-mode:luminance;mask-mode:luminance;}"];
-  [@css ".css-nqdqk{-webkit-mask-mode:match-source;mask-mode:match-source;}"];
-  [@css ".css-12nkdr1{-webkit-mask-repeat:repeat-x;mask-repeat:repeat-x;}"];
-  [@css ".css-1c10g9h{-webkit-mask-repeat:repeat-y;mask-repeat:repeat-y;}"];
-  [@css ".css-5x0wgz{-webkit-mask-repeat:repeat;mask-repeat:repeat;}"];
-  [@css ".css-ndbi8s{-webkit-mask-repeat:space;mask-repeat:space;}"];
-  [@css ".css-l620fn{-webkit-mask-repeat:round;mask-repeat:round;}"];
-  [@css ".css-71awfw{-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;}"];
+  [@css ".css-9wq8iu{-webkit-clip-path:border-box;clip-path:border-box}"];
+  [@css ".css-1pbivbf{-webkit-clip-path:padding-box;clip-path:padding-box}"];
+  [@css ".css-n54dpx{-webkit-clip-path:content-box;clip-path:content-box}"];
+  [@css ".css-1up8q0p{-webkit-clip-path:margin-box;clip-path:margin-box}"];
+  [@css ".css-12t3bw4{-webkit-clip-path:fill-box;clip-path:fill-box}"];
+  [@css ".css-iuww8a{-webkit-clip-path:stroke-box;clip-path:stroke-box}"];
+  [@css ".css-115ivni{-webkit-clip-path:view-box;clip-path:view-box}"];
+  [@css ".css-1ivaqcy{-webkit-clip-path:none;clip-path:none}"];
+  [@css ".css-1snszcd{clip-rule:nonzero}"];
+  [@css ".css-1q46lnx{clip-rule:evenodd}"];
+  [@css ".css-130lv46{-webkit-mask-image:none;mask-image:none}"];
   [@css
-    ".css-cksx21{-webkit-mask-repeat:repeat repeat;mask-repeat:repeat repeat;}"
-  ];
-  [@css
-    ".css-1lt0fa9{-webkit-mask-repeat:space repeat;mask-repeat:space repeat;}"
-  ];
-  [@css
-    ".css-13mjxaa{-webkit-mask-repeat:round repeat;mask-repeat:round repeat;}"
+    ".css-17cde2n{-webkit-mask-image:linear-gradient(45deg,#333,#000);mask-image:linear-gradient(45deg,#333,#000)}"
   ];
   [@css
-    ".css-1dt3pxt{-webkit-mask-repeat:no-repeat repeat;mask-repeat:no-repeat repeat;}"
+    ".css-dulaft{-webkit-mask-image:url(\"image.png\");mask-image:url(\"image.png\")}"
+  ];
+  [@css ".css-1avdp5t{-webkit-mask-mode:alpha;mask-mode:alpha}"];
+  [@css ".css-1qwhtsi{-webkit-mask-mode:luminance;mask-mode:luminance}"];
+  [@css ".css-nqdqk{-webkit-mask-mode:match-source;mask-mode:match-source}"];
+  [@css ".css-12nkdr1{-webkit-mask-repeat:repeat-x;mask-repeat:repeat-x}"];
+  [@css ".css-1c10g9h{-webkit-mask-repeat:repeat-y;mask-repeat:repeat-y}"];
+  [@css ".css-5x0wgz{-webkit-mask-repeat:repeat;mask-repeat:repeat}"];
+  [@css ".css-ndbi8s{-webkit-mask-repeat:space;mask-repeat:space}"];
+  [@css ".css-l620fn{-webkit-mask-repeat:round;mask-repeat:round}"];
+  [@css ".css-71awfw{-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}"];
+  [@css
+    ".css-cksx21{-webkit-mask-repeat:repeat repeat;mask-repeat:repeat repeat}"
   ];
   [@css
-    ".css-1lgn6bx{-webkit-mask-repeat:repeat space;mask-repeat:repeat space;}"
+    ".css-1lt0fa9{-webkit-mask-repeat:space repeat;mask-repeat:space repeat}"
   ];
   [@css
-    ".css-1lkudfe{-webkit-mask-repeat:space space;mask-repeat:space space;}"
+    ".css-13mjxaa{-webkit-mask-repeat:round repeat;mask-repeat:round repeat}"
   ];
   [@css
-    ".css-18j6z3w{-webkit-mask-repeat:round space;mask-repeat:round space;}"
+    ".css-1dt3pxt{-webkit-mask-repeat:no-repeat repeat;mask-repeat:no-repeat repeat}"
   ];
   [@css
-    ".css-dmpthf{-webkit-mask-repeat:no-repeat space;mask-repeat:no-repeat space;}"
+    ".css-1lgn6bx{-webkit-mask-repeat:repeat space;mask-repeat:repeat space}"
+  ];
+  [@css ".css-1lkudfe{-webkit-mask-repeat:space space;mask-repeat:space space}"];
+  [@css ".css-18j6z3w{-webkit-mask-repeat:round space;mask-repeat:round space}"];
+  [@css
+    ".css-dmpthf{-webkit-mask-repeat:no-repeat space;mask-repeat:no-repeat space}"
   ];
   [@css
-    ".css-gl8b1s{-webkit-mask-repeat:repeat round;mask-repeat:repeat round;}"
+    ".css-gl8b1s{-webkit-mask-repeat:repeat round;mask-repeat:repeat round}"
   ];
-  [@css ".css-4c6dy3{-webkit-mask-repeat:space round;mask-repeat:space round;}"];
-  [@css ".css-dc035m{-webkit-mask-repeat:round round;mask-repeat:round round;}"];
+  [@css ".css-4c6dy3{-webkit-mask-repeat:space round;mask-repeat:space round}"];
+  [@css ".css-dc035m{-webkit-mask-repeat:round round;mask-repeat:round round}"];
   [@css
-    ".css-c51vap{-webkit-mask-repeat:no-repeat round;mask-repeat:no-repeat round;}"
-  ];
-  [@css
-    ".css-sqpu1u{-webkit-mask-repeat:repeat no-repeat;mask-repeat:repeat no-repeat;}"
+    ".css-c51vap{-webkit-mask-repeat:no-repeat round;mask-repeat:no-repeat round}"
   ];
   [@css
-    ".css-1kaa087{-webkit-mask-repeat:space no-repeat;mask-repeat:space no-repeat;}"
+    ".css-sqpu1u{-webkit-mask-repeat:repeat no-repeat;mask-repeat:repeat no-repeat}"
   ];
   [@css
-    ".css-1gxt6kf{-webkit-mask-repeat:round no-repeat;mask-repeat:round no-repeat;}"
+    ".css-1kaa087{-webkit-mask-repeat:space no-repeat;mask-repeat:space no-repeat}"
   ];
   [@css
-    ".css-19obql5{-webkit-mask-repeat:no-repeat no-repeat;mask-repeat:no-repeat no-repeat;}"
-  ];
-  [@css ".css-1pe9y42{-webkit-mask-position:center;mask-position:center;}"];
-  [@css
-    ".css-1wjck5z{-webkit-mask-position:center center;mask-position:center center;}"
-  ];
-  [@css ".css-6vqk76{-webkit-mask-position:left 50%;mask-position:left 50%;}"];
-  [@css
-    ".css-uam1vo{-webkit-mask-position:bottom 10px right 20px;mask-position:bottom 10px right 20px;}"
+    ".css-1gxt6kf{-webkit-mask-repeat:round no-repeat;mask-repeat:round no-repeat}"
   ];
   [@css
-    ".css-1z2gp6{-webkit-mask-position:1rem 1rem, center;mask-position:1rem 1rem, center;}"
+    ".css-19obql5{-webkit-mask-repeat:no-repeat no-repeat;mask-repeat:no-repeat no-repeat}"
   ];
-  [@css ".css-1xcj5or{-webkit-mask-clip:border-box;mask-clip:border-box;}"];
-  [@css ".css-1ib1q3a{-webkit-mask-clip:padding-box;mask-clip:padding-box;}"];
-  [@css ".css-i7v6ku{-webkit-mask-clip:content-box;mask-clip:content-box;}"];
-  [@css ".css-1x5597p{-webkit-mask-clip:margin-box;mask-clip:margin-box;}"];
-  [@css ".css-19iay14{-webkit-mask-clip:fill-box;mask-clip:fill-box;}"];
-  [@css ".css-1eij1e5{-webkit-mask-clip:stroke-box;mask-clip:stroke-box;}"];
-  [@css ".css-16iy1a{-webkit-mask-clip:view-box;mask-clip:view-box;}"];
-  [@css ".css-1pcc5vo{-webkit-mask-clip:no-clip;mask-clip:no-clip;}"];
-  [@css ".css-frjmd7{-webkit-mask-origin:border-box;mask-origin:border-box;}"];
-  [@css ".css-xm0f4k{-webkit-mask-origin:padding-box;mask-origin:padding-box;}"];
+  [@css ".css-1pe9y42{-webkit-mask-position:center;mask-position:center}"];
   [@css
-    ".css-1gth4gk{-webkit-mask-origin:content-box;mask-origin:content-box;}"
+    ".css-1wjck5z{-webkit-mask-position:center center;mask-position:center center}"
   ];
-  [@css ".css-1ik7k5t{-webkit-mask-origin:margin-box;mask-origin:margin-box;}"];
-  [@css ".css-a9e45n{-webkit-mask-origin:fill-box;mask-origin:fill-box;}"];
-  [@css ".css-4y6p58{-webkit-mask-origin:stroke-box;mask-origin:stroke-box;}"];
-  [@css ".css-9h3jkb{-webkit-mask-origin:view-box;mask-origin:view-box;}"];
-  [@css ".css-xgqgoj{-webkit-mask-size:auto;mask-size:auto;}"];
-  [@css ".css-14pahf4{-webkit-mask-size:10px;mask-size:10px;}"];
-  [@css ".css-1n4hzm2{-webkit-mask-size:cover;mask-size:cover;}"];
-  [@css ".css-v5np7r{-webkit-mask-size:contain;mask-size:contain;}"];
-  [@css ".css-ji0jbb{-webkit-mask-size:50%;mask-size:50%;}"];
-  [@css ".css-1wr3cq7{-webkit-mask-size:10px auto;mask-size:10px auto;}"];
-  [@css ".css-rpieio{-webkit-mask-size:auto 10%;mask-size:auto 10%;}"];
-  [@css ".css-2y41vb{-webkit-mask-size:50em 50%;mask-size:50em 50%;}"];
-  [@css ".css-32tv7g{-webkit-mask-composite:add;mask-composite:add;}"];
-  [@css ".css-s075he{-webkit-mask-composite:subtract;mask-composite:subtract;}"];
+  [@css ".css-6vqk76{-webkit-mask-position:left 50%;mask-position:left 50%}"];
   [@css
-    ".css-10phvhq{-webkit-mask-composite:intersect;mask-composite:intersect;}"
-  ];
-  [@css ".css-1dn57xj{-webkit-mask-composite:exclude;mask-composite:exclude;}"];
-  [@css ".css-u6f6ef{-webkit-mask:top;mask:top;}"];
-  [@css ".css-1w8yoaq{-webkit-mask:space;mask:space;}"];
-  [@css ".css-cfk999{-webkit-mask:url(\"image.png\");mask:url(\"image.png\");}"];
-  [@css
-    ".css-1f1dmg{-webkit-mask:url(\"image.png\") luminance;mask:url(\"image.png\") luminance;}"
+    ".css-uam1vo{-webkit-mask-position:bottom 10px right 20px;mask-position:bottom 10px right 20px}"
   ];
   [@css
-    ".css-co80ky{-webkit-mask:url(\"image.png\") luminance top space;mask:url(\"image.png\") luminance top space;}"
+    ".css-qh6tm8{-webkit-mask-position:1rem 1rem,center;mask-position:1rem 1rem,center}"
   ];
-  [@css ".css-b1i8us{mask-border-source:none;}"];
-  [@css ".css-au7msv{mask-border-source:url(\"image.png\");}"];
-  [@css ".css-1i18jwz{mask-border-slice:0 fill;}"];
-  [@css ".css-1gz3qse{mask-border-slice:50% fill;}"];
-  [@css ".css-yxwqe0{mask-border-slice:1.1 fill;}"];
-  [@css ".css-81tc58{mask-border-slice:0 1 fill;}"];
-  [@css ".css-o9t8yr{mask-border-slice:0 1 2 fill;}"];
-  [@css ".css-ibrxuj{mask-border-slice:0 1 2 3 fill;}"];
-  [@css ".css-1gjnwbq{mask-border-width:auto;}"];
-  [@css ".css-1bxnkum{mask-border-width:10px;}"];
-  [@css ".css-1oj340c{mask-border-width:50%;}"];
-  [@css ".css-xquap{mask-border-width:1;}"];
-  [@css ".css-14gwtrw{mask-border-width:auto 1;}"];
-  [@css ".css-1424i71{mask-border-width:auto 1 50%;}"];
-  [@css ".css-1yaw63w{mask-border-width:auto 1 50% 1.1;}"];
-  [@css ".css-snbtf2{mask-border-outset:0;}"];
-  [@css ".css-18kfzm0{mask-border-outset:1.1;}"];
-  [@css ".css-j8h5pa{mask-border-outset:0 1;}"];
-  [@css ".css-11zbadx{mask-border-outset:0 1 2;}"];
-  [@css ".css-j1vur3{mask-border-outset:0 1 2 3;}"];
-  [@css ".css-1r8vgr1{mask-border-repeat:stretch;}"];
-  [@css ".css-1x9j3or{mask-border-repeat:repeat;}"];
-  [@css ".css-19q17r4{mask-border-repeat:round;}"];
-  [@css ".css-1ucchn8{mask-border-repeat:space;}"];
-  [@css ".css-14paifj{mask-border-repeat:stretch stretch;}"];
-  [@css ".css-7kiybl{mask-border-repeat:repeat stretch;}"];
-  [@css ".css-5zwbwc{mask-border-repeat:round stretch;}"];
-  [@css ".css-b7x2ld{mask-border-repeat:space stretch;}"];
-  [@css ".css-1x6sdt0{mask-border-repeat:stretch repeat;}"];
-  [@css ".css-1s8vjb8{mask-border-repeat:repeat repeat;}"];
-  [@css ".css-j7o22d{mask-border-repeat:round repeat;}"];
-  [@css ".css-1vhqntc{mask-border-repeat:space repeat;}"];
-  [@css ".css-1hbj4vd{mask-border-repeat:stretch round;}"];
-  [@css ".css-56az9g{mask-border-repeat:repeat round;}"];
-  [@css ".css-ram5lc{mask-border-repeat:round round;}"];
-  [@css ".css-1o4zmh8{mask-border-repeat:space round;}"];
-  [@css ".css-1qdfg8f{mask-border-repeat:stretch space;}"];
-  [@css ".css-b98ni5{mask-border-repeat:repeat space;}"];
-  [@css ".css-28fmsi{mask-border-repeat:round space;}"];
-  [@css ".css-9xi2sh{mask-border-repeat:space space;}"];
-  [@css ".css-hs0miw{mask-border:url(\"image.png\");}"];
-  [@css ".css-nefx9l{mask-type:luminance;}"];
-  [@css ".css-1l16il5{mask-type:alpha;}"];
+  [@css ".css-1xcj5or{-webkit-mask-clip:border-box;mask-clip:border-box}"];
+  [@css ".css-1ib1q3a{-webkit-mask-clip:padding-box;mask-clip:padding-box}"];
+  [@css ".css-i7v6ku{-webkit-mask-clip:content-box;mask-clip:content-box}"];
+  [@css ".css-1x5597p{-webkit-mask-clip:margin-box;mask-clip:margin-box}"];
+  [@css ".css-19iay14{-webkit-mask-clip:fill-box;mask-clip:fill-box}"];
+  [@css ".css-1eij1e5{-webkit-mask-clip:stroke-box;mask-clip:stroke-box}"];
+  [@css ".css-16iy1a{-webkit-mask-clip:view-box;mask-clip:view-box}"];
+  [@css ".css-1pcc5vo{-webkit-mask-clip:no-clip;mask-clip:no-clip}"];
+  [@css ".css-frjmd7{-webkit-mask-origin:border-box;mask-origin:border-box}"];
+  [@css ".css-xm0f4k{-webkit-mask-origin:padding-box;mask-origin:padding-box}"];
+  [@css ".css-1gth4gk{-webkit-mask-origin:content-box;mask-origin:content-box}"];
+  [@css ".css-1ik7k5t{-webkit-mask-origin:margin-box;mask-origin:margin-box}"];
+  [@css ".css-a9e45n{-webkit-mask-origin:fill-box;mask-origin:fill-box}"];
+  [@css ".css-4y6p58{-webkit-mask-origin:stroke-box;mask-origin:stroke-box}"];
+  [@css ".css-9h3jkb{-webkit-mask-origin:view-box;mask-origin:view-box}"];
+  [@css ".css-xgqgoj{-webkit-mask-size:auto;mask-size:auto}"];
+  [@css ".css-14pahf4{-webkit-mask-size:10px;mask-size:10px}"];
+  [@css ".css-1n4hzm2{-webkit-mask-size:cover;mask-size:cover}"];
+  [@css ".css-v5np7r{-webkit-mask-size:contain;mask-size:contain}"];
+  [@css ".css-ji0jbb{-webkit-mask-size:50%;mask-size:50%}"];
+  [@css ".css-1wr3cq7{-webkit-mask-size:10px auto;mask-size:10px auto}"];
+  [@css ".css-rpieio{-webkit-mask-size:auto 10%;mask-size:auto 10%}"];
+  [@css ".css-2y41vb{-webkit-mask-size:50em 50%;mask-size:50em 50%}"];
+  [@css ".css-32tv7g{-webkit-mask-composite:add;mask-composite:add}"];
+  [@css ".css-s075he{-webkit-mask-composite:subtract;mask-composite:subtract}"];
+  [@css
+    ".css-10phvhq{-webkit-mask-composite:intersect;mask-composite:intersect}"
+  ];
+  [@css ".css-1dn57xj{-webkit-mask-composite:exclude;mask-composite:exclude}"];
+  [@css ".css-u6f6ef{-webkit-mask:top;mask:top}"];
+  [@css ".css-1w8yoaq{-webkit-mask:space;mask:space}"];
+  [@css ".css-cfk999{-webkit-mask:url(\"image.png\");mask:url(\"image.png\")}"];
+  [@css
+    ".css-1f1dmg{-webkit-mask:url(\"image.png\") luminance;mask:url(\"image.png\") luminance}"
+  ];
+  [@css
+    ".css-co80ky{-webkit-mask:url(\"image.png\") luminance top space;mask:url(\"image.png\") luminance top space}"
+  ];
+  [@css ".css-b1i8us{mask-border-source:none}"];
+  [@css ".css-au7msv{mask-border-source:url(\"image.png\")}"];
+  [@css ".css-1i18jwz{mask-border-slice:0 fill}"];
+  [@css ".css-1gz3qse{mask-border-slice:50% fill}"];
+  [@css ".css-yxwqe0{mask-border-slice:1.1 fill}"];
+  [@css ".css-81tc58{mask-border-slice:0 1 fill}"];
+  [@css ".css-o9t8yr{mask-border-slice:0 1 2 fill}"];
+  [@css ".css-ibrxuj{mask-border-slice:0 1 2 3 fill}"];
+  [@css ".css-1gjnwbq{mask-border-width:auto}"];
+  [@css ".css-1bxnkum{mask-border-width:10px}"];
+  [@css ".css-1oj340c{mask-border-width:50%}"];
+  [@css ".css-xquap{mask-border-width:1}"];
+  [@css ".css-14gwtrw{mask-border-width:auto 1}"];
+  [@css ".css-1424i71{mask-border-width:auto 1 50%}"];
+  [@css ".css-1yaw63w{mask-border-width:auto 1 50% 1.1}"];
+  [@css ".css-snbtf2{mask-border-outset:0}"];
+  [@css ".css-18kfzm0{mask-border-outset:1.1}"];
+  [@css ".css-j8h5pa{mask-border-outset:0 1}"];
+  [@css ".css-11zbadx{mask-border-outset:0 1 2}"];
+  [@css ".css-j1vur3{mask-border-outset:0 1 2 3}"];
+  [@css ".css-1r8vgr1{mask-border-repeat:stretch}"];
+  [@css ".css-1x9j3or{mask-border-repeat:repeat}"];
+  [@css ".css-19q17r4{mask-border-repeat:round}"];
+  [@css ".css-1ucchn8{mask-border-repeat:space}"];
+  [@css ".css-14paifj{mask-border-repeat:stretch stretch}"];
+  [@css ".css-7kiybl{mask-border-repeat:repeat stretch}"];
+  [@css ".css-5zwbwc{mask-border-repeat:round stretch}"];
+  [@css ".css-b7x2ld{mask-border-repeat:space stretch}"];
+  [@css ".css-1x6sdt0{mask-border-repeat:stretch repeat}"];
+  [@css ".css-1s8vjb8{mask-border-repeat:repeat repeat}"];
+  [@css ".css-j7o22d{mask-border-repeat:round repeat}"];
+  [@css ".css-1vhqntc{mask-border-repeat:space repeat}"];
+  [@css ".css-1hbj4vd{mask-border-repeat:stretch round}"];
+  [@css ".css-56az9g{mask-border-repeat:repeat round}"];
+  [@css ".css-ram5lc{mask-border-repeat:round round}"];
+  [@css ".css-1o4zmh8{mask-border-repeat:space round}"];
+  [@css ".css-1qdfg8f{mask-border-repeat:stretch space}"];
+  [@css ".css-b98ni5{mask-border-repeat:repeat space}"];
+  [@css ".css-28fmsi{mask-border-repeat:round space}"];
+  [@css ".css-9xi2sh{mask-border-repeat:space space}"];
+  [@css ".css-hs0miw{mask-border:url(\"image.png\")}"];
+  [@css ".css-nefx9l{mask-type:luminance}"];
+  [@css ".css-1l16il5{mask-type:alpha}"];
   CSS.make("css-8mcpnl", []);
   CSS.make("css-182dshe", []);
   CSS.make("css-1mglbca", []);
-  CSS.make("css-1wl8b54", []);
-  CSS.make("css-23yasd", []);
-  CSS.make("css-tyz3kz", []);
+  CSS.make("css-1w1h0r2", []);
+  CSS.make("css-1t1xk7i", []);
+  CSS.make("css-1p81d38", []);
   CSS.make("css-9wq8iu", []);
   CSS.make("css-1pbivbf", []);
   CSS.make("css-n54dpx", []);
@@ -212,7 +206,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-1snszcd", []);
   CSS.make("css-1q46lnx", []);
   CSS.make("css-130lv46", []);
-  CSS.make("css-191xpd6", []);
+  CSS.make("css-17cde2n", []);
   CSS.make("css-dulaft", []);
   CSS.make("css-1avdp5t", []);
   CSS.make("css-1qwhtsi", []);
@@ -243,7 +237,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-1wjck5z", []);
   CSS.make("css-6vqk76", []);
   CSS.make("css-uam1vo", []);
-  CSS.make("css-1z2gp6", []);
+  CSS.make("css-qh6tm8", []);
   CSS.make("css-1xcj5or", []);
   CSS.make("css-1ib1q3a", []);
   CSS.make("css-i7v6ku", []);

@@ -100,6 +100,10 @@ jobs:
       - name: Test
         run: make test
 
+      - name: CSS spec coverage report is in sync
+        if: matrix.os == 'ubuntu-latest' && matrix.ocaml-compiler == '5.4.0'
+        run: make css-oracle-check
+
       - name: Format
         if: matrix.ocaml-compiler == '5.4.0'
         run: make format-check

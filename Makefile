@@ -145,3 +145,30 @@ interpreter: ## Run menhir as interpret
 .PHONY: website-watch
 website-watch: ## Run the website locally
 	@cd packages/website && npm run dev
+
+.PHONY: css-oracle
+css-oracle: ## Regenerate the CSS coverage report and website support tables from the vendored oracle
+	@$(DUNE) build packages/css-grammar/bin/registry_dump.exe
+	@_build/default/packages/css-grammar/bin/registry_dump.exe > _build/registry-dump.txt
+	@node scripts/css-oracle/report.mjs _build/registry-dump.txt
+	@node scripts/css-oracle/support-page.mjs _build/registry-dump.txt
+	@node scripts/css-oracle/conformance.mjs _build/registry-dump.txt
+
+.PHONY: css-oracle-update
+css-oracle-update: ## Refresh the vendored @webref/css spec inventory (network)
+	@node scripts/css-oracle/update.mjs
+	@$(MAKE) css-oracle
+
+CSS_ORACLE_ARTIFACTS = \
+  packages/css-grammar/data/coverage.md \
+  packages/website/src/generated/css-support-tables.mdx \
+  packages/ppx/test/css-support/spec-conformance.t
+
+.PHONY: css-oracle-check
+css-oracle-check: css-oracle ## Fail if the coverage report or website support tables are out of sync
+	@for f in $(CSS_ORACLE_ARTIFACTS); do \
+	  git ls-files --error-unmatch $$f > /dev/null 2>&1 \
+	    || { echo "$$f is not tracked by git: the oracle gate would pass vacuously"; exit 1; }; \
+	done
+	@git diff --exit-code $(CSS_ORACLE_ARTIFACTS) \
+	  || (echo "oracle artifacts are out of sync: run 'make css-oracle' and commit the result" && exit 1)

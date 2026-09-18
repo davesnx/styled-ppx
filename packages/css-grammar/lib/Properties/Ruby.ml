@@ -18,7 +18,8 @@ let property_ruby_merge : property_ruby_merge Rule.rule =
 
 module Property_ruby_position =
   [%spec_module
-  "'over' | 'under' | 'inter-character'", (module Css_types.RubyPosition)]
+  "[ 'alternate' || [ 'over' | 'under' ] ] | 'inter-character'",
+  (module Css_types.RubyPosition)]
 
 let property_ruby_position : property_ruby_position Rule.rule =
   Property_ruby_position.rule

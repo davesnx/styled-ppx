@@ -65,6 +65,19 @@ let skip_whitespace stream =
     ()
   done
 
+(* CSS Syntax 3 (SS 5.4.1): CDO/CDC tokens (`<!--`, `-->`) are discarded at
+   the top level of a stylesheet. They stay errors everywhere else. *)
+let skip_whitespace_and_cdx stream =
+  let skippable stream =
+    match current_tok stream with
+    | Tokens.WS | Tokens.CDO | Tokens.CDC -> true
+    | _ -> false
+  in
+  while skippable stream do
+    let _ = advance stream in
+    ()
+  done
+
 let accept_token stream expected =
   if current_is stream expected then Some (advance stream) else None
 
@@ -132,7 +145,7 @@ let next_significant_index tokens start =
 (* -- Token set predicates (Design 3) -- *)
 
 let is_selector_start = function
-  | Tokens.DELIM ("." | "&" | "*")
+  | Tokens.DELIM ("." | "&" | "*" | "|")
   | Tokens.HASH _ | Tokens.LEFT_BRACKET | Tokens.INTERPOLATION _ ->
     true
   | _ -> false
@@ -141,7 +154,7 @@ let is_pseudo_start = function
   | Tokens.COLON | Tokens.DOUBLE_COLON -> true
   | _ -> false
 
-let is_combinator_delim = function ">" | "+" | "~" -> true | _ -> false
+let is_combinator_delim = function ">" | "+" | "~" | "||" -> true | _ -> false
 
 let is_at_rule_start = function
   | Tokens.AT_RULE _ | Tokens.AT_KEYFRAMES _ -> true
@@ -320,6 +333,7 @@ let selector_combinator_of_delim = function
   | "+" -> Ast.Selector_adjacent_sibling
   | "~" -> Ast.Selector_general_sibling
   | ">" -> Ast.Selector_child
+  | "||" -> Ast.Selector_column
   | _ -> assert false
 
 let parse_attr_matcher stream =
@@ -348,10 +362,6 @@ let parse_attr_matcher stream =
     let _ = advance stream in
     Attr_exact
   | _ -> raise_parse_error (current_token stream)
-
-let parse_wq_name stream =
-  let name, _ = expect_ident stream in
-  name
 
 (* -- An+B microsyntax (nth payloads) -- *)
 
@@ -396,7 +406,7 @@ let classify_nth_suffix function_name (token : token_with_location) suffix =
     Nth_suffix_n_dash_digits
       (nth_int_of_digits function_name token (String.sub suffix 2 (length - 2)))
 
-let parse_nth_payload ~function_name stream =
+let parse_nth_formula ~function_name stream =
   skip_whitespace stream;
   let parse_after_n a suffix =
     match suffix with
@@ -459,6 +469,54 @@ let parse_nth_payload ~function_name stream =
   skip_whitespace stream;
   payload
 
+(* Selectors 4 <wq-name>/<ns-prefix>: a name may carry a namespace prefix
+   (`svg|circle`, `*|circle`, `|circle`). The `|` only qualifies when
+   directly followed by an identifier or `*` -- `[lang|=en]` keeps its
+   attribute matcher because the token after `|` is `=`. Whitespace
+   adjacency is implicit: the lexer emits WS tokens, so a spaced `svg | x`
+   never reaches the `DELIM "|"` case. *)
+let namespace_suffix stream =
+  match current_tok stream with
+  | Tokens.DELIM "|" ->
+    let saved = snapshot stream in
+    let _ = advance stream in
+    begin match current_tok stream with
+    | Tokens.IDENT name ->
+      let _ = advance stream in
+      Some name
+    | Tokens.DELIM "*" ->
+      let _ = advance stream in
+      Some "*"
+    | _ ->
+      restore stream saved;
+      None
+    end
+  | _ -> None
+
+let with_namespace_suffix stream prefix =
+  match namespace_suffix stream with
+  | Some name -> prefix ^ "|" ^ name
+  | None -> prefix
+
+let parse_wq_name stream =
+  match current_tok stream with
+  | Tokens.DELIM "|" ->
+    let _ = advance stream in
+    let name, _ = expect_ident stream in
+    "|" ^ name
+  | Tokens.DELIM "*" ->
+    let saved = snapshot stream in
+    let _ = advance stream in
+    begin match namespace_suffix stream with
+    | Some name -> "*|" ^ name
+    | None ->
+      restore stream saved;
+      raise_parse_error (current_token stream)
+    end
+  | _ ->
+    let name, _ = expect_ident stream in
+    with_namespace_suffix stream name
+
 let rec parse_component_value stream =
   let start_pos = (current_token stream).start_pos in
   match current_tok stream with
@@ -516,6 +574,19 @@ let rec parse_component_value stream =
     let _ = advance stream in
     with_loc start_pos stream.last_end_pos
       (Ast.Variable (content, loc) : Ast.component_value)
+  | Tokens.AT_RULE name
+  | Tokens.AT_RULE_STATEMENT name
+  | Tokens.AT_KEYFRAMES name ->
+    (* CSS Syntax 3: at-keyword tokens are preserved component values, e.g.
+       `@container` in `@supports at-rule(@container)`. *)
+    let _ = advance stream in
+    with_loc start_pos stream.last_end_pos (Ast.At_keyword name)
+  | Tokens.CDO ->
+    let _ = advance stream in
+    with_loc start_pos stream.last_end_pos Ast.Cdo
+  | Tokens.CDC ->
+    let _ = advance stream in
+    with_loc start_pos stream.last_end_pos Ast.Cdc
   | Tokens.FUNCTION name ->
     let token = advance stream in
     let body, body_loc =
@@ -594,13 +665,26 @@ let parse_type_selector stream =
     Ampersand
   | Tokens.DELIM "*" ->
     let _ = advance stream in
-    Universal
+    begin match namespace_suffix stream with
+    | Some name -> Type ("*|" ^ name)
+    | None -> Universal
+    end
+  | Tokens.DELIM "|" ->
+    let _ = advance stream in
+    begin match current_tok stream with
+    | Tokens.DELIM "*" ->
+      let _ = advance stream in
+      Type "|*"
+    | _ ->
+      let name, _ = expect_ident stream in
+      Type ("|" ^ name)
+    end
   | Tokens.INTERPOLATION (content, loc) ->
     let _ = advance stream in
     Variable (content, loc)
   | Tokens.IDENT name ->
     let _ = advance stream in
-    Type name
+    Type (with_namespace_suffix stream name)
   | _ -> raise_parse_error (current_token stream)
 
 let rec parse_attribute_selector stream =
@@ -625,8 +709,19 @@ let rec parse_attribute_selector stream =
       | _ -> raise_parse_error (current_token stream)
     in
     skip_whitespace stream;
+    let case_sensitivity =
+      match current_tok stream with
+      | Tokens.IDENT ("i" | "I") ->
+        let _ = advance stream in
+        Some Ast.Attr_case_insensitive
+      | Tokens.IDENT ("s" | "S") ->
+        let _ = advance stream in
+        Some Ast.Attr_case_sensitive
+      | _ -> None
+    in
+    skip_whitespace stream;
     let _ = expect_token stream Tokens.RIGHT_BRACKET in
-    To_equal { name; kind; value })
+    To_equal { name; kind; value; case_sensitivity })
 
 and parse_pseudo_class_selector stream =
   let _ = expect_token stream Tokens.COLON in
@@ -637,7 +732,20 @@ and parse_pseudo_class_selector stream =
   | Tokens.FUNCTION name ->
     let start_pos = (current_token stream).start_pos in
     let _ = advance stream in
-    let selectors, payload_loc = parse_relative_selector_list stream in
+    (* Selectors 4 (SS 4.1): only forgiving selector lists (`:is()`,
+       `:where()`) may be empty. `:not()`/`:has()` take a non-forgiving
+       list, so an empty payload stays a compile-time error. *)
+    let forgiving =
+      match String.lowercase_ascii name with
+      | "is" | "where" -> true
+      | _ -> false
+    in
+    skip_whitespace stream;
+    let selectors, payload_loc =
+      if forgiving && current_is stream Tokens.RIGHT_PAREN then
+        [], make_loc start_pos start_pos
+      else parse_relative_selector_list stream
+    in
     let _ = expect_token stream Tokens.RIGHT_PAREN in
     let payload_loc =
       match selectors with
@@ -660,8 +768,16 @@ and parse_pseudo_class_selector stream =
 
 and parse_pseudo_element_selector stream =
   let _ = expect_token stream Tokens.DOUBLE_COLON in
-  let name = parse_selector_ident stream in
-  Pseudoelement name
+  match current_tok stream with
+  | Tokens.FUNCTION name ->
+    let _ = advance stream in
+    skip_whitespace stream;
+    let selectors, payload_loc = parse_selector_list stream in
+    let _ = expect_token stream Tokens.RIGHT_PAREN in
+    PseudoelementFunction { name; payload = selectors, payload_loc }
+  | _ ->
+    let name = parse_selector_ident stream in
+    Pseudoelement name
 
 and parse_pseudo_list stream =
   let first = parse_pseudo_element_selector stream in
@@ -698,7 +814,8 @@ and parse_subclass_selector stream =
 and parse_non_complex_selector stream =
   let type_selector =
     match current_tok stream with
-    | Tokens.IDENT _ | Tokens.DELIM ("&" | "*") | Tokens.INTERPOLATION _ ->
+    | Tokens.IDENT _ | Tokens.DELIM ("&" | "*" | "|") | Tokens.INTERPOLATION _
+      ->
       Some (parse_type_selector stream)
     | _ -> None
   in
@@ -731,7 +848,7 @@ and parse_complex_selector stream =
       ()
     done;
     match current_tok stream with
-    | Tokens.DELIM (("+" | "~" | ">") as s) ->
+    | Tokens.DELIM (("+" | "~" | ">" | "||") as s) ->
       let _ = advance stream in
       skip_whitespace stream;
       let selector = parse_non_complex_selector stream in
@@ -778,7 +895,7 @@ and parse_relative_selector stream =
   skip_whitespace stream;
   let combinator =
     match current_tok stream with
-    | Tokens.DELIM (("+" | "~" | ">") as s) ->
+    | Tokens.DELIM (("+" | "~" | ">" | "||") as s) ->
       let _ = advance stream in
       skip_whitespace stream;
       Some (selector_combinator_of_delim s)
@@ -789,6 +906,25 @@ and parse_relative_selector stream =
 
 and parse_relative_selector_list stream =
   parse_selector_list_with stream parse_relative_selector
+
+and parse_nth_payload ~function_name stream =
+  let payload = parse_nth_formula ~function_name stream in
+  match current_tok stream, payload with
+  | Tokens.IDENT "of", Ast.Nth nth ->
+    let _ = advance stream in
+    skip_whitespace stream;
+    let rec collect acc =
+      let item = parse_complex_selector stream in
+      skip_whitespace stream;
+      match current_tok stream with
+      | Tokens.COMMA ->
+        let _ = advance stream in
+        skip_whitespace stream;
+        collect (item :: acc)
+      | _ -> List.rev (item :: acc)
+    in
+    Ast.NthOf (nth, collect [])
+  | _ -> payload
 
 let update_declaration_value_state state (value, _) =
   match value with
@@ -806,7 +942,8 @@ let update_declaration_value_state state (value, _) =
       if top_level_items = 1 then false else state.ident_like_prefix
     in
     { has_content = true; top_level_items; ident_like_prefix }
-  | Paren_block _ | Bracket_block _ | Delim _ | Selector _ | Unicode_range _ ->
+  | Paren_block _ | Bracket_block _ | Delim _ | Selector _ | Unicode_range _
+  | At_keyword _ | Cdo | Cdc ->
     { state with has_content = true }
 
 let parse_declaration_value_list stream =
@@ -854,15 +991,16 @@ let parse_declaration_no_eof stream =
     loc = loc_from_start stream start_pos;
   }
 
-let parse_rule_list stream ~stop ~parse_one ~allow_empty =
-  skip_whitespace stream;
+let parse_rule_list ?(skip = skip_whitespace) stream ~stop ~parse_one
+  ~allow_empty =
+  skip stream;
   let start_pos = (current_token stream).start_pos in
   if stop stream then
     if allow_empty then [], eof_loc stream
     else raise_parse_error (current_token stream)
   else (
     let rec loop acc =
-      skip_whitespace stream;
+      skip stream;
       if stop stream then List.rev acc
       else (
         let rule = parse_one stream in
@@ -980,23 +1118,35 @@ and parse_at_rule stream =
     }
   | Tokens.AT_RULE name ->
     let at_token = advance stream in
+    (* CSS Syntax 3 (SS 5.4.2): an at-rule's prelude runs until a `{`
+       (block form) or a `;` (statement form, e.g. `@layer reset, base;`). *)
     let prelude, prelude_loc =
       parse_component_value_list_until stream (fun stream ->
-        current_is stream Tokens.LEFT_BRACE)
+        current_is stream Tokens.LEFT_BRACE
+        || current_is stream Tokens.SEMI_COLON)
     in
-    let left_brace = expect_token stream Tokens.LEFT_BRACE in
-    let rules =
-      parse_braced_rules stream left_brace (fun stream ->
-        parse_rule_list stream
-          ~stop:(fun stream -> current_is stream Tokens.RIGHT_BRACE)
-          ~parse_one:parse_block_rule ~allow_empty:true)
-    in
-    {
-      name = name, component_loc at_token;
-      prelude = prelude, prelude_loc;
-      block = Stylesheet rules;
-      loc = loc_from_start stream start_pos;
-    }
+    if current_is stream Tokens.SEMI_COLON then (
+      let _ = advance stream in
+      {
+        name = name, component_loc at_token;
+        prelude = prelude, prelude_loc;
+        block = Empty;
+        loc = loc_from_start stream start_pos;
+      })
+    else (
+      let left_brace = expect_token stream Tokens.LEFT_BRACE in
+      let rules =
+        parse_braced_rules stream left_brace (fun stream ->
+          parse_rule_list stream
+            ~stop:(fun stream -> current_is stream Tokens.RIGHT_BRACE)
+            ~parse_one:parse_block_rule ~allow_empty:true)
+      in
+      {
+        name = name, component_loc at_token;
+        prelude = prelude, prelude_loc;
+        block = Stylesheet rules;
+        loc = loc_from_start stream start_pos;
+      })
   | _ -> raise_parse_error (current_token stream)
 
 and parse_style_rule stream =
@@ -1074,7 +1224,7 @@ let parse_declaration input =
 let parse_stylesheet input =
   let stream = make_stream input in
   let rules, loc =
-    parse_rule_list stream
+    parse_rule_list ~skip:skip_whitespace_and_cdx stream
       ~stop:(fun stream -> current_is stream Tokens.EOF)
       ~parse_one:parse_stylesheet_rule ~allow_empty:true
   in

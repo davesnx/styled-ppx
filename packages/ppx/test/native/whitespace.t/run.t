@@ -31,7 +31,7 @@ Whitespace native PPX transformations are checked as a cram snapshot.
   - media with declarations
     "[%cx \".clar {  background-image : url( 'img_tree.gif') ; }\"]"
   - ignore space on declaration url
-    "CSS.make \"css-150tv9y-cases\" []"
+    "CSS.make \"css-kcvcb2-cases\" []"
   - ignore space on values, such as box-shadow
     "[%cx \"box-shadow:    12px 12px 2px 1px rgba(0, 0, 255, 0.2)\"]"
   - ignore space before/after comments values

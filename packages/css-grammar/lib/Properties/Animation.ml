@@ -24,7 +24,7 @@ let property_animation_direction : property_animation_direction Rule.rule =
 
 module Property_animation_duration =
   [%spec_module
-  "[ <extended-time> ]#", (module Css_types.AnimationDuration)]
+  "[ 'auto' | <extended-time> ]#", (module Css_types.AnimationDuration)]
 
 let property_animation_duration : property_animation_duration Rule.rule =
   Property_animation_duration.rule

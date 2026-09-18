@@ -51,51 +51,51 @@ Interpolation native PPX transformations are checked as a cram snapshot.
   [@css "@property --state-1yj1w6c{syntax:\"*\";inherits:false;}"];
   [@css "@property --px30-cc29mn{syntax:\"*\";inherits:false;}"];
   [@css "@property --red-w69rb9{syntax:\"*\";inherits:false;}"];
-  [@css ".css-vtnh4f{color:var(--mono100-mn2jt5);}"];
-  [@css ".css-j1itjj{margin:var(--big-1c1caa8) var(--small-1tsw5sh);}"];
-  [@css ".css-pupp3j{padding:var(--small-1d5k27v) 0px;}"];
-  [@css ".css-11f97be{border:1px solid var(--alpha-vlpuld);}"];
-  [@css ".css-upyj1z{outline:1px solid var(--alpha-1ftvcb4);}"];
-  [@css ".css-19ww55u{border-bottom:0px solid var(--alpha-1y5ijmp);}"];
-  [@css ".css-1dfkyy8{width:var(--width-18c1xss);}"];
-  [@css ".css-1cgnebp{max-width:var(--max-1yrxnfd);}"];
-  [@css ".css-q0vooa{height:var(--height-1n9troi);}"];
-  [@css ".css-cd0d4{border-radius:var(--border-8yt3ey);}"];
-  [@css ".css-gdu0qi{font-size:var(--font-10lt5gt);}"];
-  [@css ".css-16nszir{font-family:var(--mono-e5legw);}"];
-  [@css ".css-1vyfd7x{line-height:var(--lh-uai7u3);}"];
-  [@css ".css-53fgx3{z-index:var(--zLevel-vut76j);}"];
-  [@css ".css-1jcegw0{left:var(--left-1s2hr3z);}"];
-  [@css ".css-1p58kmj{text-decoration-color:var(--decorationColor-seqvqc);}"];
-  [@css ".css-1t9o5gx{background-image:var(--wat-tevp0f);}"];
+  [@css ".css-vtnh4f{color:var(--mono100-mn2jt5)}"];
+  [@css ".css-j1itjj{margin:var(--big-1c1caa8) var(--small-1tsw5sh)}"];
+  [@css ".css-pupp3j{padding:var(--small-1d5k27v) 0px}"];
+  [@css ".css-11f97be{border:1px solid var(--alpha-vlpuld)}"];
+  [@css ".css-upyj1z{outline:1px solid var(--alpha-1ftvcb4)}"];
+  [@css ".css-19ww55u{border-bottom:0px solid var(--alpha-1y5ijmp)}"];
+  [@css ".css-1dfkyy8{width:var(--width-18c1xss)}"];
+  [@css ".css-1cgnebp{max-width:var(--max-1yrxnfd)}"];
+  [@css ".css-q0vooa{height:var(--height-1n9troi)}"];
+  [@css ".css-cd0d4{border-radius:var(--border-8yt3ey)}"];
+  [@css ".css-gdu0qi{font-size:var(--font-10lt5gt)}"];
+  [@css ".css-16nszir{font-family:var(--mono-e5legw)}"];
+  [@css ".css-1vyfd7x{line-height:var(--lh-uai7u3)}"];
+  [@css ".css-53fgx3{z-index:var(--zLevel-vut76j)}"];
+  [@css ".css-1jcegw0{left:var(--left-1s2hr3z)}"];
+  [@css ".css-1p58kmj{text-decoration-color:var(--decorationColor-seqvqc)}"];
+  [@css ".css-1t9o5gx{background-image:var(--wat-tevp0f)}"];
   [@css
-    ".css-15xnm6u{-webkit-mask-image:var(--externalImageUrl-75mq6y);mask-image:var(--externalImageUrl-75mq6y);}"
+    ".css-15xnm6u{-webkit-mask-image:var(--externalImageUrl-75mq6y);mask-image:var(--externalImageUrl-75mq6y)}"
   ];
   [@css
-    ".css-1a150p4{text-shadow:var(--h-ulszyz) var(--v-1rucg2y) var(--blur-n5ddfa) var(--color-1jwocqc);}"
+    ".css-1a150p4{text-shadow:var(--h-ulszyz) var(--v-1rucg2y) var(--blur-n5ddfa) var(--color-1jwocqc)}"
   ];
-  [@css ".css-pc2giy{color:var(--blue-uz6p3q);}"];
+  [@css ".css-pc2giy{color:var(--blue-uz6p3q)}"];
   [@css
-    ".css-ixihb6{box-shadow:var(--h-1cxj5q6) var(--v-1p9ysn0) var(--blur-1rsz8mu) var(--spread-1icix4c) var(--color-1eos5hw);}"
-  ];
-  [@css
-    ".css-13ts4zv{box-shadow:10px 10px 0px var(--spread-wd13u2) var(--color-3xubcm);}"
-  ];
-  [@css ".css-lxl5g5{box-shadow:var(--elevation-jhhehb);}"];
-  [@css ".css-gokeqi{box-shadow:none;}"];
-  [@css ".css-l3baal{text-overflow:var(--clip-1go0jdu);}"];
-  [@css ".css-fv8edy{transition-duration:500ms;}"];
-  [@css ".css-s36hu1{transition-duration:var(--duration-i5tvzn);}"];
-  [@css
-    ".css-1bien0s{-webkit-animation-play-state:var(--state-1yj1w6c);animation-play-state:var(--state-1yj1w6c);}"
+    ".css-ixihb6{box-shadow:var(--h-1cxj5q6) var(--v-1p9ysn0) var(--blur-1rsz8mu) var(--spread-1icix4c) var(--color-1eos5hw)}"
   ];
   [@css
-    ".css-1i5bnre{-webkit-animation-play-state:paused;animation-play-state:paused;}"
+    ".css-13ts4zv{box-shadow:10px 10px 0px var(--spread-wd13u2) var(--color-3xubcm)}"
+  ];
+  [@css ".css-lxl5g5{box-shadow:var(--elevation-jhhehb)}"];
+  [@css ".css-gokeqi{box-shadow:none}"];
+  [@css ".css-l3baal{text-overflow:var(--clip-1go0jdu)}"];
+  [@css ".css-fv8edy{transition-duration:500ms}"];
+  [@css ".css-s36hu1{transition-duration:var(--duration-i5tvzn)}"];
+  [@css
+    ".css-1bien0s{-webkit-animation-play-state:var(--state-1yj1w6c);animation-play-state:var(--state-1yj1w6c)}"
   ];
   [@css
-    ".css-x7nyl9{-webkit-column-gap:var(--px30-cc29mn);column-gap:var(--px30-cc29mn);}"
+    ".css-1i5bnre{-webkit-animation-play-state:paused;animation-play-state:paused}"
   ];
-  [@css ".css-829yln{-webkit-text-fill-color:var(--red-w69rb9);}"];
+  [@css
+    ".css-x7nyl9{-webkit-column-gap:var(--px30-cc29mn);column-gap:var(--px30-cc29mn)}"
+  ];
+  [@css ".css-829yln{-webkit-text-fill-color:var(--red-w69rb9)}"];
   module Size = {
     let big = `px(24);
     let small = `px(8);

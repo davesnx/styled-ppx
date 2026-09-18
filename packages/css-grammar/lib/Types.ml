@@ -2358,7 +2358,10 @@ and property_animation =
 
 and property_animation_delay = extended_time list
 and property_animation_direction = single_animation_direction list
-and property_animation_duration = extended_time list
+
+and property_animation_duration =
+  [ `Auto | `Extended_time of extended_time ] list
+
 and property_animation_fill_mode = single_animation_fill_mode list
 and property_animation_iteration_count = single_animation_iteration_count list
 
@@ -2946,6 +2949,8 @@ and property_display =
   | `Inline_table
   | `List_item
   | `None
+  | `Grid_lanes
+  | `Inline_grid_lanes
   | `Ruby
   | `Ruby_base
   | `Ruby_base_container
@@ -3050,6 +3055,8 @@ and property_float =
   | `None
   | `Inline_start
   | `Inline_end
+  | `Block_start
+  | `Block_end
   ]
 
 and property_font =
@@ -3115,6 +3122,7 @@ and property_font_palette =
   [ `Normal
   | `Light
   | `Dark
+  | `Dashed_ident of string
   ]
 
 and property_font_size =
@@ -3122,6 +3130,7 @@ and property_font_size =
   | `Relative_size of relative_size
   | `Extended_length of extended_length
   | `Extended_percentage of extended_percentage
+  | `Math
   ]
 
 and property_font_size_adjust =
@@ -3288,7 +3297,11 @@ and property_font_weight =
 
 and property_gap = property_row_gap * property_column_gap option
 and property_glyph_orientation_horizontal = extended_angle
-and property_glyph_orientation_vertical = extended_angle
+
+and property_glyph_orientation_vertical =
+  [ `Auto
+  | `Extended_angle of extended_angle
+  ]
 
 and property_grid =
   [ `Property_grid_template of property_grid_template
@@ -3700,20 +3713,7 @@ and property_masonry_auto_flow =
   [ `Pack | `Next ] option * [ `Definite_first | `Ordered ] option
 
 and property_max_block_size = property_max_width
-
-and property_max_height =
-  [ `Auto
-  | `Extended_length of extended_length
-  | `Extended_percentage of extended_percentage
-  | `Min_content
-  | `Max_content
-  | `Fit_content_0
-  | `Fit_content_1 of
-    [ `Extended_length of extended_length
-    | `Extended_percentage of extended_percentage
-    ]
-  ]
-
+and property_max_height = property_max_width
 and property_max_inline_size = property_max_width
 
 and property_max_lines =
@@ -3768,7 +3768,10 @@ and property_min_width =
   | `Non_standard_width of non_standard_width
   ]
 
-and property_mix_blend_mode = blend_mode
+and property_mix_blend_mode =
+  [ `Blend_mode of blend_mode
+  | `Plus_lighter
+  ]
 
 and property_media_any_hover =
   [ `None
@@ -3853,9 +3856,67 @@ and property_media_prefers_reduced_motion =
   | `Reduce
   ]
 
-and property_media_resolution = resolution
+and property_media_resolution =
+  [ `Resolution of resolution
+  | `Infinite
+  ]
+
 and property_media_min_resolution = resolution
 and property_media_max_resolution = resolution
+
+(* Value classes shared by the prelude-validation feature grammars. *)
+and property_media_length_feature = extended_length
+and property_media_ratio_feature = ratio
+and property_media_integer_feature = int
+and property_media_number_feature = float
+
+and property_media_scan =
+  [ `Interlace
+  | `Progressive
+  ]
+
+and property_media_overflow_block =
+  [ `None
+  | `Scroll
+  | `Paged
+  ]
+
+and property_media_overflow_inline =
+  [ `None
+  | `Scroll
+  ]
+
+and property_media_dynamic_range =
+  [ `Standard
+  | `High
+  ]
+
+and property_media_prefers_reduced =
+  [ `No_preference
+  | `Reduce
+  ]
+
+and property_media_nav_controls =
+  [ `None
+  | `Back
+  ]
+
+and property_media_environment_blending =
+  [ `Opaque
+  | `Additive
+  | `Subtractive
+  ]
+
+and property_media_device_posture =
+  [ `Continuous
+  | `Folded
+  ]
+
+and property_media_video_color_gamut =
+  [ `Srgb
+  | `P3
+  | `Rec2020
+  ]
 
 and property_media_scripting =
   [ `None
@@ -3911,7 +3972,8 @@ and property_offset_path =
   ]
 
 and property_offset_position =
-  [ `Auto
+  [ `Normal
+  | `Auto
   | `Position of position
   ]
 
@@ -3930,7 +3992,11 @@ and property_outline =
     * [ `Color of color | `Interpolation of string list ]
   ]
 
-and property_outline_color = color
+and property_outline_color =
+  [ `Auto
+  | `Color of color
+  ]
+
 and property_outline_offset = extended_length
 
 and property_outline_style =
@@ -4217,8 +4283,7 @@ and property_ruby_merge =
   ]
 
 and property_ruby_position =
-  [ `Over
-  | `Under
+  [ `Or of unit option * [ `Over | `Under ] option
   | `Inter_character
   ]
 
@@ -4413,10 +4478,15 @@ and property_speak =
 
 and property_speak_as =
   [ `Normal
+  | `Auto
+  | `Bubbles
+  | `Numbers
+  | `Words
   | `Or of
     unit option
     * unit option
     * [ `Literal_punctuation | `No_punctuation ] option
+  | `Counter_style_name of counter_style_name
   ]
 
 and property_src =
@@ -4438,10 +4508,7 @@ and property_stroke_linecap =
   ]
 
 and property_stroke_linejoin =
-  [ `Miter
-  | `Round
-  | `Bevel
-  ]
+  [ `Crop | `Arcs | `Miter ] option * [ `Bevel | `Round | `Fallback ] option
 
 and property_stroke_miterlimit = number_one_or_greater
 and property_stroke_opacity = alpha_value
@@ -4458,7 +4525,9 @@ and property_table_layout =
   ]
 
 and property_text_autospace =
-  [ `None
+  [ `Normal
+  | `Auto
+  | `None
   | `Ideograph_alpha
   | `Ideograph_numeric
   | `Ideograph_parenthesis
@@ -4558,7 +4627,8 @@ and property_text_decoration_skip =
   ]
 
 and property_text_decoration_skip_self =
-  [ `None
+  [ `Auto
+  | `None
   | `Or of
     unit option
     * [ `Spaces | `Or of unit option * unit option ] option
@@ -4783,7 +4853,9 @@ and property_user_select =
   ]
 
 and property_vertical_align =
-  [ `Baseline
+  [ `First
+  | `Last
+  | `Baseline
   | `Sub
   | `Super
   | `Text_top
@@ -5061,7 +5133,8 @@ and property_anchor_scope =
   ]
 
 and property_position_anchor =
-  [ `Auto
+  [ `Normal
+  | `Auto
   | `Dashed_ident of string
   ]
 
@@ -5193,7 +5266,8 @@ and property_scroll_start_target_y =
   ]
 
 and property_text_spacing_trim =
-  [ `Normal
+  [ `Auto
+  | `Normal
   | `Space_all
   | `Space_first
   | `Trim_start
@@ -5259,7 +5333,8 @@ and property_text_box_trim =
   ]
 
 and property_text_box_edge =
-  [ `Leading
+  [ `Auto
+  | `Leading
   | `Text
   | `Cap
   | `Ex
@@ -5299,6 +5374,64 @@ and property_bleed =
   | `Extended_length of extended_length
   ]
 
+and property_ascent_override =
+  [ `Normal
+  | `Extended_percentage of extended_percentage
+  ]
+
+and property_descent_override =
+  [ `Normal
+  | `Extended_percentage of extended_percentage
+  ]
+
+and property_line_gap_override =
+  [ `Normal
+  | `Extended_percentage of extended_percentage
+  ]
+
+and property_size_adjust = extended_percentage
+
+and property_navigation =
+  [ `Auto
+  | `None
+  ]
+
+and property_types =
+  [ `None
+  | `Custom_ident of string list
+  ]
+
+and property_base_palette =
+  [ `Light
+  | `Dark
+  | `Integer of int
+  ]
+
+and property_override_colors = (int * color) list
+
+and property_system =
+  [ `Cyclic
+  | `Numeric
+  | `Alphabetic
+  | `Symbolic
+  | `Additive
+  | `Static_0 of unit * int option
+  | `Static_1 of unit * counter_style_name
+  ]
+
+and property_symbols = symbol list
+and property_negative = symbol * symbol option
+
+and property_range =
+  [ `Xor of [ `Integer of int | `Infinite ] list list
+  | `Auto
+  ]
+
+and property_pad = int * symbol
+and property_fallback = counter_style_name
+and property_prefix = symbol
+and property_suffix = symbol
+and property_additive_symbols = (int * symbol) list
 and property_backdrop_blur = extended_length
 and property_scrollbar_color_legacy = color
 and property_stop_color = color

@@ -15,12 +15,12 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1i4dt3q{will-change:scroll-position;}"];
-  [@css ".css-ef3vel{will-change:contents;}"];
-  [@css ".css-1x5bobx{will-change:transform;}"];
-  [@css ".css-6fxfnd{will-change:top, left;}"];
+  [@css ".css-1i4dt3q{will-change:scroll-position}"];
+  [@css ".css-ef3vel{will-change:contents}"];
+  [@css ".css-1x5bobx{will-change:transform}"];
+  [@css ".css-gqdx72{will-change:top,left}"];
   
   CSS.make("css-1i4dt3q", []);
   CSS.make("css-ef3vel", []);
   CSS.make("css-1x5bobx", []);
-  CSS.make("css-6fxfnd", []);
+  CSS.make("css-gqdx72", []);

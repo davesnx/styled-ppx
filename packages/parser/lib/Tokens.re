@@ -27,6 +27,8 @@ type token =
   | PERCENTAGE(float) // <percentage-token>
   | DIMENSION((float, string)) // <dimension-token>
   | DESCENDANT_COMBINATOR // whitespace as selector combinator
+  | CDO // <CDO-token> "<!--"
+  | CDC // <CDC-token> "-->"
   | WS // <whitespace-token>
   | COLON // <colon-token>
   | DOUBLE_COLON // <double-colon-token>
@@ -120,6 +122,162 @@ let serialize_string = s =>
     Buffer.add_char(buf, '"');
     add_escaped_string(buf, s);
     Buffer.add_char(buf, '"');
+    Buffer.contents(buf);
+  };
+
+// CSSOM "serialize an identifier"
+// (https://drafts.csswg.org/cssom/#serialize-an-identifier).
+//
+// The lexer decodes escape sequences while consuming identifiers
+// (consume_escaped), so identifiers are stored "cooked": an input of
+// `.w-1\/2` stores the class name `w-1/2`. On the way out we must
+// re-escape any code point that would not survive re-tokenization,
+// otherwise rendered CSS with such identifiers is invalid.
+//
+// This walks code points, not bytes: the lexer's ident set excludes some
+// non-ASCII code points (e.g. U+0080-U+00B6), which must render as hex
+// escapes or our own re-parse rejects them.
+
+let is_ascii_ident_char = c =>
+  c == '-'
+  || c == '_'
+  || c >= '0'
+  && c <= '9'
+  || c >= 'a'
+  && c <= 'z'
+  || c >= 'A'
+  && c <= 'Z';
+
+let is_digit = c => c >= '0' && c <= '9';
+
+// Mirrors the lexer's `non_ascii` ident set (Lexer.re); keep in sync.
+let is_non_ascii_ident_code_point = cp =>
+  cp == 0xB7
+  || cp >= 0xC0
+  && cp <= 0xD6
+  || cp >= 0xD8
+  && cp <= 0xF6
+  || cp >= 0xF8
+  && cp <= 0x37D
+  || cp >= 0x37F
+  && cp <= 0x1FFF
+  || cp == 0x200C
+  || cp == 0x200D
+  || cp == 0x203F
+  || cp == 0x2040
+  || cp >= 0x2070
+  && cp <= 0x218F
+  || cp >= 0x2C00
+  && cp <= 0x2FEF
+  || cp >= 0x3001
+  && cp <= 0xD7FF
+  || cp >= 0xF900
+  && cp <= 0xFDCF
+  || cp >= 0xFDF0
+  && cp <= 0xFFFD
+  || cp > 0x10000;
+
+// Decode the UTF-8 code point at byte [i]; (-1, 1) on malformed input,
+// which is passed through raw (identifiers come from Sedlexing.Utf8 and
+// are well-formed in practice).
+let utf8_decode = (s, i) => {
+  let n = String.length(s);
+  let byte = k => Char.code(String.unsafe_get(s, k));
+  let b0 = byte(i);
+  if (b0 < 0x80) {
+    (b0, 1);
+  } else if (b0 < 0xC2) {
+    ((-1), 1);
+  } else if (b0 < 0xE0 && i + 1 < n) {
+    ((b0 land 0x1F) lsl 6 lor (byte(i + 1) land 0x3F), 2);
+  } else if (b0 < 0xF0 && i + 2 < n) {
+    (
+      (b0 land 0x0F)
+      lsl 12
+      lor (byte(i + 1) land 0x3F)
+      lsl 6
+      lor (byte(i + 2) land 0x3F),
+      3,
+    );
+  } else if (b0 < 0xF5 && i + 3 < n) {
+    (
+      (b0 land 0x07)
+      lsl 18
+      lor (byte(i + 1) land 0x3F)
+      lsl 12
+      lor (byte(i + 2) land 0x3F)
+      lsl 6
+      lor (byte(i + 3) land 0x3F),
+      4,
+    );
+  } else {
+    ((-1), 1);
+  };
+};
+
+// Fast path: pure-ASCII identifiers needing no escaping. Anything with a
+// non-ASCII byte takes the code-point path.
+let needs_ident_serialization = s => {
+  let len = String.length(s);
+  if (len == 0) {
+    false;
+  } else if (len == 1 && String.unsafe_get(s, 0) == '-') {
+    true;
+  } else {
+    let rec scan = i =>
+      if (i >= len) {
+        false;
+      } else {
+        let c = String.unsafe_get(s, i);
+        let plain =
+          is_ascii_ident_char(c)
+          && !(i == 0 && is_digit(c))
+          && !(i == 1 && is_digit(c) && String.unsafe_get(s, 0) == '-');
+        plain ? scan(i + 1) : true;
+      };
+    scan(0);
+  };
+};
+
+let serialize_identifier = s =>
+  if (!needs_ident_serialization(s)) {
+    s;
+  } else if (s == "-") {
+    "\\-";
+  } else {
+    let len = String.length(s);
+    let buf = Buffer.create(len + 4);
+    let hex_escape = cp =>
+      Buffer.add_string(buf, Printf.sprintf("\\%x ", cp));
+    let rec go = (i, index) =>
+      if (i < len) {
+        let (cp, width) = utf8_decode(s, i);
+        if (cp == 0x00) {
+          Buffer.add_string(
+            buf,
+            "\xEF\xBF\xBD" // U+FFFD
+          );
+        } else if (cp > 0x00 && cp < 0x20 || cp == 0x7F) {
+          hex_escape(cp);
+        } else if (cp >= Char.code('0')
+                   && cp <= Char.code('9')
+                   && (index == 0 || index == 1 && s.[0] == '-')) {
+          hex_escape(cp);
+        } else if (cp < 0x80) {
+          if (is_ascii_ident_char(Char.chr(cp))) {
+            Buffer.add_char(buf, Char.chr(cp));
+          } else {
+            Buffer.add_char(buf, '\\');
+            Buffer.add_char(buf, Char.chr(cp));
+          };
+        } else if (cp == (-1) || is_non_ascii_ident_code_point(cp)) {
+          Buffer.add_substring(buf, s, i, width);
+        } else {
+          hex_escape(cp);
+        };
+        go(i + width, index + 1);
+      };
+    go(0, 0);
     Buffer.contents(buf);
   };
 
@@ -220,6 +378,8 @@ let humanize =
   | PERCENTAGE(n) => Printf.sprintf("%s%%", float_to_string(n))
   | DIMENSION((n, d)) => Printf.sprintf("%s%s", float_to_string(n), d)
   | DESCENDANT_COMBINATOR => " "
+  | CDO => "<!--"
+  | CDC => "-->"
   | WS => " "
   | COLON => ":"
   | DOUBLE_COLON => "::"
@@ -273,4 +433,6 @@ let to_debug =
   | INTERPOLATION((v, _)) => Printf.sprintf("INTERPOLATION('%s')", v)
   | DELIM(s) => Printf.sprintf("DELIM('%s')", s)
   | DESCENDANT_COMBINATOR => "DESCENDANT_COMBINATOR"
+  | CDO => "CDO"
+  | CDC => "CDC"
   | WS => "WS";

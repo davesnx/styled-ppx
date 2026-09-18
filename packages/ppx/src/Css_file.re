@@ -141,29 +141,11 @@ module Css_transform = {
       ctx.dynamic_vars := [dynamic_var, ...ctx.dynamic_vars^];
     };
 
-  /* Detect a `$(name)` interpolation anywhere in a component-value list,
-     recursing into `Paren_block`, `Bracket_block`, and `Function` bodies.
-     The naive top-level check misses interpolations nested inside those
-     groupings (e.g. `calc($(a) + 1px)` or `(max-width: $(bp))`). */
-  let rec component_value_has_interpolation = (cv: component_value) =>
-    switch (cv) {
-    | Variable(_, _) => true
-    | Paren_block(values)
-    | Bracket_block(values) => component_value_list_has_interpolation(values)
-    | Function({ body: (values, _), _ }) =>
-      component_value_list_has_interpolation(values)
-    | _ => false
-    }
-  and component_value_list_has_interpolation = values =>
-    List.exists(
-      ((cv, _loc)) => component_value_has_interpolation(cv),
-      values,
-    );
+  let component_value_list_has_interpolation = Styled_ppx_css_parser.Ast.component_value_list_has_interpolation;
 
   /* A declaration hoists a custom property iff its *value* carries a
-     `$(…)` interpolation. Selector-position interpolations (`.$(name)`)
-     are resolved statically and never hoisted, so they are irrelevant
-     here — we only inspect the declaration value. */
+     `$()` interpolation. Selector-position interpolations are resolved
+     statically and never hoisted, so only the value is inspected. */
   let declaration_has_value_interpolation = (decl: declaration) =>
     component_value_list_has_interpolation(fst(decl.value));
 
@@ -201,17 +183,14 @@ module Css_transform = {
 
   /* @property{inherits:false} support for `&`-local interpolation vars. A
      non-inheriting custom property does not reach descendants, so changing it
-     invalidates only the element, not its subtree. Safe only when the var is
-     read on `&`'s own box, never through inheritance — which excludes both
-     descendant elements (`& .child`) AND pseudo-elements (`&::before`,
-     `&::placeholder`): a pseudo-element is a separate box that receives the
-     originating element's custom properties via inheritance, so an
-     inherits:false var set inline on `&` is invisible to it.
+     invalidates only the element, not its subtree. That is safe only when the
+     var is read on `&`'s own box, never through inheritance. Descendants and
+     pseudo-elements are separate boxes that receive custom properties via
+     inheritance, so an inherits:false var set inline on `&` is invisible to
+     them.
 
      [selector_subject_is_ampersand]: the subject (rightmost compound) of [sel]
-     is `&`'s own box, so the rule matches the styled element itself. `&:hover`,
-     `&.foo`, `.ancestor &` qualify; `& .child`, `& > .x`, `&::before`,
-     `&:after` do not. */
+     is `&`'s own box, so the rule matches the styled element itself. */
   let selector_subject_is_ampersand = (sel: selector): bool =>
     switch (
       List.rev(
@@ -518,6 +497,16 @@ module Css_transform = {
       (ctx, pseudo: pseudo_selector): pseudo_selector => {
     switch (pseudo) {
     | Pseudoelement(_) => pseudo
+    | PseudoelementFunction({ name, payload: (selector_list, payload_loc) }) =>
+      let transformed =
+        List.map(
+          ((sel, sel_loc)) => (transform_selector(ctx, sel), sel_loc),
+          selector_list,
+        );
+      PseudoelementFunction({
+        name,
+        payload: (transformed, payload_loc),
+      });
     | Pseudoclass(kind) =>
       Pseudoclass(transform_pseudoclass_kind(ctx, kind))
     };
@@ -543,6 +532,14 @@ module Css_transform = {
         | Nth(_) => nth_payload
         | NthSelector(complex_selectors) =>
           NthSelector(
+            List.map(
+              c => transform_complex_selector(ctx, c),
+              complex_selectors,
+            ),
+          )
+        | NthOf(nth, complex_selectors) =>
+          NthOf(
+            nth,
             List.map(
               c => transform_complex_selector(ctx, c),
               complex_selectors,
@@ -655,14 +652,11 @@ module Css_transform = {
     let { name, prelude, block, loc } = at_rule;
     let (prelude_values, prelude_loc) = prelude;
 
-    /* Detect any `$(name)` interpolation anywhere in the at-rule prelude
-       (recursing into nested groupings — see `component_value_has_interpolation`)
-       — e.g. the canonical `@media (max-width: $(bp))` form, where `$(bp)`
-       lives inside a `Paren_block` of the `(max-width: $(bp))` group.
-
-        Static extraction can't bind `var(--x)` into a media query (CSS
-        custom properties are not valid in media-query conditions), so we
-        reject the whole shape with a hard error. */
+    /* Reject any `$()` interpolation in an at-rule prelude: interpolation
+       lowers to `var(--x)`, and custom properties are not valid in
+       media-query conditions, so the shape cannot work. The check
+       recurses into nested groupings because the interpolation usually
+       sits inside the condition's `Paren_block`. */
     let has_interpolation =
       component_value_list_has_interpolation(prelude_values);
 
@@ -670,7 +664,8 @@ module Css_transform = {
       let (at_name, _) = name;
       Ppxlib.Location.raise_errorf(
         ~loc=to_file_loc(ctx, loc),
-        "Interpolation in @%s preludes is not supported during static extraction. CSS custom properties (var()) are not valid in media query conditions. Inline the value directly.",
+        "Interpolation is not supported in @%s preludes: `$(x)` compiles to a CSS custom property (var(--x)), and var() is not valid in @%s conditions. Write the value literally.",
+        at_name,
         at_name,
       );
     };
@@ -773,14 +768,13 @@ module Css_transform = {
     );
   };
 
-  /* Same-property declarations of a block group into ONE atom so the
-     winner is decided by intra-atom source order (emotion parity) —
-     fallback pairs like `display: -webkit-box; display: flex` stay
-     together; splitting them would let stylesheet position pick the
-     winner. Groups anchor at the LAST occurrence (a group cascades like
-     its last member; first-anchoring would hoist duplicates past
-     intervening rules). Singletons keep the historical atom shape and
-     hash. */
+  /* Same-property declarations of a block group into ONE atom so that
+     source order inside the atom picks the winner (emotion parity).
+     Splitting a fallback pair like `display: -webkit-box; display: flex`
+     would let stylesheet position pick instead. Groups anchor at the
+     LAST occurrence, since a group cascades like its last member and
+     first-anchoring would hoist duplicates past intervening rules.
+     Singletons keep the historical atom shape and hash. */
   type block_item =
     | Declaration_group(list(declaration))
     | Nested_rule(rule);
@@ -841,9 +835,9 @@ module Css_transform = {
        Cartesian product matches CSS-nesting semantics:
        `a, b { c, d { ... } }` desugars to `a c, a d, b c, b d`.
 
-       Folded with prepend then reversed once at the end — equivalent
-       output to the prior `concat_map`/`map` combination but avoids the
-       per-parent intermediate list and the final concat pass. */
+       Folded with prepend then reversed once at the end. Same output as
+       the prior `concat_map`/`map` combination, without the per-parent
+       intermediate lists and the final concat pass. */
     let merge_preludes =
         (
           ~parent: list((selector, Ppxlib.Location.t)),
@@ -1007,12 +1001,19 @@ module Css_transform = {
         );
 
       | At_rule({ name: (name, name_loc), prelude, block, loc }) =>
-        /* Only conditional group rules can be atomized (the condition
-           distributes over the block). Everything else errors like the
-           runtime path — splitting @font-face/@keyframes/@property or
-           @layer produces broken CSS. Accepted set is a deliberate
-           superset of the runtime's (@supports/@starting-style are
-           extraction-only). */
+        /* Only group rules whose context distributes over their block can
+           be atomized: the conditional group rules (@media/@supports/...)
+           and block-form @layer (the layer name distributes just like a
+           condition). Everything else errors like the runtime path, since
+           splitting @font-face/@keyframes/@property produces broken CSS.
+           Accepted set is a deliberate superset of the runtime's
+           (@supports/@starting-style are extraction-only).
+
+           @layer is classified [Atomized_block_only] (At_rules.re): the
+           name says "layer", but which form the user wrote is a property
+           of the AST shape, so the statement/block split happens here
+           where the shape is visible. Statement at-rules carry
+           `block == Empty`, block forms carry a Rule_list/Stylesheet. */
         let raise_at_rule_error = message =>
           Ppxlib.Location.raise_errorf(
             ~loc=
@@ -1024,29 +1025,82 @@ module Css_transform = {
             message,
           );
         let is_conditional_group_rule =
-          switch (String.lowercase_ascii(name)) {
-          | "media"
-          | "supports"
-          | "container"
-          | "starting-style" => true
-          | _ => false
-          };
+          Styled_ppx_css_parser.At_rules.is_conditional_group(name);
+        let is_atomized_block_only_rule =
+          Styled_ppx_css_parser.At_rules.is_atomized_block_only(name);
+        let prelude_is_empty =
+          !List.exists(((value, _)) => value != Whitespace, fst(prelude));
         switch (block) {
         | _ when String.lowercase_ascii(name) == "keyframes" =>
           raise_at_rule_error(
-            "@keyframes should be defined with %keyframe(...)",
+            "@keyframes has a dedicated extension. Define the animation separately with `let spin = [%keyframe {|from { } to { }|}]` and reference it with `animation-name: $(spin)`.",
           )
-        | _ when !is_conditional_group_rule =>
+        | _ when !is_conditional_group_rule && !is_atomized_block_only_rule =>
+          /* Tailor the error to what the at-rule IS: descriptor blocks and
+             stylesheet-level statements have a home ([%styled.global]);
+             unknown names get a typo suggestion and the supported list. */
+          let lower = String.lowercase_ascii(name);
+          let message =
+            switch (
+              List.assoc_opt(lower, Styled_ppx_css_parser.At_rules.inventory)
+            ) {
+            | Some(Styled_ppx_css_parser.At_rules.Descriptor_passthrough) =>
+              Printf.sprintf(
+                "@%s defines descriptors, not styles for this class, so it cannot live inside [%%css]. Move it to a [%%styled.global] block, where it passes through with its descriptors validated.",
+                name,
+              )
+            | Some(Styled_ppx_css_parser.At_rules.Global_passthrough)
+                when List.mem(lower, ["import", "charset", "namespace"]) =>
+              Printf.sprintf(
+                "@%s is a stylesheet-level statement, not styles for this class, so it cannot live inside [%%css]. Move it to a [%%styled.global] block; the aggregator hoists it to the top of the generated stylesheet.",
+                name,
+              )
+            | Some(_) =>
+              Printf.sprintf(
+                "@%s is not supported inside [%%css]. Move it to a [%%styled.global] block, where it passes through.",
+                name,
+              )
+            | None =>
+              let known =
+                List.map(fst, Styled_ppx_css_parser.At_rules.inventory);
+              let suggestion =
+                switch (
+                  Css_grammar.Levenshtein.find_closest_match(lower, known)
+                ) {
+                | Some(better) when better != lower =>
+                  Printf.sprintf(" Did you mean `@%s`?", better)
+                | _ => ""
+                };
+              Printf.sprintf(
+                "At-rule @%s is not supported inside [%%css].%s Supported here: @media, @supports, @container, @starting-style, and block-form @layer. Descriptor and stylesheet-level at-rules belong in [%%styled.global].",
+                name,
+                suggestion,
+              );
+            };
+          raise_at_rule_error(message);
+        | Empty when is_atomized_block_only_rule =>
           raise_at_rule_error(
             Printf.sprintf(
-              "At-rule @%s is not supported in styled-ppx",
+              "Statement-form `@%s %s;` is not supported inside [%%css]: it declares stylesheet-wide layer order, not styles for this class. Move it to a [%%styled.global] block, where it passes through and is hoisted to the top of the generated stylesheet.",
               name,
+              Styled_ppx_css_parser.Render.component_value_list(
+                Styled_ppx_css_parser.Render.strip_whitespace(fst(prelude)),
+              ),
             ),
           )
         | Empty =>
           raise_at_rule_error(
             Printf.sprintf(
-              "At-rule @%s requires a block (`@%s ... { ... }`)",
+              "@%s without a block is invalid CSS, and browsers drop the whole rule silently. Add the declarations it should apply: `@%s ... { ... }`.",
+              name,
+              name,
+            ),
+          )
+        | Rule_list(_)
+        | Stylesheet(_) when is_atomized_block_only_rule && prelude_is_empty =>
+          raise_at_rule_error(
+            Printf.sprintf(
+              "Anonymous `@%s { ... }` is not supported inside [%%css]: styled-ppx would have to invent the layer name. Layer names are cascade-visible, they define priority order and other stylesheets can re-open them, so a generated hash would reshuffle your cascade whenever the block's contents change. Name the layer: `@%s my-layer { ... }`.",
               name,
               name,
             ),
@@ -1257,8 +1311,8 @@ module Css_transform = {
 
 /* Empty `[%css {||}]` bound to a named `let` mints a deterministic
    class handle (`css-<hash-of-empty>-<label>`) so consumers can
-   resolve `&.$(name)` against it. No `[@@@css ...]` is emitted —
-   there's no rule to write. Anonymous (`_`) and statement-position
+   resolve `&.$(name)` against it. No `[@@@css ...]` is emitted since
+   there is no rule to write. Anonymous (`_`) and statement-position
    bindings return `[]`, preserving the historical `CSS.make("", [])`
    shape. */
 let mint_empty_class = (~label) =>
@@ -1418,7 +1472,8 @@ let push_global =
 
   /* Reject `&` with no parent selector: top level, or inside at-rule
      blocks not below a style rule (at-rules don't contribute a
-     selector). Recursion stops at style rules — nested `&` is fine. */
+     selector). Recursion stops at style rules, where nested `&` has a
+     parent to resolve against. */
   let rec reject_parentless_ampersand = rule =>
     switch (rule) {
     | Style_rule({ prelude: (selectors, _), _ }) =>
@@ -1445,6 +1500,33 @@ let push_global =
     | Declaration(_) => ()
     };
   List.iter(reject_parentless_ampersand, rules);
+
+  /* A conditional group rule without a block (`@media (...);`) is invalid
+     CSS that browsers drop silently; mirror the `[%css]` error instead of
+     shipping dead output. Statement at-rules that ARE valid without a
+     block (`@import`, `@layer a, b;`, ...) pass through. */
+  let rec reject_blockless_conditional = rule =>
+    switch (rule) {
+    | At_rule({ name: (name, name_loc), block: Empty, _ })
+        when Styled_ppx_css_parser.At_rules.is_conditional_group(name) =>
+      Ppxlib.Location.raise_errorf(
+        ~loc=
+          Styled_ppx_css_parser.Parser_location.to_file_location(
+            ~source_position_start,
+            name_loc,
+          ),
+        "@%s without a block is invalid CSS, and browsers drop the whole rule silently. Add the declarations it should apply: `@%s ... { ... }`.",
+        name,
+        name,
+      )
+    | At_rule({ block: Rule_list((inner, _)), _ })
+    | At_rule({ block: Stylesheet((inner, _)), _ })
+    | Style_rule({ block: (inner, _), _ }) =>
+      List.iter(reject_blockless_conditional, inner)
+    | At_rule({ block: Empty, _ })
+    | Declaration(_) => ()
+    };
+  List.iter(reject_blockless_conditional, rules);
 
   /* Flatten CSS-nesting before rendering (literal nesting only works in
      modern browsers). Same order-preserving flattener as `[%css]`;

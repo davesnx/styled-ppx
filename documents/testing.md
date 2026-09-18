@@ -56,6 +56,18 @@ and `test-generate` to ensure generated code and extracted CSS are correct.
 When asked to "add a test" in the context of cram tests, add one to one of
 those folders.
 
+One `test-css-support` entry is generated, not hand-written:
+`packages/ppx/test/css-support/spec-conformance.t` is produced by
+`make css-oracle` from the coverage oracle (see
+`documents/css-coverage-oracle.md`). Never edit it by hand; regenerate it
+and commit the diff (`make css-oracle-check` gates drift).
+
+Run cram tests through the suite alias (`make test-css-support`,
+`dune build @test-css-support`). An alias scoped to a `.t` directory
+(`dune build @packages/.../some-test.t/runtest`) silently no-ops and
+exits 0: dune attaches the alias to the directory holding the
+`(cram ...)` stanza, not the test.
+
 Test types:
 
 - **File tests**: `name.t` — single self-contained file.

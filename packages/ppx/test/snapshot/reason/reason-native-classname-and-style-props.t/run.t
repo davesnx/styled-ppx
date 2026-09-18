@@ -1,7 +1,7 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --native --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-tokvmb-Box{color:red;}"];
+  [@css ".css-tokvmb-Box{color:red}"];
   [@css.bindings [("Output.Box", "css-tokvmb-Box")]];
   module Box: {
     type makeProps;

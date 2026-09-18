@@ -1,14 +1,14 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "html{box-sizing:border-box;}"];
-  [@css "body{margin:0;color:var(--primary-1e1sh1z);}"];
-  [@css "a{-webkit-text-decoration:none;text-decoration:none;}"];
+  [@css "html{box-sizing:border-box}"];
+  [@css "body{margin:0;color:var(--primary-1qti0i4)}"];
+  [@css "a{-webkit-text-decoration:none;text-decoration:none}"];
   let primary = CSS.red;
   module MixedStyles = {
     let to_string = () =>
       (
-        ((":root{" ++ "--primary-1e1sh1z:") ++ CSS.Types.Color.toString(primary))
+        ((":root{" ++ "--primary-1qti0i4:") ++ CSS.Types.Color.toString(primary))
         ++ ";"
       )
       ++ "}";

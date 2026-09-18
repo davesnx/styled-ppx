@@ -3,7 +3,8 @@ open Support
 
 module Property_float =
   [%spec_module
-  "'left' | 'right' | 'none' | 'inline-start' | 'inline-end'",
+  "'left' | 'right' | 'none' | 'inline-start' | 'inline-end' | 'block-start' | \
+   'block-end'",
   (module Css_types.Float)]
 
 let property_float : property_float Rule.rule = Property_float.rule

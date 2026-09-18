@@ -3,7 +3,7 @@ Default mode expands `styles` on lowercase JSX and leaves other calls alone.
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml | grep -E '@css|passthrough|className|style|Foo'
-  [@css ".css-h5fkc8{margin-top:32px;}"];
+  [@css ".css-h5fkc8{margin-top:32px}"];
   let passthrough = (~styles) => styles;
   let _ = passthrough(~styles=buttonStyles);
   let _ = <div className={fst(buttonStyles)} style={snd(buttonStyles)} />;
@@ -19,7 +19,7 @@ Native mode keeps the same `styles` expansion contract before native JSX lowerin
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --native --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml | grep -E '@css|passthrough|className|style|Foo'
-  [@css ".css-h5fkc8{margin-top:32px;}"];
+  [@css ".css-h5fkc8{margin-top:32px}"];
   let passthrough = (~styles) => styles;
   let _ = passthrough(~styles=buttonStyles);
   let _ = <div className={fst(buttonStyles)} style={snd(buttonStyles)} />;

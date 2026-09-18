@@ -15,79 +15,79 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "@property --color-qfwu7a_1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-qfwu7a_2{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-qfwu7a_3{syntax:\"*\";inherits:false;}"];
-  [@css ".css-lcnm6u{-webkit-filter:none;filter:none;}"];
-  [@css ".css-1ifcuuo{-webkit-filter:url(\"#id\");filter:url(\"#id\");}"];
+  [@css "@property --color-jz34iw_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-jz34iw_2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-jz34iw_3{syntax:\"*\";inherits:false;}"];
+  [@css ".css-lcnm6u{-webkit-filter:none;filter:none}"];
+  [@css ".css-1ifcuuo{-webkit-filter:url(\"#id\");filter:url(\"#id\")}"];
   [@css
-    ".css-wzp7li{-webkit-filter:url(\"image.svg#id\");filter:url(\"image.svg#id\");}"
+    ".css-wzp7li{-webkit-filter:url(\"image.svg#id\");filter:url(\"image.svg#id\")}"
   ];
-  [@css ".css-enxr2q{-webkit-filter:blur(5px);filter:blur(5px);}"];
-  [@css ".css-ckxntt{-webkit-filter:brightness(0.5);filter:brightness(0.5);}"];
-  [@css ".css-1o440fd{-webkit-filter:contrast(150%);filter:contrast(150%);}"];
+  [@css ".css-enxr2q{-webkit-filter:blur(5px);filter:blur(5px)}"];
+  [@css ".css-ckxntt{-webkit-filter:brightness(0.5);filter:brightness(0.5)}"];
+  [@css ".css-1o440fd{-webkit-filter:contrast(150%);filter:contrast(150%)}"];
   [@css
-    ".css-1xj4bqh{-webkit-filter:drop-shadow(5px 5px 10px);filter:drop-shadow(5px 5px 10px);}"
-  ];
-  [@css
-    ".css-1arlta4{-webkit-filter:drop-shadow(15px 15px 15px #123);filter:drop-shadow(15px 15px 15px #123);}"
-  ];
-  [@css ".css-10pv1a9{-webkit-filter:grayscale(50%);filter:grayscale(50%);}"];
-  [@css
-    ".css-dycrc5{-webkit-filter:hue-rotate(50deg);filter:hue-rotate(50deg);}"
-  ];
-  [@css ".css-1vaakyf{-webkit-filter:invert(50%);filter:invert(50%);}"];
-  [@css ".css-nhtt82{-webkit-filter:opacity(50%);filter:opacity(50%);}"];
-  [@css ".css-nwh2v6{-webkit-filter:sepia(50%);filter:sepia(50%);}"];
-  [@css ".css-1e0jie{-webkit-filter:saturate(150%);filter:saturate(150%);}"];
-  [@css
-    ".css-vc13v6{-webkit-filter:grayscale(100%) sepia(100%);filter:grayscale(100%) sepia(100%);}"
+    ".css-1xj4bqh{-webkit-filter:drop-shadow(5px 5px 10px);filter:drop-shadow(5px 5px 10px)}"
   ];
   [@css
-    ".css-1twvds4{-webkit-filter:drop-shadow(0 8px 32px rgba(0, 0, 0, 0.03));filter:drop-shadow(0 8px 32px rgba(0, 0, 0, 0.03));}"
+    ".css-1arlta4{-webkit-filter:drop-shadow(15px 15px 15px #123);filter:drop-shadow(15px 15px 15px #123)}"
+  ];
+  [@css ".css-10pv1a9{-webkit-filter:grayscale(50%);filter:grayscale(50%)}"];
+  [@css
+    ".css-dycrc5{-webkit-filter:hue-rotate(50deg);filter:hue-rotate(50deg)}"
+  ];
+  [@css ".css-1vaakyf{-webkit-filter:invert(50%);filter:invert(50%)}"];
+  [@css ".css-nhtt82{-webkit-filter:opacity(50%);filter:opacity(50%)}"];
+  [@css ".css-nwh2v6{-webkit-filter:sepia(50%);filter:sepia(50%)}"];
+  [@css ".css-1e0jie{-webkit-filter:saturate(150%);filter:saturate(150%)}"];
+  [@css
+    ".css-vc13v6{-webkit-filter:grayscale(100%) sepia(100%);filter:grayscale(100%) sepia(100%)}"
   ];
   [@css
-    ".css-sjla48{-webkit-filter:drop-shadow(0 1px 0 var(--color-qfwu7a_1)) drop-shadow(0 1px 0 var(--color-qfwu7a_2)) drop-shadow(0 1px 0 var(--color-qfwu7a_3)) drop-shadow(0 32px 48px rgba(0, 0, 0, 0.075)) drop-shadow(0 8px 32px rgba(0, 0, 0, 0.03));filter:drop-shadow(0 1px 0 var(--color-qfwu7a_1)) drop-shadow(0 1px 0 var(--color-qfwu7a_2)) drop-shadow(0 1px 0 var(--color-qfwu7a_3)) drop-shadow(0 32px 48px rgba(0, 0, 0, 0.075)) drop-shadow(0 8px 32px rgba(0, 0, 0, 0.03));}"
-  ];
-  [@css ".css-47q0hq{-webkit-backdrop-filter:none;backdrop-filter:none;}"];
-  [@css
-    ".css-dj9q1s{-webkit-backdrop-filter:url(\"#id\");backdrop-filter:url(\"#id\");}"
+    ".css-y2hq2i{-webkit-filter:drop-shadow(0 8px 32px rgba(0,0,0,0.03));filter:drop-shadow(0 8px 32px rgba(0,0,0,0.03))}"
   ];
   [@css
-    ".css-fhczb9{-webkit-backdrop-filter:url(\"image.svg#id\");backdrop-filter:url(\"image.svg#id\");}"
+    ".css-2tzxur{-webkit-filter:drop-shadow(0 1px 0 var(--color-jz34iw_1)) drop-shadow(0 1px 0 var(--color-jz34iw_2)) drop-shadow(0 1px 0 var(--color-jz34iw_3)) drop-shadow(0 32px 48px rgba(0,0,0,0.075)) drop-shadow(0 8px 32px rgba(0,0,0,0.03));filter:drop-shadow(0 1px 0 var(--color-jz34iw_1)) drop-shadow(0 1px 0 var(--color-jz34iw_2)) drop-shadow(0 1px 0 var(--color-jz34iw_3)) drop-shadow(0 32px 48px rgba(0,0,0,0.075)) drop-shadow(0 8px 32px rgba(0,0,0,0.03))}"
+  ];
+  [@css ".css-47q0hq{-webkit-backdrop-filter:none;backdrop-filter:none}"];
+  [@css
+    ".css-dj9q1s{-webkit-backdrop-filter:url(\"#id\");backdrop-filter:url(\"#id\")}"
   ];
   [@css
-    ".css-cdpdax{-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);}"
+    ".css-fhczb9{-webkit-backdrop-filter:url(\"image.svg#id\");backdrop-filter:url(\"image.svg#id\")}"
   ];
   [@css
-    ".css-134smr4{-webkit-backdrop-filter:brightness(0.5);backdrop-filter:brightness(0.5);}"
+    ".css-cdpdax{-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}"
   ];
   [@css
-    ".css-ii5lod{-webkit-backdrop-filter:contrast(150%);backdrop-filter:contrast(150%);}"
+    ".css-134smr4{-webkit-backdrop-filter:brightness(0.5);backdrop-filter:brightness(0.5)}"
   ];
   [@css
-    ".css-byn3bb{-webkit-backdrop-filter:drop-shadow(15px 15px 15px rgba(0, 0, 0, 1));backdrop-filter:drop-shadow(15px 15px 15px rgba(0, 0, 0, 1));}"
+    ".css-ii5lod{-webkit-backdrop-filter:contrast(150%);backdrop-filter:contrast(150%)}"
   ];
   [@css
-    ".css-14pjicj{-webkit-backdrop-filter:grayscale(50%);backdrop-filter:grayscale(50%);}"
+    ".css-qtzu0b{-webkit-backdrop-filter:drop-shadow(15px 15px 15px rgba(0,0,0,1));backdrop-filter:drop-shadow(15px 15px 15px rgba(0,0,0,1))}"
   ];
   [@css
-    ".css-15xjduf{-webkit-backdrop-filter:hue-rotate(50deg);backdrop-filter:hue-rotate(50deg);}"
+    ".css-14pjicj{-webkit-backdrop-filter:grayscale(50%);backdrop-filter:grayscale(50%)}"
   ];
   [@css
-    ".css-1xysmnx{-webkit-backdrop-filter:invert(50%);backdrop-filter:invert(50%);}"
+    ".css-15xjduf{-webkit-backdrop-filter:hue-rotate(50deg);backdrop-filter:hue-rotate(50deg)}"
   ];
   [@css
-    ".css-bfwhax{-webkit-backdrop-filter:opacity(50%);backdrop-filter:opacity(50%);}"
+    ".css-1xysmnx{-webkit-backdrop-filter:invert(50%);backdrop-filter:invert(50%)}"
   ];
   [@css
-    ".css-e2b97y{-webkit-backdrop-filter:sepia(50%);backdrop-filter:sepia(50%);}"
+    ".css-bfwhax{-webkit-backdrop-filter:opacity(50%);backdrop-filter:opacity(50%)}"
   ];
   [@css
-    ".css-x1ltqs{-webkit-backdrop-filter:saturate(150%);backdrop-filter:saturate(150%);}"
+    ".css-e2b97y{-webkit-backdrop-filter:sepia(50%);backdrop-filter:sepia(50%)}"
   ];
   [@css
-    ".css-1t5aokm{-webkit-backdrop-filter:grayscale(100%) sepia(100%);backdrop-filter:grayscale(100%) sepia(100%);}"
+    ".css-x1ltqs{-webkit-backdrop-filter:saturate(150%);backdrop-filter:saturate(150%)}"
+  ];
+  [@css
+    ".css-1t5aokm{-webkit-backdrop-filter:grayscale(100%) sepia(100%);backdrop-filter:grayscale(100%) sepia(100%)}"
   ];
   let color = CSS.hex("333");
   
@@ -108,13 +108,13 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-nwh2v6", []);
   CSS.make("css-1e0jie", []);
   CSS.make("css-vc13v6", []);
-  CSS.make("css-1twvds4", []);
+  CSS.make("css-y2hq2i", []);
   CSS.make(
-    "css-sjla48",
+    "css-2tzxur",
     [
-      ("--color-qfwu7a_1", CSS.Types.Color.toString(color)),
-      ("--color-qfwu7a_2", CSS.Types.Color.toString(color)),
-      ("--color-qfwu7a_3", CSS.Types.Color.toString(color)),
+      ("--color-jz34iw_1", CSS.Types.Color.toString(color)),
+      ("--color-jz34iw_2", CSS.Types.Color.toString(color)),
+      ("--color-jz34iw_3", CSS.Types.Color.toString(color)),
     ],
   );
   
@@ -124,7 +124,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-cdpdax", []);
   CSS.make("css-134smr4", []);
   CSS.make("css-ii5lod", []);
-  CSS.make("css-byn3bb", []);
+  CSS.make("css-qtzu0b", []);
   CSS.make("css-14pjicj", []);
   CSS.make("css-15xjduf", []);
   CSS.make("css-1xysmnx", []);

@@ -10,20 +10,6 @@ let split_by_kind = Selector_nesting.split_by_kind;
    literally nested. Empty rules are dropped; blockless at-rules are
    not. */
 
-/* Blocks hold descriptors/keyframe selectors, not style rules:
-   pass through verbatim. */
-let is_descriptor_at_rule = name =>
-  switch (String.lowercase_ascii(name)) {
-  | "keyframes"
-  | "font-face"
-  | "property"
-  | "counter-style"
-  | "page"
-  | "font-palette-values"
-  | "font-feature-values" => true
-  | _ => false
-  };
-
 let style_rule = (~prefix: selector, rules: list(rule)) =>
   Style_rule({
     prelude: ([(prefix, loc_none)], loc_none),
@@ -164,8 +150,12 @@ and flatten_at_rule = (~prefix, ~media, at_rule: at_rule): list(rule) => {
         | inner_rules => wrap_in_media([media_rule(~prelude, inner_rules)])
         }
       };
-    } else if (is_descriptor_at_rule(name)) {
-      wrap_in_media([At_rule(at_rule)]);
+    } else if (At_rules.is_descriptor_passthrough(name)) {
+      /* Blocks hold descriptors/keyframe selectors, not style rules:
+         pass through verbatim. */
+      wrap_in_media([
+        At_rule(at_rule),
+      ]);
     } else {
       /* Group at-rule (`@supports`, `@container`, ...): flatten inside
          with a fresh media context (media must not hoist past it). */

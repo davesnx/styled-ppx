@@ -623,7 +623,9 @@ end
 
 module VerticalAlign = struct
   type t =
-    [ `baseline
+    [ `first
+    | `last
+    | `baseline
     | `sub
     | `super
     | `top
@@ -640,6 +642,8 @@ module VerticalAlign = struct
     match x with
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
+    | `first -> {js|first|js}
+    | `last -> {js|last|js}
     | `baseline -> {js|baseline|js}
     | `sub -> {js|sub|js}
     | `super -> {js|super|js}
@@ -984,6 +988,22 @@ end
 
 module AnimationDuration = struct
   type t =
+    [ `auto
+    | Time.t
+    | Cascading.t
+    | Var.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | #Time.t as x -> Time.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #Var.t as x -> Var.toString x
+end
+
+module AnimationDelay = struct
+  type t =
     [ Time.t
     | Cascading.t
     | Var.t
@@ -994,10 +1014,6 @@ module AnimationDuration = struct
     | #Time.t as x -> Time.toString x
     | #Cascading.t as x -> Cascading.toString x
     | #Var.t as x -> Var.toString x
-end
-
-module AnimationDelay = struct
-  include AnimationDuration
 end
 
 module AnimationFillMode = struct
@@ -2034,10 +2050,12 @@ module Display = struct
     | `flow
     | `flowRoot
     | `grid
+    | `gridLanes
     | `inline
     | `inlineBlock
     | `inlineFlex
     | `inlineGrid
+    | `inlineGridLanes
     | `inlineTable
     | `listItem
     | `mozBox
@@ -2077,10 +2095,12 @@ module Display = struct
     | `flow -> "flow"
     | `flowRoot -> "flow-root"
     | `grid -> {js|grid|js}
+    | `gridLanes -> {js|grid-lanes|js}
     | `inline -> {js|inline|js}
     | `inlineBlock -> {js|inline-block|js}
     | `inlineFlex -> {js|inline-flex|js}
     | `inlineGrid -> {js|inline-grid|js}
+    | `inlineGridLanes -> {js|inline-grid-lanes|js}
     | `inlineTable -> {js|inline-table|js}
     | `listItem -> {js|list-item|js}
     | `mozBox -> "-moz-box"
@@ -2852,6 +2872,8 @@ module Float = struct
     | None.t
     | `inlineStart
     | `inlineEnd
+    | `blockStart
+    | `blockEnd
     | Var.t
     | Cascading.t
     ]
@@ -2863,6 +2885,8 @@ module Float = struct
     | #None.t -> None.toString
     | `inlineStart -> {js|inline-start|js}
     | `inlineEnd -> {js|inline-end|js}
+    | `blockStart -> {js|block-start|js}
+    | `blockEnd -> {js|block-end|js}
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
 end
@@ -4470,6 +4494,56 @@ module CounterStyleType = struct
     | `unset -> {js|unset|js}
 end
 
+(* @counter-style descriptors (css-counter-styles-3) *)
+module CounterStyleSystem = struct
+  type t =
+    [ `cyclic
+    | `numeric
+    | `alphabetic
+    | `symbolic
+    | `additive
+    | `fixed of int option
+    | `extends of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `cyclic -> {js|cyclic|js}
+    | `numeric -> {js|numeric|js}
+    | `alphabetic -> {js|alphabetic|js}
+    | `symbolic -> {js|symbolic|js}
+    | `additive -> {js|additive|js}
+    | `fixed None -> {js|fixed|js}
+    | `fixed (Some n) -> {js|fixed |js} ^ string_of_int n
+    | `extends name -> {js|extends |js} ^ name
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module CounterStyleSymbols = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module CounterStyleNegative = CounterStyleSymbols
+module CounterStyleRange = CounterStyleSymbols
+module CounterStylePad = CounterStyleSymbols
+module CounterStyleFallback = CounterName
+module CounterStylePrefix = CounterStyleSymbols
+module CounterStyleSuffix = CounterStyleSymbols
+module CounterStyleAdditiveSymbols = CounterStyleSymbols
+
 module Counter = struct
   (* counter() = counter( <counter-name> [, <counter-style>]? ).
      Two surface forms map to two constructors, mirroring how [attr] and
@@ -5836,12 +5910,14 @@ module FontSize = struct
     | `xxxLarge
     | `smaller
     | `larger
+    | `math
     | Cascading.t
     ]
 
   let toString x =
     match x with
     | #Cascading.t as c -> Cascading.toString c
+    | `math -> {js|math|js}
     | `xxSmall -> {js|xx-small|js}
     | `xSmall -> {js|x-small|js}
     | `small -> {js|small|js}
@@ -5979,7 +6055,15 @@ module BackgroundBlendMode = struct
 end
 
 module MixBlendMode = struct
-  include BlendMode
+  type t =
+    [ BlendMode.t
+    | `plusLighter
+    ]
+
+  let toString x =
+    match x with
+    | #BlendMode.t as bm -> BlendMode.toString bm
+    | `plusLighter -> {js|plus-lighter|js}
 end
 
 module BackgroundPositionX = struct
@@ -7024,6 +7108,7 @@ module FontPalette = struct
     [ `normal
     | `light
     | `dark
+    | `dashedIdent of string
     | Var.t
     | Cascading.t
     ]
@@ -7033,6 +7118,7 @@ module FontPalette = struct
     | `normal -> {js|normal|js}
     | `light -> {js|light|js}
     | `dark -> {js|dark|js}
+    | `dashedIdent x -> x
     | #Var.t as x -> Var.toString x
     | #Cascading.t as x -> Cascading.toString x
 end
@@ -7049,6 +7135,105 @@ module FontSizeAdjust = struct
     match x with
     | `none -> {js|none|js}
     | `num x -> Kloth.Float.to_string x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module AscentOverride = struct
+  type t =
+    [ `normal
+    | Percentage.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | #Percentage.t as x -> Percentage.toString x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module DescentOverride = AscentOverride
+module LineGapOverride = AscentOverride
+
+module SizeAdjust = struct
+  type t =
+    [ Percentage.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #Percentage.t as x -> Percentage.toString x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+(* @view-transition descriptors (css-view-transitions-2) *)
+module ViewTransitionNavigation = struct
+  type t =
+    [ `auto
+    | `none
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `none -> {js|none|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ViewTransitionTypes = struct
+  type t =
+    [ `none
+    | `types of string list
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `types xs -> String.concat {js| |js} xs
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+(* @font-palette-values descriptors (css-fonts-4) *)
+module BasePalette = struct
+  type t =
+    [ `light
+    | `dark
+    | `num of int
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `light -> {js|light|js}
+    | `dark -> {js|dark|js}
+    | `num x -> string_of_int x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module OverrideColors = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
     | #Var.t as x -> Var.toString x
     | #Cascading.t as x -> Cascading.toString x
 end
@@ -8455,7 +8640,17 @@ module OffsetPath = struct
     | #Url.t as x -> Url.toString x
 end
 
-module OffsetPosition = OffsetAnchor
+module OffsetPosition = struct
+  type t =
+    [ `normal
+    | OffsetAnchor.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | #OffsetAnchor.t as oa -> OffsetAnchor.toString oa
+end
 
 module OffsetRotate = struct
   (* MDN syntax: [ 'auto' | 'reverse' ] || <extended-angle> *)
@@ -8653,9 +8848,10 @@ module PlaceSelf = struct
 end
 
 module PositionAnchor = struct
-  (* MDN syntax: 'auto' | <dashed-ident> *)
+  (* MDN syntax: 'normal' | 'auto' | <dashed-ident> *)
   type t =
-    [ `auto
+    [ `normal
+    | `auto
     | `value of string
     | Var.t
     | Cascading.t
@@ -8663,6 +8859,7 @@ module PositionAnchor = struct
 
   let toString x =
     match x with
+    | `normal -> {js|normal|js}
     | `auto -> {js|auto|js}
     | `value x -> x
     | #Var.t as x -> Var.toString x
@@ -8934,19 +9131,24 @@ end
 module RubyOverhang = Appearance
 
 module RubyPosition = struct
+  (* MDN syntax: [ 'alternate' || [ 'over' | 'under' ] ] | 'inter-character' *)
   type t =
-    [ `over
+    [ `alternate
+    | `over
     | `under
     | `interCharacter
+    | `value of string
     | Var.t
     | Cascading.t
     ]
 
   let toString x =
     match x with
+    | `alternate -> {js|alternate|js}
     | `over -> {js|over|js}
     | `under -> {js|under|js}
     | `interCharacter -> {js|inter-character|js}
+    | `value x -> x
     | #Var.t as x -> Var.toString x
     | #Cascading.t as x -> Cascading.toString x
 end
@@ -9362,9 +9564,18 @@ end
 module Speak = FontKerning
 
 module SpeakAs = struct
-  (* MDN syntax: 'normal' | 'spell-out' || 'digits' || [ 'literal-punctuation' | \ 'no-punctuation' ] *)
+  (* Union of the css-speech speak-as property
+     ('normal' | 'spell-out' || 'digits' ||
+      [ 'literal-punctuation' | 'no-punctuation' ])
+     and the css-counter-styles-3 speak-as descriptor
+     ('auto' | 'bubbles' | 'numbers' | 'words' | 'spell-out' |
+      <counter-style-name>); both share the registry entry. *)
   type t =
     [ `normal
+    | `auto
+    | `bubbles
+    | `numbers
+    | `words
     | `spellOut
     | `digits
     | `literalPunctuation
@@ -9377,6 +9588,10 @@ module SpeakAs = struct
   let toString x =
     match x with
     | `normal -> {js|normal|js}
+    | `auto -> {js|auto|js}
+    | `bubbles -> {js|bubbles|js}
+    | `numbers -> {js|numbers|js}
+    | `words -> {js|words|js}
     | `spellOut -> {js|spell-out|js}
     | `digits -> {js|digits|js}
     | `literalPunctuation -> {js|literal-punctuation|js}
@@ -9423,19 +9638,28 @@ module StrokeLinecap = struct
 end
 
 module StrokeLinejoin = struct
+  (* MDN syntax: [ 'crop' | 'arcs' | 'miter' ] || [ 'bevel' | 'round' | 'fallback' ] *)
   type t =
-    [ `miter
-    | `round
+    [ `crop
+    | `arcs
+    | `miter
     | `bevel
+    | `round
+    | `fallback
+    | `value of string
     | Var.t
     | Cascading.t
     ]
 
   let toString x =
     match x with
+    | `crop -> {js|crop|js}
+    | `arcs -> {js|arcs|js}
     | `miter -> {js|miter|js}
-    | `round -> {js|round|js}
     | `bevel -> {js|bevel|js}
+    | `round -> {js|round|js}
+    | `fallback -> {js|fallback|js}
+    | `value x -> x
     | #Var.t as x -> Var.toString x
     | #Cascading.t as x -> Cascading.toString x
 end
@@ -9465,7 +9689,9 @@ end
 
 module TextAutospace = struct
   type t =
-    [ `none
+    [ `normal
+    | `auto
+    | `none
     | `ideographAlpha
     | `ideographNumeric
     | `ideographParenthesis
@@ -9476,6 +9702,8 @@ module TextAutospace = struct
 
   let toString x =
     match x with
+    | `normal -> {js|normal|js}
+    | `auto -> {js|auto|js}
     | `none -> {js|none|js}
     | `ideographAlpha -> {js|ideograph-alpha|js}
     | `ideographNumeric -> {js|ideograph-numeric|js}
@@ -9487,7 +9715,8 @@ end
 
 module TextBoxEdge = struct
   type t =
-    [ `leading
+    [ `auto
+    | `leading
     | `text
     | `cap
     | `ex
@@ -9498,6 +9727,7 @@ module TextBoxEdge = struct
 
   let toString x =
     match x with
+    | `auto -> {js|auto|js}
     | `leading -> {js|leading|js}
     | `text -> {js|text|js}
     | `cap -> {js|cap|js}
@@ -9580,9 +9810,10 @@ module TextDecorationSkip = struct
 end
 
 module TextDecorationSkipSelf = struct
-  (* MDN syntax: 'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' ] \ || 'edges' || 'box-decoration' *)
+  (* MDN syntax: 'auto' | 'none' | 'objects' || [ 'spaces' | 'leading-spaces' || 'trailing-spaces' ] \ || 'edges' || 'box-decoration' *)
   type t =
-    [ `none
+    [ `auto
+    | `none
     | `objects
     | `spaces
     | `leadingSpaces
@@ -9596,6 +9827,7 @@ module TextDecorationSkipSelf = struct
 
   let toString x =
     match x with
+    | `auto -> {js|auto|js}
     | `none -> {js|none|js}
     | `objects -> {js|objects|js}
     | `spaces -> {js|spaces|js}
@@ -9775,7 +10007,8 @@ end
 
 module TextSpacingTrim = struct
   type t =
-    [ `normal
+    [ `auto
+    | `normal
     | `spaceAll
     | `spaceFirst
     | `trimStart
@@ -9785,6 +10018,7 @@ module TextSpacingTrim = struct
 
   let toString x =
     match x with
+    | `auto -> {js|auto|js}
     | `normal -> {js|normal|js}
     | `spaceAll -> {js|space-all|js}
     | `spaceFirst -> {js|space-first|js}

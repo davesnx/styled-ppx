@@ -33,7 +33,8 @@ let property_stroke_linecap : property_stroke_linecap Rule.rule =
 
 module Property_stroke_linejoin =
   [%spec_module
-  "'miter' | 'round' | 'bevel'", (module Css_types.StrokeLinejoin)]
+  "[ 'crop' | 'arcs' | 'miter' ] || [ 'bevel' | 'round' | 'fallback' ]",
+  (module Css_types.StrokeLinejoin)]
 
 let property_stroke_linejoin : property_stroke_linejoin Rule.rule =
   Property_stroke_linejoin.rule

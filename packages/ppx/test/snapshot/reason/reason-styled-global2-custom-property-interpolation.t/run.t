@@ -5,7 +5,7 @@ interpolation verbatim - no Cascading.toString wrap.
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css
-    ":root{--color-primary:var(--primary-eweeub);--gutter:var(--gutter-nbps89);}"
+    ":root{--color-primary:var(--primary-ihla52);--gutter:var(--gutter-75l7u2)}"
   ];
   let primary = CSS.Types.Color.toString(`hex("3A57FC"));
   let gutter = "16px";
@@ -14,8 +14,8 @@ interpolation verbatim - no Cascading.toString wrap.
       (
         (
           (
-            (((":root{" ++ "--primary-eweeub:") ++ primary) ++ ";")
-            ++ "--gutter-nbps89:"
+            (((":root{" ++ "--primary-ihla52:") ++ primary) ++ ";")
+            ++ "--gutter-75l7u2:"
           )
           ++ gutter
         )

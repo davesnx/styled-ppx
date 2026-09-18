@@ -9,6 +9,41 @@ let is_css_keyword = (value: Styled_ppx_css_parser.Ast.component_value) => {
   };
 };
 
+let type_check_at_rule_prelude = (at_rule: Styled_ppx_css_parser.Ast.at_rule) => {
+  let (name, _) = at_rule.name;
+  let (prelude, prelude_loc) = at_rule.prelude;
+  /* Interpolated preludes (`@media $(Media.wide)`) are rejected later by
+     the extraction pipeline with a dedicated message; skip grammar
+     validation so that error stays the one users see. */
+  if (Styled_ppx_css_parser.Ast.component_value_list_has_interpolation(
+        prelude,
+      )) {
+    [Ok()];
+  } else {
+    switch (
+      Css_grammar.validate_at_rule_prelude(~loc=prelude_loc, ~name, prelude)
+    ) {
+    | None
+    | Some(Ok ()) => [Ok()]
+    | Some(Error((loc, `Invalid_value(detail)))) =>
+      let prelude_source =
+        Styled_ppx_css_parser.Render.component_value_list(prelude)
+        |> String.trim;
+      let msg =
+        Format.sprintf(
+          "@[@%s@ has@ an@ invalid@ condition:@ '%s',@ %s@]",
+          name,
+          prelude_source,
+          Css_grammar.Rule.format_error_info(detail),
+        );
+      [Error((loc, `Invalid_value(msg)))];
+    | Some(Error((loc, `Invalid_prelude(msg)))) => [
+        Error((loc, `Invalid_value(msg))),
+      ]
+    };
+  };
+};
+
 let rec type_check_rule = (rule: Styled_ppx_css_parser.Ast.rule) => {
   switch (rule) {
   | Declaration({ name: _, value: ([(value, _)], _), _ })
@@ -45,11 +80,14 @@ let rec type_check_rule = (rule: Styled_ppx_css_parser.Ast.rule) => {
     }
   | Style_rule(style_rule) => type_check_rule_list(style_rule.block)
   | At_rule(at_rule) =>
-    switch (at_rule.block) {
-    | Empty => [Ok()]
-    | Rule_list(rule_list) => type_check_rule_list(rule_list)
-    | Stylesheet(rule_list) => type_check_rule_list(rule_list)
-    }
+    let prelude_checks = type_check_at_rule_prelude(at_rule);
+    let block_checks =
+      switch (at_rule.block) {
+      | Empty => [Ok()]
+      | Rule_list(rule_list) => type_check_rule_list(rule_list)
+      | Stylesheet(rule_list) => type_check_rule_list(rule_list)
+      };
+    prelude_checks @ block_checks;
   };
 }
 

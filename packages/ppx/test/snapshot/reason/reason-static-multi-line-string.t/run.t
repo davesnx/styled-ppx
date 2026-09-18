@@ -1,8 +1,8 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-k008qs-MultiLineStrings{display:flex;}"];
-  [@css ".css-1tyndxa-MultiLineStrings{justify-content:center;}"];
+  [@css ".css-k008qs-MultiLineStrings{display:flex}"];
+  [@css ".css-1tyndxa-MultiLineStrings{justify-content:center}"];
   [@css.bindings
     [
       (

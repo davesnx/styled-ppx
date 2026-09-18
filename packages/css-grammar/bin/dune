@@ -1,6 +1,11 @@
 (executables
  (names registry_dump registry_closure_check)
- (libraries Css_grammar css_spec_parser css_grammar_ppx_generate ppxlib))
+ (libraries
+  Css_grammar
+  css_spec_parser
+  css_grammar_ppx_generate
+  ppxlib
+  styled_ppx_css_parser))
 
 ; Fail if a grammar spec references a missing registry key.
 

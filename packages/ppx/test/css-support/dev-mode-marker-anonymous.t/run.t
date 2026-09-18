@@ -15,9 +15,9 @@ behavior; this keeps the two debug affordances symmetric.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb{color:red;}"];
-  [@css ".css-14ksm7b{color:blue;}"];
-  [@css ".css-bjcoli-named{color:green;}"];
+  [@css ".css-tokvmb{color:red}"];
+  [@css ".css-14ksm7b{color:blue}"];
+  [@css ".css-bjcoli-named{color:green}"];
   [@css.bindings [("Input.named", "css-bjcoli-named")]];
   
   let _ = CSS.make("css-tokvmb", []);

@@ -16,42 +16,42 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css "@property --tertiary-1cttnp6{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-p27yoa_1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-p27yoa_2{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-c1zhnk_1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-c1zhnk_2{syntax:\"*\";inherits:false;}"];
-  [@css "@property --secondary-fn5pf1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --box_-1n37ehb{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-zrm9xj_1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-zrm9xj_2{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-zrm9xj_3{syntax:\"*\";inherits:false;}"];
-  [@css ".css-34k09d-_spaceBeforeColon{width:30px;}"];
-  [@css ".css-1cx090v-_spaceBeforeColon{color:var(--tertiary-1cttnp6);}"];
+  [@css "@property --line-k71me3_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-k71me3_2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-10vn3j5_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-10vn3j5_2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --secondary-o4hg5w{syntax:\"*\";inherits:false;}"];
+  [@css "@property --box_-9z75f2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-bf7785_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-bf7785_2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-bf7785_3{syntax:\"*\";inherits:false;}"];
+  [@css ".css-34k09d-_spaceBeforeColon{width:30px}"];
+  [@css ".css-1cx090v-_spaceBeforeColon{color:var(--tertiary-1cttnp6)}"];
   [@css
-    ".css-qg0an3-_tabInnerFirst{box-shadow:inset 1px 0 0 0 transparent  !important;}"
+    ".css-1imssjd-_tabInnerFirst{box-shadow:inset 1px 0 0 0 transparent!important}"
   ];
   [@css
-    ".css-96uk0n-_multiShadowImportant{box-shadow:1px 0 0 0 var(--line-p27yoa_1), inset 0 -1px 0 0 var(--line-p27yoa_2)  !important;}"
+    ".css-cyxgg6-_multiShadowImportant{box-shadow:1px 0 0 0 var(--line-k71me3_1),inset 0 -1px 0 0 var(--line-k71me3_2)!important}"
   ];
-  [@css ".css-1mx0ppg-_tabTextFirst{box-shadow:inset 0 0 0 0 transparent;}"];
+  [@css ".css-1mx0ppg-_tabTextFirst{box-shadow:inset 0 0 0 0 transparent}"];
   [@css
-    ".css-u38k1n-_tabTextFirst:hover{box-shadow:1px 0 0 0 var(--line-c1zhnk_1), inset 0 -1px 0 0 var(--line-c1zhnk_2)  !important;}"
+    ".css-1u8ytlu-_tabTextFirst:hover{box-shadow:1px 0 0 0 var(--line-10vn3j5_1),inset 0 -1px 0 0 var(--line-10vn3j5_2)!important}"
   ];
-  [@css ".css-15h1qzw-_tabText{color:var(--secondary-fn5pf1);}"];
-  [@css ".css-15h1qzw-_tabText:hover{background-color:var(--box_-1n37ehb);}"];
+  [@css ".css-vgzemp-_tabText{color:var(--secondary-o4hg5w)}"];
+  [@css ".css-vgzemp-_tabText:hover{background-color:var(--box_-9z75f2)}"];
   [@css
-    ".css-15h1qzw-_tabText:hover{box-shadow:1px 0 0 0 var(--line-zrm9xj_1), inset 1px 0 0 0 var(--line-zrm9xj_2), inset 0 -1px 0 0 var(--line-zrm9xj_3) ;}"
+    ".css-vgzemp-_tabText:hover{box-shadow:1px 0 0 0 var(--line-bf7785_1),inset 1px 0 0 0 var(--line-bf7785_2),inset 0 -1px 0 0 var(--line-bf7785_3)}"
   ];
-  [@css ".css-i9gxme-_sidebar{flex-grow:1;}"];
-  [@css ".css-r6z5ec-_sidebar{z-index:1;}"];
-  [@css ".css-tjsoaq-_sidebar{transition:all 200ms ease 0ms;}"];
-  [@css ".css-145l4ca-_sidebar.css-0-_sidebarClosed{min-width:0;}"];
-  [@css ".css-1oluo0q-_sidebar.css-0-_sidebarClosed{max-width:0;}"];
-  [@css ".css-2io1ml-_sidebar.css-0-_sidebarClosed{opacity:0;}"];
-  [@css ".css-1k938xr-_sidebar.css-0-_sidebarClosed{overflow:hidden;}"];
-  [@css ".css-1vsc0qv-_checkbox{transition:transform 0.3s  !important;}"];
+  [@css ".css-i9gxme-_sidebar{flex-grow:1}"];
+  [@css ".css-r6z5ec-_sidebar{z-index:1}"];
+  [@css ".css-tjsoaq-_sidebar{transition:all 200ms ease 0ms}"];
+  [@css ".css-yuyqnp-_sidebar.css-0-_sidebarClosed{min-width:0}"];
+  [@css ".css-1xgmh5v-_sidebar.css-0-_sidebarClosed{max-width:0}"];
+  [@css ".css-1qk9jar-_sidebar.css-0-_sidebarClosed{opacity:0}"];
+  [@css ".css-14jsytz-_sidebar.css-0-_sidebarClosed{overflow:hidden}"];
+  [@css ".css-7e6ar4-_checkbox{transition:transform 0.3s!important}"];
   [@css
-    ".css-1hwm8mm-_transitions{transition:opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;}"
+    ".css-23e693-_transitions{transition:opacity 0.2s ease-in-out,visibility 0.2s ease-in-out}"
   ];
   [@css.bindings
     [
@@ -59,20 +59,20 @@ If this test fail means that the module is not in sync with the ppx
         "Input._spaceBeforeColon",
         "css-34k09d-_spaceBeforeColon css-1cx090v-_spaceBeforeColon",
       ),
-      ("Input._tabInnerFirst", "css-qg0an3-_tabInnerFirst"),
-      ("Input._multiShadowImportant", "css-96uk0n-_multiShadowImportant"),
+      ("Input._tabInnerFirst", "css-1imssjd-_tabInnerFirst"),
+      ("Input._multiShadowImportant", "css-cyxgg6-_multiShadowImportant"),
       (
         "Input._tabTextFirst",
-        "css-1mx0ppg-_tabTextFirst css-u38k1n-_tabTextFirst",
+        "css-1mx0ppg-_tabTextFirst css-1u8ytlu-_tabTextFirst",
       ),
-      ("Input._tabText", "css-15h1qzw-_tabText"),
+      ("Input._tabText", "css-vgzemp-_tabText"),
       ("Input._sidebarClosed", "css-0-_sidebarClosed"),
       (
         "Input._sidebar",
-        "css-i9gxme-_sidebar css-r6z5ec-_sidebar css-tjsoaq-_sidebar css-145l4ca-_sidebar css-1oluo0q-_sidebar css-2io1ml-_sidebar css-1k938xr-_sidebar",
+        "css-i9gxme-_sidebar css-r6z5ec-_sidebar css-tjsoaq-_sidebar css-yuyqnp-_sidebar css-1xgmh5v-_sidebar css-1qk9jar-_sidebar css-14jsytz-_sidebar",
       ),
-      ("Input._checkbox", "css-1vsc0qv-_checkbox"),
-      ("Input._transitions", "css-1hwm8mm-_transitions"),
+      ("Input._checkbox", "css-7e6ar4-_checkbox"),
+      ("Input._transitions", "css-23e693-_transitions"),
     ]
   ];
   module Color = {
@@ -94,35 +94,35 @@ If this test fail means that the module is not in sync with the ppx
       [("--tertiary-1cttnp6", CSS.Types.Color.toString(Color.Text.tertiary))],
     );
   
-  let _tabInnerFirst = CSS.make("css-qg0an3-_tabInnerFirst", []);
+  let _tabInnerFirst = CSS.make("css-1imssjd-_tabInnerFirst", []);
   
   let _multiShadowImportant =
     CSS.make(
-      "css-96uk0n-_multiShadowImportant",
+      "css-cyxgg6-_multiShadowImportant",
       [
-        ("--line-p27yoa_1", CSS.Types.Color.toString(Color.Border.line)),
-        ("--line-p27yoa_2", CSS.Types.Color.toString(Color.Border.line)),
+        ("--line-k71me3_1", CSS.Types.Color.toString(Color.Border.line)),
+        ("--line-k71me3_2", CSS.Types.Color.toString(Color.Border.line)),
       ],
     );
   
   let _tabTextFirst =
     CSS.make(
-      "css-1mx0ppg-_tabTextFirst css-u38k1n-_tabTextFirst",
+      "css-1mx0ppg-_tabTextFirst css-1u8ytlu-_tabTextFirst",
       [
-        ("--line-c1zhnk_1", CSS.Types.Color.toString(Color.Border.line)),
-        ("--line-c1zhnk_2", CSS.Types.Color.toString(Color.Border.line)),
+        ("--line-10vn3j5_1", CSS.Types.Color.toString(Color.Border.line)),
+        ("--line-10vn3j5_2", CSS.Types.Color.toString(Color.Border.line)),
       ],
     );
   
   let _tabText =
     CSS.make(
-      "css-15h1qzw-_tabText",
+      "css-vgzemp-_tabText",
       [
-        ("--secondary-fn5pf1", CSS.Types.Color.toString(Color.Text.secondary)),
-        ("--box_-1n37ehb", CSS.Types.Color.toString(Color.Background.box_)),
-        ("--line-zrm9xj_1", CSS.Types.Color.toString(Color.Border.line)),
-        ("--line-zrm9xj_2", CSS.Types.Color.toString(Color.Border.line)),
-        ("--line-zrm9xj_3", CSS.Types.Color.toString(Color.Border.line)),
+        ("--secondary-o4hg5w", CSS.Types.Color.toString(Color.Text.secondary)),
+        ("--box_-9z75f2", CSS.Types.Color.toString(Color.Background.box_)),
+        ("--line-bf7785_1", CSS.Types.Color.toString(Color.Border.line)),
+        ("--line-bf7785_2", CSS.Types.Color.toString(Color.Border.line)),
+        ("--line-bf7785_3", CSS.Types.Color.toString(Color.Border.line)),
       ],
     );
   
@@ -130,13 +130,13 @@ If this test fail means that the module is not in sync with the ppx
   
   let _sidebar =
     CSS.make(
-      "css-i9gxme-_sidebar css-r6z5ec-_sidebar css-tjsoaq-_sidebar css-145l4ca-_sidebar css-1oluo0q-_sidebar css-2io1ml-_sidebar css-1k938xr-_sidebar",
+      "css-i9gxme-_sidebar css-r6z5ec-_sidebar css-tjsoaq-_sidebar css-yuyqnp-_sidebar css-1xgmh5v-_sidebar css-1qk9jar-_sidebar css-14jsytz-_sidebar",
       [],
     );
   
-  let _checkbox = CSS.make("css-1vsc0qv-_checkbox", []);
+  let _checkbox = CSS.make("css-7e6ar4-_checkbox", []);
   
-  let _transitions = CSS.make("css-1hwm8mm-_transitions", []);
+  let _transitions = CSS.make("css-23e693-_transitions", []);
   
   let _shadow1: CSS.Shadow.t =
     CSS.Shadow.box(~blur=`px(100), `hex("000000"), ~inset=true);

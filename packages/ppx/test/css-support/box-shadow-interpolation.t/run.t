@@ -10,13 +10,13 @@ Test box-shadow and text-shadow interpolation support in cx2
   @property --textShadowValue-1g9u54a{syntax:"*";inherits:false;}
   @property --textShadowArray-ptx88i{syntax:"*";inherits:false;}
   @property --insetShadow-ae1kx4{syntax:"*";inherits:false;}
-  .css-bddc{box-shadow:var(--singleShadow-2ra8gi);}
-  .css-dm7kax{box-shadow:var(--shadowArray-16v4cs);}
-  .css-gokeqi{box-shadow:none;}
-  .css-12b85tv{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
-  .css-oixlo4{text-shadow:var(--textShadowValue-1g9u54a);}
-  .css-n95t96{text-shadow:var(--textShadowArray-ptx88i);}
-  .css-1f9ql9z{text-shadow:none;}
-  .css-1x6ky98{box-shadow:var(--insetShadow-ae1kx4);}
+  .css-bddc{box-shadow:var(--singleShadow-2ra8gi)}
+  .css-dm7kax{box-shadow:var(--shadowArray-16v4cs)}
+  .css-gokeqi{box-shadow:none}
+  .css-ea2r8h{box-shadow:0px 2px 4px 0px rgba(0,0,0,0.1)}
+  .css-oixlo4{text-shadow:var(--textShadowValue-1g9u54a)}
+  .css-n95t96{text-shadow:var(--textShadowArray-ptx88i)}
+  .css-1f9ql9z{text-shadow:none}
+  .css-1x6ky98{box-shadow:var(--insetShadow-ae1kx4)}
 
 

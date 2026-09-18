@@ -10,7 +10,7 @@ let property_position : property_position Rule.rule = Property_position.rule
 
 module Property_position_anchor =
   [%spec_module
-  "'auto' | <dashed-ident>", (module Css_types.PositionAnchor)]
+  "'normal' | 'auto' | <dashed-ident>", (module Css_types.PositionAnchor)]
 
 let property_position_anchor : property_position_anchor Rule.rule =
   Property_position_anchor.rule
