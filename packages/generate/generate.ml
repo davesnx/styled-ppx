@@ -426,8 +426,10 @@ let library_edge_target ~(groups_with_module : string -> library_group list)
 (** Two-level order: libraries first (by the dependency graph collapsed from
     module references), then, within each library, {!order_modules_within_scope}
     unchanged from PR 1. Both levels reuse {!Order.sort}, so the alphabetical
-    tiebreak and the never-fail cycle policy apply at both levels for free. *)
-let order_by_dependency (harvests : harvest list) : harvest list =
+    tiebreak and the never-fail cycle policy apply at both levels for free.
+    Returns the ordered harvests and the library keys in emitted order, the one
+    value both the log line and [--layers] consume. *)
+let order_by_dependency (harvests : harvest list) : harvest list * string list =
   let groups = group_by_library harvests in
   (* Indexed once: scanning every group for every raw reference measured 2 s
      extra on a 5,824-file input with 246 groups. *)
@@ -497,10 +499,50 @@ let order_by_dependency (harvests : harvest list) : harvest list =
             (edges h))
         ordered)
     ordered_groups;
-  List.concat_map (fun (_, ordered, _) -> ordered) ordered_groups
+  ( List.concat_map (fun (_, ordered, _) -> ordered) ordered_groups,
+    List.map (fun (g, _, _) -> g.key) ordered_groups )
+
+(** [--layers] cascade-layer name for a library key: its last path segment (a
+    no-op for a plain library name; the effective rule for a directory-fallback
+    key such as ["./lib/native"]), with every character outside [A-Za-z0-9_-]
+    replaced by ['_']. *)
+let sanitize_layer_name key =
+  Filename.basename key
+  |> String.map (function
+    | ('A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' | '-') as c -> c
+    | _ -> '_')
+
+(** When two different library keys sanitize to the same layer name, their
+    blocks share that name and CSS itself concatenates same-named [@layer]
+    blocks into one layer; warn once per colliding name so the merge isn't a
+    silent surprise. *)
+let warn_layer_name_collisions layer_names =
+  let by_name : (string, string) Hashtbl.t = Hashtbl.create 8 in
+  List.iter (fun (key, name) -> Hashtbl.add by_name name key) layer_names;
+  List.map snd layer_names
+  |> List.sort_uniq String.compare
+  |> List.iter (fun name ->
+    (* [Hashtbl.find_all] returns the most-recently-added key first; reverse
+       to report libraries in the order they were declared. *)
+    match List.rev (Hashtbl.find_all by_name name) with
+    | [] | [ _ ] -> ()
+    | many ->
+      Logger.warning
+        "layer name %S is shared by libraries %s; their rules merge into one \
+         layer"
+        name (String.concat ", " many))
+
+(** [@property] and [@keyframes] rules are global registrations, not scoped
+    declarations: leaving one inside a [@layer] block would make its
+    registration, or a keyframe name lookup, depend on layer order. [--layers]
+    emits them ahead of every layer instead. *)
+let is_global_registration rule =
+  let trimmed = String.trim rule in
+  String.starts_with ~prefix:"@property" trimmed
+  || String.starts_with ~prefix:"@keyframes" trimmed
 
 (** Collect, index, resolve, dedup, output. *)
-let run ~output_file ~order input_files =
+let run ~output_file ~order ~layers input_files =
   Logger.info "output file: %s"
     (match output_file with Some file -> file | None -> "stdout");
   let idx = Index.create () in
@@ -516,10 +558,21 @@ let run ~output_file ~order input_files =
           Some (harvest_structure ~filename ~idx ~order structure))
       input_files
   in
-  let harvests =
+  let harvests, library_order =
     match order with
-    | Order_source -> harvests
+    | Order_source -> harvests, []
     | Order_dependency -> order_by_dependency harvests
+  in
+  let layer_names =
+    if not layers then None
+    else begin
+      let pairs =
+        List.map (fun key -> key, sanitize_layer_name key) library_order
+      in
+      warn_layer_name_collisions pairs;
+      Logger.info "layers: %s" (String.concat ", " (List.map snd pairs));
+      Some pairs
+    end
   in
 
   (* Resolve all rules across all harvests, collecting errors with locations. *)
@@ -529,6 +582,7 @@ let run ~output_file ~order input_files =
   let resolved_rules = ref [] in
   List.iter
     (fun harvest ->
+      let harvest_layer = group_key harvest in
       List.iter
         (fun rule ->
           let on_error longident =
@@ -558,7 +612,7 @@ let run ~output_file ~order input_files =
             Css_extraction.resolve_sentinels ~lookup:(Hashtbl.find_opt idx)
               ~on_unresolved:on_error ~on_malformed rule
           in
-          resolved_rules := resolved :: !resolved_rules)
+          resolved_rules := (resolved, harvest_layer) :: !resolved_rules)
         harvest.rules)
     harvests;
 
@@ -588,7 +642,7 @@ let run ~output_file ~order input_files =
   let ordered_rules =
     let seen = Hashtbl.create 64 in
     List.rev !resolved_rules
-    |> List.filter (fun rule ->
+    |> List.filter (fun (rule, _layer) ->
       if Hashtbl.mem seen rule then false
       else begin
         Hashtbl.add seen rule ();
@@ -604,11 +658,72 @@ let run ~output_file ~order input_files =
     let buffer = Buffer.create 1024 in
     Buffer.add_string buffer
       "/* This file is generated by styled-ppx, do not edit manually */\n";
-    List.iter
-      (fun rule ->
-        Buffer.add_string buffer rule;
-        Buffer.add_string buffer separator)
-      ordered_rules;
+    (match layer_names with
+    | None ->
+      List.iter
+        (fun (rule, _layer) ->
+          Buffer.add_string buffer rule;
+          Buffer.add_string buffer separator)
+        ordered_rules
+    | Some layer_names ->
+      let registrations, library_rules =
+        List.partition
+          (fun (rule, _layer) -> is_global_registration rule)
+          ordered_rules
+      in
+      List.iter
+        (fun (rule, _layer) ->
+          Buffer.add_string buffer rule;
+          Buffer.add_string buffer separator)
+        registrations;
+      (* A repeated name in the statement doesn't declare a second layer, it
+         only re-mentions the same slot, so list each name once (first
+         occurrence): two colliding keys still get their own [@layer name {
+         ... }] block below, which CSS itself merges by name. *)
+      let layer_statement =
+        let seen = Hashtbl.create (List.length layer_names) in
+        List.filter_map
+          (fun (_, name) ->
+            if Hashtbl.mem seen name then None
+            else begin
+              Hashtbl.add seen name ();
+              Some name
+            end)
+          layer_names
+        |> String.concat ", "
+      in
+      Buffer.add_string buffer (Printf.sprintf "@layer %s;" layer_statement);
+      Buffer.add_string buffer separator;
+      (* Bucket rules by layer key in one pass instead of re-scanning
+         [library_rules] once per layer: each key's [Buffer.t] accumulates its
+         rules in traversal order, so blitting it below preserves the
+         "last wins" order the cascade needs within a layer. *)
+      let rules_by_layer : (string, Buffer.t) Hashtbl.t = Hashtbl.create 16 in
+      List.iter
+        (fun (rule, rule_layer) ->
+          let buf =
+            match Hashtbl.find_opt rules_by_layer rule_layer with
+            | Some buf -> buf
+            | None ->
+              let buf = Buffer.create 256 in
+              Hashtbl.add rules_by_layer rule_layer buf;
+              buf
+          in
+          Buffer.add_string buf rule;
+          Buffer.add_string buf separator)
+        library_rules;
+      List.iter
+        (fun (key, name) ->
+          Buffer.add_string buffer
+            (if minify then Printf.sprintf "@layer %s{" name
+             else Printf.sprintf "@layer %s {" name);
+          Buffer.add_string buffer separator;
+          (match Hashtbl.find_opt rules_by_layer key with
+          | Some buf -> Buffer.add_buffer buffer buf
+          | None -> ());
+          Buffer.add_string buffer "}";
+          Buffer.add_string buffer separator)
+        layer_names);
     Buffer.contents buffer
   in
   Logger.debug "stylesheet:\n%s" stylesheet;
@@ -622,14 +737,14 @@ let run ~output_file ~order input_files =
     the [[@@@css.config]] attributes the PPX embeds in its input files, so the
     environment is declared exactly once, on the (pps styled-ppx ...) stanza. *)
 let parse_args args =
-  let rec parse acc ~output_file ~log_level ~order = function
+  let rec parse acc ~output_file ~log_level ~order ~layers = function
     | "-o" :: file :: rest
     | "-output" :: file :: rest
     | "--output" :: file :: rest ->
-      parse acc ~output_file:(Some file) ~log_level ~order rest
+      parse acc ~output_file:(Some file) ~log_level ~order ~layers rest
     | "--log" :: level :: rest ->
       (match Logger.level_of_string level with
-      | Some log_level -> parse acc ~output_file ~log_level ~order rest
+      | Some log_level -> parse acc ~output_file ~log_level ~order ~layers rest
       | None ->
         Logger.error
           "invalid --log level %S (expected \"error\", \"warning\", \"info\" \
@@ -637,31 +752,43 @@ let parse_args args =
           level;
         exit 2)
     | "--debug" :: rest ->
-      parse acc ~output_file ~log_level:Logger.Debug ~order rest
+      parse acc ~output_file ~log_level:Logger.Debug ~order ~layers rest
     | "--order" :: mode :: rest ->
       (match mode with
       | "dependency" ->
-        parse acc ~output_file ~log_level ~order:Order_dependency rest
-      | "source" -> parse acc ~output_file ~log_level ~order:Order_source rest
+        parse acc ~output_file ~log_level ~order:Order_dependency ~layers rest
+      | "source" ->
+        parse acc ~output_file ~log_level ~order:Order_source ~layers rest
       | _ ->
         Logger.error
           "invalid --order value %S (expected \"dependency\" or \"source\")"
           mode;
         exit 2)
+    | "--layers" :: rest ->
+      parse acc ~output_file ~log_level ~order ~layers:true rest
     | [ (("-o" | "-output" | "--output" | "--log" | "--order") as flag) ] ->
       Logger.error "missing value for flag %S" flag;
       exit 2
     | arg :: _ when String.length arg > 0 && arg.[0] = '-' ->
       Logger.error "unknown flag %S" arg;
       exit 2
-    | arg :: rest -> parse (arg :: acc) ~output_file ~log_level ~order rest
-    | [] -> List.rev acc, output_file, log_level, order
+    | arg :: rest ->
+      parse (arg :: acc) ~output_file ~log_level ~order ~layers rest
+    | [] -> List.rev acc, output_file, log_level, order, layers
   in
   let tail = match Array.to_list args with [] -> [] | _ :: t -> t in
   parse [] ~output_file:None ~log_level:Logger.Warning ~order:Order_dependency
-    tail
+    ~layers:false tail
 
 let () =
-  let input_files, output_file, log_level, order = parse_args Sys.argv in
+  let input_files, output_file, log_level, order, layers =
+    parse_args Sys.argv
+  in
+  if layers && order = Order_source then begin
+    Logger.error
+      "--layers requires --order dependency: source order has no library \
+       groups to layer";
+    exit 2
+  end;
   Logger.set_level log_level;
-  run ~output_file ~order input_files
+  run ~output_file ~order ~layers input_files
