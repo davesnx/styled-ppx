@@ -45,6 +45,9 @@ type settings = {
   debug: flag(bool),
   minify: flag(bool),
   dev: flag(bool),
+  /* Not a CLI flag: set from the dune `library-name` cookie
+     (see Ppxlib.Driver.Cookies in ppx.re). */
+  library: option(string),
 };
 
 let currentSettings =
@@ -53,6 +56,7 @@ let currentSettings =
     debug,
     minify,
     dev,
+    library: None,
   });
 
 let updateSettings = newSettings => currentSettings := newSettings;
@@ -70,6 +74,7 @@ module Get = {
   let dev = () =>
     currentSettings.contents.dev.value
     |> Option.value(~default=currentSettings.contents.dev.defaultValue);
+  let library = () => currentSettings.contents.library;
 };
 
 module Update = {
@@ -104,6 +109,12 @@ module Update = {
         ...currentSettings.contents.dev,
         value: Some(value),
       },
+    });
+
+  let library = value =>
+    updateSettings({
+      ...currentSettings.contents,
+      library: Some(value),
     });
 
   let env =
