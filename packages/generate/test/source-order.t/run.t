@@ -30,8 +30,9 @@ Repeated property within a single binding: "blue" must win.
   .css-A-y{color:red;}
   .css-B-y{color:blue;}
 
-Cross-file: file order is the order dune passes them. Within a file,
-[@@@css ...] declaration order is preserved.
+Cross-file: absent a dependency between them, file order is the order dune
+passes them (see order-dependency.t for when one file references another).
+Within a file, [@@@css ...] declaration order is preserved.
 
   $ cat > c.ml <<EOF
   > [@@@css ".second{color:red;}"]

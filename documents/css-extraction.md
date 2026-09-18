@@ -256,7 +256,7 @@ Implemented in `packages/generate/generate.ml`. Takes a list of `.ml` /
 `.pp.ml` paths, produces a stylesheet on stdout or `-o <file>`.
 
 ```
-parse args → harvest_each_file → resolve_sentinels → dedup → write
+parse args → harvest_each_file → order_harvests → resolve_sentinels → dedup → write
 ```
 
 ### Harvest
@@ -273,7 +273,48 @@ _                         → ignore
 ```
 
 The harvest pass is the **only** time the aggregator looks at the AST.
-Everything downstream operates on plain strings.
+Everything downstream operates on plain strings, except that the harvest
+pass also records, per file, which other module names its structure
+references (see Order below) — the last thing the AST is used for.
+
+### Order
+
+Implemented in `packages/generate/order.ml`. Runs between harvest and
+resolve, reordering the harvested files before dedup picks which
+occurrence of a repeated rule survives.
+
+By default (`--order dependency`) a file's rules come after the rules of
+every file it depends on. "Depends on" means: the harvested file's
+structure references a module name (via the same free-name analysis
+`ocamldep -modules` uses), and among the input files whose derived module
+name matches, one is chosen as the target —
+
+- if exactly one input file has that module name, it's the target;
+- otherwise the candidate sharing the longest directory-path prefix with
+  the referencing file wins;
+- a tie, or no candidate at all, means no edge — this generator sees one
+  library's files at a time, so it can't always tell which same-named file
+  a reference actually meant. Logged at `--log debug`.
+
+Files with no dependency relation keep their input order (dune's own file
+order, alphabetical for a typical `(glob_files *.pp.ml)` deps stanza): the
+sort (Kahn's algorithm) always advances the alphabetically smallest ready
+file, so an edge is the only thing that can move a file out of that order.
+
+A dependency cycle can't come from a real OCaml build (dune won't compile
+a genuine circular module dependency), so one only appears when the
+same-named-module resolution above picks an edge a real build wouldn't
+have. The aggregator never fails the build over an ordering problem: it
+warns once naming the cycle's files, drops the blocking edge whose
+dependent file sorts alphabetically last, and keeps going. The result
+stays deterministic.
+
+`--order source` restores the file order dune passes on the command line,
+unconditionally, with no dependency analysis, order/edge logging, or cycle
+handling. It exists as an escape hatch for one release and to compare
+against the old behavior. Under the default `--order dependency`, `--log
+info` prints the resolved module order and `--log debug` additionally
+prints every resolved edge.
 
 ### Resolve
 
@@ -293,7 +334,8 @@ compiler convention, so editors pick them up) and exits 1.
 ### Dedup and write
 
 Resolved rule strings are deduplicated with an order-preserving
-`Hashtbl` filter: walk the rules in source-traversal order and keep the
+`Hashtbl` filter: walk the rules in the order established by Order above
+(dependency order by default, `--order source` otherwise) and keep the
 first occurrence of each string. This removes duplicates produced by the
 same rule appearing in multiple files (common for shared helpers).
 
@@ -301,9 +343,10 @@ Order preservation is load-bearing: every atomized rule has the same
 specificity (one class, no qualifiers), so the cascade tiebreaker is
 "later in stylesheet wins". A longhand override written after a
 shorthand (`margin: 10px; margin-top: 20px`) must stay after it in the
-emitted stylesheet. An earlier version deduped through
-`Set.Make(String)`, which sorted by hash-prefixed rule text and silently
-destroyed declaration order (regression test:
+emitted stylesheet, and a module's rule now stays after a dependency's
+equal-specificity rule regardless of file naming. An earlier version
+deduped through `Set.Make(String)`, which sorted by hash-prefixed rule
+text and silently destroyed declaration order (regression test:
 `packages/generate/test/source-order.t`).
 
 The deduplicated list is then written to the output channel. Inter-rule
@@ -354,9 +397,14 @@ Two consequences worth knowing:
   Everything the aggregator needs lives in the post-PPX `.ml`.
 - **Filesystem I/O from the PPX.** PPX never reads peers' artifacts.
   All cross-module information flows through the aggregator.
-- **AST traversal in the aggregator.** The aggregator does not pattern-
-  match `CSS.make` calls or rebuild module paths from filenames. The
-  PPX writes the index directly into `[@@@css.bindings ...]`.
+- **AST traversal in the aggregator, for anything but ordering.** The
+  aggregator does not pattern-match `CSS.make` calls, and rule resolution
+  never inspects the AST: the PPX writes the index directly into
+  `[@@@css.bindings ...]`. Order is the one exception — it reruns the
+  compiler's own free-module-name analysis (`Order.references`) on the
+  harvested structure to decide dependency order, and derives a module
+  name from each input filename to resolve those references to files
+  (see Order above); it still never touches `CSS.make`.
 - **Runtime resolution of selectors via `var(--xyz)` indirection.**
   Selector interpolation is resolved statically (value interpolation
   does use custom properties, but only for values); this is a
@@ -371,6 +419,8 @@ Two consequences worth knowing:
 - `documents/keyframe-static-extraction.md` — `[%keyframe]` extraction
   in depth
 - `packages/generate/generate.ml` — the aggregator implementation
+- `packages/generate/order.ml` — the dependency graph and sort behind
+  `--order dependency`
 - `packages/css-extraction/css_extraction.ml` — shared attribute names,
   sentinel encoding, and sentinel resolution
 - `packages/ppx/src/{Css_bindings,Cross_module_refs}.{re,rei}` — the

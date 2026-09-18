@@ -80,7 +80,7 @@ The format is `css-<hash>-<label>`, where the label is the `let` binding or modu
 
 ### Cascade and ordering
 
-All atoms have the same specificity (a single class). The tiebreaker is stylesheet order (later wins), and the aggregator preserves your source order exactly, so an override written after its base declaration stays after it in `styles.css`. The full rules and composition patterns live in [Which declaration wins](/reference/runtime#which-declaration-wins).
+All atoms have the same specificity (a single class). The tiebreaker is stylesheet order (later wins). Within a module the aggregator preserves your source order exactly, so an override written after its base declaration stays after it in `styles.css`; across modules, a module's rules come after the rules of every module it depends on, so a consumer's override beats its dependency's declaration regardless of file naming. The full rules and composition patterns live in [Which declaration wins](/reference/runtime#which-declaration-wins).
 
 ## Dynamic values: CSS custom properties
 
@@ -117,9 +117,10 @@ The ppx runs one file at a time and cannot see the rest of your project, so each
 
 1. walks the post-ppx `.ml`/`.pp.ml` files you point it at,
 2. harvests every extracted rule and binding export,
-3. resolves cross-module selector references,
-4. deduplicates rules (order-preserving), and
-5. writes the final stylesheet.
+3. orders the files by module dependency (a module after the modules it depends on; `--order source` opts out),
+4. resolves cross-module selector references,
+5. deduplicates rules (order-preserving), and
+6. writes the final stylesheet.
 
 You wire it up once as a dune rule; the rule, CLI flags, and troubleshooting live in [Setting up the dune rules](/getting-started/dune-setup).
 
