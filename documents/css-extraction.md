@@ -329,7 +329,8 @@ command line. It exists as an escape hatch for one release and to compare
 against the old behavior. Under the default `--order dependency`, `--log
 info` prints the library order and then each library's module order;
 `--log debug` additionally prints every library edge and every module
-edge.
+edge. `--layers` (see Cascade layers below) requires `--order dependency`,
+since it wraps each library's rules by the same grouping.
 
 ### Resolve
 
@@ -370,6 +371,40 @@ The deduplicated list is then written to the output channel. Inter-rule
 newlines are dropped when every contributing input file declared
 `env=production` in its `[@@@css.config ...]` (see the wire protocol
 section above); there is no CLI flag for this.
+
+### Cascade layers (opt-in)
+
+`--layers` (default off, and rejected together with `--order source`)
+wraps the deduplicated rule list from above into named CSS cascade
+layers, one per library, instead of one flat list. `@property` and
+`@keyframes` rules are pulled out ahead of every layer, since they are
+global registrations: a `@property` inside a layer would make the
+registration itself depend on layer order, and a `@keyframes` name is
+looked up by layer order too, so leaving both unlayered avoids surprises.
+After the registrations, one `@layer <lib1>, <lib2>, ...;` statement lists
+every library in the same dependency order as the default output, and
+then each library's remaining rules follow inside their own
+`@layer <lib> { ... }` block, still in that order. A layer's name is its
+library key with every character outside `[A-Za-z0-9_-]` replaced by `_`
+(the directory-fallback case uses the key's last path segment first). Two
+different keys can sanitize to the same name; the aggregator warns once
+and lets the two `@layer` blocks share that name, which CSS itself
+concatenates into a single layer.
+
+Layering rules changes how they interact with hand-written CSS, which is
+why the flag defaults to off. An unlayered declaration always beats a
+layered one, however low that layer sits, because the cascade only
+compares layers when both competing declarations are themselves inside a
+layer; a normal, non-`!important` layered rule loses to any unlayered
+rule regardless of specificity or source order. `!important` inverts
+that: an `!important` declaration in a layer beats an unlayered
+`!important` declaration, and among layers the earliest-declared layer
+wins for `!important` (the opposite of the normal-declaration order,
+where the latest layer wins). A consumer that turns `--layers` on has to
+put its own hand-written CSS — resets, palettes, fonts, an inline global
+stylesheet — into a layer declared before the generated ones, or that
+CSS's plain declarations stop overriding anything the generated,
+now-layered rules set.
 
 ## Atomization
 

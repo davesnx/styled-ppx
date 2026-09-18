@@ -56,6 +56,17 @@ and no warnings to report.
   .a{color:red;}
   
 
+
+--layers adds a "layers: ..." line after the order lines, listing the
+sanitized cascade-layer names in library order.
+
+  $ styled-ppx.generate --layers --log info --output out.css a.ml
+  styled-ppx: output file: out.css
+  styled-ppx: library order: .
+  styled-ppx: order: .: A
+  styled-ppx: layers: _
+  styled-ppx: environment: development
+
 An unknown level is rejected up front.
 
   $ styled-ppx.generate --log silly a.ml
