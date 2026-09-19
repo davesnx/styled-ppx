@@ -493,6 +493,16 @@ module Css_transform = {
       (ctx, pseudo: pseudo_selector): pseudo_selector => {
     switch (pseudo) {
     | Pseudoelement(_) => pseudo
+    | PseudoelementFunction({ name, payload: (selector_list, payload_loc) }) =>
+      let transformed =
+        List.map(
+          ((sel, sel_loc)) => (transform_selector(ctx, sel), sel_loc),
+          selector_list,
+        );
+      PseudoelementFunction({
+        name,
+        payload: (transformed, payload_loc),
+      });
     | Pseudoclass(kind) =>
       Pseudoclass(transform_pseudoclass_kind(ctx, kind))
     };
@@ -516,13 +526,12 @@ module Css_transform = {
       let transformed_payload =
         switch (nth_payload) {
         | Nth(_) => nth_payload
-        | NthSelector(complex_selectors) =>
-          NthSelector(
-            List.map(
-              c => transform_complex_selector(ctx, c),
-              complex_selectors,
-            ),
-          )
+        | NthSelector({ nth, selectors }) =>
+          NthSelector({
+            nth,
+            selectors:
+              List.map(c => transform_complex_selector(ctx, c), selectors),
+          })
         };
       NthFunction({
         name,
