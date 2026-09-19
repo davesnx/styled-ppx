@@ -25,12 +25,16 @@ and style_rule = ({ prelude, block, _ }: Ast.style_rule) => {
 and at_rule = ({ name, prelude, block, _ }: Ast.at_rule) => {
   switch (block) {
   /* Statement at-rules (`@import`, `@charset`, `@layer a, b;`) have no
-     block and terminate with a semicolon; `{}` would be invalid CSS. */
+     block and terminate with a semicolon; `{}` would be invalid CSS.
+     Trailing whitespace before that semicolon is trimmed the same way a
+     declaration's trailing whitespace before its semicolon is (see
+     `declaration` below), so `@import "x.css" ;` and `@import "x.css";`
+     render identically. */
   | Empty =>
     Printf.sprintf(
       "@%s %s;",
       name |> fst,
-      prelude |> fst |> strip_leading_whitespace |> component_value_list,
+      prelude |> fst |> component_value_list,
     )
   | Rule_list(_)
   | Stylesheet(_) =>

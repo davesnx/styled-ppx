@@ -633,6 +633,24 @@ Blockless at-rules pass through verbatim
   > EOF
   @import "foo.css";body{margin:0;}
 
+Statement at-rules are dispatched by lookahead (`;` vs `{`), not by a
+hard-coded name allowlist, so a name outside the old allowlist (e.g.
+`@layer`) still gets its standard blockless form instead of a parse error.
+  $ cat << "EOF" | ./Render_test.exe
+  > @layer a, b;
+  > body { margin: 0; }
+  > EOF
+  @layer a, b;body{margin:0;}
+
+A statement at-rule's trailing whitespace before `;` is trimmed the same
+way a declaration's trailing whitespace before `;` already is, so the same
+at-rule renders identically regardless of that incidental spacing.
+  $ cat << "EOF" | ./Render_test.exe
+  > @import "foo.css" ;
+  > body { margin: 0; }
+  > EOF
+  @import "foo.css";body{margin:0;}
+
 @font-face passes through verbatim with its descriptors intact
   $ cat << "EOF" | ./Render_test.exe
   > @font-face {
