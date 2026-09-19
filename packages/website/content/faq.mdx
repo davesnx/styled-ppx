@@ -40,7 +40,7 @@ Yes: server-reason-react renders your components to an HTML string, and your ser
 
 ## Why did my class names change between builds?
 
-They shouldn't have, unless something real changed: hashes are content-addressed from the CSS text (plus the main module name for interpolation variables). Names change exactly when the styles change, when a binding is renamed (the cosmetic `-label` suffix only), or when the ppx `--minify` flag differs between the builds you're comparing. Dev and prod names differ only by that label suffix; the hash is identical.
+They shouldn't have, unless something real changed: hashes are content-addressed from the CSS text (plus the main module name for interpolation variables). A class name changes exactly when the declaration it came from changes - renaming a binding has no effect on it, and dev and prod builds mint the identical class name (`--minify` only strips CSS whitespace).
 
 ## Can I extract the CSS for only part of my project?
 
