@@ -233,7 +233,7 @@ Either the binding doesn't exist, or its file wasn't passed to the rule: extend 
 Error: cross-library [%css] selector references are not supported.
 The reference `Foreign.thing` resolves to module `Foreign` which is not
 part of the current library. Move the [%css] binding into the current
-library, or inline the class chain literally.
+library.
 ```
 
 Selector references can't cross dune library boundaries. Co-locate the coupled styles in one library, and see [class references in selectors](/reference/selectors#class-references-in-selectors).
