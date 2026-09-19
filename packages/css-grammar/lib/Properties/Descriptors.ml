@@ -46,6 +46,33 @@ module Property_page =
 
 let property_page : property_page Rule.rule = Property_page.rule
 
+(* css-fonts-5 @font-face metric-override descriptors (#580). No dedicated
+   runtime module: descriptors inside at-rule bodies are validated only,
+   the source text passes through unchanged. *)
+module Property_ascent_override =
+  [%spec_module
+  "'normal' | <percentage>", (module Css_types.Cascading)]
+
+let property_ascent_override = Property_ascent_override.rule
+
+module Property_descent_override =
+  [%spec_module
+  "'normal' | <percentage>", (module Css_types.Cascading)]
+
+let property_descent_override = Property_descent_override.rule
+
+module Property_line_gap_override =
+  [%spec_module
+  "'normal' | <percentage>", (module Css_types.Cascading)]
+
+let property_line_gap_override = Property_line_gap_override.rule
+
+module Property_size_adjust =
+  [%spec_module
+  "<percentage>", (module Css_types.Cascading)]
+
+let property_size_adjust = Property_size_adjust.rule
+
 (* Additional modern properties *)
 
 let entries : (kind * packed_rule) list =
@@ -57,4 +84,9 @@ let entries : (kind * packed_rule) list =
     Property "unicode-range", pack_module (module Property_unicode_range);
     Property "bleed", pack_module (module Property_bleed);
     Property "marks", pack_module (module Property_marks);
+    Property "ascent-override", pack_module (module Property_ascent_override);
+    Property "descent-override", pack_module (module Property_descent_override);
+    ( Property "line-gap-override",
+      pack_module (module Property_line_gap_override) );
+    Property "size-adjust", pack_module (module Property_size_adjust);
   ]
