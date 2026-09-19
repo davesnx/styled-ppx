@@ -197,6 +197,50 @@ let nth_error_tests_data =
   |> error_test_cases;
 
 let declaration_ast_tests = [
+  test_case(
+    "declaration parses signed-fraction dimension without crashing", `Quick, () => {
+    switch (
+      Driver.parse_declaration(
+        ~source_position_start,
+        "transition:opacity .3s ease -.1s;",
+      )
+    ) {
+    | Ok({
+        value:
+          (
+            [
+              (Ast.Ident("opacity"), _),
+              (Ast.Whitespace, _),
+              (
+                Ast.Dimension({
+                  value: positive_value,
+                  unit: "s",
+                  kind: Ast.Dimension_time(Ast.Time_unit_s),
+                }),
+                _,
+              ),
+              (Ast.Whitespace, _),
+              (Ast.Ident("ease"), _),
+              (Ast.Whitespace, _),
+              (
+                Ast.Dimension({
+                  value: negative_value,
+                  unit: "s",
+                  kind: Ast.Dimension_time(Ast.Time_unit_s),
+                }),
+                _,
+              ),
+            ],
+            _,
+          ),
+        _,
+      }) =>
+      check(bool, "preserves .3s", true, positive_value == 0.3);
+      check(bool, "preserves -.1s", true, negative_value == (-0.1));
+    | Ok(_) => fail("unexpected declaration AST shape")
+    | Error((_, msg)) => fail("expected declaration parse success: " ++ msg)
+    }
+  }),
   test_case("declaration preserves id-like hash kind", `Quick, () => {
     switch (Driver.parse_declaration(~source_position_start, "color:#abc;")) {
     | Ok({ value: ([(Ast.Hash((value, kind)), _)], _), _ }) =>

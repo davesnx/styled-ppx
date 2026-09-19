@@ -255,7 +255,10 @@ let check_if_three_codepoints_would_start_an_identifier =
 let check_if_three_code_points_would_start_a_number =
   check(check_if_three_code_points_would_start_a_number);
 
-// TODO: floats in OCaml are compatible with numbers in CSS?
+// `repr` is always built by `consume_number` from the CSS number grammar
+// (an optional sign, digits, an optional ".", digits fraction, an optional
+// exponent) below, which is also valid `float_of_string` syntax, so this
+// conversion cannot fail for any `repr` that function produces.
 let convert_string_to_number = str => float_of_string(str);
 
 let skip_whitespace_and_comments = lexbuf =>
@@ -264,29 +267,59 @@ let skip_whitespace_and_comments = lexbuf =>
   | _ => ()
   };
 
-// TODO: check 5. without the 0 or .5 without the 0
+// https://www.w3.org/TR/css-syntax-3/#consume-a-number
+// Sign and digits are two separate, independently-optional steps (spec
+// steps 3 and 4): a sign is not required to be followed by a digit, since
+// it can instead be followed directly by a fraction (e.g. "-.5"). Consuming
+// them as one combined "sign then Plus(digit)" pattern -- as this used
+// to -- left the sign unconsumed whenever no digit followed it, so the
+// later "." + Plus(digit) fraction match then failed too (the sign was in
+// the way), and `repr` stayed empty.
 let consume_number = lexbuf => {
   let append = repr => repr ++ lexeme(lexbuf);
 
-  let kind = `Integer; // 1
+  let kind = `Integer; // 1 - 2
   let repr = "";
   let repr =
     switch%sedlex (lexbuf) {
-    | (Opt("+" | "-"), Plus(digit)) => append(repr)
+    | "+"
+    | "-" => append(repr)
     | _ => repr
-    }; // 2 - 3
+    }; // 3
+  let repr =
+    switch%sedlex (lexbuf) {
+    | Star(digit) => append(repr)
+    | _ => repr
+    }; // 4
   let (kind, repr) =
     switch%sedlex (lexbuf) {
     | (".", Plus(digit)) => (`Number, append(repr))
     | _ => (kind, repr)
-    }; // 4
+    }; // 5
   let (kind, repr) =
     switch%sedlex (lexbuf) {
     | ('E' | 'e', Opt('+' | '-'), Plus(digit)) => (`Number, append(repr))
     | _ => (kind, repr)
-    }; // 5
-  let value = convert_string_to_number(repr); // 6
-  (value, kind); // 7
+    }; // 6
+  // `repr` can only be empty here if this function was entered without the
+  // lexbuf positioned at a valid number start. Every call site (the "+",
+  // "-", and "." branches of `consume_token`, and the bare `digit` branch)
+  // checks that first, so this is an internal-invariant guard, not a
+  // reachable CSS input: a genuinely malformed number is still consumed
+  // above (e.g. a lone "-" never reaches `consume_number` at all, since
+  // `starts_a_number` rejects it beforehand).
+  if (repr == "") {
+    let (start_pos, curr_pos) = Sedlexing.lexing_positions(lexbuf);
+    raise(
+      LexingError((
+        start_pos,
+        curr_pos,
+        "Unknown failure while lexing a number. This case should be unreachable",
+      )),
+    );
+  };
+  let value = convert_string_to_number(repr); // 7
+  (value, kind); // 8
 };
 
 // https://drafts.csswg.org/css-syntax-3/#consume-url-token
