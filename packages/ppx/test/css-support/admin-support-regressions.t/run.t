@@ -76,12 +76,12 @@ This test captures the admin-support cx2 regressions from the monorepo: border-s
   
   let _borderTop =
     CSS.make(
-      "cid-k0smpx css-11h9vd4-_borderTop",
+      "cx-_borderTop cid-k0smpx css-11h9vd4",
       [("--line-17j5in5", CSS.Types.Color.toString(Color.Border.line))],
     );
   let _borderBottom =
     CSS.make(
-      "cid-4yz5wd css-epkb5g-_borderBottom",
+      "cx-_borderBottom cid-4yz5wd css-epkb5g",
       [
         (
           "--lineAlpha-1tmd8aq",
@@ -91,7 +91,7 @@ This test captures the admin-support cx2 regressions from the monorepo: border-s
     );
   let _borderLeft =
     CSS.make(
-      "cid-1w7n6a9 css-ob4w3j-_borderLeft",
+      "cx-_borderLeft cid-1w7n6a9 css-ob4w3j",
       [
         (
           "--lineAlpha-k1tpqj",
@@ -102,7 +102,7 @@ This test captures the admin-support cx2 regressions from the monorepo: border-s
   
   let _boxShadow1 =
     CSS.make(
-      "cid-114a8u4 css-1070dz6-_boxShadow1",
+      "cx-_boxShadow1 cid-114a8u4 css-1070dz6",
       [
         (
           "--deprecated__elevation1-1jpikyl",
@@ -113,7 +113,7 @@ This test captures the admin-support cx2 regressions from the monorepo: border-s
   
   let _heightPlus =
     CSS.make(
-      "cid-11xytn2 css-1y8ttxg-_heightPlus",
+      "cx-_heightPlus cid-11xytn2 css-1y8ttxg",
       [("--topMenuHeight-10ob2p1", CSS.Types.Length.toString(topMenuHeight))],
     );
 

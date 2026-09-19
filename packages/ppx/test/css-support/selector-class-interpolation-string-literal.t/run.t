@@ -14,13 +14,13 @@ only indexes [%css] class handles.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-59bkuc-wrapper.external-marker{color:blue;}"];
-  [@css.bindings [("Input.wrapper", "cid-4f6ye3", "css-59bkuc-wrapper")]];
+  [@css ".css-59bkuc.external-marker{color:blue;}"];
+  [@css.bindings [("Input.wrapper", "cid-4f6ye3", "css-59bkuc")]];
   module Css = {
     let marker = "external-marker";
   };
   
-  let wrapper = CSS.make("cid-4f6ye3 css-59bkuc-wrapper", []);
+  let wrapper = CSS.make("cx-wrapper cid-4f6ye3 css-59bkuc", []);
   
   let _ = (Css.marker, wrapper);
 

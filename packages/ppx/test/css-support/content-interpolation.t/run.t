@@ -31,7 +31,7 @@ counter().
   .css-ffxo1r{content:var(--counterSpace-jvqeh9);}
   .css-e7wury{content:var(--counterRoman-16oxrf4);}
   .css-16jow5p{content:var(--bracketed-1vvjf8x);}
-  .css-8nx65k-getListItemDecorationContent{content:var(--content_value-jr2773);}
+  .css-8nx65k{content:var(--content_value-jr2773);}
   .css-ymi9m2{content:counter(var(--myCounterName-dew6fb), lower-alpha);}
   .css-1hqoizr{content:counter(chapter, var(--myCounterStyle-o4ly7x));}
   .css-1uqb9bz{content:counter(var(--myCounterName-1re0z52), var(--myCounterStyle-1lfdsp0));}

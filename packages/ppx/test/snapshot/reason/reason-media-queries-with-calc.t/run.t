@@ -1,20 +1,10 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css
-    "@media (min-width: calc(2px + 1px)) {.css-1gk5m2e-MediaQueryCalc{color:red;}}"
-  ];
-  [@css
-    "@media (min-width: calc(1000px - 2%)) {.css-d1l0w0-MediaQueryCalc{color:red;}}"
-  ];
+  [@css "@media (min-width: calc(2px + 1px)) {.css-1gk5m2e{color:red;}}"];
+  [@css "@media (min-width: calc(1000px - 2%)) {.css-d1l0w0{color:red;}}"];
   [@css.bindings
-    [
-      (
-        "Output.MediaQueryCalc",
-        "cid-1mcoche",
-        "css-1gk5m2e-MediaQueryCalc css-d1l0w0-MediaQueryCalc",
-      ),
-    ]
+    [("Output.MediaQueryCalc", "cid-1mcoche", "css-1gk5m2e css-d1l0w0")]
   ];
   module MediaQueryCalc = {
     [@deriving abstract]
@@ -999,11 +989,7 @@
       "Reflect.deleteProperty";
     external assign2: (Js.t({..}), makeProps, Js.t({..})) => Js.t({..}) =
       "Object.assign";
-    let styles =
-      CSS.make(
-        "cid-1mcoche css-1gk5m2e-MediaQueryCalc css-d1l0w0-MediaQueryCalc",
-        [],
-      );
+    let styles = CSS.make("cid-1mcoche css-1gk5m2e css-d1l0w0", []);
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(classNameGet(props))
       and style = snd(styles);

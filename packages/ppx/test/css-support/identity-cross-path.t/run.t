@@ -21,6 +21,6 @@ file. The identity is namespaced on the compilation-unit module name
 Both paths mint the same identity:
 
   $ grep "css.bindings" native/Marker.ml
-  [@@@css.bindings [("Marker.marker", "cid-1ja89pc", "css-tokvmb-marker")]]
+  [@@@css.bindings [("Marker.marker", "cid-1ja89pc", "css-tokvmb")]]
   $ grep "css.bindings" js/Marker.ml
-  [@@@css.bindings [("Marker.marker", "cid-1ja89pc", "css-tokvmb-marker")]]
+  [@@@css.bindings [("Marker.marker", "cid-1ja89pc", "css-tokvmb")]]

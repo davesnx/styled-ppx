@@ -1,8 +1,8 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-tokvmb-Box{color:red;}"];
-  [@css.bindings [("Output.Box", "cid-1l8coch", "css-tokvmb-Box")]];
+  [@css ".css-tokvmb{color:red;}"];
+  [@css.bindings [("Output.Box", "cid-1l8coch", "css-tokvmb")]];
   module Box = {
     [@deriving abstract]
     [@warning "-69"]
@@ -986,7 +986,7 @@
       "Reflect.deleteProperty";
     external assign2: (Js.t({..}), makeProps, Js.t({..})) => Js.t({..}) =
       "Object.assign";
-    let styles = CSS.make("cid-1l8coch css-tokvmb-Box", []);
+    let styles = CSS.make("cid-1l8coch css-tokvmb", []);
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(classNameGet(props))
       and style = snd(styles);

@@ -33,15 +33,15 @@ selector-class-interpolation-empty.t for the full end-to-end behavior.
   
   let _ = CSS.make("", []);
   
-  let _a = CSS.make("cid-1quemw0", []);
-  let _a = CSS.make("cid-s7r0d8", []);
-  let _a = CSS.make("cid-g7564k", []);
+  let _a = CSS.make("cx-_a cid-1quemw0", []);
+  let _a = CSS.make("cx-_a cid-s7r0d8", []);
+  let _a = CSS.make("cx-_a cid-g7564k", []);
   
-  let _a = CSS.make("cid-i8v0tw", []);
+  let _a = CSS.make("cx-_a cid-i8v0tw", []);
   
-  let _a = CSS.make("cid-gyvl29", []);
+  let _a = CSS.make("cx-_a cid-gyvl29", []);
   
-  let _a = CSS.make("cid-1gt4t9l", []);
+  let _a = CSS.make("cx-_a cid-1gt4t9l", []);
 
 
 
