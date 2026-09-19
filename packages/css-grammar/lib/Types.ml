@@ -88,6 +88,7 @@ and extended_frequency =
   | `Interpolation of string list
   | `Function_min of calc_sum list
   | `Function_max of calc_sum list
+  | `Function_clamp of calc_sum list
   ]
 
 and extended_time =
@@ -96,6 +97,7 @@ and extended_time =
   | `Interpolation of string list
   | `Function_min of calc_sum list
   | `Function_max of calc_sum list
+  | `Function_clamp of calc_sum list
   ]
 
 and extended_percentage =
@@ -104,6 +106,8 @@ and extended_percentage =
   | `Interpolation of string list
   | `Function_min of calc_sum list
   | `Function_max of calc_sum list
+  | `Function_clamp of calc_sum list
+  | `Function_env of string * (unit * string) option
   ]
 
 and extended_angle =
@@ -112,6 +116,7 @@ and extended_angle =
   | `Interpolation of string list
   | `Function_min of calc_sum list
   | `Function_max of calc_sum list
+  | `Function_clamp of calc_sum list
   ]
 
 and extended_length =
@@ -120,6 +125,8 @@ and extended_length =
   | `Interpolation of string list
   | `Function_min of calc_sum list
   | `Function_max of calc_sum list
+  | `Function_clamp of calc_sum list
+  | `Function_env of string * (unit * string) option
   ]
 
 and calc_sum =
@@ -143,6 +150,7 @@ and extended_time_no_interp =
   | `Function_calc of calc_sum
   | `Function_min of calc_sum list
   | `Function_max of calc_sum list
+  | `Function_clamp of calc_sum list
   ]
 
 and one_bg_size =
@@ -994,7 +1002,7 @@ and function_drop_shadow =
 
 and function_element = id_selector
 and function_ellipse = shape_radius list option * (unit * position) option
-and function_env = string * unit * string option
+and function_env = string * (unit * string) option
 
 and function_fit_content =
   [ `Extended_length of extended_length
