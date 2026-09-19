@@ -31,9 +31,9 @@
 
    The emitted identifier families
    -------------------------------
-     class name   `css-<hash(content)>[-<label>]`          (class_name)
+     class name   `css-<hash(content)>`                    (class_name)
      namespace    `css-<hash(content)>`                    (namespace_of_content)
-                  the label-free identity of an atom; the seed for its vars
+                  identical to the class name; the seed for its vars
      variable     `var-<hash(namespace \0 path \0 type_key)>`   (variable)
      occurrence   `<variable>_<n>` when a name repeats in one declaration
      identity     `cid-<hash(cli_namespace \0 module \0 scope \0 name
@@ -56,9 +56,9 @@
    style.
 
    [class_and_namespace] therefore derives the variable namespace from the
-   atom's *own content* - the same string that backs the class name, with the
-   `-<label>` suffix stripped. That makes every variable a pure function of
-   the declaration content, independent of the binding's label, its sibling
+   atom's *own content* - the same string that backs the class name (the two
+   are now identical). That makes every variable a pure function of the
+   declaration content, independent of the enclosing binding, its sibling
    declarations, the file, and the scope. Identical declarations get identical
    class names AND identical variables everywhere they appear.
 
@@ -103,51 +103,22 @@ let nul_join parts = String.concat "\000" parts
 
 (* -- Class names and the atom namespace -------------------------------- *)
 
-(* The label-free identity of an atom: `css-<hash(content)>`. This is the
-   seed for the atom's interpolation variables, so a variable stays a pure
-   function of the declaration content regardless of the binding's label
-   (see the invariant in the header). *)
+(* The identity of an atom: `css-<hash(content)>`. This is the seed for the
+   atom's interpolation variables, so a variable stays a pure function of the
+   declaration content regardless of the enclosing binding (see the
+   invariant in the header). *)
 let namespace_of_content content = Printf.sprintf "css-%s" (hash content)
 
-(* A CSS identifier admits only `[A-Za-z0-9_-]` (ignoring escapes and
-   non-ASCII). OCaml binding names are wider - notably the trailing prime in
-   idiomatic names like [inputView'] - so embedding the label verbatim can
-   emit an unmatchable selector (`.css-<hash>-inputView'`, where the `'` is an
-   illegal identifier character). We drop every CSS-unsafe character rather
-   than backslash-escape it: the returned string backs BOTH the emitted
-   `.css-...-label{}` selector AND the runtime `className`, and an escape
-   (`'` -> `\'`) would land literally in the `class` attribute while the
-   selector matched the unescaped `'`, so the two would never meet. The label
-   is a purely cosmetic debug suffix, so stripping loses nothing structural. *)
-let css_safe_label name =
-  let buffer = Buffer.create (String.length name) in
-  String.iter
-    (fun c ->
-      match c with
-      | 'A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' | '-' ->
-        Buffer.add_char buffer c
-      | _ -> ())
-    name;
-  Buffer.contents buffer
-
-(* An atom's class name and its namespace, from a single content hash. The
-   class name is `<namespace>-<label>` (or just the namespace for an
-   anonymous binding, or a label that is empty once sanitized); the namespace
-   is label-free on purpose. Returns [(class_name, namespace)]. *)
-let class_and_namespace ?label content =
+(* An atom's class name and its namespace, from a single content hash. Both
+   are now the same string. Kept as a pair because callers pattern-match
+   [(class_name, namespace)] and lower interpolation variables from the
+   namespace half (see the header). *)
+let class_and_namespace content =
   let namespace = namespace_of_content content in
-  let class_name =
-    match label with
-    | Some name ->
-      (match css_safe_label name with
-      | "" -> namespace
-      | safe -> Printf.sprintf "%s-%s" namespace safe)
-    | None -> namespace
-  in
-  class_name, namespace
+  namespace, namespace
 
-(* Just the class name: `css-<hash(content)>[-<label>]`. *)
-let class_name ?label content = fst (class_and_namespace ?label content)
+(* Just the class name: `css-<hash(content)>`. *)
+let class_name content = fst (class_and_namespace content)
 
 (* -- Interpolation variables ------------------------------------------- *)
 

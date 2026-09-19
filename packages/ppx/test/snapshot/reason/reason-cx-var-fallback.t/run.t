@@ -4,20 +4,20 @@ nested `var()`, length values — anything goes inside the fallback slot).
 
   $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
-  [@@@css ".css-51tc9m-plain{color:var(--theme);}"]
-  [@@@css ".css-1c6bdk9-withFallback{color:var(--theme-color, blue);}"]
-  [@@@css ".css-11h5tjf-lengthFallback{margin:var(--gap, 16px);}"]
+  [@@@css ".css-51tc9m{color:var(--theme);}"]
+  [@@@css ".css-1c6bdk9{color:var(--theme-color, blue);}"]
+  [@@@css ".css-11h5tjf{margin:var(--gap, 16px);}"]
   [@@@css
-    ".css-chb3vj-complexFallback{background:var(--bg, linear-gradient(0deg, red, blue));}"]
-  [@@@css ".css-1cn5a9q-nested{color:var(--theme, var(--fallback, red));}"]
+    ".css-chb3vj{background:var(--bg, linear-gradient(0deg, red, blue));}"]
+  [@@@css ".css-1cn5a9q{color:var(--theme, var(--fallback, red));}"]
   [@@@css.bindings
-    [("Input.plain", "cid-10kpmqu", "css-51tc9m-plain");
-    ("Input.withFallback", "cid-asai3x", "css-1c6bdk9-withFallback");
-    ("Input.lengthFallback", "cid-182qjjd", "css-11h5tjf-lengthFallback");
-    ("Input.complexFallback", "cid-sn6ceu", "css-chb3vj-complexFallback");
-    ("Input.nested", "cid-swo4az", "css-1cn5a9q-nested")]]
-  let plain = CSS.make "cid-10kpmqu css-51tc9m-plain" []
-  let withFallback = CSS.make "cid-asai3x css-1c6bdk9-withFallback" []
-  let lengthFallback = CSS.make "cid-182qjjd css-11h5tjf-lengthFallback" []
-  let complexFallback = CSS.make "cid-sn6ceu css-chb3vj-complexFallback" []
-  let nested = CSS.make "cid-swo4az css-1cn5a9q-nested" []
+    [("Input.plain", "cid-10kpmqu", "css-51tc9m");
+    ("Input.withFallback", "cid-asai3x", "css-1c6bdk9");
+    ("Input.lengthFallback", "cid-182qjjd", "css-11h5tjf");
+    ("Input.complexFallback", "cid-sn6ceu", "css-chb3vj");
+    ("Input.nested", "cid-swo4az", "css-1cn5a9q")]]
+  let plain = CSS.make "cx-plain cid-10kpmqu css-51tc9m" []
+  let withFallback = CSS.make "cx-withFallback cid-asai3x css-1c6bdk9" []
+  let lengthFallback = CSS.make "cx-lengthFallback cid-182qjjd css-11h5tjf" []
+  let complexFallback = CSS.make "cx-complexFallback cid-sn6ceu css-chb3vj" []
+  let nested = CSS.make "cx-nested cid-swo4az css-1cn5a9q" []

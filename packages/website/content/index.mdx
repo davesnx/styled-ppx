@@ -50,7 +50,7 @@ All CSS is extracted while your project compiles:
 
 The runtime is minimal: it only carries class names and supplies variable values.
 
-Class names are human-readable in development (`css-<hash>-<binding>`) and minified in production. Read more in [How it works](/how-it-works).
+Class names are content hashes (`css-<hash>`) in every mode; a separate `cx-<binding>` marker class, on by default, makes them greppable in dev tools. Read more in [How it works](/how-it-works).
 
 ## Compose styles as code
 
