@@ -24,26 +24,26 @@ var per (source-path, runtime-type) across base / :hover / @media variants.
   [@css ".css-k008qs{display:flex;}"];
   [@css.bindings
     [
-      ("Output.multiVariant", "css-1kbzua4-multiVariant"),
-      ("Output.mixed", "css-k008qs-mixed css-1upqar2-mixed"),
-      ("Output.twoTypes", "css-e286e6-twoTypes"),
+      ("Output.multiVariant", "cid-1be0zju", "css-1kbzua4-multiVariant"),
+      ("Output.mixed", "cid-11av61d", "css-k008qs-mixed css-1upqar2-mixed"),
+      ("Output.twoTypes", "cid-1ybygzf", "css-e286e6-twoTypes"),
     ]
   ];
   let color = CSS.Types.Color.toString(`hex("3A57FC"));
   let width = CSS.px(10);
   let multiVariant =
     CSS.make(
-      "css-1kbzua4-multiVariant",
+      "cid-1be0zju css-1kbzua4-multiVariant",
       [("--color-3f9mj1", CSS.Types.Color.toString(color))],
     );
   let mixed =
     CSS.make(
-      "css-k008qs-mixed css-1upqar2-mixed",
+      "cid-11av61d css-k008qs-mixed css-1upqar2-mixed",
       [("--color-13vjntp", CSS.Types.Color.toString(color))],
     );
   let twoTypes =
     CSS.make(
-      "css-e286e6-twoTypes",
+      "cid-1ybygzf css-e286e6-twoTypes",
       [
         ("--width-1v9ua", CSS.Types.Width.toString(width)),
         ("--width-c62vcf", CSS.Types.Height.toString(width)),

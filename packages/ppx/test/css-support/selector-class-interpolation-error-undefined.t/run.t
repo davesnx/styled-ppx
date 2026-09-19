@@ -13,9 +13,9 @@ A selector ref can resolve to an earlier string literal binding.
 
   $ dune describe pp ./input.re | sed '1,/^];$/d;/^$/d'
   [@css ".css-1wbqrk2-bad.css-foo{color:red;}"];
-  [@css.bindings [("Input.bad", "css-1wbqrk2-bad")]];
+  [@css.bindings [("Input.bad", "cid-1ztayl", "css-1wbqrk2-bad")]];
   let undefined = "css-foo";
-  let bad = CSS.make("css-1wbqrk2-bad", []);
+  let bad = CSS.make("cid-1ztayl css-1wbqrk2-bad", []);
   let _ = (undefined, bad);
 
   $ dune build

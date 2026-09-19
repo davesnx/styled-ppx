@@ -9,9 +9,9 @@ function args, and other inner expressions stay private.
   [@@@css ".css-tokvmb-inner{color:red;}"]
   [@@@css ".css-ythpkc-make_button{color:var(--active-f7rv17);}"]
   [@@@css.bindings
-    [("Input.outer", "css-tokvmb-inner");
-    ("Input.make_button", "css-ythpkc-make_button")]]
-  let outer = let inner = CSS.make "css-tokvmb-inner" [] in inner
+    [("Input.outer", "cid-1din52f", "css-tokvmb-inner");
+    ("Input.make_button", "cid-1ue7vq2", "css-ythpkc-make_button")]]
+  let outer = let inner = CSS.make "cid-1din52f css-tokvmb-inner" [] in inner
   let make_button active =
-    CSS.make "css-ythpkc-make_button"
+    CSS.make "cid-1ue7vq2 css-ythpkc-make_button"
       [("--active-f7rv17", (CSS.Types.Color.toString active))]

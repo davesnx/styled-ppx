@@ -36,6 +36,10 @@
                   the label-free identity of an atom; the seed for its vars
      variable     `var-<hash(namespace \0 path \0 type_key)>`   (variable)
      occurrence   `<variable>_<n>` when a name repeats in one declaration
+     identity     `cid-<hash(cli_namespace \0 module \0 scope \0 name
+                  [\0 occurrence])>`                     (identity_class)
+                  build-independent handle for a named binding; never a
+                  path or dune library name
      keyframes    `keyframe-<hash(body)>`                  (keyframe_name)
      global key   `global-<hash(rule)>`                    (global_key)
      scoped ns    `<kind> \0 <module> \0 <scope> \0 <hash(rules)>` (scoped_namespace)
@@ -231,3 +235,24 @@ let keyframe_name rendered_body =
 
 (* Dedup key for a single [%styled.global] rule: `global-<hash(rule)>`. *)
 let global_key rendered_rule = Printf.sprintf "global-%s" (hash rendered_rule)
+
+(* The build-independent identity class for a named binding:
+   `cid-<hash(cli_namespace \0 module_name \0 scope \0 name [\0 occurrence])>`.
+   Inputs are deliberately the ones an author writes, never a physical path or
+   dune library name (those differ between native and Melange builds of the
+   same source - see the header note on [module]). [cli_namespace] is the
+   `--namespace` flag value (empty by default), mixed in so two libraries that
+   happen to share a module basename and binding name can still be told apart
+   (see documents/css-extraction.md, "Identity classes"). [module_name] is the
+   compilation-unit module name (as in [scoped_namespace]); [scope] is the
+   enclosing submodule path; [name] is the binding name or `[%styled.<tag>]`
+   module name. [occurrence] is folded into the hash only when greater than 1,
+   so a name seen exactly once keeps a stable identity independent of whether
+   a later occurrence of the same (scope, name) ever appears. *)
+let identity_class ~namespace ~module_name ~scope ~name ~occurrence =
+  let scope_key = String.concat "." scope in
+  let parts = [ namespace; module_name; scope_key; name ] in
+  let parts =
+    if occurrence > 1 then parts @ [ string_of_int occurrence ] else parts
+  in
+  Printf.sprintf "cid-%s" (hash (nul_join parts))

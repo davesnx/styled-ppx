@@ -23,18 +23,23 @@ the diff IS the blast radius.
   [@@@css ".css-1tzeee1-units{opacity:0.5;}"]
   [@@@css ".css-1j744k-withFallback{color:var(--theme, blue);}"]
   [@@@css.bindings
-    [("Input.solid", "css-tokvmb-solid");
-    ("Input.multi", "css-eaeacs-multi css-1ruxp1v-multi css-14ksm7b-multi");
-    ("Input.hovered", "css-1xu3tth-hovered css-1rwx7to-hovered");
-    ("Input.multiSel", "css-1r10myy-multiSel css-ltb45t-multiSel");
-    ("Input.withMedia", "css-14bi921-withMedia");
-    ("Input.units", "css-137pweu-units css-1tzeee1-units");
-    ("Input.withFallback", "css-1j744k-withFallback")]]
-  let solid = CSS.make "css-tokvmb-solid" []
+    [("Input.solid", "cid-ejsl7w", "css-tokvmb-solid");
+    ("Input.multi", "cid-7orjvh",
+      "css-eaeacs-multi css-1ruxp1v-multi css-14ksm7b-multi");
+    ("Input.hovered", "cid-18t9scx", "css-1xu3tth-hovered css-1rwx7to-hovered");
+    ("Input.multiSel", "cid-j5w3l0",
+      "css-1r10myy-multiSel css-ltb45t-multiSel");
+    ("Input.withMedia", "cid-1wbvjdi", "css-14bi921-withMedia");
+    ("Input.units", "cid-4x7ffc", "css-137pweu-units css-1tzeee1-units");
+    ("Input.withFallback", "cid-asai3x", "css-1j744k-withFallback")]]
+  let solid = CSS.make "cid-ejsl7w css-tokvmb-solid" []
   let multi =
-    CSS.make "css-eaeacs-multi css-1ruxp1v-multi css-14ksm7b-multi" []
-  let hovered = CSS.make "css-1xu3tth-hovered css-1rwx7to-hovered" []
-  let multiSel = CSS.make "css-1r10myy-multiSel css-ltb45t-multiSel" []
-  let withMedia = CSS.make "css-14bi921-withMedia" []
-  let units = CSS.make "css-137pweu-units css-1tzeee1-units" []
-  let withFallback = CSS.make "css-1j744k-withFallback" []
+    CSS.make "cid-7orjvh css-eaeacs-multi css-1ruxp1v-multi css-14ksm7b-multi"
+      []
+  let hovered =
+    CSS.make "cid-18t9scx css-1xu3tth-hovered css-1rwx7to-hovered" []
+  let multiSel =
+    CSS.make "cid-j5w3l0 css-1r10myy-multiSel css-ltb45t-multiSel" []
+  let withMedia = CSS.make "cid-1wbvjdi css-14bi921-withMedia" []
+  let units = CSS.make "cid-4x7ffc css-137pweu-units css-1tzeee1-units" []
+  let withFallback = CSS.make "cid-asai3x css-1j744k-withFallback" []

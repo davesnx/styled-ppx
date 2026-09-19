@@ -11,6 +11,7 @@
     [
       (
         "Output.MediaQueryCalc",
+        "cid-1mcoche",
         "css-1gk5m2e-MediaQueryCalc css-d1l0w0-MediaQueryCalc",
       ),
     ]
@@ -999,7 +1000,10 @@
     external assign2: (Js.t({..}), makeProps, Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles =
-      CSS.make("css-1gk5m2e-MediaQueryCalc css-d1l0w0-MediaQueryCalc", []);
+      CSS.make(
+        "cid-1mcoche css-1gk5m2e-MediaQueryCalc css-d1l0w0-MediaQueryCalc",
+        [],
+      );
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(classNameGet(props))
       and style = snd(styles);
