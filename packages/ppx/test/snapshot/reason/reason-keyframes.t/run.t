@@ -1,12 +1,12 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "@keyframes keyframe-c958s{0%{opacity:0 ;}100%{opacity:1 ;}}"];
+  [@css "@keyframes keyframe-m6pt8e{0%{opacity:0;}100%{opacity:1;}}"];
   [@css
     ".css-dy0iev{-webkit-animation-name:var(--animation-1sd4kiq);animation-name:var(--animation-1sd4kiq);}"
   ];
   [@css.bindings [("Output.FadeIn", "cid-18tumag", "css-dy0iev")]];
-  let animation = CSS.Types.AnimationName.make("keyframe-c958s");
+  let animation = CSS.Types.AnimationName.make("keyframe-m6pt8e");
   module FadeIn = {
     [@deriving abstract]
     [@warning "-69"]
