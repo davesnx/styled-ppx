@@ -7,6 +7,7 @@
     [
       (
         "Output.MultiLineStrings",
+        "cid-11ddqpw",
         "css-k008qs-MultiLineStrings css-1tyndxa-MultiLineStrings",
       ),
     ]
@@ -969,7 +970,10 @@
       | None => ""
       };
     let styles =
-      CSS.make("css-k008qs-MultiLineStrings css-1tyndxa-MultiLineStrings", []);
+      CSS.make(
+        "cid-11ddqpw css-k008qs-MultiLineStrings css-1tyndxa-MultiLineStrings",
+        [],
+      );
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(props.className)
       and style = snd(styles);

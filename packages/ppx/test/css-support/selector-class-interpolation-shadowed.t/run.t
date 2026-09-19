@@ -15,17 +15,20 @@ Shadowing follows OCaml semantics: `&.$(foo)` resolves to the second
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css ".css-tokvmb-foo{color:red;}"];
   [@css ".css-14ksm7b-foo{color:blue;}"];
-  [@css ".css-191lhl1-bar.css-14ksm7b-foo{font-weight:bold;}"];
+  [@css ".css-191lhl1-bar.cid-1mvyff1{font-weight:bold;}"];
   [@css.bindings
-    [("Input.foo", "css-14ksm7b-foo"), ("Input.bar", "css-191lhl1-bar")]
+    [
+      ("Input.foo", "cid-1mvyff1", "css-14ksm7b-foo"),
+      ("Input.bar", "cid-1eelq62", "css-191lhl1-bar"),
+    ]
   ];
   
-  let foo = CSS.make("css-tokvmb-foo", []);
+  let foo = CSS.make("cid-zec317 css-tokvmb-foo", []);
   let _ = foo;
   
-  let foo = CSS.make("css-14ksm7b-foo", []);
+  let foo = CSS.make("cid-1mvyff1 css-14ksm7b-foo", []);
   
-  let bar = CSS.make("css-191lhl1-bar", []);
+  let bar = CSS.make("cid-1eelq62 css-191lhl1-bar", []);
   
   let _ = (foo, bar);
 

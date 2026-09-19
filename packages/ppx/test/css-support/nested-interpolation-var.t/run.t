@@ -24,9 +24,9 @@ top-level interpolation does. If the inline list is empty `[]` for the
   [@css ".css-zjac4l-placeholder::placeholder{color:var(--c-gzgct8);}"];
   [@css.bindings
     [
-      ("Input.topLevel", "css-1b5xvk3-topLevel"),
-      ("Input.hover", "css-1orh0hp-hover"),
-      ("Input.placeholder", "css-zjac4l-placeholder"),
+      ("Input.topLevel", "cid-1pfdov9", "css-1b5xvk3-topLevel"),
+      ("Input.hover", "cid-zu568x", "css-1orh0hp-hover"),
+      ("Input.placeholder", "cid-1xk9ylj", "css-zjac4l-placeholder"),
     ]
   ];
   
@@ -34,19 +34,19 @@ top-level interpolation does. If the inline list is empty `[]` for the
   
   let topLevel =
     CSS.make(
-      "css-1b5xvk3-topLevel",
+      "cid-1pfdov9 css-1b5xvk3-topLevel",
       [("--c-dq4mhq", CSS.Types.Color.toString(c))],
     );
   
   let hover =
     CSS.make(
-      "css-1orh0hp-hover",
+      "cid-zu568x css-1orh0hp-hover",
       [("--c-11hlefi", CSS.Types.Color.toString(c))],
     );
   
   let placeholder =
     CSS.make(
-      "css-zjac4l-placeholder",
+      "cid-1xk9ylj css-zjac4l-placeholder",
       [("--c-gzgct8", CSS.Types.Color.toString(c))],
     );
   

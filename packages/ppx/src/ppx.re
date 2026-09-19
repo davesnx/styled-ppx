@@ -139,6 +139,7 @@ let make_bindings_attribute = (entries: list(Css_bindings.entry)) =>
   |> List.map((entry: Css_bindings.entry) =>
        Css_extraction.binding(
          ~longident=entry.longident,
+         ~identity=entry.identity,
          ~class_string=entry.class_string,
        )
      )
@@ -208,12 +209,23 @@ let css_error_expr = (~payload_loc) => {
   );
 };
 
-let record_css_binding = (~file, ~main_module, ~scope, ~name, ~classNames) => {
-  Local_selector_environment.register(~file, ~scope, ~name, ~classNames);
-  let longident = String.concat(".", [main_module, ...scope] @ [name]);
-  let class_string = String.concat(" ", classNames);
-  Css_bindings.record(~longident, ~class_string);
-};
+/* [name] is the registry name (the top-level binding, or the styled module
+   name) - always what cross-module `$(M.name)` refs and the longident use.
+   [identity] is the binding's identity class, computed by `Css_file.push`
+   from the *local* label (which, for a function-local rebinding, differs
+   from [name] - see documents/css-extraction.md's "Css_bindings" section); `None` for
+   an anonymous/`_` local binding, in which case there is nothing to
+   register or index. */
+let record_css_binding =
+    (~file, ~main_module, ~scope, ~name, ~identity, ~atomClasses) =>
+  switch (identity) {
+  | Some(cid) =>
+    Local_selector_environment.register(~file, ~scope, ~name, ~className=cid);
+    let longident = String.concat(".", [main_module, ...scope] @ [name]);
+    let class_string = String.concat(" ", atomClasses);
+    Css_bindings.record(~longident, ~identity=cid, ~class_string);
+  | None => ()
+  };
 
 let expand_css_expression =
     (
@@ -245,18 +257,29 @@ let expand_css_expression =
       let validations = type_check_rule_list(rule_list);
       switch (get_errors(validations)) {
       | [] =>
-        let (classNames, dynamic_vars) =
+        let (identity, atomClasses, dynamic_vars) =
           Css_file.push(
             ~file,
+            ~main_module,
             ~scope,
             ~opens,
             ~source_position_start,
             ~label?,
+            ~name=label_name,
             rule_list,
           );
+        let classNames =
+          Css_file.classes_with_identity(~identity, atomClasses);
         switch (registry_name) {
         | Some(name) =>
-          record_css_binding(~file, ~main_module, ~scope, ~name, ~classNames)
+          record_css_binding(
+            ~file,
+            ~main_module,
+            ~scope,
+            ~name,
+            ~identity,
+            ~atomClasses,
+          )
         | None => ()
         };
         let marker = Dev_mode.marker(label_name);
@@ -496,8 +519,15 @@ let expand_styled_module =
     (~file, ~main_module, ~scope, ~opens, ~name, ~htmlTag, payload) => {
   open Ppxlib;
   File.set(file);
-  let record_component_binding = classNames =>
-    record_css_binding(~file, ~main_module, ~scope, ~name, ~classNames);
+  let record_component_binding = (~identity, atomClasses) =>
+    record_css_binding(
+      ~file,
+      ~main_module,
+      ~scope,
+      ~name,
+      ~identity,
+      ~atomClasses,
+    );
 
   switch (payload.pexp_desc) {
   | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
@@ -515,16 +545,20 @@ let expand_styled_module =
     | Ok(rule_list) =>
       switch (get_errors(type_check_rule_list(rule_list))) {
       | [] =>
-        let (classNames, dynamic_vars) =
+        let (identity, atomClasses, dynamic_vars) =
           Css_file.push(
             ~file,
+            ~main_module,
             ~scope,
             ~opens,
             ~source_position_start,
             ~label=name,
+            ~name=Some(name),
             rule_list,
           );
-        record_component_binding(classNames);
+        let classNames =
+          Css_file.classes_with_identity(~identity, atomClasses);
+        record_component_binding(~identity, atomClasses);
         let styles =
           Css_to_runtime.render_make_call(
             ~loc=stringLoc,
@@ -577,6 +611,7 @@ let expand_styled_module =
     Generate.dynamicExtractedComponent(
       ~loc=payload.pexp_loc,
       ~file,
+      ~main_module,
       ~scope,
       ~opens,
       ~htmlTag,
@@ -604,7 +639,7 @@ let register_string_binding = (~file, ~scope, ~name, expr: Ppxlib.expression) =>
       ~file,
       ~scope,
       ~name,
-      ~classNames=[value],
+      ~className=value,
     )
   | _ => ()
   };
@@ -955,6 +990,12 @@ let () = {
       | "production" => Settings.Update.env(`Production)
       | _ => Settings.Update.env(`Development),
     ),
+  );
+
+  Ppxlib.Driver.add_arg(
+    ~doc=Settings.namespace.doc,
+    Settings.namespace.flag,
+    Arg.String(Settings.Update.namespace),
   );
 
   /* dune passes `--cookie library-name="<name>"` to every ppx run inside a

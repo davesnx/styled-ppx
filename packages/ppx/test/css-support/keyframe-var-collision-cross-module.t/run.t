@@ -35,7 +35,8 @@ class pointing at a missing variable.
   [@@@css
     ".css-14rjjsz-box{-webkit-animation-name:var(--grow-1ugf6s8);animation-name:var(--grow-1ugf6s8);}"]
   [@@@css ".css-k008qs-box{display:flex;}"]
-  [@@@css.bindings [("A.box", "css-14rjjsz-box css-k008qs-box")]]
+  [@@@css.bindings
+    [("A.box", "cid-1v8d5b9", "css-14rjjsz-box css-k008qs-box")]]
   let h0 = `px 0
   let h1 = `px 100
   let grow =
@@ -43,7 +44,7 @@ class pointing at a missing variable.
       ~vars:[("--h0-9tm5yy", (CSS.Types.Height.toString h0));
             ("--h1-mjt56l", (CSS.Types.Height.toString h1))] "keyframe-1h1i3op"
   let box =
-    CSS.make "css-14rjjsz-box css-k008qs-box"
+    CSS.make "cid-1v8d5b9 css-14rjjsz-box css-k008qs-box"
       (CSS.Types.AnimationName.toStyleVars "--grow-1ugf6s8" grow)
   $ cat b.ml
   [@@@css
@@ -51,7 +52,7 @@ class pointing at a missing variable.
   [@@@css
     ".css-14rjjsz-box{-webkit-animation-name:var(--grow-1ugf6s8);animation-name:var(--grow-1ugf6s8);}"]
   [@@@css ".css-hpgf8j-box{padding:8px;}"]
-  [@@@css.bindings [("B.box", "css-14rjjsz-box css-hpgf8j-box")]]
+  [@@@css.bindings [("B.box", "cid-p1cefd", "css-14rjjsz-box css-hpgf8j-box")]]
   let h0 = `px 0
   let h1 = `px 100
   let grow =
@@ -60,7 +61,7 @@ class pointing at a missing variable.
             ("--h1-1oxv8aa", (CSS.Types.Height.toString h1))]
       "keyframe-1arknxa"
   let box =
-    CSS.make "css-14rjjsz-box css-hpgf8j-box"
+    CSS.make "cid-p1cefd css-14rjjsz-box css-hpgf8j-box"
       (CSS.Types.AnimationName.toStyleVars "--grow-1ugf6s8" grow)
   $ styled-ppx.generate a.ml b.ml > styles.css
   $ cat styles.css

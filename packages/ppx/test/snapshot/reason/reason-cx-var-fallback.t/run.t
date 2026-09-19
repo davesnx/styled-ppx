@@ -11,13 +11,13 @@ nested `var()`, length values — anything goes inside the fallback slot).
     ".css-chb3vj-complexFallback{background:var(--bg, linear-gradient(0deg, red, blue));}"]
   [@@@css ".css-1cn5a9q-nested{color:var(--theme, var(--fallback, red));}"]
   [@@@css.bindings
-    [("Input.plain", "css-51tc9m-plain");
-    ("Input.withFallback", "css-1c6bdk9-withFallback");
-    ("Input.lengthFallback", "css-11h5tjf-lengthFallback");
-    ("Input.complexFallback", "css-chb3vj-complexFallback");
-    ("Input.nested", "css-1cn5a9q-nested")]]
-  let plain = CSS.make "css-51tc9m-plain" []
-  let withFallback = CSS.make "css-1c6bdk9-withFallback" []
-  let lengthFallback = CSS.make "css-11h5tjf-lengthFallback" []
-  let complexFallback = CSS.make "css-chb3vj-complexFallback" []
-  let nested = CSS.make "css-1cn5a9q-nested" []
+    [("Input.plain", "cid-10kpmqu", "css-51tc9m-plain");
+    ("Input.withFallback", "cid-asai3x", "css-1c6bdk9-withFallback");
+    ("Input.lengthFallback", "cid-182qjjd", "css-11h5tjf-lengthFallback");
+    ("Input.complexFallback", "cid-sn6ceu", "css-chb3vj-complexFallback");
+    ("Input.nested", "cid-swo4az", "css-1cn5a9q-nested")]]
+  let plain = CSS.make "cid-10kpmqu css-51tc9m-plain" []
+  let withFallback = CSS.make "cid-asai3x css-1c6bdk9-withFallback" []
+  let lengthFallback = CSS.make "cid-182qjjd css-11h5tjf-lengthFallback" []
+  let complexFallback = CSS.make "cid-sn6ceu css-chb3vj-complexFallback" []
+  let nested = CSS.make "cid-swo4az css-1cn5a9q-nested" []

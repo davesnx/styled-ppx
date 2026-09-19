@@ -14,8 +14,8 @@ through the static extraction pipeline. They also register selector bindings so
   .css-149d9vx-Box:hover{color:var(--tone-1ucf2mt);}
   .css-kusjgz-Button{color:var(--color-1a279q8);}
   .css-hpgf8j-Button{padding:8px;}
-  .css-yr9qag-card .css-tokvmb-Box.css-149d9vx-Box{margin:0;}
-  .css-10q7t6m-card .css-kusjgz-Button.css-hpgf8j-Button{display:block;}
+  .css-yr9qag-card .cid-1l8coch{margin:0;}
+  .css-10q7t6m-card .cid-1oex1yr{display:block;}
 
   $ refmt --parse ml --print re output.ml
   [@css "@property --tone-1ucf2mt{syntax:\"*\";inherits:false;}"];

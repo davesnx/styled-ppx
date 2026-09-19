@@ -98,7 +98,7 @@ let a = <div styles=(CSS.merge button danger) />
 let b = <div styles=(CSS.merge danger button) />
 ```
 
-The convention to follow: **define base styles before the styles that override them** within a module. Across modules and across libraries there's no convention to maintain — styled-ppx's `generate` orders a module's rules after every module it depends on, and a library's rules after every library it depends on, automatically. When an override doesn't stick, check definition order within the module first, or run `styled-ppx.generate --log info` to see the resolved library order and each library's module order; the binding labels in class names (`css-<hash>-danger`) show in DevTools exactly which binding each winning declaration came from.
+The convention to follow: **define base styles before the styles that override them** within a module. Across modules and across libraries there's no convention to maintain — styled-ppx's `generate` orders a module's rules after every module it depends on, and a library's rules after every library it depends on, automatically. When an override doesn't stick, check definition order within the module first, or run `styled-ppx.generate --log info` to see the resolved library order and each library's module order; the binding labels in class names (`css-<hash>-danger`) show in DevTools exactly which binding each winning declaration came from. Every named binding also carries its identity class (`cid-<hash>`) - unlike the labeled atom hash, it doesn't change when you edit the declarations, so it's a stable grep target across edits.
 
 ### Patterns
 

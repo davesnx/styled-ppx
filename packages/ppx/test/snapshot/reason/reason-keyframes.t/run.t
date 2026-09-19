@@ -5,7 +5,7 @@
   [@css
     ".css-dy0iev-FadeIn{-webkit-animation-name:var(--animation-1sd4kiq);animation-name:var(--animation-1sd4kiq);}"
   ];
-  [@css.bindings [("Output.FadeIn", "css-dy0iev-FadeIn")]];
+  [@css.bindings [("Output.FadeIn", "cid-18tumag", "css-dy0iev-FadeIn")]];
   let animation = CSS.Types.AnimationName.make("keyframe-c958s");
   module FadeIn = {
     [@deriving abstract]
@@ -992,7 +992,7 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "css-dy0iev-FadeIn",
+        "cid-18tumag css-dy0iev-FadeIn",
         CSS.Types.AnimationName.toStyleVars("--animation-1sd4kiq", animation),
       );
     let make = (props: makeProps) => {

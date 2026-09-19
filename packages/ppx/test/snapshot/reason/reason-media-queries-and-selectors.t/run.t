@@ -11,6 +11,7 @@
     [
       (
         "Output.SelectorsMediaQueries",
+        "cid-36wyir",
         "css-99qt2j-SelectorsMediaQueries css-hxxfxf-SelectorsMediaQueries css-qzw9gh-SelectorsMediaQueries css-z0beaj-SelectorsMediaQueries",
       ),
     ]
@@ -1000,7 +1001,7 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "css-99qt2j-SelectorsMediaQueries css-hxxfxf-SelectorsMediaQueries css-qzw9gh-SelectorsMediaQueries css-z0beaj-SelectorsMediaQueries",
+        "cid-36wyir css-99qt2j-SelectorsMediaQueries css-hxxfxf-SelectorsMediaQueries css-qzw9gh-SelectorsMediaQueries css-z0beaj-SelectorsMediaQueries",
         [],
       );
     let make = (props: makeProps) => {

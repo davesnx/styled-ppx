@@ -10,6 +10,7 @@
     [
       (
         "Output.DynamicComponent",
+        "cid-1hmg1vc",
         "css-fhnx1u-DynamicComponent css-k008qs-DynamicComponent",
       ),
     ]
@@ -973,7 +974,7 @@
       };
     let styles = (~var, ~id, _) =>
       CSS.make(
-        "css-fhnx1u-DynamicComponent css-k008qs-DynamicComponent",
+        "cid-1hmg1vc css-fhnx1u-DynamicComponent css-k008qs-DynamicComponent",
         [
           ("--var-1uix7by", CSS.Types.Color.toString(var)),
           ("--id-1ks2xuv", CSS.Types.Color.toString(id)),

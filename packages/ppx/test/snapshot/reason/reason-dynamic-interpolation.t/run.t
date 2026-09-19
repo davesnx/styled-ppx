@@ -8,6 +8,7 @@
     [
       (
         "Output.DynamicComponent",
+        "cid-1hmg1vc",
         "css-u97bjx-DynamicComponent css-13o7eu2-DynamicComponent",
       ),
     ]
@@ -1001,7 +1002,7 @@
       "Object.assign";
     let styles = (~var, _) =>
       CSS.make(
-        "css-u97bjx-DynamicComponent css-13o7eu2-DynamicComponent",
+        "cid-1hmg1vc css-u97bjx-DynamicComponent css-13o7eu2-DynamicComponent",
         [("--var-17zksex", CSS.Types.Color.toString(var))],
       );
     let make = (props: makeProps('var)) => {

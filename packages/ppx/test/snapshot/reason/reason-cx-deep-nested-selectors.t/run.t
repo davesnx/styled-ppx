@@ -30,19 +30,25 @@ Selectors covered here:
   [@@@css ".css-tokvmb-descendantUnderPseudo{color:red;}"]
   [@@@css ".css-nqbkm2-descendantUnderPseudo:hover .child{color:blue;}"]
   [@@@css.bindings
-    [("Input.single", "css-tokvmb-single css-12qnfjo-single");
-    ("Input.twoLevel", "css-tokvmb-twoLevel css-11jzudz-twoLevel");
-    ("Input.twoLevelPseudoClass",
+    [("Input.single", "cid-1e50cws", "css-tokvmb-single css-12qnfjo-single");
+    ("Input.twoLevel", "cid-8l8452",
+      "css-tokvmb-twoLevel css-11jzudz-twoLevel");
+    ("Input.twoLevelPseudoClass", "cid-1p6ev21",
       "css-tokvmb-twoLevelPseudoClass css-1srf6vm-twoLevelPseudoClass");
-    ("Input.threeLevel", "css-tokvmb-threeLevel css-1tfmvqw-threeLevel");
-    ("Input.descendantUnderPseudo",
+    ("Input.threeLevel", "cid-16hizhg",
+      "css-tokvmb-threeLevel css-1tfmvqw-threeLevel");
+    ("Input.descendantUnderPseudo", "cid-d9y20h",
       "css-tokvmb-descendantUnderPseudo css-nqbkm2-descendantUnderPseudo")]]
-  let single = CSS.make "css-tokvmb-single css-12qnfjo-single" []
-  let twoLevel = CSS.make "css-tokvmb-twoLevel css-11jzudz-twoLevel" []
+  let single = CSS.make "cid-1e50cws css-tokvmb-single css-12qnfjo-single" []
+  let twoLevel =
+    CSS.make "cid-8l8452 css-tokvmb-twoLevel css-11jzudz-twoLevel" []
   let twoLevelPseudoClass =
-    CSS.make "css-tokvmb-twoLevelPseudoClass css-1srf6vm-twoLevelPseudoClass"
+    CSS.make
+      "cid-1p6ev21 css-tokvmb-twoLevelPseudoClass css-1srf6vm-twoLevelPseudoClass"
       []
-  let threeLevel = CSS.make "css-tokvmb-threeLevel css-1tfmvqw-threeLevel" []
+  let threeLevel =
+    CSS.make "cid-16hizhg css-tokvmb-threeLevel css-1tfmvqw-threeLevel" []
   let descendantUnderPseudo =
     CSS.make
-      "css-tokvmb-descendantUnderPseudo css-nqbkm2-descendantUnderPseudo" []
+      "cid-d9y20h css-tokvmb-descendantUnderPseudo css-nqbkm2-descendantUnderPseudo"
+      []
