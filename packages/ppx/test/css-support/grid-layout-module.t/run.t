@@ -191,7 +191,7 @@ If this test fail means that the module is not in sync with the ppx
     ".css-xnwrvq{grid-template-rows:subgrid [sub-a] repeat(auto-fill, [sub-b] [sub-c] [sub-d]) [sub-e] repeat(1, [sub-g]);}"
   ];
   [@css ".css-1rjo398{grid-template-columns:masonry;}"];
-  [@css ".css-9glrzf{grid-template-rows:masonry ;}"];
+  [@css ".css-1fq4vh0{grid-template-rows:masonry;}"];
   [@css ".css-p6owej{masonry-auto-flow:pack;}"];
   [@css ".css-u6wgmu{masonry-auto-flow:next;}"];
   [@css ".css-bjtv39{masonry-auto-flow:definite-first;}"];
@@ -353,7 +353,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-xnwrvq", []);
   
   CSS.make("css-1rjo398", []);
-  CSS.make("css-9glrzf", []);
+  CSS.make("css-1fq4vh0", []);
   CSS.make("css-p6owej", []);
   CSS.make("css-u6wgmu", []);
   CSS.make("css-bjtv39", []);

@@ -41,8 +41,8 @@ If this test fail means that the module is not in sync with the ppx
   [@css "@property --line-1i61so0{syntax:\"*\";inherits:false;}"];
   [@css "@property --line-18cgk19{syntax:\"*\";inherits:false;}"];
   [@css "@property --accent-1w0inj7{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-p27yoa_1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-p27yoa_2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-9kmuhm_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-9kmuhm_2{syntax:\"*\";inherits:false;}"];
   [@css ".css-tjsoaq{transition:all 200ms ease 0ms;}"];
   [@css ".css-9an52v{transition:all 300ms ease-in-out 0ms;}"];
   [@css ".css-9gb0kb{transition:opacity 300ms ease-in-out 0ms;}"];
@@ -106,12 +106,12 @@ If this test fail means that the module is not in sync with the ppx
   [@css
     ".css-fwdrfx{transition:height 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);}"
   ];
-  [@css ".css-qg0an3{box-shadow:inset 1px 0 0 0 transparent  !important;}"];
-  [@css ".css-etybat{box-shadow:1px 0 0 0 black  !important;}"];
+  [@css ".css-t2slgw{box-shadow:inset 1px 0 0 0 transparent !important;}"];
+  [@css ".css-2se9zy{box-shadow:1px 0 0 0 black !important;}"];
   [@css
-    ".css-96uk0n{box-shadow:1px 0 0 0 var(--line-p27yoa_1), inset 0 -1px 0 0 var(--line-p27yoa_2)  !important;}"
+    ".css-1rh80o9{box-shadow:1px 0 0 0 var(--line-9kmuhm_1), inset 0 -1px 0 0 var(--line-9kmuhm_2) !important;}"
   ];
-  [@css ".css-1vsc0qv{transition:transform 0.3s  !important;}"];
+  [@css ".css-keq5th{transition:transform 0.3s !important;}"];
   module Color = {
     module Border = {
       let line = `rgba((0, 0, 0, `num(0.1)));
@@ -277,17 +277,17 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-1ir9788", []);
   CSS.make("css-fwdrfx", []);
   
-  CSS.make("css-qg0an3", []);
-  CSS.make("css-etybat", []);
+  CSS.make("css-t2slgw", []);
+  CSS.make("css-2se9zy", []);
   CSS.make(
-    "css-96uk0n",
+    "css-1rh80o9",
     [
-      ("--line-p27yoa_1", CSS.Types.Color.toString(Color.Border.line)),
-      ("--line-p27yoa_2", CSS.Types.Color.toString(Color.Border.line)),
+      ("--line-9kmuhm_1", CSS.Types.Color.toString(Color.Border.line)),
+      ("--line-9kmuhm_2", CSS.Types.Color.toString(Color.Border.line)),
     ],
   );
   
-  CSS.make("css-1vsc0qv", []);
+  CSS.make("css-keq5th", []);
   
   let _shadow1: CSS.Shadow.box =
     CSS.Shadow.box(~blur=`px(100), `hex("000000"), ~inset=true);
