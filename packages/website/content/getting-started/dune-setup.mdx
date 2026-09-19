@@ -164,9 +164,9 @@ Passed inside `(pps styled-ppx <flags> ...)`:
 | Flag | Effect |
 | --- | --- |
 | `--native` | Generate code for server-reason-react (native/SSR) instead of Melange |
-| `--minify` | Minify the generated CSS and drop the readable `-<label>` suffix from class names (`css-1tyndxa` instead of `css-1tyndxa-layout`) |
-| `--dev` | Add greppable marker classes (`cx-<binding>`) to classNames in development; no effect on the extracted CSS |
-| `--env development\|production` | Preset over the flags above: `development` = `--dev` (markers + readable labels), `production` = `--minify` (no labels, minified CSS) |
+| `--minify` | Minify the generated CSS; class names are unaffected (`css-1tyndxa` either way) and dev markers turn off |
+| `--dev` | Add greppable marker classes (`cx-<binding>`) to classNames; on by default. No effect on the extracted CSS |
+| `--env development\|production` | Preset over the flags above: `development` = `--dev` (markers on), `production` = `--minify` (minified CSS, markers off) |
 | `--debug` | Verbose ppx logging |
 
 <Callout type="default">
@@ -177,9 +177,9 @@ Passed inside `(pps styled-ppx <flags> ...)`:
 
 ## Production setup
 
-For a release build, pass `--env production` to the ppx. It enables `--minify` (drops the `-<label>` suffix, minifies rule bodies), disables `--dev`, and declares the environment in the extraction protocol so `styled-ppx.generate` minifies the final stylesheet on its own. Minification never changes the hashes: `css-1tyndxa-layout` in dev and `css-1tyndxa` in prod are the same atom, so a class seen in production can be looked up in a dev build.
+For a release build, pass `--env production` to the ppx. It enables `--minify` (minifies rule bodies; class names are unaffected), turns the dev markers off, and declares the environment in the extraction protocol so `styled-ppx.generate` minifies the final stylesheet on its own. Class names never change between builds: `css-1tyndxa` is the same atom in dev and in prod, so a class seen in production can be looked up in a dev build.
 
-The label switch lives on the **ppx** because labels are baked into the class names at compile time, in both the `className` your components carry and the extracted CSS. No downstream tool could drop them without desyncing the two.
+The mode switch lives on the **ppx** because the `cx-<binding>` dev marker is baked into the `className` string at compile time. No downstream tool could add or drop it without desyncing the compiled `className` from what a consumer expects to grep for in DevTools.
 
 Dune has no conditional pps flags (variables aren't allowed in `pps` arguments), so the supported pattern is duplicating the library stanza under mutually-exclusive `enabled_if` guards (same fields, different flags):
 

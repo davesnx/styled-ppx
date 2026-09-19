@@ -13,35 +13,35 @@ emitted as a cross-module sentinel.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb-marker{color:red;}"];
-  [@css ".css-3qknr-wrapper.cid-zr2uk1{color:orange;}"];
-  [@css ".css-cb06ec-wrapper.cid-zr2uk1{font-weight:bold;}"];
-  [@css ".css-bjcoli-marker{color:green;}"];
-  [@css ".css-59bkuc-wrapper.cid-11dmi54{color:blue;}"];
+  [@css ".css-tokvmb{color:red;}"];
+  [@css ".css-3qknr.cid-zr2uk1{color:orange;}"];
+  [@css ".css-cb06ec.cid-zr2uk1{font-weight:bold;}"];
+  [@css ".css-bjcoli{color:green;}"];
+  [@css ".css-59bkuc.cid-11dmi54{color:blue;}"];
   [@css.bindings
     [
-      ("Input.Css.marker", "cid-zr2uk1", "css-tokvmb-marker"),
-      ("Input.Css.wrapper", "cid-7sdyhq", "css-3qknr-wrapper"),
-      ("Input.wrapper", "cid-4f6ye3", "css-cb06ec-wrapper"),
-      ("Input.Theme.Css.marker", "cid-11dmi54", "css-bjcoli-marker"),
-      ("Input.Theme.Components.wrapper", "cid-1mhdtfv", "css-59bkuc-wrapper"),
+      ("Input.Css.marker", "cid-zr2uk1", "css-tokvmb"),
+      ("Input.Css.wrapper", "cid-7sdyhq", "css-3qknr"),
+      ("Input.wrapper", "cid-4f6ye3", "css-cb06ec"),
+      ("Input.Theme.Css.marker", "cid-11dmi54", "css-bjcoli"),
+      ("Input.Theme.Components.wrapper", "cid-1mhdtfv", "css-59bkuc"),
     ]
   ];
   module Css = {
-    let marker = CSS.make("cid-zr2uk1 css-tokvmb-marker", []);
+    let marker = CSS.make("cx-marker cid-zr2uk1 css-tokvmb", []);
   
-    let wrapper = CSS.make("cid-7sdyhq css-3qknr-wrapper", []);
+    let wrapper = CSS.make("cx-wrapper cid-7sdyhq css-3qknr", []);
   };
   
-  let wrapper = CSS.make("cid-4f6ye3 css-cb06ec-wrapper", []);
+  let wrapper = CSS.make("cx-wrapper cid-4f6ye3 css-cb06ec", []);
   
   module Theme = {
     module Css = {
-      let marker = CSS.make("cid-11dmi54 css-bjcoli-marker", []);
+      let marker = CSS.make("cx-marker cid-11dmi54 css-bjcoli", []);
     };
   
     module Components = {
-      let wrapper = CSS.make("cid-1mhdtfv css-59bkuc-wrapper", []);
+      let wrapper = CSS.make("cx-wrapper cid-1mhdtfv css-59bkuc", []);
     };
   };
   

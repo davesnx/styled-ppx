@@ -9,41 +9,38 @@ var per (source-path, runtime-type) across base / :hover / @media variants.
   [@css "@property --width-1v9ua{syntax:\"*\";inherits:false;}"];
   [@css "@property --width-c62vcf{syntax:\"*\";inherits:false;}"];
   [@css "@property --color-4uzv5u{syntax:\"*\";inherits:false;}"];
-  [@css ".css-1kbzua4-multiVariant{color:var(--color-3f9mj1);}"];
-  [@css ".css-1kbzua4-multiVariant:hover{color:var(--color-3f9mj1);}"];
-  [@css
-    "@media (max-width: 768px) {.css-1kbzua4-multiVariant{color:var(--color-3f9mj1);}}"
-  ];
-  [@css ".css-k008qs-mixed{display:flex;}"];
-  [@css ".css-1upqar2-mixed{color:var(--color-13vjntp);}"];
-  [@css ".css-1upqar2-mixed:hover{color:var(--color-13vjntp);}"];
-  [@css ".css-e286e6-twoTypes{width:var(--width-1v9ua);}"];
-  [@css ".css-e286e6-twoTypes:hover{height:var(--width-c62vcf);}"];
+  [@css ".css-1kbzua4{color:var(--color-3f9mj1);}"];
+  [@css ".css-1kbzua4:hover{color:var(--color-3f9mj1);}"];
+  [@css "@media (max-width: 768px) {.css-1kbzua4{color:var(--color-3f9mj1);}}"];
+  [@css ".css-k008qs{display:flex;}"];
+  [@css ".css-1upqar2{color:var(--color-13vjntp);}"];
+  [@css ".css-1upqar2:hover{color:var(--color-13vjntp);}"];
+  [@css ".css-e286e6{width:var(--width-1v9ua);}"];
+  [@css ".css-e286e6:hover{height:var(--width-c62vcf);}"];
   [@css ".css-tokvmb{color:red;}"];
   [@css ".css-lfbwy0:hover{color:var(--color-4uzv5u);}"];
-  [@css ".css-k008qs{display:flex;}"];
   [@css.bindings
     [
-      ("Output.multiVariant", "cid-1be0zju", "css-1kbzua4-multiVariant"),
-      ("Output.mixed", "cid-11av61d", "css-k008qs-mixed css-1upqar2-mixed"),
-      ("Output.twoTypes", "cid-1ybygzf", "css-e286e6-twoTypes"),
+      ("Output.multiVariant", "cid-1be0zju", "css-1kbzua4"),
+      ("Output.mixed", "cid-11av61d", "css-k008qs css-1upqar2"),
+      ("Output.twoTypes", "cid-1ybygzf", "css-e286e6"),
     ]
   ];
   let color = CSS.Types.Color.toString(`hex("3A57FC"));
   let width = CSS.px(10);
   let multiVariant =
     CSS.make(
-      "cid-1be0zju css-1kbzua4-multiVariant",
+      "cx-multiVariant cid-1be0zju css-1kbzua4",
       [("--color-3f9mj1", CSS.Types.Color.toString(color))],
     );
   let mixed =
     CSS.make(
-      "cid-11av61d css-k008qs-mixed css-1upqar2-mixed",
+      "cx-mixed cid-11av61d css-k008qs css-1upqar2",
       [("--color-13vjntp", CSS.Types.Color.toString(color))],
     );
   let twoTypes =
     CSS.make(
-      "cid-1ybygzf css-e286e6-twoTypes",
+      "cx-twoTypes cid-1ybygzf css-e286e6",
       [
         ("--width-1v9ua", CSS.Types.Width.toString(width)),
         ("--width-c62vcf", CSS.Types.Height.toString(width)),

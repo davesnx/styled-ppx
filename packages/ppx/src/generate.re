@@ -1127,7 +1127,6 @@ let extractedDynamicStyles =
           ~scope,
           ~opens,
           ~source_position_start,
-          ~label=moduleName,
           ~name=Some(moduleName),
           rule_list,
         );

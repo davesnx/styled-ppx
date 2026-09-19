@@ -1,18 +1,16 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css
-    "@media (min-width: 600px) {.css-99qt2j-SelectorsMediaQueries{background:blue;}}"
-  ];
-  [@css ".css-hxxfxf-SelectorsMediaQueries:hover{background:green;}"];
-  [@css ".css-qzw9gh-SelectorsMediaQueries > p{color:pink;}"];
-  [@css ".css-z0beaj-SelectorsMediaQueries > p{font-size:24px;}"];
+  [@css "@media (min-width: 600px) {.css-99qt2j{background:blue;}}"];
+  [@css ".css-hxxfxf:hover{background:green;}"];
+  [@css ".css-qzw9gh > p{color:pink;}"];
+  [@css ".css-z0beaj > p{font-size:24px;}"];
   [@css.bindings
     [
       (
         "Output.SelectorsMediaQueries",
         "cid-36wyir",
-        "css-99qt2j-SelectorsMediaQueries css-hxxfxf-SelectorsMediaQueries css-qzw9gh-SelectorsMediaQueries css-z0beaj-SelectorsMediaQueries",
+        "css-99qt2j css-hxxfxf css-qzw9gh css-z0beaj",
       ),
     ]
   ];
@@ -1000,10 +998,7 @@
     external assign2: (Js.t({..}), makeProps, Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles =
-      CSS.make(
-        "cid-36wyir css-99qt2j-SelectorsMediaQueries css-hxxfxf-SelectorsMediaQueries css-qzw9gh-SelectorsMediaQueries css-z0beaj-SelectorsMediaQueries",
-        [],
-      );
+      CSS.make("cid-36wyir css-99qt2j css-hxxfxf css-qzw9gh css-z0beaj", []);
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(classNameGet(props))
       and style = snd(styles);
