@@ -444,14 +444,9 @@ module Css_transform = {
     switch (simple) {
     | Variable(path_str, var_loc) =>
       let var_loc = to_file_loc(ctx, var_loc);
-      /* Bare `$(name)` (no `.` prefix) in selector position. We treat it
-         like an implicit class reference and resolve to the first minted
-         className as a `Type` selector if there's exactly one; otherwise
-         this case is ambiguous - fall through to error. We emit a
-         `Type(..)` rather than `Class(..)` because the user wrote no `.`,
-         so the resolved value must serve as the type-selector slot. The
-         caller (`transform_compound_selector`) only places this in the
-         `type_selector` slot, never in `subclass_selectors`. */
+      /* Bare `$(name)` (no `.` prefix) in selector position is treated as
+         an implicit class reference; it must resolve to exactly one class
+         name, otherwise the position is ambiguous. */
       let resolved =
         Local_selector_environment.resolve_selector_class_ref(
           ~file=ctx.file,
@@ -461,7 +456,7 @@ module Css_transform = {
           path_str,
         );
       switch (resolved) {
-      | [single] => Type("." ++ single)
+      | [single] => Subclass(Class(single))
       | _ =>
         Ppxlib.Location.raise_errorf(
           ~loc=var_loc,
