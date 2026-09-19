@@ -1,5 +1,6 @@
 /* When the referenced [%css] binding mints multiple atoms (one per
-   declaration), `.$(binding)` must fan out into a chain `.a.b.c`. */
+   declaration), `.$(binding)` still resolves to ONE class - the
+   binding's identity - regardless of how many atoms it minted. */
 let multi = [%css {|
   display: flex;
   color: red;

@@ -111,85 +111,90 @@ Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
   [@@@css ".css-zwhmn0-mixedCard{box-shadow:var(--shadow-2tj34g);}"]
   [@@@css ".css-1yfkn84-mixedCard{border-radius:12px;}"]
   [@@@css.bindings
-    [("Output.simpleShadow", "css-12b85tv-simpleShadow");
-    ("Output.multipleShadows", "css-bh2iep-multipleShadows");
-    ("Output.insetShadow", "css-1r1fme5-insetShadow");
-    ("Output.noShadow", "css-gokeqi-noShadow");
-    ("Output.spreadShadow", "css-1wp2o9n-spreadShadow");
-    ("Output.simpleBorder", "css-e42auv-simpleBorder");
-    ("Output.borderWithColor", "css-1h02qc1-borderWithColor");
-    ("Output.borderTransparent", "css-kujkge-borderTransparent");
-    ("Output.noBorder", "css-10ganm4-noBorder");
-    ("Output.borderStyles",
+    [("Output.simpleShadow", "cid-1ckmdi6", "css-12b85tv-simpleShadow");
+    ("Output.multipleShadows", "cid-1urhidx", "css-bh2iep-multipleShadows");
+    ("Output.insetShadow", "cid-18o58m4", "css-1r1fme5-insetShadow");
+    ("Output.noShadow", "cid-1u21xrq", "css-gokeqi-noShadow");
+    ("Output.spreadShadow", "cid-8d8vql", "css-1wp2o9n-spreadShadow");
+    ("Output.simpleBorder", "cid-1kct4wz", "css-e42auv-simpleBorder");
+    ("Output.borderWithColor", "cid-tm1wv6", "css-1h02qc1-borderWithColor");
+    ("Output.borderTransparent", "cid-tbotla", "css-kujkge-borderTransparent");
+    ("Output.noBorder", "cid-15bfnai", "css-10ganm4-noBorder");
+    ("Output.borderStyles", "cid-16nbulq",
       "css-iqmzmu-borderStyles css-dw79q1-borderStyles css-9o79gh-borderStyles css-41wvke-borderStyles");
-    ("Output.borderSeparate",
+    ("Output.borderSeparate", "cid-122xr42",
       "css-djq43j-borderSeparate css-xp8w2v-borderSeparate css-1jzkaed-borderSeparate");
-    ("Output.borderWithRadius",
+    ("Output.borderWithRadius", "cid-1j83vme",
       "css-1k7257i-borderWithRadius css-rl6otz-borderWithRadius");
-    ("Output.shadowAndBorder",
+    ("Output.shadowAndBorder", "cid-3k5k4w",
       "css-1465761-shadowAndBorder css-19uwm2g-shadowAndBorder css-1yfkn84-shadowAndBorder");
-    ("Output.cardStyle",
+    ("Output.cardStyle", "cid-1je20li",
       "css-y239qm-cardStyle css-11ixi5p-cardStyle css-1ebezfo-cardStyle");
-    ("Output.buttonBase",
+    ("Output.buttonBase", "cid-9kxo31",
       "css-1bxstvc-buttonBase css-1vuar9w-buttonBase css-rl6otz-buttonBase");
-    ("Output.borderColorInterp", "css-hfzctv-borderColorInterp");
-    ("Output.shadowInterp", "css-9fu3s3-shadowInterp");
-    ("Output.shadowFullInterp", "css-fkjemk-shadowFullInterp");
-    ("Output.borderWidthInterp", "css-11hdrfm-borderWidthInterp");
-    ("Output.mixedCard", "css-zwhmn0-mixedCard css-1yfkn84-mixedCard")]]
-  let simpleShadow = CSS.make "css-12b85tv-simpleShadow" []
-  let multipleShadows = CSS.make "css-bh2iep-multipleShadows" []
-  let insetShadow = CSS.make "css-1r1fme5-insetShadow" []
-  let noShadow = CSS.make "css-gokeqi-noShadow" []
-  let spreadShadow = CSS.make "css-1wp2o9n-spreadShadow" []
-  let simpleBorder = CSS.make "css-e42auv-simpleBorder" []
-  let borderWithColor = CSS.make "css-1h02qc1-borderWithColor" []
-  let borderTransparent = CSS.make "css-kujkge-borderTransparent" []
-  let noBorder = CSS.make "css-10ganm4-noBorder" []
+    ("Output.borderColorInterp", "cid-16k72sd", "css-hfzctv-borderColorInterp");
+    ("Output.shadowInterp", "cid-9zd6fn", "css-9fu3s3-shadowInterp");
+    ("Output.shadowFullInterp", "cid-bg3lpz", "css-fkjemk-shadowFullInterp");
+    ("Output.borderWidthInterp", "cid-1h8tvcz",
+      "css-11hdrfm-borderWidthInterp");
+    ("Output.mixedCard", "cid-10wtrx1",
+      "css-zwhmn0-mixedCard css-1yfkn84-mixedCard")]]
+  let simpleShadow = CSS.make "cid-1ckmdi6 css-12b85tv-simpleShadow" []
+  let multipleShadows = CSS.make "cid-1urhidx css-bh2iep-multipleShadows" []
+  let insetShadow = CSS.make "cid-18o58m4 css-1r1fme5-insetShadow" []
+  let noShadow = CSS.make "cid-1u21xrq css-gokeqi-noShadow" []
+  let spreadShadow = CSS.make "cid-8d8vql css-1wp2o9n-spreadShadow" []
+  let simpleBorder = CSS.make "cid-1kct4wz css-e42auv-simpleBorder" []
+  let borderWithColor = CSS.make "cid-tm1wv6 css-1h02qc1-borderWithColor" []
+  let borderTransparent = CSS.make "cid-tbotla css-kujkge-borderTransparent" []
+  let noBorder = CSS.make "cid-15bfnai css-10ganm4-noBorder" []
   let borderStyles =
     CSS.make
-      "css-iqmzmu-borderStyles css-dw79q1-borderStyles css-9o79gh-borderStyles css-41wvke-borderStyles"
+      "cid-16nbulq css-iqmzmu-borderStyles css-dw79q1-borderStyles css-9o79gh-borderStyles css-41wvke-borderStyles"
       []
   let borderSeparate =
     CSS.make
-      "css-djq43j-borderSeparate css-xp8w2v-borderSeparate css-1jzkaed-borderSeparate"
+      "cid-122xr42 css-djq43j-borderSeparate css-xp8w2v-borderSeparate css-1jzkaed-borderSeparate"
       []
   let borderWithRadius =
-    CSS.make "css-1k7257i-borderWithRadius css-rl6otz-borderWithRadius" []
+    CSS.make
+      "cid-1j83vme css-1k7257i-borderWithRadius css-rl6otz-borderWithRadius" []
   let shadowAndBorder =
     CSS.make
-      "css-1465761-shadowAndBorder css-19uwm2g-shadowAndBorder css-1yfkn84-shadowAndBorder"
+      "cid-3k5k4w css-1465761-shadowAndBorder css-19uwm2g-shadowAndBorder css-1yfkn84-shadowAndBorder"
       []
   let cardStyle =
-    CSS.make "css-y239qm-cardStyle css-11ixi5p-cardStyle css-1ebezfo-cardStyle"
+    CSS.make
+      "cid-1je20li css-y239qm-cardStyle css-11ixi5p-cardStyle css-1ebezfo-cardStyle"
       []
   let buttonBase =
     CSS.make
-      "css-1bxstvc-buttonBase css-1vuar9w-buttonBase css-rl6otz-buttonBase" []
+      "cid-9kxo31 css-1bxstvc-buttonBase css-1vuar9w-buttonBase css-rl6otz-buttonBase"
+      []
   let borderColorInterp borderColor =
-    CSS.make "css-hfzctv-borderColorInterp"
+    CSS.make "cid-16k72sd css-hfzctv-borderColorInterp"
       [("--borderColor-1on39sz", (CSS.Types.Color.toString borderColor))]
   let shadowInterp shadowX =
     fun shadowY ->
       fun blur ->
         fun spread ->
           fun shadowColor ->
-            CSS.make "css-9fu3s3-shadowInterp"
+            CSS.make "cid-9zd6fn css-9fu3s3-shadowInterp"
               [("--shadowX-11ljgmp", (CSS.Types.Length.toString shadowX));
               ("--shadowY-1qn6d0z", (CSS.Types.Length.toString shadowY));
               ("--blur-1bcbjmk", (CSS.Types.Length.toString blur));
               ("--spread-xxpef3", (CSS.Types.Length.toString spread));
               ("--shadowColor-1sod13t", (CSS.Types.Color.toString shadowColor))]
   let shadowFullInterp myShadow =
-    CSS.make "css-fkjemk-shadowFullInterp"
+    CSS.make "cid-bg3lpz css-fkjemk-shadowFullInterp"
       [("--myShadow-af5fmc", (CSS.Types.BoxShadows.toString myShadow))]
   let borderWidthInterp borderWidth =
-    CSS.make "css-11hdrfm-borderWidthInterp"
+    CSS.make "cid-1h8tvcz css-11hdrfm-borderWidthInterp"
       [("--borderWidth-apl5wd", (CSS.Types.LineWidth.toString borderWidth))]
   let mixedCard bgColor =
     fun borderColor ->
       fun shadow ->
-        CSS.make "css-zwhmn0-mixedCard css-1yfkn84-mixedCard"
+        CSS.make "cid-10wtrx1 css-zwhmn0-mixedCard css-1yfkn84-mixedCard"
           [("--bgColor-zk5xjv", (CSS.Types.Color.toString bgColor));
           ("--borderColor-rm89ze", (CSS.Types.Color.toString borderColor));
           ("--shadow-2tj34g", (CSS.Types.BoxShadows.toString shadow))]

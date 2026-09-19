@@ -1,5 +1,6 @@
 type binding = private {
   longident : string;
+  identity : string;
   class_string : string;
 }
 
@@ -32,8 +33,9 @@ val config_env_production : string
 val config_library_key : string
 val sentinel_byte : char
 val sentinel : string -> string
-val class_chain_of_class_string : string -> string
-val binding : longident:string -> class_string:string -> binding
+
+val binding :
+  longident:string -> identity:string -> class_string:string -> binding
 
 val ref_loc :
   longident:string ->
