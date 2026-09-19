@@ -2,10 +2,8 @@
 type token =
   | EOF
   | IDENT(string) // <ident-token>
-  | TYPE_SELECTOR(string) // <type-selector-token>
   | FUNCTION(string) // <function-token>
   | NTH_FUNCTION(string) // <function-token> (nth-*)
-  | AT_KEYWORD(string) // <at-keyword-token>
   | AT_KEYFRAMES(string) // <at-keyframes-token> (non-standard)
   | AT_RULE(string) // <at-rule-token> (non-standard)
   | AT_RULE_STATEMENT(string) // <at-rule-statement-token> (non-standard)
@@ -26,7 +24,6 @@ type token =
   | NUMBER(float) // <number-token>
   | PERCENTAGE(float) // <percentage-token>
   | DIMENSION((float, string)) // <dimension-token>
-  | DESCENDANT_COMBINATOR // whitespace as selector combinator
   | WS // <whitespace-token>
   | COLON // <colon-token>
   | DOUBLE_COLON // <double-colon-token>
@@ -203,10 +200,8 @@ let humanize =
   fun
   | EOF => "the end"
   | IDENT(s) => s
-  | TYPE_SELECTOR(s) => s
   | FUNCTION(fn) => Printf.sprintf("%s(", fn)
   | NTH_FUNCTION(fn) => Printf.sprintf("%s(", fn)
-  | AT_KEYWORD(s) => Printf.sprintf("@%s", s)
   | AT_KEYFRAMES(s) => Printf.sprintf("@%s", s)
   | AT_RULE_STATEMENT(s) => Printf.sprintf("@%s", s)
   | AT_RULE(s) => Printf.sprintf("@%s", s)
@@ -219,7 +214,6 @@ let humanize =
   | NUMBER(n) => float_to_string(n)
   | PERCENTAGE(n) => Printf.sprintf("%s%%", float_to_string(n))
   | DIMENSION((n, d)) => Printf.sprintf("%s%s", float_to_string(n), d)
-  | DESCENDANT_COMBINATOR => " "
   | WS => " "
   | COLON => ":"
   | DOUBLE_COLON => "::"
@@ -248,12 +242,10 @@ let to_debug =
   | COMMA => "COMMA"
   | IMPORTANT => "IMPORTANT"
   | IDENT(s) => Printf.sprintf("IDENT('%s')", s)
-  | TYPE_SELECTOR(s) => Printf.sprintf("TYPE_SELECTOR('%s')", s)
   | STRING(s) => Printf.sprintf("STRING('%s')", s)
   | FUNCTION(fn) => Printf.sprintf("FUNCTION(%s)", fn)
   | NTH_FUNCTION(fn) => Printf.sprintf("NTH_FUNCTION(%s)", fn)
   | URL(u) => Printf.sprintf("URL(%s)", u)
-  | AT_KEYWORD(s) => Printf.sprintf("AT_KEYWORD('%s')", s)
   | AT_KEYFRAMES(s) => Printf.sprintf("AT_KEYFRAMES('%s')", s)
   | AT_RULE_STATEMENT(s) => Printf.sprintf("AT_RULE_STATEMENT('%s')", s)
   | AT_RULE(s) => Printf.sprintf("AT_RULE('%s')", s)
@@ -272,5 +264,4 @@ let to_debug =
   | UNICODE_RANGE(s) => Printf.sprintf("UNICODE_RANGE('%s')", s)
   | INTERPOLATION((v, _)) => Printf.sprintf("INTERPOLATION('%s')", v)
   | DELIM(s) => Printf.sprintf("DELIM('%s')", s)
-  | DESCENDANT_COMBINATOR => "DESCENDANT_COMBINATOR"
   | WS => "WS";
