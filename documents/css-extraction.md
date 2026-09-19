@@ -397,17 +397,36 @@ deduped through `Set.Make(String)`, which sorted by hash-prefixed rule
 text and silently destroyed declaration order (regression test:
 `packages/generate/test/source-order.t`).
 
-The deduplicated list is then written to the output channel. Inter-rule
-newlines are dropped when every contributing input file declared
-`env=production` in its `[@@@css.config ...]` (see the wire protocol
-section above); there is no CLI flag for this.
+Before writing, `@import`, `@namespace`, and statement-form `@layer a, b;`
+rules are hoisted to the front of the deduplicated list as a block,
+keeping their relative order, regardless of which library or module
+emitted them: a browser only honors these rules when they precede every
+other rule, and Order above routinely places the module that emits one
+after modules with plain style rules. Classification is a string test on
+the rendered rule — starts with `@` and has no `{` — since the parser's
+`Render` always keeps a rule with a block on one line too, so absence of
+`{` is what tells a statement apart from `@media (...) { ... }`.
+`@charset` is dropped instead of hoisted: the generated file always opens
+with its own leading comment, so `@charset` can never be the literal
+first bytes of the stylesheet, and the file is written as UTF-8 regardless
+of what a module declares; dropping it is reported as a warning naming
+the input file (`packages/generate/test/statement-at-rules.t`).
+
+The deduplicated (and hoisted) list is then written to the output
+channel. Inter-rule newlines are dropped when every contributing input
+file declared `env=production` in its `[@@@css.config ...]` (see the wire
+protocol section above); there is no CLI flag for this.
 
 ### Cascade layers (opt-in)
 
 `--layers` (default off, and rejected together with `--order source`)
 wraps the deduplicated rule list from above into named CSS cascade
-layers, one per library, instead of one flat list. `@property` and
-`@keyframes` rules are pulled out ahead of every layer, since they are
+layers, one per library, instead of one flat list. Hoisted statement
+at-rules (`@import`/`@namespace`/statement `@layer`) stay ahead of
+everything below, including the registrations, the aggregator's own
+`@layer <lib1>, <lib2>, ...;` statement, and every wrapped block, for the
+same reason they are hoisted in the unlayered case. `@property` and
+`@keyframes` rules are pulled out ahead of every layer next, since they are
 global registrations: a `@property` inside a layer would make the
 registration itself depend on layer order, and a `@keyframes` name is
 looked up by layer order too, so leaving both unlayered avoids surprises.
