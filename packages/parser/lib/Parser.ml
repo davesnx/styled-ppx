@@ -809,25 +809,29 @@ let update_declaration_value_state state (value, _) =
   | Paren_block _ | Bracket_block _ | Delim _ | Selector _ | Unicode_range _ ->
     { state with has_content = true }
 
-(* Leading and trailing whitespace are not part of a declaration's value:
-   `a: b ;`, `a: b }` and `a: b<EOF>` must all yield the same value (and
-   the same rendered CSS and class hash) as `a:b;`. *)
+(* Drop the whitespace at the end of a reversed component-value list and
+   return it in source order with a location that ends at the last kept value;
+   an empty list keeps the zero-width location at [start_pos]. Declaration
+   values and at-rule preludes both exclude their surrounding whitespace, so
+   `a: b ;` and `a:b;`, or `@import url(x) ;` and `@import url(x);`, parse to
+   the same AST and render the same. *)
+let trim_trailing_whitespace start_pos rev_values =
+  let rec drop = function
+    | (Ast.Whitespace, _) :: rest -> drop rest
+    | rev_values -> rev_values
+  in
+  match drop rev_values with
+  | [] -> [], make_loc start_pos start_pos
+  | (_, (last_loc : Ast.loc)) :: _ as rev_values ->
+    List.rev rev_values, make_loc start_pos last_loc.loc_end
+
 let parse_declaration_value_list stream =
   skip_whitespace stream;
   let start_pos = (current_token stream).start_pos in
   let initial_state =
     { has_content = false; top_level_items = 0; ident_like_prefix = false }
   in
-  let rec drop_trailing_whitespace = function
-    | (Ast.Whitespace, _) :: rest -> drop_trailing_whitespace rest
-    | rev_values -> rev_values
-  in
-  let finish rev_values =
-    match drop_trailing_whitespace rev_values with
-    | [] -> [], make_loc start_pos start_pos
-    | (_, (last_loc : Ast.loc)) :: _ as rev_values ->
-      List.rev rev_values, make_loc start_pos last_loc.loc_end
-  in
+  let finish rev_values = trim_trailing_whitespace start_pos rev_values in
   let rec loop acc state =
     match current_tok stream with
     | Tokens.EOF | Tokens.RIGHT_BRACE | Tokens.SEMI_COLON | Tokens.IMPORTANT ->
@@ -979,38 +983,59 @@ and parse_at_rule stream =
       block;
       loc = loc_from_start stream start_pos;
     }
-  | Tokens.AT_RULE_STATEMENT name ->
-    let at_token = advance stream in
-    let prelude, prelude_loc =
-      parse_component_value_list_until stream (fun stream ->
-        current_is stream Tokens.SEMI_COLON)
-    in
-    let _ = expect_token stream Tokens.SEMI_COLON in
-    {
-      name = name, component_loc at_token;
-      prelude = prelude, prelude_loc;
-      block = Empty;
-      loc = loc_from_start stream start_pos;
-    }
   | Tokens.AT_RULE name ->
+    (* CSS Syntax Level 3 "consume an at-rule" (#5.4.2): the prelude runs
+       until the first '{' (block form) or ';' (statement form) at this
+       nesting depth -- nested parens/brackets/functions consume their own
+       matched delimiters recursively in parse_component_value, so neither
+       can appear here unmatched. Dispatch on whichever token stopped the
+       prelude, rather than on the at-rule's name, so a name outside any
+       fixed list (e.g. `@layer`) still gets both forms. *)
     let at_token = advance stream in
     let prelude, prelude_loc =
       parse_component_value_list_until stream (fun stream ->
-        current_is stream Tokens.LEFT_BRACE)
+        current_is stream Tokens.SEMI_COLON
+        || current_is stream Tokens.LEFT_BRACE)
     in
-    let left_brace = expect_token stream Tokens.LEFT_BRACE in
-    let rules =
-      parse_braced_rules stream left_brace (fun stream ->
-        parse_rule_list stream
-          ~stop:(fun stream -> current_is stream Tokens.RIGHT_BRACE)
-          ~parse_one:parse_block_rule ~allow_empty:true)
-    in
-    {
-      name = name, component_loc at_token;
-      prelude = prelude, prelude_loc;
-      block = Stylesheet rules;
-      loc = loc_from_start stream start_pos;
-    }
+    begin match current_tok stream with
+    | Tokens.SEMI_COLON ->
+      let _ = expect_token stream Tokens.SEMI_COLON in
+      (* A statement prelude excludes the whitespace around it, like a
+         declaration value, so `@import  url(x) ;` renders as
+         `@import url(x);`. Block preludes keep theirs: the renderer prints
+         them as before and atom hashes depend on that text. *)
+      let rec drop_leading = function
+        | (Ast.Whitespace, _) :: rest -> drop_leading rest
+        | values -> values
+      in
+      let prelude, prelude_loc =
+        match drop_leading prelude with
+        | [] -> [], prelude_loc
+        | (_, (first_loc : Ast.loc)) :: _ as prelude ->
+          trim_trailing_whitespace first_loc.loc_start (List.rev prelude)
+      in
+      {
+        name = name, component_loc at_token;
+        prelude = prelude, prelude_loc;
+        block = Empty;
+        loc = loc_from_start stream start_pos;
+      }
+    | Tokens.LEFT_BRACE ->
+      let left_brace = expect_token stream Tokens.LEFT_BRACE in
+      let rules =
+        parse_braced_rules stream left_brace (fun stream ->
+          parse_rule_list stream
+            ~stop:(fun stream -> current_is stream Tokens.RIGHT_BRACE)
+            ~parse_one:parse_block_rule ~allow_empty:true)
+      in
+      {
+        name = name, component_loc at_token;
+        prelude = prelude, prelude_loc;
+        block = Stylesheet rules;
+        loc = loc_from_start stream start_pos;
+      }
+    | _ -> raise_parse_error (current_token stream)
+    end
   | _ -> raise_parse_error (current_token stream)
 
 and parse_style_rule stream =
@@ -1033,8 +1058,7 @@ and parse_style_rule stream =
 and parse_block_rule stream =
   skip_whitespace stream;
   match current_tok stream with
-  | Tokens.AT_KEYFRAMES _ | Tokens.AT_RULE _ | Tokens.AT_RULE_STATEMENT _ ->
-    At_rule (parse_at_rule stream)
+  | Tokens.AT_KEYFRAMES _ | Tokens.AT_RULE _ -> At_rule (parse_at_rule stream)
   | Tokens.IDENT _
     when identifier_starts_property stream.tokens (stream.index + 1) ->
     let saved = snapshot stream in
@@ -1053,8 +1077,7 @@ and parse_block_rule stream =
 and parse_stylesheet_rule stream =
   skip_whitespace stream;
   match current_tok stream with
-  | Tokens.AT_KEYFRAMES _ | Tokens.AT_RULE _ | Tokens.AT_RULE_STATEMENT _ ->
-    At_rule (parse_at_rule stream)
+  | Tokens.AT_KEYFRAMES _ | Tokens.AT_RULE _ -> At_rule (parse_at_rule stream)
   | _ -> Style_rule (parse_style_rule stream)
 
 let make_stream input =
