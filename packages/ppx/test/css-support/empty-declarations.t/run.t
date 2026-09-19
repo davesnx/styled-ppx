@@ -26,22 +26,22 @@ selector-class-interpolation-empty.t for the full end-to-end behavior.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css.bindings [("Input._a", "css-0-_a")]];
+  [@css.bindings [("Input._a", "cid-1gt4t9l", "")]];
   CSS.make("", []);
   CSS.make("", []);
   CSS.make("", []);
   
   let _ = CSS.make("", []);
   
-  let _a = CSS.make("css-0-_a", []);
-  let _a = CSS.make("css-0-_a", []);
-  let _a = CSS.make("css-0-_a", []);
+  let _a = CSS.make("cid-1quemw0", []);
+  let _a = CSS.make("cid-s7r0d8", []);
+  let _a = CSS.make("cid-g7564k", []);
   
-  let _a = CSS.make("css-0-_a", []);
+  let _a = CSS.make("cid-i8v0tw", []);
   
-  let _a = CSS.make("css-0-_a", []);
+  let _a = CSS.make("cid-gyvl29", []);
   
-  let _a = CSS.make("css-0-_a", []);
+  let _a = CSS.make("cid-1gt4t9l", []);
 
 
 

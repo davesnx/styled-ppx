@@ -9,18 +9,20 @@
     Two-pass design:
 
     Pass 1 — Collect every [[\@\@\@css.bindings ...]] attribute payload into a
-    global index mapping [longident -> class_string]. The PPX itself populates
-    these payloads with the fully-qualified longident ([["M.Css.marker"]]) and
-    the space-separated class names it minted, so the generator only has to read
-    them — it does not re-derive module names from filenames or pattern-match
-    [CSS.make] calls.
+    global index mapping [longident -> identity]. The PPX itself populates these
+    payloads with the fully-qualified longident ([["M.Css.marker"]]), the
+    binding's build-independent identity class (a `cid-...` handle, see
+    [Hash_class.identity_class] in the PPX), and its atomized class string (kept
+    only as a content fingerprint for collision detection — see [Index]), so the
+    generator only has to read them — it does not re-derive module names from
+    filenames or pattern-match [CSS.make] calls.
 
     Pass 2 — For each rule string in [[\@\@\@css ...]], scan for NUL-delimited
     sentinels [\x00LONGIDENT\x00]. Look the longident up in the index and
-    substitute its class chain (multi-class bindings produce a dot-chain like
-    [cssA.cssB], a valid CSS compound selector). Resolution failures emit a hard
-    error pointing at the original [.re]/[.ml] source via the location
-    descriptors in [[\@\@\@css.refs ...]] attributes.
+    substitute its identity class verbatim (one class, regardless of how many
+    atoms the binding minted). Resolution failures emit a hard error pointing at
+    the original [.re]/[.ml] source via the location descriptors in
+    [[\@\@\@css.refs ...]] attributes.
 
     See [documents/cross-module-selector-interpolation.md]. *)
 
@@ -72,23 +74,62 @@ let longident_head longident =
   | [] -> longident
 
 (** Global index of [%css] bindings, populated from [[\@\@\@css.bindings ...]]
-    attribute payloads. Keyed by the dotted longident exactly as users write it
-    in their [%css] selector refs (e.g. [["M.Css.marker"]]) so resolution is a
-    direct [Hashtbl.find_opt]. *)
+    attribute payloads. [by_longident] is keyed by the dotted longident exactly
+    as users write it in their [%css] selector refs (e.g. [["M.Css.marker"]]),
+    mapping to the binding's identity class, so resolution is a direct
+    [Hashtbl.find_opt]. [by_identity] is the reverse index used only to detect
+    an identity collision: two different bindings whose identity classes
+    coincide (e.g. same module basename and binding name in two libraries,
+    without a distinguishing [--namespace]) but whose atomized content differs.
+    Two entries with the SAME identity and the SAME [class_string] are not a
+    collision — that's the same module compiled twice (native + melange
+    [copy_files], vendoring), which is expected and benign. *)
 module Index = struct
-  type t = (string, string) Hashtbl.t
+  type t = {
+    by_longident : (string, string) Hashtbl.t;
+    by_identity : (string, string * string * string) Hashtbl.t;
+      (** identity -> (longident, class_string, filename) of the first entry
+          seen for that identity. *)
+  }
 
-  let create () : t = Hashtbl.create 64
+  let create () : t =
+    { by_longident = Hashtbl.create 64; by_identity = Hashtbl.create 64 }
 
-  let add_from_payload (idx : t) payload =
+  let lookup (idx : t) longident = Hashtbl.find_opt idx.by_longident longident
+
+  let collision_message ~filename (entry : Css_extraction.binding)
+    ~other:(other_longident, other_class_string, other_filename) =
+    Printf.sprintf
+      "identity collision: %S (in %s) and %S (in %s) both hash to identity %s, \
+       but carry different CSS (%S vs %S). Pass `--namespace <name>` to one \
+       library's (pps styled-ppx ...) stanza, identically on its native and \
+       melange stanzas."
+      other_longident other_filename entry.longident filename entry.identity
+      other_class_string entry.class_string
+
+  let add_from_payload ~filename (idx : t) payload =
     match Css_extraction.decode_bindings_payload payload with
     | Error msg -> Error msg
     | Ok entries ->
-      List.iter
-        (fun (entry : Css_extraction.binding) ->
-          Hashtbl.replace idx entry.longident entry.class_string)
-        entries;
-      Ok ()
+      let errors =
+        List.filter_map
+          (fun (entry : Css_extraction.binding) ->
+            let error =
+              match Hashtbl.find_opt idx.by_identity entry.identity with
+              | Some ((_, other_class_string, _) as other)
+                when other_class_string <> entry.class_string ->
+                Some (collision_message ~filename entry ~other)
+              | _ -> None
+            in
+            Hashtbl.replace idx.by_identity entry.identity
+              (entry.longident, entry.class_string, filename);
+            Hashtbl.replace idx.by_longident entry.longident entry.identity;
+            error)
+          entries
+      in
+      (match errors with
+      | [] -> Ok ()
+      | msgs -> Error (String.concat "; " msgs))
 end
 
 (** Every
@@ -153,7 +194,7 @@ let harvest_structure ~filename ~idx ~order structure : harvest =
         | Ok entries -> refs := entries @ !refs
         | Error msg -> add_protocol_error Css_extraction.refs_attribute_name msg)
       | [%stri [@@@css.bindings [%e? value]]] ->
-        (match Index.add_from_payload idx value with
+        (match Index.add_from_payload ~filename idx value with
         | Ok () -> ()
         | Error msg ->
           add_protocol_error Css_extraction.bindings_attribute_name msg)
@@ -254,8 +295,7 @@ let cross_library_message ~longident ~head ~ref_loc =
     "%s\n\
      Error: cross-library [%%css] selector references are not supported.\n\
      The reference `%s` resolves to module `%s` which is not part of the\n\
-     current library. Move the [%%css] binding into the current library, or\n\
-     inline the class chain literally."
+     current library. Move the [%%css] binding into the current library."
     (format_location ref_loc) longident head
 
 let unresolved_message ~longident ~ref_loc ~in_library_modules =
@@ -609,7 +649,7 @@ let run ~output_file ~order ~layers input_files =
               :: !errors
           in
           let resolved =
-            Css_extraction.resolve_sentinels ~lookup:(Hashtbl.find_opt idx)
+            Css_extraction.resolve_sentinels ~lookup:(Index.lookup idx)
               ~on_unresolved:on_error ~on_malformed rule
           in
           resolved_rules := (resolved, harvest_layer) :: !resolved_rules)

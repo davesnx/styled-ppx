@@ -14,6 +14,7 @@
     [
       (
         "Output.StringInterpolation",
+        "cid-1n1bal7",
         "css-1oz3n15-StringInterpolation css-13o7eu2-StringInterpolation",
       ),
     ]
@@ -1010,7 +1011,7 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "css-1oz3n15-StringInterpolation css-13o7eu2-StringInterpolation",
+        "cid-1n1bal7 css-1oz3n15-StringInterpolation css-13o7eu2-StringInterpolation",
         [
           ("--var-16tzllb", CSS.Types.Color.toString(Theme.var)),
           ("--black-11zsw44", CSS.Types.Color.toString(black)),

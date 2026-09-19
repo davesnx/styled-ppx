@@ -5,8 +5,8 @@ we don't want to silently succeed, so we emit a dedicated cross-library
 error message.
 
   $ cat > a.ml <<EOF
-  > [@@@css.bindings [("A.local", "css-local")]]
-  > let local = CSS.make "css-local" []
+  > [@@@css.bindings [("A.local", "cid-local", "css-local")]]
+  > let local = CSS.make "cid-local css-local" []
   > EOF
 
   $ cat > b.ml <<EOF
@@ -19,6 +19,5 @@ error message.
   styled-ppx: File "src/b.re", line 3, characters 4-21:
   Error: cross-library [%css] selector references are not supported.
   The reference `Foreign.lib.thing` resolves to module `Foreign` which is not part of the
-  current library. Move the [%css] binding into the current library, or
-  inline the class chain literally.
+  current library. Move the [%css] binding into the current library.
   [1]
