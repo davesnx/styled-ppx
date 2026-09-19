@@ -676,3 +676,25 @@ Multiple selectors
   >  }
   > EOF
   .classname{margin-right:20px;}.classname:hover .languageIcon{opacity:1;}.classname:hover svg > path{fill:#333;}.classname .menuOpened .languageIcon{opacity:1;}.classname .menuOpened svg > path{fill:#333;}
+
+Escaped identifiers are re-escaped on render, not printed as the decoded
+character. Before this fix, `.\31 a` (class "1a") rendered as the invalid
+`.1a`, and `.a\.b` (one class literally named "a.b") rendered as `.a.b` —
+two classes, changing what the selector matches with no error at all.
+`\2d 1a` is an alternate spelling of `-1a`; both normalize the same way. A
+non-ASCII identifier such as "héllo" is left untouched.
+  $ cat << "EOF" | ./Render_test.exe
+  > .\31 a { color: red; }
+  > .-\31 a { color: red; }
+  > #\31 a { color: red; }
+  > .a\.b { color: red; }
+  > .foo\:bar { color: red; }
+  > .a\/b { color: red; }
+  > .foo\ bar { color: red; }
+  > .héllo { color: red; }
+  > .foo:not(.a\.b) { color: red; }
+  > .\- { color: red; }
+  > .\2d 1a { color: red; }
+  > --custom\ prop: red;
+  > EOF
+  --custom\ prop:red;.\31 a{color:red;}.-\31 a{color:red;}#\31 a{color:red;}.a\.b{color:red;}.foo\:bar{color:red;}.a\/b{color:red;}.foo\ bar{color:red;}.héllo{color:red;}.foo:not(.a\.b){color:red;}.\-{color:red;}.-\31 a{color:red;}

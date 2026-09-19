@@ -1,3 +1,45 @@
+/* https://drafts.csswg.org/cssom/#serialize-an-identifier
+   `consume_identifier` (Lexer.re) decodes CSS escapes while reading an
+   identifier and keeps no record that one was there, so this re-escapes
+   whatever needs it on the way back out. A NUL-containing string passes
+   through untouched: real decoded CSS never contains one (a hex escape to
+   code point 0 errors instead), so it can only be `Cross_module_refs.sentinel`,
+   which must reach the generated CSS byte-for-byte for the aggregator to find. */
+let serialize_identifier = ident =>
+  if (String.contains(ident, '\000')) {
+    ident;
+  } else {
+    let len = String.length(ident);
+    let buf = Buffer.create(len);
+    let is_digit = c => c >= '0' && c <= '9';
+    let is_alnum = c =>
+      is_digit(c) || c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
+    let escape_as_code_point = c =>
+      Buffer.add_string(buf, Printf.sprintf("\\%x ", Char.code(c)));
+    let escape_char = c => {
+      Buffer.add_char(buf, '\\');
+      Buffer.add_char(buf, c);
+    };
+    for (i in 0 to len - 1) {
+      let c = ident.[i];
+      let code = Char.code(c);
+      if (code >= 1 && code <= 0x1f || code == 0x7f) {
+        escape_as_code_point(c);
+      } else if (is_digit(c) && i == 0) {
+        escape_as_code_point(c);
+      } else if (is_digit(c) && i == 1 && ident.[0] == '-') {
+        escape_as_code_point(c);
+      } else if (c == '-' && len == 1) {
+        escape_char(c);
+      } else if (code >= 0x80 || c == '-' || c == '_' || is_alnum(c)) {
+        Buffer.add_char(buf, c);
+      } else {
+        escape_char(c);
+      };
+    };
+    Buffer.contents(buf);
+  };
+
 let rec strip_leading_whitespace = (ast: Ast.component_value_list) =>
   switch (ast) {
   | [] => []
@@ -73,7 +115,7 @@ and rule_list = (rule_list: Ast.rule_list) => {
 and declaration = ({ name, value, important, _ }: Ast.declaration) => {
   Printf.sprintf(
     "%s:%s%s;",
-    name |> fst,
+    name |> fst |> serialize_identifier,
     value |> fst |> component_value_list,
     important |> fst ? " !important" : "",
   );
@@ -89,14 +131,14 @@ and selector = (ast: Ast.selector) => {
     fun
     | Ast.Universal => "*"
     | Ampersand => "&"
-    | Type(v) => v
+    | Type(v) => serialize_identifier(v)
     | Subclass(v) => render_subclass_selector(v)
     | Variable(v, _) => variable(v)
     | Percentage(p) => Tokens.float_to_string(p) ++ "%"
   and render_subclass_selector: Ast.subclass_selector => string =
     fun
-    | Ast.Id(v) => Printf.sprintf("#%s", v)
-    | Class(v) => Printf.sprintf(".%s", v)
+    | Ast.Id(v) => Printf.sprintf("#%s", serialize_identifier(v))
+    | Class(v) => Printf.sprintf(".%s", serialize_identifier(v))
     | Attribute(attr) => Printf.sprintf("[%s]", render_attribute(attr))
     | Pseudo_class(psc) => render_pseudo_selector(psc)
     | ClassVariable(v, _) => "." ++ variable(v)
@@ -110,12 +152,14 @@ and selector = (ast: Ast.selector) => {
     | Attr_substring => "*="
   and render_attribute =
     fun
-    | Ast.Attr_value(v) => v
+    | Ast.Attr_value(v) => serialize_identifier(v)
     | To_equal({ name, kind, value }) =>
-      name ++ render_attr_matcher(kind) ++ render_attr_value(value)
+      serialize_identifier(name)
+      ++ render_attr_matcher(kind)
+      ++ render_attr_value(value)
   and render_attr_value =
     fun
-    | Ast.Attr_ident(i) => i
+    | Ast.Attr_ident(i) => serialize_identifier(i)
     | Attr_string(str) => Tokens.serialize_string(str)
   and render_nth =
     fun
@@ -147,14 +191,14 @@ and selector = (ast: Ast.selector) => {
       v |> List.map(render_complex_selector) |> String.concat(", ")
   and render_pseudo_class =
     fun
-    | Ast.PseudoIdent(i) => ":" ++ i
+    | Ast.PseudoIdent(i) => ":" ++ serialize_identifier(i)
     | Function({ name, payload: (sl, _) }) =>
       ":" ++ name ++ "(" ++ selector_list(sl) ++ ")"
     | NthFunction({ name, payload: (selector, _) }) =>
       ":" ++ name ++ "(" ++ render_nth_payload(selector) ++ ")"
   and render_pseudo_selector =
     fun
-    | Ast.Pseudoelement(v) => "::" ++ v
+    | Ast.Pseudoelement(v) => "::" ++ serialize_identifier(v)
     | Pseudoclass(pc) => render_pseudo_class(pc)
   and render_compound_selector = (compound_selector: Ast.compound_selector) => {
     let simple_selector =
@@ -231,7 +275,7 @@ and component_value = (ast: Ast.component_value) => {
   | Paren_block(block) => "(" ++ component_value_list(block) ++ ")"
   | Bracket_block(block) => "[" ++ component_value_list(block) ++ "]"
   | Percentage(value) => Tokens.float_to_string(value) ++ "%"
-  | Ident(string) => string
+  | Ident(string) => serialize_identifier(string)
   | String(string) => Tokens.serialize_string(string)
   | Uri(string) => Tokens.serialize_uri(string)
   | Delim(value) => delimiter(value)

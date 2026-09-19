@@ -436,13 +436,8 @@ module Css_transform = {
     switch (simple) {
     | Variable(path_str, var_loc) =>
       let var_loc = to_file_loc(ctx, var_loc);
-      /* Bare `$(name)` (no `.` prefix) in selector position. We treat it
-         like an implicit class reference and resolve to the referenced
-         binding's identity class. We emit a `Type(..)` rather than
-         `Class(..)` because the user wrote no `.`, so the resolved value
-         must serve as the type-selector slot. The caller
-         (`transform_compound_selector`) only places this in the
-         `type_selector` slot, never in `subclass_selectors`. */
+      /* Bare `$(name)` (no `.` prefix) in selector position is treated as
+         an implicit class reference to the binding's identity class. */
       let resolved =
         Local_selector_environment.resolve_selector_class_ref(
           ~file=ctx.file,
@@ -451,7 +446,7 @@ module Css_transform = {
           ~loc=var_loc,
           path_str,
         );
-      Type("." ++ resolved);
+      Subclass(Class(resolved));
     | _ => simple
     };
   }
