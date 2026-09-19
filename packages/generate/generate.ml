@@ -295,8 +295,7 @@ let cross_library_message ~longident ~head ~ref_loc =
     "%s\n\
      Error: cross-library [%%css] selector references are not supported.\n\
      The reference `%s` resolves to module `%s` which is not part of the\n\
-     current library. Move the [%%css] binding into the current library, or\n\
-     inline the class chain literally."
+     current library. Move the [%%css] binding into the current library."
     (format_location ref_loc) longident head
 
 let unresolved_message ~longident ~ref_loc ~in_library_modules =
