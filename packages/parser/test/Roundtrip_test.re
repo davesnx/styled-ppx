@@ -253,6 +253,19 @@ let corpus = [
   ("attribute selector with matcher", "a[href^=\"https\"] { color: red; }"),
   ("pseudo-element", "&::before { content: \"x\"; }"),
   (
+    ":nth-child(An+B of S) selector",
+    "&:nth-child(2n+1 of .x) { color: red; }",
+  ),
+  (
+    ":nth-last-child(An+B of S) with a selector list",
+    "&:nth-last-child(odd of .x, .y) { color: red; }",
+  ),
+  ("functional pseudo-element", "&::part(foo) { color: red; }"),
+  (
+    "functional pseudo-element with class payload",
+    "&::slotted(.bar) { color: red; }",
+  ),
+  (
     "unsigned and signed leading-dot numbers",
     "opacity: .5;\nmargin: -.5px;\nline-height: 1e3;",
   ),

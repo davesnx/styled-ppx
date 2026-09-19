@@ -387,7 +387,11 @@ let classify_nth_suffix function_name (token : token_with_location) suffix =
     Nth_suffix_n_dash_digits
       (nth_int_of_digits function_name token (String.sub suffix 2 (length - 2)))
 
-let parse_nth_payload ~function_name stream =
+(* [parse_selector_list] parses the Selectors-4 "of S" complex-selector-list;
+   it lives in the mutually recursive selector-parsing group further down
+   this file, so the caller passes it in rather than this function joining
+   that group. *)
+let parse_nth_payload ~function_name ~parse_selector_list stream =
   skip_whitespace stream;
   let parse_after_n a suffix =
     match suffix with
@@ -448,7 +452,17 @@ let parse_nth_payload ~function_name stream =
     | _ -> raise_parse_error (current_token stream)
   in
   skip_whitespace stream;
-  payload
+  match payload with
+  | Ast.Nth nth_value ->
+    begin match current_tok stream with
+    | Tokens.IDENT ident when String.lowercase_ascii ident = "of" ->
+      let _ = advance stream in
+      skip_whitespace stream;
+      Ast.NthSelector
+        { nth = nth_value; selectors = parse_selector_list stream }
+    | _ -> payload
+    end
+  | Ast.NthSelector _ -> payload
 
 let rec parse_component_value stream =
   let start_pos = (current_token stream).start_pos in
@@ -641,7 +655,10 @@ and parse_pseudo_class_selector stream =
   | Tokens.NTH_FUNCTION name ->
     let start_pos = (current_token stream).start_pos in
     let _ = advance stream in
-    let payload = parse_nth_payload ~function_name:name stream in
+    let payload =
+      parse_nth_payload ~function_name:name
+        ~parse_selector_list:parse_complex_selector_list stream
+    in
     let payload_loc = make_loc start_pos stream.last_end_pos in
     let _ = expect_token stream Tokens.RIGHT_PAREN in
     Pseudoclass
@@ -651,8 +668,21 @@ and parse_pseudo_class_selector stream =
 
 and parse_pseudo_element_selector stream =
   let _ = expect_token stream Tokens.DOUBLE_COLON in
-  let name = parse_selector_ident stream in
-  Pseudoelement name
+  match current_tok stream with
+  | Tokens.FUNCTION name ->
+    let start_pos = (current_token stream).start_pos in
+    let _ = advance stream in
+    let selectors, payload_loc = parse_relative_selector_list stream in
+    let _ = expect_token stream Tokens.RIGHT_PAREN in
+    let payload_loc =
+      match selectors with
+      | [] -> make_loc start_pos start_pos
+      | _ -> payload_loc
+    in
+    PseudoelementFunction { name; payload = selectors, payload_loc }
+  | _ ->
+    let name = parse_selector_ident stream in
+    Pseudoelement name
 
 and parse_pseudo_list stream =
   let first = parse_pseudo_element_selector stream in
@@ -764,6 +794,27 @@ and parse_selector_list_with stream parse_one =
   loop []
 
 and parse_selector_list stream = parse_selector_list_with stream parse_selector
+
+(* Selectors-4 "of S" in `:nth-child(An+B of S)`: a plain
+   complex-selector-list, without per-item locations, matching
+   Ast.nth_payload's NthSelector shape. Not built on parse_selector_list_with:
+   that helper is monomorphic within this recursive group (already
+   instantiated at `selector` by parse_selector_list/parse_relative_selector_list),
+   so a `complex_selector` list needs its own comma loop. *)
+and parse_complex_selector_list stream =
+  skip_whitespace stream;
+  let rec loop acc =
+    let item = parse_complex_selector stream in
+    skip_whitespace stream;
+    let acc = item :: acc in
+    match current_tok stream with
+    | Tokens.COMMA ->
+      let _ = advance stream in
+      skip_whitespace stream;
+      loop acc
+    | _ -> List.rev acc
+  in
+  loop []
 
 and parse_relative_selector stream =
   skip_whitespace stream;
