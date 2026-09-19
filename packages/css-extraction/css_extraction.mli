@@ -18,14 +18,14 @@ val refs_attribute_name : string
 
 (** [[@@@css.config [(key, value); ...]]] carries PPX-side settings that the
     aggregator must honor. Keys today: {!config_env_key} — the PPX emits
-    [("env", "production")] when it runs in production mode (labels dropped, CSS
-    minified), and the aggregator minifies its output accordingly; and
-    {!config_library_key} — the PPX emits [("library", name)] when dune passed
-    it a `library-name` cookie (set on `(library ...)` stanzas), which the
-    aggregator uses to group and order rules by owning library. The attribute is
-    omitted entirely when no key applies (development, no library cookie), so
-    absence means development. Unknown keys are ignored by the aggregator
-    (forward compatibility). *)
+    [("env", "production")] when it runs in production mode (CSS whitespace
+    minified, dev markers off), and the aggregator minifies its output
+    accordingly; and {!config_library_key} — the PPX emits [("library", name)]
+    when dune passed it a `library-name` cookie (set on `(library ...)`
+    stanzas), which the aggregator uses to group and order rules by owning
+    library. The attribute is omitted entirely when no key applies (development,
+    no library cookie), so absence means development. Unknown keys are ignored
+    by the aggregator (forward compatibility). *)
 val config_attribute_name : string
 
 val config_env_key : string

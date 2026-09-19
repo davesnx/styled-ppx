@@ -2,9 +2,9 @@
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css ".cid-16nw107{color:red;}"];
-  [@css ".css-nk32ej-card{padding:10px;}"];
-  [@css.bindings [("Output.card", "cid-16nw107", "css-nk32ej-card")]];
-  let card = CSS.make("cid-16nw107 css-nk32ej-card", []);
+  [@css ".css-nk32ej{padding:10px;}"];
+  [@css.bindings [("Output.card", "cid-16nw107", "css-nk32ej")]];
+  let card = CSS.make("cx-card cid-16nw107 css-nk32ej", []);
   module Globals = {
     let to_string = () => "";
     [@warning "-27-32"]

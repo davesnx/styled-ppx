@@ -5,16 +5,16 @@
   [@css ".cid-16nw107{background:var(--bg-1rdts9a);}"];
   [@css ".cid-1iojcla.cid-16nw107{color:white;}"];
   [@css ".container .cid-16nw107{color:var(--bg-raax3p);}"];
-  [@css ".css-nk32ej-card{padding:10px;}"];
-  [@css ".css-b7rhyr-active{border:1px solid;}"];
+  [@css ".css-nk32ej{padding:10px;}"];
+  [@css ".css-b7rhyr{border:1px solid;}"];
   [@css.bindings
     [
-      ("Output.card", "cid-16nw107", "css-nk32ej-card"),
-      ("Output.active", "cid-1iojcla", "css-b7rhyr-active"),
+      ("Output.card", "cid-16nw107", "css-nk32ej"),
+      ("Output.active", "cid-1iojcla", "css-b7rhyr"),
     ]
   ];
-  let card = CSS.make("cid-16nw107 css-nk32ej-card", []);
-  let active = CSS.make("cid-1iojcla css-b7rhyr-active", []);
+  let card = CSS.make("cx-card cid-16nw107 css-nk32ej", []);
+  let active = CSS.make("cx-active cid-1iojcla css-b7rhyr", []);
   let bg = CSS.red;
   module CardGlobals = {
     let to_string = () =>
