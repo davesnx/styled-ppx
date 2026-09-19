@@ -24,7 +24,7 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-11bssim{stroke-width:25%;}"];
   [@css ".css-16f3u6b{stroke-linecap:butt;}"];
   [@css ".css-1me96vv{stroke-linecap:round;}"];
-  [@css ".css-hs62tc{stroke-linecap:square ;}"];
+  [@css ".css-1j4dlez{stroke-linecap:square;}"];
   [@css ".css-8vbou6{stroke-linejoin:miter;}"];
   [@css ".css-1t1cl19{stroke-linejoin:bevel;}"];
   [@css ".css-8mzojx{stroke-linejoin:round;}"];
@@ -42,7 +42,7 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.make("css-16f3u6b", []);
   CSS.make("css-1me96vv", []);
-  CSS.make("css-hs62tc", []);
+  CSS.make("css-1j4dlez", []);
   
   CSS.make("css-8vbou6", []);
   CSS.make("css-1t1cl19", []);

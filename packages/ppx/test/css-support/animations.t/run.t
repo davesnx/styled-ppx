@@ -15,7 +15,7 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "@keyframes keyframe-c958s{0%{opacity:0 ;}100%{opacity:1 ;}}"];
+  [@css "@keyframes keyframe-m6pt8e{0%{opacity:0;}100%{opacity:1;}}"];
   [@css ".css-13g9u50{-webkit-animation-name:random;animation-name:random;}"];
   [@css
     ".css-1b4du2s{-webkit-animation-name:foo, bar;animation-name:foo, bar;}"
@@ -142,7 +142,7 @@ If this test fail means that the module is not in sync with the ppx
     ".css-1e29gym{-webkit-animation:a 300ms linear 400ms infinite reverse forwards running;animation:a 300ms linear 400ms infinite reverse forwards running;}"
   ];
   [@css
-    "@keyframes keyframe-1muclhj{0%{height:var(--previous-j37xwe) ;}100%{height:var(--current-1t6n3q3) ;}}"
+    "@keyframes keyframe-kuv9ix{0%{height:var(--previous-135wur0);}100%{height:var(--current-18ewl8i);}}"
   ];
   [@css
     ".css-1h7bkao{-webkit-animation-name:var(--resize-1jz21hk);animation-name:var(--resize-1jz21hk);}"
@@ -150,8 +150,8 @@ If this test fail means that the module is not in sync with the ppx
   [@css
     ".css-1bi7afk{-webkit-animation:var(--resize-1aiquq7) 180ms ease-out 0s 1 normal both;animation:var(--resize-1aiquq7) 180ms ease-out 0s 1 normal both;}"
   ];
-  let foo = CSS.Types.AnimationName.make("keyframe-c958s");
-  let bar = CSS.Types.AnimationName.make("keyframe-c958s");
+  let foo = CSS.Types.AnimationName.make("keyframe-m6pt8e");
+  let bar = CSS.Types.AnimationName.make("keyframe-m6pt8e");
   
   CSS.make("css-13g9u50", []);
   CSS.make("css-1b4du2s", []);
@@ -213,10 +213,10 @@ If this test fail means that the module is not in sync with the ppx
   let resize =
     CSS.Types.AnimationName.make(
       ~vars=[
-        ("--previous-j37xwe", CSS.Types.Height.toString(previous)),
-        ("--current-1t6n3q3", CSS.Types.Height.toString(current)),
+        ("--previous-135wur0", CSS.Types.Height.toString(previous)),
+        ("--current-18ewl8i", CSS.Types.Height.toString(current)),
       ],
-      "keyframe-1muclhj",
+      "keyframe-kuv9ix",
     );
   
   CSS.make(

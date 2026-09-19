@@ -18,13 +18,13 @@ If this test fail means that the module is not in sync with the ppx
   [@css "@property --elevation1-xawwdw_1{syntax:\"*\";inherits:false;}"];
   [@css "@property --elevation1-xawwdw_2{syntax:\"*\";inherits:false;}"];
   [@css "@property --elevation1-xawwdw_3{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-udj66h_1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-udj66h_2{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-udj66h_3{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-139ljoj_1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-139ljoj_2{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-139ljoj_3{syntax:\"*\";inherits:false;}"];
-  [@css "@property --color-139ljoj_4{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-vcr1i_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-vcr1i_2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-vcr1i_3{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-pys9ag_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-pys9ag_2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-pys9ag_3{syntax:\"*\";inherits:false;}"];
+  [@css "@property --color-pys9ag_4{syntax:\"*\";inherits:false;}"];
   [@css "@property --boxDark-17ffdav{syntax:\"*\";inherits:false;}"];
   [@css ".css-1eddbzm{background-repeat:space;}"];
   [@css ".css-kbwgys{background-repeat:round;}"];
@@ -290,10 +290,10 @@ If this test fail means that the module is not in sync with the ppx
     ".css-e4fmes{background-image:linear-gradient(45deg, blue, red), linear-gradient(red -50px, white calc(-25px + 50%), blue 100%), linear-gradient(45deg, blue, red);}"
   ];
   [@css
-    ".css-rv0dwh{background-image:linear-gradient(45deg, var(--color-udj66h_1) 25%, transparent 0%, transparent 50%, var(--color-udj66h_2) 0%, var(--color-udj66h_3) 75%, transparent 0%, transparent 100% ) ;}"
+    ".css-1vt38s1{background-image:linear-gradient(45deg, var(--color-vcr1i_1) 25%, transparent 0%, transparent 50%, var(--color-vcr1i_2) 0%, var(--color-vcr1i_3) 75%, transparent 0%, transparent 100% );}"
   ];
   [@css
-    ".css-1x2lx26{background-image:repeating-linear-gradient( 45deg, var(--color-139ljoj_1) 0px, var(--color-139ljoj_2) 4px, var(--color-139ljoj_3) 5px, var(--color-139ljoj_4) 9px ) ;}"
+    ".css-1q2tv7y{background-image:repeating-linear-gradient( 45deg, var(--color-pys9ag_1) 0px, var(--color-pys9ag_2) 4px, var(--color-pys9ag_3) 5px, var(--color-pys9ag_4) 9px );}"
   ];
   [@css
     ".css-1mgigxz{background-image:linear-gradient(45deg, var(--boxDark-17ffdav) 25%, transparent 25%), linear-gradient(red -50px, white calc(-25px + 50%), blue 100%), linear-gradient(45deg, blue, red);}"
@@ -353,24 +353,24 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-1rldqt2{background-position:bottom 10px right;}"];
   [@css ".css-24z38j{background-position:bottom 10px right 20px;}"];
   [@css ".css-1h2n9c9{background-position:0 0, center;}"];
-  [@css ".css-n81h4k{object-position:top ;}"];
-  [@css ".css-7fkzlz{object-position:bottom ;}"];
-  [@css ".css-ymgga3{object-position:left ;}"];
-  [@css ".css-1w8iwfs{object-position:right ;}"];
-  [@css ".css-19v17nb{object-position:center ;}"];
-  [@css ".css-18x56gd{object-position:25% 75% ;}"];
-  [@css ".css-b4h1sw{object-position:25% ;}"];
-  [@css ".css-16v4000{object-position:0 0 ;}"];
-  [@css ".css-kz9n4e{object-position:1cm 2cm ;}"];
-  [@css ".css-14d8bq0{object-position:10ch 8em ;}"];
-  [@css ".css-uvxj01{object-position:bottom 10px right 20px ;}"];
-  [@css ".css-o5jbis{object-position:right 3em bottom 10px ;}"];
-  [@css ".css-xhzfzt{object-position:top 0 right 10px ;}"];
-  [@css ".css-1l3159e{object-position:inherit ;}"];
-  [@css ".css-4m3t5s{object-position:initial ;}"];
-  [@css ".css-1j5c605{object-position:revert ;}"];
-  [@css ".css-2a3742{object-position:revert-layer ;}"];
-  [@css ".css-6lnld3{object-position:unset ;}"];
+  [@css ".css-1czqhry{object-position:top;}"];
+  [@css ".css-18au2x3{object-position:bottom;}"];
+  [@css ".css-eex73u{object-position:left;}"];
+  [@css ".css-xicm6t{object-position:right;}"];
+  [@css ".css-1xolpb4{object-position:center;}"];
+  [@css ".css-1aih0g1{object-position:25% 75%;}"];
+  [@css ".css-1whlnwd{object-position:25%;}"];
+  [@css ".css-1iq0ddq{object-position:0 0;}"];
+  [@css ".css-1dwopaa{object-position:1cm 2cm;}"];
+  [@css ".css-13renxt{object-position:10ch 8em;}"];
+  [@css ".css-1qease9{object-position:bottom 10px right 20px;}"];
+  [@css ".css-m3ana2{object-position:right 3em bottom 10px;}"];
+  [@css ".css-1us11ag{object-position:top 0 right 10px;}"];
+  [@css ".css-plhhjc{object-position:inherit;}"];
+  [@css ".css-13qj4w6{object-position:initial;}"];
+  [@css ".css-286ns1{object-position:revert;}"];
+  [@css ".css-jujpx4{object-position:revert-layer;}"];
+  [@css ".css-b54k9o{object-position:unset;}"];
   [@css
     "@keyframes keyframe-1b5h4ts{0%{background-position:0 0;}100%{background-position:1rem 0;}}"
   ];
@@ -656,20 +656,20 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-e4fmes", []);
   let color = `hex("333");
   CSS.make(
-    "css-rv0dwh",
+    "css-1vt38s1",
     [
-      ("--color-udj66h_1", CSS.Types.Color.toString(color)),
-      ("--color-udj66h_2", CSS.Types.Color.toString(color)),
-      ("--color-udj66h_3", CSS.Types.Color.toString(color)),
+      ("--color-vcr1i_1", CSS.Types.Color.toString(color)),
+      ("--color-vcr1i_2", CSS.Types.Color.toString(color)),
+      ("--color-vcr1i_3", CSS.Types.Color.toString(color)),
     ],
   );
   CSS.make(
-    "css-1x2lx26",
+    "css-1q2tv7y",
     [
-      ("--color-139ljoj_1", CSS.Types.Color.toString(color)),
-      ("--color-139ljoj_2", CSS.Types.Color.toString(color)),
-      ("--color-139ljoj_3", CSS.Types.Color.toString(color)),
-      ("--color-139ljoj_4", CSS.Types.Color.toString(color)),
+      ("--color-pys9ag_1", CSS.Types.Color.toString(color)),
+      ("--color-pys9ag_2", CSS.Types.Color.toString(color)),
+      ("--color-pys9ag_3", CSS.Types.Color.toString(color)),
+      ("--color-pys9ag_4", CSS.Types.Color.toString(color)),
     ],
   );
   
@@ -722,27 +722,27 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-24z38j", []);
   CSS.make("css-1h2n9c9", []);
   
-  CSS.make("css-n81h4k", []);
-  CSS.make("css-7fkzlz", []);
-  CSS.make("css-ymgga3", []);
-  CSS.make("css-1w8iwfs", []);
-  CSS.make("css-19v17nb", []);
+  CSS.make("css-1czqhry", []);
+  CSS.make("css-18au2x3", []);
+  CSS.make("css-eex73u", []);
+  CSS.make("css-xicm6t", []);
+  CSS.make("css-1xolpb4", []);
   
-  CSS.make("css-18x56gd", []);
-  CSS.make("css-b4h1sw", []);
+  CSS.make("css-1aih0g1", []);
+  CSS.make("css-1whlnwd", []);
   
-  CSS.make("css-16v4000", []);
-  CSS.make("css-kz9n4e", []);
-  CSS.make("css-14d8bq0", []);
+  CSS.make("css-1iq0ddq", []);
+  CSS.make("css-1dwopaa", []);
+  CSS.make("css-13renxt", []);
   
-  CSS.make("css-uvxj01", []);
-  CSS.make("css-o5jbis", []);
-  CSS.make("css-xhzfzt", []);
+  CSS.make("css-1qease9", []);
+  CSS.make("css-m3ana2", []);
+  CSS.make("css-1us11ag", []);
   
-  CSS.make("css-1l3159e", []);
-  CSS.make("css-4m3t5s", []);
-  CSS.make("css-1j5c605", []);
-  CSS.make("css-2a3742", []);
-  CSS.make("css-6lnld3", []);
+  CSS.make("css-plhhjc", []);
+  CSS.make("css-13qj4w6", []);
+  CSS.make("css-286ns1", []);
+  CSS.make("css-jujpx4", []);
+  CSS.make("css-b54k9o", []);
   
   let _loadingKeyframes = CSS.Types.AnimationName.make("keyframe-1b5h4ts");
