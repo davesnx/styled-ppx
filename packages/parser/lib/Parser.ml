@@ -965,38 +965,45 @@ and parse_at_rule stream =
       block;
       loc = loc_from_start stream start_pos;
     }
-  | Tokens.AT_RULE_STATEMENT name ->
-    let at_token = advance stream in
-    let prelude, prelude_loc =
-      parse_component_value_list_until stream (fun stream ->
-        current_is stream Tokens.SEMI_COLON)
-    in
-    let _ = expect_token stream Tokens.SEMI_COLON in
-    {
-      name = name, component_loc at_token;
-      prelude = prelude, prelude_loc;
-      block = Empty;
-      loc = loc_from_start stream start_pos;
-    }
   | Tokens.AT_RULE name ->
+    (* CSS Syntax Level 3 "consume an at-rule" (#5.4.2): the prelude runs
+       until the first '{' (block form) or ';' (statement form) at this
+       nesting depth -- nested parens/brackets/functions consume their own
+       matched delimiters recursively in parse_component_value, so neither
+       can appear here unmatched. Dispatch on whichever token stopped the
+       prelude, rather than on the at-rule's name, so a name outside any
+       fixed list (e.g. `@layer`) still gets both forms. *)
     let at_token = advance stream in
     let prelude, prelude_loc =
       parse_component_value_list_until stream (fun stream ->
-        current_is stream Tokens.LEFT_BRACE)
+        current_is stream Tokens.SEMI_COLON
+        || current_is stream Tokens.LEFT_BRACE)
     in
-    let left_brace = expect_token stream Tokens.LEFT_BRACE in
-    let rules =
-      parse_braced_rules stream left_brace (fun stream ->
-        parse_rule_list stream
-          ~stop:(fun stream -> current_is stream Tokens.RIGHT_BRACE)
-          ~parse_one:parse_block_rule ~allow_empty:true)
-    in
-    {
-      name = name, component_loc at_token;
-      prelude = prelude, prelude_loc;
-      block = Stylesheet rules;
-      loc = loc_from_start stream start_pos;
-    }
+    begin match current_tok stream with
+    | Tokens.SEMI_COLON ->
+      let _ = expect_token stream Tokens.SEMI_COLON in
+      {
+        name = name, component_loc at_token;
+        prelude = prelude, prelude_loc;
+        block = Empty;
+        loc = loc_from_start stream start_pos;
+      }
+    | Tokens.LEFT_BRACE ->
+      let left_brace = expect_token stream Tokens.LEFT_BRACE in
+      let rules =
+        parse_braced_rules stream left_brace (fun stream ->
+          parse_rule_list stream
+            ~stop:(fun stream -> current_is stream Tokens.RIGHT_BRACE)
+            ~parse_one:parse_block_rule ~allow_empty:true)
+      in
+      {
+        name = name, component_loc at_token;
+        prelude = prelude, prelude_loc;
+        block = Stylesheet rules;
+        loc = loc_from_start stream start_pos;
+      }
+    | _ -> raise_parse_error (current_token stream)
+    end
   | _ -> raise_parse_error (current_token stream)
 
 and parse_style_rule stream =
@@ -1019,8 +1026,7 @@ and parse_style_rule stream =
 and parse_block_rule stream =
   skip_whitespace stream;
   match current_tok stream with
-  | Tokens.AT_KEYFRAMES _ | Tokens.AT_RULE _ | Tokens.AT_RULE_STATEMENT _ ->
-    At_rule (parse_at_rule stream)
+  | Tokens.AT_KEYFRAMES _ | Tokens.AT_RULE _ -> At_rule (parse_at_rule stream)
   | Tokens.IDENT _
     when identifier_starts_property stream.tokens (stream.index + 1) ->
     let saved = snapshot stream in
@@ -1039,8 +1045,7 @@ and parse_block_rule stream =
 and parse_stylesheet_rule stream =
   skip_whitespace stream;
   match current_tok stream with
-  | Tokens.AT_KEYFRAMES _ | Tokens.AT_RULE _ | Tokens.AT_RULE_STATEMENT _ ->
-    At_rule (parse_at_rule stream)
+  | Tokens.AT_KEYFRAMES _ | Tokens.AT_RULE _ -> At_rule (parse_at_rule stream)
   | _ -> Style_rule (parse_style_rule stream)
 
 let make_stream input =
