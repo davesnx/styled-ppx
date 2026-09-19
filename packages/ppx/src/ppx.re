@@ -239,7 +239,6 @@ let expand_css_expression =
     ) => {
   open Ppxlib;
   File.set(file);
-  let label = Settings.Get.minify() ? None : label_name;
   switch (payload.pexp_desc) {
   | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
     let source_position_start =
@@ -264,7 +263,6 @@ let expand_css_expression =
             ~scope,
             ~opens,
             ~source_position_start,
-            ~label?,
             ~name=label_name,
             rule_list,
           );
@@ -552,7 +550,6 @@ let expand_styled_module =
             ~scope,
             ~opens,
             ~source_position_start,
-            ~label=name,
             ~name=Some(name),
             rule_list,
           );

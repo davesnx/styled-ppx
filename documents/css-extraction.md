@@ -85,9 +85,9 @@ A single CSS rule string. One attribute per atomized rule, per global
 rule, or per `@keyframes` block.
 
 ```ocaml
-[@@@css ".css-tokvmb-marker{color:red;}"]
-[@@@css ".css-1ru12dh-button:hover{opacity:0.8;}"]
-[@@@css "@media (min-width:768px){.css-fmb91l-card{padding:2rem;}}"]
+[@@@css ".css-tokvmb{color:red;}"]
+[@@@css ".css-1ru12dh:hover{opacity:0.8;}"]
+[@@@css "@media (min-width:768px){.css-fmb91l{padding:2rem;}}"]
 [@@@css "@keyframes keyframe-jw9oix{from{opacity:0;}to{opacity:1;}}"]
 ```
 
@@ -113,8 +113,8 @@ Resolve below).
 ```ocaml
 [@@@css.bindings
   [("M.marker", "cid-1a2b3c4", "");
-   ("M.Css.active", "cid-5d6e7f8", "css-tokvmb-active");
-   ("M.layout", "cid-9a0b1c2", "css-k008qs-layout css-1tyndxa-layout")]]
+   ("M.Css.active", "cid-5d6e7f8", "css-tokvmb");
+   ("M.layout", "cid-9a0b1c2", "css-k008qs css-1tyndxa")]]
 ```
 
 The aggregator folds every payload into two flat hash tables — its
@@ -436,19 +436,19 @@ two `[@@@css ...]` attributes. The runtime `CSS.make` call carries the
 space-separated concatenation of those class names, so consumers apply
 all atoms by setting one `className` attribute.
 
-Class names follow `css-<murmur2 hash of CSS>-<binding label>` format
-(or bare `css-<hash>` when the PPX driver runs with production
-settings). The binding label is purely cosmetic — atom hashes are
-deduplication-safe even when labels differ. Minting lives in
+Class names follow the `css-<murmur2 hash of CSS>` format, in every
+mode — the binding's `let` name never appears in the class name. Two
+bindings whose declarations render to the same CSS text mint the same
+class, dev or production. Minting lives in
 `packages/ppx/src/Hash_class.ml`.
 
 The environment is a PPX concern, set once per `(pps styled-ppx ...)`
-stanza: `--env production` (alias for `--minify`) drops label suffixes
-and minifies rule bodies; `--env development` (alias for `--dev`) keeps
-readable labels and adds `cx-<binding>` marker classes. Labels are baked
-into class names at PPX time — in both the compiled `className` and the
-extracted `[@@@css ...]` payload — so no downstream tool could change
-them without desyncing the two. The aggregator learns the environment
+stanza: `--env production` (alias for `--minify`) only minifies rule
+bodies — it has no effect on class names; `--env development` (alias for
+`--dev`) adds `cx-<binding>` marker classes. Dev markers are on by
+default, so a bare `(pps styled-ppx)` stanza already gets them;
+`--minify` and `--env production` turn them off, and an explicit `--dev`
+forces them back on regardless. The aggregator learns the environment
 from `[@@@css.config ...]` and adjusts its whitespace accordingly.
 
 Two consequences worth knowing:
@@ -470,8 +470,8 @@ second, build-independent class alongside its atoms: `cid-<hash>`
 (`Hash_class.identity_class`). `$(binding)` and `&.$(binding)` selector
 references resolve to this identity, verbatim, regardless of how many
 atoms the binding minted or whether it minted any at all. It is emitted
-first among the atoms in the className string (after the `cx-<label>`
-dev marker, when present): `cx-<label> cid-<hash> css-<hash> ...`.
+first among the atoms in the className string (after the `cx-<binding>`
+dev marker, when present): `cx-<binding> cid-<hash> css-<hash> ...`.
 
 **Inputs**, joined with `\0` and murmur2-hashed: the namespace (the
 `--namespace` flag when given, else the dune library name from the

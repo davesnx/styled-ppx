@@ -10,12 +10,12 @@ nonce.
 
   $ ../../standalone.exe --impl input.ml -o none.ml
   $ grep "css.bindings" none.ml
-  [@@@css.bindings [("Input.marker", "cid-1rctcrz", "css-tokvmb-marker")]]
+  [@@@css.bindings [("Input.marker", "cid-1rctcrz", "css-tokvmb")]]
 
   $ ../../standalone.exe --namespace a --impl input.ml -o a1.ml
   $ grep "css.bindings" a1.ml
-  [@@@css.bindings [("Input.marker", "cid-12d5hxh", "css-tokvmb-marker")]]
+  [@@@css.bindings [("Input.marker", "cid-12d5hxh", "css-tokvmb")]]
 
   $ ../../standalone.exe --namespace a --impl input.ml -o a2.ml
   $ grep "css.bindings" a2.ml
-  [@@@css.bindings [("Input.marker", "cid-12d5hxh", "css-tokvmb-marker")]]
+  [@@@css.bindings [("Input.marker", "cid-12d5hxh", "css-tokvmb")]]

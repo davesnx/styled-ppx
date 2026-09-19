@@ -810,7 +810,7 @@ module Css_transform = {
   };
 
   let atomize_rules =
-      (~source_position_start, ~label=?, rules: list(rule))
+      (~source_position_start, rules: list(rule))
       : list((string, string, rule)) => {
     /* Merge a child selector-list prelude under a parent selector-list prelude.
        For each (parent, child) pair, run `compute_new_prefix` so `&`,
@@ -859,13 +859,13 @@ module Css_transform = {
         | [decl] =>
           let decl_string = render_declaration(decl);
           let (className, namespace) =
-            Hash_class.class_and_namespace(~label?, decl_string);
+            Hash_class.class_and_namespace(decl_string);
           [(className, namespace, Declaration(decl))];
         | decls =>
           let group_string =
             decls |> List.map(render_declaration) |> String.concat("");
           let (className, namespace) =
-            Hash_class.class_and_namespace(~label?, group_string);
+            Hash_class.class_and_namespace(group_string);
           let style_rule =
             Style_rule({
               prelude: (
@@ -914,7 +914,7 @@ module Css_transform = {
               });
             let rule_string = render_rule(style_rule);
             let (className, namespace) =
-              Hash_class.class_and_namespace(~label?, rule_string);
+              Hash_class.class_and_namespace(rule_string);
             (className, namespace, style_rule);
           },
           parent_selectors,
@@ -1053,7 +1053,7 @@ module Css_transform = {
                  });
                let wrapped_string = render_rule(wrapped);
                let (new_className, new_namespace) =
-                 Hash_class.class_and_namespace(~label?, wrapped_string);
+                 Hash_class.class_and_namespace(wrapped_string);
                (new_className, new_namespace, wrapped);
              })
         };
@@ -1113,7 +1113,6 @@ module Css_transform = {
         ~scope: list(string),
         ~opens: list(list(string)),
         ~source_position_start,
-        ~label=?,
         rule_list: rule_list,
       ) => {
     let ctx = {
@@ -1125,14 +1124,15 @@ module Css_transform = {
     };
     let (rules, loc) = rule_list;
 
-    let atomic_rules = atomize_rules(~source_position_start, ~label?, rules);
+    let atomic_rules = atomize_rules(~source_position_start, rules);
 
     /* Selective atomization: the block's interpolating declarations become one
-       content-addressed bundle, with class `css-<B>-<label>` and var namespace
-       `css-<B>` (label-free) shared across base/`:hover`/`@media`. Both derive
-       from the same bundle content, so identical bundles dedup to identical
-       rules + vars and different bundles never collide, preserving the
-       cross-module atomic invariant (see Hash_class.ml) and `CSS.merge`.
+       content-addressed bundle, with class and var namespace both `css-<B>`
+       (the two are identical, see Hash_class.ml) shared across
+       base/`:hover`/`@media`. Both derive from the same bundle content, so
+       identical bundles dedup to identical rules + vars and different
+       bundles never collide, preserving the cross-module atomic invariant
+       (see Hash_class.ml) and `CSS.merge`.
 
        Static declarations keep their own per-content atom class (still shared
        across blocks). A block with no interpolation produces no bundle and is
@@ -1147,9 +1147,7 @@ module Css_transform = {
       ) {
       | [] => None
       | seeds =>
-        Some(
-          Hash_class.class_and_namespace(~label?, String.concat("", seeds)),
-        )
+        Some(Hash_class.class_and_namespace(String.concat("", seeds)))
       };
 
     let (shipped_rev, classes_rev, atom_infos_rev) =
@@ -1277,7 +1275,6 @@ let push =
       ~scope: list(string),
       ~opens: list(list(string)),
       ~source_position_start,
-      ~label=?,
       ~name: option(string),
       declarations: Styled_ppx_css_parser.Ast.rule_list,
     ) => {
@@ -1287,7 +1284,6 @@ let push =
       ~scope,
       ~opens,
       ~source_position_start,
-      ~label?,
       declarations,
     );
 

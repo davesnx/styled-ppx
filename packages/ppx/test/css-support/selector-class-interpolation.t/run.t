@@ -15,45 +15,37 @@ and the runtime `CSS.make` call must carry an empty list (no phantom
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb-foo{color:red;}"];
-  [@css ".css-11o9qin-bar.cid-zec317{color:blue;}"];
-  [@css ".css-1vf0mg9-buttonLoadingAnimation{background-size:1rem 1rem;}"];
+  [@css ".css-tokvmb{color:red;}"];
+  [@css ".css-11o9qin.cid-zec317{color:blue;}"];
+  [@css ".css-1vf0mg9{background-size:1rem 1rem;}"];
   [@css
-    ".css-rj3gnv-buttonLoadingAnimation{-webkit-animation-duration:1000ms;animation-duration:1000ms;}"
+    ".css-rj3gnv{-webkit-animation-duration:1000ms;animation-duration:1000ms;}"
   ];
-  [@css ".css-f9xk9e-colorAccent{background-color:blue;}"];
+  [@css ".css-f9xk9e{background-color:blue;}"];
   [@css
-    ".css-1eo9rnb-colorAccent:disabled:not(.css-1eo9rnb-colorAccent.cid-1wqjj7x){background-color:gray;}"
+    ".css-1eo9rnb:disabled:not(.css-1eo9rnb.cid-1wqjj7x){background-color:gray;}"
   ];
   [@css.bindings
     [
-      ("Input.foo", "cid-zec317", "css-tokvmb-foo"),
-      ("Input.bar", "cid-1eelq62", "css-11o9qin-bar"),
-      (
-        "Input.buttonLoadingAnimation",
-        "cid-1wqjj7x",
-        "css-1vf0mg9-buttonLoadingAnimation css-rj3gnv-buttonLoadingAnimation",
-      ),
-      (
-        "Input.colorAccent",
-        "cid-qhdd42",
-        "css-f9xk9e-colorAccent css-1eo9rnb-colorAccent",
-      ),
+      ("Input.foo", "cid-zec317", "css-tokvmb"),
+      ("Input.bar", "cid-1eelq62", "css-11o9qin"),
+      ("Input.buttonLoadingAnimation", "cid-1wqjj7x", "css-1vf0mg9 css-rj3gnv"),
+      ("Input.colorAccent", "cid-qhdd42", "css-f9xk9e css-1eo9rnb"),
     ]
   ];
   
-  let foo = CSS.make("cid-zec317 css-tokvmb-foo", []);
+  let foo = CSS.make("cx-foo cid-zec317 css-tokvmb", []);
   
-  let bar = CSS.make("cid-1eelq62 css-11o9qin-bar", []);
+  let bar = CSS.make("cx-bar cid-1eelq62 css-11o9qin", []);
   
   let buttonLoadingAnimation =
     CSS.make(
-      "cid-1wqjj7x css-1vf0mg9-buttonLoadingAnimation css-rj3gnv-buttonLoadingAnimation",
+      "cx-buttonLoadingAnimation cid-1wqjj7x css-1vf0mg9 css-rj3gnv",
       [],
     );
   
   let colorAccent =
-    CSS.make("cid-qhdd42 css-f9xk9e-colorAccent css-1eo9rnb-colorAccent", []);
+    CSS.make("cx-colorAccent cid-qhdd42 css-f9xk9e css-1eo9rnb", []);
   
   let _ = (foo, bar, buttonLoadingAnimation, colorAccent);
 
