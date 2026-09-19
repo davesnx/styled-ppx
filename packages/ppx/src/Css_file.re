@@ -1421,7 +1421,8 @@ let push_global =
       dynamic_vars: ref([]),
     };
 
-  /* Reject `&` with no parent selector: top level, or inside at-rule
+  /* Reject `&` (literal, or the implicit one a leading combinator like
+     `> .a` means) with no parent selector: top level, or inside at-rule
      blocks not below a style rule (at-rules don't contribute a
      selector). Recursion stops at style rules — nested `&` is fine. */
   let rec reject_parentless_ampersand = rule =>
@@ -1429,7 +1430,7 @@ let push_global =
     | Style_rule({ prelude: (selectors, _), _ }) =>
       List.iter(
         ((selector, selector_loc)) =>
-          if (Styled_ppx_css_parser.Selector_nesting.contains_ampersand(
+          if (Styled_ppx_css_parser.Selector_nesting.needs_parent_selector(
                 selector,
               )) {
             Ppxlib.Location.raise_errorf(

@@ -2,6 +2,7 @@
 
 ## 0.62.0
 
+- [FIX] Accept CSS Nesting's relative-selector shorthand in a nested rule's prelude: `.parent { > .child {} }`, `+ .sib {}` and `~ .sib {}` resolve exactly like `& > .child`. The root of `[%css]`, `[%styled.global]` and a raw stylesheet still rejects a leading combinator, and `[%styled.global]` now also rejects one inside an at-rule block with no enclosing style rule (`@media print { > .a {} }`), the same way it rejects a parentless `&`, instead of shipping unresolved `&` (@davesnx)
 - [FEATURE] Register the css-fonts-5 metric-override descriptors `ascent-override`, `descent-override`, `line-gap-override` (each `normal | <percentage>`), and `size-adjust` (`<percentage>`), so a valid `@font-face` block declaring them compiles instead of failing with an unknown-descriptor error (#580) (@davesnx)
 - [FIX] Re-escape a class, id, type selector, attribute, pseudo-class, custom property name, or custom ident on render instead of printing the lexer's decoded text verbatim. `.\31 a { color: red; }` (class `1a`) previously rendered as the invalid `.1a{...}`, and `.a\.b { color: red; }` (one class named `a.b`) rendered as `.a.b{...}` — two classes, changing what the selector matches with no error at all (@davesnx)
 - [FIX] Parse statement at-rules by what follows their prelude instead of a fixed name list, so `@layer a, b;` and any future statement at-rule work in `[%styled.global]`; the one-token `AT_RULE_STATEMENT` is gone. Trailing whitespace in a statement prelude is trimmed, so `@import "x.css" ;` renders as `@import "x.css";` (@davesnx)
