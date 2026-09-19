@@ -5,8 +5,9 @@ type token =
   | FUNCTION(string) // <function-token>
   | NTH_FUNCTION(string) // <function-token> (nth-*)
   | AT_KEYFRAMES(string) // <at-keyframes-token> (non-standard)
-  | AT_RULE(string) // <at-rule-token> (non-standard)
-  | AT_RULE_STATEMENT(string) // <at-rule-statement-token> (non-standard)
+  | AT_RULE(string) // <at-rule-token>; the parser decides statement vs
+  // block by lookahead (';' vs '{'), per CSS Syntax Level 3's single
+  // <at-keyword-token>, not by at-rule name
   | UNICODE_RANGE(string) // <unicode-range-token>
   | HASH(
       (
@@ -203,7 +204,6 @@ let humanize =
   | FUNCTION(fn) => Printf.sprintf("%s(", fn)
   | NTH_FUNCTION(fn) => Printf.sprintf("%s(", fn)
   | AT_KEYFRAMES(s) => Printf.sprintf("@%s", s)
-  | AT_RULE_STATEMENT(s) => Printf.sprintf("@%s", s)
   | AT_RULE(s) => Printf.sprintf("@%s", s)
   | UNICODE_RANGE(s) => s
   | HASH((s, _)) => Printf.sprintf("#%s", s)
@@ -247,7 +247,6 @@ let to_debug =
   | NTH_FUNCTION(fn) => Printf.sprintf("NTH_FUNCTION(%s)", fn)
   | URL(u) => Printf.sprintf("URL(%s)", u)
   | AT_KEYFRAMES(s) => Printf.sprintf("AT_KEYFRAMES('%s')", s)
-  | AT_RULE_STATEMENT(s) => Printf.sprintf("AT_RULE_STATEMENT('%s')", s)
   | AT_RULE(s) => Printf.sprintf("AT_RULE('%s')", s)
   | HASH((s, kind)) => {
       let kind =
