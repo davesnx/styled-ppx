@@ -790,6 +790,21 @@ and parse_relative_selector stream =
 and parse_relative_selector_list stream =
   parse_selector_list_with stream parse_relative_selector
 
+(* A nested rule's prelude (i.e. one inside another rule's block) may start
+   with a bare combinator per CSS Nesting ("> .child" means "& > .child").
+   Only the item that actually starts with one is parsed as a
+   [RelativeSelector]; every other item keeps producing a plain
+   [ComplexSelector], so a selector list that doesn't use this shorthand
+   (the common case) has the exact same AST as before this existed. *)
+and parse_nested_selector stream =
+  skip_whitespace stream;
+  match current_tok stream with
+  | Tokens.DELIM ("+" | "~" | ">") -> parse_relative_selector stream
+  | _ -> parse_selector stream
+
+and parse_nested_selector_list stream =
+  parse_selector_list_with stream parse_nested_selector
+
 let update_declaration_value_state state (value, _) =
   match value with
   | Whitespace -> state
@@ -1024,7 +1039,7 @@ and parse_at_rule stream =
         parse_braced_rules stream left_brace (fun stream ->
           parse_rule_list stream
             ~stop:(fun stream -> current_is stream Tokens.RIGHT_BRACE)
-            ~parse_one:parse_block_rule ~allow_empty:true)
+            ~parse_one:parse_nested_block_rule ~allow_empty:true)
       in
       {
         name = name, component_loc at_token;
@@ -1036,10 +1051,17 @@ and parse_at_rule stream =
     end
   | _ -> raise_parse_error (current_token stream)
 
-and parse_style_rule stream =
+(* [parse_prelude] is [parse_selector_list] at the root of a declaration list
+   or stylesheet (no leading combinator: there is no rule to resolve "&"
+   against), and [parse_nested_selector_list] for a rule inside another
+   rule's block (a leading combinator means "&" followed by it). Either way
+   the rules inside this rule's own block are always reached through
+   [parse_nested_block_rule]: once inside any block, further nesting always
+   has a "&" to resolve against. *)
+and parse_style_rule_with stream ~parse_prelude =
   skip_whitespace stream;
   let start_pos = (current_token stream).start_pos in
-  let prelude = parse_selector_list stream in
+  let prelude = parse_prelude stream in
   skip_whitespace stream;
   let left_brace = expect_token stream Tokens.LEFT_BRACE in
   let block =
@@ -1047,13 +1069,19 @@ and parse_style_rule stream =
       let rules, rules_loc =
         parse_rule_list stream
           ~stop:(fun stream -> current_is stream Tokens.RIGHT_BRACE)
-          ~parse_one:parse_block_rule ~allow_empty:false
+          ~parse_one:parse_nested_block_rule ~allow_empty:false
       in
       rules, rules_loc)
   in
   { prelude; block; loc = loc_from_start stream start_pos }
 
-and parse_block_rule stream =
+and parse_style_rule stream =
+  parse_style_rule_with stream ~parse_prelude:parse_selector_list
+
+and parse_nested_style_rule stream =
+  parse_style_rule_with stream ~parse_prelude:parse_nested_selector_list
+
+and parse_block_rule_with stream ~parse_style_rule =
   skip_whitespace stream;
   match current_tok stream with
   | Tokens.AT_KEYFRAMES _ | Tokens.AT_RULE _ -> At_rule (parse_at_rule stream)
@@ -1071,6 +1099,11 @@ and parse_block_rule stream =
         raise declaration_error)
     end
   | _ -> Style_rule (parse_style_rule stream)
+
+and parse_block_rule stream = parse_block_rule_with stream ~parse_style_rule
+
+and parse_nested_block_rule stream =
+  parse_block_rule_with stream ~parse_style_rule:parse_nested_style_rule
 
 and parse_stylesheet_rule stream =
   skip_whitespace stream;

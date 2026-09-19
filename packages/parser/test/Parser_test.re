@@ -556,6 +556,245 @@ let at_rule_dispatch_tests = [
   }),
 ];
 
+/* CSS Nesting's relative-selector shorthand: a nested rule's prelude may
+   start with a combinator (`> .child`, `+ .sib`, `~ .sib`), meaning
+   `& > .child` etc. Only valid inside another rule's block, not at the
+   root of a declaration list or a stylesheet (see the two rejection
+   regressions at the end of this list). */
+let parse_nested_relative_selector_exn = input => {
+  switch (Driver.parse_declaration_list(~source_position_start, input)) {
+  | Ok((
+      [
+        Ast.Style_rule({
+          block:
+            ([Ast.Style_rule({ prelude: ([(selector, _)], _), _ })], _),
+          _,
+        }),
+      ],
+      _,
+    )) => selector
+  | Ok(_) => fail("expected a single nested style rule for: " ++ input)
+  | Error((_, msg)) =>
+    fail(
+      "expected nested relative selector parse success for "
+      ++ input
+      ++ ": "
+      ++ msg,
+    )
+  };
+};
+
+let nested_relative_selector_combinator_tests =
+  [
+    (".parent { > .child { color: red; } }", Ast.Selector_child),
+    (".parent { + .child { color: red; } }", Ast.Selector_adjacent_sibling),
+    (".parent { ~ .child { color: red; } }", Ast.Selector_general_sibling),
+  ]
+  |> List.map(((input, expected_combinator)) =>
+       test_case(
+         "nested rule accepts leading combinator: " ++ input, `Quick, () => {
+         switch (parse_nested_relative_selector_exn(input)) {
+         | Ast.RelativeSelector({
+             combinator: Some(actual_combinator),
+             complex_selector:
+               Ast.Selector(
+                 Ast.CompoundSelector({
+                   type_selector: None,
+                   subclass_selectors: [Ast.Class("child")],
+                   pseudo_selectors: [],
+                 }),
+               ),
+           }) =>
+           check(
+             bool,
+             "combinator matches",
+             true,
+             actual_combinator == expected_combinator,
+           )
+         | _ => fail("expected RelativeSelector AST for: " ++ input)
+         }
+       })
+     );
+
+let nested_relative_selector_tests =
+  nested_relative_selector_combinator_tests
+  @ [
+    test_case(
+      "nested rule accepts a compound selector after the combinator (`> .a.b:hover`)",
+      `Quick,
+      () => {
+      switch (
+        parse_nested_relative_selector_exn(
+          ".parent { > .a.b:hover { color: red; } }",
+        )
+      ) {
+      | Ast.RelativeSelector({
+          combinator: Some(Ast.Selector_child),
+          complex_selector:
+            Ast.Selector(
+              Ast.CompoundSelector({
+                type_selector: None,
+                subclass_selectors:
+                  [
+                    Ast.Class("a"),
+                    Ast.Class("b"),
+                    Ast.Pseudo_class(
+                      Ast.Pseudoclass(Ast.PseudoIdent("hover")),
+                    ),
+                  ],
+                pseudo_selectors: [],
+              }),
+            ),
+        }) =>
+        ()
+      | _ => fail("expected compound relative selector AST")
+      }
+    }),
+    test_case(
+      "nested rule accepts a relative selector list (`> .a, + .b`)", `Quick, () => {
+      switch (
+        Driver.parse_declaration_list(
+          ~source_position_start,
+          ".parent { > .a, + .b { color: red; } }",
+        )
+      ) {
+      | Ok((
+          [
+            Ast.Style_rule({
+              block:
+                (
+                  [
+                    Ast.Style_rule({
+                      prelude:
+                        (
+                          [
+                            (
+                              Ast.RelativeSelector({
+                                combinator: first_combinator,
+                                _,
+                              }),
+                              _,
+                            ),
+                            (
+                              Ast.RelativeSelector({
+                                combinator: second_combinator,
+                                _,
+                              }),
+                              _,
+                            ),
+                          ],
+                          _,
+                        ),
+                      _,
+                    }),
+                  ],
+                  _,
+                ),
+              _,
+            }),
+          ],
+          _,
+        )) =>
+        check(
+          bool,
+          "first item is `>`",
+          true,
+          first_combinator == Some(Ast.Selector_child),
+        );
+        check(
+          bool,
+          "second item is `+`",
+          true,
+          second_combinator == Some(Ast.Selector_adjacent_sibling),
+        );
+      | Ok(_) => fail("expected two relative selectors")
+      | Error((_, msg)) =>
+        fail("expected relative selector list parse success: " ++ msg)
+      }
+    }),
+    test_case(
+      "nested rule accepts a leading combinator inside @media", `Quick, () => {
+      switch (
+        Driver.parse_declaration_list(
+          ~source_position_start,
+          "@media (min-width: 1px) { > .a { color: red; } }",
+        )
+      ) {
+      | Ok((
+          [
+            Ast.At_rule({
+              name: ("media", _),
+              block:
+                Ast.Stylesheet((
+                  [
+                    Ast.Style_rule({
+                      prelude:
+                        (
+                          [
+                            (
+                              Ast.RelativeSelector({
+                                combinator: Some(Ast.Selector_child),
+                                _,
+                              }),
+                              _,
+                            ),
+                          ],
+                          _,
+                        ),
+                      _,
+                    }),
+                  ],
+                  _,
+                )),
+              _,
+            }),
+          ],
+          _,
+        )) =>
+        ()
+      | Ok(_) => fail("expected relative selector nested inside @media")
+      | Error((_, msg)) =>
+        fail(
+          "expected @media nested relative selector parse success: " ++ msg,
+        )
+      }
+    }),
+    test_case(
+      "declaration-list root still rejects a leading combinator", `Quick, () => {
+      switch (
+        Driver.parse_declaration_list(
+          ~source_position_start,
+          "> .a { color: red; }",
+        )
+      ) {
+      | Error((loc, msg)) =>
+        check(
+          string,
+          "existing parse error message preserved",
+          "Parse error while reading token '>'",
+          msg,
+        );
+        check(
+          int,
+          "error points at the leading combinator",
+          0,
+          loc.loc_start.pos_cnum,
+        );
+      | Ok(_) =>
+        fail("expected a leading top-level combinator to still error")
+      }
+    }),
+    test_case(
+      "stylesheet level still rejects a leading combinator", `Quick, () => {
+      check(
+        string,
+        "existing parse error message preserved",
+        "Parse error while reading token '>' on line 1 at position 0",
+        parse("> .a {}") |> Result.get_error,
+      )
+    }),
+  ];
+
 let ambiguity_regression_tests = [
   test_case(
     "declaration list stops before nested descendant selector", `Quick, () => {
@@ -696,6 +935,7 @@ let tests =
     function_ast_tests,
     selector_combinator_ast_tests,
     at_rule_dispatch_tests,
+    nested_relative_selector_tests,
     ambiguity_regression_tests,
     invalid_utf8_tests,
   ]);
