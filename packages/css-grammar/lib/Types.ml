@@ -1268,7 +1268,7 @@ and function_translateY =
   ]
 
 and function_translateZ = extended_length
-and function_var = string * (unit * string) option
+and function_var = string * (unit * string option) option
 
 and gender =
   [ `Male
