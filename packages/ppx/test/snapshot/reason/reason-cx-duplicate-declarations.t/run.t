@@ -31,32 +31,36 @@ atom shape and hash.
   [@@@css ".css-dhb7kq-x{color:blue;color:red;}"]
   [@@@css ".css-zwzjs7-vars{margin:0;margin:var(--c-kv4uq2);}"]
   [@@@css.bindings
-    [("Input.dup", "css-ztpkbn-dup");
-    ("Input.fallback", "css-17ax8u2-fallback");
-    ("Input.interleaved", "css-1uk1gs8-interleaved css-dhb7kq-interleaved");
-    ("Input.mediaInterleaved",
+    [("Input.dup", "cid-1rqoi1k", "css-ztpkbn-dup");
+    ("Input.fallback", "cid-1t6se51", "css-17ax8u2-fallback");
+    ("Input.interleaved", "cid-8z5ze6",
+      "css-1uk1gs8-interleaved css-dhb7kq-interleaved");
+    ("Input.mediaInterleaved", "cid-17s8jfs",
       "css-1g5p0x6-mediaInterleaved css-dhb7kq-mediaInterleaved");
-    ("Input.shorthandReset",
+    ("Input.shorthandReset", "cid-18j0etq",
       "css-odz94x-shorthandReset css-19xrixt-shorthandReset");
-    ("Input.nested", "css-1e7bukr-nested");
-    ("Input.twice", "css-mngo80-twice");
-    ("Input.custom", "css-zkbrel-custom css-1r75vyo-custom");
-    ("Input.A.x", "css-tokvmb-x");
-    ("Input.B.x", "css-dhb7kq-x");
-    ("Input.vars", "css-zwzjs7-vars")]]
-  let dup = CSS.make "css-ztpkbn-dup" []
-  let fallback = CSS.make "css-17ax8u2-fallback" []
+    ("Input.nested", "cid-swo4az", "css-1e7bukr-nested");
+    ("Input.twice", "cid-bxfxu3", "css-mngo80-twice");
+    ("Input.custom", "cid-216v6m", "css-zkbrel-custom css-1r75vyo-custom");
+    ("Input.A.x", "cid-hplgo2", "css-tokvmb-x");
+    ("Input.B.x", "cid-i6ik4z", "css-dhb7kq-x");
+    ("Input.vars", "cid-10jlpap", "css-zwzjs7-vars")]]
+  let dup = CSS.make "cid-1rqoi1k css-ztpkbn-dup" []
+  let fallback = CSS.make "cid-1t6se51 css-17ax8u2-fallback" []
   let interleaved =
-    CSS.make "css-1uk1gs8-interleaved css-dhb7kq-interleaved" []
+    CSS.make "cid-8z5ze6 css-1uk1gs8-interleaved css-dhb7kq-interleaved" []
   let mediaInterleaved =
-    CSS.make "css-1g5p0x6-mediaInterleaved css-dhb7kq-mediaInterleaved" []
+    CSS.make
+      "cid-17s8jfs css-1g5p0x6-mediaInterleaved css-dhb7kq-mediaInterleaved" []
   let shorthandReset =
-    CSS.make "css-odz94x-shorthandReset css-19xrixt-shorthandReset" []
-  let nested = CSS.make "css-1e7bukr-nested" []
-  let twice = CSS.make "css-mngo80-twice" []
-  let custom = CSS.make "css-zkbrel-custom css-1r75vyo-custom" []
-  module A = struct let x = CSS.make "css-tokvmb-x" [] end
-  module B = struct let x = CSS.make "css-dhb7kq-x" [] end
+    CSS.make "cid-18j0etq css-odz94x-shorthandReset css-19xrixt-shorthandReset"
+      []
+  let nested = CSS.make "cid-swo4az css-1e7bukr-nested" []
+  let twice = CSS.make "cid-bxfxu3 css-mngo80-twice" []
+  let custom = CSS.make "cid-216v6m css-zkbrel-custom css-1r75vyo-custom" []
+  module A = struct let x = CSS.make "cid-hplgo2 css-tokvmb-x" [] end
+  module B = struct let x = CSS.make "cid-i6ik4z css-dhb7kq-x" [] end
   let c = "10px"
   let vars =
-    CSS.make "css-zwzjs7-vars" [("--c-kv4uq2", (CSS.Types.Margin.toString c))]
+    CSS.make "cid-10jlpap css-zwzjs7-vars"
+      [("--c-kv4uq2", (CSS.Types.Margin.toString c))]

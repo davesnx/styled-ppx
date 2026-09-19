@@ -41,8 +41,9 @@ a generated `:root` block for `[%styled.global]`).
   ▼
 PPX expansion (per compilation unit)
   ─ parse [%css "..."] / [%styled.<tag> ...] / [%styled.global "..."] / [%keyframe "..."]
-  ─ atomize, hash, mint class names
-  ─ resolve same-module $(name) selector interpolations
+  ─ atomize, hash, mint class names; mint each named binding's identity class
+  ─ resolve same-module $(name) selector interpolations to the referenced
+    binding's identity class
   ─ buffer rendered rules; record cross-module refs as sentinels
   │
   ▼
@@ -96,25 +97,31 @@ selector reference at PPX time. The aggregator substitutes those at
 resolve time (see "Resolve" below; the sentinel constants live in
 `packages/css-extraction/css_extraction.ml`).
 
-### `[@@@css.bindings [(longident, class_string); ...]]` — binding exports
+### `[@@@css.bindings [(longident, identity, class_string); ...]]` — binding exports
 
 One attribute per CU, listing every named `[%css]` binding and
 `[%styled.<tag>]` component the CU minted.
 The longident is the fully-qualified path users would write to reference
-the binding from another module; the class string is the
-space-separated list of atomized class names the PPX produced.
+the binding from another module; the identity is the binding's
+build-independent `cid-...` class (see "Identity classes" below) — a
+`$(binding)` selector reference resolves to this, verbatim; the class
+string is the space-separated list of atomized class names the PPX
+produced, kept only as a content fingerprint so the aggregator can tell
+a legitimate duplicate build from a real identity collision (see
+Resolve below).
 
 ```ocaml
 [@@@css.bindings
-  [("M.marker", "css-0-marker");
-   ("M.Css.active", "css-tokvmb-active");
-   ("M.layout", "css-k008qs-layout css-1tyndxa-layout")]]
+  [("M.marker", "cid-1a2b3c4", "");
+   ("M.Css.active", "cid-5d6e7f8", "css-tokvmb-active");
+   ("M.layout", "cid-9a0b1c2", "css-k008qs-layout css-1tyndxa-layout")]]
 ```
 
-The aggregator folds every payload into a flat
-`(longident, class_string) Hashtbl` — its global resolution index. No
-AST walking, no `CSS.make` pattern matching, no filename-to-module
-inference.
+The aggregator folds every payload into two flat hash tables — its
+global resolution index: `longident -> identity` for resolving `$(M.x)`
+references, and `identity -> (longident, class_string, filename)` for
+collision detection. No AST walking, no `CSS.make` pattern matching, no
+filename-to-module inference.
 
 Anonymous bindings (`let _ = [%css ...]`) are not exported because they
 cannot be referenced from another module.
@@ -234,12 +241,15 @@ supplied by the generated module's runtime `:root` block — see
 
 ### `Css_bindings`
 
-Per-CU buffer of `(longident, class_string)` exports. The ordered
-structure pass computes the longident from the compilation unit name + current
-submodule path + the enclosing top-level value name (`[%css]`) or module name
-(`[%styled.<tag>]`), then calls `Css_bindings.record`. Last-write-wins on
-duplicates within a CU (matches `Local_selector_environment` shadowing
-semantics).
+Per-CU buffer of `(longident, identity, class_string)` exports. The
+ordered structure pass computes the longident from the compilation unit
+name + current submodule path + the enclosing top-level value name
+(`[%css]`) or module name (`[%styled.<tag>]`); the identity comes from
+`Css_file.push` (see "Identity classes" below), computed from the
+*local* binding label, which for a function-local rebinding differs from
+the longident's top-level name. `Css_bindings.record` is then called
+with all three. Last-write-wins on duplicates within a CU (matches
+`Local_selector_environment` shadowing semantics).
 
 ### `Cross_module_refs`
 
@@ -267,7 +277,7 @@ the five attribute shapes:
 
 ```ocaml
 [@@@css "..."]            → push rule string
-[@@@css.bindings [...]]   → fold (longident, class_string) into Index
+[@@@css.bindings [...]]   → fold (longident, identity, class_string) into Index
 [@@@css.refs [...]]       → push (longident, location) into per-file refs
 [@@@css.config [...]]     → record the file's declared environment
 _                         → ignore
@@ -336,9 +346,9 @@ since it wraps each library's rules by the same grouping.
 
 For each rule string, scan for `\x00LONGIDENT\x00` sentinel pairs:
 
-- on hit: replace with `Hashtbl.find idx longident`, converting the
-  space-separated class string to a dot-chain (`"a b c"` → `"a.b.c"`)
-  so it slots into selector chains correctly
+- on hit: replace with the longident's identity class from the index,
+  verbatim — one class, regardless of how many atoms the referenced
+  binding minted
 - on miss: report an error using the location stored in the file's
   `[@@@css.refs ...]`, distinguishing **cross-library** (root module
   not found in any binding's longident) from **missing binding**
@@ -346,6 +356,17 @@ For each rule string, scan for `\x00LONGIDENT\x00` sentinel pairs:
 Errors are accumulated; if any fire, the aggregator prints them all to
 stderr in `File "...", line N, characters X-Y:` format (the OCaml
 compiler convention, so editors pick them up) and exits 1.
+
+**Identity collision.** While building the index (during Extract, not
+Resolve), two different bindings can hash to the same identity — e.g.
+two libraries whose modules share a basename and binding name, with no
+distinguishing `--namespace`. This is only an error when their
+`class_string` fingerprints differ: the same identity with the same
+atoms is the ordinary "same module compiled twice" case (native +
+melange, `copy_files`, vendoring) and is accepted. A real collision
+names both input files, both longidents, the shared identity, and the
+`--namespace` remedy, and is reported through the same protocol-error
+path as a malformed attribute (see `packages/generate/test/identity-collision.t`).
 
 ### Dedup and write
 
@@ -433,11 +454,56 @@ Two consequences worth knowing:
 
 1. **One `[%css]` binding maps to N class names.** This is what the
    space-separated `class_string` in `[@@@css.bindings ...]` captures.
-2. **Cross-module `$(M.marker)` resolves to a chained compound** (e.g.
-   `.cssA.cssB`) not a single class. The aggregator does the
-   space-to-dot conversion so the resulting selector requires *all*
-   atoms of `M.marker` to be present on the element, matching the
-   semantics of using `M.marker` as a className locally.
+2. **A `$(binding)` selector reference resolves to ONE class: the
+   referenced binding's identity** (see below), not a chain of its
+   atoms. This holds same-module and cross-module alike. A reference
+   means "carries that binding", not "reproduces its exact
+   declarations" — a referenced multi-atom binding drops from
+   `(0,N,0)` to `(0,1,0)` specificity inside the compound selector (see
+   the specificity note below).
+
+## Identity classes
+
+Every named `[%css]` binding and `[%styled.<tag>]` component mints a
+second, build-independent class alongside its atoms: `cid-<hash>`
+(`Hash_class.identity_class`). `$(binding)` and `&.$(binding)` selector
+references resolve to this identity, verbatim, regardless of how many
+atoms the binding minted or whether it minted any at all. It is emitted
+first among the atoms in the className string (after the `cx-<label>`
+dev marker, when present): `cx-<label> cid-<hash> css-<hash> ...`.
+
+**Inputs**, joined with `\0` and murmur2-hashed: the `--namespace` flag
+value (empty by default), the compilation-unit module name (the source
+file's basename, capitalized — never a physical path or dune library
+name, so a module compiled twice under different paths, e.g. a native
+and a Melange build via `copy_files`, mints the same identity), the
+enclosing submodule path, the binding name (or `[%styled.<tag>]` module
+name), and an occurrence index — folded in only when a `(scope, name)`
+pair repeats within one compilation unit (e.g. two functions each with
+their own `let a = [%css ...]`), so a name seen exactly once keeps a
+stable identity independent of whether a later occurrence ever appears.
+
+**`--namespace <string>`** is a PPX flag, mixed into every identity hash
+in the same library-wide way as `--dev`/`--minify`. Two libraries whose
+modules happen to share a basename and binding name would otherwise mint
+colliding identities; passing each library a distinct `--namespace`
+(identically on its native and Melange `(pps styled-ppx ...)` stanzas)
+tells them apart. See "Identity collision" under Resolve for what
+happens when they aren't.
+
+**Empty markers.** A named binding with no declarations (`let m = [%css
+{||}]`) still mints an identity — its `class_string` is `""` and no
+`[@@@css ...]` rule is emitted, since there is nothing to write. This is
+independent of `--minify`: an empty binding's identity is never dropped,
+which is what makes it possible to resolve `&.$(m)` in every mode (see
+`packages/ppx/test/css-support/identity-empty-marker.t`).
+
+**Specificity note.** `.css-x.cid-y` is still a two-class compound
+selector — `(0,2,0)` specificity, same as `.css-x.css-a.css-b` before
+this change, and both still beat plain unqualified atoms either way.
+Only a tie between two compound selectors that used to carry 3+ class
+tokens can shift, since those are the only ones whose token count
+actually drops.
 
 ## What this design intentionally avoids
 
@@ -477,3 +543,7 @@ Two consequences worth knowing:
   sentinel encoding, and sentinel resolution
 - `packages/ppx/src/{Css_bindings,Cross_module_refs}.{re,rei}` — the
   per-CU buffers feeding the aggregator
+- `packages/ppx/src/Hash_class.ml` — identity, class, and variable hash
+  formats, including `identity_class`
+- `packages/ppx/src/Local_selector_environment.re{,i}` — same-file
+  `$(name)` resolution to a binding's identity class

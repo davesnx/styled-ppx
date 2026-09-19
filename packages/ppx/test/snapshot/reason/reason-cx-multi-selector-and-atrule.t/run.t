@@ -28,30 +28,35 @@ selector chain into the at-rule's contents instead of dropping it.
   [@@@css
     "@media (max-width: 600px) {.css-pjtxwe-mediaWithNested .a:hover{color:blue;}}"]
   [@@@css.bindings
-    [("Input.multiTop", "css-rmy2q8-multiTop css-alyv6j-multiTop");
-    ("Input.multiNested", "css-xuam0t-multiNested css-1400cim-multiNested");
-    ("Input.cartesian",
+    [("Input.multiTop", "cid-za05oi",
+       "css-rmy2q8-multiTop css-alyv6j-multiTop");
+    ("Input.multiNested", "cid-gymm1w",
+      "css-xuam0t-multiNested css-1400cim-multiNested");
+    ("Input.cartesian", "cid-18oo9dc",
       "css-1v5vtx3-cartesian css-1hhu78w-cartesian css-1ehtzuk-cartesian css-1nvjsnn-cartesian");
-    ("Input.multiMixed",
+    ("Input.multiMixed", "cid-kzpsx9",
       "css-rmy2q8-multiMixed css-alyv6j-multiMixed css-bij269-multiMixed css-1k1r9ux-multiMixed");
-    ("Input.mediaUnderSelector", "css-14bi921-mediaUnderSelector");
-    ("Input.mediaDeep", "css-godogz-mediaDeep");
-    ("Input.mediaWithNested",
+    ("Input.mediaUnderSelector", "cid-jnaeeh",
+      "css-14bi921-mediaUnderSelector");
+    ("Input.mediaDeep", "cid-1xp2ctx", "css-godogz-mediaDeep");
+    ("Input.mediaWithNested", "cid-sseoij",
       "css-1c0hjb1-mediaWithNested css-1x7bng1-mediaWithNested css-pjtxwe-mediaWithNested")]]
-  let multiTop = CSS.make "css-rmy2q8-multiTop css-alyv6j-multiTop" []
+  let multiTop =
+    CSS.make "cid-za05oi css-rmy2q8-multiTop css-alyv6j-multiTop" []
   let multiNested =
-    CSS.make "css-xuam0t-multiNested css-1400cim-multiNested" []
+    CSS.make "cid-gymm1w css-xuam0t-multiNested css-1400cim-multiNested" []
   let cartesian =
     CSS.make
-      "css-1v5vtx3-cartesian css-1hhu78w-cartesian css-1ehtzuk-cartesian css-1nvjsnn-cartesian"
+      "cid-18oo9dc css-1v5vtx3-cartesian css-1hhu78w-cartesian css-1ehtzuk-cartesian css-1nvjsnn-cartesian"
       []
   let multiMixed =
     CSS.make
-      "css-rmy2q8-multiMixed css-alyv6j-multiMixed css-bij269-multiMixed css-1k1r9ux-multiMixed"
+      "cid-kzpsx9 css-rmy2q8-multiMixed css-alyv6j-multiMixed css-bij269-multiMixed css-1k1r9ux-multiMixed"
       []
-  let mediaUnderSelector = CSS.make "css-14bi921-mediaUnderSelector" []
-  let mediaDeep = CSS.make "css-godogz-mediaDeep" []
+  let mediaUnderSelector =
+    CSS.make "cid-jnaeeh css-14bi921-mediaUnderSelector" []
+  let mediaDeep = CSS.make "cid-1xp2ctx css-godogz-mediaDeep" []
   let mediaWithNested =
     CSS.make
-      "css-1c0hjb1-mediaWithNested css-1x7bng1-mediaWithNested css-pjtxwe-mediaWithNested"
+      "cid-sseoij css-1c0hjb1-mediaWithNested css-1x7bng1-mediaWithNested css-pjtxwe-mediaWithNested"
       []

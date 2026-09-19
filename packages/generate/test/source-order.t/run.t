@@ -9,7 +9,7 @@ prefix — destroying source order and silently miscompiling.
   $ cat > a.ml <<EOF
   > [@@@css ".css-eaeacs-x{margin:10px;}"]
   > [@@@css ".css-1xaekgw-x{margin-top:20px;}"]
-  > [@@@css.bindings [("A.x", "css-eaeacs-x css-1xaekgw-x")]]
+  > [@@@css.bindings [("A.x", "cid-x", "css-eaeacs-x css-1xaekgw-x")]]
   > EOF
 
   $ styled-ppx.generate a.ml
@@ -22,7 +22,7 @@ Repeated property within a single binding: "blue" must win.
   $ cat > b.ml <<EOF
   > [@@@css ".css-A-y{color:red;}"]
   > [@@@css ".css-B-y{color:blue;}"]
-  > [@@@css.bindings [("B.y", "css-A-y css-B-y")]]
+  > [@@@css.bindings [("B.y", "cid-y", "css-A-y css-B-y")]]
   > EOF
 
   $ styled-ppx.generate b.ml

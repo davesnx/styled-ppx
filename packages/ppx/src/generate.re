@@ -1105,6 +1105,7 @@ let extractedDynamicStyles =
     (
       ~loc,
       ~file,
+      ~main_module,
       ~scope,
       ~opens,
       ~moduleName,
@@ -1119,16 +1120,19 @@ let extractedDynamicStyles =
       )
     ) {
     | [] =>
-      let (classNames, dynamic_vars) =
+      let (identity, atomClasses, dynamic_vars) =
         Css_file.push(
           ~file,
+          ~main_module,
           ~scope,
           ~opens,
           ~source_position_start,
           ~label=moduleName,
+          ~name=Some(moduleName),
           rule_list,
         );
-      onClassNames(classNames);
+      let classNames = Css_file.classes_with_identity(~identity, atomClasses);
+      onClassNames(~identity, atomClasses);
       Css_to_runtime.render_make_call(
         ~loc,
         ~marker=None,
@@ -1189,6 +1193,7 @@ let dynamicExtractedComponent =
     (
       ~loc,
       ~file,
+      ~main_module,
       ~scope,
       ~opens,
       ~htmlTag,
@@ -1209,6 +1214,7 @@ let dynamicExtractedComponent =
     extractedDynamicStyles(
       ~loc,
       ~file,
+      ~main_module,
       ~scope,
       ~opens,
       ~moduleName,

@@ -18,17 +18,17 @@ as an external path unless another enclosing `Css` module exists.
   [@css ".css-59bkuc-wrapper.\000Css.marker\000{color:blue;}"];
   [@css.bindings
     [
-      ("Input.Css.marker", "css-tokvmb-marker"),
-      ("Input.Css.wrapper", "css-59bkuc-wrapper"),
+      ("Input.Css.marker", "cid-zr2uk1", "css-tokvmb-marker"),
+      ("Input.Css.wrapper", "cid-7sdyhq", "css-59bkuc-wrapper"),
     ]
   ];
   [@css.refs [("Css.marker", "input.re", 5, 8, 18)]];
   
   let _ = Css.marker;
   module Css = {
-    let marker = CSS.make("css-tokvmb-marker", []);
+    let marker = CSS.make("cid-zr2uk1 css-tokvmb-marker", []);
   
-    let wrapper = CSS.make("css-59bkuc-wrapper", []);
+    let wrapper = CSS.make("cid-7sdyhq css-59bkuc-wrapper", []);
   };
   
   let _ = (Css.marker, Css.wrapper);

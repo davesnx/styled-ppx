@@ -1,7 +1,7 @@
 /* Selector interpolation inside an @media at-rule.
 
    The recursive walk in transform_rule must descend into the at-rule
-   body and rewrite `.$(card)` to the resolved class chain there too.
+   body and rewrite `.$(card)` to `card`'s identity class there too.
    Mirrors `reason-styled-global2-at-rule-interpolation.t` but for
    selector interp instead of value interp. */
 
