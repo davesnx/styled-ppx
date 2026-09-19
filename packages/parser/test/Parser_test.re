@@ -423,6 +423,145 @@ let selector_combinator_ast_tests = [
   }),
 ];
 
+/* Statement (`;`-terminated) vs block (`{...}`-terminated) at-rule dispatch
+   must be driven by what follows the prelude (CSS Syntax Level 3 "consume
+   an at-rule"), not by a hard-coded allowlist of at-rule names. `@layer`'s
+   statement form (the standard layer-order-declaration syntax) previously
+   had no allowlist entry, so it hit a raw parse error instead of parsing as
+   a blockless at-rule the same way `@import`/`@charset`/`@namespace` do. */
+let at_rule_dispatch_tests = [
+  test_case("@layer comma list parses as a statement at-rule", `Quick, () => {
+    switch (Driver.parse_stylesheet(~source_position_start, "@layer a, b;")) {
+    | Ok(([Ast.At_rule({ name: ("layer", _), block: Ast.Empty, _ })], _)) =>
+      ()
+    | Ok(_) => fail("expected a single blockless @layer at-rule")
+    | Error((_, msg)) => fail("expected @layer a, b; to parse: " ++ msg)
+    }
+  }),
+  test_case("@layer single name parses as a statement at-rule", `Quick, () => {
+    switch (Driver.parse_stylesheet(~source_position_start, "@layer base;")) {
+    | Ok(([Ast.At_rule({ name: ("layer", _), block: Ast.Empty, _ })], _)) =>
+      ()
+    | Ok(_) => fail("expected a single blockless @layer at-rule")
+    | Error((_, msg)) => fail("expected @layer base; to parse: " ++ msg)
+    }
+  }),
+  test_case("@layer block form still parses as a block at-rule", `Quick, () => {
+    switch (
+      Driver.parse_stylesheet(
+        ~source_position_start,
+        "@layer base { .a { color: red } }",
+      )
+    ) {
+    | Ok((
+        [Ast.At_rule({ name: ("layer", _), block: Ast.Stylesheet(_), _ })],
+        _,
+      )) =>
+      ()
+    | Ok(_) => fail("expected a single block @layer at-rule")
+    | Error((_, msg)) =>
+      fail("expected @layer base { ... } to parse: " ++ msg)
+    }
+  }),
+  test_case("@import url() still parses as a statement at-rule", `Quick, () => {
+    switch (
+      Driver.parse_stylesheet(
+        ~source_position_start,
+        {|@import url("x.css");|},
+      )
+    ) {
+    | Ok(([Ast.At_rule({ name: ("import", _), block: Ast.Empty, _ })], _)) =>
+      ()
+    | Ok(_) => fail("expected a single blockless @import at-rule")
+    | Error((_, msg)) => fail("expected @import url(...); to parse: " ++ msg)
+    }
+  }),
+  test_case(
+    "@import with layer()/supports() prelude still parses as a statement at-rule",
+    `Quick,
+    () => {
+    switch (
+      Driver.parse_stylesheet(
+        ~source_position_start,
+        {|@import "x.css" layer(base) supports(display: grid);|},
+      )
+    ) {
+    | Ok(([Ast.At_rule({ name: ("import", _), block: Ast.Empty, _ })], _)) =>
+      ()
+    | Ok(_) => fail("expected a single blockless @import at-rule")
+    | Error((_, msg)) =>
+      fail("expected @import with layer()/supports() to parse: " ++ msg)
+    }
+  }),
+  test_case("@namespace still parses as a statement at-rule", `Quick, () => {
+    switch (
+      Driver.parse_stylesheet(
+        ~source_position_start,
+        "@namespace svg url(http://www.w3.org/2000/svg);",
+      )
+    ) {
+    | Ok((
+        [Ast.At_rule({ name: ("namespace", _), block: Ast.Empty, _ })],
+        _,
+      )) =>
+      ()
+    | Ok(_) => fail("expected a single blockless @namespace at-rule")
+    | Error((_, msg)) => fail("expected @namespace to parse: " ++ msg)
+    }
+  }),
+  test_case("@charset still parses as a statement at-rule", `Quick, () => {
+    switch (
+      Driver.parse_stylesheet(~source_position_start, {|@charset "utf-8";|})
+    ) {
+    | Ok(([Ast.At_rule({ name: ("charset", _), block: Ast.Empty, _ })], _)) =>
+      ()
+    | Ok(_) => fail("expected a single blockless @charset at-rule")
+    | Error((_, msg)) => fail("expected @charset to parse: " ++ msg)
+    }
+  }),
+  test_case("@media block form still parses as a block at-rule", `Quick, () => {
+    switch (
+      Driver.parse_stylesheet(
+        ~source_position_start,
+        "@media (min-width: 1px) { .a { color: red } }",
+      )
+    ) {
+    | Ok((
+        [Ast.At_rule({ name: ("media", _), block: Ast.Stylesheet(_), _ })],
+        _,
+      )) =>
+      ()
+    | Ok(_) => fail("expected a single block @media at-rule")
+    | Error((_, msg)) =>
+      fail("expected @media (min-width: 1px) { ... } to parse: " ++ msg)
+    }
+  }),
+  test_case(
+    "@font-face block form still parses as a block at-rule", `Quick, () => {
+    switch (
+      Driver.parse_stylesheet(
+        ~source_position_start,
+        "@font-face { font-family: X; }",
+      )
+    ) {
+    | Ok((
+        [
+          Ast.At_rule({
+            name: ("font-face", _),
+            block: Ast.Stylesheet(_),
+            _,
+          }),
+        ],
+        _,
+      )) =>
+      ()
+    | Ok(_) => fail("expected a single block @font-face at-rule")
+    | Error((_, msg)) =>
+      fail("expected @font-face { ... } to parse: " ++ msg)
+    }
+  }),
+];
+
 let ambiguity_regression_tests = [
   test_case(
     "declaration list stops before nested descendant selector", `Quick, () => {
@@ -562,6 +701,7 @@ let tests =
     declaration_ast_tests,
     function_ast_tests,
     selector_combinator_ast_tests,
+    at_rule_dispatch_tests,
     ambiguity_regression_tests,
     invalid_utf8_tests,
   ]);
