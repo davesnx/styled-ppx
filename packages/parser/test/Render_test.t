@@ -699,3 +699,20 @@ non-ASCII identifier such as "héllo" is left untouched.
   > --custom\ prop: red;
   > EOF
   --custom\ prop:red;.\31 a{color:red;}.-\31 a{color:red;}#\31 a{color:red;}.a\.b{color:red;}.foo\:bar{color:red;}.a\/b{color:red;}.foo\ bar{color:red;}.héllo{color:red;}.foo:not(.a\.b){color:red;}.\-{color:red;}.-\31 a{color:red;}
+
+An+B "of S" selector list (Selectors Level 4)
+  $ cat << "EOF" | ./Render_test.exe
+  > li:nth-child(2n+1 of .x) { foo: bar; }
+  > li:nth-last-child(odd of .a, .b) { foo: bar; }
+  > EOF
+  li:nth-child(2n+1 of .x){foo:bar;}li:nth-last-child(odd of .a,.b){foo:bar;}
+
+Functional pseudo-elements (::part(), ::slotted(), and any other identifier
+the lexer tokenizes as a function, since only nth-* names get their own
+token)
+  $ cat << "EOF" | ./Render_test.exe
+  > custom-element::part(foo) { foo: bar; }
+  > ::slotted(.bar) { foo: bar; }
+  > ::highlight(name) { foo: bar; }
+  > EOF
+  custom-element::part(foo){foo:bar;}::slotted(.bar){foo:bar;}::highlight(name){foo:bar;}

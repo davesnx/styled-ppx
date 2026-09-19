@@ -423,6 +423,94 @@ let selector_combinator_ast_tests = [
   }),
 ];
 
+/* Selectors Level 4 gaps: a functional pseudo-element (`::part()`, and any
+   other identifier followed by `(`, since the lexer only special-cases
+   `nth-*` names) and the "of S" form of `:nth-child()`/`:nth-last-child()`.
+   Both previously died with a raw parse error
+   (.workplace/docs/parser-audit-defects.md #7, #8). */
+let functional_selector_ast_tests = [
+  test_case("::part() parses as a functional pseudo-element", `Quick, () => {
+    switch (Driver.parse_stylesheet(~source_position_start, "::part(foo) {}")) {
+    | Ok(([Ast.Style_rule({ prelude: ([(selector, _)], _), _ })], _)) =>
+      switch (selector) {
+      | Ast.ComplexSelector(
+          Ast.Selector(
+            Ast.CompoundSelector({
+              pseudo_selectors:
+                [
+                  Ast.PseudoelementFunction({
+                    name: "part",
+                    payload:
+                      (
+                        [
+                          (
+                            Ast.RelativeSelector({
+                              combinator: None,
+                              complex_selector:
+                                Ast.Selector(
+                                  Ast.SimpleSelector(Ast.Type("foo")),
+                                ),
+                            }),
+                            _,
+                          ),
+                        ],
+                        _,
+                      ),
+                  }),
+                ],
+              _,
+            }),
+          ),
+        ) =>
+        ()
+      | _ => fail("expected functional pseudo-element AST")
+      }
+    | _ => fail("expected functional pseudo-element AST")
+    }
+  }),
+  test_case(
+    ":nth-child(An+B of S) parses the selector list alongside An+B", `Quick, () => {
+    switch (
+      Driver.parse_stylesheet(
+        ~source_position_start,
+        "li:nth-child(2n+1 of .x) {}",
+      )
+    ) {
+    | Ok(([Ast.Style_rule({ prelude: ([(selector, _)], _), _ })], _)) =>
+      switch (selector) {
+      | Ast.ComplexSelector(
+          Ast.Selector(
+            Ast.CompoundSelector({
+              subclass_selectors:
+                [
+                  Ast.Pseudo_class(
+                    Ast.Pseudoclass(
+                      Ast.NthFunction({
+                        payload:
+                          (
+                            Ast.NthSelector({
+                              nth: Ast.ANB(2, "+", 1),
+                              selectors: [Ast.Selector(_)],
+                            }),
+                            _,
+                          ),
+                        _,
+                      }),
+                    ),
+                  ),
+                ],
+              _,
+            }),
+          ),
+        ) =>
+        ()
+      | _ => fail("expected nth-of-selector-list AST")
+      }
+    | _ => fail("expected nth-of-selector-list AST")
+    }
+  }),
+];
+
 let at_rule_dispatch_tests = [
   test_case("@layer comma list parses as a statement at-rule", `Quick, () => {
     switch (Driver.parse_stylesheet(~source_position_start, "@layer a, b;")) {
@@ -929,6 +1017,7 @@ let tests =
     declaration_ast_tests,
     function_ast_tests,
     selector_combinator_ast_tests,
+    functional_selector_ast_tests,
     at_rule_dispatch_tests,
     nested_relative_selector_tests,
     ambiguity_regression_tests,
