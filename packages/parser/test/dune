@@ -1,13 +1,14 @@
 (test
  (name Runner)
- (modules Lexer_test Parser_test Runner)
+ (modules Lexer_test Parser_test Roundtrip_test Runner)
  (libraries
   sedlex
   styled_ppx_css_parser
   alcotest
   ppxlib
   ppxlib.astlib
-  ppx_deriving.runtime))
+  ppx_deriving.runtime
+  str))
 
 (rule
  (alias test-parser)
