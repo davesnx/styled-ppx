@@ -94,7 +94,11 @@ let success_tests =
     ({|screen|}, [IDENT("screen")]),
     ({|print|}, [IDENT("print")]),
     ({|@keyframes|}, [AT_KEYFRAMES("keyframes")]),
-    ({|@charset|}, [AT_RULE_STATEMENT("charset")]),
+    /* The lexer emits one AT_RULE token for every at-keyword (CSS Syntax
+       Level 3 has a single <at-keyword-token>); the parser, not the lexer,
+       decides statement vs block by what follows the prelude (`;` vs `{`).
+       See Parser_test.re's at-rule dispatch tests for that decision. */
+    ({|@charset|}, [AT_RULE("charset")]),
     ({|@media|}, [AT_RULE("media")]),
     ({|@mayushii|}, [AT_RULE("mayushii")]),
     ({|@|}, [DELIM("@")]),

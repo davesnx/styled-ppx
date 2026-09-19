@@ -869,12 +869,15 @@ let rec consume_token = lexbuf => {
   | "@" =>
     if (check_if_three_codepoints_would_start_an_identifier(lexbuf)) {
       let.ok string = consume_identifier(lexbuf) |> handle_consume_identifier;
+      /* One <at-keyword-token> for every at-keyword (CSS Syntax Level 3):
+         the parser, not the lexer, decides statement (';') vs block ('{')
+         by looking at what actually follows the prelude. `@keyframes` is
+         the one exception -- its body is a keyframe-selector list, not a
+         stylesheet or a bare statement, so the parser still needs a
+         distinct token to route it to that dedicated grammar. */
       let token =
         switch (string) {
         | "keyframes" => Tokens.AT_KEYFRAMES(string)
-        | "charset"
-        | "import"
-        | "namespace" => Tokens.AT_RULE_STATEMENT(string)
         | _ => Tokens.AT_RULE(string)
         };
       Ok(token);
