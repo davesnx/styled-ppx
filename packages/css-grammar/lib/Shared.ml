@@ -1795,7 +1795,8 @@ let url : url Rule.rule = Url.rule
 (* https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/length-percentage#use_in_calc *)
 module Extended_length =
   [%spec_module
-  "<length> | <calc()> | <interpolation> | <min()> | <max()>",
+  "<length> | <calc()> | <interpolation> | <min()> | <max()> | <clamp()> | \
+   <env()>",
   (module Css_types.Length)]
 
 let extended_length : extended_length Rule.rule = Extended_length.rule
@@ -1810,35 +1811,36 @@ let length_percentage : length_percentage Rule.rule = Length_percentage.rule
 
 module Extended_frequency =
   [%spec_module
-  "<frequency> | <calc()> | <interpolation> | <min()> | <max()>",
+  "<frequency> | <calc()> | <interpolation> | <min()> | <max()> | <clamp()>",
   (module Css_types.Frequency)]
 
 let extended_frequency : extended_frequency Rule.rule = Extended_frequency.rule
 
 module Extended_angle =
   [%spec_module
-  "<angle> | <calc()> | <interpolation> | <min()> | <max()>",
+  "<angle> | <calc()> | <interpolation> | <min()> | <max()> | <clamp()>",
   (module Css_types.Angle)]
 
 let extended_angle : extended_angle Rule.rule = Extended_angle.rule
 
 module Extended_time =
   [%spec_module
-  "<time> | <calc()> | <interpolation> | <min()> | <max()>",
+  "<time> | <calc()> | <interpolation> | <min()> | <max()> | <clamp()>",
   (module Css_types.Time)]
 
 let extended_time : extended_time Rule.rule = Extended_time.rule
 
 module Extended_time_no_interp =
   [%spec_module
-  "<time> | <calc()> | <min()> | <max()>", (module Css_types.Time)]
+  "<time> | <calc()> | <min()> | <max()> | <clamp()>", (module Css_types.Time)]
 
 let extended_time_no_interp : extended_time_no_interp Rule.rule =
   Extended_time_no_interp.rule
 
 module Extended_percentage =
   [%spec_module
-  "<percentage> | <calc()> | <interpolation> | <min()> | <max()> ",
+  "<percentage> | <calc()> | <interpolation> | <min()> | <max()> | <clamp()> | \
+   <env()>",
   (module Css_types.Percentage)]
 
 let extended_percentage : extended_percentage Rule.rule =

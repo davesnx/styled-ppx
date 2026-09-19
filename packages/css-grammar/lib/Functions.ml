@@ -100,7 +100,7 @@ let function_ellipse : function_ellipse Rule.rule = Function_ellipse.rule
 
 module Function_env =
   [%spec_module
-  "env( <custom-ident> ',' [ <declaration-value> ]? )"]
+  "env( <custom-ident> [ ',' <declaration-value> ]? )"]
 
 let function_env : function_env Rule.rule = Function_env.rule
 
