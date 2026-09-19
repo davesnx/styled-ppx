@@ -40,11 +40,19 @@ let env = {
   defaultValue: "development",
 };
 
+let namespace = {
+  flag: "--namespace",
+  doc: "Mixed into every binding's identity class hash, so two libraries that share a module basename and binding name mint distinct `cid-` classes. Pass the same value on a library's native and melange (pps styled-ppx ...) stanzas.",
+  value: None,
+  defaultValue: "",
+};
+
 type settings = {
   native: flag(bool),
   debug: flag(bool),
   minify: flag(bool),
   dev: flag(bool),
+  namespace: flag(string),
   /* Not a CLI flag: set from the dune `library-name` cookie
      (see Ppxlib.Driver.Cookies in ppx.re). */
   library: option(string),
@@ -56,6 +64,7 @@ let currentSettings =
     debug,
     minify,
     dev,
+    namespace,
     library: None,
   });
 
@@ -74,6 +83,9 @@ module Get = {
   let dev = () =>
     currentSettings.contents.dev.value
     |> Option.value(~default=currentSettings.contents.dev.defaultValue);
+  let namespace = () =>
+    currentSettings.contents.namespace.value
+    |> Option.value(~default=currentSettings.contents.namespace.defaultValue);
   let library = () => currentSettings.contents.library;
 };
 
@@ -107,6 +119,15 @@ module Update = {
       ...currentSettings.contents,
       dev: {
         ...currentSettings.contents.dev,
+        value: Some(value),
+      },
+    });
+
+  let namespace = value =>
+    updateSettings({
+      ...currentSettings.contents,
+      namespace: {
+        ...currentSettings.contents.namespace,
         value: Some(value),
       },
     });

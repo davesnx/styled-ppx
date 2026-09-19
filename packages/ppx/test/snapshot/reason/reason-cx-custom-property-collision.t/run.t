@@ -16,20 +16,20 @@ merged styles cannot overwrite each other.
   ];
   [@css.bindings
     [
-      ("Output.common", "css-160vrad-common"),
-      ("Output.clickable", "css-10a6meq-clickable"),
+      ("Output.common", "cid-45bzlz", "css-160vrad-common"),
+      ("Output.clickable", "cid-1d9eonh", "css-10a6meq-clickable"),
     ]
   ];
   let common = backgroundColor =>
     CSS.make(
-      "css-160vrad-common",
+      "cid-45bzlz css-160vrad-common",
       [
         ("--backgroundColor-ov3le6", CSS.Types.Color.toString(backgroundColor)),
       ],
     );
   let clickable = backgroundColor =>
     CSS.make(
-      "css-10a6meq-clickable",
+      "cid-1d9eonh css-10a6meq-clickable",
       [
         ("--backgroundColor-7yjmr3", CSS.Types.Color.toString(backgroundColor)),
       ],

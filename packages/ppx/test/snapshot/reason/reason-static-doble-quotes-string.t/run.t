@@ -7,6 +7,7 @@
     [
       (
         "Output.SingleQuoteStrings",
+        "cid-ekh1sj",
         "css-k008qs-SingleQuoteStrings css-1tyndxa-SingleQuoteStrings",
       ),
     ]
@@ -996,7 +997,7 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "css-k008qs-SingleQuoteStrings css-1tyndxa-SingleQuoteStrings",
+        "cid-ekh1sj css-k008qs-SingleQuoteStrings css-1tyndxa-SingleQuoteStrings",
         [],
       );
     let make = (props: makeProps) => {

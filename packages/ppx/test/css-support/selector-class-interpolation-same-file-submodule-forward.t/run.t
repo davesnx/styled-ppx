@@ -18,17 +18,17 @@ referenced submodule binding above the selector interpolation.
   [@css ".css-tokvmb-marker{color:red;}"];
   [@css.bindings
     [
-      ("Input.wrapper", "css-59bkuc-wrapper"),
-      ("Input.Css.marker", "css-tokvmb-marker"),
+      ("Input.wrapper", "cid-4f6ye3", "css-59bkuc-wrapper"),
+      ("Input.Css.marker", "cid-zr2uk1", "css-tokvmb-marker"),
     ]
   ];
   [@css.refs [("Css.marker", "input.re", 2, 6, 16)]];
   
   let _ = Css.marker;
-  let wrapper = CSS.make("css-59bkuc-wrapper", []);
+  let wrapper = CSS.make("cid-4f6ye3 css-59bkuc-wrapper", []);
   
   module Css = {
-    let marker = CSS.make("css-tokvmb-marker", []);
+    let marker = CSS.make("cid-zr2uk1 css-tokvmb-marker", []);
   };
   
   let _ = (wrapper, Css.marker);

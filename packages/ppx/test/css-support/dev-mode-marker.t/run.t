@@ -20,14 +20,15 @@ a CSS rule.
   [@css ".css-tokvmb-button{color:red;}"];
   [@css.bindings
     [
-      ("Input.layout", "css-k008qs-layout css-38zrbw-layout"),
-      ("Input.button", "css-tokvmb-button"),
+      ("Input.layout", "cid-1jj5tmt", "css-k008qs-layout css-38zrbw-layout"),
+      ("Input.button", "cid-l55coe", "css-tokvmb-button"),
     ]
   ];
   
-  let layout = CSS.make("cx-layout css-k008qs-layout css-38zrbw-layout", []);
+  let layout =
+    CSS.make("cx-layout cid-1jj5tmt css-k008qs-layout css-38zrbw-layout", []);
   
-  let button = CSS.make("cx-button css-tokvmb-button", []);
+  let button = CSS.make("cx-button cid-l55coe css-tokvmb-button", []);
   
   let _ = (layout, button);
 

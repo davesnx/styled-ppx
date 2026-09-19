@@ -1,17 +1,24 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css
-    "body .css-k008qs-multi.css-tokvmb-multi.css-eaeacs-multi{font-weight:bold;}"
-  ];
+  [@css "body .cid-wbeinp{font-weight:bold;}"];
   [@css ".css-k008qs-multi{display:flex;}"];
   [@css ".css-tokvmb-multi{color:red;}"];
   [@css ".css-eaeacs-multi{margin:10px;}"];
   [@css.bindings
-    [("Output.multi", "css-k008qs-multi css-tokvmb-multi css-eaeacs-multi")]
+    [
+      (
+        "Output.multi",
+        "cid-wbeinp",
+        "css-k008qs-multi css-tokvmb-multi css-eaeacs-multi",
+      ),
+    ]
   ];
   let multi =
-    CSS.make("css-k008qs-multi css-tokvmb-multi css-eaeacs-multi", []);
+    CSS.make(
+      "cid-wbeinp css-k008qs-multi css-tokvmb-multi css-eaeacs-multi",
+      [],
+    );
   module Globals = {
     let to_string = () => "";
     [@warning "-27-32"]

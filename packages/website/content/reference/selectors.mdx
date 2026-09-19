@@ -70,7 +70,7 @@ The supported syntax includes the usual selector building blocks:
 
 ## Class references in selectors
 
-Interpolating a **binding** in selector position references another `[%css]` value's generated classes. The reference is resolved statically: the actual class names are substituted into the extracted stylesheet:
+Interpolating a **binding** in selector position resolves to that `[%css]` value's identity class. The reference is resolved statically: the identity class is substituted into the extracted stylesheet:
 
 ```reason
 let outlined = [%css "border: 1px solid"];
@@ -100,7 +100,7 @@ let button = [%css {|
 |}]
 ```
 
-- `.$(name)` splices the binding's classes as a compound (`.cssA.cssB` when the binding has several atoms). Bare `$(name)` (no leading `.`) is accepted only when the binding has a single atom. Otherwise the ppx raises ``Bare `$(name)` selector interpolation expanded to N class names; this position only accepts a single class. Prefix with `.` to use a class chain instead: `.$(name)`.``
+- `.$(name)` and bare `$(name)` (no leading `.`) both resolve to the binding's identity class (`cid-<hash>`) — one class, regardless of how many atoms the binding minted. A binding with no declarations (`let name = [%css {||}]`) still mints an identity, so `&.$(name)` resolves against it too. A reference is therefore always a single class inside the compound selector, the same specificity as any other class.
 - References work inside combinators, pseudo-classes (`:not(&.$(other))`, `:has(.$(other))`), comma lists, and inside nested `@media` / `@supports` bodies.
 - Same-file bindings resolve during ppx expansion; **cross-module** references (`$(Card.container)`) resolve when [the stylesheet is generated](/how-it-works#class-references-in-selectors). Referencing a binding that doesn't exist is a compile error; references across *library* boundaries are unsupported (see the [build errors](/getting-started/dune-setup#troubleshooting) they produce).
 

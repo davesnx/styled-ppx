@@ -34,6 +34,7 @@ If this test fail means that the module is not in sync with the ppx
     [
       (
         "Input._chart",
+        "cid-1e3u8p2",
         "css-9y6172-_chart css-wdylr4-_chart css-3xax0l-_chart css-1fqvgu0-_chart css-o0c7xs-_chart",
       ),
     ]
@@ -41,6 +42,6 @@ If this test fail means that the module is not in sync with the ppx
   
   let _chart =
     CSS.make(
-      "css-9y6172-_chart css-wdylr4-_chart css-3xax0l-_chart css-1fqvgu0-_chart css-o0c7xs-_chart",
+      "cid-1e3u8p2 css-9y6172-_chart css-wdylr4-_chart css-3xax0l-_chart css-1fqvgu0-_chart css-o0c7xs-_chart",
       [],
     );
