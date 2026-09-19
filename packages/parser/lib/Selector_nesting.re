@@ -178,6 +178,25 @@ let subject_escapes_ampersand_subtree = (sel: selector): bool => {
   && !subject_inside_ampersand(flatten_selector_chain(sel));
 };
 
+/* A top-level prelude selector needs an ambient parent to resolve against
+   when it contains a literal `&`, or when it starts with a bare combinator
+   (`> .a` means `& > .a`, same implicit `&` as writing it out). Only the
+   outermost shape is checked for the latter — a leading combinator nested
+   inside a `:has()`/`:is()` payload (`:has(> img)`) is self-contained and
+   never needs one, which is why this doesn't just teach `contains_ampersand`
+   itself: that function also runs on payloads. Used to reject a
+   [%styled.global] rule the same way regardless of which of the two
+   spellings it used. */
+let needs_parent_selector = (selector: selector): bool => {
+  contains_ampersand(selector)
+  || (
+    switch (selector) {
+    | RelativeSelector({ combinator: Some(_), _ }) => true
+    | _ => false
+    }
+  );
+};
+
 /* Flatten nested combinator trees into head + flat segment steps.
    Purely structural (no `&` synthesis, unlike `flatten_selector_chain`);
    nested trees arise from joins/substitutions of complex selectors. */
@@ -565,22 +584,52 @@ let split_by_kind = (rules: list(rule)) => {
   );
 };
 
+/* A nested rule's prelude item that starts with a combinator (`> .child`)
+   means exactly `& combinator .child`: rebuild it as the equivalent
+   explicit-`&` complex selector so it goes through the same
+   `contains_ampersand`/`replace_ampersand` path below as if the user had
+   written `&` themselves. Flattening the combinator onto the front of
+   `complex_selector`'s own segment list (rather than nesting it as a new
+   `ComplexSelector` on the right of a fresh `Combinator`) matches exactly
+   what parsing `& combinator ...` would have produced, so `> .child` and
+   `& > .child` resolve to the identical AST. A `RelativeSelector` with no
+   combinator (only reachable today from a `:has()`-style payload, never
+   from a style-rule prelude) is just its bare `complex_selector`. */
+let relative_selector_to_complex_selector =
+    ({ combinator, complex_selector }: relative_selector): selector => {
+  switch (combinator) {
+  | None => ComplexSelector(complex_selector)
+  | Some(combinator) =>
+    let (first_selector, rest) =
+      switch (complex_selector) {
+      | Selector(selector) => (selector, [])
+      | Combinator({ left, right }) => (left, right)
+      };
+    ComplexSelector(
+      Combinator({
+        left: SimpleSelector(Ampersand),
+        right: [(combinator, first_selector), ...rest],
+      }),
+    );
+  };
+};
+
 /** Compute the merged prefix when nesting a selector under a parent.
 
     Per CSS Nesting Level 1 §3.1, a nested selector that does not
     contain the nesting selector (`&`) and does not start with a
     combinator desugars by descendant-combinator-joining with the
-    parent. Selectors that do contain `&` resolve via literal
-    substitution. The two arms below implement exactly those rules.
-
-    Selectors that start with a combinator are accepted as relative
-    (e.g. `> .child` desugars to `& > .child`) when the parser supports
-    them in nested position. The current parser only accepts leading
-    combinators inside pseudo-class payloads (`:has(> img)`); a leading
-    `>` after `{` is rejected at parse time, so this function never
-    sees that shape. Users must write `& > .child` until the parser
-    grows nested-relative-selector support. */
+    parent. Selectors that do contain `&` (including one synthesised
+    from a leading combinator, see `relative_selector_to_complex_selector`
+    above) resolve via literal substitution. The two arms below implement
+    exactly those rules. */
 let compute_new_prefix = (~prefix, current_selector) => {
+  let current_selector =
+    switch (current_selector) {
+    | RelativeSelector(relative) =>
+      relative_selector_to_complex_selector(relative)
+    | other => other
+    };
   switch (prefix) {
   | None => current_selector
   | Some(prefix) =>
