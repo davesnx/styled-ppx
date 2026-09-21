@@ -148,17 +148,17 @@ must honor, as string key/value pairs. Two keys today:
 - `env`: set to `"production"` when the PPX runs with production settings
   (`--minify` or `--env production`), and the aggregator minifies its
   output accordingly.
-- `library`: the value of the `library-name` cookie dune passes to every
+- `library-name`: the value of the `library-name` cookie dune passes to every
   ppx run inside a `(library ...)` stanza, read via
   `Ppxlib.Driver.Cookies.add_simple_handler`. Absent when the module isn't
   compiled as part of a library (for example an `(executable ...)`
   stanza) or the cookie wasn't set.
 
 ```ocaml
-[@@@css.config [("env", "production"); ("library", "my_lib")]]
+[@@@css.config [("env", "production"); ("library-name", "my_lib")]]
 ```
 
-When both apply, `env` comes first, then `library`. Absence of every key
+When both apply, `env` comes first, then `library-name`. Absence of every key
 means the attribute is omitted entirely — dev output with no library
 cookie stays exactly as before this key was added. Unknown keys are
 ignored by the aggregator (forward compatibility).
