@@ -7,6 +7,7 @@ This test ensures Reason switch type errors are reported with correct locations
   $ cat > dune << EOF
   > (executable
   >  (name input)
+  >  (flags :standard -short-paths)
   >  (libraries styled-ppx.native)
   >  (preprocess (pps styled-ppx)))
   > EOF
