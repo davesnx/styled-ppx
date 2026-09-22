@@ -357,7 +357,7 @@ Errors are accumulated; if any fire, the aggregator prints them all to
 stderr in `File "...", line N, characters X-Y:` format (the OCaml
 compiler convention, so editors pick them up) and exits 1.
 
-**Identity collision.** While building the index (during Harvest, not
+**Identity collision.** While building the index (during Extract, not
 Resolve), two different bindings can hash to the same identity — e.g.
 two libraries whose modules share a basename and binding name, with no
 distinguishing `--namespace`. This is only an error when their
