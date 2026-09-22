@@ -409,9 +409,6 @@ module Css_transform = {
     };
   }
 
-  /* Resolve `ClassVariable(name)` (i.e. `.$(name)`) to a `Class(c)`
-     subclass selector carrying the referenced [%css] binding's identity
-     class, regardless of how many atoms that binding minted. */
   and transform_compound_selector = (ctx, compound: compound_selector) => {
     let transformed_type_selector =
       Option.map(
@@ -1330,10 +1327,6 @@ let push =
   (identity, binding_classes, dynamic_vars);
 };
 
-/* The className list a `push` result renders with: the identity class
-   first (when the binding is named), then its atoms. Shared by every
-   `push` call site so the identity/atoms split doesn't get re-merged
-   three different ways. */
 let classes_with_identity = (~identity, atomClasses) =>
   switch (identity) {
   | Some(cid) => [cid, ...atomClasses]
