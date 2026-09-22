@@ -8,13 +8,13 @@ library sort breaks it deterministically instead of failing the build.
   $ mkdir lib_a lib_b
 
   $ cat > lib_a/x.ml <<EOF
-  > [@@@css.config [("library", "lib_a")]]
+  > [@@@css.config [("library-name", "lib_a")]]
   > [@@@css ".a-x{color:red;}"]
   > let _ = Lib_b.y
   > EOF
 
   $ cat > lib_b/y.ml <<EOF
-  > [@@@css.config [("library", "lib_b")]]
+  > [@@@css.config [("library-name", "lib_b")]]
   > [@@@css ".b-y{color:blue;}"]
   > let _ = Lib_a.x
   > EOF

@@ -7,13 +7,13 @@ references `Zlib.Inner.x`. The reference resolves to the library through
   $ mkdir consumer zlib
 
   $ cat > zlib/inner.ml <<EOF
-  > [@@@css.config [("library", "zlib")]]
+  > [@@@css.config [("library-name", "zlib")]]
   > [@@@css ".zlib-inner{color:green;}"]
   > let x = 1
   > EOF
 
   $ cat > consumer/main.ml <<EOF
-  > [@@@css.config [("library", "consumer")]]
+  > [@@@css.config [("library-name", "consumer")]]
   > [@@@css ".consumer-main{color:blue;}"]
   > let _ = Zlib.Inner.x
   > EOF
