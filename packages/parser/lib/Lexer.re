@@ -225,7 +225,9 @@ let consume_escaped = lexbuf => {
 };
 
 // https://drafts.csswg.org/css-syntax-3/#consume-name
-let consume_identifier = lexbuf => {
+// Escapes are decoded while reading, so `#\66 ff` names the same color as
+// `#fff`.
+let consume_name = lexbuf => {
   let rec read = acc =>
     switch%sedlex (lexbuf) {
     | identifier_code_point => read(acc ++ lexeme(lexbuf))
@@ -237,6 +239,13 @@ let consume_identifier = lexbuf => {
     };
   read(lexeme(lexbuf));
 };
+
+// An identifier is a name re-serialized into the spelling CSS needs, so the
+// token for `.\31 a` carries `\31 a` rather than the decoded `1a` that would
+// render as the invalid `.1a`, and `.a\.b` stays one class rather than two.
+// Alternate spellings normalize: `\2d 1a` and `-\31 a` both lex as `-\31 a`.
+let consume_identifier = lexbuf =>
+  consume_name(lexbuf) |> Result.map(Tokens.serialize_identifier);
 
 // https://drafts.csswg.org/css-syntax-3/#consume-remnants-of-bad-url
 let rec consume_remnants_bad_url = lexbuf =>
@@ -779,14 +788,16 @@ let rec consume_token = lexbuf => {
     | starts_with_a_valid_escape =>
       Sedlexing.rollback(lexbuf);
       switch%sedlex (lexbuf) {
-      | identifier_start_code_point =>
+      | starts_an_identifier
+      | starts_with_a_valid_escape =>
         Sedlexing.rollback(lexbuf);
         let.ok string =
           consume_identifier(lexbuf) |> handle_consume_identifier;
         Ok(Tokens.HASH((string, `ID)));
       | _ =>
-        let.ok string =
-          consume_identifier(lexbuf) |> handle_consume_identifier;
+        /* A hash that does not start an identifier (`#123456`) is a color,
+           not a selector, so its decoded name stays as is. */
+        let.ok string = consume_name(lexbuf) |> handle_consume_identifier;
         Ok(Tokens.HASH((string, `UNRESTRICTED)));
       };
     | _ => Ok(DELIM("#"))
