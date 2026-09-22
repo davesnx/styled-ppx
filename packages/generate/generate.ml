@@ -101,6 +101,12 @@ module Refs = struct
   let of_list_expr = Css_extraction.decode_refs_payload
 end
 
+(** [--order]: [Dependency] (the default) emits a module's rules after the rules
+    of every module it references; [Source] keeps the input file order. *)
+type order_mode =
+  | Dependency
+  | Source
+
 (** Per-file harvest: rules with potential sentinels, all cross-module ref
     descriptors seen in this file, the file's declared environment from
     [[@@@css.config]] ([None] when absent, i.e. development), and the module
@@ -328,7 +334,7 @@ let order_by_dependency (harvests : harvest list) : harvest list =
   ordered
 
 (** Collect, index, resolve, dedup, output. *)
-let run ~output_file ~dependency_order input_files =
+let run ~output_file ~order input_files =
   Logger.info "output file: %s"
     (match output_file with Some file -> file | None -> "stdout");
   let idx = Index.create () in
@@ -344,7 +350,9 @@ let run ~output_file ~dependency_order input_files =
       input_files
   in
   let harvests =
-    if dependency_order then order_by_dependency harvests else harvests
+    match order with
+    | Dependency -> order_by_dependency harvests
+    | Source -> harvests
   in
 
   (* Resolve all rules across all harvests, collecting errors with locations. *)
@@ -447,15 +455,14 @@ let run ~output_file ~dependency_order input_files =
     the [[@@@css.config]] attributes the PPX embeds in its input files, so the
     environment is declared exactly once, on the (pps styled-ppx ...) stanza. *)
 let parse_args args =
-  let rec parse acc ~output_file ~log_level ~dependency_order = function
+  let rec parse acc ~output_file ~log_level ~order = function
     | "-o" :: file :: rest
     | "-output" :: file :: rest
     | "--output" :: file :: rest ->
-      parse acc ~output_file:(Some file) ~log_level ~dependency_order rest
+      parse acc ~output_file:(Some file) ~log_level ~order rest
     | "--log" :: level :: rest ->
       (match Logger.level_of_string level with
-      | Some log_level ->
-        parse acc ~output_file ~log_level ~dependency_order rest
+      | Some log_level -> parse acc ~output_file ~log_level ~order rest
       | None ->
         Logger.error
           "invalid --log level %S (expected \"error\", \"warning\", \"info\" \
@@ -463,11 +470,11 @@ let parse_args args =
           level;
         exit 2)
     | "--debug" :: rest ->
-      parse acc ~output_file ~log_level:Logger.Debug ~dependency_order rest
+      parse acc ~output_file ~log_level:Logger.Debug ~order rest
     | "--order" :: "dependency" :: rest ->
-      parse acc ~output_file ~log_level ~dependency_order:true rest
+      parse acc ~output_file ~log_level ~order:Dependency rest
     | "--order" :: "source" :: rest ->
-      parse acc ~output_file ~log_level ~dependency_order:false rest
+      parse acc ~output_file ~log_level ~order:Source rest
     | "--order" :: mode :: _ ->
       Logger.error
         "invalid --order value %S (expected \"dependency\" or \"source\")" mode;
@@ -478,17 +485,13 @@ let parse_args args =
     | arg :: _ when String.length arg > 0 && arg.[0] = '-' ->
       Logger.error "unknown flag %S" arg;
       exit 2
-    | arg :: rest ->
-      parse (arg :: acc) ~output_file ~log_level ~dependency_order rest
-    | [] -> List.rev acc, output_file, log_level, dependency_order
+    | arg :: rest -> parse (arg :: acc) ~output_file ~log_level ~order rest
+    | [] -> List.rev acc, output_file, log_level, order
   in
   let tail = match Array.to_list args with [] -> [] | _ :: t -> t in
-  parse [] ~output_file:None ~log_level:Logger.Warning ~dependency_order:true
-    tail
+  parse [] ~output_file:None ~log_level:Logger.Warning ~order:Dependency tail
 
 let () =
-  let input_files, output_file, log_level, dependency_order =
-    parse_args Sys.argv
-  in
+  let input_files, output_file, log_level, order = parse_args Sys.argv in
   Logger.set_level log_level;
-  run ~output_file ~dependency_order input_files
+  run ~output_file ~order input_files
