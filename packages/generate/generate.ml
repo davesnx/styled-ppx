@@ -88,8 +88,6 @@ module Index = struct
   type t = {
     by_longident : (string, string) Hashtbl.t;
     by_identity : (string, string * string * string) Hashtbl.t;
-      (** identity -> (longident, class_string, filename) of the first entry
-          seen for that identity. *)
   }
 
   let create () : t =
