@@ -677,10 +677,11 @@ Multiple selectors
   > EOF
   .classname{margin-right:20px;}.classname:hover .languageIcon{opacity:1;}.classname:hover svg > path{fill:#333;}.classname .menuOpened .languageIcon{opacity:1;}.classname .menuOpened svg > path{fill:#333;}
 
-Escaped identifiers are re-escaped on render, not printed as the decoded
-character. Before this fix, `.\31 a` (class "1a") rendered as the invalid
-`.1a`, and `.a\.b` (one class literally named "a.b") rendered as `.a.b` —
-two classes, changing what the selector matches with no error at all.
+The lexer keeps an escaped identifier in its canonical escaped spelling
+instead of decoding it to the bare character. Before this fix, `.\31 a`
+(class "1a") rendered as the invalid `.1a`, and `.a\.b` (one class literally
+named "a.b") rendered as `.a.b` — two classes, changing what the selector
+matches with no error at all.
 `\2d 1a` is an alternate spelling of `-1a`; both normalize the same way. A
 non-ASCII identifier such as "héllo" is left untouched.
   $ cat << "EOF" | ./Render_test.exe

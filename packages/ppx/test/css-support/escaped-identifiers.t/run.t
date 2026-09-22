@@ -1,12 +1,12 @@
-The lexer decodes a CSS escape while reading an identifier but keeps no
-record that one was there, so the renderer printed the decoded text back
-out unescaped. Before this fix, `.\31 a { color: red; }` (class "1a")
+The lexer decoded a CSS escape while reading an identifier and kept no
+record that one was there, so the decoded text reached the output
+unescaped. Before this fix, `.\31 a { color: red; }` (class "1a")
 compiled with no error to the invalid `.1a{...}`, and `.a\.b { color: red; }`
 (one class literally named "a.b") compiled to `.a.b{...}` — two classes,
-silently changing what the selector matches. `serialize_identifier`
-(`Render.re`) now re-escapes on the way out, everywhere the lexer can hand
-back a decoded identifier, including the property name in `--custom\ prop`.
-A non-ASCII identifier such as "héllo" is left untouched.
+silently changing what the selector matches. `consume_identifier`
+(`Lexer.re`) now re-serializes the decoded name per CSSOM, so every
+identifier token, including the property name in `--custom\ prop`, already
+carries valid CSS. A non-ASCII identifier such as "héllo" is left untouched.
 
   $ cat > dune-project << EOF
   > (lang dune 3.10)
