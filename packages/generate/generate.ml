@@ -101,23 +101,12 @@ module Refs = struct
   let of_list_expr = Css_extraction.decode_refs_payload
 end
 
-(** [--order dependency] (the default) emits a module's rules after the rules of
-    every module it depends on; [--order source] keeps the input file order,
-    unchanged from before this flag existed. Kept as an escape hatch for one
-    release and for the winner-diff comparison against the old behaviour (see
-    [documents/css-extraction.md]). *)
-type order_mode =
-  | Order_dependency
-  | Order_source
-
 (** Per-file harvest: rules with potential sentinels, all cross-module ref
-    descriptors seen in this file, and the file's declared environment from
-    [[@@@css.config]] ([None] when absent, i.e. development). The bindings
-    attribute is consumed directly into the global [Index] during the same walk.
-    [references] is the raw module names the file's structure names (before
-    resolving them to input files), used to order harvests by dependency; see
-    {!Order}. Left [[]] under [Order_source], the one mode that never consults
-    it. *)
+    descriptors seen in this file, the file's declared environment from
+    [[@@@css.config]] ([None] when absent, i.e. development), and the module
+    names the file references ({!Order.references}), for {!order_by_dependency}.
+    The bindings attribute is consumed directly into the global [Index] during
+    the same walk. *)
 type harvest = {
   filename : string;
   rules : string list;
@@ -127,7 +116,7 @@ type harvest = {
   references : string list;
 }
 
-let harvest_structure ~filename ~idx ~order structure : harvest =
+let harvest_structure ~filename ~idx structure : harvest =
   let rules = ref [] in
   let refs = ref [] in
   let env = ref None in
@@ -169,10 +158,7 @@ let harvest_structure ~filename ~idx ~order structure : harvest =
     refs = List.rev !refs;
     env = !env;
     protocol_errors = List.rev !protocol_errors;
-    references =
-      (match order with
-      | Order_dependency -> Order.references structure
-      | Order_source -> []);
+    references = Order.references structure;
   }
 
 (** Read a post-PPX [.ml] file or its serialized [.pp.ml] AST into a ppxlib
@@ -292,90 +278,57 @@ let production_mode harvests =
       Css_extraction.config_attribute_name prod.filename dev.filename;
     false
 
-(** Resolve each harvest's raw {!Order.references} to an edge onto another
-    harvest in this run, then order by {!Order.sort}.
-
-    Candidates for a referenced name are every input file whose module name
-    matches; the one sharing the longest directory prefix with the referencing
-    file wins. A tie, or zero candidates, means no edge (debug-logged): this
-    generator only sees one library's files at a time, so a same-named-module
-    tie can't be broken from path proximity alone. PR 2 replaces this rule with
-    library-membership resolution. A reference to the referrer's own module name
-    is a self-reference and is ignored. *)
+(** Order harvests so each file comes after the files it references
+    ({!Order.sort}). A referenced module name resolves to the input file with
+    that module name; when several match, the one sharing the longest directory
+    prefix with the referrer wins, and a tie means no edge. This generator sees
+    one library at a time, so a same-named-module tie can't be broken from paths
+    alone; PR 2 resolves by library membership instead. *)
 let order_by_dependency (harvests : harvest list) : harvest list =
-  let by_module_name : (string, harvest) Hashtbl.t =
-    Hashtbl.create (List.length harvests)
-  in
+  let by_module_name = Hashtbl.create (List.length harvests) in
   List.iter
     (fun h -> Hashtbl.add by_module_name (module_of_filename h.filename) h)
     harvests;
-  let dir_segments filename =
-    Filename.dirname filename
-    |> String.split_on_char '/'
+  let dirs filename =
+    String.split_on_char '/' (Filename.dirname filename)
     |> List.filter (fun s -> s <> "" && s <> ".")
   in
-  let rec common_prefix_len a b =
+  let rec shared_prefix a b =
     match a, b with
-    | x :: xs, y :: ys when x = y -> 1 + common_prefix_len xs ys
+    | x :: xs, y :: ys when x = y -> 1 + shared_prefix xs ys
     | _ -> 0
   in
-  let resolve_reference referrer referenced_name =
-    if referenced_name = module_of_filename referrer.filename then None
-    else (
-      match Hashtbl.find_all by_module_name referenced_name with
-      | [] -> None
-      | [ only ] -> Some only
-      | candidates ->
-        let referrer_dir = dir_segments referrer.filename in
-        let scored =
-          List.map
-            (fun c ->
-              common_prefix_len referrer_dir (dir_segments c.filename), c)
-            candidates
-        in
-        let max_len =
-          List.fold_left (fun acc (l, _) -> max acc l) (-1) scored
-        in
-        (match List.filter (fun (l, _) -> l = max_len) scored with
-        | [ (_, only) ] -> Some only
-        | ties ->
-          Logger.debug
-            "ambiguous module %S referenced from %s: %d files tie for the \
-             closest path (%s); no dependency edge"
-            referenced_name referrer.filename (List.length ties)
-            (String.concat ", " (List.map (fun (_, c) -> c.filename) ties));
-          None))
+  let resolve referrer name =
+    let candidates = Hashtbl.find_all by_module_name name in
+    let closeness c =
+      shared_prefix (dirs referrer.filename) (dirs c.filename)
+    in
+    let best =
+      List.fold_left (fun acc c -> max acc (closeness c)) 0 candidates
+    in
+    match List.filter (fun c -> closeness c = best) candidates with
+    | [ only ] -> Some only
+    | [] -> None
+    | ties ->
+      Logger.debug "ambiguous module %s referenced from %s (%s); no edge" name
+        referrer.filename
+        (String.concat ", " (List.map (fun c -> c.filename) ties));
+      None
   in
-  let edges_by_filename : (string, harvest list) Hashtbl.t =
-    Hashtbl.create (List.length harvests)
-  in
-  List.iter
-    (fun h ->
-      let deps =
-        h.references
-        |> List.filter_map (resolve_reference h)
-        |> List.sort_uniq (fun a b -> String.compare a.filename b.filename)
-      in
-      Hashtbl.replace edges_by_filename h.filename deps)
-    harvests;
-  let edges h = Hashtbl.find edges_by_filename h.filename in
+  let edges h = List.filter_map (resolve h) h.references in
   let ordered = Order.sort ~nodes:harvests ~edges ~key:(fun h -> h.filename) in
-  Logger.info "order: %s"
-    (String.concat ", "
-       (List.map (fun h -> module_of_filename h.filename) ordered));
+  let name h = module_of_filename h.filename in
+  Logger.info "order: %s" (String.concat ", " (List.map name ordered));
   List.iter
     (fun h ->
       List.iter
-        (fun dep ->
-          Logger.debug "edge: %s -> %s"
-            (module_of_filename h.filename)
-            (module_of_filename dep.filename))
+        (fun dep -> Logger.debug "edge: %s -> %s" (name h) (name dep))
         (edges h))
     harvests;
   ordered
 
 (** Collect, index, resolve, dedup, output. *)
-let run ~output_file ~order input_files =
+let run ~output_file ~dependency_order input_files =
   Logger.info "output file: %s"
     (match output_file with Some file -> file | None -> "stdout");
   let idx = Index.create () in
@@ -387,14 +340,11 @@ let run ~output_file ~order input_files =
           failwith "Extracting from .css files is not supported yet";
         match read_structure filename with
         | None -> None
-        | Some structure ->
-          Some (harvest_structure ~filename ~idx ~order structure))
+        | Some structure -> Some (harvest_structure ~filename ~idx structure))
       input_files
   in
   let harvests =
-    match order with
-    | Order_source -> harvests
-    | Order_dependency -> order_by_dependency harvests
+    if dependency_order then order_by_dependency harvests else harvests
   in
 
   (* Resolve all rules across all harvests, collecting errors with locations. *)
@@ -497,14 +447,15 @@ let run ~output_file ~order input_files =
     the [[@@@css.config]] attributes the PPX embeds in its input files, so the
     environment is declared exactly once, on the (pps styled-ppx ...) stanza. *)
 let parse_args args =
-  let rec parse acc ~output_file ~log_level ~order = function
+  let rec parse acc ~output_file ~log_level ~dependency_order = function
     | "-o" :: file :: rest
     | "-output" :: file :: rest
     | "--output" :: file :: rest ->
-      parse acc ~output_file:(Some file) ~log_level ~order rest
+      parse acc ~output_file:(Some file) ~log_level ~dependency_order rest
     | "--log" :: level :: rest ->
       (match Logger.level_of_string level with
-      | Some log_level -> parse acc ~output_file ~log_level ~order rest
+      | Some log_level ->
+        parse acc ~output_file ~log_level ~dependency_order rest
       | None ->
         Logger.error
           "invalid --log level %S (expected \"error\", \"warning\", \"info\" \
@@ -512,31 +463,32 @@ let parse_args args =
           level;
         exit 2)
     | "--debug" :: rest ->
-      parse acc ~output_file ~log_level:Logger.Debug ~order rest
-    | "--order" :: mode :: rest ->
-      (match mode with
-      | "dependency" ->
-        parse acc ~output_file ~log_level ~order:Order_dependency rest
-      | "source" -> parse acc ~output_file ~log_level ~order:Order_source rest
-      | _ ->
-        Logger.error
-          "invalid --order value %S (expected \"dependency\" or \"source\")"
-          mode;
-        exit 2)
+      parse acc ~output_file ~log_level:Logger.Debug ~dependency_order rest
+    | "--order" :: "dependency" :: rest ->
+      parse acc ~output_file ~log_level ~dependency_order:true rest
+    | "--order" :: "source" :: rest ->
+      parse acc ~output_file ~log_level ~dependency_order:false rest
+    | "--order" :: mode :: _ ->
+      Logger.error
+        "invalid --order value %S (expected \"dependency\" or \"source\")" mode;
+      exit 2
     | [ (("-o" | "-output" | "--output" | "--log" | "--order") as flag) ] ->
       Logger.error "missing value for flag %S" flag;
       exit 2
     | arg :: _ when String.length arg > 0 && arg.[0] = '-' ->
       Logger.error "unknown flag %S" arg;
       exit 2
-    | arg :: rest -> parse (arg :: acc) ~output_file ~log_level ~order rest
-    | [] -> List.rev acc, output_file, log_level, order
+    | arg :: rest ->
+      parse (arg :: acc) ~output_file ~log_level ~dependency_order rest
+    | [] -> List.rev acc, output_file, log_level, dependency_order
   in
   let tail = match Array.to_list args with [] -> [] | _ :: t -> t in
-  parse [] ~output_file:None ~log_level:Logger.Warning ~order:Order_dependency
+  parse [] ~output_file:None ~log_level:Logger.Warning ~dependency_order:true
     tail
 
 let () =
-  let input_files, output_file, log_level, order = parse_args Sys.argv in
+  let input_files, output_file, log_level, dependency_order =
+    parse_args Sys.argv
+  in
   Logger.set_level log_level;
-  run ~output_file ~order input_files
+  run ~output_file ~dependency_order input_files
