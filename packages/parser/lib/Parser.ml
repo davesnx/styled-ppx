@@ -988,9 +988,7 @@ and parse_at_rule stream =
        until the first '{' (block form) or ';' (statement form) at this
        nesting depth -- nested parens/brackets/functions consume their own
        matched delimiters recursively in parse_component_value, so neither
-       can appear here unmatched. Dispatch on whichever token stopped the
-       prelude, rather than on the at-rule's name, so a name outside any
-       fixed list (e.g. `@layer`) still gets both forms. *)
+       can appear here unmatched. *)
     let at_token = advance stream in
     let prelude, prelude_loc =
       parse_component_value_list_until stream (fun stream ->
