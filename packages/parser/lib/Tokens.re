@@ -135,6 +135,46 @@ let serialize_uri = s =>
     Buffer.contents(buf);
   };
 
+// https://drafts.csswg.org/cssom/#serialize-an-identifier
+// The lexer decodes escapes while reading an identifier and then runs the
+// decoded name through this, so an identifier token already carries the one
+// spelling that is valid CSS wherever it lands: `.\31 a` keeps its escape
+// instead of becoming the invalid `.1a`, and `.a\.b` stays one class instead
+// of two. Bytes >= 0x80 are UTF-8 continuation or lead bytes and pass through.
+let serialize_identifier = ident => {
+  let len = String.length(ident);
+  let buf = Buffer.create(len);
+  let is_digit = c => c >= '0' && c <= '9';
+  let is_name_char = c =>
+    is_digit(c)
+    || c >= 'a'
+    && c <= 'z'
+    || c >= 'A'
+    && c <= 'Z'
+    || c == '-'
+    || c == '_'
+    || Char.code(c) >= 0x80;
+  let escape_as_code_point = c =>
+    Buffer.add_string(buf, Printf.sprintf("\\%x ", Char.code(c)));
+  for (i in 0 to len - 1) {
+    let c = ident.[i];
+    let code = Char.code(c);
+    if (code <= 0x1f || code == 0x7f) {
+      escape_as_code_point(c);
+    } else if (is_digit(c) && (i == 0 || i == 1 && ident.[0] == '-')) {
+      escape_as_code_point(c);
+    } else if (c == '-' && len == 1) {
+      Buffer.add_string(buf, "\\-");
+    } else if (is_name_char(c)) {
+      Buffer.add_char(buf, c);
+    } else {
+      Buffer.add_char(buf, '\\');
+      Buffer.add_char(buf, c);
+    };
+  };
+  Buffer.contents(buf);
+};
+
 let float_to_string = value => {
   let raw = string_of_float(value);
   let has_dot = String.contains(raw, '.');
