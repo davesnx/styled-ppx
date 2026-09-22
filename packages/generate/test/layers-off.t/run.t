@@ -5,13 +5,13 @@ change the default rule list, its dedup, or its separators.
   $ mkdir a_app z_base
 
   $ cat > z_base/z_base.ml <<EOF
-  > [@@@css.config [("library", "z_base")]]
+  > [@@@css.config [("library-name", "z_base")]]
   > [@@@css ".base-widget{color:red;}"]
   > let widget () = ()
   > EOF
 
   $ cat > a_app/main.ml <<EOF
-  > [@@@css.config [("library", "a_app")]]
+  > [@@@css.config [("library-name", "a_app")]]
   > [@@@css ".app-main{color:blue;}"]
   > let _ = Z_base.widget
   > EOF

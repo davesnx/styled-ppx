@@ -5,14 +5,14 @@ minified behaviour for the unlayered case.
   $ mkdir a_app z_base
 
   $ cat > z_base/z_base.ml <<EOF
-  > [@@@css.config [("library", "z_base"); ("env", "production")]]
+  > [@@@css.config [("library-name", "z_base"); ("env", "production")]]
   > [@@@css "@property --z-base-color { syntax: '<color>'; inherits: false; initial-value: red; }"]
   > [@@@css ".base-widget{color:red;}"]
   > let widget () = ()
   > EOF
 
   $ cat > a_app/main.ml <<EOF
-  > [@@@css.config [("library", "a_app"); ("env", "production")]]
+  > [@@@css.config [("library-name", "a_app"); ("env", "production")]]
   > [@@@css ".app-main{color:blue;}"]
   > let _ = Z_base.widget
   > EOF

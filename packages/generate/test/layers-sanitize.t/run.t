@@ -25,12 +25,12 @@ both libraries once.
   $ mkdir foo.bar foo_bar
 
   $ cat > foo.bar/a.ml <<EOF
-  > [@@@css.config [("library", "foo.bar")]]
+  > [@@@css.config [("library-name", "foo.bar")]]
   > [@@@css ".dot-lib{color:navy;}"]
   > EOF
 
   $ cat > foo_bar/b.ml <<EOF
-  > [@@@css.config [("library", "foo_bar")]]
+  > [@@@css.config [("library-name", "foo_bar")]]
   > [@@@css ".underscore-lib{color:maroon;}"]
   > EOF
 
