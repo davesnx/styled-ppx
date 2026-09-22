@@ -18,9 +18,6 @@ module Driver = Styled_ppx_css_parser.Driver;
 module Render = Styled_ppx_css_parser.Render;
 module Parser_location = Styled_ppx_css_parser.Parser_location;
 
-/* Parsed as a standalone file, so location offsets never leak into the
-   fixture text below; every comparison is between two parses, never
-   against a fixed offset. */
 let source_position_start = Parser_location.file_start();
 
 let parse_exn = css =>
@@ -148,12 +145,10 @@ and normalize_brace_block = (block: Ast.brace_block): Ast.brace_block =>
    cases for grammar the fixtures don't happen to cover. Each entry is
    (label, css). */
 let corpus = [
-  /* backgrounds-and-borders-module.t */
   ("background-repeat list", "background-repeat: space"),
   ("background-repeat comma list", "background-repeat: repeat-x, repeat-y"),
   ("background-size two values", "background-size: 50em 50%"),
   ("background shorthand with slash", "background: top left / 50% 60%"),
-  /* monorepo-patterns.t */
   ("transition 4-part shorthand", "transition: all 200ms ease 0ms"),
   (
     "box-shadow with interpolation",
@@ -180,7 +175,6 @@ let corpus = [
     "box-shadow: inset 1px 0 0 0 transparent !important",
   ),
   ("transition with important", "transition: transform 0.3s !important"),
-  /* monorepo-cx-patterns.t */
   (
     "space before colon, two declarations",
     "width: 30px;\ncolor : $(Color.Text.tertiary);",
@@ -193,7 +187,6 @@ let corpus = [
     "nested class-interpolation selector",
     "flex-grow: 1;\nz-index: 1;\ntransition: all 200ms ease 0ms;\n\n&.$(_sidebarClosed) {\n  min-width: 0;\n  max-width: 0;\n  opacity: 0;\n  overflow: hidden;\n}\n",
   ),
-  /* declaration-trailing-space.t */
   ("declaration with explicit semicolon and spaces", " display: flex; "),
   ("declaration without semicolon and trailing space", " display: flex "),
   ("nested block with explicit semicolon", " & > * { min-height: 0; } "),
@@ -206,7 +199,6 @@ let corpus = [
     "media block without semicolon",
     " @media (min-width: 100px) { display: flex } ",
   ),
-  /* missing-semicolon-before-nested-block.t (ASI disambiguation) */
   (
     "ASI: value then nested pseudo-class selector",
     "background-color: red\n\n  &:nth-child(2n) {\n    background-color: blue;\n  }\n",
@@ -235,13 +227,11 @@ let corpus = [
     "ASI: value then bare descendant combinator",
     "height: 100% & h4 {\n    padding: 0;\n  }\n",
   ),
-  /* selector-class-interpolation.t */
   ("class-interpolation selector alone", "&.$(foo) { color: blue; }"),
   (
     "not() wrapping class-interpolation",
     "background-color: blue;\n\n  &:disabled:not(&.$(buttonLoadingAnimation)) {\n    background-color: gray;\n  }\n",
   ),
-  /* animations.t */
   (
     "cubic-bezier with leading-dot fractions",
     "animation-timing-function: cubic-bezier(.5, .5, .5, .5)",
@@ -252,7 +242,6 @@ let corpus = [
   ),
   ("iteration count decimal", "animation-iteration-count: 4.35"),
   ("direction keyword", "animation-direction: alternate-reverse"),
-  /* Edge cases not present in the css-support fixtures. */
   ("supports block", "@supports (display: grid) { display: grid; }"),
   ("container block", "@container (min-width: 400px) { width: 50%; }"),
   ("calc expression", "width: calc(100% - 10px)"),
