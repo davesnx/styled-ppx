@@ -32,13 +32,14 @@ had no branch for the `of` keyword.
     ]
   ];
   
-  let _part = CSS.make("cx-_part cid-3hanao css-1scn809", []);
+  let _part = CSS.make(~label="_part", "cid-3hanao css-1scn809", []);
   
-  let _slotted = CSS.make("cx-_slotted cid-n06isq css-upe6d9", []);
+  let _slotted = CSS.make(~label="_slotted", "cid-n06isq css-upe6d9", []);
   
-  let _nth_child_of = CSS.make("cx-_nth_child_of cid-1k5qaw3 css-1uy51rt", []);
+  let _nth_child_of =
+    CSS.make(~label="_nth_child_of", "cid-1k5qaw3 css-1uy51rt", []);
   
   let _nth_last_child_of_list =
-    CSS.make("cx-_nth_last_child_of_list cid-1vkw39v css-1qws5ty", []);
+    CSS.make(~label="_nth_last_child_of_list", "cid-1vkw39v css-1qws5ty", []);
 
   $ dune build

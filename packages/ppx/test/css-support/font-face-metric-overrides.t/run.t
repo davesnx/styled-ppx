@@ -19,9 +19,9 @@ puts an ordinary property in an @font-face body, which takes descriptors only.
   > EOF
 
   $ dune build ./input.exe ./invalid.exe
-  File "invalid.re", line 8, characters 20-25:
+  File "invalid.re", line 8, characters 21-25:
   8 |     ascent-override: 12px;
-                          ^^^^^
+                           ^^^^
   Error: Property 'ascent-override' has an invalid value: '12px',
          Expected 'percentage' or 'normal'.
   [1]
