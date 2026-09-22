@@ -4,7 +4,7 @@
  (modes melange)
  (libraries melange.belt styled-ppx.melange reason-react)
  (preprocess
-  (pps styled-ppx melange.ppx reason-react-ppx)))
+  (pps styled-ppx melange.ppx reason-react-ppx -- --namespace lib)))
 
 (copy_files
  (files ../native/shared/*.re))
