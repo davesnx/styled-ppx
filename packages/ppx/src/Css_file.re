@@ -436,8 +436,6 @@ module Css_transform = {
     switch (simple) {
     | Variable(path_str, var_loc) =>
       let var_loc = to_file_loc(ctx, var_loc);
-      /* Bare `$(name)` (no `.` prefix) in selector position is treated as
-         an implicit class reference to the binding's identity class. */
       let resolved =
         Local_selector_environment.resolve_selector_class_ref(
           ~file=ctx.file,
