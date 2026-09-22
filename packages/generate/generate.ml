@@ -674,10 +674,6 @@ let run ~output_file ~order ~layers input_files =
       end)
   in
 
-  (* Hoist as a block rather than reordering within it: CSS requires
-     @import/@namespace/layer-statement rules ahead of every other rule, so a
-     module ordered late by {!order_by_dependency} must not leave one
-     stranded mid-stylesheet, where browsers ignore it. *)
   let statement_rules, other_rules =
     List.partition
       (fun (rule, _layer) -> is_statement_at_rule rule)
