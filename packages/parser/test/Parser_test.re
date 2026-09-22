@@ -556,11 +556,6 @@ let at_rule_dispatch_tests = [
   }),
 ];
 
-/* CSS Nesting's relative-selector shorthand: a nested rule's prelude may
-   start with a combinator (`> .child`, `+ .sib`, `~ .sib`), meaning
-   `& > .child` etc. Only valid inside another rule's block, not at the
-   root of a declaration list or a stylesheet (see the two rejection
-   regressions at the end of this list). */
 let parse_nested_relative_selector_exn = input => {
   switch (Driver.parse_declaration_list(~source_position_start, input)) {
   | Ok((

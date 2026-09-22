@@ -1033,13 +1033,6 @@ and parse_at_rule stream =
     end
   | _ -> raise_parse_error (current_token stream)
 
-(* [parse_prelude] is [parse_selector_list] at the root of a declaration list
-   or stylesheet (no leading combinator: there is no rule to resolve "&"
-   against), and [parse_nested_selector_list] for a rule inside another
-   rule's block (a leading combinator means "&" followed by it). Either way
-   the rules inside this rule's own block are always reached through
-   [parse_nested_block_rule]: once inside any block, further nesting always
-   has a "&" to resolve against. *)
 and parse_style_rule_with stream ~parse_prelude =
   skip_whitespace stream;
   let start_pos = (current_token stream).start_pos in
