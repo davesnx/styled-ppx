@@ -3,7 +3,7 @@ Cross-module selector interpolation in [%styled.global].
 The PPX cannot resolve M's classes at PPX time (M compiles separately),
 so it emits NUL-delimited sentinels in the extracted [@@@css] strings
 plus a [@@@css.refs ...] descriptor and a synthetic `let _ = M.x` for
-ocamldep tracking. The aggregator harvests the index from M's post-PPX
+ocamldep tracking. The aggregator extracts the index from M's post-PPX
 file and substitutes the sentinels with the real class chains.
 
   $ refmt --parse re --print ml m.re > m.ml

@@ -62,7 +62,7 @@ dune builds the library normally (.cmi, .cmx, executables)
   ▼
 styled-ppx.generate (post-build aggregator)
   ─ walk every .ml / .pp.ml in the library
-  ─ harvest [@@@css ...], [@@@css.bindings ...], [@@@css.refs ...], [@@@css.config ...]
+  ─ extract [@@@css ...], [@@@css.bindings ...], [@@@css.refs ...], [@@@css.config ...]
   ─ resolve NUL-delimited cross-module sentinels against the bindings index
   ─ deduplicate rules, emit final stylesheet (minified when the configs say production)
   │
@@ -164,7 +164,7 @@ cookie stays exactly as before this key was added. Unknown keys are
 ignored by the aggregator (forward compatibility).
 
 The aggregator minifies its output (drops inter-rule newlines) only when
-**every** contributing input file — every file with harvested rules or an
+**every** contributing input file — every file with extracted rules or an
 explicit config — declares `env=production`. Mixed inputs mean some
 library stanzas ran the PPX with production settings and some did not;
 the aggregator warns (visible by default) and falls back to readable
@@ -256,10 +256,10 @@ Implemented in `packages/generate/generate.ml`. Takes a list of `.ml` /
 `.pp.ml` paths, produces a stylesheet on stdout or `-o <file>`.
 
 ```
-parse args → harvest_each_file → order_harvests → resolve_sentinels → dedup → write
+parse args → extract_each_file → order_inputs → resolve_sentinels → dedup → write
 ```
 
-### Harvest
+### Extract
 
 For each input file, walk its top-level structure once and dispatch on
 the five attribute shapes:
@@ -272,19 +272,19 @@ the five attribute shapes:
 _                         → ignore
 ```
 
-The harvest pass is the **only** time the aggregator looks at the AST.
-Everything downstream operates on plain strings, except that the harvest
+The extraction pass is the **only** time the aggregator looks at the AST.
+Everything downstream operates on plain strings, except that the extraction
 pass also records, per file, which other module names its structure
 references (see Order below) — the last thing the AST is used for.
 
 ### Order
 
-Implemented in `packages/generate/order.ml`. Runs between harvest and
-resolve, reordering the harvested files before dedup picks which
+Implemented in `packages/generate/order.ml`. Runs between extract and
+resolve, reordering the inputs before dedup picks which
 occurrence of a repeated rule survives.
 
 By default (`--order dependency`) a file's rules come after the rules of
-every file it depends on. "Depends on" means: the harvested file's
+every file it depends on. "Depends on" means: the input file's
 structure references a module name (via the same free-name analysis
 `ocamldep -modules` uses), and among the input files whose derived module
 name matches, one is chosen as the target —
@@ -402,7 +402,7 @@ Two consequences worth knowing:
   never inspects the AST: the PPX writes the index directly into
   `[@@@css.bindings ...]`. Order is the one exception — it reruns the
   compiler's own free-module-name analysis (`Order.references`) on the
-  harvested structure to decide dependency order, and derives a module
+  input's structure to decide dependency order, and derives a module
   name from each input filename to resolve those references to files
   (see Order above); it still never touches `CSS.make`.
 - **Runtime resolution of selectors via `var(--xyz)` indirection.**

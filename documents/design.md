@@ -267,7 +267,7 @@ module Theme = [%styled.global {|
 
   /* Cross-module $(M.binding) emits a NUL-delimited sentinel that
      the post-build aggregator (styled-ppx.generate) substitutes
-     using the index it harvests from M's post-PPX file. */
+     using the index it extracts from M's post-PPX file. */
   body .$(OtherModule.marker) { background: red; }
 
   /* Selector interp inside @media / @supports works the same way -
