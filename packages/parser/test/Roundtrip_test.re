@@ -93,6 +93,9 @@ let shape_of = rules => {
    "divergence" on almost every declaration (anywhere source has the
    ordinary "prop: value" space). Applied to both sides of the AST
    comparison below, so it's a no-op on an already-canonical AST. */
+let strip_trailing_whitespace = (value: Ast.component_value_list) =>
+  value |> List.rev |> Render.strip_leading_whitespace |> List.rev;
+
 let rec normalize_rule_list = ((rules, loc): Ast.rule_list): Ast.rule_list => (
   rules
   |> List.filter(
@@ -126,10 +129,7 @@ and normalize_rule = (rule: Ast.rule): Ast.rule =>
     })
   }
 and normalize_value = (value: Ast.with_loc(Ast.component_value_list)) => (
-  value
-  |> fst
-  |> Render.strip_leading_whitespace
-  |> Render.strip_trailing_whitespace,
+  value |> fst |> Render.strip_leading_whitespace |> strip_trailing_whitespace,
   snd(value),
 )
 and normalize_brace_block = (block: Ast.brace_block): Ast.brace_block =>
