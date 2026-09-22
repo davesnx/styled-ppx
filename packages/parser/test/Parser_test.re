@@ -423,12 +423,6 @@ let selector_combinator_ast_tests = [
   }),
 ];
 
-/* Statement (`;`-terminated) vs block (`{...}`-terminated) at-rule dispatch
-   must be driven by what follows the prelude (CSS Syntax Level 3 "consume
-   an at-rule"), not by a hard-coded allowlist of at-rule names. `@layer`'s
-   statement form (the standard layer-order-declaration syntax) previously
-   had no allowlist entry, so it hit a raw parse error instead of parsing as
-   a blockless at-rule the same way `@import`/`@charset`/`@namespace` do. */
 let at_rule_dispatch_tests = [
   test_case("@layer comma list parses as a statement at-rule", `Quick, () => {
     switch (Driver.parse_stylesheet(~source_position_start, "@layer a, b;")) {
