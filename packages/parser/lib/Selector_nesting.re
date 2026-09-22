@@ -220,24 +220,23 @@ let rec flatten_combinator_tree =
   };
 
 /* Pop the rightmost compound off a complex selector (flattens first so
-   the popped segment is never a whole subtree). Returns
-   `(last, combinator_before_last, rest)`. */
+   the popped segment is never a whole subtree). */
 let pop_last_selector = (selector: selector) => {
   let (head, segments) = flatten_combinator_tree(selector);
   switch (List.rev(segments)) {
-  | [] => (head, None, None)
-  | [(ctor, last)] => (last, Some(ctor), Some(head))
+  | [] => (head, None)
+  | [(ctor, last)] => (last, Some((ctor, head)))
   | [(ctor, last), ...rest_rev] => (
       last,
-      Some(ctor),
-      Some(
+      Some((
+        ctor,
         ComplexSelector(
           Combinator({
             left: head,
             right: List.rev(rest_rev),
           }),
         ),
-      ),
+      )),
     )
   };
 };
@@ -295,77 +294,40 @@ let merge_compound_selectors =
    raise. */
 let join_compound_selector =
     (selector, { subclass_selectors, pseudo_selectors, _ } as compound) => {
-  let new_compound =
-    CompoundSelector({
-      type_selector: None,
-      subclass_selectors,
-      pseudo_selectors,
-    });
-  switch (pop_last_selector(selector)) {
-  | (SimpleSelector(simple), None, None) =>
-    CompoundSelector({
-      type_selector: Some(simple),
-      subclass_selectors,
-      pseudo_selectors,
-    })
-  | (SimpleSelector(simple), Some(ctor), Some(rest)) =>
-    join_selector_with_combinator(
-      ~combinator=ctor,
-      rest,
+  let (last, before_last) = pop_last_selector(selector);
+  let extended =
+    switch (last) {
+    | SimpleSelector(simple) =>
       CompoundSelector({
         type_selector: Some(simple),
         subclass_selectors,
         pseudo_selectors,
-      }),
-    )
-  | (
-      CompoundSelector({
+      })
+    | CompoundSelector({
         type_selector: last_type_selector,
         subclass_selectors: last_subclass_selectors,
         pseudo_selectors: last_pseudo_selectors,
-      }),
-      None,
-      None,
-    ) =>
-    merge_compound_selectors(
-      ~last_type_selector,
-      ~last_subclass_selectors,
-      ~last_pseudo_selectors,
-      compound,
-    )
-  | (
-      CompoundSelector({
-        type_selector: last_type_selector,
-        subclass_selectors: last_subclass_selectors,
-        pseudo_selectors: last_pseudo_selectors,
-      }),
-      Some(ctor),
-      Some(rest),
-    ) =>
-    join_selector_with_combinator(
-      ~combinator=ctor,
-      rest,
+      }) =>
       merge_compound_selectors(
         ~last_type_selector,
         ~last_subclass_selectors,
         ~last_pseudo_selectors,
         compound,
-      ),
-    )
-  /* Defensive fallback — see comment above. */
-  | (other, None, None) => join_selector_with_combinator(other, new_compound)
-  | (other, Some(ctor), Some(rest)) =>
-    join_selector_with_combinator(
-      ~combinator=ctor,
-      rest,
-      join_selector_with_combinator(other, new_compound),
-    )
-  /* The other inconsistent (Some/None) mixes are unreachable by
-     construction in `pop_last_selector`, but matching them keeps the
-     compiler's exhaustiveness check happy without a wildcard. */
-  | (_, Some(_), None)
-  | (_, None, Some(_)) =>
-    join_selector_with_combinator(selector, new_compound)
+      )
+    | other =>
+      join_selector_with_combinator(
+        other,
+        CompoundSelector({
+          type_selector: None,
+          subclass_selectors,
+          pseudo_selectors,
+        }),
+      )
+    };
+  switch (before_last) {
+  | None => extended
+  | Some((ctor, rest)) =>
+    join_selector_with_combinator(~combinator=ctor, rest, extended)
   };
 };
 
