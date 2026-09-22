@@ -359,14 +359,15 @@ compiler convention, so editors pick them up) and exits 1.
 
 **Identity collision.** While building the index (during Extract, not
 Resolve), two different bindings can hash to the same identity — e.g.
-two libraries whose modules share a basename and binding name, with no
-distinguishing `--namespace`. This is only an error when their
-`class_string` fingerprints differ: the same identity with the same
-atoms is the ordinary "same module compiled twice" case (native +
-melange, `copy_files`, vendoring) and is accepted. A real collision
-names both input files, both longidents, the shared identity, and the
-`--namespace` remedy, and is reported through the same protocol-error
-path as a malformed attribute (see `packages/generate/test/identity-collision.t`).
+two executables (no library name, so no default namespace) whose modules
+share a basename and binding name, or a plain 32-bit hash collision.
+This is only an error when their `class_string` fingerprints differ: the
+same identity with the same atoms is the ordinary "same module compiled
+twice" case (a native library and its melange twin sharing a
+`--namespace`, vendoring) and is accepted. A real collision names both
+input files, both longidents, the shared identity, and the `--namespace`
+remedy, and is reported through the same protocol-error path as a
+malformed attribute (see `packages/generate/test/identity-collision.t`).
 
 ### Dedup and write
 
@@ -472,24 +473,28 @@ atoms the binding minted or whether it minted any at all. It is emitted
 first among the atoms in the className string (after the `cx-<label>`
 dev marker, when present): `cx-<label> cid-<hash> css-<hash> ...`.
 
-**Inputs**, joined with `\0` and murmur2-hashed: the `--namespace` flag
-value (empty by default), the compilation-unit module name (the source
-file's basename, capitalized — never a physical path or dune library
-name, so a module compiled twice under different paths, e.g. a native
-and a Melange build via `copy_files`, mints the same identity), the
-enclosing submodule path, the binding name (or `[%styled.<tag>]` module
-name), and an occurrence index — folded in only when a `(scope, name)`
-pair repeats within one compilation unit (e.g. two functions each with
-their own `let a = [%css ...]`), so a name seen exactly once keeps a
-stable identity independent of whether a later occurrence ever appears.
+**Inputs**, joined with `\0` and murmur2-hashed: the namespace (the
+`--namespace` flag when given, else the dune library name from the
+`library-name` cookie, else empty — an executable has no library name),
+the compilation-unit module name (the source file's basename,
+capitalized — never a physical path, so a module compiled twice under
+different paths mints the same identity as long as the namespace agrees),
+the enclosing submodule path, the binding name (or `[%styled.<tag>]`
+module name), and an occurrence index — folded in only when a
+`(scope, name)` pair repeats within one compilation unit (e.g. two
+functions each with their own `let a = [%css ...]`), so a name seen
+exactly once keeps a stable identity independent of whether a later
+occurrence ever appears.
 
-**`--namespace <string>`** is a PPX flag, mixed into every identity hash
-in the same library-wide way as `--dev`/`--minify`. Two libraries whose
-modules happen to share a basename and binding name would otherwise mint
-colliding identities; passing each library a distinct `--namespace`
-(identically on its native and Melange `(pps styled-ppx ...)` stanzas)
-tells them apart. See "Identity collision" under Resolve for what
-happens when they aren't.
+**`--namespace <string>`** overrides the library-name default. Two dune
+libraries never share a name, so same-named modules and bindings in
+different libraries are told apart with no configuration. The flag is
+for the one case the default gets wrong: a native library and its
+Melange twin built from the same sources via `copy_files` have different
+library names, so they pass the same `--namespace` on both
+`(pps styled-ppx ...)` stanzas to keep minting the same identities. See
+"Identity collision" under Resolve for what happens when identities
+still coincide.
 
 **Empty markers.** A named binding with no declarations (`let m = [%css
 {||}]`) still mints an identity — its `class_string` is `""` and no

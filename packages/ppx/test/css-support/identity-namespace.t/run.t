@@ -1,9 +1,10 @@
-`--namespace <string>` is mixed into every binding's identity hash, so two
-libraries that would otherwise mint the same `cid-...` (same module
-basename, same binding name, no other distinguishing input) can be told
-apart. No `--namespace` is equivalent to `--namespace ""`; passing the
-same non-empty value twice mints the same identity both times - it is a
-deterministic input, not a nonce.
+`--namespace <string>` is mixed into every binding's identity hash and
+overrides the library-name default (see identity-library-namespace.t), so
+a native library and its melange twin can mint the same `cid-...` despite
+their different library names. With no `--namespace` and no library
+cookie the namespace is `""`; passing the same non-empty value twice
+mints the same identity both times - it is a deterministic input, not a
+nonce.
 
   $ refmt --parse re --print ml input.re > input.ml
 

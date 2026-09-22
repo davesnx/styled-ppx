@@ -14,4 +14,7 @@
    styled-ppx
    --native
    server-reason-react.ppx
-   server-reason-react.melange_ppx)))
+   server-reason-react.melange_ppx
+   --
+   --namespace
+   lib)))
