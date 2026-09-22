@@ -5,12 +5,6 @@ let rec strip_leading_whitespace = (ast: Ast.component_value_list) =>
   | xs => xs
   };
 
-/* Statement at-rule preludes (`@import url(x) ;`) still carry their trailing
-   whitespace out of the parser; declaration values are trimmed there since
-   #604. Kept until at-rule preludes are trimmed in the parser as well. */
-let strip_trailing_whitespace = (ast: Ast.component_value_list) =>
-  ast |> List.rev |> strip_leading_whitespace |> List.rev;
-
 let rec stylesheet = (ast: Ast.stylesheet) => {
   ast |> fst |> List.map(rule) |> String.concat("");
 }
@@ -36,11 +30,7 @@ and at_rule = ({ name, prelude, block, _ }: Ast.at_rule) => {
     Printf.sprintf(
       "@%s %s;",
       name |> fst,
-      prelude
-      |> fst
-      |> strip_leading_whitespace
-      |> strip_trailing_whitespace
-      |> component_value_list,
+      prelude |> fst |> component_value_list,
     )
   | Rule_list(_)
   | Stylesheet(_) =>

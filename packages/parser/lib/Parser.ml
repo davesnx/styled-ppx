@@ -809,25 +809,29 @@ let update_declaration_value_state state (value, _) =
   | Paren_block _ | Bracket_block _ | Delim _ | Selector _ | Unicode_range _ ->
     { state with has_content = true }
 
-(* Leading and trailing whitespace are not part of a declaration's value:
-   `a: b ;`, `a: b }` and `a: b<EOF>` must all yield the same value (and
-   the same rendered CSS and class hash) as `a:b;`. *)
+(* Drop the whitespace at the end of a reversed component-value list and
+   return it in source order with a location that ends at the last kept value;
+   an empty list keeps the zero-width location at [start_pos]. Declaration
+   values and at-rule preludes both exclude their surrounding whitespace, so
+   `a: b ;` and `a:b;`, or `@import url(x) ;` and `@import url(x);`, parse to
+   the same AST and render the same. *)
+let trim_trailing_whitespace start_pos rev_values =
+  let rec drop = function
+    | (Ast.Whitespace, _) :: rest -> drop rest
+    | rev_values -> rev_values
+  in
+  match drop rev_values with
+  | [] -> [], make_loc start_pos start_pos
+  | (_, (last_loc : Ast.loc)) :: _ as rev_values ->
+    List.rev rev_values, make_loc start_pos last_loc.loc_end
+
 let parse_declaration_value_list stream =
   skip_whitespace stream;
   let start_pos = (current_token stream).start_pos in
   let initial_state =
     { has_content = false; top_level_items = 0; ident_like_prefix = false }
   in
-  let rec drop_trailing_whitespace = function
-    | (Ast.Whitespace, _) :: rest -> drop_trailing_whitespace rest
-    | rev_values -> rev_values
-  in
-  let finish rev_values =
-    match drop_trailing_whitespace rev_values with
-    | [] -> [], make_loc start_pos start_pos
-    | (_, (last_loc : Ast.loc)) :: _ as rev_values ->
-      List.rev rev_values, make_loc start_pos last_loc.loc_end
-  in
+  let finish rev_values = trim_trailing_whitespace start_pos rev_values in
   let rec loop acc state =
     match current_tok stream with
     | Tokens.EOF | Tokens.RIGHT_BRACE | Tokens.SEMI_COLON | Tokens.IMPORTANT ->
@@ -994,6 +998,20 @@ and parse_at_rule stream =
     begin match current_tok stream with
     | Tokens.SEMI_COLON ->
       let _ = expect_token stream Tokens.SEMI_COLON in
+      (* A statement prelude excludes the whitespace around it, like a
+         declaration value, so `@import  url(x) ;` renders as
+         `@import url(x);`. Block preludes keep theirs: the renderer prints
+         them as before and atom hashes depend on that text. *)
+      let rec drop_leading = function
+        | (Ast.Whitespace, _) :: rest -> drop_leading rest
+        | values -> values
+      in
+      let prelude, prelude_loc =
+        match drop_leading prelude with
+        | [] -> [], prelude_loc
+        | (_, (first_loc : Ast.loc)) :: _ as prelude ->
+          trim_trailing_whitespace first_loc.loc_start (List.rev prelude)
+      in
       {
         name = name, component_loc at_token;
         prelude = prelude, prelude_loc;
