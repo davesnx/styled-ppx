@@ -5,9 +5,7 @@ type token =
   | FUNCTION(string) // <function-token>
   | NTH_FUNCTION(string) // <function-token> (nth-*)
   | AT_KEYFRAMES(string) // <at-keyframes-token> (non-standard)
-  | AT_RULE(string) // <at-rule-token>; the parser decides statement vs
-  // block by lookahead (';' vs '{'), per CSS Syntax Level 3's single
-  // <at-keyword-token>, not by at-rule name
+  | AT_RULE(string)
   | UNICODE_RANGE(string) // <unicode-range-token>
   | HASH(
       (
