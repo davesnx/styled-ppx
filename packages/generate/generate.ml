@@ -107,13 +107,13 @@ type order_mode =
   | Dependency
   | Source
 
-(** Per-file harvest: rules with potential sentinels, all cross-module ref
-    descriptors seen in this file, the file's declared environment from
-    [[@@@css.config]] ([None] when absent, i.e. development), and the module
-    names the file references ({!Order.references}), for {!order_by_dependency}.
-    The bindings attribute is consumed directly into the global [Index] during
-    the same walk. *)
-type harvest = {
+(** What the generator extracts from one input file: rules with potential
+    sentinels, all cross-module ref descriptors seen in this file, the file's
+    declared environment from [[@@@css.config]] ([None] when absent, i.e.
+    development), and the module names the file references
+    ({!Order.references}), for {!order_by_dependency}. The bindings attribute is
+    consumed directly into the global [Index] during the same walk. *)
+type input = {
   filename : string;
   rules : string list;
   refs : Refs.ref_loc list;
@@ -122,7 +122,7 @@ type harvest = {
   references : string list;
 }
 
-let harvest_structure ~filename ~idx structure : harvest =
+let extract_structure ~filename ~idx structure : input =
   let rules = ref [] in
   let refs = ref [] in
   let env = ref None in
@@ -255,18 +255,18 @@ let unresolved_message ~longident ~ref_loc ~in_library_modules =
        reference."
       (format_location ref_loc) longident head longident
 
-(** Decide the output mode from the harvested [[@@@css.config]] attributes.
+(** Decide the output mode from the extracted [[@@@css.config]] attributes.
 
     The PPX declares [("env", "production")] in every file it processes with
     production settings and omits the attribute in development, so the
     aggregator needs no mode flag of its own. Output is minified (inter-rule
     newlines dropped) only when every contributing input file — every file with
-    harvested rules or an explicit config — was compiled for production. Mixed
+    extracted rules or an explicit config — was compiled for production. Mixed
     inputs mean some library stanzas ran the PPX with production settings and
     some did not: warn and emit readable output. *)
-let production_mode harvests =
+let production_mode inputs =
   let contributing =
-    List.filter (fun h -> h.rules <> [] || h.env <> None) harvests
+    List.filter (fun h -> h.rules <> [] || h.env <> None) inputs
   in
   let production, development =
     List.partition
@@ -284,17 +284,17 @@ let production_mode harvests =
       Css_extraction.config_attribute_name prod.filename dev.filename;
     false
 
-(** Order harvests so each file comes after the files it references
+(** Order inputs so each file comes after the files it references
     ({!Order.sort}). A referenced module name resolves to the input file with
     that module name; when several match, the one sharing the longest directory
     prefix with the referrer wins, and a tie means no edge. This generator sees
     one library at a time, so a same-named-module tie can't be broken from paths
     alone; PR 2 resolves by library membership instead. *)
-let order_by_dependency (harvests : harvest list) : harvest list =
-  let by_module_name = Hashtbl.create (List.length harvests) in
+let order_by_dependency (inputs : input list) : input list =
+  let by_module_name = Hashtbl.create (List.length inputs) in
   List.iter
     (fun h -> Hashtbl.add by_module_name (module_of_filename h.filename) h)
-    harvests;
+    inputs;
   let dirs filename =
     String.split_on_char '/' (Filename.dirname filename)
     |> List.filter (fun s -> s <> "" && s <> ".")
@@ -322,7 +322,7 @@ let order_by_dependency (harvests : harvest list) : harvest list =
       None
   in
   let edges h = List.filter_map (resolve h) h.references in
-  let ordered = Order.sort ~nodes:harvests ~edges ~key:(fun h -> h.filename) in
+  let ordered = Order.sort ~nodes:inputs ~edges ~key:(fun h -> h.filename) in
   let name h = module_of_filename h.filename in
   Logger.info "order: %s" (String.concat ", " (List.map name ordered));
   List.iter
@@ -330,7 +330,7 @@ let order_by_dependency (harvests : harvest list) : harvest list =
       List.iter
         (fun dep -> Logger.debug "edge: %s -> %s" (name h) (name dep))
         (edges h))
-    harvests;
+    inputs;
   ordered
 
 (** Collect, index, resolve, dedup, output. *)
@@ -339,29 +339,29 @@ let run ~output_file ~order input_files =
     (match output_file with Some file -> file | None -> "stdout");
   let idx = Index.create () in
   let in_library_modules = List.map module_of_filename input_files in
-  let harvests =
+  let inputs =
     List.filter_map
       (fun filename ->
         if String.ends_with filename ~suffix:".css" then
           failwith "Extracting from .css files is not supported yet";
         match read_structure filename with
         | None -> None
-        | Some structure -> Some (harvest_structure ~filename ~idx structure))
+        | Some structure -> Some (extract_structure ~filename ~idx structure))
       input_files
   in
-  let harvests =
+  let inputs =
     match order with
-    | Dependency -> order_by_dependency harvests
-    | Source -> harvests
+    | Dependency -> order_by_dependency inputs
+    | Source -> inputs
   in
 
-  (* Resolve all rules across all harvests, collecting errors with locations. *)
+  (* Resolve all rules across all inputs, collecting errors with locations. *)
   let errors =
-    ref (List.concat_map (fun harvest -> harvest.protocol_errors) harvests)
+    ref (List.concat_map (fun input -> input.protocol_errors) inputs)
   in
   let resolved_rules = ref [] in
   List.iter
-    (fun harvest ->
+    (fun input ->
       List.iter
         (fun rule ->
           let on_error longident =
@@ -369,11 +369,11 @@ let run ~output_file ~order input_files =
               match
                 List.find_opt
                   (fun (r : Refs.ref_loc) -> r.longident = longident)
-                  harvest.refs
+                  input.refs
               with
               | Some r -> r
               | None ->
-                Css_extraction.ref_loc ~longident ~file:harvest.filename
+                Css_extraction.ref_loc ~longident ~file:input.filename
                   ~start_line:1 ~start_col:0 ~end_col:0
             in
             let msg =
@@ -383,7 +383,7 @@ let run ~output_file ~order input_files =
           in
           let on_malformed msg =
             errors :=
-              Printf.sprintf "%s: malformed [@@@%s]: %s" harvest.filename
+              Printf.sprintf "%s: malformed [@@@%s]: %s" input.filename
                 Css_extraction.css_attribute_name msg
               :: !errors
           in
@@ -392,8 +392,8 @@ let run ~output_file ~order input_files =
               ~on_unresolved:on_error ~on_malformed rule
           in
           resolved_rules := resolved :: !resolved_rules)
-        harvest.rules)
-    harvests;
+        input.rules)
+    inputs;
 
   (match !errors with
   | [] -> ()
@@ -429,7 +429,7 @@ let run ~output_file ~order input_files =
       end)
   in
 
-  let minify = production_mode harvests in
+  let minify = production_mode inputs in
   Logger.info "environment: %s"
     (if minify then "production (from [@@@css.config])" else "development");
   let stylesheet =

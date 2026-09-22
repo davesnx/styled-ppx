@@ -116,7 +116,7 @@ Interpolating a *binding* in selector position (`&.$(active)`, `:has(.$(other))`
 The ppx runs one file at a time and cannot see the rest of your project, so each compiled file carries its extracted CSS in top-level attributes (`[@@@css "..."]`) that ride along in the build artifacts. `styled-ppx.generate` is a small CLI that:
 
 1. walks the post-ppx `.ml`/`.pp.ml` files you point it at,
-2. harvests every extracted rule and binding export,
+2. extracts every rule and binding export the ppx emitted,
 3. orders the files by module dependency (a module after the modules it depends on; `--order source` opts out),
 4. resolves cross-module selector references,
 5. deduplicates rules (order-preserving), and

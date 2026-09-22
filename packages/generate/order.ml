@@ -1,8 +1,8 @@
 (** Pure graph-ordering primitives. No I/O beyond the cycle warning (see
-    [sort]), and no knowledge of [Generate]'s harvest type: callers own how a
-    node maps to a name and how a referenced name resolves to an edge. This
-    keeps the module reusable for PR 2 (library-level ordering groups nodes by
-    library, collapses cross-library edges, then calls [sort] per group). *)
+    [sort]), and no knowledge of [Generate]'s input type: callers own how a node
+    maps to a name and how a referenced name resolves to an edge. This keeps the
+    module reusable for PR 2 (library-level ordering groups nodes by library,
+    collapses cross-library edges, then calls [sort] per group). *)
 
 (** Module names a structure references, computed the way [ocamldep -modules]
     does. ppxlib freezes its own AST at a fixed internal OCaml version;
