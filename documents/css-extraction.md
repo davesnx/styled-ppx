@@ -310,7 +310,7 @@ dependent file sorts alphabetically last, and keeps going. The result
 stays deterministic.
 
 `--order source` restores the file order dune passes on the command line,
-unconditionally, with no dependency analysis, order/edge logging, or cycle
+unconditionally, ignoring dependencies, with no order/edge logging or cycle
 handling. It exists as an escape hatch for one release and to compare
 against the old behavior. Under the default `--order dependency`, `--log
 info` prints the resolved module order and `--log debug` additionally
