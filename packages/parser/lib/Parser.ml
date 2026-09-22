@@ -387,83 +387,6 @@ let classify_nth_suffix function_name (token : token_with_location) suffix =
     Nth_suffix_n_dash_digits
       (nth_int_of_digits function_name token (String.sub suffix 2 (length - 2)))
 
-(* [parse_selector_list] parses the Selectors-4 "of S" complex-selector-list;
-   it lives in the mutually recursive selector-parsing group further down
-   this file, so the caller passes it in rather than this function joining
-   that group. *)
-let parse_nth_payload ~function_name ~parse_selector_list stream =
-  skip_whitespace stream;
-  let parse_after_n a suffix =
-    match suffix with
-    | Nth_suffix_n_dash_digits b -> Ast.Nth (ANB (a, "-", b))
-    | Nth_suffix_n_dash ->
-      (* "an-" followed by a signless integer represents a negative b. *)
-      skip_whitespace stream;
-      begin match current_tok stream with
-      | Tokens.NUMBER value ->
-        let token = advance stream in
-        let b = nth_int_of_number function_name token value in
-        if b < 0 then raise_invalid_nth function_name token
-        else Ast.Nth (ANB (a, "-", b))
-      | _ -> raise_parse_error (current_token stream)
-      end
-    | Nth_suffix_n ->
-      skip_whitespace stream;
-      begin match current_tok stream with
-      | Tokens.DELIM (("+" | "-") as op) ->
-        let _ = advance stream in
-        skip_whitespace stream;
-        begin match current_tok stream with
-        | Tokens.NUMBER value ->
-          let token = advance stream in
-          Ast.Nth (ANB (a, op, nth_int_of_number function_name token value))
-        | _ -> raise_parse_error (current_token stream)
-        end
-      | Tokens.NUMBER value ->
-        let token = advance stream in
-        let b = nth_int_of_number function_name token value in
-        let op, abs_b = if b < 0 then "-", abs b else "+", b in
-        Ast.Nth (ANB (a, op, abs_b))
-      | _ -> Ast.Nth (AN a)
-      end
-  in
-  let payload =
-    match current_tok stream with
-    | Tokens.NUMBER value ->
-      let token = advance stream in
-      Ast.Nth (A (nth_int_of_number function_name token value))
-    | Tokens.DIMENSION (num, unit) ->
-      let token = advance stream in
-      let a = nth_int_of_number function_name token num in
-      parse_after_n a (classify_nth_suffix function_name token unit)
-    | Tokens.IDENT ident ->
-      let token = advance stream in
-      begin match String.lowercase_ascii ident with
-      | "even" -> Ast.Nth Even
-      | "odd" -> Ast.Nth Odd
-      | lowercase ->
-        let a, suffix =
-          if String.length lowercase > 0 && lowercase.[0] = '-' then
-            -1, String.sub lowercase 1 (String.length lowercase - 1)
-          else 1, lowercase
-        in
-        parse_after_n a (classify_nth_suffix function_name token suffix)
-      end
-    | _ -> raise_parse_error (current_token stream)
-  in
-  skip_whitespace stream;
-  match payload with
-  | Ast.Nth nth_value ->
-    begin match current_tok stream with
-    | Tokens.IDENT ident when String.lowercase_ascii ident = "of" ->
-      let _ = advance stream in
-      skip_whitespace stream;
-      Ast.NthSelector
-        { nth = nth_value; selectors = parse_selector_list stream }
-    | _ -> payload
-    end
-  | Ast.NthSelector _ -> payload
-
 let rec parse_component_value stream =
   let start_pos = (current_token stream).start_pos in
   match current_tok stream with
@@ -608,7 +531,80 @@ let parse_type_selector stream =
     Type name
   | _ -> raise_parse_error (current_token stream)
 
-let rec parse_attribute_selector stream =
+let rec parse_nth_payload ~function_name stream =
+  skip_whitespace stream;
+  let parse_after_n a suffix =
+    match suffix with
+    | Nth_suffix_n_dash_digits b -> Ast.Nth (ANB (a, "-", b))
+    | Nth_suffix_n_dash ->
+      (* "an-" followed by a signless integer represents a negative b. *)
+      skip_whitespace stream;
+      begin match current_tok stream with
+      | Tokens.NUMBER value ->
+        let token = advance stream in
+        let b = nth_int_of_number function_name token value in
+        if b < 0 then raise_invalid_nth function_name token
+        else Ast.Nth (ANB (a, "-", b))
+      | _ -> raise_parse_error (current_token stream)
+      end
+    | Nth_suffix_n ->
+      skip_whitespace stream;
+      begin match current_tok stream with
+      | Tokens.DELIM (("+" | "-") as op) ->
+        let _ = advance stream in
+        skip_whitespace stream;
+        begin match current_tok stream with
+        | Tokens.NUMBER value ->
+          let token = advance stream in
+          Ast.Nth (ANB (a, op, nth_int_of_number function_name token value))
+        | _ -> raise_parse_error (current_token stream)
+        end
+      | Tokens.NUMBER value ->
+        let token = advance stream in
+        let b = nth_int_of_number function_name token value in
+        let op, abs_b = if b < 0 then "-", abs b else "+", b in
+        Ast.Nth (ANB (a, op, abs_b))
+      | _ -> Ast.Nth (AN a)
+      end
+  in
+  let payload =
+    match current_tok stream with
+    | Tokens.NUMBER value ->
+      let token = advance stream in
+      Ast.Nth (A (nth_int_of_number function_name token value))
+    | Tokens.DIMENSION (num, unit) ->
+      let token = advance stream in
+      let a = nth_int_of_number function_name token num in
+      parse_after_n a (classify_nth_suffix function_name token unit)
+    | Tokens.IDENT ident ->
+      let token = advance stream in
+      begin match String.lowercase_ascii ident with
+      | "even" -> Ast.Nth Even
+      | "odd" -> Ast.Nth Odd
+      | lowercase ->
+        let a, suffix =
+          if String.length lowercase > 0 && lowercase.[0] = '-' then
+            -1, String.sub lowercase 1 (String.length lowercase - 1)
+          else 1, lowercase
+        in
+        parse_after_n a (classify_nth_suffix function_name token suffix)
+      end
+    | _ -> raise_parse_error (current_token stream)
+  in
+  skip_whitespace stream;
+  match payload with
+  | Ast.Nth nth_value ->
+    begin match current_tok stream with
+    | Tokens.IDENT ident when String.lowercase_ascii ident = "of" ->
+      let _ = advance stream in
+      skip_whitespace stream;
+      Ast.NthSelector
+        { nth = nth_value; selectors = parse_complex_selector_list stream }
+    | _ -> payload
+    end
+  | Ast.NthSelector _ -> payload
+
+and parse_attribute_selector stream =
   let _ = expect_token stream Tokens.LEFT_BRACKET in
   skip_whitespace stream;
   let name = parse_wq_name stream in
@@ -655,10 +651,7 @@ and parse_pseudo_class_selector stream =
   | Tokens.NTH_FUNCTION name ->
     let start_pos = (current_token stream).start_pos in
     let _ = advance stream in
-    let payload =
-      parse_nth_payload ~function_name:name
-        ~parse_selector_list:parse_complex_selector_list stream
-    in
+    let payload = parse_nth_payload ~function_name:name stream in
     let payload_loc = make_loc start_pos stream.last_end_pos in
     let _ = expect_token stream Tokens.RIGHT_PAREN in
     Pseudoclass
@@ -769,7 +762,9 @@ and parse_complex_selector stream =
 
 and parse_selector stream = ComplexSelector (parse_complex_selector stream)
 
-and parse_selector_list_with stream parse_one =
+and parse_selector_list_with :
+  'a. stream -> (stream -> 'a) -> ('a * Ast.loc) list * Ast.loc =
+ fun stream parse_one ->
   skip_whitespace stream;
   let start_pos = (current_token stream).start_pos in
   let rec loop acc =
@@ -795,26 +790,9 @@ and parse_selector_list_with stream parse_one =
 
 and parse_selector_list stream = parse_selector_list_with stream parse_selector
 
-(* Selectors-4 "of S" in `:nth-child(An+B of S)`: a plain
-   complex-selector-list, without per-item locations, matching
-   Ast.nth_payload's NthSelector shape. Not built on parse_selector_list_with:
-   that helper is monomorphic within this recursive group (already
-   instantiated at `selector` by parse_selector_list/parse_relative_selector_list),
-   so a `complex_selector` list needs its own comma loop. *)
 and parse_complex_selector_list stream =
-  skip_whitespace stream;
-  let rec loop acc =
-    let item = parse_complex_selector stream in
-    skip_whitespace stream;
-    let acc = item :: acc in
-    match current_tok stream with
-    | Tokens.COMMA ->
-      let _ = advance stream in
-      skip_whitespace stream;
-      loop acc
-    | _ -> List.rev acc
-  in
-  loop []
+  let items, _ = parse_selector_list_with stream parse_complex_selector in
+  List.map fst items
 
 and parse_relative_selector stream =
   skip_whitespace stream;
