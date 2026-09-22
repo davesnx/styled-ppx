@@ -213,6 +213,11 @@ Each `@font-face` block ships through `[@@@css ...]` like any other
 global rule, so the font registers when the extracted `.css`
 loads — no runtime side-effects required.
 
+The `@font-face`-only descriptors (`src`, `unicode-range`, `font-display`,
+`ascent-override`, `descent-override`, `line-gap-override`, `size-adjust`)
+are rejected by `Css_validation` in every other declaration context: a
+style rule, a `[%css]` block, or a different at-rule body.
+
 Declaration-value interpolation in `[%styled.global]` is lowered to CSS
 custom properties (`var(--<prefix>-<hash>)` in the extracted rule, values
 supplied by the generated module's runtime `:root` block — see
