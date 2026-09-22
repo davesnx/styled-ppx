@@ -1,7 +1,6 @@
 This test verifies that statement at-rules (`;`-terminated, no block) flow
 through [%styled.global] and the aggregator the same way block at-rules
-already do, including a name (`@layer`) that previously had no lexer
-allowlist entry for the statement form.
+already do.
 
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../standalone.exe --impl output.ml -o output.ml

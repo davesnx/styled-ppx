@@ -633,9 +633,7 @@ Blockless at-rules pass through verbatim
   > EOF
   @import "foo.css";body{margin:0;}
 
-Statement at-rules are dispatched by lookahead (`;` vs `{`), not by a
-hard-coded name allowlist, so a name outside the old allowlist (e.g.
-`@layer`) still gets its standard blockless form instead of a parse error.
+Statement at-rules are dispatched by lookahead (`;` vs `{`).
   $ cat << "EOF" | ./Render_test.exe
   > @layer a, b;
   > body { margin: 0; }
