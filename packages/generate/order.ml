@@ -54,8 +54,6 @@ let sort (type a) ~(nodes : a list) ~(edges : a -> a list) ~(key : a -> string)
   let pending : (string, string list ref) Hashtbl.t =
     Hashtbl.create node_count
   in
-  (* [dependents.(dep)] is every key that still has [dep] pending, so emitting
-     [dep] only has to walk the keys it actually blocks. *)
   let dependents : (string, string) Hashtbl.t = Hashtbl.create node_count in
   List.iter
     (fun n ->
@@ -93,10 +91,6 @@ let sort (type a) ~(nodes : a list) ~(edges : a -> a list) ~(key : a -> string)
     match KeySet.min_elt_opt !ready with
     | Some k -> emit k
     | None ->
-      (* Stuck: every remaining node waits on another remaining node.
-         Report the whole stuck set as the cycle's members, then drop one
-         blocking edge (source-to-dependency, both still unemitted) to make
-         progress: the one whose source key sorts alphabetically last. *)
       let left =
         List.filter (fun n -> not (Hashtbl.mem emitted (key n))) nodes
       in
