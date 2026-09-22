@@ -14,3 +14,8 @@
 /* At-rule body: same contrast inside a block. */
 [%css {| @media (min-width: 100px) { display: flex; } |}];
 [%css {| @media (min-width: 100px) { display: flex } |}];
+
+/* Autoprefixed value: the autoprefixer matches the value by string, so both
+   must share one class AND one body, with `-webkit-grab` present in each. */
+[%css {| cursor: grab; |}];
+[%css {| cursor: grab |}];

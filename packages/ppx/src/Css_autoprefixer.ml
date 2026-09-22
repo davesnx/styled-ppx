@@ -21,10 +21,7 @@ let prefix_value decl value prefixes =
   prefixes |> List.map (fun prefixer -> prefixed_value decl (prefixer value))
 
 let rendered_value (decl : declaration) =
-  decl.value
-  |> fst
-  |> Styled_ppx_css_parser.Render.strip_leading_whitespace
-  |> Styled_ppx_css_parser.Render.component_value_list
+  decl.value |> fst |> Styled_ppx_css_parser.Render.component_value_list
 
 let prefix_declaration (decl : declaration) =
   let property = fst decl.name in
