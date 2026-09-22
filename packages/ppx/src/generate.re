@@ -282,6 +282,13 @@ let serverCreateElement = (~loc, ~htmlTag, ~variableNames) => {
       @ params
       @ [(Nolabel, [%expr ()])],
     );
+  /* `part` is not a `ReactDOM.domProps` argument yet, so the label rides in as
+     a raw JSX prop. Only emitted when the carrier has a label. */
+  let domProps =
+    switch%expr (part) {
+    | "" => [%e domProps]
+    | label => [React.JSX.string("part", "part", label), ...[%e domProps]]
+    };
 
   let childrenExpr = propItem(~loc, "children");
   let children =
@@ -310,6 +317,13 @@ let stylesAndRefObject = (~loc) => {
           Labelled("style"),
           Helper.Exp.ident(~loc, withLoc(Lident("style"), ~loc)),
         ),
+        (
+          Optional("part"),
+          switch%expr (part == "") {
+          | true => None
+          | false => Some(part)
+          },
+        ),
         (Labelled("ref"), propItem(~loc, "innerRef")),
       ],
     ),
@@ -324,13 +338,13 @@ let newProps = (~loc) => {
   Helper.Vb.mk(~loc, valueName, value);
 };
 
-/* let className = fst(styles) ++ props.className; */
+/* let className = CSS.className(styles) ++ props.className; */
 let className = (~loc, expr) => {
   let classNameProp = propItem(~loc, "className");
   Helper.Vb.mk(
     ~loc,
     Helper.Pat.mk(~loc, Ppat_var(withLoc("className", ~loc))),
-    [%expr fst([%e expr]) ++ getOrEmpty([%e classNameProp])],
+    [%expr CSS.className([%e expr]) ++ getOrEmpty([%e classNameProp])],
   );
 };
 
@@ -338,7 +352,15 @@ let style = (~loc, expr) =>
   Helper.Vb.mk(
     ~loc,
     Helper.Pat.mk(~loc, Ppat_var(withLoc("style", ~loc))),
-    [%expr snd([%e expr])],
+    [%expr CSS.styles([%e expr])],
+  );
+
+/* let part = CSS.label(styles); rendered as the element's `part` attribute. */
+let part = (~loc, expr) =>
+  Helper.Vb.mk(
+    ~loc,
+    Helper.Pat.mk(~loc, Ppat_var(withLoc("part", ~loc))),
+    [%expr CSS.label([%e expr])],
   );
 
 /*
@@ -355,7 +377,11 @@ let makeBody = (~loc, ~htmlTag, ~className as classNameValue, ~variables) => {
   Helper.Exp.let_(
     ~loc,
     Nonrecursive,
-    [className(~loc, classNameValue), style(~loc, classNameValue)],
+    [
+      className(~loc, classNameValue),
+      style(~loc, classNameValue),
+      part(~loc, classNameValue),
+    ],
     Helper.Exp.let_(
       ~loc,
       ~attrs,
@@ -376,7 +402,11 @@ let makeBodyServer =
   Helper.Exp.let_(
     ~loc,
     Nonrecursive,
-    [className(~loc, classNameValue), style(~loc, classNameValue)],
+    [
+      className(~loc, classNameValue),
+      style(~loc, classNameValue),
+      part(~loc, classNameValue),
+    ],
     serverCreateElement(~loc, ~htmlTag, ~variableNames),
   );
 };
@@ -669,9 +699,14 @@ let defineMakeStylesObject = (~loc) => {
           [%type: ReactDOM.Style.t],
           Helper.Typ.arrow(
             ~loc,
-            Labelled("ref"),
-            [%type: option(ReactDOM.domRef)],
-            [%type: Js.t({..})],
+            Optional("part"),
+            [%type: string],
+            Helper.Typ.arrow(
+              ~loc,
+              Labelled("ref"),
+              [%type: option(ReactDOM.domRef)],
+              [%type: Js.t({..})],
+            ),
           ),
         ),
       ),
@@ -1134,7 +1169,7 @@ let extractedDynamicStyles =
       onClassNames(~identity, atomClasses);
       Css_to_runtime.render_make_call(
         ~loc,
-        ~marker=None,
+        ~label=Some(moduleName),
         ~classNames,
         ~dynamic_vars,
       );

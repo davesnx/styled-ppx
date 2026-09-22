@@ -976,6 +976,7 @@
       (
         ~className: string,
         ~style: ReactDOM.Style.t,
+        ~part: string=?,
         ~ref: option(ReactDOM.domRef)
       ) =>
       Js.t({..});
@@ -996,16 +997,23 @@
       "Object.assign";
     let styles = (~var, _) =>
       CSS.make(
+        ~label="DynamicComponent",
         "cid-1hmg1vc css-u97bjx css-13o7eu2",
         [("--var-17zksex", CSS.Types.Color.toString(var))],
       );
     let make = (props: makeProps('var)) => {
       let className =
-        fst(styles(~var=varGet(props), ()))
+        CSS.className(styles(~var=varGet(props), ()))
         ++ getOrEmpty(classNameGet(props))
-      and style = snd(styles(~var=varGet(props), ()));
+      and style = CSS.styles(styles(~var=varGet(props), ()))
+      and part = CSS.label(styles(~var=varGet(props), ()));
       let stylesObject =
-        makeStylesObject(~className, ~style, ~ref=innerRefGet(props));
+        makeStylesObject(
+          ~className,
+          ~style,
+          ~part=?part == "" ? None : Some(part),
+          ~ref=innerRefGet(props),
+        );
       let newProps = assign2(Js.Obj.empty(), props, stylesObject);
       ignore(deleteProp(newProps, "var"));
       ignore(deleteProp(newProps, "innerRef"));

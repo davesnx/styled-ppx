@@ -30,11 +30,13 @@ the diff IS the blast radius.
     ("Input.withMedia", "cid-1wbvjdi", "css-14bi921");
     ("Input.units", "cid-4x7ffc", "css-137pweu css-1tzeee1");
     ("Input.withFallback", "cid-asai3x", "css-1j744k")]]
-  let solid = CSS.make "cx-solid cid-ejsl7w css-tokvmb" []
+  let solid = CSS.make ~label:"solid" "cid-ejsl7w css-tokvmb" []
   let multi =
-    CSS.make "cx-multi cid-7orjvh css-eaeacs css-1ruxp1v css-14ksm7b" []
-  let hovered = CSS.make "cx-hovered cid-18t9scx css-1xu3tth css-1rwx7to" []
-  let multiSel = CSS.make "cx-multiSel cid-j5w3l0 css-1r10myy css-ltb45t" []
-  let withMedia = CSS.make "cx-withMedia cid-1wbvjdi css-14bi921" []
-  let units = CSS.make "cx-units cid-4x7ffc css-137pweu css-1tzeee1" []
-  let withFallback = CSS.make "cx-withFallback cid-asai3x css-1j744k" []
+    CSS.make ~label:"multi" "cid-7orjvh css-eaeacs css-1ruxp1v css-14ksm7b" []
+  let hovered =
+    CSS.make ~label:"hovered" "cid-18t9scx css-1xu3tth css-1rwx7to" []
+  let multiSel =
+    CSS.make ~label:"multiSel" "cid-j5w3l0 css-1r10myy css-ltb45t" []
+  let withMedia = CSS.make ~label:"withMedia" "cid-1wbvjdi css-14bi921" []
+  let units = CSS.make ~label:"units" "cid-4x7ffc css-137pweu css-1tzeee1" []
+  let withFallback = CSS.make ~label:"withFallback" "cid-asai3x css-1j744k" []

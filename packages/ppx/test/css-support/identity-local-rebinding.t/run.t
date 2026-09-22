@@ -26,12 +26,12 @@ byte-identical CSS (same atoms, same atomized class).
     ]
   ];
   let f = () => {
-    let a = CSS.make("cx-a cid-fo0igp css-tokvmb", []);
+    let a = CSS.make(~label="a", "cid-fo0igp css-tokvmb", []);
     a;
   };
   
   let g = () => {
-    let a = CSS.make("cx-a cid-smthfn css-tokvmb", []);
+    let a = CSS.make(~label="a", "cid-smthfn css-tokvmb", []);
     a;
   };
   

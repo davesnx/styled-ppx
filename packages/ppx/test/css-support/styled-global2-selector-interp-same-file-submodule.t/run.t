@@ -17,7 +17,7 @@ Same-file submodule selector interpolation resolves locally in
   [@css ".css-tokvmb{color:red;}"];
   [@css.bindings [("Input.Css.marker", "cid-zr2uk1", "css-tokvmb")]];
   module Css = {
-    let marker = CSS.make("cx-marker cid-zr2uk1 css-tokvmb", []);
+    let marker = CSS.make(~label="marker", "cid-zr2uk1 css-tokvmb", []);
   };
   
   module Globals = {

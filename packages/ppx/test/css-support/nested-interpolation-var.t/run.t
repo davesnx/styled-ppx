@@ -34,19 +34,22 @@ top-level interpolation does. If the inline list is empty `[]` for the
   
   let topLevel =
     CSS.make(
-      "cx-topLevel cid-1pfdov9 css-1b5xvk3",
+      ~label="topLevel",
+      "cid-1pfdov9 css-1b5xvk3",
       [("--c-dq4mhq", CSS.Types.Color.toString(c))],
     );
   
   let hover =
     CSS.make(
-      "cx-hover cid-zu568x css-1orh0hp",
+      ~label="hover",
+      "cid-zu568x css-1orh0hp",
       [("--c-11hlefi", CSS.Types.Color.toString(c))],
     );
   
   let placeholder =
     CSS.make(
-      "cx-placeholder cid-1xk9ylj css-zjac4l",
+      ~label="placeholder",
+      "cid-1xk9ylj css-zjac4l",
       [("--c-gzgct8", CSS.Types.Color.toString(c))],
     );
   

@@ -23,12 +23,12 @@ Shadowing follows OCaml semantics: `&.$(foo)` resolves to the second
     ]
   ];
   
-  let foo = CSS.make("cx-foo cid-zec317 css-tokvmb", []);
+  let foo = CSS.make(~label="foo", "cid-zec317 css-tokvmb", []);
   let _ = foo;
   
-  let foo = CSS.make("cx-foo cid-1mvyff1 css-14ksm7b", []);
+  let foo = CSS.make(~label="foo", "cid-1mvyff1 css-14ksm7b", []);
   
-  let bar = CSS.make("cx-bar cid-1eelq62 css-191lhl1", []);
+  let bar = CSS.make(~label="bar", "cid-1eelq62 css-191lhl1", []);
   
   let _ = (foo, bar);
 

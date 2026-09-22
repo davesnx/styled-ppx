@@ -1,7 +1,8 @@
 let make_static_carrier () =
   let styles = CSS.make "card title" [] in
-  Alcotest.(check string) "className" "card title" (fst styles);
-  Alcotest.(check (list (triple string string string))) "vars" [] (snd styles)
+  Alcotest.(check string) "className" "card title" (CSS.className styles);
+  Alcotest.(check (list (triple string string string)))
+    "vars" [] (CSS.styles styles)
 
 let empty_carrier () =
   Alcotest.(check string) "className" "" (CSS.className CSS.empty);
@@ -18,32 +19,32 @@ let accessors_return_carrier_parts () =
 
 let make_preserves_class_string () =
   let styles = CSS.make "  card   title  " [] in
-  Alcotest.(check string) "className" "  card   title  " (fst styles)
+  Alcotest.(check string) "className" "  card   title  " (CSS.className styles)
 
 let make_dynamic_carrier () =
   let styles = CSS.make "card" [ "--gap", "8px"; "--color", "red" ] in
-  Alcotest.(check string) "className" "card" (fst styles);
+  Alcotest.(check string) "className" "card" (CSS.className styles);
   Alcotest.(check (list (triple string string string)))
     "vars"
-    [ "--color", "--color", "red"; "--gap", "--gap", "8px" ]
-    (snd styles)
+    [ "--gap", "--gap", "8px"; "--color", "--color", "red" ]
+    (CSS.styles styles)
 
 let make_allows_duplicate_variables () =
   let styles = CSS.make "card" [ "--gap", "8px"; "--gap", "12px" ] in
   Alcotest.(check (list (triple string string string)))
     "vars"
-    [ "--gap", "--gap", "12px"; "--gap", "--gap", "8px" ]
-    (snd styles)
+    [ "--gap", "--gap", "8px"; "--gap", "--gap", "12px" ]
+    (CSS.styles styles)
 
 let merge_carriers () =
   let left = CSS.make "card" [ "--gap", "8px" ] in
   let right = CSS.make "active" [ "--color", "red" ] in
   let styles = CSS.merge left right in
-  Alcotest.(check string) "className" "card active" (fst styles);
+  Alcotest.(check string) "className" "card active" (CSS.className styles);
   Alcotest.(check (list (triple string string string)))
     "vars"
     [ "--gap", "--gap", "8px"; "--color", "--color", "red" ]
-    (snd styles)
+    (CSS.styles styles)
 
 let merge_preserves_duplicate_variables () =
   let left = CSS.make "card" [ "--gap", "8px" ] in
@@ -52,39 +53,60 @@ let merge_preserves_duplicate_variables () =
   Alcotest.(check (list (triple string string string)))
     "vars"
     [ "--gap", "--gap", "8px"; "--gap", "--gap", "12px" ]
-    (snd styles)
+    (CSS.styles styles)
 
 let merge_keeps_left_to_right_style_order () =
   let one = CSS.make "one" [ "--one", "1" ] in
   let two = CSS.make "two" [ "--two", "2" ] in
   let three = CSS.make "three" [ "--three", "3" ] in
   let styles = CSS.merge (CSS.merge one two) three in
-  Alcotest.(check string) "className" "one two three" (fst styles);
+  Alcotest.(check string) "className" "one two three" (CSS.className styles);
   Alcotest.(check (list (triple string string string)))
     "vars"
     [ "--one", "--one", "1"; "--two", "--two", "2"; "--three", "--three", "3" ]
-    (snd styles)
+    (CSS.styles styles)
 
 let merge_trims_outer_whitespace_only () =
   let styles = CSS.merge (CSS.make "  card" []) (CSS.make "active  " []) in
-  Alcotest.(check string) "className" "card active" (fst styles)
+  Alcotest.(check string) "className" "card active" (CSS.className styles)
 
 let trim_empty_merge_class () =
   let styles = CSS.merge (CSS.make "" []) (CSS.make "active" []) in
-  Alcotest.(check string) "className" "active" (fst styles)
+  Alcotest.(check string) "className" "active" (CSS.className styles)
 
 let trim_empty_merge_class_2 () =
   let styles = CSS.merge (CSS.make "    " []) (CSS.make "active" []) in
-  Alcotest.(check string) "className" "active" (fst styles)
+  Alcotest.(check string) "className" "active" (CSS.className styles)
 
 let trim_empty_merge_class_3 () =
   let styles = CSS.merge (CSS.make "active" []) (CSS.make "" []) in
-  Alcotest.(check string) "className" "active" (fst styles)
+  Alcotest.(check string) "className" "active" (CSS.className styles)
 
 let merge_empty_carriers () =
   let styles = CSS.merge (CSS.make "" []) (CSS.make "" []) in
-  Alcotest.(check string) "className" "" (fst styles);
-  Alcotest.(check (list (triple string string string))) "vars" [] (snd styles)
+  Alcotest.(check string) "className" "" (CSS.className styles);
+  Alcotest.(check (list (triple string string string)))
+    "vars" [] (CSS.styles styles)
+
+let make_records_label () =
+  Alcotest.(check string)
+    "label" "card"
+    (CSS.label (CSS.make ~label:"card" "css-a" []));
+  Alcotest.(check string) "no label" "" (CSS.label (CSS.make "css-a" []));
+  Alcotest.(check string) "empty carrier" "" (CSS.label CSS.empty)
+
+let merge_joins_labels () =
+  let card = CSS.make ~label:"card" "a" [] in
+  let active = CSS.make ~label:"active" "b" [] in
+  Alcotest.(check string)
+    "both labelled" "card active"
+    (CSS.label (CSS.merge card active));
+  Alcotest.(check string)
+    "unlabelled right" "card"
+    (CSS.label (CSS.merge card (CSS.make "b" [])));
+  Alcotest.(check string)
+    "unlabelled left" "active"
+    (CSS.label (CSS.merge (CSS.make "a" []) active))
 
 let font_families_single_font () =
   Alcotest.(check string)
@@ -115,6 +137,8 @@ let tests =
     test "trim empty merge class 2" trim_empty_merge_class_2;
     test "trim empty merge class 3" trim_empty_merge_class_3;
     test "merge empty carriers" merge_empty_carriers;
+    test "make records label" make_records_label;
+    test "merge joins labels" merge_joins_labels;
     test "font families single font" font_families_single_font;
     test "font families multiple fonts" font_families_multiple_fonts;
   ]

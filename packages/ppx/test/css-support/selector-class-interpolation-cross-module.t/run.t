@@ -18,7 +18,8 @@ location and a synthetic dep-tracking `let`.
   [@@@css.bindings [("N.container", "cid-1ov2ckq", "css-1443u2l css-z7z9b9")]]
   [@@@css.refs [("M.marker", "n.ml", 6, 6, 14)]]
   let _ = M.marker
-  let container = CSS.make "cx-container cid-1ov2ckq css-1443u2l css-z7z9b9" []
+  let container =
+    CSS.make ~label:"container" "cid-1ov2ckq css-1443u2l css-z7z9b9" []
 
 The aggregator resolves the sentinel against `M.marker`'s identity class.
 `M.marker` is an empty `[%css {||}]`, so it has no atoms and emits no rule

@@ -26,16 +26,9 @@ let minify = {
   defaultValue: false,
 };
 
-let dev = {
-  flag: "--dev",
-  doc: "Emit dev-mode marker classes (e.g. cx-layout) on [%css] output to make atomized class lists greppable in DOM inspectors. No effect on extracted CSS or atom hashes. On by default; --minify and --env production turn it off, --dev forces it back on.",
-  value: None,
-  defaultValue: true,
-};
-
 let env = {
   flag: "--env",
-  doc: " Preset over the individual flags: \"development\" enables --dev marker classes; \"production\" enables --minify (CSS whitespace only) and disables dev markers.",
+  doc: " Preset over the individual flags: \"development\" keeps the generated CSS readable; \"production\" enables --minify (CSS whitespace only).",
   value: None,
   defaultValue: "development",
 };
@@ -51,7 +44,6 @@ type settings = {
   native: flag(bool),
   debug: flag(bool),
   minify: flag(bool),
-  dev: flag(bool),
   namespace: flag(string),
   /* Not a CLI flag: set from the dune `library-name` cookie
      (see Ppxlib.Driver.Cookies in ppx.re). */
@@ -63,7 +55,6 @@ let currentSettings =
     native,
     debug,
     minify,
-    dev,
     namespace,
     library: None,
   });
@@ -80,9 +71,6 @@ module Get = {
   let minify = () =>
     currentSettings.contents.minify.value
     |> Option.value(~default=currentSettings.contents.minify.defaultValue);
-  let dev = () =>
-    currentSettings.contents.dev.value
-    |> Option.value(~default=currentSettings.contents.dev.defaultValue);
   let library = () => currentSettings.contents.library;
   /* The identity namespace: the flag when given, else the dune library name.
      Two dune libraries never share a name, so same-named modules in different
@@ -116,17 +104,7 @@ module Update = {
         value: Some(value),
       },
     });
-  let dev = value =>
-    updateSettings({
-      ...currentSettings.contents,
-      dev: {
-        ...currentSettings.contents.dev,
-        value: Some(value),
-      },
-    });
-  /* Turning minify on also turns dev off (matches `--env production`);
-     a later, explicit `--dev` still wins since flags apply in argv order. */
-  let minify = value => {
+  let minify = value =>
     updateSettings({
       ...currentSettings.contents,
       minify: {
@@ -134,10 +112,6 @@ module Update = {
         value: Some(value),
       },
     });
-    if (value) {
-      dev(false);
-    };
-  };
 
   let namespace = value =>
     updateSettings({
@@ -156,10 +130,7 @@ module Update = {
 
   let env =
     fun
-    | `Development => {
-        dev(true);
-        minify(false);
-      }
+    | `Development => minify(false)
     | `Production => minify(true);
 };
 

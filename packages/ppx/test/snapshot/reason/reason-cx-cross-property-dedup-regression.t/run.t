@@ -12,7 +12,8 @@ CSS runtime types. See input.re for the full rationale.
   let lengthVar = CSS.px(10);
   let layout =
     CSS.make(
-      "cx-layout cid-1b5eq77 css-1mfmiq8",
+      ~label="layout",
+      "cid-1b5eq77 css-1mfmiq8",
       [
         ("--lengthVar-12br693", CSS.Types.Margin.toString(lengthVar)),
         ("--lengthVar-8edltm", CSS.Types.Length.toString(lengthVar)),

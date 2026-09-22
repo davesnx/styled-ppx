@@ -76,7 +76,7 @@ Repeated fallback declarations for the same property (e.g. `display: -webkit-box
 
 ### Class names
 
-Each atom's format is `css-<hash>`, a pure hash of the declaration's CSS text, in every mode - the atom hash never carries the `let` binding's name. Dev builds add a separate `cx-<binding>` marker class purely for debuggability; it's on by default and `--minify`/`--env production` turn it off.
+Each atom's format is `css-<hash>`, a pure hash of the declaration's CSS text, in every mode - the atom hash never carries the `let` binding's name. The binding name is rendered instead as the element's `part` attribute (`<div part="layout" class="cid-… css-…">`), in development and production alike, so a style stays findable in DevTools without a class-name suffix.
 
 Every named binding also mints a second class, its **identity**: `cid-<hash>`, prepended ahead of the atoms. Unlike the atom hash, it doesn't depend on the CSS content - it's a function of the module, the binding's name, and (in a monorepo with several libraries) a `--namespace` flag - so it stays stable even if you edit the declarations. It's what a `&.$(binding)` selector reference resolves to, and what makes a binding with no declarations still referenceable.
 
