@@ -129,8 +129,6 @@ let next_significant_index tokens start =
   in
   loop start
 
-(* -- Token set predicates (Design 3) -- *)
-
 let is_selector_start = function
   | Tokens.DELIM ("." | "&" | "*")
   | Tokens.HASH _ | Tokens.LEFT_BRACKET | Tokens.INTERPOLATION _ ->
@@ -147,13 +145,11 @@ let is_at_rule_start = function
   | Tokens.AT_RULE _ | Tokens.AT_KEYFRAMES _ -> true
   | _ -> false
 
-(* Tokens that start a selector (ident or any selector-start or pseudo) *)
 let token_starts_selector tok =
   match tok with
   | Tokens.IDENT _ -> true
   | tok -> is_selector_start tok || is_pseudo_start tok
 
-(* Tokens that start a selector prelude (ident or selector-start, no pseudo) *)
 let token_starts_selector_prelude tok =
   match tok with Tokens.IDENT _ -> true | tok -> is_selector_start tok
 
@@ -353,8 +349,6 @@ let parse_wq_name stream =
   let name, _ = expect_ident stream in
   name
 
-(* -- An+B microsyntax (nth payloads) -- *)
-
 type nth_suffix =
   | Nth_suffix_n
   | Nth_suffix_n_dash (* requires a following integer *)
@@ -364,7 +358,6 @@ let raise_invalid_nth function_name (token : token_with_location) =
   let message = Printf.sprintf "Invalid an+b value in :%s()" function_name in
   raise (Parse_error (token.start_pos, token.end_pos, message))
 
-(* Reject fractional or inexact float coefficients before converting to int. *)
 let nth_int_of_number function_name (token : token_with_location) value =
   let max_exact_float_int =
     9007199254740992.
@@ -376,7 +369,6 @@ let nth_int_of_number function_name (token : token_with_location) value =
 
 let is_ascii_digit = function '0' .. '9' -> true | _ -> false
 
-(* Accept only non-empty ASCII digits; [int_of_string_opt] handles overflow. *)
 let nth_int_of_digits function_name (token : token_with_location) digits =
   if String.length digits > 0 && String.for_all is_ascii_digit digits then (
     match int_of_string_opt digits with
@@ -384,7 +376,6 @@ let nth_int_of_digits function_name (token : token_with_location) digits =
     | None -> raise_invalid_nth function_name token)
   else raise_invalid_nth function_name token
 
-(* Accept "n", "n-", or "n-<digits>", with ASCII-case-insensitive "n". *)
 let classify_nth_suffix function_name (token : token_with_location) suffix =
   let length = String.length suffix in
   if length = 0 || (suffix.[0] <> 'n' && suffix.[0] <> 'N') then
