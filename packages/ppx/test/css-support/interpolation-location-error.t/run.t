@@ -67,6 +67,7 @@ If this test fail means that the module is not in sync with the ppx
   let grid = `gri;
   let a =
     CSS.make(
-      "cx-a cid-fo0igp css-48ak65",
+      ~label="a",
+      "cid-fo0igp css-48ak65",
       [("--grid-1sb4gse", CSS.Types.Display.toString(grid))],
     );

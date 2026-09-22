@@ -24,7 +24,7 @@ its className carries only atoms.
   [@css ".css-k008qs{display:flex;}"];
   [@css ".css-tokvmb{color:red;}"];
   [@css.bindings [("Input.layout", "cid-1jj5tmt", "css-k008qs")]];
-  let layout = CSS.make("cx-layout cid-1jj5tmt css-k008qs", []);
+  let layout = CSS.make(~label="layout", "cid-1jj5tmt css-k008qs", []);
   
   let _ = CSS.make("css-tokvmb", []);
   

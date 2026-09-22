@@ -13,8 +13,8 @@
       ("Output.active", "cid-1iojcla", "css-b7rhyr"),
     ]
   ];
-  let card = CSS.make("cx-card cid-16nw107 css-nk32ej", []);
-  let active = CSS.make("cx-active cid-1iojcla css-b7rhyr", []);
+  let card = CSS.make(~label="card", "cid-16nw107 css-nk32ej", []);
+  let active = CSS.make(~label="active", "cid-1iojcla css-b7rhyr", []);
   let bg = CSS.red;
   module CardGlobals = {
     let to_string = () =>

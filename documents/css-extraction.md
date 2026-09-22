@@ -444,12 +444,24 @@ class, dev or production. Minting lives in
 
 The environment is a PPX concern, set once per `(pps styled-ppx ...)`
 stanza: `--env production` (alias for `--minify`) only minifies rule
-bodies — it has no effect on class names; `--env development` (alias for
-`--dev`) adds `cx-<binding>` marker classes. Dev markers are on by
-default, so a bare `(pps styled-ppx)` stanza already gets them;
-`--minify` and `--env production` turn them off, and an explicit `--dev`
-forces them back on regardless. The aggregator learns the environment
-from `[@@@css.config ...]` and adjusts its whitespace accordingly.
+bodies — it has no effect on class names or on the `part` label below;
+`--env development` is the default, readable output. The aggregator
+learns the environment from `[@@@css.config ...]` and adjusts its
+whitespace accordingly.
+
+**Labels ride in `part`, not in the class.** The styles carrier is a
+triple `(className, style, label)`: `CSS.make(~label="layout", ...)`
+records the binding name (or the `[%styled.<tag>]` module name), `CSS.merge`
+joins labels with a space like a `DOMTokenList`, and a styled component
+renders the label as the element's `part` attribute alongside `className`
+and `style`. `part` is a global HTML attribute that does nothing outside a
+shadow root, so it costs no CSS and needs no stripping in production:
+`[part~="layout"]` in DevTools finds every instance in every build.
+Anonymous (`let _`) and statement-position bindings have no name, so no
+label and no `part`. The `styles=` prop expansion on lowercase elements
+(`Styles_attribute`, shared with server-reason-react) still emits only
+`className` and `style`; it will add `part` once reason-react's
+`ReactDOM.domProps` accepts it.
 
 Two consequences worth knowing:
 
@@ -470,8 +482,9 @@ second, build-independent class alongside its atoms: `cid-<hash>`
 (`Hash_class.identity_class`). `$(binding)` and `&.$(binding)` selector
 references resolve to this identity, verbatim, regardless of how many
 atoms the binding minted or whether it minted any at all. It is emitted
-first among the atoms in the className string (after the `cx-<binding>`
-dev marker, when present): `cx-<binding> cid-<hash> css-<hash> ...`.
+first in the className string: `cid-<hash> css-<hash> ...`. The binding
+name itself is not a class; it is the carrier's label, rendered as the
+element's `part` attribute (see "Labels ride in `part`" above).
 
 **Inputs**, joined with `\0` and murmur2-hashed: the namespace (the
 `--namespace` flag when given, else the dune library name from the

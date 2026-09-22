@@ -39,51 +39,61 @@ vars (top-level / &:hover / @media) and withheld for descendant-read vars.
   let str = "literal";
   let topLevel =
     CSS.make(
-      "cx-topLevel cid-1lkhdb3 css-1p250wn",
+      ~label="topLevel",
+      "cid-1lkhdb3 css-1p250wn",
       [("--color-qqxh28", CSS.Types.Color.toString(color))],
     );
   let hover =
     CSS.make(
-      "cx-hover cid-ng6izt css-66gnkb",
+      ~label="hover",
+      "cid-ng6izt css-66gnkb",
       [("--color-1g10n3y", CSS.Types.Color.toString(color))],
     );
   let media =
     CSS.make(
-      "cx-media cid-12d3e0w css-kesuu8",
+      ~label="media",
+      "cid-12d3e0w css-kesuu8",
       [("--color-7zzrwb", CSS.Types.Color.toString(color))],
     );
   let descendant =
     CSS.make(
-      "cx-descendant cid-1g3dzrb css-l90awb",
+      ~label="descendant",
+      "cid-1g3dzrb css-l90awb",
       [("--color-1bmfpl7", CSS.Types.Color.toString(color))],
     );
   let bundleSpan =
     CSS.make(
-      "cx-bundleSpan cid-ijx48y css-1s0cn0c",
+      ~label="bundleSpan",
+      "cid-ijx48y css-1s0cn0c",
       [("--color-168gc9v", CSS.Types.Color.toString(color))],
     );
   let customFeeder =
     CSS.make(
-      "cx-customFeeder cid-195hxjc css-1s7c43s",
+      ~label="customFeeder",
+      "cid-195hxjc css-1s7c43s",
       [("--str-k9lkg9", str)],
     );
   let pseudoElement =
     CSS.make(
-      "cx-pseudoElement cid-4p9l0t css-1uu31vv",
+      ~label="pseudoElement",
+      "cid-4p9l0t css-1uu31vv",
       [("--color-s2338j", CSS.Types.Color.toString(color))],
     );
   let legacyPseudoElement =
     CSS.make(
-      "cx-legacyPseudoElement cid-4uo0i7 css-drvy9e",
+      ~label="legacyPseudoElement",
+      "cid-4uo0i7 css-drvy9e",
       [("--color-9jv993", CSS.Types.Color.toString(color))],
     );
   let mixedPseudo =
     CSS.make(
-      "cx-mixedPseudo cid-1rr25fw css-1ngjc2o",
+      ~label="mixedPseudo",
+      "cid-1rr25fw css-1ngjc2o",
       [("--color-1p3gcae", CSS.Types.Color.toString(color))],
     );
   let pseudoClassOnly =
     CSS.make(
-      "cx-pseudoClassOnly cid-1f0poos css-r782y4",
+      ~label="pseudoClassOnly",
+      "cid-1f0poos css-r782y4",
       [("--color-5xa71m", CSS.Types.Color.toString(color))],
     );

@@ -280,10 +280,14 @@ let expand_css_expression =
           )
         | None => ()
         };
-        let marker = Dev_mode.marker(label_name);
+        let label =
+          switch (label_name) {
+          | Some(name) when name != "_" => Some(name)
+          | _ => None
+          };
         Css_to_runtime.render_make_call(
           ~loc=stringLoc,
-          ~marker,
+          ~label,
           ~classNames,
           ~dynamic_vars,
         );
@@ -559,7 +563,7 @@ let expand_styled_module =
         let styles =
           Css_to_runtime.render_make_call(
             ~loc=stringLoc,
-            ~marker=None,
+            ~label=Some(name),
             ~classNames,
             ~dynamic_vars,
           );
@@ -970,12 +974,6 @@ let () = {
     ~doc=Settings.minify.doc,
     Settings.minify.flag,
     Arg.Unit(_ => Settings.Update.minify(true)),
-  );
-
-  Ppxlib.Driver.add_arg(
-    ~doc=Settings.dev.doc,
-    Settings.dev.flag,
-    Arg.Unit(_ => Settings.Update.dev(true)),
   );
 
   Ppxlib.Driver.add_arg(

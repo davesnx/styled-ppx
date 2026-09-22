@@ -106,18 +106,24 @@ let render_dynamic_var_list = (~loc, dynamic_vars) =>
     |> concat_list_exprs(~loc);
   };
 
+/* [label] is the binding (or component module) name; it travels in the styles
+   carrier and styled components render it as the element's [part] attribute.
+   Anonymous bindings have none. */
 let render_make_call =
-    (~loc, ~marker: option(string), ~classNames, ~dynamic_vars) => {
-  let class_string = String.concat(" ", classNames);
-  let className_string =
-    switch (marker) {
-    | Some(m) => m ++ " " ++ class_string
-    | None => class_string
-    };
+    (~loc, ~label: option(string), ~classNames, ~dynamic_vars) => {
   let className_expr =
-    Helper.Exp.constant(~loc, Pconst_string(className_string, loc, None));
-
+    Helper.Exp.constant(
+      ~loc,
+      Pconst_string(String.concat(" ", classNames), loc, None),
+    );
   let var_list = render_dynamic_var_list(~loc, dynamic_vars);
-
-  [%expr CSS.make([%e className_expr], [%e var_list])];
+  switch (label) {
+  | Some(label) =>
+    let label_expr =
+      Helper.Exp.constant(~loc, Pconst_string(label, loc, None));
+    [%expr
+     CSS.make(~label=[%e label_expr], [%e className_expr], [%e var_list])
+    ];
+  | None => [%expr CSS.make([%e className_expr], [%e var_list])]
+  };
 };

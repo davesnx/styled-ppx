@@ -164,9 +164,8 @@ Passed inside `(pps styled-ppx <flags> ...)`:
 | Flag | Effect |
 | --- | --- |
 | `--native` | Generate code for server-reason-react (native/SSR) instead of Melange |
-| `--minify` | Minify the generated CSS; class names are unaffected (`css-1tyndxa` either way) and dev markers turn off |
-| `--dev` | Add greppable marker classes (`cx-<binding>`) to classNames; on by default. No effect on the extracted CSS |
-| `--env development\|production` | Preset over the flags above: `development` = `--dev` (markers on), `production` = `--minify` (minified CSS, markers off) |
+| `--minify` | Minify the generated CSS; class names and the `part` label are unaffected (`css-1tyndxa` either way) |
+| `--env development\|production` | Preset over the flags above: `development` = readable CSS (the default), `production` = `--minify` |
 | `--debug` | Verbose ppx logging |
 
 <Callout type="default">
@@ -177,9 +176,11 @@ Passed inside `(pps styled-ppx <flags> ...)`:
 
 ## Production setup
 
-For a release build, pass `--env production` to the ppx. It enables `--minify` (minifies rule bodies; class names are unaffected), turns the dev markers off, and declares the environment in the extraction protocol so `styled-ppx.generate` minifies the final stylesheet on its own. Class names never change between builds: `css-1tyndxa` is the same atom in dev and in prod, so a class seen in production can be looked up in a dev build.
+For a release build, pass `--env production` to the ppx. It enables `--minify` (minifies rule bodies; class names are unaffected) and declares the environment in the extraction protocol so `styled-ppx.generate` minifies the final stylesheet on its own. Class names never change between builds: `css-1tyndxa` is the same atom in dev and in prod, so a class seen in production can be looked up in a dev build.
 
-The mode switch lives on the **ppx** because the `cx-<binding>` dev marker is baked into the `className` string at compile time. No downstream tool could add or drop it without desyncing the compiled `className` from what a consumer expects to grep for in DevTools.
+To find a style in DevTools, look at the element's `part` attribute rather than its classes: every styled component renders its binding name there (`<button part="Button" class="cid-… css-…">`), in development and production alike. `part` is a global HTML attribute with no effect outside a shadow root, so it costs nothing to keep; `[part~="Button"]` selects every instance.
+
+The mode switch lives on the **ppx** because the compiled `className` and `part` strings are fixed at compile time; no downstream tool can change them without desyncing the rendered DOM from the extracted stylesheet.
 
 Dune has no conditional pps flags (variables aren't allowed in `pps` arguments), so the supported pattern is duplicating the library stanza under mutually-exclusive `enabled_if` guards (same fields, different flags):
 

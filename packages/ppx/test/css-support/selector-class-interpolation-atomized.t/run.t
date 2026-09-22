@@ -23,9 +23,10 @@ A multi-declaration source binding fans out into a compound chain
     ]
   ];
   
-  let composed = CSS.make("cx-composed cid-9un6he css-k008qs css-1p7q77g", []);
+  let composed =
+    CSS.make(~label="composed", "cid-9un6he css-k008qs css-1p7q77g", []);
   
-  let user = CSS.make("cx-user cid-wa05kx css-1ez0qm9", []);
+  let user = CSS.make(~label="user", "cid-wa05kx css-1ez0qm9", []);
   
   let _ = (composed, user);
 

@@ -974,6 +974,7 @@
       (
         ~className: string,
         ~style: ReactDOM.Style.t,
+        ~part: string=?,
         ~ref: option(ReactDOM.domRef)
       ) =>
       Js.t({..});
@@ -992,14 +993,21 @@
       "Object.assign";
     let styles =
       CSS.make(
+        ~label="FadeIn",
         "cid-18tumag css-dy0iev",
         CSS.Types.AnimationName.toStyleVars("--animation-1sd4kiq", animation),
       );
     let make = (props: makeProps) => {
-      let className = fst(styles) ++ getOrEmpty(classNameGet(props))
-      and style = snd(styles);
+      let className = CSS.className(styles) ++ getOrEmpty(classNameGet(props))
+      and style = CSS.styles(styles)
+      and part = CSS.label(styles);
       let stylesObject =
-        makeStylesObject(~className, ~style, ~ref=innerRefGet(props));
+        makeStylesObject(
+          ~className,
+          ~style,
+          ~part=?part == "" ? None : Some(part),
+          ~ref=innerRefGet(props),
+        );
       let newProps = assign2(Js.Obj.empty(), props, stylesObject);
       ignore(deleteProp(newProps, "innerRef"));
       let asTag = as_Get(props);

@@ -31,11 +31,14 @@ Selectors covered here:
     ("Input.twoLevelPseudoClass", "cid-1p6ev21", "css-tokvmb css-1srf6vm");
     ("Input.threeLevel", "cid-16hizhg", "css-tokvmb css-1tfmvqw");
     ("Input.descendantUnderPseudo", "cid-d9y20h", "css-tokvmb css-nqbkm2")]]
-  let single = CSS.make "cx-single cid-1e50cws css-tokvmb css-12qnfjo" []
-  let twoLevel = CSS.make "cx-twoLevel cid-8l8452 css-tokvmb css-11jzudz" []
+  let single = CSS.make ~label:"single" "cid-1e50cws css-tokvmb css-12qnfjo" []
+  let twoLevel =
+    CSS.make ~label:"twoLevel" "cid-8l8452 css-tokvmb css-11jzudz" []
   let twoLevelPseudoClass =
-    CSS.make "cx-twoLevelPseudoClass cid-1p6ev21 css-tokvmb css-1srf6vm" []
+    CSS.make ~label:"twoLevelPseudoClass" "cid-1p6ev21 css-tokvmb css-1srf6vm"
+      []
   let threeLevel =
-    CSS.make "cx-threeLevel cid-16hizhg css-tokvmb css-1tfmvqw" []
+    CSS.make ~label:"threeLevel" "cid-16hizhg css-tokvmb css-1tfmvqw" []
   let descendantUnderPseudo =
-    CSS.make "cx-descendantUnderPseudo cid-d9y20h css-tokvmb css-nqbkm2" []
+    CSS.make ~label:"descendantUnderPseudo" "cid-d9y20h css-tokvmb css-nqbkm2"
+      []

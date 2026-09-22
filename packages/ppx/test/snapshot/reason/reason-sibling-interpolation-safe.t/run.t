@@ -23,22 +23,27 @@ interpolation as a custom property (subject is `&` or a descendant of `&`).
   let color = CSS.Types.Color.toString(`hex("3A57FC"));
   let selfSibling =
     CSS.make(
-      "cx-selfSibling cid-vk9hpa css-3pj70v",
+      ~label="selfSibling",
+      "cid-vk9hpa css-3pj70v",
       [("--color-17hzlne", CSS.Types.Color.toString(color))],
     );
   let siblingBeforeAmpersand =
     CSS.make(
-      "cx-siblingBeforeAmpersand cid-fsi55f css-c001uz",
+      ~label="siblingBeforeAmpersand",
+      "cid-fsi55f css-c001uz",
       [("--color-4fgdvo", CSS.Types.Color.toString(color))],
     );
   let childThenSibling =
     CSS.make(
-      "cx-childThenSibling cid-1er3nso css-zcel0e",
+      ~label="childThenSibling",
+      "cid-1er3nso css-zcel0e",
       [("--color-tqid89", CSS.Types.Color.toString(color))],
     );
   let descendant =
     CSS.make(
-      "cx-descendant cid-1g3dzrb css-v0ydxg",
+      ~label="descendant",
+      "cid-1g3dzrb css-v0ydxg",
       [("--color-133cflr", CSS.Types.Color.toString(color))],
     );
-  let literalSibling = CSS.make("cx-literalSibling cid-njk8sz css-1w5oqj4", []);
+  let literalSibling =
+    CSS.make(~label="literalSibling", "cid-njk8sz css-1w5oqj4", []);
