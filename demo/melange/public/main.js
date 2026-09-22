@@ -63207,7 +63207,7 @@ var AppGlobalStyles = {
   make: make8
 };
 var stack = make7(
-  "cid-195s1dh css-k008qs-stack css-cgq59l-stack",
+  "cid-1qmkxoo css-k008qs-stack css-cgq59l-stack",
   /* [] */
   0
 );
@@ -63220,7 +63220,7 @@ function getOrEmpty(str) {
 }
 function styles2(lolaOpt, param) {
   const lola = lolaOpt !== void 0 ? lolaOpt : px2(0);
-  return make7("cid-uk3qz7 css-k008qs-Cositas css-cgq59l-Cositas css-r0vq9t-Cositas", {
+  return make7("cid-dpr7nb css-k008qs-Cositas css-cgq59l-Cositas css-r0vq9t-Cositas", {
     hd: [
       "--lola-8erbae",
       Gap.toString(lola)
@@ -63252,39 +63252,39 @@ var Cositas = {
   make: make$12
 };
 var selectors = make7(
-  "cid-pm05s2 css-tokvmb-selectors css-12qnfjo-selectors",
+  "cid-d5lvj5 css-tokvmb-selectors css-12qnfjo-selectors",
   /* [] */
   0
 );
 var bounce = AnimationName.make(void 0, "keyframe-deb5ee");
 var clx = make7(
-  "cid-47oj19 css-1e8vzlw-clx css-u70tf2-clx css-1j9jp3a-clx",
+  "cid-l34q14 css-1e8vzlw-clx css-u70tf2-clx css-1j9jp3a-clx",
   /* [] */
   0
 );
 var post = make7(
-  "cid-gbz02q css-1y5r52a-post css-3qzm71-post",
+  "cid-111miqe css-1y5r52a-post css-3qzm71-post",
   /* [] */
   0
 );
 var card = make7(
-  "cid-ebd8w7 css-eaeacs-card css-25k368-card css-3fuzg5-card",
+  "cid-18vbb8l css-eaeacs-card css-25k368-card css-3fuzg5-card",
   /* [] */
   0
 );
 var container = make7(
-  "cid-1hzr7q6 css-nqqinc-container css-w3aeeb-container css-5x3p37-container css-stwpj2-container",
+  "cid-zfqje2 css-nqqinc-container css-w3aeeb-container css-5x3p37-container css-stwpj2-container",
   /* [] */
   0
 );
 var gradiend = make7(
-  "cid-j1a2e7 css-1wlyyxm-gradiend css-1wm7046-gradiend",
+  "cid-1berf41 css-1wlyyxm-gradiend css-1wm7046-gradiend",
   /* [] */
   0
 );
 var primary = hex2("141414");
 function keyframeDemoShell(color) {
-  return make7("cid-8xpkpc css-19kzrtu-keyframeDemoShell css-i3pbo-keyframeDemoShell css-3kft4e-keyframeDemoShell css-1fi1jeb-keyframeDemoShell css-205zh2-keyframeDemoShell css-kusjgz-keyframeDemoShell css-1e8vzlw-keyframeDemoShell", {
+  return make7("cid-1hy4qg9 css-19kzrtu-keyframeDemoShell css-i3pbo-keyframeDemoShell css-3kft4e-keyframeDemoShell css-1fi1jeb-keyframeDemoShell css-205zh2-keyframeDemoShell css-kusjgz-keyframeDemoShell css-1e8vzlw-keyframeDemoShell", {
     hd: [
       "--color-1a279q8",
       Color.toString(color)
@@ -63319,7 +63319,7 @@ var resize2 = AnimationName.make({
     )
   }
 }, "keyframe-1kt58w0");
-var keyframeDemoCard = make7("cid-jbn4tz css-1h7bkao-keyframeDemoCard css-65ee5x-keyframeDemoCard css-3pa72f-keyframeDemoCard css-iovuyg-keyframeDemoCard css-1c3l4rb-keyframeDemoCard css-i6bazn-keyframeDemoCard css-k008qs-keyframeDemoCard css-zcxndt-keyframeDemoCard css-1tyndxa-keyframeDemoCard css-1vw7svr-keyframeDemoCard css-1p3fawg-keyframeDemoCard css-kbn7if-keyframeDemoCard css-8c92kl-keyframeDemoCard", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
+var keyframeDemoCard = make7("cid-1jdoven css-1h7bkao-keyframeDemoCard css-65ee5x-keyframeDemoCard css-3pa72f-keyframeDemoCard css-iovuyg-keyframeDemoCard css-1c3l4rb-keyframeDemoCard css-i6bazn-keyframeDemoCard css-k008qs-keyframeDemoCard css-zcxndt-keyframeDemoCard css-1tyndxa-keyframeDemoCard css-1vw7svr-keyframeDemoCard css-1p3fawg-keyframeDemoCard css-kbn7if-keyframeDemoCard css-8c92kl-keyframeDemoCard", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
 function Main(Props) {
   return JsxRuntime.jsxs("main", {
     children: [
