@@ -103,10 +103,6 @@ let nul_join parts = String.concat "\000" parts
 
 (* -- Class names and the atom namespace -------------------------------- *)
 
-(* The identity of an atom: `css-<hash(content)>`. This is the seed for the
-   atom's interpolation variables, so a variable stays a pure function of the
-   declaration content regardless of the enclosing binding (see the
-   invariant in the header). *)
 let namespace_of_content content = Printf.sprintf "css-%s" (hash content)
 
 (* An atom's class name and its namespace, from a single content hash. Both
@@ -117,7 +113,6 @@ let class_and_namespace content =
   let namespace = namespace_of_content content in
   namespace, namespace
 
-(* Just the class name: `css-<hash(content)>`. *)
 let class_name content = fst (class_and_namespace content)
 
 (* -- Interpolation variables ------------------------------------------- *)

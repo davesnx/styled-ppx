@@ -160,7 +160,7 @@ module Update = {
         dev(true);
         minify(false);
       }
-    | `Production => minify(true) /* also turns dev off, see above */;
+    | `Production => minify(true);
 };
 
 let find = (key, args) => {
