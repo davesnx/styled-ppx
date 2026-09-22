@@ -993,9 +993,6 @@ let () = {
       | _ => [make_refs_attribute(cross_module_entries)]
       };
     let dep_items = List.map(make_synthetic_dep, cross_module_longidents);
-    /* Declares production mode and/or the owning library in the wire
-       protocol so the aggregator can minify and group without a flag of its
-       own; absence of every key means development with no known library. */
     let config_entries =
       (
         Settings.Get.minify()
@@ -1022,13 +1019,6 @@ let () = {
         | _ => [Css_extraction.config_attribute(config_entries)]
         }
       };
-    /* Order:
-       - extraction config (production/library marker)
-       - extracted CSS rules
-       - binding exports
-       - cross-module refs descriptor
-       - dep-tracking synthetic lets
-       - user's source. */
     config_items @ rule_items @ bindings_items @ refs_items @ dep_items @ str;
   };
 
