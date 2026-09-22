@@ -11,7 +11,7 @@ still resolves against that fallback group and orders it first.
   > EOF
 
   $ cat > a_app/main.ml <<EOF
-  > [@@@css.config [("library", "a_app")]]
+  > [@@@css.config [("library-name", "a_app")]]
   > [@@@css ".app-main{color:blue;}"]
   > let _ = Z_base.widget
   > EOF
