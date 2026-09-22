@@ -18,11 +18,6 @@ trailing space.
 
   $ dune build
 
-Each pair below is the same declaration once terminated by `;` (no source
-space before it) and once terminated by the end of a block or of input
-(with a source space before it). Both members of a pair must render and
-hash identically.
-
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css ".css-k008qs{display:flex;}"];
   [@css ".css-1d33txl > *{min-height:0;}"];
