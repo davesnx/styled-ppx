@@ -809,19 +809,33 @@ let update_declaration_value_state state (value, _) =
   | Paren_block _ | Bracket_block _ | Delim _ | Selector _ | Unicode_range _ ->
     { state with has_content = true }
 
+(* Leading and trailing whitespace are not part of a declaration's value:
+   `a: b ;`, `a: b }` and `a: b<EOF>` must all yield the same value (and
+   the same rendered CSS and class hash) as `a:b;`. *)
 let parse_declaration_value_list stream =
+  skip_whitespace stream;
   let start_pos = (current_token stream).start_pos in
   let initial_state =
     { has_content = false; top_level_items = 0; ident_like_prefix = false }
   in
+  let rec drop_trailing_whitespace = function
+    | (Ast.Whitespace, _) :: rest -> drop_trailing_whitespace rest
+    | rev_values -> rev_values
+  in
+  let finish rev_values =
+    match drop_trailing_whitespace rev_values with
+    | [] -> [], make_loc start_pos start_pos
+    | (_, (last_loc : Ast.loc)) :: _ as rev_values ->
+      List.rev rev_values, make_loc start_pos last_loc.loc_end
+  in
   let rec loop acc state =
     match current_tok stream with
     | Tokens.EOF | Tokens.RIGHT_BRACE | Tokens.SEMI_COLON | Tokens.IMPORTANT ->
-      with_empty_or_consumed_loc stream start_pos (List.rev acc)
+      finish acc
     | _
       when declaration_value_starts_nested_block stream.tokens stream.index
              state ->
-      with_empty_or_consumed_loc stream start_pos (List.rev acc)
+      finish acc
     | _ ->
       let value = parse_component_value stream in
       let state = update_declaration_value_state state value in

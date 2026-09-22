@@ -1,20 +1,5 @@
-let is_css_keyword = (value: Styled_ppx_css_parser.Ast.component_value) => {
-  switch (value) {
-  | Ident("inherit")
-  | Ident("unset")
-  | Ident("initial")
-  | Ident("revert")
-  | Ident("revert-layer") => true
-  | _ => false
-  };
-};
-
 let rec type_check_rule = (rule: Styled_ppx_css_parser.Ast.rule) => {
   switch (rule) {
-  | Declaration({ name: _, value: ([(value, _)], _), _ })
-      when is_css_keyword(value) => [
-      Ok(),
-    ]
   | Declaration({ name: (name, _), value: (value, value_loc), loc: _, _ }) =>
     switch (Css_grammar.validate_property(~loc=value_loc, ~name, value)) {
     | Ok () => [Ok()]

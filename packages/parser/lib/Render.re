@@ -5,16 +5,6 @@ let rec strip_leading_whitespace = (ast: Ast.component_value_list) =>
   | xs => xs
   };
 
-/* A declaration's value is collected up to whatever terminates it — `;`,
-   the block's closing `}`, or end of input — and a source space right
-   before that terminator survives into the value as a trailing `Whitespace`
-   token (see `parse_declaration_value_list`). Only an explicit `;` with no
-   preceding space leaves none. Trimming it here means the rendered
-   declaration — and the hash derived from it — depends only on the value's
-   content, not on how its source happened to end. */
-let strip_trailing_whitespace = (ast: Ast.component_value_list) =>
-  ast |> List.rev |> strip_leading_whitespace |> List.rev;
-
 let rec stylesheet = (ast: Ast.stylesheet) => {
   ast |> fst |> List.map(rule) |> String.concat("");
 }
@@ -74,11 +64,7 @@ and declaration = ({ name, value, important, _ }: Ast.declaration) => {
   Printf.sprintf(
     "%s:%s%s;",
     name |> fst,
-    value
-    |> fst
-    |> strip_leading_whitespace
-    |> strip_trailing_whitespace
-    |> component_value_list,
+    value |> fst |> component_value_list,
     important |> fst ? " !important" : "",
   );
 }
