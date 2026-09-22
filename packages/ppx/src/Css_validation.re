@@ -10,6 +10,24 @@ let font_face_descriptors = [
   "size-adjust",
 ];
 
+/* Properties that css-fonts also defines as `@font-face` descriptors. */
+let font_face_properties = [
+  "font-family",
+  "font-style",
+  "font-weight",
+  "font-stretch",
+  "font-width",
+  "font-feature-settings",
+  "font-variation-settings",
+  "font-language-override",
+];
+
+let is_font_face_descriptor = name =>
+  List.mem(
+    String.lowercase_ascii(name),
+    font_face_descriptors @ font_face_properties,
+  );
+
 let rec type_check_rule = (~at_rule, rule: Styled_ppx_css_parser.Ast.rule) => {
   switch (rule) {
   | Declaration({ name: (name, name_loc), _ })
@@ -20,6 +38,15 @@ let rec type_check_rule = (~at_rule, rule: Styled_ppx_css_parser.Ast.rule) => {
         name_loc,
         `Invalid_value(
           "Descriptor '" ++ name ++ "' is only valid inside @font-face",
+        ),
+      )),
+    ]
+  | Declaration({ name: (name, name_loc), _ })
+      when at_rule == Some("font-face") && !is_font_face_descriptor(name) => [
+      Error((
+        name_loc,
+        `Invalid_value(
+          "Property '" ++ name ++ "' is not a @font-face descriptor",
         ),
       )),
     ]
