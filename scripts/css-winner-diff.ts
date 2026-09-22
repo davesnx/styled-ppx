@@ -1,10 +1,4 @@
 #!/usr/bin/env node
-// Compares two styled-ppx.generate dev-mode stylesheets and reports CSS rule
-// pairs whose cascade winner (same property + specificity + wrapper, tied,
-// different selector) flips between the two files.
-//
-// Usage: node scripts/css-winner-diff.ts OLD.css NEW.css [--summary]
-//        node scripts/css-winner-diff.ts --self-test
 
 import { readFileSync } from "node:fs";
 import { deepStrictEqual } from "node:assert/strict";
@@ -144,7 +138,7 @@ function calcSpecificity(selector: string): Spec {
       i += m[0].length;
       continue;
     }
-    i++; // unrecognized char (e.g. stray escape); skip to avoid an infinite loop
+    i++;
   }
   return [a, b, c];
 }
@@ -238,13 +232,6 @@ function dedupeByIdentity(rules: Rule[]): Map<string, Rule> {
   return byIdentity;
 }
 
-// A pair can only be "present in both files" when BOTH of its rules are
-// unchanged (identical wrapper+selector+property+value) between old and new.
-// So we intersect by identity first, then group+pair only that intersection.
-// This keeps memory at O(intersection size) instead of O(group size ^ 2),
-// which matters because real sheets can have many rules tied at the same
-// (property, specificity, wrapper) — e.g. thousands of single-class
-// selectors all setting `color` at specificity (0,1,0).
 function diffWinners(oldRules: Rule[], newRules: Rule[]): { flips: FlipRow[]; compared: number } {
   const oldById = dedupeByIdentity(oldRules);
   const newById = dedupeByIdentity(newRules);
@@ -253,7 +240,7 @@ function diffWinners(oldRules: Rule[], newRules: Rule[]): { flips: FlipRow[]; co
   for (const [id, oldRule] of oldById) {
     const newRule = newById.get(id);
     if (!newRule) continue;
-    const key = groupKey(oldRule); // property+specificity+wrapper, invariant under identity match
+    const key = groupKey(oldRule);
     const entry = { old: oldRule, new: newRule };
     const list = groups.get(key);
     if (list) list.push(entry);
@@ -267,7 +254,7 @@ function diffWinners(oldRules: Rule[], newRules: Rule[]): { flips: FlipRow[]; co
     for (let i = 0; i < list.length; i++) {
       for (let j = i + 1; j < list.length; j++) {
         const ea = list[i], eb = list[j];
-        if (ea.old.selector === eb.old.selector) continue; // same selector: not a specificity-tie conflict
+        if (ea.old.selector === eb.old.selector) continue;
         compared++;
         const oldWinner = ea.old.line > eb.old.line ? ea.old.selector : eb.old.selector;
         const newWinner = ea.new.line > eb.new.line ? ea.new.selector : eb.new.selector;
@@ -409,7 +396,6 @@ function selfTest(): void {
   const selfDiff = diffWinners(oldParsed.rules, oldParsed.rules);
   assertEqual(selfDiff.flips.length, 0, "identical file vs itself: 0 flips");
 
-  // performance: a synthetic ~25,000-rule sheet must diff in a few seconds.
   const perfLines = ["/* header */"];
   const properties = ["color", "background-color", "padding", "margin", "display"];
   for (let i = 0; i < 25000; i++) {
