@@ -41,7 +41,8 @@ carries valid CSS. A non-ASCII identifier such as "héllo" is left untouched.
   ];
   let _test =
     CSS.make(
-      "cx-_test cid-1gr654a css-14kiwtd css-10mby7r css-1vlbr1m css-1klhelx css-1jd2wma css-67142b css-nxfkpb css-r5hrsz css-hufzp0",
+      ~label="_test",
+      "cid-1gr654a css-14kiwtd css-10mby7r css-1vlbr1m css-1klhelx css-1jd2wma css-67142b css-nxfkpb css-r5hrsz css-hufzp0",
       [],
     );
   
