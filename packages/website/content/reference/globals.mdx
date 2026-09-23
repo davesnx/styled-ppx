@@ -65,8 +65,6 @@ module Fonts = [%styled.global {|
 
 The rule ships in `styles.css`, so the font is discovered as soon as the stylesheet loads. (Font URLs must be literal: interpolation inside `url(...){:styled-ppx-css}` is rejected, since browsers don't substitute `var()` there.)
 
-Descriptors with no property counterpart (`src{:styled-ppx-css}`, `unicode-range{:styled-ppx-css}`, `font-display{:styled-ppx-css}`, `ascent-override{:styled-ppx-css}`, `descent-override{:styled-ppx-css}`, `line-gap-override{:styled-ppx-css}`, `size-adjust{:styled-ppx-css}`) are only accepted inside `@font-face{:styled-ppx-css}`. Using one in a style rule or a `[%css]{:reason}` block is a compile error. The reverse holds too: an `@font-face{:styled-ppx-css}` body accepts descriptors only, so an ordinary property such as `color{:styled-ppx-css}` inside it is a compile error.
-
 ## Notes
 
 - Top-level *bare declarations* are rejected: global styles must live under a selector. Use `* { ... }{:styled-ppx-css}` if you really want to target everything.
