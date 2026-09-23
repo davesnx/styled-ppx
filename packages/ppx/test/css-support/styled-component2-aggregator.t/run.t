@@ -20,19 +20,17 @@ through the static extraction pipeline. They also register selector bindings so
   $ refmt --parse ml --print re output.ml
   [@css "@property --tone-1ucf2mt{syntax:\"*\";inherits:false;}"];
   [@css "@property --color-1a279q8{syntax:\"*\";inherits:false;}"];
-  [@css ".css-tokvmb-Box{color:red;}"];
-  [@css ".css-149d9vx-Box:hover{color:var(--tone-1ucf2mt);}"];
-  [@css ".css-kusjgz-Button{color:var(--color-1a279q8);}"];
-  [@css ".css-hpgf8j-Button{padding:8px;}"];
-  [@css ".css-yr9qag-card .css-tokvmb-Box.css-149d9vx-Box{margin:0;}"];
-  [@css
-    ".css-10q7t6m-card .css-kusjgz-Button.css-hpgf8j-Button{display:block;}"
-  ];
+  [@css ".css-tokvmb{color:red;}"];
+  [@css ".css-149d9vx:hover{color:var(--tone-1ucf2mt);}"];
+  [@css ".css-kusjgz{color:var(--color-1a279q8);}"];
+  [@css ".css-hpgf8j{padding:8px;}"];
+  [@css ".css-yr9qag .cid-1l8coch{margin:0;}"];
+  [@css ".css-10q7t6m .cid-1oex1yr{display:block;}"];
   [@css.bindings
     [
-      ("Output.Box", "css-tokvmb-Box css-149d9vx-Box"),
-      ("Output.Button", "css-kusjgz-Button css-hpgf8j-Button"),
-      ("Output.card", "css-yr9qag-card css-10q7t6m-card"),
+      ("Output.Box", "cid-1l8coch", "css-tokvmb css-149d9vx"),
+      ("Output.Button", "cid-1oex1yr", "css-kusjgz css-hpgf8j"),
+      ("Output.card", "cid-16nw107", "css-yr9qag css-10q7t6m"),
     ]
   ];
   let tone = CSS.red;
@@ -1021,7 +1019,7 @@ through the static extraction pipeline. They also register selector bindings so
       "Object.assign";
     let styles =
       CSS.make(
-        "css-tokvmb-Box css-149d9vx-Box",
+        "cid-1l8coch css-tokvmb css-149d9vx",
         [("--tone-1ucf2mt", CSS.Types.Color.toString(tone))],
       );
     let make = (props: makeProps) => {
@@ -2030,7 +2028,7 @@ through the static extraction pipeline. They also register selector bindings so
       "Object.assign";
     let styles = (~color: CSS.Types.Color.t, _) =>
       CSS.make(
-        "css-kusjgz-Button css-hpgf8j-Button",
+        "cid-1oex1yr css-kusjgz css-hpgf8j",
         [("--color-1a279q8", CSS.Types.Color.toString(color))],
       );
     let make = (props: makeProps) => {
@@ -2054,4 +2052,4 @@ through the static extraction pipeline. They also register selector bindings so
       );
     };
   };
-  let card = CSS.make("css-yr9qag-card css-10q7t6m-card", []);
+  let card = CSS.make("cx-card cid-16nw107 css-yr9qag css-10q7t6m", []);
