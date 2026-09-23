@@ -538,20 +538,29 @@ let is_global_registration rule =
   String.starts_with ~prefix:"@property" trimmed
   || String.starts_with ~prefix:"@keyframes" trimmed
 
-(** A rendered rule is a statement at-rule ([\@import url(...);],
-    [\@namespace svg url(...);], statement-form [\@layer a, b;]) when it starts
-    with ['@'] and has no ['{']: the parser's [Render] keeps a rule with a block
-    on one line too, so absence of ['{'] is what tells a statement apart from
-    [\@media (...) { ... }]. CSS only honors
-    [\@import]/[\@namespace]/layer-statement rules when they precede every other
-    rule, so the aggregator hoists this whole class to the front of the output
-    regardless of which module emitted it or where {!order_by_dependency} placed
-    that module; relative order within the class is left alone. *)
-let is_statement_at_rule rule =
+(** A rendered rule is a hoisted [\@import]/[\@namespace] statement when, after
+    trimming, it starts with that keyword and ends with [';']. CSS only honors
+    these two kinds when they precede every other rule (and Cascade 5
+    additionally requires every [\@import] to precede every [\@namespace]), so
+    the aggregator hoists them to the front of the output — [\@import] block
+    first, then [\@namespace] — regardless of which module emitted a rule or
+    where {!order_by_dependency} placed that module; relative order within each
+    kind is left alone. Statement-form [\@layer a, b;] is deliberately NOT
+    hoisted here: CSS permits it anywhere in a stylesheet, and layer order is
+    first-occurrence order, so moving a [\@layer] statement would silently
+    reorder a library's cascade layers instead of just relocating text. Textual
+    prefix/suffix matching (not a search for ['{']) is required because an
+    [\@import] URL can itself contain ['{'] (e.g. [\@import url("a{b.css");]),
+    which a ['{']-search would misclassify as a block rule. *)
+let is_import_statement rule =
   let trimmed = String.trim rule in
-  String.length trimmed > 0
-  && trimmed.[0] = '@'
-  && not (String.contains trimmed '{')
+  String.starts_with ~prefix:"@import" trimmed
+  && String.ends_with ~suffix:";" trimmed
+
+let is_namespace_statement rule =
+  let trimmed = String.trim rule in
+  String.starts_with ~prefix:"@namespace" trimmed
+  && String.ends_with ~suffix:";" trimmed
 
 (** [\@charset] is only ever honored as the literal first bytes of a stylesheet,
     but the generated file always opens with a comment identifying it and is
@@ -674,11 +683,18 @@ let run ~output_file ~order ~layers input_files =
       end)
   in
 
-  let statement_rules, other_rules =
+  (* [@import] before [@namespace] (Cascade 5), each preserving its own
+     relative order; everything else, [@layer] statements included, stays in
+     [other_rules] untouched. *)
+  let import_rules, rest =
     List.partition
-      (fun (rule, _layer) -> is_statement_at_rule rule)
+      (fun (rule, _layer) -> is_import_statement rule)
       ordered_rules
   in
+  let namespace_rules, other_rules =
+    List.partition (fun (rule, _layer) -> is_namespace_statement rule) rest
+  in
+  let statement_rules = import_rules @ namespace_rules in
 
   let minify = production_mode inputs in
   Logger.info "environment: %s"

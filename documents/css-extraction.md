@@ -397,15 +397,24 @@ deduped through `Set.Make(String)`, which sorted by hash-prefixed rule
 text and silently destroyed declaration order (regression test:
 `packages/generate/test/source-order.t`).
 
-Before writing, `@import`, `@namespace`, and statement-form `@layer a, b;`
-rules are hoisted to the front of the deduplicated list as a block,
-keeping their relative order, regardless of which library or module
+Before writing, `@import` rules are hoisted to the front of the
+deduplicated list, then `@namespace` rules right after them, each block
+keeping its own relative order, regardless of which library or module
 emitted them: a browser only honors these rules when they precede every
-other rule, and Order above routinely places the module that emits one
-after modules with plain style rules. Classification is a string test on
-the rendered rule — starts with `@` and has no `{` — since the parser's
-`Render` always keeps a rule with a block on one line too, so absence of
-`{` is what tells a statement apart from `@media (...) { ... }`.
+other rule, Order above routinely places the module that emits one after
+modules with plain style rules, and CSS Cascade 5 additionally requires
+every `@import` to precede every `@namespace`. Classification is a string
+test on the rendered rule — starts with `@import`/`@namespace` and ends
+with `;` — rather than a search for `{`, since an `@import` URL can itself
+contain `{` (`@import url("a{b.css");` is a valid statement, not a block
+rule). Statement-form `@layer a, b;` is deliberately NOT hoisted: CSS
+allows it anywhere in a stylesheet, and layer order is first-occurrence
+order, so relocating a `@layer` statement would silently reorder a
+library's cascade layers instead of just moving text. It stays wherever
+dedup/ordering placed it, which under `--layers` (below) means inside its
+own library's `@layer { ... }` block, where it declares sub-layers scoped
+to that library's rules — a normal and supported use of statement-form
+`@layer`.
 `@charset` is dropped instead of hoisted: the generated file always opens
 with its own leading comment, so `@charset` can never be the literal
 first bytes of the stylesheet, and the file is written as UTF-8 regardless
@@ -421,11 +430,13 @@ protocol section above); there is no CLI flag for this.
 
 `--layers` (default off, and rejected together with `--order source`)
 wraps the deduplicated rule list from above into named CSS cascade
-layers, one per library, instead of one flat list. Hoisted statement
-at-rules (`@import`/`@namespace`/statement `@layer`) stay ahead of
-everything below, including the registrations, the aggregator's own
-`@layer <lib1>, <lib2>, ...;` statement, and every wrapped block, for the
-same reason they are hoisted in the unlayered case. `@property` and
+layers, one per library, instead of one flat list. Hoisted `@import` and
+`@namespace` rules stay ahead of everything below, including the
+registrations, the aggregator's own `@layer <lib1>, <lib2>, ...;`
+statement, and every wrapped block, for the same reason they are hoisted
+in the unlayered case. A statement-form `@layer a, b;` is not part of
+this hoisted set, so it falls into its library's own `@layer { ... }`
+block alongside that library's other rules. `@property` and
 `@keyframes` rules are pulled out ahead of every layer next, since they are
 global registrations: a `@property` inside a layer would make the
 registration itself depend on layer order, and a `@keyframes` name is
