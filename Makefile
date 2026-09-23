@@ -54,7 +54,7 @@ install: ## Install project dependencies
 
 .PHONY: pin
 pin: ## pin
-	opam pin add quickjs 0.4.2 -y
+	opam pin add quickjs 0.5.1 -y
 	opam pin add server-reason-react.0.4.1 "https://github.com/ml-in-barcelona/server-reason-react.git#8539f79ac2fd4af3c751c3bd3e1d422d766a7752" -y
 
 .PHONY: init
