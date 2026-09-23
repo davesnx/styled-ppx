@@ -16,7 +16,7 @@
 ; run only on OCaml 5.4. Gating is by folder: put a snapshot here to gate it.
 
 (subdir
- reason-locations
+ locations
  (cram
   (alias test-ppx-snapshot-reason)
   (enabled_if
