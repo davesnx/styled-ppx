@@ -25,14 +25,14 @@ let make_dynamic_carrier () =
   Alcotest.(check string) "className" "card" (fst styles);
   Alcotest.(check (list (triple string string string)))
     "vars"
-    [ "--color", "--color", "red"; "--gap", "--gap", "8px" ]
+    [ "--gap", "--gap", "8px"; "--color", "--color", "red" ]
     (snd styles)
 
 let make_allows_duplicate_variables () =
   let styles = CSS.make "card" [ "--gap", "8px"; "--gap", "12px" ] in
   Alcotest.(check (list (triple string string string)))
     "vars"
-    [ "--gap", "--gap", "12px"; "--gap", "--gap", "8px" ]
+    [ "--gap", "--gap", "8px"; "--gap", "--gap", "12px" ]
     (snd styles)
 
 let merge_carriers () =
