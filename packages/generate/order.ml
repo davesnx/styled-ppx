@@ -40,13 +40,20 @@ let references (structure : Ppxlib.structure) : string list =
     never fail the build over an ordering problem: warn once naming the stuck
     nodes, drop the blocking edge whose dependent (source) key sorts
     alphabetically last, and keep going. Dropping only ever removes edges from a
-    finite graph, so this always terminates. *)
+    finite graph, so this always terminates.
+
+    Two nodes sharing a [key] collapse into one (the later one in [nodes] wins,
+    since [node_of_key] is filled with [Hashtbl.replace]); [node_count] below is
+    therefore the number of distinct keys, not [List.length nodes], so the
+    emission loop's termination bound matches what can actually be emitted. *)
 let sort (type a) ~(nodes : a list) ~(edges : a -> a list) ~(key : a -> string)
   : a list =
   let module KeySet = Set.Make (String) in
-  let node_count = List.length nodes in
-  let node_of_key : (string, a) Hashtbl.t = Hashtbl.create node_count in
+  let node_of_key : (string, a) Hashtbl.t =
+    Hashtbl.create (List.length nodes)
+  in
   List.iter (fun n -> Hashtbl.replace node_of_key (key n) n) nodes;
+  let node_count = Hashtbl.length node_of_key in
   (* [pending.(key n)] is the dependency keys of [n] still to be emitted,
      restricted to keys in [nodes] (an edge to a node outside the input set,
      or to [n] itself, contributes nothing to order and is dropped up
