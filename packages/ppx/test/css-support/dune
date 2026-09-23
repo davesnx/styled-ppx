@@ -5,3 +5,12 @@
  (deps
   %{exe:../standalone.exe}
   (package styled-ppx)))
+
+; Keep the alias defined on compilers where the cram tests are disabled, so
+; `make test` can request it on every CI leg without hitting "alias is empty".
+
+(rule
+ (alias test-css-support)
+ (enabled_if
+  (< %{ocaml_version} 5.4.0))
+ (action (progn)))
