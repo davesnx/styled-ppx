@@ -3,9 +3,9 @@
   $ refmt --parse ml --print re output.ml
   [@css "@keyframes keyframe-m6pt8e{0%{opacity:0;}100%{opacity:1;}}"];
   [@css
-    ".css-dy0iev{-webkit-animation-name:var(--animation-1sd4kiq);animation-name:var(--animation-1sd4kiq);}"
+    ".css-dy0iev-FadeIn{-webkit-animation-name:var(--animation-1sd4kiq);animation-name:var(--animation-1sd4kiq);}"
   ];
-  [@css.bindings [("Output.FadeIn", "cid-18tumag", "css-dy0iev")]];
+  [@css.bindings [("Output.FadeIn", "css-dy0iev-FadeIn")]];
   let animation = CSS.Types.AnimationName.make("keyframe-m6pt8e");
   module FadeIn = {
     [@deriving abstract]
@@ -974,7 +974,6 @@
       (
         ~className: string,
         ~style: ReactDOM.Style.t,
-        ~part: string=?,
         ~ref: option(ReactDOM.domRef)
       ) =>
       Js.t({..});
@@ -993,21 +992,14 @@
       "Object.assign";
     let styles =
       CSS.make(
-        ~label="FadeIn",
-        "cid-18tumag css-dy0iev",
+        "css-dy0iev-FadeIn",
         CSS.Types.AnimationName.toStyleVars("--animation-1sd4kiq", animation),
       );
     let make = (props: makeProps) => {
-      let className = CSS.className(styles) ++ getOrEmpty(classNameGet(props))
-      and style = CSS.styles(styles)
-      and part = CSS.label(styles);
+      let className = fst(styles) ++ getOrEmpty(classNameGet(props))
+      and style = snd(styles);
       let stylesObject =
-        makeStylesObject(
-          ~className,
-          ~style,
-          ~part=?part == "" ? None : Some(part),
-          ~ref=innerRefGet(props),
-        );
+        makeStylesObject(~className, ~style, ~ref=innerRefGet(props));
       let newProps = assign2(Js.Obj.empty(), props, stylesObject);
       ignore(deleteProp(newProps, "innerRef"));
       let asTag = as_Get(props);

@@ -20,29 +20,27 @@ carries valid CSS. A non-ASCII identifier such as "héllo" is left untouched.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-14kiwtd .\\31 a{color:red;}"];
-  [@css ".css-10mby7r .-\\31 a{color:red;}"];
-  [@css ".css-1vlbr1m #\\31 a{color:red;}"];
-  [@css ".css-1klhelx .a\\.b{color:red;}"];
-  [@css ".css-1jd2wma .foo\\:bar{color:red;}"];
-  [@css ".css-67142b .a\\/b{color:red;}"];
-  [@css ".css-nxfkpb .foo\\ bar{color:red;}"];
-  [@css ".css-r5hrsz .héllo{color:red;}"];
-  [@css ".css-hufzp0 .foo:not(.a\\.b){color:red;}"];
+  [@css ".css-14kiwtd-_test .\\31 a{color:red;}"];
+  [@css ".css-10mby7r-_test .-\\31 a{color:red;}"];
+  [@css ".css-1vlbr1m-_test #\\31 a{color:red;}"];
+  [@css ".css-1klhelx-_test .a\\.b{color:red;}"];
+  [@css ".css-1jd2wma-_test .foo\\:bar{color:red;}"];
+  [@css ".css-67142b-_test .a\\/b{color:red;}"];
+  [@css ".css-nxfkpb-_test .foo\\ bar{color:red;}"];
+  [@css ".css-r5hrsz-_test .héllo{color:red;}"];
+  [@css ".css-hufzp0-_test .foo:not(.a\\.b){color:red;}"];
   [@css ".css-1x6t703{--custom\\ prop:red;}"];
   [@css.bindings
     [
       (
         "Input._test",
-        "cid-1gr654a",
-        "css-14kiwtd css-10mby7r css-1vlbr1m css-1klhelx css-1jd2wma css-67142b css-nxfkpb css-r5hrsz css-hufzp0",
+        "css-14kiwtd-_test css-10mby7r-_test css-1vlbr1m-_test css-1klhelx-_test css-1jd2wma-_test css-67142b-_test css-nxfkpb-_test css-r5hrsz-_test css-hufzp0-_test",
       ),
     ]
   ];
   let _test =
     CSS.make(
-      ~label="_test",
-      "cid-1gr654a css-14kiwtd css-10mby7r css-1vlbr1m css-1klhelx css-1jd2wma css-67142b css-nxfkpb css-r5hrsz css-hufzp0",
+      "css-14kiwtd-_test css-10mby7r-_test css-1vlbr1m-_test css-1klhelx-_test css-1jd2wma-_test css-67142b-_test css-nxfkpb-_test css-r5hrsz-_test css-hufzp0-_test",
       [],
     );
   

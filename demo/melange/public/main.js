@@ -7068,8 +7068,8 @@ var require_react_dom_development = __commonJS({
             var map8 = /* @__PURE__ */ new Map();
             var lane = 1;
             for (var index4 = 0; index4 < TotalLanes; index4++) {
-              var label2 = getLabelForLane(lane);
-              map8.set(lane, label2);
+              var label = getLabelForLane(lane);
+              map8.set(lane, label);
               lane *= 2;
             }
             return map8;
@@ -62749,20 +62749,15 @@ var React = __toESM(require_react(), 1);
 var empty_1 = {};
 var empty4 = [
   "",
-  empty_1,
-  ""
+  empty_1
 ];
-function styles(param) {
-  return param[1];
+function styles(carrier) {
+  return carrier[1];
 }
-function className(param) {
-  return param[0];
+function className(carrier) {
+  return carrier[0];
 }
-function label(param) {
-  return param[2];
-}
-function make7(labelOpt, className2, vars2) {
-  const label2 = labelOpt !== void 0 ? labelOpt : "";
+function make7(className2, vars2) {
   const loop = function(_style, _vars) {
     while (true) {
       const vars3 = _vars;
@@ -62779,18 +62774,15 @@ function make7(labelOpt, className2, vars2) {
   };
   return [
     className2,
-    loop({}, vars2),
-    label2
+    loop({}, vars2)
   ];
 }
-function join(left, right) {
-  return (left + (" " + right)).trim();
-}
-function merge2(param, param$1) {
+function merge2(styles1, styles22) {
+  const className2 = (styles1[0] + (" " + styles22[0])).trim();
+  const style = Object.assign({}, styles1[1], styles22[1]);
   return [
-    join(param[0], param$1[0]),
-    Object.assign({}, param[1], param$1[1]),
-    join(param[2], param$1[2])
+    className2,
+    style
   ];
 }
 function global_style_tag(css) {
@@ -63215,8 +63207,7 @@ var AppGlobalStyles = {
   make: make8
 };
 var stack = make7(
-  "stack",
-  "cid-1qmkxoo css-k008qs css-cgq59l",
+  "css-k008qs-stack css-cgq59l-stack",
   /* [] */
   0
 );
@@ -63229,7 +63220,7 @@ function getOrEmpty(str) {
 }
 function styles2(lolaOpt, param) {
   const lola = lolaOpt !== void 0 ? lolaOpt : px2(0);
-  return make7("Cositas", "cid-dpr7nb css-k008qs css-cgq59l css-r0vq9t", {
+  return make7("css-k008qs-Cositas css-cgq59l-Cositas css-r0vq9t-Cositas", {
     hd: [
       "--lola-8erbae",
       Gap.toString(lola)
@@ -63243,17 +63234,11 @@ function styles2(lolaOpt, param) {
 function make$12(props) {
   const className2 = styles2(props.lola, void 0)[0] + getOrEmpty(props.className);
   const style = styles2(props.lola, void 0)[1];
-  const part = styles2(props.lola, void 0)[2];
-  let tmp = {
+  const stylesObject = {
     className: className2,
     style,
     ref: props.innerRef
   };
-  const tmp$1 = part === "" ? void 0 : part;
-  if (tmp$1 !== void 0) {
-    tmp.part = valFromOption(tmp$1);
-  }
-  const stylesObject = tmp;
   const newProps = Object.assign({}, props, stylesObject);
   Reflect.deleteProperty(newProps, "lola");
   Reflect.deleteProperty(newProps, "innerRef");
@@ -63267,45 +63252,39 @@ var Cositas = {
   make: make$12
 };
 var selectors = make7(
-  "selectors",
-  "cid-d5lvj5 css-tokvmb css-12qnfjo",
+  "css-tokvmb-selectors css-12qnfjo-selectors",
   /* [] */
   0
 );
 var bounce = AnimationName.make(void 0, "keyframe-deb5ee");
 var clx = make7(
-  "clx",
-  "cid-l34q14 css-1e8vzlw css-u70tf2 css-1j9jp3a",
+  "css-1e8vzlw-clx css-u70tf2-clx css-1j9jp3a-clx",
   /* [] */
   0
 );
 var post = make7(
-  "post",
-  "cid-111miqe css-1y5r52a css-3qzm71",
+  "css-1y5r52a-post css-3qzm71-post",
   /* [] */
   0
 );
 var card = make7(
-  "card",
-  "cid-18vbb8l css-eaeacs css-25k368 css-3fuzg5",
+  "css-eaeacs-card css-25k368-card css-3fuzg5-card",
   /* [] */
   0
 );
 var container = make7(
-  "container",
-  "cid-zfqje2 css-nqqinc css-w3aeeb css-5x3p37 css-stwpj2",
+  "css-nqqinc-container css-w3aeeb-container css-5x3p37-container css-stwpj2-container",
   /* [] */
   0
 );
 var gradiend = make7(
-  "gradiend",
-  "cid-1berf41 css-1wlyyxm css-qelxhy",
+  "css-1wlyyxm-gradiend css-qelxhy-gradiend",
   /* [] */
   0
 );
 var primary = hex2("141414");
 function keyframeDemoShell(color) {
-  return make7("keyframeDemoShell", "cid-1hy4qg9 css-19kzrtu css-i3pbo css-3kft4e css-1fi1jeb css-205zh2 css-kusjgz css-1e8vzlw", {
+  return make7("css-19kzrtu-keyframeDemoShell css-i3pbo-keyframeDemoShell css-3kft4e-keyframeDemoShell css-1fi1jeb-keyframeDemoShell css-205zh2-keyframeDemoShell css-kusjgz-keyframeDemoShell css-1e8vzlw-keyframeDemoShell", {
     hd: [
       "--color-1a279q8",
       Color.toString(color)
@@ -63340,7 +63319,7 @@ var resize2 = AnimationName.make({
     )
   }
 }, "keyframe-1kt58w0");
-var keyframeDemoCard = make7("keyframeDemoCard", "cid-1jdoven css-1h7bkao css-65ee5x css-3pa72f css-iovuyg css-1c3l4rb css-i6bazn css-k008qs css-zcxndt css-1tyndxa css-1vw7svr css-1p3fawg css-kbn7if css-8c92kl", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
+var keyframeDemoCard = make7("css-1h7bkao-keyframeDemoCard css-65ee5x-keyframeDemoCard css-3pa72f-keyframeDemoCard css-iovuyg-keyframeDemoCard css-1c3l4rb-keyframeDemoCard css-i6bazn-keyframeDemoCard css-k008qs-keyframeDemoCard css-zcxndt-keyframeDemoCard css-1tyndxa-keyframeDemoCard css-1vw7svr-keyframeDemoCard css-1p3fawg-keyframeDemoCard css-kbn7if-keyframeDemoCard css-8c92kl-keyframeDemoCard", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
 function Main(Props) {
   return JsxRuntime.jsxs("main", {
     children: [

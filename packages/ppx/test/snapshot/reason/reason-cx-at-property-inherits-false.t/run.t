@@ -9,91 +9,82 @@ vars (top-level / &:hover / @media) and withheld for descendant-read vars.
   [@css "@property --color-km0lr0{syntax:\"*\";inherits:false;}"];
   [@css "@property --str-vye19e{syntax:\"*\";inherits:false;}"];
   [@css "@property --color-f5c7x{syntax:\"*\";inherits:false;}"];
-  [@css ".css-kusjgz{color:var(--color-1a279q8);}"];
-  [@css ".css-lfbwy0:hover{color:var(--color-4uzv5u);}"];
-  [@css "@media (max-width: 768px) {.css-19xpxeg{color:var(--color-km0lr0);}}"];
-  [@css ".css-1g3cfa1 .child{color:var(--color-ump0qt);}"];
-  [@css ".css-1d8si03{color:var(--color-7srqv7);}"];
-  [@css ".css-1d8si03 .child{color:var(--color-7srqv7);}"];
-  [@css ".css-1l36lcw{--brand:var(--str-vye19e);}"];
-  [@css ".css-1vdqaxy::placeholder{color:var(--color-12r6fyr);}"];
-  [@css ".css-yfluo3:before{color:var(--color-e7n16g);}"];
-  [@css ".css-i81g8d{color:var(--color-xrtge);}"];
-  [@css ".css-i81g8d::before{color:var(--color-xrtge);}"];
-  [@css ".css-11o9ny0:focus-visible:not(:disabled){color:var(--color-f5c7x);}"];
+  [@css ".css-kusjgz-topLevel{color:var(--color-1a279q8);}"];
+  [@css ".css-lfbwy0-hover:hover{color:var(--color-4uzv5u);}"];
+  [@css
+    "@media (max-width: 768px) {.css-19xpxeg-media{color:var(--color-km0lr0);}}"
+  ];
+  [@css ".css-1g3cfa1-descendant .child{color:var(--color-ump0qt);}"];
+  [@css ".css-1d8si03-bundleSpan{color:var(--color-7srqv7);}"];
+  [@css ".css-1d8si03-bundleSpan .child{color:var(--color-7srqv7);}"];
+  [@css ".css-1l36lcw-customFeeder{--brand:var(--str-vye19e);}"];
+  [@css ".css-1vdqaxy-pseudoElement::placeholder{color:var(--color-12r6fyr);}"];
+  [@css ".css-yfluo3-legacyPseudoElement:before{color:var(--color-e7n16g);}"];
+  [@css ".css-i81g8d-mixedPseudo{color:var(--color-xrtge);}"];
+  [@css ".css-i81g8d-mixedPseudo::before{color:var(--color-xrtge);}"];
+  [@css
+    ".css-11o9ny0-pseudoClassOnly:focus-visible:not(:disabled){color:var(--color-f5c7x);}"
+  ];
   [@css.bindings
     [
-      ("Output.topLevel", "cid-1lkhdb3", "css-kusjgz"),
-      ("Output.hover", "cid-ng6izt", "css-lfbwy0"),
-      ("Output.media", "cid-12d3e0w", "css-19xpxeg"),
-      ("Output.descendant", "cid-1g3dzrb", "css-1g3cfa1"),
-      ("Output.bundleSpan", "cid-ijx48y", "css-1d8si03"),
-      ("Output.customFeeder", "cid-195hxjc", "css-1l36lcw"),
-      ("Output.pseudoElement", "cid-4p9l0t", "css-1vdqaxy"),
-      ("Output.legacyPseudoElement", "cid-4uo0i7", "css-yfluo3"),
-      ("Output.mixedPseudo", "cid-1rr25fw", "css-i81g8d"),
-      ("Output.pseudoClassOnly", "cid-1f0poos", "css-11o9ny0"),
+      ("Output.topLevel", "css-kusjgz-topLevel"),
+      ("Output.hover", "css-lfbwy0-hover"),
+      ("Output.media", "css-19xpxeg-media"),
+      ("Output.descendant", "css-1g3cfa1-descendant"),
+      ("Output.bundleSpan", "css-1d8si03-bundleSpan"),
+      ("Output.customFeeder", "css-1l36lcw-customFeeder"),
+      ("Output.pseudoElement", "css-1vdqaxy-pseudoElement"),
+      ("Output.legacyPseudoElement", "css-yfluo3-legacyPseudoElement"),
+      ("Output.mixedPseudo", "css-i81g8d-mixedPseudo"),
+      ("Output.pseudoClassOnly", "css-11o9ny0-pseudoClassOnly"),
     ]
   ];
   let color = CSS.Types.Color.toString(`hex("3A57FC"));
   let str = "literal";
   let topLevel =
     CSS.make(
-      ~label="topLevel",
-      "cid-1lkhdb3 css-kusjgz",
+      "css-kusjgz-topLevel",
       [("--color-1a279q8", CSS.Types.Color.toString(color))],
     );
   let hover =
     CSS.make(
-      ~label="hover",
-      "cid-ng6izt css-lfbwy0",
+      "css-lfbwy0-hover",
       [("--color-4uzv5u", CSS.Types.Color.toString(color))],
     );
   let media =
     CSS.make(
-      ~label="media",
-      "cid-12d3e0w css-19xpxeg",
+      "css-19xpxeg-media",
       [("--color-km0lr0", CSS.Types.Color.toString(color))],
     );
   let descendant =
     CSS.make(
-      ~label="descendant",
-      "cid-1g3dzrb css-1g3cfa1",
+      "css-1g3cfa1-descendant",
       [("--color-ump0qt", CSS.Types.Color.toString(color))],
     );
   let bundleSpan =
     CSS.make(
-      ~label="bundleSpan",
-      "cid-ijx48y css-1d8si03",
+      "css-1d8si03-bundleSpan",
       [("--color-7srqv7", CSS.Types.Color.toString(color))],
     );
   let customFeeder =
-    CSS.make(
-      ~label="customFeeder",
-      "cid-195hxjc css-1l36lcw",
-      [("--str-vye19e", str)],
-    );
+    CSS.make("css-1l36lcw-customFeeder", [("--str-vye19e", str)]);
   let pseudoElement =
     CSS.make(
-      ~label="pseudoElement",
-      "cid-4p9l0t css-1vdqaxy",
+      "css-1vdqaxy-pseudoElement",
       [("--color-12r6fyr", CSS.Types.Color.toString(color))],
     );
   let legacyPseudoElement =
     CSS.make(
-      ~label="legacyPseudoElement",
-      "cid-4uo0i7 css-yfluo3",
+      "css-yfluo3-legacyPseudoElement",
       [("--color-e7n16g", CSS.Types.Color.toString(color))],
     );
   let mixedPseudo =
     CSS.make(
-      ~label="mixedPseudo",
-      "cid-1rr25fw css-i81g8d",
+      "css-i81g8d-mixedPseudo",
       [("--color-xrtge", CSS.Types.Color.toString(color))],
     );
   let pseudoClassOnly =
     CSS.make(
-      ~label="pseudoClassOnly",
-      "cid-1f0poos css-11o9ny0",
+      "css-11o9ny0-pseudoClassOnly",
       [("--color-f5c7x", CSS.Types.Color.toString(color))],
     );
