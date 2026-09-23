@@ -434,9 +434,16 @@ global registrations: a `@property` inside a layer would make the
 registration itself depend on layer order, and a `@keyframes` name is
 looked up by layer order too, so leaving both unlayered avoids surprises.
 After the registrations, one `@layer <lib1>, <lib2>, ...;` statement lists
-every library in the same dependency order as the default output, and
-then each library's remaining rules follow inside their own
-`@layer <lib> { ... }` block, still in that order. A layer's name is its
+every library that still owns a rule at this point, in the same dependency
+order as the default output, and then each such library's remaining rules
+follow inside their own `@layer <lib> { ... }` block, still in that order.
+A group with nothing left to wrap gets no block and no name in the
+statement: a module with no `[%css]` (the PPX attaches no `[@@@css.config]`
+to it, so it groups by its directory), a library whose rules all
+deduplicated away, or one whose only rules are the registrations above.
+Such a group still takes part in dependency ordering, so a styles-free
+module keeps bridging edges between styled libraries
+(`packages/generate/test/layers-empty-groups.t`). A layer's name is its
 library key with every character outside `[A-Za-z0-9_-]` replaced by `_`
 (the directory-fallback case uses the key's last path segment first). Two
 different keys can sanitize to the same name; the aggregator warns once

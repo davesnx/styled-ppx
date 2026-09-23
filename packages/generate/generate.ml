@@ -590,17 +590,6 @@ let run ~output_file ~order ~layers input_files =
     | Dependency -> order_by_dependency inputs
     | Source -> inputs, []
   in
-  let layer_names =
-    if not layers then None
-    else begin
-      let pairs =
-        List.map (fun key -> key, sanitize_layer_name key) library_order
-      in
-      warn_layer_name_collisions pairs;
-      Logger.info "layers: %s" (String.concat ", " (List.map snd pairs));
-      Some pairs
-    end
-  in
 
   (* Resolve all rules across all inputs, collecting errors with locations. *)
   let errors =
@@ -696,6 +685,44 @@ let run ~output_file ~order ~layers input_files =
   in
   let statement_rules = import_rules @ namespace_rules in
 
+  (* [--layers]: [@property]/[@keyframes] registrations go ahead of every
+     layer; everything else is bucketed by group key in one pass, in traversal
+     order, so the "last wins" order the cascade needs survives inside a layer.
+     A group gets a layer only when a rule actually landed in its bucket: a
+     module without [%css] (grouped by its directory, since the PPX attaches
+     no [@@@css.config] to it), a library whose rules all deduplicated away,
+     or one that only registers [@property]/[@keyframes] adds neither an
+     empty block nor a name-collision warning. Rule-less groups still took
+     part in {!order_by_dependency}, so a styles-free module keeps bridging
+     edges between styled libraries. *)
+  let layered =
+    if not layers then None
+    else begin
+      let registrations, library_rules =
+        List.partition
+          (fun (rule, _layer) -> is_global_registration rule)
+          other_rules
+      in
+      let rules_by_layer : (string, (string * string) list ref) Hashtbl.t =
+        Hashtbl.create 16
+      in
+      List.iter
+        (fun ((_, key) as rule) ->
+          match Hashtbl.find_opt rules_by_layer key with
+          | Some acc -> acc := rule :: !acc
+          | None -> Hashtbl.add rules_by_layer key (ref [ rule ]))
+        library_rules;
+      let layer_names =
+        library_order
+        |> List.filter (Hashtbl.mem rules_by_layer)
+        |> List.map (fun key -> key, sanitize_layer_name key)
+      in
+      warn_layer_name_collisions layer_names;
+      Logger.info "layers: %s" (String.concat ", " (List.map snd layer_names));
+      Some (registrations, rules_by_layer, layer_names)
+    end
+  in
+
   let minify = production_mode inputs in
   Logger.info "environment: %s"
     (if minify then "production (from [@@@css.config])" else "development");
@@ -709,14 +736,9 @@ let run ~output_file ~order ~layers input_files =
       Buffer.add_string buffer separator
     in
     List.iter emit statement_rules;
-    (match layer_names with
+    (match layered with
     | None -> List.iter emit other_rules
-    | Some layer_names ->
-      let registrations, library_rules =
-        List.partition
-          (fun (rule, _layer) -> is_global_registration rule)
-          other_rules
-      in
+    | Some (registrations, rules_by_layer, layer_names) ->
       List.iter emit registrations;
       (* A repeated name in the statement doesn't declare a second layer, it
          only re-mentions the same slot, so list each name once (first
@@ -736,33 +758,13 @@ let run ~output_file ~order ~layers input_files =
       in
       Buffer.add_string buffer (Printf.sprintf "@layer %s;" layer_statement);
       Buffer.add_string buffer separator;
-      (* Bucket rules by layer key in one pass instead of re-scanning
-         [library_rules] once per layer: each key's [Buffer.t] accumulates its
-         rules in traversal order, so blitting it below preserves the
-         "last wins" order the cascade needs within a layer. *)
-      let rules_by_layer : (string, Buffer.t) Hashtbl.t = Hashtbl.create 16 in
-      List.iter
-        (fun (rule, rule_layer) ->
-          let buf =
-            match Hashtbl.find_opt rules_by_layer rule_layer with
-            | Some buf -> buf
-            | None ->
-              let buf = Buffer.create 256 in
-              Hashtbl.add rules_by_layer rule_layer buf;
-              buf
-          in
-          Buffer.add_string buf rule;
-          Buffer.add_string buf separator)
-        library_rules;
       List.iter
         (fun (key, name) ->
           Buffer.add_string buffer
             (if minify then Printf.sprintf "@layer %s{" name
              else Printf.sprintf "@layer %s {" name);
           Buffer.add_string buffer separator;
-          (match Hashtbl.find_opt rules_by_layer key with
-          | Some buf -> Buffer.add_buffer buffer buf
-          | None -> ());
+          List.iter emit (List.rev !(Hashtbl.find rules_by_layer key));
           Buffer.add_string buffer "}";
           Buffer.add_string buffer separator)
         layer_names);
