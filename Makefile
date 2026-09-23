@@ -54,7 +54,8 @@ install: ## Install project dependencies
 
 .PHONY: pin
 pin: ## pin
-	opam pin add server-reason-react.0.4.1 "https://github.com/ml-in-barcelona/server-reason-react.git#56bbe2c3d9bcfad46ce491e110bc963899d33c51" -y
+	opam pin add quickjs 0.5.1 -y
+	opam pin add server-reason-react.0.4.1 "https://github.com/ml-in-barcelona/server-reason-react.git#8539f79ac2fd4af3c751c3bd3e1d422d766a7752" -y
 
 .PHONY: init
 init: setup-githooks create-switch pin install ## Create a local dev enviroment
@@ -100,13 +101,13 @@ $(foreach target,$(TEST_TARGETS), $(eval $(call create-test-promote,$(target))))
 
 .PHONY: test
 test: build
-	@for target in $(TEST_TARGETS); do \
+	@status=0; for target in $(TEST_TARGETS); do \
 		if [ "$(CI)" = "true" ]; then \
-			ALCOTEST_VERBOSE=true make $${target}; \
+			ALCOTEST_VERBOSE=true make $${target} || status=1; \
 		else \
-			ALCOTEST_VERBOSE=false make $${target}; \
+			ALCOTEST_VERBOSE=false make $${target} || status=1; \
 		fi \
-	done
+	done; exit $$status
 
 # Demo
 
