@@ -76,7 +76,7 @@ let styles = CSS.merge button (if active then highlight else CSS.empty)
 
 If you come from emotion or styled-components, this is the one semantic to relearn: **`CSS.merge` argument order does not decide which declaration wins.**
 
-Every extracted rule is atomic (a single class), so all rules have the same specificity. When two atoms set the same property, the CSS cascade breaks the tie by **stylesheet order**: later wins. Within a module, the stylesheet preserves your `[%css]` blocks' source order. Across modules in the same dune library, a module's rules come after the rules of every module in that library it depends on. Across libraries, the same rule applies one level up: a library's rules come after the rules of every library it depends on, so a consumer's override reliably beats the dependency it overrides regardless of file or library naming; modules or libraries with no dependency relation between them keep alphabetical order. In emotion, `cx(base, override)` guarantees the override wins because emotion re-serializes at runtime; here `CSS.merge(base, override)` and `CSS.merge(override, base)` render identically, because only stylesheet position matters.
+Every extracted rule is atomic (a single class), so all rules have the same specificity. When two atoms set the same property, the CSS cascade breaks the tie by **stylesheet order**: later wins. And the stylesheet preserves the order your `[%css]` blocks appear in your source. In emotion, `cx(base, override)` guarantees the override wins because emotion re-serializes at runtime; here `CSS.merge(base, override)` and `CSS.merge(override, base)` render identically, because only source position matters.
 
 ```reason
 let danger = [%css "background-color: red"];  /* defined FIRST */
@@ -98,7 +98,7 @@ let a = <div styles=(CSS.merge button danger) />
 let b = <div styles=(CSS.merge danger button) />
 ```
 
-The convention to follow: **define base styles before the styles that override them** within a module. Across modules and across libraries there's no convention to maintain — styled-ppx's `generate` orders a module's rules after every module it depends on, and a library's rules after every library it depends on, automatically. When an override doesn't stick, check definition order within the module first, or run `styled-ppx.generate --log info` to see the resolved library order and each library's module order; the `cx-<binding>` dev marker class (on by default, off under `--minify`/`--env production`) shows in DevTools exactly which binding a winning declaration's atoms came from. Every named binding also carries its identity class (`cid-<hash>`) - unlike an atom hash, it doesn't change when you edit the declarations, so it's a stable grep target across edits.
+The convention to follow: **define base styles before the styles that override them**. That applies within a module, and for cross-module overrides, in a module compiled later. When an override doesn't stick, check the definition order first; the binding labels in class names (`css-<hash>-danger`) show in DevTools exactly which binding each winning declaration came from.
 
 ### Patterns
 

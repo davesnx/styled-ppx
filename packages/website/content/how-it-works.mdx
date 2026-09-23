@@ -64,11 +64,11 @@ let layout = [%css {|
 extracts to:
 
 ```css
-.css-k008qs { display: flex; }
-.css-1tyndxa { align-items: center; }
+.css-k008qs-layout { display: flex; }
+.css-1tyndxa-layout { align-items: center; }
 ```
 
-and `layout`'s className is the space-separated list: `"cid-3f8a1b css-k008qs css-1tyndxa"`. Every named binding also gets a build-independent identity class (`cid-<hash>`, prepended first) - see [Class names](#class-names) below.
+and `layout`'s className is the space-separated list: `"css-k008qs-layout css-1tyndxa-layout"`.
 
 Class names are **content-addressed**: the hash is derived from the CSS text itself (for interpolation variables, the source path and main module name feed the hash too, so names stay stable across builds). Two components declaring `display: flex` anywhere in your project share the exact same rule, and the aggregator emits it once. On large apps this makes the stylesheet grow with the number of *distinct declarations*, not the number of components. That's the same effect utility-CSS frameworks achieve, without you maintaining a naming convention.
 
@@ -76,13 +76,11 @@ Repeated fallback declarations for the same property (e.g. `display: -webkit-box
 
 ### Class names
 
-Each atom's format is `css-<hash>`, a pure hash of the declaration's CSS text, in every mode - the atom hash never carries the `let` binding's name. Dev builds add a separate `cx-<binding>` marker class purely for debuggability; it's on by default and `--minify`/`--env production` turn it off.
-
-Every named binding also mints a second class, its **identity**: `cid-<hash>`, prepended ahead of the atoms. Unlike the atom hash, it doesn't depend on the CSS content - it's a function of the module, the binding's name, and (in a monorepo with several libraries) a `--namespace` flag - so it stays stable even if you edit the declarations. It's what a `&.$(binding)` selector reference resolves to, and what makes a binding with no declarations still referenceable.
+The format is `css-<hash>-<label>`, where the label is the `let` binding or module name (`layout` above). The label is purely cosmetic, for debuggability: hashes alone determine identity and deduplication. Running the ppx with the `--minify` flag drops the label, emitting bare `css-<hash>` names for production.
 
 ### Cascade and ordering
 
-All atoms have the same specificity (a single class). The tiebreaker is stylesheet order (later wins). Within a module the aggregator preserves your source order exactly, so an override written after its base declaration stays after it in `styles.css`; across modules, a module's rules come after the rules of every module it depends on, so a consumer's override beats its dependency's declaration regardless of file naming. The full rules and composition patterns live in [Which declaration wins](/reference/runtime#which-declaration-wins).
+All atoms have the same specificity (a single class). The tiebreaker is stylesheet order (later wins), and the aggregator preserves your source order exactly, so an override written after its base declaration stays after it in `styles.css`. The full rules and composition patterns live in [Which declaration wins](/reference/runtime#which-declaration-wins).
 
 ## Dynamic values: CSS custom properties
 
@@ -96,11 +94,9 @@ let title = (~color) => [%css {|
 ```
 
 ```css
-.css-abc123 { font-size: 2rem; }
-.css-def456 { color: var(--color-xk29fh); }
+.css-abc123-title { font-size: 2rem; }
+.css-def456-title { color: var(--color-xk29fh); }
 ```
-
-(`title`'s className also carries its identity class first, as with any named binding: `"cid-... css-abc123 css-def456"`.)
 
 The runtime side only supplies the property's *value*, through the element's inline `style` attribute (`style="--color-xk29fh: #667eea"`). That's why elements styled with interpolations carry a small `style` attribute: it holds variable definitions, never declarations.
 
@@ -113,18 +109,17 @@ A few details worth knowing:
 
 ## Class references in selectors
 
-Interpolating a *binding* in selector position (`&.$(active)`, `:has(.$(other))`) is resolved **statically**: the referenced binding's identity class is substituted into the extracted CSS, with no `var()` indirection. This is one class regardless of how many declarations the binding has, or none at all - a reference means "carries that binding", not "carries these exact declarations". Same-file references resolve during ppx expansion; references to bindings in *other modules* are resolved by the aggregator at stylesheet-generation time (one of the reasons the aggregator exists). Syntax, rules, and errors are documented in [Class references in selectors](/reference/selectors#class-references-in-selectors).
+Interpolating a *binding* in selector position (`&.$(active)`, `:has(.$(other))`) is resolved **statically**: the actual class names are substituted into the extracted CSS, with no `var()` indirection. Same-file references resolve during ppx expansion; references to bindings in *other modules* are resolved by the aggregator at stylesheet-generation time (one of the reasons the aggregator exists). Syntax, rules, and errors are documented in [Class references in selectors](/reference/selectors#class-references-in-selectors).
 
 ## The aggregator: `styled-ppx.generate`
 
 The ppx runs one file at a time and cannot see the rest of your project, so each compiled file carries its extracted CSS in top-level attributes (`[@@@css "..."]`) that ride along in the build artifacts. `styled-ppx.generate` is a small CLI that:
 
 1. walks the post-ppx `.ml`/`.pp.ml` files you point it at,
-2. extracts every rule and binding export the ppx emitted,
-3. orders the files by module dependency (a module after the modules it depends on; `--order source` opts out),
-4. resolves cross-module selector references,
-5. deduplicates rules (order-preserving), and
-6. writes the final stylesheet.
+2. harvests every extracted rule and binding export,
+3. resolves cross-module selector references,
+4. deduplicates rules (order-preserving), and
+5. writes the final stylesheet.
 
 You wire it up once as a dune rule; the rule, CLI flags, and troubleshooting live in [Setting up the dune rules](/getting-started/dune-setup).
 
