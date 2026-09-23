@@ -8,23 +8,20 @@
   (deps
    %{exe:../../standalone.exe}
    %{bin:refmt}
-   (package styled-ppx)))
- ; These snapshots contain error locations and source excerpts into the
- ; refmt-generated output.ml. refmt prints that file through the host
- ; compiler's Pprintast, whose layout differs between OCaml versions.
+   (package styled-ppx))))
+
+; These snapshots contain error locations and source excerpts into the
+; refmt-generated output.ml. refmt prints that file through the host
+; compiler's Pprintast, whose layout differs between OCaml versions, so they
+; run only on OCaml 5.4. Gating is by folder: put a snapshot here to gate it.
+
+(subdir
+ reason-locations
  (cram
-  (applies_to
-   reason-dynamic-array
-   reason-dynamic-interpolation-default-value
-   reason-dynamic-sequence
-   reason-dynamic-with-array
-   reason-dynamic-with-ident
-   reason-dynamic-with-sequence-out-scope
-   reason-media-queries-and-selectors-interpolation
-   reason-native-dynamic-interpolation-default-value
-   reason-styled-global2-selector-interp-forward-ref-error
-   reason-styled-global2-selector-interp-undefined-error
-   reason-styled-global2-top-level-ampersand-error
-   reason-warning-old-api)
+  (alias test-ppx-snapshot-reason)
   (enabled_if
-   (>= %{ocaml_version} 5.4.0))))
+   (>= %{ocaml_version} 5.4.0))
+  (deps
+   %{exe:../../standalone.exe}
+   %{bin:refmt}
+   (package styled-ppx))))
