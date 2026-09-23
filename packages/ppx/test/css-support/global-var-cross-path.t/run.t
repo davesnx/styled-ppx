@@ -27,17 +27,21 @@ basename:
   $ refmt --parse re --print ml js/Global_Css.re > js/Global_Css.ml
   $ ../../standalone.exe --impl js/Global_Css.ml -o js/Global_Css.ml
 
-The extracted static rule is byte-identical across both paths:
+The static rule and the runtime :root binding reference the same variable, and
+the PPX output is byte-identical across both paths:
 
-  $ grep -h '@@@css' native/Global_Css.ml
-  [@@@css "body{color:var(--primary-uvgzxa);}"]
-  $ grep -h '@@@css' js/Global_Css.ml
-  [@@@css "body{color:var(--primary-uvgzxa);}"]
-
-Within each build the static rule and the runtime :root binding agree, so each
-file mentions exactly one variable - and it is the SAME variable on both paths:
-
-  $ grep -o -- '--[A-Za-z0-9_-]*' native/Global_Css.ml | sort -u
-  --primary-uvgzxa
-  $ grep -o -- '--[A-Za-z0-9_-]*' js/Global_Css.ml | sort -u
-  --primary-uvgzxa
+  $ refmt --parse ml --print re native/Global_Css.ml
+  [@css "body{color:var(--primary-uvgzxa);}"];
+  let primary = CSS.red;
+  module Styles = {
+    let to_string = () =>
+      (
+        ((":root{" ++ "--primary-uvgzxa:") ++ CSS.Types.Color.toString(primary))
+        ++ ";"
+      )
+      ++ "}";
+    [@warning "-27-32"]
+    let makeProps = (~key=?, ()) => Js.Obj.empty();
+    let make = _props => CSS.global_style_tag(to_string());
+  };
+  $ diff native/Global_Css.ml js/Global_Css.ml

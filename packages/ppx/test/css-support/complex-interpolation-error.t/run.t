@@ -11,9 +11,10 @@ Test what happens with complex expressions in interpolation
   >  (preprocess (pps styled-ppx)))
   > EOF
 
-  $ dune build 2>&1 | head -30
+  $ dune build 2>&1
   File "input.re", line 9, characters 11-57:
   9 |   color: $(match prop with | Big -> `red | Small -> `blue);
                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   Error: Invalid interpolation expression: syntax error, consider adding a `;'
          before
+  [1]

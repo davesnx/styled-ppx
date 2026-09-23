@@ -13,9 +13,10 @@ position in the file, not at the beginning of the CSS string.
   >  (preprocess (pps styled-ppx)))
   > EOF
 
-  $ dune build 2>&1 | head -5
+  $ dune build 2>&1
   File "input.re", line 1, characters 44-49:
   1 | let demo = [%css "font-size: 10px; color: $(color);"];
                                                   ^^^^^
   Error: Unbound value color
   Hint:   Did you mean floor or lor?
+  [1]

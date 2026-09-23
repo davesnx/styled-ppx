@@ -11,9 +11,10 @@ This test ensures type errors inside interpolation expressions are reported
   >  (preprocess (pps styled-ppx)))
   > EOF
 
-  $ dune build 2>&1 | head -30
+  $ dune build 2>&1
   File "input.re", line 2, characters 15-23:
   2 |   color: $(1 + "string");
                      ^^^^^^^^
   Error: This constant has type string but an expression was expected of type
            int
+  [1]

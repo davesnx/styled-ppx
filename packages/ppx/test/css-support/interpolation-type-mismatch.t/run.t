@@ -11,9 +11,10 @@ This test ensures type mismatches between interpolation result and CSS types
   >  (preprocess (pps styled-ppx)))
   > EOF
 
-  $ dune build 2>&1 | head -30
+  $ dune build 2>&1
   File "input.re", line 4, characters 13-17:
   4 |     color: $(size);
                    ^^^^
   Error: The value size has type int but an expression was expected of type
            Css_types.Color.t
+  [1]

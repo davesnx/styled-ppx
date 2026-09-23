@@ -11,10 +11,18 @@ remain as sentinels until aggregation.
 The post-PPX `n.ml` shows only the cross-module ref as a sentinel — the
 same-module `localFlag` is already resolved to its class.
 
-  $ grep "css-" n.ml | head -3
-    ".css-djuldm-container.css-0-localFlag.\000M.marker\000{color:blue;}"]
-    [("N.localFlag", "css-0-localFlag");
-    ("N.container", "css-djuldm-container")]]
+  $ refmt --parse ml --print re n.ml
+  [@css ".css-djuldm-container.css-0-localFlag.\000M.marker\000{color:blue;}"];
+  [@css.bindings
+    [
+      ("N.localFlag", "css-0-localFlag"),
+      ("N.container", "css-djuldm-container"),
+    ]
+  ];
+  [@css.refs [("M.marker", "n.ml", 4, 19, 27)]];
+  let _ = M.marker;
+  let localFlag = CSS.make("css-0-localFlag", []);
+  let container = CSS.make("css-djuldm-container", []);
 
 The aggregator resolves `M.marker`. Final output matches what an inlined
 same-module reference would produce.

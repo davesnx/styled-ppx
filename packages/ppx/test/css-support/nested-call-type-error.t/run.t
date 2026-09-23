@@ -11,9 +11,10 @@ This test ensures nested call type errors inside interpolation are reported
   >  (preprocess (pps styled-ppx)))
   > EOF
 
-  $ dune build 2>&1 | head -30
+  $ dune build 2>&1
   File "input.re", line 4, characters 22-29:
   4 |     color: $(getColor("wrong"));
                             ^^^^^^^
   Error: This constant has type string but an expression was expected of type
            int
+  [1]
