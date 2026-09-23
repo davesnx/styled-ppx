@@ -102,11 +102,7 @@ $(foreach target,$(TEST_TARGETS), $(eval $(call create-test-promote,$(target))))
 .PHONY: test
 test: build
 	@status=0; for target in $(TEST_TARGETS); do \
-		if [ "$(CI)" = "true" ]; then \
-			ALCOTEST_VERBOSE=true make $${target} || status=1; \
-		else \
-			ALCOTEST_VERBOSE=false make $${target} || status=1; \
-		fi \
+		make --no-print-directory $${target} || status=1; \
 	done; exit $$status
 
 # Demo

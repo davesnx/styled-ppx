@@ -1,4 +1,5 @@
 Alcotest.run(
+  ~show_errors=true,
   "CSS Property Parser",
   List.flatten([
     Combinators_test.tests,

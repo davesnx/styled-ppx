@@ -304,6 +304,7 @@ let error_tests =
      });
 
 Alcotest.run(
+  ~show_errors=true,
   "CSS Spec Parser",
   [
     ("Parser", parse_tests),
