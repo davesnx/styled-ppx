@@ -21,18 +21,29 @@ variable baked into that identical atom -> a class/var mismatch.
   $ ../../standalone.exe --impl b.ml -o b.ml
 
 The background-color atom has the SAME class name in both modules AND the
-same `var(--...)` target despite the differing sibling. These two lines
-must stay byte-identical:
+same `var(--...)` target despite the differing sibling, and each module's
+runtime binding sets that same custom property:
 
-  $ grep -ho 'css-[0-9a-z]*-header{background-color:var(--[A-Za-z0-9_-]*);}' a.ml b.ml
-  css-8rqac1-header{background-color:var(--box-11ifi3f);}
-  css-8rqac1-header{background-color:var(--box-11ifi3f);}
-
-Each module's runtime binding sets the same custom property:
-
-  $ grep -ho '"--[A-Za-z0-9_-]*"' a.ml b.ml
-  "--box-11ifi3f"
-  "--box-11ifi3f"
+  $ refmt --parse ml --print re a.ml
+  [@css "@property --box-11ifi3f{syntax:\"*\";inherits:false;}"];
+  [@css ".css-8rqac1-header{background-color:var(--box-11ifi3f);}"];
+  [@css ".css-k008qs-header{display:flex;}"];
+  [@css.bindings [("A.header", "css-8rqac1-header css-k008qs-header")]];
+  let header =
+    CSS.make(
+      "css-8rqac1-header css-k008qs-header",
+      [("--box-11ifi3f", CSS.Types.Color.toString(Color.Background.Alt.box))],
+    );
+  $ refmt --parse ml --print re b.ml
+  [@css "@property --box-11ifi3f{syntax:\"*\";inherits:false;}"];
+  [@css ".css-8rqac1-header{background-color:var(--box-11ifi3f);}"];
+  [@css ".css-hpgf8j-header{padding:8px;}"];
+  [@css.bindings [("B.header", "css-8rqac1-header css-hpgf8j-header")]];
+  let header =
+    CSS.make(
+      "css-8rqac1-header css-hpgf8j-header",
+      [("--box-11ifi3f", CSS.Types.Color.toString(Color.Background.Alt.box))],
+    );
 
 Aggregating both modules into one stylesheet dedupes by the FULL rule text
 (generate.ml:280). Because both modules now emit a byte-identical

@@ -10,9 +10,20 @@ they only serve as "tags" that consumers chain into selectors.
 The PPX records two distinct cross-module refs and one synthetic dep per
 distinct longident.
 
-  $ grep "let _ = M" n.ml
-  let _ = M.isOpen
-  let _ = M.isHovered
+  $ refmt --parse ml --print re n.ml
+  [@css ".css-1hyfx7x-modal{display:none;}"];
+  [@css ".css-pznzdi-modal.\000M.isOpen\000{display:block;}"];
+  [@css ".css-1d03ie-modal.\000M.isHovered\000{background:rgba(0, 0, 0, 0.1);}"];
+  [@css.bindings
+    [("N.modal", "css-1hyfx7x-modal css-pznzdi-modal css-1d03ie-modal")]
+  ];
+  [@css.refs
+    [("M.isOpen", "n.ml", 6, 6, 14), ("M.isHovered", "n.ml", 7, 6, 17)]
+  ];
+  let _ = M.isOpen;
+  let _ = M.isHovered;
+  let modal =
+    CSS.make("css-1hyfx7x-modal css-pznzdi-modal css-1d03ie-modal", []);
 
   $ styled-ppx.generate m.ml n.ml > styles.css
   $ cat styles.css

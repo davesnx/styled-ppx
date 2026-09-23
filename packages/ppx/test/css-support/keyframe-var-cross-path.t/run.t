@@ -25,26 +25,21 @@ basename:
   $ refmt --parse re --print ml js/Anim_Css.re > js/Anim_Css.ml
   $ ../../standalone.exe --impl js/Anim_Css.ml -o js/Anim_Css.ml
 
-The extracted @keyframes rule is byte-identical across both paths:
+The runtime `~vars` list references the same names the static @keyframes block
+defines, and the PPX output is byte-identical across both paths:
 
-  $ grep -h 'keyframes' native/Anim_Css.ml
-    "@keyframes keyframe-t5c4er{0%{height:var(--h0-hftwzv);}100%{height:var(--h1-14y9cfq);}}"]
-  $ grep -h 'keyframes' js/Anim_Css.ml
-    "@keyframes keyframe-t5c4er{0%{height:var(--h0-hftwzv);}100%{height:var(--h1-14y9cfq);}}"]
-
-The keyframe name matches across paths:
-
-  $ grep -o -- 'keyframe-[a-z0-9]*' native/Anim_Css.ml | sort -u
-  keyframe-t5c4er
-  $ grep -o -- 'keyframe-[a-z0-9]*' js/Anim_Css.ml | sort -u
-  keyframe-t5c4er
-
-And the internal vars match across paths (the runtime `~vars` list references
-the same names the static @keyframes block defines):
-
-  $ grep -o -- '--[A-Za-z0-9_-]*' native/Anim_Css.ml | sort -u
-  --h0-hftwzv
-  --h1-14y9cfq
-  $ grep -o -- '--[A-Za-z0-9_-]*' js/Anim_Css.ml | sort -u
-  --h0-hftwzv
-  --h1-14y9cfq
+  $ refmt --parse ml --print re native/Anim_Css.ml
+  [@css
+    "@keyframes keyframe-t5c4er{0%{height:var(--h0-hftwzv);}100%{height:var(--h1-14y9cfq);}}"
+  ];
+  let h0 = `px(0);
+  let h1 = `px(100);
+  let grow =
+    CSS.Types.AnimationName.make(
+      ~vars=[
+        ("--h0-hftwzv", CSS.Types.Height.toString(h0)),
+        ("--h1-14y9cfq", CSS.Types.Height.toString(h1)),
+      ],
+      "keyframe-t5c4er",
+    );
+  $ diff native/Anim_Css.ml js/Anim_Css.ml
