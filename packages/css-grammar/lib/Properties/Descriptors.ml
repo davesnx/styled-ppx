@@ -46,9 +46,6 @@ module Property_page =
 
 let property_page : property_page Rule.rule = Property_page.rule
 
-(* css-fonts-5 @font-face metric-override descriptors (#580). No dedicated
-   runtime module: descriptors inside at-rule bodies are validated only,
-   the source text passes through unchanged. *)
 module Property_ascent_override =
   [%spec_module
   "'normal' | <percentage>", (module Css_types.Cascading)]

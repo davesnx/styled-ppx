@@ -1,6 +1,3 @@
-/* `@layer base { ... }`, `@media (...) { ... }`, and `@font-face { ... }`
-   are included alongside to prove the block form did not regress. */
-
 module GlobalStyles = [%styled.global {|
   @charset "utf-8";
   @import url("reset.css");

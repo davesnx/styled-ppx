@@ -1417,10 +1417,6 @@ let push_global =
       dynamic_vars: ref([]),
     };
 
-  /* Reject `&` (literal, or the implicit one a leading combinator like
-     `> .a` means) with no parent selector: top level, or inside at-rule
-     blocks not below a style rule (at-rules don't contribute a
-     selector). Recursion stops at style rules — nested `&` is fine. */
   let rec reject_parentless_ampersand = rule =>
     switch (rule) {
     | Style_rule({ prelude: (selectors, _), _ }) =>

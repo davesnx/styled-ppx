@@ -1,5 +1,3 @@
-/* css-fonts descriptors with no property counterpart: valid only inside
-   `@font-face`. */
 let font_face_descriptors = [
   "src",
   "unicode-range",
@@ -10,7 +8,6 @@ let font_face_descriptors = [
   "size-adjust",
 ];
 
-/* Properties that css-fonts also defines as `@font-face` descriptors. */
 let font_face_properties = [
   "font-family",
   "font-style",

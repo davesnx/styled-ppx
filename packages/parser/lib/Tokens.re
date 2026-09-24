@@ -136,11 +136,6 @@ let serialize_uri = s =>
   };
 
 // https://drafts.csswg.org/cssom/#serialize-an-identifier
-// The lexer decodes escapes while reading an identifier and then runs the
-// decoded name through this, so an identifier token already carries the one
-// spelling that is valid CSS wherever it lands: `.\31 a` keeps its escape
-// instead of becoming the invalid `.1a`, and `.a\.b` stays one class instead
-// of two. Bytes >= 0x80 are UTF-8 continuation or lead bytes and pass through.
 let serialize_identifier = ident => {
   let len = String.length(ident);
   let buf = Buffer.create(len);

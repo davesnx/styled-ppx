@@ -1,16 +1,3 @@
-/* Round-trip regression: parse -> render -> parse -> render should be a
-   fixpoint at the render layer, and the two parses should agree on AST
-   shape (modulo source locations). Closes the gap flagged in
-   .workplace/docs/parser-audit-quality.md Finding 4 ("no round-trip
-   test") -- nothing else in this package or in css-grammar/test exercises
-   parse/render stability directly.
-
-   Comments are skipped by the lexer and never reach the AST, and
-   whitespace/quote/number formatting is not preserved verbatim (CSS
-   allows many spellings of the same value). So a case is never compared
-   against its own source text -- only the first render/parse is compared
-   against the second. */
-
 open Alcotest;
 
 module Ast = Styled_ppx_css_parser.Ast;
@@ -29,22 +16,11 @@ let parse_exn = css =>
 
 let render = (rules: Ast.rule_list) => Render.rule_list(rules);
 
-/* Ast's [@deriving show] prints every location with the fixed
-   "start ... end ..." shape defined by Ast.location. Blank it out so two
-   ASTs parsed from differently-sized strings can be compared by shape
-   alone. */
 let loc_pattern =
   Str.regexp(
     "start [0-9]+ [0-9]+ [0-9]+ (L:[0-9]+ c:[0-9]+)"
     ++ " end [0-9]+ [0-9]+ [0-9]+ (L:[0-9]+ c:[0-9]+)",
   );
-/* `Variable`/`ClassVariable` (interpolation references, e.g. `$(x)` or
-   `&.$(x)`) carry a bare `Ppxlib.Location.t`, not a `with_loc`, so it has
-   no `[@printer location]` attribute (see Ast.re's `component_value` and
-   `simple_selector`/`subclass_selector`) and prints via the default
-   derived record printer instead of the compact form above. Blank out
-   each of its leaf fields individually rather than the whole record, so
-   this doesn't depend on matching newlines or nested braces. */
 let loc_field_patterns = [
   (Str.regexp("pos_fname = \"[^\"]*\""), "pos_fname = <f>"),
   (Str.regexp("pos_lnum = [0-9]+"), "pos_lnum = <n>"),
@@ -52,22 +28,7 @@ let loc_field_patterns = [
   (Str.regexp("pos_cnum = [0-9]+"), "pos_cnum = <n>"),
   (Str.regexp("loc_ghost = \\(true\\|false\\)"), "loc_ghost = <b>"),
 ];
-/* [@deriving show]'s Format-based pretty-printer wraps a record onto
-   multiple lines once it no longer fits the page width, and that
-   decision depends on how many columns the surrounding text already
-   used -- which shifts by a character or two once the numeric offsets
-   above vary in digit count between ast1 and ast2. None of that line
-   layout is semantic, so collapse all whitespace before comparing;
-   what's left is just the sequence of constructors and values. */
 let whitespace_pattern = Str.regexp("[ \t\n]+");
-/* Collapsing to a single space (above) still leaves a real difference
-   between "no line break here" (zero characters) and "line break here"
-   (now one space) at a box edge right next to punctuation, where the
-   punctuation alone already marks the boundary unambiguously. Delete
-   whitespace touching brackets/parens/braces/comma/semicolon; leave the
-   single space between two bare words (e.g. "SimpleSelector Universal")
-   alone, since that space is the only thing separating those two
-   tokens. */
 let space_before_close = Str.regexp(" \\([]}),;]\\)");
 let space_after_open = Str.regexp("\\([[{(]\\) ");
 let shape_of = rules => {
@@ -84,15 +45,6 @@ let shape_of = rules => {
   Str.global_replace(space_after_open, "\\1", raw);
 };
 
-/* Mirrors the canonicalization Render.re itself applies (Render.re:1-16,
-   62-72): a freshly parsed AST keeps incidental leading/trailing
-   Whitespace tokens in declaration values and at-rule preludes, and keeps
-   style rules with an empty block; the renderer strips both away. Without
-   this, comparing a fresh parse to a parse-after-one-render would flag
-   that intentional, already-documented canonicalization as a spurious
-   "divergence" on almost every declaration (anywhere source has the
-   ordinary "prop: value" space). Applied to both sides of the AST
-   comparison below, so it's a no-op on an already-canonical AST. */
 let strip_trailing_whitespace = (value: Ast.component_value_list) =>
   value |> List.rev |> Render.strip_leading_whitespace |> List.rev;
 
@@ -140,10 +92,6 @@ and normalize_brace_block = (block: Ast.brace_block): Ast.brace_block =>
     Ast.Stylesheet((List.map(normalize_rule, rules), loc))
   };
 
-/* CSS bodies copied from packages/ppx/test/css-support cram fixtures
-   (read once by hand, not loaded from disk here) plus hand-picked edge
-   cases for grammar the fixtures don't happen to cover. Each entry is
-   (label, css). */
 let corpus = [
   ("background-repeat list", "background-repeat: space"),
   ("background-repeat comma list", "background-repeat: repeat-x, repeat-y"),
@@ -280,25 +228,11 @@ let corpus = [
   ),
 ];
 
-/* Unquoted CSS `url(foo.png)` parses to the dedicated `Ast.Uri` variant,
-   but `Render.serialize_uri` always re-emits url() with a quoted string
-   argument, and a quoted `url("foo.png")` parses as a generic
-   `Ast.Function` (name "url") over a `String` body, not as `Ast.Uri`.
-   Render text is stable (both forms print identically), but `Ast.Uri` is
-   structurally unreachable after a single render pass -- anything
-   downstream that pattern-matches on `Ast.Uri` only sees it for
-   never-rendered, freshly-parsed source. Kept for render-stability only;
-   excluded from the AST-shape check below, and pinned as a known
-   divergence underneath instead. */
 let render_only_corpus = [
   ("background url list", "background: url(foo.png), url(bar.svg)"),
   ("url function", "background: url(foo.png)"),
 ];
 
-/* Cases with a known, currently-real round-trip divergence. Each stays a
-   green test that pins the actual (imperfect) behavior, per the task: a
-   legitimate failure is a finding to keep visible, not a fixture to
-   delete or silently skip. */
 let known_divergences = [
   (
     "unquoted url() becomes a generic Function after one render",

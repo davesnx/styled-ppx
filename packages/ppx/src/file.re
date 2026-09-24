@@ -26,10 +26,6 @@ let set = path => {
 
 let get = () => current^;
 
-/* Whether the file set by [set] was parsed by Reason's lexer rather than
-   OCaml's: they disagree on where a string literal's location starts (see
-   [Parser_location.source_position_start]'s [~loc_includes_delimiters]).
-   Unset or unrecognized defaults to Reason, matching [detectFileSuffix]. */
 let currentIsReason = () =>
   switch (current^) {
   | Some(OCaml) => false

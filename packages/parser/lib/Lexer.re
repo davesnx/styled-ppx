@@ -225,8 +225,6 @@ let consume_escaped = lexbuf => {
 };
 
 // https://drafts.csswg.org/css-syntax-3/#consume-name
-// Escapes are decoded while reading, so `#\66 ff` names the same color as
-// `#fff`.
 let consume_name = lexbuf => {
   let rec read = acc =>
     switch%sedlex (lexbuf) {
@@ -240,10 +238,6 @@ let consume_name = lexbuf => {
   read(lexeme(lexbuf));
 };
 
-// An identifier is a name re-serialized into the spelling CSS needs, so the
-// token for `.\31 a` carries `\31 a` rather than the decoded `1a` that would
-// render as the invalid `.1a`, and `.a\.b` stays one class rather than two.
-// Alternate spellings normalize: `\2d 1a` and `-\31 a` both lex as `-\31 a`.
 let consume_identifier = lexbuf =>
   consume_name(lexbuf) |> Result.map(Tokens.serialize_identifier);
 
@@ -264,10 +258,6 @@ let check_if_three_codepoints_would_start_an_identifier =
 let check_if_three_code_points_would_start_a_number =
   check(check_if_three_code_points_would_start_a_number);
 
-// `repr` is always built by `consume_number` from the CSS number grammar
-// (an optional sign, digits, an optional ".", digits fraction, an optional
-// exponent) below, which is also valid `float_of_string` syntax, so this
-// conversion cannot fail for any `repr` that function produces.
 let convert_string_to_number = str => float_of_string(str);
 
 let skip_whitespace_and_comments = lexbuf =>
@@ -277,46 +267,32 @@ let skip_whitespace_and_comments = lexbuf =>
   };
 
 // https://www.w3.org/TR/css-syntax-3/#consume-a-number
-// Sign and digits are two separate, independently-optional steps (spec
-// steps 3 and 4): a sign is not required to be followed by a digit, since
-// it can instead be followed directly by a fraction (e.g. "-.5"). Consuming
-// them as one combined "sign then Plus(digit)" pattern -- as this used
-// to -- left the sign unconsumed whenever no digit followed it, so the
-// later "." + Plus(digit) fraction match then failed too (the sign was in
-// the way), and `repr` stayed empty.
 let consume_number = lexbuf => {
   let append = repr => repr ++ lexeme(lexbuf);
 
-  let kind = `Integer; // 1 - 2
+  let kind = `Integer;
   let repr = "";
   let repr =
     switch%sedlex (lexbuf) {
     | "+"
     | "-" => append(repr)
     | _ => repr
-    }; // 3
+    };
   let repr =
     switch%sedlex (lexbuf) {
     | Star(digit) => append(repr)
     | _ => repr
-    }; // 4
+    };
   let (kind, repr) =
     switch%sedlex (lexbuf) {
     | (".", Plus(digit)) => (`Number, append(repr))
     | _ => (kind, repr)
-    }; // 5
+    };
   let (kind, repr) =
     switch%sedlex (lexbuf) {
     | ('E' | 'e', Opt('+' | '-'), Plus(digit)) => (`Number, append(repr))
     | _ => (kind, repr)
-    }; // 6
-  // `repr` can only be empty here if this function was entered without the
-  // lexbuf positioned at a valid number start. Every call site (the "+",
-  // "-", and "." branches of `consume_token`, and the bare `digit` branch)
-  // checks that first, so this is an internal-invariant guard, not a
-  // reachable CSS input: a genuinely malformed number is still consumed
-  // above (e.g. a lone "-" never reaches `consume_number` at all, since
-  // `starts_a_number` rejects it beforehand).
+    };
   if (repr == "") {
     let (start_pos, curr_pos) = Sedlexing.lexing_positions(lexbuf);
     raise(
@@ -327,8 +303,8 @@ let consume_number = lexbuf => {
       )),
     );
   };
-  let value = convert_string_to_number(repr); // 7
-  (value, kind); // 8
+  let value = convert_string_to_number(repr);
+  (value, kind);
 };
 
 // https://drafts.csswg.org/css-syntax-3/#consume-url-token
@@ -795,8 +771,6 @@ let rec consume_token = lexbuf => {
           consume_identifier(lexbuf) |> handle_consume_identifier;
         Ok(Tokens.HASH((string, `ID)));
       | _ =>
-        /* A hash that does not start an identifier (`#123456`) is a color,
-           not a selector, so its decoded name stays as is. */
         let.ok string = consume_name(lexbuf) |> handle_consume_identifier;
         Ok(Tokens.HASH((string, `UNRESTRICTED)));
       };
@@ -880,12 +854,6 @@ let rec consume_token = lexbuf => {
   | "@" =>
     if (check_if_three_codepoints_would_start_an_identifier(lexbuf)) {
       let.ok string = consume_identifier(lexbuf) |> handle_consume_identifier;
-      /* One <at-keyword-token> for every at-keyword (CSS Syntax Level 3):
-         the parser, not the lexer, decides statement (';') vs block ('{')
-         by looking at what actually follows the prelude. `@keyframes` is
-         the one exception -- its body is a keyframe-selector list, not a
-         stylesheet or a bare statement, so the parser still needs a
-         distinct token to route it to that dedicated grammar. */
       let token =
         switch (string) {
         | "keyframes" => Tokens.AT_KEYFRAMES(string)

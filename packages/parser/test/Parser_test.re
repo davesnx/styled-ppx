@@ -423,11 +423,6 @@ let selector_combinator_ast_tests = [
   }),
 ];
 
-/* Selectors Level 4 gaps: a functional pseudo-element (`::part()`, and any
-   other identifier followed by `(`, since the lexer only special-cases
-   `nth-*` names) and the "of S" form of `:nth-child()`/`:nth-last-child()`.
-   Both previously died with a raw parse error
-   (.workplace/docs/parser-audit-defects.md #7, #8). */
 let functional_selector_ast_tests = [
   test_case("::part() parses as a functional pseudo-element", `Quick, () => {
     switch (Driver.parse_stylesheet(~source_position_start, "::part(foo) {}")) {

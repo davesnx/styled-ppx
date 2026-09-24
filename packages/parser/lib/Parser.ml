@@ -537,7 +537,6 @@ let rec parse_nth_payload ~function_name stream =
     match suffix with
     | Nth_suffix_n_dash_digits b -> Ast.Nth (ANB (a, "-", b))
     | Nth_suffix_n_dash ->
-      (* "an-" followed by a signless integer represents a negative b. *)
       skip_whitespace stream;
       begin match current_tok stream with
       | Tokens.NUMBER value ->
@@ -738,10 +737,6 @@ and parse_non_complex_selector stream =
 and parse_complex_selector stream =
   let left = parse_non_complex_selector stream in
   let rec loop right =
-    (* Looking past whitespace for a combinator or a descendant selector
-       is speculative: if neither follows, this selector ends here, at
-       [selector_end], not at the whitespace [advance] below moved
-       [stream.last_end_pos] to. *)
     let selector_end = stream.last_end_pos in
     let saw_whitespace = ref false in
     while current_is_whitespace stream do
@@ -787,11 +782,6 @@ and parse_selector_list_with :
     | _ ->
       let items = List.rev acc in
       let loc =
-        (* [item_loc] is the last item's, captured before the
-           [skip_whitespace] above moved [stream.last_end_pos] past the
-           whitespace between it and the next token (`,` or `{`); using
-           [stream.last_end_pos] here would extend the prelude's location
-           through that trailing whitespace. *)
         if items = [] then make_loc start_pos start_pos
         else make_loc start_pos item_loc.loc_end
       in
@@ -821,12 +811,6 @@ and parse_relative_selector stream =
 and parse_relative_selector_list stream =
   parse_selector_list_with stream parse_relative_selector
 
-(* A nested rule's prelude (i.e. one inside another rule's block) may start
-   with a bare combinator per CSS Nesting ("> .child" means "& > .child").
-   Only the item that actually starts with one is parsed as a
-   [RelativeSelector]; every other item keeps producing a plain
-   [ComplexSelector], so a selector list that doesn't use this shorthand
-   (the common case) has the exact same AST as before this existed. *)
 and parse_nested_selector stream =
   skip_whitespace stream;
   match current_tok stream with
@@ -855,12 +839,6 @@ let update_declaration_value_state state (value, _) =
   | Paren_block _ | Bracket_block _ | Delim _ | Selector _ | Unicode_range _ ->
     { state with has_content = true }
 
-(* Drop the whitespace at the end of a reversed component-value list and
-   return it in source order with a location that ends at the last kept value;
-   an empty list keeps the zero-width location at [start_pos]. Declaration
-   values and at-rule preludes both exclude their surrounding whitespace, so
-   `a: b ;` and `a:b;`, or `@import url(x) ;` and `@import url(x);`, parse to
-   the same AST and render the same. *)
 let trim_trailing_whitespace start_pos rev_values =
   let rec drop = function
     | (Ast.Whitespace, _) :: rest -> drop rest
@@ -1030,11 +1008,6 @@ and parse_at_rule stream =
       loc = loc_from_start stream start_pos;
     }
   | Tokens.AT_RULE name ->
-    (* CSS Syntax Level 3 "consume an at-rule" (#5.4.2): the prelude runs
-       until the first '{' (block form) or ';' (statement form) at this
-       nesting depth -- nested parens/brackets/functions consume their own
-       matched delimiters recursively in parse_component_value, so neither
-       can appear here unmatched. *)
     let at_token = advance stream in
     let prelude, prelude_loc =
       parse_component_value_list_until stream (fun stream ->
@@ -1044,10 +1017,6 @@ and parse_at_rule stream =
     begin match current_tok stream with
     | Tokens.SEMI_COLON ->
       let _ = expect_token stream Tokens.SEMI_COLON in
-      (* A statement prelude excludes the whitespace around it, like a
-         declaration value, so `@import  url(x) ;` renders as
-         `@import url(x);`. Block preludes keep theirs: the renderer prints
-         them as before and atom hashes depend on that text. *)
       let rec drop_leading = function
         | (Ast.Whitespace, _) :: rest -> drop_leading rest
         | values -> values
