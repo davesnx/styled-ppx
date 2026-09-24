@@ -738,6 +738,11 @@ and parse_non_complex_selector stream =
 and parse_complex_selector stream =
   let left = parse_non_complex_selector stream in
   let rec loop right =
+    (* Looking past whitespace for a combinator or a descendant selector
+       is speculative: if neither follows, this selector ends here, at
+       [selector_end], not at the whitespace [advance] below moved
+       [stream.last_end_pos] to. *)
+    let selector_end = stream.last_end_pos in
     let saw_whitespace = ref false in
     while current_is_whitespace stream do
       saw_whitespace := true;
@@ -754,6 +759,7 @@ and parse_complex_selector stream =
       let selector = parse_non_complex_selector stream in
       loop ((Ast.Selector_descendant, selector) :: right)
     | _ ->
+      stream.last_end_pos <- selector_end;
       (match List.rev right with
       | [] -> Selector left
       | right -> Combinator { left; right })
@@ -781,8 +787,13 @@ and parse_selector_list_with :
     | _ ->
       let items = List.rev acc in
       let loc =
+        (* [item_loc] is the last item's, captured before the
+           [skip_whitespace] above moved [stream.last_end_pos] past the
+           whitespace between it and the next token (`,` or `{`); using
+           [stream.last_end_pos] here would extend the prelude's location
+           through that trailing whitespace. *)
         if items = [] then make_loc start_pos start_pos
-        else make_loc start_pos stream.last_end_pos
+        else make_loc start_pos item_loc.loc_end
       in
       items, loc
   in

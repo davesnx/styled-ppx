@@ -9,26 +9,26 @@ block's rules. Everything else used to be torn apart per-declaration:
 at-rules (@import) vanished silently. These now raise errors instead.
 
   $ ../../../standalone.exe --impl input_keyframes.ml -o output.ml
-  File "input_keyframes.ml", line 4, characters 17-27:
+  File "input_keyframes.ml", line 4, characters 16-26:
   4 | let kf = [%css "@keyframes spin { from { opacity: 0; } to { opacity: 1; } }"]
-                       ^^^^^^^^^^
+                      ^^^^^^^^^^
   Error: @keyframes should be defined with %keyframe(...)
   [1]
   $ ../../../standalone.exe --impl input_fontface.ml -o output.ml
-  File "input_fontface.ml", line 4, characters 17-27:
+  File "input_fontface.ml", line 4, characters 16-26:
   4 | let ff = [%css "@font-face { font-family: Foo; src: url(/foo.woff2); }"]
-                       ^^^^^^^^^^
+                      ^^^^^^^^^^
   Error: At-rule @font-face is not supported in styled-ppx
   [1]
   $ ../../../standalone.exe --impl input_property.ml -o output.ml
-  File "input_property.ml", line 3, characters 19-28:
+  File "input_property.ml", line 3, characters 18-27:
   3 | let prop = [%css "@property --my-color { syntax: '<color>'; inherits: false; }"]
-                         ^^^^^^^^^
+                        ^^^^^^^^^
   Error: At-rule @property is not supported in styled-ppx
   [1]
   $ ../../../standalone.exe --impl input_import.ml -o output.ml
-  File "input_import.ml", line 4, characters 16-23:
+  File "input_import.ml", line 4, characters 15-22:
   4 | let x = [%css "@import 'x.css';"]
-                      ^^^^^^^
+                     ^^^^^^^
   Error: At-rule @import is not supported in styled-ppx
   [1]

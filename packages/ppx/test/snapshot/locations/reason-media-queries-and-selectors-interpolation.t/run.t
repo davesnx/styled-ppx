@@ -1,7 +1,7 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   File "output.ml", line 6, characters 8-47:
-  6 | @media only screen and (min-width: $(width)) {
+  6 |   @media only screen and (min-width: $(width)) {
               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   Error: Interpolation in @media preludes is not supported during static extraction. CSS custom properties (var()) are not valid in media query conditions. Inline the value directly.
   [1]

@@ -1,7 +1,7 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   File "output.ml", line 2, characters 5-10:
-  2 | .$(later) {
+  2 |   .$(later) {
            ^^^^^
   Error: Selector interpolation `$(later)` does not refer to a [%css] binding or string literal earlier in this module.
   - If `later` is bound to a [%css] or string literal later in the file, reorder the bindings.
