@@ -273,6 +273,10 @@ and attr_value =
 [@deriving show({ with_path: false })]
 and pseudo_selector =
   | Pseudoelement(string)
+  | PseudoelementFunction({
+      name: string,
+      payload: with_loc(selector_list),
+    })
   | Pseudoclass(pseudoclass_kind)
 [@deriving show({ with_path: false })]
 and pseudoclass_kind =
@@ -288,7 +292,10 @@ and pseudoclass_kind =
 [@deriving show({ with_path: false })]
 and nth_payload =
   | Nth(nth)
-  | NthSelector(list(complex_selector))
+  | NthSelector({
+      nth,
+      selectors: list(complex_selector),
+    })
 [@deriving show({ with_path: false })]
 and nth =
   | Even

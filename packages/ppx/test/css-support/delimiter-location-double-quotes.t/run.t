@@ -17,9 +17,9 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 16-23:
+  File "input.re", line 1, characters 17-23:
   1 |  [%css "display: blocki;"];
-                      ^^^^^^^
+                       ^^^^^^
   Error: Property 'display' has an invalid value: 'blocki',
          Expected 'block', 'contents', 'flex', 'flow', 'flow-root', 'grid',
          'inline', 'inline-block', etc. Did you mean 'block'?
@@ -30,9 +30,9 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 1, characters 29-36:
+  File "input.re", line 1, characters 30-36:
   1 |  [%css "width: 100%; display: blocki;"];
-                                   ^^^^^^^
+                                    ^^^^^^
   Error: Property 'display' has an invalid value: 'blocki',
          Expected 'block', 'contents', 'flex', 'flow', 'flow-root', 'grid',
          'inline', 'inline-block', etc. Did you mean 'block'?
@@ -45,9 +45,9 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 2, characters 26-33:
+  File "input.re", line 2, characters 27-33:
   2 |      width: 100%; display: blocki;
-                                ^^^^^^^
+                                 ^^^^^^
   Error: Property 'display' has an invalid value: 'blocki',
          Expected 'block', 'contents', 'flex', 'flow', 'flow-root', 'grid',
          'inline', 'inline-block', etc. Did you mean 'block'?
@@ -61,9 +61,9 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 3, characters 13-20:
+  File "input.re", line 3, characters 14-20:
   3 |      display: blocki;
-                   ^^^^^^^
+                    ^^^^^^
   Error: Property 'display' has an invalid value: 'blocki',
          Expected 'block', 'contents', 'flex', 'flow', 'flow-root', 'grid',
          'inline', 'inline-block', etc. Did you mean 'block'?

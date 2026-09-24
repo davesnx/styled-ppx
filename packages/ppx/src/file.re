@@ -25,3 +25,10 @@ let set = path => {
 };
 
 let get = () => current^;
+
+let currentIsReason = () =>
+  switch (current^) {
+  | Some(OCaml) => false
+  | Some(Reason)
+  | None => true
+  };

@@ -16,12 +16,11 @@ let span (loc1 : Ppxlib.location) (loc2 : Ppxlib.location) : Ppxlib.location =
 let file_start ?(filename = "") () : Lexing.position =
   { pos_fname = filename; pos_lnum = 1; pos_bol = 0; pos_cnum = 0 }
 
-(* File position of a string constant's first content character: skips the
-   opening quote, or brace + delimiter + pipe for delimited strings. All
-   source-relative locations are rebased against it. *)
-let source_position_start ~delimiter (loc : Ppxlib.location) : Lexing.position =
+let source_position_start ~delimiter ~loc_includes_delimiters
+  (loc : Ppxlib.location) : Lexing.position =
   let offset =
-    match delimiter with None -> 1 | Some d -> String.length d + 2
+    if not loc_includes_delimiters then 0
+    else (match delimiter with None -> 1 | Some d -> String.length d + 2)
   in
   { loc.loc_start with pos_cnum = loc.loc_start.pos_cnum + offset }
 

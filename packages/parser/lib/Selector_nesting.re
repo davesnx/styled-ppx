@@ -31,10 +31,13 @@ let rec contains_ampersand = (selector: selector) => {
 }
 and pseudo_selector_contains_ampersand =
   fun
-  | Pseudoclass(Function({ payload: (selector_list, _), _ })) =>
+  | Pseudoclass(Function({ payload: (selector_list, _), _ }))
+  | PseudoelementFunction({ payload: (selector_list, _), _ }) =>
     selector_list |> List.map(fst) |> List.exists(contains_ampersand)
-  | Pseudoclass(NthFunction({ payload: (NthSelector(csl), _), _ })) =>
-    csl |> List.exists(cs => contains_ampersand(ComplexSelector(cs)))
+  | Pseudoclass(
+      NthFunction({ payload: (NthSelector({ selectors, _ }), _), _ }),
+    ) =>
+    selectors |> List.exists(cs => contains_ampersand(ComplexSelector(cs)))
   | _ => false;
 
 let is_sibling_combinator =
@@ -82,7 +85,8 @@ let rec flatten_selector_chain =
    `:first-letter`, parsed as pseudo-classes) count. */
 let pseudo_selector_is_element =
   fun
-  | Pseudoelement(_) => true
+  | Pseudoelement(_)
+  | PseudoelementFunction(_) => true
   | Pseudoclass(PseudoIdent(name)) =>
     switch (String.lowercase_ascii(name)) {
     | "before"
@@ -178,6 +182,16 @@ let subject_escapes_ampersand_subtree = (sel: selector): bool => {
   && !subject_inside_ampersand(flatten_selector_chain(sel));
 };
 
+let needs_parent_selector = (selector: selector): bool => {
+  contains_ampersand(selector)
+  || (
+    switch (selector) {
+    | RelativeSelector({ combinator: Some(_), _ }) => true
+    | _ => false
+    }
+  );
+};
+
 /* Flatten nested combinator trees into head + flat segment steps.
    Purely structural (no `&` synthesis, unlike `flatten_selector_chain`);
    nested trees arise from joins/substitutions of complex selectors. */
@@ -200,25 +214,22 @@ let rec flatten_combinator_tree =
   | other => (other, [])
   };
 
-/* Pop the rightmost compound off a complex selector (flattens first so
-   the popped segment is never a whole subtree). Returns
-   `(last, combinator_before_last, rest)`. */
 let pop_last_selector = (selector: selector) => {
   let (head, segments) = flatten_combinator_tree(selector);
   switch (List.rev(segments)) {
-  | [] => (head, None, None)
-  | [(ctor, last)] => (last, Some(ctor), Some(head))
+  | [] => (head, None)
+  | [(ctor, last)] => (last, Some((ctor, head)))
   | [(ctor, last), ...rest_rev] => (
       last,
-      Some(ctor),
-      Some(
+      Some((
+        ctor,
         ComplexSelector(
           Combinator({
             left: head,
             right: List.rev(rest_rev),
           }),
         ),
-      ),
+      )),
     )
   };
 };
@@ -276,77 +287,40 @@ let merge_compound_selectors =
    raise. */
 let join_compound_selector =
     (selector, { subclass_selectors, pseudo_selectors, _ } as compound) => {
-  let new_compound =
-    CompoundSelector({
-      type_selector: None,
-      subclass_selectors,
-      pseudo_selectors,
-    });
-  switch (pop_last_selector(selector)) {
-  | (SimpleSelector(simple), None, None) =>
-    CompoundSelector({
-      type_selector: Some(simple),
-      subclass_selectors,
-      pseudo_selectors,
-    })
-  | (SimpleSelector(simple), Some(ctor), Some(rest)) =>
-    join_selector_with_combinator(
-      ~combinator=ctor,
-      rest,
+  let (last, before_last) = pop_last_selector(selector);
+  let extended =
+    switch (last) {
+    | SimpleSelector(simple) =>
       CompoundSelector({
         type_selector: Some(simple),
         subclass_selectors,
         pseudo_selectors,
-      }),
-    )
-  | (
-      CompoundSelector({
+      })
+    | CompoundSelector({
         type_selector: last_type_selector,
         subclass_selectors: last_subclass_selectors,
         pseudo_selectors: last_pseudo_selectors,
-      }),
-      None,
-      None,
-    ) =>
-    merge_compound_selectors(
-      ~last_type_selector,
-      ~last_subclass_selectors,
-      ~last_pseudo_selectors,
-      compound,
-    )
-  | (
-      CompoundSelector({
-        type_selector: last_type_selector,
-        subclass_selectors: last_subclass_selectors,
-        pseudo_selectors: last_pseudo_selectors,
-      }),
-      Some(ctor),
-      Some(rest),
-    ) =>
-    join_selector_with_combinator(
-      ~combinator=ctor,
-      rest,
+      }) =>
       merge_compound_selectors(
         ~last_type_selector,
         ~last_subclass_selectors,
         ~last_pseudo_selectors,
         compound,
-      ),
-    )
-  /* Defensive fallback — see comment above. */
-  | (other, None, None) => join_selector_with_combinator(other, new_compound)
-  | (other, Some(ctor), Some(rest)) =>
-    join_selector_with_combinator(
-      ~combinator=ctor,
-      rest,
-      join_selector_with_combinator(other, new_compound),
-    )
-  /* The other inconsistent (Some/None) mixes are unreachable by
-     construction in `pop_last_selector`, but matching them keeps the
-     compiler's exhaustiveness check happy without a wildcard. */
-  | (_, Some(_), None)
-  | (_, None, Some(_)) =>
-    join_selector_with_combinator(selector, new_compound)
+      )
+    | other =>
+      join_selector_with_combinator(
+        other,
+        CompoundSelector({
+          type_selector: None,
+          subclass_selectors,
+          pseudo_selectors,
+        }),
+      )
+    };
+  switch (before_last) {
+  | None => extended
+  | Some((ctor, rest)) =>
+    join_selector_with_combinator(~combinator=ctor, rest, extended)
   };
 };
 
@@ -440,15 +414,15 @@ and pseudo_selector_replace_ampersand = (replaced_with: selector, selector) => {
   | Pseudoclass(
       NthFunction({
         name,
-        payload: (NthSelector(complex_selector_list), payload_loc),
+        payload: (NthSelector({ nth, selectors }), payload_loc),
       }),
     ) =>
     /* See the parallel `RelativeSelector` arm above for why the result
        of `replace_ampersand` on a `ComplexSelector(_)` is always a
        `ComplexSelector(_)`. The `Selector(other)` rewrap is defensive
        against future arms that might return a bare selector. */
-    let complex_selector_list =
-      complex_selector_list
+    let selectors =
+      selectors
       |> List.map(complex_selector =>
            replace_ampersand(
              replaced_with,
@@ -463,9 +437,28 @@ and pseudo_selector_replace_ampersand = (replaced_with: selector, selector) => {
     Pseudoclass(
       NthFunction({
         name,
-        payload: (NthSelector(complex_selector_list), payload_loc),
+        payload: (
+          NthSelector({
+            nth,
+            selectors,
+          }),
+          payload_loc,
+        ),
       }),
     );
+  | PseudoelementFunction({
+      name,
+      payload: (selector_list, selector_list_loc),
+    }) =>
+    let selector_list =
+      selector_list
+      |> List.map(((selector, loc)) =>
+           (replace_ampersand(replaced_with, selector), loc)
+         );
+    PseudoelementFunction({
+      name,
+      payload: (selector_list, selector_list_loc),
+    });
   | sel => sel
   };
 };
@@ -565,22 +558,32 @@ let split_by_kind = (rules: list(rule)) => {
   );
 };
 
-/** Compute the merged prefix when nesting a selector under a parent.
+let relative_selector_to_complex_selector =
+    ({ combinator, complex_selector }: relative_selector): selector => {
+  switch (combinator) {
+  | None => ComplexSelector(complex_selector)
+  | Some(combinator) =>
+    let (first_selector, rest) =
+      switch (complex_selector) {
+      | Selector(selector) => (selector, [])
+      | Combinator({ left, right }) => (left, right)
+      };
+    ComplexSelector(
+      Combinator({
+        left: SimpleSelector(Ampersand),
+        right: [(combinator, first_selector), ...rest],
+      }),
+    );
+  };
+};
 
-    Per CSS Nesting Level 1 §3.1, a nested selector that does not
-    contain the nesting selector (`&`) and does not start with a
-    combinator desugars by descendant-combinator-joining with the
-    parent. Selectors that do contain `&` resolve via literal
-    substitution. The two arms below implement exactly those rules.
-
-    Selectors that start with a combinator are accepted as relative
-    (e.g. `> .child` desugars to `& > .child`) when the parser supports
-    them in nested position. The current parser only accepts leading
-    combinators inside pseudo-class payloads (`:has(> img)`); a leading
-    `>` after `{` is rejected at parse time, so this function never
-    sees that shape. Users must write `& > .child` until the parser
-    grows nested-relative-selector support. */
 let compute_new_prefix = (~prefix, current_selector) => {
+  let current_selector =
+    switch (current_selector) {
+    | RelativeSelector(relative) =>
+      relative_selector_to_complex_selector(relative)
+    | other => other
+    };
   switch (prefix) {
   | None => current_selector
   | Some(prefix) =>

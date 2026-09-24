@@ -225,7 +225,7 @@ let consume_escaped = lexbuf => {
 };
 
 // https://drafts.csswg.org/css-syntax-3/#consume-name
-let consume_identifier = lexbuf => {
+let consume_name = lexbuf => {
   let rec read = acc =>
     switch%sedlex (lexbuf) {
     | identifier_code_point => read(acc ++ lexeme(lexbuf))
@@ -237,6 +237,9 @@ let consume_identifier = lexbuf => {
     };
   read(lexeme(lexbuf));
 };
+
+let consume_identifier = lexbuf =>
+  consume_name(lexbuf) |> Result.map(Tokens.serialize_identifier);
 
 // https://drafts.csswg.org/css-syntax-3/#consume-remnants-of-bad-url
 let rec consume_remnants_bad_url = lexbuf =>
@@ -255,7 +258,6 @@ let check_if_three_codepoints_would_start_an_identifier =
 let check_if_three_code_points_would_start_a_number =
   check(check_if_three_code_points_would_start_a_number);
 
-// TODO: floats in OCaml are compatible with numbers in CSS?
 let convert_string_to_number = str => float_of_string(str);
 
 let skip_whitespace_and_comments = lexbuf =>
@@ -264,29 +266,45 @@ let skip_whitespace_and_comments = lexbuf =>
   | _ => ()
   };
 
-// TODO: check 5. without the 0 or .5 without the 0
+// https://www.w3.org/TR/css-syntax-3/#consume-a-number
 let consume_number = lexbuf => {
   let append = repr => repr ++ lexeme(lexbuf);
 
-  let kind = `Integer; // 1
+  let kind = `Integer;
   let repr = "";
   let repr =
     switch%sedlex (lexbuf) {
-    | (Opt("+" | "-"), Plus(digit)) => append(repr)
+    | "+"
+    | "-" => append(repr)
     | _ => repr
-    }; // 2 - 3
+    };
+  let repr =
+    switch%sedlex (lexbuf) {
+    | Star(digit) => append(repr)
+    | _ => repr
+    };
   let (kind, repr) =
     switch%sedlex (lexbuf) {
     | (".", Plus(digit)) => (`Number, append(repr))
     | _ => (kind, repr)
-    }; // 4
+    };
   let (kind, repr) =
     switch%sedlex (lexbuf) {
     | ('E' | 'e', Opt('+' | '-'), Plus(digit)) => (`Number, append(repr))
     | _ => (kind, repr)
-    }; // 5
-  let value = convert_string_to_number(repr); // 6
-  (value, kind); // 7
+    };
+  if (repr == "") {
+    let (start_pos, curr_pos) = Sedlexing.lexing_positions(lexbuf);
+    raise(
+      LexingError((
+        start_pos,
+        curr_pos,
+        "Unknown failure while lexing a number. This case should be unreachable",
+      )),
+    );
+  };
+  let value = convert_string_to_number(repr);
+  (value, kind);
 };
 
 // https://drafts.csswg.org/css-syntax-3/#consume-url-token
@@ -746,14 +764,14 @@ let rec consume_token = lexbuf => {
     | starts_with_a_valid_escape =>
       Sedlexing.rollback(lexbuf);
       switch%sedlex (lexbuf) {
-      | identifier_start_code_point =>
+      | starts_an_identifier
+      | starts_with_a_valid_escape =>
         Sedlexing.rollback(lexbuf);
         let.ok string =
           consume_identifier(lexbuf) |> handle_consume_identifier;
         Ok(Tokens.HASH((string, `ID)));
       | _ =>
-        let.ok string =
-          consume_identifier(lexbuf) |> handle_consume_identifier;
+        let.ok string = consume_name(lexbuf) |> handle_consume_identifier;
         Ok(Tokens.HASH((string, `UNRESTRICTED)));
       };
     | _ => Ok(DELIM("#"))
@@ -839,9 +857,6 @@ let rec consume_token = lexbuf => {
       let token =
         switch (string) {
         | "keyframes" => Tokens.AT_KEYFRAMES(string)
-        | "charset"
-        | "import"
-        | "namespace" => Tokens.AT_RULE_STATEMENT(string)
         | _ => Tokens.AT_RULE(string)
         };
       Ok(token);

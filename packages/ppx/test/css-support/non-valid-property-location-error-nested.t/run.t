@@ -13,9 +13,9 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune build
-  File "input.re", line 5, characters 11-15:
+  File "input.re", line 5, characters 12-15:
   5 |     colorx: red;
-                 ^^^^
+                  ^^^
   Error: Unknown property 'colorx'. Did you mean 'color'?
   [1]
 

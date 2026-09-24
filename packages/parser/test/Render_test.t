@@ -633,6 +633,22 @@ Blockless at-rules pass through verbatim
   > EOF
   @import "foo.css";body{margin:0;}
 
+Statement at-rules are dispatched by lookahead (`;` vs `{`).
+  $ cat << "EOF" | ./Render_test.exe
+  > @layer a, b;
+  > body { margin: 0; }
+  > EOF
+  @layer a, b;body{margin:0;}
+
+A statement at-rule's trailing whitespace before `;` is trimmed the same
+way a declaration's trailing whitespace before `;` already is, so the same
+at-rule renders identically regardless of that incidental spacing.
+  $ cat << "EOF" | ./Render_test.exe
+  > @import "foo.css" ;
+  > body { margin: 0; }
+  > EOF
+  @import "foo.css";body{margin:0;}
+
 @font-face passes through verbatim with its descriptors intact
   $ cat << "EOF" | ./Render_test.exe
   > @font-face {
@@ -660,3 +676,43 @@ Multiple selectors
   >  }
   > EOF
   .classname{margin-right:20px;}.classname:hover .languageIcon{opacity:1;}.classname:hover svg > path{fill:#333;}.classname .menuOpened .languageIcon{opacity:1;}.classname .menuOpened svg > path{fill:#333;}
+
+The lexer keeps an escaped identifier in its canonical escaped spelling
+instead of decoding it to the bare character. Before this fix, `.\31 a`
+(class "1a") rendered as the invalid `.1a`, and `.a\.b` (one class literally
+named "a.b") rendered as `.a.b` — two classes, changing what the selector
+matches with no error at all.
+`\2d 1a` is an alternate spelling of `-1a`; both normalize the same way. A
+non-ASCII identifier such as "héllo" is left untouched.
+  $ cat << "EOF" | ./Render_test.exe
+  > .\31 a { color: red; }
+  > .-\31 a { color: red; }
+  > #\31 a { color: red; }
+  > .a\.b { color: red; }
+  > .foo\:bar { color: red; }
+  > .a\/b { color: red; }
+  > .foo\ bar { color: red; }
+  > .héllo { color: red; }
+  > .foo:not(.a\.b) { color: red; }
+  > .\- { color: red; }
+  > .\2d 1a { color: red; }
+  > --custom\ prop: red;
+  > EOF
+  --custom\ prop:red;.\31 a{color:red;}.-\31 a{color:red;}#\31 a{color:red;}.a\.b{color:red;}.foo\:bar{color:red;}.a\/b{color:red;}.foo\ bar{color:red;}.héllo{color:red;}.foo:not(.a\.b){color:red;}.\-{color:red;}.-\31 a{color:red;}
+
+An+B "of S" selector list (Selectors Level 4)
+  $ cat << "EOF" | ./Render_test.exe
+  > li:nth-child(2n+1 of .x) { foo: bar; }
+  > li:nth-last-child(odd of .a, .b) { foo: bar; }
+  > EOF
+  li:nth-child(2n+1 of .x){foo:bar;}li:nth-last-child(odd of .a,.b){foo:bar;}
+
+Functional pseudo-elements (::part(), ::slotted(), and any other identifier
+the lexer tokenizes as a function, since only nth-* names get their own
+token)
+  $ cat << "EOF" | ./Render_test.exe
+  > custom-element::part(foo) { foo: bar; }
+  > ::slotted(.bar) { foo: bar; }
+  > ::highlight(name) { foo: bar; }
+  > EOF
+  custom-element::part(foo){foo:bar;}::slotted(.bar){foo:bar;}::highlight(name){foo:bar;}

@@ -30,7 +30,7 @@ and at_rule = ({ name, prelude, block, _ }: Ast.at_rule) => {
     Printf.sprintf(
       "@%s %s;",
       name |> fst,
-      prelude |> fst |> strip_leading_whitespace |> component_value_list,
+      prelude |> fst |> component_value_list,
     )
   | Rule_list(_)
   | Stylesheet(_) =>
@@ -64,7 +64,7 @@ and declaration = ({ name, value, important, _ }: Ast.declaration) => {
   Printf.sprintf(
     "%s:%s%s;",
     name |> fst,
-    value |> fst |> strip_leading_whitespace |> component_value_list,
+    value |> fst |> component_value_list,
     important |> fst ? " !important" : "",
   );
 }
@@ -133,8 +133,12 @@ and selector = (ast: Ast.selector) => {
   and render_nth_payload =
     fun
     | Ast.Nth(nth) => render_nth(nth)
-    | NthSelector(v) =>
-      v |> List.map(render_complex_selector) |> String.concat(", ")
+    | NthSelector({ nth, selectors }) =>
+      render_nth(nth)
+      ++ " of "
+      ++ (
+        selectors |> List.map(render_complex_selector) |> String.concat(",")
+      )
   and render_pseudo_class =
     fun
     | Ast.PseudoIdent(i) => ":" ++ i
@@ -145,6 +149,8 @@ and selector = (ast: Ast.selector) => {
   and render_pseudo_selector =
     fun
     | Ast.Pseudoelement(v) => "::" ++ v
+    | PseudoelementFunction({ name, payload: (sl, _) }) =>
+      "::" ++ name ++ "(" ++ selector_list(sl) ++ ")"
     | Pseudoclass(pc) => render_pseudo_class(pc)
   and render_compound_selector = (compound_selector: Ast.compound_selector) => {
     let simple_selector =
