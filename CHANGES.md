@@ -30,6 +30,7 @@
 - [FIX] Hoist statement at-rules such as `@import`, `@namespace`, and statement-form `@layer` before style rules while preserving their relative order (@davesnx)
 - [FIX] Point interpolation, bare-pseudo, and `@media` prelude errors at the offending source token, with compiler excerpts and carets (@davesnx)
 - [FIX] Generate `makeProps` and a public `make` wrapper for native components, fixing `Unbound value X.makeProps` with the new server-reason-react JSX transform (@davesnx)
+- [FIX] Pin server-reason-react to 82c52e8a so `styles=` on an element that already has an optional `?className` or `?style` type-checks and merges the classes (@davesnx)
 - [FIX] Support `[%css]` inside `include struct ... end` (@davesnx)
 - [FIX] Remove CSS-unsafe characters from readable atomic-class labels; bindings ending in a prime, such as `inputView'`, now produce valid selectors (@davesnx)
 - [FIX] Derive interpolation custom-property names from their source, for example `Theme.spacing.md` becomes `--spacing-md-<hash>`, instead of using `--var-<hash>` (@davesnx)
