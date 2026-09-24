@@ -2,7 +2,9 @@
 `?style` type-checks and merges: the `[%css]` class comes first, the
 element's own class after it, and an absent `?style` still yields the
 `[%css]` inline style (empty here). Production mode keeps the class names
-free of development labels. Needs server-reason-react at 82c52e8a or later
+free of development labels. On this branch the inline `[%css]` also carries the
+identity class minted for the `__incoming` binder that the expansion binds
+it to. Needs server-reason-react at 82c52e8a or later
 (ml-in-barcelona/server-reason-react#402).
 
   $ cat > dune-project << EOF
@@ -25,5 +27,5 @@ free of development labels. Needs server-reason-react at 82c52e8a or later
   $ dune build
 
   $ ./_build/default/input.exe
-  <div class="css-k008qs" style="">ok</div>
-  <div class="css-k008qs base" style="">ok</div>
+  <div class="cid-sp8eu6 css-k008qs" style="">ok</div>
+  <div class="cid-sp8eu6 css-k008qs base" style="">ok</div>
