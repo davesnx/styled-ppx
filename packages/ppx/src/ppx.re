@@ -233,6 +233,7 @@ let expand_css_expression =
     let source_position_start =
       Styled_ppx_css_parser.Parser_location.source_position_start(
         ~delimiter,
+        ~loc_includes_delimiters=File.currentIsReason(),
         stringLoc,
       );
     switch (
@@ -301,6 +302,7 @@ let expand_global_module = (~file, ~main_module, ~scope, ~opens, payload) => {
     let source_position_start =
       Styled_ppx_css_parser.Parser_location.source_position_start(
         ~delimiter,
+        ~loc_includes_delimiters=File.currentIsReason(),
         stringLoc,
       );
     switch (
@@ -413,6 +415,7 @@ let expand_keyframe_expression =
     let source_position_start =
       Styled_ppx_css_parser.Parser_location.source_position_start(
         ~delimiter,
+        ~loc_includes_delimiters=File.currentIsReason(),
         stringLoc,
       );
     switch (
@@ -504,6 +507,7 @@ let expand_styled_module =
     let source_position_start =
       Styled_ppx_css_parser.Parser_location.source_position_start(
         ~delimiter,
+        ~loc_includes_delimiters=File.currentIsReason(),
         stringLoc,
       );
     switch (

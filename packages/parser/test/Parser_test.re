@@ -197,6 +197,50 @@ let nth_error_tests_data =
   |> error_test_cases;
 
 let declaration_ast_tests = [
+  test_case(
+    "declaration parses signed-fraction dimension without crashing", `Quick, () => {
+    switch (
+      Driver.parse_declaration(
+        ~source_position_start,
+        "transition:opacity .3s ease -.1s;",
+      )
+    ) {
+    | Ok({
+        value:
+          (
+            [
+              (Ast.Ident("opacity"), _),
+              (Ast.Whitespace, _),
+              (
+                Ast.Dimension({
+                  value: positive_value,
+                  unit: "s",
+                  kind: Ast.Dimension_time(Ast.Time_unit_s),
+                }),
+                _,
+              ),
+              (Ast.Whitespace, _),
+              (Ast.Ident("ease"), _),
+              (Ast.Whitespace, _),
+              (
+                Ast.Dimension({
+                  value: negative_value,
+                  unit: "s",
+                  kind: Ast.Dimension_time(Ast.Time_unit_s),
+                }),
+                _,
+              ),
+            ],
+            _,
+          ),
+        _,
+      }) =>
+      check(bool, "preserves .3s", true, positive_value == 0.3);
+      check(bool, "preserves -.1s", true, negative_value == (-0.1));
+    | Ok(_) => fail("unexpected declaration AST shape")
+    | Error((_, msg)) => fail("expected declaration parse success: " ++ msg)
+    }
+  }),
   test_case("declaration preserves id-like hash kind", `Quick, () => {
     switch (Driver.parse_declaration(~source_position_start, "color:#abc;")) {
     | Ok({ value: ([(Ast.Hash((value, kind)), _)], _), _ }) =>
@@ -379,6 +423,461 @@ let selector_combinator_ast_tests = [
   }),
 ];
 
+/* Selectors Level 4 gaps: a functional pseudo-element (`::part()`, and any
+   other identifier followed by `(`, since the lexer only special-cases
+   `nth-*` names) and the "of S" form of `:nth-child()`/`:nth-last-child()`.
+   Both previously died with a raw parse error
+   (.workplace/docs/parser-audit-defects.md #7, #8). */
+let functional_selector_ast_tests = [
+  test_case("::part() parses as a functional pseudo-element", `Quick, () => {
+    switch (Driver.parse_stylesheet(~source_position_start, "::part(foo) {}")) {
+    | Ok(([Ast.Style_rule({ prelude: ([(selector, _)], _), _ })], _)) =>
+      switch (selector) {
+      | Ast.ComplexSelector(
+          Ast.Selector(
+            Ast.CompoundSelector({
+              pseudo_selectors:
+                [
+                  Ast.PseudoelementFunction({
+                    name: "part",
+                    payload:
+                      (
+                        [
+                          (
+                            Ast.RelativeSelector({
+                              combinator: None,
+                              complex_selector:
+                                Ast.Selector(
+                                  Ast.SimpleSelector(Ast.Type("foo")),
+                                ),
+                            }),
+                            _,
+                          ),
+                        ],
+                        _,
+                      ),
+                  }),
+                ],
+              _,
+            }),
+          ),
+        ) =>
+        ()
+      | _ => fail("expected functional pseudo-element AST")
+      }
+    | _ => fail("expected functional pseudo-element AST")
+    }
+  }),
+  test_case(
+    ":nth-child(An+B of S) parses the selector list alongside An+B", `Quick, () => {
+    switch (
+      Driver.parse_stylesheet(
+        ~source_position_start,
+        "li:nth-child(2n+1 of .x) {}",
+      )
+    ) {
+    | Ok(([Ast.Style_rule({ prelude: ([(selector, _)], _), _ })], _)) =>
+      switch (selector) {
+      | Ast.ComplexSelector(
+          Ast.Selector(
+            Ast.CompoundSelector({
+              subclass_selectors:
+                [
+                  Ast.Pseudo_class(
+                    Ast.Pseudoclass(
+                      Ast.NthFunction({
+                        payload:
+                          (
+                            Ast.NthSelector({
+                              nth: Ast.ANB(2, "+", 1),
+                              selectors: [Ast.Selector(_)],
+                            }),
+                            _,
+                          ),
+                        _,
+                      }),
+                    ),
+                  ),
+                ],
+              _,
+            }),
+          ),
+        ) =>
+        ()
+      | _ => fail("expected nth-of-selector-list AST")
+      }
+    | _ => fail("expected nth-of-selector-list AST")
+    }
+  }),
+];
+
+let at_rule_dispatch_tests = [
+  test_case("@layer comma list parses as a statement at-rule", `Quick, () => {
+    switch (Driver.parse_stylesheet(~source_position_start, "@layer a, b;")) {
+    | Ok(([Ast.At_rule({ name: ("layer", _), block: Ast.Empty, _ })], _)) =>
+      ()
+    | Ok(_) => fail("expected a single blockless @layer at-rule")
+    | Error((_, msg)) => fail("expected @layer a, b; to parse: " ++ msg)
+    }
+  }),
+  test_case("@layer single name parses as a statement at-rule", `Quick, () => {
+    switch (Driver.parse_stylesheet(~source_position_start, "@layer base;")) {
+    | Ok(([Ast.At_rule({ name: ("layer", _), block: Ast.Empty, _ })], _)) =>
+      ()
+    | Ok(_) => fail("expected a single blockless @layer at-rule")
+    | Error((_, msg)) => fail("expected @layer base; to parse: " ++ msg)
+    }
+  }),
+  test_case("@layer block form still parses as a block at-rule", `Quick, () => {
+    switch (
+      Driver.parse_stylesheet(
+        ~source_position_start,
+        "@layer base { .a { color: red } }",
+      )
+    ) {
+    | Ok((
+        [Ast.At_rule({ name: ("layer", _), block: Ast.Stylesheet(_), _ })],
+        _,
+      )) =>
+      ()
+    | Ok(_) => fail("expected a single block @layer at-rule")
+    | Error((_, msg)) =>
+      fail("expected @layer base { ... } to parse: " ++ msg)
+    }
+  }),
+  test_case("@import url() still parses as a statement at-rule", `Quick, () => {
+    switch (
+      Driver.parse_stylesheet(
+        ~source_position_start,
+        {|@import url("x.css");|},
+      )
+    ) {
+    | Ok(([Ast.At_rule({ name: ("import", _), block: Ast.Empty, _ })], _)) =>
+      ()
+    | Ok(_) => fail("expected a single blockless @import at-rule")
+    | Error((_, msg)) => fail("expected @import url(...); to parse: " ++ msg)
+    }
+  }),
+  test_case(
+    "@import with layer()/supports() prelude still parses as a statement at-rule",
+    `Quick,
+    () => {
+    switch (
+      Driver.parse_stylesheet(
+        ~source_position_start,
+        {|@import "x.css" layer(base) supports(display: grid);|},
+      )
+    ) {
+    | Ok(([Ast.At_rule({ name: ("import", _), block: Ast.Empty, _ })], _)) =>
+      ()
+    | Ok(_) => fail("expected a single blockless @import at-rule")
+    | Error((_, msg)) =>
+      fail("expected @import with layer()/supports() to parse: " ++ msg)
+    }
+  }),
+  test_case("@namespace still parses as a statement at-rule", `Quick, () => {
+    switch (
+      Driver.parse_stylesheet(
+        ~source_position_start,
+        "@namespace svg url(http://www.w3.org/2000/svg);",
+      )
+    ) {
+    | Ok((
+        [Ast.At_rule({ name: ("namespace", _), block: Ast.Empty, _ })],
+        _,
+      )) =>
+      ()
+    | Ok(_) => fail("expected a single blockless @namespace at-rule")
+    | Error((_, msg)) => fail("expected @namespace to parse: " ++ msg)
+    }
+  }),
+  test_case("@charset still parses as a statement at-rule", `Quick, () => {
+    switch (
+      Driver.parse_stylesheet(~source_position_start, {|@charset "utf-8";|})
+    ) {
+    | Ok(([Ast.At_rule({ name: ("charset", _), block: Ast.Empty, _ })], _)) =>
+      ()
+    | Ok(_) => fail("expected a single blockless @charset at-rule")
+    | Error((_, msg)) => fail("expected @charset to parse: " ++ msg)
+    }
+  }),
+  test_case("@media block form still parses as a block at-rule", `Quick, () => {
+    switch (
+      Driver.parse_stylesheet(
+        ~source_position_start,
+        "@media (min-width: 1px) { .a { color: red } }",
+      )
+    ) {
+    | Ok((
+        [Ast.At_rule({ name: ("media", _), block: Ast.Stylesheet(_), _ })],
+        _,
+      )) =>
+      ()
+    | Ok(_) => fail("expected a single block @media at-rule")
+    | Error((_, msg)) =>
+      fail("expected @media (min-width: 1px) { ... } to parse: " ++ msg)
+    }
+  }),
+  test_case(
+    "@font-face block form still parses as a block at-rule", `Quick, () => {
+    switch (
+      Driver.parse_stylesheet(
+        ~source_position_start,
+        "@font-face { font-family: X; }",
+      )
+    ) {
+    | Ok((
+        [
+          Ast.At_rule({
+            name: ("font-face", _),
+            block: Ast.Stylesheet(_),
+            _,
+          }),
+        ],
+        _,
+      )) =>
+      ()
+    | Ok(_) => fail("expected a single block @font-face at-rule")
+    | Error((_, msg)) =>
+      fail("expected @font-face { ... } to parse: " ++ msg)
+    }
+  }),
+];
+
+let parse_nested_relative_selector_exn = input => {
+  switch (Driver.parse_declaration_list(~source_position_start, input)) {
+  | Ok((
+      [
+        Ast.Style_rule({
+          block:
+            ([Ast.Style_rule({ prelude: ([(selector, _)], _), _ })], _),
+          _,
+        }),
+      ],
+      _,
+    )) => selector
+  | Ok(_) => fail("expected a single nested style rule for: " ++ input)
+  | Error((_, msg)) =>
+    fail(
+      "expected nested relative selector parse success for "
+      ++ input
+      ++ ": "
+      ++ msg,
+    )
+  };
+};
+
+let nested_relative_selector_combinator_tests =
+  [
+    (".parent { > .child { color: red; } }", Ast.Selector_child),
+    (".parent { + .child { color: red; } }", Ast.Selector_adjacent_sibling),
+    (".parent { ~ .child { color: red; } }", Ast.Selector_general_sibling),
+  ]
+  |> List.map(((input, expected_combinator)) =>
+       test_case(
+         "nested rule accepts leading combinator: " ++ input, `Quick, () => {
+         switch (parse_nested_relative_selector_exn(input)) {
+         | Ast.RelativeSelector({
+             combinator: Some(actual_combinator),
+             complex_selector:
+               Ast.Selector(
+                 Ast.CompoundSelector({
+                   type_selector: None,
+                   subclass_selectors: [Ast.Class("child")],
+                   pseudo_selectors: [],
+                 }),
+               ),
+           }) =>
+           check(
+             bool,
+             "combinator matches",
+             true,
+             actual_combinator == expected_combinator,
+           )
+         | _ => fail("expected RelativeSelector AST for: " ++ input)
+         }
+       })
+     );
+
+let nested_relative_selector_tests =
+  nested_relative_selector_combinator_tests
+  @ [
+    test_case(
+      "nested rule accepts a compound selector after the combinator (`> .a.b:hover`)",
+      `Quick,
+      () => {
+      switch (
+        parse_nested_relative_selector_exn(
+          ".parent { > .a.b:hover { color: red; } }",
+        )
+      ) {
+      | Ast.RelativeSelector({
+          combinator: Some(Ast.Selector_child),
+          complex_selector:
+            Ast.Selector(
+              Ast.CompoundSelector({
+                type_selector: None,
+                subclass_selectors:
+                  [
+                    Ast.Class("a"),
+                    Ast.Class("b"),
+                    Ast.Pseudo_class(
+                      Ast.Pseudoclass(Ast.PseudoIdent("hover")),
+                    ),
+                  ],
+                pseudo_selectors: [],
+              }),
+            ),
+        }) =>
+        ()
+      | _ => fail("expected compound relative selector AST")
+      }
+    }),
+    test_case(
+      "nested rule accepts a relative selector list (`> .a, + .b`)", `Quick, () => {
+      switch (
+        Driver.parse_declaration_list(
+          ~source_position_start,
+          ".parent { > .a, + .b { color: red; } }",
+        )
+      ) {
+      | Ok((
+          [
+            Ast.Style_rule({
+              block:
+                (
+                  [
+                    Ast.Style_rule({
+                      prelude:
+                        (
+                          [
+                            (
+                              Ast.RelativeSelector({
+                                combinator: first_combinator,
+                                _,
+                              }),
+                              _,
+                            ),
+                            (
+                              Ast.RelativeSelector({
+                                combinator: second_combinator,
+                                _,
+                              }),
+                              _,
+                            ),
+                          ],
+                          _,
+                        ),
+                      _,
+                    }),
+                  ],
+                  _,
+                ),
+              _,
+            }),
+          ],
+          _,
+        )) =>
+        check(
+          bool,
+          "first item is `>`",
+          true,
+          first_combinator == Some(Ast.Selector_child),
+        );
+        check(
+          bool,
+          "second item is `+`",
+          true,
+          second_combinator == Some(Ast.Selector_adjacent_sibling),
+        );
+      | Ok(_) => fail("expected two relative selectors")
+      | Error((_, msg)) =>
+        fail("expected relative selector list parse success: " ++ msg)
+      }
+    }),
+    test_case(
+      "nested rule accepts a leading combinator inside @media", `Quick, () => {
+      switch (
+        Driver.parse_declaration_list(
+          ~source_position_start,
+          "@media (min-width: 1px) { > .a { color: red; } }",
+        )
+      ) {
+      | Ok((
+          [
+            Ast.At_rule({
+              name: ("media", _),
+              block:
+                Ast.Stylesheet((
+                  [
+                    Ast.Style_rule({
+                      prelude:
+                        (
+                          [
+                            (
+                              Ast.RelativeSelector({
+                                combinator: Some(Ast.Selector_child),
+                                _,
+                              }),
+                              _,
+                            ),
+                          ],
+                          _,
+                        ),
+                      _,
+                    }),
+                  ],
+                  _,
+                )),
+              _,
+            }),
+          ],
+          _,
+        )) =>
+        ()
+      | Ok(_) => fail("expected relative selector nested inside @media")
+      | Error((_, msg)) =>
+        fail(
+          "expected @media nested relative selector parse success: " ++ msg,
+        )
+      }
+    }),
+    test_case(
+      "declaration-list root still rejects a leading combinator", `Quick, () => {
+      switch (
+        Driver.parse_declaration_list(
+          ~source_position_start,
+          "> .a { color: red; }",
+        )
+      ) {
+      | Error((loc, msg)) =>
+        check(
+          string,
+          "existing parse error message preserved",
+          "Parse error while reading token '>'",
+          msg,
+        );
+        check(
+          int,
+          "error points at the leading combinator",
+          0,
+          loc.loc_start.pos_cnum,
+        );
+      | Ok(_) =>
+        fail("expected a leading top-level combinator to still error")
+      }
+    }),
+    test_case(
+      "stylesheet level still rejects a leading combinator", `Quick, () => {
+      check(
+        string,
+        "existing parse error message preserved",
+        "Parse error while reading token '>' on line 1 at position 0",
+        parse("> .a {}") |> Result.get_error,
+      )
+    }),
+  ];
+
 let ambiguity_regression_tests = [
   test_case(
     "declaration list stops before nested descendant selector", `Quick, () => {
@@ -518,6 +1017,9 @@ let tests =
     declaration_ast_tests,
     function_ast_tests,
     selector_combinator_ast_tests,
+    functional_selector_ast_tests,
+    at_rule_dispatch_tests,
+    nested_relative_selector_tests,
     ambiguity_regression_tests,
     invalid_utf8_tests,
   ]);

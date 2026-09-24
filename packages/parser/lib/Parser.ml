@@ -129,8 +129,6 @@ let next_significant_index tokens start =
   in
   loop start
 
-(* -- Token set predicates (Design 3) -- *)
-
 let is_selector_start = function
   | Tokens.DELIM ("." | "&" | "*")
   | Tokens.HASH _ | Tokens.LEFT_BRACKET | Tokens.INTERPOLATION _ ->
@@ -147,13 +145,11 @@ let is_at_rule_start = function
   | Tokens.AT_RULE _ | Tokens.AT_KEYFRAMES _ -> true
   | _ -> false
 
-(* Tokens that start a selector (ident or any selector-start or pseudo) *)
 let token_starts_selector tok =
   match tok with
   | Tokens.IDENT _ -> true
   | tok -> is_selector_start tok || is_pseudo_start tok
 
-(* Tokens that start a selector prelude (ident or selector-start, no pseudo) *)
 let token_starts_selector_prelude tok =
   match tok with Tokens.IDENT _ -> true | tok -> is_selector_start tok
 
@@ -353,8 +349,6 @@ let parse_wq_name stream =
   let name, _ = expect_ident stream in
   name
 
-(* -- An+B microsyntax (nth payloads) -- *)
-
 type nth_suffix =
   | Nth_suffix_n
   | Nth_suffix_n_dash (* requires a following integer *)
@@ -364,7 +358,6 @@ let raise_invalid_nth function_name (token : token_with_location) =
   let message = Printf.sprintf "Invalid an+b value in :%s()" function_name in
   raise (Parse_error (token.start_pos, token.end_pos, message))
 
-(* Reject fractional or inexact float coefficients before converting to int. *)
 let nth_int_of_number function_name (token : token_with_location) value =
   let max_exact_float_int =
     9007199254740992.
@@ -376,7 +369,6 @@ let nth_int_of_number function_name (token : token_with_location) value =
 
 let is_ascii_digit = function '0' .. '9' -> true | _ -> false
 
-(* Accept only non-empty ASCII digits; [int_of_string_opt] handles overflow. *)
 let nth_int_of_digits function_name (token : token_with_location) digits =
   if String.length digits > 0 && String.for_all is_ascii_digit digits then (
     match int_of_string_opt digits with
@@ -384,7 +376,6 @@ let nth_int_of_digits function_name (token : token_with_location) digits =
     | None -> raise_invalid_nth function_name token)
   else raise_invalid_nth function_name token
 
-(* Accept "n", "n-", or "n-<digits>", with ASCII-case-insensitive "n". *)
 let classify_nth_suffix function_name (token : token_with_location) suffix =
   let length = String.length suffix in
   if length = 0 || (suffix.[0] <> 'n' && suffix.[0] <> 'N') then
@@ -395,69 +386,6 @@ let classify_nth_suffix function_name (token : token_with_location) suffix =
   else
     Nth_suffix_n_dash_digits
       (nth_int_of_digits function_name token (String.sub suffix 2 (length - 2)))
-
-let parse_nth_payload ~function_name stream =
-  skip_whitespace stream;
-  let parse_after_n a suffix =
-    match suffix with
-    | Nth_suffix_n_dash_digits b -> Ast.Nth (ANB (a, "-", b))
-    | Nth_suffix_n_dash ->
-      (* "an-" followed by a signless integer represents a negative b. *)
-      skip_whitespace stream;
-      begin match current_tok stream with
-      | Tokens.NUMBER value ->
-        let token = advance stream in
-        let b = nth_int_of_number function_name token value in
-        if b < 0 then raise_invalid_nth function_name token
-        else Ast.Nth (ANB (a, "-", b))
-      | _ -> raise_parse_error (current_token stream)
-      end
-    | Nth_suffix_n ->
-      skip_whitespace stream;
-      begin match current_tok stream with
-      | Tokens.DELIM (("+" | "-") as op) ->
-        let _ = advance stream in
-        skip_whitespace stream;
-        begin match current_tok stream with
-        | Tokens.NUMBER value ->
-          let token = advance stream in
-          Ast.Nth (ANB (a, op, nth_int_of_number function_name token value))
-        | _ -> raise_parse_error (current_token stream)
-        end
-      | Tokens.NUMBER value ->
-        let token = advance stream in
-        let b = nth_int_of_number function_name token value in
-        let op, abs_b = if b < 0 then "-", abs b else "+", b in
-        Ast.Nth (ANB (a, op, abs_b))
-      | _ -> Ast.Nth (AN a)
-      end
-  in
-  let payload =
-    match current_tok stream with
-    | Tokens.NUMBER value ->
-      let token = advance stream in
-      Ast.Nth (A (nth_int_of_number function_name token value))
-    | Tokens.DIMENSION (num, unit) ->
-      let token = advance stream in
-      let a = nth_int_of_number function_name token num in
-      parse_after_n a (classify_nth_suffix function_name token unit)
-    | Tokens.IDENT ident ->
-      let token = advance stream in
-      begin match String.lowercase_ascii ident with
-      | "even" -> Ast.Nth Even
-      | "odd" -> Ast.Nth Odd
-      | lowercase ->
-        let a, suffix =
-          if String.length lowercase > 0 && lowercase.[0] = '-' then
-            -1, String.sub lowercase 1 (String.length lowercase - 1)
-          else 1, lowercase
-        in
-        parse_after_n a (classify_nth_suffix function_name token suffix)
-      end
-    | _ -> raise_parse_error (current_token stream)
-  in
-  skip_whitespace stream;
-  payload
 
 let rec parse_component_value stream =
   let start_pos = (current_token stream).start_pos in
@@ -603,7 +531,80 @@ let parse_type_selector stream =
     Type name
   | _ -> raise_parse_error (current_token stream)
 
-let rec parse_attribute_selector stream =
+let rec parse_nth_payload ~function_name stream =
+  skip_whitespace stream;
+  let parse_after_n a suffix =
+    match suffix with
+    | Nth_suffix_n_dash_digits b -> Ast.Nth (ANB (a, "-", b))
+    | Nth_suffix_n_dash ->
+      (* "an-" followed by a signless integer represents a negative b. *)
+      skip_whitespace stream;
+      begin match current_tok stream with
+      | Tokens.NUMBER value ->
+        let token = advance stream in
+        let b = nth_int_of_number function_name token value in
+        if b < 0 then raise_invalid_nth function_name token
+        else Ast.Nth (ANB (a, "-", b))
+      | _ -> raise_parse_error (current_token stream)
+      end
+    | Nth_suffix_n ->
+      skip_whitespace stream;
+      begin match current_tok stream with
+      | Tokens.DELIM (("+" | "-") as op) ->
+        let _ = advance stream in
+        skip_whitespace stream;
+        begin match current_tok stream with
+        | Tokens.NUMBER value ->
+          let token = advance stream in
+          Ast.Nth (ANB (a, op, nth_int_of_number function_name token value))
+        | _ -> raise_parse_error (current_token stream)
+        end
+      | Tokens.NUMBER value ->
+        let token = advance stream in
+        let b = nth_int_of_number function_name token value in
+        let op, abs_b = if b < 0 then "-", abs b else "+", b in
+        Ast.Nth (ANB (a, op, abs_b))
+      | _ -> Ast.Nth (AN a)
+      end
+  in
+  let payload =
+    match current_tok stream with
+    | Tokens.NUMBER value ->
+      let token = advance stream in
+      Ast.Nth (A (nth_int_of_number function_name token value))
+    | Tokens.DIMENSION (num, unit) ->
+      let token = advance stream in
+      let a = nth_int_of_number function_name token num in
+      parse_after_n a (classify_nth_suffix function_name token unit)
+    | Tokens.IDENT ident ->
+      let token = advance stream in
+      begin match String.lowercase_ascii ident with
+      | "even" -> Ast.Nth Even
+      | "odd" -> Ast.Nth Odd
+      | lowercase ->
+        let a, suffix =
+          if String.length lowercase > 0 && lowercase.[0] = '-' then
+            -1, String.sub lowercase 1 (String.length lowercase - 1)
+          else 1, lowercase
+        in
+        parse_after_n a (classify_nth_suffix function_name token suffix)
+      end
+    | _ -> raise_parse_error (current_token stream)
+  in
+  skip_whitespace stream;
+  match payload with
+  | Ast.Nth nth_value ->
+    begin match current_tok stream with
+    | Tokens.IDENT ident when String.lowercase_ascii ident = "of" ->
+      let _ = advance stream in
+      skip_whitespace stream;
+      Ast.NthSelector
+        { nth = nth_value; selectors = parse_complex_selector_list stream }
+    | _ -> payload
+    end
+  | Ast.NthSelector _ -> payload
+
+and parse_attribute_selector stream =
   let _ = expect_token stream Tokens.LEFT_BRACKET in
   skip_whitespace stream;
   let name = parse_wq_name stream in
@@ -660,8 +661,21 @@ and parse_pseudo_class_selector stream =
 
 and parse_pseudo_element_selector stream =
   let _ = expect_token stream Tokens.DOUBLE_COLON in
-  let name = parse_selector_ident stream in
-  Pseudoelement name
+  match current_tok stream with
+  | Tokens.FUNCTION name ->
+    let start_pos = (current_token stream).start_pos in
+    let _ = advance stream in
+    let selectors, payload_loc = parse_relative_selector_list stream in
+    let _ = expect_token stream Tokens.RIGHT_PAREN in
+    let payload_loc =
+      match selectors with
+      | [] -> make_loc start_pos start_pos
+      | _ -> payload_loc
+    in
+    PseudoelementFunction { name; payload = selectors, payload_loc }
+  | _ ->
+    let name = parse_selector_ident stream in
+    Pseudoelement name
 
 and parse_pseudo_list stream =
   let first = parse_pseudo_element_selector stream in
@@ -724,6 +738,11 @@ and parse_non_complex_selector stream =
 and parse_complex_selector stream =
   let left = parse_non_complex_selector stream in
   let rec loop right =
+    (* Looking past whitespace for a combinator or a descendant selector
+       is speculative: if neither follows, this selector ends here, at
+       [selector_end], not at the whitespace [advance] below moved
+       [stream.last_end_pos] to. *)
+    let selector_end = stream.last_end_pos in
     let saw_whitespace = ref false in
     while current_is_whitespace stream do
       saw_whitespace := true;
@@ -740,6 +759,7 @@ and parse_complex_selector stream =
       let selector = parse_non_complex_selector stream in
       loop ((Ast.Selector_descendant, selector) :: right)
     | _ ->
+      stream.last_end_pos <- selector_end;
       (match List.rev right with
       | [] -> Selector left
       | right -> Combinator { left; right })
@@ -748,7 +768,9 @@ and parse_complex_selector stream =
 
 and parse_selector stream = ComplexSelector (parse_complex_selector stream)
 
-and parse_selector_list_with stream parse_one =
+and parse_selector_list_with :
+  'a. stream -> (stream -> 'a) -> ('a * Ast.loc) list * Ast.loc =
+ fun stream parse_one ->
   skip_whitespace stream;
   let start_pos = (current_token stream).start_pos in
   let rec loop acc =
@@ -765,14 +787,23 @@ and parse_selector_list_with stream parse_one =
     | _ ->
       let items = List.rev acc in
       let loc =
+        (* [item_loc] is the last item's, captured before the
+           [skip_whitespace] above moved [stream.last_end_pos] past the
+           whitespace between it and the next token (`,` or `{`); using
+           [stream.last_end_pos] here would extend the prelude's location
+           through that trailing whitespace. *)
         if items = [] then make_loc start_pos start_pos
-        else make_loc start_pos stream.last_end_pos
+        else make_loc start_pos item_loc.loc_end
       in
       items, loc
   in
   loop []
 
 and parse_selector_list stream = parse_selector_list_with stream parse_selector
+
+and parse_complex_selector_list stream =
+  let items, _ = parse_selector_list_with stream parse_complex_selector in
+  List.map fst items
 
 and parse_relative_selector stream =
   skip_whitespace stream;
@@ -789,6 +820,21 @@ and parse_relative_selector stream =
 
 and parse_relative_selector_list stream =
   parse_selector_list_with stream parse_relative_selector
+
+(* A nested rule's prelude (i.e. one inside another rule's block) may start
+   with a bare combinator per CSS Nesting ("> .child" means "& > .child").
+   Only the item that actually starts with one is parsed as a
+   [RelativeSelector]; every other item keeps producing a plain
+   [ComplexSelector], so a selector list that doesn't use this shorthand
+   (the common case) has the exact same AST as before this existed. *)
+and parse_nested_selector stream =
+  skip_whitespace stream;
+  match current_tok stream with
+  | Tokens.DELIM ("+" | "~" | ">") -> parse_relative_selector stream
+  | _ -> parse_selector stream
+
+and parse_nested_selector_list stream =
+  parse_selector_list_with stream parse_nested_selector
 
 let update_declaration_value_state state (value, _) =
   match value with
@@ -809,19 +855,37 @@ let update_declaration_value_state state (value, _) =
   | Paren_block _ | Bracket_block _ | Delim _ | Selector _ | Unicode_range _ ->
     { state with has_content = true }
 
+(* Drop the whitespace at the end of a reversed component-value list and
+   return it in source order with a location that ends at the last kept value;
+   an empty list keeps the zero-width location at [start_pos]. Declaration
+   values and at-rule preludes both exclude their surrounding whitespace, so
+   `a: b ;` and `a:b;`, or `@import url(x) ;` and `@import url(x);`, parse to
+   the same AST and render the same. *)
+let trim_trailing_whitespace start_pos rev_values =
+  let rec drop = function
+    | (Ast.Whitespace, _) :: rest -> drop rest
+    | rev_values -> rev_values
+  in
+  match drop rev_values with
+  | [] -> [], make_loc start_pos start_pos
+  | (_, (last_loc : Ast.loc)) :: _ as rev_values ->
+    List.rev rev_values, make_loc start_pos last_loc.loc_end
+
 let parse_declaration_value_list stream =
+  skip_whitespace stream;
   let start_pos = (current_token stream).start_pos in
   let initial_state =
     { has_content = false; top_level_items = 0; ident_like_prefix = false }
   in
+  let finish rev_values = trim_trailing_whitespace start_pos rev_values in
   let rec loop acc state =
     match current_tok stream with
     | Tokens.EOF | Tokens.RIGHT_BRACE | Tokens.SEMI_COLON | Tokens.IMPORTANT ->
-      with_empty_or_consumed_loc stream start_pos (List.rev acc)
+      finish acc
     | _
       when declaration_value_starts_nested_block stream.tokens stream.index
              state ->
-      with_empty_or_consumed_loc stream start_pos (List.rev acc)
+      finish acc
     | _ ->
       let value = parse_component_value stream in
       let state = update_declaration_value_state state value in
@@ -965,44 +1029,63 @@ and parse_at_rule stream =
       block;
       loc = loc_from_start stream start_pos;
     }
-  | Tokens.AT_RULE_STATEMENT name ->
-    let at_token = advance stream in
-    let prelude, prelude_loc =
-      parse_component_value_list_until stream (fun stream ->
-        current_is stream Tokens.SEMI_COLON)
-    in
-    let _ = expect_token stream Tokens.SEMI_COLON in
-    {
-      name = name, component_loc at_token;
-      prelude = prelude, prelude_loc;
-      block = Empty;
-      loc = loc_from_start stream start_pos;
-    }
   | Tokens.AT_RULE name ->
+    (* CSS Syntax Level 3 "consume an at-rule" (#5.4.2): the prelude runs
+       until the first '{' (block form) or ';' (statement form) at this
+       nesting depth -- nested parens/brackets/functions consume their own
+       matched delimiters recursively in parse_component_value, so neither
+       can appear here unmatched. *)
     let at_token = advance stream in
     let prelude, prelude_loc =
       parse_component_value_list_until stream (fun stream ->
-        current_is stream Tokens.LEFT_BRACE)
+        current_is stream Tokens.SEMI_COLON
+        || current_is stream Tokens.LEFT_BRACE)
     in
-    let left_brace = expect_token stream Tokens.LEFT_BRACE in
-    let rules =
-      parse_braced_rules stream left_brace (fun stream ->
-        parse_rule_list stream
-          ~stop:(fun stream -> current_is stream Tokens.RIGHT_BRACE)
-          ~parse_one:parse_block_rule ~allow_empty:true)
-    in
-    {
-      name = name, component_loc at_token;
-      prelude = prelude, prelude_loc;
-      block = Stylesheet rules;
-      loc = loc_from_start stream start_pos;
-    }
+    begin match current_tok stream with
+    | Tokens.SEMI_COLON ->
+      let _ = expect_token stream Tokens.SEMI_COLON in
+      (* A statement prelude excludes the whitespace around it, like a
+         declaration value, so `@import  url(x) ;` renders as
+         `@import url(x);`. Block preludes keep theirs: the renderer prints
+         them as before and atom hashes depend on that text. *)
+      let rec drop_leading = function
+        | (Ast.Whitespace, _) :: rest -> drop_leading rest
+        | values -> values
+      in
+      let prelude, prelude_loc =
+        match drop_leading prelude with
+        | [] -> [], prelude_loc
+        | (_, (first_loc : Ast.loc)) :: _ as prelude ->
+          trim_trailing_whitespace first_loc.loc_start (List.rev prelude)
+      in
+      {
+        name = name, component_loc at_token;
+        prelude = prelude, prelude_loc;
+        block = Empty;
+        loc = loc_from_start stream start_pos;
+      }
+    | Tokens.LEFT_BRACE ->
+      let left_brace = expect_token stream Tokens.LEFT_BRACE in
+      let rules =
+        parse_braced_rules stream left_brace (fun stream ->
+          parse_rule_list stream
+            ~stop:(fun stream -> current_is stream Tokens.RIGHT_BRACE)
+            ~parse_one:parse_nested_block_rule ~allow_empty:true)
+      in
+      {
+        name = name, component_loc at_token;
+        prelude = prelude, prelude_loc;
+        block = Stylesheet rules;
+        loc = loc_from_start stream start_pos;
+      }
+    | _ -> raise_parse_error (current_token stream)
+    end
   | _ -> raise_parse_error (current_token stream)
 
-and parse_style_rule stream =
+and parse_style_rule_with stream ~parse_prelude =
   skip_whitespace stream;
   let start_pos = (current_token stream).start_pos in
-  let prelude = parse_selector_list stream in
+  let prelude = parse_prelude stream in
   skip_whitespace stream;
   let left_brace = expect_token stream Tokens.LEFT_BRACE in
   let block =
@@ -1010,17 +1093,22 @@ and parse_style_rule stream =
       let rules, rules_loc =
         parse_rule_list stream
           ~stop:(fun stream -> current_is stream Tokens.RIGHT_BRACE)
-          ~parse_one:parse_block_rule ~allow_empty:false
+          ~parse_one:parse_nested_block_rule ~allow_empty:false
       in
       rules, rules_loc)
   in
   { prelude; block; loc = loc_from_start stream start_pos }
 
-and parse_block_rule stream =
+and parse_style_rule stream =
+  parse_style_rule_with stream ~parse_prelude:parse_selector_list
+
+and parse_nested_style_rule stream =
+  parse_style_rule_with stream ~parse_prelude:parse_nested_selector_list
+
+and parse_block_rule_with stream ~parse_style_rule =
   skip_whitespace stream;
   match current_tok stream with
-  | Tokens.AT_KEYFRAMES _ | Tokens.AT_RULE _ | Tokens.AT_RULE_STATEMENT _ ->
-    At_rule (parse_at_rule stream)
+  | Tokens.AT_KEYFRAMES _ | Tokens.AT_RULE _ -> At_rule (parse_at_rule stream)
   | Tokens.IDENT _
     when identifier_starts_property stream.tokens (stream.index + 1) ->
     let saved = snapshot stream in
@@ -1036,11 +1124,15 @@ and parse_block_rule stream =
     end
   | _ -> Style_rule (parse_style_rule stream)
 
+and parse_block_rule stream = parse_block_rule_with stream ~parse_style_rule
+
+and parse_nested_block_rule stream =
+  parse_block_rule_with stream ~parse_style_rule:parse_nested_style_rule
+
 and parse_stylesheet_rule stream =
   skip_whitespace stream;
   match current_tok stream with
-  | Tokens.AT_KEYFRAMES _ | Tokens.AT_RULE _ | Tokens.AT_RULE_STATEMENT _ ->
-    At_rule (parse_at_rule stream)
+  | Tokens.AT_KEYFRAMES _ | Tokens.AT_RULE _ -> At_rule (parse_at_rule stream)
   | _ -> Style_rule (parse_style_rule stream)
 
 let make_stream input =

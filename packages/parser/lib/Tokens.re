@@ -2,13 +2,10 @@
 type token =
   | EOF
   | IDENT(string) // <ident-token>
-  | TYPE_SELECTOR(string) // <type-selector-token>
   | FUNCTION(string) // <function-token>
   | NTH_FUNCTION(string) // <function-token> (nth-*)
-  | AT_KEYWORD(string) // <at-keyword-token>
   | AT_KEYFRAMES(string) // <at-keyframes-token> (non-standard)
-  | AT_RULE(string) // <at-rule-token> (non-standard)
-  | AT_RULE_STATEMENT(string) // <at-rule-statement-token> (non-standard)
+  | AT_RULE(string)
   | UNICODE_RANGE(string) // <unicode-range-token>
   | HASH(
       (
@@ -26,7 +23,6 @@ type token =
   | NUMBER(float) // <number-token>
   | PERCENTAGE(float) // <percentage-token>
   | DIMENSION((float, string)) // <dimension-token>
-  | DESCENDANT_COMBINATOR // whitespace as selector combinator
   | WS // <whitespace-token>
   | COLON // <colon-token>
   | DOUBLE_COLON // <double-colon-token>
@@ -139,6 +135,46 @@ let serialize_uri = s =>
     Buffer.contents(buf);
   };
 
+// https://drafts.csswg.org/cssom/#serialize-an-identifier
+// The lexer decodes escapes while reading an identifier and then runs the
+// decoded name through this, so an identifier token already carries the one
+// spelling that is valid CSS wherever it lands: `.\31 a` keeps its escape
+// instead of becoming the invalid `.1a`, and `.a\.b` stays one class instead
+// of two. Bytes >= 0x80 are UTF-8 continuation or lead bytes and pass through.
+let serialize_identifier = ident => {
+  let len = String.length(ident);
+  let buf = Buffer.create(len);
+  let is_digit = c => c >= '0' && c <= '9';
+  let is_name_char = c =>
+    is_digit(c)
+    || c >= 'a'
+    && c <= 'z'
+    || c >= 'A'
+    && c <= 'Z'
+    || c == '-'
+    || c == '_'
+    || Char.code(c) >= 0x80;
+  let escape_as_code_point = c =>
+    Buffer.add_string(buf, Printf.sprintf("\\%x ", Char.code(c)));
+  for (i in 0 to len - 1) {
+    let c = ident.[i];
+    let code = Char.code(c);
+    if (code <= 0x1f || code == 0x7f) {
+      escape_as_code_point(c);
+    } else if (is_digit(c) && (i == 0 || i == 1 && ident.[0] == '-')) {
+      escape_as_code_point(c);
+    } else if (c == '-' && len == 1) {
+      Buffer.add_string(buf, "\\-");
+    } else if (is_name_char(c)) {
+      Buffer.add_char(buf, c);
+    } else {
+      Buffer.add_char(buf, '\\');
+      Buffer.add_char(buf, c);
+    };
+  };
+  Buffer.contents(buf);
+};
+
 let float_to_string = value => {
   let raw = string_of_float(value);
   let has_dot = String.contains(raw, '.');
@@ -203,12 +239,9 @@ let humanize =
   fun
   | EOF => "the end"
   | IDENT(s) => s
-  | TYPE_SELECTOR(s) => s
   | FUNCTION(fn) => Printf.sprintf("%s(", fn)
   | NTH_FUNCTION(fn) => Printf.sprintf("%s(", fn)
-  | AT_KEYWORD(s) => Printf.sprintf("@%s", s)
   | AT_KEYFRAMES(s) => Printf.sprintf("@%s", s)
-  | AT_RULE_STATEMENT(s) => Printf.sprintf("@%s", s)
   | AT_RULE(s) => Printf.sprintf("@%s", s)
   | UNICODE_RANGE(s) => s
   | HASH((s, _)) => Printf.sprintf("#%s", s)
@@ -219,7 +252,6 @@ let humanize =
   | NUMBER(n) => float_to_string(n)
   | PERCENTAGE(n) => Printf.sprintf("%s%%", float_to_string(n))
   | DIMENSION((n, d)) => Printf.sprintf("%s%s", float_to_string(n), d)
-  | DESCENDANT_COMBINATOR => " "
   | WS => " "
   | COLON => ":"
   | DOUBLE_COLON => "::"
@@ -248,14 +280,11 @@ let to_debug =
   | COMMA => "COMMA"
   | IMPORTANT => "IMPORTANT"
   | IDENT(s) => Printf.sprintf("IDENT('%s')", s)
-  | TYPE_SELECTOR(s) => Printf.sprintf("TYPE_SELECTOR('%s')", s)
   | STRING(s) => Printf.sprintf("STRING('%s')", s)
   | FUNCTION(fn) => Printf.sprintf("FUNCTION(%s)", fn)
   | NTH_FUNCTION(fn) => Printf.sprintf("NTH_FUNCTION(%s)", fn)
   | URL(u) => Printf.sprintf("URL(%s)", u)
-  | AT_KEYWORD(s) => Printf.sprintf("AT_KEYWORD('%s')", s)
   | AT_KEYFRAMES(s) => Printf.sprintf("AT_KEYFRAMES('%s')", s)
-  | AT_RULE_STATEMENT(s) => Printf.sprintf("AT_RULE_STATEMENT('%s')", s)
   | AT_RULE(s) => Printf.sprintf("AT_RULE('%s')", s)
   | HASH((s, kind)) => {
       let kind =
@@ -272,5 +301,4 @@ let to_debug =
   | UNICODE_RANGE(s) => Printf.sprintf("UNICODE_RANGE('%s')", s)
   | INTERPOLATION((v, _)) => Printf.sprintf("INTERPOLATION('%s')", v)
   | DELIM(s) => Printf.sprintf("DELIM('%s')", s)
-  | DESCENDANT_COMBINATOR => "DESCENDANT_COMBINATOR"
   | WS => "WS";

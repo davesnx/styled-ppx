@@ -444,14 +444,6 @@ module Css_transform = {
     switch (simple) {
     | Variable(path_str, var_loc) =>
       let var_loc = to_file_loc(ctx, var_loc);
-      /* Bare `$(name)` (no `.` prefix) in selector position. We treat it
-         like an implicit class reference and resolve to the first minted
-         className as a `Type` selector if there's exactly one; otherwise
-         this case is ambiguous - fall through to error. We emit a
-         `Type(..)` rather than `Class(..)` because the user wrote no `.`,
-         so the resolved value must serve as the type-selector slot. The
-         caller (`transform_compound_selector`) only places this in the
-         `type_selector` slot, never in `subclass_selectors`. */
       let resolved =
         Local_selector_environment.resolve_selector_class_ref(
           ~file=ctx.file,
@@ -461,7 +453,7 @@ module Css_transform = {
           path_str,
         );
       switch (resolved) {
-      | [single] => Type("." ++ single)
+      | [single] => Subclass(Class(single))
       | _ =>
         Ppxlib.Location.raise_errorf(
           ~loc=var_loc,
@@ -518,6 +510,16 @@ module Css_transform = {
       (ctx, pseudo: pseudo_selector): pseudo_selector => {
     switch (pseudo) {
     | Pseudoelement(_) => pseudo
+    | PseudoelementFunction({ name, payload: (selector_list, payload_loc) }) =>
+      let transformed =
+        List.map(
+          ((sel, sel_loc)) => (transform_selector(ctx, sel), sel_loc),
+          selector_list,
+        );
+      PseudoelementFunction({
+        name,
+        payload: (transformed, payload_loc),
+      });
     | Pseudoclass(kind) =>
       Pseudoclass(transform_pseudoclass_kind(ctx, kind))
     };
@@ -541,13 +543,12 @@ module Css_transform = {
       let transformed_payload =
         switch (nth_payload) {
         | Nth(_) => nth_payload
-        | NthSelector(complex_selectors) =>
-          NthSelector(
-            List.map(
-              c => transform_complex_selector(ctx, c),
-              complex_selectors,
-            ),
-          )
+        | NthSelector({ nth, selectors }) =>
+          NthSelector({
+            nth,
+            selectors:
+              List.map(c => transform_complex_selector(ctx, c), selectors),
+          })
         };
       NthFunction({
         name,
@@ -1416,7 +1417,8 @@ let push_global =
       dynamic_vars: ref([]),
     };
 
-  /* Reject `&` with no parent selector: top level, or inside at-rule
+  /* Reject `&` (literal, or the implicit one a leading combinator like
+     `> .a` means) with no parent selector: top level, or inside at-rule
      blocks not below a style rule (at-rules don't contribute a
      selector). Recursion stops at style rules — nested `&` is fine. */
   let rec reject_parentless_ampersand = rule =>
@@ -1424,7 +1426,7 @@ let push_global =
     | Style_rule({ prelude: (selectors, _), _ }) =>
       List.iter(
         ((selector, selector_loc)) =>
-          if (Styled_ppx_css_parser.Selector_nesting.contains_ampersand(
+          if (Styled_ppx_css_parser.Selector_nesting.needs_parent_selector(
                 selector,
               )) {
             Ppxlib.Location.raise_errorf(

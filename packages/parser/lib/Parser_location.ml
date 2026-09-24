@@ -16,12 +16,17 @@ let span (loc1 : Ppxlib.location) (loc2 : Ppxlib.location) : Ppxlib.location =
 let file_start ?(filename = "") () : Lexing.position =
   { pos_fname = filename; pos_lnum = 1; pos_bol = 0; pos_cnum = 0 }
 
-(* File position of a string constant's first content character: skips the
-   opening quote, or brace + delimiter + pipe for delimited strings. All
-   source-relative locations are rebased against it. *)
-let source_position_start ~delimiter (loc : Ppxlib.location) : Lexing.position =
+(* File position of a string constant's first content character. All
+   source-relative locations are rebased against it. Reason's lexer starts
+   [loc] at the opening quote or brace, so the offset skips it; OCaml's
+   lexer ([wrap_string_lexer]) starts [loc] at the content already. The
+   span of [loc] cannot tell the two apart: escapes in a plain string and
+   CRLF normalization in a quoted string both change it. *)
+let source_position_start ~delimiter ~loc_includes_delimiters
+  (loc : Ppxlib.location) : Lexing.position =
   let offset =
-    match delimiter with None -> 1 | Some d -> String.length d + 2
+    if not loc_includes_delimiters then 0
+    else (match delimiter with None -> 1 | Some d -> String.length d + 2)
   in
   { loc.loc_start with pos_cnum = loc.loc_start.pos_cnum + offset }
 

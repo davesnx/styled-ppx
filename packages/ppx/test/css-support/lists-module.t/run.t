@@ -61,7 +61,7 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-1vskulm{list-style-type:other-style;}"];
   [@css ".css-fh7fla{list-style-type:inside;}"];
   [@css ".css-1p3zn63{list-style-type:outside;}"];
-  [@css ".css-usotag{list-style-type:2style;}"];
+  [@css ".css-18kpnng{list-style-type:\\32 style;}"];
   [@css ".css-uhwudt{list-style-type:custom-counter-style;}"];
   [@css ".css-1e8mnj4{list-style-type:\"👍\";}"];
   [@css ".css-1f501lu{list-style-type:\"-\";}"];
@@ -134,7 +134,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-fh7fla", []);
   CSS.make("css-1p3zn63", []);
   
-  CSS.make("css-usotag", []);
+  CSS.make("css-18kpnng", []);
   CSS.make("css-uhwudt", []);
   CSS.make("css-1e8mnj4", []);
   CSS.make("css-1f501lu", []);

@@ -100,7 +100,7 @@ let function_ellipse : function_ellipse Rule.rule = Function_ellipse.rule
 
 module Function_env =
   [%spec_module
-  "env( <custom-ident> ',' [ <declaration-value> ]? )"]
+  "env( <custom-ident> [ ',' <declaration-value> ]? )"]
 
 let function_env : function_env Rule.rule = Function_env.rule
 
@@ -450,7 +450,7 @@ let function_translateZ : function_translateZ Rule.rule =
 
 module Function_var =
   [%spec_module
-  "var( <ident> [ ',' <declaration-value> ]? )", (module Css_types.Var)]
+  "var( <ident> [ ',' [ <declaration-value> ]? ]? )", (module Css_types.Var)]
 
 let function_var : function_var Rule.rule = Function_var.rule
 

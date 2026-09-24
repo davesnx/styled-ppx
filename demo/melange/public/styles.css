@@ -30,7 +30,7 @@ body{background-color:var(--pageBackground-171dvmc);color:var(--textColor-a4prc9
 @container (width < 650px) {.css-5x3p37-container{font-size:1em;}}
 @container (width < 650px) {.css-stwpj2-container .my-content{font-weight:bold;}}
 .css-1wlyyxm-gradiend{padding:36px;}
-.css-1wm7046-gradiend{background-image:repeating-linear-gradient(45deg, #333 0px, #333 4px, #f60808) ;}
+.css-qelxhy-gradiend{background-image:repeating-linear-gradient(45deg, #333 0px, #333 4px, #f60808);}
 .css-19kzrtu-keyframeDemoShell{padding:24px;}
 .css-i3pbo-keyframeDemoShell{margin-bottom:24px;}
 .css-3kft4e-keyframeDemoShell{border:2px solid #141414;}
