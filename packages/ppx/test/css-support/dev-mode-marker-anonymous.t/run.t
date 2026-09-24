@@ -17,14 +17,14 @@ behavior; this keeps the two debug affordances symmetric.
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css ".css-tokvmb{color:red;}"];
   [@css ".css-14ksm7b{color:blue;}"];
-  [@css ".css-bjcoli-named{color:green;}"];
-  [@css.bindings [("Input.named", "css-bjcoli-named")]];
+  [@css ".css-bjcoli{color:green;}"];
+  [@css.bindings [("Input.named", "cid-1hum9uj", "css-bjcoli")]];
   
   let _ = CSS.make("css-tokvmb", []);
   
   CSS.make("css-14ksm7b", []);
   
-  let named = CSS.make("cx-named css-bjcoli-named", []);
+  let named = CSS.make("label:named cid-1hum9uj css-bjcoli", []);
   
   let _ = named;
 

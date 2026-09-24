@@ -10,31 +10,31 @@ the diff IS the blast radius.
 
   $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
-  [@@@css ".css-tokvmb-solid{color:red;}"]
-  [@@@css ".css-eaeacs-multi{margin:10px;}"]
-  [@@@css ".css-1ruxp1v-multi{padding:20px;}"]
-  [@@@css ".css-14ksm7b-multi{color:blue;}"]
-  [@@@css ".css-1xu3tth-hovered{color:black;}"]
-  [@@@css ".css-1rwx7to-hovered:hover{color:white;}"]
-  [@@@css ".css-1r10myy-multiSel .a{color:green;}"]
-  [@@@css ".css-ltb45t-multiSel .b{color:green;}"]
-  [@@@css "@media (min-width: 768px) {.css-14bi921-withMedia .a{color:red;}}"]
-  [@@@css ".css-137pweu-units{width:1.5rem;}"]
-  [@@@css ".css-1tzeee1-units{opacity:0.5;}"]
-  [@@@css ".css-1j744k-withFallback{color:var(--theme, blue);}"]
+  [@@@css ".css-tokvmb{color:red;}"]
+  [@@@css ".css-eaeacs{margin:10px;}"]
+  [@@@css ".css-1ruxp1v{padding:20px;}"]
+  [@@@css ".css-14ksm7b{color:blue;}"]
+  [@@@css ".css-1xu3tth{color:black;}"]
+  [@@@css ".css-1rwx7to:hover{color:white;}"]
+  [@@@css ".css-1r10myy .a{color:green;}"]
+  [@@@css ".css-ltb45t .b{color:green;}"]
+  [@@@css "@media (min-width: 768px) {.css-14bi921 .a{color:red;}}"]
+  [@@@css ".css-137pweu{width:1.5rem;}"]
+  [@@@css ".css-1tzeee1{opacity:0.5;}"]
+  [@@@css ".css-1j744k{color:var(--theme, blue);}"]
   [@@@css.bindings
-    [("Input.solid", "css-tokvmb-solid");
-    ("Input.multi", "css-eaeacs-multi css-1ruxp1v-multi css-14ksm7b-multi");
-    ("Input.hovered", "css-1xu3tth-hovered css-1rwx7to-hovered");
-    ("Input.multiSel", "css-1r10myy-multiSel css-ltb45t-multiSel");
-    ("Input.withMedia", "css-14bi921-withMedia");
-    ("Input.units", "css-137pweu-units css-1tzeee1-units");
-    ("Input.withFallback", "css-1j744k-withFallback")]]
-  let solid = CSS.make "css-tokvmb-solid" []
+    [("Input.solid", "cid-ejsl7w", "css-tokvmb");
+    ("Input.multi", "cid-7orjvh", "css-eaeacs css-1ruxp1v css-14ksm7b");
+    ("Input.hovered", "cid-18t9scx", "css-1xu3tth css-1rwx7to");
+    ("Input.multiSel", "cid-j5w3l0", "css-1r10myy css-ltb45t");
+    ("Input.withMedia", "cid-1wbvjdi", "css-14bi921");
+    ("Input.units", "cid-4x7ffc", "css-137pweu css-1tzeee1");
+    ("Input.withFallback", "cid-asai3x", "css-1j744k")]]
+  let solid = CSS.make "label:solid cid-ejsl7w css-tokvmb" []
   let multi =
-    CSS.make "css-eaeacs-multi css-1ruxp1v-multi css-14ksm7b-multi" []
-  let hovered = CSS.make "css-1xu3tth-hovered css-1rwx7to-hovered" []
-  let multiSel = CSS.make "css-1r10myy-multiSel css-ltb45t-multiSel" []
-  let withMedia = CSS.make "css-14bi921-withMedia" []
-  let units = CSS.make "css-137pweu-units css-1tzeee1-units" []
-  let withFallback = CSS.make "css-1j744k-withFallback" []
+    CSS.make "label:multi cid-7orjvh css-eaeacs css-1ruxp1v css-14ksm7b" []
+  let hovered = CSS.make "label:hovered cid-18t9scx css-1xu3tth css-1rwx7to" []
+  let multiSel = CSS.make "label:multiSel cid-j5w3l0 css-1r10myy css-ltb45t" []
+  let withMedia = CSS.make "label:withMedia cid-1wbvjdi css-14bi921" []
+  let units = CSS.make "label:units cid-4x7ffc css-137pweu css-1tzeee1" []
+  let withFallback = CSS.make "label:withFallback cid-asai3x css-1j744k" []

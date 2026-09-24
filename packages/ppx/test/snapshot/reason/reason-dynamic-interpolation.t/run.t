@@ -2,15 +2,10 @@
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css "@property --var-17zksex{syntax:\"*\";inherits:false;}"];
-  [@css ".css-u97bjx-DynamicComponent{color:var(--var-17zksex);}"];
-  [@css ".css-13o7eu2-DynamicComponent{display:block;}"];
+  [@css ".css-u97bjx{color:var(--var-17zksex);}"];
+  [@css ".css-13o7eu2{display:block;}"];
   [@css.bindings
-    [
-      (
-        "Output.DynamicComponent",
-        "css-u97bjx-DynamicComponent css-13o7eu2-DynamicComponent",
-      ),
-    ]
+    [("Output.DynamicComponent", "cid-1hmg1vc", "css-u97bjx css-13o7eu2")]
   ];
   module DynamicComponent = {
     [@deriving abstract]
@@ -1001,7 +996,7 @@
       "Object.assign";
     let styles = (~var, _) =>
       CSS.make(
-        "css-u97bjx-DynamicComponent css-13o7eu2-DynamicComponent",
+        "label:DynamicComponent cid-1hmg1vc css-u97bjx css-13o7eu2",
         [("--var-17zksex", CSS.Types.Color.toString(var))],
       );
     let make = (props: makeProps('var)) => {

@@ -1,8 +1,8 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --native --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-tokvmb-Box{color:red;}"];
-  [@css.bindings [("Output.Box", "css-tokvmb-Box")]];
+  [@css ".css-tokvmb{color:red;}"];
+  [@css.bindings [("Output.Box", "cid-1l8coch", "css-tokvmb")]];
   module Box: {
     type makeProps;
     let make: makeProps => React.element;
@@ -960,7 +960,7 @@
       | Some(str) => " " ++ str
       | None => ""
       };
-    let styles = CSS.make("css-tokvmb-Box", []);
+    let styles = CSS.make("label:Box cid-1l8coch css-tokvmb", []);
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(props.className)
       and style = snd(styles);

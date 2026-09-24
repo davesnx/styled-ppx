@@ -3,6 +3,7 @@ module Builder = Ppxlib.Ast_builder.Default
 
 type binding = {
   longident : string;
+  identity : string;
   class_string : string;
 }
 
@@ -20,17 +21,14 @@ let refs_attribute_name = "css.refs"
 let config_attribute_name = "css.config"
 let config_env_key = "env"
 let config_env_production = "production"
+let config_library_key = "library-name"
 let sentinel_byte = '\x00'
 
 let sentinel longident =
   String.make 1 sentinel_byte ^ longident ^ String.make 1 sentinel_byte
 
-let class_chain_of_class_string class_string =
-  String.split_on_char ' ' class_string
-  |> List.filter (fun s -> s <> "")
-  |> String.concat "."
-
-let binding ~longident ~class_string = { longident; class_string }
+let binding ~longident ~identity ~class_string =
+  { longident; identity; class_string }
 
 let ref_loc ~longident ~file ~start_line ~start_col ~end_col =
   { longident; file; start_line; start_col; end_col }
@@ -64,6 +62,7 @@ let bindings_attribute entries =
     Builder.pexp_tuple ~loc
       [
         Builder.estring ~loc entry.longident;
+        Builder.estring ~loc entry.identity;
         Builder.estring ~loc entry.class_string;
       ]
   in
@@ -129,11 +128,16 @@ let decode_list ~attribute ~decode (e : Ppxlib.expression) =
 
 let decode_binding (e : Ppxlib.expression) =
   match e.pexp_desc with
-  | Pexp_tuple [ longident_e; class_e ] ->
-    (match string_of_const_expr longident_e, string_of_const_expr class_e with
-    | Some longident, Some class_string -> Ok { longident; class_string }
-    | _ -> Error "expected (longident, class_string) string tuple")
-  | _ -> Error "expected (longident, class_string) tuple"
+  | Pexp_tuple [ longident_e; identity_e; class_e ] ->
+    (match
+       ( string_of_const_expr longident_e,
+         string_of_const_expr identity_e,
+         string_of_const_expr class_e )
+     with
+    | Some longident, Some identity, Some class_string ->
+      Ok { longident; identity; class_string }
+    | _ -> Error "expected (longident, identity, class_string) string tuple")
+  | _ -> Error "expected (longident, identity, class_string) tuple"
 
 let decode_ref (e : Ppxlib.expression) =
   match e.pexp_desc with
@@ -195,8 +199,7 @@ let resolve_sentinels ~lookup ~on_unresolved ~on_malformed (rule : string) :
       | Some j ->
         let longident = String.sub rule start (j - start) in
         (match lookup longident with
-        | Some class_string ->
-          Buffer.add_string buf (class_chain_of_class_string class_string)
+        | Some identity -> Buffer.add_string buf identity
         | None ->
           on_unresolved longident;
           Buffer.add_char buf c;

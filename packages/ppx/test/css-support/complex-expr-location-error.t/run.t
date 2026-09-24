@@ -7,6 +7,7 @@ This test ensures error locations are correct in complex interpolation expressio
   $ cat > dune << EOF
   > (executable
   >  (name input)
+  >  (flags :standard -short-paths)
   >  (libraries styled-ppx.native)
   >  (preprocess (pps styled-ppx)))
   > EOF

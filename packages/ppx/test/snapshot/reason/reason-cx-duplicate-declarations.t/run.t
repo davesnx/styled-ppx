@@ -14,49 +14,45 @@ atom shape and hash.
   $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
   [@@@css "@property --c-kv4uq2{syntax:\"*\";inherits:false;}"]
-  [@@@css ".css-ztpkbn-dup{color:blue;color:red;color:blue;}"]
-  [@@@css ".css-17ax8u2-fallback{display:-webkit-box;display:flex;}"]
-  [@@@css ".css-1uk1gs8-interleaved{margin:0;}"]
-  [@@@css ".css-dhb7kq-interleaved{color:blue;color:red;}"]
-  [@@@css
-    "@media (min-width: 600px) {.css-1g5p0x6-mediaInterleaved{color:green;}}"]
-  [@@@css ".css-dhb7kq-mediaInterleaved{color:blue;color:red;}"]
-  [@@@css ".css-odz94x-shorthandReset{margin-top:5px;}"]
-  [@@@css ".css-19xrixt-shorthandReset{margin:0;margin:10px;}"]
-  [@@@css ".css-1e7bukr-nested:hover{color:blue;color:red;}"]
-  [@@@css ".css-mngo80-twice:hover{color:red;}"]
-  [@@@css ".css-zkbrel-custom{--Foo:1px;}"]
-  [@@@css ".css-1r75vyo-custom{--foo:2px;}"]
-  [@@@css ".css-tokvmb-x{color:red;}"]
-  [@@@css ".css-dhb7kq-x{color:blue;color:red;}"]
-  [@@@css ".css-zwzjs7-vars{margin:0;margin:var(--c-kv4uq2);}"]
+  [@@@css ".css-ztpkbn{color:blue;color:red;color:blue;}"]
+  [@@@css ".css-17ax8u2{display:-webkit-box;display:flex;}"]
+  [@@@css ".css-1uk1gs8{margin:0;}"]
+  [@@@css ".css-dhb7kq{color:blue;color:red;}"]
+  [@@@css "@media (min-width: 600px) {.css-1g5p0x6{color:green;}}"]
+  [@@@css ".css-odz94x{margin-top:5px;}"]
+  [@@@css ".css-19xrixt{margin:0;margin:10px;}"]
+  [@@@css ".css-1e7bukr:hover{color:blue;color:red;}"]
+  [@@@css ".css-mngo80:hover{color:red;}"]
+  [@@@css ".css-zkbrel{--Foo:1px;}"]
+  [@@@css ".css-1r75vyo{--foo:2px;}"]
+  [@@@css ".css-tokvmb{color:red;}"]
+  [@@@css ".css-zwzjs7{margin:0;margin:var(--c-kv4uq2);}"]
   [@@@css.bindings
-    [("Input.dup", "css-ztpkbn-dup");
-    ("Input.fallback", "css-17ax8u2-fallback");
-    ("Input.interleaved", "css-1uk1gs8-interleaved css-dhb7kq-interleaved");
-    ("Input.mediaInterleaved",
-      "css-1g5p0x6-mediaInterleaved css-dhb7kq-mediaInterleaved");
-    ("Input.shorthandReset",
-      "css-odz94x-shorthandReset css-19xrixt-shorthandReset");
-    ("Input.nested", "css-1e7bukr-nested");
-    ("Input.twice", "css-mngo80-twice");
-    ("Input.custom", "css-zkbrel-custom css-1r75vyo-custom");
-    ("Input.A.x", "css-tokvmb-x");
-    ("Input.B.x", "css-dhb7kq-x");
-    ("Input.vars", "css-zwzjs7-vars")]]
-  let dup = CSS.make "css-ztpkbn-dup" []
-  let fallback = CSS.make "css-17ax8u2-fallback" []
+    [("Input.dup", "cid-1rqoi1k", "css-ztpkbn");
+    ("Input.fallback", "cid-1t6se51", "css-17ax8u2");
+    ("Input.interleaved", "cid-8z5ze6", "css-1uk1gs8 css-dhb7kq");
+    ("Input.mediaInterleaved", "cid-17s8jfs", "css-1g5p0x6 css-dhb7kq");
+    ("Input.shorthandReset", "cid-18j0etq", "css-odz94x css-19xrixt");
+    ("Input.nested", "cid-swo4az", "css-1e7bukr");
+    ("Input.twice", "cid-bxfxu3", "css-mngo80");
+    ("Input.custom", "cid-216v6m", "css-zkbrel css-1r75vyo");
+    ("Input.A.x", "cid-hplgo2", "css-tokvmb");
+    ("Input.B.x", "cid-i6ik4z", "css-dhb7kq");
+    ("Input.vars", "cid-10jlpap", "css-zwzjs7")]]
+  let dup = CSS.make "label:dup cid-1rqoi1k css-ztpkbn" []
+  let fallback = CSS.make "label:fallback cid-1t6se51 css-17ax8u2" []
   let interleaved =
-    CSS.make "css-1uk1gs8-interleaved css-dhb7kq-interleaved" []
+    CSS.make "label:interleaved cid-8z5ze6 css-1uk1gs8 css-dhb7kq" []
   let mediaInterleaved =
-    CSS.make "css-1g5p0x6-mediaInterleaved css-dhb7kq-mediaInterleaved" []
+    CSS.make "label:mediaInterleaved cid-17s8jfs css-1g5p0x6 css-dhb7kq" []
   let shorthandReset =
-    CSS.make "css-odz94x-shorthandReset css-19xrixt-shorthandReset" []
-  let nested = CSS.make "css-1e7bukr-nested" []
-  let twice = CSS.make "css-mngo80-twice" []
-  let custom = CSS.make "css-zkbrel-custom css-1r75vyo-custom" []
-  module A = struct let x = CSS.make "css-tokvmb-x" [] end
-  module B = struct let x = CSS.make "css-dhb7kq-x" [] end
+    CSS.make "label:shorthandReset cid-18j0etq css-odz94x css-19xrixt" []
+  let nested = CSS.make "label:nested cid-swo4az css-1e7bukr" []
+  let twice = CSS.make "label:twice cid-bxfxu3 css-mngo80" []
+  let custom = CSS.make "label:custom cid-216v6m css-zkbrel css-1r75vyo" []
+  module A = struct let x = CSS.make "label:x cid-hplgo2 css-tokvmb" [] end
+  module B = struct let x = CSS.make "label:x cid-i6ik4z css-dhb7kq" [] end
   let c = "10px"
   let vars =
-    CSS.make "css-zwzjs7-vars" [("--c-kv4uq2", (CSS.Types.Margin.toString c))]
+    CSS.make "label:vars cid-10jlpap css-zwzjs7"
+      [("--c-kv4uq2", (CSS.Types.Margin.toString c))]

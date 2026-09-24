@@ -4,9 +4,9 @@ flat index — no AST walking, no module-path reconstruction.
 
   $ cat > a.ml <<EOF
   > [@@@css.bindings [
-  >   ("A.top", "top-leaf");
-  >   ("A.Inner.near", "near-leaf");
-  >   ("A.Inner.DeepInner.leaf", "deep-leaf")
+  >   ("A.top", "top-leaf", "top-leaf");
+  >   ("A.Inner.near", "near-leaf", "near-leaf");
+  >   ("A.Inner.DeepInner.leaf", "deep-leaf", "deep-leaf")
   > ]]
   > module Inner = struct
   >   module DeepInner = struct

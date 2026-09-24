@@ -15,40 +15,37 @@ and the runtime `CSS.make` call must carry an empty list (no phantom
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb-foo{color:red;}"];
-  [@css ".css-11o9qin-bar.css-tokvmb-foo{color:blue;}"];
-  [@css ".css-1vf0mg9-buttonLoadingAnimation{background-size:1rem 1rem;}"];
+  [@css ".css-tokvmb{color:red;}"];
+  [@css ".css-11o9qin.cid-zec317{color:blue;}"];
+  [@css ".css-1vf0mg9{background-size:1rem 1rem;}"];
   [@css
-    ".css-rj3gnv-buttonLoadingAnimation{-webkit-animation-duration:1000ms;animation-duration:1000ms;}"
+    ".css-rj3gnv{-webkit-animation-duration:1000ms;animation-duration:1000ms;}"
   ];
-  [@css ".css-f9xk9e-colorAccent{background-color:blue;}"];
+  [@css ".css-f9xk9e{background-color:blue;}"];
   [@css
-    ".css-1eo9rnb-colorAccent:disabled:not(.css-1eo9rnb-colorAccent.css-1vf0mg9-buttonLoadingAnimation.css-rj3gnv-buttonLoadingAnimation){background-color:gray;}"
+    ".css-1eo9rnb:disabled:not(.css-1eo9rnb.cid-1wqjj7x){background-color:gray;}"
   ];
   [@css.bindings
     [
-      ("Input.foo", "css-tokvmb-foo"),
-      ("Input.bar", "css-11o9qin-bar"),
-      (
-        "Input.buttonLoadingAnimation",
-        "css-1vf0mg9-buttonLoadingAnimation css-rj3gnv-buttonLoadingAnimation",
-      ),
-      ("Input.colorAccent", "css-f9xk9e-colorAccent css-1eo9rnb-colorAccent"),
+      ("Input.foo", "cid-zec317", "css-tokvmb"),
+      ("Input.bar", "cid-1eelq62", "css-11o9qin"),
+      ("Input.buttonLoadingAnimation", "cid-1wqjj7x", "css-1vf0mg9 css-rj3gnv"),
+      ("Input.colorAccent", "cid-qhdd42", "css-f9xk9e css-1eo9rnb"),
     ]
   ];
   
-  let foo = CSS.make("css-tokvmb-foo", []);
+  let foo = CSS.make("label:foo cid-zec317 css-tokvmb", []);
   
-  let bar = CSS.make("css-11o9qin-bar", []);
+  let bar = CSS.make("label:bar cid-1eelq62 css-11o9qin", []);
   
   let buttonLoadingAnimation =
     CSS.make(
-      "css-1vf0mg9-buttonLoadingAnimation css-rj3gnv-buttonLoadingAnimation",
+      "label:buttonLoadingAnimation cid-1wqjj7x css-1vf0mg9 css-rj3gnv",
       [],
     );
   
   let colorAccent =
-    CSS.make("css-f9xk9e-colorAccent css-1eo9rnb-colorAccent", []);
+    CSS.make("label:colorAccent cid-qhdd42 css-f9xk9e css-1eo9rnb", []);
   
   let _ = (foo, bar, buttonLoadingAnimation, colorAccent);
 

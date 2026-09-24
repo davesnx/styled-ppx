@@ -139,6 +139,7 @@ let make_bindings_attribute = (entries: list(Css_bindings.entry)) =>
   |> List.map((entry: Css_bindings.entry) =>
        Css_extraction.binding(
          ~longident=entry.longident,
+         ~identity=entry.identity,
          ~class_string=entry.class_string,
        )
      )
@@ -208,12 +209,23 @@ let css_error_expr = (~payload_loc) => {
   );
 };
 
-let record_css_binding = (~file, ~main_module, ~scope, ~name, ~classNames) => {
-  Local_selector_environment.register(~file, ~scope, ~name, ~classNames);
-  let longident = String.concat(".", [main_module, ...scope] @ [name]);
-  let class_string = String.concat(" ", classNames);
-  Css_bindings.record(~longident, ~class_string);
-};
+/* [name] is the registry name (the top-level binding, or the styled module
+   name) - always what cross-module `$(M.name)` refs and the longident use.
+   [identity] is the binding's identity class, computed by `Css_file.push`
+   from the *local* label (which, for a function-local rebinding, differs
+   from [name] - see documents/css-extraction.md's "Css_bindings" section); `None` for
+   an anonymous/`_` local binding, in which case there is nothing to
+   register or index. */
+let record_css_binding =
+    (~file, ~main_module, ~scope, ~name, ~identity, ~atomClasses) =>
+  switch (identity) {
+  | Some(cid) =>
+    Local_selector_environment.register(~file, ~scope, ~name, ~className=cid);
+    let longident = String.concat(".", [main_module, ...scope] @ [name]);
+    let class_string = String.concat(" ", atomClasses);
+    Css_bindings.record(~longident, ~identity=cid, ~class_string);
+  | None => ()
+  };
 
 let expand_css_expression =
     (
@@ -227,7 +239,6 @@ let expand_css_expression =
     ) => {
   open Ppxlib;
   File.set(file);
-  let label = Settings.Get.minify() ? None : label_name;
   switch (payload.pexp_desc) {
   | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
     let source_position_start =
@@ -246,18 +257,28 @@ let expand_css_expression =
       let validations = type_check_rule_list(rule_list);
       switch (get_errors(validations)) {
       | [] =>
-        let (classNames, dynamic_vars) =
+        let (identity, atomClasses, dynamic_vars) =
           Css_file.push(
             ~file,
+            ~main_module,
             ~scope,
             ~opens,
             ~source_position_start,
-            ~label?,
+            ~name=label_name,
             rule_list,
           );
+        let classNames =
+          Css_file.classes_with_identity(~identity, atomClasses);
         switch (registry_name) {
         | Some(name) =>
-          record_css_binding(~file, ~main_module, ~scope, ~name, ~classNames)
+          record_css_binding(
+            ~file,
+            ~main_module,
+            ~scope,
+            ~name,
+            ~identity,
+            ~atomClasses,
+          )
         | None => ()
         };
         let marker = Dev_mode.marker(label_name);
@@ -499,8 +520,15 @@ let expand_styled_module =
     (~file, ~main_module, ~scope, ~opens, ~name, ~htmlTag, payload) => {
   open Ppxlib;
   File.set(file);
-  let record_component_binding = classNames =>
-    record_css_binding(~file, ~main_module, ~scope, ~name, ~classNames);
+  let record_component_binding = (~identity, atomClasses) =>
+    record_css_binding(
+      ~file,
+      ~main_module,
+      ~scope,
+      ~name,
+      ~identity,
+      ~atomClasses,
+    );
 
   switch (payload.pexp_desc) {
   | Pexp_constant(Pconst_string(txt, stringLoc, delimiter)) =>
@@ -519,20 +547,23 @@ let expand_styled_module =
     | Ok(rule_list) =>
       switch (get_errors(type_check_rule_list(rule_list))) {
       | [] =>
-        let (classNames, dynamic_vars) =
+        let (identity, atomClasses, dynamic_vars) =
           Css_file.push(
             ~file,
+            ~main_module,
             ~scope,
             ~opens,
             ~source_position_start,
-            ~label=name,
+            ~name=Some(name),
             rule_list,
           );
-        record_component_binding(classNames);
+        let classNames =
+          Css_file.classes_with_identity(~identity, atomClasses);
+        record_component_binding(~identity, atomClasses);
         let styles =
           Css_to_runtime.render_make_call(
             ~loc=stringLoc,
-            ~marker=None,
+            ~marker=Dev_mode.marker(Some(name)),
             ~classNames,
             ~dynamic_vars,
           );
@@ -581,6 +612,7 @@ let expand_styled_module =
     Generate.dynamicExtractedComponent(
       ~loc=payload.pexp_loc,
       ~file,
+      ~main_module,
       ~scope,
       ~opens,
       ~htmlTag,
@@ -601,6 +633,13 @@ let binding_name_from_pat = (pat: Ppxlib.pattern): option(string) =>
   | _ => None
   };
 
+/* A `let` whose name starts with `__` is a temporary another ppx introduced
+   (server-reason-react's styles-attribute expansion binds `__incoming` and
+   `__existing` before this ppx lowers the `[%css]` inside them), so a `[%css]`
+   under it keeps the enclosing user binding as its label, marker and identity
+   instead of taking the generated name. */
+let is_generated_binder = name => String.starts_with(~prefix="__", name);
+
 let register_string_binding = (~file, ~scope, ~name, expr: Ppxlib.expression) =>
   switch (expr.pexp_desc) {
   | Pexp_constant(Pconst_string(value, _, _)) =>
@@ -608,7 +647,7 @@ let register_string_binding = (~file, ~scope, ~name, expr: Ppxlib.expression) =>
       ~file,
       ~scope,
       ~name,
-      ~classNames=[value],
+      ~className=value,
     )
   | _ => ()
   };
@@ -668,11 +707,11 @@ let map_css_expressions =
           let bindings =
             List.map(
               (binding: Ppxlib.value_binding) => {
-                let label_name = binding_name_from_pat(binding.pvb_pat);
                 let expr =
-                  switch (label_name) {
-                  | Some(name) =>
+                  switch (binding_name_from_pat(binding.pvb_pat)) {
+                  | Some(name) when !is_generated_binder(name) =>
                     map_with_label(~label_name=Some(name), binding.pvb_expr)
+                  | Some(_)
                   | None => self#expression(binding.pvb_expr)
                   };
                 {
@@ -961,6 +1000,24 @@ let () = {
     ),
   );
 
+  Ppxlib.Driver.add_arg(
+    ~doc=Settings.namespace.doc,
+    Settings.namespace.flag,
+    Arg.String(Settings.Update.namespace),
+  );
+
+  /* dune passes `--cookie library-name="<name>"` to every ppx run inside a
+     (library ...) stanza. Recorded so the wire protocol can tell the
+     aggregator which library a file's rules belong to. */
+  Ppxlib.Driver.Cookies.add_simple_handler(
+    "library-name",
+    Ppxlib.Ast_pattern.estring(Ppxlib.Ast_pattern.__),
+    ~f=
+      fun
+      | Some(name) => Settings.Update.library(name)
+      | None => (),
+  );
+
   let impl = (_ctx, str: Ppxlib.structure) => {
     let file =
       switch (str) {
@@ -985,23 +1042,32 @@ let () = {
       | _ => [make_refs_attribute(cross_module_entries)]
       };
     let dep_items = List.map(make_synthetic_dep, cross_module_longidents);
-    /* Declares production mode in the wire protocol so the aggregator can
-       minify without a flag of its own; absence means development. */
+    let config_entries =
+      (
+        Settings.Get.minify()
+          ? [
+            (
+              Css_extraction.config_env_key,
+              Css_extraction.config_env_production,
+            ),
+          ]
+          : []
+      )
+      @ (
+        switch (Settings.Get.library()) {
+        | Some(name) => [(Css_extraction.config_library_key, name)]
+        | None => []
+        }
+      );
     let config_items =
-      switch (rule_items, bindings_items) {
-      | ([], []) => []
-      | _ when Settings.Get.minify() => [
-          Css_extraction.config_attribute([("env", "production")]),
-        ]
-      | _ => []
+      switch (config_entries) {
+      | [] => []
+      | _ =>
+        switch (rule_items, bindings_items) {
+        | ([], []) => []
+        | _ => [Css_extraction.config_attribute(config_entries)]
+        }
       };
-    /* Order:
-       - extraction config (production marker)
-       - extracted CSS rules
-       - binding exports
-       - cross-module refs descriptor
-       - dep-tracking synthetic lets
-       - user's source. */
     config_items @ rule_items @ bindings_items @ refs_items @ dep_items @ str;
   };
 
