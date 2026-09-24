@@ -521,7 +521,12 @@ module name), and an occurrence index — folded in only when a
 `(scope, name)` pair repeats within one compilation unit (e.g. two
 functions each with their own `let a = [%css ...]`), so a name seen
 exactly once keeps a stable identity independent of whether a later
-occurrence ever appears.
+occurrence ever appears. A `let` whose name starts with `__` does not count
+as a binding here: it is a temporary another ppx introduced (server-reason-react's
+`styles=` expansion binds `__incoming` and `__existing` before the `[%css]`
+inside them is lowered), so the css under it takes the enclosing user
+binding's name for its label, dev marker and identity
+(`packages/ppx/test/css-support/styles-optional-className.t`).
 
 **`--namespace <string>`** overrides the library-name default. Two dune
 libraries never share a name, so same-named modules and bindings in

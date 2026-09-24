@@ -629,6 +629,13 @@ let binding_name_from_pat = (pat: Ppxlib.pattern): option(string) =>
   | _ => None
   };
 
+/* A `let` whose name starts with `__` is a temporary another ppx introduced
+   (server-reason-react's styles-attribute expansion binds `__incoming` and
+   `__existing` before this ppx lowers the `[%css]` inside them), so a `[%css]`
+   under it keeps the enclosing user binding as its label, marker and identity
+   instead of taking the generated name. */
+let is_generated_binder = name => String.starts_with(~prefix="__", name);
+
 let register_string_binding = (~file, ~scope, ~name, expr: Ppxlib.expression) =>
   switch (expr.pexp_desc) {
   | Pexp_constant(Pconst_string(value, _, _)) =>
@@ -696,11 +703,11 @@ let map_css_expressions =
           let bindings =
             List.map(
               (binding: Ppxlib.value_binding) => {
-                let label_name = binding_name_from_pat(binding.pvb_pat);
                 let expr =
-                  switch (label_name) {
-                  | Some(name) =>
+                  switch (binding_name_from_pat(binding.pvb_pat)) {
+                  | Some(name) when !is_generated_binder(name) =>
                     map_with_label(~label_name=Some(name), binding.pvb_expr)
+                  | Some(_)
                   | None => self#expression(binding.pvb_expr)
                   };
                 {
