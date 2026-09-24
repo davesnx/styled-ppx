@@ -963,7 +963,8 @@
       | Some(str) => " " ++ str
       | None => ""
       };
-    let styles = CSS.make("cid-11ddqpw css-k008qs css-1tyndxa", []);
+    let styles =
+      CSS.make("label:MultiLineStrings cid-11ddqpw css-k008qs css-1tyndxa", []);
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(props.className)
       and style = snd(styles);

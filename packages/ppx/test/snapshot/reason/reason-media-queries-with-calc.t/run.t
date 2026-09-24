@@ -989,7 +989,8 @@
       "Reflect.deleteProperty";
     external assign2: (Js.t({..}), makeProps, Js.t({..})) => Js.t({..}) =
       "Object.assign";
-    let styles = CSS.make("cid-1mcoche css-1gk5m2e css-d1l0w0", []);
+    let styles =
+      CSS.make("label:MediaQueryCalc cid-1mcoche css-1gk5m2e css-d1l0w0", []);
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(classNameGet(props))
       and style = snd(styles);

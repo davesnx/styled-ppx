@@ -992,7 +992,7 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "cid-18tumag css-dy0iev",
+        "label:FadeIn cid-18tumag css-dy0iev",
         CSS.Types.AnimationName.toStyleVars("--animation-1sd4kiq", animation),
       );
     let make = (props: makeProps) => {

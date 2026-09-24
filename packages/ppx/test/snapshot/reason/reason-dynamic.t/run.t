@@ -1000,7 +1000,7 @@
       "Object.assign";
     let styles = (~var, ~id, _) =>
       CSS.make(
-        "cid-1hmg1vc css-fhnx1u css-k008qs",
+        "label:DynamicComponent cid-1hmg1vc css-fhnx1u css-k008qs",
         [
           ("--var-1uix7by", CSS.Types.Color.toString(var)),
           ("--id-1ks2xuv", CSS.Types.Color.toString(id)),

@@ -989,7 +989,8 @@
       "Reflect.deleteProperty";
     external assign2: (Js.t({..}), makeProps, Js.t({..})) => Js.t({..}) =
       "Object.assign";
-    let styles = CSS.make("cid-11ddqpw css-k008qs css-1tyndxa", []);
+    let styles =
+      CSS.make("label:MultiLineStrings cid-11ddqpw css-k008qs css-1tyndxa", []);
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(classNameGet(props))
       and style = snd(styles);

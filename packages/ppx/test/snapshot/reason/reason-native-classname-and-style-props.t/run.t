@@ -960,7 +960,7 @@
       | Some(str) => " " ++ str
       | None => ""
       };
-    let styles = CSS.make("cid-1l8coch css-tokvmb", []);
+    let styles = CSS.make("label:Box cid-1l8coch css-tokvmb", []);
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(props.className)
       and style = snd(styles);

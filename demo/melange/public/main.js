@@ -63220,7 +63220,7 @@ function getOrEmpty(str) {
 }
 function styles2(lolaOpt, param) {
   const lola = lolaOpt !== void 0 ? lolaOpt : px2(0);
-  return make7("cid-dpr7nb css-k008qs css-cgq59l css-r0vq9t", {
+  return make7("label:Cositas cid-dpr7nb css-k008qs css-cgq59l css-r0vq9t", {
     hd: [
       "--lola-8erbae",
       Gap.toString(lola)

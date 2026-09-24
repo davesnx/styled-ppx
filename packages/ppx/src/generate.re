@@ -1134,7 +1134,7 @@ let extractedDynamicStyles =
       onClassNames(~identity, atomClasses);
       Css_to_runtime.render_make_call(
         ~loc,
-        ~marker=None,
+        ~marker=Dev_mode.marker(Some(moduleName)),
         ~classNames,
         ~dynamic_vars,
       );

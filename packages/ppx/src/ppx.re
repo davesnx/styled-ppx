@@ -559,7 +559,7 @@ let expand_styled_module =
         let styles =
           Css_to_runtime.render_make_call(
             ~loc=stringLoc,
-            ~marker=None,
+            ~marker=Dev_mode.marker(Some(name)),
             ~classNames,
             ~dynamic_vars,
           );

@@ -998,7 +998,10 @@
     external assign2: (Js.t({..}), makeProps, Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles =
-      CSS.make("cid-36wyir css-99qt2j css-hxxfxf css-qzw9gh css-z0beaj", []);
+      CSS.make(
+        "label:SelectorsMediaQueries cid-36wyir css-99qt2j css-hxxfxf css-qzw9gh css-z0beaj",
+        [],
+      );
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(classNameGet(props))
       and style = snd(styles);

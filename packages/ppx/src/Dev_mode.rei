@@ -1,8 +1,11 @@
-/** Dev-mode marker class support for [%css].
+/** Dev-mode marker class support for [%css] and [%styled.<tag>].
 
-    Every [%css] binding gets a leading marker class derived from its
-    enclosing [let] binding name (e.g. [let layout = [%css ...]] yields
-    [class="label:layout c-..."]). The marker has no associated CSS rule; it
+    Every [%css] binding, and every [%styled.<tag>] component, gets a
+    leading marker class derived from its name - the enclosing [let]
+    binding for [%css] (e.g. [let layout = [%css ...]] yields
+    [class="label:layout c-..."]), the module name for a styled component
+    (e.g. [module Box = [%styled.div ...]] yields
+    [class="label:Box c-..."]). The marker has no associated CSS rule; it
     exists purely as a grep-target in DOM inspectors.
 
     Dev mode is on by default. [--minify] and [--env production] turn it
