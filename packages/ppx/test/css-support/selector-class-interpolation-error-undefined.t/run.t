@@ -15,7 +15,7 @@ A selector ref can resolve to an earlier string literal binding.
   [@css ".css-1wbqrk2.css-foo{color:red;}"];
   [@css.bindings [("Input.bad", "cid-1ztayl", "css-1wbqrk2")]];
   let undefined = "css-foo";
-  let bad = CSS.make("cx-bad cid-1ztayl css-1wbqrk2", []);
+  let bad = CSS.make("label:bad cid-1ztayl css-1wbqrk2", []);
   let _ = (undefined, bad);
 
   $ dune build

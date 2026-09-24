@@ -5,7 +5,7 @@ only strips CSS whitespace, it never changes a class name.
 
   $ refmt --parse re --print ml input.re > input.ml
 
-With --env development, classNames carry a cx-<binding> marker, and no
+With --env development, classNames carry a label:<binding> marker, and no
 [@@@css.config] is emitted (absence means development).
 
   $ ../../standalone.exe --env development --impl input.ml -o dev.ml
@@ -17,8 +17,8 @@ With --env development, classNames carry a cx-<binding> marker, and no
   .css-38zrbw{padding:12px;}
   .css-tokvmb{color:red;}
   $ grep "CSS.make" dev.ml
-  let layout = CSS.make "cx-layout cid-1jj5tmt css-k008qs css-38zrbw" []
-  let button = CSS.make "cx-button cid-l55coe css-tokvmb" []
+  let layout = CSS.make "label:layout cid-1jj5tmt css-k008qs css-38zrbw" []
+  let button = CSS.make "label:button cid-l55coe css-tokvmb" []
 
 With --env production, the same class names appear without markers, and the
 PPX declares the environment in the wire protocol so styled-ppx.generate

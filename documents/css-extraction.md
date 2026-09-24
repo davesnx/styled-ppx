@@ -482,7 +482,7 @@ class, dev or production. Minting lives in
 The environment is a PPX concern, set once per `(pps styled-ppx ...)`
 stanza: `--env production` (alias for `--minify`) only minifies rule
 bodies — it has no effect on class names; `--env development` (alias for
-`--dev`) adds `cx-<binding>` marker classes. Dev markers are on by
+`--dev`) adds `label:<binding>` marker classes. Dev markers are on by
 default, so a bare `(pps styled-ppx)` stanza already gets them;
 `--minify` and `--env production` turn them off, and an explicit `--dev`
 forces them back on regardless. The aggregator learns the environment
@@ -507,8 +507,8 @@ second, build-independent class alongside its atoms: `cid-<hash>`
 (`Hash_class.identity_class`). `$(binding)` and `&.$(binding)` selector
 references resolve to this identity, verbatim, regardless of how many
 atoms the binding minted or whether it minted any at all. It is emitted
-first among the atoms in the className string (after the `cx-<binding>`
-dev marker, when present): `cx-<binding> cid-<hash> css-<hash> ...`.
+first among the atoms in the className string (after the `label:<binding>`
+dev marker, when present): `label:<binding> cid-<hash> css-<hash> ...`.
 
 **Inputs**, joined with `\0` and murmur2-hashed: the namespace (the
 `--namespace` flag when given, else the dune library name from the

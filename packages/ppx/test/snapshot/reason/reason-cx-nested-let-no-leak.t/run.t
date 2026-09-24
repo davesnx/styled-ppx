@@ -12,7 +12,7 @@ function args, and other inner expressions stay private.
     [("Input.outer", "cid-1din52f", "css-tokvmb");
     ("Input.make_button", "cid-1ue7vq2", "css-ythpkc")]]
   let outer =
-    let inner = CSS.make "cx-inner cid-1din52f css-tokvmb" [] in inner
+    let inner = CSS.make "label:inner cid-1din52f css-tokvmb" [] in inner
   let make_button active =
-    CSS.make "cx-make_button cid-1ue7vq2 css-ythpkc"
+    CSS.make "label:make_button cid-1ue7vq2 css-ythpkc"
       [("--active-f7rv17", (CSS.Types.Color.toString active))]

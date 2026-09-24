@@ -14,7 +14,7 @@ same-module `localFlag` is already resolved to its class.
   $ grep "css-" n.ml | head -3
   [@@@css ".css-djuldm.cid-1026km9.\000M.marker\000{color:blue;}"]
     ("N.container", "cid-1ov2ckq", "css-djuldm")]]
-  let container = CSS.make "cx-container cid-1ov2ckq css-djuldm" []
+  let container = CSS.make "label:container cid-1ov2ckq css-djuldm" []
 
 The aggregator resolves `M.marker`. Final output matches what an inlined
 same-module reference would produce.

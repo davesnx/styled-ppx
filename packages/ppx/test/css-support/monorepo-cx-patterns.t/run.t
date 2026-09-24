@@ -83,15 +83,16 @@ If this test fail means that the module is not in sync with the ppx
   
   let _spaceBeforeColon =
     CSS.make(
-      "cx-_spaceBeforeColon cid-pwoumt css-34k09d css-1cx090v",
+      "label:_spaceBeforeColon cid-pwoumt css-34k09d css-1cx090v",
       [("--tertiary-1cttnp6", CSS.Types.Color.toString(Color.Text.tertiary))],
     );
   
-  let _tabInnerFirst = CSS.make("cx-_tabInnerFirst cid-110u1xw css-qg0an3", []);
+  let _tabInnerFirst =
+    CSS.make("label:_tabInnerFirst cid-110u1xw css-qg0an3", []);
   
   let _multiShadowImportant =
     CSS.make(
-      "cx-_multiShadowImportant cid-c7rk0r css-96uk0n",
+      "label:_multiShadowImportant cid-c7rk0r css-96uk0n",
       [
         ("--line-p27yoa_1", CSS.Types.Color.toString(Color.Border.line)),
         ("--line-p27yoa_2", CSS.Types.Color.toString(Color.Border.line)),
@@ -100,7 +101,7 @@ If this test fail means that the module is not in sync with the ppx
   
   let _tabTextFirst =
     CSS.make(
-      "cx-_tabTextFirst cid-19955vg css-1mx0ppg css-u38k1n",
+      "label:_tabTextFirst cid-19955vg css-1mx0ppg css-u38k1n",
       [
         ("--line-c1zhnk_1", CSS.Types.Color.toString(Color.Border.line)),
         ("--line-c1zhnk_2", CSS.Types.Color.toString(Color.Border.line)),
@@ -109,7 +110,7 @@ If this test fail means that the module is not in sync with the ppx
   
   let _tabText =
     CSS.make(
-      "cx-_tabText cid-e443o3 css-15h1qzw",
+      "label:_tabText cid-e443o3 css-15h1qzw",
       [
         ("--secondary-fn5pf1", CSS.Types.Color.toString(Color.Text.secondary)),
         ("--box_-1n37ehb", CSS.Types.Color.toString(Color.Background.box_)),
@@ -119,17 +120,17 @@ If this test fail means that the module is not in sync with the ppx
       ],
     );
   
-  let _sidebarClosed = CSS.make("cx-_sidebarClosed cid-1wtohw8", []);
+  let _sidebarClosed = CSS.make("label:_sidebarClosed cid-1wtohw8", []);
   
   let _sidebar =
     CSS.make(
-      "cx-_sidebar cid-jjvyqu css-i9gxme css-r6z5ec css-tjsoaq css-145l4ca css-1oluo0q css-2io1ml css-1k938xr",
+      "label:_sidebar cid-jjvyqu css-i9gxme css-r6z5ec css-tjsoaq css-145l4ca css-1oluo0q css-2io1ml css-1k938xr",
       [],
     );
   
-  let _checkbox = CSS.make("cx-_checkbox cid-1sltg0l css-1vsc0qv", []);
+  let _checkbox = CSS.make("label:_checkbox cid-1sltg0l css-1vsc0qv", []);
   
-  let _transitions = CSS.make("cx-_transitions cid-1jxvvla css-1hwm8mm", []);
+  let _transitions = CSS.make("label:_transitions cid-1jxvvla css-1hwm8mm", []);
   
   let _shadow1: CSS.Shadow.t =
     CSS.Shadow.box(~blur=`px(100), `hex("000000"), ~inset=true);

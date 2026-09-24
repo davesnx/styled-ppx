@@ -22,12 +22,12 @@ bare `$(marker)` resolves to the included `Css.marker` binding.
     ]
   ];
   module Css = {
-    let marker = CSS.make("cx-marker cid-zr2uk1 css-tokvmb", []);
+    let marker = CSS.make("label:marker cid-zr2uk1 css-tokvmb", []);
   };
   
   include Css;
   
-  let wrapper = CSS.make("cx-wrapper cid-4f6ye3 css-ik1kdg", []);
+  let wrapper = CSS.make("label:wrapper cid-4f6ye3 css-ik1kdg", []);
   
   let _ = (Css.marker, wrapper);
 

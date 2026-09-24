@@ -28,7 +28,7 @@ let minify = {
 
 let dev = {
   flag: "--dev",
-  doc: "Emit dev-mode marker classes (e.g. cx-layout) on [%css] output to make atomized class lists greppable in DOM inspectors. No effect on extracted CSS or atom hashes. On by default; --minify and --env production turn it off, --dev forces it back on.",
+  doc: "Emit dev-mode marker classes (e.g. label:layout) on [%css] output to make atomized class lists greppable in DOM inspectors. No effect on extracted CSS or atom hashes. On by default; --minify and --env production turn it off, --dev forces it back on.",
   value: None,
   defaultValue: true,
 };

@@ -2052,4 +2052,4 @@ through the static extraction pipeline. They also register selector bindings so
       );
     };
   };
-  let card = CSS.make("cx-card cid-16nw107 css-yr9qag css-10q7t6m", []);
+  let card = CSS.make("label:card cid-16nw107 css-yr9qag css-10q7t6m", []);

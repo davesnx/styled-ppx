@@ -20,7 +20,7 @@ only indexes [%css] class handles.
     let marker = "external-marker";
   };
   
-  let wrapper = CSS.make("cx-wrapper cid-4f6ye3 css-59bkuc", []);
+  let wrapper = CSS.make("label:wrapper cid-4f6ye3 css-59bkuc", []);
   
   let _ = (Css.marker, wrapper);
 

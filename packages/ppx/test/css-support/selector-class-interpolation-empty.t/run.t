@@ -46,20 +46,20 @@ is actually present on the element.
     ]
   ];
   
-  let active = CSS.make("cx-active cid-1ofey90", []);
+  let active = CSS.make("label:active cid-1ofey90", []);
   
   let container =
-    CSS.make("cx-container cid-paugdl css-1443u2l css-g57662", []);
+    CSS.make("label:container cid-paugdl css-1443u2l css-g57662", []);
   
-  let selected = CSS.make("cx-selected cid-okzmy", []);
-  let highlighted = CSS.make("cx-highlighted cid-1jjszpn", []);
+  let selected = CSS.make("label:selected cid-okzmy", []);
+  let highlighted = CSS.make("label:highlighted cid-1jjszpn", []);
   
   let card =
-    CSS.make("cx-card cid-cpyuub css-q5fqw0 css-19ehxda css-17nqvvb", []);
+    CSS.make("label:card cid-cpyuub css-q5fqw0 css-19ehxda css-17nqvvb", []);
   
-  let actionButton = CSS.make("cx-actionButton cid-rmf27x", []);
+  let actionButton = CSS.make("label:actionButton cid-rmf27x", []);
   
-  let panel = CSS.make("cx-panel cid-1qtuyxa css-k008qs css-62yfsj", []);
+  let panel = CSS.make("label:panel cid-1qtuyxa css-k008qs css-62yfsj", []);
   
   let _ = (active, container, selected, highlighted, card, actionButton, panel);
 

@@ -23,13 +23,13 @@ verbatim - no Cascading.toString wrap.
   let plainStr = "10px";
   let row =
     CSS.make(
-      "cx-row cid-z61k1z css-14o54yy",
+      "label:row cid-z61k1z css-14o54yy",
       [("--colorStr-t58soe", colorStr)],
     );
   let theme =
     CSS.make(
-      "cx-theme cid-r5u180 css-10nqctf",
+      "label:theme cid-r5u180 css-10nqctf",
       [("--colorStr-11d7je1", colorStr), ("--plainStr-1cgr13y", plainStr)],
     );
   let dyn = value =>
-    CSS.make("cx-dyn cid-soz37v css-zwwqpt", [("--value-13tu4ef", value)]);
+    CSS.make("label:dyn cid-soz37v css-zwwqpt", [("--value-13tu4ef", value)]);

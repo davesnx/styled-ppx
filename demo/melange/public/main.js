@@ -63207,7 +63207,7 @@ var AppGlobalStyles = {
   make: make8
 };
 var stack = make7(
-  "cx-stack cid-1qmkxoo css-k008qs css-cgq59l",
+  "label:stack cid-1qmkxoo css-k008qs css-cgq59l",
   /* [] */
   0
 );
@@ -63252,39 +63252,39 @@ var Cositas = {
   make: make$12
 };
 var selectors = make7(
-  "cx-selectors cid-d5lvj5 css-tokvmb css-12qnfjo",
+  "label:selectors cid-d5lvj5 css-tokvmb css-12qnfjo",
   /* [] */
   0
 );
 var bounce = AnimationName.make(void 0, "keyframe-deb5ee");
 var clx = make7(
-  "cx-clx cid-l34q14 css-1e8vzlw css-u70tf2 css-1j9jp3a",
+  "label:clx cid-l34q14 css-1e8vzlw css-u70tf2 css-1j9jp3a",
   /* [] */
   0
 );
 var post = make7(
-  "cx-post cid-111miqe css-1y5r52a css-3qzm71",
+  "label:post cid-111miqe css-1y5r52a css-3qzm71",
   /* [] */
   0
 );
 var card = make7(
-  "cx-card cid-18vbb8l css-eaeacs css-25k368 css-3fuzg5",
+  "label:card cid-18vbb8l css-eaeacs css-25k368 css-3fuzg5",
   /* [] */
   0
 );
 var container = make7(
-  "cx-container cid-zfqje2 css-nqqinc css-w3aeeb css-5x3p37 css-stwpj2",
+  "label:container cid-zfqje2 css-nqqinc css-w3aeeb css-5x3p37 css-stwpj2",
   /* [] */
   0
 );
 var gradiend = make7(
-  "cx-gradiend cid-1berf41 css-1wlyyxm css-1wm7046",
+  "label:gradiend cid-1berf41 css-1wlyyxm css-1wm7046",
   /* [] */
   0
 );
 var primary = hex2("141414");
 function keyframeDemoShell(color) {
-  return make7("cx-keyframeDemoShell cid-1hy4qg9 css-19kzrtu css-i3pbo css-3kft4e css-1fi1jeb css-205zh2 css-kusjgz css-1e8vzlw", {
+  return make7("label:keyframeDemoShell cid-1hy4qg9 css-19kzrtu css-i3pbo css-3kft4e css-1fi1jeb css-205zh2 css-kusjgz css-1e8vzlw", {
     hd: [
       "--color-1a279q8",
       Color.toString(color)
@@ -63319,7 +63319,7 @@ var resize2 = AnimationName.make({
     )
   }
 }, "keyframe-1kt58w0");
-var keyframeDemoCard = make7("cx-keyframeDemoCard cid-1jdoven css-1h7bkao css-65ee5x css-3pa72f css-iovuyg css-1c3l4rb css-i6bazn css-k008qs css-zcxndt css-1tyndxa css-1vw7svr css-1p3fawg css-kbn7if css-8c92kl", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
+var keyframeDemoCard = make7("label:keyframeDemoCard cid-1jdoven css-1h7bkao css-65ee5x css-3pa72f css-iovuyg css-1c3l4rb css-i6bazn css-k008qs css-zcxndt css-1tyndxa css-1vw7svr css-1p3fawg css-kbn7if css-8c92kl", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
 function Main(Props) {
   return JsxRuntime.jsxs("main", {
     children: [

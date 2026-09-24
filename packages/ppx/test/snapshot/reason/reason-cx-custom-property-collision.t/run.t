@@ -20,14 +20,14 @@ merged styles cannot overwrite each other.
   ];
   let common = backgroundColor =>
     CSS.make(
-      "cx-common cid-45bzlz css-160vrad",
+      "label:common cid-45bzlz css-160vrad",
       [
         ("--backgroundColor-ov3le6", CSS.Types.Color.toString(backgroundColor)),
       ],
     );
   let clickable = backgroundColor =>
     CSS.make(
-      "cx-clickable cid-1d9eonh css-10a6meq",
+      "label:clickable cid-1d9eonh css-10a6meq",
       [
         ("--backgroundColor-7yjmr3", CSS.Types.Color.toString(backgroundColor)),
       ],

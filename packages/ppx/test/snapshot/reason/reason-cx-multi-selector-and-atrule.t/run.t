@@ -32,20 +32,20 @@ selector chain into the at-rule's contents instead of dropping it.
     ("Input.mediaDeep", "cid-1xp2ctx", "css-godogz");
     ("Input.mediaWithNested", "cid-sseoij",
       "css-1c0hjb1 css-1x7bng1 css-pjtxwe")]]
-  let multiTop = CSS.make "cx-multiTop cid-za05oi css-rmy2q8 css-alyv6j" []
+  let multiTop = CSS.make "label:multiTop cid-za05oi css-rmy2q8 css-alyv6j" []
   let multiNested =
-    CSS.make "cx-multiNested cid-gymm1w css-xuam0t css-1400cim" []
+    CSS.make "label:multiNested cid-gymm1w css-xuam0t css-1400cim" []
   let cartesian =
     CSS.make
-      "cx-cartesian cid-18oo9dc css-1v5vtx3 css-1hhu78w css-1ehtzuk css-1nvjsnn"
+      "label:cartesian cid-18oo9dc css-1v5vtx3 css-1hhu78w css-1ehtzuk css-1nvjsnn"
       []
   let multiMixed =
     CSS.make
-      "cx-multiMixed cid-kzpsx9 css-rmy2q8 css-alyv6j css-bij269 css-1k1r9ux"
+      "label:multiMixed cid-kzpsx9 css-rmy2q8 css-alyv6j css-bij269 css-1k1r9ux"
       []
   let mediaUnderSelector =
-    CSS.make "cx-mediaUnderSelector cid-jnaeeh css-14bi921" []
-  let mediaDeep = CSS.make "cx-mediaDeep cid-1xp2ctx css-godogz" []
+    CSS.make "label:mediaUnderSelector cid-jnaeeh css-14bi921" []
+  let mediaDeep = CSS.make "label:mediaDeep cid-1xp2ctx css-godogz" []
   let mediaWithNested =
-    CSS.make "cx-mediaWithNested cid-sseoij css-1c0hjb1 css-1x7bng1 css-pjtxwe"
-      []
+    CSS.make
+      "label:mediaWithNested cid-sseoij css-1c0hjb1 css-1x7bng1 css-pjtxwe" []

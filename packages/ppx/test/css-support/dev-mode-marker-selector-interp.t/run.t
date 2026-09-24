@@ -23,9 +23,9 @@ extracted CSS, and resolved selectors are byte-identical between
     ]
   ];
   
-  let foo = CSS.make("cx-foo cid-zec317 css-tokvmb", []);
+  let foo = CSS.make("label:foo cid-zec317 css-tokvmb", []);
   
-  let bar = CSS.make("cx-bar cid-1eelq62 css-11o9qin", []);
+  let bar = CSS.make("label:bar cid-1eelq62 css-11o9qin", []);
   
   let _ = (foo, bar);
 

@@ -10,8 +10,8 @@ atom class. The aggregated stylesheet dedups the same way, down to one rule.
   $ grep -c '@@@css "' output.ml
   1
   $ grep 'CSS.make' output.ml
-  let a = CSS.make "cx-a cid-fo0igp css-tokvmb" []
-  let b = CSS.make "cx-b cid-mkba68 css-tokvmb" []
+  let a = CSS.make "label:a cid-fo0igp css-tokvmb" []
+  let b = CSS.make "label:b cid-mkba68 css-tokvmb" []
 
   $ styled-ppx.generate output.ml > styles.css
   $ cat styles.css

@@ -23,7 +23,7 @@ distinct longident.
   let _ = M.isOpen;
   let _ = M.isHovered;
   let modal =
-    CSS.make("cx-modal cid-1g7stmc css-1hyfx7x css-pznzdi css-1d03ie", []);
+    CSS.make("label:modal cid-1g7stmc css-1hyfx7x css-pznzdi css-1d03ie", []);
 
   $ styled-ppx.generate m.ml n.ml > styles.css
   $ cat styles.css

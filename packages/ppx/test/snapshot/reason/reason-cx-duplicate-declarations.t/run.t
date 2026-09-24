@@ -39,20 +39,20 @@ atom shape and hash.
     ("Input.A.x", "cid-hplgo2", "css-tokvmb");
     ("Input.B.x", "cid-i6ik4z", "css-dhb7kq");
     ("Input.vars", "cid-10jlpap", "css-zwzjs7")]]
-  let dup = CSS.make "cx-dup cid-1rqoi1k css-ztpkbn" []
-  let fallback = CSS.make "cx-fallback cid-1t6se51 css-17ax8u2" []
+  let dup = CSS.make "label:dup cid-1rqoi1k css-ztpkbn" []
+  let fallback = CSS.make "label:fallback cid-1t6se51 css-17ax8u2" []
   let interleaved =
-    CSS.make "cx-interleaved cid-8z5ze6 css-1uk1gs8 css-dhb7kq" []
+    CSS.make "label:interleaved cid-8z5ze6 css-1uk1gs8 css-dhb7kq" []
   let mediaInterleaved =
-    CSS.make "cx-mediaInterleaved cid-17s8jfs css-1g5p0x6 css-dhb7kq" []
+    CSS.make "label:mediaInterleaved cid-17s8jfs css-1g5p0x6 css-dhb7kq" []
   let shorthandReset =
-    CSS.make "cx-shorthandReset cid-18j0etq css-odz94x css-19xrixt" []
-  let nested = CSS.make "cx-nested cid-swo4az css-1e7bukr" []
-  let twice = CSS.make "cx-twice cid-bxfxu3 css-mngo80" []
-  let custom = CSS.make "cx-custom cid-216v6m css-zkbrel css-1r75vyo" []
-  module A = struct let x = CSS.make "cx-x cid-hplgo2 css-tokvmb" [] end
-  module B = struct let x = CSS.make "cx-x cid-i6ik4z css-dhb7kq" [] end
+    CSS.make "label:shorthandReset cid-18j0etq css-odz94x css-19xrixt" []
+  let nested = CSS.make "label:nested cid-swo4az css-1e7bukr" []
+  let twice = CSS.make "label:twice cid-bxfxu3 css-mngo80" []
+  let custom = CSS.make "label:custom cid-216v6m css-zkbrel css-1r75vyo" []
+  module A = struct let x = CSS.make "label:x cid-hplgo2 css-tokvmb" [] end
+  module B = struct let x = CSS.make "label:x cid-i6ik4z css-dhb7kq" [] end
   let c = "10px"
   let vars =
-    CSS.make "cx-vars cid-10jlpap css-zwzjs7"
+    CSS.make "label:vars cid-10jlpap css-zwzjs7"
       [("--c-kv4uq2", (CSS.Types.Margin.toString c))]

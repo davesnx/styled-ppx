@@ -26,7 +26,7 @@ before popping, so the popped segment is always the rightmost compound.
     ("Input.single", "cid-1e50cws", "css-x5n7y2");
     ("Input.compoundParent", "cid-16qcgjr", "css-1wfoysu css-1ikqg0")]]
   let table =
-    CSS.make "cx-table cid-1me4lmu css-1meebco css-1rhtv1h css-r3cuwt" []
-  let single = CSS.make "cx-single cid-1e50cws css-x5n7y2" []
+    CSS.make "label:table cid-1me4lmu css-1meebco css-1rhtv1h css-r3cuwt" []
+  let single = CSS.make "label:single cid-1e50cws css-x5n7y2" []
   let compoundParent =
-    CSS.make "cx-compoundParent cid-16qcgjr css-1wfoysu css-1ikqg0" []
+    CSS.make "label:compoundParent cid-16qcgjr css-1wfoysu css-1ikqg0" []

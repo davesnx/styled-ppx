@@ -13,7 +13,7 @@ can resolve it against M's exported [@@@css.bindings].
   [@@@css.refs [("M.Css.marker", "n.ml", 3, 6, 19)]]
   let _ = M.Css.marker
   module Styles = M.Css
-  let wrapper = CSS.make "cx-wrapper cid-1axkmel css-155k9s5" []
+  let wrapper = CSS.make "label:wrapper cid-1axkmel css-155k9s5" []
 
   $ styled-ppx.generate m.ml n.ml > styles.css
   $ cat styles.css

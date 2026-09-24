@@ -1,5 +1,5 @@
 When the PPX is invoked with --dev, every named [%css] binding gets a
-leading `cx-<name>` marker class. The marker is a plain string token
+leading `label:<name>` marker class. The marker is a plain string token
 prepended to the className list inside CSS.make; it is not emitted as
 a CSS rule.
 
@@ -25,9 +25,9 @@ a CSS rule.
     ]
   ];
   
-  let layout = CSS.make("cx-layout cid-1jj5tmt css-k008qs css-38zrbw", []);
+  let layout = CSS.make("label:layout cid-1jj5tmt css-k008qs css-38zrbw", []);
   
-  let button = CSS.make("cx-button cid-l55coe css-tokvmb", []);
+  let button = CSS.make("label:button cid-l55coe css-tokvmb", []);
   
   let _ = (layout, button);
 

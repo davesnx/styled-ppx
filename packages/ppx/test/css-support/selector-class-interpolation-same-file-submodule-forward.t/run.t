@@ -25,10 +25,10 @@ referenced submodule binding above the selector interpolation.
   [@css.refs [("Css.marker", "input.re", 2, 6, 16)]];
   
   let _ = Css.marker;
-  let wrapper = CSS.make("cx-wrapper cid-4f6ye3 css-59bkuc", []);
+  let wrapper = CSS.make("label:wrapper cid-4f6ye3 css-59bkuc", []);
   
   module Css = {
-    let marker = CSS.make("cx-marker cid-zr2uk1 css-tokvmb", []);
+    let marker = CSS.make("label:marker cid-zr2uk1 css-tokvmb", []);
   };
   
   let _ = (wrapper, Css.marker);

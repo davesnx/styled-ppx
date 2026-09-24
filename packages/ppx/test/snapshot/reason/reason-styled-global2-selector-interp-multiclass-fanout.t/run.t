@@ -9,7 +9,7 @@
     [("Output.multi", "cid-wbeinp", "css-k008qs css-tokvmb css-eaeacs")]
   ];
   let multi =
-    CSS.make("cx-multi cid-wbeinp css-k008qs css-tokvmb css-eaeacs", []);
+    CSS.make("label:multi cid-wbeinp css-k008qs css-tokvmb css-eaeacs", []);
   module Globals = {
     let to_string = () => "";
     [@warning "-27-32"]

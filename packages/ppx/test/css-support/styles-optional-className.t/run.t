@@ -30,8 +30,8 @@ later (ml-in-barcelona/server-reason-react#402).
 server-reason-react's expansion binds the incoming bundle to a reserved
 `__incoming` temporary before styled-ppx lowers the `[%css]` inside it. The
 inline css still belongs to the enclosing `make` binding: the identity above
-is `make`'s, and in development mode the marker reads `cx-make`, not
-`cx-__incoming`.
+is `make`'s, and in development mode the marker reads `label:make`, not
+`label:__incoming`.
 
   $ cat > dune << EOF
   > (executable
@@ -49,5 +49,5 @@ is `make`'s, and in development mode the marker reads `cx-make`, not
   $ dune build
 
   $ ./_build/default/input.exe
-  <div class="cx-make cid-1hdqfg1 css-k008qs" style="">ok</div>
-  <div class="cx-make cid-1hdqfg1 css-k008qs base" style="">ok</div>
+  <div class="label:make cid-1hdqfg1 css-k008qs" style="">ok</div>
+  <div class="label:make cid-1hdqfg1 css-k008qs base" style="">ok</div>

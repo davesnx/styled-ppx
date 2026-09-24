@@ -57,33 +57,39 @@ deep nesting, and mixed compound/descendant inner chains.
   
   let _amp_pseudo_with_class_descendant =
     CSS.make(
-      "cx-_amp_pseudo_with_class_descendant cid-1mtruzt css-1i2mold",
+      "label:_amp_pseudo_with_class_descendant cid-1mtruzt css-1i2mold",
       [],
     );
   
   let _amp_pseudo_with_type_descendant =
-    CSS.make("cx-_amp_pseudo_with_type_descendant cid-1l96rxg css-1pw74wv", []);
+    CSS.make(
+      "label:_amp_pseudo_with_type_descendant cid-1l96rxg css-1pw74wv",
+      [],
+    );
   
   let _amp_pseudo_with_explicit_ampersand_descendant =
     CSS.make(
-      "cx-_amp_pseudo_with_explicit_ampersand_descendant cid-saeaxt css-5tdg3s",
+      "label:_amp_pseudo_with_explicit_ampersand_descendant cid-saeaxt css-5tdg3s",
       [],
     );
   
   let _amp_pseudo_with_compound_inner =
-    CSS.make("cx-_amp_pseudo_with_compound_inner cid-1gv0q8s css-1pzj0cc", []);
+    CSS.make(
+      "label:_amp_pseudo_with_compound_inner cid-1gv0q8s css-1pzj0cc",
+      [],
+    );
   
   let _amp_pseudo_with_pseudo_element_inner =
     CSS.make(
-      "cx-_amp_pseudo_with_pseudo_element_inner cid-1ogtbuw css-1cghiyt",
+      "label:_amp_pseudo_with_pseudo_element_inner cid-1ogtbuw css-1cghiyt",
       [],
     );
   
   let _amp_pseudo_three_levels =
-    CSS.make("cx-_amp_pseudo_three_levels cid-wnmhdk css-15g1xle", []);
+    CSS.make("label:_amp_pseudo_three_levels cid-wnmhdk css-15g1xle", []);
   
   let _amp_pseudo_five_levels =
-    CSS.make("cx-_amp_pseudo_five_levels cid-lhbok8 css-v719o0", []);
+    CSS.make("label:_amp_pseudo_five_levels cid-lhbok8 css-v719o0", []);
   
   let _amp_pseudo_mixed_inner =
-    CSS.make("cx-_amp_pseudo_mixed_inner cid-1tn24tq css-1d0scwj", []);
+    CSS.make("label:_amp_pseudo_mixed_inner cid-1tn24tq css-1d0scwj", []);
