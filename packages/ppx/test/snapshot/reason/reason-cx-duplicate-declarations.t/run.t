@@ -11,6 +11,11 @@ atom makes the winner an intra-atom decision, immune to position, dedup,
 and cross-binding hash sharing. Single declarations keep the historical
 atom shape and hash.
 
+The same grouping mechanism is keyed by property FAMILY, not literal
+property name, so a shorthand mixed with its own longhand groups the
+same way (`shorthandReset` below) - see `reason-family-atoms.t` for that
+as the main subject, across properties that never repeat.
+
   $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
   [@@@css "@property --c-kv4uq2{syntax:\"*\";inherits:false;}"]
@@ -19,8 +24,7 @@ atom shape and hash.
   [@@@css ".a-1uk1gs8{margin:0;}"]
   [@@@css ".a-dhb7kq{color:blue;color:red;}"]
   [@@@css "@media (min-width: 600px) {.a-1g5p0x6{color:green;}}"]
-  [@@@css ".a-odz94x{margin-top:5px;}"]
-  [@@@css ".a-19xrixt{margin:0;margin:10px;}"]
+  [@@@css ".a-qmjper{margin:0;margin-top:5px;margin:10px;}"]
   [@@@css ".a-1e7bukr:hover{color:blue;color:red;}"]
   [@@@css ".a-mngo80:hover{color:red;}"]
   [@@@css ".a-zkbrel{--Foo:1px;}"]
@@ -32,7 +36,7 @@ atom shape and hash.
     ("Input.fallback", "id-1t6se51", "a-17ax8u2");
     ("Input.interleaved", "id-8z5ze6", "a-1uk1gs8 a-dhb7kq");
     ("Input.mediaInterleaved", "id-17s8jfs", "a-1g5p0x6 a-dhb7kq");
-    ("Input.shorthandReset", "id-18j0etq", "a-odz94x a-19xrixt");
+    ("Input.shorthandReset", "id-18j0etq", "a-qmjper");
     ("Input.nested", "id-swo4az", "a-1e7bukr");
     ("Input.twice", "id-bxfxu3", "a-mngo80");
     ("Input.custom", "id-216v6m", "a-zkbrel a-1r75vyo");
@@ -45,8 +49,7 @@ atom shape and hash.
     CSS.make "label:interleaved id-8z5ze6 a-1uk1gs8 a-dhb7kq" []
   let mediaInterleaved =
     CSS.make "label:mediaInterleaved id-17s8jfs a-1g5p0x6 a-dhb7kq" []
-  let shorthandReset =
-    CSS.make "label:shorthandReset id-18j0etq a-odz94x a-19xrixt" []
+  let shorthandReset = CSS.make "label:shorthandReset id-18j0etq a-qmjper" []
   let nested = CSS.make "label:nested id-swo4az a-1e7bukr" []
   let twice = CSS.make "label:twice id-bxfxu3 a-mngo80" []
   let custom = CSS.make "label:custom id-216v6m a-zkbrel a-1r75vyo" []

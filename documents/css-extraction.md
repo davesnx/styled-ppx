@@ -492,6 +492,32 @@ two `[@@@css ...]` attributes. The runtime `CSS.make` call carries the
 space-separated concatenation of those class names, so consumers apply
 all atoms by setting one `className` attribute.
 
+**Two declarations in one block group into one atom when their covered
+leaf properties overlap**, taken transitively, not one atom per
+declaration: `{ margin: 0; margin-top: 5px; margin: 10px; }` is ONE atom
+carrying all three declarations in author order, because `margin`'s full
+leaf set includes `margin-top` (see `Slot_key.leaves_of`). This is what
+makes the final `margin: 10px` reset `margin-top` reliably: source order
+inside one rule decides the winner, not the relative position of two
+independently-hashed atoms in the generated stylesheet (a repeat of the
+same property overlaps itself trivially - `color: blue; color: red;` is
+also one atom, the older, narrower rule this generalizes). Sharing a
+property *family* is necessary but not sufficient: `padding-left` and
+`padding-right` are both in the "padding" family but cover disjoint
+leaves, so they stay TWO atoms - merging them would make a future
+`CSS.merge` too coarse, unable to drop just the overlapping side without
+also dropping the other. "Transitively" means a bridging declaration
+pulls in everything it overlaps even when those things don't overlap
+each other directly: `border: 1px solid; border-left-width: 2px;` group
+together (border's full leaf set includes border-left-width), and adding
+a third declaration `border-top: 1px solid;` (which shares no leaf with
+`border-left-width` directly) still joins the same group, bridged through
+`border`. A declaration that shares no leaf with anything else in the
+block is its own one-member group, which is exactly "one atom per
+property" for everything this doesn't otherwise merge. Grouping in
+`Css_file.re`'s `group_declarations_by_family` reuses
+`Slot_key.leaves_of` directly (not a reimplementation).
+
 Class names follow the `a-<murmur2 hash of CSS>` format, in every
 mode — the binding's `let` name never appears in the class name. Two
 bindings whose declarations render to the same CSS text mint the same
