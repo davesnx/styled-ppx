@@ -59,10 +59,10 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-1llpnps{caret-color:auto;}"];
   [@css ".css-1q51yyj{caret-color:green;}"];
   [@css
-    ".css-1ndky4e{-webkit-appearance:auto;-moz-appearance:auto;-ms-appearance:auto;appearance:auto;}"
+    ".css-1ndky4e{-webkit-appearance:auto;-moz-appearance:auto;appearance:auto;}"
   ];
   [@css
-    ".css-17grcf8{-webkit-appearance:none;-moz-appearance:none;-ms-appearance:none;appearance:none;}"
+    ".css-17grcf8{-webkit-appearance:none;-moz-appearance:none;appearance:none;}"
   ];
   [@css ".css-1ttooc5{text-overflow:\"foo\";}"];
   [@css ".css-1pwfzgv{text-overflow:clip clip;}"];
