@@ -42,7 +42,7 @@ let env = {
 
 let namespace = {
   flag: "--namespace",
-  doc: "Mixed into every binding's identity class hash. Empty by default, so a library's native and melange builds mint the same `cid-` classes. Pass distinct values to two libraries that share a module basename and binding name, so their `cid-` classes differ.",
+  doc: "Mixed into every binding's identity class hash. Empty by default, so a library's native and melange builds mint the same `id-` classes. Pass distinct values to two libraries that share a module basename and binding name, so their `id-` classes differ.",
   value: None,
   defaultValue: "",
 };

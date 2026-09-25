@@ -15,37 +15,37 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1er335o{fill-rule:nonzero;}"];
-  [@css ".css-1uqje6q{fill-rule:evenodd;}"];
-  [@css ".css-h01axr{fill-opacity:0.5;}"];
-  [@css ".css-1p4mbij{fill-opacity:45%;}"];
-  [@css ".css-stfno8{stroke-width:0;}"];
-  [@css ".css-7hbqje{stroke-width:1px;}"];
-  [@css ".css-11bssim{stroke-width:25%;}"];
-  [@css ".css-16f3u6b{stroke-linecap:butt;}"];
-  [@css ".css-1me96vv{stroke-linecap:round;}"];
-  [@css ".css-1j4dlez{stroke-linecap:square;}"];
-  [@css ".css-8vbou6{stroke-linejoin:miter;}"];
-  [@css ".css-1t1cl19{stroke-linejoin:bevel;}"];
-  [@css ".css-8mzojx{stroke-linejoin:round;}"];
-  [@css ".css-1a477up{stroke-miterlimit:4;}"];
+  [@css ".a-1er335o{fill-rule:nonzero;}"];
+  [@css ".a-1uqje6q{fill-rule:evenodd;}"];
+  [@css ".a-h01axr{fill-opacity:0.5;}"];
+  [@css ".a-1p4mbij{fill-opacity:45%;}"];
+  [@css ".a-stfno8{stroke-width:0;}"];
+  [@css ".a-7hbqje{stroke-width:1px;}"];
+  [@css ".a-11bssim{stroke-width:25%;}"];
+  [@css ".a-16f3u6b{stroke-linecap:butt;}"];
+  [@css ".a-1me96vv{stroke-linecap:round;}"];
+  [@css ".a-1j4dlez{stroke-linecap:square;}"];
+  [@css ".a-8vbou6{stroke-linejoin:miter;}"];
+  [@css ".a-1t1cl19{stroke-linejoin:bevel;}"];
+  [@css ".a-8mzojx{stroke-linejoin:round;}"];
+  [@css ".a-1a477up{stroke-miterlimit:4;}"];
   
-  CSS.make("css-1er335o", []);
-  CSS.make("css-1uqje6q", []);
+  CSS.make("a-1er335o", []);
+  CSS.make("a-1uqje6q", []);
   
-  CSS.make("css-h01axr", []);
-  CSS.make("css-1p4mbij", []);
+  CSS.make("a-h01axr", []);
+  CSS.make("a-1p4mbij", []);
   
-  CSS.make("css-stfno8", []);
-  CSS.make("css-7hbqje", []);
-  CSS.make("css-11bssim", []);
+  CSS.make("a-stfno8", []);
+  CSS.make("a-7hbqje", []);
+  CSS.make("a-11bssim", []);
   
-  CSS.make("css-16f3u6b", []);
-  CSS.make("css-1me96vv", []);
-  CSS.make("css-1j4dlez", []);
+  CSS.make("a-16f3u6b", []);
+  CSS.make("a-1me96vv", []);
+  CSS.make("a-1j4dlez", []);
   
-  CSS.make("css-8vbou6", []);
-  CSS.make("css-1t1cl19", []);
-  CSS.make("css-8mzojx", []);
+  CSS.make("a-8vbou6", []);
+  CSS.make("a-1t1cl19", []);
+  CSS.make("a-8mzojx", []);
   
-  CSS.make("css-1a477up", []);
+  CSS.make("a-1a477up", []);
