@@ -1,0 +1,1 @@
+[%css {|float-reference: block|}];

@@ -229,6 +229,18 @@ let test_column_rule_inset_cap_start_invalid = () =>
   | Error(_) => ()
   };
 
+let test_column_rule_inset_start_valid = () =>
+  switch (validate_property("column-rule-inset-start", "8px")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_column_rule_inset_start_invalid = () =>
+  switch (validate_property("column-rule-inset-start", "solid")) {
+  | Ok () => Alcotest.fail("parsing 'solid' should fail")
+  | Error(_) => ()
+  };
+
 let test_column_rule_inset_cap_valid = () =>
   switch (validate_property("column-rule-inset-cap", "0px 5px")) {
   | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
@@ -268,6 +280,727 @@ let test_rule_overlap_valid = () =>
 let test_rule_overlap_invalid = () =>
   switch (validate_property("rule-overlap", "row-over-row")) {
   | Ok () => Alcotest.fail("parsing 'row-over-row' should fail")
+  | Error(_) => ()
+  };
+
+/* css-grammar-draft-properties (2026-09-25): valid and invalid values for
+   this slice's 9 standards-track, unimplemented properties (CSS Text L4,
+   CSS Text Decoration L4, CSS Lists and Counters L3). */
+
+let test_line_padding_valid = () =>
+  switch (validate_property("line-padding", "10px")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_line_padding_invalid = () =>
+  switch (validate_property("line-padding", "solid")) {
+  | Ok () => Alcotest.fail("parsing 'solid' should fail")
+  | Error(_) => ()
+  };
+
+let test_text_group_align_valid = () =>
+  switch (validate_property("text-group-align", "center")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_text_group_align_invalid = () =>
+  switch (validate_property("text-group-align", "middle")) {
+  | Ok () => Alcotest.fail("parsing 'middle' should fail")
+  | Error(_) => ()
+  };
+
+let test_white_space_trim_valid = () =>
+  switch (
+    validate_property("white-space-trim", "discard-before discard-after")
+  ) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_white_space_trim_invalid = () =>
+  switch (validate_property("white-space-trim", "always")) {
+  | Ok () => Alcotest.fail("parsing 'always' should fail")
+  | Error(_) => ()
+  };
+
+let test_wrap_before_valid = () =>
+  switch (validate_property("wrap-before", "avoid-flex")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_wrap_before_invalid = () =>
+  switch (validate_property("wrap-before", "never")) {
+  | Ok () => Alcotest.fail("parsing 'never' should fail")
+  | Error(_) => ()
+  };
+
+let test_wrap_after_valid = () =>
+  switch (validate_property("wrap-after", "line")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_wrap_inside_valid = () =>
+  switch (validate_property("wrap-inside", "avoid")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_wrap_inside_invalid = () =>
+  switch (validate_property("wrap-inside", "never")) {
+  | Ok () => Alcotest.fail("parsing 'never' should fail")
+  | Error(_) => ()
+  };
+
+let test_text_emphasis_skip_valid = () =>
+  switch (validate_property("text-emphasis-skip", "spaces narrow")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_text_emphasis_skip_invalid = () =>
+  switch (validate_property("text-emphasis-skip", "everything")) {
+  | Ok () => Alcotest.fail("parsing 'everything' should fail")
+  | Error(_) => ()
+  };
+
+let test_marker_side_valid = () =>
+  switch (validate_property("marker-side", "match-parent")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_marker_side_invalid = () =>
+  switch (validate_property("marker-side", "match-both")) {
+  | Ok () => Alcotest.fail("parsing 'match-both' should fail")
+  | Error(_) => ()
+  };
+
+/* css-grammar-draft-properties (task 2): valid and invalid values for the
+   layout/sizing slice of the 140 standards-track/preview properties. */
+
+let test_max_size_valid = () =>
+  switch (validate_property("max-size", "100px 50px")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_max_size_invalid = () =>
+  switch (validate_property("max-size", "solid")) {
+  | Ok () => Alcotest.fail("parsing 'solid' should fail")
+  | Error(_) => ()
+  };
+
+let test_min_intrinsic_sizing_valid = () =>
+  switch (validate_property("min-intrinsic-sizing", "zero-if-scroll")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_min_intrinsic_sizing_invalid = () =>
+  switch (validate_property("min-intrinsic-sizing", "always")) {
+  | Ok () => Alcotest.fail("parsing 'always' should fail")
+  | Error(_) => ()
+  };
+
+let test_wrap_flow_valid = () =>
+  switch (validate_property("wrap-flow", "minimum")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_wrap_flow_invalid = () =>
+  switch (validate_property("wrap-flow", "never")) {
+  | Ok () => Alcotest.fail("parsing 'never' should fail")
+  | Error(_) => ()
+  };
+
+let test_wrap_through_valid = () =>
+  switch (validate_property("wrap-through", "wrap")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_margin_break_valid = () =>
+  switch (validate_property("margin-break", "discard")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_margin_break_invalid = () =>
+  switch (validate_property("margin-break", "avoid")) {
+  | Ok () => Alcotest.fail("parsing 'avoid' should fail")
+  | Error(_) => ()
+  };
+
+let test_block_step_valid = () =>
+  switch (validate_property("block-step", "10px content-box center up")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_block_step_size_invalid = () =>
+  switch (validate_property("block-step-size", "solid")) {
+  | Ok () => Alcotest.fail("parsing 'solid' should fail")
+  | Error(_) => ()
+  };
+
+let test_line_grid_valid = () =>
+  switch (validate_property("line-grid", "create")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_line_grid_invalid = () =>
+  switch (validate_property("line-grid", "always")) {
+  | Ok () => Alcotest.fail("parsing 'always' should fail")
+  | Error(_) => ()
+  };
+
+let test_line_snap_valid = () =>
+  switch (validate_property("line-snap", "baseline")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_box_snap_valid = () =>
+  switch (validate_property("box-snap", "last-baseline")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_box_snap_invalid = () =>
+  switch (validate_property("box-snap", "always")) {
+  | Ok () => Alcotest.fail("parsing 'always' should fail")
+  | Error(_) => ()
+  };
+
+let test_shape_inside_valid = () =>
+  switch (validate_property("shape-inside", "circle() border-box")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_shape_inside_invalid = () =>
+  switch (validate_property("shape-inside", "solid")) {
+  | Ok () => Alcotest.fail("parsing 'solid' should fail")
+  | Error(_) => ()
+  };
+
+let test_border_boundary_valid = () =>
+  switch (validate_property("border-boundary", "parent")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_border_boundary_invalid = () =>
+  switch (validate_property("border-boundary", "child")) {
+  | Ok () => Alcotest.fail("parsing 'child' should fail")
+  | Error(_) => ()
+  };
+
+let test_initial_letter_wrap_valid = () =>
+  switch (validate_property("initial-letter-wrap", "grid")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_initial_letter_wrap_invalid = () =>
+  switch (validate_property("initial-letter-wrap", "solid")) {
+  | Ok () => Alcotest.fail("parsing 'solid' should fail")
+  | Error(_) => ()
+  };
+
+let test_inline_sizing_valid = () =>
+  switch (validate_property("inline-sizing", "stretch")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_inline_sizing_invalid = () =>
+  switch (validate_property("inline-sizing", "always")) {
+  | Ok () => Alcotest.fail("parsing 'always' should fail")
+  | Error(_) => ()
+  };
+
+let test_line_fit_edge_valid = () =>
+  switch (validate_property("line-fit-edge", "cap")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+/* css-grammar-draft-properties (2026-09-25): valid and invalid values for
+   the Backgrounds L4 / Overflow L4 slice of the 140 standards-track
+   draft properties - one pair per grammar shape this slice introduced. */
+
+let test_background_position_block_valid = () =>
+  switch (
+    validate_property("background-position-block", "start 10px, center")
+  ) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_background_position_block_invalid = () =>
+  switch (validate_property("background-position-block", "left")) {
+  | Ok () => Alcotest.fail("parsing 'left' should fail")
+  | Error(_) => ()
+  };
+
+let test_background_repeat_block_valid = () =>
+  switch (validate_property("background-repeat-block", "space, round")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_background_repeat_block_invalid = () =>
+  switch (validate_property("background-repeat-block", "repeat-x")) {
+  | Ok () => Alcotest.fail("parsing 'repeat-x' should fail")
+  | Error(_) => ()
+  };
+
+let test_overflow_clip_margin_top_valid = () =>
+  switch (validate_property("overflow-clip-margin-top", "padding-box 5px")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_overflow_clip_margin_top_invalid = () =>
+  switch (validate_property("overflow-clip-margin-top", "solid")) {
+  | Ok () => Alcotest.fail("parsing 'solid' should fail")
+  | Error(_) => ()
+  };
+
+let test_overflow_clip_margin_shorthand_valid = () =>
+  switch (validate_property("overflow-clip-margin", "5px")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_overflow_clip_margin_block_valid = () =>
+  switch (validate_property("overflow-clip-margin-block", "border-box")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_block_ellipsis_valid = () =>
+  switch (validate_property("block-ellipsis", "\"...\"")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_block_ellipsis_invalid = () =>
+  switch (validate_property("block-ellipsis", "none")) {
+  | Ok () => Alcotest.fail("parsing 'none' should fail")
+  | Error(_) => ()
+  };
+
+let test_continue_valid = () =>
+  switch (validate_property("continue", "discard")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_continue_invalid = () =>
+  switch (validate_property("continue", "always")) {
+  | Ok () => Alcotest.fail("parsing 'always' should fail")
+  | Error(_) => ()
+  };
+
+/* css-grammar-draft-properties (paged-media/content-flow/nav slice): valid
+   and invalid values for the 19 properties this pass added. */
+
+let test_bookmark_label_valid = () =>
+  switch (validate_property("bookmark-label", "\"Chapter\"")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_bookmark_level_valid = () =>
+  switch (validate_property("bookmark-level", "2")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_bookmark_level_invalid = () =>
+  switch (validate_property("bookmark-level", "solid")) {
+  | Ok () => Alcotest.fail("parsing 'solid' should fail")
+  | Error(_) => ()
+  };
+
+let test_bookmark_state_valid = () =>
+  switch (validate_property("bookmark-state", "closed")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_bookmark_state_invalid = () =>
+  switch (validate_property("bookmark-state", "hidden")) {
+  | Ok () => Alcotest.fail("parsing 'hidden' should fail")
+  | Error(_) => ()
+  };
+
+let test_string_set_valid = () =>
+  switch (validate_property("string-set", "header \"Chapter One\"")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_string_set_invalid = () =>
+  switch (validate_property("string-set", "42")) {
+  | Ok () => Alcotest.fail("parsing '42' should fail")
+  | Error(_) => ()
+  };
+
+let test_running_valid = () =>
+  switch (validate_property("running", "myHeader")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_footnote_display_valid = () =>
+  switch (validate_property("footnote-display", "compact")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_footnote_display_invalid = () =>
+  switch (validate_property("footnote-display", "flex")) {
+  | Ok () => Alcotest.fail("parsing 'flex' should fail")
+  | Error(_) => ()
+  };
+
+let test_footnote_policy_valid = () =>
+  switch (validate_property("footnote-policy", "line")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_flow_into_valid = () =>
+  switch (validate_property("flow-into", "myFlow content")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_flow_into_invalid = () =>
+  switch (validate_property("flow-into", "myFlow other")) {
+  | Ok () => Alcotest.fail("parsing 'myFlow other' should fail")
+  | Error(_) => ()
+  };
+
+let test_flow_from_valid = () =>
+  switch (validate_property("flow-from", "myFlow")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_region_fragment_valid = () =>
+  switch (validate_property("region-fragment", "break")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_region_fragment_invalid = () =>
+  switch (validate_property("region-fragment", "always")) {
+  | Ok () => Alcotest.fail("parsing 'always' should fail")
+  | Error(_) => ()
+  };
+
+let test_float_reference_valid = () =>
+  switch (validate_property("float-reference", "column")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_float_reference_invalid = () =>
+  switch (validate_property("float-reference", "block")) {
+  | Ok () => Alcotest.fail("parsing 'block' should fail")
+  | Error(_) => ()
+  };
+
+let test_float_defer_valid = () =>
+  switch (validate_property("float-defer", "last")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_float_offset_valid = () =>
+  switch (validate_property("float-offset", "10px")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_spatial_navigation_contain_valid = () =>
+  switch (validate_property("spatial-navigation-contain", "contain")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_spatial_navigation_contain_invalid = () =>
+  switch (validate_property("spatial-navigation-contain", "none")) {
+  | Ok () => Alcotest.fail("parsing 'none' should fail")
+  | Error(_) => ()
+  };
+
+let test_spatial_navigation_action_valid = () =>
+  switch (validate_property("spatial-navigation-action", "scroll")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_spatial_navigation_function_valid = () =>
+  switch (validate_property("spatial-navigation-function", "grid")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_input_security_valid = () =>
+  switch (validate_property("input-security", "none")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_input_security_invalid = () =>
+  switch (validate_property("input-security", "hidden")) {
+  | Ok () => Alcotest.fail("parsing 'hidden' should fail")
+  | Error(_) => ()
+  };
+
+let test_slider_orientation_valid = () =>
+  switch (validate_property("slider-orientation", "top-to-bottom")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_slider_orientation_invalid = () =>
+  switch (validate_property("slider-orientation", "vertical")) {
+  | Ok () => Alcotest.fail("parsing 'vertical' should fail")
+  | Error(_) => ()
+  };
+
+let test_image_animation_valid = () =>
+  switch (validate_property("image-animation", "stopped")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_image_animation_invalid = () =>
+  switch (validate_property("image-animation", "playing")) {
+  | Ok () => Alcotest.fail("parsing 'playing' should fail")
+  | Error(_) => ()
+  };
+
+/* css-grammar-draft-properties (CSS Fill and Stroke Module L3): valid and
+   invalid values for the 16 fill- and stroke- properties this slice added. */
+
+let test_fill_break_valid = () =>
+  switch (validate_property("fill-break", "slice")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_fill_break_invalid = () =>
+  switch (validate_property("fill-break", "always")) {
+  | Ok () => Alcotest.fail("parsing 'always' should fail")
+  | Error(_) => ()
+  };
+
+let test_fill_color_valid = () =>
+  switch (validate_property("fill-color", "red")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_fill_image_valid = () =>
+  switch (validate_property("fill-image", "none, none")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_fill_origin_valid = () =>
+  switch (validate_property("fill-origin", "match-parent")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_fill_origin_invalid = () =>
+  switch (validate_property("fill-origin", "view-box")) {
+  | Ok () => Alcotest.fail("parsing 'view-box' should fail")
+  | Error(_) => ()
+  };
+
+let test_fill_position_valid = () =>
+  switch (validate_property("fill-position", "center, top left")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_fill_repeat_valid = () =>
+  switch (validate_property("fill-repeat", "repeat-x, space")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_fill_size_valid = () =>
+  switch (validate_property("fill-size", "cover, 10px 20px")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_stroke_align_valid = () =>
+  switch (validate_property("stroke-align", "inset")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_stroke_align_invalid = () =>
+  switch (validate_property("stroke-align", "middle")) {
+  | Ok () => Alcotest.fail("parsing 'middle' should fail")
+  | Error(_) => ()
+  };
+
+let test_stroke_break_valid = () =>
+  switch (validate_property("stroke-break", "bounding-box")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_stroke_dash_corner_valid = () =>
+  switch (validate_property("stroke-dash-corner", "5px")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_stroke_dash_corner_invalid = () =>
+  switch (validate_property("stroke-dash-corner", "solid")) {
+  | Ok () => Alcotest.fail("parsing 'solid' should fail")
+  | Error(_) => ()
+  };
+
+let test_stroke_dash_justify_valid = () =>
+  switch (validate_property("stroke-dash-justify", "stretch dashes")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_stroke_dash_justify_invalid = () =>
+  switch (validate_property("stroke-dash-justify", "solid")) {
+  | Ok () => Alcotest.fail("parsing 'solid' should fail")
+  | Error(_) => ()
+  };
+
+let test_stroke_image_valid = () =>
+  switch (validate_property("stroke-image", "none")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_stroke_origin_valid = () =>
+  switch (validate_property("stroke-origin", "stroke-box")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_stroke_position_valid = () =>
+  switch (validate_property("stroke-position", "50% 50%")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_stroke_repeat_valid = () =>
+  switch (validate_property("stroke-repeat", "round")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_stroke_size_valid = () =>
+  switch (validate_property("stroke-size", "contain")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+/* css-grammar-draft-properties (task 2): valid and invalid values for the
+   CSS Borders and Box Decorations L4 additions - one case per grammar
+   shape this slice introduced. */
+
+let test_border_top_radius_valid = () =>
+  switch (validate_property("border-top-radius", "10px 5px / 2px")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_border_top_radius_invalid = () =>
+  switch (validate_property("border-top-radius", "solid")) {
+  | Ok () => Alcotest.fail("parsing 'solid' should fail")
+  | Error(_) => ()
+  };
+
+let test_border_limit_valid = () =>
+  switch (validate_property("border-limit", "corners 10px")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_border_limit_invalid = () =>
+  switch (validate_property("border-limit", "diagonal")) {
+  | Ok () => Alcotest.fail("parsing 'diagonal' should fail")
+  | Error(_) => ()
+  };
+
+let test_border_top_clip_valid = () =>
+  switch (validate_property("border-top-clip", "10px 1fr 10px")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_border_top_clip_invalid = () =>
+  switch (validate_property("border-top-clip", "solid")) {
+  | Ok () => Alcotest.fail("parsing 'solid' should fail")
+  | Error(_) => ()
+  };
+
+let test_border_clip_valid = () =>
+  switch (validate_property("border-clip", "0 1fr")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_box_shadow_color_valid = () =>
+  switch (validate_property("box-shadow-color", "red, blue")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_box_shadow_offset_valid = () =>
+  switch (validate_property("box-shadow-offset", "none, 4px 4px")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_box_shadow_blur_valid = () =>
+  switch (validate_property("box-shadow-blur", "12px, 0")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_box_shadow_spread_valid = () =>
+  switch (validate_property("box-shadow-spread", "40px")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_box_shadow_position_valid = () =>
+  switch (validate_property("box-shadow-position", "inset, outset")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_box_shadow_position_invalid = () =>
+  switch (validate_property("box-shadow-position", "underset")) {
+  | Ok () => Alcotest.fail("parsing 'underset' should fail")
   | Error(_) => ()
   };
 
@@ -554,6 +1287,16 @@ let tests = [
         test_column_rule_inset_cap_start_invalid,
       ),
       Alcotest.test_case(
+        "column-rule-inset-start valid",
+        `Quick,
+        test_column_rule_inset_start_valid,
+      ),
+      Alcotest.test_case(
+        "column-rule-inset-start invalid",
+        `Quick,
+        test_column_rule_inset_start_invalid,
+      ),
+      Alcotest.test_case(
         "column-rule-inset-cap valid",
         `Quick,
         test_column_rule_inset_cap_valid,
@@ -587,6 +1330,466 @@ let tests = [
         "rule-overlap invalid",
         `Quick,
         test_rule_overlap_invalid,
+      ),
+      Alcotest.test_case(
+        "line-padding valid",
+        `Quick,
+        test_line_padding_valid,
+      ),
+      Alcotest.test_case(
+        "line-padding invalid",
+        `Quick,
+        test_line_padding_invalid,
+      ),
+      Alcotest.test_case(
+        "text-group-align valid",
+        `Quick,
+        test_text_group_align_valid,
+      ),
+      Alcotest.test_case(
+        "text-group-align invalid",
+        `Quick,
+        test_text_group_align_invalid,
+      ),
+      Alcotest.test_case(
+        "white-space-trim valid",
+        `Quick,
+        test_white_space_trim_valid,
+      ),
+      Alcotest.test_case(
+        "white-space-trim invalid",
+        `Quick,
+        test_white_space_trim_invalid,
+      ),
+      Alcotest.test_case("wrap-before valid", `Quick, test_wrap_before_valid),
+      Alcotest.test_case(
+        "wrap-before invalid",
+        `Quick,
+        test_wrap_before_invalid,
+      ),
+      Alcotest.test_case("wrap-after valid", `Quick, test_wrap_after_valid),
+      Alcotest.test_case("wrap-inside valid", `Quick, test_wrap_inside_valid),
+      Alcotest.test_case(
+        "wrap-inside invalid",
+        `Quick,
+        test_wrap_inside_invalid,
+      ),
+      Alcotest.test_case(
+        "text-emphasis-skip valid",
+        `Quick,
+        test_text_emphasis_skip_valid,
+      ),
+      Alcotest.test_case(
+        "text-emphasis-skip invalid",
+        `Quick,
+        test_text_emphasis_skip_invalid,
+      ),
+      Alcotest.test_case("marker-side valid", `Quick, test_marker_side_valid),
+      Alcotest.test_case(
+        "marker-side invalid",
+        `Quick,
+        test_marker_side_invalid,
+      ),
+      Alcotest.test_case("max-size valid", `Quick, test_max_size_valid),
+      Alcotest.test_case("max-size invalid", `Quick, test_max_size_invalid),
+      Alcotest.test_case(
+        "min-intrinsic-sizing valid",
+        `Quick,
+        test_min_intrinsic_sizing_valid,
+      ),
+      Alcotest.test_case(
+        "min-intrinsic-sizing invalid",
+        `Quick,
+        test_min_intrinsic_sizing_invalid,
+      ),
+      Alcotest.test_case("wrap-flow valid", `Quick, test_wrap_flow_valid),
+      Alcotest.test_case("wrap-flow invalid", `Quick, test_wrap_flow_invalid),
+      Alcotest.test_case(
+        "wrap-through valid",
+        `Quick,
+        test_wrap_through_valid,
+      ),
+      Alcotest.test_case(
+        "margin-break valid",
+        `Quick,
+        test_margin_break_valid,
+      ),
+      Alcotest.test_case(
+        "margin-break invalid",
+        `Quick,
+        test_margin_break_invalid,
+      ),
+      Alcotest.test_case("block-step valid", `Quick, test_block_step_valid),
+      Alcotest.test_case(
+        "block-step-size invalid",
+        `Quick,
+        test_block_step_size_invalid,
+      ),
+      Alcotest.test_case("line-grid valid", `Quick, test_line_grid_valid),
+      Alcotest.test_case("line-grid invalid", `Quick, test_line_grid_invalid),
+      Alcotest.test_case("line-snap valid", `Quick, test_line_snap_valid),
+      Alcotest.test_case("box-snap valid", `Quick, test_box_snap_valid),
+      Alcotest.test_case("box-snap invalid", `Quick, test_box_snap_invalid),
+      Alcotest.test_case(
+        "shape-inside valid",
+        `Quick,
+        test_shape_inside_valid,
+      ),
+      Alcotest.test_case(
+        "shape-inside invalid",
+        `Quick,
+        test_shape_inside_invalid,
+      ),
+      Alcotest.test_case(
+        "border-boundary valid",
+        `Quick,
+        test_border_boundary_valid,
+      ),
+      Alcotest.test_case(
+        "border-boundary invalid",
+        `Quick,
+        test_border_boundary_invalid,
+      ),
+      Alcotest.test_case(
+        "initial-letter-wrap valid",
+        `Quick,
+        test_initial_letter_wrap_valid,
+      ),
+      Alcotest.test_case(
+        "initial-letter-wrap invalid",
+        `Quick,
+        test_initial_letter_wrap_invalid,
+      ),
+      Alcotest.test_case(
+        "inline-sizing valid",
+        `Quick,
+        test_inline_sizing_valid,
+      ),
+      Alcotest.test_case(
+        "inline-sizing invalid",
+        `Quick,
+        test_inline_sizing_invalid,
+      ),
+      Alcotest.test_case(
+        "line-fit-edge valid",
+        `Quick,
+        test_line_fit_edge_valid,
+      ),
+      Alcotest.test_case(
+        "background-position-block valid",
+        `Quick,
+        test_background_position_block_valid,
+      ),
+      Alcotest.test_case(
+        "background-position-block invalid",
+        `Quick,
+        test_background_position_block_invalid,
+      ),
+      Alcotest.test_case(
+        "background-repeat-block valid",
+        `Quick,
+        test_background_repeat_block_valid,
+      ),
+      Alcotest.test_case(
+        "background-repeat-block invalid",
+        `Quick,
+        test_background_repeat_block_invalid,
+      ),
+      Alcotest.test_case(
+        "overflow-clip-margin-top valid",
+        `Quick,
+        test_overflow_clip_margin_top_valid,
+      ),
+      Alcotest.test_case(
+        "overflow-clip-margin-top invalid",
+        `Quick,
+        test_overflow_clip_margin_top_invalid,
+      ),
+      Alcotest.test_case(
+        "overflow-clip-margin shorthand valid",
+        `Quick,
+        test_overflow_clip_margin_shorthand_valid,
+      ),
+      Alcotest.test_case(
+        "overflow-clip-margin-block valid",
+        `Quick,
+        test_overflow_clip_margin_block_valid,
+      ),
+      Alcotest.test_case(
+        "block-ellipsis valid",
+        `Quick,
+        test_block_ellipsis_valid,
+      ),
+      Alcotest.test_case(
+        "block-ellipsis invalid",
+        `Quick,
+        test_block_ellipsis_invalid,
+      ),
+      Alcotest.test_case("continue valid", `Quick, test_continue_valid),
+      Alcotest.test_case("continue invalid", `Quick, test_continue_invalid),
+      Alcotest.test_case(
+        "bookmark-label valid",
+        `Quick,
+        test_bookmark_label_valid,
+      ),
+      Alcotest.test_case(
+        "bookmark-level valid",
+        `Quick,
+        test_bookmark_level_valid,
+      ),
+      Alcotest.test_case(
+        "bookmark-level invalid",
+        `Quick,
+        test_bookmark_level_invalid,
+      ),
+      Alcotest.test_case(
+        "bookmark-state valid",
+        `Quick,
+        test_bookmark_state_valid,
+      ),
+      Alcotest.test_case(
+        "bookmark-state invalid",
+        `Quick,
+        test_bookmark_state_invalid,
+      ),
+      Alcotest.test_case("string-set valid", `Quick, test_string_set_valid),
+      Alcotest.test_case(
+        "string-set invalid",
+        `Quick,
+        test_string_set_invalid,
+      ),
+      Alcotest.test_case("running valid", `Quick, test_running_valid),
+      Alcotest.test_case(
+        "footnote-display valid",
+        `Quick,
+        test_footnote_display_valid,
+      ),
+      Alcotest.test_case(
+        "footnote-display invalid",
+        `Quick,
+        test_footnote_display_invalid,
+      ),
+      Alcotest.test_case(
+        "footnote-policy valid",
+        `Quick,
+        test_footnote_policy_valid,
+      ),
+      Alcotest.test_case("flow-into valid", `Quick, test_flow_into_valid),
+      Alcotest.test_case("flow-into invalid", `Quick, test_flow_into_invalid),
+      Alcotest.test_case("flow-from valid", `Quick, test_flow_from_valid),
+      Alcotest.test_case(
+        "region-fragment valid",
+        `Quick,
+        test_region_fragment_valid,
+      ),
+      Alcotest.test_case(
+        "region-fragment invalid",
+        `Quick,
+        test_region_fragment_invalid,
+      ),
+      Alcotest.test_case(
+        "float-reference valid",
+        `Quick,
+        test_float_reference_valid,
+      ),
+      Alcotest.test_case(
+        "float-reference invalid",
+        `Quick,
+        test_float_reference_invalid,
+      ),
+      Alcotest.test_case("float-defer valid", `Quick, test_float_defer_valid),
+      Alcotest.test_case(
+        "float-offset valid",
+        `Quick,
+        test_float_offset_valid,
+      ),
+      Alcotest.test_case(
+        "spatial-navigation-contain valid",
+        `Quick,
+        test_spatial_navigation_contain_valid,
+      ),
+      Alcotest.test_case(
+        "spatial-navigation-contain invalid",
+        `Quick,
+        test_spatial_navigation_contain_invalid,
+      ),
+      Alcotest.test_case(
+        "spatial-navigation-action valid",
+        `Quick,
+        test_spatial_navigation_action_valid,
+      ),
+      Alcotest.test_case(
+        "spatial-navigation-function valid",
+        `Quick,
+        test_spatial_navigation_function_valid,
+      ),
+      Alcotest.test_case(
+        "input-security valid",
+        `Quick,
+        test_input_security_valid,
+      ),
+      Alcotest.test_case(
+        "input-security invalid",
+        `Quick,
+        test_input_security_invalid,
+      ),
+      Alcotest.test_case(
+        "slider-orientation valid",
+        `Quick,
+        test_slider_orientation_valid,
+      ),
+      Alcotest.test_case(
+        "slider-orientation invalid",
+        `Quick,
+        test_slider_orientation_invalid,
+      ),
+      Alcotest.test_case(
+        "image-animation valid",
+        `Quick,
+        test_image_animation_valid,
+      ),
+      Alcotest.test_case(
+        "image-animation invalid",
+        `Quick,
+        test_image_animation_invalid,
+      ),
+      Alcotest.test_case("fill-break valid", `Quick, test_fill_break_valid),
+      Alcotest.test_case(
+        "fill-break invalid",
+        `Quick,
+        test_fill_break_invalid,
+      ),
+      Alcotest.test_case("fill-color valid", `Quick, test_fill_color_valid),
+      Alcotest.test_case("fill-image valid", `Quick, test_fill_image_valid),
+      Alcotest.test_case("fill-origin valid", `Quick, test_fill_origin_valid),
+      Alcotest.test_case(
+        "fill-origin invalid",
+        `Quick,
+        test_fill_origin_invalid,
+      ),
+      Alcotest.test_case(
+        "fill-position valid",
+        `Quick,
+        test_fill_position_valid,
+      ),
+      Alcotest.test_case("fill-repeat valid", `Quick, test_fill_repeat_valid),
+      Alcotest.test_case("fill-size valid", `Quick, test_fill_size_valid),
+      Alcotest.test_case(
+        "stroke-align valid",
+        `Quick,
+        test_stroke_align_valid,
+      ),
+      Alcotest.test_case(
+        "stroke-align invalid",
+        `Quick,
+        test_stroke_align_invalid,
+      ),
+      Alcotest.test_case(
+        "stroke-break valid",
+        `Quick,
+        test_stroke_break_valid,
+      ),
+      Alcotest.test_case(
+        "stroke-dash-corner valid",
+        `Quick,
+        test_stroke_dash_corner_valid,
+      ),
+      Alcotest.test_case(
+        "stroke-dash-corner invalid",
+        `Quick,
+        test_stroke_dash_corner_invalid,
+      ),
+      Alcotest.test_case(
+        "stroke-dash-justify valid",
+        `Quick,
+        test_stroke_dash_justify_valid,
+      ),
+      Alcotest.test_case(
+        "stroke-dash-justify invalid",
+        `Quick,
+        test_stroke_dash_justify_invalid,
+      ),
+      Alcotest.test_case(
+        "stroke-image valid",
+        `Quick,
+        test_stroke_image_valid,
+      ),
+      Alcotest.test_case(
+        "stroke-origin valid",
+        `Quick,
+        test_stroke_origin_valid,
+      ),
+      Alcotest.test_case(
+        "stroke-position valid",
+        `Quick,
+        test_stroke_position_valid,
+      ),
+      Alcotest.test_case(
+        "stroke-repeat valid",
+        `Quick,
+        test_stroke_repeat_valid,
+      ),
+      Alcotest.test_case("stroke-size valid", `Quick, test_stroke_size_valid),
+      Alcotest.test_case(
+        "border-top-radius valid",
+        `Quick,
+        test_border_top_radius_valid,
+      ),
+      Alcotest.test_case(
+        "border-top-radius invalid",
+        `Quick,
+        test_border_top_radius_invalid,
+      ),
+      Alcotest.test_case(
+        "border-limit valid",
+        `Quick,
+        test_border_limit_valid,
+      ),
+      Alcotest.test_case(
+        "border-limit invalid",
+        `Quick,
+        test_border_limit_invalid,
+      ),
+      Alcotest.test_case(
+        "border-top-clip valid",
+        `Quick,
+        test_border_top_clip_valid,
+      ),
+      Alcotest.test_case(
+        "border-top-clip invalid",
+        `Quick,
+        test_border_top_clip_invalid,
+      ),
+      Alcotest.test_case("border-clip valid", `Quick, test_border_clip_valid),
+      Alcotest.test_case(
+        "box-shadow-color valid",
+        `Quick,
+        test_box_shadow_color_valid,
+      ),
+      Alcotest.test_case(
+        "box-shadow-offset valid",
+        `Quick,
+        test_box_shadow_offset_valid,
+      ),
+      Alcotest.test_case(
+        "box-shadow-blur valid",
+        `Quick,
+        test_box_shadow_blur_valid,
+      ),
+      Alcotest.test_case(
+        "box-shadow-spread valid",
+        `Quick,
+        test_box_shadow_spread_valid,
+      ),
+      Alcotest.test_case(
+        "box-shadow-position valid",
+        `Quick,
+        test_box_shadow_position_valid,
+      ),
+      Alcotest.test_case(
+        "box-shadow-position invalid",
+        `Quick,
+        test_box_shadow_position_invalid,
       ),
       Alcotest.test_case("display keywords", `Quick, test_display_keywords),
       Alcotest.test_case("flex-direction", `Quick, test_flex_direction),

@@ -2527,6 +2527,24 @@ and property_background_position_y =
 and property_background_repeat = repeat_style list
 and property_background_size = bg_size list
 
+and property_background_position_block =
+  [ `Center
+  | `Static of
+    [ `Start | `End ] option
+    * [ `Extended_length of extended_length
+      | `Extended_percentage of extended_percentage
+      ]
+      option
+  ]
+  list
+
+and property_background_position_inline = property_background_position_block
+
+and property_background_repeat_block =
+  [ `Repeat | `Space | `Round | `No_repeat ] list
+
+and property_background_repeat_inline = property_background_repeat_block
+
 and property_baseline_shift =
   [ `Baseline
   | `Sub
@@ -2543,6 +2561,41 @@ and property_block_overflow =
   ]
 
 and property_block_size = property_width
+
+(* CSS Rhythmic Sizing L1: https://drafts.csswg.org/css-rhythm/#propdef-block-step-size *)
+and property_block_step_size =
+  [ `None
+  | `Extended_length of extended_length
+  ]
+
+(* CSS Rhythmic Sizing L1: https://drafts.csswg.org/css-rhythm/#propdef-block-step-insert *)
+and property_block_step_insert =
+  [ `Margin_box
+  | `Padding_box
+  | `Content_box
+  ]
+
+(* CSS Rhythmic Sizing L1: https://drafts.csswg.org/css-rhythm/#propdef-block-step-align *)
+and property_block_step_align =
+  [ `Auto
+  | `Center
+  | `Start
+  | `End
+  ]
+
+(* CSS Rhythmic Sizing L1: https://drafts.csswg.org/css-rhythm/#propdef-block-step-round *)
+and property_block_step_round =
+  [ `Up
+  | `Down
+  | `Nearest
+  ]
+
+(* CSS Rhythmic Sizing L1: https://drafts.csswg.org/css-rhythm/#propdef-block-step *)
+and property_block_step =
+  property_block_step_size option
+  * property_block_step_insert option
+  * property_block_step_align option
+  * property_block_step_round option
 
 and property_border =
   [ `None
@@ -2667,6 +2720,64 @@ and property_border_radius =
       list)
     option
 
+(* CSS Borders and Box Decorations L4 § 3.6.1 (per-side radius shorthands,
+   same shape as border-radius - {1,2} vs {1,4} doesn't change the type):
+   https://drafts.csswg.org/css-borders-4/#propdef-border-top-radius *)
+and property_border_top_radius = property_border_radius
+and property_border_right_radius = property_border_radius
+and property_border_bottom_radius = property_border_radius
+and property_border_left_radius = property_border_radius
+and property_border_block_start_radius = property_border_radius
+and property_border_block_end_radius = property_border_radius
+and property_border_inline_start_radius = property_border_radius
+and property_border_inline_end_radius = property_border_radius
+
+(* https://drafts.csswg.org/css-borders-4/#propdef-border-limit *)
+and property_border_limit =
+  [ `All
+  | `Static_0 of
+    [ `Corners | `Sides ]
+    * [ `Extended_length of extended_length
+      | `Extended_percentage of extended_percentage
+      ]
+      option
+  | `Static_1 of
+    [ `Bottom | `Left | `Right | `Top ]
+    * [ `Extended_length of extended_length
+      | `Extended_percentage of extended_percentage
+      ]
+  ]
+
+and property_border_top_clip =
+  [ `None
+  | `Xor of
+    [ `Flex_value of flex_value
+    | `Xor of
+      [ `Extended_length of extended_length
+      | `Extended_percentage of extended_percentage
+      ]
+    ]
+    list
+  ]
+
+and property_border_right_clip = property_border_top_clip
+and property_border_bottom_clip = property_border_top_clip
+and property_border_left_clip = property_border_top_clip
+and property_border_block_start_clip = property_border_top_clip
+and property_border_block_end_clip = property_border_top_clip
+and property_border_inline_start_clip = property_border_top_clip
+and property_border_inline_end_clip = property_border_top_clip
+and property_border_block_clip = property_border_top_clip
+and property_border_inline_clip = property_border_top_clip
+and property_border_clip = property_border_top_clip
+and property_box_shadow_color = color list
+
+and property_box_shadow_offset =
+  [ `Extended_length of extended_length list | `None ] list
+
+and property_box_shadow_blur = extended_length list
+and property_box_shadow_spread = extended_length list
+and property_box_shadow_position = [ `Outset | `Inset ] list
 and property_border_right = property_border
 and property_border_right_color = color
 and property_border_right_style = line_style
@@ -2676,6 +2787,13 @@ and property_border_right_width = line_width
 and property_border_shape =
   [ `None
   | `Static of (basic_shape * geometry_box option) list
+  ]
+
+(* CSS Round Display L1: https://drafts.csswg.org/css-round-display/#propdef-border-boundary *)
+and property_border_boundary =
+  [ `None
+  | `Parent
+  | `Display
   ]
 
 and property_border_spacing = extended_length * extended_length option
@@ -2944,9 +3062,9 @@ and property_row_rule_inset_junction_start = inset_value
 and property_row_rule_inset_junction_end = inset_value
 
 (* CSS Gaps L1 § 3.3.1: https://drafts.csswg.org/css-gaps-1/#propdef-column-rule-inset-start
-   column-rule-inset-start itself is not browser-implemented (no BCD entry;
-   asymmetric with row-rule-inset-start, which is) so it is not registered -
-   row-rule-inset-end and column-rule-inset-end are (Chrome 149), and are. *)
+   Now registered as a standards-track property (task 2,
+   css-grammar-draft-properties) - see Column.ml's own comment. *)
+and property_column_rule_inset_start = inset_value
 and property_column_rule_inset_end = inset_value
 and property_row_rule_inset_start = inset_value
 and property_row_rule_inset_end = inset_value
@@ -3194,6 +3312,29 @@ and property_fill_rule =
   | `Evenodd
   ]
 
+(* CSS Fill and Stroke Module L3: https://drafts.csswg.org/fill-stroke/#propdef-fill-break *)
+and property_fill_break =
+  [ `Bounding_box
+  | `Slice
+  | `Clone
+  ]
+
+and property_fill_color = color
+and property_fill_image = paint list
+
+and property_fill_origin =
+  [ `Match_parent
+  | `Fill_box
+  | `Stroke_box
+  | `Content_box
+  | `Padding_box
+  | `Border_box
+  ]
+
+and property_fill_position = bg_position list
+and property_fill_repeat = repeat_style list
+and property_fill_size = bg_size list
+
 and property_filter =
   [ `None
   | `Interpolation of string list
@@ -3246,6 +3387,125 @@ and property_float =
   | `None
   | `Inline_start
   | `Inline_end
+  ]
+
+(* CSS Page Floats: https://drafts.csswg.org/css-page-floats/#propdef-float-reference *)
+and property_float_reference =
+  [ `Inline
+  | `Column
+  | `Region
+  | `Page
+  ]
+
+(* CSS Page Floats: https://drafts.csswg.org/css-page-floats/#propdef-float-defer *)
+and property_float_defer =
+  [ `Integer of int
+  | `Last
+  | `None
+  ]
+
+(* CSS Page Floats: https://drafts.csswg.org/css-page-floats/#propdef-float-offset *)
+and property_float_offset =
+  [ `Extended_length of extended_length
+  | `Extended_percentage of extended_percentage
+  ]
+
+(* CSS Generated Content L3: https://drafts.csswg.org/css-content-3/#propdef-bookmark-label *)
+and property_bookmark_label = content_list
+
+(* CSS Generated Content L3: https://drafts.csswg.org/css-content-3/#propdef-bookmark-level *)
+and property_bookmark_level =
+  [ `None
+  | `Positive_integer of positive_integer
+  ]
+
+(* CSS Generated Content L3: https://drafts.csswg.org/css-content-3/#propdef-bookmark-state *)
+and property_bookmark_state =
+  [ `Open
+  | `Closed
+  ]
+
+(* CSS Generated Content L3: https://drafts.csswg.org/css-content-3/#propdef-string-set *)
+and property_string_set =
+  [ `None
+  | `Static of (string * string list) list
+  ]
+
+(* CSS Generated Content for Paged Media: https://drafts.csswg.org/css-gcpm/#propdef-running *)
+and property_running = string
+
+(* CSS Generated Content for Paged Media: https://drafts.csswg.org/css-gcpm/#propdef-footnote-display *)
+and property_footnote_display =
+  [ `Block
+  | `Inline
+  | `Compact
+  ]
+
+(* CSS Generated Content for Paged Media: https://drafts.csswg.org/css-gcpm/#propdef-footnote-policy *)
+and property_footnote_policy =
+  [ `Auto
+  | `Line
+  | `Block
+  ]
+
+(* CSS Regions L1: https://drafts.csswg.org/css-regions/#propdef-flow-into *)
+and property_flow_into =
+  [ `None
+  | `Static of string * [ `Element | `Content ] option
+  ]
+
+(* CSS Regions L1: https://drafts.csswg.org/css-regions/#propdef-flow-from *)
+and property_flow_from =
+  [ `Custom_ident of string
+  | `None
+  ]
+
+(* CSS Regions L1: https://drafts.csswg.org/css-regions/#propdef-region-fragment *)
+and property_region_fragment =
+  [ `Auto
+  | `Break
+  ]
+
+(* CSS Spatial Navigation L1: https://drafts.csswg.org/css-spatial-nav-1/#propdef-spatial-navigation-contain *)
+and property_spatial_navigation_contain =
+  [ `Auto
+  | `Contain
+  ]
+
+(* CSS Spatial Navigation L1: https://drafts.csswg.org/css-spatial-nav-1/#propdef-spatial-navigation-action *)
+and property_spatial_navigation_action =
+  [ `Auto
+  | `Focus
+  | `Scroll
+  ]
+
+(* CSS Spatial Navigation L1: https://drafts.csswg.org/css-spatial-nav-1/#propdef-spatial-navigation-function *)
+and property_spatial_navigation_function =
+  [ `Normal
+  | `Grid
+  ]
+
+(* CSS Form Control Styling L1: https://drafts.csswg.org/css-forms-1/#propdef-input-security *)
+and property_input_security =
+  [ `Auto
+  | `None
+  ]
+
+(* CSS Form Control Styling L1: https://drafts.csswg.org/css-forms-1/#propdef-slider-orientation *)
+and property_slider_orientation =
+  [ `Auto
+  | `Left_to_right
+  | `Right_to_left
+  | `Top_to_bottom
+  | `Bottom_to_top
+  ]
+
+(* CSS Image Animation L1: https://drafts.csswg.org/css-image-animation-1/#propdef-image-animation *)
+and property_image_animation =
+  [ `Normal
+  | `Paused
+  | `Stopped
+  | `Running
   ]
 
 (* CSS Grid Layout L3 (grid lanes containers): https://drafts.csswg.org/css-grid-3/#propdef-flow-tolerance *)
@@ -3649,7 +3909,24 @@ and property_initial_letter_align =
   | `Ideographic
   ]
 
+(* CSS Inline Layout L3: https://drafts.csswg.org/css-inline-3/#propdef-initial-letter-wrap *)
+and property_initial_letter_wrap =
+  [ `None
+  | `First
+  | `All
+  | `Grid
+  | `Extended_length of extended_length
+  | `Extended_percentage of extended_percentage
+  ]
+
 and property_inline_size = property_width
+
+(* CSS Inline Layout L3: https://drafts.csswg.org/css-inline-3/#propdef-inline-sizing *)
+and property_inline_sizing =
+  [ `Normal
+  | `Stretch
+  ]
+
 and property_inset = property_top list
 and property_inset_block = property_top list
 and property_inset_block_end = property_top
@@ -3748,6 +4025,29 @@ and property_line_break =
   | `Interpolation of string list
   ]
 
+(* CSS Line Grid L1: https://drafts.csswg.org/css-line-grid/#propdef-line-grid *)
+and property_line_grid =
+  [ `Match_parent
+  | `Create
+  ]
+
+(* CSS Line Grid L1: https://drafts.csswg.org/css-line-grid/#propdef-line-snap *)
+and property_line_snap =
+  [ `None
+  | `Baseline
+  | `Contain
+  ]
+
+(* CSS Line Grid L1: https://drafts.csswg.org/css-line-grid/#propdef-box-snap *)
+and property_box_snap =
+  [ `None
+  | `Block_start
+  | `Block_end
+  | `Center
+  | `Baseline
+  | `Last_baseline
+  ]
+
 and property_line_clamp =
   [ `None
   | `Integer of int
@@ -3760,6 +4060,8 @@ and property_line_height =
   | `Extended_percentage of extended_percentage
   ]
 
+(* CSS Inline Layout L3: https://drafts.csswg.org/css-inline-3/#propdef-line-fit-edge *)
+and property_line_fit_edge = property_text_box_edge
 and property_line_height_step = extended_length
 
 and property_list_style =
@@ -3823,6 +4125,13 @@ and property_margin_top =
   | `Auto
   ]
 
+(* CSS Fragmentation L4: https://drafts.csswg.org/css-break-4/#propdef-margin-break *)
+and property_margin_break =
+  [ `Auto
+  | `Keep
+  | `Discard
+  ]
+
 and property_margin_trim =
   [ `None
   | `In_flow
@@ -3847,6 +4156,12 @@ and property_marker_mid =
 and property_marker_start =
   [ `None
   | `Url of url
+  ]
+
+(* CSS Lists and Counters L3: https://drafts.csswg.org/css-lists-3/#propdef-marker-side *)
+and property_marker_side =
+  [ `Match_self
+  | `Match_parent
   ]
 
 and property_mask = mask_layer list
@@ -3920,6 +4235,9 @@ and property_max_height =
 
 and property_max_inline_size = property_max_width
 
+(* CSS Box Sizing L4: https://drafts.csswg.org/css-sizing-4/#propdef-max-size *)
+and property_max_size = property_max_width * property_max_height option
+
 and property_max_lines =
   [ `None
   | `Integer of int
@@ -3941,6 +4259,15 @@ and property_max_width =
   ]
 
 and property_min_block_size = property_min_width
+
+(* CSS Box Sizing L4: https://drafts.csswg.org/css-sizing-4/#propdef-min-size *)
+and property_min_size = property_min_width * property_min_height option
+
+(* CSS Box Sizing L4: https://drafts.csswg.org/css-sizing-4/#propdef-min-intrinsic-sizing *)
+and property_min_intrinsic_sizing =
+  [ `Legacy
+  | `Or of unit option * unit option
+  ]
 
 and property_min_height =
   [ `Auto
@@ -4178,6 +4505,48 @@ and property_overflow_block =
   ]
 
 and property_overflow_clip_margin = visual_box option * extended_length option
+
+and property_overflow_clip_margin_top =
+  visual_box option * extended_length option
+
+and property_overflow_clip_margin_right =
+  visual_box option * extended_length option
+
+and property_overflow_clip_margin_bottom =
+  visual_box option * extended_length option
+
+and property_overflow_clip_margin_left =
+  visual_box option * extended_length option
+
+and property_overflow_clip_margin_block_start =
+  visual_box option * extended_length option
+
+and property_overflow_clip_margin_block_end =
+  visual_box option * extended_length option
+
+and property_overflow_clip_margin_inline_start =
+  visual_box option * extended_length option
+
+and property_overflow_clip_margin_inline_end =
+  visual_box option * extended_length option
+
+and property_overflow_clip_margin_block =
+  visual_box option * extended_length option
+
+and property_overflow_clip_margin_inline =
+  visual_box option * extended_length option
+
+and property_block_ellipsis =
+  [ `No_ellipsis
+  | `Auto
+  | `String of string
+  ]
+
+and property_continue =
+  [ `Auto
+  | `Discard
+  | `Collapse
+  ]
 
 and property_overflow_inline =
   [ `Visible
@@ -4617,6 +4986,15 @@ and property_shape_outside =
   | `Image of image
   ]
 
+(* CSS Round Display L1: https://drafts.csswg.org/css-round-display/#propdef-shape-inside *)
+and property_shape_inside =
+  [ `Auto
+  | `Outside_shape
+  | `Or of basic_shape option * shape_box option
+  | `Image of image
+  | `Display
+  ]
+
 and property_shape_rendering =
   [ `Auto
   | `OptimizeSpeed
@@ -4665,6 +5043,31 @@ and property_stroke_linejoin =
 and property_stroke_miterlimit = number_one_or_greater
 and property_stroke_opacity = alpha_value
 and property_stroke_width = svg_length
+
+(* CSS Fill and Stroke Module L3: https://drafts.csswg.org/fill-stroke/#propdef-stroke-align *)
+and property_stroke_align =
+  [ `Center
+  | `Inset
+  | `Outset
+  ]
+
+and property_stroke_break = property_fill_break
+
+and property_stroke_dash_corner =
+  [ `None
+  | `Extended_length of extended_length
+  ]
+
+and property_stroke_dash_justify =
+  [ `None
+  | `Or of [ `Compress | `Stretch ] option * (unit option * unit option) option
+  ]
+
+and property_stroke_image = paint list
+and property_stroke_origin = property_fill_origin
+and property_stroke_position = bg_position list
+and property_stroke_repeat = repeat_style list
+and property_stroke_size = bg_size list
 
 and property_tab_size =
   [ `Number of float
@@ -4832,6 +5235,10 @@ and property_text_emphasis_color = color
 
 and property_text_emphasis_position =
   [ `Over | `Under ] * [ `Right | `Left ] option
+
+(* CSS Text Decoration L4: https://drafts.csswg.org/css-text-decor-4/#propdef-text-emphasis-skip *)
+and property_text_emphasis_skip =
+  unit option * unit option * unit option * unit option
 
 and property_text_emphasis_style =
   [ `None
@@ -5093,6 +5500,23 @@ and property_white_space =
 
 and property_widows = int
 
+(* CSS Exclusions L1: https://drafts.csswg.org/css-exclusions/#propdef-wrap-flow *)
+and property_wrap_flow =
+  [ `Auto
+  | `Both
+  | `Start
+  | `End
+  | `Minimum
+  | `Maximum
+  | `Clear
+  ]
+
+(* CSS Exclusions L1: https://drafts.csswg.org/css-exclusions/#propdef-wrap-through *)
+and property_wrap_through =
+  [ `Wrap
+  | `None
+  ]
+
 and property_width =
   [ `Auto
   | `Extended_length of extended_length
@@ -5128,6 +5552,25 @@ and property_word_wrap =
   [ `Normal
   | `Break_word
   | `Anywhere
+  ]
+
+(* CSS Text L4: https://drafts.csswg.org/css-text-4/#propdef-wrap-before
+   wrap-after shares this exact grammar (one shared propdef table). *)
+and property_wrap_before =
+  [ `Auto
+  | `Avoid
+  | `Avoid_line
+  | `Avoid_flex
+  | `Line
+  | `Flex
+  ]
+
+and property_wrap_after = property_wrap_before
+
+(* CSS Text L4 (preview): https://drafts.csswg.org/css-text-4/#propdef-wrap-inside *)
+and property_wrap_inside =
+  [ `Auto
+  | `Avoid
   ]
 
 and property_writing_mode =
@@ -5659,6 +6102,25 @@ and property_scroll_marker_group =
 
 and property_text_edge =
   [ `Leading | `Property_text_box_edge of property_text_box_edge ] list
+
+(* CSS Text L4: https://drafts.csswg.org/css-text-4/#propdef-line-padding *)
+and property_line_padding = extended_length
+
+(* CSS Text L4: https://drafts.csswg.org/css-text-4/#propdef-text-group-align *)
+and property_text_group_align =
+  [ `None
+  | `Start
+  | `End
+  | `Left
+  | `Right
+  | `Center
+  ]
+
+(* CSS Text L4 (preview): https://drafts.csswg.org/css-text-4/#propdef-white-space-trim *)
+and property_white_space_trim =
+  [ `None
+  | `Or of unit option * unit option * unit option
+  ]
 
 and property_hyphenate_limit_last =
   [ `None

@@ -355,6 +355,188 @@ module Property_border_radius =
 let property_border_radius : property_border_radius Rule.rule =
   Property_border_radius.rule
 
+(* CSS Borders and Box Decorations L4 § 3.6.1 (per-side radius shorthands):
+   https://drafts.csswg.org/css-borders-4/#propdef-border-top-radius
+   Same shape as border-radius, but 1-2 values (one side's two corners) not
+   1-4. Each sets the two border-*-*-radius longhands of its own side. *)
+module Property_border_top_radius =
+  [%spec_module
+  "[ <extended-length> | <extended-percentage> ]{1,2} [ '/' [ \
+   <extended-length> | <extended-percentage> ]{1,2} ]?",
+  (module Css_types.BorderRadius)]
+
+let property_border_top_radius : property_border_top_radius Rule.rule =
+  Property_border_top_radius.rule
+
+module Property_border_right_radius =
+  [%spec_module
+  "[ <extended-length> | <extended-percentage> ]{1,2} [ '/' [ \
+   <extended-length> | <extended-percentage> ]{1,2} ]?",
+  (module Css_types.BorderRadius)]
+
+let property_border_right_radius : property_border_right_radius Rule.rule =
+  Property_border_right_radius.rule
+
+module Property_border_bottom_radius =
+  [%spec_module
+  "[ <extended-length> | <extended-percentage> ]{1,2} [ '/' [ \
+   <extended-length> | <extended-percentage> ]{1,2} ]?",
+  (module Css_types.BorderRadius)]
+
+let property_border_bottom_radius : property_border_bottom_radius Rule.rule =
+  Property_border_bottom_radius.rule
+
+module Property_border_left_radius =
+  [%spec_module
+  "[ <extended-length> | <extended-percentage> ]{1,2} [ '/' [ \
+   <extended-length> | <extended-percentage> ]{1,2} ]?",
+  (module Css_types.BorderRadius)]
+
+let property_border_left_radius : property_border_left_radius Rule.rule =
+  Property_border_left_radius.rule
+
+module Property_border_block_start_radius =
+  [%spec_module
+  "[ <extended-length> | <extended-percentage> ]{1,2} [ '/' [ \
+   <extended-length> | <extended-percentage> ]{1,2} ]?",
+  (module Css_types.BorderRadius)]
+
+let property_border_block_start_radius :
+  property_border_block_start_radius Rule.rule =
+  Property_border_block_start_radius.rule
+
+module Property_border_block_end_radius =
+  [%spec_module
+  "[ <extended-length> | <extended-percentage> ]{1,2} [ '/' [ \
+   <extended-length> | <extended-percentage> ]{1,2} ]?",
+  (module Css_types.BorderRadius)]
+
+let property_border_block_end_radius :
+  property_border_block_end_radius Rule.rule =
+  Property_border_block_end_radius.rule
+
+module Property_border_inline_start_radius =
+  [%spec_module
+  "[ <extended-length> | <extended-percentage> ]{1,2} [ '/' [ \
+   <extended-length> | <extended-percentage> ]{1,2} ]?",
+  (module Css_types.BorderRadius)]
+
+let property_border_inline_start_radius :
+  property_border_inline_start_radius Rule.rule =
+  Property_border_inline_start_radius.rule
+
+module Property_border_inline_end_radius =
+  [%spec_module
+  "[ <extended-length> | <extended-percentage> ]{1,2} [ '/' [ \
+   <extended-length> | <extended-percentage> ]{1,2} ]?",
+  (module Css_types.BorderRadius)]
+
+let property_border_inline_end_radius :
+  property_border_inline_end_radius Rule.rule =
+  Property_border_inline_end_radius.rule
+
+(* CSS Borders and Box Decorations L4 § 5.1: https://drafts.csswg.org/css-borders-4/#propdef-border-limit
+   Standalone - no shorthand relation. *)
+module Property_border_limit =
+  [%spec_module
+  "'all' | [ 'sides' | 'corners' ] [ <extended-length> | <extended-percentage> \
+   ]? | [ 'top' | 'right' | 'bottom' | 'left' ] [ <extended-length> | \
+   <extended-percentage> ]",
+  (module Css_types.BorderLimit)]
+
+let property_border_limit : property_border_limit Rule.rule =
+  Property_border_limit.rule
+
+(* CSS Borders and Box Decorations L4 § 5.2: https://drafts.csswg.org/css-borders-4/#propdef-border-clip
+   8 leaves (physical + logical), then 3 shorthands over them. *)
+module Property_border_top_clip =
+  [%spec_module
+  "'none' | [ [ <extended-length> | <extended-percentage> ] | <flex-value> ]+",
+  (module Css_types.BorderClip)]
+
+let property_border_top_clip : property_border_top_clip Rule.rule =
+  Property_border_top_clip.rule
+
+module Property_border_right_clip =
+  [%spec_module
+  "'none' | [ [ <extended-length> | <extended-percentage> ] | <flex-value> ]+",
+  (module Css_types.BorderClip)]
+
+let property_border_right_clip : property_border_right_clip Rule.rule =
+  Property_border_right_clip.rule
+
+module Property_border_bottom_clip =
+  [%spec_module
+  "'none' | [ [ <extended-length> | <extended-percentage> ] | <flex-value> ]+",
+  (module Css_types.BorderClip)]
+
+let property_border_bottom_clip : property_border_bottom_clip Rule.rule =
+  Property_border_bottom_clip.rule
+
+module Property_border_left_clip =
+  [%spec_module
+  "'none' | [ [ <extended-length> | <extended-percentage> ] | <flex-value> ]+",
+  (module Css_types.BorderClip)]
+
+let property_border_left_clip : property_border_left_clip Rule.rule =
+  Property_border_left_clip.rule
+
+module Property_border_block_start_clip =
+  [%spec_module
+  "'none' | [ [ <extended-length> | <extended-percentage> ] | <flex-value> ]+",
+  (module Css_types.BorderClip)]
+
+let property_border_block_start_clip :
+  property_border_block_start_clip Rule.rule =
+  Property_border_block_start_clip.rule
+
+module Property_border_block_end_clip =
+  [%spec_module
+  "'none' | [ [ <extended-length> | <extended-percentage> ] | <flex-value> ]+",
+  (module Css_types.BorderClip)]
+
+let property_border_block_end_clip : property_border_block_end_clip Rule.rule =
+  Property_border_block_end_clip.rule
+
+module Property_border_inline_start_clip =
+  [%spec_module
+  "'none' | [ [ <extended-length> | <extended-percentage> ] | <flex-value> ]+",
+  (module Css_types.BorderClip)]
+
+let property_border_inline_start_clip :
+  property_border_inline_start_clip Rule.rule =
+  Property_border_inline_start_clip.rule
+
+module Property_border_inline_end_clip =
+  [%spec_module
+  "'none' | [ [ <extended-length> | <extended-percentage> ] | <flex-value> ]+",
+  (module Css_types.BorderClip)]
+
+let property_border_inline_end_clip : property_border_inline_end_clip Rule.rule
+    =
+  Property_border_inline_end_clip.rule
+
+module Property_border_block_clip =
+  [%spec_module
+  "<'border-top-clip'>", (module Css_types.BorderClip)]
+
+let property_border_block_clip : property_border_block_clip Rule.rule =
+  Property_border_block_clip.rule
+
+module Property_border_inline_clip =
+  [%spec_module
+  "<'border-top-clip'>", (module Css_types.BorderClip)]
+
+let property_border_inline_clip : property_border_inline_clip Rule.rule =
+  Property_border_inline_clip.rule
+
+module Property_border_clip =
+  [%spec_module
+  "<'border-top-clip'>", (module Css_types.BorderClip)]
+
+let property_border_clip : property_border_clip Rule.rule =
+  Property_border_clip.rule
+
 module Property_border_right =
   [%spec_module
   "<'border'>", (module Css_types.Border)]
@@ -391,6 +573,16 @@ module Property_border_shape =
 
 let property_border_shape : property_border_shape Rule.rule =
   Property_border_shape.rule
+
+(* CSS Round Display L1 (border-boundary is round-display's own property,
+   despite the "border-" name, not css-borders-4's):
+   https://drafts.csswg.org/css-round-display/#propdef-border-boundary *)
+module Property_border_boundary =
+  [%spec_module
+  "'none' | 'parent' | 'display'", (module Css_types.BorderBoundary)]
+
+let property_border_boundary : property_border_boundary Rule.rule =
+  Property_border_boundary.rule
 
 module Property_border_spacing =
   [%spec_module
@@ -609,6 +801,73 @@ let entries : (kind * packed_rule) list =
             "border-bottom-left-radius";
           ] ),
       pack_module (module Property_border_radius) );
+    (* CSS Borders and Box Decorations L4 § 3.6.1: https://drafts.csswg.org/css-borders-4/#propdef-border-top-radius *)
+    ( Shorthand
+        ( "border-top-radius",
+          [ "border-top-left-radius"; "border-top-right-radius" ] ),
+      pack_module (module Property_border_top_radius) );
+    ( Shorthand
+        ( "border-right-radius",
+          [ "border-top-right-radius"; "border-bottom-right-radius" ] ),
+      pack_module (module Property_border_right_radius) );
+    ( Shorthand
+        ( "border-bottom-radius",
+          [ "border-bottom-left-radius"; "border-bottom-right-radius" ] ),
+      pack_module (module Property_border_bottom_radius) );
+    ( Shorthand
+        ( "border-left-radius",
+          [ "border-top-left-radius"; "border-bottom-left-radius" ] ),
+      pack_module (module Property_border_left_radius) );
+    ( Shorthand
+        ( "border-block-start-radius",
+          [ "border-start-start-radius"; "border-start-end-radius" ] ),
+      pack_module (module Property_border_block_start_radius) );
+    ( Shorthand
+        ( "border-block-end-radius",
+          [ "border-end-start-radius"; "border-end-end-radius" ] ),
+      pack_module (module Property_border_block_end_radius) );
+    ( Shorthand
+        ( "border-inline-start-radius",
+          [ "border-start-start-radius"; "border-end-start-radius" ] ),
+      pack_module (module Property_border_inline_start_radius) );
+    ( Shorthand
+        ( "border-inline-end-radius",
+          [ "border-start-end-radius"; "border-end-end-radius" ] ),
+      pack_module (module Property_border_inline_end_radius) );
+    (* CSS Borders and Box Decorations L4 § 5.1: https://drafts.csswg.org/css-borders-4/#propdef-border-limit *)
+    Property "border-limit", pack_module (module Property_border_limit);
+    (* CSS Borders and Box Decorations L4 § 5.2: https://drafts.csswg.org/css-borders-4/#propdef-border-top-clip *)
+    Property "border-top-clip", pack_module (module Property_border_top_clip);
+    ( Property "border-right-clip",
+      pack_module (module Property_border_right_clip) );
+    ( Property "border-bottom-clip",
+      pack_module (module Property_border_bottom_clip) );
+    Property "border-left-clip", pack_module (module Property_border_left_clip);
+    ( Property "border-block-start-clip",
+      pack_module (module Property_border_block_start_clip) );
+    ( Property "border-block-end-clip",
+      pack_module (module Property_border_block_end_clip) );
+    ( Property "border-inline-start-clip",
+      pack_module (module Property_border_inline_start_clip) );
+    ( Property "border-inline-end-clip",
+      pack_module (module Property_border_inline_end_clip) );
+    ( Shorthand
+        ( "border-block-clip",
+          [ "border-block-start-clip"; "border-block-end-clip" ] ),
+      pack_module (module Property_border_block_clip) );
+    ( Shorthand
+        ( "border-inline-clip",
+          [ "border-inline-start-clip"; "border-inline-end-clip" ] ),
+      pack_module (module Property_border_inline_clip) );
+    ( Shorthand
+        ( "border-clip",
+          [
+            "border-top-clip";
+            "border-right-clip";
+            "border-bottom-clip";
+            "border-left-clip";
+          ] ),
+      pack_module (module Property_border_clip) );
     (* Backgrounds and Borders L3 (border shorthands; border also resets border-image): https://www.w3.org/TR/css-backgrounds-3/#the-border-shorthands *)
     ( Shorthand
         ( "border-right",
@@ -620,6 +879,7 @@ let entries : (kind * packed_rule) list =
     ( Property "border-right-width",
       pack_module (module Property_border_right_width) );
     Property "border-shape", pack_module (module Property_border_shape);
+    Property "border-boundary", pack_module (module Property_border_boundary);
     Property "border-spacing", pack_module (module Property_border_spacing);
     ( Property "border-start-end-radius",
       pack_module (module Property_border_start_end_radius) );

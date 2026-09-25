@@ -760,6 +760,92 @@ let seed : string array =
     "rule-inset";
     "rule-overlap";
     "rule-visibility-items";
+    (* Appended 2026-09-25 (css-grammar-draft-properties, task 2): family keys
+       for the 140 standards-track/preview properties this task added -
+       computed from make test-slot-key-registry's coverage failure via
+       Family.family_key_of, not guessed. Most are standalone (no shorthand
+       relation to anything else); a few merge pre-existing standalone
+       properties into a new, shorter-named family: "max-size"/"min-size"
+       absorb max-width/max-height and min-width/min-height (both now new
+       Shorthands); "border-clip"/"border-block-clip"/"border-inline-clip"
+       and "border-block-end-radius" absorb the new border-*-clip and
+       logical border-*-radius leaves and shorthands. *)
+    "background-position-block";
+    "background-position-inline";
+    "background-repeat-block";
+    "background-repeat-inline";
+    "block-ellipsis";
+    "block-step";
+    "bookmark-label";
+    "bookmark-level";
+    "bookmark-state";
+    "border-block-clip";
+    "border-block-end-radius";
+    "border-boundary";
+    "border-clip";
+    "border-inline-clip";
+    "border-limit";
+    "box-shadow-blur";
+    "box-shadow-color";
+    "box-shadow-offset";
+    "box-shadow-position";
+    "box-shadow-spread";
+    "box-snap";
+    "continue";
+    "fill-break";
+    "fill-color";
+    "fill-image";
+    "fill-origin";
+    "fill-position";
+    "fill-repeat";
+    "fill-size";
+    "float-defer";
+    "float-offset";
+    "float-reference";
+    "flow-from";
+    "flow-into";
+    "footnote-display";
+    "footnote-policy";
+    "image-animation";
+    "initial-letter-wrap";
+    "inline-sizing";
+    "input-security";
+    "line-fit-edge";
+    "line-grid";
+    "line-padding";
+    "line-snap";
+    "margin-break";
+    "marker-side";
+    "max-size";
+    "min-intrinsic-sizing";
+    "min-size";
+    "overflow-clip-margin-block";
+    "overflow-clip-margin-inline";
+    "region-fragment";
+    "running";
+    "shape-inside";
+    "slider-orientation";
+    "spatial-navigation-action";
+    "spatial-navigation-contain";
+    "spatial-navigation-function";
+    "string-set";
+    "stroke-align";
+    "stroke-break";
+    "stroke-dash-corner";
+    "stroke-dash-justify";
+    "stroke-image";
+    "stroke-origin";
+    "stroke-position";
+    "stroke-repeat";
+    "stroke-size";
+    "text-emphasis-skip";
+    "text-group-align";
+    "white-space-trim";
+    "wrap-after";
+    "wrap-before";
+    "wrap-flow";
+    "wrap-inside";
+    "wrap-through";
   |]
 
 module Registry = struct
