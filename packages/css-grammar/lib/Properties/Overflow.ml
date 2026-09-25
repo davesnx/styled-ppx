@@ -79,7 +79,9 @@ let entries : (kind * packed_rule) list =
   [
     ( Property "-ms-overflow-style",
       pack_module (module Property__ms_overflow_style) );
-    Property "overflow", pack_module (module Property_overflow);
+    (* Overflow L3: https://www.w3.org/TR/css-overflow-3/#propdef-overflow *)
+    ( Shorthand ("overflow", [ "overflow-x"; "overflow-y" ]),
+      pack_module (module Property_overflow) );
     ( Property "overflow-clip-box",
       pack_module (module Property_overflow_clip_box) );
     Property "overflow-wrap", pack_module (module Property_overflow_wrap);

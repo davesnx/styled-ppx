@@ -6,178 +6,34 @@ type context = {
   selector : string;
 }
 
-type property =
-  | Named of string
-  | All
-
-type covered =
-  | Leaves of string list
-  | Everything
-
-type t = {
-  context : context;
-  property : property;
-  covered : covered;
-  important : bool;
-}
-
 let is_custom_property name =
   String.length name >= 2 && name.[0] = '-' && name.[1] = '-'
 
 let normalize_property name =
   if is_custom_property name then name else String.lowercase_ascii name
 
-(* Direct shorthand -> immediate-children edges only. A child that is
-   itself a shorthand (e.g. "border" -> "border-width") is expanded by
-   {!leaves_of}, not flattened here - that is what keeps nested shorthands
-   (border -> border-top -> border-top-width) correct without a
-   hand-maintained flat list. Cite: CSS Box Model L3 (margin/padding/inset),
-   CSS Backgrounds and Borders L3/4 (border/background/radius/image), CSS
-   Fonts L3 (font), CSS Basic UI L3 (outline), CSS Lists L3 (list-style),
-   CSS Text Decoration L3, CSS Transitions L1, CSS Animations L1, CSS Grid
-   Layout L1/L2, CSS Flexible Box Layout L1, CSS Box Alignment L3
-   (place-content/place-items/place-self), CSS Overflow L3, CSS Logical
-   Properties and Values L1
-   (inset-*/margin-block/margin-inline/padding-block/padding-inline;
-   border-block/border-inline stop at the two logical sides deliberately -
-   see the module doc note below).
+(* Direct shorthand -> immediate-children edges only, sourced live from
+   css-grammar's own registrations (packages/css-grammar/lib/Properties/
+   *.ml, one [Shorthand (name, longhands)] tag per shorthand, spec-cited
+   right there next to each registration - see Css_grammar.Types.kind's
+   doc). A child that is itself a shorthand (e.g. "border" -> "border-width")
+   is expanded by {!leaves_of} and {!Family}, not flattened here - that is
+   what keeps nested shorthands (border -> border-top -> border-top-width)
+   correct without a hand-maintained flat list.
 
-   How this stays current: a newly-added CSS shorthand needs one entry
-   here (its own direct children, from the spec that defines it); nothing
-   else in this module changes. A shorthand this table does not know about
-   falls through {!leaves_of} as a plain leaf (itself), which is always
-   safe (never wrongly claims to cover properties it does not) even if
-   it's under-informative (never lets it remove or be removed by its own
-   real longhands) until someone adds it. *)
+   How this stays current: css-grammar is the single source of truth now -
+   a newly-added CSS shorthand needs one [Shorthand] tag at its own
+   registration site (see any existing one for the shape), nothing in this
+   module changes. A shorthand css-grammar does not yet tag this way falls
+   through {!leaves_of} as a plain leaf (itself), which is always safe
+   (never wrongly claims to cover properties it does not) even if it's
+   under-informative (never lets it remove or be removed by its own real
+   longhands) until someone tags it. *)
 let direct_children : (string, string list) Hashtbl.t =
-  let table = Hashtbl.create 64 in
-  let add shorthand children = Hashtbl.replace table shorthand children in
-  add "margin" [ "margin-top"; "margin-right"; "margin-bottom"; "margin-left" ];
-  add "padding"
-    [ "padding-top"; "padding-right"; "padding-bottom"; "padding-left" ];
-  add "margin-block" [ "margin-block-start"; "margin-block-end" ];
-  add "margin-inline" [ "margin-inline-start"; "margin-inline-end" ];
-  add "padding-block" [ "padding-block-start"; "padding-block-end" ];
-  add "padding-inline" [ "padding-inline-start"; "padding-inline-end" ];
-  add "inset" [ "top"; "right"; "bottom"; "left" ];
-  add "inset-block" [ "inset-block-start"; "inset-block-end" ];
-  add "inset-inline" [ "inset-inline-start"; "inset-inline-end" ];
-  (* Deliberately not decomposed to -width/-style/-color, unlike the
-     physical border-* family below: no live conflict has justified the
-     extra table size yet. Add if one turns up. *)
-  add "border-block" [ "border-block-start"; "border-block-end" ];
-  add "border-inline" [ "border-inline-start"; "border-inline-end" ];
-  add "border-width"
-    [
-      "border-top-width";
-      "border-right-width";
-      "border-bottom-width";
-      "border-left-width";
-    ];
-  add "border-style"
-    [
-      "border-top-style";
-      "border-right-style";
-      "border-bottom-style";
-      "border-left-style";
-    ];
-  add "border-color"
-    [
-      "border-top-color";
-      "border-right-color";
-      "border-bottom-color";
-      "border-left-color";
-    ];
-  add "border-top"
-    [ "border-top-width"; "border-top-style"; "border-top-color" ];
-  add "border-right"
-    [ "border-right-width"; "border-right-style"; "border-right-color" ];
-  add "border-bottom"
-    [ "border-bottom-width"; "border-bottom-style"; "border-bottom-color" ];
-  add "border-left"
-    [ "border-left-width"; "border-left-style"; "border-left-color" ];
-  add "border" [ "border-width"; "border-style"; "border-color" ];
-  add "border-radius"
-    [
-      "border-top-left-radius";
-      "border-top-right-radius";
-      "border-bottom-right-radius";
-      "border-bottom-left-radius";
-    ];
-  add "border-image"
-    [
-      "border-image-source";
-      "border-image-slice";
-      "border-image-width";
-      "border-image-outset";
-      "border-image-repeat";
-    ];
-  add "outline" [ "outline-color"; "outline-style"; "outline-width" ];
-  add "background"
-    [
-      "background-image";
-      "background-position";
-      "background-size";
-      "background-repeat";
-      "background-origin";
-      "background-clip";
-      "background-attachment";
-      "background-color";
-    ];
-  add "font"
-    [
-      "font-style";
-      "font-variant";
-      "font-weight";
-      "font-stretch";
-      "font-size";
-      "line-height";
-      "font-family";
-    ];
-  add "list-style"
-    [ "list-style-type"; "list-style-position"; "list-style-image" ];
-  add "text-decoration"
-    [
-      "text-decoration-line";
-      "text-decoration-style";
-      "text-decoration-color";
-      "text-decoration-thickness";
-    ];
-  (* transition/animation cover their own meta-properties only - "transition:
-     opacity 200ms" does not make this atom's slot "opacity"; opacity stays
-     its own, unrelated slot. See the module doc note below. *)
-  add "transition"
-    [
-      "transition-property";
-      "transition-duration";
-      "transition-timing-function";
-      "transition-delay";
-    ];
-  add "animation"
-    [
-      "animation-name";
-      "animation-duration";
-      "animation-timing-function";
-      "animation-delay";
-      "animation-iteration-count";
-      "animation-direction";
-      "animation-fill-mode";
-      "animation-play-state";
-    ];
-  add "grid-template"
-    [ "grid-template-rows"; "grid-template-columns"; "grid-template-areas" ];
-  add "grid"
-    [ "grid-template"; "grid-auto-rows"; "grid-auto-columns"; "grid-auto-flow" ];
-  add "grid-row" [ "grid-row-start"; "grid-row-end" ];
-  add "grid-column" [ "grid-column-start"; "grid-column-end" ];
-  add "grid-area" [ "grid-row"; "grid-column" ];
-  add "gap" [ "row-gap"; "column-gap" ];
-  add "place-content" [ "align-content"; "justify-content" ];
-  add "place-items" [ "align-items"; "justify-items" ];
-  add "place-self" [ "align-self"; "justify-self" ];
-  add "overflow" [ "overflow-x"; "overflow-y" ];
-  add "flex" [ "flex-grow"; "flex-shrink"; "flex-basis" ];
-  add "flex-flow" [ "flex-direction"; "flex-wrap" ];
+  let table = Hashtbl.create 128 in
+  Css_grammar.shorthands ()
+  |> List.iter (fun (shorthand, children) ->
+    Hashtbl.replace table shorthand children);
   table
 
 (* Deliberately NOT unified: CSS Logical Properties and Values L1 makes a
@@ -205,35 +61,777 @@ let leaves_of property = expand [] property
 let excluded_from_all name =
   name = "direction" || name = "unicode-bidi" || is_custom_property name
 
-let context_string { at_rules; selector } =
+(* --- Context --------------------------------------------------------- *)
+
+let context_key { at_rules; selector } =
   let at_rules_part =
     at_rules
     |> List.map (fun (name, prelude) -> Printf.sprintf "@%s\x00%s" name prelude)
     |> String.concat "\x00"
   in
-  at_rules_part ^ "\x00" ^ selector
+  if at_rules_part = "" && selector = "" then ""
+  else at_rules_part ^ "\x00" ^ selector
 
-let property_string = function Named p -> p | All -> "all"
+(* --- Families: union-find over [direct_children] ---------------------- *)
 
-let key t =
-  Printf.sprintf "slot-%s"
-    (Murmur2.default
-       (context_string t.context ^ "\x00" ^ property_string t.property))
+module Family = struct
+  (* Two properties are in the same family iff some [direct_children] entry's
+     fully-expanded leaf set ({!leaves_of}) contains both - e.g.
+     margin-top/margin-left are unioned via the "margin" entry;
+     border-top-width/border-color are unioned transitively (border-top ->
+     {border-top-width,...}, border -> border-color -> {...}, both within
+     the same 12-leaf closure). A shorthand's own name is unioned with its
+     leaves too, so "border" itself lands in the family, not just its
+     children. Deterministic: the smaller string always becomes the root,
+     independent of Hashtbl.iter's unspecified order. *)
+  let parent : (string, string) Hashtbl.t = Hashtbl.create 128
 
-let covered_keys t =
-  match t.covered with
-  | Everything -> None
-  | Leaves leaves ->
-    Some (List.map (fun p -> key { t with property = Named p }) leaves)
+  let rec find x =
+    match Hashtbl.find_opt parent x with
+    | None ->
+      Hashtbl.add parent x x;
+      x
+    | Some p when p = x -> x
+    | Some p ->
+      let root = find p in
+      Hashtbl.replace parent x root;
+      root
 
-(* Walks one atomized rule (Css_file.re's [atomize_rules] output shape:
-   a bare Declaration, a same-property Declaration group wrapped in a
-   [&]-only Style_rule, a resolved-selector Style_rule, any of those under
-   one or more At_rule wrappers) collecting the at-rule chain outer to
-   inner, the innermost selector text, and the declaration(s) at the leaf.
-   [Render.selector]/[Render.component_value_list] are the same renderers
-   [Hash_class] hashes for the class name, so this gets the same whitespace
-   and ordering canonicalization for free - no new normalization logic. *)
+  let union a b =
+    let ra = find a in
+    let rb = find b in
+    if ra <> rb then (
+      let winner, loser = if compare ra rb <= 0 then ra, rb else rb, ra in
+      Hashtbl.replace parent loser winner)
+
+  let () =
+    Hashtbl.iter
+      (fun shorthand _ ->
+        List.iter (fun leaf -> union shorthand leaf) (leaves_of shorthand))
+      direct_children
+
+  let members_by_root : (string, string list) Hashtbl.t = Hashtbl.create 64
+
+  let () =
+    Hashtbl.iter
+      (fun prop _root ->
+        let root = find prop in
+        let current =
+          Option.value (Hashtbl.find_opt members_by_root root) ~default:[]
+        in
+        if not (List.mem prop current) then
+          Hashtbl.replace members_by_root root (prop :: current))
+      parent
+
+  (* Every property (shorthand, intermediate, or leaf) that participates in
+     [prop]'s family, including [prop] itself whether or not it was ever a
+     [direct_children] key. Singleton (never in [parent]) for a property
+     with no shorthand relationship at all. *)
+  let all_members_of prop =
+    match Hashtbl.find_opt parent prop with
+    | None -> [ prop ]
+    | Some root ->
+      Hashtbl.find_opt members_by_root root |> Option.value ~default:[ prop ]
+
+  let leaf_members_of prop =
+    all_members_of prop
+    |> List.filter (fun m -> not (Hashtbl.mem direct_children m))
+    |> List.sort_uniq String.compare
+
+  (* The shortest member that is itself a shorthand (a [direct_children]
+     key), ties broken alphabetically - picks "border" over "border-top"
+     or "border-width" as the family's canonical name. A family with no
+     shorthand member at all (every real property that names no
+     shorthand and isn't anyone's child) uses [prop] itself. *)
+  let family_key_of prop =
+    let shorthand_members =
+      all_members_of prop |> List.filter (Hashtbl.mem direct_children)
+    in
+    match shorthand_members with
+    | [] -> prop
+    | _ :: _ ->
+      shorthand_members
+      |> List.sort (fun a b ->
+        match compare (String.length a) (String.length b) with
+        | 0 -> compare a b
+        | c -> c)
+      |> List.hd
+
+  let bit_position_of leaf leaves =
+    let rec index i = function
+      | [] -> invalid_arg ("Slot_key.Family: " ^ leaf ^ " not in its own family")
+      | x :: _ when x = leaf -> i
+      | _ :: rest -> index (i + 1) rest
+    in
+    index 0 leaves
+
+  let mask_of prop =
+    let leaves = leaf_members_of prop in
+    leaves_of prop
+    |> List.fold_left
+         (fun mask leaf ->
+           match List.find_opt (( = ) leaf) leaves with
+           | Some _ -> mask lor (1 lsl bit_position_of leaf leaves)
+           | None -> mask
+           (* defensive: shouldn't happen, leaves_of prop
+                              subset of prop's own family by construction *))
+         0
+
+  let full_mask_of prop =
+    let n = List.length (leaf_members_of prop) in
+    if n = 0 then 0 else (1 lsl n) - 1
+end
+
+(* --- Registry: fixed, append-only property/family id table ----------- *)
+
+(* Every id this table hands out - a shorthand family's canonical name (see
+   {!Family.family_key_of}) or a standalone (family-less) property's own
+   name - in one fixed, literal, append-only array. Position in this array
+   IS the id (see {!Registry.table} below, which uses this array's order
+   verbatim - no sorting, no filtering, ever, at build time). Seeded
+   2026-09-25 from every property packages/css-grammar/lib/Properties/*.ml
+   registers (759, via [Css_grammar.property_names ()], the 25 internal
+   `@media`-feature-grammar entries in Properties/Media.ml excluded - they
+   are not CSS properties, see Css_grammar.Registry's module doc), reduced
+   through {!resolve_alias} and {!Family.family_key_of} to the 528 distinct
+   ids actually needed (44 shorthand-family canonical keys + 484 standalone
+   properties) - a leaf covered by some family (e.g. "margin-top") needs no
+   entry of its own, and neither does a true alias (e.g. "font-width", "word-
+   wrap"), {!family_id_of} redirects both kinds to their canonical key.
+
+   ORDER RULE: append a newly-needed id at the END, never insert
+   alphabetically, never reorder, never remove. Moving an existing entry's
+   position changes every atom's class name built before the move - this
+   array's whole purpose is to make that impossible by construction. A
+   property not (yet) listed here still gets a correct, stable id via
+   {!family_id_of}'s hash fallback below, just not as short a class name
+   until it's added here. This alphabetical order is simply how the 2026-
+   09-25 seed happened to be authored, not an ongoing invariant. *)
+let seed : string array =
+  [|
+    "--*";
+    "-moz-appearance";
+    "-moz-background-clip";
+    "-moz-binding";
+    "-moz-border-bottom-colors";
+    "-moz-border-left-colors";
+    "-moz-border-radius-bottomleft";
+    "-moz-border-radius-bottomright";
+    "-moz-border-radius-topleft";
+    "-moz-border-radius-topright";
+    "-moz-border-right-colors";
+    "-moz-border-top-colors";
+    "-moz-context-properties";
+    "-moz-control-character-visibility";
+    "-moz-float-edge";
+    "-moz-force-broken-image-icon";
+    "-moz-image-region";
+    "-moz-orient";
+    "-moz-osx-font-smoothing";
+    "-moz-outline-radius";
+    "-moz-stack-sizing";
+    "-moz-text-blink";
+    "-moz-user-focus";
+    "-moz-user-input";
+    "-moz-user-modify";
+    "-moz-user-select";
+    "-moz-window-dragging";
+    "-moz-window-shadow";
+    "-ms-accelerator";
+    "-ms-block-progression";
+    "-ms-content-zoom-chaining";
+    "-ms-content-zoom-limit";
+    "-ms-content-zoom-limit-max";
+    "-ms-content-zoom-limit-min";
+    "-ms-content-zoom-snap";
+    "-ms-content-zoom-snap-points";
+    "-ms-content-zoom-snap-type";
+    "-ms-content-zooming";
+    "-ms-filter";
+    "-ms-flow-from";
+    "-ms-flow-into";
+    "-ms-grid-columns";
+    "-ms-grid-rows";
+    "-ms-high-contrast-adjust";
+    "-ms-hyphenate-limit-chars";
+    "-ms-hyphenate-limit-lines";
+    "-ms-hyphenate-limit-zone";
+    "-ms-ime-align";
+    "-ms-overflow-style";
+    "-ms-scroll-chaining";
+    "-ms-scroll-limit";
+    "-ms-scroll-limit-x-max";
+    "-ms-scroll-limit-x-min";
+    "-ms-scroll-limit-y-max";
+    "-ms-scroll-limit-y-min";
+    "-ms-scroll-rails";
+    "-ms-scroll-snap-points-x";
+    "-ms-scroll-snap-points-y";
+    "-ms-scroll-snap-type";
+    "-ms-scroll-snap-x";
+    "-ms-scroll-snap-y";
+    "-ms-scroll-translation";
+    "-ms-scrollbar-3dlight-color";
+    "-ms-scrollbar-arrow-color";
+    "-ms-scrollbar-base-color";
+    "-ms-scrollbar-darkshadow-color";
+    "-ms-scrollbar-face-color";
+    "-ms-scrollbar-highlight-color";
+    "-ms-scrollbar-shadow-color";
+    "-ms-scrollbar-track-color";
+    "-ms-text-autospace";
+    "-ms-touch-select";
+    "-ms-user-select";
+    "-ms-wrap-flow";
+    "-ms-wrap-margin";
+    "-ms-wrap-through";
+    "-webkit-appearance";
+    "-webkit-background-clip";
+    "-webkit-border-before";
+    "-webkit-box-orient";
+    "-webkit-box-reflect";
+    "-webkit-box-shadow";
+    "-webkit-column-break-after";
+    "-webkit-column-break-before";
+    "-webkit-column-break-inside";
+    "-webkit-font-smoothing";
+    "-webkit-line-clamp";
+    "-webkit-mask";
+    "-webkit-mask-box-image";
+    "-webkit-overflow-scrolling";
+    "-webkit-print-color-adjust";
+    "-webkit-tap-highlight-color";
+    "-webkit-text-fill-color";
+    "-webkit-text-security";
+    "-webkit-text-stroke";
+    "-webkit-text-stroke-color";
+    "-webkit-text-stroke-width";
+    "-webkit-touch-callout";
+    "-webkit-user-drag";
+    "-webkit-user-modify";
+    "-webkit-user-select";
+    "accent-color";
+    "align-tracks";
+    "alignment-baseline";
+    "all";
+    "anchor-name";
+    "anchor-scope";
+    "animation";
+    "animation-delay-end";
+    "animation-delay-start";
+    "animation-trigger";
+    "appearance";
+    "ascent-override";
+    "aspect-ratio";
+    "azimuth";
+    "backdrop-blur";
+    "backdrop-filter";
+    "backface-visibility";
+    "background";
+    "background-blend-mode";
+    "baseline-shift";
+    "baseline-source";
+    "behavior";
+    "bleed";
+    "block-overflow";
+    "block-size";
+    "border";
+    "border-block";
+    "border-collapse";
+    "border-end-end-radius";
+    "border-end-start-radius";
+    "border-inline";
+    "border-radius";
+    "border-spacing";
+    "border-start-end-radius";
+    "border-start-start-radius";
+    "box-align";
+    "box-decoration-break";
+    "box-direction";
+    "box-flex";
+    "box-flex-group";
+    "box-lines";
+    "box-ordinal-group";
+    "box-orient";
+    "box-pack";
+    "box-shadow";
+    "box-sizing";
+    "break-after";
+    "break-before";
+    "break-inside";
+    "caption-side";
+    "caret";
+    "caret-animation";
+    "caret-color";
+    "caret-shape";
+    "clear";
+    "clip";
+    "clip-path";
+    "clip-rule";
+    "color";
+    "color-adjust";
+    "color-interpolation";
+    "color-interpolation-filters";
+    "color-rendering";
+    "color-scheme";
+    "column-fill";
+    "column-rule";
+    "column-span";
+    "column-wrap";
+    "columns";
+    "contain";
+    "contain-intrinsic-block-size";
+    "contain-intrinsic-height";
+    "contain-intrinsic-inline-size";
+    "contain-intrinsic-size";
+    "contain-intrinsic-width";
+    "container";
+    "container-name-computed";
+    "content";
+    "content-visibility";
+    "corner-block-end-shape";
+    "corner-block-start-shape";
+    "corner-bottom-left-shape";
+    "corner-bottom-right-shape";
+    "corner-bottom-shape";
+    "corner-end-end-shape";
+    "corner-end-start-shape";
+    "corner-inline-end-shape";
+    "corner-inline-start-shape";
+    "corner-left-shape";
+    "corner-right-shape";
+    "corner-shape";
+    "corner-start-end-shape";
+    "corner-start-start-shape";
+    "corner-top-left-shape";
+    "corner-top-right-shape";
+    "corner-top-shape";
+    "counter-increment";
+    "counter-reset";
+    "counter-set";
+    "cue";
+    "cue-after";
+    "cue-before";
+    "cursor";
+    "cx";
+    "cy";
+    "d";
+    "descent-override";
+    "direction";
+    "display";
+    "dominant-baseline";
+    "dynamic-range-limit";
+    "empty-cells";
+    "field-sizing";
+    "fill";
+    "fill-opacity";
+    "fill-rule";
+    "filter";
+    "flex";
+    "flex-flow";
+    "float";
+    "flood-color";
+    "flood-opacity";
+    "font";
+    "font-display";
+    "font-palette";
+    "font-smooth";
+    "font-synthesis";
+    "font-synthesis-position";
+    "font-synthesis-small-caps";
+    "font-synthesis-style";
+    "font-synthesis-weight";
+    "forced-color-adjust";
+    "gap";
+    "glyph-orientation-horizontal";
+    "glyph-orientation-vertical";
+    "grid";
+    "grid-row";
+    "hanging-punctuation";
+    "height";
+    "hyphenate-character";
+    "hyphenate-limit-chars";
+    "hyphenate-limit-last";
+    "hyphenate-limit-lines";
+    "hyphenate-limit-zone";
+    "hyphens";
+    "image-orientation";
+    "image-rendering";
+    "image-resolution";
+    "ime-mode";
+    "inherits";
+    "initial-letter";
+    "initial-letter-align";
+    "initial-value";
+    "inline-size";
+    "inset";
+    "inset-area";
+    "inset-block";
+    "inset-inline";
+    "interactivity";
+    "interest-delay";
+    "interest-delay-end";
+    "interest-delay-start";
+    "interpolate-size";
+    "isolation";
+    "justify-tracks";
+    "kerning";
+    "layout-grid";
+    "layout-grid-char";
+    "layout-grid-line";
+    "layout-grid-mode";
+    "layout-grid-type";
+    "letter-spacing";
+    "lighting-color";
+    "line-break";
+    "line-clamp";
+    "line-gap-override";
+    "line-height-step";
+    "list-style";
+    "margin";
+    "margin-block";
+    "margin-inline";
+    "margin-trim";
+    "marker";
+    "marker-end";
+    "marker-mid";
+    "marker-start";
+    "marks";
+    "mask";
+    "mask-type";
+    "masonry-auto-flow";
+    "math-depth";
+    "math-shift";
+    "math-style";
+    "max-block-size";
+    "max-height";
+    "max-inline-size";
+    "max-lines";
+    "max-width";
+    "min-block-size";
+    "min-height";
+    "min-inline-size";
+    "min-width";
+    "mix-blend-mode";
+    "nav-down";
+    "nav-left";
+    "nav-right";
+    "nav-up";
+    "object-fit";
+    "object-position";
+    "object-view-box";
+    "offset";
+    "opacity";
+    "order";
+    "orphans";
+    "outline";
+    "outline-offset";
+    "overflow";
+    "overflow-anchor";
+    "overflow-block";
+    "overflow-clip-box";
+    "overflow-clip-margin";
+    "overflow-inline";
+    "overflow-wrap";
+    "overlay";
+    "overscroll-behavior";
+    "overscroll-behavior-block";
+    "overscroll-behavior-inline";
+    "overscroll-behavior-x";
+    "overscroll-behavior-y";
+    "padding";
+    "padding-block";
+    "padding-inline";
+    "page";
+    "page-break-after";
+    "page-break-before";
+    "page-break-inside";
+    "paint-order";
+    "pause";
+    "pause-after";
+    "pause-before";
+    "perspective";
+    "perspective-origin";
+    "place-content";
+    "place-items";
+    "place-self";
+    "pointer-events";
+    "position";
+    "position-anchor";
+    "position-area";
+    "position-try";
+    "position-try-fallbacks";
+    "position-try-options";
+    "position-try-order";
+    "position-visibility";
+    "print-color-adjust";
+    "quotes";
+    "r";
+    "reading-flow";
+    "reading-order";
+    "resize";
+    "rest";
+    "rest-after";
+    "rest-before";
+    "rotate";
+    "ruby-align";
+    "ruby-merge";
+    "ruby-overhang";
+    "ruby-position";
+    "rx";
+    "ry";
+    "scale";
+    "scroll-behavior";
+    "scroll-initial-target";
+    "scroll-margin";
+    "scroll-margin-block";
+    "scroll-margin-inline";
+    "scroll-marker-group";
+    "scroll-padding";
+    "scroll-padding-block";
+    "scroll-padding-inline";
+    "scroll-snap-align";
+    "scroll-snap-coordinate";
+    "scroll-snap-destination";
+    "scroll-snap-points-x";
+    "scroll-snap-points-y";
+    "scroll-snap-stop";
+    "scroll-snap-type";
+    "scroll-snap-type-x";
+    "scroll-snap-type-y";
+    "scroll-start";
+    "scroll-start-block";
+    "scroll-start-inline";
+    "scroll-start-target";
+    "scroll-start-target-block";
+    "scroll-start-target-inline";
+    "scroll-start-target-x";
+    "scroll-start-target-y";
+    "scroll-start-x";
+    "scroll-start-y";
+    "scroll-target-group";
+    "scroll-timeline";
+    "scroll-timeline-axis";
+    "scroll-timeline-name";
+    "scrollbar-3dlight-color";
+    "scrollbar-arrow-color";
+    "scrollbar-base-color";
+    "scrollbar-color";
+    "scrollbar-color-legacy";
+    "scrollbar-darkshadow-color";
+    "scrollbar-face-color";
+    "scrollbar-gutter";
+    "scrollbar-highlight-color";
+    "scrollbar-shadow-color";
+    "scrollbar-track-color";
+    "scrollbar-width";
+    "shape-image-threshold";
+    "shape-margin";
+    "shape-outside";
+    "shape-rendering";
+    "size";
+    "size-adjust";
+    "speak";
+    "speak-as";
+    "src";
+    "stop-color";
+    "stop-opacity";
+    "stroke";
+    "stroke-color";
+    "stroke-dasharray";
+    "stroke-dashoffset";
+    "stroke-linecap";
+    "stroke-linejoin";
+    "stroke-miterlimit";
+    "stroke-opacity";
+    "stroke-width";
+    "syntax";
+    "tab-size";
+    "table-layout";
+    "text-align";
+    "text-align-all";
+    "text-align-last";
+    "text-anchor";
+    "text-autospace";
+    "text-blink";
+    "text-box";
+    "text-box-edge";
+    "text-box-trim";
+    "text-combine-upright";
+    "text-decoration";
+    "text-decoration-inset";
+    "text-decoration-skip";
+    "text-decoration-skip-box";
+    "text-decoration-skip-ink";
+    "text-decoration-skip-inset";
+    "text-decoration-skip-self";
+    "text-decoration-skip-spaces";
+    "text-edge";
+    "text-emphasis";
+    "text-emphasis-position";
+    "text-indent";
+    "text-justify";
+    "text-justify-trim";
+    "text-kashida";
+    "text-kashida-space";
+    "text-orientation";
+    "text-overflow";
+    "text-rendering";
+    "text-shadow";
+    "text-size-adjust";
+    "text-spacing-trim";
+    "text-transform";
+    "text-underline-offset";
+    "text-underline-position";
+    "text-wrap";
+    "text-wrap-mode";
+    "text-wrap-style";
+    "timeline-scope";
+    "timeline-trigger";
+    "timeline-trigger-activation-range";
+    "timeline-trigger-activation-range-end";
+    "timeline-trigger-activation-range-start";
+    "timeline-trigger-active-range";
+    "timeline-trigger-active-range-end";
+    "timeline-trigger-active-range-start";
+    "timeline-trigger-name";
+    "timeline-trigger-source";
+    "touch-action";
+    "transform";
+    "transform-box";
+    "transform-origin";
+    "transform-style";
+    "transition";
+    "translate";
+    "trigger-scope";
+    "unicode-bidi";
+    "unicode-range";
+    "user-select";
+    "vector-effect";
+    "vertical-align";
+    "view-timeline";
+    "view-timeline-axis";
+    "view-timeline-inset";
+    "view-timeline-name";
+    "view-transition-class";
+    "view-transition-name";
+    "visibility";
+    "voice-balance";
+    "voice-duration";
+    "voice-family";
+    "voice-pitch";
+    "voice-range";
+    "voice-rate";
+    "voice-stress";
+    "voice-volume";
+    "white-space";
+    "white-space-collapse";
+    "widows";
+    "width";
+    "will-change";
+    "word-break";
+    "word-space-transform";
+    "word-spacing";
+    "writing-mode";
+    "x";
+    "y";
+    "z-index";
+    "zoom";
+  |]
+
+module Registry = struct
+  (* [0, registered_max] is the table's own range, generously sized to grow
+     for a long time without touching the partition below. Everything
+     outside it is a hash, split into an "ordinary property" sub-range and
+     a "custom property" sub-range - the sole reason for that split is so
+     {!removes}'s [all]-exclusion check can recognize "[former] is a custom
+     property" from the family id integer alone. [all_sentinel] is a single
+     reserved value outside every other range. *)
+  let registered_max = 19999
+  let unregistered_ordinary_min = 20000
+  let unregistered_ordinary_max = 33327
+  let unregistered_custom_min = 33328
+  let unregistered_custom_max = 46654
+  let all_sentinel = 46655
+
+  (* [seed] verbatim - see its own ORDER RULE comment. No [List.sort_uniq]
+     or other re-derivation here: that would silently break append-only the
+     moment a new entry sorted earlier than an existing one, shifting every
+     later id (the bug this replaces - see the 2026-09-25 property-table
+     session report for how it was found). *)
+  let table : string array = seed
+  let by_name : (string, int) Hashtbl.t = Hashtbl.create (2 * Array.length table)
+
+  let () =
+    Array.iteri
+      (fun i name ->
+        if i > registered_max then
+          invalid_arg "Slot_key.Registry: seed exceeds the registered range"
+        else Hashtbl.replace by_name name i)
+      table
+
+  let index_of name = Hashtbl.find_opt by_name name
+
+  (* Reuses Murmur2 (the same algorithm Hash_class hashes class-name content
+     with) rather than a new hash function, so this stays stable across
+     builds the same way class-name hashing already is. *)
+  let hash_into ~min ~max name =
+    let span = max - min + 1 in
+    min + (Murmur2.default_int name mod span)
+end
+
+type family_id =
+  | Registered of int
+  | Unregistered of int
+  | All
+
+let family_id_to_int = function
+  | Registered n -> n
+  | Unregistered n -> n
+  | All -> Registry.all_sentinel
+
+(* A true spec-level alias (e.g. "font-width" for "font-stretch",
+   "word-wrap" for "overflow-wrap" - see Css_grammar.Types.kind's [Alias]
+   doc) is resolved to its canonical name before any family/registry lookup,
+   so setting either name is recognized as covering the other. Unlike
+   {!Family.family_key_of}, this is a plain 1:1 rename, not a shorthand
+   reduction - it happens first, then family_key_of runs on the result (an
+   alias's canonical name may itself have a family, e.g. "font-stretch" is
+   one of "font"'s own longhands). *)
+let resolve_alias property =
+  match Css_grammar.canonical_name_of property with
+  | Some canonical -> canonical
+  | None -> property
+
+let family_id_of property =
+  if property = "all" then All
+  else (
+    let key = Family.family_key_of (resolve_alias property) in
+    match Registry.index_of key with
+    | Some i -> Registered i
+    | None ->
+      if is_custom_property property then
+        Unregistered
+          (Registry.hash_into ~min:Registry.unregistered_custom_min
+             ~max:Registry.unregistered_custom_max property)
+      else
+        Unregistered
+          (Registry.hash_into ~min:Registry.unregistered_ordinary_min
+             ~max:Registry.unregistered_ordinary_max key))
+
+type t = {
+  context : context;
+  family : family_id;
+  mask : int option;
+  important : bool;
+}
+
+(* Walks one atomized rule (Css_file.re's [atomize_rules] output shape),
+   collecting the at-rule chain outer to inner, the innermost selector
+   text, and the declaration(s) at the leaf. [Render.selector]/
+   [Render.component_value_list] are the same renderers [Hash_class] hashes
+   for the class name, so this gets the same whitespace/ordering
+   canonicalization for free. *)
 let rec collect_context (rule : Ast.rule) :
   (string * string) list * string option * Ast.declaration list =
   match rule with
@@ -242,19 +840,12 @@ let rec collect_context (rule : Ast.rule) :
     let sel_text =
       sels |> List.map (fun (s, _) -> Render.selector s) |> String.concat ", "
     in
-    (* A bare `&` (the shape a same-property group with no parent selector
-       is wrapped in) is the same context as no wrapping at all - both are
-       "base", and must compare equal so a plain top-level declaration can
-       still be removed by / remove a grouped one. *)
     let selector = if sel_text = "&" then None else Some sel_text in
     let decls =
       List.filter_map (function Ast.Declaration d -> Some d | _ -> None) rules
     in
     [], selector, decls
   | Ast.At_rule { name = name, _; prelude = pre, _; block; _ } ->
-    (* Same stripping [Render.at_rule] does before rendering a prelude, so a
-       leading-whitespace difference that doesn't change the class-name hash
-       doesn't invent a different slot either. *)
     let prelude_text =
       Render.component_value_list (Render.strip_leading_whitespace pre)
     in
@@ -274,35 +865,58 @@ let of_atom (rule : Ast.rule) : t option =
   let at_rules, selector, decls = collect_context rule in
   match decls with
   | [] -> None
-  | (first : Ast.declaration) :: _ ->
-    let property = normalize_property (fst first.name) in
-    (* A group's importance is the importance of any of its members: the
-       group is one atom/one class, so dropping it for not being
-       "important enough" would drop an important declaration bundled
-       inside it along with the rest. *)
+  | _ :: _ ->
     let important =
       List.exists (fun (d : Ast.declaration) -> fst d.important) decls
     in
     let context = { at_rules; selector = Option.value selector ~default:"" } in
-    let property_v = if property = "all" then All else Named property in
-    let covered =
-      match property_v with
-      | All -> Everything
-      | Named p -> Leaves (leaves_of p)
+    (* A multi-declaration group (same-property today; a mixed shorthand +
+       longhand "family atom" from phase 3) combines every declaration's
+       own family/mask - they are always the same family by construction
+       (that's what makes them one group), so the combined mask is the OR
+       of each one's own mask, using [None] ("full") as absorbing: any
+       [None] in the group makes the whole group's mask [None]. *)
+    let properties =
+      List.map
+        (fun (d : Ast.declaration) -> normalize_property (fst d.name))
+        decls
     in
-    Some { context; property = property_v; covered; important }
+    let family = family_id_of (List.hd properties) in
+    let mask =
+      List.fold_left
+        (fun acc property ->
+          match acc with
+          | None -> None
+          | Some acc_mask ->
+            let full = Family.full_mask_of property in
+            let own = Family.mask_of property in
+            if own = full then None else Some (acc_mask lor own))
+        (Some 0) properties
+    in
+    Some { context; family; mask; important }
 
 let context_equal a b = a.at_rules = b.at_rules && a.selector = b.selector
 
-let covered_subset a b =
+let mask_subset a b =
   match a, b with
-  | Leaves xs, Leaves ys -> List.for_all (fun x -> List.mem x ys) xs
-  | Leaves xs, Everything ->
-    List.for_all (fun x -> not (excluded_from_all x)) xs
-  | Everything, Leaves _ -> false
-  | Everything, Everything -> true
+  | None, None -> true
+  | None, Some _ -> false
+  | Some _, None -> true
+  | Some ma, Some mb -> ma land mb = ma
+
+let is_excluded_from_all = function
+  | Registered i ->
+    (* the only two registered properties [all] does not reset *)
+    Registry.index_of "direction" = Some i
+    || Registry.index_of "unicode-bidi" = Some i
+  | Unregistered n ->
+    n >= Registry.unregistered_custom_min
+    && n <= Registry.unregistered_custom_max
+  | All -> false
 
 let removes ~former ~latter =
   context_equal former.context latter.context
-  && covered_subset former.covered latter.covered
+  && (match latter.family with
+    | All -> not (is_excluded_from_all former.family)
+    | _ -> former.family = latter.family && mask_subset former.mask latter.mask)
   && not (former.important && not latter.important)

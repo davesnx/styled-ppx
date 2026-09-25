@@ -6064,6 +6064,28 @@ and y = float
 
 type kind =
   | Property of string
+  | Shorthand of string * string list
+    (** A property that is a CSS shorthand: its name, and its direct longhands
+        per the spec section cited next to its registration in Properties/*.ml
+        (a longhand a shorthand resets to its initial value counts as "direct"
+        here even when the shorthand's value syntax cannot itself set it - see
+        the citations for examples). A shorthand's own longhand may itself be a
+        [Shorthand] (e.g. "border" -> "border-width" -> "border-top-width") -
+        this only ever lists one level, expand transitively via
+        {!Registry.direct_longhands} to reach every leaf. *)
+  | Alias of string * string
+    (** A true spec-level alias: this property's own name, and the other
+        property name it is a 1:1, value-for-value synonym of (its "canonical"
+        name) - e.g. "font-width" is CSS Fonts L4's rename of the legacy
+        "font-stretch"; either name is recognized as referencing the same
+        computed value. Unlike [Shorthand], an alias has no longhands of its own
+        \- it names the SAME single property as its canonical name, under a
+        second string. Both names keep their own, independent registration and
+        validator here (an alias's value grammar may differ textually - see e.g.
+        "font-width" accepting a bare [<percentage>] that "font-stretch" does
+        not - even though both describe the same underlying property); only the
+        canonical-name mapping is new. Cite the spec section next to the [Alias]
+        tag, same as [Shorthand]. *)
   | Value of string
   | Function of string
   | Media_query of string

@@ -133,3 +133,11 @@ let murmur2 str =
   h
 
 let default str = str |> murmur2 |> to_base36
+
+(* The raw 32-bit hash, before base36 encoding - for callers that need to
+   reduce it into a small numeric range (e.g. Slot_key's family-id table,
+   Hash_class's fixed-width class-name fields) instead of a printable
+   string. Same algorithm and result as [default]; this just skips the
+   string conversion for callers that would otherwise decode it right
+   back. *)
+let default_int str = murmur2 str

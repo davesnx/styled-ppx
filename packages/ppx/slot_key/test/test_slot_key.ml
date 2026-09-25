@@ -20,15 +20,150 @@ let atom_of css : Styled_ppx_css_parser.Ast.rule =
         (Printf.sprintf "expected exactly one atom in %S, got %d" css
            (List.length rules)))
 
-let slot_of ?important css =
-  match Slot_key.of_atom (atom_of css) with
-  | None -> failwith (Printf.sprintf "of_atom returned None for %S" css)
-  | Some t ->
-    (match important with None -> t | Some important -> { t with important })
-
+let slot_of css = Slot_key.of_atom (atom_of css) |> Option.get
 let check_bool = Alcotest.check Alcotest.bool
 let check_string = Alcotest.check Alcotest.string
+let check_int = Alcotest.check Alcotest.int
 let check_string_list = Alcotest.check (Alcotest.list Alcotest.string)
+
+let family_tests =
+  [
+    Alcotest_extra.test "margin's family is its own four physical sides"
+      (fun () ->
+      check_string_list "leaf_members_of margin"
+        [ "margin-bottom"; "margin-left"; "margin-right"; "margin-top" ]
+        (List.sort String.compare (Slot_key.Family.leaf_members_of "margin")));
+    Alcotest_extra.test
+      "border's family is its twelve width/style/color/side leaves plus the \
+       five border-image-* leaves it also resets, nested through \
+       width/style/color and top/right/bottom/left" (fun () ->
+      check_string_list "leaf_members_of border"
+        (List.sort String.compare
+           [
+             "border-top-width";
+             "border-top-style";
+             "border-top-color";
+             "border-right-width";
+             "border-right-style";
+             "border-right-color";
+             "border-bottom-width";
+             "border-bottom-style";
+             "border-bottom-color";
+             "border-left-width";
+             "border-left-style";
+             "border-left-color";
+             "border-image-source";
+             "border-image-slice";
+             "border-image-width";
+             "border-image-outset";
+             "border-image-repeat";
+           ])
+        (List.sort String.compare (Slot_key.Family.leaf_members_of "border")));
+    Alcotest_extra.test
+      "border-radius is a DIFFERENT family from border - no shared leaf"
+      (fun () ->
+      let border_leaves = Slot_key.Family.leaf_members_of "border" in
+      let radius_leaves = Slot_key.Family.leaf_members_of "border-radius" in
+      check_bool "disjoint" true
+        (List.for_all (fun l -> not (List.mem l border_leaves)) radius_leaves));
+    Alcotest_extra.test "family_key_of picks the shortest shorthand member"
+      (fun () ->
+      check_string "border-top-color -> border" "border"
+        (Slot_key.Family.family_key_of "border-top-color");
+      check_string "border-width -> border" "border"
+        (Slot_key.Family.family_key_of "border-width");
+      check_string "margin-top -> margin" "margin"
+        (Slot_key.Family.family_key_of "margin-top"));
+    Alcotest_extra.test
+      "a plain property with no shorthand relationship is its own family key"
+      (fun () ->
+      check_string "height -> height" "height"
+        (Slot_key.Family.family_key_of "height"));
+    Alcotest_extra.test "a shorthand's own mask is its family's full mask"
+      (fun () ->
+      check_int "mask_of margin = full_mask_of margin"
+        (Slot_key.Family.full_mask_of "margin")
+        (Slot_key.Family.mask_of "margin"));
+    Alcotest_extra.test "a lone longhand's mask is a proper, single-bit subset"
+      (fun () ->
+      let popcount n =
+        let rec loop n acc =
+          if n = 0 then acc else loop (n lsr 1) (acc + (n land 1))
+        in
+        loop n 0
+      in
+      let full = Slot_key.Family.full_mask_of "margin" in
+      let m = Slot_key.Family.mask_of "margin-top" in
+      check_bool "proper subset" true (m land full = m && m <> full);
+      check_int "exactly one bit set" 1 (popcount m));
+    Alcotest_extra.test
+      "grid-area's mask, through grid-row/grid-column, is the full 4-bit family"
+      (fun () ->
+      check_int "mask_of grid-area = full"
+        (Slot_key.Family.full_mask_of "grid-area")
+        (Slot_key.Family.mask_of "grid-area"));
+    Alcotest_extra.test
+      "transition covers its own meta-properties only (including \
+       transition-behavior, added in L2), not a value's target property"
+      (fun () ->
+      check_string_list "leaf_members_of transition"
+        (List.sort String.compare
+           [
+             "transition-property";
+             "transition-duration";
+             "transition-timing-function";
+             "transition-delay";
+             "transition-behavior";
+           ])
+        (List.sort String.compare
+           (Slot_key.Family.leaf_members_of "transition")));
+  ]
+
+let registry_tests =
+  [
+    Alcotest_extra.test "a seeded property gets a Registered family id"
+      (fun () ->
+      match Slot_key.family_id_of "height" with
+      | Registered _ -> ()
+      | Unregistered _ | All -> Alcotest.fail "expected Registered");
+    Alcotest_extra.test "family_id_of is deterministic" (fun () ->
+      check_bool "same twice" true
+        (Slot_key.family_id_of "margin-top" = Slot_key.family_id_of "margin-top"));
+    Alcotest_extra.test
+      "margin-top and margin share a family id (they're in the same family)"
+      (fun () ->
+      check_bool "same family id" true
+        (Slot_key.family_id_of "margin-top" = Slot_key.family_id_of "margin"));
+    Alcotest_extra.test "height and margin have different family ids" (fun () ->
+      check_bool "different" true
+        (Slot_key.family_id_of "height" <> Slot_key.family_id_of "margin"));
+    Alcotest_extra.test
+      "an unregistered ordinary property still gets a stable id" (fun () ->
+      let p = "totally-unregistered-property-xyz" in
+      check_bool "deterministic" true
+        (Slot_key.family_id_of p = Slot_key.family_id_of p);
+      match Slot_key.family_id_of p with
+      | Unregistered _ -> ()
+      | Registered _ | All -> Alcotest.fail "expected Unregistered");
+    Alcotest_extra.test
+      "two different custom properties get different family ids (not bucketed \
+       together)" (fun () ->
+      check_bool "distinct" true
+        (Slot_key.family_id_of "--foo" <> Slot_key.family_id_of "--bar"));
+    Alcotest_extra.test "all gets the reserved All sentinel" (fun () ->
+      match Slot_key.family_id_of "all" with
+      | All -> ()
+      | Registered _ | Unregistered _ -> Alcotest.fail "expected All");
+    Alcotest_extra.test "registered and unregistered ranges never overlap"
+      (fun () ->
+      let registered =
+        Slot_key.family_id_to_int (Slot_key.family_id_of "height")
+      in
+      let unregistered =
+        Slot_key.family_id_to_int (Slot_key.family_id_of "--some-custom-prop")
+      in
+      check_bool "disjoint" true (registered <> unregistered));
+  ]
 
 let removes_tests =
   [
@@ -86,11 +221,7 @@ let removes_tests =
         (Slot_key.removes
            ~former:(slot_of "border-top-color: red;")
            ~latter:(slot_of "border-top: 1px solid blue;")));
-    (* --- comma-list shorthands (transition/animation/grid-template): these
-       cover their own meta-property longhands only (see the `opacity`/
-       `transition` test in [leaves_tests] below for why that's the right
-       scope), but that flat longhand list still needs the same
-       both-directions [removes] check as any other shorthand. --- *)
+    (* --- comma-list shorthands (transition/animation/grid-template) --- *)
     Alcotest_extra.test "transition removes transition-duration (forward)"
       (fun () ->
       check_bool "removes" true
@@ -98,35 +229,11 @@ let removes_tests =
            ~former:(slot_of "transition-duration: 100ms;")
            ~latter:(slot_of "transition: opacity 200ms;")));
     Alcotest_extra.test
-      "transition-duration does NOT remove transition (reverse, would drop its \
-       other longhands)" (fun () ->
+      "transition-duration does NOT remove transition (reverse)" (fun () ->
       check_bool "removes" false
         (Slot_key.removes
            ~former:(slot_of "transition: opacity 200ms ease 0ms;")
            ~latter:(slot_of "transition-duration: 100ms;")));
-    Alcotest_extra.test "animation removes animation-name (forward)" (fun () ->
-      check_bool "removes" true
-        (Slot_key.removes
-           ~former:(slot_of "animation-name: spin;")
-           ~latter:(slot_of "animation: spin 1s linear;")));
-    Alcotest_extra.test "animation-name does NOT remove animation (reverse)"
-      (fun () ->
-      check_bool "removes" false
-        (Slot_key.removes
-           ~former:(slot_of "animation: spin 1s linear;")
-           ~latter:(slot_of "animation-name: fade;")));
-    Alcotest_extra.test "grid-template removes grid-template-columns (forward)"
-      (fun () ->
-      check_bool "removes" true
-        (Slot_key.removes
-           ~former:(slot_of "grid-template-columns: 1fr 1fr;")
-           ~latter:(slot_of "grid-template: \"a\" 1fr / auto;")));
-    Alcotest_extra.test
-      "grid-template-columns does NOT remove grid-template (reverse)" (fun () ->
-      check_bool "removes" false
-        (Slot_key.removes
-           ~former:(slot_of "grid-template: \"a\" 1fr / auto;")
-           ~latter:(slot_of "grid-template-columns: 2fr 2fr;")));
     Alcotest_extra.test
       "grid removes grid-template-columns (two levels: grid -> grid-template \
        -> grid-template-columns)" (fun () ->
@@ -134,6 +241,29 @@ let removes_tests =
         (Slot_key.removes
            ~former:(slot_of "grid-template-columns: 1fr 1fr;")
            ~latter:(slot_of "grid: \"a\" 1fr / auto;")));
+    Alcotest_extra.test
+      "opacity is unrelated to transition, even when the value text says \
+       \"opacity\"" (fun () ->
+      check_bool "removes" false
+        (Slot_key.removes ~former:(slot_of "opacity: 1;")
+           ~latter:(slot_of "transition: opacity 200ms;")));
+    (* --- family atoms: a group mixing several members of one family --- *)
+    Alcotest_extra.test
+      "a family atom mixing margin-top and margin-left (no shorthand) has \
+       exactly those two bits, and is removed by the full shorthand" (fun () ->
+      let mixed = slot_of "&{margin-top: 0; margin-left: 0;}" in
+      check_bool "removed by margin" true
+        (Slot_key.removes ~former:mixed ~latter:(slot_of "margin: 10px;")));
+    Alcotest_extra.test
+      "a family atom mixing the shorthand with one of its own longhands covers \
+       the full family (the shorthand already implies every side)" (fun () ->
+      let mixed = slot_of "&{margin: 10px; margin-top: 0;}" in
+      let plain_shorthand = slot_of "margin: 5px;" in
+      (* full mask on both sides: interchangeable for removal in either direction *)
+      check_bool "mixed removes plain shorthand" true
+        (Slot_key.removes ~former:plain_shorthand ~latter:mixed);
+      check_bool "plain shorthand removes mixed" true
+        (Slot_key.removes ~former:mixed ~latter:plain_shorthand));
     (* --- context: same property, different context, never interact --- *)
     Alcotest_extra.test
       ":hover does not remove base, base does not remove :hover" (fun () ->
@@ -190,9 +320,8 @@ let removes_tests =
         (Slot_key.removes
            ~former:(slot_of "color: red !important;")
            ~latter:(slot_of "color: blue !important;")));
-    Alcotest_extra.test
-      "a group is important if any of its declarations is (color:red; \
-       color:blue !important;) is not removable by a plain color" (fun () ->
+    Alcotest_extra.test "a group is important if any of its declarations is"
+      (fun () ->
       check_bool "removes" false
         (Slot_key.removes
            ~former:(slot_of "&{color: red; color: blue !important;}")
@@ -203,14 +332,12 @@ let removes_tests =
       check_bool "removes" true
         (Slot_key.removes ~former:(slot_of "color: red;")
            ~latter:(slot_of "all: unset;")));
-    Alcotest_extra.test
-      "an ordinary property does not remove all (asymmetric, like a shorthand)"
+    Alcotest_extra.test "an ordinary property does not remove all (asymmetric)"
       (fun () ->
       check_bool "removes" false
         (Slot_key.removes ~former:(slot_of "all: unset;")
            ~latter:(slot_of "color: red;")));
-    Alcotest_extra.test
-      "all does not remove direction (CSS Cascade's own exclusion)" (fun () ->
+    Alcotest_extra.test "all does not remove direction" (fun () ->
       check_bool "removes" false
         (Slot_key.removes
            ~former:(slot_of "direction: rtl;")
@@ -231,12 +358,6 @@ let removes_tests =
         (Slot_key.removes
            ~former:(slot_of "margin-left: 5px;")
            ~latter:(slot_of "margin-inline-start: 5px;")));
-    Alcotest_extra.test "margin-left does not remove margin-inline-start"
-      (fun () ->
-      check_bool "removes" false
-        (Slot_key.removes
-           ~former:(slot_of "margin-inline-start: 5px;")
-           ~latter:(slot_of "margin-left: 5px;")));
     Alcotest_extra.test
       "margin-inline removes margin-inline-start (logical shorthand, safe)"
       (fun () ->
@@ -244,7 +365,7 @@ let removes_tests =
         (Slot_key.removes
            ~former:(slot_of "margin-inline-start: 5px;")
            ~latter:(slot_of "margin-inline: 10px;")));
-    (* --- vendor prefixes: a distinct property, not unified with the unprefixed one --- *)
+    (* --- vendor prefixes: a distinct property, not unified --- *)
     Alcotest_extra.test "-webkit-transform does not remove transform" (fun () ->
       check_bool "removes" false
         (Slot_key.removes
@@ -266,7 +387,7 @@ let removes_tests =
       check_bool "removes" true
         (Slot_key.removes ~former:(slot_of "HEIGHT: 0;")
            ~latter:(slot_of "height: auto;")));
-    (* --- unknown/unregistered property: behaves like a plain leaf --- *)
+    (* --- unknown/unregistered property --- *)
     Alcotest_extra.test "an unknown property removes itself, like any leaf"
       (fun () ->
       check_bool "removes" true
@@ -275,191 +396,11 @@ let removes_tests =
            ~latter:(slot_of "--not-a-real-thing-but-also-not-custom-syntax: 2;")));
   ]
 
-let leaves_tests =
-  [
-    Alcotest_extra.test "margin expands to its four physical sides" (fun () ->
-      check_string_list "leaves_of margin"
-        [ "margin-bottom"; "margin-left"; "margin-right"; "margin-top" ]
-        (List.sort String.compare (Slot_key.leaves_of "margin")));
-    Alcotest_extra.test
-      "border expands (through border-width/style/color and the four sides) to \
-       its twelve leaves" (fun () ->
-      check_string_list "leaves_of border"
-        (List.sort String.compare
-           [
-             "border-top-width";
-             "border-top-style";
-             "border-top-color";
-             "border-right-width";
-             "border-right-style";
-             "border-right-color";
-             "border-bottom-width";
-             "border-bottom-style";
-             "border-bottom-color";
-             "border-left-width";
-             "border-left-style";
-             "border-left-color";
-           ])
-        (List.sort String.compare (Slot_key.leaves_of "border")));
-    Alcotest_extra.test
-      "grid-area expands through grid-row/grid-column to its four leaves"
-      (fun () ->
-      check_string_list "leaves_of grid-area"
-        (List.sort String.compare
-           [
-             "grid-row-start";
-             "grid-row-end";
-             "grid-column-start";
-             "grid-column-end";
-           ])
-        (List.sort String.compare (Slot_key.leaves_of "grid-area")));
-    Alcotest_extra.test "font expands to its seven longhands" (fun () ->
-      check_string_list "leaves_of font"
-        (List.sort String.compare
-           [
-             "font-style";
-             "font-variant";
-             "font-weight";
-             "font-stretch";
-             "font-size";
-             "line-height";
-             "font-family";
-           ])
-        (List.sort String.compare (Slot_key.leaves_of "font")));
-    Alcotest_extra.test
-      "transition covers its own meta-properties, not a value's target property"
-      (fun () ->
-      check_string_list "leaves_of transition"
-        (List.sort String.compare
-           [
-             "transition-property";
-             "transition-duration";
-             "transition-timing-function";
-             "transition-delay";
-           ])
-        (List.sort String.compare (Slot_key.leaves_of "transition")));
-    Alcotest_extra.test
-      "opacity is unrelated to transition, even when the value text says \
-       \"opacity\"" (fun () ->
-      check_bool "removes" false
-        (Slot_key.removes ~former:(slot_of "opacity: 1;")
-           ~latter:(slot_of "transition: opacity 200ms;")));
-    Alcotest_extra.test "flex expands to grow/shrink/basis" (fun () ->
-      check_string_list "leaves_of flex"
-        (List.sort String.compare [ "flex-grow"; "flex-shrink"; "flex-basis" ])
-        (List.sort String.compare (Slot_key.leaves_of "flex")));
-    Alcotest_extra.test "inset expands to the four physical offsets" (fun () ->
-      check_string_list "leaves_of inset"
-        (List.sort String.compare [ "top"; "right"; "bottom"; "left" ])
-        (List.sort String.compare (Slot_key.leaves_of "inset")));
-    Alcotest_extra.test "background expands to its eight longhands" (fun () ->
-      check_string_list "leaves_of background"
-        (List.sort String.compare
-           [
-             "background-image";
-             "background-position";
-             "background-size";
-             "background-repeat";
-             "background-origin";
-             "background-clip";
-             "background-attachment";
-             "background-color";
-           ])
-        (List.sort String.compare (Slot_key.leaves_of "background")));
-    Alcotest_extra.test "animation expands to its eight longhands" (fun () ->
-      check_string_list "leaves_of animation"
-        (List.sort String.compare
-           [
-             "animation-name";
-             "animation-duration";
-             "animation-timing-function";
-             "animation-delay";
-             "animation-iteration-count";
-             "animation-direction";
-             "animation-fill-mode";
-             "animation-play-state";
-           ])
-        (List.sort String.compare (Slot_key.leaves_of "animation")));
-    Alcotest_extra.test "place-items expands to align-items/justify-items"
-      (fun () ->
-      check_string_list "leaves_of place-items"
-        (List.sort String.compare [ "align-items"; "justify-items" ])
-        (List.sort String.compare (Slot_key.leaves_of "place-items")));
-    Alcotest_extra.test "gap expands to row-gap/column-gap" (fun () ->
-      check_string_list "leaves_of gap"
-        (List.sort String.compare [ "row-gap"; "column-gap" ])
-        (List.sort String.compare (Slot_key.leaves_of "gap")));
-    Alcotest_extra.test "overflow expands to overflow-x/overflow-y" (fun () ->
-      check_string_list "leaves_of overflow"
-        (List.sort String.compare [ "overflow-x"; "overflow-y" ])
-        (List.sort String.compare (Slot_key.leaves_of "overflow")));
-    Alcotest_extra.test "text-decoration expands to its four longhands"
-      (fun () ->
-      check_string_list "leaves_of text-decoration"
-        (List.sort String.compare
-           [
-             "text-decoration-line";
-             "text-decoration-style";
-             "text-decoration-color";
-             "text-decoration-thickness";
-           ])
-        (List.sort String.compare (Slot_key.leaves_of "text-decoration")));
-    Alcotest_extra.test "a plain, non-shorthand property expands to itself"
-      (fun () ->
-      check_string_list "leaves_of height" [ "height" ]
-        (Slot_key.leaves_of "height"));
-    Alcotest_extra.test "an unknown property expands to itself" (fun () ->
-      check_string_list "leaves_of unknown"
-        [ "totally-unregistered-property" ]
-        (Slot_key.leaves_of "totally-unregistered-property"));
-  ]
-
-let key_tests =
-  [
-    Alcotest_extra.test "key is deterministic for the same atom" (fun () ->
-      let a = slot_of "height: 0;" in
-      let b = slot_of "height: auto;" in
-      check_string "same slot, computed twice" (Slot_key.key a) (Slot_key.key a);
-      (* Different VALUES, same property/context: same slot key - this is
-           the entire point (see merge-order-flip-under-dedup.md). *)
-      check_string "height:0 and height:auto share a slot" (Slot_key.key a)
-        (Slot_key.key b));
-    Alcotest_extra.test "key differs when the property differs" (fun () ->
-      check_bool "distinct" true
-        (Slot_key.key (slot_of "height: 0;")
-        <> Slot_key.key (slot_of "min-height: 0;")));
-    Alcotest_extra.test "key differs when the selector context differs"
-      (fun () ->
-      check_bool "distinct" true
-        (Slot_key.key (slot_of "color: red;")
-        <> Slot_key.key (slot_of "&:hover{color: red;}")));
-    Alcotest_extra.test "key differs when the at-rule context differs"
-      (fun () ->
-      check_bool "distinct" true
-        (Slot_key.key (slot_of "height: 0;")
-        <> Slot_key.key (slot_of "@media (max-width:600px){height: 0;}")));
-    Alcotest_extra.test
-      "leading whitespace in an at-rule prelude doesn't change the key"
-      (fun () ->
-      check_string "same key"
-        (Slot_key.key (slot_of "@media (max-width:600px){height: 0;}"))
-        (Slot_key.key (slot_of "@media  (max-width:600px){height: 0;}")));
-    Alcotest_extra.test "covered_keys is None for `all`, Some for a shorthand"
-      (fun () ->
-      check_bool "all -> None" true
-        (Option.is_none (Slot_key.covered_keys (slot_of "all: unset;")));
-      check_bool "margin -> Some 4" true
-        (List.length
-           (Option.value ~default:[]
-              (Slot_key.covered_keys (slot_of "margin: 0;")))
-        = 4));
-  ]
-
 let () =
   Alcotest.run ~show_errors:true ~compact:true ~tail_errors:`Unlimited
     "slot_key"
     [
+      "family", List.concat_map snd family_tests;
+      "registry", List.concat_map snd registry_tests;
       "removes", List.concat_map snd removes_tests;
-      "leaves_of", List.concat_map snd leaves_tests;
-      "key", List.concat_map snd key_tests;
     ]

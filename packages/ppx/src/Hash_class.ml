@@ -202,6 +202,21 @@ let keyframe_name rendered_body =
 (* Dedup key for a single [%styled.global] rule: `global-<hash(rule)>`. *)
 let global_key rendered_rule = Printf.sprintf "global-%s" (hash rendered_rule)
 
+(* -- Merge-aware atom class names (atom-slot-keys, phase 2) ------------
+
+   Not wired into [class_and_namespace] yet - phase 3 teaches
+   [Css_file.re]'s atomization to call [slot_class] instead, once family
+   atoms exist there too. Implementation lives in the standalone
+   [Class_format] library (unit-tested directly there;
+   `packages/ppx/src` is a ppx_rewriter-kind, wrapped library whose
+   internal modules aren't cleanly reachable from an external test
+   executable) - re-exported here because this file is the single source
+   of truth for every hashed identifier this pipeline emits. See
+   `packages/ppx/class_format/class_format.mli` for the format and
+   `.workplace/plans/atom-slot-keys_PLAN.md` ("Direction agreed with the
+   user") for the design. *)
+let slot_class = Class_format.slot_class
+
 (* The build-independent identity class for a named binding:
    `cid-<hash(cli_namespace \0 module_name \0 scope \0 name [\0 occurrence])>`.
    Inputs are deliberately the ones an author writes, never a physical path or

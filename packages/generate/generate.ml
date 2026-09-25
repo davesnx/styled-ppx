@@ -672,6 +672,20 @@ let run ~output_file ~order ~layers input_files =
       end)
   in
 
+  (* atom-slot-keys phase 2 notes an atom class-name collision check was
+     designed here but deliberately NOT wired in - see the "Finding"
+     entry in .workplace/plans/atom-slot-keys_PLAN.md dated the same day:
+     Css_file.re's *interpolation bundling* already, legitimately, gives
+     several different declarations (e.g. margin/padding, each carrying a
+     `$(...)`) the SAME class today, and generate.ml has no way to tell
+     that apart from a genuine hash collision using rendered text alone.
+     Confirmed empirically: wiring the naive check in broke
+     packages/ppx/test/css-support/minify-interpolation.t and
+     packages/ppx/test/snapshot/reason/reason-cx-{full-integration,
+     box-shadow-border}.t, which all rely on exactly that bundling.
+     Revisit once phase 4 decides how the new format handles
+     interpolation bundles. *)
+
   (* [@import] before [@namespace] (Cascade 5), each preserving its own
      relative order; everything else, [@layer] statements included, stays in
      [other_rules] untouched. *)

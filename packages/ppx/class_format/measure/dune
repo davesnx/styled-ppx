@@ -1,0 +1,10 @@
+; Scratch measurement tool for the atom-slot-keys phase 2 checkpoint - not a
+; test, not wired into TEST_TARGETS. Reports the new class-name format's
+; length distribution against real corpora using the real Slot_key/
+; Class_format code (not a reimplementation). Kept for reproducing the
+; checkpoint numbers; delete if the team doesn't want it kept around.
+
+(executable
+ (name measure)
+ (modules measure)
+ (libraries slot_key class_format))

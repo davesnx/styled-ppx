@@ -1,6 +1,9 @@
 (library
  (name slot_key)
- ; Standalone algorithm, no ppxlib/runtime dependency. Depended on by `ppx`
- ; once wired in (see .workplace/plans/atom-slot-keys_PLAN.md); not wired yet.
+ ; Depends on css-grammar for its property/shorthand data (Css_grammar's
+ ; Shorthand kind + Registry query API - see slot_key.ml's Family/Registry
+ ; modules) and on murmur2/styled_ppx_css_parser as before. No ppxlib
+ ; dependency. Depended on by `ppx` once wired in (see
+ ; .workplace/plans/atom-slot-keys_PLAN.md); not wired yet.
  (package styled-ppx)
- (libraries murmur2 styled_ppx_css_parser))
+ (libraries murmur2 styled_ppx_css_parser Css_grammar))

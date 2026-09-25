@@ -52,6 +52,33 @@ let tests =
           expected (Murmur2.default input)))
     data
 
+(* [default_int] is [default] before base36 encoding: same algorithm, so
+   equal/distinct results must track each other, and it must be
+   deterministic and non-negative (callers reduce it mod a range). *)
+let int_tests =
+  List.map
+    (fun (input, _) ->
+      let quoted = Printf.sprintf "int:%S" input in
+      Alcotest_extra.test quoted (fun () ->
+        (Alcotest.check Alcotest.int)
+          ("default_int " ^ quoted ^ " is deterministic")
+          (Murmur2.default_int input)
+          (Murmur2.default_int input);
+        (Alcotest.check Alcotest.bool)
+          "non-negative" true
+          (Murmur2.default_int input >= 0)))
+    data
+  @ [
+      Alcotest_extra.test "equal default_int iff equal default" (fun () ->
+        let a, b = "padding: 0px;", "padding: 2px;" in
+        (Alcotest.check Alcotest.bool)
+          "different strings -> different ints" true
+          (Murmur2.default_int a <> Murmur2.default_int b);
+        (Alcotest.check Alcotest.bool)
+          "same string -> same int" true
+          (Murmur2.default_int a = Murmur2.default_int a));
+    ]
+
 let () =
   Alcotest.run ~show_errors:true ~compact:true ~tail_errors:`Unlimited "murmur2"
-    tests
+    (tests @ int_tests)

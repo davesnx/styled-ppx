@@ -80,14 +80,24 @@ let property_padding_top : property_padding_top Rule.rule =
 
 let entries : (kind * packed_rule) list =
   [
-    Property "padding", pack_module (module Property_padding);
-    Property "padding-block", pack_module (module Property_padding_block);
+    (* Box Model: https://www.w3.org/TR/css-box-4/#margin-shorthand, #padding-shorthand *)
+    ( Shorthand
+        ( "padding",
+          [ "padding-top"; "padding-right"; "padding-bottom"; "padding-left" ]
+        ),
+      pack_module (module Property_padding) );
+    (* Logical Properties L1 (margin/padding): https://www.w3.org/TR/css-logical-1/#margin-properties *)
+    ( Shorthand ("padding-block", [ "padding-block-start"; "padding-block-end" ]),
+      pack_module (module Property_padding_block) );
     ( Property "padding-block-end",
       pack_module (module Property_padding_block_end) );
     ( Property "padding-block-start",
       pack_module (module Property_padding_block_start) );
     Property "padding-bottom", pack_module (module Property_padding_bottom);
-    Property "padding-inline", pack_module (module Property_padding_inline);
+    (* Logical Properties L1 (margin/padding): https://www.w3.org/TR/css-logical-1/#margin-properties *)
+    ( Shorthand
+        ("padding-inline", [ "padding-inline-start"; "padding-inline-end" ]),
+      pack_module (module Property_padding_inline) );
     ( Property "padding-inline-end",
       pack_module (module Property_padding_inline_end) );
     ( Property "padding-inline-start",

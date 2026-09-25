@@ -8,3 +8,14 @@
  (deps test_slot_key.exe)
  (action
   (run %{deps})))
+
+(test
+ (name test_slot_key_registry)
+ (modules test_slot_key_registry)
+ (libraries alcotest alcotest_extra slot_key Css_grammar))
+
+(rule
+ (alias test-slot-key-registry)
+ (deps test_slot_key_registry.exe seed.snapshot)
+ (action
+  (run %{exe:test_slot_key_registry.exe})))
