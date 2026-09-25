@@ -746,6 +746,20 @@ let seed : string array =
     "view-transition-group";
     "view-transition-scope";
     "window-drag";
+    (* Appended 2026-09-25 (css-grammar-gaps): CSS Gaps L1 family keys - each
+       is the shortest shorthand name in its union-find component, so every
+       other member (column-rule*, row-rule*, and every rule-* shorthand or
+       leaf that shares a leaf with it) redirects here instead of needing its
+       own entry. "rule" absorbs rule/column-rule/row-rule AND
+       rule-color/-style/-width (they share column-rule-color/-style/-width's
+       leaves with column-rule itself); "rule-inset" similarly absorbs the
+       whole inset shorthand tree (cap/junction/start/end, both sides, plus
+       the 8 cap-start/cap-end/junction-start/junction-end leaves). *)
+    "rule";
+    "rule-break";
+    "rule-inset";
+    "rule-overlap";
+    "rule-visibility-items";
   |]
 
 module Registry = struct

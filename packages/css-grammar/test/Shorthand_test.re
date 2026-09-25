@@ -366,6 +366,66 @@ let expected_shorthands: list((string, list(string))) = [
     "column-rule",
     ["column-rule-color", "column-rule-style", "column-rule-width"],
   ),
+  /* CSS Gaps L1: https://drafts.csswg.org/css-gaps-1/ */
+  (
+    "column-rule-inset-cap",
+    ["column-rule-inset-cap-start", "column-rule-inset-cap-end"],
+  ),
+  (
+    "column-rule-inset-junction",
+    ["column-rule-inset-junction-start", "column-rule-inset-junction-end"],
+  ),
+  (
+    "column-rule-inset-end",
+    ["column-rule-inset-cap-end", "column-rule-inset-junction-end"],
+  ),
+  (
+    "column-rule-inset",
+    ["column-rule-inset-cap", "column-rule-inset-junction"],
+  ),
+  ("row-rule", ["row-rule-color", "row-rule-style", "row-rule-width"]),
+  (
+    "row-rule-inset-cap",
+    ["row-rule-inset-cap-start", "row-rule-inset-cap-end"],
+  ),
+  (
+    "row-rule-inset-junction",
+    ["row-rule-inset-junction-start", "row-rule-inset-junction-end"],
+  ),
+  (
+    "row-rule-inset-start",
+    ["row-rule-inset-cap-start", "row-rule-inset-junction-start"],
+  ),
+  (
+    "row-rule-inset-end",
+    ["row-rule-inset-cap-end", "row-rule-inset-junction-end"],
+  ),
+  ("row-rule-inset", ["row-rule-inset-cap", "row-rule-inset-junction"]),
+  ("rule", ["column-rule", "row-rule"]),
+  ("rule-break", ["column-rule-break", "row-rule-break"]),
+  ("rule-color", ["column-rule-color", "row-rule-color"]),
+  ("rule-style", ["column-rule-style", "row-rule-style"]),
+  ("rule-width", ["column-rule-width", "row-rule-width"]),
+  (
+    "rule-visibility-items",
+    ["column-rule-visibility-items", "row-rule-visibility-items"],
+  ),
+  ("rule-inset-cap", ["column-rule-inset-cap", "row-rule-inset-cap"]),
+  (
+    "rule-inset-junction",
+    ["column-rule-inset-junction", "row-rule-inset-junction"],
+  ),
+  ("rule-inset-end", ["column-rule-inset-end", "row-rule-inset-end"]),
+  ("rule-inset", ["column-rule-inset", "row-rule-inset"]),
+  (
+    "rule-inset-start",
+    [
+      "column-rule-inset-cap-start",
+      "column-rule-inset-junction-start",
+      "row-rule-inset-cap-start",
+      "row-rule-inset-junction-start",
+    ],
+  ),
   (
     "mask",
     [

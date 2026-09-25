@@ -6628,6 +6628,101 @@ end
 module ColumnRuleStyle = BorderStyle
 module ColumnRuleWidth = LineWidth
 
+(* CSS Gaps L1 (css-grammar-gaps): https://drafts.csswg.org/css-gaps-1/
+   column-rule/row-rule/rule's own grammar (<gap-rule-list> | <gap-auto-rule-list>)
+   is a comma list of width/style/color triples with optional repeat()/
+   repeat(auto, ...); verbatim, like Border above and BorderSpacing/Page
+   elsewhere - a single interpolation hole rarely targets a whole list. *)
+module GapRuleList = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ColumnRuleBreak = struct
+  (* MDN syntax: 'none' | 'normal' | 'intersection' *)
+  type t =
+    [ `none
+    | `normal
+    | `intersection
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `normal -> {js|normal|js}
+    | `intersection -> {js|intersection|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ColumnRuleVisibilityItems = struct
+  (* MDN syntax: 'all' | 'around' | 'between' | 'normal' *)
+  type t =
+    [ `all
+    | `around
+    | `between
+    | `normal
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `all -> {js|all|js}
+    | `around -> {js|around|js}
+    | `between -> {js|between|js}
+    | `normal -> {js|normal|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module RuleOverlap = struct
+  (* MDN syntax: 'row-over-column' | 'column-over-row' *)
+  type t =
+    [ `rowOverColumn
+    | `columnOverRow
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `rowOverColumn -> {js|row-over-column|js}
+    | `columnOverRow -> {js|column-over-row|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module InsetValue = struct
+  (* MDN syntax: <length-percentage> | overlap-join *)
+  type t =
+    [ `overlapJoin
+    | Percentage.t
+    | Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | `overlapJoin -> {js|overlap-join|js}
+    | #Percentage.t as x -> Percentage.toString x
+    | #Length.t as x -> Length.toString x
+end
+
 module ColumnSpan = struct
   type t =
     [ `none
