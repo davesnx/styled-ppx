@@ -569,8 +569,7 @@ let is_namespace_statement rule =
     silently misplaced. *)
 let is_charset rule = String.starts_with ~prefix:"@charset" (String.trim rule)
 
-(** The leading `a-`/`in-` atom class name in a rendered rule, if any
-    (atom-slot-keys phase 2, prefix rename 2026-09-25 - see
+(** The leading `a-`/`in-` atom class name in a rendered rule, if any (see
     [Hash_class.slot_class] / [Class_format]). Every atom this generator emits
     opens with its own class as a leading compound-selector token, so the first
     occurrence in the rule text is always the atom's own class. Returns [None]
@@ -630,10 +629,9 @@ let atom_class_name rule_text =
     bundling already, legitimately, gives several different declarations from
     one binding the SAME class when they all carry a [$(...)] interpolation;
     that is not a hash collision, it is the bundling mechanism working as
-    designed (see `.workplace/plans/atom-slot-keys_PLAN.md`'s "Collision check"
-    notes - an earlier, unconditional version of this check broke
-    `minify-interpolation.t` and the `reason-cx-*` snapshot tests for exactly
-    this reason). Call after [ordered_rules]'s exact-text dedup, so only
+    designed. Without this exemption, `minify-interpolation.t` and the
+    `reason-cx-*` snapshot tests would report false collisions on exactly that
+    legitimate sharing. Call after [ordered_rules]'s exact-text dedup, so only
     genuinely different rule bodies remain to compare. *)
 let check_atom_class_collisions rules =
   let seen : (string, string) Hashtbl.t = Hashtbl.create 256 in

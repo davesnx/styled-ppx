@@ -17,8 +17,7 @@ let pow36 width =
 let hashed_field ~width s =
   to_base36_padded ~width (Murmur2.default_int s mod pow36 width)
 
-(* 2026-09-25 checkpoint tweak (team-lead/user): family 3->2, value 5->4,
-   context 4->5. [extended_width] is not a free choice - it must equal
+(* [extended_width] is not a free choice - it must equal
    [Slot_key.extended_hash_width] (Slot_key owns that constant, Class_format
    only reads it, so the two can never drift out of sync - see its own doc
    comment for why the dependency runs that direction). [bundle_value_width]
@@ -37,18 +36,16 @@ let value_width = 4
 let extended_width = Slot_key.extended_hash_width
 let bundle_value_width = 7
 
-(* 2026-09-25 rename (user decision, via team-lead): the prefixes
-   themselves, not the field widths above. Named here (not just inlined as
-   string literals in [slot_class]/[bundle_class]) so a parser has one
-   place to read them from. The "-" separator is not part of the prefix
-   constant; every site below adds it explicitly.
+(* The prefixes themselves, not the field widths above. Named here (not
+   just inlined as string literals in [slot_class]/[bundle_class]) so a
+   parser has one place to read them from. The "-" separator is not part
+   of the prefix constant; every site below adds it explicitly.
 
-   There is deliberately no separate important-atom prefix (an earlier
-   version of this rename had one, "ia-"; the user replaced that with
-   folding [!important] into {!Slot_key.context_key} instead - see
-   slot_key.mli's [context] doc). An important atom is therefore an
-   ordinary [atom_prefix] atom whose context happens to be non-empty (it
-   pays for a context field instead of a different prefix letter). *)
+   There is no separate important-atom prefix: [!important] folds into
+   {!Slot_key.context_key} instead (see slot_key.mli's [context] doc), so
+   an important atom is an ordinary [atom_prefix] atom whose context
+   happens to be non-empty - it pays for a context field instead of a
+   different prefix letter. *)
 let atom_prefix = "a"
 let bundle_prefix = "in"
 

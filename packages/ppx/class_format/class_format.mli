@@ -1,25 +1,24 @@
-(** Merge-aware atom class names (atom-slot-keys, phase 2, checkpoint tweaks
-    2026-09-25, prefix rename 2026-09-25). Re-exported by [Hash_class] (the
-    single source of truth for every hashed identifier, per its own header
-    comment) - this module is standalone only so it can be unit-tested directly;
-    [Hash_class] is still where a real caller should reach for it once phase 3
-    wires it in.
+(** Merge-aware atom class names. Re-exported by [Hash_class] (the single source
+    of truth for every hashed identifier, per its own header comment)
+    - this module is standalone only so it can be unit-tested directly;
+      [Hash_class] is still where a real caller should reach for it once
+      [Css_file.re]'s atomization is taught to mint family atoms and calls into
+      this format for every atom, not just bundles.
 
     Not wired into the real atomization/generate pipeline yet, EXCEPT
     {!bundle_class}, which [Hash_class.bundle_class_and_namespace] already calls
-    for real (see the checkpoint's collision-check notes - the atom class-name
-    collision check needed a real, recognizable bundle prefix to be shown safe
-    against real interpolation-bundled content).
+    for real: the atom class-name collision check
+    (`packages/generate/generate.ml`) needs a real, recognizable bundle prefix
+    to tell a legitimate shared bundle class apart from a genuine hash
+    collision.
 
-    Prefixes, from the user's naming decision (2026-09-25): [a-] (any non-bundle
-    atom, important or not - see below), [in-] (an interpolation bundle - see
-    {!Slot_key.t.bundle}). An earlier version of this rename gave [!important]
-    its own prefix ([ia-]); the user replaced that with folding [!important]
-    into {!Slot_key.context_key} instead (see slot_key.mli's [context] doc), so
-    there is no third prefix - an important atom is an ordinary [a-] atom whose
-    context happens to be non-empty. [a-] is never a prefix of [in-] or vice
-    versa, so a literal-prefix match is unambiguous with no lookahead beyond the
-    prefix itself.
+    Prefixes: [a-] (any non-bundle atom, important or not - see below), [in-]
+    (an interpolation bundle - see {!Slot_key.t.bundle}). There is no separate
+    important-atom prefix: [!important] folds into {!Slot_key.context_key}
+    instead (see slot_key.mli's [context] doc), so an important atom is an
+    ordinary [a-] atom whose context happens to be non-empty. [a-] is never a
+    prefix of [in-] or vice versa, so a literal-prefix match is unambiguous with
+    no lookahead beyond the prefix itself.
 
     A non-bundle atom ([a-]) is its prefix followed by an optional context
     field, a family field, an optional extended-hash field, an optional mask
@@ -119,9 +118,8 @@ val hashed_field : width:int -> string -> string
 (** The {!bundle_prefix} class for [content] directly - what {!slot_class}
     delegates to for a bundle atom, exposed standalone so a caller that already
     knows an atom is a bundle (e.g. [Hash_class], wiring [Css_file.re]'s
-    existing bundle path for real - see the checkpoint's collision-check notes)
-    doesn't need to build a full, otherwise-unused {!Slot_key.t} just to reach
-    it. *)
+    existing bundle path for real) doesn't need to build a full,
+    otherwise-unused {!Slot_key.t} just to reach it. *)
 val bundle_class : string -> string
 
 (** [slot_class slot content] is [slot]'s full class name: [content] is the

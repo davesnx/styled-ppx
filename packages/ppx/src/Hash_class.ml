@@ -33,9 +33,9 @@
    -------------------------------
      class name   `a-<hash(content)>`                      (class_name)
      namespace    `css-<hash(content)>`                    (namespace_of_content)
-                  NOT the class name (see "Prefix rename" below) - the
-                  same hash input, but its own literal prefix never
-                  changes; the seed for its vars
+                  NOT the class name (see "Class vs. namespace prefixes"
+                  below) - the same hash input, but its own literal prefix
+                  never changes; the seed for its vars
      variable     `var-<hash(namespace \0 path \0 type_key)>`   (variable)
      occurrence   `<variable>_<n>` when a name repeats in one declaration
      identity     `id-<hash(cli_namespace \0 module \0 scope \0 name
@@ -60,7 +60,8 @@
    [class_and_namespace] therefore derives the variable namespace from the
    atom's *own content* - the same hash input that backs the class name (only
    the literal prefix differs: [a-] for the class, [css-] for the namespace -
-   see "Prefix rename" below). That makes every variable a pure function of
+   see "Class vs. namespace prefixes" below). That makes every variable a
+   pure function of
    the declaration content, independent of the enclosing binding, its sibling
    declarations, the file, and the scope. Identical declarations get identical
    class names AND identical variables everywhere they appear.
@@ -91,20 +92,19 @@
    *should* yield identical variables (that is the cross-build invariant we
    want), and differing content is already separated by the rules hash.
 
-   Prefix rename (2026-09-26, user decision via team-lead)
-   --------------------------------------------------------
-   The class name's own literal prefix changed from [css-] to [a-]
-   ([class_of_content]); [identity_class] from [cid-] to [id-]; and
-   [keyframe_name] from [keyframe-] to [k-]. [namespace_of_content]'s
-   literal prefix is deliberately UNCHANGED (still [css-]) - it is a hash
-   *input* to [variable] (see [nul_join [namespace; path; type_key]]
-   above), so renaming its string would silently rename every
-   already-shipped `var(--...)` custom property for no reason; only the
-   class's own presentation needed a new prefix, not the seed every
-   variable name is a pure function of. [identity_class] and
+   Class vs. namespace prefixes
+   -----------------------------
+   [class_of_content]'s prefix ([a-]) and [namespace_of_content]'s prefix
+   ([css-]) differ, and must go on differing: [namespace_of_content] is a
+   hash *input* to [variable] (see [nul_join [namespace; path; type_key]]
+   above), so changing its literal string would silently rename every
+   already-shipped `var(--...)` custom property for no reason - only the
+   class's own presentation needs a prefix a reader recognizes, not the
+   seed every variable name is a pure function of. [identity_class] and
    [keyframe_name] carry no such downstream hash consumer (each result is
    a leaf identifier, never fed into another hash - see their own doc
-   comments), so both were safe to rename directly.
+   comments), so their prefixes ([id-], [k-]) are free to be whatever is
+   most readable.
 
    Stability contract
    ------------------
@@ -142,13 +142,12 @@ let class_and_namespace content =
 let class_name content = fst (class_and_namespace content)
 
 (* Same shape as [class_and_namespace] (a [(class_name, namespace)] pair
-   from one content hash), for [Css_file.re]'s bundle path specifically
-   (atom-slot-keys checkpoint, 2026-09-25): the CLASS half gets the
-   [in-] prefix (see [Class_format.bundle_class]) so `CSS.merge`'s future
-   runtime and `generate`'s atom-class collision check can recognize a
-   bundle atom and treat it as opaque - never dropped, never dropping
-   another atom, never flagged as a collision even though several
-   different declarations from one binding share it by design. The
+   from one content hash), for [Css_file.re]'s bundle path specifically: the
+   CLASS half gets the [in-] prefix (see [Class_format.bundle_class]) so
+   `CSS.merge`'s future runtime and `generate`'s atom-class collision check
+   can recognize a bundle atom and treat it as opaque - never dropped,
+   never dropping another atom, never flagged as a collision even though
+   several different declarations from one binding share it by design. The
    NAMESPACE half is deliberately UNCHANGED (still [namespace_of_content],
    `css-<hash>`) - it seeds every interpolation variable's name (see the
    header's "atomic invariant"), and changing it would rename every
@@ -247,19 +246,16 @@ let keyframe_name rendered_body = Printf.sprintf "k-%s" (hash rendered_body)
 (* Dedup key for a single [%styled.global] rule: `global-<hash(rule)>`. *)
 let global_key rendered_rule = Printf.sprintf "global-%s" (hash rendered_rule)
 
-(* -- Merge-aware atom class names (atom-slot-keys, phase 2) ------------
+(* -- Merge-aware atom class names --------------------------------------
 
-   Not wired into [class_and_namespace] yet - phase 3 teaches
-   [Css_file.re]'s atomization to call [slot_class] instead, once family
-   atoms exist there too. Implementation lives in the standalone
-   [Class_format] library (unit-tested directly there;
-   `packages/ppx/src` is a ppx_rewriter-kind, wrapped library whose
-   internal modules aren't cleanly reachable from an external test
-   executable) - re-exported here because this file is the single source
-   of truth for every hashed identifier this pipeline emits. See
-   `packages/ppx/class_format/class_format.mli` for the format and
-   `.workplace/plans/atom-slot-keys_PLAN.md` ("Direction agreed with the
-   user") for the design. *)
+   Not wired into [class_and_namespace] yet - [Css_file.re]'s atomization
+   will call [slot_class] instead once it also mints family atoms.
+   Implementation lives in the standalone [Class_format] library
+   (unit-tested directly there; `packages/ppx/src` is a ppx_rewriter-kind,
+   wrapped library whose internal modules aren't cleanly reachable from an
+   external test executable) - re-exported here because this file is the
+   single source of truth for every hashed identifier this pipeline emits.
+   See `packages/ppx/class_format/class_format.mli` for the format. *)
 let slot_class = Class_format.slot_class
 
 (* The build-independent identity class for a named binding:

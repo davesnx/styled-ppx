@@ -6,12 +6,11 @@ type context = {
   selector : string;
   important : bool;
     (** [!important] is folded into the context, as if it were one more wrapper
-        around the declaration, like an [at_rules] entry (2026-09-25 user
-        decision, replacing an earlier separate importance guard on [removes]) -
-        a declaration and its [!important] twin are therefore never in the same
-        context, so [removes] never removes either one in favor of the other;
-        the browser's own cascade already decides between them, and [CSS.merge]
-        does not need a second opinion. See {!context_key}. *)
+        around the declaration, like an [at_rules] entry - a declaration and its
+        [!important] twin are therefore never in the same context, so [removes]
+        never removes either one in favor of the other; the browser's own
+        cascade already decides between them, and [CSS.merge] does not need a
+        second opinion. See {!context_key}. *)
 }
 
 let is_custom_property name =
@@ -204,14 +203,14 @@ end
    {!Family.family_key_of}) or a standalone (family-less) property's own
    name - in one fixed, literal, append-only array. Position in this array
    IS the id (see {!Registry.table} below, which uses this array's order
-   verbatim - no sorting, no filtering, ever, at build time). Seeded
-   2026-09-25 from every property packages/css-grammar/lib/Properties/*.ml
-   registers (757, via [Css_grammar.property_names ()], the 25 internal
-   `@media`-feature-grammar entries in Properties/Media.ml excluded - they
-   are not CSS properties, see Css_grammar.Registry's module doc; also
-   excludes "backdrop-blur" and "container-name-computed", removed
-   2026-09-25 - see the plan's Decisions), reduced through {!resolve_alias}
-   and {!Family.family_key_of} to the 526 distinct ids actually needed (44
+   verbatim - no sorting, no filtering, ever, at build time). Seeded from
+   every property packages/css-grammar/lib/Properties/*.ml registers (757,
+   via [Css_grammar.property_names ()], the 25 internal `@media`-feature-
+   grammar entries in Properties/Media.ml excluded - they are not CSS
+   properties, see Css_grammar.Registry's module doc; also excludes
+   "backdrop-blur" and "container-name-computed", which no CSS spec
+   defines), reduced through {!resolve_alias} and {!Family.family_key_of}
+   to the 526 distinct ids actually needed (44
    shorthand-family canonical keys + 482 standalone properties) - a leaf
    covered by some family (e.g. "margin-top") needs no entry of its own,
    and neither does a true alias (e.g. "font-width", "word-
@@ -770,12 +769,12 @@ let extended_hash_range =
 
 module Registry = struct
   (* The family field is 2 base36 chars (see Class_format) - 1,296 values.
-     [0, registered_max] is the table's own range. The checkpoint tweak
-     (2026-09-25, team-lead/user) replaced the old scheme's two reserved
-     numeric SUB-RANGES for unknown/custom properties (which, at 3 chars,
-     could afford to give each its own thousands-wide range) with two
-     single reserved MARKER values instead, so the common (registered)
-     case keeps almost the whole 1,296-value space to grow into. A
+     [0, registered_max] is the table's own range. Unknown/custom
+     properties get two single reserved MARKER values rather than their
+     own reserved numeric sub-ranges, so the common (registered) case
+     keeps almost the whole 1,296-value space to grow into - a field this
+     narrow cannot afford to set aside a whole sub-range for the
+     uncommon case the way a wider field could. A
      property whose family field is one of those two markers carries its
      real identity in a separate, wider hash field instead (see
      {!family_id}, [Class_format]'s [extended_width]) - the marker only
@@ -790,8 +789,7 @@ module Registry = struct
   (* [seed] verbatim - see its own ORDER RULE comment. No [List.sort_uniq]
      or other re-derivation here: that would silently break append-only the
      moment a new entry sorted earlier than an existing one, shifting every
-     later id (the bug this replaces - see the 2026-09-25 property-table
-     session report for how it was found). *)
+     later id. *)
   let table : string array = seed
   let by_name : (string, int) Hashtbl.t = Hashtbl.create (2 * Array.length table)
 
@@ -876,7 +874,7 @@ type t = {
         bundle atom and never lets one drop another atom - a bundle's class
         legitimately shares its class with unrelated declarations from the same
         binding (a real, pre-existing mechanism, not a merge decision this
-        module can safely reason about) - see the checkpoint's [csv-] prefix. *)
+        module can safely reason about) - see [Class_format]'s [in-] prefix. *)
 }
 
 (* Duplicated from [Css_file.re]'s [Css_transform.component_value_has_
@@ -948,8 +946,9 @@ let of_atom (rule : Ast.rule) : t option =
       { at_rules; selector = Option.value selector ~default:""; important }
     in
     (* A multi-declaration group (same-property today; a mixed shorthand +
-       longhand "family atom" from phase 3) combines every declaration's
-       own family/mask - they are always the same family by construction
+       longhand "family atom" once [Css_file.re]'s atomization mints them)
+       combines every declaration's own family/mask - they are always the
+       same family by construction
        (that's what makes them one group), so the combined mask is the OR
        of each one's own mask, using [None] ("full") as absorbing: any
        [None] in the group makes the whole group's mask [None]. *)

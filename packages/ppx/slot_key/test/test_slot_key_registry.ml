@@ -1,7 +1,6 @@
 (* Registry/id coverage for Slot_key's css-grammar-backed data (see
-   slot_key.ml's [direct_children]/[seed]/[Registry] and .workplace/plans/
-   atom-slot-keys_PLAN.md for why this moved out of a separate table).
-   Deliberately its own file, not test_slot_key.ml - that file covers the
+   slot_key.ml's [direct_children]/[seed]/[Registry]). Deliberately its own
+   file, not test_slot_key.ml - that file covers the
    [removes]/[of_atom] algorithm; this one covers "does every css-grammar
    property get a stable id" and "is the family graph sane", which need
    Css_grammar as a test dependency test_slot_key.ml doesn't otherwise
@@ -137,9 +136,9 @@ let family_tests =
 
 (* --- append-only seed order: an unchanged, exact-order PREFIX --------- *)
 
-(* Committed snapshot of every entry {!Slot_key.seed} holds (526 entries as
-   of 2026-09-25, one per line, plain text - not OCaml source - so it stays
-   a reviewable, diffable artifact independent of this file), in the exact
+(* Committed snapshot of every entry {!Slot_key.seed} holds (526 entries, one
+   per line, plain text - not OCaml source - so it stays a reviewable,
+   diffable artifact independent of this file), in the exact
    order they were seeded. This is the actual "an existing id must never
    move" check: {!order_tests} below asserts this snapshot is a byte-for-
    byte, same-order PREFIX of the live [Slot_key.seed] - not equal to it.
@@ -150,11 +149,12 @@ let family_tests =
    last position breaks the prefix relationship and fails immediately. Grow
    this snapshot (to the new, larger, still-frozen length) only in the same
    change that intentionally accepts a past id moving - which should not
-   happen - never to "make the test pass" after an accidental reorder. (One
-   exception so far: 2026-09-25, removing "backdrop-blur" and
-   "container-name-computed" - see the plan's Decisions - shifted every
-   later position by two; the snapshot was regenerated whole, not patched,
-   for that one change.) *)
+   happen - never to "make the test pass" after an accidental reorder.
+   Removing an id entirely (e.g. dropping a property that turns out not to
+   be real CSS) is the one case where regenerating the snapshot whole, not
+   patching it, is correct: every later position shifts by the number of
+   removed entries, which is an intentional, reviewed renumbering, not an
+   accidental reorder. *)
 let expected_seed_prefix : string array =
   let ic = open_in "seed.snapshot" in
   let rec read_lines acc =

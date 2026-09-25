@@ -338,7 +338,6 @@ let removes_tests =
         (Slot_key.removes ~former:(slot_of "min-height: 0;")
            ~latter:(slot_of "& > .x{min-height: 0;}")));
     (* --- !important is part of the context, not a separate guard ---
-       (2026-09-25 user decision, replacing the earlier per-flag guard):
        `!important` makes an atom's context different from the same
        declaration without it, the same way an enclosing `@media` or `&:hover`
        does - so `merge` never has to reason about importance directly, only

@@ -1,8 +1,7 @@
-(* Phase 2 checkpoint: concrete examples of the new class-name format
-   (Hash_class.slot_class) for every shape .workplace/plans/
-   atom-slot-keys_PLAN.md's checkpoint asks for. Not wired into the real
-   ppx/generate pipeline yet (phase 3+) - this exercises Hash_class/Slot_key
-   directly, the same way packages/ppx/slot_key/test does. *)
+(* Concrete examples of the class-name format (Hash_class.slot_class) for
+   every shape it can produce. Not wired into the real ppx/generate
+   pipeline yet - this exercises Hash_class/Slot_key directly, the same way
+   packages/ppx/slot_key/test does. *)
 
 module Driver = Styled_ppx_css_parser.Driver
 module Ast = Styled_ppx_css_parser.Ast
@@ -58,10 +57,9 @@ let examples_tests =
         let c = class_of css in
         (* Every example must at least parse into a well-formed class name:
            the right prefix, and a length this test can report. The actual
-           strings are inspected by hand in the checkpoint report (they are
-           printed by the length-distribution tool, not asserted literally
-           here - a literal hash assertion would just be re-deriving the
-           implementation, not checking behavior). *)
+           strings are not asserted literally here - a literal hash
+           assertion would just be re-deriving the implementation, not
+           checking behavior. *)
         check_bool
           (Printf.sprintf "%s: %S starts with %s or %s" label c
              Class_format.atom_prefix Class_format.bundle_prefix)
@@ -81,9 +79,9 @@ let format_tests =
       check_int "length" base_length (String.length c));
     Alcotest_extra.test
       "an !important atom uses the SAME a- prefix as a plain atom - there is \
-       no separate important-atom prefix (2026-09-25 user decision) - but is \
-       context_width chars longer, since !important is folded into the context \
-       key and a base atom's context is otherwise free" (fun () ->
+       no separate important-atom prefix - but is context_width chars longer, \
+       since !important is folded into the context key and a base atom's \
+       context is otherwise free" (fun () ->
       let plain = class_of "color: red;" in
       let important = class_of "color: red !important;" in
       check_bool "same a- prefix" true
