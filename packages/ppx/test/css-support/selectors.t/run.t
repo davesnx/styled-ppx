@@ -16,32 +16,32 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css
-    ".css-9y6172{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}"
+    ".a-9y6172{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}"
   ];
   [@css
-    ".css-wdylr4 .recharts-cartesian-grid-horizontal line:nth-last-child(1){stroke-opacity:0;}"
+    ".a-wdylr4 .recharts-cartesian-grid-horizontal line:nth-last-child(1){stroke-opacity:0;}"
   ];
   [@css
-    ".css-3xax0l .recharts-cartesian-grid-horizontal line:nth-last-child(2){stroke-opacity:0;}"
+    ".a-3xax0l .recharts-cartesian-grid-horizontal line:nth-last-child(2){stroke-opacity:0;}"
   ];
   [@css
-    ".css-1fqvgu0 .recharts-scatter .recharts-scatter-symbol .recharts-symbols{opacity:0.8;}"
+    ".a-1fqvgu0 .recharts-scatter .recharts-scatter-symbol .recharts-symbols{opacity:0.8;}"
   ];
   [@css
-    ".css-o0c7xs .recharts-scatter .recharts-scatter-symbol .recharts-symbols:hover{opacity:1;}"
+    ".a-o0c7xs .recharts-scatter .recharts-scatter-symbol .recharts-symbols:hover{opacity:1;}"
   ];
   [@css.bindings
     [
       (
         "Input._chart",
-        "cid-1e3u8p2",
-        "css-9y6172 css-wdylr4 css-3xax0l css-1fqvgu0 css-o0c7xs",
+        "id-1e3u8p2",
+        "a-9y6172 a-wdylr4 a-3xax0l a-1fqvgu0 a-o0c7xs",
       ),
     ]
   ];
   
   let _chart =
     CSS.make(
-      "label:_chart cid-1e3u8p2 css-9y6172 css-wdylr4 css-3xax0l css-1fqvgu0 css-o0c7xs",
+      "label:_chart id-1e3u8p2 a-9y6172 a-wdylr4 a-3xax0l a-1fqvgu0 a-o0c7xs",
       [],
     );

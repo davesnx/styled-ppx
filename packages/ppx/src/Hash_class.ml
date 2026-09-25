@@ -31,16 +31,18 @@
 
    The emitted identifier families
    -------------------------------
-     class name   `css-<hash(content)>`                    (class_name)
+     class name   `a-<hash(content)>`                      (class_name)
      namespace    `css-<hash(content)>`                    (namespace_of_content)
-                  identical to the class name; the seed for its vars
+                  NOT the class name (see "Class vs. namespace prefixes"
+                  below) - the same hash input, but its own literal prefix
+                  never changes; the seed for its vars
      variable     `var-<hash(namespace \0 path \0 type_key)>`   (variable)
      occurrence   `<variable>_<n>` when a name repeats in one declaration
-     identity     `cid-<hash(cli_namespace \0 module \0 scope \0 name
+     identity     `id-<hash(cli_namespace \0 module \0 scope \0 name
                   [\0 occurrence])>`                     (identity_class)
                   build-independent handle for a named binding; never a
                   path or dune library name
-     keyframes    `keyframe-<hash(body)>`                  (keyframe_name)
+     keyframes    `k-<hash(body)>`                         (keyframe_name)
      global key   `global-<hash(rule)>`                    (global_key)
      scoped ns    `<kind> \0 <module> \0 <scope> \0 <hash(rules)>` (scoped_namespace)
 
@@ -50,15 +52,17 @@
    class name already honours that - it is a pure hash of the rendered
    declaration. The *variable* substituted into that declaration must honour
    it too: otherwise two modules that emit the byte-identical
-   `.css-<h>-header{background-color:var(--...)}` rule can disagree on the
+   `.a-<h>-header{background-color:var(--...)}` rule can disagree on the
    `var(--...)` target, and an element that sets one variable ends up matched
    by a rule that reads the other -> undefined custom property -> missing
    style.
 
    [class_and_namespace] therefore derives the variable namespace from the
-   atom's *own content* - the same string that backs the class name (the two
-   are now identical). That makes every variable a pure function of the
-   declaration content, independent of the enclosing binding, its sibling
+   atom's *own content* - the same hash input that backs the class name (only
+   the literal prefix differs: [a-] for the class, [css-] for the namespace -
+   see "Class vs. namespace prefixes" below). That makes every variable a
+   pure function of
+   the declaration content, independent of the enclosing binding, its sibling
    declarations, the file, and the scope. Identical declarations get identical
    class names AND identical variables everywhere they appear.
 
@@ -88,13 +92,29 @@
    *should* yield identical variables (that is the cross-build invariant we
    want), and differing content is already separated by the rules hash.
 
+   Class vs. namespace prefixes
+   -----------------------------
+   [class_of_content]'s prefix ([a-]) and [namespace_of_content]'s prefix
+   ([css-]) differ, and must go on differing: [namespace_of_content] is a
+   hash *input* to [variable] (see [nul_join [namespace; path; type_key]]
+   above), so changing its literal string would silently rename every
+   already-shipped `var(--...)` custom property for no reason - only the
+   class's own presentation needs a prefix a reader recognizes, not the
+   seed every variable name is a pure function of. [identity_class] and
+   [keyframe_name] carry no such downstream hash consumer (each result is
+   a leaf identifier, never fed into another hash - see their own doc
+   comments), so their prefixes ([id-], [k-]) are free to be whatever is
+   most readable.
+
    Stability contract
    ------------------
    These formats are an on-disk contract. Changing a prefix, the separator,
    the hash function, or the field order rewrites EVERY class and variable
    name, which invalidates the cram snapshots and any already-shipped
-   stylesheet. Keep them in lockstep with the runtime's `css-` / `var-`
-   scheme. *)
+   stylesheet. [namespace_of_content]'s prefix is pinned harder than the
+   rest: it is a hash input, not just a display string, so it may never
+   change without also accepting that every existing `var(--...)` name
+   changes with it. *)
 
 let hash = Murmur2.default
 
@@ -103,17 +123,39 @@ let nul_join parts = String.concat "\000" parts
 
 (* -- Class names and the atom namespace -------------------------------- *)
 
+(* The variable-namespace seed. Literal prefix pinned to [css-] forever -
+   see "Prefix rename" above; never rename this one. *)
 let namespace_of_content content = Printf.sprintf "css-%s" (hash content)
 
-(* An atom's class name and its namespace, from a single content hash. Both
-   are now the same string. Kept as a pair because callers pattern-match
+(* An atom's own emitted class name: same hash input as the namespace, but
+   its own, freely-renamable presentation prefix (see "Prefix rename"). *)
+let class_of_content content = Printf.sprintf "a-%s" (hash content)
+
+(* An atom's class name and its namespace, from a single content hash - two
+   different literal strings sharing one hash input (see the header's
+   "atomic invariant"). Kept as a pair because callers pattern-match
    [(class_name, namespace)] and lower interpolation variables from the
-   namespace half (see the header). *)
+   namespace half. *)
 let class_and_namespace content =
-  let namespace = namespace_of_content content in
-  namespace, namespace
+  class_of_content content, namespace_of_content content
 
 let class_name content = fst (class_and_namespace content)
+
+(* Same shape as [class_and_namespace] (a [(class_name, namespace)] pair
+   from one content hash), for [Css_file.re]'s bundle path specifically: the
+   CLASS half gets the [in-] prefix (see [Class_format.bundle_class]) so
+   `CSS.merge`'s future runtime and `generate`'s atom-class collision check
+   can recognize a bundle atom and treat it as opaque - never dropped,
+   never dropping another atom, never flagged as a collision even though
+   several different declarations from one binding share it by design. The
+   NAMESPACE half is deliberately UNCHANGED (still [namespace_of_content],
+   `css-<hash>`) - it seeds every interpolation variable's name (see the
+   header's "atomic invariant"), and changing it would rename every
+   existing bundle's `var(--...)` custom properties for no reason; only
+   the class's own presentation needed to change, not the content-hash
+   input every variable name is still a pure function of. *)
+let bundle_class_and_namespace content =
+  Class_format.bundle_class content, namespace_of_content content
 
 (* -- Interpolation variables ------------------------------------------- *)
 
@@ -195,33 +237,34 @@ let scoped_namespace ~kind ~module_name ~scope ~rendered_rules =
   let rules_key = String.concat "\n" rendered_rules in
   nul_join [ kind; module_name; scope_key; hash rules_key ]
 
-(* `@keyframes` name from its rendered body: `keyframe-<hash(body)>`. *)
-let keyframe_name rendered_body =
-  Printf.sprintf "keyframe-%s" (hash rendered_body)
+(* `@keyframes` name from its rendered body: `k-<hash(body)>`. A leaf
+   identifier - its variable namespace comes from [scoped_namespace]
+   instead (module + scope + rendered-rules, not this string), so renaming
+   this prefix cannot rename any `var(--...)` name. *)
+let keyframe_name rendered_body = Printf.sprintf "k-%s" (hash rendered_body)
 
 (* Dedup key for a single [%styled.global] rule: `global-<hash(rule)>`. *)
 let global_key rendered_rule = Printf.sprintf "global-%s" (hash rendered_rule)
 
-(* -- Merge-aware atom class names (atom-slot-keys, phase 2) ------------
+(* -- Merge-aware atom class names --------------------------------------
 
-   Not wired into [class_and_namespace] yet - phase 3 teaches
-   [Css_file.re]'s atomization to call [slot_class] instead, once family
-   atoms exist there too. Implementation lives in the standalone
-   [Class_format] library (unit-tested directly there;
-   `packages/ppx/src` is a ppx_rewriter-kind, wrapped library whose
-   internal modules aren't cleanly reachable from an external test
-   executable) - re-exported here because this file is the single source
-   of truth for every hashed identifier this pipeline emits. See
-   `packages/ppx/class_format/class_format.mli` for the format and
-   `.workplace/plans/atom-slot-keys_PLAN.md` ("Direction agreed with the
-   user") for the design. *)
+   Not wired into [class_and_namespace] yet - [Css_file.re]'s atomization
+   will call [slot_class] instead once it also mints family atoms.
+   Implementation lives in the standalone [Class_format] library
+   (unit-tested directly there; `packages/ppx/src` is a ppx_rewriter-kind,
+   wrapped library whose internal modules aren't cleanly reachable from an
+   external test executable) - re-exported here because this file is the
+   single source of truth for every hashed identifier this pipeline emits.
+   See `packages/ppx/class_format/class_format.mli` for the format. *)
 let slot_class = Class_format.slot_class
 
 (* The build-independent identity class for a named binding:
-   `cid-<hash(cli_namespace \0 module_name \0 scope \0 name [\0 occurrence])>`.
-   Inputs are deliberately the ones an author writes, never a physical path or
-   dune library name (those differ between native and Melange builds of the
-   same source - see the header note on [module]). [cli_namespace] is the
+   `id-<hash(cli_namespace \0 module_name \0 scope \0 name [\0 occurrence])>`.
+   A leaf identifier, never fed into another hash, so renaming this prefix
+   cannot rename any `var(--...)` name. Inputs are deliberately the ones an
+   author writes, never a physical path or dune library name (those differ
+   between native and Melange builds of the same source - see the header
+   note on [module]). [cli_namespace] is the
    `--namespace` flag value (empty by default), mixed in so two libraries that
    happen to share a module basename and binding name can still be told apart
    (see documents/css-extraction.md, "Identity classes"). [module_name] is the
@@ -236,4 +279,4 @@ let identity_class ~namespace ~module_name ~scope ~name ~occurrence =
   let parts =
     if occurrence > 1 then parts @ [ string_of_int occurrence ] else parts
   in
-  Printf.sprintf "cid-%s" (hash (nul_join parts))
+  Printf.sprintf "id-%s" (hash (nul_join parts))

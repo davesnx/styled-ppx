@@ -14,23 +14,23 @@ Same-file submodule binding shadowing follows structure order: a later
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb{color:red;}"];
-  [@css ".css-bjcoli{color:green;}"];
-  [@css ".css-59bkuc.cid-1l23vtp{color:blue;}"];
+  [@css ".a-tokvmb{color:red;}"];
+  [@css ".a-bjcoli{color:green;}"];
+  [@css ".a-59bkuc.id-1l23vtp{color:blue;}"];
   [@css.bindings
     [
-      ("Input.Css.marker", "cid-1l23vtp", "css-bjcoli"),
-      ("Input.wrapper", "cid-4f6ye3", "css-59bkuc"),
+      ("Input.Css.marker", "id-1l23vtp", "a-bjcoli"),
+      ("Input.wrapper", "id-4f6ye3", "a-59bkuc"),
     ]
   ];
   module Css = {
-    let marker = CSS.make("label:marker cid-zr2uk1 css-tokvmb", []);
+    let marker = CSS.make("label:marker id-zr2uk1 a-tokvmb", []);
     let _ = marker;
   
-    let marker = CSS.make("label:marker cid-1l23vtp css-bjcoli", []);
+    let marker = CSS.make("label:marker id-1l23vtp a-bjcoli", []);
   };
   
-  let wrapper = CSS.make("label:wrapper cid-4f6ye3 css-59bkuc", []);
+  let wrapper = CSS.make("label:wrapper id-4f6ye3 a-59bkuc", []);
   
   let _ = (Css.marker, wrapper);
 

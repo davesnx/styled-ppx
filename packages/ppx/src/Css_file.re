@@ -1041,7 +1041,7 @@ module Css_transform = {
            carries the full selector chain. The Declaration arm above turns
            a bare Declaration with a parent into a Style_rule, which is what
            lets `.a .b { @media (...) { color: red } }` render correctly as
-           `@media (...) { .css-X .a .b { color:red } }`. */
+           `@media (...) { .a-X .a .b { color:red } }`. */
         | Rule_list((rules, rule_loc))
         | Stylesheet((rules, rule_loc)) =>
           extract_atomic_rules_from_block(~parent_prelude?, rules)
@@ -1129,12 +1129,13 @@ module Css_transform = {
     let atomic_rules = atomize_rules(~source_position_start, rules);
 
     /* Selective atomization: the block's interpolating declarations become one
-       content-addressed bundle, with class and var namespace both `css-<B>`
-       (the two are identical, see Hash_class.ml) shared across
-       base/`:hover`/`@media`. Both derive from the same bundle content, so
-       identical bundles dedup to identical rules + vars and different
-       bundles never collide, preserving the cross-module atomic invariant
-       (see Hash_class.ml) and `CSS.merge`.
+       content-addressed bundle, with class `in-<B>` and var namespace
+       `css-<B>` (same bundle content hash, different literal prefix - see
+       Hash_class.ml's "Prefix rename") shared across base/`:hover`/`@media`.
+       Both derive from the same bundle content, so identical bundles dedup
+       to identical rules + vars and different bundles never collide,
+       preserving the cross-module atomic invariant (see Hash_class.ml) and
+       `CSS.merge`.
 
        Static declarations keep their own per-content atom class (still shared
        across blocks). A block with no interpolation produces no bundle and is
@@ -1149,7 +1150,9 @@ module Css_transform = {
       ) {
       | [] => None
       | seeds =>
-        Some(Hash_class.class_and_namespace(String.concat("", seeds)))
+        Some(
+          Hash_class.bundle_class_and_namespace(String.concat("", seeds)),
+        )
       };
 
     let (shipped_rev, classes_rev, atom_infos_rev) =

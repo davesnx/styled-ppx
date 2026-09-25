@@ -4,6 +4,13 @@ module Render = Styled_ppx_css_parser.Render
 type context = {
   at_rules : (string * string) list;
   selector : string;
+  important : bool;
+    (** [!important] is folded into the context, as if it were one more wrapper
+        around the declaration, like an [at_rules] entry - a declaration and its
+        [!important] twin are therefore never in the same context, so [removes]
+        never removes either one in favor of the other; the browser's own
+        cascade already decides between them, and [CSS.merge] does not need a
+        second opinion. See {!context_key}. *)
 }
 
 let is_custom_property name =
@@ -63,7 +70,15 @@ let excluded_from_all name =
 
 (* --- Context --------------------------------------------------------- *)
 
-let context_key { at_rules; selector } =
+let context_key { at_rules; selector; important } =
+  (* [important] is prepended as a synthetic leading "at-rule" entry, not a
+     separate field in the key - the whole point is that it composes with
+     the real [at_rules]/[selector] exactly like another wrapper would,
+     using the same [at_rules_part] machinery, rather than needing its own
+     parallel encoding. *)
+  let at_rules =
+    if important then ("!important", "") :: at_rules else at_rules
+  in
   let at_rules_part =
     at_rules
     |> List.map (fun (name, prelude) -> Printf.sprintf "@%s\x00%s" name prelude)
@@ -188,14 +203,14 @@ end
    {!Family.family_key_of}) or a standalone (family-less) property's own
    name - in one fixed, literal, append-only array. Position in this array
    IS the id (see {!Registry.table} below, which uses this array's order
-   verbatim - no sorting, no filtering, ever, at build time). Seeded
-   2026-09-25 from every property packages/css-grammar/lib/Properties/*.ml
-   registers (757, via [Css_grammar.property_names ()], the 25 internal
-   `@media`-feature-grammar entries in Properties/Media.ml excluded - they
-   are not CSS properties, see Css_grammar.Registry's module doc; also
-   excludes "backdrop-blur" and "container-name-computed", removed
-   2026-09-25 - see the plan's Decisions), reduced through {!resolve_alias}
-   and {!Family.family_key_of} to the 526 distinct ids actually needed (44
+   verbatim - no sorting, no filtering, ever, at build time). Seeded from
+   every property packages/css-grammar/lib/Properties/*.ml registers (757,
+   via [Css_grammar.property_names ()], the 25 internal `@media`-feature-
+   grammar entries in Properties/Media.ml excluded - they are not CSS
+   properties, see Css_grammar.Registry's module doc; also excludes
+   "backdrop-blur" and "container-name-computed", which no CSS spec
+   defines), reduced through {!resolve_alias} and {!Family.family_key_of}
+   to the 526 distinct ids actually needed (44
    shorthand-family canonical keys + 482 standalone properties) - a leaf
    covered by some family (e.g. "margin-top") needs no entry of its own,
    and neither does a true alias (e.g. "font-width", "word-
@@ -762,26 +777,42 @@ let seed : string array =
     "rule-visibility-items";
   |]
 
+(* Width, in base36 chars, of the extended-hash field [Class_format] emits
+   right after the family field when it holds one of the two unregistered
+   markers below (a property outside the seed table, or a custom property -
+   neither has a table slot, so its real identity has to live somewhere).
+   Owned here, not in [Class_format], so both the encoder and this module's
+   own [Registry.hash_into] stay in sync by construction - Class_format
+   already depends on Slot_key, never the reverse. *)
+let extended_hash_width = 6
+
+let extended_hash_range =
+  let rec pow36 n acc = if n = 0 then acc else pow36 (n - 1) (acc * 36) in
+  pow36 extended_hash_width 1
+
 module Registry = struct
-  (* [0, registered_max] is the table's own range, generously sized to grow
-     for a long time without touching the partition below. Everything
-     outside it is a hash, split into an "ordinary property" sub-range and
-     a "custom property" sub-range - the sole reason for that split is so
-     {!removes}'s [all]-exclusion check can recognize "[former] is a custom
-     property" from the family id integer alone. [all_sentinel] is a single
-     reserved value outside every other range. *)
-  let registered_max = 19999
-  let unregistered_ordinary_min = 20000
-  let unregistered_ordinary_max = 33327
-  let unregistered_custom_min = 33328
-  let unregistered_custom_max = 46654
-  let all_sentinel = 46655
+  (* The family field is 2 base36 chars (see Class_format) - 1,296 values.
+     [0, registered_max] is the table's own range. Unknown/custom
+     properties get two single reserved MARKER values rather than their
+     own reserved numeric sub-ranges, so the common (registered) case
+     keeps almost the whole 1,296-value space to grow into - a field this
+     narrow cannot afford to set aside a whole sub-range for the
+     uncommon case the way a wider field could. A
+     property whose family field is one of those two markers carries its
+     real identity in a separate, wider hash field instead (see
+     {!family_id}, [Class_format]'s [extended_width]) - the marker only
+     says "look there", it is never itself hashed. [all_sentinel] is a
+     third, single reserved value, for the same reason [all] always was
+     one - not a real property, never worth a table slot. *)
+  let registered_max = 1292
+  let unregistered_ordinary_marker = 1293
+  let unregistered_custom_marker = 1294
+  let all_sentinel = 1295
 
   (* [seed] verbatim - see its own ORDER RULE comment. No [List.sort_uniq]
      or other re-derivation here: that would silently break append-only the
      moment a new entry sorted earlier than an existing one, shifting every
-     later id (the bug this replaces - see the 2026-09-25 property-table
-     session report for how it was found). *)
+     later id. *)
   let table : string array = seed
   let by_name : (string, int) Hashtbl.t = Hashtbl.create (2 * Array.length table)
 
@@ -798,20 +829,35 @@ module Registry = struct
   (* Reuses Murmur2 (the same algorithm Hash_class hashes class-name content
      with) rather than a new hash function, so this stays stable across
      builds the same way class-name hashing already is. *)
-  let hash_into ~min ~max name =
-    let span = max - min + 1 in
-    min + (Murmur2.default_int name mod span)
+  let hash_into name = Murmur2.default_int name mod extended_hash_range
 end
 
+(* [Unregistered]'s payload is the property's own extended-hash value (see
+   [extended_hash_width]/[Class_format]) - unlike the old range-based
+   scheme, the family-field integer itself no longer carries the identity,
+   only the marker does (see {!family_marker}), so a custom property and an
+   ordinary unregistered one need distinct constructors, not distinct
+   sub-ranges of one payload, to stay tellable apart from the [family_id]
+   value alone. *)
 type family_id =
   | Registered of int
   | Unregistered of int
+  | UnregisteredCustom of int
   | All
 
-let family_id_to_int = function
+(* The family FIELD's own value - what [Class_format] actually writes into
+   the 2-char family slot. [Unregistered]/[UnregisteredCustom]'s payload
+   (the real extended hash) is a separate field entirely; see
+   {!extended_hash}. *)
+let family_marker = function
   | Registered n -> n
-  | Unregistered n -> n
+  | Unregistered _ -> Registry.unregistered_ordinary_marker
+  | UnregisteredCustom _ -> Registry.unregistered_custom_marker
   | All -> Registry.all_sentinel
+
+let extended_hash = function
+  | Unregistered n | UnregisteredCustom n -> Some n
+  | Registered _ | All -> None
 
 (* A true spec-level alias (e.g. "font-width" for "font-stretch",
    "word-wrap" for "overflow-wrap" - see Css_grammar.Types.kind's [Alias]
@@ -834,20 +880,47 @@ let family_id_of property =
     | Some i -> Registered i
     | None ->
       if is_custom_property property then
-        Unregistered
-          (Registry.hash_into ~min:Registry.unregistered_custom_min
-             ~max:Registry.unregistered_custom_max property)
-      else
-        Unregistered
-          (Registry.hash_into ~min:Registry.unregistered_ordinary_min
-             ~max:Registry.unregistered_ordinary_max key))
+        UnregisteredCustom (Registry.hash_into property)
+      else Unregistered (Registry.hash_into key))
 
 type t = {
   context : context;
   family : family_id;
   mask : int option;
-  important : bool;
+  bundle : bool;
+    (** True when any declaration in this atom carries a [$(...)] value
+        interpolation - [Css_file.re]'s [transform_rule_list] bundles such
+        declarations under one shared class today (see slot_key.ml's
+        [declaration_has_value_interpolation], duplicated from there for the
+        same reason {!normalize_property} duplicates [declaration_group_key] -
+        this module cannot depend on the [ppx] library). [removes] never drops a
+        bundle atom and never lets one drop another atom - a bundle's class
+        legitimately shares its class with unrelated declarations from the same
+        binding (a real, pre-existing mechanism, not a merge decision this
+        module can safely reason about) - see [Class_format]'s [in-] prefix. *)
 }
+
+(* Duplicated from [Css_file.re]'s [Css_transform.component_value_has_
+   interpolation]/[declaration_has_value_interpolation] (this module
+   cannot depend on [ppx] - see {!normalize_property}'s own note on the
+   same constraint). A declaration's VALUE carrying a [$(...)] is what
+   makes [Css_file.re] bundle it with its siblings under one shared class
+   today; selector-position interpolations are resolved statically and
+   never bundled, so they are irrelevant here, same as there. *)
+let rec component_value_has_interpolation (cv : Ast.component_value) =
+  match cv with
+  | Ast.Variable (_, _) -> true
+  | Ast.Paren_block values | Ast.Bracket_block values ->
+    component_value_list_has_interpolation values
+  | Ast.Function { body = values, _; _ } ->
+    component_value_list_has_interpolation values
+  | _ -> false
+
+and component_value_list_has_interpolation values =
+  List.exists (fun (cv, _loc) -> component_value_has_interpolation cv) values
+
+let declaration_has_value_interpolation (decl : Ast.declaration) =
+  component_value_list_has_interpolation (fst decl.value)
 
 (* Walks one atomized rule (Css_file.re's [atomize_rules] output shape),
    collecting the at-rule chain outer to inner, the innermost selector
@@ -892,10 +965,13 @@ let of_atom (rule : Ast.rule) : t option =
     let important =
       List.exists (fun (d : Ast.declaration) -> fst d.important) decls
     in
-    let context = { at_rules; selector = Option.value selector ~default:"" } in
+    let context =
+      { at_rules; selector = Option.value selector ~default:""; important }
+    in
     (* A multi-declaration group (same-property today; a mixed shorthand +
-       longhand "family atom" from phase 3) combines every declaration's
-       own family/mask - they are always the same family by construction
+       longhand "family atom" once [Css_file.re]'s atomization mints them)
+       combines every declaration's own family/mask - they are always the
+       same family by construction
        (that's what makes them one group), so the combined mask is the OR
        of each one's own mask, using [None] ("full") as absorbing: any
        [None] in the group makes the whole group's mask [None]. *)
@@ -916,9 +992,13 @@ let of_atom (rule : Ast.rule) : t option =
             if own = full then None else Some (acc_mask lor own))
         (Some 0) properties
     in
-    Some { context; family; mask; important }
+    let bundle = List.exists declaration_has_value_interpolation decls in
+    Some { context; family; mask; bundle }
 
-let context_equal a b = a.at_rules = b.at_rules && a.selector = b.selector
+let context_equal a b =
+  a.at_rules = b.at_rules
+  && a.selector = b.selector
+  && a.important = b.important
 
 let mask_subset a b =
   match a, b with
@@ -932,14 +1012,14 @@ let is_excluded_from_all = function
     (* the only two registered properties [all] does not reset *)
     Registry.index_of "direction" = Some i
     || Registry.index_of "unicode-bidi" = Some i
-  | Unregistered n ->
-    n >= Registry.unregistered_custom_min
-    && n <= Registry.unregistered_custom_max
-  | All -> false
+  | UnregisteredCustom _ -> true
+  | Unregistered _ | All -> false
 
 let removes ~former ~latter =
-  context_equal former.context latter.context
-  && (match latter.family with
-    | All -> not (is_excluded_from_all former.family)
-    | _ -> former.family = latter.family && mask_subset former.mask latter.mask)
-  && not (former.important && not latter.important)
+  (not former.bundle)
+  && (not latter.bundle)
+  && context_equal former.context latter.context
+  &&
+  match latter.family with
+  | All -> not (is_excluded_from_all former.family)
+  | _ -> former.family = latter.family && mask_subset former.mask latter.mask
