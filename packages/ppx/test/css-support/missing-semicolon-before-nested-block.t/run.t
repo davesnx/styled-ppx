@@ -14,41 +14,51 @@ This test ensures declaration lists accept nested selectors and `@media` blocks 
   $ dune build
 
   $ dune describe pp ./input.re | sed -n '/let _case1/,$p'
-  let _case1 = CSS.make("label:_case1 id-7yg861 a-f5yfbg a-dtjebq", []);
+  let _case1 =
+    CSS.make("label:_case1 id-7yg861 a-39004yfbg a-e063z39004jebq", []);
   
   let _case2 =
-    CSS.make("label:_case2 id-147t2u6 a-1mzhirp a-lwctui a-15xyb5v", []);
-  
-  let _case3 = CSS.make("label:_case3 id-1vot2jq a-i3pbo a-1h5ewfy", []);
-  
-  let _case4 = CSS.make("label:_case4 id-jxylfo a-xrfqgp a-19gg2jl", []);
-  
-  let _case5 =
-    CSS.make("label:_case5 id-ybfv30 a-ycfik3 a-yhnnmp a-dyk6wi", []);
-  
-  let _case6 = CSS.make("label:_case6 id-1c9gvep a-x4dmss a-iaynwb", []);
-  
-  let _case7 = CSS.make("label:_case7 id-1i9tlre a-17hckkm a-1ffl96r", []);
-  
-  let _case8 = CSS.make("label:_case8 id-8qqhh a-10klw3m a-xkam5k", []);
-  
-  let _case9 =
     CSS.make(
-      "label:_case9 id-1pzdqgu a-tjsoaq a-jvb0jf a-18jcclb a-v8p7lg a-8asth4 a-cs7psf a-1u700a4",
+      "label:_case2 id-147t2u6 a-dmhirp a-7rw2m8mctui a-7rw2mdm004yb5v",
       [],
     );
   
-  let _case10 = CSS.make("label:_case10 id-and7m a-tokvmb a-1bx01wv", []);
+  let _case3 =
+    CSS.make("label:_case3 id-1vot2jq a-7p0013pbo a-gnvk4ecewfy", []);
   
-  let _case11 = CSS.make("label:_case11 id-5o83hr a-tokvmb a-1rwzcut", []);
+  let _case4 = CSS.make("label:_case4 id-jxylfo a-dmfqgp a-6e67vdig2jl", []);
   
-  let _case12 = CSS.make("label:_case12 id-a61d09 a-tokvmb a-zvekaf", []);
+  let _case5 =
+    CSS.make(
+      "label:_case5 id-ybfv30 a-3h007fik3 a-g0pq894001nnmp a-g0pq83h004k6wi",
+      [],
+    );
   
-  let _case13 = CSS.make("label:_case13 id-1h260z2 a-tokvmb a-1jt3q3v", []);
+  let _case6 =
+    CSS.make("label:_case6 id-1c9gvep a-9h002dmss a-p6loh9h002ynwb", []);
+  
+  let _case7 =
+    CSS.make("label:_case7 id-1i9tlre a-ecckkm a-m0g6m94008l96r", []);
+  
+  let _case8 = CSS.make("label:_case8 id-8qqhh a-6llw3m a-56s4994am5k", []);
+  
+  let _case9 =
+    CSS.make(
+      "label:_case9 id-1pzdqgu a-dmsoaq a-7dsxf8cb0jf a-7dsxf88cclb a-7dsxf8mp7lg a-7dsxf8rsth4 a-7dsxf940027psf a-7dsxf9400400a4",
+      [],
+    );
+  
+  let _case10 = CSS.make("label:_case10 id-and7m a-4ekvmb a-3rgzi4e01wv", []);
+  
+  let _case11 = CSS.make("label:_case11 id-5o83hr a-4ekvmb a-jzkre4ezcut", []);
+  
+  let _case12 = CSS.make("label:_case12 id-a61d09 a-4ekvmb a-r9ykb4eekaf", []);
+  
+  let _case13 = CSS.make("label:_case13 id-1h260z2 a-4ekvmb a-nh52u5w3q3v", []);
   
   let _case14 = borderColor =>
     CSS.make(
-      "label:_case14 id-1day2ma in-17mmn6x a-yhnnmp a-dyk6wi",
+      "label:_case14 id-1day2ma in-17mmn6x a-g0pq894001nnmp a-g0pq83h004k6wi",
       [("--borderColor-knlnef", CSS.Types.Color.toString(borderColor))],
     );
 

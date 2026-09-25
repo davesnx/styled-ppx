@@ -1,16 +1,16 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "@media (min-width: 600px) {.a-99qt2j{background:blue;}}"];
-  [@css ".a-hxxfxf:hover{background:green;}"];
-  [@css ".a-qzw9gh > p{color:pink;}"];
-  [@css ".a-z0beaj > p{font-size:24px;}"];
+  [@css "@media (min-width: 600px) {.a-izob039qt2j{background:blue;}}"];
+  [@css ".a-qyw7u39xfxf:hover{background:green;}"];
+  [@css ".a-og90v4ew9gh > p{color:pink;}"];
+  [@css ".a-og90v6500wbeaj > p{font-size:24px;}"];
   [@css.bindings
     [
       (
         "Output.SelectorsMediaQueries",
         "id-36wyir",
-        "a-99qt2j a-hxxfxf a-qzw9gh a-z0beaj",
+        "a-izob039qt2j a-qyw7u39xfxf a-og90v4ew9gh a-og90v6500wbeaj",
       ),
     ]
   ];
@@ -999,7 +999,7 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "label:SelectorsMediaQueries id-36wyir a-99qt2j a-hxxfxf a-qzw9gh a-z0beaj",
+        "label:SelectorsMediaQueries id-36wyir a-izob039qt2j a-qyw7u39xfxf a-og90v4ew9gh a-og90v6500wbeaj",
         [],
       );
     let make = (props: makeProps) => {

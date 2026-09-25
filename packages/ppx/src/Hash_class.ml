@@ -31,7 +31,10 @@
 
    The emitted identifier families
    -------------------------------
-     class name   `a-<hash(content)>`                      (class_name)
+     class name   `a-<context?><family><mask?><value>`     (class_and_namespace,
+                  or `a-<hash(content)>` for a rule shape    via Class_format.slot_class)
+                  with no {!Slot_key.t} (should not happen
+                  for a real atom - see {!class_of_content})
      namespace    `css-<hash(content)>`                    (namespace_of_content)
                   NOT the class name (see "Class vs. namespace prefixes"
                   below) - the same hash input, but its own literal prefix
@@ -49,22 +52,29 @@
    The atomic invariant this module protects
    ------------------------------------------
    Atomic CSS requires "one class name <=> one exact declaration body". The
-   class name already honours that - it is a pure hash of the rendered
-   declaration. The *variable* substituted into that declaration must honour
-   it too: otherwise two modules that emit the byte-identical
-   `.a-<h>-header{background-color:var(--...)}` rule can disagree on the
-   `var(--...)` target, and an element that sets one variable ends up matched
-   by a rule that reads the other -> undefined custom property -> missing
-   style.
+   class name already honours that - its VALUE field is a pure hash of the
+   rendered declaration, unique within its (context, family[, mask]) bucket
+   (see {!Class_format}'s doc comment; two atoms in different buckets never
+   need to be told apart by the value field alone, since the bucket fields
+   already differ). The *variable* substituted into that declaration must
+   honour the same invariant too: otherwise two modules that emit the
+   byte-identical `.a-<h>-header{background-color:var(--...)}` rule can
+   disagree on the `var(--...)` target, and an element that sets one
+   variable ends up matched by a rule that reads the other -> undefined
+   custom property -> missing style.
 
    [class_and_namespace] therefore derives the variable namespace from the
-   atom's *own content* - the same hash input that backs the class name (only
-   the literal prefix differs: [a-] for the class, [css-] for the namespace -
-   see "Class vs. namespace prefixes" below). That makes every variable a
-   pure function of
-   the declaration content, independent of the enclosing binding, its sibling
-   declarations, the file, and the scope. Identical declarations get identical
-   class names AND identical variables everywhere they appear.
+   atom's *own content* alone, via {!namespace_of_content} - deliberately
+   NOT from the class name's context/family/mask fields, even though both
+   are computed from the same atom. A namespace that also varied with the
+   slot would still satisfy the invariant, but would needlessly rename a
+   variable whenever the SAME rendered content happened to land in a
+   different (context, family[, mask]) bucket - the invariant only
+   requires "same content -> same variable", not "same slot -> same
+   variable". That makes every variable a pure function of the rendered
+   atom content, independent of the enclosing binding, its sibling
+   declarations, the file, and the scope. Identical rendered atoms get
+   identical class names AND identical variables everywhere they appear.
 
    [scoped_namespace] is the deliberate exception. Keyframes and
    [%styled.global] blocks are not atomized: they carry their own explicit
@@ -127,19 +137,50 @@ let nul_join parts = String.concat "\000" parts
    see "Prefix rename" above; never rename this one. *)
 let namespace_of_content content = Printf.sprintf "css-%s" (hash content)
 
-(* An atom's own emitted class name: same hash input as the namespace, but
-   its own, freely-renamable presentation prefix (see "Prefix rename"). *)
+(* Fallback class name for {!class_and_namespace}'s non-bundle path - a
+   plain hash of the content, same input as the namespace, only the
+   presentation prefix differs (see "Prefix rename"). Two cases reach
+   this: no {!Slot_key.t} at all (in practice never happens for a real
+   atom - see {!Slot_key.of_atom}'s own doc), and a slot whose own
+   [bundle] field is [true] even though the caller is not treating this
+   atom as a bundle (see {!class_and_namespace}'s comment) - this second
+   case is the one that matters in practice today. *)
 let class_of_content content = Printf.sprintf "a-%s" (hash content)
 
 (* An atom's class name and its namespace, from a single content hash - two
    different literal strings sharing one hash input (see the header's
-   "atomic invariant"). Kept as a pair because callers pattern-match
-   [(class_name, namespace)] and lower interpolation variables from the
-   namespace half. *)
-let class_and_namespace content =
-  class_of_content content, namespace_of_content content
+   "atomic invariant"). [namespace] is always the plain content hash - it
+   seeds every interpolation variable's name, so it must stay independent
+   of merge-key data (see the header's "Prefix rename"/"Stability
+   contract"). [class_name] carries the merge-key data instead
+   ({!Class_format.slot_class}'s context/family/mask/value fields) when
+   [slot] is [Some s] and [not s.bundle] - the atom's {!Slot_key.t}, built
+   by the caller from the exact same rule value [content] renders (see
+   {!Slot_key.of_atom}'s doc for why that shape match matters).
 
-let class_name content = fst (class_and_namespace content)
+   [s.bundle] must be excluded here even though it is [Some _]: this
+   function is [Css_file.re]'s NON-bundle path (its own, separately
+   decided [bundle_class_and_namespace] handles the real bundle path -
+   see [Css_file.re]'s [transform_rule_list]). [Slot_key.t.bundle] is
+   [List.exists]-based and therefore correctly detects interpolation
+   anywhere in a multi-declaration group, unlike [Css_file.re]'s own
+   [atom_has_value_interpolation] (single-declaration only, a
+   pre-existing, documented limitation - see its call site's comment).
+   Letting {!Class_format.slot_class} see a [true] bundle flag here would
+   silently mint an [in-]-prefixed class for an atom the real pipeline
+   never actually bundles (no shared class across the block, no bundle
+   var-namespace) - a class that LOOKS collision-exempt but isn't. Falling
+   back to {!class_of_content} for that case reproduces exactly what this
+   atom minted before {!Class_format} was wired in. *)
+let class_and_namespace ~slot content =
+  let namespace = namespace_of_content content in
+  let class_name =
+    match slot with
+    | Some (s : Slot_key.t) when not s.bundle ->
+      Class_format.slot_class s content
+    | Some _ | None -> class_of_content content
+  in
+  class_name, namespace
 
 (* Same shape as [class_and_namespace] (a [(class_name, namespace)] pair
    from one content hash), for [Css_file.re]'s bundle path specifically: the

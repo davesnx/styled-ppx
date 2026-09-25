@@ -25,13 +25,13 @@ If this test fail means that the module is not in sync with the ppx
   [@css "@property --line-e0dy15_1{syntax:\"*\";inherits:false;}"];
   [@css "@property --line-e0dy15_2{syntax:\"*\";inherits:false;}"];
   [@css "@property --line-e0dy15_3{syntax:\"*\";inherits:false;}"];
-  [@css ".a-34k09d{width:30px;}"];
+  [@css ".a-eck09d{width:30px;}"];
   [@css ".in-1cx090v{color:var(--tertiary-1cttnp6);}"];
-  [@css ".a-t2slgw{box-shadow:inset 1px 0 0 0 transparent !important;}"];
+  [@css ".a-oe8sa40slgw{box-shadow:inset 1px 0 0 0 transparent !important;}"];
   [@css
     ".in-1rh80o9{box-shadow:1px 0 0 0 var(--line-9kmuhm_1), inset 0 -1px 0 0 var(--line-9kmuhm_2) !important;}"
   ];
-  [@css ".a-1mx0ppg{box-shadow:inset 0 0 0 0 transparent;}"];
+  [@css ".a-400ppg{box-shadow:inset 0 0 0 0 transparent;}"];
   [@css
     ".in-1bp0v5z:hover{box-shadow:1px 0 0 0 var(--line-1rsudnc_1), inset 0 -1px 0 0 var(--line-1rsudnc_2) !important;}"
   ];
@@ -40,32 +40,32 @@ If this test fail means that the module is not in sync with the ppx
   [@css
     ".in-1nzxk4v:hover{box-shadow:1px 0 0 0 var(--line-e0dy15_1), inset 1px 0 0 0 var(--line-e0dy15_2), inset 0 -1px 0 0 var(--line-e0dy15_3);}"
   ];
-  [@css ".a-i9gxme{flex-grow:1;}"];
-  [@css ".a-r6z5ec{z-index:1;}"];
-  [@css ".a-tjsoaq{transition:all 200ms ease 0ms;}"];
-  [@css ".a-145l4ca.id-1wtohw8{min-width:0;}"];
-  [@css ".a-1oluo0q.id-1wtohw8{max-width:0;}"];
-  [@css ".a-2io1ml.id-1wtohw8{opacity:0;}"];
-  [@css ".a-1k938xr.id-1wtohw8{overflow:hidden;}"];
-  [@css ".a-keq5th{transition:transform 0.3s !important;}"];
+  [@css ".a-60002gxme{flex-grow:1;}"];
+  [@css ".a-ekz5ec{z-index:1;}"];
+  [@css ".a-dmsoaq{transition:all 200ms ease 0ms;}"];
+  [@css ".a-zg0h58cl4ca.id-1wtohw8{min-width:0;}"];
+  [@css ".a-zg0h588uo0q.id-1wtohw8{max-width:0;}"];
+  [@css ".a-zg0h58mo1ml.id-1wtohw8{opacity:0;}"];
+  [@css ".a-zg0h58r38xr.id-1wtohw8{overflow:hidden;}"];
+  [@css ".a-oe8sadmq5th{transition:transform 0.3s !important;}"];
   [@css
-    ".a-1hwm8mm{transition:opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;}"
+    ".a-dmm8mm{transition:opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;}"
   ];
   [@css.bindings
     [
-      ("Input._spaceBeforeColon", "id-pwoumt", "a-34k09d in-1cx090v"),
-      ("Input._tabInnerFirst", "id-110u1xw", "a-t2slgw"),
+      ("Input._spaceBeforeColon", "id-pwoumt", "a-eck09d in-1cx090v"),
+      ("Input._tabInnerFirst", "id-110u1xw", "a-oe8sa40slgw"),
       ("Input._multiShadowImportant", "id-c7rk0r", "in-1rh80o9"),
-      ("Input._tabTextFirst", "id-19955vg", "a-1mx0ppg in-1bp0v5z"),
+      ("Input._tabTextFirst", "id-19955vg", "a-400ppg in-1bp0v5z"),
       ("Input._tabText", "id-e443o3", "in-1nzxk4v"),
       ("Input._sidebarClosed", "id-1wtohw8", ""),
       (
         "Input._sidebar",
         "id-jjvyqu",
-        "a-i9gxme a-r6z5ec a-tjsoaq a-145l4ca a-1oluo0q a-2io1ml a-1k938xr",
+        "a-60002gxme a-ekz5ec a-dmsoaq a-zg0h58cl4ca a-zg0h588uo0q a-zg0h58mo1ml a-zg0h58r38xr",
       ),
-      ("Input._checkbox", "id-1sltg0l", "a-keq5th"),
-      ("Input._transitions", "id-1jxvvla", "a-1hwm8mm"),
+      ("Input._checkbox", "id-1sltg0l", "a-oe8sadmq5th"),
+      ("Input._transitions", "id-1jxvvla", "a-dmm8mm"),
     ]
   ];
   module Color = {
@@ -83,11 +83,12 @@ If this test fail means that the module is not in sync with the ppx
   
   let _spaceBeforeColon =
     CSS.make(
-      "label:_spaceBeforeColon id-pwoumt a-34k09d in-1cx090v",
+      "label:_spaceBeforeColon id-pwoumt a-eck09d in-1cx090v",
       [("--tertiary-1cttnp6", CSS.Types.Color.toString(Color.Text.tertiary))],
     );
   
-  let _tabInnerFirst = CSS.make("label:_tabInnerFirst id-110u1xw a-t2slgw", []);
+  let _tabInnerFirst =
+    CSS.make("label:_tabInnerFirst id-110u1xw a-oe8sa40slgw", []);
   
   let _multiShadowImportant =
     CSS.make(
@@ -100,7 +101,7 @@ If this test fail means that the module is not in sync with the ppx
   
   let _tabTextFirst =
     CSS.make(
-      "label:_tabTextFirst id-19955vg a-1mx0ppg in-1bp0v5z",
+      "label:_tabTextFirst id-19955vg a-400ppg in-1bp0v5z",
       [
         ("--line-1rsudnc_1", CSS.Types.Color.toString(Color.Border.line)),
         ("--line-1rsudnc_2", CSS.Types.Color.toString(Color.Border.line)),
@@ -123,13 +124,13 @@ If this test fail means that the module is not in sync with the ppx
   
   let _sidebar =
     CSS.make(
-      "label:_sidebar id-jjvyqu a-i9gxme a-r6z5ec a-tjsoaq a-145l4ca a-1oluo0q a-2io1ml a-1k938xr",
+      "label:_sidebar id-jjvyqu a-60002gxme a-ekz5ec a-dmsoaq a-zg0h58cl4ca a-zg0h588uo0q a-zg0h58mo1ml a-zg0h58r38xr",
       [],
     );
   
-  let _checkbox = CSS.make("label:_checkbox id-1sltg0l a-keq5th", []);
+  let _checkbox = CSS.make("label:_checkbox id-1sltg0l a-oe8sadmq5th", []);
   
-  let _transitions = CSS.make("label:_transitions id-1jxvvla a-1hwm8mm", []);
+  let _transitions = CSS.make("label:_transitions id-1jxvvla a-dmm8mm", []);
   
   let _shadow1: CSS.Shadow.t =
     CSS.Shadow.box(~blur=`px(100), `hex("000000"), ~inset=true);

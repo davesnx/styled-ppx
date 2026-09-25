@@ -492,26 +492,60 @@ two `[@@@css ...]` attributes. The runtime `CSS.make` call carries the
 space-separated concatenation of those class names, so consumers apply
 all atoms by setting one `className` attribute.
 
-Class names follow the `a-<murmur2 hash of CSS>` format, in every
-mode — the binding's `let` name never appears in the class name. Two
-bindings whose declarations render to the same CSS text mint the same
-class, dev or production. Minting lives in
-`packages/ppx/src/Hash_class.ml`.
+**Two declarations in one block group into one atom when their covered
+leaf properties overlap**, taken transitively, not one atom per
+declaration: `{ margin: 0; margin-top: 5px; margin: 10px; }` is ONE atom
+carrying all three declarations in author order, because `margin`'s full
+leaf set includes `margin-top` (see `Slot_key.leaves_of`). This is what
+makes the final `margin: 10px` reset `margin-top` reliably: source order
+inside one rule decides the winner, not the relative position of two
+independently-hashed atoms in the generated stylesheet (a repeat of the
+same property overlaps itself trivially - `color: blue; color: red;` is
+also one atom, the older, narrower rule this generalizes). Sharing a
+property *family* is necessary but not sufficient: `padding-left` and
+`padding-right` are both in the "padding" family but cover disjoint
+leaves, so they stay TWO atoms - merging them would make a future
+`CSS.merge` too coarse, unable to drop just the overlapping side without
+also dropping the other. "Transitively" means a bridging declaration
+pulls in everything it overlaps even when those things don't overlap
+each other directly: `border: 1px solid; border-left-width: 2px;` group
+together (border's full leaf set includes border-left-width), and adding
+a third declaration `border-top: 1px solid;` (which shares no leaf with
+`border-left-width` directly) still joins the same group, bridged through
+`border`. A declaration that shares no leaf with anything else in the
+block is its own one-member group, which is exactly "one atom per
+property" for everything this doesn't otherwise merge. Grouping in
+`Css_file.re`'s `group_declarations_by_family` reuses
+`Slot_key.leaves_of` directly (not a reimplementation).
+
+Class names follow the `a-<context?><family><mask?><value>` format: a
+fixed-width, base36-encoded context hash (present only under a real
+selector/at-rule, or when the declaration carries `!important` - see
+"CSS.merge" below), a 2-character property-family id from a fixed,
+append-only table, an optional mask of which of the family's longhands
+this atom covers, and a short value hash unique only within that
+(context, family[, mask]) bucket - not globally, which is what lets it
+be short. `styled-ppx.generate` checks that uniqueness (see the atom
+class collision check under "Dedup and write" above). The binding's
+`let` name never appears in the class name either way; two bindings
+whose declarations render to the same CSS text in the same context mint
+the same class, dev or production. Minting lives in
+`packages/ppx/src/Hash_class.ml` (`Class_format.slot_class`); the
+`(context, family, mask)` triple comes from `packages/ppx/slot_key`.
 
 One exception: an atom whose declaration carries a `$(...)` value
-interpolation mints `in-<murmur2 hash>` instead - still the same hash
-digits, only the prefix differs (`Hash_class.bundle_class_and_namespace`).
+interpolation mints `in-<murmur2 hash>` instead - a plain, unbucketed
+hash of the content, no context/family/mask fields at all.
 Several such declarations from one binding that all interpolate share
 ONE `in-` class (the "bundle" - see `Css_file.re`'s `transform_rule_list`),
-collapsing their custom-property namespace into one; a `a-`/`in-`
-class name's own `var(--...)` target is unaffected by this prefix
-either way, since only the CLASS half of `Hash_class.class_and_namespace`
-changed for this case, never the namespace/variable-naming half. The
-`in-` prefix exists so a merge-key-aware `CSS.merge` (in progress, see
-`.workplace/plans/atom-slot-keys_PLAN.md`) can recognize a bundle atom
-and never drop it or let it drop another atom, and so
+collapsing their custom-property namespace into one; a bundle's own
+`var(--...)` target is unaffected by which prefix its class carries,
+since only the CLASS half of `Hash_class.class_and_namespace` differs
+between the two cases, never the namespace/variable-naming half. The
+`in-` prefix lets `CSS.merge` (see below) recognize a bundle atom and
+never drop it or let it drop another atom, and lets
 `styled-ppx.generate`'s atom-class collision check ("Dedup and write"
-above) can skip it -
+above) skip it -
 several different bundle bodies legitimately sharing one class is the
 mechanism working as designed, not a hash collision.
 
@@ -535,6 +569,53 @@ Two consequences worth knowing:
    declarations" — a referenced multi-atom binding drops from
    `(0,N,0)` to `(0,1,0)` specificity inside the compound selector (see
    the specificity note below).
+
+## CSS.merge
+
+`CSS.merge(a, b)` drops a class of `a` when a class of `b` covers the
+same slot - same context, same property family, and `a`'s longhands a
+subset of `b`'s - so the winner is decided by the merge call's own
+argument order, not by which atom happened to reach the generated
+stylesheet first under content-hash dedup. Before this, `merge` was
+plain string concatenation (`fst a ^ " " ^ fst b`): if `a` and `b` both
+carry the same property atom (e.g. `content = height: auto` merged with
+`collapsed = height: 0`, both winning by turns depending on the merge
+site) and some unrelated module also happens to use `a`'s atom, that
+other module's own position in the generated stylesheet can decide
+which of `a`'s or `b`'s atom the CSS cascade actually applies -
+independent of which one this particular `merge` call meant to win.
+See `packages/ppx/slot_key/slot_key.mli`'s `removes` for the exact rule.
+
+The rule runs entirely at runtime, parsing the fixed-width fields the
+class name already carries (see "Atomization" above) - no shorthand
+table, no CSS property knowledge, in either the native or the melange
+runtime (`packages/runtime/native/shared/Merge_key.ml`, built once and
+shared into both - see its own doc comment for why it duplicates
+`Class_format`'s widths instead of depending on it: it ships in the
+melange browser bundle, and that library exists only to build the ppx's
+compile-time property registry). A bundle (`in-`), an identity (`id-`),
+a `label:<binding>` marker, and any class this pipeline didn't mint are
+never dropped and never drop anything else - `merge` only ever acts on
+a well-formed `a-` atom on either side, and only ever drops a class of
+`a`, never of `b`.
+
+`!important` needs no separate check: it is folded into the context (as
+if it were one more wrapper, like an at-rule - see
+`packages/ppx/slot_key/slot_key.mli`'s `context` type), so a plain
+declaration and its `!important` twin are never in the same context and
+never remove each other in either direction. The browser's own cascade
+already decides between them.
+
+**Accepted limit**, pinned by `packages/runtime/test/test_merge_key.ml`:
+`merge(margin: 10px, margin-top: 0)` (a shorthand, then a lone longhand
+it covers) keeps both classes - a lone longhand's mask is never a
+superset of the shorthand's full mask, by the encoding's own
+convention, so the shorthand is never dropped by a later longhand this
+way. Which one the browser actually applies still depends on where each
+atom's rule landed in the generated stylesheet. The reverse
+(`merge(margin-top: 0, margin: 10px)`, a longhand then a later
+shorthand that covers it) is not a limit - it drops normally, since a
+full mask is always a superset of any lone longhand's mask.
 
 ## Identity classes
 

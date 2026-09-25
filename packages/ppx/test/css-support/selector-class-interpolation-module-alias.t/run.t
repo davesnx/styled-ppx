@@ -14,34 +14,34 @@ chain as `$(Css.marker)` without emitting a cross-module sentinel.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".a-tokvmb{color:red;}"];
-  [@css ".a-155k9s5.id-zr2uk1{color:blue;}"];
-  [@css ".a-bjcoli{color:green;}"];
-  [@css ".a-1ejq12w.id-11dmi54{color:purple;}"];
+  [@css ".a-4ekvmb{color:red;}"];
+  [@css ".a-6psgj4ek9s5.id-zr2uk1{color:blue;}"];
+  [@css ".a-4ecoli{color:green;}"];
+  [@css ".a-6psgj4eq12w.id-11dmi54{color:purple;}"];
   [@css.bindings
     [
-      ("Input.Css.marker", "id-zr2uk1", "a-tokvmb"),
-      ("Input.wrapper", "id-4f6ye3", "a-155k9s5"),
-      ("Input.Theme.Css.marker", "id-11dmi54", "a-bjcoli"),
-      ("Input.Theme.wrapper", "id-q7k20t", "a-1ejq12w"),
+      ("Input.Css.marker", "id-zr2uk1", "a-4ekvmb"),
+      ("Input.wrapper", "id-4f6ye3", "a-6psgj4ek9s5"),
+      ("Input.Theme.Css.marker", "id-11dmi54", "a-4ecoli"),
+      ("Input.Theme.wrapper", "id-q7k20t", "a-6psgj4eq12w"),
     ]
   ];
   module Css = {
-    let marker = CSS.make("label:marker id-zr2uk1 a-tokvmb", []);
+    let marker = CSS.make("label:marker id-zr2uk1 a-4ekvmb", []);
   };
   
   module Styles = Css;
   
-  let wrapper = CSS.make("label:wrapper id-4f6ye3 a-155k9s5", []);
+  let wrapper = CSS.make("label:wrapper id-4f6ye3 a-6psgj4ek9s5", []);
   
   module Theme = {
     module Css = {
-      let marker = CSS.make("label:marker id-11dmi54 a-bjcoli", []);
+      let marker = CSS.make("label:marker id-11dmi54 a-4ecoli", []);
     };
   
     module Styles = Css;
   
-    let wrapper = CSS.make("label:wrapper id-q7k20t a-1ejq12w", []);
+    let wrapper = CSS.make("label:wrapper id-q7k20t a-6psgj4eq12w", []);
   };
   
   let _ = (Css.marker, wrapper, Theme.Css.marker, Theme.wrapper);

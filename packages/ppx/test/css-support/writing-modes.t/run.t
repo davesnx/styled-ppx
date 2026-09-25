@@ -15,53 +15,53 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".a-sxjqc9{direction:ltr;}"];
-  [@css ".a-pu82ql{direction:rtl;}"];
-  [@css ".a-1nh14px{unicode-bidi:normal;}"];
-  [@css ".a-1dxtajz{unicode-bidi:embed;}"];
-  [@css ".a-gthxsn{unicode-bidi:isolate;}"];
-  [@css ".a-1f53xur{unicode-bidi:bidi-override;}"];
-  [@css ".a-1sv30cq{unicode-bidi:isolate-override;}"];
-  [@css ".a-3e7z6r{unicode-bidi:plaintext;}"];
+  [@css ".a-5qjqc9{direction:ltr;}"];
+  [@css ".a-5q82ql{direction:rtl;}"];
+  [@css ".a-dp14px{unicode-bidi:normal;}"];
+  [@css ".a-dptajz{unicode-bidi:embed;}"];
+  [@css ".a-dphxsn{unicode-bidi:isolate;}"];
+  [@css ".a-dp3xur{unicode-bidi:bidi-override;}"];
+  [@css ".a-dp30cq{unicode-bidi:isolate-override;}"];
+  [@css ".a-dp7z6r{unicode-bidi:plaintext;}"];
   [@css
-    ".a-1tyni7l{-webkit-writing-mode:horizontal-tb;-ms-writing-mode:horizontal-tb;writing-mode:horizontal-tb;}"
+    ".a-ehni7l{-webkit-writing-mode:horizontal-tb;-ms-writing-mode:horizontal-tb;writing-mode:horizontal-tb;}"
   ];
   [@css
-    ".a-zorbdf{-webkit-writing-mode:vertical-rl;-ms-writing-mode:vertical-rl;writing-mode:vertical-rl;}"
+    ".a-ehrbdf{-webkit-writing-mode:vertical-rl;-ms-writing-mode:vertical-rl;writing-mode:vertical-rl;}"
   ];
   [@css
-    ".a-bxuv7p{-webkit-writing-mode:vertical-lr;-ms-writing-mode:vertical-lr;writing-mode:vertical-lr;}"
+    ".a-ehuv7p{-webkit-writing-mode:vertical-lr;-ms-writing-mode:vertical-lr;writing-mode:vertical-lr;}"
   ];
-  [@css ".a-1cbc989{text-orientation:mixed;}"];
-  [@css ".a-1kcjqux{text-orientation:upright;}"];
-  [@css ".a-ajfrh6{text-orientation:sideways;}"];
-  [@css ".a-byubm3{text-combine-upright:none;}"];
-  [@css ".a-16cjtzu{text-combine-upright:all;}"];
+  [@css ".a-cvc989{text-orientation:mixed;}"];
+  [@css ".a-cvjqux{text-orientation:upright;}"];
+  [@css ".a-cvfrh6{text-orientation:sideways;}"];
+  [@css ".a-ceubm3{text-combine-upright:none;}"];
+  [@css ".a-cejtzu{text-combine-upright:all;}"];
   [@css
-    ".a-mpcjo4{-webkit-writing-mode:sideways-rl;-ms-writing-mode:sideways-rl;writing-mode:sideways-rl;}"
+    ".a-ehcjo4{-webkit-writing-mode:sideways-rl;-ms-writing-mode:sideways-rl;writing-mode:sideways-rl;}"
   ];
   [@css
-    ".a-1tdq5f9{-webkit-writing-mode:sideways-lr;-ms-writing-mode:sideways-lr;writing-mode:sideways-lr;}"
+    ".a-ehq5f9{-webkit-writing-mode:sideways-lr;-ms-writing-mode:sideways-lr;writing-mode:sideways-lr;}"
   ];
-  [@css ".a-6ofs5k{text-combine-upright:digits 2;}"];
+  [@css ".a-cefs5k{text-combine-upright:digits 2;}"];
   
-  CSS.make("a-sxjqc9", []);
-  CSS.make("a-pu82ql", []);
-  CSS.make("a-1nh14px", []);
-  CSS.make("a-1dxtajz", []);
-  CSS.make("a-gthxsn", []);
-  CSS.make("a-1f53xur", []);
-  CSS.make("a-1sv30cq", []);
-  CSS.make("a-3e7z6r", []);
-  CSS.make("a-1tyni7l", []);
-  CSS.make("a-zorbdf", []);
-  CSS.make("a-bxuv7p", []);
-  CSS.make("a-1cbc989", []);
-  CSS.make("a-1kcjqux", []);
-  CSS.make("a-ajfrh6", []);
-  CSS.make("a-byubm3", []);
-  CSS.make("a-16cjtzu", []);
+  CSS.make("a-5qjqc9", []);
+  CSS.make("a-5q82ql", []);
+  CSS.make("a-dp14px", []);
+  CSS.make("a-dptajz", []);
+  CSS.make("a-dphxsn", []);
+  CSS.make("a-dp3xur", []);
+  CSS.make("a-dp30cq", []);
+  CSS.make("a-dp7z6r", []);
+  CSS.make("a-ehni7l", []);
+  CSS.make("a-ehrbdf", []);
+  CSS.make("a-ehuv7p", []);
+  CSS.make("a-cvc989", []);
+  CSS.make("a-cvjqux", []);
+  CSS.make("a-cvfrh6", []);
+  CSS.make("a-ceubm3", []);
+  CSS.make("a-cejtzu", []);
   
-  CSS.make("a-mpcjo4", []);
-  CSS.make("a-1tdq5f9", []);
-  CSS.make("a-6ofs5k", []);
+  CSS.make("a-ehcjo4", []);
+  CSS.make("a-ehq5f9", []);
+  CSS.make("a-cefs5k", []);

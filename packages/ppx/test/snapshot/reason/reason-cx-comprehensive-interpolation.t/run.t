@@ -28,10 +28,8 @@ Comprehensive test for cx2 interpolation with various property types
   [@css ".in-1swajk7{margin-bottom:var(--lengthVar-oy21bt);}"];
   [@css ".in-1swajk7{padding-left:var(--lengthVar-1lpa833);}"];
   [@css ".in-1swajk7{padding-right:var(--lengthVar-1lpa833);}"];
-  [@css ".in-1i6vyy6{gap:var(--lengthVar-vh1osb);}"];
-  [@css ".in-1i6vyy6{row-gap:var(--lengthVar-vh1osb);}"];
   [@css
-    ".in-1i6vyy6{-webkit-column-gap:var(--lengthVar-vh1osb);column-gap:var(--lengthVar-vh1osb);}"
+    ".a-1i6vyy6{gap:var(--lengthVar-vh1osb);row-gap:var(--lengthVar-vh1osb);-webkit-column-gap:var(--lengthVar-vh1osb);column-gap:var(--lengthVar-vh1osb);}"
   ];
   [@css ".in-1vzwmoy{color:var(--colorVar-14sye4i);}"];
   [@css ".in-1vzwmoy{background-color:var(--colorVar-14sye4i);}"];
@@ -42,26 +40,27 @@ Comprehensive test for cx2 interpolation with various property types
   [@css ".in-1d6x35p{top:var(--topVar-1iqysbe);}"];
   [@css ".in-1d6x35p{bottom:var(--topVar-10dkp5m);}"];
   [@css ".in-1bkxgpr{z-index:var(--zIndexVar-osv02l);}"];
-  [@css ".in-1bezkxi{border-top-width:var(--borderWidthVar-1nwhzbd);}"];
-  [@css ".in-1bezkxi{border-width:var(--borderWidthVar-1nwhzbd);}"];
+  [@css
+    ".a-1bezkxi{border-top-width:var(--borderWidthVar-1nwhzbd);border-width:var(--borderWidthVar-1nwhzbd);}"
+  ];
   [@css ".in-zoi7e9{letter-spacing:var(--spacingVar-15s0ecx);}"];
   [@css ".in-zoi7e9{word-spacing:var(--spacingVar-1m50b62);}"];
   [@css ".in-1dfkyy8{width:var(--width-18c1xss);}"];
-  [@css ".a-73nay0{height:100px;}"];
-  [@css ".a-tokvmb{color:red;}"];
+  [@css ".a-6lnay0{height:100px;}"];
+  [@css ".a-4ekvmb{color:red;}"];
   [@css.bindings
     [
       ("Output.test1", "id-1jhxcqu", "in-b8f0pi"),
       ("Output.test2", "id-zesghj", "in-1swajk7"),
-      ("Output.test3", "id-12rsoz0", "in-1i6vyy6"),
+      ("Output.test3", "id-12rsoz0", "a-1i6vyy6"),
       ("Output.test4", "id-puktrw", "in-1vzwmoy"),
       ("Output.test5", "id-1nw36ql", "in-ycpa9s"),
       ("Output.test6", "id-7ivz4", "in-1knt7y9"),
       ("Output.test7", "id-iq7p3", "in-1d6x35p"),
       ("Output.test8", "id-yq2qob", "in-1bkxgpr"),
-      ("Output.test9", "id-1u4o5z6", "in-1bezkxi"),
+      ("Output.test9", "id-1u4o5z6", "a-1bezkxi"),
       ("Output.test10", "id-1egwgp0", "in-zoi7e9"),
-      ("Output.test11", "id-16lxxsk", "in-1dfkyy8 a-73nay0 a-tokvmb"),
+      ("Output.test11", "id-16lxxsk", "in-1dfkyy8 a-6lnay0 a-4ekvmb"),
     ]
   ];
   let lengthVar = CSS.px(10);
@@ -88,7 +87,7 @@ Comprehensive test for cx2 interpolation with various property types
     );
   let test3 =
     CSS.make(
-      "label:test3 id-12rsoz0 in-1i6vyy6",
+      "label:test3 id-12rsoz0 a-1i6vyy6",
       [("--lengthVar-vh1osb", CSS.Types.Gap.toString(lengthVar))],
     );
   let test4 =
@@ -134,7 +133,7 @@ Comprehensive test for cx2 interpolation with various property types
   let borderWidthVar = `medium;
   let test9 =
     CSS.make(
-      "label:test9 id-1u4o5z6 in-1bezkxi",
+      "label:test9 id-1u4o5z6 a-1bezkxi",
       [
         (
           "--borderWidthVar-1nwhzbd",
@@ -153,6 +152,6 @@ Comprehensive test for cx2 interpolation with various property types
     );
   let test11 = width =>
     CSS.make(
-      "label:test11 id-16lxxsk in-1dfkyy8 a-73nay0 a-tokvmb",
+      "label:test11 id-16lxxsk in-1dfkyy8 a-6lnay0 a-4ekvmb",
       [("--width-18c1xss", CSS.Types.Width.toString(width))],
     );

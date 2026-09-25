@@ -15,182 +15,182 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".a-1dmoiv8{scroll-margin:0px;}"];
-  [@css ".a-37qcuf{scroll-margin:6px 5px;}"];
-  [@css ".a-1gcxymj{scroll-margin:10px 20px 30px;}"];
-  [@css ".a-1uau2fa{scroll-margin:10px 20px 30px 40px;}"];
-  [@css ".a-14b13tb{scroll-margin:20px 3em 1in 5rem;}"];
-  [@css ".a-1l59mki{scroll-margin:calc(2px);}"];
-  [@css ".a-sz3nfx{scroll-margin:calc(3 * 25px);}"];
-  [@css ".a-s1600i{scroll-margin:calc(3 * 25px) 5px 10em calc(1vw - 5px);}"];
-  [@css ".a-lbu6my{scroll-margin-block:10px;}"];
-  [@css ".a-ej4sq4{scroll-margin-block:10px 10px;}"];
-  [@css ".a-1n715zm{scroll-margin-block-end:10px;}"];
-  [@css ".a-1x04bj5{scroll-margin-block-start:10px;}"];
-  [@css ".a-jgvqxc{scroll-margin-bottom:10px;}"];
-  [@css ".a-1y612qs{scroll-margin-inline:10px;}"];
-  [@css ".a-1l5mvdw{scroll-margin-inline:10px 10px;}"];
-  [@css ".a-14fsnad{scroll-margin-inline-start:10px;}"];
-  [@css ".a-789xfm{scroll-margin-inline-end:10px;}"];
-  [@css ".a-17lfvv1{scroll-margin-left:10px;}"];
-  [@css ".a-osla2e{scroll-margin-right:10px;}"];
-  [@css ".a-1c0aols{scroll-margin-top:10px;}"];
-  [@css ".a-825nxv{scroll-padding:auto;}"];
-  [@css ".a-mjhj9v{scroll-padding:0px;}"];
-  [@css ".a-15b5af6{scroll-padding:6px 5px;}"];
-  [@css ".a-h1ms3y{scroll-padding:10px 20px 30px;}"];
-  [@css ".a-a8alk9{scroll-padding:10px 20px 30px 40px;}"];
-  [@css ".a-1gl7x4v{scroll-padding:10px auto 30px auto;}"];
-  [@css ".a-odywb5{scroll-padding:10%;}"];
-  [@css ".a-1a3doub{scroll-padding:20% 3em 1in 5rem;}"];
-  [@css ".a-1jaicma{scroll-padding:calc(2px);}"];
-  [@css ".a-mps866{scroll-padding:calc(50%);}"];
-  [@css ".a-in6ps6{scroll-padding:calc(3 * 25px);}"];
-  [@css ".a-1g6m7if{scroll-padding:calc(3 * 25px) 5px 10% calc(10% - 5px);}"];
-  [@css ".a-1d13npc{scroll-padding-block:10px;}"];
-  [@css ".a-13l7n61{scroll-padding-block:50%;}"];
-  [@css ".a-1cvn72y{scroll-padding-block:10px 50%;}"];
-  [@css ".a-1aibmh3{scroll-padding-block:50% 50%;}"];
-  [@css ".a-4na4an{scroll-padding-block-end:10px;}"];
-  [@css ".a-1i4wq8b{scroll-padding-block-end:50%;}"];
-  [@css ".a-ihtyb1{scroll-padding-block-start:10px;}"];
-  [@css ".a-vrkly5{scroll-padding-block-start:50%;}"];
-  [@css ".a-qh568d{scroll-padding-bottom:10px;}"];
-  [@css ".a-tsczmj{scroll-padding-bottom:50%;}"];
-  [@css ".a-7dhvee{scroll-padding-inline:10px;}"];
-  [@css ".a-196178e{scroll-padding-inline:50%;}"];
-  [@css ".a-4qfqw4{scroll-padding-inline:10px 50%;}"];
-  [@css ".a-84jitd{scroll-padding-inline:50% 50%;}"];
-  [@css ".a-1txxv1o{scroll-padding-inline-end:10px;}"];
-  [@css ".a-p4ybsb{scroll-padding-inline-end:50%;}"];
-  [@css ".a-17p21xl{scroll-padding-inline-start:10px;}"];
-  [@css ".a-1mws74z{scroll-padding-inline-start:50%;}"];
-  [@css ".a-1d2mm5y{scroll-padding-left:10px;}"];
-  [@css ".a-b6jsh3{scroll-padding-left:50%;}"];
-  [@css ".a-c83z1d{scroll-padding-right:10px;}"];
-  [@css ".a-1p9pbq8{scroll-padding-right:50%;}"];
-  [@css ".a-1ri05tp{scroll-padding-top:10px;}"];
-  [@css ".a-1njo8nm{scroll-padding-top:50%;}"];
-  [@css ".a-6xhsyj{scroll-snap-align:none;}"];
-  [@css ".a-1pgpqsp{scroll-snap-align:start;}"];
-  [@css ".a-niic9p{scroll-snap-align:end;}"];
-  [@css ".a-alf1ss{scroll-snap-align:center;}"];
-  [@css ".a-e0kzni{scroll-snap-align:none start;}"];
-  [@css ".a-zivewf{scroll-snap-align:end center;}"];
-  [@css ".a-xwgzch{scroll-snap-align:center start;}"];
-  [@css ".a-zo5icl{scroll-snap-align:end none;}"];
-  [@css ".a-1pbkijw{scroll-snap-align:center center;}"];
-  [@css ".a-1ljahur{scroll-snap-stop:normal;}"];
-  [@css ".a-tvqcsf{scroll-snap-stop:always;}"];
+  [@css ".a-acoiv8{scroll-margin:0px;}"];
+  [@css ".a-acqcuf{scroll-margin:6px 5px;}"];
+  [@css ".a-acxymj{scroll-margin:10px 20px 30px;}"];
+  [@css ".a-acu2fa{scroll-margin:10px 20px 30px 40px;}"];
+  [@css ".a-ac13tb{scroll-margin:20px 3em 1in 5rem;}"];
+  [@css ".a-ac9mki{scroll-margin:calc(2px);}"];
+  [@css ".a-ac3nfx{scroll-margin:calc(3 * 25px);}"];
+  [@css ".a-ac600i{scroll-margin:calc(3 * 25px) 5px 10em calc(1vw - 5px);}"];
+  [@css ".a-adu6my{scroll-margin-block:10px;}"];
+  [@css ".a-ad4sq4{scroll-margin-block:10px 10px;}"];
+  [@css ".a-ad00115zm{scroll-margin-block-end:10px;}"];
+  [@css ".a-ad0024bj5{scroll-margin-block-start:10px;}"];
+  [@css ".a-ac001vqxc{scroll-margin-bottom:10px;}"];
+  [@css ".a-ae12qs{scroll-margin-inline:10px;}"];
+  [@css ".a-aemvdw{scroll-margin-inline:10px 10px;}"];
+  [@css ".a-ae002snad{scroll-margin-inline-start:10px;}"];
+  [@css ".a-ae0019xfm{scroll-margin-inline-end:10px;}"];
+  [@css ".a-ac002fvv1{scroll-margin-left:10px;}"];
+  [@css ".a-ac004la2e{scroll-margin-right:10px;}"];
+  [@css ".a-ac008aols{scroll-margin-top:10px;}"];
+  [@css ".a-ag5nxv{scroll-padding:auto;}"];
+  [@css ".a-aghj9v{scroll-padding:0px;}"];
+  [@css ".a-ag5af6{scroll-padding:6px 5px;}"];
+  [@css ".a-agms3y{scroll-padding:10px 20px 30px;}"];
+  [@css ".a-agalk9{scroll-padding:10px 20px 30px 40px;}"];
+  [@css ".a-ag7x4v{scroll-padding:10px auto 30px auto;}"];
+  [@css ".a-agywb5{scroll-padding:10%;}"];
+  [@css ".a-agdoub{scroll-padding:20% 3em 1in 5rem;}"];
+  [@css ".a-agicma{scroll-padding:calc(2px);}"];
+  [@css ".a-ags866{scroll-padding:calc(50%);}"];
+  [@css ".a-ag6ps6{scroll-padding:calc(3 * 25px);}"];
+  [@css ".a-agm7if{scroll-padding:calc(3 * 25px) 5px 10% calc(10% - 5px);}"];
+  [@css ".a-ah3npc{scroll-padding-block:10px;}"];
+  [@css ".a-ah7n61{scroll-padding-block:50%;}"];
+  [@css ".a-ahn72y{scroll-padding-block:10px 50%;}"];
+  [@css ".a-ahbmh3{scroll-padding-block:50% 50%;}"];
+  [@css ".a-ah001a4an{scroll-padding-block-end:10px;}"];
+  [@css ".a-ah001wq8b{scroll-padding-block-end:50%;}"];
+  [@css ".a-ah002tyb1{scroll-padding-block-start:10px;}"];
+  [@css ".a-ah002kly5{scroll-padding-block-start:50%;}"];
+  [@css ".a-ag001568d{scroll-padding-bottom:10px;}"];
+  [@css ".a-ag001czmj{scroll-padding-bottom:50%;}"];
+  [@css ".a-aihvee{scroll-padding-inline:10px;}"];
+  [@css ".a-ai178e{scroll-padding-inline:50%;}"];
+  [@css ".a-aifqw4{scroll-padding-inline:10px 50%;}"];
+  [@css ".a-aijitd{scroll-padding-inline:50% 50%;}"];
+  [@css ".a-ai001xv1o{scroll-padding-inline-end:10px;}"];
+  [@css ".a-ai001ybsb{scroll-padding-inline-end:50%;}"];
+  [@css ".a-ai00221xl{scroll-padding-inline-start:10px;}"];
+  [@css ".a-ai002s74z{scroll-padding-inline-start:50%;}"];
+  [@css ".a-ag002mm5y{scroll-padding-left:10px;}"];
+  [@css ".a-ag002jsh3{scroll-padding-left:50%;}"];
+  [@css ".a-ag0043z1d{scroll-padding-right:10px;}"];
+  [@css ".a-ag004pbq8{scroll-padding-right:50%;}"];
+  [@css ".a-ag00805tp{scroll-padding-top:10px;}"];
+  [@css ".a-ag008o8nm{scroll-padding-top:50%;}"];
+  [@css ".a-ajhsyj{scroll-snap-align:none;}"];
+  [@css ".a-ajpqsp{scroll-snap-align:start;}"];
+  [@css ".a-ajic9p{scroll-snap-align:end;}"];
+  [@css ".a-ajf1ss{scroll-snap-align:center;}"];
+  [@css ".a-ajkzni{scroll-snap-align:none start;}"];
+  [@css ".a-ajvewf{scroll-snap-align:end center;}"];
+  [@css ".a-ajgzch{scroll-snap-align:center start;}"];
+  [@css ".a-aj5icl{scroll-snap-align:end none;}"];
+  [@css ".a-ajkijw{scroll-snap-align:center center;}"];
+  [@css ".a-aoahur{scroll-snap-stop:normal;}"];
+  [@css ".a-aoqcsf{scroll-snap-stop:always;}"];
   [@css
-    ".a-17nu1g1{-webkit-scroll-snap-type:none;-ms-scroll-snap-type:none;scroll-snap-type:none;}"
+    ".a-apu1g1{-webkit-scroll-snap-type:none;-ms-scroll-snap-type:none;scroll-snap-type:none;}"
   ];
   [@css
-    ".a-1i6igf3{-webkit-scroll-snap-type:x mandatory;-ms-scroll-snap-type:x mandatory;scroll-snap-type:x mandatory;}"
+    ".a-apigf3{-webkit-scroll-snap-type:x mandatory;-ms-scroll-snap-type:x mandatory;scroll-snap-type:x mandatory;}"
   ];
   [@css
-    ".a-sj8bwf{-webkit-scroll-snap-type:y mandatory;-ms-scroll-snap-type:y mandatory;scroll-snap-type:y mandatory;}"
+    ".a-ap8bwf{-webkit-scroll-snap-type:y mandatory;-ms-scroll-snap-type:y mandatory;scroll-snap-type:y mandatory;}"
   ];
   [@css
-    ".a-b4yx25{-webkit-scroll-snap-type:block mandatory;-ms-scroll-snap-type:block mandatory;scroll-snap-type:block mandatory;}"
+    ".a-apyx25{-webkit-scroll-snap-type:block mandatory;-ms-scroll-snap-type:block mandatory;scroll-snap-type:block mandatory;}"
   ];
   [@css
-    ".a-vwe0h2{-webkit-scroll-snap-type:inline mandatory;-ms-scroll-snap-type:inline mandatory;scroll-snap-type:inline mandatory;}"
+    ".a-ape0h2{-webkit-scroll-snap-type:inline mandatory;-ms-scroll-snap-type:inline mandatory;scroll-snap-type:inline mandatory;}"
   ];
   [@css
-    ".a-1262jo5{-webkit-scroll-snap-type:both mandatory;-ms-scroll-snap-type:both mandatory;scroll-snap-type:both mandatory;}"
+    ".a-ap2jo5{-webkit-scroll-snap-type:both mandatory;-ms-scroll-snap-type:both mandatory;scroll-snap-type:both mandatory;}"
   ];
   [@css
-    ".a-bsl9bg{-webkit-scroll-snap-type:x proximity;-ms-scroll-snap-type:x proximity;scroll-snap-type:x proximity;}"
+    ".a-apl9bg{-webkit-scroll-snap-type:x proximity;-ms-scroll-snap-type:x proximity;scroll-snap-type:x proximity;}"
   ];
   [@css
-    ".a-yei18o{-webkit-scroll-snap-type:y proximity;-ms-scroll-snap-type:y proximity;scroll-snap-type:y proximity;}"
+    ".a-api18o{-webkit-scroll-snap-type:y proximity;-ms-scroll-snap-type:y proximity;scroll-snap-type:y proximity;}"
   ];
   [@css
-    ".a-vjeyk4{-webkit-scroll-snap-type:block proximity;-ms-scroll-snap-type:block proximity;scroll-snap-type:block proximity;}"
+    ".a-apeyk4{-webkit-scroll-snap-type:block proximity;-ms-scroll-snap-type:block proximity;scroll-snap-type:block proximity;}"
   ];
   [@css
-    ".a-xxr31t{-webkit-scroll-snap-type:inline proximity;-ms-scroll-snap-type:inline proximity;scroll-snap-type:inline proximity;}"
+    ".a-apr31t{-webkit-scroll-snap-type:inline proximity;-ms-scroll-snap-type:inline proximity;scroll-snap-type:inline proximity;}"
   ];
   [@css
-    ".a-sfvwfl{-webkit-scroll-snap-type:both proximity;-ms-scroll-snap-type:both proximity;scroll-snap-type:both proximity;}"
+    ".a-apvwfl{-webkit-scroll-snap-type:both proximity;-ms-scroll-snap-type:both proximity;scroll-snap-type:both proximity;}"
   ];
   
-  CSS.make("a-1dmoiv8", []);
-  CSS.make("a-37qcuf", []);
-  CSS.make("a-1gcxymj", []);
-  CSS.make("a-1uau2fa", []);
-  CSS.make("a-14b13tb", []);
-  CSS.make("a-1l59mki", []);
-  CSS.make("a-sz3nfx", []);
-  CSS.make("a-s1600i", []);
-  CSS.make("a-lbu6my", []);
-  CSS.make("a-ej4sq4", []);
-  CSS.make("a-1n715zm", []);
-  CSS.make("a-1x04bj5", []);
-  CSS.make("a-jgvqxc", []);
-  CSS.make("a-1y612qs", []);
-  CSS.make("a-1l5mvdw", []);
-  CSS.make("a-14fsnad", []);
-  CSS.make("a-789xfm", []);
-  CSS.make("a-17lfvv1", []);
-  CSS.make("a-osla2e", []);
-  CSS.make("a-1c0aols", []);
-  CSS.make("a-825nxv", []);
-  CSS.make("a-mjhj9v", []);
-  CSS.make("a-15b5af6", []);
-  CSS.make("a-h1ms3y", []);
-  CSS.make("a-a8alk9", []);
-  CSS.make("a-1gl7x4v", []);
-  CSS.make("a-odywb5", []);
-  CSS.make("a-1a3doub", []);
-  CSS.make("a-1jaicma", []);
-  CSS.make("a-mps866", []);
-  CSS.make("a-in6ps6", []);
-  CSS.make("a-1g6m7if", []);
-  CSS.make("a-1d13npc", []);
-  CSS.make("a-13l7n61", []);
-  CSS.make("a-1cvn72y", []);
-  CSS.make("a-1aibmh3", []);
-  CSS.make("a-4na4an", []);
-  CSS.make("a-1i4wq8b", []);
-  CSS.make("a-ihtyb1", []);
-  CSS.make("a-vrkly5", []);
-  CSS.make("a-qh568d", []);
-  CSS.make("a-tsczmj", []);
-  CSS.make("a-7dhvee", []);
-  CSS.make("a-196178e", []);
-  CSS.make("a-4qfqw4", []);
-  CSS.make("a-84jitd", []);
-  CSS.make("a-1txxv1o", []);
-  CSS.make("a-p4ybsb", []);
-  CSS.make("a-17p21xl", []);
-  CSS.make("a-1mws74z", []);
-  CSS.make("a-1d2mm5y", []);
-  CSS.make("a-b6jsh3", []);
-  CSS.make("a-c83z1d", []);
-  CSS.make("a-1p9pbq8", []);
-  CSS.make("a-1ri05tp", []);
-  CSS.make("a-1njo8nm", []);
-  CSS.make("a-6xhsyj", []);
-  CSS.make("a-1pgpqsp", []);
-  CSS.make("a-niic9p", []);
-  CSS.make("a-alf1ss", []);
-  CSS.make("a-e0kzni", []);
-  CSS.make("a-zivewf", []);
-  CSS.make("a-xwgzch", []);
-  CSS.make("a-zo5icl", []);
-  CSS.make("a-1pbkijw", []);
-  CSS.make("a-1ljahur", []);
-  CSS.make("a-tvqcsf", []);
-  CSS.make("a-17nu1g1", []);
-  CSS.make("a-1i6igf3", []);
-  CSS.make("a-sj8bwf", []);
-  CSS.make("a-b4yx25", []);
-  CSS.make("a-vwe0h2", []);
-  CSS.make("a-1262jo5", []);
-  CSS.make("a-bsl9bg", []);
-  CSS.make("a-yei18o", []);
-  CSS.make("a-vjeyk4", []);
-  CSS.make("a-xxr31t", []);
-  CSS.make("a-sfvwfl", []);
+  CSS.make("a-acoiv8", []);
+  CSS.make("a-acqcuf", []);
+  CSS.make("a-acxymj", []);
+  CSS.make("a-acu2fa", []);
+  CSS.make("a-ac13tb", []);
+  CSS.make("a-ac9mki", []);
+  CSS.make("a-ac3nfx", []);
+  CSS.make("a-ac600i", []);
+  CSS.make("a-adu6my", []);
+  CSS.make("a-ad4sq4", []);
+  CSS.make("a-ad00115zm", []);
+  CSS.make("a-ad0024bj5", []);
+  CSS.make("a-ac001vqxc", []);
+  CSS.make("a-ae12qs", []);
+  CSS.make("a-aemvdw", []);
+  CSS.make("a-ae002snad", []);
+  CSS.make("a-ae0019xfm", []);
+  CSS.make("a-ac002fvv1", []);
+  CSS.make("a-ac004la2e", []);
+  CSS.make("a-ac008aols", []);
+  CSS.make("a-ag5nxv", []);
+  CSS.make("a-aghj9v", []);
+  CSS.make("a-ag5af6", []);
+  CSS.make("a-agms3y", []);
+  CSS.make("a-agalk9", []);
+  CSS.make("a-ag7x4v", []);
+  CSS.make("a-agywb5", []);
+  CSS.make("a-agdoub", []);
+  CSS.make("a-agicma", []);
+  CSS.make("a-ags866", []);
+  CSS.make("a-ag6ps6", []);
+  CSS.make("a-agm7if", []);
+  CSS.make("a-ah3npc", []);
+  CSS.make("a-ah7n61", []);
+  CSS.make("a-ahn72y", []);
+  CSS.make("a-ahbmh3", []);
+  CSS.make("a-ah001a4an", []);
+  CSS.make("a-ah001wq8b", []);
+  CSS.make("a-ah002tyb1", []);
+  CSS.make("a-ah002kly5", []);
+  CSS.make("a-ag001568d", []);
+  CSS.make("a-ag001czmj", []);
+  CSS.make("a-aihvee", []);
+  CSS.make("a-ai178e", []);
+  CSS.make("a-aifqw4", []);
+  CSS.make("a-aijitd", []);
+  CSS.make("a-ai001xv1o", []);
+  CSS.make("a-ai001ybsb", []);
+  CSS.make("a-ai00221xl", []);
+  CSS.make("a-ai002s74z", []);
+  CSS.make("a-ag002mm5y", []);
+  CSS.make("a-ag002jsh3", []);
+  CSS.make("a-ag0043z1d", []);
+  CSS.make("a-ag004pbq8", []);
+  CSS.make("a-ag00805tp", []);
+  CSS.make("a-ag008o8nm", []);
+  CSS.make("a-ajhsyj", []);
+  CSS.make("a-ajpqsp", []);
+  CSS.make("a-ajic9p", []);
+  CSS.make("a-ajf1ss", []);
+  CSS.make("a-ajkzni", []);
+  CSS.make("a-ajvewf", []);
+  CSS.make("a-ajgzch", []);
+  CSS.make("a-aj5icl", []);
+  CSS.make("a-ajkijw", []);
+  CSS.make("a-aoahur", []);
+  CSS.make("a-aoqcsf", []);
+  CSS.make("a-apu1g1", []);
+  CSS.make("a-apigf3", []);
+  CSS.make("a-ap8bwf", []);
+  CSS.make("a-apyx25", []);
+  CSS.make("a-ape0h2", []);
+  CSS.make("a-ap2jo5", []);
+  CSS.make("a-apl9bg", []);
+  CSS.make("a-api18o", []);
+  CSS.make("a-apeyk4", []);
+  CSS.make("a-apr31t", []);
+  CSS.make("a-apvwfl", []);

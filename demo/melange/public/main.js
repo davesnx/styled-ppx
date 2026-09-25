@@ -62823,6 +62823,206 @@ var yellowgreen = {
 };
 var transparent2 = "transparent";
 
+// ../demo-melange/node_modules/styled-ppx.melange/Merge_key.mjs
+var atom_prefix = "a-";
+var all_sentinel = "zz";
+var unregistered_custom_marker = "zy";
+var direction_marker = "5q";
+var unicode_bidi_marker = "dp";
+function is_excluded_from_all(family) {
+  if (family === unregistered_custom_marker || family === direction_marker) {
+    return true;
+  } else {
+    return family === unicode_bidi_marker;
+  }
+}
+function base36_value(s2) {
+  const value = {
+    contents: 0
+  };
+  iter6((function(c) {
+    const digit = c >= 58 ? c > 122 || c < 97 ? 0 : (c - /* 'a' */
+    97 | 0) + 10 | 0 : c >= 48 ? c - /* '0' */
+    48 | 0 : 0;
+    value.contents = Math.imul(value.contents, 36) + digit | 0;
+  }), s2);
+  return value.contents;
+}
+function fields_of_extra(extra) {
+  if (extra === 0) {
+    return [
+      false,
+      false,
+      false
+    ];
+  } else if (extra === 3) {
+    return [
+      false,
+      true,
+      false
+    ];
+  } else if (extra === 5) {
+    return [
+      true,
+      false,
+      false
+    ];
+  } else if (extra === 6) {
+    return [
+      false,
+      false,
+      true
+    ];
+  } else if (extra === 8) {
+    return [
+      true,
+      true,
+      false
+    ];
+  } else if (extra === 11) {
+    return [
+      true,
+      false,
+      true
+    ];
+  } else {
+    return;
+  }
+}
+function parse_atom(class_name) {
+  const prefix_len = atom_prefix.length;
+  if (class_name.length < prefix_len || sub5(class_name, 0, prefix_len) !== atom_prefix) {
+    return;
+  }
+  const body = sub5(class_name, prefix_len, class_name.length - prefix_len | 0);
+  const floor = 6;
+  const match = fields_of_extra(body.length - floor | 0);
+  if (match === void 0) {
+    return;
+  }
+  const pos = {
+    contents: 0
+  };
+  const take3 = function(width) {
+    const s2 = sub5(body, pos.contents, width);
+    pos.contents = pos.contents + width | 0;
+    return s2;
+  };
+  const context = match[0] ? take3(5) : "";
+  const family = take3(2);
+  const extended = match[2] ? take3(6) : void 0;
+  const mask = match[1] ? base36_value(take3(3)) : void 0;
+  take3(4);
+  return {
+    context,
+    family,
+    extended,
+    mask
+  };
+}
+function context_equal(a, b) {
+  return a.context === b.context;
+}
+function family_equal(a, b) {
+  if (a.family !== b.family) {
+    return false;
+  }
+  const match = a.extended;
+  const match$1 = b.extended;
+  if (match !== void 0) {
+    if (match$1 !== void 0) {
+      return match === match$1;
+    } else {
+      return false;
+    }
+  } else {
+    return match$1 === void 0;
+  }
+}
+function mask_subset(a, b) {
+  if (a !== void 0) {
+    if (b !== void 0) {
+      return (a & b) === a;
+    } else {
+      return true;
+    }
+  } else {
+    return b === void 0;
+  }
+}
+function removes(former, latter) {
+  if (context_equal(former, latter)) {
+    if (latter.family === all_sentinel) {
+      return !is_excluded_from_all(former.family);
+    } else if (family_equal(former, latter)) {
+      return mask_subset(former.mask, latter.mask);
+    } else {
+      return false;
+    }
+  } else {
+    return false;
+  }
+}
+function is_space3(param) {
+  if (param > 13 || param < 9) {
+    return param === 32;
+  } else {
+    return !(param === 12 || param === 11);
+  }
+}
+function split_tokens(s2) {
+  const n = s2.length;
+  let _i = 0;
+  let _acc = (
+    /* [] */
+    0
+  );
+  while (true) {
+    const acc = _acc;
+    const i = _i;
+    if (i >= n) {
+      return rev(acc);
+    }
+    if (is_space3(get2(s2, i))) {
+      _i = i + 1 | 0;
+      continue;
+    }
+    let j = i;
+    while (j < n && !is_space3(get2(s2, j))) {
+      j = j + 1 | 0;
+    }
+    ;
+    _acc = {
+      hd: sub5(s2, i, j - i | 0),
+      tl: acc
+    };
+    _i = j;
+    continue;
+  }
+  ;
+}
+function merge_class_names(former, latter) {
+  const former_tokens = split_tokens(former);
+  const latter_tokens = split_tokens(latter);
+  const latter_atoms = of_list(filter_map2(parse_atom, latter_tokens));
+  const survives = function(token) {
+    const former_atom = parse_atom(token);
+    if (former_atom !== void 0) {
+      return !exists4((function(latter_atom) {
+        return removes(former_atom, latter_atom);
+      }), latter_atoms);
+    } else {
+      return true;
+    }
+  };
+  return concat6(" ", $at(filter2(survives, former_tokens), latter_tokens));
+}
+var context_width = 5;
+var family_width = 2;
+var mask_width = 3;
+var value_width = 4;
+var extended_width = 6;
+
 // ../demo-melange/node_modules/reason-react/ReactDOM.mjs
 function unsafeAddProp(style, key, value) {
   const dict = {};
@@ -62870,7 +63070,7 @@ function make7(className2, vars2) {
   ];
 }
 function merge2(styles1, styles22) {
-  const className2 = (styles1[0] + (" " + styles22[0])).trim();
+  const className2 = merge_class_names(styles1[0], styles22[0]);
   const style = Object.assign({}, styles1[1], styles22[1]);
   return [
     className2,
@@ -63299,7 +63499,7 @@ var AppGlobalStyles = {
   make: make8
 };
 var stack = make7(
-  "label:stack id-195s1dh a-k008qs a-cgq59l",
+  "label:stack id-195s1dh a-5r08qs a-61001q59l",
   /* [] */
   0
 );
@@ -63312,7 +63512,7 @@ function getOrEmpty(str) {
 }
 function styles2(lolaOpt, param) {
   const lola = lolaOpt !== void 0 ? lolaOpt : px2(0);
-  return make7("label:Cositas id-uk3qz7 a-k008qs a-cgq59l in-r0vq9t", {
+  return make7("label:Cositas id-uk3qz7 a-5r08qs a-61001q59l in-r0vq9t", {
     hd: [
       "--lola-8erbae",
       Gap.toString(lola)
@@ -63344,38 +63544,38 @@ var Cositas = {
   make: make$12
 };
 var selectors = make7(
-  "label:selectors id-pm05s2 a-tokvmb a-12qnfjo",
+  "label:selectors id-pm05s2 a-4ekvmb a-qyw7u4enfjo",
   /* [] */
   0
 );
 var bounce = AnimationName.make(void 0, "k-deb5ee");
 var clx = make7(
-  "label:clx id-47oj19 a-1e8vzlw a-u70tf2 a-1j9jp3a",
+  "label:clx id-47oj19 a-65001vzlw a-5l0tf2 a-6i00gjp3a",
   /* [] */
   0
 );
 var post = make7(
-  "label:post id-gbz02q a-1y5r52a a-3qzm71",
+  "label:post id-gbz02q a-3hr52a a-4v002zm71",
   /* [] */
   0
 );
 var card = make7(
-  "label:card id-ebd8w7 a-eaeacs a-25k368 a-3fuzg5",
+  "label:card id-ebd8w7 a-7peacs a-3hk368 a-6500wuzg5",
   /* [] */
   0
 );
 var container = make7(
-  "label:container id-1hzr7q6 a-nqqinc a-w3aeeb a-5x3p37 a-stwpj2",
+  "label:container id-1hzr7q6 a-p3y4xecqinc a-p3y4x39004aeeb a-p3y4x6500w3p37 a-2grgh65m9swpj2",
   /* [] */
   0
 );
 var gradiend = make7(
-  "label:gradiend id-j1a2e7 a-1wlyyxm a-qelxhy",
+  "label:gradiend id-j1a2e7 a-94yyxm a-39008lxhy",
   /* [] */
   0
 );
 var tag = make7(
-  "label:tag id-1a86vzz a-1baulvz a-7ji1gv a-1isemmb a-3kft4e a-wtpnzt",
+  "label:tag id-1a86vzz a-5rulvz a-94i1gv a-7p002emmb a-3hft4e a-3npnzt",
   /* [] */
   0
 );
@@ -63383,28 +63583,28 @@ var Labels = {
   tag
 };
 var childLabel = make7(
-  "label:childLabel id-6prbgi a-in3yi3",
+  "label:childLabel id-6prbgi a-65m9s3yi3",
   /* [] */
   0
 );
 var parentWithChildSelector = make7(
-  "label:parentWithChildSelector id-1wu39qc a-o32ik7 a-19midj6 a-1qm1lh a-1xhar4a a-yd4yye",
+  "label:parentWithChildSelector id-1wu39qc a-3h2ik7 a-94idj6 a-7p001m1lh a-pgjr94ear4a a-7q0ma394yye",
   /* [] */
   0
 );
 var modifierActive = make7(
-  "label:modifierActive id-h4gfxd a-in3yi3",
+  "label:modifierActive id-h4gfxd a-65m9s3yi3",
   /* [] */
   0
 );
 var toggle = make7(
-  "label:toggle id-mfk87c a-1baulvz a-12hizlt a-12z0wuy a-s67z9l a-pk71pq a-gwf734 a-145kqdj",
+  "label:toggle id-mfk87c a-5rulvz a-94izlt a-7p0040wuy a-3h7z9l a-3n71pq a-nron439f734 a-nron43hef5kqdj",
   /* [] */
   0
 );
 var primary = hex2("141414");
 function keyframeDemoShell(color) {
-  return make7("label:keyframeDemoShell id-8xpkpc a-19kzrtu a-i3pbo a-3kft4e a-1fi1jeb a-205zh2 in-kusjgz a-1e8vzlw", {
+  return make7("label:keyframeDemoShell id-8xpkpc a-94zrtu a-7p0013pbo a-3hft4e a-3n1jeb a-395zh2 in-kusjgz a-65001vzlw", {
     hd: [
       "--color-1a279q8",
       Color.toString(color)
@@ -63439,7 +63639,7 @@ var resize2 = AnimationName.make({
     )
   }
 }, "k-1kt58w0");
-var keyframeDemoCard = make7("label:keyframeDemoCard id-jbn4tz in-1h7bkao a-65ee5x a-3pa72f a-iovuyg a-1c3l4rb a-i6bazn a-k008qs a-zcxndt a-1tyndxa a-1vw7svr a-1p3fawg a-kbn7if a-8c92kl", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
+var keyframeDemoCard = make7("label:keyframeDemoCard id-jbn4tz in-1h7bkao a-2z008ee5x a-2z1kwa72f a-2z00gvuyg a-ecl4rb a-8rbazn a-5r08qs a-9i001xndt a-9h002ndxa a-3n7svr a-39fawg a-4en7if a-4092kl", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
 function Main(Props) {
   return JsxRuntime.jsxs("main", {
     children: [

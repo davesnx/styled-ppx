@@ -15,25 +15,25 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".a-11tobub{image-rendering:auto;}"];
-  [@css ".a-1e7m01f{image-rendering:crisp-edges;}"];
-  [@css ".a-fjhmlf{image-rendering:pixelated;}"];
+  [@css ".a-6tobub{image-rendering:auto;}"];
+  [@css ".a-6tm01f{image-rendering:crisp-edges;}"];
+  [@css ".a-6thmlf{image-rendering:pixelated;}"];
   [@css
-    ".a-25toi3{background-image:image-set(\"cat.png\" 1x, \"cat-2x.png\" 2x);}"
+    ".a-39008toi3{background-image:image-set(\"cat.png\" 1x, \"cat-2x.png\" 2x);}"
   ];
   [@css
-    ".a-knsfyn{background-image:image-set(\"cat.png\" 1dppx, \"cat-2x.png\" 2dppx);}"
+    ".a-39008sfyn{background-image:image-set(\"cat.png\" 1dppx, \"cat-2x.png\" 2dppx);}"
   ];
   [@css
-    ".a-9l0k4n{background-image:image-set(\"cat.png\" 96dpi, \"cat-2x.png\" 192dpi);}"
+    ".a-390080k4n{background-image:image-set(\"cat.png\" 96dpi, \"cat-2x.png\" 192dpi);}"
   ];
-  [@css ".a-ihfchh{background-image:image-set(\"cat.png\" 37dpcm);}"];
+  [@css ".a-39008fchh{background-image:image-set(\"cat.png\" 37dpcm);}"];
   
-  CSS.make("a-11tobub", []);
-  CSS.make("a-1e7m01f", []);
-  CSS.make("a-fjhmlf", []);
+  CSS.make("a-6tobub", []);
+  CSS.make("a-6tm01f", []);
+  CSS.make("a-6thmlf", []);
   
-  CSS.make("a-25toi3", []);
-  CSS.make("a-knsfyn", []);
-  CSS.make("a-9l0k4n", []);
-  CSS.make("a-ihfchh", []);
+  CSS.make("a-39008toi3", []);
+  CSS.make("a-39008sfyn", []);
+  CSS.make("a-390080k4n", []);
+  CSS.make("a-39008fchh", []);

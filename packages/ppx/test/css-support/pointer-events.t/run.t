@@ -15,36 +15,36 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".a-1bn2far{touch-action:auto;}"];
-  [@css ".a-z0sbrd{touch-action:none;}"];
-  [@css ".a-rvsu0a{touch-action:pan-x;}"];
-  [@css ".a-1gecb00{touch-action:pan-y;}"];
-  [@css ".a-11ee94{touch-action:pan-x pan-y;}"];
-  [@css ".a-1cw4v8x{touch-action:manipulation;}"];
-  [@css ".a-1alt8dp{touch-action:pan-left;}"];
-  [@css ".a-1u0iuj3{touch-action:pan-right;}"];
-  [@css ".a-54tga0{touch-action:pan-up;}"];
-  [@css ".a-7apx43{touch-action:pan-down;}"];
-  [@css ".a-1in9hg{touch-action:pan-left pan-up;}"];
-  [@css ".a-10ugay6{touch-action:pinch-zoom;}"];
-  [@css ".a-1gnive7{touch-action:pan-x pinch-zoom;}"];
-  [@css ".a-1sg2qdh{touch-action:pan-y pinch-zoom;}"];
-  [@css ".a-12jbds3{touch-action:pan-x pan-y pinch-zoom;}"];
+  [@css ".a-dh2far{touch-action:auto;}"];
+  [@css ".a-dhsbrd{touch-action:none;}"];
+  [@css ".a-dhsu0a{touch-action:pan-x;}"];
+  [@css ".a-dhcb00{touch-action:pan-y;}"];
+  [@css ".a-dhee94{touch-action:pan-x pan-y;}"];
+  [@css ".a-dh4v8x{touch-action:manipulation;}"];
+  [@css ".a-dht8dp{touch-action:pan-left;}"];
+  [@css ".a-dhiuj3{touch-action:pan-right;}"];
+  [@css ".a-dhtga0{touch-action:pan-up;}"];
+  [@css ".a-dhpx43{touch-action:pan-down;}"];
+  [@css ".a-dhn9hg{touch-action:pan-left pan-up;}"];
+  [@css ".a-dhgay6{touch-action:pinch-zoom;}"];
+  [@css ".a-dhive7{touch-action:pan-x pinch-zoom;}"];
+  [@css ".a-dh2qdh{touch-action:pan-y pinch-zoom;}"];
+  [@css ".a-dhbds3{touch-action:pan-x pan-y pinch-zoom;}"];
   
-  CSS.make("a-1bn2far", []);
-  CSS.make("a-z0sbrd", []);
-  CSS.make("a-rvsu0a", []);
-  CSS.make("a-1gecb00", []);
-  CSS.make("a-11ee94", []);
-  CSS.make("a-1cw4v8x", []);
+  CSS.make("a-dh2far", []);
+  CSS.make("a-dhsbrd", []);
+  CSS.make("a-dhsu0a", []);
+  CSS.make("a-dhcb00", []);
+  CSS.make("a-dhee94", []);
+  CSS.make("a-dh4v8x", []);
   
-  CSS.make("a-1alt8dp", []);
-  CSS.make("a-1u0iuj3", []);
-  CSS.make("a-54tga0", []);
-  CSS.make("a-7apx43", []);
-  CSS.make("a-1in9hg", []);
+  CSS.make("a-dht8dp", []);
+  CSS.make("a-dhiuj3", []);
+  CSS.make("a-dhtga0", []);
+  CSS.make("a-dhpx43", []);
+  CSS.make("a-dhn9hg", []);
   
-  CSS.make("a-10ugay6", []);
-  CSS.make("a-1gnive7", []);
-  CSS.make("a-1sg2qdh", []);
-  CSS.make("a-12jbds3", []);
+  CSS.make("a-dhgay6", []);
+  CSS.make("a-dhive7", []);
+  CSS.make("a-dh2qdh", []);
+  CSS.make("a-dhbds3", []);
