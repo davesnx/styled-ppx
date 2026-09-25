@@ -11,8 +11,8 @@ through the static extraction pipeline. They also register selector bindings so
   @property --tone-1ucf2mt{syntax:"*";inherits:false;}
   @property --color-1a279q8{syntax:"*";inherits:false;}
   .css-tokvmb{color:red;}
-  .css-149d9vx:hover{color:var(--tone-1ucf2mt);}
-  .css-kusjgz{color:var(--color-1a279q8);}
+  .csv-149d9vx:hover{color:var(--tone-1ucf2mt);}
+  .csv-kusjgz{color:var(--color-1a279q8);}
   .css-hpgf8j{padding:8px;}
   .css-yr9qag .cid-1l8coch{margin:0;}
   .css-10q7t6m .cid-1oex1yr{display:block;}
@@ -21,15 +21,15 @@ through the static extraction pipeline. They also register selector bindings so
   [@css "@property --tone-1ucf2mt{syntax:\"*\";inherits:false;}"];
   [@css "@property --color-1a279q8{syntax:\"*\";inherits:false;}"];
   [@css ".css-tokvmb{color:red;}"];
-  [@css ".css-149d9vx:hover{color:var(--tone-1ucf2mt);}"];
-  [@css ".css-kusjgz{color:var(--color-1a279q8);}"];
+  [@css ".csv-149d9vx:hover{color:var(--tone-1ucf2mt);}"];
+  [@css ".csv-kusjgz{color:var(--color-1a279q8);}"];
   [@css ".css-hpgf8j{padding:8px;}"];
   [@css ".css-yr9qag .cid-1l8coch{margin:0;}"];
   [@css ".css-10q7t6m .cid-1oex1yr{display:block;}"];
   [@css.bindings
     [
-      ("Output.Box", "cid-1l8coch", "css-tokvmb css-149d9vx"),
-      ("Output.Button", "cid-1oex1yr", "css-kusjgz css-hpgf8j"),
+      ("Output.Box", "cid-1l8coch", "css-tokvmb csv-149d9vx"),
+      ("Output.Button", "cid-1oex1yr", "csv-kusjgz css-hpgf8j"),
       ("Output.card", "cid-16nw107", "css-yr9qag css-10q7t6m"),
     ]
   ];
@@ -1019,7 +1019,7 @@ through the static extraction pipeline. They also register selector bindings so
       "Object.assign";
     let styles =
       CSS.make(
-        "label:Box cid-1l8coch css-tokvmb css-149d9vx",
+        "label:Box cid-1l8coch css-tokvmb csv-149d9vx",
         [("--tone-1ucf2mt", CSS.Types.Color.toString(tone))],
       );
     let make = (props: makeProps) => {
@@ -2028,7 +2028,7 @@ through the static extraction pipeline. They also register selector bindings so
       "Object.assign";
     let styles = (~color: CSS.Types.Color.t, _) =>
       CSS.make(
-        "label:Button cid-1oex1yr css-kusjgz css-hpgf8j",
+        "label:Button cid-1oex1yr csv-kusjgz css-hpgf8j",
         [("--color-1a279q8", CSS.Types.Color.toString(color))],
       );
     let make = (props: makeProps) => {

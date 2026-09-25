@@ -39,13 +39,13 @@
   .css-1ebezfo{border-radius:16px;}
   .css-1bxstvc{border:2px solid #3b82f6;}
   .css-1vuar9w{box-shadow:0px 0px 0px 0px rgba(59, 130, 246, 0.5);}
-  .css-hfzctv{border:1px solid var(--borderColor-1on39sz);}
-  .css-9fu3s3{box-shadow:var(--shadowX-11ljgmp) var(--shadowY-1qn6d0z) var(--blur-1bcbjmk) var(--spread-xxpef3) var(--shadowColor-1sod13t);}
-  .css-fkjemk{box-shadow:var(--myShadow-af5fmc);}
-  .css-11hdrfm{border:var(--borderWidth-apl5wd) solid black;}
-  .css-zwhmn0{background-color:var(--bgColor-zk5xjv);}
-  .css-zwhmn0{border:1px solid var(--borderColor-rm89ze);}
-  .css-zwhmn0{box-shadow:var(--shadow-2tj34g);}
+  .csv-hfzctv{border:1px solid var(--borderColor-1on39sz);}
+  .csv-9fu3s3{box-shadow:var(--shadowX-11ljgmp) var(--shadowY-1qn6d0z) var(--blur-1bcbjmk) var(--spread-xxpef3) var(--shadowColor-1sod13t);}
+  .csv-fkjemk{box-shadow:var(--myShadow-af5fmc);}
+  .csv-11hdrfm{border:var(--borderWidth-apl5wd) solid black;}
+  .csv-zwhmn0{background-color:var(--bgColor-zk5xjv);}
+  .csv-zwhmn0{border:1px solid var(--borderColor-rm89ze);}
+  .csv-zwhmn0{box-shadow:var(--shadow-2tj34g);}
 
 Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
 
@@ -92,14 +92,14 @@ Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
   [@@@css ".css-1ebezfo{border-radius:16px;}"]
   [@@@css ".css-1bxstvc{border:2px solid #3b82f6;}"]
   [@@@css ".css-1vuar9w{box-shadow:0px 0px 0px 0px rgba(59, 130, 246, 0.5);}"]
-  [@@@css ".css-hfzctv{border:1px solid var(--borderColor-1on39sz);}"]
+  [@@@css ".csv-hfzctv{border:1px solid var(--borderColor-1on39sz);}"]
   [@@@css
-    ".css-9fu3s3{box-shadow:var(--shadowX-11ljgmp) var(--shadowY-1qn6d0z) var(--blur-1bcbjmk) var(--spread-xxpef3) var(--shadowColor-1sod13t);}"]
-  [@@@css ".css-fkjemk{box-shadow:var(--myShadow-af5fmc);}"]
-  [@@@css ".css-11hdrfm{border:var(--borderWidth-apl5wd) solid black;}"]
-  [@@@css ".css-zwhmn0{background-color:var(--bgColor-zk5xjv);}"]
-  [@@@css ".css-zwhmn0{border:1px solid var(--borderColor-rm89ze);}"]
-  [@@@css ".css-zwhmn0{box-shadow:var(--shadow-2tj34g);}"]
+    ".csv-9fu3s3{box-shadow:var(--shadowX-11ljgmp) var(--shadowY-1qn6d0z) var(--blur-1bcbjmk) var(--spread-xxpef3) var(--shadowColor-1sod13t);}"]
+  [@@@css ".csv-fkjemk{box-shadow:var(--myShadow-af5fmc);}"]
+  [@@@css ".csv-11hdrfm{border:var(--borderWidth-apl5wd) solid black;}"]
+  [@@@css ".csv-zwhmn0{background-color:var(--bgColor-zk5xjv);}"]
+  [@@@css ".csv-zwhmn0{border:1px solid var(--borderColor-rm89ze);}"]
+  [@@@css ".csv-zwhmn0{box-shadow:var(--shadow-2tj34g);}"]
   [@@@css.bindings
     [("Output.simpleShadow", "cid-1ckmdi6", "css-12b85tv");
     ("Output.multipleShadows", "cid-1urhidx", "css-bh2iep");
@@ -119,11 +119,11 @@ Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
       "css-1465761 css-19uwm2g css-1yfkn84");
     ("Output.cardStyle", "cid-1je20li", "css-y239qm css-11ixi5p css-1ebezfo");
     ("Output.buttonBase", "cid-9kxo31", "css-1bxstvc css-1vuar9w css-rl6otz");
-    ("Output.borderColorInterp", "cid-16k72sd", "css-hfzctv");
-    ("Output.shadowInterp", "cid-9zd6fn", "css-9fu3s3");
-    ("Output.shadowFullInterp", "cid-bg3lpz", "css-fkjemk");
-    ("Output.borderWidthInterp", "cid-1h8tvcz", "css-11hdrfm");
-    ("Output.mixedCard", "cid-10wtrx1", "css-zwhmn0 css-1yfkn84")]]
+    ("Output.borderColorInterp", "cid-16k72sd", "csv-hfzctv");
+    ("Output.shadowInterp", "cid-9zd6fn", "csv-9fu3s3");
+    ("Output.shadowFullInterp", "cid-bg3lpz", "csv-fkjemk");
+    ("Output.borderWidthInterp", "cid-1h8tvcz", "csv-11hdrfm");
+    ("Output.mixedCard", "cid-10wtrx1", "csv-zwhmn0 css-1yfkn84")]]
   let simpleShadow = CSS.make "label:simpleShadow cid-1ckmdi6 css-12b85tv" []
   let multipleShadows =
     CSS.make "label:multipleShadows cid-1urhidx css-bh2iep" []
@@ -155,29 +155,29 @@ Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
     CSS.make "label:buttonBase cid-9kxo31 css-1bxstvc css-1vuar9w css-rl6otz"
       []
   let borderColorInterp borderColor =
-    CSS.make "label:borderColorInterp cid-16k72sd css-hfzctv"
+    CSS.make "label:borderColorInterp cid-16k72sd csv-hfzctv"
       [("--borderColor-1on39sz", (CSS.Types.Color.toString borderColor))]
   let shadowInterp shadowX =
     fun shadowY ->
       fun blur ->
         fun spread ->
           fun shadowColor ->
-            CSS.make "label:shadowInterp cid-9zd6fn css-9fu3s3"
+            CSS.make "label:shadowInterp cid-9zd6fn csv-9fu3s3"
               [("--shadowX-11ljgmp", (CSS.Types.Length.toString shadowX));
               ("--shadowY-1qn6d0z", (CSS.Types.Length.toString shadowY));
               ("--blur-1bcbjmk", (CSS.Types.Length.toString blur));
               ("--spread-xxpef3", (CSS.Types.Length.toString spread));
               ("--shadowColor-1sod13t", (CSS.Types.Color.toString shadowColor))]
   let shadowFullInterp myShadow =
-    CSS.make "label:shadowFullInterp cid-bg3lpz css-fkjemk"
+    CSS.make "label:shadowFullInterp cid-bg3lpz csv-fkjemk"
       [("--myShadow-af5fmc", (CSS.Types.BoxShadows.toString myShadow))]
   let borderWidthInterp borderWidth =
-    CSS.make "label:borderWidthInterp cid-1h8tvcz css-11hdrfm"
+    CSS.make "label:borderWidthInterp cid-1h8tvcz csv-11hdrfm"
       [("--borderWidth-apl5wd", (CSS.Types.LineWidth.toString borderWidth))]
   let mixedCard bgColor =
     fun borderColor ->
       fun shadow ->
-        CSS.make "label:mixedCard cid-10wtrx1 css-zwhmn0 css-1yfkn84"
+        CSS.make "label:mixedCard cid-10wtrx1 csv-zwhmn0 css-1yfkn84"
           [("--bgColor-zk5xjv", (CSS.Types.Color.toString bgColor));
           ("--borderColor-rm89ze", (CSS.Types.Color.toString borderColor));
           ("--shadow-2tj34g", (CSS.Types.BoxShadows.toString shadow))]

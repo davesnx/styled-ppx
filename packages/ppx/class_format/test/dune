@@ -5,6 +5,7 @@
   alcotest
   alcotest_extra
   class_format
+  murmur2
   slot_key
   styled_ppx_css_parser))
 

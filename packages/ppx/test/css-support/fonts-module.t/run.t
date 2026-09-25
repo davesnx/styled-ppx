@@ -19,11 +19,11 @@ If this test fail means that the module is not in sync with the ppx
   [@css "@property --fontStack-q2u8nj{syntax:\"*\";inherits:false;}"];
   [@css "@property --font-165jgna{syntax:\"*\";inherits:false;}"];
   [@css ".css-1l2838t{font-family:\"Inter Semi Bold\";}"];
-  [@css ".css-1wpww9k{font-family:var(--fonts-qhzb1y);}"];
+  [@css ".csv-1wpww9k{font-family:var(--fonts-qhzb1y);}"];
   [@css ".css-13c8hy8{font-family:Inter;}"];
-  [@css ".css-1sbj23c{font-family:var(--fontStack-q2u8nj);}"];
+  [@css ".csv-1sbj23c{font-family:var(--fontStack-q2u8nj);}"];
   [@css ".css-38zhkv{font-family:Inter, Sans;}"];
-  [@css ".css-e4l4c9{font-family:Inter, var(--font-165jgna);}"];
+  [@css ".csv-e4l4c9{font-family:Inter, var(--font-165jgna);}"];
   [@css ".css-zpvvt7{font-family:\"Gill Sans Extrabold\", sans-serif;}"];
   [@css ".css-1nch51u{font-synthesis-weight:none;}"];
   [@css ".css-4qo3g2{font-synthesis-style:auto;}"];
@@ -158,17 +158,17 @@ If this test fail means that the module is not in sync with the ppx
   
   CSS.make("css-1l2838t", []);
   CSS.make(
-    "css-1wpww9k",
+    "csv-1wpww9k",
     [("--fonts-qhzb1y", CSS.Types.FontFamilies.toString(fonts))],
   );
   CSS.make("css-13c8hy8", []);
   CSS.make(
-    "css-1sbj23c",
+    "csv-1sbj23c",
     [("--fontStack-q2u8nj", CSS.Types.FontFamilies.toString(fontStack))],
   );
   CSS.make("css-38zhkv", []);
   CSS.make(
-    "css-e4l4c9",
+    "csv-e4l4c9",
     [("--font-165jgna", CSS.Types.FontFamily.toString(font))],
   );
   CSS.make("css-zpvvt7", []);

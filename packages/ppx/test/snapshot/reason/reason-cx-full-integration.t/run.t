@@ -11,13 +11,13 @@
   [@@@css "@property --size-3mc4ty{syntax:\"*\";inherits:false;}"]
   [@@@css ".css-k008qs{display:flex;}"]
   [@@@css ".css-1tyndxa{justify-content:center;}"]
-  [@@@css ".css-kusjgz{color:var(--color-1a279q8);}"]
-  [@@@css ".css-15a4g54{margin-block:var(--spacing-y96o3b);}"]
-  [@@@css ".css-15a4g54{margin-inline:var(--spacing-vh5lkd);}"]
-  [@@@css ".css-15a4g54{padding-block-start:var(--spacing-f3qjr);}"]
+  [@@@css ".csv-kusjgz{color:var(--color-1a279q8);}"]
+  [@@@css ".csv-15a4g54{margin-block:var(--spacing-y96o3b);}"]
+  [@@@css ".csv-15a4g54{margin-inline:var(--spacing-vh5lkd);}"]
+  [@@@css ".csv-15a4g54{padding-block-start:var(--spacing-f3qjr);}"]
   [@@@css
-    ".css-15a4g54{-webkit-padding-inline-end:var(--spacing-f3qjr);padding-inline-end:var(--spacing-f3qjr);}"]
-  [@@@css ".css-15a4g54{inset-block-start:var(--spacing-f3qjr);}"]
+    ".csv-15a4g54{-webkit-padding-inline-end:var(--spacing-f3qjr);padding-inline-end:var(--spacing-f3qjr);}"]
+  [@@@css ".csv-15a4g54{inset-block-start:var(--spacing-f3qjr);}"]
   [@@@css ".css-zqnfaz:hover{opacity:0.8;}"]
   [@@@css ".css-osffsa .child{-webkit-flex:1;-ms-flex:1;flex:1;}"]
   [@@@css "@media (max-width: 768px) {.css-1ruz0a1{display:block;}}"]
@@ -38,9 +38,9 @@
   [@@@css "@keyframes keyframe-jw9oix{from{opacity:0;}to{opacity:1;}}"]
   [@@@css
     "@keyframes keyframe-waibjx{0%{-webkit-transform:translateY(100%);-moz-transform:translateY(100%);-ms-transform:translateY(100%);transform:translateY(100%);}100%{-webkit-transform:translateY(0);-moz-transform:translateY(0);-ms-transform:translateY(0);transform:translateY(0);}}"]
-  [@@@css ".css-1sq1nk7{color:var(--primary-19vrfgr);}"]
-  [@@@css ".css-1sq1nk7{background-color:var(--secondary-1dc81fi);}"]
-  [@@@css ".css-1sq1nk7{font-size:var(--size-3mc4ty);}"]
+  [@@@css ".csv-1sq1nk7{color:var(--primary-19vrfgr);}"]
+  [@@@css ".csv-1sq1nk7{background-color:var(--secondary-1dc81fi);}"]
+  [@@@css ".csv-1sq1nk7{font-size:var(--size-3mc4ty);}"]
   [@@@css ".css-nk32ej{padding:10px;}"]
   [@@@css ".css-bghlac{grid-template-columns:1fr 2fr 1fr;}"]
   [@@@css ".css-16610y9{gap:20px;}"]
@@ -48,8 +48,8 @@
   [@@@css ".css-13v3rg8{overflow-y:auto;}"]
   [@@@css.bindings
     [("Input.staticCss", "cid-1ctni4v", "css-k008qs css-1tyndxa");
-    ("Input.dynamicCss", "cid-71zk3w", "css-kusjgz css-k008qs");
-    ("Input.logicalProps", "cid-r1294l", "css-15a4g54");
+    ("Input.dynamicCss", "cid-71zk3w", "csv-kusjgz css-k008qs");
+    ("Input.logicalProps", "cid-r1294l", "csv-15a4g54");
     ("Input.nestedCss", "cid-apdklp", "css-k008qs css-zqnfaz css-osffsa");
     ("Input.responsiveCss", "cid-1glbybz", "css-k008qs css-1ruz0a1");
     ("Input.multipleMediaQueries", "cid-4peqig",
@@ -57,17 +57,17 @@
     ("Input.mediaWithSelector", "cid-1jbme7d",
       "css-k008qs css-5ivle1 css-1cemfq6 css-1l7frkw");
     ("Input.complexMedia", "cid-yh1q8l", "css-lgj0h8 css-mhiow9 css-1nm9mde");
-    ("Input.mediaWithInterpolation", "cid-1c8phv0", "css-kusjgz css-11qknlj");
-    ("Input.multiVar", "cid-ckhvyf", "css-1sq1nk7 css-nk32ej");
+    ("Input.mediaWithInterpolation", "cid-1c8phv0", "csv-kusjgz css-11qknlj");
+    ("Input.multiVar", "cid-ckhvyf", "csv-1sq1nk7 css-nk32ej");
     ("Input.gridCss", "cid-nutj5n", "css-lgj0h8 css-bghlac css-16610y9");
     ("Input.scrollCss", "cid-1d2kyt3", "css-pdjuhq css-13v3rg8")]]
   let staticCss =
     CSS.make "label:staticCss cid-1ctni4v css-k008qs css-1tyndxa" []
   let dynamicCss color =
-    CSS.make "label:dynamicCss cid-71zk3w css-kusjgz css-k008qs"
+    CSS.make "label:dynamicCss cid-71zk3w csv-kusjgz css-k008qs"
       [("--color-1a279q8", (CSS.Types.Color.toString color))]
   let logicalProps spacing =
-    CSS.make "label:logicalProps cid-r1294l css-15a4g54"
+    CSS.make "label:logicalProps cid-r1294l csv-15a4g54"
       [("--spacing-y96o3b", (CSS.Types.MarginBlock.toString spacing));
       ("--spacing-vh5lkd", (CSS.Types.MarginInline.toString spacing));
       ("--spacing-f3qjr", (CSS.Types.Length.toString spacing))]
@@ -87,7 +87,7 @@
     CSS.make "label:complexMedia cid-yh1q8l css-lgj0h8 css-mhiow9 css-1nm9mde"
       []
   let mediaWithInterpolation color =
-    CSS.make "label:mediaWithInterpolation cid-1c8phv0 css-kusjgz css-11qknlj"
+    CSS.make "label:mediaWithInterpolation cid-1c8phv0 csv-kusjgz css-11qknlj"
       [("--color-1a279q8", (CSS.Types.Color.toString color))]
   let fadeIn = CSS.Types.AnimationName.make "keyframe-jw9oix"
   let slideUp = CSS.Types.AnimationName.make "keyframe-waibjx"
@@ -98,7 +98,7 @@
       let make _props = CSS.global_style_tag (to_string ())
     end
   let multiVar primary secondary size =
-    CSS.make "label:multiVar cid-ckhvyf css-1sq1nk7 css-nk32ej"
+    CSS.make "label:multiVar cid-ckhvyf csv-1sq1nk7 css-nk32ej"
       [("--primary-19vrfgr", (CSS.Types.Color.toString primary));
       ("--secondary-1dc81fi", (CSS.Types.Color.toString secondary));
       ("--size-3mc4ty", (CSS.Types.FontSize.toString size))]
@@ -144,12 +144,12 @@
   @property --size-3mc4ty{syntax:"*";inherits:false;}
   .css-k008qs{display:flex;}
   .css-1tyndxa{justify-content:center;}
-  .css-kusjgz{color:var(--color-1a279q8);}
-  .css-15a4g54{margin-block:var(--spacing-y96o3b);}
-  .css-15a4g54{margin-inline:var(--spacing-vh5lkd);}
-  .css-15a4g54{padding-block-start:var(--spacing-f3qjr);}
-  .css-15a4g54{-webkit-padding-inline-end:var(--spacing-f3qjr);padding-inline-end:var(--spacing-f3qjr);}
-  .css-15a4g54{inset-block-start:var(--spacing-f3qjr);}
+  .csv-kusjgz{color:var(--color-1a279q8);}
+  .csv-15a4g54{margin-block:var(--spacing-y96o3b);}
+  .csv-15a4g54{margin-inline:var(--spacing-vh5lkd);}
+  .csv-15a4g54{padding-block-start:var(--spacing-f3qjr);}
+  .csv-15a4g54{-webkit-padding-inline-end:var(--spacing-f3qjr);padding-inline-end:var(--spacing-f3qjr);}
+  .csv-15a4g54{inset-block-start:var(--spacing-f3qjr);}
   .css-zqnfaz:hover{opacity:0.8;}
   .css-osffsa .child{-webkit-flex:1;-ms-flex:1;flex:1;}
   @media (max-width: 768px) {.css-1ruz0a1{display:block;}}
@@ -165,9 +165,9 @@
   @media (max-width: 768px) {.css-11qknlj{opacity:0.8;}}
   @keyframes keyframe-jw9oix{from{opacity:0;}to{opacity:1;}}
   @keyframes keyframe-waibjx{0%{-webkit-transform:translateY(100%);-moz-transform:translateY(100%);-ms-transform:translateY(100%);transform:translateY(100%);}100%{-webkit-transform:translateY(0);-moz-transform:translateY(0);-ms-transform:translateY(0);transform:translateY(0);}}
-  .css-1sq1nk7{color:var(--primary-19vrfgr);}
-  .css-1sq1nk7{background-color:var(--secondary-1dc81fi);}
-  .css-1sq1nk7{font-size:var(--size-3mc4ty);}
+  .csv-1sq1nk7{color:var(--primary-19vrfgr);}
+  .csv-1sq1nk7{background-color:var(--secondary-1dc81fi);}
+  .csv-1sq1nk7{font-size:var(--size-3mc4ty);}
   .css-nk32ej{padding:10px;}
   .css-bghlac{grid-template-columns:1fr 2fr 1fr;}
   .css-16610y9{gap:20px;}

@@ -56,7 +56,7 @@ If this test fail means that the module is not in sync with the ppx
   [@css
     ".css-1ykgf7e{grid-template-columns:[linename1 linename2] 100px repeat(auto-fit, [linename1] 300px) [linename3];}"
   ];
-  [@css ".css-68fuud{grid-template-columns:var(--value-lltij1);}"];
+  [@css ".csv-68fuud{grid-template-columns:var(--value-lltij1);}"];
   [@css ".css-1p5ongh{grid-template-rows:none;}"];
   [@css ".css-1xkhlg{grid-template-rows:auto;}"];
   [@css ".css-1w8gpmy{grid-template-rows:100px;}"];
@@ -153,7 +153,7 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-img6o0{-ms-grid-row:auto / auto;grid-row:auto / auto;}"];
   [@css ".css-g317bb{-ms-grid-row:2 / span 2;grid-row:2 / span 2;}"];
   [@css ".css-1s9x97r{grid-area:1 / 1;}"];
-  [@css ".css-98twa{grid-area:var(--area-a9otef);}"];
+  [@css ".csv-98twa{grid-area:var(--area-a9otef);}"];
   [@css ".css-1furmtw{grid-area:1 / span 1;}"];
   [@css ".css-aq007a{grid-area:span 1 / 10 / -1;}"];
   [@css ".css-dat3cm{grid-column-gap:0;}"];
@@ -236,7 +236,7 @@ If this test fail means that the module is not in sync with the ppx
       CSS.pxFloat(10.),
     |]);
   CSS.make(
-    "css-68fuud",
+    "csv-68fuud",
     [("--value-lltij1", CSS.Types.GridTemplateColumns.toString(value))],
   );
   CSS.make("css-1p5ongh", []);
@@ -323,7 +323,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-1s9x97r", []);
   let area = `num(33);
   CSS.make(
-    "css-98twa",
+    "csv-98twa",
     [("--area-a9otef", CSS.Types.GridArea.toString(area))],
   );
   CSS.make("css-1furmtw", []);

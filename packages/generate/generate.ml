@@ -569,6 +569,93 @@ let is_namespace_statement rule =
     silently misplaced. *)
 let is_charset rule = String.starts_with ~prefix:"@charset" (String.trim rule)
 
+(** The leading `css-`/`csi-`/`csv-` atom class name in a rendered rule, if any
+    (atom-slot-keys phase 2 - see [Hash_class.slot_class] / [Class_format]).
+    Every atom this generator emits opens with its own class as a leading
+    compound-selector token, so the first occurrence in the rule text is always
+    the atom's own class. Returns [None] for anything else ([cid-]/[keyframe-]
+    classes, [@import]/[@namespace] statements, etc.) - those aren't this
+    check's concern. *)
+let atom_class_name rule_text =
+  (* Real output is lowercase base36 + '-', but this must not stop early on
+     other test-fixture shapes (existing generate.ml cram tests fabricate
+     raw [@@@css ...] payloads with hand-written names like ".css-A-y") -
+     under-matching here would truncate two different class names down to
+     the same "css-" prefix and report a false collision. *)
+  let is_class_char c =
+    (c >= 'a' && c <= 'z')
+    || (c >= 'A' && c <= 'Z')
+    || (c >= '0' && c <= '9')
+    || c = '-'
+    || c = '_'
+  in
+  let n = String.length rule_text in
+  let has_prefix i prefix =
+    let m = String.length prefix in
+    i + m <= n && String.sub rule_text i m = prefix
+  in
+  let rec scan i =
+    if i >= n then None
+    else if
+      rule_text.[i] = '.'
+      && (has_prefix (i + 1) "css-"
+         || has_prefix (i + 1) "csi-"
+         || has_prefix (i + 1) "csv-")
+    then (
+      let start = i + 1 in
+      let j = ref (start + 4) in
+      while !j < n && is_class_char rule_text.[!j] do
+        incr j
+      done;
+      Some (String.sub rule_text start (!j - start)))
+    else scan (i + 1)
+  in
+  scan 0
+
+(** Collision check for the new atom-class format: its value hash is only unique
+    within one (context, family[, mask]) bucket, not globally (see
+    [Class_format]'s doc comment), so a coincidental collision would otherwise
+    let two genuinely different atoms silently share one class - whichever rule
+    text is deduped away would then apply to every element using that class,
+    everywhere, for the OTHER atom's declaration too. Same shape as [Index]'s
+    `cid-` identity-collision check: same key, different content, is a hard
+    build error naming both sides, never a silently wrong stylesheet.
+
+    A `csv-` (interpolation-bundle) class is explicitly exempt, in both
+    directions - never recorded, never compared, never flagged. [Css_file.re]'s
+    bundling already, legitimately, gives several different declarations from
+    one binding the SAME class when they all carry a [$(...)] interpolation;
+    that is not a hash collision, it is the bundling mechanism working as
+    designed (see `.workplace/plans/atom-slot-keys_PLAN.md`'s "Collision check"
+    notes - an earlier, unconditional version of this check broke
+    `minify-interpolation.t` and the `reason-cx-*` snapshot tests for exactly
+    this reason). Call after [ordered_rules]'s exact-text dedup, so only
+    genuinely different rule bodies remain to compare. *)
+let check_atom_class_collisions rules =
+  let seen : (string, string) Hashtbl.t = Hashtbl.create 256 in
+  List.filter_map
+    (fun (rule, _layer) ->
+      match atom_class_name rule with
+      | None -> None
+      | Some class_name
+        when String.length class_name >= 4 && String.sub class_name 0 4 = "csv-"
+        ->
+        None
+      | Some class_name ->
+        (match Hashtbl.find_opt seen class_name with
+        | Some other when other <> rule ->
+          Some
+            (Printf.sprintf
+               "atom class collision: %S and %S both use class %S but render \
+                different CSS - a value-hash collision (astronomically \
+                unlikely by chance; rerun with a different --namespace on one \
+                side, or file an issue)."
+               other rule class_name)
+        | _ ->
+          Hashtbl.replace seen class_name rule;
+          None))
+    rules
+
 (** Collect, index, resolve, dedup, output. *)
 let run ~output_file ~order ~layers input_files =
   Logger.info "output file: %s"
@@ -672,19 +759,11 @@ let run ~output_file ~order ~layers input_files =
       end)
   in
 
-  (* atom-slot-keys phase 2 notes an atom class-name collision check was
-     designed here but deliberately NOT wired in - see the "Finding"
-     entry in .workplace/plans/atom-slot-keys_PLAN.md dated the same day:
-     Css_file.re's *interpolation bundling* already, legitimately, gives
-     several different declarations (e.g. margin/padding, each carrying a
-     `$(...)`) the SAME class today, and generate.ml has no way to tell
-     that apart from a genuine hash collision using rendered text alone.
-     Confirmed empirically: wiring the naive check in broke
-     packages/ppx/test/css-support/minify-interpolation.t and
-     packages/ppx/test/snapshot/reason/reason-cx-{full-integration,
-     box-shadow-border}.t, which all rely on exactly that bundling.
-     Revisit once phase 4 decides how the new format handles
-     interpolation bundles. *)
+  (match check_atom_class_collisions ordered_rules with
+  | [] -> ()
+  | msgs ->
+    List.iter (fun msg -> Logger.error "%s" msg) msgs;
+    exit 1);
 
   (* [@import] before [@namespace] (Cascade 5), each preserving its own
      relative order; everything else, [@layer] statements included, stays in

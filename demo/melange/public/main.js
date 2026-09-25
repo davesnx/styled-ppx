@@ -63204,7 +63204,7 @@ function getOrEmpty(str) {
 }
 function styles2(lolaOpt, param) {
   const lola = lolaOpt !== void 0 ? lolaOpt : px2(0);
-  return make7("label:Cositas cid-uk3qz7 css-k008qs css-cgq59l css-r0vq9t", {
+  return make7("label:Cositas cid-uk3qz7 css-k008qs css-cgq59l csv-r0vq9t", {
     hd: [
       "--lola-8erbae",
       Gap.toString(lola)
@@ -63296,7 +63296,7 @@ var toggle = make7(
 );
 var primary = hex2("141414");
 function keyframeDemoShell(color) {
-  return make7("label:keyframeDemoShell cid-8xpkpc css-19kzrtu css-i3pbo css-3kft4e css-1fi1jeb css-205zh2 css-kusjgz css-1e8vzlw", {
+  return make7("label:keyframeDemoShell cid-8xpkpc css-19kzrtu css-i3pbo css-3kft4e css-1fi1jeb css-205zh2 csv-kusjgz css-1e8vzlw", {
     hd: [
       "--color-1a279q8",
       Color.toString(color)
@@ -63331,7 +63331,7 @@ var resize2 = AnimationName.make({
     )
   }
 }, "keyframe-1kt58w0");
-var keyframeDemoCard = make7("label:keyframeDemoCard cid-jbn4tz css-1h7bkao css-65ee5x css-3pa72f css-iovuyg css-1c3l4rb css-i6bazn css-k008qs css-zcxndt css-1tyndxa css-1vw7svr css-1p3fawg css-kbn7if css-8c92kl", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
+var keyframeDemoCard = make7("label:keyframeDemoCard cid-jbn4tz csv-1h7bkao css-65ee5x css-3pa72f css-iovuyg css-1c3l4rb css-i6bazn css-k008qs css-zcxndt css-1tyndxa css-1vw7svr css-1p3fawg css-kbn7if css-8c92kl", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
 function Main(Props) {
   return JsxRuntime.jsxs("main", {
     children: [

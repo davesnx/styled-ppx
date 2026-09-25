@@ -17,25 +17,84 @@ let pow36 width =
 let hashed_field ~width s =
   to_base36_padded ~width (Murmur2.default_int s mod pow36 width)
 
-let context_width = 4
-let family_width = 3
+(* 2026-09-25 checkpoint tweak (team-lead/user): family 3->2, value 5->4,
+   context 4->5. [extended_width] is not a free choice - it must equal
+   [Slot_key.extended_hash_width] (Slot_key owns that constant, Class_format
+   only reads it, so the two can never drift out of sync - see its own doc
+   comment for why the dependency runs that direction). [bundle_value_width]
+   is the UPPER bound of a bundle atom's hash field, not a padded width like
+   the others: a bundle atom carries none of the other fields (see
+   [bundle_class] below), so it needs its own, globally-unique-scale hash
+   instead of one only unique within a (context,family[,mask]) bucket, and
+   {!bundle_class} deliberately reuses [Murmur2.default]'s own *unpadded*
+   base36 output (never [to_base36_padded]) so a bundle atom's length
+   distribution matches today's un-bucketed class-name hash exactly, not a
+   zero-padded, usually-longer stand-in for it. *)
+let context_width = 5
+let family_width = 2
 let mask_width = 3
-let value_width = 5
+let value_width = 4
+let extended_width = Slot_key.extended_hash_width
+let bundle_value_width = 7
+
+(* The four "extra" lengths beyond the fixed [family_width + value_width]
+   floor a non-bundle atom can have - context, mask, extended, or context
+   combined with either mask or extended (mask and extended never combine
+   with each other: a mask only ever applies to a [Registered] family, and
+   a marker family never has one - see [Slot_key.t.mask]/[family_id]).
+   Chosen so all six sums here
+   (0 and every non-empty combination) are pairwise distinct, which is what
+   lets a parser recover which optional fields are present from
+   [String.length] alone, with no shorthand table and no per-family
+   metadata - see slot_key.mli's module doc. Exposed so a test can assert
+   the "unambiguous" property directly against these values instead of
+   against a hard-coded table that could silently drift from the widths
+   above. *)
+let possible_extra_lengths =
+  [
+    0;
+    mask_width;
+    context_width;
+    extended_width;
+    context_width + mask_width;
+    context_width + extended_width;
+  ]
+
+(* Opaque to CSS.merge in both directions (see Slot_key.removes) - no
+   context/family/mask fields, since nothing about them is ever consulted
+   for a bundle atom. Exposed standalone (not just inlined in [slot_class])
+   so [Hash_class] can mint a real [csv-] class for [Css_file.re]'s
+   existing bundle path without needing to build a full, otherwise-unused
+   [Slot_key.t] just to reach it. Uses [Murmur2.default] directly, NOT
+   [hashed_field] - unpadded, so a bundle atom's hash digits are exactly
+   what they would be under today's [Hash_class.class_and_namespace] (only
+   the "css-" prefix changes to "csv-"), never zero-padded to
+   [bundle_value_width] (which would make short hashes needlessly longer
+   than today for no benefit - nothing about a bundle atom is ever parsed
+   back apart, so a fixed width buys this field nothing). *)
+let bundle_class content = "csv-" ^ Murmur2.default content
 
 let slot_class (slot : Slot_key.t) content =
-  let prefix = if slot.important then "csi" else "css" in
-  let context_part =
-    let key = Slot_key.context_key slot.context in
-    if key = "" then "" else hashed_field ~width:context_width key
-  in
-  let family_part =
-    to_base36_padded ~width:family_width (Slot_key.family_id_to_int slot.family)
-  in
-  let mask_part =
-    match slot.mask with
-    | None -> ""
-    | Some m -> to_base36_padded ~width:mask_width m
-  in
-  let value_part = hashed_field ~width:value_width content in
-  Printf.sprintf "%s-%s%s%s%s" prefix context_part family_part mask_part
-    value_part
+  if slot.bundle then bundle_class content
+  else (
+    let prefix = if slot.important then "csi" else "css" in
+    let context_part =
+      let key = Slot_key.context_key slot.context in
+      if key = "" then "" else hashed_field ~width:context_width key
+    in
+    let family_part =
+      to_base36_padded ~width:family_width (Slot_key.family_marker slot.family)
+    in
+    let extended_part =
+      match Slot_key.extended_hash slot.family with
+      | None -> ""
+      | Some h -> to_base36_padded ~width:extended_width h
+    in
+    let mask_part =
+      match slot.mask with
+      | None -> ""
+      | Some m -> to_base36_padded ~width:mask_width m
+    in
+    let value_part = hashed_field ~width:value_width content in
+    Printf.sprintf "%s-%s%s%s%s%s" prefix context_part family_part extended_part
+      mask_part value_part)

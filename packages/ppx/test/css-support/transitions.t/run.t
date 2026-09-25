@@ -92,46 +92,46 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-1i5ed1j{transition:1s 0.5s linear margin-right;}"];
   [@css ".css-1c2e7j{transition:display 4s allow-discrete;}"];
   [@css ".css-1c8vjvi{transition:all 0.5s ease-out allow-discrete;}"];
-  [@css ".css-1s53f4o{transition:var(--fullTransition-ahh0or);}"];
-  [@css ".css-7av9kq{transition:var(--fullTransition2-ezh8oo);}"];
+  [@css ".csv-1s53f4o{transition:var(--fullTransition-ahh0or);}"];
+  [@css ".csv-7av9kq{transition:var(--fullTransition2-ezh8oo);}"];
   [@css
-    ".css-vo6ojv{transition:var(--property-18qplnj) var(--duration-1iddlz) var(--timingFunction-vob4pv) var(--delay-cibt83) var(--behavior-108fus4);}"
+    ".csv-vo6ojv{transition:var(--property-18qplnj) var(--duration-1iddlz) var(--timingFunction-vob4pv) var(--delay-cibt83) var(--behavior-108fus4);}"
   ];
   [@css
-    ".css-7fw6lg{transition:var(--property-14kilfb) var(--duration-1ejdhyh) var(--timingFunction-1j1h4k7) var(--delay-pqgx10), var(--property3-s110ja) 0s;}"
+    ".csv-7fw6lg{transition:var(--property-14kilfb) var(--duration-1ejdhyh) var(--timingFunction-1j1h4k7) var(--delay-pqgx10), var(--property3-s110ja) 0s;}"
   ];
-  [@css ".css-mpxtlc{transition:var(--property-h7mj8c) 0.2s ease-out 3s;}"];
+  [@css ".csv-mpxtlc{transition:var(--property-h7mj8c) 0.2s ease-out 3s;}"];
   [@css
-    ".css-1inf0xc{transition:var(--property-1skeegy) 0.2s var(--timingFunction-1ftkhfa) 3s;}"
-  ];
-  [@css
-    ".css-g7n3fb{transition:var(--property-ivu2ul) var(--duration-kgrecx) var(--timingFunction-1p09x3l) 3s;}"
+    ".csv-1inf0xc{transition:var(--property-1skeegy) 0.2s var(--timingFunction-1ftkhfa) 3s;}"
   ];
   [@css
-    ".css-exsj4v{transition:margin-right var(--duration-oa45ow) ease-out var(--delay-dgz948);}"
+    ".csv-g7n3fb{transition:var(--property-ivu2ul) var(--duration-kgrecx) var(--timingFunction-1p09x3l) 3s;}"
   ];
   [@css
-    ".css-5zoj59{transition:var(--property-1fgs2tm) var(--duration-1n1s912) ease-out var(--delay-1ba13bw);}"
+    ".csv-exsj4v{transition:margin-right var(--duration-oa45ow) ease-out var(--delay-dgz948);}"
   ];
   [@css
-    ".css-1bqhenj{transition:margin-right 0.2s var(--timingFunction-1tn5ly2) 3s;}"
+    ".csv-5zoj59{transition:var(--property-1fgs2tm) var(--duration-1n1s912) ease-out var(--delay-1ba13bw);}"
   ];
   [@css
-    ".css-9qix23{transition:margin-right 0.2s ease-out var(--delay-16ruk7g);}"
-  ];
-  [@css ".css-13ygdrt{transition:var(--property-11bcg03) 0.2s ease-in;}"];
-  [@css
-    ".css-1ytrew9{transition:var(--property-dpf9r8) 0.2s var(--timingFunction-5iq5eh);}"
-  ];
-  [@css ".css-usxeae{transition:margin-right var(--duration-sueb4i) ease-in;}"];
-  [@css
-    ".css-zo5bqb{transition:var(--property-87e7ig) var(--duration-1rwycv) ease-in;}"
+    ".csv-1bqhenj{transition:margin-right 0.2s var(--timingFunction-1tn5ly2) 3s;}"
   ];
   [@css
-    ".css-1np81bt{transition:margin-right 0.2s var(--timingFunction-7aarh0);}"
+    ".csv-9qix23{transition:margin-right 0.2s ease-out var(--delay-16ruk7g);}"
   ];
-  [@css ".css-2kvqcx{transition:var(--property-1f94jkq) 0.2s;}"];
-  [@css ".css-sw4q0n{transition:margin-right var(--duration-fvn1cf);}"];
+  [@css ".csv-13ygdrt{transition:var(--property-11bcg03) 0.2s ease-in;}"];
+  [@css
+    ".csv-1ytrew9{transition:var(--property-dpf9r8) 0.2s var(--timingFunction-5iq5eh);}"
+  ];
+  [@css ".csv-usxeae{transition:margin-right var(--duration-sueb4i) ease-in;}"];
+  [@css
+    ".csv-zo5bqb{transition:var(--property-87e7ig) var(--duration-1rwycv) ease-in;}"
+  ];
+  [@css
+    ".csv-1np81bt{transition:margin-right 0.2s var(--timingFunction-7aarh0);}"
+  ];
+  [@css ".csv-2kvqcx{transition:var(--property-1f94jkq) 0.2s;}"];
+  [@css ".csv-sw4q0n{transition:margin-right var(--duration-fvn1cf);}"];
   
   CSS.make("css-3elsnu", []);
   CSS.make("css-1827oni", []);
@@ -185,7 +185,7 @@ If this test fail means that the module is not in sync with the ppx
       (),
     );
   CSS.make(
-    "css-1s53f4o",
+    "csv-1s53f4o",
     [
       (
         "--fullTransition-ahh0or",
@@ -200,7 +200,7 @@ If this test fail means that the module is not in sync with the ppx
       (),
     );
   CSS.make(
-    "css-7av9kq",
+    "csv-7av9kq",
     [
       (
         "--fullTransition2-ezh8oo",
@@ -210,7 +210,7 @@ If this test fail means that the module is not in sync with the ppx
   );
   
   CSS.make(
-    "css-vo6ojv",
+    "csv-vo6ojv",
     [
       ("--property-18qplnj", CSS.Types.TransitionProperty.toString(property)),
       ("--duration-1iddlz", CSS.Types.Time.toString(duration)),
@@ -223,7 +223,7 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.make(
-    "css-7fw6lg",
+    "csv-7fw6lg",
     [
       ("--property-14kilfb", CSS.Types.TransitionProperty.toString(property)),
       ("--duration-1ejdhyh", CSS.Types.Time.toString(duration)),
@@ -236,11 +236,11 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.make(
-    "css-mpxtlc",
+    "csv-mpxtlc",
     [("--property-h7mj8c", CSS.Types.TransitionProperty.toString(property))],
   );
   CSS.make(
-    "css-1inf0xc",
+    "csv-1inf0xc",
     [
       ("--property-1skeegy", CSS.Types.TransitionProperty.toString(property)),
       (
@@ -250,7 +250,7 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.make(
-    "css-g7n3fb",
+    "csv-g7n3fb",
     [
       ("--property-ivu2ul", CSS.Types.TransitionProperty.toString(property)),
       ("--duration-kgrecx", CSS.Types.Time.toString(duration)),
@@ -261,14 +261,14 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.make(
-    "css-exsj4v",
+    "csv-exsj4v",
     [
       ("--duration-oa45ow", CSS.Types.Time.toString(duration)),
       ("--delay-dgz948", CSS.Types.Time.toString(delay)),
     ],
   );
   CSS.make(
-    "css-5zoj59",
+    "csv-5zoj59",
     [
       ("--property-1fgs2tm", CSS.Types.TransitionProperty.toString(property)),
       ("--duration-1n1s912", CSS.Types.Time.toString(duration)),
@@ -276,7 +276,7 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.make(
-    "css-1bqhenj",
+    "csv-1bqhenj",
     [
       (
         "--timingFunction-1tn5ly2",
@@ -285,15 +285,15 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.make(
-    "css-9qix23",
+    "csv-9qix23",
     [("--delay-16ruk7g", CSS.Types.Time.toString(delay))],
   );
   CSS.make(
-    "css-13ygdrt",
+    "csv-13ygdrt",
     [("--property-11bcg03", CSS.Types.TransitionProperty.toString(property))],
   );
   CSS.make(
-    "css-1ytrew9",
+    "csv-1ytrew9",
     [
       ("--property-dpf9r8", CSS.Types.TransitionProperty.toString(property)),
       (
@@ -303,18 +303,18 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.make(
-    "css-usxeae",
+    "csv-usxeae",
     [("--duration-sueb4i", CSS.Types.Time.toString(duration))],
   );
   CSS.make(
-    "css-zo5bqb",
+    "csv-zo5bqb",
     [
       ("--property-87e7ig", CSS.Types.TransitionProperty.toString(property)),
       ("--duration-1rwycv", CSS.Types.Time.toString(duration)),
     ],
   );
   CSS.make(
-    "css-1np81bt",
+    "csv-1np81bt",
     [
       (
         "--timingFunction-7aarh0",
@@ -323,15 +323,15 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.make(
-    "css-13ygdrt",
+    "csv-13ygdrt",
     [("--property-11bcg03", CSS.Types.TransitionProperty.toString(property))],
   );
   CSS.make(
-    "css-usxeae",
+    "csv-usxeae",
     [("--duration-sueb4i", CSS.Types.Time.toString(duration))],
   );
   CSS.make(
-    "css-1np81bt",
+    "csv-1np81bt",
     [
       (
         "--timingFunction-7aarh0",
@@ -340,10 +340,10 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.make(
-    "css-2kvqcx",
+    "csv-2kvqcx",
     [("--property-1f94jkq", CSS.Types.TransitionProperty.toString(property))],
   );
   CSS.make(
-    "css-sw4q0n",
+    "csv-sw4q0n",
     [("--duration-fvn1cf", CSS.Types.Time.toString(duration))],
   );

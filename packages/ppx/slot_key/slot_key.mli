@@ -90,29 +90,44 @@ module Family : sig
   val full_mask_of : string -> int
 end
 
-(** A property/family's identity in the fixed, append-only table (see
-    slot_key.ml's [Registry]), or a hash-derived id when the table doesn't (yet)
-    know it, or the sentinel for CSS's [all]. [Registered]/ [Unregistered] carry
-    disjoint integer ranges (enforced in slot_key.ml) so a table hit and a hash
-    miss can never coincide; [Unregistered] further partitions custom ([--*])
-    properties into their own sub-range, which is what lets {!removes} recognize
-    "[former] is a custom property" from the integer alone, with no string
-    carried at runtime. *)
+(** A property/family's identity: a table index, or - when the property has no
+    table slot - a hash-derived id, distinguishing an ordinary property from a
+    custom ([--*]) one by constructor rather than by numeric range (the
+    2026-09-25 checkpoint tweak: the family field is 2 base36 chars, too narrow
+    to spare a whole reserved sub-range the way a wider field could), or the
+    sentinel for CSS's [all]. See {!family_marker}/ {!extended_hash} for how
+    this splits into the two class-name fields a non-[Registered] id actually
+    needs. *)
 type family_id =
   | Registered of int
   | Unregistered of int
+  | UnregisteredCustom of int
   | All
 
-(** [family_id]'s underlying integer - what a class name's family token actually
-    encodes. [All] is a single reserved sentinel value distinct from every real
-    family. *)
-val family_id_to_int : family_id -> int
+(** The family FIELD's own value - always exactly what [Class_format] writes
+    into the 2-char family slot: the table index for [Registered], or one of two
+    single reserved marker values for [Unregistered]/ [UnregisteredCustom]
+    (never the payload - that lives in {!extended_hash}), or the [all] sentinel.
+*)
+val family_marker : family_id -> int
+
+(** [Some hash] for [Unregistered]/[UnregisteredCustom] - the real identity a
+    marker in the family field says "look elsewhere for", encoded in its own
+    extended-hash class-name field (present only when {!family_marker} is one of
+    the two markers). [None] for [Registered]/[All], which need no second field.
+*)
+val extended_hash : family_id -> int option
+
+(** Width, in base36 chars, of the extended-hash field above - owned here (not
+    in [Class_format], which depends on this module) so the encoder and this
+    module's own hash-reduction stay in sync by construction. *)
+val extended_hash_width : int
 
 (** The property/family identity for one (already-normalized) property name:
     {!Family.family_key_of} looked up in the registry if the property
     participates in a shorthand relationship, otherwise the property's own name
     looked up directly. Always succeeds - an unknown property gets a stable
-    [Unregistered] id, never an error. *)
+    [Unregistered]/[UnregisteredCustom] id, never an error. *)
 val family_id_of : string -> family_id
 
 type t = {
@@ -123,6 +138,16 @@ type t = {
         property). [Some m] = a proper subset (a lone longhand, or a "family
         atom" mixing some-but-not-all members - see slot_key.ml's [of_atom]). *)
   important : bool;
+  bundle : bool;
+    (** True when any declaration in this atom carries a [$(...)] value
+        interpolation - [Css_file.re] already, legitimately, shares one class
+        across several such declarations from one binding today (see
+        slot_key.ml's [of_atom] for the exact duplicated check). {!removes}
+        never drops a bundle atom and never lets a bundle atom drop another -
+        both directions are unconditionally false whenever either side is a
+        bundle. Encoded as its own [csv-] class-name prefix (see
+        [Class_format]), which needs no context/family/mask fields at all, since
+        nothing about them is ever consulted. *)
 }
 
 (** Build the slot key for one atomized rule, exactly as [Css_file.re]'s
@@ -143,19 +168,21 @@ val of_atom : Styled_ppx_css_parser.Ast.rule -> t option
     is meant to override its left, [latter] should cause [former]'s class to be
     dropped from the left side.
 
-    Same contexts, then: if [latter.family = All], [former] is removed unless
-    its own (single, non-family) property is excluded from [all] (see
-    {!excluded_from_all} - carried here via [family_id]'s [Unregistered]
-    custom-property sub-range and two fixed [direction]/ [unicode-bidi] registry
-    entries, never a string). Otherwise, same [family], and [former.mask] is a
-    subset of [latter.mask] under the convention that [None] means "full":
-    [None]/[None] are equal (removed - the base case, two values of the same
-    plain property or the same bare shorthand); [Some _]/[None] is always a
-    subset (a later shorthand or family atom safely absorbs an earlier lone
-    longhand it covers); [None]/[Some _] is never a subset (a lone longhand
-    cannot remove a shorthand - it would silently drop the shorthand's other
-    legs; this direction stays stylesheet-order-dependent, see the plan's
-    "accepted limit"); [Some ma]/[Some mb] is a plain bitwise subset check.
-    Finally, [former] carrying [!important] blocks removal unless [latter] is
-    also [!important]. *)
+    [false] immediately if either side is a {!t.bundle} atom - bundles are
+    opaque to this decision in both directions. Otherwise: same contexts, then
+    if [latter.family = All], [former] is removed unless its own (single,
+    non-family) property is excluded from [all] (see {!excluded_from_all} -
+    carried here via [family_id]'s [UnregisteredCustom] constructor and two
+    fixed [direction]/ [unicode-bidi] registry entries, never a string).
+    Otherwise, same [family], and [former.mask] is a subset of [latter.mask]
+    under the convention that [None] means "full": [None]/[None] are equal
+    (removed - the base case, two values of the same plain property or the same
+    bare shorthand); [Some _]/[None] is always a subset (a later shorthand or
+    family atom safely absorbs an earlier lone longhand it covers);
+    [None]/[Some _] is never a subset (a lone longhand cannot remove a shorthand
+    \- it would silently drop the shorthand's other legs; this direction stays
+    stylesheet-order-dependent, see the plan's "accepted limit");
+    [Some ma]/[Some mb] is a plain bitwise subset check. Finally, [former]
+    carrying [!important] blocks removal unless [latter] is also [!important].
+*)
 val removes : former:t -> latter:t -> bool

@@ -40,13 +40,13 @@ If this test fail means that the module is not in sync with the ppx
     ".css-1jqkbxn{grid-template-columns:fit-content(20px) fit-content(10%);}"
   ];
   [@css
-    ".css-1wxdqmz{-webkit-text-decoration:var(--cosas-112i897);text-decoration:var(--cosas-112i897);}"
+    ".csv-1wxdqmz{-webkit-text-decoration:var(--cosas-112i897);text-decoration:var(--cosas-112i897);}"
   ];
   let cosas = `bold;
   
   CSS.make("css-1gtanqs css-1jqkbxn", []);
   
   CSS.make(
-    "css-1wxdqmz",
+    "csv-1wxdqmz",
     [("--cosas-112i897", CSS.Types.TextDecoration.toString(cosas))],
   );

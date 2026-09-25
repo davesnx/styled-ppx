@@ -1149,7 +1149,9 @@ module Css_transform = {
       ) {
       | [] => None
       | seeds =>
-        Some(Hash_class.class_and_namespace(String.concat("", seeds)))
+        Some(
+          Hash_class.bundle_class_and_namespace(String.concat("", seeds)),
+        )
       };
 
     let (shipped_rev, classes_rev, atom_infos_rev) =

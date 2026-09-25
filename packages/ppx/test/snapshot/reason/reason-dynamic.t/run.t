@@ -3,11 +3,11 @@
   $ refmt --parse ml --print re output.ml
   [@css "@property --var-1uix7by{syntax:\"*\";inherits:false;}"];
   [@css "@property --id-1ks2xuv{syntax:\"*\";inherits:false;}"];
-  [@css ".css-fhnx1u{color:var(--var-1uix7by);}"];
+  [@css ".csv-fhnx1u{color:var(--var-1uix7by);}"];
   [@css ".css-k008qs{display:flex;}"];
-  [@css ".css-fhnx1u{background-color:var(--id-1ks2xuv);}"];
+  [@css ".csv-fhnx1u{background-color:var(--id-1ks2xuv);}"];
   [@css.bindings
-    [("Output.DynamicComponent", "cid-1hmg1vc", "css-fhnx1u css-k008qs")]
+    [("Output.DynamicComponent", "cid-1hmg1vc", "csv-fhnx1u css-k008qs")]
   ];
   module DynamicComponent = {
     [@deriving abstract]
@@ -1000,7 +1000,7 @@
       "Object.assign";
     let styles = (~var, ~id, _) =>
       CSS.make(
-        "label:DynamicComponent cid-1hmg1vc css-fhnx1u css-k008qs",
+        "label:DynamicComponent cid-1hmg1vc csv-fhnx1u css-k008qs",
         [
           ("--var-1uix7by", CSS.Types.Color.toString(var)),
           ("--id-1ks2xuv", CSS.Types.Color.toString(id)),

@@ -34,13 +34,13 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-10cmjql{-webkit-line-clamp:2;}"];
   [@css ".css-1ojwqei{-webkit-overflow-scrolling:touch;}"];
   [@css ".css-150zphb{-webkit-tap-highlight-color:transparent;}"];
-  [@css ".css-wigs7p{-webkit-text-fill-color:var(--colorTextString-1or9u9e);}"];
+  [@css ".csv-wigs7p{-webkit-text-fill-color:var(--colorTextString-1or9u9e);}"];
   [@css ".css-cdkrf0{-webkit-animation:none;animation:none;}"];
   [@css
     ".css-17grcf8{-webkit-appearance:none;-moz-appearance:none;-ms-appearance:none;appearance:none;}"
   ];
   [@css ".css-12yqiim{aspect-ratio:21 / 8;}"];
-  [@css ".css-1ts9niw{background-color:var(--c-17nwon4);}"];
+  [@css ".csv-1ts9niw{background-color:var(--c-17nwon4);}"];
   [@css ".css-10ganm4{border:none;}"];
   [@css ".css-19xz56g{border:1px;}"];
   [@css ".css-1leqhxu{border:thin;}"];
@@ -63,7 +63,7 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-1l2ejxd{display:-webkit-box;}"];
   [@css ".css-1obf64m{display:contents;}"];
   [@css ".css-z920ed{display:table;}"];
-  [@css ".css-14lu6n6{fill:var(--c-1729nrm);}"];
+  [@css ".csv-14lu6n6{fill:var(--c-1729nrm);}"];
   [@css ".css-kqzqgg{fill:currentColor;}"];
   [@css ".css-lhfv11{gap:4px;}"];
   [@css ".css-14qxyc7{grid-column-end:span 2;}"];
@@ -85,7 +85,7 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-1ioybl{justify-self:unset;}"];
   [@css ".css-1h7rhel{left:unset;}"];
   [@css
-    ".css-riaouu{-webkit-mask-image:var(--maskedImageUrl-q8tx22);mask-image:var(--maskedImageUrl-q8tx22);}"
+    ".csv-riaouu{-webkit-mask-image:var(--maskedImageUrl-q8tx22);mask-image:var(--maskedImageUrl-q8tx22);}"
   ];
   [@css
     ".css-1wjck5z{-webkit-mask-position:center center;mask-position:center center;}"
@@ -99,7 +99,7 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-5d6l6w{resize:none;}"];
   [@css ".css-1pk6z4{right:calc(50% - 4px);}"];
   [@css ".css-50y1y6{stroke-opacity:0;}"];
-  [@css ".css-raxxd{stroke:var(--text-1dckpp2);}"];
+  [@css ".csv-raxxd{stroke:var(--text-1dckpp2);}"];
   [@css ".css-t83v5j{top:calc(50% - 1px);}"];
   [@css ".css-13m1c45{top:unset;}"];
   [@css ".css-z0sbrd{touch-action:none;}"];
@@ -128,19 +128,19 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-14lslom{border-width:thin;}"];
   [@css ".css-1dmcl79{outline-width:medium;}"];
   [@css ".css-1saehrx{outline:medium solid red;}"];
-  [@css ".css-1iid3yo{overflow:var(--lola-1i7n24a);}"];
+  [@css ".csv-1iid3yo{overflow:var(--lola-1i7n24a);}"];
   [@css ".css-i6bazn{overflow:hidden;}"];
-  [@css ".css-az2x0l{overflow-y:var(--lola-s8vp25);}"];
+  [@css ".csv-az2x0l{overflow-y:var(--lola-s8vp25);}"];
   [@css ".css-1kzo3b9{overflow-x:hidden;}"];
   [@css ".css-l7i9nl{overflow-block:hidden;}"];
-  [@css ".css-workd7{overflow-block:var(--value-d1jms4);}"];
-  [@css ".css-mbl9bh{overflow-inline:var(--value-4g8iss);}"];
+  [@css ".csv-workd7{overflow-block:var(--value-d1jms4);}"];
+  [@css ".csv-mbl9bh{overflow-inline:var(--value-4g8iss);}"];
   [@css
     ".css-p2a0mj{background-image:linear-gradient(84deg, #F80 0%, rgba(255, 255, 255, 0.8) 50%, #2A97FF 100%);}"
   ];
   [@css ".css-1amvr3s{aspect-ratio:16 / 9;}"];
-  [@css ".css-1ter7ii{right:var(--interpolation-it7nat);}"];
-  [@css ".css-1ter7ii{bottom:var(--interpolation-h66riu);}"];
+  [@css ".csv-1ter7ii{right:var(--interpolation-it7nat);}"];
+  [@css ".csv-1ter7ii{bottom:var(--interpolation-h66riu);}"];
   
   CSS.make("css-89hc5w", []);
   CSS.make("css-pdjuhq", []);
@@ -163,7 +163,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-1ojwqei", []);
   CSS.make("css-150zphb", []);
   CSS.make(
-    "css-wigs7p",
+    "csv-wigs7p",
     [
       (
         "--colorTextString-1or9u9e",
@@ -176,7 +176,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-12yqiim", []);
   
   let c = CSS.hex("e15a46");
-  CSS.make("css-1ts9niw", [("--c-17nwon4", CSS.Types.Color.toString(c))]);
+  CSS.make("csv-1ts9niw", [("--c-17nwon4", CSS.Types.Color.toString(c))]);
   
   CSS.make("css-10ganm4", []);
   
@@ -203,7 +203,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-1l2ejxd", []);
   CSS.make("css-1obf64m", []);
   CSS.make("css-z920ed", []);
-  CSS.make("css-14lu6n6", [("--c-1729nrm", CSS.Types.Paint.toString(c))]);
+  CSS.make("csv-14lu6n6", [("--c-1729nrm", CSS.Types.Paint.toString(c))]);
   CSS.make("css-kqzqgg", []);
   CSS.make("css-lhfv11", []);
   CSS.make("css-14qxyc7", []);
@@ -220,7 +220,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-1h7rhel", []);
   let maskedImageUrl = `url("https://www.example.com/eye-uncrossed.svg");
   CSS.make(
-    "css-riaouu",
+    "csv-riaouu",
     [
       ("--maskedImageUrl-q8tx22", CSS.Types.MaskImage.toString(maskedImageUrl)),
     ],
@@ -236,7 +236,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("css-pdjuhq", []);
   CSS.make("css-50y1y6", []);
   CSS.make(
-    "css-raxxd",
+    "csv-raxxd",
     [("--text-1dckpp2", CSS.Types.Paint.toString(Color.text))],
   );
   CSS.make("css-t83v5j", []);
@@ -265,12 +265,12 @@ If this test fail means that the module is not in sync with the ppx
   
   let lola = `hidden;
   CSS.make(
-    "css-1iid3yo",
+    "csv-1iid3yo",
     [("--lola-1i7n24a", CSS.Types.Overflow.toString(lola))],
   );
   CSS.make("css-i6bazn", []);
   CSS.make(
-    "css-az2x0l",
+    "csv-az2x0l",
     [("--lola-s8vp25", CSS.Types.OverflowY.toString(lola))],
   );
   CSS.make("css-1kzo3b9", []);
@@ -278,11 +278,11 @@ If this test fail means that the module is not in sync with the ppx
   let value = `clip;
   CSS.make("css-l7i9nl", []);
   CSS.make(
-    "css-workd7",
+    "csv-workd7",
     [("--value-d1jms4", CSS.Types.OverflowBlock.toString(value))],
   );
   CSS.make(
-    "css-mbl9bh",
+    "csv-mbl9bh",
     [("--value-4g8iss", CSS.Types.OverflowInline.toString(value))],
   );
   
@@ -294,7 +294,7 @@ If this test fail means that the module is not in sync with the ppx
   
   let interpolation = `px(10);
   CSS.make(
-    "css-1ter7ii",
+    "csv-1ter7ii",
     [
       ("--interpolation-it7nat", CSS.Types.Right.toString(interpolation)),
       ("--interpolation-h66riu", CSS.Types.Bottom.toString(interpolation)),

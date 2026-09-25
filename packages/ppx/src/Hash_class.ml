@@ -115,6 +115,23 @@ let class_and_namespace content =
 
 let class_name content = fst (class_and_namespace content)
 
+(* Same shape as [class_and_namespace] (a [(class_name, namespace)] pair
+   from one content hash), for [Css_file.re]'s bundle path specifically
+   (atom-slot-keys checkpoint, 2026-09-25): the CLASS half gets the new
+   [csv-] prefix (see [Class_format.bundle_class]) so `CSS.merge`'s future
+   runtime and `generate`'s atom-class collision check can recognize a
+   bundle atom and treat it as opaque - never dropped, never dropping
+   another atom, never flagged as a collision even though several
+   different declarations from one binding share it by design. The
+   NAMESPACE half is deliberately UNCHANGED (still [namespace_of_content],
+   `css-<hash>`) - it seeds every interpolation variable's name (see the
+   header's "atomic invariant"), and changing it would rename every
+   existing bundle's `var(--...)` custom properties for no reason; only
+   the class's own presentation needed to change, not the content-hash
+   input every variable name is still a pure function of. *)
+let bundle_class_and_namespace content =
+  Class_format.bundle_class content, namespace_of_content content
+
 (* -- Interpolation variables ------------------------------------------- *)
 
 (* A readable, CSS-identifier-safe prefix for an interpolation's source path.

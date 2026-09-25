@@ -10,24 +10,24 @@ merged styles cannot overwrite each other.
   $ refmt --parse ml --print re output.ml
   [@css "@property --backgroundColor-ov3le6{syntax:\"*\";inherits:false;}"];
   [@css "@property --backgroundColor-7yjmr3{syntax:\"*\";inherits:false;}"];
-  [@css ".css-160vrad{background-color:var(--backgroundColor-ov3le6);}"];
-  [@css ".css-10a6meq:hover{background-color:var(--backgroundColor-7yjmr3);}"];
+  [@css ".csv-160vrad{background-color:var(--backgroundColor-ov3le6);}"];
+  [@css ".csv-10a6meq:hover{background-color:var(--backgroundColor-7yjmr3);}"];
   [@css.bindings
     [
-      ("Output.common", "cid-45bzlz", "css-160vrad"),
-      ("Output.clickable", "cid-1d9eonh", "css-10a6meq"),
+      ("Output.common", "cid-45bzlz", "csv-160vrad"),
+      ("Output.clickable", "cid-1d9eonh", "csv-10a6meq"),
     ]
   ];
   let common = backgroundColor =>
     CSS.make(
-      "label:common cid-45bzlz css-160vrad",
+      "label:common cid-45bzlz csv-160vrad",
       [
         ("--backgroundColor-ov3le6", CSS.Types.Color.toString(backgroundColor)),
       ],
     );
   let clickable = backgroundColor =>
     CSS.make(
-      "label:clickable cid-1d9eonh css-10a6meq",
+      "label:clickable cid-1d9eonh csv-10a6meq",
       [
         ("--backgroundColor-7yjmr3", CSS.Types.Color.toString(backgroundColor)),
       ],

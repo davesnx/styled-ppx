@@ -397,6 +397,17 @@ deduped through `Set.Make(String)`, which sorted by hash-prefixed rule
 text and silently destroyed declaration order (regression test:
 `packages/generate/test/source-order.t`).
 
+**Atom class collision.** Right after that dedup pass, the aggregator
+scans the deduplicated rules for two different, non-bundle atoms
+(`css-`/`csi-` classes) that mint the same class name but render
+different CSS - the same shape as an identity collision above, applied
+to atom classes instead of `cid-` identities, and reported the same way
+(both rule bodies, the shared class, a `--namespace` remedy). `csv-`
+(interpolation-bundle) classes are exempt in both directions: several
+different bundle bodies sharing one class is that mechanism working as
+designed (see "Atomization" above), never a collision (see
+`packages/generate/test/atom-class-collision.t`).
+
 Before writing, `@import` rules are hoisted to the front of the
 deduplicated list, then `@namespace` rules right after them, each block
 keeping its own relative order, regardless of which library or module
@@ -486,6 +497,23 @@ mode — the binding's `let` name never appears in the class name. Two
 bindings whose declarations render to the same CSS text mint the same
 class, dev or production. Minting lives in
 `packages/ppx/src/Hash_class.ml`.
+
+One exception: an atom whose declaration carries a `$(...)` value
+interpolation mints `csv-<murmur2 hash>` instead - still the same hash
+digits, only the prefix differs (`Hash_class.bundle_class_and_namespace`).
+Several such declarations from one binding that all interpolate share
+ONE `csv-` class (the "bundle" - see `Css_file.re`'s `transform_rule_list`),
+collapsing their custom-property namespace into one; a `css-`/`csv-`
+class name's own `var(--...)` target is unaffected by this prefix
+either way, since only the CLASS half of `Hash_class.class_and_namespace`
+changed for this case, never the namespace/variable-naming half. The
+`csv-` prefix exists so a merge-key-aware `CSS.merge` (in progress, see
+`.workplace/plans/atom-slot-keys_PLAN.md`) can recognize a bundle atom
+and never drop it or let it drop another atom, and so
+`styled-ppx.generate`'s atom-class collision check ("Dedup and write"
+above) can skip it -
+several different bundle bodies legitimately sharing one class is the
+mechanism working as designed, not a hash collision.
 
 The environment is a PPX concern, set once per `(pps styled-ppx ...)`
 stanza: `--env production` (alias for `--minify`) only minifies rule

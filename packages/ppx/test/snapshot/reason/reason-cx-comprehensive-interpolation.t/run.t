@@ -20,48 +20,48 @@ Comprehensive test for cx2 interpolation with various property types
   [@css "@property --spacingVar-15s0ecx{syntax:\"*\";inherits:false;}"];
   [@css "@property --spacingVar-1m50b62{syntax:\"*\";inherits:false;}"];
   [@css "@property --width-18c1xss{syntax:\"*\";inherits:false;}"];
-  [@css ".css-b8f0pi{width:var(--lengthVar-1fwod6p);}"];
-  [@css ".css-b8f0pi{height:var(--lengthVar-5g6bk9);}"];
-  [@css ".css-b8f0pi{min-width:var(--lengthVar-1qqvx43);}"];
-  [@css ".css-b8f0pi{max-width:var(--lengthVar-11faw47);}"];
-  [@css ".css-1swajk7{margin-top:var(--lengthVar-oy21bt);}"];
-  [@css ".css-1swajk7{margin-bottom:var(--lengthVar-oy21bt);}"];
-  [@css ".css-1swajk7{padding-left:var(--lengthVar-1lpa833);}"];
-  [@css ".css-1swajk7{padding-right:var(--lengthVar-1lpa833);}"];
-  [@css ".css-1i6vyy6{gap:var(--lengthVar-vh1osb);}"];
-  [@css ".css-1i6vyy6{row-gap:var(--lengthVar-vh1osb);}"];
+  [@css ".csv-b8f0pi{width:var(--lengthVar-1fwod6p);}"];
+  [@css ".csv-b8f0pi{height:var(--lengthVar-5g6bk9);}"];
+  [@css ".csv-b8f0pi{min-width:var(--lengthVar-1qqvx43);}"];
+  [@css ".csv-b8f0pi{max-width:var(--lengthVar-11faw47);}"];
+  [@css ".csv-1swajk7{margin-top:var(--lengthVar-oy21bt);}"];
+  [@css ".csv-1swajk7{margin-bottom:var(--lengthVar-oy21bt);}"];
+  [@css ".csv-1swajk7{padding-left:var(--lengthVar-1lpa833);}"];
+  [@css ".csv-1swajk7{padding-right:var(--lengthVar-1lpa833);}"];
+  [@css ".csv-1i6vyy6{gap:var(--lengthVar-vh1osb);}"];
+  [@css ".csv-1i6vyy6{row-gap:var(--lengthVar-vh1osb);}"];
   [@css
-    ".css-1i6vyy6{-webkit-column-gap:var(--lengthVar-vh1osb);column-gap:var(--lengthVar-vh1osb);}"
+    ".csv-1i6vyy6{-webkit-column-gap:var(--lengthVar-vh1osb);column-gap:var(--lengthVar-vh1osb);}"
   ];
-  [@css ".css-1vzwmoy{color:var(--colorVar-14sye4i);}"];
-  [@css ".css-1vzwmoy{background-color:var(--colorVar-14sye4i);}"];
-  [@css ".css-1vzwmoy{border-top-color:var(--colorVar-14sye4i);}"];
-  [@css ".css-ycpa9s{flex-basis:var(--flexBasisVar-16vl5bp);}"];
-  [@css ".css-1knt7y9{grid-row-start:var(--gridLineVar-1qxvc00);}"];
-  [@css ".css-1knt7y9{grid-column-end:var(--gridLineVar-175omdk);}"];
-  [@css ".css-1d6x35p{top:var(--topVar-1iqysbe);}"];
-  [@css ".css-1d6x35p{bottom:var(--topVar-10dkp5m);}"];
-  [@css ".css-1bkxgpr{z-index:var(--zIndexVar-osv02l);}"];
-  [@css ".css-1bezkxi{border-top-width:var(--borderWidthVar-1nwhzbd);}"];
-  [@css ".css-1bezkxi{border-width:var(--borderWidthVar-1nwhzbd);}"];
-  [@css ".css-zoi7e9{letter-spacing:var(--spacingVar-15s0ecx);}"];
-  [@css ".css-zoi7e9{word-spacing:var(--spacingVar-1m50b62);}"];
-  [@css ".css-1dfkyy8{width:var(--width-18c1xss);}"];
+  [@css ".csv-1vzwmoy{color:var(--colorVar-14sye4i);}"];
+  [@css ".csv-1vzwmoy{background-color:var(--colorVar-14sye4i);}"];
+  [@css ".csv-1vzwmoy{border-top-color:var(--colorVar-14sye4i);}"];
+  [@css ".csv-ycpa9s{flex-basis:var(--flexBasisVar-16vl5bp);}"];
+  [@css ".csv-1knt7y9{grid-row-start:var(--gridLineVar-1qxvc00);}"];
+  [@css ".csv-1knt7y9{grid-column-end:var(--gridLineVar-175omdk);}"];
+  [@css ".csv-1d6x35p{top:var(--topVar-1iqysbe);}"];
+  [@css ".csv-1d6x35p{bottom:var(--topVar-10dkp5m);}"];
+  [@css ".csv-1bkxgpr{z-index:var(--zIndexVar-osv02l);}"];
+  [@css ".csv-1bezkxi{border-top-width:var(--borderWidthVar-1nwhzbd);}"];
+  [@css ".csv-1bezkxi{border-width:var(--borderWidthVar-1nwhzbd);}"];
+  [@css ".csv-zoi7e9{letter-spacing:var(--spacingVar-15s0ecx);}"];
+  [@css ".csv-zoi7e9{word-spacing:var(--spacingVar-1m50b62);}"];
+  [@css ".csv-1dfkyy8{width:var(--width-18c1xss);}"];
   [@css ".css-73nay0{height:100px;}"];
   [@css ".css-tokvmb{color:red;}"];
   [@css.bindings
     [
-      ("Output.test1", "cid-1jhxcqu", "css-b8f0pi"),
-      ("Output.test2", "cid-zesghj", "css-1swajk7"),
-      ("Output.test3", "cid-12rsoz0", "css-1i6vyy6"),
-      ("Output.test4", "cid-puktrw", "css-1vzwmoy"),
-      ("Output.test5", "cid-1nw36ql", "css-ycpa9s"),
-      ("Output.test6", "cid-7ivz4", "css-1knt7y9"),
-      ("Output.test7", "cid-iq7p3", "css-1d6x35p"),
-      ("Output.test8", "cid-yq2qob", "css-1bkxgpr"),
-      ("Output.test9", "cid-1u4o5z6", "css-1bezkxi"),
-      ("Output.test10", "cid-1egwgp0", "css-zoi7e9"),
-      ("Output.test11", "cid-16lxxsk", "css-1dfkyy8 css-73nay0 css-tokvmb"),
+      ("Output.test1", "cid-1jhxcqu", "csv-b8f0pi"),
+      ("Output.test2", "cid-zesghj", "csv-1swajk7"),
+      ("Output.test3", "cid-12rsoz0", "csv-1i6vyy6"),
+      ("Output.test4", "cid-puktrw", "csv-1vzwmoy"),
+      ("Output.test5", "cid-1nw36ql", "csv-ycpa9s"),
+      ("Output.test6", "cid-7ivz4", "csv-1knt7y9"),
+      ("Output.test7", "cid-iq7p3", "csv-1d6x35p"),
+      ("Output.test8", "cid-yq2qob", "csv-1bkxgpr"),
+      ("Output.test9", "cid-1u4o5z6", "csv-1bezkxi"),
+      ("Output.test10", "cid-1egwgp0", "csv-zoi7e9"),
+      ("Output.test11", "cid-16lxxsk", "csv-1dfkyy8 css-73nay0 css-tokvmb"),
     ]
   ];
   let lengthVar = CSS.px(10);
@@ -70,7 +70,7 @@ Comprehensive test for cx2 interpolation with various property types
   let autoVar = `auto;
   let test1 =
     CSS.make(
-      "label:test1 cid-1jhxcqu css-b8f0pi",
+      "label:test1 cid-1jhxcqu csv-b8f0pi",
       [
         ("--lengthVar-1fwod6p", CSS.Types.Width.toString(lengthVar)),
         ("--lengthVar-5g6bk9", CSS.Types.Height.toString(lengthVar)),
@@ -80,7 +80,7 @@ Comprehensive test for cx2 interpolation with various property types
     );
   let test2 =
     CSS.make(
-      "label:test2 cid-zesghj css-1swajk7",
+      "label:test2 cid-zesghj csv-1swajk7",
       [
         ("--lengthVar-oy21bt", CSS.Types.Margin.toString(lengthVar)),
         ("--lengthVar-1lpa833", CSS.Types.Length.toString(lengthVar)),
@@ -88,18 +88,18 @@ Comprehensive test for cx2 interpolation with various property types
     );
   let test3 =
     CSS.make(
-      "label:test3 cid-12rsoz0 css-1i6vyy6",
+      "label:test3 cid-12rsoz0 csv-1i6vyy6",
       [("--lengthVar-vh1osb", CSS.Types.Gap.toString(lengthVar))],
     );
   let test4 =
     CSS.make(
-      "label:test4 cid-puktrw css-1vzwmoy",
+      "label:test4 cid-puktrw csv-1vzwmoy",
       [("--colorVar-14sye4i", CSS.Types.Color.toString(colorVar))],
     );
   let flexBasisVar = CSS.px(100);
   let test5 =
     CSS.make(
-      "label:test5 cid-1nw36ql css-ycpa9s",
+      "label:test5 cid-1nw36ql csv-ycpa9s",
       [
         ("--flexBasisVar-16vl5bp", CSS.Types.FlexBasis.toString(flexBasisVar)),
       ],
@@ -107,7 +107,7 @@ Comprehensive test for cx2 interpolation with various property types
   let gridLineVar = `auto;
   let test6 =
     CSS.make(
-      "label:test6 cid-7ivz4 css-1knt7y9",
+      "label:test6 cid-7ivz4 csv-1knt7y9",
       [
         ("--gridLineVar-1qxvc00", CSS.Types.GridRowStart.toString(gridLineVar)),
         (
@@ -119,7 +119,7 @@ Comprehensive test for cx2 interpolation with various property types
   let topVar = CSS.px(20);
   let test7 =
     CSS.make(
-      "label:test7 cid-iq7p3 css-1d6x35p",
+      "label:test7 cid-iq7p3 csv-1d6x35p",
       [
         ("--topVar-1iqysbe", CSS.Types.Top.toString(topVar)),
         ("--topVar-10dkp5m", CSS.Types.Bottom.toString(topVar)),
@@ -128,13 +128,13 @@ Comprehensive test for cx2 interpolation with various property types
   let zIndexVar = `num(10);
   let test8 =
     CSS.make(
-      "label:test8 cid-yq2qob css-1bkxgpr",
+      "label:test8 cid-yq2qob csv-1bkxgpr",
       [("--zIndexVar-osv02l", CSS.Types.ZIndex.toString(zIndexVar))],
     );
   let borderWidthVar = `medium;
   let test9 =
     CSS.make(
-      "label:test9 cid-1u4o5z6 css-1bezkxi",
+      "label:test9 cid-1u4o5z6 csv-1bezkxi",
       [
         (
           "--borderWidthVar-1nwhzbd",
@@ -145,7 +145,7 @@ Comprehensive test for cx2 interpolation with various property types
   let spacingVar = CSS.px(2);
   let test10 =
     CSS.make(
-      "label:test10 cid-1egwgp0 css-zoi7e9",
+      "label:test10 cid-1egwgp0 csv-zoi7e9",
       [
         ("--spacingVar-15s0ecx", CSS.Types.LetterSpacing.toString(spacingVar)),
         ("--spacingVar-1m50b62", CSS.Types.WordSpacing.toString(spacingVar)),
@@ -153,6 +153,6 @@ Comprehensive test for cx2 interpolation with various property types
     );
   let test11 = width =>
     CSS.make(
-      "label:test11 cid-16lxxsk css-1dfkyy8 css-73nay0 css-tokvmb",
+      "label:test11 cid-16lxxsk csv-1dfkyy8 css-73nay0 css-tokvmb",
       [("--width-18c1xss", CSS.Types.Width.toString(width))],
     );

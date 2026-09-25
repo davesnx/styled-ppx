@@ -49,7 +49,7 @@ This test ensures declaration lists accept nested selectors and `@media` blocks 
   
   let _case14 = borderColor =>
     CSS.make(
-      "label:_case14 cid-1day2ma css-17mmn6x css-yhnnmp css-dyk6wi",
+      "label:_case14 cid-1day2ma csv-17mmn6x css-yhnnmp css-dyk6wi",
       [("--borderColor-knlnef", CSS.Types.Color.toString(borderColor))],
     );
 

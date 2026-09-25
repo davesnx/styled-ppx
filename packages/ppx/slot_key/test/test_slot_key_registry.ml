@@ -58,7 +58,8 @@ let live_css_grammar_properties =
 
 let is_registered = function
   | Slot_key.Registered _ -> true
-  | Slot_key.Unregistered _ | Slot_key.All -> false
+  | Slot_key.Unregistered _ | Slot_key.UnregisteredCustom _ | Slot_key.All ->
+    false
 
 let coverage_tests =
   [
@@ -91,7 +92,8 @@ let coverage_tests =
       let p = "totally-invented-property-not-in-css-grammar-xyz" in
       match Slot_key.family_id_of p with
       | Unregistered _ -> ()
-      | Registered _ | All -> Alcotest.fail "expected Unregistered");
+      | Registered _ | UnregisteredCustom _ | All ->
+        Alcotest.fail "expected Unregistered");
   ]
 
 (* --- family graph sanity, now fed by css-grammar's live Shorthand data - *)

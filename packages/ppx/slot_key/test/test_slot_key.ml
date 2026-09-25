@@ -125,7 +125,8 @@ let registry_tests =
       (fun () ->
       match Slot_key.family_id_of "height" with
       | Registered _ -> ()
-      | Unregistered _ | All -> Alcotest.fail "expected Registered");
+      | Unregistered _ | UnregisteredCustom _ | All ->
+        Alcotest.fail "expected Registered");
     Alcotest_extra.test "family_id_of is deterministic" (fun () ->
       check_bool "same twice" true
         (Slot_key.family_id_of "margin-top" = Slot_key.family_id_of "margin-top"));
@@ -144,7 +145,16 @@ let registry_tests =
         (Slot_key.family_id_of p = Slot_key.family_id_of p);
       match Slot_key.family_id_of p with
       | Unregistered _ -> ()
-      | Registered _ | All -> Alcotest.fail "expected Unregistered");
+      | Registered _ | UnregisteredCustom _ | All ->
+        Alcotest.fail "expected Unregistered");
+    Alcotest_extra.test
+      "a custom property gets UnregisteredCustom, not the plain Unregistered \
+       marker (distinguishable by constructor, not by a numeric range)"
+      (fun () ->
+      match Slot_key.family_id_of "--some-custom-prop" with
+      | UnregisteredCustom _ -> ()
+      | Registered _ | Unregistered _ | All ->
+        Alcotest.fail "expected UnregisteredCustom");
     Alcotest_extra.test
       "two different custom properties get different family ids (not bucketed \
        together)" (fun () ->
@@ -153,16 +163,40 @@ let registry_tests =
     Alcotest_extra.test "all gets the reserved All sentinel" (fun () ->
       match Slot_key.family_id_of "all" with
       | All -> ()
-      | Registered _ | Unregistered _ -> Alcotest.fail "expected All");
-    Alcotest_extra.test "registered and unregistered ranges never overlap"
-      (fun () ->
+      | Registered _ | Unregistered _ | UnregisteredCustom _ ->
+        Alcotest.fail "expected All");
+    Alcotest_extra.test
+      "the family marker for Registered/Unregistered/UnregisteredCustom/All \
+       never overlap" (fun () ->
       let registered =
-        Slot_key.family_id_to_int (Slot_key.family_id_of "height")
+        Slot_key.family_marker (Slot_key.family_id_of "height")
       in
       let unregistered =
-        Slot_key.family_id_to_int (Slot_key.family_id_of "--some-custom-prop")
+        Slot_key.family_marker
+          (Slot_key.family_id_of "totally-unregistered-property-xyz")
       in
-      check_bool "disjoint" true (registered <> unregistered));
+      let custom =
+        Slot_key.family_marker (Slot_key.family_id_of "--some-custom-prop")
+      in
+      let all = Slot_key.family_marker (Slot_key.family_id_of "all") in
+      check_bool "all four distinct" true
+        (List.length
+           (List.sort_uniq compare [ registered; unregistered; custom; all ])
+        = 4));
+    Alcotest_extra.test
+      "extended_hash is Some for Unregistered/UnregisteredCustom, None for \
+       Registered/All" (fun () ->
+      check_bool "registered -> None" true
+        (Slot_key.extended_hash (Slot_key.family_id_of "height") = None);
+      check_bool "all -> None" true
+        (Slot_key.extended_hash (Slot_key.family_id_of "all") = None);
+      check_bool "unregistered -> Some" true
+        (Slot_key.extended_hash
+           (Slot_key.family_id_of "totally-unregistered-property-xyz")
+        <> None);
+      check_bool "custom -> Some" true
+        (Slot_key.extended_hash (Slot_key.family_id_of "--some-custom-prop")
+        <> None));
   ]
 
 let removes_tests =
@@ -394,6 +428,34 @@ let removes_tests =
         (Slot_key.removes
            ~former:(slot_of "--not-a-real-thing-but-also-not-custom-syntax: 1;")
            ~latter:(slot_of "--not-a-real-thing-but-also-not-custom-syntax: 2;")));
+    (* --- interpolation bundles: opaque to removes in both directions --- *)
+    Alcotest_extra.test
+      "a declaration with a $(...) value interpolation is a bundle atom"
+      (fun () -> check_bool "bundle" true (slot_of "color: $(theme);").bundle);
+    Alcotest_extra.test "a plain declaration is not a bundle atom" (fun () ->
+      check_bool "bundle" false (slot_of "color: red;").bundle);
+    Alcotest_extra.test
+      "a bundle atom is never removed, even by an identical same-property atom \
+       (would be true for two plain atoms - see the base test above)" (fun () ->
+      check_bool "removes" false
+        (Slot_key.removes ~former:(slot_of "color: $(a);")
+           ~latter:(slot_of "color: $(b);")));
+    Alcotest_extra.test "a bundle atom never removes a plain atom" (fun () ->
+      check_bool "removes" false
+        (Slot_key.removes ~former:(slot_of "color: red;")
+           ~latter:(slot_of "color: $(theme);")));
+    Alcotest_extra.test "a plain atom never removes a bundle atom" (fun () ->
+      check_bool "removes" false
+        (Slot_key.removes
+           ~former:(slot_of "color: $(theme);")
+           ~latter:(slot_of "color: red;")));
+    Alcotest_extra.test
+      "a bundle atom is immune even to a same-property !important override \
+       (bundle status overrides the !important rule too)" (fun () ->
+      check_bool "removes" false
+        (Slot_key.removes
+           ~former:(slot_of "color: $(theme);")
+           ~latter:(slot_of "color: red !important;")));
   ]
 
 let () =
