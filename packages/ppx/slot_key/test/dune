@@ -1,0 +1,10 @@
+(test
+ (name test_slot_key)
+ (modules test_slot_key)
+ (libraries alcotest alcotest_extra slot_key styled_ppx_css_parser))
+
+(rule
+ (alias test-slot-key)
+ (deps test_slot_key.exe)
+ (action
+  (run %{deps})))

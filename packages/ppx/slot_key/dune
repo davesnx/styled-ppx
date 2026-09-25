@@ -1,0 +1,6 @@
+(library
+ (name slot_key)
+ ; Standalone algorithm, no ppxlib/runtime dependency. Depended on by `ppx`
+ ; once wired in (see .workplace/plans/atom-slot-keys_PLAN.md); not wired yet.
+ (package styled-ppx)
+ (libraries murmur2 styled_ppx_css_parser))
