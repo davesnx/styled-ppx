@@ -63299,7 +63299,7 @@ var AppGlobalStyles = {
   make: make8
 };
 var stack = make7(
-  "label:stack cid-195s1dh css-k008qs css-cgq59l",
+  "label:stack id-195s1dh a-k008qs a-cgq59l",
   /* [] */
   0
 );
@@ -63312,7 +63312,7 @@ function getOrEmpty(str) {
 }
 function styles2(lolaOpt, param) {
   const lola = lolaOpt !== void 0 ? lolaOpt : px2(0);
-  return make7("label:Cositas cid-uk3qz7 css-k008qs css-cgq59l css-r0vq9t", {
+  return make7("label:Cositas id-uk3qz7 a-k008qs a-cgq59l in-r0vq9t", {
     hd: [
       "--lola-8erbae",
       Gap.toString(lola)
@@ -63344,38 +63344,38 @@ var Cositas = {
   make: make$12
 };
 var selectors = make7(
-  "label:selectors cid-pm05s2 css-tokvmb css-12qnfjo",
+  "label:selectors id-pm05s2 a-tokvmb a-12qnfjo",
   /* [] */
   0
 );
-var bounce = AnimationName.make(void 0, "keyframe-deb5ee");
+var bounce = AnimationName.make(void 0, "k-deb5ee");
 var clx = make7(
-  "label:clx cid-47oj19 css-1e8vzlw css-u70tf2 css-1j9jp3a",
+  "label:clx id-47oj19 a-1e8vzlw a-u70tf2 a-1j9jp3a",
   /* [] */
   0
 );
 var post = make7(
-  "label:post cid-gbz02q css-1y5r52a css-3qzm71",
+  "label:post id-gbz02q a-1y5r52a a-3qzm71",
   /* [] */
   0
 );
 var card = make7(
-  "label:card cid-ebd8w7 css-eaeacs css-25k368 css-3fuzg5",
+  "label:card id-ebd8w7 a-eaeacs a-25k368 a-3fuzg5",
   /* [] */
   0
 );
 var container = make7(
-  "label:container cid-1hzr7q6 css-nqqinc css-w3aeeb css-5x3p37 css-stwpj2",
+  "label:container id-1hzr7q6 a-nqqinc a-w3aeeb a-5x3p37 a-stwpj2",
   /* [] */
   0
 );
 var gradiend = make7(
-  "label:gradiend cid-j1a2e7 css-1wlyyxm css-qelxhy",
+  "label:gradiend id-j1a2e7 a-1wlyyxm a-qelxhy",
   /* [] */
   0
 );
 var tag = make7(
-  "label:tag cid-1a86vzz css-1baulvz css-7ji1gv css-1isemmb css-3kft4e css-wtpnzt",
+  "label:tag id-1a86vzz a-1baulvz a-7ji1gv a-1isemmb a-3kft4e a-wtpnzt",
   /* [] */
   0
 );
@@ -63383,28 +63383,28 @@ var Labels = {
   tag
 };
 var childLabel = make7(
-  "label:childLabel cid-6prbgi css-in3yi3",
+  "label:childLabel id-6prbgi a-in3yi3",
   /* [] */
   0
 );
 var parentWithChildSelector = make7(
-  "label:parentWithChildSelector cid-1wu39qc css-o32ik7 css-19midj6 css-1qm1lh css-1xhar4a css-yd4yye",
+  "label:parentWithChildSelector id-1wu39qc a-o32ik7 a-19midj6 a-1qm1lh a-1xhar4a a-yd4yye",
   /* [] */
   0
 );
 var modifierActive = make7(
-  "label:modifierActive cid-h4gfxd css-in3yi3",
+  "label:modifierActive id-h4gfxd a-in3yi3",
   /* [] */
   0
 );
 var toggle = make7(
-  "label:toggle cid-mfk87c css-1baulvz css-12hizlt css-12z0wuy css-s67z9l css-pk71pq css-gwf734 css-145kqdj",
+  "label:toggle id-mfk87c a-1baulvz a-12hizlt a-12z0wuy a-s67z9l a-pk71pq a-gwf734 a-145kqdj",
   /* [] */
   0
 );
 var primary = hex2("141414");
 function keyframeDemoShell(color) {
-  return make7("label:keyframeDemoShell cid-8xpkpc css-19kzrtu css-i3pbo css-3kft4e css-1fi1jeb css-205zh2 css-kusjgz css-1e8vzlw", {
+  return make7("label:keyframeDemoShell id-8xpkpc a-19kzrtu a-i3pbo a-3kft4e a-1fi1jeb a-205zh2 in-kusjgz a-1e8vzlw", {
     hd: [
       "--color-1a279q8",
       Color.toString(color)
@@ -63438,8 +63438,8 @@ var resize2 = AnimationName.make({
       0
     )
   }
-}, "keyframe-1kt58w0");
-var keyframeDemoCard = make7("label:keyframeDemoCard cid-jbn4tz css-1h7bkao css-65ee5x css-3pa72f css-iovuyg css-1c3l4rb css-i6bazn css-k008qs css-zcxndt css-1tyndxa css-1vw7svr css-1p3fawg css-kbn7if css-8c92kl", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
+}, "k-1kt58w0");
+var keyframeDemoCard = make7("label:keyframeDemoCard id-jbn4tz in-1h7bkao a-65ee5x a-3pa72f a-iovuyg a-1c3l4rb a-i6bazn a-k008qs a-zcxndt a-1tyndxa a-1vw7svr a-1p3fawg a-kbn7if a-8c92kl", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
 function Main(Props) {
   return JsxRuntime.jsxs("main", {
     children: [
