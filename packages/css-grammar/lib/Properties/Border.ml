@@ -383,6 +383,15 @@ module Property_border_right_width =
 let property_border_right_width : property_border_right_width Rule.rule =
   Property_border_right_width.rule
 
+(* CSS Borders and Box Decorations L4: https://drafts.csswg.org/css-borders-4/#propdef-border-shape *)
+module Property_border_shape =
+  [%spec_module
+  "'none' | [ <basic-shape> <geometry-box>? ]{1,2}",
+  (module Css_types.BorderShape)]
+
+let property_border_shape : property_border_shape Rule.rule =
+  Property_border_shape.rule
+
 module Property_border_spacing =
   [%spec_module
   "<extended-length> [ <extended-length> ]?", (module Css_types.BorderSpacing)]
@@ -610,6 +619,7 @@ let entries : (kind * packed_rule) list =
       pack_module (module Property_border_right_style) );
     ( Property "border-right-width",
       pack_module (module Property_border_right_width) );
+    Property "border-shape", pack_module (module Property_border_shape);
     Property "border-spacing", pack_module (module Property_border_spacing);
     ( Property "border-start-end-radius",
       pack_module (module Property_border_start_end_radius) );

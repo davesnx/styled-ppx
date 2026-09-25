@@ -737,6 +737,15 @@ let seed : string array =
     "y";
     "z-index";
     "zoom";
+    (* Appended 2026-09-25 (css-grammar-missing-properties): newly registered
+       properties, none a shorthand family, so each gets its own entry. *)
+    "border-shape";
+    "flow-tolerance";
+    "frame-sizing";
+    "scroll-axis-lock";
+    "view-transition-group";
+    "view-transition-scope";
+    "window-drag";
   |]
 
 module Registry = struct

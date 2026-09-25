@@ -8,6 +8,17 @@ module Property_scroll_behavior =
 let property_scroll_behavior : property_scroll_behavior Rule.rule =
   Property_scroll_behavior.rule
 
+(* CSS Overflow L5: https://drafts.csswg.org/css-overflow-5/#propdef-scroll-axis-lock
+   Reuses Css_types.ForcedColorAdjust (a safe superset: auto | none |
+   preserve-parent-color), same precedent as ForcedColorAdjust.ml's
+   -ms-high-contrast-adjust, which is also plainly 'auto' | 'none'. *)
+module Property_scroll_axis_lock =
+  [%spec_module
+  "'auto' | 'none'", (module Css_types.ForcedColorAdjust)]
+
+let property_scroll_axis_lock : property_scroll_axis_lock Rule.rule =
+  Property_scroll_axis_lock.rule
+
 module Property_scroll_margin =
   [%spec_module
   "[ <extended-length> ]{1,4}", (module Css_types.ScrollMargin)]
@@ -716,6 +727,7 @@ let entries : (kind * packed_rule) list =
     ( Property "-ms-scrollbar-track-color",
       pack_module (module Property__ms_scrollbar_track_color) );
     Property "scroll-behavior", pack_module (module Property_scroll_behavior);
+    Property "scroll-axis-lock", pack_module (module Property_scroll_axis_lock);
     ( Property "scroll-initial-target",
       pack_module (module Property_scroll_initial_target) );
     Property "scroll-snap-stop", pack_module (module Property_scroll_snap_stop);

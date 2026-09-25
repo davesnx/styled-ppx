@@ -547,6 +547,27 @@ module Gap = struct
     | #Length.t as l -> Length.toString l
 end
 
+module FlowTolerance = struct
+  (* MDN syntax: 'normal' | <length-percentage> | 'infinite' *)
+  type t =
+    [ `normal
+    | `infinite
+    | Percentage.t
+    | Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
+    | `normal -> {js|normal|js}
+    | `infinite -> {js|infinite|js}
+    | #Percentage.t as p -> Percentage.toString p
+    | #Length.t as l -> Length.toString l
+end
+
 module StrokeDashArray = struct
   type t =
     [ Length.t
@@ -2980,6 +3001,29 @@ module BoxSizing = struct
     | #Cascading.t as c -> Cascading.toString c
 end
 
+module FrameSizing = struct
+  (* MDN syntax: 'auto' | 'content-width' | 'content-height' | 'content-block-size' | 'content-inline-size' *)
+  type t =
+    [ `auto
+    | `contentWidth
+    | `contentHeight
+    | `contentBlockSize
+    | `contentInlineSize
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `contentWidth -> {js|content-width|js}
+    | `contentHeight -> {js|content-height|js}
+    | `contentBlockSize -> {js|content-block-size|js}
+    | `contentInlineSize -> {js|content-inline-size|js}
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
+end
+
 module ColumnCount = struct
   type t =
     [ Auto.t
@@ -4058,6 +4102,21 @@ module ClipPath = struct
     match x with
     | #None.t -> None.toString
     | #Url.t as u -> Url.toString u
+    | #GeometryBox.t as gb -> GeometryBox.toString gb
+end
+
+module BorderShape = struct
+  (* MDN syntax: 'none' | [ <basic-shape> <geometry-box>? ]{1,2}
+     Interpolation only carries the <geometry-box> half, matching ClipPath's
+     own simplification above - <basic-shape> is not yet a runtime type. *)
+  type t =
+    [ None.t
+    | GeometryBox.t
+    ]
+
+  let toString x =
+    match x with
+    | #None.t -> None.toString
     | #GeometryBox.t as gb -> GeometryBox.toString gb
 end
 
@@ -9978,6 +10037,44 @@ module ViewTimelineInset = Margin
 module ViewTimelineName = AnimationName
 module ViewTransitionName = AnimationName
 
+module ViewTransitionGroup = struct
+  (* MDN syntax: 'normal' | 'contain' | 'nearest' | <custom-ident> *)
+  type t =
+    [ `normal
+    | `contain
+    | `nearest
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `contain -> {js|contain|js}
+    | `nearest -> {js|nearest|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ViewTransitionScope = struct
+  (* MDN syntax: 'none' | 'all' *)
+  type t =
+    [ `none
+    | `all
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `all -> {js|all|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
 module VoiceBalance = struct
   type t =
     [ `left
@@ -10287,6 +10384,23 @@ module WritingMode = struct
     | `verticalLr -> {js|vertical-lr|js}
     | `sidewaysRl -> {js|sideways-rl|js}
     | `sidewaysLr -> {js|sideways-lr|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module WindowDrag = struct
+  (* MDN syntax: 'none' | 'move' *)
+  type t =
+    [ `none
+    | `move
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `move -> {js|move|js}
     | #Var.t as x -> Var.toString x
     | #Cascading.t as x -> Cascading.toString x
 end
