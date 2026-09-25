@@ -1,40 +1,70 @@
-The identity namespace defaults to the dune library name, which dune passes
-as the `library-name` cookie to every ppx run inside a `(library ...)`
-stanza. Two dune libraries never share a name, so `Button.root` in library
-`ui` and `Button.root` in library `admin` mint distinct `cid-...` classes
-with no configuration.
+The identity namespace does not depend on the dune `library-name` cookie.
+Two dune libraries with different library names mint the SAME `cid-...`
+for the same module and binding name when neither passes `--namespace`
+(RED before the fix: see the report for the pre-fix diff).
 
   $ refmt --parse re --print ml input.re > input.ml
 
   $ ../../standalone.exe -cookie 'library-name="ui"' --impl input.ml -o ui.ml
-  $ grep "css.bindings" ui.ml
-  [@@@css.bindings [("Input.marker", "cid-1lismv4", "css-tokvmb")]]
+  $ cat ui.ml
+  [@@@css.config [("library-name", "ui")]]
+  [@@@css ".css-tokvmb{color:red;}"]
+  [@@@css.bindings [("Input.marker", "cid-1rctcrz", "css-tokvmb")]]
+  let marker = CSS.make "label:marker cid-1rctcrz css-tokvmb" []
+  let _ = marker
 
   $ ../../standalone.exe -cookie 'library-name="admin"' --impl input.ml -o admin.ml
-  $ grep "css.bindings" admin.ml
-  [@@@css.bindings [("Input.marker", "cid-1v8uaax", "css-tokvmb")]]
+  $ cat admin.ml
+  [@@@css.config [("library-name", "admin")]]
+  [@@@css ".css-tokvmb{color:red;}"]
+  [@@@css.bindings [("Input.marker", "cid-1rctcrz", "css-tokvmb")]]
+  let marker = CSS.make "label:marker cid-1rctcrz css-tokvmb" []
+  let _ = marker
 
-The same library name mints the same identity, build after build.
+  $ diff ui.ml admin.ml
+  1c1
+  < [@@@css.config [("library-name", "ui")]]
+  ---
+  > [@@@css.config [("library-name", "admin")]]
+  [1]
 
-  $ ../../standalone.exe -cookie 'library-name="ui"' --impl input.ml -o ui2.ml
-  $ grep "css.bindings" ui2.ml
-  [@@@css.bindings [("Input.marker", "cid-1lismv4", "css-tokvmb")]]
-
-`--namespace` overrides the default. A native library and its melange twin
-built from the same sources have different library names, so they pass one
-shared `--namespace` and keep minting the same identity.
-
-  $ ../../standalone.exe -cookie 'library-name="lib_native"' --namespace lib --impl input.ml -o native.ml
-  $ grep "css.bindings" native.ml
-  [@@@css.bindings [("Input.marker", "cid-1j0hi0j", "css-tokvmb")]]
-
-  $ ../../standalone.exe -cookie 'library-name="lib_js"' --namespace lib --impl input.ml -o js.ml
-  $ grep "css.bindings" js.ml
-  [@@@css.bindings [("Input.marker", "cid-1j0hi0j", "css-tokvmb")]]
-
-Without a cookie (an executable stanza) the namespace is empty, unchanged
-from before the default existed; see identity-namespace.t.
+Without a cookie at all (an executable stanza) the identity is the same
+too: the cookie was never part of the hash once `--namespace` is absent.
 
   $ ../../standalone.exe --impl input.ml -o none.ml
-  $ grep "css.bindings" none.ml
-  [@@@css.bindings [("Input.marker", "cid-1rctcrz", "css-tokvmb")]]
+  $ diff ui.ml none.ml
+  1d0
+  < [@@@css.config [("library-name", "ui")]]
+  [1]
+
+`--namespace` still lets two libraries that share a module basename and
+binding name mint distinct identities, the way it did before the library
+name was ever a default: pass each one a different value.
+
+  $ ../../standalone.exe -cookie 'library-name="ui"' --namespace ui --impl input.ml -o ui-ns.ml
+  $ ../../standalone.exe -cookie 'library-name="admin"' --namespace admin --impl input.ml -o admin-ns.ml
+  $ diff ui-ns.ml admin-ns.ml
+  1c1
+  < [@@@css.config [("library-name", "ui")]]
+  ---
+  > [@@@css.config [("library-name", "admin")]]
+  3,4c3,4
+  < [@@@css.bindings [("Input.marker", "cid-1lismv4", "css-tokvmb")]]
+  < let marker = CSS.make "label:marker cid-1lismv4 css-tokvmb" []
+  ---
+  > [@@@css.bindings [("Input.marker", "cid-1v8uaax", "css-tokvmb")]]
+  > let marker = CSS.make "label:marker cid-1v8uaax css-tokvmb" []
+  [1]
+
+A native library and its melange twin, built from the same sources under
+different library names, still keep minting the same identity by passing
+one shared `--namespace` on both stanzas - unchanged from before.
+
+  $ ../../standalone.exe -cookie 'library-name="lib_native"' --namespace lib --impl input.ml -o native.ml
+  $ ../../standalone.exe -cookie 'library-name="lib_js"' --namespace lib --impl input.ml -o js.ml
+  $ diff native.ml js.ml
+  1c1
+  < [@@@css.config [("library-name", "lib_native")]]
+  ---
+  > [@@@css.config [("library-name", "lib_js")]]
+  [1]

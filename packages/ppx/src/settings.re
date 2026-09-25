@@ -42,7 +42,7 @@ let env = {
 
 let namespace = {
   flag: "--namespace",
-  doc: "Mixed into every binding's identity class hash. Defaults to the dune library name (the `library-name` cookie), so two libraries that share a module basename and binding name mint distinct `cid-` classes. Pass an explicit value, identically on both stanzas, when a library's native and melange builds have different names.",
+  doc: "Mixed into every binding's identity class hash. Empty by default, so a library's native and melange builds mint the same `cid-` classes. Pass distinct values to two libraries that share a module basename and binding name, so their `cid-` classes differ.",
   value: None,
   defaultValue: "",
 };
@@ -84,19 +84,9 @@ module Get = {
     currentSettings.contents.dev.value
     |> Option.value(~default=currentSettings.contents.dev.defaultValue);
   let library = () => currentSettings.contents.library;
-  /* The identity namespace: the flag when given, else the dune library name.
-     Two dune libraries never share a name, so same-named modules in different
-     libraries mint distinct identities without configuration; a native library
-     and its melange twin have different names and pass the flag instead. */
   let namespace = () =>
-    switch (currentSettings.contents.namespace.value) {
-    | Some(ns) when ns != "" => ns
-    | _ =>
-      Option.value(
-        currentSettings.contents.library,
-        ~default=currentSettings.contents.namespace.defaultValue,
-      )
-    };
+    currentSettings.contents.namespace.value
+    |> Option.value(~default=currentSettings.contents.namespace.defaultValue);
 };
 
 module Update = {
