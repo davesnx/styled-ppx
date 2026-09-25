@@ -43,10 +43,10 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".a-60002gxme{flex-grow:1;}"];
   [@css ".a-ekz5ec{z-index:1;}"];
   [@css ".a-dmsoaq{transition:all 200ms ease 0ms;}"];
-  [@css ".a-zg0h58cl4ca.id-1wtohw8{min-width:0;}"];
-  [@css ".a-zg0h588uo0q.id-1wtohw8{max-width:0;}"];
-  [@css ".a-zg0h58mo1ml.id-1wtohw8{opacity:0;}"];
-  [@css ".a-zg0h58r38xr.id-1wtohw8{overflow:hidden;}"];
+  [@css ".a-qpfuu8c5z1r.id-1wtohw8{min-width:0;}"];
+  [@css ".a-qpfuu88sfs8.id-1wtohw8{max-width:0;}"];
+  [@css ".a-qpfuu8mluc1.id-1wtohw8{opacity:0;}"];
+  [@css ".a-qpfuu8r2pa5.id-1wtohw8{overflow:hidden;}"];
   [@css ".a-oe8sadmq5th{transition:transform 0.3s !important;}"];
   [@css
     ".a-dmm8mm{transition:opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;}"
@@ -62,7 +62,7 @@ If this test fail means that the module is not in sync with the ppx
       (
         "Input._sidebar",
         "id-jjvyqu",
-        "a-60002gxme a-ekz5ec a-dmsoaq a-zg0h58cl4ca a-zg0h588uo0q a-zg0h58mo1ml a-zg0h58r38xr",
+        "a-60002gxme a-ekz5ec a-dmsoaq a-qpfuu8c5z1r a-qpfuu88sfs8 a-qpfuu8mluc1 a-qpfuu8r2pa5",
       ),
       ("Input._checkbox", "id-1sltg0l", "a-oe8sadmq5th"),
       ("Input._transitions", "id-1jxvvla", "a-dmm8mm"),
@@ -124,7 +124,7 @@ If this test fail means that the module is not in sync with the ppx
   
   let _sidebar =
     CSS.make(
-      "label:_sidebar id-jjvyqu a-60002gxme a-ekz5ec a-dmsoaq a-zg0h58cl4ca a-zg0h588uo0q a-zg0h58mo1ml a-zg0h58r38xr",
+      "label:_sidebar id-jjvyqu a-60002gxme a-ekz5ec a-dmsoaq a-qpfuu8c5z1r a-qpfuu88sfs8 a-qpfuu8mluc1 a-qpfuu8r2pa5",
       [],
     );
   

@@ -14,11 +14,11 @@ Same-file open statements participate in selector interpolation. After
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css ".a-4ekvmb{color:red;}"];
-  [@css ".a-i1f1s4e1kdg.id-zr2uk1{color:blue;}"];
+  [@css ".a-132sj4efbq8.id-zr2uk1{color:blue;}"];
   [@css.bindings
     [
       ("Input.Css.marker", "id-zr2uk1", "a-4ekvmb"),
-      ("Input.wrapper", "id-4f6ye3", "a-i1f1s4e1kdg"),
+      ("Input.wrapper", "id-4f6ye3", "a-132sj4efbq8"),
     ]
   ];
   module Css = {
@@ -28,7 +28,7 @@ Same-file open statements participate in selector interpolation. After
   open Css;
   let _ = marker;
   
-  let wrapper = CSS.make("label:wrapper id-4f6ye3 a-i1f1s4e1kdg", []);
+  let wrapper = CSS.make("label:wrapper id-4f6ye3 a-132sj4efbq8", []);
   
   let _ = (Css.marker, wrapper);
 

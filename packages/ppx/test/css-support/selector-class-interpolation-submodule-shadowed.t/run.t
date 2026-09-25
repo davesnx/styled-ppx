@@ -16,11 +16,11 @@ Same-file submodule binding shadowing follows structure order: a later
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css ".a-4ekvmb{color:red;}"];
   [@css ".a-4ecoli{color:green;}"];
-  [@css ".a-nifi34ebkuc.id-1l23vtp{color:blue;}"];
+  [@css ".a-rmw3m4edehe.id-1l23vtp{color:blue;}"];
   [@css.bindings
     [
       ("Input.Css.marker", "id-1l23vtp", "a-4ecoli"),
-      ("Input.wrapper", "id-4f6ye3", "a-nifi34ebkuc"),
+      ("Input.wrapper", "id-4f6ye3", "a-rmw3m4edehe"),
     ]
   ];
   module Css = {
@@ -30,7 +30,7 @@ Same-file submodule binding shadowing follows structure order: a later
     let marker = CSS.make("label:marker id-1l23vtp a-4ecoli", []);
   };
   
-  let wrapper = CSS.make("label:wrapper id-4f6ye3 a-nifi34ebkuc", []);
+  let wrapper = CSS.make("label:wrapper id-4f6ye3 a-rmw3m4edehe", []);
   
   let _ = (Css.marker, wrapper);
 

@@ -15,15 +15,15 @@ chain as `$(Css.marker)` without emitting a cross-module sentinel.
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css ".a-4ekvmb{color:red;}"];
-  [@css ".a-6psgj4ek9s5.id-zr2uk1{color:blue;}"];
+  [@css ".a-132sj4efbq8.id-zr2uk1{color:blue;}"];
   [@css ".a-4ecoli{color:green;}"];
-  [@css ".a-6psgj4eq12w.id-11dmi54{color:purple;}"];
+  [@css ".a-wsszk4ewr87.id-11dmi54{color:purple;}"];
   [@css.bindings
     [
       ("Input.Css.marker", "id-zr2uk1", "a-4ekvmb"),
-      ("Input.wrapper", "id-4f6ye3", "a-6psgj4ek9s5"),
+      ("Input.wrapper", "id-4f6ye3", "a-132sj4efbq8"),
       ("Input.Theme.Css.marker", "id-11dmi54", "a-4ecoli"),
-      ("Input.Theme.wrapper", "id-q7k20t", "a-6psgj4eq12w"),
+      ("Input.Theme.wrapper", "id-q7k20t", "a-wsszk4ewr87"),
     ]
   ];
   module Css = {
@@ -32,7 +32,7 @@ chain as `$(Css.marker)` without emitting a cross-module sentinel.
   
   module Styles = Css;
   
-  let wrapper = CSS.make("label:wrapper id-4f6ye3 a-6psgj4ek9s5", []);
+  let wrapper = CSS.make("label:wrapper id-4f6ye3 a-132sj4efbq8", []);
   
   module Theme = {
     module Css = {
@@ -41,7 +41,7 @@ chain as `$(Css.marker)` without emitting a cross-module sentinel.
   
     module Styles = Css;
   
-    let wrapper = CSS.make("label:wrapper id-q7k20t a-6psgj4eq12w", []);
+    let wrapper = CSS.make("label:wrapper id-q7k20t a-wsszk4ewr87", []);
   };
   
   let _ = (Css.marker, wrapper, Theme.Css.marker, Theme.wrapper);

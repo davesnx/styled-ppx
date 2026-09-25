@@ -14,8 +14,8 @@ through the static extraction pipeline. They also register selector bindings so
   .in-149d9vx:hover{color:var(--tone-1ucf2mt);}
   .in-kusjgz{color:var(--color-1a279q8);}
   .a-94gf8j{padding:8px;}
-  .a-3z34l7p9qag .id-1l8coch{margin:0;}
-  .a-10njk5r7t6m .id-1oex1yr{display:block;}
+  .a-wvojo7pq8sp .id-1l8coch{margin:0;}
+  .a-q397j5r0ryo .id-1oex1yr{display:block;}
 
   $ refmt --parse ml --print re output.ml
   [@css "@property --tone-1ucf2mt{syntax:\"*\";inherits:false;}"];
@@ -24,13 +24,13 @@ through the static extraction pipeline. They also register selector bindings so
   [@css ".in-149d9vx:hover{color:var(--tone-1ucf2mt);}"];
   [@css ".in-kusjgz{color:var(--color-1a279q8);}"];
   [@css ".a-94gf8j{padding:8px;}"];
-  [@css ".a-3z34l7p9qag .id-1l8coch{margin:0;}"];
-  [@css ".a-10njk5r7t6m .id-1oex1yr{display:block;}"];
+  [@css ".a-wvojo7pq8sp .id-1l8coch{margin:0;}"];
+  [@css ".a-q397j5r0ryo .id-1oex1yr{display:block;}"];
   [@css.bindings
     [
       ("Output.Box", "id-1l8coch", "a-4ekvmb in-149d9vx"),
       ("Output.Button", "id-1oex1yr", "in-kusjgz a-94gf8j"),
-      ("Output.card", "id-16nw107", "a-3z34l7p9qag a-10njk5r7t6m"),
+      ("Output.card", "id-16nw107", "a-wvojo7pq8sp a-q397j5r0ryo"),
     ]
   ];
   let tone = CSS.red;
@@ -2052,4 +2052,4 @@ through the static extraction pipeline. They also register selector bindings so
       );
     };
   };
-  let card = CSS.make("label:card id-16nw107 a-3z34l7p9qag a-10njk5r7t6m", []);
+  let card = CSS.make("label:card id-16nw107 a-wvojo7pq8sp a-q397j5r0ryo", []);

@@ -546,6 +546,65 @@ module Css_transform = {
     };
   };
 
+  /* Resolve `$(binding)`/`&.$(binding)` selector-class references (via
+     `transform_selector`, reused unchanged from above) BEFORE atomization,
+     leaving declaration values untouched. This must run ahead of
+     `atomize_rules`: an atom's class name and `Slot_key` context both hash
+     the rendered rule text (`render_rule`/`render_declaration`,
+     `Render.selector` respectively), and that text must already carry the
+     REFERENCED BINDING'S identity class, not the literal `$(row)` marker -
+     otherwise two files with the same local binding name and the same
+     nested selector (e.g. `& > div:not(:last-child).$(row)`) render
+     identical unresolved text and mint the SAME atom class even though
+     `row` resolves to a different `id-` class in each file, which
+     `styled-ppx.generate`'s atom-class-collision check then rightly rejects
+     (same class, different final CSS).
+
+     Declaration values are NOT resolved here - deferred to `lower_atom`
+     (`transform_rule`'s full walk), since a value interpolation's own
+     variable name depends on the atom's own class/namespace, which is only
+     known once atomize_rules and `Hash_class.class_and_namespace` have run;
+     resolving selector-class refs first creates no such cycle, because
+     `resolve_selector_class_ref` only needs the REFERENCED binding's
+     already-registered identity class, never this atom's own.
+
+     Idempotent: a selector already resolved to `Class(...)`/
+     `Subclass(Class(...))` falls through `transform_selector`'s
+     catch-all, so running it again in `lower_atom` later is a no-op. */
+  let rec resolve_rule_selectors = (ctx, rule: rule): rule =>
+    switch (rule) {
+    | Declaration(_) => rule
+    | Style_rule({ prelude: (selectors, selector_loc), block, loc }) =>
+      let (rule_list, rule_loc) = block;
+      Style_rule({
+        prelude: (
+          List.map(
+            ((sel, sel_loc)) => (transform_selector(ctx, sel), sel_loc),
+            selectors,
+          ),
+          selector_loc,
+        ),
+        block: (List.map(resolve_rule_selectors(ctx), rule_list), rule_loc),
+        loc,
+      });
+    | At_rule({ name, prelude, block, loc }) =>
+      let map_payload = ((rules, rule_loc)) => (
+        List.map(resolve_rule_selectors(ctx), rules),
+        rule_loc,
+      );
+      At_rule({
+        name,
+        prelude,
+        block:
+          switch (block) {
+          | Empty => Empty
+          | Rule_list(payload) => Rule_list(map_payload(payload))
+          | Stylesheet(payload) => Stylesheet(map_payload(payload))
+          },
+        loc,
+      });
+    };
+
   let transform_declaration = (ctx, ~var_namespace, decl: declaration) => {
     let (property_name, _) = decl.name;
     let (value_list, value_loc) = decl.value;
@@ -1214,7 +1273,14 @@ module Css_transform = {
     };
     let (rules, loc) = rule_list;
 
-    let atomic_rules = atomize_rules(~source_position_start, rules);
+    /* Resolve selector-class references before atomizing (see
+       `resolve_rule_selectors`'s own comment) so an atom's hash reflects
+       the RESOLVED selector, not a local binding name that can mean a
+       different binding in every file that uses it. */
+    let selector_resolved_rules =
+      List.map(resolve_rule_selectors(ctx), rules);
+    let atomic_rules =
+      atomize_rules(~source_position_start, selector_resolved_rules);
 
     /* Selective atomization: the block's interpolating declarations become one
        content-addressed bundle, with class `in-<B>` and var namespace

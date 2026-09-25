@@ -14,11 +14,11 @@ submodule instead of being emitted as a cross-module sentinel.
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css ".a-4ekvmb{color:red;}"];
-  [@css ".a-fik4a4ezk30.plain-string-selector{color:blue;}"];
+  [@css ".a-yvmv14evelu.plain-string-selector{color:blue;}"];
   [@css.bindings
     [
       ("Input.Css.marker", "id-zr2uk1", "a-4ekvmb"),
-      ("Input.wrapper", "id-4f6ye3", "a-fik4a4ezk30"),
+      ("Input.wrapper", "id-4f6ye3", "a-yvmv14evelu"),
     ]
   ];
   module Css = {
@@ -26,7 +26,7 @@ submodule instead of being emitted as a cross-module sentinel.
     let notCx2 = "plain-string-selector";
   };
   
-  let wrapper = CSS.make("label:wrapper id-4f6ye3 a-fik4a4ezk30", []);
+  let wrapper = CSS.make("label:wrapper id-4f6ye3 a-yvmv14evelu", []);
   
   let _ = (Css.marker, Css.notCx2, wrapper);
 

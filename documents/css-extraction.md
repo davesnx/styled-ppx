@@ -41,9 +41,11 @@ a generated `:root` block for `[%styled.global]`).
   ▼
 PPX expansion (per compilation unit)
   ─ parse [%css "..."] / [%styled.<tag> ...] / [%styled.global "..."] / [%keyframe "..."]
-  ─ atomize, hash, mint class names; mint each named binding's identity class
   ─ resolve same-module $(name) selector interpolations to the referenced
-    binding's identity class
+    binding's identity class (or a cross-module sentinel), BEFORE atomizing -
+    an atom's hash must see the RESOLVED selector, never the literal
+    $(name) text, which means the same thing in every file
+  ─ atomize, hash, mint class names; mint each named binding's identity class
   ─ buffer rendered rules; record cross-module refs as sentinels
   │
   ▼
@@ -198,6 +200,18 @@ It tracks named `[%css]` bindings and `[%styled.<tag>]` components, same-file
 module aliases, same-file opens/includes, and earlier string literals.
 Cross-module references only go through `Cross_module_refs` after this local
 resolver fails.
+
+`Css_file.re` resolves every `$(name)`/`&.$(name)` selector reference in a
+`[%css]`/`[%styled.<tag>]` block (via `resolve_rule_selectors`) before
+atomizing it, precisely so two files that both use a local binding named
+`row` in the same selector shape - but whose `row`s are different bindings
+with different identity classes - mint different atom classes instead of
+colliding: the atom's hash sees `row`'s resolved identity class (or, for a
+cross-module `$(M.row)`, the sentinel `Cross_module_refs` would otherwise
+have inserted later), never the bare, textually-ambiguous `$(row)` marker.
+This only touches selector position; declaration VALUES are still resolved
+later, in `lower_atom`, since a value interpolation's variable name depends
+on the atom's own class/namespace - resolved only after atomizing.
 
 ### `Css_file.Buffer`
 
