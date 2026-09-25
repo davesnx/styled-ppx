@@ -9,19 +9,29 @@
     string format on top of it in [Hash_class]; phases 3+ wire it into
     atomization, the runtime, and generate. *)
 
-(** One atom's position: the at-rule chain it sits under (outer to inner), and
-    its selector suffix relative to [&] rendered by
+(** One atom's position: the at-rule chain it sits under (outer to inner), its
+    selector suffix relative to [&] rendered by
     {!Styled_ppx_css_parser.Render.selector} ([""] at the top level - a bare
-    declaration and a [&]-only group are the same context). Two atoms only ever
-    compete for the same context if this is exactly equal. *)
+    declaration and a [&]-only group are the same context), and whether it
+    carries [!important]. Two atoms only ever compete for the same context if
+    this is exactly equal - [important] is folded in here (2026-09-25 user
+    decision) rather than checked as a separate guard on {!removes}, so a
+    declaration and its [!important] twin are never in the same context and
+    never remove each other in either direction; the browser's own cascade
+    already decides between them. *)
 type context = {
   at_rules : (string * string) list;
   selector : string;
+  important : bool;
 }
 
 (** The canonical string {!Hash_class} hashes to get a class name's (optional)
-    context token. Empty for the base context, which is why a base atom's class
-    name carries no context part at all. *)
+    context token. Empty for the base, non-important context, which is why a
+    base atom's class name carries no context part at all - an [!important] atom
+    in the base context is therefore no longer free: it is folded in as a
+    synthetic leading [at_rules] entry (["!important"]), the same composition
+    {!context}'s own doc describes, so it costs a real context token like any
+    other wrapper would. *)
 val context_key : context -> string
 
 (** Lowercase, except a custom property ([--*]), which is case-sensitive.
@@ -137,7 +147,6 @@ type t = {
     (** [None] = the family's full mask (a plain shorthand, or any non-family
         property). [Some m] = a proper subset (a lone longhand, or a "family
         atom" mixing some-but-not-all members - see slot_key.ml's [of_atom]). *)
-  important : bool;
   bundle : bool;
     (** True when any declaration in this atom carries a [$(...)] value
         interpolation - [Css_file.re] already, legitimately, shares one class
@@ -155,13 +164,13 @@ type t = {
     [Declaration] group wrapped in a [&]-only [Style_rule], an atom wrapped in a
     resolved parent selector, any of those under one or more [At_rule] wrappers,
     or [!important] on some or all of a group's declarations (the group's own
-    [important] is true if any member is). Phase 3 additionally teaches
-    [Css_file.re] to emit *family atoms* - one atom for a binding that mixes a
-    shorthand with its own longhands in one context - which this function
-    already handles correctly today via the same multi-declaration-group path
-    used for same-property groups: their combined mask is the OR of every
-    declaration's own mask. Returns [None] only for a rule shape [atomize_rules]
-    never actually produces. *)
+    {!context}.[important] is true if any member is). Phase 3 additionally
+    teaches [Css_file.re] to emit *family atoms* - one atom for a binding that
+    mixes a shorthand with its own longhands in one context - which this
+    function already handles correctly today via the same
+    multi-declaration-group path used for same-property groups: their combined
+    mask is the OR of every declaration's own mask. Returns [None] only for a
+    rule shape [atomize_rules] never actually produces. *)
 val of_atom : Styled_ppx_css_parser.Ast.rule -> t option
 
 (** [removes ~former ~latter] : true when, in a [CSS.merge] whose right argument
@@ -182,7 +191,8 @@ val of_atom : Styled_ppx_css_parser.Ast.rule -> t option
     [None]/[Some _] is never a subset (a lone longhand cannot remove a shorthand
     \- it would silently drop the shorthand's other legs; this direction stays
     stylesheet-order-dependent, see the plan's "accepted limit");
-    [Some ma]/[Some mb] is a plain bitwise subset check. Finally, [former]
-    carrying [!important] blocks removal unless [latter] is also [!important].
-*)
+    [Some ma]/[Some mb] is a plain bitwise subset check. [!important] carries no
+    separate check here - it is already part of {!context} (2026-09-25 user
+    decision), so [former]'s and [latter]'s importance must already agree for
+    "same contexts" to hold at all. *)
 val removes : former:t -> latter:t -> bool

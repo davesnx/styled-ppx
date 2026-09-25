@@ -337,29 +337,68 @@ let removes_tests =
       check_bool "removes" false
         (Slot_key.removes ~former:(slot_of "min-height: 0;")
            ~latter:(slot_of "& > .x{min-height: 0;}")));
-    (* --- !important --- *)
-    Alcotest_extra.test "a plain atom does not remove an !important one"
-      (fun () ->
+    (* --- !important is part of the context, not a separate guard ---
+       (2026-09-25 user decision, replacing the earlier per-flag guard):
+       `!important` makes an atom's context different from the same
+       declaration without it, the same way an enclosing `@media` or `&:hover`
+       does - so `merge` never has to reason about importance directly, only
+       about whether two atoms share a context. Two declarations that differ
+       ONLY in `!important` never remove each other, in either direction:
+       the browser's own cascade already decides between them, and `merge`
+       does not need a second opinion. *)
+    Alcotest_extra.test
+      "a plain atom and an !important one never share a context, in either \
+       direction - merge(red !important, blue) keeps both" (fun () ->
       check_bool "removes" false
         (Slot_key.removes
            ~former:(slot_of "color: red !important;")
            ~latter:(slot_of "color: blue;")));
-    Alcotest_extra.test "an !important atom removes a plain one" (fun () ->
-      check_bool "removes" true
+    Alcotest_extra.test
+      "merge(red, blue !important) also keeps both - importance differs, so \
+       former and latter are never in the same context (this is the one case \
+       that changed: the old per-flag guard used to let an !important latter \
+       remove a plain former)" (fun () ->
+      check_bool "removes" false
         (Slot_key.removes ~former:(slot_of "color: red;")
            ~latter:(slot_of "color: blue !important;")));
     Alcotest_extra.test
-      "two !important atoms in the same slot: later still wins" (fun () ->
+      "two !important atoms in the same slot ARE in the same context, so \
+       merge(red !important, blue !important) still drops the first, same as \
+       two plain atoms" (fun () ->
       check_bool "removes" true
         (Slot_key.removes
            ~former:(slot_of "color: red !important;")
            ~latter:(slot_of "color: blue !important;")));
-    Alcotest_extra.test "a group is important if any of its declarations is"
-      (fun () ->
+    Alcotest_extra.test
+      "a group's context is important if any of its declarations is - still \
+       keeps both against a plain latter, for the same reason as the single \
+       -declaration case above" (fun () ->
       check_bool "removes" false
         (Slot_key.removes
            ~former:(slot_of "&{color: red; color: blue !important;}")
            ~latter:(slot_of "color: green;")));
+    Alcotest_extra.test
+      "importance composes with a REAL enclosing context, not just the base \
+       case: same selector, mismatched importance still keeps both" (fun () ->
+      check_bool "removes" false
+        (Slot_key.removes
+           ~former:(slot_of "&:hover{color: red;}")
+           ~latter:(slot_of "&:hover{color: blue !important;}")));
+    Alcotest_extra.test
+      "importance composes with a REAL enclosing context: same selector, same \
+       importance still removes, same as the base case" (fun () ->
+      check_bool "removes" true
+        (Slot_key.removes
+           ~former:(slot_of "&:hover{color: red !important;}")
+           ~latter:(slot_of "&:hover{color: blue !important;}")));
+    Alcotest_extra.test
+      "the other polarity of the enclosing-context composition: an !important \
+       former does not remove a plain latter under the same selector either"
+      (fun () ->
+      check_bool "removes" false
+        (Slot_key.removes
+           ~former:(slot_of "&:hover{color: red !important;}")
+           ~latter:(slot_of "&:hover{color: blue;}")));
     (* --- `all` --- *)
     Alcotest_extra.test "all removes an ordinary property in the same context"
       (fun () ->

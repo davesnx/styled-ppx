@@ -85,10 +85,10 @@ A single CSS rule string. One attribute per atomized rule, per global
 rule, or per `@keyframes` block.
 
 ```ocaml
-[@@@css ".css-tokvmb{color:red;}"]
-[@@@css ".css-1ru12dh:hover{opacity:0.8;}"]
-[@@@css "@media (min-width:768px){.css-fmb91l{padding:2rem;}}"]
-[@@@css "@keyframes keyframe-jw9oix{from{opacity:0;}to{opacity:1;}}"]
+[@@@css ".a-tokvmb{color:red;}"]
+[@@@css ".a-1ru12dh:hover{opacity:0.8;}"]
+[@@@css "@media (min-width:768px){.a-fmb91l{padding:2rem;}}"]
+[@@@css "@keyframes k-jw9oix{from{opacity:0;}to{opacity:1;}}"]
 ```
 
 The string may contain NUL-delimited cross-module sentinels
@@ -103,7 +103,7 @@ One attribute per CU, listing every named `[%css]` binding and
 `[%styled.<tag>]` component the CU minted.
 The longident is the fully-qualified path users would write to reference
 the binding from another module; the identity is the binding's
-build-independent `cid-...` class (see "Identity classes" below) — a
+build-independent `id-...` class (see "Identity classes" below) — a
 `$(binding)` selector reference resolves to this, verbatim; the class
 string is the space-separated list of atomized class names the PPX
 produced, kept only as a content fingerprint so the aggregator can tell
@@ -112,9 +112,9 @@ Resolve below).
 
 ```ocaml
 [@@@css.bindings
-  [("M.marker", "cid-1a2b3c4", "");
-   ("M.Css.active", "cid-5d6e7f8", "css-tokvmb");
-   ("M.layout", "cid-9a0b1c2", "css-k008qs css-1tyndxa")]]
+  [("M.marker", "id-1a2b3c4", "");
+   ("M.Css.active", "id-5d6e7f8", "a-tokvmb");
+   ("M.layout", "id-9a0b1c2", "a-k008qs a-1tyndxa")]]
 ```
 
 The aggregator folds every payload into two flat hash tables — its
@@ -399,10 +399,10 @@ text and silently destroyed declaration order (regression test:
 
 **Atom class collision.** Right after that dedup pass, the aggregator
 scans the deduplicated rules for two different, non-bundle atoms
-(`css-`/`csi-` classes) that mint the same class name but render
+(`a-` classes) that mint the same class name but render
 different CSS - the same shape as an identity collision above, applied
-to atom classes instead of `cid-` identities, and reported the same way
-(both rule bodies, the shared class, a `--namespace` remedy). `csv-`
+to atom classes instead of `id-` identities, and reported the same way
+(both rule bodies, the shared class, a `--namespace` remedy). `in-`
 (interpolation-bundle) classes are exempt in both directions: several
 different bundle bodies sharing one class is that mechanism working as
 designed (see "Atomization" above), never a collision (see
@@ -492,22 +492,22 @@ two `[@@@css ...]` attributes. The runtime `CSS.make` call carries the
 space-separated concatenation of those class names, so consumers apply
 all atoms by setting one `className` attribute.
 
-Class names follow the `css-<murmur2 hash of CSS>` format, in every
+Class names follow the `a-<murmur2 hash of CSS>` format, in every
 mode — the binding's `let` name never appears in the class name. Two
 bindings whose declarations render to the same CSS text mint the same
 class, dev or production. Minting lives in
 `packages/ppx/src/Hash_class.ml`.
 
 One exception: an atom whose declaration carries a `$(...)` value
-interpolation mints `csv-<murmur2 hash>` instead - still the same hash
+interpolation mints `in-<murmur2 hash>` instead - still the same hash
 digits, only the prefix differs (`Hash_class.bundle_class_and_namespace`).
 Several such declarations from one binding that all interpolate share
-ONE `csv-` class (the "bundle" - see `Css_file.re`'s `transform_rule_list`),
-collapsing their custom-property namespace into one; a `css-`/`csv-`
+ONE `in-` class (the "bundle" - see `Css_file.re`'s `transform_rule_list`),
+collapsing their custom-property namespace into one; a `a-`/`in-`
 class name's own `var(--...)` target is unaffected by this prefix
 either way, since only the CLASS half of `Hash_class.class_and_namespace`
 changed for this case, never the namespace/variable-naming half. The
-`csv-` prefix exists so a merge-key-aware `CSS.merge` (in progress, see
+`in-` prefix exists so a merge-key-aware `CSS.merge` (in progress, see
 `.workplace/plans/atom-slot-keys_PLAN.md`) can recognize a bundle atom
 and never drop it or let it drop another atom, and so
 `styled-ppx.generate`'s atom-class collision check ("Dedup and write"
@@ -539,12 +539,12 @@ Two consequences worth knowing:
 ## Identity classes
 
 Every named `[%css]` binding and `[%styled.<tag>]` component mints a
-second, build-independent class alongside its atoms: `cid-<hash>`
+second, build-independent class alongside its atoms: `id-<hash>`
 (`Hash_class.identity_class`). `$(binding)` and `&.$(binding)` selector
 references resolve to this identity, verbatim, regardless of how many
 atoms the binding minted or whether it minted any at all. It is emitted
 first among the atoms in the className string (after the `label:<binding>`
-dev marker, when present): `label:<binding> cid-<hash> css-<hash> ...`.
+dev marker, when present): `label:<binding> id-<hash> a-<hash> ...`.
 
 **Inputs**, joined with `\0` and murmur2-hashed: the `--namespace` flag
 value (empty by default), the compilation-unit module name (the source
@@ -578,8 +578,8 @@ independent of `--minify`: an empty binding's identity is never dropped,
 which is what makes it possible to resolve `&.$(m)` in every mode (see
 `packages/ppx/test/css-support/identity-empty-marker.t`).
 
-**Specificity note.** `.css-x.cid-y` is still a two-class compound
-selector — `(0,2,0)` specificity, same as `.css-x.css-a.css-b` before
+**Specificity note.** `.a-x.id-y` is still a two-class compound
+selector — `(0,2,0)` specificity, same as `.a-x.a-a.a-b` before
 this change, and both still beat plain unqualified atoms either way.
 Only a tie between two compound selectors that used to carry 3+ class
 tokens can shift, since those are the only ones whose token count

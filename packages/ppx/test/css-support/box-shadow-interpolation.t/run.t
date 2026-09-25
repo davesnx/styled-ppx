@@ -10,13 +10,13 @@ Test box-shadow and text-shadow interpolation support in cx2
   @property --textShadowValue-1g9u54a{syntax:"*";inherits:false;}
   @property --textShadowArray-ptx88i{syntax:"*";inherits:false;}
   @property --insetShadow-ae1kx4{syntax:"*";inherits:false;}
-  .csv-bddc{box-shadow:var(--singleShadow-2ra8gi);}
-  .csv-dm7kax{box-shadow:var(--shadowArray-16v4cs);}
-  .css-gokeqi{box-shadow:none;}
-  .css-12b85tv{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
-  .csv-oixlo4{text-shadow:var(--textShadowValue-1g9u54a);}
-  .csv-n95t96{text-shadow:var(--textShadowArray-ptx88i);}
-  .css-1f9ql9z{text-shadow:none;}
-  .csv-1x6ky98{box-shadow:var(--insetShadow-ae1kx4);}
+  .in-bddc{box-shadow:var(--singleShadow-2ra8gi);}
+  .in-dm7kax{box-shadow:var(--shadowArray-16v4cs);}
+  .a-gokeqi{box-shadow:none;}
+  .a-12b85tv{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
+  .in-oixlo4{text-shadow:var(--textShadowValue-1g9u54a);}
+  .in-n95t96{text-shadow:var(--textShadowArray-ptx88i);}
+  .a-1f9ql9z{text-shadow:none;}
+  .in-1x6ky98{box-shadow:var(--insetShadow-ae1kx4);}
 
 

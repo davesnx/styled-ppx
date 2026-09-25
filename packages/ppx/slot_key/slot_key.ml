@@ -4,6 +4,14 @@ module Render = Styled_ppx_css_parser.Render
 type context = {
   at_rules : (string * string) list;
   selector : string;
+  important : bool;
+    (** [!important] is folded into the context, as if it were one more wrapper
+        around the declaration, like an [at_rules] entry (2026-09-25 user
+        decision, replacing an earlier separate importance guard on [removes]) -
+        a declaration and its [!important] twin are therefore never in the same
+        context, so [removes] never removes either one in favor of the other;
+        the browser's own cascade already decides between them, and [CSS.merge]
+        does not need a second opinion. See {!context_key}. *)
 }
 
 let is_custom_property name =
@@ -63,7 +71,15 @@ let excluded_from_all name =
 
 (* --- Context --------------------------------------------------------- *)
 
-let context_key { at_rules; selector } =
+let context_key { at_rules; selector; important } =
+  (* [important] is prepended as a synthetic leading "at-rule" entry, not a
+     separate field in the key - the whole point is that it composes with
+     the real [at_rules]/[selector] exactly like another wrapper would,
+     using the same [at_rules_part] machinery, rather than needing its own
+     parallel encoding. *)
+  let at_rules =
+    if important then ("!important", "") :: at_rules else at_rules
+  in
   let at_rules_part =
     at_rules
     |> List.map (fun (name, prelude) -> Printf.sprintf "@%s\x00%s" name prelude)
@@ -850,7 +866,6 @@ type t = {
   context : context;
   family : family_id;
   mask : int option;
-  important : bool;
   bundle : bool;
     (** True when any declaration in this atom carries a [$(...)] value
         interpolation - [Css_file.re]'s [transform_rule_list] bundles such
@@ -929,7 +944,9 @@ let of_atom (rule : Ast.rule) : t option =
     let important =
       List.exists (fun (d : Ast.declaration) -> fst d.important) decls
     in
-    let context = { at_rules; selector = Option.value selector ~default:"" } in
+    let context =
+      { at_rules; selector = Option.value selector ~default:""; important }
+    in
     (* A multi-declaration group (same-property today; a mixed shorthand +
        longhand "family atom" from phase 3) combines every declaration's
        own family/mask - they are always the same family by construction
@@ -954,9 +971,12 @@ let of_atom (rule : Ast.rule) : t option =
         (Some 0) properties
     in
     let bundle = List.exists declaration_has_value_interpolation decls in
-    Some { context; family; mask; important; bundle }
+    Some { context; family; mask; bundle }
 
-let context_equal a b = a.at_rules = b.at_rules && a.selector = b.selector
+let context_equal a b =
+  a.at_rules = b.at_rules
+  && a.selector = b.selector
+  && a.important = b.important
 
 let mask_subset a b =
   match a, b with
@@ -977,7 +997,7 @@ let removes ~former ~latter =
   (not former.bundle)
   && (not latter.bundle)
   && context_equal former.context latter.context
-  && (match latter.family with
-    | All -> not (is_excluded_from_all former.family)
-    | _ -> former.family = latter.family && mask_subset former.mask latter.mask)
-  && not (former.important && not latter.important)
+  &&
+  match latter.family with
+  | All -> not (is_excluded_from_all former.family)
+  | _ -> former.family = latter.family && mask_subset former.mask latter.mask

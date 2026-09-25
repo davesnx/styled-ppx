@@ -11,7 +11,7 @@
     Pass 1 — Collect every [[\@\@\@css.bindings ...]] attribute payload into a
     global index mapping [longident -> identity]. The PPX itself populates these
     payloads with the fully-qualified longident ([["M.Css.marker"]]), the
-    binding's build-independent identity class (a `cid-...` handle, see
+    binding's build-independent identity class (a `id-...` handle, see
     [Hash_class.identity_class] in the PPX), and its atomized class string (kept
     only as a content fingerprint for collision detection — see [Index]), so the
     generator only has to read them — it does not re-derive module names from
@@ -569,19 +569,24 @@ let is_namespace_statement rule =
     silently misplaced. *)
 let is_charset rule = String.starts_with ~prefix:"@charset" (String.trim rule)
 
-(** The leading `css-`/`csi-`/`csv-` atom class name in a rendered rule, if any
-    (atom-slot-keys phase 2 - see [Hash_class.slot_class] / [Class_format]).
-    Every atom this generator emits opens with its own class as a leading
-    compound-selector token, so the first occurrence in the rule text is always
-    the atom's own class. Returns [None] for anything else ([cid-]/[keyframe-]
-    classes, [@import]/[@namespace] statements, etc.) - those aren't this
-    check's concern. *)
+(** The leading `a-`/`in-` atom class name in a rendered rule, if any
+    (atom-slot-keys phase 2, prefix rename 2026-09-25 - see
+    [Hash_class.slot_class] / [Class_format]). Every atom this generator emits
+    opens with its own class as a leading compound-selector token, so the first
+    occurrence in the rule text is always the atom's own class. Returns [None]
+    for anything else ([id-]/[k-] classes, [@import]/ [@namespace] statements,
+    etc.) - those aren't this check's concern. There is no separate
+    important-atom prefix: an [!important] atom is still [a-], just with a
+    non-empty context (see [Slot_key.context_key]'s doc). *)
 let atom_class_name rule_text =
   (* Real output is lowercase base36 + '-', but this must not stop early on
      other test-fixture shapes (existing generate.ml cram tests fabricate
-     raw [@@@css ...] payloads with hand-written names like ".css-A-y") -
+     raw [@@@css ...] payloads with hand-written names like ".a-A-y") -
      under-matching here would truncate two different class names down to
-     the same "css-" prefix and report a false collision. *)
+     the same prefix and report a false collision. The two prefixes differ
+     in length (2 vs 3), so the matched prefix's own length - not a fixed
+     constant - decides where the rest of the class name starts; neither is
+     a prefix of the other, so trying them in either order is unambiguous. *)
   let is_class_char c =
     (c >= 'a' && c <= 'z')
     || (c >= 'A' && c <= 'Z')
@@ -594,21 +599,20 @@ let atom_class_name rule_text =
     let m = String.length prefix in
     i + m <= n && String.sub rule_text i m = prefix
   in
+  let prefixes = [ "a-"; "in-" ] in
   let rec scan i =
     if i >= n then None
-    else if
-      rule_text.[i] = '.'
-      && (has_prefix (i + 1) "css-"
-         || has_prefix (i + 1) "csi-"
-         || has_prefix (i + 1) "csv-")
-    then (
-      let start = i + 1 in
-      let j = ref (start + 4) in
-      while !j < n && is_class_char rule_text.[!j] do
-        incr j
-      done;
-      Some (String.sub rule_text start (!j - start)))
-    else scan (i + 1)
+    else if rule_text.[i] <> '.' then scan (i + 1)
+    else (
+      match List.find_opt (fun p -> has_prefix (i + 1) p) prefixes with
+      | None -> scan (i + 1)
+      | Some p ->
+        let start = i + 1 in
+        let j = ref (start + String.length p) in
+        while !j < n && is_class_char rule_text.[!j] do
+          incr j
+        done;
+        Some (String.sub rule_text start (!j - start)))
   in
   scan 0
 
@@ -618,10 +622,10 @@ let atom_class_name rule_text =
     let two genuinely different atoms silently share one class - whichever rule
     text is deduped away would then apply to every element using that class,
     everywhere, for the OTHER atom's declaration too. Same shape as [Index]'s
-    `cid-` identity-collision check: same key, different content, is a hard
-    build error naming both sides, never a silently wrong stylesheet.
+    `id-` identity-collision check: same key, different content, is a hard build
+    error naming both sides, never a silently wrong stylesheet.
 
-    A `csv-` (interpolation-bundle) class is explicitly exempt, in both
+    An `in-` (interpolation-bundle) class is explicitly exempt, in both
     directions - never recorded, never compared, never flagged. [Css_file.re]'s
     bundling already, legitimately, gives several different declarations from
     one binding the SAME class when they all carry a [$(...)] interpolation;
@@ -638,7 +642,7 @@ let check_atom_class_collisions rules =
       match atom_class_name rule with
       | None -> None
       | Some class_name
-        when String.length class_name >= 4 && String.sub class_name 0 4 = "csv-"
+        when String.length class_name >= 3 && String.sub class_name 0 3 = "in-"
         ->
         None
       | Some class_name ->

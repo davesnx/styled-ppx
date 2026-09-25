@@ -15,196 +15,188 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "@keyframes keyframe-m6pt8e{0%{opacity:0;}100%{opacity:1;}}"];
-  [@css ".css-13g9u50{-webkit-animation-name:random;animation-name:random;}"];
+  [@css "@keyframes k-m6pt8e{0%{opacity:0;}100%{opacity:1;}}"];
+  [@css ".a-13g9u50{-webkit-animation-name:random;animation-name:random;}"];
+  [@css ".a-1b4du2s{-webkit-animation-name:foo, bar;animation-name:foo, bar;}"];
   [@css
-    ".css-1b4du2s{-webkit-animation-name:foo, bar;animation-name:foo, bar;}"
+    ".in-ixbkch{-webkit-animation-name:var(--foo-ucoxjj);animation-name:var(--foo-ucoxjj);}"
   ];
   [@css
-    ".csv-ixbkch{-webkit-animation-name:var(--foo-ucoxjj);animation-name:var(--foo-ucoxjj);}"
+    ".in-bcfqed{-webkit-animation-name:var(--foo-qnewyj), var(--bar-1nj9014);animation-name:var(--foo-qnewyj), var(--bar-1nj9014);}"
+  ];
+  [@css ".a-k2nfq1{-webkit-animation-duration:0s;animation-duration:0s;}"];
+  [@css ".a-kniaw8{-webkit-animation-duration:1s;animation-duration:1s;}"];
+  [@css ".a-2rwveq{-webkit-animation-duration:100ms;animation-duration:100ms;}"];
+  [@css
+    ".a-15rtj8j{-webkit-animation-duration:1.64s, 15.22s;animation-duration:1.64s, 15.22s;}"
   ];
   [@css
-    ".csv-bcfqed{-webkit-animation-name:var(--foo-qnewyj), var(--bar-1nj9014);animation-name:var(--foo-qnewyj), var(--bar-1nj9014);}"
-  ];
-  [@css ".css-k2nfq1{-webkit-animation-duration:0s;animation-duration:0s;}"];
-  [@css ".css-kniaw8{-webkit-animation-duration:1s;animation-duration:1s;}"];
-  [@css
-    ".css-2rwveq{-webkit-animation-duration:100ms;animation-duration:100ms;}"
+    ".a-1ehoaxk{-webkit-animation-duration:10s, 35s, 230ms;animation-duration:10s, 35s, 230ms;}"
   ];
   [@css
-    ".css-15rtj8j{-webkit-animation-duration:1.64s, 15.22s;animation-duration:1.64s, 15.22s;}"
+    ".a-1qgt0tu{-webkit-animation-timing-function:ease;animation-timing-function:ease;}"
   ];
   [@css
-    ".css-1ehoaxk{-webkit-animation-duration:10s, 35s, 230ms;animation-duration:10s, 35s, 230ms;}"
+    ".a-1lywp0a{-webkit-animation-timing-function:linear;animation-timing-function:linear;}"
   ];
   [@css
-    ".css-1qgt0tu{-webkit-animation-timing-function:ease;animation-timing-function:ease;}"
+    ".a-1hyviul{-webkit-animation-timing-function:ease-in;animation-timing-function:ease-in;}"
   ];
   [@css
-    ".css-1lywp0a{-webkit-animation-timing-function:linear;animation-timing-function:linear;}"
+    ".a-3wf3zo{-webkit-animation-timing-function:ease-out;animation-timing-function:ease-out;}"
   ];
   [@css
-    ".css-1hyviul{-webkit-animation-timing-function:ease-in;animation-timing-function:ease-in;}"
+    ".a-3pa72f{-webkit-animation-timing-function:ease-in-out;animation-timing-function:ease-in-out;}"
   ];
   [@css
-    ".css-3wf3zo{-webkit-animation-timing-function:ease-out;animation-timing-function:ease-out;}"
+    ".a-17l4e4x{-webkit-animation-timing-function:cubic-bezier(0.5, 0.5, 0.5, 0.5);animation-timing-function:cubic-bezier(0.5, 0.5, 0.5, 0.5);}"
   ];
   [@css
-    ".css-3pa72f{-webkit-animation-timing-function:ease-in-out;animation-timing-function:ease-in-out;}"
+    ".a-ktf1tj{-webkit-animation-timing-function:cubic-bezier(0.5, 1.5, 0.5, -2.5);animation-timing-function:cubic-bezier(0.5, 1.5, 0.5, -2.5);}"
   ];
   [@css
-    ".css-17l4e4x{-webkit-animation-timing-function:cubic-bezier(0.5, 0.5, 0.5, 0.5);animation-timing-function:cubic-bezier(0.5, 0.5, 0.5, 0.5);}"
+    ".a-l6j52{-webkit-animation-timing-function:step-start;animation-timing-function:step-start;}"
   ];
   [@css
-    ".css-ktf1tj{-webkit-animation-timing-function:cubic-bezier(0.5, 1.5, 0.5, -2.5);animation-timing-function:cubic-bezier(0.5, 1.5, 0.5, -2.5);}"
+    ".a-c4w8e9{-webkit-animation-timing-function:step-end;animation-timing-function:step-end;}"
   ];
   [@css
-    ".css-l6j52{-webkit-animation-timing-function:step-start;animation-timing-function:step-start;}"
+    ".a-1stl2sx{-webkit-animation-timing-function:steps(3, start);animation-timing-function:steps(3, start);}"
   ];
   [@css
-    ".css-c4w8e9{-webkit-animation-timing-function:step-end;animation-timing-function:step-end;}"
+    ".a-11mldx6{-webkit-animation-timing-function:steps(5, end);animation-timing-function:steps(5, end);}"
   ];
   [@css
-    ".css-1stl2sx{-webkit-animation-timing-function:steps(3, start);animation-timing-function:steps(3, start);}"
+    ".a-1x6lnxf{-webkit-animation-timing-function:ease, step-start, cubic-bezier(0.1, 0.7, 1, 0.1);animation-timing-function:ease, step-start, cubic-bezier(0.1, 0.7, 1, 0.1);}"
   ];
   [@css
-    ".css-11mldx6{-webkit-animation-timing-function:steps(5, end);animation-timing-function:steps(5, end);}"
+    ".a-17p8nyb{-webkit-animation-iteration-count:infinite;animation-iteration-count:infinite;}"
   ];
   [@css
-    ".css-1x6lnxf{-webkit-animation-timing-function:ease, step-start, cubic-bezier(0.1, 0.7, 1, 0.1);animation-timing-function:ease, step-start, cubic-bezier(0.1, 0.7, 1, 0.1);}"
+    ".a-18cslxe{-webkit-animation-iteration-count:8;animation-iteration-count:8;}"
   ];
   [@css
-    ".css-17p8nyb{-webkit-animation-iteration-count:infinite;animation-iteration-count:infinite;}"
+    ".a-1rrgpcx{-webkit-animation-iteration-count:4.35;animation-iteration-count:4.35;}"
   ];
   [@css
-    ".css-18cslxe{-webkit-animation-iteration-count:8;animation-iteration-count:8;}"
+    ".a-13pnpot{-webkit-animation-iteration-count:2, 0, infinite;animation-iteration-count:2, 0, infinite;}"
   ];
   [@css
-    ".css-1rrgpcx{-webkit-animation-iteration-count:4.35;animation-iteration-count:4.35;}"
+    ".a-iqjqic{-webkit-animation-direction:normal;animation-direction:normal;}"
   ];
   [@css
-    ".css-13pnpot{-webkit-animation-iteration-count:2, 0, infinite;animation-iteration-count:2, 0, infinite;}"
+    ".a-1dji1sk{-webkit-animation-direction:alternate;animation-direction:alternate;}"
   ];
   [@css
-    ".css-iqjqic{-webkit-animation-direction:normal;animation-direction:normal;}"
+    ".a-1ah6c5b{-webkit-animation-direction:reverse;animation-direction:reverse;}"
   ];
   [@css
-    ".css-1dji1sk{-webkit-animation-direction:alternate;animation-direction:alternate;}"
+    ".a-6b5c2u{-webkit-animation-direction:alternate-reverse;animation-direction:alternate-reverse;}"
   ];
   [@css
-    ".css-1ah6c5b{-webkit-animation-direction:reverse;animation-direction:reverse;}"
+    ".a-qf2f1p{-webkit-animation-direction:normal, reverse;animation-direction:normal, reverse;}"
   ];
   [@css
-    ".css-6b5c2u{-webkit-animation-direction:alternate-reverse;animation-direction:alternate-reverse;}"
+    ".a-yl5ztj{-webkit-animation-direction:alternate, reverse, normal;animation-direction:alternate, reverse, normal;}"
   ];
   [@css
-    ".css-qf2f1p{-webkit-animation-direction:normal, reverse;animation-direction:normal, reverse;}"
+    ".a-1x3r8bj{-webkit-animation-play-state:running;animation-play-state:running;}"
   ];
   [@css
-    ".css-yl5ztj{-webkit-animation-direction:alternate, reverse, normal;animation-direction:alternate, reverse, normal;}"
+    ".a-1i5bnre{-webkit-animation-play-state:paused;animation-play-state:paused;}"
   ];
   [@css
-    ".css-1x3r8bj{-webkit-animation-play-state:running;animation-play-state:running;}"
+    ".a-1ejgcqk{-webkit-animation-play-state:paused, running, running;animation-play-state:paused, running, running;}"
+  ];
+  [@css ".a-lndlyv{-webkit-animation-delay:1s;animation-delay:1s;}"];
+  [@css ".a-5q6y00{-webkit-animation-delay:-1s;animation-delay:-1s;}"];
+  [@css
+    ".a-vz2h4y{-webkit-animation-delay:2.1s, 480ms;animation-delay:2.1s, 480ms;}"
+  ];
+  [@css ".a-kjy95r{-webkit-animation-fill-mode:none;animation-fill-mode:none;}"];
+  [@css
+    ".a-144nmjc{-webkit-animation-fill-mode:forwards;animation-fill-mode:forwards;}"
   ];
   [@css
-    ".css-1i5bnre{-webkit-animation-play-state:paused;animation-play-state:paused;}"
+    ".a-1wl5fpo{-webkit-animation-fill-mode:backwards;animation-fill-mode:backwards;}"
+  ];
+  [@css ".a-iovuyg{-webkit-animation-fill-mode:both;animation-fill-mode:both;}"];
+  [@css
+    ".a-rar2w3{-webkit-animation-fill-mode:both, forwards, none;animation-fill-mode:both, forwards, none;}"
   ];
   [@css
-    ".css-1ejgcqk{-webkit-animation-play-state:paused, running, running;animation-play-state:paused, running, running;}"
-  ];
-  [@css ".css-lndlyv{-webkit-animation-delay:1s;animation-delay:1s;}"];
-  [@css ".css-5q6y00{-webkit-animation-delay:-1s;animation-delay:-1s;}"];
-  [@css
-    ".css-vz2h4y{-webkit-animation-delay:2.1s, 480ms;animation-delay:2.1s, 480ms;}"
+    ".a-bshgs5{-webkit-animation:foo 1s 2s infinite linear alternate both;animation:foo 1s 2s infinite linear alternate both;}"
   ];
   [@css
-    ".css-kjy95r{-webkit-animation-fill-mode:none;animation-fill-mode:none;}"
+    ".a-1jo1me1{-webkit-animation:4s ease-in 1s infinite reverse both paused;animation:4s ease-in 1s infinite reverse both paused;}"
   ];
   [@css
-    ".css-144nmjc{-webkit-animation-fill-mode:forwards;animation-fill-mode:forwards;}"
+    ".a-1e29gym{-webkit-animation:a 300ms linear 400ms infinite reverse forwards running;animation:a 300ms linear 400ms infinite reverse forwards running;}"
   ];
   [@css
-    ".css-1wl5fpo{-webkit-animation-fill-mode:backwards;animation-fill-mode:backwards;}"
+    "@keyframes k-kuv9ix{0%{height:var(--previous-135wur0);}100%{height:var(--current-18ewl8i);}}"
   ];
   [@css
-    ".css-iovuyg{-webkit-animation-fill-mode:both;animation-fill-mode:both;}"
+    ".in-1h7bkao{-webkit-animation-name:var(--resize-1jz21hk);animation-name:var(--resize-1jz21hk);}"
   ];
   [@css
-    ".css-rar2w3{-webkit-animation-fill-mode:both, forwards, none;animation-fill-mode:both, forwards, none;}"
+    ".in-1bi7afk{-webkit-animation:var(--resize-1aiquq7) 180ms ease-out 0s 1 normal both;animation:var(--resize-1aiquq7) 180ms ease-out 0s 1 normal both;}"
   ];
-  [@css
-    ".css-bshgs5{-webkit-animation:foo 1s 2s infinite linear alternate both;animation:foo 1s 2s infinite linear alternate both;}"
-  ];
-  [@css
-    ".css-1jo1me1{-webkit-animation:4s ease-in 1s infinite reverse both paused;animation:4s ease-in 1s infinite reverse both paused;}"
-  ];
-  [@css
-    ".css-1e29gym{-webkit-animation:a 300ms linear 400ms infinite reverse forwards running;animation:a 300ms linear 400ms infinite reverse forwards running;}"
-  ];
-  [@css
-    "@keyframes keyframe-kuv9ix{0%{height:var(--previous-135wur0);}100%{height:var(--current-18ewl8i);}}"
-  ];
-  [@css
-    ".csv-1h7bkao{-webkit-animation-name:var(--resize-1jz21hk);animation-name:var(--resize-1jz21hk);}"
-  ];
-  [@css
-    ".csv-1bi7afk{-webkit-animation:var(--resize-1aiquq7) 180ms ease-out 0s 1 normal both;animation:var(--resize-1aiquq7) 180ms ease-out 0s 1 normal both;}"
-  ];
-  let foo = CSS.Types.AnimationName.make("keyframe-m6pt8e");
-  let bar = CSS.Types.AnimationName.make("keyframe-m6pt8e");
+  let foo = CSS.Types.AnimationName.make("k-m6pt8e");
+  let bar = CSS.Types.AnimationName.make("k-m6pt8e");
   
-  CSS.make("css-13g9u50", []);
-  CSS.make("css-1b4du2s", []);
+  CSS.make("a-13g9u50", []);
+  CSS.make("a-1b4du2s", []);
   CSS.make(
-    "csv-ixbkch",
+    "in-ixbkch",
     CSS.Types.AnimationName.toStyleVars("--foo-ucoxjj", foo),
   );
   CSS.make(
-    "csv-bcfqed",
+    "in-bcfqed",
     CSS.Types.AnimationName.toStyleVars("--foo-qnewyj", foo)
     @ CSS.Types.AnimationName.toStyleVars("--bar-1nj9014", bar),
   );
-  CSS.make("css-k2nfq1", []);
-  CSS.make("css-kniaw8", []);
-  CSS.make("css-2rwveq", []);
-  CSS.make("css-15rtj8j", []);
-  CSS.make("css-1ehoaxk", []);
-  CSS.make("css-1qgt0tu", []);
-  CSS.make("css-1lywp0a", []);
-  CSS.make("css-1hyviul", []);
-  CSS.make("css-3wf3zo", []);
-  CSS.make("css-3pa72f", []);
-  CSS.make("css-17l4e4x", []);
-  CSS.make("css-ktf1tj", []);
-  CSS.make("css-l6j52", []);
-  CSS.make("css-c4w8e9", []);
-  CSS.make("css-1stl2sx", []);
-  CSS.make("css-11mldx6", []);
-  CSS.make("css-1x6lnxf", []);
-  CSS.make("css-17p8nyb", []);
-  CSS.make("css-18cslxe", []);
-  CSS.make("css-1rrgpcx", []);
-  CSS.make("css-13pnpot", []);
-  CSS.make("css-iqjqic", []);
-  CSS.make("css-1dji1sk", []);
-  CSS.make("css-1ah6c5b", []);
-  CSS.make("css-6b5c2u", []);
-  CSS.make("css-qf2f1p", []);
-  CSS.make("css-yl5ztj", []);
-  CSS.make("css-1x3r8bj", []);
-  CSS.make("css-1i5bnre", []);
-  CSS.make("css-1ejgcqk", []);
-  CSS.make("css-lndlyv", []);
-  CSS.make("css-5q6y00", []);
-  CSS.make("css-vz2h4y", []);
-  CSS.make("css-kjy95r", []);
-  CSS.make("css-144nmjc", []);
-  CSS.make("css-1wl5fpo", []);
-  CSS.make("css-iovuyg", []);
-  CSS.make("css-rar2w3", []);
-  CSS.make("css-bshgs5", []);
-  CSS.make("css-1jo1me1", []);
-  CSS.make("css-1e29gym", []);
+  CSS.make("a-k2nfq1", []);
+  CSS.make("a-kniaw8", []);
+  CSS.make("a-2rwveq", []);
+  CSS.make("a-15rtj8j", []);
+  CSS.make("a-1ehoaxk", []);
+  CSS.make("a-1qgt0tu", []);
+  CSS.make("a-1lywp0a", []);
+  CSS.make("a-1hyviul", []);
+  CSS.make("a-3wf3zo", []);
+  CSS.make("a-3pa72f", []);
+  CSS.make("a-17l4e4x", []);
+  CSS.make("a-ktf1tj", []);
+  CSS.make("a-l6j52", []);
+  CSS.make("a-c4w8e9", []);
+  CSS.make("a-1stl2sx", []);
+  CSS.make("a-11mldx6", []);
+  CSS.make("a-1x6lnxf", []);
+  CSS.make("a-17p8nyb", []);
+  CSS.make("a-18cslxe", []);
+  CSS.make("a-1rrgpcx", []);
+  CSS.make("a-13pnpot", []);
+  CSS.make("a-iqjqic", []);
+  CSS.make("a-1dji1sk", []);
+  CSS.make("a-1ah6c5b", []);
+  CSS.make("a-6b5c2u", []);
+  CSS.make("a-qf2f1p", []);
+  CSS.make("a-yl5ztj", []);
+  CSS.make("a-1x3r8bj", []);
+  CSS.make("a-1i5bnre", []);
+  CSS.make("a-1ejgcqk", []);
+  CSS.make("a-lndlyv", []);
+  CSS.make("a-5q6y00", []);
+  CSS.make("a-vz2h4y", []);
+  CSS.make("a-kjy95r", []);
+  CSS.make("a-144nmjc", []);
+  CSS.make("a-1wl5fpo", []);
+  CSS.make("a-iovuyg", []);
+  CSS.make("a-rar2w3", []);
+  CSS.make("a-bshgs5", []);
+  CSS.make("a-1jo1me1", []);
+  CSS.make("a-1e29gym", []);
   
   let previousHeight = 20;
   let currentHeight = 80;
@@ -216,14 +208,14 @@ If this test fail means that the module is not in sync with the ppx
         ("--previous-135wur0", CSS.Types.Height.toString(previous)),
         ("--current-18ewl8i", CSS.Types.Height.toString(current)),
       ],
-      "keyframe-kuv9ix",
+      "k-kuv9ix",
     );
   
   CSS.make(
-    "csv-1h7bkao",
+    "in-1h7bkao",
     CSS.Types.AnimationName.toStyleVars("--resize-1jz21hk", resize),
   );
   CSS.make(
-    "csv-1bi7afk",
+    "in-1bi7afk",
     CSS.Types.AnimationName.toStyleVars("--resize-1aiquq7", resize),
   );

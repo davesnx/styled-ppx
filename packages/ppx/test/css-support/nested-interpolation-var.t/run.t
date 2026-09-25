@@ -19,14 +19,14 @@ top-level interpolation does. If the inline list is empty `[]` for the
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css "@property --c-dq4mhq{syntax:\"*\";inherits:false;}"];
   [@css "@property --c-11hlefi{syntax:\"*\";inherits:false;}"];
-  [@css ".csv-1b5xvk3{color:var(--c-dq4mhq);}"];
-  [@css ".csv-1orh0hp:hover{color:var(--c-11hlefi);}"];
-  [@css ".csv-zjac4l::placeholder{color:var(--c-gzgct8);}"];
+  [@css ".in-1b5xvk3{color:var(--c-dq4mhq);}"];
+  [@css ".in-1orh0hp:hover{color:var(--c-11hlefi);}"];
+  [@css ".in-zjac4l::placeholder{color:var(--c-gzgct8);}"];
   [@css.bindings
     [
-      ("Input.topLevel", "cid-1pfdov9", "csv-1b5xvk3"),
-      ("Input.hover", "cid-zu568x", "csv-1orh0hp"),
-      ("Input.placeholder", "cid-1xk9ylj", "csv-zjac4l"),
+      ("Input.topLevel", "id-1pfdov9", "in-1b5xvk3"),
+      ("Input.hover", "id-zu568x", "in-1orh0hp"),
+      ("Input.placeholder", "id-1xk9ylj", "in-zjac4l"),
     ]
   ];
   
@@ -34,19 +34,19 @@ top-level interpolation does. If the inline list is empty `[]` for the
   
   let topLevel =
     CSS.make(
-      "label:topLevel cid-1pfdov9 csv-1b5xvk3",
+      "label:topLevel id-1pfdov9 in-1b5xvk3",
       [("--c-dq4mhq", CSS.Types.Color.toString(c))],
     );
   
   let hover =
     CSS.make(
-      "label:hover cid-zu568x csv-1orh0hp",
+      "label:hover id-zu568x in-1orh0hp",
       [("--c-11hlefi", CSS.Types.Color.toString(c))],
     );
   
   let placeholder =
     CSS.make(
-      "label:placeholder cid-1xk9ylj csv-zjac4l",
+      "label:placeholder id-1xk9ylj in-zjac4l",
       [("--c-gzgct8", CSS.Types.Color.toString(c))],
     );
   

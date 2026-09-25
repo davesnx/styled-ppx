@@ -63,12 +63,14 @@ let examples_tests =
            here - a literal hash assertion would just be re-deriving the
            implementation, not checking behavior). *)
         check_bool
-          (Printf.sprintf "%s: %S starts with css-, csi-, or csv-" label c)
+          (Printf.sprintf "%s: %S starts with %s or %s" label c
+             Class_format.atom_prefix Class_format.bundle_prefix)
           true
-          (starts_with "css-" c || starts_with "csi-" c || starts_with "csv-" c)))
+          (starts_with (Class_format.atom_prefix ^ "-") c
+          || starts_with (Class_format.bundle_prefix ^ "-") c)))
     examples
 
-let base_length = 4 + Class_format.family_width + Class_format.value_width
+let base_length = Class_format.floor_of_prefix Class_format.atom_prefix
 
 let format_tests =
   [
@@ -78,11 +80,16 @@ let format_tests =
       let c = class_of "height: 0;" in
       check_int "length" base_length (String.length c));
     Alcotest_extra.test
-      "an !important atom uses the csi- prefix, same length as css-" (fun () ->
+      "an !important atom uses the SAME a- prefix as a plain atom - there is \
+       no separate important-atom prefix (2026-09-25 user decision) - but is \
+       context_width chars longer, since !important is folded into the context \
+       key and a base atom's context is otherwise free" (fun () ->
       let plain = class_of "color: red;" in
       let important = class_of "color: red !important;" in
-      check_bool "csi- prefix" true (starts_with "csi-" important);
-      check_int "same total length" (String.length plain)
+      check_bool "same a- prefix" true
+        (starts_with (Class_format.atom_prefix ^ "-") important);
+      check_int "context_width chars longer (importance costs a context field)"
+        (String.length plain + Class_format.context_width)
         (String.length important));
     Alcotest_extra.test
       "a non-base context costs exactly context_width more than base" (fun () ->
@@ -91,6 +98,17 @@ let format_tests =
       check_int "hover is context_width chars longer"
         (String.length base + Class_format.context_width)
         (String.length hover));
+    Alcotest_extra.test
+      "!important composes with a real selector context into ONE context \
+       field, not two - hover alone, important alone, and hover+important \
+       together are all exactly context_width longer than base, never \
+       2*context_width, because the whole context key (however many pieces fed \
+       into it) is hashed down to one fixed-width field" (fun () ->
+      let base = class_of "color: red;" in
+      let hover_important = class_of "&:hover{color: red !important;}" in
+      check_int "context_width chars longer, not 2*context_width"
+        (String.length base + Class_format.context_width)
+        (String.length hover_important));
     Alcotest_extra.test
       "a lone longhand (needs a mask) costs exactly mask_width more than a \
        plain property of the same context" (fun () ->
@@ -133,20 +151,25 @@ let format_tests =
       check_int "same length as a custom property" (String.length custom)
         (String.length unknown));
     Alcotest_extra.test
-      "a bundle atom ($(...) interpolation) uses the csv- prefix, carries none \
+      "a bundle atom ($(...) interpolation) uses the in- prefix, carries none \
        of the other fields, and its hash is exactly the same unpadded Murmur2 \
        digest today's class_and_namespace already computes - only the prefix \
        changed, not the hash algorithm or width" (fun () ->
       let content = Render.rule (atom_of "color: $(theme);") in
       let c = class_of "color: $(theme);" in
-      check_bool "csv- prefix" true (starts_with "csv-" c);
-      check_string "csv- + unpadded Murmur2.default"
-        ("csv-" ^ Murmur2.default content)
+      check_bool "in- prefix" true
+        (starts_with (Class_format.bundle_prefix ^ "-") c);
+      check_string "in- + unpadded Murmur2.default"
+        (Class_format.bundle_prefix ^ "-" ^ Murmur2.default content)
         c;
       check_bool
-        "length is at most 4 + bundle_value_width (unpadded, so can be shorter)"
+        "length is at most len(in-) + bundle_value_width (unpadded, so can be \
+         shorter)"
         true
-        (String.length c <= 4 + Class_format.bundle_value_width));
+        (String.length c
+        <= String.length Class_format.bundle_prefix
+           + 1
+           + Class_format.bundle_value_width));
     Alcotest_extra.test
       "the six possible non-bundle extra-length values are pairwise distinct \
        (the property that makes runtime parsing unambiguous)" (fun () ->

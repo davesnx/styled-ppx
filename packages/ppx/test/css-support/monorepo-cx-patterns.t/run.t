@@ -25,47 +25,47 @@ If this test fail means that the module is not in sync with the ppx
   [@css "@property --line-e0dy15_1{syntax:\"*\";inherits:false;}"];
   [@css "@property --line-e0dy15_2{syntax:\"*\";inherits:false;}"];
   [@css "@property --line-e0dy15_3{syntax:\"*\";inherits:false;}"];
-  [@css ".css-34k09d{width:30px;}"];
-  [@css ".csv-1cx090v{color:var(--tertiary-1cttnp6);}"];
-  [@css ".css-t2slgw{box-shadow:inset 1px 0 0 0 transparent !important;}"];
+  [@css ".a-34k09d{width:30px;}"];
+  [@css ".in-1cx090v{color:var(--tertiary-1cttnp6);}"];
+  [@css ".a-t2slgw{box-shadow:inset 1px 0 0 0 transparent !important;}"];
   [@css
-    ".csv-1rh80o9{box-shadow:1px 0 0 0 var(--line-9kmuhm_1), inset 0 -1px 0 0 var(--line-9kmuhm_2) !important;}"
+    ".in-1rh80o9{box-shadow:1px 0 0 0 var(--line-9kmuhm_1), inset 0 -1px 0 0 var(--line-9kmuhm_2) !important;}"
   ];
-  [@css ".css-1mx0ppg{box-shadow:inset 0 0 0 0 transparent;}"];
+  [@css ".a-1mx0ppg{box-shadow:inset 0 0 0 0 transparent;}"];
   [@css
-    ".csv-1bp0v5z:hover{box-shadow:1px 0 0 0 var(--line-1rsudnc_1), inset 0 -1px 0 0 var(--line-1rsudnc_2) !important;}"
+    ".in-1bp0v5z:hover{box-shadow:1px 0 0 0 var(--line-1rsudnc_1), inset 0 -1px 0 0 var(--line-1rsudnc_2) !important;}"
   ];
-  [@css ".csv-1nzxk4v{color:var(--secondary-16kletf);}"];
-  [@css ".csv-1nzxk4v:hover{background-color:var(--box_-vdb5xj);}"];
+  [@css ".in-1nzxk4v{color:var(--secondary-16kletf);}"];
+  [@css ".in-1nzxk4v:hover{background-color:var(--box_-vdb5xj);}"];
   [@css
-    ".csv-1nzxk4v:hover{box-shadow:1px 0 0 0 var(--line-e0dy15_1), inset 1px 0 0 0 var(--line-e0dy15_2), inset 0 -1px 0 0 var(--line-e0dy15_3);}"
+    ".in-1nzxk4v:hover{box-shadow:1px 0 0 0 var(--line-e0dy15_1), inset 1px 0 0 0 var(--line-e0dy15_2), inset 0 -1px 0 0 var(--line-e0dy15_3);}"
   ];
-  [@css ".css-i9gxme{flex-grow:1;}"];
-  [@css ".css-r6z5ec{z-index:1;}"];
-  [@css ".css-tjsoaq{transition:all 200ms ease 0ms;}"];
-  [@css ".css-145l4ca.cid-1wtohw8{min-width:0;}"];
-  [@css ".css-1oluo0q.cid-1wtohw8{max-width:0;}"];
-  [@css ".css-2io1ml.cid-1wtohw8{opacity:0;}"];
-  [@css ".css-1k938xr.cid-1wtohw8{overflow:hidden;}"];
-  [@css ".css-keq5th{transition:transform 0.3s !important;}"];
+  [@css ".a-i9gxme{flex-grow:1;}"];
+  [@css ".a-r6z5ec{z-index:1;}"];
+  [@css ".a-tjsoaq{transition:all 200ms ease 0ms;}"];
+  [@css ".a-145l4ca.id-1wtohw8{min-width:0;}"];
+  [@css ".a-1oluo0q.id-1wtohw8{max-width:0;}"];
+  [@css ".a-2io1ml.id-1wtohw8{opacity:0;}"];
+  [@css ".a-1k938xr.id-1wtohw8{overflow:hidden;}"];
+  [@css ".a-keq5th{transition:transform 0.3s !important;}"];
   [@css
-    ".css-1hwm8mm{transition:opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;}"
+    ".a-1hwm8mm{transition:opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;}"
   ];
   [@css.bindings
     [
-      ("Input._spaceBeforeColon", "cid-pwoumt", "css-34k09d csv-1cx090v"),
-      ("Input._tabInnerFirst", "cid-110u1xw", "css-t2slgw"),
-      ("Input._multiShadowImportant", "cid-c7rk0r", "csv-1rh80o9"),
-      ("Input._tabTextFirst", "cid-19955vg", "css-1mx0ppg csv-1bp0v5z"),
-      ("Input._tabText", "cid-e443o3", "csv-1nzxk4v"),
-      ("Input._sidebarClosed", "cid-1wtohw8", ""),
+      ("Input._spaceBeforeColon", "id-pwoumt", "a-34k09d in-1cx090v"),
+      ("Input._tabInnerFirst", "id-110u1xw", "a-t2slgw"),
+      ("Input._multiShadowImportant", "id-c7rk0r", "in-1rh80o9"),
+      ("Input._tabTextFirst", "id-19955vg", "a-1mx0ppg in-1bp0v5z"),
+      ("Input._tabText", "id-e443o3", "in-1nzxk4v"),
+      ("Input._sidebarClosed", "id-1wtohw8", ""),
       (
         "Input._sidebar",
-        "cid-jjvyqu",
-        "css-i9gxme css-r6z5ec css-tjsoaq css-145l4ca css-1oluo0q css-2io1ml css-1k938xr",
+        "id-jjvyqu",
+        "a-i9gxme a-r6z5ec a-tjsoaq a-145l4ca a-1oluo0q a-2io1ml a-1k938xr",
       ),
-      ("Input._checkbox", "cid-1sltg0l", "css-keq5th"),
-      ("Input._transitions", "cid-1jxvvla", "css-1hwm8mm"),
+      ("Input._checkbox", "id-1sltg0l", "a-keq5th"),
+      ("Input._transitions", "id-1jxvvla", "a-1hwm8mm"),
     ]
   ];
   module Color = {
@@ -83,16 +83,15 @@ If this test fail means that the module is not in sync with the ppx
   
   let _spaceBeforeColon =
     CSS.make(
-      "label:_spaceBeforeColon cid-pwoumt css-34k09d csv-1cx090v",
+      "label:_spaceBeforeColon id-pwoumt a-34k09d in-1cx090v",
       [("--tertiary-1cttnp6", CSS.Types.Color.toString(Color.Text.tertiary))],
     );
   
-  let _tabInnerFirst =
-    CSS.make("label:_tabInnerFirst cid-110u1xw css-t2slgw", []);
+  let _tabInnerFirst = CSS.make("label:_tabInnerFirst id-110u1xw a-t2slgw", []);
   
   let _multiShadowImportant =
     CSS.make(
-      "label:_multiShadowImportant cid-c7rk0r csv-1rh80o9",
+      "label:_multiShadowImportant id-c7rk0r in-1rh80o9",
       [
         ("--line-9kmuhm_1", CSS.Types.Color.toString(Color.Border.line)),
         ("--line-9kmuhm_2", CSS.Types.Color.toString(Color.Border.line)),
@@ -101,7 +100,7 @@ If this test fail means that the module is not in sync with the ppx
   
   let _tabTextFirst =
     CSS.make(
-      "label:_tabTextFirst cid-19955vg css-1mx0ppg csv-1bp0v5z",
+      "label:_tabTextFirst id-19955vg a-1mx0ppg in-1bp0v5z",
       [
         ("--line-1rsudnc_1", CSS.Types.Color.toString(Color.Border.line)),
         ("--line-1rsudnc_2", CSS.Types.Color.toString(Color.Border.line)),
@@ -110,7 +109,7 @@ If this test fail means that the module is not in sync with the ppx
   
   let _tabText =
     CSS.make(
-      "label:_tabText cid-e443o3 csv-1nzxk4v",
+      "label:_tabText id-e443o3 in-1nzxk4v",
       [
         ("--secondary-16kletf", CSS.Types.Color.toString(Color.Text.secondary)),
         ("--box_-vdb5xj", CSS.Types.Color.toString(Color.Background.box_)),
@@ -120,17 +119,17 @@ If this test fail means that the module is not in sync with the ppx
       ],
     );
   
-  let _sidebarClosed = CSS.make("label:_sidebarClosed cid-1wtohw8", []);
+  let _sidebarClosed = CSS.make("label:_sidebarClosed id-1wtohw8", []);
   
   let _sidebar =
     CSS.make(
-      "label:_sidebar cid-jjvyqu css-i9gxme css-r6z5ec css-tjsoaq css-145l4ca css-1oluo0q css-2io1ml css-1k938xr",
+      "label:_sidebar id-jjvyqu a-i9gxme a-r6z5ec a-tjsoaq a-145l4ca a-1oluo0q a-2io1ml a-1k938xr",
       [],
     );
   
-  let _checkbox = CSS.make("label:_checkbox cid-1sltg0l css-keq5th", []);
+  let _checkbox = CSS.make("label:_checkbox id-1sltg0l a-keq5th", []);
   
-  let _transitions = CSS.make("label:_transitions cid-1jxvvla css-1hwm8mm", []);
+  let _transitions = CSS.make("label:_transitions id-1jxvvla a-1hwm8mm", []);
   
   let _shadow1: CSS.Shadow.t =
     CSS.Shadow.box(~blur=`px(100), `hex("000000"), ~inset=true);

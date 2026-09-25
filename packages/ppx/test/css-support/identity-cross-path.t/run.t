@@ -8,7 +8,7 @@ twice under different paths - Dune `copy_files` into a Melange build dir,
 vendoring, or a native (SSR) build plus a Melange (client) build of one
 file. The identity is namespaced on the compilation-unit module name
 (`Marker`), never the physical path, so both builds mint the same
-`cid-...` and a `$(marker)` reference resolves identically on either side.
+`id-...` and a `$(marker)` reference resolves identically on either side.
 
   $ mkdir -p native js
   $ cp Marker.re native/Marker.re
@@ -21,6 +21,6 @@ file. The identity is namespaced on the compilation-unit module name
 Both paths mint the same identity:
 
   $ grep "css.bindings" native/Marker.ml
-  [@@@css.bindings [("Marker.marker", "cid-1ja89pc", "css-tokvmb")]]
+  [@@@css.bindings [("Marker.marker", "id-1ja89pc", "a-tokvmb")]]
   $ grep "css.bindings" js/Marker.ml
-  [@@@css.bindings [("Marker.marker", "cid-1ja89pc", "css-tokvmb")]]
+  [@@@css.bindings [("Marker.marker", "id-1ja89pc", "a-tokvmb")]]

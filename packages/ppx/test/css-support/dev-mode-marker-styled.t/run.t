@@ -16,12 +16,12 @@ covers both a static payload (Box) and a dynamic labeled-argument payload
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css "@property --color-1a279q8{syntax:\"*\";inherits:false;}"];
-  [@css ".css-tokvmb{color:red;}"];
-  [@css ".csv-kusjgz{color:var(--color-1a279q8);}"];
+  [@css ".a-tokvmb{color:red;}"];
+  [@css ".in-kusjgz{color:var(--color-1a279q8);}"];
   [@css.bindings
     [
-      ("Input.Box", "cid-zugc0d", "css-tokvmb"),
-      ("Input.Button", "cid-1qldrk3", "csv-kusjgz"),
+      ("Input.Box", "id-zugc0d", "a-tokvmb"),
+      ("Input.Button", "id-1qldrk3", "in-kusjgz"),
     ]
   ];
   
@@ -1010,7 +1010,7 @@ covers both a static payload (Box) and a dynamic labeled-argument payload
     external assign2: (Js.t({..}), makeProps, Js.t({..})) => Js.t({..}) =
       "Object.assign";
   
-    let styles = CSS.make("label:Box cid-zugc0d css-tokvmb", []);
+    let styles = CSS.make("label:Box id-zugc0d a-tokvmb", []);
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(classNameGet(props))
       and style = snd(styles);
@@ -2020,7 +2020,7 @@ covers both a static payload (Box) and a dynamic labeled-argument payload
   
     let styles = (~color: CSS.Types.Color.t, _) =>
       CSS.make(
-        "label:Button cid-1qldrk3 csv-kusjgz",
+        "label:Button id-1qldrk3 in-kusjgz",
         [("--color-1a279q8", CSS.Types.Color.toString(color))],
       );
     let make = (props: makeProps) => {

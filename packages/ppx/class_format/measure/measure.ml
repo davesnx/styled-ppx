@@ -12,12 +12,14 @@ let is_class_char c =
   (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c = '-'
 
 let find_class_token line =
-  (* First ".css-..."/".csi-..."/".csv-..." token in the line (there is at
-     most one real atom class per corpus line - see merge-order-flip-
-     under-dedup.md's "one line per rule" observation about this exact
-     corpus). A [csv-] token (a bundle atom, already wired for real - see
-     Hash_class.bundle_class_and_namespace) is measured as-is, not
-     re-estimated: it needs no css-/csi- field arithmetic at all. *)
+  (* First ".a-..."/".in-..." token in the line (there is at most one real
+     atom class per corpus line - see merge-order-flip-under-dedup.md's
+     "one line per rule" observation about this exact corpus). There is no
+     separate important-atom prefix at all ([!important] is folded into
+     {!Slot_key.context_key} instead - see [Class_format]'s doc comment),
+     so only these two prefixes ever appear here. An [in-] token (a bundle
+     atom, already wired for real) is measured as-is, not re-estimated: it
+     needs no [a-] field arithmetic at all. *)
   let n = String.length line in
   let has_prefix i p =
     let m = String.length p in
@@ -27,13 +29,18 @@ let find_class_token line =
     if i >= n then None
     else if
       line.[i] = '.'
-      && (has_prefix (i + 1) "css-"
-         || has_prefix (i + 1) "csi-"
-         || has_prefix (i + 1) "csv-")
+      && (has_prefix (i + 1) (Class_format.atom_prefix ^ "-")
+         || has_prefix (i + 1) (Class_format.bundle_prefix ^ "-"))
     then (
       let start = i + 1 in
-      let is_bundle = has_prefix start "csv-" in
-      let j = ref (start + 4) in
+      let is_bundle = has_prefix start (Class_format.bundle_prefix ^ "-") in
+      let prefix_len =
+        String.length
+          (if is_bundle then Class_format.bundle_prefix
+           else Class_format.atom_prefix)
+        + 1
+      in
+      let j = ref (start + prefix_len) in
       while !j < n && is_class_char line.[!j] do
         incr j
       done;
@@ -41,6 +48,22 @@ let find_class_token line =
     else scan (i + 1)
   in
   scan 0
+
+(* A plain substring search for "!important" in a declaration body - same
+   spirit as [properties_in_body]'s own text-based proxy just below (a full
+   CSS parse is more than this measurement script needs). The HYPOTHETICAL
+   new slot-key format (simulated below) folds this into whether the atom
+   pays for a context field at all (see [Slot_key.context_key]'s doc);
+   today's real corpus doesn't encode importance in the class token, so
+   this can't be read off the token the way bundle-ness can. *)
+let has_important body =
+  let needle = "!important" in
+  let n = String.length body
+  and m = String.length needle in
+  let rec loop i =
+    i + m <= n && (String.sub body i m = needle || loop (i + 1))
+  in
+  loop 0
 
 (* Declared property names inside the {...} body - same approach as the
    phase-1 evaluation's Python `derive_slots`: text before each top-level
@@ -87,7 +110,8 @@ let new_length ~has_context ~mask_needed ~extended_needed =
   + (if has_context then Class_format.context_width else 0)
   + (if mask_needed then Class_format.mask_width else 0)
   + (if extended_needed then Class_format.extended_width else 0)
-  + 4 (* "css-"/"csi-" *)
+  + 1 (* "-" *)
+  + String.length Class_format.atom_prefix
 
 type row = {
   old_length : int;
@@ -176,19 +200,21 @@ let analyze_line line : row option =
       then (
         (* A single-line at-rule wrapper (this corpus's shape, e.g.
            "@media (...){height: auto;}") - context is always present. *)
+        let body = body_between line (start + len) in
         let properties =
-          body_between line (start + len)
-          |> properties_in_body
-          |> List.map Slot_key.normalize_property
+          body |> properties_in_body |> List.map Slot_key.normalize_property
         in
         row_of ~context:true ~old_len:len ~properties)
       else (
         let class_end = start + len in
         let ctx = has_context line class_end in
+        let body = body_between line class_end in
+        (* [!important] costs a context field too, folded into the same
+           context {!Slot_key.context_key} would compute - not a separate
+           prefix (see [find_class_token]'s doc). *)
+        let ctx = ctx || has_important body in
         let properties =
-          body_between line class_end
-          |> properties_in_body
-          |> List.map Slot_key.normalize_property
+          body |> properties_in_body |> List.map Slot_key.normalize_property
         in
         row_of ~context:ctx ~old_len:len ~properties)
     | None -> None)
@@ -216,7 +242,7 @@ let () =
     let non_bundle = List.filter (fun r -> not r.bundle) rows in
     let n_nb = List.length non_bundle in
     (* [pct_of] denominator is the group the count is a fraction OF - the
-       four css-/csi- breakdowns below are fractions of [n_nb] (the non-
+       four non-bundle breakdowns below are fractions of [n_nb] (the non-
        bundle atoms), not of [n] (all atoms including bundles), which was a
        real bug caught while writing up the checkpoint numbers: it silently
        made every one of those four percentages read low, since [n] > [n_nb]
@@ -238,16 +264,15 @@ let () =
       List.length (List.filter (fun r -> r.extended) non_bundle)
     in
     let bundle_count = List.length (List.filter (fun r -> r.bundle) rows) in
-    Printf.printf
-      "atoms analyzed: %d (%d css-/csi-, %d already-real csv- bundles)\n" n n_nb
-      bundle_count;
+    Printf.printf "atoms analyzed: %d (%d a-, %d already-real in- bundles)\n" n
+      n_nb bundle_count;
     Printf.printf "old total class-name chars: %d (avg %.2f)\n" old_total
       (float_of_int old_total /. float_of_int n);
     Printf.printf "new total class-name chars: %d (avg %.2f)\n" new_total
       (float_of_int new_total /. float_of_int n);
     Printf.printf "delta: %+d chars (%+.2f avg/atom)\n" (new_total - old_total)
       (float_of_int (new_total - old_total) /. float_of_int n);
-    Printf.printf "of the %d css-/csi- (non-bundle) atoms:\n" n_nb;
+    Printf.printf "of the %d a- (non-bundle) atoms:\n" n_nb;
     Printf.printf "  base (no context, no mask, no extended): %d (%.1f%%)\n"
       base_count (pct_nb base_count);
     Printf.printf "  non-base context: %d (%.1f%%)\n" context_count
@@ -258,17 +283,20 @@ let () =
       "  needs the extended-hash field (unregistered/custom): %d (%.1f%%)\n"
       extended_count (pct_nb extended_count);
     Printf.printf
-      "bundle (csv-, already real, measured as-is, no delta): %d (%.1f%%)\n"
+      "bundle (in-, already real, measured as-is, no delta): %d (%.1f%%)\n"
       bundle_count (pct bundle_count);
     (* Rewrite the corpus with each old class token replaced by a
-       placeholder of the NEW computed length, same prefix ("css-"/"csi-"
-       preserved), so the caller can gzip old vs new. Each field is hashed
-       SEPARATELY at its own real width (context<=4, family/mask<=3,
-       value<=5), mirroring how [Class_format.slot_class] actually builds a
-       class name field by field, rather than one combined hash: a single
-       hash over a >12-char width overflows OCaml's native int well before
-       reaching it (36^15 is far past the 63-bit range), and produces a
-       biased, leading-zero-heavy result that would make the placeholders
+       placeholder of the NEW computed length, so the caller can gzip old vs
+       new. The placeholder's prefix is always [a-] - there is no separate
+       important-atom prefix (see [find_class_token]'s doc); an [!important]
+       declaration instead gets [row.context = true], which the [context]
+       field below already accounts for. Each other field is hashed
+       SEPARATELY at its own real width (context<=5, family/mask<=3,
+       extended/value<=6), mirroring how [Class_format.slot_class] actually
+       builds a class name field by field, rather than one combined hash: a
+       single hash over a >12-char width overflows OCaml's native int well
+       before reaching it (36^15 is far past the 63-bit range), and produces
+       a biased, leading-zero-heavy result that would make the placeholders
        LESS realistic (more repetition, so gzip would again understate the
        real cost) than genuinely independent per-field hashes are. *)
     let oc = open_out rewritten_out_path in
@@ -280,7 +308,7 @@ let () =
           output_string oc line;
           output_char oc '\n'
         | Some (start, len, false), Some row ->
-          let prefix = String.sub line start 4 in
+          let prefix = Class_format.atom_prefix ^ "-" in
           let field ~width tag =
             Class_format.hashed_field ~width (line ^ tag)
           in

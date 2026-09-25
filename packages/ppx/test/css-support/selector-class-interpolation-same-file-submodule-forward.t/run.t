@@ -14,21 +14,21 @@ referenced submodule binding above the selector interpolation.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-59bkuc.\000Css.marker\000{color:blue;}"];
-  [@css ".css-tokvmb{color:red;}"];
+  [@css ".a-59bkuc.\000Css.marker\000{color:blue;}"];
+  [@css ".a-tokvmb{color:red;}"];
   [@css.bindings
     [
-      ("Input.wrapper", "cid-4f6ye3", "css-59bkuc"),
-      ("Input.Css.marker", "cid-zr2uk1", "css-tokvmb"),
+      ("Input.wrapper", "id-4f6ye3", "a-59bkuc"),
+      ("Input.Css.marker", "id-zr2uk1", "a-tokvmb"),
     ]
   ];
   [@css.refs [("Css.marker", "input.re", 2, 6, 16)]];
   
   let _ = Css.marker;
-  let wrapper = CSS.make("label:wrapper cid-4f6ye3 css-59bkuc", []);
+  let wrapper = CSS.make("label:wrapper id-4f6ye3 a-59bkuc", []);
   
   module Css = {
-    let marker = CSS.make("label:marker cid-zr2uk1 css-tokvmb", []);
+    let marker = CSS.make("label:marker id-zr2uk1 a-tokvmb", []);
   };
   
   let _ = (wrapper, Css.marker);
