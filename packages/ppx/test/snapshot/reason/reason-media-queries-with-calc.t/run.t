@@ -1,10 +1,10 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "@media (min-width: calc(2px + 1px)) {.css-1gk5m2e{color:red;}}"];
-  [@css "@media (min-width: calc(1000px - 2%)) {.css-d1l0w0{color:red;}}"];
+  [@css "@media (min-width: calc(2px + 1px)) {.a-1gk5m2e{color:red;}}"];
+  [@css "@media (min-width: calc(1000px - 2%)) {.a-d1l0w0{color:red;}}"];
   [@css.bindings
-    [("Output.MediaQueryCalc", "cid-1mcoche", "css-1gk5m2e css-d1l0w0")]
+    [("Output.MediaQueryCalc", "id-1mcoche", "a-1gk5m2e a-d1l0w0")]
   ];
   module MediaQueryCalc = {
     [@deriving abstract]
@@ -990,7 +990,7 @@
     external assign2: (Js.t({..}), makeProps, Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles =
-      CSS.make("label:MediaQueryCalc cid-1mcoche css-1gk5m2e css-d1l0w0", []);
+      CSS.make("label:MediaQueryCalc id-1mcoche a-1gk5m2e a-d1l0w0", []);
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(classNameGet(props))
       and style = snd(styles);

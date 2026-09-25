@@ -18,20 +18,20 @@ byte-identical CSS (same atoms, same atomized class).
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb{color:red;}"];
+  [@css ".a-tokvmb{color:red;}"];
   [@css.bindings
     [
-      ("Input.f", "cid-fo0igp", "css-tokvmb"),
-      ("Input.g", "cid-smthfn", "css-tokvmb"),
+      ("Input.f", "id-fo0igp", "a-tokvmb"),
+      ("Input.g", "id-smthfn", "a-tokvmb"),
     ]
   ];
   let f = () => {
-    let a = CSS.make("label:a cid-fo0igp css-tokvmb", []);
+    let a = CSS.make("label:a id-fo0igp a-tokvmb", []);
     a;
   };
   
   let g = () => {
-    let a = CSS.make("label:a cid-smthfn css-tokvmb", []);
+    let a = CSS.make("label:a id-smthfn a-tokvmb", []);
     a;
   };
   

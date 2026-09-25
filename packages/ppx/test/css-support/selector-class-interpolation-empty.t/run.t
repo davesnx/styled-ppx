@@ -19,47 +19,45 @@ to every consumer.
   >  (preprocess (pps styled-ppx)))
   > EOF
 
-The empty binding `active` mints only its identity class (`cid-...`,
+The empty binding `active` mints only its identity class (`id-...`,
 independent of content - see `Hash_class.identity_class`); its
 `class_string` in `[@@@css.bindings ...]` is `""` and no `[@@@css ...]`
 rule is emitted for it. The consumer `container`'s nested rule keeps a
-`.cid-...` qualifier, so `background: blue` only applies when the class
+`.id-...` qualifier, so `background: blue` only applies when the class
 is actually present on the element.
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1443u2l{background:red;}"];
-  [@css ".css-g57662.cid-1ofey90{background:blue;}"];
-  [@css ".css-q5fqw0{padding:1rem;}"];
-  [@css ".css-19ehxda.cid-okzmy{border-color:blue;}"];
-  [@css ".css-17nqvvb.cid-1jjszpn{background:yellow;}"];
-  [@css ".css-k008qs{display:flex;}"];
-  [@css ".css-62yfsj .cid-rmf27x{color:black;}"];
+  [@css ".a-1443u2l{background:red;}"];
+  [@css ".a-g57662.id-1ofey90{background:blue;}"];
+  [@css ".a-q5fqw0{padding:1rem;}"];
+  [@css ".a-19ehxda.id-okzmy{border-color:blue;}"];
+  [@css ".a-17nqvvb.id-1jjszpn{background:yellow;}"];
+  [@css ".a-k008qs{display:flex;}"];
+  [@css ".a-62yfsj .id-rmf27x{color:black;}"];
   [@css.bindings
     [
-      ("Input.active", "cid-1ofey90", ""),
-      ("Input.container", "cid-paugdl", "css-1443u2l css-g57662"),
-      ("Input.selected", "cid-okzmy", ""),
-      ("Input.highlighted", "cid-1jjszpn", ""),
-      ("Input.card", "cid-cpyuub", "css-q5fqw0 css-19ehxda css-17nqvvb"),
-      ("Input.actionButton", "cid-rmf27x", ""),
-      ("Input.panel", "cid-1qtuyxa", "css-k008qs css-62yfsj"),
+      ("Input.active", "id-1ofey90", ""),
+      ("Input.container", "id-paugdl", "a-1443u2l a-g57662"),
+      ("Input.selected", "id-okzmy", ""),
+      ("Input.highlighted", "id-1jjszpn", ""),
+      ("Input.card", "id-cpyuub", "a-q5fqw0 a-19ehxda a-17nqvvb"),
+      ("Input.actionButton", "id-rmf27x", ""),
+      ("Input.panel", "id-1qtuyxa", "a-k008qs a-62yfsj"),
     ]
   ];
   
-  let active = CSS.make("label:active cid-1ofey90", []);
+  let active = CSS.make("label:active id-1ofey90", []);
   
-  let container =
-    CSS.make("label:container cid-paugdl css-1443u2l css-g57662", []);
+  let container = CSS.make("label:container id-paugdl a-1443u2l a-g57662", []);
   
-  let selected = CSS.make("label:selected cid-okzmy", []);
-  let highlighted = CSS.make("label:highlighted cid-1jjszpn", []);
+  let selected = CSS.make("label:selected id-okzmy", []);
+  let highlighted = CSS.make("label:highlighted id-1jjszpn", []);
   
-  let card =
-    CSS.make("label:card cid-cpyuub css-q5fqw0 css-19ehxda css-17nqvvb", []);
+  let card = CSS.make("label:card id-cpyuub a-q5fqw0 a-19ehxda a-17nqvvb", []);
   
-  let actionButton = CSS.make("label:actionButton cid-rmf27x", []);
+  let actionButton = CSS.make("label:actionButton id-rmf27x", []);
   
-  let panel = CSS.make("label:panel cid-1qtuyxa css-k008qs css-62yfsj", []);
+  let panel = CSS.make("label:panel id-1qtuyxa a-k008qs a-62yfsj", []);
   
   let _ = (active, container, selected, highlighted, card, actionButton, panel);
 

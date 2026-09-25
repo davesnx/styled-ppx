@@ -13,21 +13,21 @@ bare `$(marker)` resolves to the included `Css.marker` binding.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb{color:red;}"];
-  [@css ".css-ik1kdg.cid-zr2uk1{color:blue;}"];
+  [@css ".a-tokvmb{color:red;}"];
+  [@css ".a-ik1kdg.id-zr2uk1{color:blue;}"];
   [@css.bindings
     [
-      ("Input.Css.marker", "cid-zr2uk1", "css-tokvmb"),
-      ("Input.wrapper", "cid-4f6ye3", "css-ik1kdg"),
+      ("Input.Css.marker", "id-zr2uk1", "a-tokvmb"),
+      ("Input.wrapper", "id-4f6ye3", "a-ik1kdg"),
     ]
   ];
   module Css = {
-    let marker = CSS.make("label:marker cid-zr2uk1 css-tokvmb", []);
+    let marker = CSS.make("label:marker id-zr2uk1 a-tokvmb", []);
   };
   
   include Css;
   
-  let wrapper = CSS.make("label:wrapper cid-4f6ye3 css-ik1kdg", []);
+  let wrapper = CSS.make("label:wrapper id-4f6ye3 a-ik1kdg", []);
   
   let _ = (Css.marker, wrapper);
 

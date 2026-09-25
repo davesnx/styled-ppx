@@ -21,8 +21,8 @@ let animation = [%keyframe {|
 It expands to a static extracted `@keyframes` rule plus an animation-name value:
 
 ```ocaml
-[@@@css "@keyframes keyframe-c958s{0%{opacity:0 ;}100%{opacity:1 ;}}"]
-let animation = CSS.Types.AnimationName.make("keyframe-c958s")
+[@@@css "@keyframes k-c958s{0%{opacity:0 ;}100%{opacity:1 ;}}"]
+let animation = CSS.Types.AnimationName.make("k-c958s")
 ```
 
 This shape cannot support:
@@ -40,7 +40,7 @@ let animation = [%keyframe {|
 CSS itself can express this with custom properties:
 
 ```css
-@keyframes keyframe-x {
+@keyframes k-x {
   0% { height: var(--var-prev); }
   100% { height: var(--var-current); }
 }
@@ -64,9 +64,9 @@ Current flow:
 1. `expand_keyframe_expression` accepts a string constant.
 2. It parses with `Styled_ppx_css_parser.Driver.parse_keyframes`.
 3. `Css_file.push_keyframe` renders the parsed rules.
-4. The rendered body is hashed into `keyframe-<hash>`.
+4. The rendered body is hashed into `k-<hash>`.
 5. The static `@keyframes` rule is pushed into `Css_file.Buffer`.
-6. The expression returns `CSS.Types.AnimationName.make("keyframe-<hash>")`.
+6. The expression returns `CSS.Types.AnimationName.make("k-<hash>")`.
 
 Current limitation:
 
@@ -116,12 +116,12 @@ let styles = [%css {|
 Expected static CSS:
 
 ```css
-@keyframes keyframe-abc {
+@keyframes k-abc {
   0% { height: var(--var-prev); }
   100% { height: var(--var-current); }
 }
 
-.css-def {
+.a-def {
   animation-name: var(--var-animation);
 }
 ```
@@ -130,7 +130,7 @@ Expected runtime style vars on the animated element:
 
 ```reason
 [
-  ("--var-animation", "keyframe-abc"),
+  ("--var-animation", "k-abc"),
   ("--var-prev", CSS.Types.Height.toString(prev)),
   ("--var-current", CSS.Types.Height.toString(current)),
 ]
@@ -265,7 +265,7 @@ let push_keyframe = (~file, ~scope, ~opens, keyframe_rules) => {
        );
 
   let rendered_body = transformed_rules |> List.map(render_rule) |> String.concat(" ");
-  let keyframe_name = Printf.sprintf("keyframe-%s", Murmur2.default(rendered_body));
+  let keyframe_name = Printf.sprintf("k-%s", Murmur2.default(rendered_body));
   Buffer.add_rule(keyframe_name, rendered_keyframe);
   (keyframe_name, List.rev(dynamic_vars^));
 };
@@ -290,7 +290,7 @@ CSS.Types.AnimationName.make
   ~vars:[ ("--var-prev", CSS.Types.Height.toString prev)
         ; ("--var-current", CSS.Types.Height.toString current)
         ]
-  "keyframe-abc"
+  "k-abc"
 ```
 
 This needs a small helper parallel to the var-list construction in
@@ -326,7 +326,7 @@ Generate conceptually:
 ```ocaml
 let animation_value = animation in
 CSS.make
-  "css-def"
+  "a-def"
   ([ ("--var-animation", CSS.Types.AnimationName.toString animation_value) ]
    @ CSS.Types.AnimationName.vars animation_value)
 ```
@@ -370,14 +370,14 @@ For longhand `animation-name`:
 Static CSS:
 
 ```css
-.css-x { animation-name: var(--var-fade); }
+.a-x { animation-name: var(--var-fade); }
 ```
 
 Runtime vars:
 
 ```ocaml
 CSS.make
-  "css-x"
+  "a-x"
   (CSS.Types.AnimationName.toStyleVars "--var-fade" fade)
 ```
 
@@ -390,14 +390,14 @@ For multiple longhand names:
 Static CSS:
 
 ```css
-.css-x { animation-name: var(--var-fade), var(--var-slide); }
+.a-x { animation-name: var(--var-fade), var(--var-slide); }
 ```
 
 Runtime vars:
 
 ```ocaml
 CSS.make
-  "css-x"
+  "a-x"
   (CSS.Types.AnimationName.toStyleVars "--var-fade" fade
    @ CSS.Types.AnimationName.toStyleVars "--var-slide" slide)
 ```
@@ -411,14 +411,14 @@ For shorthand `animation` when the interpolation is the animation-name component
 Static CSS:
 
 ```css
-.css-x { animation: var(--var-fade) 180ms ease-out both; }
+.a-x { animation: var(--var-fade) 180ms ease-out both; }
 ```
 
 Runtime vars:
 
 ```ocaml
 CSS.make
-  "css-x"
+  "a-x"
   (CSS.Types.AnimationName.toStyleVars "--var-fade" fade)
 ```
 
@@ -433,7 +433,7 @@ For multiple shorthand animations:
 Static CSS:
 
 ```css
-.css-x {
+.a-x {
   animation: var(--var-fade) 180ms ease-out both,
              var(--var-slide) 240ms linear both;
 }
@@ -443,7 +443,7 @@ Runtime vars:
 
 ```ocaml
 CSS.make
-  "css-x"
+  "a-x"
   (CSS.Types.AnimationName.toStyleVars "--var-fade" fade
    @ CSS.Types.AnimationName.toStyleVars "--var-slide" slide)
 ```
@@ -458,7 +458,7 @@ That interpolation is typed as the whole `Animation` value, so the static CSS is
 only:
 
 ```css
-.css-x { animation: var(--var-full-animation); }
+.a-x { animation: var(--var-full-animation); }
 ```
 
 It cannot automatically discover nested `AnimationName.vars` unless the runtime

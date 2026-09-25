@@ -1,20 +1,20 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "body:not(.cid-16nw107){margin:0;}"];
-  [@css ".cid-16nw107{background:var(--bg-1rdts9a);}"];
-  [@css ".cid-1iojcla.cid-16nw107{color:white;}"];
-  [@css ".container .cid-16nw107{color:var(--bg-raax3p);}"];
-  [@css ".css-nk32ej{padding:10px;}"];
-  [@css ".css-b7rhyr{border:1px solid;}"];
+  [@css "body:not(.id-16nw107){margin:0;}"];
+  [@css ".id-16nw107{background:var(--bg-1rdts9a);}"];
+  [@css ".id-1iojcla.id-16nw107{color:white;}"];
+  [@css ".container .id-16nw107{color:var(--bg-raax3p);}"];
+  [@css ".a-nk32ej{padding:10px;}"];
+  [@css ".a-b7rhyr{border:1px solid;}"];
   [@css.bindings
     [
-      ("Output.card", "cid-16nw107", "css-nk32ej"),
-      ("Output.active", "cid-1iojcla", "css-b7rhyr"),
+      ("Output.card", "id-16nw107", "a-nk32ej"),
+      ("Output.active", "id-1iojcla", "a-b7rhyr"),
     ]
   ];
-  let card = CSS.make("label:card cid-16nw107 css-nk32ej", []);
-  let active = CSS.make("label:active cid-1iojcla css-b7rhyr", []);
+  let card = CSS.make("label:card id-16nw107 a-nk32ej", []);
+  let active = CSS.make("label:active id-1iojcla a-b7rhyr", []);
   let bg = CSS.red;
   module CardGlobals = {
     let to_string = () =>

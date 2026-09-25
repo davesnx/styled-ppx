@@ -26,13 +26,13 @@ it does not change how numbers render.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1dmpxco{margin:-0.5px;}"];
-  [@css ".css-15u1kc6{margin:0.5px;}"];
-  [@css ".css-1edr2ev{transition:opacity 0.3s ease -0.1s;}"];
-  [@css ".css-bvktvb{top:-5px;}"];
-  CSS.make("css-1dmpxco", []);
-  CSS.make("css-15u1kc6", []);
-  CSS.make("css-1edr2ev", []);
-  CSS.make("css-bvktvb", []);
+  [@css ".a-1dmpxco{margin:-0.5px;}"];
+  [@css ".a-15u1kc6{margin:0.5px;}"];
+  [@css ".a-1edr2ev{transition:opacity 0.3s ease -0.1s;}"];
+  [@css ".a-bvktvb{top:-5px;}"];
+  CSS.make("a-1dmpxco", []);
+  CSS.make("a-15u1kc6", []);
+  CSS.make("a-1edr2ev", []);
+  CSS.make("a-bvktvb", []);
 
   $ dune build

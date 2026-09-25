@@ -20,20 +20,20 @@ with no trailing space.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-k008qs{display:flex;}"];
-  [@css ".css-1d33txl > *{min-height:0;}"];
-  [@css "@media (min-width: 100px) {.css-oi5e8m{display:flex;}}"];
-  [@css ".css-ehba41{cursor:-webkit-grab;cursor:grab;}"];
+  [@css ".a-k008qs{display:flex;}"];
+  [@css ".a-1d33txl > *{min-height:0;}"];
+  [@css "@media (min-width: 100px) {.a-oi5e8m{display:flex;}}"];
+  [@css ".a-ehba41{cursor:-webkit-grab;cursor:grab;}"];
   
-  CSS.make("css-k008qs", []);
+  CSS.make("a-k008qs", []);
   
-  CSS.make("css-k008qs", []);
+  CSS.make("a-k008qs", []);
   
-  CSS.make("css-1d33txl", []);
-  CSS.make("css-1d33txl", []);
+  CSS.make("a-1d33txl", []);
+  CSS.make("a-1d33txl", []);
   
-  CSS.make("css-oi5e8m", []);
-  CSS.make("css-oi5e8m", []);
+  CSS.make("a-oi5e8m", []);
+  CSS.make("a-oi5e8m", []);
   
-  CSS.make("css-ehba41", []);
-  CSS.make("css-ehba41", []);
+  CSS.make("a-ehba41", []);
+  CSS.make("a-ehba41", []);

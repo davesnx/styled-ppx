@@ -1,9 +1,11 @@
 /* Tests for the [Shorthand] and [Alias] kinds (Types.ml) and the query API
    they feed (Registry.ml's [shorthands]/[is_shorthand]/[direct_longhands]/
    [aliases]/[is_alias]/[canonical_name_of]) - not the value grammars
-   themselves (those are covered elsewhere). See .workplace/plans/
-   atom-slot-keys_PLAN.md for why this data now lives in css-grammar instead
-   of a separate table in slot_key. */
+   themselves (those are covered elsewhere). This data lives in css-grammar,
+   next to each property's own registration, rather than in a separate table
+   in slot_key: css-grammar already owns every property's spec citation, and
+   a shorthand's longhands are exactly as much a part of its definition as
+   its value grammar is. */
 
 module Parser = Css_grammar;
 let check = Alcotest_extra.check;
@@ -75,8 +77,7 @@ let cycle_tests: tests = [
    own registration site in its Properties file. This is what actually enforces
    "matches the spec" - an accidental edit to a registration's longhand list
    fails here even though every longhand still resolves (which the coverage
-   tests above would not catch on their own). Sourced 2026-09-25 - see the
-   corresponding property-table session report for the citations. */
+   tests above would not catch on their own). */
 let expected_shorthands: list((string, list(string))) = [
   ("margin", ["margin-top", "margin-right", "margin-bottom", "margin-left"]),
   (

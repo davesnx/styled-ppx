@@ -18,18 +18,18 @@ This test captures the admin-support cx2 regressions from the monorepo: border-s
     "@property --deprecated__elevation1-1jpikyl{syntax:\"*\";inherits:false;}"
   ];
   [@css "@property --topMenuHeight-10ob2p1{syntax:\"*\";inherits:false;}"];
-  [@css ".css-11h9vd4{border-top:1px solid var(--line-17j5in5);}"];
-  [@css ".css-epkb5g{border-bottom:1px solid var(--lineAlpha-1tmd8aq);}"];
-  [@css ".css-ob4w3j{border-left:1px solid var(--lineAlpha-k1tpqj);}"];
-  [@css ".css-1070dz6{box-shadow:var(--deprecated__elevation1-1jpikyl);}"];
-  [@css ".css-1y8ttxg{height:calc(100vh + var(--topMenuHeight-10ob2p1));}"];
+  [@css ".in-11h9vd4{border-top:1px solid var(--line-17j5in5);}"];
+  [@css ".in-epkb5g{border-bottom:1px solid var(--lineAlpha-1tmd8aq);}"];
+  [@css ".in-ob4w3j{border-left:1px solid var(--lineAlpha-k1tpqj);}"];
+  [@css ".in-1070dz6{box-shadow:var(--deprecated__elevation1-1jpikyl);}"];
+  [@css ".in-1y8ttxg{height:calc(100vh + var(--topMenuHeight-10ob2p1));}"];
   [@css.bindings
     [
-      ("Input._borderTop", "cid-k0smpx", "css-11h9vd4"),
-      ("Input._borderBottom", "cid-4yz5wd", "css-epkb5g"),
-      ("Input._borderLeft", "cid-1w7n6a9", "css-ob4w3j"),
-      ("Input._boxShadow1", "cid-114a8u4", "css-1070dz6"),
-      ("Input._heightPlus", "cid-11xytn2", "css-1y8ttxg"),
+      ("Input._borderTop", "id-k0smpx", "in-11h9vd4"),
+      ("Input._borderBottom", "id-4yz5wd", "in-epkb5g"),
+      ("Input._borderLeft", "id-1w7n6a9", "in-ob4w3j"),
+      ("Input._boxShadow1", "id-114a8u4", "in-1070dz6"),
+      ("Input._heightPlus", "id-11xytn2", "in-1y8ttxg"),
     ]
   ];
   module Alias = {
@@ -68,12 +68,12 @@ This test captures the admin-support cx2 regressions from the monorepo: border-s
   
   let _borderTop =
     CSS.make(
-      "label:_borderTop cid-k0smpx css-11h9vd4",
+      "label:_borderTop id-k0smpx in-11h9vd4",
       [("--line-17j5in5", CSS.Types.Color.toString(Color.Border.line))],
     );
   let _borderBottom =
     CSS.make(
-      "label:_borderBottom cid-4yz5wd css-epkb5g",
+      "label:_borderBottom id-4yz5wd in-epkb5g",
       [
         (
           "--lineAlpha-1tmd8aq",
@@ -83,7 +83,7 @@ This test captures the admin-support cx2 regressions from the monorepo: border-s
     );
   let _borderLeft =
     CSS.make(
-      "label:_borderLeft cid-1w7n6a9 css-ob4w3j",
+      "label:_borderLeft id-1w7n6a9 in-ob4w3j",
       [
         (
           "--lineAlpha-k1tpqj",
@@ -94,7 +94,7 @@ This test captures the admin-support cx2 regressions from the monorepo: border-s
   
   let _boxShadow1 =
     CSS.make(
-      "label:_boxShadow1 cid-114a8u4 css-1070dz6",
+      "label:_boxShadow1 id-114a8u4 in-1070dz6",
       [
         (
           "--deprecated__elevation1-1jpikyl",
@@ -105,7 +105,7 @@ This test captures the admin-support cx2 regressions from the monorepo: border-s
   
   let _heightPlus =
     CSS.make(
-      "label:_heightPlus cid-11xytn2 css-1y8ttxg",
+      "label:_heightPlus id-11xytn2 in-1y8ttxg",
       [("--topMenuHeight-10ob2p1", CSS.Types.Length.toString(topMenuHeight))],
     );
 

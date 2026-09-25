@@ -362,7 +362,7 @@ module ThemeStyles = [%styled.global {|
 ### `[%keyframe]`
 
 Shares the same front end and extracts `@keyframes` blocks named by
-content hash (`keyframe-<murmur2(body)>`, via `Css_file.push_keyframe`).
+content hash (`k-<murmur2(body)>`, via `Css_file.push_keyframe`).
 Value interpolation in keyframe declarations is lowered to
 CSS custom properties in the extracted `@keyframes` rule, while the generated
 `AnimationName.t` carries the runtime custom-property bindings that

@@ -24,21 +24,21 @@ counter().
   @property --myCounterStyle-5pdc5a{syntax:"*";inherits:false;}
   @property --countersNoStyle-g89gy3{syntax:"*";inherits:false;}
   @property --countersStyled-x8q6x3{syntax:"*";inherits:false;}
-  .css-sikia9{content:var(--singleCounter-ek68js);}
-  .css-1tainop{content:var(--singleCounterNoStyle-2521aj);}
-  .css-10brgn5{content:var(--singleText-5c1v76);}
-  .css-zh4bht{content:var(--counterDot-17rsat4);}
-  .css-ffxo1r{content:var(--counterSpace-jvqeh9);}
-  .css-e7wury{content:var(--counterRoman-16oxrf4);}
-  .css-16jow5p{content:var(--bracketed-1vvjf8x);}
-  .css-8nx65k{content:var(--content_value-jr2773);}
-  .css-ymi9m2{content:counter(var(--myCounterName-dew6fb), lower-alpha);}
-  .css-1hqoizr{content:counter(chapter, var(--myCounterStyle-o4ly7x));}
-  .css-1uqb9bz{content:counter(var(--myCounterName-1re0z52), var(--myCounterStyle-1lfdsp0));}
-  .css-1ghcaxs{content:counters(var(--myCounterName-hs66zo), ".", var(--myCounterStyle-5pdc5a));}
-  .css-x7dhko{content:counter(ol);}
-  .css-1igtirf{content:counter(chapter);}
-  .css-ufyh7z{content:counters(section, ".");}
-  .css-j8o8sv{content:counters(section, ".", decimal-leading-zero);}
-  .css-p698h{content:var(--countersNoStyle-g89gy3);}
-  .css-1e3j96l{content:var(--countersStyled-x8q6x3);}
+  .in-sikia9{content:var(--singleCounter-ek68js);}
+  .in-1tainop{content:var(--singleCounterNoStyle-2521aj);}
+  .in-10brgn5{content:var(--singleText-5c1v76);}
+  .in-zh4bht{content:var(--counterDot-17rsat4);}
+  .in-ffxo1r{content:var(--counterSpace-jvqeh9);}
+  .in-e7wury{content:var(--counterRoman-16oxrf4);}
+  .in-16jow5p{content:var(--bracketed-1vvjf8x);}
+  .in-8nx65k{content:var(--content_value-jr2773);}
+  .in-ymi9m2{content:counter(var(--myCounterName-dew6fb), lower-alpha);}
+  .in-1hqoizr{content:counter(chapter, var(--myCounterStyle-o4ly7x));}
+  .in-1uqb9bz{content:counter(var(--myCounterName-1re0z52), var(--myCounterStyle-1lfdsp0));}
+  .in-1ghcaxs{content:counters(var(--myCounterName-hs66zo), ".", var(--myCounterStyle-5pdc5a));}
+  .a-x7dhko{content:counter(ol);}
+  .a-1igtirf{content:counter(chapter);}
+  .a-ufyh7z{content:counters(section, ".");}
+  .a-j8o8sv{content:counters(section, ".", decimal-leading-zero);}
+  .in-p698h{content:var(--countersNoStyle-g89gy3);}
+  .in-1e3j96l{content:var(--countersStyled-x8q6x3);}

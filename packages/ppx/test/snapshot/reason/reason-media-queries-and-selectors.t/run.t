@@ -1,16 +1,16 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "@media (min-width: 600px) {.css-99qt2j{background:blue;}}"];
-  [@css ".css-hxxfxf:hover{background:green;}"];
-  [@css ".css-qzw9gh > p{color:pink;}"];
-  [@css ".css-z0beaj > p{font-size:24px;}"];
+  [@css "@media (min-width: 600px) {.a-99qt2j{background:blue;}}"];
+  [@css ".a-hxxfxf:hover{background:green;}"];
+  [@css ".a-qzw9gh > p{color:pink;}"];
+  [@css ".a-z0beaj > p{font-size:24px;}"];
   [@css.bindings
     [
       (
         "Output.SelectorsMediaQueries",
-        "cid-36wyir",
-        "css-99qt2j css-hxxfxf css-qzw9gh css-z0beaj",
+        "id-36wyir",
+        "a-99qt2j a-hxxfxf a-qzw9gh a-z0beaj",
       ),
     ]
   ];
@@ -999,7 +999,7 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "label:SelectorsMediaQueries cid-36wyir css-99qt2j css-hxxfxf css-qzw9gh css-z0beaj",
+        "label:SelectorsMediaQueries id-36wyir a-99qt2j a-hxxfxf a-qzw9gh a-z0beaj",
         [],
       );
     let make = (props: makeProps) => {

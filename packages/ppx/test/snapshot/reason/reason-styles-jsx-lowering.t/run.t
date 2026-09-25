@@ -3,7 +3,7 @@ Default mode expands `styles` on lowercase JSX and leaves other calls alone.
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-h5fkc8{margin-top:32px;}"];
+  [@css ".a-h5fkc8{margin-top:32px;}"];
   let buttonStyles = ("button", ReactDOM.Style.make());
   let bodyLg = ("body-lg", ReactDOM.Style.make());
   let baseStyle = ReactDOM.Style.make();
@@ -25,10 +25,8 @@ Default mode expands `styles` on lowercase JSX and leaves other calls alone.
     />;
   let _ =
     <p
-      className={CSS.className(
-        Cn2.(Css.bodyLg +++ CSS.make("css-h5fkc8", [])),
-      )}
-      style={CSS.styles(Cn2.(Css.bodyLg +++ CSS.make("css-h5fkc8", [])))}
+      className={CSS.className(Cn2.(Css.bodyLg +++ CSS.make("a-h5fkc8", [])))}
+      style={CSS.styles(Cn2.(Css.bodyLg +++ CSS.make("a-h5fkc8", [])))}
     />;
   let _ =
     <div
@@ -43,7 +41,7 @@ Native mode keeps the same `styles` expansion contract before native JSX lowerin
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --native --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-h5fkc8{margin-top:32px;}"];
+  [@css ".a-h5fkc8{margin-top:32px;}"];
   let buttonStyles = ("button", ReactDOM.Style.make());
   let bodyLg = ("body-lg", ReactDOM.Style.make());
   let baseStyle = ReactDOM.Style.make();
@@ -65,10 +63,8 @@ Native mode keeps the same `styles` expansion contract before native JSX lowerin
     />;
   let _ =
     <p
-      className={CSS.className(
-        Cn2.(Css.bodyLg +++ CSS.make("css-h5fkc8", [])),
-      )}
-      style={CSS.styles(Cn2.(Css.bodyLg +++ CSS.make("css-h5fkc8", [])))}
+      className={CSS.className(Cn2.(Css.bodyLg +++ CSS.make("a-h5fkc8", [])))}
+      style={CSS.styles(Cn2.(Css.bodyLg +++ CSS.make("a-h5fkc8", [])))}
     />;
   let _ =
     <div

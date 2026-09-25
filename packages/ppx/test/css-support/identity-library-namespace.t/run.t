@@ -1,5 +1,5 @@
 The identity namespace does not depend on the dune `library-name` cookie.
-Two dune libraries with different library names mint the SAME `cid-...`
+Two dune libraries with different library names mint the SAME `id-...`
 for the same module and binding name when neither passes `--namespace`
 (RED before the fix: see the report for the pre-fix diff).
 
@@ -8,17 +8,17 @@ for the same module and binding name when neither passes `--namespace`
   $ ../../standalone.exe -cookie 'library-name="ui"' --impl input.ml -o ui.ml
   $ cat ui.ml
   [@@@css.config [("library-name", "ui")]]
-  [@@@css ".css-tokvmb{color:red;}"]
-  [@@@css.bindings [("Input.marker", "cid-1rctcrz", "css-tokvmb")]]
-  let marker = CSS.make "label:marker cid-1rctcrz css-tokvmb" []
+  [@@@css ".a-tokvmb{color:red;}"]
+  [@@@css.bindings [("Input.marker", "id-1rctcrz", "a-tokvmb")]]
+  let marker = CSS.make "label:marker id-1rctcrz a-tokvmb" []
   let _ = marker
 
   $ ../../standalone.exe -cookie 'library-name="admin"' --impl input.ml -o admin.ml
   $ cat admin.ml
   [@@@css.config [("library-name", "admin")]]
-  [@@@css ".css-tokvmb{color:red;}"]
-  [@@@css.bindings [("Input.marker", "cid-1rctcrz", "css-tokvmb")]]
-  let marker = CSS.make "label:marker cid-1rctcrz css-tokvmb" []
+  [@@@css ".a-tokvmb{color:red;}"]
+  [@@@css.bindings [("Input.marker", "id-1rctcrz", "a-tokvmb")]]
+  let marker = CSS.make "label:marker id-1rctcrz a-tokvmb" []
   let _ = marker
 
   $ diff ui.ml admin.ml
@@ -49,11 +49,11 @@ name was ever a default: pass each one a different value.
   ---
   > [@@@css.config [("library-name", "admin")]]
   3,4c3,4
-  < [@@@css.bindings [("Input.marker", "cid-1lismv4", "css-tokvmb")]]
-  < let marker = CSS.make "label:marker cid-1lismv4 css-tokvmb" []
+  < [@@@css.bindings [("Input.marker", "id-1lismv4", "a-tokvmb")]]
+  < let marker = CSS.make "label:marker id-1lismv4 a-tokvmb" []
   ---
-  > [@@@css.bindings [("Input.marker", "cid-1v8uaax", "css-tokvmb")]]
-  > let marker = CSS.make "label:marker cid-1v8uaax css-tokvmb" []
+  > [@@@css.bindings [("Input.marker", "id-1v8uaax", "a-tokvmb")]]
+  > let marker = CSS.make "label:marker id-1v8uaax a-tokvmb" []
   [1]
 
 A native library and its melange twin, built from the same sources under
