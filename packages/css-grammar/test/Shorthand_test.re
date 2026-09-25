@@ -181,6 +181,57 @@ let expected_shorthands: list((string, list(string))) = [
       "border-bottom-left-radius",
     ],
   ),
+  /* CSS Borders and Box Decorations L4 (task 2, css-grammar-draft-properties):
+     https://drafts.csswg.org/css-borders-4/ */
+  (
+    "border-top-radius",
+    ["border-top-left-radius", "border-top-right-radius"],
+  ),
+  (
+    "border-right-radius",
+    ["border-top-right-radius", "border-bottom-right-radius"],
+  ),
+  (
+    "border-bottom-radius",
+    ["border-bottom-left-radius", "border-bottom-right-radius"],
+  ),
+  (
+    "border-left-radius",
+    ["border-top-left-radius", "border-bottom-left-radius"],
+  ),
+  (
+    "border-block-start-radius",
+    ["border-start-start-radius", "border-start-end-radius"],
+  ),
+  (
+    "border-block-end-radius",
+    ["border-end-start-radius", "border-end-end-radius"],
+  ),
+  (
+    "border-inline-start-radius",
+    ["border-start-start-radius", "border-end-start-radius"],
+  ),
+  (
+    "border-inline-end-radius",
+    ["border-start-end-radius", "border-end-end-radius"],
+  ),
+  (
+    "border-block-clip",
+    ["border-block-start-clip", "border-block-end-clip"],
+  ),
+  (
+    "border-inline-clip",
+    ["border-inline-start-clip", "border-inline-end-clip"],
+  ),
+  (
+    "border-clip",
+    [
+      "border-top-clip",
+      "border-right-clip",
+      "border-bottom-clip",
+      "border-left-clip",
+    ],
+  ),
   (
     "border-image",
     [
@@ -360,9 +411,39 @@ let expected_shorthands: list((string, list(string))) = [
   ("place-items", ["align-items", "justify-items"]),
   ("place-self", ["align-self", "justify-self"]),
   ("overflow", ["overflow-x", "overflow-y"]),
+  (
+    "overflow-clip-margin",
+    [
+      "overflow-clip-margin-top",
+      "overflow-clip-margin-right",
+      "overflow-clip-margin-bottom",
+      "overflow-clip-margin-left",
+    ],
+  ),
+  (
+    "overflow-clip-margin-block",
+    ["overflow-clip-margin-block-start", "overflow-clip-margin-block-end"],
+  ),
+  (
+    "overflow-clip-margin-inline",
+    ["overflow-clip-margin-inline-start", "overflow-clip-margin-inline-end"],
+  ),
   ("flex", ["flex-grow", "flex-shrink", "flex-basis"]),
   ("flex-flow", ["flex-direction", "flex-wrap"]),
   ("columns", ["column-width", "column-count", "column-height"]),
+  /* Task 2 (css-grammar-draft-properties): CSS Box Sizing L4, CSS Rhythmic
+     Sizing L1. */
+  ("max-size", ["max-width", "max-height"]),
+  ("min-size", ["min-width", "min-height"]),
+  (
+    "block-step",
+    [
+      "block-step-size",
+      "block-step-insert",
+      "block-step-align",
+      "block-step-round",
+    ],
+  ),
   (
     "column-rule",
     ["column-rule-color", "column-rule-style", "column-rule-width"],
@@ -375,6 +456,10 @@ let expected_shorthands: list((string, list(string))) = [
   (
     "column-rule-inset-junction",
     ["column-rule-inset-junction-start", "column-rule-inset-junction-end"],
+  ),
+  (
+    "column-rule-inset-start",
+    ["column-rule-inset-cap-start", "column-rule-inset-junction-start"],
   ),
   (
     "column-rule-inset-end",

@@ -210,6 +210,15 @@ let property_text_emphasis_position : property_text_emphasis_position Rule.rule
     =
   Property_text_emphasis_position.rule
 
+(* CSS Text Decoration L4: https://drafts.csswg.org/css-text-decor-4/#propdef-text-emphasis-skip *)
+module Property_text_emphasis_skip =
+  [%spec_module
+  "'spaces' || 'punctuation' || 'symbols' || 'narrow'",
+  (module Css_types.TextEmphasisSkip)]
+
+let property_text_emphasis_skip : property_text_emphasis_skip Rule.rule =
+  Property_text_emphasis_skip.rule
+
 module Property_text_emphasis_style =
   [%spec_module
   "'none' | [ 'filled' | 'open' ] || [ 'dot' | 'circle' | 'double-circle' | \
@@ -367,6 +376,33 @@ module Property_text_edge =
 
 let property_text_edge : property_text_edge Rule.rule = Property_text_edge.rule
 
+(* CSS Text L4: https://drafts.csswg.org/css-text-4/#propdef-line-padding *)
+module Property_line_padding =
+  [%spec_module
+  "<extended-length>", (module Css_types.LinePadding)]
+
+let property_line_padding : property_line_padding Rule.rule =
+  Property_line_padding.rule
+
+(* CSS Text L4: https://drafts.csswg.org/css-text-4/#propdef-text-group-align *)
+module Property_text_group_align =
+  [%spec_module
+  "'none' | 'start' | 'end' | 'left' | 'right' | 'center'",
+  (module Css_types.TextGroupAlign)]
+
+let property_text_group_align : property_text_group_align Rule.rule =
+  Property_text_group_align.rule
+
+(* CSS Text L4 (preview - Safari Technology Preview only):
+   https://drafts.csswg.org/css-text-4/#propdef-white-space-trim *)
+module Property_white_space_trim =
+  [%spec_module
+  "'none' | 'discard-before' || 'discard-after' || 'discard-inner'",
+  (module Css_types.WhiteSpaceTrim)]
+
+let property_white_space_trim : property_white_space_trim Rule.rule =
+  Property_white_space_trim.rule
+
 let entries : (kind * packed_rule) list =
   [
     ( Property "-ms-text-autospace",
@@ -429,9 +465,15 @@ let entries : (kind * packed_rule) list =
       pack_module (module Property_text_emphasis_color) );
     ( Property "text-emphasis-position",
       pack_module (module Property_text_emphasis_position) );
+    ( Property "text-emphasis-skip",
+      pack_module (module Property_text_emphasis_skip) );
     ( Property "text-emphasis-style",
       pack_module (module Property_text_emphasis_style) );
     Property "text-indent", pack_module (module Property_text_indent);
+    (* CSS Text L4: https://drafts.csswg.org/css-text-4/ *)
+    Property "line-padding", pack_module (module Property_line_padding);
+    Property "text-group-align", pack_module (module Property_text_group_align);
+    Property "white-space-trim", pack_module (module Property_white_space_trim);
     ( Property "text-justify-trim",
       pack_module (module Property_text_justify_trim) );
     Property "text-kashida", pack_module (module Property_text_kashida);

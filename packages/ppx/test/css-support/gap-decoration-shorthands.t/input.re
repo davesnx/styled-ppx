@@ -36,6 +36,7 @@
 [%css {|column-rule-inset-cap: 0px|}];
 [%css {|column-rule-inset-cap: 0px 5px|}];
 [%css {|column-rule-inset-junction: -5px|}];
+[%css {|column-rule-inset-start: 8px|}];
 [%css {|column-rule-inset-end: 0px|}];
 [%css {|column-rule-inset: 0px|}];
 [%css {|column-rule-inset: 0px / -5px|}];

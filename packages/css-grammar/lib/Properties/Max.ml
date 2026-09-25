@@ -40,6 +40,13 @@ module Property_max_width =
 
 let property_max_width : property_max_width Rule.rule = Property_max_width.rule
 
+(* CSS Box Sizing L4: https://drafts.csswg.org/css-sizing-4/#propdef-max-size *)
+module Property_max_size =
+  [%spec_module
+  "<'max-width'> [ <'max-height'> ]?", (module Css_types.MaxWidth)]
+
+let property_max_size : property_max_size Rule.rule = Property_max_size.rule
+
 let entries : (kind * packed_rule) list =
   [
     Property "max-block-size", pack_module (module Property_max_block_size);
@@ -47,4 +54,6 @@ let entries : (kind * packed_rule) list =
     Property "max-inline-size", pack_module (module Property_max_inline_size);
     Property "max-lines", pack_module (module Property_max_lines);
     Property "max-width", pack_module (module Property_max_width);
+    ( Shorthand ("max-size", [ "max-width"; "max-height" ]),
+      pack_module (module Property_max_size) );
   ]

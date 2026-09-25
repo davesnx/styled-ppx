@@ -29,9 +29,18 @@ module Property_break_inside =
 let property_break_inside : property_break_inside Rule.rule =
   Property_break_inside.rule
 
+(* CSS Fragmentation L4: https://drafts.csswg.org/css-break-4/#propdef-margin-break *)
+module Property_margin_break =
+  [%spec_module
+  "'auto' | 'keep' | 'discard'", (module Css_types.MarginBreak)]
+
+let property_margin_break : property_margin_break Rule.rule =
+  Property_margin_break.rule
+
 let entries : (kind * packed_rule) list =
   [
     Property "break-inside", pack_module (module Property_break_inside);
     Property "break-before", pack_module (module Property_break_before);
     Property "break-after", pack_module (module Property_break_after);
+    Property "margin-break", pack_module (module Property_margin_break);
   ]
