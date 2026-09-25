@@ -21,20 +21,20 @@ and "Rule not found in registry: webkit-mask-box-repeat".
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css
-    ".a-oh9l4c{background:-webkit-gradient(linear, left top, left bottom, from(red), to(blue));}"
+    ".a-399l4c{background:-webkit-gradient(linear, left top, left bottom, from(red), to(blue));}"
   ];
   [@css
-    ".a-1kr95w2{background:-webkit-gradient(radial, center center, 0px, center center, 100px, from(blue), to(red));}"
+    ".a-3995w2{background:-webkit-gradient(radial, center center, 0px, center center, 100px, from(blue), to(red));}"
   ];
   [@css
-    ".a-vnsa3w{-webkit-mask-box-image:url(\"mask.png\") 10px 10px 10px 10px stretch stretch;}"
+    ".a-2gsa3w{-webkit-mask-box-image:url(\"mask.png\") 10px 10px 10px 10px stretch stretch;}"
   ];
   [@css
-    ".a-1dg3brk{-webkit-mask-box-image:url(\"mask.png\") 5% 5% 5% 5% round repeat;}"
+    ".a-2g3brk{-webkit-mask-box-image:url(\"mask.png\") 5% 5% 5% 5% round repeat;}"
   ];
   
-  CSS.make("a-oh9l4c", []);
-  CSS.make("a-1kr95w2", []);
+  CSS.make("a-399l4c", []);
+  CSS.make("a-3995w2", []);
   
-  CSS.make("a-vnsa3w", []);
-  CSS.make("a-1dg3brk", []);
+  CSS.make("a-2gsa3w", []);
+  CSS.make("a-2g3brk", []);

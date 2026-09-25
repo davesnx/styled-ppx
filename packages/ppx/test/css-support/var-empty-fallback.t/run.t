@@ -17,14 +17,14 @@ rejecting nothing where a comma isn't present at all.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".a-9e8w5r{color:var(--x);}"];
-  [@css ".a-dy0bz1{color:var(--x,);}"];
-  [@css ".a-13rxf5k{color:var(--x, );}"];
-  [@css ".a-1lvcyrh{margin:var(--m, 1px 2px);}"];
-  [@css ".a-fjens4{color:var(--x, var(--y,));}"];
+  [@css ".a-4e8w5r{color:var(--x);}"];
+  [@css ".a-4e0bz1{color:var(--x,);}"];
+  [@css ".a-4exf5k{color:var(--x, );}"];
+  [@css ".a-7pcyrh{margin:var(--m, 1px 2px);}"];
+  [@css ".a-4eens4{color:var(--x, var(--y,));}"];
   
-  CSS.make("a-9e8w5r", []);
-  CSS.make("a-dy0bz1", []);
-  CSS.make("a-13rxf5k", []);
-  CSS.make("a-1lvcyrh", []);
-  CSS.make("a-fjens4", []);
+  CSS.make("a-4e8w5r", []);
+  CSS.make("a-4e0bz1", []);
+  CSS.make("a-4exf5k", []);
+  CSS.make("a-7pcyrh", []);
+  CSS.make("a-4eens4", []);

@@ -8,17 +8,17 @@ for the same module and binding name when neither passes `--namespace`
   $ ../../standalone.exe -cookie 'library-name="ui"' --impl input.ml -o ui.ml
   $ cat ui.ml
   [@@@css.config [("library-name", "ui")]]
-  [@@@css ".a-tokvmb{color:red;}"]
-  [@@@css.bindings [("Input.marker", "id-1rctcrz", "a-tokvmb")]]
-  let marker = CSS.make "label:marker id-1rctcrz a-tokvmb" []
+  [@@@css ".a-4ekvmb{color:red;}"]
+  [@@@css.bindings [("Input.marker", "id-1rctcrz", "a-4ekvmb")]]
+  let marker = CSS.make "label:marker id-1rctcrz a-4ekvmb" []
   let _ = marker
 
   $ ../../standalone.exe -cookie 'library-name="admin"' --impl input.ml -o admin.ml
   $ cat admin.ml
   [@@@css.config [("library-name", "admin")]]
-  [@@@css ".a-tokvmb{color:red;}"]
-  [@@@css.bindings [("Input.marker", "id-1rctcrz", "a-tokvmb")]]
-  let marker = CSS.make "label:marker id-1rctcrz a-tokvmb" []
+  [@@@css ".a-4ekvmb{color:red;}"]
+  [@@@css.bindings [("Input.marker", "id-1rctcrz", "a-4ekvmb")]]
+  let marker = CSS.make "label:marker id-1rctcrz a-4ekvmb" []
   let _ = marker
 
   $ diff ui.ml admin.ml
@@ -49,11 +49,11 @@ name was ever a default: pass each one a different value.
   ---
   > [@@@css.config [("library-name", "admin")]]
   3,4c3,4
-  < [@@@css.bindings [("Input.marker", "id-1lismv4", "a-tokvmb")]]
-  < let marker = CSS.make "label:marker id-1lismv4 a-tokvmb" []
+  < [@@@css.bindings [("Input.marker", "id-1lismv4", "a-4ekvmb")]]
+  < let marker = CSS.make "label:marker id-1lismv4 a-4ekvmb" []
   ---
-  > [@@@css.bindings [("Input.marker", "id-1v8uaax", "a-tokvmb")]]
-  > let marker = CSS.make "label:marker id-1v8uaax a-tokvmb" []
+  > [@@@css.bindings [("Input.marker", "id-1v8uaax", "a-4ekvmb")]]
+  > let marker = CSS.make "label:marker id-1v8uaax a-4ekvmb" []
   [1]
 
 A native library and its melange twin, built from the same sources under

@@ -82,15 +82,15 @@ Interpolation native PPX transformations are checked as a cram snapshot.
     ".in-13ts4zv{box-shadow:10px 10px 0px var(--spread-wd13u2) var(--color-3xubcm);}"
   ];
   [@css ".in-lxl5g5{box-shadow:var(--elevation-jhhehb);}"];
-  [@css ".a-gokeqi{box-shadow:none;}"];
+  [@css ".a-40keqi{box-shadow:none;}"];
   [@css ".in-l3baal{text-overflow:var(--clip-1go0jdu);}"];
-  [@css ".a-fv8edy{transition-duration:500ms;}"];
+  [@css ".a-dm0048edy{transition-duration:500ms;}"];
   [@css ".in-s36hu1{transition-duration:var(--duration-i5tvzn);}"];
   [@css
     ".in-1bien0s{-webkit-animation-play-state:var(--state-1yj1w6c);animation-play-state:var(--state-1yj1w6c);}"
   ];
   [@css
-    ".a-1i5bnre{-webkit-animation-play-state:paused;animation-play-state:paused;}"
+    ".a-2z03kbnre{-webkit-animation-play-state:paused;animation-play-state:paused;}"
   ];
   [@css
     ".in-x7nyl9{-webkit-column-gap:var(--px30-cc29mn);column-gap:var(--px30-cc29mn);}"
@@ -291,13 +291,13 @@ Interpolation native PPX transformations are checked as a cram snapshot.
         ),
       ],
     );
-  let _ = CSS.make("a-gokeqi", []);
+  let _ = CSS.make("a-40keqi", []);
   let _ =
     CSS.make(
       "in-l3baal",
       [("--clip-1go0jdu", CSS.Types.TextOverflow.toString(clip))],
     );
-  let _ = CSS.make("a-fv8edy", []);
+  let _ = CSS.make("a-dm0048edy", []);
   let _ =
     CSS.make(
       "in-s36hu1",
@@ -310,7 +310,7 @@ Interpolation native PPX transformations are checked as a cram snapshot.
       "in-1bien0s",
       [("--state-1yj1w6c", CSS.Types.AnimationPlayState.toString(state))],
     );
-  let _ = CSS.make("a-1i5bnre", []);
+  let _ = CSS.make("a-2z03kbnre", []);
   let _ =
     CSS.make(
       "in-x7nyl9",

@@ -934,15 +934,17 @@ module Css_transform = {
       | None =>
         switch (decls) {
         | [decl] =>
+          let bare_rule = Declaration(decl);
           let decl_string = render_declaration(decl);
           let (className, namespace) =
-            Hash_class.class_and_namespace(decl_string);
-          [(className, namespace, Declaration(decl))];
+            Hash_class.class_and_namespace(
+              ~slot=Slot_key.of_atom(bare_rule),
+              decl_string,
+            );
+          [(className, namespace, bare_rule)];
         | decls =>
           let group_string =
             decls |> List.map(render_declaration) |> String.concat("");
-          let (className, namespace) =
-            Hash_class.class_and_namespace(group_string);
           let style_rule =
             Style_rule({
               prelude: (
@@ -955,6 +957,11 @@ module Css_transform = {
               ),
               loc: Ppxlib.Location.none,
             });
+          let (className, namespace) =
+            Hash_class.class_and_namespace(
+              ~slot=Slot_key.of_atom(style_rule),
+              group_string,
+            );
           [(className, namespace, style_rule)];
         }
       | Some(parent_selectors) =>
@@ -991,7 +998,10 @@ module Css_transform = {
               });
             let rule_string = render_rule(style_rule);
             let (className, namespace) =
-              Hash_class.class_and_namespace(rule_string);
+              Hash_class.class_and_namespace(
+                ~slot=Slot_key.of_atom(style_rule),
+                rule_string,
+              );
             (className, namespace, style_rule);
           },
           parent_selectors,
@@ -1130,7 +1140,10 @@ module Css_transform = {
                  });
                let wrapped_string = render_rule(wrapped);
                let (new_className, new_namespace) =
-                 Hash_class.class_and_namespace(wrapped_string);
+                 Hash_class.class_and_namespace(
+                   ~slot=Slot_key.of_atom(wrapped),
+                   wrapped_string,
+                 );
                (new_className, new_namespace, wrapped);
              })
         };

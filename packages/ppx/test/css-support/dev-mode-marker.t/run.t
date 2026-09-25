@@ -15,19 +15,19 @@ a CSS rule.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".a-k008qs{display:flex;}"];
-  [@css ".a-38zrbw{padding:12px;}"];
-  [@css ".a-tokvmb{color:red;}"];
+  [@css ".a-5r08qs{display:flex;}"];
+  [@css ".a-94zrbw{padding:12px;}"];
+  [@css ".a-4ekvmb{color:red;}"];
   [@css.bindings
     [
-      ("Input.layout", "id-1jj5tmt", "a-k008qs a-38zrbw"),
-      ("Input.button", "id-l55coe", "a-tokvmb"),
+      ("Input.layout", "id-1jj5tmt", "a-5r08qs a-94zrbw"),
+      ("Input.button", "id-l55coe", "a-4ekvmb"),
     ]
   ];
   
-  let layout = CSS.make("label:layout id-1jj5tmt a-k008qs a-38zrbw", []);
+  let layout = CSS.make("label:layout id-1jj5tmt a-5r08qs a-94zrbw", []);
   
-  let button = CSS.make("label:button id-l55coe a-tokvmb", []);
+  let button = CSS.make("label:button id-l55coe a-4ekvmb", []);
   
   let _ = (layout, button);
 

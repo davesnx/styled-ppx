@@ -10,14 +10,14 @@ interpolation as a custom property (subject is `&` or a descendant of `&`).
   [@css ".x + .in-c001uz{color:var(--color-4fgdvo);}"];
   [@css ".in-zcel0e > * + *{color:var(--color-tqid89);}"];
   [@css ".in-v0ydxg .child{border-color:var(--color-133cflr);}"];
-  [@css ".a-1w5oqj4 + .x{color:red;}"];
+  [@css ".a-fxps84eoqj4 + .x{color:red;}"];
   [@css.bindings
     [
       ("Output.selfSibling", "id-vk9hpa", "in-3pj70v"),
       ("Output.siblingBeforeAmpersand", "id-fsi55f", "in-c001uz"),
       ("Output.childThenSibling", "id-1er3nso", "in-zcel0e"),
       ("Output.descendant", "id-1g3dzrb", "in-v0ydxg"),
-      ("Output.literalSibling", "id-njk8sz", "a-1w5oqj4"),
+      ("Output.literalSibling", "id-njk8sz", "a-fxps84eoqj4"),
     ]
   ];
   let color = CSS.Types.Color.toString(`hex("3A57FC"));
@@ -41,4 +41,5 @@ interpolation as a custom property (subject is `&` or a descendant of `&`).
       "label:descendant id-1g3dzrb in-v0ydxg",
       [("--color-133cflr", CSS.Types.Color.toString(color))],
     );
-  let literalSibling = CSS.make("label:literalSibling id-njk8sz a-1w5oqj4", []);
+  let literalSibling =
+    CSS.make("label:literalSibling id-njk8sz a-fxps84eoqj4", []);

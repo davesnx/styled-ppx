@@ -27,37 +27,42 @@ rule is emitted for it. The consumer `container`'s nested rule keeps a
 is actually present on the element.
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".a-1443u2l{background:red;}"];
-  [@css ".a-g57662.id-1ofey90{background:blue;}"];
-  [@css ".a-q5fqw0{padding:1rem;}"];
-  [@css ".a-19ehxda.id-okzmy{border-color:blue;}"];
-  [@css ".a-17nqvvb.id-1jjszpn{background:yellow;}"];
-  [@css ".a-k008qs{display:flex;}"];
-  [@css ".a-62yfsj .id-rmf27x{color:black;}"];
+  [@css ".a-393u2l{background:red;}"];
+  [@css ".a-pwpfa397662.id-1ofey90{background:blue;}"];
+  [@css ".a-94fqw0{padding:1rem;}"];
+  [@css ".a-ezau73hef5hxda.id-okzmy{border-color:blue;}"];
+  [@css ".a-gk5o139qvvb.id-1jjszpn{background:yellow;}"];
+  [@css ".a-5r08qs{display:flex;}"];
+  [@css ".a-kpacu4eyfsj .id-rmf27x{color:black;}"];
   [@css.bindings
     [
       ("Input.active", "id-1ofey90", ""),
-      ("Input.container", "id-paugdl", "a-1443u2l a-g57662"),
+      ("Input.container", "id-paugdl", "a-393u2l a-pwpfa397662"),
       ("Input.selected", "id-okzmy", ""),
       ("Input.highlighted", "id-1jjszpn", ""),
-      ("Input.card", "id-cpyuub", "a-q5fqw0 a-19ehxda a-17nqvvb"),
+      ("Input.card", "id-cpyuub", "a-94fqw0 a-ezau73hef5hxda a-gk5o139qvvb"),
       ("Input.actionButton", "id-rmf27x", ""),
-      ("Input.panel", "id-1qtuyxa", "a-k008qs a-62yfsj"),
+      ("Input.panel", "id-1qtuyxa", "a-5r08qs a-kpacu4eyfsj"),
     ]
   ];
   
   let active = CSS.make("label:active id-1ofey90", []);
   
-  let container = CSS.make("label:container id-paugdl a-1443u2l a-g57662", []);
+  let container =
+    CSS.make("label:container id-paugdl a-393u2l a-pwpfa397662", []);
   
   let selected = CSS.make("label:selected id-okzmy", []);
   let highlighted = CSS.make("label:highlighted id-1jjszpn", []);
   
-  let card = CSS.make("label:card id-cpyuub a-q5fqw0 a-19ehxda a-17nqvvb", []);
+  let card =
+    CSS.make(
+      "label:card id-cpyuub a-94fqw0 a-ezau73hef5hxda a-gk5o139qvvb",
+      [],
+    );
   
   let actionButton = CSS.make("label:actionButton id-rmf27x", []);
   
-  let panel = CSS.make("label:panel id-1qtuyxa a-k008qs a-62yfsj", []);
+  let panel = CSS.make("label:panel id-1qtuyxa a-5r08qs a-kpacu4eyfsj", []);
   
   let _ = (active, container, selected, highlighted, card, actionButton, panel);
 

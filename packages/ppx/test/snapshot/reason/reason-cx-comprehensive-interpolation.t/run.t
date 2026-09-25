@@ -46,8 +46,8 @@ Comprehensive test for cx2 interpolation with various property types
   [@css ".in-zoi7e9{letter-spacing:var(--spacingVar-15s0ecx);}"];
   [@css ".in-zoi7e9{word-spacing:var(--spacingVar-1m50b62);}"];
   [@css ".in-1dfkyy8{width:var(--width-18c1xss);}"];
-  [@css ".a-73nay0{height:100px;}"];
-  [@css ".a-tokvmb{color:red;}"];
+  [@css ".a-6lnay0{height:100px;}"];
+  [@css ".a-4ekvmb{color:red;}"];
   [@css.bindings
     [
       ("Output.test1", "id-1jhxcqu", "in-b8f0pi"),
@@ -60,7 +60,7 @@ Comprehensive test for cx2 interpolation with various property types
       ("Output.test8", "id-yq2qob", "in-1bkxgpr"),
       ("Output.test9", "id-1u4o5z6", "a-1bezkxi"),
       ("Output.test10", "id-1egwgp0", "in-zoi7e9"),
-      ("Output.test11", "id-16lxxsk", "in-1dfkyy8 a-73nay0 a-tokvmb"),
+      ("Output.test11", "id-16lxxsk", "in-1dfkyy8 a-6lnay0 a-4ekvmb"),
     ]
   ];
   let lengthVar = CSS.px(10);
@@ -152,6 +152,6 @@ Comprehensive test for cx2 interpolation with various property types
     );
   let test11 = width =>
     CSS.make(
-      "label:test11 id-16lxxsk in-1dfkyy8 a-73nay0 a-tokvmb",
+      "label:test11 id-16lxxsk in-1dfkyy8 a-6lnay0 a-4ekvmb",
       [("--width-18c1xss", CSS.Types.Width.toString(width))],
     );

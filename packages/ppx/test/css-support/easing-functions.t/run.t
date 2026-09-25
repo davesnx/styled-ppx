@@ -15,12 +15,12 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".a-duudp6{transition-timing-function:steps(2, jump-start);}"];
-  [@css ".a-2tegan{transition-timing-function:steps(2, jump-end);}"];
-  [@css ".a-1qfsz2c{transition-timing-function:steps(1, jump-both);}"];
-  [@css ".a-1m48w8e{transition-timing-function:steps(2, jump-none);}"];
+  [@css ".a-dm00gudp6{transition-timing-function:steps(2, jump-start);}"];
+  [@css ".a-dm00gegan{transition-timing-function:steps(2, jump-end);}"];
+  [@css ".a-dm00gsz2c{transition-timing-function:steps(1, jump-both);}"];
+  [@css ".a-dm00g8w8e{transition-timing-function:steps(2, jump-none);}"];
   
-  CSS.make("a-duudp6", []);
-  CSS.make("a-2tegan", []);
-  CSS.make("a-1qfsz2c", []);
-  CSS.make("a-1m48w8e", []);
+  CSS.make("a-dm00gudp6", []);
+  CSS.make("a-dm00gegan", []);
+  CSS.make("a-dm00gsz2c", []);
+  CSS.make("a-dm00g8w8e", []);

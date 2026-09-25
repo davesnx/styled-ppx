@@ -23,20 +23,20 @@ This test ensures autoprefixing happens in the PPX extraction path.
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css
-    ".a-6tr4kf{-webkit-text-size-adjust:none;-moz-text-size-adjust:none;-ms-text-size-adjust:none;text-size-adjust:none;}"
+    ".a-czr4kf{-webkit-text-size-adjust:none;-moz-text-size-adjust:none;-ms-text-size-adjust:none;text-size-adjust:none;}"
   ];
   [@css
-    ".a-4jky3p{-webkit-text-decoration:line-through;text-decoration:line-through;}"
+    ".a-cfky3p{-webkit-text-decoration:line-through;text-decoration:line-through;}"
   ];
-  [@css ".a-lgj0h8{display:grid;}"];
+  [@css ".a-5rj0h8{display:grid;}"];
   [@css
-    ".a-17p8nyb{-webkit-animation-iteration-count:infinite;animation-iteration-count:infinite;}"
+    ".a-2z00w8nyb{-webkit-animation-iteration-count:infinite;animation-iteration-count:infinite;}"
   ];
   [@css
-    ".a-11ib09{-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px);}"
+    ".a-37ib09{-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px);}"
   ];
-  CSS.make("a-6tr4kf", []);
-  CSS.make("a-4jky3p", []);
-  CSS.make("a-lgj0h8", []);
-  CSS.make("a-17p8nyb", []);
-  CSS.make("a-11ib09", []);
+  CSS.make("a-czr4kf", []);
+  CSS.make("a-cfky3p", []);
+  CSS.make("a-5rj0h8", []);
+  CSS.make("a-2z00w8nyb", []);
+  CSS.make("a-37ib09", []);

@@ -9,12 +9,12 @@ deterministic input, not a nonce.
 
   $ ../../standalone.exe --impl input.ml -o none.ml
   $ grep "css.bindings" none.ml
-  [@@@css.bindings [("Input.marker", "id-1rctcrz", "a-tokvmb")]]
+  [@@@css.bindings [("Input.marker", "id-1rctcrz", "a-4ekvmb")]]
 
   $ ../../standalone.exe --namespace a --impl input.ml -o a1.ml
   $ grep "css.bindings" a1.ml
-  [@@@css.bindings [("Input.marker", "id-12d5hxh", "a-tokvmb")]]
+  [@@@css.bindings [("Input.marker", "id-12d5hxh", "a-4ekvmb")]]
 
   $ ../../standalone.exe --namespace a --impl input.ml -o a2.ml
   $ grep "css.bindings" a2.ml
-  [@@@css.bindings [("Input.marker", "id-12d5hxh", "a-tokvmb")]]
+  [@@@css.bindings [("Input.marker", "id-12d5hxh", "a-4ekvmb")]]

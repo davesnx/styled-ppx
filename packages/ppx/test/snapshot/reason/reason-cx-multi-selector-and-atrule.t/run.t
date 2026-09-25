@@ -6,41 +6,48 @@ selector chain into the at-rule's contents instead of dropping it.
 
   $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
-  [@@@css ".a-rmy2q8 .a{color:red;}"]
-  [@@@css ".a-alyv6j .b{color:red;}"]
-  [@@@css ".a-xuam0t .parent .a{color:blue;}"]
-  [@@@css ".a-1400cim .parent .b{color:blue;}"]
-  [@@@css ".a-1v5vtx3 .a .c{color:green;}"]
-  [@@@css ".a-1hhu78w .a .d{color:green;}"]
-  [@@@css ".a-1ehtzuk .b .c{color:green;}"]
-  [@@@css ".a-1nvjsnn .b .d{color:green;}"]
-  [@@@css ".a-bij269 .a:hover{color:blue;}"]
-  [@@@css ".a-1k1r9ux .b:hover{color:blue;}"]
-  [@@@css "@media (min-width: 768px) {.a-14bi921 .a{color:red;}}"]
-  [@@@css "@media (max-width: 600px) {.a-godogz .a .b{color:red;}}"]
-  [@@@css ".a-1c0hjb1 .a{color:black;}"]
-  [@@@css "@media (max-width: 600px) {.a-1x7bng1 .a{color:red;}}"]
-  [@@@css "@media (max-width: 600px) {.a-pjtxwe .a:hover{color:blue;}}"]
+  [@@@css ".a-2sekz4ey2q8 .a{color:red;}"]
+  [@@@css ".a-bcuim4eyv6j .b{color:red;}"]
+  [@@@css ".a-aofs04eam0t .parent .a{color:blue;}"]
+  [@@@css ".a-gdpy14e0cim .parent .b{color:blue;}"]
+  [@@@css ".a-eu1gr4evtx3 .a .c{color:green;}"]
+  [@@@css ".a-rbso84eu78w .a .d{color:green;}"]
+  [@@@css ".a-d7tqn4etzuk .b .c{color:green;}"]
+  [@@@css ".a-mmzne4ejsnn .b .d{color:green;}"]
+  [@@@css ".a-y066w4ej269 .a:hover{color:blue;}"]
+  [@@@css ".a-mrd5q4er9ux .b:hover{color:blue;}"]
+  [@@@css "@media (min-width: 768px) {.a-a1ok24ei921 .a{color:red;}}"]
+  [@@@css "@media (max-width: 600px) {.a-o95t84edogz .a .b{color:red;}}"]
+  [@@@css ".a-2sekz4ehjb1 .a{color:black;}"]
+  [@@@css "@media (max-width: 600px) {.a-dft6c4ebng1 .a{color:red;}}"]
+  [@@@css "@media (max-width: 600px) {.a-yea404etxwe .a:hover{color:blue;}}"]
   [@@@css.bindings
-    [("Input.multiTop", "id-za05oi", "a-rmy2q8 a-alyv6j");
-    ("Input.multiNested", "id-gymm1w", "a-xuam0t a-1400cim");
+    [("Input.multiTop", "id-za05oi", "a-2sekz4ey2q8 a-bcuim4eyv6j");
+    ("Input.multiNested", "id-gymm1w", "a-aofs04eam0t a-gdpy14e0cim");
     ("Input.cartesian", "id-18oo9dc",
-      "a-1v5vtx3 a-1hhu78w a-1ehtzuk a-1nvjsnn");
-    ("Input.multiMixed", "id-kzpsx9", "a-rmy2q8 a-alyv6j a-bij269 a-1k1r9ux");
-    ("Input.mediaUnderSelector", "id-jnaeeh", "a-14bi921");
-    ("Input.mediaDeep", "id-1xp2ctx", "a-godogz");
-    ("Input.mediaWithNested", "id-sseoij", "a-1c0hjb1 a-1x7bng1 a-pjtxwe")]]
-  let multiTop = CSS.make "label:multiTop id-za05oi a-rmy2q8 a-alyv6j" []
+      "a-eu1gr4evtx3 a-rbso84eu78w a-d7tqn4etzuk a-mmzne4ejsnn");
+    ("Input.multiMixed", "id-kzpsx9",
+      "a-2sekz4ey2q8 a-bcuim4eyv6j a-y066w4ej269 a-mrd5q4er9ux");
+    ("Input.mediaUnderSelector", "id-jnaeeh", "a-a1ok24ei921");
+    ("Input.mediaDeep", "id-1xp2ctx", "a-o95t84edogz");
+    ("Input.mediaWithNested", "id-sseoij",
+      "a-2sekz4ehjb1 a-dft6c4ebng1 a-yea404etxwe")]]
+  let multiTop =
+    CSS.make "label:multiTop id-za05oi a-2sekz4ey2q8 a-bcuim4eyv6j" []
   let multiNested =
-    CSS.make "label:multiNested id-gymm1w a-xuam0t a-1400cim" []
+    CSS.make "label:multiNested id-gymm1w a-aofs04eam0t a-gdpy14e0cim" []
   let cartesian =
     CSS.make
-      "label:cartesian id-18oo9dc a-1v5vtx3 a-1hhu78w a-1ehtzuk a-1nvjsnn" []
+      "label:cartesian id-18oo9dc a-eu1gr4evtx3 a-rbso84eu78w a-d7tqn4etzuk a-mmzne4ejsnn"
+      []
   let multiMixed =
-    CSS.make "label:multiMixed id-kzpsx9 a-rmy2q8 a-alyv6j a-bij269 a-1k1r9ux"
+    CSS.make
+      "label:multiMixed id-kzpsx9 a-2sekz4ey2q8 a-bcuim4eyv6j a-y066w4ej269 a-mrd5q4er9ux"
       []
   let mediaUnderSelector =
-    CSS.make "label:mediaUnderSelector id-jnaeeh a-14bi921" []
-  let mediaDeep = CSS.make "label:mediaDeep id-1xp2ctx a-godogz" []
+    CSS.make "label:mediaUnderSelector id-jnaeeh a-a1ok24ei921" []
+  let mediaDeep = CSS.make "label:mediaDeep id-1xp2ctx a-o95t84edogz" []
   let mediaWithNested =
-    CSS.make "label:mediaWithNested id-sseoij a-1c0hjb1 a-1x7bng1 a-pjtxwe" []
+    CSS.make
+      "label:mediaWithNested id-sseoij a-2sekz4ehjb1 a-dft6c4ebng1 a-yea404etxwe"
+      []

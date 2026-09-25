@@ -19,26 +19,27 @@ had no branch for the `of` keyword.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".a-1scn809::part(foo){color:red;}"];
-  [@css ".a-upe6d9::slotted(.bar){color:blue;}"];
-  [@css ".a-1uy51rt:nth-child(2n+1 of .x){color:green;}"];
-  [@css ".a-1qws5ty:nth-last-child(odd of .a,.b){color:yellow;}"];
+  [@css ".a-5r7jx4en809::part(foo){color:red;}"];
+  [@css ".a-wmvcz4ee6d9::slotted(.bar){color:blue;}"];
+  [@css ".a-da0h14e51rt:nth-child(2n+1 of .x){color:green;}"];
+  [@css ".a-kj3e34es5ty:nth-last-child(odd of .a,.b){color:yellow;}"];
   [@css.bindings
     [
-      ("Input._part", "id-3hanao", "a-1scn809"),
-      ("Input._slotted", "id-n06isq", "a-upe6d9"),
-      ("Input._nth_child_of", "id-1k5qaw3", "a-1uy51rt"),
-      ("Input._nth_last_child_of_list", "id-1vkw39v", "a-1qws5ty"),
+      ("Input._part", "id-3hanao", "a-5r7jx4en809"),
+      ("Input._slotted", "id-n06isq", "a-wmvcz4ee6d9"),
+      ("Input._nth_child_of", "id-1k5qaw3", "a-da0h14e51rt"),
+      ("Input._nth_last_child_of_list", "id-1vkw39v", "a-kj3e34es5ty"),
     ]
   ];
   
-  let _part = CSS.make("label:_part id-3hanao a-1scn809", []);
+  let _part = CSS.make("label:_part id-3hanao a-5r7jx4en809", []);
   
-  let _slotted = CSS.make("label:_slotted id-n06isq a-upe6d9", []);
+  let _slotted = CSS.make("label:_slotted id-n06isq a-wmvcz4ee6d9", []);
   
-  let _nth_child_of = CSS.make("label:_nth_child_of id-1k5qaw3 a-1uy51rt", []);
+  let _nth_child_of =
+    CSS.make("label:_nth_child_of id-1k5qaw3 a-da0h14e51rt", []);
   
   let _nth_last_child_of_list =
-    CSS.make("label:_nth_last_child_of_list id-1vkw39v a-1qws5ty", []);
+    CSS.make("label:_nth_last_child_of_list id-1vkw39v a-kj3e34es5ty", []);
 
   $ dune build

@@ -5,16 +5,16 @@
   [@css ".id-16nw107{background:var(--bg-1rdts9a);}"];
   [@css ".id-1iojcla.id-16nw107{color:white;}"];
   [@css ".container .id-16nw107{color:var(--bg-raax3p);}"];
-  [@css ".a-nk32ej{padding:10px;}"];
-  [@css ".a-b7rhyr{border:1px solid;}"];
+  [@css ".a-9432ej{padding:10px;}"];
+  [@css ".a-3hrhyr{border:1px solid;}"];
   [@css.bindings
     [
-      ("Output.card", "id-16nw107", "a-nk32ej"),
-      ("Output.active", "id-1iojcla", "a-b7rhyr"),
+      ("Output.card", "id-16nw107", "a-9432ej"),
+      ("Output.active", "id-1iojcla", "a-3hrhyr"),
     ]
   ];
-  let card = CSS.make("label:card id-16nw107 a-nk32ej", []);
-  let active = CSS.make("label:active id-1iojcla a-b7rhyr", []);
+  let card = CSS.make("label:card id-16nw107 a-9432ej", []);
+  let active = CSS.make("label:active id-1iojcla a-3hrhyr", []);
   let bg = CSS.red;
   module CardGlobals = {
     let to_string = () =>
