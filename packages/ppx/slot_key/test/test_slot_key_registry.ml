@@ -135,20 +135,24 @@ let family_tests =
 
 (* --- append-only seed order: an unchanged, exact-order PREFIX --------- *)
 
-(* Committed snapshot of every entry {!Slot_key.seed} held on 2026-09-25 (528
-   entries, one per line, plain text - not OCaml source - so it stays a
-   reviewable, diffable artifact independent of this file), in the exact
+(* Committed snapshot of every entry {!Slot_key.seed} holds (526 entries as
+   of 2026-09-25, one per line, plain text - not OCaml source - so it stays
+   a reviewable, diffable artifact independent of this file), in the exact
    order they were seeded. This is the actual "an existing id must never
    move" check: {!order_tests} below asserts this snapshot is a byte-for-
    byte, same-order PREFIX of the live [Slot_key.seed] - not equal to it.
    That distinction is the whole point: appending a new entry after this
    snapshot (the normal, expected way to grow the table) keeps it a valid
    prefix and the test keeps passing with no edit to the snapshot needed;
-   renaming, reordering, or inserting anything AT OR BEFORE position 527
-   breaks the prefix relationship and fails immediately. Grow this snapshot
-   (to the new, larger, still-frozen length) only in the same change that
-   intentionally accepts a past id moving - which should not happen - never
-   to "make the test pass" after an accidental reorder. *)
+   renaming, reordering, or inserting anything at or before the snapshot's
+   last position breaks the prefix relationship and fails immediately. Grow
+   this snapshot (to the new, larger, still-frozen length) only in the same
+   change that intentionally accepts a past id moving - which should not
+   happen - never to "make the test pass" after an accidental reorder. (One
+   exception so far: 2026-09-25, removing "backdrop-blur" and
+   "container-name-computed" - see the plan's Decisions - shifted every
+   later position by two; the snapshot was regenerated whole, not patched,
+   for that one change.) *)
 let expected_seed_prefix : string array =
   let ic = open_in "seed.snapshot" in
   let rec read_lines acc =
@@ -163,8 +167,8 @@ let expected_seed_prefix : string array =
 let order_tests =
   [
     Alcotest_extra.test
-      "the seed's first 528 entries are an unchanged, exact-order prefix of \
-       the live array (per seed.snapshot) - appending new entries after them \
+      "the seed's committed prefix (per seed.snapshot) is an unchanged, \
+       exact-order prefix of the live array - appending new entries after them \
        is fine and needs no edit to the snapshot; moving, renaming, or \
        reordering any of them is not, and fails here" (fun () ->
       let n = Array.length expected_seed_prefix in

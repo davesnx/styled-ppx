@@ -190,13 +190,15 @@ end
    IS the id (see {!Registry.table} below, which uses this array's order
    verbatim - no sorting, no filtering, ever, at build time). Seeded
    2026-09-25 from every property packages/css-grammar/lib/Properties/*.ml
-   registers (759, via [Css_grammar.property_names ()], the 25 internal
+   registers (757, via [Css_grammar.property_names ()], the 25 internal
    `@media`-feature-grammar entries in Properties/Media.ml excluded - they
-   are not CSS properties, see Css_grammar.Registry's module doc), reduced
-   through {!resolve_alias} and {!Family.family_key_of} to the 528 distinct
-   ids actually needed (44 shorthand-family canonical keys + 484 standalone
-   properties) - a leaf covered by some family (e.g. "margin-top") needs no
-   entry of its own, and neither does a true alias (e.g. "font-width", "word-
+   are not CSS properties, see Css_grammar.Registry's module doc; also
+   excludes "backdrop-blur" and "container-name-computed", removed
+   2026-09-25 - see the plan's Decisions), reduced through {!resolve_alias}
+   and {!Family.family_key_of} to the 526 distinct ids actually needed (44
+   shorthand-family canonical keys + 482 standalone properties) - a leaf
+   covered by some family (e.g. "margin-top") needs no entry of its own,
+   and neither does a true alias (e.g. "font-width", "word-
    wrap"), {!family_id_of} redirects both kinds to their canonical key.
 
    ORDER RULE: append a newly-needed id at the END, never insert
@@ -324,7 +326,6 @@ let seed : string array =
     "ascent-override";
     "aspect-ratio";
     "azimuth";
-    "backdrop-blur";
     "backdrop-filter";
     "backface-visibility";
     "background";
@@ -386,7 +387,6 @@ let seed : string array =
     "contain-intrinsic-size";
     "contain-intrinsic-width";
     "container";
-    "container-name-computed";
     "content";
     "content-visibility";
     "corner-block-end-shape";

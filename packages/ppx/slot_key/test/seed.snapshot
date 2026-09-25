@@ -113,7 +113,6 @@ appearance
 ascent-override
 aspect-ratio
 azimuth
-backdrop-blur
 backdrop-filter
 backface-visibility
 background
@@ -175,7 +174,6 @@ contain-intrinsic-inline-size
 contain-intrinsic-size
 contain-intrinsic-width
 container
-container-name-computed
 content
 content-visibility
 corner-block-end-shape

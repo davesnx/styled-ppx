@@ -5307,7 +5307,6 @@ and property_bleed =
   | `Extended_length of extended_length
   ]
 
-and property_backdrop_blur = extended_length
 and property_scrollbar_color_legacy = color
 and property_stop_color = color
 and property_stop_opacity = alpha_value
@@ -5425,11 +5424,6 @@ and property_scroll_marker_group =
   [ `None
   | `Before
   | `After
-  ]
-
-and property_container_name_computed =
-  [ `None
-  | `Custom_ident of string list
   ]
 
 and property_text_edge =
