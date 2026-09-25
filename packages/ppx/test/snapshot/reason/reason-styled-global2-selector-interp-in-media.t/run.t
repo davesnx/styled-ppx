@@ -3,9 +3,9 @@
   $ refmt --parse ml --print re output.ml
   [@css ".id-16nw107{color:black;}"];
   [@css "@media (max-width: 640px) {.id-16nw107{color:gray;}}"];
-  [@css ".a-hpgf8j{padding:8px;}"];
-  [@css.bindings [("Output.card", "id-16nw107", "a-hpgf8j")]];
-  let card = CSS.make("label:card id-16nw107 a-hpgf8j", []);
+  [@css ".a-94gf8j{padding:8px;}"];
+  [@css.bindings [("Output.card", "id-16nw107", "a-94gf8j")]];
+  let card = CSS.make("label:card id-16nw107 a-94gf8j", []);
   module ResponsiveGlobals = {
     let to_string = () => "";
     [@warning "-27-32"]

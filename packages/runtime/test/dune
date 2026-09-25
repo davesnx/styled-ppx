@@ -9,7 +9,16 @@
   server-reason-react.belt
   server-reason-react.reactDom
   alcotest_extra
-  styled-ppx.native)
+  styled-ppx.native
+  ; class_format/slot_key/styled_ppx_css_parser are test-only, to build
+  ; real Class_format.slot_class atoms for test_merge_key.ml - proving the
+  ; real ppx-side encoder and the real runtime-side Merge_key decoder
+  ; agree, not a third, hand-rolled copy of the field layout. The shipped
+  ; runtime library itself never depends on them (see Merge_key.ml's own
+  ; doc comment for why).
+  class_format
+  slot_key
+  styled_ppx_css_parser)
  (preprocess
   (pps styled-ppx)))
 

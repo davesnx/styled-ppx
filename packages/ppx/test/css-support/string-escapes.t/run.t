@@ -17,41 +17,41 @@ documents/string-escape-bug.md for context.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".a-64u917{content:\"\\\"\";}"];
-  [@css ".a-14y1y2p{content:\"\\\\\";}"];
-  [@css ".a-1f06l48{content:\"'\";}"];
-  [@css ".a-eyucdh{content:\"a\\\"b\";}"];
-  [@css ".a-1svugqq{content:\"before\\\\after\";}"];
-  [@css ".a-6dew8m{content:\"line\\A one\";}"];
-  [@css ".a-1xb5ir8{content:\"—\";}"];
-  [@css ".a-1blk38d [data-name=\"O\\\"Brien\"]{color:red;}"];
-  [@css ".a-dv08vt{background-image:url(\"path/with\\\"quote.png\");}"];
-  [@css ".a-ynwlhr{background-image:url(\"path\\\\to\\\\file.png\");}"];
-  [@css ".a-aaqqv9{content:\"\\9 \";}"];
-  [@css ".a-1n1y7g7{content:\"\\7F \";}"];
+  [@css ".a-4wu917{content:\"\\\"\";}"];
+  [@css ".a-4w1y2p{content:\"\\\\\";}"];
+  [@css ".a-4w6l48{content:\"'\";}"];
+  [@css ".a-4wucdh{content:\"a\\\"b\";}"];
+  [@css ".a-4wugqq{content:\"before\\\\after\";}"];
+  [@css ".a-4wew8m{content:\"line\\A one\";}"];
+  [@css ".a-4w5ir8{content:\"—\";}"];
+  [@css ".a-g49s14ek38d [data-name=\"O\\\"Brien\"]{color:red;}"];
+  [@css ".a-3900808vt{background-image:url(\"path/with\\\"quote.png\");}"];
+  [@css ".a-39008wlhr{background-image:url(\"path\\\\to\\\\file.png\");}"];
+  [@css ".a-4wqqv9{content:\"\\9 \";}"];
+  [@css ".a-4wy7g7{content:\"\\7F \";}"];
   
-  CSS.make("a-64u917", []);
+  CSS.make("a-4wu917", []);
   
-  CSS.make("a-14y1y2p", []);
+  CSS.make("a-4w1y2p", []);
   
-  CSS.make("a-1f06l48", []);
+  CSS.make("a-4w6l48", []);
   
-  CSS.make("a-eyucdh", []);
+  CSS.make("a-4wucdh", []);
   
-  CSS.make("a-1svugqq", []);
+  CSS.make("a-4wugqq", []);
   
-  CSS.make("a-6dew8m", []);
+  CSS.make("a-4wew8m", []);
   
-  CSS.make("a-1xb5ir8", []);
+  CSS.make("a-4w5ir8", []);
   
-  CSS.make("a-1f06l48", []);
+  CSS.make("a-4w6l48", []);
   
-  CSS.make("a-1blk38d", []);
+  CSS.make("a-g49s14ek38d", []);
   
-  CSS.make("a-dv08vt", []);
+  CSS.make("a-3900808vt", []);
   
-  CSS.make("a-ynwlhr", []);
+  CSS.make("a-39008wlhr", []);
   
-  CSS.make("a-aaqqv9", []);
+  CSS.make("a-4wqqv9", []);
   
-  CSS.make("a-1n1y7g7", []);
+  CSS.make("a-4wy7g7", []);

@@ -7,9 +7,9 @@
   [@css ".in-1oz3n15{color:var(--var-16tzllb);}"];
   [@css ".in-1oz3n15{background-color:var(--black-11zsw44);}"];
   [@css ".in-1oz3n15{border-color:var(--black-1e15k1a);}"];
-  [@css ".a-13o7eu2{display:block;}"];
+  [@css ".a-5r7eu2{display:block;}"];
   [@css.bindings
-    [("Output.StringInterpolation", "id-1n1bal7", "in-1oz3n15 a-13o7eu2")]
+    [("Output.StringInterpolation", "id-1n1bal7", "in-1oz3n15 a-5r7eu2")]
   ];
   module Theme = {
     let var = CSS.hex("333333");
@@ -1003,7 +1003,7 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "label:StringInterpolation id-1n1bal7 in-1oz3n15 a-13o7eu2",
+        "label:StringInterpolation id-1n1bal7 in-1oz3n15 a-5r7eu2",
         [
           ("--var-16tzllb", CSS.Types.Color.toString(Theme.var)),
           ("--black-11zsw44", CSS.Types.Color.toString(black)),

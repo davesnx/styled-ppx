@@ -34,15 +34,17 @@ If this test fail means that the module is not in sync with the ppx
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css "@property --cosas-112i897{syntax:\"*\";inherits:false;}"];
   [@css
-    ".a-1gtanqs{width:-webkit-fit-content;width:-moz-fit-content;width:fit-content;}"
+    ".a-ecanqs{width:-webkit-fit-content;width:-moz-fit-content;width:fit-content;}"
   ];
-  [@css ".a-1jqkbxn{grid-template-columns:fit-content(20px) fit-content(10%);}"];
+  [@css
+    ".a-6i00gkbxn{grid-template-columns:fit-content(20px) fit-content(10%);}"
+  ];
   [@css
     ".in-1wxdqmz{-webkit-text-decoration:var(--cosas-112i897);text-decoration:var(--cosas-112i897);}"
   ];
   let cosas = `bold;
   
-  CSS.make("a-1gtanqs a-1jqkbxn", []);
+  CSS.make("a-ecanqs a-6i00gkbxn", []);
   
   CSS.make(
     "in-1wxdqmz",

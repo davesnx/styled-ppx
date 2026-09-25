@@ -12,17 +12,17 @@ var per (source-path, runtime-type) across base / :hover / @media variants.
   [@css ".in-1kbzua4{color:var(--color-3f9mj1);}"];
   [@css ".in-1kbzua4:hover{color:var(--color-3f9mj1);}"];
   [@css "@media (max-width: 768px) {.in-1kbzua4{color:var(--color-3f9mj1);}}"];
-  [@css ".a-k008qs{display:flex;}"];
+  [@css ".a-5r08qs{display:flex;}"];
   [@css ".in-1upqar2{color:var(--color-13vjntp);}"];
   [@css ".in-1upqar2:hover{color:var(--color-13vjntp);}"];
   [@css ".in-e286e6{width:var(--width-1v9ua);}"];
   [@css ".in-e286e6:hover{height:var(--width-c62vcf);}"];
-  [@css ".a-tokvmb{color:red;}"];
+  [@css ".a-4ekvmb{color:red;}"];
   [@css ".in-lfbwy0:hover{color:var(--color-4uzv5u);}"];
   [@css.bindings
     [
       ("Output.multiVariant", "id-1be0zju", "in-1kbzua4"),
-      ("Output.mixed", "id-11av61d", "a-k008qs in-1upqar2"),
+      ("Output.mixed", "id-11av61d", "a-5r08qs in-1upqar2"),
       ("Output.twoTypes", "id-1ybygzf", "in-e286e6"),
     ]
   ];
@@ -35,7 +35,7 @@ var per (source-path, runtime-type) across base / :hover / @media variants.
     );
   let mixed =
     CSS.make(
-      "label:mixed id-11av61d a-k008qs in-1upqar2",
+      "label:mixed id-11av61d a-5r08qs in-1upqar2",
       [("--color-13vjntp", CSS.Types.Color.toString(color))],
     );
   let twoTypes =
@@ -48,11 +48,11 @@ var per (source-path, runtime-type) across base / :hover / @media variants.
     );
   let _ =
     CSS.make(
-      "a-tokvmb in-lfbwy0",
+      "a-4ekvmb in-lfbwy0",
       [("--color-4uzv5u", CSS.Types.Color.toString(color))],
     );
   let _ =
     CSS.make(
-      "a-k008qs in-lfbwy0",
+      "a-5r08qs in-lfbwy0",
       [("--color-4uzv5u", CSS.Types.Color.toString(color))],
     );
