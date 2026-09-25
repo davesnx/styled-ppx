@@ -63494,6 +63494,208 @@ var toggle = make7(
   /* [] */
   0
 );
+var mergeLeftRed = make7(
+  "label:mergeLeftRed id-xj79l2 a-4ekvmb",
+  /* [] */
+  0
+);
+var mergeRightBlue = make7(
+  "label:mergeRightBlue id-rmeksf a-4esm7b",
+  /* [] */
+  0
+);
+var heightAutoDecoy = make7(
+  "label:heightAutoDecoy id-12da7xi a-6l7jm9",
+  /* [] */
+  0
+);
+var FaqDecoy = {
+  heightAutoDecoy
+};
+var faqOpenContent = make7(
+  "label:faqOpenContent id-qck8g9 a-6l7jm9 a-8rbazn",
+  /* [] */
+  0
+);
+var faqCollapsed = make7(
+  "label:faqCollapsed id-1tw41t7 a-6lvr0w",
+  /* [] */
+  0
+);
+var marginTopZero = make7(
+  "label:marginTopZero id-c4lyme a-7p008n4zf",
+  /* [] */
+  0
+);
+var marginAll10 = make7(
+  "label:marginAll10 id-rrmfw a-7peacs",
+  /* [] */
+  0
+);
+var marginAll10Reversed = make7(
+  "label:marginAll10Reversed id-19kb2l3 a-7peacs",
+  /* [] */
+  0
+);
+var marginTopZeroReversed = make7(
+  "label:marginTopZeroReversed id-oibhbu a-7p008n4zf",
+  /* [] */
+  0
+);
+var differentColor = make7(
+  "label:differentColor id-1yxuf5h a-4e3x2f",
+  /* [] */
+  0
+);
+var differentBackground = make7(
+  "label:differentBackground id-m7e9qy a-39zz22",
+  /* [] */
+  0
+);
+var hoverBaseColor = make7(
+  "label:hoverBaseColor id-69rt6v a-4ecoli",
+  /* [] */
+  0
+);
+var hoverOverride = make7(
+  "label:hoverOverride id-zaoc9q a-qyw7u4eb4a5",
+  /* [] */
+  0
+);
+var hoverFirst = make7(
+  "label:hoverFirst id-vfuhim a-qyw7u4ego80",
+  /* [] */
+  0
+);
+var hoverSecond = make7(
+  "label:hoverSecond id-st9aqn a-qyw7u4em3mo",
+  /* [] */
+  0
+);
+var mediaFirst = make7(
+  "label:mediaFirst id-1yjmkjm a-ftrjp4eqtu6",
+  /* [] */
+  0
+);
+var mediaSecond = make7(
+  "label:mediaSecond id-dpv5ji a-ftrjp4edjbj",
+  /* [] */
+  0
+);
+var importantRed = make7(
+  "label:importantRed id-cg72f a-oe8sa4eltzl",
+  /* [] */
+  0
+);
+var plainBlueForImportant = make7(
+  "label:plainBlueForImportant id-ovywjm a-4esm7b",
+  /* [] */
+  0
+);
+var plainRedForImportant = make7(
+  "label:plainRedForImportant id-1y9lfm8 a-4ekvmb",
+  /* [] */
+  0
+);
+var importantBlue = make7(
+  "label:importantBlue id-q3vp21 a-oe8sa4e3jtv",
+  /* [] */
+  0
+);
+var importantRedVsImportantBlue = make7(
+  "label:importantRedVsImportantBlue id-17mhudr a-oe8sa4eltzl",
+  /* [] */
+  0
+);
+var customXRed = make7(
+  "label:customXRed id-iv9hkj a-zytx2ztfp7wt",
+  /* [] */
+  0
+);
+var customXBlue = make7(
+  "label:customXBlue id-j3dium a-zytx2ztfqbjc",
+  /* [] */
+  0
+);
+var useCustomX = make7(
+  "label:useCustomX id-vzabfw a-4e8w5r",
+  /* [] */
+  0
+);
+function dynColorA(color) {
+  return make7("label:dynColorA id-oxnnly in-kusjgz", {
+    hd: [
+      "--color-1a279q8",
+      Color.toString(color)
+    ],
+    tl: (
+      /* [] */
+      0
+    )
+  });
+}
+function dynColorB(color) {
+  return make7("label:dynColorB id-eaixg1 in-kusjgz", {
+    hd: [
+      "--color-1a279q8",
+      Color.toString(color)
+    ],
+    tl: (
+      /* [] */
+      0
+    )
+  });
+}
+var assocA = make7(
+  "label:assocA id-1ns1py9 a-4efdvb",
+  /* [] */
+  0
+);
+var assocB = make7(
+  "label:assocB id-1ojnt9w a-4et30w",
+  /* [] */
+  0
+);
+var assocC = make7(
+  "label:assocC id-167j6uv a-4efm8j",
+  /* [] */
+  0
+);
+var paddingBothZero = make7(
+  "label:paddingBothZero id-kx9m5d a-94002yq1t a-940048fgp",
+  /* [] */
+  0
+);
+var paddingLeft4 = make7(
+  "label:paddingLeft4 id-1j3kmra a-94002wcsq",
+  /* [] */
+  0
+);
+var wordWrapBreak = make7(
+  "label:wordWrapBreak id-k9t8x6 a-8xpt08",
+  /* [] */
+  0
+);
+var overflowWrapNormal = make7(
+  "label:overflowWrapNormal id-1l5xha2 a-8xlw6e",
+  /* [] */
+  0
+);
+var identityKeptColor = make7(
+  "label:identityKeptColor id-15nl9wy a-4enj2d",
+  /* [] */
+  0
+);
+var identityKeptOverride = make7(
+  "label:identityKeptOverride id-10n1eq1 a-4efdvb",
+  /* [] */
+  0
+);
+var identityKeptHighlight = make7(
+  "label:identityKeptHighlight id-1cfjy5z a-e440ocfhlzg",
+  /* [] */
+  0
+);
 var primary = hex2("141414");
 function keyframeDemoShell(color) {
   return make7("label:keyframeDemoShell id-8xpkpc a-94zrtu a-7p0013pbo a-3hft4e a-3n1jeb a-395zh2 in-kusjgz a-65001vzlw", {
@@ -63615,6 +63817,153 @@ function Main(Props) {
             children: "toggle: on via &.$(modifierActive)",
             className: merge2(toggle, modifierActive)[0],
             style: merge2(toggle, modifierActive)[1]
+          })
+        ]
+      }),
+      JsxRuntime.jsxs("section", {
+        children: [
+          JsxRuntime.jsx("h2", {
+            children: "CSS.merge"
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "1. same property: right wins"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(red, blue) -> expect blue",
+            className: merge2(mergeLeftRed, mergeRightBlue)[0],
+            style: merge2(mergeLeftRed, mergeRightBlue)[1]
+          }),
+          JsxRuntime.jsx("p", {
+            children: "Faq: merge(content{height:auto}, collapsed{height:0}) -> expect height 0 (this text hidden)",
+            className: merge2(faqOpenContent, faqCollapsed)[0],
+            style: merge2(faqOpenContent, faqCollapsed)[1]
+          }),
+          JsxRuntime.jsx("p", {
+            children: "Decoy: unrelated height:auto, rendered first, same class as faqOpenContent's",
+            className: heightAutoDecoy[0],
+            style: heightAutoDecoy[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "2. longhand then shorthand"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(margin-top:0, margin:10px) -> expect 10px all sides",
+            className: merge2(marginTopZero, marginAll10)[0],
+            style: merge2(marginTopZero, marginAll10)[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "3. shorthand then longhand (accepted limit)"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(margin:10px, margin-top:0) -> both classes kept, see report for what rendered",
+            className: merge2(marginAll10Reversed, marginTopZeroReversed)[0],
+            style: merge2(marginAll10Reversed, marginTopZeroReversed)[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "4. different properties"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(color, background) -> expect both applied",
+            className: merge2(differentColor, differentBackground)[0],
+            style: merge2(differentColor, differentBackground)[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "5. contexts"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "base + :hover -> green at rest, purple on hover",
+            className: merge2(hoverBaseColor, hoverOverride)[0],
+            style: merge2(hoverBaseColor, hoverOverride)[1]
+          }),
+          JsxRuntime.jsx("p", {
+            children: ":hover + :hover -> teal on hover (right wins)",
+            className: merge2(hoverFirst, hoverSecond)[0],
+            style: merge2(hoverFirst, hoverSecond)[1]
+          }),
+          JsxRuntime.jsx("p", {
+            children: "base + @media(<=700px) -> green normally, orange under 700px (both kept)",
+            className: merge2(hoverBaseColor, mediaFirst)[0],
+            style: merge2(hoverBaseColor, mediaFirst)[1]
+          }),
+          JsxRuntime.jsx("p", {
+            children: "@media + same @media -> brown under 700px (right wins)",
+            className: merge2(mediaFirst, mediaSecond)[0],
+            style: merge2(mediaFirst, mediaSecond)[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "6. !important"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(red !important, blue) -> expect red",
+            className: merge2(importantRed, plainBlueForImportant)[0],
+            style: merge2(importantRed, plainBlueForImportant)[1]
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(red, blue !important) -> expect blue",
+            className: merge2(plainRedForImportant, importantBlue)[0],
+            style: merge2(plainRedForImportant, importantBlue)[1]
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(red !important, blue !important) -> expect blue",
+            className: merge2(importantRedVsImportantBlue, importantBlue)[0],
+            style: merge2(importantRedVsImportantBlue, importantBlue)[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "7. custom property"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(--x:red, --x:blue) then color:var(--x) -> expect blue",
+            className: merge2(merge2(customXRed, customXBlue), useCustomX)[0],
+            style: merge2(merge2(customXRed, customXBlue), useCustomX)[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "8. interpolation bundle on each side"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge($(orange), $(blue)) -> both in- classes kept, see report for winner",
+            className: merge2(dynColorA(hex2("e8590c")), dynColorB(hex2("1971c2")))[0],
+            style: merge2(dynColorA(hex2("e8590c")), dynColorB(hex2("1971c2")))[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "9. merge of merges"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(merge(a,b), c) -> expect navy",
+            className: merge2(merge2(assocA, assocB), assocC)[0],
+            style: merge2(merge2(assocA, assocB), assocC)[1]
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(a, merge(b,c)) -> expect navy, same as the other order",
+            className: merge2(assocA, merge2(assocB, assocC))[0],
+            style: merge2(assocA, merge2(assocB, assocC))[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "10. family atom"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(padding-left:0;padding-right:0, padding-left:4px) -> expect left 4px, right 0",
+            className: merge2(paddingBothZero, paddingLeft4)[0],
+            style: merge2(paddingBothZero, paddingLeft4)[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "11. alias"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(word-wrap:break-word, overflow-wrap:normal) -> see report for what applies",
+            className: merge2(wordWrapBreak, overflowWrapNormal)[0],
+            style: merge2(wordWrapBreak, overflowWrapNormal)[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "12. identity survives a merge"
+          }),
+          JsxRuntime.jsx("div", {
+            children: JsxRuntime.jsx("p", {
+              children: "crimson + underlined: .$(identityKeptColor) still matches after merge",
+              className: merge2(identityKeptColor, identityKeptOverride)[0],
+              style: merge2(identityKeptColor, identityKeptOverride)[1]
+            }),
+            className: identityKeptHighlight[0],
+            style: identityKeptHighlight[1]
           })
         ]
       })
