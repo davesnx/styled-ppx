@@ -13,6 +13,8 @@
   @property --bgColor-zk5xjv{syntax:"*";inherits:false;}
   @property --borderColor-rm89ze{syntax:"*";inherits:false;}
   @property --shadow-2tj34g{syntax:"*";inherits:false;}
+  @layer styled-ppx.global, styled-ppx.descendant, styled-ppx.base, styled-ppx.conditional;
+  @layer styled-ppx.base {
   .a-4085tv{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
   .a-402iep{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1), 0px 4px 8px 0px rgba(0, 0, 0, 0.2);}
   .a-40fme5{box-shadow:inset 0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
@@ -22,13 +24,6 @@
   .a-3h2qc1{border:2px dashed #ff0000;}
   .a-3hjkge{border:1px solid transparent;}
   .a-3hanm4{border:none;}
-  .a-3hghsmzmu{border-top:1px solid red;}
-  .a-3hb2879q1{border-right:2px dashed blue;}
-  .a-3h00779gh{border-bottom:3px dotted green;}
-  .a-3h1dswvke{border-left:4px double orange;}
-  .a-3hlokq43j{border-width:2px;}
-  .a-3hsua8w2v{border-style:solid;}
-  .a-3hef5kaed{border-color:#333;}
   .a-3h257i{border:1px solid #ccc;}
   .a-3n6otz{border-radius:8px;}
   .a-405761{box-shadow:0px 4px 6px 0px rgba(0, 0, 0, 0.1);}
@@ -45,7 +40,15 @@
   .a-3hdrfm{border:var(--borderWidth-apl5wd) solid black;}
   .in-zwhmn0{background-color:var(--bgColor-zk5xjv);}
   .in-zwhmn0{border:1px solid var(--borderColor-rm89ze);}
+  .a-3hlokq43j{border-width:2px;}
+  .a-3hsua8w2v{border-style:solid;}
+  .a-3hef5kaed{border-color:#333;}
+  .a-3hghsmzmu{border-top:1px solid red;}
+  .a-3hb2879q1{border-right:2px dashed blue;}
+  .a-3h00779gh{border-bottom:3px dotted green;}
+  .a-3h1dswvke{border-left:4px double orange;}
   .in-zwhmn0{box-shadow:var(--shadow-2tj34g);}
+  }
 
 Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
 

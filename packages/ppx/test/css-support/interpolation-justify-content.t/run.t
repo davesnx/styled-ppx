@@ -110,6 +110,8 @@ Test interpolation support for various properties in cx2
   @property --overscrollBehavior-17qcsbs{syntax:"*";inherits:false;}
   @property --accentColor-mn7yh{syntax:"*";inherits:false;}
   @property --caretColor-zmu88x{syntax:"*";inherits:false;}
+  @layer styled-ppx.global, styled-ppx.descendant, styled-ppx.base, styled-ppx.conditional;
+  @layer styled-ppx.base {
   .a-9h002k6fd{justify-content:var(--justifyContent-4qveqt);}
   .a-9i0010r6u{align-items:var(--alignItems-521j9v);}
   .a-9j001pxby{align-self:var(--alignSelf-ljwnlg);}
@@ -164,8 +166,8 @@ Test interpolation support for various properties in cx2
   .a-3hloku872{border-width:var(--borderWidth-1231nny);}
   .a-3hef5cluv{border-color:var(--borderColor-vdrhmb);}
   .a-3n9x1x{border-radius:var(--borderRadius-br4a6q);}
-  .a-3903kipa5{background-repeat:var(--backgroundRepeat-3sra9y);}
   .a-3902ob4if{background-position:var(--backgroundPosition-1nm342w);}
+  .a-3903kipa5{background-repeat:var(--backgroundRepeat-3sra9y);}
   .a-39074p6rq{background-size:var(--backgroundSize-nk11f3);}
   .a-8p002idah{outline-style:var(--outlineStyle-1c46eti);}
   .a-8p0048xcq{outline-width:var(--outlineWidth-6upc5w);}
@@ -215,3 +217,4 @@ Test interpolation support for various properties in cx2
   .a-8zr0ae{overscroll-behavior:var(--overscrollBehavior-17qcsbs);}
   .a-2tqgla{accent-color:var(--accentColor-mn7yh);}
   .a-488xpc{caret-color:var(--caretColor-zmu88x);}
+  }

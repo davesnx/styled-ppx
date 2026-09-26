@@ -529,15 +529,6 @@ let warn_layer_name_collisions layer_names =
          layer"
         name (String.concat ", " many))
 
-(** [@property] and [@keyframes] rules are global registrations, not scoped
-    declarations: leaving one inside a [@layer] block would make its
-    registration, or a keyframe name lookup, depend on layer order. [--layers]
-    emits them ahead of every layer instead. *)
-let is_global_registration rule =
-  let trimmed = String.trim rule in
-  String.starts_with ~prefix:"@property" trimmed
-  || String.starts_with ~prefix:"@keyframes" trimmed
-
 (** A rendered rule is a hoisted [\@import]/[\@namespace] statement when, after
     trimming, it starts with that keyword and ends with [';']. CSS only honors
     these two kinds when they precede every other rule (and Cascade 5
@@ -577,7 +568,7 @@ let is_charset rule = String.starts_with ~prefix:"@charset" (String.trim rule)
     etc.) - those aren't this check's concern. There is no separate
     important-atom prefix: an [!important] atom is still [a-], just with a
     non-empty context (see [Slot_key.context_key]'s doc). *)
-let atom_class_name rule_text =
+let atom_class_and_end rule_text =
   (* Real output is lowercase base36 + '-', but this must not stop early on
      other test-fixture shapes (existing generate.ml cram tests fabricate
      raw [@@@css ...] payloads with hand-written names like ".a-A-y") -
@@ -611,9 +602,14 @@ let atom_class_name rule_text =
         while !j < n && is_class_char rule_text.[!j] do
           incr j
         done;
-        Some (String.sub rule_text start (!j - start)))
+        Some (String.sub rule_text start (!j - start), !j))
   in
   scan 0
+
+(** The atom's own class name alone, dropping the end position
+    {!atom_class_and_end} also returns (used by {!rule_tier} to look at what
+    immediately follows the class token). *)
+let atom_class_name rule_text = Option.map fst (atom_class_and_end rule_text)
 
 (** Collision check for the new atom-class format: its value hash is only unique
     within one (context, family[, mask]) bucket, not globally (see
@@ -657,6 +653,331 @@ let check_atom_class_collisions rules =
           Hashtbl.replace seen class_name rule;
           None))
     rules
+
+(* -- Cascade tiers -------------------------------------------------------
+
+   Every rule this aggregator ships shares the atomic invariant "one class,
+   no qualifiers", so two rules for the same property only ever compete by
+   stylesheet position - the later one wins. Content-hash dedup (and,
+   before it, an atom's own author) has no say over WHERE two such rules
+   land relative to each other once they come from different bindings, so
+   two real bugs fell out of this: a block's own `@media (min-width:...)`
+   override landing BEFORE its base declaration in the emitted sheet (so
+   the base declaration, unconditionally later, always won, even inside
+   the media query), and the same base rule emitted by two different
+   generate.ml runs (two stylesheets on one page) landing in a different
+   relative position to some OTHER sheet's conditional rule on the same
+   property, depending only on which sheet the browser loaded last.
+
+   Two fixed, always-in-this-order CSS layers fix both: every "unconditional"
+   rule goes in `styled-ppx.base`, every rule that only applies under some
+   extra condition (a media/feature query, or a pseudo-class/pseudo-element
+   on the rule's own selector) goes in `styled-ppx.conditional`, and
+   `@layer` order beats source order regardless of which stylesheet, or
+   which position within one stylesheet, either rule came from. *)
+
+let global_layer_name = "styled-ppx.global"
+let descendant_layer_name = "styled-ppx.descendant"
+let base_layer_name = "styled-ppx.base"
+let conditional_layer_name = "styled-ppx.conditional"
+
+(** [@property]/[@keyframes]/[@font-face] are registrations, not style rules
+    that compete for an element: a [@property] inside a layer would make the
+    custom-property registration itself depend on layer order, a [@keyframes]
+    name lookup would too, and [@font-face] has no per-element cascade to begin
+    with. All three stay outside every layer, exactly as [@import]/[@namespace]
+    (hoisted separately, above) and dropped [@charset] do. A literal,
+    user-authored [@layer] at-rule (statement form, ["@layer a, b;"], or block
+    form, ["@layer name { ... }"]) stays outside every tier layer for a
+    different reason: nesting it inside one of styled-ppx's own layers would
+    rescope whatever sub-layer NAME it declares to live underneath that tier
+    specifically, silently changing what the user's own [@layer] statement means
+    \- the exact hazard the "Dedup and write" doc section already explains for
+    why it is never hoisted with [@import]/[@namespace] either. Checked on the
+    OUTERMOST at-rule name only - a [%styled.global] rule wrapped in its own
+    [@media]/[@supports] still starts with that wrapper, never with one of these
+    four names, so this is an exact, not just a heuristic, test. *)
+let stays_outside_all_layers rule_text =
+  let trimmed = String.trim rule_text in
+  String.starts_with ~prefix:"@property" trimmed
+  || String.starts_with ~prefix:"@keyframes" trimmed
+  || String.starts_with ~prefix:"@font-face" trimmed
+  || String.starts_with ~prefix:"@layer" trimmed
+
+(** The selector text and the declaration-body text of the innermost
+    (deepest-nested) [{...}] span in [text] - the actual style rule, whether
+    [text] is a bare rule (depth 1) or wrapped in one or more at-rules (depth
+    2+: [@media]/[@supports]/[@container] can themselves nest; the selector
+    returned is that rule's own prelude, never an enclosing at-rule's media
+    condition). [None] for text with no balanced brace pair at all. *)
+let innermost_selector_and_block text =
+  let n = String.length text in
+  let stack = ref [] in
+  let last_boundary = ref 0 in
+  let best = ref None in
+  for i = 0 to n - 1 do
+    match text.[i] with
+    | '{' ->
+      let selector = String.sub text !last_boundary (i - !last_boundary) in
+      stack := (i + 1, selector) :: !stack;
+      last_boundary := i + 1
+    | '}' ->
+      (match !stack with
+      | (start, selector) :: rest ->
+        let depth = List.length !stack in
+        stack := rest;
+        last_boundary := i + 1;
+        let better =
+          match !best with
+          | None -> true
+          | Some (best_depth, _, _, _) -> depth > best_depth
+        in
+        if better then best := Some (depth, selector, start, i)
+      | [] -> ())
+    | _ -> ()
+  done;
+  match !best with
+  | None -> None
+  | Some (_, selector, start, end_) ->
+    Some (selector, String.sub text start (end_ - start))
+
+let innermost_declaration_block text =
+  Option.map snd (innermost_selector_and_block text)
+
+(** A combinator character outside any parenthesised pseudo-class argument (so
+    `:not(:last-child)`'s inner `:` never counts, but a real descendant space
+    does). *)
+let is_combinator_char = function
+  | ' ' | '\t' | '\n' | '>' | '+' | '~' -> true
+  | _ -> false
+
+let has_top_level_combinator selector =
+  let depth = ref 0 in
+  let found = ref false in
+  String.iter
+    (fun c ->
+      match c with
+      | '(' -> incr depth
+      | ')' -> decr depth
+      | c when !depth = 0 && is_combinator_char c -> found := true
+      | _ -> ())
+    selector;
+  !found
+
+(** The rightmost compound selector - the subject, in CSS Selectors terms - of a
+    (possibly multi-compound) selector: everything after the LAST top-level
+    combinator, or the whole (trimmed) selector when there is none. *)
+let rightmost_compound selector =
+  let n = String.length selector in
+  let depth = ref 0 in
+  let last_combinator = ref (-1) in
+  for i = 0 to n - 1 do
+    match selector.[i] with
+    | '(' -> incr depth
+    | ')' -> decr depth
+    | c when !depth = 0 && is_combinator_char c -> last_combinator := i
+    | _ -> ()
+  done;
+  let start = if !last_combinator = -1 then 0 else !last_combinator + 1 in
+  String.trim (String.sub selector start (n - start))
+
+(** True when [rule_text]'s own selector reaches, via a combinator, for a
+    DIFFERENT element than the atom's own class (every atom's class is always
+    that selector's leading token - see {!atom_class_name}'s doc), and that
+    different element's subject compound has no class of its own: a bare element
+    type or `*` (".x > div", ".x span", ".x > *"). A subject that DOES carry its
+    own class (".x .id-..." from a `$(binding)` reference, ".x .tiptap") is not
+    this shape - seeing a class there means the rule targets a specific,
+    identified element, not "whatever happens to be under here". No combinator
+    at all (".x", ".x:hover") means the atom's own compound IS the subject -
+    never this shape either. *)
+let is_descendant_shape rule_text =
+  match innermost_selector_and_block rule_text with
+  | None -> false
+  | Some (selector, _) ->
+    has_top_level_combinator selector
+    && not (String.contains (rightmost_compound selector) '.')
+
+(** [Descendant] (below), [Conditional], or [Base]. [Descendant] is checked
+    FIRST, independent of at-rule/pseudo wrapping: it is a question about what
+    element the rule reaches for, not about when it applies, so a
+    descendant-shaped rule that also happens to sit inside `@media` is still
+    [Descendant], not [Conditional] - reasoned out from the `/gbp-monitor` bug
+    this closes: an ancestor's blind ".x *"-shaped reach must lose to the
+    CHILD's own rule regardless of whether that child's own rule is itself
+    unconditional or conditional, so "reaches for a different, unspecified
+    element" has to outrank both, not just [Base]. [Conditional] otherwise when
+    [rule_text] only applies under some extra condition beyond the plain
+    presence of its own element: wrapped in an at-rule
+    ([@media]/[@supports]/[@container] are the only ones that ever wrap an atom
+    class - [@property]/[@keyframes]/[@font-face]/ [%styled.global] rules carry
+    no atom class at all and never reach this function, see the "no atom class"
+    filter in {!run} below), or a pseudo-class/pseudo-element attached DIRECTLY
+    to the atom's own compound selector (".x:hover", ".x::before", chained
+    ".x:focus-visible:not(:disabled)"). [Base] otherwise, including a
+    descendant/child selector whose subject DOES carry its own class (".x
+    .id-...", ".x .tiptap" - see {!is_descendant_shape}'s doc) and any rule with
+    no combinator at all. *)
+type tier =
+  | Descendant
+  | Base
+  | Conditional
+
+let rule_tier rule_text =
+  if is_descendant_shape rule_text then Descendant
+  else (
+    let trimmed = String.trim rule_text in
+    if String.length trimmed > 0 && trimmed.[0] = '@' then Conditional
+    else (
+      match atom_class_and_end rule_text with
+      | None ->
+        Base
+        (* unreachable here - callers only ask for tier-eligible rules, i.e. atom_class_name <> None *)
+      | Some (_, after) ->
+        if after < String.length rule_text && rule_text.[after] = ':' then
+          Conditional
+        else Base))
+
+(** The property name of each top-level (";"-separated) declaration in a
+    declaration-block's text. CSS property names never contain [:] or [;]
+    themselves, so splitting on [;] and taking each piece up to its first [:] is
+    exact even though a VALUE can legally contain either character later on (a
+    color, a calc() expression, a quoted string). *)
+let property_names_in_block block_text =
+  block_text
+  |> String.split_on_char ';'
+  |> List.filter_map (fun decl ->
+    let decl = String.trim decl in
+    if decl = "" then None
+    else (
+      match String.index_opt decl ':' with
+      | None -> None
+      | Some i -> Some (String.trim (String.sub decl 0 i))))
+
+let popcount n =
+  let rec loop n acc =
+    if n = 0 then acc else loop (n lsr 1) (acc + (n land 1))
+  in
+  loop n 0
+
+(** One rendered rule's own (family key, combined leaf mask) pairs, one entry
+    per DISTINCT property family its own declaration(s) touch - read from the
+    rendered TEXT (generate.ml never sees the ppx's AST or a [Slot_key.t]),
+    through [Slot_key.Family] for the actual shorthand/leaf data (the same
+    css-grammar-sourced table [Slot_key.of_atom] uses to build a real atom's own
+    mask). A bundle's several declarations can touch several different families
+    at once (no single [Slot_key.t] could represent that - a bundle spans more
+    than one property, sometimes more than one context, which is exactly why it
+    has no context/family/mask fields of its own); each of ITS OWN families
+    still gets a mask, OR-ed across every declaration of that family in this one
+    rule, mirroring how [Slot_key.of_atom] combines a same-file
+    multi-declaration group. *)
+let families_of_rule rule_text =
+  match innermost_declaration_block rule_text with
+  | None -> []
+  | Some block ->
+    let by_family : (string, int) Hashtbl.t = Hashtbl.create 4 in
+    property_names_in_block block
+    |> List.iter (fun property ->
+      let property = Slot_key.normalize_property property in
+      let family = Slot_key.Family.family_key_of property in
+      let mask = Slot_key.Family.mask_of property in
+      let existing =
+        Option.value (Hashtbl.find_opt by_family family) ~default:0
+      in
+      Hashtbl.replace by_family family (existing lor mask));
+    Hashtbl.fold (fun family mask acc -> (family, mask) :: acc) by_family []
+
+(** Stable sort: within families [a] and [b] BOTH touch, the one covering MORE
+    of that family's leaves (more bits set - a shorthand, or a wider family
+    atom) sorts first, so a later, narrower override (a lone longhand from a
+    different atom or bundle) still lands after it and wins by ordinary cascade
+    position - exactly the guarantee `CSS.merge` gives two atoms it CAN see
+    inside, extended here to a bundle merge can't. Rules that share no family at
+    all compare equal, so a stable sort leaves their relative order exactly as
+    dependency/ source order already placed them: this only ever reorders rules
+    that are already fighting over the same property family, never anything
+    else. Overlapping declarations *within* one block are already one atom (see
+    [Css_file.re]'s family-atom grouping), so this never reorders an author's
+    own single binding, only two different bindings' atoms. *)
+let compare_by_shorthand_first (families_a, _) (families_b, _) =
+  match
+    List.find_map
+      (fun (family, mask_a) ->
+        List.assoc_opt family families_b
+        |> Option.map (fun mask_b -> mask_a, mask_b))
+      families_a
+  with
+  | None -> 0
+  | Some (mask_a, mask_b) -> compare (popcount mask_b) (popcount mask_a)
+
+(** Sort [rules] by {!compare_by_shorthand_first}, precomputing each rule's
+    families once ("decorate-sort-undecorate") instead of re-parsing its text on
+    every comparison a stable sort makes. *)
+let sort_by_shorthand_first rules =
+  rules
+  |> List.map (fun ((rule_text, _layer) as r) -> families_of_rule rule_text, r)
+  |> List.stable_sort compare_by_shorthand_first
+  |> List.map snd
+
+(** Bucket [rules] by library key (using [library_order] for both the bucket set
+    and the emission order), the same grouping {!run}'s [--layers] used to apply
+    once to every rule; reused per-tier once tiers exist, so a library still
+    gets exactly one nested [\@layer] block per tier it actually contributes a
+    rule to, never an empty one. *)
+let bucket_by_library ~library_order (rules : (string * string) list) =
+  let rules_by_layer : (string, (string * string) list ref) Hashtbl.t =
+    Hashtbl.create 16
+  in
+  List.iter
+    (fun ((_, key) as rule) ->
+      match Hashtbl.find_opt rules_by_layer key with
+      | Some acc -> acc := rule :: !acc
+      | None -> Hashtbl.add rules_by_layer key (ref [ rule ]))
+    rules;
+  let layer_names =
+    library_order
+    |> List.filter (Hashtbl.mem rules_by_layer)
+    |> List.map (fun key -> key, sanitize_layer_name key)
+  in
+  warn_layer_name_collisions layer_names;
+  rules_by_layer, layer_names
+
+(** Render the nested [\@layer lib1, lib2; \@layer lib1 { ... } ...] sequence
+    for one tier's rules, appended to [buffer]. Each library's own rules are
+    sorted by {!sort_by_shorthand_first} - the family fight this sort resolves
+    can just as easily be between two atoms in the SAME library as between two
+    different ones. *)
+let emit_library_layers ~buffer ~separator ~minify ~library_order ~tier_name
+  ~emit rules =
+  let rules_by_layer, layer_names = bucket_by_library ~library_order rules in
+  Logger.info "layers (%s): %s" tier_name
+    (String.concat ", " (List.map snd layer_names));
+  let layer_statement =
+    let seen = Hashtbl.create (List.length layer_names) in
+    List.filter_map
+      (fun (_, name) ->
+        if Hashtbl.mem seen name then None
+        else begin
+          Hashtbl.add seen name ();
+          Some name
+        end)
+      layer_names
+    |> String.concat ", "
+  in
+  Buffer.add_string buffer (Printf.sprintf "@layer %s;" layer_statement);
+  Buffer.add_string buffer separator;
+  List.iter
+    (fun (key, name) ->
+      Buffer.add_string buffer
+        (if minify then Printf.sprintf "@layer %s{" name
+         else Printf.sprintf "@layer %s {" name);
+      Buffer.add_string buffer separator;
+      List.iter emit
+        (sort_by_shorthand_first (List.rev !(Hashtbl.find rules_by_layer key)));
+      Buffer.add_string buffer "}";
+      Buffer.add_string buffer separator)
+    layer_names
 
 (** Collect, index, resolve, dedup, output. *)
 let run ~output_file ~order ~layers input_files =
@@ -780,42 +1101,51 @@ let run ~output_file ~order ~layers input_files =
   in
   let statement_rules = import_rules @ namespace_rules in
 
-  (* [--layers]: [@property]/[@keyframes] registrations go ahead of every
-     layer; everything else is bucketed by group key in one pass, in traversal
-     order, so the "last wins" order the cascade needs survives inside a layer.
-     A group gets a layer only when a rule actually landed in its bucket: a
-     module without [%css] (grouped by its directory, since the PPX attaches
-     no [@@@css.config] to it), a library whose rules all deduplicated away,
-     or one that only registers [@property]/[@keyframes] adds neither an
-     empty block nor a name-collision warning. Rule-less groups still took
-     part in {!order_by_dependency}, so a styles-free module keeps bridging
-     edges between styled libraries. *)
-  let layered =
-    if not layers then None
-    else begin
-      let registrations, library_rules =
-        List.partition
-          (fun (rule, _layer) -> is_global_registration rule)
-          other_rules
-      in
-      let rules_by_layer : (string, (string * string) list ref) Hashtbl.t =
-        Hashtbl.create 16
-      in
-      List.iter
-        (fun ((_, key) as rule) ->
-          match Hashtbl.find_opt rules_by_layer key with
-          | Some acc -> acc := rule :: !acc
-          | None -> Hashtbl.add rules_by_layer key (ref [ rule ]))
-        library_rules;
-      let layer_names =
-        library_order
-        |> List.filter (Hashtbl.mem rules_by_layer)
-        |> List.map (fun key -> key, sanitize_layer_name key)
-      in
-      warn_layer_name_collisions layer_names;
-      Logger.info "layers: %s" (String.concat ", " (List.map snd layer_names));
-      Some (registrations, rules_by_layer, layer_names)
-    end
+  (* Cascade tiers: split [other_rules] into what stays outside every layer
+     ([@property]/[@keyframes]/[@font-face] registrations and a literal
+     [@layer] at-rule - see [stays_outside_all_layers] - never atom-classed,
+     and never style rules that compete for an element either) and what
+     tiers - a [%styled.global] style rule, ALSO never atom-classed but a
+     real, cascading rule (`html{...}`, `*{...}`, `*::before{...}`, an
+     author's own global selector), lands in [styled-ppx.global], the
+     LOWEST tier; every real atom, [a-] or [in-] alike, lands in
+     [descendant]/[base]/[conditional] as before. Global rules MUST be
+     layered, not left unlayered like registrations: CSS lets an unlayered
+     normal declaration beat ANY layered one regardless of layer or
+     specificity, so leaving globals unlayered while atoms became layered
+     would let a `[%styled.global]` default (`*{box-sizing:inherit}`, a
+     global `a{color:blue}`) beat an atom on the same element,
+     `!important` aside - the exact regression this tier was almost shipped
+     with. Putting `styled-ppx.global` FIRST (lowest of all four) instead
+     restores "an element's own atom always beats a global default", now
+     unconditionally instead of only when the atom happened to be more
+     specific or later in the stylesheet - see "Cascade tiers" in the docs
+     for the specificity change this is. *)
+  let registrations, atomless_style_rules =
+    List.partition
+      (fun (rule, _layer) -> stays_outside_all_layers rule)
+      other_rules
+  in
+  let global_rules, tier_eligible_rules =
+    List.partition
+      (fun (rule, _layer) -> atom_class_name rule = None)
+      atomless_style_rules
+  in
+  let descendant_rules, non_descendant_rules =
+    List.partition
+      (fun (rule, _layer) -> rule_tier rule = Descendant)
+      tier_eligible_rules
+  in
+  let base_rules, conditional_rules =
+    List.partition
+      (fun (rule, _layer) -> rule_tier rule = Base)
+      non_descendant_rules
+  in
+  let any_tiered =
+    global_rules <> []
+    || descendant_rules <> []
+    || base_rules <> []
+    || conditional_rules <> []
   in
 
   let minify = production_mode inputs in
@@ -831,38 +1161,47 @@ let run ~output_file ~order ~layers input_files =
       Buffer.add_string buffer separator
     in
     List.iter emit statement_rules;
-    (match layered with
-    | None -> List.iter emit other_rules
-    | Some (registrations, rules_by_layer, layer_names) ->
-      List.iter emit registrations;
-      (* A repeated name in the statement doesn't declare a second layer, it
-         only re-mentions the same slot, so list each name once (first
-         occurrence): two colliding keys still get their own [@layer name {
-         ... }] block below, which CSS itself merges by name. *)
-      let layer_statement =
-        let seen = Hashtbl.create (List.length layer_names) in
-        List.filter_map
-          (fun (_, name) ->
-            if Hashtbl.mem seen name then None
-            else begin
-              Hashtbl.add seen name ();
-              Some name
-            end)
-          layer_names
-        |> String.concat ", "
-      in
-      Buffer.add_string buffer (Printf.sprintf "@layer %s;" layer_statement);
+    List.iter emit registrations;
+    if any_tiered then begin
+      (* Unconditional and in this fixed order whenever THIS sheet ships any
+         tiered rule at all, regardless of whether a given tier is locally
+         empty: two different generate.ml outputs loaded on the same page
+         share these four layer names, and CSS layer order is fixed by
+         each name's FIRST occurrence across every stylesheet on the page -
+         if one sheet only ever populates `conditional` and loads before
+         another sheet that only populates `base`, omitting the empty tier
+         from either sheet's own statement would let load order flip which
+         one wins, exactly the bug tiers exist to remove. A sheet that
+         ships NO tiered rule at all (only registrations) skips the whole
+         apparatus (this branch) instead - it contributes nothing to any
+         layer, so there is nothing to guarantee order for. *)
+      Buffer.add_string buffer
+        (Printf.sprintf "@layer %s, %s, %s, %s;" global_layer_name
+           descendant_layer_name base_layer_name conditional_layer_name);
       Buffer.add_string buffer separator;
-      List.iter
-        (fun (key, name) ->
+      let emit_tier name rules =
+        (* A tier with no rule in THIS sheet gets no block at all - the
+           statement above already reserved its position in the global
+           layer order, so an empty block would add nothing (mirrors
+           [--layers]'s own "no rule, no block" rule for a library). *)
+        if rules <> [] then begin
           Buffer.add_string buffer
             (if minify then Printf.sprintf "@layer %s{" name
              else Printf.sprintf "@layer %s {" name);
           Buffer.add_string buffer separator;
-          List.iter emit (List.rev !(Hashtbl.find rules_by_layer key));
+          if not layers then List.iter emit (sort_by_shorthand_first rules)
+          else
+            emit_library_layers ~buffer ~separator ~minify ~library_order
+              ~tier_name:name ~emit rules;
           Buffer.add_string buffer "}";
-          Buffer.add_string buffer separator)
-        layer_names);
+          Buffer.add_string buffer separator
+        end
+      in
+      emit_tier global_layer_name global_rules;
+      emit_tier descendant_layer_name descendant_rules;
+      emit_tier base_layer_name base_rules;
+      emit_tier conditional_layer_name conditional_rules
+    end;
     Buffer.contents buffer
   in
   Logger.debug "stylesheet:\n%s" stylesheet;
