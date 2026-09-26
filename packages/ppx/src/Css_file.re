@@ -167,6 +167,33 @@ module Css_transform = {
   let declaration_has_value_interpolation = (decl: declaration) =>
     component_value_list_has_interpolation(fst(decl.value));
 
+  /* Every `$(name)` source path a value interpolates, recursing the same
+     shape `component_value_has_interpolation` does (into `Paren_block`,
+     `Bracket_block`, `Function` bodies) - collecting the path string
+     instead of stopping at a bool. Used to decide which of a block's
+     interpolating declarations must SHARE a bundle (see
+     `transform_rule_list`'s bundle grouping below): two declarations that
+     interpolate the same path need one variable between them; two that
+     interpolate different, unrelated paths do not. */
+  let rec component_value_interpolation_paths = (cv: component_value) =>
+    switch (cv) {
+    | Variable(path, _) => [path]
+    | Paren_block(values)
+    | Bracket_block(values) =>
+      component_value_list_interpolation_paths(values)
+    | Function({ body: (values, _), _ }) =>
+      component_value_list_interpolation_paths(values)
+    | _ => []
+    }
+  and component_value_list_interpolation_paths = values =>
+    List.concat_map(
+      ((cv, _loc)) => component_value_interpolation_paths(cv),
+      values,
+    );
+
+  let declaration_interpolation_paths = (decl: declaration) =>
+    component_value_list_interpolation_paths(fst(decl.value));
+
   /* The single declaration an atom carries: bare (top-level), nested under a
      selector (`Style_rule`), or under an at-rule. None for an atom with no
      declaration body (e.g. an empty at-rule), OR for a multi-declaration
@@ -1282,93 +1309,171 @@ module Css_transform = {
     let atomic_rules =
       atomize_rules(~source_position_start, selector_resolved_rules);
 
-    /* Selective atomization: TWO OR MORE of the block's interpolating
-       declarations become one content-addressed bundle, with class `in-<B>`
-       and var namespace `css-<B>` (same bundle content hash, different
-       literal prefix - see Hash_class.ml's "Prefix rename") shared across
-       base/`:hover`/`@media`. Both derive from the same bundle content, so
-       identical bundles dedup to identical rules + vars and different
-       bundles never collide, preserving the cross-module atomic invariant
-       (see Hash_class.ml).
+    /* Selective atomization: of a block's SINGLETON interpolating atoms
+       (`atom_has_value_interpolation` - a multi-declaration group from
+       `group_declarations_by_family`'s leaf-overlap pass is never a
+       candidate here, see `atom_declaration`'s own doc: it already shares
+       one namespace for whatever it groups), only those that reference the
+       SAME `$(name)` source path as another one actually need to share
+       anything - one variable, one inline custom property for that value
+       across base/`:hover`/`@media` (see Hash_class.ml). Two atoms that
+       merely both happen to interpolate, but different, unrelated paths,
+       do not: `color: $(a); background-color: $(b);` used to force both
+       into one bundle for no reason neither value needed.
 
-       A block with exactly ONE interpolating declaration is not a bundle at
-       all: it already got a real, structural slot-keyed class from
-       `atomize_rules` above (via `Hash_class.class_and_namespace` /
-       `Slot_key.of_atom`, same path a static atom uses), so it merges
-       normally like any other atom - `CSS.merge` only stays blind to a
-       declaration that genuinely shares its class with an unrelated
-       sibling, not to every interpolated declaration on principle.
+       Grouped by shared path with union-find - same technique
+       `group_declarations_by_family` already uses for leaf overlap,
+       transitively: an atom interpolating two paths (`border: $(a) solid
+       $(b);`) bridges both into one group, same reasoning a declaration
+       bridging two leaf sets does there. A group of exactly one atom is
+       not a bundle at all: it already got a real, structural slot-keyed
+       class from `atomize_rules` above (via `Hash_class.class_and_namespace`
+       / `Slot_key.of_atom`, same path a static atom uses), so it merges
+       normally like any other atom - `CSS.merge` only stays blind to an
+       atom that genuinely shares its class with an unrelated sibling, not
+       to every interpolated declaration on principle. A group of two or
+       more gets today's bundle mechanism (class `in-<B>`/var namespace
+       `css-<B>` - same bundle content hash, different literal prefix, see
+       Hash_class.ml's "Prefix rename"), scoped to that group's own members
+       only, so a block can now mint more than one independent bundle.
 
-       Static declarations keep their own per-content atom class (still shared
-       across blocks). A block with no interpolation, or exactly one
-       interpolating declaration, produces no bundle and is byte-for-byte
-       identical to the pre-bundle output for that declaration. */
-    let bundle =
-      switch (
-        atomic_rules
-        |> List.filter_map(((_cn, _ns, rule)) =>
-             atom_has_value_interpolation(rule)
-               ? Some(render_rule(rule)) : None
-           )
-      ) {
-      | []
-      | [_] => None
-      | seeds =>
-        Some(
-          Hash_class.bundle_class_and_namespace(String.concat("", seeds)),
-        )
+       Static declarations keep their own per-content atom class (still
+       shared across blocks). A block with no interpolation, or where no
+       two interpolating atoms share a path, mints no bundle at all and is
+       byte-for-byte identical to the pre-bundle output. */
+    let interpolating_atoms =
+      atomic_rules
+      |> List.mapi((i, atom) => (i, atom))
+      |> List.filter(((_i, (_cn, _ns, rule))) =>
+           atom_has_value_interpolation(rule)
+         )
+      |> Array.of_list;
+    let interpolating_count = Array.length(interpolating_atoms);
+    let paths_of = i => {
+      let (_atomic_index, (_cn, _ns, rule)) = interpolating_atoms[i];
+      switch (atom_declaration(rule)) {
+      | Some(decl) => declaration_interpolation_paths(decl)
+      | None => [] /* unreachable: atom_has_value_interpolation implies Some */
       };
-
-    let (shipped_rev, classes_rev, atom_infos_rev) =
-      List.fold_left(
-        (
-          (shipped_acc, classes_acc, atom_infos_acc),
-          (className, var_namespace, rule),
-        ) => {
-          let (effective_class, effective_namespace, dedup_key) =
-            switch (bundle) {
-            | Some((bundle_class, bundle_namespace))
-                when atom_has_value_interpolation(rule) => (
-                bundle_class,
-                bundle_namespace,
-                None /* content-keyed: many bundle rules share one class */,
-              )
-            | _ => (className, var_namespace, Some(className))
-            };
-
-          let processed =
-            lower_atom(
-              ctx,
-              ~effective_class,
-              ~effective_namespace,
-              ~loc,
-              rule,
-            )
-            |> List.map(r => (dedup_key, r));
-
-          let classes_acc =
-            List.mem(effective_class, classes_acc)
-              ? classes_acc : [effective_class, ...classes_acc];
-
-          /* Record the atom's `&`-locality and the vars it references (scanned
-             from rendered text so cross-atom dedup can't hide a reference), for
-             the inherits:false decision below. */
-          let atom_local = atom_is_ampersand_local(rule);
-          let referenced =
-            processed
-            |> List.concat_map(((_key, r)) =>
-                 custom_property_names_in_text(render_rule(r))
-               );
-
-          (
-            List.rev_append(processed, shipped_acc),
-            classes_acc,
-            [(atom_local, referenced), ...atom_infos_acc],
+    };
+    let paths = Array.init(interpolating_count, paths_of);
+    /* Union-find over positions [0, interpolating_count) - path-compressed,
+       no union-by-rank (a block's interpolating-atom count is always
+       small). Connects i and j when their path sets intersect. */
+    let parent = Array.init(interpolating_count, i => i);
+    let rec find = i =>
+      if (parent[i] == i) {
+        i;
+      } else {
+        let root = find(parent[i]);
+        parent[i] = root;
+        root;
+      };
+    let union = (i, j) => {
+      let (ri, rj) = (find(i), find(j));
+      if (ri != rj) {
+        parent[max(ri, rj)] = min(ri, rj);
+      };
+    };
+    for (i in 0 to interpolating_count - 1) {
+      for (j in i + 1 to interpolating_count - 1) {
+        if (List.exists(p => List.mem(p, paths[j]), paths[i])) {
+          union(i, j);
+        };
+      };
+    };
+    let members_by_root: Hashtbl.t(int, ref(list(int))) =
+      Hashtbl.create(8);
+    for (i in 0 to interpolating_count - 1) {
+      let root = find(i);
+      switch (Hashtbl.find_opt(members_by_root, root)) {
+      | Some(members) => members := [i, ...members^]
+      | None => Hashtbl.add(members_by_root, root, ref([i]))
+      };
+    };
+    /* Only a root with 2+ members mints a bundle; a singleton root's atom
+       keeps the real class `atomic_rules` already gave it (no entry here). */
+    let bundle_by_atomic_index: Hashtbl.t(int, (string, string)) =
+      Hashtbl.create(8);
+    Hashtbl.iter(
+      (_root, members) =>
+        switch (List.rev(members^)) {
+        | []
+        | [_] => ()
+        | member_positions =>
+          let seeds =
+            member_positions
+            |> List.map(k => {
+                 let (_atomic_index, (_cn, _ns, rule)) = interpolating_atoms[k];
+                 render_rule(rule);
+               });
+          let bundle_class_and_namespace =
+            Hash_class.bundle_class_and_namespace(String.concat("", seeds));
+          List.iter(
+            k => {
+              let (atomic_index, _) = interpolating_atoms[k];
+              Hashtbl.replace(
+                bundle_by_atomic_index,
+                atomic_index,
+                bundle_class_and_namespace,
+              );
+            },
+            member_positions,
           );
         },
-        ([], [], []),
-        atomic_rules,
-      );
+      members_by_root,
+    );
+
+    let (shipped_rev, classes_rev, atom_infos_rev) =
+      atomic_rules
+      |> List.mapi((i, atom) => (i, atom))
+      |> List.fold_left(
+           (
+             (shipped_acc, classes_acc, atom_infos_acc),
+             (i, (className, var_namespace, rule)),
+           ) => {
+             let (effective_class, effective_namespace, dedup_key) =
+               switch (Hashtbl.find_opt(bundle_by_atomic_index, i)) {
+               | Some((bundle_class, bundle_namespace)) => (
+                   bundle_class,
+                   bundle_namespace,
+                   None /* content-keyed: many bundle rules share one class */,
+                 )
+               | None => (className, var_namespace, Some(className))
+               };
+
+             let processed =
+               lower_atom(
+                 ctx,
+                 ~effective_class,
+                 ~effective_namespace,
+                 ~loc,
+                 rule,
+               )
+               |> List.map(r => (dedup_key, r));
+
+             let classes_acc =
+               List.mem(effective_class, classes_acc)
+                 ? classes_acc : [effective_class, ...classes_acc];
+
+             /* Record the atom's `&`-locality and the vars it references
+                (scanned from rendered text so cross-atom dedup can't hide a
+                reference), for the inherits:false decision below. */
+             let atom_local = atom_is_ampersand_local(rule);
+             let referenced =
+               processed
+               |> List.concat_map(((_key, r)) =>
+                    custom_property_names_in_text(render_rule(r))
+                  );
+
+             (
+               List.rev_append(processed, shipped_acc),
+               classes_acc,
+               [(atom_local, referenced), ...atom_infos_acc],
+             );
+           },
+           ([], [], []),
+         );
 
     let atom_infos = atom_infos_rev;
     let dynamic_vars_final = List.rev(ctx.dynamic_vars^);

@@ -702,14 +702,21 @@ the same class, dev or production. Minting lives in
 `packages/ppx/src/Hash_class.ml` (`Class_format.slot_class`); the
 `(context, family, mask)` triple comes from `packages/ppx/slot_key`.
 
-One exception: when a block has TWO OR MORE declarations that carry a
-`$(...)` value interpolation, they mint one shared `_in_<murmur2 hash>`
+One exception: when a block has TWO OR MORE declarations that interpolate
+the SAME `$(name)` source path, they mint one shared `_in_<murmur2 hash>`
 class instead - a plain, unbucketed hash of their concatenated content, no
 context/family/mask fields at all (the "bundle" - see `Css_file.re`'s
-`transform_rule_list`). A single interpolating declaration is NOT a
-bundle: it mints its own real, slot-keyed `_a_` class exactly like a static
-atom, and merges normally (see `CSS.merge` below) - bundling only kicks
-in when two or more of a block's interpolating declarations would
+`transform_rule_list`). Grouped by shared path with the same union-find
+technique the shorthand/longhand leaf-overlap grouping above uses,
+transitively: a declaration interpolating two paths bridges both into one
+group. Two declarations that merely both interpolate, but different,
+unrelated paths - `color: $(a); background-color: $(b);` - do NOT bundle:
+each mints its own real, slot-keyed `_a_` class exactly like a static
+atom, and merges normally (see `CSS.merge` below), since neither value
+ever needed to share a variable with the other. A single interpolating
+declaration, or one whose path no sibling declaration in the block
+shares, is likewise not a bundle - bundling only kicks in when two or
+more of a block's interpolating declarations, sharing a path, would
 otherwise need separate custom-property namespaces for what is often the
 same value reused across `base`/`:hover`/`@media` variants. A bundle's own
 `var(--...)` target is unaffected by which prefix its class carries,

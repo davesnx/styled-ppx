@@ -5,17 +5,15 @@ verbatim - no Cascading.toString wrap.
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css "@property --colorStr-t58soe{syntax:\"*\";inherits:false;}"];
-  [@css "@property --colorStr-11d7je1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --plainStr-1cgr13y{syntax:\"*\";inherits:false;}"];
+  [@css "@property --plainStr-vbhzka{syntax:\"*\";inherits:false;}"];
   [@css "@property --value-13tu4ef{syntax:\"*\";inherits:false;}"];
   [@css "._a_zy7gz1zq54yy{--color-link:var(--colorStr-t58soe);}"];
-  [@css "._in_10nqctf{--color-link:var(--colorStr-11d7je1);}"];
-  [@css "._in_10nqctf{--spacing:var(--plainStr-1cgr13y);}"];
+  [@css "._a_zy4gc55zkohh{--spacing:var(--plainStr-vbhzka);}"];
   [@css "._a_zyqed1fpwqpt{--token:var(--value-13tu4ef);}"];
   [@css.bindings
     [
       ("Output.row", "_id_z61k1z", "_a_zy7gz1zq54yy"),
-      ("Output.theme", "_id_r5u180", "_in_10nqctf"),
+      ("Output.theme", "_id_r5u180", "_a_zy7gz1zq54yy _a_zy4gc55zkohh"),
       ("Output.dyn", "_id_soz37v", "_a_zyqed1fpwqpt"),
     ]
   ];
@@ -28,8 +26,8 @@ verbatim - no Cascading.toString wrap.
     );
   let theme =
     CSS.make(
-      "label:theme _id_r5u180 _in_10nqctf",
-      [("--colorStr-11d7je1", colorStr), ("--plainStr-1cgr13y", plainStr)],
+      "label:theme _id_r5u180 _a_zy7gz1zq54yy _a_zy4gc55zkohh",
+      [("--colorStr-t58soe", colorStr), ("--plainStr-vbhzka", plainStr)],
     );
   let dyn = value =>
     CSS.make(

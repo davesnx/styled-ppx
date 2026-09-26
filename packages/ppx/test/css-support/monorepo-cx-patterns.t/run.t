@@ -20,11 +20,11 @@ If this test fail means that the module is not in sync with the ppx
   [@css "@property --line-9kmuhm_2{syntax:\"*\";inherits:false;}"];
   [@css "@property --line-1rsudnc_1{syntax:\"*\";inherits:false;}"];
   [@css "@property --line-1rsudnc_2{syntax:\"*\";inherits:false;}"];
-  [@css "@property --secondary-16kletf{syntax:\"*\";inherits:false;}"];
-  [@css "@property --box_-vdb5xj{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-e0dy15_1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-e0dy15_2{syntax:\"*\";inherits:false;}"];
-  [@css "@property --line-e0dy15_3{syntax:\"*\";inherits:false;}"];
+  [@css "@property --secondary-hfvj8d{syntax:\"*\";inherits:false;}"];
+  [@css "@property --box_-1n2q0et{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-3w1stm_1{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-3w1stm_2{syntax:\"*\";inherits:false;}"];
+  [@css "@property --line-3w1stm_3{syntax:\"*\";inherits:false;}"];
   [@css "._a_eck09d{width:30px;}"];
   [@css "._a_4e090v{color:var(--tertiary-1cttnp6);}"];
   [@css "._a_oe8sa40slgw{box-shadow:inset 1px 0 0 0 transparent !important;}"];
@@ -35,10 +35,10 @@ If this test fail means that the module is not in sync with the ppx
   [@css
     "._a_h5nao400v5z:hover{box-shadow:1px 0 0 0 var(--line-1rsudnc_1), inset 0 -1px 0 0 var(--line-1rsudnc_2) !important;}"
   ];
-  [@css "._in_1nzxk4v{color:var(--secondary-16kletf);}"];
-  [@css "._in_1nzxk4v:hover{background-color:var(--box_-vdb5xj);}"];
+  [@css "._a_4eyeca{color:var(--secondary-hfvj8d);}"];
+  [@css "._a_qyw7u39004kqt8:hover{background-color:var(--box_-1n2q0et);}"];
   [@css
-    "._in_1nzxk4v:hover{box-shadow:1px 0 0 0 var(--line-e0dy15_1), inset 1px 0 0 0 var(--line-e0dy15_2), inset 0 -1px 0 0 var(--line-e0dy15_3);}"
+    "._a_qyw7u40rvac:hover{box-shadow:1px 0 0 0 var(--line-3w1stm_1), inset 1px 0 0 0 var(--line-3w1stm_2), inset 0 -1px 0 0 var(--line-3w1stm_3);}"
   ];
   [@css "._a_60002gxme{flex-grow:1;}"];
   [@css "._a_ekz5ec{z-index:1;}"];
@@ -57,7 +57,11 @@ If this test fail means that the module is not in sync with the ppx
       ("Input._tabInnerFirst", "_id_110u1xw", "_a_oe8sa40slgw"),
       ("Input._multiShadowImportant", "_id_c7rk0r", "_a_oe8sa4080o9"),
       ("Input._tabTextFirst", "_id_19955vg", "_a_400ppg _a_h5nao400v5z"),
-      ("Input._tabText", "_id_e443o3", "_in_1nzxk4v"),
+      (
+        "Input._tabText",
+        "_id_e443o3",
+        "_a_4eyeca _a_qyw7u39004kqt8 _a_qyw7u40rvac",
+      ),
       ("Input._sidebarClosed", "_id_1wtohw8", ""),
       (
         "Input._sidebar",
@@ -110,13 +114,13 @@ If this test fail means that the module is not in sync with the ppx
   
   let _tabText =
     CSS.make(
-      "label:_tabText _id_e443o3 _in_1nzxk4v",
+      "label:_tabText _id_e443o3 _a_4eyeca _a_qyw7u39004kqt8 _a_qyw7u40rvac",
       [
-        ("--secondary-16kletf", CSS.Types.Color.toString(Color.Text.secondary)),
-        ("--box_-vdb5xj", CSS.Types.Color.toString(Color.Background.box_)),
-        ("--line-e0dy15_1", CSS.Types.Color.toString(Color.Border.line)),
-        ("--line-e0dy15_2", CSS.Types.Color.toString(Color.Border.line)),
-        ("--line-e0dy15_3", CSS.Types.Color.toString(Color.Border.line)),
+        ("--secondary-hfvj8d", CSS.Types.Color.toString(Color.Text.secondary)),
+        ("--box_-1n2q0et", CSS.Types.Color.toString(Color.Background.box_)),
+        ("--line-3w1stm_1", CSS.Types.Color.toString(Color.Border.line)),
+        ("--line-3w1stm_2", CSS.Types.Color.toString(Color.Border.line)),
+        ("--line-3w1stm_3", CSS.Types.Color.toString(Color.Border.line)),
       ],
     );
   

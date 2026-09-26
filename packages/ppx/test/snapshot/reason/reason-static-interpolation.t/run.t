@@ -1,15 +1,21 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "@property --var-16tzllb{syntax:\"*\";inherits:false;}"];
-  [@css "@property --black-11zsw44{syntax:\"*\";inherits:false;}"];
-  [@css "@property --black-1e15k1a{syntax:\"*\";inherits:false;}"];
-  [@css "._in_1oz3n15{color:var(--var-16tzllb);}"];
-  [@css "._in_1oz3n15{background-color:var(--black-11zsw44);}"];
-  [@css "._in_1oz3n15{border-color:var(--black-1e15k1a);}"];
+  [@css "@property --var-1ee0jdu{syntax:\"*\";inherits:false;}"];
+  [@css "@property --black-98dcqh{syntax:\"*\";inherits:false;}"];
+  [@css "@property --black-1o7s4tf{syntax:\"*\";inherits:false;}"];
+  [@css "._a_4e9vey{color:var(--var-1ee0jdu);}"];
+  [@css "._a_39004n5y8{background-color:var(--black-98dcqh);}"];
+  [@css "._a_3hef5gxfp{border-color:var(--black-1o7s4tf);}"];
   [@css "._a_5r7eu2{display:block;}"];
   [@css.bindings
-    [("Output.StringInterpolation", "_id_1n1bal7", "_in_1oz3n15 _a_5r7eu2")]
+    [
+      (
+        "Output.StringInterpolation",
+        "_id_1n1bal7",
+        "_a_4e9vey _a_39004n5y8 _a_3hef5gxfp _a_5r7eu2",
+      ),
+    ]
   ];
   module Theme = {
     let var = CSS.hex("333333");
@@ -1003,11 +1009,11 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "label:StringInterpolation _id_1n1bal7 _in_1oz3n15 _a_5r7eu2",
+        "label:StringInterpolation _id_1n1bal7 _a_4e9vey _a_39004n5y8 _a_3hef5gxfp _a_5r7eu2",
         [
-          ("--var-16tzllb", CSS.Types.Color.toString(Theme.var)),
-          ("--black-11zsw44", CSS.Types.Color.toString(black)),
-          ("--black-1e15k1a", CSS.Types.Color.toString(Theme.Border.black)),
+          ("--var-1ee0jdu", CSS.Types.Color.toString(Theme.var)),
+          ("--black-98dcqh", CSS.Types.Color.toString(black)),
+          ("--black-1o7s4tf", CSS.Types.Color.toString(Theme.Border.black)),
         ],
       );
     let make = (props: makeProps) => {

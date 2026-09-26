@@ -10,9 +10,8 @@
   @property --shadowColor-1sod13t{syntax:"*";inherits:false;}
   @property --myShadow-af5fmc{syntax:"*";inherits:false;}
   @property --borderWidth-apl5wd{syntax:"*";inherits:false;}
-  @property --bgColor-zk5xjv{syntax:"*";inherits:false;}
-  @property --borderColor-rm89ze{syntax:"*";inherits:false;}
-  @property --shadow-2tj34g{syntax:"*";inherits:false;}
+  @property --bgColor-vilhl2{syntax:"*";inherits:false;}
+  @property --shadow-giamln{syntax:"*";inherits:false;}
   @layer styled-ppx.global, styled-ppx.descendant, styled-ppx.base, styled-ppx.conditional;
   @layer styled-ppx.base {
   ._a_4085tv{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
@@ -38,8 +37,6 @@
   ._a_40u3s3{box-shadow:var(--shadowX-11ljgmp) var(--shadowY-1qn6d0z) var(--blur-1bcbjmk) var(--spread-xxpef3) var(--shadowColor-1sod13t);}
   ._a_40jemk{box-shadow:var(--myShadow-af5fmc);}
   ._a_3hdrfm{border:var(--borderWidth-apl5wd) solid black;}
-  ._in_zwhmn0{background-color:var(--bgColor-zk5xjv);}
-  ._in_zwhmn0{border:1px solid var(--borderColor-rm89ze);}
   ._a_3hlokq43j{border-width:2px;}
   ._a_3hsua8w2v{border-style:solid;}
   ._a_3hef5kaed{border-color:#333;}
@@ -47,7 +44,8 @@
   ._a_3hb2879q1{border-right:2px dashed blue;}
   ._a_3h00779gh{border-bottom:3px dotted green;}
   ._a_3h1dswvke{border-left:4px double orange;}
-  ._in_zwhmn0{box-shadow:var(--shadow-2tj34g);}
+  ._a_39004pvpe{background-color:var(--bgColor-vilhl2);}
+  ._a_40ae1x{box-shadow:var(--shadow-giamln);}
   }
 
 Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
@@ -63,9 +61,8 @@ Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
   [@@@css "@property --shadowColor-1sod13t{syntax:\"*\";inherits:false;}"]
   [@@@css "@property --myShadow-af5fmc{syntax:\"*\";inherits:false;}"]
   [@@@css "@property --borderWidth-apl5wd{syntax:\"*\";inherits:false;}"]
-  [@@@css "@property --bgColor-zk5xjv{syntax:\"*\";inherits:false;}"]
-  [@@@css "@property --borderColor-rm89ze{syntax:\"*\";inherits:false;}"]
-  [@@@css "@property --shadow-2tj34g{syntax:\"*\";inherits:false;}"]
+  [@@@css "@property --bgColor-vilhl2{syntax:\"*\";inherits:false;}"]
+  [@@@css "@property --shadow-giamln{syntax:\"*\";inherits:false;}"]
   [@@@css "._a_4085tv{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1);}"]
   [@@@css
     "._a_402iep{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1), 0px 4px 8px 0px rgba(0, 0, 0, 0.2);}"]
@@ -100,9 +97,8 @@ Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
     "._a_40u3s3{box-shadow:var(--shadowX-11ljgmp) var(--shadowY-1qn6d0z) var(--blur-1bcbjmk) var(--spread-xxpef3) var(--shadowColor-1sod13t);}"]
   [@@@css "._a_40jemk{box-shadow:var(--myShadow-af5fmc);}"]
   [@@@css "._a_3hdrfm{border:var(--borderWidth-apl5wd) solid black;}"]
-  [@@@css "._in_zwhmn0{background-color:var(--bgColor-zk5xjv);}"]
-  [@@@css "._in_zwhmn0{border:1px solid var(--borderColor-rm89ze);}"]
-  [@@@css "._in_zwhmn0{box-shadow:var(--shadow-2tj34g);}"]
+  [@@@css "._a_39004pvpe{background-color:var(--bgColor-vilhl2);}"]
+  [@@@css "._a_40ae1x{box-shadow:var(--shadow-giamln);}"]
   [@@@css.bindings
     [("Output.simpleShadow", "_id_1ckmdi6", "_a_4085tv");
     ("Output.multipleShadows", "_id_1urhidx", "_a_402iep");
@@ -125,7 +121,8 @@ Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
     ("Output.shadowInterp", "_id_9zd6fn", "_a_40u3s3");
     ("Output.shadowFullInterp", "_id_bg3lpz", "_a_40jemk");
     ("Output.borderWidthInterp", "_id_1h8tvcz", "_a_3hdrfm");
-    ("Output.mixedCard", "_id_10wtrx1", "_in_zwhmn0 _a_3nkn84")]]
+    ("Output.mixedCard", "_id_10wtrx1",
+      "_a_39004pvpe _a_3hzctv _a_40ae1x _a_3nkn84")]]
   let simpleShadow = CSS.make "label:simpleShadow _id_1ckmdi6 _a_4085tv" []
   let multipleShadows =
     CSS.make "label:multipleShadows _id_1urhidx _a_402iep" []
@@ -178,7 +175,8 @@ Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
   let mixedCard bgColor =
     fun borderColor ->
       fun shadow ->
-        CSS.make "label:mixedCard _id_10wtrx1 _in_zwhmn0 _a_3nkn84"
-          [("--bgColor-zk5xjv", (CSS.Types.Color.toString bgColor));
-          ("--borderColor-rm89ze", (CSS.Types.Color.toString borderColor));
-          ("--shadow-2tj34g", (CSS.Types.BoxShadows.toString shadow))]
+        CSS.make
+          "label:mixedCard _id_10wtrx1 _a_39004pvpe _a_3hzctv _a_40ae1x _a_3nkn84"
+          [("--bgColor-vilhl2", (CSS.Types.Color.toString bgColor));
+          ("--borderColor-1on39sz", (CSS.Types.Color.toString borderColor));
+          ("--shadow-giamln", (CSS.Types.BoxShadows.toString shadow))]
