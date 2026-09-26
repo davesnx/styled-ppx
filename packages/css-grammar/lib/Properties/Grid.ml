@@ -1,6 +1,15 @@
 open Types
 open Support
 
+(* CSS Grid Layout L3 (grid lanes containers): https://drafts.csswg.org/css-grid-3/#propdef-flow-tolerance *)
+module Property_flow_tolerance =
+  [%spec_module
+  "'normal' | <extended-length> | <extended-percentage> | 'infinite'",
+  (module Css_types.FlowTolerance)]
+
+let property_flow_tolerance : property_flow_tolerance Rule.rule =
+  Property_flow_tolerance.rule
+
 module Property_grid =
   [%spec_module
   "<'grid-template'> | <'grid-template-rows'> '/' [ 'auto-flow' && [ 'dense' \
@@ -155,6 +164,7 @@ let entries : (kind * packed_rule) list =
   [
     Property "-ms-grid-columns", pack_module (module Property__ms_grid_columns);
     Property "-ms-grid-rows", pack_module (module Property__ms_grid_rows);
+    Property "flow-tolerance", pack_module (module Property_flow_tolerance);
     Property "grid-auto-flow", pack_module (module Property_grid_auto_flow);
     (* Grid Layout L2: https://www.w3.org/TR/css-grid-2/#propdef-grid-template, #propdef-grid, #propdef-grid-area *)
     ( Shorthand

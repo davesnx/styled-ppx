@@ -524,3 +524,10 @@ x
 y
 z-index
 zoom
+border-shape
+flow-tolerance
+frame-sizing
+scroll-axis-lock
+view-transition-group
+view-transition-scope
+window-drag

@@ -44,12 +44,33 @@ module Property_view_transition_name =
 let property_view_transition_name : property_view_transition_name Rule.rule =
   Property_view_transition_name.rule
 
+(* CSS View Transitions L2: https://drafts.csswg.org/css-view-transitions-2/#propdef-view-transition-group *)
+module Property_view_transition_group =
+  [%spec_module
+  "'normal' | 'contain' | 'nearest' | <custom-ident>",
+  (module Css_types.ViewTransitionGroup)]
+
+let property_view_transition_group : property_view_transition_group Rule.rule =
+  Property_view_transition_group.rule
+
+(* CSS View Transitions L2: https://drafts.csswg.org/css-view-transitions-2/#propdef-view-transition-scope *)
+module Property_view_transition_scope =
+  [%spec_module
+  "'none' | 'all'", (module Css_types.ViewTransitionScope)]
+
+let property_view_transition_scope : property_view_transition_scope Rule.rule =
+  Property_view_transition_scope.rule
+
 let entries : (kind * packed_rule) list =
   [
     ( Property "view-transition-class",
       pack_module (module Property_view_transition_class) );
     ( Property "view-transition-name",
       pack_module (module Property_view_transition_name) );
+    ( Property "view-transition-group",
+      pack_module (module Property_view_transition_group) );
+    ( Property "view-transition-scope",
+      pack_module (module Property_view_transition_scope) );
     Property "view-timeline", pack_module (module Property_view_timeline);
     ( Property "view-timeline-axis",
       pack_module (module Property_view_timeline_axis) );

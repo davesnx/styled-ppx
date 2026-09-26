@@ -161,6 +161,7 @@ let registry : (kind * packed_rule) list =
       Properties.Widows.entries;
       Properties.Width.entries;
       Properties.WillChange.entries;
+      Properties.WindowDrag.entries;
       Properties.WordBreak.entries;
       Properties.WordWrap.entries;
       Properties.WordSpacing.entries;
