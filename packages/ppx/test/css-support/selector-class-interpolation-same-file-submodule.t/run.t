@@ -13,35 +13,35 @@ emitted as a cross-module sentinel.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".a-4ekvmb{color:red;}"];
-  [@css ".a-i1f1s4eqknr.id-zr2uk1{color:orange;}"];
-  [@css ".a-nifi365m9s06ec.id-zr2uk1{font-weight:bold;}"];
-  [@css ".a-4ecoli{color:green;}"];
-  [@css ".a-nifi34ebkuc.id-11dmi54{color:blue;}"];
+  [@css "._a_4ekvmb{color:red;}"];
+  [@css "._a_qye7h4e56b5._id_zr2uk1{color:orange;}"];
+  [@css "._a_qye7h65m9ssyz4._id_zr2uk1{font-weight:bold;}"];
+  [@css "._a_4ecoli{color:green;}"];
+  [@css "._a_uisk84e7jnm._id_11dmi54{color:blue;}"];
   [@css.bindings
     [
-      ("Input.Css.marker", "id-zr2uk1", "a-4ekvmb"),
-      ("Input.Css.wrapper", "id-7sdyhq", "a-i1f1s4eqknr"),
-      ("Input.wrapper", "id-4f6ye3", "a-nifi365m9s06ec"),
-      ("Input.Theme.Css.marker", "id-11dmi54", "a-4ecoli"),
-      ("Input.Theme.Components.wrapper", "id-1mhdtfv", "a-nifi34ebkuc"),
+      ("Input.Css.marker", "_id_zr2uk1", "_a_4ekvmb"),
+      ("Input.Css.wrapper", "_id_7sdyhq", "_a_qye7h4e56b5"),
+      ("Input.wrapper", "_id_4f6ye3", "_a_qye7h65m9ssyz4"),
+      ("Input.Theme.Css.marker", "_id_11dmi54", "_a_4ecoli"),
+      ("Input.Theme.Components.wrapper", "_id_1mhdtfv", "_a_uisk84e7jnm"),
     ]
   ];
   module Css = {
-    let marker = CSS.make("label:marker id-zr2uk1 a-4ekvmb", []);
+    let marker = CSS.make("label:marker _id_zr2uk1 _a_4ekvmb", []);
   
-    let wrapper = CSS.make("label:wrapper id-7sdyhq a-i1f1s4eqknr", []);
+    let wrapper = CSS.make("label:wrapper _id_7sdyhq _a_qye7h4e56b5", []);
   };
   
-  let wrapper = CSS.make("label:wrapper id-4f6ye3 a-nifi365m9s06ec", []);
+  let wrapper = CSS.make("label:wrapper _id_4f6ye3 _a_qye7h65m9ssyz4", []);
   
   module Theme = {
     module Css = {
-      let marker = CSS.make("label:marker id-11dmi54 a-4ecoli", []);
+      let marker = CSS.make("label:marker _id_11dmi54 _a_4ecoli", []);
     };
   
     module Components = {
-      let wrapper = CSS.make("label:wrapper id-1mhdtfv a-nifi34ebkuc", []);
+      let wrapper = CSS.make("label:wrapper _id_1mhdtfv _a_uisk84e7jnm", []);
     };
   };
   

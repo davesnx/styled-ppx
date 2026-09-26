@@ -15,14 +15,14 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".a-5r3gy9{display:ruby;}"];
-  [@css ".a-5rb5b1{display:ruby-base;}"];
-  [@css ".a-5riprk{display:ruby-text;}"];
-  [@css ".a-5rp41v{display:ruby-base-container;}"];
-  [@css ".a-5rjuuf{display:ruby-text-container;}"];
+  [@css "._a_5r3gy9{display:ruby;}"];
+  [@css "._a_5rb5b1{display:ruby-base;}"];
+  [@css "._a_5riprk{display:ruby-text;}"];
+  [@css "._a_5rp41v{display:ruby-base-container;}"];
+  [@css "._a_5rjuuf{display:ruby-text-container;}"];
   
-  CSS.make("a-5r3gy9", []);
-  CSS.make("a-5rb5b1", []);
-  CSS.make("a-5riprk", []);
-  CSS.make("a-5rp41v", []);
-  CSS.make("a-5rjuuf", []);
+  CSS.make("_a_5r3gy9", []);
+  CSS.make("_a_5rb5b1", []);
+  CSS.make("_a_5riprk", []);
+  CSS.make("_a_5rp41v", []);
+  CSS.make("_a_5rjuuf", []);
