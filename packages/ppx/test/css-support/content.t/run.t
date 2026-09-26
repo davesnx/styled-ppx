@@ -15,183 +15,183 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".a-1cvidje{quotes:auto;}"];
-  [@css ".a-esf2ur{content:\"►\" / \"\";}"];
-  [@css ".a-1rzsdc1{content:\"\";}"];
-  [@css ".a-x7dhko{content:counter(ol);}"];
-  [@css ".a-8szbnh{content:counter(count, decimal);}"];
-  [@css ".a-10h56qq{content:counter(count, decimal) \") \";}"];
-  [@css ".a-8wd7tk{content:unset;}"];
-  [@css ".a-jvordy{content:normal;}"];
-  [@css ".a-71zcbh{content:none;}"];
-  [@css ".a-xq1wxf{content:url(\"http://www.example.com/test.png\");}"];
-  [@css ".a-leiwy{content:linear-gradient(#e66465, #9198e5);}"];
+  [@css "._a_9uidje{quotes:auto;}"];
+  [@css "._a_4wf2ur{content:\"►\" / \"\";}"];
+  [@css "._a_4wsdc1{content:\"\";}"];
+  [@css "._a_4wdhko{content:counter(ol);}"];
+  [@css "._a_4wzbnh{content:counter(count, decimal);}"];
+  [@css "._a_4w56qq{content:counter(count, decimal) \") \";}"];
+  [@css "._a_4wd7tk{content:unset;}"];
+  [@css "._a_4wordy{content:normal;}"];
+  [@css "._a_4wzcbh{content:none;}"];
+  [@css "._a_4w1wxf{content:url(\"http://www.example.com/test.png\");}"];
+  [@css "._a_4weiwy{content:linear-gradient(#e66465, #9198e5);}"];
   [@css
-    ".a-1synydd{content:image-set(\"image1x.png\" 1x, \"image2x.png\" 2x);}"
+    "._a_4wnydd{content:image-set(\"image1x.png\" 1x, \"image2x.png\" 2x);}"
   ];
   [@css
-    ".a-u6u5b0{content:url(\"../img/test.png\") / \"This is the alt text\";}"
+    "._a_4wu5b0{content:url(\"../img/test.png\") / \"This is the alt text\";}"
   ];
-  [@css ".a-1446790{content:\"unparsed text\";}"];
-  [@css ".a-1pr3ui{content:counter(chapter_counter);}"];
-  [@css ".a-14exuxw{content:counter(chapter_counter, upper-roman);}"];
-  [@css ".a-18nwggo{content:counters(section_counter, \".\");}"];
+  [@css "._a_4w6790{content:\"unparsed text\";}"];
+  [@css "._a_4wr3ui{content:counter(chapter_counter);}"];
+  [@css "._a_4wxuxw{content:counter(chapter_counter, upper-roman);}"];
+  [@css "._a_4wwggo{content:counters(section_counter, \".\");}"];
   [@css
-    ".a-1a914i9{content:counters(section_counter, \".\", decimal-leading-zero);}"
+    "._a_4w14i9{content:counters(section_counter, \".\", decimal-leading-zero);}"
   ];
-  [@css ".a-1c6n5wz{content:attr(href);}"];
-  [@css ".a-1wl2bce{content:attr(data-width px);}"];
-  [@css ".a-c4enc9{content:open-quote;}"];
-  [@css ".a-1vy0d5m{content:close-quote;}"];
-  [@css ".a-1lroxre{content:no-open-quote;}"];
-  [@css ".a-m6yzsz{content:no-close-quote;}"];
+  [@css "._a_4wn5wz{content:attr(href);}"];
+  [@css "._a_4w2bce{content:attr(data-width px);}"];
+  [@css "._a_4wenc9{content:open-quote;}"];
+  [@css "._a_4w0d5m{content:close-quote;}"];
+  [@css "._a_4woxre{content:no-open-quote;}"];
+  [@css "._a_4wyzsz{content:no-close-quote;}"];
   [@css
-    ".a-10fq46n{content:\"prefix\" url(\"http://www.example.com/test.png\");}"
+    "._a_4wq46n{content:\"prefix\" url(\"http://www.example.com/test.png\");}"
   ];
   [@css
-    ".a-nxt6w1{content:\"prefix\" url(\"/img/test.png\") \"suffix\" / \"Alt text\";}"
+    "._a_4wt6w1{content:\"prefix\" url(\"/img/test.png\") \"suffix\" / \"Alt text\";}"
   ];
-  [@css ".a-36wmef{content:open-quote counter(chapter_counter);}"];
-  [@css ".a-19u1hfk{content:inherit;}"];
-  [@css ".a-hqslsq{content:initial;}"];
-  [@css ".a-1dxltxf{content:revert;}"];
-  [@css ".a-kjtvgg{content:revert-layer;}"];
-  [@css ".a-1ybks2k{content:\"点\";}"];
-  [@css ".a-a9f07t{content:\"lola\";}"];
-  [@css ".a-13bvtt9{content:\" \";}"];
-  [@css ".a-1f06l48{content:\"'\";}"];
-  [@css ".a-64u917{content:\"\\\"\";}"];
-  [@css ".a-buwufj{content:attr(data-value);}"];
-  [@css ".a-1rln7nw{content:attr(data-value raw-string);}"];
-  [@css ".a-1vktxzt{content:attr(data-value em);}"];
-  [@css ".a-1piebvu{content:attr(data-value px);}"];
-  [@css ".a-1m33vis{content:\"→\";}"];
-  [@css ".a-es8i71{content:\"←\";}"];
-  [@css ".a-b3jm9f{content:\"↑\";}"];
-  [@css ".a-y08ulk{content:\"↓\";}"];
-  [@css ".a-15ni5s9{content:\"“\";}"];
-  [@css ".a-3tb13f{content:\"‘\";}"];
-  [@css ".a-s8n7fj{content:\"’\";}"];
-  [@css ".a-129wxr5{content:\"•\";}"];
-  [@css ".a-1xb5ir8{content:\"—\";}"];
-  [@css ".a-hk17ng{content:\"…\";}"];
-  [@css ".a-1of8arn{content:\"♥\";}"];
-  [@css ".a-j4gzna{content:\"✓\";}"];
-  [@css ".a-1yay3yn{content:\"✗\";}"];
-  [@css ".a-wlvyh0{content:\"\" attr(data-title) \"”\";}"];
-  [@css ".a-h1nazq{content:\"→\" \" Click here\";}"];
-  [@css ".a-1j520c{content:\"Step \" counter(step, decimal) \": \";}"];
-  [@css ".a-1epe5sp{content:\"💡\";}"];
-  [@css ".a-7r561c{content:\"👍\";}"];
-  [@css ".a-1d5vc81{content:\"»\";}"];
-  [@css ".a-uc3v3e{content:\"§\";}"];
-  [@css ".a-wzfv9f{content:\"→ \" attr(href);}"];
-  [@css ".a-ru4efr{content:\"• \" counter(item, decimal) \" \";}"];
+  [@css "._a_4wwmef{content:open-quote counter(chapter_counter);}"];
+  [@css "._a_4w1hfk{content:inherit;}"];
+  [@css "._a_4wslsq{content:initial;}"];
+  [@css "._a_4wltxf{content:revert;}"];
+  [@css "._a_4wtvgg{content:revert-layer;}"];
+  [@css "._a_4wks2k{content:\"点\";}"];
+  [@css "._a_4wf07t{content:\"lola\";}"];
+  [@css "._a_4wvtt9{content:\" \";}"];
+  [@css "._a_4w6l48{content:\"'\";}"];
+  [@css "._a_4wu917{content:\"\\\"\";}"];
+  [@css "._a_4wwufj{content:attr(data-value);}"];
+  [@css "._a_4wn7nw{content:attr(data-value raw-string);}"];
+  [@css "._a_4wtxzt{content:attr(data-value em);}"];
+  [@css "._a_4webvu{content:attr(data-value px);}"];
+  [@css "._a_4w3vis{content:\"→\";}"];
+  [@css "._a_4w8i71{content:\"←\";}"];
+  [@css "._a_4wjm9f{content:\"↑\";}"];
+  [@css "._a_4w8ulk{content:\"↓\";}"];
+  [@css "._a_4wi5s9{content:\"“\";}"];
+  [@css "._a_4wb13f{content:\"‘\";}"];
+  [@css "._a_4wn7fj{content:\"’\";}"];
+  [@css "._a_4wwxr5{content:\"•\";}"];
+  [@css "._a_4w5ir8{content:\"—\";}"];
+  [@css "._a_4w17ng{content:\"…\";}"];
+  [@css "._a_4w8arn{content:\"♥\";}"];
+  [@css "._a_4wgzna{content:\"✓\";}"];
+  [@css "._a_4wy3yn{content:\"✗\";}"];
+  [@css "._a_4wvyh0{content:\"\" attr(data-title) \"”\";}"];
+  [@css "._a_4wnazq{content:\"→\" \" Click here\";}"];
+  [@css "._a_4w520c{content:\"Step \" counter(step, decimal) \": \";}"];
+  [@css "._a_4we5sp{content:\"💡\";}"];
+  [@css "._a_4w561c{content:\"👍\";}"];
+  [@css "._a_4wvc81{content:\"»\";}"];
+  [@css "._a_4w3v3e{content:\"§\";}"];
+  [@css "._a_4wfv9f{content:\"→ \" attr(href);}"];
+  [@css "._a_4w4efr{content:\"• \" counter(item, decimal) \" \";}"];
   
-  CSS.make("a-1cvidje", []);
+  CSS.make("_a_9uidje", []);
   
-  CSS.make("a-esf2ur", []);
+  CSS.make("_a_4wf2ur", []);
   
-  CSS.make("a-1rzsdc1", []);
+  CSS.make("_a_4wsdc1", []);
   
-  CSS.make("a-x7dhko", []);
-  CSS.make("a-8szbnh", []);
-  CSS.make("a-10h56qq", []);
-  CSS.make("a-8wd7tk", []);
+  CSS.make("_a_4wdhko", []);
+  CSS.make("_a_4wzbnh", []);
+  CSS.make("_a_4w56qq", []);
+  CSS.make("_a_4wd7tk", []);
   
-  CSS.make("a-jvordy", []);
-  CSS.make("a-71zcbh", []);
+  CSS.make("_a_4wordy", []);
+  CSS.make("_a_4wzcbh", []);
   
-  CSS.make("a-xq1wxf", []);
-  CSS.make("a-leiwy", []);
-  CSS.make("a-1synydd", []);
+  CSS.make("_a_4w1wxf", []);
+  CSS.make("_a_4weiwy", []);
+  CSS.make("_a_4wnydd", []);
   
-  CSS.make("a-u6u5b0", []);
+  CSS.make("_a_4wu5b0", []);
   
-  CSS.make("a-1446790", []);
+  CSS.make("_a_4w6790", []);
   
-  CSS.make("a-1pr3ui", []);
-  CSS.make("a-14exuxw", []);
+  CSS.make("_a_4wr3ui", []);
+  CSS.make("_a_4wxuxw", []);
   
-  CSS.make("a-18nwggo", []);
-  CSS.make("a-1a914i9", []);
+  CSS.make("_a_4wwggo", []);
+  CSS.make("_a_4w14i9", []);
   
-  CSS.make("a-1c6n5wz", []);
-  CSS.make("a-1wl2bce", []);
+  CSS.make("_a_4wn5wz", []);
+  CSS.make("_a_4w2bce", []);
   
-  CSS.make("a-c4enc9", []);
-  CSS.make("a-1vy0d5m", []);
-  CSS.make("a-1lroxre", []);
-  CSS.make("a-m6yzsz", []);
+  CSS.make("_a_4wenc9", []);
+  CSS.make("_a_4w0d5m", []);
+  CSS.make("_a_4woxre", []);
+  CSS.make("_a_4wyzsz", []);
   
-  CSS.make("a-10fq46n", []);
-  CSS.make("a-nxt6w1", []);
+  CSS.make("_a_4wq46n", []);
+  CSS.make("_a_4wt6w1", []);
   
-  CSS.make("a-36wmef", []);
+  CSS.make("_a_4wwmef", []);
   
-  CSS.make("a-19u1hfk", []);
-  CSS.make("a-hqslsq", []);
-  CSS.make("a-1dxltxf", []);
-  CSS.make("a-kjtvgg", []);
-  CSS.make("a-8wd7tk", []);
+  CSS.make("_a_4w1hfk", []);
+  CSS.make("_a_4wslsq", []);
+  CSS.make("_a_4wltxf", []);
+  CSS.make("_a_4wtvgg", []);
+  CSS.make("_a_4wd7tk", []);
   
-  CSS.make("a-1ybks2k", []);
-  CSS.make("a-1ybks2k", []);
-  CSS.make("a-1ybks2k", []);
-  CSS.make("a-a9f07t", []);
-  CSS.make("a-a9f07t", []);
-  CSS.make("a-1rzsdc1", []);
-  CSS.make("a-13bvtt9", []);
-  CSS.make("a-13bvtt9", []);
-  CSS.make("a-1rzsdc1", []);
-  CSS.make("a-1f06l48", []);
-  CSS.make("a-64u917", []);
+  CSS.make("_a_4wks2k", []);
+  CSS.make("_a_4wks2k", []);
+  CSS.make("_a_4wks2k", []);
+  CSS.make("_a_4wf07t", []);
+  CSS.make("_a_4wf07t", []);
+  CSS.make("_a_4wsdc1", []);
+  CSS.make("_a_4wvtt9", []);
+  CSS.make("_a_4wvtt9", []);
+  CSS.make("_a_4wsdc1", []);
+  CSS.make("_a_4w6l48", []);
+  CSS.make("_a_4wu917", []);
   
-  CSS.make("a-1c6n5wz", []);
-  CSS.make("a-buwufj", []);
+  CSS.make("_a_4wn5wz", []);
+  CSS.make("_a_4wwufj", []);
   
-  CSS.make("a-1rln7nw", []);
-  CSS.make("a-1vktxzt", []);
-  CSS.make("a-1piebvu", []);
+  CSS.make("_a_4wn7nw", []);
+  CSS.make("_a_4wtxzt", []);
+  CSS.make("_a_4webvu", []);
   
-  CSS.make("a-1m33vis", []);
-  CSS.make("a-es8i71", []);
-  CSS.make("a-b3jm9f", []);
-  CSS.make("a-y08ulk", []);
+  CSS.make("_a_4w3vis", []);
+  CSS.make("_a_4w8i71", []);
+  CSS.make("_a_4wjm9f", []);
+  CSS.make("_a_4w8ulk", []);
   
-  CSS.make("a-15ni5s9", []);
+  CSS.make("_a_4wi5s9", []);
   
-  CSS.make("a-3tb13f", []);
-  CSS.make("a-s8n7fj", []);
+  CSS.make("_a_4wb13f", []);
+  CSS.make("_a_4wn7fj", []);
   
-  CSS.make("a-129wxr5", []);
-  CSS.make("a-1xb5ir8", []);
-  CSS.make("a-hk17ng", []);
-  CSS.make("a-1of8arn", []);
-  CSS.make("a-j4gzna", []);
-  CSS.make("a-1yay3yn", []);
-  CSS.make("a-hk17ng", []);
+  CSS.make("_a_4wwxr5", []);
+  CSS.make("_a_4w5ir8", []);
+  CSS.make("_a_4w17ng", []);
+  CSS.make("_a_4w8arn", []);
+  CSS.make("_a_4wgzna", []);
+  CSS.make("_a_4wy3yn", []);
+  CSS.make("_a_4w17ng", []);
   
-  CSS.make("a-wlvyh0", []);
-  CSS.make("a-h1nazq", []);
-  CSS.make("a-1j520c", []);
+  CSS.make("_a_4wvyh0", []);
+  CSS.make("_a_4wnazq", []);
+  CSS.make("_a_4w520c", []);
   
-  CSS.make("a-1epe5sp", []);
-  CSS.make("a-7r561c", []);
+  CSS.make("_a_4we5sp", []);
+  CSS.make("_a_4w561c", []);
   
-  CSS.make("a-1d5vc81", []);
-  CSS.make("a-uc3v3e", []);
+  CSS.make("_a_4wvc81", []);
+  CSS.make("_a_4w3v3e", []);
   
-  CSS.make("a-1m33vis", []);
-  CSS.make("a-13bvtt9", []);
+  CSS.make("_a_4w3vis", []);
+  CSS.make("_a_4wvtt9", []);
   
-  CSS.make("a-1m33vis", []);
-  CSS.make("a-129wxr5", []);
-  CSS.make("a-1xb5ir8", []);
-  CSS.make("a-hk17ng", []);
-  CSS.make("a-64u917", []);
-  CSS.make("a-64u917", []);
-  CSS.make("a-j4gzna", []);
-  CSS.make("a-1of8arn", []);
-  CSS.make("a-wzfv9f", []);
-  CSS.make("a-ru4efr", []);
+  CSS.make("_a_4w3vis", []);
+  CSS.make("_a_4wwxr5", []);
+  CSS.make("_a_4w5ir8", []);
+  CSS.make("_a_4w17ng", []);
+  CSS.make("_a_4wu917", []);
+  CSS.make("_a_4wu917", []);
+  CSS.make("_a_4wgzna", []);
+  CSS.make("_a_4w8arn", []);
+  CSS.make("_a_4wfv9f", []);
+  CSS.make("_a_4w4efr", []);

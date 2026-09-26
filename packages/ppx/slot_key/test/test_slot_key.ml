@@ -466,33 +466,49 @@ let removes_tests =
         (Slot_key.removes
            ~former:(slot_of "--not-a-real-thing-but-also-not-custom-syntax: 1;")
            ~latter:(slot_of "--not-a-real-thing-but-also-not-custom-syntax: 2;")));
-    (* --- interpolation bundles: opaque to removes in both directions --- *)
+    (* --- interpolation bundles: opaque to removes in both directions ---
+       [of_atom] always returns [bundle = false] (see its own doc - a real
+       bundle is a fact about the whole block, which one atom's AST can't
+       say). A single interpolating declaration therefore merges like any
+       plain atom; only a HAND-BUILT bundle slot (simulating what
+       [Css_file.re] does for a genuine, two-or-more-declaration bundle)
+       exercises [removes]'s bundle exemption below. *)
     Alcotest_extra.test
-      "a declaration with a $(...) value interpolation is a bundle atom"
-      (fun () -> check_bool "bundle" true (slot_of "color: $(theme);").bundle);
+      "a declaration with a $(...) value interpolation is NOT, by itself, a \
+       bundle atom - Css_file.re decides bundle membership at the block level, \
+       not per declaration" (fun () ->
+      check_bool "bundle" false (slot_of "color: $(theme);").bundle);
     Alcotest_extra.test "a plain declaration is not a bundle atom" (fun () ->
       check_bool "bundle" false (slot_of "color: red;").bundle);
     Alcotest_extra.test
-      "a bundle atom is never removed, even by an identical same-property atom \
-       (would be true for two plain atoms - see the base test above)" (fun () ->
-      check_bool "removes" false
+      "a single interpolating declaration merges like a plain atom of the same \
+       property (the fix: it is not a bundle)" (fun () ->
+      check_bool "removes" true
         (Slot_key.removes ~former:(slot_of "color: $(a);")
            ~latter:(slot_of "color: $(b);")));
-    Alcotest_extra.test "a bundle atom never removes a plain atom" (fun () ->
-      check_bool "removes" false
-        (Slot_key.removes ~former:(slot_of "color: red;")
-           ~latter:(slot_of "color: $(theme);")));
-    Alcotest_extra.test "a plain atom never removes a bundle atom" (fun () ->
-      check_bool "removes" false
-        (Slot_key.removes
-           ~former:(slot_of "color: $(theme);")
-           ~latter:(slot_of "color: red;")));
     Alcotest_extra.test
-      "a bundle atom is immune even to a same-property !important override \
-       (bundle status overrides the !important rule too)" (fun () ->
+      "a hand-built bundle atom is never removed, even by an identical \
+       same-property atom (would be true for two plain atoms - see the base \
+       test above)" (fun () ->
+      let bundle_slot = { (slot_of "color: $(a);") with bundle = true } in
       check_bool "removes" false
-        (Slot_key.removes
-           ~former:(slot_of "color: $(theme);")
+        (Slot_key.removes ~former:bundle_slot ~latter:(slot_of "color: $(b);")));
+    Alcotest_extra.test "a hand-built bundle atom never removes a plain atom"
+      (fun () ->
+      let bundle_slot = { (slot_of "color: $(theme);") with bundle = true } in
+      check_bool "removes" false
+        (Slot_key.removes ~former:(slot_of "color: red;") ~latter:bundle_slot));
+    Alcotest_extra.test "a plain atom never removes a hand-built bundle atom"
+      (fun () ->
+      let bundle_slot = { (slot_of "color: $(theme);") with bundle = true } in
+      check_bool "removes" false
+        (Slot_key.removes ~former:bundle_slot ~latter:(slot_of "color: red;")));
+    Alcotest_extra.test
+      "a hand-built bundle atom is immune even to a same-property !important \
+       override (bundle status overrides the !important rule too)" (fun () ->
+      let bundle_slot = { (slot_of "color: $(theme);") with bundle = true } in
+      check_bool "removes" false
+        (Slot_key.removes ~former:bundle_slot
            ~latter:(slot_of "color: red !important;")));
   ]
 

@@ -15,53 +15,53 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".a-6tuveb{width:1cap;}"];
-  [@css ".a-xh6gk5{width:2.5cap;}"];
-  [@css ".a-1auf708{width:1ic;}"];
-  [@css ".a-1muf374{width:3.5ic;}"];
-  [@css ".a-1tdwc7t{width:1lh;}"];
-  [@css ".a-d4qnkz{width:2lh;}"];
-  [@css ".a-1z04gax{width:1rcap;}"];
-  [@css ".a-13ynmih{width:1rch;}"];
-  [@css ".a-1joy0pg{width:1rex;}"];
-  [@css ".a-151mfob{width:1ric;}"];
-  [@css ".a-1xmnp92{width:1rlh;}"];
-  [@css ".a-16nrh49{width:50vb;}"];
-  [@css ".a-cgijca{width:50vi;}"];
-  [@css ".a-1ef0vtm{width:40Q;}"];
-  [@css ".a-1b38f82{height:10lh;}"];
-  [@css ".a-z3igma{margin:2cap;}"];
-  [@css ".a-1xmh56p{padding:5ic;}"];
-  [@css ".a-1pesmpm{font-size:1.5lh;}"];
-  [@css ".a-1nt3fhm{line-height:2rlh;}"];
+  [@css "._a_ecuveb{width:1cap;}"];
+  [@css "._a_ec6gk5{width:2.5cap;}"];
+  [@css "._a_ecf708{width:1ic;}"];
+  [@css "._a_ecf374{width:3.5ic;}"];
+  [@css "._a_ecwc7t{width:1lh;}"];
+  [@css "._a_ecqnkz{width:2lh;}"];
+  [@css "._a_ec4gax{width:1rcap;}"];
+  [@css "._a_ecnmih{width:1rch;}"];
+  [@css "._a_ecy0pg{width:1rex;}"];
+  [@css "._a_ecmfob{width:1ric;}"];
+  [@css "._a_ecnp92{width:1rlh;}"];
+  [@css "._a_ecrh49{width:50vb;}"];
+  [@css "._a_ecijca{width:50vi;}"];
+  [@css "._a_ec0vtm{width:40Q;}"];
+  [@css "._a_6l8f82{height:10lh;}"];
+  [@css "._a_7pigma{margin:2cap;}"];
+  [@css "._a_94h56p{padding:5ic;}"];
+  [@css "._a_6500wsmpm{font-size:1.5lh;}"];
+  [@css "._a_658jk3fhm{line-height:2rlh;}"];
   
-  CSS.make("a-6tuveb", []);
-  CSS.make("a-xh6gk5", []);
+  CSS.make("_a_ecuveb", []);
+  CSS.make("_a_ec6gk5", []);
   
-  CSS.make("a-1auf708", []);
-  CSS.make("a-1muf374", []);
+  CSS.make("_a_ecf708", []);
+  CSS.make("_a_ecf374", []);
   
-  CSS.make("a-1tdwc7t", []);
-  CSS.make("a-d4qnkz", []);
+  CSS.make("_a_ecwc7t", []);
+  CSS.make("_a_ecqnkz", []);
   
-  CSS.make("a-1z04gax", []);
+  CSS.make("_a_ec4gax", []);
   
-  CSS.make("a-13ynmih", []);
+  CSS.make("_a_ecnmih", []);
   
-  CSS.make("a-1joy0pg", []);
+  CSS.make("_a_ecy0pg", []);
   
-  CSS.make("a-151mfob", []);
+  CSS.make("_a_ecmfob", []);
   
-  CSS.make("a-1xmnp92", []);
+  CSS.make("_a_ecnp92", []);
   
-  CSS.make("a-16nrh49", []);
+  CSS.make("_a_ecrh49", []);
   
-  CSS.make("a-cgijca", []);
+  CSS.make("_a_ecijca", []);
   
-  CSS.make("a-1ef0vtm", []);
+  CSS.make("_a_ec0vtm", []);
   
-  CSS.make("a-1b38f82", []);
-  CSS.make("a-z3igma", []);
-  CSS.make("a-1xmh56p", []);
-  CSS.make("a-1pesmpm", []);
-  CSS.make("a-1nt3fhm", []);
+  CSS.make("_a_6l8f82", []);
+  CSS.make("_a_7pigma", []);
+  CSS.make("_a_94h56p", []);
+  CSS.make("_a_6500wsmpm", []);
+  CSS.make("_a_658jk3fhm", []);

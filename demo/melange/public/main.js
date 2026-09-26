@@ -63753,6 +63753,206 @@ var yellowgreen = {
 };
 var transparent2 = "transparent";
 
+// ../demo-melange/node_modules/styled-ppx.melange/Merge_key.mjs
+var atom_prefix = "_a_";
+var all_sentinel = "zz";
+var unregistered_custom_marker = "zy";
+var direction_marker = "5q";
+var unicode_bidi_marker = "dp";
+function is_excluded_from_all(family) {
+  if (family === unregistered_custom_marker || family === direction_marker) {
+    return true;
+  } else {
+    return family === unicode_bidi_marker;
+  }
+}
+function base36_value(s2) {
+  const value = {
+    contents: 0
+  };
+  iter6((function(c) {
+    const digit = c >= 58 ? c > 122 || c < 97 ? 0 : (c - /* 'a' */
+    97 | 0) + 10 | 0 : c >= 48 ? c - /* '0' */
+    48 | 0 : 0;
+    value.contents = Math.imul(value.contents, 36) + digit | 0;
+  }), s2);
+  return value.contents;
+}
+function fields_of_extra(extra) {
+  if (extra === 0) {
+    return [
+      false,
+      false,
+      false
+    ];
+  } else if (extra === 3) {
+    return [
+      false,
+      true,
+      false
+    ];
+  } else if (extra === 5) {
+    return [
+      true,
+      false,
+      false
+    ];
+  } else if (extra === 6) {
+    return [
+      false,
+      false,
+      true
+    ];
+  } else if (extra === 8) {
+    return [
+      true,
+      true,
+      false
+    ];
+  } else if (extra === 11) {
+    return [
+      true,
+      false,
+      true
+    ];
+  } else {
+    return;
+  }
+}
+function parse_atom(class_name) {
+  const prefix_len = atom_prefix.length;
+  if (class_name.length < prefix_len || sub5(class_name, 0, prefix_len) !== atom_prefix) {
+    return;
+  }
+  const body = sub5(class_name, prefix_len, class_name.length - prefix_len | 0);
+  const floor = 6;
+  const match = fields_of_extra(body.length - floor | 0);
+  if (match === void 0) {
+    return;
+  }
+  const pos = {
+    contents: 0
+  };
+  const take3 = function(width) {
+    const s2 = sub5(body, pos.contents, width);
+    pos.contents = pos.contents + width | 0;
+    return s2;
+  };
+  const context = match[0] ? take3(5) : "";
+  const family = take3(2);
+  const extended = match[2] ? take3(6) : void 0;
+  const mask = match[1] ? base36_value(take3(3)) : void 0;
+  take3(4);
+  return {
+    context,
+    family,
+    extended,
+    mask
+  };
+}
+function context_equal(a, b) {
+  return a.context === b.context;
+}
+function family_equal(a, b) {
+  if (a.family !== b.family) {
+    return false;
+  }
+  const match = a.extended;
+  const match$1 = b.extended;
+  if (match !== void 0) {
+    if (match$1 !== void 0) {
+      return match === match$1;
+    } else {
+      return false;
+    }
+  } else {
+    return match$1 === void 0;
+  }
+}
+function mask_subset(a, b) {
+  if (a !== void 0) {
+    if (b !== void 0) {
+      return (a & b) === a;
+    } else {
+      return true;
+    }
+  } else {
+    return b === void 0;
+  }
+}
+function removes(former, latter) {
+  if (context_equal(former, latter)) {
+    if (latter.family === all_sentinel) {
+      return !is_excluded_from_all(former.family);
+    } else if (family_equal(former, latter)) {
+      return mask_subset(former.mask, latter.mask);
+    } else {
+      return false;
+    }
+  } else {
+    return false;
+  }
+}
+function is_space3(param) {
+  if (param > 13 || param < 9) {
+    return param === 32;
+  } else {
+    return !(param === 12 || param === 11);
+  }
+}
+function split_tokens(s2) {
+  const n = s2.length;
+  let _i = 0;
+  let _acc = (
+    /* [] */
+    0
+  );
+  while (true) {
+    const acc = _acc;
+    const i = _i;
+    if (i >= n) {
+      return rev(acc);
+    }
+    if (is_space3(get2(s2, i))) {
+      _i = i + 1 | 0;
+      continue;
+    }
+    let j = i;
+    while (j < n && !is_space3(get2(s2, j))) {
+      j = j + 1 | 0;
+    }
+    ;
+    _acc = {
+      hd: sub5(s2, i, j - i | 0),
+      tl: acc
+    };
+    _i = j;
+    continue;
+  }
+  ;
+}
+function merge_class_names(former, latter) {
+  const former_tokens = split_tokens(former);
+  const latter_tokens = split_tokens(latter);
+  const latter_atoms = of_list(filter_map2(parse_atom, latter_tokens));
+  const survives = function(token) {
+    const former_atom = parse_atom(token);
+    if (former_atom !== void 0) {
+      return !exists4((function(latter_atom) {
+        return removes(former_atom, latter_atom);
+      }), latter_atoms);
+    } else {
+      return true;
+    }
+  };
+  return concat6(" ", $at(filter2(survives, former_tokens), latter_tokens));
+}
+var context_width = 5;
+var family_width = 2;
+var mask_width = 3;
+var value_width = 4;
+var extended_width = 6;
+
 // ../demo-melange/node_modules/reason-react/ReactDOM.mjs
 function unsafeAddProp(style, key, value) {
   const dict = {};
@@ -63800,7 +64000,7 @@ function make7(className2, vars2) {
   ];
 }
 function merge2(styles1, styles22) {
-  const className2 = (styles1[0] + (" " + styles22[0])).trim();
+  const className2 = merge_class_names(styles1[0], styles22[0]);
   const style = Object.assign({}, styles1[1], styles22[1]);
   return [
     className2,
@@ -64229,7 +64429,7 @@ var AppGlobalStyles = {
   make: make8
 };
 var stack = make7(
-  "label:stack id-195s1dh a-k008qs a-cgq59l",
+  "label:stack _id_195s1dh _a_5r08qs _a_61001q59l",
   /* [] */
   0
 );
@@ -64242,7 +64442,7 @@ function getOrEmpty(str) {
 }
 function styles2(lolaOpt, param) {
   const lola = lolaOpt !== void 0 ? lolaOpt : px2(0);
-  return make7("label:Cositas id-uk3qz7 a-k008qs a-cgq59l in-r0vq9t", {
+  return make7("label:Cositas _id_uk3qz7 _a_5r08qs _a_61001q59l _a_6fvq9t", {
     hd: [
       "--lola-8erbae",
       Gap.toString(lola)
@@ -64274,38 +64474,38 @@ var Cositas = {
   make: make$12
 };
 var selectors = make7(
-  "label:selectors id-pm05s2 a-tokvmb a-12qnfjo",
+  "label:selectors _id_pm05s2 _a_4ekvmb _a_qyw7u4enfjo",
   /* [] */
   0
 );
-var bounce = AnimationName.make(void 0, "k-deb5ee");
+var bounce = AnimationName.make(void 0, "_k_deb5ee");
 var clx = make7(
-  "label:clx id-47oj19 a-1e8vzlw a-u70tf2 a-1j9jp3a",
+  "label:clx _id_47oj19 _a_65001vzlw _a_5l0tf2 _a_6i00gjp3a",
   /* [] */
   0
 );
 var post = make7(
-  "label:post id-gbz02q a-1y5r52a a-3qzm71",
+  "label:post _id_gbz02q _a_3hr52a _a_4v002zm71",
   /* [] */
   0
 );
 var card = make7(
-  "label:card id-ebd8w7 a-eaeacs a-25k368 a-3fuzg5",
+  "label:card _id_ebd8w7 _a_7peacs _a_3hk368 _a_6500wuzg5",
   /* [] */
   0
 );
 var container = make7(
-  "label:container id-1hzr7q6 a-nqqinc a-w3aeeb a-5x3p37 a-stwpj2",
+  "label:container _id_1hzr7q6 _a_p3y4xecqinc _a_p3y4x39004aeeb _a_p3y4x6500w3p37 _a_2grgh65m9swpj2",
   /* [] */
   0
 );
 var gradiend = make7(
-  "label:gradiend id-j1a2e7 a-1wlyyxm a-qelxhy",
+  "label:gradiend _id_j1a2e7 _a_94yyxm _a_39008lxhy",
   /* [] */
   0
 );
 var tag = make7(
-  "label:tag id-1a86vzz a-1baulvz a-7ji1gv a-1isemmb a-3kft4e a-wtpnzt",
+  "label:tag _id_1a86vzz _a_5rulvz _a_94i1gv _a_7p002emmb _a_3hft4e _a_3npnzt",
   /* [] */
   0
 );
@@ -64313,28 +64513,230 @@ var Labels = {
   tag
 };
 var childLabel = make7(
-  "label:childLabel id-6prbgi a-in3yi3",
+  "label:childLabel _id_6prbgi _a_65m9s3yi3",
   /* [] */
   0
 );
 var parentWithChildSelector = make7(
-  "label:parentWithChildSelector id-1wu39qc a-o32ik7 a-19midj6 a-1qm1lh a-1xhar4a a-yd4yye",
+  "label:parentWithChildSelector _id_1wu39qc _a_3h2ik7 _a_94idj6 _a_7p001m1lh _a_5arac4ell0e _a_j7d0239xe6s",
   /* [] */
   0
 );
 var modifierActive = make7(
-  "label:modifierActive id-h4gfxd a-in3yi3",
+  "label:modifierActive _id_h4gfxd _a_65m9s3yi3",
   /* [] */
   0
 );
 var toggle = make7(
-  "label:toggle id-mfk87c a-1baulvz a-12hizlt a-12z0wuy a-s67z9l a-pk71pq a-gwf734 a-145kqdj",
+  "label:toggle _id_mfk87c _a_5rulvz _a_94izlt _a_7p0040wuy _a_3h7z9l _a_3n71pq _a_i52hj395tlc _a_i52hj3hef5ogsp",
+  /* [] */
+  0
+);
+var mergeLeftRed = make7(
+  "label:mergeLeftRed _id_xj79l2 _a_4ekvmb",
+  /* [] */
+  0
+);
+var mergeRightBlue = make7(
+  "label:mergeRightBlue _id_rmeksf _a_4esm7b",
+  /* [] */
+  0
+);
+var heightAutoDecoy = make7(
+  "label:heightAutoDecoy _id_12da7xi _a_6l7jm9",
+  /* [] */
+  0
+);
+var FaqDecoy = {
+  heightAutoDecoy
+};
+var faqOpenContent = make7(
+  "label:faqOpenContent _id_qck8g9 _a_6l7jm9 _a_8rbazn",
+  /* [] */
+  0
+);
+var faqCollapsed = make7(
+  "label:faqCollapsed _id_1tw41t7 _a_6lvr0w",
+  /* [] */
+  0
+);
+var marginTopZero = make7(
+  "label:marginTopZero _id_c4lyme _a_7p008n4zf",
+  /* [] */
+  0
+);
+var marginAll10 = make7(
+  "label:marginAll10 _id_rrmfw _a_7peacs",
+  /* [] */
+  0
+);
+var marginAll10Reversed = make7(
+  "label:marginAll10Reversed _id_19kb2l3 _a_7peacs",
+  /* [] */
+  0
+);
+var marginTopZeroReversed = make7(
+  "label:marginTopZeroReversed _id_oibhbu _a_7p008n4zf",
+  /* [] */
+  0
+);
+var differentColor = make7(
+  "label:differentColor _id_1yxuf5h _a_4e3x2f",
+  /* [] */
+  0
+);
+var differentBackground = make7(
+  "label:differentBackground _id_m7e9qy _a_39zz22",
+  /* [] */
+  0
+);
+var hoverBaseColor = make7(
+  "label:hoverBaseColor _id_69rt6v _a_4ecoli",
+  /* [] */
+  0
+);
+var hoverOverride = make7(
+  "label:hoverOverride _id_zaoc9q _a_qyw7u4eb4a5",
+  /* [] */
+  0
+);
+var hoverFirst = make7(
+  "label:hoverFirst _id_vfuhim _a_qyw7u4ego80",
+  /* [] */
+  0
+);
+var hoverSecond = make7(
+  "label:hoverSecond _id_st9aqn _a_qyw7u4em3mo",
+  /* [] */
+  0
+);
+var mediaFirst = make7(
+  "label:mediaFirst _id_1yjmkjm _a_ftrjp4eqtu6",
+  /* [] */
+  0
+);
+var mediaSecond = make7(
+  "label:mediaSecond _id_dpv5ji _a_ftrjp4edjbj",
+  /* [] */
+  0
+);
+var importantRed = make7(
+  "label:importantRed _id_cg72f _a_oe8sa4eltzl",
+  /* [] */
+  0
+);
+var plainBlueForImportant = make7(
+  "label:plainBlueForImportant _id_ovywjm _a_4esm7b",
+  /* [] */
+  0
+);
+var plainRedForImportant = make7(
+  "label:plainRedForImportant _id_1y9lfm8 _a_4ekvmb",
+  /* [] */
+  0
+);
+var importantBlue = make7(
+  "label:importantBlue _id_q3vp21 _a_oe8sa4e3jtv",
+  /* [] */
+  0
+);
+var importantRedVsImportantBlue = make7(
+  "label:importantRedVsImportantBlue _id_17mhudr _a_oe8sa4eltzl",
+  /* [] */
+  0
+);
+var customXRed = make7(
+  "label:customXRed _id_iv9hkj _a_zytx2ztfp7wt",
+  /* [] */
+  0
+);
+var customXBlue = make7(
+  "label:customXBlue _id_j3dium _a_zytx2ztfqbjc",
+  /* [] */
+  0
+);
+var useCustomX = make7(
+  "label:useCustomX _id_vzabfw _a_4e8w5r",
+  /* [] */
+  0
+);
+function dynColorA(color) {
+  return make7("label:dynColorA _id_oxnnly _a_4esjgz", {
+    hd: [
+      "--color-1a279q8",
+      Color.toString(color)
+    ],
+    tl: (
+      /* [] */
+      0
+    )
+  });
+}
+function dynColorB(color) {
+  return make7("label:dynColorB _id_eaixg1 _a_4esjgz", {
+    hd: [
+      "--color-1a279q8",
+      Color.toString(color)
+    ],
+    tl: (
+      /* [] */
+      0
+    )
+  });
+}
+var assocA = make7(
+  "label:assocA _id_1ns1py9 _a_4efdvb",
+  /* [] */
+  0
+);
+var assocB = make7(
+  "label:assocB _id_1ojnt9w _a_4et30w",
+  /* [] */
+  0
+);
+var assocC = make7(
+  "label:assocC _id_167j6uv _a_4efm8j",
+  /* [] */
+  0
+);
+var paddingBothZero = make7(
+  "label:paddingBothZero _id_kx9m5d _a_94002yq1t _a_940048fgp",
+  /* [] */
+  0
+);
+var paddingLeft4 = make7(
+  "label:paddingLeft4 _id_1j3kmra _a_94002wcsq",
+  /* [] */
+  0
+);
+var wordWrapBreak = make7(
+  "label:wordWrapBreak _id_k9t8x6 _a_8xpt08",
+  /* [] */
+  0
+);
+var overflowWrapNormal = make7(
+  "label:overflowWrapNormal _id_1l5xha2 _a_8xlw6e",
+  /* [] */
+  0
+);
+var identityKeptColor = make7(
+  "label:identityKeptColor _id_15nl9wy _a_4enj2d",
+  /* [] */
+  0
+);
+var identityKeptOverride = make7(
+  "label:identityKeptOverride _id_10n1eq1 _a_4efdvb",
+  /* [] */
+  0
+);
+var identityKeptHighlight = make7(
+  "label:identityKeptHighlight _id_1cfjy5z _a_a5k1dcfwtlg",
   /* [] */
   0
 );
 var primary = hex2("141414");
 function keyframeDemoShell(color) {
-  return make7("label:keyframeDemoShell id-8xpkpc a-19kzrtu a-i3pbo a-3kft4e a-1fi1jeb a-205zh2 in-kusjgz a-1e8vzlw", {
+  return make7("label:keyframeDemoShell _id_8xpkpc _a_94zrtu _a_7p0013pbo _a_3hft4e _a_3n1jeb _a_395zh2 _a_4esjgz _a_65001vzlw", {
     hd: [
       "--color-1a279q8",
       Color.toString(color)
@@ -64368,8 +64770,8 @@ var resize2 = AnimationName.make({
       0
     )
   }
-}, "k-1kt58w0");
-var keyframeDemoCard = make7("label:keyframeDemoCard id-jbn4tz in-1h7bkao a-65ee5x a-3pa72f a-iovuyg a-1c3l4rb a-i6bazn a-k008qs a-zcxndt a-1tyndxa a-1vw7svr a-1p3fawg a-kbn7if a-8c92kl", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
+}, "_k_1kt58w0");
+var keyframeDemoCard = make7("label:keyframeDemoCard _id_jbn4tz _a_2z01sbkao _a_2z008ee5x _a_2z1kwa72f _a_2z00gvuyg _a_ecl4rb _a_8rbazn _a_5r08qs _a_9i001xndt _a_9h002ndxa _a_3n7svr _a_39fawg _a_4en7if _a_4092kl", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
 function Main(Props) {
   return JsxRuntime.jsxs("main", {
     children: [
@@ -64453,6 +64855,153 @@ function Main(Props) {
             children: "toggle: on via &.$(modifierActive)",
             className: merge2(toggle, modifierActive)[0],
             style: merge2(toggle, modifierActive)[1]
+          })
+        ]
+      }),
+      JsxRuntime.jsxs("section", {
+        children: [
+          JsxRuntime.jsx("h2", {
+            children: "CSS.merge"
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "1. same property: right wins"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(red, blue) -> expect blue",
+            className: merge2(mergeLeftRed, mergeRightBlue)[0],
+            style: merge2(mergeLeftRed, mergeRightBlue)[1]
+          }),
+          JsxRuntime.jsx("p", {
+            children: "Faq: merge(content{height:auto}, collapsed{height:0}) -> expect height 0 (this text hidden)",
+            className: merge2(faqOpenContent, faqCollapsed)[0],
+            style: merge2(faqOpenContent, faqCollapsed)[1]
+          }),
+          JsxRuntime.jsx("p", {
+            children: "Decoy: unrelated height:auto, rendered first, same class as faqOpenContent's",
+            className: heightAutoDecoy[0],
+            style: heightAutoDecoy[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "2. longhand then shorthand"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(margin-top:0, margin:10px) -> expect 10px all sides",
+            className: merge2(marginTopZero, marginAll10)[0],
+            style: merge2(marginTopZero, marginAll10)[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "3. shorthand then longhand (accepted limit)"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(margin:10px, margin-top:0) -> both classes kept, see report for what rendered",
+            className: merge2(marginAll10Reversed, marginTopZeroReversed)[0],
+            style: merge2(marginAll10Reversed, marginTopZeroReversed)[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "4. different properties"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(color, background) -> expect both applied",
+            className: merge2(differentColor, differentBackground)[0],
+            style: merge2(differentColor, differentBackground)[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "5. contexts"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "base + :hover -> green at rest, purple on hover",
+            className: merge2(hoverBaseColor, hoverOverride)[0],
+            style: merge2(hoverBaseColor, hoverOverride)[1]
+          }),
+          JsxRuntime.jsx("p", {
+            children: ":hover + :hover -> teal on hover (right wins)",
+            className: merge2(hoverFirst, hoverSecond)[0],
+            style: merge2(hoverFirst, hoverSecond)[1]
+          }),
+          JsxRuntime.jsx("p", {
+            children: "base + @media(<=700px) -> green normally, orange under 700px (both kept)",
+            className: merge2(hoverBaseColor, mediaFirst)[0],
+            style: merge2(hoverBaseColor, mediaFirst)[1]
+          }),
+          JsxRuntime.jsx("p", {
+            children: "@media + same @media -> brown under 700px (right wins)",
+            className: merge2(mediaFirst, mediaSecond)[0],
+            style: merge2(mediaFirst, mediaSecond)[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "6. !important"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(red !important, blue) -> expect red",
+            className: merge2(importantRed, plainBlueForImportant)[0],
+            style: merge2(importantRed, plainBlueForImportant)[1]
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(red, blue !important) -> expect blue",
+            className: merge2(plainRedForImportant, importantBlue)[0],
+            style: merge2(plainRedForImportant, importantBlue)[1]
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(red !important, blue !important) -> expect blue",
+            className: merge2(importantRedVsImportantBlue, importantBlue)[0],
+            style: merge2(importantRedVsImportantBlue, importantBlue)[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "7. custom property"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(--x:red, --x:blue) then color:var(--x) -> expect blue",
+            className: merge2(merge2(customXRed, customXBlue), useCustomX)[0],
+            style: merge2(merge2(customXRed, customXBlue), useCustomX)[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "8. interpolation bundle on each side"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge($(orange), $(blue)) -> both in- classes kept, see report for winner",
+            className: merge2(dynColorA(hex2("e8590c")), dynColorB(hex2("1971c2")))[0],
+            style: merge2(dynColorA(hex2("e8590c")), dynColorB(hex2("1971c2")))[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "9. merge of merges"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(merge(a,b), c) -> expect navy",
+            className: merge2(merge2(assocA, assocB), assocC)[0],
+            style: merge2(merge2(assocA, assocB), assocC)[1]
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(a, merge(b,c)) -> expect navy, same as the other order",
+            className: merge2(assocA, merge2(assocB, assocC))[0],
+            style: merge2(assocA, merge2(assocB, assocC))[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "10. family atom"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(padding-left:0;padding-right:0, padding-left:4px) -> expect left 4px, right 0",
+            className: merge2(paddingBothZero, paddingLeft4)[0],
+            style: merge2(paddingBothZero, paddingLeft4)[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "11. alias"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(word-wrap:break-word, overflow-wrap:normal) -> see report for what applies",
+            className: merge2(wordWrapBreak, overflowWrapNormal)[0],
+            style: merge2(wordWrapBreak, overflowWrapNormal)[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "12. identity survives a merge"
+          }),
+          JsxRuntime.jsx("div", {
+            children: JsxRuntime.jsx("p", {
+              children: "crimson + underlined: .$(identityKeptColor) still matches after merge",
+              className: merge2(identityKeptColor, identityKeptOverride)[0],
+              style: merge2(identityKeptColor, identityKeptOverride)[1]
+            }),
+            className: identityKeptHighlight[0],
+            style: identityKeptHighlight[1]
           })
         ]
       })

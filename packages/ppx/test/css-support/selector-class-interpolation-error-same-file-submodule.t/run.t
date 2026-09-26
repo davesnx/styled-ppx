@@ -13,20 +13,20 @@ submodule instead of being emitted as a cross-module sentinel.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".a-tokvmb{color:red;}"];
-  [@css ".a-e9zk30.plain-string-selector{color:blue;}"];
+  [@css "._a_4ekvmb{color:red;}"];
+  [@css "._a_yvmv14evelu.plain-string-selector{color:blue;}"];
   [@css.bindings
     [
-      ("Input.Css.marker", "id-zr2uk1", "a-tokvmb"),
-      ("Input.wrapper", "id-4f6ye3", "a-e9zk30"),
+      ("Input.Css.marker", "_id_zr2uk1", "_a_4ekvmb"),
+      ("Input.wrapper", "_id_4f6ye3", "_a_yvmv14evelu"),
     ]
   ];
   module Css = {
-    let marker = CSS.make("label:marker id-zr2uk1 a-tokvmb", []);
+    let marker = CSS.make("label:marker _id_zr2uk1 _a_4ekvmb", []);
     let notCx2 = "plain-string-selector";
   };
   
-  let wrapper = CSS.make("label:wrapper id-4f6ye3 a-e9zk30", []);
+  let wrapper = CSS.make("label:wrapper _id_4f6ye3 _a_yvmv14evelu", []);
   
   let _ = (Css.marker, Css.notCx2, wrapper);
 

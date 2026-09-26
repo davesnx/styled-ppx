@@ -15,150 +15,150 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".a-roynbj{box-sizing:border-box;}"];
-  [@css ".a-g393ep{box-sizing:content-box;}"];
-  [@css ".a-19ks84b{outline-style:auto;}"];
-  [@css ".a-vqdro3{outline-style:none;}"];
-  [@css ".a-xlynf6{outline-style:dotted;}"];
-  [@css ".a-1hmqa57{outline-style:dashed;}"];
-  [@css ".a-1709twl{outline-style:solid;}"];
-  [@css ".a-1dqoq43{outline-style:double;}"];
-  [@css ".a-1521dni{outline-style:groove;}"];
-  [@css ".a-l7ia9n{outline-style:ridge;}"];
-  [@css ".a-rtduzy{outline-style:inset;}"];
-  [@css ".a-qe8noo{outline-style:outset;}"];
-  [@css ".a-1uer6ge{outline-offset:-5px;}"];
-  [@css ".a-1nkfqwb{outline-offset:0;}"];
-  [@css ".a-165ch4u{outline-offset:5px;}"];
-  [@css ".a-5d6l6w{resize:none;}"];
-  [@css ".a-w8wl10{resize:both;}"];
-  [@css ".a-1o40f2m{resize:horizontal;}"];
-  [@css ".a-nwqaai{resize:vertical;}"];
-  [@css ".a-bkj8c{text-overflow:clip;}"];
-  [@css ".a-bmjq4j{text-overflow:ellipsis;}"];
-  [@css ".a-1j8r2w0{cursor:default;}"];
-  [@css ".a-bc6hmx{cursor:none;}"];
-  [@css ".a-to4qqq{cursor:context-menu;}"];
-  [@css ".a-17aaee9{cursor:cell;}"];
-  [@css ".a-1vskbts{cursor:vertical-text;}"];
-  [@css ".a-lelkeh{cursor:alias;}"];
-  [@css ".a-1n3476y{cursor:copy;}"];
-  [@css ".a-1cus137{cursor:no-drop;}"];
-  [@css ".a-vdhlfv{cursor:not-allowed;}"];
-  [@css ".a-ehba41{cursor:-webkit-grab;cursor:grab;}"];
-  [@css ".a-m2aufq{cursor:-webkit-grabbing;cursor:grabbing;}"];
-  [@css ".a-3hsboj{cursor:ew-resize;}"];
-  [@css ".a-kqxfz0{cursor:ns-resize;}"];
-  [@css ".a-13l8jep{cursor:nesw-resize;}"];
-  [@css ".a-kxobzn{cursor:nwse-resize;}"];
-  [@css ".a-fmjlp0{cursor:col-resize;}"];
-  [@css ".a-12owrya{cursor:row-resize;}"];
-  [@css ".a-16euxfn{cursor:all-scroll;}"];
-  [@css ".a-vgd1sg{cursor:zoom-in;}"];
-  [@css ".a-kmtb2g{cursor:zoom-out;}"];
-  [@css ".a-1llpnps{caret-color:auto;}"];
-  [@css ".a-1q51yyj{caret-color:green;}"];
+  [@css "._a_41ynbj{box-sizing:border-box;}"];
+  [@css "._a_4193ep{box-sizing:content-box;}"];
+  [@css "._a_8p002s84b{outline-style:auto;}"];
+  [@css "._a_8p002dro3{outline-style:none;}"];
+  [@css "._a_8p002ynf6{outline-style:dotted;}"];
+  [@css "._a_8p002qa57{outline-style:dashed;}"];
+  [@css "._a_8p0029twl{outline-style:solid;}"];
+  [@css "._a_8p002oq43{outline-style:double;}"];
+  [@css "._a_8p0021dni{outline-style:groove;}"];
+  [@css "._a_8p002ia9n{outline-style:ridge;}"];
+  [@css "._a_8p002duzy{outline-style:inset;}"];
+  [@css "._a_8p0028noo{outline-style:outset;}"];
+  [@css "._a_8qr6ge{outline-offset:-5px;}"];
+  [@css "._a_8qfqwb{outline-offset:0;}"];
+  [@css "._a_8qch4u{outline-offset:5px;}"];
+  [@css "._a_9y6l6w{resize:none;}"];
+  [@css "._a_9ywl10{resize:both;}"];
+  [@css "._a_9y0f2m{resize:horizontal;}"];
+  [@css "._a_9yqaai{resize:vertical;}"];
+  [@css "._a_cwkj8c{text-overflow:clip;}"];
+  [@css "._a_cwjq4j{text-overflow:ellipsis;}"];
+  [@css "._a_5lr2w0{cursor:default;}"];
+  [@css "._a_5l6hmx{cursor:none;}"];
+  [@css "._a_5l4qqq{cursor:context-menu;}"];
+  [@css "._a_5laee9{cursor:cell;}"];
+  [@css "._a_5lkbts{cursor:vertical-text;}"];
+  [@css "._a_5llkeh{cursor:alias;}"];
+  [@css "._a_5l476y{cursor:copy;}"];
+  [@css "._a_5ls137{cursor:no-drop;}"];
+  [@css "._a_5lhlfv{cursor:not-allowed;}"];
+  [@css "._a_5lba41{cursor:-webkit-grab;cursor:grab;}"];
+  [@css "._a_5laufq{cursor:-webkit-grabbing;cursor:grabbing;}"];
+  [@css "._a_5lsboj{cursor:ew-resize;}"];
+  [@css "._a_5lxfz0{cursor:ns-resize;}"];
+  [@css "._a_5l8jep{cursor:nesw-resize;}"];
+  [@css "._a_5lobzn{cursor:nwse-resize;}"];
+  [@css "._a_5ljlp0{cursor:col-resize;}"];
+  [@css "._a_5lwrya{cursor:row-resize;}"];
+  [@css "._a_5luxfn{cursor:all-scroll;}"];
+  [@css "._a_5ld1sg{cursor:zoom-in;}"];
+  [@css "._a_5ltb2g{cursor:zoom-out;}"];
+  [@css "._a_48pnps{caret-color:auto;}"];
+  [@css "._a_481yyj{caret-color:green;}"];
   [@css
-    ".a-1ndky4e{-webkit-appearance:auto;-moz-appearance:auto;-ms-appearance:auto;appearance:auto;}"
+    "._a_33ky4e{-webkit-appearance:auto;-moz-appearance:auto;-ms-appearance:auto;appearance:auto;}"
   ];
   [@css
-    ".a-17grcf8{-webkit-appearance:none;-moz-appearance:none;-ms-appearance:none;appearance:none;}"
+    "._a_33rcf8{-webkit-appearance:none;-moz-appearance:none;-ms-appearance:none;appearance:none;}"
   ];
-  [@css ".a-1ttooc5{text-overflow:\"foo\";}"];
-  [@css ".a-1pwfzgv{text-overflow:clip clip;}"];
-  [@css ".a-r61axg{text-overflow:ellipsis clip;}"];
-  [@css ".a-2w1db5{text-overflow:\"foo\" clip;}"];
-  [@css ".a-2b9k39{text-overflow:clip ellipsis;}"];
-  [@css ".a-1m742kz{text-overflow:ellipsis ellipsis;}"];
-  [@css ".a-85ad1k{text-overflow:\"foo\" ellipsis;}"];
-  [@css ".a-n09ns{text-overflow:clip \"foo\";}"];
-  [@css ".a-9zgl00{text-overflow:ellipsis \"foo\";}"];
-  [@css ".a-l6jnzg{text-overflow:\"foo\" \"foo\";}"];
+  [@css "._a_cwooc5{text-overflow:\"foo\";}"];
+  [@css "._a_cwfzgv{text-overflow:clip clip;}"];
+  [@css "._a_cw1axg{text-overflow:ellipsis clip;}"];
+  [@css "._a_cw1db5{text-overflow:\"foo\" clip;}"];
+  [@css "._a_cw9k39{text-overflow:clip ellipsis;}"];
+  [@css "._a_cw42kz{text-overflow:ellipsis ellipsis;}"];
+  [@css "._a_cwad1k{text-overflow:\"foo\" ellipsis;}"];
+  [@css "._a_cw09ns{text-overflow:clip \"foo\";}"];
+  [@css "._a_cwgl00{text-overflow:ellipsis \"foo\";}"];
+  [@css "._a_cwjnzg{text-overflow:\"foo\" \"foo\";}"];
   [@css
-    ".a-99p0oo{-webkit-user-select:auto;-moz-user-select:auto;-ms-user-select:auto;user-select:auto;}"
-  ];
-  [@css
-    ".a-1mmoigx{-webkit-user-select:text;-moz-user-select:text;-ms-user-select:text;user-select:text;}"
+    "._a_drp0oo{-webkit-user-select:auto;-moz-user-select:auto;-ms-user-select:auto;user-select:auto;}"
   ];
   [@css
-    ".a-9y6172{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}"
+    "._a_droigx{-webkit-user-select:text;-moz-user-select:text;-ms-user-select:text;user-select:text;}"
   ];
   [@css
-    ".a-1rsyfv1{-webkit-user-select:contain;-moz-user-select:contain;-ms-user-select:contain;user-select:contain;}"
+    "._a_dr6172{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}"
   ];
   [@css
-    ".a-1udvaqc{-webkit-user-select:all;-moz-user-select:all;-ms-user-select:all;user-select:all;}"
+    "._a_dryfv1{-webkit-user-select:contain;-moz-user-select:contain;-ms-user-select:contain;user-select:contain;}"
+  ];
+  [@css
+    "._a_drvaqc{-webkit-user-select:all;-moz-user-select:all;-ms-user-select:all;user-select:all;}"
   ];
   
-  CSS.make("a-roynbj", []);
-  CSS.make("a-g393ep", []);
-  CSS.make("a-19ks84b", []);
-  CSS.make("a-vqdro3", []);
-  CSS.make("a-xlynf6", []);
-  CSS.make("a-1hmqa57", []);
-  CSS.make("a-1709twl", []);
-  CSS.make("a-1dqoq43", []);
-  CSS.make("a-1521dni", []);
-  CSS.make("a-l7ia9n", []);
-  CSS.make("a-rtduzy", []);
-  CSS.make("a-qe8noo", []);
-  CSS.make("a-1uer6ge", []);
-  CSS.make("a-1nkfqwb", []);
-  CSS.make("a-165ch4u", []);
-  CSS.make("a-5d6l6w", []);
-  CSS.make("a-w8wl10", []);
-  CSS.make("a-1o40f2m", []);
-  CSS.make("a-nwqaai", []);
-  CSS.make("a-bkj8c", []);
-  CSS.make("a-bmjq4j", []);
+  CSS.make("_a_41ynbj", []);
+  CSS.make("_a_4193ep", []);
+  CSS.make("_a_8p002s84b", []);
+  CSS.make("_a_8p002dro3", []);
+  CSS.make("_a_8p002ynf6", []);
+  CSS.make("_a_8p002qa57", []);
+  CSS.make("_a_8p0029twl", []);
+  CSS.make("_a_8p002oq43", []);
+  CSS.make("_a_8p0021dni", []);
+  CSS.make("_a_8p002ia9n", []);
+  CSS.make("_a_8p002duzy", []);
+  CSS.make("_a_8p0028noo", []);
+  CSS.make("_a_8qr6ge", []);
+  CSS.make("_a_8qfqwb", []);
+  CSS.make("_a_8qch4u", []);
+  CSS.make("_a_9y6l6w", []);
+  CSS.make("_a_9ywl10", []);
+  CSS.make("_a_9y0f2m", []);
+  CSS.make("_a_9yqaai", []);
+  CSS.make("_a_cwkj8c", []);
+  CSS.make("_a_cwjq4j", []);
   
-  CSS.make("a-1j8r2w0", []);
-  CSS.make("a-bc6hmx", []);
-  CSS.make("a-to4qqq", []);
-  CSS.make("a-17aaee9", []);
-  CSS.make("a-1vskbts", []);
-  CSS.make("a-lelkeh", []);
-  CSS.make("a-1n3476y", []);
-  CSS.make("a-1cus137", []);
-  CSS.make("a-vdhlfv", []);
-  CSS.make("a-ehba41", []);
-  CSS.make("a-m2aufq", []);
-  CSS.make("a-3hsboj", []);
-  CSS.make("a-kqxfz0", []);
-  CSS.make("a-13l8jep", []);
-  CSS.make("a-kxobzn", []);
-  CSS.make("a-fmjlp0", []);
-  CSS.make("a-12owrya", []);
-  CSS.make("a-16euxfn", []);
-  CSS.make("a-vgd1sg", []);
-  CSS.make("a-kmtb2g", []);
-  CSS.make("a-1llpnps", []);
-  CSS.make("a-1q51yyj", []);
+  CSS.make("_a_5lr2w0", []);
+  CSS.make("_a_5l6hmx", []);
+  CSS.make("_a_5l4qqq", []);
+  CSS.make("_a_5laee9", []);
+  CSS.make("_a_5lkbts", []);
+  CSS.make("_a_5llkeh", []);
+  CSS.make("_a_5l476y", []);
+  CSS.make("_a_5ls137", []);
+  CSS.make("_a_5lhlfv", []);
+  CSS.make("_a_5lba41", []);
+  CSS.make("_a_5laufq", []);
+  CSS.make("_a_5lsboj", []);
+  CSS.make("_a_5lxfz0", []);
+  CSS.make("_a_5l8jep", []);
+  CSS.make("_a_5lobzn", []);
+  CSS.make("_a_5ljlp0", []);
+  CSS.make("_a_5lwrya", []);
+  CSS.make("_a_5luxfn", []);
+  CSS.make("_a_5ld1sg", []);
+  CSS.make("_a_5ltb2g", []);
+  CSS.make("_a_48pnps", []);
+  CSS.make("_a_481yyj", []);
   
-  CSS.make("a-1ndky4e", []);
-  CSS.make("a-17grcf8", []);
+  CSS.make("_a_33ky4e", []);
+  CSS.make("_a_33rcf8", []);
   
-  CSS.make("a-bkj8c", []);
-  CSS.make("a-bmjq4j", []);
+  CSS.make("_a_cwkj8c", []);
+  CSS.make("_a_cwjq4j", []);
   
-  CSS.make("a-1ttooc5", []);
-  CSS.make("a-1pwfzgv", []);
-  CSS.make("a-r61axg", []);
+  CSS.make("_a_cwooc5", []);
+  CSS.make("_a_cwfzgv", []);
+  CSS.make("_a_cw1axg", []);
   
-  CSS.make("a-2w1db5", []);
-  CSS.make("a-2b9k39", []);
-  CSS.make("a-1m742kz", []);
+  CSS.make("_a_cw1db5", []);
+  CSS.make("_a_cw9k39", []);
+  CSS.make("_a_cw42kz", []);
   
-  CSS.make("a-85ad1k", []);
+  CSS.make("_a_cwad1k", []);
   
-  CSS.make("a-n09ns", []);
-  CSS.make("a-9zgl00", []);
+  CSS.make("_a_cw09ns", []);
+  CSS.make("_a_cwgl00", []);
   
-  CSS.make("a-l6jnzg", []);
-  CSS.make("a-99p0oo", []);
-  CSS.make("a-1mmoigx", []);
-  CSS.make("a-9y6172", []);
-  CSS.make("a-1rsyfv1", []);
-  CSS.make("a-1udvaqc", []);
+  CSS.make("_a_cwjnzg", []);
+  CSS.make("_a_drp0oo", []);
+  CSS.make("_a_droigx", []);
+  CSS.make("_a_dr6172", []);
+  CSS.make("_a_dryfv1", []);
+  CSS.make("_a_drvaqc", []);
 
   $ dune build

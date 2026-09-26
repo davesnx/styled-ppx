@@ -15,20 +15,20 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".a-eacf4s{flow-from:none;}"];
-  [@css ".a-12dxqeo{flow-from:named-flow;}"];
-  [@css ".a-1gnxqr6{flow-into:none;}"];
-  [@css ".a-1p2ywcc{flow-into:named-flow;}"];
-  [@css ".a-11m8xd9{flow-into:named-flow element;}"];
-  [@css ".a-yotzaz{flow-into:named-flow content;}"];
-  [@css ".a-u82igy{region-fragment:auto;}"];
-  [@css ".a-8r95p4{region-fragment:break;}"];
+  [@css "._a_fucf4s{flow-from:none;}"];
+  [@css "._a_fuxqeo{flow-from:named-flow;}"];
+  [@css "._a_fvxqr6{flow-into:none;}"];
+  [@css "._a_fvywcc{flow-into:named-flow;}"];
+  [@css "._a_fv8xd9{flow-into:named-flow element;}"];
+  [@css "._a_fvtzaz{flow-into:named-flow content;}"];
+  [@css "._a_gd2igy{region-fragment:auto;}"];
+  [@css "._a_gd95p4{region-fragment:break;}"];
   
-  CSS.make("a-eacf4s", []);
-  CSS.make("a-12dxqeo", []);
-  CSS.make("a-1gnxqr6", []);
-  CSS.make("a-1p2ywcc", []);
-  CSS.make("a-11m8xd9", []);
-  CSS.make("a-yotzaz", []);
-  CSS.make("a-u82igy", []);
-  CSS.make("a-8r95p4", []);
+  CSS.make("_a_fucf4s", []);
+  CSS.make("_a_fuxqeo", []);
+  CSS.make("_a_fvxqr6", []);
+  CSS.make("_a_fvywcc", []);
+  CSS.make("_a_fv8xd9", []);
+  CSS.make("_a_fvtzaz", []);
+  CSS.make("_a_gd2igy", []);
+  CSS.make("_a_gd95p4", []);

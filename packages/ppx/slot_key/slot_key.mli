@@ -151,15 +151,21 @@ type t = {
         property). [Some m] = a proper subset (a lone longhand, or a "family
         atom" mixing some-but-not-all members - see slot_key.ml's [of_atom]). *)
   bundle : bool;
-    (** True when any declaration in this atom carries a [$(...)] value
-        interpolation - [Css_file.re] already, legitimately, shares one class
-        across several such declarations from one binding today (see
-        slot_key.ml's [of_atom] for the exact duplicated check). {!removes}
-        never drops a bundle atom and never lets a bundle atom drop another -
-        both directions are unconditionally false whenever either side is a
-        bundle. Encoded as its own [in-] class-name prefix (see [Class_format]),
-        which needs no context/family/mask fields at all, since nothing about
-        them is ever consulted. *)
+    (** True when [Css_file.re] is treating this atom as part of a REAL bundle:
+        two or more interpolating declarations from the same block that
+        interpolate the SAME source path (transitively - see [Css_file.re]'s
+        [transform_rule_list]) sharing one class. A single interpolating
+        declaration, or one whose path no sibling declaration shares, is NOT a
+        bundle - it mints its own real, merge-participating slot-keyed class
+        instead (see [Class_format.slot_class]). {!of_atom} always returns
+        [false] here: bundle-hood depends on how many OTHER declarations in the
+        block share this atom's path, which one atom's own AST can't say, and
+        the real pipeline never needs it to say [true] either, since a genuine
+        bundle's class is minted directly by [Class_format.bundle_class],
+        bypassing this type entirely (see slot_key.ml's [of_atom] for the full
+        reasoning). {!removes} still exempts a bundle atom in both directions
+        when one is constructed with [bundle = true] by hand (a test does this
+        to exercise that exemption; nothing in the real pipeline does). *)
 }
 
 (** Build the slot key for one atomized rule, exactly as [Css_file.re]'s
@@ -173,7 +179,8 @@ type t = {
     handles that shape correctly today via the same multi-declaration-group path
     used for same-property groups: their combined mask is the OR of every
     declaration's own mask. Returns [None] only for a rule shape [atomize_rules]
-    never actually produces. *)
+    never actually produces. The returned {!t.bundle} is always [false] - see
+    its own doc for why. *)
 val of_atom : Styled_ppx_css_parser.Ast.rule -> t option
 
 (** [removes ~former ~latter] : true when, in a [CSS.merge] whose right argument
