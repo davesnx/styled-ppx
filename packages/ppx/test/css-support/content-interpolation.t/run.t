@@ -26,22 +26,22 @@ counter().
   @property --countersStyled-x8q6x3{syntax:"*";inherits:false;}
   @layer styled-ppx.global, styled-ppx.descendant, styled-ppx.base, styled-ppx.conditional;
   @layer styled-ppx.base {
-  .a-4wkia9{content:var(--singleCounter-ek68js);}
-  .a-4winop{content:var(--singleCounterNoStyle-2521aj);}
-  .a-4wrgn5{content:var(--singleText-5c1v76);}
-  .a-4w4bht{content:var(--counterDot-17rsat4);}
-  .a-4wxo1r{content:var(--counterSpace-jvqeh9);}
-  .a-4wwury{content:var(--counterRoman-16oxrf4);}
-  .a-4wow5p{content:var(--bracketed-1vvjf8x);}
-  .a-4wx65k{content:var(--content_value-jr2773);}
-  .a-4wi9m2{content:counter(var(--myCounterName-dew6fb), lower-alpha);}
-  .a-4woizr{content:counter(chapter, var(--myCounterStyle-o4ly7x));}
-  .a-4wb9bz{content:counter(var(--myCounterName-1re0z52), var(--myCounterStyle-1lfdsp0));}
-  .a-4wcaxs{content:counters(var(--myCounterName-hs66zo), ".", var(--myCounterStyle-5pdc5a));}
-  .a-4wdhko{content:counter(ol);}
-  .a-4wtirf{content:counter(chapter);}
-  .a-4wyh7z{content:counters(section, ".");}
-  .a-4wo8sv{content:counters(section, ".", decimal-leading-zero);}
-  .a-4w698h{content:var(--countersNoStyle-g89gy3);}
-  .a-4wj96l{content:var(--countersStyled-x8q6x3);}
+  ._a_4wkia9{content:var(--singleCounter-ek68js);}
+  ._a_4winop{content:var(--singleCounterNoStyle-2521aj);}
+  ._a_4wrgn5{content:var(--singleText-5c1v76);}
+  ._a_4w4bht{content:var(--counterDot-17rsat4);}
+  ._a_4wxo1r{content:var(--counterSpace-jvqeh9);}
+  ._a_4wwury{content:var(--counterRoman-16oxrf4);}
+  ._a_4wow5p{content:var(--bracketed-1vvjf8x);}
+  ._a_4wx65k{content:var(--content_value-jr2773);}
+  ._a_4wi9m2{content:counter(var(--myCounterName-dew6fb), lower-alpha);}
+  ._a_4woizr{content:counter(chapter, var(--myCounterStyle-o4ly7x));}
+  ._a_4wb9bz{content:counter(var(--myCounterName-1re0z52), var(--myCounterStyle-1lfdsp0));}
+  ._a_4wcaxs{content:counters(var(--myCounterName-hs66zo), ".", var(--myCounterStyle-5pdc5a));}
+  ._a_4wdhko{content:counter(ol);}
+  ._a_4wtirf{content:counter(chapter);}
+  ._a_4wyh7z{content:counters(section, ".");}
+  ._a_4wo8sv{content:counters(section, ".", decimal-leading-zero);}
+  ._a_4w698h{content:var(--countersNoStyle-g89gy3);}
+  ._a_4wj96l{content:var(--countersStyled-x8q6x3);}
   }

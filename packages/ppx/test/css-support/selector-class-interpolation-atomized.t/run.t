@@ -13,19 +13,19 @@ A multi-declaration source binding fans out into a compound chain
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".a-5r08qs{display:flex;}"];
-  [@css ".a-6fq77g{gap:1rem;}"];
-  [@css ".a-ybcbs4etymk.id-9un6he{color:red;}"];
+  [@css "._a_5r08qs{display:flex;}"];
+  [@css "._a_6fq77g{gap:1rem;}"];
+  [@css "._a_a8tv84efvbl._id_9un6he{color:red;}"];
   [@css.bindings
     [
-      ("Input.composed", "id-9un6he", "a-5r08qs a-6fq77g"),
-      ("Input.user", "id-wa05kx", "a-ybcbs4etymk"),
+      ("Input.composed", "_id_9un6he", "_a_5r08qs _a_6fq77g"),
+      ("Input.user", "_id_wa05kx", "_a_a8tv84efvbl"),
     ]
   ];
   
-  let composed = CSS.make("label:composed id-9un6he a-5r08qs a-6fq77g", []);
+  let composed = CSS.make("label:composed _id_9un6he _a_5r08qs _a_6fq77g", []);
   
-  let user = CSS.make("label:user id-wa05kx a-ybcbs4etymk", []);
+  let user = CSS.make("label:user _id_wa05kx _a_a8tv84efvbl", []);
   
   let _ = (composed, user);
 

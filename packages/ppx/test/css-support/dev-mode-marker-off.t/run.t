@@ -15,19 +15,19 @@ lock in that the marker disappears in production regardless of the default.
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css.config [("env", "production")]];
-  [@css ".a-5r08qs{display:flex;}"];
-  [@css ".a-94zrbw{padding:12px;}"];
-  [@css ".a-4ekvmb{color:red;}"];
+  [@css "._a_5r08qs{display:flex;}"];
+  [@css "._a_94zrbw{padding:12px;}"];
+  [@css "._a_4ekvmb{color:red;}"];
   [@css.bindings
     [
-      ("Input.layout", "id-1jj5tmt", "a-5r08qs a-94zrbw"),
-      ("Input.button", "id-l55coe", "a-4ekvmb"),
+      ("Input.layout", "_id_1jj5tmt", "_a_5r08qs _a_94zrbw"),
+      ("Input.button", "_id_l55coe", "_a_4ekvmb"),
     ]
   ];
   
-  let layout = CSS.make("id-1jj5tmt a-5r08qs a-94zrbw", []);
+  let layout = CSS.make("_id_1jj5tmt _a_5r08qs _a_94zrbw", []);
   
-  let button = CSS.make("id-l55coe a-4ekvmb", []);
+  let button = CSS.make("_id_l55coe _a_4ekvmb", []);
   
   let _ = (layout, button);
 

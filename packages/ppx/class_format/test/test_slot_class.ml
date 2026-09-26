@@ -64,8 +64,8 @@ let examples_tests =
           (Printf.sprintf "%s: %S starts with %s or %s" label c
              Class_format.atom_prefix Class_format.bundle_prefix)
           true
-          (starts_with (Class_format.atom_prefix ^ "-") c
-          || starts_with (Class_format.bundle_prefix ^ "-") c)))
+          (starts_with Class_format.atom_prefix c
+          || starts_with Class_format.bundle_prefix c)))
     examples
 
 let base_length = Class_format.floor_of_prefix Class_format.atom_prefix
@@ -78,14 +78,14 @@ let format_tests =
       let c = class_of "height: 0;" in
       check_int "length" base_length (String.length c));
     Alcotest_extra.test
-      "an !important atom uses the SAME a- prefix as a plain atom - there is \
+      "an !important atom uses the SAME _a_ prefix as a plain atom - there is \
        no separate important-atom prefix - but is context_width chars longer, \
        since !important is folded into the context key and a base atom's \
        context is otherwise free" (fun () ->
       let plain = class_of "color: red;" in
       let important = class_of "color: red !important;" in
-      check_bool "same a- prefix" true
-        (starts_with (Class_format.atom_prefix ^ "-") important);
+      check_bool "same _a_ prefix" true
+        (starts_with Class_format.atom_prefix important);
       check_int "context_width chars longer (importance costs a context field)"
         (String.length plain + Class_format.context_width)
         (String.length important));
@@ -151,32 +151,30 @@ let format_tests =
     Alcotest_extra.test
       "a single interpolating declaration is NOT a bundle: class_of (via \
        Slot_key.of_atom, which always returns bundle = false) mints a real, \
-       structural a- class for it, same as any other atom - Css_file.re only \
+       structural _a_ class for it, same as any other atom - Css_file.re only \
        reaches for Class_format.bundle_class directly when two or more \
        interpolating declarations share one class" (fun () ->
       let c = class_of "color: $(theme);" in
-      check_bool "a- prefix, not in-" true
-        (starts_with (Class_format.atom_prefix ^ "-") c));
+      check_bool "_a_ prefix, not _in_" true
+        (starts_with Class_format.atom_prefix c));
     Alcotest_extra.test
       "Class_format.bundle_class (Css_file.re's real, two-or-more-declaration \
-       bundle path) uses the in- prefix, carries none of the other fields, and \
-       its hash is exactly the same unpadded Murmur2 digest \
+       bundle path) uses the _in_ prefix, carries none of the other fields, \
+       and its hash is exactly the same unpadded Murmur2 digest \
        class_and_namespace already computes for a single atom - only the \
        prefix changed, not the hash algorithm or width" (fun () ->
       let content = Render.rule (atom_of "color: $(theme);") in
       let c = Class_format.bundle_class content in
-      check_bool "in- prefix" true
-        (starts_with (Class_format.bundle_prefix ^ "-") c);
-      check_string "in- + unpadded Murmur2.default"
-        (Class_format.bundle_prefix ^ "-" ^ Murmur2.default content)
+      check_bool "_in_ prefix" true (starts_with Class_format.bundle_prefix c);
+      check_string "_in_ + unpadded Murmur2.default"
+        (Class_format.bundle_prefix ^ Murmur2.default content)
         c;
       check_bool
-        "length is at most len(in-) + bundle_value_width (unpadded, so can be \
+        "length is at most len(_in_) + bundle_value_width (unpadded, so can be \
          shorter)"
         true
         (String.length c
         <= String.length Class_format.bundle_prefix
-           + 1
            + Class_format.bundle_value_width));
     Alcotest_extra.test
       "slot_class's own bundle branch (never reached by a real Slot_key.t - \

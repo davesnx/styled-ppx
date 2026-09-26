@@ -38,24 +38,24 @@ let bundle_value_width = 7
 
 (* The prefixes themselves, not the field widths above. Named here (not
    just inlined as string literals in [slot_class]/[bundle_class]) so a
-   parser has one place to read them from. The "-" separator is not part
-   of the prefix constant; every site below adds it explicitly.
+   parser has one place to read them from. Each prefix already carries its
+   own trailing delimiter (the second "_"); no site below adds a separator.
 
    There is no separate important-atom prefix: [!important] folds into
    {!Slot_key.context_key} instead (see slot_key.mli's [context] doc), so
    an important atom is an ordinary [atom_prefix] atom whose context
    happens to be non-empty - it pays for a context field instead of a
    different prefix letter. *)
-let atom_prefix = "a"
-let bundle_prefix = "in"
+let atom_prefix = "_a_"
+let bundle_prefix = "_in_"
 
-(* A non-bundle atom's minimum length: its own prefix + "-" + the fixed
-   family + value floor, before any of [possible_extra_lengths] applies.
-   Takes a prefix argument (rather than hard-coding [atom_prefix]) purely
-   so a caller/test can compute a floor from a prefix string without
-   duplicating the arithmetic; only [atom_prefix] is ever passed today. *)
-let floor_of_prefix prefix =
-  String.length prefix + 1 + family_width + value_width
+(* A non-bundle atom's minimum length: its own prefix (delimiter included)
+   plus the fixed family + value floor, before any of
+   [possible_extra_lengths] applies. Takes a prefix argument (rather than
+   hard-coding [atom_prefix]) purely so a caller/test can compute a floor
+   from a prefix string without duplicating the arithmetic; only
+   [atom_prefix] is ever passed today. *)
+let floor_of_prefix prefix = String.length prefix + family_width + value_width
 
 (* The four "extra" lengths beyond the fixed [family_width + value_width]
    floor a non-bundle atom can have - context, mask, extended, or context
@@ -83,7 +83,7 @@ let possible_extra_lengths =
 (* Opaque to CSS.merge in both directions (see Slot_key.removes) - no
    context/family/mask fields, since nothing about them is ever consulted
    for a bundle atom. Exposed standalone (not just inlined in [slot_class])
-   so [Hash_class] can mint a real [in-] class for [Css_file.re]'s
+   so [Hash_class] can mint a real [_in_] class for [Css_file.re]'s
    existing bundle path without needing to build a full, otherwise-unused
    [Slot_key.t] just to reach it. Uses [Murmur2.default] directly, NOT
    [hashed_field] - unpadded, so a bundle atom's hash digits are exactly
@@ -92,7 +92,7 @@ let possible_extra_lengths =
    would make short hashes needlessly longer than today for no benefit -
    nothing about a bundle atom is ever parsed back apart, so a fixed
    width buys this field nothing). *)
-let bundle_class content = bundle_prefix ^ "-" ^ Murmur2.default content
+let bundle_class content = bundle_prefix ^ Murmur2.default content
 
 let slot_class (slot : Slot_key.t) content =
   if slot.bundle then bundle_class content
@@ -118,5 +118,5 @@ let slot_class (slot : Slot_key.t) content =
       | Some m -> to_base36_padded ~width:mask_width m
     in
     let value_part = hashed_field ~width:value_width content in
-    Printf.sprintf "%s-%s%s%s%s%s" atom_prefix context_part family_part
+    Printf.sprintf "%s%s%s%s%s%s" atom_prefix context_part family_part
       extended_part mask_part value_part)

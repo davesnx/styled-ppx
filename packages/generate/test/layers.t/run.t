@@ -11,13 +11,13 @@ layers.t` for a library's rules split across tiers.
   > [@@@css.config [("library-name", "z_base")]]
   > [@@@css "@property --z-base-color { syntax: '<color>'; inherits: false; initial-value: red; }"]
   > [@@@css "@keyframes z-base-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }"]
-  > [@@@css ".a-basewidget{color:red;}"]
+  > [@@@css "._a_basewidget{color:red;}"]
   > let widget () = ()
   > EOF
 
   $ cat > a_app/main.ml <<EOF
   > [@@@css.config [("library-name", "a_app")]]
-  > [@@@css ".a-appmain{color:blue;}"]
+  > [@@@css "._a_appmain{color:blue;}"]
   > let _ = Z_base.widget
   > EOF
 
@@ -29,9 +29,9 @@ layers.t` for a library's rules split across tiers.
   @layer styled-ppx.base {
   @layer z_base, a_app;
   @layer z_base {
-  .a-basewidget{color:red;}
+  ._a_basewidget{color:red;}
   }
   @layer a_app {
-  .a-appmain{color:blue;}
+  ._a_appmain{color:blue;}
   }
   }

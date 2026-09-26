@@ -4,7 +4,7 @@ segment, with every character outside `[A-Za-z0-9_-]` replaced by `_`.
   $ mkdir -p lib/na.tive
 
   $ cat > lib/na.tive/x.ml <<EOF
-  > [@@@css ".a-nativex{color:teal;}"]
+  > [@@@css "._a_nativex{color:teal;}"]
   > let x = 1
   > EOF
 
@@ -14,7 +14,7 @@ segment, with every character outside `[A-Za-z0-9_-]` replaced by `_`.
   @layer styled-ppx.base {
   @layer na_tive;
   @layer na_tive {
-  .a-nativex{color:teal;}
+  ._a_nativex{color:teal;}
   }
   }
 
@@ -29,12 +29,12 @@ both libraries once.
 
   $ cat > foo.bar/a.ml <<EOF
   > [@@@css.config [("library-name", "foo.bar")]]
-  > [@@@css ".a-dotlib{color:navy;}"]
+  > [@@@css "._a_dotlib{color:navy;}"]
   > EOF
 
   $ cat > foo_bar/b.ml <<EOF
   > [@@@css.config [("library-name", "foo_bar")]]
-  > [@@@css ".a-underscorelib{color:maroon;}"]
+  > [@@@css "._a_underscorelib{color:maroon;}"]
   > EOF
 
   $ styled-ppx.generate --layers foo.bar/a.ml foo_bar/b.ml
@@ -44,9 +44,9 @@ both libraries once.
   @layer styled-ppx.base {
   @layer foo_bar;
   @layer foo_bar {
-  .a-dotlib{color:navy;}
+  ._a_dotlib{color:navy;}
   }
   @layer foo_bar {
-  .a-underscorelib{color:maroon;}
+  ._a_underscorelib{color:maroon;}
   }
   }

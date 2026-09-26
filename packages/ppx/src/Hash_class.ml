@@ -31,8 +31,8 @@
 
    The emitted identifier families
    -------------------------------
-     class name   `a-<context?><family><mask?><value>`     (class_and_namespace,
-                  or `a-<hash(content)>` for a rule shape    via Class_format.slot_class)
+     class name   `_a_<context?><family><mask?><value>`    (class_and_namespace,
+                  or `_a_<hash(content)>` for a rule shape   via Class_format.slot_class)
                   with no {!Slot_key.t} (should not happen
                   for a real atom - see {!class_of_content})
      namespace    `css-<hash(content)>`                    (namespace_of_content)
@@ -41,11 +41,11 @@
                   never changes; the seed for its vars
      variable     `var-<hash(namespace \0 path \0 type_key)>`   (variable)
      occurrence   `<variable>_<n>` when a name repeats in one declaration
-     identity     `id-<hash(cli_namespace \0 module \0 scope \0 name
-                  [\0 occurrence])>`                     (identity_class)
+     identity     `_id_<hash(cli_namespace \0 module \0 scope \0 name
+                  [\0 occurrence])>`                    (identity_class)
                   build-independent handle for a named binding; never a
                   path or dune library name
-     keyframes    `k-<hash(body)>`                         (keyframe_name)
+     keyframes    `_k_<hash(body)>`                        (keyframe_name)
      global key   `global-<hash(rule)>`                    (global_key)
      scoped ns    `<kind> \0 <module> \0 <scope> \0 <hash(rules)>` (scoped_namespace)
 
@@ -58,7 +58,7 @@
    need to be told apart by the value field alone, since the bucket fields
    already differ). The *variable* substituted into that declaration must
    honour the same invariant too: otherwise two modules that emit the
-   byte-identical `.a-<h>-header{background-color:var(--...)}` rule can
+   byte-identical `._a_<h>-header{background-color:var(--...)}` rule can
    disagree on the `var(--...)` target, and an element that sets one
    variable ends up matched by a rule that reads the other -> undefined
    custom property -> missing style.
@@ -104,7 +104,7 @@
 
    Class vs. namespace prefixes
    -----------------------------
-   [class_of_content]'s prefix ([a-]) and [namespace_of_content]'s prefix
+   [class_of_content]'s prefix ([_a_]) and [namespace_of_content]'s prefix
    ([css-]) differ, and must go on differing: [namespace_of_content] is a
    hash *input* to [variable] (see [nul_join [namespace; path; type_key]]
    above), so changing its literal string would silently rename every
@@ -113,7 +113,7 @@
    seed every variable name is a pure function of. [identity_class] and
    [keyframe_name] carry no such downstream hash consumer (each result is
    a leaf identifier, never fed into another hash - see their own doc
-   comments), so their prefixes ([id-], [k-]) are free to be whatever is
+   comments), so their prefixes ([_id_], [_k_]) are free to be whatever is
    most readable.
 
    Stability contract
@@ -143,7 +143,7 @@ let namespace_of_content content = Printf.sprintf "css-%s" (hash content)
    {!Slot_key.t} at all, which in practice never happens for a real atom
    (see {!Slot_key.of_atom}'s own doc: it returns [None] only for a rule
    shape [atomize_rules] never actually produces). *)
-let class_of_content content = Printf.sprintf "a-%s" (hash content)
+let class_of_content content = Printf.sprintf "_a_%s" (hash content)
 
 (* An atom's class name and its namespace, from a single content hash - two
    different literal strings sharing one hash input (see the header's
@@ -161,7 +161,7 @@ let class_of_content content = Printf.sprintf "a-%s" (hash content)
    -declaration bundle mints its class directly via {!bundle_class_and_namespace}
    below, never through this function or [Slot_key] at all - so
    [Class_format.slot_class] always takes its real, structural encoding
-   here, never its [in-] branch. *)
+   here, never its [_in_] branch. *)
 let class_and_namespace ~slot content =
   let namespace = namespace_of_content content in
   let class_name =
@@ -173,7 +173,7 @@ let class_and_namespace ~slot content =
 
 (* Same shape as [class_and_namespace] (a [(class_name, namespace)] pair
    from one content hash), for [Css_file.re]'s bundle path specifically: the
-   CLASS half gets the [in-] prefix (see [Class_format.bundle_class]) so
+   CLASS half gets the [_in_] prefix (see [Class_format.bundle_class]) so
    `CSS.merge`'s future runtime and `generate`'s atom-class collision check
    can recognize a bundle atom and treat it as opaque - never dropped,
    never dropping another atom, never flagged as a collision even though
@@ -267,11 +267,15 @@ let scoped_namespace ~kind ~module_name ~scope ~rendered_rules =
   let rules_key = String.concat "\n" rendered_rules in
   nul_join [ kind; module_name; scope_key; hash rules_key ]
 
-(* `@keyframes` name from its rendered body: `k-<hash(body)>`. A leaf
+(* `@keyframes` name from its rendered body: `_k_<hash(body)>`. A leaf
    identifier - its variable namespace comes from [scoped_namespace]
    instead (module + scope + rendered-rules, not this string), so renaming
-   this prefix cannot rename any `var(--...)` name. *)
-let keyframe_name rendered_body = Printf.sprintf "k-%s" (hash rendered_body)
+   this prefix cannot rename any `var(--...)` name. A valid CSS
+   <custom-ident>: starts with `_`, which is a valid identifier-start
+   character, so it needs no escaping in the `@keyframes` name, the
+   `animation-name` value that references it, or the runtime
+   [CSS.Types.AnimationName] that carries it dynamically. *)
+let keyframe_name rendered_body = Printf.sprintf "_k_%s" (hash rendered_body)
 
 (* Dedup key for a single [%styled.global] rule: `global-<hash(rule)>`. *)
 let global_key rendered_rule = Printf.sprintf "global-%s" (hash rendered_rule)
@@ -289,7 +293,7 @@ let global_key rendered_rule = Printf.sprintf "global-%s" (hash rendered_rule)
 let slot_class = Class_format.slot_class
 
 (* The build-independent identity class for a named binding:
-   `id-<hash(cli_namespace \0 module_name \0 scope \0 name [\0 occurrence])>`.
+   `_id_<hash(cli_namespace \0 module_name \0 scope \0 name [\0 occurrence])>`.
    A leaf identifier, never fed into another hash, so renaming this prefix
    cannot rename any `var(--...)` name. Inputs are deliberately the ones an
    author writes, never a physical path or dune library name (those differ
@@ -309,4 +313,4 @@ let identity_class ~namespace ~module_name ~scope ~name ~occurrence =
   let parts =
     if occurrence > 1 then parts @ [ string_of_int occurrence ] else parts
   in
-  Printf.sprintf "id-%s" (hash (nul_join parts))
+  Printf.sprintf "_id_%s" (hash (nul_join parts))

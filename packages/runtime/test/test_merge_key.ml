@@ -216,6 +216,39 @@ let two_declaration_bundle_still_exempt () =
   Alcotest_extra.assert_string (CSS.className merged)
     (Printf.sprintf "%s %s" bundle_class (class_of "padding-top: 0;"))
 
+(* The `_a_` rename (atom `a-` -> `_a_`) landed: `Merge_key.atom_prefix` now
+   recognizes only `_a_`, so a hand-written class that merely starts with the
+   OLD `a-` shape, like `"a-header"`, is no longer read as an atom at all -
+   {!Merge_key.parse_atom} returns [None] for it, and {!merge_class_names}
+   keeps every token neither side recognizes as an atom, unconditionally.
+   This is the CSS.merge-visible behavior change the rename was for: a
+   hand-written `a-header` class used to collide with a real atom (see
+   {!hand_written_class_ambiguity_persists_under_the_new_prefix} below); now
+   it doesn't, because `a-` isn't a recognized prefix shape any more. *)
+let hand_written_a_dash_class_is_no_longer_misread_as_an_atom () =
+  Alcotest_extra.assert_string
+    (Merge_key.merge_class_names "label:x a-header" "a-he1234")
+    "label:x a-header a-he1234"
+
+(* Known, documented limit, shifted to the new prefix: `Merge_key.parse_atom`
+   still recognizes a class by PREFIX and LENGTH alone (it has no way to ask
+   the ppx "did you really mint this one?"), so a hand-written author class
+   that happens to start with `_a_` and land on one of the six lengths a real
+   atom can have is still indistinguishable from a real one. `"_a_header"`
+   (body "header", 6 chars - exactly the family+value floor, no
+   context/mask/extended) and `"_a_he1234"` (body "he1234", the same 6 chars)
+   both parse as ordinary, same-family, same-context, full-mask atoms, so
+   `removes` drops the former - a real author class silently vanishes from
+   the className string. Pinned as CURRENT, ACCEPTED behavior: the rename
+   narrows the odds of an accidental collision (a hand-written class now
+   needs to start with the less-common `_a_` sequence, not just `a-`), but
+   does not and cannot eliminate them - this test documents that the limit
+   persists, just at the new prefix. *)
+let hand_written_class_ambiguity_persists_under_the_new_prefix () =
+  Alcotest_extra.assert_string
+    (Merge_key.merge_class_names "label:x _a_header" "_a_he1234")
+    "label:x _a_he1234"
+
 (* -- Merge_key's own hardcoded constants, cross-checked against the real
    Slot_key/Class_format values, not just against a comment. Merge_key
    cannot depend on Slot_key for real (see its own doc comment: it ships
@@ -268,6 +301,14 @@ let tests =
     Alcotest_extra.test
       "a real two-declaration bundle stays exempt from merge in both directions"
       two_declaration_bundle_still_exempt;
+    Alcotest_extra.test
+      "a hand-written a-header class is no longer misread as an atom now that \
+       only _a_ is a recognized prefix"
+      hand_written_a_dash_class_is_no_longer_misread_as_an_atom;
+    Alcotest_extra.test
+      "known limit, shifted: a hand-written _a_<6 chars> class is \
+       indistinguishable from a real atom and can be silently dropped"
+      hand_written_class_ambiguity_persists_under_the_new_prefix;
     Alcotest_extra.test
       "a later shorthand drops an earlier lone longhand it covers (not a limit)"
       longhand_then_shorthand_drops_longhand;

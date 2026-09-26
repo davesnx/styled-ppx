@@ -10,7 +10,7 @@ nothing to merge.
 
   $ cat > z_base/z_base.ml <<EOF
   > [@@@css.config [("library-name", "z_base")]]
-  > [@@@css ".a-basewidget{color:red;}"]
+  > [@@@css "._a_basewidget{color:red;}"]
   > let widget () = ()
   > EOF
 
@@ -27,7 +27,7 @@ reaches `z_base` only through `Plain`, and `z_base` is still emitted first.
 
   $ cat > a_app/main.ml <<EOF
   > [@@@css.config [("library-name", "a_app")]]
-  > [@@@css ".a-appmain{color:blue;}"]
+  > [@@@css "._a_appmain{color:blue;}"]
   > let _ = Plain.widget
   > EOF
 
@@ -45,10 +45,10 @@ reaches `z_base` only through `Plain`, and `z_base` is still emitted first.
   @layer styled-ppx.base {
   @layer z_base, a_app;
   @layer z_base {
-  .a-basewidget{color:red;}
+  ._a_basewidget{color:red;}
   }
   @layer a_app {
-  .a-appmain{color:blue;}
+  ._a_appmain{color:blue;}
   }
   }
 
@@ -70,9 +70,9 @@ before, and no empty block is emitted for it.
   @layer styled-ppx.base {
   @layer z_base, a_app;
   @layer z_base {
-  .a-basewidget{color:red;}
+  ._a_basewidget{color:red;}
   }
   @layer a_app {
-  .a-appmain{color:blue;}
+  ._a_appmain{color:blue;}
   }
   }

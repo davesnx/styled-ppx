@@ -87,10 +87,10 @@ A single CSS rule string. One attribute per atomized rule, per global
 rule, or per `@keyframes` block.
 
 ```ocaml
-[@@@css ".a-tokvmb{color:red;}"]
-[@@@css ".a-1ru12dh:hover{opacity:0.8;}"]
-[@@@css "@media (min-width:768px){.a-fmb91l{padding:2rem;}}"]
-[@@@css "@keyframes k-jw9oix{from{opacity:0;}to{opacity:1;}}"]
+[@@@css "._a_tokvmb{color:red;}"]
+[@@@css "._a_1ru12dh:hover{opacity:0.8;}"]
+[@@@css "@media (min-width:768px){._a_fmb91l{padding:2rem;}}"]
+[@@@css "@keyframes _k_jw9oix{from{opacity:0;}to{opacity:1;}}"]
 ```
 
 The string may contain NUL-delimited cross-module sentinels
@@ -105,7 +105,7 @@ One attribute per CU, listing every named `[%css]` binding and
 `[%styled.<tag>]` component the CU minted.
 The longident is the fully-qualified path users would write to reference
 the binding from another module; the identity is the binding's
-build-independent `id-...` class (see "Identity classes" below) — a
+build-independent `_id_...` class (see "Identity classes" below) — a
 `$(binding)` selector reference resolves to this, verbatim; the class
 string is the space-separated list of atomized class names the PPX
 produced, kept only as a content fingerprint so the aggregator can tell
@@ -114,9 +114,9 @@ Resolve below).
 
 ```ocaml
 [@@@css.bindings
-  [("M.marker", "id-1a2b3c4", "");
-   ("M.Css.active", "id-5d6e7f8", "a-tokvmb");
-   ("M.layout", "id-9a0b1c2", "a-k008qs a-1tyndxa")]]
+  [("M.marker", "_id_1a2b3c4", "");
+   ("M.Css.active", "_id_5d6e7f8", "_a_tokvmb");
+   ("M.layout", "_id_9a0b1c2", "_a_k008qs _a_1tyndxa")]]
 ```
 
 The aggregator folds every payload into two flat hash tables — its
@@ -413,10 +413,10 @@ text and silently destroyed declaration order (regression test:
 
 **Atom class collision.** Right after that dedup pass, the aggregator
 scans the deduplicated rules for two different, non-bundle atoms
-(`a-` classes) that mint the same class name but render
+(`_a_` classes) that mint the same class name but render
 different CSS - the same shape as an identity collision above, applied
-to atom classes instead of `id-` identities, and reported the same way
-(both rule bodies, the shared class, a `--namespace` remedy). `in-`
+to atom classes instead of `_id_` identities, and reported the same way
+(both rule bodies, the shared class, a `--namespace` remedy). `_in_`
 (interpolation-bundle) classes are exempt in both directions: several
 different bundle bodies sharing one class is that mechanism working as
 designed (see "Atomization" above), never a collision (see
@@ -454,8 +454,8 @@ protocol section above); there is no CLI flag for this.
 
 ### Cascade tiers (always on)
 
-Every deduplicated STYLE rule this generator emits - a real atom (`a-`/
-`in-` class) or a `[%styled.global]` rule (no atom class, but a real,
+Every deduplicated STYLE rule this generator emits - a real atom (`_a_`/
+`_in_` class) or a `[%styled.global]` rule (no atom class, but a real,
 cascading rule all the same - `html{...}`, `*{...}`, `*::before{...}`, an
 author's own global selector) - is classified into one of exactly four
 CSS cascade layers, lowest to highest priority: `styled-ppx.global`,
@@ -499,7 +499,7 @@ other sheet already declared it first.
 
 **A real, documented behavior change**: a `[%styled.global]` selector
 with HIGHER specificity than an atom (`.theme-dark .card{color:green}` vs
-an atom `.a-card{color:blue}`) used to beat the atom outright -
+an atom `._a_card{color:blue}`) used to beat the atom outright -
 specificity is compared before source order, and unlayered vs. unlayered
 never considers layers at all. Now that `styled-ppx.global` is its own,
 lowest layer, layer order beats specificity entirely: the atom wins
@@ -514,7 +514,7 @@ always `styled-ppx.global` - global rules never compete for the SAME
 descendant/base/conditional distinction an atom's own selector does, they
 are simply the floor every atom sits above. A rule WITH an atom class is
 classified per rendered rule (not per class, so two declarations of the
-same `in-` bundle can land in different tiers), `Descendant` checked
+same `_in_` bundle can land in different tiers), `Descendant` checked
 FIRST and independent of at-rule/pseudo wrapping (see the reasoning
 below), then `Conditional`, then `Base`:
 
@@ -524,7 +524,7 @@ below), then `Conditional`, then `Base`:
   subject compound (the rightmost compound - the actual element the rule
   styles, in CSS Selectors terms) has no class of its own: a bare element
   type or `*` (`.x > div`, `.x span`, `.x > *`). A subject that DOES carry
-  its own class (`.x .id-...` - what a `$(binding)` selector reference
+  its own class (`.x ._id_...` - what a `$(binding)` selector reference
   resolves to - or a literal author class like `.x .tiptap`) is NOT this
   shape: seeing a class there means the rule targets a specific,
   identified element, not "whatever happens to be under here", so it
@@ -572,10 +572,10 @@ against layer order.
 **Sort, inside each tier**: a stable sort puts an atom covering MORE of a
 property family's leaves (a shorthand, or a wider family atom) before one
 covering fewer of the SAME family (a lone longhand from a different
-binding or a different `in-` bundle) - rules that share no family compare
+binding or a different `_in_` bundle) - rules that share no family compare
 equal, so the sort never reorders anything else, and only ever reorders
 rules that were already fighting over the same property. This is what
-`CSS.merge` (below) cannot do for two atoms hidden inside different `in-`
+`CSS.merge` (below) cannot do for two atoms hidden inside different `_in_`
 bundles (`CSS.merge` only ever sees a bundle's class as one opaque,
 never-dropped token): the sort fixes their relative STYLESHEET position
 instead, restoring the override a `merge` call intended even though
@@ -687,7 +687,7 @@ property" for everything this doesn't otherwise merge. Grouping in
 `Css_file.re`'s `group_declarations_by_family` reuses
 `Slot_key.leaves_of` directly (not a reimplementation).
 
-Class names follow the `a-<context?><family><mask?><value>` format: a
+Class names follow the `_a_<context?><family><mask?><value>` format: a
 fixed-width, base36-encoded context hash (present only under a real
 selector/at-rule, or when the declaration carries `!important` - see
 "CSS.merge" below), a 2-character property-family id from a fixed,
@@ -703,11 +703,11 @@ the same class, dev or production. Minting lives in
 `(context, family, mask)` triple comes from `packages/ppx/slot_key`.
 
 One exception: when a block has TWO OR MORE declarations that carry a
-`$(...)` value interpolation, they mint one shared `in-<murmur2 hash>`
+`$(...)` value interpolation, they mint one shared `_in_<murmur2 hash>`
 class instead - a plain, unbucketed hash of their concatenated content, no
 context/family/mask fields at all (the "bundle" - see `Css_file.re`'s
 `transform_rule_list`). A single interpolating declaration is NOT a
-bundle: it mints its own real, slot-keyed `a-` class exactly like a static
+bundle: it mints its own real, slot-keyed `_a_` class exactly like a static
 atom, and merges normally (see `CSS.merge` below) - bundling only kicks
 in when two or more of a block's interpolating declarations would
 otherwise need separate custom-property namespaces for what is often the
@@ -715,7 +715,7 @@ same value reused across `base`/`:hover`/`@media` variants. A bundle's own
 `var(--...)` target is unaffected by which prefix its class carries,
 since only the CLASS half of `Hash_class.class_and_namespace` differs
 between the two cases, never the namespace/variable-naming half. The
-`in-` prefix lets `CSS.merge` (see below) recognize a bundle atom and
+`_in_` prefix lets `CSS.merge` (see below) recognize a bundle atom and
 never drop it or let it drop another atom, and lets
 `styled-ppx.generate`'s atom-class collision check ("Dedup and write"
 above) skip it -
@@ -766,10 +766,10 @@ runtime (`packages/runtime/native/shared/Merge_key.ml`, built once and
 shared into both - see its own doc comment for why it duplicates
 `Class_format`'s widths instead of depending on it: it ships in the
 melange browser bundle, and that library exists only to build the ppx's
-compile-time property registry). A bundle (`in-`), an identity (`id-`),
+compile-time property registry). A bundle (`_in_`), an identity (`_id_`),
 a `label:<binding>` marker, and any class this pipeline didn't mint are
 never dropped and never drop anything else - `merge` only ever acts on
-a well-formed `a-` atom on either side, and only ever drops a class of
+a well-formed `_a_` atom on either side, and only ever drops a class of
 `a`, never of `b`.
 
 `!important` needs no separate check: it is folded into the context (as
@@ -791,21 +791,42 @@ shorthand that covers it) is not a limit - it drops normally, since a
 full mask is always a superset of any lone longhand's mask.
 
 `merge`'s remaining gap here, and the one it can never close for a bundle
-(two atoms hidden behind the SAME opaque `in-` class), is exactly what the
+(two atoms hidden behind the SAME opaque `_in_` class), is exactly what the
 aggregator's shorthand-before-longhand sort exists for - see "Cascade
 tiers" above: the sort fixes stylesheet POSITION so the browser's own
 cascade still resolves the override correctly, whether or not `merge`
 itself could see the two properties involved.
 
+**Known limit, pinned by `packages/runtime/test/test_merge_key.ml`**:
+`Merge_key.parse_atom` (and its ppx-side mirror, `Slot_key.of_atom`'s
+consumers) recognizes an atom by PREFIX and LENGTH alone - it has no way
+to ask the ppx "did you really mint this class?" - so a hand-written,
+author-authored class that happens to start with `_a_` and happens to
+land on one of the six lengths a real atom can have is indistinguishable
+from a real one. `merge_class_names "label:x _a_header" "_a_he1234"` drops
+the hand-written `_a_header`: both strings parse as ordinary, same-
+family, same-context, full-mask atoms (`"_a_header"`'s body, `header`, is
+exactly the family+value floor - 6 characters, no context/mask/extended
+fields - and `"_a_he1234"`'s body is the same length), so `removes` sees
+no reason to keep both. Accepted as current behavior, same shape as
+before the `_a_`/`_in_`/`_id_`/`_k_` prefix rename - only the odds of an
+accidental collision changed (a hand-written class now needs to start
+with the less common `_a_` sequence rather than plain `a-`), not the
+existence of the limit. A hand-written class that merely starts with the
+OLD `a-` shape, like `"a-header"`, is no longer read as an atom at all
+now that only `_a_` is a recognized prefix - `packages/runtime/test/
+test_merge_key.ml` pins both: the old shape now surviving `CSS.merge`
+untouched, and the same ambiguity persisting under the new prefix.
+
 ## Identity classes
 
 Every named `[%css]` binding and `[%styled.<tag>]` component mints a
-second, build-independent class alongside its atoms: `id-<hash>`
+second, build-independent class alongside its atoms: `_id_<hash>`
 (`Hash_class.identity_class`). `$(binding)` and `&.$(binding)` selector
 references resolve to this identity, verbatim, regardless of how many
 atoms the binding minted or whether it minted any at all. It is emitted
 first among the atoms in the className string (after the `label:<binding>`
-dev marker, when present): `label:<binding> id-<hash> a-<hash> ...`.
+dev marker, when present): `label:<binding> _id_<hash> _a_<hash> ...`.
 
 **Inputs**, joined with `\0` and murmur2-hashed: the `--namespace` flag
 value (empty by default), the compilation-unit module name (the source
@@ -839,8 +860,8 @@ independent of `--minify`: an empty binding's identity is never dropped,
 which is what makes it possible to resolve `&.$(m)` in every mode (see
 `packages/ppx/test/css-support/identity-empty-marker.t`).
 
-**Specificity note.** `.a-x.id-y` is still a two-class compound
-selector — `(0,2,0)` specificity, same as `.a-x.a-a.a-b` before
+**Specificity note.** `._a_x._id_y` is still a two-class compound
+selector — `(0,2,0)` specificity, same as `._a_x._a_a._a_b` before
 this change, and both still beat plain unqualified atoms either way.
 Only a tie between two compound selectors that used to carry 3+ class
 tokens can shift, since those are the only ones whose token count

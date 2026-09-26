@@ -19,14 +19,14 @@ top-level interpolation does. If the inline list is empty `[]` for the
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css "@property --c-dq4mhq{syntax:\"*\";inherits:false;}"];
   [@css "@property --c-11hlefi{syntax:\"*\";inherits:false;}"];
-  [@css ".a-4exvk3{color:var(--c-dq4mhq);}"];
-  [@css ".a-qyw7u4eh0hp:hover{color:var(--c-11hlefi);}"];
-  [@css ".a-wu9h64eac4l::placeholder{color:var(--c-gzgct8);}"];
+  [@css "._a_4exvk3{color:var(--c-dq4mhq);}"];
+  [@css "._a_qyw7u4eh0hp:hover{color:var(--c-11hlefi);}"];
+  [@css "._a_wu9h64eac4l::placeholder{color:var(--c-gzgct8);}"];
   [@css.bindings
     [
-      ("Input.topLevel", "id-1pfdov9", "a-4exvk3"),
-      ("Input.hover", "id-zu568x", "a-qyw7u4eh0hp"),
-      ("Input.placeholder", "id-1xk9ylj", "a-wu9h64eac4l"),
+      ("Input.topLevel", "_id_1pfdov9", "_a_4exvk3"),
+      ("Input.hover", "_id_zu568x", "_a_qyw7u4eh0hp"),
+      ("Input.placeholder", "_id_1xk9ylj", "_a_wu9h64eac4l"),
     ]
   ];
   
@@ -34,19 +34,19 @@ top-level interpolation does. If the inline list is empty `[]` for the
   
   let topLevel =
     CSS.make(
-      "label:topLevel id-1pfdov9 a-4exvk3",
+      "label:topLevel _id_1pfdov9 _a_4exvk3",
       [("--c-dq4mhq", CSS.Types.Color.toString(c))],
     );
   
   let hover =
     CSS.make(
-      "label:hover id-zu568x a-qyw7u4eh0hp",
+      "label:hover _id_zu568x _a_qyw7u4eh0hp",
       [("--c-11hlefi", CSS.Types.Color.toString(c))],
     );
   
   let placeholder =
     CSS.make(
-      "label:placeholder id-1xk9ylj a-wu9h64eac4l",
+      "label:placeholder _id_1xk9ylj _a_wu9h64eac4l",
       [("--c-gzgct8", CSS.Types.Color.toString(c))],
     );
   

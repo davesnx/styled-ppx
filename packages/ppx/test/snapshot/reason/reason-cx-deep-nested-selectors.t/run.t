@@ -19,23 +19,26 @@ Selectors covered here:
 
   $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
-  [@@@css ".a-4ekvmb{color:red;}"]
-  [@@@css ".a-qyw7u4enfjo:hover{color:blue;}"]
-  [@@@css ".a-7t7p64wzudz:focus-visible::after{content:\"\";}"]
-  [@@@css ".a-rv9hg4ef6vm:hover:focus{color:green;}"]
-  [@@@css ".a-xltrd4emvqw:hover .child:focus{color:green;}"]
-  [@@@css ".a-d3qow4ebkm2:hover .child{color:blue;}"]
+  [@@@css "._a_4ekvmb{color:red;}"]
+  [@@@css "._a_qyw7u4enfjo:hover{color:blue;}"]
+  [@@@css "._a_7t7p64wzudz:focus-visible::after{content:\"\";}"]
+  [@@@css "._a_rv9hg4ef6vm:hover:focus{color:green;}"]
+  [@@@css "._a_xltrd4emvqw:hover .child:focus{color:green;}"]
+  [@@@css "._a_d3qow4ebkm2:hover .child{color:blue;}"]
   [@@@css.bindings
-    [("Input.single", "id-1e50cws", "a-4ekvmb a-qyw7u4enfjo");
-    ("Input.twoLevel", "id-8l8452", "a-4ekvmb a-7t7p64wzudz");
-    ("Input.twoLevelPseudoClass", "id-1p6ev21", "a-4ekvmb a-rv9hg4ef6vm");
-    ("Input.threeLevel", "id-16hizhg", "a-4ekvmb a-xltrd4emvqw");
-    ("Input.descendantUnderPseudo", "id-d9y20h", "a-4ekvmb a-d3qow4ebkm2")]]
-  let single = CSS.make "label:single id-1e50cws a-4ekvmb a-qyw7u4enfjo" []
-  let twoLevel = CSS.make "label:twoLevel id-8l8452 a-4ekvmb a-7t7p64wzudz" []
+    [("Input.single", "_id_1e50cws", "_a_4ekvmb _a_qyw7u4enfjo");
+    ("Input.twoLevel", "_id_8l8452", "_a_4ekvmb _a_7t7p64wzudz");
+    ("Input.twoLevelPseudoClass", "_id_1p6ev21", "_a_4ekvmb _a_rv9hg4ef6vm");
+    ("Input.threeLevel", "_id_16hizhg", "_a_4ekvmb _a_xltrd4emvqw");
+    ("Input.descendantUnderPseudo", "_id_d9y20h", "_a_4ekvmb _a_d3qow4ebkm2")]]
+  let single = CSS.make "label:single _id_1e50cws _a_4ekvmb _a_qyw7u4enfjo" []
+  let twoLevel =
+    CSS.make "label:twoLevel _id_8l8452 _a_4ekvmb _a_7t7p64wzudz" []
   let twoLevelPseudoClass =
-    CSS.make "label:twoLevelPseudoClass id-1p6ev21 a-4ekvmb a-rv9hg4ef6vm" []
+    CSS.make "label:twoLevelPseudoClass _id_1p6ev21 _a_4ekvmb _a_rv9hg4ef6vm"
+      []
   let threeLevel =
-    CSS.make "label:threeLevel id-16hizhg a-4ekvmb a-xltrd4emvqw" []
+    CSS.make "label:threeLevel _id_16hizhg _a_4ekvmb _a_xltrd4emvqw" []
   let descendantUnderPseudo =
-    CSS.make "label:descendantUnderPseudo id-d9y20h a-4ekvmb a-d3qow4ebkm2" []
+    CSS.make "label:descendantUnderPseudo _id_d9y20h _a_4ekvmb _a_d3qow4ebkm2"
+      []

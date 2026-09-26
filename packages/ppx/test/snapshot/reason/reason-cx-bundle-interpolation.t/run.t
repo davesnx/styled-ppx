@@ -13,38 +13,38 @@ own real, slot-keyed `a-` class instead.
   [@css "@property --width-1v9ua{syntax:\"*\";inherits:false;}"];
   [@css "@property --width-c62vcf{syntax:\"*\";inherits:false;}"];
   [@css "@property --color-4uzv5u{syntax:\"*\";inherits:false;}"];
-  [@css ".in-1kbzua4{color:var(--color-3f9mj1);}"];
-  [@css ".in-1kbzua4:hover{color:var(--color-3f9mj1);}"];
-  [@css "@media (max-width: 768px) {.in-1kbzua4{color:var(--color-3f9mj1);}}"];
-  [@css ".a-5r08qs{display:flex;}"];
-  [@css ".in-1upqar2{color:var(--color-13vjntp);}"];
-  [@css ".in-1upqar2:hover{color:var(--color-13vjntp);}"];
-  [@css ".in-e286e6{width:var(--width-1v9ua);}"];
-  [@css ".in-e286e6:hover{height:var(--width-c62vcf);}"];
-  [@css ".a-4ekvmb{color:red;}"];
-  [@css ".a-qyw7u4ebwy0:hover{color:var(--color-4uzv5u);}"];
+  [@css "._in_1kbzua4{color:var(--color-3f9mj1);}"];
+  [@css "._in_1kbzua4:hover{color:var(--color-3f9mj1);}"];
+  [@css "@media (max-width: 768px) {._in_1kbzua4{color:var(--color-3f9mj1);}}"];
+  [@css "._a_5r08qs{display:flex;}"];
+  [@css "._in_1upqar2{color:var(--color-13vjntp);}"];
+  [@css "._in_1upqar2:hover{color:var(--color-13vjntp);}"];
+  [@css "._in_e286e6{width:var(--width-1v9ua);}"];
+  [@css "._in_e286e6:hover{height:var(--width-c62vcf);}"];
+  [@css "._a_4ekvmb{color:red;}"];
+  [@css "._a_qyw7u4ebwy0:hover{color:var(--color-4uzv5u);}"];
   [@css.bindings
     [
-      ("Output.multiVariant", "id-1be0zju", "in-1kbzua4"),
-      ("Output.mixed", "id-11av61d", "a-5r08qs in-1upqar2"),
-      ("Output.twoTypes", "id-1ybygzf", "in-e286e6"),
+      ("Output.multiVariant", "_id_1be0zju", "_in_1kbzua4"),
+      ("Output.mixed", "_id_11av61d", "_a_5r08qs _in_1upqar2"),
+      ("Output.twoTypes", "_id_1ybygzf", "_in_e286e6"),
     ]
   ];
   let color = CSS.Types.Color.toString(`hex("3A57FC"));
   let width = CSS.px(10);
   let multiVariant =
     CSS.make(
-      "label:multiVariant id-1be0zju in-1kbzua4",
+      "label:multiVariant _id_1be0zju _in_1kbzua4",
       [("--color-3f9mj1", CSS.Types.Color.toString(color))],
     );
   let mixed =
     CSS.make(
-      "label:mixed id-11av61d a-5r08qs in-1upqar2",
+      "label:mixed _id_11av61d _a_5r08qs _in_1upqar2",
       [("--color-13vjntp", CSS.Types.Color.toString(color))],
     );
   let twoTypes =
     CSS.make(
-      "label:twoTypes id-1ybygzf in-e286e6",
+      "label:twoTypes _id_1ybygzf _in_e286e6",
       [
         ("--width-1v9ua", CSS.Types.Width.toString(width)),
         ("--width-c62vcf", CSS.Types.Height.toString(width)),
@@ -52,11 +52,11 @@ own real, slot-keyed `a-` class instead.
     );
   let _ =
     CSS.make(
-      "a-4ekvmb a-qyw7u4ebwy0",
+      "_a_4ekvmb _a_qyw7u4ebwy0",
       [("--color-4uzv5u", CSS.Types.Color.toString(color))],
     );
   let _ =
     CSS.make(
-      "a-5r08qs a-qyw7u4ebwy0",
+      "_a_5r08qs _a_qyw7u4ebwy0",
       [("--color-4uzv5u", CSS.Types.Color.toString(color))],
     );

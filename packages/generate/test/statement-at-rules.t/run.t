@@ -24,10 +24,10 @@ nesting the user's OWN `@layer utilities, base;` inside `styled-ppx.global`
 would rescope "utilities"/"base" to live underneath it, silently changing
 what the user's statement means, so it stays at the top level regardless
 of where dedup/ordering placed it relative to an ATOM rule (`a_styles.ml`'s
-`.a-styles`, tiered, ends up after it here).
+`._a_styles`, tiered, ends up after it here).
 
   $ cat > a_styles.ml <<EOF
-  > [@@@css ".a-styles{color:red;}"]
+  > [@@@css "._a_styles{color:red;}"]
   > EOF
 
   $ cat > z_statements.ml <<EOF
@@ -45,7 +45,7 @@ of where dedup/ordering placed it relative to an ATOM rule (`a_styles.ml`'s
   @layer utilities, base;
   @layer styled-ppx.global, styled-ppx.descendant, styled-ppx.base, styled-ppx.conditional;
   @layer styled-ppx.base {
-  .a-styles{color:red;}
+  ._a_styles{color:red;}
   }
 
 `--layers` wraps each library's ATOM rules in a nested `@layer`, inside
@@ -66,7 +66,7 @@ registration before tiers existed.
   @layer styled-ppx.base {
   @layer _;
   @layer _ {
-  .a-styles{color:red;}
+  ._a_styles{color:red;}
   }
   }
 
@@ -106,7 +106,7 @@ took any `{` as proof of a block rule and, under `--layers`, would emit this
 
   $ cat > d_import_brace.ml <<EOF
   > [@@@css "@import url(\"a{b.css\");"]
-  > [@@@css ".a-dgreen{color:green;}"]
+  > [@@@css "._a_dgreen{color:green;}"]
   > EOF
 
   $ styled-ppx.generate d_import_brace.ml
@@ -114,7 +114,7 @@ took any `{` as proof of a block rule and, under `--layers`, would emit this
   @import url("a{b.css");
   @layer styled-ppx.global, styled-ppx.descendant, styled-ppx.base, styled-ppx.conditional;
   @layer styled-ppx.base {
-  .a-dgreen{color:green;}
+  ._a_dgreen{color:green;}
   }
 
   $ styled-ppx.generate --layers d_import_brace.ml
@@ -124,6 +124,6 @@ took any `{` as proof of a block rule and, under `--layers`, would emit this
   @layer styled-ppx.base {
   @layer _;
   @layer _ {
-  .a-dgreen{color:green;}
+  ._a_dgreen{color:green;}
   }
   }

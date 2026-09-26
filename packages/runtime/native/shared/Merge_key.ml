@@ -10,7 +10,7 @@
    wide it is and how two atoms' fields compare.
 
    This is the single rule [Slot_key.removes] defines, minus the [bundle]
-   short-circuit (an [in-] token never reaches {!parse_atom}'s callers in
+   short-circuit (an [_in_] token never reaches {!parse_atom}'s callers in
    the first place - see [merge_class_names] below).
 
    Why this duplicates [Class_format]'s widths instead of depending on it:
@@ -25,7 +25,7 @@
    the cross-check against the real [Slot_key]/[Class_format] values (that
    test, not this library, is allowed to depend on them). *)
 
-let atom_prefix = "a-"
+let atom_prefix = "_a_"
 let context_width = 5
 let family_width = 2
 let mask_width = 3
@@ -48,7 +48,7 @@ let is_excluded_from_all family =
   || String.equal family direction_marker
   || String.equal family unicode_bidi_marker
 
-(* One [a-] atom's merge-relevant fields, sliced out of its class name.
+(* One [_a_] atom's merge-relevant fields, sliced out of its class name.
    [context]/[family]/[extended] are the raw base36 substrings (compared
    for string equality only); [mask] is the one field decoded to an int,
    since only it needs a bitwise subset check. *)
@@ -75,11 +75,11 @@ let base36_value s =
     s;
   !value
 
-(* [None] for anything that isn't a well-formed [a-] atom: not [a-]
-   -prefixed, or [a-]-prefixed but not one of the six lengths
+(* [None] for anything that isn't a well-formed [_a_] atom: not [_a_]
+   -prefixed, or [_a_]-prefixed but not one of the six lengths
    [Class_format.possible_extra_lengths] makes possible (a stray class
    this pipeline never minted). Either way, the caller treats it as
-   opaque and passes it through untouched, same as an [in-]/[id-]/
+   opaque and passes it through untouched, same as an [_in_]/[_id_]/
    [label:...] token. *)
 (* Which optional fields [extra] chars beyond the family+value floor
    implies - the six values [Class_format.possible_extra_lengths]
@@ -173,8 +173,8 @@ let split_tokens s =
   loop 0 []
 
 (* [merge_class_names former latter]: [former]'s tokens survive unless a
-   token is a parseable [a-] atom that some [latter] atom [removes]. Every
-   other token - [in-] bundles, [id-] identities, `label:<binding>`
+   token is a parseable [_a_] atom that some [latter] atom [removes]. Every
+   other token - [_in_] bundles, [_id_] identities, `label:<binding>`
    markers, and any class this module fails to parse - is kept
    unconditionally, on both sides, in its original relative order (bundles
    and identities are never dropped and never drop anything, by

@@ -5,7 +5,7 @@ atoms became layered. CSS lets an UNLAYERED normal declaration beat ANY
 layered one, regardless of layer or specificity - so the moment atoms
 became layered and globals did not, a global default like
 `*{box-sizing:inherit}` would have started beating an atom's own
-`.a-box9k{box-sizing:content-box;}` on the same element, `!important`
+`._a_box9k{box-sizing:content-box;}` on the same element, `!important`
 aside. Before cascade tiers existed at all, both were unlayered and
 competed by ordinary specificity/order, where the atom's one-class
 selector already beat `*`'s zero-specificity universal selector - so this
@@ -13,7 +13,7 @@ would have been a real regression, not a pre-existing limitation.
 
   $ cat > box_sizing.ml <<EOF
   > [@@@css "*{box-sizing:inherit;}"]
-  > [@@@css ".a-box9k{box-sizing:content-box;}"]
+  > [@@@css "._a_box9k{box-sizing:content-box;}"]
   > EOF
 
   $ styled-ppx.generate box_sizing.ml
@@ -23,12 +23,12 @@ would have been a real regression, not a pre-existing limitation.
   *{box-sizing:inherit;}
   }
   @layer styled-ppx.base {
-  .a-box9k{box-sizing:content-box;}
+  ._a_box9k{box-sizing:content-box;}
   }
 
 What the browser does now, and why: `styled-ppx.global` is declared FIRST
 (lowest) in the four-name statement, so its `*{box-sizing:inherit;}`
-never beats `styled-ppx.base`'s `.a-box9k{box-sizing:content-box;}` -
+never beats `styled-ppx.base`'s `._a_box9k{box-sizing:content-box;}` -
 `styled-ppx.global`'s own specificity or stylesheet position no longer
 matters at all once it is the lowest layer, restoring "an element's own
 atom always beats a global default" unconditionally.
@@ -42,7 +42,7 @@ regardless of how specific the global selector is.
 
   $ cat > specificity.ml <<EOF
   > [@@@css ".theme-dark .card{color:green;}"]
-  > [@@@css ".a-cardown{color:blue;}"]
+  > [@@@css "._a_cardown{color:blue;}"]
   > EOF
 
   $ styled-ppx.generate specificity.ml
@@ -52,13 +52,13 @@ regardless of how specific the global selector is.
   .theme-dark .card{color:green;}
   }
   @layer styled-ppx.base {
-  .a-cardown{color:blue;}
+  ._a_cardown{color:blue;}
   }
 
 Before this change, `.theme-dark .card` (specificity 0,2,0) beat
-`.a-cardown` (specificity 0,1,0) outright, regardless of which one came
+`._a_cardown` (specificity 0,1,0) outright, regardless of which one came
 later in the stylesheet - a real, if perhaps unintended, way for a theme
-class to override a component's own atom. Now `.a-cardown` always wins,
+class to override a component's own atom. Now `._a_cardown` always wins,
 specificity no longer enters into it at all: an author whose global
 STILL needs to win uses `!important` (the same escape hatch every other
 tier documents), which beats a non-`!important` declaration in a higher
@@ -74,7 +74,7 @@ being the lowest layer for everything else.
 
   $ cat > important_global.ml <<EOF
   > [@@@css "*{box-sizing:inherit !important;}"]
-  > [@@@css ".a-box9k2{box-sizing:content-box;}"]
+  > [@@@css "._a_box9k2{box-sizing:content-box;}"]
   > EOF
 
   $ styled-ppx.generate important_global.ml
@@ -84,7 +84,7 @@ being the lowest layer for everything else.
   *{box-sizing:inherit !important;}
   }
   @layer styled-ppx.base {
-  .a-box9k2{box-sizing:content-box;}
+  ._a_box9k2{box-sizing:content-box;}
   }
 
 What the browser does here, and why: normal declarations compare layer
@@ -92,7 +92,7 @@ order first (`global` loses to `base`), but `!important` declarations
 compare importance FIRST and, among important declarations, the
 EARLIEST-declared layer wins - so `*{box-sizing:inherit !important;}`,
 despite sitting in the lowest layer, still beats
-`.a-box9k2{box-sizing:content-box;}`'s plain declaration. This is the
+`._a_box9k2{box-sizing:content-box;}`'s plain declaration. This is the
 same intentional, CSS-spec-level escape hatch every other tier
 documents, not a gap: an author whose global default must truly win uses
 `!important`, same as they always could to beat any unconditional rule.
@@ -105,7 +105,7 @@ all, so they need no layer of their own.
   > [@@@css "@property --brand{syntax:\"<color>\";inherits:false;initial-value:red;}"]
   > [@@@css "@keyframes spin{to{transform:rotate(360deg);}}"]
   > [@@@css "@font-face{font-family:\"Body\";src:url(\"body.woff2\");}"]
-  > [@@@css ".a-registered{color:blue;}"]
+  > [@@@css "._a_registered{color:blue;}"]
   > EOF
 
   $ styled-ppx.generate registration.ml
@@ -115,5 +115,5 @@ all, so they need no layer of their own.
   @font-face{font-family:"Body";src:url("body.woff2");}
   @layer styled-ppx.global, styled-ppx.descendant, styled-ppx.base, styled-ppx.conditional;
   @layer styled-ppx.base {
-  .a-registered{color:blue;}
+  ._a_registered{color:blue;}
   }

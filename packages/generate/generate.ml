@@ -560,23 +560,24 @@ let is_namespace_statement rule =
     silently misplaced. *)
 let is_charset rule = String.starts_with ~prefix:"@charset" (String.trim rule)
 
-(** The leading `a-`/`in-` atom class name in a rendered rule, if any (see
+(** The leading `_a_`/`_in_` atom class name in a rendered rule, if any (see
     [Hash_class.slot_class] / [Class_format]). Every atom this generator emits
     opens with its own class as a leading compound-selector token, so the first
     occurrence in the rule text is always the atom's own class. Returns [None]
-    for anything else ([id-]/[k-] classes, [@import]/ [@namespace] statements,
+    for anything else ([_id_]/[_k_] classes, [@import]/ [@namespace] statements,
     etc.) - those aren't this check's concern. There is no separate
-    important-atom prefix: an [!important] atom is still [a-], just with a
+    important-atom prefix: an [!important] atom is still [_a_], just with a
     non-empty context (see [Slot_key.context_key]'s doc). *)
 let atom_class_and_end rule_text =
-  (* Real output is lowercase base36 + '-', but this must not stop early on
-     other test-fixture shapes (existing generate.ml cram tests fabricate
-     raw [@@@css ...] payloads with hand-written names like ".a-A-y") -
-     under-matching here would truncate two different class names down to
-     the same prefix and report a false collision. The two prefixes differ
-     in length (2 vs 3), so the matched prefix's own length - not a fixed
-     constant - decides where the rest of the class name starts; neither is
-     a prefix of the other, so trying them in either order is unambiguous. *)
+  (* Real output is lowercase base36 preceded by the prefix's own trailing
+     "_", but this must not stop early on other test-fixture shapes (existing
+     generate.ml cram tests fabricate raw [@@@css ...] payloads with
+     hand-written names like "._a_A-y") - under-matching here would truncate
+     two different class names down to the same prefix and report a false
+     collision. The two prefixes differ in length (3 vs 4), so the matched
+     prefix's own length - not a fixed constant - decides where the rest of
+     the class name starts; neither is a prefix of the other, so trying them
+     in either order is unambiguous. *)
   let is_class_char c =
     (c >= 'a' && c <= 'z')
     || (c >= 'A' && c <= 'Z')
@@ -589,7 +590,7 @@ let atom_class_and_end rule_text =
     let m = String.length prefix in
     i + m <= n && String.sub rule_text i m = prefix
   in
-  let prefixes = [ "a-"; "in-" ] in
+  let prefixes = [ "_a_"; "_in_" ] in
   let rec scan i =
     if i >= n then None
     else if rule_text.[i] <> '.' then scan (i + 1)
@@ -617,10 +618,10 @@ let atom_class_name rule_text = Option.map fst (atom_class_and_end rule_text)
     let two genuinely different atoms silently share one class - whichever rule
     text is deduped away would then apply to every element using that class,
     everywhere, for the OTHER atom's declaration too. Same shape as [Index]'s
-    `id-` identity-collision check: same key, different content, is a hard build
-    error naming both sides, never a silently wrong stylesheet.
+    `_id_` identity-collision check: same key, different content, is a hard
+    build error naming both sides, never a silently wrong stylesheet.
 
-    An `in-` (interpolation-bundle) class is explicitly exempt, in both
+    An `_in_` (interpolation-bundle) class is explicitly exempt, in both
     directions - never recorded, never compared, never flagged. [Css_file.re]'s
     bundling already, legitimately, gives several different declarations from
     one binding the SAME class when they all carry a [$(...)] interpolation;
@@ -636,7 +637,7 @@ let check_atom_class_collisions rules =
       match atom_class_name rule with
       | None -> None
       | Some class_name
-        when String.length class_name >= 3 && String.sub class_name 0 3 = "in-"
+        when String.length class_name >= 4 && String.sub class_name 0 4 = "_in_"
         ->
         None
       | Some class_name ->
@@ -1108,7 +1109,7 @@ let run ~output_file ~order ~layers input_files =
      tiers - a [%styled.global] style rule, ALSO never atom-classed but a
      real, cascading rule (`html{...}`, `*{...}`, `*::before{...}`, an
      author's own global selector), lands in [styled-ppx.global], the
-     LOWEST tier; every real atom, [a-] or [in-] alike, lands in
+     LOWEST tier; every real atom, [_a_] or [_in_] alike, lands in
      [descendant]/[base]/[conditional] as before. Global rules MUST be
      layered, not left unlayered like registrations: CSS lets an unlayered
      normal declaration beat ANY layered one regardless of layer or

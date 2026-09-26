@@ -49,125 +49,127 @@ If this test fail means that the module is not in sync with the ppx
   [@css "@property --timingFunction-7aarh0{syntax:\"*\";inherits:false;}"];
   [@css "@property --property-1f94jkq{syntax:\"*\";inherits:false;}"];
   [@css "@property --duration-fvn1cf{syntax:\"*\";inherits:false;}"];
-  [@css ".a-dm008lsnu{transition-property:none;}"];
-  [@css ".a-dm0087oni{transition-property:all;}"];
-  [@css ".a-dm0082vzd{transition-property:width;}"];
-  [@css ".a-dm0082xp0{transition-property:width, height;}"];
-  [@css ".a-dm004qcio{transition-duration:0s;}"];
-  [@css ".a-dm004wvco{transition-duration:1s;}"];
-  [@css ".a-dm004abun{transition-duration:100ms;}"];
-  [@css ".a-dm004wbyo{transition-duration:10s, 30s, 230ms;}"];
-  [@css ".a-dm00g62sr{transition-timing-function:ease;}"];
-  [@css ".a-dm00gk20j{transition-timing-function:linear;}"];
-  [@css ".a-dm00gm6mw{transition-timing-function:ease-in;}"];
-  [@css ".a-dm00gwco7{transition-timing-function:ease-out;}"];
-  [@css ".a-dm00grnz4{transition-timing-function:ease-in-out;}"];
+  [@css "._a_dm008lsnu{transition-property:none;}"];
+  [@css "._a_dm0087oni{transition-property:all;}"];
+  [@css "._a_dm0082vzd{transition-property:width;}"];
+  [@css "._a_dm0082xp0{transition-property:width, height;}"];
+  [@css "._a_dm004qcio{transition-duration:0s;}"];
+  [@css "._a_dm004wvco{transition-duration:1s;}"];
+  [@css "._a_dm004abun{transition-duration:100ms;}"];
+  [@css "._a_dm004wbyo{transition-duration:10s, 30s, 230ms;}"];
+  [@css "._a_dm00g62sr{transition-timing-function:ease;}"];
+  [@css "._a_dm00gk20j{transition-timing-function:linear;}"];
+  [@css "._a_dm00gm6mw{transition-timing-function:ease-in;}"];
+  [@css "._a_dm00gwco7{transition-timing-function:ease-out;}"];
+  [@css "._a_dm00grnz4{transition-timing-function:ease-in-out;}"];
   [@css
-    ".a-dm00gucrr{transition-timing-function:cubic-bezier(0.5, 0.5, 0.5, 0.5);}"
+    "._a_dm00gucrr{transition-timing-function:cubic-bezier(0.5, 0.5, 0.5, 0.5);}"
   ];
   [@css
-    ".a-dm00ghuiw{transition-timing-function:cubic-bezier(0.5, 1.5, 0.5, -2.5);}"
+    "._a_dm00ghuiw{transition-timing-function:cubic-bezier(0.5, 1.5, 0.5, -2.5);}"
   ];
-  [@css ".a-dm00gkmi5{transition-timing-function:step-start;}"];
-  [@css ".a-dm00gglpi{transition-timing-function:step-end;}"];
-  [@css ".a-dm00gh31g{transition-timing-function:steps(3, start);}"];
-  [@css ".a-dm00g6kkr{transition-timing-function:steps(5, end);}"];
+  [@css "._a_dm00gkmi5{transition-timing-function:step-start;}"];
+  [@css "._a_dm00gglpi{transition-timing-function:step-end;}"];
+  [@css "._a_dm00gh31g{transition-timing-function:steps(3, start);}"];
+  [@css "._a_dm00g6kkr{transition-timing-function:steps(5, end);}"];
   [@css
-    ".a-dm00gj2vv{transition-timing-function:ease, step-start, cubic-bezier(0.1, 0.7, 1, 0.1);}"
+    "._a_dm00gj2vv{transition-timing-function:ease, step-start, cubic-bezier(0.1, 0.7, 1, 0.1);}"
   ];
-  [@css ".a-dm002nxui{transition-delay:1s;}"];
-  [@css ".a-dm002h2bu{transition-delay:-1s;}"];
-  [@css ".a-dm002w8mt{transition-delay:2s, 4ms;}"];
-  [@css ".a-dm001szc2{transition-behavior:normal;}"];
-  [@css ".a-dm001g4wh{transition-behavior:allow-discrete;}"];
-  [@css ".a-dm00158if{transition-behavior:allow-discrete, normal;}"];
-  [@css ".a-dmmma2{transition:margin-right 2s, opacity 0.5s;}"];
-  [@css ".a-dmzmc5{transition:1s 2s width linear;}"];
-  [@css ".a-dmmdqb{transition:none;}"];
-  [@css ".a-dmcb8v{transition:margin-right;}"];
-  [@css ".a-dmcwj8{transition:margin-right ease-in;}"];
-  [@css ".a-dmny5s{transition:0.5s;}"];
-  [@css ".a-dmn6u7{transition:200ms 0.5s;}"];
-  [@css ".a-dmixva{transition:linear;}"];
-  [@css ".a-dmed1j{transition:1s 0.5s linear margin-right;}"];
-  [@css ".a-dm2e7j{transition:display 4s allow-discrete;}"];
-  [@css ".a-dmvjvi{transition:all 0.5s ease-out allow-discrete;}"];
-  [@css ".a-dm3f4o{transition:var(--fullTransition-ahh0or);}"];
-  [@css ".a-dmv9kq{transition:var(--fullTransition2-ezh8oo);}"];
+  [@css "._a_dm002nxui{transition-delay:1s;}"];
+  [@css "._a_dm002h2bu{transition-delay:-1s;}"];
+  [@css "._a_dm002w8mt{transition-delay:2s, 4ms;}"];
+  [@css "._a_dm001szc2{transition-behavior:normal;}"];
+  [@css "._a_dm001g4wh{transition-behavior:allow-discrete;}"];
+  [@css "._a_dm00158if{transition-behavior:allow-discrete, normal;}"];
+  [@css "._a_dmmma2{transition:margin-right 2s, opacity 0.5s;}"];
+  [@css "._a_dmzmc5{transition:1s 2s width linear;}"];
+  [@css "._a_dmmdqb{transition:none;}"];
+  [@css "._a_dmcb8v{transition:margin-right;}"];
+  [@css "._a_dmcwj8{transition:margin-right ease-in;}"];
+  [@css "._a_dmny5s{transition:0.5s;}"];
+  [@css "._a_dmn6u7{transition:200ms 0.5s;}"];
+  [@css "._a_dmixva{transition:linear;}"];
+  [@css "._a_dmed1j{transition:1s 0.5s linear margin-right;}"];
+  [@css "._a_dm2e7j{transition:display 4s allow-discrete;}"];
+  [@css "._a_dmvjvi{transition:all 0.5s ease-out allow-discrete;}"];
+  [@css "._a_dm3f4o{transition:var(--fullTransition-ahh0or);}"];
+  [@css "._a_dmv9kq{transition:var(--fullTransition2-ezh8oo);}"];
   [@css
-    ".a-dm6ojv{transition:var(--property-18qplnj) var(--duration-1iddlz) var(--timingFunction-vob4pv) var(--delay-cibt83) var(--behavior-108fus4);}"
-  ];
-  [@css
-    ".a-dmw6lg{transition:var(--property-14kilfb) var(--duration-1ejdhyh) var(--timingFunction-1j1h4k7) var(--delay-pqgx10), var(--property3-s110ja) 0s;}"
-  ];
-  [@css ".a-dmxtlc{transition:var(--property-h7mj8c) 0.2s ease-out 3s;}"];
-  [@css
-    ".a-dmf0xc{transition:var(--property-1skeegy) 0.2s var(--timingFunction-1ftkhfa) 3s;}"
+    "._a_dm6ojv{transition:var(--property-18qplnj) var(--duration-1iddlz) var(--timingFunction-vob4pv) var(--delay-cibt83) var(--behavior-108fus4);}"
   ];
   [@css
-    ".a-dmn3fb{transition:var(--property-ivu2ul) var(--duration-kgrecx) var(--timingFunction-1p09x3l) 3s;}"
+    "._a_dmw6lg{transition:var(--property-14kilfb) var(--duration-1ejdhyh) var(--timingFunction-1j1h4k7) var(--delay-pqgx10), var(--property3-s110ja) 0s;}"
+  ];
+  [@css "._a_dmxtlc{transition:var(--property-h7mj8c) 0.2s ease-out 3s;}"];
+  [@css
+    "._a_dmf0xc{transition:var(--property-1skeegy) 0.2s var(--timingFunction-1ftkhfa) 3s;}"
   ];
   [@css
-    ".a-dmsj4v{transition:margin-right var(--duration-oa45ow) ease-out var(--delay-dgz948);}"
+    "._a_dmn3fb{transition:var(--property-ivu2ul) var(--duration-kgrecx) var(--timingFunction-1p09x3l) 3s;}"
   ];
   [@css
-    ".a-dmoj59{transition:var(--property-1fgs2tm) var(--duration-1n1s912) ease-out var(--delay-1ba13bw);}"
+    "._a_dmsj4v{transition:margin-right var(--duration-oa45ow) ease-out var(--delay-dgz948);}"
   ];
   [@css
-    ".a-dmhenj{transition:margin-right 0.2s var(--timingFunction-1tn5ly2) 3s;}"
+    "._a_dmoj59{transition:var(--property-1fgs2tm) var(--duration-1n1s912) ease-out var(--delay-1ba13bw);}"
   ];
   [@css
-    ".a-dmix23{transition:margin-right 0.2s ease-out var(--delay-16ruk7g);}"
+    "._a_dmhenj{transition:margin-right 0.2s var(--timingFunction-1tn5ly2) 3s;}"
   ];
-  [@css ".a-dmgdrt{transition:var(--property-11bcg03) 0.2s ease-in;}"];
   [@css
-    ".a-dmrew9{transition:var(--property-dpf9r8) 0.2s var(--timingFunction-5iq5eh);}"
+    "._a_dmix23{transition:margin-right 0.2s ease-out var(--delay-16ruk7g);}"
   ];
-  [@css ".a-dmxeae{transition:margin-right var(--duration-sueb4i) ease-in;}"];
+  [@css "._a_dmgdrt{transition:var(--property-11bcg03) 0.2s ease-in;}"];
   [@css
-    ".a-dm5bqb{transition:var(--property-87e7ig) var(--duration-1rwycv) ease-in;}"
+    "._a_dmrew9{transition:var(--property-dpf9r8) 0.2s var(--timingFunction-5iq5eh);}"
   ];
-  [@css ".a-dm81bt{transition:margin-right 0.2s var(--timingFunction-7aarh0);}"];
-  [@css ".a-dmvqcx{transition:var(--property-1f94jkq) 0.2s;}"];
-  [@css ".a-dm4q0n{transition:margin-right var(--duration-fvn1cf);}"];
+  [@css "._a_dmxeae{transition:margin-right var(--duration-sueb4i) ease-in;}"];
+  [@css
+    "._a_dm5bqb{transition:var(--property-87e7ig) var(--duration-1rwycv) ease-in;}"
+  ];
+  [@css
+    "._a_dm81bt{transition:margin-right 0.2s var(--timingFunction-7aarh0);}"
+  ];
+  [@css "._a_dmvqcx{transition:var(--property-1f94jkq) 0.2s;}"];
+  [@css "._a_dm4q0n{transition:margin-right var(--duration-fvn1cf);}"];
   
-  CSS.make("a-dm008lsnu", []);
-  CSS.make("a-dm0087oni", []);
-  CSS.make("a-dm0082vzd", []);
-  CSS.make("a-dm0082xp0", []);
-  CSS.make("a-dm004qcio", []);
-  CSS.make("a-dm004wvco", []);
-  CSS.make("a-dm004abun", []);
-  CSS.make("a-dm004wbyo", []);
-  CSS.make("a-dm00g62sr", []);
-  CSS.make("a-dm00gk20j", []);
-  CSS.make("a-dm00gm6mw", []);
-  CSS.make("a-dm00gwco7", []);
-  CSS.make("a-dm00grnz4", []);
-  CSS.make("a-dm00gucrr", []);
-  CSS.make("a-dm00ghuiw", []);
-  CSS.make("a-dm00gkmi5", []);
-  CSS.make("a-dm00gglpi", []);
-  CSS.make("a-dm00gh31g", []);
-  CSS.make("a-dm00g6kkr", []);
-  CSS.make("a-dm00gj2vv", []);
-  CSS.make("a-dm002nxui", []);
-  CSS.make("a-dm002h2bu", []);
-  CSS.make("a-dm002w8mt", []);
-  CSS.make("a-dm001szc2", []);
-  CSS.make("a-dm001g4wh", []);
-  CSS.make("a-dm00158if", []);
-  CSS.make("a-dmmma2", []);
-  CSS.make("a-dmzmc5", []);
-  CSS.make("a-dmmdqb", []);
-  CSS.make("a-dmcb8v", []);
-  CSS.make("a-dmcwj8", []);
-  CSS.make("a-dmny5s", []);
-  CSS.make("a-dmn6u7", []);
-  CSS.make("a-dmixva", []);
-  CSS.make("a-dmed1j", []);
-  CSS.make("a-dm2e7j", []);
-  CSS.make("a-dmvjvi", []);
+  CSS.make("_a_dm008lsnu", []);
+  CSS.make("_a_dm0087oni", []);
+  CSS.make("_a_dm0082vzd", []);
+  CSS.make("_a_dm0082xp0", []);
+  CSS.make("_a_dm004qcio", []);
+  CSS.make("_a_dm004wvco", []);
+  CSS.make("_a_dm004abun", []);
+  CSS.make("_a_dm004wbyo", []);
+  CSS.make("_a_dm00g62sr", []);
+  CSS.make("_a_dm00gk20j", []);
+  CSS.make("_a_dm00gm6mw", []);
+  CSS.make("_a_dm00gwco7", []);
+  CSS.make("_a_dm00grnz4", []);
+  CSS.make("_a_dm00gucrr", []);
+  CSS.make("_a_dm00ghuiw", []);
+  CSS.make("_a_dm00gkmi5", []);
+  CSS.make("_a_dm00gglpi", []);
+  CSS.make("_a_dm00gh31g", []);
+  CSS.make("_a_dm00g6kkr", []);
+  CSS.make("_a_dm00gj2vv", []);
+  CSS.make("_a_dm002nxui", []);
+  CSS.make("_a_dm002h2bu", []);
+  CSS.make("_a_dm002w8mt", []);
+  CSS.make("_a_dm001szc2", []);
+  CSS.make("_a_dm001g4wh", []);
+  CSS.make("_a_dm00158if", []);
+  CSS.make("_a_dmmma2", []);
+  CSS.make("_a_dmzmc5", []);
+  CSS.make("_a_dmmdqb", []);
+  CSS.make("_a_dmcb8v", []);
+  CSS.make("_a_dmcwj8", []);
+  CSS.make("_a_dmny5s", []);
+  CSS.make("_a_dmn6u7", []);
+  CSS.make("_a_dmixva", []);
+  CSS.make("_a_dmed1j", []);
+  CSS.make("_a_dm2e7j", []);
+  CSS.make("_a_dmvjvi", []);
   
   let property = CSS.Types.TransitionProperty.make("margin-right");
   let timingFunction = `easeOut;
@@ -183,7 +185,7 @@ If this test fail means that the module is not in sync with the ppx
       (),
     );
   CSS.make(
-    "a-dm3f4o",
+    "_a_dm3f4o",
     [
       (
         "--fullTransition-ahh0or",
@@ -198,7 +200,7 @@ If this test fail means that the module is not in sync with the ppx
       (),
     );
   CSS.make(
-    "a-dmv9kq",
+    "_a_dmv9kq",
     [
       (
         "--fullTransition2-ezh8oo",
@@ -208,7 +210,7 @@ If this test fail means that the module is not in sync with the ppx
   );
   
   CSS.make(
-    "a-dm6ojv",
+    "_a_dm6ojv",
     [
       ("--property-18qplnj", CSS.Types.TransitionProperty.toString(property)),
       ("--duration-1iddlz", CSS.Types.Time.toString(duration)),
@@ -221,7 +223,7 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.make(
-    "a-dmw6lg",
+    "_a_dmw6lg",
     [
       ("--property-14kilfb", CSS.Types.TransitionProperty.toString(property)),
       ("--duration-1ejdhyh", CSS.Types.Time.toString(duration)),
@@ -234,11 +236,11 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.make(
-    "a-dmxtlc",
+    "_a_dmxtlc",
     [("--property-h7mj8c", CSS.Types.TransitionProperty.toString(property))],
   );
   CSS.make(
-    "a-dmf0xc",
+    "_a_dmf0xc",
     [
       ("--property-1skeegy", CSS.Types.TransitionProperty.toString(property)),
       (
@@ -248,7 +250,7 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.make(
-    "a-dmn3fb",
+    "_a_dmn3fb",
     [
       ("--property-ivu2ul", CSS.Types.TransitionProperty.toString(property)),
       ("--duration-kgrecx", CSS.Types.Time.toString(duration)),
@@ -259,14 +261,14 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.make(
-    "a-dmsj4v",
+    "_a_dmsj4v",
     [
       ("--duration-oa45ow", CSS.Types.Time.toString(duration)),
       ("--delay-dgz948", CSS.Types.Time.toString(delay)),
     ],
   );
   CSS.make(
-    "a-dmoj59",
+    "_a_dmoj59",
     [
       ("--property-1fgs2tm", CSS.Types.TransitionProperty.toString(property)),
       ("--duration-1n1s912", CSS.Types.Time.toString(duration)),
@@ -274,7 +276,7 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.make(
-    "a-dmhenj",
+    "_a_dmhenj",
     [
       (
         "--timingFunction-1tn5ly2",
@@ -283,15 +285,15 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.make(
-    "a-dmix23",
+    "_a_dmix23",
     [("--delay-16ruk7g", CSS.Types.Time.toString(delay))],
   );
   CSS.make(
-    "a-dmgdrt",
+    "_a_dmgdrt",
     [("--property-11bcg03", CSS.Types.TransitionProperty.toString(property))],
   );
   CSS.make(
-    "a-dmrew9",
+    "_a_dmrew9",
     [
       ("--property-dpf9r8", CSS.Types.TransitionProperty.toString(property)),
       (
@@ -301,18 +303,18 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.make(
-    "a-dmxeae",
+    "_a_dmxeae",
     [("--duration-sueb4i", CSS.Types.Time.toString(duration))],
   );
   CSS.make(
-    "a-dm5bqb",
+    "_a_dm5bqb",
     [
       ("--property-87e7ig", CSS.Types.TransitionProperty.toString(property)),
       ("--duration-1rwycv", CSS.Types.Time.toString(duration)),
     ],
   );
   CSS.make(
-    "a-dm81bt",
+    "_a_dm81bt",
     [
       (
         "--timingFunction-7aarh0",
@@ -321,15 +323,15 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.make(
-    "a-dmgdrt",
+    "_a_dmgdrt",
     [("--property-11bcg03", CSS.Types.TransitionProperty.toString(property))],
   );
   CSS.make(
-    "a-dmxeae",
+    "_a_dmxeae",
     [("--duration-sueb4i", CSS.Types.Time.toString(duration))],
   );
   CSS.make(
-    "a-dm81bt",
+    "_a_dm81bt",
     [
       (
         "--timingFunction-7aarh0",
@@ -338,10 +340,10 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.make(
-    "a-dmvqcx",
+    "_a_dmvqcx",
     [("--property-1f94jkq", CSS.Types.TransitionProperty.toString(property))],
   );
   CSS.make(
-    "a-dm4q0n",
+    "_a_dm4q0n",
     [("--duration-fvn1cf", CSS.Types.Time.toString(duration))],
   );

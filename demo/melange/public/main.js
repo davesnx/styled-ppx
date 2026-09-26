@@ -62716,7 +62716,7 @@ var yellowgreen = {
 var transparent2 = "transparent";
 
 // ../demo-melange/node_modules/styled-ppx.melange/Merge_key.mjs
-var atom_prefix = "a-";
+var atom_prefix = "_a_";
 var all_sentinel = "zz";
 var unregistered_custom_marker = "zy";
 var direction_marker = "5q";
@@ -63391,7 +63391,7 @@ var AppGlobalStyles = {
   make: make8
 };
 var stack = make7(
-  "label:stack id-195s1dh a-5r08qs a-61001q59l",
+  "label:stack _id_195s1dh _a_5r08qs _a_61001q59l",
   /* [] */
   0
 );
@@ -63404,7 +63404,7 @@ function getOrEmpty(str) {
 }
 function styles2(lolaOpt, param) {
   const lola = lolaOpt !== void 0 ? lolaOpt : px2(0);
-  return make7("label:Cositas id-uk3qz7 a-5r08qs a-61001q59l a-6fvq9t", {
+  return make7("label:Cositas _id_uk3qz7 _a_5r08qs _a_61001q59l _a_6fvq9t", {
     hd: [
       "--lola-8erbae",
       Gap.toString(lola)
@@ -63436,38 +63436,38 @@ var Cositas = {
   make: make$12
 };
 var selectors = make7(
-  "label:selectors id-pm05s2 a-4ekvmb a-qyw7u4enfjo",
+  "label:selectors _id_pm05s2 _a_4ekvmb _a_qyw7u4enfjo",
   /* [] */
   0
 );
-var bounce = AnimationName.make(void 0, "k-deb5ee");
+var bounce = AnimationName.make(void 0, "_k_deb5ee");
 var clx = make7(
-  "label:clx id-47oj19 a-65001vzlw a-5l0tf2 a-6i00gjp3a",
+  "label:clx _id_47oj19 _a_65001vzlw _a_5l0tf2 _a_6i00gjp3a",
   /* [] */
   0
 );
 var post = make7(
-  "label:post id-gbz02q a-3hr52a a-4v002zm71",
+  "label:post _id_gbz02q _a_3hr52a _a_4v002zm71",
   /* [] */
   0
 );
 var card = make7(
-  "label:card id-ebd8w7 a-7peacs a-3hk368 a-6500wuzg5",
+  "label:card _id_ebd8w7 _a_7peacs _a_3hk368 _a_6500wuzg5",
   /* [] */
   0
 );
 var container = make7(
-  "label:container id-1hzr7q6 a-p3y4xecqinc a-p3y4x39004aeeb a-p3y4x6500w3p37 a-2grgh65m9swpj2",
+  "label:container _id_1hzr7q6 _a_p3y4xecqinc _a_p3y4x39004aeeb _a_p3y4x6500w3p37 _a_2grgh65m9swpj2",
   /* [] */
   0
 );
 var gradiend = make7(
-  "label:gradiend id-j1a2e7 a-94yyxm a-39008lxhy",
+  "label:gradiend _id_j1a2e7 _a_94yyxm _a_39008lxhy",
   /* [] */
   0
 );
 var tag = make7(
-  "label:tag id-1a86vzz a-5rulvz a-94i1gv a-7p002emmb a-3hft4e a-3npnzt",
+  "label:tag _id_1a86vzz _a_5rulvz _a_94i1gv _a_7p002emmb _a_3hft4e _a_3npnzt",
   /* [] */
   0
 );
@@ -63475,37 +63475,37 @@ var Labels = {
   tag
 };
 var childLabel = make7(
-  "label:childLabel id-6prbgi a-65m9s3yi3",
+  "label:childLabel _id_6prbgi _a_65m9s3yi3",
   /* [] */
   0
 );
 var parentWithChildSelector = make7(
-  "label:parentWithChildSelector id-1wu39qc a-3h2ik7 a-94idj6 a-7p001m1lh a-auvzk4e6789 a-psjsu39ao10",
+  "label:parentWithChildSelector _id_1wu39qc _a_3h2ik7 _a_94idj6 _a_7p001m1lh _a_5arac4ell0e _a_j7d0239xe6s",
   /* [] */
   0
 );
 var modifierActive = make7(
-  "label:modifierActive id-h4gfxd a-65m9s3yi3",
+  "label:modifierActive _id_h4gfxd _a_65m9s3yi3",
   /* [] */
   0
 );
 var toggle = make7(
-  "label:toggle id-mfk87c a-5rulvz a-94izlt a-7p0040wuy a-3h7z9l a-3n71pq a-9nh7a39946k a-9nh7a3hef5pi22",
+  "label:toggle _id_mfk87c _a_5rulvz _a_94izlt _a_7p0040wuy _a_3h7z9l _a_3n71pq _a_i52hj395tlc _a_i52hj3hef5ogsp",
   /* [] */
   0
 );
 var mergeLeftRed = make7(
-  "label:mergeLeftRed id-xj79l2 a-4ekvmb",
+  "label:mergeLeftRed _id_xj79l2 _a_4ekvmb",
   /* [] */
   0
 );
 var mergeRightBlue = make7(
-  "label:mergeRightBlue id-rmeksf a-4esm7b",
+  "label:mergeRightBlue _id_rmeksf _a_4esm7b",
   /* [] */
   0
 );
 var heightAutoDecoy = make7(
-  "label:heightAutoDecoy id-12da7xi a-6l7jm9",
+  "label:heightAutoDecoy _id_12da7xi _a_6l7jm9",
   /* [] */
   0
 );
@@ -63513,117 +63513,117 @@ var FaqDecoy = {
   heightAutoDecoy
 };
 var faqOpenContent = make7(
-  "label:faqOpenContent id-qck8g9 a-6l7jm9 a-8rbazn",
+  "label:faqOpenContent _id_qck8g9 _a_6l7jm9 _a_8rbazn",
   /* [] */
   0
 );
 var faqCollapsed = make7(
-  "label:faqCollapsed id-1tw41t7 a-6lvr0w",
+  "label:faqCollapsed _id_1tw41t7 _a_6lvr0w",
   /* [] */
   0
 );
 var marginTopZero = make7(
-  "label:marginTopZero id-c4lyme a-7p008n4zf",
+  "label:marginTopZero _id_c4lyme _a_7p008n4zf",
   /* [] */
   0
 );
 var marginAll10 = make7(
-  "label:marginAll10 id-rrmfw a-7peacs",
+  "label:marginAll10 _id_rrmfw _a_7peacs",
   /* [] */
   0
 );
 var marginAll10Reversed = make7(
-  "label:marginAll10Reversed id-19kb2l3 a-7peacs",
+  "label:marginAll10Reversed _id_19kb2l3 _a_7peacs",
   /* [] */
   0
 );
 var marginTopZeroReversed = make7(
-  "label:marginTopZeroReversed id-oibhbu a-7p008n4zf",
+  "label:marginTopZeroReversed _id_oibhbu _a_7p008n4zf",
   /* [] */
   0
 );
 var differentColor = make7(
-  "label:differentColor id-1yxuf5h a-4e3x2f",
+  "label:differentColor _id_1yxuf5h _a_4e3x2f",
   /* [] */
   0
 );
 var differentBackground = make7(
-  "label:differentBackground id-m7e9qy a-39zz22",
+  "label:differentBackground _id_m7e9qy _a_39zz22",
   /* [] */
   0
 );
 var hoverBaseColor = make7(
-  "label:hoverBaseColor id-69rt6v a-4ecoli",
+  "label:hoverBaseColor _id_69rt6v _a_4ecoli",
   /* [] */
   0
 );
 var hoverOverride = make7(
-  "label:hoverOverride id-zaoc9q a-qyw7u4eb4a5",
+  "label:hoverOverride _id_zaoc9q _a_qyw7u4eb4a5",
   /* [] */
   0
 );
 var hoverFirst = make7(
-  "label:hoverFirst id-vfuhim a-qyw7u4ego80",
+  "label:hoverFirst _id_vfuhim _a_qyw7u4ego80",
   /* [] */
   0
 );
 var hoverSecond = make7(
-  "label:hoverSecond id-st9aqn a-qyw7u4em3mo",
+  "label:hoverSecond _id_st9aqn _a_qyw7u4em3mo",
   /* [] */
   0
 );
 var mediaFirst = make7(
-  "label:mediaFirst id-1yjmkjm a-ftrjp4eqtu6",
+  "label:mediaFirst _id_1yjmkjm _a_ftrjp4eqtu6",
   /* [] */
   0
 );
 var mediaSecond = make7(
-  "label:mediaSecond id-dpv5ji a-ftrjp4edjbj",
+  "label:mediaSecond _id_dpv5ji _a_ftrjp4edjbj",
   /* [] */
   0
 );
 var importantRed = make7(
-  "label:importantRed id-cg72f a-oe8sa4eltzl",
+  "label:importantRed _id_cg72f _a_oe8sa4eltzl",
   /* [] */
   0
 );
 var plainBlueForImportant = make7(
-  "label:plainBlueForImportant id-ovywjm a-4esm7b",
+  "label:plainBlueForImportant _id_ovywjm _a_4esm7b",
   /* [] */
   0
 );
 var plainRedForImportant = make7(
-  "label:plainRedForImportant id-1y9lfm8 a-4ekvmb",
+  "label:plainRedForImportant _id_1y9lfm8 _a_4ekvmb",
   /* [] */
   0
 );
 var importantBlue = make7(
-  "label:importantBlue id-q3vp21 a-oe8sa4e3jtv",
+  "label:importantBlue _id_q3vp21 _a_oe8sa4e3jtv",
   /* [] */
   0
 );
 var importantRedVsImportantBlue = make7(
-  "label:importantRedVsImportantBlue id-17mhudr a-oe8sa4eltzl",
+  "label:importantRedVsImportantBlue _id_17mhudr _a_oe8sa4eltzl",
   /* [] */
   0
 );
 var customXRed = make7(
-  "label:customXRed id-iv9hkj a-zytx2ztfp7wt",
+  "label:customXRed _id_iv9hkj _a_zytx2ztfp7wt",
   /* [] */
   0
 );
 var customXBlue = make7(
-  "label:customXBlue id-j3dium a-zytx2ztfqbjc",
+  "label:customXBlue _id_j3dium _a_zytx2ztfqbjc",
   /* [] */
   0
 );
 var useCustomX = make7(
-  "label:useCustomX id-vzabfw a-4e8w5r",
+  "label:useCustomX _id_vzabfw _a_4e8w5r",
   /* [] */
   0
 );
 function dynColorA(color) {
-  return make7("label:dynColorA id-oxnnly a-4esjgz", {
+  return make7("label:dynColorA _id_oxnnly _a_4esjgz", {
     hd: [
       "--color-1a279q8",
       Color.toString(color)
@@ -63635,7 +63635,7 @@ function dynColorA(color) {
   });
 }
 function dynColorB(color) {
-  return make7("label:dynColorB id-eaixg1 a-4esjgz", {
+  return make7("label:dynColorB _id_eaixg1 _a_4esjgz", {
     hd: [
       "--color-1a279q8",
       Color.toString(color)
@@ -63647,58 +63647,58 @@ function dynColorB(color) {
   });
 }
 var assocA = make7(
-  "label:assocA id-1ns1py9 a-4efdvb",
+  "label:assocA _id_1ns1py9 _a_4efdvb",
   /* [] */
   0
 );
 var assocB = make7(
-  "label:assocB id-1ojnt9w a-4et30w",
+  "label:assocB _id_1ojnt9w _a_4et30w",
   /* [] */
   0
 );
 var assocC = make7(
-  "label:assocC id-167j6uv a-4efm8j",
+  "label:assocC _id_167j6uv _a_4efm8j",
   /* [] */
   0
 );
 var paddingBothZero = make7(
-  "label:paddingBothZero id-kx9m5d a-94002yq1t a-940048fgp",
+  "label:paddingBothZero _id_kx9m5d _a_94002yq1t _a_940048fgp",
   /* [] */
   0
 );
 var paddingLeft4 = make7(
-  "label:paddingLeft4 id-1j3kmra a-94002wcsq",
+  "label:paddingLeft4 _id_1j3kmra _a_94002wcsq",
   /* [] */
   0
 );
 var wordWrapBreak = make7(
-  "label:wordWrapBreak id-k9t8x6 a-8xpt08",
+  "label:wordWrapBreak _id_k9t8x6 _a_8xpt08",
   /* [] */
   0
 );
 var overflowWrapNormal = make7(
-  "label:overflowWrapNormal id-1l5xha2 a-8xlw6e",
+  "label:overflowWrapNormal _id_1l5xha2 _a_8xlw6e",
   /* [] */
   0
 );
 var identityKeptColor = make7(
-  "label:identityKeptColor id-15nl9wy a-4enj2d",
+  "label:identityKeptColor _id_15nl9wy _a_4enj2d",
   /* [] */
   0
 );
 var identityKeptOverride = make7(
-  "label:identityKeptOverride id-10n1eq1 a-4efdvb",
+  "label:identityKeptOverride _id_10n1eq1 _a_4efdvb",
   /* [] */
   0
 );
 var identityKeptHighlight = make7(
-  "label:identityKeptHighlight id-1cfjy5z a-lrdmscfwr95",
+  "label:identityKeptHighlight _id_1cfjy5z _a_a5k1dcfwtlg",
   /* [] */
   0
 );
 var primary = hex2("141414");
 function keyframeDemoShell(color) {
-  return make7("label:keyframeDemoShell id-8xpkpc a-94zrtu a-7p0013pbo a-3hft4e a-3n1jeb a-395zh2 a-4esjgz a-65001vzlw", {
+  return make7("label:keyframeDemoShell _id_8xpkpc _a_94zrtu _a_7p0013pbo _a_3hft4e _a_3n1jeb _a_395zh2 _a_4esjgz _a_65001vzlw", {
     hd: [
       "--color-1a279q8",
       Color.toString(color)
@@ -63732,8 +63732,8 @@ var resize2 = AnimationName.make({
       0
     )
   }
-}, "k-1kt58w0");
-var keyframeDemoCard = make7("label:keyframeDemoCard id-jbn4tz a-2z01sbkao a-2z008ee5x a-2z1kwa72f a-2z00gvuyg a-ecl4rb a-8rbazn a-5r08qs a-9i001xndt a-9h002ndxa a-3n7svr a-39fawg a-4en7if a-4092kl", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
+}, "_k_1kt58w0");
+var keyframeDemoCard = make7("label:keyframeDemoCard _id_jbn4tz _a_2z01sbkao _a_2z008ee5x _a_2z1kwa72f _a_2z00gvuyg _a_ecl4rb _a_8rbazn _a_5r08qs _a_9i001xndt _a_9h002ndxa _a_3n7svr _a_39fawg _a_4en7if _a_4092kl", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
 function Main(Props) {
   return JsxRuntime.jsxs("main", {
     children: [

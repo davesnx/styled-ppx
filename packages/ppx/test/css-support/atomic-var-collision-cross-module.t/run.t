@@ -23,12 +23,12 @@ variable baked into that identical atom -> a class/var mismatch.
 The background-color atom has the SAME class name in both modules AND the
 same `var(--...)` target despite the differing sibling. These two lines
 must stay byte-identical. (This declaration is the only interpolating one
-in its own binding, so it mints a real, slot-keyed `a-` atom - same path a
-static atom uses - not an `in-` bundle; see `Slot_key.t.bundle`'s doc.)
+in its own binding, so it mints a real, slot-keyed `_a_` atom - same path a
+static atom uses - not an `_in_` bundle; see `Slot_key.t.bundle`'s doc.)
 
-  $ grep -ho 'a-[0-9a-z]*{background-color:var(--[A-Za-z0-9_-]*);}' a.ml b.ml
-  a-39004qac1{background-color:var(--box-11ifi3f);}
-  a-39004qac1{background-color:var(--box-11ifi3f);}
+  $ grep -ho '_a_[0-9a-z]*{background-color:var(--[A-Za-z0-9_-]*);}' a.ml b.ml
+  _a_39004qac1{background-color:var(--box-11ifi3f);}
+  _a_39004qac1{background-color:var(--box-11ifi3f);}
 
 Each module's runtime binding sets the same custom property:
 
@@ -38,7 +38,7 @@ Each module's runtime binding sets the same custom property:
 
 Aggregating both modules into one stylesheet dedupes by the FULL rule text
 (generate.ml:280). Because both modules now emit a byte-identical
-`a-39004qac1` rule, dedup collapses them to one -> the selector appears
+`_a_39004qac1` rule, dedup collapses them to one -> the selector appears
 exactly once with the variable every `header` element actually sets. Before
 the fix the two rules had different bodies, both survived, and the cascade
 left one module's element referencing an undefined variable (missing
@@ -50,7 +50,7 @@ background).
   @property --box-11ifi3f{syntax:"*";inherits:false;}
   @layer styled-ppx.global, styled-ppx.descendant, styled-ppx.base, styled-ppx.conditional;
   @layer styled-ppx.base {
-  .a-39004qac1{background-color:var(--box-11ifi3f);}
-  .a-5r08qs{display:flex;}
-  .a-94gf8j{padding:8px;}
+  ._a_39004qac1{background-color:var(--box-11ifi3f);}
+  ._a_5r08qs{display:flex;}
+  ._a_94gf8j{padding:8px;}
   }

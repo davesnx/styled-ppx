@@ -1,8 +1,8 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".a-5r7eu2{display:block;}"];
-  [@css.bindings [("Output.OneSingleProperty", "id-1wjxo18", "a-5r7eu2")]];
+  [@css "._a_5r7eu2{display:block;}"];
+  [@css.bindings [("Output.OneSingleProperty", "_id_1wjxo18", "_a_5r7eu2")]];
   module OneSingleProperty = {
     [@deriving abstract]
     [@warning "-69"]
@@ -986,7 +986,7 @@
       "Reflect.deleteProperty";
     external assign2: (Js.t({..}), makeProps, Js.t({..})) => Js.t({..}) =
       "Object.assign";
-    let styles = CSS.make("label:OneSingleProperty id-1wjxo18 a-5r7eu2", []);
+    let styles = CSS.make("label:OneSingleProperty _id_1wjxo18 _a_5r7eu2", []);
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(classNameGet(props))
       and style = snd(styles);

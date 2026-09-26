@@ -10,26 +10,26 @@ merged styles cannot overwrite each other.
   $ refmt --parse ml --print re output.ml
   [@css "@property --backgroundColor-ov3le6{syntax:\"*\";inherits:false;}"];
   [@css "@property --backgroundColor-7yjmr3{syntax:\"*\";inherits:false;}"];
-  [@css ".a-39004vrad{background-color:var(--backgroundColor-ov3le6);}"];
+  [@css "._a_39004vrad{background-color:var(--backgroundColor-ov3le6);}"];
   [@css
-    ".a-qyw7u390046meq:hover{background-color:var(--backgroundColor-7yjmr3);}"
+    "._a_qyw7u390046meq:hover{background-color:var(--backgroundColor-7yjmr3);}"
   ];
   [@css.bindings
     [
-      ("Output.common", "id-45bzlz", "a-39004vrad"),
-      ("Output.clickable", "id-1d9eonh", "a-qyw7u390046meq"),
+      ("Output.common", "_id_45bzlz", "_a_39004vrad"),
+      ("Output.clickable", "_id_1d9eonh", "_a_qyw7u390046meq"),
     ]
   ];
   let common = backgroundColor =>
     CSS.make(
-      "label:common id-45bzlz a-39004vrad",
+      "label:common _id_45bzlz _a_39004vrad",
       [
         ("--backgroundColor-ov3le6", CSS.Types.Color.toString(backgroundColor)),
       ],
     );
   let clickable = backgroundColor =>
     CSS.make(
-      "label:clickable id-1d9eonh a-qyw7u390046meq",
+      "label:clickable _id_1d9eonh _a_qyw7u390046meq",
       [
         ("--backgroundColor-7yjmr3", CSS.Types.Color.toString(backgroundColor)),
       ],
