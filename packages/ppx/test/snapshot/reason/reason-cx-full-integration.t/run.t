@@ -11,7 +11,7 @@
   [@@@css "@property --size-3mc4ty{syntax:\"*\";inherits:false;}"]
   [@@@css ".a-5r08qs{display:flex;}"]
   [@@@css ".a-9h002ndxa{justify-content:center;}"]
-  [@@@css ".in-kusjgz{color:var(--color-1a279q8);}"]
+  [@@@css ".a-4esjgz{color:var(--color-1a279q8);}"]
   [@@@css ".in-15a4g54{margin-block:var(--spacing-y96o3b);}"]
   [@@@css ".in-15a4g54{margin-inline:var(--spacing-vh5lkd);}"]
   [@@@css ".in-15a4g54{padding-block-start:var(--spacing-f3qjr);}"]
@@ -48,7 +48,7 @@
   [@@@css ".a-8r0023rg8{overflow-y:auto;}"]
   [@@@css.bindings
     [("Input.staticCss", "id-1ctni4v", "a-5r08qs a-9h002ndxa");
-    ("Input.dynamicCss", "id-71zk3w", "in-kusjgz a-5r08qs");
+    ("Input.dynamicCss", "id-71zk3w", "a-4esjgz a-5r08qs");
     ("Input.logicalProps", "id-r1294l", "in-15a4g54");
     ("Input.nestedCss", "id-apdklp", "a-5r08qs a-qyw7u8mnfaz a-3rgzi60ffsa");
     ("Input.responsiveCss", "id-1glbybz", "a-5r08qs a-5eyct5rz0a1");
@@ -58,13 +58,13 @@
       "a-5r08qs a-5ixlc60vle1 a-5eyct61001mfq6 a-xdd5e60frkw");
     ("Input.complexMedia", "id-yh1q8l",
       "a-5rj0h8 a-hgkhj5riow9 a-wkmu5390049mde");
-    ("Input.mediaWithInterpolation", "id-1c8phv0", "in-kusjgz a-5eyct8mknlj");
+    ("Input.mediaWithInterpolation", "id-1c8phv0", "a-4esjgz a-5eyct8mknlj");
     ("Input.multiVar", "id-ckhvyf", "in-1sq1nk7 a-9432ej");
     ("Input.gridCss", "id-nutj5n", "a-5rj0h8 a-6i00ghlac a-6f10y9");
     ("Input.scrollCss", "id-1d2kyt3", "a-aajuhq a-8r0023rg8")]]
   let staticCss = CSS.make "label:staticCss id-1ctni4v a-5r08qs a-9h002ndxa" []
   let dynamicCss color =
-    CSS.make "label:dynamicCss id-71zk3w in-kusjgz a-5r08qs"
+    CSS.make "label:dynamicCss id-71zk3w a-4esjgz a-5r08qs"
       [("--color-1a279q8", (CSS.Types.Color.toString color))]
   let logicalProps spacing =
     CSS.make "label:logicalProps id-r1294l in-15a4g54"
@@ -88,7 +88,7 @@
     CSS.make
       "label:complexMedia id-yh1q8l a-5rj0h8 a-hgkhj5riow9 a-wkmu5390049mde" []
   let mediaWithInterpolation color =
-    CSS.make "label:mediaWithInterpolation id-1c8phv0 in-kusjgz a-5eyct8mknlj"
+    CSS.make "label:mediaWithInterpolation id-1c8phv0 a-4esjgz a-5eyct8mknlj"
       [("--color-1a279q8", (CSS.Types.Color.toString color))]
   let fadeIn = CSS.Types.AnimationName.make "k-jw9oix"
   let slideUp = CSS.Types.AnimationName.make "k-waibjx"
@@ -144,7 +144,7 @@
   @property --size-3mc4ty{syntax:"*";inherits:false;}
   .a-5r08qs{display:flex;}
   .a-9h002ndxa{justify-content:center;}
-  .in-kusjgz{color:var(--color-1a279q8);}
+  .a-4esjgz{color:var(--color-1a279q8);}
   .in-15a4g54{margin-block:var(--spacing-y96o3b);}
   .in-15a4g54{margin-inline:var(--spacing-vh5lkd);}
   .in-15a4g54{padding-block-start:var(--spacing-f3qjr);}

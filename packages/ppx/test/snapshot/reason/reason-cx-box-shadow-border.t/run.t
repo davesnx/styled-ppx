@@ -39,10 +39,10 @@
   .a-3nezfo{border-radius:16px;}
   .a-3hstvc{border:2px solid #3b82f6;}
   .a-40ar9w{box-shadow:0px 0px 0px 0px rgba(59, 130, 246, 0.5);}
-  .in-hfzctv{border:1px solid var(--borderColor-1on39sz);}
-  .in-9fu3s3{box-shadow:var(--shadowX-11ljgmp) var(--shadowY-1qn6d0z) var(--blur-1bcbjmk) var(--spread-xxpef3) var(--shadowColor-1sod13t);}
-  .in-fkjemk{box-shadow:var(--myShadow-af5fmc);}
-  .in-11hdrfm{border:var(--borderWidth-apl5wd) solid black;}
+  .a-3hzctv{border:1px solid var(--borderColor-1on39sz);}
+  .a-40u3s3{box-shadow:var(--shadowX-11ljgmp) var(--shadowY-1qn6d0z) var(--blur-1bcbjmk) var(--spread-xxpef3) var(--shadowColor-1sod13t);}
+  .a-40jemk{box-shadow:var(--myShadow-af5fmc);}
+  .a-3hdrfm{border:var(--borderWidth-apl5wd) solid black;}
   .in-zwhmn0{background-color:var(--bgColor-zk5xjv);}
   .in-zwhmn0{border:1px solid var(--borderColor-rm89ze);}
   .in-zwhmn0{box-shadow:var(--shadow-2tj34g);}
@@ -92,11 +92,11 @@ Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
   [@@@css ".a-3nezfo{border-radius:16px;}"]
   [@@@css ".a-3hstvc{border:2px solid #3b82f6;}"]
   [@@@css ".a-40ar9w{box-shadow:0px 0px 0px 0px rgba(59, 130, 246, 0.5);}"]
-  [@@@css ".in-hfzctv{border:1px solid var(--borderColor-1on39sz);}"]
+  [@@@css ".a-3hzctv{border:1px solid var(--borderColor-1on39sz);}"]
   [@@@css
-    ".in-9fu3s3{box-shadow:var(--shadowX-11ljgmp) var(--shadowY-1qn6d0z) var(--blur-1bcbjmk) var(--spread-xxpef3) var(--shadowColor-1sod13t);}"]
-  [@@@css ".in-fkjemk{box-shadow:var(--myShadow-af5fmc);}"]
-  [@@@css ".in-11hdrfm{border:var(--borderWidth-apl5wd) solid black;}"]
+    ".a-40u3s3{box-shadow:var(--shadowX-11ljgmp) var(--shadowY-1qn6d0z) var(--blur-1bcbjmk) var(--spread-xxpef3) var(--shadowColor-1sod13t);}"]
+  [@@@css ".a-40jemk{box-shadow:var(--myShadow-af5fmc);}"]
+  [@@@css ".a-3hdrfm{border:var(--borderWidth-apl5wd) solid black;}"]
   [@@@css ".in-zwhmn0{background-color:var(--bgColor-zk5xjv);}"]
   [@@@css ".in-zwhmn0{border:1px solid var(--borderColor-rm89ze);}"]
   [@@@css ".in-zwhmn0{box-shadow:var(--shadow-2tj34g);}"]
@@ -118,10 +118,10 @@ Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
     ("Output.shadowAndBorder", "id-3k5k4w", "a-405761 a-3hwm2g a-3nkn84");
     ("Output.cardStyle", "id-1je20li", "a-4039qm a-3hxi5p a-3nezfo");
     ("Output.buttonBase", "id-9kxo31", "a-3hstvc a-40ar9w a-3n6otz");
-    ("Output.borderColorInterp", "id-16k72sd", "in-hfzctv");
-    ("Output.shadowInterp", "id-9zd6fn", "in-9fu3s3");
-    ("Output.shadowFullInterp", "id-bg3lpz", "in-fkjemk");
-    ("Output.borderWidthInterp", "id-1h8tvcz", "in-11hdrfm");
+    ("Output.borderColorInterp", "id-16k72sd", "a-3hzctv");
+    ("Output.shadowInterp", "id-9zd6fn", "a-40u3s3");
+    ("Output.shadowFullInterp", "id-bg3lpz", "a-40jemk");
+    ("Output.borderWidthInterp", "id-1h8tvcz", "a-3hdrfm");
     ("Output.mixedCard", "id-10wtrx1", "in-zwhmn0 a-3nkn84")]]
   let simpleShadow = CSS.make "label:simpleShadow id-1ckmdi6 a-4085tv" []
   let multipleShadows = CSS.make "label:multipleShadows id-1urhidx a-402iep" []
@@ -149,24 +149,24 @@ Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
   let buttonBase =
     CSS.make "label:buttonBase id-9kxo31 a-3hstvc a-40ar9w a-3n6otz" []
   let borderColorInterp borderColor =
-    CSS.make "label:borderColorInterp id-16k72sd in-hfzctv"
+    CSS.make "label:borderColorInterp id-16k72sd a-3hzctv"
       [("--borderColor-1on39sz", (CSS.Types.Color.toString borderColor))]
   let shadowInterp shadowX =
     fun shadowY ->
       fun blur ->
         fun spread ->
           fun shadowColor ->
-            CSS.make "label:shadowInterp id-9zd6fn in-9fu3s3"
+            CSS.make "label:shadowInterp id-9zd6fn a-40u3s3"
               [("--shadowX-11ljgmp", (CSS.Types.Length.toString shadowX));
               ("--shadowY-1qn6d0z", (CSS.Types.Length.toString shadowY));
               ("--blur-1bcbjmk", (CSS.Types.Length.toString blur));
               ("--spread-xxpef3", (CSS.Types.Length.toString spread));
               ("--shadowColor-1sod13t", (CSS.Types.Color.toString shadowColor))]
   let shadowFullInterp myShadow =
-    CSS.make "label:shadowFullInterp id-bg3lpz in-fkjemk"
+    CSS.make "label:shadowFullInterp id-bg3lpz a-40jemk"
       [("--myShadow-af5fmc", (CSS.Types.BoxShadows.toString myShadow))]
   let borderWidthInterp borderWidth =
-    CSS.make "label:borderWidthInterp id-1h8tvcz in-11hdrfm"
+    CSS.make "label:borderWidthInterp id-1h8tvcz a-3hdrfm"
       [("--borderWidth-apl5wd", (CSS.Types.LineWidth.toString borderWidth))]
   let mixedCard bgColor =
     fun borderColor ->

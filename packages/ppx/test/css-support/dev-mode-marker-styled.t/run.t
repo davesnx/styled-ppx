@@ -17,11 +17,11 @@ covers both a static payload (Box) and a dynamic labeled-argument payload
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css "@property --color-1a279q8{syntax:\"*\";inherits:false;}"];
   [@css ".a-4ekvmb{color:red;}"];
-  [@css ".in-kusjgz{color:var(--color-1a279q8);}"];
+  [@css ".a-4esjgz{color:var(--color-1a279q8);}"];
   [@css.bindings
     [
       ("Input.Box", "id-zugc0d", "a-4ekvmb"),
-      ("Input.Button", "id-1qldrk3", "in-kusjgz"),
+      ("Input.Button", "id-1qldrk3", "a-4esjgz"),
     ]
   ];
   
@@ -2020,7 +2020,7 @@ covers both a static payload (Box) and a dynamic labeled-argument payload
   
     let styles = (~color: CSS.Types.Color.t, _) =>
       CSS.make(
-        "label:Button id-1qldrk3 in-kusjgz",
+        "label:Button id-1qldrk3 a-4esjgz",
         [("--color-1a279q8", CSS.Types.Color.toString(color))],
       );
     let make = (props: makeProps) => {

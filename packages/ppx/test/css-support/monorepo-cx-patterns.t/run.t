@@ -26,14 +26,14 @@ If this test fail means that the module is not in sync with the ppx
   [@css "@property --line-e0dy15_2{syntax:\"*\";inherits:false;}"];
   [@css "@property --line-e0dy15_3{syntax:\"*\";inherits:false;}"];
   [@css ".a-eck09d{width:30px;}"];
-  [@css ".in-1cx090v{color:var(--tertiary-1cttnp6);}"];
+  [@css ".a-4e090v{color:var(--tertiary-1cttnp6);}"];
   [@css ".a-oe8sa40slgw{box-shadow:inset 1px 0 0 0 transparent !important;}"];
   [@css
-    ".in-1rh80o9{box-shadow:1px 0 0 0 var(--line-9kmuhm_1), inset 0 -1px 0 0 var(--line-9kmuhm_2) !important;}"
+    ".a-oe8sa4080o9{box-shadow:1px 0 0 0 var(--line-9kmuhm_1), inset 0 -1px 0 0 var(--line-9kmuhm_2) !important;}"
   ];
   [@css ".a-400ppg{box-shadow:inset 0 0 0 0 transparent;}"];
   [@css
-    ".in-1bp0v5z:hover{box-shadow:1px 0 0 0 var(--line-1rsudnc_1), inset 0 -1px 0 0 var(--line-1rsudnc_2) !important;}"
+    ".a-h5nao400v5z:hover{box-shadow:1px 0 0 0 var(--line-1rsudnc_1), inset 0 -1px 0 0 var(--line-1rsudnc_2) !important;}"
   ];
   [@css ".in-1nzxk4v{color:var(--secondary-16kletf);}"];
   [@css ".in-1nzxk4v:hover{background-color:var(--box_-vdb5xj);}"];
@@ -53,10 +53,10 @@ If this test fail means that the module is not in sync with the ppx
   ];
   [@css.bindings
     [
-      ("Input._spaceBeforeColon", "id-pwoumt", "a-eck09d in-1cx090v"),
+      ("Input._spaceBeforeColon", "id-pwoumt", "a-eck09d a-4e090v"),
       ("Input._tabInnerFirst", "id-110u1xw", "a-oe8sa40slgw"),
-      ("Input._multiShadowImportant", "id-c7rk0r", "in-1rh80o9"),
-      ("Input._tabTextFirst", "id-19955vg", "a-400ppg in-1bp0v5z"),
+      ("Input._multiShadowImportant", "id-c7rk0r", "a-oe8sa4080o9"),
+      ("Input._tabTextFirst", "id-19955vg", "a-400ppg a-h5nao400v5z"),
       ("Input._tabText", "id-e443o3", "in-1nzxk4v"),
       ("Input._sidebarClosed", "id-1wtohw8", ""),
       (
@@ -83,7 +83,7 @@ If this test fail means that the module is not in sync with the ppx
   
   let _spaceBeforeColon =
     CSS.make(
-      "label:_spaceBeforeColon id-pwoumt a-eck09d in-1cx090v",
+      "label:_spaceBeforeColon id-pwoumt a-eck09d a-4e090v",
       [("--tertiary-1cttnp6", CSS.Types.Color.toString(Color.Text.tertiary))],
     );
   
@@ -92,7 +92,7 @@ If this test fail means that the module is not in sync with the ppx
   
   let _multiShadowImportant =
     CSS.make(
-      "label:_multiShadowImportant id-c7rk0r in-1rh80o9",
+      "label:_multiShadowImportant id-c7rk0r a-oe8sa4080o9",
       [
         ("--line-9kmuhm_1", CSS.Types.Color.toString(Color.Border.line)),
         ("--line-9kmuhm_2", CSS.Types.Color.toString(Color.Border.line)),
@@ -101,7 +101,7 @@ If this test fail means that the module is not in sync with the ppx
   
   let _tabTextFirst =
     CSS.make(
-      "label:_tabTextFirst id-19955vg a-400ppg in-1bp0v5z",
+      "label:_tabTextFirst id-19955vg a-400ppg a-h5nao400v5z",
       [
         ("--line-1rsudnc_1", CSS.Types.Color.toString(Color.Border.line)),
         ("--line-1rsudnc_2", CSS.Types.Color.toString(Color.Border.line)),

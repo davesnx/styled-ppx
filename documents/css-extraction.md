@@ -547,12 +547,16 @@ the same class, dev or production. Minting lives in
 `packages/ppx/src/Hash_class.ml` (`Class_format.slot_class`); the
 `(context, family, mask)` triple comes from `packages/ppx/slot_key`.
 
-One exception: an atom whose declaration carries a `$(...)` value
-interpolation mints `in-<murmur2 hash>` instead - a plain, unbucketed
-hash of the content, no context/family/mask fields at all.
-Several such declarations from one binding that all interpolate share
-ONE `in-` class (the "bundle" - see `Css_file.re`'s `transform_rule_list`),
-collapsing their custom-property namespace into one; a bundle's own
+One exception: when a block has TWO OR MORE declarations that carry a
+`$(...)` value interpolation, they mint one shared `in-<murmur2 hash>`
+class instead - a plain, unbucketed hash of their concatenated content, no
+context/family/mask fields at all (the "bundle" - see `Css_file.re`'s
+`transform_rule_list`). A single interpolating declaration is NOT a
+bundle: it mints its own real, slot-keyed `a-` class exactly like a static
+atom, and merges normally (see `CSS.merge` below) - bundling only kicks
+in when two or more of a block's interpolating declarations would
+otherwise need separate custom-property namespaces for what is often the
+same value reused across `base`/`:hover`/`@media` variants. A bundle's own
 `var(--...)` target is unaffected by which prefix its class carries,
 since only the CLASS half of `Hash_class.class_and_namespace` differs
 between the two cases, never the namespace/variable-naming half. The

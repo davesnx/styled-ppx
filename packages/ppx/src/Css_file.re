@@ -1282,18 +1282,27 @@ module Css_transform = {
     let atomic_rules =
       atomize_rules(~source_position_start, selector_resolved_rules);
 
-    /* Selective atomization: the block's interpolating declarations become one
-       content-addressed bundle, with class `in-<B>` and var namespace
-       `css-<B>` (same bundle content hash, different literal prefix - see
-       Hash_class.ml's "Prefix rename") shared across base/`:hover`/`@media`.
-       Both derive from the same bundle content, so identical bundles dedup
-       to identical rules + vars and different bundles never collide,
-       preserving the cross-module atomic invariant (see Hash_class.ml) and
-       `CSS.merge`.
+    /* Selective atomization: TWO OR MORE of the block's interpolating
+       declarations become one content-addressed bundle, with class `in-<B>`
+       and var namespace `css-<B>` (same bundle content hash, different
+       literal prefix - see Hash_class.ml's "Prefix rename") shared across
+       base/`:hover`/`@media`. Both derive from the same bundle content, so
+       identical bundles dedup to identical rules + vars and different
+       bundles never collide, preserving the cross-module atomic invariant
+       (see Hash_class.ml).
+
+       A block with exactly ONE interpolating declaration is not a bundle at
+       all: it already got a real, structural slot-keyed class from
+       `atomize_rules` above (via `Hash_class.class_and_namespace` /
+       `Slot_key.of_atom`, same path a static atom uses), so it merges
+       normally like any other atom - `CSS.merge` only stays blind to a
+       declaration that genuinely shares its class with an unrelated
+       sibling, not to every interpolated declaration on principle.
 
        Static declarations keep their own per-content atom class (still shared
-       across blocks). A block with no interpolation produces no bundle and is
-       byte-for-byte identical to the pre-bundle output. */
+       across blocks). A block with no interpolation, or exactly one
+       interpolating declaration, produces no bundle and is byte-for-byte
+       identical to the pre-bundle output for that declaration. */
     let bundle =
       switch (
         atomic_rules
@@ -1302,7 +1311,8 @@ module Css_transform = {
                ? Some(render_rule(rule)) : None
            )
       ) {
-      | [] => None
+      | []
+      | [_] => None
       | seeds =>
         Some(
           Hash_class.bundle_class_and_namespace(String.concat("", seeds)),

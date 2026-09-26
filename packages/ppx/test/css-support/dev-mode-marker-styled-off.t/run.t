@@ -16,11 +16,11 @@ Dev markers are on by default; `--env production` turns them off for
   [@css.config [("env", "production")]];
   [@css "@property --color-1a279q8{syntax:\"*\";inherits:false;}"];
   [@css ".a-4ekvmb{color:red;}"];
-  [@css ".in-kusjgz{color:var(--color-1a279q8);}"];
+  [@css ".a-4esjgz{color:var(--color-1a279q8);}"];
   [@css.bindings
     [
       ("Input.Box", "id-zugc0d", "a-4ekvmb"),
-      ("Input.Button", "id-1qldrk3", "in-kusjgz"),
+      ("Input.Button", "id-1qldrk3", "a-4esjgz"),
     ]
   ];
   
@@ -2019,7 +2019,7 @@ Dev markers are on by default; `--env production` turns them off for
   
     let styles = (~color: CSS.Types.Color.t, _) =>
       CSS.make(
-        "id-1qldrk3 in-kusjgz",
+        "id-1qldrk3 a-4esjgz",
         [("--color-1a279q8", CSS.Types.Color.toString(color))],
       );
     let make = (props: makeProps) => {

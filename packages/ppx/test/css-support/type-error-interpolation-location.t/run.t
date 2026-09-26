@@ -40,13 +40,13 @@ If this test fail means that the module is not in sync with the ppx
     ".a-6i00gkbxn{grid-template-columns:fit-content(20px) fit-content(10%);}"
   ];
   [@css
-    ".in-1wxdqmz{-webkit-text-decoration:var(--cosas-112i897);text-decoration:var(--cosas-112i897);}"
+    ".a-cfdqmz{-webkit-text-decoration:var(--cosas-112i897);text-decoration:var(--cosas-112i897);}"
   ];
   let cosas = `bold;
   
   CSS.make("a-ecanqs a-6i00gkbxn", []);
   
   CSS.make(
-    "in-1wxdqmz",
+    "a-cfdqmz",
     [("--cosas-112i897", CSS.Types.TextDecoration.toString(cosas))],
   );

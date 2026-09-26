@@ -63404,7 +63404,7 @@ function getOrEmpty(str) {
 }
 function styles2(lolaOpt, param) {
   const lola = lolaOpt !== void 0 ? lolaOpt : px2(0);
-  return make7("label:Cositas id-uk3qz7 a-5r08qs a-61001q59l in-r0vq9t", {
+  return make7("label:Cositas id-uk3qz7 a-5r08qs a-61001q59l a-6fvq9t", {
     hd: [
       "--lola-8erbae",
       Gap.toString(lola)
@@ -63623,7 +63623,7 @@ var useCustomX = make7(
   0
 );
 function dynColorA(color) {
-  return make7("label:dynColorA id-oxnnly in-kusjgz", {
+  return make7("label:dynColorA id-oxnnly a-4esjgz", {
     hd: [
       "--color-1a279q8",
       Color.toString(color)
@@ -63635,7 +63635,7 @@ function dynColorA(color) {
   });
 }
 function dynColorB(color) {
-  return make7("label:dynColorB id-eaixg1 in-kusjgz", {
+  return make7("label:dynColorB id-eaixg1 a-4esjgz", {
     hd: [
       "--color-1a279q8",
       Color.toString(color)
@@ -63698,7 +63698,7 @@ var identityKeptHighlight = make7(
 );
 var primary = hex2("141414");
 function keyframeDemoShell(color) {
-  return make7("label:keyframeDemoShell id-8xpkpc a-94zrtu a-7p0013pbo a-3hft4e a-3n1jeb a-395zh2 in-kusjgz a-65001vzlw", {
+  return make7("label:keyframeDemoShell id-8xpkpc a-94zrtu a-7p0013pbo a-3hft4e a-3n1jeb a-395zh2 a-4esjgz a-65001vzlw", {
     hd: [
       "--color-1a279q8",
       Color.toString(color)
@@ -63733,7 +63733,7 @@ var resize2 = AnimationName.make({
     )
   }
 }, "k-1kt58w0");
-var keyframeDemoCard = make7("label:keyframeDemoCard id-jbn4tz in-1h7bkao a-2z008ee5x a-2z1kwa72f a-2z00gvuyg a-ecl4rb a-8rbazn a-5r08qs a-9i001xndt a-9h002ndxa a-3n7svr a-39fawg a-4en7if a-4092kl", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
+var keyframeDemoCard = make7("label:keyframeDemoCard id-jbn4tz a-2z01sbkao a-2z008ee5x a-2z1kwa72f a-2z00gvuyg a-ecl4rb a-8rbazn a-5r08qs a-9i001xndt a-9h002ndxa a-3n7svr a-39fawg a-4en7if a-4092kl", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
 function Main(Props) {
   return JsxRuntime.jsxs("main", {
     children: [

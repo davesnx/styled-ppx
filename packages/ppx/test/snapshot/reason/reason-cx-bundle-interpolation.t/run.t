@@ -1,5 +1,9 @@
 Plan 3b: a block's interpolating declarations share one bundle class and one
-var per (source-path, runtime-type) across base / :hover / @media variants.
+var per (source-path, runtime-type) across base / :hover / @media variants -
+but only when TWO OR MORE of them share the block (`multiVariant`, `mixed`,
+`twoTypes` below). The last two anonymous bindings each have exactly ONE
+interpolating declaration, so they are not bundles at all: each mints its
+own real, slot-keyed `a-` class instead.
 
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
@@ -18,7 +22,7 @@ var per (source-path, runtime-type) across base / :hover / @media variants.
   [@css ".in-e286e6{width:var(--width-1v9ua);}"];
   [@css ".in-e286e6:hover{height:var(--width-c62vcf);}"];
   [@css ".a-4ekvmb{color:red;}"];
-  [@css ".in-lfbwy0:hover{color:var(--color-4uzv5u);}"];
+  [@css ".a-qyw7u4ebwy0:hover{color:var(--color-4uzv5u);}"];
   [@css.bindings
     [
       ("Output.multiVariant", "id-1be0zju", "in-1kbzua4"),
@@ -48,11 +52,11 @@ var per (source-path, runtime-type) across base / :hover / @media variants.
     );
   let _ =
     CSS.make(
-      "a-4ekvmb in-lfbwy0",
+      "a-4ekvmb a-qyw7u4ebwy0",
       [("--color-4uzv5u", CSS.Types.Color.toString(color))],
     );
   let _ =
     CSS.make(
-      "a-5r08qs in-lfbwy0",
+      "a-5r08qs a-qyw7u4ebwy0",
       [("--color-4uzv5u", CSS.Types.Color.toString(color))],
     );

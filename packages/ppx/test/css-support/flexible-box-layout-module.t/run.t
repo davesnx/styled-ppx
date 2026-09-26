@@ -45,16 +45,16 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".a-60x0uu{-webkit-flex:2 2;-ms-flex:2 2;flex:2 2;}"];
   [@css ".a-608a55{-webkit-flex:2 2 10%;-ms-flex:2 2 10%;flex:2 2 10%;}"];
   [@css
-    ".in-1x4f3wz{-webkit-flex:var(--flex1-3keqbf);-ms-flex:var(--flex1-3keqbf);flex:var(--flex1-3keqbf);}"
+    ".a-60f3wz{-webkit-flex:var(--flex1-3keqbf);-ms-flex:var(--flex1-3keqbf);flex:var(--flex1-3keqbf);}"
   ];
   [@css
-    ".in-19g0la7{-webkit-flex:var(--value-bdy3z7) var(--value2-1p309rg);-ms-flex:var(--value-bdy3z7) var(--value2-1p309rg);flex:var(--value-bdy3z7) var(--value2-1p309rg);}"
+    ".a-600la7{-webkit-flex:var(--value-bdy3z7) var(--value2-1p309rg);-ms-flex:var(--value-bdy3z7) var(--value2-1p309rg);flex:var(--value-bdy3z7) var(--value2-1p309rg);}"
   ];
   [@css
-    ".in-djecpy{-webkit-flex:var(--value-1g8t0wn) var(--value2-dmenma) var(--min-e3h4r0);-ms-flex:var(--value-1g8t0wn) var(--value2-dmenma) var(--min-e3h4r0);flex:var(--value-1g8t0wn) var(--value2-dmenma) var(--min-e3h4r0);}"
+    ".a-60ecpy{-webkit-flex:var(--value-1g8t0wn) var(--value2-dmenma) var(--min-e3h4r0);-ms-flex:var(--value-1g8t0wn) var(--value2-dmenma) var(--min-e3h4r0);flex:var(--value-1g8t0wn) var(--value2-dmenma) var(--min-e3h4r0);}"
   ];
   [@css
-    ".in-1f5dbv2{-webkit-flex:var(--value-1g7nd20_1) var(--value-fet175_2);-ms-flex:var(--value-1g7nd20_1) var(--value-fet175_2);flex:var(--value-1g7nd20_1) var(--value-fet175_2);}"
+    ".a-60dbv2{-webkit-flex:var(--value-1g7nd20_1) var(--value-fet175_2);-ms-flex:var(--value-1g7nd20_1) var(--value-fet175_2);flex:var(--value-1g7nd20_1) var(--value-fet175_2);}"
   ];
   [@css ".a-600014n70{flex-basis:auto;}"];
   [@css ".a-60001wkcj{flex-basis:content;}"];
@@ -123,18 +123,18 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("a-60x0uu", []);
   CSS.make("a-608a55", []);
   CSS.make(
-    "in-1x4f3wz",
+    "a-60f3wz",
     [("--flex1-3keqbf", CSS.Types.Flex.toString(X.flex1))],
   );
   CSS.make(
-    "in-19g0la7",
+    "a-600la7",
     [
       ("--value-bdy3z7", CSS.Types.FlexGrow.toString(X.value)),
       ("--value2-1p309rg", CSS.Types.FlexShrink.toString(X.value2)),
     ],
   );
   CSS.make(
-    "in-djecpy",
+    "a-60ecpy",
     [
       ("--value-1g8t0wn", CSS.Types.FlexGrow.toString(X.value)),
       ("--value2-dmenma", CSS.Types.FlexShrink.toString(X.value2)),
@@ -142,7 +142,7 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.make(
-    "in-1f5dbv2",
+    "a-60dbv2",
     [
       ("--value-1g7nd20_1", CSS.Types.FlexGrow.toString(X.value)),
       ("--value-fet175_2", CSS.Types.FlexShrink.toString(X.value)),

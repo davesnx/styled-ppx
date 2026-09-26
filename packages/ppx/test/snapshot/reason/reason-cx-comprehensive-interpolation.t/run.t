@@ -29,38 +29,38 @@ Comprehensive test for cx2 interpolation with various property types
   [@css ".in-1swajk7{padding-left:var(--lengthVar-1lpa833);}"];
   [@css ".in-1swajk7{padding-right:var(--lengthVar-1lpa833);}"];
   [@css
-    ".a-1i6vyy6{gap:var(--lengthVar-vh1osb);row-gap:var(--lengthVar-vh1osb);-webkit-column-gap:var(--lengthVar-vh1osb);column-gap:var(--lengthVar-vh1osb);}"
+    ".a-6fvyy6{gap:var(--lengthVar-vh1osb);row-gap:var(--lengthVar-vh1osb);-webkit-column-gap:var(--lengthVar-vh1osb);column-gap:var(--lengthVar-vh1osb);}"
   ];
   [@css ".in-1vzwmoy{color:var(--colorVar-14sye4i);}"];
   [@css ".in-1vzwmoy{background-color:var(--colorVar-14sye4i);}"];
   [@css ".in-1vzwmoy{border-top-color:var(--colorVar-14sye4i);}"];
-  [@css ".in-ycpa9s{flex-basis:var(--flexBasisVar-16vl5bp);}"];
+  [@css ".a-60001pa9s{flex-basis:var(--flexBasisVar-16vl5bp);}"];
   [@css ".in-1knt7y9{grid-row-start:var(--gridLineVar-1qxvc00);}"];
   [@css ".in-1knt7y9{grid-column-end:var(--gridLineVar-175omdk);}"];
   [@css ".in-1d6x35p{top:var(--topVar-1iqysbe);}"];
   [@css ".in-1d6x35p{bottom:var(--topVar-10dkp5m);}"];
-  [@css ".in-1bkxgpr{z-index:var(--zIndexVar-osv02l);}"];
+  [@css ".a-ekxgpr{z-index:var(--zIndexVar-osv02l);}"];
   [@css
-    ".a-1bezkxi{border-top-width:var(--borderWidthVar-1nwhzbd);border-width:var(--borderWidthVar-1nwhzbd);}"
+    ".a-3hlokzkxi{border-top-width:var(--borderWidthVar-1nwhzbd);border-width:var(--borderWidthVar-1nwhzbd);}"
   ];
   [@css ".in-zoi7e9{letter-spacing:var(--spacingVar-15s0ecx);}"];
   [@css ".in-zoi7e9{word-spacing:var(--spacingVar-1m50b62);}"];
-  [@css ".in-1dfkyy8{width:var(--width-18c1xss);}"];
+  [@css ".a-eckyy8{width:var(--width-18c1xss);}"];
   [@css ".a-6lnay0{height:100px;}"];
   [@css ".a-4ekvmb{color:red;}"];
   [@css.bindings
     [
       ("Output.test1", "id-1jhxcqu", "in-b8f0pi"),
       ("Output.test2", "id-zesghj", "in-1swajk7"),
-      ("Output.test3", "id-12rsoz0", "a-1i6vyy6"),
+      ("Output.test3", "id-12rsoz0", "a-6fvyy6"),
       ("Output.test4", "id-puktrw", "in-1vzwmoy"),
-      ("Output.test5", "id-1nw36ql", "in-ycpa9s"),
+      ("Output.test5", "id-1nw36ql", "a-60001pa9s"),
       ("Output.test6", "id-7ivz4", "in-1knt7y9"),
       ("Output.test7", "id-iq7p3", "in-1d6x35p"),
-      ("Output.test8", "id-yq2qob", "in-1bkxgpr"),
-      ("Output.test9", "id-1u4o5z6", "a-1bezkxi"),
+      ("Output.test8", "id-yq2qob", "a-ekxgpr"),
+      ("Output.test9", "id-1u4o5z6", "a-3hlokzkxi"),
       ("Output.test10", "id-1egwgp0", "in-zoi7e9"),
-      ("Output.test11", "id-16lxxsk", "in-1dfkyy8 a-6lnay0 a-4ekvmb"),
+      ("Output.test11", "id-16lxxsk", "a-eckyy8 a-6lnay0 a-4ekvmb"),
     ]
   ];
   let lengthVar = CSS.px(10);
@@ -87,7 +87,7 @@ Comprehensive test for cx2 interpolation with various property types
     );
   let test3 =
     CSS.make(
-      "label:test3 id-12rsoz0 a-1i6vyy6",
+      "label:test3 id-12rsoz0 a-6fvyy6",
       [("--lengthVar-vh1osb", CSS.Types.Gap.toString(lengthVar))],
     );
   let test4 =
@@ -98,7 +98,7 @@ Comprehensive test for cx2 interpolation with various property types
   let flexBasisVar = CSS.px(100);
   let test5 =
     CSS.make(
-      "label:test5 id-1nw36ql in-ycpa9s",
+      "label:test5 id-1nw36ql a-60001pa9s",
       [
         ("--flexBasisVar-16vl5bp", CSS.Types.FlexBasis.toString(flexBasisVar)),
       ],
@@ -127,13 +127,13 @@ Comprehensive test for cx2 interpolation with various property types
   let zIndexVar = `num(10);
   let test8 =
     CSS.make(
-      "label:test8 id-yq2qob in-1bkxgpr",
+      "label:test8 id-yq2qob a-ekxgpr",
       [("--zIndexVar-osv02l", CSS.Types.ZIndex.toString(zIndexVar))],
     );
   let borderWidthVar = `medium;
   let test9 =
     CSS.make(
-      "label:test9 id-1u4o5z6 a-1bezkxi",
+      "label:test9 id-1u4o5z6 a-3hlokzkxi",
       [
         (
           "--borderWidthVar-1nwhzbd",
@@ -152,6 +152,6 @@ Comprehensive test for cx2 interpolation with various property types
     );
   let test11 = width =>
     CSS.make(
-      "label:test11 id-16lxxsk in-1dfkyy8 a-6lnay0 a-4ekvmb",
+      "label:test11 id-16lxxsk a-eckyy8 a-6lnay0 a-4ekvmb",
       [("--width-18c1xss", CSS.Types.Width.toString(width))],
     );

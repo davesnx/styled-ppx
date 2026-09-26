@@ -218,7 +218,7 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".a-4085p6{box-shadow:1px 1px, inset 2px 2px red;}"];
   [@css ".a-40q314{box-shadow:0 0 5px, inset 0 0 10px black;}"];
   [@css
-    ".in-1cg0xa4{box-shadow:-1px 1px 0px 0px var(--elevation1-xawwdw_1), 1px 1px 0px 0px var(--elevation1-xawwdw_2), 0px -1px 0px 0px var(--elevation1-xawwdw_3);}"
+    ".a-400xa4{box-shadow:-1px 1px 0px 0px var(--elevation1-xawwdw_1), 1px 1px 0px 0px var(--elevation1-xawwdw_2), 0px -1px 0px 0px var(--elevation1-xawwdw_3);}"
   ];
   [@css ".a-3900w2nfr{background-position-x:right;}"];
   [@css ".a-3900wvq06{background-position-x:center;}"];
@@ -290,13 +290,13 @@ If this test fail means that the module is not in sync with the ppx
     ".a-39008fmes{background-image:linear-gradient(45deg, blue, red), linear-gradient(red -50px, white calc(-25px + 50%), blue 100%), linear-gradient(45deg, blue, red);}"
   ];
   [@css
-    ".in-1vt38s1{background-image:linear-gradient(45deg, var(--color-vcr1i_1) 25%, transparent 0%, transparent 50%, var(--color-vcr1i_2) 0%, var(--color-vcr1i_3) 75%, transparent 0%, transparent 100% );}"
+    ".a-3900838s1{background-image:linear-gradient(45deg, var(--color-vcr1i_1) 25%, transparent 0%, transparent 50%, var(--color-vcr1i_2) 0%, var(--color-vcr1i_3) 75%, transparent 0%, transparent 100% );}"
   ];
   [@css
-    ".in-1q2tv7y{background-image:repeating-linear-gradient( 45deg, var(--color-pys9ag_1) 0px, var(--color-pys9ag_2) 4px, var(--color-pys9ag_3) 5px, var(--color-pys9ag_4) 9px );}"
+    ".a-39008tv7y{background-image:repeating-linear-gradient( 45deg, var(--color-pys9ag_1) 0px, var(--color-pys9ag_2) 4px, var(--color-pys9ag_3) 5px, var(--color-pys9ag_4) 9px );}"
   ];
   [@css
-    ".in-1mgigxz{background-image:linear-gradient(45deg, var(--boxDark-17ffdav) 25%, transparent 25%), linear-gradient(red -50px, white calc(-25px + 50%), blue 100%), linear-gradient(45deg, blue, red);}"
+    ".a-39008igxz{background-image:linear-gradient(45deg, var(--boxDark-17ffdav) 25%, transparent 25%), linear-gradient(red -50px, white calc(-25px + 50%), blue 100%), linear-gradient(45deg, blue, red);}"
   ];
   [@css ".a-39008fodl{background-image:radial-gradient(white, black);}"];
   [@css ".a-390085i1d{background-image:radial-gradient(circle, white, black);}"];
@@ -583,7 +583,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("a-4085p6", []);
   CSS.make("a-40q314", []);
   CSS.make(
-    "in-1cg0xa4",
+    "a-400xa4",
     [
       (
         "--elevation1-xawwdw_1",
@@ -664,7 +664,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("a-39008fmes", []);
   let color = `hex("333");
   CSS.make(
-    "in-1vt38s1",
+    "a-3900838s1",
     [
       ("--color-vcr1i_1", CSS.Types.Color.toString(color)),
       ("--color-vcr1i_2", CSS.Types.Color.toString(color)),
@@ -672,7 +672,7 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.make(
-    "in-1q2tv7y",
+    "a-39008tv7y",
     [
       ("--color-pys9ag_1", CSS.Types.Color.toString(color)),
       ("--color-pys9ag_2", CSS.Types.Color.toString(color)),
@@ -682,7 +682,7 @@ If this test fail means that the module is not in sync with the ppx
   );
   
   CSS.make(
-    "in-1mgigxz",
+    "a-39008igxz",
     [
       ("--boxDark-17ffdav", CSS.Types.Color.toString(Color.Background.boxDark)),
     ],

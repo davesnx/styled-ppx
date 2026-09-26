@@ -55,26 +55,24 @@ If this test fail means that the module is not in sync with the ppx
     ".a-dmmtix{transition:width 200ms ease, height 200ms ease, background-color 200ms ease;}"
   ];
   [@css ".a-dmhocq{transition:transform 0.3s;}"];
-  [@css ".in-z1xaab{box-shadow:inset 0 -1px 0 0 var(--lineAlpha-14x2350);}"];
-  [@css ".in-k42oj0{box-shadow:inset 1px 0 0 0 var(--line-16iaxxw);}"];
+  [@css ".a-40xaab{box-shadow:inset 0 -1px 0 0 var(--lineAlpha-14x2350);}"];
+  [@css ".a-402oj0{box-shadow:inset 1px 0 0 0 var(--line-16iaxxw);}"];
+  [@css ".a-40xwmt{box-shadow:inset 0 0 0 1000px var(--selectedMuted-coapl4);}"];
+  [@css ".a-40rt76{box-shadow:inset 0 0 0 0.5px var(--flag-r97mq);}"];
   [@css
-    ".in-jfxwmt{box-shadow:inset 0 0 0 1000px var(--selectedMuted-coapl4);}"
-  ];
-  [@css ".in-lirt76{box-shadow:inset 0 0 0 0.5px var(--flag-r97mq);}"];
-  [@css
-    ".in-1iayzvr{box-shadow:0 0 0 1px var(--elevation1-10w4q1l), 0 1px 0 0 var(--elevation1Bottom-1jgyvpw);}"
+    ".a-40yzvr{box-shadow:0 0 0 1px var(--elevation1-10w4q1l), 0 1px 0 0 var(--elevation1Bottom-1jgyvpw);}"
   ];
   [@css
-    ".in-13ydyrw{box-shadow:0 0 0 1px var(--border-16e6nb4), 0 2px 4px 0 var(--elevation2-a9z6ve);}"
+    ".a-40dyrw{box-shadow:0 0 0 1px var(--border-16e6nb4), 0 2px 4px 0 var(--elevation2-a9z6ve);}"
   ];
   [@css
-    ".in-1ga3v0v{box-shadow:0 0 0 1px var(--border-1pvcfai), 0 3px 18px 0 var(--elevation3-u89uz4);}"
+    ".a-403v0v{box-shadow:0 0 0 1px var(--border-1pvcfai), 0 3px 18px 0 var(--elevation3-u89uz4);}"
   ];
   [@css
-    ".in-w2f2bw{box-shadow:1px 0 0 0 var(--line-1fm6v6v_1), inset 1px 0 0 0 var(--line-1fm6v6v_2), inset 0 -1px 0 0 var(--line-1fm6v6v_3);}"
+    ".a-40f2bw{box-shadow:1px 0 0 0 var(--line-1fm6v6v_1), inset 1px 0 0 0 var(--line-1fm6v6v_2), inset 0 -1px 0 0 var(--line-1fm6v6v_3);}"
   ];
   [@css
-    ".in-uatfq{box-shadow:inset 0 1px 0 0 var(--line-110y8m6_1), inset 0 -1px 0 0 var(--line-110y8m6_2);}"
+    ".a-40atfq{box-shadow:inset 0 1px 0 0 var(--line-110y8m6_1), inset 0 -1px 0 0 var(--line-110y8m6_2);}"
   ];
   [@css ".a-40sr4i{box-shadow:0 1px 3px 0 rgba(0, 0, 0, 0.1);}"];
   [@css ".a-40ptrw{box-shadow:0px 0px 1px 0 rgba(255, 255, 255, 0.5);}"];
@@ -82,18 +80,18 @@ If this test fail means that the module is not in sync with the ppx
     ".a-40knjr{box-shadow:0px 1px 1px 0px rgba(49, 46, 29, 0.06), 0px 2px 2px 0px rgba(49, 46, 29, 0.04), 0px 4px 3px 0px rgba(49, 46, 29, 0.02);}"
   ];
   [@css
-    ".in-x09jpc{box-shadow:0 0 0 1px var(--elevation1-s7j1om), 0 3px 18px 0 var(--elevation3-1tt1uog);}"
+    ".a-409jpc{box-shadow:0 0 0 1px var(--elevation1-s7j1om), 0 3px 18px 0 var(--elevation3-1tt1uog);}"
   ];
-  [@css ".in-1q2o3yi{border:1px solid var(--line-10u4hbk);}"];
+  [@css ".a-3ho3yi{border:1px solid var(--line-10u4hbk);}"];
   [@css ".a-3hyc9x{border:0px none transparent;}"];
-  [@css ".in-11h9vd4{border-top:1px solid var(--line-17j5in5);}"];
-  [@css ".in-pkcjyn{border-bottom:1px solid var(--line-jfym6t);}"];
-  [@css ".in-1ry65jw{border-left:1px solid var(--line-2dnuub);}"];
-  [@css ".in-ypjvaq{border-right:1px solid var(--line-doha9t);}"];
-  [@css ".in-1ismcmj{border:1px dashed var(--line-uf1ggy);}"];
-  [@css ".in-150towz{border:1px none var(--line-1i61so0);}"];
-  [@css ".in-188ct1l{outline:1px solid var(--line-18cgk19);}"];
-  [@css ".in-1xnyi32{outline:2px solid var(--accent-1w0inj7);}"];
+  [@css ".a-3hghs9vd4{border-top:1px solid var(--line-17j5in5);}"];
+  [@css ".a-3h007cjyn{border-bottom:1px solid var(--line-jfym6t);}"];
+  [@css ".a-3h1ds65jw{border-left:1px solid var(--line-2dnuub);}"];
+  [@css ".a-3hb28jvaq{border-right:1px solid var(--line-doha9t);}"];
+  [@css ".a-3hmcmj{border:1px dashed var(--line-uf1ggy);}"];
+  [@css ".a-3htowz{border:1px none var(--line-1i61so0);}"];
+  [@css ".a-8pct1l{outline:1px solid var(--line-18cgk19);}"];
+  [@css ".a-8pyi32{outline:2px solid var(--accent-1w0inj7);}"];
   [@css
     ".a-2zep28{-webkit-animation:helpMenuFadeIn 0.18s ease-in-out forwards;animation:helpMenuFadeIn 0.18s ease-in-out forwards;}"
   ];
@@ -109,7 +107,7 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".a-oe8sa40slgw{box-shadow:inset 1px 0 0 0 transparent !important;}"];
   [@css ".a-oe8sa40e9zy{box-shadow:1px 0 0 0 black !important;}"];
   [@css
-    ".in-1rh80o9{box-shadow:1px 0 0 0 var(--line-9kmuhm_1), inset 0 -1px 0 0 var(--line-9kmuhm_2) !important;}"
+    ".a-oe8sa4080o9{box-shadow:1px 0 0 0 var(--line-9kmuhm_1), inset 0 -1px 0 0 var(--line-9kmuhm_2) !important;}"
   ];
   [@css ".a-oe8sadmq5th{transition:transform 0.3s !important;}"];
   module Color = {
@@ -142,17 +140,17 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("a-dmhocq", []);
   
   CSS.make(
-    "in-z1xaab",
+    "a-40xaab",
     [
       ("--lineAlpha-14x2350", CSS.Types.Color.toString(Color.Border.lineAlpha)),
     ],
   );
   CSS.make(
-    "in-k42oj0",
+    "a-402oj0",
     [("--line-16iaxxw", CSS.Types.Color.toString(Color.Border.line))],
   );
   CSS.make(
-    "in-jfxwmt",
+    "a-40xwmt",
     [
       (
         "--selectedMuted-coapl4",
@@ -161,12 +159,12 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.make(
-    "in-lirt76",
+    "a-40rt76",
     [("--flag-r97mq", CSS.Types.Color.toString(Color.Shadow.flag))],
   );
   
   CSS.make(
-    "in-1iayzvr",
+    "a-40yzvr",
     [
       (
         "--elevation1-10w4q1l",
@@ -179,7 +177,7 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.make(
-    "in-13ydyrw",
+    "a-40dyrw",
     [
       ("--border-16e6nb4", CSS.Types.Color.toString(Color.Shadow.border)),
       (
@@ -189,7 +187,7 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.make(
-    "in-1ga3v0v",
+    "a-403v0v",
     [
       ("--border-1pvcfai", CSS.Types.Color.toString(Color.Shadow.border)),
       (
@@ -200,7 +198,7 @@ If this test fail means that the module is not in sync with the ppx
   );
   
   CSS.make(
-    "in-w2f2bw",
+    "a-40f2bw",
     [
       ("--line-1fm6v6v_1", CSS.Types.Color.toString(Color.Border.line)),
       ("--line-1fm6v6v_2", CSS.Types.Color.toString(Color.Border.line)),
@@ -208,7 +206,7 @@ If this test fail means that the module is not in sync with the ppx
     ],
   );
   CSS.make(
-    "in-uatfq",
+    "a-40atfq",
     [
       ("--line-110y8m6_1", CSS.Types.Color.toString(Color.Border.line)),
       ("--line-110y8m6_2", CSS.Types.Color.toString(Color.Border.line)),
@@ -219,7 +217,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("a-40ptrw", []);
   CSS.make("a-40knjr", []);
   CSS.make(
-    "in-x09jpc",
+    "a-409jpc",
     [
       (
         "--elevation1-s7j1om",
@@ -233,41 +231,41 @@ If this test fail means that the module is not in sync with the ppx
   );
   
   CSS.make(
-    "in-1q2o3yi",
+    "a-3ho3yi",
     [("--line-10u4hbk", CSS.Types.Color.toString(Color.Border.line))],
   );
   CSS.make("a-3hyc9x", []);
   CSS.make(
-    "in-11h9vd4",
+    "a-3hghs9vd4",
     [("--line-17j5in5", CSS.Types.Color.toString(Color.Border.line))],
   );
   CSS.make(
-    "in-pkcjyn",
+    "a-3h007cjyn",
     [("--line-jfym6t", CSS.Types.Color.toString(Color.Border.line))],
   );
   CSS.make(
-    "in-1ry65jw",
+    "a-3h1ds65jw",
     [("--line-2dnuub", CSS.Types.Color.toString(Color.Border.line))],
   );
   CSS.make(
-    "in-ypjvaq",
+    "a-3hb28jvaq",
     [("--line-doha9t", CSS.Types.Color.toString(Color.Border.line))],
   );
   CSS.make(
-    "in-1ismcmj",
+    "a-3hmcmj",
     [("--line-uf1ggy", CSS.Types.Color.toString(Color.Border.line))],
   );
   CSS.make(
-    "in-150towz",
+    "a-3htowz",
     [("--line-1i61so0", CSS.Types.Color.toString(Color.Border.line))],
   );
   
   CSS.make(
-    "in-188ct1l",
+    "a-8pct1l",
     [("--line-18cgk19", CSS.Types.Color.toString(Color.Border.line))],
   );
   CSS.make(
-    "in-1xnyi32",
+    "a-8pyi32",
     [("--accent-1w0inj7", CSS.Types.Color.toString(Color.Border.accent))],
   );
   
@@ -280,7 +278,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("a-oe8sa40slgw", []);
   CSS.make("a-oe8sa40e9zy", []);
   CSS.make(
-    "in-1rh80o9",
+    "a-oe8sa4080o9",
     [
       ("--line-9kmuhm_1", CSS.Types.Color.toString(Color.Border.line)),
       ("--line-9kmuhm_2", CSS.Types.Color.toString(Color.Border.line)),

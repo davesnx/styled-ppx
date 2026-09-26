@@ -30,7 +30,7 @@ as the main subject, across properties that never repeat.
   [@@@css ".a-zygl8yfjbrel{--Foo:1px;}"]
   [@@@css ".a-zy803csp5vyo{--foo:2px;}"]
   [@@@css ".a-4ekvmb{color:red;}"]
-  [@@@css ".a-zwzjs7{margin:0;margin:var(--c-kv4uq2);}"]
+  [@@@css ".a-7pzjs7{margin:0;margin:var(--c-kv4uq2);}"]
   [@@@css.bindings
     [("Input.dup", "id-1rqoi1k", "a-4epkbn");
     ("Input.fallback", "id-1t6se51", "a-5rx8u2");
@@ -42,7 +42,7 @@ as the main subject, across properties that never repeat.
     ("Input.custom", "id-216v6m", "a-zygl8yfjbrel a-zy803csp5vyo");
     ("Input.A.x", "id-hplgo2", "a-4ekvmb");
     ("Input.B.x", "id-i6ik4z", "a-4eb7kq");
-    ("Input.vars", "id-10jlpap", "a-zwzjs7")]]
+    ("Input.vars", "id-10jlpap", "a-7pzjs7")]]
   let dup = CSS.make "label:dup id-1rqoi1k a-4epkbn" []
   let fallback = CSS.make "label:fallback id-1t6se51 a-5rx8u2" []
   let interleaved = CSS.make "label:interleaved id-8z5ze6 a-7p1gs8 a-4eb7kq" []
@@ -57,5 +57,5 @@ as the main subject, across properties that never repeat.
   module B = struct let x = CSS.make "label:x id-i6ik4z a-4eb7kq" [] end
   let c = "10px"
   let vars =
-    CSS.make "label:vars id-10jlpap a-zwzjs7"
+    CSS.make "label:vars id-10jlpap a-7pzjs7"
       [("--c-kv4uq2", (CSS.Types.Margin.toString c))]

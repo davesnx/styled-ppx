@@ -8,22 +8,22 @@ verbatim - no Cascading.toString wrap.
   [@css "@property --colorStr-11d7je1{syntax:\"*\";inherits:false;}"];
   [@css "@property --plainStr-1cgr13y{syntax:\"*\";inherits:false;}"];
   [@css "@property --value-13tu4ef{syntax:\"*\";inherits:false;}"];
-  [@css ".in-14o54yy{--color-link:var(--colorStr-t58soe);}"];
+  [@css ".a-zy7gz1zq54yy{--color-link:var(--colorStr-t58soe);}"];
   [@css ".in-10nqctf{--color-link:var(--colorStr-11d7je1);}"];
   [@css ".in-10nqctf{--spacing:var(--plainStr-1cgr13y);}"];
-  [@css ".in-zwwqpt{--token:var(--value-13tu4ef);}"];
+  [@css ".a-zyqed1fpwqpt{--token:var(--value-13tu4ef);}"];
   [@css.bindings
     [
-      ("Output.row", "id-z61k1z", "in-14o54yy"),
+      ("Output.row", "id-z61k1z", "a-zy7gz1zq54yy"),
       ("Output.theme", "id-r5u180", "in-10nqctf"),
-      ("Output.dyn", "id-soz37v", "in-zwwqpt"),
+      ("Output.dyn", "id-soz37v", "a-zyqed1fpwqpt"),
     ]
   ];
   let colorStr = CSS.Types.Color.toString(`hex("3A57FC"));
   let plainStr = "10px";
   let row =
     CSS.make(
-      "label:row id-z61k1z in-14o54yy",
+      "label:row id-z61k1z a-zy7gz1zq54yy",
       [("--colorStr-t58soe", colorStr)],
     );
   let theme =
@@ -32,4 +32,7 @@ verbatim - no Cascading.toString wrap.
       [("--colorStr-11d7je1", colorStr), ("--plainStr-1cgr13y", plainStr)],
     );
   let dyn = value =>
-    CSS.make("label:dyn id-soz37v in-zwwqpt", [("--value-13tu4ef", value)]);
+    CSS.make(
+      "label:dyn id-soz37v a-zyqed1fpwqpt",
+      [("--value-13tu4ef", value)],
+    );

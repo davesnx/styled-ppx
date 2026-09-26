@@ -137,14 +137,12 @@ let nul_join parts = String.concat "\000" parts
    see "Prefix rename" above; never rename this one. *)
 let namespace_of_content content = Printf.sprintf "css-%s" (hash content)
 
-(* Fallback class name for {!class_and_namespace}'s non-bundle path - a
-   plain hash of the content, same input as the namespace, only the
-   presentation prefix differs (see "Prefix rename"). Two cases reach
-   this: no {!Slot_key.t} at all (in practice never happens for a real
-   atom - see {!Slot_key.of_atom}'s own doc), and a slot whose own
-   [bundle] field is [true] even though the caller is not treating this
-   atom as a bundle (see {!class_and_namespace}'s comment) - this second
-   case is the one that matters in practice today. *)
+(* Fallback class name for {!class_and_namespace} - a plain hash of the
+   content, same input as the namespace, only the presentation prefix
+   differs (see "Prefix rename"). Reached only when there is no
+   {!Slot_key.t} at all, which in practice never happens for a real atom
+   (see {!Slot_key.of_atom}'s own doc: it returns [None] only for a rule
+   shape [atomize_rules] never actually produces). *)
 let class_of_content content = Printf.sprintf "a-%s" (hash content)
 
 (* An atom's class name and its namespace, from a single content hash - two
@@ -153,32 +151,23 @@ let class_of_content content = Printf.sprintf "a-%s" (hash content)
    seeds every interpolation variable's name, so it must stay independent
    of merge-key data (see the header's "Prefix rename"/"Stability
    contract"). [class_name] carries the merge-key data instead
-   ({!Class_format.slot_class}'s context/family/mask/value fields) when
-   [slot] is [Some s] and [not s.bundle] - the atom's {!Slot_key.t}, built
-   by the caller from the exact same rule value [content] renders (see
-   {!Slot_key.of_atom}'s doc for why that shape match matters).
+   ({!Class_format.slot_class}'s context/family/mask/value fields), built
+   from the atom's {!Slot_key.t} - the caller's own [Slot_key.of_atom] on
+   the exact same rule value [content] renders (see its doc for why that
+   shape match matters).
 
-   [s.bundle] must be excluded here even though it is [Some _]: this
-   function is [Css_file.re]'s NON-bundle path (its own, separately
-   decided [bundle_class_and_namespace] handles the real bundle path -
-   see [Css_file.re]'s [transform_rule_list]). [Slot_key.t.bundle] is
-   [List.exists]-based and therefore correctly detects interpolation
-   anywhere in a multi-declaration group, unlike [Css_file.re]'s own
-   [atom_has_value_interpolation] (single-declaration only, a
-   pre-existing, documented limitation - see its call site's comment).
-   Letting {!Class_format.slot_class} see a [true] bundle flag here would
-   silently mint an [in-]-prefixed class for an atom the real pipeline
-   never actually bundles (no shared class across the block, no bundle
-   var-namespace) - a class that LOOKS collision-exempt but isn't. Falling
-   back to {!class_of_content} for that case reproduces exactly what this
-   atom minted before {!Class_format} was wired in. *)
+   [slot.bundle] is always [false] here (see {!Slot_key.t.bundle}'s doc):
+   this function is [Css_file.re]'s NON-bundle path - a genuine, two-or-more
+   -declaration bundle mints its class directly via {!bundle_class_and_namespace}
+   below, never through this function or [Slot_key] at all - so
+   [Class_format.slot_class] always takes its real, structural encoding
+   here, never its [in-] branch. *)
 let class_and_namespace ~slot content =
   let namespace = namespace_of_content content in
   let class_name =
     match slot with
-    | Some (s : Slot_key.t) when not s.bundle ->
-      Class_format.slot_class s content
-    | Some _ | None -> class_of_content content
+    | Some (s : Slot_key.t) -> Class_format.slot_class s content
+    | None -> class_of_content content
   in
   class_name, namespace
 
