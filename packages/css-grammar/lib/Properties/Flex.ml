@@ -56,6 +56,10 @@ let entries : (kind * packed_rule) list =
     Property "flex-grow", pack_module (module Property_flex_grow);
     Property "flex-shrink", pack_module (module Property_flex_shrink);
     Property "flex-basis", pack_module (module Property_flex_basis);
-    Property "flex", pack_module (module Property_flex);
-    Property "flex-flow", pack_module (module Property_flex_flow);
+    (* Flexible Box Layout L1: https://www.w3.org/TR/css-flexbox-1/#flex-property, #flex-flow-property *)
+    ( Shorthand ("flex", [ "flex-grow"; "flex-shrink"; "flex-basis" ]),
+      pack_module (module Property_flex) );
+    (* Flexible Box Layout L1: https://www.w3.org/TR/css-flexbox-1/#flex-property, #flex-flow-property *)
+    ( Shorthand ("flex-flow", [ "flex-direction"; "flex-wrap" ]),
+      pack_module (module Property_flex_flow) );
   ]

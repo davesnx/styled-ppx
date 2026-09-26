@@ -14,21 +14,21 @@ as an external path unless another enclosing `Css` module exists.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb{color:red;}"];
-  [@css ".css-59bkuc.\000Css.marker\000{color:blue;}"];
+  [@css "._a_4ekvmb{color:red;}"];
+  [@css "._a_ye3jo4ed103.\000Css.marker\000{color:blue;}"];
   [@css.bindings
     [
-      ("Input.Css.marker", "cid-zr2uk1", "css-tokvmb"),
-      ("Input.Css.wrapper", "cid-7sdyhq", "css-59bkuc"),
+      ("Input.Css.marker", "_id_zr2uk1", "_a_4ekvmb"),
+      ("Input.Css.wrapper", "_id_7sdyhq", "_a_ye3jo4ed103"),
     ]
   ];
   [@css.refs [("Css.marker", "input.re", 5, 8, 18)]];
   
   let _ = Css.marker;
   module Css = {
-    let marker = CSS.make("label:marker cid-zr2uk1 css-tokvmb", []);
+    let marker = CSS.make("label:marker _id_zr2uk1 _a_4ekvmb", []);
   
-    let wrapper = CSS.make("label:wrapper cid-7sdyhq css-59bkuc", []);
+    let wrapper = CSS.make("label:wrapper _id_7sdyhq _a_ye3jo4ed103", []);
   };
   
   let _ = (Css.marker, Css.wrapper);

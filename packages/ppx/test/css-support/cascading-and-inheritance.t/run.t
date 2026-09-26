@@ -15,12 +15,12 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1v7yg6i{color:unset;}"];
-  [@css ".css-1uehh2p{font-weight:unset;}"];
-  [@css ".css-kh6y3o{background-image:unset;}"];
-  [@css ".css-1oovyp6{width:unset;}"];
+  [@css "._a_4eyg6i{color:unset;}"];
+  [@css "._a_65m9shh2p{font-weight:unset;}"];
+  [@css "._a_390086y3o{background-image:unset;}"];
+  [@css "._a_ecvyp6{width:unset;}"];
   
-  CSS.make("css-1v7yg6i", []);
-  CSS.make("css-1uehh2p", []);
-  CSS.make("css-kh6y3o", []);
-  CSS.make("css-1oovyp6", []);
+  CSS.make("_a_4eyg6i", []);
+  CSS.make("_a_65m9shh2p", []);
+  CSS.make("_a_390086y3o", []);
+  CSS.make("_a_ecvyp6", []);

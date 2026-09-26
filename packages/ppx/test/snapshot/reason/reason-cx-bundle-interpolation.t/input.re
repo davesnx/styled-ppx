@@ -1,11 +1,16 @@
-/* Selective atomization: a block's interpolating declarations share one
-   content-addressed bundle class and one var per (source-path, runtime-type)
-   across base / :hover / @media. Static declarations keep their own shared
-   atom class. Identical bundles dedup to identical class + var; different
-   bundles never collide, so cross-module identity and CSS.merge stay correct. */
+/* Selective atomization: only interpolating declarations that share the
+   SAME source path bundle - one content-addressed class and one var per
+   (source-path, runtime-type) across base / :hover / @media. Two
+   declarations that merely both interpolate, but different, unrelated
+   values, do NOT bundle: each mints its own real, slot-keyed class and
+   merges independently. Static declarations keep their own shared atom
+   class. Identical bundles dedup to identical class + var; different
+   bundles never collide, so cross-module identity and CSS.merge stay
+   correct. */
 
 let color = CSS.Types.Color.toString(`hex("3A57FC"));
 let width = CSS.px(10);
+let accent = CSS.Types.Color.toString(`hex("00A67D"));
 
 /* One value across base / :hover / @media collapses to one var, one inline
    custom property, three rules sharing the bundle class. */
@@ -41,6 +46,29 @@ let twoTypes = [%css
   &:hover {
     height: $(width);
   }
+|}
+];
+
+/* Two unrelated interpolated values in one block: `color` and `accent`
+   share no path, so neither needs the other's variable - each mints its
+   own real, slot-keyed `_a_` class instead of one shared bundle. */
+let separateValues = [%css
+  {|
+  color: $(color);
+  background-color: $(accent);
+|}
+];
+
+/* Mixed sharing: `color` is used twice (base + :hover) and must still
+   share one variable between them; `accent` is used once in the same
+   block and stays its own real atom, not swept into `color`'s bundle. */
+let partialShare = [%css
+  {|
+  color: $(color);
+  &:hover {
+    color: $(color);
+  }
+  background-color: $(accent);
 |}
 ];
 

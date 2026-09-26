@@ -13,9 +13,9 @@ from the extracted selector. The identity is independent of `--minify`
 
   $ ../../standalone.exe --impl input.ml -o dev.ml
   $ grep "css" dev.ml
-  [@@@css.bindings [("Input.marker", "cid-1rctcrz", "")]]
+  [@@@css.bindings [("Input.marker", "_id_1rctcrz", "")]]
 
   $ ../../standalone.exe --minify --impl input.ml -o prod.ml
   $ grep "css" prod.ml
   [@@@css.config [("env", "production")]]
-  [@@@css.bindings [("Input.marker", "cid-1rctcrz", "")]]
+  [@@@css.bindings [("Input.marker", "_id_1rctcrz", "")]]

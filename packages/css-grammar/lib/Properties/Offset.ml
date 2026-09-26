@@ -48,7 +48,17 @@ let property_offset_rotate : property_offset_rotate Rule.rule =
 
 let entries : (kind * packed_rule) list =
   [
-    Property "offset", pack_module (module Property_offset);
+    (* Motion Path L1: https://www.w3.org/TR/css-motion-1/#offset-shorthand-property *)
+    ( Shorthand
+        ( "offset",
+          [
+            "offset-position";
+            "offset-path";
+            "offset-distance";
+            "offset-rotate";
+            "offset-anchor";
+          ] ),
+      pack_module (module Property_offset) );
     Property "offset-anchor", pack_module (module Property_offset_anchor);
     Property "offset-distance", pack_module (module Property_offset_distance);
     Property "offset-path", pack_module (module Property_offset_path);

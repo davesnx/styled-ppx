@@ -167,9 +167,47 @@ module Css_transform = {
   let declaration_has_value_interpolation = (decl: declaration) =>
     component_value_list_has_interpolation(fst(decl.value));
 
+  /* Every `$(name)` source path a value interpolates, recursing the same
+     shape `component_value_has_interpolation` does (into `Paren_block`,
+     `Bracket_block`, `Function` bodies) - collecting the path string
+     instead of stopping at a bool. Used to decide which of a block's
+     interpolating declarations must SHARE a bundle (see
+     `transform_rule_list`'s bundle grouping below): two declarations that
+     interpolate the same path need one variable between them; two that
+     interpolate different, unrelated paths do not. */
+  let rec component_value_interpolation_paths = (cv: component_value) =>
+    switch (cv) {
+    | Variable(path, _) => [path]
+    | Paren_block(values)
+    | Bracket_block(values) =>
+      component_value_list_interpolation_paths(values)
+    | Function({ body: (values, _), _ }) =>
+      component_value_list_interpolation_paths(values)
+    | _ => []
+    }
+  and component_value_list_interpolation_paths = values =>
+    List.concat_map(
+      ((cv, _loc)) => component_value_interpolation_paths(cv),
+      values,
+    );
+
+  let declaration_interpolation_paths = (decl: declaration) =>
+    component_value_list_interpolation_paths(fst(decl.value));
+
   /* The single declaration an atom carries: bare (top-level), nested under a
      selector (`Style_rule`), or under an at-rule. None for an atom with no
-     declaration body (e.g. an empty at-rule). */
+     declaration body (e.g. an empty at-rule), OR for a multi-declaration
+     group (same-property or same-family, see `group_declarations_by_family`)
+     - such a group's bundling eligibility (`atom_has_value_interpolation`
+     below) is therefore always [false], never re-examined per member. This
+     is harmless, not a gap: a multi-declaration group already puts every
+     member in ONE atom with its own inline `var(--...)` per interpolating
+     declaration (unaffected by grouping - substitution happens per
+     declaration, before grouping), so the sharing bundling exists for
+     (one variable, not one per occurrence) is already achieved by the
+     grouping itself; bundling's remaining, distinct job is sharing a value
+     ACROSS separately-grouped atoms (base vs `:hover` vs `@media`), which a
+     single already-merged group has no need for. */
   let rec atom_declaration = (rule: rule): option(declaration) =>
     switch (rule) {
     | Declaration(decl) => Some(decl)
@@ -535,6 +573,65 @@ module Css_transform = {
     };
   };
 
+  /* Resolve `$(binding)`/`&.$(binding)` selector-class references (via
+     `transform_selector`, reused unchanged from above) BEFORE atomization,
+     leaving declaration values untouched. This must run ahead of
+     `atomize_rules`: an atom's class name and `Slot_key` context both hash
+     the rendered rule text (`render_rule`/`render_declaration`,
+     `Render.selector` respectively), and that text must already carry the
+     REFERENCED BINDING'S identity class, not the literal `$(row)` marker -
+     otherwise two files with the same local binding name and the same
+     nested selector (e.g. `& > div:not(:last-child).$(row)`) render
+     identical unresolved text and mint the SAME atom class even though
+     `row` resolves to a different `id-` class in each file, which
+     `styled-ppx.generate`'s atom-class-collision check then rightly rejects
+     (same class, different final CSS).
+
+     Declaration values are NOT resolved here - deferred to `lower_atom`
+     (`transform_rule`'s full walk), since a value interpolation's own
+     variable name depends on the atom's own class/namespace, which is only
+     known once atomize_rules and `Hash_class.class_and_namespace` have run;
+     resolving selector-class refs first creates no such cycle, because
+     `resolve_selector_class_ref` only needs the REFERENCED binding's
+     already-registered identity class, never this atom's own.
+
+     Idempotent: a selector already resolved to `Class(...)`/
+     `Subclass(Class(...))` falls through `transform_selector`'s
+     catch-all, so running it again in `lower_atom` later is a no-op. */
+  let rec resolve_rule_selectors = (ctx, rule: rule): rule =>
+    switch (rule) {
+    | Declaration(_) => rule
+    | Style_rule({ prelude: (selectors, selector_loc), block, loc }) =>
+      let (rule_list, rule_loc) = block;
+      Style_rule({
+        prelude: (
+          List.map(
+            ((sel, sel_loc)) => (transform_selector(ctx, sel), sel_loc),
+            selectors,
+          ),
+          selector_loc,
+        ),
+        block: (List.map(resolve_rule_selectors(ctx), rule_list), rule_loc),
+        loc,
+      });
+    | At_rule({ name, prelude, block, loc }) =>
+      let map_payload = ((rules, rule_loc)) => (
+        List.map(resolve_rule_selectors(ctx), rules),
+        rule_loc,
+      );
+      At_rule({
+        name,
+        prelude,
+        block:
+          switch (block) {
+          | Empty => Empty
+          | Rule_list(payload) => Rule_list(map_payload(payload))
+          | Stylesheet(payload) => Stylesheet(map_payload(payload))
+          },
+        loc,
+      });
+    };
+
   let transform_declaration = (ctx, ~var_namespace, decl: declaration) => {
     let (property_name, _) = decl.name;
     let (value_list, value_loc) = decl.value;
@@ -752,54 +849,118 @@ module Css_transform = {
     );
   };
 
-  /* Same-property declarations of a block group into ONE atom so the
-     winner is decided by intra-atom source order (emotion parity) —
-     fallback pairs like `display: -webkit-box; display: flex` stay
-     together; splitting them would let stylesheet position pick the
-     winner. Groups anchor at the LAST occurrence (a group cascades like
-     its last member; first-anchoring would hoist duplicates past
-     intervening rules). Singletons keep the historical atom shape and
-     hash. */
+  /* Declarations of a block group into one atom when their COVERED LEAF
+     PROPERTIES overlap, taken transitively - not merely because they share
+     a family. Sharing a family is necessary but not sufficient:
+     `padding-left`/`padding-right` are both in the "padding" family but
+     cover disjoint leaves (no shared longhand), so they stay separate
+     atoms - grouping them would make a future `CSS.merge` too coarse (it
+     could no longer drop just one side's atom without also dropping the
+     other's). `margin: 10px; margin-top: 0;` DO overlap (margin's full
+     leaf set includes margin-top), so they group into one atom, and a
+     same-property repeat overlaps itself trivially (fallback pairs like
+     `display: -webkit-box; display: flex` stay together, as before).
+     "Transitively": a bridging declaration pulls everything it overlaps
+     into one group even when those things don't overlap each other
+     directly - `border: 1px solid; border-left-width: 2px;` group
+     together (border's full leaf set includes border-left-width), but
+     `border-top: 1px solid; border-left-width: 2px;` do NOT (border-top's
+     three leaves are all on the top side, none of them is
+     border-left-width). Groups anchor at the LAST occurrence (a group
+     cascades like its last member; first-anchoring would hoist earlier
+     members past intervening rules). Singleton, single-declaration groups
+     keep the historical atom shape and hash. */
   type block_item =
     | Declaration_group(list(declaration))
     | Nested_rule(rule);
 
-  /* Property names are case-insensitive; custom properties (`--*`) are
-     case-sensitive. */
-  let declaration_group_key = ({ name: (name, _), _ }: declaration) =>
-    if (String.length(name) >= 2 && String.sub(name, 0, 2) == "--") {
-      name;
-    } else {
-      String.lowercase_ascii(name);
+  /* A declaration's covered leaf (non-shorthand) properties (see
+     `Slot_key.leaves_of`) - `[property]` itself when it names no
+     shorthand. `Slot_key.normalize_property` lowercases everything except
+     a custom property (`--*`, case-sensitive); a custom property is never
+     a shorthand member, so `leaves_of` returns it unchanged and two
+     differently-cased custom properties correctly never overlap. */
+  let declaration_leaves = ({ name: (name, _), _ }: declaration) =>
+    Slot_key.leaves_of(Slot_key.normalize_property(name));
+
+  let leaf_sets_overlap = (a: list(string), b: list(string)) =>
+    List.exists(leaf => List.mem(leaf, b), a);
+
+  let group_declarations_by_family = (rules: list(rule)): list(block_item) => {
+    /* Every `Declaration` in this block, in order, paired with its leaf
+       set (computed once per declaration, not once per pair compared
+       below) and its position in `rules` (for last-occurrence anchoring). */
+    let decls =
+      rules
+      |> List.mapi((index, rule) => (index, rule))
+      |> List.filter_map(((index, rule)) =>
+           switch (rule) {
+           | Declaration(decl) =>
+             Some((index, decl, declaration_leaves(decl)))
+           | _ => None
+           }
+         )
+      |> Array.of_list;
+    let n = Array.length(decls);
+
+    /* Union-find over positions [0, n) in `decls` - path-compressed, no
+       union-by-rank (n is a block's declaration count, always small).
+       Connects i and j when their leaf sets overlap, so the relation is
+       transitive by construction: if i-j and j-k are each unioned, find(i)
+       = find(j) = find(k) regardless of whether i and k overlap directly. */
+    let parent = Array.init(n, i => i);
+    let rec find = i =>
+      if (parent[i] == i) {
+        i;
+      } else {
+        let root = find(parent[i]);
+        parent[i] = root;
+        root;
+      };
+    let union = (i, j) => {
+      let (ri, rj) = (find(i), find(j));
+      if (ri != rj) {
+        parent[max(ri, rj)] = min(ri, rj);
+      };
+    };
+    for (i in 0 to n - 1) {
+      for (j in i + 1 to n - 1) {
+        let (_, _, leaves_i) = decls[i];
+        let (_, _, leaves_j) = decls[j];
+        if (leaf_sets_overlap(leaves_i, leaves_j)) {
+          union(i, j);
+        };
+      };
     };
 
-  let group_declarations_by_property = (rules: list(rule)): list(block_item) => {
-    /* Pass 1: collect declarations per key + each key's last index. */
-    let decls_by_key: Hashtbl.t(string, ref(list(declaration))) =
+    /* Collect each group's members (in author order) and the block-level
+       index of its LAST member, keyed by union-find root. */
+    let members_by_root: Hashtbl.t(int, ref(list(declaration))) =
       Hashtbl.create(8);
-    let last_index_by_key: Hashtbl.t(string, int) = Hashtbl.create(8);
-    List.iteri(
-      (index, rule) =>
-        switch (rule) {
-        | Declaration(decl) =>
-          let key = declaration_group_key(decl);
-          switch (Hashtbl.find_opt(decls_by_key, key)) {
-          | Some(group) => group := [decl, ...group^]
-          | None => Hashtbl.add(decls_by_key, key, ref([decl]))
-          };
-          Hashtbl.replace(last_index_by_key, key, index);
-        | _ => ()
-        },
-      rules,
+    let last_index_by_root: Hashtbl.t(int, int) = Hashtbl.create(8);
+    let root_by_block_index: Hashtbl.t(int, int) = Hashtbl.create(8);
+    Array.iteri(
+      (i, (block_index, decl, _leaves)) => {
+        let root = find(i);
+        Hashtbl.replace(root_by_block_index, block_index, root);
+        switch (Hashtbl.find_opt(members_by_root, root)) {
+        | Some(group) => group := [decl, ...group^]
+        | None => Hashtbl.add(members_by_root, root, ref([decl]))
+        };
+        Hashtbl.replace(last_index_by_root, root, block_index);
+      },
+      decls,
     );
-    /* Pass 2: emit each group at its last occurrence. */
+
+    /* Emit each group at its last member's position, same anchoring rule
+       as before, now keyed by union-find root instead of a literal key. */
     List.mapi(
       (index, rule) =>
         switch (rule) {
-        | Declaration(decl) =>
-          let key = declaration_group_key(decl);
-          if (Hashtbl.find(last_index_by_key, key) == index) {
-            let group = Hashtbl.find(decls_by_key, key);
+        | Declaration(_) =>
+          let root = Hashtbl.find(root_by_block_index, index);
+          if (Hashtbl.find(last_index_by_root, root) == index) {
+            let group = Hashtbl.find(members_by_root, root);
             [Declaration_group(List.rev(group^))];
           } else {
             [];
@@ -848,8 +1009,8 @@ module Css_transform = {
       |> List.rev;
     };
 
-    /* Wrap a same-property `Declaration` group (see
-       `group_declarations_by_property`) as one atom. No parent:
+    /* Wrap a same-family `Declaration` group (see
+       `group_declarations_by_family`) as one atom. No parent:
        singleton keeps the historical bare `Declaration` atom (hash
        stability); a group becomes `& { ... }` (`&` resolves to the
        className). With a parent: one `Style_rule(parent){group}` atom
@@ -859,15 +1020,17 @@ module Css_transform = {
       | None =>
         switch (decls) {
         | [decl] =>
+          let bare_rule = Declaration(decl);
           let decl_string = render_declaration(decl);
           let (className, namespace) =
-            Hash_class.class_and_namespace(decl_string);
-          [(className, namespace, Declaration(decl))];
+            Hash_class.class_and_namespace(
+              ~slot=Slot_key.of_atom(bare_rule),
+              decl_string,
+            );
+          [(className, namespace, bare_rule)];
         | decls =>
           let group_string =
             decls |> List.map(render_declaration) |> String.concat("");
-          let (className, namespace) =
-            Hash_class.class_and_namespace(group_string);
           let style_rule =
             Style_rule({
               prelude: (
@@ -880,6 +1043,11 @@ module Css_transform = {
               ),
               loc: Ppxlib.Location.none,
             });
+          let (className, namespace) =
+            Hash_class.class_and_namespace(
+              ~slot=Slot_key.of_atom(style_rule),
+              group_string,
+            );
           [(className, namespace, style_rule)];
         }
       | Some(parent_selectors) =>
@@ -916,7 +1084,10 @@ module Css_transform = {
               });
             let rule_string = render_rule(style_rule);
             let (className, namespace) =
-              Hash_class.class_and_namespace(rule_string);
+              Hash_class.class_and_namespace(
+                ~slot=Slot_key.of_atom(style_rule),
+                rule_string,
+              );
             (className, namespace, style_rule);
           },
           parent_selectors,
@@ -924,14 +1095,14 @@ module Css_transform = {
       };
     };
 
-    /* Atomize one block's rules: same-property declarations group into a
-       single atom (see `group_declarations_by_property`); everything
+    /* Atomize one block's rules: same-family declarations group into a
+       single atom (see `group_declarations_by_family`); everything
        else atomizes rule by rule. */
     let rec extract_atomic_rules_from_block =
             (~parent_prelude=?, rules: list(rule))
             : list((string, string, rule)) =>
       rules
-      |> group_declarations_by_property
+      |> group_declarations_by_family
       |> List.concat_map(
            fun
            | Declaration_group(decls) =>
@@ -1041,7 +1212,7 @@ module Css_transform = {
            carries the full selector chain. The Declaration arm above turns
            a bare Declaration with a parent into a Style_rule, which is what
            lets `.a .b { @media (...) { color: red } }` render correctly as
-           `@media (...) { .css-X .a .b { color:red } }`. */
+           `@media (...) { .a-X .a .b { color:red } }`. */
         | Rule_list((rules, rule_loc))
         | Stylesheet((rules, rule_loc)) =>
           extract_atomic_rules_from_block(~parent_prelude?, rules)
@@ -1055,7 +1226,10 @@ module Css_transform = {
                  });
                let wrapped_string = render_rule(wrapped);
                let (new_className, new_namespace) =
-                 Hash_class.class_and_namespace(wrapped_string);
+                 Hash_class.class_and_namespace(
+                   ~slot=Slot_key.of_atom(wrapped),
+                   wrapped_string,
+                 );
                (new_className, new_namespace, wrapped);
              })
         };
@@ -1126,82 +1300,180 @@ module Css_transform = {
     };
     let (rules, loc) = rule_list;
 
-    let atomic_rules = atomize_rules(~source_position_start, rules);
+    /* Resolve selector-class references before atomizing (see
+       `resolve_rule_selectors`'s own comment) so an atom's hash reflects
+       the RESOLVED selector, not a local binding name that can mean a
+       different binding in every file that uses it. */
+    let selector_resolved_rules =
+      List.map(resolve_rule_selectors(ctx), rules);
+    let atomic_rules =
+      atomize_rules(~source_position_start, selector_resolved_rules);
 
-    /* Selective atomization: the block's interpolating declarations become one
-       content-addressed bundle, with class and var namespace both `css-<B>`
-       (the two are identical, see Hash_class.ml) shared across
-       base/`:hover`/`@media`. Both derive from the same bundle content, so
-       identical bundles dedup to identical rules + vars and different
-       bundles never collide, preserving the cross-module atomic invariant
-       (see Hash_class.ml) and `CSS.merge`.
+    /* Selective atomization: of a block's SINGLETON interpolating atoms
+       (`atom_has_value_interpolation` - a multi-declaration group from
+       `group_declarations_by_family`'s leaf-overlap pass is never a
+       candidate here, see `atom_declaration`'s own doc: it already shares
+       one namespace for whatever it groups), only those that reference the
+       SAME `$(name)` source path as another one actually need to share
+       anything - one variable, one inline custom property for that value
+       across base/`:hover`/`@media` (see Hash_class.ml). Two atoms that
+       merely both happen to interpolate, but different, unrelated paths,
+       do not: `color: $(a); background-color: $(b);` used to force both
+       into one bundle for no reason neither value needed.
 
-       Static declarations keep their own per-content atom class (still shared
-       across blocks). A block with no interpolation produces no bundle and is
+       Grouped by shared path with union-find - same technique
+       `group_declarations_by_family` already uses for leaf overlap,
+       transitively: an atom interpolating two paths (`border: $(a) solid
+       $(b);`) bridges both into one group, same reasoning a declaration
+       bridging two leaf sets does there. A group of exactly one atom is
+       not a bundle at all: it already got a real, structural slot-keyed
+       class from `atomize_rules` above (via `Hash_class.class_and_namespace`
+       / `Slot_key.of_atom`, same path a static atom uses), so it merges
+       normally like any other atom - `CSS.merge` only stays blind to an
+       atom that genuinely shares its class with an unrelated sibling, not
+       to every interpolated declaration on principle. A group of two or
+       more gets today's bundle mechanism (class `in-<B>`/var namespace
+       `css-<B>` - same bundle content hash, different literal prefix, see
+       Hash_class.ml's "Prefix rename"), scoped to that group's own members
+       only, so a block can now mint more than one independent bundle.
+
+       Static declarations keep their own per-content atom class (still
+       shared across blocks). A block with no interpolation, or where no
+       two interpolating atoms share a path, mints no bundle at all and is
        byte-for-byte identical to the pre-bundle output. */
-    let bundle =
-      switch (
-        atomic_rules
-        |> List.filter_map(((_cn, _ns, rule)) =>
-             atom_has_value_interpolation(rule)
-               ? Some(render_rule(rule)) : None
-           )
-      ) {
-      | [] => None
-      | seeds =>
-        Some(Hash_class.class_and_namespace(String.concat("", seeds)))
+    let interpolating_atoms =
+      atomic_rules
+      |> List.mapi((i, atom) => (i, atom))
+      |> List.filter(((_i, (_cn, _ns, rule))) =>
+           atom_has_value_interpolation(rule)
+         )
+      |> Array.of_list;
+    let interpolating_count = Array.length(interpolating_atoms);
+    let paths_of = i => {
+      let (_atomic_index, (_cn, _ns, rule)) = interpolating_atoms[i];
+      switch (atom_declaration(rule)) {
+      | Some(decl) => declaration_interpolation_paths(decl)
+      | None => [] /* unreachable: atom_has_value_interpolation implies Some */
       };
-
-    let (shipped_rev, classes_rev, atom_infos_rev) =
-      List.fold_left(
-        (
-          (shipped_acc, classes_acc, atom_infos_acc),
-          (className, var_namespace, rule),
-        ) => {
-          let (effective_class, effective_namespace, dedup_key) =
-            switch (bundle) {
-            | Some((bundle_class, bundle_namespace))
-                when atom_has_value_interpolation(rule) => (
-                bundle_class,
-                bundle_namespace,
-                None /* content-keyed: many bundle rules share one class */,
-              )
-            | _ => (className, var_namespace, Some(className))
-            };
-
-          let processed =
-            lower_atom(
-              ctx,
-              ~effective_class,
-              ~effective_namespace,
-              ~loc,
-              rule,
-            )
-            |> List.map(r => (dedup_key, r));
-
-          let classes_acc =
-            List.mem(effective_class, classes_acc)
-              ? classes_acc : [effective_class, ...classes_acc];
-
-          /* Record the atom's `&`-locality and the vars it references (scanned
-             from rendered text so cross-atom dedup can't hide a reference), for
-             the inherits:false decision below. */
-          let atom_local = atom_is_ampersand_local(rule);
-          let referenced =
-            processed
-            |> List.concat_map(((_key, r)) =>
-                 custom_property_names_in_text(render_rule(r))
-               );
-
-          (
-            List.rev_append(processed, shipped_acc),
-            classes_acc,
-            [(atom_local, referenced), ...atom_infos_acc],
+    };
+    let paths = Array.init(interpolating_count, paths_of);
+    /* Union-find over positions [0, interpolating_count) - path-compressed,
+       no union-by-rank (a block's interpolating-atom count is always
+       small). Connects i and j when their path sets intersect. */
+    let parent = Array.init(interpolating_count, i => i);
+    let rec find = i =>
+      if (parent[i] == i) {
+        i;
+      } else {
+        let root = find(parent[i]);
+        parent[i] = root;
+        root;
+      };
+    let union = (i, j) => {
+      let (ri, rj) = (find(i), find(j));
+      if (ri != rj) {
+        parent[max(ri, rj)] = min(ri, rj);
+      };
+    };
+    for (i in 0 to interpolating_count - 1) {
+      for (j in i + 1 to interpolating_count - 1) {
+        if (List.exists(p => List.mem(p, paths[j]), paths[i])) {
+          union(i, j);
+        };
+      };
+    };
+    let members_by_root: Hashtbl.t(int, ref(list(int))) =
+      Hashtbl.create(8);
+    for (i in 0 to interpolating_count - 1) {
+      let root = find(i);
+      switch (Hashtbl.find_opt(members_by_root, root)) {
+      | Some(members) => members := [i, ...members^]
+      | None => Hashtbl.add(members_by_root, root, ref([i]))
+      };
+    };
+    /* Only a root with 2+ members mints a bundle; a singleton root's atom
+       keeps the real class `atomic_rules` already gave it (no entry here). */
+    let bundle_by_atomic_index: Hashtbl.t(int, (string, string)) =
+      Hashtbl.create(8);
+    Hashtbl.iter(
+      (_root, members) =>
+        switch (List.rev(members^)) {
+        | []
+        | [_] => ()
+        | member_positions =>
+          let seeds =
+            member_positions
+            |> List.map(k => {
+                 let (_atomic_index, (_cn, _ns, rule)) = interpolating_atoms[k];
+                 render_rule(rule);
+               });
+          let bundle_class_and_namespace =
+            Hash_class.bundle_class_and_namespace(String.concat("", seeds));
+          List.iter(
+            k => {
+              let (atomic_index, _) = interpolating_atoms[k];
+              Hashtbl.replace(
+                bundle_by_atomic_index,
+                atomic_index,
+                bundle_class_and_namespace,
+              );
+            },
+            member_positions,
           );
         },
-        ([], [], []),
-        atomic_rules,
-      );
+      members_by_root,
+    );
+
+    let (shipped_rev, classes_rev, atom_infos_rev) =
+      atomic_rules
+      |> List.mapi((i, atom) => (i, atom))
+      |> List.fold_left(
+           (
+             (shipped_acc, classes_acc, atom_infos_acc),
+             (i, (className, var_namespace, rule)),
+           ) => {
+             let (effective_class, effective_namespace, dedup_key) =
+               switch (Hashtbl.find_opt(bundle_by_atomic_index, i)) {
+               | Some((bundle_class, bundle_namespace)) => (
+                   bundle_class,
+                   bundle_namespace,
+                   None /* content-keyed: many bundle rules share one class */,
+                 )
+               | None => (className, var_namespace, Some(className))
+               };
+
+             let processed =
+               lower_atom(
+                 ctx,
+                 ~effective_class,
+                 ~effective_namespace,
+                 ~loc,
+                 rule,
+               )
+               |> List.map(r => (dedup_key, r));
+
+             let classes_acc =
+               List.mem(effective_class, classes_acc)
+                 ? classes_acc : [effective_class, ...classes_acc];
+
+             /* Record the atom's `&`-locality and the vars it references
+                (scanned from rendered text so cross-atom dedup can't hide a
+                reference), for the inherits:false decision below. */
+             let atom_local = atom_is_ampersand_local(rule);
+             let referenced =
+               processed
+               |> List.concat_map(((_key, r)) =>
+                    custom_property_names_in_text(render_rule(r))
+                  );
+
+             (
+               List.rev_append(processed, shipped_acc),
+               classes_acc,
+               [(atom_local, referenced), ...atom_infos_acc],
+             );
+           },
+           ([], [], []),
+         );
 
     let atom_infos = atom_infos_rev;
     let dynamic_vars_final = List.rev(ctx.dynamic_vars^);

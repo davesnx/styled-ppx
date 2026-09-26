@@ -15,57 +15,57 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1g6dwvy{-webkit-column-width:10em;column-width:10em;}"];
-  [@css ".css-tt22l4{-webkit-column-width:auto;column-width:auto;}"];
-  [@css ".css-xm7yc3{-webkit-column-count:2;column-count:2;}"];
-  [@css ".css-64yhyp{-webkit-column-count:auto;column-count:auto;}"];
-  [@css ".css-1x0rbi4{-webkit-columns:100px;columns:100px;}"];
-  [@css ".css-1shjrzp{-webkit-columns:3;columns:3;}"];
-  [@css ".css-1ussapk{-webkit-columns:10em 2;columns:10em 2;}"];
-  [@css ".css-19fadp1{-webkit-columns:auto auto;columns:auto auto;}"];
-  [@css ".css-1b4umhd{-webkit-columns:2 10em;columns:2 10em;}"];
-  [@css ".css-yyak2{-webkit-columns:auto 10em;columns:auto 10em;}"];
-  [@css ".css-1bp29w9{-webkit-columns:2 auto;columns:2 auto;}"];
-  [@css ".css-6w0lyg{-webkit-column-rule-color:red;column-rule-color:red;}"];
-  [@css ".css-10twiag{-webkit-column-rule-style:none;column-rule-style:none;}"];
+  [@css "._a_4o004dwvy{-webkit-column-width:10em;column-width:10em;}"];
+  [@css "._a_4o00422l4{-webkit-column-width:auto;column-width:auto;}"];
+  [@css "._a_4o0017yc3{-webkit-column-count:2;column-count:2;}"];
+  [@css "._a_4o001yhyp{-webkit-column-count:auto;column-count:auto;}"];
+  [@css "._a_4orbi4{-webkit-columns:100px;columns:100px;}"];
+  [@css "._a_4ojrzp{-webkit-columns:3;columns:3;}"];
+  [@css "._a_4osapk{-webkit-columns:10em 2;columns:10em 2;}"];
+  [@css "._a_4oadp1{-webkit-columns:auto auto;columns:auto auto;}"];
+  [@css "._a_4oumhd{-webkit-columns:2 10em;columns:2 10em;}"];
+  [@css "._a_4oyak2{-webkit-columns:auto 10em;columns:auto 10em;}"];
+  [@css "._a_4o29w9{-webkit-columns:2 auto;columns:2 auto;}"];
+  [@css "._a_4l0010lyg{-webkit-column-rule-color:red;column-rule-color:red;}"];
+  [@css "._a_4l002wiag{-webkit-column-rule-style:none;column-rule-style:none;}"];
   [@css
-    ".css-13q2g8z{-webkit-column-rule-style:solid;column-rule-style:solid;}"
+    "._a_4l0022g8z{-webkit-column-rule-style:solid;column-rule-style:solid;}"
   ];
   [@css
-    ".css-1wyszib{-webkit-column-rule-style:dotted;column-rule-style:dotted;}"
+    "._a_4l002szib{-webkit-column-rule-style:dotted;column-rule-style:dotted;}"
   ];
-  [@css ".css-1ro8iyd{-webkit-column-rule-width:1px;column-rule-width:1px;}"];
-  [@css ".css-6dy1fb{-webkit-column-rule:transparent;column-rule:transparent;}"];
+  [@css "._a_4l0048iyd{-webkit-column-rule-width:1px;column-rule-width:1px;}"];
+  [@css "._a_4ly1fb{-webkit-column-rule:transparent;column-rule:transparent;}"];
   [@css
-    ".css-peh5u6{-webkit-column-rule:1px solid black;column-rule:1px solid black;}"
+    "._a_4lh5u6{-webkit-column-rule:1px solid black;column-rule:1px solid black;}"
   ];
-  [@css ".css-1i0zc18{-webkit-column-span:none;column-span:none;}"];
-  [@css ".css-ooe1k2{-webkit-column-span:all;column-span:all;}"];
-  [@css ".css-35ub2p{-webkit-column-fill:auto;column-fill:auto;}"];
-  [@css ".css-l1o7d8{-webkit-column-fill:balance;column-fill:balance;}"];
-  [@css ".css-9s58g2{-webkit-column-fill:balance-all;column-fill:balance-all;}"];
+  [@css "._a_4mzc18{-webkit-column-span:none;column-span:none;}"];
+  [@css "._a_4me1k2{-webkit-column-span:all;column-span:all;}"];
+  [@css "._a_4kub2p{-webkit-column-fill:auto;column-fill:auto;}"];
+  [@css "._a_4ko7d8{-webkit-column-fill:balance;column-fill:balance;}"];
+  [@css "._a_4k58g2{-webkit-column-fill:balance-all;column-fill:balance-all;}"];
   
-  CSS.make("css-1g6dwvy", []);
-  CSS.make("css-tt22l4", []);
-  CSS.make("css-xm7yc3", []);
-  CSS.make("css-64yhyp", []);
-  CSS.make("css-1x0rbi4", []);
-  CSS.make("css-1shjrzp", []);
-  CSS.make("css-1ussapk", []);
+  CSS.make("_a_4o004dwvy", []);
+  CSS.make("_a_4o00422l4", []);
+  CSS.make("_a_4o0017yc3", []);
+  CSS.make("_a_4o001yhyp", []);
+  CSS.make("_a_4orbi4", []);
+  CSS.make("_a_4ojrzp", []);
+  CSS.make("_a_4osapk", []);
   
-  CSS.make("css-19fadp1", []);
-  CSS.make("css-1b4umhd", []);
-  CSS.make("css-yyak2", []);
-  CSS.make("css-1bp29w9", []);
-  CSS.make("css-6w0lyg", []);
-  CSS.make("css-10twiag", []);
-  CSS.make("css-13q2g8z", []);
-  CSS.make("css-1wyszib", []);
-  CSS.make("css-1ro8iyd", []);
-  CSS.make("css-6dy1fb", []);
-  CSS.make("css-peh5u6", []);
-  CSS.make("css-1i0zc18", []);
-  CSS.make("css-ooe1k2", []);
-  CSS.make("css-35ub2p", []);
-  CSS.make("css-l1o7d8", []);
-  CSS.make("css-9s58g2", []);
+  CSS.make("_a_4oadp1", []);
+  CSS.make("_a_4oumhd", []);
+  CSS.make("_a_4oyak2", []);
+  CSS.make("_a_4o29w9", []);
+  CSS.make("_a_4l0010lyg", []);
+  CSS.make("_a_4l002wiag", []);
+  CSS.make("_a_4l0022g8z", []);
+  CSS.make("_a_4l002szib", []);
+  CSS.make("_a_4l0048iyd", []);
+  CSS.make("_a_4ly1fb", []);
+  CSS.make("_a_4lh5u6", []);
+  CSS.make("_a_4mzc18", []);
+  CSS.make("_a_4me1k2", []);
+  CSS.make("_a_4kub2p", []);
+  CSS.make("_a_4ko7d8", []);
+  CSS.make("_a_4k58g2", []);

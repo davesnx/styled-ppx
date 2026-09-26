@@ -48,7 +48,17 @@ let property_transition_timing_function :
 
 let entries : (kind * packed_rule) list =
   [
-    Property "transition", pack_module (module Property_transition);
+    (* Transitions L2 (adds transition-behavior over L1): https://drafts.csswg.org/css-transitions-2/#transition-shorthand-property *)
+    ( Shorthand
+        ( "transition",
+          [
+            "transition-property";
+            "transition-duration";
+            "transition-timing-function";
+            "transition-delay";
+            "transition-behavior";
+          ] ),
+      pack_module (module Property_transition) );
     ( Property "transition-behavior",
       pack_module (module Property_transition_behavior) );
     Property "transition-delay", pack_module (module Property_transition_delay);

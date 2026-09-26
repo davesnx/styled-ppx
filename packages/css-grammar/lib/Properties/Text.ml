@@ -396,7 +396,16 @@ let entries : (kind * packed_rule) list =
     Property "text-box-trim", pack_module (module Property_text_box_trim);
     ( Property "text-combine-upright",
       pack_module (module Property_text_combine_upright) );
-    Property "text-decoration", pack_module (module Property_text_decoration);
+    (* Text Decoration L4: https://www.w3.org/TR/css-text-decor-4/#text-decoration-property *)
+    ( Shorthand
+        ( "text-decoration",
+          [
+            "text-decoration-line";
+            "text-decoration-style";
+            "text-decoration-color";
+            "text-decoration-thickness";
+          ] ),
+      pack_module (module Property_text_decoration) );
     ( Property "text-decoration-color",
       pack_module (module Property_text_decoration_color) );
     ( Property "text-decoration-inset",
@@ -412,7 +421,10 @@ let entries : (kind * packed_rule) list =
     ( Property "text-decoration-skip-spaces",
       pack_module (module Property_text_decoration_skip_spaces) );
     Property "text-edge", pack_module (module Property_text_edge);
-    Property "text-emphasis", pack_module (module Property_text_emphasis);
+    (* Text Decoration L3 (text-emphasis-position deliberately excluded - spec note: style/color vary per-run, position rarely does): https://www.w3.org/TR/css-text-decor-3/#text-emphasis-property *)
+    ( Shorthand
+        ("text-emphasis", [ "text-emphasis-color"; "text-emphasis-style" ]),
+      pack_module (module Property_text_emphasis) );
     ( Property "text-emphasis-color",
       pack_module (module Property_text_emphasis_color) );
     ( Property "text-emphasis-position",

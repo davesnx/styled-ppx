@@ -15,37 +15,41 @@ and the runtime `CSS.make` call must carry an empty list (no phantom
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb{color:red;}"];
-  [@css ".css-11o9qin.cid-zec317{color:blue;}"];
-  [@css ".css-1vf0mg9{background-size:1rem 1rem;}"];
+  [@css "._a_4ekvmb{color:red;}"];
+  [@css "._a_8s8tj4em6j7._id_zec317{color:blue;}"];
+  [@css "._a_390740mg9{background-size:1rem 1rem;}"];
   [@css
-    ".css-rj3gnv{-webkit-animation-duration:1000ms;animation-duration:1000ms;}"
+    "._a_2z0083gnv{-webkit-animation-duration:1000ms;animation-duration:1000ms;}"
   ];
-  [@css ".css-f9xk9e{background-color:blue;}"];
+  [@css "._a_39004xk9e{background-color:blue;}"];
   [@css
-    ".css-1eo9rnb:disabled:not(.css-1eo9rnb.cid-1wqjj7x){background-color:gray;}"
+    "._a_we4a139004apm0:disabled:not(._a_we4a139004apm0._id_1wqjj7x){background-color:gray;}"
   ];
   [@css.bindings
     [
-      ("Input.foo", "cid-zec317", "css-tokvmb"),
-      ("Input.bar", "cid-1eelq62", "css-11o9qin"),
-      ("Input.buttonLoadingAnimation", "cid-1wqjj7x", "css-1vf0mg9 css-rj3gnv"),
-      ("Input.colorAccent", "cid-qhdd42", "css-f9xk9e css-1eo9rnb"),
+      ("Input.foo", "_id_zec317", "_a_4ekvmb"),
+      ("Input.bar", "_id_1eelq62", "_a_8s8tj4em6j7"),
+      (
+        "Input.buttonLoadingAnimation",
+        "_id_1wqjj7x",
+        "_a_390740mg9 _a_2z0083gnv",
+      ),
+      ("Input.colorAccent", "_id_qhdd42", "_a_39004xk9e _a_we4a139004apm0"),
     ]
   ];
   
-  let foo = CSS.make("label:foo cid-zec317 css-tokvmb", []);
+  let foo = CSS.make("label:foo _id_zec317 _a_4ekvmb", []);
   
-  let bar = CSS.make("label:bar cid-1eelq62 css-11o9qin", []);
+  let bar = CSS.make("label:bar _id_1eelq62 _a_8s8tj4em6j7", []);
   
   let buttonLoadingAnimation =
     CSS.make(
-      "label:buttonLoadingAnimation cid-1wqjj7x css-1vf0mg9 css-rj3gnv",
+      "label:buttonLoadingAnimation _id_1wqjj7x _a_390740mg9 _a_2z0083gnv",
       [],
     );
   
   let colorAccent =
-    CSS.make("label:colorAccent cid-qhdd42 css-f9xk9e css-1eo9rnb", []);
+    CSS.make("label:colorAccent _id_qhdd42 _a_39004xk9e _a_we4a139004apm0", []);
   
   let _ = (foo, bar, buttonLoadingAnimation, colorAccent);
 

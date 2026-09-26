@@ -17,28 +17,30 @@ Each pair below must render and hash to the same atom.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-6r0lf8 .parent > .child{color:red;}"];
-  [@css ".css-1hamckf .parent + .sibling{color:red;}"];
-  [@css ".css-n0wq26 .parent ~ .sibling{color:red;}"];
-  [@css ".css-n5qd0b .parent > .a.b:hover{color:red;}"];
-  [@css ".css-1haviu8 .parent > .a{color:red;}"];
-  [@css ".css-1ym0uum .parent + .b{color:red;}"];
-  [@css "@media (min-width: 1px) {.css-h19ouy .parent > .child{color:red;}}"];
+  [@css "._a_hfkiz4e0lf8 .parent > .child{color:red;}"];
+  [@css "._a_oicak4emckf .parent + .sibling{color:red;}"];
+  [@css "._a_ehmrb4ewq26 .parent ~ .sibling{color:red;}"];
+  [@css "._a_f8a2u4eqd0b .parent > .a.b:hover{color:red;}"];
+  [@css "._a_ew2o54eviu8 .parent > .a{color:red;}"];
+  [@css "._a_ornrm4e0uum .parent + .b{color:red;}"];
+  [@css
+    "@media (min-width: 1px) {._a_7gls64e9ouy .parent > .child{color:red;}}"
+  ];
   
-  CSS.make("css-6r0lf8", []);
-  CSS.make("css-6r0lf8", []);
+  CSS.make("_a_hfkiz4e0lf8", []);
+  CSS.make("_a_hfkiz4e0lf8", []);
   
-  CSS.make("css-1hamckf", []);
-  CSS.make("css-1hamckf", []);
+  CSS.make("_a_oicak4emckf", []);
+  CSS.make("_a_oicak4emckf", []);
   
-  CSS.make("css-n0wq26", []);
-  CSS.make("css-n0wq26", []);
+  CSS.make("_a_ehmrb4ewq26", []);
+  CSS.make("_a_ehmrb4ewq26", []);
   
-  CSS.make("css-n5qd0b", []);
-  CSS.make("css-n5qd0b", []);
+  CSS.make("_a_f8a2u4eqd0b", []);
+  CSS.make("_a_f8a2u4eqd0b", []);
   
-  CSS.make("css-1haviu8 css-1ym0uum", []);
-  CSS.make("css-1haviu8 css-1ym0uum", []);
+  CSS.make("_a_ew2o54eviu8 _a_ornrm4e0uum", []);
+  CSS.make("_a_ew2o54eviu8 _a_ornrm4e0uum", []);
   
-  CSS.make("css-h19ouy", []);
-  CSS.make("css-h19ouy", []);
+  CSS.make("_a_7gls64e9ouy", []);
+  CSS.make("_a_7gls64e9ouy", []);

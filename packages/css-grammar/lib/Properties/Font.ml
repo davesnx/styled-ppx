@@ -250,7 +250,15 @@ let entries : (kind * packed_rule) list =
     ( Property "font-variant-caps",
       pack_module (module Property_font_variant_caps) );
     Property "font-stretch", pack_module (module Property_font_stretch);
-    Property "font-width", pack_module (module Property_font_width);
+    (* CSS Fonts L4 - https://www.w3.org/TR/css-fonts-4/#font-width-prop :
+       the spec renamed "font-stretch" to "font-width", keeping "font-stretch"
+       as a legacy name alias for the same computed value. Normalized the
+       other way here ("font-width" -> "font-stretch") since "font-stretch"
+       is the name real code overwhelmingly already uses; either direction is
+       equally correct for a same-property alias, this just picks the more
+       useful canonical id. *)
+    ( Alias ("font-width", "font-stretch"),
+      pack_module (module Property_font_width) );
     Property "font-kerning", pack_module (module Property_font_kerning);
     ( Property "font-variant-position",
       pack_module (module Property_font_variant_position) );
@@ -266,7 +274,32 @@ let entries : (kind * packed_rule) list =
     ( Property "font-synthesis-position",
       pack_module (module Property_font_synthesis_position) );
     Property "font-display", pack_module (module Property_font_display);
-    Property "font", pack_module (module Property_font);
+    (* Fonts L4 (settable: style/variant/weight/stretch/size/line-height/family; the rest is reset-only - cannot be set through the shorthand, still reset to initial): https://www.w3.org/TR/css-fonts-4/#font-prop *)
+    ( Shorthand
+        ( "font",
+          [
+            "font-style";
+            "font-variant";
+            "font-weight";
+            "font-stretch";
+            "font-size";
+            "line-height";
+            "font-family";
+            "font-feature-settings";
+            "font-kerning";
+            "font-language-override";
+            "font-optical-sizing";
+            "font-size-adjust";
+            "font-variant-alternates";
+            "font-variant-caps";
+            "font-variant-east-asian";
+            "font-variant-emoji";
+            "font-variant-ligatures";
+            "font-variant-numeric";
+            "font-variant-position";
+            "font-variation-settings";
+          ] ),
+      pack_module (module Property_font) );
     Property "font-family", pack_module (module Property_font_family);
     ( Property "font-feature-settings",
       pack_module (module Property_font_feature_settings) );

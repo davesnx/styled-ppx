@@ -58089,22 +58089,6 @@ var ContainerName = {
 };
 function toString$282(x) {
   if (typeof x === "string") {
-    if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
-      return toString(x);
-    } else {
-      return "none";
-    }
-  } else if (x.NAME === "value") {
-    return x.VAL;
-  } else {
-    return toString$3(x);
-  }
-}
-var ContainerNameComputed = {
-  toString: toString$282
-};
-function toString$283(x) {
-  if (typeof x === "string") {
     if (x === "size") {
       return "size";
     } else if (x === "inlineSize") {
@@ -58119,9 +58103,9 @@ function toString$283(x) {
   }
 }
 var ContainerType = {
-  toString: toString$283
+  toString: toString$282
 };
-function toString$284(x) {
+function toString$283(x) {
   if (typeof x === "string") {
     if (x === "cueBefore") {
       return "cue-before";
@@ -58137,6 +58121,26 @@ function toString$284(x) {
   }
 }
 var Cue = {
+  toString: toString$283
+};
+function toString$284(x) {
+  if (typeof x === "string") {
+    if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
+      return toString(x);
+    } else {
+      return "none";
+    }
+  }
+  const variant = x.NAME;
+  if (variant === "url") {
+    return toString$6(x);
+  } else if (variant === "value") {
+    return x.VAL;
+  } else {
+    return toString$3(x);
+  }
+}
+var CueAfter = {
   toString: toString$284
 };
 function toString$285(x) {
@@ -58156,30 +58160,10 @@ function toString$285(x) {
     return toString$3(x);
   }
 }
-var CueAfter = {
+var CueBefore = {
   toString: toString$285
 };
 function toString$286(x) {
-  if (typeof x === "string") {
-    if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
-      return toString(x);
-    } else {
-      return "none";
-    }
-  }
-  const variant = x.NAME;
-  if (variant === "url") {
-    return toString$6(x);
-  } else if (variant === "value") {
-    return x.VAL;
-  } else {
-    return toString$3(x);
-  }
-}
-var CueBefore = {
-  toString: toString$286
-};
-function toString$287(x) {
   if (typeof x === "string") {
     if (x === "mathematical") {
       return "mathematical";
@@ -58213,9 +58197,9 @@ function toString$287(x) {
   }
 }
 var DominantBaseline = {
-  toString: toString$287
+  toString: toString$286
 };
-function toString$288(x) {
+function toString$287(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -58229,9 +58213,9 @@ function toString$288(x) {
   }
 }
 var EmptyCells = {
-  toString: toString$288
+  toString: toString$287
 };
-function toString$289(x) {
+function toString$288(x) {
   if (typeof x === "string") {
     if (x === "fixed") {
       return "fixed";
@@ -58245,9 +58229,9 @@ function toString$289(x) {
   }
 }
 var FieldSizing = {
-  toString: toString$289
+  toString: toString$288
 };
-function toString$290(x) {
+function toString$289(x) {
   if (typeof x === "string") {
     if (x === "nonzero") {
       return "nonzero";
@@ -58261,9 +58245,9 @@ function toString$290(x) {
   }
 }
 var FillRule = {
-  toString: toString$290
+  toString: toString$289
 };
-function toString$291(x) {
+function toString$290(x) {
   if (typeof x === "string") {
     if (x === "flexWrap") {
       return "flex-wrap";
@@ -58279,9 +58263,9 @@ function toString$291(x) {
   }
 }
 var FlexFlow = {
-  toString: toString$291
+  toString: toString$290
 };
-function toString$292(x) {
+function toString$291(x) {
   if (typeof x === "string") {
     if (x === "menu") {
       return "menu";
@@ -58317,9 +58301,9 @@ function toString$292(x) {
   }
 }
 var Font = {
-  toString: toString$292
+  toString: toString$291
 };
-function toString$293(x) {
+function toString$292(x) {
   if (typeof x === "string") {
     if (x === "normal") {
       return "normal";
@@ -58333,9 +58317,9 @@ function toString$293(x) {
   }
 }
 var FontFeatureSettings = {
-  toString: toString$293
+  toString: toString$292
 };
-function toString$294(x) {
+function toString$293(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -58351,9 +58335,9 @@ function toString$294(x) {
   }
 }
 var FontPalette = {
-  toString: toString$294
+  toString: toString$293
 };
-function toString$295(x) {
+function toString$294(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -58367,9 +58351,9 @@ function toString$295(x) {
   }
 }
 var FontSizeAdjust = {
-  toString: toString$295
+  toString: toString$294
 };
-function toString$296(x) {
+function toString$295(x) {
   if (typeof x === "string") {
     if (x === "always") {
       return "always";
@@ -58391,9 +58375,9 @@ function toString$296(x) {
   }
 }
 var FontSmooth = {
-  toString: toString$296
+  toString: toString$295
 };
-function toString$297(x) {
+function toString$296(x) {
   if (typeof x === "string") {
     return toString(x);
   }
@@ -58407,9 +58391,9 @@ function toString$297(x) {
   }
 }
 var FontStretch = {
-  toString: toString$297
+  toString: toString$296
 };
-function toString$298(x) {
+function toString$297(x) {
   if (typeof x === "string") {
     if (x === "position") {
       return "position";
@@ -58431,9 +58415,9 @@ function toString$298(x) {
   }
 }
 var FontSynthesis = {
-  toString: toString$298
+  toString: toString$297
 };
-function toString$299(x) {
+function toString$298(x) {
   if (typeof x === "string") {
     if (x === "historicalForms") {
       return "historical-forms";
@@ -58449,9 +58433,9 @@ function toString$299(x) {
   }
 }
 var FontVariantAlternates = {
-  toString: toString$299
+  toString: toString$298
 };
-function toString$300(x) {
+function toString$299(x) {
   if (typeof x === "string") {
     if (x === "ruby") {
       return "ruby";
@@ -58467,9 +58451,9 @@ function toString$300(x) {
   }
 }
 var FontVariantEastAsian = {
-  toString: toString$300
+  toString: toString$299
 };
-function toString$301(x) {
+function toString$300(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -58485,9 +58469,9 @@ function toString$301(x) {
   }
 }
 var FontVariantLigatures = {
-  toString: toString$301
+  toString: toString$300
 };
-function toString$302(x) {
+function toString$301(x) {
   if (typeof x === "string") {
     if (x === "ordinal") {
       return "ordinal";
@@ -58505,9 +58489,9 @@ function toString$302(x) {
   }
 }
 var FontVariantNumeric = {
-  toString: toString$302
+  toString: toString$301
 };
-function toString$303(x) {
+function toString$302(x) {
   if (typeof x === "string") {
     if (x === "normal") {
       return "normal";
@@ -58525,9 +58509,9 @@ function toString$303(x) {
   }
 }
 var FontVariationSettings = {
-  toString: toString$303
+  toString: toString$302
 };
-function toString$304(x) {
+function toString$303(x) {
   if (typeof x === "string") {
     if (x === "none") {
       return "none";
@@ -58543,9 +58527,9 @@ function toString$304(x) {
   }
 }
 var ForcedColorAdjust = {
-  toString: toString$304
+  toString: toString$303
 };
-function toString$305(x) {
+function toString$304(x) {
   if (typeof x === "string") {
     if (x === "none") {
       return "none";
@@ -58567,9 +58551,9 @@ function toString$305(x) {
   }
 }
 var HangingPunctuation = {
-  toString: toString$305
+  toString: toString$304
 };
-function toString$306(x) {
+function toString$305(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -58583,9 +58567,9 @@ function toString$306(x) {
   }
 }
 var HyphenateCharacter = {
-  toString: toString$306
+  toString: toString$305
 };
-function toString$307(x) {
+function toString$306(x) {
   if (typeof x === "string") {
     if (x === "column") {
       return "column";
@@ -58605,9 +58589,9 @@ function toString$307(x) {
   }
 }
 var HyphenateLimitLast = {
-  toString: toString$307
+  toString: toString$306
 };
-function toString$308(x) {
+function toString$307(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -58621,9 +58605,9 @@ function toString$308(x) {
   }
 }
 var HyphenateLimitLines = {
-  toString: toString$308
+  toString: toString$307
 };
-function toString$309(x) {
+function toString$308(x) {
   if (typeof x === "string") {
     if (x === "snap") {
       return "snap";
@@ -58639,9 +58623,9 @@ function toString$309(x) {
   }
 }
 var ImageResolution = {
-  toString: toString$309
+  toString: toString$308
 };
-function toString$310(x) {
+function toString$309(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -58661,9 +58645,9 @@ function toString$310(x) {
   }
 }
 var ImeMode = {
-  toString: toString$310
+  toString: toString$309
 };
-function toString$311(x) {
+function toString$310(x) {
   if (typeof x === "string") {
     if (x === "false_") {
       return "false";
@@ -58677,9 +58661,9 @@ function toString$311(x) {
   }
 }
 var Inherits = {
-  toString: toString$311
+  toString: toString$310
 };
-function toString$312(x) {
+function toString$311(x) {
   if (typeof x === "string") {
     if (x === "normal") {
       return "normal";
@@ -58699,9 +58683,9 @@ function toString$312(x) {
   }
 }
 var InitialLetter = {
-  toString: toString$312
+  toString: toString$311
 };
-function toString$313(x) {
+function toString$312(x) {
   if (typeof x === "string") {
     if (x === "hanging") {
       return "hanging";
@@ -58719,9 +58703,9 @@ function toString$313(x) {
   }
 }
 var InitialLetterAlign = {
-  toString: toString$313
+  toString: toString$312
 };
-function toString$314(x) {
+function toString$313(x) {
   if (typeof x === "string") {
     if (x === "left") {
       return "left";
@@ -58753,9 +58737,9 @@ function toString$314(x) {
   }
 }
 var InsetArea = {
-  toString: toString$314
+  toString: toString$313
 };
-function toString$315(x) {
+function toString$314(x) {
   if (typeof x === "string") {
     if (x === "allowKeywords") {
       return "allow-keywords";
@@ -58769,6 +58753,22 @@ function toString$315(x) {
   }
 }
 var InterpolateSize = {
+  toString: toString$314
+};
+function toString$315(x) {
+  if (typeof x === "string") {
+    if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
+      return toString(x);
+    } else {
+      return "auto";
+    }
+  } else if (x.NAME === "value") {
+    return x.VAL;
+  } else {
+    return toString$3(x);
+  }
+}
+var LayoutGridChar = {
   toString: toString$315
 };
 function toString$316(x) {
@@ -58784,7 +58784,7 @@ function toString$316(x) {
     return toString$3(x);
   }
 }
-var LayoutGridChar = {
+var LayoutGridLine = {
   toString: toString$316
 };
 function toString$317(x) {
@@ -58800,7 +58800,7 @@ function toString$317(x) {
     return toString$3(x);
   }
 }
-var LayoutGridLine = {
+var LayoutGridMode = {
   toString: toString$317
 };
 function toString$318(x) {
@@ -58816,26 +58816,10 @@ function toString$318(x) {
     return toString$3(x);
   }
 }
-var LayoutGridMode = {
+var LayoutGridType = {
   toString: toString$318
 };
 function toString$319(x) {
-  if (typeof x === "string") {
-    if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
-      return toString(x);
-    } else {
-      return "auto";
-    }
-  } else if (x.NAME === "value") {
-    return x.VAL;
-  } else {
-    return toString$3(x);
-  }
-}
-var LayoutGridType = {
-  toString: toString$319
-};
-function toString$320(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -58849,9 +58833,9 @@ function toString$320(x) {
   }
 }
 var LineClamp = {
-  toString: toString$320
+  toString: toString$319
 };
-function toString$321(x) {
+function toString$320(x) {
   if (typeof x === "string") {
     if (x === "listStyleImage") {
       return "list-style-image";
@@ -58869,9 +58853,9 @@ function toString$321(x) {
   }
 }
 var ListStyle = {
-  toString: toString$321
+  toString: toString$320
 };
-function toString$322(x) {
+function toString$321(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -58887,9 +58871,9 @@ function toString$322(x) {
   }
 }
 var MarginTrim = {
-  toString: toString$322
+  toString: toString$321
 };
-function toString$323(x) {
+function toString$322(x) {
   if (typeof x === "string") {
     if (x === "none") {
       return "none";
@@ -58907,9 +58891,9 @@ function toString$323(x) {
   }
 }
 var Marks = {
-  toString: toString$323
+  toString: toString$322
 };
-function toString$324(x) {
+function toString$323(x) {
   if (typeof x === "string") {
     return toString(x);
   } else if (x.NAME === "value") {
@@ -58919,9 +58903,9 @@ function toString$324(x) {
   }
 }
 var Mask = {
-  toString: toString$324
+  toString: toString$323
 };
-function toString$325(x) {
+function toString$324(x) {
   if (typeof x === "string") {
     if (x === "maskBorderSlice") {
       return "mask-border-slice";
@@ -58945,9 +58929,9 @@ function toString$325(x) {
   }
 }
 var MaskBorder = {
-  toString: toString$325
+  toString: toString$324
 };
-function toString$326(x) {
+function toString$325(x) {
   if (typeof x === "string") {
     if (x === "luminance") {
       return "luminance";
@@ -58961,9 +58945,9 @@ function toString$326(x) {
   }
 }
 var MaskBorderMode = {
-  toString: toString$326
+  toString: toString$325
 };
-function toString$327(x) {
+function toString$326(x) {
   if (typeof x === "string") {
     if (x === "noClip") {
       return "no-clip";
@@ -58977,6 +58961,18 @@ function toString$327(x) {
   }
 }
 var MaskClip = {
+  toString: toString$326
+};
+function toString$327(x) {
+  if (typeof x === "string") {
+    return toString(x);
+  } else if (x.NAME === "value") {
+    return x.VAL;
+  } else {
+    return toString$3(x);
+  }
+}
+var MaskComposite = {
   toString: toString$327
 };
 function toString$328(x) {
@@ -58988,22 +58984,10 @@ function toString$328(x) {
     return toString$3(x);
   }
 }
-var MaskComposite = {
+var MaskMode = {
   toString: toString$328
 };
 function toString$329(x) {
-  if (typeof x === "string") {
-    return toString(x);
-  } else if (x.NAME === "value") {
-    return x.VAL;
-  } else {
-    return toString$3(x);
-  }
-}
-var MaskMode = {
-  toString: toString$329
-};
-function toString$330(x) {
   if (typeof x === "string") {
     if (x === "luminance") {
       return "luminance";
@@ -59017,9 +59001,9 @@ function toString$330(x) {
   }
 }
 var MaskType = {
-  toString: toString$330
+  toString: toString$329
 };
-function toString$331(x) {
+function toString$330(x) {
   if (typeof x === "string") {
     if (x === "pack") {
       return "pack";
@@ -59039,9 +59023,9 @@ function toString$331(x) {
   }
 }
 var MasonryAutoFlow = {
-  toString: toString$331
+  toString: toString$330
 };
-function toString$332(x) {
+function toString$331(x) {
   if (typeof x === "string") {
     if (x === "add") {
       return "add(";
@@ -59061,6 +59045,22 @@ function toString$332(x) {
   }
 }
 var MathDepth = {
+  toString: toString$331
+};
+function toString$332(x) {
+  if (typeof x === "string") {
+    if (x === "compact") {
+      return "compact";
+    } else if (x === "normal") {
+      return "normal";
+    } else {
+      return toString(x);
+    }
+  } else {
+    return toString$3(x);
+  }
+}
+var MathShift = {
   toString: toString$332
 };
 function toString$333(x) {
@@ -59076,26 +59076,10 @@ function toString$333(x) {
     return toString$3(x);
   }
 }
-var MathShift = {
+var MathStyle = {
   toString: toString$333
 };
 function toString$334(x) {
-  if (typeof x === "string") {
-    if (x === "compact") {
-      return "compact";
-    } else if (x === "normal") {
-      return "normal";
-    } else {
-      return toString(x);
-    }
-  } else {
-    return toString$3(x);
-  }
-}
-var MathStyle = {
-  toString: toString$334
-};
-function toString$335(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -59109,6 +59093,18 @@ function toString$335(x) {
   }
 }
 var MaxLines = {
+  toString: toString$334
+};
+function toString$335(x) {
+  if (typeof x === "string") {
+    return toString(x);
+  } else if (x.NAME === "value") {
+    return x.VAL;
+  } else {
+    return toString$3(x);
+  }
+}
+var MediaAnyHover = {
   toString: toString$335
 };
 function toString$336(x) {
@@ -59120,22 +59116,10 @@ function toString$336(x) {
     return toString$3(x);
   }
 }
-var MediaAnyHover = {
+var MediaAnyPointer = {
   toString: toString$336
 };
 function toString$337(x) {
-  if (typeof x === "string") {
-    return toString(x);
-  } else if (x.NAME === "value") {
-    return x.VAL;
-  } else {
-    return toString$3(x);
-  }
-}
-var MediaAnyPointer = {
-  toString: toString$337
-};
-function toString$338(x) {
   if (typeof x === "string") {
     if (x === "srgb") {
       return "srgb";
@@ -59151,9 +59135,9 @@ function toString$338(x) {
   }
 }
 var MediaColorGamut = {
-  toString: toString$338
+  toString: toString$337
 };
-function toString$339(x) {
+function toString$338(x) {
   if (typeof x === "string") {
     if (x === "fullscreen") {
       return "fullscreen";
@@ -59171,9 +59155,9 @@ function toString$339(x) {
   }
 }
 var MediaDisplayMode = {
-  toString: toString$339
+  toString: toString$338
 };
-function toString$340(x) {
+function toString$339(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -59187,9 +59171,9 @@ function toString$340(x) {
   }
 }
 var MediaForcedColors = {
-  toString: toString$340
+  toString: toString$339
 };
-function toString$341(x) {
+function toString$340(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -59203,9 +59187,9 @@ function toString$341(x) {
   }
 }
 var MediaHover = {
-  toString: toString$341
+  toString: toString$340
 };
-function toString$342(x) {
+function toString$341(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -59219,6 +59203,18 @@ function toString$342(x) {
   }
 }
 var MediaInvertedColors = {
+  toString: toString$341
+};
+function toString$342(x) {
+  if (typeof x === "string") {
+    return toString(x);
+  } else if (x.NAME === "value") {
+    return x.VAL;
+  } else {
+    return toString$3(x);
+  }
+}
+var MediaMaxResolution = {
   toString: toString$342
 };
 function toString$343(x) {
@@ -59230,22 +59226,10 @@ function toString$343(x) {
     return toString$3(x);
   }
 }
-var MediaMaxResolution = {
+var MediaMinResolution = {
   toString: toString$343
 };
 function toString$344(x) {
-  if (typeof x === "string") {
-    return toString(x);
-  } else if (x.NAME === "value") {
-    return x.VAL;
-  } else {
-    return toString$3(x);
-  }
-}
-var MediaMinResolution = {
-  toString: toString$344
-};
-function toString$345(x) {
   if (typeof x === "string") {
     if (x === "landscape") {
       return "landscape";
@@ -59259,9 +59243,9 @@ function toString$345(x) {
   }
 }
 var MediaOrientation = {
-  toString: toString$345
+  toString: toString$344
 };
-function toString$346(x) {
+function toString$345(x) {
   if (typeof x === "string") {
     return toString(x);
   } else if (x.NAME === "value") {
@@ -59271,9 +59255,9 @@ function toString$346(x) {
   }
 }
 var MediaPointer = {
-  toString: toString$346
+  toString: toString$345
 };
-function toString$347(x) {
+function toString$346(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -59287,9 +59271,9 @@ function toString$347(x) {
   }
 }
 var MediaPrefersColorScheme = {
-  toString: toString$347
+  toString: toString$346
 };
-function toString$348(x) {
+function toString$347(x) {
   if (typeof x === "string") {
     if (x === "more") {
       return "more";
@@ -59305,9 +59289,9 @@ function toString$348(x) {
   }
 }
 var MediaPrefersContrast = {
-  toString: toString$348
+  toString: toString$347
 };
-function toString$349(x) {
+function toString$348(x) {
   if (typeof x === "string") {
     if (x === "reduce") {
       return "reduce";
@@ -59321,9 +59305,9 @@ function toString$349(x) {
   }
 }
 var MediaPrefersReducedMotion = {
-  toString: toString$349
+  toString: toString$348
 };
-function toString$350(x) {
+function toString$349(x) {
   if (typeof x === "string") {
     return toString(x);
   } else if (x.NAME === "value") {
@@ -59333,9 +59317,9 @@ function toString$350(x) {
   }
 }
 var MediaResolution = {
-  toString: toString$350
+  toString: toString$349
 };
-function toString$351(x) {
+function toString$350(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -59351,9 +59335,9 @@ function toString$351(x) {
   }
 }
 var MediaScripting = {
-  toString: toString$351
+  toString: toString$350
 };
-function toString$352(x) {
+function toString$351(x) {
   if (typeof x === "string") {
     if (x === "none") {
       return "none";
@@ -59369,9 +59353,9 @@ function toString$352(x) {
   }
 }
 var MediaUpdate = {
-  toString: toString$352
+  toString: toString$351
 };
-function toString$353(x) {
+function toString$352(x) {
   if (typeof x === "string") {
     return toString(x);
   }
@@ -59385,6 +59369,18 @@ function toString$353(x) {
   }
 }
 var Binding = {
+  toString: toString$352
+};
+function toString$353(x) {
+  if (typeof x === "string") {
+    return toString(x);
+  } else if (x.NAME === "value") {
+    return x.VAL;
+  } else {
+    return toString$3(x);
+  }
+}
+var BoxReflect = {
   toString: toString$353
 };
 function toString$354(x) {
@@ -59396,7 +59392,7 @@ function toString$354(x) {
     return toString$3(x);
   }
 }
-var BoxReflect = {
+var ContextProperties = {
   toString: toString$354
 };
 function toString$355(x) {
@@ -59408,7 +59404,7 @@ function toString$355(x) {
     return toString$3(x);
   }
 }
-var ContextProperties = {
+var ImageRegion = {
   toString: toString$355
 };
 function toString$356(x) {
@@ -59420,22 +59416,10 @@ function toString$356(x) {
     return toString$3(x);
   }
 }
-var ImageRegion = {
+var StackSizing = {
   toString: toString$356
 };
 function toString$357(x) {
-  if (typeof x === "string") {
-    return toString(x);
-  } else if (x.NAME === "value") {
-    return x.VAL;
-  } else {
-    return toString$3(x);
-  }
-}
-var StackSizing = {
-  toString: toString$357
-};
-function toString$358(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -59451,6 +59435,18 @@ function toString$358(x) {
   }
 }
 var TextBlink = {
+  toString: toString$357
+};
+function toString$358(x) {
+  if (typeof x === "string") {
+    return toString(x);
+  } else if (x.NAME === "value") {
+    return x.VAL;
+  } else {
+    return toString$3(x);
+  }
+}
+var TextSecurity = {
   toString: toString$358
 };
 function toString$359(x) {
@@ -59462,7 +59458,7 @@ function toString$359(x) {
     return toString$3(x);
   }
 }
-var TextSecurity = {
+var TextStroke = {
   toString: toString$359
 };
 function toString$360(x) {
@@ -59474,7 +59470,7 @@ function toString$360(x) {
     return toString$3(x);
   }
 }
-var TextStroke = {
+var TouchCallout = {
   toString: toString$360
 };
 function toString$361(x) {
@@ -59486,7 +59482,7 @@ function toString$361(x) {
     return toString$3(x);
   }
 }
-var TouchCallout = {
+var UserDrag = {
   toString: toString$361
 };
 function toString$362(x) {
@@ -59498,7 +59494,7 @@ function toString$362(x) {
     return toString$3(x);
   }
 }
-var UserDrag = {
+var UserFocus = {
   toString: toString$362
 };
 function toString$363(x) {
@@ -59510,7 +59506,7 @@ function toString$363(x) {
     return toString$3(x);
   }
 }
-var UserFocus = {
+var UserInput = {
   toString: toString$363
 };
 function toString$364(x) {
@@ -59522,7 +59518,7 @@ function toString$364(x) {
     return toString$3(x);
   }
 }
-var UserInput = {
+var UserModify = {
   toString: toString$364
 };
 function toString$365(x) {
@@ -59534,7 +59530,7 @@ function toString$365(x) {
     return toString$3(x);
   }
 }
-var UserModify = {
+var WindowDragging = {
   toString: toString$365
 };
 function toString$366(x) {
@@ -59546,22 +59542,10 @@ function toString$366(x) {
     return toString$3(x);
   }
 }
-var WindowDragging = {
+var WindowShadow = {
   toString: toString$366
 };
 function toString$367(x) {
-  if (typeof x === "string") {
-    return toString(x);
-  } else if (x.NAME === "value") {
-    return x.VAL;
-  } else {
-    return toString$3(x);
-  }
-}
-var WindowShadow = {
-  toString: toString$367
-};
-function toString$368(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -59583,9 +59567,9 @@ function toString$368(x) {
   }
 }
 var Offset = {
-  toString: toString$368
+  toString: toString$367
 };
-function toString$369(x) {
+function toString$368(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -59607,9 +59591,9 @@ function toString$369(x) {
   }
 }
 var OffsetPath = {
-  toString: toString$369
+  toString: toString$368
 };
-function toString$370(x) {
+function toString$369(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -59629,9 +59613,9 @@ function toString$370(x) {
   }
 }
 var OffsetRotate = {
-  toString: toString$370
+  toString: toString$369
 };
-function toString$371(x) {
+function toString$370(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -59655,9 +59639,9 @@ function toString$371(x) {
   }
 }
 var Outline = {
-  toString: toString$371
+  toString: toString$370
 };
-function toString$372(x) {
+function toString$371(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -59677,9 +59661,9 @@ function toString$372(x) {
   }
 }
 var PaintOrder = {
-  toString: toString$372
+  toString: toString$371
 };
-function toString$373(x) {
+function toString$372(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -59693,9 +59677,9 @@ function toString$373(x) {
   }
 }
 var Page = {
-  toString: toString$373
+  toString: toString$372
 };
-function toString$374(x) {
+function toString$373(x) {
   if (typeof x === "string") {
     if (x === "pauseAfter") {
       return "pause-after";
@@ -59711,6 +59695,34 @@ function toString$374(x) {
   }
 }
 var Pause = {
+  toString: toString$373
+};
+function toString$374(x) {
+  if (typeof x === "string") {
+    if (x === "none") {
+      return "none";
+    } else if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
+      return toString(x);
+    } else if (x === "weak") {
+      return "weak";
+    } else if (x === "xWeak") {
+      return "x-weak";
+    } else if (x === "medium") {
+      return "medium";
+    } else if (x === "strong") {
+      return "strong";
+    } else {
+      return "x-strong";
+    }
+  }
+  const variant = x.NAME;
+  if (variant === "var" || variant === "varDefault") {
+    return toString$3(x);
+  } else {
+    return toString$4(x);
+  }
+}
+var PauseAfter = {
   toString: toString$374
 };
 function toString$375(x) {
@@ -59738,36 +59750,8 @@ function toString$375(x) {
     return toString$4(x);
   }
 }
-var PauseAfter = {
-  toString: toString$375
-};
-function toString$376(x) {
-  if (typeof x === "string") {
-    if (x === "none") {
-      return "none";
-    } else if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
-      return toString(x);
-    } else if (x === "weak") {
-      return "weak";
-    } else if (x === "xWeak") {
-      return "x-weak";
-    } else if (x === "medium") {
-      return "medium";
-    } else if (x === "strong") {
-      return "strong";
-    } else {
-      return "x-strong";
-    }
-  }
-  const variant = x.NAME;
-  if (variant === "var" || variant === "varDefault") {
-    return toString$3(x);
-  } else {
-    return toString$4(x);
-  }
-}
 var PauseBefore = {
-  toString: toString$376
+  toString: toString$375
 };
 var PlaceContent = {
   toString: toString$87
@@ -59778,7 +59762,7 @@ var PlaceItems = {
 var PlaceSelf = {
   toString: toString$86
 };
-function toString$377(x) {
+function toString$376(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -59792,9 +59776,9 @@ function toString$377(x) {
   }
 }
 var PositionAnchor = {
-  toString: toString$377
+  toString: toString$376
 };
-function toString$378(x) {
+function toString$377(x) {
   if (typeof x === "string") {
     if (x === "left") {
       return "left";
@@ -59826,6 +59810,22 @@ function toString$378(x) {
   }
 }
 var PositionArea = {
+  toString: toString$377
+};
+function toString$378(x) {
+  if (typeof x === "string") {
+    if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
+      return toString(x);
+    } else {
+      return "none";
+    }
+  } else if (x.NAME === "value") {
+    return x.VAL;
+  } else {
+    return toString$3(x);
+  }
+}
+var PositionTry = {
   toString: toString$378
 };
 function toString$379(x) {
@@ -59841,26 +59841,10 @@ function toString$379(x) {
     return toString$3(x);
   }
 }
-var PositionTry = {
+var PositionTryFallbacks = {
   toString: toString$379
 };
 function toString$380(x) {
-  if (typeof x === "string") {
-    if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
-      return toString(x);
-    } else {
-      return "none";
-    }
-  } else if (x.NAME === "value") {
-    return x.VAL;
-  } else {
-    return toString$3(x);
-  }
-}
-var PositionTryFallbacks = {
-  toString: toString$380
-};
-function toString$381(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -59880,9 +59864,9 @@ function toString$381(x) {
   }
 }
 var PositionTryOptions = {
-  toString: toString$381
+  toString: toString$380
 };
-function toString$382(x) {
+function toString$381(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -59900,9 +59884,9 @@ function toString$382(x) {
   }
 }
 var PositionVisibility = {
-  toString: toString$382
+  toString: toString$381
 };
-function toString$383(x) {
+function toString$382(x) {
   if (typeof x === "string") {
     if (x === "exact") {
       return "exact";
@@ -59916,9 +59900,9 @@ function toString$383(x) {
   }
 }
 var PrintColorAdjust = {
-  toString: toString$383
+  toString: toString$382
 };
-function toString$384(x) {
+function toString$383(x) {
   if (typeof x === "string") {
     if (x === "none") {
       return "none";
@@ -59934,9 +59918,9 @@ function toString$384(x) {
   }
 }
 var Quotes = {
-  toString: toString$384
+  toString: toString$383
 };
-function toString$385(x) {
+function toString$384(x) {
   if (typeof x === "string") {
     if (x === "gridRows") {
       return "grid-rows";
@@ -59958,9 +59942,9 @@ function toString$385(x) {
   }
 }
 var ReadingFlow = {
-  toString: toString$385
+  toString: toString$384
 };
-function toString$386(x) {
+function toString$385(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -59976,6 +59960,34 @@ function toString$386(x) {
   }
 }
 var Rest = {
+  toString: toString$385
+};
+function toString$386(x) {
+  if (typeof x === "string") {
+    if (x === "none") {
+      return "none";
+    } else if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
+      return toString(x);
+    } else if (x === "weak") {
+      return "weak";
+    } else if (x === "xWeak") {
+      return "x-weak";
+    } else if (x === "medium") {
+      return "medium";
+    } else if (x === "strong") {
+      return "strong";
+    } else {
+      return "x-strong";
+    }
+  }
+  const variant = x.NAME;
+  if (variant === "var" || variant === "varDefault") {
+    return toString$3(x);
+  } else {
+    return toString$4(x);
+  }
+}
+var RestAfter = {
   toString: toString$386
 };
 function toString$387(x) {
@@ -60003,38 +60015,10 @@ function toString$387(x) {
     return toString$4(x);
   }
 }
-var RestAfter = {
+var RestBefore = {
   toString: toString$387
 };
 function toString$388(x) {
-  if (typeof x === "string") {
-    if (x === "none") {
-      return "none";
-    } else if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
-      return toString(x);
-    } else if (x === "weak") {
-      return "weak";
-    } else if (x === "xWeak") {
-      return "x-weak";
-    } else if (x === "medium") {
-      return "medium";
-    } else if (x === "strong") {
-      return "strong";
-    } else {
-      return "x-strong";
-    }
-  }
-  const variant = x.NAME;
-  if (variant === "var" || variant === "varDefault") {
-    return toString$3(x);
-  } else {
-    return toString$4(x);
-  }
-}
-var RestBefore = {
-  toString: toString$388
-};
-function toString$389(x) {
   if (typeof x === "string") {
     if (x === "collapse") {
       return "collapse";
@@ -60050,9 +60034,9 @@ function toString$389(x) {
   }
 }
 var RubyMerge = {
-  toString: toString$389
+  toString: toString$388
 };
-function toString$390(x) {
+function toString$389(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -60068,9 +60052,9 @@ function toString$390(x) {
   }
 }
 var RubyPosition = {
-  toString: toString$390
+  toString: toString$389
 };
-function toString$391(x) {
+function toString$390(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -60086,9 +60070,9 @@ function toString$391(x) {
   }
 }
 var ScrollMarkerGroup = {
-  toString: toString$391
+  toString: toString$390
 };
-function toString$392(x) {
+function toString$391(x) {
   if (typeof x === "string") {
     if (x === "none") {
       return "none";
@@ -60108,9 +60092,9 @@ function toString$392(x) {
   }
 }
 var ScrollSnapAlign = {
-  toString: toString$392
+  toString: toString$391
 };
-function toString$393(x) {
+function toString$392(x) {
   if (typeof x === "string") {
     if (x === "none") {
       return "none";
@@ -60130,6 +60114,28 @@ function toString$393(x) {
   }
 }
 var ScrollSnapCoordinate = {
+  toString: toString$392
+};
+function toString$393(x) {
+  if (typeof x === "string") {
+    if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
+      return toString(x);
+    } else if (x === "zero") {
+      return toString$7(x);
+    } else {
+      return "none";
+    }
+  }
+  const variant = x.NAME;
+  if (variant === "var" || variant === "varDefault") {
+    return toString$3(x);
+  } else if (variant === "value") {
+    return x.VAL;
+  } else {
+    return toString$7(x);
+  }
+}
+var ScrollSnapPointsX = {
   toString: toString$393
 };
 function toString$394(x) {
@@ -60151,32 +60157,10 @@ function toString$394(x) {
     return toString$7(x);
   }
 }
-var ScrollSnapPointsX = {
+var ScrollSnapPointsY = {
   toString: toString$394
 };
 function toString$395(x) {
-  if (typeof x === "string") {
-    if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
-      return toString(x);
-    } else if (x === "zero") {
-      return toString$7(x);
-    } else {
-      return "none";
-    }
-  }
-  const variant = x.NAME;
-  if (variant === "var" || variant === "varDefault") {
-    return toString$3(x);
-  } else if (variant === "value") {
-    return x.VAL;
-  } else {
-    return toString$7(x);
-  }
-}
-var ScrollSnapPointsY = {
-  toString: toString$395
-};
-function toString$396(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -60190,9 +60174,9 @@ function toString$396(x) {
   }
 }
 var ScrollSnapStop = {
-  toString: toString$396
+  toString: toString$395
 };
-function toString$397(x) {
+function toString$396(x) {
   if (typeof x === "string") {
     if (x === "none") {
       return "none";
@@ -60220,9 +60204,9 @@ function toString$397(x) {
   }
 }
 var ScrollSnapType = {
-  toString: toString$397
+  toString: toString$396
 };
-function toString$398(x) {
+function toString$397(x) {
   if (typeof x === "string") {
     if (x === "end_") {
       return "end";
@@ -60254,6 +60238,32 @@ function toString$398(x) {
   }
 }
 var ScrollStart = {
+  toString: toString$397
+};
+function toString$398(x) {
+  if (typeof x === "string") {
+    if (x === "end_") {
+      return "end";
+    } else if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
+      return toString(x);
+    } else if (x === "zero") {
+      return toString$7(x);
+    } else if (x === "start") {
+      return "start";
+    } else if (x === "center") {
+      return "center";
+    } else {
+      return "auto";
+    }
+  }
+  const variant = x.NAME;
+  if (variant === "var" || variant === "varDefault") {
+    return toString$3(x);
+  } else {
+    return toString$7(x);
+  }
+}
+var ScrollStartBlock = {
   toString: toString$398
 };
 function toString$399(x) {
@@ -60279,7 +60289,7 @@ function toString$399(x) {
     return toString$7(x);
   }
 }
-var ScrollStartBlock = {
+var ScrollStartInline = {
   toString: toString$399
 };
 function toString$400(x) {
@@ -60305,7 +60315,7 @@ function toString$400(x) {
     return toString$7(x);
   }
 }
-var ScrollStartInline = {
+var ScrollStartX = {
   toString: toString$400
 };
 function toString$401(x) {
@@ -60331,36 +60341,10 @@ function toString$401(x) {
     return toString$7(x);
   }
 }
-var ScrollStartX = {
+var ScrollStartY = {
   toString: toString$401
 };
 function toString$402(x) {
-  if (typeof x === "string") {
-    if (x === "end_") {
-      return "end";
-    } else if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
-      return toString(x);
-    } else if (x === "zero") {
-      return toString$7(x);
-    } else if (x === "start") {
-      return "start";
-    } else if (x === "center") {
-      return "center";
-    } else {
-      return "auto";
-    }
-  }
-  const variant = x.NAME;
-  if (variant === "var" || variant === "varDefault") {
-    return toString$3(x);
-  } else {
-    return toString$7(x);
-  }
-}
-var ScrollStartY = {
-  toString: toString$402
-};
-function toString$403(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -60382,9 +60366,9 @@ function toString$403(x) {
   }
 }
 var $$ScrollTimeline = {
-  toString: toString$403
+  toString: toString$402
 };
-function toString$404(x) {
+function toString$403(x) {
   if (typeof x === "string") {
     if (x === "x") {
       return "x";
@@ -60404,9 +60388,9 @@ function toString$404(x) {
   }
 }
 var ScrollTimelineAxis = {
-  toString: toString$404
+  toString: toString$403
 };
-function toString$405(x) {
+function toString$404(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -60420,9 +60404,9 @@ function toString$405(x) {
   }
 }
 var ShapeOutside = {
-  toString: toString$405
+  toString: toString$404
 };
-function toString$406(x) {
+function toString$405(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -60440,9 +60424,9 @@ function toString$406(x) {
   }
 }
 var ShapeRendering = {
-  toString: toString$406
+  toString: toString$405
 };
-function toString$407(x) {
+function toString$406(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -60486,9 +60470,9 @@ function toString$407(x) {
   }
 }
 var Size = {
-  toString: toString$407
+  toString: toString$406
 };
-function toString$408(x) {
+function toString$407(x) {
   if (typeof x === "string") {
     if (x === "literalPunctuation") {
       return "literal-punctuation";
@@ -60510,9 +60494,9 @@ function toString$408(x) {
   }
 }
 var SpeakAs = {
-  toString: toString$408
+  toString: toString$407
 };
-function toString$409(x) {
+function toString$408(x) {
   if (typeof x === "string") {
     return toString(x);
   }
@@ -60526,9 +60510,9 @@ function toString$409(x) {
   }
 }
 var Src = {
-  toString: toString$409
+  toString: toString$408
 };
-function toString$410(x) {
+function toString$409(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -60544,9 +60528,9 @@ function toString$410(x) {
   }
 }
 var StrokeLinecap = {
-  toString: toString$410
+  toString: toString$409
 };
-function toString$411(x) {
+function toString$410(x) {
   if (typeof x === "string") {
     if (x === "round") {
       return "round";
@@ -60562,9 +60546,9 @@ function toString$411(x) {
   }
 }
 var StrokeLinejoin = {
-  toString: toString$411
+  toString: toString$410
 };
-function toString$412(x) {
+function toString$411(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -60580,9 +60564,9 @@ function toString$412(x) {
   }
 }
 var TextAnchor = {
-  toString: toString$412
+  toString: toString$411
 };
-function toString$413(x) {
+function toString$412(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -60602,9 +60586,9 @@ function toString$413(x) {
   }
 }
 var TextAutospace = {
-  toString: toString$413
+  toString: toString$412
 };
-function toString$414(x) {
+function toString$413(x) {
   if (typeof x === "string") {
     if (x === "text") {
       return "text";
@@ -60624,9 +60608,9 @@ function toString$414(x) {
   }
 }
 var TextBoxEdge = {
-  toString: toString$414
+  toString: toString$413
 };
-function toString$415(x) {
+function toString$414(x) {
   if (typeof x === "string") {
     if (x === "none") {
       return "none";
@@ -60644,9 +60628,9 @@ function toString$415(x) {
   }
 }
 var TextBoxTrim = {
-  toString: toString$415
+  toString: toString$414
 };
-function toString$416(x) {
+function toString$415(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -60668,6 +60652,34 @@ function toString$416(x) {
   }
 }
 var TextCombineUpright = {
+  toString: toString$415
+};
+function toString$416(x) {
+  if (typeof x === "string") {
+    if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
+      return toString(x);
+    } else if (x === "boxDecoration") {
+      return "box-decoration";
+    } else if (x === "edges") {
+      return "edges";
+    } else if (x === "trailingSpaces") {
+      return "trailing-spaces";
+    } else if (x === "objects") {
+      return "objects";
+    } else if (x === "leadingSpaces") {
+      return "leading-spaces";
+    } else if (x === "spaces") {
+      return "spaces";
+    } else {
+      return "none";
+    }
+  } else if (x.NAME === "value") {
+    return x.VAL;
+  } else {
+    return toString$3(x);
+  }
+}
+var TextDecorationSkip = {
   toString: toString$416
 };
 function toString$417(x) {
@@ -60695,7 +60707,7 @@ function toString$417(x) {
     return toString$3(x);
   }
 }
-var TextDecorationSkip = {
+var TextDecorationSkipSelf = {
   toString: toString$417
 };
 function toString$418(x) {
@@ -60723,38 +60735,10 @@ function toString$418(x) {
     return toString$3(x);
   }
 }
-var TextDecorationSkipSelf = {
+var TextDecorationSkipSpaces = {
   toString: toString$418
 };
 function toString$419(x) {
-  if (typeof x === "string") {
-    if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
-      return toString(x);
-    } else if (x === "boxDecoration") {
-      return "box-decoration";
-    } else if (x === "edges") {
-      return "edges";
-    } else if (x === "trailingSpaces") {
-      return "trailing-spaces";
-    } else if (x === "objects") {
-      return "objects";
-    } else if (x === "leadingSpaces") {
-      return "leading-spaces";
-    } else if (x === "spaces") {
-      return "spaces";
-    } else {
-      return "none";
-    }
-  } else if (x.NAME === "value") {
-    return x.VAL;
-  } else {
-    return toString$3(x);
-  }
-}
-var TextDecorationSkipSpaces = {
-  toString: toString$419
-};
-function toString$420(x) {
   if (typeof x === "string") {
     if (x === "textBoxEdge") {
       return "text-box-edge";
@@ -60770,9 +60754,9 @@ function toString$420(x) {
   }
 }
 var TextEdge = {
-  toString: toString$420
+  toString: toString$419
 };
-function toString$421(x) {
+function toString$420(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -60788,9 +60772,9 @@ function toString$421(x) {
   }
 }
 var TextEmphasis = {
-  toString: toString$421
+  toString: toString$420
 };
-function toString$422(x) {
+function toString$421(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -60812,9 +60796,9 @@ function toString$422(x) {
   }
 }
 var TextIndent = {
-  toString: toString$422
+  toString: toString$421
 };
-function toString$423(x) {
+function toString$422(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -60830,9 +60814,9 @@ function toString$423(x) {
   }
 }
 var TextKashidaSpace = {
-  toString: toString$423
+  toString: toString$422
 };
-function toString$424(x) {
+function toString$423(x) {
   if (typeof x === "string") {
     if (x === "mixed") {
       return "mixed";
@@ -60848,9 +60832,9 @@ function toString$424(x) {
   }
 }
 var TextOrientation = {
-  toString: toString$424
+  toString: toString$423
 };
-function toString$425(x) {
+function toString$424(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -60868,9 +60852,9 @@ function toString$425(x) {
   }
 }
 var TextRendering = {
-  toString: toString$425
+  toString: toString$424
 };
-function toString$426(x) {
+function toString$425(x) {
   if (typeof x === "string") {
     if (x === "none") {
       return "none";
@@ -60886,9 +60870,9 @@ function toString$426(x) {
   }
 }
 var TextSizeAdjust = {
-  toString: toString$426
+  toString: toString$425
 };
-function toString$427(x) {
+function toString$426(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -60906,9 +60890,9 @@ function toString$427(x) {
   }
 }
 var TextSpacingTrim = {
-  toString: toString$427
+  toString: toString$426
 };
-function toString$428(x) {
+function toString$427(x) {
   if (typeof x === "string") {
     if (x === "left") {
       return "left";
@@ -60930,9 +60914,9 @@ function toString$428(x) {
   }
 }
 var TextUnderlinePosition = {
-  toString: toString$428
+  toString: toString$427
 };
-function toString$429(x) {
+function toString$428(x) {
   if (typeof x === "string") {
     if (x === "wrap") {
       return "wrap";
@@ -60952,9 +60936,9 @@ function toString$429(x) {
   }
 }
 var TextWrap = {
-  toString: toString$429
+  toString: toString$428
 };
-function toString$430(x) {
+function toString$429(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -60972,9 +60956,9 @@ function toString$430(x) {
   }
 }
 var TextWrapStyle = {
-  toString: toString$430
+  toString: toString$429
 };
-function toString$431(x) {
+function toString$430(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -60988,9 +60972,9 @@ function toString$431(x) {
   }
 }
 var TimelineScope = {
-  toString: toString$431
+  toString: toString$430
 };
-function toString$432(x) {
+function toString$431(x) {
   if (typeof x === "string") {
     if (x === "plaintext") {
       return "plaintext";
@@ -61020,9 +61004,9 @@ function toString$432(x) {
   }
 }
 var UnicodeBidi = {
-  toString: toString$432
+  toString: toString$431
 };
-function toString$433(x) {
+function toString$432(x) {
   if (typeof x === "string") {
     return toString(x);
   } else if (x.NAME === "value") {
@@ -61032,9 +61016,9 @@ function toString$433(x) {
   }
 }
 var UnicodeRange = {
-  toString: toString$433
+  toString: toString$432
 };
-function toString$434(x) {
+function toString$433(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -61048,9 +61032,9 @@ function toString$434(x) {
   }
 }
 var VectorEffect = {
-  toString: toString$434
+  toString: toString$433
 };
-function toString$435(x) {
+function toString$434(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -61072,9 +61056,9 @@ function toString$435(x) {
   }
 }
 var $$ViewTimeline = {
-  toString: toString$435
+  toString: toString$434
 };
-function toString$436(x) {
+function toString$435(x) {
   if (typeof x === "string") {
     if (x === "x") {
       return "x";
@@ -61094,9 +61078,9 @@ function toString$436(x) {
   }
 }
 var ViewTimelineAxis = {
-  toString: toString$436
+  toString: toString$435
 };
-function toString$437(x) {
+function toString$436(x) {
   if (typeof x === "string") {
     if (x === "left") {
       return "left";
@@ -61118,9 +61102,9 @@ function toString$437(x) {
   }
 }
 var VoiceBalance = {
-  toString: toString$437
+  toString: toString$436
 };
-function toString$438(x) {
+function toString$437(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -61136,9 +61120,9 @@ function toString$438(x) {
   }
 }
 var VoiceDuration = {
-  toString: toString$438
+  toString: toString$437
 };
-function toString$439(x) {
+function toString$438(x) {
   if (typeof x === "string") {
     if (x === "preserve") {
       return "preserve";
@@ -61152,6 +61136,36 @@ function toString$439(x) {
   }
 }
 var VoiceFamily = {
+  toString: toString$438
+};
+function toString$439(x) {
+  if (typeof x === "string") {
+    if (x === "high") {
+      return "high";
+    } else if (x === "xHigh") {
+      return "x-high";
+    } else if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
+      return toString(x);
+    } else if (x === "xLow") {
+      return "x-low";
+    } else if (x === "medium") {
+      return "medium";
+    } else if (x === "low") {
+      return "low";
+    } else {
+      return "absolute";
+    }
+  }
+  const variant = x.NAME;
+  if (variant === "percent") {
+    return toString$5(x);
+  } else if (variant === "value") {
+    return x.VAL;
+  } else {
+    return toString$3(x);
+  }
+}
+var VoicePitch = {
   toString: toString$439
 };
 function toString$440(x) {
@@ -61181,40 +61195,10 @@ function toString$440(x) {
     return toString$3(x);
   }
 }
-var VoicePitch = {
+var VoiceRange = {
   toString: toString$440
 };
 function toString$441(x) {
-  if (typeof x === "string") {
-    if (x === "high") {
-      return "high";
-    } else if (x === "xHigh") {
-      return "x-high";
-    } else if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
-      return toString(x);
-    } else if (x === "xLow") {
-      return "x-low";
-    } else if (x === "medium") {
-      return "medium";
-    } else if (x === "low") {
-      return "low";
-    } else {
-      return "absolute";
-    }
-  }
-  const variant = x.NAME;
-  if (variant === "percent") {
-    return toString$5(x);
-  } else if (variant === "value") {
-    return x.VAL;
-  } else {
-    return toString$3(x);
-  }
-}
-var VoiceRange = {
-  toString: toString$441
-};
-function toString$442(x) {
   if (typeof x === "string") {
     if (x === "xFast") {
       return "x-fast";
@@ -61242,9 +61226,9 @@ function toString$442(x) {
   }
 }
 var VoiceRate = {
-  toString: toString$442
+  toString: toString$441
 };
-function toString$443(x) {
+function toString$442(x) {
   if (typeof x === "string") {
     if (x === "none") {
       return "none";
@@ -61264,9 +61248,9 @@ function toString$443(x) {
   }
 }
 var VoiceStress = {
-  toString: toString$443
+  toString: toString$442
 };
-function toString$444(x) {
+function toString$443(x) {
   if (typeof x === "string") {
     if (x === "xLoud") {
       return "x-loud";
@@ -61290,9 +61274,9 @@ function toString$444(x) {
   }
 }
 var VoiceVolume = {
-  toString: toString$444
+  toString: toString$443
 };
-function toString$445(x) {
+function toString$444(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -61312,9 +61296,9 @@ function toString$445(x) {
   }
 }
 var WhiteSpaceCollapse = {
-  toString: toString$445
+  toString: toString$444
 };
-function toString$446(x) {
+function toString$445(x) {
   if (typeof x === "string") {
     if (x === "unset" || x === "revert" || x === "revertLayer" || x === "inherit_" || x === "initial") {
       return toString(x);
@@ -61328,9 +61312,9 @@ function toString$446(x) {
   }
 }
 var WillChange = {
-  toString: toString$446
+  toString: toString$445
 };
-function toString$447(x) {
+function toString$446(x) {
   if (typeof x === "string") {
     if (x === "none") {
       return "none";
@@ -61348,9 +61332,9 @@ function toString$447(x) {
   }
 }
 var WordSpaceTransform = {
-  toString: toString$447
+  toString: toString$446
 };
-function toString$448(x) {
+function toString$447(x) {
   if (typeof x === "string") {
     if (x === "sidewaysLr") {
       return "sideways-lr";
@@ -61370,9 +61354,9 @@ function toString$448(x) {
   }
 }
 var WritingMode = {
-  toString: toString$448
+  toString: toString$447
 };
-function toString$449(x) {
+function toString$448(x) {
   if (typeof x === "string") {
     if (x === "reset") {
       return "reset";
@@ -61392,7 +61376,7 @@ function toString$449(x) {
   }
 }
 var Zoom = {
-  toString: toString$449
+  toString: toString$448
 };
 
 // ../demo-melange/node_modules/styled-ppx.melange/Alias.mjs
@@ -62731,6 +62715,206 @@ var yellowgreen = {
 };
 var transparent2 = "transparent";
 
+// ../demo-melange/node_modules/styled-ppx.melange/Merge_key.mjs
+var atom_prefix = "_a_";
+var all_sentinel = "zz";
+var unregistered_custom_marker = "zy";
+var direction_marker = "5q";
+var unicode_bidi_marker = "dp";
+function is_excluded_from_all(family) {
+  if (family === unregistered_custom_marker || family === direction_marker) {
+    return true;
+  } else {
+    return family === unicode_bidi_marker;
+  }
+}
+function base36_value(s2) {
+  const value = {
+    contents: 0
+  };
+  iter6((function(c) {
+    const digit = c >= 58 ? c > 122 || c < 97 ? 0 : (c - /* 'a' */
+    97 | 0) + 10 | 0 : c >= 48 ? c - /* '0' */
+    48 | 0 : 0;
+    value.contents = Math.imul(value.contents, 36) + digit | 0;
+  }), s2);
+  return value.contents;
+}
+function fields_of_extra(extra) {
+  if (extra === 0) {
+    return [
+      false,
+      false,
+      false
+    ];
+  } else if (extra === 3) {
+    return [
+      false,
+      true,
+      false
+    ];
+  } else if (extra === 5) {
+    return [
+      true,
+      false,
+      false
+    ];
+  } else if (extra === 6) {
+    return [
+      false,
+      false,
+      true
+    ];
+  } else if (extra === 8) {
+    return [
+      true,
+      true,
+      false
+    ];
+  } else if (extra === 11) {
+    return [
+      true,
+      false,
+      true
+    ];
+  } else {
+    return;
+  }
+}
+function parse_atom(class_name) {
+  const prefix_len = atom_prefix.length;
+  if (class_name.length < prefix_len || sub5(class_name, 0, prefix_len) !== atom_prefix) {
+    return;
+  }
+  const body = sub5(class_name, prefix_len, class_name.length - prefix_len | 0);
+  const floor = 6;
+  const match = fields_of_extra(body.length - floor | 0);
+  if (match === void 0) {
+    return;
+  }
+  const pos = {
+    contents: 0
+  };
+  const take3 = function(width) {
+    const s2 = sub5(body, pos.contents, width);
+    pos.contents = pos.contents + width | 0;
+    return s2;
+  };
+  const context = match[0] ? take3(5) : "";
+  const family = take3(2);
+  const extended = match[2] ? take3(6) : void 0;
+  const mask = match[1] ? base36_value(take3(3)) : void 0;
+  take3(4);
+  return {
+    context,
+    family,
+    extended,
+    mask
+  };
+}
+function context_equal(a, b) {
+  return a.context === b.context;
+}
+function family_equal(a, b) {
+  if (a.family !== b.family) {
+    return false;
+  }
+  const match = a.extended;
+  const match$1 = b.extended;
+  if (match !== void 0) {
+    if (match$1 !== void 0) {
+      return match === match$1;
+    } else {
+      return false;
+    }
+  } else {
+    return match$1 === void 0;
+  }
+}
+function mask_subset(a, b) {
+  if (a !== void 0) {
+    if (b !== void 0) {
+      return (a & b) === a;
+    } else {
+      return true;
+    }
+  } else {
+    return b === void 0;
+  }
+}
+function removes(former, latter) {
+  if (context_equal(former, latter)) {
+    if (latter.family === all_sentinel) {
+      return !is_excluded_from_all(former.family);
+    } else if (family_equal(former, latter)) {
+      return mask_subset(former.mask, latter.mask);
+    } else {
+      return false;
+    }
+  } else {
+    return false;
+  }
+}
+function is_space3(param) {
+  if (param > 13 || param < 9) {
+    return param === 32;
+  } else {
+    return !(param === 12 || param === 11);
+  }
+}
+function split_tokens(s2) {
+  const n = s2.length;
+  let _i = 0;
+  let _acc = (
+    /* [] */
+    0
+  );
+  while (true) {
+    const acc = _acc;
+    const i = _i;
+    if (i >= n) {
+      return rev(acc);
+    }
+    if (is_space3(get2(s2, i))) {
+      _i = i + 1 | 0;
+      continue;
+    }
+    let j = i;
+    while (j < n && !is_space3(get2(s2, j))) {
+      j = j + 1 | 0;
+    }
+    ;
+    _acc = {
+      hd: sub5(s2, i, j - i | 0),
+      tl: acc
+    };
+    _i = j;
+    continue;
+  }
+  ;
+}
+function merge_class_names(former, latter) {
+  const former_tokens = split_tokens(former);
+  const latter_tokens = split_tokens(latter);
+  const latter_atoms = of_list(filter_map2(parse_atom, latter_tokens));
+  const survives = function(token) {
+    const former_atom = parse_atom(token);
+    if (former_atom !== void 0) {
+      return !exists4((function(latter_atom) {
+        return removes(former_atom, latter_atom);
+      }), latter_atoms);
+    } else {
+      return true;
+    }
+  };
+  return concat6(" ", $at(filter2(survives, former_tokens), latter_tokens));
+}
+var context_width = 5;
+var family_width = 2;
+var mask_width = 3;
+var value_width = 4;
+var extended_width = 6;
+
 // ../demo-melange/node_modules/reason-react/ReactDOM.mjs
 function unsafeAddProp(style, key, value) {
   const dict = {};
@@ -62778,7 +62962,7 @@ function make7(className2, vars2) {
   ];
 }
 function merge2(styles1, styles22) {
-  const className2 = (styles1[0] + (" " + styles22[0])).trim();
+  const className2 = merge_class_names(styles1[0], styles22[0]);
   const style = Object.assign({}, styles1[1], styles22[1]);
   return [
     className2,
@@ -63207,7 +63391,7 @@ var AppGlobalStyles = {
   make: make8
 };
 var stack = make7(
-  "label:stack cid-195s1dh css-k008qs css-cgq59l",
+  "label:stack _id_195s1dh _a_5r08qs _a_61001q59l",
   /* [] */
   0
 );
@@ -63220,7 +63404,7 @@ function getOrEmpty(str) {
 }
 function styles2(lolaOpt, param) {
   const lola = lolaOpt !== void 0 ? lolaOpt : px2(0);
-  return make7("label:Cositas cid-uk3qz7 css-k008qs css-cgq59l css-r0vq9t", {
+  return make7("label:Cositas _id_uk3qz7 _a_5r08qs _a_61001q59l _a_6fvq9t", {
     hd: [
       "--lola-8erbae",
       Gap.toString(lola)
@@ -63252,38 +63436,38 @@ var Cositas = {
   make: make$12
 };
 var selectors = make7(
-  "label:selectors cid-pm05s2 css-tokvmb css-12qnfjo",
+  "label:selectors _id_pm05s2 _a_4ekvmb _a_qyw7u4enfjo",
   /* [] */
   0
 );
-var bounce = AnimationName.make(void 0, "keyframe-deb5ee");
+var bounce = AnimationName.make(void 0, "_k_deb5ee");
 var clx = make7(
-  "label:clx cid-47oj19 css-1e8vzlw css-u70tf2 css-1j9jp3a",
+  "label:clx _id_47oj19 _a_65001vzlw _a_5l0tf2 _a_6i00gjp3a",
   /* [] */
   0
 );
 var post = make7(
-  "label:post cid-gbz02q css-1y5r52a css-3qzm71",
+  "label:post _id_gbz02q _a_3hr52a _a_4v002zm71",
   /* [] */
   0
 );
 var card = make7(
-  "label:card cid-ebd8w7 css-eaeacs css-25k368 css-3fuzg5",
+  "label:card _id_ebd8w7 _a_7peacs _a_3hk368 _a_6500wuzg5",
   /* [] */
   0
 );
 var container = make7(
-  "label:container cid-1hzr7q6 css-nqqinc css-w3aeeb css-5x3p37 css-stwpj2",
+  "label:container _id_1hzr7q6 _a_p3y4xecqinc _a_p3y4x39004aeeb _a_p3y4x6500w3p37 _a_2grgh65m9swpj2",
   /* [] */
   0
 );
 var gradiend = make7(
-  "label:gradiend cid-j1a2e7 css-1wlyyxm css-qelxhy",
+  "label:gradiend _id_j1a2e7 _a_94yyxm _a_39008lxhy",
   /* [] */
   0
 );
 var tag = make7(
-  "label:tag cid-1a86vzz css-1baulvz css-7ji1gv css-1isemmb css-3kft4e css-wtpnzt",
+  "label:tag _id_1a86vzz _a_5rulvz _a_94i1gv _a_7p002emmb _a_3hft4e _a_3npnzt",
   /* [] */
   0
 );
@@ -63291,28 +63475,230 @@ var Labels = {
   tag
 };
 var childLabel = make7(
-  "label:childLabel cid-6prbgi css-in3yi3",
+  "label:childLabel _id_6prbgi _a_65m9s3yi3",
   /* [] */
   0
 );
 var parentWithChildSelector = make7(
-  "label:parentWithChildSelector cid-1wu39qc css-o32ik7 css-19midj6 css-1qm1lh css-1xhar4a css-yd4yye",
+  "label:parentWithChildSelector _id_1wu39qc _a_3h2ik7 _a_94idj6 _a_7p001m1lh _a_5arac4ell0e _a_j7d0239xe6s",
   /* [] */
   0
 );
 var modifierActive = make7(
-  "label:modifierActive cid-h4gfxd css-in3yi3",
+  "label:modifierActive _id_h4gfxd _a_65m9s3yi3",
   /* [] */
   0
 );
 var toggle = make7(
-  "label:toggle cid-mfk87c css-1baulvz css-12hizlt css-12z0wuy css-s67z9l css-pk71pq css-gwf734 css-145kqdj",
+  "label:toggle _id_mfk87c _a_5rulvz _a_94izlt _a_7p0040wuy _a_3h7z9l _a_3n71pq _a_i52hj395tlc _a_i52hj3hef5ogsp",
+  /* [] */
+  0
+);
+var mergeLeftRed = make7(
+  "label:mergeLeftRed _id_xj79l2 _a_4ekvmb",
+  /* [] */
+  0
+);
+var mergeRightBlue = make7(
+  "label:mergeRightBlue _id_rmeksf _a_4esm7b",
+  /* [] */
+  0
+);
+var heightAutoDecoy = make7(
+  "label:heightAutoDecoy _id_12da7xi _a_6l7jm9",
+  /* [] */
+  0
+);
+var FaqDecoy = {
+  heightAutoDecoy
+};
+var faqOpenContent = make7(
+  "label:faqOpenContent _id_qck8g9 _a_6l7jm9 _a_8rbazn",
+  /* [] */
+  0
+);
+var faqCollapsed = make7(
+  "label:faqCollapsed _id_1tw41t7 _a_6lvr0w",
+  /* [] */
+  0
+);
+var marginTopZero = make7(
+  "label:marginTopZero _id_c4lyme _a_7p008n4zf",
+  /* [] */
+  0
+);
+var marginAll10 = make7(
+  "label:marginAll10 _id_rrmfw _a_7peacs",
+  /* [] */
+  0
+);
+var marginAll10Reversed = make7(
+  "label:marginAll10Reversed _id_19kb2l3 _a_7peacs",
+  /* [] */
+  0
+);
+var marginTopZeroReversed = make7(
+  "label:marginTopZeroReversed _id_oibhbu _a_7p008n4zf",
+  /* [] */
+  0
+);
+var differentColor = make7(
+  "label:differentColor _id_1yxuf5h _a_4e3x2f",
+  /* [] */
+  0
+);
+var differentBackground = make7(
+  "label:differentBackground _id_m7e9qy _a_39zz22",
+  /* [] */
+  0
+);
+var hoverBaseColor = make7(
+  "label:hoverBaseColor _id_69rt6v _a_4ecoli",
+  /* [] */
+  0
+);
+var hoverOverride = make7(
+  "label:hoverOverride _id_zaoc9q _a_qyw7u4eb4a5",
+  /* [] */
+  0
+);
+var hoverFirst = make7(
+  "label:hoverFirst _id_vfuhim _a_qyw7u4ego80",
+  /* [] */
+  0
+);
+var hoverSecond = make7(
+  "label:hoverSecond _id_st9aqn _a_qyw7u4em3mo",
+  /* [] */
+  0
+);
+var mediaFirst = make7(
+  "label:mediaFirst _id_1yjmkjm _a_ftrjp4eqtu6",
+  /* [] */
+  0
+);
+var mediaSecond = make7(
+  "label:mediaSecond _id_dpv5ji _a_ftrjp4edjbj",
+  /* [] */
+  0
+);
+var importantRed = make7(
+  "label:importantRed _id_cg72f _a_oe8sa4eltzl",
+  /* [] */
+  0
+);
+var plainBlueForImportant = make7(
+  "label:plainBlueForImportant _id_ovywjm _a_4esm7b",
+  /* [] */
+  0
+);
+var plainRedForImportant = make7(
+  "label:plainRedForImportant _id_1y9lfm8 _a_4ekvmb",
+  /* [] */
+  0
+);
+var importantBlue = make7(
+  "label:importantBlue _id_q3vp21 _a_oe8sa4e3jtv",
+  /* [] */
+  0
+);
+var importantRedVsImportantBlue = make7(
+  "label:importantRedVsImportantBlue _id_17mhudr _a_oe8sa4eltzl",
+  /* [] */
+  0
+);
+var customXRed = make7(
+  "label:customXRed _id_iv9hkj _a_zytx2ztfp7wt",
+  /* [] */
+  0
+);
+var customXBlue = make7(
+  "label:customXBlue _id_j3dium _a_zytx2ztfqbjc",
+  /* [] */
+  0
+);
+var useCustomX = make7(
+  "label:useCustomX _id_vzabfw _a_4e8w5r",
+  /* [] */
+  0
+);
+function dynColorA(color) {
+  return make7("label:dynColorA _id_oxnnly _a_4esjgz", {
+    hd: [
+      "--color-1a279q8",
+      Color.toString(color)
+    ],
+    tl: (
+      /* [] */
+      0
+    )
+  });
+}
+function dynColorB(color) {
+  return make7("label:dynColorB _id_eaixg1 _a_4esjgz", {
+    hd: [
+      "--color-1a279q8",
+      Color.toString(color)
+    ],
+    tl: (
+      /* [] */
+      0
+    )
+  });
+}
+var assocA = make7(
+  "label:assocA _id_1ns1py9 _a_4efdvb",
+  /* [] */
+  0
+);
+var assocB = make7(
+  "label:assocB _id_1ojnt9w _a_4et30w",
+  /* [] */
+  0
+);
+var assocC = make7(
+  "label:assocC _id_167j6uv _a_4efm8j",
+  /* [] */
+  0
+);
+var paddingBothZero = make7(
+  "label:paddingBothZero _id_kx9m5d _a_94002yq1t _a_940048fgp",
+  /* [] */
+  0
+);
+var paddingLeft4 = make7(
+  "label:paddingLeft4 _id_1j3kmra _a_94002wcsq",
+  /* [] */
+  0
+);
+var wordWrapBreak = make7(
+  "label:wordWrapBreak _id_k9t8x6 _a_8xpt08",
+  /* [] */
+  0
+);
+var overflowWrapNormal = make7(
+  "label:overflowWrapNormal _id_1l5xha2 _a_8xlw6e",
+  /* [] */
+  0
+);
+var identityKeptColor = make7(
+  "label:identityKeptColor _id_15nl9wy _a_4enj2d",
+  /* [] */
+  0
+);
+var identityKeptOverride = make7(
+  "label:identityKeptOverride _id_10n1eq1 _a_4efdvb",
+  /* [] */
+  0
+);
+var identityKeptHighlight = make7(
+  "label:identityKeptHighlight _id_1cfjy5z _a_a5k1dcfwtlg",
   /* [] */
   0
 );
 var primary = hex2("141414");
 function keyframeDemoShell(color) {
-  return make7("label:keyframeDemoShell cid-8xpkpc css-19kzrtu css-i3pbo css-3kft4e css-1fi1jeb css-205zh2 css-kusjgz css-1e8vzlw", {
+  return make7("label:keyframeDemoShell _id_8xpkpc _a_94zrtu _a_7p0013pbo _a_3hft4e _a_3n1jeb _a_395zh2 _a_4esjgz _a_65001vzlw", {
     hd: [
       "--color-1a279q8",
       Color.toString(color)
@@ -63346,8 +63732,8 @@ var resize2 = AnimationName.make({
       0
     )
   }
-}, "keyframe-1kt58w0");
-var keyframeDemoCard = make7("label:keyframeDemoCard cid-jbn4tz css-1h7bkao css-65ee5x css-3pa72f css-iovuyg css-1c3l4rb css-i6bazn css-k008qs css-zcxndt css-1tyndxa css-1vw7svr css-1p3fawg css-kbn7if css-8c92kl", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
+}, "_k_1kt58w0");
+var keyframeDemoCard = make7("label:keyframeDemoCard _id_jbn4tz _a_2z01sbkao _a_2z008ee5x _a_2z1kwa72f _a_2z00gvuyg _a_ecl4rb _a_8rbazn _a_5r08qs _a_9i001xndt _a_9h002ndxa _a_3n7svr _a_39fawg _a_4en7if _a_4092kl", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
 function Main(Props) {
   return JsxRuntime.jsxs("main", {
     children: [
@@ -63431,6 +63817,153 @@ function Main(Props) {
             children: "toggle: on via &.$(modifierActive)",
             className: merge2(toggle, modifierActive)[0],
             style: merge2(toggle, modifierActive)[1]
+          })
+        ]
+      }),
+      JsxRuntime.jsxs("section", {
+        children: [
+          JsxRuntime.jsx("h2", {
+            children: "CSS.merge"
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "1. same property: right wins"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(red, blue) -> expect blue",
+            className: merge2(mergeLeftRed, mergeRightBlue)[0],
+            style: merge2(mergeLeftRed, mergeRightBlue)[1]
+          }),
+          JsxRuntime.jsx("p", {
+            children: "Faq: merge(content{height:auto}, collapsed{height:0}) -> expect height 0 (this text hidden)",
+            className: merge2(faqOpenContent, faqCollapsed)[0],
+            style: merge2(faqOpenContent, faqCollapsed)[1]
+          }),
+          JsxRuntime.jsx("p", {
+            children: "Decoy: unrelated height:auto, rendered first, same class as faqOpenContent's",
+            className: heightAutoDecoy[0],
+            style: heightAutoDecoy[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "2. longhand then shorthand"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(margin-top:0, margin:10px) -> expect 10px all sides",
+            className: merge2(marginTopZero, marginAll10)[0],
+            style: merge2(marginTopZero, marginAll10)[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "3. shorthand then longhand (accepted limit)"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(margin:10px, margin-top:0) -> both classes kept, see report for what rendered",
+            className: merge2(marginAll10Reversed, marginTopZeroReversed)[0],
+            style: merge2(marginAll10Reversed, marginTopZeroReversed)[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "4. different properties"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(color, background) -> expect both applied",
+            className: merge2(differentColor, differentBackground)[0],
+            style: merge2(differentColor, differentBackground)[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "5. contexts"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "base + :hover -> green at rest, purple on hover",
+            className: merge2(hoverBaseColor, hoverOverride)[0],
+            style: merge2(hoverBaseColor, hoverOverride)[1]
+          }),
+          JsxRuntime.jsx("p", {
+            children: ":hover + :hover -> teal on hover (right wins)",
+            className: merge2(hoverFirst, hoverSecond)[0],
+            style: merge2(hoverFirst, hoverSecond)[1]
+          }),
+          JsxRuntime.jsx("p", {
+            children: "base + @media(<=700px) -> green normally, orange under 700px (both kept)",
+            className: merge2(hoverBaseColor, mediaFirst)[0],
+            style: merge2(hoverBaseColor, mediaFirst)[1]
+          }),
+          JsxRuntime.jsx("p", {
+            children: "@media + same @media -> brown under 700px (right wins)",
+            className: merge2(mediaFirst, mediaSecond)[0],
+            style: merge2(mediaFirst, mediaSecond)[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "6. !important"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(red !important, blue) -> expect red",
+            className: merge2(importantRed, plainBlueForImportant)[0],
+            style: merge2(importantRed, plainBlueForImportant)[1]
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(red, blue !important) -> expect blue",
+            className: merge2(plainRedForImportant, importantBlue)[0],
+            style: merge2(plainRedForImportant, importantBlue)[1]
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(red !important, blue !important) -> expect blue",
+            className: merge2(importantRedVsImportantBlue, importantBlue)[0],
+            style: merge2(importantRedVsImportantBlue, importantBlue)[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "7. custom property"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(--x:red, --x:blue) then color:var(--x) -> expect blue",
+            className: merge2(merge2(customXRed, customXBlue), useCustomX)[0],
+            style: merge2(merge2(customXRed, customXBlue), useCustomX)[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "8. interpolation bundle on each side"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge($(orange), $(blue)) -> both in- classes kept, see report for winner",
+            className: merge2(dynColorA(hex2("e8590c")), dynColorB(hex2("1971c2")))[0],
+            style: merge2(dynColorA(hex2("e8590c")), dynColorB(hex2("1971c2")))[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "9. merge of merges"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(merge(a,b), c) -> expect navy",
+            className: merge2(merge2(assocA, assocB), assocC)[0],
+            style: merge2(merge2(assocA, assocB), assocC)[1]
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(a, merge(b,c)) -> expect navy, same as the other order",
+            className: merge2(assocA, merge2(assocB, assocC))[0],
+            style: merge2(assocA, merge2(assocB, assocC))[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "10. family atom"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(padding-left:0;padding-right:0, padding-left:4px) -> expect left 4px, right 0",
+            className: merge2(paddingBothZero, paddingLeft4)[0],
+            style: merge2(paddingBothZero, paddingLeft4)[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "11. alias"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "merge(word-wrap:break-word, overflow-wrap:normal) -> see report for what applies",
+            className: merge2(wordWrapBreak, overflowWrapNormal)[0],
+            style: merge2(wordWrapBreak, overflowWrapNormal)[1]
+          }),
+          JsxRuntime.jsx("h3", {
+            children: "12. identity survives a merge"
+          }),
+          JsxRuntime.jsx("div", {
+            children: JsxRuntime.jsx("p", {
+              children: "crimson + underlined: .$(identityKeptColor) still matches after merge",
+              className: merge2(identityKeptColor, identityKeptOverride)[0],
+              style: merge2(identityKeptColor, identityKeptOverride)[1]
+            }),
+            className: identityKeptHighlight[0],
+            style: identityKeptHighlight[1]
           })
         ]
       })

@@ -1,0 +1,8 @@
+(library
+ (name class_format)
+ ; Standalone so it's directly unit-testable (packages/ppx/src is a
+ ; ppx_rewriter-kind, wrapped library; its internal modules aren't cleanly
+ ; reachable from an external test executable). Mirrors murmur2/slot_key's
+ ; own standalone-library shape in this same directory.
+ (package styled-ppx)
+ (libraries murmur2 slot_key))
