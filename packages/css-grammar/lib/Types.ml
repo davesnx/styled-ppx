@@ -1416,6 +1416,78 @@ and line_width =
   | `Thick
   ]
 
+(* CSS Gaps L1: https://drafts.csswg.org/css-gaps-1/#typedef-inset-value *)
+and inset_value =
+  [ `Extended_length of extended_length
+  | `Extended_percentage of extended_percentage
+  | `Overlap_join
+  ]
+
+(* CSS Gaps L1 § 4.1: https://drafts.csswg.org/css-gaps-1/#typedef-line-color-list *)
+and repeat_line_color = positive_integer * unit * color list
+and auto_repeat_line_color = unit * unit * color list
+
+and line_color_or_repeat =
+  [ `Color of color
+  | `Repeat_line_color of repeat_line_color
+  ]
+
+and line_color_list = line_color_or_repeat list
+
+and auto_line_color_list =
+  (line_color_or_repeat list * unit) option
+  * auto_repeat_line_color
+  * (unit * line_color_or_repeat list) option
+
+(* CSS Gaps L1 § 4.2: https://drafts.csswg.org/css-gaps-1/#typedef-line-style-list *)
+and repeat_line_style = positive_integer * unit * line_style list
+and auto_repeat_line_style = unit * unit * line_style list
+
+and line_style_or_repeat =
+  [ `Line_style of line_style
+  | `Repeat_line_style of repeat_line_style
+  ]
+
+and line_style_list = line_style_or_repeat list
+
+and auto_line_style_list =
+  (line_style_or_repeat list * unit) option
+  * auto_repeat_line_style
+  * (unit * line_style_or_repeat list) option
+
+(* CSS Gaps L1 § 4.3: https://drafts.csswg.org/css-gaps-1/#typedef-line-width-list *)
+and repeat_line_width = positive_integer * unit * line_width list
+and auto_repeat_line_width = unit * unit * line_width list
+
+and line_width_or_repeat =
+  [ `Line_width of line_width
+  | `Repeat_line_width of repeat_line_width
+  ]
+
+and line_width_list = line_width_or_repeat list
+
+and auto_line_width_list =
+  (line_width_or_repeat list * unit) option
+  * auto_repeat_line_width
+  * (unit * line_width_or_repeat list) option
+
+(* CSS Gaps L1 § 4.4: https://drafts.csswg.org/css-gaps-1/#typedef-gap-rule *)
+and gap_rule = line_width option * line_style option * color option
+and gap_repeat_rule = positive_integer * unit * gap_rule list
+and gap_auto_repeat_rule = unit * unit * gap_rule list
+
+and gap_rule_or_repeat =
+  [ `Gap_rule of gap_rule
+  | `Gap_repeat_rule of gap_repeat_rule
+  ]
+
+and gap_rule_list = gap_rule_or_repeat list
+
+and gap_auto_rule_list =
+  (gap_rule_or_repeat list * unit) option
+  * gap_auto_repeat_rule
+  * (unit * gap_rule_or_repeat list) option
+
 and linear_color_hint =
   [ `Extended_length of extended_length
   | `Extended_percentage of extended_percentage
@@ -2818,14 +2890,123 @@ and property_column_gap =
   | `Extended_percentage of extended_percentage
   ]
 
+(* CSS Gaps L1 § 4.4 (supersedes css-multicol-1's plain triple):
+   https://drafts.csswg.org/css-gaps-1/#propdef-column-rule *)
 and property_column_rule =
-  property_column_rule_width option
-  * property_column_rule_style option
-  * property_column_rule_color option
+  [ `Gap_rule_list of gap_rule_list
+  | `Gap_auto_rule_list of gap_auto_rule_list
+  ]
 
-and property_column_rule_color = color
-and property_column_rule_style = property_border_style
-and property_column_rule_width = property_border_width
+(* CSS Gaps L1 § 4.1 (supersedes css-multicol-1's plain <color>):
+   https://drafts.csswg.org/css-gaps-1/#propdef-column-rule-color *)
+and property_column_rule_color =
+  [ `Line_color_list of line_color_list
+  | `Auto_line_color_list of auto_line_color_list
+  ]
+
+(* CSS Gaps L1 § 4.2 (supersedes css-multicol-1's plain <'border-style'>):
+   https://drafts.csswg.org/css-gaps-1/#propdef-column-rule-style *)
+and property_column_rule_style =
+  [ `Line_style_list of line_style_list
+  | `Auto_line_style_list of auto_line_style_list
+  ]
+
+(* CSS Gaps L1 § 4.3 (supersedes css-multicol-1's plain <'border-width'>):
+   https://drafts.csswg.org/css-gaps-1/#propdef-column-rule-width *)
+and property_column_rule_width =
+  [ `Line_width_list of line_width_list
+  | `Auto_line_width_list of auto_line_width_list
+  ]
+
+(* CSS Gaps L1 § 3.2: https://drafts.csswg.org/css-gaps-1/#propdef-column-rule-break *)
+and property_column_rule_break =
+  [ `None
+  | `Normal
+  | `Intersection
+  ]
+
+and property_row_rule_break = property_column_rule_break
+
+(* CSS Gaps L1 § 3.3.2: https://drafts.csswg.org/css-gaps-1/#propdef-column-rule-inset-cap *)
+and property_column_rule_inset_cap = inset_value * inset_value option
+and property_column_rule_inset_junction = inset_value * inset_value option
+and property_row_rule_inset_cap = inset_value * inset_value option
+and property_row_rule_inset_junction = inset_value * inset_value option
+
+(* CSS Gaps L1 § 3.3: leaves - https://drafts.csswg.org/css-gaps-1/#propdef-column-rule-inset-cap-start *)
+and property_column_rule_inset_cap_start = inset_value
+and property_column_rule_inset_cap_end = inset_value
+and property_column_rule_inset_junction_start = inset_value
+and property_column_rule_inset_junction_end = inset_value
+and property_row_rule_inset_cap_start = inset_value
+and property_row_rule_inset_cap_end = inset_value
+and property_row_rule_inset_junction_start = inset_value
+and property_row_rule_inset_junction_end = inset_value
+
+(* CSS Gaps L1 § 3.3.1: https://drafts.csswg.org/css-gaps-1/#propdef-column-rule-inset-start
+   column-rule-inset-start itself is not browser-implemented (no BCD entry;
+   asymmetric with row-rule-inset-start, which is) so it is not registered -
+   row-rule-inset-end and column-rule-inset-end are (Chrome 149), and are. *)
+and property_column_rule_inset_end = inset_value
+and property_row_rule_inset_start = inset_value
+and property_row_rule_inset_end = inset_value
+
+(* CSS Gaps L1 § 3.3.3: https://drafts.csswg.org/css-gaps-1/#propdef-column-rule-inset *)
+and property_column_rule_inset =
+  property_column_rule_inset_cap
+  * (unit * property_column_rule_inset_junction) option
+
+and property_row_rule_inset =
+  property_row_rule_inset_cap * (unit * property_row_rule_inset_junction) option
+
+(* CSS Gaps L1 § 3.4: https://drafts.csswg.org/css-gaps-1/#propdef-column-rule-visibility-items *)
+and property_column_rule_visibility_items =
+  [ `All
+  | `Around
+  | `Between
+  | `Normal
+  ]
+
+and property_row_rule_visibility_items = property_column_rule_visibility_items
+
+(* CSS Gaps L1 § 3.5: https://drafts.csswg.org/css-gaps-1/#propdef-rule-overlap
+   Standalone - no column-/row- split. *)
+and property_rule_overlap =
+  [ `Row_over_column
+  | `Column_over_row
+  ]
+
+(* CSS Gaps L1 § 4.4: https://drafts.csswg.org/css-gaps-1/#propdef-row-rule
+   row-rule mirrors column-rule exactly (same typedefs, own longhands). *)
+and property_row_rule =
+  [ `Gap_rule_list of gap_rule_list
+  | `Gap_auto_rule_list of gap_auto_rule_list
+  ]
+
+and property_row_rule_color = property_column_rule_color
+and property_row_rule_style = property_column_rule_style
+and property_row_rule_width = property_column_rule_width
+
+(* CSS Gaps L1 § 4.4: https://drafts.csswg.org/css-gaps-1/#propdef-rule
+   rule and every rule-* below are bidirectional shorthands: each sets its
+   column-rule-* and row-rule-* counterpart(s) to the same value, so its own
+   grammar is just <'column-rule*'> (parses identically; direct_longhands
+   name both sides explicitly in the registration). *)
+and property_rule = property_column_rule
+and property_rule_break = property_column_rule_break
+and property_rule_color = property_column_rule_color
+and property_rule_style = property_column_rule_style
+and property_rule_width = property_column_rule_width
+and property_rule_visibility_items = property_column_rule_visibility_items
+and property_rule_inset_cap = property_column_rule_inset_cap
+and property_rule_inset_junction = property_column_rule_inset_junction
+and property_rule_inset_end = property_column_rule_inset_end
+and property_rule_inset = property_column_rule_inset
+
+(* rule-inset-start: see the column-rule-inset-start note above - it flattens
+   straight to the four leaves since the unimplemented intermediate property
+   is skipped, rather than aliasing property_column_rule_inset_start. *)
+and property_rule_inset_start = inset_value
 
 and property_column_span =
   [ `None

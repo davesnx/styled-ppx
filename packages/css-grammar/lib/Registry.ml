@@ -64,6 +64,7 @@ let registry : (kind * packed_rule) list =
       Properties.Font.entries;
       Properties.ForcedColorAdjust.entries;
       Properties.Gap.entries;
+      Properties.GapRule.entries;
       Properties.Glyph.entries;
       Properties.Grid.entries;
       Properties.HangingPunctuation.entries;
@@ -127,6 +128,7 @@ let registry : (kind * packed_rule) list =
       Properties.Right.entries;
       Properties.Rotate.entries;
       Properties.RowGap.entries;
+      Properties.RowRule.entries;
       Properties.Ruby.entries;
       Properties.Rx.entries;
       Properties.Ry.entries;

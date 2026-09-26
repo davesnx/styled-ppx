@@ -531,3 +531,8 @@ scroll-axis-lock
 view-transition-group
 view-transition-scope
 window-drag
+rule
+rule-break
+rule-inset
+rule-overlap
+rule-visibility-items

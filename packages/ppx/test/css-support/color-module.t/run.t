@@ -44,23 +44,23 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_cf0016wvt{text-decoration-color:transparent;}"];
   [@css "._a_cf001w3fg{text-decoration-color:currentColor;}"];
   [@css
-    "._a_4l001tlwt{-webkit-column-rule-color:rgba(0,0,0,0.5);column-rule-color:rgba(0,0,0,0.5);}"
+    "._a_et001tlwt{-webkit-column-rule-color:rgba(0,0,0,0.5);column-rule-color:rgba(0,0,0,0.5);}"
   ];
-  [@css "._a_4l0016q4n{-webkit-column-rule-color:#F06;column-rule-color:#F06;}"];
+  [@css "._a_et0016q4n{-webkit-column-rule-color:#F06;column-rule-color:#F06;}"];
   [@css
-    "._a_4l001el08{-webkit-column-rule-color:#FF0066;column-rule-color:#FF0066;}"
-  ];
-  [@css
-    "._a_4l001f49a{-webkit-column-rule-color:hsl(0,0%,0%);column-rule-color:hsl(0,0%,0%);}"
+    "._a_et001el08{-webkit-column-rule-color:#FF0066;column-rule-color:#FF0066;}"
   ];
   [@css
-    "._a_4l001row3{-webkit-column-rule-color:hsl(0,0%,0%,0.5);column-rule-color:hsl(0,0%,0%,0.5);}"
+    "._a_et001f49a{-webkit-column-rule-color:hsl(0,0%,0%);column-rule-color:hsl(0,0%,0%);}"
   ];
   [@css
-    "._a_4l001ru4n{-webkit-column-rule-color:transparent;column-rule-color:transparent;}"
+    "._a_et001row3{-webkit-column-rule-color:hsl(0,0%,0%,0.5);column-rule-color:hsl(0,0%,0%,0.5);}"
   ];
   [@css
-    "._a_4l00103e1{-webkit-column-rule-color:currentColor;column-rule-color:currentColor;}"
+    "._a_et001ru4n{-webkit-column-rule-color:transparent;column-rule-color:transparent;}"
+  ];
+  [@css
+    "._a_et00103e1{-webkit-column-rule-color:currentColor;column-rule-color:currentColor;}"
   ];
   [@css "._a_4eelx5{color:rgb(0% 20% 70%);}"];
   [@css "._a_4ex4dj{color:rgb(0 64 185);}"];
@@ -127,52 +127,52 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_cf001fh32{text-decoration-color:#000000FF;}"];
   [@css "._a_cf0012zim{text-decoration-color:rebeccapurple;}"];
   [@css
-    "._a_4l0016vui{-webkit-column-rule-color:rgb(0% 20% 70%);column-rule-color:rgb(0% 20% 70%);}"
+    "._a_et0016vui{-webkit-column-rule-color:rgb(0% 20% 70%);column-rule-color:rgb(0% 20% 70%);}"
   ];
   [@css
-    "._a_4l0013dyf{-webkit-column-rule-color:rgb(0 64 185);column-rule-color:rgb(0 64 185);}"
+    "._a_et0013dyf{-webkit-column-rule-color:rgb(0 64 185);column-rule-color:rgb(0 64 185);}"
   ];
   [@css
-    "._a_4l001qvl6{-webkit-column-rule-color:hsl(0 0% 0%);column-rule-color:hsl(0 0% 0%);}"
+    "._a_et001qvl6{-webkit-column-rule-color:hsl(0 0% 0%);column-rule-color:hsl(0 0% 0%);}"
   ];
   [@css
-    "._a_4l0018yii{-webkit-column-rule-color:rgba(0% 20% 70% / 50%);column-rule-color:rgba(0% 20% 70% / 50%);}"
+    "._a_et0018yii{-webkit-column-rule-color:rgba(0% 20% 70% / 50%);column-rule-color:rgba(0% 20% 70% / 50%);}"
   ];
   [@css
-    "._a_4l001t9pq{-webkit-column-rule-color:rgba(0% 20% 70% / 0.5);column-rule-color:rgba(0% 20% 70% / 0.5);}"
+    "._a_et001t9pq{-webkit-column-rule-color:rgba(0% 20% 70% / 0.5);column-rule-color:rgba(0% 20% 70% / 0.5);}"
   ];
   [@css
-    "._a_4l001wwr9{-webkit-column-rule-color:rgba(0 64 185 / 50%);column-rule-color:rgba(0 64 185 / 50%);}"
+    "._a_et001wwr9{-webkit-column-rule-color:rgba(0 64 185 / 50%);column-rule-color:rgba(0 64 185 / 50%);}"
   ];
   [@css
-    "._a_4l001c8ch{-webkit-column-rule-color:rgba(0 64 185 / 0.5);column-rule-color:rgba(0 64 185 / 0.5);}"
+    "._a_et001c8ch{-webkit-column-rule-color:rgba(0 64 185 / 0.5);column-rule-color:rgba(0 64 185 / 0.5);}"
   ];
   [@css
-    "._a_4l001uu68{-webkit-column-rule-color:hsla(0 0% 0% /0.5);column-rule-color:hsla(0 0% 0% /0.5);}"
+    "._a_et001uu68{-webkit-column-rule-color:hsla(0 0% 0% /0.5);column-rule-color:hsla(0 0% 0% /0.5);}"
   ];
   [@css
-    "._a_4l0014t4f{-webkit-column-rule-color:rgb(0% 20% 70% / 50%);column-rule-color:rgb(0% 20% 70% / 50%);}"
+    "._a_et0014t4f{-webkit-column-rule-color:rgb(0% 20% 70% / 50%);column-rule-color:rgb(0% 20% 70% / 50%);}"
   ];
   [@css
-    "._a_4l001xjvr{-webkit-column-rule-color:rgb(0% 20% 70% / 0.5);column-rule-color:rgb(0% 20% 70% / 0.5);}"
+    "._a_et001xjvr{-webkit-column-rule-color:rgb(0% 20% 70% / 0.5);column-rule-color:rgb(0% 20% 70% / 0.5);}"
   ];
   [@css
-    "._a_4l001mwf4{-webkit-column-rule-color:rgb(0 64 185 / 50%);column-rule-color:rgb(0 64 185 / 50%);}"
+    "._a_et001mwf4{-webkit-column-rule-color:rgb(0 64 185 / 50%);column-rule-color:rgb(0 64 185 / 50%);}"
   ];
   [@css
-    "._a_4l001t3by{-webkit-column-rule-color:rgb(0 64 185 / 0.5);column-rule-color:rgb(0 64 185 / 0.5);}"
+    "._a_et001t3by{-webkit-column-rule-color:rgb(0 64 185 / 0.5);column-rule-color:rgb(0 64 185 / 0.5);}"
   ];
   [@css
-    "._a_4l001f3h2{-webkit-column-rule-color:hsl(0 0% 0% / 0.5);column-rule-color:hsl(0 0% 0% / 0.5);}"
+    "._a_et001f3h2{-webkit-column-rule-color:hsl(0 0% 0% / 0.5);column-rule-color:hsl(0 0% 0% / 0.5);}"
   ];
   [@css
-    "._a_4l001psoy{-webkit-column-rule-color:#000F;column-rule-color:#000F;}"
+    "._a_et001psoy{-webkit-column-rule-color:#000F;column-rule-color:#000F;}"
   ];
   [@css
-    "._a_4l00196r0{-webkit-column-rule-color:#000000FF;column-rule-color:#000000FF;}"
+    "._a_et00196r0{-webkit-column-rule-color:#000000FF;column-rule-color:#000000FF;}"
   ];
   [@css
-    "._a_4l001t3it{-webkit-column-rule-color:rebeccapurple;column-rule-color:rebeccapurple;}"
+    "._a_et001t3it{-webkit-column-rule-color:rebeccapurple;column-rule-color:rebeccapurple;}"
   ];
   [@css "._a_4e7eia{color:color-mix(in srgb, teal 65%, olive);}"];
   [@css "._a_4eagm7{color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);}"];
@@ -248,31 +248,31 @@ If this test fail means that the module is not in sync with the ppx
     "._a_cf001znhc{text-decoration-color:color-mix(in lab, teal 65%, olive);}"
   ];
   [@css
-    "._a_4l001t29u{-webkit-column-rule-color:color-mix(in srgb, teal 65%, olive);column-rule-color:color-mix(in srgb, teal 65%, olive);}"
+    "._a_et001t29u{-webkit-column-rule-color:color-mix(in srgb, teal 65%, olive);column-rule-color:color-mix(in srgb, teal 65%, olive);}"
   ];
   [@css
-    "._a_4l0013exx{-webkit-column-rule-color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);column-rule-color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);}"
+    "._a_et0013exx{-webkit-column-rule-color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);column-rule-color:color-mix(in srgb, rgb(255, 0, 0, 0.2) 65%, olive);}"
   ];
   [@css
-    "._a_4l001njzz{-webkit-column-rule-color:color-mix(in srgb, currentColor, rgba(0, 0, 0, 0.5) 65%);column-rule-color:color-mix(in srgb, currentColor, rgba(0, 0, 0, 0.5) 65%);}"
+    "._a_et001njzz{-webkit-column-rule-color:color-mix(in srgb, currentColor, rgba(0, 0, 0, 0.5) 65%);column-rule-color:color-mix(in srgb, currentColor, rgba(0, 0, 0, 0.5) 65%);}"
   ];
   [@css
-    "._a_4l001mvwj{-webkit-column-rule-color:color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, 0.5) 65%);column-rule-color:color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, 0.5) 65%);}"
+    "._a_et001mvwj{-webkit-column-rule-color:color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, 0.5) 65%);column-rule-color:color-mix(in srgb, currentColor 10%, rgba(0, 0, 0, 0.5) 65%);}"
   ];
   [@css
-    "._a_4l001mgb0{-webkit-column-rule-color:color-mix(in lch, teal 65%, olive);column-rule-color:color-mix(in lch, teal 65%, olive);}"
+    "._a_et001mgb0{-webkit-column-rule-color:color-mix(in lch, teal 65%, olive);column-rule-color:color-mix(in lch, teal 65%, olive);}"
   ];
   [@css
-    "._a_4l001iyg8{-webkit-column-rule-color:color-mix(in hsl, teal 65%, olive);column-rule-color:color-mix(in hsl, teal 65%, olive);}"
+    "._a_et001iyg8{-webkit-column-rule-color:color-mix(in hsl, teal 65%, olive);column-rule-color:color-mix(in hsl, teal 65%, olive);}"
   ];
   [@css
-    "._a_4l001a2h1{-webkit-column-rule-color:color-mix(in hwb, teal 65%, olive);column-rule-color:color-mix(in hwb, teal 65%, olive);}"
+    "._a_et001a2h1{-webkit-column-rule-color:color-mix(in hwb, teal 65%, olive);column-rule-color:color-mix(in hwb, teal 65%, olive);}"
   ];
   [@css
-    "._a_4l001641x{-webkit-column-rule-color:color-mix(in xyz, teal 65%, olive);column-rule-color:color-mix(in xyz, teal 65%, olive);}"
+    "._a_et001641x{-webkit-column-rule-color:color-mix(in xyz, teal 65%, olive);column-rule-color:color-mix(in xyz, teal 65%, olive);}"
   ];
   [@css
-    "._a_4l001gkgb{-webkit-column-rule-color:color-mix(in lab, teal 65%, olive);column-rule-color:color-mix(in lab, teal 65%, olive);}"
+    "._a_et001gkgb{-webkit-column-rule-color:color-mix(in lab, teal 65%, olive);column-rule-color:color-mix(in lab, teal 65%, olive);}"
   ];
   [@css "._a_4eii5p{color:rgba(0, 0, 0, calc(1));}"];
   [@css "._a_4eqmml{color:rgba(0, 0, 0, calc(10 - 1));}"];
@@ -305,13 +305,13 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("_a_cf00167jc", []);
   CSS.make("_a_cf0016wvt", []);
   CSS.make("_a_cf001w3fg", []);
-  CSS.make("_a_4l001tlwt", []);
-  CSS.make("_a_4l0016q4n", []);
-  CSS.make("_a_4l001el08", []);
-  CSS.make("_a_4l001f49a", []);
-  CSS.make("_a_4l001row3", []);
-  CSS.make("_a_4l001ru4n", []);
-  CSS.make("_a_4l00103e1", []);
+  CSS.make("_a_et001tlwt", []);
+  CSS.make("_a_et0016q4n", []);
+  CSS.make("_a_et001el08", []);
+  CSS.make("_a_et001f49a", []);
+  CSS.make("_a_et001row3", []);
+  CSS.make("_a_et001ru4n", []);
+  CSS.make("_a_et00103e1", []);
   
   CSS.make("_a_4eelx5", []);
   CSS.make("_a_4ex4dj", []);
@@ -378,22 +378,22 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("_a_cf001xjkw", []);
   CSS.make("_a_cf001fh32", []);
   CSS.make("_a_cf0012zim", []);
-  CSS.make("_a_4l0016vui", []);
-  CSS.make("_a_4l0013dyf", []);
-  CSS.make("_a_4l001qvl6", []);
-  CSS.make("_a_4l0018yii", []);
-  CSS.make("_a_4l001t9pq", []);
-  CSS.make("_a_4l001wwr9", []);
-  CSS.make("_a_4l001c8ch", []);
-  CSS.make("_a_4l001uu68", []);
-  CSS.make("_a_4l0014t4f", []);
-  CSS.make("_a_4l001xjvr", []);
-  CSS.make("_a_4l001mwf4", []);
-  CSS.make("_a_4l001t3by", []);
-  CSS.make("_a_4l001f3h2", []);
-  CSS.make("_a_4l001psoy", []);
-  CSS.make("_a_4l00196r0", []);
-  CSS.make("_a_4l001t3it", []);
+  CSS.make("_a_et0016vui", []);
+  CSS.make("_a_et0013dyf", []);
+  CSS.make("_a_et001qvl6", []);
+  CSS.make("_a_et0018yii", []);
+  CSS.make("_a_et001t9pq", []);
+  CSS.make("_a_et001wwr9", []);
+  CSS.make("_a_et001c8ch", []);
+  CSS.make("_a_et001uu68", []);
+  CSS.make("_a_et0014t4f", []);
+  CSS.make("_a_et001xjvr", []);
+  CSS.make("_a_et001mwf4", []);
+  CSS.make("_a_et001t3by", []);
+  CSS.make("_a_et001f3h2", []);
+  CSS.make("_a_et001psoy", []);
+  CSS.make("_a_et00196r0", []);
+  CSS.make("_a_et001t3it", []);
   
   CSS.make("_a_4e7eia", []);
   CSS.make("_a_4eagm7", []);
@@ -436,15 +436,15 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("_a_cf001gihm", []);
   CSS.make("_a_cf001znhc", []);
   
-  CSS.make("_a_4l001t29u", []);
-  CSS.make("_a_4l0013exx", []);
-  CSS.make("_a_4l001njzz", []);
-  CSS.make("_a_4l001mvwj", []);
-  CSS.make("_a_4l001mgb0", []);
-  CSS.make("_a_4l001iyg8", []);
-  CSS.make("_a_4l001a2h1", []);
-  CSS.make("_a_4l001641x", []);
-  CSS.make("_a_4l001gkgb", []);
+  CSS.make("_a_et001t29u", []);
+  CSS.make("_a_et0013exx", []);
+  CSS.make("_a_et001njzz", []);
+  CSS.make("_a_et001mvwj", []);
+  CSS.make("_a_et001mgb0", []);
+  CSS.make("_a_et001iyg8", []);
+  CSS.make("_a_et001a2h1", []);
+  CSS.make("_a_et001641x", []);
+  CSS.make("_a_et001gkgb", []);
   
   CSS.make("_a_4eii5p", []);
   CSS.make("_a_4eqmml", []);

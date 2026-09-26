@@ -26,18 +26,20 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_4oumhd{-webkit-columns:2 10em;columns:2 10em;}"];
   [@css "._a_4oyak2{-webkit-columns:auto 10em;columns:auto 10em;}"];
   [@css "._a_4o29w9{-webkit-columns:2 auto;columns:2 auto;}"];
-  [@css "._a_4l0010lyg{-webkit-column-rule-color:red;column-rule-color:red;}"];
-  [@css "._a_4l002wiag{-webkit-column-rule-style:none;column-rule-style:none;}"];
+  [@css "._a_et0010lyg{-webkit-column-rule-color:red;column-rule-color:red;}"];
+  [@css "._a_et002wiag{-webkit-column-rule-style:none;column-rule-style:none;}"];
   [@css
-    "._a_4l0022g8z{-webkit-column-rule-style:solid;column-rule-style:solid;}"
+    "._a_et0022g8z{-webkit-column-rule-style:solid;column-rule-style:solid;}"
   ];
   [@css
-    "._a_4l002szib{-webkit-column-rule-style:dotted;column-rule-style:dotted;}"
+    "._a_et002szib{-webkit-column-rule-style:dotted;column-rule-style:dotted;}"
   ];
-  [@css "._a_4l0048iyd{-webkit-column-rule-width:1px;column-rule-width:1px;}"];
-  [@css "._a_4ly1fb{-webkit-column-rule:transparent;column-rule:transparent;}"];
+  [@css "._a_et0048iyd{-webkit-column-rule-width:1px;column-rule-width:1px;}"];
   [@css
-    "._a_4lh5u6{-webkit-column-rule:1px solid black;column-rule:1px solid black;}"
+    "._a_et007y1fb{-webkit-column-rule:transparent;column-rule:transparent;}"
+  ];
+  [@css
+    "._a_et007h5u6{-webkit-column-rule:1px solid black;column-rule:1px solid black;}"
   ];
   [@css "._a_4mzc18{-webkit-column-span:none;column-span:none;}"];
   [@css "._a_4me1k2{-webkit-column-span:all;column-span:all;}"];
@@ -57,13 +59,13 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("_a_4oumhd", []);
   CSS.make("_a_4oyak2", []);
   CSS.make("_a_4o29w9", []);
-  CSS.make("_a_4l0010lyg", []);
-  CSS.make("_a_4l002wiag", []);
-  CSS.make("_a_4l0022g8z", []);
-  CSS.make("_a_4l002szib", []);
-  CSS.make("_a_4l0048iyd", []);
-  CSS.make("_a_4ly1fb", []);
-  CSS.make("_a_4lh5u6", []);
+  CSS.make("_a_et0010lyg", []);
+  CSS.make("_a_et002wiag", []);
+  CSS.make("_a_et0022g8z", []);
+  CSS.make("_a_et002szib", []);
+  CSS.make("_a_et0048iyd", []);
+  CSS.make("_a_et007y1fb", []);
+  CSS.make("_a_et007h5u6", []);
   CSS.make("_a_4mzc18", []);
   CSS.make("_a_4me1k2", []);
   CSS.make("_a_4kub2p", []);
