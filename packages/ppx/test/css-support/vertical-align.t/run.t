@@ -15,19 +15,19 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".a-dt9eo6{vertical-align:baseline;}"];
-  [@css ".a-dtkzuz{vertical-align:sub;}"];
-  [@css ".a-dt1ck9{vertical-align:super;}"];
-  [@css ".a-dtawz4{vertical-align:top;}"];
-  [@css ".a-dtbbe2{vertical-align:text-top;}"];
-  [@css ".a-dt6cul{vertical-align:middle;}"];
-  [@css ".a-dt0n61{vertical-align:bottom;}"];
-  [@css ".a-dtdzq1{vertical-align:text-bottom;}"];
-  CSS.make("a-dt9eo6", []);
-  CSS.make("a-dtkzuz", []);
-  CSS.make("a-dt1ck9", []);
-  CSS.make("a-dtawz4", []);
-  CSS.make("a-dtbbe2", []);
-  CSS.make("a-dt6cul", []);
-  CSS.make("a-dt0n61", []);
-  CSS.make("a-dtdzq1", []);
+  [@css "._a_dt9eo6{vertical-align:baseline;}"];
+  [@css "._a_dtkzuz{vertical-align:sub;}"];
+  [@css "._a_dt1ck9{vertical-align:super;}"];
+  [@css "._a_dtawz4{vertical-align:top;}"];
+  [@css "._a_dtbbe2{vertical-align:text-top;}"];
+  [@css "._a_dt6cul{vertical-align:middle;}"];
+  [@css "._a_dt0n61{vertical-align:bottom;}"];
+  [@css "._a_dtdzq1{vertical-align:text-bottom;}"];
+  CSS.make("_a_dt9eo6", []);
+  CSS.make("_a_dtkzuz", []);
+  CSS.make("_a_dt1ck9", []);
+  CSS.make("_a_dtawz4", []);
+  CSS.make("_a_dtbbe2", []);
+  CSS.make("_a_dt6cul", []);
+  CSS.make("_a_dt0n61", []);
+  CSS.make("_a_dtdzq1", []);

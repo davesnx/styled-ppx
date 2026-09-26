@@ -166,6 +166,89 @@ let merge_of_merges_is_associative () =
     (Printf.sprintf "%s %s" (class_of "color: red;")
        (class_of "&:hover{color: blue !important;}"))
 
+(* -- single-declaration bundles: a block whose ONLY interpolating
+   declaration is this one gets a real, slot-keyed `a-` class (same path
+   a static atom uses), so it now merges normally instead of being an
+   opaque `in-` blob forever kept on both sides. A genuinely bundled atom
+   (two or more interpolating declarations sharing one class) stays
+   exempt - see `two_declaration_bundle_still_exempt` below. *)
+
+(* CaptionNumber repro: `caption`'s own default `background-color:
+   $(accent)` and `captionBgColor(bgColor)`'s `background-color:
+   $(bgColor)` are each their own binding's ONLY interpolating
+   declaration - same family, same (base) context - so `latter` must
+   drop `former`, exactly like two plain `background-color` atoms would. *)
+let single_declaration_bundle_merges_like_a_plain_atom () =
+  let caption_default = make "background-color: $(accent);" in
+  let caption_bg_color = make "background-color: $(bgColor);" in
+  let merged = CSS.merge caption_default caption_bg_color in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (class_of "background-color: $(bgColor);")
+
+(* Faq repro: `content`'s `padding-top: $(px8)` is its binding's only
+   interpolating declaration; `collapsed`'s `padding-top: 0` is a plain,
+   static atom. Both must resolve to the same (family, context) slot, so
+   the static override drops the dynamic default regardless of which one
+   the stylesheet happens to render first. *)
+let faq_padding_top_dynamic_then_static_drops_dynamic () =
+  let dynamic = make "padding-top: $(px8);" in
+  let static = make "padding-top: 0;" in
+  let merged = CSS.merge dynamic static in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (class_of "padding-top: 0;")
+
+(* Pin: a REAL two-declaration bundle (the shape Css_file.re mints when a
+   block has two or more interpolating declarations, sharing one class -
+   built here the same way Css_file.re does, via `Class_format.bundle_class`
+   on the concatenation of both declarations' rendered text) stays fully
+   opaque to merge in both directions - never dropped, never drops the
+   other side - unaffected by giving single-declaration bundles a slot key. *)
+let two_declaration_bundle_still_exempt () =
+  let seeds =
+    [ "padding-top: $(gap);"; "background-color: $(accent);" ]
+    |> List.map (fun css -> Render.rule (atom_of css))
+    |> String.concat ""
+  in
+  let bundle_class = Class_format.bundle_class seeds in
+  let bundled = CSS.make bundle_class [] in
+  let plain_padding_top = make "padding-top: 0;" in
+  let merged = CSS.merge bundled plain_padding_top in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s" bundle_class (class_of "padding-top: 0;"))
+
+(* The `_a_` rename (atom `a-` -> `_a_`) landed: `Merge_key.atom_prefix` now
+   recognizes only `_a_`, so a hand-written class that merely starts with the
+   OLD `a-` shape, like `"a-header"`, is no longer read as an atom at all -
+   {!Merge_key.parse_atom} returns [None] for it, and {!merge_class_names}
+   keeps every token neither side recognizes as an atom, unconditionally.
+   This is the CSS.merge-visible behavior change the rename was for: a
+   hand-written `a-header` class used to collide with a real atom (see
+   {!hand_written_class_ambiguity_persists_under_the_new_prefix} below); now
+   it doesn't, because `a-` isn't a recognized prefix shape any more. *)
+let hand_written_a_dash_class_is_no_longer_misread_as_an_atom () =
+  Alcotest_extra.assert_string
+    (Merge_key.merge_class_names "label:x a-header" "a-he1234")
+    "label:x a-header a-he1234"
+
+(* Known, documented limit, shifted to the new prefix: `Merge_key.parse_atom`
+   still recognizes a class by PREFIX and LENGTH alone (it has no way to ask
+   the ppx "did you really mint this one?"), so a hand-written author class
+   that happens to start with `_a_` and land on one of the six lengths a real
+   atom can have is still indistinguishable from a real one. `"_a_header"`
+   (body "header", 6 chars - exactly the family+value floor, no
+   context/mask/extended) and `"_a_he1234"` (body "he1234", the same 6 chars)
+   both parse as ordinary, same-family, same-context, full-mask atoms, so
+   `removes` drops the former - a real author class silently vanishes from
+   the className string. Pinned as CURRENT, ACCEPTED behavior: the rename
+   narrows the odds of an accidental collision (a hand-written class now
+   needs to start with the less-common `_a_` sequence, not just `a-`), but
+   does not and cannot eliminate them - this test documents that the limit
+   persists, just at the new prefix. *)
+let hand_written_class_ambiguity_persists_under_the_new_prefix () =
+  Alcotest_extra.assert_string
+    (Merge_key.merge_class_names "label:x _a_header" "_a_he1234")
+    "label:x _a_he1234"
+
 (* -- Merge_key's own hardcoded constants, cross-checked against the real
    Slot_key/Class_format values, not just against a comment. Merge_key
    cannot depend on Slot_key for real (see its own doc comment: it ships
@@ -207,6 +290,25 @@ let tests =
       faq_repro;
     Alcotest_extra.test "CaptionNumber repro: same shape, background-color"
       caption_number_repro;
+    Alcotest_extra.test
+      "single-declaration bundle merges like a plain atom: CaptionNumber's own \
+       two interpolated background-color declarations"
+      single_declaration_bundle_merges_like_a_plain_atom;
+    Alcotest_extra.test
+      "Faq's interpolated padding-top drops in favor of a later static \
+       padding-top override"
+      faq_padding_top_dynamic_then_static_drops_dynamic;
+    Alcotest_extra.test
+      "a real two-declaration bundle stays exempt from merge in both directions"
+      two_declaration_bundle_still_exempt;
+    Alcotest_extra.test
+      "a hand-written a-header class is no longer misread as an atom now that \
+       only _a_ is a recognized prefix"
+      hand_written_a_dash_class_is_no_longer_misread_as_an_atom;
+    Alcotest_extra.test
+      "known limit, shifted: a hand-written _a_<6 chars> class is \
+       indistinguishable from a real atom and can be silently dropped"
+      hand_written_class_ambiguity_persists_under_the_new_prefix;
     Alcotest_extra.test
       "a later shorthand drops an earlier lone longhand it covers (not a limit)"
       longhand_then_shorthand_drops_longhand;

@@ -1,10 +1,10 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".id-16nw107{color:red;}"];
-  [@css ".a-9432ej{padding:10px;}"];
-  [@css.bindings [("Output.card", "id-16nw107", "a-9432ej")]];
-  let card = CSS.make("label:card id-16nw107 a-9432ej", []);
+  [@css "._id_16nw107{color:red;}"];
+  [@css "._a_9432ej{padding:10px;}"];
+  [@css.bindings [("Output.card", "_id_16nw107", "_a_9432ej")]];
+  let card = CSS.make("label:card _id_16nw107 _a_9432ej", []);
   module Globals = {
     let to_string = () => "";
     [@warning "-27-32"]

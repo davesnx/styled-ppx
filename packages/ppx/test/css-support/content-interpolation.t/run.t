@@ -24,21 +24,24 @@ counter().
   @property --myCounterStyle-5pdc5a{syntax:"*";inherits:false;}
   @property --countersNoStyle-g89gy3{syntax:"*";inherits:false;}
   @property --countersStyled-x8q6x3{syntax:"*";inherits:false;}
-  .in-sikia9{content:var(--singleCounter-ek68js);}
-  .in-1tainop{content:var(--singleCounterNoStyle-2521aj);}
-  .in-10brgn5{content:var(--singleText-5c1v76);}
-  .in-zh4bht{content:var(--counterDot-17rsat4);}
-  .in-ffxo1r{content:var(--counterSpace-jvqeh9);}
-  .in-e7wury{content:var(--counterRoman-16oxrf4);}
-  .in-16jow5p{content:var(--bracketed-1vvjf8x);}
-  .in-8nx65k{content:var(--content_value-jr2773);}
-  .in-ymi9m2{content:counter(var(--myCounterName-dew6fb), lower-alpha);}
-  .in-1hqoizr{content:counter(chapter, var(--myCounterStyle-o4ly7x));}
-  .in-1uqb9bz{content:counter(var(--myCounterName-1re0z52), var(--myCounterStyle-1lfdsp0));}
-  .in-1ghcaxs{content:counters(var(--myCounterName-hs66zo), ".", var(--myCounterStyle-5pdc5a));}
-  .a-4wdhko{content:counter(ol);}
-  .a-4wtirf{content:counter(chapter);}
-  .a-4wyh7z{content:counters(section, ".");}
-  .a-4wo8sv{content:counters(section, ".", decimal-leading-zero);}
-  .in-p698h{content:var(--countersNoStyle-g89gy3);}
-  .in-1e3j96l{content:var(--countersStyled-x8q6x3);}
+  @layer styled-ppx.global, styled-ppx.descendant, styled-ppx.base, styled-ppx.conditional;
+  @layer styled-ppx.base {
+  ._a_4wkia9{content:var(--singleCounter-ek68js);}
+  ._a_4winop{content:var(--singleCounterNoStyle-2521aj);}
+  ._a_4wrgn5{content:var(--singleText-5c1v76);}
+  ._a_4w4bht{content:var(--counterDot-17rsat4);}
+  ._a_4wxo1r{content:var(--counterSpace-jvqeh9);}
+  ._a_4wwury{content:var(--counterRoman-16oxrf4);}
+  ._a_4wow5p{content:var(--bracketed-1vvjf8x);}
+  ._a_4wx65k{content:var(--content_value-jr2773);}
+  ._a_4wi9m2{content:counter(var(--myCounterName-dew6fb), lower-alpha);}
+  ._a_4woizr{content:counter(chapter, var(--myCounterStyle-o4ly7x));}
+  ._a_4wb9bz{content:counter(var(--myCounterName-1re0z52), var(--myCounterStyle-1lfdsp0));}
+  ._a_4wcaxs{content:counters(var(--myCounterName-hs66zo), ".", var(--myCounterStyle-5pdc5a));}
+  ._a_4wdhko{content:counter(ol);}
+  ._a_4wtirf{content:counter(chapter);}
+  ._a_4wyh7z{content:counters(section, ".");}
+  ._a_4wo8sv{content:counters(section, ".", decimal-leading-zero);}
+  ._a_4w698h{content:var(--countersNoStyle-g89gy3);}
+  ._a_4wj96l{content:var(--countersStyled-x8q6x3);}
+  }

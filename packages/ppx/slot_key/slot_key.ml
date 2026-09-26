@@ -888,39 +888,29 @@ type t = {
   family : family_id;
   mask : int option;
   bundle : bool;
-    (** True when any declaration in this atom carries a [$(...)] value
-        interpolation - [Css_file.re]'s [transform_rule_list] bundles such
-        declarations under one shared class today (see slot_key.ml's
-        [declaration_has_value_interpolation], duplicated from there for the
-        same reason {!normalize_property} duplicates [declaration_group_key] -
-        this module cannot depend on the [ppx] library). [removes] never drops a
-        bundle atom and never lets one drop another atom - a bundle's class
-        legitimately shares its class with unrelated declarations from the same
-        binding (a real, pre-existing mechanism, not a merge decision this
-        module can safely reason about) - see [Class_format]'s [in-] prefix. *)
+    (** True when [Css_file.re] is treating this atom as part of a REAL bundle:
+        two or more interpolating declarations from the same block sharing one
+        class (see its [transform_rule_list]'s [bundle] computation). A single
+        interpolating declaration is NOT a bundle - it mints its own real,
+        merge-participating slot-keyed class instead, the same path a static
+        atom uses (see [Class_format.slot_class]).
+
+        Bundle-hood is a fact about the whole BLOCK (how many of its
+        declarations interpolate), not about any one atom's own AST, so
+        {!of_atom} - which only ever sees one atom - cannot determine it by
+        inspection the way it does {!family}/{!mask}: it always returns [false].
+        Nothing in the real pipeline ever needs it to return [true] either,
+        since a genuine bundle's class is minted directly by
+        [Class_format.bundle_class] ([Hash_class.bundle_class_and_namespace]),
+        bypassing [Slot_key]/[Class_format.slot_class] entirely - a real
+        bundle's content is the concatenation of every member declaration's
+        rendered text, not one atom's context/family/mask, so it was never
+        representable as a {!t} in the first place. The field stays on the type,
+        and {!removes} still exempts it in both directions, so a test can
+        construct a hypothetical bundle atom directly (e.g.
+        [{ (of_atom ... |> Option.get) with bundle = true }]) to exercise that
+        exemption in isolation. *)
 }
-
-(* Duplicated from [Css_file.re]'s [Css_transform.component_value_has_
-   interpolation]/[declaration_has_value_interpolation] (this module
-   cannot depend on [ppx] - see {!normalize_property}'s own note on the
-   same constraint). A declaration's VALUE carrying a [$(...)] is what
-   makes [Css_file.re] bundle it with its siblings under one shared class
-   today; selector-position interpolations are resolved statically and
-   never bundled, so they are irrelevant here, same as there. *)
-let rec component_value_has_interpolation (cv : Ast.component_value) =
-  match cv with
-  | Ast.Variable (_, _) -> true
-  | Ast.Paren_block values | Ast.Bracket_block values ->
-    component_value_list_has_interpolation values
-  | Ast.Function { body = values, _; _ } ->
-    component_value_list_has_interpolation values
-  | _ -> false
-
-and component_value_list_has_interpolation values =
-  List.exists (fun (cv, _loc) -> component_value_has_interpolation cv) values
-
-let declaration_has_value_interpolation (decl : Ast.declaration) =
-  component_value_list_has_interpolation (fst decl.value)
 
 (* Walks one atomized rule (Css_file.re's [atomize_rules] output shape),
    collecting the at-rule chain outer to inner, the innermost selector
@@ -992,8 +982,9 @@ let of_atom (rule : Ast.rule) : t option =
             if own = full then None else Some (acc_mask lor own))
         (Some 0) properties
     in
-    let bundle = List.exists declaration_has_value_interpolation decls in
-    Some { context; family; mask; bundle }
+    (* Always [false] - see {!t.bundle}'s doc for why this function cannot
+       determine bundle-hood from one atom's AST alone. *)
+    Some { context; family; mask; bundle = false }
 
 let context_equal a b =
   a.at_rules = b.at_rules

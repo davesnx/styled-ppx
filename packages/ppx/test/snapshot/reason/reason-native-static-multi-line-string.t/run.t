@@ -1,10 +1,10 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --native --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".a-5r08qs{display:flex;}"];
-  [@css ".a-9h002ndxa{justify-content:center;}"];
+  [@css "._a_5r08qs{display:flex;}"];
+  [@css "._a_9h002ndxa{justify-content:center;}"];
   [@css.bindings
-    [("Output.MultiLineStrings", "id-11ddqpw", "a-5r08qs a-9h002ndxa")]
+    [("Output.MultiLineStrings", "_id_11ddqpw", "_a_5r08qs _a_9h002ndxa")]
   ];
   module MultiLineStrings: {
     type makeProps;
@@ -964,7 +964,7 @@
       | None => ""
       };
     let styles =
-      CSS.make("label:MultiLineStrings id-11ddqpw a-5r08qs a-9h002ndxa", []);
+      CSS.make("label:MultiLineStrings _id_11ddqpw _a_5r08qs _a_9h002ndxa", []);
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(props.className)
       and style = snd(styles);

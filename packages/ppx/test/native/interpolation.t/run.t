@@ -51,51 +51,51 @@ Interpolation native PPX transformations are checked as a cram snapshot.
   [@css "@property --state-1yj1w6c{syntax:\"*\";inherits:false;}"];
   [@css "@property --px30-cc29mn{syntax:\"*\";inherits:false;}"];
   [@css "@property --red-w69rb9{syntax:\"*\";inherits:false;}"];
-  [@css ".in-vtnh4f{color:var(--mono100-mn2jt5);}"];
-  [@css ".in-j1itjj{margin:var(--big-1c1caa8) var(--small-1tsw5sh);}"];
-  [@css ".in-pupp3j{padding:var(--small-1d5k27v) 0px;}"];
-  [@css ".in-11f97be{border:1px solid var(--alpha-vlpuld);}"];
-  [@css ".in-upyj1z{outline:1px solid var(--alpha-1ftvcb4);}"];
-  [@css ".in-19ww55u{border-bottom:0px solid var(--alpha-1y5ijmp);}"];
-  [@css ".in-1dfkyy8{width:var(--width-18c1xss);}"];
-  [@css ".in-1cgnebp{max-width:var(--max-1yrxnfd);}"];
-  [@css ".in-q0vooa{height:var(--height-1n9troi);}"];
-  [@css ".in-cd0d4{border-radius:var(--border-8yt3ey);}"];
-  [@css ".in-gdu0qi{font-size:var(--font-10lt5gt);}"];
-  [@css ".in-16nszir{font-family:var(--mono-e5legw);}"];
-  [@css ".in-1vyfd7x{line-height:var(--lh-uai7u3);}"];
-  [@css ".in-53fgx3{z-index:var(--zLevel-vut76j);}"];
-  [@css ".in-1jcegw0{left:var(--left-1s2hr3z);}"];
-  [@css ".in-1p58kmj{text-decoration-color:var(--decorationColor-seqvqc);}"];
-  [@css ".in-1t9o5gx{background-image:var(--wat-tevp0f);}"];
+  [@css "._a_4enh4f{color:var(--mono100-mn2jt5);}"];
+  [@css "._a_7pitjj{margin:var(--big-1c1caa8) var(--small-1tsw5sh);}"];
+  [@css "._a_94pp3j{padding:var(--small-1d5k27v) 0px;}"];
+  [@css "._a_3h97be{border:1px solid var(--alpha-vlpuld);}"];
+  [@css "._a_8pyj1z{outline:1px solid var(--alpha-1ftvcb4);}"];
+  [@css "._a_3h007w55u{border-bottom:0px solid var(--alpha-1y5ijmp);}"];
+  [@css "._a_eckyy8{width:var(--width-18c1xss);}"];
+  [@css "._a_88nebp{max-width:var(--max-1yrxnfd);}"];
+  [@css "._a_6lvooa{height:var(--height-1n9troi);}"];
+  [@css "._a_3nd0d4{border-radius:var(--border-8yt3ey);}"];
+  [@css "._a_6500wu0qi{font-size:var(--font-10lt5gt);}"];
+  [@css "._a_65001szir{font-family:var(--mono-e5legw);}"];
+  [@css "._a_658jkfd7x{line-height:var(--lh-uai7u3);}"];
+  [@css "._a_ekfgx3{z-index:var(--zLevel-vut76j);}"];
+  [@css "._a_71002egw0{left:var(--left-1s2hr3z);}"];
+  [@css "._a_cf0018kmj{text-decoration-color:var(--decorationColor-seqvqc);}"];
+  [@css "._a_39008o5gx{background-image:var(--wat-tevp0f);}"];
   [@css
-    ".in-15xnm6u{-webkit-mask-image:var(--externalImageUrl-75mq6y);mask-image:var(--externalImageUrl-75mq6y);}"
+    "._a_7y074nm6u{-webkit-mask-image:var(--externalImageUrl-75mq6y);mask-image:var(--externalImageUrl-75mq6y);}"
   ];
   [@css
-    ".in-1a150p4{text-shadow:var(--h-ulszyz) var(--v-1rucg2y) var(--blur-n5ddfa) var(--color-1jwocqc);}"
+    "._a_cy50p4{text-shadow:var(--h-ulszyz) var(--v-1rucg2y) var(--blur-n5ddfa) var(--color-1jwocqc);}"
   ];
-  [@css ".in-pc2giy{color:var(--blue-uz6p3q);}"];
+  [@css "._a_4e2giy{color:var(--blue-uz6p3q);}"];
   [@css
-    ".in-ixihb6{box-shadow:var(--h-1cxj5q6) var(--v-1p9ysn0) var(--blur-1rsz8mu) var(--spread-1icix4c) var(--color-1eos5hw);}"
-  ];
-  [@css
-    ".in-13ts4zv{box-shadow:10px 10px 0px var(--spread-wd13u2) var(--color-3xubcm);}"
-  ];
-  [@css ".in-lxl5g5{box-shadow:var(--elevation-jhhehb);}"];
-  [@css ".a-40keqi{box-shadow:none;}"];
-  [@css ".in-l3baal{text-overflow:var(--clip-1go0jdu);}"];
-  [@css ".a-dm0048edy{transition-duration:500ms;}"];
-  [@css ".in-s36hu1{transition-duration:var(--duration-i5tvzn);}"];
-  [@css
-    ".in-1bien0s{-webkit-animation-play-state:var(--state-1yj1w6c);animation-play-state:var(--state-1yj1w6c);}"
+    "._a_40ihb6{box-shadow:var(--h-1cxj5q6) var(--v-1p9ysn0) var(--blur-1rsz8mu) var(--spread-1icix4c) var(--color-1eos5hw);}"
   ];
   [@css
-    ".a-2z03kbnre{-webkit-animation-play-state:paused;animation-play-state:paused;}"
+    "._a_40s4zv{box-shadow:10px 10px 0px var(--spread-wd13u2) var(--color-3xubcm);}"
+  ];
+  [@css "._a_40l5g5{box-shadow:var(--elevation-jhhehb);}"];
+  [@css "._a_40keqi{box-shadow:none;}"];
+  [@css "._a_cwbaal{text-overflow:var(--clip-1go0jdu);}"];
+  [@css "._a_dm0048edy{transition-duration:500ms;}"];
+  [@css "._a_dm0046hu1{transition-duration:var(--duration-i5tvzn);}"];
+  [@css
+    "._a_2z03ken0s{-webkit-animation-play-state:var(--state-1yj1w6c);animation-play-state:var(--state-1yj1w6c);}"
   ];
   [@css
-    ".in-x7nyl9{-webkit-column-gap:var(--px30-cc29mn);column-gap:var(--px30-cc29mn);}"
+    "._a_2z03kbnre{-webkit-animation-play-state:paused;animation-play-state:paused;}"
   ];
-  [@css ".in-829yln{-webkit-text-fill-color:var(--red-w69rb9);}"];
+  [@css
+    "._a_6f001nyl9{-webkit-column-gap:var(--px30-cc29mn);column-gap:var(--px30-cc29mn);}"
+  ];
+  [@css "._a_2k9yln{-webkit-text-fill-color:var(--red-w69rb9);}"];
   module Size = {
     let big = `px(24);
     let small = `px(8);
@@ -144,12 +144,12 @@ Interpolation native PPX transformations are checked as a cram snapshot.
   
   let _ =
     CSS.make(
-      "in-vtnh4f",
+      "_a_4enh4f",
       [("--mono100-mn2jt5", CSS.Types.Color.toString(mono100))],
     );
   let _ =
     CSS.make(
-      "in-j1itjj",
+      "_a_7pitjj",
       [
         ("--big-1c1caa8", CSS.Types.Margin.toString(Size.big)),
         ("--small-1tsw5sh", CSS.Types.Margin.toString(Size.small)),
@@ -157,89 +157,89 @@ Interpolation native PPX transformations are checked as a cram snapshot.
     );
   let _ =
     CSS.make(
-      "in-vtnh4f",
+      "_a_4enh4f",
       [("--mono100-mn2jt5", CSS.Types.Color.toString(mono100))],
     );
   let _ =
     CSS.make(
-      "in-pupp3j",
+      "_a_94pp3j",
       [("--small-1d5k27v", CSS.Types.Padding.toString(Size.small))],
     );
   let _ =
     CSS.make(
-      "in-11f97be",
+      "_a_3h97be",
       [("--alpha-vlpuld", CSS.Types.Color.toString(Color.Border.alpha))],
     );
   let _ =
     CSS.make(
-      "in-upyj1z",
+      "_a_8pyj1z",
       [("--alpha-1ftvcb4", CSS.Types.Color.toString(Color.Border.alpha))],
     );
   let _ =
     CSS.make(
-      "in-19ww55u",
+      "_a_3h007w55u",
       [("--alpha-1y5ijmp", CSS.Types.Color.toString(Color.Border.alpha))],
     );
   let _ =
     CSS.make(
-      "in-1dfkyy8",
+      "_a_eckyy8",
       [("--width-18c1xss", CSS.Types.Width.toString(width))],
     );
   let _ =
     CSS.make(
-      "in-1cgnebp",
+      "_a_88nebp",
       [("--max-1yrxnfd", CSS.Types.MaxWidth.toString(max))],
     );
   let _ =
     CSS.make(
-      "in-q0vooa",
+      "_a_6lvooa",
       [("--height-1n9troi", CSS.Types.Height.toString(height))],
     );
   let _ =
     CSS.make(
-      "in-cd0d4",
+      "_a_3nd0d4",
       [("--border-8yt3ey", CSS.Types.BorderRadius.toString(border))],
     );
   let _ =
     CSS.make(
-      "in-gdu0qi",
+      "_a_6500wu0qi",
       [("--font-10lt5gt", CSS.Types.FontSize.toString(font))],
     );
   let _ =
     CSS.make(
-      "in-16nszir",
+      "_a_65001szir",
       [("--mono-e5legw", CSS.Types.FontFamilies.toString(mono))],
     );
   let _ =
     CSS.make(
-      "in-1vyfd7x",
+      "_a_658jkfd7x",
       [("--lh-uai7u3", CSS.Types.LineHeight.toString(lh))],
     );
   let _ =
     CSS.make(
-      "in-53fgx3",
+      "_a_ekfgx3",
       [("--zLevel-vut76j", CSS.Types.ZIndex.toString(zLevel))],
     );
   let _ =
     CSS.make(
-      "in-1jcegw0",
+      "_a_71002egw0",
       [("--left-1s2hr3z", CSS.Types.Left.toString(left))],
     );
   let _ =
     CSS.make(
-      "in-1p58kmj",
+      "_a_cf0018kmj",
       [
         ("--decorationColor-seqvqc", CSS.Types.Color.toString(decorationColor)),
       ],
     );
   let _ =
     CSS.make(
-      "in-1t9o5gx",
+      "_a_39008o5gx",
       [("--wat-tevp0f", CSS.Types.BackgroundImage.toString(wat))],
     );
   let _ =
     CSS.make(
-      "in-15xnm6u",
+      "_a_7y074nm6u",
       [
         (
           "--externalImageUrl-75mq6y",
@@ -249,7 +249,7 @@ Interpolation native PPX transformations are checked as a cram snapshot.
     );
   let _ =
     CSS.make(
-      "in-1a150p4",
+      "_a_cy50p4",
       [
         ("--h-ulszyz", CSS.Types.Length.toString(h)),
         ("--v-1rucg2y", CSS.Types.Length.toString(v)),
@@ -259,12 +259,12 @@ Interpolation native PPX transformations are checked as a cram snapshot.
     );
   let _ =
     CSS.make(
-      "in-pc2giy",
+      "_a_4e2giy",
       [("--blue-uz6p3q", CSS.Types.Color.toString(Theme.blue))],
     );
   let _ =
     CSS.make(
-      "in-ixihb6",
+      "_a_40ihb6",
       [
         ("--h-1cxj5q6", CSS.Types.Length.toString(h)),
         ("--v-1p9ysn0", CSS.Types.Length.toString(v)),
@@ -275,7 +275,7 @@ Interpolation native PPX transformations are checked as a cram snapshot.
     );
   let _ =
     CSS.make(
-      "in-13ts4zv",
+      "_a_40s4zv",
       [
         ("--spread-wd13u2", CSS.Types.Length.toString(spread)),
         ("--color-3xubcm", CSS.Types.Color.toString(color)),
@@ -283,7 +283,7 @@ Interpolation native PPX transformations are checked as a cram snapshot.
     );
   let _ =
     CSS.make(
-      "in-lxl5g5",
+      "_a_40l5g5",
       [
         (
           "--elevation-jhhehb",
@@ -291,33 +291,33 @@ Interpolation native PPX transformations are checked as a cram snapshot.
         ),
       ],
     );
-  let _ = CSS.make("a-40keqi", []);
+  let _ = CSS.make("_a_40keqi", []);
   let _ =
     CSS.make(
-      "in-l3baal",
+      "_a_cwbaal",
       [("--clip-1go0jdu", CSS.Types.TextOverflow.toString(clip))],
     );
-  let _ = CSS.make("a-dm0048edy", []);
+  let _ = CSS.make("_a_dm0048edy", []);
   let _ =
     CSS.make(
-      "in-s36hu1",
+      "_a_dm0046hu1",
       [
         ("--duration-i5tvzn", CSS.Types.TransitionDuration.toString(duration)),
       ],
     );
   let _ =
     CSS.make(
-      "in-1bien0s",
+      "_a_2z03ken0s",
       [("--state-1yj1w6c", CSS.Types.AnimationPlayState.toString(state))],
     );
-  let _ = CSS.make("a-2z03kbnre", []);
+  let _ = CSS.make("_a_2z03kbnre", []);
   let _ =
     CSS.make(
-      "in-x7nyl9",
+      "_a_6f001nyl9",
       [("--px30-cc29mn", CSS.Types.Gap.toString(Size.px30))],
     );
   let _ =
     CSS.make(
-      "in-829yln",
+      "_a_2k9yln",
       [("--red-w69rb9", CSS.Types.WebkitTextFillColor.toString(Color.red))],
     );

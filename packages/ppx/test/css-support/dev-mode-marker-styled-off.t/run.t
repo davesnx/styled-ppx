@@ -15,12 +15,12 @@ Dev markers are on by default; `--env production` turns them off for
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css.config [("env", "production")]];
   [@css "@property --color-1a279q8{syntax:\"*\";inherits:false;}"];
-  [@css ".a-4ekvmb{color:red;}"];
-  [@css ".in-kusjgz{color:var(--color-1a279q8);}"];
+  [@css "._a_4ekvmb{color:red;}"];
+  [@css "._a_4esjgz{color:var(--color-1a279q8);}"];
   [@css.bindings
     [
-      ("Input.Box", "id-zugc0d", "a-4ekvmb"),
-      ("Input.Button", "id-1qldrk3", "in-kusjgz"),
+      ("Input.Box", "_id_zugc0d", "_a_4ekvmb"),
+      ("Input.Button", "_id_1qldrk3", "_a_4esjgz"),
     ]
   ];
   
@@ -1009,7 +1009,7 @@ Dev markers are on by default; `--env production` turns them off for
     external assign2: (Js.t({..}), makeProps, Js.t({..})) => Js.t({..}) =
       "Object.assign";
   
-    let styles = CSS.make("id-zugc0d a-4ekvmb", []);
+    let styles = CSS.make("_id_zugc0d _a_4ekvmb", []);
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(classNameGet(props))
       and style = snd(styles);
@@ -2019,7 +2019,7 @@ Dev markers are on by default; `--env production` turns them off for
   
     let styles = (~color: CSS.Types.Color.t, _) =>
       CSS.make(
-        "id-1qldrk3 in-kusjgz",
+        "_id_1qldrk3 _a_4esjgz",
         [("--color-1a279q8", CSS.Types.Color.toString(color))],
       );
     let make = (props: makeProps) => {

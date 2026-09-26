@@ -1,12 +1,12 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css "@keyframes k-m6pt8e{0%{opacity:0;}100%{opacity:1;}}"];
+  [@css "@keyframes _k_m6pt8e{0%{opacity:0;}100%{opacity:1;}}"];
   [@css
-    ".in-dy0iev{-webkit-animation-name:var(--animation-1sd4kiq);animation-name:var(--animation-1sd4kiq);}"
+    "._a_2z01s0iev{-webkit-animation-name:var(--animation-1sd4kiq);animation-name:var(--animation-1sd4kiq);}"
   ];
-  [@css.bindings [("Output.FadeIn", "id-18tumag", "in-dy0iev")]];
-  let animation = CSS.Types.AnimationName.make("k-m6pt8e");
+  [@css.bindings [("Output.FadeIn", "_id_18tumag", "_a_2z01s0iev")]];
+  let animation = CSS.Types.AnimationName.make("_k_m6pt8e");
   module FadeIn = {
     [@deriving abstract]
     [@warning "-69"]
@@ -992,7 +992,7 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "label:FadeIn id-18tumag in-dy0iev",
+        "label:FadeIn _id_18tumag _a_2z01s0iev",
         CSS.Types.AnimationName.toStyleVars("--animation-1sd4kiq", animation),
       );
     let make = (props: makeProps) => {
