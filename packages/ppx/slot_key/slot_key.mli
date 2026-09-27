@@ -143,6 +143,23 @@ val extended_hash_width : int
     [Unregistered]/[UnregisteredCustom] id, never an error. *)
 val family_id_of : string -> family_id
 
+(** The number of shorthand levels above [property] in the css-grammar shorthand
+    graph, resolving an alias (see Css_grammar's [Alias]) to its canonical name
+    first: 0 for a property no shorthand lists as a direct longhand ("margin",
+    "border", "border-top", a plain leaf like "color"), 1 for a direct longhand
+    of a depth-0 shorthand ("margin-top", "border-width"), 2 for a longhand of a
+    longhand ("border-top-width", strictly above both its parents "border-width"
+    (1) and "border-top" (0)). A property reachable via more than one shorthand
+    chain takes the LONGEST one, not the shortest - see [slot_key.ml]'s own doc
+    comment for why only the longest path guarantees
+    [depth_of shorthand < depth_of property] for every shorthand/property edge
+    in the graph, plus why an alias must redirect and why a logical property
+    (margin-inline, ...) needs no special-casing. Used by [generate.ml]'s
+    [sort_by_shorthand_first] as a TOTAL per-rule sort key (with
+    [is_descendant_shape]) that a comparison sort can rely on being transitive.
+*)
+val depth_of : string -> int
+
 type t = {
   context : context;
   family : family_id;
