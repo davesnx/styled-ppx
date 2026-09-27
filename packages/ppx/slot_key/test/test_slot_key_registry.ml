@@ -132,6 +132,28 @@ let family_tests =
         (List.length (Slot_key.Family.leaf_members_of "mask"));
       check_int "animation family leaves" 12
         (List.length (Slot_key.Family.leaf_members_of "animation")));
+    Alcotest_extra.test
+      "every shorthand's own depth is strictly below every one of its direct \
+       longhands' depth, for every edge in the live css-grammar shorthand \
+       graph (not just the hand-picked examples above) - the exact invariant \
+       generate.ml's sort relies on to put a shorthand before its own \
+       longhand; a shortest-path depth breaks this for a property reachable \
+       through more than one shorthand (border-width/border-top-width above), \
+       so only the longest-path definition can pass this check" (fun () ->
+      let violations =
+        Css_grammar.shorthands ()
+        |> List.concat_map (fun (shorthand, longhands) ->
+          longhands
+          |> List.filter_map (fun longhand ->
+            let sd = Slot_key.depth_of shorthand in
+            let ld = Slot_key.depth_of longhand in
+            if sd < ld then None
+            else
+              Some (Printf.sprintf "%s(%d) -> %s(%d)" shorthand sd longhand ld)))
+      in
+      check_string_list
+        "shorthand/longhand pairs with depth NOT strictly increasing" []
+        violations);
   ]
 
 (* --- append-only seed order: an unchanged, exact-order PREFIX --------- *)

@@ -457,16 +457,15 @@ protocol section above); there is no CLI flag for this.
 Every deduplicated STYLE rule this generator emits - a real atom (`_a_`/
 `_in_` class) or a `[%styled.global]` rule (no atom class, but a real,
 cascading rule all the same - `html{...}`, `*{...}`, `*::before{...}`, an
-author's own global selector) - is classified into one of exactly four
+author's own global selector) - is classified into one of exactly three
 CSS cascade layers, lowest to highest priority: `styled-ppx.global`,
-`styled-ppx.descendant`, `styled-ppx.base`, and `styled-ppx.conditional`.
-Every output stylesheet opens with the same, unconditional `@layer
-styled-ppx.global, styled-ppx.descendant, styled-ppx.base,
-styled-ppx.conditional;` statement (right after the hoisted
-`@import`/`@namespace` rules and the registrations below) whenever it
-ships any rule that tiers at all. Layer order beats source order, so
-this fixes four real bugs content-hash dedup and plain concatenation
-could not:
+`styled-ppx.base`, and `styled-ppx.conditional`. Every output stylesheet
+opens with the same, unconditional `@layer styled-ppx.global,
+styled-ppx.base, styled-ppx.conditional;` statement (right after the
+hoisted `@import`/`@namespace` rules and the registrations below)
+whenever it ships any rule that tiers at all. Layer order beats source
+order, so this fixes three real bugs content-hash dedup and plain
+concatenation could not:
 
 - a block's own `@media`/`:hover` override landing BEFORE its
   unconditional declaration in the deduplicated list (so the
@@ -476,23 +475,24 @@ could not:
   invocations (two `<link>`s on one page) landing in a different
   relative order to some OTHER sheet's conditional rule, depending only
   on which `<link>` the browser happened to load last;
-- an ancestor's blind reach for an unclassed descendant
-  (`.wrapper * {color}`) beating the descendant element's OWN class on
-  the same property, purely because the ancestor's rule happened to land
-  later in the stylesheet;
 - and a `[%styled.global]` default (`*{box-sizing:inherit}`, a global
-  `a{color:blue}`) beating an atom on the same element - the regression
-  the first three tiers were almost shipped with: an unlayered normal
-  declaration beats ANY layered one in CSS, regardless of layer or
-  specificity, so leaving globals unlayered while atoms became layered
-  would have let a global default win over an atom that used to beat it
-  by ordinary specificity or source order.
+  `a{color:blue}`) beating an atom on the same element: an unlayered
+  normal declaration beats ANY layered one in CSS, regardless of layer
+  or specificity, so leaving globals unlayered while atoms are layered
+  would let a global default win over an atom that used to beat it by
+  ordinary specificity or source order.
 
-Two sheets that both use these four fixed names agree on `global <
-descendant < base < conditional` regardless of load order, because CSS
-fixes cascade-layer order by each name's first occurrence across every
+A descendant-shaped rule (`.wrapper * {color}`, `.list li {...}` -
+see "Sort, inside each tier" below for exactly what this means) stays
+in the tier of its own context, exactly like any other rule: it is not
+its own tier, and specificity decides between it and a child's own atom
+the same way it would without any layers at all.
+
+Two sheets that both use these three fixed names agree on `global <
+base < conditional` regardless of load order, because CSS fixes
+cascade-layer order by each name's first occurrence across every
 stylesheet on the page, cumulatively - which is also why the statement
-lists all four names unconditionally even when this particular sheet
+lists all three names unconditionally even when this particular sheet
 only ever populates some of them: omitting an empty one would make this
 sheet's contribution to the OTHER tiers' priority depend on whether some
 other sheet already declared it first.
@@ -511,31 +511,11 @@ escape hatch every other tier already relies on.
 in `packages/generate/generate.ml`) is either a registration (stays
 outside every layer, see below) or a `[%styled.global]` rule, which is
 always `styled-ppx.global` - global rules never compete for the SAME
-descendant/base/conditional distinction an atom's own selector does, they
-are simply the floor every atom sits above. A rule WITH an atom class is
+base/conditional distinction an atom's own selector does, they are
+simply the floor every atom sits above. A rule WITH an atom class is
 classified per rendered rule (not per class, so two declarations of the
-same `_in_` bundle can land in different tiers), `Descendant` checked
-FIRST and independent of at-rule/pseudo wrapping (see the reasoning
-below), then `Conditional`, then `Base`:
+same `_in_` bundle can land in different tiers) into exactly one of:
 
-- `Descendant`: the rule's selector reaches, via a combinator, for a
-  DIFFERENT element than the atom's own class (every atom's class is
-  always that selector's leading token), and that different element's
-  subject compound (the rightmost compound - the actual element the rule
-  styles, in CSS Selectors terms) has no class of its own: a bare element
-  type or `*` (`.x > div`, `.x span`, `.x > *`). A subject that DOES carry
-  its own class (`.x ._id_...` - what a `$(binding)` selector reference
-  resolves to - or a literal author class like `.x .tiptap`) is NOT this
-  shape: seeing a class there means the rule targets a specific,
-  identified element, not "whatever happens to be under here", so it
-  stays `Base`/`Conditional` as before this tier existed. Checked
-  independent of at-rule/pseudo wrapping - `@media (...) { .x > span
-  {...} }` is still `Descendant`, not `Conditional` - because
-  descendant-ness is a question of WHAT ELEMENT the rule reaches for, not
-  of WHEN it applies: an ancestor's blind reach must lose to the child's
-  own rule regardless of whether that child's own rule is itself
-  unconditional or conditional, so "reaches for a different, unspecified
-  element" has to outrank both, not just `Base`.
 - `Conditional`: the rule is wrapped in an at-rule (`@media`/`@supports`/
   `@container` are the only ones that ever wrap an atom class -
   `@property`/`@keyframes`/`@font-face` registrations and a literal
@@ -543,51 +523,129 @@ below), then `Conditional`, then `Base`:
   classification, see "outside the tiers" below), or a pseudo-class/
   pseudo-element is attached DIRECTLY to the atom's own compound selector
   (`.x:hover`, `.x::before`, chained `.x:focus-visible:not(:disabled)`).
-- `Base`: everything else, including a descendant/child selector whose
-  subject carries its own class (see above) and any selector with no
-  combinator at all.
-
-A real, narrower gap remains even with four tiers: `.x *{color:red}`
-where `.x` itself is styled by nothing that competes (no rule targets
-`.x` on the same property at all) still depends on stylesheet position
-relative to some OTHER, unrelated rule that also happens to match the
-descendant element - cross-element ordering beyond "does this rule's own
-subject carry the atom's own class" is a different, harder problem tiers
-do not fully solve.
+- `Base`: everything else, including a descendant/child selector (see
+  `is_descendant_shape` below) and any selector with no combinator at
+  all. Whether the rule is descendant-shaped or not plays no part in
+  this classification - it only affects sort order WITHIN whichever of
+  these two tiers the rule already landed in, see "Sort, inside each
+  tier" below.
 
 `!important` needs no special handling here, but is worth naming
 explicitly: CSS compares declaration importance BEFORE layer order, and
 among `!important` declarations the EARLIEST-declared layer wins (the
 reverse of the normal-declaration rule, where the latest layer wins) - so
-an `!important` declaration in `styled-ppx.global` or `styled-ppx.
-descendant` still beats a plain, non-`!important` declaration in a higher
-layer, despite `global`/`descendant` being the two lowest layers for
-everything else. This is an intentional, spec-level escape hatch (an
-author who needs a global default or a descendant override to truly win
-uses `!important`, same as they always could to beat any unconditional
-rule), not a gap in this design - `styled-ppx.generate` only decides
-which layer a rule goes in, never how a browser weighs importance
-against layer order.
+an `!important` declaration in `styled-ppx.global` still beats a plain,
+non-`!important` declaration in a higher layer, despite `global` being
+the lowest layer for everything else. This is an intentional, spec-level
+escape hatch (an author who needs a global default to truly win uses
+`!important`, same as they always could to beat any unconditional rule),
+not a gap in this design - `styled-ppx.generate` only decides which
+layer a rule goes in, never how a browser weighs importance against
+layer order.
 
-**Sort, inside each tier**: a stable sort puts an atom covering MORE of a
-property family's leaves (a shorthand, or a wider family atom) before one
-covering fewer of the SAME family (a lone longhand from a different
-binding or a different `_in_` bundle) - rules that share no family compare
-equal, so the sort never reorders anything else, and only ever reorders
-rules that were already fighting over the same property. This is what
-`CSS.merge` (below) cannot do for two atoms hidden inside different `_in_`
-bundles (`CSS.merge` only ever sees a bundle's class as one opaque,
-never-dropped token): the sort fixes their relative STYLESHEET position
-instead, restoring the override a `merge` call intended even though
-`merge` itself still cannot see one property next to another inside a
-bundle. Reads each rule's own property name(s) straight from its rendered
-text (through `Slot_key.Family`'s css-grammar-sourced shorthand/leaf data,
-the same table a real atom's own mask is built from) rather than from a
-`Slot_key.t` - a bundle's declarations never had one to begin with (a real
-bundle spans more than one property, sometimes more than one context, see
-"Atomization" above). Two declarations already grouped into one atom
-because their leaves overlap (see "Atomization") never need this: they are
-one rule, in author order, before the sort ever runs.
+**Sort, inside each tier**: a TOTAL per-rule key, `(descendant-shaped,
+shorthand depth)`, not a pairwise comparison between two rules. A
+descendant-shaped rule - the rule's selector reaches, via a combinator,
+for a DIFFERENT element than the atom's own class (every atom's class is
+always that selector's leading token), and that different element's
+subject compound (the rightmost compound - the actual element the rule
+styles, in CSS Selectors terms) has no class of its own: a bare element
+type or `*` (`.x > div`, `.x span`, `.x > *`). A subject that DOES carry
+its own class (`.x ._id_...` - what a `$(binding)` selector reference
+resolves to - or a literal author class like `.x .tiptap`) is NOT this
+shape: seeing a class there means the rule targets a specific,
+identified element, not "whatever happens to be under here" - is always
+emitted BEFORE an own-element rule in the same tier, so a genuine
+specificity TIE between an ancestor's blind reach and the child's own
+atom resolves to the child, the later rule in the tier, winning: the
+fix for the one case removing the `descendant` tier needed a
+replacement for (`.wrapper * {color}` vs the child's own `color` atom,
+both `(0,1,0)`). A real specificity difference is untouched either way
+- the browser's own cascade already prefers the more specific rule
+regardless of stylesheet position, tiers or no tiers; this ordering
+only ever matters when specificity is equal, which is also why
+descendant-shape is the PRIMARY sort key and not the depth compare
+below: the two guarantees are almost never both live for the same pair
+(a descendant rule and the child's own atom rarely share a property
+too), and on the rare pair where they would disagree, protecting the
+child from an unrelated ancestor's blind reach takes priority over
+depth's narrower concern (restoring one binding's own
+shorthand-then-longhand override intent).
+
+Within rules that are equally descendant-shaped (both, or neither), a
+rule's own shorthand DEPTH decides: the number of shorthand levels
+above its property in the css-grammar shorthand graph (`Slot_key.
+depth_of` - 0 for a top-level shorthand like `margin`, or a plain leaf
+like `color`; 1 for a direct longhand, `margin-top`; 2 for a longhand
+of a longhand). A shallower rule (a shorthand, or a wider family atom)
+sorts before a deeper one covering less (a lone longhand from a
+different binding or a different `_in_` bundle). A property reachable
+through more than one shorthand takes the LONGEST such path, not the
+shortest: `border-top-width` is a direct longhand of both `border-top`
+(its own, parent-less shorthand, depth 0) and `border-width` (itself a
+longhand of `border`, depth 1); the longest path puts it at depth 2,
+strictly above BOTH parents, which is what keeps `border-width` sorting
+before `border-top-width` - the shortest path would tie them both at
+depth 1 and leave their relative order to whatever the pre-sort order
+happened to be. An alias (`grid-column-gap` for `column-gap`) resolves
+to its canonical name's depth first - it names the exact same computed
+property, so it must sort exactly like its canonical name would. A
+logical property (`margin-inline-start`) needs no such redirect: it is
+registered as its own, separate shorthand entry with only its own
+logical longhands, never a physical one, so the graph already keeps it
+apart from its physical counterpart. Depth is a TOTAL order - a plain
+integer comparison, always transitive - which is exactly what
+`List.stable_sort` needs for its own correctness guarantee to hold: a
+comparator that instead matched rules pairwise by shared property
+family, treating any two rules that share no family as equal, is NOT a
+transitive relation (two rules each "equal" to a common third rule need
+not be equal to each other), so a stable sort built on one could leave
+a genuine shorthand stranded after its own longhand whenever enough
+family-unrelated rules separated them in the pre-sort list -
+`shorthand-depth-stress.t`'s 30-rule fixture pins this: every one of
+nine shorthand/longhand pairs, shuffled among sixteen unrelated
+declarations, sorts correctly.
+
+A bundle, or a same-file family-atom group (see "Atomization" - several
+declarations already merged into one atom because their leaves overlap,
+needing no separate sort entry: they are one rule, in author order,
+before the sort ever runs), has no single depth of its own the way a
+plain, single-property atom does; it is keyed by the MINIMUM depth over
+every declaration it carries. This protects the group's SHALLOWEST
+declaration correctly (a `padding: 4px;` inside the group still sorts
+before an unrelated `padding-top: 0;` atom that needs to override it,
+the same guarantee a lone `padding` atom would get), but not every
+declaration in the group at once: a bundle of `margin-top: 0;` (depth
+1) and `padding: 4px;` (depth 0), keyed by the group's minimum (0), no
+longer sorts its `margin-top: 0;` at its own true depth 1 - an
+unrelated `margin: 10px;` atom (depth 0, genuinely wider than
+`margin-top`) is not guaranteed to sort before this group's
+`margin-top: 0;` the way it would if `margin-top` sorted honestly on
+its own. Accepted, not fixed: a multi-declaration rule that mixes
+properties at different depths cannot be ordered correctly against
+every other rule at once, only against rules competing for its
+shallowest declaration's own property.
+
+This is what `CSS.merge` (below) cannot do for two atoms hidden inside
+different `_in_` bundles (`CSS.merge` only ever sees a bundle's class
+as one opaque, never-dropped token): the sort fixes their relative
+STYLESHEET position instead, restoring the override a `merge` call
+intended even though `merge` itself still cannot see one property next
+to another inside a bundle. Reads each rule's own property name(s)
+straight from its rendered text (through `Slot_key.depth_of`'s
+css-grammar-sourced shorthand graph, the same table a real atom's own
+mask is built from) rather than from a `Slot_key.t` - a bundle's
+declarations never had one to begin with (a real bundle spans more than
+one property, sometimes more than one context, see "Atomization"
+above).
+
+A real, narrower gap remains: `.x *{color:red}` where `.x` itself is
+styled by nothing that competes (no rule targets `.x` on the same
+property at all) still depends on stylesheet position relative to some
+OTHER, unrelated rule that also happens to match the descendant element
+- cross-element ordering beyond "does this rule's own subject carry the
+atom's own class" is a different, harder problem this sort does not
+fully solve.
 
 **Outside every tier, always**: `@property`, `@keyframes`, `@font-face`
 registrations, hoisted `@import`/`@namespace`, dropped `@charset`, and a
@@ -609,24 +667,24 @@ every tier.
 `--layers` (default off, and rejected together with `--order source`)
 wraps each tier's OWN rules into named per-library CSS cascade layers,
 nested one level inside that tier's `@layer styled-ppx.global { ... }` /
-`@layer styled-ppx.descendant { ... }` / `@layer styled-ppx.base { ... }`
-/ `@layer styled-ppx.conditional { ... }` block - the outer tier
-statement above already settles global-vs-descendant-vs-base-vs-
-conditional order before any library ordering is even consulted, so a
-library's conditional atom never has to out-rank a DIFFERENT library's
-base, descendant, or global rule by accident. Inside each non-empty tier,
-one `@layer <lib1>, <lib2>, ...;` statement lists every library that
-still owns a rule IN THAT TIER, in the same dependency order as the
-default output, and then each such library's rules for that tier follow
-inside their own nested `@layer <lib> { ... }` block - the same
-per-library bucketing the unlayered case skips, just computed once per
-tier instead of once overall, so a library can get a block in one tier
-and none in another. A group with nothing left to wrap in a given tier
-gets no block and no name in that tier's statement, same rule as before
-tiers existed. A tier with no rule in this sheet at all gets no `@layer
-<lib1>, ...;` statement and no library blocks either - only the OUTER,
-four-name tier statement is unconditional; a per-library statement inside
-an empty tier would have nothing to say. `@property`/`@keyframes`/
+`@layer styled-ppx.base { ... }` / `@layer styled-ppx.conditional { ... }`
+block - the outer tier statement above already settles
+global-vs-base-vs-conditional order before any library ordering is even
+consulted, so a library's conditional atom never has to out-rank a
+DIFFERENT library's base or global rule by accident. Inside each
+non-empty tier, one `@layer <lib1>, <lib2>, ...;` statement lists every
+library that still owns a rule IN THAT TIER, in the same dependency
+order as the default output, and then each such library's rules for
+that tier follow inside their own nested `@layer <lib> { ... }` block -
+the same per-library bucketing the unlayered case skips, just computed
+once per tier instead of once overall, so a library can get a block in
+one tier and none in another. A group with nothing left to wrap in a
+given tier gets no block and no name in that tier's statement, same
+rule as before tiers existed. A tier with no rule in this sheet at all
+gets no `@layer <lib1>, ...;` statement and no library blocks either -
+only the OUTER, three-name tier statement is unconditional; a
+per-library statement inside an empty tier would have nothing to say.
+`@property`/`@keyframes`/
 `@font-face` registrations and a literal `@layer` at-rule stay outside
 every tier and every library layer, exactly as before tiers existed: a
 `@property` inside a layer would make the registration itself depend on
@@ -642,16 +700,16 @@ that: an `!important` declaration in a layer beats an unlayered
 `!important` declaration, and among layers the earliest-declared layer
 wins for `!important` (the opposite of the normal-declaration order,
 where the latest layer wins) - this applies to the mandatory
-`styled-ppx.global`/`.descendant`/`.base`/`.conditional` tiers too,
-`--layers` or not; not addressed by this change, flagged here rather than
-silently ignored (see "Cascade tiers" above for the specific
-global/descendant `!important` interaction). A consumer that turns
-`--layers` on has to put its own hand-written CSS — resets, palettes,
-fonts, an inline global stylesheet not routed through `[%styled.global]`
-at all — into a layer declared before the generated ones (before
-`styled-ppx.global`, the first-declared of the four, now that they always
-exist), or that CSS's plain declarations stop overriding anything the
-generated, now-layered rules set.
+`styled-ppx.global`/`.base`/`.conditional` tiers too, `--layers` or not;
+not addressed by this change, flagged here rather than silently ignored
+(see "Cascade tiers" above for the specific global `!important`
+interaction). A consumer that turns `--layers` on has to put its own
+hand-written CSS — resets, palettes, fonts, an inline global stylesheet
+not routed through `[%styled.global]` at all — into a layer declared
+before the generated ones (before `styled-ppx.global`, the
+first-declared of the three, now that they always exist), or that CSS's
+plain declarations stop overriding anything the generated, now-layered
+rules set.
 
 ## Atomization
 
