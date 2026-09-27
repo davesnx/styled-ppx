@@ -1136,10 +1136,22 @@ let of_atom (rule : Ast.rule) : t option =
        same family by construction
        (that's what makes them one group), so the combined mask is the OR
        of each one's own mask, using [None] ("full") as absorbing: any
-       [None] in the group makes the whole group's mask [None]. *)
+       [None] in the group makes the whole group's mask [None].
+
+       [resolve_alias] runs here, before {!Family.mask_of}/
+       {!Family.full_mask_of} below, not just inside {!family_id_of}: an
+       alias like "grid-column-gap" is never a member of [Family]'s
+       union-find (built only from {!Css_grammar.shorthands}, which knows
+       nothing of {!Css_grammar.aliases}), so left unresolved it forms its
+       own singleton family where [mask_of = full_mask_of], making the mask
+       fold below treat it as "full" - the same shape as the real shorthand
+       "gap". That silently let a later "grid-row-gap"/"row-gap" atom's
+       mask-less class remove an earlier "column-gap" atom's class in
+       {!removes}, even though the two set disjoint longhands. *)
     let properties =
       List.map
-        (fun (d : Ast.declaration) -> normalize_property (fst d.name))
+        (fun (d : Ast.declaration) ->
+          resolve_alias (normalize_property (fst d.name)))
         decls
     in
     let family = family_id_of (List.hd properties) in

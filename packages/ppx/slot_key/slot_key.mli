@@ -104,6 +104,25 @@ module Family : sig
   val full_mask_of : string -> int
 end
 
+(** A true spec-level alias's canonical name (e.g. ["grid-row-gap"] ->
+    ["row-gap"], via {!Css_grammar}'s own [Alias] kind - see
+    [Css_grammar.Types.kind]'s doc), or [property] unchanged when it names no
+    alias. A plain 1:1 rename, not a shorthand reduction - it must run before
+    {!Family.mask_of}/{!Family.full_mask_of} as well as before
+    {!Family.family_key_of}: [Family]'s union-find is built only from
+    {!direct_children} (itself built only from {!Css_grammar.shorthands}), which
+    never lists an alias, so an unresolved alias name that is really one leaf of
+    a multi-leaf family (e.g. ["grid-row-gap"], one of ["gap"]'s two legs) looks
+    like its own unrelated one-member family instead, where
+    [mask_of = full_mask_of] always - exactly the shape of a real, family-
+    covering shorthand. {!family_id_of} and {!depth_of} already resolve this
+    internally; exposed here because {!of_atom}'s mask computation needs it too
+    (calling {!Family.mask_of}/{!Family.full_mask_of} on each declaration's own
+    property name, not just on the head property {!family_id_of} uses), and so a
+    test can assert the invariant holds for every registered alias, not just the
+    hand-picked ones. *)
+val resolve_alias : string -> string
+
 (** A property/family's identity: a table index, or - when the property has no
     table slot - a hash-derived id, distinguishing an ordinary property from a
     custom ([--*]) one by constructor rather than by numeric range (the family
