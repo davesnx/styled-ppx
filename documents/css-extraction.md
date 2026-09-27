@@ -759,6 +759,16 @@ whose declarations render to the same CSS text in the same context mint
 the same class, dev or production. Minting lives in
 `packages/ppx/src/Hash_class.ml` (`Class_format.slot_class`); the
 `(context, family, mask)` triple comes from `packages/ppx/slot_key`.
+An alias (`grid-row-gap` for `row-gap`, one of two legs of `gap`) resolves
+to its canonical name before its mask is computed too, the same redirect
+`Slot_key.depth_of` already does for sort order (see "Cascade tiers"
+above): it
+names the exact same computed property, so it must get the exact same
+mask its canonical name would - never a mask computed against the
+alias's own, unresolved name, which `Slot_key.Family`'s union-find (built
+only from registered shorthands, never from aliases) would otherwise see
+as an unrelated one-member family and mask as "full" regardless of how
+many longhands the real, canonical property actually covers.
 
 One exception: when a block has TWO OR MORE declarations that interpolate
 the SAME `$(name)` source path, they mint one shared `_in_<murmur2 hash>`

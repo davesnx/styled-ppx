@@ -249,6 +249,38 @@ let hand_written_class_ambiguity_persists_under_the_new_prefix () =
     (Merge_key.merge_class_names "label:x _a_header" "_a_he1234")
     "label:x _a_he1234"
 
+(* -- Round 6 (monorepo, b70a86b0): disjoint "gap" longhands never drop -----
+   each other, whatever order they merge in or whichever of the two
+   registered spellings each one uses. Real trigger:
+   PPTableComparison_Css.row (`grid-column-gap: 24px`) merged with
+   `rowToolLimit` (`grid-row-gap: $(Size.px8)`, an interpolated value)
+   dropped `row`'s column-gap atom, because [of_atom] computed
+   "grid-row-gap"'s mask against its own unresolved name - a one-member
+   pseudo-family where mask always equals "full" - instead of against
+   "row-gap"'s real, partial mask (one of two legs of "gap"). See
+   Slot_key.of_atom's doc and test_slot_key_registry.ml's "mask" group for
+   the general invariant this restores. *)
+let disjoint_gap_longhands_both_survive () =
+  let column = make "column-gap: 24px;" in
+  let row = make "row-gap: $(px8);" in
+  let merged = CSS.merge column row in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s"
+       (class_of "column-gap: 24px;")
+       (class_of "row-gap: $(px8);"))
+
+(* Same pair, the real monorepo spelling: the legacy "grid-*" aliases, not
+   the canonical "column-gap"/"row-gap" - byte-for-byte the shape round 6
+   found broken. *)
+let disjoint_gap_longhands_both_survive_legacy_alias_spelling () =
+  let column = make "grid-column-gap: 24px;" in
+  let row = make "grid-row-gap: $(px8);" in
+  let merged = CSS.merge column row in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s"
+       (class_of "grid-column-gap: 24px;")
+       (class_of "grid-row-gap: $(px8);"))
+
 (* -- Merge_key's own hardcoded constants, cross-checked against the real
    Slot_key/Class_format values, not just against a comment. Merge_key
    cannot depend on Slot_key for real (see its own doc comment: it ships
@@ -316,6 +348,14 @@ let tests =
       "accepted limit: an earlier shorthand is NOT dropped by a later lone \
        longhand - both survive"
       shorthand_then_longhand_keeps_both;
+    Alcotest_extra.test
+      "round 6: column-gap and an interpolated row-gap are disjoint legs of \
+       gap's family - neither drops the other"
+      disjoint_gap_longhands_both_survive;
+    Alcotest_extra.test
+      "round 6, real monorepo spelling: grid-column-gap and an interpolated \
+       grid-row-gap - neither drops the other"
+      disjoint_gap_longhands_both_survive_legacy_alias_spelling;
     Alcotest_extra.test
       "same property under &:hover merges like the base context"
       hover_context_merges_like_base;
