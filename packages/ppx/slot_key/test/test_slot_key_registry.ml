@@ -235,6 +235,83 @@ let alias_tests =
         = Slot_key.family_id_of "overflow-wrap"));
   ]
 
+(* --- mask invariant: a leaf's own mask must distinguish it from its -----
+   family's other legs whenever there ARE other legs to distinguish from.
+   Round 6 (monorepo, b70a86b0) found this broken for the alias spellings
+   "grid-row-gap"/"grid-column-gap": [of_atom] called
+   [Family.mask_of]/[Family.full_mask_of] on the raw, unresolved alias name,
+   which [Family]'s union-find (built only from [direct_children], itself
+   built only from [Css_grammar.shorthands] - never [Css_grammar.aliases])
+   treats as its own one-member family, where [mask_of = full_mask_of]
+   always. That silently let a "row-gap" atom's mask-less class remove an
+   earlier "column-gap" atom's class in [removes], even though the two set
+   disjoint longhands. [of_atom] now resolves the alias first (see its own
+   doc comment); these two tests pin the invariant that fix restores, at the
+   registry/graph level, independent of [of_atom]'s own implementation -
+   the first over every real shorthand's longhand list, the second over
+   every real alias, resolved to canonical (both empty pre-fix and
+   post-fix, since [Family.mask_of]/[full_mask_of] on an already-canonical
+   name never had this bug - only [of_atom]'s failure to resolve one did;
+   see test_merge_key.ml's runtime tests for the regression these two do
+   NOT catch). *)
+let mask_tests =
+  [
+    Alcotest_extra.test
+      "every longhand of a multi-leaf family has a mask that is not the \
+       family's full mask - equal is only legitimate when the leaf is the \
+       family's ONLY leaf (a shorthand with exactly one direct longhand, where \
+       covering that one leaf covers the whole family by definition)" (fun () ->
+      let violations =
+        Css_grammar.shorthands ()
+        |> List.concat_map (fun (shorthand, _longhands) ->
+          let leaves = Slot_key.Family.leaf_members_of shorthand in
+          if List.length leaves <= 1 then []
+          else
+            leaves
+            |> List.filter_map (fun leaf ->
+              let mask = Slot_key.Family.mask_of leaf in
+              let full = Slot_key.Family.full_mask_of leaf in
+              if mask <> full then None
+              else
+                Some
+                  (Printf.sprintf
+                     "%s: mask=%d = full=%d in a %d-leaf family (%s)" leaf mask
+                     full (List.length leaves) shorthand)))
+      in
+      check_string_list
+        "leaves whose own mask wrongly equals their family's full mask" []
+        violations);
+    Alcotest_extra.test
+      "every alias, resolved to its canonical name, obeys the same invariant - \
+       covers the alias names themselves (\"grid-row-gap\", not just \
+       \"row-gap\"), which the shorthand/longhand check above never names \
+       directly. Exempts an alias whose canonical name IS the family's own \
+       shorthand root (\"grid-gap\" -> \"gap\" - a shorthand legitimately has \
+       mask = full), the same one-leaf-family exemption as above, restated in \
+       terms of \"is this a leaf at all\" rather than leaf count, since an \
+       alias resolves straight to a family key, never to a leaf list" (fun () ->
+      let violations =
+        Css_grammar.aliases ()
+        |> List.filter_map (fun (alias, _canonical) ->
+          let resolved = Slot_key.resolve_alias alias in
+          let family_key = Slot_key.Family.family_key_of resolved in
+          if resolved = family_key then None
+          else (
+            let mask = Slot_key.Family.mask_of resolved in
+            let full = Slot_key.Family.full_mask_of resolved in
+            if mask <> full then None
+            else (
+              let leaves = Slot_key.Family.leaf_members_of family_key in
+              Some
+                (Printf.sprintf
+                   "%s (-> %s): mask=%d = full=%d in a %d-leaf family (%s)"
+                   alias resolved mask full (List.length leaves) family_key))))
+      in
+      check_string_list
+        "aliases whose resolved mask wrongly equals their family's full mask" []
+        violations);
+  ]
+
 let () =
   Alcotest.run ~show_errors:true ~compact:true ~tail_errors:`Unlimited
     "slot_key_registry"
@@ -243,4 +320,5 @@ let () =
       "family", List.concat_map snd family_tests;
       "order", List.concat_map snd order_tests;
       "alias", List.concat_map snd alias_tests;
+      "mask", List.concat_map snd mask_tests;
     ]
