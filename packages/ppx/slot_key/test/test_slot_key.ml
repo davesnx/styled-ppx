@@ -117,6 +117,51 @@ let family_tests =
            ])
         (List.sort String.compare
            (Slot_key.Family.leaf_members_of "transition")));
+    Alcotest_extra.test "a top-level shorthand is depth 0" (fun () ->
+      check_int "depth_of margin" 0 (Slot_key.depth_of "margin");
+      check_int "depth_of border" 0 (Slot_key.depth_of "border");
+      (* "border-top" is registered as its OWN shorthand
+         (["border-top-width"; "border-top-style"; "border-top-color"]),
+         never as one of "border"'s own longhands ("border"'s are
+         ["border-width"; "border-style"; "border-color"; "border-image"]
+         \- CSS decomposes "border" by PROPERTY, not by SIDE). Nothing
+         lists "border-top" as its own longhand either, so it is depth 0
+         too, not 1 - a real gap between how a shorthand reads in prose
+         ("border-top" sounds nested "under" "border") and how
+         css-grammar's registry actually encodes it: two independent
+         decomposition axes (by side, by property) that both bottom out at
+         "border-top-width" - see the next test for how the longest-path
+         rule still orders that property correctly above both axes. *)
+      check_int "depth_of border-top" 0 (Slot_key.depth_of "border-top"));
+    Alcotest_extra.test "a plain, family-less leaf is depth 0" (fun () ->
+      check_int "depth_of color" 0 (Slot_key.depth_of "color"));
+    Alcotest_extra.test "a direct longhand is depth 1" (fun () ->
+      check_int "depth_of margin-top" 1 (Slot_key.depth_of "margin-top"));
+    Alcotest_extra.test
+      "border-top-width has TWO independent parents - border-top (depth 0, by \
+       side) and border-width (depth 1, by property, itself a longhand of \
+       border) - and takes the LONGER one, depth 2, not 1: only the longest \
+       path keeps border-top-width strictly above BOTH of its parents \
+       (border-width at 1, border-top at 0), which is what lets border-width \
+       still sort before border-top-width even though a shorter path through \
+       border-top alone would have tied them at depth 1" (fun () ->
+      check_int "depth_of border-width" 1 (Slot_key.depth_of "border-width");
+      check_int "depth_of border-top-width" 2
+        (Slot_key.depth_of "border-top-width"));
+    Alcotest_extra.test
+      "an alias resolves to its canonical name's depth, not depth 0 from its \
+       own (unregistered) spelling" (fun () ->
+      check_int "depth_of grid-column-gap = depth_of column-gap"
+        (Slot_key.depth_of "column-gap")
+        (Slot_key.depth_of "grid-column-gap");
+      check_int "depth_of grid-column-gap" 1
+        (Slot_key.depth_of "grid-column-gap"));
+    Alcotest_extra.test
+      "a logical property's depth comes from its own logical shorthand, never \
+       its physical counterpart" (fun () ->
+      check_int "depth_of margin-inline-start" 1
+        (Slot_key.depth_of "margin-inline-start");
+      check_int "depth_of margin-inline" 0 (Slot_key.depth_of "margin-inline"));
   ]
 
 let registry_tests =

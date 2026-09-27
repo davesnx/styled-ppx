@@ -678,7 +678,6 @@ let check_atom_class_collisions rules =
    which position within one stylesheet, either rule came from. *)
 
 let global_layer_name = "styled-ppx.global"
-let descendant_layer_name = "styled-ppx.descendant"
 let base_layer_name = "styled-ppx.base"
 let conditional_layer_name = "styled-ppx.conditional"
 
@@ -799,15 +798,22 @@ let is_descendant_shape rule_text =
     has_top_level_combinator selector
     && not (String.contains (rightmost_compound selector) '.')
 
-(** [Descendant] (below), [Conditional], or [Base]. [Descendant] is checked
-    FIRST, independent of at-rule/pseudo wrapping: it is a question about what
-    element the rule reaches for, not about when it applies, so a
-    descendant-shaped rule that also happens to sit inside `@media` is still
-    [Descendant], not [Conditional] - reasoned out from the `/gbp-monitor` bug
-    this closes: an ancestor's blind ".x *"-shaped reach must lose to the
-    CHILD's own rule regardless of whether that child's own rule is itself
-    unconditional or conditional, so "reaches for a different, unspecified
-    element" has to outrank both, not just [Base]. [Conditional] otherwise when
+(** [Conditional] or [Base] - a descendant-shaped rule (see
+    {!is_descendant_shape}) is neither: it stays in the tier of its own
+    context, exactly like any other rule, so specificity (not layer order)
+    decides between a parent's blind reach (".x *", ".x li") and the child's
+    own atom, the same way it did before tiers existed. [Descendant] used to
+    be its own, lowest tier - removed (round 5): sitting below [Base]
+    unconditionally made an ancestor's rule lose to EVERY child atom
+    regardless of specificity, which broke five real, more-specific-ancestor
+    patterns ([".list li"], [".field input"], [".clearButtonContainer
+    span"], [":where(.stack) > *"], [".field button"]) to fix the one
+    ({/gbp-monitor}'s ".x *", genuinely tied at (0,1,0)) it was meant for.
+    {!sort_by_shorthand_first} now protects that one case instead, by
+    emitting descendant-shaped rules before own-element rules within
+    whichever tier they land in, so a genuine specificity TIE still resolves
+    to the child (later rule wins a tie); a real specificity difference is
+    untouched by stylesheet position either way. [Conditional] when
     [rule_text] only applies under some extra condition beyond the plain
     presence of its own element: wrapped in an at-rule
     ([@media]/[@supports]/[@container] are the only ones that ever wrap an atom
@@ -820,24 +826,21 @@ let is_descendant_shape rule_text =
     .id-...", ".x .tiptap" - see {!is_descendant_shape}'s doc) and any rule with
     no combinator at all. *)
 type tier =
-  | Descendant
   | Base
   | Conditional
 
 let rule_tier rule_text =
-  if is_descendant_shape rule_text then Descendant
+  let trimmed = String.trim rule_text in
+  if String.length trimmed > 0 && trimmed.[0] = '@' then Conditional
   else (
-    let trimmed = String.trim rule_text in
-    if String.length trimmed > 0 && trimmed.[0] = '@' then Conditional
-    else (
-      match atom_class_and_end rule_text with
-      | None ->
-        Base
-        (* unreachable here - callers only ask for tier-eligible rules, i.e. atom_class_name <> None *)
-      | Some (_, after) ->
-        if after < String.length rule_text && rule_text.[after] = ':' then
-          Conditional
-        else Base))
+    match atom_class_and_end rule_text with
+    | None ->
+      Base
+      (* unreachable here - callers only ask for tier-eligible rules, i.e. atom_class_name <> None *)
+    | Some (_, after) ->
+      if after < String.length rule_text && rule_text.[after] = ':' then
+        Conditional
+      else Base)
 
 (** The property name of each top-level (";"-separated) declaration in a
     declaration-block's text. CSS property names never contain [:] or [;]
@@ -855,71 +858,106 @@ let property_names_in_block block_text =
       | None -> None
       | Some i -> Some (String.trim (String.sub decl 0 i))))
 
-let popcount n =
-  let rec loop n acc =
-    if n = 0 then acc else loop (n lsr 1) (acc + (n land 1))
-  in
-  loop n 0
+(** One rendered rule's own shorthand depth (see [Slot_key.depth_of]): the
+    MINIMUM depth over every property its own declaration(s) touch - read from
+    the rendered TEXT (generate.ml never sees the ppx's AST or a [Slot_key.t]).
+    A bundle or family-atom group's several declarations can touch several
+    different properties at once (no single [Slot_key.t] could represent that -
+    see [Slot_key.t.bundle]'s doc), so there is no single "this rule's depth"
+    fact the way there is for an ordinary, single-property atom; MIN is the
+    choice that keeps the sort's guarantee correct for the SHALLOWEST
+    declaration in the rule - at the cost of not being fully correct for a rule
+    that mixes depths at all (see below). A rule with a depth-0 declaration (a
+    plain shorthand, or an ordinary leaf like "color") MUST sort no later than
+    anything that could override just that one declaration through a shallower
+    or equal path, regardless of what ELSE is in the same rule - using the
+    group's deepest (MAX) declaration instead would let a genuinely shallow
+    declaration sort too LATE, keyed off an unrelated, deeper sibling in the
+    same bundle, and end up winning a cascade fight it should have lost: a
+    bundle of `margin-top: 0;` (depth 1) + `padding: 4px;` (depth 0) sorting by
+    MAX (1) would land AFTER a `padding-top: 0;` atom (depth 1) that exists
+    specifically to override this bundle's own `padding: 4px;` - putting the
+    wide shorthand LATER than the narrow override it needs to lose to, exactly
+    backwards. MIN (0 here) keeps it sorting no later than any depth-0 rule, so
+    `padding-top: 0;` (depth 1) still lands after it and wins, same as it would
+    for a lone atom.
 
-(** One rendered rule's own (family key, combined leaf mask) pairs, one entry
-    per DISTINCT property family its own declaration(s) touch - read from the
-    rendered TEXT (generate.ml never sees the ppx's AST or a [Slot_key.t]),
-    through [Slot_key.Family] for the actual shorthand/leaf data (the same
-    css-grammar-sourced table [Slot_key.of_atom] uses to build a real atom's own
-    mask). A bundle's several declarations can touch several different families
-    at once (no single [Slot_key.t] could represent that - a bundle spans more
-    than one property, sometimes more than one context, which is exactly why it
-    has no context/family/mask fields of its own); each of ITS OWN families
-    still gets a mask, OR-ed across every declaration of that family in this one
-    rule, mirroring how [Slot_key.of_atom] combines a same-file
-    multi-declaration group. *)
-let families_of_rule rule_text =
+    This is not fully correct for the OTHER declaration in that same bundle:
+    `margin-top: 0;` is now keyed as if it were depth 0 too (the group's MIN),
+    so a `margin: 10px;` atom elsewhere (depth 0, genuinely wider than
+    `margin-top`) is no longer guaranteed to sort before this bundle's
+    `margin-top: 0;` the way it would if `margin-top` sorted honestly at its own
+    depth 1 - a real, accepted limitation: a multi-declaration rule that mixes
+    depths cannot be correctly ordered against every OTHER rule simultaneously,
+    only against rules competing for its shallowest declaration's own property.
+    An empty or unparseable block (should not happen for a real atom, see
+    [innermost_declaration_block]) has no properties to take a minimum over;
+    treated as depth 0, the same safe direction MIN already protects. *)
+let rule_depth rule_text =
   match innermost_declaration_block rule_text with
-  | None -> []
-  | Some block ->
-    let by_family : (string, int) Hashtbl.t = Hashtbl.create 4 in
-    property_names_in_block block
-    |> List.iter (fun property ->
-      let property = Slot_key.normalize_property property in
-      let family = Slot_key.Family.family_key_of property in
-      let mask = Slot_key.Family.mask_of property in
-      let existing =
-        Option.value (Hashtbl.find_opt by_family family) ~default:0
-      in
-      Hashtbl.replace by_family family (existing lor mask));
-    Hashtbl.fold (fun family mask acc -> (family, mask) :: acc) by_family []
-
-(** Stable sort: within families [a] and [b] BOTH touch, the one covering MORE
-    of that family's leaves (more bits set - a shorthand, or a wider family
-    atom) sorts first, so a later, narrower override (a lone longhand from a
-    different atom or bundle) still lands after it and wins by ordinary cascade
-    position - exactly the guarantee `CSS.merge` gives two atoms it CAN see
-    inside, extended here to a bundle merge can't. Rules that share no family at
-    all compare equal, so a stable sort leaves their relative order exactly as
-    dependency/ source order already placed them: this only ever reorders rules
-    that are already fighting over the same property family, never anything
-    else. Overlapping declarations *within* one block are already one atom (see
-    [Css_file.re]'s family-atom grouping), so this never reorders an author's
-    own single binding, only two different bindings' atoms. *)
-let compare_by_shorthand_first (families_a, _) (families_b, _) =
-  match
-    List.find_map
-      (fun (family, mask_a) ->
-        List.assoc_opt family families_b
-        |> Option.map (fun mask_b -> mask_a, mask_b))
-      families_a
-  with
   | None -> 0
-  | Some (mask_a, mask_b) -> compare (popcount mask_b) (popcount mask_a)
+  | Some block ->
+    (match
+       property_names_in_block block
+       |> List.map (fun property ->
+         Slot_key.depth_of (Slot_key.normalize_property property))
+     with
+    | [] -> 0
+    | d :: ds -> List.fold_left min d ds)
 
-(** Sort [rules] by {!compare_by_shorthand_first}, precomputing each rule's
-    families once ("decorate-sort-undecorate") instead of re-parsing its text on
-    every comparison a stable sort makes. *)
+(** Sort key: descendant-shape first (see {!is_descendant_shape}'s doc),
+    shorthand depth (see [Slot_key.depth_of]/{!rule_depth}) second - a TOTAL key
+    computed once per rule, not a pairwise "do these two rules share a family"
+    comparison. The earlier pairwise comparator returned "equal" for any two
+    rules that share no property family, which is not transitive (two rules the
+    comparator calls "equal" to a common third rule need not be equal to EACH
+    OTHER), so [List.stable_sort] - a comparison sort, which only guarantees a
+    correct order for a comparator that is a genuine strict weak ordering -
+    could leave a shorthand stranded after its own longhand whenever enough
+    family-unrelated rules sat between them in the pre-sort list (see
+    tiers-shorthand-sort.t's stress-test cram case for a reproduction: 5 of 9
+    checked pairs came out wrong in a 30-rule shuffle). A per-rule depth is a
+    plain integer, so comparing it is always transitive by construction -
+    [List.stable_sort]'s guarantee actually holds now.
+
+    Depth reorders some genuinely UNRELATED rules relative to each other too
+    (two rules at different depths that do not override each other at all -
+    different properties, no shorthand relation between them), but that
+    reordering can never change a winner: two rules only ever compete for the
+    same computed property through a shorthand relationship (one sets the
+    other's value directly, or via a longhand-of-a-longhand chain), and depth is
+    defined exactly along that chain - shallower is always the more general
+    declaration - so any two rules that DO compete are always ordered
+    shallow-then-deep by this key; two rules that do not compete have no cascade
+    winner for stylesheet position to protect in the first place, so reordering
+    them is harmless by definition.
+
+    Descendant-shape is primary, not depth, because the two guarantees are
+    almost never both live for the same pair - a descendant rule and the child's
+    own atom rarely share a property too - and on the rare pair where they would
+    disagree (an ancestor's rule is itself a shallower shorthand than the
+    child's own deeper longhand, or vice versa), protecting the child from an
+    unrelated ancestor's blind reach (see the `/gbp-monitor` case round 5's
+    descendant-tier removal needed a replacement for) is the invariant that
+    removal exists for, so it must not be overridden by depth's narrower concern
+    (restoring one binding's own shorthand-then-longhand override intent across
+    atoms `CSS.merge` can't see inside a bundle to compare directly). Rules that
+    are equally descendant-shaped (both, or neither) fall through to depth. *)
+let compare_descendant_first_then_depth (is_descendant_a, depth_a, _)
+  (is_descendant_b, depth_b, _) =
+  if is_descendant_a <> is_descendant_b then
+    compare is_descendant_b is_descendant_a
+  else compare depth_a depth_b
+
+(** Sort [rules] by {!compare_descendant_first_then_depth}, precomputing each
+    rule's descendant-shape and depth once ("decorate-sort-undecorate") instead
+    of re-parsing its text on every comparison a stable sort makes. *)
 let sort_by_shorthand_first rules =
   rules
-  |> List.map (fun ((rule_text, _layer) as r) -> families_of_rule rule_text, r)
-  |> List.stable_sort compare_by_shorthand_first
-  |> List.map snd
+  |> List.map (fun ((rule_text, _layer) as r) ->
+    is_descendant_shape rule_text, rule_depth rule_text, r)
+  |> List.stable_sort compare_descendant_first_then_depth
+  |> List.map (fun (_, _, r) -> r)
 
 (** Bucket [rules] by library key (using [library_order] for both the bucket set
     and the emission order), the same grouping {!run}'s [--layers] used to apply
@@ -1110,14 +1148,17 @@ let run ~output_file ~order ~layers input_files =
      real, cascading rule (`html{...}`, `*{...}`, `*::before{...}`, an
      author's own global selector), lands in [styled-ppx.global], the
      LOWEST tier; every real atom, [_a_] or [_in_] alike, lands in
-     [descendant]/[base]/[conditional] as before. Global rules MUST be
+     [base]/[conditional] - no separate [descendant] tier, see [rule_tier]'s
+     doc for why round 5 removed it (a descendant-shaped rule stays in the
+     tier of its own context instead, and {!sort_by_shorthand_first} orders
+     it before own-element rules within that tier). Global rules MUST be
      layered, not left unlayered like registrations: CSS lets an unlayered
      normal declaration beat ANY layered one regardless of layer or
      specificity, so leaving globals unlayered while atoms became layered
      would let a `[%styled.global]` default (`*{box-sizing:inherit}`, a
      global `a{color:blue}`) beat an atom on the same element,
      `!important` aside - the exact regression this tier was almost shipped
-     with. Putting `styled-ppx.global` FIRST (lowest of all four) instead
+     with. Putting `styled-ppx.global` FIRST (lowest of the three) instead
      restores "an element's own atom always beats a global default", now
      unconditionally instead of only when the atom happened to be more
      specific or later in the stylesheet - see "Cascade tiers" in the docs
@@ -1132,21 +1173,13 @@ let run ~output_file ~order ~layers input_files =
       (fun (rule, _layer) -> atom_class_name rule = None)
       atomless_style_rules
   in
-  let descendant_rules, non_descendant_rules =
-    List.partition
-      (fun (rule, _layer) -> rule_tier rule = Descendant)
-      tier_eligible_rules
-  in
   let base_rules, conditional_rules =
     List.partition
       (fun (rule, _layer) -> rule_tier rule = Base)
-      non_descendant_rules
+      tier_eligible_rules
   in
   let any_tiered =
-    global_rules <> []
-    || descendant_rules <> []
-    || base_rules <> []
-    || conditional_rules <> []
+    global_rules <> [] || base_rules <> [] || conditional_rules <> []
   in
 
   let minify = production_mode inputs in
@@ -1167,7 +1200,7 @@ let run ~output_file ~order ~layers input_files =
       (* Unconditional and in this fixed order whenever THIS sheet ships any
          tiered rule at all, regardless of whether a given tier is locally
          empty: two different generate.ml outputs loaded on the same page
-         share these four layer names, and CSS layer order is fixed by
+         share these three layer names, and CSS layer order is fixed by
          each name's FIRST occurrence across every stylesheet on the page -
          if one sheet only ever populates `conditional` and loads before
          another sheet that only populates `base`, omitting the empty tier
@@ -1177,8 +1210,8 @@ let run ~output_file ~order ~layers input_files =
          apparatus (this branch) instead - it contributes nothing to any
          layer, so there is nothing to guarantee order for. *)
       Buffer.add_string buffer
-        (Printf.sprintf "@layer %s, %s, %s, %s;" global_layer_name
-           descendant_layer_name base_layer_name conditional_layer_name);
+        (Printf.sprintf "@layer %s, %s, %s;" global_layer_name base_layer_name
+           conditional_layer_name);
       Buffer.add_string buffer separator;
       let emit_tier name rules =
         (* A tier with no rule in THIS sheet gets no block at all - the
@@ -1199,7 +1232,6 @@ let run ~output_file ~order ~layers input_files =
         end
       in
       emit_tier global_layer_name global_rules;
-      emit_tier descendant_layer_name descendant_rules;
       emit_tier base_layer_name base_rules;
       emit_tier conditional_layer_name conditional_rules
     end;

@@ -858,6 +858,92 @@ let resolve_alias property =
   | Some canonical -> canonical
   | None -> property
 
+(* Reverse edges of [direct_children]: every shorthand that lists [prop] as
+   one of its OWN direct longhands (not transitively) - built once, the
+   same way [direct_children] itself is. *)
+let direct_parents : (string, string list) Hashtbl.t = Hashtbl.create 128
+
+let () =
+  Hashtbl.iter
+    (fun shorthand longhands ->
+      List.iter
+        (fun longhand ->
+          let existing =
+            Option.value (Hashtbl.find_opt direct_parents longhand) ~default:[]
+          in
+          Hashtbl.replace direct_parents longhand (shorthand :: existing))
+        longhands)
+    direct_children
+
+(* The number of shorthand levels above [property] in the css-grammar
+   shorthand graph: 0 for a property no shorthand lists as a direct
+   longhand (a top-level shorthand like "margin", or an ordinary leaf like
+   "color"), 1 for a direct longhand of a depth-0 shorthand
+   ("margin-top"), 2 for a longhand of a longhand ("border-top-width", via
+   "border-width" at depth 1, itself a longhand of "border" at depth 0).
+
+   A property reachable via more than one shorthand chain takes the
+   LONGEST one - the MAXIMUM over every direct parent's own depth, plus
+   one - not the shortest. The invariant this depth exists to guarantee is
+   that every shorthand S covering a property P has [depth_of S < depth_of
+   P], for every S, so S always sorts before P (see [generate.ml]'s
+   [sort_by_shorthand_first]): the longest-path assignment is what makes
+   that hold for EVERY edge, since [depth_of P] is always [1 + the max
+   over P's own direct parents], which is strictly greater than each of
+   those parents' own depth individually, not just the largest one. The
+   shortest path does NOT have this property: "border-top-width" is a
+   direct longhand of both "border-top" (depth 0, its own registered
+   shorthand, never listed as a longhand of "border" itself - see the
+   next paragraph) and "border-width" (depth 1, itself a direct longhand
+   of "border"). The shortest path through "border-top" would give
+   "border-top-width" depth 1 - equal to "border-width"'s own depth 1,
+   breaking the invariant for the very real "border-width" vs
+   "border-top-width" edge (a stable sort could then leave "border-width"
+   after "border-top-width" depending on pre-sort order, exactly the bug
+   this depth key exists to prevent). The longest path gives
+   "border-top-width" depth 2 - correctly above BOTH of its parents,
+   "border-width" (1) and "border-top" (0) - restoring the invariant for
+   every edge, verified directly against the real css-grammar shorthand
+   graph in [test_slot_key.ml] ("every shorthand's own depth is below
+   every one of its direct AND transitive longhands' depth").
+
+   "border-top" is registered as its own shorthand
+   (["border-top-width"; "border-top-style"; "border-top-color"]), never
+   as one of "border"'s own longhands ("border"'s are ["border-width";
+   "border-style"; "border-color"; "border-image"] - CSS decomposes
+   "border" by PROPERTY, not by SIDE) - so "border-top" has no parent of
+   its own and is depth 0, same as "border".
+
+   An alias (see {!resolve_alias}) is resolved to its canonical name
+   first: it names the exact same computed property, so it must get the
+   exact same depth its canonical name would - "grid-column-gap" must
+   compute as depth 1, same as "column-gap" under "gap", not depth 0,
+   which is what a literal, un-resolved graph lookup on the alias's own
+   spelling would wrongly give it (no shorthand's longhand list is ever
+   written using an alias spelling, only the canonical one - see
+   Css_grammar.Types.kind's [Alias] doc). Logical properties
+   (margin-inline, margin-block, ...) need no such redirect: they are
+   registered as their own, separate shorthand entries with only their
+   own logical longhands (never a physical one - see [direct_children]'s
+   own doc for why unifying the two would be wrong at compile time), so
+   this graph already keeps them apart from their physical counterparts
+   without any special-casing here. *)
+let depth_cache : (string, int) Hashtbl.t = Hashtbl.create 128
+
+let rec depth_of property =
+  let property = resolve_alias property in
+  match Hashtbl.find_opt depth_cache property with
+  | Some d -> d
+  | None ->
+    let d =
+      match Hashtbl.find_opt direct_parents property with
+      | None | Some [] -> 0
+      | Some parents ->
+        1 + List.fold_left (fun acc p -> max acc (depth_of p)) 0 parents
+    in
+    Hashtbl.replace depth_cache property d;
+    d
+
 let family_id_of property =
   if property = "all" then All
   else (
