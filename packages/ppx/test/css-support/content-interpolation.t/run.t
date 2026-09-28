@@ -24,8 +24,6 @@ counter().
   @property --myCounterStyle-5pdc5a{syntax:"*";inherits:false;}
   @property --countersNoStyle-g89gy3{syntax:"*";inherits:false;}
   @property --countersStyled-x8q6x3{syntax:"*";inherits:false;}
-  @layer styled-ppx.global, styled-ppx.atoms;
-  @layer styled-ppx.atoms {
   ._a_4wkia9{content:var(--singleCounter-ek68js);}
   ._a_4winop{content:var(--singleCounterNoStyle-2521aj);}
   ._a_4wrgn5{content:var(--singleText-5c1v76);}
@@ -44,4 +42,3 @@ counter().
   ._a_4wo8sv{content:counters(section, ".", decimal-leading-zero);}
   ._a_4w698h{content:var(--countersNoStyle-g89gy3);}
   ._a_4wj96l{content:var(--countersStyled-x8q6x3);}
-  }

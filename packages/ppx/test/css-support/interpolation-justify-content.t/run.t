@@ -110,8 +110,6 @@ Test interpolation support for various properties in cx2
   @property --overscrollBehavior-17qcsbs{syntax:"*";inherits:false;}
   @property --accentColor-mn7yh{syntax:"*";inherits:false;}
   @property --caretColor-zmu88x{syntax:"*";inherits:false;}
-  @layer styled-ppx.global, styled-ppx.atoms;
-  @layer styled-ppx.atoms {
   ._a_610019kvu{-webkit-flex-direction:var(--flexDirection-vyhh8o);-ms-flex-direction:var(--flexDirection-vyhh8o);flex-direction:var(--flexDirection-vyhh8o);}
   ._a_5rpg0g{display:var(--display-jduo1l);}
   ._a_e0jrd3{visibility:var(--visibility-10dikjf);}
@@ -217,4 +215,3 @@ Test interpolation support for various properties in cx2
   ._a_6f002ftvm{row-gap:var(--rowGap-1l1vram);}
   ._a_7o0044owk{list-style-type:var(--listStyleType-wes33f);}
   ._a_7o002r375{list-style-position:var(--listStylePosition-1gexoze);}
-  }

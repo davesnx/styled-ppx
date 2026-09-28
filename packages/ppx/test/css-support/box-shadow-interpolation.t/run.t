@@ -10,8 +10,6 @@ Test box-shadow and text-shadow interpolation support in cx2
   @property --textShadowValue-1g9u54a{syntax:"*";inherits:false;}
   @property --textShadowArray-ptx88i{syntax:"*";inherits:false;}
   @property --insetShadow-ae1kx4{syntax:"*";inherits:false;}
-  @layer styled-ppx.global, styled-ppx.atoms;
-  @layer styled-ppx.atoms {
   ._a_40bddc{box-shadow:var(--singleShadow-2ra8gi);}
   ._a_407kax{box-shadow:var(--shadowArray-16v4cs);}
   ._a_40keqi{box-shadow:none;}
@@ -20,6 +18,5 @@ Test box-shadow and text-shadow interpolation support in cx2
   ._a_cy5t96{text-shadow:var(--textShadowArray-ptx88i);}
   ._a_cyql9z{text-shadow:none;}
   ._a_40ky98{box-shadow:var(--insetShadow-ae1kx4);}
-  }
 
 

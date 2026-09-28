@@ -12,8 +12,6 @@
   @property --borderWidth-apl5wd{syntax:"*";inherits:false;}
   @property --bgColor-vilhl2{syntax:"*";inherits:false;}
   @property --shadow-giamln{syntax:"*";inherits:false;}
-  @layer styled-ppx.global, styled-ppx.atoms;
-  @layer styled-ppx.atoms {
   ._a_40lhv8{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
   ._a_40pkfc{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1), 0px 4px 8px 0px rgba(0, 0, 0, 0.2);}
   ._a_40fb00{box-shadow:inset 0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
@@ -46,7 +44,6 @@
   ._a_3hsuadx68{border-style:solid;}
   ._a_3hef5edq6{border-color:#333;}
   ._a_39004fadc{background-color:var(--bgColor-vilhl2);}
-  }
 
 Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
 

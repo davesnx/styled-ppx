@@ -423,10 +423,8 @@ let library_edge_target ~(groups_with_module : string -> library_group list)
 (** Two-level order: libraries first (by the dependency graph collapsed from
     module references), then, within each library, {!order_modules_within_scope}
     unchanged from PR 1. Both levels reuse {!Order.sort}, so the alphabetical
-    tiebreak and the never-fail cycle policy apply at both levels for free.
-    Returns the ordered inputs and the library keys in emitted order, the one
-    value both the log line and [--layers] consume. *)
-let order_by_dependency (inputs : input list) : input list * string list =
+    tiebreak and the never-fail cycle policy apply at both levels for free. *)
+let order_by_dependency (inputs : input list) : input list =
   let groups = group_by_library inputs in
   (* Indexed once: scanning every group for every raw reference measured 2 s
      extra on a 5,824-file input with 246 groups. *)
@@ -496,38 +494,7 @@ let order_by_dependency (inputs : input list) : input list * string list =
             (edges h))
         ordered)
     ordered_groups;
-  ( List.concat_map (fun (_, ordered, _) -> ordered) ordered_groups,
-    List.map (fun (g, _, _) -> g.key) ordered_groups )
-
-(** [--layers] cascade-layer name for a library key: its last path segment (a
-    no-op for a plain library name; the effective rule for a directory-fallback
-    key such as ["./lib/native"]), with every character outside [A-Za-z0-9_-]
-    replaced by ['_']. *)
-let sanitize_layer_name key =
-  Filename.basename key
-  |> String.map (function
-    | ('A' .. 'Z' | 'a' .. 'z' | '0' .. '9' | '_' | '-') as c -> c
-    | _ -> '_')
-
-(** When two different library keys sanitize to the same layer name, their
-    blocks share that name and CSS itself concatenates same-named [@layer]
-    blocks into one layer; warn once per colliding name so the merge isn't a
-    silent surprise. *)
-let warn_layer_name_collisions layer_names =
-  let by_name : (string, string) Hashtbl.t = Hashtbl.create 8 in
-  List.iter (fun (key, name) -> Hashtbl.add by_name name key) layer_names;
-  List.map snd layer_names
-  |> List.sort_uniq String.compare
-  |> List.iter (fun name ->
-    (* [Hashtbl.find_all] returns the most-recently-added key first; reverse
-       to report libraries in the order they were declared. *)
-    match List.rev (Hashtbl.find_all by_name name) with
-    | [] | [ _ ] -> ()
-    | many ->
-      Logger.warning
-        "layer name %S is shared by libraries %s; their rules merge into one \
-         layer"
-        name (String.concat ", " many))
+  List.concat_map (fun (_, ordered, _) -> ordered) ordered_groups
 
 (** A rendered rule is a hoisted [\@import]/[\@namespace] statement when, after
     trimming, it starts with that keyword and ends with [';']. CSS only honors
@@ -537,12 +504,15 @@ let warn_layer_name_collisions layer_names =
     first, then [\@namespace] — regardless of which module emitted a rule or
     where {!order_by_dependency} placed that module; relative order within each
     kind is left alone. Statement-form [\@layer a, b;] is deliberately NOT
-    hoisted here: CSS permits it anywhere in a stylesheet, and layer order is
-    first-occurrence order, so moving a [\@layer] statement would silently
-    reorder a library's cascade layers instead of just relocating text. Textual
-    prefix/suffix matching (not a search for ['{']) is required because an
-    [\@import] URL can itself contain ['{'] (e.g. [\@import url("a{b.css");]),
-    which a ['{']-search would misclassify as a block rule. *)
+    hoisted here: CSS permits it anywhere in a stylesheet, and a layer's
+    priority is fixed by its name's FIRST occurrence across the whole page, so
+    moving a user's own [\@layer] statement would silently change which layer it
+    introduces first, relative to layers other stylesheets on the page may
+    declare - a hazard independent of whether this aggregator emits any layer of
+    its own. Textual prefix/suffix matching (not a search for ['{']) is required
+    because an [\@import] URL can itself contain ['{'] (e.g.
+    [\@import url("a{b.css");]), which a ['{']-search would misclassify as a
+    block rule. *)
 let is_import_statement rule =
   let trimmed = String.trim rule in
   String.starts_with ~prefix:"@import" trimmed
@@ -633,7 +603,7 @@ let atom_class_name rule_text = Option.map fst (atom_class_and_end rule_text)
 let check_atom_class_collisions rules =
   let seen : (string, string) Hashtbl.t = Hashtbl.create 256 in
   List.filter_map
-    (fun (rule, _layer) ->
+    (fun rule ->
       match atom_class_name rule with
       | None -> None
       | Some class_name
@@ -667,86 +637,49 @@ let check_atom_class_collisions rules =
    declaration, unconditionally later, always win, even inside the media
    query.
 
-   Round 7 shipped this as three separate, always-in-this-order CSS
-   layers (`styled-ppx.global` < `.base` < `.conditional`), fixing the
-   ordering bug above by giving layer order unconditional priority over
-   stylesheet position. Round 7b found this was too strong for `base`
-   vs `conditional` specifically: CSS layer priority beats SPECIFICITY
-   too, not just position, so a genuinely more specific rule in an
-   earlier layer (an ancestor's own rule, `.parent >
-   :first-child:not(:last-child){display:inline}` at (0,3,0), classified
-   `Base`) lost to a plain, one-class atom in a later layer (`.child{...}`
-   at (0,1,0), classified `Conditional` under some `@media`) - exactly
-   backwards, and a real regression on 163 of 167 monorepo pages at
-   narrow viewports.
+   Fix: every rule that can compete for an element is emitted in one of
+   three fixed-order groups - `global` ([%styled.global] rules), `base` (an
+   atom's own, unconditional context), `conditional` (an atom wrapped in
+   `@media`/`@supports`/`@container`, or carrying a pseudo-class/pseudo-
+   element directly on its own selector - see {!rule_tier}) - each group
+   independently sorted by {!sort_by_shorthand_first} (descendant-shaped
+   rules first, then shorthand depth). No CSS layer separates the three:
+   ordinary CSS cascade rules apply, SPECIFICITY first, stylesheet position
+   only as the tie-break - which is exactly why a `conditional` rule still
+   wins a genuine tie against a `base` one (it is textually later), and why
+   a `[%styled.global]` rule with higher specificity than an atom now wins
+   outright, same as any two plain, unlayered CSS rules would (an accepted
+   consequence - see `global-tier.t`).
 
-   Final design: TWO layers, `styled-ppx.global` < `styled-ppx.atoms`.
-   `global` (a `[%styled.global]` rule - see {!rule_tier}'s doc for why
-   it never competes for the same base/conditional distinction an atom's
-   own selector does) keeps its own, separate, LOWER layer - an
-   established, deliberate decision unrelated to round 7b: an element's
-   own atom must always beat a global default regardless of specificity,
-   the same guarantee round 7 shipped and round 7b does not touch. Every
-   real atom, `base` or `conditional` alike, goes into the ONE shared
-   `styled-ppx.atoms` layer instead of two separate ones, ordered inside
-   it by tier (base rules first, then conditional; see {!rule_tier}),
-   each group further sorted by {!sort_by_shorthand_first}. Because
-   `base` and `conditional` now share one layer, the browser compares
-   them by ordinary CSS cascade rules - SPECIFICITY first, stylesheet
-   position only as the tie-break - restoring the ancestor-rule-vs-atom
-   case correctly, while emission order still settles the common case of
-   two rules of EQUAL specificity (almost every atom-vs-atom conflict): a
-   `conditional` rule still wins a genuine tie against a `base` one,
-   because it is textually later within the shared `atoms` layer.
-
-   `!important` needs one piece of special handling, exactly at the
-   global/atoms boundary (never between `base` and `conditional`, which
-   share one layer and so need none): CSS reverses cascade-layer
-   priority for `!important` declarations (the EARLIEST-declared layer
-   wins, not the latest) - `styled-ppx.global`, declared FIRST, means an
-   `!important` global declaration beats an `!important` atom, the
-   mirror image of the normal-declaration case. This is the same
-   spec-level escape hatch round 7's design already relied on: an author
-   whose global default must truly beat an atom uses `!important`, same
-   as they always could to beat any unconditional rule - see
-   `layers-global-tier.t`'s `important_global.ml` case.
-
-   Accepted, not fixed: two SEPARATE `styled-ppx.generate` invocations
-   (two `<link>`s on one page) no longer have a guaranteed relative
-   order WITHIN `styled-ppx.atoms` - CSS layers are cumulative BY NAME,
-   so both sheets' atom rules land in the same one `atoms` layer, and
-   within it, a tie between two DIFFERENT sheets' rules now falls back
-   to ordinary stylesheet position, which depends on which `<link>` the
-   browser loads first, exactly like before layers existed at all. The
-   `global` < `atoms` guarantee itself is UNAFFECTED - both layer names
-   are fixed and always declared in this order regardless of load order,
-   same as round 7 already guaranteed - only the position of one
-   sheet's `atoms` rules relative to ANOTHER sheet's is no longer fixed.
-   Closing this gap for real needs one aggregated stylesheet (every
-   input file passed to a single `styled-ppx.generate` invocation), not
-   a `generate.ml`-side fix - `tiers-two-stylesheets.t` pins the
-   current, accepted behavior. *)
-
-let global_layer_name = "styled-ppx.global"
-let atoms_layer_name = "styled-ppx.atoms"
+   Accepted, not fixed: two SEPARATE `styled-ppx.generate` invocations (two
+   `<link>`s on one page) have no guaranteed relative order between their
+   own tiered rules, for the rare case where the two sheets share a class -
+   `--namespace` salts each library's atom classes (see `Hash_class.ml`),
+   so two different libraries never mint the same one; sharing a class
+   only happens for a native/Melange twin pair passing the same explicit
+   `--namespace`, or for two runs with no namespace at all. When it does
+   happen: each sheet's OWN tier order still holds internally
+   (`tiers-two-stylesheets.t`), but a tie between two DIFFERENT sheets'
+   rules depends on which `<link>` the browser loads first, exactly like
+   plain CSS always has. *)
 
 (** [@property]/[@keyframes]/[@font-face] are registrations, not style rules
-    that compete for an element: a [@property] inside a layer would make the
-    custom-property registration itself depend on layer order, a [@keyframes]
-    name lookup would too, and [@font-face] has no per-element cascade to begin
-    with. All three stay outside both [styled-ppx] layers, exactly as
-    [@import]/[@namespace] (hoisted separately, above) and dropped [@charset]
-    do. A literal, user-authored [@layer] at-rule (statement form,
-    ["@layer a, b;"], or block form, ["@layer name { ... }"]) stays outside them
-    for a different reason: nesting it inside one of [styled-ppx]'s own layers
-    would rescope whatever sub-layer NAME it declares to live underneath that
-    layer specifically, silently changing what the user's own [@layer] statement
-    means - the exact hazard the "Dedup and write" doc section already explains
-    for why it is never hoisted with [@import]/[@namespace] either. Checked on
+    that compete for an element - a [@property] rule is a custom-property
+    definition, a [@keyframes] rule is a name lookup, and [@font-face] has no
+    per-element cascade to begin with - so none of the three take part in
+    tiering; they stay wherever dedup/ordering already placed them, ahead of
+    every tiered rule (see [run] below), exactly as [@import]/[@namespace]
+    (hoisted separately, above) and dropped [@charset] do. A literal,
+    user-authored [@layer] at-rule (statement form, ["@layer a, b;"], or block
+    form, ["@layer name { ... }"]) stays there too, for a different reason: a
+    layer's priority is fixed by its name's first occurrence across the whole
+    page (see [is_import_statement]'s doc), so reordering it relative to the
+    style rules around it - even without wrapping anything in a layer of our own
+    \- risks changing which layer it introduces first on the page. Checked on
     the OUTERMOST at-rule name only - a [%styled.global] rule wrapped in its own
     [@media]/[@supports] still starts with that wrapper, never with one of these
     four names, so this is an exact, not just a heuristic, test. *)
-let stays_outside_all_layers rule_text =
+let is_registration_rule rule_text =
   let trimmed = String.trim rule_text in
   String.starts_with ~prefix:"@property" trimmed
   || String.starts_with ~prefix:"@keyframes" trimmed
@@ -1003,98 +936,13 @@ let compare_descendant_first_then_depth (is_descendant_a, depth_a, _)
     of re-parsing its text on every comparison a stable sort makes. *)
 let sort_by_shorthand_first rules =
   rules
-  |> List.map (fun ((rule_text, _layer) as r) ->
-    is_descendant_shape rule_text, rule_depth rule_text, r)
+  |> List.map (fun rule_text ->
+    is_descendant_shape rule_text, rule_depth rule_text, rule_text)
   |> List.stable_sort compare_descendant_first_then_depth
   |> List.map (fun (_, _, r) -> r)
 
-(** Bucket [rules] by library key, preserving each library's own original
-    relative order - the raw grouping {!emit_library_layers} calls once per rule
-    GROUP it is given (e.g. [[base_rules; conditional_rules]] for
-    [styled-ppx.atoms], so each library's nested block there can hold its own
-    base rules, then conditional, in that order). Does NOT itself warn about a
-    sanitized-name collision (two keys reducing to the same layer name): the
-    caller does that once, on the union across every group it was given, not per
-    group - two keys that never share a single group's rules could still collide
-    once combined into one CSS layer. *)
-let bucket_by_library (rules : (string * string) list) =
-  let rules_by_library : (string, (string * string) list ref) Hashtbl.t =
-    Hashtbl.create 16
-  in
-  List.iter
-    (fun ((_, key) as rule) ->
-      match Hashtbl.find_opt rules_by_library key with
-      | Some acc -> acc := rule :: !acc
-      | None -> Hashtbl.add rules_by_library key (ref [ rule ]))
-    rules;
-  rules_by_library
-
-(** One library's own rules from a {!bucket_by_library} table, in original order
-    \- [[]] for a library with no rule in this particular group. *)
-let rules_of_library rules_by_library key =
-  match Hashtbl.find_opt rules_by_library key with
-  | None -> []
-  | Some acc -> List.rev !acc
-
-(** Render the nested [\@layer lib1, lib2; \@layer lib1 { ... } ...] sequence
-    for one CSS layer's contents, appended to [buffer]: one
-    [\@layer lib1, lib2, ...;] statement listing the dependency-ordered union of
-    every library with a rule in ANY of [rule_groups], then one nested
-    [\@layer <lib> { ... }] block per library holding THAT library's own rules
-    from each group in [rule_groups]'s own order (each independently sorted by
-    {!sort_by_shorthand_first}) - called once for [styled-ppx.global]'s own
-    rules (a single-element group list) and once for [styled-ppx.atoms]'s (base
-    then conditional, preserving tier order WITHIN one library's own block the
-    same way the un-layered case does, see {!run}).
-
-    Library order does NOT hold ACROSS tiers OR across the two `styled-ppx`
-    layers - nesting each library in its own CSS layer gives library dependency
-    order unconditional priority over specificity between two DIFFERENT
-    libraries' rules within the SAME `styled-ppx` layer, exactly what [--layers]
-    has always meant, a different, pre-existing tradeoff from (and unaffected
-    by) round 7b's fix for cross-tier specificity within `styled-ppx.atoms`, or
-    the global-vs-atoms layer priority. *)
-let emit_library_layers ~buffer ~separator ~minify ~library_order ~emit
-  rule_groups =
-  let buckets = List.map bucket_by_library rule_groups in
-  let has_a_rule key = List.exists (fun b -> Hashtbl.mem b key) buckets in
-  let layer_names =
-    library_order
-    |> List.filter has_a_rule
-    |> List.map (fun key -> key, sanitize_layer_name key)
-  in
-  warn_layer_name_collisions layer_names;
-  Logger.info "layers: %s" (String.concat ", " (List.map snd layer_names));
-  let layer_statement =
-    let seen = Hashtbl.create (List.length layer_names) in
-    List.filter_map
-      (fun (_, name) ->
-        if Hashtbl.mem seen name then None
-        else begin
-          Hashtbl.add seen name ();
-          Some name
-        end)
-      layer_names
-    |> String.concat ", "
-  in
-  Buffer.add_string buffer (Printf.sprintf "@layer %s;" layer_statement);
-  Buffer.add_string buffer separator;
-  List.iter
-    (fun (key, name) ->
-      Buffer.add_string buffer
-        (if minify then Printf.sprintf "@layer %s{" name
-         else Printf.sprintf "@layer %s {" name);
-      Buffer.add_string buffer separator;
-      List.iter
-        (fun bucket ->
-          List.iter emit (sort_by_shorthand_first (rules_of_library bucket key)))
-        buckets;
-      Buffer.add_string buffer "}";
-      Buffer.add_string buffer separator)
-    layer_names
-
 (** Collect, index, resolve, dedup, output. *)
-let run ~output_file ~order ~layers input_files =
+let run ~output_file ~order input_files =
   Logger.info "output file: %s"
     (match output_file with Some file -> file | None -> "stdout");
   let idx = Index.create () in
@@ -1109,10 +957,10 @@ let run ~output_file ~order ~layers input_files =
         | Some structure -> Some (extract_structure ~filename ~idx structure))
       input_files
   in
-  let inputs, library_order =
+  let inputs =
     match order with
     | Dependency -> order_by_dependency inputs
-    | Source -> inputs, []
+    | Source -> inputs
   in
 
   (* Resolve all rules across all inputs, collecting errors with locations. *)
@@ -1122,7 +970,6 @@ let run ~output_file ~order ~layers input_files =
   let resolved_rules = ref [] in
   List.iter
     (fun input ->
-      let input_layer = group_key input in
       List.iter
         (fun rule ->
           let on_error longident =
@@ -1158,7 +1005,7 @@ let run ~output_file ~order ~layers input_files =
                comment, so @charset could never be the first bytes of the \
                stylesheet; output is UTF-8 regardless."
               input.filename
-          else resolved_rules := (resolved, input_layer) :: !resolved_rules)
+          else resolved_rules := resolved :: !resolved_rules)
         input.rules)
     inputs;
 
@@ -1188,7 +1035,7 @@ let run ~output_file ~order ~layers input_files =
   let ordered_rules =
     let seen = Hashtbl.create 64 in
     List.rev !resolved_rules
-    |> List.filter (fun (rule, _layer) ->
+    |> List.filter (fun rule ->
       if Hashtbl.mem seen rule then false
       else begin
         Hashtbl.add seen rule ();
@@ -1205,61 +1052,39 @@ let run ~output_file ~order ~layers input_files =
   (* [@import] before [@namespace] (Cascade 5), each preserving its own
      relative order; everything else, [@layer] statements included, stays in
      [other_rules] untouched. *)
-  let import_rules, rest =
-    List.partition
-      (fun (rule, _layer) -> is_import_statement rule)
-      ordered_rules
-  in
+  let import_rules, rest = List.partition is_import_statement ordered_rules in
   let namespace_rules, other_rules =
-    List.partition (fun (rule, _layer) -> is_namespace_statement rule) rest
+    List.partition is_namespace_statement rest
   in
   let statement_rules = import_rules @ namespace_rules in
 
-  (* Cascade tiers: split [other_rules] into what stays outside both
-     [styled-ppx] layers entirely ([@property]/[@keyframes]/[@font-face]
-     registrations and a literal [@layer] at-rule - see
-     [stays_outside_all_layers] - never atom-classed, and never style rules
-     that compete for an element either) and what goes INSIDE one of them -
-     a [%styled.global] style rule, ALSO never atom-classed but a real,
-     cascading rule (`html{...}`, `*{...}`, `*::before{...}`, an author's
-     own global selector), is [global], its own SEPARATE, LOWER
-     `styled-ppx.global` layer; every real atom, [_a_] or [_in_] alike, is
-     [base] or [conditional], both sharing the ONE, higher
-     `styled-ppx.atoms` layer, ordered inside it by tier (base first, then
-     conditional) - no separate [descendant] tier, see [rule_tier]'s doc for
-     why round 5 removed it (a descendant-shaped rule stays in the tier of
-     its own context instead, and {!sort_by_shorthand_first} orders it
-     before own-element rules within that tier). Global rules MUST be
-     layered, not left outside like registrations: CSS lets an unlayered
-     normal declaration beat ANY layered one regardless of specificity, so
-     leaving globals unlayered while atoms are layered would let a
-     `[%styled.global]` default (`*{box-sizing:inherit}`, a global
-     `a{color:blue}`) beat an atom on the same element, `!important`
-     aside - the exact regression round 7's tiers were almost shipped
-     with. Giving global its OWN, lower layer (rather than folding it into
-     `styled-ppx.atoms` too) is a deliberate, separate decision from round
-     7b's fix - an element's own atom must always beat a global default
-     regardless of specificity, which needs global in a genuinely
-     LOWER-PRIORITY layer, not merely emitted first within a shared one
-     (unlike `base` vs `conditional`, where round 7b found specificity
-     itself needed restoring - see "Cascade tiers" above). *)
+  (* Cascade tiers: split [other_rules] into what takes no part in tiering
+     ([@property]/[@keyframes]/[@font-face] registrations and a literal
+     [@layer] at-rule - see [is_registration_rule] - never atom-classed, and
+     never style rules that compete for an element either) and what does - a
+     [%styled.global] style rule, ALSO never atom-classed but a real,
+     cascading rule (`html{...}`, `*{...}`, `*::before{...}`, an author's own
+     global selector), is [global]; every real atom, [_a_] or [_in_] alike,
+     is [base] or [conditional] (no separate [descendant] tier - see
+     [rule_tier]'s doc for why round 5 removed it: a descendant-shaped rule
+     stays in the tier of its own context instead, and
+     {!sort_by_shorthand_first} orders it before own-element rules within
+     that tier). Emission order below is [global], then [base], then
+     [conditional] - each group independently sorted by
+     {!sort_by_shorthand_first} - with no CSS layer around any of them:
+     specificity decides first, exactly as in plain CSS, position only as
+     the tie-break (see "Cascade tiers" above for the accepted
+     consequences). *)
   let registrations, atomless_style_rules =
-    List.partition
-      (fun (rule, _layer) -> stays_outside_all_layers rule)
-      other_rules
+    List.partition is_registration_rule other_rules
   in
   let global_rules, tier_eligible_rules =
     List.partition
-      (fun (rule, _layer) -> atom_class_name rule = None)
+      (fun rule -> atom_class_name rule = None)
       atomless_style_rules
   in
   let base_rules, conditional_rules =
-    List.partition
-      (fun (rule, _layer) -> rule_tier rule = Base)
-      tier_eligible_rules
-  in
-  let any_tiered =
-    global_rules <> [] || base_rules <> [] || conditional_rules <> []
+    List.partition (fun rule -> rule_tier rule = Base) tier_eligible_rules
   in
 
   let minify = production_mode inputs in
@@ -1270,56 +1095,15 @@ let run ~output_file ~order ~layers input_files =
     let buffer = Buffer.create 1024 in
     Buffer.add_string buffer
       "/* This file is generated by styled-ppx, do not edit manually */\n";
-    let emit (rule, _layer) =
+    let emit rule =
       Buffer.add_string buffer rule;
       Buffer.add_string buffer separator
     in
     List.iter emit statement_rules;
     List.iter emit registrations;
-    if any_tiered then begin
-      (* Two named layers, `global` declared first (lower priority for
-         normal declarations; HIGHER for `!important` ones, since CSS
-         reverses layer priority there - see "Cascade tiers" above).
-         Unconditional whenever this sheet ships any tiered rule at all,
-         regardless of whether one of the two is locally empty: two
-         different generate.ml outputs loaded on the same page share these
-         two layer names, and CSS layer order is fixed by each name's FIRST
-         occurrence across every stylesheet on the page - omitting an empty
-         one from either sheet's own statement would let load order flip
-         which one wins. Within `styled-ppx.atoms`, tier order (base, then
-         conditional) is expressed purely by EMISSION POSITION, each group
-         independently sorted by {!sort_by_shorthand_first} - not by two
-         separate layers, so specificity between a `base` and a
-         `conditional` rule is compared normally by the browser instead of
-         being overridden by layer priority (round 7b's fix). *)
-      Buffer.add_string buffer
-        (Printf.sprintf "@layer %s, %s;" global_layer_name atoms_layer_name);
-      Buffer.add_string buffer separator;
-      (* [rule_groups] is emitted in ITS OWN given order, each group
-         independently sorted - a single-element list for
-         `styled-ppx.global` (nothing to order against), [base_rules;
-         conditional_rules] for `styled-ppx.atoms` (tier order). A layer
-         with no rule across every group gets no block at all - the
-         statement above already reserved its position in the layer
-         order, so an empty block would add nothing. *)
-      let emit_layer name rule_groups =
-        if List.exists (fun rules -> rules <> []) rule_groups then begin
-          Buffer.add_string buffer
-            (if minify then Printf.sprintf "@layer %s{" name
-             else Printf.sprintf "@layer %s {" name);
-          Buffer.add_string buffer separator;
-          if not layers then
-            List.iter emit (List.concat_map sort_by_shorthand_first rule_groups)
-          else
-            emit_library_layers ~buffer ~separator ~minify ~library_order ~emit
-              rule_groups;
-          Buffer.add_string buffer "}";
-          Buffer.add_string buffer separator
-        end
-      in
-      emit_layer global_layer_name [ global_rules ];
-      emit_layer atoms_layer_name [ base_rules; conditional_rules ]
-    end;
+    List.iter emit (sort_by_shorthand_first global_rules);
+    List.iter emit (sort_by_shorthand_first base_rules);
+    List.iter emit (sort_by_shorthand_first conditional_rules);
     Buffer.contents buffer
   in
   Logger.debug "stylesheet:\n%s" stylesheet;
@@ -1333,14 +1117,14 @@ let run ~output_file ~order ~layers input_files =
     the [[@@@css.config]] attributes the PPX embeds in its input files, so the
     environment is declared exactly once, on the (pps styled-ppx ...) stanza. *)
 let parse_args args =
-  let rec parse acc ~output_file ~log_level ~order ~layers = function
+  let rec parse acc ~output_file ~log_level ~order = function
     | "-o" :: file :: rest
     | "-output" :: file :: rest
     | "--output" :: file :: rest ->
-      parse acc ~output_file:(Some file) ~log_level ~order ~layers rest
+      parse acc ~output_file:(Some file) ~log_level ~order rest
     | "--log" :: level :: rest ->
       (match Logger.level_of_string level with
-      | Some log_level -> parse acc ~output_file ~log_level ~order ~layers rest
+      | Some log_level -> parse acc ~output_file ~log_level ~order rest
       | None ->
         Logger.error
           "invalid --log level %S (expected \"error\", \"warning\", \"info\" \
@@ -1348,40 +1132,28 @@ let parse_args args =
           level;
         exit 2)
     | "--debug" :: rest ->
-      parse acc ~output_file ~log_level:Logger.Debug ~order ~layers rest
+      parse acc ~output_file ~log_level:Logger.Debug ~order rest
     | "--order" :: "dependency" :: rest ->
-      parse acc ~output_file ~log_level ~order:Dependency ~layers rest
+      parse acc ~output_file ~log_level ~order:Dependency rest
     | "--order" :: "source" :: rest ->
-      parse acc ~output_file ~log_level ~order:Source ~layers rest
+      parse acc ~output_file ~log_level ~order:Source rest
     | "--order" :: mode :: _ ->
       Logger.error
         "invalid --order value %S (expected \"dependency\" or \"source\")" mode;
       exit 2
-    | "--layers" :: rest ->
-      parse acc ~output_file ~log_level ~order ~layers:true rest
     | [ (("-o" | "-output" | "--output" | "--log" | "--order") as flag) ] ->
       Logger.error "missing value for flag %S" flag;
       exit 2
     | arg :: _ when String.length arg > 0 && arg.[0] = '-' ->
       Logger.error "unknown flag %S" arg;
       exit 2
-    | arg :: rest ->
-      parse (arg :: acc) ~output_file ~log_level ~order ~layers rest
-    | [] -> List.rev acc, output_file, log_level, order, layers
+    | arg :: rest -> parse (arg :: acc) ~output_file ~log_level ~order rest
+    | [] -> List.rev acc, output_file, log_level, order
   in
   let tail = match Array.to_list args with [] -> [] | _ :: t -> t in
-  parse [] ~output_file:None ~log_level:Logger.Warning ~order:Dependency
-    ~layers:false tail
+  parse [] ~output_file:None ~log_level:Logger.Warning ~order:Dependency tail
 
 let () =
-  let input_files, output_file, log_level, order, layers =
-    parse_args Sys.argv
-  in
-  if layers && order = Source then begin
-    Logger.error
-      "--layers requires --order dependency: source order has no library \
-       groups to layer";
-    exit 2
-  end;
+  let input_files, output_file, log_level, order = parse_args Sys.argv in
   Logger.set_level log_level;
-  run ~output_file ~order ~layers input_files
+  run ~output_file ~order input_files
