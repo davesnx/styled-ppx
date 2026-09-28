@@ -784,6 +784,10 @@ Two consequences worth knowing:
 
 ## CSS.merge
 
+See `documents/how-merging-works.md` for the user-facing version of this
+section (the promise, worked examples, and the known limits, without the
+implementation detail below).
+
 `CSS.merge(a, b)` drops a class of `a` when a class of `b` covers the
 same slot - same context, same property family, and `a`'s longhands a
 subset of `b`'s - so the winner is decided by the merge call's own
@@ -947,6 +951,8 @@ actually drops.
 
 ## See also
 
+- `documents/how-merging-works.md` — `CSS.merge`, sheet order, and
+  `--namespace`, for library users
 - `documents/design.md` — overall CSS pipeline (parsing, validation,
   generation) and the `[%styled.global]` / selector-interpolation
   design in depth
