@@ -771,13 +771,21 @@ selector/at-rule, or when the declaration carries `!important` - see
 append-only table, an optional mask of which of the family's longhands
 this atom covers, and a short value hash unique only within that
 (context, family[, mask]) bucket - not globally, which is what lets it
-be short. `styled-ppx.generate` checks that uniqueness (see the atom
-class collision check under "Dedup and write" above). The binding's
-`let` name never appears in the class name either way; two bindings
-whose declarations render to the same CSS text in the same context mint
-the same class, dev or production. Minting lives in
-`packages/ppx/src/Hash_class.ml` (`Class_format.slot_class`); the
-`(context, family, mask)` triple comes from `packages/ppx/slot_key`.
+be short. The value hash is computed over the rendered declaration
+salted with `--namespace` (see "Identity classes" below - the same flag,
+defaulting the same way, now salts atom and bundle classes too, not just
+identities): two libraries with different namespaces never share an
+atom class for the same declaration, even byte-identical, so one
+library's stylesheet position can never decide a tie against another
+library's own override of it. `styled-ppx.generate` checks the
+per-bucket uniqueness this leaves (see the atom class collision check
+under "Dedup and write" above). The binding's `let` name never appears
+in the class name either way; two bindings whose declarations render to
+the same CSS text in the same context AND namespace mint the same
+class, dev or production. Minting lives in `packages/ppx/src/Hash_class.ml`
+(`Class_format.slot_class`); the `(context, family, mask)` triple comes
+from `packages/ppx/slot_key` and is never itself salted - only the value
+field's hash input is.
 An alias (`grid-row-gap` for `row-gap`, one of two legs of `gap`) resolves
 to its canonical name before its mask is computed too, the same redirect
 `Slot_key.depth_of` already does for sort order (see "Cascade tiers"
@@ -808,7 +816,10 @@ otherwise need separate custom-property namespaces for what is often the
 same value reused across `base`/`:hover`/`@media` variants. A bundle's own
 `var(--...)` target is unaffected by which prefix its class carries,
 since only the CLASS half of `Hash_class.class_and_namespace` differs
-between the two cases, never the namespace/variable-naming half. The
+between the two cases, never the namespace/variable-naming half - and
+that CLASS half is salted with `--namespace` exactly like a real atom's
+value field (`Hash_class.bundle_class_and_namespace`), so two libraries
+never share a bundle class either. The
 `_in_` prefix lets `CSS.merge` (see below) recognize a bundle atom and
 never drop it or let it drop another atom, and lets
 `styled-ppx.generate`'s atom-class collision check ("Dedup and write"
@@ -923,10 +934,11 @@ first among the atoms in the className string (after the `label:<binding>`
 dev marker, when present): `label:<binding> _id_<hash> _a_<hash> ...`.
 
 **Inputs**, joined with `\0` and murmur2-hashed: the `--namespace` flag
-value (empty by default), the compilation-unit module name (the source
+value (see below), the compilation-unit module name (the source
 file's basename, capitalized — never a physical path or dune library
 name, so a module compiled twice under different paths, e.g. a native
-and a Melange build via `copy_files`, mints the same identity), the
+and a Melange build via `copy_files`, mints the same identity when both
+share a namespace), the
 enclosing submodule path, the binding name (or `[%styled.<tag>]` module
 name), and an occurrence index — folded in only when a
 `(scope, name)` pair repeats within one compilation unit (e.g. two
@@ -939,13 +951,27 @@ inside them is lowered), so the css under it takes the enclosing user
 binding's name for its label, dev marker and identity
 (`packages/ppx/test/css-support/styles-optional-className.t`).
 
-**`--namespace <string>`** is a PPX flag, mixed into every identity hash
-in the same library-wide way as `--dev`/`--minify`. Two libraries whose
-modules happen to share a basename and binding name would otherwise mint
-colliding identities; passing each library a distinct `--namespace`
-(identically on its native and Melange `(pps styled-ppx ...)` stanzas)
-tells them apart. See "Identity collision" under Resolve for what
-happens when they aren't.
+**`--namespace=<string>`** is a PPX flag, mixed into every identity
+(`_id_`), atom (`_a_`) and bundle (`_in_`) class hash in the same
+library-wide way as `--dev`/`--minify` (see "Atomization" above). In a
+dune `(pps ...)` list write it as one token, `--namespace=<string>`:
+dune reads a separate value token as a PPX library name. It defaults to the dune `library-name` cookie
+(`Settings.Get.namespace`, `packages/ppx/src/settings.re`) - the same
+cookie `[@@@css.config]`'s `library-name` entry already carries - so
+each dune library salts its own classes with no flag needed, and never
+collides with another library's byte-identical declaration on a page
+that links both (see "Class names" above). With neither the cookie nor
+the flag (e.g. the standalone driver run with no `-cookie`, as every
+css-support cram test does), the namespace is empty and adds nothing to
+the hash input. An explicit `--namespace` overrides the
+cookie: pass one shared value to both a native library and its Melange
+twin's `(pps styled-ppx ...)` stanzas (`copy_files` gives them different
+dune library names by default) so they keep minting identical atom and
+identity classes; pass two libraries with no dune cookie distinct
+values to tell them apart the way this flag always has
+(`packages/ppx/test/css-support/atom-namespace-twin.t`,
+`identity-library-namespace.t`). See "Identity collision" under Resolve
+for what happens when two libraries collide anyway.
 
 **Empty markers.** A named binding with no declarations (`let m = [%css
 {||}]`) still mints an identity — its `class_string` is `""` and no

@@ -42,7 +42,7 @@ let env = {
 
 let namespace = {
   flag: "--namespace",
-  doc: "Mixed into every binding's identity class hash. Empty by default, so a library's native and melange builds mint the same `id-` classes. Pass distinct values to two libraries that share a module basename and binding name, so their `id-` classes differ.",
+  doc: "Mixed into every atom (`_a_`), bundle (`_in_`) and identity (`_id_`) class hash, so the same declaration in two libraries mints two different classes and never collides on a page that links both. Defaults to the dune `library-name` cookie (empty when neither the cookie nor this flag is present, e.g. the standalone driver with no `-cookie`). Pass an explicit value to override the cookie: give a native library and its melange twin the SAME value in both stanzas so they keep minting identical classes, or give two libraries with no dune cookie distinct values so their classes differ.",
   value: None,
   defaultValue: "",
 };
@@ -84,9 +84,19 @@ module Get = {
     currentSettings.contents.dev.value
     |> Option.value(~default=currentSettings.contents.dev.defaultValue);
   let library = () => currentSettings.contents.library;
+  /* An explicit `--namespace` always wins; absent that, default to the dune
+     `library-name` cookie (so each library salts its own classes without a
+     flag); absent both, the empty default (e.g. the standalone driver run
+     with no `-cookie`, as every css-support cram test does). */
   let namespace = () =>
-    currentSettings.contents.namespace.value
-    |> Option.value(~default=currentSettings.contents.namespace.defaultValue);
+    switch (currentSettings.contents.namespace.value) {
+    | Some(value) => value
+    | None =>
+      switch (currentSettings.contents.library) {
+      | Some(name) => name
+      | None => currentSettings.contents.namespace.defaultValue
+      }
+    };
 };
 
 module Update = {
