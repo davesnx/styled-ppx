@@ -972,6 +972,646 @@ module Css_transform = {
     |> List.concat;
   };
 
+  /* Media condition ordering (StyleX's `lastMediaQueryWinsTransform`).
+     Within one block, when 2+ sibling `@media` at-rules set the same
+     property family under the same selector target, plain CSS gives the
+     tie at equal specificity to stylesheet POSITION, not source order -
+     and `generate` dedupes byte-identical rules by first sighting, so two
+     blocks writing the same two conditions in opposite order silently
+     collapse onto whichever block the aggregator saw first (see
+     `media-order-dedup-flip.t`). Rewriting each earlier condition to
+     exclude every later one makes the group pairwise disjoint, so at most
+     one ever applies and "last written wins" holds regardless of
+     stylesheet position or which other block already emitted the same
+     rule. Runs here, before `atomize_rules` hashes each atom's rendered
+     text, so the REWRITTEN condition is what ends up in the class name.
+
+     Scope, matching StyleX exactly: `@media` only - `@supports`/
+     `@container` are left alone by construction (`media_atom_slot` only
+     classifies `At_rule` nodes named "media"). A prelude this can't
+     confidently classify (further nesting, a block mixing more than one
+     property family, an interpolated condition - rejected later anyway,
+     see `media-query-interpolation-error.t`) is left untouched rather
+     than guessed at: this pass is an ordering optimization, not a
+     validity check. */
+
+  /* One `@media` at-rule's (selector, family, important) - the same
+     grouping question `CSS.merge` (`Slot_key.removes`) already asks of
+     two atoms ("do these compete for the same spot"), minus the at-rule
+     chain itself (exactly the part a group's members are allowed to
+     differ on - that's the thing being rewritten). `None` when the
+     at-rule's own content doesn't reduce to one clean (target, family)
+     unit, e.g. two unrelated properties or a nested at-rule - see the
+     scope note above. */
+  let media_atom_slot = (at_rule: at_rule): option(Slot_key.t) => {
+    let inner_rules =
+      switch (at_rule.block) {
+      | Rule_list((rules, _))
+      | Stylesheet((rules, _)) => rules
+      | Empty => []
+      };
+    switch (group_declarations_by_family(inner_rules)) {
+    | [Declaration_group(decls)] =>
+      let synthetic =
+        switch (decls) {
+        | [d] => Declaration(d)
+        | decls =>
+          Style_rule({
+            prelude: (
+              [(SimpleSelector(Ampersand), Ppxlib.Location.none)],
+              Ppxlib.Location.none,
+            ),
+            block: (
+              List.map(d => Declaration(d), decls),
+              Ppxlib.Location.none,
+            ),
+            loc: Ppxlib.Location.none,
+          })
+        };
+      Slot_key.of_atom(synthetic);
+    | [Nested_rule(Style_rule(_) as sr)] => Slot_key.of_atom(sr)
+    | _ => None /* mixed families or further nesting: left alone, see above */
+    };
+  };
+
+  /* Same trim `Selector_nesting` already uses for a media prelude
+     (`join_media`). */
+  let drop_leading_whitespace = Styled_ppx_css_parser.Selector_nesting.trim_left;
+  let trim_whitespace = tokens =>
+    tokens
+    |> Styled_ppx_css_parser.Selector_nesting.trim_left
+    |> Styled_ppx_css_parser.Selector_nesting.trim_right;
+
+  /* `tokens` split on top-level commas (an MQ4 query list is CSS's `or`).
+     A comma nested inside a `Paren_block`/`Function` is already part of
+     that token's own sub-list, never visible here - the parser has
+     already done the depth tracking, so this needs none of its own. */
+  let split_top_level_commas =
+      (tokens: component_value_list): list(component_value_list) => {
+    let (branches, current) =
+      List.fold_left(
+        ((branches, current), (cv, _loc) as tok) =>
+          switch (cv) {
+          | Delim(Delimiter_comma) => (
+              [List.rev(current), ...branches],
+              [],
+            )
+          | _ => (branches, [tok, ...current])
+          },
+        ([], []),
+        tokens,
+      );
+    List.rev([List.rev(current), ...branches]) |> List.map(trim_whitespace);
+  };
+
+  /* True when one OR-branch (one comma-separated alternative) carries a
+     leading media-type keyword (`screen`, `print`, `all`, ...), optionally
+     itself prefixed by `not`/`only` - the `<media-query>`
+     `['not'|'only']? <media-type> ['and' ...]?` production, as opposed to a
+     bare `<media-condition>` (an and/or-chain of parenthesized features,
+     optionally `not`-prefixed). A media type can never be wrapped in
+     parentheses (`<media-in-parens>` only ever contains a
+     `<media-condition>`, and a media type is not one), so a query built
+     this way cannot be turned into a `(not (...))` AND-term at all -
+     negating it correctly would need the OUTER, per-query `not`/`only`
+     toggle instead, a different mechanism this pass does not implement.
+     Conservative default (anything that isn't clearly a parenthesized
+     condition counts as "has a media type") so an unrecognized shape is
+     excluded rather than mishandled - see `rewrite_media_prelude_siblings`,
+     which drops any candidate with a `true` branch here entirely, matching
+     `media-type-query-unchanged.t`. */
+  let branch_has_media_type = (branch: component_value_list): bool => {
+    let skip_leading_not_or_only = tokens =>
+      switch (tokens) {
+      | [(Ident(name), _), ...rest]
+          when
+            String.lowercase_ascii(name) == "not"
+            || String.lowercase_ascii(name) == "only" =>
+        drop_leading_whitespace(rest)
+      | tokens => tokens
+      };
+    switch (skip_leading_not_or_only(drop_leading_whitespace(branch))) {
+    | [(Paren_block(_), _), ..._] => false
+    | [] => false
+    | _ => true
+    };
+  };
+
+  /* `<mf-name>`s whose range test every supported browser resolves to a
+     plain, definite true/false - never CSS's third ("unknown") truth
+     value - for a literal `px`/`em`/`rem` length. */
+  let is_safe_range_feature_name = name =>
+    switch (String.lowercase_ascii(name)) {
+    | "min-width"
+    | "max-width"
+    | "min-height"
+    | "max-height" => true
+    | _ => false
+    };
+
+  let is_safe_length_unit = unit =>
+    switch (String.lowercase_ascii(unit)) {
+    | "px"
+    | "em"
+    | "rem" => true
+    | _ => false
+    };
+
+  /* Contents of ONE `Paren_block` - true only for the two shapes every
+     supported browser resolves to a definite true/false: `<safe-name>:
+     <literal px/em/rem length>`, or `orientation: landscape|portrait`.
+     Anything else (`calc()`, a percentage, a range comparison, a boolean
+     feature) is NOT safe to negate - see `query_is_negation_safe`. */
+  let paren_contents_is_safe_feature = (contents: component_value_list): bool =>
+    switch (List.filter(((cv, _)) => cv != Whitespace, contents)) {
+    | [
+        (Ident(name), _),
+        (Delim(Delimiter_colon), _),
+        (Dimension({ unit, _ }), _),
+      ] =>
+      is_safe_range_feature_name(name) && is_safe_length_unit(unit)
+    | [(Ident(name), _), (Delim(Delimiter_colon), _), (Ident(value), _)]
+        when String.lowercase_ascii(name) == "orientation" =>
+      switch (String.lowercase_ascii(value)) {
+      | "landscape"
+      | "portrait" => true
+      | _ => false
+      }
+    | _ => false
+    };
+
+  /* True when every feature test in this query (one full `@media`
+     prelude, already known to carry no media type) is one of the two
+     safe shapes above, so the query only ever resolves to a definite
+     true/false - never "unknown". Matters for a query used as a
+     NEGATION SOURCE (the `<later>` in `and (not (<later>))`):
+     three-valued media-feature logic means `not unknown` is itself
+     `unknown`, and `true and unknown` is `unknown`, not `false` - so
+     negating an "unknown"-capable later query can turn an EARLIER rule
+     that used to apply unconditionally into one that never applies
+     again. `min-width: calc(1000px - 2%)` mixes an absolute length with
+     a percentage, not a valid `<length>` in a media feature; the
+     browser resolves it, and its negation, to permanently `false` -
+     not `true`, the way negating an ordinary `false` would - see
+     `media-calc-feature-unchanged.t`, which shows the computed-style
+     loss this would otherwise cause.
+
+     Checked per OR-branch (an unsafe feature anywhere in any branch
+     makes the whole query unsafe - De Morgan negates every branch), after
+     stripping an optional leading condition-level `not` (already known
+     absent a media type, so every remaining top-level token is a
+     `Paren_block`, the `and` keyword, or whitespace). Shared with the
+     same-type-prefix path below (`split_type_prefix_and_chain`), whose
+     own chain (after the shared type prefix + its own leading `and`) has
+     exactly this same shape and the exact same "unknown" risk. */
+  let chain_is_negation_safe = (tokens: component_value_list): bool =>
+    tokens
+    |> List.for_all(((cv, _)) =>
+         switch (cv) {
+         | Paren_block(inner) => paren_contents_is_safe_feature(inner)
+         | Ident(kw) when String.lowercase_ascii(kw) == "and" => true
+         | Whitespace => true
+         | _ => false
+         }
+       );
+
+  let query_is_negation_safe = (prelude: component_value_list): bool =>
+    split_top_level_commas(prelude)
+    |> List.for_all(branch => {
+         let checked =
+           switch (branch) {
+           | [(Ident(name), _), ...rest]
+               when String.lowercase_ascii(name) == "not" => rest
+           | branch => branch
+           };
+         chain_is_negation_safe(checked);
+       });
+
+  /* The four media types Media Queries 4 still defines (`tty`/`tv`/
+     `projection`/`handheld`/`braille`/`embossed`/`aural` were removed
+     from the spec) - unlike a feature's VALUE, a media type test is
+     never partially-supported or invalid, so recognizing one carries
+     none of `query_is_negation_safe`'s "unknown" risk; the reason it is
+     handled separately at all is purely syntactic (`branch_has_media_type`'s
+     doc: a type can never be wrapped in parentheses). */
+  let is_recognized_media_type = name =>
+    switch (String.lowercase_ascii(name)) {
+    | "all"
+    | "print"
+    | "screen"
+    | "speech" => true
+    | _ => false
+    };
+
+  /* Splits one type-bearing, single OR-branch (`branch_has_media_type`
+     already true for it) into (a comparison key for its exact type
+     prefix, the feature-chain tokens after its own `'and'`) - `None` when
+     the leading idents aren't exactly one recognized type (bare, or
+     `only`-prefixed), or when there is no `and <chain>` to fold a
+     negation into (a bare `@media screen` has no feature condition -
+     `branch_has_media_type`'s "no correct form" reasoning again).
+
+     A `not`-prefixed type is explicitly EXCLUDED (`words` containing
+     "not" always returns `None`), unlike `only` - `not` negates the
+     WHOLE query (type and condition together, per spec), so `not screen
+     and (A) and (not (B))` does NOT reduce to "A-but-not-B" the way the
+     bare-type case does: De Morgan turns the leading `not` into an OR
+     across the whole expression, so the appended `(not (B))` term ends
+     up OR'd at the top level instead of scoped inside the original AND,
+     so the earlier rule fires in cases where neither original rule
+     should apply. `only` has no such problem (a no-op in every browser
+     that matters), so `only
+     screen and (A) and (not (B))` reduces exactly like the bare-type
+     case.
+
+     Two branches with the SAME key (`rewrite_media_prelude_siblings`
+     groups on it) share the exact same `only`/type combination, so
+     appending `and (not (<other's chain>))` after EITHER's own chain
+     stays a single, valid `<media-condition-without-or>` for that shared
+     type. */
+  let split_type_prefix_and_chain =
+      (branch: component_value_list)
+      : option((string, component_value_list, component_value_list)) => {
+    let rec collect = (words, prefix_toks, tokens) =>
+      switch (tokens) {
+      | [(Whitespace, _) as tok, ...rest] =>
+        collect(words, [tok, ...prefix_toks], rest)
+      | [(Ident(kw), _), ...rest] when String.lowercase_ascii(kw) == "and" =>
+        Some((words, List.rev(prefix_toks), drop_leading_whitespace(rest)))
+      | [(Ident(word), _) as tok, ...rest] =>
+        collect(
+          [String.lowercase_ascii(word), ...words],
+          [tok, ...prefix_toks],
+          rest,
+        )
+      | [] => Some((words, List.rev(prefix_toks), []))
+      | _ => None /* a Paren_block (or anything else) before any `and`:
+                     not a type prefix at all */
+      };
+    switch (collect([], [], branch)) {
+    | None => None
+    | Some((words_rev, prefix_toks, chain)) =>
+      let words = List.rev(words_rev);
+      let type_words = List.filter(w => w != "only", words);
+      switch (type_words, chain) {
+      | ([ty], [_, ..._])
+          when is_recognized_media_type(ty) && !List.mem("not", words) =>
+        Some((
+          String.concat(" ", words),
+          trim_whitespace(prefix_toks),
+          chain,
+        ))
+      | _ => None
+      };
+    };
+  };
+
+  /* `current`, made safe to extend with further ` and (...)` terms. Every
+     MQ4 shape except a bare, unwrapped `not <condition>` already is: a
+     single parenthesized feature or an `and`-chain of them is already a
+     `<media-and>`/`<media-in-parens>`, which the grammar lets grow with
+     more `and <media-in-parens>` terms directly. A bare `<media-not>` is
+     not - it has no `and`-continuation of its own - so wrap it in one
+     fresh pair of parens first, turning it into a `<media-in-parens>` (a
+     valid, if trivial, one-element and-chain) before anything is
+     appended. */
+  let ensure_and_chainable =
+      (branch: component_value_list): component_value_list =>
+    switch (branch) {
+    | [(Ident(name), _), ..._] when String.lowercase_ascii(name) == "not" => [
+        (Paren_block(branch), Ppxlib.Location.none),
+      ]
+    | branch => branch
+    };
+
+  /* The logical negation of one later OR-branch, as a term ready to append
+     directly after ` and ` (i.e. already a valid `<media-in-parens>` -
+     `branch_has_media_type` guarantees the branch itself is a bare
+     `<media-condition>`, never a media type, by the time this runs). Two
+     shapes:
+     - already `not <rest>`: double negation cancels - `rest` is whatever
+       the author originally wrapped the `not` around, already a valid
+       `<media-in-parens>` on its own (a `<media-not>`'s operand always is),
+       so it is reused verbatim with no extra wrap.
+     - anything else (one parenthesized feature, or an `and`-chain of
+       several): the negation is `not <that>`, which is a `<media-not>` -
+       itself a `<media-condition>`, not yet a `<media-in-parens>` - so the
+       WHOLE `not <that>` is wrapped in one fresh pair of parens:
+       `(not (min-width: 900px))`, or `(not ((min-width: 768px) and
+       (max-width: 1279px)))` when `<that>` is itself a multi-term chain
+       needing its own inner wrap first to become one `<media-in-parens>`
+       for `not` to apply to. */
+  let negate_as_and_term =
+      (branch: component_value_list): component_value_list => {
+    let loc =
+      switch (branch) {
+      | [(_, l), ..._] => l
+      | [] => Ppxlib.Location.none
+      };
+    switch (branch) {
+    | [(Ident(name), _), ...rest]
+        when String.lowercase_ascii(name) == "not" => [
+        (Paren_block(trim_whitespace(rest)), loc),
+      ]
+    | [(Paren_block(_), _) as single] => [
+        (
+          Paren_block([(Ident("not"), loc), (Whitespace, loc), single]),
+          loc,
+        ),
+      ]
+    | _ => [
+        (
+          Paren_block([
+            (Ident("not"), loc),
+            (Whitespace, loc),
+            (Paren_block(branch), loc),
+          ]),
+          loc,
+        ),
+      ]
+    };
+  };
+
+  let join_with_commas =
+      (branches: list(component_value_list)): component_value_list =>
+    switch (branches) {
+    | [] => []
+    | [first, ...rest] =>
+      List.fold_left(
+        (acc, branch) =>
+          acc
+          @ [
+            (Delim(Delimiter_comma), Ppxlib.Location.none),
+            (Whitespace, Ppxlib.Location.none),
+          ]
+          @ branch,
+        first,
+        rest,
+      )
+    };
+
+  let and_join = (a, b) =>
+    a
+    @ [
+      (Whitespace, Ppxlib.Location.none),
+      (Ident("and"), Ppxlib.Location.none),
+      (Whitespace, Ppxlib.Location.none),
+    ]
+    @ b;
+
+  /* `current AND (not later1) AND (not later2)...`, De Morgan-distributed
+     into every OR-branch of `current` independently (mirrors StyleX's
+     `combineMediaQueryWithNegations`, `~/.librarian/github.com/facebook/stylex`),
+     each negation wrapped in its own parens (`(not (...))`, never a bare
+     `and not (...)` - invalid MQ4, `not` only starts a whole condition).
+     `later` are the ORIGINAL (not previously rewritten) preludes of every
+     strictly-later group member - a 3+-way group chains against all of
+     them, not just its neighbor.
+
+     `~type_prefix`: for a same-type group (`split_type_prefix_and_chain`),
+     `current`/`later` are already just the shared-type members' own
+     feature chains (no comma, no type) - split/rejoin-by-comma is then a
+     no-op, so the same steps produce `<chain> and (not (...))...`, and
+     the untouched type prefix is prepended once at the end. */
+  let negate_prelude_chain =
+      (
+        ~type_prefix: option(component_value_list),
+        ~current: component_value_list,
+        ~later: list(component_value_list),
+      )
+      : component_value_list => {
+    let not_terms =
+      later
+      |> List.concat_map(prelude =>
+           split_top_level_commas(prelude) |> List.map(negate_as_and_term)
+         );
+    let negated =
+      current
+      |> split_top_level_commas
+      |> List.map(ensure_and_chainable)
+      |> List.map(branch => List.fold_left(and_join, branch, not_terms))
+      |> join_with_commas;
+    switch (type_prefix) {
+    | None => negated
+    | Some(prefix) => and_join(prefix, negated)
+    };
+  };
+
+  /* Stable grouping by structural key, first-seen order - `n` is always a
+     block's own at-rule count (small), so the linear scan per insert costs
+     nothing worth a hashtable for. */
+  let group_by_key = (key_of, items) => {
+    let groups = ref([]);
+    items
+    |> List.iter(item => {
+         let k = key_of(item);
+         switch (
+           List.find_opt(((existing_key, _)) => existing_key == k, groups^)
+         ) {
+         | Some((_, members)) => members := [item, ...members^]
+         | None => groups := groups^ @ [(k, ref([item]))]
+         };
+       });
+    groups^ |> List.map(((_, members)) => List.rev(members^));
+  };
+
+  /* `Plain`: no media type anywhere in the prelude (every OR-branch) - the
+     original, StyleX-equivalent path. `Typed`: a SINGLE branch (no
+     top-level comma) that is exactly `['not'|'only']? <type> 'and'
+     <chain>` for one recognized type (`screen` is by far the most common
+     in practice) - carries the comparison key (so only an EXACT same
+     `not`/`only`/type combination groups together, see
+     `split_type_prefix_and_chain`'s doc), the original prefix tokens (for
+     verbatim reuse) and the chain tokens (the only part ever negated). A
+     comma list mixing a typed and an untyped branch, or two different
+     types, classifies as neither and is excluded entirely (`None`) -
+     mixed or other types stay untouched. */
+  type media_kind =
+    | Plain
+    | Typed(string, component_value_list, component_value_list);
+
+  let classify_media_query =
+      (prelude: component_value_list): option(media_kind) =>
+    switch (split_top_level_commas(prelude)) {
+    | [branch] when !branch_has_media_type(branch) => Some(Plain)
+    | [branch] =>
+      switch (split_type_prefix_and_chain(branch)) {
+      | Some((key, prefix, chain)) => Some(Typed(key, prefix, chain))
+      | None => None
+      }
+    | branches =>
+      List.for_all(b => !branch_has_media_type(b), branches)
+        ? Some(Plain) : None
+    };
+
+  let media_kind_key = kind =>
+    switch (kind) {
+    | Plain => ""
+    | Typed(key, _, _) => "typed:" ++ key
+    };
+
+  /* What this member contributes if it is used as a LATER negation
+     source: `Plain`'s is its whole (possibly multi-branch) prelude,
+     fed to `negate_prelude_chain`'s own per-branch splitting; `Typed`'s
+     is just its chain (already known single-branch), fed straight to
+     `negate_as_and_term`. Same representation type either way
+     (`component_value_list`), so both the safety check and the "what do
+     later members contribute" step read uniformly below. */
+  let later_representation = (kind, prelude) =>
+    switch (kind) {
+    | Plain => prelude
+    | Typed(_, _, chain) => chain
+    };
+
+  let is_safe_as_later = (kind, repr) =>
+    switch (kind) {
+    | Plain => query_is_negation_safe(repr)
+    | Typed(_, _, _) => chain_is_negation_safe(repr)
+    };
+
+  /* One rule-list level (siblings): find every classifiable `@media`
+     at-rule, group by (target, family, !important, media_kind), and for
+     every group of 2+, rewrite every member but the last against every
+     strictly-later member's ORIGINAL prelude. Non-candidates (base
+     declarations, `@supports`/`@container`, unclassifiable `@media`,
+     singleton groups) pass through unchanged. */
+  let rewrite_media_prelude_siblings = (rules: list(rule)): list(rule) => {
+    let candidates =
+      rules
+      |> List.mapi((i, r) => (i, r))
+      |> List.filter_map(((i, r)) =>
+           switch (r) {
+           | At_rule({ name: (n, _), prelude, _ } as ar)
+               when
+                 String.lowercase_ascii(n) == "media"
+                 && !component_value_list_has_interpolation(fst(prelude)) =>
+             switch (
+               media_atom_slot(ar),
+               classify_media_query(fst(prelude)),
+             ) {
+             | (Some(slot), Some(kind)) => Some((i, ar, slot, kind))
+             | _ => None
+             }
+           | _ => None
+           }
+         );
+    let groups =
+      group_by_key(
+        ((_, _, slot: Slot_key.t, kind)) =>
+          (
+            slot.context.selector,
+            slot.context.important,
+            slot.family,
+            media_kind_key(kind),
+          ),
+        candidates,
+      );
+    let rewritten: Hashtbl.t(int, component_value_list) = Hashtbl.create(8);
+    groups
+    |> List.iter(members =>
+         switch (members) {
+         | []
+         | [_] => () /* nothing else in this (target, family, kind) to negate against */
+         | members =>
+           let reprs =
+             members
+             |> List.map(
+                  ((_, ar, _, kind): (int, at_rule, Slot_key.t, media_kind)) =>
+                  later_representation(kind, fst(ar.prelude))
+                );
+           let arr = Array.of_list(reprs);
+           let n = Array.length(arr);
+           /* Every member from index 1 on is a potential negation SOURCE
+              for some earlier member (index 0 is never negated - nothing
+              precedes it). If any of them can resolve to "unknown" (see
+              `query_is_negation_safe`'s doc), negating ANY member of this
+              group can turn an earlier, always-applying rule into one
+              that never applies: leave the WHOLE group untouched rather
+              than negate against the safe members only and silently
+              accept a narrower, harder-to-audit gap. */
+           let (_, _, _, group_kind) = List.hd(members);
+           let later_side_is_safe =
+             Array.to_list(Array.sub(arr, 1, n - 1))
+             |> List.for_all(repr => is_safe_as_later(group_kind, repr));
+           if (later_side_is_safe) {
+             members
+             |> List.iteri(
+                  (
+                    idx,
+                    (i, ar, _slot, kind): (
+                      int,
+                      at_rule,
+                      Slot_key.t,
+                      media_kind,
+                    ),
+                  ) =>
+                  if (idx < n - 1) {
+                    let later =
+                      Array.to_list(Array.sub(arr, idx + 1, n - idx - 1));
+                    let new_prelude =
+                      switch (kind) {
+                      | Plain =>
+                        negate_prelude_chain(
+                          ~type_prefix=None,
+                          ~current=fst(ar.prelude),
+                          ~later,
+                        )
+                      | Typed(_, prefix, chain) =>
+                        negate_prelude_chain(
+                          ~type_prefix=Some(prefix),
+                          ~current=chain,
+                          ~later,
+                        )
+                      };
+                    Hashtbl.replace(rewritten, i, new_prelude);
+                  }
+                );
+           };
+         }
+       );
+    rules
+    |> List.mapi((i, r) =>
+         switch (r, Hashtbl.find_opt(rewritten, i)) {
+         | (At_rule(ar), Some(new_prelude)) =>
+           At_rule({
+             ...ar,
+             prelude: (new_prelude, snd(ar.prelude)),
+           })
+         | _ => r
+         }
+       );
+  };
+
+  /* Applies the sibling rewrite at every nesting level independently
+     (mirrors StyleX's "a nested object gets its own independent
+     sibling-rewrite pass one depth down"): a `@media` block's own inner
+     rules, or a nested selector's block, can have their own sibling
+     `@media` groups one level deeper. */
+  let rec rewrite_media_conditions = (rules: list(rule)): list(rule) =>
+    rules
+    |> rewrite_media_prelude_siblings
+    |> List.map(recurse_media_children)
+  and recurse_media_children = (r: rule): rule =>
+    switch (r) {
+    | Declaration(_) => r
+    | Style_rule({ block: (inner, loc), _ } as sr) =>
+      Style_rule({
+        ...sr,
+        block: (rewrite_media_conditions(inner), loc),
+      })
+    | At_rule({ block: Rule_list((inner, loc)), _ } as ar) =>
+      At_rule({
+        ...ar,
+        block: Rule_list((rewrite_media_conditions(inner), loc)),
+      })
+    | At_rule({ block: Stylesheet((inner, loc)), _ } as ar) =>
+      At_rule({
+        ...ar,
+        block: Stylesheet((rewrite_media_conditions(inner), loc)),
+      })
+    | At_rule({ block: Empty, _ }) => r
+    };
+
   let atomize_rules =
       (~source_position_start, rules: list(rule))
       : list((string, string, rule)) => {
@@ -1310,8 +1950,13 @@ module Css_transform = {
        different binding in every file that uses it. */
     let selector_resolved_rules =
       List.map(resolve_rule_selectors(ctx), rules);
+    /* Media condition ordering (see `rewrite_media_conditions`'s own
+       doc): runs before `atomize_rules` so a rewritten `@media` condition
+       is what gets hashed into its atom's class name. */
+    let media_rewritten_rules =
+      rewrite_media_conditions(selector_resolved_rules);
     let atomic_rules =
-      atomize_rules(~source_position_start, selector_resolved_rules);
+      atomize_rules(~source_position_start, media_rewritten_rules);
 
     /* Selective atomization: of a block's SINGLETON interpolating atoms
        (`atom_has_value_interpolation` - a multi-declaration group from

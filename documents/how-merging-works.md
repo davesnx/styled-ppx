@@ -161,6 +161,37 @@ like plain CSS; sheet position is only ever the tie-break, never an
 unconditional priority. A hand-written selector with higher specificity
 than an atom still wins outright (`packages/generate/test/global-tier.t`).
 
+### Overlapping `@media` conditions in one block
+
+The grouping above decides ties BETWEEN rules; it says nothing about two
+`@media` rules for the same property inside the SAME block. Plain CSS
+would give that tie to stylesheet position too, not to which `@media`
+was written last - so extraction rewrites each earlier condition to
+exclude every later one on the same selector and property family
+(`packages/ppx/src/Css_file.re`'s `rewrite_media_conditions`), before
+the rule is hashed into a class:
+
+```css
+/* you write */
+@media (min-width: 600px) { color: red; }
+@media (min-width: 900px) { color: blue; }
+
+/* extracted */
+@media (min-width: 600px) and (not (min-width: 900px)) { color: red; }
+@media (min-width: 900px) { color: blue; }
+```
+
+The negation is always its own parenthesized term - `(not (...))` - never
+a bare `and not (...)`, which Media Queries 4 only allows at the very
+start of a condition; a browser resolves the bare form as `not all`, a
+condition that never matches, which would silently break every
+rewritten rule.
+
+Blue now wins at 900px and above no matter where either rule lands in
+the sheet, and no matter whether some OTHER block already emitted the
+same two `@media` rules in the opposite order. Only `@media` gets this
+treatment - see "Known limits" below.
+
 ## Several libraries on one page
 
 `--namespace` (the ppx flag; defaults to the dune `library-name` cookie,
@@ -240,6 +271,42 @@ all) still depends on which one the browser loads first
   intent. No target/condition split and no CSS layer over this — an
   author who needs one of these two to always win still reaches for a more
   specific selector or `!important`.
+- **`@supports`/`@container` are not rewritten.** The overlapping-`@media`
+  fix above (StyleX's `lastMediaQueryWinsTransform`) covers `@media`
+  only, matching StyleX exactly. Two overlapping `@supports` or
+  `@container` rules for the same property in one block still depend on
+  sheet position, not source order — a known, deliberate gap.
+- **A query carrying a media type is rewritten only when every member of
+  the group shares the exact same bare-or-`only` type** (`screen`/`only
+  screen`, the common real shape): the shared type is carried through
+  unchanged, only each member's own feature chain is negated. Two
+  remaining gaps, both deliberate: a comma list mixing a typed and an
+  untyped branch, or two DIFFERENT types (a media type can never appear
+  inside parentheses, so there is no single form to negate a mix of
+  types into); and a `not`-prefixed type (`not screen and (...)`) even
+  with a matching type on every member — `not` inverts the WHOLE query
+  (type and condition together), so folding a negation into just the
+  condition gives a wrong result. Tested by
+  `packages/ppx/test/css-support/media-type-query-same-type-rewrite.t`.
+- **A later query is negated only when every feature it tests resolves
+  to a definite true/false in every browser** — `min-width`/`max-width`/
+  `min-height`/`max-height` with a literal px/em/rem length, or
+  `orientation`; never `calc()`, a percentage, or range-comparison
+  syntax. Media features use three-valued logic: negating a feature the
+  browser cannot evaluate gives "unknown", so the earlier rule would never
+  apply again and its value would be lost. If any later member of a group is unsafe this way, the WHOLE
+  group is left untouched. Tested by
+  `packages/ppx/test/css-support/media-calc-feature-unchanged.t`.
+- **The rewrite always wraps, even when already disjoint.** It does not
+  reason about ranges (`(min-width: 768px) and (max-width: 1279px)`
+  never actually overlaps `(min-width: 1280px)`), so a correct,
+  non-overlapping pair still gets a redundant `and (not (...))` clause —
+  correct, just extra bytes.
+- **Browser floor for the rewritten `(not (...))` form.** `<query> and
+  (not (<query>))` needs Chrome 104, Firefox 64 (`or`/range syntax) or 102
+  (full range syntax), Safari 16.4. Below that floor the rewritten
+  condition evaluates to false, so the rewritten earlier rule never
+  applies there.
 
 ## See also
 

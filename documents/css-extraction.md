@@ -835,6 +835,94 @@ Two consequences worth knowing:
    `(0,N,0)` to `(0,1,0)` specificity inside the compound selector (see
    the specificity note below).
 
+### Media condition ordering
+
+When one block sets the same property (or overlapping shorthand family)
+under two or more `@media` rules on the same selector, plain CSS gives
+the tie at equal specificity to stylesheet *position*, and
+`styled-ppx.generate` dedupes byte-identical rules by first sighting -
+neither tracks the block's own source order once two blocks emit the
+same `@media` text. `Css_file.re`'s `rewrite_media_conditions` fixes
+this before atomization: for every group of 2+ sibling `@media`
+at-rules that set the same `(selector, property family)`, each earlier
+condition is rewritten to exclude every later one (StyleX's
+`lastMediaQueryWinsTransform`), so the group becomes pairwise disjoint
+and "last written wins" holds regardless of stylesheet position:
+
+```css
+/* source */
+@media (min-width: 600px) { color: red; }
+@media (min-width: 900px) { color: blue; }
+
+/* extracted */
+@media (min-width: 600px) and (not (min-width: 900px)) { color: red; }
+@media (min-width: 900px) { color: blue; }
+```
+
+Every negation is wrapped in its own parentheses - `(not (...))`, never a
+bare `and not (...)`. Media Queries 4 only lets `not` start a whole
+condition (`<media-not> = not <media-in-parens>`); anywhere else (after
+an `and`) it must be parenthesized into its own `<media-in-parens>`
+first. The bare form is a parse error a browser resolves to `not all` -
+a condition that can never match - which would make every rewritten
+earlier rule dead code.
+
+A comma-separated (`or`) condition is negated by De Morgan: every branch
+gets the same `(not (...))` terms appended independently. A 3+-way group
+chains each earlier member against every strictly later one, not just
+its immediate neighbor.
+
+This runs *before* `Hash_class` hashes the atom's class name, so the
+rewritten condition - not the source one - is what ends up in the class
+and the stylesheet; two blocks that write the same two `@media`
+conditions in opposite order now mint different, correctly-ordered
+atoms instead of colliding on one shared, first-sighted pair.
+
+v1 always wraps: it does not check whether two ranges are already
+disjoint (`(min-width: 768px) and (max-width: 1279px)` vs
+`(min-width: 1280px)` never actually overlap), so an already-correct,
+non-overlapping pair still gets a redundant `and (not (...))` clause.
+`# ponytail: always-wrap is O(bytes) not O(correctness-risk); add
+interval detection (StyleX's range/interval math) when a monorepo round
+shows real size cost.` Only `@media` is rewritten - `@supports` and
+`@container` are a known, deliberate gap (see "Known limits" in
+`how-merging-works.md`). A `@media` block whose content doesn't reduce
+to one clean (selector, family) unit (further nesting, or two unrelated
+properties in one block) is left untouched rather than guessed at: this
+pass is an ordering optimization, not a validity check.
+
+**A later query is negated only when every feature it tests resolves to
+a definite true/false in every browser** - `min-width`/`max-width`/
+`min-height`/`max-height` with a literal px/em/rem length, or
+`orientation` - never `calc()`, a percentage, or range-comparison
+syntax. Three-valued media-feature logic means `not unknown` is itself
+`unknown`, and `true and unknown` is `unknown`, not `false`: negating a
+query with an invalid or unsupported feature can turn an EARLIER rule
+that used to apply unconditionally into one that never applies again -
+a real, user-visible regression, not just a missed optimization.
+Concretely: `min-width: calc(1000px - 2%)` mixes an absolute length with
+a percentage (not valid in a media feature), so the browser resolves it
+- and its negation - to permanently `false`; naively wrapping an
+earlier `calc(2px + 1px)` rule against it would make that earlier rule
+permanently false too, losing a style that showed at every normal
+viewport width. If any later member of a group is unsafe this way, the
+WHOLE group is left untouched, not just that one pairing.
+
+**A query carrying a media type CAN be rewritten, when every member of
+the group shares the exact same bare-or-`only` type** (`screen`/`only
+screen` is by far the most common case in practice): the shared type is
+carried through unchanged, only each member's own feature chain is
+negated - `@media screen and (max-width: 992px) {...}` then
+`@media screen and (max-width: 480px) {...}` extracts the first as
+`@media screen and (max-width: 992px) and (not (max-width: 480px)) {...}`.
+A `not`-prefixed type (`not screen and (...)`) is a separate, remaining
+known gap even with a matching type on every member: `not` inverts the
+WHOLE query (type and condition together, not just the condition), so
+folding a negation into just the condition produces a genuinely wrong
+result. A comma list mixing a typed and an untyped branch, or two
+different types, is also left untouched - "keep mixed or other types
+untouched" (`media-type-query-same-type-rewrite.t`).
+
 ## CSS.merge
 
 See `documents/how-merging-works.md` for the user-facing version of this
