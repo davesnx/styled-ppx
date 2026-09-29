@@ -608,6 +608,59 @@ family-unrelated rules separated them in the pre-sort list -
 nine shorthand/longhand pairs, shuffled among sixteen unrelated
 declarations, sorts correctly.
 
+**Conditional group only**: once descendant-shape and depth tie two
+`conditional` rules (the common case - two atoms wrapped in an at-rule, or
+carrying a pseudo-class/pseudo-element directly, of equal specificity),
+three more key components decide, in this order: **at-rule rank** (0 for
+no wrapper, 1 for `@supports`, 2 for `@media`, 3 for `@container` - StyleX's
+own relative order); **pseudo rank** (StyleX's `PSEUDO_CLASS_PRIORITIES`/
+`PSEUDO_ELEMENT_PRIORITY`, ported verbatim - `:hover` 130, `:focus` 150,
+`:focus-visible` 160, `:active` 170, every pseudo-element 5000, read only
+from the pseudo chain directly suffixed to the atom's own class, the same
+position the classification above checks - and stopping at the first
+top-level combinator or `,`, so a rule that reaches further
+(`.x:hover .id-y{...}`, `.x:hover > span{...}`) still reads only its own
+`:hover`, not a mangled string spanning into the unrelated selector text
+past it); and **media width bound** (only
+read when the at-rule rank is `@media` - the single `min-width`/
+`max-width` px value in the prelude, ascending for `min-width`, descending
+for `max-width`, `None` when the prelude combines features and sorts
+first). Fixed and global: the same pseudo, at-rule or width always sorts
+the same way, in every block, in every file - not a per-block "last
+declaration wins" rule. `global` and `base` never use this extended key
+(see "Classification" above and `packages/generate/generate.ml`'s
+`sort_conditional_rules`).
+
+This is a total order, not an injective one: two different `@supports`
+conditions, or two different pseudo-elements (`::before` vs `::after`),
+still tie on every component above and fall through to stable/file order -
+an accepted, documented gap, same as StyleX (see "Known limits" in
+`how-merging-works.md`). The fixed order also applies to two conditions
+written in the SAME block: a block that writes `:focus{color:blue}` then
+`:hover{color:red}` gets `blue` (focus, the higher-ranked pseudo) when both
+apply, reversing what "last declaration wins" would otherwise give for
+that one block - decided on purpose, for cross-block consistency, not
+inherited as a side effect (see `how-merging-works.md`).
+
+The media width bound is read with a plain substring scan over the
+prelude text, not the MQ4 grammar (`css-grammar/lib/Shared.ml:1104-1182`,
+not wired into this package): it drops a leading `screen`/`all` media type
+(`only` optional) and its own `and` first - `@media screen and
+(max-width: 767px)` is the dominant real shape, and that `and` is not the
+same thing as a compound feature query's `and` - then reads a single
+`min-width`/`max-width: <n>px` feature (whitespace after the `:` optional,
+since generated code always has one - `@media (min-width: 600px)` - while
+a hand-written `[@@@css ...]` fixture may not) and returns `None` for
+anything else: a compound prelude (`and`/`or`/`not`), a feature this scan
+does not recognize, a unit other than `px` (an `em`/`vw` bound needs a
+font-size/viewport to compare against a `px` one, out of scope here), a
+`print` or other/unrecognized media type (left as `None` on purpose - not
+stripped like `screen`/`all`), or a leading `not` (`not screen` negates
+the type entirely, a different condition from `screen`, so it is never
+stripped either). `None` sorts first - a fixed, total choice, not a claim
+that an unreadable prelude deserves to lose on any semantic ground - so an
+unreadable prelude never outranks one this scan can read.
+
 A bundle, or a same-file family-atom group (see "Atomization" - several
 declarations already merged into one atom because their leaves overlap,
 needing no separate sort entry: they are one rule, in author order,

@@ -85,12 +85,12 @@ body{background-color:var(--pageBackground-171dvmc);color:var(--textColor-a4prc9
 ._a_9h002vhe1{justify-content:center;}
 ._a_6i00glaaa{grid-template-columns:auto 40%;}
 ._a_qyw7u4e3f0l:hover{color:blue;}
-@container (width < 650px) {._a_p3y4xec8xdh{width:50%;}}
 ._a_qyw7u4e9doq:hover{color:purple;}
 ._a_qyw7u4ed9rh:hover{color:red;}
 ._a_qyw7u4eaunu:hover{color:teal;}
 @media (max-width: 700px) {._a_ftrjp4extel{color:orange;}}
 @media (max-width: 700px) {._a_ftrjp4e3z28{color:brown;}}
+@container (width < 650px) {._a_p3y4xec8xdh{width:50%;}}
 @container (width < 650px) {._a_p3y4x39004i85y{background-color:gray;}}
 @container (width < 650px) {._a_p3y4x6500ww99w{font-size:1em;}}
 @container (width < 650px) {._a_2grgh65m9szns1 .my-content{font-weight:bold;}}

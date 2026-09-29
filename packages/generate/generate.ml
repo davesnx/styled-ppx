@@ -941,6 +941,367 @@ let sort_by_shorthand_first rules =
   |> List.stable_sort compare_descendant_first_then_depth
   |> List.map (fun (_, _, r) -> r)
 
+(* -- Condition priority -----------------------------------------------
+
+   Inside the [conditional] group only, a tie {!sort_by_shorthand_first}
+   leaves open between two conditions of otherwise-equal specificity
+   (":hover" vs ":focus"; two "@media (min-width:...)" breakpoints;
+   "@supports" vs "@media") is now decided by a fixed order between the
+   conditions themselves, instead of falling through to
+   `order_modules_within_scope`'s filename tie-break (see its doc) - so the
+   same pair of conditions always resolves the same way, everywhere,
+   including inside one block (a block's own declaration order no longer
+   decides between two conditions).
+
+   Appended AFTER descendant-shape and depth, never before, for the same
+   reason depth comes after descendant-shape (see
+   {!compare_descendant_first_then_depth}'s doc): those two protect a real
+   specificity/override relationship (parent-vs-child, shorthand-vs-
+   longhand) that a condition-only tie-break must never reopen. Applied
+   ONLY to the [conditional] group, via {!sort_conditional_rules} below -
+   not [global] or [base]: a [global] rule never goes through {!rule_tier}
+   and can still be `@`-wrapped or bare, so this key has nothing
+   meaningful to decide for it.
+
+   Pseudo-class/pseudo-element and at-rule ranks are StyleX's
+   `PSEUDO_CLASS_PRIORITIES`/`AT_RULE_PRIORITIES`/`PSEUDO_ELEMENT_PRIORITY`
+   (`@stylexjs/shared/src/utils/property-priorities.js`), ported verbatim -
+   a fixed, already-vetted order, no reason to invent our own numbers. Not
+   ported: StyleX turns this same priority into a CSS layer (or a
+   specificity bump) that can override a real specificity difference
+   between rules; this key never does - it only ever breaks a tie between
+   rules the browser already treats as equally specific. *)
+
+(** The leading `@...` prelude of an at-rule-wrapped rule (`"@media
+    (min-width:600px)"` from `"@media (min-width:600px){.x{color:red;}}"`),
+    or [None] when [rule_text] carries no at-rule wrapper at all. Only the
+    OUTERMOST prelude: {!rule_tier} already buckets any `@`-wrapped rule into
+    one [Conditional] group regardless of nesting. *)
+let outermost_at_rule_prelude rule_text =
+  let trimmed = String.trim rule_text in
+  if String.length trimmed = 0 || trimmed.[0] <> '@' then None
+  else
+    Option.map
+      (fun i -> String.trim (String.sub trimmed 0 i))
+      (String.index_opt trimmed '{')
+
+(** Fixed rank per at-rule kind - StyleX's `AT_RULE_PRIORITIES`, in the same
+    relative order (`@supports` < `@media` < `@container`; only the order
+    matters here, not StyleX's own raw numbers). 0 for no wrapper at all, so a
+    [Base]-tier rule (never `@`-wrapped, by {!rule_tier}'s own definition) is
+    never touched by this key. *)
+let at_rule_rank rule_text =
+  match outermost_at_rule_prelude rule_text with
+  | None -> 0
+  | Some p when String.starts_with ~prefix:"@supports" p -> 1
+  | Some p when String.starts_with ~prefix:"@media" p -> 2
+  | Some p when String.starts_with ~prefix:"@container" p -> 3
+  | Some _ -> 0
+
+(** StyleX's `PSEUDO_CLASS_PRIORITIES`, ported verbatim (values unchanged;
+    camelCase keys respelled kebab-case to match real CSS syntax - `focusWithin`
+    -> `:focus-within`). Falls back to StyleX's own default (40, the
+    `:is`/`:where`/`:not` bucket) for anything not in the table, so this is
+    total, never partial. *)
+let pseudo_class_priority = function
+  | ":is" | ":where" | ":not" -> 40
+  | ":has" -> 45
+  | ":dir" -> 50
+  | ":lang" -> 51
+  | ":first-child" -> 52
+  | ":first-of-type" -> 53
+  | ":last-child" -> 54
+  | ":last-of-type" -> 55
+  | ":only-child" -> 56
+  | ":only-of-type" -> 57
+  | ":nth-child" -> 60
+  | ":nth-last-child" -> 61
+  | ":nth-of-type" -> 62
+  | ":nth-last-of-type" -> 63
+  | ":empty" -> 70
+  | ":link" -> 80
+  | ":any-link" -> 81
+  | ":local-link" -> 82
+  | ":target-within" -> 83
+  | ":target" -> 84
+  | ":visited" -> 85
+  | ":enabled" -> 91
+  | ":disabled" -> 92
+  | ":required" -> 93
+  | ":optional" -> 94
+  | ":read-only" -> 95
+  | ":read-write" -> 96
+  | ":placeholder-shown" -> 97
+  | ":in-range" -> 98
+  | ":out-of-range" -> 99
+  | ":default" -> 100
+  | ":checked" | ":indeterminate" -> 101
+  | ":blank" -> 102
+  | ":valid" -> 103
+  | ":invalid" -> 104
+  | ":user-invalid" -> 105
+  | ":autofill" -> 110
+  | ":picture-in-picture" -> 120
+  | ":modal" -> 121
+  | ":fullscreen" -> 122
+  | ":paused" -> 123
+  | ":playing" -> 124
+  | ":current" -> 125
+  | ":past" -> 126
+  | ":future" -> 127
+  | ":hover" -> 130
+  | ":focus-within" -> 140
+  | ":focus" -> 150
+  | ":focus-visible" -> 160
+  | ":active" -> 170
+  | _ -> 40
+
+(** StyleX's flat `PSEUDO_ELEMENT_PRIORITY`: every pseudo-element (`::before`,
+    `::after`, ...) gets the SAME weight, well above any pseudo-class. StyleX
+    does not disambiguate `::before` from `::after` either, so a tie between two
+    DIFFERENT pseudo-elements stays unresolved here too (falls through to
+    stable/file order). *)
+let pseudo_element_priority = 5000
+
+(** The chain of pseudo-class/pseudo-element parts directly on [selector]
+    (StyleX's `PSEUDO_PART_REGEX`, hand-rolled to match this file's own style of
+    manual scanning - see {!rightmost_compound}): split at each top-level `:`,
+    outside a functional pseudo-class's parenthesised argument (so
+    `:not(:disabled)` stays one part), without splitting `::before` in half. *)
+let pseudo_parts selector =
+  let n = String.length selector in
+  let parts = ref [] in
+  let depth = ref 0 in
+  let start = ref (-1) in
+  let flush upto =
+    if !start >= 0 && upto > !start then
+      parts := String.sub selector !start (upto - !start) :: !parts
+  in
+  let i = ref 0 in
+  while !i < n do
+    match selector.[!i] with
+    | '(' ->
+      incr depth;
+      incr i
+    | ')' ->
+      decr depth;
+      incr i
+    | ':' when !depth = 0 ->
+      flush !i;
+      start := !i;
+      i := !i + if !i + 1 < n && selector.[!i + 1] = ':' then 2 else 1
+    | _ -> incr i
+  done;
+  flush n;
+  List.rev !parts
+
+(** One chain part's own weight: a pseudo-element (leading `::`) always scores
+    {!pseudo_element_priority}; a pseudo-class looks up {!pseudo_class_priority}
+    on its name with any functional argument stripped (`:not(:disabled)` ->
+    `:not`). *)
+let pseudo_part_weight part =
+  if String.length part >= 2 && part.[0] = ':' && part.[1] = ':' then
+    pseudo_element_priority
+  else (
+    match String.index_opt part '(' with
+    | Some i -> pseudo_class_priority (String.sub part 0 i)
+    | None -> pseudo_class_priority part)
+
+(** The end of the pseudo chain starting at [start] (right after the atom's
+    own class): the first top-level combinator (space, `>`, `+`, `~`, `,`) or
+    `{`, whichever comes first, outside a functional pseudo's parenthesised
+    argument (so `:nth-child(2n+1 of .x)`'s own space does not end the chain
+    early). `.x:hover ._id_y{...}` and `.x:hover > span{...}` both reach,
+    past `:hover`, for a DIFFERENT compound - only the leading `:hover` is
+    this atom's own condition; the rest is a combinator into unrelated
+    selector text that must never be summed into the same chain. *)
+let pseudo_chain_end rule_text start =
+  let n = String.length rule_text in
+  let depth = ref 0 in
+  let i = ref start in
+  while
+    !i < n
+    && rule_text.[!i] <> '{'
+    && not
+         (!depth = 0
+         && (is_combinator_char rule_text.[!i] || rule_text.[!i] = ','))
+  do
+    (match rule_text.[!i] with
+    | '(' -> incr depth
+    | ')' -> decr depth
+    | _ -> ());
+    incr i
+  done;
+  !i
+
+(** Sum of {!pseudo_part_weight} over the pseudo chain directly suffixed to the
+    ATOM'S OWN class token (StyleX's `getCompoundPseudoPriority`) - 0 for no
+    such suffix. Reads the chain from exactly where {!rule_tier} itself looks
+    (right after {!atom_class_and_end}'s own class) up to {!pseudo_chain_end},
+    NOT {!rightmost_compound} of the whole selector: for a descendant/child rule
+    (`.x > div:not(:last-child)`), the rightmost compound is a DIFFERENT
+    element's pseudo entirely, one {!rule_tier} already classifies [Base] -
+    reading it would reorder an atom over a pseudo it doesn't even carry
+    (`selector-ref-atom-collision.t` is exactly this shape). A chain mixing in a
+    functional pseudo-class opts out of summing, same as StyleX, falling back to
+    the shared default (40) rather than a number that would misrepresent the
+    chain. *)
+let pseudo_rank rule_text =
+  match atom_class_and_end rule_text with
+  | None -> 0
+  | Some (_, after) ->
+    if after >= String.length rule_text || rule_text.[after] <> ':' then 0
+    else (
+      let chain_end = pseudo_chain_end rule_text after in
+      match pseudo_parts (String.sub rule_text after (chain_end - after)) with
+      | [] -> 0
+      | [ only ] -> pseudo_part_weight only
+      | many when List.exists (fun p -> String.contains p '(') many -> 40
+      | many -> List.fold_left (fun acc p -> acc + pseudo_part_weight p) 0 many)
+
+(** The index right after the first occurrence of [needle] in [haystack], or
+    [None] when it does not occur (a media prelude is a handful of bytes - a
+    linear scan needs no search library). *)
+let index_after haystack needle =
+  let hn = String.length haystack
+  and nn = String.length needle in
+  let rec loop i =
+    if i + nn > hn then None
+    else if String.sub haystack i nn = needle then Some (i + nn)
+    else loop (i + 1)
+  in
+  loop 0
+
+(** Drop a leading `screen`/`all` media type (`only` optional) and its own
+    `and`, so `@media screen and (max-width: 767px)` - the dominant real shape,
+    not a hand-built fixture - resolves a width instead of bailing out on the
+    type clause's OWN `and` (a media TYPE and a media FEATURE query are
+    different `and`s; the bail-out below cannot tell them apart once both are
+    just the substring `" and "`). Only for the caller's and/or/not check right
+    below - the digit search after it still reads the untouched prelude, since
+    stripping a leading type never removes the feature text after it. Left
+    untouched, so the checks below still return [None] for them: `print` and any
+    other/unrecognized type (no on-screen width to compare against), and a
+    leading `not` (`not screen` negates the type entirely - a different
+    condition from `screen`, not the same type with the negation silently
+    dropped). *)
+let strip_screen_or_all_media_type lower =
+  let prefixes =
+    [
+      "@media only screen and ";
+      "@media only all and ";
+      "@media screen and ";
+      "@media all and ";
+    ]
+  in
+  match
+    List.find_opt
+      (fun p ->
+        String.length lower >= String.length p
+        && String.sub lower 0 (String.length p) = p)
+      prefixes
+  with
+  | Some p ->
+    String.sub lower (String.length p) (String.length lower - String.length p)
+  | None -> lower
+
+(** ponytail: a substring scan, not a real media-query parser - reads only a
+    single `min-width`/`max-width: <n>px` feature; upgrade to a real media AST
+    if `@supports`/`@container` or non-`px` units ever need a tie-break too.
+
+    The single `min-width`/`max-width` px bound an `@media` prelude sorts by, or
+    [None] when the prelude (after {!strip_screen_or_all_media_type}) combines
+    features (`and`/`or`/`not` - no single value to sort by), names no width
+    feature, or the value isn't `px` (an `em`/`vw` bound would need a
+    font-size/viewport to compare against another unit, out of scope here).
+    Whitespace after the `:` is optional, since real rendered output has it
+    (`@media (min-width: 600px)`) while hand-written fixtures may not. Encoded
+    as [(kind_rank, signed_value)]: `min` = [(0, value)] (plain ascending
+    compare already gives "min-width ascending" - a wider, later-declared
+    breakpoint wins a tie); `max` = [(1, -value)] (kind mismatch always
+    separates min from max first; negating flips ascending compare into
+    "narrower wins" for max-width). *)
+let media_width_bound prelude =
+  let lower = String.lowercase_ascii prelude in
+  let feature_part = strip_screen_or_all_media_type lower in
+  if
+    index_after feature_part " and " <> None
+    || index_after feature_part " or " <> None
+    || index_after feature_part "not " <> None
+  then None
+  else (
+    let bound key kind_rank sign =
+      match index_after lower key with
+      | None -> None
+      | Some after ->
+        let n = String.length lower in
+        let j = ref after in
+        while !j < n && lower.[!j] = ' ' do
+          incr j
+        done;
+        let start = !j in
+        while !j < n && lower.[!j] >= '0' && lower.[!j] <= '9' do
+          incr j
+        done;
+        if !j = start || !j + 2 > n || String.sub lower !j 2 <> "px" then None
+        else
+          Some
+            ( kind_rank,
+              sign * int_of_string (String.sub lower start (!j - start)) )
+    in
+    match bound "min-width:" 0 1 with
+    | Some v -> Some v
+    | None -> bound "max-width:" 1 (-1))
+
+(** Two [Some] bounds compare structurally ([(kind_rank, signed_value)],
+    lexicographic - kind first, so a `min` bound and a `max` bound never
+    interleave by raw pixel value alone). [None] (an unreadable or compound
+    prelude) sorts before any [Some] bound: a fixed, total choice - a rule this
+    scan cannot read cleanly never outranks one it can - not a claim that
+    "unreadable" deserves to lose on any semantic ground; StyleX's own reader
+    makes the opposite choice (`None` wins) for the same reason, fixed and
+    arbitrary is all a tie-break needs. *)
+let compare_media_width_bound a b =
+  match a, b with
+  | None, None -> 0
+  | None, Some _ -> -1
+  | Some _, None -> 1
+  | Some a, Some b -> compare a b
+
+(** {!sort_by_shorthand_first}'s own two keys (descendant-shape, depth), then
+    three more for the [conditional] group ONLY: at-rule rank ({!at_rule_rank}),
+    pseudo rank ({!pseudo_rank}), then the media width bound
+    ({!media_width_bound}, read only when [at_rule_rank = 2] - a
+    `@supports`/`@container` prelude has no width to read). A valid total order
+    (every component is a plain [bool]/[int], or a [(int * int) option] compared
+    by {!compare_media_width_bound}), not a claim that every pair gets a
+    DISTINCT key: two different `@supports` conditions, or two different
+    pseudo-elements, still tie and fall through to stable/file order - out of
+    scope here, same as StyleX (which has no tie-break for either case). *)
+let sort_conditional_rules rules =
+  rules
+  |> List.map (fun rule_text ->
+    let at_rule = at_rule_rank rule_text in
+    let width =
+      match outermost_at_rule_prelude rule_text with
+      | Some prelude when at_rule = 2 -> media_width_bound prelude
+      | _ -> None
+    in
+    ( is_descendant_shape rule_text,
+      rule_depth rule_text,
+      at_rule,
+      pseudo_rank rule_text,
+      width,
+      rule_text ))
+  |> List.stable_sort
+       (fun (da, deptha, ata, pa, wa, _) (db, depthb, atb, pb, wb, _) ->
+       if da <> db then compare db da
+       else if deptha <> depthb then compare deptha depthb
+       else if ata <> atb then compare ata atb
+       else if pa <> pb then compare pa pb
+       else compare_media_width_bound wa wb)
+  |> List.map (fun (_, _, _, _, _, r) -> r)
+
 (** Collect, index, resolve, dedup, output. *)
 let run ~output_file ~order input_files =
   Logger.info "output file: %s"
@@ -1103,7 +1464,7 @@ let run ~output_file ~order input_files =
     List.iter emit registrations;
     List.iter emit (sort_by_shorthand_first global_rules);
     List.iter emit (sort_by_shorthand_first base_rules);
-    List.iter emit (sort_by_shorthand_first conditional_rules);
+    List.iter emit (sort_conditional_rules conditional_rules);
     Buffer.contents buffer
   in
   Logger.debug "stylesheet:\n%s" stylesheet;

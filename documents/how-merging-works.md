@@ -134,6 +134,28 @@ the way you'd expect — a component's own class beats an ancestor's blind
 lands before a lone longhand that overrides just one of its sides
 (`packages/generate/test/tiers-shorthand-sort.t`).
 
+**Inside the conditional group, a fixed order between conditions decides
+a remaining tie** (two conditional atoms, equal specificity, same
+parent-to-child shape, same shorthand depth): at-rule kind first
+(`@supports` before `@media` before `@container`), then a fixed
+pseudo-class/pseudo-element priority (StyleX's own table — `:hover`
+before `:focus-within` before `:focus` before `:focus-visible` before
+`:active`; any pseudo-element outranks any pseudo-class), then `@media`
+width (`min-width` ascending, `max-width` descending — the wider,
+later-declared breakpoint wins). This order is the SAME everywhere: in
+every file, in every block, not "whichever one this block wrote last".
+A single block that writes
+
+```reason
+let danger = [%css "&:focus { color: blue; } &:hover { color: red; }"];
+```
+
+gets `color: blue` (focus) when both `:hover` and `:focus` apply, even
+though `:hover` was written last — the fixed priority, not declaration
+order, decides (`packages/generate/test/tiers-condition-tie-single-block.t`).
+Plain CSS, read top to bottom, would give `red` here; styled-ppx does not,
+on purpose — see "Known limits" below.
+
 **No CSS layer wraps any of this.** Specificity decides first, exactly
 like plain CSS; sheet position is only ever the tie-break, never an
 unconditional priority. A hand-written selector with higher specificity
@@ -197,6 +219,27 @@ all) still depends on which one the browser loads first
   override, same specificity — the conditional rule wins the tie above
   1280px, by sheet position, because conditional atoms are always
   emitted after base ones.
+- **A fixed pseudo-class/pseudo-element order applies even inside one
+  block.** `&:focus { color: blue; } &:hover { color: red; }` in ONE
+  `[%css]` block gives `color: blue` (focus outranks hover in the fixed
+  order), not `red` — the opposite of what "last declaration wins" would
+  give for this exact block on its own
+  (`packages/generate/test/tiers-condition-tie-single-block.t`). Chosen on
+  purpose: the alternative (each block's own declaration order deciding)
+  made the SAME shared pair of conditions resolve differently depending on
+  which of two components happened to compile first
+  (`packages/generate/test/tiers-condition-tie-pseudo-class.t`). To
+  override a lower-priority pseudo's declaration with a higher-priority
+  one, write the higher-priority one — its own position in the block no
+  longer matters.
+- **Two pseudo-elements, or two different `@supports` conditions, still
+  tie.** `::before` vs `::after`, or `@supports (display:grid)` vs
+  `@supports (display:flex)`, get the same fixed-order rank as each other
+  (StyleX has no finer answer for either case either), so the tie falls
+  back to sheet position — not guaranteed to match either block's own
+  intent. No target/condition split and no CSS layer over this — an
+  author who needs one of these two to always win still reaches for a more
+  specific selector or `!important`.
 
 ## See also
 
