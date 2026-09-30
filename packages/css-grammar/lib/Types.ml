@@ -2599,6 +2599,13 @@ and property_border_right = property_border
 and property_border_right_color = color
 and property_border_right_style = line_style
 and property_border_right_width = line_width
+
+(* CSS Borders and Box Decorations L4: https://drafts.csswg.org/css-borders-4/#propdef-border-shape *)
+and property_border_shape =
+  [ `None
+  | `Static of (basic_shape * geometry_box option) list
+  ]
+
 and property_border_spacing = extended_length * extended_length option
 
 and property_border_start_end_radius =
@@ -3058,6 +3065,14 @@ and property_float =
   | `None
   | `Inline_start
   | `Inline_end
+  ]
+
+(* CSS Grid Layout L3 (grid lanes containers): https://drafts.csswg.org/css-grid-3/#propdef-flow-tolerance *)
+and property_flow_tolerance =
+  [ `Normal
+  | `Extended_length of extended_length
+  | `Extended_percentage of extended_percentage
+  | `Infinite
   ]
 
 and property_font =
@@ -3826,6 +3841,15 @@ and property_forced_color_adjust =
   | `Preserve_parent_color
   ]
 
+(* CSS Box Sizing L4: https://drafts.csswg.org/css-sizing-4/#propdef-frame-sizing *)
+and property_frame_sizing =
+  [ `Auto
+  | `Content_width
+  | `Content_height
+  | `Content_block_size
+  | `Content_inline_size
+  ]
+
 and property_media_grid = int
 
 and property_media_hover =
@@ -4238,6 +4262,12 @@ and property_scale =
 and property_scroll_behavior =
   [ `Auto
   | `Smooth
+  ]
+
+(* CSS Overflow L5: https://drafts.csswg.org/css-overflow-5/#propdef-scroll-axis-lock *)
+and property_scroll_axis_lock =
+  [ `Auto
+  | `None
   ]
 
 and property_scroll_margin = extended_length list
@@ -4928,6 +4958,12 @@ and property_writing_mode =
   | `Svg_writing_mode of svg_writing_mode
   ]
 
+(* CSS Basic User Interface L4: https://drafts.csswg.org/css-ui-4/#propdef-window-drag *)
+and property_window_drag =
+  [ `None
+  | `Move
+  ]
+
 and property_z_index =
   [ `Auto
   | `Integer of int
@@ -5055,6 +5091,20 @@ and property_view_timeline_name = [ `None | `Custom_ident of string ] list
 and property_view_transition_name =
   [ `None
   | `Custom_ident of string
+  ]
+
+(* CSS View Transitions L2: https://drafts.csswg.org/css-view-transitions-2/#propdef-view-transition-group *)
+and property_view_transition_group =
+  [ `Normal
+  | `Contain
+  | `Nearest
+  | `Custom_ident of string
+  ]
+
+(* CSS View Transitions L2: https://drafts.csswg.org/css-view-transitions-2/#propdef-view-transition-scope *)
+and property_view_transition_scope =
+  [ `None
+  | `All
   ]
 
 and property_anchor_name =

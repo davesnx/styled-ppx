@@ -1,0 +1,1 @@
+[%css {|window-drag: grab|}];

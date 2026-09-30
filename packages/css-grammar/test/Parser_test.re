@@ -76,6 +76,95 @@ let test_unregistered_property = () =>
   | None => ()
   };
 
+/* css-grammar-missing-properties (2026-09-25): valid and invalid values for
+   the 7 properties added in that pass, one browser-implemented (Chrome/Edge
+   or Safari, per MDN browser-compat-data) each. */
+
+let test_border_shape_valid = () =>
+  switch (validate_property("border-shape", "inset(10%) border-box")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_border_shape_invalid = () =>
+  switch (validate_property("border-shape", "12px")) {
+  | Ok () => Alcotest.fail("parsing '12px' should fail")
+  | Error(_) => ()
+  };
+
+let test_flow_tolerance_valid = () =>
+  switch (validate_property("flow-tolerance", "infinite")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_flow_tolerance_invalid = () =>
+  switch (validate_property("flow-tolerance", "5")) {
+  | Ok () => Alcotest.fail("parsing '5' should fail")
+  | Error(_) => ()
+  };
+
+let test_frame_sizing_valid = () =>
+  switch (validate_property("frame-sizing", "content-inline-size")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_frame_sizing_invalid = () =>
+  switch (validate_property("frame-sizing", "cover")) {
+  | Ok () => Alcotest.fail("parsing 'cover' should fail")
+  | Error(_) => ()
+  };
+
+let test_scroll_axis_lock_valid = () =>
+  switch (validate_property("scroll-axis-lock", "auto")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_scroll_axis_lock_invalid = () =>
+  switch (validate_property("scroll-axis-lock", "smooth")) {
+  | Ok () => Alcotest.fail("parsing 'smooth' should fail")
+  | Error(_) => ()
+  };
+
+let test_view_transition_group_valid = () =>
+  switch (validate_property("view-transition-group", "my-group")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_view_transition_group_invalid = () =>
+  switch (validate_property("view-transition-group", "5px")) {
+  | Ok () => Alcotest.fail("parsing '5px' should fail")
+  | Error(_) => ()
+  };
+
+let test_view_transition_scope_valid = () =>
+  switch (validate_property("view-transition-scope", "all")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_view_transition_scope_invalid = () =>
+  /* 'contain' is valid for view-transition-group, not view-transition-scope. */
+  switch (validate_property("view-transition-scope", "contain")) {
+  | Ok () => Alcotest.fail("parsing 'contain' should fail")
+  | Error(_) => ()
+  };
+
+let test_window_drag_valid = () =>
+  switch (validate_property("window-drag", "move")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_window_drag_invalid = () =>
+  switch (validate_property("window-drag", "grab")) {
+  | Ok () => Alcotest.fail("parsing 'grab' should fail")
+  | Error(_) => ()
+  };
+
 let test_display_keywords = () => {
   let keywords = ["block", "inline", "flex", "grid", "none", "contents"];
   List.iter(
@@ -257,6 +346,72 @@ let tests = [
         "unregistered property",
         `Quick,
         test_unregistered_property,
+      ),
+      Alcotest.test_case(
+        "border-shape valid",
+        `Quick,
+        test_border_shape_valid,
+      ),
+      Alcotest.test_case(
+        "border-shape invalid",
+        `Quick,
+        test_border_shape_invalid,
+      ),
+      Alcotest.test_case(
+        "flow-tolerance valid",
+        `Quick,
+        test_flow_tolerance_valid,
+      ),
+      Alcotest.test_case(
+        "flow-tolerance invalid",
+        `Quick,
+        test_flow_tolerance_invalid,
+      ),
+      Alcotest.test_case(
+        "frame-sizing valid",
+        `Quick,
+        test_frame_sizing_valid,
+      ),
+      Alcotest.test_case(
+        "frame-sizing invalid",
+        `Quick,
+        test_frame_sizing_invalid,
+      ),
+      Alcotest.test_case(
+        "scroll-axis-lock valid",
+        `Quick,
+        test_scroll_axis_lock_valid,
+      ),
+      Alcotest.test_case(
+        "scroll-axis-lock invalid",
+        `Quick,
+        test_scroll_axis_lock_invalid,
+      ),
+      Alcotest.test_case(
+        "view-transition-group valid",
+        `Quick,
+        test_view_transition_group_valid,
+      ),
+      Alcotest.test_case(
+        "view-transition-group invalid",
+        `Quick,
+        test_view_transition_group_invalid,
+      ),
+      Alcotest.test_case(
+        "view-transition-scope valid",
+        `Quick,
+        test_view_transition_scope_valid,
+      ),
+      Alcotest.test_case(
+        "view-transition-scope invalid",
+        `Quick,
+        test_view_transition_scope_invalid,
+      ),
+      Alcotest.test_case("window-drag valid", `Quick, test_window_drag_valid),
+      Alcotest.test_case(
+        "window-drag invalid",
+        `Quick,
+        test_window_drag_invalid,
       ),
       Alcotest.test_case("display keywords", `Quick, test_display_keywords),
       Alcotest.test_case("flex-direction", `Quick, test_flex_direction),

@@ -74,9 +74,20 @@ module Property_box_sizing =
 let property_box_sizing : property_box_sizing Rule.rule =
   Property_box_sizing.rule
 
+(* CSS Box Sizing L4: https://drafts.csswg.org/css-sizing-4/#propdef-frame-sizing *)
+module Property_frame_sizing =
+  [%spec_module
+  "'auto' | 'content-width' | 'content-height' | 'content-block-size' | \
+   'content-inline-size'",
+  (module Css_types.FrameSizing)]
+
+let property_frame_sizing : property_frame_sizing Rule.rule =
+  Property_frame_sizing.rule
+
 let entries : (kind * packed_rule) list =
   [
     Property "box-sizing", pack_module (module Property_box_sizing);
+    Property "frame-sizing", pack_module (module Property_frame_sizing);
     ( Property "box-decoration-break",
       pack_module (module Property_box_decoration_break) );
     Property "box-align", pack_module (module Property_box_align);
