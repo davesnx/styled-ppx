@@ -165,6 +165,112 @@ let test_window_drag_invalid = () =>
   | Error(_) => ()
   };
 
+/* css-grammar-gaps (2026-09-25): valid and invalid values for the CSS Gaps
+   Module Level 1 family (row-rule, column-rule additions, and rule) - one
+   case per grammar shape this pass introduced. */
+
+let test_column_rule_color_list_valid = () =>
+  switch (validate_property("column-rule-color", "red, repeat(auto, blue)")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_column_rule_color_list_invalid = () =>
+  switch (validate_property("column-rule-color", "repeat(2, 10px)")) {
+  | Ok () => Alcotest.fail("parsing 'repeat(2, 10px)' should fail")
+  | Error(_) => ()
+  };
+
+let test_row_rule_valid = () =>
+  switch (validate_property("row-rule", "1px solid red, 2px dashed blue")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_row_rule_invalid = () =>
+  switch (validate_property("row-rule", "not-a-rule")) {
+  | Ok () => Alcotest.fail("parsing 'not-a-rule' should fail")
+  | Error(_) => ()
+  };
+
+let test_rule_valid = () =>
+  switch (validate_property("rule", "1px solid red")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_rule_invalid = () =>
+  switch (validate_property("rule", "not-a-rule")) {
+  | Ok () => Alcotest.fail("parsing 'not-a-rule' should fail")
+  | Error(_) => ()
+  };
+
+let test_column_rule_break_valid = () =>
+  switch (validate_property("column-rule-break", "intersection")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_column_rule_break_invalid = () =>
+  switch (validate_property("column-rule-break", "always")) {
+  | Ok () => Alcotest.fail("parsing 'always' should fail")
+  | Error(_) => ()
+  };
+
+let test_column_rule_inset_cap_start_valid = () =>
+  switch (validate_property("column-rule-inset-cap-start", "overlap-join")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_column_rule_inset_cap_start_invalid = () =>
+  switch (validate_property("column-rule-inset-cap-start", "solid")) {
+  | Ok () => Alcotest.fail("parsing 'solid' should fail")
+  | Error(_) => ()
+  };
+
+let test_column_rule_inset_cap_valid = () =>
+  switch (validate_property("column-rule-inset-cap", "0px 5px")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_column_rule_inset_valid = () =>
+  switch (validate_property("column-rule-inset", "0px / -5px")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_rule_inset_start_valid = () =>
+  switch (validate_property("rule-inset-start", "8px")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_column_rule_visibility_items_valid = () =>
+  switch (validate_property("column-rule-visibility-items", "between")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_column_rule_visibility_items_invalid = () =>
+  switch (validate_property("column-rule-visibility-items", "sometimes")) {
+  | Ok () => Alcotest.fail("parsing 'sometimes' should fail")
+  | Error(_) => ()
+  };
+
+let test_rule_overlap_valid = () =>
+  switch (validate_property("rule-overlap", "column-over-row")) {
+  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
+  | Ok () => ()
+  };
+
+let test_rule_overlap_invalid = () =>
+  switch (validate_property("rule-overlap", "row-over-row")) {
+  | Ok () => Alcotest.fail("parsing 'row-over-row' should fail")
+  | Error(_) => ()
+  };
+
 let test_display_keywords = () => {
   let keywords = ["block", "inline", "flex", "grid", "none", "contents"];
   List.iter(
@@ -412,6 +518,75 @@ let tests = [
         "window-drag invalid",
         `Quick,
         test_window_drag_invalid,
+      ),
+      Alcotest.test_case(
+        "column-rule-color list valid",
+        `Quick,
+        test_column_rule_color_list_valid,
+      ),
+      Alcotest.test_case(
+        "column-rule-color list invalid",
+        `Quick,
+        test_column_rule_color_list_invalid,
+      ),
+      Alcotest.test_case("row-rule valid", `Quick, test_row_rule_valid),
+      Alcotest.test_case("row-rule invalid", `Quick, test_row_rule_invalid),
+      Alcotest.test_case("rule valid", `Quick, test_rule_valid),
+      Alcotest.test_case("rule invalid", `Quick, test_rule_invalid),
+      Alcotest.test_case(
+        "column-rule-break valid",
+        `Quick,
+        test_column_rule_break_valid,
+      ),
+      Alcotest.test_case(
+        "column-rule-break invalid",
+        `Quick,
+        test_column_rule_break_invalid,
+      ),
+      Alcotest.test_case(
+        "column-rule-inset-cap-start valid",
+        `Quick,
+        test_column_rule_inset_cap_start_valid,
+      ),
+      Alcotest.test_case(
+        "column-rule-inset-cap-start invalid",
+        `Quick,
+        test_column_rule_inset_cap_start_invalid,
+      ),
+      Alcotest.test_case(
+        "column-rule-inset-cap valid",
+        `Quick,
+        test_column_rule_inset_cap_valid,
+      ),
+      Alcotest.test_case(
+        "column-rule-inset valid",
+        `Quick,
+        test_column_rule_inset_valid,
+      ),
+      Alcotest.test_case(
+        "rule-inset-start valid",
+        `Quick,
+        test_rule_inset_start_valid,
+      ),
+      Alcotest.test_case(
+        "column-rule-visibility-items valid",
+        `Quick,
+        test_column_rule_visibility_items_valid,
+      ),
+      Alcotest.test_case(
+        "column-rule-visibility-items invalid",
+        `Quick,
+        test_column_rule_visibility_items_invalid,
+      ),
+      Alcotest.test_case(
+        "rule-overlap valid",
+        `Quick,
+        test_rule_overlap_valid,
+      ),
+      Alcotest.test_case(
+        "rule-overlap invalid",
+        `Quick,
+        test_rule_overlap_invalid,
       ),
       Alcotest.test_case("display keywords", `Quick, test_display_keywords),
       Alcotest.test_case("flex-direction", `Quick, test_flex_direction),

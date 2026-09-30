@@ -1034,6 +1034,177 @@ module Line_width =
 
 let line_width : line_width Rule.rule = Line_width.rule
 
+(* CSS Gaps L1: https://drafts.csswg.org/css-gaps-1/#typedef-inset-value
+   Used by the rule-inset* leaves and shorthands (Gap.ml/RowRule.ml/GapRule.ml).
+   Grammar-fragment only: its own witness is never checked (Value kind), so
+   Css_types.InsetValue is reused for readability, not because it must resolve
+   here - see the properties that register it directly for the real witness. *)
+module Inset_value =
+  [%spec_module
+  "<extended-length> | <extended-percentage> | 'overlap-join'",
+  (module Css_types.InsetValue)]
+
+let inset_value : inset_value Rule.rule = Inset_value.rule
+
+(* CSS Gaps L1 § 4.1-4.3: https://drafts.csswg.org/css-gaps-1/#typedef-line-color-list
+   (and the analogous -style-/-width- typedefs). Three parallel families, one
+   per leaf type (<color>, <line-style>, <line-width>); each pattern is
+   otherwise identical to the others and to Track_list/Track_repeat/
+   Auto_repeat/Auto_track_list above. Grammar fragments only - never a
+   property's own top-level grammar - so their witness argument is inert
+   (Value kind is excluded from the runtime witness conformance check); reuse
+   Css_types.Cascading, the codebase's existing "no real runtime module
+   needed" placeholder (see Descriptors.ml's @font-face metric overrides). *)
+module Repeat_line_color =
+  [%spec_module
+  "repeat( <positive-integer> ',' [ <color> ]# )", (module Css_types.Cascading)]
+
+let repeat_line_color : repeat_line_color Rule.rule = Repeat_line_color.rule
+
+module Auto_repeat_line_color =
+  [%spec_module
+  "repeat( 'auto' ',' [ <color> ]# )", (module Css_types.Cascading)]
+
+let auto_repeat_line_color : auto_repeat_line_color Rule.rule =
+  Auto_repeat_line_color.rule
+
+module Line_color_or_repeat =
+  [%spec_module
+  "<color> | <repeat-line-color>", (module Css_types.Cascading)]
+
+let line_color_or_repeat : line_color_or_repeat Rule.rule =
+  Line_color_or_repeat.rule
+
+module Line_color_list =
+  [%spec_module
+  "[ <line-color-or-repeat> ]#", (module Css_types.Cascading)]
+
+let line_color_list : line_color_list Rule.rule = Line_color_list.rule
+
+module Auto_line_color_list =
+  [%spec_module
+  "[ [ <line-color-or-repeat> ]# ',' ]? <auto-repeat-line-color> [ ',' [ \
+   <line-color-or-repeat> ]# ]?",
+  (module Css_types.Cascading)]
+
+let auto_line_color_list : auto_line_color_list Rule.rule =
+  Auto_line_color_list.rule
+
+module Repeat_line_style =
+  [%spec_module
+  "repeat( <positive-integer> ',' [ <line-style> ]# )",
+  (module Css_types.Cascading)]
+
+let repeat_line_style : repeat_line_style Rule.rule = Repeat_line_style.rule
+
+module Auto_repeat_line_style =
+  [%spec_module
+  "repeat( 'auto' ',' [ <line-style> ]# )", (module Css_types.Cascading)]
+
+let auto_repeat_line_style : auto_repeat_line_style Rule.rule =
+  Auto_repeat_line_style.rule
+
+module Line_style_or_repeat =
+  [%spec_module
+  "<line-style> | <repeat-line-style>", (module Css_types.Cascading)]
+
+let line_style_or_repeat : line_style_or_repeat Rule.rule =
+  Line_style_or_repeat.rule
+
+module Line_style_list =
+  [%spec_module
+  "[ <line-style-or-repeat> ]#", (module Css_types.Cascading)]
+
+let line_style_list : line_style_list Rule.rule = Line_style_list.rule
+
+module Auto_line_style_list =
+  [%spec_module
+  "[ [ <line-style-or-repeat> ]# ',' ]? <auto-repeat-line-style> [ ',' [ \
+   <line-style-or-repeat> ]# ]?",
+  (module Css_types.Cascading)]
+
+let auto_line_style_list : auto_line_style_list Rule.rule =
+  Auto_line_style_list.rule
+
+module Repeat_line_width =
+  [%spec_module
+  "repeat( <positive-integer> ',' [ <line-width> ]# )",
+  (module Css_types.Cascading)]
+
+let repeat_line_width : repeat_line_width Rule.rule = Repeat_line_width.rule
+
+module Auto_repeat_line_width =
+  [%spec_module
+  "repeat( 'auto' ',' [ <line-width> ]# )", (module Css_types.Cascading)]
+
+let auto_repeat_line_width : auto_repeat_line_width Rule.rule =
+  Auto_repeat_line_width.rule
+
+module Line_width_or_repeat =
+  [%spec_module
+  "<line-width> | <repeat-line-width>", (module Css_types.Cascading)]
+
+let line_width_or_repeat : line_width_or_repeat Rule.rule =
+  Line_width_or_repeat.rule
+
+module Line_width_list =
+  [%spec_module
+  "[ <line-width-or-repeat> ]#", (module Css_types.Cascading)]
+
+let line_width_list : line_width_list Rule.rule = Line_width_list.rule
+
+module Auto_line_width_list =
+  [%spec_module
+  "[ [ <line-width-or-repeat> ]# ',' ]? <auto-repeat-line-width> [ ',' [ \
+   <line-width-or-repeat> ]# ]?",
+  (module Css_types.Cascading)]
+
+let auto_line_width_list : auto_line_width_list Rule.rule =
+  Auto_line_width_list.rule
+
+(* CSS Gaps L1 § 4.4: https://drafts.csswg.org/css-gaps-1/#typedef-gap-rule
+   The column-rule/row-rule shorthand's own item type and its list/repeat
+   wrappers, mirroring the line-color/-style/-width families above. *)
+module Gap_rule =
+  [%spec_module
+  "<line-width> || <line-style> || <color>", (module Css_types.Cascading)]
+
+let gap_rule : gap_rule Rule.rule = Gap_rule.rule
+
+module Gap_repeat_rule =
+  [%spec_module
+  "repeat( <positive-integer> ',' [ <gap-rule> ]# )",
+  (module Css_types.Cascading)]
+
+let gap_repeat_rule : gap_repeat_rule Rule.rule = Gap_repeat_rule.rule
+
+module Gap_auto_repeat_rule =
+  [%spec_module
+  "repeat( 'auto' ',' [ <gap-rule> ]# )", (module Css_types.Cascading)]
+
+let gap_auto_repeat_rule : gap_auto_repeat_rule Rule.rule =
+  Gap_auto_repeat_rule.rule
+
+module Gap_rule_or_repeat =
+  [%spec_module
+  "<gap-rule> | <gap-repeat-rule>", (module Css_types.Cascading)]
+
+let gap_rule_or_repeat : gap_rule_or_repeat Rule.rule = Gap_rule_or_repeat.rule
+
+module Gap_rule_list =
+  [%spec_module
+  "[ <gap-rule-or-repeat> ]#", (module Css_types.Cascading)]
+
+let gap_rule_list : gap_rule_list Rule.rule = Gap_rule_list.rule
+
+module Gap_auto_rule_list =
+  [%spec_module
+  "[ [ <gap-rule-or-repeat> ]# ',' ]? <gap-auto-repeat-rule> [ ',' [ \
+   <gap-rule-or-repeat> ]# ]?",
+  (module Css_types.Cascading)]
+
+let gap_auto_rule_list : gap_auto_rule_list Rule.rule = Gap_auto_rule_list.rule
+
 module Linear_color_hint =
   [%spec_module
   "<extended-length> | <extended-percentage>",

@@ -764,6 +764,22 @@ let seed : string array =
     "view-transition-group";
     "view-transition-scope";
     "window-drag";
+    (* Appended 2026-09-25 (css-grammar-gaps): CSS Gaps L1 family keys.
+       "rule" is deliberately NOT listed here: it unions with the
+       already-seeded "column-rule" (its own family key since before this
+       PR), and rule-color/-style/-width union in transitively through
+       column-rule-color/-style/-width, column-rule's own longhands. Per
+       family_id_of's seed-priority rule (see its own doc), an
+       already-registered family member always keeps its slot over a new,
+       shorter name, so "rule" and rule-color/-style/-width all redirect to
+       "column-rule"'s existing slot instead of needing one of their own.
+       rule-break, rule-inset, rule-overlap and rule-visibility-items union
+       only NEW Gaps L1 properties with no pre-existing family, so each is a
+       genuinely new family and needs its own entry below. *)
+    "rule-break";
+    "rule-inset";
+    "rule-overlap";
+    "rule-visibility-items";
   |]
 
 (* Width, in base36 chars, of the extended-hash field [Class_format] emits
