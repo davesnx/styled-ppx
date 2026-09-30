@@ -105,9 +105,14 @@ module Index = struct
       other_longident other_filename entry.longident filename entry.identity
       other_class_string entry.class_string
 
-  let add_from_payload ~filename (idx : t) payload =
+  (* [`Malformed] is a payload the PPX could not have produced (a decode
+     failure); [`Collision] is a well-formed payload that names a real
+     identity collision. The two read very differently to whoever hits them,
+     so the caller reports them with different wording. *)
+  let add_from_payload ~filename (idx : t) payload :
+    (unit, [ `Malformed of string | `Collision of string ]) result =
     match Css_extraction.decode_bindings_payload payload with
-    | Error msg -> Error msg
+    | Error msg -> Error (`Malformed msg)
     | Ok entries ->
       let errors =
         List.filter_map
@@ -127,7 +132,7 @@ module Index = struct
       in
       (match errors with
       | [] -> Ok ()
-      | msgs -> Error (String.concat "; " msgs))
+      | msgs -> Error (`Collision (String.concat "; " msgs)))
 end
 
 (** Every
@@ -189,8 +194,11 @@ let extract_structure ~filename ~idx structure : input =
       | [%stri [@@@css.bindings [%e? value]]] ->
         (match Index.add_from_payload ~filename idx value with
         | Ok () -> ()
-        | Error msg ->
-          add_protocol_error Css_extraction.bindings_attribute_name msg)
+        | Error (`Malformed msg) ->
+          add_protocol_error Css_extraction.bindings_attribute_name msg
+        | Error (`Collision msg) ->
+          protocol_errors :=
+            Printf.sprintf "%s: %s" filename msg :: !protocol_errors)
       | [%stri [@@@css.config [%e? value]]] ->
         (match Css_extraction.decode_config_payload value with
         | Ok entries ->
@@ -421,9 +429,11 @@ let library_edge_target ~(groups_with_module : string -> library_group list)
       |> single)
 
 (** Two-level order: libraries first (by the dependency graph collapsed from
-    module references), then, within each library, {!order_modules_within_scope}
-    unchanged from PR 1. Both levels reuse {!Order.sort}, so the alphabetical
-    tiebreak and the never-fail cycle policy apply at both levels for free. *)
+    module references), then, within each library, the same per-module
+    dependency order used across the whole input set
+    ({!order_modules_within_scope}). Both levels reuse {!Order.sort}, so the
+    alphabetical tiebreak and the never-fail cycle policy apply at both levels
+    for free. *)
 let order_by_dependency (inputs : input list) : input list =
   let groups = group_by_library inputs in
   (* Indexed once: scanning every group for every raw reference measured 2 s
