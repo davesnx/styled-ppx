@@ -611,11 +611,11 @@ declarations, sorts correctly.
 **Conditional group only**: once descendant-shape and depth tie two
 `conditional` rules (the common case - two atoms wrapped in an at-rule, or
 carrying a pseudo-class/pseudo-element directly, of equal specificity),
-three more key components decide, in this order: **at-rule rank** (0 for
+two more key components decide, in this order: **at-rule rank** (0 for
 no wrapper, 1 for `@supports`, 2 for `@media`, 3 for `@container` - this
 project's own strict hierarchy; the leaf VALUES 30/200/300 are StyleX's,
 but StyleX itself never compares them as a separate tier before pseudo
-rank - it sums both into one weight); **pseudo rank** (StyleX's
+rank - it sums both into one weight); and **pseudo rank** (StyleX's
 `PSEUDO_CLASS_PRIORITIES`/`PSEUDO_ELEMENT_PRIORITY` table, copied verbatim
 - `:hover` 130, `:focus` 150,
 `:focus-visible` 160, `:active` 170, every pseudo-element 5000, read only
@@ -624,17 +624,44 @@ position the classification above checks - and stopping at the first
 top-level combinator or `,`, so a rule that reaches further
 (`.x:hover .id-y{...}`, `.x:hover > span{...}`) still reads only its own
 `:hover`, not a mangled string spanning into the unrelated selector text
-past it); and **media width bound** (only
-read when the at-rule rank is `@media` - KIND first, then value: a query
-with a lower bound (a plain `min-width`, or a `min-width`/`max-width`
-RANGE, keyed by its lower bound alone) is min-kind, ascending; a query
-naming ONLY a `max-width` is max-kind, descending by that bound, and
-EVERY max-kind sorts after EVERY min-kind regardless of value; `None`
-(anything else) sorts first). Fixed and global: the same pseudo, at-rule or width always sorts
+past it). Fixed and global: the same at-rule kind or pseudo always sorts
 the same way, in every block, in every file - not a per-block "last
 declaration wins" rule. `global` and `base` never use this extended key
 (see "Classification" above and `packages/generate/generate.ml`'s
 `sort_conditional_rules`).
+
+Two rules tied on BOTH components fall straight through to
+`List.stable_sort`'s own guarantee: whichever order they already had when
+they reached this sort - library, then module dependency order, then a
+module's own DEFINITION order (`order_modules_within_scope`'s doc). This
+is also the order a `CSS.merge`/`+++` call's right-hand (override)
+argument needs to win, since the later-defined rule sorts last -
+`packages/ppx/test/css-support/condition-priority-stable-order.t` pins
+three real, shipped pairs this way: `MobileMenu_Css.ml`'s `toggleButton`
+(`@media (min-width:768px)`) then `toggleButtonShowAtTablet` (the same
+range bounded by `max-width:1279px`); `Header_Css.ml`'s `header` (the
+range) then `headerWithBanner` (`max-width:1279px` alone, through an
+interpolated `_in_` bundle rather than a plain `_a_` atom - stable order
+sorts a bundle exactly like a plain atom, since it never looks at the
+class prefix); `Discoverable_Css.ml`'s `praiseViewport` (the range), then
+`praiseViewportMobile` (`max-width:767px`), then `praiseViewportExpanded`
+(`max-width:1279px`) - the LAST-defined of the three sorts last and wins
+against BOTH earlier rules, not just the one immediately before it.
+
+A media-width tie-break (ascending `min-width`, descending `max-width`)
+used to sit here too, between at-rule rank and pseudo rank. REMOVED by
+decision: a real monorepo round found it got 2 of 4 real, shipped ties
+wrong (the `Header_Css.ml`/`Discoverable_Css.ml` pairs above) - a
+`min-width`/`max-width` range tied against a plain `max-width` rule for
+the same property has no reliable width-only answer, since only the
+generator's own input order can ever encode which side a
+`CSS.merge`/`+++` call meant as the override; width alone cannot. Getting
+the other 2 of 4 (the `MobileMenu_Css.ml` pair, and one before this track
+began) right was coincidence, not evidence the key was salvageable with a
+narrower fix. The known limit this leaves: two rules from DIFFERENT,
+unrelated modules that reach one element (not through one `[%css]`
+block's own author order) depend on file order - see "Order" above and
+"Known limits" in `how-merging-works.md`.
 
 This is a total order, not an injective one: two different `@supports`
 conditions, or two different pseudo-elements (`::before` vs `::after`),
@@ -646,54 +673,6 @@ written in the SAME block: a block that writes `:focus{color:blue}` then
 apply, reversing what "last declaration wins" would otherwise give for
 that one block - decided on purpose, for cross-block consistency, not
 inherited as a side effect (see `how-merging-works.md`).
-
-The media width bound is read with a plain substring scan over the
-prelude text, not the MQ4 grammar (`css-grammar/lib/Shared.ml:1104-1182`,
-not wired into this package): it drops a leading `screen`/`all` media type
-(`only` optional) and its own `and` first - `@media screen and
-(max-width: 767px)` is the dominant real shape, and that `and` is not the
-same thing as a compound feature query's `and` - then reads every
-`min-width`/`max-width: <n>px` feature left, joined by `and`. A query
-with a lower bound - a plain `min-width`, or a RANGE that also has a
-`max-width` - is min-kind, keyed by that lower bound alone; a RANGE's own
-upper bound is read only to confirm the prelude parses and is then
-discarded, never part of the key. A query naming ONLY a `max-width`, no
-lower bound at all, is max-kind, keyed by that upper bound, and sorts
-after EVERY min-kind query regardless of either one's numbers.
-Whitespace after the `:` is optional, since generated code always has
-one (`@media (min-width: 600px)`) while a hand-written `[@@@css ...]`
-fixture may not. Returns `None` (unreadable, sorts first) for anything
-else: an `or`/`not` anywhere in the prelude, a term this scan does not
-recognize as `min-width`/`max-width`, a unit other than `px` (an `em`/`vw`
-bound needs a font-size/viewport to compare against a `px` one, out of
-scope here), two terms for the SAME bound (ambiguous - not a claim of
-intersecting them), a `print` or other/unrecognized media type (left as
-`None` on purpose - not stripped like `screen`/`all`), or a leading `not`
-(`not screen` negates the type entirely, a different condition from
-`screen`, so it is never stripped either).
-
-Why kind before value: the generator only ever sees two conditions to
-order, never which one a `CSS.merge`/`+++` call meant as the override, so
-it cannot always get every real, shipped pair "right" by any single rule
-- it follows the common real pattern instead (mobile-first `min-width`,
-a narrower range as a scoped override INSIDE that breakpoint, a
-`max-width`-only rule for an unrelated, desktop-first override) and
-falls back to definition order on a genuine tie. Three real, shipped
-shapes pin this trade-off directly
-(`packages/ppx/test/css-support/condition-priority-media-range.t`,
-`condition-priority-media-range-shapes.t`): a plain `min-width` and a
-RANGE with the SAME lower bound tie (min-kind vs min-kind), so
-definition order decides - the range, declared second, wins, fixing the
-regression this key exists to prevent (`@media (min-width:
-768px){...}`, unbounded, used to always beat `@media (min-width: 768px)
-and (max-width: 1279px){...}`, bounded, regardless of intent). A RANGE
-against a plain `max-width`-only rule for the SAME numbers ties on
-NEITHER value NOR definition order - only kind - and the
-`max-width`-only rule always wins, whichever was declared first: two
-more real, shipped components hit exactly this shape, one of them
-through an interpolated `_in_` bundle rather than a plain `_a_` atom
-(the width key reads a bundle's own `@media` text the same way, so it
-sorts identically either way).
 
 A bundle, or a same-file family-atom group (see "Atomization" - several
 declarations already merged into one atom because their leaves overlap,
