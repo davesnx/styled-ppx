@@ -64,11 +64,11 @@ let layout = [%css {|
 extracts to:
 
 ```css
-.css-k008qs-layout { display: flex; }
-.css-1tyndxa-layout { align-items: center; }
+._a_5r08qs { display: flex; }
+._a_9i001xndt { align-items: center; }
 ```
 
-and `layout`'s className is the space-separated list: `"css-k008qs-layout css-1tyndxa-layout"`.
+and `layout`'s className is `"label:layout _id_3zgh83 _a_5r08qs _a_9i001xndt"`: a dev-only `label:layout` marker (grep-friendly, dropped in production), a build-independent identity class (`_id_3zgh83`, what a `$(layout)` selector reference resolves to), then the two atoms above.
 
 Class names are **content-addressed**: the hash is derived from the CSS text itself (for interpolation variables, the source path and main module name feed the hash too, so names stay stable across builds). Two components declaring `display: flex` anywhere in your project share the exact same rule, and the aggregator emits it once. On large apps this makes the stylesheet grow with the number of *distinct declarations*, not the number of components. That's the same effect utility-CSS frameworks achieve, without you maintaining a naming convention.
 
@@ -76,11 +76,11 @@ Repeated fallback declarations for the same property (e.g. `display: -webkit-box
 
 ### Class names
 
-The format is `css-<hash>-<label>`, where the label is the `let` binding or module name (`layout` above). The label is purely cosmetic, for debuggability: hashes alone determine identity and deduplication. Running the ppx with the `--minify` flag drops the label, emitting bare `css-<hash>` names for production.
+Atom class names follow the `_a_<context?><family><mask?><value>` format: a hash of which selector/at-rule context the declaration is under, a short id for its CSS property family, an optional mask of which of that family's longhands it sets, and a value hash - all derived from the declaration itself, never from your `let` binding or module name. Two declarations that render to the same CSS in the same context mint the same class, whatever you named them. The `let` binding's own name never appears in the class: instead, each named `[%css]`/`[%styled.<tag>]` binding mints its own separate, build-independent **identity class** (`_id_<hash>`, `layout`'s `_id_3zgh83` above) that a `$(binding)` selector reference resolves to. Running the ppx with `--dev` (the default) additionally prepends a `label:<binding>` marker class purely for grepping in development; `--minify`/`--env production` drops it. Neither flag changes any atom or identity class - see [Setting up the dune rules](/getting-started/dune-setup#ppx-flags).
 
 ### Cascade and ordering
 
-All atoms have the same specificity (a single class). The tiebreaker is stylesheet order (later wins), and the aggregator preserves your source order exactly, so an override written after its base declaration stays after it in `styles.css`. The full rules and composition patterns live in [Which declaration wins](/reference/runtime#which-declaration-wins).
+`CSS.merge(a, b)` decides by **argument order**, not by which one your source declares first: for any property both sides set, `b` wins, the same rule you'd expect from an object spread. Sheet position is a fallback, not the rule: rules are grouped into globals, then unconditional (`base`) atoms, then conditional (`@media`/`@supports`/`:hover`, ...) atoms, with no CSS layer wrapping any of it, so ordinary specificity always decides first and position only ever breaks a genuine tie. The full rule, its worked examples, and its known limits live in `documents/how-merging-works.md` and [Which declaration wins](/reference/runtime#which-declaration-wins).
 
 ## Dynamic values: CSS custom properties
 
@@ -94,11 +94,12 @@ let title = (~color) => [%css {|
 ```
 
 ```css
-.css-abc123-title { font-size: 2rem; }
-.css-def456-title { color: var(--color-xk29fh); }
+@property --color-1a279q8 { syntax: "*"; inherits: false; }
+._a_6500wnbku { font-size: 2rem; }
+._a_4esjgz { color: var(--color-1a279q8); }
 ```
 
-The runtime side only supplies the property's *value*, through the element's inline `style` attribute (`style="--color-xk29fh: #667eea"`). That's why elements styled with interpolations carry a small `style` attribute: it holds variable definitions, never declarations.
+The runtime side only supplies the property's *value*, through the element's inline `style` attribute (`style="--color-1a279q8: #667eea"`). That's why elements styled with interpolations carry a small `style` attribute: it holds variable definitions, never declarations.
 
 A few details worth knowing:
 

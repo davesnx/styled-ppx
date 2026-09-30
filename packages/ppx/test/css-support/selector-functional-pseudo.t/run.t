@@ -1,6 +1,6 @@
 Functional pseudo-elements (`::part()`, `::slotted()`) and the Selectors
 Level 4 "of S" form of `:nth-child()`/`:nth-last-child()` were both
-unparseable (.workplace/docs/parser-audit-defects.md #7, #8): the lexer only
+unparseable: the lexer only
 special-cases `nth-*` names for An+B payloads, so no other identifier
 followed by `(` ever reached a pseudo-element parser, and `parse_nth_payload`
 had no branch for the `of` keyword.

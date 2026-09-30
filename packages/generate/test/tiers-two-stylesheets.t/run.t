@@ -1,5 +1,5 @@
-The two-stylesheet shape (`tableContainer`, monorepo report "Round 3
-analysis"): the SAME `overflow-x: auto` atom is emitted by two different
+The two-stylesheet shape (`tableContainer`): the SAME
+`overflow-x: auto` atom is emitted by two different
 generated stylesheets (the "static" sheet, which also narrows it under
 `@media (min-width:1280px)`, and an unrelated "toolkit" sheet, which
 doesn't). Each stylesheet comes from its OWN `styled-ppx.generate`
