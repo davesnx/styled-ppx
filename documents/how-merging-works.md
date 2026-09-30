@@ -142,20 +142,11 @@ choice of what to check first, not StyleX's; only the pseudo-class/
 pseudo-element NUMBERS below are StyleX's own table), then a fixed
 pseudo-class/pseudo-element priority (`:hover` before `:focus-within`
 before `:focus` before `:focus-visible` before `:active`; any
-pseudo-element outranks any pseudo-class), then `@media` width — a query
-with a lower bound (a plain `min-width`, or a `min-width`/`max-width`
-RANGE) sorts ascending by that lower bound; a query naming ONLY a
-`max-width` sorts descending by that bound, AFTER every query with a
-lower bound, regardless of the actual numbers on either side. This order
-cannot know which side of a `CSS.merge`/`+++` call was meant as the
-override, so it follows the common real pattern instead: a RANGE tied
-with a plain `min-width` at the SAME lower bound (e.g. `@media
-(min-width: 768px) and (max-width: 1279px)` next to `@media (min-width:
-768px)`) is decided by which one was declared LATER (the range, read as
-a scoped override inside the wider breakpoint, normally wins); a RANGE
-tied against a `max-width`-only rule is decided by kind alone, and the
-`max-width`-only rule always wins, however either one was declared. This
-order is the SAME everywhere: in every file, in every block, not
+pseudo-element outranks any pseudo-class). Two conditions tied on BOTH
+still resolve deterministically, by falling through to DEFINITION
+ORDER: whichever one was declared later wins - the same order a
+`CSS.merge`/`+++` call's right-hand (override) argument needs to win.
+This order is the SAME everywhere: in every file, in every block, not
 "whichever one this block wrote last".
 A single block that writes
 
@@ -327,19 +318,29 @@ all) still depends on which one the browser loads first
   (full range syntax), Safari 16.4. Below that floor the rewritten
   condition evaluates to false, so the rewritten earlier rule never
   applies there.
-- **A `min-width`/`max-width` range vs. a plain `min-width`, at the SAME
-  lower bound, still depends on declaration order.** See "Sheet order"
-  above — the range wins only because it is declared later in the real,
-  shipped example the fix targets; the same two conditions in the
-  opposite declaration order give the opposite winner. Only a range
-  against a `max-width`-only rule is independent of declaration order
-  (kind alone decides, always the `max-width`-only side).
-- **A compound `@media` query beyond one `min`/`max`-width feature still
-  ties.** An `or`, a `not`, a third feature (e.g. `orientation`), a
-  non-`px` unit, or two terms for the SAME bound (two `min-width`s) all
-  still fall back to sheet position instead — the kind-based rule only
-  ever resolves a `min-width`/`max-width`/range comparison, not every
-  compound `@media` prelude.
+- **Two conditions tied on at-rule kind and pseudo rank depend on
+  DEFINITION order, not on either condition's own numbers.** There used
+  to be a third tie-break here — a `min-width`/`max-width` comparison —
+  removed by decision: a real monorepo round found it got 2 of 4 real,
+  shipped ties wrong (a range tied against a plain `max-width` rule for
+  the same property has no reliable width-only answer; only definition
+  order, which is what the generator's own input order actually encodes,
+  gets every real, shipped pair right). Within ONE library, dependency
+  order then a module's own definition order decide — which matches the
+  usual pattern of writing a base rule, then a narrower modifier, in that
+  order. Between two DIFFERENT, unrelated modules whose rules reach one
+  element (not through one `[%css]` block's own author order, and not
+  through a `CSS.merge`/`+++` call, which already has its own argument
+  order to decide by) — file order decides, and file order is exactly
+  the thing this whole track exists to stop depending on for a shared
+  pair of conditions. Writing both conditions in the same block helps
+  when the tie is between two otherwise-identical at-rules with no
+  pseudo at all, since a single block's own declaration order IS its
+  definition order; it does NOT help when the tie is a pseudo-class/
+  pseudo-element one (the fixed priority above still decides, even
+  inside one block - see the next bullet). Either way, an author who
+  still needs a specific winner can always raise specificity or use
+  `!important`.
 
 ## See also
 
