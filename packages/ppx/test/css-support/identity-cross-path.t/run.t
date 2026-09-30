@@ -20,7 +20,13 @@ file. The identity is namespaced on the compilation-unit module name
 
 Both paths mint the same identity:
 
-  $ grep "css.bindings" native/Marker.ml
+  $ cat native/Marker.ml
+  [@@@css ".css-tokvmb{color:red;}"]
   [@@@css.bindings [("Marker.marker", "cid-1ja89pc", "css-tokvmb")]]
-  $ grep "css.bindings" js/Marker.ml
+  let marker = CSS.make "label:marker cid-1ja89pc css-tokvmb" []
+  let _ = marker
+  $ cat js/Marker.ml
+  [@@@css ".css-tokvmb{color:red;}"]
   [@@@css.bindings [("Marker.marker", "cid-1ja89pc", "css-tokvmb")]]
+  let marker = CSS.make "label:marker cid-1ja89pc css-tokvmb" []
+  let _ = marker

@@ -1,7 +1,6 @@
 The identity namespace does not depend on the dune `library-name` cookie.
 Two dune libraries with different library names mint the SAME `cid-...`
-for the same module and binding name when neither passes `--namespace`
-(RED before the fix: see the report for the pre-fix diff).
+for the same module and binding name when neither passes `--namespace`.
 
   $ refmt --parse re --print ml input.re > input.ml
 

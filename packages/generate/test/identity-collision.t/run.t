@@ -18,7 +18,7 @@ exits 1.
   > EOF
 
   $ styled-ppx.generate a.ml b.ml
-  styled-ppx: b.ml: malformed [@@@css.bindings]: identity collision: "A.marker" (in a.ml) and "B.marker" (in b.ml) both hash to identity cid-shared, but carry different CSS ("css-a" vs "css-b"). Pass `--namespace <name>` to one library's (pps styled-ppx ...) stanza, identically on its native and melange stanzas.
+  styled-ppx: b.ml: identity collision: "A.marker" (in a.ml) and "B.marker" (in b.ml) both hash to identity cid-shared, but carry different CSS ("css-a" vs "css-b"). Pass `--namespace <name>` to one library's (pps styled-ppx ...) stanza, identically on its native and melange stanzas.
   [1]
 
 Same identity with the SAME atomized content is not a collision - it is

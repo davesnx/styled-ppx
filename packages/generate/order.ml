@@ -1,8 +1,9 @@
 (** Pure graph-ordering primitives. No I/O beyond the cycle warning (see
     [sort]), and no knowledge of [Generate]'s input type: callers own how a node
     maps to a name and how a referenced name resolves to an edge. This keeps the
-    module reusable for PR 2 (library-level ordering groups nodes by library,
-    collapses cross-library edges, then calls [sort] per group). *)
+    module reusable both for ordering modules within one library and for
+    ordering libraries themselves (library-level ordering groups nodes by
+    library, collapses cross-library edges, then calls [sort] per group). *)
 
 (** Module names a structure references, computed the way [ocamldep -modules]
     does. ppxlib freezes its own AST at a fixed internal OCaml version;
@@ -10,8 +11,7 @@
     Parsetree of the compiler this generator is built with, which is exactly
     what compiler-libs [Depend] expects. Reusing the compiler's own
     free-module-name walk avoids maintaining a second one. Verified for this
-    ppxlib/OCaml pairing against [ocamldep -modules] output; see the P1 decision
-    in [.workplace/plans/generate-dependency-order_PLAN.md]. *)
+    ppxlib/OCaml pairing against [ocamldep -modules] output. *)
 let references (structure : Ppxlib.structure) : string list =
   let compiler_structure =
     Ppxlib.Selected_ast.To_ocaml.copy_structure structure
@@ -35,7 +35,7 @@ let references (structure : Ppxlib.structure) : string list =
 
     A real dependency graph among already-compiled OCaml modules cannot cycle:
     dune would have refused to build it. A cycle here is therefore necessarily
-    an artifact of how the caller resolved a referenced name to a node (PR 1's
+    an artifact of how the caller resolved a referenced name to a node (its
     ambiguous-name heuristic can pick an edge a real build wouldn't have). We
     never fail the build over an ordering problem: warn once naming the stuck
     nodes, drop the blocking edge whose dependent (source) key sorts
