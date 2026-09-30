@@ -764,16 +764,18 @@ let seed : string array =
     "view-transition-group";
     "view-transition-scope";
     "window-drag";
-    (* Appended 2026-09-25 (css-grammar-gaps): CSS Gaps L1 family keys - each
-       is the shortest shorthand name in its union-find component, so every
-       other member (column-rule*, row-rule*, and every rule-* shorthand or
-       leaf that shares a leaf with it) redirects here instead of needing its
-       own entry. "rule" absorbs rule/column-rule/row-rule AND
-       rule-color/-style/-width (they share column-rule-color/-style/-width's
-       leaves with column-rule itself); "rule-inset" similarly absorbs the
-       whole inset shorthand tree (cap/junction/start/end, both sides, plus
-       the 8 cap-start/cap-end/junction-start/junction-end leaves). *)
-    "rule";
+    (* Appended 2026-09-25 (css-grammar-gaps): CSS Gaps L1 family keys.
+       "rule" is deliberately NOT listed here: it unions with the
+       already-seeded "column-rule" (its own family key since before this
+       PR), and rule-color/-style/-width union in transitively through
+       column-rule-color/-style/-width, column-rule's own longhands. Per
+       family_id_of's seed-priority rule (see its own doc), an
+       already-registered family member always keeps its slot over a new,
+       shorter name, so "rule" and rule-color/-style/-width all redirect to
+       "column-rule"'s existing slot instead of needing one of their own.
+       rule-break, rule-inset, rule-overlap and rule-visibility-items union
+       only NEW Gaps L1 properties with no pre-existing family, so each is a
+       genuinely new family and needs its own entry below. *)
     "rule-break";
     "rule-inset";
     "rule-overlap";

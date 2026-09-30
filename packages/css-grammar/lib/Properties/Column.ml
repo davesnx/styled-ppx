@@ -124,10 +124,18 @@ let property_column_rule_inset_junction :
   property_column_rule_inset_junction Rule.rule =
   Property_column_rule_inset_junction.rule
 
-(* CSS Gaps L1 § 3.3.1 (-start/-end shorthands): column-rule-inset-start
-   itself is not browser-implemented (no BCD entry; asymmetric with
-   row-rule-inset-start, which is), so only column-rule-inset-end is added -
+(* CSS Gaps L1 § 3.3.1 (-start/-end shorthands):
    https://drafts.csswg.org/css-gaps-1/#propdef-column-rule-inset-start *)
+module Property_column_rule_inset_start =
+  [%spec_module
+  "<inset-value>", (module Css_types.InsetValue)]
+
+let property_column_rule_inset_start :
+  property_column_rule_inset_start Rule.rule =
+  Property_column_rule_inset_start.rule
+
+(* CSS Gaps L1 § 3.3.1 (-start/-end shorthands):
+   https://drafts.csswg.org/css-gaps-1/#propdef-column-rule-inset-end *)
 module Property_column_rule_inset_end =
   [%spec_module
   "<inset-value>", (module Css_types.InsetValue)]
@@ -216,6 +224,11 @@ let entries : (kind * packed_rule) list =
             "column-rule-inset-junction-start"; "column-rule-inset-junction-end";
           ] ),
       pack_module (module Property_column_rule_inset_junction) );
+    ( Shorthand
+        ( "column-rule-inset-start",
+          [ "column-rule-inset-cap-start"; "column-rule-inset-junction-start" ]
+        ),
+      pack_module (module Property_column_rule_inset_start) );
     ( Shorthand
         ( "column-rule-inset-end",
           [ "column-rule-inset-cap-end"; "column-rule-inset-junction-end" ] ),

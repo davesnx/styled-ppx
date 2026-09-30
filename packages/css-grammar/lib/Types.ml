@@ -2944,9 +2944,8 @@ and property_row_rule_inset_junction_start = inset_value
 and property_row_rule_inset_junction_end = inset_value
 
 (* CSS Gaps L1 § 3.3.1: https://drafts.csswg.org/css-gaps-1/#propdef-column-rule-inset-start
-   column-rule-inset-start itself is not browser-implemented (no BCD entry;
-   asymmetric with row-rule-inset-start, which is) so it is not registered -
-   row-rule-inset-end and column-rule-inset-end are (Chrome 149), and are. *)
+   https://drafts.csswg.org/css-gaps-1/#propdef-column-rule-inset-end *)
+and property_column_rule_inset_start = inset_value
 and property_column_rule_inset_end = inset_value
 and property_row_rule_inset_start = inset_value
 and property_row_rule_inset_end = inset_value
@@ -3002,11 +3001,7 @@ and property_rule_inset_cap = property_column_rule_inset_cap
 and property_rule_inset_junction = property_column_rule_inset_junction
 and property_rule_inset_end = property_column_rule_inset_end
 and property_rule_inset = property_column_rule_inset
-
-(* rule-inset-start: see the column-rule-inset-start note above - it flattens
-   straight to the four leaves since the unimplemented intermediate property
-   is skipped, rather than aliasing property_column_rule_inset_start. *)
-and property_rule_inset_start = inset_value
+and property_rule_inset_start = property_column_rule_inset_start
 
 and property_column_span =
   [ `None

@@ -377,6 +377,10 @@ let expected_shorthands: list((string, list(string))) = [
     ["column-rule-inset-junction-start", "column-rule-inset-junction-end"],
   ),
   (
+    "column-rule-inset-start",
+    ["column-rule-inset-cap-start", "column-rule-inset-junction-start"],
+  ),
+  (
     "column-rule-inset-end",
     ["column-rule-inset-cap-end", "column-rule-inset-junction-end"],
   ),
@@ -418,15 +422,7 @@ let expected_shorthands: list((string, list(string))) = [
   ),
   ("rule-inset-end", ["column-rule-inset-end", "row-rule-inset-end"]),
   ("rule-inset", ["column-rule-inset", "row-rule-inset"]),
-  (
-    "rule-inset-start",
-    [
-      "column-rule-inset-cap-start",
-      "column-rule-inset-junction-start",
-      "row-rule-inset-cap-start",
-      "row-rule-inset-junction-start",
-    ],
-  ),
+  ("rule-inset-start", ["column-rule-inset-start", "row-rule-inset-start"]),
   (
     "mask",
     [
