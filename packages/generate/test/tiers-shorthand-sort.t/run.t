@@ -1,5 +1,5 @@
-The /pricing shape (`featureCell`/`featureTitleCell`, monorepo report
-"Round 3 analysis"): `merge(featureCell{padding: 4px $(gap)}, featureTitleCell{padding-top:
+A pricing-page shape (`featureCell`/`featureTitleCell`):
+`merge(featureCell{padding: 4px $(gap)}, featureTitleCell{padding-top:
 0; padding-bottom: 0})` - `featureTitleCell` is meant to override
 `featureCell`'s vertical padding. `featureCell`'s block has a SECOND
 interpolated declaration too (its own accent color), so its

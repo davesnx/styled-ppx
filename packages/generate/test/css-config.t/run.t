@@ -40,9 +40,9 @@ Unknown config keys are ignored (forward compatibility).
   .c{color:green;}
 
 A config that only carries a `library-name` key (no `env`) must not flip
-production mode: unknown keys are ignored today, and this pins that
-contract for the upcoming aggregator PR that reads `library-name` to group and
-order rules by owning library.
+production mode: unknown keys are ignored, and this pins that contract for
+`library-name`, which the aggregator reads to group and order rules by
+owning library.
 
   $ cat > lib-only.ml <<EOF
   > [@@@css.config [("library-name", "foo")]]

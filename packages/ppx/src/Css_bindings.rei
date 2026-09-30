@@ -8,8 +8,8 @@
     references resolve to this, verbatim; the class string is the
     space-separated list of atomized class names the PPX minted for it,
     kept as a content fingerprint so the aggregator can tell a legitimate
-    duplicate build from a real identity collision (see
-    [Generate.Index]).
+    duplicate build from a real identity collision (see the [Index] module
+    in [styled-ppx.generate]'s [generate.ml]).
 
     The impl transformer drains this buffer at end-of-CU and emits one
     [\[\@\@\@css.bindings ...\]] attribute carrying every entry. The

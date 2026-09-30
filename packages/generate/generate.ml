@@ -105,9 +105,14 @@ module Index = struct
       other_longident other_filename entry.longident filename entry.identity
       other_class_string entry.class_string
 
-  let add_from_payload ~filename (idx : t) payload =
+  (* [`Malformed] is a payload the PPX could not have produced (a decode
+     failure); [`Collision] is a well-formed payload that names a real
+     identity collision. The two read very differently to whoever hits them,
+     so the caller reports them with different wording. *)
+  let add_from_payload ~filename (idx : t) payload :
+    (unit, [ `Malformed of string | `Collision of string ]) result =
     match Css_extraction.decode_bindings_payload payload with
-    | Error msg -> Error msg
+    | Error msg -> Error (`Malformed msg)
     | Ok entries ->
       let errors =
         List.filter_map
@@ -127,7 +132,7 @@ module Index = struct
       in
       (match errors with
       | [] -> Ok ()
-      | msgs -> Error (String.concat "; " msgs))
+      | msgs -> Error (`Collision (String.concat "; " msgs)))
 end
 
 (** Every
@@ -189,8 +194,11 @@ let extract_structure ~filename ~idx structure : input =
       | [%stri [@@@css.bindings [%e? value]]] ->
         (match Index.add_from_payload ~filename idx value with
         | Ok () -> ()
-        | Error msg ->
-          add_protocol_error Css_extraction.bindings_attribute_name msg)
+        | Error (`Malformed msg) ->
+          add_protocol_error Css_extraction.bindings_attribute_name msg
+        | Error (`Collision msg) ->
+          protocol_errors :=
+            Printf.sprintf "%s: %s" filename msg :: !protocol_errors)
       | [%stri [@@@css.config [%e? value]]] ->
         (match Css_extraction.decode_config_payload value with
         | Ok entries ->
@@ -421,9 +429,11 @@ let library_edge_target ~(groups_with_module : string -> library_group list)
       |> single)
 
 (** Two-level order: libraries first (by the dependency graph collapsed from
-    module references), then, within each library, {!order_modules_within_scope}
-    unchanged from PR 1. Both levels reuse {!Order.sort}, so the alphabetical
-    tiebreak and the never-fail cycle policy apply at both levels for free. *)
+    module references), then, within each library, the same per-module
+    dependency order used across the whole input set
+    ({!order_modules_within_scope}). Both levels reuse {!Order.sort}, so the
+    alphabetical tiebreak and the never-fail cycle policy apply at both levels
+    for free. *)
 let order_by_dependency (inputs : input list) : input list =
   let groups = group_by_library inputs in
   (* Indexed once: scanning every group for every raw reference measured 2 s
@@ -781,28 +791,28 @@ let is_descendant_shape rule_text =
     && not (String.contains (rightmost_compound selector) '.')
 
 (** [Conditional] or [Base] - a descendant-shaped rule (see
-    {!is_descendant_shape}) is neither: it stays in the tier of its own
-    context, exactly like any other rule, so specificity (not layer order)
-    decides between a parent's blind reach (".x *", ".x li") and the child's
-    own atom, the same way it did before tiers existed. [Descendant] used to
-    be its own, lowest tier - removed (round 5): sitting below [Base]
-    unconditionally made an ancestor's rule lose to EVERY child atom
-    regardless of specificity, which broke five real, more-specific-ancestor
-    patterns ([".list li"], [".field input"], [".clearButtonContainer
-    span"], [":where(.stack) > *"], [".field button"]) to fix the one
-    ({/gbp-monitor}'s ".x *", genuinely tied at (0,1,0)) it was meant for.
-    {!sort_by_shorthand_first} now protects that one case instead, by
-    emitting descendant-shaped rules before own-element rules within
-    whichever tier they land in, so a genuine specificity TIE still resolves
-    to the child (later rule wins a tie); a real specificity difference is
-    untouched by stylesheet position either way. [Conditional] when
-    [rule_text] only applies under some extra condition beyond the plain
-    presence of its own element: wrapped in an at-rule
-    ([@media]/[@supports]/[@container] are the only ones that ever wrap an atom
-    class - [@property]/[@keyframes]/[@font-face]/ [%styled.global] rules carry
-    no atom class at all and never reach this function, see the "no atom class"
-    filter in {!run} below), or a pseudo-class/pseudo-element attached DIRECTLY
-    to the atom's own compound selector (".x:hover", ".x::before", chained
+    {!is_descendant_shape}) is neither: it stays in the tier of its own context,
+    exactly like any other rule, so specificity (not layer order) decides
+    between a parent's blind reach (".x *", ".x li") and the child's own atom,
+    the same way it did before tiers existed. [Descendant] used to be its own,
+    lowest tier - removed: sitting below [Base] unconditionally made an
+    ancestor's rule lose to EVERY child atom regardless of specificity, which
+    broke five real, more-specific-ancestor patterns ([".list li"],
+    [".field input"], [".clearButtonContainer span"], [":where(.stack) > *"],
+    [".field button"]) to fix the one (an ancestor selector genuinely tied in
+    specificity with a child's own atom, e.g. ".x *" tied at (0,1,0)) it was
+    meant for. {!sort_by_shorthand_first} now protects that one case instead, by
+    emitting descendant-shaped rules before own-element rules within whichever
+    tier they land in, so a genuine specificity TIE still resolves to the child
+    (later rule wins a tie); a real specificity difference is untouched by
+    stylesheet position either way. [Conditional] when [rule_text] only applies
+    under some extra condition beyond the plain presence of its own element:
+    wrapped in an at-rule ([@media]/[@supports]/[@container] are the only ones
+    that ever wrap an atom class - [@property]/[@keyframes]/[@font-face]/
+    [%styled.global] rules carry no atom class at all and never reach this
+    function, see the "no atom class" filter in {!run} below), or a
+    pseudo-class/pseudo-element attached DIRECTLY to the atom's own compound
+    selector (".x:hover", ".x::before", chained
     ".x:focus-visible:not(:disabled)"). [Base] otherwise, including a
     descendant/child selector whose subject DOES carry its own class (".x
     .id-...", ".x .tiptap" - see {!is_descendant_shape}'s doc) and any rule with
@@ -919,12 +929,12 @@ let rule_depth rule_text =
     own atom rarely share a property too - and on the rare pair where they would
     disagree (an ancestor's rule is itself a shallower shorthand than the
     child's own deeper longhand, or vice versa), protecting the child from an
-    unrelated ancestor's blind reach (see the `/gbp-monitor` case round 5's
-    descendant-tier removal needed a replacement for) is the invariant that
-    removal exists for, so it must not be overridden by depth's narrower concern
-    (restoring one binding's own shorthand-then-longhand override intent across
-    atoms `CSS.merge` can't see inside a bundle to compare directly). Rules that
-    are equally descendant-shaped (both, or neither) fall through to depth. *)
+    unrelated ancestor's blind reach (the case the [Descendant] tier's removal
+    above needed a replacement for) is the invariant that removal exists for, so
+    it must not be overridden by depth's narrower concern (restoring one
+    binding's own shorthand-then-longhand override intent across atoms
+    `CSS.merge` can't see inside a bundle to compare directly). Rules that are
+    equally descendant-shaped (both, or neither) fall through to depth. *)
 let compare_descendant_first_then_depth (is_descendant_a, depth_a, _)
   (is_descendant_b, depth_b, _) =
   if is_descendant_a <> is_descendant_b then
@@ -1512,7 +1522,7 @@ let run ~output_file ~order input_files =
      cascading rule (`html{...}`, `*{...}`, `*::before{...}`, an author's own
      global selector), is [global]; every real atom, [_a_] or [_in_] alike,
      is [base] or [conditional] (no separate [descendant] tier - see
-     [rule_tier]'s doc for why round 5 removed it: a descendant-shaped rule
+     [rule_tier]'s doc for why it was removed: a descendant-shaped rule
      stays in the tier of its own context instead, and
      {!sort_by_shorthand_first} orders it before own-element rules within
      that tier). Emission order below is [global], then [base], then

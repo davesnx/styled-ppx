@@ -4,10 +4,11 @@ sibling dir1/util.ml by path proximity, not dir2's. But dir1/util.ml also
 references X, and X has only one candidate file, so that edge is
 unambiguous. The two edges close a cycle between dir1/util.ml and dir1/x.ml
 that a real OCaml build could never produce on its own (dune wouldn't have
-compiled a genuine circular dependency) — it only exists because this
-generator resolves same-named modules by path proximity instead of real
-library membership (PR 2 fixes that). The sort breaks the cycle
-deterministically instead of failing the build.
+compiled a genuine circular dependency) — it only exists because, within
+one library, this generator resolves same-named modules by path proximity
+rather than real library membership (a cross-library reference resolves by
+real membership instead; see `library_edge_target`). The sort breaks the
+cycle deterministically instead of failing the build.
 
   $ mkdir dir1 dir2
 

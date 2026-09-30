@@ -237,8 +237,8 @@ let alias_tests =
 
 (* --- mask invariant: a leaf's own mask must distinguish it from its -----
    family's other legs whenever there ARE other legs to distinguish from.
-   Round 6 (monorepo, b70a86b0) found this broken for the alias spellings
-   "grid-row-gap"/"grid-column-gap": [of_atom] called
+   This was found broken for the alias spellings "grid-row-gap"/
+   "grid-column-gap": [of_atom] called
    [Family.mask_of]/[Family.full_mask_of] on the raw, unresolved alias name,
    which [Family]'s union-find (built only from [direct_children], itself
    built only from [Css_grammar.shorthands] - never [Css_grammar.aliases])
@@ -312,6 +312,64 @@ let mask_tests =
         violations);
   ]
 
+(* --- family-id stability: a property already in [seed] never moves -----
+   Without a guard, a later shorthand registration can silently move an
+   already-seeded property off its own slot two ways: {!Family.family_key_of}'s
+   shortest-name rule lets a shorter new shorthand win over an
+   already-registered, longer one in the same family (a new "rule" shorthand
+   unioning with the already-registered "column-rule"); separately, a new
+   shorthand unioning two or more previously-standalone, already-registered
+   properties (a new "max-size" shorthand unioning "max-width" and
+   "max-height", each its own one-member family until then) is not even
+   covered by the shortest-name rule at all, since neither is itself a
+   shorthand - both would fall through to the brand-new shorthand's own,
+   never-registered name. [Slot_key.family_id_of] guards against both: it
+   prefers whichever member of the WHOLE family (shorthand or leaf) already
+   has a seed slot, over the shortest-name rule. This test asserts the guard
+   holds for every property in [seed] today, not just a hand-picked case, so
+   a future shorthand registration that would silently move one of them
+   fails here instead of shipping. Every seed entry is either a family key
+   or a standalone (family-less) property today (see [seed]'s own doc), so
+   each is expected to keep resolving to its own slot right now. A new
+   shorthand that unions two already-seeded properties (for example a
+   "max-size" over "max-width" and "max-height") can only keep one of their
+   slots, so it fails here and needs an explicit decision. *)
+let family_id_stability_tests =
+  [
+    Alcotest_extra.test
+      "every property in seed keeps its own seed slot as its family id - an \
+       already-registered family member always wins over a later shorthand \
+       that joins its family, whether that shorthand is shorter (\"rule\" vs \
+       \"column-rule\") or unions two previously-standalone properties \
+       (\"max-size\" vs \"max-width\"/\"max-height\")" (fun () ->
+      let seed_index =
+        Slot_key.seed
+        |> Array.to_list
+        |> List.mapi (fun i name -> name, i)
+        (* "all" is seeded to reserve its position in the append-only order,
+           but [family_id_of] special-cases it to the [All] sentinel rather
+           than looking it up in the registry - not a family-id regression,
+           see coverage_tests above for the same exclusion. *)
+        |> List.filter (fun (name, _) -> name <> "all")
+      in
+      let violations =
+        seed_index
+        |> List.filter_map (fun (name, index) ->
+          match Slot_key.family_id_of name with
+          | Registered i when i = index -> None
+          | Registered i ->
+            Some
+              (Printf.sprintf
+                 "%s: seeded at %d, family_id_of now resolves to %d" name index
+                 i)
+          | Unregistered _ | UnregisteredCustom _ | All ->
+            Some (Printf.sprintf "%s: no longer Registered at all" name))
+      in
+      check_string_list
+        "seeded properties whose family id moved away from their own seed slot"
+        [] violations);
+  ]
+
 let () =
   Alcotest.run ~show_errors:true ~compact:true ~tail_errors:`Unlimited
     "slot_key_registry"
@@ -321,4 +379,5 @@ let () =
       "order", List.concat_map snd order_tests;
       "alias", List.concat_map snd alias_tests;
       "mask", List.concat_map snd mask_tests;
+      "family-id-stability", List.concat_map snd family_id_stability_tests;
     ]

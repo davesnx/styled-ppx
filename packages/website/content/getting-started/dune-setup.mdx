@@ -162,9 +162,9 @@ Passed inside `(pps styled-ppx <flags> ...)`:
 | Flag | Effect |
 | --- | --- |
 | `--native` | Generate code for server-reason-react (native/SSR) instead of Melange |
-| `--minify` | Minify the generated CSS and drop the readable `-<label>` suffix from class names (`css-1tyndxa` instead of `css-1tyndxa-layout`) |
-| `--dev` | Add greppable marker classes to classNames in development; no effect on the extracted CSS |
-| `--env development\|production` | Preset over the flags above: `development` = `--dev` (markers + readable labels), `production` = `--minify` (no labels, minified CSS) |
+| `--minify` | Minify the generated CSS (drop inter-rule whitespace); no effect on class names, which never carry a label |
+| `--dev` | Add a greppable `label:<binding>` marker class to classNames in development; no effect on atom classes or the extracted CSS |
+| `--env development\|production` | Preset over the flags above: `development` = `--dev` (`label:<binding>` markers on), `production` = `--minify` (markers off, minified CSS) |
 | `--debug` | Verbose ppx logging |
 
 <Callout type="default">
@@ -175,9 +175,9 @@ Passed inside `(pps styled-ppx <flags> ...)`:
 
 ## Production setup
 
-For a release build, pass `--env production` to the ppx. It enables `--minify` (drops the `-<label>` suffix, minifies rule bodies), disables `--dev`, and declares the environment in the extraction protocol so `styled-ppx.generate` minifies the final stylesheet on its own. Minification never changes the hashes: `css-1tyndxa-layout` in dev and `css-1tyndxa` in prod are the same atom, so a class seen in production can be looked up in a dev build.
+For a release build, pass `--env production` to the ppx. It enables `--minify` (minifies rule bodies only; class names are unaffected), disables `--dev` (drops the `label:<binding>` marker class), and declares the environment in the extraction protocol so `styled-ppx.generate` minifies the final stylesheet on its own. Atom and identity class names are identical in dev and production - only the `label:<binding>` marker's presence differs - so a class seen in production can be looked up directly in a dev build.
 
-The label switch lives on the **ppx** because labels are baked into the class names at compile time, in both the `className` your components carry and the extracted CSS. No downstream tool could drop them without desyncing the two.
+The dev-marker switch lives on the **ppx**: `label:<binding>` is its own marker class, prepended to the `className` string alongside the real atom and identity classes, never baked into an atom's own hash. Toggling `--dev` only adds or removes that one marker class; every atom and identity class stays exactly the same either way.
 
 Dune has no conditional pps flags (variables aren't allowed in `pps` arguments), so the supported pattern is duplicating the library stanza under mutually-exclusive `enabled_if` guards (same fields, different flags):
 
@@ -236,4 +236,4 @@ library, or inline the class chain literally.
 
 Selector references can't cross dune library boundaries. Co-locate the coupled styles in one library, and see [class references in selectors](/reference/selectors#class-references-in-selectors).
 
-**Styles apply in the wrong order.** With atomic CSS the tiebreaker is stylesheet source order, not class-name order or merge order. See [Which declaration wins](/reference/runtime#which-declaration-wins).
+**Styles apply in the wrong order.** For two `styles` values you combine with `CSS.merge(a, b)`, argument order decides: `b` wins any property both sides set, regardless of source or compile order. Stylesheet position only ever breaks a tie between atoms `CSS.merge` didn't relate (different property families, or classes concatenated without going through `CSS.merge` at all) - and even then, later position only wins at equal specificity. See [Which declaration wins](/reference/runtime#which-declaration-wins) and `documents/how-merging-works.md`.
