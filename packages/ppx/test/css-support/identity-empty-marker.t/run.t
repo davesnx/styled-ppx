@@ -12,10 +12,14 @@ from the extracted selector. The identity is independent of `--minify`
   $ refmt --parse re --print ml input.re > input.ml
 
   $ ../../standalone.exe --impl input.ml -o dev.ml
-  $ grep "css" dev.ml
+  $ cat dev.ml
   [@@@css.bindings [("Input.marker", "cid-1rctcrz", "")]]
+  let marker = CSS.make "label:marker cid-1rctcrz" []
+  let _ = marker
 
   $ ../../standalone.exe --minify --impl input.ml -o prod.ml
-  $ grep "css" prod.ml
+  $ cat prod.ml
   [@@@css.config [("env", "production")]]
   [@@@css.bindings [("Input.marker", "cid-1rctcrz", "")]]
+  let marker = CSS.make "cid-1rctcrz" []
+  let _ = marker

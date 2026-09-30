@@ -11,9 +11,14 @@ remain as sentinels until aggregation.
 The post-PPX `n.ml` shows only the cross-module ref as a sentinel — the
 same-module `localFlag` is already resolved to its class.
 
-  $ grep "css-" n.ml | head -3
+  $ cat n.ml
   [@@@css ".css-djuldm.cid-1026km9.\000M.marker\000{color:blue;}"]
+  [@@@css.bindings
+    [("N.localFlag", "cid-1026km9", "");
     ("N.container", "cid-1ov2ckq", "css-djuldm")]]
+  [@@@css.refs [("M.marker", "n.ml", 4, 19, 27)]]
+  let _ = M.marker
+  let localFlag = CSS.make "label:localFlag cid-1026km9" []
   let container = CSS.make "label:container cid-1ov2ckq css-djuldm" []
 
 The aggregator resolves `M.marker`. Final output matches what an inlined
