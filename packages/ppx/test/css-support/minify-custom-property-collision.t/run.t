@@ -1,6 +1,7 @@
-Minified [%css] omits labels from class names, but custom-property names still
-include the owning style namespace and must not collide across independent
-styles that reuse the same local interpolation name.
+Class names are `css-<hash(content)>` in every mode, minified or not.
+Custom-property names still include the owning style namespace and must not
+collide across independent styles that reuse the same local interpolation
+name.
 
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../standalone.exe --minify --impl output.ml -o output.ml

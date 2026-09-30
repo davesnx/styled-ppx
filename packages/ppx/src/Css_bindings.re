@@ -1,5 +1,6 @@
 type entry = {
   longident: string,
+  identity: string,
   class_string: string,
 };
 
@@ -16,7 +17,7 @@ let reset = () => {
   Hashtbl.clear(seen);
 };
 
-let record = (~longident: string, ~class_string: string) =>
+let record = (~longident: string, ~identity: string, ~class_string: string) =>
   if (longident != "") {
     if (Hashtbl.mem(seen, longident)) {
       /* Last-write-wins: replace the older entry in-place instead of
@@ -27,6 +28,7 @@ let record = (~longident: string, ~class_string: string) =>
             e.longident == longident
               ? {
                 longident,
+                identity,
                 class_string,
               }
               : e,
@@ -38,6 +40,7 @@ let record = (~longident: string, ~class_string: string) =>
         [
           {
             longident,
+            identity,
             class_string,
           },
           ...entries^,

@@ -101,6 +101,57 @@ let gradiend = [%css
     |}
 ];
 
+/* Selector references: `.$(binding)` inside a [%css] rule targets another
+   binding's identity class (works across modules too), and `&.$(binding)`
+   does the same compounded onto the current selector. */
+
+module Labels = {
+  let tag = [%css
+    {|
+    display: inline-block;
+    padding: 2px 8px;
+    margin-left: 8px;
+    border: 2px solid #141414;
+    border-radius: 4px;
+  |}
+  ];
+};
+
+let childLabel = [%css "font-weight: bold;"];
+
+let parentWithChildSelector = [%css
+  {|
+  border: 3px solid #2f9e44;
+  padding: 16px;
+  margin-bottom: 16px;
+
+  .$(childLabel) {
+    color: #2f9e44;
+  }
+
+  .$(Labels.tag) {
+    background: #d3f9d8;
+  }
+|}
+];
+
+let modifierActive = [%css "font-weight: bold;"];
+
+let toggle = [%css
+  {|
+  display: inline-block;
+  padding: 6px 14px;
+  margin-right: 8px;
+  border: 2px solid #495057;
+  border-radius: 999px;
+
+  &.$(modifierActive) {
+    background: #ffd43b;
+    border-color: #f08c00;
+  }
+|}
+];
+
 let primary = CSS.hex("141414");
 
 let keyframeDemoShell = color => [%css
@@ -170,5 +221,22 @@ let make = () =>
     <section styles=stack>
       <div styles=clx> {React.string("code everywhere!")} </div>
       <div styles=selectors> {React.string("Red text")} </div>
+    </section>
+    <section styles=parentWithChildSelector>
+      <h2> {React.string("Selector references")} </h2>
+      <p styles=childLabel>
+        {React.string("Green text via the parent's .$(childLabel) selector")}
+      </p>
+      <span styles=Labels.tag>
+        {React.string(
+           "Bordered via a submodule .$(Labels.tag) selector reference",
+         )}
+      </span>
+    </section>
+    <section>
+      <span styles=toggle> {React.string("toggle: off")} </span>
+      <span styles={CSS.merge(toggle, modifierActive)}>
+        {React.string("toggle: on via &.$(modifierActive)")}
+      </span>
     </section>
   </main>;

@@ -1,5 +1,5 @@
 When the PPX is invoked with --dev, every named [%css] binding gets a
-leading `cx-<name>` marker class. The marker is a plain string token
+leading `label:<name>` marker class. The marker is a plain string token
 prepended to the className list inside CSS.make; it is not emitted as
 a CSS rule.
 
@@ -15,19 +15,19 @@ a CSS rule.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-k008qs-layout{display:flex;}"];
-  [@css ".css-38zrbw-layout{padding:12px;}"];
-  [@css ".css-tokvmb-button{color:red;}"];
+  [@css ".css-k008qs{display:flex;}"];
+  [@css ".css-38zrbw{padding:12px;}"];
+  [@css ".css-tokvmb{color:red;}"];
   [@css.bindings
     [
-      ("Input.layout", "css-k008qs-layout css-38zrbw-layout"),
-      ("Input.button", "css-tokvmb-button"),
+      ("Input.layout", "cid-1jj5tmt", "css-k008qs css-38zrbw"),
+      ("Input.button", "cid-l55coe", "css-tokvmb"),
     ]
   ];
   
-  let layout = CSS.make("cx-layout css-k008qs-layout css-38zrbw-layout", []);
+  let layout = CSS.make("label:layout cid-1jj5tmt css-k008qs css-38zrbw", []);
   
-  let button = CSS.make("cx-button css-tokvmb-button", []);
+  let button = CSS.make("label:button cid-l55coe css-tokvmb", []);
   
   let _ = (layout, button);
 

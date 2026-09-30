@@ -4489,8 +4489,8 @@ var require_react_dom_development = __commonJS({
           return type.displayName || "Context";
         }
         function getComponentNameFromFiber(fiber) {
-          var tag = fiber.tag, type = fiber.type;
-          switch (tag) {
+          var tag2 = fiber.tag, type = fiber.type;
+          switch (tag2) {
             case CacheComponent:
               return "Cache";
             case ContextConsumer:
@@ -5499,13 +5499,13 @@ var require_react_dom_development = __commonJS({
           menuitem: true
         }, omittedCloseTags);
         var HTML = "__html";
-        function assertValidProps(tag, props) {
+        function assertValidProps(tag2, props) {
           if (!props) {
             return;
           }
-          if (voidElementTags[tag]) {
+          if (voidElementTags[tag2]) {
             if (props.children != null || props.dangerouslySetInnerHTML != null) {
-              throw new Error(tag + " is a void element tag and must neither have `children` nor use `dangerouslySetInnerHTML`.");
+              throw new Error(tag2 + " is a void element tag and must neither have `children` nor use `dangerouslySetInnerHTML`.");
             }
           }
           if (props.dangerouslySetInnerHTML != null) {
@@ -6410,8 +6410,8 @@ var require_react_dom_development = __commonJS({
           batchedUpdatesImpl = _batchedUpdatesImpl;
           flushSyncImpl = _flushSyncImpl;
         }
-        function isInteractive(tag) {
-          return tag === "button" || tag === "input" || tag === "select" || tag === "textarea";
+        function isInteractive(tag2) {
+          return tag2 === "button" || tag2 === "input" || tag2 === "select" || tag2 === "textarea";
         }
         function shouldPreventMouseEvent(name2, type, props) {
           switch (name2) {
@@ -8102,8 +8102,8 @@ var require_react_dom_development = __commonJS({
           if (targetInst !== null) {
             var nearestMounted = getNearestMountedFiber(targetInst);
             if (nearestMounted !== null) {
-              var tag = nearestMounted.tag;
-              if (tag === SuspenseComponent) {
+              var tag2 = nearestMounted.tag;
+              if (tag2 === SuspenseComponent) {
                 var instance = getSuspenseInstanceFromFiber(nearestMounted);
                 if (instance !== null) {
                   queuedTarget.blockedOn = instance;
@@ -8112,7 +8112,7 @@ var require_react_dom_development = __commonJS({
                   });
                   return;
                 }
-              } else if (tag === HostRoot) {
+              } else if (tag2 === HostRoot) {
                 var root2 = nearestMounted.stateNode;
                 if (isRootDehydrated(root2)) {
                   queuedTarget.blockedOn = getContainerFromFiber(nearestMounted);
@@ -8340,14 +8340,14 @@ var require_react_dom_development = __commonJS({
             if (nearestMounted === null) {
               targetInst = null;
             } else {
-              var tag = nearestMounted.tag;
-              if (tag === SuspenseComponent) {
+              var tag2 = nearestMounted.tag;
+              if (tag2 === SuspenseComponent) {
                 var instance = getSuspenseInstanceFromFiber(nearestMounted);
                 if (instance !== null) {
                   return instance;
                 }
                 targetInst = null;
-              } else if (tag === HostRoot) {
+              } else if (tag2 === HostRoot) {
                 var root2 = nearestMounted.stateNode;
                 if (isRootDehydrated(root2)) {
                   return getContainerFromFiber(nearestMounted);
@@ -10038,8 +10038,8 @@ var require_react_dom_development = __commonJS({
           var instance = targetFiber;
           var lastHostComponent = null;
           while (instance !== null) {
-            var _instance2 = instance, stateNode = _instance2.stateNode, tag = _instance2.tag;
-            if (tag === HostComponent && stateNode !== null) {
+            var _instance2 = instance, stateNode = _instance2.stateNode, tag2 = _instance2.tag;
+            if (tag2 === HostComponent && stateNode !== null) {
               lastHostComponent = stateNode;
               if (reactEventName !== null) {
                 var listener = getListener(instance, reactEventName);
@@ -10060,8 +10060,8 @@ var require_react_dom_development = __commonJS({
           var listeners = [];
           var instance = targetFiber;
           while (instance !== null) {
-            var _instance3 = instance, stateNode = _instance3.stateNode, tag = _instance3.tag;
-            if (tag === HostComponent && stateNode !== null) {
+            var _instance3 = instance, stateNode = _instance3.stateNode, tag2 = _instance3.tag;
+            if (tag2 === HostComponent && stateNode !== null) {
               var currentTarget = stateNode;
               var captureListener = getListener(instance, captureName);
               if (captureListener != null) {
@@ -10125,11 +10125,11 @@ var require_react_dom_development = __commonJS({
             if (instance === common) {
               break;
             }
-            var _instance4 = instance, alternate3 = _instance4.alternate, stateNode = _instance4.stateNode, tag = _instance4.tag;
+            var _instance4 = instance, alternate3 = _instance4.alternate, stateNode = _instance4.stateNode, tag2 = _instance4.tag;
             if (alternate3 !== null && alternate3 === common) {
               break;
             }
-            if (tag === HostComponent && stateNode !== null) {
+            if (tag2 === HostComponent && stateNode !== null) {
               var currentTarget = stateNode;
               if (inCapturePhase) {
                 var captureListener = getListener(instance, registrationName);
@@ -10270,7 +10270,7 @@ var require_react_dom_development = __commonJS({
         function trapClickOnNonInteractiveElement(node) {
           node.onclick = noop;
         }
-        function setInitialDOMProperties(tag, domElement, rootContainerElement, nextProps, isCustomComponentTag) {
+        function setInitialDOMProperties(tag2, domElement, rootContainerElement, nextProps, isCustomComponentTag) {
           for (var propKey in nextProps) {
             if (!nextProps.hasOwnProperty(propKey)) {
               continue;
@@ -10290,7 +10290,7 @@ var require_react_dom_development = __commonJS({
               }
             } else if (propKey === CHILDREN) {
               if (typeof nextProp === "string") {
-                var canSetTextContent = tag !== "textarea" || nextProp !== "";
+                var canSetTextContent = tag2 !== "textarea" || nextProp !== "";
                 if (canSetTextContent) {
                   setTextContent(domElement, nextProp);
                 }
@@ -10379,13 +10379,13 @@ var require_react_dom_development = __commonJS({
         function createTextNode(text4, rootContainerElement) {
           return getOwnerDocumentFromRootContainer(rootContainerElement).createTextNode(text4);
         }
-        function setInitialProperties(domElement, tag, rawProps, rootContainerElement) {
-          var isCustomComponentTag = isCustomComponent(tag, rawProps);
+        function setInitialProperties(domElement, tag2, rawProps, rootContainerElement) {
+          var isCustomComponentTag = isCustomComponent(tag2, rawProps);
           {
-            validatePropertiesInDevelopment(tag, rawProps);
+            validatePropertiesInDevelopment(tag2, rawProps);
           }
           var props;
-          switch (tag) {
+          switch (tag2) {
             case "dialog":
               listenToNonDelegatedEvent("cancel", domElement);
               listenToNonDelegatedEvent("close", domElement);
@@ -10441,9 +10441,9 @@ var require_react_dom_development = __commonJS({
             default:
               props = rawProps;
           }
-          assertValidProps(tag, props);
-          setInitialDOMProperties(tag, domElement, rootContainerElement, props, isCustomComponentTag);
-          switch (tag) {
+          assertValidProps(tag2, props);
+          setInitialDOMProperties(tag2, domElement, rootContainerElement, props, isCustomComponentTag);
+          switch (tag2) {
             case "input":
               track(domElement);
               postMountWrapper(domElement, rawProps, false);
@@ -10465,14 +10465,14 @@ var require_react_dom_development = __commonJS({
               break;
           }
         }
-        function diffProperties(domElement, tag, lastRawProps, nextRawProps, rootContainerElement) {
+        function diffProperties(domElement, tag2, lastRawProps, nextRawProps, rootContainerElement) {
           {
-            validatePropertiesInDevelopment(tag, nextRawProps);
+            validatePropertiesInDevelopment(tag2, nextRawProps);
           }
           var updatePayload = null;
           var lastProps;
           var nextProps;
-          switch (tag) {
+          switch (tag2) {
             case "input":
               lastProps = getHostProps(domElement, lastRawProps);
               nextProps = getHostProps(domElement, nextRawProps);
@@ -10496,7 +10496,7 @@ var require_react_dom_development = __commonJS({
               }
               break;
           }
-          assertValidProps(tag, nextProps);
+          assertValidProps(tag2, nextProps);
           var propKey;
           var styleName;
           var styleUpdates = null;
@@ -10600,14 +10600,14 @@ var require_react_dom_development = __commonJS({
           }
           return updatePayload;
         }
-        function updateProperties(domElement, updatePayload, tag, lastRawProps, nextRawProps) {
-          if (tag === "input" && nextRawProps.type === "radio" && nextRawProps.name != null) {
+        function updateProperties(domElement, updatePayload, tag2, lastRawProps, nextRawProps) {
+          if (tag2 === "input" && nextRawProps.type === "radio" && nextRawProps.name != null) {
             updateChecked(domElement, nextRawProps);
           }
-          var wasCustomComponentTag = isCustomComponent(tag, lastRawProps);
-          var isCustomComponentTag = isCustomComponent(tag, nextRawProps);
+          var wasCustomComponentTag = isCustomComponent(tag2, lastRawProps);
+          var isCustomComponentTag = isCustomComponent(tag2, nextRawProps);
           updateDOMProperties(domElement, updatePayload, wasCustomComponentTag, isCustomComponentTag);
-          switch (tag) {
+          switch (tag2) {
             case "input":
               updateWrapper(domElement, nextRawProps);
               break;
@@ -10628,14 +10628,14 @@ var require_react_dom_development = __commonJS({
             return possibleStandardNames[lowerCasedName] || null;
           }
         }
-        function diffHydratedProperties(domElement, tag, rawProps, parentNamespace, rootContainerElement, isConcurrentMode, shouldWarnDev) {
+        function diffHydratedProperties(domElement, tag2, rawProps, parentNamespace, rootContainerElement, isConcurrentMode, shouldWarnDev) {
           var isCustomComponentTag;
           var extraAttributeNames;
           {
-            isCustomComponentTag = isCustomComponent(tag, rawProps);
-            validatePropertiesInDevelopment(tag, rawProps);
+            isCustomComponentTag = isCustomComponent(tag2, rawProps);
+            validatePropertiesInDevelopment(tag2, rawProps);
           }
-          switch (tag) {
+          switch (tag2) {
             case "dialog":
               listenToNonDelegatedEvent("cancel", domElement);
               listenToNonDelegatedEvent("close", domElement);
@@ -10679,7 +10679,7 @@ var require_react_dom_development = __commonJS({
               listenToNonDelegatedEvent("invalid", domElement);
               break;
           }
-          assertValidProps(tag, rawProps);
+          assertValidProps(tag2, rawProps);
           {
             extraAttributeNames = /* @__PURE__ */ new Set();
             var attributes = domElement.attributes;
@@ -10770,7 +10770,7 @@ var require_react_dom_development = __commonJS({
                 } else {
                   var ownNamespace = parentNamespace;
                   if (ownNamespace === HTML_NAMESPACE) {
-                    ownNamespace = getIntrinsicNamespace(tag);
+                    ownNamespace = getIntrinsicNamespace(tag2);
                   }
                   if (ownNamespace === HTML_NAMESPACE) {
                     extraAttributeNames.delete(propKey.toLowerCase());
@@ -10801,7 +10801,7 @@ var require_react_dom_development = __commonJS({
               }
             }
           }
-          switch (tag) {
+          switch (tag2) {
             case "input":
               track(domElement);
               postMountWrapper(domElement, rawProps, true);
@@ -10843,13 +10843,13 @@ var require_react_dom_development = __commonJS({
             error('Did not expect server HTML to contain the text node "%s" in <%s>.', child.nodeValue, parentNode.nodeName.toLowerCase());
           }
         }
-        function warnForInsertedHydratedElement(parentNode, tag, props) {
+        function warnForInsertedHydratedElement(parentNode, tag2, props) {
           {
             if (didWarnInvalidHydration) {
               return;
             }
             didWarnInvalidHydration = true;
-            error("Expected server HTML to contain a matching <%s> in <%s>.", tag, parentNode.nodeName.toLowerCase());
+            error("Expected server HTML to contain a matching <%s> in <%s>.", tag2, parentNode.nodeName.toLowerCase());
           }
         }
         function warnForInsertedHydratedText(parentNode, text4) {
@@ -10864,8 +10864,8 @@ var require_react_dom_development = __commonJS({
             error('Expected server HTML to contain a matching text node for "%s" in <%s>.', text4, parentNode.nodeName.toLowerCase());
           }
         }
-        function restoreControlledState$3(domElement, tag, props) {
-          switch (tag) {
+        function restoreControlledState$3(domElement, tag2, props) {
+          switch (tag2) {
             case "input":
               restoreControlledState(domElement, props);
               return;
@@ -10912,88 +10912,88 @@ var require_react_dom_development = __commonJS({
             listItemTagAutoclosing: null,
             dlItemTagAutoclosing: null
           };
-          updatedAncestorInfo = function(oldInfo, tag) {
+          updatedAncestorInfo = function(oldInfo, tag2) {
             var ancestorInfo = assign({}, oldInfo || emptyAncestorInfo);
             var info = {
-              tag
+              tag: tag2
             };
-            if (inScopeTags.indexOf(tag) !== -1) {
+            if (inScopeTags.indexOf(tag2) !== -1) {
               ancestorInfo.aTagInScope = null;
               ancestorInfo.buttonTagInScope = null;
               ancestorInfo.nobrTagInScope = null;
             }
-            if (buttonScopeTags.indexOf(tag) !== -1) {
+            if (buttonScopeTags.indexOf(tag2) !== -1) {
               ancestorInfo.pTagInButtonScope = null;
             }
-            if (specialTags.indexOf(tag) !== -1 && tag !== "address" && tag !== "div" && tag !== "p") {
+            if (specialTags.indexOf(tag2) !== -1 && tag2 !== "address" && tag2 !== "div" && tag2 !== "p") {
               ancestorInfo.listItemTagAutoclosing = null;
               ancestorInfo.dlItemTagAutoclosing = null;
             }
             ancestorInfo.current = info;
-            if (tag === "form") {
+            if (tag2 === "form") {
               ancestorInfo.formTag = info;
             }
-            if (tag === "a") {
+            if (tag2 === "a") {
               ancestorInfo.aTagInScope = info;
             }
-            if (tag === "button") {
+            if (tag2 === "button") {
               ancestorInfo.buttonTagInScope = info;
             }
-            if (tag === "nobr") {
+            if (tag2 === "nobr") {
               ancestorInfo.nobrTagInScope = info;
             }
-            if (tag === "p") {
+            if (tag2 === "p") {
               ancestorInfo.pTagInButtonScope = info;
             }
-            if (tag === "li") {
+            if (tag2 === "li") {
               ancestorInfo.listItemTagAutoclosing = info;
             }
-            if (tag === "dd" || tag === "dt") {
+            if (tag2 === "dd" || tag2 === "dt") {
               ancestorInfo.dlItemTagAutoclosing = info;
             }
             return ancestorInfo;
           };
-          var isTagValidWithParent = function(tag, parentTag) {
+          var isTagValidWithParent = function(tag2, parentTag) {
             switch (parentTag) {
               // https://html.spec.whatwg.org/multipage/syntax.html#parsing-main-inselect
               case "select":
-                return tag === "option" || tag === "optgroup" || tag === "#text";
+                return tag2 === "option" || tag2 === "optgroup" || tag2 === "#text";
               case "optgroup":
-                return tag === "option" || tag === "#text";
+                return tag2 === "option" || tag2 === "#text";
               // Strictly speaking, seeing an <option> doesn't mean we're in a <select>
               // but
               case "option":
-                return tag === "#text";
+                return tag2 === "#text";
               // https://html.spec.whatwg.org/multipage/syntax.html#parsing-main-intd
               // https://html.spec.whatwg.org/multipage/syntax.html#parsing-main-incaption
               // No special behavior since these rules fall back to "in body" mode for
               // all except special table nodes which cause bad parsing behavior anyway.
               // https://html.spec.whatwg.org/multipage/syntax.html#parsing-main-intr
               case "tr":
-                return tag === "th" || tag === "td" || tag === "style" || tag === "script" || tag === "template";
+                return tag2 === "th" || tag2 === "td" || tag2 === "style" || tag2 === "script" || tag2 === "template";
               // https://html.spec.whatwg.org/multipage/syntax.html#parsing-main-intbody
               case "tbody":
               case "thead":
               case "tfoot":
-                return tag === "tr" || tag === "style" || tag === "script" || tag === "template";
+                return tag2 === "tr" || tag2 === "style" || tag2 === "script" || tag2 === "template";
               // https://html.spec.whatwg.org/multipage/syntax.html#parsing-main-incolgroup
               case "colgroup":
-                return tag === "col" || tag === "template";
+                return tag2 === "col" || tag2 === "template";
               // https://html.spec.whatwg.org/multipage/syntax.html#parsing-main-intable
               case "table":
-                return tag === "caption" || tag === "colgroup" || tag === "tbody" || tag === "tfoot" || tag === "thead" || tag === "style" || tag === "script" || tag === "template";
+                return tag2 === "caption" || tag2 === "colgroup" || tag2 === "tbody" || tag2 === "tfoot" || tag2 === "thead" || tag2 === "style" || tag2 === "script" || tag2 === "template";
               // https://html.spec.whatwg.org/multipage/syntax.html#parsing-main-inhead
               case "head":
-                return tag === "base" || tag === "basefont" || tag === "bgsound" || tag === "link" || tag === "meta" || tag === "title" || tag === "noscript" || tag === "noframes" || tag === "style" || tag === "script" || tag === "template";
+                return tag2 === "base" || tag2 === "basefont" || tag2 === "bgsound" || tag2 === "link" || tag2 === "meta" || tag2 === "title" || tag2 === "noscript" || tag2 === "noframes" || tag2 === "style" || tag2 === "script" || tag2 === "template";
               // https://html.spec.whatwg.org/multipage/semantics.html#the-html-element
               case "html":
-                return tag === "head" || tag === "body" || tag === "frameset";
+                return tag2 === "head" || tag2 === "body" || tag2 === "frameset";
               case "frameset":
-                return tag === "frame";
+                return tag2 === "frame";
               case "#document":
-                return tag === "html";
+                return tag2 === "html";
             }
-            switch (tag) {
+            switch (tag2) {
               case "h1":
               case "h2":
               case "h3":
@@ -11022,8 +11022,8 @@ var require_react_dom_development = __commonJS({
             }
             return true;
           };
-          var findInvalidAncestorForTag = function(tag, ancestorInfo) {
-            switch (tag) {
+          var findInvalidAncestorForTag = function(tag2, ancestorInfo) {
+            switch (tag2) {
               case "address":
               case "article":
               case "aside":
@@ -14889,9 +14889,9 @@ var require_react_dom_development = __commonJS({
         function rerenderState(initialState) {
           return rerenderReducer(basicStateReducer);
         }
-        function pushEffect(tag, create4, destroy, deps) {
+        function pushEffect(tag2, create4, destroy, deps) {
           var effect = {
-            tag,
+            tag: tag2,
             create: create4,
             destroy,
             deps,
@@ -16997,8 +16997,8 @@ var require_react_dom_development = __commonJS({
           }
         }
         function resetSuspendedComponent(sourceFiber, rootRenderLanes) {
-          var tag = sourceFiber.tag;
-          if ((sourceFiber.mode & ConcurrentMode) === NoMode && (tag === FunctionComponent || tag === ForwardRef || tag === SimpleMemoComponent)) {
+          var tag2 = sourceFiber.tag;
+          if ((sourceFiber.mode & ConcurrentMode) === NoMode && (tag2 === FunctionComponent || tag2 === ForwardRef || tag2 === SimpleMemoComponent)) {
             var currentSource = sourceFiber.alternate;
             if (currentSource) {
               sourceFiber.updateQueue = currentSource.updateQueue;
@@ -20268,8 +20268,8 @@ var require_react_dom_development = __commonJS({
           }
         }
         function insertOrAppendPlacementNodeIntoContainer(node, before, parent) {
-          var tag = node.tag;
-          var isHost = tag === HostComponent || tag === HostText;
+          var tag2 = node.tag;
+          var isHost = tag2 === HostComponent || tag2 === HostText;
           if (isHost) {
             var stateNode = node.stateNode;
             if (before) {
@@ -20277,7 +20277,7 @@ var require_react_dom_development = __commonJS({
             } else {
               appendChildToContainer(parent, stateNode);
             }
-          } else if (tag === HostPortal) ;
+          } else if (tag2 === HostPortal) ;
           else {
             var child = node.child;
             if (child !== null) {
@@ -20291,8 +20291,8 @@ var require_react_dom_development = __commonJS({
           }
         }
         function insertOrAppendPlacementNode(node, before, parent) {
-          var tag = node.tag;
-          var isHost = tag === HostComponent || tag === HostText;
+          var tag2 = node.tag;
+          var isHost = tag2 === HostComponent || tag2 === HostText;
           if (isHost) {
             var stateNode = node.stateNode;
             if (before) {
@@ -20300,7 +20300,7 @@ var require_react_dom_development = __commonJS({
             } else {
               appendChild(parent, stateNode);
             }
-          } else if (tag === HostPortal) ;
+          } else if (tag2 === HostPortal) ;
           else {
             var child = node.child;
             if (child !== null) {
@@ -20417,11 +20417,11 @@ var require_react_dom_development = __commonJS({
                     var firstEffect = lastEffect.next;
                     var effect = firstEffect;
                     do {
-                      var _effect = effect, destroy = _effect.destroy, tag = _effect.tag;
+                      var _effect = effect, destroy = _effect.destroy, tag2 = _effect.tag;
                       if (destroy !== void 0) {
-                        if ((tag & Insertion) !== NoFlags$1) {
+                        if ((tag2 & Insertion) !== NoFlags$1) {
                           safelyCallDestroy(deletedFiber, nearestMountedAncestor, destroy);
-                        } else if ((tag & Layout) !== NoFlags$1) {
+                        } else if ((tag2 & Layout) !== NoFlags$1) {
                           {
                             markComponentLayoutEffectUnmountStarted(deletedFiber);
                           }
@@ -22589,8 +22589,8 @@ var require_react_dom_development = __commonJS({
             if (!(fiber.mode & ConcurrentMode)) {
               return;
             }
-            var tag = fiber.tag;
-            if (tag !== IndeterminateComponent && tag !== HostRoot && tag !== ClassComponent && tag !== FunctionComponent && tag !== ForwardRef && tag !== MemoComponent && tag !== SimpleMemoComponent) {
+            var tag2 = fiber.tag;
+            if (tag2 !== IndeterminateComponent && tag2 !== HostRoot && tag2 !== ClassComponent && tag2 !== FunctionComponent && tag2 !== ForwardRef && tag2 !== MemoComponent && tag2 !== SimpleMemoComponent) {
               return;
             }
             var componentName = getComponentNameFromFiber(fiber) || "ReactComponent";
@@ -22890,9 +22890,9 @@ var require_react_dom_development = __commonJS({
         };
         function scheduleFibersWithFamiliesRecursively(fiber, updatedFamilies, staleFamilies) {
           {
-            var alternate3 = fiber.alternate, child = fiber.child, sibling = fiber.sibling, tag = fiber.tag, type = fiber.type;
+            var alternate3 = fiber.alternate, child = fiber.child, sibling = fiber.sibling, tag2 = fiber.tag, type = fiber.type;
             var candidateType = null;
-            switch (tag) {
+            switch (tag2) {
               case FunctionComponent:
               case SimpleMemoComponent:
               case ClassComponent:
@@ -22913,7 +22913,7 @@ var require_react_dom_development = __commonJS({
                 if (staleFamilies.has(family)) {
                   needsRemount = true;
                 } else if (updatedFamilies.has(family)) {
-                  if (tag === ClassComponent) {
+                  if (tag2 === ClassComponent) {
                     needsRemount = true;
                   } else {
                     needsRender = true;
@@ -22955,9 +22955,9 @@ var require_react_dom_development = __commonJS({
         };
         function findHostInstancesForMatchingFibersRecursively(fiber, types, hostInstances) {
           {
-            var child = fiber.child, sibling = fiber.sibling, tag = fiber.tag, type = fiber.type;
+            var child = fiber.child, sibling = fiber.sibling, tag2 = fiber.tag, type = fiber.type;
             var candidateType = null;
-            switch (tag) {
+            switch (tag2) {
               case FunctionComponent:
               case SimpleMemoComponent:
               case ClassComponent:
@@ -23050,8 +23050,8 @@ var require_react_dom_development = __commonJS({
             hasBadMapPolyfill = true;
           }
         }
-        function FiberNode(tag, pendingProps, key, mode) {
-          this.tag = tag;
+        function FiberNode(tag2, pendingProps, key, mode) {
+          this.tag = tag2;
           this.key = key;
           this.elementType = null;
           this.type = null;
@@ -23093,8 +23093,8 @@ var require_react_dom_development = __commonJS({
             }
           }
         }
-        var createFiber = function(tag, pendingProps, key, mode) {
-          return new FiberNode(tag, pendingProps, key, mode);
+        var createFiber = function(tag2, pendingProps, key, mode) {
+          return new FiberNode(tag2, pendingProps, key, mode);
         };
         function shouldConstruct$1(Component) {
           var prototype = Component.prototype;
@@ -23218,9 +23218,9 @@ var require_react_dom_development = __commonJS({
           }
           return workInProgress2;
         }
-        function createHostRootFiber(tag, isStrictMode, concurrentUpdatesByDefaultOverride) {
+        function createHostRootFiber(tag2, isStrictMode, concurrentUpdatesByDefaultOverride) {
           var mode;
-          if (tag === ConcurrentRoot) {
+          if (tag2 === ConcurrentRoot) {
             mode = ConcurrentMode;
             if (isStrictMode === true) {
               mode |= StrictLegacyMode;
@@ -23452,8 +23452,8 @@ var require_react_dom_development = __commonJS({
           target._debugHookTypes = source._debugHookTypes;
           return target;
         }
-        function FiberRootNode(containerInfo, tag, hydrate2, identifierPrefix, onRecoverableError) {
-          this.tag = tag;
+        function FiberRootNode(containerInfo, tag2, hydrate2, identifierPrefix, onRecoverableError) {
+          this.tag = tag2;
           this.containerInfo = containerInfo;
           this.pendingChildren = null;
           this.current = null;
@@ -23491,7 +23491,7 @@ var require_react_dom_development = __commonJS({
             }
           }
           {
-            switch (tag) {
+            switch (tag2) {
               case ConcurrentRoot:
                 this._debugRootType = hydrate2 ? "hydrateRoot()" : "createRoot()";
                 break;
@@ -23501,9 +23501,9 @@ var require_react_dom_development = __commonJS({
             }
           }
         }
-        function createFiberRoot(containerInfo, tag, hydrate2, initialChildren, hydrationCallbacks, isStrictMode, concurrentUpdatesByDefaultOverride, identifierPrefix, onRecoverableError, transitionCallbacks) {
-          var root2 = new FiberRootNode(containerInfo, tag, hydrate2, identifierPrefix, onRecoverableError);
-          var uninitializedFiber = createHostRootFiber(tag, isStrictMode);
+        function createFiberRoot(containerInfo, tag2, hydrate2, initialChildren, hydrationCallbacks, isStrictMode, concurrentUpdatesByDefaultOverride, identifierPrefix, onRecoverableError, transitionCallbacks) {
+          var root2 = new FiberRootNode(containerInfo, tag2, hydrate2, identifierPrefix, onRecoverableError);
+          var uninitializedFiber = createHostRootFiber(tag2, isStrictMode);
           root2.current = uninitializedFiber;
           uninitializedFiber.stateNode = root2;
           {
@@ -23594,14 +23594,14 @@ var require_react_dom_development = __commonJS({
             return hostFiber.stateNode;
           }
         }
-        function createContainer(containerInfo, tag, hydrationCallbacks, isStrictMode, concurrentUpdatesByDefaultOverride, identifierPrefix, onRecoverableError, transitionCallbacks) {
+        function createContainer(containerInfo, tag2, hydrationCallbacks, isStrictMode, concurrentUpdatesByDefaultOverride, identifierPrefix, onRecoverableError, transitionCallbacks) {
           var hydrate2 = false;
           var initialChildren = null;
-          return createFiberRoot(containerInfo, tag, hydrate2, initialChildren, hydrationCallbacks, isStrictMode, concurrentUpdatesByDefaultOverride, identifierPrefix, onRecoverableError);
+          return createFiberRoot(containerInfo, tag2, hydrate2, initialChildren, hydrationCallbacks, isStrictMode, concurrentUpdatesByDefaultOverride, identifierPrefix, onRecoverableError);
         }
-        function createHydrationContainer(initialChildren, callback, containerInfo, tag, hydrationCallbacks, isStrictMode, concurrentUpdatesByDefaultOverride, identifierPrefix, onRecoverableError, transitionCallbacks) {
+        function createHydrationContainer(initialChildren, callback, containerInfo, tag2, hydrationCallbacks, isStrictMode, concurrentUpdatesByDefaultOverride, identifierPrefix, onRecoverableError, transitionCallbacks) {
           var hydrate2 = true;
-          var root2 = createFiberRoot(containerInfo, tag, hydrate2, initialChildren, hydrationCallbacks, isStrictMode, concurrentUpdatesByDefaultOverride, identifierPrefix, onRecoverableError);
+          var root2 = createFiberRoot(containerInfo, tag2, hydrate2, initialChildren, hydrationCallbacks, isStrictMode, concurrentUpdatesByDefaultOverride, identifierPrefix, onRecoverableError);
           root2.context = getContextForSubtree(null);
           var current3 = root2.current;
           var eventTime = requestEventTime();
@@ -28945,11 +28945,11 @@ function caml_hash(count3, _limit, seed, obj) {
             const size4 = obj$1.length | 0;
             if (size4 !== 0) {
               const obj_tag = obj$1.TAG;
-              const tag = size4 << 10 | obj_tag;
+              const tag2 = size4 << 10 | obj_tag;
               if (obj_tag === 248) {
                 hash5 = caml_hash_mix_int(hash5, obj$1[1]);
               } else {
-                hash5 = caml_hash_mix_int(hash5, tag);
+                hash5 = caml_hash_mix_int(hash5, tag2);
                 const v = size4 - 1 | 0;
                 const block3 = v < num4 ? v : num4;
                 for (let i = 0; i <= block3; ++i) {
@@ -63207,7 +63207,7 @@ var AppGlobalStyles = {
   make: make8
 };
 var stack = make7(
-  "css-k008qs-stack css-cgq59l-stack",
+  "label:stack cid-195s1dh css-k008qs css-cgq59l",
   /* [] */
   0
 );
@@ -63220,7 +63220,7 @@ function getOrEmpty(str) {
 }
 function styles2(lolaOpt, param) {
   const lola = lolaOpt !== void 0 ? lolaOpt : px2(0);
-  return make7("css-k008qs-Cositas css-cgq59l-Cositas css-r0vq9t-Cositas", {
+  return make7("label:Cositas cid-uk3qz7 css-k008qs css-cgq59l css-r0vq9t", {
     hd: [
       "--lola-8erbae",
       Gap.toString(lola)
@@ -63252,39 +63252,67 @@ var Cositas = {
   make: make$12
 };
 var selectors = make7(
-  "css-tokvmb-selectors css-12qnfjo-selectors",
+  "label:selectors cid-pm05s2 css-tokvmb css-12qnfjo",
   /* [] */
   0
 );
 var bounce = AnimationName.make(void 0, "keyframe-deb5ee");
 var clx = make7(
-  "css-1e8vzlw-clx css-u70tf2-clx css-1j9jp3a-clx",
+  "label:clx cid-47oj19 css-1e8vzlw css-u70tf2 css-1j9jp3a",
   /* [] */
   0
 );
 var post = make7(
-  "css-1y5r52a-post css-3qzm71-post",
+  "label:post cid-gbz02q css-1y5r52a css-3qzm71",
   /* [] */
   0
 );
 var card = make7(
-  "css-eaeacs-card css-25k368-card css-3fuzg5-card",
+  "label:card cid-ebd8w7 css-eaeacs css-25k368 css-3fuzg5",
   /* [] */
   0
 );
 var container = make7(
-  "css-nqqinc-container css-w3aeeb-container css-5x3p37-container css-stwpj2-container",
+  "label:container cid-1hzr7q6 css-nqqinc css-w3aeeb css-5x3p37 css-stwpj2",
   /* [] */
   0
 );
 var gradiend = make7(
-  "css-1wlyyxm-gradiend css-qelxhy-gradiend",
+  "label:gradiend cid-j1a2e7 css-1wlyyxm css-qelxhy",
+  /* [] */
+  0
+);
+var tag = make7(
+  "label:tag cid-1a86vzz css-1baulvz css-7ji1gv css-1isemmb css-3kft4e css-wtpnzt",
+  /* [] */
+  0
+);
+var Labels = {
+  tag
+};
+var childLabel = make7(
+  "label:childLabel cid-6prbgi css-in3yi3",
+  /* [] */
+  0
+);
+var parentWithChildSelector = make7(
+  "label:parentWithChildSelector cid-1wu39qc css-o32ik7 css-19midj6 css-1qm1lh css-1xhar4a css-yd4yye",
+  /* [] */
+  0
+);
+var modifierActive = make7(
+  "label:modifierActive cid-h4gfxd css-in3yi3",
+  /* [] */
+  0
+);
+var toggle = make7(
+  "label:toggle cid-mfk87c css-1baulvz css-12hizlt css-12z0wuy css-s67z9l css-pk71pq css-gwf734 css-145kqdj",
   /* [] */
   0
 );
 var primary = hex2("141414");
 function keyframeDemoShell(color) {
-  return make7("css-19kzrtu-keyframeDemoShell css-i3pbo-keyframeDemoShell css-3kft4e-keyframeDemoShell css-1fi1jeb-keyframeDemoShell css-205zh2-keyframeDemoShell css-kusjgz-keyframeDemoShell css-1e8vzlw-keyframeDemoShell", {
+  return make7("label:keyframeDemoShell cid-8xpkpc css-19kzrtu css-i3pbo css-3kft4e css-1fi1jeb css-205zh2 css-kusjgz css-1e8vzlw", {
     hd: [
       "--color-1a279q8",
       Color.toString(color)
@@ -63319,7 +63347,7 @@ var resize2 = AnimationName.make({
     )
   }
 }, "keyframe-1kt58w0");
-var keyframeDemoCard = make7("css-1h7bkao-keyframeDemoCard css-65ee5x-keyframeDemoCard css-3pa72f-keyframeDemoCard css-iovuyg-keyframeDemoCard css-1c3l4rb-keyframeDemoCard css-i6bazn-keyframeDemoCard css-k008qs-keyframeDemoCard css-zcxndt-keyframeDemoCard css-1tyndxa-keyframeDemoCard css-1vw7svr-keyframeDemoCard css-1p3fawg-keyframeDemoCard css-kbn7if-keyframeDemoCard css-8c92kl-keyframeDemoCard", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
+var keyframeDemoCard = make7("label:keyframeDemoCard cid-jbn4tz css-1h7bkao css-65ee5x css-3pa72f css-iovuyg css-1c3l4rb css-i6bazn css-k008qs css-zcxndt css-1tyndxa css-1vw7svr css-1p3fawg css-kbn7if css-8c92kl", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
 function Main(Props) {
   return JsxRuntime.jsxs("main", {
     children: [
@@ -63372,6 +63400,39 @@ function Main(Props) {
         ],
         className: stack[0],
         style: stack[1]
+      }),
+      JsxRuntime.jsxs("section", {
+        children: [
+          JsxRuntime.jsx("h2", {
+            children: "Selector references"
+          }),
+          JsxRuntime.jsx("p", {
+            children: "Green text via the parent's .$(childLabel) selector",
+            className: childLabel[0],
+            style: childLabel[1]
+          }),
+          JsxRuntime.jsx("span", {
+            children: "Bordered via a submodule .$(Labels.tag) selector reference",
+            className: tag[0],
+            style: tag[1]
+          })
+        ],
+        className: parentWithChildSelector[0],
+        style: parentWithChildSelector[1]
+      }),
+      JsxRuntime.jsxs("section", {
+        children: [
+          JsxRuntime.jsx("span", {
+            children: "toggle: off",
+            className: toggle[0],
+            style: toggle[1]
+          }),
+          JsxRuntime.jsx("span", {
+            children: "toggle: on via &.$(modifierActive)",
+            className: merge2(toggle, modifierActive)[0],
+            style: merge2(toggle, modifierActive)[1]
+          })
+        ]
       })
     ],
     className: gradiend[0],

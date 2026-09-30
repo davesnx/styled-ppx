@@ -41,8 +41,9 @@ a generated `:root` block for `[%styled.global]`).
   ▼
 PPX expansion (per compilation unit)
   ─ parse [%css "..."] / [%styled.<tag> ...] / [%styled.global "..."] / [%keyframe "..."]
-  ─ atomize, hash, mint class names
-  ─ resolve same-module $(name) selector interpolations
+  ─ atomize, hash, mint class names; mint each named binding's identity class
+  ─ resolve same-module $(name) selector interpolations to the referenced
+    binding's identity class
   ─ buffer rendered rules; record cross-module refs as sentinels
   │
   ▼
@@ -62,7 +63,7 @@ dune builds the library normally (.cmi, .cmx, executables)
   ▼
 styled-ppx.generate (post-build aggregator)
   ─ walk every .ml / .pp.ml in the library
-  ─ harvest [@@@css ...], [@@@css.bindings ...], [@@@css.refs ...], [@@@css.config ...]
+  ─ extract [@@@css ...], [@@@css.bindings ...], [@@@css.refs ...], [@@@css.config ...]
   ─ resolve NUL-delimited cross-module sentinels against the bindings index
   ─ deduplicate rules, emit final stylesheet (minified when the configs say production)
   │
@@ -84,9 +85,9 @@ A single CSS rule string. One attribute per atomized rule, per global
 rule, or per `@keyframes` block.
 
 ```ocaml
-[@@@css ".css-tokvmb-marker{color:red;}"]
-[@@@css ".css-1ru12dh-button:hover{opacity:0.8;}"]
-[@@@css "@media (min-width:768px){.css-fmb91l-card{padding:2rem;}}"]
+[@@@css ".css-tokvmb{color:red;}"]
+[@@@css ".css-1ru12dh:hover{opacity:0.8;}"]
+[@@@css "@media (min-width:768px){.css-fmb91l{padding:2rem;}}"]
 [@@@css "@keyframes keyframe-jw9oix{from{opacity:0;}to{opacity:1;}}"]
 ```
 
@@ -96,25 +97,31 @@ selector reference at PPX time. The aggregator substitutes those at
 resolve time (see "Resolve" below; the sentinel constants live in
 `packages/css-extraction/css_extraction.ml`).
 
-### `[@@@css.bindings [(longident, class_string); ...]]` — binding exports
+### `[@@@css.bindings [(longident, identity, class_string); ...]]` — binding exports
 
 One attribute per CU, listing every named `[%css]` binding and
 `[%styled.<tag>]` component the CU minted.
 The longident is the fully-qualified path users would write to reference
-the binding from another module; the class string is the
-space-separated list of atomized class names the PPX produced.
+the binding from another module; the identity is the binding's
+build-independent `cid-...` class (see "Identity classes" below) — a
+`$(binding)` selector reference resolves to this, verbatim; the class
+string is the space-separated list of atomized class names the PPX
+produced, kept only as a content fingerprint so the aggregator can tell
+a legitimate duplicate build from a real identity collision (see
+Resolve below).
 
 ```ocaml
 [@@@css.bindings
-  [("M.marker", "css-0-marker");
-   ("M.Css.active", "css-tokvmb-active");
-   ("M.layout", "css-k008qs-layout css-1tyndxa-layout")]]
+  [("M.marker", "cid-1a2b3c4", "");
+   ("M.Css.active", "cid-5d6e7f8", "css-tokvmb");
+   ("M.layout", "cid-9a0b1c2", "css-k008qs css-1tyndxa")]]
 ```
 
-The aggregator folds every payload into a flat
-`(longident, class_string) Hashtbl` — its global resolution index. No
-AST walking, no `CSS.make` pattern matching, no filename-to-module
-inference.
+The aggregator folds every payload into two flat hash tables — its
+global resolution index: `longident -> identity` for resolving `$(M.x)`
+references, and `identity -> (longident, class_string, filename)` for
+collision detection. No AST walking, no `CSS.make` pattern matching, no
+filename-to-module inference.
 
 Anonymous bindings (`let _ = [%css ...]`) are not exported because they
 cannot be referenced from another module.
@@ -141,21 +148,31 @@ The accompanying synthetic `let _ = M.marker` lines exist so that:
 
 ### `[@@@css.config [(key, value); ...]]` — extraction settings
 
-Emitted when the PPX runs with production settings (`--minify` or
-`--env production`) and the CU contributes extraction items. Carries
-PPX-side settings the aggregator must honor, as string key/value pairs.
-The only key today is `env`:
+Emitted when the CU contributes extraction items (rules or bindings) and
+at least one config key applies. Carries PPX-side settings the aggregator
+must honor, as string key/value pairs. Two keys today:
+
+- `env`: set to `"production"` when the PPX runs with production settings
+  (`--minify` or `--env production`), and the aggregator minifies its
+  output accordingly.
+- `library-name`: the value of the `library-name` cookie dune passes to every
+  ppx run inside a `(library ...)` stanza, read via
+  `Ppxlib.Driver.Cookies.add_simple_handler`. Absent when the module isn't
+  compiled as part of a library (for example an `(executable ...)`
+  stanza) or the cookie wasn't set. The aggregator reads this key to group
+  and order rules by owning library; see Order below.
 
 ```ocaml
-[@@@css.config [("env", "production")]]
+[@@@css.config [("env", "production"); ("library-name", "my_lib")]]
 ```
 
-Absence means development — the attribute is not emitted in dev builds,
-so dev output stays clean. Unknown keys are ignored by the aggregator
-(forward compatibility).
+When both apply, `env` comes first, then `library-name`. Absence of every key
+means the attribute is omitted entirely — dev output with no library
+cookie stays exactly as before this key was added. Unknown keys are
+ignored by the aggregator (forward compatibility).
 
 The aggregator minifies its output (drops inter-rule newlines) only when
-**every** contributing input file — every file with harvested rules or an
+**every** contributing input file — every file with extracted rules or an
 explicit config — declares `env=production`. Mixed inputs mean some
 library stanzas ran the PPX with production settings and some did not;
 the aggregator warns (visible by default) and falls back to readable
@@ -232,12 +249,15 @@ supplied by the generated module's runtime `:root` block — see
 
 ### `Css_bindings`
 
-Per-CU buffer of `(longident, class_string)` exports. The ordered
-structure pass computes the longident from the compilation unit name + current
-submodule path + the enclosing top-level value name (`[%css]`) or module name
-(`[%styled.<tag>]`), then calls `Css_bindings.record`. Last-write-wins on
-duplicates within a CU (matches `Local_selector_environment` shadowing
-semantics).
+Per-CU buffer of `(longident, identity, class_string)` exports. The
+ordered structure pass computes the longident from the compilation unit
+name + current submodule path + the enclosing top-level value name
+(`[%css]`) or module name (`[%styled.<tag>]`); the identity comes from
+`Css_file.push` (see "Identity classes" below), computed from the
+*local* binding label, which for a function-local rebinding differs from
+the longident's top-level name. `Css_bindings.record` is then called
+with all three. Last-write-wins on duplicates within a CU (matches
+`Local_selector_environment` shadowing semantics).
 
 ### `Cross_module_refs`
 
@@ -255,32 +275,88 @@ Implemented in `packages/generate/generate.ml`. Takes a list of `.ml` /
 `.pp.ml` paths, produces a stylesheet on stdout or `-o <file>`.
 
 ```
-parse args → harvest_each_file → resolve_sentinels → dedup → write
+parse args → extract_each_file → order_inputs → resolve_sentinels → dedup → write
 ```
 
-### Harvest
+### Extract
 
 For each input file, walk its top-level structure once and dispatch on
 the five attribute shapes:
 
 ```ocaml
 [@@@css "..."]            → push rule string
-[@@@css.bindings [...]]   → fold (longident, class_string) into Index
+[@@@css.bindings [...]]   → fold (longident, identity, class_string) into Index
 [@@@css.refs [...]]       → push (longident, location) into per-file refs
 [@@@css.config [...]]     → record the file's declared environment
 _                         → ignore
 ```
 
-The harvest pass is the **only** time the aggregator looks at the AST.
-Everything downstream operates on plain strings.
+The extraction pass is the **only** time the aggregator looks at the AST.
+Everything downstream operates on plain strings, except that the extraction
+pass also records, per file, which other module names its structure
+references (see Order below) — the last thing the AST is used for.
+
+### Order
+
+Implemented in `packages/generate/order.ml` (the pure `sort`/`references`
+primitives) and `packages/generate/generate.ml` (`order_by_dependency`,
+which applies them). Runs between extract and resolve, reordering the
+inputs before dedup picks which occurrence of a repeated rule
+survives.
+
+By default (`--order dependency`) the order is two levels: libraries
+first, then, inside each library, files.
+
+**Library level.** Every input file belongs to a group: its declared
+`library` key from `[@@@css.config]` (see above), or, when that key is
+absent, the directory of its input path. A library's rules come after the
+rules of every library it depends on. A raw module reference `X` from a
+file in library `L1` becomes a library edge `L1 -> L2` when:
+
+- `L1` itself has no module named `X` (otherwise it's a same-library
+  reference, resolved at the module level below, and contributes no
+  library edge), and
+- exactly one other library has a module named `X` (the `(wrapped false)`
+  case — dune exposes every module of an unwrapped library at top level);
+  or, failing that, exactly one other library's name capitalizes
+  (`String.capitalize_ascii`) to `X` (the default `(wrapped true)` case —
+  a wrapped library is referenced through its alias module, e.g. `Zlib.Inner.x`
+  for a library named `zlib`).
+
+Anything else (zero or multiple candidates either way) means no edge.
+
+**Module level.** Inside a library, a file's rules come after the rules of
+every file in the *same* library it depends on — module resolution now
+never crosses a library boundary. Candidates for a referenced name are the
+files in that one library whose module name matches; the one sharing the
+longest directory-path prefix with the referencing file wins a tie. No
+same-library candidate at all means no module edge (the library edge above
+already ordered the two libraries relative to each other).
+
+Both levels call the same `Order.sort` (Kahn's algorithm, always advancing
+the alphabetically smallest ready key), so both get the same guarantees:
+files or libraries with no dependency relation keep their input order, and
+a cycle — which can't come from a real dune graph, only from this
+heuristic picking an edge a real build wouldn't have — never fails the
+build. The aggregator warns once naming the cycle's members, drops the
+blocking edge whose source sorts alphabetically last, and keeps going.
+
+`--order source` skips all of this, ignoring references and `library`
+keys, and keeps the file order dune passes on the command line. It exists
+as an escape hatch for one release and to compare
+against the old behavior. Under the default `--order dependency`, `--log
+info` prints the library order and then each library's module order;
+`--log debug` additionally prints every library edge and every module
+edge. `--layers` (see Cascade layers below) requires `--order dependency`,
+since it wraps each library's rules by the same grouping.
 
 ### Resolve
 
 For each rule string, scan for `\x00LONGIDENT\x00` sentinel pairs:
 
-- on hit: replace with `Hashtbl.find idx longident`, converting the
-  space-separated class string to a dot-chain (`"a b c"` → `"a.b.c"`)
-  so it slots into selector chains correctly
+- on hit: replace with the longident's identity class from the index,
+  verbatim — one class, regardless of how many atoms the referenced
+  binding minted
 - on miss: report an error using the location stored in the file's
   `[@@@css.refs ...]`, distinguishing **cross-library** (root module
   not found in any binding's longident) from **missing binding**
@@ -289,26 +365,113 @@ Errors are accumulated; if any fire, the aggregator prints them all to
 stderr in `File "...", line N, characters X-Y:` format (the OCaml
 compiler convention, so editors pick them up) and exits 1.
 
+**Identity collision.** While building the index (during Extract, not
+Resolve), two different bindings can hash to the same identity — e.g.
+two libraries whose modules share a basename and binding name, with no
+distinguishing `--namespace`. This is only an error when their
+`class_string` fingerprints differ: the same identity with the same
+atoms is the ordinary "same module compiled twice" case (native +
+melange, `copy_files`, vendoring) and is accepted. A real collision
+names both input files, both longidents, the shared identity, and the
+`--namespace` remedy, and is reported through the same protocol-error
+path as a
+malformed attribute (see `packages/generate/test/identity-collision.t`).
+
 ### Dedup and write
 
 Resolved rule strings are deduplicated with an order-preserving
-`Hashtbl` filter: walk the rules in source-traversal order and keep the
-first occurrence of each string. This removes duplicates produced by the
-same rule appearing in multiple files (common for shared helpers).
+`Hashtbl` filter: walk the rules in the order established by Order above
+(library, then module, then source — or the plain file order under
+`--order source`) and keep the first occurrence of each string. This
+removes duplicates produced by the same rule appearing in multiple files
+(common for shared helpers, and for a native/melange pair of the same
+library compiled twice).
 
 Order preservation is load-bearing: every atomized rule has the same
 specificity (one class, no qualifiers), so the cascade tiebreaker is
 "later in stylesheet wins". A longhand override written after a
 shorthand (`margin: 10px; margin-top: 20px`) must stay after it in the
-emitted stylesheet. An earlier version deduped through
-`Set.Make(String)`, which sorted by hash-prefixed rule text and silently
-destroyed declaration order (regression test:
+emitted stylesheet, and a module's rule now stays after a dependency's
+equal-specificity rule regardless of file naming. An earlier version
+deduped through `Set.Make(String)`, which sorted by hash-prefixed rule
+text and silently destroyed declaration order (regression test:
 `packages/generate/test/source-order.t`).
 
-The deduplicated list is then written to the output channel. Inter-rule
-newlines are dropped when every contributing input file declared
-`env=production` in its `[@@@css.config ...]` (see the wire protocol
-section above); there is no CLI flag for this.
+Before writing, `@import` rules are hoisted to the front of the
+deduplicated list, then `@namespace` rules right after them, each block
+keeping its own relative order, regardless of which library or module
+emitted them: a browser only honors these rules when they precede every
+other rule, Order above routinely places the module that emits one after
+modules with plain style rules, and CSS Cascade 5 additionally requires
+every `@import` to precede every `@namespace`. Classification is a string
+test on the rendered rule — starts with `@import`/`@namespace` and ends
+with `;` — rather than a search for `{`, since an `@import` URL can itself
+contain `{` (`@import url("a{b.css");` is a valid statement, not a block
+rule). Statement-form `@layer a, b;` is deliberately NOT hoisted: CSS
+allows it anywhere in a stylesheet, and layer order is first-occurrence
+order, so relocating a `@layer` statement would silently reorder a
+library's cascade layers instead of just moving text. It stays wherever
+dedup/ordering placed it, which under `--layers` (below) means inside its
+own library's `@layer { ... }` block, where it declares sub-layers scoped
+to that library's rules — a normal and supported use of statement-form
+`@layer`.
+`@charset` is dropped instead of hoisted: the generated file always opens
+with its own leading comment, so `@charset` can never be the literal
+first bytes of the stylesheet, and the file is written as UTF-8 regardless
+of what a module declares; dropping it is reported as a warning naming
+the input file (`packages/generate/test/statement-at-rules.t`).
+
+The deduplicated (and hoisted) list is then written to the output
+channel. Inter-rule newlines are dropped when every contributing input
+file declared `env=production` in its `[@@@css.config ...]` (see the wire
+protocol section above); there is no CLI flag for this.
+
+### Cascade layers (opt-in)
+
+`--layers` (default off, and rejected together with `--order source`)
+wraps the deduplicated rule list from above into named CSS cascade
+layers, one per library, instead of one flat list. Hoisted `@import` and
+`@namespace` rules stay ahead of everything below, including the
+registrations, the aggregator's own `@layer <lib1>, <lib2>, ...;`
+statement, and every wrapped block, for the same reason they are hoisted
+in the unlayered case. A statement-form `@layer a, b;` is not part of
+this hoisted set, so it falls into its library's own `@layer { ... }`
+block alongside that library's other rules. `@property` and
+`@keyframes` rules are pulled out ahead of every layer next, since they are
+global registrations: a `@property` inside a layer would make the
+registration itself depend on layer order, and a `@keyframes` name is
+looked up by layer order too, so leaving both unlayered avoids surprises.
+After the registrations, one `@layer <lib1>, <lib2>, ...;` statement lists
+every library that still owns a rule at this point, in the same dependency
+order as the default output, and then each such library's remaining rules
+follow inside their own `@layer <lib> { ... }` block, still in that order.
+A group with nothing left to wrap gets no block and no name in the
+statement: a module with no `[%css]` (the PPX attaches no `[@@@css.config]`
+to it, so it groups by its directory), a library whose rules all
+deduplicated away, or one whose only rules are the registrations above.
+Such a group still takes part in dependency ordering, so a styles-free
+module keeps bridging edges between styled libraries
+(`packages/generate/test/layers-empty-groups.t`). A layer's name is its
+library key with every character outside `[A-Za-z0-9_-]` replaced by `_`
+(the directory-fallback case uses the key's last path segment first). Two
+different keys can sanitize to the same name; the aggregator warns once
+and lets the two `@layer` blocks share that name, which CSS itself
+concatenates into a single layer.
+
+Layering rules changes how they interact with hand-written CSS, which is
+why the flag defaults to off. An unlayered declaration always beats a
+layered one, however low that layer sits, because the cascade only
+compares layers when both competing declarations are themselves inside a
+layer; a normal, non-`!important` layered rule loses to any unlayered
+rule regardless of specificity or source order. `!important` inverts
+that: an `!important` declaration in a layer beats an unlayered
+`!important` declaration, and among layers the earliest-declared layer
+wins for `!important` (the opposite of the normal-declaration order,
+where the latest layer wins). A consumer that turns `--layers` on has to
+put its own hand-written CSS — resets, palettes, fonts, an inline global
+stylesheet — into a layer declared before the generated ones, or that
+CSS's plain declarations stop overriding anything the generated,
+now-layered rules set.
 
 ## Atomization
 
@@ -318,30 +481,81 @@ two `[@@@css ...]` attributes. The runtime `CSS.make` call carries the
 space-separated concatenation of those class names, so consumers apply
 all atoms by setting one `className` attribute.
 
-Class names follow `css-<murmur2 hash of CSS>-<binding label>` format
-(or bare `css-<hash>` when the PPX driver runs with production
-settings). The binding label is purely cosmetic — atom hashes are
-deduplication-safe even when labels differ. Minting lives in
+Class names follow the `css-<murmur2 hash of CSS>` format, in every
+mode — the binding's `let` name never appears in the class name. Two
+bindings whose declarations render to the same CSS text mint the same
+class, dev or production. Minting lives in
 `packages/ppx/src/Hash_class.ml`.
 
 The environment is a PPX concern, set once per `(pps styled-ppx ...)`
-stanza: `--env production` (alias for `--minify`) drops label suffixes
-and minifies rule bodies; `--env development` (alias for `--dev`) keeps
-readable labels and adds `cx-<binding>` marker classes. Labels are baked
-into class names at PPX time — in both the compiled `className` and the
-extracted `[@@@css ...]` payload — so no downstream tool could change
-them without desyncing the two. The aggregator learns the environment
+stanza: `--env production` (alias for `--minify`) only minifies rule
+bodies — it has no effect on class names; `--env development` (alias for
+`--dev`) adds `label:<binding>` marker classes. Dev markers are on by
+default, so a bare `(pps styled-ppx)` stanza already gets them;
+`--minify` and `--env production` turn them off, and an explicit `--dev`
+forces them back on regardless. The aggregator learns the environment
 from `[@@@css.config ...]` and adjusts its whitespace accordingly.
 
 Two consequences worth knowing:
 
 1. **One `[%css]` binding maps to N class names.** This is what the
    space-separated `class_string` in `[@@@css.bindings ...]` captures.
-2. **Cross-module `$(M.marker)` resolves to a chained compound** (e.g.
-   `.cssA.cssB`) not a single class. The aggregator does the
-   space-to-dot conversion so the resulting selector requires *all*
-   atoms of `M.marker` to be present on the element, matching the
-   semantics of using `M.marker` as a className locally.
+2. **A `$(binding)` selector reference resolves to ONE class: the
+   referenced binding's identity** (see below), not a chain of its
+   atoms. This holds same-module and cross-module alike. A reference
+   means "carries that binding", not "reproduces its exact
+   declarations" — a referenced multi-atom binding drops from
+   `(0,N,0)` to `(0,1,0)` specificity inside the compound selector (see
+   the specificity note below).
+
+## Identity classes
+
+Every named `[%css]` binding and `[%styled.<tag>]` component mints a
+second, build-independent class alongside its atoms: `cid-<hash>`
+(`Hash_class.identity_class`). `$(binding)` and `&.$(binding)` selector
+references resolve to this identity, verbatim, regardless of how many
+atoms the binding minted or whether it minted any at all. It is emitted
+first among the atoms in the className string (after the `label:<binding>`
+dev marker, when present): `label:<binding> cid-<hash> css-<hash> ...`.
+
+**Inputs**, joined with `\0` and murmur2-hashed: the `--namespace` flag
+value (empty by default), the compilation-unit module name (the source
+file's basename, capitalized — never a physical path or dune library
+name, so a module compiled twice under different paths, e.g. a native
+and a Melange build via `copy_files`, mints the same identity), the
+enclosing submodule path, the binding name (or `[%styled.<tag>]` module
+name), and an occurrence index — folded in only when a
+`(scope, name)` pair repeats within one compilation unit (e.g. two
+functions each with their own `let a = [%css ...]`), so a name seen
+exactly once keeps a stable identity independent of whether a later
+occurrence ever appears. A `let` whose name starts with `__` does not count
+as a binding here: it is a temporary another ppx introduced (server-reason-react's
+`styles=` expansion binds `__incoming` and `__existing` before the `[%css]`
+inside them is lowered), so the css under it takes the enclosing user
+binding's name for its label, dev marker and identity
+(`packages/ppx/test/css-support/styles-optional-className.t`).
+
+**`--namespace <string>`** is a PPX flag, mixed into every identity hash
+in the same library-wide way as `--dev`/`--minify`. Two libraries whose
+modules happen to share a basename and binding name would otherwise mint
+colliding identities; passing each library a distinct `--namespace`
+(identically on its native and Melange `(pps styled-ppx ...)` stanzas)
+tells them apart. See "Identity collision" under Resolve for what
+happens when they aren't.
+
+**Empty markers.** A named binding with no declarations (`let m = [%css
+{||}]`) still mints an identity — its `class_string` is `""` and no
+`[@@@css ...]` rule is emitted, since there is nothing to write. This is
+independent of `--minify`: an empty binding's identity is never dropped,
+which is what makes it possible to resolve `&.$(m)` in every mode (see
+`packages/ppx/test/css-support/identity-empty-marker.t`).
+
+**Specificity note.** `.css-x.cid-y` is still a two-class compound
+selector — `(0,2,0)` specificity, same as `.css-x.css-a.css-b` before
+this change, and both still beat plain unqualified atoms either way.
+Only a tie between two compound selectors that used to carry 3+ class
+tokens can shift, since those are the only ones whose token count
+actually drops.
 
 ## What this design intentionally avoids
 
@@ -353,9 +567,14 @@ Two consequences worth knowing:
   Everything the aggregator needs lives in the post-PPX `.ml`.
 - **Filesystem I/O from the PPX.** PPX never reads peers' artifacts.
   All cross-module information flows through the aggregator.
-- **AST traversal in the aggregator.** The aggregator does not pattern-
-  match `CSS.make` calls or rebuild module paths from filenames. The
-  PPX writes the index directly into `[@@@css.bindings ...]`.
+- **AST traversal in the aggregator, for anything but ordering.** The
+  aggregator does not pattern-match `CSS.make` calls, and rule resolution
+  never inspects the AST: the PPX writes the index directly into
+  `[@@@css.bindings ...]`. Order is the one exception — it reruns the
+  compiler's own free-module-name analysis (`Order.references`) on the
+  input's structure to decide dependency order, and derives a module
+  name from each input filename to resolve those references to files
+  (see Order above); it still never touches `CSS.make`.
 - **Runtime resolution of selectors via `var(--xyz)` indirection.**
   Selector interpolation is resolved statically (value interpolation
   does use custom properties, but only for values); this is a
@@ -370,7 +589,13 @@ Two consequences worth knowing:
 - `documents/keyframe-static-extraction.md` — `[%keyframe]` extraction
   in depth
 - `packages/generate/generate.ml` — the aggregator implementation
+- `packages/generate/order.ml` — the dependency graph and sort behind
+  `--order dependency`
 - `packages/css-extraction/css_extraction.ml` — shared attribute names,
   sentinel encoding, and sentinel resolution
 - `packages/ppx/src/{Css_bindings,Cross_module_refs}.{re,rei}` — the
   per-CU buffers feeding the aggregator
+- `packages/ppx/src/Hash_class.ml` — identity, class, and variable hash
+  formats, including `identity_class`
+- `packages/ppx/src/Local_selector_environment.re{,i}` — same-file
+  `$(name)` resolution to a binding's identity class

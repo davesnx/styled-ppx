@@ -2,6 +2,7 @@ let dynamicExtractedComponent:
   (
     ~loc: Ppxlib.location,
     ~file: string,
+    ~main_module: string,
     ~scope: list(string),
     ~opens: list(list(string)),
     ~htmlTag: string,
@@ -10,7 +11,7 @@ let dynamicExtractedComponent:
     ~defaultValue: option(Ppxlib.expression),
     ~param: Ppxlib.pattern,
     ~body: Ppxlib.expression,
-    ~onClassNames: list(string) => unit
+    ~onClassNames: (~identity: option(string), list(string)) => unit
   ) =>
   Ppxlib.module_expr;
 

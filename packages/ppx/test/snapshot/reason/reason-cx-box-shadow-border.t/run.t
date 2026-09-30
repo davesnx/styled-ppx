@@ -13,41 +13,39 @@
   @property --bgColor-zk5xjv{syntax:"*";inherits:false;}
   @property --borderColor-rm89ze{syntax:"*";inherits:false;}
   @property --shadow-2tj34g{syntax:"*";inherits:false;}
-  .css-12b85tv-simpleShadow{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
-  .css-bh2iep-multipleShadows{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1), 0px 4px 8px 0px rgba(0, 0, 0, 0.2);}
-  .css-1r1fme5-insetShadow{box-shadow:inset 0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
-  .css-gokeqi-noShadow{box-shadow:none;}
-  .css-1wp2o9n-spreadShadow{box-shadow:0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -2px rgba(0, 0, 0, 0.1);}
-  .css-e42auv-simpleBorder{border:1px solid black;}
-  .css-1h02qc1-borderWithColor{border:2px dashed #ff0000;}
-  .css-kujkge-borderTransparent{border:1px solid transparent;}
-  .css-10ganm4-noBorder{border:none;}
-  .css-iqmzmu-borderStyles{border-top:1px solid red;}
-  .css-dw79q1-borderStyles{border-right:2px dashed blue;}
-  .css-9o79gh-borderStyles{border-bottom:3px dotted green;}
-  .css-41wvke-borderStyles{border-left:4px double orange;}
-  .css-djq43j-borderSeparate{border-width:2px;}
-  .css-xp8w2v-borderSeparate{border-style:solid;}
-  .css-1jzkaed-borderSeparate{border-color:#333;}
-  .css-1k7257i-borderWithRadius{border:1px solid #ccc;}
-  .css-rl6otz-borderWithRadius{border-radius:8px;}
-  .css-1465761-shadowAndBorder{box-shadow:0px 4px 6px 0px rgba(0, 0, 0, 0.1);}
-  .css-19uwm2g-shadowAndBorder{border:1px solid #e5e7eb;}
-  .css-1yfkn84-shadowAndBorder{border-radius:12px;}
-  .css-y239qm-cardStyle{box-shadow:0px 1px 3px 0px rgba(0, 0, 0, 0.1), 0px 1px 2px -1px rgba(0, 0, 0, 0.1);}
-  .css-11ixi5p-cardStyle{border:1px solid rgba(0, 0, 0, 0.05);}
-  .css-1ebezfo-cardStyle{border-radius:16px;}
-  .css-1bxstvc-buttonBase{border:2px solid #3b82f6;}
-  .css-1vuar9w-buttonBase{box-shadow:0px 0px 0px 0px rgba(59, 130, 246, 0.5);}
-  .css-rl6otz-buttonBase{border-radius:8px;}
-  .css-hfzctv-borderColorInterp{border:1px solid var(--borderColor-1on39sz);}
-  .css-9fu3s3-shadowInterp{box-shadow:var(--shadowX-11ljgmp) var(--shadowY-1qn6d0z) var(--blur-1bcbjmk) var(--spread-xxpef3) var(--shadowColor-1sod13t);}
-  .css-fkjemk-shadowFullInterp{box-shadow:var(--myShadow-af5fmc);}
-  .css-11hdrfm-borderWidthInterp{border:var(--borderWidth-apl5wd) solid black;}
-  .css-zwhmn0-mixedCard{background-color:var(--bgColor-zk5xjv);}
-  .css-zwhmn0-mixedCard{border:1px solid var(--borderColor-rm89ze);}
-  .css-zwhmn0-mixedCard{box-shadow:var(--shadow-2tj34g);}
-  .css-1yfkn84-mixedCard{border-radius:12px;}
+  .css-12b85tv{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
+  .css-bh2iep{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1), 0px 4px 8px 0px rgba(0, 0, 0, 0.2);}
+  .css-1r1fme5{box-shadow:inset 0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
+  .css-gokeqi{box-shadow:none;}
+  .css-1wp2o9n{box-shadow:0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -2px rgba(0, 0, 0, 0.1);}
+  .css-e42auv{border:1px solid black;}
+  .css-1h02qc1{border:2px dashed #ff0000;}
+  .css-kujkge{border:1px solid transparent;}
+  .css-10ganm4{border:none;}
+  .css-iqmzmu{border-top:1px solid red;}
+  .css-dw79q1{border-right:2px dashed blue;}
+  .css-9o79gh{border-bottom:3px dotted green;}
+  .css-41wvke{border-left:4px double orange;}
+  .css-djq43j{border-width:2px;}
+  .css-xp8w2v{border-style:solid;}
+  .css-1jzkaed{border-color:#333;}
+  .css-1k7257i{border:1px solid #ccc;}
+  .css-rl6otz{border-radius:8px;}
+  .css-1465761{box-shadow:0px 4px 6px 0px rgba(0, 0, 0, 0.1);}
+  .css-19uwm2g{border:1px solid #e5e7eb;}
+  .css-1yfkn84{border-radius:12px;}
+  .css-y239qm{box-shadow:0px 1px 3px 0px rgba(0, 0, 0, 0.1), 0px 1px 2px -1px rgba(0, 0, 0, 0.1);}
+  .css-11ixi5p{border:1px solid rgba(0, 0, 0, 0.05);}
+  .css-1ebezfo{border-radius:16px;}
+  .css-1bxstvc{border:2px solid #3b82f6;}
+  .css-1vuar9w{box-shadow:0px 0px 0px 0px rgba(59, 130, 246, 0.5);}
+  .css-hfzctv{border:1px solid var(--borderColor-1on39sz);}
+  .css-9fu3s3{box-shadow:var(--shadowX-11ljgmp) var(--shadowY-1qn6d0z) var(--blur-1bcbjmk) var(--spread-xxpef3) var(--shadowColor-1sod13t);}
+  .css-fkjemk{box-shadow:var(--myShadow-af5fmc);}
+  .css-11hdrfm{border:var(--borderWidth-apl5wd) solid black;}
+  .css-zwhmn0{background-color:var(--bgColor-zk5xjv);}
+  .css-zwhmn0{border:1px solid var(--borderColor-rm89ze);}
+  .css-zwhmn0{box-shadow:var(--shadow-2tj34g);}
 
 Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
 
@@ -65,131 +63,121 @@ Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
   [@@@css "@property --bgColor-zk5xjv{syntax:\"*\";inherits:false;}"]
   [@@@css "@property --borderColor-rm89ze{syntax:\"*\";inherits:false;}"]
   [@@@css "@property --shadow-2tj34g{syntax:\"*\";inherits:false;}"]
+  [@@@css ".css-12b85tv{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1);}"]
   [@@@css
-    ".css-12b85tv-simpleShadow{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1);}"]
+    ".css-bh2iep{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1), 0px 4px 8px 0px rgba(0, 0, 0, 0.2);}"]
+  [@@@css ".css-1r1fme5{box-shadow:inset 0px 2px 4px 0px rgba(0, 0, 0, 0.1);}"]
+  [@@@css ".css-gokeqi{box-shadow:none;}"]
   [@@@css
-    ".css-bh2iep-multipleShadows{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1), 0px 4px 8px 0px rgba(0, 0, 0, 0.2);}"]
+    ".css-1wp2o9n{box-shadow:0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -2px rgba(0, 0, 0, 0.1);}"]
+  [@@@css ".css-e42auv{border:1px solid black;}"]
+  [@@@css ".css-1h02qc1{border:2px dashed #ff0000;}"]
+  [@@@css ".css-kujkge{border:1px solid transparent;}"]
+  [@@@css ".css-10ganm4{border:none;}"]
+  [@@@css ".css-iqmzmu{border-top:1px solid red;}"]
+  [@@@css ".css-dw79q1{border-right:2px dashed blue;}"]
+  [@@@css ".css-9o79gh{border-bottom:3px dotted green;}"]
+  [@@@css ".css-41wvke{border-left:4px double orange;}"]
+  [@@@css ".css-djq43j{border-width:2px;}"]
+  [@@@css ".css-xp8w2v{border-style:solid;}"]
+  [@@@css ".css-1jzkaed{border-color:#333;}"]
+  [@@@css ".css-1k7257i{border:1px solid #ccc;}"]
+  [@@@css ".css-rl6otz{border-radius:8px;}"]
+  [@@@css ".css-1465761{box-shadow:0px 4px 6px 0px rgba(0, 0, 0, 0.1);}"]
+  [@@@css ".css-19uwm2g{border:1px solid #e5e7eb;}"]
+  [@@@css ".css-1yfkn84{border-radius:12px;}"]
   [@@@css
-    ".css-1r1fme5-insetShadow{box-shadow:inset 0px 2px 4px 0px rgba(0, 0, 0, 0.1);}"]
-  [@@@css ".css-gokeqi-noShadow{box-shadow:none;}"]
+    ".css-y239qm{box-shadow:0px 1px 3px 0px rgba(0, 0, 0, 0.1), 0px 1px 2px -1px rgba(0, 0, 0, 0.1);}"]
+  [@@@css ".css-11ixi5p{border:1px solid rgba(0, 0, 0, 0.05);}"]
+  [@@@css ".css-1ebezfo{border-radius:16px;}"]
+  [@@@css ".css-1bxstvc{border:2px solid #3b82f6;}"]
+  [@@@css ".css-1vuar9w{box-shadow:0px 0px 0px 0px rgba(59, 130, 246, 0.5);}"]
+  [@@@css ".css-hfzctv{border:1px solid var(--borderColor-1on39sz);}"]
   [@@@css
-    ".css-1wp2o9n-spreadShadow{box-shadow:0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -2px rgba(0, 0, 0, 0.1);}"]
-  [@@@css ".css-e42auv-simpleBorder{border:1px solid black;}"]
-  [@@@css ".css-1h02qc1-borderWithColor{border:2px dashed #ff0000;}"]
-  [@@@css ".css-kujkge-borderTransparent{border:1px solid transparent;}"]
-  [@@@css ".css-10ganm4-noBorder{border:none;}"]
-  [@@@css ".css-iqmzmu-borderStyles{border-top:1px solid red;}"]
-  [@@@css ".css-dw79q1-borderStyles{border-right:2px dashed blue;}"]
-  [@@@css ".css-9o79gh-borderStyles{border-bottom:3px dotted green;}"]
-  [@@@css ".css-41wvke-borderStyles{border-left:4px double orange;}"]
-  [@@@css ".css-djq43j-borderSeparate{border-width:2px;}"]
-  [@@@css ".css-xp8w2v-borderSeparate{border-style:solid;}"]
-  [@@@css ".css-1jzkaed-borderSeparate{border-color:#333;}"]
-  [@@@css ".css-1k7257i-borderWithRadius{border:1px solid #ccc;}"]
-  [@@@css ".css-rl6otz-borderWithRadius{border-radius:8px;}"]
-  [@@@css
-    ".css-1465761-shadowAndBorder{box-shadow:0px 4px 6px 0px rgba(0, 0, 0, 0.1);}"]
-  [@@@css ".css-19uwm2g-shadowAndBorder{border:1px solid #e5e7eb;}"]
-  [@@@css ".css-1yfkn84-shadowAndBorder{border-radius:12px;}"]
-  [@@@css
-    ".css-y239qm-cardStyle{box-shadow:0px 1px 3px 0px rgba(0, 0, 0, 0.1), 0px 1px 2px -1px rgba(0, 0, 0, 0.1);}"]
-  [@@@css ".css-11ixi5p-cardStyle{border:1px solid rgba(0, 0, 0, 0.05);}"]
-  [@@@css ".css-1ebezfo-cardStyle{border-radius:16px;}"]
-  [@@@css ".css-1bxstvc-buttonBase{border:2px solid #3b82f6;}"]
-  [@@@css
-    ".css-1vuar9w-buttonBase{box-shadow:0px 0px 0px 0px rgba(59, 130, 246, 0.5);}"]
-  [@@@css ".css-rl6otz-buttonBase{border-radius:8px;}"]
-  [@@@css
-    ".css-hfzctv-borderColorInterp{border:1px solid var(--borderColor-1on39sz);}"]
-  [@@@css
-    ".css-9fu3s3-shadowInterp{box-shadow:var(--shadowX-11ljgmp) var(--shadowY-1qn6d0z) var(--blur-1bcbjmk) var(--spread-xxpef3) var(--shadowColor-1sod13t);}"]
-  [@@@css ".css-fkjemk-shadowFullInterp{box-shadow:var(--myShadow-af5fmc);}"]
-  [@@@css
-    ".css-11hdrfm-borderWidthInterp{border:var(--borderWidth-apl5wd) solid black;}"]
-  [@@@css ".css-zwhmn0-mixedCard{background-color:var(--bgColor-zk5xjv);}"]
-  [@@@css ".css-zwhmn0-mixedCard{border:1px solid var(--borderColor-rm89ze);}"]
-  [@@@css ".css-zwhmn0-mixedCard{box-shadow:var(--shadow-2tj34g);}"]
-  [@@@css ".css-1yfkn84-mixedCard{border-radius:12px;}"]
+    ".css-9fu3s3{box-shadow:var(--shadowX-11ljgmp) var(--shadowY-1qn6d0z) var(--blur-1bcbjmk) var(--spread-xxpef3) var(--shadowColor-1sod13t);}"]
+  [@@@css ".css-fkjemk{box-shadow:var(--myShadow-af5fmc);}"]
+  [@@@css ".css-11hdrfm{border:var(--borderWidth-apl5wd) solid black;}"]
+  [@@@css ".css-zwhmn0{background-color:var(--bgColor-zk5xjv);}"]
+  [@@@css ".css-zwhmn0{border:1px solid var(--borderColor-rm89ze);}"]
+  [@@@css ".css-zwhmn0{box-shadow:var(--shadow-2tj34g);}"]
   [@@@css.bindings
-    [("Output.simpleShadow", "css-12b85tv-simpleShadow");
-    ("Output.multipleShadows", "css-bh2iep-multipleShadows");
-    ("Output.insetShadow", "css-1r1fme5-insetShadow");
-    ("Output.noShadow", "css-gokeqi-noShadow");
-    ("Output.spreadShadow", "css-1wp2o9n-spreadShadow");
-    ("Output.simpleBorder", "css-e42auv-simpleBorder");
-    ("Output.borderWithColor", "css-1h02qc1-borderWithColor");
-    ("Output.borderTransparent", "css-kujkge-borderTransparent");
-    ("Output.noBorder", "css-10ganm4-noBorder");
-    ("Output.borderStyles",
-      "css-iqmzmu-borderStyles css-dw79q1-borderStyles css-9o79gh-borderStyles css-41wvke-borderStyles");
-    ("Output.borderSeparate",
-      "css-djq43j-borderSeparate css-xp8w2v-borderSeparate css-1jzkaed-borderSeparate");
-    ("Output.borderWithRadius",
-      "css-1k7257i-borderWithRadius css-rl6otz-borderWithRadius");
-    ("Output.shadowAndBorder",
-      "css-1465761-shadowAndBorder css-19uwm2g-shadowAndBorder css-1yfkn84-shadowAndBorder");
-    ("Output.cardStyle",
-      "css-y239qm-cardStyle css-11ixi5p-cardStyle css-1ebezfo-cardStyle");
-    ("Output.buttonBase",
-      "css-1bxstvc-buttonBase css-1vuar9w-buttonBase css-rl6otz-buttonBase");
-    ("Output.borderColorInterp", "css-hfzctv-borderColorInterp");
-    ("Output.shadowInterp", "css-9fu3s3-shadowInterp");
-    ("Output.shadowFullInterp", "css-fkjemk-shadowFullInterp");
-    ("Output.borderWidthInterp", "css-11hdrfm-borderWidthInterp");
-    ("Output.mixedCard", "css-zwhmn0-mixedCard css-1yfkn84-mixedCard")]]
-  let simpleShadow = CSS.make "css-12b85tv-simpleShadow" []
-  let multipleShadows = CSS.make "css-bh2iep-multipleShadows" []
-  let insetShadow = CSS.make "css-1r1fme5-insetShadow" []
-  let noShadow = CSS.make "css-gokeqi-noShadow" []
-  let spreadShadow = CSS.make "css-1wp2o9n-spreadShadow" []
-  let simpleBorder = CSS.make "css-e42auv-simpleBorder" []
-  let borderWithColor = CSS.make "css-1h02qc1-borderWithColor" []
-  let borderTransparent = CSS.make "css-kujkge-borderTransparent" []
-  let noBorder = CSS.make "css-10ganm4-noBorder" []
+    [("Output.simpleShadow", "cid-1ckmdi6", "css-12b85tv");
+    ("Output.multipleShadows", "cid-1urhidx", "css-bh2iep");
+    ("Output.insetShadow", "cid-18o58m4", "css-1r1fme5");
+    ("Output.noShadow", "cid-1u21xrq", "css-gokeqi");
+    ("Output.spreadShadow", "cid-8d8vql", "css-1wp2o9n");
+    ("Output.simpleBorder", "cid-1kct4wz", "css-e42auv");
+    ("Output.borderWithColor", "cid-tm1wv6", "css-1h02qc1");
+    ("Output.borderTransparent", "cid-tbotla", "css-kujkge");
+    ("Output.noBorder", "cid-15bfnai", "css-10ganm4");
+    ("Output.borderStyles", "cid-16nbulq",
+      "css-iqmzmu css-dw79q1 css-9o79gh css-41wvke");
+    ("Output.borderSeparate", "cid-122xr42",
+      "css-djq43j css-xp8w2v css-1jzkaed");
+    ("Output.borderWithRadius", "cid-1j83vme", "css-1k7257i css-rl6otz");
+    ("Output.shadowAndBorder", "cid-3k5k4w",
+      "css-1465761 css-19uwm2g css-1yfkn84");
+    ("Output.cardStyle", "cid-1je20li", "css-y239qm css-11ixi5p css-1ebezfo");
+    ("Output.buttonBase", "cid-9kxo31", "css-1bxstvc css-1vuar9w css-rl6otz");
+    ("Output.borderColorInterp", "cid-16k72sd", "css-hfzctv");
+    ("Output.shadowInterp", "cid-9zd6fn", "css-9fu3s3");
+    ("Output.shadowFullInterp", "cid-bg3lpz", "css-fkjemk");
+    ("Output.borderWidthInterp", "cid-1h8tvcz", "css-11hdrfm");
+    ("Output.mixedCard", "cid-10wtrx1", "css-zwhmn0 css-1yfkn84")]]
+  let simpleShadow = CSS.make "label:simpleShadow cid-1ckmdi6 css-12b85tv" []
+  let multipleShadows =
+    CSS.make "label:multipleShadows cid-1urhidx css-bh2iep" []
+  let insetShadow = CSS.make "label:insetShadow cid-18o58m4 css-1r1fme5" []
+  let noShadow = CSS.make "label:noShadow cid-1u21xrq css-gokeqi" []
+  let spreadShadow = CSS.make "label:spreadShadow cid-8d8vql css-1wp2o9n" []
+  let simpleBorder = CSS.make "label:simpleBorder cid-1kct4wz css-e42auv" []
+  let borderWithColor =
+    CSS.make "label:borderWithColor cid-tm1wv6 css-1h02qc1" []
+  let borderTransparent =
+    CSS.make "label:borderTransparent cid-tbotla css-kujkge" []
+  let noBorder = CSS.make "label:noBorder cid-15bfnai css-10ganm4" []
   let borderStyles =
     CSS.make
-      "css-iqmzmu-borderStyles css-dw79q1-borderStyles css-9o79gh-borderStyles css-41wvke-borderStyles"
+      "label:borderStyles cid-16nbulq css-iqmzmu css-dw79q1 css-9o79gh css-41wvke"
       []
   let borderSeparate =
     CSS.make
-      "css-djq43j-borderSeparate css-xp8w2v-borderSeparate css-1jzkaed-borderSeparate"
-      []
+      "label:borderSeparate cid-122xr42 css-djq43j css-xp8w2v css-1jzkaed" []
   let borderWithRadius =
-    CSS.make "css-1k7257i-borderWithRadius css-rl6otz-borderWithRadius" []
+    CSS.make "label:borderWithRadius cid-1j83vme css-1k7257i css-rl6otz" []
   let shadowAndBorder =
     CSS.make
-      "css-1465761-shadowAndBorder css-19uwm2g-shadowAndBorder css-1yfkn84-shadowAndBorder"
-      []
+      "label:shadowAndBorder cid-3k5k4w css-1465761 css-19uwm2g css-1yfkn84" []
   let cardStyle =
-    CSS.make "css-y239qm-cardStyle css-11ixi5p-cardStyle css-1ebezfo-cardStyle"
+    CSS.make "label:cardStyle cid-1je20li css-y239qm css-11ixi5p css-1ebezfo"
       []
   let buttonBase =
-    CSS.make
-      "css-1bxstvc-buttonBase css-1vuar9w-buttonBase css-rl6otz-buttonBase" []
+    CSS.make "label:buttonBase cid-9kxo31 css-1bxstvc css-1vuar9w css-rl6otz"
+      []
   let borderColorInterp borderColor =
-    CSS.make "css-hfzctv-borderColorInterp"
+    CSS.make "label:borderColorInterp cid-16k72sd css-hfzctv"
       [("--borderColor-1on39sz", (CSS.Types.Color.toString borderColor))]
   let shadowInterp shadowX =
     fun shadowY ->
       fun blur ->
         fun spread ->
           fun shadowColor ->
-            CSS.make "css-9fu3s3-shadowInterp"
+            CSS.make "label:shadowInterp cid-9zd6fn css-9fu3s3"
               [("--shadowX-11ljgmp", (CSS.Types.Length.toString shadowX));
               ("--shadowY-1qn6d0z", (CSS.Types.Length.toString shadowY));
               ("--blur-1bcbjmk", (CSS.Types.Length.toString blur));
               ("--spread-xxpef3", (CSS.Types.Length.toString spread));
               ("--shadowColor-1sod13t", (CSS.Types.Color.toString shadowColor))]
   let shadowFullInterp myShadow =
-    CSS.make "css-fkjemk-shadowFullInterp"
+    CSS.make "label:shadowFullInterp cid-bg3lpz css-fkjemk"
       [("--myShadow-af5fmc", (CSS.Types.BoxShadows.toString myShadow))]
   let borderWidthInterp borderWidth =
-    CSS.make "css-11hdrfm-borderWidthInterp"
+    CSS.make "label:borderWidthInterp cid-1h8tvcz css-11hdrfm"
       [("--borderWidth-apl5wd", (CSS.Types.LineWidth.toString borderWidth))]
   let mixedCard bgColor =
     fun borderColor ->
       fun shadow ->
-        CSS.make "css-zwhmn0-mixedCard css-1yfkn84-mixedCard"
+        CSS.make "label:mixedCard cid-10wtrx1 css-zwhmn0 css-1yfkn84"
           [("--bgColor-zk5xjv", (CSS.Types.Color.toString bgColor));
           ("--borderColor-rm89ze", (CSS.Types.Color.toString borderColor));
           ("--shadow-2tj34g", (CSS.Types.BoxShadows.toString shadow))]

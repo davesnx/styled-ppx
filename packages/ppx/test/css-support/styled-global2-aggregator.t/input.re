@@ -2,7 +2,7 @@
 
    The PPX emits each top-level rule as a [@@@css ...] attribute (with
    `var(--var-<hash>)` already substituted for interpolation positions).
-   The aggregator harvests those attributes and writes them to the
+   The aggregator extracts those attributes and writes them to the
    final stylesheet.
 
    The runtime `:root { --var-<hash>: <value>; }` block lives inside the

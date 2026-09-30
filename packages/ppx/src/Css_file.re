@@ -409,12 +409,6 @@ module Css_transform = {
     };
   }
 
-  /* Resolve `ClassVariable(name)` (i.e. `.$(name)`) by replacing it with
-     the chain of `Class(c)` subclass selectors corresponding to the
-     classNames the referenced [%css] binding minted. Multi-declaration
-     bindings expand to a compound chain (`&.cssA.cssB`) which matches the
-     "AND" semantics: every consumer of the referenced binding has all of
-     its atomized classes applied to the same element. */
   and transform_compound_selector = (ctx, compound: compound_selector) => {
     let transformed_type_selector =
       Option.map(
@@ -423,9 +417,7 @@ module Css_transform = {
       );
     let transformed_subclasses =
       compound.subclass_selectors
-      |> List.concat_map(subclass =>
-           transform_subclass_selector_to_list(ctx, subclass)
-         );
+      |> List.map(subclass => transform_subclass_selector(ctx, subclass));
     let transformed_pseudos =
       compound.pseudo_selectors
       |> List.map(pseudo => transform_pseudo_selector(ctx, pseudo));
@@ -452,17 +444,7 @@ module Css_transform = {
           ~loc=var_loc,
           path_str,
         );
-      switch (resolved) {
-      | [single] => Subclass(Class(single))
-      | _ =>
-        Ppxlib.Location.raise_errorf(
-          ~loc=var_loc,
-          "Bare `$(%s)` selector interpolation expanded to %d class names; this position only accepts a single class. Prefix with `.` to use a class chain instead: `.$(%s)`.",
-          path_str,
-          List.length(resolved),
-          path_str,
-        )
-      };
+      Subclass(Class(resolved));
     | _ => simple
     };
   }
@@ -479,14 +461,11 @@ module Css_transform = {
     };
   }
 
-  /* `transform_subclass_selector_to_list` returns a *list* of subclass
-     selectors so `ClassVariable` can fan out into a compound chain
-     (`.cssA.cssB`) for multi-declaration source bindings. */
-  and transform_subclass_selector_to_list =
-      (ctx, subclass: subclass_selector): list(subclass_selector) => {
+  and transform_subclass_selector =
+      (ctx, subclass: subclass_selector): subclass_selector => {
     switch (subclass) {
     | ClassVariable(path_str, var_loc) =>
-      let classNames =
+      let className =
         Local_selector_environment.resolve_selector_class_ref(
           ~file=ctx.file,
           ~scope=ctx.scope,
@@ -494,11 +473,10 @@ module Css_transform = {
           ~loc=to_file_loc(ctx, var_loc),
           path_str,
         );
-      List.map(c => Class(c), classNames);
-    | Pseudo_class(pseudo) => [
-        Pseudo_class(transform_pseudo_selector(ctx, pseudo)),
-      ]
-    | _ => [subclass]
+      Class(className);
+    | Pseudo_class(pseudo) =>
+      Pseudo_class(transform_pseudo_selector(ctx, pseudo))
+    | _ => subclass
     };
   }
 
@@ -834,7 +812,7 @@ module Css_transform = {
   };
 
   let atomize_rules =
-      (~source_position_start, ~label=?, rules: list(rule))
+      (~source_position_start, rules: list(rule))
       : list((string, string, rule)) => {
     /* Merge a child selector-list prelude under a parent selector-list prelude.
        For each (parent, child) pair, run `compute_new_prefix` so `&`,
@@ -883,13 +861,13 @@ module Css_transform = {
         | [decl] =>
           let decl_string = render_declaration(decl);
           let (className, namespace) =
-            Hash_class.class_and_namespace(~label?, decl_string);
+            Hash_class.class_and_namespace(decl_string);
           [(className, namespace, Declaration(decl))];
         | decls =>
           let group_string =
             decls |> List.map(render_declaration) |> String.concat("");
           let (className, namespace) =
-            Hash_class.class_and_namespace(~label?, group_string);
+            Hash_class.class_and_namespace(group_string);
           let style_rule =
             Style_rule({
               prelude: (
@@ -938,7 +916,7 @@ module Css_transform = {
               });
             let rule_string = render_rule(style_rule);
             let (className, namespace) =
-              Hash_class.class_and_namespace(~label?, rule_string);
+              Hash_class.class_and_namespace(rule_string);
             (className, namespace, style_rule);
           },
           parent_selectors,
@@ -1077,7 +1055,7 @@ module Css_transform = {
                  });
                let wrapped_string = render_rule(wrapped);
                let (new_className, new_namespace) =
-                 Hash_class.class_and_namespace(~label?, wrapped_string);
+                 Hash_class.class_and_namespace(wrapped_string);
                (new_className, new_namespace, wrapped);
              })
         };
@@ -1137,7 +1115,6 @@ module Css_transform = {
         ~scope: list(string),
         ~opens: list(list(string)),
         ~source_position_start,
-        ~label=?,
         rule_list: rule_list,
       ) => {
     let ctx = {
@@ -1149,14 +1126,15 @@ module Css_transform = {
     };
     let (rules, loc) = rule_list;
 
-    let atomic_rules = atomize_rules(~source_position_start, ~label?, rules);
+    let atomic_rules = atomize_rules(~source_position_start, rules);
 
     /* Selective atomization: the block's interpolating declarations become one
-       content-addressed bundle, with class `css-<B>-<label>` and var namespace
-       `css-<B>` (label-free) shared across base/`:hover`/`@media`. Both derive
-       from the same bundle content, so identical bundles dedup to identical
-       rules + vars and different bundles never collide, preserving the
-       cross-module atomic invariant (see Hash_class.ml) and `CSS.merge`.
+       content-addressed bundle, with class and var namespace both `css-<B>`
+       (the two are identical, see Hash_class.ml) shared across
+       base/`:hover`/`@media`. Both derive from the same bundle content, so
+       identical bundles dedup to identical rules + vars and different
+       bundles never collide, preserving the cross-module atomic invariant
+       (see Hash_class.ml) and `CSS.merge`.
 
        Static declarations keep their own per-content atom class (still shared
        across blocks). A block with no interpolation produces no bundle and is
@@ -1171,9 +1149,7 @@ module Css_transform = {
       ) {
       | [] => None
       | seeds =>
-        Some(
-          Hash_class.class_and_namespace(~label?, String.concat("", seeds)),
-        )
+        Some(Hash_class.class_and_namespace(String.concat("", seeds)))
       };
 
     let (shipped_rev, classes_rev, atom_infos_rev) =
@@ -1256,25 +1232,52 @@ module Css_transform = {
   };
 };
 
-/* Empty `[%css {||}]` bound to a named `let` mints a deterministic
-   class handle (`css-<hash-of-empty>-<label>`) so consumers can
-   resolve `&.$(name)` against it. No `[@@@css ...]` is emitted —
-   there's no rule to write. Anonymous (`_`) and statement-position
-   bindings return `[]`, preserving the historical `CSS.make("", [])`
-   shape. */
-let mint_empty_class = (~label) =>
-  switch (label) {
-  | Some(name) when name != "_" => [Hash_class.class_name(~label=name, "")]
-  | _ => []
+/* Per-compilation-unit occurrence counter for identity classes, keyed by
+   (scope, name). A repeated (scope, name) - e.g. two functions each with
+   their own `let a = [%css ...]` - would otherwise mint the same identity
+   for two unrelated bindings; the occurrence count breaks the tie. Cleared
+   in `get()`, at the same point every other per-CU accumulator resets. */
+let identity_occurrences: Hashtbl.t((string, string), int) =
+  Hashtbl.create(64);
+
+let next_identity_occurrence = (~scope: list(string), ~name: string) => {
+  let key = (String.concat(".", scope), name);
+  let next =
+    1 + Option.value(Hashtbl.find_opt(identity_occurrences, key), ~default=0);
+  Hashtbl.replace(identity_occurrences, key, next);
+  next;
+};
+
+/* The identity class for a named binding (see `Hash_class.identity_class`).
+   `None` for an anonymous (`_`) or statement-position binding: it cannot be
+   referenced cross-module, so it needs no stable handle. Independent of
+   `--minify` - unlike the historical label suffix, the identity is never
+   dropped in production, which is what lets an empty named binding still
+   resolve `&.$(name)` under `--minify` (see documents/css-extraction.md). */
+let identity_of_name = (~main_module, ~scope, ~name: option(string)) =>
+  switch (name) {
+  | Some(n) when n != "_" =>
+    let occurrence = next_identity_occurrence(~scope, ~name=n);
+    Some(
+      Hash_class.identity_class(
+        ~namespace=Settings.Get.namespace(),
+        ~module_name=main_module,
+        ~scope,
+        ~name=n,
+        ~occurrence,
+      ),
+    );
+  | _ => None
   };
 
 let push =
     (
       ~file,
+      ~main_module,
       ~scope: list(string),
       ~opens: list(list(string)),
       ~source_position_start,
-      ~label=?,
+      ~name: option(string),
       declarations: Styled_ppx_css_parser.Ast.rule_list,
     ) => {
   let (shipped_rules, binding_classes, dynamic_vars, safe_inherits_false_vars) =
@@ -1283,7 +1286,6 @@ let push =
       ~scope,
       ~opens,
       ~source_position_start,
-      ~label?,
       declarations,
     );
 
@@ -1318,14 +1320,16 @@ let push =
     safe_inherits_false_vars,
   );
 
-  let classNames =
-    switch (binding_classes) {
-    | [] => mint_empty_class(~label)
-    | _ => binding_classes
-    };
+  let identity = identity_of_name(~main_module, ~scope, ~name);
 
-  (classNames, dynamic_vars);
+  (identity, binding_classes, dynamic_vars);
 };
+
+let classes_with_identity = (~identity, atomClasses) =>
+  switch (identity) {
+  | Some(cid) => [cid, ...atomClasses]
+  | None => atomClasses
+  };
 
 let push_keyframe =
     (
@@ -1487,5 +1491,6 @@ let get = () => {
   let rules = Buffer.get_rules();
   Buffer.clear();
   Local_selector_environment.clear();
+  Hashtbl.clear(identity_occurrences);
   rules;
 };

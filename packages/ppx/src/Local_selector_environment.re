@@ -3,7 +3,7 @@
    before typing: same-file modules, aliases, opens/includes, named [%css]
    bindings, and literal string selectors seen earlier in the file. */
 
-let table: Hashtbl.t((string, string), list(string)) = Hashtbl.create(64);
+let table: Hashtbl.t((string, string), string) = Hashtbl.create(64);
 let local_modules: Hashtbl.t((string, string), unit) = Hashtbl.create(64);
 let aliases: Hashtbl.t((string, string), list(string)) =
   Hashtbl.create(32);
@@ -40,18 +40,13 @@ let register_alias =
 };
 
 let register =
-    (
-      ~file: string,
-      ~scope: list(string),
-      ~name: string,
-      ~classNames: list(string),
-    ) =>
+    (~file: string, ~scope: list(string), ~name: string, ~className: string) =>
   if (name != "_") {
     List.iter(path => register_module(~file, ~path), prefixes(scope));
-    Hashtbl.replace(table, (file, join_path(scope @ [name])), classNames);
+    Hashtbl.replace(table, (file, join_path(scope @ [name])), className);
   };
 
-let lookup = (~file: string, ~path: list(string)): option(list(string)) =>
+let lookup = (~file: string, ~path: list(string)): option(string) =>
   Hashtbl.find_opt(table, (file, join_path(path)));
 
 let module_exists = (~file: string, ~path: list(string)): bool =>
@@ -68,7 +63,7 @@ let include_module =
   let current_prefix = join_path(scope);
   let copied = ref([]);
   Hashtbl.iter(
-    ((entry_file, entry_path), classNames) =>
+    ((entry_file, entry_path), className) =>
       if (entry_file == file) {
         let suffix =
           if (entry_path == module_prefix) {
@@ -97,15 +92,15 @@ let include_module =
         | Some(suffix) =>
           let included_path =
             current_prefix == "" ? suffix : current_prefix ++ "." ++ suffix;
-          copied := [(included_path, classNames), ...copied^];
+          copied := [(included_path, className), ...copied^];
         | None => ()
         };
       },
     table,
   );
   List.iter(
-    ((included_path, classNames)) =>
-      Hashtbl.replace(table, (file, included_path), classNames),
+    ((included_path, className)) =>
+      Hashtbl.replace(table, (file, included_path), className),
     copied^,
   );
 };
@@ -233,7 +228,7 @@ let resolve_selector_class_ref =
       path_str: string,
     ) => {
   switch (lookup_local_class_ref(~file, ~scope, ~opens, path_str)) {
-  | Some(classNames) => classNames
+  | Some(className) => className
   | None
       when
         String.contains(path_str, '.')
@@ -249,7 +244,7 @@ let resolve_selector_class_ref =
       | _ => path_str
       };
     Cross_module_refs.record(~file, ~longident, ~loc);
-    [Cross_module_refs.sentinel(longident)];
+    Cross_module_refs.sentinel(longident);
   | None =>
     Ppxlib.Location.raise_errorf(
       ~loc,

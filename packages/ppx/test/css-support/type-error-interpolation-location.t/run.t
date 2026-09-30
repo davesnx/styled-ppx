@@ -8,6 +8,7 @@ If this test fail means that the module is not in sync with the ppx
   $ cat > dune << EOF
   > (executable
   >  (name input)
+  >  (flags :standard -short-paths)
   >  (libraries styled-ppx.native)
   >  (preprocess (pps styled-ppx)))
   > EOF
