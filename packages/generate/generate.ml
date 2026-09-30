@@ -1169,10 +1169,10 @@ let pseudo_rank rule_text =
       | many when List.exists (fun p -> String.contains p '(') many -> 40
       | many -> List.fold_left (fun acc p -> acc + pseudo_part_weight p) 0 many)
 
-(** The index right after the first occurrence of [needle] in [haystack], or
-    [None] when it does not occur (a media prelude is a handful of bytes - a
-    linear scan needs no search library). *)
-let index_after haystack needle =
+(** The index right after the first occurrence of [needle] in [haystack] at or
+    after [from], or [None] when it does not occur (a media prelude is a handful
+    of bytes - a linear scan needs no search library). *)
+let index_after ?(from = 0) haystack needle =
   let hn = String.length haystack
   and nn = String.length needle in
   let rec loop i =
@@ -1180,7 +1180,22 @@ let index_after haystack needle =
     else if String.sub haystack i nn = needle then Some (i + nn)
     else loop (i + 1)
   in
-  loop 0
+  loop from
+
+(** [s] split at every occurrence of [sep] (a plain substring search, same
+    tolerance as {!index_after} - the and-chains this reads are already flat,
+    single-feature terms with no nesting to track). *)
+let split_on_substring s sep =
+  let n = String.length s
+  and sn = String.length sep in
+  let rec loop start acc =
+    match index_after ~from:start s sep with
+    | None -> List.rev (String.sub s start (n - start) :: acc)
+    | Some after ->
+      let match_start = after - sn in
+      loop after (String.sub s start (match_start - start) :: acc)
+  in
+  loop 0 []
 
 (** Drop a leading `screen`/`all` media type (`only` optional) and its own
     `and`, so `@media screen and (max-width: 767px)` - the dominant real shape,
@@ -1215,66 +1230,136 @@ let strip_screen_or_all_media_type lower =
     String.sub lower (String.length p) (String.length lower - String.length p)
   | None -> lower
 
-(** ponytail: a substring scan, not a real media-query parser - reads only a
-    single `min-width`/`max-width: <n>px` feature; upgrade to a real media AST
-    if `@supports`/`@container` or non-`px` units ever need a tie-break too.
+(** [Some value] when [term] contains [feature_key] (`"min-width:"` or
+    `"max-width:"`) followed by optional whitespace, then digits, then `px` -
+    the same tolerant scan {!media_width_bound} always used, now applied to one
+    `and`-separated term instead of the whole prelude (a leading `@media `, or
+    leftover parens/whitespace around the term, are ignored the same way they
+    always were). [None] when the key is absent, or present but not followed by
+    a clean `<digits>px` value. *)
+let px_value_after term feature_key =
+  match index_after term feature_key with
+  | None -> None
+  | Some after ->
+    let n = String.length term in
+    let j = ref after in
+    while !j < n && term.[!j] = ' ' do
+      incr j
+    done;
+    let start = !j in
+    while !j < n && term.[!j] >= '0' && term.[!j] <= '9' do
+      incr j
+    done;
+    if !j = start || !j + 2 > n || String.sub term !j 2 <> "px" then None
+    else Some (int_of_string (String.sub term start (!j - start)))
 
-    The single `min-width`/`max-width` px bound an `@media` prelude sorts by, or
-    [None] when the prelude (after {!strip_screen_or_all_media_type}) combines
-    features (`and`/`or`/`not` - no single value to sort by), names no width
-    feature, or the value isn't `px` (an `em`/`vw` bound would need a
-    font-size/viewport to compare against another unit, out of scope here).
-    Whitespace after the `:` is optional, since real rendered output has it
-    (`@media (min-width: 600px)`) while hand-written fixtures may not. Encoded
-    as [(kind_rank, signed_value)]: `min` = [(0, value)] (plain ascending
-    compare already gives "min-width ascending" - a wider, later-declared
-    breakpoint wins a tie); `max` = [(1, -value)] (kind mismatch always
-    separates min from max first; negating flips ascending compare into
-    "narrower wins" for max-width). *)
+(** Which side of an `@media` width feature a prelude names, and by what it
+    sorts. Declared in exactly this order on purpose: OCaml's structural
+    [compare] orders a variant by constructor TAG before its argument, so this
+    declaration order alone is the whole cross-kind rule -
+    {!sort_conditional_rules} just calls [compare], no hand-written comparator
+    needed.
+
+    - [No_width_bound]: unreadable, or no width feature at all - sorts FIRST,
+      same as before.
+    - [Min_width_bound lower]: the query has a lower bound - a plain
+      `min-width`, OR a `min-width`/`max-width` RANGE (a range's own upper bound
+      is read only to confirm the prelude parses; it is never part of the key -
+      see the note below) - sorts next, ascending by [lower] (unchanged from
+      before: a wider, later-declared breakpoint wins a tie between two plain
+      `min-width`s).
+    - [Max_width_bound negated_upper]: the query names ONLY a `max-width`, no
+      lower bound at all - sorts LAST, after every [Min_width_bound] regardless
+      of value, negated so ascending [compare] on the negated value sorts
+      DESCENDING on the real upper (unchanged from before: the narrower
+      `max-width` sorts last and wins).
+
+    Why a RANGE keys on its lower bound alone, discarding the upper: the
+    generator only ever sees two CONDITIONS to order, never which one a
+    `CSS.merge`/`+++` call meant as the override - it cannot always get every
+    real, shipped pair "right", so it follows the common real pattern instead
+    (mobile-first `min-width`, a narrower range as a scoped override INSIDE that
+    breakpoint, a `max-width`-only rule for an unrelated, desktop-first
+    override) and falls back to definition order on a genuine tie between two
+    ranges, or a range and a plain `min-width`, that share a lower bound -
+    `packages/ppx/test/css-support/condition-priority-media-range-shapes.t` has
+    three real, shipped examples of exactly this trade-off (one where the range
+    must win, two where the `max-width`-only rule must). *)
+type width_key =
+  | No_width_bound
+  | Min_width_bound of int
+  | Max_width_bound of int
+
+(** ponytail: a substring scan, not a real media-query parser - reads only
+    `min-width`/`max-width: <n>px` features joined by `and`; upgrade to a
+    real media AST if `@supports`/`@container` or non-`px` units ever need a
+    tie-break too.
+
+    [No_width_bound] when the prelude (after
+    {!strip_screen_or_all_media_type}) has an `or`/`not` anywhere, a term
+    that is neither `min-width`/`max-width` in `px`, two terms for the SAME
+    bound (ambiguous - not a claim of intersecting them), or no width
+    feature at all. Whitespace after the `:` is optional, since real
+    rendered output has it (`@media (min-width: 600px)`) while hand-written
+    fixtures may not.
+
+    This is the fix for the real regression this key existed to prevent in
+    the first place: `@media (min-width: 768px){...}` (a lower bound, no
+    upper) and `@media (min-width: 768px) and (max-width: 1279px){...}` (a
+    RANGE, same lower bound) used to compare as `Some _` against `None`
+    (the range bailed out on its own `and`), so the unbounded rule always
+    won between 768 and 1279px regardless of which one the author meant to
+    override. Both are now [Min_width_bound 768] - a genuine tie, decided
+    by definition order (see {!width_key}'s doc for why, and for the two
+    other real shapes where a range instead ties against a `max-width`-only
+    rule, decided by kind, not by value or definition order). *)
 let media_width_bound prelude =
   let lower = String.lowercase_ascii prelude in
   let feature_part = strip_screen_or_all_media_type lower in
   if
-    index_after feature_part " and " <> None
-    || index_after feature_part " or " <> None
+    index_after feature_part " or " <> None
     || index_after feature_part "not " <> None
-  then None
+  then No_width_bound
   else (
-    let bound key kind_rank sign =
-      match index_after lower key with
-      | None -> None
-      | Some after ->
-        let n = String.length lower in
-        let j = ref after in
-        while !j < n && lower.[!j] = ' ' do
-          incr j
-        done;
-        let start = !j in
-        while !j < n && lower.[!j] >= '0' && lower.[!j] <= '9' do
-          incr j
-        done;
-        if !j = start || !j + 2 > n || String.sub lower !j 2 <> "px" then None
-        else
-          Some
-            ( kind_rank,
-              sign * int_of_string (String.sub lower start (!j - start)) )
+    let classify term =
+      match px_value_after term "min-width:" with
+      | Some v -> Some (`Min v)
+      | None ->
+        (match px_value_after term "max-width:" with
+        | Some v -> Some (`Max v)
+        | None -> None)
     in
-    match bound "min-width:" 0 1 with
-    | Some v -> Some v
-    | None -> bound "max-width:" 1 (-1))
+    let rec fold terms min_seen max_seen =
+      match terms with
+      | [] ->
+        (match min_seen with
+        | Some lo -> Min_width_bound lo
+        | None ->
+          (match max_seen with
+          | Some hi -> Max_width_bound (-hi)
+          | None -> No_width_bound))
+      | term :: rest ->
+        (match classify term with
+        | None -> No_width_bound
+        | Some (`Min v) ->
+          if min_seen <> None then No_width_bound
+          else fold rest (Some v) max_seen
+        | Some (`Max v) ->
+          if max_seen <> None then No_width_bound
+          else fold rest min_seen (Some v))
+    in
+    fold (split_on_substring feature_part " and ") None None)
 
 (** {!sort_by_shorthand_first}'s own two keys (descendant-shape, depth), then
     three more for the [conditional] group ONLY: at-rule rank ({!at_rule_rank}),
     pseudo rank ({!pseudo_rank}), then the media width bound
     ({!media_width_bound}, read only when [at_rule_rank = 2] - a
     `@supports`/`@container` prelude has no width to read). A valid total order
-    (every component is a plain [bool]/[int], or a [(int * int) option]); the
-    width bound compares with plain [compare] - [None] already sorts before
-    [Some _] by constructor order, and two [Some]s compare their [(int * int)]
-    payload structurally (kind first, then value), exactly the
-    [(kind_rank, signed_value)] ordering {!media_width_bound}'s doc describes,
-    so a hand-written comparator would only repeat what [compare] already does.
-    Not a claim that every pair gets a DISTINCT key: two different `@supports`
+    (every component is a plain [bool]/[int], or a {!width_key}); the width
+    bound compares with plain [compare] - {!width_key}'s own doc explains why
+    its declaration order already gives the right cross-kind rule, so a
+    hand-written comparator would only repeat what [compare] already does. Not a
+    claim that every pair gets a DISTINCT key: two different `@supports`
     conditions, or two different pseudo-elements, still tie and fall through to
     stable/file order - out of scope here, same as StyleX (which has no
     tie-break for either case). *)
@@ -1285,7 +1370,7 @@ let sort_conditional_rules rules =
     let width =
       match outermost_at_rule_prelude rule_text with
       | Some prelude when at_rule = 2 -> media_width_bound prelude
-      | _ -> None
+      | _ -> No_width_bound
     in
     ( is_descendant_shape rule_text,
       rule_depth rule_text,
