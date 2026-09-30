@@ -963,10 +963,20 @@ let sort_by_shorthand_first rules =
    and can still be `@`-wrapped or bare, so this key has nothing
    meaningful to decide for it.
 
-   Pseudo-class/pseudo-element and at-rule ranks are StyleX's
-   `PSEUDO_CLASS_PRIORITIES`/`AT_RULE_PRIORITIES`/`PSEUDO_ELEMENT_PRIORITY`
-   (`@stylexjs/shared/src/utils/property-priorities.js`), ported verbatim -
-   a fixed, already-vetted order, no reason to invent our own numbers. Not
+   The pseudo-class/pseudo-element and at-rule priority TABLES are
+   StyleX's `PSEUDO_CLASS_PRIORITIES`/`AT_RULE_PRIORITIES`/
+   `PSEUDO_ELEMENT_PRIORITY`
+   (`@stylexjs/shared/src/utils/property-priorities.js`), copied verbatim -
+   no reason to invent our own numbers for those. The COMPOSITION is not
+   StyleX's: real StyleX sums a rule's property/pseudo/at-rule weights into
+   one arithmetic total
+   (`@stylexjs/babel-plugin/src/shared/utils/generate-css-rule.js:106-110`),
+   so a heavy enough pseudo-class chain can outrank a light at-rule wrapper
+   (`:active` at 170 beats `@supports`-wrapped `:link` at 30+80=110 in real
+   StyleX). This key instead compares at-rule rank BEFORE pseudo rank as a
+   strict, two-level hierarchy - any at-rule wrapper unconditionally
+   outranks any bare pseudo-class tie, regardless of magnitude. That
+   hierarchy is this project's own choice, not ported from StyleX. Not
    ported: StyleX turns this same priority into a CSS layer (or a
    specificity bump) that can override a real specificity difference
    between rules; this key never does - it only ever breaks a tie between
@@ -1253,31 +1263,21 @@ let media_width_bound prelude =
     | Some v -> Some v
     | None -> bound "max-width:" 1 (-1))
 
-(** Two [Some] bounds compare structurally ([(kind_rank, signed_value)],
-    lexicographic - kind first, so a `min` bound and a `max` bound never
-    interleave by raw pixel value alone). [None] (an unreadable or compound
-    prelude) sorts before any [Some] bound: a fixed, total choice - a rule this
-    scan cannot read cleanly never outranks one it can - not a claim that
-    "unreadable" deserves to lose on any semantic ground; StyleX's own reader
-    makes the opposite choice (`None` wins) for the same reason, fixed and
-    arbitrary is all a tie-break needs. *)
-let compare_media_width_bound a b =
-  match a, b with
-  | None, None -> 0
-  | None, Some _ -> -1
-  | Some _, None -> 1
-  | Some a, Some b -> compare a b
-
 (** {!sort_by_shorthand_first}'s own two keys (descendant-shape, depth), then
     three more for the [conditional] group ONLY: at-rule rank ({!at_rule_rank}),
     pseudo rank ({!pseudo_rank}), then the media width bound
     ({!media_width_bound}, read only when [at_rule_rank = 2] - a
     `@supports`/`@container` prelude has no width to read). A valid total order
-    (every component is a plain [bool]/[int], or a [(int * int) option] compared
-    by {!compare_media_width_bound}), not a claim that every pair gets a
-    DISTINCT key: two different `@supports` conditions, or two different
-    pseudo-elements, still tie and fall through to stable/file order - out of
-    scope here, same as StyleX (which has no tie-break for either case). *)
+    (every component is a plain [bool]/[int], or a [(int * int) option]); the
+    width bound compares with plain [compare] - [None] already sorts before
+    [Some _] by constructor order, and two [Some]s compare their [(int * int)]
+    payload structurally (kind first, then value), exactly the
+    [(kind_rank, signed_value)] ordering {!media_width_bound}'s doc describes,
+    so a hand-written comparator would only repeat what [compare] already does.
+    Not a claim that every pair gets a DISTINCT key: two different `@supports`
+    conditions, or two different pseudo-elements, still tie and fall through to
+    stable/file order - out of scope here, same as StyleX (which has no
+    tie-break for either case). *)
 let sort_conditional_rules rules =
   rules
   |> List.map (fun rule_text ->
@@ -1299,7 +1299,7 @@ let sort_conditional_rules rules =
        else if deptha <> depthb then compare deptha depthb
        else if ata <> atb then compare ata atb
        else if pa <> pb then compare pa pb
-       else compare_media_width_bound wa wb)
+       else compare wa wb)
   |> List.map (fun (_, _, _, _, _, r) -> r)
 
 (** Collect, index, resolve, dedup, output. *)

@@ -612,9 +612,12 @@ declarations, sorts correctly.
 `conditional` rules (the common case - two atoms wrapped in an at-rule, or
 carrying a pseudo-class/pseudo-element directly, of equal specificity),
 three more key components decide, in this order: **at-rule rank** (0 for
-no wrapper, 1 for `@supports`, 2 for `@media`, 3 for `@container` - StyleX's
-own relative order); **pseudo rank** (StyleX's `PSEUDO_CLASS_PRIORITIES`/
-`PSEUDO_ELEMENT_PRIORITY`, ported verbatim - `:hover` 130, `:focus` 150,
+no wrapper, 1 for `@supports`, 2 for `@media`, 3 for `@container` - this
+project's own strict hierarchy; the leaf VALUES 30/200/300 are StyleX's,
+but StyleX itself never compares them as a separate tier before pseudo
+rank - it sums both into one weight); **pseudo rank** (StyleX's
+`PSEUDO_CLASS_PRIORITIES`/`PSEUDO_ELEMENT_PRIORITY` table, copied verbatim
+- `:hover` 130, `:focus` 150,
 `:focus-visible` 160, `:active` 170, every pseudo-element 5000, read only
 from the pseudo chain directly suffixed to the atom's own class, the same
 position the classification above checks - and stopping at the first
