@@ -31,6 +31,19 @@ module Property_shape_rendering =
 let property_shape_rendering : property_shape_rendering Rule.rule =
   Property_shape_rendering.rule
 
+(* CSS Round Display L1: https://drafts.csswg.org/css-round-display/#propdef-shape-inside
+   'shape-box' is unlinked plain text in the spec's own Value cell (a markup
+   slip - every other alternative here is a proper type/keyword link); reads
+   as the same <shape-box> typedef shape-outside already uses two lines up. *)
+module Property_shape_inside =
+  [%spec_module
+  "'auto' | 'outside-shape' | [ <basic-shape> || <shape-box> ] | <image> | \
+   'display'",
+  (module Css_types.ShapeOutside)]
+
+let property_shape_inside : property_shape_inside Rule.rule =
+  Property_shape_inside.rule
+
 let entries : (kind * packed_rule) list =
   [
     ( Property "shape-image-threshold",
@@ -38,4 +51,5 @@ let entries : (kind * packed_rule) list =
     Property "shape-margin", pack_module (module Property_shape_margin);
     Property "shape-outside", pack_module (module Property_shape_outside);
     Property "shape-rendering", pack_module (module Property_shape_rendering);
+    Property "shape-inside", pack_module (module Property_shape_inside);
   ]

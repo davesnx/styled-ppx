@@ -67,6 +67,51 @@ module Property_box_shadow =
 let property_box_shadow : property_box_shadow Rule.rule =
   Property_box_shadow.rule
 
+(* CSS Borders and Box Decorations L4 § 6.1-6.5: https://drafts.csswg.org/css-borders-4/#propdef-box-shadow-color
+   (and the 4 sibling propdefs). This draft redefines box-shadow itself as
+   the shorthand resetting these 5 (<'box-shadow-color'>? && [ [ none |
+   <length>{2} ] [ <'box-shadow-blur'> <'box-shadow-spread'>? ]? ] &&
+   <'box-shadow-position'>? - a 3-way && with an offset sub-grammar that
+   deliberately differs from box-shadow-offset's own, per the spec's own
+   note). Registering that redefinition safely needs its own careful pass -
+   left as-is for now (box-shadow keeps its existing simpler grammar and
+   Property kind); these 5 are added standalone, not yet wired as its
+   longhands. *)
+module Property_box_shadow_color =
+  [%spec_module
+  "[ <color> ]#", (module Css_types.Color)]
+
+let property_box_shadow_color : property_box_shadow_color Rule.rule =
+  Property_box_shadow_color.rule
+
+module Property_box_shadow_offset =
+  [%spec_module
+  "[ 'none' | [ <extended-length> ]{1,2} ]#", (module Css_types.Cascading)]
+
+let property_box_shadow_offset : property_box_shadow_offset Rule.rule =
+  Property_box_shadow_offset.rule
+
+module Property_box_shadow_blur =
+  [%spec_module
+  "[ <extended-length> ]#", (module Css_types.Length)]
+
+let property_box_shadow_blur : property_box_shadow_blur Rule.rule =
+  Property_box_shadow_blur.rule
+
+module Property_box_shadow_spread =
+  [%spec_module
+  "[ <extended-length> ]#", (module Css_types.Length)]
+
+let property_box_shadow_spread : property_box_shadow_spread Rule.rule =
+  Property_box_shadow_spread.rule
+
+module Property_box_shadow_position =
+  [%spec_module
+  "[ 'outset' | 'inset' ]#", (module Css_types.BoxShadowPosition)]
+
+let property_box_shadow_position : property_box_shadow_position Rule.rule =
+  Property_box_shadow_position.rule
+
 module Property_box_sizing =
   [%spec_module
   "'content-box' | 'border-box'", (module Css_types.BoxSizing)]
@@ -100,4 +145,12 @@ let entries : (kind * packed_rule) list =
     Property "box-orient", pack_module (module Property_box_orient);
     Property "box-pack", pack_module (module Property_box_pack);
     Property "box-shadow", pack_module (module Property_box_shadow);
+    Property "box-shadow-color", pack_module (module Property_box_shadow_color);
+    ( Property "box-shadow-offset",
+      pack_module (module Property_box_shadow_offset) );
+    Property "box-shadow-blur", pack_module (module Property_box_shadow_blur);
+    ( Property "box-shadow-spread",
+      pack_module (module Property_box_shadow_spread) );
+    ( Property "box-shadow-position",
+      pack_module (module Property_box_shadow_position) );
   ]

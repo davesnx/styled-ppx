@@ -1,4 +1,4 @@
-/* css-grammar-missing-properties (2026-09-25): CSS View Transitions L2,
+/* CSS View Transitions L2,
    https://drafts.csswg.org/css-view-transitions-2/#propdef-view-transition-group,
    #propdef-view-transition-scope */
 [%css {|view-transition-group: normal|}];

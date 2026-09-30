@@ -755,8 +755,8 @@ let seed : string array =
     "y";
     "z-index";
     "zoom";
-    (* Appended 2026-09-25 (css-grammar-missing-properties): newly registered
-       properties, none a shorthand family, so each gets its own entry. *)
+    (* Appended 2026-09-25: newly registered properties, none a shorthand
+       family, so each gets its own entry. *)
     "border-shape";
     "flow-tolerance";
     "frame-sizing";
@@ -780,6 +780,108 @@ let seed : string array =
     "rule-inset";
     "rule-overlap";
     "rule-visibility-items";
+    (* Appended 2026-09-25: family keys for the 140 standards-track/preview
+       properties added in this pass - computed from make
+       test-slot-key-registry's coverage failure via Family.family_key_of,
+       not guessed. Most are standalone (no shorthand relation to anything
+       else); "border-clip"/"border-block-clip"/"border-inline-clip" absorb
+       the new border-*-clip leaves (genuinely new shorthands, no
+       pre-existing family to disturb). max-size and min-size are
+       registered as plain properties, not Shorthands (see CHANGES.md), so
+       neither absorbs max-width/max-height or min-width/min-height; each
+       still gets its own standalone slot below like any other new
+       property. border-block-end-radius is a plain property too, for the
+       same reason (its 3 siblings - border-block-start-radius,
+       border-inline-start-radius, border-inline-end-radius - are also
+       plain properties, appended below, after the ORDER RULE's committed
+       snapshot prefix, since this pass' own snapshot already froze the
+       gap right after this entry). *)
+    "background-position-block";
+    "background-position-inline";
+    "background-repeat-block";
+    "background-repeat-inline";
+    "block-ellipsis";
+    "block-step";
+    "bookmark-label";
+    "bookmark-level";
+    "bookmark-state";
+    "border-block-clip";
+    "border-block-end-radius";
+    "border-boundary";
+    "border-clip";
+    "border-inline-clip";
+    "border-limit";
+    "box-shadow-blur";
+    "box-shadow-color";
+    "box-shadow-offset";
+    "box-shadow-position";
+    "box-shadow-spread";
+    "box-snap";
+    "continue";
+    "fill-break";
+    "fill-color";
+    "fill-image";
+    "fill-origin";
+    "fill-position";
+    "fill-repeat";
+    "fill-size";
+    "float-defer";
+    "float-offset";
+    "float-reference";
+    "flow-from";
+    "flow-into";
+    "footnote-display";
+    "footnote-policy";
+    "image-animation";
+    "initial-letter-wrap";
+    "inline-sizing";
+    "input-security";
+    "line-fit-edge";
+    "line-grid";
+    "line-padding";
+    "line-snap";
+    "margin-break";
+    "marker-side";
+    "max-size";
+    "min-intrinsic-sizing";
+    "min-size";
+    "overflow-clip-margin-block";
+    "overflow-clip-margin-inline";
+    "region-fragment";
+    "running";
+    "shape-inside";
+    "slider-orientation";
+    "spatial-navigation-action";
+    "spatial-navigation-contain";
+    "spatial-navigation-function";
+    "string-set";
+    "stroke-align";
+    "stroke-break";
+    "stroke-dash-corner";
+    "stroke-dash-justify";
+    "stroke-image";
+    "stroke-origin";
+    "stroke-position";
+    "stroke-repeat";
+    "stroke-size";
+    "text-emphasis-skip";
+    "text-group-align";
+    "white-space-trim";
+    "wrap-after";
+    "wrap-before";
+    "wrap-flow";
+    "wrap-inside";
+    "wrap-through";
+    (* Appended 2026-09-25: border-block-start-radius, border-inline-start-
+       radius, and border-inline-end-radius (CSS Borders and Box
+       Decorations L4) are registered as plain properties, not Shorthands
+       (see CHANGES.md), the same as their sibling border-block-end-radius
+       above - none of the four absorbs the pre-existing logical corner
+       leaves. Appended here, after the committed snapshot prefix, rather
+       than next to border-block-end-radius above, per the ORDER RULE. *)
+    "border-block-start-radius";
+    "border-inline-end-radius";
+    "border-inline-start-radius";
   |]
 
 (* Width, in base36 chars, of the extended-hash field [Class_format] emits
