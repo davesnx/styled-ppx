@@ -194,6 +194,13 @@ the sheet, and no matter whether some OTHER block already emitted the
 same two `@media` rules in the opposite order. Only `@media` gets this
 treatment - see "Known limits" below.
 
+The rewrite changes the printed rule and the class name, not what
+`CSS.merge` compares: the merge key keeps the condition as you wrote it.
+So `CSS.merge(a, b)` still drops `a`'s `@media (min-width: 600px)` atom
+when `b` sets the same property under the same written condition, even if
+`b`'s own block rewrote that condition
+(`packages/runtime/test/media-merge-context.t`).
+
 ## Several libraries on one page
 
 `--namespace` (the ppx flag; defaults to the dune `library-name` cookie,
