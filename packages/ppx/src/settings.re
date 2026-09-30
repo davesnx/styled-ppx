@@ -70,6 +70,11 @@ let currentSettings =
 
 let updateSettings = newSettings => currentSettings := newSettings;
 
+/* Set only by the literal --dev flag (Update.devFlag), never by --env
+   development. Once set, --minify and --env production stop turning dev
+   off, whatever their position relative to --dev on the command line. */
+let devExplicit = ref(false);
+
 module Get = {
   let native = () =>
     currentSettings.contents.native.value
@@ -124,8 +129,10 @@ module Update = {
         value: Some(value),
       },
     });
-  /* Turning minify on also turns dev off (matches `--env production`);
-     a later, explicit `--dev` still wins since flags apply in argv order. */
+  /* Turning minify on also turns dev off (matches `--env production`),
+     unless an explicit --dev was given: that wins regardless of where
+     --dev sits relative to --minify / --env production on the command
+     line (see devFlag below). */
   let minify = value => {
     updateSettings({
       ...currentSettings.contents,
@@ -134,9 +141,19 @@ module Update = {
         value: Some(value),
       },
     });
-    if (value) {
+    if (value && ! devExplicit^) {
       dev(false);
     };
+  };
+
+  /* The literal --dev flag: like `dev(true)`, but also remembers that
+     --dev was explicitly requested, so no --minify / --env production on
+     either side of it on the command line can turn it back off. --env
+     development calls `dev` directly instead of this, so it doesn't get
+     this precedence. */
+  let devFlag = () => {
+    devExplicit := true;
+    dev(true);
   };
 
   let namespace = value =>

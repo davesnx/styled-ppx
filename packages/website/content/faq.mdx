@@ -40,7 +40,7 @@ Yes: server-reason-react renders your components to an HTML string, and your ser
 
 ## Why did my class names change between builds?
 
-They shouldn't have, unless something real changed: hashes are content-addressed from the CSS text (plus the main module name for interpolation variables). Names change exactly when the styles change, when a binding is renamed (the cosmetic `-label` suffix only), or when the ppx `--minify` flag differs between the builds you're comparing. Dev and prod names differ only by that label suffix; the hash is identical.
+They shouldn't have, unless something real changed: an atom's class name is a hash of its own rendered declaration alone (salted with `--namespace`, when set) - never the binding's `let` name or a module path. Renaming a binding never changes any atom class; it only changes that binding's separate **identity class** (`_id_<hash>`, keyed on the module, scope, and binding name - see [How it works](/how-it-works#class-names)) and, in dev builds, its `label:<binding>` marker. The ppx `--minify` flag doesn't affect any class name either - it only strips whitespace from the generated CSS. Names change exactly when the declaration itself changes, when `--namespace` differs between the builds you're comparing, or when a binding is renamed (only its identity class and dev marker, never its atoms).
 
 ## Can I extract the CSS for only part of my project?
 

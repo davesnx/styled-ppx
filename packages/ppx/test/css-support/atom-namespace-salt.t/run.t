@@ -1,8 +1,7 @@
 Two dune libraries that both declare the SAME base atom (`margin: 10px`) must
 never mint the SAME atom class for it: content-hash dedup would otherwise let
 one library's copy of that atom - wherever it lands in a page that links both
-sheets - decide a tie against the OTHER library's own `@media` override of it
-(case #2 in `.workplace/docs/atom-slot-keys-design-and-bugs.md`, section 5.1).
+sheets - decide a tie against the OTHER library's own `@media` override of it.
 `--namespace` (defaulting to the dune `library-name` cookie) salts the atom
 hash so this never happens: the two libraries' atoms differ even though the
 declaration is byte-identical.

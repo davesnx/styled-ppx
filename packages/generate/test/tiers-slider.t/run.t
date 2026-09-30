@@ -1,4 +1,4 @@
-The slider shape (`sliderMenuWrapper`, monorepo report "Round 3 analysis"):
+The slider shape (`sliderMenuWrapper`):
 one binding sets a base, always-on padding/margin via two interpolated
 declarations (`padding: 0 $(px24); margin-left: $(px8);` - a genuine
 two-declaration `_in_` bundle, since both interpolate) and ALSO narrows that
@@ -35,5 +35,5 @@ which one dedup happened to produce first, so at a >=1280px viewport it
 now wins - fixing the bug without needing `CSS.merge` to see inside the
 bundle at all, and without needing a CSS layer to do it: ordering by TIER
 is enough here because both rules are equally specific; see
-`descendant-tier.t`'s "Round 7b" case for a pair where specificity, not
+`descendant-tier.t`'s `media_menu.ml` case for a pair where specificity, not
 tier order, has to decide.
