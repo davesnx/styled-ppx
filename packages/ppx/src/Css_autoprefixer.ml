@@ -67,9 +67,9 @@ let prefix_declaration (decl : declaration) =
     | "max-height" | "min-block-size" | "max-block-size"
       when value = "fit-content" || value = "max-content" ->
       prefix_value decl value [ webkit; moz ]
-    (* -webkit-min-content never existed (old WebKit's alias was the
-       unrelated, unprefixed keyword `min-intrinsic`); only Firefox needed a
-       prefix for `min-content`. *)
+    (* -webkit-min-content shipped in old WebKit/Blink, but Chrome 46+ and
+       Safari 11+ read unprefixed `min-content`; -moz-min-content stays for
+       Firefox before 66. *)
     | "width" | "min-width" | "max-width" | "height" | "min-height"
     | "max-height" | "min-block-size" | "max-block-size"
       when value = "min-content" ->

@@ -14,8 +14,9 @@ keyword (`x`/`y`/`both`) and only accepted a bare strictness keyword.
 drops "inline" from the name, it does not just add a vendor prefix to it.
 - `-ms-writing-mode` reads `lr-tb`/`tb-rl`/... instead of
 `horizontal-tb`/`vertical-rl`/....
-- `-webkit-min-content` never existed (old WebKit's alias was the unrelated
-`min-intrinsic` keyword); only Firefox needed a prefix for `min-content`.
+- `-webkit-min-content` shipped in old WebKit/Blink, but Chrome 46+ and
+Safari 11+ read unprefixed `min-content`; `-moz-min-content` stays for
+Firefox before 66.
 - `min-width: fill-available` (accepted directly, per the CSS Sizing draft)
 prefixed its Firefox variant as `-moz-fill-available` instead of the real
 `-moz-available`.
