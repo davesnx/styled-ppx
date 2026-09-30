@@ -1,5 +1,5 @@
-/* css-grammar-draft-properties (2026-09-25): 9 standards-track,
-   unimplemented properties from CSS Text L4, CSS Text Decoration L4, and
+/* 9 standards-track, unimplemented properties from CSS Text L4,
+   CSS Text Decoration L4, and
    CSS Lists and Counters L3. white-space-trim and wrap-inside are
    preview-only (Safari Technology Preview), added the same way. */
 [%css {|line-padding: 10px|}];

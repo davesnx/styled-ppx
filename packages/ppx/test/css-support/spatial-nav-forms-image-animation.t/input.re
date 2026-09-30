@@ -1,4 +1,4 @@
-/* css-grammar-draft-properties: CSS Spatial Navigation L1
+/* CSS Spatial Navigation L1
    (https://drafts.csswg.org/css-spatial-nav-1/), CSS Form Control Styling L1
    (https://drafts.csswg.org/css-forms-1/), CSS Image Animation L1
    (https://drafts.csswg.org/css-image-animation-1/) */

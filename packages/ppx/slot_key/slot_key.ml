@@ -157,7 +157,10 @@ module Family = struct
      key), ties broken alphabetically - picks "border" over "border-top"
      or "border-width" as the family's canonical name. A family with no
      shorthand member at all (every real property that names no
-     shorthand and isn't anyone's child) uses [prop] itself. *)
+     shorthand and isn't anyone's child) uses [prop] itself. A pure
+     function of the shorthand graph alone, with no notion of which key
+     already has a registry slot - see {!family_id_of} for the id-stable
+     variant that prefers an existing registration over this rule. *)
   let family_key_of prop =
     let shorthand_members =
       all_members_of prop |> List.filter (Hashtbl.mem direct_children)
@@ -752,8 +755,8 @@ let seed : string array =
     "y";
     "z-index";
     "zoom";
-    (* Appended 2026-09-25 (css-grammar-missing-properties): newly registered
-       properties, none a shorthand family, so each gets its own entry. *)
+    (* Appended 2026-09-25: newly registered properties, none a shorthand
+       family, so each gets its own entry. *)
     "border-shape";
     "flow-tolerance";
     "frame-sizing";
@@ -761,30 +764,38 @@ let seed : string array =
     "view-transition-group";
     "view-transition-scope";
     "window-drag";
-    (* Appended 2026-09-25 (css-grammar-gaps): CSS Gaps L1 family keys - each
-       is the shortest shorthand name in its union-find component, so every
-       other member (column-rule*, row-rule*, and every rule-* shorthand or
-       leaf that shares a leaf with it) redirects here instead of needing its
-       own entry. "rule" absorbs rule/column-rule/row-rule AND
-       rule-color/-style/-width (they share column-rule-color/-style/-width's
-       leaves with column-rule itself); "rule-inset" similarly absorbs the
-       whole inset shorthand tree (cap/junction/start/end, both sides, plus
-       the 8 cap-start/cap-end/junction-start/junction-end leaves). *)
-    "rule";
+    (* Appended 2026-09-25 (css-grammar-gaps): CSS Gaps L1 family keys.
+       "rule" is deliberately NOT listed here: it unions with the
+       already-seeded "column-rule" (its own family key since before this
+       PR), and rule-color/-style/-width union in transitively through
+       column-rule-color/-style/-width, column-rule's own longhands. Per
+       family_id_of's seed-priority rule (see its own doc), an
+       already-registered family member always keeps its slot over a new,
+       shorter name, so "rule" and rule-color/-style/-width all redirect to
+       "column-rule"'s existing slot instead of needing one of their own.
+       rule-break, rule-inset, rule-overlap and rule-visibility-items union
+       only NEW Gaps L1 properties with no pre-existing family, so each is a
+       genuinely new family and needs its own entry below. *)
     "rule-break";
     "rule-inset";
     "rule-overlap";
     "rule-visibility-items";
-    (* Appended 2026-09-25 (css-grammar-draft-properties, task 2): family keys
-       for the 140 standards-track/preview properties this task added -
-       computed from make test-slot-key-registry's coverage failure via
-       Family.family_key_of, not guessed. Most are standalone (no shorthand
-       relation to anything else); a few merge pre-existing standalone
-       properties into a new, shorter-named family: "max-size"/"min-size"
-       absorb max-width/max-height and min-width/min-height (both now new
-       Shorthands); "border-clip"/"border-block-clip"/"border-inline-clip"
-       and "border-block-end-radius" absorb the new border-*-clip and
-       logical border-*-radius leaves and shorthands. *)
+    (* Appended 2026-09-25: family keys for the 140 standards-track/preview
+       properties added in this pass - computed from make
+       test-slot-key-registry's coverage failure via Family.family_key_of,
+       not guessed. Most are standalone (no shorthand relation to anything
+       else); "border-clip"/"border-block-clip"/"border-inline-clip" absorb
+       the new border-*-clip leaves (genuinely new shorthands, no
+       pre-existing family to disturb). max-size and min-size are
+       registered as plain properties, not Shorthands (see CHANGES.md), so
+       neither absorbs max-width/max-height or min-width/min-height; each
+       still gets its own standalone slot below like any other new
+       property. border-block-end-radius is a plain property too, for the
+       same reason (its 3 siblings - border-block-start-radius,
+       border-inline-start-radius, border-inline-end-radius - are also
+       plain properties, appended below, after the ORDER RULE's committed
+       snapshot prefix, since this pass' own snapshot already froze the
+       gap right after this entry). *)
     "background-position-block";
     "background-position-inline";
     "background-repeat-block";
@@ -861,6 +872,16 @@ let seed : string array =
     "wrap-flow";
     "wrap-inside";
     "wrap-through";
+    (* Appended 2026-09-25: border-block-start-radius, border-inline-start-
+       radius, and border-inline-end-radius (CSS Borders and Box
+       Decorations L4) are registered as plain properties, not Shorthands
+       (see CHANGES.md), the same as their sibling border-block-end-radius
+       above - none of the four absorbs the pre-existing logical corner
+       leaves. Appended here, after the committed snapshot prefix, rather
+       than next to border-block-end-radius above, per the ORDER RULE. *)
+    "border-block-start-radius";
+    "border-inline-end-radius";
+    "border-inline-start-radius";
   |]
 
 (* Width, in base36 chars, of the extended-hash field [Class_format] emits
@@ -1044,10 +1065,50 @@ let rec depth_of property =
     Hashtbl.replace depth_cache property d;
     d
 
+(* A property that already has a seed slot must keep it as its family's id,
+   even after a later shorthand pulls it into a bigger family alongside
+   other already-registered members - two real shapes this protects
+   against:
+   - a shorter shorthand unions with an already-registered LONGER shorthand
+     (e.g. "rule" unioning with "column-rule"): {!Family.family_key_of}'s
+     shortest-name rule alone would rename every existing column-rule*
+     atom's class the moment "rule" is registered.
+   - a new shorthand unions two or more previously-STANDALONE properties
+     that each already had their own slot (e.g. "max-size" unioning
+     "max-width" and "max-height", each its own one-member family until
+     then): {!Family.family_key_of} only ever looks at SHORTHAND members,
+     so neither "max-width" nor "max-height" is even a candidate - both
+     would fall through to a brand-new, never-before-seen key ("max-size"
+     itself, an [Unregistered] hash fallback) instead of reusing either
+     existing slot.
+   The fix generalizes to both: among EVERY member of the property's family
+   ({!Family.all_members_of} - shorthand keys and leaves alike, [property]
+   itself included), the first one [Registry.index_of] already knows wins
+   outright, ties broken by ascending seed index (whichever was registered
+   first). {!Family.family_key_of}'s shortest-name rule only decides when
+   NONE of the family's members has a slot yet (a genuinely new family,
+   where there is no existing id to protect). When two or more
+   already-different, already-registered properties are unioned by one new
+   shorthand (the "max-size" shape above), only the winning one keeps its
+   own class unchanged - the others now share its family id, distinguished
+   by mask, which is unavoidable once the shorthand relationship makes them
+   one real family. Lives here, not in {!Family}, because [Registry] (built
+   from {!seed}) is defined after [Family] in this file - this is the one
+   place that already sees both. *)
 let family_id_of property =
   if property = "all" then All
   else (
-    let key = Family.family_key_of (resolve_alias property) in
+    let property = resolve_alias property in
+    let key =
+      match
+        Family.all_members_of property
+        |> List.filter_map (fun c ->
+          Registry.index_of c |> Option.map (fun i -> i, c))
+        |> List.sort (fun (i, _) (j, _) -> compare i j)
+      with
+      | (_, already_registered) :: _ -> already_registered
+      | [] -> Family.family_key_of property
+    in
     match Registry.index_of key with
     | Some i -> Registered i
     | None ->

@@ -92,8 +92,8 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_9h002getn{justify-content:flex-end;}"];
   [@css "._a_9h002dmss{justify-content:space-between;}"];
   [@css "._a_9h0024oss{justify-content:space-around;}"];
-  [@css "._a_ga001g5zj{min-height:auto;}"];
-  [@css "._a_ga002682b{min-width:auto;}"];
+  [@css "._a_8ag5zj{min-height:auto;}"];
+  [@css "._a_8c682b{min-width:auto;}"];
   [@css "._a_8nvlbw{order:0;}"];
   [@css "._a_8ni80x{order:1;}"];
   module X = {
@@ -176,7 +176,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("_a_9h002getn", []);
   CSS.make("_a_9h002dmss", []);
   CSS.make("_a_9h0024oss", []);
-  CSS.make("_a_ga001g5zj", []);
-  CSS.make("_a_ga002682b", []);
+  CSS.make("_a_8ag5zj", []);
+  CSS.make("_a_8c682b", []);
   CSS.make("_a_8nvlbw", []);
   CSS.make("_a_8ni80x", []);

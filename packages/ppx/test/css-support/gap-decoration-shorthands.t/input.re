@@ -1,5 +1,5 @@
 /* css-grammar-gaps (2026-09-25): CSS Gaps Module Level 1, https://drafts.csswg.org/css-gaps-1/
-   All 37 properties added by that pass, one browser-implemented (Chrome
+   All 38 properties added by that pass, one browser-implemented (Chrome
    149+) family: row-rule, column-rule additions, and rule. */
 
 /* Section 4.1-4.3: column-rule-color/-style/-width supersede the old
@@ -26,9 +26,7 @@
 [%css {|rule-break: normal|}];
 
 /* Section 3.3: inset - leaves, -cap-/-junction- shorthands (1 or 2 values),
-   -start/-end shorthands, and the universal shorthand (cap[/junction]).
-   column-rule-inset-start itself is not added (not browser-implemented);
-   row-rule-inset-start and rule-inset-start are. */
+   -start/-end shorthands, and the universal shorthand (cap[/junction]). */
 [%css {|column-rule-inset-cap-start: 10px|}];
 [%css {|column-rule-inset-cap-end: -5px|}];
 [%css {|column-rule-inset-junction-start: 50%|}];
@@ -36,7 +34,7 @@
 [%css {|column-rule-inset-cap: 0px|}];
 [%css {|column-rule-inset-cap: 0px 5px|}];
 [%css {|column-rule-inset-junction: -5px|}];
-[%css {|column-rule-inset-start: 8px|}];
+[%css {|column-rule-inset-start: 10px|}];
 [%css {|column-rule-inset-end: 0px|}];
 [%css {|column-rule-inset: 0px|}];
 [%css {|column-rule-inset: 0px / -5px|}];

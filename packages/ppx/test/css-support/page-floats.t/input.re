@@ -1,4 +1,4 @@
-/* css-grammar-draft-properties: CSS Page Floats
+/* CSS Page Floats
    (https://drafts.csswg.org/css-page-floats/) */
 [%css {|float-reference: inline|}];
 [%css {|float-reference: column|}];

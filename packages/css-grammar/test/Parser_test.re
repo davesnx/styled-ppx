@@ -76,9 +76,9 @@ let test_unregistered_property = () =>
   | None => ()
   };
 
-/* css-grammar-missing-properties (2026-09-25): valid and invalid values for
-   the 7 properties added in that pass, one browser-implemented (Chrome/Edge
-   or Safari, per MDN browser-compat-data) each. */
+/* 2026-09-25: valid and invalid values for the 7 properties added in this
+   pass, one browser-implemented (Chrome/Edge or Safari, per MDN
+   browser-compat-data) each. */
 
 let test_border_shape_valid = () =>
   switch (validate_property("border-shape", "inset(10%) border-box")) {
@@ -283,9 +283,9 @@ let test_rule_overlap_invalid = () =>
   | Error(_) => ()
   };
 
-/* css-grammar-draft-properties (2026-09-25): valid and invalid values for
-   this slice's 9 standards-track, unimplemented properties (CSS Text L4,
-   CSS Text Decoration L4, CSS Lists and Counters L3). */
+/* 2026-09-25: valid and invalid values for this slice's 9 standards-track,
+   unimplemented properties (CSS Text L4, CSS Text Decoration L4, CSS Lists
+   and Counters L3). */
 
 let test_line_padding_valid = () =>
   switch (validate_property("line-padding", "10px")) {
@@ -379,8 +379,8 @@ let test_marker_side_invalid = () =>
   | Error(_) => ()
   };
 
-/* css-grammar-draft-properties (task 2): valid and invalid values for the
-   layout/sizing slice of the 140 standards-track/preview properties. */
+/* Valid and invalid values for the layout/sizing slice of the 140
+   standards-track/preview properties. */
 
 let test_max_size_valid = () =>
   switch (validate_property("max-size", "100px 50px")) {
@@ -526,15 +526,28 @@ let test_inline_sizing_invalid = () =>
   | Error(_) => ()
   };
 
-let test_line_fit_edge_valid = () =>
+let test_line_fit_edge_valid = () => {
+  let values = ["ideographic", "cap alphabetic", "leading"];
+  List.iter(
+    value =>
+      switch (validate_property("line-fit-edge", value)) {
+      | Error(msg) =>
+        Alcotest.fail("parsing '" ++ value ++ "' should succeed: " ++ msg)
+      | Ok () => ()
+      },
+    values,
+  );
+};
+
+let test_line_fit_edge_invalid = () =>
   switch (validate_property("line-fit-edge", "cap")) {
-  | Error(msg) => Alcotest.fail("parsing should succeed: " ++ msg)
-  | Ok () => ()
+  | Ok () => Alcotest.fail("parsing 'cap' alone should fail")
+  | Error(_) => ()
   };
 
-/* css-grammar-draft-properties (2026-09-25): valid and invalid values for
-   the Backgrounds L4 / Overflow L4 slice of the 140 standards-track
-   draft properties - one pair per grammar shape this slice introduced. */
+/* 2026-09-25: valid and invalid values for the Backgrounds L4 / Overflow L4
+   slice of the 140 standards-track draft properties - one pair per grammar
+   shape this slice introduced. */
 
 let test_background_position_block_valid = () =>
   switch (
@@ -610,8 +623,8 @@ let test_continue_invalid = () =>
   | Error(_) => ()
   };
 
-/* css-grammar-draft-properties (paged-media/content-flow/nav slice): valid
-   and invalid values for the 19 properties this pass added. */
+/* Valid and invalid values for the paged-media/content-flow/nav slice of
+   19 properties this pass added. */
 
 let test_bookmark_label_valid = () =>
   switch (validate_property("bookmark-label", "\"Chapter\"")) {
@@ -793,8 +806,8 @@ let test_image_animation_invalid = () =>
   | Error(_) => ()
   };
 
-/* css-grammar-draft-properties (CSS Fill and Stroke Module L3): valid and
-   invalid values for the 16 fill- and stroke- properties this slice added. */
+/* CSS Fill and Stroke Module L3: valid and invalid values for the 16
+   fill- and stroke- properties this slice added. */
 
 let test_fill_break_valid = () =>
   switch (validate_property("fill-break", "slice")) {
@@ -922,9 +935,8 @@ let test_stroke_size_valid = () =>
   | Ok () => ()
   };
 
-/* css-grammar-draft-properties (task 2): valid and invalid values for the
-   CSS Borders and Box Decorations L4 additions - one case per grammar
-   shape this slice introduced. */
+/* Valid and invalid values for the CSS Borders and Box Decorations L4
+   additions - one case per grammar shape this slice introduced. */
 
 let test_border_top_radius_valid = () =>
   switch (validate_property("border-top-radius", "10px 5px / 2px")) {
@@ -1474,6 +1486,11 @@ let tests = [
         "line-fit-edge valid",
         `Quick,
         test_line_fit_edge_valid,
+      ),
+      Alcotest.test_case(
+        "line-fit-edge invalid",
+        `Quick,
+        test_line_fit_edge_invalid,
       ),
       Alcotest.test_case(
         "background-position-block valid",

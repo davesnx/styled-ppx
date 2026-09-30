@@ -249,13 +249,11 @@ let hand_written_class_ambiguity_persists_under_the_new_prefix () =
     (Merge_key.merge_class_names "label:x _a_header" "_a_he1234")
     "label:x _a_he1234"
 
-(* -- Round 6 (monorepo, b70a86b0): disjoint "gap" longhands never drop -----
-   each other, whatever order they merge in or whichever of the two
-   registered spellings each one uses. Real trigger:
-   PPTableComparison_Css.row (`grid-column-gap: 24px`) merged with
-   `rowToolLimit` (`grid-row-gap: $(Size.px8)`, an interpolated value)
-   dropped `row`'s column-gap atom, because [of_atom] computed
-   "grid-row-gap"'s mask against its own unresolved name - a one-member
+(* -- Disjoint "gap" longhands never drop each other, whatever order they
+   merge in or whichever of the two registered spellings each one uses.
+   Real trigger: a static `column-gap: 24px` merged with an interpolated
+   `row-gap: $(...)` dropped the column-gap atom, because [of_atom] computed
+   "row-gap"'s mask against its own unresolved name - a one-member
    pseudo-family where mask always equals "full" - instead of against
    "row-gap"'s real, partial mask (one of two legs of "gap"). See
    Slot_key.of_atom's doc and test_slot_key_registry.ml's "mask" group for
@@ -269,9 +267,8 @@ let disjoint_gap_longhands_both_survive () =
        (class_of "column-gap: 24px;")
        (class_of "row-gap: $(px8);"))
 
-(* Same pair, the real monorepo spelling: the legacy "grid-*" aliases, not
-   the canonical "column-gap"/"row-gap" - byte-for-byte the shape round 6
-   found broken. *)
+(* Same pair, spelled with the legacy "grid-*" aliases instead of the
+   canonical "column-gap"/"row-gap" - the same shape the fix above covers. *)
 let disjoint_gap_longhands_both_survive_legacy_alias_spelling () =
   let column = make "grid-column-gap: 24px;" in
   let row = make "grid-row-gap: $(px8);" in
@@ -349,11 +346,11 @@ let tests =
        longhand - both survive"
       shorthand_then_longhand_keeps_both;
     Alcotest_extra.test
-      "round 6: column-gap and an interpolated row-gap are disjoint legs of \
-       gap's family - neither drops the other"
+      "column-gap and an interpolated row-gap are disjoint legs of gap's \
+       family - neither drops the other"
       disjoint_gap_longhands_both_survive;
     Alcotest_extra.test
-      "round 6, real monorepo spelling: grid-column-gap and an interpolated \
+      "the legacy alias spelling: grid-column-gap and an interpolated \
        grid-row-gap - neither drops the other"
       disjoint_gap_longhands_both_survive_legacy_alias_spelling;
     Alcotest_extra.test

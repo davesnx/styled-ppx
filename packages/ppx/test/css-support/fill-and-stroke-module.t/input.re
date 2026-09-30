@@ -1,4 +1,4 @@
-/* css-grammar-draft-properties: CSS Fill and Stroke Module Level 3,
+/* CSS Fill and Stroke Module Level 3,
    https://drafts.csswg.org/fill-stroke/ - the 16 fill- and stroke-
    properties this slice added (fill-rule/-opacity, stroke-width/-linecap/
    etc already existed). */

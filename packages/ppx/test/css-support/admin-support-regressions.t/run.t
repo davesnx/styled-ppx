@@ -1,4 +1,4 @@
-This test captures the admin-support cx2 regressions from the monorepo: border-side shorthands with interpolated colors, box-shadow array interpolation, and length interpolation inside calc().
+This test captures cx2 regressions in an admin-style UI: border-side shorthands with interpolated colors, box-shadow array interpolation, and length interpolation inside calc().
   $ cat > dune-project << EOF
   > (lang dune 3.10)
   > EOF

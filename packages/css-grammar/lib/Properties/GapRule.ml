@@ -78,19 +78,9 @@ module Property_rule_inset =
 let property_rule_inset : property_rule_inset Rule.rule =
   Property_rule_inset.rule
 
-(* rule-inset-start: column-rule-inset-start itself is not registered (see
-   Column.ml), so this cannot reference it via <'column-rule-inset-start'>;
-   its grammar is written out directly (identical to what that reference
-   would have parsed) and direct_longhands names the four real leaves
-   straight through, skipping the unimplemented intermediate on the column
-   side (row-rule-inset-start IS registered, so that side goes through it
-   normally in the leaf sense too - both sides are named explicitly here for
-   symmetry and because row-rule-inset-start is itself a Shorthand, not a
-   leaf, so it cannot be a direct_longhand target here without duplicating
-   its own longhand set instead of just listing it). *)
 module Property_rule_inset_start =
   [%spec_module
-  "<inset-value>", (module Css_types.InsetValue)]
+  "<'column-rule-inset-start'>", (module Css_types.InsetValue)]
 
 let property_rule_inset_start : property_rule_inset_start Rule.rule =
   Property_rule_inset_start.rule
@@ -134,12 +124,7 @@ let entries : (kind * packed_rule) list =
       pack_module (module Property_rule_inset) );
     ( Shorthand
         ( "rule-inset-start",
-          [
-            "column-rule-inset-cap-start";
-            "column-rule-inset-junction-start";
-            "row-rule-inset-cap-start";
-            "row-rule-inset-junction-start";
-          ] ),
+          [ "column-rule-inset-start"; "row-rule-inset-start" ] ),
       pack_module (module Property_rule_inset_start) );
     Property "rule-overlap", pack_module (module Property_rule_overlap);
   ]

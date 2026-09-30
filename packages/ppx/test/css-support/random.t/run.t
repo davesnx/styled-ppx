@@ -92,7 +92,7 @@ If this test fail means that the module is not in sync with the ppx
   ];
   [@css "._a_7y35sawfw{-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;}"];
   [@css
-    "._a_g8002c9a0{max-width:-webkit-max-content;max-width:-moz-max-content;max-width:max-content;}"
+    "._a_88c9a0{max-width:-webkit-max-content;max-width:-moz-max-content;max-width:max-content;}"
   ];
   [@css "._a_8p12fz{outline:none;}"];
   [@css "._a_9ln4zy{position:unset;}"];
@@ -227,7 +227,7 @@ If this test fail means that the module is not in sync with the ppx
   );
   CSS.make("_a_7y1kwck5z", []);
   CSS.make("_a_7y35sawfw", []);
-  CSS.make("_a_g8002c9a0", []);
+  CSS.make("_a_88c9a0", []);
   CSS.make("_a_8p12fz", []);
   CSS.make("_a_8snuue", []);
   CSS.make("_a_9ln4zy", []);

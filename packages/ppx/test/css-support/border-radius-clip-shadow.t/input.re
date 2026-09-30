@@ -1,5 +1,4 @@
-/* css-grammar-draft-properties (task 2): CSS Borders and Box Decorations L4,
-   https://drafts.csswg.org/css-borders-4/ */
+/* CSS Borders and Box Decorations L4, https://drafts.csswg.org/css-borders-4/ */
 
 /* per-side radius shorthands */
 [%css {|border-top-radius: 10px|}];

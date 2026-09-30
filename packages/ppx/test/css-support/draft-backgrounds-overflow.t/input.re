@@ -1,5 +1,4 @@
-/* css-grammar-draft-properties (2026-09-25): standards-track draft
-   properties from CSS Backgrounds Module Level 4
+/* Standards-track draft properties from CSS Backgrounds Module Level 4
    (https://drafts.csswg.org/css-backgrounds-4/) and CSS Overflow Module
    Level 4 (https://drafts.csswg.org/css-overflow-4/), none implemented in
    any browser yet (two, block-ellipsis and continue, are preview-only in

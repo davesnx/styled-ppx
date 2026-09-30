@@ -181,8 +181,13 @@ let expected_shorthands: list((string, list(string))) = [
       "border-bottom-left-radius",
     ],
   ),
-  /* CSS Borders and Box Decorations L4 (task 2, css-grammar-draft-properties):
-     https://drafts.csswg.org/css-borders-4/ */
+  /* CSS Borders and Box Decorations L4: https://drafts.csswg.org/css-borders-4/
+     border-block-start-radius/-block-end-radius/-inline-start-radius/
+     -inline-end-radius are registered as plain properties, not shorthands
+     here: see CHANGES.md - each would union two of the pre-existing
+     logical radius leaves above, and since all four together transitively
+     cover all four leaves, that would move those leaves into one new
+     shared family instead of keeping their own. */
   (
     "border-top-radius",
     ["border-top-left-radius", "border-top-right-radius"],
@@ -198,22 +203,6 @@ let expected_shorthands: list((string, list(string))) = [
   (
     "border-left-radius",
     ["border-top-left-radius", "border-bottom-left-radius"],
-  ),
-  (
-    "border-block-start-radius",
-    ["border-start-start-radius", "border-start-end-radius"],
-  ),
-  (
-    "border-block-end-radius",
-    ["border-end-start-radius", "border-end-end-radius"],
-  ),
-  (
-    "border-inline-start-radius",
-    ["border-start-start-radius", "border-end-start-radius"],
-  ),
-  (
-    "border-inline-end-radius",
-    ["border-start-end-radius", "border-end-end-radius"],
   ),
   (
     "border-block-clip",
@@ -431,10 +420,8 @@ let expected_shorthands: list((string, list(string))) = [
   ("flex", ["flex-grow", "flex-shrink", "flex-basis"]),
   ("flex-flow", ["flex-direction", "flex-wrap"]),
   ("columns", ["column-width", "column-count", "column-height"]),
-  /* Task 2 (css-grammar-draft-properties): CSS Box Sizing L4, CSS Rhythmic
-     Sizing L1. */
-  ("max-size", ["max-width", "max-height"]),
-  ("min-size", ["min-width", "min-height"]),
+  /* CSS Rhythmic Sizing L1. max-size/min-size (CSS Box Sizing L4) are
+     registered as plain properties, not shorthands: see CHANGES.md. */
   (
     "block-step",
     [
@@ -503,15 +490,7 @@ let expected_shorthands: list((string, list(string))) = [
   ),
   ("rule-inset-end", ["column-rule-inset-end", "row-rule-inset-end"]),
   ("rule-inset", ["column-rule-inset", "row-rule-inset"]),
-  (
-    "rule-inset-start",
-    [
-      "column-rule-inset-cap-start",
-      "column-rule-inset-junction-start",
-      "row-rule-inset-cap-start",
-      "row-rule-inset-junction-start",
-    ],
-  ),
+  ("rule-inset-start", ["column-rule-inset-start", "row-rule-inset-start"]),
   (
     "mask",
     [

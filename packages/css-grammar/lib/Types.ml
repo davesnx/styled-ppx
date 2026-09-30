@@ -3062,8 +3062,7 @@ and property_row_rule_inset_junction_start = inset_value
 and property_row_rule_inset_junction_end = inset_value
 
 (* CSS Gaps L1 § 3.3.1: https://drafts.csswg.org/css-gaps-1/#propdef-column-rule-inset-start
-   Now registered as a standards-track property (task 2,
-   css-grammar-draft-properties) - see Column.ml's own comment. *)
+   https://drafts.csswg.org/css-gaps-1/#propdef-column-rule-inset-end *)
 and property_column_rule_inset_start = inset_value
 and property_column_rule_inset_end = inset_value
 and property_row_rule_inset_start = inset_value
@@ -3120,11 +3119,7 @@ and property_rule_inset_cap = property_column_rule_inset_cap
 and property_rule_inset_junction = property_column_rule_inset_junction
 and property_rule_inset_end = property_column_rule_inset_end
 and property_rule_inset = property_column_rule_inset
-
-(* rule-inset-start: see the column-rule-inset-start note above - it flattens
-   straight to the four leaves since the unimplemented intermediate property
-   is skipped, rather than aliasing property_column_rule_inset_start. *)
-and property_rule_inset_start = inset_value
+and property_rule_inset_start = property_column_rule_inset_start
 
 and property_column_span =
   [ `None
@@ -4061,7 +4056,14 @@ and property_line_height =
   ]
 
 (* CSS Inline Layout L3: https://drafts.csswg.org/css-inline-3/#propdef-line-fit-edge *)
-and property_line_fit_edge = property_text_box_edge
+and property_line_fit_edge =
+  [ `Leading
+  | `Xor of [ `Text | `Ideographic | `Ideographic_ink ]
+  | `Static of
+    [ `Text | `Ideographic | `Ideographic_ink | `Cap | `Ex ]
+    * [ `Text | `Ideographic | `Ideographic_ink | `Alphabetic ]
+  ]
+
 and property_line_height_step = extended_length
 
 and property_list_style =

@@ -818,21 +818,17 @@ let entries : (kind * packed_rule) list =
         ( "border-left-radius",
           [ "border-top-left-radius"; "border-bottom-left-radius" ] ),
       pack_module (module Property_border_left_radius) );
-    ( Shorthand
-        ( "border-block-start-radius",
-          [ "border-start-start-radius"; "border-start-end-radius" ] ),
+    (* Registered as plain properties, not Shorthand: see CHANGES.md - each
+       would union two of the pre-existing logical radius leaves, and since
+       the four together transitively cover all four leaves, that would
+       move those leaves into one new shared family instead of their own. *)
+    ( Property "border-block-start-radius",
       pack_module (module Property_border_block_start_radius) );
-    ( Shorthand
-        ( "border-block-end-radius",
-          [ "border-end-start-radius"; "border-end-end-radius" ] ),
+    ( Property "border-block-end-radius",
       pack_module (module Property_border_block_end_radius) );
-    ( Shorthand
-        ( "border-inline-start-radius",
-          [ "border-start-start-radius"; "border-end-start-radius" ] ),
+    ( Property "border-inline-start-radius",
       pack_module (module Property_border_inline_start_radius) );
-    ( Shorthand
-        ( "border-inline-end-radius",
-          [ "border-start-end-radius"; "border-end-end-radius" ] ),
+    ( Property "border-inline-end-radius",
       pack_module (module Property_border_inline_end_radius) );
     (* CSS Borders and Box Decorations L4 § 5.1: https://drafts.csswg.org/css-borders-4/#propdef-border-limit *)
     Property "border-limit", pack_module (module Property_border_limit);

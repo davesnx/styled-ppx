@@ -32,12 +32,15 @@ let property_line_height_step : property_line_height_step Rule.rule =
   Property_line_height_step.rule
 
 (* CSS Inline Layout L3: https://drafts.csswg.org/css-inline-3/#propdef-line-fit-edge
-   Reuses Css_types.TextBoxEdge - same flattened <text-edge> value set as the
-   existing text-box-edge (Text.ml), which already includes 'leading'. *)
+   'leading' | <text-edge>, the same <text-edge> grammar Text.ml's
+   property_text_box writes out inline (text/ideographic/ideographic-ink
+   alone, or one of cap/ex followed by one of alphabetic plus those three). *)
 module Property_line_fit_edge =
   [%spec_module
-  "'leading' | 'text' | 'cap' | 'ex' | 'alphabetic'",
-  (module Css_types.TextBoxEdge)]
+  "'leading' | [ 'text' | 'ideographic' | 'ideographic-ink' ] | [ 'text' | \
+   'ideographic' | 'ideographic-ink' | 'cap' | 'ex' ] [ 'text' | 'ideographic' \
+   | 'ideographic-ink' | 'alphabetic' ]",
+  (module Css_types.LineFitEdge)]
 
 let property_line_fit_edge : property_line_fit_edge Rule.rule =
   Property_line_fit_edge.rule

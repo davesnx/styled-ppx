@@ -111,7 +111,7 @@ let property_background_position_inline :
    browser): https://drafts.csswg.org/css-backgrounds-4/#propdef-background-repeat-block
    Shares its propdef row with background-repeat-x/-y, which this codebase
    deliberately does not register (implemented then removed from every
-   browser - see the css-grammar-missing-properties plan). <repetition> is
+   browser). <repetition> is
    inlined here rather than named, matching Repeat_style's own convention
    in Shared.ml (which inlines the same 4 keywords rather than naming a
    fragment). *)

@@ -1,5 +1,5 @@
-/* css-grammar-draft-properties (task 2): the layout/sizing slice of the 140
-   standards-track/preview properties, across 7 small specs. */
+/* The layout/sizing slice of the 140 standards-track/preview properties,
+   across 7 small specs. */
 
 /* CSS Box Sizing L4 */
 [%css {|max-size: 100px|}];
@@ -27,7 +27,7 @@
 /* CSS Inline Layout L3 */
 [%css {|initial-letter-wrap: grid|}];
 [%css {|inline-sizing: stretch|}];
-[%css {|line-fit-edge: cap|}];
+[%css {|line-fit-edge: cap alphabetic|}];
 
 /* CSS Line Grid L1 */
 [%css {|line-grid: create|}];

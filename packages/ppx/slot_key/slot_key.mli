@@ -91,7 +91,10 @@ module Family : sig
       member that is itself a registered shorthand (so
       [family_key_of "border-top-color" = "border"]), or [property] itself when
       no member is a shorthand (a plain property's family key is itself). Two
-      properties in the same family always compute the same key. *)
+      properties in the same family always compute the same key. A pure function
+      of the shorthand graph alone - it does not know which key already has a
+      registry slot; see [Slot_key.family_id_of] for the id-stable variant that
+      prefers an existing registration over this rule. *)
   val family_key_of : string -> string
 
   (** The bitmask, over {!leaf_members_of}'s fixed ordering, of the leaves
@@ -155,11 +158,25 @@ val extended_hash : family_id -> int option
     module's own hash-reduction stay in sync by construction. *)
 val extended_hash_width : int
 
-(** The property/family identity for one (already-normalized) property name:
-    {!Family.family_key_of} looked up in the registry if the property
-    participates in a shorthand relationship, otherwise the property's own name
-    looked up directly. Always succeeds - an unknown property gets a stable
-    [Unregistered]/[UnregisteredCustom] id, never an error. *)
+(** The property/family identity for one (already-normalized) property name,
+    looked up in the registry. The family key is whichever member of the
+    property's whole family ({!Family.all_members_of} conceptually - every
+    shorthand and every leaf, [property] itself included) already has a registry
+    slot, ties broken by ascending seed index (whichever was registered first);
+    {!Family.family_key_of}'s shortest-name rule only decides when none of the
+    family's members is registered yet (a genuinely new family). This keeps an
+    existing property's id stable across two shapes a later shorthand
+    registration can otherwise disturb: a shorter shorthand joining an existing,
+    already-registered one (a new "rule" shorthand unioning with the
+    already-registered "column-rule" must not rename every existing column-rule*
+    class), and a new shorthand unioning two or more previously-standalone,
+    already-registered properties (a new "max-size" shorthand unioning
+    "max-width" and "max-height", each its own family until then - one of the
+    two keeps its own class, the other now shares it, which is unavoidable once
+    the shorthand makes them one real family). A property with no shorthand
+    relationship uses its own name directly. Always succeeds - an unknown
+    property gets a stable [Unregistered]/[UnregisteredCustom] id, never an
+    error. *)
 val family_id_of : string -> family_id
 
 (** The number of shorthand levels above [property] in the css-grammar shorthand

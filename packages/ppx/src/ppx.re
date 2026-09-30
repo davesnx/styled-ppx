@@ -986,7 +986,7 @@ let () = {
   Ppxlib.Driver.add_arg(
     ~doc=Settings.dev.doc,
     Settings.dev.flag,
-    Arg.Unit(_ => Settings.Update.dev(true)),
+    Arg.Unit(_ => Settings.Update.devFlag()),
   );
 
   Ppxlib.Driver.add_arg(

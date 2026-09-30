@@ -58,7 +58,7 @@ Interpolation native PPX transformations are checked as a cram snapshot.
   [@css "._a_8pyj1z{outline:1px solid var(--alpha-1ftvcb4);}"];
   [@css "._a_3h007w55u{border-bottom:0px solid var(--alpha-1y5ijmp);}"];
   [@css "._a_eckyy8{width:var(--width-18c1xss);}"];
-  [@css "._a_g8002nebp{max-width:var(--max-1yrxnfd);}"];
+  [@css "._a_88nebp{max-width:var(--max-1yrxnfd);}"];
   [@css "._a_6lvooa{height:var(--height-1n9troi);}"];
   [@css "._a_3nd0d4{border-radius:var(--border-8yt3ey);}"];
   [@css "._a_6500wu0qi{font-size:var(--font-10lt5gt);}"];
@@ -187,7 +187,7 @@ Interpolation native PPX transformations are checked as a cram snapshot.
     );
   let _ =
     CSS.make(
-      "_a_g8002nebp",
+      "_a_88nebp",
       [("--max-1yrxnfd", CSS.Types.MaxWidth.toString(max))],
     );
   let _ =

@@ -3939,8 +3939,7 @@ module FlexBasis = struct
     | #Value.t as x -> Value.toString x
 end
 
-(* CSS Box Sizing L4 (task 2, css-grammar-draft-properties):
-   https://drafts.csswg.org/css-sizing-4/#propdef-min-intrinsic-sizing *)
+(* CSS Box Sizing L4: https://drafts.csswg.org/css-sizing-4/#propdef-min-intrinsic-sizing *)
 module MinIntrinsicSizing = struct
   (* MDN syntax: 'legacy' | 'zero-if-scroll' || 'zero-if-extrinsic' *)
   type t =
@@ -4682,17 +4681,12 @@ end
 
 module BorderShape = struct
   (* MDN syntax: 'none' | [ <basic-shape> <geometry-box>? ]{1,2}
-     Interpolation only carries the <geometry-box> half, matching ClipPath's
-     own simplification above - <basic-shape> is not yet a runtime type. *)
-  type t =
-    [ None.t
-    | GeometryBox.t
-    ]
+     <geometry-box> can only follow a <basic-shape>, so it has no standalone
+     interpolation value here; <basic-shape> has no runtime type yet (same
+     limit as ClipPath), so only 'none' is interpolatable for now. *)
+  type t = None.t
 
-  let toString x =
-    match x with
-    | #None.t -> None.toString
-    | #GeometryBox.t as gb -> GeometryBox.toString gb
+  let toString x = match x with #None.t -> None.toString
 end
 
 module BackfaceVisibility = struct
@@ -6341,7 +6335,7 @@ module BoxShadows = struct
     Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Shadow.toString x
 end
 
-(* CSS Borders and Box Decorations L4 (css-grammar-draft-properties):
+(* CSS Borders and Box Decorations L4:
    https://drafts.csswg.org/css-borders-4/#propdef-box-shadow-position *)
 module BoxShadowPosition = struct
   type t =
@@ -6431,7 +6425,7 @@ module BorderRadius = struct
   let toString x = Length.toString x
 end
 
-(* CSS Borders and Box Decorations L4 (css-grammar-draft-properties):
+(* CSS Borders and Box Decorations L4:
    https://drafts.csswg.org/css-borders-4/#propdef-border-limit *)
 module BorderLimit = struct
   type t =
@@ -7728,7 +7722,7 @@ module FillRule = struct
     | #Cascading.t as x -> Cascading.toString x
 end
 
-(* CSS Fill and Stroke Module L3 (css-grammar-draft-properties):
+(* CSS Fill and Stroke Module L3:
    https://drafts.csswg.org/fill-stroke/ - shared by fill-break/stroke-break. *)
 module FillBreak = struct
   (* MDN syntax: 'bounding-box' | 'slice' | 'clone' *)
@@ -10187,6 +10181,7 @@ module ScrollTimelineAxis = struct
 end
 
 module ScrollTimelineName = AnimationName
+module ScrollAxisLock = FontOpticalSizing
 module ScrollbarColorLegacy = Color
 module ShapeImageThreshold = Opacity
 module ShapeMargin = Length
@@ -10566,6 +10561,48 @@ module TextEdge = struct
     | `value x -> x
     | #Var.t as x -> Var.toString x
     | #Cascading.t as x -> Cascading.toString x
+end
+
+module LineFitEdge = struct
+  (* MDN syntax: 'leading' | [ 'text' | 'ideographic' | 'ideographic-ink' ] \
+     | [ 'text' | 'ideographic' | 'ideographic-ink' | 'cap' | 'ex' ] \
+     [ 'text' | 'ideographic' | 'ideographic-ink' | 'alphabetic' ] *)
+  type edge =
+    [ `text
+    | `ideographic
+    | `ideographicInk
+    | `cap
+    | `ex
+    | `alphabetic
+    ]
+
+  let edge_toString (x : edge) =
+    match x with
+    | `text -> {js|text|js}
+    | `ideographic -> {js|ideographic|js}
+    | `ideographicInk -> {js|ideographic-ink|js}
+    | `cap -> {js|cap|js}
+    | `ex -> {js|ex|js}
+    | `alphabetic -> {js|alphabetic|js}
+
+  (* [`pair] does not statically restrict which side a keyword can sit on
+     (the grammar above does: cap/ex first only, alphabetic second only) -
+     same permissiveness already accepted for BorderShape/ClipPath. *)
+  type t =
+    [ `leading
+    | edge
+    | `pair of edge * edge
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `leading -> {js|leading|js}
+    | `pair (a, b) -> edge_toString a ^ {js| |js} ^ edge_toString b
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #edge as x -> edge_toString x
 end
 
 module LinePadding = struct

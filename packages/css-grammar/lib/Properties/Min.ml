@@ -34,7 +34,9 @@ module Property_min_width =
 
 let property_min_width : property_min_width Rule.rule = Property_min_width.rule
 
-(* CSS Box Sizing L4: https://drafts.csswg.org/css-sizing-4/#propdef-min-size *)
+(* CSS Box Sizing L4: https://drafts.csswg.org/css-sizing-4/#propdef-min-size
+   Registered as a plain property, not a Shorthand of min-width/min-height:
+   see CHANGES.md - CSS.merge does not treat it as covering its longhands. *)
 module Property_min_size =
   [%spec_module
   "<'min-width'> [ <'min-height'> ]?", (module Css_types.MinWidth)]
@@ -56,8 +58,7 @@ let entries : (kind * packed_rule) list =
     Property "min-height", pack_module (module Property_min_height);
     Property "min-inline-size", pack_module (module Property_min_inline_size);
     Property "min-width", pack_module (module Property_min_width);
-    ( Shorthand ("min-size", [ "min-width"; "min-height" ]),
-      pack_module (module Property_min_size) );
+    Property "min-size", pack_module (module Property_min_size);
     ( Property "min-intrinsic-sizing",
       pack_module (module Property_min_intrinsic_sizing) );
   ]

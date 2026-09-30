@@ -1,4 +1,4 @@
-/* css-grammar-draft-properties: CSS Generated Content L3
+/* CSS Generated Content L3
    (https://drafts.csswg.org/css-content-3/) and CSS Generated Content for
    Paged Media (https://drafts.csswg.org/css-gcpm/). */
 [%css {|bookmark-label: "Chapter"|}];

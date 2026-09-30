@@ -8,13 +8,10 @@ module Property_scroll_behavior =
 let property_scroll_behavior : property_scroll_behavior Rule.rule =
   Property_scroll_behavior.rule
 
-(* CSS Overflow L5: https://drafts.csswg.org/css-overflow-5/#propdef-scroll-axis-lock
-   Reuses Css_types.ForcedColorAdjust (a safe superset: auto | none |
-   preserve-parent-color), same precedent as ForcedColorAdjust.ml's
-   -ms-high-contrast-adjust, which is also plainly 'auto' | 'none'. *)
+(* CSS Overflow L5: https://drafts.csswg.org/css-overflow-5/#propdef-scroll-axis-lock *)
 module Property_scroll_axis_lock =
   [%spec_module
-  "'auto' | 'none'", (module Css_types.ForcedColorAdjust)]
+  "'auto' | 'none'", (module Css_types.ScrollAxisLock)]
 
 let property_scroll_axis_lock : property_scroll_axis_lock Rule.rule =
   Property_scroll_axis_lock.rule

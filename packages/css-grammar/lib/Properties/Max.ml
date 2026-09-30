@@ -40,7 +40,9 @@ module Property_max_width =
 
 let property_max_width : property_max_width Rule.rule = Property_max_width.rule
 
-(* CSS Box Sizing L4: https://drafts.csswg.org/css-sizing-4/#propdef-max-size *)
+(* CSS Box Sizing L4: https://drafts.csswg.org/css-sizing-4/#propdef-max-size
+   Registered as a plain property, not a Shorthand of max-width/max-height:
+   see CHANGES.md - CSS.merge does not treat it as covering its longhands. *)
 module Property_max_size =
   [%spec_module
   "<'max-width'> [ <'max-height'> ]?", (module Css_types.MaxWidth)]
@@ -54,6 +56,5 @@ let entries : (kind * packed_rule) list =
     Property "max-inline-size", pack_module (module Property_max_inline_size);
     Property "max-lines", pack_module (module Property_max_lines);
     Property "max-width", pack_module (module Property_max_width);
-    ( Shorthand ("max-size", [ "max-width"; "max-height" ]),
-      pack_module (module Property_max_size) );
+    Property "max-size", pack_module (module Property_max_size);
   ]

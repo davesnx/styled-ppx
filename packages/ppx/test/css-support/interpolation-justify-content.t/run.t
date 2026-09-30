@@ -110,8 +110,6 @@ Test interpolation support for various properties in cx2
   @property --overscrollBehavior-17qcsbs{syntax:"*";inherits:false;}
   @property --accentColor-mn7yh{syntax:"*";inherits:false;}
   @property --caretColor-zmu88x{syntax:"*";inherits:false;}
-  @layer styled-ppx.global, styled-ppx.base, styled-ppx.conditional;
-  @layer styled-ppx.base {
   ._a_610019kvu{-webkit-flex-direction:var(--flexDirection-vyhh8o);-ms-flex-direction:var(--flexDirection-vyhh8o);flex-direction:var(--flexDirection-vyhh8o);}
   ._a_5rpg0g{display:var(--display-jduo1l);}
   ._a_e0jrd3{visibility:var(--visibility-10dikjf);}
@@ -120,6 +118,10 @@ Test interpolation support for various properties in cx2
   ._a_ek1pdf{z-index:var(--zIndex-umrllj);}
   ._a_eckyy8{width:var(--width-18c1xss);}
   ._a_6lvooa{height:var(--height-1n9troi);}
+  ._a_8c9y0n{min-width:var(--minWidth-lb9cvd);}
+  ._a_88t8nq{max-width:var(--maxWidth-1rew851);}
+  ._a_8ad7lc{min-height:var(--minHeight-1o3pcp1);}
+  ._a_85vy9j{max-height:var(--maxHeight-1xgmjux);}
   ._a_7pc3av{margin:var(--margin-n8c989);}
   ._a_94x5yj{padding:var(--padding-46h8wl);}
   ._a_4esjgz{color:var(--color-1a279q8);}
@@ -187,10 +189,6 @@ Test interpolation support for various properties in cx2
   ._a_710040eke{right:var(--right-xeiqea);}
   ._a_71001xtx2{bottom:var(--bottom-q421ib);}
   ._a_71002egw0{left:var(--left-1s2hr3z);}
-  ._a_ga0029y0n{min-width:var(--minWidth-lb9cvd);}
-  ._a_g8002t8nq{max-width:var(--maxWidth-1rew851);}
-  ._a_ga001d7lc{min-height:var(--minHeight-1o3pcp1);}
-  ._a_g8001vy9j{max-height:var(--maxHeight-1xgmjux);}
   ._a_7p008dxtd{margin-top:var(--marginTop-1s6a92v);}
   ._a_7p004x1jv{margin-right:var(--marginRight-9awpa7);}
   ._a_7p0010uhk{margin-bottom:var(--marginBottom-zo090i);}
@@ -217,4 +215,3 @@ Test interpolation support for various properties in cx2
   ._a_6f002ftvm{row-gap:var(--rowGap-1l1vram);}
   ._a_7o0044owk{list-style-type:var(--listStyleType-wes33f);}
   ._a_7o002r375{list-style-position:var(--listStylePosition-1gexoze);}
-  }
