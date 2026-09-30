@@ -16,7 +16,7 @@
   [@@@css ".css-15a4g54{margin-inline:var(--spacing-vh5lkd);}"]
   [@@@css ".css-15a4g54{padding-block-start:var(--spacing-f3qjr);}"]
   [@@@css
-    ".css-15a4g54{-webkit-padding-inline-end:var(--spacing-f3qjr);padding-inline-end:var(--spacing-f3qjr);}"]
+    ".css-15a4g54{-webkit-padding-end:var(--spacing-f3qjr);padding-inline-end:var(--spacing-f3qjr);}"]
   [@@@css ".css-15a4g54{inset-block-start:var(--spacing-f3qjr);}"]
   [@@@css ".css-zqnfaz:hover{opacity:0.8;}"]
   [@@@css ".css-osffsa .child{-webkit-flex:1;-ms-flex:1;flex:1;}"]
@@ -148,7 +148,7 @@
   .css-15a4g54{margin-block:var(--spacing-y96o3b);}
   .css-15a4g54{margin-inline:var(--spacing-vh5lkd);}
   .css-15a4g54{padding-block-start:var(--spacing-f3qjr);}
-  .css-15a4g54{-webkit-padding-inline-end:var(--spacing-f3qjr);padding-inline-end:var(--spacing-f3qjr);}
+  .css-15a4g54{-webkit-padding-end:var(--spacing-f3qjr);padding-inline-end:var(--spacing-f3qjr);}
   .css-15a4g54{inset-block-start:var(--spacing-f3qjr);}
   .css-zqnfaz:hover{opacity:0.8;}
   .css-osffsa .child{-webkit-flex:1;-ms-flex:1;flex:1;}

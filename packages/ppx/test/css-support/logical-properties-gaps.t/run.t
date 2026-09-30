@@ -23,21 +23,17 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-zwx81y{margin-block-end:0;}"];
   [@css ".css-mrpv1b{margin-block-end:10%;}"];
   [@css ".css-18s2cvy{margin-block-end:calc(10px + 5%);}"];
+  [@css ".css-8bl53j{-webkit-margin-start:auto;margin-inline-start:auto;}"];
+  [@css ".css-1towkc2{-webkit-margin-start:0;margin-inline-start:0;}"];
+  [@css ".css-1m3u6cp{-webkit-margin-start:10%;margin-inline-start:10%;}"];
   [@css
-    ".css-8bl53j{-webkit-margin-inline-start:auto;margin-inline-start:auto;}"
+    ".css-1e3gejl{-webkit-margin-start:calc(10px + 5%);margin-inline-start:calc(10px + 5%);}"
   ];
-  [@css ".css-1towkc2{-webkit-margin-inline-start:0;margin-inline-start:0;}"];
+  [@css ".css-17o8jnk{-webkit-margin-end:auto;margin-inline-end:auto;}"];
+  [@css ".css-nqjlf7{-webkit-margin-end:0;margin-inline-end:0;}"];
+  [@css ".css-174j3z4{-webkit-margin-end:10%;margin-inline-end:10%;}"];
   [@css
-    ".css-1m3u6cp{-webkit-margin-inline-start:10%;margin-inline-start:10%;}"
-  ];
-  [@css
-    ".css-1e3gejl{-webkit-margin-inline-start:calc(10px + 5%);margin-inline-start:calc(10px + 5%);}"
-  ];
-  [@css ".css-17o8jnk{-webkit-margin-inline-end:auto;margin-inline-end:auto;}"];
-  [@css ".css-nqjlf7{-webkit-margin-inline-end:0;margin-inline-end:0;}"];
-  [@css ".css-174j3z4{-webkit-margin-inline-end:10%;margin-inline-end:10%;}"];
-  [@css
-    ".css-c7dzrx{-webkit-margin-inline-end:calc(10px + 5%);margin-inline-end:calc(10px + 5%);}"
+    ".css-c7dzrx{-webkit-margin-end:calc(10px + 5%);margin-inline-end:calc(10px + 5%);}"
   ];
   [@css ".css-1fqrm8j{padding-block-start:0;}"];
   [@css ".css-4y7et8{padding-block-start:10%;}"];
@@ -45,17 +41,15 @@ If this test fail means that the module is not in sync with the ppx
   [@css ".css-1j8cfwc{padding-block-end:0;}"];
   [@css ".css-4ckgml{padding-block-end:10%;}"];
   [@css ".css-f1nqch{padding-block-end:calc(10px + 5%);}"];
-  [@css ".css-9qs69z{-webkit-padding-inline-start:0;padding-inline-start:0;}"];
+  [@css ".css-9qs69z{-webkit-padding-start:0;padding-inline-start:0;}"];
+  [@css ".css-x4ziqq{-webkit-padding-start:10%;padding-inline-start:10%;}"];
   [@css
-    ".css-x4ziqq{-webkit-padding-inline-start:10%;padding-inline-start:10%;}"
+    ".css-81gmtp{-webkit-padding-start:calc(10px + 5%);padding-inline-start:calc(10px + 5%);}"
   ];
+  [@css ".css-1ny2g5x{-webkit-padding-end:0;padding-inline-end:0;}"];
+  [@css ".css-116gpxd{-webkit-padding-end:10%;padding-inline-end:10%;}"];
   [@css
-    ".css-81gmtp{-webkit-padding-inline-start:calc(10px + 5%);padding-inline-start:calc(10px + 5%);}"
-  ];
-  [@css ".css-1ny2g5x{-webkit-padding-inline-end:0;padding-inline-end:0;}"];
-  [@css ".css-116gpxd{-webkit-padding-inline-end:10%;padding-inline-end:10%;}"];
-  [@css
-    ".css-rr442x{-webkit-padding-inline-end:calc(10px + 5%);padding-inline-end:calc(10px + 5%);}"
+    ".css-rr442x{-webkit-padding-end:calc(10px + 5%);padding-inline-end:calc(10px + 5%);}"
   ];
   [@css ".css-mogd9e{margin-block:auto auto;}"];
   [@css ".css-14y7mti{margin-block:10px 20px;}"];
