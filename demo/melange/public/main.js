@@ -55371,11 +55371,7 @@ var ClipPath = {
   toString: toString$150
 };
 function toString$151(x) {
-  if (typeof x === "string" && x === "none") {
-    return toString$1;
-  } else {
-    return toString$149(x);
-  }
+  return toString$1;
 }
 var BorderShape = {
   toString: toString$151
