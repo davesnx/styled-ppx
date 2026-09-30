@@ -27,3 +27,7 @@
  (deps test.exe)
  (action
   (run %{deps})))
+
+(cram
+ (alias test-runtime)
+ (deps %{exe:media_merge_repro/print_merge.exe}))

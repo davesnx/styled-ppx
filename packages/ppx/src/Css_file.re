@@ -1469,17 +1469,49 @@ module Css_transform = {
     | Typed(_, _, _) => chain_is_negation_safe(repr)
     };
 
+  /* Keyed by PHYSICAL identity of the prelude's own `with_loc` pair, not
+     its source location: `rewrite_media_conditions` and `atomize_rules`
+     both walk the SAME tree (nothing is rebuilt in between - see
+     `rewrite_media_prelude_siblings`'s own doc), so the exact same
+     `at_rule.prelude` value is read on both sides, and physical equality
+     can never collide, unlike a location - which two different preludes
+     COULD share (a synthetic/ghost location, or any future code path
+     that copies one at-rule's location onto another's prelude, the way
+     `Selector_nesting.join_media` does for nested-`@media`-in-`@media`
+     flattening on the unrelated `[%styled.global]` path). `Hashtbl.hash`
+     is only ever used as a bucketing hint here (cheap and always
+     terminates - these preludes are a handful of tokens), never as the
+     actual equality check. */
+  module Media_rewrite_table =
+    Hashtbl.Make({
+      type t = with_loc(component_value_list);
+      let equal = (a, b) => a === b;
+      let hash = Hashtbl.hash;
+    });
+
   /* One rule-list level (siblings): find every classifiable `@media`
      at-rule, group by (target, family, !important, media_kind), and for
-     every group of 2+, rewrite every member but the last against every
-     strictly-later member's ORIGINAL prelude. Non-candidates (base
-     declarations, `@supports`/`@container`, unclassifiable `@media`,
-     singleton groups) pass through unchanged. */
-  let rewrite_media_prelude_siblings = (rules: list(rule)): list(rule) => {
+     every group of 2+, record a rewritten prelude for every member but
+     the last, keyed by that member's OWN (pre-rewrite) prelude value -
+     `atomize_rules` looks this up when it builds the atom, using the
+     rewritten text for the class hash and the printed rule while
+     `Slot_key.of_atom` still sees the ORIGINAL, un-rewritten prelude for
+     `CSS.merge`'s context (the rewrite is block-local ordering, invisible
+     to a merge call site elsewhere - the class an atom gets must not
+     depend on what its own block's siblings happened to need). Preludes
+     are never mutated in place, so nested levels are found by walking the
+     SAME original tree `rewrite_media_conditions` was given - see there.
+     Non-candidates (base declarations, `@supports`/`@container`,
+     unclassifiable `@media`, singleton groups) get no table entry and
+     stay exactly as authored. */
+  let rewrite_media_prelude_siblings =
+      (
+        media_rewrites: Media_rewrite_table.t(component_value_list),
+        rules: list(rule),
+      ) => {
     let candidates =
       rules
-      |> List.mapi((i, r) => (i, r))
-      |> List.filter_map(((i, r)) =>
+      |> List.filter_map(r =>
            switch (r) {
            | At_rule({ name: (n, _), prelude, _ } as ar)
                when
@@ -1489,7 +1521,7 @@ module Css_transform = {
                media_atom_slot(ar),
                classify_media_query(fst(prelude)),
              ) {
-             | (Some(slot), Some(kind)) => Some((i, ar, slot, kind))
+             | (Some(slot), Some(kind)) => Some((ar, slot, kind))
              | _ => None
              }
            | _ => None
@@ -1497,7 +1529,7 @@ module Css_transform = {
          );
     let groups =
       group_by_key(
-        ((_, _, slot: Slot_key.t, kind)) =>
+        ((_, slot: Slot_key.t, kind)) =>
           (
             slot.context.selector,
             slot.context.important,
@@ -1506,7 +1538,6 @@ module Css_transform = {
           ),
         candidates,
       );
-    let rewritten: Hashtbl.t(int, component_value_list) = Hashtbl.create(8);
     groups
     |> List.iter(members =>
          switch (members) {
@@ -1515,8 +1546,7 @@ module Css_transform = {
          | members =>
            let reprs =
              members
-             |> List.map(
-                  ((_, ar, _, kind): (int, at_rule, Slot_key.t, media_kind)) =>
+             |> List.map(((ar, _, kind): (at_rule, Slot_key.t, media_kind)) =>
                   later_representation(kind, fst(ar.prelude))
                 );
            let arr = Array.of_list(reprs);
@@ -1529,7 +1559,7 @@ module Css_transform = {
               that never applies: leave the WHOLE group untouched rather
               than negate against the safe members only and silently
               accept a narrower, harder-to-audit gap. */
-           let (_, _, _, group_kind) = List.hd(members);
+           let (_, _, group_kind) = List.hd(members);
            let later_side_is_safe =
              Array.to_list(Array.sub(arr, 1, n - 1))
              |> List.for_all(repr => is_safe_as_later(group_kind, repr));
@@ -1538,12 +1568,7 @@ module Css_transform = {
              |> List.iteri(
                   (
                     idx,
-                    (i, ar, _slot, kind): (
-                      int,
-                      at_rule,
-                      Slot_key.t,
-                      media_kind,
-                    ),
+                    (ar, _slot, kind): (at_rule, Slot_key.t, media_kind),
                   ) =>
                   if (idx < n - 1) {
                     let later =
@@ -1563,21 +1588,14 @@ module Css_transform = {
                           ~later,
                         )
                       };
-                    Hashtbl.replace(rewritten, i, new_prelude);
+                    Media_rewrite_table.replace(
+                      media_rewrites,
+                      ar.prelude,
+                      new_prelude,
+                    );
                   }
                 );
            };
-         }
-       );
-    rules
-    |> List.mapi((i, r) =>
-         switch (r, Hashtbl.find_opt(rewritten, i)) {
-         | (At_rule(ar), Some(new_prelude)) =>
-           At_rule({
-             ...ar,
-             prelude: (new_prelude, snd(ar.prelude)),
-           })
-         | _ => r
          }
        );
   };
@@ -1586,34 +1604,34 @@ module Css_transform = {
      (mirrors StyleX's "a nested object gets its own independent
      sibling-rewrite pass one depth down"): a `@media` block's own inner
      rules, or a nested selector's block, can have their own sibling
-     `@media` groups one level deeper. */
-  let rec rewrite_media_conditions = (rules: list(rule)): list(rule) =>
-    rules
-    |> rewrite_media_prelude_siblings
-    |> List.map(recurse_media_children)
-  and recurse_media_children = (r: rule): rule =>
+     `@media` groups one level deeper. Walks the ORIGINAL tree only - see
+     `rewrite_media_prelude_siblings`'s doc for why nothing is rebuilt
+     here. */
+  let rec rewrite_media_conditions =
+          (
+            media_rewrites: Media_rewrite_table.t(component_value_list),
+            rules: list(rule),
+          ) => {
+    rewrite_media_prelude_siblings(media_rewrites, rules);
+    List.iter(recurse_media_children(media_rewrites), rules);
+  }
+  and recurse_media_children = (media_rewrites, r: rule) =>
     switch (r) {
-    | Declaration(_) => r
-    | Style_rule({ block: (inner, loc), _ } as sr) =>
-      Style_rule({
-        ...sr,
-        block: (rewrite_media_conditions(inner), loc),
-      })
-    | At_rule({ block: Rule_list((inner, loc)), _ } as ar) =>
-      At_rule({
-        ...ar,
-        block: Rule_list((rewrite_media_conditions(inner), loc)),
-      })
-    | At_rule({ block: Stylesheet((inner, loc)), _ } as ar) =>
-      At_rule({
-        ...ar,
-        block: Stylesheet((rewrite_media_conditions(inner), loc)),
-      })
-    | At_rule({ block: Empty, _ }) => r
+    | Declaration(_) => ()
+    | Style_rule({ block: (inner, _), _ }) =>
+      rewrite_media_conditions(media_rewrites, inner)
+    | At_rule({ block: Rule_list((inner, _)), _ })
+    | At_rule({ block: Stylesheet((inner, _)), _ }) =>
+      rewrite_media_conditions(media_rewrites, inner)
+    | At_rule({ block: Empty, _ }) => ()
     };
 
   let atomize_rules =
-      (~source_position_start, rules: list(rule))
+      (
+        ~source_position_start,
+        ~media_rewrites: Media_rewrite_table.t(component_value_list),
+        rules: list(rule),
+      )
       : list((string, string, rule)) => {
     /* Merge a child selector-list prelude under a parent selector-list prelude.
        For each (parent, child) pair, run `compute_new_prefix` so `&`,
@@ -1858,24 +1876,47 @@ module Css_transform = {
            `@media (...) { .a-X .a .b { color:red } }`. */
         | Rule_list((rules, rule_loc))
         | Stylesheet((rules, rule_loc)) =>
+          /* The media rewrite (`rewrite_media_conditions`) records a
+             replacement prelude keyed by THIS at-rule's own (pre-rewrite)
+             prelude value (physical identity, see `Media_rewrite_table`'s
+             doc), if its block-local siblings required one. The
+             replacement drives the class hash and the printed rule -
+             that's the whole point, so two blocks disagreeing on order
+             mint different classes - but `Slot_key.of_atom` below must
+             still see the ORIGINAL prelude: it feeds `CSS.merge`'s
+             context equality, which has nothing to do with this block's
+             own sibling `@media` rules and must not silently change
+             because of them (see this function's own doc). */
+          let effective_prelude =
+            switch (Media_rewrite_table.find_opt(media_rewrites, prelude)) {
+            | Some(rewritten_tokens) => (rewritten_tokens, snd(prelude))
+            | None => prelude
+            };
           extract_atomic_rules_from_block(~parent_prelude?, rules)
           |> List.map(((_className, _namespace, inner_rule)) => {
                let wrapped =
+                 At_rule({
+                   name: (name, name_loc),
+                   prelude: effective_prelude,
+                   block: Rule_list(([inner_rule], rule_loc)),
+                   loc,
+                 });
+               let wrapped_string = render_rule(wrapped);
+               let context_source =
                  At_rule({
                    name: (name, name_loc),
                    prelude,
                    block: Rule_list(([inner_rule], rule_loc)),
                    loc,
                  });
-               let wrapped_string = render_rule(wrapped);
                let (new_className, new_namespace) =
                  Hash_class.class_and_namespace(
                    ~namespace=Settings.Get.namespace(),
-                   ~slot=Slot_key.of_atom(wrapped),
+                   ~slot=Slot_key.of_atom(context_source),
                    wrapped_string,
                  );
                (new_className, new_namespace, wrapped);
-             })
+             });
         };
       };
     };
@@ -1951,12 +1992,19 @@ module Css_transform = {
     let selector_resolved_rules =
       List.map(resolve_rule_selectors(ctx), rules);
     /* Media condition ordering (see `rewrite_media_conditions`'s own
-       doc): runs before `atomize_rules` so a rewritten `@media` condition
-       is what gets hashed into its atom's class name. */
-    let media_rewritten_rules =
-      rewrite_media_conditions(selector_resolved_rules);
+       doc): computed before `atomize_rules` so a rewritten `@media`
+       condition is available for its atom's class name, but the tree
+       itself is untouched - `atomize_rules` looks up `media_rewrites` to
+       keep `Slot_key.of_atom`'s merge context on the ORIGINAL prelude. */
+    let media_rewrites: Media_rewrite_table.t(component_value_list) =
+      Media_rewrite_table.create(8);
+    rewrite_media_conditions(media_rewrites, selector_resolved_rules);
     let atomic_rules =
-      atomize_rules(~source_position_start, media_rewritten_rules);
+      atomize_rules(
+        ~source_position_start,
+        ~media_rewrites,
+        selector_resolved_rules,
+      );
 
     /* Selective atomization: of a block's SINGLETON interpolating atoms
        (`atom_has_value_interpolation` - a multi-declaration group from

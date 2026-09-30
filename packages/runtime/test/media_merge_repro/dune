@@ -1,0 +1,5 @@
+(executable
+ (name print_merge)
+ (libraries styled-ppx.native)
+ (preprocess
+  (pps styled-ppx)))
