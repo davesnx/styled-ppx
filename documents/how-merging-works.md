@@ -137,11 +137,13 @@ lands before a lone longhand that overrides just one of its sides
 **Inside the conditional group, a fixed order between conditions decides
 a remaining tie** (two conditional atoms, equal specificity, same
 parent-to-child shape, same shorthand depth): at-rule kind first
-(`@supports` before `@media` before `@container`), then a fixed
-pseudo-class/pseudo-element priority (StyleX's own table — `:hover`
-before `:focus-within` before `:focus` before `:focus-visible` before
-`:active`; any pseudo-element outranks any pseudo-class), then `@media`
-width (`min-width` ascending, `max-width` descending — the wider,
+(`@supports` before `@media` before `@container` - this project's own
+choice of what to check first, not StyleX's; only the pseudo-class/
+pseudo-element NUMBERS below are StyleX's own table), then a fixed
+pseudo-class/pseudo-element priority (`:hover` before `:focus-within`
+before `:focus` before `:focus-visible` before `:active`; any
+pseudo-element outranks any pseudo-class), then `@media` width
+(`min-width` ascending, `max-width` descending — the wider,
 later-declared breakpoint wins). This order is the SAME everywhere: in
 every file, in every block, not "whichever one this block wrote last".
 A single block that writes
