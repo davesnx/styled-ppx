@@ -17,41 +17,41 @@ documents/string-escape-bug.md for context.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-64u917{content:\"\\\"\";}"];
-  [@css ".css-14y1y2p{content:\"\\\\\";}"];
-  [@css ".css-1f06l48{content:\"'\";}"];
-  [@css ".css-eyucdh{content:\"a\\\"b\";}"];
-  [@css ".css-1svugqq{content:\"before\\\\after\";}"];
-  [@css ".css-6dew8m{content:\"line\\A one\";}"];
-  [@css ".css-1xb5ir8{content:\"—\";}"];
-  [@css ".css-1blk38d [data-name=\"O\\\"Brien\"]{color:red;}"];
-  [@css ".css-dv08vt{background-image:url(\"path/with\\\"quote.png\");}"];
-  [@css ".css-ynwlhr{background-image:url(\"path\\\\to\\\\file.png\");}"];
-  [@css ".css-aaqqv9{content:\"\\9 \";}"];
-  [@css ".css-1n1y7g7{content:\"\\7F \";}"];
+  [@css "._a_4wu917{content:\"\\\"\";}"];
+  [@css "._a_4w1y2p{content:\"\\\\\";}"];
+  [@css "._a_4w6l48{content:\"'\";}"];
+  [@css "._a_4wucdh{content:\"a\\\"b\";}"];
+  [@css "._a_4wugqq{content:\"before\\\\after\";}"];
+  [@css "._a_4wew8m{content:\"line\\A one\";}"];
+  [@css "._a_4w5ir8{content:\"—\";}"];
+  [@css "._a_g49s14ek38d [data-name=\"O\\\"Brien\"]{color:red;}"];
+  [@css "._a_3900808vt{background-image:url(\"path/with\\\"quote.png\");}"];
+  [@css "._a_39008wlhr{background-image:url(\"path\\\\to\\\\file.png\");}"];
+  [@css "._a_4wqqv9{content:\"\\9 \";}"];
+  [@css "._a_4wy7g7{content:\"\\7F \";}"];
   
-  CSS.make("css-64u917", []);
+  CSS.make("_a_4wu917", []);
   
-  CSS.make("css-14y1y2p", []);
+  CSS.make("_a_4w1y2p", []);
   
-  CSS.make("css-1f06l48", []);
+  CSS.make("_a_4w6l48", []);
   
-  CSS.make("css-eyucdh", []);
+  CSS.make("_a_4wucdh", []);
   
-  CSS.make("css-1svugqq", []);
+  CSS.make("_a_4wugqq", []);
   
-  CSS.make("css-6dew8m", []);
+  CSS.make("_a_4wew8m", []);
   
-  CSS.make("css-1xb5ir8", []);
+  CSS.make("_a_4w5ir8", []);
   
-  CSS.make("css-1f06l48", []);
+  CSS.make("_a_4w6l48", []);
   
-  CSS.make("css-1blk38d", []);
+  CSS.make("_a_g49s14ek38d", []);
   
-  CSS.make("css-dv08vt", []);
+  CSS.make("_a_3900808vt", []);
   
-  CSS.make("css-ynwlhr", []);
+  CSS.make("_a_39008wlhr", []);
   
-  CSS.make("css-aaqqv9", []);
+  CSS.make("_a_4wqqv9", []);
   
-  CSS.make("css-1n1y7g7", []);
+  CSS.make("_a_4wy7g7", []);

@@ -92,13 +92,21 @@ let property_margin_trim : property_margin_trim Rule.rule =
 
 let entries : (kind * packed_rule) list =
   [
-    Property "margin", pack_module (module Property_margin);
-    Property "margin-block", pack_module (module Property_margin_block);
+    (* Box Model: https://www.w3.org/TR/css-box-4/#margin-shorthand, #padding-shorthand *)
+    ( Shorthand
+        ( "margin",
+          [ "margin-top"; "margin-right"; "margin-bottom"; "margin-left" ] ),
+      pack_module (module Property_margin) );
+    (* Logical Properties L1 (margin/padding): https://www.w3.org/TR/css-logical-1/#margin-properties *)
+    ( Shorthand ("margin-block", [ "margin-block-start"; "margin-block-end" ]),
+      pack_module (module Property_margin_block) );
     Property "margin-block-end", pack_module (module Property_margin_block_end);
     ( Property "margin-block-start",
       pack_module (module Property_margin_block_start) );
     Property "margin-bottom", pack_module (module Property_margin_bottom);
-    Property "margin-inline", pack_module (module Property_margin_inline);
+    (* Logical Properties L1 (margin/padding): https://www.w3.org/TR/css-logical-1/#margin-properties *)
+    ( Shorthand ("margin-inline", [ "margin-inline-start"; "margin-inline-end" ]),
+      pack_module (module Property_margin_inline) );
     ( Property "margin-inline-end",
       pack_module (module Property_margin_inline_end) );
     ( Property "margin-inline-start",

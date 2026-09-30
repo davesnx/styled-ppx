@@ -85,7 +85,11 @@ let entries : (kind * packed_rule) list =
     Property "column-wrap", pack_module (module Property_column_wrap);
     Property "column-gap", pack_module (module Property_column_gap);
     Property "column-count", pack_module (module Property_column_count);
-    Property "column-rule", pack_module (module Property_column_rule);
+    (* Multi-column Layout L2: https://www.w3.org/TR/css-multicol-2/#columns, #column-rule-style *)
+    ( Shorthand
+        ( "column-rule",
+          [ "column-rule-color"; "column-rule-style"; "column-rule-width" ] ),
+      pack_module (module Property_column_rule) );
     ( Property "column-rule-color",
       pack_module (module Property_column_rule_color) );
     ( Property "column-rule-style",

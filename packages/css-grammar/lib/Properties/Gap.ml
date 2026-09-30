@@ -8,4 +8,8 @@ module Property_gap =
 let property_gap : property_gap Rule.rule = Property_gap.rule
 
 let entries : (kind * packed_rule) list =
-  [ Property "gap", pack_module (module Property_gap) ]
+  (* Box Alignment L3: https://www.w3.org/TR/css-align-3/#gap-shorthand, #place-content, #place-items, #place-self *)
+  [
+    ( Shorthand ("gap", [ "row-gap"; "column-gap" ]),
+      pack_module (module Property_gap) );
+  ]

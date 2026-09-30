@@ -124,8 +124,33 @@ let entries : (kind * packed_rule) list =
   [
     Property "mask-border-mode", pack_module (module Property_mask_border_mode);
     Property "mask-type", pack_module (module Property_mask_type);
-    Property "mask", pack_module (module Property_mask);
-    Property "mask-border", pack_module (module Property_mask_border);
+    (* Masking L1: https://www.w3.org/TR/css-masking-1/#the-mask, #the-mask-border *)
+    ( Shorthand
+        ( "mask",
+          [
+            "mask-image";
+            "mask-mode";
+            "mask-position";
+            "mask-size";
+            "mask-repeat";
+            "mask-origin";
+            "mask-clip";
+            "mask-composite";
+            "mask-border";
+          ] ),
+      pack_module (module Property_mask) );
+    (* Masking L1: https://www.w3.org/TR/css-masking-1/#the-mask, #the-mask-border *)
+    ( Shorthand
+        ( "mask-border",
+          [
+            "mask-border-mode";
+            "mask-border-outset";
+            "mask-border-repeat";
+            "mask-border-slice";
+            "mask-border-source";
+            "mask-border-width";
+          ] ),
+      pack_module (module Property_mask_border) );
     ( Property "mask-border-outset",
       pack_module (module Property_mask_border_outset) );
     ( Property "mask-border-repeat",

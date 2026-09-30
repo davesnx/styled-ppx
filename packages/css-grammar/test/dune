@@ -7,6 +7,7 @@
   Modifiers_test
   Parser_test
   Rules_test
+  Shorthand_test
   Standard_test)
  (flags
   (:standard -open Alcotest_extra))

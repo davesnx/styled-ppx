@@ -135,7 +135,23 @@ end
 
 let entries : (kind * packed_rule) list =
   [
-    Property "animation", pack_module (module Property_animation);
+    (* Animations L2 (settable: name/duration/timing-function/delay/iteration-count/direction/fill-mode/play-state/timeline; reset-only: composition, range): https://drafts.csswg.org/css-animations-2/#animation *)
+    ( Shorthand
+        ( "animation",
+          [
+            "animation-name";
+            "animation-duration";
+            "animation-timing-function";
+            "animation-delay";
+            "animation-iteration-count";
+            "animation-direction";
+            "animation-fill-mode";
+            "animation-play-state";
+            "animation-timeline";
+            "animation-composition";
+            "animation-range";
+          ] ),
+      pack_module (module Property_animation) );
     ( Property "animation-composition",
       pack_module (module Property_animation_composition) );
     Property "animation-delay", pack_module (module Property_animation_delay);
@@ -154,7 +170,10 @@ let entries : (kind * packed_rule) list =
     Property "animation-name", pack_module (module Property_animation_name);
     ( Property "animation-play-state",
       pack_module (module Property_animation_play_state) );
-    Property "animation-range", pack_module (module Property_animation_range);
+    (* Animations L2 (settable: name/duration/timing-function/delay/iteration-count/direction/fill-mode/play-state/timeline; reset-only: composition, range): https://drafts.csswg.org/css-animations-2/#animation *)
+    ( Shorthand
+        ("animation-range", [ "animation-range-start"; "animation-range-end" ]),
+      pack_module (module Property_animation_range) );
     ( Property "animation-range-end",
       pack_module (module Property_animation_range_end) );
     ( Property "animation-range-start",

@@ -24,8 +24,8 @@ later (ml-in-barcelona/server-reason-react#402).
   $ dune build
 
   $ ./_build/default/input.exe
-  <div class="cid-1hdqfg1 css-k008qs" style="">ok</div>
-  <div class="cid-1hdqfg1 css-k008qs base" style="">ok</div>
+  <div class="_id_1hdqfg1 _a_5r08qs" style="">ok</div>
+  <div class="_id_1hdqfg1 _a_5r08qs base" style="">ok</div>
 
 server-reason-react's expansion binds the incoming bundle to a reserved
 `__incoming` temporary before styled-ppx lowers the `[%css]` inside it. The
@@ -49,5 +49,5 @@ is `make`'s, and in development mode the marker reads `label:make`, not
   $ dune build
 
   $ ./_build/default/input.exe
-  <div class="label:make cid-1hdqfg1 css-k008qs" style="">ok</div>
-  <div class="label:make cid-1hdqfg1 css-k008qs base" style="">ok</div>
+  <div class="label:make _id_1hdqfg1 _a_5r08qs" style="">ok</div>
+  <div class="label:make _id_1hdqfg1 _a_5r08qs base" style="">ok</div>

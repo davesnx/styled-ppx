@@ -15,42 +15,40 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css
-    ".css-1majsr1{-webkit-print-color-adjust:economy;color-adjust:economy;}"
-  ];
-  [@css ".css-1i8uoce{-webkit-print-color-adjust:exact;color-adjust:exact;}"];
-  [@css ".css-k2jaoo{forced-color-adjust:auto;}"];
-  [@css ".css-9og3m8{forced-color-adjust:none;}"];
-  [@css ".css-1aesf9s{forced-color-adjust:preserve-parent-color;}"];
-  [@css ".css-14rmdkq{color-scheme:normal;}"];
-  [@css ".css-1bo0ddm{color-scheme:light;}"];
-  [@css ".css-ed8a77{color-scheme:dark;}"];
-  [@css ".css-ujor4h{color-scheme:light dark;}"];
-  [@css ".css-4hsghk{color-scheme:dark light;}"];
-  [@css ".css-1nd6avj{color-scheme:only light;}"];
-  [@css ".css-p0bop6{color-scheme:light only;}"];
-  [@css ".css-16p24tl{color-scheme:light light;}"];
-  [@css ".css-1uyd4nr{color-scheme:dark dark;}"];
-  [@css ".css-1y02q1k{color-scheme:light purple;}"];
-  [@css ".css-eqcn74{color-scheme:purple dark interesting;}"];
-  [@css ".css-5yh2ut{color-scheme:none;}"];
-  [@css ".css-1ge6jec{color-scheme:light none;}"];
+  [@css "._a_4fjsr1{-webkit-print-color-adjust:economy;color-adjust:economy;}"];
+  [@css "._a_4fuoce{-webkit-print-color-adjust:exact;color-adjust:exact;}"];
+  [@css "._a_6ejaoo{forced-color-adjust:auto;}"];
+  [@css "._a_6eg3m8{forced-color-adjust:none;}"];
+  [@css "._a_6esf9s{forced-color-adjust:preserve-parent-color;}"];
+  [@css "._a_4jmdkq{color-scheme:normal;}"];
+  [@css "._a_4j0ddm{color-scheme:light;}"];
+  [@css "._a_4j8a77{color-scheme:dark;}"];
+  [@css "._a_4jor4h{color-scheme:light dark;}"];
+  [@css "._a_4jsghk{color-scheme:dark light;}"];
+  [@css "._a_4j6avj{color-scheme:only light;}"];
+  [@css "._a_4jbop6{color-scheme:light only;}"];
+  [@css "._a_4j24tl{color-scheme:light light;}"];
+  [@css "._a_4jd4nr{color-scheme:dark dark;}"];
+  [@css "._a_4j2q1k{color-scheme:light purple;}"];
+  [@css "._a_4jcn74{color-scheme:purple dark interesting;}"];
+  [@css "._a_4jh2ut{color-scheme:none;}"];
+  [@css "._a_4j6jec{color-scheme:light none;}"];
   
-  CSS.make("css-1majsr1", []);
-  CSS.make("css-1i8uoce", []);
-  CSS.make("css-k2jaoo", []);
-  CSS.make("css-9og3m8", []);
-  CSS.make("css-1aesf9s", []);
-  CSS.make("css-14rmdkq", []);
-  CSS.make("css-1bo0ddm", []);
-  CSS.make("css-ed8a77", []);
-  CSS.make("css-ujor4h", []);
-  CSS.make("css-4hsghk", []);
-  CSS.make("css-1nd6avj", []);
-  CSS.make("css-p0bop6", []);
-  CSS.make("css-16p24tl", []);
-  CSS.make("css-1uyd4nr", []);
-  CSS.make("css-1y02q1k", []);
-  CSS.make("css-eqcn74", []);
-  CSS.make("css-5yh2ut", []);
-  CSS.make("css-1ge6jec", []);
+  CSS.make("_a_4fjsr1", []);
+  CSS.make("_a_4fuoce", []);
+  CSS.make("_a_6ejaoo", []);
+  CSS.make("_a_6eg3m8", []);
+  CSS.make("_a_6esf9s", []);
+  CSS.make("_a_4jmdkq", []);
+  CSS.make("_a_4j0ddm", []);
+  CSS.make("_a_4j8a77", []);
+  CSS.make("_a_4jor4h", []);
+  CSS.make("_a_4jsghk", []);
+  CSS.make("_a_4j6avj", []);
+  CSS.make("_a_4jbop6", []);
+  CSS.make("_a_4j24tl", []);
+  CSS.make("_a_4jd4nr", []);
+  CSS.make("_a_4j2q1k", []);
+  CSS.make("_a_4jcn74", []);
+  CSS.make("_a_4jh2ut", []);
+  CSS.make("_a_4j6jec", []);

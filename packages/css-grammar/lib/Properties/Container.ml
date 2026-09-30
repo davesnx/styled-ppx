@@ -24,6 +24,8 @@ let property_container_type : property_container_type Rule.rule =
 let entries : (kind * packed_rule) list =
   [
     Property "container-type", pack_module (module Property_container_type);
-    Property "container", pack_module (module Property_container);
+    (* Containment L3: https://www.w3.org/TR/css-contain-3/#container-shorthand *)
+    ( Shorthand ("container", [ "container-name"; "container-type" ]),
+      pack_module (module Property_container) );
     Property "container-name", pack_module (module Property_container_name);
   ]

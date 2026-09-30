@@ -61,29 +61,11 @@ module Property_word_space_transform =
 let property_word_space_transform : property_word_space_transform Rule.rule =
   Property_word_space_transform.rule
 
-module Property_backdrop_blur =
-  [%spec_module
-  "<extended-length>", (module Css_types.Length)]
-
-let property_backdrop_blur : property_backdrop_blur Rule.rule =
-  Property_backdrop_blur.rule
-
-module Property_container_name_computed =
-  [%spec_module
-  "'none' | [ <custom-ident> ]#", (module Css_types.ContainerNameComputed)]
-
-let property_container_name_computed :
-  property_container_name_computed Rule.rule =
-  Property_container_name_computed.rule
-
 let entries : (kind * packed_rule) list =
   [
     Property "kerning", pack_module (module Property_kerning);
     Property "behavior", pack_module (module Property_behavior);
-    Property "backdrop-blur", pack_module (module Property_backdrop_blur);
     Property "clip", pack_module (module Property_clip);
-    ( Property "container-name-computed",
-      pack_module (module Property_container_name_computed) );
     Property "azimuth", pack_module (module Property_azimuth);
     Property "cue", pack_module (module Property_cue);
     Property "cue-after", pack_module (module Property_cue_after);

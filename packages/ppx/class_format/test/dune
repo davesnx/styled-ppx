@@ -1,0 +1,16 @@
+(test
+ (name test_slot_class)
+ (modules test_slot_class)
+ (libraries
+  alcotest
+  alcotest_extra
+  class_format
+  murmur2
+  slot_key
+  styled_ppx_css_parser))
+
+(rule
+ (alias test-slot-class)
+ (deps test_slot_class.exe)
+ (action
+  (run %{deps})))

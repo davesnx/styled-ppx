@@ -15,22 +15,22 @@ If this test fail means that the module is not in sync with the ppx
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1e77ccc{container-type:normal;}"];
-  [@css ".css-14f6sj7{container-type:size;}"];
-  [@css ".css-3qzm71{container-type:inline-size;}"];
-  [@css ".css-glnlpx{container-name:none;}"];
-  [@css ".css-6zbaxz{container-name:sidebar;}"];
-  [@css ".css-1ctqxl0{container-name:sidebar main;}"];
-  [@css ".css-1use1gg{container:sidebar / inline-size;}"];
-  [@css ".css-vubl4h{container:sidebar / size;}"];
-  [@css ".css-hs1iko{container:none;}"];
+  [@css "._a_4v0027ccc{container-type:normal;}"];
+  [@css "._a_4v0026sj7{container-type:size;}"];
+  [@css "._a_4v002zm71{container-type:inline-size;}"];
+  [@css "._a_4v001nlpx{container-name:none;}"];
+  [@css "._a_4v001baxz{container-name:sidebar;}"];
+  [@css "._a_4v001qxl0{container-name:sidebar main;}"];
+  [@css "._a_4ve1gg{container:sidebar / inline-size;}"];
+  [@css "._a_4vbl4h{container:sidebar / size;}"];
+  [@css "._a_4v1iko{container:none;}"];
   
-  CSS.make("css-1e77ccc", []);
-  CSS.make("css-14f6sj7", []);
-  CSS.make("css-3qzm71", []);
-  CSS.make("css-glnlpx", []);
-  CSS.make("css-6zbaxz", []);
-  CSS.make("css-1ctqxl0", []);
-  CSS.make("css-1use1gg", []);
-  CSS.make("css-vubl4h", []);
-  CSS.make("css-hs1iko", []);
+  CSS.make("_a_4v0027ccc", []);
+  CSS.make("_a_4v0026sj7", []);
+  CSS.make("_a_4v002zm71", []);
+  CSS.make("_a_4v001nlpx", []);
+  CSS.make("_a_4v001baxz", []);
+  CSS.make("_a_4v001qxl0", []);
+  CSS.make("_a_4ve1gg", []);
+  CSS.make("_a_4vbl4h", []);
+  CSS.make("_a_4v1iko", []);
