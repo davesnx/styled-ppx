@@ -14,8 +14,5 @@ already do.
   @layer a, b;
   @layer base {.example{color:red;}}
   @font-face {font-family:"Inter";}
-  @layer styled-ppx.global, styled-ppx.base, styled-ppx.conditional;
-  @layer styled-ppx.global {
   @media (min-width: 1px) {.responsive{color:blue;}}
   body{margin:0;}
-  }

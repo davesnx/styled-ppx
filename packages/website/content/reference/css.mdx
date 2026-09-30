@@ -78,7 +78,7 @@ If you need the raw values outside JSX, use [`CSS.className` and `CSS.styles`](.
 
 ## Composition
 
-Styles are ordinary values: combine them with `CSS.merge`, branch with a plain conditional, store them in records. One thing to know: which declaration wins is decided by stylesheet order, not merge order.
+Styles are ordinary values: combine them with `CSS.merge`, branch with a plain conditional, store them in records. One thing to know: in `CSS.merge(a, b)`, `b`'s declaration wins for any property both sides set, with a few documented limits.
 
 The `styles` type, `CSS.merge`, the full override rules, patterns, and anti-patterns all live in [The `CSS` module](./runtime#composition).
 

@@ -32,13 +32,16 @@
    The emitted identifier families
    -------------------------------
      class name   `_a_<context?><family><mask?><value>`    (class_and_namespace,
-                  or `_a_<hash(content)>` for a rule shape   via Class_format.slot_class)
-                  with no {!Slot_key.t} (should not happen
-                  for a real atom - see {!class_of_content})
+                  or `_a_<hash(cli_namespace \0 content)>` via Class_format.slot_class)
+                  for a rule shape with no {!Slot_key.t}
+                  (should not happen for a real atom - see
+                  {!class_of_content})
+     bundle       `_in_<hash(cli_namespace \0 content)>`   (bundle_class_and_namespace,
+                                                             via Class_format.bundle_class)
      namespace    `css-<hash(content)>`                    (namespace_of_content)
                   NOT the class name (see "Class vs. namespace prefixes"
-                  below) - the same hash input, but its own literal prefix
-                  never changes; the seed for its vars
+                  below) - the same, UN-salted hash input, but its own
+                  literal prefix never changes; the seed for its vars
      variable     `var-<hash(namespace \0 path \0 type_key)>`   (variable)
      occurrence   `<variable>_<n>` when a name repeats in one declaration
      identity     `_id_<hash(cli_namespace \0 module \0 scope \0 name
@@ -48,6 +51,15 @@
      keyframes    `_k_<hash(body)>`                        (keyframe_name)
      global key   `global-<hash(rule)>`                    (global_key)
      scoped ns    `<kind> \0 <module> \0 <scope> \0 <hash(rules)>` (scoped_namespace)
+
+   [cli_namespace] is the `--namespace` flag (defaulting to the dune
+   `library-name` cookie - see [Settings.Get.namespace]), empty when
+   neither is present; {!salted_content} folds it ahead of [content] only
+   when non-empty, so it is never a distinguishing input for the class
+   OR bundle hash when absent (byte-identical to before this salt
+   existed). It salts the CLASS/BUNDLE half of an atom only, never the
+   `var(--...)` [namespace] row above, never `_k_`/`label:` - see the
+   atomic invariant below for why the variable stays un-salted.
 
    The atomic invariant this module protects
    ------------------------------------------
@@ -145,16 +157,36 @@ let namespace_of_content content = Printf.sprintf "css-%s" (hash content)
    shape [atomize_rules] never actually produces). *)
 let class_of_content content = Printf.sprintf "_a_%s" (hash content)
 
+(* [content], salted with [namespace] (the `--namespace` flag, defaulting to
+   the dune `library-name` cookie - see [Settings.Get.namespace]) - the hash
+   input for a class's VALUE field, never for {!namespace_of_content} (see
+   below). Empty [namespace] leaves [content] untouched, so a standalone run
+   with neither the cookie nor an explicit flag hashes exactly as it did
+   before this salt existed. A non-empty [namespace] is NUL-joined ahead of
+   [content] (see the header's "Separator") so two libraries salting the
+   same content with two different namespaces mint two different classes,
+   and two runs salting it with the SAME namespace (a native/melange twin
+   pair passing one shared value - see [Settings.namespace]'s doc) mint the
+   identical one. *)
+let salted_content namespace content =
+  if namespace = "" then content else nul_join [ namespace; content ]
+
 (* An atom's class name and its namespace, from a single content hash - two
    different literal strings sharing one hash input (see the header's
-   "atomic invariant"). [namespace] is always the plain content hash - it
-   seeds every interpolation variable's name, so it must stay independent
-   of merge-key data (see the header's "Prefix rename"/"Stability
-   contract"). [class_name] carries the merge-key data instead
+   "atomic invariant"). [namespace] (the RESULT, i.e. the var(--...) seed)
+   is always the plain, un-salted content hash - it seeds every
+   interpolation variable's name, so it must stay independent of both the
+   merge-key data (see the header's "Prefix rename"/"Stability contract")
+   AND the `--namespace` flag: salting it too would rename every
+   already-shipped `var(--...)` custom property whenever a library's
+   `--namespace` changed, for no reason the header's "atomic invariant"
+   requires. [class_name] carries the merge-key data instead
    ({!Class_format.slot_class}'s context/family/mask/value fields), built
-   from the atom's {!Slot_key.t} - the caller's own [Slot_key.of_atom] on
-   the exact same rule value [content] renders (see its doc for why that
-   shape match matters).
+   from the atom's {!Slot_key.t} and the flag/cookie-salted content (see
+   {!salted_content}) - the caller's own [Slot_key.of_atom] on the exact
+   same, UN-salted rule value [content] renders (see its doc for why that
+   shape match matters; salting only the class half, never the [Slot_key]
+   derivation, is what keeps context/family/mask keyed on structure alone).
 
    [slot.bundle] is always [false] here (see {!Slot_key.t.bundle}'s doc):
    this function is [Css_file.re]'s NON-bundle path - a genuine, two-or-more
@@ -162,30 +194,34 @@ let class_of_content content = Printf.sprintf "_a_%s" (hash content)
    below, never through this function or [Slot_key] at all - so
    [Class_format.slot_class] always takes its real, structural encoding
    here, never its [_in_] branch. *)
-let class_and_namespace ~slot content =
-  let namespace = namespace_of_content content in
+let class_and_namespace ~namespace ~slot content =
+  let var_namespace = namespace_of_content content in
+  let salted = salted_content namespace content in
   let class_name =
     match slot with
-    | Some (s : Slot_key.t) -> Class_format.slot_class s content
-    | None -> class_of_content content
+    | Some (s : Slot_key.t) -> Class_format.slot_class s salted
+    | None -> class_of_content salted
   in
-  class_name, namespace
+  class_name, var_namespace
 
 (* Same shape as [class_and_namespace] (a [(class_name, namespace)] pair
    from one content hash), for [Css_file.re]'s bundle path specifically: the
-   CLASS half gets the [_in_] prefix (see [Class_format.bundle_class]) so
-   `CSS.merge`'s future runtime and `generate`'s atom-class collision check
-   can recognize a bundle atom and treat it as opaque - never dropped,
-   never dropping another atom, never flagged as a collision even though
-   several different declarations from one binding share it by design. The
-   NAMESPACE half is deliberately UNCHANGED (still [namespace_of_content],
-   `css-<hash>`) - it seeds every interpolation variable's name (see the
-   header's "atomic invariant"), and changing it would rename every
-   existing bundle's `var(--...)` custom properties for no reason; only
-   the class's own presentation needed to change, not the content-hash
-   input every variable name is still a pure function of. *)
-let bundle_class_and_namespace content =
-  Class_format.bundle_class content, namespace_of_content content
+   CLASS half gets the [_in_] prefix (see [Class_format.bundle_class]),
+   hashed from the flag/cookie-salted content (see {!salted_content}, same
+   salt [class_and_namespace] applies) so `generate`'s atom-class collision
+   check can recognize a bundle atom and treat it as opaque - never
+   dropped, never dropping another atom, never flagged as a collision even
+   though several different declarations from one binding share it by
+   design. The NAMESPACE half is deliberately UN-salted (still
+   [namespace_of_content] on the raw [content], `css-<hash>`) - it seeds
+   every interpolation variable's name (see the header's "atomic
+   invariant"), and salting it would rename every existing bundle's
+   `var(--...)` custom properties whenever `--namespace` changed, for no
+   reason; only the class's own presentation needed the salt, not the
+   content-hash input every variable name is still a pure function of. *)
+let bundle_class_and_namespace ~namespace content =
+  ( Class_format.bundle_class (salted_content namespace content),
+    namespace_of_content content )
 
 (* -- Interpolation variables ------------------------------------------- *)
 

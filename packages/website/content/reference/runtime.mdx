@@ -74,31 +74,25 @@ let styles = CSS.merge button (if active then highlight else CSS.empty)
 
 ### Which declaration wins
 
-If you come from emotion or styled-components, this is the one semantic to relearn: **`CSS.merge` argument order does not decide which declaration wins.**
-
-Every extracted rule is atomic (a single class), so all rules have the same specificity. When two atoms set the same property, the CSS cascade breaks the tie by **stylesheet order**: later wins. And the stylesheet preserves the order your `[%css]` blocks appear in your source. In emotion, `cx(base, override)` guarantees the override wins because emotion re-serializes at runtime; here `CSS.merge(base, override)` and `CSS.merge(override, base)` render identically, because only source position matters.
+If you come from emotion or styled-components, this already matches what you'd expect: **`CSS.merge(a, b)` — `b`'s declaration wins**, for any property both sides set, with the few limits listed below. `CSS.merge(a, b)` and `CSS.merge(b, a)` do not render the same thing.
 
 ```reason
-let danger = [%css "background-color: red"];  /* defined FIRST */
-let button = [%css "background-color: gray"]; /* defined second */
+let danger = [%css "background-color: red"];
+let button = [%css "background-color: gray"];
 
-/* Both of these render a GRAY background: button's atom
-   comes later in the stylesheet, so it wins the tie. */
-<div styles={CSS.merge(button, danger)} />;
-<div styles={CSS.merge(danger, button)} />;
+<div styles={CSS.merge(button, danger)} />; /* red - danger is the right argument */
+<div styles={CSS.merge(danger, button)} />; /* gray - button is the right argument */
 ```
 
 ```mlx
-let danger = [%css "background-color: red"]  (* defined FIRST *)
-let button = [%css "background-color: gray"] (* defined second *)
+let danger = [%css "background-color: red"]
+let button = [%css "background-color: gray"]
 
-(* Both of these render a GRAY background: button's atom
-   comes later in the stylesheet, so it wins the tie. *)
-let a = <div styles=(CSS.merge button danger) />
-let b = <div styles=(CSS.merge danger button) />
+let a = <div styles=(CSS.merge button danger) /> (* red - danger is the right argument *)
+let b = <div styles=(CSS.merge danger button) /> (* gray - button is the right argument *)
 ```
 
-The convention to follow: **define base styles before the styles that override them**. That applies within a module, and for cross-module overrides, in a module compiled later. When an override doesn't stick, check the definition order first; the binding labels in class names (`css-<hash>-danger`) show in DevTools exactly which binding each winning declaration came from.
+The rule, its worked examples, and its known limits (a lone longhand can't drop an earlier shorthand; `!important` always keeps both sides; interpolation bundles and `$(binding)` identities are never dropped) are in the repository's `documents/how-merging-works.md`. Argument order is what decides - not which `[%css]` block appears first in your source, and not which module compiles first.
 
 ### Patterns
 
@@ -165,12 +159,12 @@ let%component make ?(styles = CSS.empty) ~children () =
   <div styles=(CSS.merge base_styles styles)> children </div>
 ```
 
-Merging the caller's value combines its vars and class names; remember that for *conflicting properties* the caller's declarations win only if they're defined later in source than `baseStyles` (see above), or if they target different properties.
+Merging the caller's value combines its vars and class names; since `styles` is the right argument, its declarations win over `baseStyles`'s for any property it also sets (see "Which declaration wins" above) - `baseStyles`'s declarations survive only for the properties `styles` doesn't touch.
 
 ### Anti-patterns
 
 - **Don't concatenate class names by hand.** `CSS.className(a) ++ " " ++ CSS.className(b)` silently drops the custom-property vars that `CSS.merge` would carry, so interpolated values stop applying.
-- **Don't rely on merge order for overrides.** See "Which declaration wins".
+- **Don't rely on definition or source order for overrides.** `CSS.merge(a, b)`'s own argument order is what decides, not which `[%css]` block was written first or which module compiles first. See "Which declaration wins".
 
 ## Values
 

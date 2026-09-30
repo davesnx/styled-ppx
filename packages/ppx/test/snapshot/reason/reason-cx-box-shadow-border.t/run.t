@@ -12,41 +12,38 @@
   @property --borderWidth-apl5wd{syntax:"*";inherits:false;}
   @property --bgColor-vilhl2{syntax:"*";inherits:false;}
   @property --shadow-giamln{syntax:"*";inherits:false;}
-  @layer styled-ppx.global, styled-ppx.base, styled-ppx.conditional;
-  @layer styled-ppx.base {
-  ._a_4085tv{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
-  ._a_402iep{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1), 0px 4px 8px 0px rgba(0, 0, 0, 0.2);}
-  ._a_40fme5{box-shadow:inset 0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
-  ._a_40keqi{box-shadow:none;}
-  ._a_402o9n{box-shadow:0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -2px rgba(0, 0, 0, 0.1);}
-  ._a_3h2auv{border:1px solid black;}
-  ._a_3h2qc1{border:2px dashed #ff0000;}
-  ._a_3hjkge{border:1px solid transparent;}
-  ._a_3hanm4{border:none;}
-  ._a_3hghsmzmu{border-top:1px solid red;}
-  ._a_3hb2879q1{border-right:2px dashed blue;}
-  ._a_3h00779gh{border-bottom:3px dotted green;}
-  ._a_3h1dswvke{border-left:4px double orange;}
-  ._a_3h257i{border:1px solid #ccc;}
-  ._a_3n6otz{border-radius:8px;}
-  ._a_405761{box-shadow:0px 4px 6px 0px rgba(0, 0, 0, 0.1);}
-  ._a_3hwm2g{border:1px solid #e5e7eb;}
-  ._a_3nkn84{border-radius:12px;}
-  ._a_4039qm{box-shadow:0px 1px 3px 0px rgba(0, 0, 0, 0.1), 0px 1px 2px -1px rgba(0, 0, 0, 0.1);}
-  ._a_3hxi5p{border:1px solid rgba(0, 0, 0, 0.05);}
-  ._a_3nezfo{border-radius:16px;}
-  ._a_3hstvc{border:2px solid #3b82f6;}
-  ._a_40ar9w{box-shadow:0px 0px 0px 0px rgba(59, 130, 246, 0.5);}
-  ._a_3hzctv{border:1px solid var(--borderColor-1on39sz);}
-  ._a_40u3s3{box-shadow:var(--shadowX-11ljgmp) var(--shadowY-1qn6d0z) var(--blur-1bcbjmk) var(--spread-xxpef3) var(--shadowColor-1sod13t);}
-  ._a_40jemk{box-shadow:var(--myShadow-af5fmc);}
-  ._a_3hdrfm{border:var(--borderWidth-apl5wd) solid black;}
-  ._a_40ae1x{box-shadow:var(--shadow-giamln);}
-  ._a_3hlokq43j{border-width:2px;}
-  ._a_3hsua8w2v{border-style:solid;}
-  ._a_3hef5kaed{border-color:#333;}
-  ._a_39004pvpe{background-color:var(--bgColor-vilhl2);}
-  }
+  ._a_40lhv8{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
+  ._a_40pkfc{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1), 0px 4px 8px 0px rgba(0, 0, 0, 0.2);}
+  ._a_40fb00{box-shadow:inset 0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
+  ._a_401fp9{box-shadow:none;}
+  ._a_4059q8{box-shadow:0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -2px rgba(0, 0, 0, 0.1);}
+  ._a_3hn3ja{border:1px solid black;}
+  ._a_3hl0sh{border:2px dashed #ff0000;}
+  ._a_3hhj16{border:1px solid transparent;}
+  ._a_3hcvhu{border:none;}
+  ._a_3hghs75d5{border-top:1px solid red;}
+  ._a_3hb28q36u{border-right:2px dashed blue;}
+  ._a_3h00731uw{border-bottom:3px dotted green;}
+  ._a_3h1dspk0f{border-left:4px double orange;}
+  ._a_3h5unl{border:1px solid #ccc;}
+  ._a_3nrtka{border-radius:8px;}
+  ._a_40fjfj{box-shadow:0px 4px 6px 0px rgba(0, 0, 0, 0.1);}
+  ._a_3heuo0{border:1px solid #e5e7eb;}
+  ._a_3n4z5l{border-radius:12px;}
+  ._a_40162g{box-shadow:0px 1px 3px 0px rgba(0, 0, 0, 0.1), 0px 1px 2px -1px rgba(0, 0, 0, 0.1);}
+  ._a_3hlw6q{border:1px solid rgba(0, 0, 0, 0.05);}
+  ._a_3ndpry{border-radius:16px;}
+  ._a_3h5o67{border:2px solid #3b82f6;}
+  ._a_40si3w{box-shadow:0px 0px 0px 0px rgba(59, 130, 246, 0.5);}
+  ._a_3h51sj{border:1px solid var(--borderColor-1on39sz);}
+  ._a_40f8br{box-shadow:var(--shadowX-11ljgmp) var(--shadowY-1qn6d0z) var(--blur-1bcbjmk) var(--spread-xxpef3) var(--shadowColor-1sod13t);}
+  ._a_40sn3t{box-shadow:var(--myShadow-af5fmc);}
+  ._a_3hpcwd{border:var(--borderWidth-apl5wd) solid black;}
+  ._a_40vdp5{box-shadow:var(--shadow-giamln);}
+  ._a_3hlokfl8k{border-width:2px;}
+  ._a_3hsuadx68{border-style:solid;}
+  ._a_3hef5edq6{border-color:#333;}
+  ._a_39004fadc{background-color:var(--bgColor-vilhl2);}
 
 Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
 

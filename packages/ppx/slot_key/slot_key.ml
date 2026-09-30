@@ -157,7 +157,10 @@ module Family = struct
      key), ties broken alphabetically - picks "border" over "border-top"
      or "border-width" as the family's canonical name. A family with no
      shorthand member at all (every real property that names no
-     shorthand and isn't anyone's child) uses [prop] itself. *)
+     shorthand and isn't anyone's child) uses [prop] itself. A pure
+     function of the shorthand graph alone, with no notion of which key
+     already has a registry slot - see {!family_id_of} for the id-stable
+     variant that prefers an existing registration over this rule. *)
   let family_key_of prop =
     let shorthand_members =
       all_members_of prop |> List.filter (Hashtbl.mem direct_children)
@@ -944,10 +947,50 @@ let rec depth_of property =
     Hashtbl.replace depth_cache property d;
     d
 
+(* A property that already has a seed slot must keep it as its family's id,
+   even after a later shorthand pulls it into a bigger family alongside
+   other already-registered members - two real shapes this protects
+   against:
+   - a shorter shorthand unions with an already-registered LONGER shorthand
+     (e.g. "rule" unioning with "column-rule"): {!Family.family_key_of}'s
+     shortest-name rule alone would rename every existing column-rule*
+     atom's class the moment "rule" is registered.
+   - a new shorthand unions two or more previously-STANDALONE properties
+     that each already had their own slot (e.g. "max-size" unioning
+     "max-width" and "max-height", each its own one-member family until
+     then): {!Family.family_key_of} only ever looks at SHORTHAND members,
+     so neither "max-width" nor "max-height" is even a candidate - both
+     would fall through to a brand-new, never-before-seen key ("max-size"
+     itself, an [Unregistered] hash fallback) instead of reusing either
+     existing slot.
+   The fix generalizes to both: among EVERY member of the property's family
+   ({!Family.all_members_of} - shorthand keys and leaves alike, [property]
+   itself included), the first one [Registry.index_of] already knows wins
+   outright, ties broken by ascending seed index (whichever was registered
+   first). {!Family.family_key_of}'s shortest-name rule only decides when
+   NONE of the family's members has a slot yet (a genuinely new family,
+   where there is no existing id to protect). When two or more
+   already-different, already-registered properties are unioned by one new
+   shorthand (the "max-size" shape above), only the winning one keeps its
+   own class unchanged - the others now share its family id, distinguished
+   by mask, which is unavoidable once the shorthand relationship makes them
+   one real family. Lives here, not in {!Family}, because [Registry] (built
+   from {!seed}) is defined after [Family] in this file - this is the one
+   place that already sees both. *)
 let family_id_of property =
   if property = "all" then All
   else (
-    let key = Family.family_key_of (resolve_alias property) in
+    let property = resolve_alias property in
+    let key =
+      match
+        Family.all_members_of property
+        |> List.filter_map (fun c ->
+          Registry.index_of c |> Option.map (fun i -> i, c))
+        |> List.sort (fun (i, _) (j, _) -> compare i j)
+      with
+      | (_, already_registered) :: _ -> already_registered
+      | [] -> Family.family_key_of property
+    in
     match Registry.index_of key with
     | Some i -> Registered i
     | None ->

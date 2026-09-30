@@ -13,5 +13,6 @@
   (pps
    styled-ppx
    --native
+   --namespace=demo
    server-reason-react.ppx
    server-reason-react.melange_ppx)))
