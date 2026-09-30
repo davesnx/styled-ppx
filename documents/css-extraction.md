@@ -361,8 +361,7 @@ as an escape hatch for one release and to compare
 against the old behavior. Under the default `--order dependency`, `--log
 info` prints the library order and then each library's module order;
 `--log debug` additionally prints every library edge and every module
-edge. `--layers` (see Cascade layers below) requires `--order dependency`,
-since it wraps each library's rules by the same grouping.
+edge.
 
 ### Resolve
 
@@ -433,14 +432,16 @@ test on the rendered rule — starts with `@import`/`@namespace` and ends
 with `;` — rather than a search for `{`, since an `@import` URL can itself
 contain `{` (`@import url("a{b.css");` is a valid statement, not a block
 rule). Statement-form `@layer a, b;` is deliberately NOT hoisted with
-`@import`/`@namespace`: CSS allows it anywhere in a stylesheet, and layer
-order is first-occurrence order, so relocating a `@layer` statement would
-silently reorder a library's cascade layers instead of just moving text.
-It carries no atom class of its own, so cascade tiers (below) treat it
-exactly like a registration or a global rule: it stays outside every tier,
-ahead of the tier statement, in whatever relative position dedup/ordering
-placed it among the other rules that also stay outside the tiers — a
-normal and supported way to declare sub-layers from user-written CSS.
+`@import`/`@namespace`: CSS allows it anywhere in a stylesheet, but a
+layer's priority is fixed by its name's FIRST occurrence across the whole
+page, so relocating a user's own `@layer` statement could silently change
+which layer it introduces first there - a hazard independent of whether
+this aggregator wraps anything in a layer of its own. It carries no atom
+class of its own, so cascade tiers (below) treat it exactly like a
+registration: it takes no part in tiering, staying in whatever relative
+position dedup/ordering already gave it among the other rules that also
+sit outside the tiers — a normal and supported way to declare layers from
+user-written CSS.
 `@charset` is dropped instead of hoisted: the generated file always opens
 with its own leading comment, so `@charset` can never be the literal
 first bytes of the stylesheet, and the file is written as UTF-8 regardless
@@ -457,64 +458,56 @@ protocol section above); there is no CLI flag for this.
 Every deduplicated STYLE rule this generator emits - a real atom (`_a_`/
 `_in_` class) or a `[%styled.global]` rule (no atom class, but a real,
 cascading rule all the same - `html{...}`, `*{...}`, `*::before{...}`, an
-author's own global selector) - is classified into one of exactly three
-CSS cascade layers, lowest to highest priority: `styled-ppx.global`,
-`styled-ppx.base`, and `styled-ppx.conditional`. Every output stylesheet
-opens with the same, unconditional `@layer styled-ppx.global,
-styled-ppx.base, styled-ppx.conditional;` statement (right after the
-hoisted `@import`/`@namespace` rules and the registrations below)
-whenever it ships any rule that tiers at all. Layer order beats source
-order, so this fixes three real bugs content-hash dedup and plain
-concatenation could not:
-
-- a block's own `@media`/`:hover` override landing BEFORE its
-  unconditional declaration in the deduplicated list (so the
-  unconditional one, being later, always won, even while the condition
-  held);
-- the SAME atom emitted by two different `styled-ppx.generate`
-  invocations (two `<link>`s on one page) landing in a different
-  relative order to some OTHER sheet's conditional rule, depending only
-  on which `<link>` the browser happened to load last;
-- and a `[%styled.global]` default (`*{box-sizing:inherit}`, a global
-  `a{color:blue}`) beating an atom on the same element: an unlayered
-  normal declaration beats ANY layered one in CSS, regardless of layer
-  or specificity, so leaving globals unlayered while atoms are layered
-  would let a global default win over an atom that used to beat it by
-  ordinary specificity or source order.
+author's own global selector) - is emitted into one of THREE fixed-order
+groups: `global` (`[%styled.global]` rules), `base` (an atom's own,
+unconditional context), `conditional` (an atom wrapped in an at-rule, or
+carrying a pseudo-class/pseudo-element directly on its own selector - see
+"Classification" below), each group further ordered by "Sort, inside
+each tier" below. No CSS layer wraps any of the three: ordinary CSS
+cascade rules apply, SPECIFICITY first, emission position only as the
+tie-break - exactly like plain, unlayered CSS. Within `atoms`-shaped
+rules, tier order (base before conditional) fixes a real bug
+content-hash dedup and plain concatenation could not: a block's own
+`@media`/`:hover` override landing BEFORE its unconditional declaration
+in the deduplicated list (so the unconditional one, being later, always
+won, even while the condition held). Ordering by tier fixes this
+whenever the two competing rules are equally specific (the common case:
+two single-class atoms); a genuine specificity difference between a
+`base` and a `conditional` rule is decided by the browser's own cascade
+regardless of tier order - see "Classification" for the accepted
+consequence for a `[%styled.global]` rule.
 
 A descendant-shaped rule (`.wrapper * {color}`, `.list li {...}` -
 see "Sort, inside each tier" below for exactly what this means) stays
 in the tier of its own context, exactly like any other rule: it is not
 its own tier, and specificity decides between it and a child's own atom
-the same way it would without any layers at all.
+the same way it would with no tiers at all.
 
-Two sheets that both use these three fixed names agree on `global <
-base < conditional` regardless of load order, because CSS fixes
-cascade-layer order by each name's first occurrence across every
-stylesheet on the page, cumulatively - which is also why the statement
-lists all three names unconditionally even when this particular sheet
-only ever populates some of them: omitting an empty one would make this
-sheet's contribution to the OTHER tiers' priority depend on whether some
-other sheet already declared it first.
-
-**A real, documented behavior change**: a `[%styled.global]` selector
-with HIGHER specificity than an atom (`.theme-dark .card{color:green}` vs
-an atom `._a_card{color:blue}`) used to beat the atom outright -
-specificity is compared before source order, and unlayered vs. unlayered
-never considers layers at all. Now that `styled-ppx.global` is its own,
-lowest layer, layer order beats specificity entirely: the atom wins
-regardless of how specific the global selector is. An author whose
-global still needs to win uses `!important` (see below) - the same
-escape hatch every other tier already relies on.
+**Accepted limit: two separate stylesheets have no guaranteed relative
+order between their own tiered rules, when they share a class.**
+`--namespace` (see "Atomization" above) salts each library's atom
+classes, so two different libraries never mint the same one; sharing a
+class only happens for a native/Melange twin pair passing the same
+explicit `--namespace`, or for two runs with no namespace at all. When it
+does happen: two different `styled-ppx.generate` invocations (two
+`<link>`s on one page) simply concatenate on the page in load order,
+exactly like any two plain CSS files always have - so which sheet's rule
+ends up textually later, and therefore wins an equal-specificity tie
+against the OTHER sheet's rule, depends on load order, a page-authoring
+detail this aggregator has no visibility into. Each sheet's OWN tier
+order still holds internally (its own conditional rules still come after
+its own base rules, and its own atoms still come after its own globals);
+only the relative position of two DIFFERENT sheets' rules is unguaranteed
+- see `tiers-two-stylesheets.t`.
 
 **Classification**: a rule with NO atom class at all (see `atom_class_name`
-in `packages/generate/generate.ml`) is either a registration (stays
-outside every layer, see below) or a `[%styled.global]` rule, which is
-always `styled-ppx.global` - global rules never compete for the SAME
-base/conditional distinction an atom's own selector does, they are
-simply the floor every atom sits above. A rule WITH an atom class is
-classified per rendered rule (not per class, so two declarations of the
-same `_in_` bundle can land in different tiers) into exactly one of:
+in `packages/generate/generate.ml`) is either a registration (takes no
+part in tiering, see below) or a `[%styled.global]` rule, which is always
+`global` - global rules never compete for the SAME base/conditional
+distinction an atom's own selector does, they are simply always emitted
+before either tier. A rule WITH an atom class is classified per rendered
+rule (not per class, so two declarations of the same `_in_` bundle can
+land in different tiers) into exactly one of:
 
 - `Conditional`: the rule is wrapped in an at-rule (`@media`/`@supports`/
   `@container` are the only ones that ever wrap an atom class -
@@ -530,18 +523,27 @@ same `_in_` bundle can land in different tiers) into exactly one of:
   these two tiers the rule already landed in, see "Sort, inside each
   tier" below.
 
-`!important` needs no special handling here, but is worth naming
-explicitly: CSS compares declaration importance BEFORE layer order, and
-among `!important` declarations the EARLIEST-declared layer wins (the
-reverse of the normal-declaration rule, where the latest layer wins) - so
-an `!important` declaration in `styled-ppx.global` still beats a plain,
-non-`!important` declaration in a higher layer, despite `global` being
-the lowest layer for everything else. This is an intentional, spec-level
-escape hatch (an author who needs a global default to truly win uses
-`!important`, same as they always could to beat any unconditional rule),
-not a gap in this design - `styled-ppx.generate` only decides which
-layer a rule goes in, never how a browser weighs importance against
-layer order.
+None of `global`, `base` or `conditional` is wrapped in a CSS layer, so
+tier order between them is only ever a TIE-BREAK between equally specific
+rules - it never overrides a real specificity difference: an ancestor's
+own `base` rule with higher specificity than an unrelated `conditional`
+atom still wins, exactly as it would with no tiers at all, and a
+`[%styled.global]` rule with higher (or equal) specificity than an atom
+it targets (`.theme-dark .card{color:green}` vs an atom
+`._a_card{color:blue}`) wins too - an accepted consequence: an author
+whose atom must still win either raises its own specificity or uses
+`!important`, the same escape hatch plain CSS always offers.
+
+`!important` needs no special handling anywhere in this ordering, `global`
+included: importance is compared once, before specificity or position,
+then two `!important` declarations on the same property compete exactly
+like two plain ones do - specificity first, tier order (then the
+shorthand-depth sort) as the tie-break - see `tiers-important.t` for the
+responsive-override case (a component's `!important` base padding,
+narrowed by an `!important` media-query override of the same
+properties), and `global-tier.t` for the global-vs-atom cases: a more
+specific atom beats an `!important` global the same way it beats a plain
+one.
 
 **Sort, inside each tier**: a TOTAL per-rule key, `(descendant-shaped,
 shorthand depth)`, not a pairwise comparison between two rules. A
@@ -647,69 +649,20 @@ OTHER, unrelated rule that also happens to match the descendant element
 atom's own class" is a different, harder problem this sort does not
 fully solve.
 
-**Outside every tier, always**: `@property`, `@keyframes`, `@font-face`
-registrations, hoisted `@import`/`@namespace`, dropped `@charset`, and a
-literal, user-authored `@layer` at-rule (statement or block form) - none
-of these compete for an element in the cascade the way a `[%styled.
-global]` rule or an atom does, and nesting a literal `@layer` inside one
-of styled-ppx's own tiers would rescope whatever sub-layer name it
-declares, silently changing what the user's own statement means (the same
-hazard "Dedup and write" already explains for why it is never hoisted
-with `@import`/`@namespace` either). They are emitted exactly where they
-were before tiers existed: ahead of the tier statement, in whatever
-relative order dedup/ordering already gave them. A `[%styled.global]`
-rule is NOT in this list - it has no atom class either, but it IS a real,
-cascading rule, so it goes into `styled-ppx.global` (above), not outside
-every tier.
+**Takes no part in tiering, always**: `@property`, `@keyframes`,
+`@font-face` registrations, hoisted `@import`/`@namespace`, dropped
+`@charset`, and a literal, user-authored `@layer` at-rule (statement or
+block form) - none of these compete for an element in the cascade the
+way a `[%styled.global]` rule or an atom does. They are emitted exactly
+where they were before tiers existed: ahead of every tiered rule, in
+whatever relative order dedup/ordering already gave them. A
+`[%styled.global]` rule is NOT in this list - it has no atom class
+either, but it IS a real, cascading rule, so it is `global` (above).
 
-### Cascade layers (opt-in), nested inside tiers
-
-`--layers` (default off, and rejected together with `--order source`)
-wraps each tier's OWN rules into named per-library CSS cascade layers,
-nested one level inside that tier's `@layer styled-ppx.global { ... }` /
-`@layer styled-ppx.base { ... }` / `@layer styled-ppx.conditional { ... }`
-block - the outer tier statement above already settles
-global-vs-base-vs-conditional order before any library ordering is even
-consulted, so a library's conditional atom never has to out-rank a
-DIFFERENT library's base or global rule by accident. Inside each
-non-empty tier, one `@layer <lib1>, <lib2>, ...;` statement lists every
-library that still owns a rule IN THAT TIER, in the same dependency
-order as the default output, and then each such library's rules for
-that tier follow inside their own nested `@layer <lib> { ... }` block -
-the same per-library bucketing the unlayered case skips, just computed
-once per tier instead of once overall, so a library can get a block in
-one tier and none in another. A group with nothing left to wrap in a
-given tier gets no block and no name in that tier's statement, same
-rule as before tiers existed. A tier with no rule in this sheet at all
-gets no `@layer <lib1>, ...;` statement and no library blocks either -
-only the OUTER, three-name tier statement is unconditional; a
-per-library statement inside an empty tier would have nothing to say.
-`@property`/`@keyframes`/
-`@font-face` registrations and a literal `@layer` at-rule stay outside
-every tier and every library layer, exactly as before tiers existed: a
-`@property` inside a layer would make the registration itself depend on
-layer order, and a `@keyframes` name lookup would too.
-
-Layering rules changes how they interact with hand-written CSS, which is
-why the flag defaults to off. An unlayered declaration always beats a
-layered one, however low that layer sits, because the cascade only
-compares layers when both competing declarations are themselves inside a
-layer; a normal, non-`!important` layered rule loses to any unlayered
-rule regardless of specificity or source order. `!important` inverts
-that: an `!important` declaration in a layer beats an unlayered
-`!important` declaration, and among layers the earliest-declared layer
-wins for `!important` (the opposite of the normal-declaration order,
-where the latest layer wins) - this applies to the mandatory
-`styled-ppx.global`/`.base`/`.conditional` tiers too, `--layers` or not;
-not addressed by this change, flagged here rather than silently ignored
-(see "Cascade tiers" above for the specific global `!important`
-interaction). A consumer that turns `--layers` on has to put its own
-hand-written CSS — resets, palettes, fonts, an inline global stylesheet
-not routed through `[%styled.global]` at all — into a layer declared
-before the generated ones (before `styled-ppx.global`, the
-first-declared of the three, now that they always exist), or that CSS's
-plain declarations stop overriding anything the generated, now-layered
-rules set.
+`--layers` is not a recognized flag: passing it is rejected the same way
+any other unrecognized flag is. Two different libraries' rules compete
+the same way `base`/`conditional`/`global` do - ordinary specificity
+first, emission position (dependency order) as the tie-break.
 
 ## Atomization
 
@@ -752,13 +705,21 @@ selector/at-rule, or when the declaration carries `!important` - see
 append-only table, an optional mask of which of the family's longhands
 this atom covers, and a short value hash unique only within that
 (context, family[, mask]) bucket - not globally, which is what lets it
-be short. `styled-ppx.generate` checks that uniqueness (see the atom
-class collision check under "Dedup and write" above). The binding's
-`let` name never appears in the class name either way; two bindings
-whose declarations render to the same CSS text in the same context mint
-the same class, dev or production. Minting lives in
-`packages/ppx/src/Hash_class.ml` (`Class_format.slot_class`); the
-`(context, family, mask)` triple comes from `packages/ppx/slot_key`.
+be short. The value hash is computed over the rendered declaration
+salted with `--namespace` (see "Identity classes" below - the same flag,
+defaulting the same way, now salts atom and bundle classes too, not just
+identities): two libraries with different namespaces never share an
+atom class for the same declaration, even byte-identical, so one
+library's stylesheet position can never decide a tie against another
+library's own override of it. `styled-ppx.generate` checks the
+per-bucket uniqueness this leaves (see the atom class collision check
+under "Dedup and write" above). The binding's `let` name never appears
+in the class name either way; two bindings whose declarations render to
+the same CSS text in the same context AND namespace mint the same
+class, dev or production. Minting lives in `packages/ppx/src/Hash_class.ml`
+(`Class_format.slot_class`); the `(context, family, mask)` triple comes
+from `packages/ppx/slot_key` and is never itself salted - only the value
+field's hash input is.
 An alias (`grid-row-gap` for `row-gap`, one of two legs of `gap`) resolves
 to its canonical name before its mask is computed too, the same redirect
 `Slot_key.depth_of` already does for sort order (see "Cascade tiers"
@@ -789,7 +750,10 @@ otherwise need separate custom-property namespaces for what is often the
 same value reused across `base`/`:hover`/`@media` variants. A bundle's own
 `var(--...)` target is unaffected by which prefix its class carries,
 since only the CLASS half of `Hash_class.class_and_namespace` differs
-between the two cases, never the namespace/variable-naming half. The
+between the two cases, never the namespace/variable-naming half - and
+that CLASS half is salted with `--namespace` exactly like a real atom's
+value field (`Hash_class.bundle_class_and_namespace`), so two libraries
+never share a bundle class either. The
 `_in_` prefix lets `CSS.merge` (see below) recognize a bundle atom and
 never drop it or let it drop another atom, and lets
 `styled-ppx.generate`'s atom-class collision check ("Dedup and write"
@@ -819,6 +783,10 @@ Two consequences worth knowing:
    the specificity note below).
 
 ## CSS.merge
+
+See `documents/how-merging-works.md` for the user-facing version of this
+section (the promise, worked examples, and the known limits, without the
+implementation detail below).
 
 `CSS.merge(a, b)` drops a class of `a` when a class of `b` covers the
 same slot - same context, same property family, and `a`'s longhands a
@@ -904,10 +872,11 @@ first among the atoms in the className string (after the `label:<binding>`
 dev marker, when present): `label:<binding> _id_<hash> _a_<hash> ...`.
 
 **Inputs**, joined with `\0` and murmur2-hashed: the `--namespace` flag
-value (empty by default), the compilation-unit module name (the source
+value (see below), the compilation-unit module name (the source
 file's basename, capitalized — never a physical path or dune library
 name, so a module compiled twice under different paths, e.g. a native
-and a Melange build via `copy_files`, mints the same identity), the
+and a Melange build via `copy_files`, mints the same identity when both
+share a namespace), the
 enclosing submodule path, the binding name (or `[%styled.<tag>]` module
 name), and an occurrence index — folded in only when a
 `(scope, name)` pair repeats within one compilation unit (e.g. two
@@ -920,13 +889,27 @@ inside them is lowered), so the css under it takes the enclosing user
 binding's name for its label, dev marker and identity
 (`packages/ppx/test/css-support/styles-optional-className.t`).
 
-**`--namespace <string>`** is a PPX flag, mixed into every identity hash
-in the same library-wide way as `--dev`/`--minify`. Two libraries whose
-modules happen to share a basename and binding name would otherwise mint
-colliding identities; passing each library a distinct `--namespace`
-(identically on its native and Melange `(pps styled-ppx ...)` stanzas)
-tells them apart. See "Identity collision" under Resolve for what
-happens when they aren't.
+**`--namespace=<string>`** is a PPX flag, mixed into every identity
+(`_id_`), atom (`_a_`) and bundle (`_in_`) class hash in the same
+library-wide way as `--dev`/`--minify` (see "Atomization" above). In a
+dune `(pps ...)` list write it as one token, `--namespace=<string>`:
+dune reads a separate value token as a PPX library name. It defaults to the dune `library-name` cookie
+(`Settings.Get.namespace`, `packages/ppx/src/settings.re`) - the same
+cookie `[@@@css.config]`'s `library-name` entry already carries - so
+each dune library salts its own classes with no flag needed, and never
+collides with another library's byte-identical declaration on a page
+that links both (see "Class names" above). With neither the cookie nor
+the flag (e.g. the standalone driver run with no `-cookie`, as every
+css-support cram test does), the namespace is empty and adds nothing to
+the hash input. An explicit `--namespace` overrides the
+cookie: pass one shared value to both a native library and its Melange
+twin's `(pps styled-ppx ...)` stanzas (`copy_files` gives them different
+dune library names by default) so they keep minting identical atom and
+identity classes; pass two libraries with no dune cookie distinct
+values to tell them apart the way this flag always has
+(`packages/ppx/test/css-support/atom-namespace-twin.t`,
+`identity-library-namespace.t`). See "Identity collision" under Resolve
+for what happens when two libraries collide anyway.
 
 **Empty markers.** A named binding with no declarations (`let m = [%css
 {||}]`) still mints an identity — its `class_string` is `""` and no
@@ -968,6 +951,8 @@ actually drops.
 
 ## See also
 
+- `documents/how-merging-works.md` — `CSS.merge`, sheet order, and
+  `--namespace`, for library users
 - `documents/design.md` — overall CSS pipeline (parsing, validation,
   generation) and the `[%styled.global]` / selector-interpolation
   design in depth

@@ -4107,17 +4107,12 @@ end
 
 module BorderShape = struct
   (* MDN syntax: 'none' | [ <basic-shape> <geometry-box>? ]{1,2}
-     Interpolation only carries the <geometry-box> half, matching ClipPath's
-     own simplification above - <basic-shape> is not yet a runtime type. *)
-  type t =
-    [ None.t
-    | GeometryBox.t
-    ]
+     <geometry-box> can only follow a <basic-shape>, so it has no standalone
+     interpolation value here; <basic-shape> has no runtime type yet (same
+     limit as ClipPath), so only 'none' is interpolatable for now. *)
+  type t = None.t
 
-  let toString x =
-    match x with
-    | #None.t -> None.toString
-    | #GeometryBox.t as gb -> GeometryBox.toString gb
+  let toString x = match x with #None.t -> None.toString
 end
 
 module BackfaceVisibility = struct
@@ -9412,6 +9407,7 @@ module ScrollTimelineAxis = struct
 end
 
 module ScrollTimelineName = AnimationName
+module ScrollAxisLock = FontOpticalSizing
 module ScrollbarColorLegacy = Color
 module ShapeImageThreshold = Opacity
 module ShapeMargin = Length

@@ -21,10 +21,11 @@ let make className vars : styles =
 
 (* Drop a class of [styles1] when a class of [styles2] covers the same
    merge-key slot (context + family, [styles1]'s longhands a subset of
-   [styles2]'s) - see [Merge_key.removes]. A bundle ([in-]), identity
-   ([id-]), `label:<binding>` marker, or any class this module can't parse
+   [styles2]'s) - see [Merge_key.removes]. A bundle ([_in_]), identity
+   ([_id_]), `label:<binding>` marker, or any class this module can't parse
    is never dropped and never drops anything else; [styles2]'s own classes
-   are never dropped either way. *)
+   are never dropped either way. See `documents/how-merging-works.md` for
+   the full rule, worked examples, and known limits. *)
 let merge (styles1 : styles) (styles2 : styles) =
   let className = Merge_key.merge_class_names (fst styles1) (fst styles2) in
   let style = ReactDOM.Style.combine (snd styles1) (snd styles2) in
