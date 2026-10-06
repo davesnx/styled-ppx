@@ -181,6 +181,46 @@ let expected_shorthands: list((string, list(string))) = [
       "border-bottom-left-radius",
     ],
   ),
+  /* CSS Borders and Box Decorations L4: https://drafts.csswg.org/css-borders-4/
+     border-block-start-radius/-block-end-radius/-inline-start-radius/
+     -inline-end-radius are registered as plain properties, not shorthands
+     here: see CHANGES.md - each would union two of the pre-existing
+     logical radius leaves above, and since all four together transitively
+     cover all four leaves, that would move those leaves into one new
+     shared family instead of keeping their own. */
+  (
+    "border-top-radius",
+    ["border-top-left-radius", "border-top-right-radius"],
+  ),
+  (
+    "border-right-radius",
+    ["border-top-right-radius", "border-bottom-right-radius"],
+  ),
+  (
+    "border-bottom-radius",
+    ["border-bottom-left-radius", "border-bottom-right-radius"],
+  ),
+  (
+    "border-left-radius",
+    ["border-top-left-radius", "border-bottom-left-radius"],
+  ),
+  (
+    "border-block-clip",
+    ["border-block-start-clip", "border-block-end-clip"],
+  ),
+  (
+    "border-inline-clip",
+    ["border-inline-start-clip", "border-inline-end-clip"],
+  ),
+  (
+    "border-clip",
+    [
+      "border-top-clip",
+      "border-right-clip",
+      "border-bottom-clip",
+      "border-left-clip",
+    ],
+  ),
   (
     "border-image",
     [
@@ -360,13 +400,97 @@ let expected_shorthands: list((string, list(string))) = [
   ("place-items", ["align-items", "justify-items"]),
   ("place-self", ["align-self", "justify-self"]),
   ("overflow", ["overflow-x", "overflow-y"]),
+  (
+    "overflow-clip-margin",
+    [
+      "overflow-clip-margin-top",
+      "overflow-clip-margin-right",
+      "overflow-clip-margin-bottom",
+      "overflow-clip-margin-left",
+    ],
+  ),
+  (
+    "overflow-clip-margin-block",
+    ["overflow-clip-margin-block-start", "overflow-clip-margin-block-end"],
+  ),
+  (
+    "overflow-clip-margin-inline",
+    ["overflow-clip-margin-inline-start", "overflow-clip-margin-inline-end"],
+  ),
   ("flex", ["flex-grow", "flex-shrink", "flex-basis"]),
   ("flex-flow", ["flex-direction", "flex-wrap"]),
   ("columns", ["column-width", "column-count", "column-height"]),
+  /* CSS Rhythmic Sizing L1. max-size/min-size (CSS Box Sizing L4) are
+     registered as plain properties, not shorthands: see CHANGES.md. */
+  (
+    "block-step",
+    [
+      "block-step-size",
+      "block-step-insert",
+      "block-step-align",
+      "block-step-round",
+    ],
+  ),
   (
     "column-rule",
     ["column-rule-color", "column-rule-style", "column-rule-width"],
   ),
+  /* CSS Gaps L1: https://drafts.csswg.org/css-gaps-1/ */
+  (
+    "column-rule-inset-cap",
+    ["column-rule-inset-cap-start", "column-rule-inset-cap-end"],
+  ),
+  (
+    "column-rule-inset-junction",
+    ["column-rule-inset-junction-start", "column-rule-inset-junction-end"],
+  ),
+  (
+    "column-rule-inset-start",
+    ["column-rule-inset-cap-start", "column-rule-inset-junction-start"],
+  ),
+  (
+    "column-rule-inset-end",
+    ["column-rule-inset-cap-end", "column-rule-inset-junction-end"],
+  ),
+  (
+    "column-rule-inset",
+    ["column-rule-inset-cap", "column-rule-inset-junction"],
+  ),
+  ("row-rule", ["row-rule-color", "row-rule-style", "row-rule-width"]),
+  (
+    "row-rule-inset-cap",
+    ["row-rule-inset-cap-start", "row-rule-inset-cap-end"],
+  ),
+  (
+    "row-rule-inset-junction",
+    ["row-rule-inset-junction-start", "row-rule-inset-junction-end"],
+  ),
+  (
+    "row-rule-inset-start",
+    ["row-rule-inset-cap-start", "row-rule-inset-junction-start"],
+  ),
+  (
+    "row-rule-inset-end",
+    ["row-rule-inset-cap-end", "row-rule-inset-junction-end"],
+  ),
+  ("row-rule-inset", ["row-rule-inset-cap", "row-rule-inset-junction"]),
+  ("rule", ["column-rule", "row-rule"]),
+  ("rule-break", ["column-rule-break", "row-rule-break"]),
+  ("rule-color", ["column-rule-color", "row-rule-color"]),
+  ("rule-style", ["column-rule-style", "row-rule-style"]),
+  ("rule-width", ["column-rule-width", "row-rule-width"]),
+  (
+    "rule-visibility-items",
+    ["column-rule-visibility-items", "row-rule-visibility-items"],
+  ),
+  ("rule-inset-cap", ["column-rule-inset-cap", "row-rule-inset-cap"]),
+  (
+    "rule-inset-junction",
+    ["column-rule-inset-junction", "row-rule-inset-junction"],
+  ),
+  ("rule-inset-end", ["column-rule-inset-end", "row-rule-inset-end"]),
+  ("rule-inset", ["column-rule-inset", "row-rule-inset"]),
+  ("rule-inset-start", ["column-rule-inset-start", "row-rule-inset-start"]),
   (
     "mask",
     [

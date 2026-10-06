@@ -35,9 +35,11 @@ If this test fail means that the module is not in sync with the ppx
     "._a_4l002szib{-webkit-column-rule-style:dotted;column-rule-style:dotted;}"
   ];
   [@css "._a_4l0048iyd{-webkit-column-rule-width:1px;column-rule-width:1px;}"];
-  [@css "._a_4ly1fb{-webkit-column-rule:transparent;column-rule:transparent;}"];
   [@css
-    "._a_4lh5u6{-webkit-column-rule:1px solid black;column-rule:1px solid black;}"
+    "._a_4l007y1fb{-webkit-column-rule:transparent;column-rule:transparent;}"
+  ];
+  [@css
+    "._a_4l007h5u6{-webkit-column-rule:1px solid black;column-rule:1px solid black;}"
   ];
   [@css "._a_4mzc18{-webkit-column-span:none;column-span:none;}"];
   [@css "._a_4me1k2{-webkit-column-span:all;column-span:all;}"];
@@ -62,8 +64,8 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("_a_4l0022g8z", []);
   CSS.make("_a_4l002szib", []);
   CSS.make("_a_4l0048iyd", []);
-  CSS.make("_a_4ly1fb", []);
-  CSS.make("_a_4lh5u6", []);
+  CSS.make("_a_4l007y1fb", []);
+  CSS.make("_a_4l007h5u6", []);
   CSS.make("_a_4mzc18", []);
   CSS.make("_a_4me1k2", []);
   CSS.make("_a_4kub2p", []);

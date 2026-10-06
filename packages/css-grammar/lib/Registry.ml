@@ -26,6 +26,8 @@ let registry : (kind * packed_rule) list =
       Properties.BaselineSource.entries;
       Properties.BlockSize.entries;
       Properties.BlockOverflow.entries;
+      Properties.BlockStep.entries;
+      Properties.Bookmark.entries;
       Properties.Border.entries;
       Properties.Bottom.entries;
       Properties.Box.entries;
@@ -64,6 +66,7 @@ let registry : (kind * packed_rule) list =
       Properties.Font.entries;
       Properties.ForcedColorAdjust.entries;
       Properties.Gap.entries;
+      Properties.GapRule.entries;
       Properties.Glyph.entries;
       Properties.Grid.entries;
       Properties.HangingPunctuation.entries;
@@ -74,6 +77,7 @@ let registry : (kind * packed_rule) list =
       Properties.Hyphens.entries;
       Properties.Ime.entries;
       Properties.Image.entries;
+      Properties.ImageAnimation.entries;
       Properties.InitialLetter.entries;
       Properties.InitialLetterAlign.entries;
       Properties.InlineSize.entries;
@@ -87,6 +91,7 @@ let registry : (kind * packed_rule) list =
       Properties.LetterSpacing.entries;
       Properties.LightingColor.entries;
       Properties.Line.entries;
+      Properties.LineGrid.entries;
       Properties.Layout.entries;
       Properties.ListProperties.entries;
       Properties.Margin.entries;
@@ -122,11 +127,13 @@ let registry : (kind * packed_rule) list =
       Properties.R.entries;
       Properties.ReadingFlow.entries;
       Properties.ReadingOrder.entries;
+      Properties.Regions.entries;
       Properties.Rest.entries;
       Properties.Resize.entries;
       Properties.Right.entries;
       Properties.Rotate.entries;
       Properties.RowGap.entries;
+      Properties.RowRule.entries;
       Properties.Ruby.entries;
       Properties.Rx.entries;
       Properties.Ry.entries;
@@ -134,6 +141,7 @@ let registry : (kind * packed_rule) list =
       Properties.Scroll.entries;
       Properties.Shape.entries;
       Properties.Size.entries;
+      Properties.SpatialNavigation.entries;
       Properties.SpeakAs.entries;
       Properties.StopColor.entries;
       Properties.StopOpacity.entries;
@@ -161,6 +169,7 @@ let registry : (kind * packed_rule) list =
       Properties.Widows.entries;
       Properties.Width.entries;
       Properties.WillChange.entries;
+      Properties.WindowDrag.entries;
       Properties.WordBreak.entries;
       Properties.WordWrap.entries;
       Properties.WordSpacing.entries;
