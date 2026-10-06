@@ -6,7 +6,7 @@ to register, so no consumer can reference them via `$(...)`.
 
 (2) A named `let` binding — including `let _a = ...`, where the
 leading underscore only suppresses unused-variable warnings — mints a
-deterministic synthetic class `css-<hash-of-empty>-<binding>` so
+deterministic synthetic class `a-<hash-of-empty>-<binding>` so
 `let m = [%css {||}]` produces a real handle that a sibling [%css]
 block can target via `&.$(m)`. No `[@@@css ...]` rule is emitted
 because there's nothing to write. See
@@ -26,22 +26,22 @@ selector-class-interpolation-empty.t for the full end-to-end behavior.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css.bindings [("Input._a", "cid-1gt4t9l", "")]];
+  [@css.bindings [("Input._a", "_id_1gt4t9l", "")]];
   CSS.make("", []);
   CSS.make("", []);
   CSS.make("", []);
   
   let _ = CSS.make("", []);
   
-  let _a = CSS.make("label:_a cid-1quemw0", []);
-  let _a = CSS.make("label:_a cid-s7r0d8", []);
-  let _a = CSS.make("label:_a cid-g7564k", []);
+  let _a = CSS.make("label:_a _id_1quemw0", []);
+  let _a = CSS.make("label:_a _id_s7r0d8", []);
+  let _a = CSS.make("label:_a _id_g7564k", []);
   
-  let _a = CSS.make("label:_a cid-i8v0tw", []);
+  let _a = CSS.make("label:_a _id_i8v0tw", []);
   
-  let _a = CSS.make("label:_a cid-gyvl29", []);
+  let _a = CSS.make("label:_a _id_gyvl29", []);
   
-  let _a = CSS.make("label:_a cid-1gt4t9l", []);
+  let _a = CSS.make("label:_a _id_1gt4t9l", []);
 
 
 

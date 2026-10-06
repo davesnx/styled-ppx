@@ -10,14 +10,14 @@ same as before.
   $ ../../standalone.exe --dev --minify --impl input.ml -o dev-minify.ml
   $ cat dev-minify.ml
   [@@@css.config [("env", "production")]]
-  [@@@css ".css-k008qs{display:flex;}"]
-  [@@@css ".css-38zrbw{padding:12px;}"]
-  [@@@css ".css-tokvmb{color:red;}"]
+  [@@@css "._a_5r08qs{display:flex;}"]
+  [@@@css "._a_94zrbw{padding:12px;}"]
+  [@@@css "._a_4ekvmb{color:red;}"]
   [@@@css.bindings
-    [("Input.layout", "cid-1jj5tmt", "css-k008qs css-38zrbw");
-    ("Input.button", "cid-l55coe", "css-tokvmb")]]
-  let layout = CSS.make "label:layout cid-1jj5tmt css-k008qs css-38zrbw" []
-  let button = CSS.make "label:button cid-l55coe css-tokvmb" []
+    [("Input.layout", "_id_1jj5tmt", "_a_5r08qs _a_94zrbw");
+    ("Input.button", "_id_l55coe", "_a_4ekvmb")]]
+  let layout = CSS.make "label:layout _id_1jj5tmt _a_5r08qs _a_94zrbw" []
+  let button = CSS.make "label:button _id_l55coe _a_4ekvmb" []
   let _ = (layout, button)
 
 --minify --dev (the other order) keeps the marker too:
@@ -25,14 +25,14 @@ same as before.
   $ ../../standalone.exe --minify --dev --impl input.ml -o minify-dev.ml
   $ cat minify-dev.ml
   [@@@css.config [("env", "production")]]
-  [@@@css ".css-k008qs{display:flex;}"]
-  [@@@css ".css-38zrbw{padding:12px;}"]
-  [@@@css ".css-tokvmb{color:red;}"]
+  [@@@css "._a_5r08qs{display:flex;}"]
+  [@@@css "._a_94zrbw{padding:12px;}"]
+  [@@@css "._a_4ekvmb{color:red;}"]
   [@@@css.bindings
-    [("Input.layout", "cid-1jj5tmt", "css-k008qs css-38zrbw");
-    ("Input.button", "cid-l55coe", "css-tokvmb")]]
-  let layout = CSS.make "label:layout cid-1jj5tmt css-k008qs css-38zrbw" []
-  let button = CSS.make "label:button cid-l55coe css-tokvmb" []
+    [("Input.layout", "_id_1jj5tmt", "_a_5r08qs _a_94zrbw");
+    ("Input.button", "_id_l55coe", "_a_4ekvmb")]]
+  let layout = CSS.make "label:layout _id_1jj5tmt _a_5r08qs _a_94zrbw" []
+  let button = CSS.make "label:button _id_l55coe _a_4ekvmb" []
   let _ = (layout, button)
 
 --dev --env production keeps the marker:
@@ -40,14 +40,14 @@ same as before.
   $ ../../standalone.exe --dev --env production --impl input.ml -o dev-prod.ml
   $ cat dev-prod.ml
   [@@@css.config [("env", "production")]]
-  [@@@css ".css-k008qs{display:flex;}"]
-  [@@@css ".css-38zrbw{padding:12px;}"]
-  [@@@css ".css-tokvmb{color:red;}"]
+  [@@@css "._a_5r08qs{display:flex;}"]
+  [@@@css "._a_94zrbw{padding:12px;}"]
+  [@@@css "._a_4ekvmb{color:red;}"]
   [@@@css.bindings
-    [("Input.layout", "cid-1jj5tmt", "css-k008qs css-38zrbw");
-    ("Input.button", "cid-l55coe", "css-tokvmb")]]
-  let layout = CSS.make "label:layout cid-1jj5tmt css-k008qs css-38zrbw" []
-  let button = CSS.make "label:button cid-l55coe css-tokvmb" []
+    [("Input.layout", "_id_1jj5tmt", "_a_5r08qs _a_94zrbw");
+    ("Input.button", "_id_l55coe", "_a_4ekvmb")]]
+  let layout = CSS.make "label:layout _id_1jj5tmt _a_5r08qs _a_94zrbw" []
+  let button = CSS.make "label:button _id_l55coe _a_4ekvmb" []
   let _ = (layout, button)
 
 --env production --dev (the other order) keeps the marker too:
@@ -55,14 +55,14 @@ same as before.
   $ ../../standalone.exe --env production --dev --impl input.ml -o prod-dev.ml
   $ cat prod-dev.ml
   [@@@css.config [("env", "production")]]
-  [@@@css ".css-k008qs{display:flex;}"]
-  [@@@css ".css-38zrbw{padding:12px;}"]
-  [@@@css ".css-tokvmb{color:red;}"]
+  [@@@css "._a_5r08qs{display:flex;}"]
+  [@@@css "._a_94zrbw{padding:12px;}"]
+  [@@@css "._a_4ekvmb{color:red;}"]
   [@@@css.bindings
-    [("Input.layout", "cid-1jj5tmt", "css-k008qs css-38zrbw");
-    ("Input.button", "cid-l55coe", "css-tokvmb")]]
-  let layout = CSS.make "label:layout cid-1jj5tmt css-k008qs css-38zrbw" []
-  let button = CSS.make "label:button cid-l55coe css-tokvmb" []
+    [("Input.layout", "_id_1jj5tmt", "_a_5r08qs _a_94zrbw");
+    ("Input.button", "_id_l55coe", "_a_4ekvmb")]]
+  let layout = CSS.make "label:layout _id_1jj5tmt _a_5r08qs _a_94zrbw" []
+  let button = CSS.make "label:button _id_l55coe _a_4ekvmb" []
   let _ = (layout, button)
 
 Without --dev, --minify alone still turns the marker off:
@@ -70,14 +70,14 @@ Without --dev, --minify alone still turns the marker off:
   $ ../../standalone.exe --minify --impl input.ml -o minify-only.ml
   $ cat minify-only.ml
   [@@@css.config [("env", "production")]]
-  [@@@css ".css-k008qs{display:flex;}"]
-  [@@@css ".css-38zrbw{padding:12px;}"]
-  [@@@css ".css-tokvmb{color:red;}"]
+  [@@@css "._a_5r08qs{display:flex;}"]
+  [@@@css "._a_94zrbw{padding:12px;}"]
+  [@@@css "._a_4ekvmb{color:red;}"]
   [@@@css.bindings
-    [("Input.layout", "cid-1jj5tmt", "css-k008qs css-38zrbw");
-    ("Input.button", "cid-l55coe", "css-tokvmb")]]
-  let layout = CSS.make "cid-1jj5tmt css-k008qs css-38zrbw" []
-  let button = CSS.make "cid-l55coe css-tokvmb" []
+    [("Input.layout", "_id_1jj5tmt", "_a_5r08qs _a_94zrbw");
+    ("Input.button", "_id_l55coe", "_a_4ekvmb")]]
+  let layout = CSS.make "_id_1jj5tmt _a_5r08qs _a_94zrbw" []
+  let button = CSS.make "_id_l55coe _a_4ekvmb" []
   let _ = (layout, button)
 
 Without --dev, --env production alone still turns the marker off:
@@ -85,12 +85,12 @@ Without --dev, --env production alone still turns the marker off:
   $ ../../standalone.exe --env production --impl input.ml -o prod-only.ml
   $ cat prod-only.ml
   [@@@css.config [("env", "production")]]
-  [@@@css ".css-k008qs{display:flex;}"]
-  [@@@css ".css-38zrbw{padding:12px;}"]
-  [@@@css ".css-tokvmb{color:red;}"]
+  [@@@css "._a_5r08qs{display:flex;}"]
+  [@@@css "._a_94zrbw{padding:12px;}"]
+  [@@@css "._a_4ekvmb{color:red;}"]
   [@@@css.bindings
-    [("Input.layout", "cid-1jj5tmt", "css-k008qs css-38zrbw");
-    ("Input.button", "cid-l55coe", "css-tokvmb")]]
-  let layout = CSS.make "cid-1jj5tmt css-k008qs css-38zrbw" []
-  let button = CSS.make "cid-l55coe css-tokvmb" []
+    [("Input.layout", "_id_1jj5tmt", "_a_5r08qs _a_94zrbw");
+    ("Input.button", "_id_l55coe", "_a_4ekvmb")]]
+  let layout = CSS.make "_id_1jj5tmt _a_5r08qs _a_94zrbw" []
+  let button = CSS.make "_id_l55coe _a_4ekvmb" []
   let _ = (layout, button)

@@ -5,31 +5,32 @@ verbatim - no Cascading.toString wrap.
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css "@property --colorStr-t58soe{syntax:\"*\";inherits:false;}"];
-  [@css "@property --colorStr-11d7je1{syntax:\"*\";inherits:false;}"];
-  [@css "@property --plainStr-1cgr13y{syntax:\"*\";inherits:false;}"];
+  [@css "@property --plainStr-vbhzka{syntax:\"*\";inherits:false;}"];
   [@css "@property --value-13tu4ef{syntax:\"*\";inherits:false;}"];
-  [@css ".css-14o54yy{--color-link:var(--colorStr-t58soe);}"];
-  [@css ".css-10nqctf{--color-link:var(--colorStr-11d7je1);}"];
-  [@css ".css-10nqctf{--spacing:var(--plainStr-1cgr13y);}"];
-  [@css ".css-zwwqpt{--token:var(--value-13tu4ef);}"];
+  [@css "._a_zy7gz1zq54yy{--color-link:var(--colorStr-t58soe);}"];
+  [@css "._a_zy4gc55zkohh{--spacing:var(--plainStr-vbhzka);}"];
+  [@css "._a_zyqed1fpwqpt{--token:var(--value-13tu4ef);}"];
   [@css.bindings
     [
-      ("Output.row", "cid-z61k1z", "css-14o54yy"),
-      ("Output.theme", "cid-r5u180", "css-10nqctf"),
-      ("Output.dyn", "cid-soz37v", "css-zwwqpt"),
+      ("Output.row", "_id_z61k1z", "_a_zy7gz1zq54yy"),
+      ("Output.theme", "_id_r5u180", "_a_zy7gz1zq54yy _a_zy4gc55zkohh"),
+      ("Output.dyn", "_id_soz37v", "_a_zyqed1fpwqpt"),
     ]
   ];
   let colorStr = CSS.Types.Color.toString(`hex("3A57FC"));
   let plainStr = "10px";
   let row =
     CSS.make(
-      "label:row cid-z61k1z css-14o54yy",
+      "label:row _id_z61k1z _a_zy7gz1zq54yy",
       [("--colorStr-t58soe", colorStr)],
     );
   let theme =
     CSS.make(
-      "label:theme cid-r5u180 css-10nqctf",
-      [("--colorStr-11d7je1", colorStr), ("--plainStr-1cgr13y", plainStr)],
+      "label:theme _id_r5u180 _a_zy7gz1zq54yy _a_zy4gc55zkohh",
+      [("--colorStr-t58soe", colorStr), ("--plainStr-vbhzka", plainStr)],
     );
   let dyn = value =>
-    CSS.make("label:dyn cid-soz37v css-zwwqpt", [("--value-13tu4ef", value)]);
+    CSS.make(
+      "label:dyn _id_soz37v _a_zyqed1fpwqpt",
+      [("--value-13tu4ef", value)],
+    );

@@ -92,7 +92,20 @@ let property_background_size : property_background_size Rule.rule =
 let entries : (kind * packed_rule) list =
   [
     Property "background-color", pack_module (module Property_background_color);
-    Property "background", pack_module (module Property_background);
+    (* Backgrounds and Borders L3 (background): https://www.w3.org/TR/css-backgrounds-3/#the-background *)
+    ( Shorthand
+        ( "background",
+          [
+            "background-image";
+            "background-position";
+            "background-size";
+            "background-repeat";
+            "background-origin";
+            "background-clip";
+            "background-attachment";
+            "background-color";
+          ] ),
+      pack_module (module Property_background) );
     ( Property "background-attachment",
       pack_module (module Property_background_attachment) );
     ( Property "background-blend-mode",
@@ -101,7 +114,10 @@ let entries : (kind * packed_rule) list =
     Property "background-image", pack_module (module Property_background_image);
     ( Property "background-origin",
       pack_module (module Property_background_origin) );
-    ( Property "background-position",
+    (* Backgrounds L4 draft, background-position-x/-y (shipped cross-browser for years before standardization): https://drafts.csswg.org/css-backgrounds-4/#the-background-position *)
+    ( Shorthand
+        ( "background-position",
+          [ "background-position-x"; "background-position-y" ] ),
       pack_module (module Property_background_position) );
     ( Property "background-position-x",
       pack_module (module Property_background_position_x) );

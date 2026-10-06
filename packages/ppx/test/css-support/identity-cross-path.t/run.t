@@ -8,7 +8,7 @@ twice under different paths - Dune `copy_files` into a Melange build dir,
 vendoring, or a native (SSR) build plus a Melange (client) build of one
 file. The identity is namespaced on the compilation-unit module name
 (`Marker`), never the physical path, so both builds mint the same
-`cid-...` and a `$(marker)` reference resolves identically on either side.
+`_id_...` and a `$(marker)` reference resolves identically on either side.
 
   $ mkdir -p native js
   $ cp Marker.re native/Marker.re
@@ -21,12 +21,12 @@ file. The identity is namespaced on the compilation-unit module name
 Both paths mint the same identity:
 
   $ cat native/Marker.ml
-  [@@@css ".css-tokvmb{color:red;}"]
-  [@@@css.bindings [("Marker.marker", "cid-1ja89pc", "css-tokvmb")]]
-  let marker = CSS.make "label:marker cid-1ja89pc css-tokvmb" []
+  [@@@css "._a_4ekvmb{color:red;}"]
+  [@@@css.bindings [("Marker.marker", "_id_1ja89pc", "_a_4ekvmb")]]
+  let marker = CSS.make "label:marker _id_1ja89pc _a_4ekvmb" []
   let _ = marker
   $ cat js/Marker.ml
-  [@@@css ".css-tokvmb{color:red;}"]
-  [@@@css.bindings [("Marker.marker", "cid-1ja89pc", "css-tokvmb")]]
-  let marker = CSS.make "label:marker cid-1ja89pc css-tokvmb" []
+  [@@@css "._a_4ekvmb{color:red;}"]
+  [@@@css.bindings [("Marker.marker", "_id_1ja89pc", "_a_4ekvmb")]]
+  let marker = CSS.make "label:marker _id_1ja89pc _a_4ekvmb" []
   let _ = marker

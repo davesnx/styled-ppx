@@ -11,48 +11,52 @@ atom makes the winner an intra-atom decision, immune to position, dedup,
 and cross-binding hash sharing. Single declarations keep the historical
 atom shape and hash.
 
+The same grouping mechanism is keyed by property FAMILY, not literal
+property name, so a shorthand mixed with its own longhand groups the
+same way (`shorthandReset` below) - see `reason-family-atoms.t` for that
+as the main subject, across properties that never repeat.
+
   $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
   [@@@css "@property --c-kv4uq2{syntax:\"*\";inherits:false;}"]
-  [@@@css ".css-ztpkbn{color:blue;color:red;color:blue;}"]
-  [@@@css ".css-17ax8u2{display:-webkit-box;display:flex;}"]
-  [@@@css ".css-1uk1gs8{margin:0;}"]
-  [@@@css ".css-dhb7kq{color:blue;color:red;}"]
-  [@@@css "@media (min-width: 600px) {.css-1g5p0x6{color:green;}}"]
-  [@@@css ".css-odz94x{margin-top:5px;}"]
-  [@@@css ".css-19xrixt{margin:0;margin:10px;}"]
-  [@@@css ".css-1e7bukr:hover{color:blue;color:red;}"]
-  [@@@css ".css-mngo80:hover{color:red;}"]
-  [@@@css ".css-zkbrel{--Foo:1px;}"]
-  [@@@css ".css-1r75vyo{--foo:2px;}"]
-  [@@@css ".css-tokvmb{color:red;}"]
-  [@@@css ".css-zwzjs7{margin:0;margin:var(--c-kv4uq2);}"]
+  [@@@css "._a_4epkbn{color:blue;color:red;color:blue;}"]
+  [@@@css "._a_5rx8u2{display:-webkit-box;display:flex;}"]
+  [@@@css "._a_7p1gs8{margin:0;}"]
+  [@@@css "._a_4eb7kq{color:blue;color:red;}"]
+  [@@@css "@media (min-width: 600px) {._a_izob04ep0x6{color:green;}}"]
+  [@@@css "._a_7pjper{margin:0;margin-top:5px;margin:10px;}"]
+  [@@@css "._a_qyw7u4ebukr:hover{color:blue;color:red;}"]
+  [@@@css "._a_qyw7u4ego80:hover{color:red;}"]
+  [@@@css "._a_zygl8yfjbrel{--Foo:1px;}"]
+  [@@@css "._a_zy803csp5vyo{--foo:2px;}"]
+  [@@@css "._a_4ekvmb{color:red;}"]
+  [@@@css "._a_7pzjs7{margin:0;margin:var(--c-kv4uq2);}"]
   [@@@css.bindings
-    [("Input.dup", "cid-1rqoi1k", "css-ztpkbn");
-    ("Input.fallback", "cid-1t6se51", "css-17ax8u2");
-    ("Input.interleaved", "cid-8z5ze6", "css-1uk1gs8 css-dhb7kq");
-    ("Input.mediaInterleaved", "cid-17s8jfs", "css-1g5p0x6 css-dhb7kq");
-    ("Input.shorthandReset", "cid-18j0etq", "css-odz94x css-19xrixt");
-    ("Input.nested", "cid-swo4az", "css-1e7bukr");
-    ("Input.twice", "cid-bxfxu3", "css-mngo80");
-    ("Input.custom", "cid-216v6m", "css-zkbrel css-1r75vyo");
-    ("Input.A.x", "cid-hplgo2", "css-tokvmb");
-    ("Input.B.x", "cid-i6ik4z", "css-dhb7kq");
-    ("Input.vars", "cid-10jlpap", "css-zwzjs7")]]
-  let dup = CSS.make "label:dup cid-1rqoi1k css-ztpkbn" []
-  let fallback = CSS.make "label:fallback cid-1t6se51 css-17ax8u2" []
+    [("Input.dup", "_id_1rqoi1k", "_a_4epkbn");
+    ("Input.fallback", "_id_1t6se51", "_a_5rx8u2");
+    ("Input.interleaved", "_id_8z5ze6", "_a_7p1gs8 _a_4eb7kq");
+    ("Input.mediaInterleaved", "_id_17s8jfs", "_a_izob04ep0x6 _a_4eb7kq");
+    ("Input.shorthandReset", "_id_18j0etq", "_a_7pjper");
+    ("Input.nested", "_id_swo4az", "_a_qyw7u4ebukr");
+    ("Input.twice", "_id_bxfxu3", "_a_qyw7u4ego80");
+    ("Input.custom", "_id_216v6m", "_a_zygl8yfjbrel _a_zy803csp5vyo");
+    ("Input.A.x", "_id_hplgo2", "_a_4ekvmb");
+    ("Input.B.x", "_id_i6ik4z", "_a_4eb7kq");
+    ("Input.vars", "_id_10jlpap", "_a_7pzjs7")]]
+  let dup = CSS.make "label:dup _id_1rqoi1k _a_4epkbn" []
+  let fallback = CSS.make "label:fallback _id_1t6se51 _a_5rx8u2" []
   let interleaved =
-    CSS.make "label:interleaved cid-8z5ze6 css-1uk1gs8 css-dhb7kq" []
+    CSS.make "label:interleaved _id_8z5ze6 _a_7p1gs8 _a_4eb7kq" []
   let mediaInterleaved =
-    CSS.make "label:mediaInterleaved cid-17s8jfs css-1g5p0x6 css-dhb7kq" []
-  let shorthandReset =
-    CSS.make "label:shorthandReset cid-18j0etq css-odz94x css-19xrixt" []
-  let nested = CSS.make "label:nested cid-swo4az css-1e7bukr" []
-  let twice = CSS.make "label:twice cid-bxfxu3 css-mngo80" []
-  let custom = CSS.make "label:custom cid-216v6m css-zkbrel css-1r75vyo" []
-  module A = struct let x = CSS.make "label:x cid-hplgo2 css-tokvmb" [] end
-  module B = struct let x = CSS.make "label:x cid-i6ik4z css-dhb7kq" [] end
+    CSS.make "label:mediaInterleaved _id_17s8jfs _a_izob04ep0x6 _a_4eb7kq" []
+  let shorthandReset = CSS.make "label:shorthandReset _id_18j0etq _a_7pjper" []
+  let nested = CSS.make "label:nested _id_swo4az _a_qyw7u4ebukr" []
+  let twice = CSS.make "label:twice _id_bxfxu3 _a_qyw7u4ego80" []
+  let custom =
+    CSS.make "label:custom _id_216v6m _a_zygl8yfjbrel _a_zy803csp5vyo" []
+  module A = struct let x = CSS.make "label:x _id_hplgo2 _a_4ekvmb" [] end
+  module B = struct let x = CSS.make "label:x _id_i6ik4z _a_4eb7kq" [] end
   let c = "10px"
   let vars =
-    CSS.make "label:vars cid-10jlpap css-zwzjs7"
+    CSS.make "label:vars _id_10jlpap _a_7pzjs7"
       [("--c-kv4uq2", (CSS.Types.Margin.toString c))]

@@ -13,22 +13,22 @@ Shadowing follows OCaml semantics: `&.$(foo)` resolves to the second
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb{color:red;}"];
-  [@css ".css-14ksm7b{color:blue;}"];
-  [@css ".css-191lhl1.cid-1mvyff1{font-weight:bold;}"];
+  [@css "._a_4ekvmb{color:red;}"];
+  [@css "._a_4esm7b{color:blue;}"];
+  [@css "._a_tb8ov65m9solf9._id_1mvyff1{font-weight:bold;}"];
   [@css.bindings
     [
-      ("Input.foo", "cid-1mvyff1", "css-14ksm7b"),
-      ("Input.bar", "cid-1eelq62", "css-191lhl1"),
+      ("Input.foo", "_id_1mvyff1", "_a_4esm7b"),
+      ("Input.bar", "_id_1eelq62", "_a_tb8ov65m9solf9"),
     ]
   ];
   
-  let foo = CSS.make("label:foo cid-zec317 css-tokvmb", []);
+  let foo = CSS.make("label:foo _id_zec317 _a_4ekvmb", []);
   let _ = foo;
   
-  let foo = CSS.make("label:foo cid-1mvyff1 css-14ksm7b", []);
+  let foo = CSS.make("label:foo _id_1mvyff1 _a_4esm7b", []);
   
-  let bar = CSS.make("label:bar cid-1eelq62 css-191lhl1", []);
+  let bar = CSS.make("label:bar _id_1eelq62 _a_tb8ov65m9solf9", []);
   
   let _ = (foo, bar);
 

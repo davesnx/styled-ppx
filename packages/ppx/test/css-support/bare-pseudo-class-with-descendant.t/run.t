@@ -26,70 +26,82 @@ deep nesting, and mixed compound/descendant inner chains.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1i2mold:hover .child{color:red;}"];
-  [@css ".css-1pw74wv:hover span{color:blue;}"];
-  [@css ".css-5tdg3s:hover .child{color:green;}"];
-  [@css ".css-1pzj0cc:hover:focus{color:yellow;}"];
-  [@css ".css-1cghiyt:hover::after{color:orange;}"];
-  [@css ".css-15g1xle:hover .child .grandchild{color:purple;}"];
-  [@css ".css-v719o0:hover .a .b .c .d{color:pink;}"];
-  [@css ".css-1d0scwj:hover .a:focus .b{color:brown;}"];
+  [@css "._a_d3qow4emold:hover .child{color:red;}"];
+  [@css "._a_dwogj4e74wv:hover span{color:blue;}"];
+  [@css "._a_d3qow4edg3s:hover .child{color:green;}"];
+  [@css "._a_rv9hg4ej0cc:hover:focus{color:yellow;}"];
+  [@css "._a_4ii3y4ehiyt:hover::after{color:orange;}"];
+  [@css "._a_yj7sa4e1xle:hover .child .grandchild{color:purple;}"];
+  [@css "._a_h0ece4e19o0:hover .a .b .c .d{color:pink;}"];
+  [@css "._a_t7s414escwj:hover .a:focus .b{color:brown;}"];
   [@css.bindings
     [
-      ("Input._amp_pseudo_with_class_descendant", "cid-1mtruzt", "css-1i2mold"),
-      ("Input._amp_pseudo_with_type_descendant", "cid-1l96rxg", "css-1pw74wv"),
+      (
+        "Input._amp_pseudo_with_class_descendant",
+        "_id_1mtruzt",
+        "_a_d3qow4emold",
+      ),
+      (
+        "Input._amp_pseudo_with_type_descendant",
+        "_id_1l96rxg",
+        "_a_dwogj4e74wv",
+      ),
       (
         "Input._amp_pseudo_with_explicit_ampersand_descendant",
-        "cid-saeaxt",
-        "css-5tdg3s",
+        "_id_saeaxt",
+        "_a_d3qow4edg3s",
       ),
-      ("Input._amp_pseudo_with_compound_inner", "cid-1gv0q8s", "css-1pzj0cc"),
+      (
+        "Input._amp_pseudo_with_compound_inner",
+        "_id_1gv0q8s",
+        "_a_rv9hg4ej0cc",
+      ),
       (
         "Input._amp_pseudo_with_pseudo_element_inner",
-        "cid-1ogtbuw",
-        "css-1cghiyt",
+        "_id_1ogtbuw",
+        "_a_4ii3y4ehiyt",
       ),
-      ("Input._amp_pseudo_three_levels", "cid-wnmhdk", "css-15g1xle"),
-      ("Input._amp_pseudo_five_levels", "cid-lhbok8", "css-v719o0"),
-      ("Input._amp_pseudo_mixed_inner", "cid-1tn24tq", "css-1d0scwj"),
+      ("Input._amp_pseudo_three_levels", "_id_wnmhdk", "_a_yj7sa4e1xle"),
+      ("Input._amp_pseudo_five_levels", "_id_lhbok8", "_a_h0ece4e19o0"),
+      ("Input._amp_pseudo_mixed_inner", "_id_1tn24tq", "_a_t7s414escwj"),
     ]
   ];
   
   let _amp_pseudo_with_class_descendant =
     CSS.make(
-      "label:_amp_pseudo_with_class_descendant cid-1mtruzt css-1i2mold",
+      "label:_amp_pseudo_with_class_descendant _id_1mtruzt _a_d3qow4emold",
       [],
     );
   
   let _amp_pseudo_with_type_descendant =
     CSS.make(
-      "label:_amp_pseudo_with_type_descendant cid-1l96rxg css-1pw74wv",
+      "label:_amp_pseudo_with_type_descendant _id_1l96rxg _a_dwogj4e74wv",
       [],
     );
   
   let _amp_pseudo_with_explicit_ampersand_descendant =
     CSS.make(
-      "label:_amp_pseudo_with_explicit_ampersand_descendant cid-saeaxt css-5tdg3s",
+      "label:_amp_pseudo_with_explicit_ampersand_descendant _id_saeaxt _a_d3qow4edg3s",
       [],
     );
   
   let _amp_pseudo_with_compound_inner =
     CSS.make(
-      "label:_amp_pseudo_with_compound_inner cid-1gv0q8s css-1pzj0cc",
+      "label:_amp_pseudo_with_compound_inner _id_1gv0q8s _a_rv9hg4ej0cc",
       [],
     );
   
   let _amp_pseudo_with_pseudo_element_inner =
     CSS.make(
-      "label:_amp_pseudo_with_pseudo_element_inner cid-1ogtbuw css-1cghiyt",
+      "label:_amp_pseudo_with_pseudo_element_inner _id_1ogtbuw _a_4ii3y4ehiyt",
       [],
     );
   
   let _amp_pseudo_three_levels =
-    CSS.make("label:_amp_pseudo_three_levels cid-wnmhdk css-15g1xle", []);
+    CSS.make("label:_amp_pseudo_three_levels _id_wnmhdk _a_yj7sa4e1xle", []);
   
   let _amp_pseudo_five_levels =
-    CSS.make("label:_amp_pseudo_five_levels cid-lhbok8 css-v719o0", []);
+    CSS.make("label:_amp_pseudo_five_levels _id_lhbok8 _a_h0ece4e19o0", []);
   
   let _amp_pseudo_mixed_inner =
-    CSS.make("label:_amp_pseudo_mixed_inner cid-1tn24tq css-1d0scwj", []);
+    CSS.make("label:_amp_pseudo_mixed_inner _id_1tn24tq _a_t7s414escwj", []);

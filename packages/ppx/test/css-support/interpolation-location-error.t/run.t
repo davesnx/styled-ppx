@@ -62,11 +62,11 @@ If this test fail means that the module is not in sync with the ppx
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css "@property --grid-1sb4gse{syntax:\"*\";inherits:false;}"];
-  [@css ".css-48ak65{display:var(--grid-1sb4gse);}"];
-  [@css.bindings [("Input.a", "cid-fo0igp", "css-48ak65")]];
+  [@css "._a_5rak65{display:var(--grid-1sb4gse);}"];
+  [@css.bindings [("Input.a", "_id_fo0igp", "_a_5rak65")]];
   let grid = `gri;
   let a =
     CSS.make(
-      "label:a cid-fo0igp css-48ak65",
+      "label:a _id_fo0igp _a_5rak65",
       [("--grid-1sb4gse", CSS.Types.Display.toString(grid))],
     );

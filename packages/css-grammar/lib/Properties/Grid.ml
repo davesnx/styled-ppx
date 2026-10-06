@@ -156,22 +156,51 @@ let entries : (kind * packed_rule) list =
     Property "-ms-grid-columns", pack_module (module Property__ms_grid_columns);
     Property "-ms-grid-rows", pack_module (module Property__ms_grid_rows);
     Property "grid-auto-flow", pack_module (module Property_grid_auto_flow);
-    Property "grid", pack_module (module Property_grid);
-    Property "grid-area", pack_module (module Property_grid_area);
+    (* Grid Layout L2: https://www.w3.org/TR/css-grid-2/#propdef-grid-template, #propdef-grid, #propdef-grid-area *)
+    ( Shorthand
+        ( "grid",
+          [
+            "grid-template";
+            "grid-auto-rows";
+            "grid-auto-columns";
+            "grid-auto-flow";
+          ] ),
+      pack_module (module Property_grid) );
+    (* Grid Layout L2: https://www.w3.org/TR/css-grid-2/#propdef-grid-template, #propdef-grid, #propdef-grid-area *)
+    ( Shorthand ("grid-area", [ "grid-row"; "grid-column" ]),
+      pack_module (module Property_grid_area) );
     ( Property "grid-auto-columns",
       pack_module (module Property_grid_auto_columns) );
     Property "grid-auto-rows", pack_module (module Property_grid_auto_rows);
-    Property "grid-column", pack_module (module Property_grid_column);
+    (* Grid Layout L2: https://www.w3.org/TR/css-grid-2/#propdef-grid-template, #propdef-grid, #propdef-grid-area *)
+    ( Shorthand ("grid-column", [ "grid-column-start"; "grid-column-end" ]),
+      pack_module (module Property_grid_column) );
     Property "grid-column-end", pack_module (module Property_grid_column_end);
-    Property "grid-column-gap", pack_module (module Property_grid_column_gap);
+    (* CSS Box Alignment L3 - https://www.w3.org/TR/css-align-3/#gap-legacy :
+       legacy alias for "column-gap", mapped value-for-value. *)
+    ( Alias ("grid-column-gap", "column-gap"),
+      pack_module (module Property_grid_column_gap) );
     ( Property "grid-column-start",
       pack_module (module Property_grid_column_start) );
-    Property "grid-gap", pack_module (module Property_grid_gap);
-    Property "grid-row", pack_module (module Property_grid_row);
+    (* CSS Box Alignment L3 - https://www.w3.org/TR/css-align-3/#gap-legacy :
+       legacy alias for "gap", mapped value-for-value. *)
+    Alias ("grid-gap", "gap"), pack_module (module Property_grid_gap);
+    (* Grid Layout L2: https://www.w3.org/TR/css-grid-2/#propdef-grid-template, #propdef-grid, #propdef-grid-area *)
+    ( Shorthand ("grid-row", [ "grid-row-start"; "grid-row-end" ]),
+      pack_module (module Property_grid_row) );
     Property "grid-row-end", pack_module (module Property_grid_row_end);
-    Property "grid-row-gap", pack_module (module Property_grid_row_gap);
+    (* CSS Box Alignment L3 - https://www.w3.org/TR/css-align-3/#gap-legacy :
+       legacy alias for "row-gap", mapped value-for-value. *)
+    ( Alias ("grid-row-gap", "row-gap"),
+      pack_module (module Property_grid_row_gap) );
     Property "grid-row-start", pack_module (module Property_grid_row_start);
-    Property "grid-template", pack_module (module Property_grid_template);
+    (* Grid Layout L2: https://www.w3.org/TR/css-grid-2/#propdef-grid-template, #propdef-grid, #propdef-grid-area *)
+    ( Shorthand
+        ( "grid-template",
+          [
+            "grid-template-rows"; "grid-template-columns"; "grid-template-areas";
+          ] ),
+      pack_module (module Property_grid_template) );
     ( Property "grid-template-areas",
       pack_module (module Property_grid_template_areas) );
     ( Property "grid-template-columns",

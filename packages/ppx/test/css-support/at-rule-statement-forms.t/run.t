@@ -13,6 +13,6 @@ already do.
   @layer utilities;
   @layer a, b;
   @layer base {.example{color:red;}}
-  @media (min-width: 1px) {.responsive{color:blue;}}
   @font-face {font-family:"Inter";}
+  @media (min-width: 1px) {.responsive{color:blue;}}
   body{margin:0;}

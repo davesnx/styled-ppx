@@ -6762,23 +6762,6 @@ module ContainerName = struct
     | #Cascading.t as x -> Cascading.toString x
 end
 
-module ContainerNameComputed = struct
-  (* MDN syntax: 'none' | [ <custom-ident> ]# *)
-  type t =
-    [ `none
-    | `value of string
-    | Var.t
-    | Cascading.t
-    ]
-
-  let toString x =
-    match x with
-    | `none -> {js|none|js}
-    | `value x -> x
-    | #Var.t as x -> Var.toString x
-    | #Cascading.t as x -> Cascading.toString x
-end
-
 module ContainerType = struct
   type t =
     [ `normal

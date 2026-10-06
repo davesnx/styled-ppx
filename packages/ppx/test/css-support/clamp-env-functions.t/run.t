@@ -15,17 +15,17 @@ properties, not just registered as standalone functions.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-zpelvd{width:clamp(10px, 5vw, 100px);}"];
-  [@css ".css-2ju9ys{padding-top:env(safe-area-inset-top);}"];
-  [@css ".css-1qehw7i{padding-top:env(safe-area-inset-top, 8px);}"];
-  [@css ".css-ojmp0b{font-size:clamp(1rem, 2.5vw, 2rem);}"];
-  [@css ".css-1k5blas{max-width:clamp(20%, 50vw, 80%);}"];
-  [@css ".css-1vs0z9k{width:calc(clamp(1px, 2vw, 3px) + 1px);}"];
-  CSS.make("css-zpelvd", []);
-  CSS.make("css-2ju9ys", []);
-  CSS.make("css-1qehw7i", []);
-  CSS.make("css-ojmp0b", []);
-  CSS.make("css-1k5blas", []);
-  CSS.make("css-1vs0z9k", []);
+  [@css "._a_ecelvd{width:clamp(10px, 5vw, 100px);}"];
+  [@css "._a_94008u9ys{padding-top:env(safe-area-inset-top);}"];
+  [@css "._a_94008hw7i{padding-top:env(safe-area-inset-top, 8px);}"];
+  [@css "._a_6500wmp0b{font-size:clamp(1rem, 2.5vw, 2rem);}"];
+  [@css "._a_88blas{max-width:clamp(20%, 50vw, 80%);}"];
+  [@css "._a_ec0z9k{width:calc(clamp(1px, 2vw, 3px) + 1px);}"];
+  CSS.make("_a_ecelvd", []);
+  CSS.make("_a_94008u9ys", []);
+  CSS.make("_a_94008hw7i", []);
+  CSS.make("_a_6500wmp0b", []);
+  CSS.make("_a_88blas", []);
+  CSS.make("_a_ec0z9k", []);
 
   $ dune build

@@ -13,20 +13,25 @@ before popping, so the popped segment is always the rightmost compound.
 
   $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
-  [@@@css ".css-1meebco tbody tr:first-child td{border-top:1px solid gray;}"]
   [@@@css
-    ".css-1rhtv1h tbody tr:first-child td:first-child{border-top:1px solid transparent;}"]
+    "._a_g79843hghsebco tbody tr:first-child td{border-top:1px solid gray;}"]
   [@@@css
-    ".css-r3cuwt tbody tr:first-child td:last-child{border-top:1px solid transparent;}"]
-  [@@@css ".css-x5n7y2 tbody tr:first-child td:first-child{color:red;}"]
-  [@@@css ".css-1wfoysu ul li:hover::before{content:\"\";}"]
-  [@@@css ".css-1ikqg0 ul li:hover::after{content:\"\";}"]
+    "._a_x5lvq3hghstv1h tbody tr:first-child td:first-child{border-top:1px solid transparent;}"]
+  [@@@css
+    "._a_lf3m83hghscuwt tbody tr:first-child td:last-child{border-top:1px solid transparent;}"]
+  [@@@css "._a_x5lvq4en7y2 tbody tr:first-child td:first-child{color:red;}"]
+  [@@@css "._a_pkdux4woysu ul li:hover::before{content:\"\";}"]
+  [@@@css "._a_rf47n4wkqg0 ul li:hover::after{content:\"\";}"]
   [@@@css.bindings
-    [("Input.table", "cid-1me4lmu", "css-1meebco css-1rhtv1h css-r3cuwt");
-    ("Input.single", "cid-1e50cws", "css-x5n7y2");
-    ("Input.compoundParent", "cid-16qcgjr", "css-1wfoysu css-1ikqg0")]]
+    [("Input.table", "_id_1me4lmu",
+       "_a_g79843hghsebco _a_x5lvq3hghstv1h _a_lf3m83hghscuwt");
+    ("Input.single", "_id_1e50cws", "_a_x5lvq4en7y2");
+    ("Input.compoundParent", "_id_16qcgjr", "_a_pkdux4woysu _a_rf47n4wkqg0")]]
   let table =
-    CSS.make "label:table cid-1me4lmu css-1meebco css-1rhtv1h css-r3cuwt" []
-  let single = CSS.make "label:single cid-1e50cws css-x5n7y2" []
+    CSS.make
+      "label:table _id_1me4lmu _a_g79843hghsebco _a_x5lvq3hghstv1h _a_lf3m83hghscuwt"
+      []
+  let single = CSS.make "label:single _id_1e50cws _a_x5lvq4en7y2" []
   let compoundParent =
-    CSS.make "label:compoundParent cid-16qcgjr css-1wfoysu css-1ikqg0" []
+    CSS.make "label:compoundParent _id_16qcgjr _a_pkdux4woysu _a_rf47n4wkqg0"
+      []
