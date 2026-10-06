@@ -37,7 +37,7 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_2kgs7p{-webkit-text-fill-color:var(--colorTextString-1or9u9e);}"];
   [@css "._a_2zkrf0{-webkit-animation:none;animation:none;}"];
   [@css
-    "._a_33rcf8{-webkit-appearance:none;-moz-appearance:none;-ms-appearance:none;appearance:none;}"
+    "._a_33rcf8{-webkit-appearance:none;-moz-appearance:none;appearance:none;}"
   ];
   [@css "._a_35qiim{aspect-ratio:21 / 8;}"];
   [@css "._a_390049niw{background-color:var(--c-17nwon4);}"];
@@ -67,8 +67,8 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_5wzqgg{fill:currentColor;}"];
   [@css "._a_6ffv11{gap:4px;}"];
   [@css "._a_6j001xyc7{grid-column-end:span 2;}"];
-  [@css "._a_6j003e1eh{-ms-grid-column:unset;grid-column:unset;}"];
-  [@css "._a_6j00crf94{-ms-grid-row:unset;grid-row:unset;}"];
+  [@css "._a_6j003e1eh{grid-column:unset;}"];
+  [@css "._a_6j00crf94{grid-row:unset;}"];
   [@css "._a_6i00gz6hb{grid-template-columns:max-content max-content;}"];
   [@css
     "._a_6i00ggo9j{grid-template-columns:minmax(10px, auto) fit-content(20px) fit-content(20px);}"

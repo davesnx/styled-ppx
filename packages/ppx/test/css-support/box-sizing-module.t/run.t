@@ -18,44 +18,32 @@ If this test fail means that the module is not in sync with the ppx
   [@css
     "._a_ec3le8{width:-webkit-max-content;width:-moz-max-content;width:max-content;}"
   ];
-  [@css
-    "._a_ecckkm{width:-webkit-min-content;width:-moz-min-content;width:min-content;}"
-  ];
+  [@css "._a_ecckkm{width:-moz-min-content;width:min-content;}"];
   [@css "._a_ecccy6{width:fit-content(10%);}"];
   [@css
     "._a_8cktvk{min-width:-webkit-max-content;min-width:-moz-max-content;min-width:max-content;}"
   ];
-  [@css
-    "._a_8creoz{min-width:-webkit-min-content;min-width:-moz-min-content;min-width:min-content;}"
-  ];
+  [@css "._a_8creoz{min-width:-moz-min-content;min-width:min-content;}"];
   [@css "._a_8ckswh{min-width:fit-content(10%);}"];
   [@css
     "._a_88c9a0{max-width:-webkit-max-content;max-width:-moz-max-content;max-width:max-content;}"
   ];
-  [@css
-    "._a_88nlwm{max-width:-webkit-min-content;max-width:-moz-min-content;max-width:min-content;}"
-  ];
+  [@css "._a_88nlwm{max-width:-moz-min-content;max-width:min-content;}"];
   [@css "._a_88zzeg{max-width:fit-content(10%);}"];
   [@css
     "._a_6l27ji{height:-webkit-max-content;height:-moz-max-content;height:max-content;}"
   ];
-  [@css
-    "._a_6lzl7o{height:-webkit-min-content;height:-moz-min-content;height:min-content;}"
-  ];
+  [@css "._a_6lzl7o{height:-moz-min-content;height:min-content;}"];
   [@css "._a_6lv2pj{height:fit-content(10%);}"];
   [@css
     "._a_8ayx8i{min-height:-webkit-max-content;min-height:-moz-max-content;min-height:max-content;}"
   ];
-  [@css
-    "._a_8ap2tk{min-height:-webkit-min-content;min-height:-moz-min-content;min-height:min-content;}"
-  ];
+  [@css "._a_8ap2tk{min-height:-moz-min-content;min-height:min-content;}"];
   [@css "._a_8abza9{min-height:fit-content(10%);}"];
   [@css
     "._a_85yxes{max-height:-webkit-max-content;max-height:-moz-max-content;max-height:max-content;}"
   ];
-  [@css
-    "._a_854hk2{max-height:-webkit-min-content;max-height:-moz-min-content;max-height:min-content;}"
-  ];
+  [@css "._a_854hk2{max-height:-moz-min-content;max-height:min-content;}"];
   [@css "._a_85ct3b{max-height:fit-content(10%);}"];
   [@css "._a_35cmp3{aspect-ratio:auto;}"];
   [@css "._a_35qo31{aspect-ratio:2;}"];

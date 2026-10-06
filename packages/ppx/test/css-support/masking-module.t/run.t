@@ -48,9 +48,9 @@ If this test fail means that the module is not in sync with the ppx
   [@css
     "._a_7y074laft{-webkit-mask-image:url(\"image.png\");mask-image:url(\"image.png\");}"
   ];
-  [@css "._a_7y0e8dp5t{-webkit-mask-mode:alpha;mask-mode:alpha;}"];
-  [@css "._a_7y0e8htsi{-webkit-mask-mode:luminance;mask-mode:luminance;}"];
-  [@css "._a_7y0e8qdqk{-webkit-mask-mode:match-source;mask-mode:match-source;}"];
+  [@css "._a_7y0e8dp5t{mask-mode:alpha;}"];
+  [@css "._a_7y0e8htsi{mask-mode:luminance;}"];
+  [@css "._a_7y0e8qdqk{mask-mode:match-source;}"];
   [@css "._a_7y35skdr1{-webkit-mask-repeat:repeat-x;mask-repeat:repeat-x;}"];
   [@css "._a_7y35s0g9h{-webkit-mask-repeat:repeat-y;mask-repeat:repeat-y;}"];
   [@css "._a_7y35s0wgz{-webkit-mask-repeat:repeat;mask-repeat:repeat;}"];
@@ -143,14 +143,10 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_7y6bk3cq7{-webkit-mask-size:10px auto;mask-size:10px auto;}"];
   [@css "._a_7y6bkieio{-webkit-mask-size:auto 10%;mask-size:auto 10%;}"];
   [@css "._a_7y6bk41vb{-webkit-mask-size:50em 50%;mask-size:50em 50%;}"];
-  [@css "._a_7y03ktv7g{-webkit-mask-composite:add;mask-composite:add;}"];
-  [@css
-    "._a_7y03k75he{-webkit-mask-composite:subtract;mask-composite:subtract;}"
-  ];
-  [@css
-    "._a_7y03khvhq{-webkit-mask-composite:intersect;mask-composite:intersect;}"
-  ];
-  [@css "._a_7y03k57xj{-webkit-mask-composite:exclude;mask-composite:exclude;}"];
+  [@css "._a_7y03ktv7g{mask-composite:add;}"];
+  [@css "._a_7y03k75he{mask-composite:subtract;}"];
+  [@css "._a_7y03khvhq{mask-composite:intersect;}"];
+  [@css "._a_7y03k57xj{mask-composite:exclude;}"];
   [@css "._a_7yf6ef{-webkit-mask:top;mask:top;}"];
   [@css "._a_7yyoaq{-webkit-mask:space;mask:space;}"];
   [@css "._a_7yk999{-webkit-mask:url(\"image.png\");mask:url(\"image.png\");}"];

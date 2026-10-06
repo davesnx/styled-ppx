@@ -167,7 +167,7 @@ Test interpolation support for various properties in cx2
   ._a_43g6ew{break-before:var(--breakBefore-1uz2974);}
   ._a_42h63b{break-after:var(--breakAfter-1ppm471);}
   ._a_441x2b{break-inside:var(--breakInside-1jjp0ej);}
-  ._a_33xzs9{-webkit-appearance:var(--appearance-39c8ha);-moz-appearance:var(--appearance-39c8ha);-ms-appearance:var(--appearance-39c8ha);appearance:var(--appearance-39c8ha);}
+  ._a_33xzs9{-webkit-appearance:var(--appearance-39c8ha);-moz-appearance:var(--appearance-39c8ha);appearance:var(--appearance-39c8ha);}
   ._a_dhpsgl{touch-action:var(--touchAction-1px8y2f);}
   ._a_aa8i0o{scroll-behavior:var(--scrollBehavior-1ji12j4);}
   ._a_8zr0ae{overscroll-behavior:var(--overscrollBehavior-17qcsbs);}

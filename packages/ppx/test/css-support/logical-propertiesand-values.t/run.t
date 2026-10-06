@@ -35,10 +35,8 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_7q001g6i4{margin-block-end:10px;}"];
   [@css "._a_7rwfix{margin-inline:10px;}"];
   [@css "._a_7rtclh{margin-inline:10px 10px;}"];
-  [@css
-    "._a_7r002bip2{-webkit-margin-inline-start:10px;margin-inline-start:10px;}"
-  ];
-  [@css "._a_7r001lgiv{-webkit-margin-inline-end:10px;margin-inline-end:10px;}"];
+  [@css "._a_7r002bip2{-webkit-margin-start:10px;margin-inline-start:10px;}"];
+  [@css "._a_7r001lgiv{-webkit-margin-end:10px;margin-inline-end:10px;}"];
   [@css "._a_712r9d{inset:10px;}"];
   [@css "._a_71sk63{inset:10px 10px;}"];
   [@css "._a_71kvre{inset:10px 10px 10px;}"];
@@ -57,12 +55,8 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_95001otoy{padding-block-end:10px;}"];
   [@css "._a_962b2w{padding-inline:10px;}"];
   [@css "._a_969f8q{padding-inline:10px 10px;}"];
-  [@css
-    "._a_96002js84{-webkit-padding-inline-start:10px;padding-inline-start:10px;}"
-  ];
-  [@css
-    "._a_96001ob79{-webkit-padding-inline-end:10px;padding-inline-end:10px;}"
-  ];
+  [@css "._a_96002js84{-webkit-padding-start:10px;padding-inline-start:10px;}"];
+  [@css "._a_96001ob79{-webkit-padding-end:10px;padding-inline-end:10px;}"];
   [@css "._a_3ijynl{border-block:1px;}"];
   [@css "._a_3ig7ep{border-block:2px dotted;}"];
   [@css "._a_3i5w5p{border-block:medium dashed green;}"];

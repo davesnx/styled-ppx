@@ -24,13 +24,13 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_dp30cq{unicode-bidi:isolate-override;}"];
   [@css "._a_dp7z6r{unicode-bidi:plaintext;}"];
   [@css
-    "._a_ehni7l{-webkit-writing-mode:horizontal-tb;-ms-writing-mode:horizontal-tb;writing-mode:horizontal-tb;}"
+    "._a_ehni7l{-webkit-writing-mode:horizontal-tb;writing-mode:horizontal-tb;}"
   ];
   [@css
-    "._a_ehrbdf{-webkit-writing-mode:vertical-rl;-ms-writing-mode:vertical-rl;writing-mode:vertical-rl;}"
+    "._a_ehrbdf{-webkit-writing-mode:vertical-rl;writing-mode:vertical-rl;}"
   ];
   [@css
-    "._a_ehuv7p{-webkit-writing-mode:vertical-lr;-ms-writing-mode:vertical-lr;writing-mode:vertical-lr;}"
+    "._a_ehuv7p{-webkit-writing-mode:vertical-lr;writing-mode:vertical-lr;}"
   ];
   [@css "._a_cvc989{text-orientation:mixed;}"];
   [@css "._a_cvjqux{text-orientation:upright;}"];
@@ -38,10 +38,10 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_ceubm3{text-combine-upright:none;}"];
   [@css "._a_cejtzu{text-combine-upright:all;}"];
   [@css
-    "._a_ehcjo4{-webkit-writing-mode:sideways-rl;-ms-writing-mode:sideways-rl;writing-mode:sideways-rl;}"
+    "._a_ehcjo4{-webkit-writing-mode:sideways-rl;writing-mode:sideways-rl;}"
   ];
   [@css
-    "._a_ehq5f9{-webkit-writing-mode:sideways-lr;-ms-writing-mode:sideways-lr;writing-mode:sideways-lr;}"
+    "._a_ehq5f9{-webkit-writing-mode:sideways-lr;writing-mode:sideways-lr;}"
   ];
   [@css "._a_cefs5k{text-combine-upright:digits 2;}"];
   

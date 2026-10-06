@@ -23,21 +23,17 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_7q001x81y{margin-block-end:0;}"];
   [@css "._a_7q001pv1b{margin-block-end:10%;}"];
   [@css "._a_7q0012cvy{margin-block-end:calc(10px + 5%);}"];
+  [@css "._a_7r002l53j{-webkit-margin-start:auto;margin-inline-start:auto;}"];
+  [@css "._a_7r002wkc2{-webkit-margin-start:0;margin-inline-start:0;}"];
+  [@css "._a_7r002u6cp{-webkit-margin-start:10%;margin-inline-start:10%;}"];
   [@css
-    "._a_7r002l53j{-webkit-margin-inline-start:auto;margin-inline-start:auto;}"
+    "._a_7r002gejl{-webkit-margin-start:calc(10px + 5%);margin-inline-start:calc(10px + 5%);}"
   ];
-  [@css "._a_7r002wkc2{-webkit-margin-inline-start:0;margin-inline-start:0;}"];
+  [@css "._a_7r0018jnk{-webkit-margin-end:auto;margin-inline-end:auto;}"];
+  [@css "._a_7r001jlf7{-webkit-margin-end:0;margin-inline-end:0;}"];
+  [@css "._a_7r001j3z4{-webkit-margin-end:10%;margin-inline-end:10%;}"];
   [@css
-    "._a_7r002u6cp{-webkit-margin-inline-start:10%;margin-inline-start:10%;}"
-  ];
-  [@css
-    "._a_7r002gejl{-webkit-margin-inline-start:calc(10px + 5%);margin-inline-start:calc(10px + 5%);}"
-  ];
-  [@css "._a_7r0018jnk{-webkit-margin-inline-end:auto;margin-inline-end:auto;}"];
-  [@css "._a_7r001jlf7{-webkit-margin-inline-end:0;margin-inline-end:0;}"];
-  [@css "._a_7r001j3z4{-webkit-margin-inline-end:10%;margin-inline-end:10%;}"];
-  [@css
-    "._a_7r001dzrx{-webkit-margin-inline-end:calc(10px + 5%);margin-inline-end:calc(10px + 5%);}"
+    "._a_7r001dzrx{-webkit-margin-end:calc(10px + 5%);margin-inline-end:calc(10px + 5%);}"
   ];
   [@css "._a_95002rm8j{padding-block-start:0;}"];
   [@css "._a_950027et8{padding-block-start:10%;}"];
@@ -45,17 +41,15 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_95001cfwc{padding-block-end:0;}"];
   [@css "._a_95001kgml{padding-block-end:10%;}"];
   [@css "._a_95001nqch{padding-block-end:calc(10px + 5%);}"];
-  [@css "._a_96002s69z{-webkit-padding-inline-start:0;padding-inline-start:0;}"];
+  [@css "._a_96002s69z{-webkit-padding-start:0;padding-inline-start:0;}"];
+  [@css "._a_96002ziqq{-webkit-padding-start:10%;padding-inline-start:10%;}"];
   [@css
-    "._a_96002ziqq{-webkit-padding-inline-start:10%;padding-inline-start:10%;}"
+    "._a_96002gmtp{-webkit-padding-start:calc(10px + 5%);padding-inline-start:calc(10px + 5%);}"
   ];
+  [@css "._a_960012g5x{-webkit-padding-end:0;padding-inline-end:0;}"];
+  [@css "._a_96001gpxd{-webkit-padding-end:10%;padding-inline-end:10%;}"];
   [@css
-    "._a_96002gmtp{-webkit-padding-inline-start:calc(10px + 5%);padding-inline-start:calc(10px + 5%);}"
-  ];
-  [@css "._a_960012g5x{-webkit-padding-inline-end:0;padding-inline-end:0;}"];
-  [@css "._a_96001gpxd{-webkit-padding-inline-end:10%;padding-inline-end:10%;}"];
-  [@css
-    "._a_96001442x{-webkit-padding-inline-end:calc(10px + 5%);padding-inline-end:calc(10px + 5%);}"
+    "._a_96001442x{-webkit-padding-end:calc(10px + 5%);padding-inline-end:calc(10px + 5%);}"
   ];
   [@css "._a_7qgd9e{margin-block:auto auto;}"];
   [@css "._a_7q7mti{margin-block:10px 20px;}"];

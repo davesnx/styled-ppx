@@ -23,7 +23,7 @@ This test ensures autoprefixing happens in the PPX extraction path.
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css
-    "._a_czr4kf{-webkit-text-size-adjust:none;-moz-text-size-adjust:none;-ms-text-size-adjust:none;text-size-adjust:none;}"
+    "._a_czr4kf{-webkit-text-size-adjust:none;-moz-text-size-adjust:none;text-size-adjust:none;}"
   ];
   [@css
     "._a_cfky3p{-webkit-text-decoration:line-through;text-decoration:line-through;}"
