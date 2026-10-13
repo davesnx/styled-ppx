@@ -882,6 +882,23 @@ let seed : string array =
     "border-block-start-radius";
     "border-inline-end-radius";
     "border-inline-start-radius";
+    (* @font-palette-values, @view-transition and @counter-style
+       descriptors. They are registered as css-grammar properties (scoped to
+       their at-rule by Css_validation), so each needs a standalone slot;
+       none is a shorthand. Appended, so no existing slot id moves. *)
+    "additive-symbols";
+    "base-palette";
+    "fallback";
+    "navigation";
+    "negative";
+    "override-colors";
+    "pad";
+    "prefix";
+    "range";
+    "suffix";
+    "symbols";
+    "system";
+    "types";
   |]
 
 (* Width, in base36 chars, of the extended-hash field [Class_format] emits
