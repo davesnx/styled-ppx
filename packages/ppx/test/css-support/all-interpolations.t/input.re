@@ -341,6 +341,8 @@ let rowGapVal = `em(1.);
 /* Interpolated */
 let widthVal = `px(100);
 [%css {|width: $(widthVal)|}];
+let clampVal = `clamp((`rem(1.), `vw(2.), `rem(3.)));
+[%css {|width: $(clampVal)|}];
 
 /* Static */
 [%css {|min-width: max-content|}];

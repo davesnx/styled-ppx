@@ -188,6 +188,7 @@ module Length = struct
     [ length
     | `min of t array
     | `max of t array
+    | `clamp of t * t * t
     | `add of calc_value * calc_value
     | `sub of calc_value * calc_value
     | `mult of calc_value * calc_value
@@ -204,6 +205,7 @@ module Length = struct
     | `calc of calc_value
     | `min of t array
     | `max of t array
+    | `clamp of t * t * t
     ]
 
   let ch (x : float) = `ch x
@@ -256,7 +258,7 @@ module Length = struct
     | `zero -> {js|0|js}
     | #Percentage.t as p -> Percentage.toString p
     | `calc calc -> calc_value_to_string calc
-    | (`min _ | `max _) as x -> minmax_to_string x
+    | (`min _ | `max _ | `clamp _) as x -> minmax_to_string x
     | #Var.t as x -> Var.toString x
 
   and calc_value_to_string x =
@@ -264,11 +266,19 @@ module Length = struct
     | #length as t -> toString t
     | `num x -> Kloth.Float.to_string x
     | `calc calc -> calc_value_to_string calc
-    | (`min _ | `max _) as x -> minmax_to_string x
+    | (`min _ | `max _ | `clamp _) as x -> minmax_to_string x
     | (`add _ | `sub _ | `mult _ | `div _) as x ->
       Calc.min_max_to_string calc_value_to_string minmax_to_string x
 
   and minmax_to_string = function
+    | `clamp (min, preferred, max) ->
+      {js|clamp(|js}
+      ^ toString min
+      ^ {js|, |js}
+      ^ toString preferred
+      ^ {js|, |js}
+      ^ toString max
+      ^ {js|)|js}
     | (`calc _ | `min _ | `max _ | `num _) as x ->
       Calc.min_max_num_to_string toString x
     | #length as l -> toString l

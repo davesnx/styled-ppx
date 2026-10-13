@@ -97,6 +97,11 @@ let font_families_multiple_fonts () =
     (CSS.Types.FontFamilies.toString
        [| `quoted {js|Inter|js}; `system_ui; `sans_serif |])
 
+let length_clamp () =
+  Alcotest.(check string)
+    "clamp" {js|clamp(1rem, 2vw, 3rem)|js}
+    (CSS.Types.Length.toString (`clamp (`rem 1., `vw 2., `rem 3.)))
+
 let tests =
   [
     test "empty carrier" empty_carrier;
@@ -117,4 +122,5 @@ let tests =
     test "merge empty carriers" merge_empty_carriers;
     test "font families single font" font_families_single_font;
     test "font families multiple fonts" font_families_multiple_fonts;
+    test "length clamp" length_clamp;
   ]
