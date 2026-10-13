@@ -51211,6 +51211,8 @@ function toString$7(x) {
     return Float.to_string(x.VAL) + "px";
   } else if (variant === "inch") {
     return Float.to_string(x.VAL) + "in";
+  } else if (variant === "min" || variant === "max" || variant === "clamp") {
+    return minmax_to_string$1(x);
   } else if (variant === "cqmax") {
     return Float.to_string(x.VAL) + "cqmax";
   } else if (variant === "cqmin") {
@@ -51251,8 +51253,6 @@ function toString$7(x) {
     return Float.to_string(x.VAL) + "cqi";
   } else if (variant === "cqw") {
     return Float.to_string(x.VAL) + "cqw";
-  } else if (variant === "min" || variant === "max") {
-    return minmax_to_string$1(x);
   } else if (variant === "rem") {
     return Float.to_string(x.VAL) + "rem";
   } else {
@@ -51269,11 +51269,11 @@ function calc_value_to_string$1(_x) {
     if (variant === "var" || variant === "rem" || variant === "cqw" || variant === "cqi" || variant === "cqh" || variant === "cqb" || variant === "vw" || variant === "vh" || variant === "px" || variant === "pt" || variant === "pc" || variant === "mm" || variant === "ex" || variant === "em" || variant === "cm" || variant === "ch" || variant === "percent" || variant === "varDefault" || variant === "vmin" || variant === "vmax" || variant === "cqmin" || variant === "cqmax" || variant === "inch" || variant === "pxFloat") {
       return toString$7(x);
     }
+    if (variant === "min" || variant === "max" || variant === "clamp") {
+      return minmax_to_string$1(x);
+    }
     if (variant === "sub" || variant === "div" || variant === "add" || variant === "mult") {
       return min_max_to_string(calc_value_to_string$1)(minmax_to_string$1, x);
-    }
-    if (variant === "min" || variant === "max") {
-      return minmax_to_string$1(x);
     }
     if (variant === "num") {
       return Float.to_string(x.VAL);
@@ -51290,9 +51290,12 @@ function minmax_to_string$1(x) {
   const variant = x.NAME;
   if (variant === "var" || variant === "rem" || variant === "cqw" || variant === "cqi" || variant === "cqh" || variant === "cqb" || variant === "vw" || variant === "vh" || variant === "px" || variant === "pt" || variant === "pc" || variant === "mm" || variant === "ex" || variant === "em" || variant === "cm" || variant === "ch" || variant === "percent" || variant === "varDefault" || variant === "vmin" || variant === "vmax" || variant === "cqmin" || variant === "cqmax" || variant === "inch" || variant === "pxFloat") {
     return toString$7(x);
-  } else {
+  }
+  if (variant !== "clamp") {
     return min_max_num_to_string(toString$7, x);
   }
+  const match = x.VAL;
+  return "clamp(" + (toString$7(match[0]) + (", " + (toString$7(match[1]) + (", " + (toString$7(match[2]) + ")")))));
 }
 var Length = {
   ch,
@@ -57044,7 +57047,7 @@ function toString$230(x) {
     return toString$229(x);
   }
   const variant = x.NAME;
-  if (variant === "var" || variant === "rem" || variant === "min" || variant === "max" || variant === "cqw" || variant === "cqi" || variant === "cqh" || variant === "cqb" || variant === "vw" || variant === "vh" || variant === "px" || variant === "pt" || variant === "pc" || variant === "mm" || variant === "fr" || variant === "ex" || variant === "em" || variant === "cm" || variant === "ch" || variant === "percent" || variant === "fitContent" || variant === "varDefault" || variant === "lineNames" || variant === "minmax" || variant === "vmin" || variant === "vmax" || variant === "cqmin" || variant === "cqmax" || variant === "inch" || variant === "pxFloat" || variant === "calc") {
+  if (variant === "var" || variant === "rem" || variant === "min" || variant === "max" || variant === "cqw" || variant === "cqi" || variant === "cqh" || variant === "cqb" || variant === "vw" || variant === "vh" || variant === "px" || variant === "pt" || variant === "pc" || variant === "mm" || variant === "fr" || variant === "ex" || variant === "em" || variant === "cm" || variant === "ch" || variant === "percent" || variant === "fitContent" || variant === "varDefault" || variant === "lineNames" || variant === "minmax" || variant === "vmin" || variant === "vmax" || variant === "cqmin" || variant === "cqmax" || variant === "clamp" || variant === "inch" || variant === "pxFloat" || variant === "calc") {
     return toString$229(x);
   } else {
     return "'" + (x.VAL + "'");
