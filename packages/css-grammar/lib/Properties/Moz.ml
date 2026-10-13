@@ -307,7 +307,15 @@ let entries : (kind * packed_rule) list =
     ( Property "-moz-image-region",
       pack_module (module Property__moz_image_region) );
     Property "-moz-orient", pack_module (module Property__moz_orient);
-    ( Property "-moz-outline-radius",
+    (* Mozilla legacy (pre-standard corner radius, superseded by outline unified with border-radius's pattern; own vendor family): non-standard, css-grammar Properties/Moz.ml *)
+    ( Shorthand
+        ( "-moz-outline-radius",
+          [
+            "-moz-outline-radius-bottomleft";
+            "-moz-outline-radius-bottomright";
+            "-moz-outline-radius-topleft";
+            "-moz-outline-radius-topright";
+          ] ),
       pack_module (module Property__moz_outline_radius) );
     ( Property "-moz-outline-radius-bottomleft",
       pack_module (module Property__moz_outline_radius_bottomleft) );

@@ -1,18 +1,18 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-14ksm7b-cssRule{color:blue;}"];
-  [@css ".css-ggod7l-classNameWithCss{background-color:green;}"];
+  [@css "._a_4esm7b{color:blue;}"];
+  [@css "._a_39004od7l{background-color:green;}"];
   [@css.bindings
     [
-      ("Output.cssRule", "css-14ksm7b-cssRule"),
-      ("Output.classNameWithCss", "css-ggod7l-classNameWithCss"),
+      ("Output.cssRule", "_id_feg3n0", "_a_4esm7b"),
+      ("Output.classNameWithCss", "_id_wvmpur", "_a_39004od7l"),
     ]
   ];
   let className = [%cx "display: block;"];
   let classNameWithMultiLine = [%cx {| display: block; |}];
   let classNameWithArray = [%cx [|cssProperty|]];
-  let cssRule = CSS.make("css-14ksm7b-cssRule", []);
+  let cssRule = CSS.make("label:cssRule _id_feg3n0 _a_4esm7b", []);
   let classNameWithCss = [%cx
-    [|cssRule, CSS.make("css-ggod7l-classNameWithCss", [])|]
+    [|cssRule, CSS.make("label:classNameWithCss _id_wvmpur _a_39004od7l", [])|]
   ];

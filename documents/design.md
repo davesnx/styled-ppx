@@ -267,7 +267,7 @@ module Theme = [%styled.global {|
 
   /* Cross-module $(M.binding) emits a NUL-delimited sentinel that
      the post-build aggregator (styled-ppx.generate) substitutes
-     using the index it harvests from M's post-PPX file. */
+     using the index it extracts from M's post-PPX file. */
   body .$(OtherModule.marker) { background: red; }
 
   /* Selector interp inside @media / @supports works the same way -
@@ -329,6 +329,7 @@ module ThemeStyles = [%styled.global {|
 | Non-string payload                                                        | `Pmod_extension` pointing at the payload, with the correct-form example.                                                                  |
 | Interpolation inside `url(...)`                                           | `raise_errorf`: browsers don't substitute `var()` inside `url()`.                                                                          |
 | Interpolation in an at-rule prelude (e.g. `@media (max-width: $(bp))`)   | `raise_errorf` pointing at the interpolation.                                                                                             |
+| Invalid `@media` / `@supports` / `@container` prelude (`@media (min-widht: 1px)`, `@supports color: red`) | Compile error from `Css_validation.type_check_at_rule_prelude`: structure checked against the registered `media-query-list` / `supports-condition` / `container-condition-list` grammars, `@media`/`@container` feature names against the spec inventory (with a `Did you mean` hint), feature values against the feature's grammar. `@supports` skips the name check, since probing unknown syntax is its purpose. Interpolated preludes are skipped here. |
 | Parentless `&` (top level, or under an at-rule with no style rule above)  | `raise_errorf`: `&` has no parent selector to resolve against.                                                                            |
 | Selector interp `$(name)` references undefined or forward local binding   | `raise_errorf` from `Local_selector_environment.resolve_selector_class_ref` pointing at the interpolation.                                                  |
 | Bare `$(name)` (no `.` prefix) resolves to multiple classes               | `raise_errorf` instructing the user to switch to `.$(name)` for chain semantics.                                                          |
@@ -362,7 +363,7 @@ module ThemeStyles = [%styled.global {|
 ### `[%keyframe]`
 
 Shares the same front end and extracts `@keyframes` blocks named by
-content hash (`keyframe-<murmur2(body)>`, via `Css_file.push_keyframe`).
+content hash (`_k_<murmur2(body)>`, via `Css_file.push_keyframe`).
 Value interpolation in keyframe declarations is lowered to
 CSS custom properties in the extracted `@keyframes` rule, while the generated
 `AnimationName.t` carries the runtime custom-property bindings that

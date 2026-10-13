@@ -8,5 +8,6 @@ Alcotest.run(
     Standard_test.tests,
     Parser_test.tests,
     Interpolation_extraction_test.tests,
+    Shorthand_test.tests,
   ]),
 );

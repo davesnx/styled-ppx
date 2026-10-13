@@ -166,6 +166,7 @@ include Properties.Media;
 include Properties.Descriptors;
 include Properties.Legacy;
 include Registry;
+include At_rule_prelude;
 
 module Rule = Rule;
 module Css_value_types = Css_value_types;

@@ -41,7 +41,10 @@ let entries : (kind * packed_rule) list =
   [
     Property "outline-width", pack_module (module Property_outline_width);
     Property "outline-style", pack_module (module Property_outline_style);
-    Property "outline", pack_module (module Property_outline);
+    (* Basic User Interface L3/L4 (outline-offset deliberately excluded, not reset): https://www.w3.org/TR/css-ui-4/#outline-props *)
+    ( Shorthand
+        ("outline", [ "outline-color"; "outline-style"; "outline-width" ]),
+      pack_module (module Property_outline) );
     Property "outline-offset", pack_module (module Property_outline_offset);
     Property "outline-color", pack_module (module Property_outline_color);
   ]

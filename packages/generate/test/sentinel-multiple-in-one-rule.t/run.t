@@ -2,7 +2,7 @@ Multiple sentinels in the same rule string each resolve independently.
 Useful pattern: chaining two cross-module markers on one selector.
 
   $ cat > a.ml <<EOF
-  > [@@@css.bindings [("A.one", "klass-1"); ("A.two", "klass-2")]]
+  > [@@@css.bindings [("A.one", "klass-1", "klass-1"); ("A.two", "klass-2", "klass-2")]]
   > let one = CSS.make "klass-1" []
   > let two = CSS.make "klass-2" []
   > EOF

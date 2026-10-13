@@ -6,12 +6,13 @@ function args, and other inner expressions stay private.
   $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
   [@@@css "@property --active-f7rv17{syntax:\"*\";inherits:false;}"]
-  [@@@css ".css-tokvmb-inner{color:red;}"]
-  [@@@css ".css-ythpkc-make_button{color:var(--active-f7rv17);}"]
+  [@@@css "._a_4ekvmb{color:red;}"]
+  [@@@css "._a_4ehpkc{color:var(--active-f7rv17);}"]
   [@@@css.bindings
-    [("Input.outer", "css-tokvmb-inner");
-    ("Input.make_button", "css-ythpkc-make_button")]]
-  let outer = let inner = CSS.make "css-tokvmb-inner" [] in inner
+    [("Input.outer", "_id_1din52f", "_a_4ekvmb");
+    ("Input.make_button", "_id_1ue7vq2", "_a_4ehpkc")]]
+  let outer =
+    let inner = CSS.make "label:inner _id_1din52f _a_4ekvmb" [] in inner
   let make_button active =
-    CSS.make "css-ythpkc-make_button"
+    CSS.make "label:make_button _id_1ue7vq2 _a_4ehpkc"
       [("--active-f7rv17", (CSS.Types.Color.toString active))]

@@ -1,8 +1,7 @@
 /* Functional pseudo-elements (`::part()`, `::slotted()`, and any other
    identifier the lexer tokenizes as a function, since only nth-* names get
    their own token) and the Selectors Level 4 "of S" form of
-   `:nth-child()`/`:nth-last-child()` were both unparseable
-   (.workplace/docs/parser-audit-defects.md #7, #8). */
+   `:nth-child()`/`:nth-last-child()` were both unparseable. */
 
 let _part = [%css
   {|

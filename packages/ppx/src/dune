@@ -9,6 +9,8 @@
   styled_ppx_css_parser
   Css_grammar
   murmur2
+  slot_key
+  class_format
   server-reason-react.styles-attribute
   sedlex
   ppxlib

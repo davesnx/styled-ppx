@@ -14,21 +14,24 @@ before popping, so the popped segment is always the rightmost compound.
   $ ../../../standalone.exe --impl input.ml -o output.ml
   $ cat output.ml
   [@@@css
-    ".css-1meebco-table tbody tr:first-child td{border-top:1px solid gray;}"]
+    "._a_g79843hghsebco tbody tr:first-child td{border-top:1px solid gray;}"]
   [@@@css
-    ".css-1rhtv1h-table tbody tr:first-child td:first-child{border-top:1px solid transparent;}"]
+    "._a_x5lvq3hghstv1h tbody tr:first-child td:first-child{border-top:1px solid transparent;}"]
   [@@@css
-    ".css-r3cuwt-table tbody tr:first-child td:last-child{border-top:1px solid transparent;}"]
-  [@@@css ".css-x5n7y2-single tbody tr:first-child td:first-child{color:red;}"]
-  [@@@css ".css-1wfoysu-compoundParent ul li:hover::before{content:\"\";}"]
-  [@@@css ".css-1ikqg0-compoundParent ul li:hover::after{content:\"\";}"]
+    "._a_lf3m83hghscuwt tbody tr:first-child td:last-child{border-top:1px solid transparent;}"]
+  [@@@css "._a_x5lvq4en7y2 tbody tr:first-child td:first-child{color:red;}"]
+  [@@@css "._a_pkdux4woysu ul li:hover::before{content:\"\";}"]
+  [@@@css "._a_rf47n4wkqg0 ul li:hover::after{content:\"\";}"]
   [@@@css.bindings
-    [("Input.table", "css-1meebco-table css-1rhtv1h-table css-r3cuwt-table");
-    ("Input.single", "css-x5n7y2-single");
-    ("Input.compoundParent",
-      "css-1wfoysu-compoundParent css-1ikqg0-compoundParent")]]
+    [("Input.table", "_id_1me4lmu",
+       "_a_g79843hghsebco _a_x5lvq3hghstv1h _a_lf3m83hghscuwt");
+    ("Input.single", "_id_1e50cws", "_a_x5lvq4en7y2");
+    ("Input.compoundParent", "_id_16qcgjr", "_a_pkdux4woysu _a_rf47n4wkqg0")]]
   let table =
-    CSS.make "css-1meebco-table css-1rhtv1h-table css-r3cuwt-table" []
-  let single = CSS.make "css-x5n7y2-single" []
+    CSS.make
+      "label:table _id_1me4lmu _a_g79843hghsebco _a_x5lvq3hghstv1h _a_lf3m83hghscuwt"
+      []
+  let single = CSS.make "label:single _id_1e50cws _a_x5lvq4en7y2" []
   let compoundParent =
-    CSS.make "css-1wfoysu-compoundParent css-1ikqg0-compoundParent" []
+    CSS.make "label:compoundParent _id_16qcgjr _a_pkdux4woysu _a_rf47n4wkqg0"
+      []

@@ -12,12 +12,7 @@ let register_alias:
   unit;
 
 let register:
-  (
-    ~file: string,
-    ~scope: list(string),
-    ~name: string,
-    ~classNames: list(string)
-  ) =>
+  (~file: string, ~scope: list(string), ~name: string, ~className: string) =>
   unit;
 
 let include_module:
@@ -38,6 +33,6 @@ let resolve_selector_class_ref:
     ~loc: Ppxlib.Location.t,
     string
   ) =>
-  list(string);
+  string;
 
 let clear: unit => unit;

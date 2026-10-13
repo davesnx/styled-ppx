@@ -1,15 +1,10 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-k008qs-SingleQuoteStrings{display:flex;}"];
-  [@css ".css-1tyndxa-SingleQuoteStrings{justify-content:center;}"];
+  [@css "._a_5r08qs{display:flex;}"];
+  [@css "._a_9h002ndxa{justify-content:center;}"];
   [@css.bindings
-    [
-      (
-        "Output.SingleQuoteStrings",
-        "css-k008qs-SingleQuoteStrings css-1tyndxa-SingleQuoteStrings",
-      ),
-    ]
+    [("Output.SingleQuoteStrings", "_id_ekh1sj", "_a_5r08qs _a_9h002ndxa")]
   ];
   module SingleQuoteStrings = {
     [@deriving abstract]
@@ -996,7 +991,7 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "css-k008qs-SingleQuoteStrings css-1tyndxa-SingleQuoteStrings",
+        "label:SingleQuoteStrings _id_ekh1sj _a_5r08qs _a_9h002ndxa",
         [],
       );
     let make = (props: makeProps) => {

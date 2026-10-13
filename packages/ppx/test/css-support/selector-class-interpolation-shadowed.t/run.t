@@ -13,19 +13,22 @@ Shadowing follows OCaml semantics: `&.$(foo)` resolves to the second
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb-foo{color:red;}"];
-  [@css ".css-14ksm7b-foo{color:blue;}"];
-  [@css ".css-191lhl1-bar.css-14ksm7b-foo{font-weight:bold;}"];
+  [@css "._a_4ekvmb{color:red;}"];
+  [@css "._a_4esm7b{color:blue;}"];
+  [@css "._a_tb8ov65m9solf9._id_1mvyff1{font-weight:bold;}"];
   [@css.bindings
-    [("Input.foo", "css-14ksm7b-foo"), ("Input.bar", "css-191lhl1-bar")]
+    [
+      ("Input.foo", "_id_1mvyff1", "_a_4esm7b"),
+      ("Input.bar", "_id_1eelq62", "_a_tb8ov65m9solf9"),
+    ]
   ];
   
-  let foo = CSS.make("css-tokvmb-foo", []);
+  let foo = CSS.make("label:foo _id_zec317 _a_4ekvmb", []);
   let _ = foo;
   
-  let foo = CSS.make("css-14ksm7b-foo", []);
+  let foo = CSS.make("label:foo _id_1mvyff1 _a_4esm7b", []);
   
-  let bar = CSS.make("css-191lhl1-bar", []);
+  let bar = CSS.make("label:bar _id_1eelq62 _a_tb8ov65m9solf9", []);
   
   let _ = (foo, bar);
 

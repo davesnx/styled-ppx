@@ -13,7 +13,7 @@ Malformed extraction attributes are protocol errors, not silent skips.
   > EOF
 
   $ styled-ppx.generate malformed_bindings.ml
-  styled-ppx: malformed_bindings.ml: malformed [@@@css.bindings]: malformed css.bindings payload at entry 0: expected (longident, class_string) string tuple
+  styled-ppx: malformed_bindings.ml: malformed [@@@css.bindings]: malformed css.bindings payload at entry 0: expected (longident, identity, class_string) tuple
   [1]
 
   $ cat > malformed_refs.ml <<EOF

@@ -1,15 +1,10 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css ".css-k008qs-MultiLineStrings{display:flex;}"];
-  [@css ".css-1tyndxa-MultiLineStrings{justify-content:center;}"];
+  [@css "._a_5r08qs{display:flex;}"];
+  [@css "._a_9h002ndxa{justify-content:center;}"];
   [@css.bindings
-    [
-      (
-        "Output.MultiLineStrings",
-        "css-k008qs-MultiLineStrings css-1tyndxa-MultiLineStrings",
-      ),
-    ]
+    [("Output.MultiLineStrings", "_id_11ddqpw", "_a_5r08qs _a_9h002ndxa")]
   ];
   module MultiLineStrings = {
     [@deriving abstract]
@@ -995,7 +990,7 @@
     external assign2: (Js.t({..}), makeProps, Js.t({..})) => Js.t({..}) =
       "Object.assign";
     let styles =
-      CSS.make("css-k008qs-MultiLineStrings css-1tyndxa-MultiLineStrings", []);
+      CSS.make("label:MultiLineStrings _id_11ddqpw _a_5r08qs _a_9h002ndxa", []);
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(classNameGet(props))
       and style = snd(styles);

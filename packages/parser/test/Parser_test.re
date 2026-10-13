@@ -1004,6 +1004,133 @@ let invalid_utf8_tests = [
   }),
 ];
 
+let namespace_and_cdx_tests = {
+  let type_selector_of = input =>
+    switch (Driver.parse_stylesheet(~source_position_start, input)) {
+    | Ok((
+        [
+          Ast.Style_rule({
+            prelude:
+              (
+                [
+                  (
+                    Ast.ComplexSelector(
+                      Ast.Selector(Ast.SimpleSelector(Ast.Type(name))),
+                    ),
+                    _,
+                  ),
+                ],
+                _,
+              ),
+            _,
+          }),
+        ],
+        _,
+      )) => name
+    | Ok(_) => fail("expected a single type selector for " ++ input)
+    | Error((_, msg)) => fail("expected " ++ input ++ " to parse: " ++ msg)
+    };
+  let attribute_name_of = input =>
+    switch (Driver.parse_stylesheet(~source_position_start, input)) {
+    | Ok((
+        [
+          Ast.Style_rule({
+            prelude:
+              (
+                [
+                  (
+                    Ast.ComplexSelector(
+                      Ast.Selector(
+                        Ast.CompoundSelector({
+                          subclass_selectors: [Ast.Attribute(attribute)],
+                          _,
+                        }),
+                      ),
+                    ),
+                    _,
+                  ),
+                ],
+                _,
+              ),
+            _,
+          }),
+        ],
+        _,
+      )) =>
+      switch (attribute) {
+      | Ast.Attr_value(name) => name
+      | Ast.To_equal({ name, _ }) => name
+      }
+    | Ok(_) => fail("expected a single attribute selector for " ++ input)
+    | Error((_, msg)) => fail("expected " ++ input ++ " to parse: " ++ msg)
+    };
+  let namespace_type_cases =
+    [("svg|circle", "svg|circle"), ("*|circle", "*|circle")]
+    @ [("|circle", "|circle"), ("svg|*", "svg|*"), ("|*", "|*")]
+    @ [("*|*", "*|*")]
+    |> List.map(((selector, expected)) =>
+         test_case("namespace type selector " ++ selector, `Quick, () =>
+           check(
+             string,
+             selector,
+             expected,
+             type_selector_of(selector ++ " {}"),
+           )
+         )
+       );
+  let namespace_attribute_cases =
+    [
+      ("[svg|href]", "svg|href"),
+      ("[*|href]", "*|href"),
+      ("[|href]", "|href"),
+      ("[xlink|href=a]", "xlink|href"),
+      ("[lang|=en]", "lang"),
+    ]
+    |> List.map(((selector, expected)) =>
+         test_case("namespace attribute selector " ++ selector, `Quick, () =>
+           check(
+             string,
+             selector,
+             expected,
+             attribute_name_of(selector ++ " {}"),
+           )
+         )
+       );
+  let cdx_cases =
+    [
+      "<!-- a { color: red } -->",
+      "<!--a { color: red }-->",
+      "--> <!-- a { color: red }",
+    ]
+    |> List.map(input =>
+         test_case(
+           "CDO/CDC are ignored at the top level: " ++ input, `Quick, () =>
+           switch (Driver.parse_stylesheet(~source_position_start, input)) {
+           | Ok(([Ast.Style_rule(_)], _)) => ()
+           | Ok(_) => fail("expected exactly one style rule for " ++ input)
+           | Error((_, msg)) =>
+             fail("expected " ++ input ++ " to parse: " ++ msg)
+           }
+         )
+       );
+  namespace_type_cases
+  @ namespace_attribute_cases
+  @ cdx_cases
+  @ [
+    test_case("CDO is an error inside a block", `Quick, () =>
+      switch (
+        Driver.parse_stylesheet(
+          ~source_position_start,
+          "a { <!-- color: red }",
+        )
+      ) {
+      | Error(_) => ()
+      | Ok(_) => fail("expected CDO inside a block to be an error")
+      }
+    ),
+  ];
+};
+
 let tests =
   List.concat([
     error_tests_data,
@@ -1017,4 +1144,5 @@ let tests =
     nested_relative_selector_tests,
     ambiguity_regression_tests,
     invalid_utf8_tests,
+    namespace_and_cdx_tests,
   ]);

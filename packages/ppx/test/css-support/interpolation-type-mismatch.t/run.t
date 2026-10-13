@@ -7,6 +7,7 @@ This test ensures type mismatches between interpolation result and CSS types
   $ cat > dune << EOF
   > (executable
   >  (name input)
+  >  (flags :standard -short-paths)
   >  (libraries styled-ppx.native)
   >  (preprocess (pps styled-ppx)))
   > EOF

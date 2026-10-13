@@ -8,6 +8,14 @@ module Property_scroll_behavior =
 let property_scroll_behavior : property_scroll_behavior Rule.rule =
   Property_scroll_behavior.rule
 
+(* CSS Overflow L5: https://drafts.csswg.org/css-overflow-5/#propdef-scroll-axis-lock *)
+module Property_scroll_axis_lock =
+  [%spec_module
+  "'auto' | 'none'", (module Css_types.ScrollAxisLock)]
+
+let property_scroll_axis_lock : property_scroll_axis_lock Rule.rule =
+  Property_scroll_axis_lock.rule
+
 module Property_scroll_margin =
   [%spec_module
   "[ <extended-length> ]{1,4}", (module Css_types.ScrollMargin)]
@@ -716,11 +724,24 @@ let entries : (kind * packed_rule) list =
     ( Property "-ms-scrollbar-track-color",
       pack_module (module Property__ms_scrollbar_track_color) );
     Property "scroll-behavior", pack_module (module Property_scroll_behavior);
+    Property "scroll-axis-lock", pack_module (module Property_scroll_axis_lock);
     ( Property "scroll-initial-target",
       pack_module (module Property_scroll_initial_target) );
     Property "scroll-snap-stop", pack_module (module Property_scroll_snap_stop);
-    Property "scroll-margin", pack_module (module Property_scroll_margin);
-    ( Property "scroll-margin-block",
+    (* Scroll Snap L1 (scroll-margin) + Logical Properties L1: https://www.w3.org/TR/css-scroll-snap-1/#scroll-margin ; https://www.w3.org/TR/css-logical-1/ *)
+    ( Shorthand
+        ( "scroll-margin",
+          [
+            "scroll-margin-top";
+            "scroll-margin-right";
+            "scroll-margin-bottom";
+            "scroll-margin-left";
+          ] ),
+      pack_module (module Property_scroll_margin) );
+    (* Scroll Snap L1 (scroll-margin) + Logical Properties L1: https://www.w3.org/TR/css-scroll-snap-1/#scroll-margin ; https://www.w3.org/TR/css-logical-1/ *)
+    ( Shorthand
+        ( "scroll-margin-block",
+          [ "scroll-margin-block-start"; "scroll-margin-block-end" ] ),
       pack_module (module Property_scroll_margin_block) );
     ( Property "scroll-margin-block-end",
       pack_module (module Property_scroll_margin_block_end) );
@@ -728,7 +749,10 @@ let entries : (kind * packed_rule) list =
       pack_module (module Property_scroll_margin_block_start) );
     ( Property "scroll-margin-bottom",
       pack_module (module Property_scroll_margin_bottom) );
-    ( Property "scroll-margin-inline",
+    (* Scroll Snap L1 (scroll-margin) + Logical Properties L1: https://www.w3.org/TR/css-scroll-snap-1/#scroll-margin ; https://www.w3.org/TR/css-logical-1/ *)
+    ( Shorthand
+        ( "scroll-margin-inline",
+          [ "scroll-margin-inline-start"; "scroll-margin-inline-end" ] ),
       pack_module (module Property_scroll_margin_inline) );
     ( Property "scroll-margin-inline-end",
       pack_module (module Property_scroll_margin_inline_end) );
@@ -742,8 +766,20 @@ let entries : (kind * packed_rule) list =
       pack_module (module Property_scroll_margin_top) );
     ( Property "scroll-marker-group",
       pack_module (module Property_scroll_marker_group) );
-    Property "scroll-padding", pack_module (module Property_scroll_padding);
-    ( Property "scroll-padding-block",
+    (* Scroll Snap L1 (scroll-padding) + Logical Properties L1: https://www.w3.org/TR/css-scroll-snap-1/#scroll-padding ; https://www.w3.org/TR/css-logical-1/ *)
+    ( Shorthand
+        ( "scroll-padding",
+          [
+            "scroll-padding-top";
+            "scroll-padding-right";
+            "scroll-padding-bottom";
+            "scroll-padding-left";
+          ] ),
+      pack_module (module Property_scroll_padding) );
+    (* Scroll Snap L1 (scroll-padding) + Logical Properties L1: https://www.w3.org/TR/css-scroll-snap-1/#scroll-padding ; https://www.w3.org/TR/css-logical-1/ *)
+    ( Shorthand
+        ( "scroll-padding-block",
+          [ "scroll-padding-block-start"; "scroll-padding-block-end" ] ),
       pack_module (module Property_scroll_padding_block) );
     ( Property "scroll-padding-block-end",
       pack_module (module Property_scroll_padding_block_end) );
@@ -751,7 +787,10 @@ let entries : (kind * packed_rule) list =
       pack_module (module Property_scroll_padding_block_start) );
     ( Property "scroll-padding-bottom",
       pack_module (module Property_scroll_padding_bottom) );
-    ( Property "scroll-padding-inline",
+    (* Scroll Snap L1 (scroll-padding) + Logical Properties L1: https://www.w3.org/TR/css-scroll-snap-1/#scroll-padding ; https://www.w3.org/TR/css-logical-1/ *)
+    ( Shorthand
+        ( "scroll-padding-inline",
+          [ "scroll-padding-inline-start"; "scroll-padding-inline-end" ] ),
       pack_module (module Property_scroll_padding_inline) );
     ( Property "scroll-padding-inline-end",
       pack_module (module Property_scroll_padding_inline_end) );

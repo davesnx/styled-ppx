@@ -31,10 +31,25 @@ module Property_line_height_step =
 let property_line_height_step : property_line_height_step Rule.rule =
   Property_line_height_step.rule
 
+(* CSS Inline Layout L3: https://drafts.csswg.org/css-inline-3/#propdef-line-fit-edge
+   'leading' | <text-edge>, the same <text-edge> grammar Text.ml's
+   property_text_box writes out inline (text/ideographic/ideographic-ink
+   alone, or one of cap/ex followed by one of alphabetic plus those three). *)
+module Property_line_fit_edge =
+  [%spec_module
+  "'leading' | [ 'text' | 'ideographic' | 'ideographic-ink' ] | [ 'text' | \
+   'ideographic' | 'ideographic-ink' | 'cap' | 'ex' ] [ 'text' | 'ideographic' \
+   | 'ideographic-ink' | 'alphabetic' ]",
+  (module Css_types.LineFitEdge)]
+
+let property_line_fit_edge : property_line_fit_edge Rule.rule =
+  Property_line_fit_edge.rule
+
 let entries : (kind * packed_rule) list =
   [
     Property "line-clamp", pack_module (module Property_line_clamp);
     Property "line-height-step", pack_module (module Property_line_height_step);
     Property "line-height", pack_module (module Property_line_height);
     Property "line-break", pack_module (module Property_line_break);
+    Property "line-fit-edge", pack_module (module Property_line_fit_edge);
   ]
