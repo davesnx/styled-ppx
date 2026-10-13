@@ -11,49 +11,23 @@ let check_int = Alcotest.check Alcotest.int
 let check_string = Alcotest.check Alcotest.string
 let check_string_list = Alcotest.check (Alcotest.list Alcotest.string)
 
-(* Properties/Media.ml registers 25 entries under the [Property] tag that
-   are internal `@media` feature-value grammars (media-hover,
-   media-color-gamut, ...), not CSS properties any declaration ever names -
-   see Css_grammar.Types.kind's module doc. Excluded from the "must be
-   Registered, not hash-fallback" check below since they were deliberately
-   left out of Slot_key's seed for the same reason. *)
-let media_feature_pseudo_properties =
-  [
-    "media-any-hover";
-    "media-any-pointer";
-    "media-color-gamut";
-    "media-color-index";
-    "media-display-mode";
-    "media-forced-colors";
-    "media-grid";
-    "media-hover";
-    "media-inverted-colors";
-    "media-max-aspect-ratio";
-    "media-max-resolution";
-    "media-min-aspect-ratio";
-    "media-min-color";
-    "media-min-color-index";
-    "media-min-resolution";
-    "media-monochrome";
-    "media-orientation";
-    "media-pointer";
-    "media-prefers-color-scheme";
-    "media-prefers-contrast";
-    "media-prefers-reduced-motion";
-    "media-resolution";
-    "media-scripting";
-    "media-type";
-    "media-update";
-  ]
+(* Properties/Media.ml registers every `media-*` entry under the [Property]
+   tag, but they are internal `@media`/`@container` feature-value grammars
+   (media-hover, media-min-width, ...), not CSS properties any declaration
+   ever names - see Css_grammar.Types.kind's module doc. Excluded from the
+   "must be Registered, not hash-fallback" check below since they were
+   deliberately left out of Slot_key's seed for the same reason. *)
+let is_media_feature_pseudo_property name =
+  String.starts_with ~prefix:"media-" name
 
 (* [family_id_of] special-cases "all" to the [All] sentinel (CSS's [all]
    keyword, not a real property with a family) - excluded here for the same
-   reason [media_feature_pseudo_properties] is: it is registered in
+   reason [is_media_feature_pseudo_property] is: it is registered in
    css-grammar but is not a property this table assigns a family id to. *)
 let live_css_grammar_properties =
   Css_grammar.property_names ()
   |> List.filter (fun name ->
-    (not (List.mem name media_feature_pseudo_properties)) && name <> "all")
+    (not (is_media_feature_pseudo_property name)) && name <> "all")
 
 let is_registered = function
   | Slot_key.Registered _ -> true

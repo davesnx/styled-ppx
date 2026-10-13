@@ -464,3 +464,22 @@ let string_of_delimiter =
   | Delimiter_underscore => "_"
   | Delimiter_gte => ">="
   | Delimiter_lte => "<=";
+
+/* Detect a `$(name)` interpolation anywhere in a component-value list,
+   recursing into `Paren_block`, `Bracket_block`, and `Function` bodies.
+   The naive top-level check misses interpolations nested inside those
+   groupings (e.g. `calc($(a) + 1px)` or `(max-width: $(bp))`). */
+let rec component_value_has_interpolation = (cv: component_value) =>
+  switch (cv) {
+  | Variable(_, _) => true
+  | Paren_block(values)
+  | Bracket_block(values) => component_value_list_has_interpolation(values)
+  | Function({ body: (values, _), _ }) =>
+    component_value_list_has_interpolation(values)
+  | _ => false
+  }
+and component_value_list_has_interpolation = values =>
+  List.exists(
+    ((cv, _loc)) => component_value_has_interpolation(cv),
+    values,
+  );

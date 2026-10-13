@@ -208,8 +208,8 @@ end
    IS the id (see {!Registry.table} below, which uses this array's order
    verbatim - no sorting, no filtering, ever, at build time). Seeded from
    every property packages/css-grammar/lib/Properties/*.ml registers (757,
-   via [Css_grammar.property_names ()], the 25 internal `@media`-feature-
-   grammar entries in Properties/Media.ml excluded - they are not CSS
+   via [Css_grammar.property_names ()], the internal `@media`-feature-
+   grammar entries (every `media-*`) in Properties/Media.ml excluded - they are not CSS
    properties, see Css_grammar.Registry's module doc; also excludes
    "backdrop-blur" and "container-name-computed", which no CSS spec
    defines), reduced through {!resolve_alias} and {!Family.family_key_of}
