@@ -252,6 +252,14 @@ style rule, a `[%css]` block, or a different at-rule body. Inside an
 `font-*` properties css-fonts also defines as descriptors), so an ordinary
 property such as `color` there is rejected as well.
 
+The same scoping applies to the other descriptor-only at-rules:
+`@font-palette-values` (`base-palette`, `override-colors`, plus `font-family`),
+`@view-transition` (`navigation`, `types`) and `@counter-style` (`system`,
+`symbols`, `negative`, `range`, `pad`, `fallback`, `prefix`, `suffix`,
+`additive-symbols`). Each descriptor is validated against its spec grammar and
+rejected outside its at-rule; the scopes live in `Css_validation.re`.
+`@counter-style`'s `speak-as` is not registered yet.
+
 Declaration-value interpolation in `[%styled.global]` is lowered to CSS
 custom properties (`var(--<prefix>-<hash>)` in the extracted rule, values
 supplied by the generated module's runtime `:root` block — see
