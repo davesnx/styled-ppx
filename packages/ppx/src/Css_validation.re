@@ -25,6 +25,41 @@ let is_font_face_descriptor = name =>
     font_face_descriptors @ font_face_properties,
   );
 
+let type_check_at_rule_prelude = (at_rule: Styled_ppx_css_parser.Ast.at_rule) => {
+  let (name, _) = at_rule.name;
+  let (prelude, prelude_loc) = at_rule.prelude;
+  /* Interpolated preludes (`@media $(Media.wide)`) are handled by the
+     extraction pipeline, which resolves them; the grammars only model
+     literal conditions. */
+  if (Styled_ppx_css_parser.Ast.component_value_list_has_interpolation(
+        prelude,
+      )) {
+    [Ok()];
+  } else {
+    switch (
+      Css_grammar.validate_at_rule_prelude(~loc=prelude_loc, ~name, prelude)
+    ) {
+    | None
+    | Some(Ok ()) => [Ok()]
+    | Some(Error((loc, `Invalid_value(detail)))) =>
+      let prelude_source =
+        Styled_ppx_css_parser.Render.component_value_list(prelude)
+        |> String.trim;
+      let msg =
+        Format.sprintf(
+          "@[@%s@ has@ an@ invalid@ condition:@ '%s',@ %s@]",
+          name,
+          prelude_source,
+          Css_grammar.Rule.format_error_info(detail),
+        );
+      [Error((loc, `Invalid_value(msg)))];
+    | Some(Error((loc, `Invalid_prelude(msg)))) => [
+        Error((loc, `Invalid_value(msg))),
+      ]
+    };
+  };
+};
+
 let rec type_check_rule = (~at_rule, rule: Styled_ppx_css_parser.Ast.rule) => {
   switch (rule) {
   | Declaration({ name: (name, name_loc), _ })
@@ -77,13 +112,19 @@ let rec type_check_rule = (~at_rule, rule: Styled_ppx_css_parser.Ast.rule) => {
     }
   | Style_rule(style_rule) =>
     type_check_rule_list(~at_rule, style_rule.block)
-  | At_rule({ name: (name, _), block, _ }) =>
-    let at_rule = Some(String.lowercase_ascii(name));
-    switch (block) {
-    | Empty => [Ok()]
-    | Rule_list(rule_list) => type_check_rule_list(~at_rule, rule_list)
-    | Stylesheet(rule_list) => type_check_rule_list(~at_rule, rule_list)
-    };
+  | At_rule(at_rule) =>
+    let prelude_checks = type_check_at_rule_prelude(at_rule);
+    let (name, _) = at_rule.name;
+    let at_rule_name = Some(String.lowercase_ascii(name));
+    let block_checks =
+      switch (at_rule.block) {
+      | Empty => [Ok()]
+      | Rule_list(rule_list) =>
+        type_check_rule_list(~at_rule=at_rule_name, rule_list)
+      | Stylesheet(rule_list) =>
+        type_check_rule_list(~at_rule=at_rule_name, rule_list)
+      };
+    prelude_checks @ block_checks;
   };
 }
 

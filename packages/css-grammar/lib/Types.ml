@@ -4395,9 +4395,67 @@ and property_media_prefers_reduced_motion =
   | `Reduce
   ]
 
-and property_media_resolution = resolution
+and property_media_resolution =
+  [ `Resolution of resolution
+  | `Infinite
+  ]
+
 and property_media_min_resolution = resolution
 and property_media_max_resolution = resolution
+
+(* Value classes shared by the prelude-validation feature grammars. *)
+and property_media_length_feature = extended_length
+and property_media_ratio_feature = ratio
+and property_media_integer_feature = int
+and property_media_number_feature = float
+
+and property_media_scan =
+  [ `Interlace
+  | `Progressive
+  ]
+
+and property_media_overflow_block =
+  [ `None
+  | `Scroll
+  | `Paged
+  ]
+
+and property_media_overflow_inline =
+  [ `None
+  | `Scroll
+  ]
+
+and property_media_dynamic_range =
+  [ `Standard
+  | `High
+  ]
+
+and property_media_prefers_reduced =
+  [ `No_preference
+  | `Reduce
+  ]
+
+and property_media_nav_controls =
+  [ `None
+  | `Back
+  ]
+
+and property_media_environment_blending =
+  [ `Opaque
+  | `Additive
+  | `Subtractive
+  ]
+
+and property_media_device_posture =
+  [ `Continuous
+  | `Folded
+  ]
+
+and property_media_video_color_gamut =
+  [ `Srgb
+  | `P3
+  | `Rec2020
+  ]
 
 and property_media_scripting =
   [ `None
