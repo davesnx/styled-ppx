@@ -439,7 +439,11 @@ every `@import` to precede every `@namespace`. Classification is a string
 test on the rendered rule — starts with `@import`/`@namespace` and ends
 with `;` — rather than a search for `{`, since an `@import` URL can itself
 contain `{` (`@import url("a{b.css");` is a valid statement, not a block
-rule). Statement-form `@layer a, b;` is deliberately NOT hoisted with
+rule). A namespace-qualified selector (`svg|circle`, `[xlink|href]`) only
+matches when the page declares its prefix with `@namespace svg url(...);`,
+which the hoisting above then places ahead of the rule; `*|name` and `|name`
+need no declaration (`packages/ppx/test/css-support/namespace-selectors.t`).
+Statement-form `@layer a, b;` is deliberately NOT hoisted with
 `@import`/`@namespace`: CSS allows it anywhere in a stylesheet, but a
 layer's priority is fixed by its name's FIRST occurrence across the whole
 page, so relocating a user's own `@layer` statement could silently change
