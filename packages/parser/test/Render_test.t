@@ -716,3 +716,15 @@ token)
   > ::highlight(name) { foo: bar; }
   > EOF
   custom-element::part(foo){foo:bar;}::slotted(.bar){foo:bar;}::highlight(name){foo:bar;}
+
+Namespace selectors (Selectors Level 4 <ns-prefix>) in type and attribute selectors
+  $ cat << "EOF" | ./Render_test.exe
+  > svg|circle { foo: bar; }
+  > *|a { foo: bar; }
+  > |a { foo: bar; }
+  > svg|* { foo: bar; }
+  > [xlink|href] { foo: bar; }
+  > [*|href=a] { foo: bar; }
+  > [lang|=en] { foo: bar; }
+  > EOF
+  svg|circle{foo:bar;}*|a{foo:bar;}|a{foo:bar;}svg|*{foo:bar;}[xlink|href]{foo:bar;}[*|href=a]{foo:bar;}[lang|=en]{foo:bar;}
