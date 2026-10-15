@@ -109,7 +109,7 @@ show("E07", [("a", e07_a), ("b", e07_b)], CSS.merge(e07_a, e07_b));
 
 /* E08: A physical (padding-left), B logical (padding-inline-start), A defined before B
    intended: B
-   note: the prefixer adds -webkit-padding-start to B */
+   note: the prefixer adds -webkit-padding-start to B; it counts as padding-inline-start (depth 1), same as E45 */
 let e08_a = [%css {|
   padding-left: 311px;
 |}];
@@ -120,7 +120,7 @@ show("E08", [("a", e08_a), ("b", e08_b)], CSS.merge(e08_a, e08_b));
 
 /* E09: A logical (padding-inline-end), B physical (padding-right), B defined before A
    intended: B
-   note: the prefixer adds -webkit-padding-end to A */
+   note: the prefixer adds -webkit-padding-end to A; it counts as padding-inline-end (depth 1), so A, defined after B, now lands after it (same depth keeps source order) */
 let e09_b = [%css {|
   padding-right: 313px;
 |}];
@@ -228,7 +228,7 @@ show("E18", [("a", e18_a), ("b", e18_b)], CSS.merge(e18_a, e18_b));
 
 /* E19: :focus longhand (A) then :active shorthand (B), the prefixed twin of C32
    intended: B
-   note: the prefixer adds -webkit-animation-duration to A and -webkit-animation to B */
+   note: the prefixer adds -webkit-animation-duration to A and -webkit-animation to B; the prefixed longhand counts as depth 1 and lands after the shorthand, same as the unprefixed C32 */
 let e19_a = [%css {|
   &:focus { animation-duration: 331s; }
 |}];

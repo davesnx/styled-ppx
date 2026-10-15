@@ -110,7 +110,6 @@ Test interpolation support for various properties in cx2
   @property --overscrollBehavior-17qcsbs{syntax:"*";inherits:false;}
   @property --accentColor-mn7yh{syntax:"*";inherits:false;}
   @property --caretColor-zmu88x{syntax:"*";inherits:false;}
-  ._a_6100019kvu{-webkit-flex-direction:var(--flexDirection-vyhh8o);-ms-flex-direction:var(--flexDirection-vyhh8o);flex-direction:var(--flexDirection-vyhh8o);}
   ._a_5rpg0g{display:var(--display-jduo1l);}
   ._a_e0jrd3{visibility:var(--visibility-10dikjf);}
   ._a_8rkydf{overflow:var(--overflow-1mtk7mf);}
@@ -136,7 +135,6 @@ Test interpolation support for various properties in cx2
   ._a_9ktret{pointer-events:var(--pointerEvents-1hbyrkf);}
   ._a_8mvp00{opacity:var(--opacity-1hgminq);}
   ._a_6fuf95{gap:var(--gap-py3nvz);}
-  ._a_6f0001g4ax{-webkit-column-gap:var(--columnGap-ie3e74);column-gap:var(--columnGap-ie3e74);}
   ._a_7qalzm{margin-block:var(--marginBlock-v40cvv);}
   ._a_7rvqz5{margin-inline:var(--marginInline-ivw2py);}
   ._a_95lw87{padding-block:var(--paddingBlock-1vcjdwn);}
@@ -163,7 +161,6 @@ Test interpolation support for various properties in cx2
   ._a_7a2xt3{isolation:var(--isolation-1ad21a4);}
   ._a_8d89er{mix-blend-mode:var(--mixBlendMode-1gh357x);}
   ._a_3a727u{background-blend-mode:var(--backgroundBlendMode-1ubdfn4);}
-  ._a_4o00010ec3{-webkit-column-count:var(--columnCount-1vrfrhd);column-count:var(--columnCount-1vrfrhd);}
   ._a_43g6ew{break-before:var(--breakBefore-1uz2974);}
   ._a_42h63b{break-after:var(--breakAfter-1ppm471);}
   ._a_441x2b{break-inside:var(--breakInside-1jjp0ej);}
@@ -179,6 +176,7 @@ Test interpolation support for various properties in cx2
   ._a_9h00014yx2{align-content:var(--alignContent-13ah8fi);}
   ._a_9i0002pwmx{justify-items:var(--justifyItems-1excenu);}
   ._a_9j0002fvf2{justify-self:var(--justifySelf-67xw19);}
+  ._a_6100019kvu{-webkit-flex-direction:var(--flexDirection-vyhh8o);-ms-flex-direction:var(--flexDirection-vyhh8o);flex-direction:var(--flexDirection-vyhh8o);}
   ._a_610002drze{flex-wrap:var(--flexWrap-mf3oja);}
   ._a_600002u6xw{flex-grow:var(--flexGrow-fuzkbv);}
   ._a_600004wsqe{flex-shrink:var(--flexShrink-1pv1ijl);}
@@ -213,5 +211,7 @@ Test interpolation support for various properties in cx2
   ._a_8p0001q72v{outline-color:var(--outlineColor-rydsxk);}
   ._a_6i0002w8xd{grid-auto-flow:var(--gridAutoFlow-16d9clt);}
   ._a_6f0002ftvm{row-gap:var(--rowGap-1l1vram);}
+  ._a_6f0001g4ax{-webkit-column-gap:var(--columnGap-ie3e74);column-gap:var(--columnGap-ie3e74);}
   ._a_7o00044owk{list-style-type:var(--listStyleType-wes33f);}
   ._a_7o0002r375{list-style-position:var(--listStylePosition-1gexoze);}
+  ._a_4o00010ec3{-webkit-column-count:var(--columnCount-1vrfrhd);column-count:var(--columnCount-1vrfrhd);}

@@ -12,10 +12,8 @@ html{margin:0;padding:0;}
 #root{margin:0;padding:0;}
 body{background-color:var(--pageBackground-171dvmc);color:var(--textColor-a4prc9);font-family:"Menlo", "monospace";line-height:1.5;}
 ._a_5r08qs{display:flex;}
-._a_610001q59l{-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;}
 ._a_604qq7{-webkit-flex:1;-ms-flex:1;flex:1;}
 ._a_5r1fx4{display:flex;}
-._a_610001bumx{-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;}
 ._a_6f6fnz{gap:var(--lola-8erbae);}
 ._a_4eh072{color:red;}
 ._a_5lx1dp{cursor:auto;}
@@ -58,15 +56,13 @@ body{background-color:var(--pageBackground-171dvmc);color:var(--textColor-a4prc9
 ._a_940sqd{padding:24px;}
 ._a_3ngzf7{border-radius:18px;}
 ._a_39do0u{background:#f6f1e8;}
-._a_2z001s49z5{-webkit-animation-name:var(--resize-1jz21hk);animation-name:var(--resize-1jz21hk);}
-._a_2z0008fc7i{-webkit-animation-duration:1200ms;animation-duration:1200ms;}
-._a_2z01kw7a08{-webkit-animation-timing-function:ease-in-out;animation-timing-function:ease-in-out;}
-._a_2z000gllw7{-webkit-animation-fill-mode:both;animation-fill-mode:both;}
 ._a_ec0v5o{width:280px;}
 ._a_3njx05{border-radius:14px;}
 ._a_39wy1d{background:linear-gradient(135deg, #101828 0%, #364152 100%);}
 ._a_4eu7uq{color:white;}
 ._a_40xf3p{box-shadow:0 20px 40px rgba(16, 24, 40, 0.22);}
+._a_610001q59l{-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;}
+._a_610001bumx{-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;}
 ._a_650001iz7u{font-family:"Menlo", "monospace";}
 ._a_4v0002an9u{container-type:inline-size;}
 ._a_65000w2eld{font-size:1.5em;}
@@ -81,6 +77,10 @@ body{background-color:var(--pageBackground-171dvmc);color:var(--textColor-a4prc9
 ._a_940004mw5y{padding-right:0;}
 ._a_9400029r9v{padding-left:4px;}
 ._a_7p0001bzyn{margin-bottom:24px;}
+._a_2z001s49z5{-webkit-animation-name:var(--resize-1jz21hk);animation-name:var(--resize-1jz21hk);}
+._a_2z0008fc7i{-webkit-animation-duration:1200ms;animation-duration:1200ms;}
+._a_2z01kw7a08{-webkit-animation-timing-function:ease-in-out;animation-timing-function:ease-in-out;}
+._a_2z000gllw7{-webkit-animation-fill-mode:both;animation-fill-mode:both;}
 ._a_9i0001dmle{align-items:center;}
 ._a_9h0002vhe1{justify-content:center;}
 ._a_6i000glaaa{grid-template-columns:auto 40%;}
