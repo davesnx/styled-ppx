@@ -162,6 +162,16 @@ let family_tests =
       check_int "depth_of margin-inline-start" 1
         (Slot_key.depth_of "margin-inline-start");
       check_int "depth_of margin-inline" 0 (Slot_key.depth_of "margin-inline"));
+    Alcotest_extra.test
+      "a vendor-prefixed twin has the depth of its standard name" (fun () ->
+      check_int "-webkit-animation-duration"
+        (Slot_key.depth_of "animation-duration")
+        (Slot_key.depth_of "-webkit-animation-duration");
+      check_int "-webkit-padding-start is padding-inline-start" 1
+        (Slot_key.depth_of "-webkit-padding-start");
+      check_int "-ms-flex-direction"
+        (Slot_key.depth_of "flex-direction")
+        (Slot_key.depth_of "-ms-flex-direction"));
   ]
 
 let registry_tests =

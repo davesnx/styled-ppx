@@ -1068,8 +1068,36 @@ let () =
    without any special-casing here. *)
 let depth_cache : (string, int) Hashtbl.t = Hashtbl.create 128
 
+(* The autoprefixer's vendor-prefixed twins (see [Css_autoprefixer]) have no
+   registry entry of their own, so a literal lookup would give them depth 0 and
+   sort a longhand's rule as if it were a shorthand. Strip the prefix to reach
+   the standard name, unless the prefixed name is itself in the shorthand graph
+   (e.g. "-webkit-mask-position"), which keeps its own depth. The one spelling
+   that is not a plain strip is old WebKit's logical margin/padding, which drops
+   "inline" from the name ("-webkit-padding-start" is "padding-inline-start"). *)
+let strip_vendor_prefix property =
+  let registered p =
+    Hashtbl.mem direct_children p || Hashtbl.mem direct_parents p
+  in
+  if registered property then property
+  else (
+    match property with
+    | "-webkit-margin-start" -> "margin-inline-start"
+    | "-webkit-margin-end" -> "margin-inline-end"
+    | "-webkit-padding-start" -> "padding-inline-start"
+    | "-webkit-padding-end" -> "padding-inline-end"
+    | _ ->
+      let strip prefix =
+        let n = String.length prefix in
+        if String.length property > n && String.sub property 0 n = prefix then
+          Some (String.sub property n (String.length property - n))
+        else None
+      in
+      List.find_map strip [ "-webkit-"; "-moz-"; "-ms-"; "-o-" ]
+      |> Option.value ~default:property)
+
 let rec depth_of property =
-  let property = resolve_alias property in
+  let property = resolve_alias (strip_vendor_prefix property) in
   match Hashtbl.find_opt depth_cache property with
   | Some d -> d
   | None ->

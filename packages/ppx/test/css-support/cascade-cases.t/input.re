@@ -500,7 +500,7 @@ show("C45", [("ctx c45_compactButtonLeft", c45_compactButtonLeft)], c45);
 
 /* C46: same block, pseudo-element: longhand then @media shorthand (depth A>B)
    intended: B
-   note: monorepo source: animation-duration then animation: none; B has a duration here so the winner is visible. The prefixer adds -webkit-animation-duration, which has depth 0, so the longhand rule sorts as depth 0 and lands before the shorthand */
+   note: monorepo source: animation-duration then animation: none; B has a duration here so the winner is visible. The prefixer adds -webkit-animation-duration; it counts as the longhand it is (depth 1), so the longhand rule lands after the shorthand, same as the unprefixed C32 */
 let c46 = [%css {|
   &::before { animation-duration: 206s; }
   &::before { @media (prefers-reduced-motion: reduce) { animation: 207s ease; } }
