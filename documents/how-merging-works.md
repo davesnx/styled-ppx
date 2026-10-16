@@ -247,18 +247,22 @@ still resolve deterministically, by falling through to DEFINITION
 ORDER: whichever one was declared later wins - the same order a
 `CSS.merge`/`+++` call's right-hand (override) argument needs to win.
 This order is the SAME everywhere: in every file, in every block, not
-"whichever one this block wrote last".
+"whichever one this block wrote last". It decides only between atoms the
+specificity twin does not relate (two blocks that reach one element as two
+class names, or a chain past the twin cap).
 A single block that writes
 
 ```reason
 let danger = [%css "&:focus { color: blue; } &:hover { color: red; }"];
 ```
 
-gets `color: blue` (focus) when both `:hover` and `:focus` apply, even
-though `:hover` was written last — the fixed priority, not declaration
-order, decides (`packages/generate/test/tiers-condition-tie-single-block.t`).
-Plain CSS, read top to bottom, would give `red` here; styled-ppx does not,
-on purpose — see "Known limits" below.
+gets `color: red` (hover, written last) when both apply: the block gives
+`:hover` a twin, so source order decides, as in plain CSS
+(`packages/ppx/test/css-support/condition-priority-pseudo-class.t`: the `:hover` class is `_t1_`). The same holds for
+`CSS.merge` of the two. The sheet by itself, with no twin class in use,
+still puts `:focus` last (`packages/generate/test/tiers-condition-tie-single-block.t`
+pins that sheet order); see "Known limits" below for what the twin cannot
+decide.
 
 **No CSS layer wraps any of this.** Specificity decides first, exactly
 like plain CSS; sheet position is only ever the tie-break, never an
@@ -342,16 +346,27 @@ all) still depends on which one the browser loads first
 - **Partial cover across libraries.** `merge(a, b)` where `a` sets
   `margin` and `b` sets only `margin-top` keeps both classes (the example
   above) — correct as long as `b`'s library's sheet loads after `a`'s.
-- **Twin limits.** The twin cannot help where `merge` has no overlap to see: a
-  logical property against a physical one (`padding-inline` and
-  `padding-left`), and an `_in_` bundle, whose class holds several properties
-  and contexts. Both classes stay and the sheet order decides (pinned by
-  `cascade-gaps.t`). A chain of more than two overlapping merges stops at
-  level 2, so in a chain of four state atoms the last two tie and the sheet's
-  pseudo-class rank decides (`cascade-remaining.t`, R02). The same selector
-  with an extra at-rule (`& .child` against `@media { & .child }`) keeps both
-  classes, and the later one wins by its twin. The twin raises the sheet size
-  (the demo `styles.css` goes from 4.5 KB to 9.0 KB, 1.7 KB to 2.4 KB gzipped).
+- **Logical against physical properties.** `padding-inline-start` and
+  `padding-left` are different families for `merge`, so neither drops nor
+  twins the other (`cascade-gaps.t` G24, G33; `cascade-exotic.t` E09, E11).
+  Which side a logical property sets depends on `writing-mode` and
+  `direction`, and the compiler does not know them. Both classes stay and the
+  sheet order decides. Write both with the same kind of property when one must
+  override the other.
+- **Bundles get no twin.** An `_in_` bundle's class holds several properties
+  and contexts, so `merge` can neither drop nor raise one member (see
+  "Interpolation bundles").
+- **Twin cap.** A chain of more than two overlapping merges stops at level 2,
+  so in a chain of four state atoms on one property (`:hover`, `:focus`,
+  `:active`, `:disabled`) the last two tie and the sheet's pseudo-class rank
+  decides (`cascade-remaining.t`, R02 and R02R). The result then depends on
+  the rank, not on the merge order.
+- **A twin does not weigh type selectors.** A twin adds one type selector of
+  weight per level. An earlier `& span.x` and a later `& .x` on one element
+  differ by one type selector, which a level 1 twin only ties (level 2
+  beats it). A later `& span.x` over an earlier `& .x` needs no twin.
+- **The twin raises the sheet size** (the demo `styles.css` goes from 4.5 KB to
+  9.0 KB, 1.7 KB to 2.4 KB gzipped).
 - **A selector context is not dropped by a base declaration.** `&:hover`,
   `& .child` and `::before` atoms of `a` stay, even with the same
   property in `b`; so does an `@media` atom under such a selector.
@@ -379,27 +394,17 @@ all) still depends on which one the browser loads first
   override, same specificity — the conditional rule wins the tie above
   1280px, by sheet position, because conditional atoms are always
   emitted after base ones.
-- **A fixed pseudo-class/pseudo-element order applies even inside one
-  block.** `&:focus { color: blue; } &:hover { color: red; }` in ONE
-  `[%css]` block gives `color: blue` (focus outranks hover in the fixed
-  order), not `red` — the opposite of what "last declaration wins" would
-  give for this exact block on its own
-  (`packages/generate/test/tiers-condition-tie-single-block.t`). Chosen on
-  purpose: the alternative (each block's own declaration order deciding)
-  made the SAME shared pair of conditions resolve differently depending on
-  which of two components happened to compile first
-  (`packages/generate/test/tiers-condition-tie-pseudo-class.t`). To
-  override a lower-priority pseudo's declaration with a higher-priority
-  one, write the higher-priority one — its own position in the block no
-  longer matters.
-- **Two pseudo-elements, or two different `@supports` conditions, still
-  tie.** `::before` vs `::after`, or `@supports (display:grid)` vs
-  `@supports (display:flex)`, get the same fixed-order rank as each other
-  (StyleX has no finer answer for either case either), so the tie falls
-  back to sheet position — not guaranteed to match either block's own
-  intent. No target/condition split and no CSS layer over this — an
-  author who needs one of these two to always win still reaches for a more
-  specific selector or `!important`.
+- **A fixed pseudo-class order decides what the twin cannot.**
+  `&:focus { color: blue; } &:hover { color: red; }` in ONE `[%css]` block, or
+  `CSS.merge` of the two, follows source order: the twin raises `:hover`, so
+  `color: red` wins when both match, as in plain CSS (`cascade-cases.t` C11,
+  C15). Where no twin applies (two blocks put on one element as two class
+  names, or a chain past the cap), the generated sheet's fixed order
+  (`:hover` before `:focus` before `:active`; the same for pseudo-elements and
+  for two `@supports` conditions) decides, the same for every block in every
+  file (`packages/generate/test/tiers-condition-tie-single-block.t` pins that
+  sheet order). To make one of them win there, write the more specific
+  selector.
 - **`@supports`/`@container` are not rewritten.** The overlapping-`@media`
   fix above (StyleX's `lastMediaQueryWinsTransform`) covers `@media`
   only, matching StyleX exactly. Two overlapping `@supports` or
@@ -451,13 +456,10 @@ all) still depends on which one the browser loads first
   through a `CSS.merge`/`+++` call, which already has its own argument
   order to decide by) — file order decides, and file order is exactly
   the thing this whole track exists to stop depending on for a shared
-  pair of conditions. Writing both conditions in the same block helps
-  when the tie is between two otherwise-identical at-rules with no
-  pseudo at all, since a single block's own declaration order IS its
-  definition order; it does NOT help when the tie is a pseudo-class/
-  pseudo-element one (the fixed priority above still decides, even
-  inside one block - see the next bullet). Either way, an author who
-  still needs a specific winner can always raise specificity or use
+  pair of conditions. A block or a `CSS.merge` that writes both gives the
+  later one a twin, so source order decides there (see "Known limits"); the
+  fixed priority above still decides when no twin applies. Either way, an
+  author who still needs a specific winner can always raise specificity or use
   `!important`.
 
 ## See also

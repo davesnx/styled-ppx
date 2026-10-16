@@ -41,7 +41,8 @@ let c02_b = [%css {|
 show("C02", [("a", c02_a), ("b", c02_b)], CSS.merge(c02_a, c02_b));
 
 /* C03: A is !important, B is not
-   intended: B */
+   intended: A
+   note: an important declaration beats a later plain one in plain CSS, so A is right; the label said B before */
 let c03_a = [%css {|
   margin-left: 105px !important;
 |}];
@@ -62,7 +63,8 @@ let c04_b = [%css {|
 show("C04", [("ctx c04_sticky", c04_sticky), ("a", c04_a), ("b", c04_b)], CSS.merge(c04_a, c04_b));
 
 /* C05: A more specific than B (browser decides, order irrelevant)
-   intended: B */
+   intended: A
+   note: the more specific selector wins whatever the source order, in plain CSS too; the label said B before */
 let c05_a = [%css {|
   &:first-child { margin-left: 109px; }
 |}];
@@ -336,7 +338,7 @@ show("C29S", [("a", C29s_second.c29s_a), ("b", C29s_first.c29s_b)], CSS.merge(C2
 
 /* C30: same block, descendant pseudo: @media vs @media, A defined before B
    intended: B
-   note: the two @media ranges never overlap; only the sheet order is pinned */
+   note: the two @media ranges never overlap, so no width has two rules; the harness reports the winner per width (mixed) and only the sheet order is pinned */
 let c30 = [%css {|
   th { &:first-child { @media (min-width: 768px) and (max-width: 1279px) { margin-left: 168px; } } }
   th { &:first-child { @media (max-width: 767px) { margin-left: 169px; } } }
@@ -375,7 +377,8 @@ let c33_b = [%css {|
 show("C33", [("a", c33_a), ("b", c33_b)], CSS.merge(c33_a, c33_b));
 
 /* C34: A is an _in_ bundle (@container + :disabled), B @media, at-rank A>B
-   intended: B */
+   intended: B
+   note: per state. While `:disabled` is off B wins; while it is on, A's `:disabled` member wins by specificity (0,2,0 against a bare @media), as in plain CSS */
 let c34_a_v1 = CSS.px(175);
 let c34_a = [%css {|
   @container app-main (max-width: 992px) { margin-left: $(c34_a_v1); }
