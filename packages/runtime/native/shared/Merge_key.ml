@@ -62,7 +62,11 @@ type atom = {
     (* [None] means "full" (a plain shorthand, or any
                          non-family property) - see [Slot_key.t.mask]. *)
   level : int; (* 0 for [_a_]; k for the specificity twin [_t<k>_] *)
-  body : string; (* the class name without its prefix *)
+  token : string; (* the whole class name, to hand back untouched *)
+  slot : int;
+    (* [family] as an int: atoms of one family share it, so it keys the
+       lookup that keeps merging from comparing every pair. Equal slots do
+       not prove equal families; [family_equal] still decides. *)
 }
 
 let base36_value s =
@@ -109,7 +113,7 @@ let twin_prefix level = "_t" ^ string_of_int level ^ "_"
 let split_prefix class_name =
   let n = String.length class_name in
   if n >= 3 && String.equal (String.sub class_name 0 3) atom_prefix then
-    Some (0, String.sub class_name 3 (n - 3))
+    Some (0, 3)
   else if
     n >= 4
     && class_name.[0] = '_'
@@ -117,22 +121,20 @@ let split_prefix class_name =
     && class_name.[2] >= '1'
     && class_name.[2] <= Char.chr (Char.code '0' + max_level)
     && class_name.[3] = '_'
-  then
-    Some
-      (Char.code class_name.[2] - Char.code '0', String.sub class_name 4 (n - 4))
+  then Some (Char.code class_name.[2] - Char.code '0', 4)
   else None
 
 let parse_atom class_name =
   match split_prefix class_name with
   | None -> None
-  | Some (level, body) ->
+  | Some (level, start) ->
     let floor = family_width + value_width in
-    (match fields_of_extra (String.length body - floor) with
+    (match fields_of_extra (String.length class_name - start - floor) with
     | None -> None
     | Some (has_context, has_mask, has_extended) ->
-      let pos = ref 0 in
+      let pos = ref start in
       let take width =
-        let s = String.sub body !pos width in
+        let s = String.sub class_name !pos width in
         pos := !pos + width;
         s
       in
@@ -145,7 +147,16 @@ let parse_atom class_name =
         if has_mask then Some (base36_value (take mask_width)) else None
       in
       ignore (take value_width);
-      Some { context; family; extended; mask; level; body })
+      Some
+        {
+          context;
+          family;
+          extended;
+          mask;
+          level;
+          token = class_name;
+          slot = base36_value family;
+        })
 
 let context_equal a b = String.equal a.context b.context
 
@@ -219,6 +230,61 @@ let surely_after ~former ~latter =
     former.mask = None && latter.mask <> None
   else false
 
+(* Atoms by family, so an atom is compared only with those that can matter:
+   the same family, or the [all] sentinel (which overlaps and removes
+   every family but a few). Most merges then compare almost nothing. *)
+type slots =
+  | Leaf
+  | Node of slots * int * atom list * slots
+
+(* A plain binary tree rather than [Map.Make]: the functor alone adds tens of
+   kilobytes to the browser bundle. Slots are base36 numbers, so an unbalanced
+   tree stays shallow. *)
+let rec slots_find slot = function
+  | Leaf -> []
+  | Node (l, k, atoms, r) ->
+    if slot = k then atoms
+    else if slot < k then slots_find slot l
+    else slots_find slot r
+
+let rec slots_add a = function
+  | Leaf -> Node (Leaf, a.slot, [ a ], Leaf)
+  | Node (l, k, atoms, r) ->
+    if a.slot = k then Node (l, k, a :: atoms, r)
+    else if a.slot < k then Node (slots_add a l, k, atoms, r)
+    else Node (l, k, atoms, slots_add a r)
+
+type index = {
+  by_slot : slots;
+  alls : atom list; (* the [all]-family atoms *)
+  everything : atom list;
+}
+
+type token =
+  | Atom of atom
+  | Opaque of string
+
+let empty_index = { by_slot = Leaf; alls = []; everything = [] }
+
+let add_atom index a =
+  {
+    by_slot = slots_add a index.by_slot;
+    alls =
+      (if String.equal a.family all_sentinel then a :: index.alls
+       else index.alls);
+    everything = a :: index.everything;
+  }
+
+(* Folds over a superset of the atoms of [index] that can overlap or remove
+   with [a]: the exact checks stay in the callers. *)
+let fold_candidates index a f init =
+  if String.equal a.family all_sentinel then
+    List.fold_left f init index.everything
+  else
+    List.fold_left f
+      (List.fold_left f init (slots_find a.slot index.by_slot))
+      index.alls
+
 (* The level [latter] needs to beat the surviving [formers] by source order:
    one above every former of the same kind (plain or not) that it overlaps
    and does not remove, or the former's own level when the sheet order
@@ -226,7 +292,7 @@ let surely_after ~former ~latter =
    specificity (":hover", ":disabled", "& .a", "& .b") are such a tie. Whether
    they style one element is unknown at runtime; a needless raise is harmless
    because a twin never beats a rule with one more class-like part. *)
-let twin_level formers latter =
+let twin_level seen latter =
   let conflicts former =
     is_plain former = is_plain latter
     && overlaps ~former ~latter
@@ -235,38 +301,47 @@ let twin_level formers latter =
   let needed former =
     former.level + if surely_after ~former ~latter then 0 else 1
   in
-  List.fold_left
+  fold_candidates seen latter
     (fun level former ->
       if conflicts former then max level (needed former) else level)
-    latter.level formers
+    latter.level
   |> min max_level
 
 let token_of a level =
-  (if level = 0 then atom_prefix else twin_prefix level) ^ a.body
+  let start = if a.level = 0 then 3 else 4 in
+  (if level = 0 then atom_prefix else twin_prefix level)
+  ^ String.sub a.token start (String.length a.token - start)
 
-(* [raise_levels formers latters]: [latters] as tokens, each with the twin
-   level it needs against the [formers] (already filtered for removal; a twin
-   never needs an earlier atom raised) and against the latters before it, at
-   the level they were just given. A latter raised by a former would otherwise
-   lose to an earlier latter it sits after in the sheet. *)
-let raise_levels formers latters =
+(* [raise_levels seen latters]: [latters] as tokens, each with the twin
+   level it needs against the [seen] atoms (the former survivors, already
+   filtered for removal; a twin never needs an earlier atom raised) and
+   against the latters before it, at the level they were just given. A latter
+   raised by a former would otherwise lose to an earlier latter it sits after
+   in the sheet. *)
+let raise_levels seen latters =
   let _, tokens =
     List.fold_left
-      (fun (seen, tokens) token ->
-        match parse_atom token with
-        | None -> seen, token :: tokens
-        | Some a ->
+      (fun (seen, tokens) parsed ->
+        match parsed with
+        | Opaque token -> seen, token :: tokens
+        | Atom a ->
           let level = twin_level seen a in
-          let a' = { a with level } in
-          ( a' :: seen,
-            (if level = a.level then token else token_of a level) :: tokens ))
-      (List.filter_map parse_atom formers, [])
-      latters
+          ( add_atom seen { a with level },
+            (if level = a.level then a.token else token_of a level) :: tokens ))
+      (seen, []) latters
   in
   List.rev tokens
 
+let parse_token token =
+  match parse_atom token with None -> Opaque token | Some a -> Atom a
+
+let index_of parsed =
+  List.fold_left
+    (fun index -> function Opaque _ -> index | Atom a -> add_atom index a)
+    empty_index parsed
+
 (* A block's classes in source order: each atom against the ones before it. *)
-let twin_block tokens = raise_levels [] tokens
+let twin_block tokens = raise_levels empty_index (List.map parse_token tokens)
 
 (* -- className string merge --------------------------------------------- *)
 
@@ -295,19 +370,20 @@ let split_tokens s =
    [latter]'s tokens are never dropped - [CSS.merge]'s right argument always
    wins outright. *)
 let merge_class_names former latter =
-  let former_tokens = split_tokens former in
-  let latter_tokens = split_tokens latter in
-  let latter_atoms =
-    List.filter_map parse_atom latter_tokens |> Array.of_list
-  in
-  let survives token =
-    match parse_atom token with
-    | None -> true
-    | Some former_atom ->
+  let former_tokens = List.map parse_token (split_tokens former) in
+  let latter_tokens = List.map parse_token (split_tokens latter) in
+  let latter_index = index_of latter_tokens in
+  let survives = function
+    | Opaque _ -> true
+    | Atom former_atom ->
       not
-        (Array.exists
-           (fun latter_atom -> removes ~former:former_atom ~latter:latter_atom)
-           latter_atoms)
+        (fold_candidates latter_index former_atom
+           (fun found latter_atom ->
+             found || removes ~former:former_atom ~latter:latter_atom)
+           false)
   in
   let survivors = List.filter survives former_tokens in
-  survivors @ raise_levels survivors latter_tokens |> String.concat " "
+  let token_string = function Opaque t -> t | Atom a -> a.token in
+  List.map token_string survivors
+  @ raise_levels (index_of survivors) latter_tokens
+  |> String.concat " "

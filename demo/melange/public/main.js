@@ -63862,7 +63862,7 @@ function split_prefix(class_name) {
   if (n >= 3 && sub5(class_name, 0, 3) === atom_prefix) {
     return [
       0,
-      sub5(class_name, 3, n - 3 | 0)
+      3
     ];
   } else if (n >= 4 && get2(class_name, 0) === /* '_' */
   95 && get2(class_name, 1) === /* 't' */
@@ -63872,7 +63872,7 @@ function split_prefix(class_name) {
     return [
       get2(class_name, 2) - /* '0' */
       48 | 0,
-      sub5(class_name, 4, n - 4 | 0)
+      4
     ];
   } else {
     return;
@@ -63883,17 +63883,17 @@ function parse_atom(class_name) {
   if (match === void 0) {
     return;
   }
-  const body = match[1];
+  const start = match[1];
   const floor = 6;
-  const match$1 = fields_of_extra(body.length - floor | 0);
+  const match$1 = fields_of_extra((class_name.length - start | 0) - floor | 0);
   if (match$1 === void 0) {
     return;
   }
   const pos = {
-    contents: 0
+    contents: start
   };
   const take3 = function(width) {
-    const s2 = sub5(body, pos.contents, width);
+    const s2 = sub5(class_name, pos.contents, width);
     pos.contents = pos.contents + width | 0;
     return s2;
   };
@@ -63908,7 +63908,8 @@ function parse_atom(class_name) {
     extended,
     mask,
     level: match[0],
-    body
+    token: class_name,
+    slot: base36_value(family)
   };
 }
 function context_equal(a, b) {
@@ -63999,7 +64000,136 @@ function surely_after(former, latter) {
     return false;
   }
 }
-function twin_level(formers, latter) {
+function slots_find(slot, _param) {
+  while (true) {
+    const param = _param;
+    if (
+      /* tag */
+      typeof param !== "object" && typeof param !== "function"
+    ) {
+      return (
+        /* [] */
+        0
+      );
+    }
+    const k = param._1;
+    if (slot === k) {
+      return param._2;
+    }
+    if (slot < k) {
+      _param = param._0;
+      continue;
+    }
+    _param = param._3;
+    continue;
+  }
+  ;
+}
+function slots_add(a, param) {
+  if (
+    /* tag */
+    typeof param !== "object" && typeof param !== "function"
+  ) {
+    return {
+      TAG: (
+        /* Node */
+        0
+      ),
+      _0: (
+        /* Leaf */
+        0
+      ),
+      _1: a.slot,
+      _2: {
+        hd: a,
+        tl: (
+          /* [] */
+          0
+        )
+      },
+      _3: (
+        /* Leaf */
+        0
+      )
+    };
+  }
+  const r = param._3;
+  const atoms = param._2;
+  const k = param._1;
+  const l = param._0;
+  if (a.slot === k) {
+    return {
+      TAG: (
+        /* Node */
+        0
+      ),
+      _0: l,
+      _1: k,
+      _2: {
+        hd: a,
+        tl: atoms
+      },
+      _3: r
+    };
+  } else if (a.slot < k) {
+    return {
+      TAG: (
+        /* Node */
+        0
+      ),
+      _0: slots_add(a, l),
+      _1: k,
+      _2: atoms,
+      _3: r
+    };
+  } else {
+    return {
+      TAG: (
+        /* Node */
+        0
+      ),
+      _0: l,
+      _1: k,
+      _2: atoms,
+      _3: slots_add(a, r)
+    };
+  }
+}
+var empty_index = {
+  by_slot: (
+    /* Leaf */
+    0
+  ),
+  alls: (
+    /* [] */
+    0
+  ),
+  everything: (
+    /* [] */
+    0
+  )
+};
+function add_atom(index3, a) {
+  return {
+    by_slot: slots_add(a, index3.by_slot),
+    alls: a.family === all_sentinel ? {
+      hd: a,
+      tl: index3.alls
+    } : index3.alls,
+    everything: {
+      hd: a,
+      tl: index3.everything
+    }
+  };
+}
+function fold_candidates(index3, a, f, init6) {
+  if (a.family === all_sentinel) {
+    return fold_left5(f, init6, index3.everything);
+  } else {
+    return fold_left5(f, fold_left5(f, init6, slots_find(a.slot, index3.by_slot)), index3.alls);
+  }
+}
+function twin_level(seen, latter) {
   const conflicts = function(former) {
     if (is_plain(former) === is_plain(latter) && overlaps(former, latter)) {
       return !removes(former, latter);
@@ -64010,68 +64140,88 @@ function twin_level(formers, latter) {
   const needed = function(former) {
     return former.level + (surely_after(former, latter) ? 0 : 1) | 0;
   };
-  return caml_int_min(2, fold_left5((function(level, former) {
+  return caml_int_min(2, fold_candidates(seen, latter, (function(level, former) {
     if (conflicts(former)) {
       return caml_int_max(level, needed(former));
     } else {
       return level;
     }
-  }), latter.level, formers));
+  }), latter.level));
 }
 function token_of(a, level) {
-  return (level === 0 ? atom_prefix : twin_prefix(level)) + a.body;
+  const start = a.level === 0 ? 3 : 4;
+  return (level === 0 ? atom_prefix : twin_prefix(level)) + sub5(a.token, start, a.token.length - start | 0);
 }
-function raise_levels(formers, latters) {
-  const match = fold_left5((function(param, token) {
+function raise_levels(seen, latters) {
+  const match = fold_left5((function(param, parsed) {
     const tokens = param[1];
-    const seen = param[0];
-    const a = parse_atom(token);
-    if (a === void 0) {
+    const seen2 = param[0];
+    if (parsed.TAG !== /* Atom */
+    0) {
       return [
-        seen,
+        seen2,
         {
-          hd: token,
+          hd: parsed._0,
           tl: tokens
         }
       ];
     }
-    const level = twin_level(seen, a);
-    const a$p_context = a.context;
-    const a$p_family = a.family;
-    const a$p_extended = a.extended;
-    const a$p_mask = a.mask;
-    const a$p_body = a.body;
-    const a$p = {
-      context: a$p_context,
-      family: a$p_family,
-      extended: a$p_extended,
-      mask: a$p_mask,
-      level,
-      body: a$p_body
-    };
+    const a = parsed._0;
+    const level = twin_level(seen2, a);
     return [
+      add_atom(seen2, {
+        context: a.context,
+        family: a.family,
+        extended: a.extended,
+        mask: a.mask,
+        level,
+        token: a.token,
+        slot: a.slot
+      }),
       {
-        hd: a$p,
-        tl: seen
-      },
-      {
-        hd: level === a.level ? token : token_of(a, level),
+        hd: level === a.level ? a.token : token_of(a, level),
         tl: tokens
       }
     ];
   }), [
-    filter_map2(parse_atom, formers),
+    seen,
     /* [] */
     0
   ], latters);
   return rev(match[1]);
 }
+function parse_token(token) {
+  const a = parse_atom(token);
+  if (a !== void 0) {
+    return {
+      TAG: (
+        /* Atom */
+        0
+      ),
+      _0: a
+    };
+  } else {
+    return {
+      TAG: (
+        /* Opaque */
+        1
+      ),
+      _0: token
+    };
+  }
+}
+function index_of(parsed) {
+  return fold_left5((function(index3, a) {
+    if (a.TAG === /* Atom */
+    0) {
+      return add_atom(index3, a._0);
+    } else {
+      return index3;
+    }
+  }), empty_index, parsed);
+}
 function twin_block(tokens) {
-  return raise_levels(
-    /* [] */
-    0,
-    tokens
-  );
+  return raise_levels(empty_index, map5(parse_token, tokens));
 }
 function is_space3(param) {
   if (param > 13 || param < 9) {
@@ -64112,21 +64262,33 @@ function split_tokens(s2) {
   ;
 }
 function merge_class_names(former, latter) {
-  const former_tokens = split_tokens(former);
-  const latter_tokens = split_tokens(latter);
-  const latter_atoms = of_list(filter_map2(parse_atom, latter_tokens));
-  const survives = function(token) {
-    const former_atom = parse_atom(token);
-    if (former_atom !== void 0) {
-      return !exists4((function(latter_atom) {
-        return removes(former_atom, latter_atom);
-      }), latter_atoms);
-    } else {
+  const former_tokens = map5(parse_token, split_tokens(former));
+  const latter_tokens = map5(parse_token, split_tokens(latter));
+  const latter_index = index_of(latter_tokens);
+  const survives = function(former_atom) {
+    if (former_atom.TAG !== /* Atom */
+    0) {
       return true;
     }
+    const former_atom$1 = former_atom._0;
+    return !fold_candidates(latter_index, former_atom$1, (function(found, latter_atom) {
+      if (found) {
+        return true;
+      } else {
+        return removes(former_atom$1, latter_atom);
+      }
+    }), false);
   };
   const survivors = filter2(survives, former_tokens);
-  return concat6(" ", $at(survivors, raise_levels(survivors, latter_tokens)));
+  const token_string = function(t) {
+    if (t.TAG === /* Atom */
+    0) {
+      return t._0.token;
+    } else {
+      return t._0;
+    }
+  };
+  return concat6(" ", $at(map5(token_string, survivors), raise_levels(index_of(survivors), latter_tokens)));
 }
 var context_width = 5;
 var family_width = 2;
