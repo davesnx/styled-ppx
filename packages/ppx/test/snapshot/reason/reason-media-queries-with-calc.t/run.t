@@ -4,7 +4,9 @@
   [@css "@media (min-width: calc(2px + 1px)) {._a_0veay4e5m2e{color:red;}}"];
   [@css "@media (min-width: calc(1000px - 2%)) {._a_04c6e4el0w0{color:red;}}"];
   [@css.bindings
-    [("Output.MediaQueryCalc", "_id_1mcoche", "_a_0veay4e5m2e _a_04c6e4el0w0")]
+    [
+      ("Output.MediaQueryCalc", "_id_1mcoche", "_a_0veay4e5m2e _t1_04c6e4el0w0"),
+    ]
   ];
   module MediaQueryCalc = {
     [@deriving abstract]
@@ -991,7 +993,7 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "label:MediaQueryCalc _id_1mcoche _a_0veay4e5m2e _a_04c6e4el0w0",
+        "label:MediaQueryCalc _id_1mcoche _a_0veay4e5m2e _t1_04c6e4el0w0",
         [],
       );
     let make = (props: makeProps) => {

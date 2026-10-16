@@ -359,6 +359,100 @@ let long_family_longhands_do_not_drop_each_other () =
       "border-image-source: none;", "border-top-width: 1px;";
     ]
 
+(* -- Specificity twin ----------------------------------------------------
+
+   [Merge_key] swaps the later atom's [_a_] class for [_t<k>_] where the
+   sheet order cannot be trusted to put it last (see [Merge_key.twin_level]).
+   [generate] gives [_t<k>_] its higher specificity; the swap itself is only
+   a prefix change, so every expectation below is the real atom class with
+   its prefix replaced. *)
+let twin level css =
+  let cls = class_of css in
+  assert (String.sub cls 0 3 = "_a_");
+  Printf.sprintf "_t%d_%s" level (String.sub cls 3 (String.length cls - 3))
+
+let wide_padding = "@media (max-width:1200px){padding: 1px;}"
+let wide_top = "@media (max-width:1200px){padding-top: 1px;}"
+
+let base_former_media_latter_needs_no_twin () =
+  let merged =
+    CSS.merge (make "padding-top: 1px;")
+      (make "@media (max-width:600px){padding: 2px;}")
+  in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s"
+       (class_of "padding-top: 1px;")
+       (class_of "@media (max-width:600px){padding: 2px;}"))
+
+let media_former_base_latter_gets_twin () =
+  let merged = CSS.merge (make wide_padding) (make "padding-top: 2px;") in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s" (class_of wide_padding)
+       (twin 1 "padding-top: 2px;"))
+
+let two_media_contexts_get_twin () =
+  let narrow = "@media (max-width:900px){padding-top: 3px;}" in
+  let merged = CSS.merge (make wide_top) (make narrow) in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s" (class_of wide_top) (twin 1 narrow))
+
+let a_ = "@media (max-width:1200px){border-top: 1px solid red;}"
+let b_ = "@media (max-width:900px){border-color: blue;}"
+let c_ = "border-top: 3px dotted green;"
+let c_media = "@media (max-width:700px){border-top: 2px dashed green;}"
+let d_ = "@media (max-width:500px){border-color: black;}"
+
+let three_way_chain_reaches_level_two () =
+  let merged = CSS.merge (CSS.merge (make a_) (make b_)) (make c_) in
+  (* [a_] is covered by [c_] and dropped; [b_] only overlaps, so [c_] must
+     beat the twin [b_] already is. *)
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s" (twin 1 b_) (twin 2 c_))
+
+let levels_stop_at_the_cap () =
+  let merged =
+    CSS.merge
+      (CSS.merge (CSS.merge (make a_) (make b_)) (make c_media))
+      (make d_)
+  in
+  (* [d_] would need level 3 over [c_media]; it stays at 2 and the sheet
+     order decides. *)
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s %s %s" (class_of a_) (twin 1 b_) (twin 2 c_media)
+       (twin 2 d_))
+
+let selector_latter_takes_the_twin_level () =
+  let hover = "&:hover{padding-top: 4px;}" in
+  let narrow = "@media (max-width:900px){padding-top: 3px;}" in
+  let merged =
+    CSS.merge (CSS.merge (make wide_top) (make narrow)) (make hover)
+  in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s %s" (class_of wide_top) (twin 1 narrow)
+       (twin 1 hover))
+
+let selector_former_follows_a_later_twin () =
+  let hover = "&:hover{padding-top: 4px;}" in
+  let narrow = "@media (max-width:900px){padding-top: 3px;}" in
+  let merged =
+    CSS.merge (CSS.merge (make wide_top) (make hover)) (make narrow)
+  in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s %s" (class_of wide_top) (twin 1 hover)
+       (twin 1 narrow))
+
+let removal_wins_over_twin () =
+  let merged = CSS.merge (make wide_top) (make "padding-top: 2px;") in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (class_of "padding-top: 2px;")
+
+let block_classes_follow_source_order () =
+  let tokens = [ class_of wide_padding; class_of "padding-top: 2px;" ] in
+  Alcotest_extra.assert_string
+    (String.concat " " (Merge_key.twin_block tokens))
+    (Printf.sprintf "%s %s" (class_of wide_padding)
+       (twin 1 "padding-top: 2px;"))
+
 let tests =
   [
     Alcotest_extra.test
@@ -444,4 +538,31 @@ let tests =
       "longhands of the 20-leaf font family and the 17-leaf border family \
        never drop each other"
       long_family_longhands_do_not_drop_each_other;
+    Alcotest_extra.test "a base former and an at-rules-only latter need no twin"
+      base_former_media_latter_needs_no_twin;
+    Alcotest_extra.test
+      "an at-rules-only former and a base latter that only overlaps it: the \
+       latter becomes _t1_"
+      media_former_base_latter_gets_twin;
+    Alcotest_extra.test
+      "two different at-rules-only contexts on one property: the latter \
+       becomes _t1_"
+      two_media_contexts_get_twin;
+    Alcotest_extra.test
+      "a three-way chain: the last atom becomes _t2_ over the _t1_ one"
+      three_way_chain_reaches_level_two;
+    Alcotest_extra.test "a fourth overlapping merge stays at _t2_ (the cap)"
+      levels_stop_at_the_cap;
+    Alcotest_extra.test
+      "a selector latter takes the twin level of the atom it must stay above"
+      selector_latter_takes_the_twin_level;
+    Alcotest_extra.test
+      "a selector former is raised when a later twin overlaps it"
+      selector_former_follows_a_later_twin;
+    Alcotest_extra.test
+      "removal wins over a twin when the latter's mask covers the former's"
+      removal_wins_over_twin;
+    Alcotest_extra.test
+      "a block's own atoms get twins in source order (twin_block)"
+      block_classes_follow_source_order;
   ]

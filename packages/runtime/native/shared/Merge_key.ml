@@ -9,6 +9,10 @@
    check); this module never needs to know WHAT a field means, only how
    wide it is and how two atoms' fields compare.
 
+   The twin ([_t<k>_] classes, see [twin_level]) is the other half: where
+   removal is not possible, the later atom's class is swapped for a twin that
+   [packages/generate] gives a higher specificity.
+
    This is the single rule [Slot_key.removes] defines, minus the [bundle]
    short-circuit (an [_in_] token never reaches {!parse_atom}'s callers in
    the first place - see [merge_class_names] below).
@@ -59,6 +63,8 @@ type atom = {
   mask : int option;
     (* [None] means "full" (a plain shorthand, or any
                          non-family property) - see [Slot_key.t.mask]. *)
+  level : int; (* 0 for [_a_]; k for the specificity twin [_t<k>_] *)
+  body : string; (* the class name without its prefix *)
 }
 
 let base36_value s =
@@ -94,18 +100,36 @@ let fields_of_extra extra =
   else if extra = context_width + extended_width then Some (true, false, true)
   else None
 
+(* The specificity twin: [_t<k>_<body>] is [_a_<body>] with [k] extra
+   copies of its class in the selector (see packages/generate). *)
+(* Above this level an atom stays at [max_level] and the sheet order decides
+   the tie, as before the twin. [packages/generate] emits the same number of
+   twin selectors. *)
+let max_level = 2
+let twin_prefix level = Printf.sprintf "_t%d_" level
+
+let split_prefix class_name =
+  let n = String.length class_name in
+  if n >= 3 && String.equal (String.sub class_name 0 3) atom_prefix then
+    Some (0, String.sub class_name 3 (n - 3))
+  else if
+    n >= 4
+    && class_name.[0] = '_'
+    && class_name.[1] = 't'
+    && class_name.[2] >= '1'
+    && class_name.[2] <= Char.chr (Char.code '0' + max_level)
+    && class_name.[3] = '_'
+  then
+    Some
+      (Char.code class_name.[2] - Char.code '0', String.sub class_name 4 (n - 4))
+  else None
+
 let parse_atom class_name =
-  let prefix_len = String.length atom_prefix in
-  if
-    String.length class_name < prefix_len
-    || not (String.equal (String.sub class_name 0 prefix_len) atom_prefix)
-  then None
-  else (
-    let body =
-      String.sub class_name prefix_len (String.length class_name - prefix_len)
-    in
+  match split_prefix class_name with
+  | None -> None
+  | Some (level, body) ->
     let floor = family_width + value_width in
-    match fields_of_extra (String.length body - floor) with
+    (match fields_of_extra (String.length body - floor) with
     | None -> None
     | Some (has_context, has_mask, has_extended) ->
       let pos = ref 0 in
@@ -123,7 +147,7 @@ let parse_atom class_name =
         if has_mask then Some (base36_value (take mask_width)) else None
       in
       ignore (take value_width);
-      Some { context; family; extended; mask })
+      Some { context; family; extended; mask; level; body })
 
 let context_equal a b = String.equal a.context b.context
 
@@ -164,6 +188,107 @@ let removes ~former ~latter =
   if String.equal latter.family all_sentinel then
     not (is_excluded_from_all former.family)
   else family_equal former latter && mask_subset former.mask latter.mask
+
+(* -- specificity twin ------------------------------------------------- *)
+
+(* Only atoms in the base context or under at-rules alone take part: both
+   have natural specificity (0,1,0), so source order alone decides between
+   them. Selector and [!important] contexts keep their own, higher
+   specificity and are left alone. *)
+let is_plain a = is_base a || is_at_rules_only a
+
+(* Could [former] and [latter] set a common property? *)
+let overlaps ~former ~latter =
+  if String.equal latter.family all_sentinel then
+    not (is_excluded_from_all former.family)
+  else if String.equal former.family all_sentinel then
+    not (is_excluded_from_all latter.family)
+  else
+    family_equal former latter
+    &&
+    match former.mask, latter.mask with
+    | None, _ | _, None -> true
+    | Some ma, Some mb -> ma land mb <> 0
+
+(* Does the sheet surely put [latter] after [former]? Base rules come before
+   at-rule rules; inside one context a shorthand (full mask) comes before a
+   longhand ([generate]'s sort_by_shorthand_first). Anything else (two
+   different at-rule contexts, partial masks) depends on a hash or on the
+   sheet position, so is not sure. *)
+let surely_after ~former ~latter =
+  if is_base former && is_at_rules_only latter then true
+  else if context_equal former latter then
+    former.mask = None && latter.mask <> None
+  else false
+
+(* The level [latter] needs to beat the surviving [formers] by source order.
+   A plain [latter] must clear every plain, overlapping former. A [latter]
+   with a selector context (":hover", "& .child", "!important") already has
+   higher natural specificity; it only has to keep it over a twin: it takes
+   the level of the highest overlapping plain former. *)
+let twin_level formers latter =
+  let conflicts former =
+    is_plain former && overlaps ~former ~latter && not (removes ~former ~latter)
+  in
+  let needed former =
+    if is_plain latter then
+      former.level + if surely_after ~former ~latter then 0 else 1
+    else former.level
+  in
+  List.fold_left
+    (fun level former ->
+      if conflicts former then max level (needed former) else level)
+    latter.level formers
+  |> min max_level
+
+let token_of a level =
+  (if level = 0 then atom_prefix else twin_prefix level) ^ a.body
+
+(* A [former] with a selector context must also keep its natural specificity
+   over a [latter] twin that overlaps it. *)
+let twin_former latters former =
+  if is_plain former then former.level
+  else
+    List.fold_left
+      (fun level latter ->
+        if is_plain latter && overlaps ~former ~latter then
+          max level latter.level
+        else level)
+      former.level latters
+
+(* [raise_levels formers latters]: the [formers] (already filtered for
+   removal) and [latters] as tokens, each with the twin level it needs. *)
+let raise_levels formers latters =
+  let former_atoms = List.filter_map parse_atom formers in
+  let relevel token a level =
+    if level = a.level then token else token_of a level
+  in
+  let latters' =
+    List.map
+      (fun token ->
+        match parse_atom token with
+        | None -> token
+        | Some a -> relevel token a (twin_level former_atoms a))
+      latters
+  in
+  let latter_atoms = List.filter_map parse_atom latters' in
+  let formers' =
+    List.map
+      (fun token ->
+        match parse_atom token with
+        | None -> token
+        | Some a -> relevel token a (min max_level (twin_former latter_atoms a)))
+      formers
+  in
+  formers', latters'
+
+(* A block's classes in source order: each atom against the ones before it. *)
+let twin_block tokens =
+  List.fold_left
+    (fun acc token ->
+      let formers, latters = raise_levels acc [ token ] in
+      formers @ latters)
+    [] tokens
 
 (* -- className string merge --------------------------------------------- *)
 
@@ -207,4 +332,6 @@ let merge_class_names former latter =
            (fun latter_atom -> removes ~former:former_atom ~latter:latter_atom)
            latter_atoms)
   in
-  List.filter survives former_tokens @ latter_tokens |> String.concat " "
+  let survivors = List.filter survives former_tokens in
+  let survivors, latter_tokens = raise_levels survivors latter_tokens in
+  survivors @ latter_tokens |> String.concat " "

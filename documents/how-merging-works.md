@@ -54,7 +54,9 @@ The same holds inside one block: a base declaration written after an
 `@media`/`@supports`/`@container` one for the same longhands drops the
 earlier one (`@media (...) { padding-top: 8px; } padding: 0;` keeps only
 `padding: 0`), and written before it does not (`padding: 0; @media (...)
-{ padding-top: 8px; }` keeps both). A declaration that interpolates `$(...)`
+{ padding-top: 8px; }` keeps both). When the base declaration covers only part of the
+earlier one (`@media (...) { padding: 8px; } padding-top: 0;`), both stay and the
+base one is a twin (below). A declaration that interpolates `$(...)`
 takes no part in this.
 The reverse never happens: a conditional `b` does not drop a base `a`,
 since `a` still applies when the condition is false.
@@ -100,7 +102,7 @@ CSS.merge(wide, narrow);
 (`shorthand_then_longhand_keeps_both`, same file — this is the accepted
 limit "a longhand can't drop an earlier shorthand", not a bug)
 
-**An `@media` shorthand, then a base longhand — the covered side is dropped:**
+**An `@media` shorthand, then a base longhand — a specificity twin:**
 
 ```reason
 let responsive = [%css "@media (max-width: 600px) { padding: 8px; }"];
@@ -111,20 +113,46 @@ CSS.merge(responsive, override);
    other three sides below 600px */
 ```
 
-This works because a box shorthand inside a condition is split into one
-atom per side when it is extracted: `padding`, `margin`,
-`scroll-padding`, `scroll-margin`, `inset`, `border-width`,
-`border-style`, `border-color`, `overflow`, `gap`, and the `-block` and
-`-inline` forms of `padding`, `margin` and `inset`. A shorthand in the base context is
-not split. A shorthand left whole is not dropped by a base longhand:
-`border-radius`, `border`, `outline`, `background`, `font`, a value with a
-top-level `var()`, and a value where one `$(path)` would end up on two
-sides (`padding: $(x)`, `padding: $(a) $(b)`, `padding: 8px $(x)`), which
-would form an `_in_` bundle that merge never drops. Four different paths
-are split. A logical longhand (`padding-inline-start`) and a physical one
-(`padding-left`) are different properties for merge, whatever the writing
-mode.
-(`packages/ppx/test/css-support/cascade-gaps.t` pins each of these.)
+`padding` covers more than `padding-top`, so `merge` cannot drop it, and a
+rule under `@media` sorts after a base rule in the sheet. `merge` therefore
+swaps the class of `padding-top` for its **twin**. `styled-ppx.generate`
+writes every `_a_<x>` rule with extra selectors for the twin classes:
+
+```css
+._a_<x>,._t1_<x>._t1_<x>,._t2_<x>._t2_<x>._t2_<x> { padding-top: 0; }
+```
+
+`._a_<x>` has specificity (0,1,0), `._t1_<x>._t1_<x>` (0,2,0) and the level 2
+twin (0,3,0), so a twin wins over a lower level whatever the sheet order, and
+`padding` still applies to the sides the twin does not set. The twin class
+replaces the atom class on the element (`_a_<x>` becomes `_t1_<x>`), the
+runtime changes only the prefix, with no table.
+
+Where `merge(a, b)` (and a block, for its own atoms, in source order) uses a
+twin: `b`'s atom is in the base context or under at-rules alone, an atom of
+`a` that survives overlaps it in the same kind of context (same family, masks
+that meet and are not covered, or `all`), and the sheet order would not
+surely put `b` last. The sheet surely puts `b` last when `a` is base and `b`
+is under at-rules, or when both share a context and `a` is a shorthand and `b`
+a longhand: no twin there. A level is one above the highest level of the atoms
+it must beat (0 when the sheet order already does it), and the cap is level 2:
+at the cap the sheet order decides, as it did before the twin
+(`packages/ppx/test/css-support/cascade-twin.t`, G55). A selector or
+`!important` atom keeps its higher specificity by taking the level of the
+twin it must stay above (G58, G60: `:hover` still beats `@media`).
+
+The same rule makes these cases follow source order, with nothing split:
+`border-radius`, `border`, `outline`, `background`, `font`, a top-level
+`var()`, a repeated `$(path)` (`padding: $(x)`) and a conditional shorthand
+against its longhand. A logical longhand (`padding-inline-start`) and a
+physical one (`padding-left`) are different properties for merge, whatever
+the writing mode, so they get no twin.
+(`cascade-gaps.t` and `cascade-twin.t` pin each of these.)
+
+**A twin ties with an author selector.** A twin has the specificity of a
+two-class author selector (`.parent.on`), and its rule comes later in the sheet,
+so the twin wins that tie, which a plain atom would lose (G56). Keep the
+author selector more specific, or avoid merging into that property.
 
 **`!important` vs. a plain declaration — both kept:**
 
@@ -288,14 +316,15 @@ all) still depends on which one the browser loads first
 - **Partial cover across libraries.** `merge(a, b)` where `a` sets
   `margin` and `b` sets only `margin-top` keeps both classes (the example
   above) — correct as long as `b`'s library's sheet loads after `a`'s.
-- **Conditional shorthands that are not split.** A base longhand does not
-  drop a conditional `border-radius`, `border`, `outline`, `background`,
-  `font` or `flex` value, a conditional shorthand with a top-level `var()`
-  or a repeated `$(path)`, or a logical/physical pair
-  (`padding-inline` against `padding-left`). Both classes stay, and the
-  conditional rule wins while its condition holds (see "A conditional
-  atom beats an unconditional one" below). Pinned by
-  `packages/ppx/test/css-support/cascade-gaps.t`.
+- **Twin limits.** The twin cannot help where `merge` has no overlap to see:
+  the same selector with an extra at-rule (`& .child` against
+  `@media { & .child }`, `&:hover` against `@media { &:hover }`), a logical
+  property against a physical one (`padding-inline` and `padding-left`), and
+  an `_in_` bundle, whose class holds several properties and contexts. Both
+  classes stay and the sheet order decides (pinned by `cascade-gaps.t`). A
+  chain of more than two overlapping merges stops at level 2. Two different
+  selector contexts (`:focus` after `:hover`) get no twin. The twin raises the
+  sheet size (the demo `styles.css` goes from 4.5 KB to 10.3 KB, 1.7 KB to 2.6 KB gzipped).
 - **A selector context is not dropped by a base declaration.** `&:hover`,
   `& .child` and `::before` atoms of `a` stay, even with the same
   property in `b`; so does an `@media` atom under such a selector.

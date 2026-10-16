@@ -63854,15 +63854,84 @@ function fields_of_extra(extra) {
     return;
   }
 }
-function parse_atom(class_name) {
-  const prefix_len = atom_prefix.length;
-  if (class_name.length < prefix_len || sub5(class_name, 0, prefix_len) !== atom_prefix) {
+function twin_prefix(level) {
+  return _1(sprintf({
+    TAG: (
+      /* Format */
+      0
+    ),
+    _0: {
+      TAG: (
+        /* String_literal */
+        11
+      ),
+      _0: "_t",
+      _1: {
+        TAG: (
+          /* Int */
+          4
+        ),
+        _0: (
+          /* Int_d */
+          0
+        ),
+        _1: (
+          /* No_padding */
+          0
+        ),
+        _2: (
+          /* No_precision */
+          0
+        ),
+        _3: {
+          TAG: (
+            /* Char_literal */
+            12
+          ),
+          _0: (
+            /* '_' */
+            95
+          ),
+          _1: (
+            /* End_of_format */
+            0
+          )
+        }
+      }
+    },
+    _1: "_t%d_"
+  }), level);
+}
+function split_prefix(class_name) {
+  const n = class_name.length;
+  if (n >= 3 && sub5(class_name, 0, 3) === atom_prefix) {
+    return [
+      0,
+      sub5(class_name, 3, n - 3 | 0)
+    ];
+  } else if (n >= 4 && get2(class_name, 0) === /* '_' */
+  95 && get2(class_name, 1) === /* 't' */
+  116 && get2(class_name, 2) >= /* '1' */
+  49 && get2(class_name, 2) <= chr(50) && get2(class_name, 3) === /* '_' */
+  95) {
+    return [
+      get2(class_name, 2) - /* '0' */
+      48 | 0,
+      sub5(class_name, 4, n - 4 | 0)
+    ];
+  } else {
     return;
   }
-  const body = sub5(class_name, prefix_len, class_name.length - prefix_len | 0);
-  const floor = 6;
-  const match = fields_of_extra(body.length - floor | 0);
+}
+function parse_atom(class_name) {
+  const match = split_prefix(class_name);
   if (match === void 0) {
+    return;
+  }
+  const body = match[1];
+  const floor = 6;
+  const match$1 = fields_of_extra(body.length - floor | 0);
+  if (match$1 === void 0) {
     return;
   }
   const pos = {
@@ -63873,16 +63942,18 @@ function parse_atom(class_name) {
     pos.contents = pos.contents + width | 0;
     return s2;
   };
-  const context = match[0] ? take3(5) : "";
+  const context = match$1[0] ? take3(5) : "";
   const family = take3(2);
-  const extended = match[2] ? take3(6) : void 0;
-  const mask = match[1] ? base36_value(take3(4)) : void 0;
+  const extended = match$1[2] ? take3(6) : void 0;
+  const mask = match$1[1] ? base36_value(take3(4)) : void 0;
   take3(4);
   return {
     context,
     family,
     extended,
-    mask
+    mask,
+    level: match[0],
+    body
   };
 }
 function context_equal(a, b) {
@@ -63939,6 +64010,127 @@ function removes(former, latter) {
     return false;
   }
 }
+function is_plain(a) {
+  if (a.context === "") {
+    return true;
+  } else {
+    return is_at_rules_only(a);
+  }
+}
+function overlaps(former, latter) {
+  if (latter.family === all_sentinel) {
+    return !is_excluded_from_all(former.family);
+  }
+  if (former.family === all_sentinel) {
+    return !is_excluded_from_all(latter.family);
+  }
+  if (!family_equal(former, latter)) {
+    return false;
+  }
+  const match = former.mask;
+  const match$1 = latter.mask;
+  if (match !== void 0 && match$1 !== void 0) {
+    return (match & match$1) !== 0;
+  } else {
+    return true;
+  }
+}
+function surely_after(former, latter) {
+  if (former.context === "" && is_at_rules_only(latter)) {
+    return true;
+  } else if (context_equal(former, latter) && former.mask === void 0) {
+    return latter.mask !== void 0;
+  } else {
+    return false;
+  }
+}
+function twin_level(formers, latter) {
+  const conflicts = function(former) {
+    if (is_plain(former) && overlaps(former, latter)) {
+      return !removes(former, latter);
+    } else {
+      return false;
+    }
+  };
+  const needed = function(former) {
+    if (is_plain(latter)) {
+      return former.level + (surely_after(former, latter) ? 0 : 1) | 0;
+    } else {
+      return former.level;
+    }
+  };
+  return caml_int_min(2, fold_left5((function(level, former) {
+    if (conflicts(former)) {
+      return caml_int_max(level, needed(former));
+    } else {
+      return level;
+    }
+  }), latter.level, formers));
+}
+function token_of(a, level) {
+  return (level === 0 ? atom_prefix : twin_prefix(level)) + a.body;
+}
+function twin_former(latters, former) {
+  if (is_plain(former)) {
+    return former.level;
+  } else {
+    return fold_left5((function(level, latter) {
+      if (is_plain(latter) && overlaps(former, latter) && level <= latter.level) {
+        return latter.level;
+      } else {
+        return level;
+      }
+    }), former.level, latters);
+  }
+}
+function raise_levels(formers, latters) {
+  const former_atoms = filter_map2(parse_atom, formers);
+  const relevel = function(token, a, level) {
+    if (level === a.level) {
+      return token;
+    } else {
+      return token_of(a, level);
+    }
+  };
+  const latters$p = map5((function(token) {
+    const a = parse_atom(token);
+    if (a !== void 0) {
+      return relevel(token, a, twin_level(former_atoms, a));
+    } else {
+      return token;
+    }
+  }), latters);
+  const latter_atoms = filter_map2(parse_atom, latters$p);
+  const formers$p = map5((function(token) {
+    const a = parse_atom(token);
+    if (a !== void 0) {
+      return relevel(token, a, caml_int_min(2, twin_former(latter_atoms, a)));
+    } else {
+      return token;
+    }
+  }), formers);
+  return [
+    formers$p,
+    latters$p
+  ];
+}
+function twin_block(tokens) {
+  return fold_left5(
+    (function(acc, token) {
+      const match = raise_levels(acc, {
+        hd: token,
+        tl: (
+          /* [] */
+          0
+        )
+      });
+      return $at(match[0], match[1]);
+    }),
+    /* [] */
+    0,
+    tokens
+  );
+}
 function is_space3(param) {
   if (param > 13 || param < 9) {
     return param === 32;
@@ -63991,13 +64183,16 @@ function merge_class_names(former, latter) {
       return true;
     }
   };
-  return concat6(" ", $at(filter2(survives, former_tokens), latter_tokens));
+  const survivors = filter2(survives, former_tokens);
+  const match = raise_levels(survivors, latter_tokens);
+  return concat6(" ", $at(match[0], match[1]));
 }
 var context_width = 5;
 var family_width = 2;
 var mask_width = 4;
 var value_width = 4;
 var extended_width = 6;
+var max_level = 2;
 
 // ../demo-melange/node_modules/reason-react/ReactDOM.mjs
 function unsafeAddProp(style, key, value) {
@@ -64574,7 +64769,7 @@ var modifierActive = make7(
   0
 );
 var toggle = make7(
-  "label:toggle _id_8jiwri _a_5r4ri2 _a_94q2r6 _a_7p0004gtl7 _a_3hmfgf _a_3n9mlt _a_lmw1g39bg96 _a_lmw1g3h0cn495eb _a_lmw1g3h01kwjhdq _a_lmw1g3h0001kilm _a_lmw1g3h0074bldq",
+  "label:toggle _id_8jiwri _a_5r4ri2 _a_94q2r6 _a_7p0004gtl7 _a_3hmfgf _a_3n9mlt _a_lmw1g39bg96 _a_lmw1g3h0ef5176a",
   /* [] */
   0
 );
