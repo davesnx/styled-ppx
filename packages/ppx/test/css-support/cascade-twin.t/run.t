@@ -55,6 +55,30 @@ overlap with a base atom, an author selector of equal specificity, and a
   G61 b: label:g61_b _id_c8ukp _a_qyw7u4ej85p _a_1lub34eewkq _a_mzyyh4evz20 _a_egfee4epz49 _a_wu9h64eecmo
   G61 c: label:g61_c _id_1f5fygi _a_0f0zo4e1mxw
   G61 result: label:g61_a _id_6xyx7r _a_0p2f04edryl label:g61_b _id_c8ukp _t1_qyw7u4ej85p _t1_1lub34eewkq _t1_mzyyh4evz20 _t1_egfee4epz49 _t1_wu9h64eecmo label:g61_c _id_1f5fygi _t1_0f0zo4e1mxw
+  G62 ctx g62_x: label:g62_x _id_dqage4
+  G62 a: label:g62_a _id_6z55t _a_0u1th3hef5oh3i
+  G62 f: label:g62_f _id_k38qjs _a_3hcn4dv9q
+  G62 c: label:g62_c _id_kgtvzw _a_x4g8b3hcn4i8d6
+  G62 result: label:g62_a _id_6z55t _a_0u1th3hef5oh3i label:g62_f _id_k38qjs _t1_3hcn4dv9q label:g62_c _id_kgtvzw _t1_x4g8b3hcn4i8d6
+  G63 a: label:g63_a _id_1i8la4g _a_0u1th3hef59qj7
+  G63 f: label:g63_f _id_71j5ic _a_3hcn47md7
+  G63 c: label:g63_c _id_128nlx4 _a_5wdc33hcn4s7ob
+  G63 result: label:g63_a _id_1i8la4g _a_0u1th3hef59qj7 label:g63_f _id_71j5ic _t1_3hcn47md7 label:g63_c _id_128nlx4 _t1_5wdc33hcn4s7ob
+  G64 ctx g64_x: label:g64_x _id_5vv95s
+  G64 a: label:g64_a _id_11xoc9 _a_0u1th3hef57eo9
+  G64 f: label:g64_f _id_dherzy _a_3hcn49io8
+  G64 c: label:g64_c _id_1p9hjdh _a_5uzps3hcn4k889
+  G64 result: label:g64_a _id_11xoc9 _a_0u1th3hef57eo9 label:g64_f _id_dherzy _t1_3hcn49io8 label:g64_c _id_1p9hjdh _t1_5uzps3hcn4k889
+  G65 ctx g65_x: label:g65_x _id_1oq2lzb
+  G65 a: label:g65_a _id_s1un0v _a_0u1th3hef5bllm
+  G65 f: label:g65_f _id_4ra6dd _a_3hcn444i4
+  G65 c: label:g65_c _id_nz8k91 _a_p4tmq3hcn415a4
+  G65 result: label:g65_a _id_s1un0v _a_0u1th3hef5bllm label:g65_f _id_4ra6dd _t1_3hcn444i4 label:g65_c _id_nz8k91 _t1_p4tmq3hcn415a4
+  G66 ctx g66_x: label:g66_x _id_qxa9f2
+  G66 a: label:g66_a _id_1nhjoqj _a_0u1th3hef5k7ns
+  G66 f: label:g66_f _id_1av6rto _a_3hcn4lt69
+  G66 c: label:g66_c _id_15rp9ze _a_k9lqp3hcn4erzc
+  G66 result: label:g66_a _id_1nhjoqj _a_0u1th3hef5k7ns label:g66_f _id_1av6rto _t1_3hcn4lt69 label:g66_c _id_15rp9ze _t1_k9lqp3hcn4erzc
 
 The stylesheet, from the same post-PPX files the executable was built from:
 
@@ -68,6 +92,15 @@ The stylesheet, from the same post-PPX files the executable was built from:
   ._a_3hef5f3p1,._t1_3hef5f3p1._t1_3hef5f3p1,._t2_3hef5f3p1._t2_3hef5f3p1._t2_3hef5f3p1{border-color:rgb(22, 0, 0);}
   ._a_7p002svew,._t1_7p002svew._t1_7p002svew,._t2_7p002svew._t2_7p002svew._t2_7p002svew{margin-left:563px;}
   ._a_6500wix1i,._t1_6500wix1i._t1_6500wix1i,._t2_6500wix1i._t2_6500wix1i._t2_6500wix1i{font-size:16px;}
+  ._a_3hcn4dv9q,._t1_3hcn4dv9q._t1_3hcn4dv9q,._t2_3hcn4dv9q._t2_3hcn4dv9q._t2_3hcn4dv9q{border-top-color:rgb(62, 0, 0);}
+  ._id_dqage4 ._a_x4g8b3hcn4i8d6,._id_dqage4 ._t1_x4g8b3hcn4i8d6._t1_x4g8b3hcn4i8d6,._id_dqage4 ._t2_x4g8b3hcn4i8d6._t2_x4g8b3hcn4i8d6._t2_x4g8b3hcn4i8d6{border-top-color:rgb(63, 0, 0);}
+  ._a_3hcn47md7,._t1_3hcn47md7._t1_3hcn47md7,._t2_3hcn47md7._t2_3hcn47md7._t2_3hcn47md7{border-top-color:rgb(72, 0, 0);}
+  ._a_5wdc33hcn4s7ob + ._a_5wdc33hcn4s7ob,._t1_5wdc33hcn4s7ob._t1_5wdc33hcn4s7ob + ._t1_5wdc33hcn4s7ob._t1_5wdc33hcn4s7ob,._t2_5wdc33hcn4s7ob._t2_5wdc33hcn4s7ob._t2_5wdc33hcn4s7ob + ._t2_5wdc33hcn4s7ob._t2_5wdc33hcn4s7ob._t2_5wdc33hcn4s7ob{border-top-color:rgb(73, 0, 0);}
+  ._a_3hcn49io8,._t1_3hcn49io8._t1_3hcn49io8,._t2_3hcn49io8._t2_3hcn49io8._t2_3hcn49io8{border-top-color:rgb(82, 0, 0);}
+  ._id_5vv95s + ._a_5uzps3hcn4k889,._id_5vv95s + ._t1_5uzps3hcn4k889._t1_5uzps3hcn4k889,._id_5vv95s + ._t2_5uzps3hcn4k889._t2_5uzps3hcn4k889._t2_5uzps3hcn4k889{border-top-color:rgb(83, 0, 0);}
+  ._a_3hcn444i4,._t1_3hcn444i4._t1_3hcn444i4,._t2_3hcn444i4._t2_3hcn444i4._t2_3hcn444i4{border-top-color:rgb(92, 0, 0);}
+  ._id_1oq2lzb:first-child ._a_p4tmq3hcn415a4,._id_1oq2lzb:first-child ._t1_p4tmq3hcn415a4._t1_p4tmq3hcn415a4,._id_1oq2lzb:first-child ._t2_p4tmq3hcn415a4._t2_p4tmq3hcn415a4._t2_p4tmq3hcn415a4{border-top-color:rgb(93, 0, 0);}
+  ._a_3hcn4lt69,._t1_3hcn4lt69._t1_3hcn4lt69,._t2_3hcn4lt69._t2_3hcn4lt69._t2_3hcn4lt69{border-top-color:rgb(102, 0, 0);}
   ._a_qyw7u4ej85p:hover,._t1_qyw7u4ej85p._t1_qyw7u4ej85p:hover,._t2_qyw7u4ej85p._t2_qyw7u4ej85p._t2_qyw7u4ej85p:hover{color:rgb(62, 0, 0);}
   ._a_1lub34eewkq:focus,._t1_1lub34eewkq._t1_1lub34eewkq:focus,._t2_1lub34eewkq._t2_1lub34eewkq._t2_1lub34eewkq:focus{color:rgb(62, 0, 0);}
   ._a_wu9h64eecmo::placeholder,._t1_wu9h64eecmo._t1_wu9h64eecmo::placeholder,._t2_wu9h64eecmo._t2_wu9h64eecmo._t2_wu9h64eecmo::placeholder{color:rgb(64, 0, 0);}
@@ -92,3 +125,9 @@ The stylesheet, from the same post-PPX files the executable was built from:
   @media (max-width: 1200px) {._a_0p2f0940022q28,._t1_0p2f0940022q28._t1_0p2f0940022q28,._t2_0p2f0940022q28._t2_0p2f0940022q28._t2_0p2f0940022q28{padding-left:591px;}}
   @media (max-width: 1200px) {._a_0p2f0940080sr9,._t1_0p2f0940080sr9._t1_0p2f0940080sr9,._t2_0p2f0940080sr9._t2_0p2f0940080sr9._t2_0p2f0940080sr9{padding-top:601px;}}
   @media (max-width: 900px) {._a_0f0zo94008biqu,._t1_0f0zo94008biqu._t1_0f0zo94008biqu,._t2_0f0zo94008biqu._t2_0f0zo94008biqu._t2_0f0zo94008biqu{padding-top:603px;}}
+  @media (min-width: 1px) {._a_0u1th3hef5oh3i,._t1_0u1th3hef5oh3i._t1_0u1th3hef5oh3i,._t2_0u1th3hef5oh3i._t2_0u1th3hef5oh3i._t2_0u1th3hef5oh3i{border-color:rgb(61, 0, 0);}}
+  @media (min-width: 1px) {._a_0u1th3hef59qj7,._t1_0u1th3hef59qj7._t1_0u1th3hef59qj7,._t2_0u1th3hef59qj7._t2_0u1th3hef59qj7._t2_0u1th3hef59qj7{border-color:rgb(71, 0, 0);}}
+  @media (min-width: 1px) {._a_0u1th3hef57eo9,._t1_0u1th3hef57eo9._t1_0u1th3hef57eo9,._t2_0u1th3hef57eo9._t2_0u1th3hef57eo9._t2_0u1th3hef57eo9{border-color:rgb(81, 0, 0);}}
+  @media (min-width: 1px) {._a_0u1th3hef5bllm,._t1_0u1th3hef5bllm._t1_0u1th3hef5bllm,._t2_0u1th3hef5bllm._t2_0u1th3hef5bllm._t2_0u1th3hef5bllm{border-color:rgb(91, 0, 0);}}
+  @media (min-width: 1px) {._a_0u1th3hef5k7ns,._t1_0u1th3hef5k7ns._t1_0u1th3hef5k7ns,._t2_0u1th3hef5k7ns._t2_0u1th3hef5k7ns._t2_0u1th3hef5k7ns{border-color:rgb(101, 0, 0);}}
+  @media (min-width: 1px) {._id_qxa9f2 ._a_k9lqp3hcn4erzc,._id_qxa9f2 ._t1_k9lqp3hcn4erzc._t1_k9lqp3hcn4erzc,._id_qxa9f2 ._t2_k9lqp3hcn4erzc._t2_k9lqp3hcn4erzc._t2_k9lqp3hcn4erzc{border-top-color:rgb(103, 0, 0);}}

@@ -128,6 +128,14 @@ twin (0,3,0), so a twin wins over a lower level whatever the sheet order, and
 replaces the atom class on the element (`_a_<x>` becomes `_t1_<x>`), the
 runtime changes only the prefix, with no table.
 
+When the atom has a selector (`.parent &`, `& + &`, `&:hover`), each twin
+selector is the same selector with every `._a_<x>` replaced by the twin class,
+so the twin applies only where the atom applies:
+
+```css
+._id_<p> ._a_<x>,._id_<p> ._t1_<x>._t1_<x>,._id_<p> ._t2_<x>._t2_<x>._t2_<x> { padding-top: 0; }
+```
+
 Where `merge(a, b)` (and a block, for its own atoms, in source order) uses a
 twin: `b`'s atom is in the base context or under at-rules alone, an atom of
 `a` that survives overlaps it in the same kind of context (same family, masks
