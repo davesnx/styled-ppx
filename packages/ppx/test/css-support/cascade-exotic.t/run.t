@@ -7,15 +7,16 @@ Every value is unique to its case, so no atom is shared between cases and the
 sheet shows each pair on its own.
 
 The cases cover `@supports`, the `all` sentinel and its exclusions, logical and
-physical properties, pseudo-elements, raw `var()` shorthands, interpolation
-bundles against an override, prefixed properties, shorthands of shorthands,
+physical properties, pseudo-elements, raw `var()` shorthands, atoms that share
+one interpolation variable against an override, prefixed properties, shorthands of shorthands,
 `!important`, three-way merges, nested at-rules, the one-block `@media` rewrite
 and its exceptions, descendant selectors and `[%styled.global]` against an atom,
 custom properties, property aliases and pseudo-class chains.
 
 A pair `cascade-cases.t` already pins is not repeated here: `$(x)` in a
-shorthand against a longhand (C08, C18, C19, C27, C43), an `_in_` bundle against
-a plain atom or an @media atom (C34, C35, C37, C43, C47), and the same `@media`
+shorthand against a longhand (C08, C18, C19, C27, C43), a group of atoms that
+share one interpolation variable against a plain atom or an @media atom (C34,
+C35, C37, C43, C47), and the same `@media`
 pair across a merge (C07, C14).
 
 The executable prints, per case, the class string of each operand and of the

@@ -1,5 +1,5 @@
 Pins what `CSS.merge` and the stylesheet order do today, with the base-removes
-rule (`Slot_key.removes`) and the box shorthand split, for shapes where the
+rule (`Slot_key.removes`) and the specificity twin, for shapes where the
 author's intended winner and the produced winner can differ, as one case per
 shape (G01 to G51S). It extends `cascade-cases.t` (C01 to C49) and
 `cascade-exotic.t` (E01 to E45). Each case sits above its code in `input.re`
@@ -8,8 +8,8 @@ winner: the test records the gap, it does not approve it.
 
 The cases cover an interpolated shorthand against a longhand (single path,
 repeated paths, a static value with a repeated path, four distinct paths, a raw
-`var()`), `_in_` bundles on either side of a merge, the same selector with extra
-at-rules, nested at-rules, two different conditions, the split and unsplit
+`var()`), groups of atoms that share one `$(x)` on either side of a merge, the
+same selector with extra at-rules, nested at-rules, two different conditions,
 shorthands against their longhands, three-way merges in both groupings, the same
 pairs in one block, and operands in two files in both file orders.
 

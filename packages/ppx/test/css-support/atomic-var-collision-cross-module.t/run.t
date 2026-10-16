@@ -24,7 +24,7 @@ The background-color atom has the SAME class name in both modules AND the
 same `var(--...)` target despite the differing sibling. These two lines
 must stay byte-identical. (This declaration is the only interpolating one
 in its own binding, so it mints a real, slot-keyed `_a_` atom - same path a
-static atom uses - not an `_in_` bundle; see `Slot_key.t.bundle`'s doc.)
+static atom uses - not one of a group of atoms that share a variable.)
 
   $ grep -ho '_a_[0-9a-z]*{background-color:var(--[A-Za-z0-9_-]*);}' a.ml b.ml
   _a_390004qac1{background-color:var(--box-11ifi3f);}

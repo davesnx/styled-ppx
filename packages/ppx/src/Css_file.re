@@ -1706,12 +1706,6 @@ module Css_transform = {
     | At_rule({ block: Empty, _ }) => ()
     };
 
-  let is_bare_ampersand = (selectors: list((selector, Ppxlib.Location.t))) =>
-    switch (selectors) {
-    | [(SimpleSelector(Ampersand), _)] => true
-    | _ => false
-    };
-
   let atomize_rules =
       (
         ~source_position_start,
@@ -1859,7 +1853,7 @@ module Css_transform = {
        single atom (see `group_declarations_by_family`); everything
        else atomizes rule by rule. */
     let rec extract_atomic_rules_from_block =
-            (~conditional=false, ~parent_prelude=?, rules: list(rule))
+            (~parent_prelude=?, rules: list(rule))
             : list((string, string, rule)) =>
       rules
       |> group_declarations_by_family
@@ -1868,11 +1862,10 @@ module Css_transform = {
            | Declaration_group(decls) =>
              wrap_declaration_group_under_parent(~parent_prelude?, decls)
            | Nested_rule(rule) =>
-             extract_atomic_rules(~conditional, ~parent_prelude?, rule),
+             extract_atomic_rules(~parent_prelude?, rule),
          )
     and extract_atomic_rules =
-        (~conditional=false, ~parent_prelude=?, rule: rule)
-        : list((string, string, rule)) => {
+        (~parent_prelude=?, rule: rule): list((string, string, rule)) => {
       switch (rule) {
       | Declaration(decl) =>
         wrap_declaration_group_under_parent(~parent_prelude?, [decl])
@@ -1929,7 +1922,6 @@ module Css_transform = {
           effective_selectors,
         );
         extract_atomic_rules_from_block(
-          ~conditional=conditional || !is_bare_ampersand(effective_selectors),
           ~parent_prelude=effective_selectors,
           rules,
         );
@@ -2009,11 +2001,7 @@ module Css_transform = {
             | Some(rewritten_tokens) => (rewritten_tokens, snd(prelude))
             | None => prelude
             };
-          extract_atomic_rules_from_block(
-            ~conditional=true,
-            ~parent_prelude?,
-            rules,
-          )
+          extract_atomic_rules_from_block(~parent_prelude?, rules)
           |> List.map(((_className, _namespace, inner_rule)) => {
                let wrapped =
                  Slot_key.canonical_nesting(
@@ -2140,36 +2128,35 @@ module Css_transform = {
        at-rules alone for the same longhands, exactly as `CSS.merge(a, b)`
        does for two blocks (`Slot_key.removes`): the earlier atom would
        otherwise still win while its condition holds. Its class is never
-       minted. An interpolating atom takes part like any other: it has a
-       slot, and the group variable it may share (see below) does not
-       depend on which of its members survive. */
-    let atomic_rules = {
+       minted, but it stays in `all_atomic_rules`: the variable group below
+       is built from every atom, so no later declaration renames the
+       variable or the classes of the atoms that remain. */
+    let dropped = {
       let slots =
         all_atomic_rules
         |> List.map(((_, _, rule)) => Slot_key.of_atom(rule))
         |> Array.of_list;
-      all_atomic_rules
-      |> List.mapi((i, atom) => (i, atom))
-      |> List.filter(((i, _)) =>
-           switch (slots[i]) {
-           | Some(former)
-               when Slot_key.context_is_at_rules_only(former.context) =>
-             let dropped = ref(false);
-             for (j in i + 1 to Array.length(slots) - 1) {
-               switch (slots[j]) {
-               | Some(latter)
-                   when
-                     Slot_key.context_key(latter.context) == ""
-                     && Slot_key.removes(~former, ~latter) =>
-                 dropped := true
-               | _ => ()
-               };
-             };
-             ! dropped^;
-           | _ => true
-           }
-         )
-      |> List.map(snd);
+      Array.mapi(
+        (i, slot) =>
+          switch (slot) {
+          | Some(former: Slot_key.t)
+              when Slot_key.context_is_at_rules_only(former.context) =>
+            let dropped = ref(false);
+            for (j in i + 1 to Array.length(slots) - 1) {
+              switch (slots[j]) {
+              | Some(latter: Slot_key.t)
+                  when
+                    Slot_key.context_key(latter.context) == ""
+                    && Slot_key.removes(~former, ~latter) =>
+                dropped := true
+              | _ => ()
+              };
+            };
+            dropped^;
+          | _ => false
+          },
+        slots,
+      );
     };
 
     /* Selective atomization: of a block's SINGLETON interpolating atoms
@@ -2196,15 +2183,15 @@ module Css_transform = {
        group seed (the rendered members) and its variable namespace is the
        group's (`css-<hash(seed)>`): one variable and one inline custom
        property per path, and one class still means one exact body (the body
-       names the group variable). The seed holds the members only, so
-       changing another declaration of the block changes neither the seed,
-       nor the variable, nor a member's class.
+       names the group variable). The seed holds the members only, dropped
+       ones included, so changing another declaration of the block changes
+       neither the seed, nor the variable, nor a member's class.
 
        Static declarations keep their own per-content atom class (still
        shared across blocks). A block with no interpolation, or where no
        two interpolating atoms share a path, is unaffected. */
     let interpolating_atoms =
-      atomic_rules
+      all_atomic_rules
       |> List.mapi((i, atom) => (i, atom))
       |> List.filter(((_i, (_cn, _ns, rule))) =>
            atom_has_value_interpolation(rule)
@@ -2254,7 +2241,7 @@ module Css_transform = {
       };
     };
     /* Only a root with 2+ members mints group classes; a singleton root's
-       atom keeps the real class `atomic_rules` already gave it (no entry
+       atom keeps the real class `atomize_rules` already gave it (no entry
        here). */
     let group_by_atomic_index: Hashtbl.t(int, (string, string)) =
       Hashtbl.create(8);
@@ -2294,7 +2281,7 @@ module Css_transform = {
     );
 
     let (shipped_rev, classes_rev, atom_infos_rev) =
-      atomic_rules
+      all_atomic_rules
       |> List.mapi((i, atom) => (i, atom))
       |> List.fold_left(
            (
@@ -2311,35 +2298,41 @@ module Css_transform = {
                | None => (className, var_namespace, Some(className))
                };
 
-             let processed =
+             let lowered =
                lower_atom(
                  ctx,
                  ~effective_class,
                  ~effective_namespace,
                  ~loc,
                  rule,
-               )
-               |> List.map(r => (dedup_key, r));
+               );
+             /* A dropped atom ships nothing, but its interpolation is still
+                read, like the inline value `CSS.merge` leaves behind. */
+             if (dropped[i]) {
+               (shipped_acc, classes_acc, atom_infos_acc);
+             } else {
+               let processed = List.map(r => (dedup_key, r), lowered);
 
-             let classes_acc =
-               List.mem(effective_class, classes_acc)
-                 ? classes_acc : [effective_class, ...classes_acc];
+               let classes_acc =
+                 List.mem(effective_class, classes_acc)
+                   ? classes_acc : [effective_class, ...classes_acc];
 
-             /* Record the atom's `&`-locality and the vars it references
-                (scanned from rendered text so cross-atom dedup can't hide a
-                reference), for the inherits:false decision below. */
-             let atom_local = atom_is_ampersand_local(rule);
-             let referenced =
-               processed
-               |> List.concat_map(((_key, r)) =>
-                    custom_property_names_in_text(render_rule(r))
-                  );
+               /* Record the atom's `&`-locality and the vars it references
+                  (scanned from rendered text so cross-atom dedup can't hide a
+                  reference), for the inherits:false decision below. */
+               let atom_local = atom_is_ampersand_local(rule);
+               let referenced =
+                 processed
+                 |> List.concat_map(((_key, r)) =>
+                      custom_property_names_in_text(render_rule(r))
+                    );
 
-             (
-               List.rev_append(processed, shipped_acc),
-               classes_acc,
-               [(atom_local, referenced), ...atom_infos_acc],
-             );
+               (
+                 List.rev_append(processed, shipped_acc),
+                 classes_acc,
+                 [(atom_local, referenced), ...atom_infos_acc],
+               );
+             };
            },
            ([], [], []),
          );
@@ -2347,12 +2340,17 @@ module Css_transform = {
     let atom_infos = atom_infos_rev;
     let dynamic_vars_final = List.rev(ctx.dynamic_vars^);
 
-    /* A var registers @property{inherits:false} iff its type supports it and
-       every atom that reads it is `&`-local. */
+    /* A var registers @property{inherits:false} iff its type supports it,
+       some atom reads it (a dropped atom's var has no reader) and every atom
+       that reads it is `&`-local. */
     let safe_inherits_false_vars =
       dynamic_vars_final
       |> List.filter_map(({ name, var_type, _ }) =>
            if (var_type_supports_inherits_false(var_type)
+               && List.exists(
+                    ((_, referenced)) => List.mem(name, referenced),
+                    atom_infos,
+                  )
                && List.for_all(
                     ((atom_local, referenced)) =>
                       atom_local || !List.mem(name, referenced),

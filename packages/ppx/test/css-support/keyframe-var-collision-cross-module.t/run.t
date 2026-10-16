@@ -9,7 +9,7 @@ Two hashing schemes meet here, both routed through Hash_class.
 First, the `animation-name: $(grow)` atom is hashed from its own declaration
 content (Hash_class.class_and_namespace/Slot_key.of_atom - it is the only
 interpolating declaration in its binding, so it mints a real, slot-keyed
-`a-` atom, not an `in-` bundle - see `Slot_key.t.bundle`'s doc), so its
+`a-` atom, not one of a group of atoms that share a variable), so its
 class (a-2z01sjjsz) AND its variable (--var-1ugf6s8) are identical in both
 modules and the aggregator dedupes the rule to a single line.
 Second, the keyframe itself is namespaced by kind+module+scope

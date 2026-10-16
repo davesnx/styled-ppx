@@ -201,9 +201,9 @@ let e16_b = [%css {|
 |}];
 show("E16", [("a", e16_a), ("b", e16_b)], CSS.merge(e16_a, e16_b));
 
-/* E17: A is an _in_ bundle (base and :hover share one $(x)), B a plain base override (the card example in how-merging-works.md)
+/* E17: A is a group of atoms sharing one $(x) (base and :hover), B a plain base override (the card example in how-merging-works.md)
    intended: B
-   note: per state. While `:hover` is off B wins; while it is on, A's `:hover` member wins by specificity (0,2,0 against 0,1,0), as in plain CSS. The real gap is the bundle, which `merge` never drops (see Known limits) */
+   note: per state. B drops A's base atom but not its `:hover` atom (a selector context stays). While `:hover` is off B wins; while it is on, A's `:hover` atom wins by specificity (0,2,0 against 0,1,0), as in plain CSS */
 let e17_v1 = CSS.rgb(27, 0, 0);
 let e17_a = [%css {|
   border-top-color: $(e17_v1);
@@ -214,7 +214,7 @@ let e17_b = [%css {|
 |}];
 show("E17", [("a", e17_a), ("b", e17_b)], CSS.merge(e17_a, e17_b));
 
-/* E18: A and B are both _in_ bundles (base and :hover share one $(x) each)
+/* E18: A and B are both groups of atoms sharing one $(x) (base and :hover each)
    intended: B */
 let e18_v1 = CSS.rgb(29, 0, 0);
 let e18_v2 = CSS.rgb(30, 0, 0);

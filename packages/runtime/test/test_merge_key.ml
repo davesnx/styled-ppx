@@ -511,6 +511,20 @@ let selector_block_classes_follow_source_order () =
     (String.concat " " (Merge_key.twin_block tokens))
     (Printf.sprintf "%s %s" (class_of hover) (twin 1 disabled))
 
+(* [border-color] overlaps the @media [border-top] on the top colour without
+   covering it, so merging raises it over [border_top]; [border-right-color]
+   under another @media follows [border-color] in its own block and overlaps
+   [border_top] not at all, so only the raise of [border-color] can lift it. *)
+let later_atoms_of_the_block_follow_a_raised_atom () =
+  let border_top = "@media (max-width:500px){border-top: 1px solid red;}" in
+  let border_color = "border-color: blue;" in
+  let right_color = "@media (max-width:600px){border-right-color: green;}" in
+  let block = class_of border_color ^ " " ^ class_of right_color in
+  Alcotest_extra.assert_string
+    (Merge_key.merge_class_names (class_of border_top) block)
+    (Printf.sprintf "%s %s %s" (class_of border_top) (twin 1 border_color)
+       (twin 1 right_color))
+
 let tests =
   [
     Alcotest_extra.test
@@ -639,4 +653,7 @@ let tests =
     Alcotest_extra.test
       "a block's own atoms get twins in source order (twin_block)"
       block_classes_follow_source_order;
+    Alcotest_extra.test
+      "a block's later atoms follow the atom that merging raised"
+      later_atoms_of_the_block_follow_a_raised_atom;
   ]
