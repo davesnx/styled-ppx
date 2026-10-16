@@ -35,13 +35,13 @@ If this test fail means that the module is not in sync with the ppx
       (
         "Input._chart",
         "_id_1e3u8p2",
-        "_a_dr6172 _a_v3rlzc0ylr4 _a_bhmy9c0ax0l _a_nfiwp8mvgu0 _a_yuqvu8mc7xs",
+        "_a_dr6172 _a_v3rlzc0ylr4 _t1_bhmy9c0ax0l _a_nfiwp8mvgu0 _t1_yuqvu8mc7xs",
       ),
     ]
   ];
   
   let _chart =
     CSS.make(
-      "label:_chart _id_1e3u8p2 _a_dr6172 _a_v3rlzc0ylr4 _a_bhmy9c0ax0l _a_nfiwp8mvgu0 _a_yuqvu8mc7xs",
+      "label:_chart _id_1e3u8p2 _a_dr6172 _a_v3rlzc0ylr4 _t1_bhmy9c0ax0l _a_nfiwp8mvgu0 _t1_yuqvu8mc7xs",
       [],
     );

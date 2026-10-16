@@ -89,13 +89,13 @@ specificity), so read the `result` line together with the sheet.
   G11 result style: --g11_a_v1-evlpt3:211px;--g11_b_v1-15hdob5:212px
   G12 a: label:g12_a _id_ok0wbn _a_cusig4exlm3
   G12 b: label:g12_b _id_15ljxw9 _a_s19nz4epz1m
-  G12 result: label:g12_a _id_ok0wbn _a_cusig4exlm3 label:g12_b _id_15ljxw9 _a_s19nz4epz1m
+  G12 result: label:g12_a _id_ok0wbn _a_cusig4exlm3 label:g12_b _id_15ljxw9 _t1_s19nz4epz1m
   G13 a: label:g13_a _id_evr7y5 _a_bfxpa4egtum
   G13 b: label:g13_b _id_jlws23 _a_qyw7u4exirz
-  G13 result: label:g13_a _id_evr7y5 _a_bfxpa4egtum label:g13_b _id_jlws23 _a_qyw7u4exirz
+  G13 result: label:g13_a _id_evr7y5 _a_bfxpa4egtum label:g13_b _id_jlws23 _t1_qyw7u4exirz
   G14 a: label:g14_a _id_1b7ll7u _a_cusig4ehjl1
   G14 b: label:g14_b _id_1pdntjk _a_s19nz4ev00p
-  G14 result: label:g14_a _id_1b7ll7u _a_cusig4ehjl1 label:g14_b _id_1pdntjk _a_s19nz4ev00p
+  G14 result: label:g14_a _id_1b7ll7u _a_cusig4ehjl1 label:g14_b _id_1pdntjk _t1_s19nz4ev00p
   G15 a: label:g15_a _id_q30hsk _a_cusig4e2nat
   G15 b: label:g15_b _id_au8c59 _a_cusig4eo88q
   G15 result: label:g15_a _id_q30hsk label:g15_b _id_au8c59 _a_cusig4eo88q

@@ -191,10 +191,12 @@ let removes ~former ~latter =
 
 (* -- specificity twin ------------------------------------------------- *)
 
-(* Only atoms in the base context or under at-rules alone take part: both
-   have natural specificity (0,1,0), so source order alone decides between
-   them. Selector and [!important] contexts keep their own, higher
-   specificity and are left alone. *)
+(* A twin only breaks a tie, so only atoms of the same kind are compared. Base
+   and at-rules-only atoms have natural specificity (0,1,0); an atom with a
+   selector or [!important] has more class-like parts (or more weight), so
+   against a plain atom it wins or loses on its own, whatever the source order.
+   A twin adds a type selector only, so it never lifts an atom over that
+   difference. *)
 let is_plain a = is_base a || is_at_rules_only a
 
 (* Could [former] and [latter] set a common property? *)
@@ -221,19 +223,21 @@ let surely_after ~former ~latter =
     former.mask = None && latter.mask <> None
   else false
 
-(* The level [latter] needs to beat the surviving [formers] by source order.
-   A plain [latter] must clear every plain, overlapping former. A [latter]
-   with a selector context (":hover", "& .child", "!important") already has
-   higher natural specificity; it only has to keep it over a twin: it takes
-   the level of the highest overlapping plain former. *)
+(* The level [latter] needs to beat the surviving [formers] by source order:
+   one above every former of the same kind (plain or not) that it overlaps
+   and does not remove, or the former's own level when the sheet order
+   surely puts [latter] after it. Two atoms of different selectors but equal
+   specificity (":hover", ":disabled", "& .a", "& .b") are such a tie. Whether
+   they style one element is unknown at runtime; a needless raise is harmless
+   because a twin never beats a rule with one more class-like part. *)
 let twin_level formers latter =
   let conflicts former =
-    is_plain former && overlaps ~former ~latter && not (removes ~former ~latter)
+    is_plain former = is_plain latter
+    && overlaps ~former ~latter
+    && not (removes ~former ~latter)
   in
   let needed former =
-    if is_plain latter then
-      former.level + if surely_after ~former ~latter then 0 else 1
-    else former.level
+    former.level + if surely_after ~former ~latter then 0 else 1
   in
   List.fold_left
     (fun level former ->
@@ -244,43 +248,22 @@ let twin_level formers latter =
 let token_of a level =
   (if level = 0 then atom_prefix else twin_prefix level) ^ a.body
 
-(* A [former] with a selector context must also keep its natural specificity
-   over a [latter] twin that overlaps it. *)
-let twin_former latters former =
-  if is_plain former then former.level
-  else
-    List.fold_left
-      (fun level latter ->
-        if is_plain latter && overlaps ~former ~latter then
-          max level latter.level
-        else level)
-      former.level latters
-
 (* [raise_levels formers latters]: the [formers] (already filtered for
-   removal) and [latters] as tokens, each with the twin level it needs. *)
+   removal, returned unchanged: a twin never needs an earlier atom raised)
+   and [latters] as tokens, each with the twin level it needs. *)
 let raise_levels formers latters =
   let former_atoms = List.filter_map parse_atom formers in
-  let relevel token a level =
-    if level = a.level then token else token_of a level
-  in
   let latters' =
     List.map
       (fun token ->
         match parse_atom token with
         | None -> token
-        | Some a -> relevel token a (twin_level former_atoms a))
+        | Some a ->
+          let level = twin_level former_atoms a in
+          if level = a.level then token else token_of a level)
       latters
   in
-  let latter_atoms = List.filter_map parse_atom latters' in
-  let formers' =
-    List.map
-      (fun token ->
-        match parse_atom token with
-        | None -> token
-        | Some a -> relevel token a (min max_level (twin_former latter_atoms a)))
-      formers
-  in
-  formers', latters'
+  formers, latters'
 
 (* A block's classes in source order: each atom against the ones before it. *)
 let twin_block tokens =

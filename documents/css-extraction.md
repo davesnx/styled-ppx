@@ -1028,20 +1028,22 @@ element: a level `k` twin has specificity (0,c,k) where the atom has (0,c,0),
 so it beats an atom with the same number of classes and pseudo-classes and
 never one with more. `_in_` rules get none. `_t1_` and `_t2_` do not clash with `_a_`, `_in_`, `_id_`, `_k_` or `label:`.
 
-A twin is used for a later atom that is in the base context or under at-rules
-alone and that overlaps an earlier surviving atom of those two kinds (same
-family, masks that meet, or the `all` sentinel) which `removes` does not drop,
-unless the sheet surely puts it last (earlier atom base and later under
-at-rules; or equal contexts, earlier a shorthand and later a longhand). Its
-level is the highest level of the atoms it must beat, plus one when the sheet
-order is not sure; the cap is 2, and at the cap the sheet order decides.
-A selector or `!important` atom takes the level of the highest twin it
-overlaps, and an earlier one is raised when a later twin overlaps it, so
-`:hover` keeps beating `@media`. A twin never reaches an author selector of
-specificity one class above the atom stays above the twin (an author `.a.b`
-beats every twin level). A box shorthand is no longer
-split per longhand in a condition. The same selector with an extra at-rule,
-logical against physical properties and `_in_` bundles get no twin.
+A twin is used for a later atom that overlaps an earlier surviving atom of the
+same kind (both base or at-rules alone, or both with a selector or
+`!important`; same family, masks that meet, or the `all` sentinel) which
+`removes` does not drop, unless the sheet surely puts it last (earlier atom
+base and later under at-rules; or equal contexts, earlier a shorthand and later
+a longhand). Its level is the highest level of the atoms it must beat, plus one
+when the sheet order is not sure; the cap is 2, and at the cap the sheet order
+decides. Atoms of different kinds are not compared: an atom with a selector has
+more class-like parts than a plain one and wins or loses by specificity, and
+the type-selector weight of a twin never lifts an atom over that difference, so
+no earlier atom is ever raised. The runtime does not know the element two
+selectors style; a twin that is not needed changes nothing. A twin never
+reaches an author selector with one more class
+or pseudo-class (an author `.a.b` beats every twin level). A box shorthand is
+no longer split per longhand in a condition. Logical against physical
+properties and `_in_` bundles get no twin.
 
 `!important` needs no separate check: it is folded into the context (as
 if it were one more wrapper, like an at-rule - see
