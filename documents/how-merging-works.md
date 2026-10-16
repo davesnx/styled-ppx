@@ -57,7 +57,10 @@ earlier one (`@media (...) { padding-top: 8px; } padding: 0;` keeps only
 { padding-top: 8px; }` keeps both). When the base declaration covers only part of the
 earlier one (`@media (...) { padding: 8px; } padding-top: 0;`), both stay and the
 base one is a twin (below). A declaration that interpolates `$(...)`
-takes no part in this.
+takes part like any other. The dropped atom ships no class or rule, but its
+value is still read and set inline, so the variable it uses stays used (no
+unused-variable warning) and a later base declaration changes no other name
+(`packages/ppx/test/css-support/cascade-review.t`, V01).
 The reverse never happens: a conditional `b` does not drop a base `a`,
 since `a` still applies when the condition is false.
 
@@ -136,6 +139,15 @@ so the twin applies only where the atom applies:
 ._id_<p> ._a_<x>,._id_<p> ._t1_<x>:not(x-),._id_<p> ._t2_<x>:not(x-):not(x-) { padding-top: 0; }
 ```
 
+When the atom repeats its class in several compound selectors (`& + &`), either
+element may be the merged one and the other may carry the plain `_a_<x>`, so
+there is one twin selector per compound, the others matching
+`:is(._a_<x>,._t1_<x>)`:
+
+```css
+._t1_<x>:not(x-) + :is(._a_<x>,._t1_<x>),:is(._a_<x>,._t1_<x>) + ._t1_<x>:not(x-)
+```
+
 Where `merge(a, b)` (and a block, for its own atoms, in source order) uses a
 twin: an atom of `a` that survives overlaps `b`'s atom (same family, masks that
 meet and are not covered, or `all`), both are of the same kind (both in the
@@ -144,7 +156,9 @@ and the sheet order would not surely put `b` last. The sheet surely puts `b`
 last when `a` is base and `b` is under at-rules, or when both share a context
 and `a` is a shorthand and `b` a longhand: no twin there. A level is one above
 the highest level of the atoms it must beat (0 when the sheet order already
-does it), and the cap is level 2: at the cap the sheet order decides, as it did
+does it). The atoms it must beat are `a`'s survivors and the atoms of `b`
+before it, at the level they were just given, so a twin raised by `a` carries
+over to the later atoms of `b` (`cascade-review.t`, V05). The cap is level 2: at the cap the sheet order decides, as it did
 before the twin (`packages/ppx/test/css-support/cascade-twin.t`, G55; a chain of
 four state atoms, R02 in `cascade-remaining.t`). This covers two different
 selectors of equal specificity (`:hover` then `:disabled`, `& .a` then `& .b`,

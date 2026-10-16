@@ -92,7 +92,7 @@ let g06_b = [%css {|
 |}];
 show("G06", [("a", g06_a), ("b", g06_b)], CSS.merge(g06_a, g06_b));
 
-/* G07: A is an _in_ bundle (base and @media share one `$(x)` on padding-top), B base padding-top
+/* G07: A is a group of atoms sharing one `$(x)` (base and @media on padding-top), B base padding-top
    intended: B */
 let g07_a_v1 = CSS.px(171);
 let g07_a = [%css {|
@@ -116,7 +116,7 @@ let g08_b = [%css {|
 |}];
 show("G08", [("a", g08_a), ("b", g08_b)], CSS.merge(g08_a, g08_b));
 
-/* G09: A base padding-top, B is an _in_ bundle (base and @media share one `$(x)`)
+/* G09: A base padding-top, B is a group of atoms sharing one `$(x)` (base and @media)
    intended: B */
 let g09_b_v1 = CSS.px(192);
 let g09_a = [%css {|
@@ -128,7 +128,7 @@ let g09_b = [%css {|
 |}];
 show("G09", [("a", g09_a), ("b", g09_b)], CSS.merge(g09_a, g09_b));
 
-/* G10: A is an _in_ bundle (base and @media share one `$(x)`), B @media padding-top
+/* G10: A is a group of atoms sharing one `$(x)` (base and @media), B @media padding-top
    intended: B */
 let g10_a_v1 = CSS.px(201);
 let g10_a = [%css {|
@@ -140,7 +140,7 @@ let g10_b = [%css {|
 |}];
 show("G10", [("a", g10_a), ("b", g10_b)], CSS.merge(g10_a, g10_b));
 
-/* G11: A and B are both _in_ bundles on padding-top
+/* G11: A and B are both groups of atoms sharing one `$(x)`, on padding-top
    intended: B */
 let g11_a_v1 = CSS.px(211);
 let g11_a = [%css {|

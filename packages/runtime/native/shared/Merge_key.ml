@@ -104,7 +104,7 @@ let fields_of_extra extra =
    the tie, as before the twin. [packages/generate] emits the same number of
    twin selectors. *)
 let max_level = 2
-let twin_prefix level = Printf.sprintf "_t%d_" level
+let twin_prefix level = "_t" ^ string_of_int level ^ "_"
 
 let split_prefix class_name =
   let n = String.length class_name in
@@ -171,14 +171,13 @@ let mask_subset a b =
   | Some _, None -> true
   | Some ma, Some mb -> ma land mb = ma
 
-(* [removes ~former ~latter]: mirrors [Slot_key.removes] exactly - same context, or a
-   [latter] in the base context over a [former] whose context is at-rules
-   alone (it overrides [former]'s [@media]/[@container] values on the same
-   element; selector and [!important] contexts stay, a conditional [latter]
-   never removes a base [former]), then
-   either [latter]'s family is the [all] sentinel (former removed unless
-   excluded), or the same family and [former]'s mask a subset of
-   [latter]'s. *)
+(* [removes ~former ~latter]: mirrors [Slot_key.removes] exactly - same
+   context, or a [latter] in the base context over a [former] whose context is
+   at-rules alone (it overrides [former]'s [@media]/[@container] values on the
+   same element; selector and [!important] contexts stay, a conditional
+   [latter] never removes a base [former]), then either [latter]'s family is
+   the [all] sentinel (former removed unless excluded), or the same family and
+   [former]'s mask a subset of [latter]'s. *)
 let removes ~former ~latter =
   (context_equal former latter || (is_base latter && is_at_rules_only former))
   &&
@@ -245,30 +244,29 @@ let twin_level formers latter =
 let token_of a level =
   (if level = 0 then atom_prefix else twin_prefix level) ^ a.body
 
-(* [raise_levels formers latters]: the [formers] (already filtered for
-   removal, returned unchanged: a twin never needs an earlier atom raised)
-   and [latters] as tokens, each with the twin level it needs. *)
+(* [raise_levels formers latters]: [latters] as tokens, each with the twin
+   level it needs against the [formers] (already filtered for removal; a twin
+   never needs an earlier atom raised) and against the latters before it, at
+   the level they were just given. A latter raised by a former would otherwise
+   lose to an earlier latter it sits after in the sheet. *)
 let raise_levels formers latters =
-  let former_atoms = List.filter_map parse_atom formers in
-  let latters' =
-    List.map
-      (fun token ->
+  let _, tokens =
+    List.fold_left
+      (fun (seen, tokens) token ->
         match parse_atom token with
-        | None -> token
+        | None -> seen, token :: tokens
         | Some a ->
-          let level = twin_level former_atoms a in
-          if level = a.level then token else token_of a level)
+          let level = twin_level seen a in
+          let a' = { a with level } in
+          ( a' :: seen,
+            (if level = a.level then token else token_of a level) :: tokens ))
+      (List.filter_map parse_atom formers, [])
       latters
   in
-  formers, latters'
+  List.rev tokens
 
 (* A block's classes in source order: each atom against the ones before it. *)
-let twin_block tokens =
-  List.fold_left
-    (fun acc token ->
-      let formers, latters = raise_levels acc [ token ] in
-      formers @ latters)
-    [] tokens
+let twin_block tokens = raise_levels [] tokens
 
 (* -- className string merge --------------------------------------------- *)
 
@@ -293,8 +291,9 @@ let split_tokens s =
    other token - [_id_] identities, `label:<binding>` markers, and any class
    this module fails to parse - is kept unconditionally, on both sides, in
    its original relative order (identities are never dropped and never drop
-   anything; an unparseable class is not this module's concern to police). [latter]'s tokens are never dropped -
-   [CSS.merge]'s right argument always wins outright. *)
+   anything; an unparseable class is not this module's concern to police).
+   [latter]'s tokens are never dropped - [CSS.merge]'s right argument always
+   wins outright. *)
 let merge_class_names former latter =
   let former_tokens = split_tokens former in
   let latter_tokens = split_tokens latter in
@@ -311,5 +310,4 @@ let merge_class_names former latter =
            latter_atoms)
   in
   let survivors = List.filter survives former_tokens in
-  let survivors, latter_tokens = raise_levels survivors latter_tokens in
-  survivors @ latter_tokens |> String.concat " "
+  survivors @ raise_levels survivors latter_tokens |> String.concat " "

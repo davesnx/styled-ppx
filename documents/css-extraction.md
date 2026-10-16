@@ -822,12 +822,14 @@ the earlier bundle). Each member's class is the usual slot-keyed one, with its
 value field hashed from the seed and the member's own rendered rule
 (`Hash_class.group_class_and_namespace`), salted with `--namespace` like any
 atom class: one class still means one exact body, because the body names the
-group variable. The seed holds the members only, so changing another
-declaration of the block changes neither the variable nor any member class
-(`packages/ppx/test/css-support/cascade-remaining.t`, R10). Because members
-are ordinary atoms, `CSS.merge` and the twin treat them like any other: a
-later base override drops the base and `@media` members and keeps the
-`:hover` member (R06, R07).
+group variable. The seed holds the members only, a member that a later base
+declaration drops included (the group is built before that removal), so
+changing another declaration of the block changes neither the variable nor any
+member class (`packages/ppx/test/css-support/cascade-remaining.t`, R10;
+`cascade-review.t`, V07 and V08). Because members are ordinary atoms,
+`CSS.merge` and the twin treat them like any other: a later base override drops
+the base and `@media` members and keeps the `:hover` member
+(`cascade-remaining.t`, R06, R07).
 
 The environment is a PPX concern, set once per `(pps styled-ppx ...)`
 stanza: `--env production` (alias for `--minify`) only minifies rule
@@ -982,9 +984,11 @@ that are sorted separately.
 
 Inside one block, `transform_rule_list` applies the same rule right after
 atomization: an atom under at-rules alone is not minted when a LATER base
-atom of the block satisfies `Slot_key.removes` against it. Atoms that
-interpolate `$(...)` are skipped. When a later base atom covers only part of
-it, both stay and the block's class list goes through `Merge_key.twin_block`
+atom of the block satisfies `Slot_key.removes` against it. An atom that
+interpolates `$(...)` takes part like any other: it ships no class or rule,
+but it is still lowered, so its value stays an inline custom property and the
+variable it reads stays used (`cascade-review.t`, V01). When a later base atom
+covers only part of it, both stay and the block's class list goes through `Merge_key.twin_block`
 (see "Specificity twin" below).
 
 One exception to "same context": a `b` atom in the BASE context (the
@@ -1010,7 +1014,13 @@ drift). Each is the whole selector of the atom, from its start (after any
 at-rule `{`) to the `{` of the declarations, with every `._a_<x>` replaced by
 `._t<k>_<x>`, and the first copy followed by `:not(x-)` repeated `k` times.
 Text before or after the atom class stays, so a twin keeps its conditions
-(`._a_<x>:hover`, `._id_<y> ._a_<x>`, `._a_<x> + ._a_<x>`, inside `@media`).
+(`._a_<x>:hover`, `._id_<y> ._a_<x>`, inside `@media`). Copies in one compound
+selector are one element (`._a_<x>:not(._a_<x>._id_<y>)`) and are all
+replaced. When the class is in several compound selectors (`._a_<x> + ._a_<x>`,
+`& ~ &`, `& &`) either element may be the merged one, and the other may be an
+unmerged `_a_<x>`, so there is one selector per compound: the twin class and
+the `:not(x-)` in that compound, `:is(._a_<x>,._t<k>_<x>)` in the others
+(`cascade-review.t`, V02 to V04).
 `:not(x-)` weighs as its argument, one type selector, and `x-` matches no
 element: a level `k` twin has specificity (0,c,k) where the atom has (0,c,0),
 so it beats an atom with the same number of classes and pseudo-classes and

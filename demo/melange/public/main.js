@@ -63855,52 +63855,7 @@ function fields_of_extra(extra) {
   }
 }
 function twin_prefix(level) {
-  return _1(sprintf({
-    TAG: (
-      /* Format */
-      0
-    ),
-    _0: {
-      TAG: (
-        /* String_literal */
-        11
-      ),
-      _0: "_t",
-      _1: {
-        TAG: (
-          /* Int */
-          4
-        ),
-        _0: (
-          /* Int_d */
-          0
-        ),
-        _1: (
-          /* No_padding */
-          0
-        ),
-        _2: (
-          /* No_precision */
-          0
-        ),
-        _3: {
-          TAG: (
-            /* Char_literal */
-            12
-          ),
-          _0: (
-            /* '_' */
-            95
-          ),
-          _1: (
-            /* End_of_format */
-            0
-          )
-        }
-      }
-    },
-    _1: "_t%d_"
-  }), level);
+  return "_t" + (String(level) + "_");
 }
 function split_prefix(class_name) {
   const n = class_name.length;
@@ -64067,36 +64022,52 @@ function token_of(a, level) {
   return (level === 0 ? atom_prefix : twin_prefix(level)) + a.body;
 }
 function raise_levels(formers, latters) {
-  const former_atoms = filter_map2(parse_atom, formers);
-  const latters$p = map5((function(token) {
+  const match = fold_left5((function(param, token) {
+    const tokens = param[1];
+    const seen = param[0];
     const a = parse_atom(token);
     if (a === void 0) {
-      return token;
+      return [
+        seen,
+        {
+          hd: token,
+          tl: tokens
+        }
+      ];
     }
-    const level = twin_level(former_atoms, a);
-    if (level === a.level) {
-      return token;
-    } else {
-      return token_of(a, level);
-    }
-  }), latters);
-  return [
-    formers,
-    latters$p
-  ];
+    const level = twin_level(seen, a);
+    const a$p_context = a.context;
+    const a$p_family = a.family;
+    const a$p_extended = a.extended;
+    const a$p_mask = a.mask;
+    const a$p_body = a.body;
+    const a$p = {
+      context: a$p_context,
+      family: a$p_family,
+      extended: a$p_extended,
+      mask: a$p_mask,
+      level,
+      body: a$p_body
+    };
+    return [
+      {
+        hd: a$p,
+        tl: seen
+      },
+      {
+        hd: level === a.level ? token : token_of(a, level),
+        tl: tokens
+      }
+    ];
+  }), [
+    filter_map2(parse_atom, formers),
+    /* [] */
+    0
+  ], latters);
+  return rev(match[1]);
 }
 function twin_block(tokens) {
-  return fold_left5(
-    (function(acc, token) {
-      const match = raise_levels(acc, {
-        hd: token,
-        tl: (
-          /* [] */
-          0
-        )
-      });
-      return $at(match[0], match[1]);
-    }),
+  return raise_levels(
     /* [] */
     0,
     tokens
@@ -64155,8 +64126,7 @@ function merge_class_names(former, latter) {
     }
   };
   const survivors = filter2(survives, former_tokens);
-  const match = raise_levels(survivors, latter_tokens);
-  return concat6(" ", $at(match[0], match[1]));
+  return concat6(" ", $at(survivors, raise_levels(survivors, latter_tokens)));
 }
 var context_width = 5;
 var family_width = 2;

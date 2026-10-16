@@ -1209,14 +1209,17 @@ let sort_conditional_rules rules =
     [_a_] rule therefore also answers to the twin classes of every level up to
     [Merge_key.max_level]. The twin selector is the whole selector, from its
     start (after any at-rule [{]) to the [{] that opens the declarations, with
-    every [._a_X] replaced by [._t<k>_X]; the first copy also gets [k] times
-    [:not(x-)]: [._id_a:hover ._a_X + ._a_X] becomes
-    [._id_a:hover ._t1_X:not(x-) + ._t1_X], so the twin keeps the conditions of
-    the atom. [:not(x-)] weighs as its argument, one type selector (0,0,1), and
-    [x-] matches no element. A twin therefore beats an atom with the same number
-    of classes and pseudo-classes, as a later rule would, but never a rule with
-    one more class-like part, such as [.a.b] or [:hover]. Rules of other classes
-    are left alone. *)
+    every [._a_X] replaced by [._t<k>_X], and [k] times [:not(x-)] after one of
+    them: [._id_a:hover ._a_X] becomes [._id_a:hover ._t1_X:not(x-)], so the
+    twin keeps the conditions of the atom. When the class occurs in two compound
+    selectors ([._a_X + ._a_X]) either element may be the merged one, so there
+    is one twin selector per compound, the others matching [:is(._a_X,._t1_X)]:
+    [._t1_X:not(x-) + :is(._a_X,._t1_X)] and
+    [:is(._a_X,._t1_X) + ._t1_X:not(x-)]. [:not(x-)] weighs as its argument, one
+    type selector (0,0,1), and [x-] matches no element. A twin therefore beats
+    an atom with the same number of classes and pseudo-classes, as a later rule
+    would, but never a rule with one more class-like part, such as [.a.b] or
+    [:hover]. Rules of other classes are left alone. *)
 let twin_levels = Merge_key.max_level
 
 let is_class_char c =
@@ -1242,27 +1245,51 @@ let split_top_level_commas selector =
   go 0 0 0 []
 
 (** [branch] with every [.<atom_class>] (not the start of a longer class)
-    replaced by [replacement]; the first one by [first] instead. *)
-let replace_class ~atom_class ~first ~replacement branch =
+    replaced by [replacement ~compound], [compound] counting the compound
+    selectors of [branch] from 0: copies in one compound (also inside a
+    [:not(...)] of it) are one element, copies in two compounds are two. *)
+let replace_class ~atom_class ~replacement branch =
   let needle = "." ^ atom_class in
   let m = String.length needle in
   let n = String.length branch in
   let buffer = Buffer.create n in
-  let rec go i ~first_pending =
-    if i >= n then ()
-    else if
-      i + m <= n
-      && String.sub branch i m = needle
-      && (i + m = n || not (is_class_char branch.[i + m]))
-    then (
-      Buffer.add_string buffer (if first_pending then first else replacement);
-      go (i + m) ~first_pending:false)
-    else (
-      Buffer.add_char buffer branch.[i];
-      go (i + 1) ~first_pending)
+  let rec go i ~depth ~compound ~separated =
+    if i < n then (
+      let c = branch.[i] in
+      let sep = depth = 0 && (c = ' ' || c = '>' || c = '+' || c = '~') in
+      let compound =
+        if (not sep) && separated then compound + 1 else compound
+      in
+      if
+        i + m <= n
+        && String.sub branch i m = needle
+        && (i + m = n || not (is_class_char branch.[i + m]))
+      then (
+        Buffer.add_string buffer (replacement ~compound);
+        go (i + m) ~depth ~compound ~separated:false)
+      else (
+        Buffer.add_char buffer c;
+        let depth =
+          match c with
+          | '(' | '[' -> depth + 1
+          | ')' | ']' -> depth - 1
+          | _ -> depth
+        in
+        go (i + 1) ~depth ~compound ~separated:sep))
   in
-  go 0 ~first_pending:true;
+  go 0 ~depth:0 ~compound:0 ~separated:false;
   Buffer.contents buffer
+
+(** The compounds of [branch] that contain [.<atom_class>], in order. *)
+let class_compounds ~atom_class branch =
+  let found = ref [] in
+  ignore
+    (replace_class ~atom_class
+       ~replacement:(fun ~compound ->
+         if not (List.mem compound !found) then found := compound :: !found;
+         "")
+       branch);
+  List.rev !found
 
 let add_twins rule_text =
   match atom_class_and_end rule_text with
@@ -1283,17 +1310,35 @@ let add_twins rule_text =
       let branches =
         split_top_level_commas selector
         |> List.filter (fun branch ->
-          replace_class ~atom_class:cls ~first:"" ~replacement:"" branch
-          <> branch)
+          class_compounds ~atom_class:cls branch <> [])
       in
       let twins =
         List.init twin_levels (fun i ->
           let k = i + 1 in
-          let replacement = "." ^ Merge_key.twin_prefix k ^ body in
-          let first =
-            replacement ^ String.concat "" (List.init k (fun _ -> ":not(x-)"))
+          let twin = "." ^ Merge_key.twin_prefix k ^ body in
+          let boosted =
+            twin ^ String.concat "" (List.init k (fun _ -> ":not(x-)"))
           in
-          List.map (replace_class ~atom_class:cls ~first ~replacement) branches
+          let either = ":is(." ^ cls ^ "," ^ twin ^ ")" in
+          (* In one compound the copies are one element, which carries the
+             twin. With the class in several compounds (`& + &`) either
+             element may be the merged one and the others may not: one
+             twin selector per compound. *)
+          List.concat_map
+            (fun branch ->
+              List.map
+                (fun merged ->
+                  let boosted_pending = ref true in
+                  replace_class ~atom_class:cls
+                    ~replacement:(fun ~compound ->
+                      if compound <> merged then either
+                      else if !boosted_pending then (
+                        boosted_pending := false;
+                        boosted)
+                      else twin)
+                    branch)
+                (class_compounds ~atom_class:cls branch))
+            branches
           |> String.concat ",")
         |> List.map (fun twin -> "," ^ twin)
         |> String.concat ""

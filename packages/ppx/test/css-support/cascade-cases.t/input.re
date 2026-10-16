@@ -376,7 +376,7 @@ let c33_b = [%css {|
 |}];
 show("C33", [("a", c33_a), ("b", c33_b)], CSS.merge(c33_a, c33_b));
 
-/* C34: A is an _in_ bundle (@container + :disabled), B @media, at-rank A>B
+/* C34: A is a group of atoms sharing one `$(x)` (@container + :disabled), B @media, at-rank A>B
    intended: B
    note: per state. While `:disabled` is off B wins; while it is on, A's `:disabled` member wins by specificity (0,2,0 against a bare @media), as in plain CSS */
 let c34_a_v1 = CSS.px(175);
@@ -389,7 +389,7 @@ let c34_b = [%css {|
 |}];
 show("C34", [("a", c34_a), ("b", c34_b)], CSS.merge(c34_a, c34_b));
 
-/* C35: A is an _in_ bundle (:last-child + @media, :disabled), B ancestor-class (base)
+/* C35: A is a group of atoms sharing one `$(x)` (:last-child + @media, :disabled), B ancestor-class (base)
    intended: B */
 let c35_rowIndented = [%css ""];
 let c35_a_v1 = CSS.px(177);
@@ -412,7 +412,7 @@ let c36 = [%css {|
 |}];
 show("C36", [], c36);
 
-/* C37: A base, B an _in_ bundle with equal key, operands in two files, A's file sorts first
+/* C37: A base, B a group of atoms sharing one `$(x)` with equal key, operands in two files, A's file sorts first
    intended: B */
 show("C37", [("a", C37_first.c37_a), ("b", C37_second.c37_b)], CSS.merge(C37_first.c37_a, C37_second.c37_b));
 
@@ -469,7 +469,7 @@ let c42 = [%css {|
 |}];
 show("C42", [], c42);
 
-/* C43: A @media longhand, B an _in_ bundle shorthand (depth A>B, at-rank A>B)
+/* C43: A @media longhand, B a shorthand in a group of atoms sharing one `$(x)` (depth A>B, at-rank A>B)
    intended: B */
 let c43_a = [%css {|
   @media (max-width: 767px) { margin-top: 196px; }
@@ -510,7 +510,7 @@ let c46 = [%css {|
 |}];
 show("C46", [], c46);
 
-/* C47: same block: class-qualified @media (A) vs :hover bundle (B), at-rank A>B
+/* C47: same block: class-qualified @media (A) vs :hover atom of a group sharing one `$(x)` (B), at-rank A>B
    intended: B */
 let c47_headerMenuOpened = [%css ""];
 let c47_v1 = CSS.px(208);

@@ -95,7 +95,7 @@ in their own, separate cluster (their shared property, `padding-top`/
 properties `display`/`max-height` above, an EARLIER, unrelated key
 component the removed width key never touched either) - but WITHIN that
 cluster, the same rule applies: `headerWithBanner` (declared second)
-sorts after `header` (declared first) and wins, bundle or not.
+sorts after `header` (declared first) and wins, with a shared variable or not.
 
 This is the exact fix for the real regression the removed width key
 caused: `praiseViewport`/`praiseViewportExpanded` reached one element via

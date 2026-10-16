@@ -1,13 +1,14 @@
-Plan 3b/option (c): a block's interpolating declarations share one bundle
-class and one var per (source-path, runtime-type) across base / :hover /
-@media variants - but only when TWO OR MORE of them interpolate the SAME
-source path (`multiVariant`, `mixed`, `twoTypes` below). `separateValues`
+Plan 3b/option (c): a block's interpolating declarations share one var per
+(source-path, runtime-type) across base / :hover / @media variants - but only
+when TWO OR MORE of them interpolate the SAME source path (`multiVariant`,
+`mixed`, `twoTypes` below). Each of them still has its own real, slot-keyed
+`_a_` class, so `CSS.merge` treats it like any other atom. `separateValues`
 and `partialShare` cover the negative case: two declarations that merely
 both interpolate, but different, unrelated values, do not share anything -
 each mints its own real, slot-keyed `_a_` class, and `CSS.merge` resolves
 them independently. The last two anonymous bindings each have exactly ONE
-interpolating declaration overall, so they are not bundles at all: each
-mints its own real, slot-keyed `_a_` class instead.
+interpolating declaration overall, so they share nothing: each mints its own
+real, slot-keyed `_a_` class instead.
 
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
