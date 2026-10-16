@@ -1216,6 +1216,34 @@ let sort_conditional_rules rules =
     else compare pa pb)
   |> List.map (fun (_, _, _, _, r) -> r)
 
+(** Specificity twins: [CSS.merge] may swap an atom class [_a_X] for [_t<k>_X]
+    (see [Merge_key]) to win by specificity, whatever the sheet order. Every
+    [_a_] rule therefore also answers to [k] extra copies of the twin class,
+    written where the atom class is: [._a_X:hover .c] becomes
+    [._a_X:hover .c,._t1_X._t1_X:hover .c,...]. Rules of other classes ([_in_])
+    are left alone. *)
+let twin_levels = 2
+
+let add_twins rule_text =
+  match atom_class_and_end rule_text with
+  | Some (cls, after) when String.starts_with ~prefix:"_a_" cls ->
+    (match String.index_from_opt rule_text after '{' with
+    | None -> rule_text
+    | Some brace ->
+      let body = String.sub cls 3 (String.length cls - 3) in
+      let rest = String.sub rule_text after (brace - after) in
+      let twins =
+        List.init twin_levels (fun i ->
+          let k = i + 1 in
+          let c = Printf.sprintf "._t%d_%s" k body in
+          "," ^ String.concat "" (List.init (k + 1) (fun _ -> c)) ^ rest)
+        |> String.concat ""
+      in
+      String.sub rule_text 0 brace
+      ^ twins
+      ^ String.sub rule_text brace (String.length rule_text - brace))
+  | _ -> rule_text
+
 (** Collect, index, resolve, dedup, output. *)
 let run ~output_file ~order input_files =
   Logger.info "output file: %s"
@@ -1287,15 +1315,7 @@ let run ~output_file ~order input_files =
   (match !errors with
   | [] -> ()
   | _ ->
-    (* One source reference can reach several atoms (a conditional box
-       shorthand is split into one atom per side), each reporting the same
-       unresolved reference. *)
-    List.rev !errors
-    |> List.fold_left
-         (fun seen msg -> if List.mem msg seen then seen else msg :: seen)
-         []
-    |> List.rev
-    |> List.iter (fun msg -> Logger.error "%s" msg);
+    List.iter (fun msg -> Logger.error "%s" msg) (List.rev !errors);
     exit 1);
 
   (* Dedup the resolved CSS rules while preserving source order.
@@ -1385,8 +1405,9 @@ let run ~output_file ~order input_files =
     List.iter emit statement_rules;
     List.iter emit registrations;
     List.iter emit (sort_by_shorthand_first global_rules);
-    List.iter emit (sort_by_shorthand_first base_rules);
-    List.iter emit (sort_conditional_rules conditional_rules);
+    let emit_atom rule = emit (add_twins rule) in
+    List.iter emit_atom (sort_by_shorthand_first base_rules);
+    List.iter emit_atom (sort_conditional_rules conditional_rules);
     Buffer.contents buffer
   in
   Logger.debug "stylesheet:\n%s" stylesheet;

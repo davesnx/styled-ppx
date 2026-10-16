@@ -995,8 +995,9 @@ that are sorted separately.
 Inside one block, `transform_rule_list` applies the same rule right after
 atomization: an atom under at-rules alone is not minted when a LATER base
 atom of the block satisfies `Slot_key.removes` against it. Atoms that
-interpolate `$(...)` are skipped. A box shorthand under the at-rule is
-already split per longhand, so a later base longhand drops only its own side.
+interpolate `$(...)` are skipped. When a later base atom covers only part of
+it, both stay and the block's class list goes through `Merge_key.twin_block`
+(see "Specificity twin" below).
 
 One exception to "same context": a `b` atom in the BASE context (the
 context hash is empty) also drops an `a` atom whose context is at-rules
@@ -1004,16 +1005,36 @@ alone (first context character `0`, `Slot_key.context_is_at_rules_only`,
 mirrored by `Merge_key.is_at_rules_only`) when the family and mask match as
 usual. A selector or `!important` context of `a` is kept, and a
 conditional `b` never drops a base `a`. The mask check only passes when the
-`a` atom is narrow enough, so `Css_file.re`'s `split_box_shorthand` splits
-a box shorthand outside the base context (inside an at-rule, under a
-selector other than a bare `&`, or `!important`) into one atom per longhand
-(`padding`, `margin`, `scroll-padding`, `scroll-margin`, `inset`,
-`border-width`/`-style`/`-color`, `overflow`, `gap`, and the `-block`/
-`-inline` forms). It leaves a declaration whole when it is not a plain
-1-to-4 (axis: 1-to-2) value list: `border-radius`, `border`, `outline`,
-`background`, `font`, a top-level `var()`, or a `$(path)` that would land
-on two longhands (the split atoms would form an `_in_` bundle). The
-generator reports an unresolved reference once, not once per split atom.
+`a` atom is narrow enough; otherwise both stay, and the specificity twin below
+settles which one wins.
+
+### Specificity twin
+
+For a later atom that overlaps a surviving earlier one but cannot remove it
+(a shorthand against a longhand, two at-rule contexts), the sheet order may put
+the earlier atom last. `Merge_key.twin_level` (`merge`) and
+`Merge_key.twin_block` (one block, called from `Css_file.re`'s
+`transform_rule_list`; the ppx copies the module with `copy_files`) swap the
+later class `_a_<x>` for `_t1_<x>` or `_t2_<x>`; only the prefix changes.
+`generate.ml`'s `add_twins` writes every `_a_` rule with the selectors
+`._t1_<x>._t1_<x>` and `._t2_<x>._t2_<x>._t2_<x>` where the atom class stands
+(`._a_<x>:hover`, `._a_<x> .child`, inside `@media`), so a twin has specificity
+(0,2,0) or (0,3,0) against (0,1,0) of the atom. `_in_` rules get none. `_t1_`
+and `_t2_` do not clash with `_a_`, `_in_`, `_id_`, `_k_` or `label:`.
+
+A twin is used for a later atom that is in the base context or under at-rules
+alone and that overlaps an earlier surviving atom of those two kinds (same
+family, masks that meet, or the `all` sentinel) which `removes` does not drop,
+unless the sheet surely puts it last (earlier atom base and later under
+at-rules; or equal contexts, earlier a shorthand and later a longhand). Its
+level is the highest level of the atoms it must beat, plus one when the sheet
+order is not sure; the cap is 2, and at the cap the sheet order decides.
+A selector or `!important` atom takes the level of the highest twin it
+overlaps, and an earlier one is raised when a later twin overlaps it, so
+`:hover` keeps beating `@media`. A twin ties with an author selector of
+specificity (0,2,0) and wins it by sheet position. A box shorthand is no longer
+split per longhand in a condition. The same selector with an extra at-rule,
+logical against physical properties and `_in_` bundles get no twin.
 
 `!important` needs no separate check: it is folded into the context (as
 if it were one more wrapper, like an at-rule - see

@@ -18,3 +18,5 @@
   ppxlib.astlib)
  (preprocess
   (pps ppxlib.metaquot)))
+
+(copy_files ../../runtime/native/shared/Merge_key.ml)
