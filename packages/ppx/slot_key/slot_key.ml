@@ -1225,6 +1225,61 @@ let rec collect_context (rule : Ast.rule) :
     in
     (String.lowercase_ascii name, prelude_text) :: at_rules, selector, decls
 
+(* [@media], [@supports] and [@container] each add one condition that must
+   hold, so a chain of them is a conjunction and its order is not meaningful.
+   [@starting-style] (and anything else) is not a plain condition: it changes
+   which styles apply, so it stays where it was written and splits the chain
+   into runs that are sorted separately. The rank is the outer-to-inner order
+   the generated sheet already uses ([at_rule_rank] in generate.ml). *)
+let commutative_rank = function
+  | "supports" -> Some 0
+  | "media" -> Some 1
+  | "container" -> Some 2
+  | _ -> None
+
+let canonical_nesting (rule : Ast.rule) : Ast.rule =
+  let rec peel acc = function
+    | Ast.At_rule
+        ({
+           block = Ast.Rule_list ([ inner ], _) | Ast.Stylesheet ([ inner ], _);
+           _;
+         } as ar) ->
+      peel (ar :: acc) inner
+    | leaf -> List.rev acc, leaf
+  in
+  let at_rules, leaf = peel [] rule in
+  let key (ar : Ast.at_rule) =
+    let name = String.lowercase_ascii (fst ar.name) in
+    ( commutative_rank name,
+      Render.component_value_list
+        (Render.strip_leading_whitespace (fst ar.prelude)) )
+  in
+  let rec sort_runs = function
+    | [] -> []
+    | ar :: _ as chain ->
+      let is_commutative (a : Ast.at_rule) =
+        commutative_rank (String.lowercase_ascii (fst a.name)) <> None
+      in
+      if is_commutative ar then (
+        let rec split run = function
+          | a :: rest when is_commutative a -> split (a :: run) rest
+          | rest -> List.rev run, rest
+        in
+        let run, rest = split [] chain in
+        List.stable_sort (fun a b -> compare (key a) (key b)) run
+        @ sort_runs rest)
+      else ar :: sort_runs (List.tl chain)
+  in
+  let block_loc (ar : Ast.at_rule) =
+    match ar.block with
+    | Ast.Rule_list (_, loc) | Ast.Stylesheet (_, loc) -> loc
+    | Ast.Empty -> ar.loc
+  in
+  List.fold_right
+    (fun (ar : Ast.at_rule) inner ->
+      Ast.At_rule { ar with block = Ast.Rule_list ([ inner ], block_loc ar) })
+    (sort_runs at_rules) leaf
+
 let of_atom (rule : Ast.rule) : t option =
   let at_rules, selector, decls = collect_context rule in
   match decls with

@@ -102,15 +102,15 @@ specificity), so read the `result` line together with the sheet.
   G16 a: label:g16_a _id_dmso15 _a_0kk4l94008hrp6 _a_0kk4l94004i6xk _a_0kk4l94001odg5 _a_0kk4l94002nmo1
   G16 b: label:g16_b _id_i91hv1 _a_94008wnds
   G16 result: label:g16_a _id_dmso15 _a_0kk4l94004i6xk _a_0kk4l94001odg5 _a_0kk4l94002nmo1 label:g16_b _id_i91hv1 _a_94008wnds
-  G17 a: label:g17_a _id_1tqi38q _a_06krz7p002d85p
+  G17 a: label:g17_a _id_1tqi38q _a_0bwi47p002qdre
   G17 b: label:g17_b _id_1xhi4qf _a_7p0021u47
   G17 result: label:g17_a _id_1tqi38q label:g17_b _id_1xhi4qf _a_7p0021u47
   G18 a: label:g18_a _id_qve405 _a_0bwi47p0028h0m
   G18 b: label:g18_b _id_1t29m73 _a_7p002ikad
   G18 result: label:g18_a _id_qve405 label:g18_b _id_1t29m73 _a_7p002ikad
-  G19 a: label:g19_a _id_1y5qofl _a_0knhz7p0022fjs
+  G19 a: label:g19_a _id_1y5qofl _a_0kk4l7p002mm7n
   G19 b: label:g19_b _id_1thyb6p _a_0kk4l7p0020z0w
-  G19 result: label:g19_a _id_1y5qofl _a_0knhz7p0022fjs label:g19_b _id_1thyb6p _a_0kk4l7p0020z0w
+  G19 result: label:g19_a _id_1y5qofl label:g19_b _id_1thyb6p _a_0kk4l7p0020z0w
   G20 a: label:g20_a _id_g0g3nc _a_0p2f07p0023nxv
   G20 b: label:g20_b _id_1c074z _a_0f0zo7p002depv
   G20 result: label:g20_a _id_g0g3nc _a_0p2f07p0023nxv label:g20_b _id_1c074z _a_0f0zo7p002depv
@@ -316,6 +316,7 @@ its classes are the ones printed above:
   @supports (display: grid) {@media (max-width: 1200px) {._a_0kk4l94004i6xk{padding-right:261px;}}}
   @supports (display: grid) {@media (max-width: 1200px) {._a_0kk4l94001odg5{padding-bottom:261px;}}}
   @supports (display: grid) {@media (max-width: 1200px) {._a_0kk4l94002nmo1{padding-left:261px;}}}
+  @supports (display: grid) {@media (max-width: 1200px) {._a_0kk4l7p002mm7n{margin-left:291px;}}}
   @supports (display: grid) {@media (max-width: 1200px) {._a_0kk4l7p0020z0w{margin-left:292px;}}}
   @media (max-width: 1200px) {._a_0p2f0940085eff{padding-top:611px;}}
   @media (max-width: 1200px) {._a_0p2f094004wfxm{padding-right:611px;}}
@@ -339,8 +340,8 @@ its classes are the ones printed above:
   @media (max-width: 1200px) {._a_0p2f094008xv6u{padding-top:202px;}}
   @media (max-width: 1200px) {._in_193brsh{padding-top:var(--g11_a_v1-evlpt3);}}
   @media (max-width: 1200px) {._in_lovnlp{padding-top:var(--g11_b_v1-15hdob5);}}
+  @media (max-width: 1200px) {@container app-main (max-width: 1000px) {._a_0bwi47p002qdre{margin-left:271px;}}}
   @media (max-width: 1200px) {@container app-main (max-width: 1000px) {._a_0bwi47p0028h0m{margin-left:281px;}}}
-  @media (max-width: 1200px) {@supports (display: grid) {._a_0knhz7p0022fjs{margin-left:291px;}}}
   @media (max-width: 1200px) {._a_0p2f07p0023nxv{margin-left:301px;}}
   @media (max-width: 900px) {._a_0f0zo7p002depv{margin-left:302px;}}
   @media (max-width: 1200px) {._a_0p2f09400872cq{padding-top:311px;}}
@@ -406,7 +407,6 @@ its classes are the ones printed above:
   @media (max-width: 1200px) {._a_0p2f0940048jty{padding-right:602px;}}
   @media (max-width: 1200px) {._a_0p2f094001v8e5{padding-bottom:602px;}}
   @media (max-width: 1200px) {._a_0p2f094002qysh{padding-left:602px;}}
-  @container app-main (max-width: 1000px) {@media (max-width: 1200px) {._a_06krz7p002d85p{margin-left:271px;}}}
   @container app-main (max-width: 1000px) {._a_0crm394008pn2p{padding-top:411px;}}
   @container app-main (max-width: 1000px) {._a_0crm394004mjdw{padding-right:411px;}}
   @container app-main (max-width: 1000px) {._a_0crm3940015tw7{padding-bottom:411px;}}

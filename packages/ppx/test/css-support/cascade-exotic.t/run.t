@@ -132,9 +132,9 @@ specificity), so read the `result` line together with the sheet.
   E29 a: label:e29_a _id_17wzo6n _a_0z6h37p002b1n2
   E29 b: label:e29_b _id_1n2e1d2 _a_0crm37p0023me0
   E29 result: label:e29_a _id_17wzo6n _a_0z6h37p002b1n2 label:e29_b _id_1n2e1d2 _a_0crm37p0023me0
-  E30 a: label:e30_a _id_1hjq29l _a_06krz7p002dg5z
+  E30 a: label:e30_a _id_1hjq29l _a_0bwi47p002asf7
   E30 b: label:e30_b _id_m17h65 _a_0aatx7p002cgo6
-  E30 result: label:e30_a _id_1hjq29l _a_06krz7p002dg5z label:e30_b _id_m17h65 _a_0aatx7p002cgo6
+  E30 result: label:e30_a _id_1hjq29l _a_0bwi47p002asf7 label:e30_b _id_m17h65 _a_0aatx7p002cgo6
   E31 result: label:e31 _id_psw2h1 _a_0f0zo7p0024ep7 _a_0p2f07p002l0a4
   E32 result: label:e32 _id_15n668e _a_0p2f07p0024j5c _a_0f0zo7p002opsv
   E33 result: label:e33 _id_ftiwkg _a_0gqkv7p002luqw _a_03qdy7p002pa78
@@ -252,6 +252,7 @@ its classes are the ones printed above:
   @media (max-width: 1200px) {._a_0p2f07p002y0kt{margin-left:346px;}}
   @media (max-width: 1100px) {._a_0aatx7p0022avm{margin-left:352px;}}
   @media (max-width: 1200px) {@container app-main (max-width: 900px) {._a_0z6h37p002b1n2{margin-left:353px;}}}
+  @media (max-width: 1200px) {@container app-main (max-width: 1000px) {._a_0bwi47p002asf7{margin-left:355px;}}}
   @media (max-width: 1100px) {._a_0aatx7p002cgo6{margin-left:356px;}}
   @media (max-width: 900px) and (not (max-width: 1200px)){._a_0f0zo7p0024ep7{margin-left:357px;}}
   @media (max-width: 1200px) {._a_0p2f07p002l0a4{margin-left:358px;}}
@@ -264,7 +265,6 @@ its classes are the ones printed above:
   @media screen and (max-width: 1200px) {._a_0gqkv7p002onxl{margin-left:365px;}}
   @media (max-width: 900px) {._a_0f0zo7p002iivl{margin-left:366px;}}
   @container app-main (max-width: 1000px) {._a_0crm37p0023me0{margin-left:354px;}}
-  @container app-main (max-width: 1000px) {@media (max-width: 1200px) {._a_06krz7p002dg5z{margin-left:355px;}}}
   ._in_h4yksb:hover{border-top-color:var(--e17_v1-1w2tyhh);}
   ._in_1m6suwf:hover{border-left-color:var(--e18_v1-t1ny06);}
   ._in_1llxr99:hover{border-left-color:var(--e18_v2-1bzve6l);}

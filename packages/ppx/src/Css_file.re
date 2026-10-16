@@ -2005,20 +2005,24 @@ module Css_transform = {
           )
           |> List.map(((_className, _namespace, inner_rule)) => {
                let wrapped =
-                 At_rule({
-                   name: (name, name_loc),
-                   prelude: effective_prelude,
-                   block: Rule_list(([inner_rule], rule_loc)),
-                   loc,
-                 });
+                 Slot_key.canonical_nesting(
+                   At_rule({
+                     name: (name, name_loc),
+                     prelude: effective_prelude,
+                     block: Rule_list(([inner_rule], rule_loc)),
+                     loc,
+                   }),
+                 );
                let wrapped_string = render_rule(wrapped);
                let context_source =
-                 At_rule({
-                   name: (name, name_loc),
-                   prelude,
-                   block: Rule_list(([inner_rule], rule_loc)),
-                   loc,
-                 });
+                 Slot_key.canonical_nesting(
+                   At_rule({
+                     name: (name, name_loc),
+                     prelude,
+                     block: Rule_list(([inner_rule], rule_loc)),
+                     loc,
+                   }),
+                 );
                let (new_className, new_namespace) =
                  Hash_class.class_and_namespace(
                    ~namespace=Settings.Get.namespace(),

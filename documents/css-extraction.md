@@ -983,6 +983,15 @@ never dropped and never drop anything else - `merge` only ever acts on
 a well-formed `_a_` atom on either side, and only ever drops a class of
 `a`, never of `b`.
 
+Before the context is hashed, `Css_file.re` puts the chain of `@supports`,
+`@media` and `@container` wrappers around an atom in one fixed order
+(`Slot_key.canonical_nesting`: kind in that order, then prelude text), in
+the rendered rule and in the context alike. The two spellings of one
+conjunction therefore give one rule text and one class name, so
+`generate`'s one-class-one-rule check never sees them disagree. Other
+at-rules (`@starting-style`) keep their place and split the chain into runs
+that are sorted separately.
+
 One exception to "same context": a `b` atom in the BASE context (the
 context hash is empty) also drops an `a` atom whose context is at-rules
 alone (first context character `0`, `Slot_key.context_is_at_rules_only`,
