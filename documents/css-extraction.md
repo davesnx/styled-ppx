@@ -1016,10 +1016,13 @@ the earlier atom last. `Merge_key.twin_level` (`merge`) and
 `Merge_key.twin_block` (one block, called from `Css_file.re`'s
 `transform_rule_list`; the ppx copies the module with `copy_files`) swap the
 later class `_a_<x>` for `_t1_<x>` or `_t2_<x>`; only the prefix changes.
-`generate.ml`'s `add_twins` writes every `_a_` rule with the selectors
-`._t1_<x>._t1_<x>` and `._t2_<x>._t2_<x>._t2_<x>` where the atom class stands
-(`._a_<x>:hover`, `._a_<x> .child`, inside `@media`), so a twin has specificity
-(0,2,0) or (0,3,0) against (0,1,0) of the atom. `_in_` rules get none. `_t1_`
+`generate.ml`'s `add_twins` writes every `_a_` rule with two more selectors.
+Each is the whole selector of the atom, from its start (after any at-rule `{`)
+to the `{` of the declarations, with every `._a_<x>` replaced by
+`._t1_<x>._t1_<x>` or `._t2_<x>._t2_<x>._t2_<x>`. Text before or after the atom
+class stays, so a twin keeps its conditions (`._a_<x>:hover`,
+`._id_<y> ._a_<x>`, `._a_<x> + ._a_<x>`, inside `@media`). Each atom class in
+the selector adds one (`_t1_`) or two (`_t2_`) classes of specificity. `_in_` rules get none. `_t1_`
 and `_t2_` do not clash with `_a_`, `_in_`, `_id_`, `_k_` or `label:`.
 
 A twin is used for a later atom that is in the base context or under at-rules

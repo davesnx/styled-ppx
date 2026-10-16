@@ -163,3 +163,77 @@ let g61_c = [%css {|
   @media (max-width: 900px) { color: rgb(65, 0, 0); }
 |}];
 show("G61", [("a", g61_a), ("b", g61_b), ("c", g61_c)], CSS.merge(CSS.merge(g61_a, g61_b), g61_c));
+
+/* G62: C has an ancestor before its own class (`.anc &`)
+   A is an @media `border-color`, F a base `border-top-color` after it (F needs one twin level), C the atom under test: same property as F, so C gets F's twin level
+   intended: C inside `.anc`, F elsewhere */
+let g62_x = [%css ""];
+let g62_a = [%css {|
+  @media (min-width: 1px) { border-color: rgb(61, 0, 0); }
+|}];
+let g62_f = [%css {|
+  border-top-color: rgb(62, 0, 0);
+|}];
+let g62_c = [%css {|
+  .$(g62_x) & { border-top-color: rgb(63, 0, 0); }
+|}];
+show("G62", [("ctx g62_x", g62_x), ("a", g62_a), ("f", g62_f), ("c", g62_c)], CSS.merge(CSS.merge(g62_a, g62_f), g62_c));
+
+/* G63: C is `& + &`, its own class twice: every copy must become the twin
+   A is an @media `border-color`, F a base `border-top-color` after it (F needs one twin level), C the atom under test: same property as F, so C gets F's twin level
+   intended: C on the second of two siblings, F on the first */
+let g63_a = [%css {|
+  @media (min-width: 1px) { border-color: rgb(71, 0, 0); }
+|}];
+let g63_f = [%css {|
+  border-top-color: rgb(72, 0, 0);
+|}];
+let g63_c = [%css {|
+  & + & { border-top-color: rgb(73, 0, 0); }
+|}];
+show("G63", [("a", g63_a), ("f", g63_f), ("c", g63_c)], CSS.merge(CSS.merge(g63_a, g63_f), g63_c));
+
+/* G64: C is `.x + &`, a sibling of another class
+   A is an @media `border-color`, F a base `border-top-color` after it (F needs one twin level), C the atom under test: same property as F, so C gets F's twin level
+   intended: C on a sibling that follows `.x`, F elsewhere */
+let g64_x = [%css ""];
+let g64_a = [%css {|
+  @media (min-width: 1px) { border-color: rgb(81, 0, 0); }
+|}];
+let g64_f = [%css {|
+  border-top-color: rgb(82, 0, 0);
+|}];
+let g64_c = [%css {|
+  .$(g64_x) + & { border-top-color: rgb(83, 0, 0); }
+|}];
+show("G64", [("ctx g64_x", g64_x), ("a", g64_a), ("f", g64_f), ("c", g64_c)], CSS.merge(CSS.merge(g64_a, g64_f), g64_c));
+
+/* G65: C has a pseudo-class on its ancestor (`.anc:first-child &`)
+   A is an @media `border-color`, F a base `border-top-color` after it (F needs one twin level), C the atom under test: same property as F, so C gets F's twin level
+   intended: C inside a first-child `.anc`, F elsewhere */
+let g65_x = [%css ""];
+let g65_a = [%css {|
+  @media (min-width: 1px) { border-color: rgb(91, 0, 0); }
+|}];
+let g65_f = [%css {|
+  border-top-color: rgb(92, 0, 0);
+|}];
+let g65_c = [%css {|
+  .$(g65_x):first-child & { border-top-color: rgb(93, 0, 0); }
+|}];
+show("G65", [("ctx g65_x", g65_x), ("a", g65_a), ("f", g65_f), ("c", g65_c)], CSS.merge(CSS.merge(g65_a, g65_f), g65_c));
+
+/* G66: C has an ancestor and sits inside an @media
+   A is an @media `border-color`, F a base `border-top-color` after it (F needs one twin level), C the atom under test: same property as F, so C gets F's twin level
+   intended: C inside `.anc`, F elsewhere */
+let g66_x = [%css ""];
+let g66_a = [%css {|
+  @media (min-width: 1px) { border-color: rgb(101, 0, 0); }
+|}];
+let g66_f = [%css {|
+  border-top-color: rgb(102, 0, 0);
+|}];
+let g66_c = [%css {|
+  @media (min-width: 1px) { .$(g66_x) & { border-top-color: rgb(103, 0, 0); } }
+|}];
+show("G66", [("ctx g66_x", g66_x), ("a", g66_a), ("f", g66_f), ("c", g66_c)], CSS.merge(CSS.merge(g66_a, g66_f), g66_c));

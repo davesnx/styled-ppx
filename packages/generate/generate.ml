@@ -1218,11 +1218,59 @@ let sort_conditional_rules rules =
 
 (** Specificity twins: [CSS.merge] may swap an atom class [_a_X] for [_t<k>_X]
     (see [Merge_key]) to win by specificity, whatever the sheet order. Every
-    [_a_] rule therefore also answers to [k] extra copies of the twin class,
-    written where the atom class is: [._a_X:hover .c] becomes
-    [._a_X:hover .c,._t1_X._t1_X:hover .c,...]. Rules of other classes ([_in_])
+    [_a_] rule therefore also answers to [k] extra copies of the twin class. The
+    twin selector is the whole selector, from its start (after any at-rule [{])
+    to the [{] that opens the declarations, with every [._a_X] replaced by the
+    twin class repeated [k + 1] times: [._id_a:hover ._a_X + ._a_X] becomes
+    [._id_a:hover ._t1_X._t1_X + ._t1_X._t1_X], so the twin keeps the conditions
+    of the atom and only raises its specificity. Rules of other classes ([_in_])
     are left alone. *)
 let twin_levels = 2
+
+let is_class_char c =
+  (c >= 'a' && c <= 'z')
+  || (c >= 'A' && c <= 'Z')
+  || (c >= '0' && c <= '9')
+  || c = '-'
+  || c = '_'
+
+(** [selector] split at its top-level commas (not inside [()] or [[]]). *)
+let split_top_level_commas selector =
+  let n = String.length selector in
+  let rec go i start depth acc =
+    if i >= n then List.rev (String.sub selector start (n - start) :: acc)
+    else (
+      match selector.[i] with
+      | '(' | '[' -> go (i + 1) start (depth + 1) acc
+      | ')' | ']' -> go (i + 1) start (depth - 1) acc
+      | ',' when depth = 0 ->
+        go (i + 1) (i + 1) depth (String.sub selector start (i - start) :: acc)
+      | _ -> go (i + 1) start depth acc)
+  in
+  go 0 0 0 []
+
+(** [branch] with every [.<atom_class>] (not the start of a longer class)
+    replaced by [replacement]. *)
+let replace_class ~atom_class ~replacement branch =
+  let needle = "." ^ atom_class in
+  let m = String.length needle in
+  let n = String.length branch in
+  let buffer = Buffer.create n in
+  let rec go i =
+    if i >= n then ()
+    else if
+      i + m <= n
+      && String.sub branch i m = needle
+      && (i + m = n || not (is_class_char branch.[i + m]))
+    then (
+      Buffer.add_string buffer replacement;
+      go (i + m))
+    else (
+      Buffer.add_char buffer branch.[i];
+      go (i + 1))
+  in
+  go 0;
+  Buffer.contents buffer
 
 let add_twins rule_text =
   match atom_class_and_end rule_text with
@@ -1230,13 +1278,29 @@ let add_twins rule_text =
     (match String.index_from_opt rule_text after '{' with
     | None -> rule_text
     | Some brace ->
+      let class_start = after - String.length cls - 1 in
+      let selector_start =
+        match String.rindex_from_opt rule_text class_start '{' with
+        | Some i -> i + 1
+        | None -> 0
+      in
+      let selector =
+        String.sub rule_text selector_start (brace - selector_start)
+      in
       let body = String.sub cls 3 (String.length cls - 3) in
-      let rest = String.sub rule_text after (brace - after) in
+      let branches =
+        split_top_level_commas selector
+        |> List.filter (fun branch ->
+          replace_class ~atom_class:cls ~replacement:"" branch <> branch)
+      in
       let twins =
         List.init twin_levels (fun i ->
           let k = i + 1 in
           let c = Printf.sprintf "._t%d_%s" k body in
-          "," ^ String.concat "" (List.init (k + 1) (fun _ -> c)) ^ rest)
+          let replacement = String.concat "" (List.init (k + 1) (fun _ -> c)) in
+          List.map (replace_class ~atom_class:cls ~replacement) branches
+          |> String.concat ",")
+        |> List.map (fun twin -> "," ^ twin)
         |> String.concat ""
       in
       String.sub rule_text 0 brace
