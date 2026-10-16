@@ -2113,12 +2113,49 @@ module Css_transform = {
     let media_rewrites: Media_rewrite_table.t(component_value_list) =
       Media_rewrite_table.create(8);
     rewrite_media_conditions(media_rewrites, selector_resolved_rules);
-    let atomic_rules =
+    let all_atomic_rules =
       atomize_rules(
         ~source_position_start,
         ~media_rewrites,
         selector_resolved_rules,
       );
+    /* A later base declaration of the block overrides an earlier atom under
+       at-rules alone for the same longhands, exactly as `CSS.merge(a, b)`
+       does for two blocks (`Slot_key.removes`): the earlier atom would
+       otherwise still win while its condition holds. Its class is never
+       minted. An interpolating atom has no slot (it may become a bundle,
+       which `removes` exempts), so it neither drops nor is dropped. */
+    let atomic_rules = {
+      let slots =
+        all_atomic_rules
+        |> List.map(((_, _, rule)) =>
+             atom_has_value_interpolation(rule)
+               ? None : Slot_key.of_atom(rule)
+           )
+        |> Array.of_list;
+      all_atomic_rules
+      |> List.mapi((i, atom) => (i, atom))
+      |> List.filter(((i, _)) =>
+           switch (slots[i]) {
+           | Some(former)
+               when Slot_key.context_is_at_rules_only(former.context) =>
+             let dropped = ref(false);
+             for (j in i + 1 to Array.length(slots) - 1) {
+               switch (slots[j]) {
+               | Some(latter)
+                   when
+                     Slot_key.context_key(latter.context) == ""
+                     && Slot_key.removes(~former, ~latter) =>
+                 dropped := true
+               | _ => ()
+               };
+             };
+             ! dropped^;
+           | _ => true
+           }
+         )
+      |> List.map(snd);
+    };
 
     /* Selective atomization: of a block's SINGLETON interpolating atoms
        (`atom_has_value_interpolation` - a multi-declaration group from

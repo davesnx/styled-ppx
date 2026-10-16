@@ -201,10 +201,10 @@ specificity), so read the `result` line together with the sheet.
   G47 result: label:g47 _id_1dto0oe _a_94a4gd _a_0p2f09400082uxx
   G48 a: label:g48_a _id_epkxz0 _a_0p2f0940008bn02
   G48 b: label:g48_b _id_1vtw6u8 _a_944pn0
-  G48 result: label:g48 _id_uvlb5j _a_0p2f0940008bn02 _a_944pn0
+  G48 result: label:g48 _id_uvlb5j _a_944pn0
   G49 a: label:g49_a _id_epc09d _a_0p2f0940008qcle _a_0p2f0940004ugg1 _a_0p2f0940001arec _a_0p2f09400022q28
   G49 b: label:g49_b _id_n2bfd5 _a_940008vkr1
-  G49 result: label:g49 _id_ft4hgr _a_0p2f0940008qcle _a_0p2f0940004ugg1 _a_0p2f0940001arec _a_0p2f09400022q28 _a_940008vkr1
+  G49 result: label:g49 _id_ft4hgr _a_0p2f0940004ugg1 _a_0p2f0940001arec _a_0p2f09400022q28 _a_940008vkr1
   G50 a: label:g50_a _id_kel9e1 _a_940008awxs
   G50 b: label:g50_b _id_7nrwrz _a_0p2f0940008ybd4 _a_0p2f09400048jty _a_0p2f0940001v8e5 _a_0p2f0940002qysh
   G50 result: label:g50 _id_pvs05l _a_940008awxs _a_0p2f0940008ybd4 _a_0p2f09400048jty _a_0p2f0940001v8e5 _a_0p2f0940002qysh
