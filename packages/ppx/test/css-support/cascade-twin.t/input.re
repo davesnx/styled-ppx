@@ -88,7 +88,7 @@ let g55_d = [%css {|
 |}];
 show("G55", [("a", g55_a), ("b", g55_b), ("c", g55_c), ("d", g55_d)], CSS.merge(CSS.merge(CSS.merge(g55_a, g55_b), g55_c), g55_d));
 
-/* G56: author two-class selector `.g56-hook.g56-on` (0,2,0) against B, a merged atom that got a twin (0,2,0)
+/* G56: author two-class selector `.g56-hook.g56-on` (0,2,0) against B, a merged atom that got a twin (0,1,1)
    intended: A (the author selector is the more specific one in plain CSS) */
 module G56_global = [%styled.global {|
   .g56-hook.g56-on { margin-left: 561px; }

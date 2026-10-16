@@ -1016,14 +1016,17 @@ the earlier atom last. `Merge_key.twin_level` (`merge`) and
 `Merge_key.twin_block` (one block, called from `Css_file.re`'s
 `transform_rule_list`; the ppx copies the module with `copy_files`) swap the
 later class `_a_<x>` for `_t1_<x>` or `_t2_<x>`; only the prefix changes.
-`generate.ml`'s `add_twins` writes every `_a_` rule with two more selectors.
-Each is the whole selector of the atom, from its start (after any at-rule `{`)
-to the `{` of the declarations, with every `._a_<x>` replaced by
-`._t1_<x>._t1_<x>` or `._t2_<x>._t2_<x>._t2_<x>`. Text before or after the atom
-class stays, so a twin keeps its conditions (`._a_<x>:hover`,
-`._id_<y> ._a_<x>`, `._a_<x> + ._a_<x>`, inside `@media`). Each atom class in
-the selector adds one (`_t1_`) or two (`_t2_`) classes of specificity. `_in_` rules get none. `_t1_`
-and `_t2_` do not clash with `_a_`, `_in_`, `_id_`, `_k_` or `label:`.
+`generate.ml`'s `add_twins` writes every `_a_` rule with `Merge_key.max_level`
+more selectors (it uses the same module through `copy_files`, so the cap cannot
+drift). Each is the whole selector of the atom, from its start (after any
+at-rule `{`) to the `{` of the declarations, with every `._a_<x>` replaced by
+`._t<k>_<x>`, and the first copy followed by `:not(x-)` repeated `k` times.
+Text before or after the atom class stays, so a twin keeps its conditions
+(`._a_<x>:hover`, `._id_<y> ._a_<x>`, `._a_<x> + ._a_<x>`, inside `@media`).
+`:not(x-)` weighs as its argument, one type selector, and `x-` matches no
+element: a level `k` twin has specificity (0,c,k) where the atom has (0,c,0),
+so it beats an atom with the same number of classes and pseudo-classes and
+never one with more. `_in_` rules get none. `_t1_` and `_t2_` do not clash with `_a_`, `_in_`, `_id_`, `_k_` or `label:`.
 
 A twin is used for a later atom that is in the base context or under at-rules
 alone and that overlaps an earlier surviving atom of those two kinds (same
@@ -1034,8 +1037,9 @@ level is the highest level of the atoms it must beat, plus one when the sheet
 order is not sure; the cap is 2, and at the cap the sheet order decides.
 A selector or `!important` atom takes the level of the highest twin it
 overlaps, and an earlier one is raised when a later twin overlaps it, so
-`:hover` keeps beating `@media`. A twin ties with an author selector of
-specificity (0,2,0) and wins it by sheet position. A box shorthand is no longer
+`:hover` keeps beating `@media`. A twin never reaches an author selector of
+specificity one class above the atom stays above the twin (an author `.a.b`
+beats every twin level). A box shorthand is no longer
 split per longhand in a condition. The same selector with an extra at-rule,
 logical against physical properties and `_in_` bundles get no twin.
 
