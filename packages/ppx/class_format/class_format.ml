@@ -94,6 +94,10 @@ let possible_extra_lengths =
    width buys this field nothing). *)
 let bundle_class content = bundle_prefix ^ Murmur2.default content
 
+(* [Merge_key] duplicates this character: a context whose first character is
+   this marker holds at-rules alone. *)
+let at_rules_marker = '0'
+
 let slot_class (slot : Slot_key.t) content =
   if slot.bundle then bundle_class content
   else (
@@ -102,7 +106,18 @@ let slot_class (slot : Slot_key.t) content =
        {!Slot_key.context_key} folds importance into the context. *)
     let context_part =
       let key = Slot_key.context_key slot.context in
-      if key = "" then "" else hashed_field ~width:context_width key
+      if key = "" then ""
+      else (
+        (* The first character carries the context kind: [at_rules_marker]
+           for at-rules alone, never for any other context. *)
+        let hash = Bytes.of_string (hashed_field ~width:context_width key) in
+        let first = Bytes.get hash 0 in
+        Bytes.set hash 0
+          (if Slot_key.context_is_at_rules_only slot.context then
+             at_rules_marker
+           else if first = at_rules_marker then '1'
+           else first);
+        Bytes.to_string hash)
     in
     let family_part =
       to_base36_padded ~width:family_width (Slot_key.family_marker slot.family)

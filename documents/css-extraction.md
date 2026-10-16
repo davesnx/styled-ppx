@@ -779,7 +779,9 @@ property" for everything this doesn't otherwise merge. Grouping in
 Class names follow the `_a_<context?><family><mask?><value>` format: a
 fixed-width, base36-encoded context hash (present only under a real
 selector/at-rule, or when the declaration carries `!important` - see
-"CSS.merge" below), a 2-character property-family id from a fixed,
+"CSS.merge" below; the first character is `0` when the context is
+at-rules alone, no selector and no `!important`, and never `0` for any
+other context), a 2-character property-family id from a fixed,
 append-only table, an optional mask of which of the family's longhands
 this atom covers, and a short value hash unique only within that
 (context, family[, mask]) bucket - not globally, which is what lets it
@@ -980,6 +982,23 @@ a `label:<binding>` marker, and any class this pipeline didn't mint are
 never dropped and never drop anything else - `merge` only ever acts on
 a well-formed `_a_` atom on either side, and only ever drops a class of
 `a`, never of `b`.
+
+One exception to "same context": a `b` atom in the BASE context (the
+context hash is empty) also drops an `a` atom whose context is at-rules
+alone (first context character `0`, `Slot_key.context_is_at_rules_only`,
+mirrored by `Merge_key.is_at_rules_only`) when the family and mask match as
+usual. A selector or `!important` context of `a` is kept, and a
+conditional `b` never drops a base `a`. The mask check only passes when the
+`a` atom is narrow enough, so `Css_file.re`'s `split_box_shorthand` splits
+a box shorthand outside the base context (inside an at-rule, under a
+selector other than a bare `&`, or `!important`) into one atom per longhand
+(`padding`, `margin`, `scroll-padding`, `scroll-margin`, `inset`,
+`border-width`/`-style`/`-color`, `overflow`, `gap`, and the `-block`/
+`-inline` forms). It leaves a declaration whole when it is not a plain
+1-to-4 (axis: 1-to-2) value list: `border-radius`, `border`, `outline`,
+`background`, `font`, a top-level `var()`, or a `$(path)` that would land
+on two longhands (the split atoms would form an `_in_` bundle). The
+generator reports an unresolved reference once, not once per split atom.
 
 `!important` needs no separate check: it is folded into the context (as
 if it were one more wrapper, like an at-rule - see

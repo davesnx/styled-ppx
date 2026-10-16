@@ -1281,6 +1281,14 @@ let context_equal a b =
   && a.selector = b.selector
   && a.important = b.important
 
+(* The base context: no at-rule, no selector, not [!important] - exactly the
+   context [context_key] hashes to the empty string, which [Class_format]
+   leaves out of the class name. *)
+let is_base context = context_key context = ""
+
+let context_is_at_rules_only { at_rules; selector; important } =
+  at_rules <> [] && selector = "" && not important
+
 let mask_subset a b =
   match a, b with
   | None, None -> true
@@ -1299,7 +1307,8 @@ let is_excluded_from_all = function
 let removes ~former ~latter =
   (not former.bundle)
   && (not latter.bundle)
-  && context_equal former.context latter.context
+  && (context_equal former.context latter.context
+     || (is_base latter.context && context_is_at_rules_only former.context))
   &&
   match latter.family with
   | All -> not (is_excluded_from_all former.family)

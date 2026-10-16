@@ -13,7 +13,10 @@ disjoint leaves, so they still get separate atoms.
   [@css "._a_4ekvmb{color:red;}"];
   [@css "._a_7p0008n4zf{margin-top:0;}"];
   [@css "._a_940008cand{padding-top:0;}"];
-  [@css "._a_qyw7u7po9vs:hover{margin:10px;margin-top:0;}"];
+  [@css "._a_qyw7u7p00048jb9:hover{margin-right:10px;}"];
+  [@css "._a_qyw7u7p000187id:hover{margin-bottom:10px;}"];
+  [@css "._a_qyw7u7p0002ghq5:hover{margin-left:10px;}"];
+  [@css "._a_qyw7u7p00088l7m:hover{margin-top:10px;margin-top:0;}"];
   [@css "._a_940002yq1t{padding-left:0;}"];
   [@css "._a_9400048fgp{padding-right:0;}"];
   [@css "._a_3h2ghsmzmu{border-top:1px solid red;}"];
@@ -33,7 +36,11 @@ disjoint leaves, so they still get separate atoms.
         "_id_mz6ujm",
         "_a_7p0008n4zf _a_940008cand",
       ),
-      ("Output.underSelector", "_id_vkdvp6", "_a_qyw7u7po9vs"),
+      (
+        "Output.underSelector",
+        "_id_vkdvp6",
+        "_a_qyw7u7p00048jb9 _a_qyw7u7p000187id _a_qyw7u7p0002ghq5 _a_qyw7u7p00088l7m",
+      ),
       (
         "Output.sameFamilyDisjointLeaves",
         "_id_ds74ar",
@@ -64,7 +71,10 @@ disjoint leaves, so they still get separate atoms.
       [],
     );
   let underSelector =
-    CSS.make("label:underSelector _id_vkdvp6 _a_qyw7u7po9vs", []);
+    CSS.make(
+      "label:underSelector _id_vkdvp6 _a_qyw7u7p00048jb9 _a_qyw7u7p000187id _a_qyw7u7p0002ghq5 _a_qyw7u7p00088l7m",
+      [],
+    );
   let sameFamilyDisjointLeaves =
     CSS.make(
       "label:sameFamilyDisjointLeaves _id_ds74ar _a_940002yq1t _a_9400048fgp",

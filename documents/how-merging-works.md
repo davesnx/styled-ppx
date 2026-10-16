@@ -34,6 +34,17 @@ it sets. `merge(a, b)` drops a class of `a` when a class of `b` has the
 longhand** the `a` class sets. Nothing else changes: `CSS.styles` still
 carries both class name lists and both custom-property values.
 
+There is one exception to "same context". When `b`'s declaration is
+unconditional (base context: no `@media`/`@supports`/`@container`, no
+selector, not `!important`), it also drops `a`'s atoms of the same
+longhands that sit under at-rules alone. `b` sets the property for the
+element in every state, so an `@media` value of `a` for it would
+otherwise still win while the condition holds. A selector context
+(`:hover`, `& .child`, `::before`) or an `!important` context of `a` is
+not dropped: it matches other states of the element, or beats `b` anyway.
+The reverse never happens: a conditional `b` does not drop a base `a`,
+since `a` still applies when the condition is false.
+
 **Same property, dropped:**
 
 ```reason
@@ -74,6 +85,32 @@ CSS.merge(wide, narrow);
 
 (`shorthand_then_longhand_keeps_both`, same file — this is the accepted
 limit "a longhand can't drop an earlier shorthand", not a bug)
+
+**An `@media` shorthand, then a base longhand — the covered side is dropped:**
+
+```reason
+let responsive = [%css "@media (max-width: 600px) { padding: 8px; }"];
+let override = [%css "padding-top: 0;"];
+
+CSS.merge(responsive, override);
+/* padding-top: 0 applies at every width; the media query still sets the
+   other three sides below 600px */
+```
+
+This works because a box shorthand inside a condition is split into one
+atom per side when it is extracted: `padding`, `margin`,
+`scroll-padding`, `scroll-margin`, `inset`, `border-width`,
+`border-style`, `border-color`, `overflow`, `gap`, and the `-block` and
+`-inline` forms of `padding`, `margin` and `inset`. A shorthand in the base context is
+not split. A shorthand left whole is not dropped by a base longhand:
+`border-radius`, `border`, `outline`, `background`, `font`, a value with a
+top-level `var()`, and a value where one `$(path)` would end up on two
+sides (`padding: $(x)`, `padding: $(a) $(b)`, `padding: 8px $(x)`), which
+would form an `_in_` bundle that merge never drops. Four different paths
+are split. A logical longhand (`padding-inline-start`) and a physical one
+(`padding-left`) are different properties for merge, whatever the writing
+mode.
+(`packages/ppx/test/css-support/cascade-gaps.t` pins each of these.)
 
 **`!important` vs. a plain declaration — both kept:**
 
@@ -237,6 +274,17 @@ all) still depends on which one the browser loads first
 - **Partial cover across libraries.** `merge(a, b)` where `a` sets
   `margin` and `b` sets only `margin-top` keeps both classes (the example
   above) — correct as long as `b`'s library's sheet loads after `a`'s.
+- **Conditional shorthands that are not split.** A base longhand does not
+  drop a conditional `border-radius`, `border`, `outline`, `background`,
+  `font` or `flex` value, a conditional shorthand with a top-level `var()`
+  or a repeated `$(path)`, or a logical/physical pair
+  (`padding-inline` against `padding-left`). Both classes stay, and the
+  conditional rule wins while its condition holds (see "A conditional
+  atom beats an unconditional one" below). Pinned by
+  `packages/ppx/test/css-support/cascade-gaps.t`.
+- **A selector context is not dropped by a base declaration.** `&:hover`,
+  `& .child` and `::before` atoms of `a` stay, even with the same
+  property in `b`; so does an `@media` atom under such a selector.
 - **Interpolation bundles.** `merge` never drops an `_in_` bundle, so an
   override of a property inside a bundle is decided by specificity and
   sheet order, not by argument order (the `card` example above).

@@ -38,6 +38,11 @@ type context = {
     other wrapper would. *)
 val context_key : context -> string
 
+(** True for a context made of at-rules alone: no selector and no [!important].
+    [Class_format] marks such a context in the class name, so [CSS.merge] can
+    tell it from a selector context without parsing the hash. *)
+val context_is_at_rules_only : context -> bool
+
 (** Lowercase, except a custom property ([--*]), which is case-sensitive.
     Mirrors [Css_file.re]'s [declaration_group_key] - duplicated rather than
     shared because [slot_key] must not depend on the [ppx] library (it is a
@@ -241,8 +246,13 @@ val of_atom : Styled_ppx_css_parser.Ast.rule -> t option
     dropped from the left side.
 
     [false] immediately if either side is a {!t.bundle} atom - bundles are
-    opaque to this decision in both directions. Otherwise: same contexts, then
-    if [latter.family = All], [former] is removed unless its own (single,
+    opaque to this decision in both directions. Otherwise: same contexts, or
+    [latter] in the base context and [former] in a context of at-rules alone (a
+    plain declaration written later overrides [former]'s [@media], [@container]
+    or [@supports] values, which target the same element; it does not touch a
+    selector context such as [:hover] or [& .child], nor an [!important] one; a
+    conditional [latter] never removes a base [former]), then if
+    [latter.family = All], [former] is removed unless its own (single,
     non-family) property is excluded from [all] (see {!excluded_from_all} -
     carried here via [family_id]'s [UnregisteredCustom] constructor and two
     fixed [direction]/ [unicode-bidi] registry entries, never a string).
@@ -257,5 +267,6 @@ val of_atom : Styled_ppx_css_parser.Ast.rule -> t option
     order); [Some ma]/[Some mb] is a plain bitwise subset check. [!important]
     carries no separate check here - it is already part of {!context}, so
     [former]'s and [latter]'s importance must already agree for "same contexts"
-    to hold at all. *)
+    to hold at all, and an [!important] [latter] is never in the base context.
+*)
 val removes : former:t -> latter:t -> bool

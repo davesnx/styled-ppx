@@ -63888,6 +63888,17 @@ function parse_atom(class_name) {
 function context_equal(a, b) {
   return a.context === b.context;
 }
+function is_base(a) {
+  return a.context === "";
+}
+function is_at_rules_only(a) {
+  if (a.context !== "") {
+    return get2(a.context, 0) === /* '0' */
+    48;
+  } else {
+    return false;
+  }
+}
 function family_equal(a, b) {
   if (a.family !== b.family) {
     return false;
@@ -63916,7 +63927,7 @@ function mask_subset(a, b) {
   }
 }
 function removes(former, latter) {
-  if (context_equal(former, latter)) {
+  if (context_equal(former, latter) || latter.context === "" && is_at_rules_only(former)) {
     if (latter.family === all_sentinel) {
       return !is_excluded_from_all(former.family);
     } else if (family_equal(former, latter)) {
@@ -64530,7 +64541,7 @@ var card = make7(
   0
 );
 var container = make7(
-  "label:container _id_3949vv _a_p3y4xec8xdh _a_p3y4x390004i85y _a_p3y4x65000ww99w _a_2grgh655m9szns1",
+  "label:container _id_3949vv _a_03y4xec8xdh _a_03y4x390004i85y _a_03y4x65000ww99w _a_2grgh655m9szns1",
   /* [] */
   0
 );
@@ -64563,7 +64574,7 @@ var modifierActive = make7(
   0
 );
 var toggle = make7(
-  "label:toggle _id_8jiwri _a_5r4ri2 _a_94q2r6 _a_7p0004gtl7 _a_3hmfgf _a_3n9mlt _a_lmw1g39bg96 _a_lmw1g3h0ef5176a",
+  "label:toggle _id_8jiwri _a_5r4ri2 _a_94q2r6 _a_7p0004gtl7 _a_3hmfgf _a_3n9mlt _a_lmw1g39bg96 _a_lmw1g3h0cn495eb _a_lmw1g3h01kwjhdq _a_lmw1g3h0001kilm _a_lmw1g3h0074bldq",
   /* [] */
   0
 );
@@ -64646,12 +64657,12 @@ var hoverSecond = make7(
   0
 );
 var mediaFirst = make7(
-  "label:mediaFirst _id_11y1zoz _a_ftrjp4extel",
+  "label:mediaFirst _id_11y1zoz _a_0trjp4extel",
   /* [] */
   0
 );
 var mediaSecond = make7(
-  "label:mediaSecond _id_6b3yfa _a_ftrjp4e3z28",
+  "label:mediaSecond _id_6b3yfa _a_0trjp4e3z28",
   /* [] */
   0
 );
