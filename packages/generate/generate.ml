@@ -1217,15 +1217,19 @@ let sort_conditional_rules rules =
   |> List.map (fun (_, _, _, _, r) -> r)
 
 (** Specificity twins: [CSS.merge] may swap an atom class [_a_X] for [_t<k>_X]
-    (see [Merge_key]) to win by specificity, whatever the sheet order. Every
-    [_a_] rule therefore also answers to [k] extra copies of the twin class. The
-    twin selector is the whole selector, from its start (after any at-rule [{])
-    to the [{] that opens the declarations, with every [._a_X] replaced by the
-    twin class repeated [k + 1] times: [._id_a:hover ._a_X + ._a_X] becomes
-    [._id_a:hover ._t1_X._t1_X + ._t1_X._t1_X], so the twin keeps the conditions
-    of the atom and only raises its specificity. Rules of other classes ([_in_])
-    are left alone. *)
-let twin_levels = 2
+    (see [Merge_key]) to win by source order, whatever the sheet order. Every
+    [_a_] rule therefore also answers to the twin classes of every level up to
+    [Merge_key.max_level]. The twin selector is the whole selector, from its
+    start (after any at-rule [{]) to the [{] that opens the declarations, with
+    every [._a_X] replaced by [._t<k>_X]; the first copy also gets [k] times
+    [:not(x-)]: [._id_a:hover ._a_X + ._a_X] becomes
+    [._id_a:hover ._t1_X:not(x-) + ._t1_X], so the twin keeps the conditions of
+    the atom. [:not(x-)] weighs as its argument, one type selector (0,0,1), and
+    [x-] matches no element. A twin therefore beats an atom with the same number
+    of classes and pseudo-classes, as a later rule would, but never a rule with
+    one more class-like part, such as [.a.b] or [:hover]. Rules of other classes
+    ([_in_]) are left alone. *)
+let twin_levels = Merge_key.max_level
 
 let is_class_char c =
   (c >= 'a' && c <= 'z')
@@ -1250,26 +1254,26 @@ let split_top_level_commas selector =
   go 0 0 0 []
 
 (** [branch] with every [.<atom_class>] (not the start of a longer class)
-    replaced by [replacement]. *)
-let replace_class ~atom_class ~replacement branch =
+    replaced by [replacement]; the first one by [first] instead. *)
+let replace_class ~atom_class ~first ~replacement branch =
   let needle = "." ^ atom_class in
   let m = String.length needle in
   let n = String.length branch in
   let buffer = Buffer.create n in
-  let rec go i =
+  let rec go i ~first_pending =
     if i >= n then ()
     else if
       i + m <= n
       && String.sub branch i m = needle
       && (i + m = n || not (is_class_char branch.[i + m]))
     then (
-      Buffer.add_string buffer replacement;
-      go (i + m))
+      Buffer.add_string buffer (if first_pending then first else replacement);
+      go (i + m) ~first_pending:false)
     else (
       Buffer.add_char buffer branch.[i];
-      go (i + 1))
+      go (i + 1) ~first_pending)
   in
-  go 0;
+  go 0 ~first_pending:true;
   Buffer.contents buffer
 
 let add_twins rule_text =
@@ -1291,14 +1295,17 @@ let add_twins rule_text =
       let branches =
         split_top_level_commas selector
         |> List.filter (fun branch ->
-          replace_class ~atom_class:cls ~replacement:"" branch <> branch)
+          replace_class ~atom_class:cls ~first:"" ~replacement:"" branch
+          <> branch)
       in
       let twins =
         List.init twin_levels (fun i ->
           let k = i + 1 in
-          let c = Printf.sprintf "._t%d_%s" k body in
-          let replacement = String.concat "" (List.init (k + 1) (fun _ -> c)) in
-          List.map (replace_class ~atom_class:cls ~replacement) branches
+          let replacement = "." ^ Merge_key.twin_prefix k ^ body in
+          let first =
+            replacement ^ String.concat "" (List.init k (fun _ -> ":not(x-)"))
+          in
+          List.map (replace_class ~atom_class:cls ~first ~replacement) branches
           |> String.concat ",")
         |> List.map (fun twin -> "," ^ twin)
         |> String.concat ""

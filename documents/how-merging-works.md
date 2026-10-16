@@ -119,11 +119,11 @@ swaps the class of `padding-top` for its **twin**. `styled-ppx.generate`
 writes every `_a_<x>` rule with extra selectors for the twin classes:
 
 ```css
-._a_<x>,._t1_<x>._t1_<x>,._t2_<x>._t2_<x>._t2_<x> { padding-top: 0; }
+._a_<x>,._t1_<x>:not(x-),._t2_<x>:not(x-):not(x-) { padding-top: 0; }
 ```
 
-`._a_<x>` has specificity (0,1,0), `._t1_<x>._t1_<x>` (0,2,0) and the level 2
-twin (0,3,0), so a twin wins over a lower level whatever the sheet order, and
+`._a_<x>` has specificity (0,1,0), `._t1_<x>:not(x-)` (0,1,1) and the level 2
+twin (0,1,2), so a twin wins over a lower level whatever the sheet order, and
 `padding` still applies to the sides the twin does not set. The twin class
 replaces the atom class on the element (`_a_<x>` becomes `_t1_<x>`), the
 runtime changes only the prefix, with no table.
@@ -133,7 +133,7 @@ selector is the same selector with every `._a_<x>` replaced by the twin class,
 so the twin applies only where the atom applies:
 
 ```css
-._id_<p> ._a_<x>,._id_<p> ._t1_<x>._t1_<x>,._id_<p> ._t2_<x>._t2_<x>._t2_<x> { padding-top: 0; }
+._id_<p> ._a_<x>,._id_<p> ._t1_<x>:not(x-),._id_<p> ._t2_<x>:not(x-):not(x-) { padding-top: 0; }
 ```
 
 Where `merge(a, b)` (and a block, for its own atoms, in source order) uses a
@@ -157,10 +157,13 @@ physical one (`padding-left`) are different properties for merge, whatever
 the writing mode, so they get no twin.
 (`cascade-gaps.t` and `cascade-twin.t` pin each of these.)
 
-**A twin ties with an author selector.** A twin has the specificity of a
-two-class author selector (`.parent.on`), and its rule comes later in the sheet,
-so the twin wins that tie, which a plain atom would lose (G56). Keep the
-author selector more specific, or avoid merging into that property.
+**A twin stays below an author selector with more classes.** `:not(x-)` weighs
+as one type selector (0,0,1; `x-` matches no element), so a twin only decides
+ties between rules with the same number of classes and pseudo-classes, as a
+later rule would. An author selector such as `.parent.on` (0,2,0) still beats
+a twin of any level (G56, R08B, R08C). A twin still beats a one-class author
+rule (R08D), and ties with an author selector that adds one type selector to
+one class (`a.link`, 0,1,1) at level 1: the later rule in the sheet wins.
 
 **`!important` vs. a plain declaration — both kept:**
 

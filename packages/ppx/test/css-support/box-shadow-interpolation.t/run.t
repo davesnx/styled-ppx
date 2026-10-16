@@ -10,13 +10,13 @@ Test box-shadow and text-shadow interpolation support in cx2
   @property --textShadowValue-1g9u54a{syntax:"*";inherits:false;}
   @property --textShadowArray-ptx88i{syntax:"*";inherits:false;}
   @property --insetShadow-ae1kx4{syntax:"*";inherits:false;}
-  ._a_40bddc,._t1_40bddc._t1_40bddc,._t2_40bddc._t2_40bddc._t2_40bddc{box-shadow:var(--singleShadow-2ra8gi);}
-  ._a_407kax,._t1_407kax._t1_407kax,._t2_407kax._t2_407kax._t2_407kax{box-shadow:var(--shadowArray-16v4cs);}
-  ._a_40keqi,._t1_40keqi._t1_40keqi,._t2_40keqi._t2_40keqi._t2_40keqi{box-shadow:none;}
-  ._a_4085tv,._t1_4085tv._t1_4085tv,._t2_4085tv._t2_4085tv._t2_4085tv{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
-  ._a_cyxlo4,._t1_cyxlo4._t1_cyxlo4,._t2_cyxlo4._t2_cyxlo4._t2_cyxlo4{text-shadow:var(--textShadowValue-1g9u54a);}
-  ._a_cy5t96,._t1_cy5t96._t1_cy5t96,._t2_cy5t96._t2_cy5t96._t2_cy5t96{text-shadow:var(--textShadowArray-ptx88i);}
-  ._a_cyql9z,._t1_cyql9z._t1_cyql9z,._t2_cyql9z._t2_cyql9z._t2_cyql9z{text-shadow:none;}
-  ._a_40ky98,._t1_40ky98._t1_40ky98,._t2_40ky98._t2_40ky98._t2_40ky98{box-shadow:var(--insetShadow-ae1kx4);}
+  ._a_40bddc,._t1_40bddc:not(x-),._t2_40bddc:not(x-):not(x-){box-shadow:var(--singleShadow-2ra8gi);}
+  ._a_407kax,._t1_407kax:not(x-),._t2_407kax:not(x-):not(x-){box-shadow:var(--shadowArray-16v4cs);}
+  ._a_40keqi,._t1_40keqi:not(x-),._t2_40keqi:not(x-):not(x-){box-shadow:none;}
+  ._a_4085tv,._t1_4085tv:not(x-),._t2_4085tv:not(x-):not(x-){box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
+  ._a_cyxlo4,._t1_cyxlo4:not(x-),._t2_cyxlo4:not(x-):not(x-){text-shadow:var(--textShadowValue-1g9u54a);}
+  ._a_cy5t96,._t1_cy5t96:not(x-),._t2_cy5t96:not(x-):not(x-){text-shadow:var(--textShadowArray-ptx88i);}
+  ._a_cyql9z,._t1_cyql9z:not(x-),._t2_cyql9z:not(x-):not(x-){text-shadow:none;}
+  ._a_40ky98,._t1_40ky98:not(x-),._t2_40ky98:not(x-):not(x-){box-shadow:var(--insetShadow-ae1kx4);}
 
 
