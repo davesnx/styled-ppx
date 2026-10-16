@@ -117,6 +117,33 @@ let r05p_b = [%css {|
 |}];
 show("R05P", [("a", r05p_a), ("b", r05p_b)], CSS.merge(r05p_a, r05p_b));
 
+/* R09: nested media, one inner sibling rewrite. A is one nested `@media (min-width: 100px) { @media (max-width: 1200px) }`,
+   B has the same nest twice, `(max-width: 1200px)` and `(max-width: 900px)`, and the first one is rewritten to exclude the second
+   intended: B
+   note: the first atom of B has the context of A (the rewrite is block-local), so merge drops A and keeps both atoms of B */
+let r09_a = [%css {|
+  @media (min-width: 100px) { @media (max-width: 1200px) { color: rgb(91, 0, 0); } }
+|}];
+let r09_b = [%css {|
+  @media (min-width: 100px) {
+    @media (max-width: 1200px) { color: rgb(92, 0, 0); }
+    @media (max-width: 900px) { color: rgb(93, 0, 0); }
+  }
+|}];
+show("R09", [("a", r09_a), ("b", r09_b)], CSS.merge(r09_a, r09_b));
+
+/* R09R: R09 with the operands swapped
+   intended: B
+   note: A, one atom with the context of B's first atom, drops it and wins over B's second atom by its twin */
+show("R09R", [("a", r09_b), ("b", r09_a)], CSS.merge(r09_b, r09_a));
+
+/* R09S: the same nest written in the other order, with the inner rewrite
+   intended: B */
+let r09s_a = [%css {|
+  @media (max-width: 1200px) { @media (min-width: 100px) { color: rgb(94, 0, 0); } }
+|}];
+show("R09S", [("a", r09_b), ("b", r09s_a)], CSS.merge(r09_b, r09s_a));
+
 /* R08B: author two-class selector `.r08b-a.r08b-b` (0,2,0) against B, a merged atom at twin level 2
    (A @media border-top, B @media border-color needs level 1, C base border-top needs level 2)
    intended: A (the author selector is the more specific one in plain CSS) */
