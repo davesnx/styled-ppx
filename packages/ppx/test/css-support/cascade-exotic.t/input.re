@@ -120,7 +120,7 @@ show("E08", [("a", e08_a), ("b", e08_b)], CSS.merge(e08_a, e08_b));
 
 /* E09: A logical (padding-inline-end), B physical (padding-right), B defined before A
    intended: B
-   note: the prefixer adds -webkit-padding-end to A; it counts as padding-inline-end (depth 1), so A, defined after B, now lands after it (same depth keeps source order) */
+   note: known limit (the writing mode is unknown at compile time, see how-merging-works.md); the prefixer adds -webkit-padding-end to A; it counts as padding-inline-end (depth 1), so A, defined after B, now lands after it (same depth keeps source order) */
 let e09_b = [%css {|
   padding-right: 313px;
 |}];
@@ -140,7 +140,8 @@ let e10_b = [%css {|
 show("E10", [("a", e10_a), ("b", e10_b)], CSS.merge(e10_a, e10_b));
 
 /* E11: A physical longhand (margin-bottom), B logical shorthand (margin-block)
-   intended: B */
+   intended: B
+   note: known limit, as E09 (logical and physical properties are different families) */
 let e11_a = [%css {|
   margin-bottom: 317px;
 |}];
@@ -201,7 +202,8 @@ let e16_b = [%css {|
 show("E16", [("a", e16_a), ("b", e16_b)], CSS.merge(e16_a, e16_b));
 
 /* E17: A is an _in_ bundle (base and :hover share one $(x)), B a plain base override (the card example in how-merging-works.md)
-   intended: B */
+   intended: B
+   note: per state. While `:hover` is off B wins; while it is on, A's `:hover` member wins by specificity (0,2,0 against 0,1,0), as in plain CSS. The real gap is the bundle, which `merge` never drops (see Known limits) */
 let e17_v1 = CSS.rgb(27, 0, 0);
 let e17_a = [%css {|
   border-top-color: $(e17_v1);
@@ -359,7 +361,8 @@ let e31 = [%css {|
 show("E31", [], e31);
 
 /* E32: one block, two overlapping @media, wide first and narrow second
-   intended: B */
+   intended: B
+   note: the rewrite makes the two ranges disjoint, so the harness reports the winner per width (mixed): B at and below the narrow width, A in the rest of the wide range */
 let e32 = [%css {|
   @media (max-width: 1200px) { margin-left: 359px; }
   @media (max-width: 900px) { margin-left: 360px; }
@@ -367,7 +370,8 @@ let e32 = [%css {|
 show("E32", [], e32);
 
 /* E33: one block, two overlapping @media with the same media type
-   intended: B */
+   intended: B
+   note: as E32, the winner is reported per width */
 let e33 = [%css {|
   @media screen and (max-width: 1200px) { margin-left: 361px; }
   @media screen and (max-width: 900px) { margin-left: 362px; }
@@ -473,7 +477,8 @@ let e43_b = [%css {|
 show("E43", [("a", e43_a), ("b", e43_b)], CSS.merge(e43_a, e43_b));
 
 /* E44: one block, the same property twice in the same context
-   intended: B */
+   intended: B
+   note: control. Both declarations sit in one atom, so there is no A and B class to tell apart; the later declaration wins in the browser */
 let e44 = [%css {|
   margin-left: 381px;
   margin-left: 382px;

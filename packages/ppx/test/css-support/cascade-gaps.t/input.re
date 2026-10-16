@@ -267,7 +267,8 @@ let g22_b = [%css {|
 show("G22", [("a", g22_a), ("b", g22_b)], CSS.merge(g22_a, g22_b));
 
 /* G23: A @media `margin: 331px auto`, B base margin-left
-   intended: B */
+   intended: B
+   note: B sets only one side, so the winner is per property (A or B, reported as mixed): B for margin-left, A for the other three sides */
 let g23_a = [%css {|
   @media (max-width: 1200px) { margin: 331px auto; }
 |}];
@@ -278,7 +279,7 @@ show("G23", [("a", g23_a), ("b", g23_b)], CSS.merge(g23_a, g23_b));
 
 /* G24: A @media padding-inline (logical), B base padding-left (physical)
    intended: B
-   note: left-to-right, so padding-inline-start and padding-left are one property */
+   note: left-to-right, so padding-inline-start and padding-left are one property. Known limit: the writing mode is unknown at compile time (see how-merging-works.md), so merge does not relate them */
 let g24_a = [%css {|
   @media (max-width: 1200px) { padding-inline: 341px; }
 |}];
@@ -319,7 +320,8 @@ let g27_b = [%css {|
 show("G27", [("a", g27_a), ("b", g27_b)], CSS.merge(g27_a, g27_b));
 
 /* G28: A @media `overflow: hidden`, B base overflow-y (monorepo shape)
-   intended: B */
+   intended: B
+   note: B sets only overflow-y, so the winner is per property (A or B, reported as mixed): B for overflow-y, A for overflow-x */
 let g28_a = [%css {|
   @media (max-width: 1200px) { overflow: hidden; }
 |}];
@@ -369,7 +371,8 @@ let g32_b = [%css {|
 show("G32", [("a", g32_a), ("b", g32_b)], CSS.merge(g32_a, g32_b));
 
 /* G33: A @media padding-block (logical), B base padding-top (physical)
-   intended: B */
+   intended: B
+   note: known limit, as G24 */
 let g33_a = [%css {|
   @media (max-width: 1200px) { padding-block: 431px; }
 |}];
@@ -473,7 +476,8 @@ let g42_b = [%css {|
 show("G42", [("a", g42_a), ("b", g42_b)], CSS.merge(g42_a, g42_b));
 
 /* G43: three-way, left grouping: merge(merge(a, b), c); a base padding, b @media padding, c base padding-top
-   intended: C on top, B elsewhere */
+   intended: C on top, B elsewhere
+   note: per property (B or C, reported as mixed): C for padding-top, B for the other sides */
 let g43_a = [%css {|
   padding: 531px;
 |}];
@@ -486,7 +490,8 @@ let g43_c = [%css {|
 show("G43", [("a", g43_a), ("b", g43_b), ("c", g43_c)], CSS.merge(CSS.merge(g43_a, g43_b), g43_c));
 
 /* G44: G43 with right grouping: merge(a, merge(b, c))
-   intended: C on top, B elsewhere */
+   intended: C on top, B elsewhere
+   note: per property (B or C, reported as mixed): C for padding-top, B for the other sides */
 let g44_a = [%css {|
   padding: 541px;
 |}];

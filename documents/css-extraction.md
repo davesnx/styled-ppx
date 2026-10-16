@@ -679,12 +679,12 @@ This is a total order, not an injective one: two different `@supports`
 conditions, or two different pseudo-elements (`::before` vs `::after`),
 still tie on every component above and fall through to stable/file order -
 an accepted, documented gap, same as StyleX (see "Known limits" in
-`how-merging-works.md`). The fixed order also applies to two conditions
-written in the SAME block: a block that writes `:focus{color:blue}` then
-`:hover{color:red}` gets `blue` (focus, the higher-ranked pseudo) when both
-apply, reversing what "last declaration wins" would otherwise give for
-that one block - decided on purpose, for cross-block consistency, not
-inherited as a side effect (see `how-merging-works.md`).
+`how-merging-works.md`). The fixed order decides the sheet. Two conditions
+written in the SAME block, or merged, are related by the specificity twin
+instead (see "Specificity twin"): a block that writes `:focus{color:blue}`
+then `:hover{color:red}` gets `red`, the later one, as in plain CSS. The fixed
+order only decides what the twin does not relate (two class names on one
+element, or a chain past the cap).
 
 A bundle, or a same-file family-atom group (see "Atomization" - several
 declarations already merged into one atom because their leaves overlap,
