@@ -419,15 +419,14 @@ text and silently destroyed declaration order (regression test:
 `packages/generate/test/source-order.t`).
 
 **Atom class collision.** Right after that dedup pass, the aggregator
-scans the deduplicated rules for two different, non-bundle atoms
+scans the deduplicated rules for two different atoms
 (`_a_` classes) that mint the same class name but render
 different CSS - the same shape as an identity collision above, applied
 to atom classes instead of `_id_` identities, and reported the same way
-(both rule bodies, the shared class, a `--namespace` remedy). `_in_`
-(interpolation-bundle) classes are exempt in both directions: several
-different bundle bodies sharing one class is that mechanism working as
-designed (see "Atomization" above), never a collision (see
-`packages/generate/test/atom-class-collision.t`).
+(both rule bodies, the shared class, a `--namespace` remedy). A member of a
+group of declarations that share one interpolation variable has its own class
+whose value hash covers the group (see "Atomization" above), so it is checked
+like any other atom (see `packages/generate/test/atom-class-collision.t`).
 
 Before writing, `@import` rules are hoisted to the front of the
 deduplicated list, then `@namespace` rules right after them, each block
@@ -467,8 +466,8 @@ protocol section above); there is no CLI flag for this.
 
 ### Cascade tiers (always on)
 
-Every deduplicated STYLE rule this generator emits - a real atom (`_a_`/
-`_in_` class) or a `[%styled.global]` rule (no atom class, but a real,
+Every deduplicated STYLE rule this generator emits - a real atom (`_a_`
+class) or a `[%styled.global]` rule (no atom class, but a real,
 cascading rule all the same - `html{...}`, `*{...}`, `*::before{...}`, an
 author's own global selector) - is emitted into one of THREE fixed-order
 groups: `global` (`[%styled.global]` rules), `base` (an atom's own,
@@ -518,7 +517,7 @@ part in tiering, see below) or a `[%styled.global]` rule, which is always
 `global` - global rules never compete for the SAME base/conditional
 distinction an atom's own selector does, they are simply always emitted
 before either tier. A rule WITH an atom class is classified per rendered
-rule (not per class, so two declarations of the same `_in_` bundle can
+rule (not per class, so a multi-rule atom can
 land in different tiers) into exactly one of:
 
 - `Conditional`: the rule is wrapped in an at-rule (`@media`/`@supports`/
@@ -593,7 +592,7 @@ depth_of` - 0 for a top-level shorthand like `margin`, or a plain leaf
 like `color`; 1 for a direct longhand, `margin-top`; 2 for a longhand
 of a longhand). A shallower rule (a shorthand, or a wider family atom)
 sorts before a deeper one covering less (a lone longhand from a
-different binding or a different `_in_` bundle). A property reachable
+different binding). A property reachable
 through more than one shorthand takes the LONGEST such path, not the
 shortest: `border-top-width` is a direct longhand of both `border-top`
 (its own, parent-less shorthand, depth 0) and `border-width` (itself a
@@ -652,10 +651,8 @@ argument needs to win, since the later-defined rule sorts last -
 three real, shipped pairs this way: `MobileMenu_Css.ml`'s `toggleButton`
 (`@media (min-width:768px)`) then `toggleButtonShowAtTablet` (the same
 range bounded by `max-width:1279px`); `Header_Css.ml`'s `header` (the
-range) then `headerWithBanner` (`max-width:1279px` alone, through an
-interpolated `_in_` bundle rather than a plain `_a_` atom - stable order
-sorts a bundle exactly like a plain atom, since it never looks at the
-class prefix); `Discoverable_Css.ml`'s `praiseViewport` (the range), then
+range) then `headerWithBanner` (`max-width:1279px` alone, through
+interpolated declarations that share one variable); `Discoverable_Css.ml`'s `praiseViewport` (the range), then
 `praiseViewportMobile` (`max-width:767px`), then `praiseViewportExpanded`
 (`max-width:1279px`) - the LAST-defined of the three sorts last and wins
 against BOTH earlier rules, not just the one immediately before it.
@@ -686,7 +683,7 @@ then `:hover{color:red}` gets `red`, the later one, as in plain CSS. The fixed
 order only decides what the twin does not relate (two class names on one
 element, or a chain past the cap).
 
-A bundle, or a same-file family-atom group (see "Atomization" - several
+A same-file family-atom group (see "Atomization" - several
 declarations already merged into one atom because their leaves overlap,
 needing no separate sort entry: they are one rule, in author order,
 before the sort ever runs), has no single depth of its own the way a
@@ -695,7 +692,7 @@ every declaration it carries. This protects the group's SHALLOWEST
 declaration correctly (a `padding: 4px;` inside the group still sorts
 before an unrelated `padding-top: 0;` atom that needs to override it,
 the same guarantee a lone `padding` atom would get), but not every
-declaration in the group at once: a bundle of `margin-top: 0;` (depth
+declaration in the group at once: a group of `margin-top: 0;` (depth
 1) and `padding: 4px;` (depth 0), keyed by the group's minimum (0), no
 longer sorts its `margin-top: 0;` at its own true depth 1 - an
 unrelated `margin: 10px;` atom (depth 0, genuinely wider than
@@ -706,18 +703,13 @@ properties at different depths cannot be ordered correctly against
 every other rule at once, only against rules competing for its
 shallowest declaration's own property.
 
-This is what `CSS.merge` (below) cannot do for two atoms hidden inside
-different `_in_` bundles (`CSS.merge` only ever sees a bundle's class
-as one opaque, never-dropped token): the sort fixes their relative
-STYLESHEET position instead, restoring the override a `merge` call
-intended even though `merge` itself still cannot see one property next
-to another inside a bundle. Reads each rule's own property name(s)
-straight from its rendered text (through `Slot_key.depth_of`'s
-css-grammar-sourced shorthand graph, the same table a real atom's own
-mask is built from) rather than from a `Slot_key.t` - a bundle's
-declarations never had one to begin with (a real bundle spans more than
-one property, sometimes more than one context, see "Atomization"
-above).
+This is what `CSS.merge` (below) cannot do for two atoms of different
+libraries or files that only meet in the browser (no `merge` call between
+them): the sort fixes their relative STYLESHEET position instead. Reads each
+rule's own property name(s) straight from its rendered text (through
+`Slot_key.depth_of`'s css-grammar-sourced shorthand graph, the same table a
+real atom's own mask is built from) rather than from a `Slot_key.t`, since
+`generate.ml` never sees the ppx's AST.
 
 A real, narrower gap remains: `.x *{color:red}` where `.x` itself is
 styled by nothing that competes (no rule targets `.x` on the same
@@ -787,7 +779,7 @@ this atom covers, and a short value hash unique only within that
 (context, family[, mask]) bucket - not globally, which is what lets it
 be short. The value hash is computed over the rendered declaration
 salted with `--namespace` (see "Identity classes" below - the same flag,
-defaulting the same way, now salts atom and bundle classes too, not just
+defaulting the same way, now salts atom classes too, not just
 identities): two libraries with different namespaces never share an
 atom class for the same declaration, even byte-identical, so one
 library's stylesheet position can never decide a tie against another
@@ -811,35 +803,31 @@ only from registered shorthands, never from aliases) would otherwise see
 as an unrelated one-member family and mask as "full" regardless of how
 many longhands the real, canonical property actually covers.
 
-One exception: when a block has TWO OR MORE declarations that interpolate
-the SAME `$(name)` source path, they mint one shared `_in_<murmur2 hash>`
-class instead - a plain, unbucketed hash of their concatenated content, no
-context/family/mask fields at all (the "bundle" - see `Css_file.re`'s
-`transform_rule_list`). Grouped by shared path with the same union-find
-technique the shorthand/longhand leaf-overlap grouping above uses,
-transitively: a declaration interpolating two paths bridges both into one
-group. Two declarations that merely both interpolate, but different,
-unrelated paths - `color: $(a); background-color: $(b);` - do NOT bundle:
-each mints its own real, slot-keyed `_a_` class exactly like a static
-atom, and merges normally (see `CSS.merge` below), since neither value
-ever needed to share a variable with the other. A single interpolating
-declaration, or one whose path no sibling declaration in the block
-shares, is likewise not a bundle - bundling only kicks in when two or
-more of a block's interpolating declarations, sharing a path, would
-otherwise need separate custom-property namespaces for what is often the
-same value reused across `base`/`:hover`/`@media` variants. A bundle's own
-`var(--...)` target is unaffected by which prefix its class carries,
-since only the CLASS half of `Hash_class.class_and_namespace` differs
-between the two cases, never the namespace/variable-naming half - and
-that CLASS half is salted with `--namespace` exactly like a real atom's
-value field (`Hash_class.bundle_class_and_namespace`), so two libraries
-never share a bundle class either. The
-`_in_` prefix lets `CSS.merge` (see below) recognize a bundle atom and
-never drop it or let it drop another atom, and lets
-`styled-ppx.generate`'s atom-class collision check ("Dedup and write"
-above) skip it -
-several different bundle bodies legitimately sharing one class is the
-mechanism working as designed, not a hash collision.
+A group of declarations that interpolate the SAME `$(name)` source path:
+when a block has TWO OR MORE of them, they share one variable namespace (see
+`Css_file.re`'s `transform_rule_list`) but each stays an ordinary slot-keyed
+`_a_` atom, with its own context, family and mask fields. Grouped by shared
+path with the same union-find technique the shorthand/longhand leaf-overlap
+grouping above uses, transitively: a declaration interpolating two paths
+bridges both into one group. Two declarations that merely both interpolate,
+but different, unrelated paths - `color: $(a); background-color: $(b);` -
+share nothing: each has its own namespace, as a static atom's content decides
+it. A single interpolating declaration, or one whose path no sibling shares,
+is not in a group either.
+
+For a group, the namespace is `css-<hash(seed)>`, where the seed is the
+concatenated rendered members in source order, so all members read one
+variable and one inline custom property sets it (the same variable names as
+the earlier bundle). Each member's class is the usual slot-keyed one, with its
+value field hashed from the seed and the member's own rendered rule
+(`Hash_class.group_class_and_namespace`), salted with `--namespace` like any
+atom class: one class still means one exact body, because the body names the
+group variable. The seed holds the members only, so changing another
+declaration of the block changes neither the variable nor any member class
+(`packages/ppx/test/css-support/cascade-remaining.t`, R10). Because members
+are ordinary atoms, `CSS.merge` and the twin treat them like any other: a
+later base override drops the base and `@media` members and keeps the
+`:hover` member (R06, R07).
 
 The environment is a PPX concern, set once per `(pps styled-ppx ...)`
 stanza: `--env production` (alias for `--minify`) only minifies rule
@@ -977,7 +965,7 @@ runtime (`packages/runtime/native/shared/Merge_key.ml`, built once and
 shared into both - see its own doc comment for why it duplicates
 `Class_format`'s widths instead of depending on it: it ships in the
 melange browser bundle, and that library exists only to build the ppx's
-compile-time property registry). A bundle (`_in_`), an identity (`_id_`),
+compile-time property registry). An identity (`_id_`),
 a `label:<binding>` marker, and any class this pipeline didn't mint are
 never dropped and never drop anything else - `merge` only ever acts on
 a well-formed `_a_` atom on either side, and only ever drops a class of
@@ -1026,7 +1014,7 @@ Text before or after the atom class stays, so a twin keeps its conditions
 `:not(x-)` weighs as its argument, one type selector, and `x-` matches no
 element: a level `k` twin has specificity (0,c,k) where the atom has (0,c,0),
 so it beats an atom with the same number of classes and pseudo-classes and
-never one with more. `_in_` rules get none. `_t1_` and `_t2_` do not clash with `_a_`, `_in_`, `_id_`, `_k_` or `label:`.
+never one with more. `_t1_` and `_t2_` do not clash with `_a_`, `_id_`, `_k_` or `label:`.
 
 A twin is used for a later atom that overlaps an earlier surviving atom of the
 same kind (both base or at-rules alone, or both with a selector or
@@ -1043,7 +1031,7 @@ selectors style; a twin that is not needed changes nothing. A twin never
 reaches an author selector with one more class
 or pseudo-class (an author `.a.b` beats every twin level). A box shorthand is
 no longer split per longhand in a condition. Logical against physical
-properties and `_in_` bundles get no twin.
+properties get no twin.
 
 `!important` needs no separate check: it is folded into the context (as
 if it were one more wrapper, like an at-rule - see
@@ -1063,9 +1051,8 @@ atom's rule landed in the generated stylesheet. The reverse
 shorthand that covers it) is not a limit - it drops normally, since a
 full mask is always a superset of any lone longhand's mask.
 
-`merge`'s remaining gap here, and the one it can never close for a bundle
-(two atoms hidden behind the SAME opaque `_in_` class), is exactly what the
-aggregator's shorthand-before-longhand sort exists for - see "Cascade
+`merge`'s remaining gap here is exactly what the aggregator's
+shorthand-before-longhand sort exists for - see "Cascade
 tiers" above: the sort fixes stylesheet POSITION so the browser's own
 cascade still resolves the override correctly, whether or not `merge`
 itself could see the two properties involved.
@@ -1120,7 +1107,7 @@ binding's name for its label, dev marker and identity
 (`packages/ppx/test/css-support/styles-optional-className.t`).
 
 **`--namespace=<string>`** is a PPX flag, mixed into every identity
-(`_id_`), atom (`_a_`) and bundle (`_in_`) class hash in the same
+(`_id_`) and atom (`_a_`) class hash in the same
 library-wide way as `--dev`/`--minify` (see "Atomization" above). In a
 dune `(pps ...)` list write it as one token, `--namespace=<string>`:
 dune reads a separate value token as a PPX library name. It defaults to the dune `library-name` cookie

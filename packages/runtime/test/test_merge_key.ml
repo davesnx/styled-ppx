@@ -197,19 +197,16 @@ let merge_of_merges_is_associative () =
     (Printf.sprintf "%s %s" (class_of "color: red;")
        (class_of "&:hover{color: blue !important;}"))
 
-(* -- single-declaration bundles: a block whose ONLY interpolating
-   declaration is this one gets a real, slot-keyed `a-` class (same path
-   a static atom uses), so it now merges normally instead of being an
-   opaque `in-` blob forever kept on both sides. A genuinely bundled atom
-   (two or more interpolating declarations sharing one class) stays
-   exempt - see `two_declaration_bundle_still_exempt` below. *)
+(* -- interpolating declarations are ordinary atoms: each one, alone or as a
+   member of a group that shares one `$(x)`, has a real slot-keyed `_a_`
+   class, so it merges like any other atom. *)
 
 (* CaptionNumber repro: `caption`'s own default `background-color:
    $(accent)` and `captionBgColor(bgColor)`'s `background-color:
    $(bgColor)` are each their own binding's ONLY interpolating
    declaration - same family, same (base) context - so `latter` must
    drop `former`, exactly like two plain `background-color` atoms would. *)
-let single_declaration_bundle_merges_like_a_plain_atom () =
+let interpolating_declaration_merges_like_a_plain_atom () =
   let caption_default = make "background-color: $(accent);" in
   let caption_bg_color = make "background-color: $(bgColor);" in
   let merged = CSS.merge caption_default caption_bg_color in
@@ -228,24 +225,28 @@ let faq_padding_top_dynamic_then_static_drops_dynamic () =
   Alcotest_extra.assert_string (CSS.className merged)
     (class_of "padding-top: 0;")
 
-(* Pin: a REAL two-declaration bundle (the shape Css_file.re mints when a
-   block has two or more interpolating declarations, sharing one class -
-   built here the same way Css_file.re does, via `Class_format.bundle_class`
-   on the concatenation of both declarations' rendered text) stays fully
-   opaque to merge in both directions - never dropped, never drops the
-   other side - unaffected by giving single-declaration bundles a slot key. *)
-let two_declaration_bundle_still_exempt () =
-  let seeds =
-    [ "padding-top: $(gap);"; "background-color: $(accent);" ]
-    |> List.map (fun css -> Render.rule (atom_of css))
-    |> String.concat ""
-  in
-  let bundle_class = Class_format.bundle_class seeds in
-  let bundled = CSS.make bundle_class [] in
-  let plain_padding_top = make "padding-top: 0;" in
-  let merged = CSS.merge bundled plain_padding_top in
+(* A group of three declarations that share one `$(gap)` (base, `:hover`,
+   `@media`) is three atoms. A later static base override drops the base and
+   the `@media` member and keeps the `:hover` member, which has more
+   class-like parts than the override: the plain-CSS result. *)
+let group_members_merge_one_by_one () =
+  let base = "padding-top: $(gap);" in
+  let hover = "&:hover{padding-top: $(gap);}" in
+  let media = "@media (max-width:1200px){padding-top: $(gap);}" in
+  let group = CSS.merge (CSS.merge (make base) (make hover)) (make media) in
+  let override = make "padding-top: 0;" in
+  let merged = CSS.merge group override in
   Alcotest_extra.assert_string (CSS.className merged)
-    (Printf.sprintf "%s %s" bundle_class (class_of "padding-top: 0;"))
+    (Printf.sprintf "%s %s" (class_of hover) (class_of "padding-top: 0;"))
+
+(* No class prefix other than `_a_` is read as an atom: a token that is not an
+   atom (here a leftover `_in_` class from an older build) is kept on both
+   sides and never dropped. *)
+let unknown_prefix_token_is_kept () =
+  let left = CSS.make "_in_1abc2de" [] in
+  let merged = CSS.merge left (make "padding-top: 0;") in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "_in_1abc2de %s" (class_of "padding-top: 0;"))
 
 (* The `_a_` rename (atom `a-` -> `_a_`) landed: `Merge_key.atom_prefix` now
    recognizes only `_a_`, so a hand-written class that merely starts with the
@@ -502,16 +503,20 @@ let tests =
     Alcotest_extra.test "CaptionNumber repro: same shape, background-color"
       caption_number_repro;
     Alcotest_extra.test
-      "single-declaration bundle merges like a plain atom: CaptionNumber's own \
+      "interpolating declaration merges like a plain atom: CaptionNumber's own \
        two interpolated background-color declarations"
-      single_declaration_bundle_merges_like_a_plain_atom;
+      interpolating_declaration_merges_like_a_plain_atom;
     Alcotest_extra.test
       "Faq's interpolated padding-top drops in favor of a later static \
        padding-top override"
       faq_padding_top_dynamic_then_static_drops_dynamic;
     Alcotest_extra.test
-      "a real two-declaration bundle stays exempt from merge in both directions"
-      two_declaration_bundle_still_exempt;
+      "the members of a group sharing one interpolation merge one by one: a \
+       later base override drops the base and @media members, keeps :hover"
+      group_members_merge_one_by_one;
+    Alcotest_extra.test
+      "a token with no atom prefix (an old _in_ class) is kept, never dropped"
+      unknown_prefix_token_is_kept;
     Alcotest_extra.test
       "a hand-written a-header class is no longer misread as an atom now that \
        only _a_ is a recognized prefix"

@@ -144,6 +144,41 @@ let r09s_a = [%css {|
 |}];
 show("R09S", [("a", r09_b), ("b", r09s_a)], CSS.merge(r09_b, r09s_a));
 
+/* R06: A is a group of three declarations that share one `$(x)` (base, `:hover`, `@media`), B a later base override
+   intended: B
+   note: per state. The base and `@media` members of A are dropped; the `:hover` member stays, and while `:hover` is on it wins by specificity, as in plain CSS */
+let r06_v1 = CSS.px(61);
+let r06_a = [%css {|
+  padding-top: $(r06_v1);
+  &:hover { padding-top: $(r06_v1); }
+  @media (max-width: 1200px) { padding-top: $(r06_v1); }
+|}];
+let r06_b = [%css {|
+  padding-top: 62px;
+|}];
+show("R06", [("a", r06_a), ("b", r06_b)], CSS.merge(r06_a, r06_b));
+
+/* R07: the group of R06 in one file, the override in another, merged in a third
+   intended: B
+   note: per state, as R06 */
+show("R07", [("a", R07_first.r07_a), ("b", R07_second.r07_b)], CSS.merge(R07_first.r07_a, R07_second.r07_b));
+
+/* R10: the same group (base and `:hover` sharing `$(r10_v1)`) in two blocks with different other declarations
+   note: not a cascade case. The group seed holds the members only, so the member classes and the variable are the same in both blocks: X and Y print the same two `_a_` classes for the group and the same inline custom property, and only the extra atom differs */
+let r10_v1 = CSS.px(101);
+let r10_x = [%css {|
+  padding-top: $(r10_v1);
+  &:hover { padding-top: $(r10_v1); }
+  color: rgb(101, 0, 0);
+|}];
+let r10_y = [%css {|
+  display: flex;
+  padding-top: $(r10_v1);
+  margin-left: 102px;
+  &:hover { padding-top: $(r10_v1); }
+|}];
+show_parts("R10", [("x", r10_x), ("y", r10_y)]);
+
 /* R08B: author two-class selector `.r08b-a.r08b-b` (0,2,0) against B, a merged atom at twin level 2
    (A @media border-top, B @media border-color needs level 1, C base border-top needs level 2)
    intended: A (the author selector is the more specific one in plain CSS) */

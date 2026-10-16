@@ -21,7 +21,7 @@ let make className vars : styles =
 
 (* Drop a class of [styles1] when a class of [styles2] covers the same
    merge-key slot (context + family, [styles1]'s longhands a subset of
-   [styles2]'s) - see [Merge_key.removes]. A bundle ([_in_]), identity
+   [styles2]'s) - see [Merge_key.removes]. An identity
    ([_id_]), `label:<binding>` marker, or any class this module can't parse
    is never dropped and never drops anything else; [styles2]'s own classes
    are never dropped either way. See `documents/how-merging-works.md` for

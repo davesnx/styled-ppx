@@ -26,13 +26,13 @@ same file so their relative sheet order is checked together:
   [@@@css
     "@media (min-width: 768px) and (max-width: 1279px) {._a_0kutk5rhjfe{display:block;}}"]
   [@@@css
-    "@media (min-width: 768px) and (max-width: 1279px) {._in_yqjybn{padding-top:var(--pad-g2wfjo);}}"]
+    "@media (min-width: 768px) and (max-width: 1279px) {._a_0kutk940089wvy{padding-top:var(--pad-g2wfjo);}}"]
   [@@@css
-    "@media (min-width: 768px) and (max-width: 1279px) {._in_yqjybn{padding-left:var(--pad-g2wfjo);}}"]
+    "@media (min-width: 768px) and (max-width: 1279px) {._a_0kutk94002fe44{padding-left:var(--pad-g2wfjo);}}"]
   [@@@css
-    "@media (max-width: 1279px) {._in_11ru35y{padding-top:var(--pad-160gt2j);}}"]
+    "@media (max-width: 1279px) {._a_0yyk8940085gim{padding-top:var(--pad-160gt2j);}}"]
   [@@@css
-    "@media (max-width: 1279px) {._in_11ru35y{padding-left:var(--pad-160gt2j);}}"]
+    "@media (max-width: 1279px) {._a_0yyk894002453x{padding-left:var(--pad-160gt2j);}}"]
   [@@@css
     "@media (min-width: 768px) and (max-width: 1279px) {._a_0kutk850y8f{max-height:1200px;}}"]
   [@@@css "@media (max-width: 767px) {._a_0lkns85mrev{max-height:2000px;}}"]
@@ -40,8 +40,9 @@ same file so their relative sheet order is checked together:
   [@@@css.bindings
     [("Input.toggleButton", "_id_3ymu7f", "_a_06loh5rnofe");
     ("Input.toggleButtonShowAtTablet", "_id_12oj7bj", "_a_0kutk5rhjfe");
-    ("Input.header", "_id_o6yfa8", "_in_yqjybn");
-    ("Input.headerWithBanner", "_id_181aa5d", "_in_11ru35y");
+    ("Input.header", "_id_o6yfa8", "_a_0kutk940089wvy _a_0kutk94002fe44");
+    ("Input.headerWithBanner", "_id_181aa5d",
+      "_a_0yyk8940085gim _a_0yyk894002453x");
     ("Input.praiseViewport", "_id_1qycs1i", "_a_0kutk850y8f");
     ("Input.praiseViewportMobile", "_id_1apfsf0", "_a_0lkns85mrev");
     ("Input.praiseViewportExpanded", "_id_5psizx", "_a_0yyk885k4cx")]]
@@ -49,10 +50,11 @@ same file so their relative sheet order is checked together:
   let toggleButtonShowAtTablet =
     CSS.make "label:toggleButtonShowAtTablet _id_12oj7bj _a_0kutk5rhjfe" []
   let header ~pad =
-    CSS.make "label:header _id_o6yfa8 _in_yqjybn"
+    CSS.make "label:header _id_o6yfa8 _a_0kutk940089wvy _a_0kutk94002fe44"
       [("--pad-g2wfjo", (CSS.Types.Length.toString pad))]
   let headerWithBanner ~pad =
-    CSS.make "label:headerWithBanner _id_181aa5d _in_11ru35y"
+    CSS.make
+      "label:headerWithBanner _id_181aa5d _a_0yyk8940085gim _a_0yyk894002453x"
       [("--pad-160gt2j", (CSS.Types.Length.toString pad))]
   let praiseViewport =
     CSS.make "label:praiseViewport _id_1qycs1i _a_0kutk850y8f" []
@@ -74,10 +76,10 @@ same file so their relative sheet order is checked together:
   @media (min-width: 768px) and (max-width: 1279px) {._a_0kutk850y8f,._t1_0kutk850y8f:not(x-),._t2_0kutk850y8f:not(x-):not(x-){max-height:1200px;}}
   @media (max-width: 767px) {._a_0lkns85mrev,._t1_0lkns85mrev:not(x-),._t2_0lkns85mrev:not(x-):not(x-){max-height:2000px;}}
   @media (max-width: 1279px) {._a_0yyk885k4cx,._t1_0yyk885k4cx:not(x-),._t2_0yyk885k4cx:not(x-):not(x-){max-height:10000px;}}
-  @media (min-width: 768px) and (max-width: 1279px) {._in_yqjybn{padding-top:var(--pad-g2wfjo);}}
-  @media (min-width: 768px) and (max-width: 1279px) {._in_yqjybn{padding-left:var(--pad-g2wfjo);}}
-  @media (max-width: 1279px) {._in_11ru35y{padding-top:var(--pad-160gt2j);}}
-  @media (max-width: 1279px) {._in_11ru35y{padding-left:var(--pad-160gt2j);}}
+  @media (min-width: 768px) and (max-width: 1279px) {._a_0kutk940089wvy,._t1_0kutk940089wvy:not(x-),._t2_0kutk940089wvy:not(x-):not(x-){padding-top:var(--pad-g2wfjo);}}
+  @media (min-width: 768px) and (max-width: 1279px) {._a_0kutk94002fe44,._t1_0kutk94002fe44:not(x-),._t2_0kutk94002fe44:not(x-):not(x-){padding-left:var(--pad-g2wfjo);}}
+  @media (max-width: 1279px) {._a_0yyk8940085gim,._t1_0yyk8940085gim:not(x-),._t2_0yyk8940085gim:not(x-):not(x-){padding-top:var(--pad-160gt2j);}}
+  @media (max-width: 1279px) {._a_0yyk894002453x,._t1_0yyk894002453x:not(x-),._t2_0yyk894002453x:not(x-):not(x-){padding-left:var(--pad-160gt2j);}}
 
 `toggleButtonShowAtTablet` (declared second) sorts after `toggleButton`
 (declared first) - the later-defined rule wins. `praiseViewport`,

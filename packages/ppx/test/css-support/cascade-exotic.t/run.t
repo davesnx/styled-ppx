@@ -86,16 +86,16 @@ specificity), so read the `result` line together with the sheet.
   E16 a: label:e16_a _id_1i6xrdx _a_94002igrf
   E16 b: label:e16_b _id_1syppgx _a_94se6h
   E16 result: label:e16_a _id_1i6xrdx label:e16_b _id_1syppgx _a_94se6h
-  E17 a: label:e17_a _id_yee9vw _in_h4yksb
+  E17 a: label:e17_a _id_yee9vw _a_3hcn4vq7p _a_qyw7u3hcn4ey88
   E17 a style: --e17_v1-1w2tyhh:rgb(27, 0, 0)
   E17 b: label:e17_b _id_dw56fu _a_3hcn4xj20
-  E17 result: label:e17_a _id_yee9vw _in_h4yksb label:e17_b _id_dw56fu _a_3hcn4xj20
+  E17 result: label:e17_a _id_yee9vw _a_qyw7u3hcn4ey88 label:e17_b _id_dw56fu _a_3hcn4xj20
   E17 result style: --e17_v1-1w2tyhh:rgb(27, 0, 0)
-  E18 a: label:e18_a _id_29swre _in_1m6suwf
+  E18 a: label:e18_a _id_29swre _a_3h0748783 _a_qyw7u3h074usgf
   E18 a style: --e18_v1-t1ny06:rgb(29, 0, 0)
-  E18 b: label:e18_b _id_fv21ql _in_1llxr99
+  E18 b: label:e18_b _id_fv21ql _a_3h074w57x _a_qyw7u3h074vd91
   E18 b style: --e18_v2-1bzve6l:rgb(30, 0, 0)
-  E18 result: label:e18_a _id_29swre _in_1m6suwf label:e18_b _id_fv21ql _in_1llxr99
+  E18 result: label:e18_a _id_29swre label:e18_b _id_fv21ql _a_3h074w57x _a_qyw7u3h074vd91
   E18 result style: --e18_v1-t1ny06:rgb(29, 0, 0);--e18_v2-1bzve6l:rgb(30, 0, 0)
   E19 a: label:e19_a _id_7plkfj _a_1lub32z008hok3
   E19 b: label:e19_b _id_taocjx _a_x7ow72z5tji
@@ -223,10 +223,10 @@ its classes are the ones printed above:
   ._a_7p0022k5d,._t1_7p0022k5d:not(x-),._t2_7p0022k5d:not(x-):not(x-){margin-left:381px;margin-left:382px;}
   ._a_71002ejjz,._t1_71002ejjz:not(x-),._t2_71002ejjz:not(x-):not(x-){left:383px;}
   ._a_74002s0x2,._t1_74002s0x2:not(x-),._t2_74002s0x2:not(x-):not(x-){inset-inline-start:384px;}
-  ._in_h4yksb{border-top-color:var(--e17_v1-1w2tyhh);}
+  ._a_3hcn4vq7p,._t1_3hcn4vq7p:not(x-),._t2_3hcn4vq7p:not(x-):not(x-){border-top-color:var(--e17_v1-1w2tyhh);}
   ._a_3hcn4xj20,._t1_3hcn4xj20:not(x-),._t2_3hcn4xj20:not(x-):not(x-){border-top-color:rgb(28, 0, 0);}
-  ._in_1m6suwf{border-left-color:var(--e18_v1-t1ny06);}
-  ._in_1llxr99{border-left-color:var(--e18_v2-1bzve6l);}
+  ._a_3h0748783,._t1_3h0748783:not(x-),._t2_3h0748783:not(x-):not(x-){border-left-color:var(--e18_v1-t1ny06);}
+  ._a_3h074w57x,._t1_3h074w57x:not(x-),._t2_3h074w57x:not(x-):not(x-){border-left-color:var(--e18_v2-1bzve6l);}
   ._a_3hekgwqdq,._t1_3hekgwqdq:not(x-),._t2_3hekgwqdq:not(x-):not(x-){border-top-width:335px;}
   ._a_1lub33htomz:focus,._t1_1lub33htomz:not(x-):focus,._t2_1lub33htomz:not(x-):not(x-):focus{border:337px solid rgb(38, 0, 0);border-top-width:339px;}
   ._a_x7ow72z5tji:active,._t1_x7ow72z5tji:not(x-):active,._t2_x7ow72z5tji:not(x-):not(x-):active{-webkit-animation:332s ease;animation:332s ease;}
@@ -263,6 +263,6 @@ its classes are the ones printed above:
   @media screen and (max-width: 1200px) {._a_0gqkv7p002onxl,._t1_0gqkv7p002onxl:not(x-),._t2_0gqkv7p002onxl:not(x-):not(x-){margin-left:365px;}}
   @media (max-width: 900px) {._a_0f0zo7p002iivl,._t1_0f0zo7p002iivl:not(x-),._t2_0f0zo7p002iivl:not(x-):not(x-){margin-left:366px;}}
   @container app-main (max-width: 1000px) {._a_0crm37p0023me0,._t1_0crm37p0023me0:not(x-),._t2_0crm37p0023me0:not(x-):not(x-){margin-left:354px;}}
-  ._in_h4yksb:hover{border-top-color:var(--e17_v1-1w2tyhh);}
-  ._in_1m6suwf:hover{border-left-color:var(--e18_v1-t1ny06);}
-  ._in_1llxr99:hover{border-left-color:var(--e18_v2-1bzve6l);}
+  ._a_qyw7u3hcn4ey88:hover,._t1_qyw7u3hcn4ey88:not(x-):hover,._t2_qyw7u3hcn4ey88:not(x-):not(x-):hover{border-top-color:var(--e17_v1-1w2tyhh);}
+  ._a_qyw7u3h074usgf:hover,._t1_qyw7u3h074usgf:not(x-):hover,._t2_qyw7u3h074usgf:not(x-):not(x-):hover{border-left-color:var(--e18_v1-t1ny06);}
+  ._a_qyw7u3h074vd91:hover,._t1_qyw7u3h074vd91:not(x-):hover,._t2_qyw7u3h074vd91:not(x-):not(x-):hover{border-left-color:var(--e18_v2-1bzve6l);}

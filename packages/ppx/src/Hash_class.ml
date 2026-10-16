@@ -36,8 +36,9 @@
                   for a rule shape with no {!Slot_key.t}
                   (should not happen for a real atom - see
                   {!class_of_content})
-     bundle       `_in_<hash(cli_namespace \0 content)>`   (bundle_class_and_namespace,
-                                                             via Class_format.bundle_class)
+     group member `_a_<context?><family><mask?><hash(cli_namespace \0 seed \0 content)>`
+                  (group_class_and_namespace: an atom of a group that shares
+                  one interpolation variable, see its doc)
      namespace    `css-<hash(content)>`                    (namespace_of_content)
                   NOT the class name (see "Class vs. namespace prefixes"
                   below) - the same, UN-salted hash input, but its own
@@ -56,8 +57,8 @@
    `library-name` cookie - see [Settings.Get.namespace]), empty when
    neither is present; {!salted_content} folds it ahead of [content] only
    when non-empty, so it is never a distinguishing input for the class
-   OR bundle hash when absent (byte-identical to before this salt
-   existed). It salts the CLASS/BUNDLE half of an atom only, never the
+   OR group hash when absent (byte-identical to before this salt
+   existed). It salts the CLASS half of an atom only, never the
    `var(--...)` [namespace] row above, never `_k_`/`label:` - see the
    atomic invariant below for why the variable stays un-salted.
 
@@ -188,12 +189,8 @@ let salted_content namespace content =
    shape match matters; salting only the class half, never the [Slot_key]
    derivation, is what keeps context/family/mask keyed on structure alone).
 
-   [slot.bundle] is always [false] here (see {!Slot_key.t.bundle}'s doc):
-   this function is [Css_file.re]'s NON-bundle path - a genuine, two-or-more
-   -declaration bundle mints its class directly via {!bundle_class_and_namespace}
-   below, never through this function or [Slot_key] at all - so
-   [Class_format.slot_class] always takes its real, structural encoding
-   here, never its [_in_] branch. *)
+   A member of a group of atoms that share one variable uses
+   {!group_class_and_namespace} below instead. *)
 let class_and_namespace ~namespace ~slot content =
   let var_namespace = namespace_of_content content in
   let salted = salted_content namespace content in
@@ -204,24 +201,30 @@ let class_and_namespace ~namespace ~slot content =
   in
   class_name, var_namespace
 
-(* Same shape as [class_and_namespace] (a [(class_name, namespace)] pair
-   from one content hash), for [Css_file.re]'s bundle path specifically: the
-   CLASS half gets the [_in_] prefix (see [Class_format.bundle_class]),
-   hashed from the flag/cookie-salted content (see {!salted_content}, same
-   salt [class_and_namespace] applies) so `generate`'s atom-class collision
-   check can recognize a bundle atom and treat it as opaque - never
-   dropped, never dropping another atom, never flagged as a collision even
-   though several different declarations from one binding share it by
-   design. The NAMESPACE half is deliberately UN-salted (still
-   [namespace_of_content] on the raw [content], `css-<hash>`) - it seeds
-   every interpolation variable's name (see the header's "atomic
-   invariant"), and salting it would rename every existing bundle's
-   `var(--...)` custom properties whenever `--namespace` changed, for no
-   reason; only the class's own presentation needed the salt, not the
-   content-hash input every variable name is still a pure function of. *)
-let bundle_class_and_namespace ~namespace content =
-  ( Class_format.bundle_class (salted_content namespace content),
-    namespace_of_content content )
+(* Same shape as [class_and_namespace], for a member of a group of atoms that
+   share one interpolation variable (see [Css_file.re]'s grouping of
+   interpolating declarations that name the same `$(path)`). [seed] is the
+   concatenated rendered content of every member of the group, in source
+   order, so it does not depend on any other declaration of the block.
+   - The NAMESPACE (the seed of the group's variable names) is
+     [namespace_of_content seed]: every member reads the same variable, and
+     one inline custom property per path sets it. It is un-salted, like every
+     namespace (see [class_and_namespace]).
+   - The CLASS is the member's ordinary slot-keyed atom class (context,
+     family, mask, as for a static atom, so [CSS.merge] sees it like any
+     other atom) with its value field hashed from [seed] and [content]
+     together, flag/cookie-salted. The body of the rule names the group's
+     variable, so two members of two different groups with the same
+     [content] must not share a class: the atomic invariant (one class, one
+     exact body) holds through the seed. *)
+let group_class_and_namespace ~namespace ~slot ~seed content =
+  let salted = salted_content namespace (nul_join [ seed; content ]) in
+  let class_name =
+    match slot with
+    | Some (s : Slot_key.t) -> Class_format.slot_class s salted
+    | None -> class_of_content salted
+  in
+  class_name, namespace_of_content seed
 
 (* -- Interpolation variables ------------------------------------------- *)
 

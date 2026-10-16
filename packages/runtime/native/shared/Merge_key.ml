@@ -13,9 +13,7 @@
    removal is not possible, the later atom's class is swapped for a twin that
    [packages/generate] gives a higher specificity.
 
-   This is the single rule [Slot_key.removes] defines, minus the [bundle]
-   short-circuit (an [_in_] token never reaches {!parse_atom}'s callers in
-   the first place - see [merge_class_names] below).
+   This is the single rule [Slot_key.removes] defines.
 
    Why this duplicates [Class_format]'s widths instead of depending on it:
    this module ships in the melange runtime bundle (real browser JS).
@@ -85,7 +83,7 @@ let base36_value s =
    -prefixed, or [_a_]-prefixed but not one of the six lengths
    [Class_format.possible_extra_lengths] makes possible (a stray class
    this pipeline never minted). Either way, the caller treats it as
-   opaque and passes it through untouched, same as an [_in_]/[_id_]/
+   opaque and passes it through untouched, same as an [_id_]/
    [label:...] token. *)
 (* Which optional fields [extra] chars beyond the family+value floor
    implies - the six values [Class_format.possible_extra_lengths]
@@ -173,8 +171,7 @@ let mask_subset a b =
   | Some _, None -> true
   | Some ma, Some mb -> ma land mb = ma
 
-(* [removes ~former ~latter]: mirrors [Slot_key.removes] exactly (minus
-   the bundle check, already handled by the caller) - same context, or a
+(* [removes ~former ~latter]: mirrors [Slot_key.removes] exactly - same context, or a
    [latter] in the base context over a [former] whose context is at-rules
    alone (it overrides [former]'s [@media]/[@container] values on the same
    element; selector and [!important] contexts stay, a conditional [latter]
@@ -293,12 +290,10 @@ let split_tokens s =
 
 (* [merge_class_names former latter]: [former]'s tokens survive unless a
    token is a parseable [_a_] atom that some [latter] atom [removes]. Every
-   other token - [_in_] bundles, [_id_] identities, `label:<binding>`
-   markers, and any class this module fails to parse - is kept
-   unconditionally, on both sides, in its original relative order (bundles
-   and identities are never dropped and never drop anything, by
-   [Slot_key.removes]'s own contract; an unparseable class is not this
-   module's concern to police). [latter]'s tokens are never dropped -
+   other token - [_id_] identities, `label:<binding>` markers, and any class
+   this module fails to parse - is kept unconditionally, on both sides, in
+   its original relative order (identities are never dropped and never drop
+   anything; an unparseable class is not this module's concern to police). [latter]'s tokens are never dropped -
    [CSS.merge]'s right argument always wins outright. *)
 let merge_class_names former latter =
   let former_tokens = split_tokens former in

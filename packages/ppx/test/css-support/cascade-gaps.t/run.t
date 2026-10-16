@@ -61,10 +61,10 @@ specificity), so read the `result` line together with the sheet.
   G06 b style: --g06_b_v1-1mo9n5b:162px
   G06 result: label:g06_a _id_cocjkr _a_0p2f094gldf label:g06_b _id_1osqhf3 _t1_94008c1lf
   G06 result style: --g06_b_v1-1mo9n5b:162px
-  G07 a: label:g07_a _id_22o0f1 _in_17owvxb
+  G07 a: label:g07_a _id_22o0f1 _a_940080hkb _a_0p2f094008vsfb
   G07 a style: --g07_a_v1-1n6gf7y:171px
   G07 b: label:g07_b _id_4yzruu _a_94008eqd3
-  G07 result: label:g07_a _id_22o0f1 _in_17owvxb label:g07_b _id_4yzruu _a_94008eqd3
+  G07 result: label:g07_a _id_22o0f1 label:g07_b _id_4yzruu _a_94008eqd3
   G07 result style: --g07_a_v1-1n6gf7y:171px
   G08 a: label:g08_a _id_ghrac4 _a_0p2f094m3ut
   G08 a style: --g08_a_v1-g0aivi:181px
@@ -72,20 +72,20 @@ specificity), so read the `result` line together with the sheet.
   G08 result: label:g08_a _id_ghrac4 label:g08_b _id_a9w0uv _a_94ep5r
   G08 result style: --g08_a_v1-g0aivi:181px
   G09 a: label:g09_a _id_3jliw _a_94008sawn
-  G09 b: label:g09_b _id_crbk5 _in_1adrker
+  G09 b: label:g09_b _id_crbk5 _a_94008r2f4 _a_0p2f0940088ker
   G09 b style: --g09_b_v1-1lh50ku:192px
-  G09 result: label:g09_a _id_3jliw _a_94008sawn label:g09_b _id_crbk5 _in_1adrker
+  G09 result: label:g09_a _id_3jliw label:g09_b _id_crbk5 _a_94008r2f4 _a_0p2f0940088ker
   G09 result style: --g09_b_v1-1lh50ku:192px
-  G10 a: label:g10_a _id_9jyret _in_85rpxf
+  G10 a: label:g10_a _id_9jyret _a_94008dzkr _a_0p2f0940084z1u
   G10 a style: --g10_a_v1-azo504:201px
   G10 b: label:g10_b _id_v2ts67 _a_0p2f094008xv6u
-  G10 result: label:g10_a _id_9jyret _in_85rpxf label:g10_b _id_v2ts67 _a_0p2f094008xv6u
+  G10 result: label:g10_a _id_9jyret _a_94008dzkr label:g10_b _id_v2ts67 _a_0p2f094008xv6u
   G10 result style: --g10_a_v1-azo504:201px
-  G11 a: label:g11_a _id_1kz82nw _in_193brsh
+  G11 a: label:g11_a _id_1kz82nw _a_9400892i9 _a_0p2f094008wydr
   G11 a style: --g11_a_v1-evlpt3:211px
-  G11 b: label:g11_b _id_1v2b23j _in_lovnlp
+  G11 b: label:g11_b _id_1v2b23j _a_94008bdfy _a_0p2f094008qnp2
   G11 b style: --g11_b_v1-15hdob5:212px
-  G11 result: label:g11_a _id_1kz82nw _in_193brsh label:g11_b _id_1v2b23j _in_lovnlp
+  G11 result: label:g11_a _id_1kz82nw label:g11_b _id_1v2b23j _a_94008bdfy _a_0p2f094008qnp2
   G11 result style: --g11_a_v1-evlpt3:211px;--g11_b_v1-15hdob5:212px
   G12 a: label:g12_a _id_ok0wbn _a_cusig4exlm3
   G12 b: label:g12_b _id_15ljxw9 _a_s19nz4epz1m
@@ -254,13 +254,13 @@ its classes are the ones printed above:
   ._a_94008sqfx,._t1_94008sqfx:not(x-),._t2_94008sqfx:not(x-):not(x-){padding-top:145px;}
   ._a_94008hwvz,._t1_94008hwvz:not(x-),._t2_94008hwvz:not(x-):not(x-){padding-top:151px;}
   ._a_94008c1lf,._t1_94008c1lf:not(x-),._t2_94008c1lf:not(x-):not(x-){padding-top:var(--g06_b_v1-1mo9n5b);}
-  ._in_17owvxb{padding-top:var(--g07_a_v1-1n6gf7y);}
+  ._a_940080hkb,._t1_940080hkb:not(x-),._t2_940080hkb:not(x-):not(x-){padding-top:var(--g07_a_v1-1n6gf7y);}
   ._a_94008eqd3,._t1_94008eqd3:not(x-),._t2_94008eqd3:not(x-):not(x-){padding-top:172px;}
   ._a_94008sawn,._t1_94008sawn:not(x-),._t2_94008sawn:not(x-):not(x-){padding-top:191px;}
-  ._in_1adrker{padding-top:var(--g09_b_v1-1lh50ku);}
-  ._in_85rpxf{padding-top:var(--g10_a_v1-azo504);}
-  ._in_193brsh{padding-top:var(--g11_a_v1-evlpt3);}
-  ._in_lovnlp{padding-top:var(--g11_b_v1-15hdob5);}
+  ._a_94008r2f4,._t1_94008r2f4:not(x-),._t2_94008r2f4:not(x-):not(x-){padding-top:var(--g09_b_v1-1lh50ku);}
+  ._a_94008dzkr,._t1_94008dzkr:not(x-),._t2_94008dzkr:not(x-):not(x-){padding-top:var(--g10_a_v1-azo504);}
+  ._a_9400892i9,._t1_9400892i9:not(x-),._t2_9400892i9:not(x-):not(x-){padding-top:var(--g11_a_v1-evlpt3);}
+  ._a_94008bdfy,._t1_94008bdfy:not(x-),._t2_94008bdfy:not(x-):not(x-){padding-top:var(--g11_b_v1-15hdob5);}
   ._a_94008wnds,._t1_94008wnds:not(x-),._t2_94008wnds:not(x-):not(x-){padding-top:262px;}
   ._a_7p0021u47,._t1_7p0021u47:not(x-),._t2_7p0021u47:not(x-):not(x-){margin-left:272px;}
   ._a_7p002ikad,._t1_7p002ikad:not(x-),._t2_7p002ikad:not(x-):not(x-){margin-left:282px;}
@@ -330,12 +330,12 @@ its classes are the ones printed above:
   ._a_qyw7u94008frph:hover,._t1_qyw7u94008frph:not(x-):hover,._t2_qyw7u94008frph:not(x-):not(x-):hover{padding-top:442px;}
   @supports (display: grid) {@media (max-width: 1200px) {._a_0kk4l7p002mm7n,._t1_0kk4l7p002mm7n:not(x-),._t2_0kk4l7p002mm7n:not(x-):not(x-){margin-left:291px;}}}
   @supports (display: grid) {@media (max-width: 1200px) {._a_0kk4l7p0020z0w,._t1_0kk4l7p0020z0w:not(x-),._t2_0kk4l7p0020z0w:not(x-):not(x-){margin-left:292px;}}}
-  @media (max-width: 1200px) {._in_17owvxb{padding-top:var(--g07_a_v1-1n6gf7y);}}
-  @media (max-width: 1200px) {._in_1adrker{padding-top:var(--g09_b_v1-1lh50ku);}}
-  @media (max-width: 1200px) {._in_85rpxf{padding-top:var(--g10_a_v1-azo504);}}
+  @media (max-width: 1200px) {._a_0p2f094008vsfb,._t1_0p2f094008vsfb:not(x-),._t2_0p2f094008vsfb:not(x-):not(x-){padding-top:var(--g07_a_v1-1n6gf7y);}}
+  @media (max-width: 1200px) {._a_0p2f0940088ker,._t1_0p2f0940088ker:not(x-),._t2_0p2f0940088ker:not(x-):not(x-){padding-top:var(--g09_b_v1-1lh50ku);}}
+  @media (max-width: 1200px) {._a_0p2f0940084z1u,._t1_0p2f0940084z1u:not(x-),._t2_0p2f0940084z1u:not(x-):not(x-){padding-top:var(--g10_a_v1-azo504);}}
   @media (max-width: 1200px) {._a_0p2f094008xv6u,._t1_0p2f094008xv6u:not(x-),._t2_0p2f094008xv6u:not(x-):not(x-){padding-top:202px;}}
-  @media (max-width: 1200px) {._in_193brsh{padding-top:var(--g11_a_v1-evlpt3);}}
-  @media (max-width: 1200px) {._in_lovnlp{padding-top:var(--g11_b_v1-15hdob5);}}
+  @media (max-width: 1200px) {._a_0p2f094008wydr,._t1_0p2f094008wydr:not(x-),._t2_0p2f094008wydr:not(x-):not(x-){padding-top:var(--g11_a_v1-evlpt3);}}
+  @media (max-width: 1200px) {._a_0p2f094008qnp2,._t1_0p2f094008qnp2:not(x-),._t2_0p2f094008qnp2:not(x-):not(x-){padding-top:var(--g11_b_v1-15hdob5);}}
   @media (max-width: 1200px) {@container app-main (max-width: 1000px) {._a_0bwi47p002qdre,._t1_0bwi47p002qdre:not(x-),._t2_0bwi47p002qdre:not(x-):not(x-){margin-left:271px;}}}
   @media (max-width: 1200px) {@container app-main (max-width: 1000px) {._a_0bwi47p0028h0m,._t1_0bwi47p0028h0m:not(x-),._t2_0bwi47p0028h0m:not(x-):not(x-){margin-left:281px;}}}
   @media (max-width: 1200px) {._a_0p2f07p0023nxv,._t1_0p2f07p0023nxv:not(x-),._t2_0p2f07p0023nxv:not(x-):not(x-){margin-left:301px;}}

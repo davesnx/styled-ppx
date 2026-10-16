@@ -92,7 +92,7 @@ let a = <div styles=(CSS.merge button danger) /> (* red - danger is the right ar
 let b = <div styles=(CSS.merge danger button) /> (* gray - button is the right argument *)
 ```
 
-The rule, its worked examples, and its known limits (a lone longhand can't drop an earlier shorthand; `!important` always keeps both sides; interpolation bundles and `$(binding)` identities are never dropped) are in the repository's `documents/how-merging-works.md`. Argument order is what decides - not which `[%css]` block appears first in your source, and not which module compiles first.
+The rule, its worked examples, and its known limits (a lone longhand can't drop an earlier shorthand; `!important` always keeps both sides; `$(binding)` identities are never dropped) are in the repository's `documents/how-merging-works.md`. Argument order is what decides - not which `[%css]` block appears first in your source, and not which module compiles first.
 
 ### Patterns
 
