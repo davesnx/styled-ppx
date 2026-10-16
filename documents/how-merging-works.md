@@ -301,7 +301,12 @@ The rewrite changes the printed rule and the class name, not what
 So `CSS.merge(a, b)` still drops `a`'s `@media (min-width: 600px)` atom
 when `b` sets the same property under the same written condition, even if
 `b`'s own block rewrote that condition
-(`packages/runtime/test/media-merge-context.t`).
+(`packages/runtime/test/media-merge-context.t`). This holds at every level of
+nesting: for `@media (min-width: 100px) { @media (max-width: 1200px) { ... }
+@media (max-width: 900px) { ... } }` the first inner atom keeps the key of the
+unrewritten `(min-width: 100px)` / `(max-width: 1200px)` pair, so it drops an
+earlier atom written that way (`packages/ppx/test/css-support/cascade-remaining.t`,
+R09).
 
 ## Several libraries on one page
 

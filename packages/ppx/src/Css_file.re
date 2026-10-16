@@ -1743,6 +1743,19 @@ module Css_transform = {
       };
     };
 
+    /* The same atom with the ORIGINAL (pre-rewrite) preludes of every
+       at-rule around it, keyed by the physical identity of the rewritten
+       rule `extract_atomic_rules_from_block` returns. The context key must
+       not see a sibling `@media` rewrite at any nesting level, not only the
+       outermost one; each level wraps the rewritten inner rule, so the
+       original is carried here. An atom with no at-rule has no entry. */
+    let original_rules: ref(list((rule, rule))) = ref([]);
+    let original_of = (rule: rule) =>
+      switch (List.assq_opt(rule, original_rules^)) {
+      | Some(original) => original
+      | None => rule
+      };
+
     /* Atomize one block's rules: same-family declarations group into a
        single atom (see `group_declarations_by_family`); everything
        else atomizes rule by rule. */
@@ -1902,10 +1915,13 @@ module Css_transform = {
                    At_rule({
                      name: (name, name_loc),
                      prelude,
-                     block: Rule_list(([inner_rule], rule_loc)),
+                     block:
+                       Rule_list(([original_of(inner_rule)], rule_loc)),
                      loc,
                    }),
                  );
+               original_rules :=
+                 [(wrapped, context_source), ...original_rules^];
                let (new_className, new_namespace) =
                  Hash_class.class_and_namespace(
                    ~namespace=Settings.Get.namespace(),
