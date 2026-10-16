@@ -226,6 +226,16 @@ type t = {
         to exercise that exemption; nothing in the real pipeline does). *)
 }
 
+(** Put the chain of [@supports]/[@media]/[@container] wrappers around one atom
+    in one fixed order (that rank, then prelude text), so the two spellings of
+    the same conjunction (`@media X { @supports Y {..} }` and
+    `@supports Y { @media X {..} }`) give one rule text and so one class name.
+    Other at-rules (`@starting-style`) are not reordered; they split the chain
+    into runs that are sorted on their own. Only a chain of single-child
+    at-rules ending in the atom is touched. *)
+val canonical_nesting :
+  Styled_ppx_css_parser.Ast.rule -> Styled_ppx_css_parser.Ast.rule
+
 (** Build the slot key for one atomized rule, exactly as [Css_file.re]'s
     [atomize_rules] produces it today: a bare [Declaration], a same-property
     [Declaration] group wrapped in a [&]-only [Style_rule], an atom wrapped in a

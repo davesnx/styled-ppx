@@ -34,6 +34,14 @@ it sets. `merge(a, b)` drops a class of `a` when a class of `b` has the
 longhand** the `a` class sets. Nothing else changes: `CSS.styles` still
 carries both class name lists and both custom-property values.
 
+Nested `@supports`, `@media` and `@container` count as one condition that
+holds when all of them hold, so their written order does not matter:
+`@media (...) { @supports (...) { ... } }` and
+`@supports (...) { @media (...) { ... } }` are the same context, and the
+generated rule always nests them in the order `@supports`, `@media`,
+`@container` (two of the same kind in the order of their text).
+`@starting-style` is not reordered.
+
 There is one exception to "same context". When `b`'s declaration is
 unconditional (base context: no `@media`/`@supports`/`@container`, no
 selector, not `!important`), it also drops `a`'s atoms of the same
