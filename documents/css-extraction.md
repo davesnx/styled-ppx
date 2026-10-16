@@ -992,6 +992,12 @@ conjunction therefore give one rule text and one class name, so
 at-rules (`@starting-style`) keep their place and split the chain into runs
 that are sorted separately.
 
+Inside one block, `transform_rule_list` applies the same rule right after
+atomization: an atom under at-rules alone is not minted when a LATER base
+atom of the block satisfies `Slot_key.removes` against it. Atoms that
+interpolate `$(...)` are skipped. A box shorthand under the at-rule is
+already split per longhand, so a later base longhand drops only its own side.
+
 One exception to "same context": a `b` atom in the BASE context (the
 context hash is empty) also drops an `a` atom whose context is at-rules
 alone (first context character `0`, `Slot_key.context_is_at_rules_only`,

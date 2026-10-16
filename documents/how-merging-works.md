@@ -50,6 +50,12 @@ element in every state, so an `@media` value of `a` for it would
 otherwise still win while the condition holds. A selector context
 (`:hover`, `& .child`, `::before`) or an `!important` context of `a` is
 not dropped: it matches other states of the element, or beats `b` anyway.
+The same holds inside one block: a base declaration written after an
+`@media`/`@supports`/`@container` one for the same longhands drops the
+earlier one (`@media (...) { padding-top: 8px; } padding: 0;` keeps only
+`padding: 0`), and written before it does not (`padding: 0; @media (...)
+{ padding-top: 8px; }` keeps both). A declaration that interpolates `$(...)`
+takes no part in this.
 The reverse never happens: a conditional `b` does not drop a base `a`,
 since `a` still applies when the condition is false.
 
