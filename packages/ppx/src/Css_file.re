@@ -152,8 +152,8 @@ module Css_transform = {
      shape `component_value_has_interpolation` does (into `Paren_block`,
      `Bracket_block`, `Function` bodies) - collecting the path string
      instead of stopping at a bool. Used to decide which of a block's
-     interpolating declarations must SHARE a bundle (see
-     `transform_rule_list`'s bundle grouping below): two declarations that
+     interpolating declarations must SHARE a variable group (see
+     `transform_rule_list`'s grouping below): two declarations that
      interpolate the same path need one variable between them; two that
      interpolate different, unrelated paths do not. */
   let rec component_value_interpolation_paths = (cv: component_value) =>
@@ -210,8 +210,9 @@ module Css_transform = {
     };
 
   /* True when the atom's declaration interpolates a runtime value. Such atoms
-     are bundled (one shared class + var namespace) rather than atomized, so the
-     same value across base/`:hover`/`@media` collapses to one custom property. */
+     may share a variable namespace with the others that interpolate the same
+     path, so the same value across base/`:hover`/`@media` collapses to one
+     custom property. */
   let atom_has_value_interpolation = (rule: rule): bool =>
     switch (atom_declaration(rule)) {
     | Some(decl) => declaration_has_value_interpolation(decl)
@@ -1717,7 +1718,7 @@ module Css_transform = {
         ~media_rewrites: Media_rewrite_table.t(component_value_list),
         rules: list(rule),
       )
-      : list((string, string, rule)) => {
+      : (list((string, string, rule)), rule => rule) => {
     /* Merge a child selector-list prelude under a parent selector-list prelude.
        For each (parent, child) pair, run `compute_new_prefix` so `&`,
        `::pseudo`, and descendant combinators all resolve correctly. The
@@ -2048,7 +2049,10 @@ module Css_transform = {
       };
     };
 
-    extract_atomic_rules_from_block(~parent_prelude=?None, rules);
+    (
+      extract_atomic_rules_from_block(~parent_prelude=?None, rules),
+      original_of,
+    );
   };
 
   /* Lower a single atom into its concrete CSS rules, resolving `&` /
@@ -2126,7 +2130,7 @@ module Css_transform = {
     let media_rewrites: Media_rewrite_table.t(component_value_list) =
       Media_rewrite_table.create(8);
     rewrite_media_conditions(media_rewrites, selector_resolved_rules);
-    let all_atomic_rules =
+    let (all_atomic_rules, original_of) =
       atomize_rules(
         ~source_position_start,
         ~media_rewrites,
@@ -2136,15 +2140,13 @@ module Css_transform = {
        at-rules alone for the same longhands, exactly as `CSS.merge(a, b)`
        does for two blocks (`Slot_key.removes`): the earlier atom would
        otherwise still win while its condition holds. Its class is never
-       minted. An interpolating atom has no slot (it may become a bundle,
-       which `removes` exempts), so it neither drops nor is dropped. */
+       minted. An interpolating atom takes part like any other: it has a
+       slot, and the group variable it may share (see below) does not
+       depend on which of its members survive. */
     let atomic_rules = {
       let slots =
         all_atomic_rules
-        |> List.map(((_, _, rule)) =>
-             atom_has_value_interpolation(rule)
-               ? None : Slot_key.of_atom(rule)
-           )
+        |> List.map(((_, _, rule)) => Slot_key.of_atom(rule))
         |> Array.of_list;
       all_atomic_rules
       |> List.mapi((i, atom) => (i, atom))
@@ -2179,29 +2181,28 @@ module Css_transform = {
        anything - one variable, one inline custom property for that value
        across base/`:hover`/`@media` (see Hash_class.ml). Two atoms that
        merely both happen to interpolate, but different, unrelated paths,
-       do not: `color: $(a); background-color: $(b);` used to force both
-       into one bundle for no reason neither value needed.
+       do not: `color: $(a); background-color: $(b);` share nothing.
 
        Grouped by shared path with union-find - same technique
        `group_declarations_by_family` already uses for leaf overlap,
        transitively: an atom interpolating two paths (`border: $(a) solid
        $(b);`) bridges both into one group, same reasoning a declaration
-       bridging two leaf sets does there. A group of exactly one atom is
-       not a bundle at all: it already got a real, structural slot-keyed
-       class from `atomize_rules` above (via `Hash_class.class_and_namespace`
-       / `Slot_key.of_atom`, same path a static atom uses), so it merges
-       normally like any other atom - `CSS.merge` only stays blind to an
-       atom that genuinely shares its class with an unrelated sibling, not
-       to every interpolated declaration on principle. A group of two or
-       more gets today's bundle mechanism (class `in-<B>`/var namespace
-       `css-<B>` - same bundle content hash, different literal prefix, see
-       Hash_class.ml's "Prefix rename"), scoped to that group's own members
-       only, so a block can now mint more than one independent bundle.
+       bridging two leaf sets does there. A group of exactly one atom keeps
+       the structural slot-keyed class `atomize_rules` gave it (via
+       `Hash_class.class_and_namespace` / `Slot_key.of_atom`, same path a
+       static atom uses). In a group of two or more every member is still an
+       ordinary slot-keyed atom of its own, so `CSS.merge` and the twin treat
+       it like any other atom, but its class value is hashed together with the
+       group seed (the rendered members) and its variable namespace is the
+       group's (`css-<hash(seed)>`): one variable and one inline custom
+       property per path, and one class still means one exact body (the body
+       names the group variable). The seed holds the members only, so
+       changing another declaration of the block changes neither the seed,
+       nor the variable, nor a member's class.
 
        Static declarations keep their own per-content atom class (still
        shared across blocks). A block with no interpolation, or where no
-       two interpolating atoms share a path, mints no bundle at all and is
-       byte-for-byte identical to the pre-bundle output. */
+       two interpolating atoms share a path, is unaffected. */
     let interpolating_atoms =
       atomic_rules
       |> List.mapi((i, atom) => (i, atom))
@@ -2252,9 +2253,10 @@ module Css_transform = {
       | None => Hashtbl.add(members_by_root, root, ref([i]))
       };
     };
-    /* Only a root with 2+ members mints a bundle; a singleton root's atom
-       keeps the real class `atomic_rules` already gave it (no entry here). */
-    let bundle_by_atomic_index: Hashtbl.t(int, (string, string)) =
+    /* Only a root with 2+ members mints group classes; a singleton root's
+       atom keeps the real class `atomic_rules` already gave it (no entry
+       here). */
+    let group_by_atomic_index: Hashtbl.t(int, (string, string)) =
       Hashtbl.create(8);
     Hashtbl.iter(
       (_root, members) =>
@@ -2268,18 +2270,21 @@ module Css_transform = {
                  let (_atomic_index, (_cn, _ns, rule)) = interpolating_atoms[k];
                  render_rule(rule);
                });
-          let bundle_class_and_namespace =
-            Hash_class.bundle_class_and_namespace(
-              ~namespace=Settings.Get.namespace(),
-              String.concat("", seeds),
-            );
+          let seed = String.concat("", seeds);
           List.iter(
             k => {
-              let (atomic_index, _) = interpolating_atoms[k];
+              let (atomic_index, (_cn, _ns, rule)) = interpolating_atoms[k];
+              /* The slot comes from the ORIGINAL preludes, as for every atom
+                 (see `original_of`). */
               Hashtbl.replace(
-                bundle_by_atomic_index,
+                group_by_atomic_index,
                 atomic_index,
-                bundle_class_and_namespace,
+                Hash_class.group_class_and_namespace(
+                  ~namespace=Settings.Get.namespace(),
+                  ~slot=Slot_key.of_atom(original_of(rule)),
+                  ~seed,
+                  render_rule(rule),
+                ),
               );
             },
             member_positions,
@@ -2297,11 +2302,11 @@ module Css_transform = {
              (i, (className, var_namespace, rule)),
            ) => {
              let (effective_class, effective_namespace, dedup_key) =
-               switch (Hashtbl.find_opt(bundle_by_atomic_index, i)) {
-               | Some((bundle_class, bundle_namespace)) => (
-                   bundle_class,
-                   bundle_namespace,
-                   None /* content-keyed: many bundle rules share one class */,
+               switch (Hashtbl.find_opt(group_by_atomic_index, i)) {
+               | Some((group_class, group_namespace)) => (
+                   group_class,
+                   group_namespace,
+                   Some(group_class),
                  )
                | None => (className, var_namespace, Some(className))
                };
@@ -2426,9 +2431,7 @@ let push =
     );
 
   /* Ship every rule, deduped by its key. Static atoms key by class name (class
-     and content are 1:1). Bundle rules carry `None` and key by rendered content,
-     since many share one bundle class and class-name keying would drop all but
-     the first. */
+     and content are 1:1). A rule with no key is keyed by its rendered content. */
   List.iter(
     ((dedup_key, rule)) => {
       let rendered_css = render_prefixed_rule(rule);

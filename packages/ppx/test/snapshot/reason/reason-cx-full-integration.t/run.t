@@ -12,12 +12,12 @@
   [@@@css "._a_5r08qs{display:flex;}"]
   [@@@css "._a_9h0002ndxa{justify-content:center;}"]
   [@@@css "._a_4esjgz{color:var(--color-1a279q8);}"]
-  [@@@css "._in_15a4g54{margin-block:var(--spacing-y96o3b);}"]
-  [@@@css "._in_15a4g54{margin-inline:var(--spacing-vh5lkd);}"]
-  [@@@css "._in_15a4g54{padding-block-start:var(--spacing-f3qjr);}"]
+  [@@@css "._a_7q6ur1{margin-block:var(--spacing-y96o3b);}"]
+  [@@@css "._a_7rmw9s{margin-inline:var(--spacing-vh5lkd);}"]
+  [@@@css "._a_950002nzcc{padding-block-start:var(--spacing-f3qjr);}"]
   [@@@css
-    "._in_15a4g54{-webkit-padding-end:var(--spacing-f3qjr);padding-inline-end:var(--spacing-f3qjr);}"]
-  [@@@css "._in_15a4g54{inset-block-start:var(--spacing-f3qjr);}"]
+    "._a_960001rl26{-webkit-padding-end:var(--spacing-f3qjr);padding-inline-end:var(--spacing-f3qjr);}"]
+  [@@@css "._a_730002gfxq{inset-block-start:var(--spacing-f3qjr);}"]
   [@@@css "._a_qyw7u8mnfaz:hover{opacity:0.8;}"]
   [@@@css "._a_3rgzi60ffsa .child{-webkit-flex:1;-ms-flex:1;flex:1;}"]
   [@@@css "@media (max-width: 768px) {._a_0eyct5rz0a1{display:block;}}"]
@@ -50,7 +50,8 @@
   [@@@css.bindings
     [("Input.staticCss", "_id_1ctni4v", "_a_5r08qs _a_9h0002ndxa");
     ("Input.dynamicCss", "_id_71zk3w", "_a_4esjgz _a_5r08qs");
-    ("Input.logicalProps", "_id_r1294l", "_in_15a4g54");
+    ("Input.logicalProps", "_id_r1294l",
+      "_a_7q6ur1 _a_7rmw9s _a_950002nzcc _a_960001rl26 _a_730002gfxq");
     ("Input.nestedCss", "_id_apdklp",
       "_a_5r08qs _a_qyw7u8mnfaz _a_3rgzi60ffsa");
     ("Input.responsiveCss", "_id_1glbybz", "_a_5r08qs _a_0eyct5rz0a1");
@@ -71,7 +72,8 @@
     CSS.make "label:dynamicCss _id_71zk3w _a_4esjgz _a_5r08qs"
       [("--color-1a279q8", (CSS.Types.Color.toString color))]
   let logicalProps spacing =
-    CSS.make "label:logicalProps _id_r1294l _in_15a4g54"
+    CSS.make
+      "label:logicalProps _id_r1294l _a_7q6ur1 _a_7rmw9s _a_950002nzcc _a_960001rl26 _a_730002gfxq"
       [("--spacing-y96o3b", (CSS.Types.MarginBlock.toString spacing));
       ("--spacing-vh5lkd", (CSS.Types.MarginInline.toString spacing));
       ("--spacing-f3qjr", (CSS.Types.Length.toString spacing))]
@@ -154,8 +156,8 @@
   body{margin:0;font-family:system-ui, sans-serif;}
   ._a_5r08qs,._t1_5r08qs:not(x-),._t2_5r08qs:not(x-):not(x-){display:flex;}
   ._a_4esjgz,._t1_4esjgz:not(x-),._t2_4esjgz:not(x-):not(x-){color:var(--color-1a279q8);}
-  ._in_15a4g54{margin-block:var(--spacing-y96o3b);}
-  ._in_15a4g54{margin-inline:var(--spacing-vh5lkd);}
+  ._a_7q6ur1,._t1_7q6ur1:not(x-),._t2_7q6ur1:not(x-):not(x-){margin-block:var(--spacing-y96o3b);}
+  ._a_7rmw9s,._t1_7rmw9s:not(x-),._t2_7rmw9s:not(x-):not(x-){margin-inline:var(--spacing-vh5lkd);}
   ._a_3rgzi60ffsa .child,._t1_3rgzi60ffsa:not(x-) .child,._t2_3rgzi60ffsa:not(x-):not(x-) .child{-webkit-flex:1;-ms-flex:1;flex:1;}
   ._a_5ixlc60vle1 .item,._t1_5ixlc60vle1:not(x-) .item,._t2_5ixlc60vle1:not(x-):not(x-) .item{-webkit-flex:1;-ms-flex:1;flex:1;}
   ._a_5rj0h8,._t1_5rj0h8:not(x-),._t2_5rj0h8:not(x-):not(x-){display:grid;}
@@ -164,9 +166,9 @@
   ._a_6f10y9,._t1_6f10y9:not(x-),._t2_6f10y9:not(x-):not(x-){gap:20px;}
   ._a_aajuhq,._t1_aajuhq:not(x-),._t2_aajuhq:not(x-):not(x-){scroll-behavior:smooth;}
   ._a_9h0002ndxa,._t1_9h0002ndxa:not(x-),._t2_9h0002ndxa:not(x-):not(x-){justify-content:center;}
-  ._in_15a4g54{padding-block-start:var(--spacing-f3qjr);}
-  ._in_15a4g54{-webkit-padding-end:var(--spacing-f3qjr);padding-inline-end:var(--spacing-f3qjr);}
-  ._in_15a4g54{inset-block-start:var(--spacing-f3qjr);}
+  ._a_950002nzcc,._t1_950002nzcc:not(x-),._t2_950002nzcc:not(x-):not(x-){padding-block-start:var(--spacing-f3qjr);}
+  ._a_960001rl26,._t1_960001rl26:not(x-),._t2_960001rl26:not(x-):not(x-){-webkit-padding-end:var(--spacing-f3qjr);padding-inline-end:var(--spacing-f3qjr);}
+  ._a_730002gfxq,._t1_730002gfxq:not(x-),._t2_730002gfxq:not(x-):not(x-){inset-block-start:var(--spacing-f3qjr);}
   ._a_65000wix1i,._t1_65000wix1i:not(x-),._t2_65000wix1i:not(x-):not(x-){font-size:16px;}
   ._a_390004dlbg,._t1_390004dlbg:not(x-),._t2_390004dlbg:not(x-):not(x-){background-color:var(--secondary-12msuqq);}
   ._a_65000w61at,._t1_65000w61at:not(x-),._t2_65000w61at:not(x-):not(x-){font-size:var(--size-1tljh9b);}

@@ -20,46 +20,50 @@ Comprehensive test for cx2 interpolation with various property types
   [@css "@property --spacingVar-15s0ecx{syntax:\"*\";inherits:false;}"];
   [@css "@property --spacingVar-1m50b62{syntax:\"*\";inherits:false;}"];
   [@css "@property --width-18c1xss{syntax:\"*\";inherits:false;}"];
-  [@css "._in_b8f0pi{width:var(--lengthVar-1fwod6p);}"];
-  [@css "._in_b8f0pi{height:var(--lengthVar-5g6bk9);}"];
-  [@css "._in_b8f0pi{min-width:var(--lengthVar-1qqvx43);}"];
-  [@css "._in_b8f0pi{max-width:var(--lengthVar-11faw47);}"];
-  [@css "._in_1swajk7{margin-top:var(--lengthVar-oy21bt);}"];
-  [@css "._in_1swajk7{margin-bottom:var(--lengthVar-oy21bt);}"];
-  [@css "._in_1swajk7{padding-left:var(--lengthVar-1lpa833);}"];
-  [@css "._in_1swajk7{padding-right:var(--lengthVar-1lpa833);}"];
+  [@css "._a_ecycn1{width:var(--lengthVar-1fwod6p);}"];
+  [@css "._a_6l0uxe{height:var(--lengthVar-5g6bk9);}"];
+  [@css "._a_8c71xq{min-width:var(--lengthVar-1qqvx43);}"];
+  [@css "._a_881fz4{max-width:var(--lengthVar-11faw47);}"];
+  [@css "._a_7p00082cnj{margin-top:var(--lengthVar-oy21bt);}"];
+  [@css "._a_7p0001svkk{margin-bottom:var(--lengthVar-oy21bt);}"];
+  [@css "._a_940002wnd4{padding-left:var(--lengthVar-1lpa833);}"];
+  [@css "._a_940004e60a{padding-right:var(--lengthVar-1lpa833);}"];
   [@css
     "._a_6fvyy6{gap:var(--lengthVar-vh1osb);row-gap:var(--lengthVar-vh1osb);-webkit-column-gap:var(--lengthVar-vh1osb);column-gap:var(--lengthVar-vh1osb);}"
   ];
-  [@css "._in_1vzwmoy{color:var(--colorVar-14sye4i);}"];
-  [@css "._in_1vzwmoy{background-color:var(--colorVar-14sye4i);}"];
-  [@css "._in_1vzwmoy{border-top-color:var(--colorVar-14sye4i);}"];
+  [@css "._a_4elu6g{color:var(--colorVar-14sye4i);}"];
+  [@css "._a_390004b4vw{background-color:var(--colorVar-14sye4i);}"];
+  [@css "._a_3h0cn4pmfs{border-top-color:var(--colorVar-14sye4i);}"];
   [@css "._a_600001pa9s{flex-basis:var(--flexBasisVar-16vl5bp);}"];
-  [@css "._in_1knt7y9{grid-row-start:var(--gridLineVar-1qxvc00);}"];
-  [@css "._in_1knt7y9{grid-column-end:var(--gridLineVar-175omdk);}"];
-  [@css "._in_1d6x35p{top:var(--topVar-1iqysbe);}"];
-  [@css "._in_1d6x35p{bottom:var(--topVar-10dkp5m);}"];
+  [@css "._a_6j0008pajf{grid-row-start:var(--gridLineVar-1qxvc00);}"];
+  [@css "._a_6j0001zfv9{grid-column-end:var(--gridLineVar-175omdk);}"];
+  [@css "._a_710008nazj{top:var(--topVar-1iqysbe);}"];
+  [@css "._a_7100011us7{bottom:var(--topVar-10dkp5m);}"];
   [@css "._a_ekxgpr{z-index:var(--zIndexVar-osv02l);}"];
   [@css
     "._a_3h1lokzkxi{border-top-width:var(--borderWidthVar-1nwhzbd);border-width:var(--borderWidthVar-1nwhzbd);}"
   ];
-  [@css "._in_zoi7e9{letter-spacing:var(--spacingVar-15s0ecx);}"];
-  [@css "._in_zoi7e9{word-spacing:var(--spacingVar-1m50b62);}"];
+  [@css "._a_7id9x9{letter-spacing:var(--spacingVar-15s0ecx);}"];
+  [@css "._a_egi5r7{word-spacing:var(--spacingVar-1m50b62);}"];
   [@css "._a_eckyy8{width:var(--width-18c1xss);}"];
   [@css "._a_6lnay0{height:100px;}"];
   [@css "._a_4ekvmb{color:red;}"];
   [@css.bindings
     [
-      ("Output.test1", "_id_1jhxcqu", "_in_b8f0pi"),
-      ("Output.test2", "_id_zesghj", "_in_1swajk7"),
+      ("Output.test1", "_id_1jhxcqu", "_a_ecycn1 _a_6l0uxe _a_8c71xq _a_881fz4"),
+      (
+        "Output.test2",
+        "_id_zesghj",
+        "_a_7p00082cnj _a_7p0001svkk _a_940002wnd4 _a_940004e60a",
+      ),
       ("Output.test3", "_id_12rsoz0", "_a_6fvyy6"),
-      ("Output.test4", "_id_puktrw", "_in_1vzwmoy"),
+      ("Output.test4", "_id_puktrw", "_a_4elu6g _a_390004b4vw _a_3h0cn4pmfs"),
       ("Output.test5", "_id_1nw36ql", "_a_600001pa9s"),
-      ("Output.test6", "_id_7ivz4", "_in_1knt7y9"),
-      ("Output.test7", "_id_iq7p3", "_in_1d6x35p"),
+      ("Output.test6", "_id_7ivz4", "_a_6j0008pajf _a_6j0001zfv9"),
+      ("Output.test7", "_id_iq7p3", "_a_710008nazj _a_7100011us7"),
       ("Output.test8", "_id_yq2qob", "_a_ekxgpr"),
       ("Output.test9", "_id_1u4o5z6", "_a_3h1lokzkxi"),
-      ("Output.test10", "_id_1egwgp0", "_in_zoi7e9"),
+      ("Output.test10", "_id_1egwgp0", "_a_7id9x9 _a_egi5r7"),
       ("Output.test11", "_id_16lxxsk", "_a_eckyy8 _a_6lnay0 _a_4ekvmb"),
     ]
   ];
@@ -69,7 +73,7 @@ Comprehensive test for cx2 interpolation with various property types
   let autoVar = `auto;
   let test1 =
     CSS.make(
-      "label:test1 _id_1jhxcqu _in_b8f0pi",
+      "label:test1 _id_1jhxcqu _a_ecycn1 _a_6l0uxe _a_8c71xq _a_881fz4",
       [
         ("--lengthVar-1fwod6p", CSS.Types.Width.toString(lengthVar)),
         ("--lengthVar-5g6bk9", CSS.Types.Height.toString(lengthVar)),
@@ -79,7 +83,7 @@ Comprehensive test for cx2 interpolation with various property types
     );
   let test2 =
     CSS.make(
-      "label:test2 _id_zesghj _in_1swajk7",
+      "label:test2 _id_zesghj _a_7p00082cnj _a_7p0001svkk _a_940002wnd4 _a_940004e60a",
       [
         ("--lengthVar-oy21bt", CSS.Types.Margin.toString(lengthVar)),
         ("--lengthVar-1lpa833", CSS.Types.Length.toString(lengthVar)),
@@ -92,7 +96,7 @@ Comprehensive test for cx2 interpolation with various property types
     );
   let test4 =
     CSS.make(
-      "label:test4 _id_puktrw _in_1vzwmoy",
+      "label:test4 _id_puktrw _a_4elu6g _a_390004b4vw _a_3h0cn4pmfs",
       [("--colorVar-14sye4i", CSS.Types.Color.toString(colorVar))],
     );
   let flexBasisVar = CSS.px(100);
@@ -106,7 +110,7 @@ Comprehensive test for cx2 interpolation with various property types
   let gridLineVar = `auto;
   let test6 =
     CSS.make(
-      "label:test6 _id_7ivz4 _in_1knt7y9",
+      "label:test6 _id_7ivz4 _a_6j0008pajf _a_6j0001zfv9",
       [
         ("--gridLineVar-1qxvc00", CSS.Types.GridRowStart.toString(gridLineVar)),
         (
@@ -118,7 +122,7 @@ Comprehensive test for cx2 interpolation with various property types
   let topVar = CSS.px(20);
   let test7 =
     CSS.make(
-      "label:test7 _id_iq7p3 _in_1d6x35p",
+      "label:test7 _id_iq7p3 _a_710008nazj _a_7100011us7",
       [
         ("--topVar-1iqysbe", CSS.Types.Top.toString(topVar)),
         ("--topVar-10dkp5m", CSS.Types.Bottom.toString(topVar)),
@@ -144,7 +148,7 @@ Comprehensive test for cx2 interpolation with various property types
   let spacingVar = CSS.px(2);
   let test10 =
     CSS.make(
-      "label:test10 _id_1egwgp0 _in_zoi7e9",
+      "label:test10 _id_1egwgp0 _a_7id9x9 _a_egi5r7",
       [
         ("--spacingVar-15s0ecx", CSS.Types.LetterSpacing.toString(spacingVar)),
         ("--spacingVar-1m50b62", CSS.Types.WordSpacing.toString(spacingVar)),

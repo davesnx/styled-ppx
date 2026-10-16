@@ -208,22 +208,6 @@ type t = {
     (** [None] = the family's full mask (a plain shorthand, or any non-family
         property). [Some m] = a proper subset (a lone longhand, or a "family
         atom" mixing some-but-not-all members - see slot_key.ml's [of_atom]). *)
-  bundle : bool;
-    (** True when [Css_file.re] is treating this atom as part of a REAL bundle:
-        two or more interpolating declarations from the same block that
-        interpolate the SAME source path (transitively - see [Css_file.re]'s
-        [transform_rule_list]) sharing one class. A single interpolating
-        declaration, or one whose path no sibling declaration shares, is NOT a
-        bundle - it mints its own real, merge-participating slot-keyed class
-        instead (see [Class_format.slot_class]). {!of_atom} always returns
-        [false] here: bundle-hood depends on how many OTHER declarations in the
-        block share this atom's path, which one atom's own AST can't say, and
-        the real pipeline never needs it to say [true] either, since a genuine
-        bundle's class is minted directly by [Class_format.bundle_class],
-        bypassing this type entirely (see slot_key.ml's [of_atom] for the full
-        reasoning). {!removes} still exempts a bundle atom in both directions
-        when one is constructed with [bundle = true] by hand (a test does this
-        to exercise that exemption; nothing in the real pipeline does). *)
 }
 
 (** Put the chain of [@supports]/[@media]/[@container] wrappers around one atom
@@ -247,22 +231,19 @@ val canonical_nesting :
     handles that shape correctly today via the same multi-declaration-group path
     used for same-property groups: their combined mask is the OR of every
     declaration's own mask. Returns [None] only for a rule shape [atomize_rules]
-    never actually produces. The returned {!t.bundle} is always [false] - see
-    its own doc for why. *)
+    never actually produces. *)
 val of_atom : Styled_ppx_css_parser.Ast.rule -> t option
 
 (** [removes ~former ~latter] : true when, in a [CSS.merge] whose right argument
     is meant to override its left, [latter] should cause [former]'s class to be
     dropped from the left side.
 
-    [false] immediately if either side is a {!t.bundle} atom - bundles are
-    opaque to this decision in both directions. Otherwise: same contexts, or
-    [latter] in the base context and [former] in a context of at-rules alone (a
-    plain declaration written later overrides [former]'s [@media], [@container]
-    or [@supports] values, which target the same element; it does not touch a
-    selector context such as [:hover] or [& .child], nor an [!important] one; a
-    conditional [latter] never removes a base [former]), then if
-    [latter.family = All], [former] is removed unless its own (single,
+    Same contexts, or [latter] in the base context and [former] in a context of
+    at-rules alone (a plain declaration written later overrides [former]'s
+    [@media], [@container] or [@supports] values, which target the same element;
+    it does not touch a selector context such as [:hover] or [& .child], nor an
+    [!important] one; a conditional [latter] never removes a base [former]),
+    then if [latter.family = All], [former] is removed unless its own (single,
     non-family) property is excluded from [all] (see {!excluded_from_all} -
     carried here via [family_id]'s [UnregisteredCustom] constructor and two
     fixed [direction]/ [unicode-bidi] registry entries, never a string).

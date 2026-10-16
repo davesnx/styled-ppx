@@ -540,7 +540,7 @@ let is_namespace_statement rule =
     silently misplaced. *)
 let is_charset rule = String.starts_with ~prefix:"@charset" (String.trim rule)
 
-(** The leading `_a_`/`_in_` atom class name in a rendered rule, if any (see
+(** The leading `_a_` atom class name in a rendered rule, if any (see
     [Hash_class.slot_class] / [Class_format]). Every atom this generator emits
     opens with its own class as a leading compound-selector token, so the first
     occurrence in the rule text is always the atom's own class. Returns [None]
@@ -554,10 +554,7 @@ let atom_class_and_end rule_text =
      generate.ml cram tests fabricate raw [@@@css ...] payloads with
      hand-written names like "._a_A-y") - under-matching here would truncate
      two different class names down to the same prefix and report a false
-     collision. The two prefixes differ in length (3 vs 4), so the matched
-     prefix's own length - not a fixed constant - decides where the rest of
-     the class name starts; neither is a prefix of the other, so trying them
-     in either order is unambiguous. *)
+     collision. *)
   let is_class_char c =
     (c >= 'a' && c <= 'z')
     || (c >= 'A' && c <= 'Z')
@@ -570,20 +567,18 @@ let atom_class_and_end rule_text =
     let m = String.length prefix in
     i + m <= n && String.sub rule_text i m = prefix
   in
-  let prefixes = [ "_a_"; "_in_" ] in
+  let prefix = "_a_" in
   let rec scan i =
     if i >= n then None
     else if rule_text.[i] <> '.' then scan (i + 1)
+    else if not (has_prefix (i + 1) prefix) then scan (i + 1)
     else (
-      match List.find_opt (fun p -> has_prefix (i + 1) p) prefixes with
-      | None -> scan (i + 1)
-      | Some p ->
-        let start = i + 1 in
-        let j = ref (start + String.length p) in
-        while !j < n && is_class_char rule_text.[!j] do
-          incr j
-        done;
-        Some (String.sub rule_text start (!j - start), !j))
+      let start = i + 1 in
+      let j = ref (start + String.length prefix) in
+      while !j < n && is_class_char rule_text.[!j] do
+        incr j
+      done;
+      Some (String.sub rule_text start (!j - start), !j))
   in
   scan 0
 
@@ -601,25 +596,17 @@ let atom_class_name rule_text = Option.map fst (atom_class_and_end rule_text)
     `_id_` identity-collision check: same key, different content, is a hard
     build error naming both sides, never a silently wrong stylesheet.
 
-    An `_in_` (interpolation-bundle) class is explicitly exempt, in both
-    directions - never recorded, never compared, never flagged. [Css_file.re]'s
-    bundling already, legitimately, gives several different declarations from
-    one binding the SAME class when they all carry a [$(...)] interpolation;
-    that is not a hash collision, it is the bundling mechanism working as
-    designed. Without this exemption, `minify-interpolation.t` and the
-    `reason-cx-*` snapshot tests would report false collisions on exactly that
-    legitimate sharing. Call after [ordered_rules]'s exact-text dedup, so only
-    genuinely different rule bodies remain to compare. *)
+    Every atom has its own class, including each member of a group of
+    declarations that share one interpolation variable (its value hash covers
+    the group seed, see [Hash_class.group_class_and_namespace]), so the check
+    applies to all of them. Call after [ordered_rules]'s exact-text dedup, so
+    only genuinely different rule bodies remain to compare. *)
 let check_atom_class_collisions rules =
   let seen : (string, string) Hashtbl.t = Hashtbl.create 256 in
   List.filter_map
     (fun rule ->
       match atom_class_name rule with
       | None -> None
-      | Some class_name
-        when String.length class_name >= 4 && String.sub class_name 0 4 = "_in_"
-        ->
-        None
       | Some class_name ->
         (match Hashtbl.find_opt seen class_name with
         | Some other when other <> rule ->
@@ -853,31 +840,31 @@ let property_names_in_block block_text =
 (** One rendered rule's own shorthand depth (see [Slot_key.depth_of]): the
     MINIMUM depth over every property its own declaration(s) touch - read from
     the rendered TEXT (generate.ml never sees the ppx's AST or a [Slot_key.t]).
-    A bundle or family-atom group's several declarations can touch several
-    different properties at once (no single [Slot_key.t] could represent that -
-    see [Slot_key.t.bundle]'s doc), so there is no single "this rule's depth"
-    fact the way there is for an ordinary, single-property atom; MIN is the
-    choice that keeps the sort's guarantee correct for the SHALLOWEST
-    declaration in the rule - at the cost of not being fully correct for a rule
-    that mixes depths at all (see below). A rule with a depth-0 declaration (a
-    plain shorthand, or an ordinary leaf like "color") MUST sort no later than
+    A family-atom group's several declarations can touch several different
+    properties at once (no single [Slot_key.t] could represent that - see
+    [Slot_key.of_atom]'s doc), so there is no single "this rule's depth" fact
+    the way there is for an ordinary, single-property atom; MIN is the choice
+    that keeps the sort's guarantee correct for the SHALLOWEST declaration in
+    the rule - at the cost of not being fully correct for a rule that mixes
+    depths at all (see below). A rule with a depth-0 declaration (a plain
+    shorthand, or an ordinary leaf like "color") MUST sort no later than
     anything that could override just that one declaration through a shallower
     or equal path, regardless of what ELSE is in the same rule - using the
     group's deepest (MAX) declaration instead would let a genuinely shallow
     declaration sort too LATE, keyed off an unrelated, deeper sibling in the
-    same bundle, and end up winning a cascade fight it should have lost: a
-    bundle of `margin-top: 0;` (depth 1) + `padding: 4px;` (depth 0) sorting by
-    MAX (1) would land AFTER a `padding-top: 0;` atom (depth 1) that exists
-    specifically to override this bundle's own `padding: 4px;` - putting the
-    wide shorthand LATER than the narrow override it needs to lose to, exactly
-    backwards. MIN (0 here) keeps it sorting no later than any depth-0 rule, so
-    `padding-top: 0;` (depth 1) still lands after it and wins, same as it would
-    for a lone atom.
+    same group, and end up winning a cascade fight it should have lost: a group
+    of `margin-top: 0;` (depth 1) + `padding: 4px;` (depth 0) sorting by MAX (1)
+    would land AFTER a `padding-top: 0;` atom (depth 1) that exists specifically
+    to override this group's own `padding: 4px;` - putting the wide shorthand
+    LATER than the narrow override it needs to lose to, exactly backwards. MIN
+    (0 here) keeps it sorting no later than any depth-0 rule, so `padding-top:
+    0;` (depth 1) still lands after it and wins, same as it would for a lone
+    atom.
 
-    This is not fully correct for the OTHER declaration in that same bundle:
+    This is not fully correct for the OTHER declaration in that same group:
     `margin-top: 0;` is now keyed as if it were depth 0 too (the group's MIN),
     so a `margin: 10px;` atom elsewhere (depth 0, genuinely wider than
-    `margin-top`) is no longer guaranteed to sort before this bundle's
+    `margin-top`) is no longer guaranteed to sort before this group's
     `margin-top: 0;` the way it would if `margin-top` sorted honestly at its own
     depth 1 - a real, accepted limitation: a multi-declaration rule that mixes
     depths cannot be correctly ordered against every OTHER rule simultaneously,
@@ -933,8 +920,9 @@ let rule_depth rule_text =
     above needed a replacement for) is the invariant that removal exists for, so
     it must not be overridden by depth's narrower concern (restoring one
     binding's own shorthand-then-longhand override intent across atoms
-    `CSS.merge` can't see inside a bundle to compare directly). Rules that are
-    equally descendant-shaped (both, or neither) fall through to depth. *)
+    `CSS.merge` can't see inside a multi-declaration atom to compare directly).
+    Rules that are equally descendant-shaped (both, or neither) fall through to
+    depth. *)
 let compare_descendant_first_then_depth (is_descendant_a, depth_a, _)
   (is_descendant_b, depth_b, _) =
   if is_descendant_a <> is_descendant_b then
@@ -1228,7 +1216,7 @@ let sort_conditional_rules rules =
     [x-] matches no element. A twin therefore beats an atom with the same number
     of classes and pseudo-classes, as a later rule would, but never a rule with
     one more class-like part, such as [.a.b] or [:hover]. Rules of other classes
-    ([_in_]) are left alone. *)
+    are left alone. *)
 let twin_levels = Merge_key.max_level
 
 let is_class_char c =
@@ -1438,7 +1426,7 @@ let run ~output_file ~order input_files =
      never style rules that compete for an element either) and what does - a
      [%styled.global] style rule, ALSO never atom-classed but a real,
      cascading rule (`html{...}`, `*{...}`, `*::before{...}`, an author's own
-     global selector), is [global]; every real atom, [_a_] or [_in_] alike,
+     global selector), is [global]; every real atom, [_a_],
      is [base] or [conditional] (no separate [descendant] tier - see
      [rule_tier]'s doc for why it was removed: a descendant-shaped rule
      stays in the tier of its own context instead, and

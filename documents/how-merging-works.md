@@ -190,29 +190,36 @@ CSS.merge(plain, important);
 
 (`mismatched_importance_never_merges`, same file)
 
-**Never dropped, on either side:** an interpolation bundle (`_in_...`,
-minted when two or more of a block's declarations interpolate the SAME
-`$(name)` — typically one value reused across `base`/`:hover`/`@media`
-variants, so they share one custom property), an identity class
+**Never dropped, on either side:** an identity class
 (`_id_...`, what a `$(binding)` selector reference resolves to), a
 `label:<binding>` dev marker, and any class this pipeline didn't mint (a
 hand-written class, a third-party class passed through `className`).
 `merge` only ever inspects `_a_`-prefixed atoms; it leaves everything
 else exactly as it found it.
 
+**Declarations that share one `$(name)` are separate atoms.** When two or
+more of a block's declarations interpolate the SAME `$(name)` — typically one
+value reused across `base`/`:hover`/`@media` variants — they share one custom
+property (one inline variable), but each is still its own atom with its own
+class, context and property family, so `merge` treats each like any other atom:
+
 ```reason
 let card = accent => [%css "border-color: $(accent); &:hover { border-color: $(accent); }"];
-/* one _in_ bundle: base and :hover both interpolate the same $(accent) */
+/* two atoms: base and :hover, one shared variable for $(accent) */
 
 CSS.merge(card("gray"), [%css "border-color: green;"]);
-/* both classes stay - the plain override can't see the border-color
-   declaration hiding inside the bundle, so it can't drop just that one.
-   Which border-color applies is then decided by specificity and sheet
-   order, not by merge (see "Known limits") */
+/* the base atom is dropped (same context, same property); the :hover atom
+   stays, and while hovered it still wins by specificity (0,2,0 against
+   0,1,0), as in plain CSS. */
 ```
 
-`packages/runtime/test/test_merge_key.ml`'s `two_declaration_bundle_still_exempt`
-proves the mechanism directly against a real `_in_` class.
+`packages/runtime/test/test_merge_key.ml`'s `group_members_merge_one_by_one`
+proves the mechanism against real atom classes, and
+`packages/ppx/test/css-support/cascade-remaining.t` (R06, R07, R10) against the
+generated sheet. The class value of a member also covers the group (the
+rendered members), so one class still means one exact rule body; the group
+holds the members only, so changing another declaration of the block changes
+neither the variable nor the member classes.
 
 ## Sheet order
 
@@ -353,9 +360,6 @@ all) still depends on which one the browser loads first
   `direction`, and the compiler does not know them. Both classes stay and the
   sheet order decides. Write both with the same kind of property when one must
   override the other.
-- **Bundles get no twin.** An `_in_` bundle's class holds several properties
-  and contexts, so `merge` can neither drop nor raise one member (see
-  "Interpolation bundles").
 - **Twin cap.** A chain of more than two overlapping merges stops at level 2,
   so in a chain of four state atoms on one property (`:hover`, `:focus`,
   `:active`, `:disabled`) the last two tie and the sheet's pseudo-class rank
@@ -370,11 +374,8 @@ all) still depends on which one the browser loads first
 - **A selector context is not dropped by a base declaration.** `&:hover`,
   `& .child` and `::before` atoms of `a` stay, even with the same
   property in `b`; so does an `@media` atom under such a selector.
-- **Interpolation bundles.** `merge` never drops an `_in_` bundle, so an
-  override of a property inside a bundle is decided by specificity and
-  sheet order, not by argument order (the `card` example above).
 - **Mixed shorthand depths in one rule.** A rule combining declarations at
-  different shorthand depths (e.g. a bundle with both a `padding` and a
+  different shorthand depths (e.g. a family atom with both a `padding` and a
   `margin-top`) sorts by its SHALLOWEST declaration, so it is not
   guaranteed correct against every other rule at once
   (`packages/generate/test/shorthand-depth-stress.t`).
