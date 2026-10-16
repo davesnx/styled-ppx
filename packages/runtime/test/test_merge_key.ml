@@ -400,7 +400,11 @@ let levels_stop_at_the_cap () =
     (Printf.sprintf "%s %s %s %s" (class_of a_) (twin 1 b_) (twin 2 c_media)
        (twin 2 d_))
 
-let selector_latter_takes_the_twin_level () =
+(* A twin only breaks ties between contexts of the same kind: two plain ones
+   (base, at-rules alone) or two with a selector or [!important]. A selector
+   atom already has more class-like parts than a plain atom (and a plain twin
+   adds a type selector only), so the one with the selector wins on its own. *)
+let selector_latter_over_plain_formers_needs_no_twin () =
   let hover = "&:hover{padding-top: 4px;}" in
   let narrow = "@media (max-width:900px){padding-top: 3px;}" in
   let merged =
@@ -408,17 +412,64 @@ let selector_latter_takes_the_twin_level () =
   in
   Alcotest_extra.assert_string (CSS.className merged)
     (Printf.sprintf "%s %s %s" (class_of wide_top) (twin 1 narrow)
-       (twin 1 hover))
+       (class_of hover))
 
-let selector_former_follows_a_later_twin () =
+let selector_former_is_not_raised_by_a_later_twin () =
   let hover = "&:hover{padding-top: 4px;}" in
   let narrow = "@media (max-width:900px){padding-top: 3px;}" in
   let merged =
     CSS.merge (CSS.merge (make wide_top) (make hover)) (make narrow)
   in
   Alcotest_extra.assert_string (CSS.className merged)
-    (Printf.sprintf "%s %s %s" (class_of wide_top) (twin 1 hover)
+    (Printf.sprintf "%s %s %s" (class_of wide_top) (class_of hover)
        (twin 1 narrow))
+
+let hover = "&:hover{color: red;}"
+let focus = "&:focus{color: blue;}"
+let active = "&:active{color: green;}"
+let disabled = "&:disabled{color: black;}"
+
+let two_selector_contexts_get_twin () =
+  let merged = CSS.merge (make hover) (make disabled) in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s" (class_of hover) (twin 1 disabled))
+
+let selector_chain_reaches_the_cap () =
+  let merged =
+    CSS.merge
+      (CSS.merge (CSS.merge (make hover) (make focus)) (make active))
+      (make disabled)
+  in
+  (* [disabled] would need level 3; it stays at 2 and the sheet order
+     (pseudo-class rank) decides against [active]. *)
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s %s %s" (class_of hover) (twin 1 focus)
+       (twin 2 active) (twin 2 disabled))
+
+let descendant_selectors_get_twin () =
+  let child_a = "& .a{color: red;}" in
+  let child_b = "& .b{color: blue;}" in
+  let merged = CSS.merge (make child_a) (make child_b) in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s" (class_of child_a) (twin 1 child_b))
+
+let same_selector_with_extra_at_rule_gets_twin () =
+  let narrow_hover = "@media (max-width:900px){&:hover{color: red;}}" in
+  let merged = CSS.merge (make narrow_hover) (make hover) in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s" (class_of narrow_hover) (twin 1 hover))
+
+let important_contexts_get_twin_only_among_themselves () =
+  let wide = "@media (max-width:900px){color: red !important;}" in
+  let narrow = "@media (max-width:700px){color: blue !important;}" in
+  let plain = "color: black;" in
+  let both = CSS.merge (make wide) (make narrow) in
+  Alcotest_extra.assert_string (CSS.className both)
+    (Printf.sprintf "%s %s" (class_of wide) (twin 1 narrow));
+  (* A plain latter never beats an important former, whatever its level. *)
+  let with_plain = CSS.merge (make wide) (make plain) in
+  Alcotest_extra.assert_string (CSS.className with_plain)
+    (Printf.sprintf "%s %s" (class_of wide) (class_of plain))
 
 let removal_wins_over_twin () =
   let merged = CSS.merge (make wide_top) (make "padding-top: 2px;") in
@@ -431,6 +482,12 @@ let block_classes_follow_source_order () =
     (String.concat " " (Merge_key.twin_block tokens))
     (Printf.sprintf "%s %s" (class_of wide_padding)
        (twin 1 "padding-top: 2px;"))
+
+let selector_block_classes_follow_source_order () =
+  let tokens = [ class_of hover; class_of disabled ] in
+  Alcotest_extra.assert_string
+    (String.concat " " (Merge_key.twin_block tokens))
+    (Printf.sprintf "%s %s" (class_of hover) (twin 1 disabled))
 
 let tests =
   [
@@ -528,12 +585,24 @@ let tests =
       three_way_chain_reaches_level_two;
     Alcotest_extra.test "a fourth overlapping merge stays at _t2_ (the cap)"
       levels_stop_at_the_cap;
+    Alcotest_extra.test "a selector latter over plain formers needs no twin"
+      selector_latter_over_plain_formers_needs_no_twin;
+    Alcotest_extra.test "a selector former is not raised by a later twin"
+      selector_former_is_not_raised_by_a_later_twin;
+    Alcotest_extra.test "two selector contexts on one property get a twin"
+      two_selector_contexts_get_twin;
+    Alcotest_extra.test "a chain of four selector atoms stops at the cap"
+      selector_chain_reaches_the_cap;
+    Alcotest_extra.test "two descendant selectors on one property get a twin"
+      descendant_selectors_get_twin;
     Alcotest_extra.test
-      "a selector latter takes the twin level of the atom it must stay above"
-      selector_latter_takes_the_twin_level;
+      "the same selector with an extra at-rule in the former gets a twin"
+      same_selector_with_extra_at_rule_gets_twin;
     Alcotest_extra.test
-      "a selector former is raised when a later twin overlaps it"
-      selector_former_follows_a_later_twin;
+      "important contexts get a twin among themselves, a plain latter none"
+      important_contexts_get_twin_only_among_themselves;
+    Alcotest_extra.test "a block's selector atoms get twins in source order"
+      selector_block_classes_follow_source_order;
     Alcotest_extra.test
       "removal wins over a twin when the latter's mask covers the former's"
       removal_wins_over_twin;

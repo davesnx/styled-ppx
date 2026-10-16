@@ -57,7 +57,7 @@
     ("Input.multipleMediaQueries", "_id_4peqig",
       "_a_6500wix1i _a_0eyct6500w2zb1 _t1_0jsdf6500w7vub");
     ("Input.mediaWithSelector", "_id_1jbme7d",
-      "_a_5r08qs _a_5ixlc60vle1 _a_0eyct61001mfq6 _a_xdd5e60frkw");
+      "_a_5r08qs _a_5ixlc60vle1 _a_0eyct61001mfq6 _t1_xdd5e60frkw");
     ("Input.complexMedia", "_id_yh1q8l",
       "_a_5rj0h8 _a_0gkhj5riow9 _a_0kmu5390049mde");
     ("Input.mediaWithInterpolation", "_id_1c8phv0", "_a_4esjgz _a_0eyct8mknlj");
@@ -86,7 +86,7 @@
       []
   let mediaWithSelector =
     CSS.make
-      "label:mediaWithSelector _id_1jbme7d _a_5r08qs _a_5ixlc60vle1 _a_0eyct61001mfq6 _a_xdd5e60frkw"
+      "label:mediaWithSelector _id_1jbme7d _a_5r08qs _a_5ixlc60vle1 _a_0eyct61001mfq6 _t1_xdd5e60frkw"
       []
   let complexMedia =
     CSS.make

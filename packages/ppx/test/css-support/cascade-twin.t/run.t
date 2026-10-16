@@ -43,42 +43,42 @@ overlap with a base atom, an author selector of two classes (it must beat the tw
   G58 a: label:g58_a _id_jqbjd0 _a_0p2f094008bn02
   G58 b: label:g58_b _id_1ulzyr2 _a_0f0zo94008fg96
   G58 c: label:g58_c _id_1u5yp68 _a_qyw7u94008n8bc
-  G58 result: label:g58_a _id_jqbjd0 _a_0p2f094008bn02 label:g58_b _id_1ulzyr2 _t1_0f0zo94008fg96 label:g58_c _id_1u5yp68 _t1_qyw7u94008n8bc
+  G58 result: label:g58_a _id_jqbjd0 _a_0p2f094008bn02 label:g58_b _id_1ulzyr2 _t1_0f0zo94008fg96 label:g58_c _id_1u5yp68 _a_qyw7u94008n8bc
   G59 a: label:g59_a _id_14dhr2t _a_0p2f0940022q28
   G59 b: label:g59_b _id_1jiijm6 _a_0f0zo94qxcd
   G59 result: label:g59_a _id_14dhr2t _a_0p2f0940022q28 label:g59_b _id_1jiijm6 _t1_0f0zo94qxcd
   G60 a: label:g60_a _id_1cqlun4 _a_0p2f0940080sr9
   G60 b: label:g60_b _id_y2bmp7 _a_qyw7u940085uki
   G60 c: label:g60_c _id_1uciqbf _a_0f0zo94008biqu
-  G60 result: label:g60_a _id_1cqlun4 _a_0p2f0940080sr9 label:g60_b _id_y2bmp7 _t1_qyw7u940085uki label:g60_c _id_1uciqbf _t1_0f0zo94008biqu
+  G60 result: label:g60_a _id_1cqlun4 _a_0p2f0940080sr9 label:g60_b _id_y2bmp7 _a_qyw7u940085uki label:g60_c _id_1uciqbf _t1_0f0zo94008biqu
   G61 a: label:g61_a _id_6xyx7r _a_0p2f04edryl
-  G61 b: label:g61_b _id_c8ukp _a_qyw7u4ej85p _a_1lub34eewkq _a_mzyyh4evz20 _a_egfee4epz49 _a_wu9h64eecmo
+  G61 b: label:g61_b _id_c8ukp _a_qyw7u4ej85p _t1_1lub34eewkq _t2_mzyyh4evz20 _t2_egfee4epz49 _t2_wu9h64eecmo
   G61 c: label:g61_c _id_1f5fygi _a_0f0zo4e1mxw
-  G61 result: label:g61_a _id_6xyx7r _a_0p2f04edryl label:g61_b _id_c8ukp _t1_qyw7u4ej85p _t1_1lub34eewkq _t1_mzyyh4evz20 _t1_egfee4epz49 _t1_wu9h64eecmo label:g61_c _id_1f5fygi _t1_0f0zo4e1mxw
+  G61 result: label:g61_a _id_6xyx7r _a_0p2f04edryl label:g61_b _id_c8ukp _a_qyw7u4ej85p _t1_1lub34eewkq _t2_mzyyh4evz20 _t2_egfee4epz49 _t2_wu9h64eecmo label:g61_c _id_1f5fygi _t1_0f0zo4e1mxw
   G62 ctx g62_x: label:g62_x _id_dqage4
   G62 a: label:g62_a _id_6z55t _a_0u1th3hef5oh3i
   G62 f: label:g62_f _id_k38qjs _a_3hcn4dv9q
   G62 c: label:g62_c _id_kgtvzw _a_x4g8b3hcn4i8d6
-  G62 result: label:g62_a _id_6z55t _a_0u1th3hef5oh3i label:g62_f _id_k38qjs _t1_3hcn4dv9q label:g62_c _id_kgtvzw _t1_x4g8b3hcn4i8d6
+  G62 result: label:g62_a _id_6z55t _a_0u1th3hef5oh3i label:g62_f _id_k38qjs _t1_3hcn4dv9q label:g62_c _id_kgtvzw _a_x4g8b3hcn4i8d6
   G63 a: label:g63_a _id_1i8la4g _a_0u1th3hef59qj7
   G63 f: label:g63_f _id_71j5ic _a_3hcn47md7
   G63 c: label:g63_c _id_128nlx4 _a_5wdc33hcn4s7ob
-  G63 result: label:g63_a _id_1i8la4g _a_0u1th3hef59qj7 label:g63_f _id_71j5ic _t1_3hcn47md7 label:g63_c _id_128nlx4 _t1_5wdc33hcn4s7ob
+  G63 result: label:g63_a _id_1i8la4g _a_0u1th3hef59qj7 label:g63_f _id_71j5ic _t1_3hcn47md7 label:g63_c _id_128nlx4 _a_5wdc33hcn4s7ob
   G64 ctx g64_x: label:g64_x _id_5vv95s
   G64 a: label:g64_a _id_11xoc9 _a_0u1th3hef57eo9
   G64 f: label:g64_f _id_dherzy _a_3hcn49io8
   G64 c: label:g64_c _id_1p9hjdh _a_5uzps3hcn4k889
-  G64 result: label:g64_a _id_11xoc9 _a_0u1th3hef57eo9 label:g64_f _id_dherzy _t1_3hcn49io8 label:g64_c _id_1p9hjdh _t1_5uzps3hcn4k889
+  G64 result: label:g64_a _id_11xoc9 _a_0u1th3hef57eo9 label:g64_f _id_dherzy _t1_3hcn49io8 label:g64_c _id_1p9hjdh _a_5uzps3hcn4k889
   G65 ctx g65_x: label:g65_x _id_1oq2lzb
   G65 a: label:g65_a _id_s1un0v _a_0u1th3hef5bllm
   G65 f: label:g65_f _id_4ra6dd _a_3hcn444i4
   G65 c: label:g65_c _id_nz8k91 _a_p4tmq3hcn415a4
-  G65 result: label:g65_a _id_s1un0v _a_0u1th3hef5bllm label:g65_f _id_4ra6dd _t1_3hcn444i4 label:g65_c _id_nz8k91 _t1_p4tmq3hcn415a4
+  G65 result: label:g65_a _id_s1un0v _a_0u1th3hef5bllm label:g65_f _id_4ra6dd _t1_3hcn444i4 label:g65_c _id_nz8k91 _a_p4tmq3hcn415a4
   G66 ctx g66_x: label:g66_x _id_qxa9f2
   G66 a: label:g66_a _id_1nhjoqj _a_0u1th3hef5k7ns
   G66 f: label:g66_f _id_1av6rto _a_3hcn4lt69
   G66 c: label:g66_c _id_15rp9ze _a_k9lqp3hcn4erzc
-  G66 result: label:g66_a _id_1nhjoqj _a_0u1th3hef5k7ns label:g66_f _id_1av6rto _t1_3hcn4lt69 label:g66_c _id_15rp9ze _t1_k9lqp3hcn4erzc
+  G66 result: label:g66_a _id_1nhjoqj _a_0u1th3hef5k7ns label:g66_f _id_1av6rto _t1_3hcn4lt69 label:g66_c _id_15rp9ze _a_k9lqp3hcn4erzc
 
 The stylesheet, from the same post-PPX files the executable was built from:
 

@@ -20,6 +20,31 @@ selector, below any extra class).
   $ dune build ./input.exe
 
   $ ./_build/default/input.exe
+  R02 a: label:r02_a _id_1mpq1v2 _a_qyw7u4egzjf
+  R02 b: label:r02_b _id_66hfch _a_1lub34e0zif
+  R02 c: label:r02_c _id_1s6ivru _a_x7ow74eoyli
+  R02 d: label:r02_d _id_irlw9d _a_17qp44e8rk2
+  R02 result: label:r02_a _id_1mpq1v2 _a_qyw7u4egzjf label:r02_b _id_66hfch _t1_1lub34e0zif label:r02_c _id_1s6ivru _t2_x7ow74eoyli label:r02_d _id_irlw9d _t2_17qp44e8rk2
+  R02R a: label:r02r_a _id_cpana1 _a_17qp44et6wz
+  R02R b: label:r02r_b _id_u900ha _a_x7ow74ete35
+  R02R c: label:r02r_c _id_1j0psvg _a_1lub34e57t1
+  R02R d: label:r02r_d _id_1u99431 _a_qyw7u4e0bw5
+  R02R result: label:r02r_a _id_cpana1 _a_17qp44et6wz label:r02r_b _id_u900ha _t1_x7ow74ete35 label:r02r_c _id_1j0psvg _t2_1lub34e57t1 label:r02r_d _id_1u99431 _t2_qyw7u4e0bw5
+  R03 a: label:r03_a _id_1xuyqzm _a_rv9hg4e38cf
+  R03 b: label:r03_b _id_fuvwcz _a_qyw7u4ehbll
+  R03 result: label:r03_a _id_1xuyqzm _a_rv9hg4e38cf label:r03_b _id_fuvwcz _t1_qyw7u4ehbll
+  R04 a: label:r04_a _id_1izzli1 _a_pam9a4epp37
+  R04 b: label:r04_b _id_1v7qgjz _a_xd16w4efcf5
+  R04 result: label:r04_a _id_1izzli1 _a_pam9a4epp37 label:r04_b _id_1v7qgjz _t1_xd16w4efcf5
+  R04P a: label:r04p_a _id_1s2xwb1 _a_wj05a4etua8
+  R04P b: label:r04p_b _id_ep0ml4 _a_xmsc94efb8a
+  R04P result: label:r04p_a _id_1s2xwb1 _a_wj05a4etua8 label:r04p_b _id_ep0ml4 _t1_xmsc94efb8a
+  R05 a: label:r05_a _id_7zxxob _a_cht884et78e
+  R05 b: label:r05_b _id_17mrocn _a_qzvjj4e1m1g
+  R05 result: label:r05_a _id_7zxxob _a_cht884et78e label:r05_b _id_17mrocn _t1_qzvjj4e1m1g
+  R05P a: label:r05p_a _id_1mygf6e _a_cht884exnrr
+  R05P b: label:r05p_b _id_1mtlvwg _a_4eegxm
+  R05P result: label:r05p_a _id_1mygf6e _a_cht884exnrr label:r05p_b _id_1mtlvwg _a_4eegxm
   R08B b: label:r08b_x _id_11vll3p label:r08b_y _id_f933k4 _t1_0f0zo3hef5hu2t label:r08b_z _id_1osxcg7 _t2_3hghsj9p8
   R08C b: label:r08c_x _id_1vjizct label:r08c_y _id_149ymow _t1_0f0zo3hef5frea label:r08c_z _id_vwunfb _t2_3hghs2or6
   R08D b: label:r08d_x _id_1evo5wk _a_0p2f07pn3ge label:r08d_y _id_ts5d20 _t1_7p002uzlh
@@ -29,9 +54,27 @@ selector, below any extra class).
   .r08d-a{margin-left:821px;}
   .r08b-a.r08b-b{border-top-width:801px;}
   .r08c-a.r08c-b.r08c-c{border-top-width:811px;}
+  ._a_xd16w4efcf5 .child:hover,._t1_xd16w4efcf5:not(x-) .child:hover,._t2_xd16w4efcf5:not(x-):not(x-) .child:hover{color:rgb(42, 0, 0);}
+  ._a_pam9a4epp37 .child:focus,._t1_pam9a4epp37:not(x-) .child:focus,._t2_pam9a4epp37:not(x-):not(x-) .child:focus{color:rgb(41, 0, 0);}
+  ._a_4eegxm,._t1_4eegxm:not(x-),._t2_4eegxm:not(x-):not(x-){color:rgb(54, 0, 0);}
   ._a_3hghsj9p8,._t1_3hghsj9p8:not(x-),._t2_3hghsj9p8:not(x-):not(x-){border-top:804px dotted rgb(82, 0, 0);}
   ._a_3hghs2or6,._t1_3hghs2or6:not(x-),._t2_3hghs2or6:not(x-):not(x-){border-top:814px dotted rgb(83, 0, 0);}
   ._a_7p002uzlh,._t1_7p002uzlh:not(x-),._t2_7p002uzlh:not(x-):not(x-){margin-left:823px;}
+  ._a_17qp44e8rk2:disabled,._t1_17qp44e8rk2:not(x-):disabled,._t2_17qp44e8rk2:not(x-):not(x-):disabled{color:rgb(24, 0, 0);}
+  ._a_17qp44et6wz:disabled,._t1_17qp44et6wz:not(x-):disabled,._t2_17qp44et6wz:not(x-):not(x-):disabled{color:rgb(25, 0, 0);}
+  ._a_qyw7u4egzjf:hover,._t1_qyw7u4egzjf:not(x-):hover,._t2_qyw7u4egzjf:not(x-):not(x-):hover{color:rgb(21, 0, 0);}
+  ._a_qyw7u4e0bw5:hover,._t1_qyw7u4e0bw5:not(x-):hover,._t2_qyw7u4e0bw5:not(x-):not(x-):hover{color:rgb(28, 0, 0);}
+  ._a_qyw7u4ehbll:hover,._t1_qyw7u4ehbll:not(x-):hover,._t2_qyw7u4ehbll:not(x-):not(x-):hover{color:rgb(32, 0, 0);}
+  ._a_1lub34e0zif:focus,._t1_1lub34e0zif:not(x-):focus,._t2_1lub34e0zif:not(x-):not(x-):focus{color:rgb(22, 0, 0);}
+  ._a_1lub34e57t1:focus,._t1_1lub34e57t1:not(x-):focus,._t2_1lub34e57t1:not(x-):not(x-):focus{color:rgb(27, 0, 0);}
+  ._a_x7ow74eoyli:active,._t1_x7ow74eoyli:not(x-):active,._t2_x7ow74eoyli:not(x-):not(x-):active{color:rgb(23, 0, 0);}
+  ._a_x7ow74ete35:active,._t1_x7ow74ete35:not(x-):active,._t2_x7ow74ete35:not(x-):not(x-):active{color:rgb(26, 0, 0);}
+  ._a_rv9hg4e38cf:hover:focus,._t1_rv9hg4e38cf:not(x-):hover:focus,._t2_rv9hg4e38cf:not(x-):not(x-):hover:focus{color:rgb(31, 0, 0);}
+  ._a_xmsc94efb8a:hover::before,._t1_xmsc94efb8a:not(x-):hover::before,._t2_xmsc94efb8a:not(x-):not(x-):hover::before{color:rgb(44, 0, 0);}
+  ._a_wj05a4etua8:focus::before,._t1_wj05a4etua8:not(x-):focus::before,._t2_wj05a4etua8:not(x-):not(x-):focus::before{color:rgb(43, 0, 0);}
+  @media (max-width: 1200px) {._a_cht884et78e,._t1_cht884et78e:not(x-),._t2_cht884et78e:not(x-):not(x-){color:rgb(51, 0, 0) !important;}}
+  @media (max-width: 900px) {._a_qzvjj4e1m1g,._t1_qzvjj4e1m1g:not(x-),._t2_qzvjj4e1m1g:not(x-):not(x-){color:rgb(52, 0, 0) !important;}}
+  @media (max-width: 1200px) {._a_cht884exnrr,._t1_cht884exnrr:not(x-),._t2_cht884exnrr:not(x-):not(x-){color:rgb(53, 0, 0) !important;}}
   @media (max-width: 1200px) {._a_0p2f03hghsee3r,._t1_0p2f03hghsee3r:not(x-),._t2_0p2f03hghsee3r:not(x-):not(x-){border-top:802px solid rgb(80, 0, 0);}}
   @media (max-width: 1200px) {._a_0p2f03hghss1yf,._t1_0p2f03hghss1yf:not(x-),._t2_0p2f03hghss1yf:not(x-):not(x-){border-top:812px solid rgb(81, 0, 0);}}
   @media (max-width: 1200px) {._a_0p2f07pn3ge,._t1_0p2f07pn3ge:not(x-),._t2_0p2f07pn3ge:not(x-):not(x-){margin:822px;}}

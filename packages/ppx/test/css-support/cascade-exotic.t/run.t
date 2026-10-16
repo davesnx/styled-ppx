@@ -76,10 +76,10 @@ specificity), so read the `result` line together with the sheet.
   E12 result: label:e12_a _id_1bvzmo1 _a_71w720 label:e12_b _id_1v0fb4 _a_7100862dn
   E13 a: label:e13_a _id_1rl4bhy _a_2y6oc4eka7d
   E13 b: label:e13_b _id_1kswgxt _a_uo5714ehng9
-  E13 result: label:e13_a _id_1rl4bhy _a_2y6oc4eka7d label:e13_b _id_1kswgxt _a_uo5714ehng9
+  E13 result: label:e13_a _id_1rl4bhy _a_2y6oc4eka7d label:e13_b _id_1kswgxt _t1_uo5714ehng9
   E14 a: label:e14_a _id_l4w2s0 _a_glt2n4e9r8z
   E14 b: label:e14_b _id_1lq5nuv _a_xmsc94ee0l8
-  E14 result: label:e14_a _id_l4w2s0 _a_glt2n4e9r8z label:e14_b _id_1lq5nuv _a_xmsc94ee0l8
+  E14 result: label:e14_a _id_l4w2s0 _a_glt2n4e9r8z label:e14_b _id_1lq5nuv _t1_xmsc94ee0l8
   E15 a: label:e15_a _id_1i263tt _a_7pi834
   E15 b: label:e15_b _id_tdw72g _a_7p002ul8g
   E15 result: label:e15_a _id_1i263tt _a_7pi834 label:e15_b _id_tdw72g _a_7p002ul8g
@@ -99,7 +99,7 @@ specificity), so read the `result` line together with the sheet.
   E18 result style: --e18_v1-t1ny06:rgb(29, 0, 0);--e18_v2-1bzve6l:rgb(30, 0, 0)
   E19 a: label:e19_a _id_7plkfj _a_1lub32z008hok3
   E19 b: label:e19_b _id_taocjx _a_x7ow72z5tji
-  E19 result: label:e19_a _id_7plkfj _a_1lub32z008hok3 label:e19_b _id_taocjx _a_x7ow72z5tji
+  E19 result: label:e19_a _id_7plkfj _a_1lub32z008hok3 label:e19_b _id_taocjx _t1_x7ow72z5tji
   E20 a: label:e20_a _id_12atsww _a_2svney
   E20 b: label:e20_b _id_13rm7w3 _a_droigx
   E20 result: label:e20_a _id_12atsww _a_2svney label:e20_b _id_13rm7w3 _a_droigx
@@ -108,10 +108,10 @@ specificity), so read the `result` line together with the sheet.
   E21 result: label:e21_a _id_vw2ne _a_3h0ljd label:e21_b _id_pf7vxb _a_3hekgwqdq
   E22 a: label:e22_a _id_1ru0x3 _a_qyw7u3hlokvz7n
   E22 b: label:e22_b _id_1qzft2x _a_1lub33htomz
-  E22 result: label:e22_a _id_1ru0x3 _a_qyw7u3hlokvz7n label:e22_b _id_1qzft2x _a_1lub33htomz
+  E22 result: label:e22_a _id_1ru0x3 _a_qyw7u3hlokvz7n label:e22_b _id_1qzft2x _t1_1lub33htomz
   E23 a: label:e23_a _id_188a8wj _a_oe8sa94008llzq
   E23 b: label:e23_b _id_1446a39 _a_cht88948fkm
-  E23 result: label:e23_a _id_188a8wj _a_oe8sa94008llzq label:e23_b _id_1446a39 _a_cht88948fkm
+  E23 result: label:e23_a _id_188a8wj _a_oe8sa94008llzq label:e23_b _id_1446a39 _t1_cht88948fkm
   E24 a: label:e24_a _id_y73jiv _a_7p002d4qg
   E24 b: label:e24_b _id_hqe50r _a_7puinr
   E24 c: label:e24_c _id_426s3k _a_7p002cqrw
@@ -157,7 +157,7 @@ specificity), so read the `result` line together with the sheet.
   E42 result: label:e42_a _id_rsx84a label:e42_b _id_vtwae2 _a_8x4jlj
   E43 a: label:e43_a _id_pvzbp3 _a_qss4z7p002ywuh
   E43 b: label:e43_b _id_13e0y5i _a_vflny7p002j2yf
-  E43 result: label:e43_a _id_pvzbp3 _a_qss4z7p002ywuh label:e43_b _id_13e0y5i _a_vflny7p002j2yf
+  E43 result: label:e43_a _id_pvzbp3 _a_qss4z7p002ywuh label:e43_b _id_13e0y5i _t1_vflny7p002j2yf
   E44 result: label:e44 _id_nw31d3 _a_7p0022k5d
   E45 a: label:e45_a _id_118bvcf _a_71002ejjz
   E45 b: label:e45_b _id_15lyehp _a_74002s0x2

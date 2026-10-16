@@ -64046,18 +64046,14 @@ function surely_after(former, latter) {
 }
 function twin_level(formers, latter) {
   const conflicts = function(former) {
-    if (is_plain(former) && overlaps(former, latter)) {
+    if (is_plain(former) === is_plain(latter) && overlaps(former, latter)) {
       return !removes(former, latter);
     } else {
       return false;
     }
   };
   const needed = function(former) {
-    if (is_plain(latter)) {
-      return former.level + (surely_after(former, latter) ? 0 : 1) | 0;
-    } else {
-      return former.level;
-    }
+    return former.level + (surely_after(former, latter) ? 0 : 1) | 0;
   };
   return caml_int_min(2, fold_left5((function(level, former) {
     if (conflicts(former)) {
@@ -64070,47 +64066,22 @@ function twin_level(formers, latter) {
 function token_of(a, level) {
   return (level === 0 ? atom_prefix : twin_prefix(level)) + a.body;
 }
-function twin_former(latters, former) {
-  if (is_plain(former)) {
-    return former.level;
-  } else {
-    return fold_left5((function(level, latter) {
-      if (is_plain(latter) && overlaps(former, latter) && level <= latter.level) {
-        return latter.level;
-      } else {
-        return level;
-      }
-    }), former.level, latters);
-  }
-}
 function raise_levels(formers, latters) {
   const former_atoms = filter_map2(parse_atom, formers);
-  const relevel = function(token, a, level) {
+  const latters$p = map5((function(token) {
+    const a = parse_atom(token);
+    if (a === void 0) {
+      return token;
+    }
+    const level = twin_level(former_atoms, a);
     if (level === a.level) {
       return token;
     } else {
       return token_of(a, level);
     }
-  };
-  const latters$p = map5((function(token) {
-    const a = parse_atom(token);
-    if (a !== void 0) {
-      return relevel(token, a, twin_level(former_atoms, a));
-    } else {
-      return token;
-    }
   }), latters);
-  const latter_atoms = filter_map2(parse_atom, latters$p);
-  const formers$p = map5((function(token) {
-    const a = parse_atom(token);
-    if (a !== void 0) {
-      return relevel(token, a, caml_int_min(2, twin_former(latter_atoms, a)));
-    } else {
-      return token;
-    }
-  }), formers);
   return [
-    formers$p,
+    formers,
     latters$p
   ];
 }

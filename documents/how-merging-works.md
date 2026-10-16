@@ -137,17 +137,27 @@ so the twin applies only where the atom applies:
 ```
 
 Where `merge(a, b)` (and a block, for its own atoms, in source order) uses a
-twin: `b`'s atom is in the base context or under at-rules alone, an atom of
-`a` that survives overlaps it in the same kind of context (same family, masks
-that meet and are not covered, or `all`), and the sheet order would not
-surely put `b` last. The sheet surely puts `b` last when `a` is base and `b`
-is under at-rules, or when both share a context and `a` is a shorthand and `b`
-a longhand: no twin there. A level is one above the highest level of the atoms
-it must beat (0 when the sheet order already does it), and the cap is level 2:
-at the cap the sheet order decides, as it did before the twin
-(`packages/ppx/test/css-support/cascade-twin.t`, G55). A selector or
-`!important` atom keeps its higher specificity by taking the level of the
-twin it must stay above (G58, G60: `:hover` still beats `@media`).
+twin: an atom of `a` that survives overlaps `b`'s atom (same family, masks that
+meet and are not covered, or `all`), both are of the same kind (both in the
+base context or under at-rules alone, or both with a selector or `!important`),
+and the sheet order would not surely put `b` last. The sheet surely puts `b`
+last when `a` is base and `b` is under at-rules, or when both share a context
+and `a` is a shorthand and `b` a longhand: no twin there. A level is one above
+the highest level of the atoms it must beat (0 when the sheet order already
+does it), and the cap is level 2: at the cap the sheet order decides, as it did
+before the twin (`packages/ppx/test/css-support/cascade-twin.t`, G55; a chain of
+four state atoms, R02 in `cascade-remaining.t`). This covers two different
+selectors of equal specificity (`:hover` then `:disabled`, `& .a` then `& .b`,
+`&.x` then `&:focus`) and the same selector with an extra at-rule
+(`@media { &:hover }` then `&:hover`): the later one wins, as in plain CSS.
+Atoms of different kinds are not compared. An atom with a selector has more
+class-like parts than a plain atom, so it wins or loses against it by
+specificity, as in plain CSS, and a twin (a type-selector weight) never changes
+that: `&:hover:focus` then `&:hover` keeps the first one winning when both match
+(R03), and `:hover` still beats `@media` (G58, G60). The runtime does not know
+whether two selectors style one element. A twin that is not needed changes
+nothing. One known gap: an earlier `& span.x` and a later `& .x` on one element
+differ by one type selector, which a level 1 twin only ties.
 
 The same rule makes these cases follow source order, with nothing split:
 `border-radius`, `border`, `outline`, `background`, `font`, a top-level
@@ -327,15 +337,16 @@ all) still depends on which one the browser loads first
 - **Partial cover across libraries.** `merge(a, b)` where `a` sets
   `margin` and `b` sets only `margin-top` keeps both classes (the example
   above) — correct as long as `b`'s library's sheet loads after `a`'s.
-- **Twin limits.** The twin cannot help where `merge` has no overlap to see:
-  the same selector with an extra at-rule (`& .child` against
-  `@media { & .child }`, `&:hover` against `@media { &:hover }`), a logical
-  property against a physical one (`padding-inline` and `padding-left`), and
-  an `_in_` bundle, whose class holds several properties and contexts. Both
-  classes stay and the sheet order decides (pinned by `cascade-gaps.t`). A
-  chain of more than two overlapping merges stops at level 2. Two different
-  selector contexts (`:focus` after `:hover`) get no twin. The twin raises the
-  sheet size (the demo `styles.css` goes from 4.5 KB to 10.3 KB, 1.7 KB to 2.6 KB gzipped).
+- **Twin limits.** The twin cannot help where `merge` has no overlap to see: a
+  logical property against a physical one (`padding-inline` and
+  `padding-left`), and an `_in_` bundle, whose class holds several properties
+  and contexts. Both classes stay and the sheet order decides (pinned by
+  `cascade-gaps.t`). A chain of more than two overlapping merges stops at
+  level 2, so in a chain of four state atoms the last two tie and the sheet's
+  pseudo-class rank decides (`cascade-remaining.t`, R02). The same selector
+  with an extra at-rule (`& .child` against `@media { & .child }`) keeps both
+  classes, and the later one wins by its twin. The twin raises the sheet size
+  (the demo `styles.css` goes from 4.5 KB to 9.0 KB, 1.7 KB to 2.4 KB gzipped).
 - **A selector context is not dropped by a base declaration.** `&:hover`,
   `& .child` and `::before` atoms of `a` stay, even with the same
   property in `b`; so does an `@media` atom under such a selector.
