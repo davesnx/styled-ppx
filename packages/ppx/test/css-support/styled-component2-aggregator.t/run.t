@@ -13,8 +13,11 @@ through the static extraction pipeline. They also register selector bindings so
   ._a_4ekvmb{color:red;}
   ._a_4esjgz{color:var(--color-1a279q8);}
   ._a_94gf8j{padding:8px;}
-  ._a_21zok7ph1xd ._id_1l8coch{margin:0;}
   ._a_zo4xe5r9awo ._id_1oex1yr{display:block;}
+  ._a_21zok7p0081c60 ._id_1l8coch{margin-top:0;}
+  ._a_21zok7p0044654 ._id_1l8coch{margin-right:0;}
+  ._a_21zok7p0016cb1 ._id_1l8coch{margin-bottom:0;}
+  ._a_21zok7p002g20i ._id_1l8coch{margin-left:0;}
   ._a_qyw7u4ed9vx:hover{color:var(--tone-1ucf2mt);}
 
   $ refmt --parse ml --print re output.ml
@@ -24,13 +27,20 @@ through the static extraction pipeline. They also register selector bindings so
   [@css "._a_qyw7u4ed9vx:hover{color:var(--tone-1ucf2mt);}"];
   [@css "._a_4esjgz{color:var(--color-1a279q8);}"];
   [@css "._a_94gf8j{padding:8px;}"];
-  [@css "._a_21zok7ph1xd ._id_1l8coch{margin:0;}"];
+  [@css "._a_21zok7p0081c60 ._id_1l8coch{margin-top:0;}"];
+  [@css "._a_21zok7p0044654 ._id_1l8coch{margin-right:0;}"];
+  [@css "._a_21zok7p0016cb1 ._id_1l8coch{margin-bottom:0;}"];
+  [@css "._a_21zok7p002g20i ._id_1l8coch{margin-left:0;}"];
   [@css "._a_zo4xe5r9awo ._id_1oex1yr{display:block;}"];
   [@css.bindings
     [
       ("Output.Box", "_id_1l8coch", "_a_4ekvmb _a_qyw7u4ed9vx"),
       ("Output.Button", "_id_1oex1yr", "_a_4esjgz _a_94gf8j"),
-      ("Output.card", "_id_16nw107", "_a_21zok7ph1xd _a_zo4xe5r9awo"),
+      (
+        "Output.card",
+        "_id_16nw107",
+        "_a_21zok7p0081c60 _a_21zok7p0044654 _a_21zok7p0016cb1 _a_21zok7p002g20i _a_zo4xe5r9awo",
+      ),
     ]
   ];
   let tone = CSS.red;
@@ -2053,4 +2063,7 @@ through the static extraction pipeline. They also register selector bindings so
     };
   };
   let card =
-    CSS.make("label:card _id_16nw107 _a_21zok7ph1xd _a_zo4xe5r9awo", []);
+    CSS.make(
+      "label:card _id_16nw107 _a_21zok7p0081c60 _a_21zok7p0044654 _a_21zok7p0016cb1 _a_21zok7p002g20i _a_zo4xe5r9awo",
+      [],
+    );

@@ -23,7 +23,7 @@ as the main subject, across properties that never repeat.
   [@@@css "._a_5rx8u2{display:-webkit-box;display:flex;}"]
   [@@@css "._a_7p1gs8{margin:0;}"]
   [@@@css "._a_4eb7kq{color:blue;color:red;}"]
-  [@@@css "@media (min-width: 600px) {._a_izob04ep0x6{color:green;}}"]
+  [@@@css "@media (min-width: 600px) {._a_0zob04ep0x6{color:green;}}"]
   [@@@css "._a_7pjper{margin:0;margin-top:5px;margin:10px;}"]
   [@@@css "._a_qyw7u4ebukr:hover{color:blue;color:red;}"]
   [@@@css "._a_qyw7u4ego80:hover{color:red;}"]
@@ -35,7 +35,7 @@ as the main subject, across properties that never repeat.
     [("Input.dup", "_id_1rqoi1k", "_a_4epkbn");
     ("Input.fallback", "_id_1t6se51", "_a_5rx8u2");
     ("Input.interleaved", "_id_8z5ze6", "_a_7p1gs8 _a_4eb7kq");
-    ("Input.mediaInterleaved", "_id_17s8jfs", "_a_izob04ep0x6 _a_4eb7kq");
+    ("Input.mediaInterleaved", "_id_17s8jfs", "_a_0zob04ep0x6 _a_4eb7kq");
     ("Input.shorthandReset", "_id_18j0etq", "_a_7pjper");
     ("Input.nested", "_id_swo4az", "_a_qyw7u4ebukr");
     ("Input.twice", "_id_bxfxu3", "_a_qyw7u4ego80");
@@ -48,7 +48,7 @@ as the main subject, across properties that never repeat.
   let interleaved =
     CSS.make "label:interleaved _id_8z5ze6 _a_7p1gs8 _a_4eb7kq" []
   let mediaInterleaved =
-    CSS.make "label:mediaInterleaved _id_17s8jfs _a_izob04ep0x6 _a_4eb7kq" []
+    CSS.make "label:mediaInterleaved _id_17s8jfs _a_0zob04ep0x6 _a_4eb7kq" []
   let shorthandReset = CSS.make "label:shorthandReset _id_18j0etq _a_7pjper" []
   let nested = CSS.make "label:nested _id_swo4az _a_qyw7u4ebukr" []
   let twice = CSS.make "label:twice _id_bxfxu3 _a_qyw7u4ego80" []

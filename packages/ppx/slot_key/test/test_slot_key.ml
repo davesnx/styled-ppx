@@ -366,14 +366,29 @@ let removes_tests =
       check_bool "removes" false
         (Slot_key.removes ~former:(slot_of "color: red;")
            ~latter:(slot_of "&::before{color: blue;}")));
-    Alcotest_extra.test
-      "@media does not remove base, base does not remove @media" (fun () ->
+    Alcotest_extra.test "@media does not remove base, base removes @media"
+      (fun () ->
       let base = slot_of "height: 0;" in
       let media = slot_of "@media (max-width:600px){height: auto;}" in
       check_bool "media removes base" false
         (Slot_key.removes ~former:base ~latter:media);
-      check_bool "base removes media" false
+      check_bool "base removes media" true
         (Slot_key.removes ~former:media ~latter:base));
+    Alcotest_extra.test
+      "a base latter removes at-rule contexts only: not a selector, a \
+       pseudo-element or an !important context" (fun () ->
+      let base = slot_of "color: blue;" in
+      List.iter
+        (fun css ->
+          check_bool css false
+            (Slot_key.removes ~former:(slot_of css) ~latter:base))
+        [
+          "&:hover{color: red;}";
+          "& .child{color: red;}";
+          "&::before{color: red;}";
+          "color: red !important;";
+          "@media (max-width:600px){color: red !important;}";
+        ]);
     Alcotest_extra.test "@supports does not remove @media, same property"
       (fun () ->
       check_bool "removes" false

@@ -1287,7 +1287,15 @@ let run ~output_file ~order input_files =
   (match !errors with
   | [] -> ()
   | _ ->
-    List.iter (fun msg -> Logger.error "%s" msg) (List.rev !errors);
+    (* One source reference can reach several atoms (a conditional box
+       shorthand is split into one atom per side), each reporting the same
+       unresolved reference. *)
+    List.rev !errors
+    |> List.fold_left
+         (fun seen msg -> if List.mem msg seen then seen else msg :: seen)
+         []
+    |> List.rev
+    |> List.iter (fun msg -> Logger.error "%s" msg);
     exit 1);
 
   (* Dedup the resolved CSS rules while preserving source order.

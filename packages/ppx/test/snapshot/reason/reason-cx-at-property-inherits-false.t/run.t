@@ -12,7 +12,7 @@ vars (top-level / &:hover / @media) and withheld for descendant-read vars.
   [@css "._a_4esjgz{color:var(--color-1a279q8);}"];
   [@css "._a_qyw7u4ebwy0:hover{color:var(--color-4uzv5u);}"];
   [@css
-    "@media (max-width: 768px) {._a_5eyct4epxeg{color:var(--color-km0lr0);}}"
+    "@media (max-width: 768px) {._a_0eyct4epxeg{color:var(--color-km0lr0);}}"
   ];
   [@css "._a_s19nz4ecfa1 .child{color:var(--color-ump0qt);}"];
   [@css "._in_1d8si03{color:var(--color-7srqv7);}"];
@@ -29,7 +29,7 @@ vars (top-level / &:hover / @media) and withheld for descendant-read vars.
     [
       ("Output.topLevel", "_id_1lkhdb3", "_a_4esjgz"),
       ("Output.hover", "_id_ng6izt", "_a_qyw7u4ebwy0"),
-      ("Output.media", "_id_12d3e0w", "_a_5eyct4epxeg"),
+      ("Output.media", "_id_12d3e0w", "_a_0eyct4epxeg"),
       ("Output.descendant", "_id_1g3dzrb", "_a_s19nz4ecfa1"),
       ("Output.bundleSpan", "_id_ijx48y", "_in_1d8si03"),
       ("Output.customFeeder", "_id_195hxjc", "_a_zytoc7ez6lcw"),
@@ -53,7 +53,7 @@ vars (top-level / &:hover / @media) and withheld for descendant-read vars.
     );
   let media =
     CSS.make(
-      "label:media _id_12d3e0w _a_5eyct4epxeg",
+      "label:media _id_12d3e0w _a_0eyct4epxeg",
       [("--color-km0lr0", CSS.Types.Color.toString(color))],
     );
   let descendant =

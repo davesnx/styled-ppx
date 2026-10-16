@@ -1607,6 +1607,128 @@ module Css_transform = {
     | At_rule({ block: Empty, _ }) => ()
     };
 
+  /* Box shorthands a conditional atom is split into longhands for.
+     `CSS.merge` drops an earlier atom only when its mask is a subset of a
+     later plain atom's (`Merge_key.removes`), so a conditional
+     `padding: X` (full mask) can never be dropped by a later `padding-top`.
+     Split into one atom per side, each carries its own one-side mask and
+     `padding-top: 0` drops exactly the matching side. Only 1-to-4 value
+     box shorthands (`sides`) and 1-to-2 value axis shorthands (`axes`)
+     qualify: the value-to-side mapping is a plain repeat rule, with no
+     slash, no component-order exceptions and no keyword that sets
+     one side differently. `border-radius` (corner order plus an
+     elliptical `/`), `border`, `outline`, `background` and `font` (each
+     component picks a different longhand) are left whole. */
+  let box_shorthand_longhands =
+      (name: string): option((bool, list(string))) => {
+    let four = (prefix, suffix) =>
+      Some((
+        true,
+        ["top", "right", "bottom", "left"]
+        |> List.map(side => prefix ++ side ++ suffix),
+      ));
+    let two = (first, second) => Some((false, [first, second]));
+    switch (name) {
+    | "padding" => four("padding-", "")
+    | "margin" => four("margin-", "")
+    | "scroll-padding" => four("scroll-padding-", "")
+    | "scroll-margin" => four("scroll-margin-", "")
+    | "border-width" => four("border-", "-width")
+    | "border-style" => four("border-", "-style")
+    | "border-color" => four("border-", "-color")
+    | "inset" => Some((true, ["top", "right", "bottom", "left"]))
+    | "overflow" => two("overflow-x", "overflow-y")
+    | "gap" => two("row-gap", "column-gap")
+    | "padding-block" => two("padding-block-start", "padding-block-end")
+    | "padding-inline" => two("padding-inline-start", "padding-inline-end")
+    | "margin-block" => two("margin-block-start", "margin-block-end")
+    | "margin-inline" => two("margin-inline-start", "margin-inline-end")
+    | "inset-block" => two("inset-block-start", "inset-block-end")
+    | "inset-inline" => two("inset-inline-start", "inset-inline-end")
+    | _ => None
+    };
+  };
+
+  /* One declaration as longhands, or itself when it does not qualify (see
+     `box_shorthand_longhands`). Also left whole: a top-level `var()`
+     (one custom property may hold several values, the longhands would
+     only get the whole list), and an interpolated path used by two of
+     the resulting longhands (`padding: $(a) $(b)` repeats each path on
+     opposite sides): those would form an `_in_` bundle that `CSS.merge`
+     never drops, worse than the one droppable shorthand atom. */
+  let split_box_shorthand = (decl: declaration): list(declaration) => {
+    let (name, name_loc) = decl.name;
+    switch (box_shorthand_longhands(String.lowercase_ascii(name))) {
+    | None => [decl]
+    | Some((is_box, longhands)) =>
+      let (values, values_loc) = decl.value;
+      let components = List.filter(((cv, _)) => cv != Whitespace, values);
+      let is_unsplittable = ((cv: component_value, _)) =>
+        switch (cv) {
+        | Function({ name: (fn, _), _ }) =>
+          String.lowercase_ascii(fn) == "var"
+        | Delim(_) => true
+        | _ => false
+        };
+      let per_longhand =
+        switch (is_box, components) {
+        | (_, []) => None
+        | (_, components) when List.exists(is_unsplittable, components) =>
+          None
+        | (true, [a]) => Some([a, a, a, a])
+        | (true, [a, b]) => Some([a, b, a, b])
+        | (true, [a, b, c]) => Some([a, b, c, b])
+        | (true, [a, b, c, d]) => Some([a, b, c, d])
+        | (false, [a]) => Some([a, a])
+        | (false, [a, b]) => Some([a, b])
+        | _ => None
+        };
+      switch (per_longhand) {
+      | None => [decl]
+      | Some(per_longhand) =>
+        let paths =
+          List.concat_map(
+            cv => component_value_list_interpolation_paths([cv]),
+            per_longhand,
+          );
+        let distinct = List.sort_uniq(compare, paths);
+        if (List.length(distinct) != List.length(paths)) {
+          [decl];
+        } else {
+          List.map2(
+            (longhand, cv) =>
+              {
+                ...decl,
+                name: (longhand, name_loc),
+                value: ([cv], values_loc),
+              },
+            longhands,
+            per_longhand,
+          );
+        };
+      };
+    };
+  };
+
+  /* Called only for a declaration outside the base context (inside an
+     at-rule, under a selector, or `!important`): a base atom is only
+     removed by a same-context later atom, where the full mask already
+     works, and splitting it would add atoms for no gain. */
+  let expand_box_shorthands = (~conditional: bool, rules: list(rule)) =>
+    List.concat_map(
+      fun
+      | Declaration(decl) when conditional || fst(decl.important) =>
+        List.map(d => Declaration(d), split_box_shorthand(decl))
+      | rule => [rule],
+      rules,
+    );
+
+  let is_bare_ampersand = (selectors: list((selector, Ppxlib.Location.t))) =>
+    switch (selectors) {
+    | [(SimpleSelector(Ampersand), _)] => true
+    | _ => false
+    };
+
   let atomize_rules =
       (
         ~source_position_start,
@@ -1741,19 +1863,21 @@ module Css_transform = {
        single atom (see `group_declarations_by_family`); everything
        else atomizes rule by rule. */
     let rec extract_atomic_rules_from_block =
-            (~parent_prelude=?, rules: list(rule))
+            (~conditional=false, ~parent_prelude=?, rules: list(rule))
             : list((string, string, rule)) =>
       rules
+      |> expand_box_shorthands(~conditional)
       |> group_declarations_by_family
       |> List.concat_map(
            fun
            | Declaration_group(decls) =>
              wrap_declaration_group_under_parent(~parent_prelude?, decls)
            | Nested_rule(rule) =>
-             extract_atomic_rules(~parent_prelude?, rule),
+             extract_atomic_rules(~conditional, ~parent_prelude?, rule),
          )
     and extract_atomic_rules =
-        (~parent_prelude=?, rule: rule): list((string, string, rule)) => {
+        (~conditional=false, ~parent_prelude=?, rule: rule)
+        : list((string, string, rule)) => {
       switch (rule) {
       | Declaration(decl) =>
         wrap_declaration_group_under_parent(~parent_prelude?, [decl])
@@ -1794,6 +1918,7 @@ module Css_transform = {
           | Some(parent) => merge_preludes(~parent, ~child=child_selectors)
           };
         extract_atomic_rules_from_block(
+          ~conditional=conditional || !is_bare_ampersand(effective_selectors),
           ~parent_prelude=effective_selectors,
           rules,
         );
@@ -1873,7 +1998,11 @@ module Css_transform = {
             | Some(rewritten_tokens) => (rewritten_tokens, snd(prelude))
             | None => prelude
             };
-          extract_atomic_rules_from_block(~parent_prelude?, rules)
+          extract_atomic_rules_from_block(
+            ~conditional=true,
+            ~parent_prelude?,
+            rules,
+          )
           |> List.map(((_className, _namespace, inner_rule)) => {
                let wrapped =
                  At_rule({

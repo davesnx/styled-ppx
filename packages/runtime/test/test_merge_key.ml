@@ -100,6 +100,37 @@ let media_context_merges_like_base () =
   Alcotest_extra.assert_string (CSS.className merged)
     (class_of "@media (max-width:600px){color: blue;}")
 
+let base_latter_drops_at_rule_former () =
+  let media = make "@media (max-width:600px){color: green;}" in
+  let container = make "@container (min-width:1px){color: green;}" in
+  let base = make "color: blue;" in
+  Alcotest_extra.assert_string
+    (CSS.className (CSS.merge media base))
+    (class_of "color: blue;");
+  Alcotest_extra.assert_string
+    (CSS.className (CSS.merge container base))
+    (class_of "color: blue;")
+
+let base_latter_keeps_selector_former () =
+  let base = make "color: blue;" in
+  List.iter
+    (fun css ->
+      let merged = CSS.merge (make css) base in
+      Alcotest_extra.assert_string (CSS.className merged)
+        (Printf.sprintf "%s %s" (class_of css) (class_of "color: blue;")))
+    [
+      "&:hover{color: red;}"; "& .child{color: red;}"; "&::before{color: red;}";
+    ]
+
+let base_latter_needs_a_covering_mask () =
+  let media = make "@media (max-width:600px){padding-top: 1px;}" in
+  let base = make "padding-left: 2px;" in
+  let merged = CSS.merge media base in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s"
+       (class_of "@media (max-width:600px){padding-top: 1px;}")
+       (class_of "padding-left: 2px;"))
+
 let different_contexts_never_merge () =
   let base = make "color: red;" in
   let hovered = make "&:hover{color: blue;}" in
@@ -362,6 +393,14 @@ let tests =
     Alcotest_extra.test
       "different contexts (base vs &:hover) never merge, same property"
       different_contexts_never_merge;
+    Alcotest_extra.test "a base latter drops an at-rule former of the same slot"
+      base_latter_drops_at_rule_former;
+    Alcotest_extra.test
+      "a base latter keeps a selector or pseudo-element former"
+      base_latter_keeps_selector_former;
+    Alcotest_extra.test
+      "a base latter keeps an at-rule former its mask does not cover"
+      base_latter_needs_a_covering_mask;
     Alcotest_extra.test
       "a plain atom and its !important twin never merge, in either direction \
        (plain former)"

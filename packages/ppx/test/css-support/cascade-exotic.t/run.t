@@ -39,14 +39,14 @@ specificity), so read the `result` line together with the sheet.
 
   $ ./_build/default/input.exe
   E01 a: label:e01_a _id_9osalz _a_7p002ms4m
-  E01 b: label:e01_b _id_dw89wp _a_159rq7p002r214
-  E01 result: label:e01_a _id_9osalz _a_7p002ms4m label:e01_b _id_dw89wp _a_159rq7p002r214
-  E02 a: label:e02_a _id_1n226mp _a_op2f07p002so52
-  E02 b: label:e02_b _id_1evkk87 _a_159rq7p002s7xu
-  E02 result: label:e02_a _id_1n226mp _a_op2f07p002so52 label:e02_b _id_1evkk87 _a_159rq7p002s7xu
-  E03 a: label:e03_a _id_1894u2t _a_vao227p0020xo5
-  E03 b: label:e03_b _id_gxfws9 _a_159rq7p002us7i
-  E03 result: label:e03_a _id_1894u2t _a_vao227p0020xo5 label:e03_b _id_gxfws9 _a_159rq7p002us7i
+  E01 b: label:e01_b _id_dw89wp _a_059rq7p002r214
+  E01 result: label:e01_a _id_9osalz _a_7p002ms4m label:e01_b _id_dw89wp _a_059rq7p002r214
+  E02 a: label:e02_a _id_1n226mp _a_0p2f07p002so52
+  E02 b: label:e02_b _id_1evkk87 _a_059rq7p002s7xu
+  E02 result: label:e02_a _id_1n226mp _a_0p2f07p002so52 label:e02_b _id_1evkk87 _a_059rq7p002s7xu
+  E03 a: label:e03_a _id_1894u2t _a_0ao227p0020xo5
+  E03 b: label:e03_b _id_gxfws9 _a_059rq7p002us7i
+  E03 result: label:e03_a _id_1894u2t _a_0ao227p0020xo5 label:e03_b _id_gxfws9 _a_059rq7p002us7i
   E04 a: label:e04_a _id_wsw80a _a_7p0022kq6
   E04 b: label:e04_b _id_u6zq7w _a_zz00pi
   E04 result: label:e04_a _id_wsw80a label:e04_b _id_u6zq7w _a_zz00pi
@@ -97,49 +97,49 @@ specificity), so read the `result` line together with the sheet.
   E18 b style: --e18_v2-1bzve6l:rgb(30, 0, 0)
   E18 result: label:e18_a _id_29swre _in_1m6suwf label:e18_b _id_fv21ql _in_1llxr99
   E18 result style: --e18_v1-t1ny06:rgb(29, 0, 0);--e18_v2-1bzve6l:rgb(30, 0, 0)
-  E19 a: label:e19_a _id_7plkfj _a_0lub32z008hok3
+  E19 a: label:e19_a _id_7plkfj _a_1lub32z008hok3
   E19 b: label:e19_b _id_taocjx _a_x7ow72z5tji
-  E19 result: label:e19_a _id_7plkfj _a_0lub32z008hok3 label:e19_b _id_taocjx _a_x7ow72z5tji
+  E19 result: label:e19_a _id_7plkfj _a_1lub32z008hok3 label:e19_b _id_taocjx _a_x7ow72z5tji
   E20 a: label:e20_a _id_12atsww _a_2svney
   E20 b: label:e20_b _id_13rm7w3 _a_droigx
   E20 result: label:e20_a _id_12atsww _a_2svney label:e20_b _id_13rm7w3 _a_droigx
   E21 a: label:e21_a _id_vw2ne _a_3h0ljd
   E21 b: label:e21_b _id_pf7vxb _a_3hekgwqdq
   E21 result: label:e21_a _id_vw2ne _a_3h0ljd label:e21_b _id_pf7vxb _a_3hekgwqdq
-  E22 a: label:e22_a _id_1ru0x3 _a_qyw7u3hlokvz7n
-  E22 b: label:e22_b _id_1qzft2x _a_0lub33htomz
-  E22 result: label:e22_a _id_1ru0x3 _a_qyw7u3hlokvz7n label:e22_b _id_1qzft2x _a_0lub33htomz
+  E22 a: label:e22_a _id_1ru0x3 _a_qyw7u3hekggmzt _a_qyw7u3h6bkdvl3 _a_qyw7u3h004wrw5 _a_qyw7u3h0sgeuea
+  E22 b: label:e22_b _id_1qzft2x _a_1lub33htomz
+  E22 result: label:e22_a _id_1ru0x3 _a_qyw7u3hekggmzt _a_qyw7u3h6bkdvl3 _a_qyw7u3h004wrw5 _a_qyw7u3h0sgeuea label:e22_b _id_1qzft2x _a_1lub33htomz
   E23 a: label:e23_a _id_188a8wj _a_oe8sa94008llzq
-  E23 b: label:e23_b _id_1446a39 _a_cht88948fkm
-  E23 result: label:e23_a _id_188a8wj _a_oe8sa94008llzq label:e23_b _id_1446a39 _a_cht88948fkm
+  E23 b: label:e23_b _id_1446a39 _a_cht8894008wmul _a_cht8894004n1ri _a_cht88940010ush _a_cht88940025pwa
+  E23 result: label:e23_a _id_188a8wj _a_oe8sa94008llzq label:e23_b _id_1446a39 _a_cht8894008wmul _a_cht8894004n1ri _a_cht88940010ush _a_cht88940025pwa
   E24 a: label:e24_a _id_y73jiv _a_7p002d4qg
   E24 b: label:e24_b _id_hqe50r _a_7puinr
   E24 c: label:e24_c _id_426s3k _a_7p002cqrw
   E24 result: label:e24_a _id_y73jiv label:e24_b _id_hqe50r _a_7puinr label:e24_c _id_426s3k _a_7p002cqrw
   E25 a: label:e25_a _id_1gckiua _a_7p0028sx6
-  E25 b: label:e25_b _id_1m0tp6j _a_op2f07p002y0kt
+  E25 b: label:e25_b _id_1m0tp6j _a_0p2f07p002y0kt
   E25 c: label:e25_c _id_10zwq9e _a_7p0026rac
-  E25 result: label:e25_a _id_1gckiua label:e25_b _id_1m0tp6j _a_op2f07p002y0kt label:e25_c _id_10zwq9e _a_7p0026rac
+  E25 result: label:e25_a _id_1gckiua label:e25_b _id_1m0tp6j label:e25_c _id_10zwq9e _a_7p0026rac
   E26 left a: label:e26_a _id_1sw8ngh _a_7p0023ace
   E26 left empty: label:e26_empty _id_ap8yq6
   E26 left result: label:e26_a _id_1sw8ngh _a_7p0023ace label:e26_empty _id_ap8yq6
   E26 right result: label:e26_empty _id_ap8yq6 label:e26_a _id_1sw8ngh _a_7p0023ace
   E27 a: label:e27_a _id_1i9pupd _a_7p0021if4 _a_qyw7u7p0028sdg
   E27 result: label:e27_a _id_1i9pupd label:e27_a _id_1i9pupd _a_7p0021if4 _a_qyw7u7p0028sdg
-  E28 a: label:e28_a _id_eijk8x _a_qkk4l7p002ejru
-  E28 b: label:e28_b _id_8eke8l _a_6aatx7p0022avm
-  E28 result: label:e28_a _id_eijk8x _a_qkk4l7p002ejru label:e28_b _id_8eke8l _a_6aatx7p0022avm
-  E29 a: label:e29_a _id_17wzo6n _a_oz6h37p002b1n2
-  E29 b: label:e29_b _id_1n2e1d2 _a_ycrm37p0023me0
-  E29 result: label:e29_a _id_17wzo6n _a_oz6h37p002b1n2 label:e29_b _id_1n2e1d2 _a_ycrm37p0023me0
-  E30 a: label:e30_a _id_1hjq29l _a_16krz7p002dg5z
-  E30 b: label:e30_b _id_m17h65 _a_6aatx7p002cgo6
-  E30 result: label:e30_a _id_1hjq29l _a_16krz7p002dg5z label:e30_b _id_m17h65 _a_6aatx7p002cgo6
-  E31 result: label:e31 _id_psw2h1 _a_of0zo7p0024ep7 _a_op2f07p002l0a4
-  E32 result: label:e32 _id_15n668e _a_op2f07p0024j5c _a_of0zo7p002opsv
-  E33 result: label:e33 _id_ftiwkg _a_zgqkv7p002luqw _a_d3qdy7p002pa78
-  E34 result: label:e34 _id_sjtyhp _a_j4q027p0028cv9 _a_eq5or7p002w9to
-  E35 result: label:e35 _id_1fo0xx2 _a_zgqkv7p002onxl _a_of0zo7p002iivl
+  E28 a: label:e28_a _id_eijk8x _a_0kk4l7p002ejru
+  E28 b: label:e28_b _id_8eke8l _a_0aatx7p0022avm
+  E28 result: label:e28_a _id_eijk8x _a_0kk4l7p002ejru label:e28_b _id_8eke8l _a_0aatx7p0022avm
+  E29 a: label:e29_a _id_17wzo6n _a_0z6h37p002b1n2
+  E29 b: label:e29_b _id_1n2e1d2 _a_0crm37p0023me0
+  E29 result: label:e29_a _id_17wzo6n _a_0z6h37p002b1n2 label:e29_b _id_1n2e1d2 _a_0crm37p0023me0
+  E30 a: label:e30_a _id_1hjq29l _a_06krz7p002dg5z
+  E30 b: label:e30_b _id_m17h65 _a_0aatx7p002cgo6
+  E30 result: label:e30_a _id_1hjq29l _a_06krz7p002dg5z label:e30_b _id_m17h65 _a_0aatx7p002cgo6
+  E31 result: label:e31 _id_psw2h1 _a_0f0zo7p0024ep7 _a_0p2f07p002l0a4
+  E32 result: label:e32 _id_15n668e _a_0p2f07p0024j5c _a_0f0zo7p002opsv
+  E33 result: label:e33 _id_ftiwkg _a_0gqkv7p002luqw _a_03qdy7p002pa78
+  E34 result: label:e34 _id_sjtyhp _a_04q027p0028cv9 _a_0q5or7p002w9to
+  E35 result: label:e35 _id_1fo0xx2 _a_0gqkv7p002onxl _a_0f0zo7p002iivl
   E36 parent: label:e36_a _id_8l1jh8 _a_dzdgw7p0022shq
   E36 child: label:e36_b _id_zvocwr _a_7p002pqxt
   E37 parent: label:e37_a _id_1211w0b _a_exm317p002zf0w
@@ -147,8 +147,8 @@ specificity), so read the `result` line together with the sheet.
   E38 b: label:e38_b _id_c21s08 _a_7p002yrio
   E39 b: label:e39_b _id_hr2prc _a_7p002t7fr
   E40 a: label:e40_a _id_1mtopv8 _a_zys35fv8j1n8
-  E40 b: label:e40_b _id_spf3ru _a_op2f0zys35fv8rtiz
-  E40 result: label:e40_a _id_1mtopv8 _a_zys35fv8j1n8 label:e40_b _id_spf3ru _a_op2f0zys35fv8rtiz
+  E40 b: label:e40_b _id_spf3ru _a_0p2f0zys35fv8rtiz
+  E40 result: label:e40_a _id_1mtopv8 _a_zys35fv8j1n8 label:e40_b _id_spf3ru _a_0p2f0zys35fv8rtiz
   E41 a: label:e41_a _id_rrocj5 _a_zy13yy5e8vw2
   E41 b: label:e41_b _id_1q9snzb _a_zyo7exr1amxx
   E41 result: label:e41_a _id_rrocj5 _a_zy13yy5e8vw2 label:e41_b _id_1q9snzb _a_zyo7exr1amxx
@@ -228,41 +228,47 @@ its classes are the ones printed above:
   ._in_1m6suwf{border-left-color:var(--e18_v1-t1ny06);}
   ._in_1llxr99{border-left-color:var(--e18_v2-1bzve6l);}
   ._a_3hekgwqdq{border-top-width:335px;}
-  ._a_0lub33htomz:focus{border:337px solid rgb(38, 0, 0);border-top-width:339px;}
+  ._a_1lub33htomz:focus{border:337px solid rgb(38, 0, 0);border-top-width:339px;}
   ._a_x7ow72z5tji:active{-webkit-animation:332s ease;animation:332s ease;}
   ._a_2y6oc4eka7d::before{color:rgb(21, 0, 0);}
   ._a_uo5714ehng9::after{color:rgb(22, 0, 0);}
   ._a_glt2n4e9r8z::before:hover{color:rgb(23, 0, 0);}
   ._a_xmsc94ee0l8:hover::before{color:rgb(24, 0, 0);}
-  @media (max-width: 1200px) {._a_cht88948fkm{padding:341px !important;}}
-  @media (max-width: 1200px) {._a_op2f0zys35fv8rtiz{--e40-x:376px;}}
-  ._a_qyw7u3hlokvz7n:hover{border-width:336px;}
+  @media (max-width: 1200px) {._a_0p2f0zys35fv8rtiz{--e40-x:376px;}}
   ._a_qyw7u7p0028sdg:hover{margin-left:350px;}
-  ._a_0lub32z008hok3:focus{-webkit-animation-duration:331s;animation-duration:331s;}
+  ._a_1lub32z008hok3:focus{-webkit-animation-duration:331s;animation-duration:331s;}
   ._a_vflny7p002j2yf:active:first-child{margin-left:380px;}
   ._a_qss4z7p002ywuh:hover:focus-within{margin-left:379px;}
-  @supports (display: grid) {._a_159rq7p002r214{margin-left:302px;}}
-  @supports (display: grid) {._a_159rq7p002s7xu{margin-left:304px;}}
-  @supports (display: grid) {._a_159rq7p002us7i{margin-left:305px;}}
-  @supports (display: flex) {._a_vao227p0020xo5{margin-left:306px;}}
-  @supports (display: grid) {@media (max-width: 1200px) {._a_qkk4l7p002ejru{margin-left:351px;}}}
-  @media (max-width: 1200px) {._a_op2f07p002so52{margin-left:303px;}}
-  @media (max-width: 1200px) {._a_op2f07p002y0kt{margin-left:346px;}}
-  @media (max-width: 1100px) {._a_6aatx7p0022avm{margin-left:352px;}}
-  @media (max-width: 1200px) {@container app-main (max-width: 900px) {._a_oz6h37p002b1n2{margin-left:353px;}}}
-  @media (max-width: 1100px) {._a_6aatx7p002cgo6{margin-left:356px;}}
-  @media (max-width: 900px) and (not (max-width: 1200px)){._a_of0zo7p0024ep7{margin-left:357px;}}
-  @media (max-width: 1200px) {._a_op2f07p002l0a4{margin-left:358px;}}
-  @media (max-width: 1200px) and (not (max-width: 900px)){._a_op2f07p0024j5c{margin-left:359px;}}
-  @media (max-width: 900px) {._a_of0zo7p002opsv{margin-left:360px;}}
-  @media screen and (max-width: 1200px) and (not (max-width: 900px)){._a_zgqkv7p002luqw{margin-left:361px;}}
-  @media screen and (max-width: 900px) {._a_d3qdy7p002pa78{margin-left:362px;}}
-  @media not screen and (min-width: 1200px) {._a_j4q027p0028cv9{margin-left:363px;}}
-  @media not screen and (min-width: 900px) {._a_eq5or7p002w9to{margin-left:364px;}}
-  @media screen and (max-width: 1200px) {._a_zgqkv7p002onxl{margin-left:365px;}}
-  @media (max-width: 900px) {._a_of0zo7p002iivl{margin-left:366px;}}
-  @container app-main (max-width: 1000px) {._a_ycrm37p0023me0{margin-left:354px;}}
-  @container app-main (max-width: 1000px) {@media (max-width: 1200px) {._a_16krz7p002dg5z{margin-left:355px;}}}
+  @supports (display: grid) {._a_059rq7p002r214{margin-left:302px;}}
+  @supports (display: grid) {._a_059rq7p002s7xu{margin-left:304px;}}
+  @supports (display: grid) {._a_059rq7p002us7i{margin-left:305px;}}
+  @supports (display: flex) {._a_0ao227p0020xo5{margin-left:306px;}}
+  @supports (display: grid) {@media (max-width: 1200px) {._a_0kk4l7p002ejru{margin-left:351px;}}}
+  @media (max-width: 1200px) {._a_0p2f07p002so52{margin-left:303px;}}
+  @media (max-width: 1200px) {._a_cht8894008wmul{padding-top:341px !important;}}
+  @media (max-width: 1200px) {._a_cht8894004n1ri{padding-right:341px !important;}}
+  @media (max-width: 1200px) {._a_cht88940010ush{padding-bottom:341px !important;}}
+  @media (max-width: 1200px) {._a_cht88940025pwa{padding-left:341px !important;}}
+  @media (max-width: 1200px) {._a_0p2f07p002y0kt{margin-left:346px;}}
+  @media (max-width: 1100px) {._a_0aatx7p0022avm{margin-left:352px;}}
+  @media (max-width: 1200px) {@container app-main (max-width: 900px) {._a_0z6h37p002b1n2{margin-left:353px;}}}
+  @media (max-width: 1100px) {._a_0aatx7p002cgo6{margin-left:356px;}}
+  @media (max-width: 900px) and (not (max-width: 1200px)){._a_0f0zo7p0024ep7{margin-left:357px;}}
+  @media (max-width: 1200px) {._a_0p2f07p002l0a4{margin-left:358px;}}
+  @media (max-width: 1200px) and (not (max-width: 900px)){._a_0p2f07p0024j5c{margin-left:359px;}}
+  @media (max-width: 900px) {._a_0f0zo7p002opsv{margin-left:360px;}}
+  @media screen and (max-width: 1200px) and (not (max-width: 900px)){._a_0gqkv7p002luqw{margin-left:361px;}}
+  @media screen and (max-width: 900px) {._a_03qdy7p002pa78{margin-left:362px;}}
+  @media not screen and (min-width: 1200px) {._a_04q027p0028cv9{margin-left:363px;}}
+  @media not screen and (min-width: 900px) {._a_0q5or7p002w9to{margin-left:364px;}}
+  @media screen and (max-width: 1200px) {._a_0gqkv7p002onxl{margin-left:365px;}}
+  @media (max-width: 900px) {._a_0f0zo7p002iivl{margin-left:366px;}}
+  @container app-main (max-width: 1000px) {._a_0crm37p0023me0{margin-left:354px;}}
+  @container app-main (max-width: 1000px) {@media (max-width: 1200px) {._a_06krz7p002dg5z{margin-left:355px;}}}
   ._in_h4yksb:hover{border-top-color:var(--e17_v1-1w2tyhh);}
   ._in_1m6suwf:hover{border-left-color:var(--e18_v1-t1ny06);}
   ._in_1llxr99:hover{border-left-color:var(--e18_v2-1bzve6l);}
+  ._a_qyw7u3hekggmzt:hover{border-top-width:336px;}
+  ._a_qyw7u3h6bkdvl3:hover{border-right-width:336px;}
+  ._a_qyw7u3h004wrw5:hover{border-bottom-width:336px;}
+  ._a_qyw7u3h0sgeuea:hover{border-left-width:336px;}

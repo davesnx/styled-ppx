@@ -127,6 +127,13 @@ let parse_atom class_name =
 
 let context_equal a b = String.equal a.context b.context
 
+(* The base context is the one [Class_format] leaves out of the class name. *)
+let is_base a = String.equal a.context ""
+
+(* [Class_format.at_rules_marker]: the first character of a context made of
+   at-rules alone (no selector, not [!important]). *)
+let is_at_rules_only a = a.context <> "" && a.context.[0] = '0'
+
 let family_equal a b =
   String.equal a.family b.family
   &&
@@ -143,12 +150,16 @@ let mask_subset a b =
   | Some ma, Some mb -> ma land mb = ma
 
 (* [removes ~former ~latter]: mirrors [Slot_key.removes] exactly (minus
-   the bundle check, already handled by the caller) - same context, then
+   the bundle check, already handled by the caller) - same context, or a
+   [latter] in the base context over a [former] whose context is at-rules
+   alone (it overrides [former]'s [@media]/[@container] values on the same
+   element; selector and [!important] contexts stay, a conditional [latter]
+   never removes a base [former]), then
    either [latter]'s family is the [all] sentinel (former removed unless
    excluded), or the same family and [former]'s mask a subset of
    [latter]'s. *)
 let removes ~former ~latter =
-  context_equal former latter
+  (context_equal former latter || (is_base latter && is_at_rules_only former))
   &&
   if String.equal latter.family all_sentinel then
     not (is_excluded_from_all former.family)

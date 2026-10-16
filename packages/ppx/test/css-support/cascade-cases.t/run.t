@@ -42,11 +42,11 @@ specificity), so read the `result` line together with the sheet.
   C05 b: label:c05_b _id_xojpie _a_7p002ix26
   C05 result: label:c05_a _id_ze6f3u _a_ekl7q7p002lpe2 label:c05_b _id_xojpie _a_7p002ix26
   C06 a: label:c06_a _id_9h2ksf _a_7p002zb3m
-  C06 b: label:c06_b _id_1a3a86h _a_48cqd7p002hw65
-  C06 result: label:c06_a _id_9h2ksf _a_7p002zb3m label:c06_b _id_1a3a86h _a_48cqd7p002hw65
-  C07 a: label:c07_a _id_l80pc8 _a_op2f07p002rqkl
-  C07 b: label:c07_b _id_1burhrp _a_4m2ng7p002mf8b
-  C07 result: label:c07_a _id_l80pc8 _a_op2f07p002rqkl label:c07_b _id_1burhrp _a_4m2ng7p002mf8b
+  C06 b: label:c06_b _id_1a3a86h _a_08cqd7p002hw65
+  C06 result: label:c06_a _id_9h2ksf _a_7p002zb3m label:c06_b _id_1a3a86h _a_08cqd7p002hw65
+  C07 a: label:c07_a _id_l80pc8 _a_0p2f07p002rqkl
+  C07 b: label:c07_b _id_1burhrp _a_0m2ng7p002mf8b
+  C07 result: label:c07_a _id_l80pc8 _a_0p2f07p002rqkl label:c07_b _id_1burhrp _a_0m2ng7p002mf8b
   C08 a: label:c08_a _id_1ockbuu _a_3hxp00
   C08 a style: --c08_a_v1-1lvioua:rgb(116, 0, 0)
   C08 b: label:c08_b _id_1e5sasy _a_3h007alxb
@@ -55,49 +55,49 @@ specificity), so read the `result` line together with the sheet.
   C09 a: label:c09_a _id_hceiu2 _a_7prubs
   C09 b: label:c09_b _id_ut9754 _a_7p0024dth
   C09 result: label:c09_a _id_hceiu2 _a_7prubs label:c09_b _id_ut9754 _a_7p0024dth
-  C10 a: label:c10_a _id_9tijwd _a_e40pk7p0021f9x
-  C10 b: label:c10_b _id_18mu5ns _a_2weld7p00220ko
-  C10 result: label:c10_a _id_9tijwd _a_e40pk7p0021f9x label:c10_b _id_18mu5ns _a_2weld7p00220ko
+  C10 a: label:c10_a _id_9tijwd _a_040pk7p0021f9x
+  C10 b: label:c10_b _id_18mu5ns _a_0weld7p00220ko
+  C10 result: label:c10_a _id_9tijwd _a_040pk7p0021f9x label:c10_b _id_18mu5ns _a_0weld7p00220ko
   C11 a: label:c11_a _id_1of8059 _a_hilvs7p002pol0
   C11 b: label:c11_b _id_1x85356 _a_h5nao7p002a83i
   C11 result: label:c11_a _id_1of8059 _a_hilvs7p002pol0 label:c11_b _id_1x85356 _a_h5nao7p002a83i
   C12 ctx c12_selected: label:c12_selected _id_1e5bhwu
-  C12 a: label:c12_a _id_1vocoou _a_07qp47p0020gi1
+  C12 a: label:c12_a _id_1vocoou _a_17qp47p0020gi1
   C12 b: label:c12_b _id_13qlz5s _a_bba1b7p002nc5q
-  C12 result: label:c12_a _id_1vocoou _a_07qp47p0020gi1 label:c12_b _id_13qlz5s _a_bba1b7p002nc5q
-  C13 a: label:c13_a _id_10r8ilv _a_48cqd7p002t29f
+  C12 result: label:c12_a _id_1vocoou _a_17qp47p0020gi1 label:c12_b _id_13qlz5s _a_bba1b7p002nc5q
+  C13 a: label:c13_a _id_10r8ilv _a_08cqd7p002t29f
   C13 b: label:c13_b _id_15lqjan _a_7p0021n1i
-  C13 result: label:c13_a _id_10r8ilv _a_48cqd7p002t29f label:c13_b _id_15lqjan _a_7p0021n1i
-  C14 a: label:c14_a _id_1bf4umr _a_4m2ng7p002uwms
-  C14 b: label:c14_b _id_q7vaei _a_op2f07p0029z3v
-  C14 result: label:c14_a _id_1bf4umr _a_4m2ng7p002uwms label:c14_b _id_q7vaei _a_op2f07p0029z3v
+  C13 result: label:c13_a _id_10r8ilv label:c13_b _id_15lqjan _a_7p0021n1i
+  C14 a: label:c14_a _id_1bf4umr _a_0m2ng7p002uwms
+  C14 b: label:c14_b _id_q7vaei _a_0p2f07p0029z3v
+  C14 result: label:c14_a _id_1bf4umr _a_0m2ng7p002uwms label:c14_b _id_q7vaei _a_0p2f07p0029z3v
   C15 a: label:c15_a _id_v7nmed _a_h5nao7p002e4q0
   C15 b: label:c15_b _id_103qmrm _a_hilvs7p002l88o
   C15 result: label:c15_a _id_v7nmed _a_h5nao7p002e4q0 label:c15_b _id_103qmrm _a_hilvs7p002l88o
   C16 a: label:c16_a _id_1yqfcxe _a_94008sfay
-  C16 b: label:c16_b _id_1v9j5os _a_5eyct94bgtl
-  C16 result: label:c16_a _id_1yqfcxe _a_94008sfay label:c16_b _id_1v9j5os _a_5eyct94bgtl
+  C16 b: label:c16_b _id_1v9j5os _a_0eyct94008jjo7 _a_0eyct94004fq8v _a_0eyct94001ash1 _a_0eyct94002yzp5
+  C16 result: label:c16_a _id_1yqfcxe _a_94008sfay label:c16_b _id_1v9j5os _a_0eyct94008jjo7 _a_0eyct94004fq8v _a_0eyct94001ash1 _a_0eyct94002yzp5
   C17 ctx c17_buttonDisabled: label:c17_buttonDisabled _id_1447smv
   C17 a: label:c17_a _id_5opoy _a_zljev7p0023unn
-  C17 b: label:c17_b _id_1kn9kpj _a_07qp47p002c72t
-  C17 result: label:c17_a _id_5opoy _a_zljev7p0023unn label:c17_b _id_1kn9kpj _a_07qp47p002c72t
+  C17 b: label:c17_b _id_1kn9kpj _a_17qp47p002c72t
+  C17 result: label:c17_a _id_5opoy _a_zljev7p0023unn label:c17_b _id_1kn9kpj _a_17qp47p002c72t
   C18 a: label:c18_a _id_eyloby _a_3hlok4jf1
   C18 b: label:c18_b _id_qg1xdk _a_3h00740we
   C18 b style: --c18_b_v1-vt5hie:rgb(138, 0, 0)
   C18 result: label:c18_a _id_eyloby _a_3hlok4jf1 label:c18_b _id_qg1xdk _a_3h00740we
   C18 result style: --c18_b_v1-vt5hie:rgb(138, 0, 0)
-  C19 a: label:c19_a _id_1bflcs3 _a_tlkns94z9it
-  C19 a style: --c19_a_v1-1g9lghy:139px;--c19_a_v2-10uwx3v:140px;--c19_a_v3-b504ir:141px;--c19_a_v4-19o2xwm:142px
-  C19 b: label:c19_b _id_1jo0oq _a_9yyk894001e01b
+  C19 a: label:c19_a _id_1bflcs3 _a_0lkns9400813ea _a_0lkns9400469ei _a_0lkns94001nnno _a_0lkns94002feuq
+  C19 a style: --c19_a_v1-163ybf4:139px;--c19_a_v2-s45lvy:140px;--c19_a_v3-a7ldva:141px;--c19_a_v4-1j7xtmt:142px
+  C19 b: label:c19_b _id_1jo0oq _a_0yyk894001e01b
   C19 b style: --c19_b_v1-64pxg7:143px
-  C19 result: label:c19_a _id_1bflcs3 _a_tlkns94z9it label:c19_b _id_1jo0oq _a_9yyk894001e01b
-  C19 result style: --c19_a_v1-1g9lghy:139px;--c19_a_v2-10uwx3v:140px;--c19_a_v3-b504ir:141px;--c19_a_v4-19o2xwm:142px;--c19_b_v1-64pxg7:143px
+  C19 result: label:c19_a _id_1bflcs3 _a_0lkns9400813ea _a_0lkns9400469ei _a_0lkns94001nnno _a_0lkns94002feuq label:c19_b _id_1jo0oq _a_0yyk894001e01b
+  C19 result style: --c19_a_v1-163ybf4:139px;--c19_a_v2-s45lvy:140px;--c19_a_v3-a7ldva:141px;--c19_a_v4-1j7xtmt:142px;--c19_b_v1-64pxg7:143px
   C20 a: label:c20_a _id_oo5y04 _a_beqwm7p00280q7
   C20 b: label:c20_b _id_1h4wcvr _a_t48el7p002w5n3
   C20 result: label:c20_a _id_oo5y04 _a_beqwm7p00280q7 label:c20_b _id_1h4wcvr _a_t48el7p002w5n3
   C21 a: label:c21_a _id_o820es _a_94erbd
-  C21 b: label:c21_b _id_1b316ye _a_tlkns94008gk6l
-  C21 result: label:c21_a _id_o820es _a_94erbd label:c21_b _id_1b316ye _a_tlkns94008gk6l
+  C21 b: label:c21_b _id_1b316ye _a_0lkns94008gk6l
+  C21 result: label:c21_a _id_o820es _a_94erbd label:c21_b _id_1b316ye _a_0lkns94008gk6l
   C22 ctx c22_inputNoBorder: label:c22_inputNoBorder _id_1eh3ga9
   C22 ctx c22_inputError: label:c22_inputError _id_1m4arcl
   C22 a: label:c22_a _id_bpr44t _a_yj3qo7p002mrog
@@ -108,45 +108,45 @@ specificity), so read the `result` line together with the sheet.
   C23 a: label:c23_a _id_1h4k8vt _a_psx2i7p0021r9j
   C23 b: label:c23_b _id_rhiltm _a_wnwbp7p002ydte
   C23 result: label:c23_a _id_1h4k8vt _a_psx2i7p0021r9j label:c23_b _id_rhiltm _a_wnwbp7p002ydte
-  C24 a: label:c24_a _id_a7zc2y _a_5eyct9416b1
+  C24 a: label:c24_a _id_a7zc2y _a_0eyct9400819j0 _a_0eyct940044pvb _a_0eyct94001ftoe _a_0eyct940025jcq
   C24 b: label:c24_b _id_16r4hzu _a_940083ump
-  C24 result: label:c24_a _id_a7zc2y _a_5eyct9416b1 label:c24_b _id_16r4hzu _a_940083ump
-  C25 a: label:c25_a _id_dr2emr _a_7l0qc94tmv1
+  C24 result: label:c24_a _id_a7zc2y _a_0eyct940044pvb _a_0eyct94001ftoe _a_0eyct940025jcq label:c24_b _id_16r4hzu _a_940083ump
+  C25 a: label:c25_a _id_dr2emr _a_7l0qc940089m9k _a_7l0qc94004s2dt _a_7l0qc940015ta4 _a_7l0qc94002y0r2
   C25 b: label:c25_b _id_1ucp1kz _a_7l0qc9400496cx
-  C25 result: label:c25_a _id_dr2emr _a_7l0qc94tmv1 label:c25_b _id_1ucp1kz _a_7l0qc9400496cx
+  C25 result: label:c25_a _id_dr2emr _a_7l0qc940089m9k _a_7l0qc940015ta4 _a_7l0qc94002y0r2 label:c25_b _id_1ucp1kz _a_7l0qc9400496cx
   C26 ctx c26_buttonSelected: label:c26_buttonSelected _id_1w5r4st
-  C26 a: label:c26_a _id_1wu295b _a_0lub38p0028f4e
+  C26 a: label:c26_a _id_1wu295b _a_1lub38p0028f4e
   C26 b: label:c26_b _id_1a36gtu _a_cx72w8p6gkw
-  C26 result: label:c26_a _id_1wu295b _a_0lub38p0028f4e label:c26_b _id_1a36gtu _a_cx72w8p6gkw
-  C27 a: label:c27_a _id_1kul53t _a_tlkns9400130iw
+  C26 result: label:c26_a _id_1wu295b _a_1lub38p0028f4e label:c26_b _id_1a36gtu _a_cx72w8p6gkw
+  C27 a: label:c27_a _id_1kul53t _a_0lkns9400130iw
   C27 a style: --c27_a_v1-1hjd3hh:157px
-  C27 b: label:c27_b _id_1btrebe _a_9yyk894mf2m
-  C27 b style: --c27_b_v1-ecvqql:158px;--c27_b_v2-1cbrlo8:159px;--c27_b_v3-1cwxpmt:160px;--c27_b_v4-1suqbkt:161px
-  C27 result: label:c27_a _id_1kul53t _a_tlkns9400130iw label:c27_b _id_1btrebe _a_9yyk894mf2m
-  C27 result style: --c27_a_v1-1hjd3hh:157px;--c27_b_v1-ecvqql:158px;--c27_b_v2-1cbrlo8:159px;--c27_b_v3-1cwxpmt:160px;--c27_b_v4-1suqbkt:161px
+  C27 b: label:c27_b _id_1btrebe _a_0yyk8940080sah _a_0yyk894004ny7b _a_0yyk894001miul _a_0yyk89400234pb
+  C27 b style: --c27_b_v1-16885d4:158px;--c27_b_v2-1m0j9b0:159px;--c27_b_v3-1hppezn:160px;--c27_b_v4-jal82u:161px
+  C27 result: label:c27_a _id_1kul53t _a_0lkns9400130iw label:c27_b _id_1btrebe _a_0yyk8940080sah _a_0yyk894004ny7b _a_0yyk894001miul _a_0yyk89400234pb
+  C27 result style: --c27_a_v1-1hjd3hh:157px;--c27_b_v1-16885d4:158px;--c27_b_v2-1m0j9b0:159px;--c27_b_v3-1hppezn:160px;--c27_b_v4-jal82u:161px
   C28 a: label:c28_a _id_1dzye _a_663aw7p002sqqh
   C28 b: label:c28_b _id_1mqwope _a_4sm4u7p002v7fa
   C28 result: label:c28_a _id_1dzye _a_663aw7p002sqqh label:c28_b _id_1mqwope _a_4sm4u7p002v7fa
-  C29 a: label:c29_a _id_1mnug77 _a_e40pk7p002xply
-  C29 b: label:c29_b _id_1h2xeb _a_5eyct7p002a5oh
-  C29 result: label:c29_a _id_1mnug77 _a_e40pk7p002xply label:c29_b _id_1h2xeb _a_5eyct7p002a5oh
-  C29S a: label:c29s_a _id_1lq16sq _a_e40pk7p0026vnd
-  C29S b: label:c29s_b _id_9quai9 _a_5eyct7p002un4b
-  C29S result: label:c29s_a _id_1lq16sq _a_e40pk7p0026vnd label:c29s_b _id_9quai9 _a_5eyct7p002un4b
+  C29 a: label:c29_a _id_1mnug77 _a_040pk7p002xply
+  C29 b: label:c29_b _id_1h2xeb _a_0eyct7p002a5oh
+  C29 result: label:c29_a _id_1mnug77 _a_040pk7p002xply label:c29_b _id_1h2xeb _a_0eyct7p002a5oh
+  C29S a: label:c29s_a _id_1lq16sq _a_040pk7p0026vnd
+  C29S b: label:c29s_b _id_9quai9 _a_0eyct7p002un4b
+  C29S result: label:c29s_a _id_1lq16sq _a_040pk7p0026vnd label:c29s_b _id_9quai9 _a_0eyct7p002un4b
   C30 result: label:c30 _id_1c4z69j _a_2zdht7p002udu7 _a_6d4lr7p002li07
   C31 a: label:c31_a _id_122vg2n _a_4sm4u7p002f318
   C31 b: label:c31_b _id_1a5cy56 _a_663aw7p002rbvl
   C31 result: label:c31_a _id_122vg2n _a_4sm4u7p002f318 label:c31_b _id_1a5cy56 _a_663aw7p002rbvl
-  C32 a: label:c32_a _id_1ek8295 _a_0lub38p002xhxr
+  C32 a: label:c32_a _id_1ek8295 _a_1lub38p002xhxr
   C32 b: label:c32_b _id_1ggv8nb _a_x7ow78plm9p
-  C32 result: label:c32_a _id_1ek8295 _a_0lub38p002xhxr label:c32_b _id_1ggv8nb _a_x7ow78plm9p
+  C32 result: label:c32_a _id_1ek8295 _a_1lub38p002xhxr label:c32_b _id_1ggv8nb _a_x7ow78plm9p
   C33 a: label:c33_a _id_8pspmu _a_wnwbp7p002eund
   C33 b: label:c33_b _id_48ih9p _a_psx2i7p002srlh
   C33 result: label:c33_a _id_8pspmu _a_wnwbp7p002eund label:c33_b _id_48ih9p _a_psx2i7p002srlh
   C34 a: label:c34_a _id_14o83mv _in_e66e9x
   C34 a style: --c34_a_v1-1xdslk1:175px
-  C34 b: label:c34_b _id_7tm2kg _a_op2f07p002l8pl
-  C34 result: label:c34_a _id_14o83mv _in_e66e9x label:c34_b _id_7tm2kg _a_op2f07p002l8pl
+  C34 b: label:c34_b _id_7tm2kg _a_0p2f07p002l8pl
+  C34 result: label:c34_a _id_14o83mv _in_e66e9x label:c34_b _id_7tm2kg _a_0p2f07p002l8pl
   C34 result style: --c34_a_v1-1xdslk1:175px
   C35 ctx c35_rowIndented: label:c35_rowIndented _id_66z6xh
   C35 a: label:c35_a _id_1edop6 _in_lgxrcz
@@ -170,28 +170,28 @@ specificity), so read the `result` line together with the sheet.
   C38 b: label:c38_b _id_v1li1d _a_ra8lm7p002tc72
   C38 result: label:c38_a _id_ug3vas _a_ugao67p002qgqh label:c38_b _id_v1li1d _a_ra8lm7p002tc72
   C39 result: label:c39 _id_6d8oqf _a_ekl7q3hghsq4mq _a_qyw7u3hpa8a83z
-  C40 result: label:c40 _id_bzqj9h _a_27csn940010i0u _a_zucss94w4l0
-  C40 result style: --c40_v1-1bz5jgd:189px;--c40_v2-1dn44o2:190px
+  C40 result: label:c40 _id_bzqj9h _a_27csn940010i0u _a_zucss94008bhua _a_zucss94004l9tt _a_zucss94001wzfo _a_zucss94002ur1w
+  C40 result style: --c40_v1-1bz5jgd:189px;--c40_v2-1w0q8ym:190px
   C41 ctx c41_tbody: label:c41_tbody _id_vm645b
   C41 ctx c41_rowTitleAlwaysVisible: label:c41_rowTitleAlwaysVisible _id_19bya77
   C41 result: label:c41 _id_12z3w26 _a_eda5c94008zrmd _in_8r42bl
   C41 result style: --c41_v1-1j6wafs:192px
-  C42 result: label:c42 _id_rfojbb _a_izmu294lxcy _a_e6xeu94008in7j
-  C43 a: label:c43_a _id_15u1vzy _a_tlkns7p0086ndg
-  C43 b: label:c43_b _id_1axilhb _in_hp3r9r
-  C43 b style: --c43_b_v1-1xvqxy7:199px
-  C43 result: label:c43_a _id_15u1vzy _a_tlkns7p0086ndg label:c43_b _id_1axilhb _in_hp3r9r
-  C43 result style: --c43_b_v1-1xvqxy7:199px
-  C44 result: label:c44 _id_15q2cly _a_kiios3hlokcxkw _a_vo2ns3h004edka
+  C42 result: label:c42 _id_rfojbb _a_izmu294008sot2 _a_izmu294004qdlh _a_izmu294001f4h0 _a_izmu294002t9qt _a_e6xeu94008in7j
+  C43 a: label:c43_a _id_15u1vzy _a_0lkns7p0086ndg
+  C43 b: label:c43_b _id_1axilhb _in_1yn9bw0 _a_17qp47p008o4hq _a_17qp47p004potp _a_17qp47p002a0co
+  C43 b style: --c43_b_v1-1v6prfd:199px
+  C43 result: label:c43_a _id_15u1vzy _a_0lkns7p0086ndg label:c43_b _id_1axilhb _in_1yn9bw0 _a_17qp47p008o4hq _a_17qp47p004potp _a_17qp47p002a0co
+  C43 result style: --c43_b_v1-1v6prfd:199px
+  C44 result: label:c44 _id_15q2cly _a_kiios3hekgppxo _a_kiios3h6bkexyd _a_kiios3h0045s6n _a_kiios3h0sgi3ze _a_vo2ns3h004edka
   C45 ctx c45_compactButtonLeft: label:c45_compactButtonLeft _id_z1l0g2
-  C45 result: label:c45 _id_1dru6e3 _in_1rp7ocu _a_07qp43hef5ui7a
+  C45 result: label:c45 _id_1dru6e3 _in_1rp7ocu _a_17qp43hef5ui7a
   C45 result style: --c45_v1-19lye7:rgb(204, 0, 0);--c45_v2-1h7t4j3:rgb(205, 0, 0)
   C46 result: label:c46 _id_1u8w2oz _a_2y6oc2z008jmji _a_ra0y62zvxvs
   C47 ctx c47_headerMenuOpened: label:c47_headerMenuOpened _id_15bl859
   C47 result: label:c47 _id_1p3m5s4 _in_l2s8fc _in_hy12jj
   C47 result style: --c47_v1-1hv8o2g:208px;--c47_v2-sxcaga:209px
   C48 result: label:c48 _id_1t3pmcy _a_otmai7p002nesm _a_glkoj7p002viye
-  C49 result: label:c49 _id_24diba _a_2cunn3hef5s3e1 _a_f1m0m3hag2y
+  C49 result: label:c49 _id_24diba _a_2cunn3hcn4qhy7 _a_2cunn3h1kw8qnj _a_2cunn3h001oyn9 _a_2cunn3h074hjge _a_f1m0m3hag2y
 
 The stylesheet, from the same post-PPX files the executable was built from, so
 its classes are the ones printed above:
@@ -202,46 +202,58 @@ its classes are the ones printed above:
   @property --c37s_b_v1-s4zg91{syntax:"*";inherits:false;}
   @property --c08_a_v1-1lvioua{syntax:"*";inherits:false;}
   @property --c18_b_v1-vt5hie{syntax:"*";inherits:false;}
-  @property --c19_a_v1-1g9lghy{syntax:"*";inherits:false;}
-  @property --c19_a_v2-10uwx3v{syntax:"*";inherits:false;}
-  @property --c19_a_v3-b504ir{syntax:"*";inherits:false;}
-  @property --c19_a_v4-19o2xwm{syntax:"*";inherits:false;}
+  @property --c19_a_v1-163ybf4{syntax:"*";inherits:false;}
+  @property --c19_a_v2-s45lvy{syntax:"*";inherits:false;}
+  @property --c19_a_v3-a7ldva{syntax:"*";inherits:false;}
+  @property --c19_a_v4-1j7xtmt{syntax:"*";inherits:false;}
   @property --c19_b_v1-64pxg7{syntax:"*";inherits:false;}
   @property --c22_a_v1-15yxvdj{syntax:"*";inherits:false;}
   @property --c27_a_v1-1hjd3hh{syntax:"*";inherits:false;}
-  @property --c27_b_v1-ecvqql{syntax:"*";inherits:false;}
-  @property --c27_b_v2-1cbrlo8{syntax:"*";inherits:false;}
-  @property --c27_b_v3-1cwxpmt{syntax:"*";inherits:false;}
-  @property --c27_b_v4-1suqbkt{syntax:"*";inherits:false;}
+  @property --c27_b_v1-16885d4{syntax:"*";inherits:false;}
+  @property --c27_b_v2-1m0j9b0{syntax:"*";inherits:false;}
+  @property --c27_b_v3-1hppezn{syntax:"*";inherits:false;}
+  @property --c27_b_v4-jal82u{syntax:"*";inherits:false;}
   @property --c34_a_v1-1xdslk1{syntax:"*";inherits:false;}
   @property --c35_a_v1-qbjrz1{syntax:"*";inherits:false;}
   @property --c35_b_v1-19zf6xg{syntax:"*";inherits:false;}
   @property --c41_v1-1j6wafs{syntax:"*";inherits:false;}
-  @property --c43_b_v1-1xvqxy7{syntax:"*";inherits:false;}
+  @property --c43_b_v1-1v6prfd{syntax:"*";inherits:false;}
   @property --c45_v1-19lye7{syntax:"*";inherits:false;}
   @property --c45_v2-1h7t4j3{syntax:"*";inherits:false;}
   @property --c47_v1-1hv8o2g{syntax:"*";inherits:false;}
   @property --c47_v2-sxcaga{syntax:"*";inherits:false;}
-  ._a_7l0qc94tmv1 input{padding:154px;}
-  ._a_izmu294lxcy td{padding:193px 194px;}
   ._a_f1m0m3hag2y input:focus{border:212px solid rgb(214, 0, 0);}
   ._a_beqwm7p00280q7 svg{margin-left:144px !important;}
   ._a_t48el7p002w5n3 > svg{margin-left:145px !important;}
   ._a_psx2i7p0021r9j > a{margin-left:150px;}
+  ._a_7l0qc940089m9k input{padding-top:154px;}
+  ._a_7l0qc94004s2dt input{padding-right:154px;}
+  ._a_7l0qc940015ta4 input{padding-bottom:154px;}
+  ._a_7l0qc94002y0r2 input{padding-left:154px;}
   ._a_7l0qc9400496cx input{padding-right:155px;}
   ._a_psx2i7p002srlh > a{margin-left:174px;}
   ._a_ra8lm7p002tc72 input{margin-left:185px !important;}
   ._a_ugao67p002qgqh > input{margin-left:186px !important;}
   ._a_27csn940010i0u a{padding-bottom:var(--c40_v1-1bz5jgd);}
-  ._a_kiios3hlokcxkw td:first-child{border-width:200px;}
-  ._a_2cunn3hef5s3e1 input:hover{border-color:rgb(213, 0, 0);}
+  ._a_izmu294008sot2 td{padding-top:193px;}
+  ._a_izmu294004qdlh td{padding-right:194px;}
+  ._a_izmu294001f4h0 td{padding-bottom:193px;}
+  ._a_izmu294002t9qt td{padding-left:194px;}
+  ._a_kiios3hekgppxo td:first-child{border-top-width:200px;}
+  ._a_kiios3h6bkexyd td:first-child{border-right-width:200px;}
+  ._a_kiios3h0045s6n td:first-child{border-bottom-width:200px;}
+  ._a_kiios3h0sgi3ze td:first-child{border-left-width:200px;}
+  ._a_2cunn3hcn4qhy7 input:hover{border-top-color:rgb(213, 0, 0);}
+  ._a_2cunn3h1kw8qnj input:hover{border-right-color:rgb(213, 0, 0);}
+  ._a_2cunn3h001oyn9 input:hover{border-bottom-color:rgb(213, 0, 0);}
+  ._a_2cunn3h074hjge input:hover{border-left-color:rgb(213, 0, 0);}
   ._a_3hxp00{border:115px solid var(--c08_a_v1-1lvioua);}
   ._a_3h007alxb{border-bottom:117px dotted;}
   ._a_7prubs{margin:118px;}
   ._a_3h00740we{border-bottom:137px solid var(--c18_b_v1-vt5hie);}
   ._a_94erbd{padding:146px;}
   ._a_cx72w8p6gkw._id_1w5r4st{outline:156px dashed red;}
-  ._in_hp3r9r{margin:197px 0 var(--c43_b_v1-1xvqxy7);}
+  ._in_1yn9bw0{margin:197px 0 var(--c43_b_v1-1v6prfd);}
   ._in_1rp7ocu._id_z1l0g2{border-left:202px solid var(--c45_v1-19lye7);}
   ._a_7p002t5hr{margin-left:181px;}
   ._in_1frk7ck{margin-left:var(--c37_b_v1-la3zpt);}
@@ -268,7 +280,6 @@ its classes are the ones printed above:
   ._a_940083ump{padding-top:153px;}
   ._id_66z6xh ._a_y3idz94002rflh{padding-left:var(--c35_b_v1-19zf6xg);}
   ._id_vm645b:first-child ._a_eda5c94008zrmd{padding-top:191px;}
-  @media (max-width: 767px) {._a_zucss94w4l0 a{padding:188px 0 var(--c40_v2-1dn44o2);}}
   ._a_4sm4u7p002v7fa:disabled span{margin-left:163px !important;}
   ._a_4sm4u7p002f318:disabled span{margin-left:170px !important;}
   ._a_663aw7p002sqqh:hover span{margin-left:162px !important;}
@@ -277,16 +288,15 @@ its classes are the ones printed above:
   @media (min-width: 768px) and (max-width: 1279px) {._a_2zdht7p002udu7 th:first-child{margin-left:168px;}}
   @media (max-width: 767px) {._a_6d4lr7p002li07 th:first-child{margin-left:169px;}}
   @media (min-width: 1280px) {._a_wnwbp7p002eund > a{margin-left:173px;}}
+  @media (max-width: 767px) {._a_zucss94008bhua a{padding-top:188px;}}
+  @media (max-width: 767px) {._a_zucss94004l9tt a{padding-right:0;}}
+  @media (max-width: 767px) {._a_zucss94001wzfo a{padding-bottom:var(--c40_v2-1w0q8ym);}}
+  @media (max-width: 767px) {._a_zucss94002ur1w a{padding-left:0;}}
   @media (max-width: 767px) {._a_e6xeu94008in7j td{padding-top:195px;}}
   ._a_vo2ns3h004edka:last-child td{border-bottom-width:201px;}
   ._a_ekl7q3hghsq4mq:first-child{border-top:187px dotted red;}
-  ._in_hp3r9r:disabled{margin:198px 0 var(--c43_b_v1-1xvqxy7);}
   ._in_1rp7ocu:disabled{border-left:203px solid var(--c45_v1-19lye7);}
   ._a_x7ow78plm9p:active{outline:172px groove red;}
-  @media (max-width: 768px) {._a_5eyct94bgtl{padding:133px;}}
-  @media (max-width: 767px) {._a_tlkns94z9it{padding:var(--c19_a_v1-1g9lghy) var(--c19_a_v2-10uwx3v) var(--c19_a_v3-b504ir) var(--c19_a_v4-19o2xwm);}}
-  @media (max-width: 768px) {._a_5eyct9416b1{padding:152px;}}
-  @media (max-width: 1279px) {._a_9yyk894mf2m{padding:var(--c27_b_v1-ecvqql) var(--c27_b_v2-1cbrlo8) var(--c27_b_v3-1cwxpmt) var(--c27_b_v4-1suqbkt);}}
   @media (prefers-reduced-motion: reduce) {._a_ra0y62zvxvs::before{-webkit-animation:207s ease;animation:207s ease;}}
   ._a_ekl7q7p002lpe2:first-child{margin-left:109px;}
   ._a_ekl7q7p0024ttg:first-child{margin-left:179px;}
@@ -294,42 +304,62 @@ its classes are the ones printed above:
   ._in_1frk7ck:disabled{margin-left:var(--c37_b_v1-la3zpt);}
   ._in_o5kb48:disabled{margin-left:var(--c37s_b_v1-s4zg91);}
   ._a_hilvs7p002pol0:disabled{margin-left:122px !important;}
-  ._a_07qp47p0020gi1:disabled{margin-left:124px;}
+  ._a_17qp47p0020gi1:disabled{margin-left:124px;}
   ._a_hilvs7p002l88o:disabled{margin-left:131px !important;}
-  ._a_07qp47p002c72t:disabled{margin-left:135px;}
+  ._a_17qp47p002c72t:disabled{margin-left:135px;}
   ._in_e66e9x:disabled{margin-left:var(--c34_a_v1-1xdslk1);}
   ._in_lgxrcz:disabled{padding-left:var(--c35_a_v1-qbjrz1);}
   ._in_8r42bl:disabled{padding-top:var(--c41_v1-1j6wafs);}
-  ._a_07qp43hef5ui7a:disabled{border-color:var(--c45_v2-1h7t4j3);}
+  ._a_17qp47p008o4hq:disabled{margin-top:198px;}
+  ._a_17qp47p004potp:disabled{margin-right:0;}
+  ._in_1yn9bw0:disabled{margin-bottom:var(--c43_b_v1-1v6prfd);}
+  ._a_17qp47p002a0co:disabled{margin-left:0;}
+  ._a_17qp43hef5ui7a:disabled{border-color:var(--c45_v2-1h7t4j3);}
   ._in_l2s8fc:disabled{margin-left:var(--c47_v1-1hv8o2g);}
   ._in_hy12jj:disabled{margin-left:var(--c47_v2-sxcaga);}
   ._a_h5nao7p002a83i:hover{margin-left:123px !important;}
   ._a_h5nao7p002e4q0:hover{margin-left:130px !important;}
   ._in_hy12jj:hover{margin-left:var(--c47_v2-sxcaga);}
-  ._a_0lub38p0028f4e:focus{outline-style:dotted;}
-  ._a_0lub38p002xhxr:focus{outline-style:double;}
+  ._a_1lub38p0028f4e:focus{outline-style:dotted;}
+  ._a_1lub38p002xhxr:focus{outline-style:double;}
   ._a_2y6oc2z008jmji::before{-webkit-animation-duration:206s;animation-duration:206s;}
-  @media print {._a_e40pk7p002xply{margin-left:164px;}}
-  @media (max-width: 768px) {._a_5eyct7p002a5oh{margin-left:165px;}}
-  @media (max-width: 768px) {._a_5eyct7p002un4b{margin-left:167px;}}
-  @media print {._a_e40pk7p0026vnd{margin-left:166px;}}
-  @media (max-width: 1200px) {._a_op2f07p002rqkl{margin-left:113px;}}
-  @media (max-width: 992px) {._a_4m2ng7p002mf8b{margin-left:114px;}}
-  @media print {._a_e40pk7p0021f9x{margin-left:120px;}}
-  @media (max-width: 1200px) {._a_op2f07p0029z3v{margin-left:128px;}}
-  @media (max-width: 992px) {._a_4m2ng7p002uwms{margin-left:129px;}}
-  @media (max-width: 1279px) {._a_9yyk894001e01b{padding-bottom:var(--c19_b_v1-64pxg7);}}
-  @media (max-width: 767px) {._a_tlkns94008gk6l{padding-top:147px;}}
-  @media (max-width: 767px) {._a_tlkns9400130iw{padding-bottom:var(--c27_a_v1-1hjd3hh);}}
-  @media (max-width: 1200px) {._a_op2f07p002l8pl{margin-left:176px;}}
-  @media (max-width: 767px) {._a_tlkns7p0086ndg{margin-top:196px;}}
+  @media print {._a_040pk7p002xply{margin-left:164px;}}
+  @media (max-width: 768px) {._a_0eyct7p002a5oh{margin-left:165px;}}
+  @media (max-width: 768px) {._a_0eyct7p002un4b{margin-left:167px;}}
+  @media print {._a_040pk7p0026vnd{margin-left:166px;}}
+  @media (max-width: 1200px) {._a_0p2f07p002rqkl{margin-left:113px;}}
+  @media (max-width: 992px) {._a_0m2ng7p002mf8b{margin-left:114px;}}
+  @media print {._a_040pk7p0021f9x{margin-left:120px;}}
+  @media (max-width: 1200px) {._a_0p2f07p0029z3v{margin-left:128px;}}
+  @media (max-width: 992px) {._a_0m2ng7p002uwms{margin-left:129px;}}
+  @media (max-width: 768px) {._a_0eyct94008jjo7{padding-top:133px;}}
+  @media (max-width: 768px) {._a_0eyct94004fq8v{padding-right:133px;}}
+  @media (max-width: 768px) {._a_0eyct94001ash1{padding-bottom:133px;}}
+  @media (max-width: 768px) {._a_0eyct94002yzp5{padding-left:133px;}}
+  @media (max-width: 767px) {._a_0lkns9400813ea{padding-top:var(--c19_a_v1-163ybf4);}}
+  @media (max-width: 767px) {._a_0lkns9400469ei{padding-right:var(--c19_a_v2-s45lvy);}}
+  @media (max-width: 767px) {._a_0lkns94001nnno{padding-bottom:var(--c19_a_v3-a7ldva);}}
+  @media (max-width: 767px) {._a_0lkns94002feuq{padding-left:var(--c19_a_v4-1j7xtmt);}}
+  @media (max-width: 1279px) {._a_0yyk894001e01b{padding-bottom:var(--c19_b_v1-64pxg7);}}
+  @media (max-width: 767px) {._a_0lkns94008gk6l{padding-top:147px;}}
+  @media (max-width: 768px) {._a_0eyct9400819j0{padding-top:152px;}}
+  @media (max-width: 768px) {._a_0eyct940044pvb{padding-right:152px;}}
+  @media (max-width: 768px) {._a_0eyct94001ftoe{padding-bottom:152px;}}
+  @media (max-width: 768px) {._a_0eyct940025jcq{padding-left:152px;}}
+  @media (max-width: 767px) {._a_0lkns9400130iw{padding-bottom:var(--c27_a_v1-1hjd3hh);}}
+  @media (max-width: 1279px) {._a_0yyk8940080sah{padding-top:var(--c27_b_v1-16885d4);}}
+  @media (max-width: 1279px) {._a_0yyk894004ny7b{padding-right:var(--c27_b_v2-1m0j9b0);}}
+  @media (max-width: 1279px) {._a_0yyk894001miul{padding-bottom:var(--c27_b_v3-1hppezn);}}
+  @media (max-width: 1279px) {._a_0yyk89400234pb{padding-left:var(--c27_b_v4-jal82u);}}
+  @media (max-width: 1200px) {._a_0p2f07p002l8pl{margin-left:176px;}}
+  @media (max-width: 767px) {._a_0lkns7p0086ndg{margin-top:196px;}}
   @media (max-width: 767px) {._in_l2s8fc._id_15bl859{margin-left:var(--c47_v1-1hv8o2g);}}
   @media (max-width: 1279px) {._id_19bya77 ._in_8r42bl:first-child{padding-top:var(--c41_v1-1j6wafs);}}
   @media (max-width: 1279px) {._a_glkoj7p002viye:first-child{margin-left:211px;}}
   @media (max-width: 1279px) {._in_lgxrcz:last-child{padding-left:var(--c35_a_v1-qbjrz1);}}
   @media (max-width: 1279px) {._a_f6v007p002vsgb:nth-child(2){margin-left:180px;}}
-  @container (max-width: 768px) {._a_48cqd7p002hw65{margin-left:112px;}}
-  @container app-main (max-width: 768px) {._a_2weld7p00220ko{margin-left:121px;}}
-  @container (max-width: 768px) {._a_48cqd7p002t29f{margin-left:126px;}}
+  @container (max-width: 768px) {._a_08cqd7p002hw65{margin-left:112px;}}
+  @container app-main (max-width: 768px) {._a_0weld7p00220ko{margin-left:121px;}}
+  @container (max-width: 768px) {._a_08cqd7p002t29f{margin-left:126px;}}
   @container app-main (max-width: 992px) {._in_e66e9x{margin-left:var(--c34_a_v1-1xdslk1);}}
   ._a_qyw7u3hpa8a83z:hover{border-top-style:solid;}
