@@ -812,6 +812,104 @@ module Css_transform = {
     );
   };
 
+  /* Pseudo-elements that no engine lets a pseudo-class follow: Firefox 148,
+     Chromium 147 and WebKit 26.4 all give `CSS.supports("selector(.x::before:hover)")
+     = false` for `:hover`, `:focus`, `:active`, `:not()`, `:is()`, `:where()`,
+     `:has()`, `:first-child`, `:nth-child()`, `:disabled`, `:checked`, `:empty`,
+     `:lang()`, `:dir()`, `:focus-visible`, `:focus-within`, `:root`, `:target`,
+     `:window-inactive` and `:fullscreen` after each of them, and a `:hover`
+     rule on the pseudo-element never matches under a real pointer. The browser
+     drops the whole rule. Left out on purpose, because some engine accepts a
+     pseudo-class after them: `::placeholder` (`:hover` in Firefox and WebKit),
+     `::selection` and `::cue` (`:window-inactive`, `:hover` in Chromium and
+     WebKit), `::file-selector-button`, `::part()`, `::slotted()`, the
+     `::-webkit-` and `::-moz-` families, `::view-transition-*` and
+     `::details-content`. */
+  let never_followed_by_pseudo_class = [
+    "before",
+    "after",
+    "first-line",
+    "first-letter",
+    "marker",
+  ];
+
+  /* The first pseudo-class that follows one of those pseudo-elements in one
+     compound, with the pseudo-element's name. Both spellings: `::before` and
+     the legacy `:before`. */
+  let rec pseudo_class_after_pseudo_element =
+          (sel: selector)
+          : option((string, Styled_ppx_css_parser.Ast.pseudo_selector)) => {
+    let is_listed = name =>
+      List.mem(String.lowercase_ascii(name), never_followed_by_pseudo_class);
+    let of_compound =
+        ({ subclass_selectors, pseudo_selectors, _ }: compound_selector) => {
+      let rec scan = (current, pseudos) =>
+        switch (pseudos) {
+        | [] => None
+        | [Pseudoelement(name), ...rest] =>
+          scan(is_listed(name) ? Some(name) : None, rest)
+        | [PseudoelementFunction(_), ...rest] => scan(None, rest)
+        | [Pseudoclass(_) as pc, ..._] when current != None =>
+          Some((Option.get(current), pc))
+        | [Pseudoclass(_), ...rest] => scan(current, rest)
+        };
+      let rec scan_legacy = (current, subclasses) =>
+        switch (subclasses) {
+        | [] => None
+        | [Pseudo_class(Pseudoclass(PseudoIdent(name))), ...rest]
+            when current == None && is_listed(name) && name != "marker" =>
+          scan_legacy(Some(name), rest)
+        | [Pseudo_class(Pseudoclass(_) as pc), ..._] when current != None =>
+          Some((Option.get(current), pc))
+        | [_, ...rest] => scan_legacy(current, rest)
+        };
+      switch (scan_legacy(None, subclass_selectors)) {
+      | Some(_) as found => found
+      | None => scan(None, pseudo_selectors)
+      };
+    };
+    switch (sel) {
+    | CompoundSelector(compound) => of_compound(compound)
+    | ComplexSelector(Selector(inner)) =>
+      pseudo_class_after_pseudo_element(inner)
+    | ComplexSelector(Combinator({ left, right })) =>
+      List.find_map(
+        pseudo_class_after_pseudo_element,
+        [left, ...List.map(snd, right)],
+      )
+    | RelativeSelector({ complex_selector, _ }) =>
+      pseudo_class_after_pseudo_element(ComplexSelector(complex_selector))
+    | SimpleSelector(_) => None
+    };
+  };
+
+  let raise_pseudo_class_after_pseudo_element_error =
+      (~loc, ~source_position_start, ~element, ~pseudo_class) => {
+    let render = pseudo =>
+      Styled_ppx_css_parser.Render.selector(
+        CompoundSelector({
+          type_selector: None,
+          subclass_selectors: [],
+          pseudo_selectors: [pseudo],
+        }),
+      );
+    let pseudo_class = render(pseudo_class);
+    Ppxlib.Location.raise_errorf(
+      ~loc=
+        Styled_ppx_css_parser.Parser_location.to_file_location(
+          ~source_position_start,
+          loc,
+        ),
+      "`%s` after the pseudo-element `::%s` never matches: no browser accepts `&::%s%s`, so the whole rule is dropped. Write the pseudo-class first: `&%s::%s`.",
+      pseudo_class,
+      element,
+      element,
+      pseudo_class,
+      pseudo_class,
+      element,
+    );
+  };
+
   /* Mirrors the `@media`-prelude rejection: a value interpolation under a
      subtree-escaping selector cannot be reached by the `var(--…)`
      indirection, so reject it instead of emitting silently-broken CSS. */
@@ -1813,6 +1911,22 @@ module Css_transform = {
           | None => child_selectors
           | Some(parent) => merge_preludes(~parent, ~child=child_selectors)
           };
+        /* Checked after the parent merge: `&::after { &:focus { ... } }`
+           resolves to `&::after:focus`. */
+        List.iter(
+          ((sel, sel_loc)) =>
+            switch (pseudo_class_after_pseudo_element(sel)) {
+            | Some((element, pseudo_class)) =>
+              raise_pseudo_class_after_pseudo_element_error(
+                ~loc=sel_loc,
+                ~source_position_start,
+                ~element,
+                ~pseudo_class,
+              )
+            | None => ()
+            },
+          effective_selectors,
+        );
         extract_atomic_rules_from_block(
           ~conditional=conditional || !is_bare_ampersand(effective_selectors),
           ~parent_prelude=effective_selectors,

@@ -170,11 +170,11 @@ let e13_b = [%css {|
 |}];
 show("E13", [("a", e13_a), ("b", e13_b)], CSS.merge(e13_a, e13_b));
 
-/* E14: pseudo-class after pseudo-element (A) vs before it (B), the same chain weight
+/* E14: pseudo-element alone (A) vs a pseudo-class before the pseudo-element (B)
    intended: B
-   note: a browser never matches ::before:hover, so A can never apply */
+   note: the other order, `&::before:hover`, is a compile error now (`pseudo-class-after-pseudo-element-error.t`): no browser accepts it, so it could never apply */
 let e14_a = [%css {|
-  &::before:hover { color: rgb(23, 0, 0); }
+  &::before { color: rgb(23, 0, 0); }
 |}];
 let e14_b = [%css {|
   &:hover::before { color: rgb(24, 0, 0); }

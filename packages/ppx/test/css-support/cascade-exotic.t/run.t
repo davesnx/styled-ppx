@@ -77,9 +77,9 @@ specificity), so read the `result` line together with the sheet.
   E13 a: label:e13_a _id_1rl4bhy _a_2y6oc4eka7d
   E13 b: label:e13_b _id_1kswgxt _a_uo5714ehng9
   E13 result: label:e13_a _id_1rl4bhy _a_2y6oc4eka7d label:e13_b _id_1kswgxt _t1_uo5714ehng9
-  E14 a: label:e14_a _id_l4w2s0 _a_glt2n4e9r8z
+  E14 a: label:e14_a _id_l4w2s0 _a_2y6oc4evzik
   E14 b: label:e14_b _id_1lq5nuv _a_xmsc94ee0l8
-  E14 result: label:e14_a _id_l4w2s0 _a_glt2n4e9r8z label:e14_b _id_1lq5nuv _t1_xmsc94ee0l8
+  E14 result: label:e14_a _id_l4w2s0 _a_2y6oc4evzik label:e14_b _id_1lq5nuv _t1_xmsc94ee0l8
   E15 a: label:e15_a _id_1i263tt _a_7pi834
   E15 b: label:e15_b _id_tdw72g _a_7p0002ul8g
   E15 result: label:e15_a _id_1i263tt _a_7pi834 label:e15_b _id_tdw72g _a_7p0002ul8g
@@ -232,7 +232,7 @@ its classes are the ones printed above:
   ._a_x7ow72z5tji:active,._t1_x7ow72z5tji:not(x-):active,._t2_x7ow72z5tji:not(x-):not(x-):active{-webkit-animation:332s ease;animation:332s ease;}
   ._a_2y6oc4eka7d::before,._t1_2y6oc4eka7d:not(x-)::before,._t2_2y6oc4eka7d:not(x-):not(x-)::before{color:rgb(21, 0, 0);}
   ._a_uo5714ehng9::after,._t1_uo5714ehng9:not(x-)::after,._t2_uo5714ehng9:not(x-):not(x-)::after{color:rgb(22, 0, 0);}
-  ._a_glt2n4e9r8z::before:hover,._t1_glt2n4e9r8z:not(x-)::before:hover,._t2_glt2n4e9r8z:not(x-):not(x-)::before:hover{color:rgb(23, 0, 0);}
+  ._a_2y6oc4evzik::before,._t1_2y6oc4evzik:not(x-)::before,._t2_2y6oc4evzik:not(x-):not(x-)::before{color:rgb(23, 0, 0);}
   ._a_xmsc94ee0l8:hover::before,._t1_xmsc94ee0l8:not(x-):hover::before,._t2_xmsc94ee0l8:not(x-):not(x-):hover::before{color:rgb(24, 0, 0);}
   @media (max-width: 1200px) {._a_cht88948fkm,._t1_cht88948fkm:not(x-),._t2_cht88948fkm:not(x-):not(x-){padding:341px !important;}}
   @media (max-width: 1200px) {._a_0p2f0zys35fv8rtiz,._t1_0p2f0zys35fv8rtiz:not(x-),._t2_0p2f0zys35fv8rtiz:not(x-):not(x-){--e40-x:376px;}}
