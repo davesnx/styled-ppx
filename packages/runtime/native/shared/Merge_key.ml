@@ -4,16 +4,16 @@
    [CSS.merge]'s removal rule, applied entirely at runtime by parsing the
    fixed-width fields [Class_format] already encoded into an atom's class
    name (context/family/extended/mask/value) - no shorthand table, no CSS
-   property knowledge. Every field is compared as an opaque string (context,
-   family, extended) or an opaque bounded int (mask, via a bitwise subset
-   check); this module never needs to know WHAT a field means, only how
-   wide it is and how two atoms' fields compare.
+   property knowledge. It mirrors [Slot_key.removes]. This module never
+   needs to know WHAT a field means, only how wide it is and how two atoms'
+   fields compare: context and extended are compared in place, by offset
+   into the class name, the family is packed into an int, and only the mask
+   is decoded (a bitwise subset check). No substring is built per field
+   because merging runs on every [CSS.merge] call.
 
-   The twin ([_t<k>_] classes, see [twin_level]) is the other half: where
-   removal is not possible, the later atom's class is swapped for a twin that
-   [packages/generate] gives a higher specificity.
-
-   This is the single rule [Slot_key.removes] defines.
+   The twin ([_t<k>_] classes, see [twin_block] and [raise_levels]) is the
+   other half: where removal is not possible, the later atom's class is
+   swapped for a twin that [packages/generate] gives a higher specificity.
 
    Why this duplicates [Class_format]'s widths instead of depending on it:
    this module ships in the melange runtime bundle (real browser JS).
@@ -34,10 +34,11 @@ let mask_width = 3
 let value_width = 4
 let extended_width = 6
 
-(* [Slot_key.Registry]'s three reserved family markers and the two fixed
-   registered indices [Slot_key.is_excluded_from_all] special-cases,
-   base36-encoded at [family_width] the same way [Class_format.slot_class]
-   encodes every family field. These five 2-character strings are the
+(* [Slot_key.Registry]'s two reserved family markers ([all] and unregistered
+   custom properties) and the two fixed registered indices
+   [Slot_key.is_excluded_from_all] special-cases, base36-encoded at
+   [family_width] the same way [Class_format.slot_class] encodes every family
+   field. These four 2-character strings are the
    ONLY property-specific knowledge this module carries, and only for the
    [all: unset] case - everything else compares fields as opaque data. *)
 let all_sentinel = "zz"
@@ -51,17 +52,21 @@ let unicode_bidi_marker = "dp"
 let family_code c0 c1 = (Char.code c0 lsl 16) lor Char.code c1
 let all_family = family_code all_sentinel.[0] all_sentinel.[1]
 
-let is_excluded_from_all family =
-  family
-  = family_code unregistered_custom_marker.[0] unregistered_custom_marker.[1]
-  || family = family_code direction_marker.[0] direction_marker.[1]
-  || family = family_code unicode_bidi_marker.[0] unicode_bidi_marker.[1]
+let unregistered_custom_family =
+  family_code unregistered_custom_marker.[0] unregistered_custom_marker.[1]
 
-(* One [_a_] atom's merge-relevant fields, as offsets into its class name.
-   Nothing is sliced out: context and extended are compared in place, the
-   family is an int and the mask is the one field decoded, since only it
-   needs a bitwise subset check. Merging runs on every [CSS.merge] call, so
-   building no substring per field is what keeps it cheap. *)
+let direction_family = family_code direction_marker.[0] direction_marker.[1]
+
+let unicode_bidi_family =
+  family_code unicode_bidi_marker.[0] unicode_bidi_marker.[1]
+
+let is_excluded_from_all family =
+  family = unregistered_custom_family
+  || family = direction_family
+  || family = unicode_bidi_family
+
+(* One [_a_] atom's merge-relevant fields, as offsets into its class name
+   (see the header for why nothing is sliced out). *)
 type atom = {
   token : string; (* the whole class name, to hand back untouched *)
   level : int; (* 0 for [_a_]; k for the specificity twin [_t<k>_] *)
@@ -92,16 +97,16 @@ let fields_of_extra extra =
   else if extra = context_width + extended_width then Some (true, false, true)
   else None
 
-(* The specificity twin: [_t<k>_<body>] is [_a_<body>] with [k] extra
-   copies of its class in the selector (see packages/generate). *)
-(* Above this level an atom stays at [max_level] and the sheet order decides
-   the tie, as before the twin. [packages/generate] emits the same number of
-   twin selectors. *)
+(* The specificity twin: [_t<k>_<body>] is [_a_<body>] with [k] times
+   [:not(x-)] after its class in the selector (see packages/generate). Past
+   [max_level] an atom stays there and the sheet order decides the tie.
+   [packages/generate] emits the same number of twin selectors. *)
 let max_level = 2
 let twin_prefix level = "_t" ^ string_of_int level ^ "_"
 
 (* The twin level and the prefix width of [class_name], or [None] when it
-   starts with neither prefix. *)
+   starts with neither prefix. The [_a_] test is written out character by
+   character so no [String.sub] runs per token. *)
 let split_prefix class_name =
   let n = String.length class_name in
   if
@@ -327,8 +332,8 @@ let split_tokens s =
    this module fails to parse - is kept unconditionally, on both sides, in
    its original relative order (identities are never dropped and never drop
    anything; an unparseable class is not this module's concern to police).
-   [latter]'s tokens are never dropped - [CSS.merge]'s right argument always
-   wins outright. *)
+   [latter]'s tokens are never dropped and keep their place, but an atom may
+   come back with a twin prefix (see [raise_levels]). *)
 let merge_class_names former latter =
   let former_tokens = List.map parse_token (split_tokens former) in
   let latter_tokens = List.map parse_token (split_tokens latter) in

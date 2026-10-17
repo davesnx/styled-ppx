@@ -21,7 +21,7 @@ let show = (id, parts, result) => {
   };
 };
 
-/* G01: A @media `padding: $(x)` (one path on four sides, not split), B base padding-top
+/* G01: A @media `padding: $(x)` (one path on four sides), B base padding-top
    intended: B */
 let g01_x = CSS.px(111);
 let g01_a = [%css {|
@@ -32,7 +32,7 @@ let g01_b = [%css {|
 |}];
 show("G01", [("a", g01_a), ("b", g01_b)], CSS.merge(g01_a, g01_b));
 
-/* G02: A @media `padding: $(a) $(b)` (each path on two sides, not split), B base padding-top
+/* G02: A @media `padding: $(a) $(b)` (each path on two sides), B base padding-top
    intended: B */
 let g02_a_v1 = CSS.px(121);
 let g02_a_v2 = CSS.px(122);
@@ -46,7 +46,7 @@ show("G02", [("a", g02_a), ("b", g02_b)], CSS.merge(g02_a, g02_b));
 
 /* G03: A @media `padding: 131px $(x)` (static top and bottom, path on left and right), B base padding-top
    intended: B
-   note: the path is repeated, so the declaration is not split even though the top side is static */
+   note: the path is repeated, and the top side is static */
 let g03_x = CSS.px(132);
 let g03_a = [%css {|
   @media (max-width: 1200px) { padding: 131px $(g03_x); }
@@ -56,9 +56,9 @@ let g03_b = [%css {|
 |}];
 show("G03", [("a", g03_a), ("b", g03_b)], CSS.merge(g03_a, g03_b));
 
-/* G04: A @media `padding: $(a) $(b) $(c) $(d)` (four distinct paths, split), B base padding-top
+/* G04: A @media `padding: $(a) $(b) $(c) $(d)` (four distinct paths), B base padding-top
    intended: B
-   note: control, the split applies */
+   note: control, no path repeats */
 let g04_a_v1 = CSS.px(141);
 let g04_a_v2 = CSS.px(142);
 let g04_a_v3 = CSS.px(143);
@@ -71,7 +71,7 @@ let g04_b = [%css {|
 |}];
 show("G04", [("a", g04_a), ("b", g04_b)], CSS.merge(g04_a, g04_b));
 
-/* G05: A @media `padding: var(--g05-p, 152px)` (top-level var(), not split), B base padding-top
+/* G05: A @media `padding: var(--g05-p, 152px)` (top-level var()), B base padding-top
    intended: B */
 let g05_a = [%css {|
   @media (max-width: 1200px) { padding: var(--g05-p, 152px); }
@@ -81,7 +81,7 @@ let g05_b = [%css {|
 |}];
 show("G05", [("a", g05_a), ("b", g05_b)], CSS.merge(g05_a, g05_b));
 
-/* G06: A @media `padding: 161px` (split), B base `padding-top: $(x)` (interpolated)
+/* G06: A @media `padding: 161px`, B base `padding-top: $(x)` (interpolated)
    intended: B */
 let g06_b_v1 = CSS.px(162);
 let g06_a = [%css {|
@@ -104,9 +104,9 @@ let g07_b = [%css {|
 |}];
 show("G07", [("a", g07_a), ("b", g07_b)], CSS.merge(g07_a, g07_b));
 
-/* G08: A @media `padding: $(x)` (not split), B base shorthand `padding: 182px`
+/* G08: A @media `padding: $(x)`, B base shorthand `padding: 182px`
    intended: B
-   note: the full masks match, so the base shorthand can drop A without a split */
+   note: the full masks match, so the base shorthand drops A */
 let g08_a_v1 = CSS.px(181);
 let g08_a = [%css {|
   @media (max-width: 1200px) { padding: $(g08_a_v1); }
@@ -245,7 +245,7 @@ let g20_b = [%css {|
 |}];
 show("G20", [("a", g20_a), ("b", g20_b)], CSS.merge(g20_a, g20_b));
 
-/* G21: A @media padding, B padding-top in the same @media (equal context, split and mask)
+/* G21: A @media padding, B padding-top in the same @media (equal context)
    intended: B
    note: control */
 let g21_a = [%css {|
@@ -288,7 +288,7 @@ let g24_b = [%css {|
 |}];
 show("G24", [("a", g24_a), ("b", g24_b)], CSS.merge(g24_a, g24_b));
 
-/* G25: A @media border shorthand (not split), B base border-top-color
+/* G25: A @media border shorthand, B base border-top-color
    intended: B */
 let g25_a = [%css {|
   @media (max-width: 1200px) { border: 351px solid rgb(35, 1, 0); }
@@ -298,7 +298,7 @@ let g25_b = [%css {|
 |}];
 show("G25", [("a", g25_a), ("b", g25_b)], CSS.merge(g25_a, g25_b));
 
-/* G26: A @media border-radius (not split), B base border-top-left-radius
+/* G26: A @media border-radius, B base border-top-left-radius
    intended: B */
 let g26_a = [%css {|
   @media (max-width: 1200px) { border-radius: 361px; }
@@ -381,7 +381,7 @@ let g33_b = [%css {|
 |}];
 show("G33", [("a", g33_a), ("b", g33_b)], CSS.merge(g33_a, g33_b));
 
-/* G34: A `&:hover` padding, B `&:hover` padding-top (equal context, split and mask)
+/* G34: A `&:hover` padding, B `&:hover` padding-top (equal context)
    intended: B
    note: control */
 let g34_a = [%css {|
@@ -413,7 +413,7 @@ let g36_b = [%css {|
 |}];
 show("G36", [("a", g36_a), ("b", g36_b)], CSS.merge(g36_a, g36_b));
 
-/* G37: A @media font shorthand (not split), B base font-size
+/* G37: A @media font shorthand, B base font-size
    intended: B */
 let g37_a = [%css {|
   @media (max-width: 1200px) { font: 14px/47px serif; }
@@ -423,7 +423,7 @@ let g37_b = [%css {|
 |}];
 show("G37", [("a", g37_a), ("b", g37_b)], CSS.merge(g37_a, g37_b));
 
-/* G38: A @media background shorthand (not split), B base background-color
+/* G38: A @media background shorthand, B base background-color
    intended: B */
 let g38_a = [%css {|
   @media (max-width: 1200px) { background: rgb(48, 0, 0); }
@@ -433,7 +433,7 @@ let g38_b = [%css {|
 |}];
 show("G38", [("a", g38_a), ("b", g38_b)], CSS.merge(g38_a, g38_b));
 
-/* G39: A @media flex shorthand (not split), B base flex-grow
+/* G39: A @media flex shorthand, B base flex-grow
    intended: B */
 let g39_a = [%css {|
   @media (max-width: 1200px) { flex: 1 1 491px; }

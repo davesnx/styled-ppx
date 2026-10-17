@@ -38,6 +38,9 @@ type context = {
     other wrapper would. *)
 val context_key : context -> string
 
+(** True for the base context: no at-rule, no selector, not [!important]. *)
+val is_base : context -> bool
+
 (** True for a context made of at-rules alone: no selector and no [!important].
     [Class_format] marks such a context in the class name, so [CSS.merge] can
     tell it from a selector context without parsing the hash. *)

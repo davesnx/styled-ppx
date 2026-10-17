@@ -179,15 +179,15 @@ module Css_transform = {
      selector (`Style_rule`), or under an at-rule. None for an atom with no
      declaration body (e.g. an empty at-rule), OR for a multi-declaration
      group (same-property or same-family, see `group_declarations_by_family`)
-     - such a group's bundling eligibility (`atom_has_value_interpolation`
+     - such a group's variable-group eligibility (`atom_has_value_interpolation`
      below) is therefore always [false], never re-examined per member. This
      is harmless, not a gap: a multi-declaration group already puts every
      member in ONE atom with its own inline `var(--...)` per interpolating
      declaration (unaffected by grouping - substitution happens per
-     declaration, before grouping), so the sharing bundling exists for
-     (one variable, not one per occurrence) is already achieved by the
-     grouping itself; bundling's remaining, distinct job is sharing a value
-     ACROSS separately-grouped atoms (base vs `:hover` vs `@media`), which a
+     declaration, before grouping), so the sharing a variable group exists
+     for (one variable, not one per occurrence) is already achieved by the
+     grouping itself; a variable group's remaining, distinct job is sharing a
+     value ACROSS separately-grouped atoms (base vs `:hover` vs `@media`), which a
      single already-merged group has no need for. */
   let rec atom_declaration = (rule: rule): option(declaration) =>
     switch (rule) {
@@ -2141,18 +2141,18 @@ module Css_transform = {
           switch (slot) {
           | Some(former: Slot_key.t)
               when Slot_key.context_is_at_rules_only(former.context) =>
-            let dropped = ref(false);
+            let found = ref(false);
             for (j in i + 1 to Array.length(slots) - 1) {
               switch (slots[j]) {
               | Some(latter: Slot_key.t)
                   when
-                    Slot_key.context_key(latter.context) == ""
+                    Slot_key.is_base(latter.context)
                     && Slot_key.removes(~former, ~latter) =>
-                dropped := true
+                found := true
               | _ => ()
               };
             };
-            dropped^;
+            found^;
           | _ => false
           },
         slots,
@@ -2288,14 +2288,10 @@ module Css_transform = {
              (shipped_acc, classes_acc, atom_infos_acc),
              (i, (className, var_namespace, rule)),
            ) => {
-             let (effective_class, effective_namespace, dedup_key) =
+             let (effective_class, effective_namespace) =
                switch (Hashtbl.find_opt(group_by_atomic_index, i)) {
-               | Some((group_class, group_namespace)) => (
-                   group_class,
-                   group_namespace,
-                   Some(group_class),
-                 )
-               | None => (className, var_namespace, Some(className))
+               | Some(group) => group
+               | None => (className, var_namespace)
                };
 
              let lowered =
@@ -2311,7 +2307,7 @@ module Css_transform = {
              if (dropped[i]) {
                (shipped_acc, classes_acc, atom_infos_acc);
              } else {
-               let processed = List.map(r => (dedup_key, r), lowered);
+               let processed = List.map(r => (effective_class, r), lowered);
 
                let classes_acc =
                  List.mem(effective_class, classes_acc)
@@ -2428,18 +2424,10 @@ let push =
       declarations,
     );
 
-  /* Ship every rule, deduped by its key. Static atoms key by class name (class
-     and content are 1:1). A rule with no key is keyed by its rendered content. */
+  /* Ship every rule, deduped by its class name (class and content are 1:1). */
   List.iter(
-    ((dedup_key, rule)) => {
-      let rendered_css = render_prefixed_rule(rule);
-      let key =
-        switch (dedup_key) {
-        | Some(className) => className
-        | None => rendered_css
-        };
-      Buffer.add_rule(key, rendered_css);
-    },
+    ((className, rule)) =>
+      Buffer.add_rule(className, render_prefixed_rule(rule)),
     shipped_rules,
   );
 

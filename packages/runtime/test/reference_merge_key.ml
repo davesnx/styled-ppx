@@ -2,34 +2,9 @@
    kept unchanged as the oracle for test_merge_key_differential.ml. Do not
    optimise it. *)
 
-(* Merge_key
-   =========
-
-   [CSS.merge]'s removal rule, applied entirely at runtime by parsing the
-   fixed-width fields [Class_format] already encoded into an atom's class
-   name (context/family/extended/mask/value) - no shorthand table, no CSS
-   property knowledge. Every field is compared as an opaque string (context,
-   family, extended) or an opaque bounded int (mask, via a bitwise subset
-   check); this module never needs to know WHAT a field means, only how
-   wide it is and how two atoms' fields compare.
-
-   The twin ([_t<k>_] classes, see [twin_level]) is the other half: where
-   removal is not possible, the later atom's class is swapped for a twin that
-   [packages/generate] gives a higher specificity.
-
-   This is the single rule [Slot_key.removes] defines.
-
-   Why this duplicates [Class_format]'s widths instead of depending on it:
-   this module ships in the melange runtime bundle (real browser JS).
-   [Class_format]/[Slot_key]/[Css_grammar] exist to build the ppx's
-   compile-time property registry; depending on them here would ship that
-   whole registry to the browser for a module whose entire point is that
-   runtime merge needs no such registry. The widths and markers below are
-   a deliberate, narrow duplication - see
-   [packages/ppx/class_format/class_format.mli]'s length table for the
-   authoritative definition, and [packages/runtime/test]'s own tests for
-   the cross-check against the real [Slot_key]/[Class_format] values (that
-   test, not this library, is allowed to depend on them). *)
+(* The pre-rewrite [Merge_key]: string fields and a family tree, no in-place
+   offsets. See [packages/runtime/native/shared/Merge_key.ml] for what the
+   module does and why. *)
 
 let atom_prefix = "_a_"
 let context_width = 5

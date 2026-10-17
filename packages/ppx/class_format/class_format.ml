@@ -27,10 +27,9 @@ let mask_width = 3
 let value_width = 4
 let extended_width = Slot_key.extended_hash_width
 
-(* The prefixes themselves, not the field widths above. Named here (not
-   just inlined as string literals in [slot_class]) so a
-   parser has one place to read them from. Each prefix already carries its
-   own trailing delimiter (the second "_"); no site below adds a separator.
+(* Named here, not inlined in [slot_class], so a parser has one place to
+   read it from. It carries its own trailing delimiter (the second "_"); no
+   site below adds a separator.
 
    There is no separate important-atom prefix: [!important] folds into
    {!Slot_key.context_key} instead (see slot_key.mli's [context] doc), so
@@ -41,13 +40,10 @@ let atom_prefix = "_a_"
 
 (* An atom's minimum length: its own prefix (delimiter included)
    plus the fixed family + value floor, before any of
-   [possible_extra_lengths] applies. Takes a prefix argument (rather than
-   hard-coding [atom_prefix]) purely so a caller/test can compute a floor
-   from a prefix string without duplicating the arithmetic; only
-   [atom_prefix] is ever passed today. *)
-let floor_of_prefix prefix = String.length prefix + family_width + value_width
+   [possible_extra_lengths] applies. *)
+let atom_floor = String.length atom_prefix + family_width + value_width
 
-(* The four "extra" lengths beyond the fixed [family_width + value_width]
+(* The six "extra" lengths beyond the fixed [family_width + value_width]
    floor an atom can have - context, mask, extended, or context
    combined with either mask or extended (mask and extended never combine
    with each other: a mask only ever applies to a [Registered] family, and
@@ -75,7 +71,7 @@ let possible_extra_lengths =
 let at_rules_marker = '0'
 
 let slot_class (slot : Slot_key.t) content =
-  (* No important-atom prefix (see the note above [floor_of_prefix]) - an
+  (* No important-atom prefix (see the note above [atom_prefix]) - an
        !important atom already pays for a real context field instead, since
        {!Slot_key.context_key} folds importance into the context. *)
   let context_part =

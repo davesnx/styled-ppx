@@ -32,7 +32,7 @@ your .re / .ml source
   ▼
 ① ppx expansion (while compiling each file)
    ─ parse & type-check the CSS
-   ─ split into atomic rules, one class per declaration
+   ─ split into atomic rules: one class per property slot and condition
    ─ lower $(expr) interpolations to CSS custom properties
    ─ park the rendered CSS in [@@@css "..."] attributes
   │
