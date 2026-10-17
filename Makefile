@@ -105,10 +105,8 @@ $(foreach target,$(TEST_TARGETS), $(eval $(call create-test,$(target))))
 $(foreach target,$(TEST_TARGETS), $(eval $(call create-test-watch,$(target))))
 $(foreach target,$(TEST_TARGETS), $(eval $(call create-test-promote,$(target))))
 
-# One dune invocation: the build and every test alias share one scheduler, and
-# dune reports every failing alias instead of stopping at the first.
 .PHONY: test
-test: ## Build everything and run every test alias
+test:
 	$(DUNE) build --promote-install-files --root . @@default $(addprefix @,$(TEST_TARGETS))
 
 # Demo
