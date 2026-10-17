@@ -47,8 +47,14 @@ create-switch: ## Create opam switch
 	opam switch create . 5.4.0 --deps-only --with-test --no-install
 
 .PHONY: install
-install: ## Install project dependencies
+install: install-opam install-npm ## Install project dependencies
+
+.PHONY: install-opam
+install-opam: ## Install opam dependencies
 	opam install . --deps-only --with-test --with-dev-setup --working-dir . -y
+
+.PHONY: install-npm
+install-npm: ## Install npm dependencies
 	npm install
 	npm install --prefix demo/melange
 
@@ -100,10 +106,8 @@ $(foreach target,$(TEST_TARGETS), $(eval $(call create-test-watch,$(target))))
 $(foreach target,$(TEST_TARGETS), $(eval $(call create-test-promote,$(target))))
 
 .PHONY: test
-test: build
-	@status=0; for target in $(TEST_TARGETS); do \
-		make --no-print-directory $${target} || status=1; \
-	done; exit $$status
+test:
+	$(DUNE) build --promote-install-files --root . @@default $(addprefix @,$(TEST_TARGETS))
 
 # Demo
 
