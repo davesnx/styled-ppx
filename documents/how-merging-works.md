@@ -415,7 +415,7 @@ all) still depends on which one the browser loads first
   by class-name prefix and length alone; a hand-written class starting
   with `_a_` that happens to land on one of the six real atom lengths can
   be silently dropped
-  (`hand_written_class_ambiguity_persists_under_the_new_prefix`,
+  (`hand_written_atom_shaped_class_is_read_as_an_atom`,
   `packages/runtime/test/test_merge_key.ml`). Don't hand-write a class
   starting with `_a_`.
 - **`merge(wide, narrow)` keeps both classes.** Same fact as the

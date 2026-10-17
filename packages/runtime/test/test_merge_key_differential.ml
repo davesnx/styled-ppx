@@ -1,7 +1,7 @@
-(* [Merge_key] against [Reference_merge_key], the module as it was before it
-   was rewritten to compare fields in place (kept here as the oracle). Both
-   must return the same string for every input, so the rewrite is a pure
-   speed-up. Inputs are random and seeded, so a failure replays. *)
+(* [Merge_key] against [Reference_merge_key], an independent implementation
+   (string fields, family tree) kept as the oracle. Both must return the same
+   string for every input. Inputs are random and seeded, so a failure
+   replays. *)
 
 let alphabet = "0123456789abcdefghijklmnopqrstuvwxyz"
 let pick st arr = arr.(Random.State.int st (Array.length arr))

@@ -66,7 +66,7 @@ let examples_tests =
           (starts_with Class_format.atom_prefix c)))
     examples
 
-let base_length = Class_format.floor_of_prefix Class_format.atom_prefix
+let base_length = Class_format.atom_floor
 
 let format_tests =
   [

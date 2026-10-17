@@ -817,9 +817,9 @@ is not in a group either.
 
 For a group, the namespace is `css-<hash(seed)>`, where the seed is the
 concatenated rendered members in source order, so all members read one
-variable and one inline custom property sets it (the same variable names as
-the earlier bundle). Each member's class is the usual slot-keyed one, with its
-value field hashed from the seed and the member's own rendered rule
+variable and one inline custom property sets it. Each member's class is the
+usual slot-keyed one, with its value field hashed from the seed and the
+member's own rendered rule
 (`Hash_class.group_class_and_namespace`), salted with `--namespace` like any
 atom class: one class still means one exact body, because the body names the
 group variable. The seed holds the members only, a member that a later base
@@ -1039,9 +1039,8 @@ the type-selector weight of a twin never lifts an atom over that difference, so
 no earlier atom is ever raised. The runtime does not know the element two
 selectors style; a twin that is not needed changes nothing. A twin never
 reaches an author selector with one more class
-or pseudo-class (an author `.a.b` beats every twin level). A box shorthand is
-no longer split per longhand in a condition. Logical against physical
-properties get no twin.
+or pseudo-class (an author `.a.b` beats every twin level). Logical against
+physical properties get no twin.
 
 `!important` needs no separate check: it is folded into the context (as
 if it were one more wrapper, like an at-rule - see
@@ -1079,7 +1078,7 @@ family, same-context, full-mask atoms (`"_a_header"`'s body, `header`, is
 exactly the family+value floor - 6 characters, no context/mask/extended
 fields - and `"_a_he1234"`'s body is the same length), so `removes` sees
 no reason to keep both. Accepted as current behavior, same shape as
-before the `_a_`/`_in_`/`_id_`/`_k_` prefix rename - only the odds of an
+before the `_a_`/`_id_`/`_k_` prefix rename - only the odds of an
 accidental collision changed (a hand-written class now needs to start
 with the less common `_a_` sequence rather than plain `a-`), not the
 existence of the limit. A hand-written class that merely starts with the

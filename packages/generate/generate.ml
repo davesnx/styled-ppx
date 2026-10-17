@@ -540,6 +540,13 @@ let is_namespace_statement rule =
     silently misplaced. *)
 let is_charset rule = String.starts_with ~prefix:"@charset" (String.trim rule)
 
+let is_class_char c =
+  (c >= 'a' && c <= 'z')
+  || (c >= 'A' && c <= 'Z')
+  || (c >= '0' && c <= '9')
+  || c = '-'
+  || c = '_'
+
 (** The leading `_a_` atom class name in a rendered rule, if any (see
     [Hash_class.slot_class] / [Class_format]). Every atom this generator emits
     opens with its own class as a leading compound-selector token, so the first
@@ -555,13 +562,6 @@ let atom_class_and_end rule_text =
      hand-written names like "._a_A-y") - under-matching here would truncate
      two different class names down to the same prefix and report a false
      collision. *)
-  let is_class_char c =
-    (c >= 'a' && c <= 'z')
-    || (c >= 'A' && c <= 'Z')
-    || (c >= '0' && c <= '9')
-    || c = '-'
-    || c = '_'
-  in
   let n = String.length rule_text in
   let has_prefix i prefix =
     let m = String.length prefix in
@@ -1204,31 +1204,6 @@ let sort_conditional_rules rules =
     else compare pa pb)
   |> List.map (fun (_, _, _, _, r) -> r)
 
-(** Specificity twins: [CSS.merge] may swap an atom class [_a_X] for [_t<k>_X]
-    (see [Merge_key]) to win by source order, whatever the sheet order. Every
-    [_a_] rule therefore also answers to the twin classes of every level up to
-    [Merge_key.max_level]. The twin selector is the whole selector, from its
-    start (after any at-rule [{]) to the [{] that opens the declarations, with
-    every [._a_X] replaced by [._t<k>_X], and [k] times [:not(x-)] after one of
-    them: [._id_a:hover ._a_X] becomes [._id_a:hover ._t1_X:not(x-)], so the
-    twin keeps the conditions of the atom. When the class occurs in two compound
-    selectors ([._a_X + ._a_X]) either element may be the merged one, so there
-    is one twin selector per compound, the others matching [:is(._a_X,._t1_X)]:
-    [._t1_X:not(x-) + :is(._a_X,._t1_X)] and
-    [:is(._a_X,._t1_X) + ._t1_X:not(x-)]. [:not(x-)] weighs as its argument, one
-    type selector (0,0,1), and [x-] matches no element. A twin therefore beats
-    an atom with the same number of classes and pseudo-classes, as a later rule
-    would, but never a rule with one more class-like part, such as [.a.b] or
-    [:hover]. Rules of other classes are left alone. *)
-let twin_levels = Merge_key.max_level
-
-let is_class_char c =
-  (c >= 'a' && c <= 'z')
-  || (c >= 'A' && c <= 'Z')
-  || (c >= '0' && c <= '9')
-  || c = '-'
-  || c = '_'
-
 (** [selector] split at its top-level commas (not inside [()] or [[]]). *)
 let split_top_level_commas selector =
   let n = String.length selector in
@@ -1256,7 +1231,7 @@ let replace_class ~atom_class ~replacement branch =
   let rec go i ~depth ~compound ~separated =
     if i < n then (
       let c = branch.[i] in
-      let sep = depth = 0 && (c = ' ' || c = '>' || c = '+' || c = '~') in
+      let sep = depth = 0 && is_combinator_char c in
       let compound =
         if (not sep) && separated then compound + 1 else compound
       in
@@ -1296,7 +1271,7 @@ let class_compounds ~atom_class branch =
 let compound_at branch i =
   let rec go k ~depth ~compound ~separated =
     let c = branch.[k] in
-    let sep = depth = 0 && (c = ' ' || c = '>' || c = '+' || c = '~') in
+    let sep = depth = 0 && is_combinator_char c in
     let compound = if (not sep) && separated then compound + 1 else compound in
     if k = i then compound
     else (
@@ -1359,6 +1334,11 @@ let rec occurs_under_nots ~atom_class ~even text =
            (String.sub text (i + 5) (j - i - 5)))
        spans
 
+let atom_body cls = String.sub cls 3 (String.length cls - 3)
+let placeholder_open = '\001'
+let placeholder_close = '\002'
+let placeholder i = Printf.sprintf "%c%d%c" placeholder_open i placeholder_close
+
 (** [branch] with every [:not(...)] that holds [.<atom_class>] and sits in a
     compound for which [expand] is true replaced by a placeholder [\001<i>\002],
     and the chains [i] stands for. A twin cannot swap a negated class:
@@ -1369,10 +1349,10 @@ let rec occurs_under_nots ~atom_class ~even text =
     compound also holds a positive [.<atom_class>] the twin swaps the same class
     inside the [:not], which is right and shorter, so [expand] is false. *)
 let protect_negations ~atom_class ~expand branch =
-  let body = String.sub atom_class 3 (String.length atom_class - 3) in
   let names =
     atom_class
-    :: List.init twin_levels (fun i -> Merge_key.twin_prefix (i + 1) ^ body)
+    :: List.init Merge_key.max_level (fun i ->
+      Merge_key.twin_prefix (i + 1) ^ atom_body atom_class)
   in
   let n = String.length branch in
   let buffer = Buffer.create n in
@@ -1386,11 +1366,12 @@ let protect_negations ~atom_class ~expand branch =
         else None
       in
       match arg_end with
-      | Some j
-        when occurs_under_nots ~atom_class ~even:true
-               (String.sub branch start (j - start)) ->
-        if expand (compound_at branch i) then (
-          let arg = String.sub branch start (j - start) in
+      | Some j ->
+        let arg = String.sub branch start (j - start) in
+        if
+          occurs_under_nots ~atom_class ~even:true arg
+          && expand (compound_at branch i)
+        then (
           let chain =
             List.map
               (fun name ->
@@ -1402,30 +1383,26 @@ let protect_negations ~atom_class ~expand branch =
               names
             |> String.concat ""
           in
-          Buffer.add_string buffer
-            (Printf.sprintf "\001%d\002" (List.length !chains));
+          Buffer.add_string buffer (placeholder (List.length !chains));
           chains := chain :: !chains)
         else Buffer.add_string buffer (String.sub branch i (j + 1 - i));
         go (j + 1)
-      | Some j
-        when occurs_under_nots ~atom_class ~even:false
-               (String.sub branch start (j - start)) ->
-        Buffer.add_string buffer (String.sub branch i (j + 1 - i));
-        go (j + 1)
-      | _ ->
+      | None ->
         Buffer.add_char buffer branch.[i];
         go (i + 1))
   in
   go 0;
   Buffer.contents buffer, Array.of_list (List.rev !chains)
 
+(** [text] with each placeholder of {!protect_negations} replaced by its chain.
+*)
 let restore_negations chains text =
   let n = String.length text in
   let buffer = Buffer.create n in
   let rec go i =
     if i < n then
-      if text.[i] = '\001' then (
-        let j = String.index_from text i '\002' in
+      if text.[i] = placeholder_open then (
+        let j = String.index_from text i placeholder_close in
         let idx = int_of_string (String.sub text (i + 1) (j - i - 1)) in
         Buffer.add_string buffer chains.(idx);
         go (j + 1))
@@ -1436,9 +1413,25 @@ let restore_negations chains text =
   go 0;
   Buffer.contents buffer
 
+(** Specificity twins: [CSS.merge] may swap an atom class [_a_X] for [_t<k>_X]
+    (see [Merge_key]) to win by source order, whatever the sheet order. Every
+    [_a_] rule therefore also answers to the twin classes of every level up to
+    [Merge_key.max_level]. The twin selector is the whole selector, from its
+    start (after any at-rule [{]) to the [{] that opens the declarations, with
+    every [._a_X] replaced by [._t<k>_X], and [k] times [:not(x-)] after one of
+    them: [._id_a:hover ._a_X] becomes [._id_a:hover ._t1_X:not(x-)], so the
+    twin keeps the conditions of the atom. When the class occurs in two compound
+    selectors ([._a_X + ._a_X]) either element may be the merged one, so there
+    is one twin selector per compound, the others matching [:is(._a_X,._t1_X)]:
+    [._t1_X:not(x-) + :is(._a_X,._t1_X)] and
+    [:is(._a_X,._t1_X) + ._t1_X:not(x-)]. [:not(x-)] weighs as its argument, one
+    type selector (0,0,1), and [x-] matches no element. A twin therefore beats
+    an atom with the same number of classes and pseudo-classes, as a later rule
+    would, but never a rule with one more class-like part, such as [.a.b] or
+    [:hover]. Rules of other classes are left alone. *)
 let add_twins rule_text =
   match atom_class_and_end rule_text with
-  | Some (cls, after) when String.starts_with ~prefix:"_a_" cls ->
+  | Some (cls, after) ->
     (match String.index_from_opt rule_text after '{' with
     | None -> rule_text
     | Some brace ->
@@ -1451,16 +1444,18 @@ let add_twins rule_text =
       let selector =
         String.sub rule_text selector_start (brace - selector_start)
       in
-      let body = String.sub cls 3 (String.length cls - 3) in
+      let body = atom_body cls in
       (* [protected] hides the negations that get a chain from the twin swap;
          the others stay in the text and are swapped with their compound. *)
       let classified =
         split_top_level_commas selector
         |> List.map (fun branch ->
-          let all, _ =
+          (* Hiding every negation that holds the class leaves only its
+             positive occurrences to count. *)
+          let without_negated, _ =
             protect_negations ~atom_class:cls ~expand:(fun _ -> true) branch
           in
-          let positive = class_compounds ~atom_class:cls all in
+          let positive = class_compounds ~atom_class:cls without_negated in
           let protected, chains =
             protect_negations ~atom_class:cls
               ~expand:(fun compound -> not (List.mem compound positive))
@@ -1479,7 +1474,7 @@ let add_twins rule_text =
           classified
       in
       let twins =
-        List.init twin_levels (fun i ->
+        List.init Merge_key.max_level (fun i ->
           let k = i + 1 in
           let twin = "." ^ Merge_key.twin_prefix k ^ body in
           let boosted =
@@ -1640,8 +1635,8 @@ let run ~output_file ~order input_files =
      never style rules that compete for an element either) and what does - a
      [%styled.global] style rule, ALSO never atom-classed but a real,
      cascading rule (`html{...}`, `*{...}`, `*::before{...}`, an author's own
-     global selector), is [global]; every real atom, [_a_],
-     is [base] or [conditional] (no separate [descendant] tier - see
+     global selector), is [global]; every real atom ([_a_]) is
+     [base] or [conditional] (no separate [descendant] tier - see
      [rule_tier]'s doc for why it was removed: a descendant-shaped rule
      stays in the tier of its own context instead, and
      {!sort_by_shorthand_first} orders it before own-element rules within

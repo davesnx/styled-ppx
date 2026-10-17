@@ -63808,26 +63808,29 @@ var all_family = family_code(
   /* 'z' */
   122
 );
+var unregistered_custom_family = family_code(
+  /* 'z' */
+  122,
+  /* 'y' */
+  121
+);
+var direction_family = family_code(
+  /* '5' */
+  53,
+  /* 'q' */
+  113
+);
+var unicode_bidi_family = family_code(
+  /* 'd' */
+  100,
+  /* 'p' */
+  112
+);
 function is_excluded_from_all(family) {
-  if (family === family_code(
-    /* 'z' */
-    122,
-    /* 'y' */
-    121
-  ) || family === family_code(
-    /* '5' */
-    53,
-    /* 'q' */
-    113
-  )) {
+  if (family === unregistered_custom_family || family === direction_family) {
     return true;
   } else {
-    return family === family_code(
-      /* 'd' */
-      100,
-      /* 'p' */
-      112
-    );
+    return family === unicode_bidi_family;
   }
 }
 function base36_digit(c) {

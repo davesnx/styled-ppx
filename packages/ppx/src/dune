@@ -21,4 +21,6 @@
 
 (copy_files ../../runtime/native/shared/Merge_key.ml)
 
+; Merge_key uses Str_sub, so it is copied with it.
+
 (copy_files ../../runtime/native/shared/Str_sub.ml)

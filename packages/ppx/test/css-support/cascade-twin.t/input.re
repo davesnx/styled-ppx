@@ -102,7 +102,7 @@ let g56_y = [%css {|
 |}];
 show_parts("G56", [("b", CSS.merge(g56_x, g56_y))]);
 
-/* G57: A @media `font` shorthand (not split), B base font-size
+/* G57: A @media `font` shorthand, B base font-size
    intended: B */
 let g57_a = [%css {|
   @media (max-width: 1200px) { font: 14px/1.2 serif; }
