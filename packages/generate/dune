@@ -1,7 +1,7 @@
 (executable
  (name generate)
  (public_name styled-ppx.generate)
- (modules generate order Merge_key)
+ (modules generate order Merge_key Str_sub)
  (libraries
   styled-ppx
   css_extraction
@@ -13,3 +13,5 @@
   (pps ppxlib.metaquot)))
 
 (copy_files ../runtime/native/shared/Merge_key.ml)
+
+(copy_files ../runtime/native/shared/Str_sub.ml)
