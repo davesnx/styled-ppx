@@ -20,3 +20,5 @@
   (pps ppxlib.metaquot)))
 
 (copy_files ../../runtime/native/shared/Merge_key.ml)
+
+(copy_files ../../runtime/native/shared/Str_sub.ml)
