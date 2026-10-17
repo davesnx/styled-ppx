@@ -139,6 +139,24 @@ so the twin applies only where the atom applies:
 ._id_<p> ._a_<x>,._id_<p> ._t1_<x>:not(x-),._id_<p> ._t2_<x>:not(x-):not(x-) { padding-top: 0; }
 ```
 
+A `:not(...)` that holds the class cannot take a twin: `:not(._t1_<x>:not(x-))`
+is true on every element without the twin class, so an atom that was never
+merged would apply under its own root. When the compound of the `:not` has no
+positive `&` (`:not(&) > a`, `& :not(&)`, `:not(&) + &`), the element carries one
+of `_a_<x>`, `_t1_<x>` and `_t2_<x>`, so the rule excludes all three, as a chain
+of plain `:not` (no `:is()`):
+
+```css
+:not(._a_<x>):not(._t1_<x>):not(._t2_<x>) > a { color: red; }
+```
+
+The chain weighs two classes more than the single `:not` (0,3,x instead of
+0,1,x). A branch with no positive `&` anywhere gets no twin selector: the atom is
+never raised, which is harmless, since it does not apply to the element that
+carries it. When the same compound also has a positive `&`
+(`&:hover:not(&.on)`) nothing changes: the element carries one class, and the
+twin swaps it inside the `:not` too. A double negation (`:not(:not(&)) > a`) is the class itself, so it also keeps the swap (`cascade-not-amp.t`).
+
 When the atom repeats its class in several compound selectors (`& + &`), either
 element may be the merged one and the other may carry the plain `_a_<x>`, so
 there is one twin selector per compound, the others matching
