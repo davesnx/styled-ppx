@@ -1291,6 +1291,151 @@ let class_compounds ~atom_class branch =
        branch);
   List.rev !found
 
+(** The compound selector of [branch] that holds position [i], counted as in
+    {!replace_class}. *)
+let compound_at branch i =
+  let rec go k ~depth ~compound ~separated =
+    let c = branch.[k] in
+    let sep = depth = 0 && (c = ' ' || c = '>' || c = '+' || c = '~') in
+    let compound = if (not sep) && separated then compound + 1 else compound in
+    if k = i then compound
+    else (
+      let depth =
+        match c with
+        | '(' | '[' -> depth + 1
+        | ')' | ']' -> depth - 1
+        | _ -> depth
+      in
+      go (k + 1) ~depth ~compound ~separated:sep)
+  in
+  go 0 ~depth:0 ~compound:0 ~separated:false
+
+(** The index of the [)] that closes a group whose arguments start at [i]. *)
+let close_paren text i =
+  let n = String.length text in
+  let rec go i depth =
+    if i >= n then None
+    else (
+      match text.[i] with
+      | '(' -> go (i + 1) (depth + 1)
+      | ')' -> if depth = 0 then Some i else go (i + 1) (depth - 1)
+      | _ -> go (i + 1) depth)
+  in
+  go i 0
+
+(** The outermost [:not(...)] of [text] as (start of [:not(], index of its
+    closing [)]). *)
+let not_spans text =
+  let n = String.length text in
+  let rec go i acc =
+    if i >= n then List.rev acc
+    else if i + 5 <= n && String.sub text i 5 = ":not(" then (
+      match close_paren text (i + 5) with
+      | Some j -> go (j + 1) ((i, j) :: acc)
+      | None -> go (i + 1) acc)
+    else go (i + 1) acc
+  in
+  go 0 []
+
+(** Whether [.<atom_class>] occurs in [text] under an even ([even]) or odd
+    number of [:not(...)]. A double negation is the class itself. *)
+let rec occurs_under_nots ~atom_class ~even text =
+  let spans = not_spans text in
+  let outside =
+    let buffer = Buffer.create (String.length text) in
+    let pos = ref 0 in
+    List.iter
+      (fun (i, j) ->
+        Buffer.add_string buffer (String.sub text !pos (i - !pos));
+        pos := j + 1)
+      spans;
+    Buffer.add_string buffer (String.sub text !pos (String.length text - !pos));
+    Buffer.contents buffer
+  in
+  (even && class_compounds ~atom_class outside <> [])
+  || List.exists
+       (fun (i, j) ->
+         occurs_under_nots ~atom_class ~even:(not even)
+           (String.sub text (i + 5) (j - i - 5)))
+       spans
+
+(** [branch] with every [:not(...)] that holds [.<atom_class>] and sits in a
+    compound for which [expand] is true replaced by a placeholder [\001<i>\002],
+    and the chains [i] stands for. A twin cannot swap a negated class:
+    [:not(._t1_X:not(x-))] is true on every element without the twin, so an atom
+    never merged would apply under its own root. The element carries one of the
+    atom class and its twin classes, so the chain excludes all of them:
+    [:not(._a_X)] becomes [:not(._a_X):not(._t1_X):not(._t2_X)]. Where the
+    compound also holds a positive [.<atom_class>] the twin swaps the same class
+    inside the [:not], which is right and shorter, so [expand] is false. *)
+let protect_negations ~atom_class ~expand branch =
+  let body = String.sub atom_class 3 (String.length atom_class - 3) in
+  let names =
+    atom_class
+    :: List.init twin_levels (fun i -> Merge_key.twin_prefix (i + 1) ^ body)
+  in
+  let n = String.length branch in
+  let buffer = Buffer.create n in
+  let chains = ref [] in
+  let rec go i =
+    if i < n then (
+      let start = i + 5 in
+      let arg_end =
+        if i + 5 <= n && String.sub branch i 5 = ":not(" then
+          close_paren branch start
+        else None
+      in
+      match arg_end with
+      | Some j
+        when occurs_under_nots ~atom_class ~even:true
+               (String.sub branch start (j - start)) ->
+        if expand (compound_at branch i) then (
+          let arg = String.sub branch start (j - start) in
+          let chain =
+            List.map
+              (fun name ->
+                ":not("
+                ^ replace_class ~atom_class
+                    ~replacement:(fun ~compound:_ -> "." ^ name)
+                    arg
+                ^ ")")
+              names
+            |> String.concat ""
+          in
+          Buffer.add_string buffer
+            (Printf.sprintf "\001%d\002" (List.length !chains));
+          chains := chain :: !chains)
+        else Buffer.add_string buffer (String.sub branch i (j + 1 - i));
+        go (j + 1)
+      | Some j
+        when occurs_under_nots ~atom_class ~even:false
+               (String.sub branch start (j - start)) ->
+        Buffer.add_string buffer (String.sub branch i (j + 1 - i));
+        go (j + 1)
+      | _ ->
+        Buffer.add_char buffer branch.[i];
+        go (i + 1))
+  in
+  go 0;
+  Buffer.contents buffer, Array.of_list (List.rev !chains)
+
+let restore_negations chains text =
+  let n = String.length text in
+  let buffer = Buffer.create n in
+  let rec go i =
+    if i < n then
+      if text.[i] = '\001' then (
+        let j = String.index_from text i '\002' in
+        let idx = int_of_string (String.sub text (i + 1) (j - i - 1)) in
+        Buffer.add_string buffer chains.(idx);
+        go (j + 1))
+      else (
+        Buffer.add_char buffer text.[i];
+        go (i + 1))
+  in
+  go 0;
+  Buffer.contents buffer
+
 let add_twins rule_text =
   match atom_class_and_end rule_text with
   | Some (cls, after) when String.starts_with ~prefix:"_a_" cls ->
@@ -1307,10 +1452,31 @@ let add_twins rule_text =
         String.sub rule_text selector_start (brace - selector_start)
       in
       let body = String.sub cls 3 (String.length cls - 3) in
-      let branches =
+      (* [protected] hides the negations that get a chain from the twin swap;
+         the others stay in the text and are swapped with their compound. *)
+      let classified =
         split_top_level_commas selector
-        |> List.filter (fun branch ->
-          class_compounds ~atom_class:cls branch <> [])
+        |> List.map (fun branch ->
+          let all, _ =
+            protect_negations ~atom_class:cls ~expand:(fun _ -> true) branch
+          in
+          let positive = class_compounds ~atom_class:cls all in
+          let protected, chains =
+            protect_negations ~atom_class:cls
+              ~expand:(fun compound -> not (List.mem compound positive))
+              branch
+          in
+          restore_negations chains protected, protected, chains, positive <> [])
+      in
+      let selector =
+        List.map (fun (expanded, _, _, _) -> expanded) classified
+        |> String.concat ","
+      in
+      let branches =
+        List.filter_map
+          (fun (_, protected, chains, has_class) ->
+            if has_class then Some (protected, chains) else None)
+          classified
       in
       let twins =
         List.init twin_levels (fun i ->
@@ -1325,25 +1491,28 @@ let add_twins rule_text =
              element may be the merged one and the others may not: one
              twin selector per compound. *)
           List.concat_map
-            (fun branch ->
+            (fun (branch, chains) ->
               List.map
                 (fun merged ->
                   let boosted_pending = ref true in
-                  replace_class ~atom_class:cls
-                    ~replacement:(fun ~compound ->
-                      if compound <> merged then either
-                      else if !boosted_pending then (
-                        boosted_pending := false;
-                        boosted)
-                      else twin)
-                    branch)
+                  restore_negations chains
+                  @@ replace_class ~atom_class:cls
+                       ~replacement:(fun ~compound ->
+                         if compound <> merged then either
+                         else if !boosted_pending then (
+                           boosted_pending := false;
+                           boosted)
+                         else twin)
+                       branch)
                 (class_compounds ~atom_class:cls branch))
             branches
           |> String.concat ",")
+        |> List.filter (fun twin -> twin <> "")
         |> List.map (fun twin -> "," ^ twin)
         |> String.concat ""
       in
-      String.sub rule_text 0 brace
+      String.sub rule_text 0 selector_start
+      ^ selector
       ^ twins
       ^ String.sub rule_text brace (String.length rule_text - brace))
   | _ -> rule_text
