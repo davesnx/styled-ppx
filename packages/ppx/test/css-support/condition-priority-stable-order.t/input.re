@@ -13,9 +13,8 @@ let toggleButtonShowAtTablet = [%css {|
 /* Header_Css.ml (Header.re:86-90): a min+max range, then a plain
    max-width atom for the same property - same tie, same rule.
    Interpolated (both declarations share one $(pad) path), so both rules
-   are _in_ bundles, not _a_ atoms - stable order sorts a bundle exactly
-   like a plain atom, since it only ever looks at declaration order, never
-   the class prefix. */
+   read one shared variable - stable order sorts them exactly like plain
+   atoms, since it only ever looks at declaration order. */
 let header = (~pad) => [%css {|
   @media (min-width: 768px) and (max-width: 1279px) { padding-top: $(pad); padding-left: $(pad); }
 |}];
@@ -25,8 +24,8 @@ let headerWithBanner = (~pad) => [%css {|
 |}];
 
 /* Discoverable_Css.ml (Discoverable.re:261): the SAME range-then-max-width
-   shape as header, plain _a_ atoms this time - confirms the bundle result
-   above isn't an artifact of bundling. praiseViewportMobile (a THIRD,
+   shape as header, plain _a_ atoms this time - confirms the result above
+   isn't an artifact of the shared variable. praiseViewportMobile (a THIRD,
    narrower max-width atom for the SAME property) is declared between
    praiseViewport and praiseViewportExpanded, checking that
    praiseViewportExpanded - the LAST-defined of the three - still sorts

@@ -1068,8 +1068,36 @@ let () =
    without any special-casing here. *)
 let depth_cache : (string, int) Hashtbl.t = Hashtbl.create 128
 
+(* The autoprefixer's vendor-prefixed twins (see [Css_autoprefixer]) have no
+   registry entry of their own, so a literal lookup would give them depth 0 and
+   sort a longhand's rule as if it were a shorthand. Strip the prefix to reach
+   the standard name, unless the prefixed name is itself in the shorthand graph
+   (e.g. "-webkit-mask-position"), which keeps its own depth. The one spelling
+   that is not a plain strip is old WebKit's logical margin/padding, which drops
+   "inline" from the name ("-webkit-padding-start" is "padding-inline-start"). *)
+let strip_vendor_prefix property =
+  let registered p =
+    Hashtbl.mem direct_children p || Hashtbl.mem direct_parents p
+  in
+  if registered property then property
+  else (
+    match property with
+    | "-webkit-margin-start" -> "margin-inline-start"
+    | "-webkit-margin-end" -> "margin-inline-end"
+    | "-webkit-padding-start" -> "padding-inline-start"
+    | "-webkit-padding-end" -> "padding-inline-end"
+    | _ ->
+      let strip prefix =
+        let n = String.length prefix in
+        if String.length property > n && String.sub property 0 n = prefix then
+          Some (String.sub property n (String.length property - n))
+        else None
+      in
+      List.find_map strip [ "-webkit-"; "-moz-"; "-ms-"; "-o-" ]
+      |> Option.value ~default:property)
+
 let rec depth_of property =
-  let property = resolve_alias property in
+  let property = resolve_alias (strip_vendor_prefix property) in
   match Hashtbl.find_opt depth_cache property with
   | Some d -> d
   | None ->
@@ -1137,29 +1165,6 @@ type t = {
   context : context;
   family : family_id;
   mask : int option;
-  bundle : bool;
-    (** True when [Css_file.re] is treating this atom as part of a REAL bundle:
-        two or more interpolating declarations from the same block sharing one
-        class (see its [transform_rule_list]'s [bundle] computation). A single
-        interpolating declaration is NOT a bundle - it mints its own real,
-        merge-participating slot-keyed class instead, the same path a static
-        atom uses (see [Class_format.slot_class]).
-
-        Bundle-hood is a fact about the whole BLOCK (how many of its
-        declarations interpolate), not about any one atom's own AST, so
-        {!of_atom} - which only ever sees one atom - cannot determine it by
-        inspection the way it does {!family}/{!mask}: it always returns [false].
-        Nothing in the real pipeline ever needs it to return [true] either,
-        since a genuine bundle's class is minted directly by
-        [Class_format.bundle_class] ([Hash_class.bundle_class_and_namespace]),
-        bypassing [Slot_key]/[Class_format.slot_class] entirely - a real
-        bundle's content is the concatenation of every member declaration's
-        rendered text, not one atom's context/family/mask, so it was never
-        representable as a {!t} in the first place. The field stays on the type,
-        and {!removes} still exempts it in both directions, so a test can
-        construct a hypothetical bundle atom directly (e.g.
-        [{ (of_atom ... |> Option.get) with bundle = true }]) to exercise that
-        exemption in isolation. *)
 }
 
 (* Walks one atomized rule (Css_file.re's [atomize_rules] output shape),
@@ -1196,6 +1201,61 @@ let rec collect_context (rule : Ast.rule) :
       | _ -> [], None, []
     in
     (String.lowercase_ascii name, prelude_text) :: at_rules, selector, decls
+
+(* [@media], [@supports] and [@container] each add one condition that must
+   hold, so a chain of them is a conjunction and its order is not meaningful.
+   [@starting-style] (and anything else) is not a plain condition: it changes
+   which styles apply, so it stays where it was written and splits the chain
+   into runs that are sorted separately. The rank is the outer-to-inner order
+   the generated sheet already uses ([at_rule_rank] in generate.ml). *)
+let commutative_rank = function
+  | "supports" -> Some 0
+  | "media" -> Some 1
+  | "container" -> Some 2
+  | _ -> None
+
+let canonical_nesting (rule : Ast.rule) : Ast.rule =
+  let rec peel acc = function
+    | Ast.At_rule
+        ({
+           block = Ast.Rule_list ([ inner ], _) | Ast.Stylesheet ([ inner ], _);
+           _;
+         } as ar) ->
+      peel (ar :: acc) inner
+    | leaf -> List.rev acc, leaf
+  in
+  let at_rules, leaf = peel [] rule in
+  let key (ar : Ast.at_rule) =
+    let name = String.lowercase_ascii (fst ar.name) in
+    ( commutative_rank name,
+      Render.component_value_list
+        (Render.strip_leading_whitespace (fst ar.prelude)) )
+  in
+  let rec sort_runs = function
+    | [] -> []
+    | ar :: _ as chain ->
+      let is_commutative (a : Ast.at_rule) =
+        commutative_rank (String.lowercase_ascii (fst a.name)) <> None
+      in
+      if is_commutative ar then (
+        let rec split run = function
+          | a :: rest when is_commutative a -> split (a :: run) rest
+          | rest -> List.rev run, rest
+        in
+        let run, rest = split [] chain in
+        List.stable_sort (fun a b -> compare (key a) (key b)) run
+        @ sort_runs rest)
+      else ar :: sort_runs (List.tl chain)
+  in
+  let block_loc (ar : Ast.at_rule) =
+    match ar.block with
+    | Ast.Rule_list (_, loc) | Ast.Stylesheet (_, loc) -> loc
+    | Ast.Empty -> ar.loc
+  in
+  List.fold_right
+    (fun (ar : Ast.at_rule) inner ->
+      Ast.At_rule { ar with block = Ast.Rule_list ([ inner ], block_loc ar) })
+    (sort_runs at_rules) leaf
 
 let of_atom (rule : Ast.rule) : t option =
   let at_rules, selector, decls = collect_context rule in
@@ -1244,14 +1304,20 @@ let of_atom (rule : Ast.rule) : t option =
             if own = full then None else Some (acc_mask lor own))
         (Some 0) properties
     in
-    (* Always [false] - see {!t.bundle}'s doc for why this function cannot
-       determine bundle-hood from one atom's AST alone. *)
-    Some { context; family; mask; bundle = false }
+    Some { context; family; mask }
 
 let context_equal a b =
   a.at_rules = b.at_rules
   && a.selector = b.selector
   && a.important = b.important
+
+(* The base context: no at-rule, no selector, not [!important] - exactly the
+   context [context_key] hashes to the empty string, which [Class_format]
+   leaves out of the class name. *)
+let is_base context = context_key context = ""
+
+let context_is_at_rules_only { at_rules; selector; important } =
+  at_rules <> [] && selector = "" && not important
 
 let mask_subset a b =
   match a, b with
@@ -1269,9 +1335,8 @@ let is_excluded_from_all = function
   | Unregistered _ | All -> false
 
 let removes ~former ~latter =
-  (not former.bundle)
-  && (not latter.bundle)
-  && context_equal former.context latter.context
+  (context_equal former.context latter.context
+  || (is_base latter.context && context_is_at_rules_only former.context))
   &&
   match latter.family with
   | All -> not (is_excluded_from_all former.family)

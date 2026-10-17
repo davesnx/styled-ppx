@@ -162,6 +162,16 @@ let family_tests =
       check_int "depth_of margin-inline-start" 1
         (Slot_key.depth_of "margin-inline-start");
       check_int "depth_of margin-inline" 0 (Slot_key.depth_of "margin-inline"));
+    Alcotest_extra.test
+      "a vendor-prefixed twin has the depth of its standard name" (fun () ->
+      check_int "-webkit-animation-duration"
+        (Slot_key.depth_of "animation-duration")
+        (Slot_key.depth_of "-webkit-animation-duration");
+      check_int "-webkit-padding-start is padding-inline-start" 1
+        (Slot_key.depth_of "-webkit-padding-start");
+      check_int "-ms-flex-direction"
+        (Slot_key.depth_of "flex-direction")
+        (Slot_key.depth_of "-ms-flex-direction"));
   ]
 
 let registry_tests =
@@ -356,14 +366,29 @@ let removes_tests =
       check_bool "removes" false
         (Slot_key.removes ~former:(slot_of "color: red;")
            ~latter:(slot_of "&::before{color: blue;}")));
-    Alcotest_extra.test
-      "@media does not remove base, base does not remove @media" (fun () ->
+    Alcotest_extra.test "@media does not remove base, base removes @media"
+      (fun () ->
       let base = slot_of "height: 0;" in
       let media = slot_of "@media (max-width:600px){height: auto;}" in
       check_bool "media removes base" false
         (Slot_key.removes ~former:base ~latter:media);
-      check_bool "base removes media" false
+      check_bool "base removes media" true
         (Slot_key.removes ~former:media ~latter:base));
+    Alcotest_extra.test
+      "a base latter removes at-rule contexts only: not a selector, a \
+       pseudo-element or an !important context" (fun () ->
+      let base = slot_of "color: blue;" in
+      List.iter
+        (fun css ->
+          check_bool css false
+            (Slot_key.removes ~former:(slot_of css) ~latter:base))
+        [
+          "&:hover{color: red;}";
+          "& .child{color: red;}";
+          "&::before{color: red;}";
+          "color: red !important;";
+          "@media (max-width:600px){color: red !important;}";
+        ]);
     Alcotest_extra.test "@supports does not remove @media, same property"
       (fun () ->
       check_bool "removes" false
@@ -511,49 +536,36 @@ let removes_tests =
         (Slot_key.removes
            ~former:(slot_of "--not-a-real-thing-but-also-not-custom-syntax: 1;")
            ~latter:(slot_of "--not-a-real-thing-but-also-not-custom-syntax: 2;")));
-    (* --- interpolation bundles: opaque to removes in both directions ---
-       [of_atom] always returns [bundle = false] (see its own doc - a real
-       bundle is a fact about the whole block, which one atom's AST can't
-       say). A single interpolating declaration therefore merges like any
-       plain atom; only a HAND-BUILT bundle slot (simulating what
-       [Css_file.re] does for a genuine, two-or-more-declaration bundle)
-       exercises [removes]'s bundle exemption below. *)
+    (* --- interpolating declarations are ordinary atoms ---
+       A group of declarations that share one `$(x)` (base, `:hover`,
+       `@media`) is not one opaque class: each member is an atom with its own
+       context, so [removes] drops exactly the members a later declaration
+       covers. *)
     Alcotest_extra.test
-      "a declaration with a $(...) value interpolation is NOT, by itself, a \
-       bundle atom - Css_file.re decides bundle membership at the block level, \
-       not per declaration" (fun () ->
-      check_bool "bundle" false (slot_of "color: $(theme);").bundle);
-    Alcotest_extra.test "a plain declaration is not a bundle atom" (fun () ->
-      check_bool "bundle" false (slot_of "color: red;").bundle);
-    Alcotest_extra.test
-      "a single interpolating declaration merges like a plain atom of the same \
-       property (the fix: it is not a bundle)" (fun () ->
+      "an interpolating declaration merges like a plain atom of the same \
+       property" (fun () ->
       check_bool "removes" true
         (Slot_key.removes ~former:(slot_of "color: $(a);")
            ~latter:(slot_of "color: $(b);")));
     Alcotest_extra.test
-      "a hand-built bundle atom is never removed, even by an identical \
-       same-property atom (would be true for two plain atoms - see the base \
-       test above)" (fun () ->
-      let bundle_slot = { (slot_of "color: $(a);") with bundle = true } in
-      check_bool "removes" false
-        (Slot_key.removes ~former:bundle_slot ~latter:(slot_of "color: $(b);")));
-    Alcotest_extra.test "a hand-built bundle atom never removes a plain atom"
+      "a later base declaration removes an earlier interpolating @media member"
       (fun () ->
-      let bundle_slot = { (slot_of "color: $(theme);") with bundle = true } in
-      check_bool "removes" false
-        (Slot_key.removes ~former:(slot_of "color: red;") ~latter:bundle_slot));
-    Alcotest_extra.test "a plain atom never removes a hand-built bundle atom"
-      (fun () ->
-      let bundle_slot = { (slot_of "color: $(theme);") with bundle = true } in
-      check_bool "removes" false
-        (Slot_key.removes ~former:bundle_slot ~latter:(slot_of "color: red;")));
+      check_bool "removes" true
+        (Slot_key.removes
+           ~former:(slot_of "@media (max-width:1200px){color: $(a);}")
+           ~latter:(slot_of "color: red;")));
     Alcotest_extra.test
-      "a hand-built bundle atom is immune even to a same-property !important \
-       override (bundle status overrides the !important rule too)" (fun () ->
-      let bundle_slot = { (slot_of "color: $(theme);") with bundle = true } in
+      "a later base declaration keeps an earlier interpolating :hover member"
+      (fun () ->
       check_bool "removes" false
-        (Slot_key.removes ~former:bundle_slot
+        (Slot_key.removes
+           ~former:(slot_of "&:hover{color: $(a);}")
+           ~latter:(slot_of "color: red;")));
+    Alcotest_extra.test
+      "an interpolating declaration is not removed by a same-property \
+       !important one" (fun () ->
+      check_bool "removes" false
+        (Slot_key.removes ~former:(slot_of "color: $(a);")
            ~latter:(slot_of "color: red !important;")));
   ]
 

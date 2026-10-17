@@ -24,14 +24,14 @@ before popping, so the popped segment is always the rightmost compound.
   [@@@css "._a_rf47n4wkqg0 ul li:hover::after{content:\"\";}"]
   [@@@css.bindings
     [("Input.table", "_id_1me4lmu",
-       "_a_g79843hghsebco _a_x5lvq3hghstv1h _a_lf3m83hghscuwt");
+       "_a_g79843hghsebco _t1_x5lvq3hghstv1h _t2_lf3m83hghscuwt");
     ("Input.single", "_id_1e50cws", "_a_x5lvq4en7y2");
-    ("Input.compoundParent", "_id_16qcgjr", "_a_pkdux4woysu _a_rf47n4wkqg0")]]
+    ("Input.compoundParent", "_id_16qcgjr", "_a_pkdux4woysu _t1_rf47n4wkqg0")]]
   let table =
     CSS.make
-      "label:table _id_1me4lmu _a_g79843hghsebco _a_x5lvq3hghstv1h _a_lf3m83hghscuwt"
+      "label:table _id_1me4lmu _a_g79843hghsebco _t1_x5lvq3hghstv1h _t2_lf3m83hghscuwt"
       []
   let single = CSS.make "label:single _id_1e50cws _a_x5lvq4en7y2" []
   let compoundParent =
-    CSS.make "label:compoundParent _id_16qcgjr _a_pkdux4woysu _a_rf47n4wkqg0"
+    CSS.make "label:compoundParent _id_16qcgjr _a_pkdux4woysu _t1_rf47n4wkqg0"
       []

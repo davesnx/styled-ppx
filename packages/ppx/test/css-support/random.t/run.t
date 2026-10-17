@@ -139,8 +139,8 @@ If this test fail means that the module is not in sync with the ppx
     "._a_39008a0mj{background-image:linear-gradient(84deg, #F80 0%, rgba(255, 255, 255, 0.8) 50%, #2A97FF 100%);}"
   ];
   [@css "._a_35vr3s{aspect-ratio:16 / 9;}"];
-  [@css "._in_1ter7ii{right:var(--interpolation-it7nat);}"];
-  [@css "._in_1ter7ii{bottom:var(--interpolation-h66riu);}"];
+  [@css "._a_71004ak9k{right:var(--interpolation-it7nat);}"];
+  [@css "._a_71001nunb{bottom:var(--interpolation-h66riu);}"];
   
   CSS.make("_a_aahc5w", []);
   CSS.make("_a_aajuhq", []);
@@ -294,7 +294,7 @@ If this test fail means that the module is not in sync with the ppx
   
   let interpolation = `px(10);
   CSS.make(
-    "_in_1ter7ii",
+    "_a_71004ak9k _a_71001nunb",
     [
       ("--interpolation-it7nat", CSS.Types.Right.toString(interpolation)),
       ("--interpolation-h66riu", CSS.Types.Bottom.toString(interpolation)),

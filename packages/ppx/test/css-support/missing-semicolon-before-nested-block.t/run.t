@@ -24,7 +24,7 @@ This test ensures declaration lists accept nested selectors and `@media` blocks 
     );
   
   let _case3 =
-    CSS.make("label:_case3 _id_1vot2jq _a_7p0013pbo _a_gnvk4ecewfy", []);
+    CSS.make("label:_case3 _id_1vot2jq _a_7p0013pbo _a_0nvk4ecewfy", []);
   
   let _case4 = CSS.make("label:_case4 _id_jxylfo _a_dmfqgp _a_6e67vdig2jl", []);
   
@@ -35,10 +35,10 @@ This test ensures declaration lists accept nested selectors and `@media` blocks 
     );
   
   let _case6 =
-    CSS.make("label:_case6 _id_1c9gvep _a_9h002dmss _a_p6loh9h002ynwb", []);
+    CSS.make("label:_case6 _id_1c9gvep _a_9h002dmss _a_06loh9h002ynwb", []);
   
   let _case7 =
-    CSS.make("label:_case7 _id_1i9tlre _a_ecckkm _a_m0g6m94008l96r", []);
+    CSS.make("label:_case7 _id_1i9tlre _a_ecckkm _a_00g6m94008l96r", []);
   
   let _case8 = CSS.make("label:_case8 _id_8qqhh _a_6llw3m _a_56s4994am5k", []);
   

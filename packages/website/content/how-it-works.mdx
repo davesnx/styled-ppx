@@ -32,7 +32,7 @@ your .re / .ml source
   ▼
 ① ppx expansion (while compiling each file)
    ─ parse & type-check the CSS
-   ─ split into atomic rules, one class per declaration
+   ─ split into atomic rules: one class per property slot and condition
    ─ lower $(expr) interpolations to CSS custom properties
    ─ park the rendered CSS in [@@@css "..."] attributes
   │
@@ -76,11 +76,11 @@ Repeated fallback declarations for the same property (e.g. `display: -webkit-box
 
 ### Class names
 
-Atom class names follow the `_a_<context?><family><mask?><value>` format: a hash of which selector/at-rule context the declaration is under, a short id for its CSS property family, an optional mask of which of that family's longhands it sets, and a value hash - all derived from the declaration itself, never from your `let` binding or module name. Two declarations that render to the same CSS in the same context mint the same class, whatever you named them. The `let` binding's own name never appears in the class: instead, each named `[%css]`/`[%styled.<tag>]` binding mints its own separate, build-independent **identity class** (`_id_<hash>`, `layout`'s `_id_3zgh83` above) that a `$(binding)` selector reference resolves to. Running the ppx with `--dev` (the default) additionally prepends a `label:<binding>` marker class purely for grepping in development; `--minify`/`--env production` drops it. Neither flag changes any atom or identity class - see [Setting up the dune rules](/getting-started/dune-setup#ppx-flags).
+Atom class names follow the `_a_<context?><family><mask?><value>` format: a hash of which selector/at-rule context the declaration is under (its first character is `0` when the context is at-rules alone), a short id for its CSS property family, an optional mask of which of that family's longhands it sets, and a value hash - all derived from the declaration itself, never from your `let` binding or module name. Two declarations that render to the same CSS in the same context mint the same class, whatever you named them. The `let` binding's own name never appears in the class: instead, each named `[%css]`/`[%styled.<tag>]` binding mints its own separate, build-independent **identity class** (`_id_<hash>`, `layout`'s `_id_3zgh83` above) that a `$(binding)` selector reference resolves to. Running the ppx with `--dev` (the default) additionally prepends a `label:<binding>` marker class purely for grepping in development; `--minify`/`--env production` drops it. Neither flag changes any atom or identity class - see [Setting up the dune rules](/getting-started/dune-setup#ppx-flags).
 
 ### Cascade and ordering
 
-`CSS.merge(a, b)` decides by **argument order**, not by which one your source declares first: for any property both sides set, `b` wins, the same rule you'd expect from an object spread. Sheet position is a fallback, not the rule: rules are grouped into globals, then unconditional (`base`) atoms, then conditional (`@media`/`@supports`/`:hover`, ...) atoms, with no CSS layer wrapping any of it, so ordinary specificity always decides first and position only ever breaks a genuine tie. The full rule, its worked examples, and its known limits live in `documents/how-merging-works.md` and [Which declaration wins](/reference/runtime#which-declaration-wins).
+`CSS.merge(a, b)` decides by **argument order**, not by which one your source declares first: for any property both sides set, `b` wins, the same rule you'd expect from an object spread. An unconditional declaration in `b` also overrides the same property under `@media`/`@supports`/`@container` in `a`: when it covers all of it, `merge` drops the class, and when it covers only part (`@media { padding: 8px }` then `padding-top: 0`), `merge` swaps its class for a `_t1_`/`_t2_` twin that the stylesheet also answers to with a higher specificity. Sheet position is a fallback, not the rule: rules are grouped into globals, then unconditional (`base`) atoms, then conditional (`@media`/`@supports`/`:hover`, ...) atoms, with no CSS layer wrapping any of it, so ordinary specificity always decides first and position only ever breaks a genuine tie. The full rule, its worked examples, and its known limits live in `documents/how-merging-works.md` and [Which declaration wins](/reference/runtime#which-declaration-wins).
 
 ## Dynamic values: CSS custom properties
 
