@@ -540,7 +540,14 @@ let is_namespace_statement rule =
     silently misplaced. *)
 let is_charset rule = String.starts_with ~prefix:"@charset" (String.trim rule)
 
-(** The leading `_a_`/`_in_` atom class name in a rendered rule, if any (see
+let is_class_char c =
+  (c >= 'a' && c <= 'z')
+  || (c >= 'A' && c <= 'Z')
+  || (c >= '0' && c <= '9')
+  || c = '-'
+  || c = '_'
+
+(** The leading `_a_` atom class name in a rendered rule, if any (see
     [Hash_class.slot_class] / [Class_format]). Every atom this generator emits
     opens with its own class as a leading compound-selector token, so the first
     occurrence in the rule text is always the atom's own class. Returns [None]
@@ -554,36 +561,24 @@ let atom_class_and_end rule_text =
      generate.ml cram tests fabricate raw [@@@css ...] payloads with
      hand-written names like "._a_A-y") - under-matching here would truncate
      two different class names down to the same prefix and report a false
-     collision. The two prefixes differ in length (3 vs 4), so the matched
-     prefix's own length - not a fixed constant - decides where the rest of
-     the class name starts; neither is a prefix of the other, so trying them
-     in either order is unambiguous. *)
-  let is_class_char c =
-    (c >= 'a' && c <= 'z')
-    || (c >= 'A' && c <= 'Z')
-    || (c >= '0' && c <= '9')
-    || c = '-'
-    || c = '_'
-  in
+     collision. *)
   let n = String.length rule_text in
   let has_prefix i prefix =
     let m = String.length prefix in
     i + m <= n && String.sub rule_text i m = prefix
   in
-  let prefixes = [ "_a_"; "_in_" ] in
+  let prefix = "_a_" in
   let rec scan i =
     if i >= n then None
     else if rule_text.[i] <> '.' then scan (i + 1)
+    else if not (has_prefix (i + 1) prefix) then scan (i + 1)
     else (
-      match List.find_opt (fun p -> has_prefix (i + 1) p) prefixes with
-      | None -> scan (i + 1)
-      | Some p ->
-        let start = i + 1 in
-        let j = ref (start + String.length p) in
-        while !j < n && is_class_char rule_text.[!j] do
-          incr j
-        done;
-        Some (String.sub rule_text start (!j - start), !j))
+      let start = i + 1 in
+      let j = ref (start + String.length prefix) in
+      while !j < n && is_class_char rule_text.[!j] do
+        incr j
+      done;
+      Some (String.sub rule_text start (!j - start), !j))
   in
   scan 0
 
@@ -601,25 +596,17 @@ let atom_class_name rule_text = Option.map fst (atom_class_and_end rule_text)
     `_id_` identity-collision check: same key, different content, is a hard
     build error naming both sides, never a silently wrong stylesheet.
 
-    An `_in_` (interpolation-bundle) class is explicitly exempt, in both
-    directions - never recorded, never compared, never flagged. [Css_file.re]'s
-    bundling already, legitimately, gives several different declarations from
-    one binding the SAME class when they all carry a [$(...)] interpolation;
-    that is not a hash collision, it is the bundling mechanism working as
-    designed. Without this exemption, `minify-interpolation.t` and the
-    `reason-cx-*` snapshot tests would report false collisions on exactly that
-    legitimate sharing. Call after [ordered_rules]'s exact-text dedup, so only
-    genuinely different rule bodies remain to compare. *)
+    Every atom has its own class, including each member of a group of
+    declarations that share one interpolation variable (its value hash covers
+    the group seed, see [Hash_class.group_class_and_namespace]), so the check
+    applies to all of them. Call after [ordered_rules]'s exact-text dedup, so
+    only genuinely different rule bodies remain to compare. *)
 let check_atom_class_collisions rules =
   let seen : (string, string) Hashtbl.t = Hashtbl.create 256 in
   List.filter_map
     (fun rule ->
       match atom_class_name rule with
       | None -> None
-      | Some class_name
-        when String.length class_name >= 4 && String.sub class_name 0 4 = "_in_"
-        ->
-        None
       | Some class_name ->
         (match Hashtbl.find_opt seen class_name with
         | Some other when other <> rule ->
@@ -853,31 +840,31 @@ let property_names_in_block block_text =
 (** One rendered rule's own shorthand depth (see [Slot_key.depth_of]): the
     MINIMUM depth over every property its own declaration(s) touch - read from
     the rendered TEXT (generate.ml never sees the ppx's AST or a [Slot_key.t]).
-    A bundle or family-atom group's several declarations can touch several
-    different properties at once (no single [Slot_key.t] could represent that -
-    see [Slot_key.t.bundle]'s doc), so there is no single "this rule's depth"
-    fact the way there is for an ordinary, single-property atom; MIN is the
-    choice that keeps the sort's guarantee correct for the SHALLOWEST
-    declaration in the rule - at the cost of not being fully correct for a rule
-    that mixes depths at all (see below). A rule with a depth-0 declaration (a
-    plain shorthand, or an ordinary leaf like "color") MUST sort no later than
+    A family-atom group's several declarations can touch several different
+    properties at once (no single [Slot_key.t] could represent that - see
+    [Slot_key.of_atom]'s doc), so there is no single "this rule's depth" fact
+    the way there is for an ordinary, single-property atom; MIN is the choice
+    that keeps the sort's guarantee correct for the SHALLOWEST declaration in
+    the rule - at the cost of not being fully correct for a rule that mixes
+    depths at all (see below). A rule with a depth-0 declaration (a plain
+    shorthand, or an ordinary leaf like "color") MUST sort no later than
     anything that could override just that one declaration through a shallower
     or equal path, regardless of what ELSE is in the same rule - using the
     group's deepest (MAX) declaration instead would let a genuinely shallow
     declaration sort too LATE, keyed off an unrelated, deeper sibling in the
-    same bundle, and end up winning a cascade fight it should have lost: a
-    bundle of `margin-top: 0;` (depth 1) + `padding: 4px;` (depth 0) sorting by
-    MAX (1) would land AFTER a `padding-top: 0;` atom (depth 1) that exists
-    specifically to override this bundle's own `padding: 4px;` - putting the
-    wide shorthand LATER than the narrow override it needs to lose to, exactly
-    backwards. MIN (0 here) keeps it sorting no later than any depth-0 rule, so
-    `padding-top: 0;` (depth 1) still lands after it and wins, same as it would
-    for a lone atom.
+    same group, and end up winning a cascade fight it should have lost: a group
+    of `margin-top: 0;` (depth 1) + `padding: 4px;` (depth 0) sorting by MAX (1)
+    would land AFTER a `padding-top: 0;` atom (depth 1) that exists specifically
+    to override this group's own `padding: 4px;` - putting the wide shorthand
+    LATER than the narrow override it needs to lose to, exactly backwards. MIN
+    (0 here) keeps it sorting no later than any depth-0 rule, so `padding-top:
+    0;` (depth 1) still lands after it and wins, same as it would for a lone
+    atom.
 
-    This is not fully correct for the OTHER declaration in that same bundle:
+    This is not fully correct for the OTHER declaration in that same group:
     `margin-top: 0;` is now keyed as if it were depth 0 too (the group's MIN),
     so a `margin: 10px;` atom elsewhere (depth 0, genuinely wider than
-    `margin-top`) is no longer guaranteed to sort before this bundle's
+    `margin-top`) is no longer guaranteed to sort before this group's
     `margin-top: 0;` the way it would if `margin-top` sorted honestly at its own
     depth 1 - a real, accepted limitation: a multi-declaration rule that mixes
     depths cannot be correctly ordered against every OTHER rule simultaneously,
@@ -933,8 +920,9 @@ let rule_depth rule_text =
     above needed a replacement for) is the invariant that removal exists for, so
     it must not be overridden by depth's narrower concern (restoring one
     binding's own shorthand-then-longhand override intent across atoms
-    `CSS.merge` can't see inside a bundle to compare directly). Rules that are
-    equally descendant-shaped (both, or neither) fall through to depth. *)
+    `CSS.merge` can't see inside a multi-declaration atom to compare directly).
+    Rules that are equally descendant-shaped (both, or neither) fall through to
+    depth. *)
 let compare_descendant_first_then_depth (is_descendant_a, depth_a, _)
   (is_descendant_b, depth_b, _) =
   if is_descendant_a <> is_descendant_b then
@@ -1216,6 +1204,314 @@ let sort_conditional_rules rules =
     else compare pa pb)
   |> List.map (fun (_, _, _, _, r) -> r)
 
+(** [selector] split at its top-level commas (not inside [()] or [[]]). *)
+let split_top_level_commas selector =
+  let n = String.length selector in
+  let rec go i start depth acc =
+    if i >= n then List.rev (String.sub selector start (n - start) :: acc)
+    else (
+      match selector.[i] with
+      | '(' | '[' -> go (i + 1) start (depth + 1) acc
+      | ')' | ']' -> go (i + 1) start (depth - 1) acc
+      | ',' when depth = 0 ->
+        go (i + 1) (i + 1) depth (String.sub selector start (i - start) :: acc)
+      | _ -> go (i + 1) start depth acc)
+  in
+  go 0 0 0 []
+
+(** [branch] with every [.<atom_class>] (not the start of a longer class)
+    replaced by [replacement ~compound], [compound] counting the compound
+    selectors of [branch] from 0: copies in one compound (also inside a
+    [:not(...)] of it) are one element, copies in two compounds are two. *)
+let replace_class ~atom_class ~replacement branch =
+  let needle = "." ^ atom_class in
+  let m = String.length needle in
+  let n = String.length branch in
+  let buffer = Buffer.create n in
+  let rec go i ~depth ~compound ~separated =
+    if i < n then (
+      let c = branch.[i] in
+      let sep = depth = 0 && is_combinator_char c in
+      let compound =
+        if (not sep) && separated then compound + 1 else compound
+      in
+      if
+        i + m <= n
+        && String.sub branch i m = needle
+        && (i + m = n || not (is_class_char branch.[i + m]))
+      then (
+        Buffer.add_string buffer (replacement ~compound);
+        go (i + m) ~depth ~compound ~separated:false)
+      else (
+        Buffer.add_char buffer c;
+        let depth =
+          match c with
+          | '(' | '[' -> depth + 1
+          | ')' | ']' -> depth - 1
+          | _ -> depth
+        in
+        go (i + 1) ~depth ~compound ~separated:sep))
+  in
+  go 0 ~depth:0 ~compound:0 ~separated:false;
+  Buffer.contents buffer
+
+(** The compounds of [branch] that contain [.<atom_class>], in order. *)
+let class_compounds ~atom_class branch =
+  let found = ref [] in
+  ignore
+    (replace_class ~atom_class
+       ~replacement:(fun ~compound ->
+         if not (List.mem compound !found) then found := compound :: !found;
+         "")
+       branch);
+  List.rev !found
+
+(** The compound selector of [branch] that holds position [i], counted as in
+    {!replace_class}. *)
+let compound_at branch i =
+  let rec go k ~depth ~compound ~separated =
+    let c = branch.[k] in
+    let sep = depth = 0 && is_combinator_char c in
+    let compound = if (not sep) && separated then compound + 1 else compound in
+    if k = i then compound
+    else (
+      let depth =
+        match c with
+        | '(' | '[' -> depth + 1
+        | ')' | ']' -> depth - 1
+        | _ -> depth
+      in
+      go (k + 1) ~depth ~compound ~separated:sep)
+  in
+  go 0 ~depth:0 ~compound:0 ~separated:false
+
+(** The index of the [)] that closes a group whose arguments start at [i]. *)
+let close_paren text i =
+  let n = String.length text in
+  let rec go i depth =
+    if i >= n then None
+    else (
+      match text.[i] with
+      | '(' -> go (i + 1) (depth + 1)
+      | ')' -> if depth = 0 then Some i else go (i + 1) (depth - 1)
+      | _ -> go (i + 1) depth)
+  in
+  go i 0
+
+(** The outermost [:not(...)] of [text] as (start of [:not(], index of its
+    closing [)]). *)
+let not_spans text =
+  let n = String.length text in
+  let rec go i acc =
+    if i >= n then List.rev acc
+    else if i + 5 <= n && String.sub text i 5 = ":not(" then (
+      match close_paren text (i + 5) with
+      | Some j -> go (j + 1) ((i, j) :: acc)
+      | None -> go (i + 1) acc)
+    else go (i + 1) acc
+  in
+  go 0 []
+
+(** Whether [.<atom_class>] occurs in [text] under an even ([even]) or odd
+    number of [:not(...)]. A double negation is the class itself. *)
+let rec occurs_under_nots ~atom_class ~even text =
+  let spans = not_spans text in
+  let outside =
+    let buffer = Buffer.create (String.length text) in
+    let pos = ref 0 in
+    List.iter
+      (fun (i, j) ->
+        Buffer.add_string buffer (String.sub text !pos (i - !pos));
+        pos := j + 1)
+      spans;
+    Buffer.add_string buffer (String.sub text !pos (String.length text - !pos));
+    Buffer.contents buffer
+  in
+  (even && class_compounds ~atom_class outside <> [])
+  || List.exists
+       (fun (i, j) ->
+         occurs_under_nots ~atom_class ~even:(not even)
+           (String.sub text (i + 5) (j - i - 5)))
+       spans
+
+let atom_body cls = String.sub cls 3 (String.length cls - 3)
+let placeholder_open = '\001'
+let placeholder_close = '\002'
+let placeholder i = Printf.sprintf "%c%d%c" placeholder_open i placeholder_close
+
+(** [branch] with every [:not(...)] that holds [.<atom_class>] and sits in a
+    compound for which [expand] is true replaced by a placeholder [\001<i>\002],
+    and the chains [i] stands for. A twin cannot swap a negated class:
+    [:not(._t1_X:not(x-))] is true on every element without the twin, so an atom
+    never merged would apply under its own root. The element carries one of the
+    atom class and its twin classes, so the chain excludes all of them:
+    [:not(._a_X)] becomes [:not(._a_X):not(._t1_X):not(._t2_X)]. Where the
+    compound also holds a positive [.<atom_class>] the twin swaps the same class
+    inside the [:not], which is right and shorter, so [expand] is false. *)
+let protect_negations ~atom_class ~expand branch =
+  let names =
+    atom_class
+    :: List.init Merge_key.max_level (fun i ->
+      Merge_key.twin_prefix (i + 1) ^ atom_body atom_class)
+  in
+  let n = String.length branch in
+  let buffer = Buffer.create n in
+  let chains = ref [] in
+  let rec go i =
+    if i < n then (
+      let start = i + 5 in
+      let arg_end =
+        if i + 5 <= n && String.sub branch i 5 = ":not(" then
+          close_paren branch start
+        else None
+      in
+      match arg_end with
+      | Some j ->
+        let arg = String.sub branch start (j - start) in
+        if
+          occurs_under_nots ~atom_class ~even:true arg
+          && expand (compound_at branch i)
+        then (
+          let chain =
+            List.map
+              (fun name ->
+                ":not("
+                ^ replace_class ~atom_class
+                    ~replacement:(fun ~compound:_ -> "." ^ name)
+                    arg
+                ^ ")")
+              names
+            |> String.concat ""
+          in
+          Buffer.add_string buffer (placeholder (List.length !chains));
+          chains := chain :: !chains)
+        else Buffer.add_string buffer (String.sub branch i (j + 1 - i));
+        go (j + 1)
+      | None ->
+        Buffer.add_char buffer branch.[i];
+        go (i + 1))
+  in
+  go 0;
+  Buffer.contents buffer, Array.of_list (List.rev !chains)
+
+(** [text] with each placeholder of {!protect_negations} replaced by its chain.
+*)
+let restore_negations chains text =
+  let n = String.length text in
+  let buffer = Buffer.create n in
+  let rec go i =
+    if i < n then
+      if text.[i] = placeholder_open then (
+        let j = String.index_from text i placeholder_close in
+        let idx = int_of_string (String.sub text (i + 1) (j - i - 1)) in
+        Buffer.add_string buffer chains.(idx);
+        go (j + 1))
+      else (
+        Buffer.add_char buffer text.[i];
+        go (i + 1))
+  in
+  go 0;
+  Buffer.contents buffer
+
+(** Specificity twins: [CSS.merge] may swap an atom class [_a_X] for [_t<k>_X]
+    (see [Merge_key]) to win by source order, whatever the sheet order. Every
+    [_a_] rule therefore also answers to the twin classes of every level up to
+    [Merge_key.max_level]. The twin selector is the whole selector, from its
+    start (after any at-rule [{]) to the [{] that opens the declarations, with
+    every [._a_X] replaced by [._t<k>_X], and [k] times [:not(x-)] after one of
+    them: [._id_a:hover ._a_X] becomes [._id_a:hover ._t1_X:not(x-)], so the
+    twin keeps the conditions of the atom. When the class occurs in two compound
+    selectors ([._a_X + ._a_X]) either element may be the merged one, so there
+    is one twin selector per compound, the others matching [:is(._a_X,._t1_X)]:
+    [._t1_X:not(x-) + :is(._a_X,._t1_X)] and
+    [:is(._a_X,._t1_X) + ._t1_X:not(x-)]. [:not(x-)] weighs as its argument, one
+    type selector (0,0,1), and [x-] matches no element. A twin therefore beats
+    an atom with the same number of classes and pseudo-classes, as a later rule
+    would, but never a rule with one more class-like part, such as [.a.b] or
+    [:hover]. Rules of other classes are left alone. *)
+let add_twins rule_text =
+  match atom_class_and_end rule_text with
+  | Some (cls, after) ->
+    (match String.index_from_opt rule_text after '{' with
+    | None -> rule_text
+    | Some brace ->
+      let class_start = after - String.length cls - 1 in
+      let selector_start =
+        match String.rindex_from_opt rule_text class_start '{' with
+        | Some i -> i + 1
+        | None -> 0
+      in
+      let selector =
+        String.sub rule_text selector_start (brace - selector_start)
+      in
+      let body = atom_body cls in
+      (* [protected] hides the negations that get a chain from the twin swap;
+         the others stay in the text and are swapped with their compound. *)
+      let classified =
+        split_top_level_commas selector
+        |> List.map (fun branch ->
+          (* Hiding every negation that holds the class leaves only its
+             positive occurrences to count. *)
+          let without_negated, _ =
+            protect_negations ~atom_class:cls ~expand:(fun _ -> true) branch
+          in
+          let positive = class_compounds ~atom_class:cls without_negated in
+          let protected, chains =
+            protect_negations ~atom_class:cls
+              ~expand:(fun compound -> not (List.mem compound positive))
+              branch
+          in
+          restore_negations chains protected, protected, chains, positive <> [])
+      in
+      let selector =
+        List.map (fun (expanded, _, _, _) -> expanded) classified
+        |> String.concat ","
+      in
+      let branches =
+        List.filter_map
+          (fun (_, protected, chains, has_class) ->
+            if has_class then Some (protected, chains) else None)
+          classified
+      in
+      let twins =
+        List.init Merge_key.max_level (fun i ->
+          let k = i + 1 in
+          let twin = "." ^ Merge_key.twin_prefix k ^ body in
+          let boosted =
+            twin ^ String.concat "" (List.init k (fun _ -> ":not(x-)"))
+          in
+          let either = ":is(." ^ cls ^ "," ^ twin ^ ")" in
+          (* In one compound the copies are one element, which carries the
+             twin. With the class in several compounds (`& + &`) either
+             element may be the merged one and the others may not: one
+             twin selector per compound. *)
+          List.concat_map
+            (fun (branch, chains) ->
+              List.map
+                (fun merged ->
+                  let boosted_pending = ref true in
+                  restore_negations chains
+                  @@ replace_class ~atom_class:cls
+                       ~replacement:(fun ~compound ->
+                         if compound <> merged then either
+                         else if !boosted_pending then (
+                           boosted_pending := false;
+                           boosted)
+                         else twin)
+                       branch)
+                (class_compounds ~atom_class:cls branch))
+            branches
+          |> String.concat ",")
+        |> List.filter (fun twin -> twin <> "")
+        |> List.map (fun twin -> "," ^ twin)
+        |> String.concat ""
+      in
+      String.sub rule_text 0 selector_start
+      ^ selector
+      ^ twins
+      ^ String.sub rule_text brace (String.length rule_text - brace))
+  | _ -> rule_text
+
 (** Collect, index, resolve, dedup, output. *)
 let run ~output_file ~order input_files =
   Logger.info "output file: %s"
@@ -1339,8 +1635,8 @@ let run ~output_file ~order input_files =
      never style rules that compete for an element either) and what does - a
      [%styled.global] style rule, ALSO never atom-classed but a real,
      cascading rule (`html{...}`, `*{...}`, `*::before{...}`, an author's own
-     global selector), is [global]; every real atom, [_a_] or [_in_] alike,
-     is [base] or [conditional] (no separate [descendant] tier - see
+     global selector), is [global]; every real atom ([_a_]) is
+     [base] or [conditional] (no separate [descendant] tier - see
      [rule_tier]'s doc for why it was removed: a descendant-shaped rule
      stays in the tier of its own context instead, and
      {!sort_by_shorthand_first} orders it before own-element rules within
@@ -1377,8 +1673,9 @@ let run ~output_file ~order input_files =
     List.iter emit statement_rules;
     List.iter emit registrations;
     List.iter emit (sort_by_shorthand_first global_rules);
-    List.iter emit (sort_by_shorthand_first base_rules);
-    List.iter emit (sort_conditional_rules conditional_rules);
+    let emit_atom rule = emit (add_twins rule) in
+    List.iter emit_atom (sort_by_shorthand_first base_rules);
+    List.iter emit_atom (sort_conditional_rules conditional_rules);
     Buffer.contents buffer
   in
   Logger.debug "stylesheet:\n%s" stylesheet;

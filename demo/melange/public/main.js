@@ -37181,14 +37181,14 @@ function rcontains_from2(s2, i, c) {
     throw exn;
   }
 }
-function find_maximal_suffix_and_period(sub9) {
-  const sublen = sub9.length;
+function find_maximal_suffix_and_period(sub10) {
+  const sublen = sub10.length;
   let i = -1;
   let j = 0;
   let k = 1;
   let p = 1;
   while ((j + k | 0) < sublen) {
-    const c = (get2(sub9, j + k | 0) - get2(sub9, i + k | 0) | 0) << 0;
+    const c = (get2(sub10, j + k | 0) - get2(sub10, i + k | 0) | 0) << 0;
     if (c < 0) {
       j = j + k | 0;
       k = 1;
@@ -37213,7 +37213,7 @@ function find_maximal_suffix_and_period(sub9) {
   k = 1;
   p = 1;
   while ((j + k | 0) < sublen) {
-    const c$1 = Math.imul(-1, get2(sub9, j + k | 0) - get2(sub9, i + k | 0) | 0);
+    const c$1 = Math.imul(-1, get2(sub10, j + k | 0) - get2(sub10, i + k | 0) | 0);
     if (c$1 < 0) {
       j = j + k | 0;
       k = 1;
@@ -37245,24 +37245,24 @@ function find_maximal_suffix_and_period(sub9) {
     ];
   }
 }
-function is_sub_periodic(sub9, param) {
+function is_sub_periodic(sub10, param) {
   const p = param[1];
   const l = param[0];
   if (l > p) {
     return false;
   }
   let i = 0;
-  while (i <= l && equal(get2(sub9, i), get2(sub9, i + p | 0))) {
+  while (i <= l && equal(get2(sub10, i), get2(sub10, i + p | 0))) {
     i = i + 1 | 0;
   }
   ;
   return i > l;
 }
-function find3(start, sub9, param, sub_periodic, s2) {
+function find3(start, sub10, param, sub_periodic, s2) {
   const p = param[1];
   const l = param[0];
   const slen = s2.length;
-  const sublen = sub9.length;
+  const sublen = sub10.length;
   if (!(0 <= start && start <= slen)) {
     return invalid_start(start, slen);
   }
@@ -37273,7 +37273,7 @@ function find3(start, sub9, param, sub_periodic, s2) {
       let memory = -1;
       while (j <= smax) {
         let i = 1 + max(l, memory) | 0;
-        while (i < sublen && equal(get2(sub9, i), get2(s2, i + j | 0))) {
+        while (i < sublen && equal(get2(sub10, i), get2(s2, i + j | 0))) {
           i = i + 1 | 0;
         }
         ;
@@ -37282,7 +37282,7 @@ function find3(start, sub9, param, sub_periodic, s2) {
           memory = -1;
         } else {
           i = l;
-          while (i > memory && equal(get2(sub9, i), get2(s2, i + j | 0))) {
+          while (i > memory && equal(get2(sub10, i), get2(s2, i + j | 0))) {
             i = i - 1 | 0;
           }
           ;
@@ -37301,7 +37301,7 @@ function find3(start, sub9, param, sub_periodic, s2) {
     const q = 1 + max(l + 1 | 0, (sublen - l | 0) - 1 | 0) | 0;
     while (j <= smax) {
       let i$1 = l + 1 | 0;
-      while (i$1 < sublen && equal(get2(sub9, i$1), get2(s2, i$1 + j | 0))) {
+      while (i$1 < sublen && equal(get2(sub10, i$1), get2(s2, i$1 + j | 0))) {
         i$1 = i$1 + 1 | 0;
       }
       ;
@@ -37309,7 +37309,7 @@ function find3(start, sub9, param, sub_periodic, s2) {
         j = j + (i$1 - l | 0) | 0;
       } else {
         i$1 = l;
-        while (i$1 >= 0 && equal(get2(sub9, i$1), get2(s2, i$1 + j | 0))) {
+        while (i$1 >= 0 && equal(get2(sub10, i$1), get2(s2, i$1 + j | 0))) {
           i$1 = i$1 - 1 | 0;
         }
         ;
@@ -37331,14 +37331,14 @@ function find3(start, sub9, param, sub_periodic, s2) {
     throw exn;
   }
 }
-function rfind_maximal_suffix_and_period(sub9) {
-  const sublen = sub9.length;
+function rfind_maximal_suffix_and_period(sub10) {
+  const sublen = sub10.length;
   let i = -1;
   let j = 0;
   let k = 1;
   let p = 1;
   while ((j + k | 0) < sublen) {
-    const c = (get2(sub9, (sub9.length - 1 | 0) - (j + k | 0) | 0) - get2(sub9, (sub9.length - 1 | 0) - (i + k | 0) | 0) | 0) << 0;
+    const c = (get2(sub10, (sub10.length - 1 | 0) - (j + k | 0) | 0) - get2(sub10, (sub10.length - 1 | 0) - (i + k | 0) | 0) | 0) << 0;
     if (c < 0) {
       j = j + k | 0;
       k = 1;
@@ -37363,7 +37363,7 @@ function rfind_maximal_suffix_and_period(sub9) {
   k = 1;
   p = 1;
   while ((j + k | 0) < sublen) {
-    const c$1 = Math.imul(-1, get2(sub9, (sub9.length - 1 | 0) - (j + k | 0) | 0) - get2(sub9, (sub9.length - 1 | 0) - (i + k | 0) | 0) | 0);
+    const c$1 = Math.imul(-1, get2(sub10, (sub10.length - 1 | 0) - (j + k | 0) | 0) - get2(sub10, (sub10.length - 1 | 0) - (i + k | 0) | 0) | 0);
     if (c$1 < 0) {
       j = j + k | 0;
       k = 1;
@@ -37395,24 +37395,24 @@ function rfind_maximal_suffix_and_period(sub9) {
     ];
   }
 }
-function ris_sub_periodic(sub9, param) {
+function ris_sub_periodic(sub10, param) {
   const p = param[1];
   const l = param[0];
   if (l > p) {
     return false;
   }
   let i = 0;
-  while (i <= l && equal(get2(sub9, (sub9.length - 1 | 0) - i | 0), get2(sub9, (sub9.length - 1 | 0) - (i + p | 0) | 0))) {
+  while (i <= l && equal(get2(sub10, (sub10.length - 1 | 0) - i | 0), get2(sub10, (sub10.length - 1 | 0) - (i + p | 0) | 0))) {
     i = i + 1 | 0;
   }
   ;
   return i > l;
 }
-function rfind(start, sub9, param, rsub_periodic, s2) {
+function rfind(start, sub10, param, rsub_periodic, s2) {
   const p = param[1];
   const l = param[0];
   const slen = s2.length;
-  const sublen = sub9.length;
+  const sublen = sub10.length;
   if (!(0 <= start && start <= slen)) {
     return invalid_start(start, slen);
   }
@@ -37424,7 +37424,7 @@ function rfind(start, sub9, param, rsub_periodic, s2) {
       let memory = -1;
       while (j <= smax) {
         let i = 1 + max(l, memory) | 0;
-        while (i < sublen && equal(get2(sub9, (sub9.length - 1 | 0) - i | 0), get2(s2, (s2.length - 1 | 0) - (i + j | 0) | 0))) {
+        while (i < sublen && equal(get2(sub10, (sub10.length - 1 | 0) - i | 0), get2(s2, (s2.length - 1 | 0) - (i + j | 0) | 0))) {
           i = i + 1 | 0;
         }
         ;
@@ -37433,7 +37433,7 @@ function rfind(start, sub9, param, rsub_periodic, s2) {
           memory = -1;
         } else {
           i = l;
-          while (i > memory && equal(get2(sub9, (sub9.length - 1 | 0) - i | 0), get2(s2, (s2.length - 1 | 0) - (i + j | 0) | 0))) {
+          while (i > memory && equal(get2(sub10, (sub10.length - 1 | 0) - i | 0), get2(s2, (s2.length - 1 | 0) - (i + j | 0) | 0))) {
             i = i - 1 | 0;
           }
           ;
@@ -37452,7 +37452,7 @@ function rfind(start, sub9, param, rsub_periodic, s2) {
     const q = 1 + max(l + 1 | 0, (sublen - l | 0) - 1 | 0) | 0;
     while (j <= smax) {
       let i$1 = l + 1 | 0;
-      while (i$1 < sublen && equal(get2(sub9, (sub9.length - 1 | 0) - i$1 | 0), get2(s2, (s2.length - 1 | 0) - (i$1 + j | 0) | 0))) {
+      while (i$1 < sublen && equal(get2(sub10, (sub10.length - 1 | 0) - i$1 | 0), get2(s2, (s2.length - 1 | 0) - (i$1 + j | 0) | 0))) {
         i$1 = i$1 + 1 | 0;
       }
       ;
@@ -37460,7 +37460,7 @@ function rfind(start, sub9, param, rsub_periodic, s2) {
         j = j + (i$1 - l | 0) | 0;
       } else {
         i$1 = l;
-        while (i$1 >= 0 && equal(get2(sub9, (sub9.length - 1 | 0) - i$1 | 0), get2(s2, (s2.length - 1 | 0) - (i$1 + j | 0) | 0))) {
+        while (i$1 >= 0 && equal(get2(sub10, (sub10.length - 1 | 0) - i$1 | 0), get2(s2, (s2.length - 1 | 0) - (i$1 + j | 0) | 0))) {
           i$1 = i$1 - 1 | 0;
         }
         ;
@@ -37482,31 +37482,31 @@ function rfind(start, sub9, param, rsub_periodic, s2) {
     throw exn;
   }
 }
-function find_first(sub9) {
-  const sub_lp = find_maximal_suffix_and_period(sub9);
-  const sub_periodic = is_sub_periodic(sub9, sub_lp);
+function find_first(sub10) {
+  const sub_lp = find_maximal_suffix_and_period(sub10);
+  const sub_periodic = is_sub_periodic(sub10, sub_lp);
   return function(startOpt, s2) {
     const start = startOpt !== void 0 ? startOpt : 0;
-    const i = find3(start, sub9, sub_lp, sub_periodic, s2);
+    const i = find3(start, sub10, sub_lp, sub_periodic, s2);
     if (i !== -1) {
       return i;
     }
   };
 }
-function find_last(sub9) {
-  const rsub_lp = rfind_maximal_suffix_and_period(sub9);
-  const rsub_periodic = ris_sub_periodic(sub9, rsub_lp);
+function find_last(sub10) {
+  const rsub_lp = rfind_maximal_suffix_and_period(sub10);
+  const rsub_periodic = ris_sub_periodic(sub10, rsub_lp);
   return function(start, s2) {
     const start$1 = start !== void 0 ? start : s2.length;
-    const i = rfind(start$1, sub9, rsub_lp, rsub_periodic, s2);
+    const i = rfind(start$1, sub10, rsub_lp, rsub_periodic, s2);
     if (i !== -1) {
       return i;
     }
   };
 }
-function find_all2(sub9) {
-  const sub_lp = find_maximal_suffix_and_period(sub9);
-  const sub_periodic = is_sub_periodic(sub9, sub_lp);
+function find_all2(sub10) {
+  const sub_lp = find_maximal_suffix_and_period(sub10);
+  const sub_periodic = is_sub_periodic(sub10, sub_lp);
   return function(f, startOpt, s2, acc) {
     const start = startOpt !== void 0 ? startOpt : 0;
     const slen = s2.length;
@@ -37519,11 +37519,11 @@ function find_all2(sub9) {
         if (start$1 > slen) {
           return acc$1;
         }
-        const i = find3(start$1, sub9, sub_lp, sub_periodic, s2);
+        const i = find3(start$1, sub10, sub_lp, sub_periodic, s2);
         if (i === -1) {
           return acc$1;
         }
-        const start$2 = i + max(sub9.length, 1) | 0;
+        const start$2 = i + max(sub10.length, 1) | 0;
         _start = start$2;
         _acc = _2(f, i, acc$1);
         continue;
@@ -37534,9 +37534,9 @@ function find_all2(sub9) {
     }
   };
 }
-function rfind_all(sub9) {
-  const rsub_lp = rfind_maximal_suffix_and_period(sub9);
-  const rsub_periodic = ris_sub_periodic(sub9, rsub_lp);
+function rfind_all(sub10) {
+  const rsub_lp = rfind_maximal_suffix_and_period(sub10);
+  const rsub_periodic = ris_sub_periodic(sub10, rsub_lp);
   return function(f, start, s2, acc) {
     const slen = s2.length;
     const start$1 = start !== void 0 ? start : s2.length;
@@ -37549,11 +37549,11 @@ function rfind_all(sub9) {
         if (start$2 < 0) {
           return acc$1;
         }
-        const i = rfind(start$2, sub9, rsub_lp, rsub_periodic, s2);
+        const i = rfind(start$2, sub10, rsub_lp, rsub_periodic, s2);
         if (i === -1) {
           return acc$1;
         }
-        const start$3 = i - max(sub9.length, 1) | 0;
+        const start$3 = i - max(sub10.length, 1) | 0;
         _start = start$3;
         _acc = _2(f, i, acc$1);
         continue;
@@ -37695,11 +37695,11 @@ function ends_with2(suffix, s2) {
     return false;
   }
 }
-function includes(sub9) {
-  const sub_lp = find_maximal_suffix_and_period(sub9);
-  const sub_periodic = is_sub_periodic(sub9, sub_lp);
+function includes(sub10) {
+  const sub_lp = find_maximal_suffix_and_period(sub10);
+  const sub_periodic = is_sub_periodic(sub10, sub_lp);
   return function(s2) {
-    return find3(0, sub9, sub_lp, sub_periodic, s2) !== -1;
+    return find3(0, sub10, sub_lp, sub_periodic, s2) !== -1;
   };
 }
 function hash4(x) {
@@ -63788,30 +63788,65 @@ var yellowgreen = {
 };
 var transparent2 = "transparent";
 
+// ../demo-melange/node_modules/styled-ppx.melange/Str_sub.mjs
+function sub8(s2, pos, len2) {
+  return s2.slice(pos, pos + len2 | 0);
+}
+
 // ../demo-melange/node_modules/styled-ppx.melange/Merge_key.mjs
 var atom_prefix = "_a_";
 var all_sentinel = "zz";
 var unregistered_custom_marker = "zy";
 var direction_marker = "5q";
 var unicode_bidi_marker = "dp";
+function family_code(c0, c1) {
+  return c0 << 16 | c1;
+}
+var all_family = family_code(
+  /* 'z' */
+  122,
+  /* 'z' */
+  122
+);
+var unregistered_custom_family = family_code(
+  /* 'z' */
+  122,
+  /* 'y' */
+  121
+);
+var direction_family = family_code(
+  /* '5' */
+  53,
+  /* 'q' */
+  113
+);
+var unicode_bidi_family = family_code(
+  /* 'd' */
+  100,
+  /* 'p' */
+  112
+);
 function is_excluded_from_all(family) {
-  if (family === unregistered_custom_marker || family === direction_marker) {
+  if (family === unregistered_custom_family || family === direction_family) {
     return true;
   } else {
-    return family === unicode_bidi_marker;
+    return family === unicode_bidi_family;
   }
 }
-function base36_value(s2) {
-  const value = {
-    contents: 0
-  };
-  iter6((function(c) {
-    const digit = c >= 58 ? c > 122 || c < 97 ? 0 : (c - /* 'a' */
-    97 | 0) + 10 | 0 : c >= 48 ? c - /* '0' */
-    48 | 0 : 0;
-    value.contents = Math.imul(value.contents, 36) + digit | 0;
-  }), s2);
-  return value.contents;
+function base36_digit(c) {
+  if (c >= 58) {
+    if (c > 122 || c < 97) {
+      return 0;
+    } else {
+      return (c - /* 'a' */
+      97 | 0) + 10 | 0;
+    }
+  } else if (c >= 48) {
+    return c - /* '0' */
+    48 | 0;
+  } else {
+    return 0;
+  }
 }
 function fields_of_extra(extra) {
   if (extra === 0) {
@@ -63854,70 +63889,131 @@ function fields_of_extra(extra) {
     return;
   }
 }
-function parse_atom(class_name) {
-  const prefix_len = atom_prefix.length;
-  if (class_name.length < prefix_len || sub5(class_name, 0, prefix_len) !== atom_prefix) {
+function twin_prefix(level) {
+  return "_t" + (String(level) + "_");
+}
+function split_prefix(class_name) {
+  const n = class_name.length;
+  if (n >= 3 && get2(class_name, 0) === /* '_' */
+  95 && get2(class_name, 1) === /* 'a' */
+  97 && get2(class_name, 2) === /* '_' */
+  95) {
+    return [
+      0,
+      3
+    ];
+  } else if (n >= 4 && get2(class_name, 0) === /* '_' */
+  95 && get2(class_name, 1) === /* 't' */
+  116 && get2(class_name, 2) >= /* '1' */
+  49 && get2(class_name, 2) <= chr(50) && get2(class_name, 3) === /* '_' */
+  95) {
+    return [
+      get2(class_name, 2) - /* '0' */
+      48 | 0,
+      4
+    ];
+  } else {
     return;
   }
-  const body = sub5(class_name, prefix_len, class_name.length - prefix_len | 0);
-  const floor = 6;
-  const match = fields_of_extra(body.length - floor | 0);
+}
+function parse_atom(token) {
+  const match = split_prefix(token);
   if (match === void 0) {
     return;
   }
-  const pos = {
-    contents: 0
-  };
-  const take3 = function(width) {
-    const s2 = sub5(body, pos.contents, width);
-    pos.contents = pos.contents + width | 0;
-    return s2;
-  };
-  const context = match[0] ? take3(5) : "";
-  const family = take3(2);
-  const extended = match[2] ? take3(6) : void 0;
-  const mask = match[1] ? base36_value(take3(4)) : void 0;
-  take3(4);
+  const start = match[1];
+  const floor = 6;
+  const match$1 = fields_of_extra((token.length - start | 0) - floor | 0);
+  if (match$1 === void 0) {
+    return;
+  }
+  const has_extended = match$1[2];
+  const has_context = match$1[0];
+  const context = has_context ? start : -1;
+  const pos = has_context ? start + 5 | 0 : start;
+  const family = family_code(get2(token, pos), get2(token, pos + 1 | 0));
+  const pos$1 = pos + 2 | 0;
+  const extended = has_extended ? pos$1 : -1;
+  const pos$2 = has_extended ? pos$1 + 6 | 0 : pos$1;
+  let mask;
+  if (match$1[1]) {
+    let mask$1 = 0;
+    for (let i = 0; i <= 3; ++i) {
+      mask$1 = Math.imul(mask$1, 36) + base36_digit(get2(token, pos$2 + i | 0)) | 0;
+    }
+    mask = mask$1;
+  } else {
+    mask = -1;
+  }
   return {
+    token,
+    level: match[0],
     context,
     family,
     extended,
     mask
   };
 }
-function context_equal(a, b) {
-  return a.context === b.context;
+function same_field(a, offset_a, b, offset_b, width) {
+  let _i = 0;
+  while (true) {
+    const i = _i;
+    if (i >= width) {
+      return true;
+    }
+    if (get2(a, offset_a + i | 0) !== get2(b, offset_b + i | 0)) {
+      return false;
+    }
+    _i = i + 1 | 0;
+    continue;
+  }
+  ;
 }
-function family_equal(a, b) {
-  if (a.family !== b.family) {
+function context_equal(a, b) {
+  if (a.context < 0) {
+    return b.context < 0;
+  } else if (b.context >= 0) {
+    return same_field(a.token, a.context, b.token, b.context, 5);
+  } else {
     return false;
   }
-  const match = a.extended;
-  const match$1 = b.extended;
-  if (match !== void 0) {
-    if (match$1 !== void 0) {
-      return match === match$1;
+}
+function is_base(a) {
+  return a.context < 0;
+}
+function is_at_rules_only(a) {
+  if (a.context >= 0) {
+    return get2(a.token, a.context) === /* '0' */
+    48;
+  } else {
+    return false;
+  }
+}
+function family_equal(a, b) {
+  if (a.family === b.family) {
+    if (a.extended < 0) {
+      return b.extended < 0;
+    } else if (b.extended >= 0) {
+      return same_field(a.token, a.extended, b.token, b.extended, 6);
     } else {
       return false;
     }
   } else {
-    return match$1 === void 0;
+    return false;
   }
 }
 function mask_subset(a, b) {
-  if (a !== void 0) {
-    if (b !== void 0) {
-      return (a & b) === a;
-    } else {
-      return true;
-    }
+  if (a < 0) {
+    return b < 0;
+  } else if (b < 0) {
+    return true;
   } else {
-    return b === void 0;
+    return (a & b) === a;
   }
 }
 function removes(former, latter) {
-  if (context_equal(former, latter)) {
-    if (latter.family === all_sentinel) {
+  if (context_equal(former, latter) || latter.context < 0 && is_at_rules_only(former)) {
+    if (latter.family === all_family) {
       return !is_excluded_from_all(former.family);
     } else if (family_equal(former, latter)) {
       return mask_subset(former.mask, latter.mask);
@@ -63927,6 +64023,155 @@ function removes(former, latter) {
   } else {
     return false;
   }
+}
+function is_plain(a) {
+  if (a.context < 0) {
+    return true;
+  } else {
+    return is_at_rules_only(a);
+  }
+}
+function overlaps(former, latter) {
+  if (latter.family === all_family) {
+    return !is_excluded_from_all(former.family);
+  } else if (former.family === all_family) {
+    return !is_excluded_from_all(latter.family);
+  } else if (family_equal(former, latter)) {
+    if (former.mask < 0 || latter.mask < 0) {
+      return true;
+    } else {
+      return (former.mask & latter.mask) !== 0;
+    }
+  } else {
+    return false;
+  }
+}
+function surely_after(former, latter) {
+  if (former.context < 0 && is_at_rules_only(latter)) {
+    return true;
+  } else if (context_equal(former, latter) && former.mask < 0) {
+    return latter.mask >= 0;
+  } else {
+    return false;
+  }
+}
+function may_interact(a, b) {
+  if (a.family === b.family || a.family === all_family) {
+    return true;
+  } else {
+    return b.family === all_family;
+  }
+}
+var placeholder = {
+  token: "",
+  level: 0,
+  context: -1,
+  family: -1,
+  extended: -1,
+  mask: -1
+};
+function make_seen(capacity) {
+  return {
+    atoms: make(capacity, placeholder),
+    count: 0
+  };
+}
+function add2(seen, a) {
+  set(seen.atoms, seen.count, a);
+  seen.count = seen.count + 1 | 0;
+}
+function twin_level(seen, latter) {
+  let level = latter.level;
+  for (let i = 0, i_finish = seen.count; i < i_finish; ++i) {
+    const former = get(seen.atoms, i);
+    if (may_interact(former, latter) && is_plain(former) === is_plain(latter) && overlaps(former, latter) && !removes(former, latter)) {
+      const needed = former.level + (surely_after(former, latter) ? 0 : 1) | 0;
+      if (needed > level) {
+        level = needed;
+      }
+    }
+  }
+  if (level < 2) {
+    return level;
+  } else {
+    return 2;
+  }
+}
+function token_of(a, level) {
+  const start = a.level === 0 ? 3 : 4;
+  return (level === 0 ? atom_prefix : twin_prefix(level)) + sub8(a.token, start, a.token.length - start | 0);
+}
+function token_string(t) {
+  if (t.TAG === /* Atom */
+  0) {
+    return t._0.token;
+  } else {
+    return t._0;
+  }
+}
+function parse_token(token) {
+  const a = parse_atom(token);
+  if (a !== void 0) {
+    return {
+      TAG: (
+        /* Atom */
+        0
+      ),
+      _0: a
+    };
+  } else {
+    return {
+      TAG: (
+        /* Opaque */
+        1
+      ),
+      _0: token
+    };
+  }
+}
+function raise_levels(seen, latters) {
+  return rev(fold_left5(
+    (function(tokens, token) {
+      if (token.TAG !== /* Atom */
+      0) {
+        return {
+          hd: token._0,
+          tl: tokens
+        };
+      }
+      const a = token._0;
+      const level = twin_level(seen, a);
+      add2(seen, {
+        token: a.token,
+        level,
+        context: a.context,
+        family: a.family,
+        extended: a.extended,
+        mask: a.mask
+      });
+      return {
+        hd: level === a.level ? a.token : token_of(a, level),
+        tl: tokens
+      };
+    }),
+    /* [] */
+    0,
+    latters
+  ));
+}
+function atom_count(tokens) {
+  return fold_left5((function(n, param) {
+    if (param.TAG === /* Atom */
+    0) {
+      return n + 1 | 0;
+    } else {
+      return n;
+    }
+  }), 0, tokens);
+}
+function twin_block(tokens) {
+  const parsed = map5(parse_token, tokens);
+  return raise_levels(make_seen(atom_count(parsed)), parsed);
 }
 function is_space3(param) {
   if (param > 13 || param < 9) {
@@ -63958,7 +64203,7 @@ function split_tokens(s2) {
     }
     ;
     _acc = {
-      hd: sub5(s2, i, j - i | 0),
+      hd: sub8(s2, i, j - i | 0),
       tl: acc
     };
     _i = j;
@@ -63967,26 +64212,44 @@ function split_tokens(s2) {
   ;
 }
 function merge_class_names(former, latter) {
-  const former_tokens = split_tokens(former);
-  const latter_tokens = split_tokens(latter);
-  const latter_atoms = of_list(filter_map2(parse_atom, latter_tokens));
-  const survives = function(token) {
-    const former_atom = parse_atom(token);
-    if (former_atom !== void 0) {
-      return !exists4((function(latter_atom) {
-        return removes(former_atom, latter_atom);
-      }), latter_atoms);
-    } else {
+  const former_tokens = map5(parse_token, split_tokens(former));
+  const latter_tokens = map5(parse_token, split_tokens(latter));
+  const latter_atoms = of_list(filter_map2((function(a) {
+    if (a.TAG === /* Atom */
+    0) {
+      return a._0;
+    }
+  }), latter_tokens));
+  const survives = function(former_atom) {
+    if (former_atom.TAG !== /* Atom */
+    0) {
       return true;
     }
+    const former_atom$1 = former_atom._0;
+    return !exists4((function(latter_atom) {
+      if (may_interact(former_atom$1, latter_atom)) {
+        return removes(former_atom$1, latter_atom);
+      } else {
+        return false;
+      }
+    }), latter_atoms);
   };
-  return concat6(" ", $at(filter2(survives, former_tokens), latter_tokens));
+  const survivors = filter2(survives, former_tokens);
+  const seen = make_seen(atom_count(survivors) + latter_atoms.length | 0);
+  iter5((function(a) {
+    if (a.TAG === /* Atom */
+    0) {
+      return add2(seen, a._0);
+    }
+  }), survivors);
+  return concat6(" ", $at(map5(token_string, survivors), raise_levels(seen, latter_tokens)));
 }
 var context_width = 5;
 var family_width = 2;
 var mask_width = 4;
 var value_width = 4;
 var extended_width = 6;
+var max_level = 2;
 
 // ../demo-melange/node_modules/reason-react/ReactDOM.mjs
 function unsafeAddProp(style, key, value) {
@@ -64408,7 +64671,7 @@ var $$double2 = $$double;
 var uppercase2 = uppercase;
 var lowercase3 = lowercase2;
 var capitalize2 = capitalize;
-var sub8 = sub7;
+var sub9 = sub7;
 var $$super2 = $$super;
 var textTop2 = textTop;
 var textBottom2 = textBottom;
@@ -64530,7 +64793,7 @@ var card = make7(
   0
 );
 var container = make7(
-  "label:container _id_3949vv _a_p3y4xec8xdh _a_p3y4x390004i85y _a_p3y4x65000ww99w _a_2grgh655m9szns1",
+  "label:container _id_3949vv _a_03y4xec8xdh _a_03y4x390004i85y _a_03y4x65000ww99w _a_2grgh655m9szns1",
   /* [] */
   0
 );
@@ -64646,12 +64909,12 @@ var hoverSecond = make7(
   0
 );
 var mediaFirst = make7(
-  "label:mediaFirst _id_11y1zoz _a_ftrjp4extel",
+  "label:mediaFirst _id_11y1zoz _a_0trjp4extel",
   /* [] */
   0
 );
 var mediaSecond = make7(
-  "label:mediaSecond _id_6b3yfa _a_ftrjp4e3z28",
+  "label:mediaSecond _id_6b3yfa _a_0trjp4e3z28",
   /* [] */
   0
 );

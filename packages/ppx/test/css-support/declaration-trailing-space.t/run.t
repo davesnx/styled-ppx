@@ -22,7 +22,7 @@ with no trailing space.
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css "._a_5r08qs{display:flex;}"];
   [@css "._a_7rw2m8a3txl > *{min-height:0;}"];
-  [@css "@media (min-width: 100px) {._a_6pdot5r5e8m{display:flex;}}"];
+  [@css "@media (min-width: 100px) {._a_0pdot5r5e8m{display:flex;}}"];
   [@css "._a_5lba41{cursor:-webkit-grab;cursor:grab;}"];
   
   CSS.make("_a_5r08qs", []);
@@ -32,8 +32,8 @@ with no trailing space.
   CSS.make("_a_7rw2m8a3txl", []);
   CSS.make("_a_7rw2m8a3txl", []);
   
-  CSS.make("_a_6pdot5r5e8m", []);
-  CSS.make("_a_6pdot5r5e8m", []);
+  CSS.make("_a_0pdot5r5e8m", []);
+  CSS.make("_a_0pdot5r5e8m", []);
   
   CSS.make("_a_5lba41", []);
   CSS.make("_a_5lba41", []);

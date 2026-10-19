@@ -56,6 +56,18 @@ element itself. Write `&:hover` for compound (`<parent>:hover`, the usual
 intent), or `& :hover` to opt into the explicit descendant form.
 ```
 
+## A pseudo-class after a pseudo-element is rejected
+
+`&::before:hover` is not a valid selector in any browser: Firefox, Chromium and WebKit drop the whole rule, so it never applies. styled-ppx rejects it for `::before`, `::after`, `::first-line`, `::first-letter` and `::marker` (and the legacy `:before` spellings), at any nesting depth, with the location of the selector:
+
+```
+`:hover` after the pseudo-element `::before` never matches: no browser accepts
+`&::before:hover`, so the whole rule is dropped. Write the pseudo-class first:
+`&:hover::before`.
+```
+
+Other pseudo-elements stay accepted, because some engine allows a pseudo-class after them: `::part(x):hover`, `::file-selector-button:hover`, `::placeholder:hover`, `::selection:window-inactive`, the `::-webkit-scrollbar` and `::-webkit-slider-thumb` families, `::view-transition-old(x):only-child` and `::details-content:hover`.
+
 ## Supported selector features
 
 The supported syntax includes the usual selector building blocks:

@@ -42,7 +42,7 @@ let env = {
 
 let namespace = {
   flag: "--namespace",
-  doc: "Mixed into every atom (`_a_`), bundle (`_in_`) and identity (`_id_`) class hash, so the same declaration in two libraries mints two different classes and never collides on a page that links both. Defaults to the dune `library-name` cookie (empty when neither the cookie nor this flag is present, e.g. the standalone driver with no `-cookie`). Pass an explicit value to override the cookie: give a native library and its melange twin the SAME value in both stanzas so they keep minting identical classes, or give two libraries with no dune cookie distinct values so their classes differ.",
+  doc: "Mixed into every atom (`_a_`) and identity (`_id_`) class hash, so the same declaration in two libraries mints two different classes and never collides on a page that links both. Defaults to the dune `library-name` cookie (empty when neither the cookie nor this flag is present, e.g. the standalone driver with no `-cookie`). Pass an explicit value to override the cookie: give a native library and its melange twin the SAME value in both stanzas so they keep minting identical classes, or give two libraries with no dune cookie distinct values so their classes differ.",
   value: None,
   defaultValue: "",
 };

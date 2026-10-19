@@ -12,38 +12,38 @@
   @property --borderWidth-apl5wd{syntax:"*";inherits:false;}
   @property --bgColor-vilhl2{syntax:"*";inherits:false;}
   @property --shadow-giamln{syntax:"*";inherits:false;}
-  ._a_40lhv8{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
-  ._a_40pkfc{box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1), 0px 4px 8px 0px rgba(0, 0, 0, 0.2);}
-  ._a_40fb00{box-shadow:inset 0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
-  ._a_401fp9{box-shadow:none;}
-  ._a_4059q8{box-shadow:0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -2px rgba(0, 0, 0, 0.1);}
-  ._a_3hn3ja{border:1px solid black;}
-  ._a_3hl0sh{border:2px dashed #ff0000;}
-  ._a_3hhj16{border:1px solid transparent;}
-  ._a_3hcvhu{border:none;}
-  ._a_3h2ghs75d5{border-top:1px solid red;}
-  ._a_3h0b28q36u{border-right:2px dashed blue;}
-  ._a_3h000731uw{border-bottom:3px dotted green;}
-  ._a_3h01dspk0f{border-left:4px double orange;}
-  ._a_3h5unl{border:1px solid #ccc;}
-  ._a_3nrtka{border-radius:8px;}
-  ._a_40fjfj{box-shadow:0px 4px 6px 0px rgba(0, 0, 0, 0.1);}
-  ._a_3heuo0{border:1px solid #e5e7eb;}
-  ._a_3n4z5l{border-radius:12px;}
-  ._a_40162g{box-shadow:0px 1px 3px 0px rgba(0, 0, 0, 0.1), 0px 1px 2px -1px rgba(0, 0, 0, 0.1);}
-  ._a_3hlw6q{border:1px solid rgba(0, 0, 0, 0.05);}
-  ._a_3ndpry{border-radius:16px;}
-  ._a_3h5o67{border:2px solid #3b82f6;}
-  ._a_40si3w{box-shadow:0px 0px 0px 0px rgba(59, 130, 246, 0.5);}
-  ._a_3h51sj{border:1px solid var(--borderColor-1on39sz);}
-  ._a_40f8br{box-shadow:var(--shadowX-11ljgmp) var(--shadowY-1qn6d0z) var(--blur-1bcbjmk) var(--spread-xxpef3) var(--shadowColor-1sod13t);}
-  ._a_40sn3t{box-shadow:var(--myShadow-af5fmc);}
-  ._a_3hpcwd{border:var(--borderWidth-apl5wd) solid black;}
-  ._a_40vdp5{box-shadow:var(--shadow-giamln);}
-  ._a_3h1lokfl8k{border-width:2px;}
-  ._a_3h0suadx68{border-style:solid;}
-  ._a_3h0ef5edq6{border-color:#333;}
-  ._a_390004fadc{background-color:var(--bgColor-vilhl2);}
+  ._a_40lhv8,._t1_40lhv8:not(x-),._t2_40lhv8:not(x-):not(x-){box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
+  ._a_40pkfc,._t1_40pkfc:not(x-),._t2_40pkfc:not(x-):not(x-){box-shadow:0px 2px 4px 0px rgba(0, 0, 0, 0.1), 0px 4px 8px 0px rgba(0, 0, 0, 0.2);}
+  ._a_40fb00,._t1_40fb00:not(x-),._t2_40fb00:not(x-):not(x-){box-shadow:inset 0px 2px 4px 0px rgba(0, 0, 0, 0.1);}
+  ._a_401fp9,._t1_401fp9:not(x-),._t2_401fp9:not(x-):not(x-){box-shadow:none;}
+  ._a_4059q8,._t1_4059q8:not(x-),._t2_4059q8:not(x-):not(x-){box-shadow:0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -2px rgba(0, 0, 0, 0.1);}
+  ._a_3hn3ja,._t1_3hn3ja:not(x-),._t2_3hn3ja:not(x-):not(x-){border:1px solid black;}
+  ._a_3hl0sh,._t1_3hl0sh:not(x-),._t2_3hl0sh:not(x-):not(x-){border:2px dashed #ff0000;}
+  ._a_3hhj16,._t1_3hhj16:not(x-),._t2_3hhj16:not(x-):not(x-){border:1px solid transparent;}
+  ._a_3hcvhu,._t1_3hcvhu:not(x-),._t2_3hcvhu:not(x-):not(x-){border:none;}
+  ._a_3h2ghs75d5,._t1_3h2ghs75d5:not(x-),._t2_3h2ghs75d5:not(x-):not(x-){border-top:1px solid red;}
+  ._a_3h0b28q36u,._t1_3h0b28q36u:not(x-),._t2_3h0b28q36u:not(x-):not(x-){border-right:2px dashed blue;}
+  ._a_3h000731uw,._t1_3h000731uw:not(x-),._t2_3h000731uw:not(x-):not(x-){border-bottom:3px dotted green;}
+  ._a_3h01dspk0f,._t1_3h01dspk0f:not(x-),._t2_3h01dspk0f:not(x-):not(x-){border-left:4px double orange;}
+  ._a_3h5unl,._t1_3h5unl:not(x-),._t2_3h5unl:not(x-):not(x-){border:1px solid #ccc;}
+  ._a_3nrtka,._t1_3nrtka:not(x-),._t2_3nrtka:not(x-):not(x-){border-radius:8px;}
+  ._a_40fjfj,._t1_40fjfj:not(x-),._t2_40fjfj:not(x-):not(x-){box-shadow:0px 4px 6px 0px rgba(0, 0, 0, 0.1);}
+  ._a_3heuo0,._t1_3heuo0:not(x-),._t2_3heuo0:not(x-):not(x-){border:1px solid #e5e7eb;}
+  ._a_3n4z5l,._t1_3n4z5l:not(x-),._t2_3n4z5l:not(x-):not(x-){border-radius:12px;}
+  ._a_40162g,._t1_40162g:not(x-),._t2_40162g:not(x-):not(x-){box-shadow:0px 1px 3px 0px rgba(0, 0, 0, 0.1), 0px 1px 2px -1px rgba(0, 0, 0, 0.1);}
+  ._a_3hlw6q,._t1_3hlw6q:not(x-),._t2_3hlw6q:not(x-):not(x-){border:1px solid rgba(0, 0, 0, 0.05);}
+  ._a_3ndpry,._t1_3ndpry:not(x-),._t2_3ndpry:not(x-):not(x-){border-radius:16px;}
+  ._a_3h5o67,._t1_3h5o67:not(x-),._t2_3h5o67:not(x-):not(x-){border:2px solid #3b82f6;}
+  ._a_40si3w,._t1_40si3w:not(x-),._t2_40si3w:not(x-):not(x-){box-shadow:0px 0px 0px 0px rgba(59, 130, 246, 0.5);}
+  ._a_3h51sj,._t1_3h51sj:not(x-),._t2_3h51sj:not(x-):not(x-){border:1px solid var(--borderColor-1on39sz);}
+  ._a_40f8br,._t1_40f8br:not(x-),._t2_40f8br:not(x-):not(x-){box-shadow:var(--shadowX-11ljgmp) var(--shadowY-1qn6d0z) var(--blur-1bcbjmk) var(--spread-xxpef3) var(--shadowColor-1sod13t);}
+  ._a_40sn3t,._t1_40sn3t:not(x-),._t2_40sn3t:not(x-):not(x-){box-shadow:var(--myShadow-af5fmc);}
+  ._a_3hpcwd,._t1_3hpcwd:not(x-),._t2_3hpcwd:not(x-):not(x-){border:var(--borderWidth-apl5wd) solid black;}
+  ._a_40vdp5,._t1_40vdp5:not(x-),._t2_40vdp5:not(x-):not(x-){box-shadow:var(--shadow-giamln);}
+  ._a_3h1lokfl8k,._t1_3h1lokfl8k:not(x-),._t2_3h1lokfl8k:not(x-):not(x-){border-width:2px;}
+  ._a_3h0suadx68,._t1_3h0suadx68:not(x-),._t2_3h0suadx68:not(x-):not(x-){border-style:solid;}
+  ._a_3h0ef5edq6,._t1_3h0ef5edq6:not(x-),._t2_3h0ef5edq6:not(x-):not(x-){border-color:#333;}
+  ._a_390004fadc,._t1_390004fadc:not(x-),._t2_390004fadc:not(x-):not(x-){background-color:var(--bgColor-vilhl2);}
 
 Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
 

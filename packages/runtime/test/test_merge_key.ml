@@ -100,6 +100,37 @@ let media_context_merges_like_base () =
   Alcotest_extra.assert_string (CSS.className merged)
     (class_of "@media (max-width:600px){color: blue;}")
 
+let base_latter_drops_at_rule_former () =
+  let media = make "@media (max-width:600px){color: green;}" in
+  let container = make "@container (min-width:1px){color: green;}" in
+  let base = make "color: blue;" in
+  Alcotest_extra.assert_string
+    (CSS.className (CSS.merge media base))
+    (class_of "color: blue;");
+  Alcotest_extra.assert_string
+    (CSS.className (CSS.merge container base))
+    (class_of "color: blue;")
+
+let base_latter_keeps_selector_former () =
+  let base = make "color: blue;" in
+  List.iter
+    (fun css ->
+      let merged = CSS.merge (make css) base in
+      Alcotest_extra.assert_string (CSS.className merged)
+        (Printf.sprintf "%s %s" (class_of css) (class_of "color: blue;")))
+    [
+      "&:hover{color: red;}"; "& .child{color: red;}"; "&::before{color: red;}";
+    ]
+
+let base_latter_needs_a_covering_mask () =
+  let media = make "@media (max-width:600px){padding-top: 1px;}" in
+  let base = make "padding-left: 2px;" in
+  let merged = CSS.merge media base in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s"
+       (class_of "@media (max-width:600px){padding-top: 1px;}")
+       (class_of "padding-left: 2px;"))
+
 let different_contexts_never_merge () =
   let base = make "color: red;" in
   let hovered = make "&:hover{color: blue;}" in
@@ -166,19 +197,16 @@ let merge_of_merges_is_associative () =
     (Printf.sprintf "%s %s" (class_of "color: red;")
        (class_of "&:hover{color: blue !important;}"))
 
-(* -- single-declaration bundles: a block whose ONLY interpolating
-   declaration is this one gets a real, slot-keyed `a-` class (same path
-   a static atom uses), so it now merges normally instead of being an
-   opaque `in-` blob forever kept on both sides. A genuinely bundled atom
-   (two or more interpolating declarations sharing one class) stays
-   exempt - see `two_declaration_bundle_still_exempt` below. *)
+(* -- interpolating declarations are ordinary atoms: each one, alone or as a
+   member of a group that shares one `$(x)`, has a real slot-keyed `_a_`
+   class, so it merges like any other atom. *)
 
 (* CaptionNumber repro: `caption`'s own default `background-color:
    $(accent)` and `captionBgColor(bgColor)`'s `background-color:
    $(bgColor)` are each their own binding's ONLY interpolating
    declaration - same family, same (base) context - so `latter` must
    drop `former`, exactly like two plain `background-color` atoms would. *)
-let single_declaration_bundle_merges_like_a_plain_atom () =
+let interpolating_declaration_merges_like_a_plain_atom () =
   let caption_default = make "background-color: $(accent);" in
   let caption_bg_color = make "background-color: $(bgColor);" in
   let merged = CSS.merge caption_default caption_bg_color in
@@ -197,54 +225,47 @@ let faq_padding_top_dynamic_then_static_drops_dynamic () =
   Alcotest_extra.assert_string (CSS.className merged)
     (class_of "padding-top: 0;")
 
-(* Pin: a REAL two-declaration bundle (the shape Css_file.re mints when a
-   block has two or more interpolating declarations, sharing one class -
-   built here the same way Css_file.re does, via `Class_format.bundle_class`
-   on the concatenation of both declarations' rendered text) stays fully
-   opaque to merge in both directions - never dropped, never drops the
-   other side - unaffected by giving single-declaration bundles a slot key. *)
-let two_declaration_bundle_still_exempt () =
-  let seeds =
-    [ "padding-top: $(gap);"; "background-color: $(accent);" ]
-    |> List.map (fun css -> Render.rule (atom_of css))
-    |> String.concat ""
-  in
-  let bundle_class = Class_format.bundle_class seeds in
-  let bundled = CSS.make bundle_class [] in
-  let plain_padding_top = make "padding-top: 0;" in
-  let merged = CSS.merge bundled plain_padding_top in
+(* A group of three declarations that share one `$(gap)` (base, `:hover`,
+   `@media`) is three atoms. A later static base override drops the base and
+   the `@media` member and keeps the `:hover` member, which has more
+   class-like parts than the override: the plain-CSS result. *)
+let group_members_merge_one_by_one () =
+  let base = "padding-top: $(gap);" in
+  let hover = "&:hover{padding-top: $(gap);}" in
+  let media = "@media (max-width:1200px){padding-top: $(gap);}" in
+  let group = CSS.merge (CSS.merge (make base) (make hover)) (make media) in
+  let override = make "padding-top: 0;" in
+  let merged = CSS.merge group override in
   Alcotest_extra.assert_string (CSS.className merged)
-    (Printf.sprintf "%s %s" bundle_class (class_of "padding-top: 0;"))
+    (Printf.sprintf "%s %s" (class_of hover) (class_of "padding-top: 0;"))
 
-(* The `_a_` rename (atom `a-` -> `_a_`) landed: `Merge_key.atom_prefix` now
-   recognizes only `_a_`, so a hand-written class that merely starts with the
-   OLD `a-` shape, like `"a-header"`, is no longer read as an atom at all -
-   {!Merge_key.parse_atom} returns [None] for it, and {!merge_class_names}
-   keeps every token neither side recognizes as an atom, unconditionally.
-   This is the CSS.merge-visible behavior change the rename was for: a
-   hand-written `a-header` class used to collide with a real atom (see
-   {!hand_written_class_ambiguity_persists_under_the_new_prefix} below); now
-   it doesn't, because `a-` isn't a recognized prefix shape any more. *)
-let hand_written_a_dash_class_is_no_longer_misread_as_an_atom () =
+(* Only the `_a_` prefix marks an atom: a token without it is kept on both
+   sides and never dropped. *)
+let unknown_prefix_token_is_kept () =
+  let left = CSS.make "plain1abc2de" [] in
+  let merged = CSS.merge left (make "padding-top: 0;") in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "plain1abc2de %s" (class_of "padding-top: 0;"))
+
+(* A hand-written class that merely starts with `a-`, like `"a-header"`, is
+   not an atom: {!Merge_key.parse_atom} returns [None] for it, and
+   {!merge_class_names} keeps every token neither side recognizes as an atom,
+   unconditionally. *)
+let a_dash_class_is_not_an_atom () =
   Alcotest_extra.assert_string
     (Merge_key.merge_class_names "label:x a-header" "a-he1234")
     "label:x a-header a-he1234"
 
-(* Known, documented limit, shifted to the new prefix: `Merge_key.parse_atom`
-   still recognizes a class by PREFIX and LENGTH alone (it has no way to ask
-   the ppx "did you really mint this one?"), so a hand-written author class
-   that happens to start with `_a_` and land on one of the six lengths a real
-   atom can have is still indistinguishable from a real one. `"_a_header"`
-   (body "header", 6 chars - exactly the family+value floor, no
-   context/mask/extended) and `"_a_he1234"` (body "he1234", the same 6 chars)
-   both parse as ordinary, same-family, same-context, full-mask atoms, so
-   `removes` drops the former - a real author class silently vanishes from
-   the className string. Pinned as CURRENT, ACCEPTED behavior: the rename
-   narrows the odds of an accidental collision (a hand-written class now
-   needs to start with the less-common `_a_` sequence, not just `a-`), but
-   does not and cannot eliminate them - this test documents that the limit
-   persists, just at the new prefix. *)
-let hand_written_class_ambiguity_persists_under_the_new_prefix () =
+(* Known, documented limit: {!Merge_key.parse_atom} recognizes a class by
+   PREFIX and LENGTH alone (it has no way to ask the ppx "did you really mint
+   this one?"), so a hand-written class that starts with `_a_` and lands on one
+   of the six lengths a real atom can have is indistinguishable from a real
+   one. `"_a_header"` (body "header", 6 chars - exactly the family+value
+   floor, no context/mask/extended) and `"_a_he1234"` (body "he1234", the same
+   6 chars) both parse as ordinary, same-family, same-context, full-mask
+   atoms, so `removes` drops the former - a real author class silently
+   vanishes from the className string. Pinned as accepted behavior. *)
+let hand_written_atom_shaped_class_is_read_as_an_atom () =
   Alcotest_extra.assert_string
     (Merge_key.merge_class_names "label:x _a_header" "_a_he1234")
     "label:x _a_he1234"
@@ -281,7 +302,7 @@ let disjoint_gap_longhands_both_survive_legacy_alias_spelling () =
 (* -- Merge_key's own hardcoded constants, cross-checked against the real
    Slot_key/Class_format values, not just against a comment. Merge_key
    cannot depend on Slot_key for real (see its own doc comment: it ships
-   in the melange browser bundle), so its five family-marker constants
+   in the melange browser bundle), so its four family-marker constants
    are a deliberate, narrow duplication - this is the test that catches
    them drifting if the registry ever grows past today's seed or the
    family field's width ever changes. *)
@@ -328,6 +349,171 @@ let long_family_longhands_do_not_drop_each_other () =
       "border-image-source: none;", "border-top-width: 1px;";
     ]
 
+(* -- Specificity twin ----------------------------------------------------
+
+   [Merge_key] swaps the later atom's [_a_] class for [_t<k>_] where the
+   sheet order cannot be trusted to put it last (see [Merge_key.twin_level]).
+   [generate] gives [_t<k>_] its higher specificity; the swap itself is only
+   a prefix change, so every expectation below is the real atom class with
+   its prefix replaced. *)
+let twin level css =
+  let cls = class_of css in
+  assert (String.sub cls 0 3 = "_a_");
+  Printf.sprintf "_t%d_%s" level (String.sub cls 3 (String.length cls - 3))
+
+let wide_padding = "@media (max-width:1200px){padding: 1px;}"
+let wide_top = "@media (max-width:1200px){padding-top: 1px;}"
+
+let base_former_media_latter_needs_no_twin () =
+  let merged =
+    CSS.merge (make "padding-top: 1px;")
+      (make "@media (max-width:600px){padding: 2px;}")
+  in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s"
+       (class_of "padding-top: 1px;")
+       (class_of "@media (max-width:600px){padding: 2px;}"))
+
+let media_former_base_latter_gets_twin () =
+  let merged = CSS.merge (make wide_padding) (make "padding-top: 2px;") in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s" (class_of wide_padding)
+       (twin 1 "padding-top: 2px;"))
+
+let two_media_contexts_get_twin () =
+  let narrow = "@media (max-width:900px){padding-top: 3px;}" in
+  let merged = CSS.merge (make wide_top) (make narrow) in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s" (class_of wide_top) (twin 1 narrow))
+
+let a_ = "@media (max-width:1200px){border-top: 1px solid red;}"
+let b_ = "@media (max-width:900px){border-color: blue;}"
+let c_ = "border-top: 3px dotted green;"
+let c_media = "@media (max-width:700px){border-top: 2px dashed green;}"
+let d_ = "@media (max-width:500px){border-color: black;}"
+
+let three_way_chain_reaches_level_two () =
+  let merged = CSS.merge (CSS.merge (make a_) (make b_)) (make c_) in
+  (* [a_] is covered by [c_] and dropped; [b_] only overlaps, so [c_] must
+     beat the twin [b_] already is. *)
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s" (twin 1 b_) (twin 2 c_))
+
+let levels_stop_at_the_cap () =
+  let merged =
+    CSS.merge
+      (CSS.merge (CSS.merge (make a_) (make b_)) (make c_media))
+      (make d_)
+  in
+  (* [d_] would need level 3 over [c_media]; it stays at 2 and the sheet
+     order decides. *)
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s %s %s" (class_of a_) (twin 1 b_) (twin 2 c_media)
+       (twin 2 d_))
+
+(* A twin only breaks ties between contexts of the same kind: two plain ones
+   (base, at-rules alone) or two with a selector or [!important]. A selector
+   atom already has more class-like parts than a plain atom (and a plain twin
+   adds a type selector only), so the one with the selector wins on its own. *)
+let selector_latter_over_plain_formers_needs_no_twin () =
+  let hover = "&:hover{padding-top: 4px;}" in
+  let narrow = "@media (max-width:900px){padding-top: 3px;}" in
+  let merged =
+    CSS.merge (CSS.merge (make wide_top) (make narrow)) (make hover)
+  in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s %s" (class_of wide_top) (twin 1 narrow)
+       (class_of hover))
+
+let selector_former_is_not_raised_by_a_later_twin () =
+  let hover = "&:hover{padding-top: 4px;}" in
+  let narrow = "@media (max-width:900px){padding-top: 3px;}" in
+  let merged =
+    CSS.merge (CSS.merge (make wide_top) (make hover)) (make narrow)
+  in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s %s" (class_of wide_top) (class_of hover)
+       (twin 1 narrow))
+
+let hover = "&:hover{color: red;}"
+let focus = "&:focus{color: blue;}"
+let active = "&:active{color: green;}"
+let disabled = "&:disabled{color: black;}"
+
+let two_selector_contexts_get_twin () =
+  let merged = CSS.merge (make hover) (make disabled) in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s" (class_of hover) (twin 1 disabled))
+
+let selector_chain_reaches_the_cap () =
+  let merged =
+    CSS.merge
+      (CSS.merge (CSS.merge (make hover) (make focus)) (make active))
+      (make disabled)
+  in
+  (* [disabled] would need level 3; it stays at 2 and the sheet order
+     (pseudo-class rank) decides against [active]. *)
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s %s %s" (class_of hover) (twin 1 focus)
+       (twin 2 active) (twin 2 disabled))
+
+let descendant_selectors_get_twin () =
+  let child_a = "& .a{color: red;}" in
+  let child_b = "& .b{color: blue;}" in
+  let merged = CSS.merge (make child_a) (make child_b) in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s" (class_of child_a) (twin 1 child_b))
+
+let same_selector_with_extra_at_rule_gets_twin () =
+  let narrow_hover = "@media (max-width:900px){&:hover{color: red;}}" in
+  let merged = CSS.merge (make narrow_hover) (make hover) in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (Printf.sprintf "%s %s" (class_of narrow_hover) (twin 1 hover))
+
+let important_contexts_get_twin_only_among_themselves () =
+  let wide = "@media (max-width:900px){color: red !important;}" in
+  let narrow = "@media (max-width:700px){color: blue !important;}" in
+  let plain = "color: black;" in
+  let both = CSS.merge (make wide) (make narrow) in
+  Alcotest_extra.assert_string (CSS.className both)
+    (Printf.sprintf "%s %s" (class_of wide) (twin 1 narrow));
+  (* A plain latter never beats an important former, whatever its level. *)
+  let with_plain = CSS.merge (make wide) (make plain) in
+  Alcotest_extra.assert_string (CSS.className with_plain)
+    (Printf.sprintf "%s %s" (class_of wide) (class_of plain))
+
+let removal_wins_over_twin () =
+  let merged = CSS.merge (make wide_top) (make "padding-top: 2px;") in
+  Alcotest_extra.assert_string (CSS.className merged)
+    (class_of "padding-top: 2px;")
+
+let block_classes_follow_source_order () =
+  let tokens = [ class_of wide_padding; class_of "padding-top: 2px;" ] in
+  Alcotest_extra.assert_string
+    (String.concat " " (Merge_key.twin_block tokens))
+    (Printf.sprintf "%s %s" (class_of wide_padding)
+       (twin 1 "padding-top: 2px;"))
+
+let selector_block_classes_follow_source_order () =
+  let tokens = [ class_of hover; class_of disabled ] in
+  Alcotest_extra.assert_string
+    (String.concat " " (Merge_key.twin_block tokens))
+    (Printf.sprintf "%s %s" (class_of hover) (twin 1 disabled))
+
+(* [border-color] overlaps the @media [border-top] on the top colour without
+   covering it, so merging raises it over [border_top]; [border-right-color]
+   under another @media follows [border-color] in its own block and overlaps
+   [border_top] not at all, so only the raise of [border-color] can lift it. *)
+let later_atoms_of_the_block_follow_a_raised_atom () =
+  let border_top = "@media (max-width:500px){border-top: 1px solid red;}" in
+  let border_color = "border-color: blue;" in
+  let right_color = "@media (max-width:600px){border-right-color: green;}" in
+  let block = class_of border_color ^ " " ^ class_of right_color in
+  Alcotest_extra.assert_string
+    (Merge_key.merge_class_names (class_of border_top) block)
+    (Printf.sprintf "%s %s %s" (class_of border_top) (twin 1 border_color)
+       (twin 1 right_color))
+
 let tests =
   [
     Alcotest_extra.test
@@ -341,24 +527,26 @@ let tests =
     Alcotest_extra.test "CaptionNumber repro: same shape, background-color"
       caption_number_repro;
     Alcotest_extra.test
-      "single-declaration bundle merges like a plain atom: CaptionNumber's own \
+      "interpolating declaration merges like a plain atom: CaptionNumber's own \
        two interpolated background-color declarations"
-      single_declaration_bundle_merges_like_a_plain_atom;
+      interpolating_declaration_merges_like_a_plain_atom;
     Alcotest_extra.test
       "Faq's interpolated padding-top drops in favor of a later static \
        padding-top override"
       faq_padding_top_dynamic_then_static_drops_dynamic;
     Alcotest_extra.test
-      "a real two-declaration bundle stays exempt from merge in both directions"
-      two_declaration_bundle_still_exempt;
+      "the members of a group sharing one interpolation merge one by one: a \
+       later base override drops the base and @media members, keeps :hover"
+      group_members_merge_one_by_one;
+    Alcotest_extra.test "a token with no atom prefix is kept, never dropped"
+      unknown_prefix_token_is_kept;
     Alcotest_extra.test
-      "a hand-written a-header class is no longer misread as an atom now that \
-       only _a_ is a recognized prefix"
-      hand_written_a_dash_class_is_no_longer_misread_as_an_atom;
+      "a hand-written a-header class is not an atom: only _a_ is a prefix"
+      a_dash_class_is_not_an_atom;
     Alcotest_extra.test
-      "known limit, shifted: a hand-written _a_<6 chars> class is \
-       indistinguishable from a real atom and can be silently dropped"
-      hand_written_class_ambiguity_persists_under_the_new_prefix;
+      "known limit: a hand-written _a_<6 chars> class is indistinguishable \
+       from a real atom and can be silently dropped"
+      hand_written_atom_shaped_class_is_read_as_an_atom;
     Alcotest_extra.test
       "a later shorthand drops an earlier lone longhand it covers (not a limit)"
       longhand_then_shorthand_drops_longhand;
@@ -383,6 +571,14 @@ let tests =
     Alcotest_extra.test
       "different contexts (base vs &:hover) never merge, same property"
       different_contexts_never_merge;
+    Alcotest_extra.test "a base latter drops an at-rule former of the same slot"
+      base_latter_drops_at_rule_former;
+    Alcotest_extra.test
+      "a base latter keeps a selector or pseudo-element former"
+      base_latter_keeps_selector_former;
+    Alcotest_extra.test
+      "a base latter keeps an at-rule former its mask does not cover"
+      base_latter_needs_a_covering_mask;
     Alcotest_extra.test
       "a plain atom and its !important twin never merge, in either direction \
        (plain former)"
@@ -405,4 +601,46 @@ let tests =
       "longhands of the 20-leaf font family and the 17-leaf border family \
        never drop each other"
       long_family_longhands_do_not_drop_each_other;
+    Alcotest_extra.test "a base former and an at-rules-only latter need no twin"
+      base_former_media_latter_needs_no_twin;
+    Alcotest_extra.test
+      "an at-rules-only former and a base latter that only overlaps it: the \
+       latter becomes _t1_"
+      media_former_base_latter_gets_twin;
+    Alcotest_extra.test
+      "two different at-rules-only contexts on one property: the latter \
+       becomes _t1_"
+      two_media_contexts_get_twin;
+    Alcotest_extra.test
+      "a three-way chain: the last atom becomes _t2_ over the _t1_ one"
+      three_way_chain_reaches_level_two;
+    Alcotest_extra.test "a fourth overlapping merge stays at _t2_ (the cap)"
+      levels_stop_at_the_cap;
+    Alcotest_extra.test "a selector latter over plain formers needs no twin"
+      selector_latter_over_plain_formers_needs_no_twin;
+    Alcotest_extra.test "a selector former is not raised by a later twin"
+      selector_former_is_not_raised_by_a_later_twin;
+    Alcotest_extra.test "two selector contexts on one property get a twin"
+      two_selector_contexts_get_twin;
+    Alcotest_extra.test "a chain of four selector atoms stops at the cap"
+      selector_chain_reaches_the_cap;
+    Alcotest_extra.test "two descendant selectors on one property get a twin"
+      descendant_selectors_get_twin;
+    Alcotest_extra.test
+      "the same selector with an extra at-rule in the former gets a twin"
+      same_selector_with_extra_at_rule_gets_twin;
+    Alcotest_extra.test
+      "important contexts get a twin among themselves, a plain latter none"
+      important_contexts_get_twin_only_among_themselves;
+    Alcotest_extra.test "a block's selector atoms get twins in source order"
+      selector_block_classes_follow_source_order;
+    Alcotest_extra.test
+      "removal wins over a twin when the latter's mask covers the former's"
+      removal_wins_over_twin;
+    Alcotest_extra.test
+      "a block's own atoms get twins in source order (twin_block)"
+      block_classes_follow_source_order;
+    Alcotest_extra.test
+      "a block's later atoms follow the atom that merging raised"
+      later_atoms_of_the_block_follow_a_raised_atom;
   ]

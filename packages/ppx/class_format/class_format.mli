@@ -1,31 +1,21 @@
 (** Merge-aware atom class names. Re-exported by [Hash_class] (the single source
     of truth for every hashed identifier, per its own header comment)
     - this module is standalone only so it can be unit-tested directly;
-      [Hash_class] is still where a real caller should reach for it once
-      [Css_file.re]'s atomization is taught to mint family atoms and calls into
-      this format for every atom, not just bundles.
+      [Hash_class] is where a real caller reaches for it, and [Css_file.re]'s
+      atomization mints every atom through this format.
 
-    Not wired into the real atomization/generate pipeline yet, EXCEPT
-    {!bundle_class}, which [Hash_class.bundle_class_and_namespace] already calls
-    for real: the atom class-name collision check
-    (`packages/generate/generate.ml`) needs a real, recognizable bundle prefix
-    to tell a legitimate shared bundle class apart from a genuine hash
-    collision.
+    Prefix: [_a_], for every atom, important or not (see below). It carries its
+    own trailing delimiter (the second "_"), so no separate separator is ever
+    added at a call site. There is no separate important-atom prefix:
+    [!important] folds into {!Slot_key.context_key} instead (see slot_key.mli's
+    [context] doc), so an important atom is an ordinary [_a_] atom whose context
+    happens to be non-empty. A member of a group of atoms that share one
+    interpolation variable is an ordinary [_a_] atom too ([Hash_class] hashes
+    its value field together with the group seed).
 
-    Prefixes: [_a_] (any non-bundle atom, important or not - see below), [_in_]
-    (an interpolation bundle - see {!Slot_key.t.bundle}). Each prefix already
-    carries its own trailing delimiter (the second "_"), so no separate
-    separator is ever added at a call site. There is no separate important-atom
-    prefix: [!important] folds into {!Slot_key.context_key} instead (see
-    slot_key.mli's [context] doc), so an important atom is an ordinary [_a_]
-    atom whose context happens to be non-empty. [_a_] is never a prefix of
-    [_in_] or vice versa, so a literal-prefix match is unambiguous with no
-    lookahead beyond the prefix itself.
-
-    A non-bundle atom ([_a_]) is its prefix followed by an optional context
-    field, a family field, an optional extended-hash field, an optional mask
-    field, and a value field, concatenated with no separator. A bundle atom
-    ([_in_]) carries only a hash, none of those other fields.
+    An atom is its prefix followed by an optional context field, a family field,
+    an optional extended-hash field, an optional mask field, and a value field,
+    concatenated with no separator.
 
     - [context] is 5 base36 chars, present only when {!Slot_key.context_key} is
       non-empty (a base, non-important atom has no context part at all, so it
@@ -47,57 +37,36 @@
       property, which is what keeps the common case short.
     - [value] is always exactly 4 base36 chars, a hash of the atom's own
       rendered content - unique only within one (context, family[, mask])
-      bucket, not globally, which is what lets it be shorter than today's class
-      hash. [generate] checks that uniqueness (mirroring its existing [_id_]
-      identity-collision check, skipping [_in_] atoms).
-    - A bundle atom ([_in_]) carries only a {!bundle_value_width}-char (upper
-      bound; unpadded, so often shorter) value hash - as wide as today's
-      un-bucketed class-name hash, since it has no (context, family[, mask])
-      bucket to be unique within, unlike every other atom above.
+      bucket, not globally, which is what lets it be short. [generate] checks
+      that uniqueness (mirroring its existing [_id_] identity-collision check).
 
-    **The length table, keyed by prefix first** ({!floor_of_prefix} computes the
-    floor row, {!possible_extra_lengths} the six "extra" values the floor can be
-    added to; a bundle atom is a separate, simpler row entirely):
+    **The length table**: the floor, {!atom_floor}, is the prefix plus family
+    and value, 3+2+4 = 9. {!possible_extra_lengths} are the six "extra" values
+    the floor can be added to (mask, context, extended), so an atom is 9, 13,
+    14, 15, 18 or 20 characters long.
 
-    {v
-    prefix | len(prefix)+family+value floor | + extras (mask/context/extended)
-    -------|---------------------------------|-----------------------------------
-    _a_    | 3+2+4 = 9                       | 9, 13, 14, 15, 18, 20
-    _in_   | 4, then an unpadded hash        | variable, up to 4+7=11
-    v}
-
-    An [!important] atom in an otherwise-base context is an [_a_] row atom with
-    the [+context_width] extra applied (14 or 15, depending on whether it also
-    needs a mask/extended field) - {!Slot_key.context_key} makes this happen
-    automatically, {!slot_class} does not special-case it.
-
-    {!floor_of_prefix} computes the [_a_] row's floor directly from the prefix
-    string, so it never needs updating by hand if the prefix's length ever
-    changes again - [_in_]'s row is not [floor_of_prefix]-shaped at all, see
-    {!bundle_class}.)
+    An [!important] atom in an otherwise-base context has the [+context_width]
+    extra applied (14 or 15, depending on whether it also needs a mask/extended
+    field) - {!Slot_key.context_key} makes this happen automatically,
+    {!slot_class} does not special-case it.
 
     Parsing at runtime is pure arithmetic on the string's length and fixed
     slices once the prefix is known - no shorthand table needed there. See
     {!possible_extra_lengths} for the exact, pairwise-distinct set of "extra"
-    lengths beyond a prefix's own floor that makes this possible. *)
+    lengths beyond the floor that makes this possible. *)
 
 val atom_prefix : string
-val bundle_prefix : string
 val context_width : int
 val family_width : int
 val mask_width : int
 val value_width : int
 val extended_width : int
-val bundle_value_width : int
 
-(** A non-bundle atom's minimum length for the given prefix (its own length,
-    plus the fixed family+value floor) - before any of {!possible_extra_lengths}
-    applies. Call with {!atom_prefix}; {!bundle_prefix} has no floor in this
-    sense, see {!bundle_class}. *)
-val floor_of_prefix : string -> int
+(** An atom's minimum length (its prefix, plus the fixed family+value floor) -
+    before any of {!possible_extra_lengths} applies. *)
+val atom_floor : int
 
-(** The six possible values of a non-bundle atom's length minus
-    {!floor_of_prefix}'s floor for its own prefix: [0] (base,
+(** The six possible values of an atom's length minus {!atom_floor}: [0] (base,
     [Registered]/[All], no mask), [mask_width] (a longhand/family-atom mask,
     base context), [context_width] (a non-base context, no mask),
     [extended_width] (an unregistered/custom marker, base context),
@@ -112,19 +81,7 @@ val possible_extra_lengths : int list
 *)
 val to_base36_padded : width:int -> int -> string
 
-(** [content]'s hash, reduced to exactly [width] base36 digits - the encoding
-    for a field whose input is arbitrary text ([context], atom [content]),
-    unlike [family]/[mask] which are already small bounded ints. *)
-val hashed_field : width:int -> string -> string
-
-(** The {!bundle_prefix} class for [content] directly - what {!slot_class}
-    delegates to for a bundle atom, exposed standalone so a caller that already
-    knows an atom is a bundle (e.g. [Hash_class], wiring [Css_file.re]'s
-    existing bundle path for real) doesn't need to build a full,
-    otherwise-unused {!Slot_key.t} just to reach it. *)
-val bundle_class : string -> string
-
 (** [slot_class slot content] is [slot]'s full class name: [content] is the
     atom's own rendered text (the same string [Hash_class.class_and_namespace]
-    hashes today). *)
+    hashes). *)
 val slot_class : Slot_key.t -> string -> string

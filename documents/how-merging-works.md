@@ -34,6 +34,36 @@ it sets. `merge(a, b)` drops a class of `a` when a class of `b` has the
 longhand** the `a` class sets. Nothing else changes: `CSS.styles` still
 carries both class name lists and both custom-property values.
 
+Nested `@supports`, `@media` and `@container` count as one condition that
+holds when all of them hold, so their written order does not matter:
+`@media (...) { @supports (...) { ... } }` and
+`@supports (...) { @media (...) { ... } }` are the same context, and the
+generated rule always nests them in the order `@supports`, `@media`,
+`@container` (two of the same kind in the order of their text).
+`@starting-style` is not reordered.
+
+There is one exception to "same context". When `b`'s declaration is
+unconditional (base context: no `@media`/`@supports`/`@container`, no
+selector, not `!important`), it also drops `a`'s atoms of the same
+longhands that sit under at-rules alone. `b` sets the property for the
+element in every state, so an `@media` value of `a` for it would
+otherwise still win while the condition holds. A selector context
+(`:hover`, `& .child`, `::before`) or an `!important` context of `a` is
+not dropped: it matches other states of the element, or beats `b` anyway.
+The same holds inside one block: a base declaration written after an
+`@media`/`@supports`/`@container` one for the same longhands drops the
+earlier one (`@media (...) { padding-top: 8px; } padding: 0;` keeps only
+`padding: 0`), and written before it does not (`padding: 0; @media (...)
+{ padding-top: 8px; }` keeps both). When the base declaration covers only part of the
+earlier one (`@media (...) { padding: 8px; } padding-top: 0;`), both stay and the
+base one is a twin (below). A declaration that interpolates `$(...)`
+takes part like any other. The dropped atom ships no class or rule, but its
+value is still read and set inline, so the variable it uses stays used (no
+unused-variable warning) and a later base declaration changes no other name
+(`packages/ppx/test/css-support/cascade-review.t`, V01).
+The reverse never happens: a conditional `b` does not drop a base `a`,
+since `a` still applies when the condition is false.
+
 **Same property, dropped:**
 
 ```reason
@@ -75,6 +105,108 @@ CSS.merge(wide, narrow);
 (`shorthand_then_longhand_keeps_both`, same file — this is the accepted
 limit "a longhand can't drop an earlier shorthand", not a bug)
 
+**An `@media` shorthand, then a base longhand — a specificity twin:**
+
+```reason
+let responsive = [%css "@media (max-width: 600px) { padding: 8px; }"];
+let override = [%css "padding-top: 0;"];
+
+CSS.merge(responsive, override);
+/* padding-top: 0 applies at every width; the media query still sets the
+   other three sides below 600px */
+```
+
+`padding` covers more than `padding-top`, so `merge` cannot drop it, and a
+rule under `@media` sorts after a base rule in the sheet. `merge` therefore
+swaps the class of `padding-top` for its **twin**. `styled-ppx.generate`
+writes every `_a_<x>` rule with extra selectors for the twin classes:
+
+```css
+._a_<x>,._t1_<x>:not(x-),._t2_<x>:not(x-):not(x-) { padding-top: 0; }
+```
+
+`._a_<x>` has specificity (0,1,0), `._t1_<x>:not(x-)` (0,1,1) and the level 2
+twin (0,1,2), so a twin wins over a lower level whatever the sheet order, and
+`padding` still applies to the sides the twin does not set. The twin class
+replaces the atom class on the element (`_a_<x>` becomes `_t1_<x>`), the
+runtime changes only the prefix, with no table.
+
+When the atom has a selector (`.parent &`, `& + &`, `&:hover`), each twin
+selector is the same selector with every `._a_<x>` replaced by the twin class,
+so the twin applies only where the atom applies:
+
+```css
+._id_<p> ._a_<x>,._id_<p> ._t1_<x>:not(x-),._id_<p> ._t2_<x>:not(x-):not(x-) { padding-top: 0; }
+```
+
+A `:not(...)` that holds the class cannot take a twin: `:not(._t1_<x>:not(x-))`
+is true on every element without the twin class, so an atom that was never
+merged would apply under its own root. When the compound of the `:not` has no
+positive `&` (`:not(&) > a`, `& :not(&)`, `:not(&) + &`), the element carries one
+of `_a_<x>`, `_t1_<x>` and `_t2_<x>`, so the rule excludes all three, as a chain
+of plain `:not` (no `:is()`):
+
+```css
+:not(._a_<x>):not(._t1_<x>):not(._t2_<x>) > a { color: red; }
+```
+
+The chain weighs two classes more than the single `:not` (0,3,x instead of
+0,1,x). A branch with no positive `&` anywhere gets no twin selector: the atom is
+never raised, which is harmless, since it does not apply to the element that
+carries it. When the same compound also has a positive `&`
+(`&:hover:not(&.on)`) nothing changes: the element carries one class, and the
+twin swaps it inside the `:not` too. A double negation (`:not(:not(&)) > a`) is the class itself, so it also keeps the swap (`cascade-not-amp.t`).
+
+When the atom repeats its class in several compound selectors (`& + &`), either
+element may be the merged one and the other may carry the plain `_a_<x>`, so
+there is one twin selector per compound, the others matching
+`:is(._a_<x>,._t1_<x>)`:
+
+```css
+._t1_<x>:not(x-) + :is(._a_<x>,._t1_<x>),:is(._a_<x>,._t1_<x>) + ._t1_<x>:not(x-)
+```
+
+Where `merge(a, b)` (and a block, for its own atoms, in source order) uses a
+twin: an atom of `a` that survives overlaps `b`'s atom (same family, masks that
+meet and are not covered, or `all`), both are of the same kind (both in the
+base context or under at-rules alone, or both with a selector or `!important`),
+and the sheet order would not surely put `b` last. The sheet surely puts `b`
+last when `a` is base and `b` is under at-rules, or when both share a context
+and `a` is a shorthand and `b` a longhand: no twin there. A level is one above
+the highest level of the atoms it must beat (0 when the sheet order already
+does it). The atoms it must beat are `a`'s survivors and the atoms of `b`
+before it, at the level they were just given, so a twin raised by `a` carries
+over to the later atoms of `b` (`cascade-review.t`, V05). The cap is level 2: at the cap the sheet order decides, as it did
+before the twin (`packages/ppx/test/css-support/cascade-twin.t`, G55; a chain of
+four state atoms, R02 in `cascade-remaining.t`). This covers two different
+selectors of equal specificity (`:hover` then `:disabled`, `& .a` then `& .b`,
+`&.x` then `&:focus`) and the same selector with an extra at-rule
+(`@media { &:hover }` then `&:hover`): the later one wins, as in plain CSS.
+Atoms of different kinds are not compared. An atom with a selector has more
+class-like parts than a plain atom, so it wins or loses against it by
+specificity, as in plain CSS, and a twin (a type-selector weight) never changes
+that: `&:hover:focus` then `&:hover` keeps the first one winning when both match
+(R03), and `:hover` still beats `@media` (G58, G60). The runtime does not know
+whether two selectors style one element. A twin that is not needed changes
+nothing. One known gap: an earlier `& span.x` and a later `& .x` on one element
+differ by one type selector, which a level 1 twin only ties.
+
+The same rule makes these cases follow source order, with nothing split:
+`border-radius`, `border`, `outline`, `background`, `font`, a top-level
+`var()`, a repeated `$(path)` (`padding: $(x)`) and a conditional shorthand
+against its longhand. A logical longhand (`padding-inline-start`) and a
+physical one (`padding-left`) are different properties for merge, whatever
+the writing mode, so they get no twin.
+(`cascade-gaps.t` and `cascade-twin.t` pin each of these.)
+
+**A twin stays below an author selector with more classes.** `:not(x-)` weighs
+as one type selector (0,0,1; `x-` matches no element), so a twin only decides
+ties between rules with the same number of classes and pseudo-classes, as a
+later rule would. An author selector such as `.parent.on` (0,2,0) still beats
+a twin of any level (G56, R08B, R08C). A twin still beats a one-class author
+rule (R08D), and ties with an author selector that adds one type selector to
+one class (`a.link`, 0,1,1) at level 1: the later rule in the sheet wins.
+
 **`!important` vs. a plain declaration — both kept:**
 
 ```reason
@@ -90,29 +222,36 @@ CSS.merge(plain, important);
 
 (`mismatched_importance_never_merges`, same file)
 
-**Never dropped, on either side:** an interpolation bundle (`_in_...`,
-minted when two or more of a block's declarations interpolate the SAME
-`$(name)` — typically one value reused across `base`/`:hover`/`@media`
-variants, so they share one custom property), an identity class
+**Never dropped, on either side:** an identity class
 (`_id_...`, what a `$(binding)` selector reference resolves to), a
 `label:<binding>` dev marker, and any class this pipeline didn't mint (a
 hand-written class, a third-party class passed through `className`).
 `merge` only ever inspects `_a_`-prefixed atoms; it leaves everything
 else exactly as it found it.
 
+**Declarations that share one `$(name)` are separate atoms.** When two or
+more of a block's declarations interpolate the SAME `$(name)` — typically one
+value reused across `base`/`:hover`/`@media` variants — they share one custom
+property (one inline variable), but each is still its own atom with its own
+class, context and property family, so `merge` treats each like any other atom:
+
 ```reason
 let card = accent => [%css "border-color: $(accent); &:hover { border-color: $(accent); }"];
-/* one _in_ bundle: base and :hover both interpolate the same $(accent) */
+/* two atoms: base and :hover, one shared variable for $(accent) */
 
 CSS.merge(card("gray"), [%css "border-color: green;"]);
-/* both classes stay - the plain override can't see the border-color
-   declaration hiding inside the bundle, so it can't drop just that one.
-   Which border-color applies is then decided by specificity and sheet
-   order, not by merge (see "Known limits") */
+/* the base atom is dropped (same context, same property); the :hover atom
+   stays, and while hovered it still wins by specificity (0,2,0 against
+   0,1,0), as in plain CSS. */
 ```
 
-`packages/runtime/test/test_merge_key.ml`'s `two_declaration_bundle_still_exempt`
-proves the mechanism directly against a real `_in_` class.
+`packages/runtime/test/test_merge_key.ml`'s `group_members_merge_one_by_one`
+proves the mechanism against real atom classes, and
+`packages/ppx/test/css-support/cascade-remaining.t` (R06, R07, R10) against the
+generated sheet. The class value of a member also covers the group (the
+rendered members), so one class still means one exact rule body; the group
+holds the members only, so changing another declaration of the block changes
+neither the variable nor the member classes.
 
 ## Sheet order
 
@@ -147,18 +286,22 @@ still resolve deterministically, by falling through to DEFINITION
 ORDER: whichever one was declared later wins - the same order a
 `CSS.merge`/`+++` call's right-hand (override) argument needs to win.
 This order is the SAME everywhere: in every file, in every block, not
-"whichever one this block wrote last".
+"whichever one this block wrote last". It decides only between atoms the
+specificity twin does not relate (two blocks that reach one element as two
+class names, or a chain past the twin cap).
 A single block that writes
 
 ```reason
 let danger = [%css "&:focus { color: blue; } &:hover { color: red; }"];
 ```
 
-gets `color: blue` (focus) when both `:hover` and `:focus` apply, even
-though `:hover` was written last — the fixed priority, not declaration
-order, decides (`packages/generate/test/tiers-condition-tie-single-block.t`).
-Plain CSS, read top to bottom, would give `red` here; styled-ppx does not,
-on purpose — see "Known limits" below.
+gets `color: red` (hover, written last) when both apply: the block gives
+`:hover` a twin, so source order decides, as in plain CSS
+(`packages/ppx/test/css-support/condition-priority-pseudo-class.t`: the `:hover` class is `_t1_`). The same holds for
+`CSS.merge` of the two. The sheet by itself, with no twin class in use,
+still puts `:focus` last (`packages/generate/test/tiers-condition-tie-single-block.t`
+pins that sheet order); see "Known limits" below for what the twin cannot
+decide.
 
 **No CSS layer wraps any of this.** Specificity decides first, exactly
 like plain CSS; sheet position is only ever the tie-break, never an
@@ -201,7 +344,12 @@ The rewrite changes the printed rule and the class name, not what
 So `CSS.merge(a, b)` still drops `a`'s `@media (min-width: 600px)` atom
 when `b` sets the same property under the same written condition, even if
 `b`'s own block rewrote that condition
-(`packages/runtime/test/media-merge-context.t`).
+(`packages/runtime/test/media-merge-context.t`). This holds at every level of
+nesting: for `@media (min-width: 100px) { @media (max-width: 1200px) { ... }
+@media (max-width: 900px) { ... } }` the first inner atom keeps the key of the
+unrewritten `(min-width: 100px)` / `(max-width: 1200px)` pair, so it drops an
+earlier atom written that way (`packages/ppx/test/css-support/cascade-remaining.t`,
+R09).
 
 ## Several libraries on one page
 
@@ -237,11 +385,29 @@ all) still depends on which one the browser loads first
 - **Partial cover across libraries.** `merge(a, b)` where `a` sets
   `margin` and `b` sets only `margin-top` keeps both classes (the example
   above) — correct as long as `b`'s library's sheet loads after `a`'s.
-- **Interpolation bundles.** `merge` never drops an `_in_` bundle, so an
-  override of a property inside a bundle is decided by specificity and
-  sheet order, not by argument order (the `card` example above).
+- **Logical against physical properties.** `padding-inline-start` and
+  `padding-left` are different families for `merge`, so neither drops nor
+  twins the other (`cascade-gaps.t` G24, G33; `cascade-exotic.t` E09, E11).
+  Which side a logical property sets depends on `writing-mode` and
+  `direction`, and the compiler does not know them. Both classes stay and the
+  sheet order decides. Write both with the same kind of property when one must
+  override the other.
+- **Twin cap.** A chain of more than two overlapping merges stops at level 2,
+  so in a chain of four state atoms on one property (`:hover`, `:focus`,
+  `:active`, `:disabled`) the last two tie and the sheet's pseudo-class rank
+  decides (`cascade-remaining.t`, R02 and R02R). The result then depends on
+  the rank, not on the merge order.
+- **A twin does not weigh type selectors.** A twin adds one type selector of
+  weight per level. An earlier `& span.x` and a later `& .x` on one element
+  differ by one type selector, which a level 1 twin only ties (level 2
+  beats it). A later `& span.x` over an earlier `& .x` needs no twin.
+- **The twin raises the sheet size** (the demo `styles.css` goes from 4.5 KB to
+  9.0 KB, 1.7 KB to 2.4 KB gzipped).
+- **A selector context is not dropped by a base declaration.** `&:hover`,
+  `& .child` and `::before` atoms of `a` stay, even with the same
+  property in `b`; so does an `@media` atom under such a selector.
 - **Mixed shorthand depths in one rule.** A rule combining declarations at
-  different shorthand depths (e.g. a bundle with both a `padding` and a
+  different shorthand depths (e.g. a family atom with both a `padding` and a
   `margin-top`) sorts by its SHALLOWEST declaration, so it is not
   guaranteed correct against every other rule at once
   (`packages/generate/test/shorthand-depth-stress.t`).
@@ -249,7 +415,7 @@ all) still depends on which one the browser loads first
   by class-name prefix and length alone; a hand-written class starting
   with `_a_` that happens to land on one of the six real atom lengths can
   be silently dropped
-  (`hand_written_class_ambiguity_persists_under_the_new_prefix`,
+  (`hand_written_atom_shaped_class_is_read_as_an_atom`,
   `packages/runtime/test/test_merge_key.ml`). Don't hand-write a class
   starting with `_a_`.
 - **`merge(wide, narrow)` keeps both classes.** Same fact as the
@@ -261,27 +427,17 @@ all) still depends on which one the browser loads first
   override, same specificity — the conditional rule wins the tie above
   1280px, by sheet position, because conditional atoms are always
   emitted after base ones.
-- **A fixed pseudo-class/pseudo-element order applies even inside one
-  block.** `&:focus { color: blue; } &:hover { color: red; }` in ONE
-  `[%css]` block gives `color: blue` (focus outranks hover in the fixed
-  order), not `red` — the opposite of what "last declaration wins" would
-  give for this exact block on its own
-  (`packages/generate/test/tiers-condition-tie-single-block.t`). Chosen on
-  purpose: the alternative (each block's own declaration order deciding)
-  made the SAME shared pair of conditions resolve differently depending on
-  which of two components happened to compile first
-  (`packages/generate/test/tiers-condition-tie-pseudo-class.t`). To
-  override a lower-priority pseudo's declaration with a higher-priority
-  one, write the higher-priority one — its own position in the block no
-  longer matters.
-- **Two pseudo-elements, or two different `@supports` conditions, still
-  tie.** `::before` vs `::after`, or `@supports (display:grid)` vs
-  `@supports (display:flex)`, get the same fixed-order rank as each other
-  (StyleX has no finer answer for either case either), so the tie falls
-  back to sheet position — not guaranteed to match either block's own
-  intent. No target/condition split and no CSS layer over this — an
-  author who needs one of these two to always win still reaches for a more
-  specific selector or `!important`.
+- **A fixed pseudo-class order decides what the twin cannot.**
+  `&:focus { color: blue; } &:hover { color: red; }` in ONE `[%css]` block, or
+  `CSS.merge` of the two, follows source order: the twin raises `:hover`, so
+  `color: red` wins when both match, as in plain CSS (`cascade-cases.t` C11,
+  C15). Where no twin applies (two blocks put on one element as two class
+  names, or a chain past the cap), the generated sheet's fixed order
+  (`:hover` before `:focus` before `:active`; the same for pseudo-elements and
+  for two `@supports` conditions) decides, the same for every block in every
+  file (`packages/generate/test/tiers-condition-tie-single-block.t` pins that
+  sheet order). To make one of them win there, write the more specific
+  selector.
 - **`@supports`/`@container` are not rewritten.** The overlapping-`@media`
   fix above (StyleX's `lastMediaQueryWinsTransform`) covers `@media`
   only, matching StyleX exactly. Two overlapping `@supports` or
@@ -333,13 +489,10 @@ all) still depends on which one the browser loads first
   through a `CSS.merge`/`+++` call, which already has its own argument
   order to decide by) — file order decides, and file order is exactly
   the thing this whole track exists to stop depending on for a shared
-  pair of conditions. Writing both conditions in the same block helps
-  when the tie is between two otherwise-identical at-rules with no
-  pseudo at all, since a single block's own declaration order IS its
-  definition order; it does NOT help when the tie is a pseudo-class/
-  pseudo-element one (the fixed priority above still decides, even
-  inside one block - see the next bullet). Either way, an author who
-  still needs a specific winner can always raise specificity or use
+  pair of conditions. A block or a `CSS.merge` that writes both gives the
+  later one a twin, so source order decides there (see "Known limits"); the
+  fixed priority above still decides when no twin applies. Either way, an
+  author who still needs a specific winner can always raise specificity or use
   `!important`.
 
 ## See also
