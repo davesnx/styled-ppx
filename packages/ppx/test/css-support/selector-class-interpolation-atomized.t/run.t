@@ -1,5 +1,5 @@
-A multi-declaration source binding fans out into a compound chain
-(`&.cssA.cssB`) when referenced by another [%css]'s selector.
+A multi-declaration source binding resolves to its single identity class
+when referenced by another [%css]'s selector.
 
   $ cat > dune-project << EOF
   > (lang dune 3.10)

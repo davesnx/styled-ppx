@@ -28,9 +28,11 @@ synthetic dep markers. The styled.global module shell is preserved.
       let make _props = CSS.global_style_tag (to_string ())
     end
 
-The aggregator resolves `M.marker` to its single class and `M.card` to
-the dotted chain of all atoms (so ` .$(M.card):hover` becomes
-`.atom1.atom2:hover`, requiring all atoms on the same element).
+The aggregator resolves each reference to the identity class of the
+referenced binding. `M.marker` becomes `._id_12qpfnx` and `M.card`
+becomes `._id_v2n2gu`, so `.$(M.card):hover` becomes
+`._id_v2n2gu:hover`. One identity class stands for the whole binding,
+whatever its number of atoms.
 
   $ styled-ppx.generate m.ml n.ml > styles.css
   $ cat styles.css

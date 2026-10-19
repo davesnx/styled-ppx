@@ -100,7 +100,7 @@ let button = [%css {|
 |}]
 ```
 
-- `.$(name)` splices the binding's classes as a compound (`.cssA.cssB` when the binding has several atoms). Bare `$(name)` (no leading `.`) is accepted only when the binding has a single atom. Otherwise the ppx raises ``Bare `$(name)` selector interpolation expanded to N class names; this position only accepts a single class. Prefix with `.` to use a class chain instead: `.$(name)`.``
+- `.$(name)` splices the binding's identity class (`._id_<hash>`), however many declarations the binding has. Bare `$(name)` (no leading `.`) resolves to the same single class.
 - References work inside combinators, pseudo-classes (`:not(&.$(other))`, `:has(.$(other))`), comma lists, and inside nested `@media` / `@supports` bodies.
 - Same-file bindings resolve during ppx expansion; **cross-module** references (`$(Card.container)`) resolve when [the stylesheet is generated](/how-it-works#class-references-in-selectors). Referencing a binding that doesn't exist is a compile error; references across *library* boundaries are unsupported (see the [build errors](/getting-started/dune-setup#troubleshooting) they produce).
 

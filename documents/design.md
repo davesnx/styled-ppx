@@ -112,7 +112,7 @@ selector-interpolation walks. Differs from `[%css]` in two ways:
   left unexpanded (no dedicated migration diagnostic exists today).
 - Splits each interpolated rule into two complementary outputs:
   the static rule with `var(--<prefix>-<hash>)` substituted in value
-  positions and resolved class chains substituted in selector
+  positions and resolved class identities substituted in selector
   positions (extracted via `Buffer.add_global_rule` like a static
   global) plus a generated module containing
   `to_string`/`makeProps`/`make` that emit a single
@@ -257,8 +257,8 @@ module Theme = [%styled.global {|
   /* Bare $(name) - resolves to a class type-selector */
   body $(card) { line-height: 1.5; }
 
-  /* .$(name) - class-position; multi-decl bindings fan out into a
-     compound chain (.atom1.atom2). */
+  /* .$(name) - class-position; emits the binding's single identity
+     class (._id_<hash>), however many declarations it has. */
   .$(card).$(active) { color: white; }
 
   /* Combinators, pseudo, attribute selectors, comma lists, nesting,
@@ -295,8 +295,8 @@ Resolution rules (identical to `[%css]`):
   location (via the synthetic `let _ = M.binding` line the PPX emits
   alongside `[@@@css.refs ...]`).
 - Bare `$(name)` (no leading dot) in selector position resolves the
-  binding and emits a `.classname` type-selector. Multi-class bindings
-  are rejected here (use `.$(name)` for the chain instead).
+  binding and emits a `.classname` type-selector. Every named binding
+  resolves to one identity class, so there is no multi-class rejection.
 
 Selector interpolation has no effect on the generated module's
 `to_string`: `dynamic_vars` only collects value-position
@@ -332,7 +332,6 @@ module ThemeStyles = [%styled.global {|
 | Invalid `@media` / `@supports` / `@container` prelude (`@media (min-widht: 1px)`, `@supports color: red`) | Compile error from `Css_validation.type_check_at_rule_prelude`: structure checked against the registered `media-query-list` / `supports-condition` / `container-condition-list` grammars, `@media`/`@container` feature names against the spec inventory (with a `Did you mean` hint), feature values against the feature's grammar. `@supports` skips the name check, since probing unknown syntax is its purpose. Interpolated preludes are skipped here. |
 | Parentless `&` (top level, or under an at-rule with no style rule above)  | `raise_errorf`: `&` has no parent selector to resolve against.                                                                            |
 | Selector interp `$(name)` references undefined or forward local binding   | `raise_errorf` from `Local_selector_environment.resolve_selector_class_ref` pointing at the interpolation.                                                  |
-| Bare `$(name)` (no `.` prefix) resolves to multiple classes               | `raise_errorf` instructing the user to switch to `.$(name)` for chain semantics.                                                          |
 | Cross-module `$(M.x)` where `M.x` doesn't exist at link time              | `Unbound module` / `Unbound value` from OCaml typechecker via the synthetic `let _ = M.x`; aggregator also reports a missing-binding error using the location stored in `[@@@css.refs ...]`. |
 
 #### Code map
