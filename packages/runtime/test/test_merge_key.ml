@@ -351,15 +351,16 @@ let long_family_longhands_do_not_drop_each_other () =
 
 (* -- Specificity twin ----------------------------------------------------
 
-   [Merge_key] swaps the later atom's [_a_] class for [_t<k>_] where the
-   sheet order cannot be trusted to put it last (see [Merge_key.twin_level]).
-   [generate] gives [_t<k>_] its higher specificity; the swap itself is only
-   a prefix change, so every expectation below is the real atom class with
-   its prefix replaced. *)
+   [Merge_key] adds a twin class [_t<k>_] after the later atom's [_a_] class
+   where the sheet order cannot be trusted to put it last (see
+   [Merge_key.twin_level]). [generate] gives [_t<k>_] its higher specificity
+   when the atom has a competitor in its file; the [_a_] class stays, so every
+   expectation below is the real atom class followed by its twin. *)
 let twin level css =
   let cls = class_of css in
   assert (String.sub cls 0 3 = "_a_");
-  Printf.sprintf "_t%d_%s" level (String.sub cls 3 (String.length cls - 3))
+  Printf.sprintf "%s _t%d_%s" cls level
+    (String.sub cls 3 (String.length cls - 3))
 
 let wide_padding = "@media (max-width:1200px){padding: 1px;}"
 let wide_top = "@media (max-width:1200px){padding-top: 1px;}"
@@ -514,6 +515,30 @@ let later_atoms_of_the_block_follow_a_raised_atom () =
     (Printf.sprintf "%s %s %s" (class_of border_top) (twin 1 border_color)
        (twin 1 right_color))
 
+(* A twin is a class next to the [_a_] class, so a merged value merged again
+   keeps one pair per atom, and a twin whose [_a_] class is missing is an
+   opaque class that is passed through. *)
+let twin_pair_survives_a_second_merge () =
+  let once = CSS.merge (make wide_padding) (make "padding-top: 2px;") in
+  let twice = CSS.merge once (make "color: red;") in
+  Alcotest_extra.assert_string (CSS.className twice)
+    (Printf.sprintf "%s %s %s" (class_of wide_padding)
+       (twin 1 "padding-top: 2px;")
+       (class_of "color: red;"));
+  let again = CSS.merge (make "color: red;") once in
+  Alcotest_extra.assert_string (CSS.className again)
+    (Printf.sprintf "%s %s %s" (class_of "color: red;") (class_of wide_padding)
+       (twin 1 "padding-top: 2px;"))
+
+let twin_without_its_atom_class_is_opaque () =
+  let lone =
+    String.concat " "
+      (List.tl (String.split_on_char ' ' (twin 1 "padding-top: 2px;")))
+  in
+  Alcotest_extra.assert_string
+    (Merge_key.merge_class_names lone (class_of "padding-top: 3px;"))
+    (Printf.sprintf "%s %s" lone (class_of "padding-top: 3px;"))
+
 let tests =
   [
     Alcotest_extra.test
@@ -643,4 +668,8 @@ let tests =
     Alcotest_extra.test
       "a block's later atoms follow the atom that merging raised"
       later_atoms_of_the_block_follow_a_raised_atom;
+    Alcotest_extra.test "a twin pair survives a second merge once"
+      twin_pair_survives_a_second_merge;
+    Alcotest_extra.test "a twin without its _a_ class is passed through"
+      twin_without_its_atom_class_is_opaque;
   ]

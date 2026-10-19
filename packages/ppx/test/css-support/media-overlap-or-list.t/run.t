@@ -9,9 +9,11 @@ the negation into every branch of the `or` list independently.
     "@media (min-width: 600px) and (not (min-width: 900px)), (min-width: 1200px) and (orientation: landscape) and (not (min-width: 900px)){._a_05ij04epdat{color:red;}}"]
   [@@@css "@media (min-width: 900px) {._a_0p5mk4et4n8{color:blue;}}"]
   [@@@css.bindings
-    [("Output.block", "_id_ovbeuh", "_a_05ij04epdat _t1_0p5mk4et4n8")]]
+    [("Output.block", "_id_ovbeuh",
+       "_a_05ij04epdat _a_0p5mk4et4n8 _t1_0p5mk4et4n8")]]
   let block =
-    CSS.make "label:block _id_ovbeuh _a_05ij04epdat _t1_0p5mk4et4n8" []
+    CSS.make
+      "label:block _id_ovbeuh _a_05ij04epdat _a_0p5mk4et4n8 _t1_0p5mk4et4n8" []
   let _ = block
 
   $ styled-ppx.generate output.ml > styles.css

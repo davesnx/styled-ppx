@@ -35,13 +35,13 @@ carries valid CSS. A non-ASCII identifier such as "héllo" is left untouched.
       (
         "Input._test",
         "_id_1gr654a",
-        "_a_4pi0m4eiwtd _t1_48it44eby7r _t2_4k2bk4ebr1m _t2_fb9h24ehelx _t2_w3jcb4e2wma _t2_lcdsg4e142b _t2_nyseq4efkpb _t2_p85254ehrsz _t2_u8qrs4efzp0",
+        "_a_4pi0m4eiwtd _a_48it44eby7r _t1_48it44eby7r _a_4k2bk4ebr1m _t2_4k2bk4ebr1m _a_fb9h24ehelx _t2_fb9h24ehelx _a_w3jcb4e2wma _t2_w3jcb4e2wma _a_lcdsg4e142b _t2_lcdsg4e142b _a_nyseq4efkpb _t2_nyseq4efkpb _a_p85254ehrsz _t2_p85254ehrsz _a_u8qrs4efzp0 _t2_u8qrs4efzp0",
       ),
     ]
   ];
   let _test =
     CSS.make(
-      "label:_test _id_1gr654a _a_4pi0m4eiwtd _t1_48it44eby7r _t2_4k2bk4ebr1m _t2_fb9h24ehelx _t2_w3jcb4e2wma _t2_lcdsg4e142b _t2_nyseq4efkpb _t2_p85254ehrsz _t2_u8qrs4efzp0",
+      "label:_test _id_1gr654a _a_4pi0m4eiwtd _a_48it44eby7r _t1_48it44eby7r _a_4k2bk4ebr1m _t2_4k2bk4ebr1m _a_fb9h24ehelx _t2_fb9h24ehelx _a_w3jcb4e2wma _t2_w3jcb4e2wma _a_lcdsg4e142b _t2_lcdsg4e142b _a_nyseq4efkpb _t2_nyseq4efkpb _a_p85254ehrsz _t2_p85254ehrsz _a_u8qrs4efzp0 _t2_u8qrs4efzp0",
       [],
     );
   

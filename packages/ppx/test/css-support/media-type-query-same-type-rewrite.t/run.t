@@ -34,27 +34,35 @@ mixed or other types untouched), and a `not`-prefixed type.
   [@@@css
     "@media print and (max-width: 480px) {._a_0y5ye3h1lokcoyl{border-width:2px;}}"]
   [@@@css.bindings
-    [("Output.screenPair", "_id_dbqz2g", "_a_0od994eqxej _t1_01qk84ejnqp");
+    [("Output.screenPair", "_id_dbqz2g",
+       "_a_0od994eqxej _a_01qk84ejnqp _t1_01qk84ejnqp");
     ("Output.onlyPair", "_id_1qnsba9",
-      "_a_0i5p165000waktn _t1_0gp3865000wjlif");
-    ("Output.notScreenPair", "_id_1u5eua8", "_a_0qk2neczkzc _t1_0d785ecogb2");
-    ("Output.commaMixedTypes", "_id_1vmtjrt", "_a_0xhpf6luuex _t1_0p5mk6l2v22");
+      "_a_0i5p165000waktn _a_0gp3865000wjlif _t1_0gp3865000wjlif");
+    ("Output.notScreenPair", "_id_1u5eua8",
+      "_a_0qk2neczkzc _a_0d785ecogb2 _t1_0d785ecogb2");
+    ("Output.commaMixedTypes", "_id_1vmtjrt",
+      "_a_0xhpf6luuex _a_0p5mk6l2v22 _t1_0p5mk6l2v22");
     ("Output.differentTypesPair", "_id_rrgrr1",
-      "_a_0od993h1lokug7y _t1_0y5ye3h1lokcoyl")]]
+      "_a_0od993h1lokug7y _a_0y5ye3h1lokcoyl _t1_0y5ye3h1lokcoyl")]]
   let screenPair =
-    CSS.make "label:screenPair _id_dbqz2g _a_0od994eqxej _t1_01qk84ejnqp" []
+    CSS.make
+      "label:screenPair _id_dbqz2g _a_0od994eqxej _a_01qk84ejnqp _t1_01qk84ejnqp"
+      []
   let onlyPair =
     CSS.make
-      "label:onlyPair _id_1qnsba9 _a_0i5p165000waktn _t1_0gp3865000wjlif" []
+      "label:onlyPair _id_1qnsba9 _a_0i5p165000waktn _a_0gp3865000wjlif _t1_0gp3865000wjlif"
+      []
   let notScreenPair =
-    CSS.make "label:notScreenPair _id_1u5eua8 _a_0qk2neczkzc _t1_0d785ecogb2"
+    CSS.make
+      "label:notScreenPair _id_1u5eua8 _a_0qk2neczkzc _a_0d785ecogb2 _t1_0d785ecogb2"
       []
   let commaMixedTypes =
-    CSS.make "label:commaMixedTypes _id_1vmtjrt _a_0xhpf6luuex _t1_0p5mk6l2v22"
+    CSS.make
+      "label:commaMixedTypes _id_1vmtjrt _a_0xhpf6luuex _a_0p5mk6l2v22 _t1_0p5mk6l2v22"
       []
   let differentTypesPair =
     CSS.make
-      "label:differentTypesPair _id_rrgrr1 _a_0od993h1lokug7y _t1_0y5ye3h1lokcoyl"
+      "label:differentTypesPair _id_rrgrr1 _a_0od993h1lokug7y _a_0y5ye3h1lokcoyl _t1_0y5ye3h1lokcoyl"
       []
   let _ =
     (screenPair, onlyPair, notScreenPair, commaMixedTypes, differentTypesPair)

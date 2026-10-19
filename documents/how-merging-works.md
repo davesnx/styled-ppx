@@ -118,52 +118,71 @@ CSS.merge(responsive, override);
 
 `padding` covers more than `padding-top`, so `merge` cannot drop it, and a
 rule under `@media` sorts after a base rule in the sheet. `merge` therefore
-swaps the class of `padding-top` for its **twin**. `styled-ppx.generate`
-writes every `_a_<x>` rule with extra selectors for the twin classes:
+adds a **twin** class after the class of `padding-top`. `styled-ppx.generate`
+writes the rule of an atom with extra selectors for the twin classes, when the
+atom has a competitor in its own source file (see "Where the twin rule
+exists" below):
 
 ```css
-._a_<x>,._t1_<x>:not(x-),._t2_<x>:not(x-):not(x-) { padding-top: 0; }
+._a_<x>,._t1_<x>:not(x-) { padding-top: 0; }
 ```
 
 `._a_<x>` has specificity (0,1,0), `._t1_<x>:not(x-)` (0,1,1) and the level 2
 twin (0,1,2), so a twin wins over a lower level whatever the sheet order, and
 `padding` still applies to the sides the twin does not set. The twin class
-replaces the atom class on the element (`_a_<x>` becomes `_t1_<x>`), the
-runtime changes only the prefix, with no table.
+sits next to the atom class on the element (`_a_<x> _t1_<x>`), so an atom
+whose twin rule does not exist still applies through `._a_<x>`. The runtime
+only adds a prefixed copy of the class name, with no table.
+
+**Where the twin rule exists.** `generate` writes twin selectors only for an
+atom that a merge may need to raise: the atom has a competitor in the same
+source file (or in a file it uses in a selector, `$(X)`) that
+- may hit the same element with the same specificity. Two facts keep selectors
+  apart: whether the rule styles the `&` element itself or another element
+  reached through a combinator (`& > div`), and its pseudo-element
+  (`:before` and `::before` are one). Everything else is compared through the
+  specificity of the whole selector (ids, classes, types, with `:is`, `:not`
+  and `:has` weighing their most specific argument and `:where` nothing), as
+  `& .x` and `& .y` can hit one element. So `&:hover` against `&:focus`,
+  `&.on` or `&:is(.a, .b)` compete, and a rule against the same rule under
+  `@media`; `&:hover` against the base rule, or `& > ::before` against the base
+  rule, never do,
+- gives the element another value (identical declarations under two at-rules
+  never need a twin),
+- overlaps it without being replaced by it (`merge` drops what a later atom
+  covers), and
+- the sheet order may put after it. A base rule comes before an `@media` rule,
+  and a shorthand before its longhand in one context, so a base declaration
+  and the same property under `@media`, or `padding` and `padding-left`, need
+  no twin.
+
+`generate` cannot know which of these pairs a merge will meet, and the runtime
+cannot know which `generate` left out, so an atom that gets any twin gets both
+levels. Most atoms have no competitor, and their rule is a plain
+`._a_<x> { ... }`. A merge of atoms from two files has no twin rule, unless
+each atom has such a competitor in its own file, so the sheet order decides, as
+it did before the twin (`packages/ppx/test/css-support/cascade-twin-scope.t`;
+`cascade-gaps.t` G51 and G51S). Keep the two atoms in one file when one must
+beat the other.
 
 When the atom has a selector (`.parent &`, `& + &`, `&:hover`), each twin
-selector is the same selector with every `._a_<x>` replaced by the twin class,
+selector is the same selector with one `._a_<x>` replaced by the twin class,
 so the twin applies only where the atom applies:
 
 ```css
 ._id_<p> ._a_<x>,._id_<p> ._t1_<x>:not(x-),._id_<p> ._t2_<x>:not(x-):not(x-) { padding-top: 0; }
 ```
 
-A `:not(...)` that holds the class cannot take a twin: `:not(._t1_<x>:not(x-))`
-is true on every element without the twin class, so an atom that was never
-merged would apply under its own root. When the compound of the `:not` has no
-positive `&` (`:not(&) > a`, `& :not(&)`, `:not(&) + &`), the element carries one
-of `_a_<x>`, `_t1_<x>` and `_t2_<x>`, so the rule excludes all three, as a chain
-of plain `:not` (no `:is()`):
-
-```css
-:not(._a_<x>):not(._t1_<x>):not(._t2_<x>) > a { color: red; }
-```
-
-The chain weighs two classes more than the single `:not` (0,3,x instead of
-0,1,x). A branch with no positive `&` anywhere gets no twin selector: the atom is
-never raised, which is harmless, since it does not apply to the element that
-carries it. When the same compound also has a positive `&`
-(`&:hover:not(&.on)`) nothing changes: the element carries one class, and the
-twin swaps it inside the `:not` too. A double negation (`:not(:not(&)) > a`) is the class itself, so it also keeps the swap (`cascade-not-amp.t`).
+A `:not(...)` that holds the class is left as it is and takes no twin. The
+element keeps its `_a_<x>` class next to the twin, so `:not(._a_<x>)` is right
+for every element that carries the atom (`cascade-not-amp.t`).
 
 When the atom repeats its class in several compound selectors (`& + &`), either
-element may be the merged one and the other may carry the plain `_a_<x>`, so
-there is one twin selector per compound, the others matching
-`:is(._a_<x>,._t1_<x>)`:
+element may be the merged one, so there is one twin selector per compound, the
+other compounds keep `._a_<x>`:
 
 ```css
-._t1_<x>:not(x-) + :is(._a_<x>,._t1_<x>),:is(._a_<x>,._t1_<x>) + ._t1_<x>:not(x-)
+._t1_<x>:not(x-) + ._a_<x>,._a_<x> + ._t1_<x>:not(x-)
 ```
 
 Where `merge(a, b)` (and a block, for its own atoms, in source order) uses a
@@ -401,8 +420,11 @@ all) still depends on which one the browser loads first
   weight per level. An earlier `& span.x` and a later `& .x` on one element
   differ by one type selector, which a level 1 twin only ties (level 2
   beats it). A later `& span.x` over an earlier `& .x` needs no twin.
-- **The twin raises the sheet size** (the demo `styles.css` goes from 4.5 KB to
-  9.0 KB, 1.7 KB to 2.4 KB gzipped).
+- **A merge across files has no twin rule.** Twin rules exist only for atoms
+  with a competitor in their own file. Two atoms from two files that overlap
+  fall back to the sheet order (`cascade-gaps.t` G51, G51S; `cascade-cases.t`
+  C29S under `print`).
+- **The twin raises the sheet size** only for atoms that need it (see "Where the twin rule exists").
 - **A selector context is not dropped by a base declaration.** `&:hover`,
   `& .child` and `::before` atoms of `a` stay, even with the same
   property in `b`; so does an `@media` atom under such a selector.
