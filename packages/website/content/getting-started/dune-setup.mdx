@@ -163,7 +163,7 @@ Passed inside `(pps styled-ppx <flags> ...)`:
 | --- | --- |
 | `--native` | Generate code for server-reason-react (native/SSR) instead of Melange |
 | `--minify` | Minify the generated CSS (drop inter-rule whitespace); no effect on class names, which never carry a label |
-| `--dev` | Add a greppable `label:<binding>` marker class to classNames in development; no effect on atom classes or the extracted CSS |
+| `--dev` | Greppable `label:<binding>` marker class on classNames. On by default; `--minify` and `--env production` turn it off, but an explicit `--dev` keeps it on, in either flag order. No effect on atom classes or the extracted CSS |
 | `--env development\|production` | Preset over the flags above: `development` = `--dev` (`label:<binding>` markers on), `production` = `--minify` (markers off, minified CSS) |
 | `--debug` | Verbose ppx logging |
 
