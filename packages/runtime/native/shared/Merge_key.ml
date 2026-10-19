@@ -12,8 +12,11 @@
    because merging runs on every [CSS.merge] call.
 
    The twin ([_t<k>_] classes, see [twin_block] and [raise_levels]) is the
-   other half: where removal is not possible, the later atom's class is
-   swapped for a twin that [packages/generate] gives a higher specificity.
+   other half: where removal is not possible, the later atom gets a twin class
+   next to its [_a_] class, and [packages/generate] gives the twin rule a higher
+   specificity. [generate] writes a twin rule only for an atom that has a
+   competitor in its own source file. The [_a_] class stays on the element, so
+   an atom whose twin rule does not exist still applies.
 
    Why this duplicates [Class_format]'s widths instead of depending on it:
    this module ships in the melange runtime bundle (real browser JS).
@@ -27,7 +30,6 @@
    the cross-check against the real [Slot_key]/[Class_format] values (that
    test, not this library, is allowed to depend on them). *)
 
-let atom_prefix = "_a_"
 let context_width = 5
 let family_width = 2
 let mask_width = 4
@@ -69,7 +71,9 @@ let is_excluded_from_all family =
    (see the header for why nothing is sliced out). *)
 type atom = {
   token : string; (* the whole class name, to hand back untouched *)
-  level : int; (* 0 for [_a_]; k for the specificity twin [_t<k>_] *)
+  level : int;
+    (* 0 for [_a_]; k for a twin [_t<k>_] next to it. [token] is the [_a_]
+       class, or the twin class before [fold_twins] ran. *)
   context : int; (* offset of the context field, [-1] for the base context *)
   family : int;
   extended : int; (* offset of the extended field, [-1] when absent *)
@@ -100,7 +104,8 @@ let fields_of_extra extra =
 (* The specificity twin: [_t<k>_<body>] is [_a_<body>] with [k] times
    [:not(x-)] after its class in the selector (see packages/generate). Past
    [max_level] an atom stays there and the sheet order decides the tie.
-   [packages/generate] emits the same number of twin selectors. *)
+   [packages/generate] emits the same number of twin selectors, for the atoms
+   that need them. *)
 let max_level = 2
 let twin_prefix level = "_t" ^ string_of_int level ^ "_"
 
@@ -272,26 +277,70 @@ let twin_level seen latter =
   done;
   min !level max_level
 
-let token_of a level =
-  let start = if a.level = 0 then 3 else 4 in
-  (if level = 0 then atom_prefix else twin_prefix level)
-  ^ Str_sub.sub a.token start (String.length a.token - start)
-
 type token =
   | Atom of atom
   | Opaque of string
 
-let token_string = function Opaque t -> t | Atom a -> a.token
+(* [tokens] (reversed) with the class names of [a] pushed on: its [_a_] class,
+   then its twin class when [level] is above 0. *)
+let push_atom a level tokens =
+  if level = 0 then a.token :: tokens
+  else (
+    let body = Str_sub.sub a.token 3 (String.length a.token - 3) in
+    (twin_prefix level ^ body) :: a.token :: tokens)
 
 let parse_token token =
   match parse_atom token with None -> Opaque token | Some a -> Atom a
+
+let is_twin a = a.token.[1] = 't'
+
+let same_body a b =
+  let start x = if is_twin x then 4 else 3 in
+  let sa = start a
+  and sb = start b in
+  String.length a.token - sa = String.length b.token - sb
+  && same_field a.token sa b.token sb (String.length a.token - sa)
+
+(* A twin class sits next to its [_a_] class. Fold the twin into the level of
+   that [_a_] atom, so one record carries the level and [push_atom] writes
+   both classes back. A twin without its [_a_] class (this module never writes
+   one) is opaque. *)
+let fold_twins tokens =
+  if
+    not
+      (List.exists (function Atom a -> is_twin a | Opaque _ -> false) tokens)
+  then tokens
+  else (
+    let bases =
+      List.filter_map
+        (function Atom a when not (is_twin a) -> Some a | _ -> None)
+        tokens
+    in
+    List.filter_map
+      (function
+        | Opaque _ as token -> Some token
+        | Atom twin when is_twin twin ->
+          if List.exists (same_body twin) bases then None
+          else Some (Opaque twin.token)
+        | Atom base ->
+          let level =
+            List.fold_left
+              (fun level -> function
+                | Atom twin when is_twin twin && same_body twin base ->
+                  max level twin.level
+                | _ -> level)
+              base.level tokens
+          in
+          Some (Atom { base with level }))
+      tokens)
 
 (* [raise_levels seen latters]: [latters] as tokens, each with the twin
    level it needs against the [seen] atoms (the former survivors, already
    filtered for removal; a twin never needs an earlier atom raised) and
    against the latters before it, at the level they were just given. A latter
    raised by a former would otherwise lose to an earlier latter it sits after
-   in the sheet. [seen] must have room for every atom of [latters]. *)
+   in the sheet. A raised atom keeps its [_a_] class and gets its twin class
+   after it. [seen] must have room for every atom of [latters]. *)
 let raise_levels seen latters =
   List.fold_left
     (fun tokens -> function
@@ -299,7 +348,7 @@ let raise_levels seen latters =
       | Atom a ->
         let level = twin_level seen a in
         add seen { a with level };
-        (if level = a.level then a.token else token_of a level) :: tokens)
+        push_atom a level tokens)
     [] latters
   |> List.rev
 
@@ -308,7 +357,7 @@ let atom_count tokens =
 
 (* A block's classes in source order: each atom against the ones before it. *)
 let twin_block tokens =
-  let parsed = List.map parse_token tokens in
+  let parsed = fold_twins (List.map parse_token tokens) in
   raise_levels (make_seen (atom_count parsed)) parsed
 
 (* -- className string merge --------------------------------------------- *)
@@ -336,10 +385,10 @@ let split_tokens s =
    its original relative order (identities are never dropped and never drop
    anything; an unparseable class is not this module's concern to police).
    [latter]'s tokens are never dropped and keep their place, but an atom may
-   come back with a twin prefix (see [raise_levels]). *)
+   come back with a twin class after it (see [raise_levels]). *)
 let merge_class_names former latter =
-  let former_tokens = List.map parse_token (split_tokens former) in
-  let latter_tokens = List.map parse_token (split_tokens latter) in
+  let former_tokens = fold_twins (List.map parse_token (split_tokens former)) in
+  let latter_tokens = fold_twins (List.map parse_token (split_tokens latter)) in
   let latter_atoms =
     Array.of_list
       (List.filter_map
@@ -359,5 +408,11 @@ let merge_class_names former latter =
   let survivors = List.filter survives former_tokens in
   let seen = make_seen (atom_count survivors + Array.length latter_atoms) in
   List.iter (function Atom a -> add seen a | Opaque _ -> ()) survivors;
-  List.map token_string survivors @ raise_levels seen latter_tokens
-  |> String.concat " "
+  let former_classes =
+    List.fold_left
+      (fun tokens -> function
+        | Opaque t -> t :: tokens | Atom a -> push_atom a a.level tokens)
+      [] survivors
+    |> List.rev
+  in
+  former_classes @ raise_levels seen latter_tokens |> String.concat " "

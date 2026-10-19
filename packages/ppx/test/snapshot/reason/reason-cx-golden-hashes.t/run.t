@@ -26,7 +26,8 @@ the diff IS the blast radius.
     [("Input.solid", "_id_ejsl7w", "_a_4ekvmb");
     ("Input.multi", "_id_7orjvh", "_a_7peacs _a_94xp1v _a_4esm7b");
     ("Input.hovered", "_id_18t9scx", "_a_4e3tth _a_qyw7u4ex7to");
-    ("Input.multiSel", "_id_j5w3l0", "_a_2sekz4e0myy _t1_bcuim4eb45t");
+    ("Input.multiSel", "_id_j5w3l0",
+      "_a_2sekz4e0myy _a_bcuim4eb45t _t1_bcuim4eb45t");
     ("Input.withMedia", "_id_1wbvjdi", "_a_a1ok24ei921");
     ("Input.units", "_id_4x7ffc", "_a_ecpweu _a_8meee1");
     ("Input.withFallback", "_id_asai3x", "_a_4e744k")]]
@@ -36,7 +37,9 @@ the diff IS the blast radius.
   let hovered =
     CSS.make "label:hovered _id_18t9scx _a_4e3tth _a_qyw7u4ex7to" []
   let multiSel =
-    CSS.make "label:multiSel _id_j5w3l0 _a_2sekz4e0myy _t1_bcuim4eb45t" []
+    CSS.make
+      "label:multiSel _id_j5w3l0 _a_2sekz4e0myy _a_bcuim4eb45t _t1_bcuim4eb45t"
+      []
   let withMedia = CSS.make "label:withMedia _id_1wbvjdi _a_a1ok24ei921" []
   let units = CSS.make "label:units _id_4x7ffc _a_ecpweu _a_8meee1" []
   let withFallback = CSS.make "label:withFallback _id_asai3x _a_4e744k" []

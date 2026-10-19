@@ -1266,25 +1266,6 @@ let class_compounds ~atom_class branch =
        branch);
   List.rev !found
 
-(** The compound selector of [branch] that holds position [i], counted as in
-    {!replace_class}. *)
-let compound_at branch i =
-  let rec go k ~depth ~compound ~separated =
-    let c = branch.[k] in
-    let sep = depth = 0 && is_combinator_char c in
-    let compound = if (not sep) && separated then compound + 1 else compound in
-    if k = i then compound
-    else (
-      let depth =
-        match c with
-        | '(' | '[' -> depth + 1
-        | ')' | ']' -> depth - 1
-        | _ -> depth
-      in
-      go (k + 1) ~depth ~compound ~separated:sep)
-  in
-  go 0 ~depth:0 ~compound:0 ~separated:false
-
 (** The index of the [)] that closes a group whose arguments start at [i]. *)
 let close_paren text i =
   let n = String.length text in
@@ -1312,91 +1293,36 @@ let not_spans text =
   in
   go 0 []
 
-(** Whether [.<atom_class>] occurs in [text] under an even ([even]) or odd
-    number of [:not(...)]. A double negation is the class itself. *)
-let rec occurs_under_nots ~atom_class ~even text =
-  let spans = not_spans text in
-  let outside =
-    let buffer = Buffer.create (String.length text) in
-    let pos = ref 0 in
-    List.iter
-      (fun (i, j) ->
-        Buffer.add_string buffer (String.sub text !pos (i - !pos));
-        pos := j + 1)
-      spans;
-    Buffer.add_string buffer (String.sub text !pos (String.length text - !pos));
-    Buffer.contents buffer
-  in
-  (even && class_compounds ~atom_class outside <> [])
-  || List.exists
-       (fun (i, j) ->
-         occurs_under_nots ~atom_class ~even:(not even)
-           (String.sub text (i + 5) (j - i - 5)))
-       spans
-
 let atom_body cls = String.sub cls 3 (String.length cls - 3)
 let placeholder_open = '\001'
 let placeholder_close = '\002'
 let placeholder i = Printf.sprintf "%c%d%c" placeholder_open i placeholder_close
 
-(** [branch] with every [:not(...)] that holds [.<atom_class>] and sits in a
-    compound for which [expand] is true replaced by a placeholder [\001<i>\002],
-    and the chains [i] stands for. A twin cannot swap a negated class:
-    [:not(._t1_X:not(x-))] is true on every element without the twin, so an atom
-    never merged would apply under its own root. The element carries one of the
-    atom class and its twin classes, so the chain excludes all of them:
-    [:not(._a_X)] becomes [:not(._a_X):not(._t1_X):not(._t2_X)]. Where the
-    compound also holds a positive [.<atom_class>] the twin swaps the same class
-    inside the [:not], which is right and shorter, so [expand] is false. *)
-let protect_negations ~atom_class ~expand branch =
-  let names =
-    atom_class
-    :: List.init Merge_key.max_level (fun i ->
-      Merge_key.twin_prefix (i + 1) ^ atom_body atom_class)
+(** [branch] with every outermost [:not(...)] that holds [.<atom_class>]
+    replaced by a placeholder [\001<i>\002], and the negations [i] stands for. A
+    twin never swaps a negated class: the element keeps its [_a_] class next to
+    the twin, so [:not(._a_X)] stays right as it is. *)
+let protect_negations ~atom_class branch =
+  let buffer = Buffer.create (String.length branch) in
+  let saved = ref [] in
+  let pos =
+    List.fold_left
+      (fun pos (i, j) ->
+        let negation = String.sub branch i (j + 1 - i) in
+        Buffer.add_string buffer (String.sub branch pos (i - pos));
+        if class_compounds ~atom_class negation <> [] then (
+          Buffer.add_string buffer (placeholder (List.length !saved));
+          saved := negation :: !saved)
+        else Buffer.add_string buffer negation;
+        j + 1)
+      0 (not_spans branch)
   in
-  let n = String.length branch in
-  let buffer = Buffer.create n in
-  let chains = ref [] in
-  let rec go i =
-    if i < n then (
-      let start = i + 5 in
-      let arg_end =
-        if i + 5 <= n && String.sub branch i 5 = ":not(" then
-          close_paren branch start
-        else None
-      in
-      match arg_end with
-      | Some j ->
-        let arg = String.sub branch start (j - start) in
-        if
-          occurs_under_nots ~atom_class ~even:true arg
-          && expand (compound_at branch i)
-        then (
-          let chain =
-            List.map
-              (fun name ->
-                ":not("
-                ^ replace_class ~atom_class
-                    ~replacement:(fun ~compound:_ -> "." ^ name)
-                    arg
-                ^ ")")
-              names
-            |> String.concat ""
-          in
-          Buffer.add_string buffer (placeholder (List.length !chains));
-          chains := chain :: !chains)
-        else Buffer.add_string buffer (String.sub branch i (j + 1 - i));
-        go (j + 1)
-      | None ->
-        Buffer.add_char buffer branch.[i];
-        go (i + 1))
-  in
-  go 0;
-  Buffer.contents buffer, Array.of_list (List.rev !chains)
+  Buffer.add_string buffer (String.sub branch pos (String.length branch - pos));
+  Buffer.contents buffer, Array.of_list (List.rev !saved)
 
-(** [text] with each placeholder of {!protect_negations} replaced by its chain.
-*)
-let restore_negations chains text =
+(** [text] with each placeholder of {!protect_negations} replaced by its
+    negation. *)
+let restore_negations saved text =
   let n = String.length text in
   let buffer = Buffer.create n in
   let rec go i =
@@ -1404,7 +1330,7 @@ let restore_negations chains text =
       if text.[i] = placeholder_open then (
         let j = String.index_from text i placeholder_close in
         let idx = int_of_string (String.sub text (i + 1) (j - i - 1)) in
-        Buffer.add_string buffer chains.(idx);
+        Buffer.add_string buffer saved.(idx);
         go (j + 1))
       else (
         Buffer.add_char buffer text.[i];
@@ -1413,104 +1339,410 @@ let restore_negations chains text =
   go 0;
   Buffer.contents buffer
 
-(** Specificity twins: [CSS.merge] may swap an atom class [_a_X] for [_t<k>_X]
-    (see [Merge_key]) to win by source order, whatever the sheet order. Every
-    [_a_] rule therefore also answers to the twin classes of every level up to
-    [Merge_key.max_level]. The twin selector is the whole selector, from its
-    start (after any at-rule [{]) to the [{] that opens the declarations, with
-    every [._a_X] replaced by [._t<k>_X], and [k] times [:not(x-)] after one of
-    them: [._id_a:hover ._a_X] becomes [._id_a:hover ._t1_X:not(x-)], so the
-    twin keeps the conditions of the atom. When the class occurs in two compound
-    selectors ([._a_X + ._a_X]) either element may be the merged one, so there
-    is one twin selector per compound, the others matching [:is(._a_X,._t1_X)]:
-    [._t1_X:not(x-) + :is(._a_X,._t1_X)] and
-    [:is(._a_X,._t1_X) + ._t1_X:not(x-)]. [:not(x-)] weighs as its argument, one
-    type selector (0,0,1), and [x-] matches no element. A twin therefore beats
-    an atom with the same number of classes and pseudo-classes, as a later rule
-    would, but never a rule with one more class-like part, such as [.a.b] or
-    [:hover]. Rules of other classes are left alone. *)
-let add_twins rule_text =
+(** The atom class of [rule_text], and the bounds of its selector: from the
+    start (after any at-rule [{]) to the [{] that opens the declarations. *)
+let atom_selector rule_text =
   match atom_class_and_end rule_text with
+  | None -> None
   | Some (cls, after) ->
-    (match String.index_from_opt rule_text after '{' with
-    | None -> rule_text
-    | Some brace ->
-      let class_start = after - String.length cls - 1 in
-      let selector_start =
-        match String.rindex_from_opt rule_text class_start '{' with
-        | Some i -> i + 1
-        | None -> 0
-      in
-      let selector =
-        String.sub rule_text selector_start (brace - selector_start)
-      in
-      let body = atom_body cls in
-      (* [protected] hides the negations that get a chain from the twin swap;
-         the others stay in the text and are swapped with their compound. *)
-      let classified =
-        split_top_level_commas selector
-        |> List.map (fun branch ->
-          (* Hiding every negation that holds the class leaves only its
-             positive occurrences to count. *)
-          let without_negated, _ =
-            protect_negations ~atom_class:cls ~expand:(fun _ -> true) branch
-          in
-          let positive = class_compounds ~atom_class:cls without_negated in
-          let protected, chains =
-            protect_negations ~atom_class:cls
-              ~expand:(fun compound -> not (List.mem compound positive))
-              branch
-          in
-          restore_negations chains protected, protected, chains, positive <> [])
-      in
-      let selector =
-        List.map (fun (expanded, _, _, _) -> expanded) classified
-        |> String.concat ","
-      in
-      let branches =
-        List.filter_map
-          (fun (_, protected, chains, has_class) ->
-            if has_class then Some (protected, chains) else None)
-          classified
-      in
-      let twins =
-        List.init Merge_key.max_level (fun i ->
-          let k = i + 1 in
-          let twin = "." ^ Merge_key.twin_prefix k ^ body in
-          let boosted =
-            twin ^ String.concat "" (List.init k (fun _ -> ":not(x-)"))
-          in
-          let either = ":is(." ^ cls ^ "," ^ twin ^ ")" in
-          (* In one compound the copies are one element, which carries the
-             twin. With the class in several compounds (`& + &`) either
-             element may be the merged one and the others may not: one
-             twin selector per compound. *)
-          List.concat_map
-            (fun (branch, chains) ->
-              List.map
-                (fun merged ->
-                  let boosted_pending = ref true in
-                  restore_negations chains
-                  @@ replace_class ~atom_class:cls
-                       ~replacement:(fun ~compound ->
-                         if compound <> merged then either
-                         else if !boosted_pending then (
-                           boosted_pending := false;
-                           boosted)
-                         else twin)
-                       branch)
-                (class_compounds ~atom_class:cls branch))
-            branches
-          |> String.concat ",")
-        |> List.filter (fun twin -> twin <> "")
+    Option.map
+      (fun brace ->
+        let class_start = after - String.length cls - 1 in
+        let selector_start =
+          match String.rindex_from_opt rule_text class_start '{' with
+          | Some i -> i + 1
+          | None -> 0
+        in
+        cls, selector_start, brace)
+      (String.index_from_opt rule_text after '{')
+
+(** Specificity of selectors, computed on the parsed selector (the same AST the
+    ppx builds): (ids, classes, types). [:is], [:not] and [:has] take the most
+    specific item of their argument, [:where] weighs nothing, a pseudo-element
+    and a legacy single-colon one ([:before]) weigh a type, any other
+    pseudo-class, a class and an attribute a class. *)
+module Specificity = struct
+  open Styled_ppx_css_parser.Ast
+
+  let add (a, b, c) (a', b', c') = a + a', b + b', c + c'
+  let most x y = if compare x y >= 0 then x else y
+
+  let legacy_pseudo_elements =
+    [ "before"; "after"; "first-line"; "first-letter" ]
+
+  let rec selector : selector -> int * int * int = function
+    | SimpleSelector s -> simple s
+    | CompoundSelector c -> compound c
+    | ComplexSelector c -> complex c
+    | RelativeSelector { complex_selector; _ } -> complex complex_selector
+
+  and complex : complex_selector -> int * int * int = function
+    | Selector s -> selector s
+    | Combinator { left; right } ->
+      List.fold_left
+        (fun acc (_, s) -> add acc (selector s))
+        (selector left) right
+
+  and compound { type_selector; subclass_selectors; pseudo_selectors } =
+    let total =
+      match type_selector with Some s -> simple s | None -> 0, 0, 0
+    in
+    let total =
+      List.fold_left
+        (fun acc s -> add acc (subclass s))
+        total subclass_selectors
+    in
+    List.fold_left (fun acc p -> add acc (pseudo p)) total pseudo_selectors
+
+  and simple : simple_selector -> int * int * int = function
+    | Type _ -> 0, 0, 1
+    | Subclass s -> subclass s
+    | Universal | Ampersand | Variable _ | Percentage _ -> 0, 0, 0
+
+  and subclass : subclass_selector -> int * int * int = function
+    | Id _ -> 1, 0, 0
+    | Class _ | ClassVariable _ | Attribute _ -> 0, 1, 0
+    | Pseudo_class p -> pseudo p
+
+  and list_most (selectors, _) =
+    List.fold_left (fun acc (s, _) -> most acc (selector s)) (0, 0, 0) selectors
+
+  and pseudo : pseudo_selector -> int * int * int = function
+    | Pseudoelement _ -> 0, 0, 1
+    | PseudoelementFunction { payload; _ } -> add (0, 0, 1) (list_most payload)
+    | Pseudoclass (PseudoIdent name) ->
+      if List.mem (String.lowercase_ascii name) legacy_pseudo_elements then
+        0, 0, 1
+      else 0, 1, 0
+    | Pseudoclass (Function { name; payload }) ->
+      (match String.lowercase_ascii name with
+      | "where" -> 0, 0, 0
+      | "is" | "not" | "has" | "matches" | "-webkit-any" | "-moz-any" ->
+        list_most payload
+      | _ -> 0, 1, 0)
+    | Pseudoclass (NthFunction { payload = NthSelector { selectors; _ }, _; _ })
+      ->
+      add (0, 1, 0)
+        (List.fold_left (fun acc c -> most acc (complex c)) (0, 0, 0) selectors)
+    | Pseudoclass (NthFunction _) -> 0, 1, 0
+
+  (** The compound of [selector] that the rule styles: the last one. *)
+  let rec subject : selector -> compound_selector option = function
+    | CompoundSelector c -> Some c
+    | SimpleSelector (Subclass s) ->
+      Some
+        {
+          type_selector = None;
+          subclass_selectors = [ s ];
+          pseudo_selectors = [];
+        }
+    | SimpleSelector s ->
+      Some
+        {
+          type_selector = Some s;
+          subclass_selectors = [];
+          pseudo_selectors = [];
+        }
+    | ComplexSelector (Selector s) -> subject s
+    | ComplexSelector (Combinator { left; right }) ->
+      (match List.rev right with
+      | (_, last) :: _ -> subject last
+      | [] -> subject left)
+    | RelativeSelector { complex_selector; _ } ->
+      subject (ComplexSelector complex_selector)
+
+  (** The pseudo-elements of a compound, in one spelling. *)
+  let pseudo_elements compound_selector =
+    let of_pseudo : pseudo_selector -> string list = function
+      | Pseudoelement name | PseudoelementFunction { name; _ } ->
+        [ String.lowercase_ascii name ]
+      | Pseudoclass (PseudoIdent name)
+        when List.mem (String.lowercase_ascii name) legacy_pseudo_elements ->
+        [ String.lowercase_ascii name ]
+      | Pseudoclass _ -> []
+    in
+    let from_subclasses =
+      List.concat_map
+        (function Pseudo_class p -> of_pseudo p | _ -> [])
+        compound_selector.subclass_selectors
+    in
+    List.sort_uniq compare
+      (List.concat_map of_pseudo compound_selector.pseudo_selectors
+      @ from_subclasses)
+
+  let has_class name compound_selector =
+    List.exists
+      (function Class c -> c = name | _ -> false)
+      compound_selector.subclass_selectors
+end
+
+(** What an atom rule styles, from its parsed selector: for each branch of the
+    selector list, whether its subject is the atom's own element (the compound
+    that holds the atom class) or another one reached through a combinator, and
+    its pseudo-elements, and its specificity. Everything else in the selector is
+    compared through the specificity only: [& .x] and [& .y] can hit one
+    element, so they are not told apart. *)
+type target = {
+  subjects : (bool * string list) list;
+  weights : (int * int * int) list;
+}
+
+let rec first_style_rule rules =
+  List.find_map
+    (function
+      | Styled_ppx_css_parser.Ast.Style_rule { prelude = selectors, _; _ } ->
+        Some selectors
+      | At_rule { block = Stylesheet (rules, _) | Rule_list (rules, _); _ } ->
+        first_style_rule rules
+      | At_rule _ | Declaration _ -> None)
+    rules
+
+(** The target of the rule of atom [cls], [None] when the rule does not parse:
+    an atom of unknown target is taken to compete with every other. *)
+let target_of_rule ~cls rule_text =
+  match
+    Styled_ppx_css_parser.Driver.parse_stylesheet
+      ~source_position_start:Lexing.dummy_pos rule_text
+  with
+  | Error _ -> None
+  | Ok (rules, _) ->
+    Option.map
+      (fun selectors ->
+        let branches = List.map fst selectors in
+        {
+          subjects =
+            List.sort_uniq compare
+              (List.map
+                 (fun branch ->
+                   match Specificity.subject branch with
+                   | Some c ->
+                     Specificity.has_class cls c, Specificity.pseudo_elements c
+                   | None -> false, [])
+                 branches);
+          weights =
+            List.sort_uniq compare (List.map Specificity.selector branches);
+        })
+      (first_style_rule rules)
+
+(** Could the two rules hit one element with one specificity, so that a twin
+    decides between them? An unparsed rule could. *)
+let same_element a b =
+  match a, b with
+  | Some a, Some b ->
+    List.exists (fun s -> List.mem s b.subjects) a.subjects
+    && List.exists (fun w -> List.mem w b.weights) a.weights
+  | _ -> true
+
+(** The target and the declarations of an atom rule. Two atoms that can hit one
+    element with one specificity compete; the declarations tell the atoms that
+    give the element one value whichever wins. *)
+let atom_target rule_text =
+  match atom_selector rule_text with
+  | None -> None
+  | Some (cls, _, brace) ->
+    let body =
+      match String.index_from_opt rule_text brace '}' with
+      | Some close -> String.sub rule_text brace (close + 1 - brace)
+      | None -> ""
+    in
+    Some (cls, (target_of_rule ~cls rule_text, body))
+
+(** Specificity twins: [CSS.merge] puts a twin class [_t<k>_X] next to the atom
+    class [_a_X] (see [Merge_key]) so the atom wins by source order, whatever
+    the sheet order. The rule of an atom with a competitor therefore also
+    answers to the twin classes of every level up to [Merge_key.max_level]: the
+    runtime cannot see which pairs [generate] left out, so an atom that gets any
+    twin gets them all. The twin selector is the whole selector, from its start
+    (after any at-rule [{]) to the [{] that opens the declarations, with one
+    [._a_X] replaced by [._t<k>_X] followed by [k] times [:not(x-)]:
+    [._id_a:hover ._a_X] becomes [._id_a:hover ._t1_X:not(x-)], so the twin
+    keeps the conditions of the atom. The element has the [_a_] class too, so
+    the other copies of the class stay as they are. When the class occurs in two
+    compound selectors ([._a_X + ._a_X]) either element may be the merged one:
+    one twin selector per compound. [:not(x-)] weighs as its argument, one type
+    selector (0,0,1), and [x-] matches no element. A twin therefore beats an
+    atom with the same number of classes and pseudo-classes, as a later rule
+    would, but never a rule with one more class-like part, such as [.a.b] or
+    [:hover]. A negation that holds the class is left alone and takes no twin.
+    Rules of other classes are left alone. *)
+let add_twins rule_text =
+  match atom_selector rule_text with
+  | Some (cls, selector_start, brace) ->
+    let selector =
+      String.sub rule_text selector_start (brace - selector_start)
+    in
+    let body = atom_body cls in
+    let branches =
+      split_top_level_commas selector
+      |> List.map (fun branch -> protect_negations ~atom_class:cls branch)
+      |> List.filter (fun (protected, _) ->
+        class_compounds ~atom_class:cls protected <> [])
+    in
+    let twins =
+      List.init Merge_key.max_level (fun i ->
+        let k = i + 1 in
+        let boosted =
+          "."
+          ^ Merge_key.twin_prefix k
+          ^ body
+          ^ String.concat "" (List.init k (fun _ -> ":not(x-)"))
+        in
+        List.concat_map
+          (fun (protected, saved) ->
+            List.map
+              (fun merged ->
+                let boosted_pending = ref true in
+                restore_negations saved
+                @@ replace_class ~atom_class:cls
+                     ~replacement:(fun ~compound ->
+                       if compound = merged && !boosted_pending then (
+                         boosted_pending := false;
+                         boosted)
+                       else "." ^ cls)
+                     protected)
+              (class_compounds ~atom_class:cls protected))
+          branches
         |> List.map (fun twin -> "," ^ twin)
-        |> String.concat ""
-      in
-      String.sub rule_text 0 selector_start
-      ^ selector
-      ^ twins
-      ^ String.sub rule_text brace (String.length rule_text - brace))
-  | _ -> rule_text
+        |> String.concat "")
+      |> String.concat ""
+    in
+    String.sub rule_text 0 selector_start
+    ^ selector
+    ^ twins
+    ^ String.sub rule_text brace (String.length rule_text - brace)
+  | None -> rule_text
+
+(** Could [CSS.merge] raise [latter] over [former]? The two must be able to hit
+    one element with one specificity ({!same_element}; only their at-rules and
+    the spelling of their selectors may differ), overlap, and [latter] must not
+    remove [former]. Two atoms with the same declarations (a width of [100%]
+    under two different at-rules) give the element one value whichever wins, so
+    they never meet. The step is 0 when the sheet order surely puts [latter]
+    after [former] and 1 when it does not, as {!Merge_key.twin_level} decides.
+    Atoms that style different elements, or have another specificity, never
+    meet: a twin cannot change the winner. *)
+let raise_step (former, (target_former, body_former))
+  (latter, (target_latter, body_latter)) =
+  if
+    same_element target_former target_latter
+    && body_former <> body_latter
+    && Merge_key.(
+         may_interact former latter
+         && is_plain former = is_plain latter
+         && overlaps ~former ~latter
+         && not (removes ~former ~latter))
+  then Some (if Merge_key.surely_after ~former ~latter then 0 else 1)
+  else None
+
+(** The [_id_] classes written in a selector of [rule_text]. *)
+let identity_classes rule_text =
+  let n = String.length rule_text in
+  let rec scan i acc =
+    if i + 5 > n then acc
+    else if rule_text.[i] = '.' && String.sub rule_text (i + 1) 4 = "_id_" then (
+      let j = ref (i + 5) in
+      while !j < n && is_class_char rule_text.[!j] do
+        incr j
+      done;
+      scan !j (String.sub rule_text (i + 1) (!j - i - 1) :: acc))
+    else scan (i + 1) acc
+  in
+  scan 0 []
+
+(** Union-find over input file names: the scope in which atoms compete. *)
+module Scope = struct
+  type t = (string, string) Hashtbl.t
+
+  let create () : t = Hashtbl.create 16
+
+  let rec find (t : t) file =
+    match Hashtbl.find_opt t file with
+    | Some parent when parent <> file ->
+      let root = find t parent in
+      Hashtbl.replace t file root;
+      root
+    | _ -> file
+
+  let union (t : t) a b =
+    let ra = find t a
+    and rb = find t b in
+    if ra <> rb then Hashtbl.replace t ra rb
+end
+
+(** For the atoms of one scope, the atoms that may reach a twin level in a merge
+    (they get every level, see {!add_twins}), as {!Merge_key.twin_level}
+    computes it with every atom of the scope merged: one above the level of an
+    earlier atom it must beat (none when the sheet order surely puts it after),
+    capped at [Merge_key.max_level]. An atom that removes what it overlaps, or
+    that the sheet puts last, needs no twin; the level of the atoms it must beat
+    carries over to it. Those atoms are added to [levels]. *)
+let add_twin_levels levels atom_classes =
+  let atoms =
+    List.sort_uniq compare atom_classes
+    |> List.filter_map (fun (cls, target) ->
+      Option.map (fun atom -> cls, (atom, target)) (Merge_key.parse_atom cls))
+    |> Array.of_list
+  in
+  let n = Array.length atoms in
+  let steps =
+    Array.init n (fun latter ->
+      List.filter_map
+        (fun former ->
+          if former = latter then None
+          else
+            Option.map
+              (fun step -> former, step)
+              (raise_step (snd atoms.(former)) (snd atoms.(latter))))
+        (List.init n Fun.id))
+  in
+  (* A merge lists an atom once, so the level of an atom must not come back
+     through a path that holds it. Keeping the best level and the best one from
+     another predecessor drops the paths that go back and forth between two
+     atoms (a base [padding-top] and an [@media] [padding]): a safe bound that
+     can only add levels. *)
+  let best = Array.make n 0 in
+  let best_via = Array.make n (-1) in
+  let second = Array.make n 0 in
+  let update latter via value =
+    if via = best_via.(latter) then
+      value > best.(latter)
+      &&
+      (best.(latter) <- value;
+       true)
+    else if value > best.(latter) then (
+      second.(latter) <- best.(latter);
+      best.(latter) <- value;
+      best_via.(latter) <- via;
+      true)
+    else
+      value > second.(latter)
+      &&
+      (second.(latter) <- value;
+       true)
+  in
+  let rec settle () =
+    let changed = ref false in
+    Array.iteri
+      (fun latter edges ->
+        List.iter
+          (fun (former, step) ->
+            let seen =
+              if best_via.(former) = latter then second.(former)
+              else best.(former)
+            in
+            let needed = min Merge_key.max_level (seen + step) in
+            if needed > 0 && update latter former needed then changed := true)
+          edges)
+      steps;
+    if !changed then settle ()
+  in
+  settle ();
+  let level = best in
+  Array.iteri
+    (fun i (cls, _) ->
+      if level.(i) > Option.value (Hashtbl.find_opt levels cls) ~default:0 then
+        Hashtbl.replace levels cls level.(i))
+    atoms
 
 (** Collect, index, resolve, dedup, output. *)
 let run ~output_file ~order input_files =
@@ -1539,8 +1771,12 @@ let run ~output_file ~order input_files =
     ref (List.concat_map (fun input -> input.protocol_errors) inputs)
   in
   let resolved_rules = ref [] in
+  let twin_levels = Hashtbl.create 64 in
+  let scope = Scope.create () in
+  let scope_atoms = Hashtbl.create 16 in
   List.iter
     (fun input ->
+      let input_atoms = ref [] in
       List.iter
         (fun rule ->
           let on_error longident =
@@ -1576,9 +1812,33 @@ let run ~output_file ~order input_files =
                comment, so @charset could never be the first bytes of the \
                stylesheet; output is UTF-8 regardless."
               input.filename
-          else resolved_rules := resolved :: !resolved_rules)
-        input.rules)
+          else (
+            resolved_rules := resolved :: !resolved_rules;
+            (* A class of file A in a selector of file B shows B means to
+               override A: they compete as one file. *)
+            List.iter
+              (fun identity ->
+                match Hashtbl.find_opt idx.Index.by_identity identity with
+                | Some (_, _, defining_file) ->
+                  Scope.union scope input.filename defining_file
+                | None -> ())
+              (identity_classes resolved);
+            Option.iter
+              (fun atom -> input_atoms := atom :: !input_atoms)
+              (atom_target resolved)))
+        input.rules;
+      Hashtbl.replace scope_atoms input.filename !input_atoms)
     inputs;
+  let atoms_by_scope = Hashtbl.create 16 in
+  Hashtbl.iter
+    (fun file atoms ->
+      let root = Scope.find scope file in
+      let known =
+        Option.value (Hashtbl.find_opt atoms_by_scope root) ~default:[]
+      in
+      Hashtbl.replace atoms_by_scope root (atoms @ known))
+    scope_atoms;
+  Hashtbl.iter (fun _ atoms -> add_twin_levels twin_levels atoms) atoms_by_scope;
 
   (match !errors with
   | [] -> ()
@@ -1673,7 +1933,11 @@ let run ~output_file ~order input_files =
     List.iter emit statement_rules;
     List.iter emit registrations;
     List.iter emit (sort_by_shorthand_first global_rules);
-    let emit_atom rule = emit (add_twins rule) in
+    let emit_atom rule =
+      match atom_class_name rule with
+      | Some cls when Hashtbl.mem twin_levels cls -> emit (add_twins rule)
+      | _ -> emit rule
+    in
     List.iter emit_atom (sort_by_shorthand_first base_rules);
     List.iter emit_atom (sort_conditional_rules conditional_rules);
     Buffer.contents buffer

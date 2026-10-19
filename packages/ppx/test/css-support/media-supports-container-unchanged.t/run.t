@@ -12,10 +12,10 @@ shape that must not regress into being rewritten.
   [@@@css "@supports (display: grid) {._a_059rq4e3jvj{color:green;}}"]
   [@@@css.bindings
     [("Output.block", "_id_ovbeuh",
-       "_a_0zob04e6zo5 _t1_0p5mk4et4n8 _t2_059rq4e3jvj")]]
+       "_a_0zob04e6zo5 _a_0p5mk4et4n8 _t1_0p5mk4et4n8 _a_059rq4e3jvj _t2_059rq4e3jvj")]]
   let block =
     CSS.make
-      "label:block _id_ovbeuh _a_0zob04e6zo5 _t1_0p5mk4et4n8 _t2_059rq4e3jvj"
+      "label:block _id_ovbeuh _a_0zob04e6zo5 _a_0p5mk4et4n8 _t1_0p5mk4et4n8 _a_059rq4e3jvj _t2_059rq4e3jvj"
       []
   let _ = block
 

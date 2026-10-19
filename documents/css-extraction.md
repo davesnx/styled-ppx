@@ -1006,21 +1006,29 @@ For a later atom that overlaps a surviving earlier one but cannot remove it
 (a shorthand against a longhand, two at-rule contexts), the sheet order may put
 the earlier atom last. `Merge_key.twin_level` (`merge`) and
 `Merge_key.twin_block` (one block, called from `Css_file.re`'s
-`transform_rule_list`; the ppx copies the module with `copy_files`) swap the
-later class `_a_<x>` for `_t1_<x>` or `_t2_<x>`; only the prefix changes.
-`generate.ml`'s `add_twins` writes every `_a_` rule with `Merge_key.max_level`
-more selectors (it uses the same module through `copy_files`, so the cap cannot
-drift). Each is the whole selector of the atom, from its start (after any
-at-rule `{`) to the `{` of the declarations, with every `._a_<x>` replaced by
-`._t<k>_<x>`, and the first copy followed by `:not(x-)` repeated `k` times.
+`transform_rule_list`; the ppx copies the module with `copy_files`) add a twin
+class `_t1_<x>` or `_t2_<x>` after the later class `_a_<x>`; the `_a_` class
+stays, so an atom without a twin rule still applies.
+`generate.ml` collects, per scope (an input file, joined with the files whose
+`_id_` classes it uses in a selector), the atoms that a merge may need to raise
+(`add_twin_levels`, with `Merge_key.overlaps`, `removes` and `surely_after`, for
+atoms that `same_element` says may hit one element with one specificity). The
+target is read from the parsed selector (`Styled_ppx_css_parser.Driver`, the
+AST the ppx builds): whether the subject is the `&` element or another one,
+its pseudo-elements, and the specificity of the whole selector (`Specificity`).
+`add_twins` writes the rules of those atoms with one selector per level up to
+`Merge_key.max_level` (it uses the same module through `copy_files`, so the cap
+cannot drift); the runtime ignores which pairs `generate` left out, so an atom
+gets all levels or none. Other atoms keep a plain rule, and a merge across files
+falls back to the sheet order. Each is the whole selector of the atom, from its start (after any
+at-rule `{`) to the `{` of the declarations, with one `._a_<x>` replaced by
+`._t<k>_<x>` followed by `:not(x-)` repeated `k` times.
 Text before or after the atom class stays, so a twin keeps its conditions
-(`._a_<x>:hover`, `._id_<y> ._a_<x>`, inside `@media`). Copies in one compound
-selector are one element (`._a_<x>:not(._a_<x>._id_<y>)`) and are all
-replaced. When the class is in several compound selectors (`._a_<x> + ._a_<x>`,
-`& ~ &`, `& &`) either element may be the merged one, and the other may be an
-unmerged `_a_<x>`, so there is one selector per compound: the twin class and
-the `:not(x-)` in that compound, `:is(._a_<x>,._t<k>_<x>)` in the others
-(`cascade-review.t`, V02 to V04).
+(`._a_<x>:hover`, `._id_<y> ._a_<x>`, inside `@media`). A `:not(...)` that holds
+the class is not touched. When the class is in several compound selectors
+(`._a_<x> + ._a_<x>`, `& ~ &`, `& &`) either element may be the merged one, so
+there is one selector per compound: the twin in that compound, `._a_<x>` in the
+others (`cascade-review.t`, V02 to V04).
 `:not(x-)` weighs as its argument, one type selector, and `x-` matches no
 element: a level `k` twin has specificity (0,c,k) where the atom has (0,c,0),
 so it beats an atom with the same number of classes and pseudo-classes and

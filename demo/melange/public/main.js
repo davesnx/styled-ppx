@@ -63794,7 +63794,6 @@ function sub8(s2, pos, len2) {
 }
 
 // ../demo-melange/node_modules/styled-ppx.melange/Merge_key.mjs
-var atom_prefix = "_a_";
 var all_sentinel = "zz";
 var unregistered_custom_marker = "zy";
 var direction_marker = "5q";
@@ -64097,17 +64096,21 @@ function twin_level(seen, latter) {
     return 2;
   }
 }
-function token_of(a, level) {
-  const start = a.level === 0 ? 3 : 4;
-  return (level === 0 ? atom_prefix : twin_prefix(level)) + sub8(a.token, start, a.token.length - start | 0);
-}
-function token_string(t) {
-  if (t.TAG === /* Atom */
-  0) {
-    return t._0.token;
-  } else {
-    return t._0;
+function push_atom(a, level, tokens) {
+  if (level === 0) {
+    return {
+      hd: a.token,
+      tl: tokens
+    };
   }
+  const body = sub8(a.token, 3, a.token.length - 3 | 0);
+  return {
+    hd: twin_prefix(level) + body,
+    tl: {
+      hd: a.token,
+      tl: tokens
+    }
+  };
 }
 function parse_token(token) {
   const a = parse_atom(token);
@@ -64129,6 +64132,96 @@ function parse_token(token) {
     };
   }
 }
+function is_twin(a) {
+  return get2(a.token, 1) === /* 't' */
+  116;
+}
+function same_body(a, b) {
+  const start = function(x) {
+    if (is_twin(x)) {
+      return 4;
+    } else {
+      return 3;
+    }
+  };
+  const sa = start(a);
+  const sb = start(b);
+  if ((a.token.length - sa | 0) === (b.token.length - sb | 0)) {
+    return same_field(a.token, sa, b.token, sb, a.token.length - sa | 0);
+  } else {
+    return false;
+  }
+}
+function fold_twins(tokens) {
+  if (!exists5((function(a) {
+    if (a.TAG === /* Atom */
+    0) {
+      return is_twin(a._0);
+    } else {
+      return false;
+    }
+  }), tokens)) {
+    return tokens;
+  }
+  const bases = filter_map2((function(a) {
+    if (a.TAG !== /* Atom */
+    0) {
+      return;
+    }
+    const a$1 = a._0;
+    if (!is_twin(a$1)) {
+      return a$1;
+    }
+  }), tokens);
+  return filter_map2((function(token) {
+    if (token.TAG !== /* Atom */
+    0) {
+      return token;
+    }
+    const twin = token._0;
+    if (is_twin(twin)) {
+      if (exists5((function(param) {
+        return same_body(twin, param);
+      }), bases)) {
+        return;
+      } else {
+        return {
+          TAG: (
+            /* Opaque */
+            1
+          ),
+          _0: twin.token
+        };
+      }
+    }
+    const level = fold_left5((function(level2, twin$1) {
+      if (twin$1.TAG !== /* Atom */
+      0) {
+        return level2;
+      }
+      const twin$2 = twin$1._0;
+      if (is_twin(twin$2) && same_body(twin$2, twin) && level2 <= twin$2.level) {
+        return twin$2.level;
+      } else {
+        return level2;
+      }
+    }), twin.level, tokens);
+    return {
+      TAG: (
+        /* Atom */
+        0
+      ),
+      _0: {
+        token: twin.token,
+        level,
+        context: twin.context,
+        family: twin.family,
+        extended: twin.extended,
+        mask: twin.mask
+      }
+    };
+  }), tokens);
+}
 function raise_levels(seen, latters) {
   return rev(fold_left5(
     (function(tokens, token) {
@@ -64149,10 +64242,7 @@ function raise_levels(seen, latters) {
         extended: a.extended,
         mask: a.mask
       });
-      return {
-        hd: level === a.level ? a.token : token_of(a, level),
-        tl: tokens
-      };
+      return push_atom(a, level, tokens);
     }),
     /* [] */
     0,
@@ -64170,7 +64260,7 @@ function atom_count(tokens) {
   }), 0, tokens);
 }
 function twin_block(tokens) {
-  const parsed = map5(parse_token, tokens);
+  const parsed = fold_twins(map5(parse_token, tokens));
   return raise_levels(make_seen(atom_count(parsed)), parsed);
 }
 function is_space3(param) {
@@ -64212,8 +64302,8 @@ function split_tokens(s2) {
   ;
 }
 function merge_class_names(former, latter) {
-  const former_tokens = map5(parse_token, split_tokens(former));
-  const latter_tokens = map5(parse_token, split_tokens(latter));
+  const former_tokens = fold_twins(map5(parse_token, split_tokens(former)));
+  const latter_tokens = fold_twins(map5(parse_token, split_tokens(latter)));
   const latter_atoms = of_list(filter_map2((function(a) {
     if (a.TAG === /* Atom */
     0) {
@@ -64242,7 +64332,23 @@ function merge_class_names(former, latter) {
       return add2(seen, a._0);
     }
   }), survivors);
-  return concat6(" ", $at(map5(token_string, survivors), raise_levels(seen, latter_tokens)));
+  const former_classes = rev(fold_left5(
+    (function(tokens, t) {
+      if (t.TAG !== /* Atom */
+      0) {
+        return {
+          hd: t._0,
+          tl: tokens
+        };
+      }
+      const a = t._0;
+      return push_atom(a, a.level, tokens);
+    }),
+    /* [] */
+    0,
+    survivors
+  ));
+  return concat6(" ", $at(former_classes, raise_levels(seen, latter_tokens)));
 }
 var context_width = 5;
 var family_width = 2;

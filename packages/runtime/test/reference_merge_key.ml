@@ -286,10 +286,15 @@ let twin_level seen latter =
     latter.level
   |> min max_level
 
-let token_of a level =
-  let start = if a.level = 0 then 3 else 4 in
-  (if level = 0 then atom_prefix else twin_prefix level)
-  ^ String.sub a.token start (String.length a.token - start)
+let is_twin a = a.token.[1] = 't'
+
+let body_of a =
+  let start = if is_twin a then 4 else 3 in
+  String.sub a.token start (String.length a.token - start)
+
+(* An atom's class names: its [_a_] class, then its twin class when raised. *)
+let classes_of a level =
+  if level = 0 then [ a.token ] else [ a.token; twin_prefix level ^ body_of a ]
 
 (* [raise_levels seen latters]: [latters] as tokens, each with the twin
    level it needs against the [seen] atoms (the former survivors, already
@@ -306,7 +311,7 @@ let raise_levels seen latters =
         | Atom a ->
           let level = twin_level seen a in
           ( add_atom seen { a with level },
-            (if level = a.level then a.token else token_of a level) :: tokens ))
+            List.rev_append (classes_of a level) tokens ))
       (seen, []) latters
   in
   List.rev tokens
@@ -314,13 +319,38 @@ let raise_levels seen latters =
 let parse_token token =
   match parse_atom token with None -> Opaque token | Some a -> Atom a
 
+(* The twin class of an atom sits next to its [_a_] class: its level moves to
+   that atom, and a twin without an [_a_] class is opaque. *)
+let fold_twins parsed =
+  let bases =
+    List.filter_map
+      (function Atom a when not (is_twin a) -> Some (body_of a) | _ -> None)
+      parsed
+  in
+  let twin_level body =
+    List.fold_left
+      (fun level -> function
+        | Atom a when is_twin a && String.equal (body_of a) body ->
+          max level a.level
+        | _ -> level)
+      0 parsed
+  in
+  List.filter_map
+    (function
+      | Atom a when is_twin a ->
+        if List.mem (body_of a) bases then None else Some (Opaque a.token)
+      | Atom a -> Some (Atom { a with level = twin_level (body_of a) })
+      | Opaque _ as token -> Some token)
+    parsed
+
 let index_of parsed =
   List.fold_left
     (fun index -> function Opaque _ -> index | Atom a -> add_atom index a)
     empty_index parsed
 
 (* A block's classes in source order: each atom against the ones before it. *)
-let twin_block tokens = raise_levels empty_index (List.map parse_token tokens)
+let twin_block tokens =
+  raise_levels empty_index (fold_twins (List.map parse_token tokens))
 
 (* -- className string merge --------------------------------------------- *)
 
@@ -349,8 +379,8 @@ let split_tokens s =
    [latter]'s tokens are never dropped - [CSS.merge]'s right argument always
    wins outright. *)
 let merge_class_names former latter =
-  let former_tokens = List.map parse_token (split_tokens former) in
-  let latter_tokens = List.map parse_token (split_tokens latter) in
+  let former_tokens = fold_twins (List.map parse_token (split_tokens former)) in
+  let latter_tokens = fold_twins (List.map parse_token (split_tokens latter)) in
   let latter_index = index_of latter_tokens in
   let survives = function
     | Opaque _ -> true
@@ -362,7 +392,7 @@ let merge_class_names former latter =
            false)
   in
   let survivors = List.filter survives former_tokens in
-  let token_string = function Opaque t -> t | Atom a -> a.token in
-  List.map token_string survivors
+  let classes = function Opaque t -> [ t ] | Atom a -> classes_of a a.level in
+  List.concat_map classes survivors
   @ raise_levels (index_of survivors) latter_tokens
   |> String.concat " "

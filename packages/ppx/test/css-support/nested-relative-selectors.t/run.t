@@ -39,8 +39,8 @@ Each pair below must render and hash to the same atom.
   CSS.make("_a_f8a2u4eqd0b", []);
   CSS.make("_a_f8a2u4eqd0b", []);
   
-  CSS.make("_a_ew2o54eviu8 _t1_ornrm4e0uum", []);
-  CSS.make("_a_ew2o54eviu8 _t1_ornrm4e0uum", []);
+  CSS.make("_a_ew2o54eviu8 _a_ornrm4e0uum _t1_ornrm4e0uum", []);
+  CSS.make("_a_ew2o54eviu8 _a_ornrm4e0uum _t1_ornrm4e0uum", []);
   
   CSS.make("_a_7gls64e9ouy", []);
   CSS.make("_a_7gls64e9ouy", []);

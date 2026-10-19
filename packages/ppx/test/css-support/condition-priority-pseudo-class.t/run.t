@@ -13,9 +13,12 @@ last.
   [@@@css "._a_1lub34ebzcl:focus{color:blue;}"]
   [@@@css "._a_qyw7u4ego80:hover{color:red;}"]
   [@@@css.bindings
-    [("Input.danger", "_id_47cxs7", "_a_1lub34ebzcl _t1_qyw7u4ego80")]]
+    [("Input.danger", "_id_47cxs7",
+       "_a_1lub34ebzcl _a_qyw7u4ego80 _t1_qyw7u4ego80")]]
   let danger =
-    CSS.make "label:danger _id_47cxs7 _a_1lub34ebzcl _t1_qyw7u4ego80" []
+    CSS.make
+      "label:danger _id_47cxs7 _a_1lub34ebzcl _a_qyw7u4ego80 _t1_qyw7u4ego80"
+      []
   let _ = danger
 
   $ styled-ppx.generate output.ml > styles.css

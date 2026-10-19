@@ -24,7 +24,7 @@ let make className vars : styles =
    ([_id_]), `label:<binding>` marker, or any class this module can't parse
    is never dropped and never drops anything else; [styles2]'s own classes
    are never dropped either way, and keep their place, but an atom may get a
-   twin prefix. See `documents/how-merging-works.md` for
+   twin class after it. See `documents/how-merging-works.md` for
    the full rule, worked examples, and known limits. *)
 let merge (styles1 : styles) (styles2 : styles) =
   let className = Merge_key.merge_class_names (fst styles1) (fst styles2) in
