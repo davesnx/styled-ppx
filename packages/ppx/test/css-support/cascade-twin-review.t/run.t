@@ -1,8 +1,9 @@
-Three properties of the twin rules, each with the element it is checked on in Chromium, Firefox and WebKit (the later argument must win, in both merge orders).
+Three properties of the twin rules, each with the element it is checked on in Chromium, Firefox and WebKit (the later argument must win, in both merge orders), and one known limit.
 
 - `lvl.re`, `lvl_sel.re`, `xa.re` and `xb.re`: the runtime raises an atom over every overlapping earlier atom, whichever pairs `generate` left out, so an atom that gets any twin gets every level. Three atoms under three `@media`, the first two with equal declarations, merged in a chain: the third needs `_t2_` and its rule exists. The same with a child selector, and across two files.
 - `subject.re`: `& .x` and `& .y` can hit one `<span class="x y">`, `& > div` and `& div` one `<div>`, and `&:before` and `&::before` are one pseudo-element: they compete although their text differs.
 - `weight.re`: `&:is(.p, .q)` weighs one class, as `&.x`; an escaped `.md\:flex` is one class, as `:hover`; a colon in an attribute value is no pseudo-class, so `&[data-k="a:b"]` weighs as `:focus`.
+- `xc.re` and `xd.re`, known limit: a twin can win over a later atom that has no twin rules. `merge(merge(Xc.w, Xc.x), Xd.y)` gives `y` the class `_t2_`, but `y` has no competitor in `xd.re` and no `$(X)` link, so `generate` writes no twin rule for it, and the `_t1_` rule of `x` wins (Chromium: rgb(15, 0, 0)). CSS source order expects `y`, rgb(16, 0, 0).
 
   $ cat > dune-project << EOF
   > (lang dune 3.10)
@@ -21,6 +22,7 @@ Three properties of the twin rules, each with the element it is checked on in Ch
   lvl: label:a _id_ndfefj _a_0pdotec7ry5 label:b _id_130d1dp _a_0p2atecyfbm _t1_0p2atecyfbm label:c _id_fz67jh _a_0spn9echsa8 _t2_0spn9echsa8
   lvl_sel: label:a _id_56jsch _a_bu1yr4e6u0r label:b _id_q5lbol _a_57mbs4eb6zv _t1_57mbs4eb6zv label:c _id_1qwcjpl _a_luhzr4e07x9 _t2_luhzr4e07x9
   cross: label:a _id_165aid0 _a_0linq4e1p2n label:b _id_110ttsi _a_0u1th4e89sq _t1_0u1th4e89sq label:c _id_62bw5v _a_0mbx44eimv1 _t2_0mbx44eimv1
+  cross limit: label:w _id_11zy4k2 _a_0linq4e1x33 label:x _id_u0obg9 _a_0u1th4el2gi _t1_0u1th4el2gi label:y _id_1ig9ml8 _a_0mbx44ermtq _t2_0mbx44ermtq
   subject x y ab: label:x _id_1960q70 _a_zdhud4evqqy label:y _id_7jy1bb _a_y78w54et6y8 _t1_y78w54et6y8
   subject x y ba: label:y _id_7jy1bb _a_y78w54et6y8 label:x _id_1960q70 _a_zdhud4evqqy _t1_zdhud4evqqy
   subject child descendant ab: label:child _id_x493py _a_x9qwt4erw83 label:descendant _id_v5ypei _a_s7e0m4epvtm _t1_s7e0m4epvtm
@@ -57,3 +59,6 @@ Three properties of the twin rules, each with the element it is checked on in Ch
   @media (max-width: 9999px) {._a_0linq4e1p2n{color:rgb(11, 0, 0);}}
   @media (min-width: 1px) {._a_0u1th4e89sq,._t1_0u1th4e89sq:not(x-),._t2_0u1th4e89sq:not(x-):not(x-){color:rgb(12, 0, 0);}}
   @media (min-width: 2px) {._a_0mbx44eimv1,._t1_0mbx44eimv1:not(x-),._t2_0mbx44eimv1:not(x-):not(x-){color:rgb(13, 0, 0);}}
+  @media (max-width: 9999px) {._a_0linq4e1x33,._t1_0linq4e1x33:not(x-),._t2_0linq4e1x33:not(x-):not(x-){color:rgb(14, 0, 0);}}
+  @media (min-width: 1px) {._a_0u1th4el2gi,._t1_0u1th4el2gi:not(x-),._t2_0u1th4el2gi:not(x-):not(x-){color:rgb(15, 0, 0);}}
+  @media (min-width: 2px) {._a_0mbx44ermtq{color:rgb(16, 0, 0);}}

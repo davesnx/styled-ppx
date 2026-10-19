@@ -162,8 +162,12 @@ levels. Most atoms have no competitor, and their rule is a plain
 `._a_<x> { ... }`. A merge of atoms from two files has no twin rule, unless
 each atom has such a competitor in its own file, so the sheet order decides, as
 it did before the twin (`packages/ppx/test/css-support/cascade-twin-scope.t`;
-`cascade-gaps.t` G51 and G51S). Keep the two atoms in one file when one must
-beat the other.
+`cascade-gaps.t` G51 and G51S). Known limit: a twin can win over a later atom
+that has no twin rules. If an earlier atom has a twin rule from its own file,
+and the later atom from another file has none, the later atom gets only a twin
+class, and the earlier twin wins (`cascade-twin-review.t`, `xc.re` and
+`xd.re`). Keep atoms that must override each other in one file or link them
+with `$(X)`.
 
 When the atom has a selector (`.parent &`, `& + &`, `&:hover`), each twin
 selector is the same selector with one `._a_<x>` replaced by the twin class,

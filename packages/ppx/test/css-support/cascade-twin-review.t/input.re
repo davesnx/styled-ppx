@@ -15,6 +15,10 @@ Printf.printf(
   "cross: %s\n",
   CSS.className(CSS.merge(CSS.merge(Xa.a, Xb.b), Xb.c)),
 );
+Printf.printf(
+  "cross limit: %s\n",
+  CSS.className(CSS.merge(CSS.merge(Xc.w, Xc.x), Xd.y)),
+);
 show("subject x y", Subject.x, Subject.y);
 show("subject child descendant", Subject.child, Subject.descendant);
 show("subject legacy modern", Subject.legacy, Subject.modern);
