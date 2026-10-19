@@ -25,8 +25,8 @@ documents/string-escape-bug.md for context.
   [@css "._a_4wew8m{content:\"line\\A one\";}"];
   [@css "._a_4w5ir8{content:\"—\";}"];
   [@css "._a_g49s14ek38d [data-name=\"O\\\"Brien\"]{color:red;}"];
-  [@css "._a_3900808vt{background-image:url(\"path/with\\\"quote.png\");}"];
-  [@css "._a_39008wlhr{background-image:url(\"path\\\\to\\\\file.png\");}"];
+  [@css "._a_39000808vt{background-image:url(\"path/with\\\"quote.png\");}"];
+  [@css "._a_390008wlhr{background-image:url(\"path\\\\to\\\\file.png\");}"];
   [@css "._a_4wqqv9{content:\"\\9 \";}"];
   [@css "._a_4wy7g7{content:\"\\7F \";}"];
   
@@ -48,9 +48,9 @@ documents/string-escape-bug.md for context.
   
   CSS.make("_a_g49s14ek38d", []);
   
-  CSS.make("_a_3900808vt", []);
+  CSS.make("_a_39000808vt", []);
   
-  CSS.make("_a_39008wlhr", []);
+  CSS.make("_a_390008wlhr", []);
   
   CSS.make("_a_4wqqv9", []);
   

@@ -31,7 +31,7 @@ let hashed_field ~width s =
    zero-padded, usually-longer stand-in for it. *)
 let context_width = 5
 let family_width = 2
-let mask_width = 3
+let mask_width = 4
 let value_width = 4
 let extended_width = Slot_key.extended_hash_width
 let bundle_value_width = 7

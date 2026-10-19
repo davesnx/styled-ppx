@@ -16,10 +16,10 @@ If this test fails, the var() and cascading support is broken
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css "._a_4en3kf{color:var(--primary-color);}"];
-  [@css "._a_39004fuqy{background-color:var(--bg-color);}"];
+  [@css "._a_390004fuqy{background-color:var(--bg-color);}"];
   [@css "._a_7pcrrr{margin:var(--spacing);}"];
   [@css "._a_947rr7{padding:var(--padding);}"];
-  [@css "._a_6500wykz8{font-size:var(--font-size);}"];
+  [@css "._a_65000wykz8{font-size:var(--font-size);}"];
   [@css "._a_ecra93{width:var(--width);}"];
   [@css "._a_6lqm6h{height:var(--height);}"];
   [@css "._a_4ey3yl{color:inherit;}"];
@@ -44,17 +44,17 @@ If this test fails, the var() and cascading support is broken
   [@css
     "._a_604fps{-webkit-flex:revert-layer;-ms-flex:revert-layer;flex:revert-layer;}"
   ];
-  [@css "._a_6500we5f8{font-size:inherit;}"];
-  [@css "._a_6500w53xd{font-size:initial;}"];
-  [@css "._a_6500wswxq{font-size:unset;}"];
-  [@css "._a_6500wntfo{font-size:revert;}"];
-  [@css "._a_6500wpi5f{font-size:revert-layer;}"];
+  [@css "._a_65000we5f8{font-size:inherit;}"];
+  [@css "._a_65000w53xd{font-size:initial;}"];
+  [@css "._a_65000wswxq{font-size:unset;}"];
+  [@css "._a_65000wntfo{font-size:revert;}"];
+  [@css "._a_65000wpi5f{font-size:revert-layer;}"];
   
   CSS.make("_a_4en3kf", []);
-  CSS.make("_a_39004fuqy", []);
+  CSS.make("_a_390004fuqy", []);
   CSS.make("_a_7pcrrr", []);
   CSS.make("_a_947rr7", []);
-  CSS.make("_a_6500wykz8", []);
+  CSS.make("_a_65000wykz8", []);
   CSS.make("_a_ecra93", []);
   CSS.make("_a_6lqm6h", []);
   
@@ -82,8 +82,8 @@ If this test fails, the var() and cascading support is broken
   CSS.make("_a_608jui", []);
   CSS.make("_a_604fps", []);
   
-  CSS.make("_a_6500we5f8", []);
-  CSS.make("_a_6500w53xd", []);
-  CSS.make("_a_6500wswxq", []);
-  CSS.make("_a_6500wntfo", []);
-  CSS.make("_a_6500wpi5f", []);
+  CSS.make("_a_65000we5f8", []);
+  CSS.make("_a_65000w53xd", []);
+  CSS.make("_a_65000wswxq", []);
+  CSS.make("_a_65000wntfo", []);
+  CSS.make("_a_65000wpi5f", []);

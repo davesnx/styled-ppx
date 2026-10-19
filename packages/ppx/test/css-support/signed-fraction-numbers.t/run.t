@@ -29,10 +29,10 @@ it does not change how numbers render.
   [@css "._a_7ppxco{margin:-0.5px;}"];
   [@css "._a_7p1kc6{margin:0.5px;}"];
   [@css "._a_dmr2ev{transition:opacity 0.3s ease -0.1s;}"];
-  [@css "._a_71008ktvb{top:-5px;}"];
+  [@css "._a_710008ktvb{top:-5px;}"];
   CSS.make("_a_7ppxco", []);
   CSS.make("_a_7p1kc6", []);
   CSS.make("_a_dmr2ev", []);
-  CSS.make("_a_71008ktvb", []);
+  CSS.make("_a_710008ktvb", []);
 
   $ dune build

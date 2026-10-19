@@ -41,10 +41,10 @@
       real hash lives here instead). Never present together with [mask] - a mask
       only ever applies to a [Registered] family (see {!Slot_key.t.mask}), and a
       marker family never has one.
-    - [mask] is 3 base36 chars, present only when {!Slot_key.t}'s [mask] is
-      [Some _] (a lone longhand or a non-full family atom) - omitted for a plain
-      shorthand or any non-family property, which is what keeps the common case
-      short.
+    - [mask] is 4 base36 chars (the 20-leaf [font] family needs 20 bits),
+      present only when {!Slot_key.t}'s [mask] is [Some _] (a lone longhand or a
+      non-full family atom) - omitted for a plain shorthand or any non-family
+      property, which is what keeps the common case short.
     - [value] is always exactly 4 base36 chars, a hash of the atom's own
       rendered content - unique only within one (context, family[, mask])
       bucket, not globally, which is what lets it be shorter than today's class
@@ -62,7 +62,7 @@
     {v
     prefix | len(prefix)+family+value floor | + extras (mask/context/extended)
     -------|---------------------------------|-----------------------------------
-    _a_    | 3+2+4 = 9                       | 9, 12, 14, 15, 17, 20
+    _a_    | 3+2+4 = 9                       | 9, 13, 14, 15, 18, 20
     _in_   | 4, then an unpadded hash        | variable, up to 4+7=11
     v}
 

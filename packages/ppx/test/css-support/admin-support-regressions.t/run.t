@@ -18,16 +18,16 @@ This test captures cx2 regressions in an admin-style UI: border-side shorthands 
     "@property --deprecated__elevation1-1jpikyl{syntax:\"*\";inherits:false;}"
   ];
   [@css "@property --topMenuHeight-10ob2p1{syntax:\"*\";inherits:false;}"];
-  [@css "._a_3hghs9vd4{border-top:1px solid var(--line-17j5in5);}"];
-  [@css "._a_3h007kb5g{border-bottom:1px solid var(--lineAlpha-1tmd8aq);}"];
-  [@css "._a_3h1ds4w3j{border-left:1px solid var(--lineAlpha-k1tpqj);}"];
+  [@css "._a_3h2ghs9vd4{border-top:1px solid var(--line-17j5in5);}"];
+  [@css "._a_3h0007kb5g{border-bottom:1px solid var(--lineAlpha-1tmd8aq);}"];
+  [@css "._a_3h01ds4w3j{border-left:1px solid var(--lineAlpha-k1tpqj);}"];
   [@css "._a_400dz6{box-shadow:var(--deprecated__elevation1-1jpikyl);}"];
   [@css "._a_6lttxg{height:calc(100vh + var(--topMenuHeight-10ob2p1));}"];
   [@css.bindings
     [
-      ("Input._borderTop", "_id_k0smpx", "_a_3hghs9vd4"),
-      ("Input._borderBottom", "_id_4yz5wd", "_a_3h007kb5g"),
-      ("Input._borderLeft", "_id_1w7n6a9", "_a_3h1ds4w3j"),
+      ("Input._borderTop", "_id_k0smpx", "_a_3h2ghs9vd4"),
+      ("Input._borderBottom", "_id_4yz5wd", "_a_3h0007kb5g"),
+      ("Input._borderLeft", "_id_1w7n6a9", "_a_3h01ds4w3j"),
       ("Input._boxShadow1", "_id_114a8u4", "_a_400dz6"),
       ("Input._heightPlus", "_id_11xytn2", "_a_6lttxg"),
     ]
@@ -68,12 +68,12 @@ This test captures cx2 regressions in an admin-style UI: border-side shorthands 
   
   let _borderTop =
     CSS.make(
-      "label:_borderTop _id_k0smpx _a_3hghs9vd4",
+      "label:_borderTop _id_k0smpx _a_3h2ghs9vd4",
       [("--line-17j5in5", CSS.Types.Color.toString(Color.Border.line))],
     );
   let _borderBottom =
     CSS.make(
-      "label:_borderBottom _id_4yz5wd _a_3h007kb5g",
+      "label:_borderBottom _id_4yz5wd _a_3h0007kb5g",
       [
         (
           "--lineAlpha-1tmd8aq",
@@ -83,7 +83,7 @@ This test captures cx2 regressions in an admin-style UI: border-side shorthands 
     );
   let _borderLeft =
     CSS.make(
-      "label:_borderLeft _id_1w7n6a9 _a_3h1ds4w3j",
+      "label:_borderLeft _id_1w7n6a9 _a_3h01ds4w3j",
       [
         (
           "--lineAlpha-k1tpqj",

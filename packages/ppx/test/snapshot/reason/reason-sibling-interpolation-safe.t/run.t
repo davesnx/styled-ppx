@@ -9,14 +9,14 @@ interpolation as a custom property (subject is `&` or a descendant of `&`).
   [@css "._a_5wdc34ej70v + ._a_5wdc34ej70v{color:var(--color-17hzlne);}"];
   [@css ".x + ._a_6ve1u4e01uz{color:var(--color-4fgdvo);}"];
   [@css "._a_xbwf14eel0e > * + *{color:var(--color-tqid89);}"];
-  [@css "._a_s19nz3hef5ydxg .child{border-color:var(--color-133cflr);}"];
+  [@css "._a_s19nz3h0ef5ydxg .child{border-color:var(--color-133cflr);}"];
   [@css "._a_fxps84eoqj4 + .x{color:red;}"];
   [@css.bindings
     [
       ("Output.selfSibling", "_id_vk9hpa", "_a_5wdc34ej70v"),
       ("Output.siblingBeforeAmpersand", "_id_fsi55f", "_a_6ve1u4e01uz"),
       ("Output.childThenSibling", "_id_1er3nso", "_a_xbwf14eel0e"),
-      ("Output.descendant", "_id_1g3dzrb", "_a_s19nz3hef5ydxg"),
+      ("Output.descendant", "_id_1g3dzrb", "_a_s19nz3h0ef5ydxg"),
       ("Output.literalSibling", "_id_njk8sz", "_a_fxps84eoqj4"),
     ]
   ];
@@ -38,7 +38,7 @@ interpolation as a custom property (subject is `&` or a descendant of `&`).
     );
   let descendant =
     CSS.make(
-      "label:descendant _id_1g3dzrb _a_s19nz3hef5ydxg",
+      "label:descendant _id_1g3dzrb _a_s19nz3h0ef5ydxg",
       [("--color-133cflr", CSS.Types.Color.toString(color))],
     );
   let literalSibling =

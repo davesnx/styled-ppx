@@ -50,15 +50,15 @@ prefixed its Firefox variant as `-moz-fill-available` instead of the real
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_7y0e8dp5t{mask-mode:alpha;}"];
-  [@css "._a_7y03k57xj{mask-composite:exclude;}"];
-  [@css "._a_6j00cozaa{grid-row:1 / 3;}"];
-  [@css "._a_6j003zjvj{grid-column:2;}"];
+  [@css "._a_7y00e8dp5t{mask-mode:alpha;}"];
+  [@css "._a_7y003k57xj{mask-composite:exclude;}"];
+  [@css "._a_6j000cozaa{grid-row:1 / 3;}"];
+  [@css "._a_6j0003zjvj{grid-column:2;}"];
   [@css "._a_ap8bwf{scroll-snap-type:y mandatory;}"];
-  [@css "._a_7r002bip2{-webkit-margin-start:10px;margin-inline-start:10px;}"];
-  [@css "._a_7r001lgiv{-webkit-margin-end:10px;margin-inline-end:10px;}"];
-  [@css "._a_96002js84{-webkit-padding-start:10px;padding-inline-start:10px;}"];
-  [@css "._a_96001ob79{-webkit-padding-end:10px;padding-inline-end:10px;}"];
+  [@css "._a_7r0002bip2{-webkit-margin-start:10px;margin-inline-start:10px;}"];
+  [@css "._a_7r0001lgiv{-webkit-margin-end:10px;margin-inline-end:10px;}"];
+  [@css "._a_960002js84{-webkit-padding-start:10px;padding-inline-start:10px;}"];
+  [@css "._a_960001ob79{-webkit-padding-end:10px;padding-inline-end:10px;}"];
   [@css
     "._a_ehrbdf{-webkit-writing-mode:vertical-rl;writing-mode:vertical-rl;}"
   ];
@@ -66,15 +66,15 @@ prefixed its Firefox variant as `-moz-fill-available` instead of the real
   [@css
     "._a_8ch21t{min-width:-webkit-fill-available;min-width:-moz-available;min-width:fill-available;}"
   ];
-  CSS.make("_a_7y0e8dp5t", []);
-  CSS.make("_a_7y03k57xj", []);
-  CSS.make("_a_6j00cozaa", []);
-  CSS.make("_a_6j003zjvj", []);
+  CSS.make("_a_7y00e8dp5t", []);
+  CSS.make("_a_7y003k57xj", []);
+  CSS.make("_a_6j000cozaa", []);
+  CSS.make("_a_6j0003zjvj", []);
   CSS.make("_a_ap8bwf", []);
-  CSS.make("_a_7r002bip2", []);
-  CSS.make("_a_7r001lgiv", []);
-  CSS.make("_a_96002js84", []);
-  CSS.make("_a_96001ob79", []);
+  CSS.make("_a_7r0002bip2", []);
+  CSS.make("_a_7r0001lgiv", []);
+  CSS.make("_a_960002js84", []);
+  CSS.make("_a_960001ob79", []);
   CSS.make("_a_ehrbdf", []);
   CSS.make("_a_8creoz", []);
   CSS.make("_a_8ch21t", []);

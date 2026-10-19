@@ -30,7 +30,7 @@ This test ensures autoprefixing happens in the PPX extraction path.
   ];
   [@css "._a_5rj0h8{display:grid;}"];
   [@css
-    "._a_2z00w8nyb{-webkit-animation-iteration-count:infinite;animation-iteration-count:infinite;}"
+    "._a_2z000w8nyb{-webkit-animation-iteration-count:infinite;animation-iteration-count:infinite;}"
   ];
   [@css
     "._a_37ib09{-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px);}"
@@ -38,5 +38,5 @@ This test ensures autoprefixing happens in the PPX extraction path.
   CSS.make("_a_czr4kf", []);
   CSS.make("_a_cfky3p", []);
   CSS.make("_a_5rj0h8", []);
-  CSS.make("_a_2z00w8nyb", []);
+  CSS.make("_a_2z000w8nyb", []);
   CSS.make("_a_37ib09", []);

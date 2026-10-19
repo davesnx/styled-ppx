@@ -34,14 +34,14 @@ Comprehensive test for cx2 interpolation with various property types
   [@css "._in_1vzwmoy{color:var(--colorVar-14sye4i);}"];
   [@css "._in_1vzwmoy{background-color:var(--colorVar-14sye4i);}"];
   [@css "._in_1vzwmoy{border-top-color:var(--colorVar-14sye4i);}"];
-  [@css "._a_60001pa9s{flex-basis:var(--flexBasisVar-16vl5bp);}"];
+  [@css "._a_600001pa9s{flex-basis:var(--flexBasisVar-16vl5bp);}"];
   [@css "._in_1knt7y9{grid-row-start:var(--gridLineVar-1qxvc00);}"];
   [@css "._in_1knt7y9{grid-column-end:var(--gridLineVar-175omdk);}"];
   [@css "._in_1d6x35p{top:var(--topVar-1iqysbe);}"];
   [@css "._in_1d6x35p{bottom:var(--topVar-10dkp5m);}"];
   [@css "._a_ekxgpr{z-index:var(--zIndexVar-osv02l);}"];
   [@css
-    "._a_3hlokzkxi{border-top-width:var(--borderWidthVar-1nwhzbd);border-width:var(--borderWidthVar-1nwhzbd);}"
+    "._a_3h1lokzkxi{border-top-width:var(--borderWidthVar-1nwhzbd);border-width:var(--borderWidthVar-1nwhzbd);}"
   ];
   [@css "._in_zoi7e9{letter-spacing:var(--spacingVar-15s0ecx);}"];
   [@css "._in_zoi7e9{word-spacing:var(--spacingVar-1m50b62);}"];
@@ -54,11 +54,11 @@ Comprehensive test for cx2 interpolation with various property types
       ("Output.test2", "_id_zesghj", "_in_1swajk7"),
       ("Output.test3", "_id_12rsoz0", "_a_6fvyy6"),
       ("Output.test4", "_id_puktrw", "_in_1vzwmoy"),
-      ("Output.test5", "_id_1nw36ql", "_a_60001pa9s"),
+      ("Output.test5", "_id_1nw36ql", "_a_600001pa9s"),
       ("Output.test6", "_id_7ivz4", "_in_1knt7y9"),
       ("Output.test7", "_id_iq7p3", "_in_1d6x35p"),
       ("Output.test8", "_id_yq2qob", "_a_ekxgpr"),
-      ("Output.test9", "_id_1u4o5z6", "_a_3hlokzkxi"),
+      ("Output.test9", "_id_1u4o5z6", "_a_3h1lokzkxi"),
       ("Output.test10", "_id_1egwgp0", "_in_zoi7e9"),
       ("Output.test11", "_id_16lxxsk", "_a_eckyy8 _a_6lnay0 _a_4ekvmb"),
     ]
@@ -98,7 +98,7 @@ Comprehensive test for cx2 interpolation with various property types
   let flexBasisVar = CSS.px(100);
   let test5 =
     CSS.make(
-      "label:test5 _id_1nw36ql _a_60001pa9s",
+      "label:test5 _id_1nw36ql _a_600001pa9s",
       [
         ("--flexBasisVar-16vl5bp", CSS.Types.FlexBasis.toString(flexBasisVar)),
       ],
@@ -133,7 +133,7 @@ Comprehensive test for cx2 interpolation with various property types
   let borderWidthVar = `medium;
   let test9 =
     CSS.make(
-      "label:test9 _id_1u4o5z6 _a_3hlokzkxi",
+      "label:test9 _id_1u4o5z6 _a_3h1lokzkxi",
       [
         (
           "--borderWidthVar-1nwhzbd",

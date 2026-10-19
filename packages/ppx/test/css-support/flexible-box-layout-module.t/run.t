@@ -23,14 +23,14 @@ If this test fail means that the module is not in sync with the ppx
   [@css "@property --min-e3h4r0{syntax:\"*\";inherits:false;}"];
   [@css "@property --value-1g7nd20_1{syntax:\"*\";inherits:false;}"];
   [@css "@property --value-fet175_2{syntax:\"*\";inherits:false;}"];
-  [@css "._a_9h001vgc7{align-content:flex-start;}"];
-  [@css "._a_9h001x96o{align-content:flex-end;}"];
-  [@css "._a_9h001t6ef{align-content:space-between;}"];
-  [@css "._a_9h001ulzr{align-content:space-around;}"];
-  [@css "._a_9i001vg9w{align-items:flex-start;}"];
-  [@css "._a_9i001kcm0{align-items:flex-end;}"];
-  [@css "._a_9j0017e4w{align-self:flex-start;}"];
-  [@css "._a_9j001sg73{align-self:flex-end;}"];
+  [@css "._a_9h0001vgc7{align-content:flex-start;}"];
+  [@css "._a_9h0001x96o{align-content:flex-end;}"];
+  [@css "._a_9h0001t6ef{align-content:space-between;}"];
+  [@css "._a_9h0001ulzr{align-content:space-around;}"];
+  [@css "._a_9i0001vg9w{align-items:flex-start;}"];
+  [@css "._a_9i0001kcm0{align-items:flex-end;}"];
+  [@css "._a_9j00017e4w{align-self:flex-start;}"];
+  [@css "._a_9j0001sg73{align-self:flex-end;}"];
   [@css "._a_5r08qs{display:flex;}"];
   [@css "._a_5rcmzt{display:inline-flex;}"];
   [@css "._a_603p27{-webkit-flex:none;-ms-flex:none;flex:none;}"];
@@ -56,20 +56,20 @@ If this test fail means that the module is not in sync with the ppx
   [@css
     "._a_60dbv2{-webkit-flex:var(--value-1g7nd20_1) var(--value-fet175_2);-ms-flex:var(--value-1g7nd20_1) var(--value-fet175_2);flex:var(--value-1g7nd20_1) var(--value-fet175_2);}"
   ];
-  [@css "._a_600014n70{flex-basis:auto;}"];
-  [@css "._a_60001wkcj{flex-basis:content;}"];
-  [@css "._a_60001cjcr{flex-basis:1px;}"];
+  [@css "._a_6000014n70{flex-basis:auto;}"];
+  [@css "._a_600001wkcj{flex-basis:content;}"];
+  [@css "._a_600001cjcr{flex-basis:1px;}"];
   [@css
-    "._a_61001z8uk{-webkit-flex-direction:row;-ms-flex-direction:row;flex-direction:row;}"
+    "._a_610001z8uk{-webkit-flex-direction:row;-ms-flex-direction:row;flex-direction:row;}"
   ];
   [@css
-    "._a_61001j89b{-webkit-flex-direction:row-reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse;}"
+    "._a_610001j89b{-webkit-flex-direction:row-reverse;-ms-flex-direction:row-reverse;flex-direction:row-reverse;}"
   ];
   [@css
-    "._a_61001q59l{-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;}"
+    "._a_610001q59l{-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;}"
   ];
   [@css
-    "._a_61001iomr{-webkit-flex-direction:column-reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse;}"
+    "._a_610001iomr{-webkit-flex-direction:column-reverse;-ms-flex-direction:column-reverse;flex-direction:column-reverse;}"
   ];
   [@css "._a_6180vn{flex-flow:row;}"];
   [@css "._a_61a89u{flex-flow:row-reverse;}"];
@@ -81,17 +81,17 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_61zoft{flex-flow:row-reverse nowrap;}"];
   [@css "._a_61l4v1{flex-flow:column wrap;}"];
   [@css "._a_61o660{flex-flow:column-reverse wrap-reverse;}"];
-  [@css "._a_60002chni{flex-grow:0;}"];
-  [@css "._a_60002v6bo{flex-grow:5;}"];
-  [@css "._a_60004oltb{flex-shrink:1;}"];
-  [@css "._a_600045a5q{flex-shrink:10;}"];
-  [@css "._a_61002sxg9{flex-wrap:nowrap;}"];
-  [@css "._a_61002p9i7{flex-wrap:wrap;}"];
-  [@css "._a_610024whp{flex-wrap:wrap-reverse;}"];
-  [@css "._a_9h0020841{justify-content:flex-start;}"];
-  [@css "._a_9h002getn{justify-content:flex-end;}"];
-  [@css "._a_9h002dmss{justify-content:space-between;}"];
-  [@css "._a_9h0024oss{justify-content:space-around;}"];
+  [@css "._a_600002chni{flex-grow:0;}"];
+  [@css "._a_600002v6bo{flex-grow:5;}"];
+  [@css "._a_600004oltb{flex-shrink:1;}"];
+  [@css "._a_6000045a5q{flex-shrink:10;}"];
+  [@css "._a_610002sxg9{flex-wrap:nowrap;}"];
+  [@css "._a_610002p9i7{flex-wrap:wrap;}"];
+  [@css "._a_6100024whp{flex-wrap:wrap-reverse;}"];
+  [@css "._a_9h00020841{justify-content:flex-start;}"];
+  [@css "._a_9h0002getn{justify-content:flex-end;}"];
+  [@css "._a_9h0002dmss{justify-content:space-between;}"];
+  [@css "._a_9h00024oss{justify-content:space-around;}"];
   [@css "._a_8ag5zj{min-height:auto;}"];
   [@css "._a_8c682b{min-width:auto;}"];
   [@css "._a_8nvlbw{order:0;}"];
@@ -103,14 +103,14 @@ If this test fail means that the module is not in sync with the ppx
     let min = `px(500);
   };
   
-  CSS.make("_a_9h001vgc7", []);
-  CSS.make("_a_9h001x96o", []);
-  CSS.make("_a_9h001t6ef", []);
-  CSS.make("_a_9h001ulzr", []);
-  CSS.make("_a_9i001vg9w", []);
-  CSS.make("_a_9i001kcm0", []);
-  CSS.make("_a_9j0017e4w", []);
-  CSS.make("_a_9j001sg73", []);
+  CSS.make("_a_9h0001vgc7", []);
+  CSS.make("_a_9h0001x96o", []);
+  CSS.make("_a_9h0001t6ef", []);
+  CSS.make("_a_9h0001ulzr", []);
+  CSS.make("_a_9i0001vg9w", []);
+  CSS.make("_a_9i0001kcm0", []);
+  CSS.make("_a_9j00017e4w", []);
+  CSS.make("_a_9j0001sg73", []);
   CSS.make("_a_5r08qs", []);
   CSS.make("_a_5rcmzt", []);
   CSS.make("_a_603p27", []);
@@ -148,13 +148,13 @@ If this test fail means that the module is not in sync with the ppx
       ("--value-fet175_2", CSS.Types.FlexShrink.toString(X.value)),
     ],
   );
-  CSS.make("_a_600014n70", []);
-  CSS.make("_a_60001wkcj", []);
-  CSS.make("_a_60001cjcr", []);
-  CSS.make("_a_61001z8uk", []);
-  CSS.make("_a_61001j89b", []);
-  CSS.make("_a_61001q59l", []);
-  CSS.make("_a_61001iomr", []);
+  CSS.make("_a_6000014n70", []);
+  CSS.make("_a_600001wkcj", []);
+  CSS.make("_a_600001cjcr", []);
+  CSS.make("_a_610001z8uk", []);
+  CSS.make("_a_610001j89b", []);
+  CSS.make("_a_610001q59l", []);
+  CSS.make("_a_610001iomr", []);
   CSS.make("_a_6180vn", []);
   CSS.make("_a_61a89u", []);
   CSS.make("_a_61gqdn", []);
@@ -165,17 +165,17 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("_a_61zoft", []);
   CSS.make("_a_61l4v1", []);
   CSS.make("_a_61o660", []);
-  CSS.make("_a_60002chni", []);
-  CSS.make("_a_60002v6bo", []);
-  CSS.make("_a_60004oltb", []);
-  CSS.make("_a_600045a5q", []);
-  CSS.make("_a_61002sxg9", []);
-  CSS.make("_a_61002p9i7", []);
-  CSS.make("_a_610024whp", []);
-  CSS.make("_a_9h0020841", []);
-  CSS.make("_a_9h002getn", []);
-  CSS.make("_a_9h002dmss", []);
-  CSS.make("_a_9h0024oss", []);
+  CSS.make("_a_600002chni", []);
+  CSS.make("_a_600002v6bo", []);
+  CSS.make("_a_600004oltb", []);
+  CSS.make("_a_6000045a5q", []);
+  CSS.make("_a_610002sxg9", []);
+  CSS.make("_a_610002p9i7", []);
+  CSS.make("_a_6100024whp", []);
+  CSS.make("_a_9h00020841", []);
+  CSS.make("_a_9h0002getn", []);
+  CSS.make("_a_9h0002dmss", []);
+  CSS.make("_a_9h00024oss", []);
   CSS.make("_a_8ag5zj", []);
   CSS.make("_a_8c682b", []);
   CSS.make("_a_8nvlbw", []);

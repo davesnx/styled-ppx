@@ -20,9 +20,9 @@ mixed or other types untouched), and a `not`-prefixed type.
   [@@@css
     "@media screen and (max-width: 480px) {._a_41qk84ejnqp{color:blue;}}"]
   [@@@css
-    "@media only screen and (max-width: 992px) and (not (max-width: 480px)){._a_hi5p16500waktn{font-size:14px;}}"]
+    "@media only screen and (max-width: 992px) and (not (max-width: 480px)){._a_hi5p165000waktn{font-size:14px;}}"]
   [@@@css
-    "@media only screen and (max-width: 480px) {._a_vgp386500wjlif{font-size:12px;}}"]
+    "@media only screen and (max-width: 480px) {._a_vgp3865000wjlif{font-size:12px;}}"]
   [@@@css
     "@media not screen and (max-width: 992px) {._a_2qk2neczkzc{width:1px;}}"]
   [@@@css
@@ -30,20 +30,20 @@ mixed or other types untouched), and a `not`-prefixed type.
   [@@@css "@media screen, (min-width: 600px) {._a_mxhpf6luuex{height:1px;}}"]
   [@@@css "@media (min-width: 900px) {._a_mp5mk6l2v22{height:2px;}}"]
   [@@@css
-    "@media screen and (max-width: 992px) {._a_eod993hlokug7y{border-width:1px;}}"]
+    "@media screen and (max-width: 992px) {._a_eod993h1lokug7y{border-width:1px;}}"]
   [@@@css
-    "@media print and (max-width: 480px) {._a_iy5ye3hlokcoyl{border-width:2px;}}"]
+    "@media print and (max-width: 480px) {._a_iy5ye3h1lokcoyl{border-width:2px;}}"]
   [@@@css.bindings
     [("Output.screenPair", "_id_dbqz2g", "_a_eod994eqxej _a_41qk84ejnqp");
-    ("Output.onlyPair", "_id_1qnsba9", "_a_hi5p16500waktn _a_vgp386500wjlif");
+    ("Output.onlyPair", "_id_1qnsba9", "_a_hi5p165000waktn _a_vgp3865000wjlif");
     ("Output.notScreenPair", "_id_1u5eua8", "_a_2qk2neczkzc _a_wd785ecogb2");
     ("Output.commaMixedTypes", "_id_1vmtjrt", "_a_mxhpf6luuex _a_mp5mk6l2v22");
     ("Output.differentTypesPair", "_id_rrgrr1",
-      "_a_eod993hlokug7y _a_iy5ye3hlokcoyl")]]
+      "_a_eod993h1lokug7y _a_iy5ye3h1lokcoyl")]]
   let screenPair =
     CSS.make "label:screenPair _id_dbqz2g _a_eod994eqxej _a_41qk84ejnqp" []
   let onlyPair =
-    CSS.make "label:onlyPair _id_1qnsba9 _a_hi5p16500waktn _a_vgp386500wjlif"
+    CSS.make "label:onlyPair _id_1qnsba9 _a_hi5p165000waktn _a_vgp3865000wjlif"
       []
   let notScreenPair =
     CSS.make "label:notScreenPair _id_1u5eua8 _a_2qk2neczkzc _a_wd785ecogb2" []
@@ -52,7 +52,7 @@ mixed or other types untouched), and a `not`-prefixed type.
       []
   let differentTypesPair =
     CSS.make
-      "label:differentTypesPair _id_rrgrr1 _a_eod993hlokug7y _a_iy5ye3hlokcoyl"
+      "label:differentTypesPair _id_rrgrr1 _a_eod993h1lokug7y _a_iy5ye3h1lokcoyl"
       []
   let _ =
     (screenPair, onlyPair, notScreenPair, commaMixedTypes, differentTypesPair)
@@ -66,7 +66,7 @@ mixed or other types untouched), and a `not`-prefixed type.
   @media not screen and (max-width: 480px) {._a_wd785ecogb2{width:2px;}}
   @media screen, (min-width: 600px) {._a_mxhpf6luuex{height:1px;}}
   @media (min-width: 900px) {._a_mp5mk6l2v22{height:2px;}}
-  @media only screen and (max-width: 992px) and (not (max-width: 480px)){._a_hi5p16500waktn{font-size:14px;}}
-  @media only screen and (max-width: 480px) {._a_vgp386500wjlif{font-size:12px;}}
-  @media screen and (max-width: 992px) {._a_eod993hlokug7y{border-width:1px;}}
-  @media print and (max-width: 480px) {._a_iy5ye3hlokcoyl{border-width:2px;}}
+  @media only screen and (max-width: 992px) and (not (max-width: 480px)){._a_hi5p165000waktn{font-size:14px;}}
+  @media only screen and (max-width: 480px) {._a_vgp3865000wjlif{font-size:12px;}}
+  @media screen and (max-width: 992px) {._a_eod993h1lokug7y{border-width:1px;}}
+  @media print and (max-width: 480px) {._a_iy5ye3h1lokcoyl{border-width:2px;}}

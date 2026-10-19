@@ -307,6 +307,27 @@ let marker_hardcoded_constants_match_real_registry () =
   Alcotest_extra.assert_string Merge_key.unregistered_custom_marker
     real_custom_marker
 
+(* A mask is a bitset over its family's leaves. [font] has 20 leaves and
+   [border] 17, so the mask field has to hold 20 bits: when it wraps, the
+   mask of [line-height] reads as the bits of five other longhands and a merge
+   drops [font-style] or [font-variant-caps] next to it. *)
+let long_family_longhands_do_not_drop_each_other () =
+  List.iter
+    (fun (first, second) ->
+      let merged = CSS.merge (make first) (make second) in
+      Alcotest_extra.assert_string (CSS.className merged)
+        (Printf.sprintf "%s %s" (class_of first) (class_of second));
+      let merged = CSS.merge (make second) (make first) in
+      Alcotest_extra.assert_string (CSS.className merged)
+        (Printf.sprintf "%s %s" (class_of second) (class_of first)))
+    [
+      "font-style: italic;", "line-height: 1.5;";
+      "font-size-adjust: 0.5;", "line-height: 1.5;";
+      "font-variant-caps: small-caps;", "font-weight: 700;";
+      "line-height: 1.5;", "font-weight: 700;";
+      "border-image-source: none;", "border-top-width: 1px;";
+    ]
+
 let tests =
   [
     Alcotest_extra.test
@@ -380,4 +401,8 @@ let tests =
       "merge of merges is associative: a chain reaches the same result a \
        single pass over every atom would"
       merge_of_merges_is_associative;
+    Alcotest_extra.test
+      "longhands of the 20-leaf font family and the 17-leaf border family \
+       never drop each other"
+      long_family_longhands_do_not_drop_each_other;
   ]

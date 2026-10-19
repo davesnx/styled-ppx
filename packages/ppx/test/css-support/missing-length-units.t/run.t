@@ -32,8 +32,8 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_6l8f82{height:10lh;}"];
   [@css "._a_7pigma{margin:2cap;}"];
   [@css "._a_94h56p{padding:5ic;}"];
-  [@css "._a_6500wsmpm{font-size:1.5lh;}"];
-  [@css "._a_658jk3fhm{line-height:2rlh;}"];
+  [@css "._a_65000wsmpm{font-size:1.5lh;}"];
+  [@css "._a_65b8jk3fhm{line-height:2rlh;}"];
   
   CSS.make("_a_ecuveb", []);
   CSS.make("_a_ec6gk5", []);
@@ -63,5 +63,5 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("_a_6l8f82", []);
   CSS.make("_a_7pigma", []);
   CSS.make("_a_94h56p", []);
-  CSS.make("_a_6500wsmpm", []);
-  CSS.make("_a_658jk3fhm", []);
+  CSS.make("_a_65000wsmpm", []);
+  CSS.make("_a_65b8jk3fhm", []);

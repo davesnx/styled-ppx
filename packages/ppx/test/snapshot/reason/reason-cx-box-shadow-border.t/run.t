@@ -21,10 +21,10 @@
   ._a_3hl0sh{border:2px dashed #ff0000;}
   ._a_3hhj16{border:1px solid transparent;}
   ._a_3hcvhu{border:none;}
-  ._a_3hghs75d5{border-top:1px solid red;}
-  ._a_3hb28q36u{border-right:2px dashed blue;}
-  ._a_3h00731uw{border-bottom:3px dotted green;}
-  ._a_3h1dspk0f{border-left:4px double orange;}
+  ._a_3h2ghs75d5{border-top:1px solid red;}
+  ._a_3h0b28q36u{border-right:2px dashed blue;}
+  ._a_3h000731uw{border-bottom:3px dotted green;}
+  ._a_3h01dspk0f{border-left:4px double orange;}
   ._a_3h5unl{border:1px solid #ccc;}
   ._a_3nrtka{border-radius:8px;}
   ._a_40fjfj{box-shadow:0px 4px 6px 0px rgba(0, 0, 0, 0.1);}
@@ -40,10 +40,10 @@
   ._a_40sn3t{box-shadow:var(--myShadow-af5fmc);}
   ._a_3hpcwd{border:var(--borderWidth-apl5wd) solid black;}
   ._a_40vdp5{box-shadow:var(--shadow-giamln);}
-  ._a_3hlokfl8k{border-width:2px;}
-  ._a_3hsuadx68{border-style:solid;}
-  ._a_3hef5edq6{border-color:#333;}
-  ._a_39004fadc{background-color:var(--bgColor-vilhl2);}
+  ._a_3h1lokfl8k{border-width:2px;}
+  ._a_3h0suadx68{border-style:solid;}
+  ._a_3h0ef5edq6{border-color:#333;}
+  ._a_390004fadc{background-color:var(--bgColor-vilhl2);}
 
 Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
 
@@ -71,13 +71,13 @@ Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
   [@@@css "._a_3h2qc1{border:2px dashed #ff0000;}"]
   [@@@css "._a_3hjkge{border:1px solid transparent;}"]
   [@@@css "._a_3hanm4{border:none;}"]
-  [@@@css "._a_3hghsmzmu{border-top:1px solid red;}"]
-  [@@@css "._a_3hb2879q1{border-right:2px dashed blue;}"]
-  [@@@css "._a_3h00779gh{border-bottom:3px dotted green;}"]
-  [@@@css "._a_3h1dswvke{border-left:4px double orange;}"]
-  [@@@css "._a_3hlokq43j{border-width:2px;}"]
-  [@@@css "._a_3hsua8w2v{border-style:solid;}"]
-  [@@@css "._a_3hef5kaed{border-color:#333;}"]
+  [@@@css "._a_3h2ghsmzmu{border-top:1px solid red;}"]
+  [@@@css "._a_3h0b2879q1{border-right:2px dashed blue;}"]
+  [@@@css "._a_3h000779gh{border-bottom:3px dotted green;}"]
+  [@@@css "._a_3h01dswvke{border-left:4px double orange;}"]
+  [@@@css "._a_3h1lokq43j{border-width:2px;}"]
+  [@@@css "._a_3h0sua8w2v{border-style:solid;}"]
+  [@@@css "._a_3h0ef5kaed{border-color:#333;}"]
   [@@@css "._a_3h257i{border:1px solid #ccc;}"]
   [@@@css "._a_3n6otz{border-radius:8px;}"]
   [@@@css "._a_405761{box-shadow:0px 4px 6px 0px rgba(0, 0, 0, 0.1);}"]
@@ -94,7 +94,7 @@ Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
     "._a_40u3s3{box-shadow:var(--shadowX-11ljgmp) var(--shadowY-1qn6d0z) var(--blur-1bcbjmk) var(--spread-xxpef3) var(--shadowColor-1sod13t);}"]
   [@@@css "._a_40jemk{box-shadow:var(--myShadow-af5fmc);}"]
   [@@@css "._a_3hdrfm{border:var(--borderWidth-apl5wd) solid black;}"]
-  [@@@css "._a_39004pvpe{background-color:var(--bgColor-vilhl2);}"]
+  [@@@css "._a_390004pvpe{background-color:var(--bgColor-vilhl2);}"]
   [@@@css "._a_40ae1x{box-shadow:var(--shadow-giamln);}"]
   [@@@css.bindings
     [("Output.simpleShadow", "_id_1ckmdi6", "_a_4085tv");
@@ -107,9 +107,9 @@ Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
     ("Output.borderTransparent", "_id_tbotla", "_a_3hjkge");
     ("Output.noBorder", "_id_15bfnai", "_a_3hanm4");
     ("Output.borderStyles", "_id_16nbulq",
-      "_a_3hghsmzmu _a_3hb2879q1 _a_3h00779gh _a_3h1dswvke");
+      "_a_3h2ghsmzmu _a_3h0b2879q1 _a_3h000779gh _a_3h01dswvke");
     ("Output.borderSeparate", "_id_122xr42",
-      "_a_3hlokq43j _a_3hsua8w2v _a_3hef5kaed");
+      "_a_3h1lokq43j _a_3h0sua8w2v _a_3h0ef5kaed");
     ("Output.borderWithRadius", "_id_1j83vme", "_a_3h257i _a_3n6otz");
     ("Output.shadowAndBorder", "_id_3k5k4w", "_a_405761 _a_3hwm2g _a_3nkn84");
     ("Output.cardStyle", "_id_1je20li", "_a_4039qm _a_3hxi5p _a_3nezfo");
@@ -119,7 +119,7 @@ Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
     ("Output.shadowFullInterp", "_id_bg3lpz", "_a_40jemk");
     ("Output.borderWidthInterp", "_id_1h8tvcz", "_a_3hdrfm");
     ("Output.mixedCard", "_id_10wtrx1",
-      "_a_39004pvpe _a_3hzctv _a_40ae1x _a_3nkn84")]]
+      "_a_390004pvpe _a_3hzctv _a_40ae1x _a_3nkn84")]]
   let simpleShadow = CSS.make "label:simpleShadow _id_1ckmdi6 _a_4085tv" []
   let multipleShadows =
     CSS.make "label:multipleShadows _id_1urhidx _a_402iep" []
@@ -134,11 +134,11 @@ Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
   let noBorder = CSS.make "label:noBorder _id_15bfnai _a_3hanm4" []
   let borderStyles =
     CSS.make
-      "label:borderStyles _id_16nbulq _a_3hghsmzmu _a_3hb2879q1 _a_3h00779gh _a_3h1dswvke"
+      "label:borderStyles _id_16nbulq _a_3h2ghsmzmu _a_3h0b2879q1 _a_3h000779gh _a_3h01dswvke"
       []
   let borderSeparate =
     CSS.make
-      "label:borderSeparate _id_122xr42 _a_3hlokq43j _a_3hsua8w2v _a_3hef5kaed"
+      "label:borderSeparate _id_122xr42 _a_3h1lokq43j _a_3h0sua8w2v _a_3h0ef5kaed"
       []
   let borderWithRadius =
     CSS.make "label:borderWithRadius _id_1j83vme _a_3h257i _a_3n6otz" []
@@ -173,7 +173,7 @@ Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
     fun borderColor ->
       fun shadow ->
         CSS.make
-          "label:mixedCard _id_10wtrx1 _a_39004pvpe _a_3hzctv _a_40ae1x _a_3nkn84"
+          "label:mixedCard _id_10wtrx1 _a_390004pvpe _a_3hzctv _a_40ae1x _a_3nkn84"
           [("--bgColor-vilhl2", (CSS.Types.Color.toString bgColor));
           ("--borderColor-1on39sz", (CSS.Types.Color.toString borderColor));
           ("--shadow-giamln", (CSS.Types.BoxShadows.toString shadow))]

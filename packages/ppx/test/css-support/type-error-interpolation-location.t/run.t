@@ -37,14 +37,14 @@ If this test fail means that the module is not in sync with the ppx
     "._a_ecanqs{width:-webkit-fit-content;width:-moz-fit-content;width:fit-content;}"
   ];
   [@css
-    "._a_6i00gkbxn{grid-template-columns:fit-content(20px) fit-content(10%);}"
+    "._a_6i000gkbxn{grid-template-columns:fit-content(20px) fit-content(10%);}"
   ];
   [@css
     "._a_cfdqmz{-webkit-text-decoration:var(--cosas-112i897);text-decoration:var(--cosas-112i897);}"
   ];
   let cosas = `bold;
   
-  CSS.make("_a_ecanqs _a_6i00gkbxn", []);
+  CSS.make("_a_ecanqs _a_6i000gkbxn", []);
   
   CSS.make(
     "_a_cfdqmz",

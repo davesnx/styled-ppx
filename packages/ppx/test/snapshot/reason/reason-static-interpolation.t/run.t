@@ -5,15 +5,15 @@
   [@css "@property --black-98dcqh{syntax:\"*\";inherits:false;}"];
   [@css "@property --black-1o7s4tf{syntax:\"*\";inherits:false;}"];
   [@css "._a_4e9vey{color:var(--var-1ee0jdu);}"];
-  [@css "._a_39004n5y8{background-color:var(--black-98dcqh);}"];
-  [@css "._a_3hef5gxfp{border-color:var(--black-1o7s4tf);}"];
+  [@css "._a_390004n5y8{background-color:var(--black-98dcqh);}"];
+  [@css "._a_3h0ef5gxfp{border-color:var(--black-1o7s4tf);}"];
   [@css "._a_5r7eu2{display:block;}"];
   [@css.bindings
     [
       (
         "Output.StringInterpolation",
         "_id_1n1bal7",
-        "_a_4e9vey _a_39004n5y8 _a_3hef5gxfp _a_5r7eu2",
+        "_a_4e9vey _a_390004n5y8 _a_3h0ef5gxfp _a_5r7eu2",
       ),
     ]
   ];
@@ -1009,7 +1009,7 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "label:StringInterpolation _id_1n1bal7 _a_4e9vey _a_39004n5y8 _a_3hef5gxfp _a_5r7eu2",
+        "label:StringInterpolation _id_1n1bal7 _a_4e9vey _a_390004n5y8 _a_3h0ef5gxfp _a_5r7eu2",
         [
           ("--var-1ee0jdu", CSS.Types.Color.toString(Theme.var)),
           ("--black-98dcqh", CSS.Types.Color.toString(black)),

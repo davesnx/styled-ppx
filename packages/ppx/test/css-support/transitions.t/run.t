@@ -49,38 +49,38 @@ If this test fail means that the module is not in sync with the ppx
   [@css "@property --timingFunction-7aarh0{syntax:\"*\";inherits:false;}"];
   [@css "@property --property-1f94jkq{syntax:\"*\";inherits:false;}"];
   [@css "@property --duration-fvn1cf{syntax:\"*\";inherits:false;}"];
-  [@css "._a_dm008lsnu{transition-property:none;}"];
-  [@css "._a_dm0087oni{transition-property:all;}"];
-  [@css "._a_dm0082vzd{transition-property:width;}"];
-  [@css "._a_dm0082xp0{transition-property:width, height;}"];
-  [@css "._a_dm004qcio{transition-duration:0s;}"];
-  [@css "._a_dm004wvco{transition-duration:1s;}"];
-  [@css "._a_dm004abun{transition-duration:100ms;}"];
-  [@css "._a_dm004wbyo{transition-duration:10s, 30s, 230ms;}"];
-  [@css "._a_dm00g62sr{transition-timing-function:ease;}"];
-  [@css "._a_dm00gk20j{transition-timing-function:linear;}"];
-  [@css "._a_dm00gm6mw{transition-timing-function:ease-in;}"];
-  [@css "._a_dm00gwco7{transition-timing-function:ease-out;}"];
-  [@css "._a_dm00grnz4{transition-timing-function:ease-in-out;}"];
+  [@css "._a_dm0008lsnu{transition-property:none;}"];
+  [@css "._a_dm00087oni{transition-property:all;}"];
+  [@css "._a_dm00082vzd{transition-property:width;}"];
+  [@css "._a_dm00082xp0{transition-property:width, height;}"];
+  [@css "._a_dm0004qcio{transition-duration:0s;}"];
+  [@css "._a_dm0004wvco{transition-duration:1s;}"];
+  [@css "._a_dm0004abun{transition-duration:100ms;}"];
+  [@css "._a_dm0004wbyo{transition-duration:10s, 30s, 230ms;}"];
+  [@css "._a_dm000g62sr{transition-timing-function:ease;}"];
+  [@css "._a_dm000gk20j{transition-timing-function:linear;}"];
+  [@css "._a_dm000gm6mw{transition-timing-function:ease-in;}"];
+  [@css "._a_dm000gwco7{transition-timing-function:ease-out;}"];
+  [@css "._a_dm000grnz4{transition-timing-function:ease-in-out;}"];
   [@css
-    "._a_dm00gucrr{transition-timing-function:cubic-bezier(0.5, 0.5, 0.5, 0.5);}"
+    "._a_dm000gucrr{transition-timing-function:cubic-bezier(0.5, 0.5, 0.5, 0.5);}"
   ];
   [@css
-    "._a_dm00ghuiw{transition-timing-function:cubic-bezier(0.5, 1.5, 0.5, -2.5);}"
+    "._a_dm000ghuiw{transition-timing-function:cubic-bezier(0.5, 1.5, 0.5, -2.5);}"
   ];
-  [@css "._a_dm00gkmi5{transition-timing-function:step-start;}"];
-  [@css "._a_dm00gglpi{transition-timing-function:step-end;}"];
-  [@css "._a_dm00gh31g{transition-timing-function:steps(3, start);}"];
-  [@css "._a_dm00g6kkr{transition-timing-function:steps(5, end);}"];
+  [@css "._a_dm000gkmi5{transition-timing-function:step-start;}"];
+  [@css "._a_dm000gglpi{transition-timing-function:step-end;}"];
+  [@css "._a_dm000gh31g{transition-timing-function:steps(3, start);}"];
+  [@css "._a_dm000g6kkr{transition-timing-function:steps(5, end);}"];
   [@css
-    "._a_dm00gj2vv{transition-timing-function:ease, step-start, cubic-bezier(0.1, 0.7, 1, 0.1);}"
+    "._a_dm000gj2vv{transition-timing-function:ease, step-start, cubic-bezier(0.1, 0.7, 1, 0.1);}"
   ];
-  [@css "._a_dm002nxui{transition-delay:1s;}"];
-  [@css "._a_dm002h2bu{transition-delay:-1s;}"];
-  [@css "._a_dm002w8mt{transition-delay:2s, 4ms;}"];
-  [@css "._a_dm001szc2{transition-behavior:normal;}"];
-  [@css "._a_dm001g4wh{transition-behavior:allow-discrete;}"];
-  [@css "._a_dm00158if{transition-behavior:allow-discrete, normal;}"];
+  [@css "._a_dm0002nxui{transition-delay:1s;}"];
+  [@css "._a_dm0002h2bu{transition-delay:-1s;}"];
+  [@css "._a_dm0002w8mt{transition-delay:2s, 4ms;}"];
+  [@css "._a_dm0001szc2{transition-behavior:normal;}"];
+  [@css "._a_dm0001g4wh{transition-behavior:allow-discrete;}"];
+  [@css "._a_dm000158if{transition-behavior:allow-discrete, normal;}"];
   [@css "._a_dmmma2{transition:margin-right 2s, opacity 0.5s;}"];
   [@css "._a_dmzmc5{transition:1s 2s width linear;}"];
   [@css "._a_dmmdqb{transition:none;}"];
@@ -133,32 +133,32 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_dmvqcx{transition:var(--property-1f94jkq) 0.2s;}"];
   [@css "._a_dm4q0n{transition:margin-right var(--duration-fvn1cf);}"];
   
-  CSS.make("_a_dm008lsnu", []);
-  CSS.make("_a_dm0087oni", []);
-  CSS.make("_a_dm0082vzd", []);
-  CSS.make("_a_dm0082xp0", []);
-  CSS.make("_a_dm004qcio", []);
-  CSS.make("_a_dm004wvco", []);
-  CSS.make("_a_dm004abun", []);
-  CSS.make("_a_dm004wbyo", []);
-  CSS.make("_a_dm00g62sr", []);
-  CSS.make("_a_dm00gk20j", []);
-  CSS.make("_a_dm00gm6mw", []);
-  CSS.make("_a_dm00gwco7", []);
-  CSS.make("_a_dm00grnz4", []);
-  CSS.make("_a_dm00gucrr", []);
-  CSS.make("_a_dm00ghuiw", []);
-  CSS.make("_a_dm00gkmi5", []);
-  CSS.make("_a_dm00gglpi", []);
-  CSS.make("_a_dm00gh31g", []);
-  CSS.make("_a_dm00g6kkr", []);
-  CSS.make("_a_dm00gj2vv", []);
-  CSS.make("_a_dm002nxui", []);
-  CSS.make("_a_dm002h2bu", []);
-  CSS.make("_a_dm002w8mt", []);
-  CSS.make("_a_dm001szc2", []);
-  CSS.make("_a_dm001g4wh", []);
-  CSS.make("_a_dm00158if", []);
+  CSS.make("_a_dm0008lsnu", []);
+  CSS.make("_a_dm00087oni", []);
+  CSS.make("_a_dm00082vzd", []);
+  CSS.make("_a_dm00082xp0", []);
+  CSS.make("_a_dm0004qcio", []);
+  CSS.make("_a_dm0004wvco", []);
+  CSS.make("_a_dm0004abun", []);
+  CSS.make("_a_dm0004wbyo", []);
+  CSS.make("_a_dm000g62sr", []);
+  CSS.make("_a_dm000gk20j", []);
+  CSS.make("_a_dm000gm6mw", []);
+  CSS.make("_a_dm000gwco7", []);
+  CSS.make("_a_dm000grnz4", []);
+  CSS.make("_a_dm000gucrr", []);
+  CSS.make("_a_dm000ghuiw", []);
+  CSS.make("_a_dm000gkmi5", []);
+  CSS.make("_a_dm000gglpi", []);
+  CSS.make("_a_dm000gh31g", []);
+  CSS.make("_a_dm000g6kkr", []);
+  CSS.make("_a_dm000gj2vv", []);
+  CSS.make("_a_dm0002nxui", []);
+  CSS.make("_a_dm0002h2bu", []);
+  CSS.make("_a_dm0002w8mt", []);
+  CSS.make("_a_dm0001szc2", []);
+  CSS.make("_a_dm0001g4wh", []);
+  CSS.make("_a_dm000158if", []);
   CSS.make("_a_dmmma2", []);
   CSS.make("_a_dmzmc5", []);
   CSS.make("_a_dmmdqb", []);

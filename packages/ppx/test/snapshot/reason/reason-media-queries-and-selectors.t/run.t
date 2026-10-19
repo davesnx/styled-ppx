@@ -4,13 +4,13 @@
   [@css "@media (min-width: 600px) {._a_izob039qt2j{background:blue;}}"];
   [@css "._a_qyw7u39xfxf:hover{background:green;}"];
   [@css "._a_og90v4ew9gh > p{color:pink;}"];
-  [@css "._a_og90v6500wbeaj > p{font-size:24px;}"];
+  [@css "._a_og90v65000wbeaj > p{font-size:24px;}"];
   [@css.bindings
     [
       (
         "Output.SelectorsMediaQueries",
         "_id_36wyir",
-        "_a_izob039qt2j _a_qyw7u39xfxf _a_og90v4ew9gh _a_og90v6500wbeaj",
+        "_a_izob039qt2j _a_qyw7u39xfxf _a_og90v4ew9gh _a_og90v65000wbeaj",
       ),
     ]
   ];
@@ -999,7 +999,7 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "label:SelectorsMediaQueries _id_36wyir _a_izob039qt2j _a_qyw7u39xfxf _a_og90v4ew9gh _a_og90v6500wbeaj",
+        "label:SelectorsMediaQueries _id_36wyir _a_izob039qt2j _a_qyw7u39xfxf _a_og90v4ew9gh _a_og90v65000wbeaj",
         [],
       );
     let make = (props: makeProps) => {

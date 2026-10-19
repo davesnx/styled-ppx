@@ -26,11 +26,11 @@ keyword, whose error names the property.
   [1]
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css "._a_3n00cl1tb{border-top-radius:10px;}"];
-  [@css "._a_3n00c0ay0{border-top-radius:10px 5px / 2px 1px;}"];
-  [@css "._a_3n00avogz{border-right-radius:4px;}"];
-  [@css "._a_3n0033qjb{border-bottom-radius:4px;}"];
-  [@css "._a_3n005n019{border-left-radius:4px;}"];
+  [@css "._a_3n000cl1tb{border-top-radius:10px;}"];
+  [@css "._a_3n000c0ay0{border-top-radius:10px 5px / 2px 1px;}"];
+  [@css "._a_3n000avogz{border-right-radius:4px;}"];
+  [@css "._a_3n00033qjb{border-bottom-radius:4px;}"];
+  [@css "._a_3n0005n019{border-left-radius:4px;}"];
   [@css "._a_h1g86n{border-block-start-radius:4px;}"];
   [@css "._a_f7b3em{border-block-end-radius:4px;}"];
   [@css "._a_h3hyd2{border-inline-start-radius:4px;}"];
@@ -40,14 +40,14 @@ keyword, whose error names the property.
   [@css "._a_fbjp28{border-limit:corners;}"];
   [@css "._a_fbue5t{border-limit:corners 10px;}"];
   [@css "._a_fbbzmt{border-limit:left 4em;}"];
-  [@css "._a_f9008az3q{border-top-clip:10px 1fr 10px;}"];
-  [@css "._a_f9004yn5u{border-right-clip:none;}"];
-  [@css "._a_f90019q3s{border-bottom-clip:0 10px 1fr 10px;}"];
-  [@css "._a_f9002emob{border-left-clip:5px;}"];
-  [@css "._a_f60021ui5{border-block-start-clip:10px;}"];
-  [@css "._a_f6001l7yx{border-block-end-clip:10px;}"];
-  [@css "._a_fa002ufja{border-inline-start-clip:10px;}"];
-  [@css "._a_fa001u3cc{border-inline-end-clip:10px;}"];
+  [@css "._a_f90008az3q{border-top-clip:10px 1fr 10px;}"];
+  [@css "._a_f90004yn5u{border-right-clip:none;}"];
+  [@css "._a_f900019q3s{border-bottom-clip:0 10px 1fr 10px;}"];
+  [@css "._a_f90002emob{border-left-clip:5px;}"];
+  [@css "._a_f600021ui5{border-block-start-clip:10px;}"];
+  [@css "._a_f60001l7yx{border-block-end-clip:10px;}"];
+  [@css "._a_fa0002ufja{border-inline-start-clip:10px;}"];
+  [@css "._a_fa0001u3cc{border-inline-end-clip:10px;}"];
   [@css "._a_f6ysgj{border-block-clip:10px 1fr;}"];
   [@css "._a_favz6k{border-inline-clip:10px 1fr;}"];
   [@css "._a_f9e3gi{border-clip:0 1fr;}"];
@@ -60,11 +60,11 @@ keyword, whose error names the property.
   [@css "._a_ffw7at{box-shadow-position:inset;}"];
   [@css "._a_ffp1t5{box-shadow-position:outset, inset;}"];
   
-  CSS.make("_a_3n00cl1tb", []);
-  CSS.make("_a_3n00c0ay0", []);
-  CSS.make("_a_3n00avogz", []);
-  CSS.make("_a_3n0033qjb", []);
-  CSS.make("_a_3n005n019", []);
+  CSS.make("_a_3n000cl1tb", []);
+  CSS.make("_a_3n000c0ay0", []);
+  CSS.make("_a_3n000avogz", []);
+  CSS.make("_a_3n00033qjb", []);
+  CSS.make("_a_3n0005n019", []);
   CSS.make("_a_h1g86n", []);
   CSS.make("_a_f7b3em", []);
   CSS.make("_a_h3hyd2", []);
@@ -76,14 +76,14 @@ keyword, whose error names the property.
   CSS.make("_a_fbue5t", []);
   CSS.make("_a_fbbzmt", []);
   
-  CSS.make("_a_f9008az3q", []);
-  CSS.make("_a_f9004yn5u", []);
-  CSS.make("_a_f90019q3s", []);
-  CSS.make("_a_f9002emob", []);
-  CSS.make("_a_f60021ui5", []);
-  CSS.make("_a_f6001l7yx", []);
-  CSS.make("_a_fa002ufja", []);
-  CSS.make("_a_fa001u3cc", []);
+  CSS.make("_a_f90008az3q", []);
+  CSS.make("_a_f90004yn5u", []);
+  CSS.make("_a_f900019q3s", []);
+  CSS.make("_a_f90002emob", []);
+  CSS.make("_a_f600021ui5", []);
+  CSS.make("_a_f60001l7yx", []);
+  CSS.make("_a_fa0002ufja", []);
+  CSS.make("_a_fa0001u3cc", []);
   CSS.make("_a_f6ysgj", []);
   CSS.make("_a_favz6k", []);
   CSS.make("_a_f9e3gi", []);

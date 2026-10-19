@@ -86,10 +86,10 @@ If this test fail means that the module is not in sync with the ppx
   ];
   [@css "._a_3ho3yi{border:1px solid var(--line-10u4hbk);}"];
   [@css "._a_3hyc9x{border:0px none transparent;}"];
-  [@css "._a_3hghs9vd4{border-top:1px solid var(--line-17j5in5);}"];
-  [@css "._a_3h007cjyn{border-bottom:1px solid var(--line-jfym6t);}"];
-  [@css "._a_3h1ds65jw{border-left:1px solid var(--line-2dnuub);}"];
-  [@css "._a_3hb28jvaq{border-right:1px solid var(--line-doha9t);}"];
+  [@css "._a_3h2ghs9vd4{border-top:1px solid var(--line-17j5in5);}"];
+  [@css "._a_3h0007cjyn{border-bottom:1px solid var(--line-jfym6t);}"];
+  [@css "._a_3h01ds65jw{border-left:1px solid var(--line-2dnuub);}"];
+  [@css "._a_3h0b28jvaq{border-right:1px solid var(--line-doha9t);}"];
   [@css "._a_3hmcmj{border:1px dashed var(--line-uf1ggy);}"];
   [@css "._a_3htowz{border:1px none var(--line-1i61so0);}"];
   [@css "._a_8pct1l{outline:1px solid var(--line-18cgk19);}"];
@@ -238,19 +238,19 @@ If this test fail means that the module is not in sync with the ppx
   );
   CSS.make("_a_3hyc9x", []);
   CSS.make(
-    "_a_3hghs9vd4",
+    "_a_3h2ghs9vd4",
     [("--line-17j5in5", CSS.Types.Color.toString(Color.Border.line))],
   );
   CSS.make(
-    "_a_3h007cjyn",
+    "_a_3h0007cjyn",
     [("--line-jfym6t", CSS.Types.Color.toString(Color.Border.line))],
   );
   CSS.make(
-    "_a_3h1ds65jw",
+    "_a_3h01ds65jw",
     [("--line-2dnuub", CSS.Types.Color.toString(Color.Border.line))],
   );
   CSS.make(
-    "_a_3hb28jvaq",
+    "_a_3h0b28jvaq",
     [("--line-doha9t", CSS.Types.Color.toString(Color.Border.line))],
   );
   CSS.make(

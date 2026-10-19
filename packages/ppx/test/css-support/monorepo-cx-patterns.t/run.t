@@ -36,11 +36,11 @@ If this test fail means that the module is not in sync with the ppx
     "._a_h5nao400v5z:hover{box-shadow:1px 0 0 0 var(--line-1rsudnc_1), inset 0 -1px 0 0 var(--line-1rsudnc_2) !important;}"
   ];
   [@css "._a_4eyeca{color:var(--secondary-hfvj8d);}"];
-  [@css "._a_qyw7u39004kqt8:hover{background-color:var(--box_-1n2q0et);}"];
+  [@css "._a_qyw7u390004kqt8:hover{background-color:var(--box_-1n2q0et);}"];
   [@css
     "._a_qyw7u40rvac:hover{box-shadow:1px 0 0 0 var(--line-3w1stm_1), inset 1px 0 0 0 var(--line-3w1stm_2), inset 0 -1px 0 0 var(--line-3w1stm_3);}"
   ];
-  [@css "._a_60002gxme{flex-grow:1;}"];
+  [@css "._a_600002gxme{flex-grow:1;}"];
   [@css "._a_ekz5ec{z-index:1;}"];
   [@css "._a_dmsoaq{transition:all 200ms ease 0ms;}"];
   [@css "._a_y4vkx8cytek._id_1wtohw8{min-width:0;}"];
@@ -60,13 +60,13 @@ If this test fail means that the module is not in sync with the ppx
       (
         "Input._tabText",
         "_id_e443o3",
-        "_a_4eyeca _a_qyw7u39004kqt8 _a_qyw7u40rvac",
+        "_a_4eyeca _a_qyw7u390004kqt8 _a_qyw7u40rvac",
       ),
       ("Input._sidebarClosed", "_id_1wtohw8", ""),
       (
         "Input._sidebar",
         "_id_jjvyqu",
-        "_a_60002gxme _a_ekz5ec _a_dmsoaq _a_y4vkx8cytek _a_y4vkx88twos _a_y4vkx8mm5d1 _a_y4vkx8r3w86",
+        "_a_600002gxme _a_ekz5ec _a_dmsoaq _a_y4vkx8cytek _a_y4vkx88twos _a_y4vkx8mm5d1 _a_y4vkx8r3w86",
       ),
       ("Input._checkbox", "_id_1sltg0l", "_a_oe8sadmq5th"),
       ("Input._transitions", "_id_1jxvvla", "_a_dmm8mm"),
@@ -114,7 +114,7 @@ If this test fail means that the module is not in sync with the ppx
   
   let _tabText =
     CSS.make(
-      "label:_tabText _id_e443o3 _a_4eyeca _a_qyw7u39004kqt8 _a_qyw7u40rvac",
+      "label:_tabText _id_e443o3 _a_4eyeca _a_qyw7u390004kqt8 _a_qyw7u40rvac",
       [
         ("--secondary-hfvj8d", CSS.Types.Color.toString(Color.Text.secondary)),
         ("--box_-1n2q0et", CSS.Types.Color.toString(Color.Background.box_)),
@@ -128,7 +128,7 @@ If this test fail means that the module is not in sync with the ppx
   
   let _sidebar =
     CSS.make(
-      "label:_sidebar _id_jjvyqu _a_60002gxme _a_ekz5ec _a_dmsoaq _a_y4vkx8cytek _a_y4vkx88twos _a_y4vkx8mm5d1 _a_y4vkx8r3w86",
+      "label:_sidebar _id_jjvyqu _a_600002gxme _a_ekz5ec _a_dmsoaq _a_y4vkx8cytek _a_y4vkx88twos _a_y4vkx8mm5d1 _a_y4vkx8r3w86",
       [],
     );
   

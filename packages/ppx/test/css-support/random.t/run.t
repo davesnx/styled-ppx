@@ -40,7 +40,7 @@ If this test fail means that the module is not in sync with the ppx
     "._a_33rcf8{-webkit-appearance:none;-moz-appearance:none;appearance:none;}"
   ];
   [@css "._a_35qiim{aspect-ratio:21 / 8;}"];
-  [@css "._a_390049niw{background-color:var(--c-17nwon4);}"];
+  [@css "._a_3900049niw{background-color:var(--c-17nwon4);}"];
   [@css "._a_3hanm4{border:none;}"];
   [@css "._a_3hz56g{border:1px;}"];
   [@css "._a_3hqhxu{border:thin;}"];
@@ -50,14 +50,14 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_3hrvox{border:thin dashed red;}"];
   [@css "._a_3hh4t0{border:2px dotted #333;}"];
   [@css "._a_3hznxf{border:medium double blue;}"];
-  [@css "._a_71001842v{bottom:unset;}"];
+  [@css "._a_710001842v{bottom:unset;}"];
   [@css "._a_40keqi{box-shadow:none;}"];
   [@css "._a_44n7nl{break-inside:avoid;}"];
   [@css "._a_48dnqv{caret-color:#e15a46;}"];
   [@css "._a_4ey3yl{color:inherit;}"];
   [@css "._a_4ec5tt{color:var(--color-link);}"];
-  [@css "._a_4o004mo4e{-webkit-column-width:125px;column-width:125px;}"];
-  [@css "._a_4o00422l4{-webkit-column-width:auto;column-width:auto;}"];
+  [@css "._a_4o0004mo4e{-webkit-column-width:125px;column-width:125px;}"];
+  [@css "._a_4o000422l4{-webkit-column-width:auto;column-width:auto;}"];
   [@css "._a_5f5by5{counter-increment:ol;}"];
   [@css "._a_5gor4s{counter-reset:ol;}"];
   [@css "._a_5rejxd{display:-webkit-box;}"];
@@ -66,42 +66,42 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_5wu6n6{fill:var(--c-1729nrm);}"];
   [@css "._a_5wzqgg{fill:currentColor;}"];
   [@css "._a_6ffv11{gap:4px;}"];
-  [@css "._a_6j001xyc7{grid-column-end:span 2;}"];
-  [@css "._a_6j003e1eh{grid-column:unset;}"];
-  [@css "._a_6j00crf94{grid-row:unset;}"];
-  [@css "._a_6i00gz6hb{grid-template-columns:max-content max-content;}"];
+  [@css "._a_6j0001xyc7{grid-column-end:span 2;}"];
+  [@css "._a_6j0003e1eh{grid-column:unset;}"];
+  [@css "._a_6j000crf94{grid-row:unset;}"];
+  [@css "._a_6i000gz6hb{grid-template-columns:max-content max-content;}"];
   [@css
-    "._a_6i00ggo9j{grid-template-columns:minmax(10px, auto) fit-content(20px) fit-content(20px);}"
+    "._a_6i000ggo9j{grid-template-columns:minmax(10px, auto) fit-content(20px) fit-content(20px);}"
   ];
   [@css
-    "._a_6i00gyg51{grid-template-columns:minmax(51px, auto) fit-content(20px) fit-content(20px);}"
+    "._a_6i000gyg51{grid-template-columns:minmax(51px, auto) fit-content(20px) fit-content(20px);}"
   ];
-  [@css "._a_6i00gwvwy{grid-template-columns:repeat(2, auto);}"];
-  [@css "._a_6i00gu6jz{grid-template-columns:repeat(3, auto);}"];
+  [@css "._a_6i000gwvwy{grid-template-columns:repeat(2, auto);}"];
+  [@css "._a_6i000gu6jz{grid-template-columns:repeat(3, auto);}"];
   [@css
     "._a_6l0xge{height:-webkit-fit-content;height:-moz-fit-content;height:fit-content;}"
   ];
-  [@css "._a_9i0027xd1{justify-items:start;}"];
-  [@css "._a_9j002oybl{justify-self:unset;}"];
-  [@css "._a_71002rhel{left:unset;}"];
+  [@css "._a_9i00027xd1{justify-items:start;}"];
+  [@css "._a_9j0002oybl{justify-self:unset;}"];
+  [@css "._a_710002rhel{left:unset;}"];
   [@css
-    "._a_7y074aouu{-webkit-mask-image:var(--maskedImageUrl-q8tx22);mask-image:var(--maskedImageUrl-q8tx22);}"
+    "._a_7y0074aouu{-webkit-mask-image:var(--maskedImageUrl-q8tx22);mask-image:var(--maskedImageUrl-q8tx22);}"
   ];
   [@css
-    "._a_7y1kwck5z{-webkit-mask-position:center center;mask-position:center center;}"
+    "._a_7y01kwck5z{-webkit-mask-position:center center;mask-position:center center;}"
   ];
-  [@css "._a_7y35sawfw{-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;}"];
+  [@css "._a_7y035sawfw{-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;}"];
   [@css
     "._a_88c9a0{max-width:-webkit-max-content;max-width:-moz-max-content;max-width:max-content;}"
   ];
   [@css "._a_8p12fz{outline:none;}"];
   [@css "._a_9ln4zy{position:unset;}"];
   [@css "._a_9y6l6w{resize:none;}"];
-  [@css "._a_71004k6z4{right:calc(50% - 4px);}"];
+  [@css "._a_710004k6z4{right:calc(50% - 4px);}"];
   [@css "._a_c0y1y6{stroke-opacity:0;}"];
   [@css "._a_btaxxd{stroke:var(--text-1dckpp2);}"];
-  [@css "._a_710083v5j{top:calc(50% - 1px);}"];
-  [@css "._a_710081c45{top:unset;}"];
+  [@css "._a_7100083v5j{top:calc(50% - 1px);}"];
+  [@css "._a_7100081c45{top:unset;}"];
   [@css "._a_dhsbrd{touch-action:none;}"];
   [@css "._a_dhee94{touch-action:pan-x pan-y;}"];
   [@css "._a_dkf4tj{transform-origin:center bottom;}"];
@@ -121,22 +121,22 @@ If this test fail means that the module is not in sync with the ppx
   [@css
     "._a_ec3le8{width:-webkit-max-content;width:-moz-max-content;width:max-content;}"
   ];
-  [@css "._a_dm002v97v{transition-delay:240ms;}"];
+  [@css "._a_dm0002v97v{transition-delay:240ms;}"];
   [@css
-    "._a_2z008i4el{-webkit-animation-duration:150ms;animation-duration:150ms;}"
+    "._a_2z0008i4el{-webkit-animation-duration:150ms;animation-duration:150ms;}"
   ];
-  [@css "._a_3hlokslom{border-width:thin;}"];
-  [@css "._a_8p004cl79{outline-width:medium;}"];
+  [@css "._a_3h1lokslom{border-width:thin;}"];
+  [@css "._a_8p0004cl79{outline-width:medium;}"];
   [@css "._a_8pehrx{outline:medium solid red;}"];
   [@css "._a_8rd3yo{overflow:var(--lola-1i7n24a);}"];
   [@css "._a_8rbazn{overflow:hidden;}"];
-  [@css "._a_8r0022x0l{overflow-y:var(--lola-s8vp25);}"];
-  [@css "._a_8r001o3b9{overflow-x:hidden;}"];
+  [@css "._a_8r00022x0l{overflow-y:var(--lola-s8vp25);}"];
+  [@css "._a_8r0001o3b9{overflow-x:hidden;}"];
   [@css "._a_8ti9nl{overflow-block:hidden;}"];
   [@css "._a_8trkd7{overflow-block:var(--value-d1jms4);}"];
   [@css "._a_8wl9bh{overflow-inline:var(--value-4g8iss);}"];
   [@css
-    "._a_39008a0mj{background-image:linear-gradient(84deg, #F80 0%, rgba(255, 255, 255, 0.8) 50%, #2A97FF 100%);}"
+    "._a_390008a0mj{background-image:linear-gradient(84deg, #F80 0%, rgba(255, 255, 255, 0.8) 50%, #2A97FF 100%);}"
   ];
   [@css "._a_35vr3s{aspect-ratio:16 / 9;}"];
   [@css "._in_1ter7ii{right:var(--interpolation-it7nat);}"];
@@ -176,7 +176,7 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("_a_35qiim", []);
   
   let c = CSS.hex("e15a46");
-  CSS.make("_a_390049niw", [("--c-17nwon4", CSS.Types.Color.toString(c))]);
+  CSS.make("_a_3900049niw", [("--c-17nwon4", CSS.Types.Color.toString(c))]);
   
   CSS.make("_a_3hanm4", []);
   
@@ -190,14 +190,14 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("_a_3hrvox", []);
   CSS.make("_a_3hh4t0", []);
   CSS.make("_a_3hznxf", []);
-  CSS.make("_a_71001842v", []);
+  CSS.make("_a_710001842v", []);
   CSS.make("_a_40keqi", []);
   CSS.make("_a_44n7nl", []);
   CSS.make("_a_48dnqv", []);
   CSS.make("_a_4ey3yl", []);
   CSS.make("_a_4ec5tt", []);
-  CSS.make("_a_4o004mo4e", []);
-  CSS.make("_a_4o00422l4", []);
+  CSS.make("_a_4o0004mo4e", []);
+  CSS.make("_a_4o000422l4", []);
   CSS.make("_a_5f5by5", []);
   CSS.make("_a_5gor4s", []);
   CSS.make("_a_5rejxd", []);
@@ -206,41 +206,41 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("_a_5wu6n6", [("--c-1729nrm", CSS.Types.Paint.toString(c))]);
   CSS.make("_a_5wzqgg", []);
   CSS.make("_a_6ffv11", []);
-  CSS.make("_a_6j001xyc7", []);
-  CSS.make("_a_6j003e1eh", []);
-  CSS.make("_a_6j00crf94", []);
-  CSS.make("_a_6i00gz6hb", []);
-  CSS.make("_a_6i00ggo9j", []);
-  CSS.make("_a_6i00gyg51", []);
-  CSS.make("_a_6i00gwvwy", []);
-  CSS.make("_a_6i00gu6jz", []);
+  CSS.make("_a_6j0001xyc7", []);
+  CSS.make("_a_6j0003e1eh", []);
+  CSS.make("_a_6j000crf94", []);
+  CSS.make("_a_6i000gz6hb", []);
+  CSS.make("_a_6i000ggo9j", []);
+  CSS.make("_a_6i000gyg51", []);
+  CSS.make("_a_6i000gwvwy", []);
+  CSS.make("_a_6i000gu6jz", []);
   CSS.make("_a_6l0xge", []);
-  CSS.make("_a_9i0027xd1", []);
-  CSS.make("_a_9j002oybl", []);
-  CSS.make("_a_71002rhel", []);
+  CSS.make("_a_9i00027xd1", []);
+  CSS.make("_a_9j0002oybl", []);
+  CSS.make("_a_710002rhel", []);
   let maskedImageUrl = `url("https://www.example.com/eye-uncrossed.svg");
   CSS.make(
-    "_a_7y074aouu",
+    "_a_7y0074aouu",
     [
       ("--maskedImageUrl-q8tx22", CSS.Types.MaskImage.toString(maskedImageUrl)),
     ],
   );
-  CSS.make("_a_7y1kwck5z", []);
-  CSS.make("_a_7y35sawfw", []);
+  CSS.make("_a_7y01kwck5z", []);
+  CSS.make("_a_7y035sawfw", []);
   CSS.make("_a_88c9a0", []);
   CSS.make("_a_8p12fz", []);
   CSS.make("_a_8snuue", []);
   CSS.make("_a_9ln4zy", []);
   CSS.make("_a_9y6l6w", []);
-  CSS.make("_a_71004k6z4", []);
+  CSS.make("_a_710004k6z4", []);
   CSS.make("_a_aajuhq", []);
   CSS.make("_a_c0y1y6", []);
   CSS.make(
     "_a_btaxxd",
     [("--text-1dckpp2", CSS.Types.Paint.toString(Color.text))],
   );
-  CSS.make("_a_710083v5j", []);
-  CSS.make("_a_710081c45", []);
+  CSS.make("_a_7100083v5j", []);
+  CSS.make("_a_7100081c45", []);
   CSS.make("_a_dhsbrd", []);
   CSS.make("_a_dhee94", []);
   CSS.make("_a_dkf4tj", []);
@@ -256,11 +256,11 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("_a_ecanqs", []);
   CSS.make("_a_ec3le8", []);
   
-  CSS.make("_a_dm002v97v", []);
-  CSS.make("_a_2z008i4el", []);
+  CSS.make("_a_dm0002v97v", []);
+  CSS.make("_a_2z0008i4el", []);
   
-  CSS.make("_a_3hlokslom", []);
-  CSS.make("_a_8p004cl79", []);
+  CSS.make("_a_3h1lokslom", []);
+  CSS.make("_a_8p0004cl79", []);
   CSS.make("_a_8pehrx", []);
   
   let lola = `hidden;
@@ -270,10 +270,10 @@ If this test fail means that the module is not in sync with the ppx
   );
   CSS.make("_a_8rbazn", []);
   CSS.make(
-    "_a_8r0022x0l",
+    "_a_8r00022x0l",
     [("--lola-s8vp25", CSS.Types.OverflowY.toString(lola))],
   );
-  CSS.make("_a_8r001o3b9", []);
+  CSS.make("_a_8r0001o3b9", []);
   
   let value = `clip;
   CSS.make("_a_8ti9nl", []);
@@ -286,7 +286,7 @@ If this test fail means that the module is not in sync with the ppx
     [("--value-4g8iss", CSS.Types.OverflowInline.toString(value))],
   );
   
-  CSS.make("_a_39008a0mj", []);
+  CSS.make("_a_390008a0mj", []);
   
   CSS.make("_a_35vr3s", []);
   

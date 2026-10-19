@@ -56,20 +56,20 @@ Interpolation native PPX transformations are checked as a cram snapshot.
   [@css "._a_94pp3j{padding:var(--small-1d5k27v) 0px;}"];
   [@css "._a_3h97be{border:1px solid var(--alpha-vlpuld);}"];
   [@css "._a_8pyj1z{outline:1px solid var(--alpha-1ftvcb4);}"];
-  [@css "._a_3h007w55u{border-bottom:0px solid var(--alpha-1y5ijmp);}"];
+  [@css "._a_3h0007w55u{border-bottom:0px solid var(--alpha-1y5ijmp);}"];
   [@css "._a_eckyy8{width:var(--width-18c1xss);}"];
   [@css "._a_88nebp{max-width:var(--max-1yrxnfd);}"];
   [@css "._a_6lvooa{height:var(--height-1n9troi);}"];
   [@css "._a_3nd0d4{border-radius:var(--border-8yt3ey);}"];
-  [@css "._a_6500wu0qi{font-size:var(--font-10lt5gt);}"];
-  [@css "._a_65001szir{font-family:var(--mono-e5legw);}"];
-  [@css "._a_658jkfd7x{line-height:var(--lh-uai7u3);}"];
+  [@css "._a_65000wu0qi{font-size:var(--font-10lt5gt);}"];
+  [@css "._a_650001szir{font-family:var(--mono-e5legw);}"];
+  [@css "._a_65b8jkfd7x{line-height:var(--lh-uai7u3);}"];
   [@css "._a_ekfgx3{z-index:var(--zLevel-vut76j);}"];
-  [@css "._a_71002egw0{left:var(--left-1s2hr3z);}"];
-  [@css "._a_cf0018kmj{text-decoration-color:var(--decorationColor-seqvqc);}"];
-  [@css "._a_39008o5gx{background-image:var(--wat-tevp0f);}"];
+  [@css "._a_710002egw0{left:var(--left-1s2hr3z);}"];
+  [@css "._a_cf00018kmj{text-decoration-color:var(--decorationColor-seqvqc);}"];
+  [@css "._a_390008o5gx{background-image:var(--wat-tevp0f);}"];
   [@css
-    "._a_7y074nm6u{-webkit-mask-image:var(--externalImageUrl-75mq6y);mask-image:var(--externalImageUrl-75mq6y);}"
+    "._a_7y0074nm6u{-webkit-mask-image:var(--externalImageUrl-75mq6y);mask-image:var(--externalImageUrl-75mq6y);}"
   ];
   [@css
     "._a_cy50p4{text-shadow:var(--h-ulszyz) var(--v-1rucg2y) var(--blur-n5ddfa) var(--color-1jwocqc);}"
@@ -84,16 +84,16 @@ Interpolation native PPX transformations are checked as a cram snapshot.
   [@css "._a_40l5g5{box-shadow:var(--elevation-jhhehb);}"];
   [@css "._a_40keqi{box-shadow:none;}"];
   [@css "._a_cwbaal{text-overflow:var(--clip-1go0jdu);}"];
-  [@css "._a_dm0048edy{transition-duration:500ms;}"];
-  [@css "._a_dm0046hu1{transition-duration:var(--duration-i5tvzn);}"];
+  [@css "._a_dm00048edy{transition-duration:500ms;}"];
+  [@css "._a_dm00046hu1{transition-duration:var(--duration-i5tvzn);}"];
   [@css
-    "._a_2z03ken0s{-webkit-animation-play-state:var(--state-1yj1w6c);animation-play-state:var(--state-1yj1w6c);}"
+    "._a_2z003ken0s{-webkit-animation-play-state:var(--state-1yj1w6c);animation-play-state:var(--state-1yj1w6c);}"
   ];
   [@css
-    "._a_2z03kbnre{-webkit-animation-play-state:paused;animation-play-state:paused;}"
+    "._a_2z003kbnre{-webkit-animation-play-state:paused;animation-play-state:paused;}"
   ];
   [@css
-    "._a_6f001nyl9{-webkit-column-gap:var(--px30-cc29mn);column-gap:var(--px30-cc29mn);}"
+    "._a_6f0001nyl9{-webkit-column-gap:var(--px30-cc29mn);column-gap:var(--px30-cc29mn);}"
   ];
   [@css "._a_2k9yln{-webkit-text-fill-color:var(--red-w69rb9);}"];
   module Size = {
@@ -177,7 +177,7 @@ Interpolation native PPX transformations are checked as a cram snapshot.
     );
   let _ =
     CSS.make(
-      "_a_3h007w55u",
+      "_a_3h0007w55u",
       [("--alpha-1y5ijmp", CSS.Types.Color.toString(Color.Border.alpha))],
     );
   let _ =
@@ -202,17 +202,17 @@ Interpolation native PPX transformations are checked as a cram snapshot.
     );
   let _ =
     CSS.make(
-      "_a_6500wu0qi",
+      "_a_65000wu0qi",
       [("--font-10lt5gt", CSS.Types.FontSize.toString(font))],
     );
   let _ =
     CSS.make(
-      "_a_65001szir",
+      "_a_650001szir",
       [("--mono-e5legw", CSS.Types.FontFamilies.toString(mono))],
     );
   let _ =
     CSS.make(
-      "_a_658jkfd7x",
+      "_a_65b8jkfd7x",
       [("--lh-uai7u3", CSS.Types.LineHeight.toString(lh))],
     );
   let _ =
@@ -222,24 +222,24 @@ Interpolation native PPX transformations are checked as a cram snapshot.
     );
   let _ =
     CSS.make(
-      "_a_71002egw0",
+      "_a_710002egw0",
       [("--left-1s2hr3z", CSS.Types.Left.toString(left))],
     );
   let _ =
     CSS.make(
-      "_a_cf0018kmj",
+      "_a_cf00018kmj",
       [
         ("--decorationColor-seqvqc", CSS.Types.Color.toString(decorationColor)),
       ],
     );
   let _ =
     CSS.make(
-      "_a_39008o5gx",
+      "_a_390008o5gx",
       [("--wat-tevp0f", CSS.Types.BackgroundImage.toString(wat))],
     );
   let _ =
     CSS.make(
-      "_a_7y074nm6u",
+      "_a_7y0074nm6u",
       [
         (
           "--externalImageUrl-75mq6y",
@@ -297,23 +297,23 @@ Interpolation native PPX transformations are checked as a cram snapshot.
       "_a_cwbaal",
       [("--clip-1go0jdu", CSS.Types.TextOverflow.toString(clip))],
     );
-  let _ = CSS.make("_a_dm0048edy", []);
+  let _ = CSS.make("_a_dm00048edy", []);
   let _ =
     CSS.make(
-      "_a_dm0046hu1",
+      "_a_dm00046hu1",
       [
         ("--duration-i5tvzn", CSS.Types.TransitionDuration.toString(duration)),
       ],
     );
   let _ =
     CSS.make(
-      "_a_2z03ken0s",
+      "_a_2z003ken0s",
       [("--state-1yj1w6c", CSS.Types.AnimationPlayState.toString(state))],
     );
-  let _ = CSS.make("_a_2z03kbnre", []);
+  let _ = CSS.make("_a_2z003kbnre", []);
   let _ =
     CSS.make(
-      "_a_6f001nyl9",
+      "_a_6f0001nyl9",
       [("--px30-cc29mn", CSS.Types.Gap.toString(Size.px30))],
     );
   let _ =

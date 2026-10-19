@@ -27,8 +27,8 @@ in its own binding, so it mints a real, slot-keyed `_a_` atom - same path a
 static atom uses - not an `_in_` bundle; see `Slot_key.t.bundle`'s doc.)
 
   $ grep -ho '_a_[0-9a-z]*{background-color:var(--[A-Za-z0-9_-]*);}' a.ml b.ml
-  _a_39004qac1{background-color:var(--box-11ifi3f);}
-  _a_39004qac1{background-color:var(--box-11ifi3f);}
+  _a_390004qac1{background-color:var(--box-11ifi3f);}
+  _a_390004qac1{background-color:var(--box-11ifi3f);}
 
 Each module's runtime binding sets the same custom property:
 
@@ -50,4 +50,4 @@ background).
   @property --box-11ifi3f{syntax:"*";inherits:false;}
   ._a_5r08qs{display:flex;}
   ._a_94gf8j{padding:8px;}
-  ._a_39004qac1{background-color:var(--box-11ifi3f);}
+  ._a_390004qac1{background-color:var(--box-11ifi3f);}

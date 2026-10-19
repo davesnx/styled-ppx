@@ -191,6 +191,19 @@ let format_tests =
         (Class_format.bundle_class content)
         (Class_format.slot_class slot content));
     Alcotest_extra.test
+      "the mask field holds the full mask of every family (a mask wider than \
+       the field would wrap and read as the bits of other longhands)" (fun () ->
+      let limit = int_of_float (36. ** float_of_int Class_format.mask_width) in
+      let too_wide =
+        Array.to_list Slot_key.seed
+        |> List.filter (fun property ->
+          Slot_key.Family.full_mask_of property >= limit)
+        |> List.sort_uniq compare
+      in
+      Alcotest.check
+        (Alcotest.list Alcotest.string)
+        "properties whose family mask does not fit" [] too_wide);
+    Alcotest_extra.test
       "the six possible non-bundle extra-length values are pairwise distinct \
        (the property that makes runtime parsing unambiguous)" (fun () ->
       let lengths = Class_format.possible_extra_lengths in

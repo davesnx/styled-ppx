@@ -63820,7 +63820,7 @@ function fields_of_extra(extra) {
       false,
       false
     ];
-  } else if (extra === 3) {
+  } else if (extra === 4) {
     return [
       false,
       true,
@@ -63838,7 +63838,7 @@ function fields_of_extra(extra) {
       false,
       true
     ];
-  } else if (extra === 8) {
+  } else if (extra === 9) {
     return [
       true,
       true,
@@ -63876,7 +63876,7 @@ function parse_atom(class_name) {
   const context = match[0] ? take3(5) : "";
   const family = take3(2);
   const extended = match[2] ? take3(6) : void 0;
-  const mask = match[1] ? base36_value(take3(3)) : void 0;
+  const mask = match[1] ? base36_value(take3(4)) : void 0;
   take3(4);
   return {
     context,
@@ -63984,7 +63984,7 @@ function merge_class_names(former, latter) {
 }
 var context_width = 5;
 var family_width = 2;
-var mask_width = 3;
+var mask_width = 4;
 var value_width = 4;
 var extended_width = 6;
 
@@ -64464,7 +64464,7 @@ var AppGlobalStyles = {
   make: make8
 };
 var stack = make7(
-  "label:stack _id_1pxsjq1 _a_5r1fx4 _a_61001bumx",
+  "label:stack _id_1pxsjq1 _a_5r1fx4 _a_610001bumx",
   /* [] */
   0
 );
@@ -64477,7 +64477,7 @@ function getOrEmpty(str) {
 }
 function styles2(lolaOpt, param) {
   const lola = lolaOpt !== void 0 ? lolaOpt : px2(0);
-  return make7("label:Cositas _id_u5iy82 _a_5r1fx4 _a_61001bumx _a_6f6fnz", {
+  return make7("label:Cositas _id_u5iy82 _a_5r1fx4 _a_610001bumx _a_6f6fnz", {
     hd: [
       "--lola-8erbae",
       Gap.toString(lola)
@@ -64515,32 +64515,32 @@ var selectors = make7(
 );
 var bounce = AnimationName.make(void 0, "_k_deb5ee");
 var clx = make7(
-  "label:clx _id_7f7nwl _a_65001iz7u _a_5lx1dp _a_6i00glaaa",
+  "label:clx _id_7f7nwl _a_650001iz7u _a_5lx1dp _a_6i000glaaa",
   /* [] */
   0
 );
 var post = make7(
-  "label:post _id_1ouuv5z _a_3h7g4z _a_4v002an9u",
+  "label:post _id_1ouuv5z _a_3h7g4z _a_4v0002an9u",
   /* [] */
   0
 );
 var card = make7(
-  "label:card _id_ekr4vx _a_7pscym _a_3hddty _a_6500w2eld",
+  "label:card _id_ekr4vx _a_7pscym _a_3hddty _a_65000w2eld",
   /* [] */
   0
 );
 var container = make7(
-  "label:container _id_3949vv _a_p3y4xec8xdh _a_p3y4x39004i85y _a_p3y4x6500ww99w _a_2grgh65m9szns1",
+  "label:container _id_3949vv _a_p3y4xec8xdh _a_p3y4x390004i85y _a_p3y4x65000ww99w _a_2grgh655m9szns1",
   /* [] */
   0
 );
 var gradiend = make7(
-  "label:gradiend _id_whzzqa _a_94jps9 _a_39008j78y",
+  "label:gradiend _id_whzzqa _a_94jps9 _a_390008j78y",
   /* [] */
   0
 );
 var tag = make7(
-  "label:tag _id_p2v853 _a_5r4ri2 _a_94atxh _a_7p002nvj1 _a_3h86iq _a_3nhw0l",
+  "label:tag _id_p2v853 _a_5r4ri2 _a_94atxh _a_7p0002nvj1 _a_3h86iq _a_3nhw0l",
   /* [] */
   0
 );
@@ -64548,22 +64548,22 @@ var Labels = {
   tag
 };
 var childLabel = make7(
-  "label:childLabel _id_mapgd _a_65m9shrn5",
+  "label:childLabel _id_mapgd _a_655m9shrn5",
   /* [] */
   0
 );
 var parentWithChildSelector = make7(
-  "label:parentWithChildSelector _id_1ec7v4x _a_3hgl9r _a_94ud5c _a_7p001o874 _a_ozjdw4exogy _a_czcm139jbly",
+  "label:parentWithChildSelector _id_1ec7v4x _a_3hgl9r _a_94ud5c _a_7p0001o874 _a_ozjdw4exogy _a_czcm139jbly",
   /* [] */
   0
 );
 var modifierActive = make7(
-  "label:modifierActive _id_h03zfx _a_65m9shrn5",
+  "label:modifierActive _id_h03zfx _a_655m9shrn5",
   /* [] */
   0
 );
 var toggle = make7(
-  "label:toggle _id_8jiwri _a_5r4ri2 _a_94q2r6 _a_7p004gtl7 _a_3hmfgf _a_3n9mlt _a_lmw1g39bg96 _a_lmw1g3hef5176a",
+  "label:toggle _id_8jiwri _a_5r4ri2 _a_94q2r6 _a_7p0004gtl7 _a_3hmfgf _a_3n9mlt _a_lmw1g39bg96 _a_lmw1g3h0ef5176a",
   /* [] */
   0
 );
@@ -64596,7 +64596,7 @@ var faqCollapsed = make7(
   0
 );
 var marginTopZero = make7(
-  "label:marginTopZero _id_o7aab6 _a_7p008qkzl",
+  "label:marginTopZero _id_o7aab6 _a_7p0008qkzl",
   /* [] */
   0
 );
@@ -64611,7 +64611,7 @@ var marginAll10Reversed = make7(
   0
 );
 var marginTopZeroReversed = make7(
-  "label:marginTopZeroReversed _id_1oco6kb _a_7p008qkzl",
+  "label:marginTopZeroReversed _id_1oco6kb _a_7p0008qkzl",
   /* [] */
   0
 );
@@ -64735,12 +64735,12 @@ var assocC = make7(
   0
 );
 var paddingBothZero = make7(
-  "label:paddingBothZero _id_w5knev _a_94002vk8k _a_94004mw5y",
+  "label:paddingBothZero _id_w5knev _a_940002vk8k _a_940004mw5y",
   /* [] */
   0
 );
 var paddingLeft4 = make7(
-  "label:paddingLeft4 _id_hmbwdd _a_940029r9v",
+  "label:paddingLeft4 _id_hmbwdd _a_9400029r9v",
   /* [] */
   0
 );
@@ -64771,7 +64771,7 @@ var identityKeptHighlight = make7(
 );
 var primary = hex2("141414");
 function keyframeDemoShell(color) {
-  return make7("label:keyframeDemoShell _id_1370sl7 _a_940sqd _a_7p001bzyn _a_3h86iq _a_3ngzf7 _a_39do0u _a_4eh6am _a_65001iz7u", {
+  return make7("label:keyframeDemoShell _id_1370sl7 _a_940sqd _a_7p0001bzyn _a_3h86iq _a_3ngzf7 _a_39do0u _a_4eh6am _a_650001iz7u", {
     hd: [
       "--color-1a279q8",
       Color.toString(color)
@@ -64806,7 +64806,7 @@ var resize2 = AnimationName.make({
     )
   }
 }, "_k_1kt58w0");
-var keyframeDemoCard = make7("label:keyframeDemoCard _id_bm1n1z _a_2z01s49z5 _a_2z008fc7i _a_2z1kw7a08 _a_2z00gllw7 _a_ec0v5o _a_8rbn5v _a_5r1fx4 _a_9i001dmle _a_9h002vhe1 _a_3njx05 _a_39wy1d _a_4eu7uq _a_40xf3p", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
+var keyframeDemoCard = make7("label:keyframeDemoCard _id_bm1n1z _a_2z001s49z5 _a_2z0008fc7i _a_2z01kw7a08 _a_2z000gllw7 _a_ec0v5o _a_8rbn5v _a_5r1fx4 _a_9i0001dmle _a_9h0002vhe1 _a_3njx05 _a_39wy1d _a_4eu7uq _a_40xf3p", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
 function Main(Props) {
   return JsxRuntime.jsxs("main", {
     children: [

@@ -28,7 +28,7 @@
 let atom_prefix = "_a_"
 let context_width = 5
 let family_width = 2
-let mask_width = 3
+let mask_width = 4
 let value_width = 4
 let extended_width = 6
 

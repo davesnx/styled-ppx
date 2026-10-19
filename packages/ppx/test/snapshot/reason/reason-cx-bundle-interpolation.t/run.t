@@ -28,7 +28,7 @@ mints its own real, slot-keyed `_a_` class instead.
   [@css "._in_e286e6{width:var(--width-1v9ua);}"];
   [@css "._in_e286e6:hover{height:var(--width-c62vcf);}"];
   [@css "._a_4esjgz{color:var(--color-1a279q8);}"];
-  [@css "._a_3900412gx{background-color:var(--accent-1gxhmqu);}"];
+  [@css "._a_39000412gx{background-color:var(--accent-1gxhmqu);}"];
   [@css "._a_4ekvmb{color:red;}"];
   [@css "._a_qyw7u4ebwy0:hover{color:var(--color-4uzv5u);}"];
   [@css.bindings
@@ -36,8 +36,8 @@ mints its own real, slot-keyed `_a_` class instead.
       ("Output.multiVariant", "_id_1be0zju", "_in_1kbzua4"),
       ("Output.mixed", "_id_11av61d", "_a_5r08qs _in_1upqar2"),
       ("Output.twoTypes", "_id_1ybygzf", "_in_e286e6"),
-      ("Output.separateValues", "_id_1y219dc", "_a_4esjgz _a_3900412gx"),
-      ("Output.partialShare", "_id_r0r4jt", "_in_1upqar2 _a_3900412gx"),
+      ("Output.separateValues", "_id_1y219dc", "_a_4esjgz _a_39000412gx"),
+      ("Output.partialShare", "_id_r0r4jt", "_in_1upqar2 _a_39000412gx"),
     ]
   ];
   let color = CSS.Types.Color.toString(`hex("3A57FC"));
@@ -63,7 +63,7 @@ mints its own real, slot-keyed `_a_` class instead.
     );
   let separateValues =
     CSS.make(
-      "label:separateValues _id_1y219dc _a_4esjgz _a_3900412gx",
+      "label:separateValues _id_1y219dc _a_4esjgz _a_39000412gx",
       [
         ("--color-1a279q8", CSS.Types.Color.toString(color)),
         ("--accent-1gxhmqu", CSS.Types.Color.toString(accent)),
@@ -71,7 +71,7 @@ mints its own real, slot-keyed `_a_` class instead.
     );
   let partialShare =
     CSS.make(
-      "label:partialShare _id_r0r4jt _in_1upqar2 _a_3900412gx",
+      "label:partialShare _id_r0r4jt _in_1upqar2 _a_39000412gx",
       [
         ("--color-13vjntp", CSS.Types.Color.toString(color)),
         ("--accent-1gxhmqu", CSS.Types.Color.toString(accent)),

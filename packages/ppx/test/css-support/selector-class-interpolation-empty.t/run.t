@@ -30,7 +30,7 @@ is actually present on the element.
   [@css "._a_393u2l{background:red;}"];
   [@css "._a_3lv8v39725c._id_1ofey90{background:blue;}"];
   [@css "._a_94fqw0{padding:1rem;}"];
-  [@css "._a_4p0n23hef5cnv6._id_okzmy{border-color:blue;}"];
+  [@css "._a_4p0n23h0ef5cnv6._id_okzmy{border-color:blue;}"];
   [@css "._a_rmeji39asz5._id_1jjszpn{background:yellow;}"];
   [@css "._a_5r08qs{display:flex;}"];
   [@css "._a_2nhg94em44p ._id_rmf27x{color:black;}"];
@@ -43,7 +43,7 @@ is actually present on the element.
       (
         "Input.card",
         "_id_cpyuub",
-        "_a_94fqw0 _a_4p0n23hef5cnv6 _a_rmeji39asz5",
+        "_a_94fqw0 _a_4p0n23h0ef5cnv6 _a_rmeji39asz5",
       ),
       ("Input.actionButton", "_id_rmf27x", ""),
       ("Input.panel", "_id_1qtuyxa", "_a_5r08qs _a_2nhg94em44p"),
@@ -60,7 +60,7 @@ is actually present on the element.
   
   let card =
     CSS.make(
-      "label:card _id_cpyuub _a_94fqw0 _a_4p0n23hef5cnv6 _a_rmeji39asz5",
+      "label:card _id_cpyuub _a_94fqw0 _a_4p0n23h0ef5cnv6 _a_rmeji39asz5",
       [],
     );
   

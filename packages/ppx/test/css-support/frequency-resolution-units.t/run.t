@@ -19,21 +19,21 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_6tm01f{image-rendering:crisp-edges;}"];
   [@css "._a_6thmlf{image-rendering:pixelated;}"];
   [@css
-    "._a_39008toi3{background-image:image-set(\"cat.png\" 1x, \"cat-2x.png\" 2x);}"
+    "._a_390008toi3{background-image:image-set(\"cat.png\" 1x, \"cat-2x.png\" 2x);}"
   ];
   [@css
-    "._a_39008sfyn{background-image:image-set(\"cat.png\" 1dppx, \"cat-2x.png\" 2dppx);}"
+    "._a_390008sfyn{background-image:image-set(\"cat.png\" 1dppx, \"cat-2x.png\" 2dppx);}"
   ];
   [@css
-    "._a_390080k4n{background-image:image-set(\"cat.png\" 96dpi, \"cat-2x.png\" 192dpi);}"
+    "._a_3900080k4n{background-image:image-set(\"cat.png\" 96dpi, \"cat-2x.png\" 192dpi);}"
   ];
-  [@css "._a_39008fchh{background-image:image-set(\"cat.png\" 37dpcm);}"];
+  [@css "._a_390008fchh{background-image:image-set(\"cat.png\" 37dpcm);}"];
   
   CSS.make("_a_6tobub", []);
   CSS.make("_a_6tm01f", []);
   CSS.make("_a_6thmlf", []);
   
-  CSS.make("_a_39008toi3", []);
-  CSS.make("_a_39008sfyn", []);
-  CSS.make("_a_390080k4n", []);
-  CSS.make("_a_39008fchh", []);
+  CSS.make("_a_390008toi3", []);
+  CSS.make("_a_390008sfyn", []);
+  CSS.make("_a_3900080k4n", []);
+  CSS.make("_a_390008fchh", []);

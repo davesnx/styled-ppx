@@ -38,16 +38,16 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_4e9bfd{color:light-dark(white, black);}"];
   [@css "._a_4exrra{color:light-dark(#fff, #000);}"];
   [@css "._a_4ed5hk{color:light-dark(rgb(255, 255, 255), rgb(0, 0, 0));}"];
-  [@css "._a_3900476db{background-color:light-dark(#f0f0f0, #1a1a1a);}"];
+  [@css "._a_39000476db{background-color:light-dark(#f0f0f0, #1a1a1a);}"];
   [@css "._a_4eq67q{color:color(srgb 1 0.5 0);}"];
   [@css "._a_4evn4u{color:color(srgb 1 0.5 0 / 0.5);}"];
   [@css "._a_4e4vx0{color:color(display-p3 1 0.5 0);}"];
   [@css "._a_4eh8l1{color:color(display-p3 1 0.5 0 / 0.5);}"];
-  [@css "._a_39004jf25{background-color:hwb(0 0% 0%);}"];
-  [@css "._a_390046psj{background-color:lab(50% 20 -30);}"];
-  [@css "._a_39004qziw{background-color:lch(50% 30 120);}"];
-  [@css "._a_39004l9l2{background-color:oklab(50% 0.1 -0.1);}"];
-  [@css "._a_39004ibmj{background-color:oklch(50% 0.15 120);}"];
+  [@css "._a_390004jf25{background-color:hwb(0 0% 0%);}"];
+  [@css "._a_3900046psj{background-color:lab(50% 20 -30);}"];
+  [@css "._a_390004qziw{background-color:lch(50% 30 120);}"];
+  [@css "._a_390004l9l2{background-color:oklab(50% 0.1 -0.1);}"];
+  [@css "._a_390004ibmj{background-color:oklch(50% 0.15 120);}"];
   
   CSS.make("_a_4esyq5", []);
   CSS.make("_a_4e1qgw", []);
@@ -77,15 +77,15 @@ If this test fail means that the module is not in sync with the ppx
   CSS.make("_a_4e9bfd", []);
   CSS.make("_a_4exrra", []);
   CSS.make("_a_4ed5hk", []);
-  CSS.make("_a_3900476db", []);
+  CSS.make("_a_39000476db", []);
   
   CSS.make("_a_4eq67q", []);
   CSS.make("_a_4evn4u", []);
   CSS.make("_a_4e4vx0", []);
   CSS.make("_a_4eh8l1", []);
   
-  CSS.make("_a_39004jf25", []);
-  CSS.make("_a_390046psj", []);
-  CSS.make("_a_39004qziw", []);
-  CSS.make("_a_39004l9l2", []);
-  CSS.make("_a_39004ibmj", []);
+  CSS.make("_a_390004jf25", []);
+  CSS.make("_a_3900046psj", []);
+  CSS.make("_a_390004qziw", []);
+  CSS.make("_a_390004l9l2", []);
+  CSS.make("_a_390004ibmj", []);

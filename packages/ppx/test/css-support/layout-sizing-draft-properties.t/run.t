@@ -37,10 +37,10 @@ error names the property.
   [@css "._a_gyjxpg{wrap-flow:minimum;}"];
   [@css "._a_h0ahj7{wrap-through:none;}"];
   [@css "._a_g5n5yv{margin-break:keep;}"];
-  [@css "._a_f2008myq3{block-step-size:none;}"];
-  [@css "._a_f2002gz9k{block-step-insert:content-box;}"];
-  [@css "._a_f2001kywn{block-step-align:center;}"];
-  [@css "._a_f2004jjp9{block-step-round:nearest;}"];
+  [@css "._a_f20008myq3{block-step-size:none;}"];
+  [@css "._a_f20002gz9k{block-step-insert:content-box;}"];
+  [@css "._a_f20001kywn{block-step-align:center;}"];
+  [@css "._a_f20004jjp9{block-step-round:nearest;}"];
   [@css "._a_f2stl1{block-step:10px content-box center up;}"];
   [@css "._a_fy64xq{initial-letter-wrap:grid;}"];
   [@css "._a_fzl4el{inline-sizing:stretch;}"];
@@ -64,10 +64,10 @@ error names the property.
   
   CSS.make("_a_g5n5yv", []);
   
-  CSS.make("_a_f2008myq3", []);
-  CSS.make("_a_f2002gz9k", []);
-  CSS.make("_a_f2001kywn", []);
-  CSS.make("_a_f2004jjp9", []);
+  CSS.make("_a_f20008myq3", []);
+  CSS.make("_a_f20002gz9k", []);
+  CSS.make("_a_f20001kywn", []);
+  CSS.make("_a_f20004jjp9", []);
   CSS.make("_a_f2stl1", []);
   
   CSS.make("_a_fy64xq", []);

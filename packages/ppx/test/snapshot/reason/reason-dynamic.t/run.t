@@ -5,13 +5,13 @@
   [@css "@property --id-1s0m1fr{syntax:\"*\";inherits:false;}"];
   [@css "._a_4e7bjx{color:var(--var-17zksex);}"];
   [@css "._a_5r08qs{display:flex;}"];
-  [@css "._a_39004g7ti{background-color:var(--id-1s0m1fr);}"];
+  [@css "._a_390004g7ti{background-color:var(--id-1s0m1fr);}"];
   [@css.bindings
     [
       (
         "Output.DynamicComponent",
         "_id_1hmg1vc",
-        "_a_4e7bjx _a_5r08qs _a_39004g7ti",
+        "_a_4e7bjx _a_5r08qs _a_390004g7ti",
       ),
     ]
   ];
@@ -1006,7 +1006,7 @@
       "Object.assign";
     let styles = (~var, ~id, _) =>
       CSS.make(
-        "label:DynamicComponent _id_1hmg1vc _a_4e7bjx _a_5r08qs _a_39004g7ti",
+        "label:DynamicComponent _id_1hmg1vc _a_4e7bjx _a_5r08qs _a_390004g7ti",
         [
           ("--var-17zksex", CSS.Types.Color.toString(var)),
           ("--id-1s0m1fr", CSS.Types.Color.toString(id)),
