@@ -65,13 +65,17 @@ let sort (type a) ~(nodes : a list) ~(edges : a -> a list) ~(key : a -> string)
   List.iter
     (fun n ->
       let own_key = key n in
-      let deps =
-        edges n
-        |> List.map key
-        |> List.filter (fun k -> k <> own_key && Hashtbl.mem node_of_key k)
-      in
-      Hashtbl.replace pending own_key (ref deps);
-      List.iter (fun dep -> Hashtbl.add dependents dep own_key) deps)
+      if not (Hashtbl.mem pending own_key) then begin
+        let winner = Hashtbl.find node_of_key own_key in
+        let deps =
+          edges winner
+          |> List.map key
+          |> List.filter (fun k -> k <> own_key && Hashtbl.mem node_of_key k)
+          |> List.sort_uniq String.compare
+        in
+        Hashtbl.replace pending own_key (ref deps);
+        List.iter (fun dep -> Hashtbl.add dependents dep own_key) deps
+      end)
     nodes;
   let by_key a b = String.compare (key a) (key b) in
   let ready =
@@ -90,9 +94,13 @@ let sort (type a) ~(nodes : a list) ~(edges : a -> a list) ~(key : a -> string)
     result := Hashtbl.find node_of_key k :: !result;
     Hashtbl.find_all dependents k
     |> List.iter (fun dependent ->
-      let deps = Hashtbl.find pending dependent in
-      deps := List.filter (fun d -> d <> k) !deps;
-      if !deps = [] then ready := KeySet.add dependent !ready)
+      (* A dependent whose edge to [k] was dropped as a cycle breaker may
+         already be emitted; re-adding it would emit it twice. *)
+      if not (Hashtbl.mem emitted dependent) then begin
+        let deps = Hashtbl.find pending dependent in
+        deps := List.filter (fun d -> d <> k) !deps;
+        if !deps = [] then ready := KeySet.add dependent !ready
+      end)
   in
   while Hashtbl.length emitted < node_count do
     match KeySet.min_elt_opt !ready with
