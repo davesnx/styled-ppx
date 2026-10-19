@@ -1085,11 +1085,12 @@ which is what makes it possible to resolve `&.$(m)` in every mode (see
 `packages/ppx/test/css-support/identity-empty-marker.t`).
 
 **Specificity note.** `._a_x._id_y` is still a two-class compound
-selector — `(0,2,0)` specificity, same as `._a_x._a_a._a_b` before
-this change, and both still beat plain unqualified atoms either way.
-Only a tie between two compound selectors that used to carry 3+ class
-tokens can shift, since those are the only ones whose token count
-actually drops.
+selector with `(0,2,0)` specificity. Before this change,
+`._a_x._a_a._a_b` had `(0,3,0)`. Both still beat plain unqualified
+atoms, but the reduction can change the winner against any competing
+selector, not only a tie between compound selectors. For example, a
+later two-class selector can now override a rule that previously had
+three classes.
 
 ## What this design intentionally avoids
 
