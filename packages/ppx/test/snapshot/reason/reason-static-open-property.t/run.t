@@ -3,6 +3,7 @@
   $ refmt --parse ml --print re output.ml
   [@css "._a_5r7eu2{display:block;}"];
   [@css.bindings [("Output.OneSingleProperty", "_id_1wjxo18", "_a_5r7eu2")]];
+  [@css.blocks [(1, "_id_1wjxo18 _a_5r7eu2")]];
   module OneSingleProperty = {
     [@deriving abstract]
     [@warning "-69"]

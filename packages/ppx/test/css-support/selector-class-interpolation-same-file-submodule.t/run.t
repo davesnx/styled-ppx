@@ -27,6 +27,15 @@ emitted as a cross-module sentinel.
       ("Input.Theme.Components.wrapper", "_id_1mhdtfv", "_a_uisk84e7jnm"),
     ]
   ];
+  [@css.blocks
+    [
+      (2, "_id_zr2uk1 _a_4ekvmb"),
+      (4, "_id_7sdyhq _a_qye7h4e56b5"),
+      (9, "_id_4f6ye3 _a_qye7h655m9ssyz4"),
+      (15, "_id_11dmi54 _a_4ecoli"),
+      (19, "_id_1mhdtfv _a_uisk84e7jnm"),
+    ]
+  ];
   module Css = {
     let marker = CSS.make("label:marker _id_zr2uk1 _a_4ekvmb", []);
   

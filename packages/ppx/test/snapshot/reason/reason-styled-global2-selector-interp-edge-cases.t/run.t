@@ -13,6 +13,7 @@
       ("Output.active", "_id_1iojcla", "_a_3hrhyr"),
     ]
   ];
+  [@css.blocks [(1, "_id_16nw107 _a_9432ej"), (2, "_id_1iojcla _a_3hrhyr")]];
   let card = CSS.make("label:card _id_16nw107 _a_9432ej", []);
   let active = CSS.make("label:active _id_1iojcla _a_3hrhyr", []);
   let bg = CSS.red;

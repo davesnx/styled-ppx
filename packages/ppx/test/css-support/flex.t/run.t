@@ -31,6 +31,22 @@ If this test fail means that the module is not in sync with the ppx
   [@css
     "._a_600jqd{-webkit-flex:2 2 min-content;-ms-flex:2 2 min-content;flex:2 2 min-content;}"
   ];
+  [@css.blocks
+    [
+      (2, "_a_60jwvb"),
+      (3, "_a_60c6td"),
+      (4, "_a_603p27"),
+      (8, "_a_60fr2u"),
+      (11, "_a_60wv0x"),
+      (12, "_a_60vgg1"),
+      (13, "_a_60aax7"),
+      (16, "_a_60thbz"),
+      (19, "_a_60x0uu"),
+      (22, "_a_608a55"),
+      (23, "_a_605q0r"),
+      (24, "_a_600jqd"),
+    ]
+  ];
   
   CSS.make("_a_60jwvb", []);
   CSS.make("_a_60c6td", []);

@@ -72,6 +72,22 @@ If this test fail means that the module is not in sync with the ppx
       ("Input._transitions", "_id_1jxvvla", "_a_dmm8mm"),
     ]
   ];
+  [@css.blocks
+    [
+      (16, "_id_pwoumt _a_eck09d _a_4e090v"),
+      (23, "_id_110u1xw _a_oe8sa40slgw"),
+      (28, "_id_c7rk0r _a_oe8sa4080o9"),
+      (34, "_id_19955vg _a_400ppg _a_h5nao400v5z"),
+      (47, "_id_e443o3 _a_4eyeca _a_qyw7u390004kqt8 _a_qyw7u40rvac"),
+      (61, "_id_1wtohw8"),
+      (
+        64,
+        "_id_jjvyqu _a_600002gxme _a_ekz5ec _a_dmsoaq _a_y4vkx8cytek _a_y4vkx88twos _a_y4vkx8mm5d1 _a_y4vkx8r3w86",
+      ),
+      (79, "_id_1sltg0l _a_oe8sadmq5th"),
+      (83, "_id_1jxvvla _a_dmm8mm"),
+    ]
+  ];
   module Color = {
     module Border = {
       let line = `rgba((0, 0, 0, `num(0.1)));

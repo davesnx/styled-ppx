@@ -50,6 +50,34 @@ names the property.
   [@css "._a_gqpijn{stroke-position:50% 50%;}"];
   [@css "._a_grl4q4{stroke-repeat:round;}"];
   [@css "._a_gsg9ov{stroke-size:contain;}"];
+  [@css.blocks
+    [
+      (5, "_a_fj56cl"),
+      (6, "_a_fjev2u"),
+      (7, "_a_fke35e"),
+      (8, "_a_fll8sq"),
+      (9, "_a_flgv4m"),
+      (10, "_a_fmya6b"),
+      (11, "_a_fm29sd"),
+      (12, "_a_fnlyrj"),
+      (13, "_a_fnkrpk"),
+      (14, "_a_fov7hi"),
+      (15, "_a_fo6jli"),
+      (16, "_a_fp0opq"),
+      (17, "_a_fpgmie"),
+      (18, "_a_gkxdk3"),
+      (19, "_a_gl0rrf"),
+      (20, "_a_gmvg6s"),
+      (21, "_a_gmty9s"),
+      (22, "_a_gnokf8"),
+      (23, "_a_gn7mdb"),
+      (24, "_a_gomj20"),
+      (25, "_a_gpym2d"),
+      (26, "_a_gqpijn"),
+      (27, "_a_grl4q4"),
+      (28, "_a_gsg9ov"),
+    ]
+  ];
   
   CSS.make("_a_fj56cl", []);
   CSS.make("_a_fjev2u", []);

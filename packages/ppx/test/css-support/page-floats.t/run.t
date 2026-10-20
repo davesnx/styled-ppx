@@ -34,6 +34,20 @@ the property.
   [@css "._a_frh37k{float-offset:0;}"];
   [@css "._a_frwu5a{float-offset:10px;}"];
   [@css "._a_fr5tyx{float-offset:10%;}"];
+  [@css.blocks
+    [
+      (3, "_a_fsgd04"),
+      (4, "_a_fsfd3q"),
+      (5, "_a_fsrpyx"),
+      (6, "_a_fsssig"),
+      (7, "_a_fqk6ea"),
+      (8, "_a_fqeb1u"),
+      (9, "_a_fqr3fc"),
+      (10, "_a_frh37k"),
+      (11, "_a_frwu5a"),
+      (12, "_a_fr5tyx"),
+    ]
+  ];
   
   CSS.make("_a_fsgd04", []);
   CSS.make("_a_fsfd3q", []);

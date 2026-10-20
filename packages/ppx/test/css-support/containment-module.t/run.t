@@ -41,6 +41,36 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_4vcq8j{container:x / size;}"];
   [@css "._a_4va7f0{container:x / inline-size;}"];
   [@css "._a_4vppda{container:x y / size;}"];
+  [@css.blocks
+    [
+      (2, "_a_4pgt40"),
+      (3, "_a_4pyisx"),
+      (4, "_a_4p7x2x"),
+      (5, "_a_4p1cha"),
+      (6, "_a_4pw7cp"),
+      (7, "_a_4pyn5q"),
+      (8, "_a_4pjwgs"),
+      (9, "_a_4p7zd4"),
+      (10, "_a_4pc7bb"),
+      (22, "_a_eclzv6"),
+      (23, "_a_ecsy8j"),
+      (24, "_a_ecq9h0"),
+      (25, "_a_eccz18"),
+      (26, "_a_ecidqw"),
+      (27, "_a_ec8ucx"),
+      (28, "_a_4v00027ccc"),
+      (29, "_a_4v00026sj7"),
+      (30, "_a_4v0002zm71"),
+      (31, "_a_4v0001nlpx"),
+      (32, "_a_4v00019f0l"),
+      (33, "_a_4v0001kmkr"),
+      (34, "_a_4v1iko"),
+      (35, "_a_4v52qy"),
+      (36, "_a_4vcq8j"),
+      (37, "_a_4va7f0"),
+      (38, "_a_4vppda"),
+    ]
+  ];
   
   CSS.make("_a_4pgt40", []);
   CSS.make("_a_4pyisx", []);

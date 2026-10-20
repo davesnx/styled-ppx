@@ -10,6 +10,7 @@ can resolve it against M's exported [@@@css.bindings].
   $ cat n.ml
   [@@@css "._a_mgr994ev1t1.\000M.Css.marker\000{color:blue;}"]
   [@@@css.bindings [("N.wrapper", "_id_1axkmel", "_a_mgr994ev1t1")]]
+  [@@@css.blocks [(2, "_id_1axkmel _a_mgr994ev1t1")]]
   [@@@css.refs [("M.Css.marker", "n.ml", 3, 6, 19)]]
   let _ = M.Css.marker
   module Styles = M.Css

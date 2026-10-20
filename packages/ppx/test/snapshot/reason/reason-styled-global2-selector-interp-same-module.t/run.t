@@ -4,6 +4,7 @@
   [@css "body ._id_wu3nwu{font-weight:bold;}"];
   [@css "._a_4emldq{color:orange;}"];
   [@css.bindings [("Output.highlighted", "_id_wu3nwu", "_a_4emldq")]];
+  [@css.blocks [(1, "_id_wu3nwu _a_4emldq")]];
   let highlighted = CSS.make("label:highlighted _id_wu3nwu _a_4emldq", []);
   module Globals = {
     let to_string = () => "";

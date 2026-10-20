@@ -23,6 +23,7 @@ instead.
     "@media (min-width: calc(1000px - 2%)) {._a_h4c6e4el0w0{color:red;}}"]
   [@@@css.bindings
     [("Output.block", "_id_ovbeuh", "_a_aveay4e5m2e _a_h4c6e4el0w0")]]
+  [@@@css.blocks [(3, "_id_ovbeuh _a_aveay4e5m2e _a_h4c6e4el0w0")]]
   let block =
     CSS.make "label:block _id_ovbeuh _a_aveay4e5m2e _a_h4c6e4el0w0" []
   let _ = block

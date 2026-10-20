@@ -22,6 +22,9 @@ when referenced by another [%css]'s selector.
       ("Input.user", "_id_wa05kx", "_a_a8tv84efvbl"),
     ]
   ];
+  [@css.blocks
+    [(8, "_id_9un6he _a_5r08qs _a_6fq77g"), (13, "_id_wa05kx _a_a8tv84efvbl")]
+  ];
   
   let composed = CSS.make("label:composed _id_9un6he _a_5r08qs _a_6fq77g", []);
   

@@ -11,6 +11,7 @@ binding name, with no `--namespace` flag at all.
   [@@@css.config [("library-name", "ui")]]
   [@@@css "._a_4eogw8{color:red;}"]
   [@@@css.bindings [("Input.marker", "_id_1lismv4", "_a_4eogw8")]]
+  [@@@css.blocks [(1, "_id_1lismv4 _a_4eogw8")]]
   let marker = CSS.make "label:marker _id_1lismv4 _a_4eogw8" []
   let _ = marker
 
@@ -19,19 +20,22 @@ binding name, with no `--namespace` flag at all.
   [@@@css.config [("library-name", "admin")]]
   [@@@css "._a_4elw89{color:red;}"]
   [@@@css.bindings [("Input.marker", "_id_1v8uaax", "_a_4elw89")]]
+  [@@@css.blocks [(1, "_id_1v8uaax _a_4elw89")]]
   let marker = CSS.make "label:marker _id_1v8uaax _a_4elw89" []
   let _ = marker
 
   $ diff ui.ml admin.ml
-  1,4c1,4
+  1,5c1,5
   < [@@@css.config [("library-name", "ui")]]
   < [@@@css "._a_4eogw8{color:red;}"]
   < [@@@css.bindings [("Input.marker", "_id_1lismv4", "_a_4eogw8")]]
+  < [@@@css.blocks [(1, "_id_1lismv4 _a_4eogw8")]]
   < let marker = CSS.make "label:marker _id_1lismv4 _a_4eogw8" []
   ---
   > [@@@css.config [("library-name", "admin")]]
   > [@@@css "._a_4elw89{color:red;}"]
   > [@@@css.bindings [("Input.marker", "_id_1v8uaax", "_a_4elw89")]]
+  > [@@@css.blocks [(1, "_id_1v8uaax _a_4elw89")]]
   > let marker = CSS.make "label:marker _id_1v8uaax _a_4elw89" []
   [1]
 
@@ -42,6 +46,7 @@ to the empty default - unrelated to either library name above:
   $ cat none.ml
   [@@@css "._a_4ekvmb{color:red;}"]
   [@@@css.bindings [("Input.marker", "_id_1rctcrz", "_a_4ekvmb")]]
+  [@@@css.blocks [(1, "_id_1rctcrz _a_4ekvmb")]]
   let marker = CSS.make "label:marker _id_1rctcrz _a_4ekvmb" []
   let _ = marker
 
@@ -55,15 +60,17 @@ library-name cookies (the native/melange twin case -
   $ ../../standalone.exe -cookie 'library-name="ui"' --namespace ui --impl input.ml -o ui-ns.ml
   $ ../../standalone.exe -cookie 'library-name="admin"' --namespace admin --impl input.ml -o admin-ns.ml
   $ diff ui-ns.ml admin-ns.ml
-  1,4c1,4
+  1,5c1,5
   < [@@@css.config [("library-name", "ui")]]
   < [@@@css "._a_4eogw8{color:red;}"]
   < [@@@css.bindings [("Input.marker", "_id_1lismv4", "_a_4eogw8")]]
+  < [@@@css.blocks [(1, "_id_1lismv4 _a_4eogw8")]]
   < let marker = CSS.make "label:marker _id_1lismv4 _a_4eogw8" []
   ---
   > [@@@css.config [("library-name", "admin")]]
   > [@@@css "._a_4elw89{color:red;}"]
   > [@@@css.bindings [("Input.marker", "_id_1v8uaax", "_a_4elw89")]]
+  > [@@@css.blocks [(1, "_id_1v8uaax _a_4elw89")]]
   > let marker = CSS.make "label:marker _id_1v8uaax _a_4elw89" []
   [1]
 

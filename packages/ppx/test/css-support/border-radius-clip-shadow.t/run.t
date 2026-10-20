@@ -59,6 +59,43 @@ keyword, whose error names the property.
   [@css "._a_fgpgkn{box-shadow-spread:40px;}"];
   [@css "._a_ffw7at{box-shadow-position:inset;}"];
   [@css "._a_ffp1t5{box-shadow-position:outset, inset;}"];
+  [@css.blocks
+    [
+      (4, "_a_3n000cl1tb"),
+      (5, "_a_3n000c0ay0"),
+      (6, "_a_3n000avogz"),
+      (7, "_a_3n00033qjb"),
+      (8, "_a_3n0005n019"),
+      (9, "_a_h1g86n"),
+      (10, "_a_f7b3em"),
+      (11, "_a_h3hyd2"),
+      (12, "_a_h2dz7t"),
+      (15, "_a_fbpvas"),
+      (16, "_a_fbqqxc"),
+      (17, "_a_fbjp28"),
+      (18, "_a_fbue5t"),
+      (19, "_a_fbbzmt"),
+      (22, "_a_f90008az3q"),
+      (23, "_a_f90004yn5u"),
+      (24, "_a_f900019q3s"),
+      (25, "_a_f90002emob"),
+      (26, "_a_f600021ui5"),
+      (27, "_a_f60001l7yx"),
+      (28, "_a_fa0002ufja"),
+      (29, "_a_fa0001u3cc"),
+      (30, "_a_f6ysgj"),
+      (31, "_a_favz6k"),
+      (32, "_a_f9e3gi"),
+      (35, "_a_fduw20"),
+      (36, "_a_fd3mmo"),
+      (37, "_a_fejo2u"),
+      (38, "_a_fetafk"),
+      (39, "_a_fcxgmz"),
+      (40, "_a_fgpgkn"),
+      (41, "_a_ffw7at"),
+      (42, "_a_ffp1t5"),
+    ]
+  ];
   
   CSS.make("_a_3n000cl1tb", []);
   CSS.make("_a_3n000c0ay0", []);

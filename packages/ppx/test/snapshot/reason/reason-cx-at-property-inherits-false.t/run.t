@@ -39,6 +39,20 @@ vars (top-level / &:hover / @media) and withheld for descendant-read vars.
       ("Output.pseudoClassOnly", "_id_1f0poos", "_a_2f3u04e9ny0"),
     ]
   ];
+  [@css.blocks
+    [
+      (3, "_id_1lkhdb3 _a_4esjgz"),
+      (4, "_id_ng6izt _a_qyw7u4ebwy0"),
+      (5, "_id_12d3e0w _a_5eyct4epxeg"),
+      (6, "_id_1g3dzrb _a_s19nz4ecfa1"),
+      (7, "_id_ijx48y _in_1d8si03"),
+      (8, "_id_195hxjc _a_zytoc7ez6lcw"),
+      (9, "_id_4p9l0t _a_wu9h64eqaxy"),
+      (10, "_id_4uo0i7 _a_bzw494eluo3"),
+      (11, "_id_1rr25fw _in_i81g8d"),
+      (13, "_id_1f0poos _a_2f3u04e9ny0"),
+    ]
+  ];
   let color = CSS.Types.Color.toString(`hex("3A57FC"));
   let str = "literal";
   let topLevel =

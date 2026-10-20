@@ -6,6 +6,7 @@
   [@css.bindings
     [("Output.SingleQuoteStrings", "_id_ekh1sj", "_a_5r08qs _a_9h0002ndxa")]
   ];
+  [@css.blocks [(2, "_id_ekh1sj _a_5r08qs _a_9h0002ndxa")]];
   module SingleQuoteStrings = {
     [@deriving abstract]
     [@warning "-69"]

@@ -23,10 +23,12 @@ Both paths mint the same identity:
   $ cat native/Marker.ml
   [@@@css "._a_4ekvmb{color:red;}"]
   [@@@css.bindings [("Marker.marker", "_id_1ja89pc", "_a_4ekvmb")]]
+  [@@@css.blocks [(1, "_id_1ja89pc _a_4ekvmb")]]
   let marker = CSS.make "label:marker _id_1ja89pc _a_4ekvmb" []
   let _ = marker
   $ cat js/Marker.ml
   [@@@css "._a_4ekvmb{color:red;}"]
   [@@@css.bindings [("Marker.marker", "_id_1ja89pc", "_a_4ekvmb")]]
+  [@@@css.blocks [(1, "_id_1ja89pc _a_4ekvmb")]]
   let marker = CSS.make "label:marker _id_1ja89pc _a_4ekvmb" []
   let _ = marker

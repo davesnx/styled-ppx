@@ -112,6 +112,49 @@ If this test fail means that the module is not in sync with the ppx
     "._a_oe8sa4080o9{box-shadow:1px 0 0 0 var(--line-9kmuhm_1), inset 0 -1px 0 0 var(--line-9kmuhm_2) !important;}"
   ];
   [@css "._a_oe8sadmq5th{transition:transform 0.3s !important;}"];
+  [@css.blocks
+    [
+      (25, "_a_dmsoaq"),
+      (26, "_a_dmn52v"),
+      (27, "_a_dmb0kb"),
+      (30, "_a_dm2ga4"),
+      (31, "_a_dmk53a"),
+      (32, "_a_dmm8mm"),
+      (33, "_a_dmmtix"),
+      (34, "_a_dmhocq"),
+      (41, "_a_40xaab"),
+      (42, "_a_402oj0"),
+      (43, "_a_40xwmt"),
+      (44, "_a_40rt76"),
+      (47, "_a_40yzvr"),
+      (48, "_a_40dyrw"),
+      (49, "_a_403v0v"),
+      (52, "_a_40f2bw"),
+      (53, "_a_40atfq"),
+      (56, "_a_40sr4i"),
+      (57, "_a_40ptrw"),
+      (58, "_a_40knjr"),
+      (59, "_a_409jpc"),
+      (65, "_a_3ho3yi"),
+      (66, "_a_3hyc9x"),
+      (67, "_a_3h2ghs9vd4"),
+      (68, "_a_3h0007cjyn"),
+      (69, "_a_3h01ds65jw"),
+      (70, "_a_3h0b28jvaq"),
+      (71, "_a_3hmcmj"),
+      (72, "_a_3htowz"),
+      (78, "_a_8pct1l"),
+      (79, "_a_8pyi32"),
+      (85, "_a_2zep28"),
+      (86, "_a_2zhwlt"),
+      (92, "_a_dm9788"),
+      (93, "_a_dmdrfx"),
+      (100, "_a_oe8sa40slgw"),
+      (101, "_a_oe8sa40e9zy"),
+      (102, "_a_oe8sa4080o9"),
+      (105, "_a_oe8sadmq5th"),
+    ]
+  ];
   module Color = {
     module Border = {
       let line = `rgba((0, 0, 0, `num(0.1)));

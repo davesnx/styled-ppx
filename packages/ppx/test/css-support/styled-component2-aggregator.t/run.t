@@ -11,11 +11,11 @@ through the static extraction pipeline. They also register selector bindings so
   @property --tone-1ucf2mt{syntax:"*";inherits:false;}
   @property --color-1a279q8{syntax:"*";inherits:false;}
   ._a_4ekvmb{color:red;}
+  ._a_qyw7u4ed9vx:hover{color:var(--tone-1ucf2mt);}
   ._a_4esjgz{color:var(--color-1a279q8);}
   ._a_94gf8j{padding:8px;}
   ._a_21zok7ph1xd ._id_1l8coch{margin:0;}
   ._a_zo4xe5r9awo ._id_1oex1yr{display:block;}
-  ._a_qyw7u4ed9vx:hover{color:var(--tone-1ucf2mt);}
 
   $ refmt --parse ml --print re output.ml
   [@css "@property --tone-1ucf2mt{syntax:\"*\";inherits:false;}"];
@@ -31,6 +31,13 @@ through the static extraction pipeline. They also register selector bindings so
       ("Output.Box", "_id_1l8coch", "_a_4ekvmb _a_qyw7u4ed9vx"),
       ("Output.Button", "_id_1oex1yr", "_a_4esjgz _a_94gf8j"),
       ("Output.card", "_id_16nw107", "_a_21zok7ph1xd _a_zo4xe5r9awo"),
+    ]
+  ];
+  [@css.blocks
+    [
+      (2, "_id_1l8coch _a_4ekvmb _a_qyw7u4ed9vx"),
+      (11, "_id_1oex1yr _a_4esjgz _a_94gf8j"),
+      (16, "_id_16nw107 _a_21zok7ph1xd _a_zo4xe5r9awo"),
     ]
   ];
   let tone = CSS.red;

@@ -37,6 +37,14 @@ and the runtime `CSS.make` call must carry an empty list (no phantom
       ("Input.colorAccent", "_id_qhdd42", "_a_390004xk9e _a_we4a1390004apm0"),
     ]
   ];
+  [@css.blocks
+    [
+      (7, "_id_zec317 _a_4ekvmb"),
+      (9, "_id_1eelq62 _a_8s8tj4em6j7"),
+      (15, "_id_1wqjj7x _a_3900740mg9 _a_2z00083gnv"),
+      (22, "_id_qhdd42 _a_390004xk9e _a_we4a1390004apm0"),
+    ]
+  ];
   
   let foo = CSS.make("label:foo _id_zec317 _a_4ekvmb", []);
   

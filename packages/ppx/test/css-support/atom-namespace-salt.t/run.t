@@ -18,6 +18,8 @@ Library "ui":
   [@@@css.bindings
     [("Input.base", "_id_msle0w", "_a_7px4i4");
     ("Input.withMedia", "_id_1o6qo3l", "_a_7px4i4 _a_p6loh7puqbu")]]
+  [@@@css.blocks
+    [(1, "_id_msle0w _a_7px4i4"); (4, "_id_1o6qo3l _a_7px4i4 _a_p6loh7puqbu")]]
   let base = CSS.make "label:base _id_msle0w _a_7px4i4" []
   let withMedia =
     CSS.make "label:withMedia _id_1o6qo3l _a_7px4i4 _a_p6loh7puqbu" []
@@ -34,6 +36,8 @@ Library "admin", same source, same base declaration, also carries a
   [@@@css.bindings
     [("Input.base", "_id_sheykm", "_a_7phzb9");
     ("Input.withMedia", "_id_16foyc5", "_a_7phzb9 _a_p6loh7p87ap")]]
+  [@@@css.blocks
+    [(1, "_id_sheykm _a_7phzb9"); (4, "_id_16foyc5 _a_7phzb9 _a_p6loh7p87ap")]]
   let base = CSS.make "label:base _id_sheykm _a_7phzb9" []
   let withMedia =
     CSS.make "label:withMedia _id_16foyc5 _a_7phzb9 _a_p6loh7p87ap" []
@@ -51,15 +55,19 @@ libraries - nothing else does:
   > [@@@css.config [("library-name", "admin")]]
   > [@@@css "._a_7phzb9{margin:10px;}"]
   > [@@@css "@media (min-width: 768px) {._a_p6loh7p87ap{margin:20px;}}"]
-  5,7c5,7
+  5,6c5,6
   <   [("Input.base", "_id_msle0w", "_a_7px4i4");
   <   ("Input.withMedia", "_id_1o6qo3l", "_a_7px4i4 _a_p6loh7puqbu")]]
-  < let base = CSS.make "label:base _id_msle0w _a_7px4i4" []
   ---
   >   [("Input.base", "_id_sheykm", "_a_7phzb9");
   >   ("Input.withMedia", "_id_16foyc5", "_a_7phzb9 _a_p6loh7p87ap")]]
+  8,9c8,9
+  <   [(1, "_id_msle0w _a_7px4i4"); (4, "_id_1o6qo3l _a_7px4i4 _a_p6loh7puqbu")]]
+  < let base = CSS.make "label:base _id_msle0w _a_7px4i4" []
+  ---
+  >   [(1, "_id_sheykm _a_7phzb9"); (4, "_id_16foyc5 _a_7phzb9 _a_p6loh7p87ap")]]
   > let base = CSS.make "label:base _id_sheykm _a_7phzb9" []
-  9c9
+  11c11
   <   CSS.make "label:withMedia _id_1o6qo3l _a_7px4i4 _a_p6loh7puqbu" []
   ---
   >   CSS.make "label:withMedia _id_16foyc5 _a_7phzb9 _a_p6loh7p87ap" []

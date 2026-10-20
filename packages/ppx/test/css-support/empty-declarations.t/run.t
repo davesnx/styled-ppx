@@ -27,6 +27,20 @@ selector-class-interpolation-empty.t for the full end-to-end behavior.
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css.bindings [("Input._a", "_id_1gt4t9l", "")]];
+  [@css.blocks
+    [
+      (1, ""),
+      (2, ""),
+      (3, ""),
+      (6, ""),
+      (11, "_id_1quemw0"),
+      (12, "_id_s7r0d8"),
+      (13, "_id_g7564k"),
+      (15, "_id_i8v0tw"),
+      (19, "_id_gyvl29"),
+      (23, "_id_1gt4t9l"),
+    ]
+  ];
   CSS.make("", []);
   CSS.make("", []);
   CSS.make("", []);

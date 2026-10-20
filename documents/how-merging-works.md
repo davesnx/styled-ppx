@@ -116,49 +116,42 @@ proves the mechanism directly against a real `_in_` class.
 
 ## Sheet order
 
-Inside one generated stylesheet, rules are grouped, in this fixed order:
+Inside one generated stylesheet, `[%styled.global]` rules (`html { ... }`,
+`* { ... }`, an author's own selector) come first. All atom rules follow, in
+one order that `styled-ppx.generate` builds from three sources:
 
-1. **Globals** (`[%styled.global]` rules — `html { ... }`, `* { ... }`, an
-   author's own selector).
-2. **Base atoms** (a `[%css]` declaration's own, unconditional context).
-3. **Conditional atoms** (wrapped in `@media`/`@supports`/`@container`, or
-   carrying a pseudo-class/pseudo-element directly, like `:hover`).
+1. **Parent-to-child rules first.** A rule that reaches an unclassed
+   descendant (`.wrapper * { ... }`, `.list li { ... }`) is emitted before
+   same-element rules, so a component's own class beats an ancestor's blind
+   `* { ... }` reach on a `(0,1,0)` tie
+   (`packages/generate/test/descendant-tier.t`).
+2. **Edges.** Two atom rules *compete* when only the sheet position can
+   decide between them: equal importance, equal specificity, the same
+   element and pseudo-element, and at least one shared longhand.
+   - *Block edge*: inside one block (one `[%css]`, named or not), an earlier
+     competing rule comes first. One block reads as plain CSS:
+     `[%css "&:focus { color: blue; } &:hover { color: red; }"]` gives `red`
+     when both apply, because `:hover` is written last
+     (`packages/generate/test/tiers-condition-tie-single-block.t`).
+   - *Cover edge*: in one context (same at-rules, same selector), a shorthand
+     comes before a rule whose longhands it all sets
+     (`packages/generate/test/tiers-shorthand-sort.t`). This is always right:
+     when the shorthand is the later merge argument, `CSS.merge` drops the
+     covered atom.
+3. **Definition order** for every pair the edges leave open: library, then
+   module dependency order, then the order of definition in a file. A
+   `CSS.merge(a, b)` gets `b`'s rules last when `b` is defined after `a`.
 
-Inside each group: a parent-to-child rule (`.wrapper * { ... }`,
-`.list li { ... }`) is emitted before a same-element rule, and a
-shorthand is emitted before its own longhands. Two rules of equal
-specificity fall back to this position, so a genuine tie always resolves
-the way you'd expect — a component's own class beats an ancestor's blind
-`* { ... }` reach even though both are `(0,1,0)`
-(`packages/generate/test/descendant-tier.t`), and a shorthand's rule
-lands before a lone longhand that overrides just one of its sides
-(`packages/generate/test/tiers-shorthand-sort.t`).
+The sheet is built from its end, so a rule stays at its definition position
+unless an edge pulls it ahead of a rule it must precede. Two blocks that put
+the same two rules in opposite orders are a conflict: the build prints a
+warning that names both blocks, and the pair keeps definition order
+(`packages/generate/test/tiers-condition-tie-pseudo-class.t`). A longer
+cycle of blocks is cut at one rule, with a warning
+(`packages/generate/test/ordered-sheet-cycle.t`).
 
-**Inside the conditional group, a fixed order between conditions decides
-a remaining tie** (two conditional atoms, equal specificity, same
-parent-to-child shape, same shorthand depth): at-rule kind first
-(`@supports` before `@media` before `@container` - this project's own
-choice of what to check first, not StyleX's; only the pseudo-class/
-pseudo-element NUMBERS below are StyleX's own table), then a fixed
-pseudo-class/pseudo-element priority (`:hover` before `:focus-within`
-before `:focus` before `:focus-visible` before `:active`; any
-pseudo-element outranks any pseudo-class). Two conditions tied on BOTH
-still resolve deterministically, by falling through to DEFINITION
-ORDER: whichever one was declared later wins - the same order a
-`CSS.merge`/`+++` call's right-hand (override) argument needs to win.
-This order is the SAME everywhere: in every file, in every block, not
-"whichever one this block wrote last".
-A single block that writes
-
-```reason
-let danger = [%css "&:focus { color: blue; } &:hover { color: red; }"];
-```
-
-gets `color: blue` (focus) when both `:hover` and `:focus` apply, even
-though `:hover` was written last — the fixed priority, not declaration
-order, decides (`packages/generate/test/tiers-condition-tie-single-block.t`).
-Plain CSS, read top to bottom, would give `red` here; styled-ppx does not,
-on purpose — see "Known limits" below.
+There is no fixed rank between conditions (`:hover` against `:focus`,
+`@media` against `@supports`): a block or definition order decides.
 
 **No CSS layer wraps any of this.** Specificity decides first, exactly
 like plain CSS; sheet position is only ever the tie-break, never an
@@ -240,10 +233,10 @@ all) still depends on which one the browser loads first
 - **Interpolation bundles.** `merge` never drops an `_in_` bundle, so an
   override of a property inside a bundle is decided by specificity and
   sheet order, not by argument order (the `card` example above).
-- **Mixed shorthand depths in one rule.** A rule combining declarations at
-  different shorthand depths (e.g. a bundle with both a `padding` and a
-  `margin-top`) sorts by its SHALLOWEST declaration, so it is not
-  guaranteed correct against every other rule at once
+- **Cover edges compare whole rules.** A rule that groups several
+  declarations (a bundle with both a `padding` and a `margin-top`) covers
+  another rule only when it sets every longhand of that rule, so a partial
+  overlap gets no cover edge and falls to definition order
   (`packages/generate/test/shorthand-depth-stress.t`).
 - **A hand-written class shaped like an atom.** `merge` recognizes an atom
   by class-name prefix and length alone; a hand-written class starting
@@ -255,33 +248,19 @@ all) still depends on which one the browser loads first
 - **`merge(wide, narrow)` keeps both classes.** Same fact as the
   shorthand-then-longhand example above — it depends on sheet order, not
   on `merge` itself, to pick the right one.
-- **A conditional atom beats an unconditional one at equal specificity.**
-  `packages/generate/test/tiers-slider.t`: an always-on
-  `padding: 0 24px` and a `@media (min-width:1280px) { padding: 0 120px }`
-  override, same specificity — the conditional rule wins the tie above
-  1280px, by sheet position, because conditional atoms are always
-  emitted after base ones.
-- **A fixed pseudo-class/pseudo-element order applies even inside one
-  block.** `&:focus { color: blue; } &:hover { color: red; }` in ONE
-  `[%css]` block gives `color: blue` (focus outranks hover in the fixed
-  order), not `red` — the opposite of what "last declaration wins" would
-  give for this exact block on its own
-  (`packages/generate/test/tiers-condition-tie-single-block.t`). Chosen on
-  purpose: the alternative (each block's own declaration order deciding)
-  made the SAME shared pair of conditions resolve differently depending on
-  which of two components happened to compile first
-  (`packages/generate/test/tiers-condition-tie-pseudo-class.t`). To
-  override a lower-priority pseudo's declaration with a higher-priority
-  one, write the higher-priority one — its own position in the block no
-  longer matters.
-- **Two pseudo-elements, or two different `@supports` conditions, still
-  tie.** `::before` vs `::after`, or `@supports (display:grid)` vs
-  `@supports (display:flex)`, get the same fixed-order rank as each other
-  (StyleX has no finer answer for either case either), so the tie falls
-  back to sheet position — not guaranteed to match either block's own
-  intent. No target/condition split and no CSS layer over this — an
-  author who needs one of these two to always win still reaches for a more
-  specific selector or `!important`.
+- **A merge whose later argument is defined earlier.** `CSS.merge(a, b)`
+  where `b` is defined before `a` (earlier in the file, or in a file the
+  dependency order puts first) and no block orders the two competing rules:
+  definition order puts `b`'s rule first, so `a`'s rule wins the tie. Same
+  when the two blocks are in two files that do not depend on each other.
+  Define the override after the base, or write both in one block.
+- **Two blocks that disagree.** Two blocks that put the same two competing
+  rules in opposite orders can not both hold; the build warns, names both
+  blocks, and keeps definition order for the pair
+  (`packages/generate/test/tiers-condition-tie-pseudo-class.t`).
+- **Rules of different specificity are not reordered.** An at-rule adds no
+  specificity, a pseudo-class does: `&:hover` beats a bare `@media` atom
+  whatever the order, as in plain CSS.
 - **`@supports`/`@container` are not rewritten.** The overlapping-`@media`
   fix above (StyleX's `lastMediaQueryWinsTransform`) covers `@media`
   only, matching StyleX exactly. Two overlapping `@supports` or
@@ -318,30 +297,6 @@ all) still depends on which one the browser loads first
   (full range syntax), Safari 16.4. Below that floor the rewritten
   condition evaluates to false, so the rewritten earlier rule never
   applies there.
-- **Two conditions tied on at-rule kind and pseudo rank depend on
-  DEFINITION order, not on either condition's own numbers.** There used
-  to be a third tie-break here — a `min-width`/`max-width` comparison —
-  removed by decision: a real monorepo round found it got 2 of 4 real,
-  shipped ties wrong (a range tied against a plain `max-width` rule for
-  the same property has no reliable width-only answer; only definition
-  order, which is what the generator's own input order actually encodes,
-  gets every real, shipped pair right). Within ONE library, dependency
-  order then a module's own definition order decide — which matches the
-  usual pattern of writing a base rule, then a narrower modifier, in that
-  order. Between two DIFFERENT, unrelated modules whose rules reach one
-  element (not through one `[%css]` block's own author order, and not
-  through a `CSS.merge`/`+++` call, which already has its own argument
-  order to decide by) — file order decides, and file order is exactly
-  the thing this whole track exists to stop depending on for a shared
-  pair of conditions. Writing both conditions in the same block helps
-  when the tie is between two otherwise-identical at-rules with no
-  pseudo at all, since a single block's own declaration order IS its
-  definition order; it does NOT help when the tie is a pseudo-class/
-  pseudo-element one (the fixed priority above still decides, even
-  inside one block - see the next bullet). Either way, an author who
-  still needs a specific winner can always raise specificity or use
-  `!important`.
-
 ## See also
 
 - `documents/css-extraction.md` — the exact class-name encoding, the

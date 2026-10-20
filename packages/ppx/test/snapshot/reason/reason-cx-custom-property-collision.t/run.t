@@ -20,6 +20,9 @@ merged styles cannot overwrite each other.
       ("Output.clickable", "_id_1d9eonh", "_a_qyw7u3900046meq"),
     ]
   ];
+  [@css.blocks
+    [(2, "_id_45bzlz _a_390004vrad"), (6, "_id_1d9eonh _a_qyw7u3900046meq")]
+  ];
   let common = backgroundColor =>
     CSS.make(
       "label:common _id_45bzlz _a_390004vrad",

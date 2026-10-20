@@ -39,6 +39,15 @@ carries valid CSS. A non-ASCII identifier such as "héllo" is left untouched.
       ),
     ]
   ];
+  [@css.blocks
+    [
+      (
+        2,
+        "_id_1gr654a _a_4pi0m4eiwtd _a_48it44eby7r _a_4k2bk4ebr1m _a_fb9h24ehelx _a_w3jcb4e2wma _a_lcdsg4e142b _a_nyseq4efkpb _a_p85254ehrsz _a_u8qrs4efzp0",
+      ),
+      (15, "_a_zyvb5paat703"),
+    ]
+  ];
   let _test =
     CSS.make(
       "label:_test _id_1gr654a _a_4pi0m4eiwtd _a_48it44eby7r _a_4k2bk4ebr1m _a_fb9h24ehelx _a_w3jcb4e2wma _a_lcdsg4e142b _a_nyseq4efkpb _a_p85254ehrsz _a_u8qrs4efzp0",

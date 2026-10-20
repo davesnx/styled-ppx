@@ -89,6 +89,41 @@ If this test fail means that the module is not in sync with the ppx
   [@css
     "._a_37aokm{-webkit-backdrop-filter:grayscale(100%) sepia(100%);backdrop-filter:grayscale(100%) sepia(100%);}"
   ];
+  [@css.blocks
+    [
+      (4, "_a_5znm6u"),
+      (5, "_a_5zcuuo"),
+      (6, "_a_5zp7li"),
+      (7, "_a_5zxr2q"),
+      (8, "_a_5zxntt"),
+      (9, "_a_5z40fd"),
+      (14, "_a_5z4bqh"),
+      (16, "_a_5zlta4"),
+      (17, "_a_5zv1a9"),
+      (18, "_a_5zcrc5"),
+      (19, "_a_5zakyf"),
+      (20, "_a_5ztt82"),
+      (21, "_a_5zh2v6"),
+      (22, "_a_5z0jie"),
+      (23, "_a_5z13v6"),
+      (24, "_a_5zvds4"),
+      (27, "_a_5zla48"),
+      (36, "_a_37q0hq"),
+      (37, "_a_379q1s"),
+      (38, "_a_37czb9"),
+      (39, "_a_37pdax"),
+      (40, "_a_37smr4"),
+      (41, "_a_375lod"),
+      (42, "_a_37n3bb"),
+      (43, "_a_37jicj"),
+      (44, "_a_37jduf"),
+      (45, "_a_37smnx"),
+      (46, "_a_37whax"),
+      (47, "_a_37b97y"),
+      (48, "_a_37ltqs"),
+      (49, "_a_37aokm"),
+    ]
+  ];
   let color = CSS.hex("333");
   
   CSS.make("_a_5znm6u", []);

@@ -40,6 +40,17 @@ mints its own real, slot-keyed `_a_` class instead.
       ("Output.partialShare", "_id_r0r4jt", "_in_1upqar2 _a_39000412gx"),
     ]
   ];
+  [@css.blocks
+    [
+      (6, "_id_1be0zju _in_1kbzua4"),
+      (17, "_id_11av61d _a_5r08qs _in_1upqar2"),
+      (25, "_id_1ybygzf _in_e286e6"),
+      (32, "_id_1y219dc _a_4esjgz _a_39000412gx"),
+      (38, "_id_r0r4jt _in_1upqar2 _a_39000412gx"),
+      (45, "_a_4ekvmb _a_qyw7u4ebwy0"),
+      (51, "_a_5r08qs _a_qyw7u4ebwy0"),
+    ]
+  ];
   let color = CSS.Types.Color.toString(`hex("3A57FC"));
   let width = CSS.px(10);
   let accent = CSS.Types.Color.toString(`hex("00A67D"));

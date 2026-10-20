@@ -18,6 +18,15 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_eco4ty{width:calc(100vh - calc(2rem + 120px));}"];
   [@css "._a_ecuhfp{width:calc(100vh * 2);}"];
   [@css "._a_ec8hw4{width:calc(2 * 120px);}"];
+  [@css.blocks
+    [
+      (1, "_a_eco6vg"),
+      (2, "_a_ecj19s"),
+      (3, "_a_eco4ty"),
+      (4, "_a_ecuhfp"),
+      (5, "_a_ec8hw4"),
+    ]
+  ];
   CSS.make("_a_eco6vg", []);
   CSS.make("_a_ecj19s", []);
   CSS.make("_a_eco4ty", []);

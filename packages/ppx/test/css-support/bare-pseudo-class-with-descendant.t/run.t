@@ -66,6 +66,18 @@ deep nesting, and mixed compound/descendant inner chains.
       ("Input._amp_pseudo_mixed_inner", "_id_1tn24tq", "_a_t7s414escwj"),
     ]
   ];
+  [@css.blocks
+    [
+      (14, "_id_1mtruzt _a_d3qow4emold"),
+      (22, "_id_1l96rxg _a_dwogj4e74wv"),
+      (30, "_id_saeaxt _a_d3qow4edg3s"),
+      (38, "_id_1gv0q8s _a_rv9hg4ej0cc"),
+      (46, "_id_1ogtbuw _a_4ii3y4ehiyt"),
+      (59, "_id_wnmhdk _a_yj7sa4e1xle"),
+      (69, "_id_lhbok8 _a_h0ece4e19o0"),
+      (84, "_id_1tn24tq _a_t7s414escwj"),
+    ]
+  ];
   
   let _amp_pseudo_with_class_descendant =
     CSS.make(

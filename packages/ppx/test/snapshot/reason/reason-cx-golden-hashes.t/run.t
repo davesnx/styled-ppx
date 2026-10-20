@@ -30,6 +30,14 @@ the diff IS the blast radius.
     ("Input.withMedia", "_id_1wbvjdi", "_a_a1ok24ei921");
     ("Input.units", "_id_4x7ffc", "_a_ecpweu _a_8meee1");
     ("Input.withFallback", "_id_asai3x", "_a_4e744k")]]
+  [@@@css.blocks
+    [(12, "_id_ejsl7w _a_4ekvmb");
+    (15, "_id_7orjvh _a_7peacs _a_94xp1v _a_4esm7b");
+    (22, "_id_18t9scx _a_4e3tth _a_qyw7u4ex7to");
+    (30, "_id_j5w3l0 _a_2sekz4e0myy _a_bcuim4eb45t");
+    (39, "_id_1wbvjdi _a_a1ok24ei921");
+    (48, "_id_4x7ffc _a_ecpweu _a_8meee1");
+    (54, "_id_asai3x _a_4e744k")]]
   let solid = CSS.make "label:solid _id_ejsl7w _a_4ekvmb" []
   let multi =
     CSS.make "label:multi _id_7orjvh _a_7peacs _a_94xp1v _a_4esm7b" []

@@ -21,6 +21,9 @@ Same-file open statements participate in selector interpolation. After
       ("Input.wrapper", "_id_4f6ye3", "_a_qye7h4eikep"),
     ]
   ];
+  [@css.blocks
+    [(2, "_id_zr2uk1 _a_4ekvmb"), (8, "_id_4f6ye3 _a_qye7h4eikep")]
+  ];
   module Css = {
     let marker = CSS.make("label:marker _id_zr2uk1 _a_4ekvmb", []);
   };

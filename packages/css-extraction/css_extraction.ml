@@ -7,6 +7,11 @@ type binding = {
   class_string : string;
 }
 
+type block = {
+  line : int;
+  class_string : string;
+}
+
 type ref_loc = {
   longident : string;
   file : string;
@@ -18,6 +23,7 @@ type ref_loc = {
 let css_attribute_name = "css"
 let bindings_attribute_name = "css.bindings"
 let refs_attribute_name = "css.refs"
+let blocks_attribute_name = "css.blocks"
 let config_attribute_name = "css.config"
 let config_env_key = "env"
 let config_env_production = "production"
@@ -29,6 +35,8 @@ let sentinel longident =
 
 let binding ~longident ~identity ~class_string =
   { longident; identity; class_string }
+
+let block ~line ~class_string = { line; class_string }
 
 let ref_loc ~longident ~file ~start_line ~start_col ~end_col =
   { longident; file; start_line; start_col; end_col }
@@ -67,6 +75,15 @@ let bindings_attribute entries =
       ]
   in
   make_list_attribute ~name:bindings_attribute_name
+    (Builder.elist ~loc (List.map entry_to_expr entries))
+
+let blocks_attribute entries =
+  let loc = Ppxlib.Location.none in
+  let entry_to_expr (entry : block) =
+    Builder.pexp_tuple ~loc
+      [ Builder.eint ~loc entry.line; Builder.estring ~loc entry.class_string ]
+  in
+  make_list_attribute ~name:blocks_attribute_name
     (Builder.elist ~loc (List.map entry_to_expr entries))
 
 let config_attribute entries =
@@ -157,6 +174,14 @@ let decode_ref (e : Ppxlib.expression) =
   | _ ->
     Error "expected (longident, file, start_line, start_col, end_col) tuple"
 
+let decode_block (e : Ppxlib.expression) =
+  match e.pexp_desc with
+  | Pexp_tuple [ line_e; class_e ] ->
+    (match int_of_const_expr line_e, string_of_const_expr class_e with
+    | Some line, Some class_string -> Ok { line; class_string }
+    | _ -> Error "expected (line, class_string) tuple")
+  | _ -> Error "expected (line, class_string) tuple"
+
 let decode_config_entry (e : Ppxlib.expression) =
   match e.pexp_desc with
   | Pexp_tuple [ key_e; value_e ] ->
@@ -170,6 +195,9 @@ let decode_bindings_payload =
 
 let decode_config_payload =
   decode_list ~attribute:config_attribute_name ~decode:decode_config_entry
+
+let decode_blocks_payload =
+  decode_list ~attribute:blocks_attribute_name ~decode:decode_block
 
 let decode_refs_payload =
   decode_list ~attribute:refs_attribute_name ~decode:decode_ref

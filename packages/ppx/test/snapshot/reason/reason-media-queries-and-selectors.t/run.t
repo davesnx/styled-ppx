@@ -14,6 +14,14 @@
       ),
     ]
   ];
+  [@css.blocks
+    [
+      (
+        3,
+        "_id_36wyir _a_izob039qt2j _a_qyw7u39xfxf _a_og90v4ew9gh _a_og90v65000wbeaj",
+      ),
+    ]
+  ];
   module SelectorsMediaQueries = {
     [@deriving abstract]
     [@warning "-69"]

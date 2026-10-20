@@ -31,6 +31,12 @@ Selectors covered here:
     ("Input.twoLevelPseudoClass", "_id_1p6ev21", "_a_4ekvmb _a_rv9hg4ef6vm");
     ("Input.threeLevel", "_id_16hizhg", "_a_4ekvmb _a_xltrd4emvqw");
     ("Input.descendantUnderPseudo", "_id_d9y20h", "_a_4ekvmb _a_d3qow4ebkm2")]]
+  [@@@css.blocks
+    [(9, "_id_1e50cws _a_4ekvmb _a_qyw7u4enfjo");
+    (19, "_id_8l8452 _a_4ekvmb _a_7t7p64wzudz");
+    (31, "_id_1p6ev21 _a_4ekvmb _a_rv9hg4ef6vm");
+    (43, "_id_16hizhg _a_4ekvmb _a_xltrd4emvqw");
+    (57, "_id_d9y20h _a_4ekvmb _a_d3qow4ebkm2")]]
   let single = CSS.make "label:single _id_1e50cws _a_4ekvmb _a_qyw7u4enfjo" []
   let twoLevel =
     CSS.make "label:twoLevel _id_8l8452 _a_4ekvmb _a_7t7p64wzudz" []

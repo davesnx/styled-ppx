@@ -9,6 +9,9 @@
       ("Output.classNameWithCss", "_id_wvmpur", "_a_390004od7l"),
     ]
   ];
+  [@css.blocks
+    [(4, "_id_feg3n0 _a_4esm7b"), (5, "_id_wvmpur _a_390004od7l")]
+  ];
   let className = [%cx "display: block;"];
   let classNameWithMultiLine = [%cx {| display: block; |}];
   let classNameWithArray = [%cx [|cssProperty|]];

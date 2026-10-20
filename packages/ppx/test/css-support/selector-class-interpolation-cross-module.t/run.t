@@ -17,6 +17,7 @@ location and a synthetic dep-tracking `let`.
   [@@@css "._a_gnp5r39ddnj.\000M.marker\000{background:blue;}"]
   [@@@css.bindings
     [("N.container", "_id_1ov2ckq", "_a_393u2l _a_gnp5r39ddnj")]]
+  [@@@css.blocks [(3, "_id_1ov2ckq _a_393u2l _a_gnp5r39ddnj")]]
   [@@@css.refs [("M.marker", "n.ml", 6, 6, 14)]]
   let _ = M.marker
   let container =

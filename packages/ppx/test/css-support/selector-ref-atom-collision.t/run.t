@@ -18,6 +18,9 @@ the literal `$(row)` marker, which is identical in both files.
   [@@@css.bindings
     [("A.row", "_id_qqjiik", "_a_4ekvmb");
     ("A.list", "_id_rvu3wa", "_a_338dn5r760i _a_ggsyq5lb484")]]
+  [@@@css.blocks
+    [(1, "_id_qqjiik _a_4ekvmb");
+    (4, "_id_rvu3wa _a_338dn5r760i _a_ggsyq5lb484")]]
   let row = CSS.make "label:row _id_qqjiik _a_4ekvmb" []
   let list = CSS.make "label:list _id_rvu3wa _a_338dn5r760i _a_ggsyq5lb484" []
 
@@ -28,6 +31,9 @@ the literal `$(row)` marker, which is identical in both files.
   [@@@css.bindings
     [("B.row", "_id_avtt0b", "_a_4esm7b");
     ("B.list", "_id_11lkn7z", "_a_coyc85r18kg _a_bnnt45lmqgv")]]
+  [@@@css.blocks
+    [(1, "_id_avtt0b _a_4esm7b");
+    (4, "_id_11lkn7z _a_coyc85r18kg _a_bnnt45lmqgv")]]
   let row = CSS.make "label:row _id_avtt0b _a_4esm7b" []
   let list = CSS.make "label:list _id_11lkn7z _a_coyc85r18kg _a_bnnt45lmqgv" []
 

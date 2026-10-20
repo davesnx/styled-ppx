@@ -4,6 +4,16 @@ type binding = private {
   class_string : string;
 }
 
+(** One [%css]/[%styled.<tag>] block, named or anonymous: the source line of its
+    CSS string and its class string (identity class, then atom classes in source
+    order, as [CSS.make] receives them, without the dev label). The aggregator
+    orders competing atoms of one block in this order. No file field: the
+    block's file is the input file that carries the attribute. *)
+type block = private {
+  line : int;
+  class_string : string;
+}
+
 type ref_loc = private {
   longident : string;
   file : string;
@@ -15,6 +25,10 @@ type ref_loc = private {
 val css_attribute_name : string
 val bindings_attribute_name : string
 val refs_attribute_name : string
+
+(** [[@@@css.blocks [(line, class_string); ...]]]: every block of the
+    compilation unit, see {!block}. *)
+val blocks_attribute_name : string
 
 (** [[@@@css.config [(key, value); ...]]] carries PPX-side settings that the
     aggregator must honor. Keys today: {!config_env_key} — the PPX emits
@@ -37,6 +51,8 @@ val sentinel : string -> string
 val binding :
   longident:string -> identity:string -> class_string:string -> binding
 
+val block : line:int -> class_string:string -> block
+
 val ref_loc :
   longident:string ->
   file:string ->
@@ -49,10 +65,12 @@ val ref_loc_of_location : longident:string -> Ppxlib.Location.t -> ref_loc
 val css_attribute : string -> Ppxlib.structure_item
 val bindings_attribute : binding list -> Ppxlib.structure_item
 val refs_attribute : ref_loc list -> Ppxlib.structure_item
+val blocks_attribute : block list -> Ppxlib.structure_item
 val config_attribute : (string * string) list -> Ppxlib.structure_item
 val decode_css_payload : Ppxlib.expression -> (string, string) result
 val decode_bindings_payload : Ppxlib.expression -> (binding list, string) result
 val decode_refs_payload : Ppxlib.expression -> (ref_loc list, string) result
+val decode_blocks_payload : Ppxlib.expression -> (block list, string) result
 
 val decode_config_payload :
   Ppxlib.expression -> ((string * string) list, string) result

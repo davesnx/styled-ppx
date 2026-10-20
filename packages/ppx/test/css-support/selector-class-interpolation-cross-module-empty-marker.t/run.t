@@ -17,6 +17,7 @@ distinct longident.
   [@css.bindings
     [("N.modal", "_id_1g7stmc", "_a_5rfx7x _a_bti1z5rn55o _a_pkso639fi5u")]
   ];
+  [@css.blocks [(3, "_id_1g7stmc _a_5rfx7x _a_bti1z5rn55o _a_pkso639fi5u")]];
   [@css.refs
     [("M.isOpen", "n.ml", 6, 6, 14), ("M.isHovered", "n.ml", 7, 6, 17)]
   ];

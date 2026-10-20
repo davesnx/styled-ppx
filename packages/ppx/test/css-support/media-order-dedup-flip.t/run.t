@@ -26,6 +26,9 @@ the two blocks no longer collide and each keeps its own author order.
   [@@@css.bindings
     [("Output.blockA", "_id_bitm25", "_a_izob04e6zo5 _a_mp5mk4et4n8");
     ("Output.blockB", "_id_1kl48f", "_a_mp5mk4exhzt _a_izob04e698n")]]
+  [@@@css.blocks
+    [(3, "_id_bitm25 _a_izob04e6zo5 _a_mp5mk4et4n8");
+    (9, "_id_1kl48f _a_mp5mk4exhzt _a_izob04e698n")]]
   let blockA =
     CSS.make "label:blockA _id_bitm25 _a_izob04e6zo5 _a_mp5mk4et4n8" []
   let blockB =

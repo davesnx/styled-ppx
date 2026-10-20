@@ -23,6 +23,7 @@ Dev markers are on by default; `--env production` turns them off for
       ("Input.Button", "_id_1qldrk3", "_a_4esjgz"),
     ]
   ];
+  [@css.blocks [(5, "_id_zugc0d _a_4ekvmb"), (8, "_id_1qldrk3 _a_4esjgz")]];
   
   module Box = {
     [@deriving abstract]

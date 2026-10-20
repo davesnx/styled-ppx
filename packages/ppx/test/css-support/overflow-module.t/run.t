@@ -50,6 +50,45 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_8vluqi{overflow-clip-margin:1em;}"];
   [@css "._a_8vxgse{overflow-clip-margin:content-box 5px;}"];
   [@css "._a_8v8vwx{overflow-clip-margin:5px content-box;}"];
+  [@css.blocks
+    [
+      (2, "_a_7lcixw"),
+      (3, "_a_7lhhy3"),
+      (6, "_a_87eyiu"),
+      (7, "_a_87khmq"),
+      (8, "_a_8r0001bhz6"),
+      (9, "_a_8r0001o3b9"),
+      (10, "_a_8r00013fel"),
+      (11, "_a_8r0001d1he"),
+      (12, "_a_8r0001shjd"),
+      (13, "_a_8r0002v34m"),
+      (14, "_a_8r0002vlu9"),
+      (15, "_a_8r00023dqe"),
+      (16, "_a_8r0002vnbz"),
+      (17, "_a_8r00023rg8"),
+      (18, "_a_8w7o30"),
+      (19, "_a_8wocar"),
+      (20, "_a_8wmbnd"),
+      (21, "_a_8wvnt4"),
+      (22, "_a_8wl3d7"),
+      (23, "_a_8t376w"),
+      (24, "_a_8ti9nl"),
+      (25, "_a_8tmqtl"),
+      (26, "_a_8t7b3k"),
+      (27, "_a_8te70x"),
+      (28, "_a_bdyyg0"),
+      (29, "_a_bdkn4i"),
+      (30, "_a_bd0g5d"),
+      (31, "_a_bdacsl"),
+      (32, "_a_8vw8p9"),
+      (33, "_a_8vc69b"),
+      (34, "_a_8v4htk"),
+      (35, "_a_8vg26a"),
+      (36, "_a_8vluqi"),
+      (37, "_a_8vxgse"),
+      (38, "_a_8v8vwx"),
+    ]
+  ];
   
   CSS.make("_a_7lcixw", []);
   CSS.make("_a_7lhhy3", []);

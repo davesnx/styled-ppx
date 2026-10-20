@@ -3,6 +3,7 @@
   $ refmt --parse ml --print re output.ml
   [@css "._a_4ekvmb{color:red;}"];
   [@css.bindings [("Output.Box", "_id_1l8coch", "_a_4ekvmb")]];
+  [@css.blocks [(1, "_id_1l8coch _a_4ekvmb")]];
   module Box = {
     [@deriving abstract]
     [@warning "-69"]

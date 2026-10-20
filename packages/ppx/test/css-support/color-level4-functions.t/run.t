@@ -48,6 +48,43 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_390004qziw{background-color:lch(50% 30 120);}"];
   [@css "._a_390004l9l2{background-color:oklab(50% 0.1 -0.1);}"];
   [@css "._a_390004ibmj{background-color:oklch(50% 0.15 120);}"];
+  [@css.blocks
+    [
+      (4, "_a_4esyq5"),
+      (5, "_a_4e1qgw"),
+      (6, "_a_4ezea3"),
+      (7, "_a_4e3fh9"),
+      (10, "_a_4e2e9t"),
+      (11, "_a_4e3erw"),
+      (12, "_a_4en9r5"),
+      (13, "_a_4e699s"),
+      (16, "_a_4e2dh3"),
+      (17, "_a_4ej1zh"),
+      (18, "_a_4eaqt7"),
+      (19, "_a_4ezfou"),
+      (22, "_a_4enil4"),
+      (23, "_a_4e00n7"),
+      (24, "_a_4exkis"),
+      (25, "_a_4em1az"),
+      (28, "_a_4eqt74"),
+      (29, "_a_4es7y3"),
+      (30, "_a_4ezyac"),
+      (31, "_a_4ehrqn"),
+      (34, "_a_4e9bfd"),
+      (35, "_a_4exrra"),
+      (36, "_a_4ed5hk"),
+      (37, "_a_39000476db"),
+      (40, "_a_4eq67q"),
+      (41, "_a_4evn4u"),
+      (42, "_a_4e4vx0"),
+      (43, "_a_4eh8l1"),
+      (46, "_a_390004jf25"),
+      (47, "_a_3900046psj"),
+      (48, "_a_390004qziw"),
+      (49, "_a_390004l9l2"),
+      (50, "_a_390004ibmj"),
+    ]
+  ];
   
   CSS.make("_a_4esyq5", []);
   CSS.make("_a_4e1qgw", []);

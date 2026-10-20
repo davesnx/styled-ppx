@@ -24,6 +24,18 @@ with no trailing space.
   [@css "._a_7rw2m8a3txl > *{min-height:0;}"];
   [@css "@media (min-width: 100px) {._a_6pdot5r5e8m{display:flex;}}"];
   [@css "._a_5lba41{cursor:-webkit-grab;cursor:grab;}"];
+  [@css.blocks
+    [
+      (3, "_a_5r08qs"),
+      (7, "_a_5r08qs"),
+      (11, "_a_7rw2m8a3txl"),
+      (12, "_a_7rw2m8a3txl"),
+      (15, "_a_6pdot5r5e8m"),
+      (16, "_a_6pdot5r5e8m"),
+      (20, "_a_5lba41"),
+      (21, "_a_5lba41"),
+    ]
+  ];
   
   CSS.make("_a_5r08qs", []);
   

@@ -39,6 +39,34 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_90qfuu{overscroll-behavior-block:contain;}"];
   [@css "._a_90iw13{overscroll-behavior-block:none;}"];
   [@css "._a_90unay{overscroll-behavior-block:auto;}"];
+  [@css.blocks
+    [
+      (2, "_a_8zho3a"),
+      (3, "_a_8z7j1d"),
+      (4, "_a_8zukkc"),
+      (5, "_a_8zxxxe"),
+      (6, "_a_8zypmu"),
+      (7, "_a_8zmwul"),
+      (8, "_a_8zbl4h"),
+      (9, "_a_8zanq6"),
+      (10, "_a_8zyhlg"),
+      (11, "_a_8z9kl3"),
+      (12, "_a_8zifvx"),
+      (13, "_a_8zmixw"),
+      (14, "_a_92zttn"),
+      (15, "_a_92zrzr"),
+      (16, "_a_92jltw"),
+      (17, "_a_93sund"),
+      (18, "_a_93t8de"),
+      (19, "_a_93yb72"),
+      (20, "_a_91sm2h"),
+      (21, "_a_91iqqo"),
+      (22, "_a_91kyxi"),
+      (23, "_a_90qfuu"),
+      (24, "_a_90iw13"),
+      (25, "_a_90unay"),
+    ]
+  ];
   
   CSS.make("_a_8zho3a", []);
   CSS.make("_a_8z7j1d", []);

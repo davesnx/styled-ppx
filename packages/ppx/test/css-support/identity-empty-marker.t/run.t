@@ -14,6 +14,7 @@ from the extracted selector. The identity is independent of `--minify`
   $ ../../standalone.exe --impl input.ml -o dev.ml
   $ cat dev.ml
   [@@@css.bindings [("Input.marker", "_id_1rctcrz", "")]]
+  [@@@css.blocks [(1, "_id_1rctcrz")]]
   let marker = CSS.make "label:marker _id_1rctcrz" []
   let _ = marker
 
@@ -21,5 +22,6 @@ from the extracted selector. The identity is independent of `--minify`
   $ cat prod.ml
   [@@@css.config [("env", "production")]]
   [@@@css.bindings [("Input.marker", "_id_1rctcrz", "")]]
+  [@@@css.blocks [(1, "_id_1rctcrz")]]
   let marker = CSS.make "_id_1rctcrz" []
   let _ = marker

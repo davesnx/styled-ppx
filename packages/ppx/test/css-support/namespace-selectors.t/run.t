@@ -29,6 +29,15 @@ Namespace-qualified selectors (`svg|circle`, `*|a`, `|a`, `svg|*`,
       ("Input._e", "_id_7b4bx6", "_a_rxkey4eowbc"),
     ]
   ];
+  [@css.blocks
+    [
+      (3, "_id_1quemw0 _a_zh70v5w9wvj"),
+      (4, "_id_1ctzq0z _a_jxqpf4ekoom"),
+      (5, "_id_u33r7w _a_noi564e8hmn"),
+      (6, "_id_11pafqa _a_bkgso4es6rf"),
+      (7, "_id_7b4bx6 _a_rxkey4eowbc"),
+    ]
+  ];
   
   let _a = CSS.make("label:_a _id_1quemw0 _a_zh70v5w9wvj", []);
   let _b = CSS.make("label:_b _id_1ctzq0z _a_jxqpf4ekoom", []);

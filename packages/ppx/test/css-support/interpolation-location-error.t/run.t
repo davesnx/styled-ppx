@@ -64,6 +64,7 @@ If this test fail means that the module is not in sync with the ppx
   [@css "@property --grid-1sb4gse{syntax:\"*\";inherits:false;}"];
   [@css "._a_5rak65{display:var(--grid-1sb4gse);}"];
   [@css.bindings [("Input.a", "_id_fo0igp", "_a_5rak65")]];
+  [@css.blocks [(2, "_id_fo0igp _a_5rak65")]];
   let grid = `gri;
   let a =
     CSS.make(

@@ -26,6 +26,14 @@ chain as `$(Css.marker)` without emitting a cross-module sentinel.
       ("Input.Theme.wrapper", "_id_q7k20t", "_a_uisk84er06r"),
     ]
   ];
+  [@css.blocks
+    [
+      (2, "_id_zr2uk1 _a_4ekvmb"),
+      (7, "_id_4f6ye3 _a_qye7h4eikep"),
+      (13, "_id_11dmi54 _a_4ecoli"),
+      (18, "_id_q7k20t _a_uisk84er06r"),
+    ]
+  ];
   module Css = {
     let marker = CSS.make("label:marker _id_zr2uk1 _a_4ekvmb", []);
   };

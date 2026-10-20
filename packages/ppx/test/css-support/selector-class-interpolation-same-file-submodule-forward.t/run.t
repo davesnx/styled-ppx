@@ -22,6 +22,9 @@ referenced submodule binding above the selector interpolation.
       ("Input.Css.marker", "_id_zr2uk1", "_a_4ekvmb"),
     ]
   ];
+  [@css.blocks
+    [(1, "_id_4f6ye3 _a_ye3jo4ed103"), (6, "_id_zr2uk1 _a_4ekvmb")]
+  ];
   [@css.refs [("Css.marker", "input.re", 2, 6, 16)]];
   
   let _ = Css.marker;

@@ -23,6 +23,13 @@ Same-file submodule binding shadowing follows structure order: a later
       ("Input.wrapper", "_id_4f6ye3", "_a_daz5z4ei0c4"),
     ]
   ];
+  [@css.blocks
+    [
+      (2, "_id_zr2uk1 _a_4ekvmb"),
+      (5, "_id_1l23vtp _a_4ecoli"),
+      (8, "_id_4f6ye3 _a_daz5z4ei0c4"),
+    ]
+  ];
   module Css = {
     let marker = CSS.make("label:marker _id_zr2uk1 _a_4ekvmb", []);
     let _ = marker;

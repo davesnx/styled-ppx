@@ -29,6 +29,24 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_bycl19{stroke-linejoin:bevel;}"];
   [@css "._a_byzojx{stroke-linejoin:round;}"];
   [@css "._a_bz77up{stroke-miterlimit:4;}"];
+  [@css.blocks
+    [
+      (7, "_a_5y335o"),
+      (8, "_a_5yje6q"),
+      (62, "_a_5x1axr"),
+      (63, "_a_5xmbij"),
+      (69, "_a_c1fno8"),
+      (70, "_a_c1bqje"),
+      (71, "_a_c1ssim"),
+      (75, "_a_bx3u6b"),
+      (76, "_a_bx96vv"),
+      (77, "_a_bxdlez"),
+      (80, "_a_bybou6"),
+      (81, "_a_bycl19"),
+      (82, "_a_byzojx"),
+      (87, "_a_bz77up"),
+    ]
+  ];
   
   CSS.make("_a_5y335o", []);
   CSS.make("_a_5yje6q", []);

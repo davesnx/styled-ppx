@@ -22,6 +22,9 @@ extracted CSS, and resolved selectors are byte-identical between
       ("Input.bar", "_id_1eelq62", "_a_8s8tj4em6j7"),
     ]
   ];
+  [@css.blocks
+    [(8, "_id_zec317 _a_4ekvmb"), (10, "_id_1eelq62 _a_8s8tj4em6j7")]
+  ];
   
   let foo = CSS.make("label:foo _id_zec317 _a_4ekvmb", []);
   

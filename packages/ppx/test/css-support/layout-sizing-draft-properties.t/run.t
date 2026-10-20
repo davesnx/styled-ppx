@@ -50,6 +50,33 @@ error names the property.
   [@css "._a_fh23yj{box-snap:last-baseline;}"];
   [@css "._a_f8c3iu{border-boundary:parent;}"];
   [@css "._a_geq7gh{shape-inside:circle() border-box;}"];
+  [@css.blocks
+    [
+      (5, "_a_g72k91"),
+      (6, "_a_g7o8qx"),
+      (7, "_a_g9z1wa"),
+      (8, "_a_g92f9q"),
+      (9, "_a_g8tgfk"),
+      (10, "_a_g86fqb"),
+      (11, "_a_g8jrij"),
+      (14, "_a_gyjxpg"),
+      (15, "_a_h0ahj7"),
+      (18, "_a_g5n5yv"),
+      (21, "_a_f20008myq3"),
+      (22, "_a_f20002gz9k"),
+      (23, "_a_f20001kywn"),
+      (24, "_a_f20004jjp9"),
+      (25, "_a_f2stl1"),
+      (28, "_a_fy64xq"),
+      (29, "_a_fzl4el"),
+      (30, "_a_g1x0ci"),
+      (33, "_a_g2v01o"),
+      (34, "_a_g4l7fm"),
+      (35, "_a_fh23yj"),
+      (38, "_a_f8c3iu"),
+      (39, "_a_geq7gh"),
+    ]
+  ];
   
   CSS.make("_a_g72k91", []);
   CSS.make("_a_g7o8qx", []);

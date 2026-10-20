@@ -29,6 +29,13 @@ top-level interpolation does. If the inline list is empty `[]` for the
       ("Input.placeholder", "_id_1xk9ylj", "_a_wu9h64eac4l"),
     ]
   ];
+  [@css.blocks
+    [
+      (14, "_id_1pfdov9 _a_4exvk3"),
+      (17, "_id_zu568x _a_qyw7u4eh0hp"),
+      (20, "_id_1xk9ylj _a_wu9h64eac4l"),
+    ]
+  ];
   
   let c = CSS.hex("ff0000");
   

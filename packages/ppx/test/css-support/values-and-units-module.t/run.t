@@ -32,6 +32,28 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_94vl0f{padding:5vh;}"];
   [@css "._a_94nbv5{padding:5vmin;}"];
   [@css "._a_94tnlf{padding:5vmax;}"];
+  [@css.blocks
+    [
+      (2, "_a_ecmhzu"),
+      (3, "_a_ecmtw2"),
+      (4, "_a_ecqw8v"),
+      (5, "_a_ecjpn0"),
+      (6, "_a_ecyuy0"),
+      (7, "_a_ecjkyq"),
+      (8, "_a_ecqvys"),
+      (9, "_a_ecfuw8"),
+      (10, "_a_ecfuw8"),
+      (11, "_a_ec3oae"),
+      (12, "_a_ecodca"),
+      (13, "_a_ectqhb"),
+      (14, "_a_941t7g"),
+      (15, "_a_948q7f"),
+      (16, "_a_94w8ry"),
+      (17, "_a_94vl0f"),
+      (18, "_a_94nbv5"),
+      (19, "_a_94tnlf"),
+    ]
+  ];
   
   CSS.make("_a_ecmhzu", []);
   CSS.make("_a_ecmtw2", []);

@@ -54,6 +54,45 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_8o85qu{orphans:2;}"];
   [@css "._a_ebq94c{widows:1;}"];
   [@css "._a_ebmc20{widows:2;}"];
+  [@css.blocks
+    [
+      (2, "_a_43gwd0"),
+      (3, "_a_43sw5z"),
+      (4, "_a_43e3mx"),
+      (5, "_a_43u2iv"),
+      (6, "_a_43acmv"),
+      (7, "_a_43s0v2"),
+      (8, "_a_43efcv"),
+      (9, "_a_43wwqb"),
+      (10, "_a_43az7b"),
+      (11, "_a_43inlv"),
+      (12, "_a_43wpn3"),
+      (13, "_a_43bno4"),
+      (14, "_a_42801c"),
+      (15, "_a_42f7vs"),
+      (16, "_a_4257zp"),
+      (17, "_a_42bk6r"),
+      (18, "_a_42ekzp"),
+      (19, "_a_425qvb"),
+      (20, "_a_424tvf"),
+      (21, "_a_42k4gz"),
+      (22, "_a_42iwkw"),
+      (23, "_a_42l3j6"),
+      (24, "_a_42yot9"),
+      (25, "_a_4298ro"),
+      (26, "_a_44fnl3"),
+      (27, "_a_44n7nl"),
+      (28, "_a_441xo4"),
+      (29, "_a_447h5w"),
+      (30, "_a_44pnax"),
+      (31, "_a_3sipz1"),
+      (32, "_a_3sthfn"),
+      (33, "_a_8o262r"),
+      (34, "_a_8o85qu"),
+      (36, "_a_ebq94c"),
+      (37, "_a_ebmc20"),
+    ]
+  ];
   
   CSS.make("_a_43gwd0", []);
   CSS.make("_a_43sw5z", []);

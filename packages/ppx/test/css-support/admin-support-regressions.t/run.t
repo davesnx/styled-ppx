@@ -32,6 +32,15 @@ This test captures cx2 regressions in an admin-style UI: border-side shorthands 
       ("Input._heightPlus", "_id_11xytn2", "_a_6lttxg"),
     ]
   ];
+  [@css.blocks
+    [
+      (35, "_id_k0smpx _a_3h2ghs9vd4"),
+      (37, "_id_4yz5wd _a_3h0007kb5g"),
+      (39, "_id_1w7n6a9 _a_3h01ds4w3j"),
+      (41, "_id_114a8u4 _a_400dz6"),
+      (43, "_id_11xytn2 _a_6lttxg"),
+    ]
+  ];
   module Alias = {
     module Shadow = {
       type t = CSS.Shadow.t;

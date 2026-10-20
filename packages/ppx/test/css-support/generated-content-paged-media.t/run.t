@@ -42,6 +42,27 @@ error names the property.
   [@css "._a_fwgn0m{footnote-policy:auto;}"];
   [@css "._a_fwpoa2{footnote-policy:line;}"];
   [@css "._a_fw06l6{footnote-policy:block;}"];
+  [@css.blocks
+    [
+      (4, "_a_f3iw93"),
+      (5, "_a_f31cv3"),
+      (6, "_a_f4gtar"),
+      (7, "_a_f43uz1"),
+      (8, "_a_f5gcl2"),
+      (9, "_a_f5tdnk"),
+      (10, "_a_gjnekd"),
+      (11, "_a_gjkcpd"),
+      (12, "_a_gj4i6x"),
+      (13, "_a_gd5t9y"),
+      (14, "_a_gdmemd"),
+      (15, "_a_fvhh3d"),
+      (16, "_a_fvt121"),
+      (17, "_a_fvqnac"),
+      (18, "_a_fwgn0m"),
+      (19, "_a_fwpoa2"),
+      (20, "_a_fw06l6"),
+    ]
+  ];
   
   CSS.make("_a_f3iw93", []);
   CSS.make("_a_f31cv3", []);

@@ -24,6 +24,7 @@ its className carries only atoms.
   [@css "._a_5r08qs{display:flex;}"];
   [@css "._a_4ekvmb{color:red;}"];
   [@css.bindings [("Input.layout", "_id_1jj5tmt", "_a_5r08qs")]];
+  [@css.blocks [(1, "_id_1jj5tmt _a_5r08qs"), (3, "_a_4ekvmb")]];
   let layout = CSS.make("label:layout _id_1jj5tmt _a_5r08qs", []);
   
   let _ = CSS.make("_a_4ekvmb", []);

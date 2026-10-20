@@ -50,6 +50,45 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_3axi8v{background-blend-mode:color;}"];
   [@css "._a_3a9g5x{background-blend-mode:luminosity;}"];
   [@css "._a_3al4fq{background-blend-mode:normal, multiply;}"];
+  [@css.blocks
+    [
+      (2, "_a_8dlko4"),
+      (3, "_a_8dvjpz"),
+      (4, "_a_8dk0am"),
+      (5, "_a_8dzyj4"),
+      (6, "_a_8dt403"),
+      (7, "_a_8dm2bs"),
+      (8, "_a_8dhaz0"),
+      (9, "_a_8dw6n1"),
+      (10, "_a_8dzgq9"),
+      (11, "_a_8dndlc"),
+      (12, "_a_8d54fr"),
+      (13, "_a_8dbobq"),
+      (14, "_a_8duj9e"),
+      (15, "_a_8dqzf6"),
+      (16, "_a_8d0k1i"),
+      (17, "_a_8dszft"),
+      (18, "_a_7ajmn5"),
+      (19, "_a_7anam7"),
+      (20, "_a_3a0fcc"),
+      (21, "_a_3awb0u"),
+      (22, "_a_3amqbu"),
+      (23, "_a_3akb0h"),
+      (24, "_a_3aejn3"),
+      (25, "_a_3agoey"),
+      (26, "_a_3ayjd5"),
+      (27, "_a_3a39ay"),
+      (28, "_a_3abqd8"),
+      (29, "_a_3ae5j0"),
+      (30, "_a_3a2r9t"),
+      (31, "_a_3anlb2"),
+      (32, "_a_3ay3l6"),
+      (33, "_a_3aoyo7"),
+      (34, "_a_3axi8v"),
+      (35, "_a_3a9g5x"),
+      (36, "_a_3al4fq"),
+    ]
+  ];
   
   CSS.make("_a_8dlko4", []);
   CSS.make("_a_8dvjpz", []);

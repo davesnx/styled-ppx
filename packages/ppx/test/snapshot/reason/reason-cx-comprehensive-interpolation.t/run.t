@@ -63,6 +63,21 @@ Comprehensive test for cx2 interpolation with various property types
       ("Output.test11", "_id_16lxxsk", "_a_eckyy8 _a_6lnay0 _a_4ekvmb"),
     ]
   ];
+  [@css.blocks
+    [
+      (7, "_id_1jhxcqu _in_b8f0pi"),
+      (15, "_id_zesghj _in_1swajk7"),
+      (23, "_id_12rsoz0 _a_6fvyy6"),
+      (30, "_id_puktrw _in_1vzwmoy"),
+      (36, "_id_1nw36ql _a_600001pa9s"),
+      (42, "_id_7ivz4 _in_1knt7y9"),
+      (47, "_id_iq7p3 _in_1d6x35p"),
+      (52, "_id_yq2qob _a_ekxgpr"),
+      (58, "_id_1u4o5z6 _a_3h1lokzkxi"),
+      (65, "_id_1egwgp0 _in_zoi7e9"),
+      (70, "_id_16lxxsk _a_eckyy8 _a_6lnay0 _a_4ekvmb"),
+    ]
+  ];
   let lengthVar = CSS.px(10);
   let colorVar = CSS.red;
   let percentVar = CSS.pct(50.0);
