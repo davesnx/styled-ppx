@@ -912,21 +912,21 @@ let sort_by_shorthand_first rules =
    2. Block edges: in one block's class list ([[@@@css.blocks]]), an earlier competing rule
       comes first. One block then reads as plain CSS: the declaration written
       last wins.
-   3. Cover edges ({!covers}): in one context, a shorthand rule comes before
-      a rule whose longhands it all sets. A block edge between the same two
-      rules wins.
-   4. Definition order (the first time [ordered_rules] lists the rule) for
+   3. Definition order (the first time [ordered_rules] lists the rule) for
       every pair the edges leave open. A [CSS.merge (a, b)] gets [b]'s rules
       last when [b] is defined after [a] (later in the file, or in a file the
       dependency order puts later).
 
+   There is no "shorthand before a longhand it covers" edge: through an
+   unrelated block's longhand in the same context, such an edge can pull a
+   merge's later argument ahead of the earlier one
+   (`ordered-sheet-monorepo-regressions.t`). [CSS.merge] already drops a
+   longhand that a later argument's shorthand covers.
+
    The sheet is built from its END: among the rules whose successors are all
    placed, the latest by priority is placed next. So a rule keeps its
    definition position unless an edge pulls it ahead of a rule it must
-   precede. Built from the front instead, a cover edge pushes a longhand
-   behind the LAST shorthand of its context in the whole sheet, and that
-   broke more competing pairs (measured on the cascade cases and on the
-   monorepo merge sites, 2026-10-20).
+   precede.
 
    Two blocks that order the same two rules in opposite directions are a
    conflict: generate warns, names both blocks, drops both edges and keeps
@@ -1073,17 +1073,15 @@ module Specificity = struct
     go 0 zero
 end
 
-(** What the order needs to know about one atom rule. [context] is the rule text
-    up to its declarations (at-rule chain and selector, atom class written [&]),
-    plus ["!"] for [!important] declarations. [subject] names the element and
-    pseudo-element the rule styles: ["own"] plus the pseudo-elements after the
-    atom class, or the whole selector (atom class written [&]) when a combinator
-    after the atom class reaches another element. [leaves] is the sorted set of
-    longhands the declarations set ([all] kept apart in [sets_all]). *)
+(** What the order needs to know about one atom rule. [subject] names the
+    element and pseudo-element the rule styles: ["own"] plus the pseudo-elements
+    after the atom class, or the whole selector (atom class written [&]) when a
+    combinator after the atom class reaches another element. [leaves] is the
+    sorted set of longhands the declarations set, a legacy alias read as its
+    canonical name ([all] kept apart in [sets_all]). *)
 type atom_rule = {
   text : string;
   descendant : bool;
-  context : string;
   specificity : Specificity.t;
   important : bool;
   subject : string;
@@ -1159,18 +1157,9 @@ let atom_rule_of_text text =
     find_substring (String.lowercase_ascii block) "!important" <> None
   in
   let amp = replace_all ~sub:("." ^ class_name) ~by:"&" in
-  let prelude =
-    match String.index_opt text '}' with
-    | Some close ->
-      (match String.rindex_from_opt text close '{' with
-      | Some open_ -> String.sub text 0 open_
-      | None -> text)
-    | None -> text
-  in
   {
     text;
     descendant = is_descendant_shape text;
-    context = (amp prelude ^ if important then "!" else "");
     specificity = Specificity.of_list selector;
     important;
     subject =
@@ -1180,7 +1169,8 @@ let atom_rule_of_text text =
     leaves =
       properties
       |> List.filter (fun p -> p <> "all")
-      |> List.concat_map Slot_key.leaves_of
+      |> List.concat_map (fun p ->
+        Slot_key.leaves_of (Slot_key.resolve_alias p))
       |> List.sort_uniq String.compare;
     sets_all = List.mem "all" properties;
   }
@@ -1194,16 +1184,6 @@ let rec sorted_intersect a b =
     else if c < 0 then sorted_intersect xs b
     else sorted_intersect a ys
 
-let rec sorted_subset a b =
-  match a, b with
-  | [], _ -> true
-  | _, [] -> false
-  | x :: xs, y :: ys ->
-    let c = String.compare x y in
-    if c = 0 then sorted_subset xs ys
-    else if c > 0 then sorted_subset a ys
-    else false
-
 let resettable leaves =
   List.exists (fun l -> not (Slot_key.excluded_from_all l)) leaves
 
@@ -1211,20 +1191,6 @@ let overlaps a b =
   (a.sets_all && (b.sets_all || resettable b.leaves))
   || (b.sets_all && resettable a.leaves)
   || sorted_intersect a.leaves b.leaves
-
-(** [covers a b]: same context, and [a] sets every longhand [b] sets and more.
-    When [a] is the later argument of a merge, [CSS.merge] drops [b]; when [b]
-    is, [b] must follow [a] in the sheet. So [a] before [b] is always right. *)
-let covers a b =
-  String.equal a.context b.context
-  && a.text <> b.text
-  &&
-  if a.sets_all then
-    (not b.sets_all) && not (List.exists Slot_key.excluded_from_all b.leaves)
-  else
-    (not b.sets_all)
-    && List.length a.leaves > List.length b.leaves
-    && sorted_subset b.leaves a.leaves
 
 (** Two rules compete when the sheet position can decide between them: the
     cascade reaches position only after importance and specificity, and only for
@@ -1235,10 +1201,6 @@ let competes a b =
   && a.important = b.important
   && String.equal a.subject b.subject
   && overlaps a b
-
-type edge_origin =
-  | Cover
-  | Block of string
 
 type order_stats = {
   conflicts : int;  (** pairs two blocks order in opposite directions *)
@@ -1253,8 +1215,8 @@ let order_atom_rules ~(blocks : (string * string list) list) rules =
   let n = Array.length atoms in
   let index_of = Hashtbl.create n in
   Array.iteri (fun i a -> Hashtbl.replace index_of a.text i) atoms;
-  (* (i, j) -> why rule i must come before rule j *)
-  let edges : (int * int, edge_origin) Hashtbl.t = Hashtbl.create n in
+  (* (i, j) -> the block that puts rule i before rule j *)
+  let edges : (int * int, string) Hashtbl.t = Hashtbl.create n in
   List.iter
     (fun (name, texts) ->
       let members =
@@ -1272,7 +1234,7 @@ let order_atom_rules ~(blocks : (string * string list) list) rules =
           let i = members.(x)
           and j = members.(y) in
           if competes atoms.(i) atoms.(j) && not (Hashtbl.mem edges (i, j)) then
-            Hashtbl.replace edges (i, j) (Block name)
+            Hashtbl.replace edges (i, j) name
         done
       done)
     blocks;
@@ -1281,9 +1243,9 @@ let order_atom_rules ~(blocks : (string * string list) list) rules =
   in
   let conflicts =
     Hashtbl.fold
-      (fun (i, j) origin acc ->
-        match origin, Hashtbl.find_opt edges (j, i) with
-        | Block a, Some (Block b) when i < j -> (i, j, a, b) :: acc
+      (fun (i, j) a acc ->
+        match Hashtbl.find_opt edges (j, i) with
+        | Some b when i < j -> (i, j, a, b) :: acc
         | _ -> acc)
       edges []
     |> List.sort compare
@@ -1297,48 +1259,16 @@ let order_atom_rules ~(blocks : (string * string list) list) rules =
       Hashtbl.remove edges (i, j);
       Hashtbl.remove edges (j, i))
     conflicts;
-  (* Cover edges, found per context through a longhand index. A block edge
-     between the same two rules, in either direction, wins. *)
-  let by_context = Hashtbl.create 64 in
-  Array.iteri (fun i a -> Hashtbl.add by_context a.context i) atoms;
-  Hashtbl.fold (fun k _ acc -> k :: acc) by_context []
-  |> List.sort_uniq String.compare
-  |> List.iter (fun context ->
-    let members = Hashtbl.find_all by_context context in
-    let by_leaf = Hashtbl.create 16 in
-    List.iter
-      (fun i -> List.iter (fun l -> Hashtbl.add by_leaf l i) atoms.(i).leaves)
-      members;
-    let all_setters = List.filter (fun i -> atoms.(i).sets_all) members in
-    List.iter
-      (fun j ->
-        let candidates =
-          match atoms.(j).leaves with
-          | l :: _ -> Hashtbl.find_all by_leaf l @ all_setters
-          | [] -> all_setters
-        in
-        List.iter
-          (fun i ->
-            if
-              i <> j
-              && covers atoms.(i) atoms.(j)
-              && (not (Hashtbl.mem edges (i, j)))
-              && not (Hashtbl.mem edges (j, i))
-            then Hashtbl.replace edges (i, j) Cover)
-          candidates)
-      members);
   (* The sheet is built from its end: a rule is placed once every rule that
      must follow it is placed, and among those the latest by priority goes
      first. So a rule stays at its definition position unless an edge pulls
      it earlier, ahead of a rule it must precede. *)
   let succ = Array.make n [] in
   let pending = Array.make n 0 in
-  let block_pending = Array.make n 0 in
   Hashtbl.iter
-    (fun (i, j) origin ->
-      succ.(j) <- (i, origin) :: succ.(j);
-      pending.(i) <- pending.(i) + 1;
-      if origin <> Cover then block_pending.(i) <- block_pending.(i) + 1)
+    (fun (i, j) _ ->
+      succ.(j) <- i :: succ.(j);
+      pending.(i) <- pending.(i) + 1)
     edges;
   let priority i = ((if atoms.(i).descendant then 0 else 1) * n) + i in
   let module Ready = Set.Make (Int) in
@@ -1354,9 +1284,8 @@ let order_atom_rules ~(blocks : (string * string list) list) rules =
     incr count;
     result := atoms.(i).text :: !result;
     List.iter
-      (fun (j, origin) ->
+      (fun j ->
         if not placed.(j) then begin
-          if origin <> Cover then block_pending.(j) <- block_pending.(j) - 1;
           pending.(j) <- pending.(j) - 1;
           if pending.(j) = 0 then ready := Ready.add (priority j) !ready
         end)
@@ -1369,38 +1298,32 @@ let order_atom_rules ~(blocks : (string * string list) list) rules =
       ready := Ready.remove p !ready;
       place (if p >= n then p - n else p)
     | None ->
-      (* A cycle. Place the rule that waits on the fewest block edges, then on
-         the fewest edges, then the latest by priority, and drop the edges it
-         waits on: a cover edge only matters for some later merge, a block
-         edge for every use of its block. *)
+      (* A cycle. Place the rule that waits on the fewest edges, then the
+         latest by priority, and drop the edges it waits on. *)
       let best = ref (-1) in
       for i = 0 to n - 1 do
         if
           (not placed.(i))
           && (!best < 0
              || compare
-                  (block_pending.(i), pending.(i), -priority i)
-                  (block_pending.(!best), pending.(!best), -priority !best)
+                  (pending.(i), -priority i)
+                  (pending.(!best), -priority !best)
                 < 0)
         then best := i
       done;
       let i = !best in
       let names =
         Hashtbl.fold
-          (fun (from, to_) origin acc ->
-            match origin with
-            | Block name when from = i && not placed.(to_) -> name :: acc
-            | _ -> acc)
+          (fun (from, to_) name acc ->
+            if from = i && not placed.(to_) then name :: acc else acc)
           edges []
         |> List.sort_uniq String.compare
       in
-      if names <> [] then begin
-        incr cycles;
-        Logger.warning
-          "blocks %s order competing rules in a cycle; the sheet emits %s \
-           after rules those blocks put after it"
-          (String.concat ", " names) (short atoms.(i).text)
-      end;
+      incr cycles;
+      Logger.warning
+        "blocks %s order competing rules in a cycle; the sheet emits %s after \
+         rules those blocks put after it"
+        (String.concat ", " names) (short atoms.(i).text);
       pending.(i) <- 0;
       place i
   done;

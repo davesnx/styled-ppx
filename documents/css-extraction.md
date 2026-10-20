@@ -507,7 +507,11 @@ cascade can not separate otherwise: equal `!important`, equal specificity
 subject element and pseudo-element (a rule whose selector reaches another
 element through a combinator after the atom class only competes with a rule
 of the same selector), and at least one shared longhand
-(`Slot_key.leaves_of`; `all` overlaps every property it resets).
+(`Slot_key.leaves_of`; `all` overlaps every property it resets). A legacy
+alias that css-grammar registers (`grid-gap`, `grid-row-gap`,
+`grid-column-gap`, `word-wrap`, `font-width`) counts as its canonical
+property (`Slot_key.resolve_alias`), so `grid-gap: 40px` and a later
+`gap: 16px` compete.
 
 **Order keys**, in priority:
 
@@ -518,13 +522,18 @@ of the same selector), and at least one shared longhand
    `[@@@css.blocks ...]` (every `[%css]`/`[%styled.<tag>]` block, named or
    anonymous). Inside one block, an earlier competing rule must come
    before a later one.
-3. Cover edges. In one context (the rule text up to its declarations, atom
-   class written `&`, plus importance), a rule whose longhands strictly
-   contain another rule's longhands comes first. Always right: if the
-   covering rule is the later argument of `CSS.merge`, `Merge_key.removes`
-   drops the covered atom. A block edge between the same two rules wins.
-4. Definition order (first occurrence in the deduplicated, dependency-ordered
+3. Definition order (first occurrence in the deduplicated, dependency-ordered
    rule list) for every pair the edges leave open.
+
+There is no "shorthand before a longhand it covers" edge across blocks.
+Such an edge also reaches through an unrelated block: in the Ahrefs
+monorepo, a `padding-right` rule under `@media (max-width: 1279px)` in one
+file pulled `headerWithBanner`'s `padding` rule in that context, and through
+its block edge its base rule, ahead of `header`'s rules, so
+`merge(header, headerWithBanner)` gave `header` the tie
+(`packages/ppx/test/css-support/ordered-sheet-monorepo-regressions.t`).
+`CSS.merge` already drops a longhand that a later argument's shorthand
+covers.
 
 The sheet is built from its end: among the rules whose successors are all
 placed, the latest by definition order is placed next. A rule therefore
@@ -536,9 +545,8 @@ opposite directions: a warning names both blocks (the binding's longident
 from `[@@@css.bindings]`, or `file:line` of an anonymous class list), both
 edges are dropped, and the pair keeps definition order
 (`tiers-condition-tie-pseudo-class.t`). A longer cycle is cut at the rule
-that waits on the fewest block edges, with a warning naming the blocks whose
-order it drops (`ordered-sheet-cycle.t`). Cover edges dropped to cut a cycle
-are not reported.
+that waits on the fewest edges, with a warning naming the blocks whose
+order it drops (`ordered-sheet-cycle.t`).
 
 **Not used, by measurement (2026-10-20).** #616's base-before-conditional
 tier, shorthand depth as a global key, and the fixed at-rule and
@@ -820,11 +828,10 @@ shorthand that covers it) is not a limit - it drops normally, since a
 full mask is always a superset of any lone longhand's mask.
 
 `merge`'s remaining gap here, and the one it can never close for a bundle
-(two atoms hidden behind the SAME opaque `_in_` class), is exactly what the
-aggregator's shorthand-before-longhand sort exists for - see "Cascade
-tiers" above: the sort fixes stylesheet POSITION so the browser's own
-cascade still resolves the override correctly, whether or not `merge`
-itself could see the two properties involved.
+(two atoms hidden behind the SAME opaque `_in_` class), is left to sheet
+position - see "Sheet order" above: one block's source order, then
+definition order. When the narrow binding is defined after the wide one,
+or both are written in one block, the narrow rule comes later and wins.
 
 **Known limit, pinned by `packages/runtime/test/test_merge_key.ml`**:
 `Merge_key.parse_atom` (and its ppx-side mirror, `Slot_key.of_atom`'s

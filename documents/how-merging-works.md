@@ -68,8 +68,8 @@ CSS.merge(wide, narrow);
 /* both classes stay: a single side (margin-top) can never cover the whole
    shorthand's other three sides, so dropping the shorthand would silently
    lose them. Which one wins the TOP edge then depends on sheet order - see
-   "Sheet order" below (shorthands sort before their longhands, so
-   margin-top: 0 wins here too). */
+   "Sheet order" below (narrow is defined after wide, so margin-top: 0
+   comes later and wins here too). */
 ```
 
 (`shorthand_then_longhand_keeps_both`, same file — this is the accepted
@@ -127,17 +127,14 @@ one order that `styled-ppx.generate` builds from three sources:
    (`packages/generate/test/descendant-tier.t`).
 2. **Edges.** Two atom rules *compete* when only the sheet position can
    decide between them: equal importance, equal specificity, the same
-   element and pseudo-element, and at least one shared longhand.
+   element and pseudo-element, and at least one shared longhand. A legacy
+   alias counts as its canonical property: `grid-gap` competes with `gap`,
+   `word-wrap` with `overflow-wrap`.
    - *Block edge*: inside one block (one `[%css]`, named or not), an earlier
      competing rule comes first. One block reads as plain CSS:
      `[%css "&:focus { color: blue; } &:hover { color: red; }"]` gives `red`
      when both apply, because `:hover` is written last
      (`packages/generate/test/tiers-condition-tie-single-block.t`).
-   - *Cover edge*: in one context (same at-rules, same selector), a shorthand
-     comes before a rule whose longhands it all sets
-     (`packages/generate/test/tiers-shorthand-sort.t`). This is always right:
-     when the shorthand is the later merge argument, `CSS.merge` drops the
-     covered atom.
 3. **Definition order** for every pair the edges leave open: library, then
    module dependency order, then the order of definition in a file. A
    `CSS.merge(a, b)` gets `b`'s rules last when `b` is defined after `a`.
@@ -151,7 +148,13 @@ cycle of blocks is cut at one rule, with a warning
 (`packages/generate/test/ordered-sheet-cycle.t`).
 
 There is no fixed rank between conditions (`:hover` against `:focus`,
-`@media` against `@supports`): a block or definition order decides.
+`@media` against `@supports`), and no rank between a shorthand and its
+longhands across blocks: a block or definition order decides. A
+"shorthand before the longhands it covers" rule would reach through
+unrelated blocks: a `padding-right` rule under one `@media` in another file
+would pull `headerWithBanner`'s `padding` rules ahead of `header`'s, and
+`CSS.merge(header, headerWithBanner)` would give `header` the tie
+(`packages/ppx/test/css-support/ordered-sheet-monorepo-regressions.t`).
 
 **No CSS layer wraps any of this.** Specificity decides first, exactly
 like plain CSS; sheet position is only ever the tie-break, never an
@@ -233,11 +236,6 @@ all) still depends on which one the browser loads first
 - **Interpolation bundles.** `merge` never drops an `_in_` bundle, so an
   override of a property inside a bundle is decided by specificity and
   sheet order, not by argument order (the `card` example above).
-- **Cover edges compare whole rules.** A rule that groups several
-  declarations (a bundle with both a `padding` and a `margin-top`) covers
-  another rule only when it sets every longhand of that rule, so a partial
-  overlap gets no cover edge and falls to definition order
-  (`packages/generate/test/shorthand-depth-stress.t`).
 - **A hand-written class shaped like an atom.** `merge` recognizes an atom
   by class-name prefix and length alone; a hand-written class starting
   with `_a_` that happens to land on one of the six real atom lengths can
@@ -247,13 +245,22 @@ all) still depends on which one the browser loads first
   starting with `_a_`.
 - **`merge(wide, narrow)` keeps both classes.** Same fact as the
   shorthand-then-longhand example above — it depends on sheet order, not
-  on `merge` itself, to pick the right one.
+  on `merge` itself, to pick the right one. With `narrow` defined before
+  `wide` it is the next limit
+  (`packages/generate/test/tiers-shorthand-sort.t`).
 - **A merge whose later argument is defined earlier.** `CSS.merge(a, b)`
   where `b` is defined before `a` (earlier in the file, or in a file the
   dependency order puts first) and no block orders the two competing rules:
   definition order puts `b`'s rule first, so `a`'s rule wins the tie. Same
   when the two blocks are in two files that do not depend on each other.
   Define the override after the base, or write both in one block.
+- **A shared atom keeps its first position.** An atom rule that several
+  bindings share (same declaration in the same context) is emitted once, at
+  its first definition. So in `CSS.merge(a, b)` with `b` defined after `a`,
+  `a`'s rule still comes last when other bindings share both atoms and the
+  first definition of `a`'s atom is later than that of `b`'s. Seen in the
+  Ahrefs monorepo: `controls +++ controlsColumnStretchMobile`, where both
+  `flex-direction` atoms are shared with other files.
 - **Two blocks that disagree.** Two blocks that put the same two competing
   rules in opposite orders can not both hold; the build warns, names both
   blocks, and keeps definition order for the pair

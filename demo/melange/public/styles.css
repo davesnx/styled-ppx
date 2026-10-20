@@ -32,9 +32,6 @@ body{background-color:var(--pageBackground-171dvmc);color:var(--textColor-a4prc9
 @container (width < 650px) {._a_p3y4x65000ww99w{font-size:1em;}}
 @container (width < 650px) {._a_2grgh655m9szns1 .my-content{font-weight:bold;}}
 ._a_94jps9{padding:36px;}
-._a_39gotr{background:#d3f9d8;}
-._a_39do0u{background:#f6f1e8;}
-._a_39wy1d{background:linear-gradient(135deg, #101828 0%, #364152 100%);}
 ._a_390008j78y{background-image:repeating-linear-gradient(45deg, #333 0px, #333 4px, #f60808);}
 ._a_5r4ri2{display:inline-block;}
 ._a_94atxh{padding:2px 8px;}
@@ -59,6 +56,7 @@ body{background-color:var(--pageBackground-171dvmc);color:var(--textColor-a4prc9
 ._a_6lg8p2{height:0;}
 ._a_7p0008qkzl{margin-top:0;}
 ._a_4eztwz{color:seagreen;}
+._a_39gotr{background:#d3f9d8;}
 ._a_4e0z6h{color:green;}
 ._a_qyw7u4e9doq:hover{color:purple;}
 ._a_qyw7u4ed9rh:hover{color:red;}
@@ -74,7 +72,6 @@ body{background-color:var(--pageBackground-171dvmc);color:var(--textColor-a4prc9
 ._a_4eexrb{color:crimson;}
 ._a_4ea0ny{color:darkorange;}
 ._a_4einwu{color:navy;}
-._a_940sqd{padding:24px;}
 ._a_940002vk8k{padding-left:0;}
 ._a_940004mw5y{padding-right:0;}
 ._a_9400029r9v{padding-left:4px;}
@@ -82,8 +79,10 @@ body{background-color:var(--pageBackground-171dvmc);color:var(--textColor-a4prc9
 ._a_8xpe22{overflow-wrap:normal;}
 ._a_4eheaa{color:teal;}
 ._a_8tr29cfn434 ._id_1z0zv2z{-webkit-text-decoration:underline;text-decoration:underline;}
+._a_940sqd{padding:24px;}
 ._a_7p0001bzyn{margin-bottom:24px;}
 ._a_3ngzf7{border-radius:18px;}
+._a_39do0u{background:#f6f1e8;}
 ._a_2z001s49z5{-webkit-animation-name:var(--resize-1jz21hk);animation-name:var(--resize-1jz21hk);}
 ._a_2z0008fc7i{-webkit-animation-duration:1200ms;animation-duration:1200ms;}
 ._a_2z01kw7a08{-webkit-animation-timing-function:ease-in-out;animation-timing-function:ease-in-out;}
@@ -92,5 +91,6 @@ body{background-color:var(--pageBackground-171dvmc);color:var(--textColor-a4prc9
 ._a_9i0001dmle{align-items:center;}
 ._a_9h0002vhe1{justify-content:center;}
 ._a_3njx05{border-radius:14px;}
+._a_39wy1d{background:linear-gradient(135deg, #101828 0%, #364152 100%);}
 ._a_4eu7uq{color:white;}
 ._a_40xf3p{box-shadow:0 20px 40px rgba(16, 24, 40, 0.22);}

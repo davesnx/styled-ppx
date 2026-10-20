@@ -4,7 +4,7 @@ position, like plain CSS with no layers ever existing (see "Cascade tiers"
 in `generate.ml`, and `global-tier.t`/`descendant-tier.t` for the
 consequences that accepts). The output order is still fixed - globals,
 then the atoms in the "Ordered sheet" order (parent-to-child shape, block
-edges, cover edges, definition order) - but nothing wraps any of it in a
+edges, definition order) - but nothing wraps any of it in a
 cascade layer, so that order is only ever a tie-break, never an
 unconditional priority.
 
