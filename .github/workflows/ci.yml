@@ -17,8 +17,6 @@ concurrency:
 env:
   OPAM_VERSION: 2.3.0
   DUNE_PROFILE: release
-  DUNE_CACHE: enabled
-  DUNE_CACHE_STORAGE_MODE: copy
 
 permissions:
   contents: write
@@ -41,75 +39,17 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
-    env:
-      OPAM_CACHE_PREFIX: opam-${{ matrix.os }}-${{ matrix.ocaml-compiler }}-setup-ocaml-3.9.0-
-      DUNE_CACHE_PREFIX: dune-${{ matrix.os }}-${{ matrix.ocaml-compiler }}-
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Load opam cache
-        id: opam-cache
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            ${{ runner.tool_cache }}/opam
-            ~/.opam
-            _opam
-            .opam-path
-          key: ${{ env.OPAM_CACHE_PREFIX }}${{ hashFiles('*.opam', 'dune-project', 'Makefile') }}
-          restore-keys: ${{ env.OPAM_CACHE_PREFIX }}
-
-      - name: Use OCaml ${{ matrix.ocaml-compiler }}
-        uses: ocaml/setup-ocaml@v3.9.0
-        if: steps.opam-cache.outputs.cache-matched-key == ''
+      - uses: ml-in-barcelona/gh-ci-action@v1.1.0
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
-          dune-cache: false
-          opam-disable-sandboxing: true
-
-      - name: Get OPAM executable path
-        if: steps.opam-cache.outputs.cache-matched-key == ''
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const opam_path = await io.which('opam', true);
-            console.log('opam executable found: %s', opam_path);
-            const Fs = require('fs/promises');
-            await Fs.writeFile('.opam-path', opam_path, 'utf-8');
-            console.log('stored path to .opam-path');
-
-      - name: Use cached OPAM environment
-        shell: bash
-        run: |
-          # https://github.com/ocaml/setup-ocaml/blob/b2105f9/packages/setup-ocaml/src/installer.ts#L33
-          echo "OPAMVERBOSE=$RUNNER_DEBUG"   >> "$GITHUB_ENV"
-          echo "OPAMCOLOR=always"            >> "$GITHUB_ENV"
-          echo "OPAMCONFIRMLEVEL=unsafe-yes" >> "$GITHUB_ENV"
-          echo "OPAMERRLOGLEN=0"             >> "$GITHUB_ENV"
-          echo "OPAMPRECISETRACKING=1"       >> "$GITHUB_ENV"
-          echo "OPAMYES=1"                   >> "$GITHUB_ENV"
-
-          echo "OPAMROOT=$HOME/.opam"        >> "$GITHUB_ENV"
-
-          OPAM_PATH="$(cat .opam-path)"
-          chmod +x "$OPAM_PATH"
-          dirname "$OPAM_PATH" >> "$GITHUB_PATH"
-
-      - name: Install opam dependencies
-        if: steps.opam-cache.outputs.cache-hit != 'true'
-        run: make pin install-opam
-
-      - name: Save opam cache
-        uses: actions/cache/save@v4
-        if: steps.opam-cache.outputs.cache-hit != 'true'
-        with:
-          path: |
-            ${{ runner.tool_cache }}/opam
-            ~/.opam
-            _opam
-            .opam-path
-          key: ${{ env.OPAM_CACHE_PREFIX }}${{ hashFiles('*.opam', 'dune-project', 'Makefile') }}
+          pins: |
+            quickjs 0.5.1
+            server-reason-react.0.4.1 https://github.com/ml-in-barcelona/server-reason-react.git#82c52e8a27dffa433f56753713bd699c9b31016b
+          with-dev-setup: true
+          extra-packages: dune-release
 
       - name: Load npm cache
         id: npm-cache
@@ -124,19 +64,7 @@ jobs:
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: make install-npm
 
-      - name: Load dune cache
-        uses: actions/cache/restore@v4
-        with:
-          path: ~/.cache/dune
-          key: ${{ env.DUNE_CACHE_PREFIX }}${{ github.sha }}
-          restore-keys: ${{ env.DUNE_CACHE_PREFIX }}
-
-      - name: Measure dune cache
-        id: dune-cache-before
-        run: |
-          echo "DUNE_CACHE_ROOT=$HOME/.cache/dune" >> "$GITHUB_ENV"
-          mkdir -p "$HOME/.cache/dune"
-          echo "kb=$(du -sk "$HOME/.cache/dune" | cut -f1)" >> "$GITHUB_OUTPUT"
+      - uses: ml-in-barcelona/gh-ci-action/dune-cache/load@v1.1.0
 
       - name: Build and test
         run: make test
@@ -155,24 +83,7 @@ jobs:
           name: ${{ matrix.os }}
           path: _build/default/packages/bin/bin.exe
 
-      - name: Trim dune cache
-        id: dune-cache-after
-        if: ${{ !cancelled() }}
-        run: |
-          kb="$(du -sk "$HOME/.cache/dune" | cut -f1)"
-          echo "grown=$(( kb > ${{ steps.dune-cache-before.outputs.kb }} + 1024 ))" >> "$GITHUB_OUTPUT"
-          opam exec -- dune cache trim --size=2GB
-
-      - name: Save dune cache
-        uses: actions/cache/save@v4
-        if: ${{ !cancelled() && steps.dune-cache-after.outputs.grown == '1' }}
-        with:
-          path: ~/.cache/dune
-          key: ${{ env.DUNE_CACHE_PREFIX }}${{ github.sha }}
-
-      - name: Install dune-release
-        if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'ubuntu-latest' && matrix.ocaml-compiler == '5.4.0'
-        run: opam install dune-release -y
+      - uses: ml-in-barcelona/gh-ci-action/dune-cache/save@v1.1.0
 
       - name: Release to opam
         uses: davesnx/dune-release-action@v0.4.0
