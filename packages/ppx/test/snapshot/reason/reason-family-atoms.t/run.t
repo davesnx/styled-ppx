@@ -48,6 +48,20 @@ disjoint leaves, so they still get separate atoms.
       ("Output.transitiveBridge", "_id_1r4280b", "_a_3htdra"),
     ]
   ];
+  [@css.blocks
+    [
+      (1, "_id_1b2y2pm _a_7pow79"),
+      (5, "_id_9pf9ej _a_7p8lih"),
+      (10, "_id_5viu7a _a_7pp6yp"),
+      (15, "_id_1eulq6f _a_4ekvmb _a_7p0008n4zf"),
+      (19, "_id_mz6ujm _a_7p0008n4zf _a_940008cand"),
+      (24, "_id_vkdvp6 _a_qyw7u7po9vs"),
+      (31, "_id_ds74ar _a_940002yq1t _a_9400048fgp"),
+      (36, "_id_18fztpi _a_3h2ghsmzmu _a_3h00sgpy0o"),
+      (41, "_id_jjk2yk _a_3hu7ex"),
+      (47, "_id_1r4280b _a_3htdra"),
+    ]
+  ];
   let shorthandThenLonghand =
     CSS.make("label:shorthandThenLonghand _id_1b2y2pm _a_7pow79", []);
   let longhandThenShorthand =

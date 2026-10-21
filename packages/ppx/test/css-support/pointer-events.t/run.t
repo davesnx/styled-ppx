@@ -30,6 +30,25 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_dhive7{touch-action:pan-x pinch-zoom;}"];
   [@css "._a_dh2qdh{touch-action:pan-y pinch-zoom;}"];
   [@css "._a_dhbds3{touch-action:pan-x pan-y pinch-zoom;}"];
+  [@css.blocks
+    [
+      (2, "_a_dh2far"),
+      (3, "_a_dhsbrd"),
+      (4, "_a_dhsu0a"),
+      (5, "_a_dhcb00"),
+      (6, "_a_dhee94"),
+      (7, "_a_dh4v8x"),
+      (10, "_a_dht8dp"),
+      (11, "_a_dhiuj3"),
+      (12, "_a_dhtga0"),
+      (13, "_a_dhpx43"),
+      (14, "_a_dhn9hg"),
+      (17, "_a_dhgay6"),
+      (18, "_a_dhive7"),
+      (19, "_a_dh2qdh"),
+      (20, "_a_dhbds3"),
+    ]
+  ];
   
   CSS.make("_a_dh2far", []);
   CSS.make("_a_dhsbrd", []);

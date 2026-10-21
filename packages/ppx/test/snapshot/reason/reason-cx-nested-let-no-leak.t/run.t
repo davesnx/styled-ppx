@@ -11,6 +11,8 @@ function args, and other inner expressions stay private.
   [@@@css.bindings
     [("Input.outer", "_id_1din52f", "_a_4ekvmb");
     ("Input.make_button", "_id_1ue7vq2", "_a_4ehpkc")]]
+  [@@@css.blocks
+    [(10, "_id_1din52f _a_4ekvmb"); (15, "_id_1ue7vq2 _a_4ehpkc")]]
   let outer =
     let inner = CSS.make "label:inner _id_1din52f _a_4ekvmb" [] in inner
   let make_button active =

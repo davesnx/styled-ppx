@@ -20,15 +20,17 @@ mode a twin pair must avoid:
   $ ../../standalone.exe -cookie 'library-name="lib_native"' --impl native/Marker.ml -o native/default.ml
   $ ../../standalone.exe -cookie 'library-name="lib_js"' --impl js/Marker.ml -o js/default.ml
   $ diff native/default.ml js/default.ml
-  1,4c1,4
+  1,5c1,5
   < [@@@css.config [("library-name", "lib_native")]]
   < [@@@css "._a_7pkwep{margin:10px;}"]
   < [@@@css.bindings [("Marker.marker", "_id_1gfp5g8", "_a_7pkwep")]]
+  < [@@@css.blocks [(1, "_id_1gfp5g8 _a_7pkwep")]]
   < let marker = CSS.make "label:marker _id_1gfp5g8 _a_7pkwep" []
   ---
   > [@@@css.config [("library-name", "lib_js")]]
   > [@@@css "._a_7pwt2x{margin:10px;}"]
   > [@@@css.bindings [("Marker.marker", "_id_jr5pjc", "_a_7pwt2x")]]
+  > [@@@css.blocks [(1, "_id_jr5pjc _a_7pwt2x")]]
   > let marker = CSS.make "label:marker _id_jr5pjc _a_7pwt2x" []
   [1]
 
@@ -41,6 +43,7 @@ differing cookies, so both mint identical atom and identity classes again:
   [@@@css.config [("library-name", "lib_native")]]
   [@@@css "._a_7pjvti{margin:10px;}"]
   [@@@css.bindings [("Marker.marker", "_id_ikmmxf", "_a_7pjvti")]]
+  [@@@css.blocks [(1, "_id_ikmmxf _a_7pjvti")]]
   let marker = CSS.make "label:marker _id_ikmmxf _a_7pjvti" []
   let _ = marker
   $ diff native/twin.ml js/twin.ml

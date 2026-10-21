@@ -34,6 +34,29 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_94h56p{padding:5ic;}"];
   [@css "._a_65000wsmpm{font-size:1.5lh;}"];
   [@css "._a_65b8jk3fhm{line-height:2rlh;}"];
+  [@css.blocks
+    [
+      (4, "_a_ecuveb"),
+      (5, "_a_ec6gk5"),
+      (8, "_a_ecf708"),
+      (9, "_a_ecf374"),
+      (12, "_a_ecwc7t"),
+      (13, "_a_ecqnkz"),
+      (16, "_a_ec4gax"),
+      (19, "_a_ecnmih"),
+      (22, "_a_ecy0pg"),
+      (25, "_a_ecmfob"),
+      (28, "_a_ecnp92"),
+      (31, "_a_ecrh49"),
+      (34, "_a_ecijca"),
+      (37, "_a_ec0vtm"),
+      (40, "_a_6l8f82"),
+      (41, "_a_7pigma"),
+      (42, "_a_94h56p"),
+      (43, "_a_65000wsmpm"),
+      (44, "_a_65b8jk3fhm"),
+    ]
+  ];
   
   CSS.make("_a_ecuveb", []);
   CSS.make("_a_ec6gk5", []);

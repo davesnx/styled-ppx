@@ -66,6 +66,22 @@ prefixed its Firefox variant as `-moz-fill-available` instead of the real
   [@css
     "._a_8ch21t{min-width:-webkit-fill-available;min-width:-moz-available;min-width:fill-available;}"
   ];
+  [@css.blocks
+    [
+      (1, "_a_7y00e8dp5t"),
+      (2, "_a_7y003k57xj"),
+      (3, "_a_6j000cozaa"),
+      (4, "_a_6j0003zjvj"),
+      (5, "_a_ap8bwf"),
+      (6, "_a_7r0002bip2"),
+      (7, "_a_7r0001lgiv"),
+      (8, "_a_960002js84"),
+      (9, "_a_960001ob79"),
+      (10, "_a_ehrbdf"),
+      (11, "_a_8creoz"),
+      (12, "_a_8ch21t"),
+    ]
+  ];
   CSS.make("_a_7y00e8dp5t", []);
   CSS.make("_a_7y003k57xj", []);
   CSS.make("_a_6j000cozaa", []);

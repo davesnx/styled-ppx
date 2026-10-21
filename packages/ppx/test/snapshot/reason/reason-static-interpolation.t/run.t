@@ -17,6 +17,9 @@
       ),
     ]
   ];
+  [@css.blocks
+    [(9, "_id_1n1bal7 _a_4e9vey _a_390004n5y8 _a_3h0ef5gxfp _a_5r7eu2")]
+  ];
   module Theme = {
     let var = CSS.hex("333333");
     module Border = {

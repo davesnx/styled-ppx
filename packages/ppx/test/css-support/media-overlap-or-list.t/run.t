@@ -10,6 +10,7 @@ the negation into every branch of the `or` list independently.
   [@@@css "@media (min-width: 900px) {._a_mp5mk4et4n8{color:blue;}}"]
   [@@@css.bindings
     [("Output.block", "_id_ovbeuh", "_a_k5ij04epdat _a_mp5mk4et4n8")]]
+  [@@@css.blocks [(3, "_id_ovbeuh _a_k5ij04epdat _a_mp5mk4et4n8")]]
   let block =
     CSS.make "label:block _id_ovbeuh _a_k5ij04epdat _a_mp5mk4et4n8" []
   let _ = block

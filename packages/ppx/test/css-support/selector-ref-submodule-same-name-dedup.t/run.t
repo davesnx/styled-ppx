@@ -14,6 +14,11 @@ match a color rule.
     ("Input.A.first", "_id_1uvitr9", "_a_dr6aa4e3aq5");
     ("Input.B.marker", "_id_1o984wl", "");
     ("Input.B.second", "_id_165477j", "_a_zdrnh4edp77")]]
+  [@@@css.blocks
+    [(3, "_id_16nw92g");
+    (4, "_id_1uvitr9 _a_dr6aa4e3aq5");
+    (8, "_id_1o984wl");
+    (9, "_id_165477j _a_zdrnh4edp77")]]
   module A =
     struct
       let marker = CSS.make "label:marker _id_16nw92g" []

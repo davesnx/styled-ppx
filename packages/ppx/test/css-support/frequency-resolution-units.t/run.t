@@ -28,6 +28,17 @@ If this test fail means that the module is not in sync with the ppx
     "._a_3900080k4n{background-image:image-set(\"cat.png\" 96dpi, \"cat-2x.png\" 192dpi);}"
   ];
   [@css "._a_390008fchh{background-image:image-set(\"cat.png\" 37dpcm);}"];
+  [@css.blocks
+    [
+      (5, "_a_6tobub"),
+      (6, "_a_6tm01f"),
+      (7, "_a_6thmlf"),
+      (10, "_a_390008toi3"),
+      (11, "_a_390008sfyn"),
+      (12, "_a_3900080k4n"),
+      (13, "_a_390008fchh"),
+    ]
+  ];
   
   CSS.make("_a_6tobub", []);
   CSS.make("_a_6tm01f", []);

@@ -32,6 +32,14 @@ and "Rule not found in registry: webkit-mask-box-repeat".
   [@css
     "._a_2g3brk{-webkit-mask-box-image:url(\"mask.png\") 5% 5% 5% 5% round repeat;}"
   ];
+  [@css.blocks
+    [
+      (5, "_a_399l4c"),
+      (8, "_a_3995w2"),
+      (12, "_a_2gsa3w"),
+      (13, "_a_2g3brk"),
+    ]
+  ];
   
   CSS.make("_a_399l4c", []);
   CSS.make("_a_3995w2", []);

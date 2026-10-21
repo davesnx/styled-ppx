@@ -15,6 +15,7 @@ rather than being silently merged into one.
   [@@@css "._id_qqjiik{cursor:pointer;}"]
   [@@@css "._a_4ekvmb{color:red;}"]
   [@@@css.bindings [("A.row", "_id_qqjiik", "_a_4ekvmb")]]
+  [@@@css.blocks [(1, "_id_qqjiik _a_4ekvmb")]]
   let row = CSS.make "label:row _id_qqjiik _a_4ekvmb" []
   module Globals =
     struct
@@ -27,6 +28,7 @@ rather than being silently merged into one.
   [@@@css "._id_avtt0b{cursor:pointer;}"]
   [@@@css "._a_4esm7b{color:blue;}"]
   [@@@css.bindings [("B.row", "_id_avtt0b", "_a_4esm7b")]]
+  [@@@css.blocks [(1, "_id_avtt0b _a_4esm7b")]]
   let row = CSS.make "label:row _id_avtt0b _a_4esm7b" []
   module Globals =
     struct

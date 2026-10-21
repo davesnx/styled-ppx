@@ -53,6 +53,48 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_35ebk2{aspect-ratio:1 / 1;}"];
   [@css "._a_35vr3s{aspect-ratio:16 / 9;}"];
   [@css "._a_35vip7{aspect-ratio:0.5;}"];
+  [@css.blocks
+    [
+      (4, "_a_9hdqw8"),
+      (5, "_a_9h5dhv"),
+      (6, "_a_9hnyc7"),
+      (7, "_a_9hg07y"),
+      (8, "_a_9hn9tt"),
+      (9, "_a_9h8p3p"),
+      (10, "_a_9hwium"),
+      (11, "_a_9hgpzp"),
+      (12, "_a_9hvq2g"),
+      (13, "_a_9h4mkx"),
+      (16, "_a_9iym04"),
+      (17, "_a_9icea0"),
+      (18, "_a_9iqbga"),
+      (19, "_a_9iwgtc"),
+      (20, "_a_9ip3r0"),
+      (21, "_a_9ikxp5"),
+      (22, "_a_9ie9sr"),
+      (25, "_a_9jrl8b"),
+      (26, "_a_9je2kp"),
+      (27, "_a_9j5pw6"),
+      (28, "_a_9jzgxw"),
+      (29, "_a_9jxvva"),
+      (30, "_a_9jr5sl"),
+      (31, "_a_9j3gqb"),
+      (34, "_a_2t8d29"),
+      (35, "_a_2tjc5t"),
+      (36, "_a_2t2rnk"),
+      (37, "_a_2tauhw"),
+      (40, "_a_dh2far"),
+      (41, "_a_dhsbrd"),
+      (42, "_a_dhsu0a"),
+      (43, "_a_dhcb00"),
+      (44, "_a_dh4v8x"),
+      (45, "_a_dhee94"),
+      (48, "_a_35cmp3"),
+      (49, "_a_35ebk2"),
+      (50, "_a_35vr3s"),
+      (51, "_a_35vip7"),
+    ]
+  ];
   
   CSS.make("_a_9hdqw8", []);
   CSS.make("_a_9h5dhv", []);

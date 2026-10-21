@@ -20,6 +20,15 @@ interpolation as a custom property (subject is `&` or a descendant of `&`).
       ("Output.literalSibling", "_id_njk8sz", "_a_fxps84eoqj4"),
     ]
   ];
+  [@css.blocks
+    [
+      (2, "_id_vk9hpa _a_5wdc34ej70v"),
+      (7, "_id_fsi55f _a_6ve1u4e01uz"),
+      (12, "_id_1er3nso _a_xbwf14eel0e"),
+      (17, "_id_1g3dzrb _a_s19nz3h0ef5ydxg"),
+      (22, "_id_njk8sz _a_fxps84eoqj4"),
+    ]
+  ];
   let color = CSS.Types.Color.toString(`hex("3A57FC"));
   let selfSibling =
     CSS.make(

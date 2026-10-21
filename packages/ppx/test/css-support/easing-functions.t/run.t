@@ -19,6 +19,14 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_dm000gegan{transition-timing-function:steps(2, jump-end);}"];
   [@css "._a_dm000gsz2c{transition-timing-function:steps(1, jump-both);}"];
   [@css "._a_dm000g8w8e{transition-timing-function:steps(2, jump-none);}"];
+  [@css.blocks
+    [
+      (2, "_a_dm000gudp6"),
+      (3, "_a_dm000gegan"),
+      (4, "_a_dm000gsz2c"),
+      (5, "_a_dm000g8w8e"),
+    ]
+  ];
   
   CSS.make("_a_dm000gudp6", []);
   CSS.make("_a_dm000gegan", []);

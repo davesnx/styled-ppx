@@ -11,6 +11,7 @@ deterministic input, not a nonce.
   $ cat none.ml
   [@@@css "._a_4ekvmb{color:red;}"]
   [@@@css.bindings [("Input.marker", "_id_1rctcrz", "_a_4ekvmb")]]
+  [@@@css.blocks [(1, "_id_1rctcrz _a_4ekvmb")]]
   let marker = CSS.make "label:marker _id_1rctcrz _a_4ekvmb" []
   let _ = marker
 
@@ -18,6 +19,7 @@ deterministic input, not a nonce.
   $ cat a1.ml
   [@@@css "._a_4ect8h{color:red;}"]
   [@@@css.bindings [("Input.marker", "_id_12d5hxh", "_a_4ect8h")]]
+  [@@@css.blocks [(1, "_id_12d5hxh _a_4ect8h")]]
   let marker = CSS.make "label:marker _id_12d5hxh _a_4ect8h" []
   let _ = marker
 
@@ -25,5 +27,6 @@ deterministic input, not a nonce.
   $ cat a2.ml
   [@@@css "._a_4ect8h{color:red;}"]
   [@@@css.bindings [("Input.marker", "_id_12d5hxh", "_a_4ect8h")]]
+  [@@@css.blocks [(1, "_id_12d5hxh _a_4ect8h")]]
   let marker = CSS.make "label:marker _id_12d5hxh _a_4ect8h" []
   let _ = marker

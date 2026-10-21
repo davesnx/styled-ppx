@@ -22,6 +22,9 @@ as an external path unless another enclosing `Css` module exists.
       ("Input.Css.wrapper", "_id_7sdyhq", "_a_ye3jo4ed103"),
     ]
   ];
+  [@css.blocks
+    [(2, "_id_zr2uk1 _a_4ekvmb"), (4, "_id_7sdyhq _a_ye3jo4ed103")]
+  ];
   [@css.refs [("Css.marker", "input.re", 5, 8, 18)]];
   
   let _ = Css.marker;

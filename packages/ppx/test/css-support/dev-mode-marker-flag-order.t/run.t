@@ -16,6 +16,8 @@ same as before.
   [@@@css.bindings
     [("Input.layout", "_id_1jj5tmt", "_a_5r08qs _a_94zrbw");
     ("Input.button", "_id_l55coe", "_a_4ekvmb")]]
+  [@@@css.blocks
+    [(1, "_id_1jj5tmt _a_5r08qs _a_94zrbw"); (2, "_id_l55coe _a_4ekvmb")]]
   let layout = CSS.make "label:layout _id_1jj5tmt _a_5r08qs _a_94zrbw" []
   let button = CSS.make "label:button _id_l55coe _a_4ekvmb" []
   let _ = (layout, button)
@@ -31,6 +33,8 @@ same as before.
   [@@@css.bindings
     [("Input.layout", "_id_1jj5tmt", "_a_5r08qs _a_94zrbw");
     ("Input.button", "_id_l55coe", "_a_4ekvmb")]]
+  [@@@css.blocks
+    [(1, "_id_1jj5tmt _a_5r08qs _a_94zrbw"); (2, "_id_l55coe _a_4ekvmb")]]
   let layout = CSS.make "label:layout _id_1jj5tmt _a_5r08qs _a_94zrbw" []
   let button = CSS.make "label:button _id_l55coe _a_4ekvmb" []
   let _ = (layout, button)
@@ -46,6 +50,8 @@ same as before.
   [@@@css.bindings
     [("Input.layout", "_id_1jj5tmt", "_a_5r08qs _a_94zrbw");
     ("Input.button", "_id_l55coe", "_a_4ekvmb")]]
+  [@@@css.blocks
+    [(1, "_id_1jj5tmt _a_5r08qs _a_94zrbw"); (2, "_id_l55coe _a_4ekvmb")]]
   let layout = CSS.make "label:layout _id_1jj5tmt _a_5r08qs _a_94zrbw" []
   let button = CSS.make "label:button _id_l55coe _a_4ekvmb" []
   let _ = (layout, button)
@@ -61,6 +67,8 @@ same as before.
   [@@@css.bindings
     [("Input.layout", "_id_1jj5tmt", "_a_5r08qs _a_94zrbw");
     ("Input.button", "_id_l55coe", "_a_4ekvmb")]]
+  [@@@css.blocks
+    [(1, "_id_1jj5tmt _a_5r08qs _a_94zrbw"); (2, "_id_l55coe _a_4ekvmb")]]
   let layout = CSS.make "label:layout _id_1jj5tmt _a_5r08qs _a_94zrbw" []
   let button = CSS.make "label:button _id_l55coe _a_4ekvmb" []
   let _ = (layout, button)
@@ -76,6 +84,8 @@ Without --dev, --minify alone still turns the marker off:
   [@@@css.bindings
     [("Input.layout", "_id_1jj5tmt", "_a_5r08qs _a_94zrbw");
     ("Input.button", "_id_l55coe", "_a_4ekvmb")]]
+  [@@@css.blocks
+    [(1, "_id_1jj5tmt _a_5r08qs _a_94zrbw"); (2, "_id_l55coe _a_4ekvmb")]]
   let layout = CSS.make "_id_1jj5tmt _a_5r08qs _a_94zrbw" []
   let button = CSS.make "_id_l55coe _a_4ekvmb" []
   let _ = (layout, button)
@@ -91,6 +101,8 @@ Without --dev, --env production alone still turns the marker off:
   [@@@css.bindings
     [("Input.layout", "_id_1jj5tmt", "_a_5r08qs _a_94zrbw");
     ("Input.button", "_id_l55coe", "_a_4ekvmb")]]
+  [@@@css.blocks
+    [(1, "_id_1jj5tmt _a_5r08qs _a_94zrbw"); (2, "_id_l55coe _a_4ekvmb")]]
   let layout = CSS.make "_id_1jj5tmt _a_5r08qs _a_94zrbw" []
   let button = CSS.make "_id_l55coe _a_4ekvmb" []
   let _ = (layout, button)

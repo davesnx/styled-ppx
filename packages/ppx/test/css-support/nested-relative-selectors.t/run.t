@@ -26,6 +26,22 @@ Each pair below must render and hash to the same atom.
   [@css
     "@media (min-width: 1px) {._a_7gls64e9ouy .parent > .child{color:red;}}"
   ];
+  [@css.blocks
+    [
+      (7, "_a_hfkiz4e0lf8"),
+      (8, "_a_hfkiz4e0lf8"),
+      (10, "_a_oicak4emckf"),
+      (11, "_a_oicak4emckf"),
+      (13, "_a_ehmrb4ewq26"),
+      (14, "_a_ehmrb4ewq26"),
+      (17, "_a_f8a2u4eqd0b"),
+      (18, "_a_f8a2u4eqd0b"),
+      (21, "_a_ew2o54eviu8 _a_ornrm4e0uum"),
+      (22, "_a_ew2o54eviu8 _a_ornrm4e0uum"),
+      (25, "_a_7gls64e9ouy"),
+      (26, "_a_7gls64e9ouy"),
+    ]
+  ];
   
   CSS.make("_a_hfkiz4e0lf8", []);
   CSS.make("_a_hfkiz4e0lf8", []);

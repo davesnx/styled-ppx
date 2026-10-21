@@ -18,6 +18,7 @@ deduping.
   [@@@css
     "._a_9nd225rj253 > div:not(:last-child).\000Shared.row\000{display:flex;}"]
   [@@@css.bindings [("N1.list", "_id_16l4e1q", "_a_9nd225rj253")]]
+  [@@@css.blocks [(1, "_id_16l4e1q _a_9nd225rj253")]]
   [@@@css.refs [("Shared.row", "n1.ml", 1, 45, 55)]]
   let _ = Shared.row
   let list = CSS.make "label:list _id_16l4e1q _a_9nd225rj253" []
@@ -26,6 +27,7 @@ deduping.
   [@@@css
     "._a_9nd225rj253 > div:not(:last-child).\000Shared.row\000{display:flex;}"]
   [@@@css.bindings [("N2.list", "_id_j3g9qa", "_a_9nd225rj253")]]
+  [@@@css.blocks [(1, "_id_j3g9qa _a_9nd225rj253")]]
   [@@@css.refs [("Shared.row", "n2.ml", 1, 45, 55)]]
   let _ = Shared.row
   let list = CSS.make "label:list _id_j3g9qa _a_9nd225rj253" []

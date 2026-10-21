@@ -150,6 +150,57 @@ If this test fail means that the module is not in sync with the ppx
   [@css
     "._a_2z7afk{-webkit-animation:var(--resize-1aiquq7) 180ms ease-out 0s 1 normal both;animation:var(--resize-1aiquq7) 180ms ease-out 0s 1 normal both;}"
   ];
+  [@css.blocks
+    [
+      (5, "_a_2z001s9u50"),
+      (6, "_a_2z001sdu2s"),
+      (7, "_a_2z001sbkch"),
+      (8, "_a_2z001sfqed"),
+      (9, "_a_2z0008nfq1"),
+      (10, "_a_2z0008iaw8"),
+      (11, "_a_2z0008wveq"),
+      (12, "_a_2z0008tj8j"),
+      (13, "_a_2z0008oaxk"),
+      (14, "_a_2z01kwt0tu"),
+      (15, "_a_2z01kwwp0a"),
+      (16, "_a_2z01kwviul"),
+      (17, "_a_2z01kwf3zo"),
+      (18, "_a_2z01kwa72f"),
+      (19, "_a_2z01kw4e4x"),
+      (20, "_a_2z01kwf1tj"),
+      (21, "_a_2z01kw6j52"),
+      (22, "_a_2z01kww8e9"),
+      (23, "_a_2z01kwl2sx"),
+      (24, "_a_2z01kwldx6"),
+      (26, "_a_2z01kwlnxf"),
+      (28, "_a_2z000w8nyb"),
+      (29, "_a_2z000wslxe"),
+      (30, "_a_2z000wgpcx"),
+      (31, "_a_2z000wnpot"),
+      (32, "_a_2z0004jqic"),
+      (33, "_a_2z0004i1sk"),
+      (34, "_a_2z00046c5b"),
+      (35, "_a_2z00045c2u"),
+      (36, "_a_2z00042f1p"),
+      (37, "_a_2z00045ztj"),
+      (38, "_a_2z003kr8bj"),
+      (39, "_a_2z003kbnre"),
+      (40, "_a_2z003kgcqk"),
+      (41, "_a_2z0002dlyv"),
+      (42, "_a_2z00026y00"),
+      (43, "_a_2z00022h4y"),
+      (44, "_a_2z000gy95r"),
+      (45, "_a_2z000gnmjc"),
+      (46, "_a_2z000g5fpo"),
+      (47, "_a_2z000gvuyg"),
+      (48, "_a_2z000gr2w3"),
+      (49, "_a_2zhgs5"),
+      (50, "_a_2z1me1"),
+      (51, "_a_2z9gym"),
+      (66, "_a_2z001sbkao"),
+      (67, "_a_2z7afk"),
+    ]
+  ];
   let foo = CSS.Types.AnimationName.make("_k_m6pt8e");
   let bar = CSS.Types.AnimationName.make("_k_m6pt8e");
   

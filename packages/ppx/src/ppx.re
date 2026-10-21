@@ -1034,6 +1034,11 @@ let () = {
       | [] => []
       | _ => [make_bindings_attribute(binding_entries)]
       };
+    let blocks_items =
+      switch (Css_blocks.drain()) {
+      | [] => []
+      | blocks => [Css_extraction.blocks_attribute(blocks)]
+      };
     let (cross_module_entries, cross_module_longidents) =
       Cross_module_refs.drain();
     let refs_items =
@@ -1068,7 +1073,13 @@ let () = {
         | _ => [Css_extraction.config_attribute(config_entries)]
         }
       };
-    config_items @ rule_items @ bindings_items @ refs_items @ dep_items @ str;
+    config_items
+    @ rule_items
+    @ bindings_items
+    @ blocks_items
+    @ refs_items
+    @ dep_items
+    @ str;
   };
 
   Ppxlib.Driver.V2.register_transformation(

@@ -45,6 +45,28 @@ error names the property.
   [@css "._a_fxruim{image-animation:paused;}"];
   [@css "._a_fxci5z{image-animation:stopped;}"];
   [@css "._a_fx987c{image-animation:running;}"];
+  [@css.blocks
+    [
+      (5, "_a_gh0m8o"),
+      (6, "_a_gho0tl"),
+      (7, "_a_ggylya"),
+      (8, "_a_ggcs1f"),
+      (9, "_a_ggmv9e"),
+      (10, "_a_giw9j7"),
+      (11, "_a_gikhle"),
+      (12, "_a_g0vsvf"),
+      (13, "_a_g0xrmz"),
+      (14, "_a_gfbked"),
+      (15, "_a_gf592w"),
+      (16, "_a_gfedm7"),
+      (17, "_a_gfopqg"),
+      (18, "_a_gfp6e5"),
+      (19, "_a_fxz01g"),
+      (20, "_a_fxruim"),
+      (21, "_a_fxci5z"),
+      (22, "_a_fx987c"),
+    ]
+  ];
   
   CSS.make("_a_gh0m8o", []);
   CSS.make("_a_gho0tl", []);

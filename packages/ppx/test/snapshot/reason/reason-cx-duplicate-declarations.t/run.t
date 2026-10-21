@@ -43,6 +43,18 @@ as the main subject, across properties that never repeat.
     ("Input.A.x", "_id_hplgo2", "_a_4ekvmb");
     ("Input.B.x", "_id_i6ik4z", "_a_4eb7kq");
     ("Input.vars", "_id_10jlpap", "_a_7pzjs7")]]
+  [@@@css.blocks
+    [(11, "_id_1rqoi1k _a_4epkbn");
+    (15, "_id_1t6se51 _a_5rx8u2");
+    (19, "_id_8z5ze6 _a_7p1gs8 _a_4eb7kq");
+    (27, "_id_17s8jfs _a_izob04ep0x6 _a_4eb7kq");
+    (35, "_id_18j0etq _a_7pjper");
+    (38, "_id_swo4az _a_qyw7u4ebukr");
+    (42, "_id_bxfxu3 _a_qyw7u4ego80");
+    (45, "_id_216v6m _a_zygl8yfjbrel _a_zy803csp5vyo");
+    (51, "_id_hplgo2 _a_4ekvmb");
+    (55, "_id_i6ik4z _a_4eb7kq");
+    (60, "_id_10jlpap _a_7pzjs7")]]
   let dup = CSS.make "label:dup _id_1rqoi1k _a_4epkbn" []
   let fallback = CSS.make "label:fallback _id_1t6se51 _a_5rx8u2" []
   let interleaved =

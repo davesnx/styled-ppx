@@ -1,17 +1,12 @@
-The condition-priority sort key was tried with a THIRD component - a
-media-width tie-break (ascending `min-width`, descending `max-width`,
-kind before value) - between at-rule rank and pseudo rank. A monorepo
-round found it got 2 of 4 real, shipped ties wrong: a `min-width`/
-`max-width` RANGE tied against a plain `max-width` rule for the SAME
-property has no reliable width-only answer, since only the generator's
-OWN INPUT ORDER can ever encode which side a `CSS.merge`/`+++` call meant
-as the override - width alone cannot. The width component is REMOVED.
-Two rules tied on at-rule rank and pseudo rank now fall straight through
-to `List.stable_sort`'s own guarantee: whichever order they already had
-when they reached this sort - library, then module dependency order,
-then a module's own DEFINITION order - which is also the order a
-`CSS.merge`/`+++` call's right-hand (override) argument needs to win,
-since the later-defined rule sorts last.
+Media-width ties have no fixed rule: a `min-width`/`max-width` RANGE tied
+against a plain `max-width` rule for the SAME property has no reliable
+width-only answer, since only the generator's OWN INPUT ORDER can encode
+which side a `CSS.merge`/`+++` call meant as the override. (A media-width
+key was tried and removed: a monorepo round found it got 2 of 4 real,
+shipped ties wrong.) Two competing rules that no block orders keep their
+DEFINITION order - library, then module dependency order, then a module's
+own definition order - which is also the order a `CSS.merge`/`+++` call's
+right-hand (override) argument needs to win when it is defined later.
 
 Three real, shipped pairs, all four checked directly (not simulated),
 same file so their relative sheet order is checked together:
@@ -45,6 +40,14 @@ same file so their relative sheet order is checked together:
     ("Input.praiseViewport", "_id_1qycs1i", "_a_5kutk850y8f");
     ("Input.praiseViewportMobile", "_id_1apfsf0", "_a_tlkns85mrev");
     ("Input.praiseViewportExpanded", "_id_5psizx", "_a_9yyk885k4cx")]]
+  [@@@css.blocks
+    [(2, "_id_3ymu7f _a_p6loh5rnofe");
+    (7, "_id_12oj7bj _a_5kutk5rhjfe");
+    (12, "_id_o6yfa8 _in_yqjybn");
+    (17, "_id_181aa5d _in_11ru35y");
+    (22, "_id_1qycs1i _a_5kutk850y8f");
+    (26, "_id_1apfsf0 _a_tlkns85mrev");
+    (30, "_id_5psizx _a_9yyk885k4cx")]]
   let toggleButton = CSS.make "label:toggleButton _id_3ymu7f _a_p6loh5rnofe" []
   let toggleButtonShowAtTablet =
     CSS.make "label:toggleButtonShowAtTablet _id_12oj7bj _a_5kutk5rhjfe" []
@@ -71,29 +74,22 @@ same file so their relative sheet order is checked together:
   @property --pad-160gt2j{syntax:"*";inherits:false;}
   @media (min-width: 768px) {._a_p6loh5rnofe{display:none;}}
   @media (min-width: 768px) and (max-width: 1279px) {._a_5kutk5rhjfe{display:block;}}
-  @media (min-width: 768px) and (max-width: 1279px) {._a_5kutk850y8f{max-height:1200px;}}
-  @media (max-width: 767px) {._a_tlkns85mrev{max-height:2000px;}}
-  @media (max-width: 1279px) {._a_9yyk885k4cx{max-height:10000px;}}
   @media (min-width: 768px) and (max-width: 1279px) {._in_yqjybn{padding-top:var(--pad-g2wfjo);}}
   @media (min-width: 768px) and (max-width: 1279px) {._in_yqjybn{padding-left:var(--pad-g2wfjo);}}
   @media (max-width: 1279px) {._in_11ru35y{padding-top:var(--pad-160gt2j);}}
   @media (max-width: 1279px) {._in_11ru35y{padding-left:var(--pad-160gt2j);}}
+  @media (min-width: 768px) and (max-width: 1279px) {._a_5kutk850y8f{max-height:1200px;}}
+  @media (max-width: 767px) {._a_tlkns85mrev{max-height:2000px;}}
+  @media (max-width: 1279px) {._a_9yyk885k4cx{max-height:10000px;}}
 
 `toggleButtonShowAtTablet` (declared second) sorts after `toggleButton`
 (declared first) - the later-defined rule wins. `praiseViewport`,
 `praiseViewportMobile` and `praiseViewportExpanded` sort in EXACTLY their
 declaration order, so `praiseViewportExpanded` - declared LAST of the
-three - sorts last and wins against BOTH earlier rules, not just the one
-declared immediately before it; at a width where all three could apply
-(e.g. 700px, inside every one of `max-height:2000px`'s, `max-height:
-10000px`'s and - if it were also unbounded below - `max-height:1200px`'s
-own range), `max-height:10000px` wins. `header`/`headerWithBanner` sort
-in their own, separate cluster (their shared property, `padding-top`/
-`padding-left`, is a deeper shorthand family than the plain leaf
-properties `display`/`max-height` above, an EARLIER, unrelated key
-component the removed width key never touched either) - but WITHIN that
-cluster, the same rule applies: `headerWithBanner` (declared second)
-sorts after `header` (declared first) and wins, bundle or not.
+three - sorts last and wins against BOTH earlier rules; at 700px, inside
+every range, `max-height:10000px` wins. `header`/`headerWithBanner` keep
+their own declaration order too: `headerWithBanner` (declared second) sorts
+after `header` (declared first) and wins, bundle or not.
 
 This is the exact fix for the real regression the removed width key
 caused: `praiseViewport`/`praiseViewportExpanded` reached one element via

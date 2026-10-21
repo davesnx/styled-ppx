@@ -17,6 +17,13 @@ verbatim - no Cascading.toString wrap.
       ("Output.dyn", "_id_soz37v", "_a_zyqed1fpwqpt"),
     ]
   ];
+  [@css.blocks
+    [
+      (3, "_id_z61k1z _a_zy7gz1zq54yy"),
+      (7, "_id_r5u180 _a_zy7gz1zq54yy _a_zy4gc55zkohh"),
+      (11, "_id_soz37v _a_zyqed1fpwqpt"),
+    ]
+  ];
   let colorStr = CSS.Types.Color.toString(`hex("3A57FC"));
   let plainStr = "10px";
   let row =

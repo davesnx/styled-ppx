@@ -6,6 +6,7 @@
   [@css.bindings
     [("Output.MultiLineStrings", "_id_11ddqpw", "_a_5r08qs _a_9h0002ndxa")]
   ];
+  [@css.blocks [(2, "_id_11ddqpw _a_5r08qs _a_9h0002ndxa")]];
   module MultiLineStrings = {
     [@deriving abstract]
     [@warning "-69"]

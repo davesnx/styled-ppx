@@ -38,6 +38,7 @@ class pointing at a missing variable.
     "._a_2z001sjjsz{-webkit-animation-name:var(--grow-1ugf6s8);animation-name:var(--grow-1ugf6s8);}"]
   [@@@css "._a_5r08qs{display:flex;}"]
   [@@@css.bindings [("A.box", "_id_1v8d5b9", "_a_2z001sjjsz _a_5r08qs")]]
+  [@@@css.blocks [(4, "_id_1v8d5b9 _a_2z001sjjsz _a_5r08qs")]]
   let h0 = `px 0
   let h1 = `px 100
   let grow =
@@ -54,6 +55,7 @@ class pointing at a missing variable.
     "._a_2z001sjjsz{-webkit-animation-name:var(--grow-1ugf6s8);animation-name:var(--grow-1ugf6s8);}"]
   [@@@css "._a_94gf8j{padding:8px;}"]
   [@@@css.bindings [("B.box", "_id_p1cefd", "_a_2z001sjjsz _a_94gf8j")]]
+  [@@@css.blocks [(4, "_id_p1cefd _a_2z001sjjsz _a_94gf8j")]]
   let h0 = `px 0
   let h1 = `px 100
   let grow =

@@ -35,6 +35,15 @@ This test ensures autoprefixing happens in the PPX extraction path.
   [@css
     "._a_37ib09{-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px);}"
   ];
+  [@css.blocks
+    [
+      (1, "_a_czr4kf"),
+      (2, "_a_cfky3p"),
+      (3, "_a_5rj0h8"),
+      (4, "_a_2z000w8nyb"),
+      (5, "_a_37ib09"),
+    ]
+  ];
   CSS.make("_a_czr4kf", []);
   CSS.make("_a_cfky3p", []);
   CSS.make("_a_5rj0h8", []);

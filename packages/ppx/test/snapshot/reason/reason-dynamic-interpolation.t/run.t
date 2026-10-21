@@ -7,6 +7,7 @@
   [@css.bindings
     [("Output.DynamicComponent", "_id_1hmg1vc", "_a_4e7bjx _a_5r7eu2")]
   ];
+  [@css.blocks [(2, "_id_1hmg1vc _a_4e7bjx _a_5r7eu2")]];
   module DynamicComponent = {
     [@deriving abstract]
     [@warning "-69"]

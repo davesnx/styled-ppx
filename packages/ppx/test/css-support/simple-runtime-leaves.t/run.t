@@ -33,6 +33,28 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_6ubtb7{image-resolution:2dppx;}"];
   [@css "._a_6uwnyr{image-resolution:from-image snap;}"];
   [@css "._a_6uehnm{image-resolution:96dpi snap;}"];
+  [@css.blocks
+    [
+      (2, "_a_5u2ddt"),
+      (3, "_a_5uav7h"),
+      (4, "_a_5vzhlp"),
+      (5, "_a_5vat5c"),
+      (6, "_a_797wts"),
+      (7, "_a_794lek"),
+      (8, "_a_6xo2dy"),
+      (9, "_a_6xwub8"),
+      (10, "_a_6x0l7m"),
+      (11, "_a_6ybm9f"),
+      (12, "_a_6ynpsj"),
+      (13, "_a_6ywje6"),
+      (14, "_a_6ytz0y"),
+      (15, "_a_6uqonx"),
+      (16, "_a_6u4m46"),
+      (17, "_a_6ubtb7"),
+      (18, "_a_6uwnyr"),
+      (19, "_a_6uehnm"),
+    ]
+  ];
   
   CSS.make("_a_5u2ddt", []);
   CSS.make("_a_5uav7h", []);

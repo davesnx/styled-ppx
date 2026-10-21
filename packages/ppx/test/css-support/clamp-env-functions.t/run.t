@@ -21,6 +21,16 @@ properties, not just registered as standalone functions.
   [@css "._a_65000wmp0b{font-size:clamp(1rem, 2.5vw, 2rem);}"];
   [@css "._a_88blas{max-width:clamp(20%, 50vw, 80%);}"];
   [@css "._a_ec0z9k{width:calc(clamp(1px, 2vw, 3px) + 1px);}"];
+  [@css.blocks
+    [
+      (1, "_a_ecelvd"),
+      (2, "_a_940008u9ys"),
+      (3, "_a_940008hw7i"),
+      (4, "_a_65000wmp0b"),
+      (5, "_a_88blas"),
+      (6, "_a_ec0z9k"),
+    ]
+  ];
   CSS.make("_a_ecelvd", []);
   CSS.make("_a_940008u9ys", []);
   CSS.make("_a_940008hw7i", []);

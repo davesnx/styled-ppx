@@ -27,6 +27,7 @@ subject is outside `&`'s subtree — slipped through and shipped a dead
   $ cat output.ml
   [@@@css ":is(._a_276yq4ejfl7 div){color:var(--c-qdrabr);}"]
   [@@@css.bindings [("Input_is_ok.ok", "_id_1e0vjjz", "_a_276yq4ejfl7")]]
+  [@@@css.blocks [(4, "_id_1e0vjjz _a_276yq4ejfl7")]]
   let c = "red"
   let ok =
     CSS.make "label:ok _id_1e0vjjz _a_276yq4ejfl7"

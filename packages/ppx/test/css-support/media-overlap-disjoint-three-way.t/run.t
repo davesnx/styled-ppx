@@ -13,6 +13,7 @@ at the cost of extra bytes.
   [@@@css "@media (min-width: 1280px) {._a_xyxs57p8n8o{margin:16px;}}"]
   [@@@css.bindings
     [("Output.block", "_id_ovbeuh", "_a_7prbkv _a_5kutk7pogdr _a_xyxs57p8n8o")]]
+  [@@@css.blocks [(3, "_id_ovbeuh _a_7prbkv _a_5kutk7pogdr _a_xyxs57p8n8o")]]
   let block =
     CSS.make "label:block _id_ovbeuh _a_7prbkv _a_5kutk7pogdr _a_xyxs57p8n8o"
       []

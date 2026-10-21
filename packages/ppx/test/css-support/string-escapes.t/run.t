@@ -29,6 +29,23 @@ documents/string-escape-bug.md for context.
   [@css "._a_390008wlhr{background-image:url(\"path\\\\to\\\\file.png\");}"];
   [@css "._a_4wqqv9{content:\"\\9 \";}"];
   [@css "._a_4wy7g7{content:\"\\7F \";}"];
+  [@css.blocks
+    [
+      (12, "_a_4wu917"),
+      (16, "_a_4w1y2p"),
+      (19, "_a_4w6l48"),
+      (22, "_a_4wucdh"),
+      (25, "_a_4wugqq"),
+      (30, "_a_4wew8m"),
+      (34, "_a_4w5ir8"),
+      (39, "_a_4w6l48"),
+      (43, "_a_g49s14ek38d"),
+      (47, "_a_39000808vt"),
+      (50, "_a_390008wlhr"),
+      (55, "_a_4wqqv9"),
+      (59, "_a_4wy7g7"),
+    ]
+  ];
   
   CSS.make("_a_4wu917", []);
   

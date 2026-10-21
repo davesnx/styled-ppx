@@ -5,6 +5,7 @@
   [@css "@media (max-width: 640px) {._id_16nw107{color:gray;}}"];
   [@css "._a_94gf8j{padding:8px;}"];
   [@css.bindings [("Output.card", "_id_16nw107", "_a_94gf8j")]];
+  [@css.blocks [(1, "_id_16nw107 _a_94gf8j")]];
   let card = CSS.make("label:card _id_16nw107 _a_94gf8j", []);
   module ResponsiveGlobals = {
     let to_string = () => "";

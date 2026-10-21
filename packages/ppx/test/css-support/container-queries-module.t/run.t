@@ -24,6 +24,19 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_4ve1gg{container:sidebar / inline-size;}"];
   [@css "._a_4vbl4h{container:sidebar / size;}"];
   [@css "._a_4v1iko{container:none;}"];
+  [@css.blocks
+    [
+      (2, "_a_4v00027ccc"),
+      (3, "_a_4v00026sj7"),
+      (4, "_a_4v0002zm71"),
+      (5, "_a_4v0001nlpx"),
+      (6, "_a_4v0001baxz"),
+      (7, "_a_4v0001qxl0"),
+      (8, "_a_4ve1gg"),
+      (9, "_a_4vbl4h"),
+      (10, "_a_4v1iko"),
+    ]
+  ];
   
   CSS.make("_a_4v00027ccc", []);
   CSS.make("_a_4v00026sj7", []);

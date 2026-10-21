@@ -22,6 +22,15 @@ rejecting nothing where a comma isn't present at all.
   [@css "._a_4exf5k{color:var(--x, );}"];
   [@css "._a_7pcyrh{margin:var(--m, 1px 2px);}"];
   [@css "._a_4eens4{color:var(--x, var(--y,));}"];
+  [@css.blocks
+    [
+      (3, "_a_4e8w5r"),
+      (4, "_a_4e0bz1"),
+      (5, "_a_4exf5k"),
+      (6, "_a_7pcyrh"),
+      (7, "_a_4eens4"),
+    ]
+  ];
   
   CSS.make("_a_4e8w5r", []);
   CSS.make("_a_4e0bz1", []);

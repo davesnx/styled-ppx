@@ -23,6 +23,18 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_dt6cul{vertical-align:middle;}"];
   [@css "._a_dt0n61{vertical-align:bottom;}"];
   [@css "._a_dtdzq1{vertical-align:text-bottom;}"];
+  [@css.blocks
+    [
+      (1, "_a_dt9eo6"),
+      (2, "_a_dtkzuz"),
+      (3, "_a_dt1ck9"),
+      (4, "_a_dtawz4"),
+      (5, "_a_dtbbe2"),
+      (6, "_a_dt6cul"),
+      (7, "_a_dt0n61"),
+      (8, "_a_dtdzq1"),
+    ]
+  ];
   CSS.make("_a_dt9eo6", []);
   CSS.make("_a_dtkzuz", []);
   CSS.make("_a_dt1ck9", []);

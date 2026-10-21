@@ -66,6 +66,37 @@ If this test fail means that the module is not in sync with the ppx
   [@css
     "._a_85e59j{max-height:-webkit-fit-content;max-height:-moz-fit-content;max-height:fit-content;}"
   ];
+  [@css.blocks
+    [
+      (2, "_a_ec3le8"),
+      (3, "_a_ecckkm"),
+      (4, "_a_ecccy6"),
+      (5, "_a_8cktvk"),
+      (6, "_a_8creoz"),
+      (7, "_a_8ckswh"),
+      (8, "_a_88c9a0"),
+      (9, "_a_88nlwm"),
+      (10, "_a_88zzeg"),
+      (11, "_a_6l27ji"),
+      (12, "_a_6lzl7o"),
+      (13, "_a_6lv2pj"),
+      (14, "_a_8ayx8i"),
+      (15, "_a_8ap2tk"),
+      (16, "_a_8abza9"),
+      (17, "_a_85yxes"),
+      (18, "_a_854hk2"),
+      (19, "_a_85ct3b"),
+      (25, "_a_35cmp3"),
+      (26, "_a_35qo31"),
+      (27, "_a_35vr3s"),
+      (41, "_a_ecanqs"),
+      (44, "_a_8c4rbf"),
+      (47, "_a_88hjh6"),
+      (50, "_a_6l0xge"),
+      (53, "_a_8ax31z"),
+      (56, "_a_85e59j"),
+    ]
+  ];
   
   CSS.make("_a_ec3le8", []);
   CSS.make("_a_ecckkm", []);

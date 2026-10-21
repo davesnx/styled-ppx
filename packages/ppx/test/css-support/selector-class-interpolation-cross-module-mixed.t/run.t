@@ -16,6 +16,7 @@ same-module `localFlag` is already resolved to its class.
   [@@@css.bindings
     [("N.localFlag", "_id_1026km9", "");
     ("N.container", "_id_1ov2ckq", "_a_brk8p4evyfi")]]
+  [@@@css.blocks [(1, "_id_1026km9"); (3, "_id_1ov2ckq _a_brk8p4evyfi")]]
   [@@@css.refs [("M.marker", "n.ml", 4, 19, 27)]]
   let _ = M.marker
   let localFlag = CSS.make "label:localFlag _id_1026km9" []

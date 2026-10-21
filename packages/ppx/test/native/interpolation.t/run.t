@@ -96,6 +96,42 @@ Interpolation native PPX transformations are checked as a cram snapshot.
     "._a_6f0001nyl9{-webkit-column-gap:var(--px30-cc29mn);column-gap:var(--px30-cc29mn);}"
   ];
   [@css "._a_2k9yln{-webkit-text-fill-color:var(--red-w69rb9);}"];
+  [@css.blocks
+    [
+      (52, "_a_4enh4f"),
+      (53, "_a_7pitjj"),
+      (54, "_a_4enh4f"),
+      (55, "_a_94pp3j"),
+      (56, "_a_3h97be"),
+      (57, "_a_8pyj1z"),
+      (58, "_a_3h0007w55u"),
+      (59, "_a_eckyy8"),
+      (60, "_a_88nebp"),
+      (61, "_a_6lvooa"),
+      (62, "_a_3nd0d4"),
+      (63, "_a_65000wu0qi"),
+      (64, "_a_650001szir"),
+      (65, "_a_65b8jkfd7x"),
+      (66, "_a_ekfgx3"),
+      (67, "_a_710002egw0"),
+      (68, "_a_cf00018kmj"),
+      (69, "_a_390008o5gx"),
+      (70, "_a_7y0074nm6u"),
+      (71, "_a_cy50p4"),
+      (72, "_a_4e2giy"),
+      (73, "_a_40ihb6"),
+      (74, "_a_40s4zv"),
+      (75, "_a_40l5g5"),
+      (76, "_a_40keqi"),
+      (77, "_a_cwbaal"),
+      (78, "_a_dm00048edy"),
+      (79, "_a_dm00046hu1"),
+      (80, "_a_2z003ken0s"),
+      (81, "_a_2z003kbnre"),
+      (82, "_a_6f0001nyl9"),
+      (83, "_a_2k9yln"),
+    ]
+  ];
   module Size = {
     let big = `px(24);
     let small = `px(8);

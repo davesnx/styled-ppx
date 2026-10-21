@@ -48,6 +48,33 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_4kub2p{-webkit-column-fill:auto;column-fill:auto;}"];
   [@css "._a_4ko7d8{-webkit-column-fill:balance;column-fill:balance;}"];
   [@css "._a_4k58g2{-webkit-column-fill:balance-all;column-fill:balance-all;}"];
+  [@css.blocks
+    [
+      (2, "_a_4o0004dwvy"),
+      (3, "_a_4o000422l4"),
+      (4, "_a_4o00017yc3"),
+      (5, "_a_4o0001yhyp"),
+      (6, "_a_4orbi4"),
+      (7, "_a_4ojrzp"),
+      (8, "_a_4osapk"),
+      (11, "_a_4oadp1"),
+      (12, "_a_4oumhd"),
+      (13, "_a_4oyak2"),
+      (14, "_a_4o29w9"),
+      (15, "_a_4l00010lyg"),
+      (16, "_a_4l0002wiag"),
+      (17, "_a_4l00022g8z"),
+      (18, "_a_4l0002szib"),
+      (19, "_a_4l00048iyd"),
+      (20, "_a_4l0007y1fb"),
+      (21, "_a_4l0007h5u6"),
+      (22, "_a_4mzc18"),
+      (23, "_a_4me1k2"),
+      (24, "_a_4kub2p"),
+      (25, "_a_4ko7d8"),
+      (26, "_a_4k58g2"),
+    ]
+  ];
   
   CSS.make("_a_4o0004dwvy", []);
   CSS.make("_a_4o000422l4", []);

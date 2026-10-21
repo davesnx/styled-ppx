@@ -20,6 +20,15 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_bh07g6{scrollbar-width:auto;}"];
   [@css "._a_bhrmx3{scrollbar-width:thin;}"];
   [@css "._a_bhrjsx{scrollbar-width:none;}"];
+  [@css.blocks
+    [
+      (2, "_a_b9p1bd"),
+      (3, "_a_b9d6oa"),
+      (4, "_a_bh07g6"),
+      (5, "_a_bhrmx3"),
+      (6, "_a_bhrjsx"),
+    ]
+  ];
   
   CSS.make("_a_b9p1bd", []);
   CSS.make("_a_b9d6oa", []);

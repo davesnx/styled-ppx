@@ -24,6 +24,9 @@ a CSS rule.
       ("Input.button", "_id_l55coe", "_a_4ekvmb"),
     ]
   ];
+  [@css.blocks
+    [(6, "_id_1jj5tmt _a_5r08qs _a_94zrbw"), (8, "_id_l55coe _a_4ekvmb")]
+  ];
   
   let layout = CSS.make("label:layout _id_1jj5tmt _a_5r08qs _a_94zrbw", []);
   

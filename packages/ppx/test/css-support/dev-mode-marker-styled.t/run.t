@@ -24,6 +24,7 @@ covers both a static payload (Box) and a dynamic labeled-argument payload
       ("Input.Button", "_id_1qldrk3", "_a_4esjgz"),
     ]
   ];
+  [@css.blocks [(6, "_id_zugc0d _a_4ekvmb"), (9, "_id_1qldrk3 _a_4esjgz")]];
   
   module Box = {
     [@deriving abstract]

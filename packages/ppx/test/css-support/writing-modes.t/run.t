@@ -44,6 +44,29 @@ If this test fail means that the module is not in sync with the ppx
     "._a_ehq5f9{-webkit-writing-mode:sideways-lr;writing-mode:sideways-lr;}"
   ];
   [@css "._a_cefs5k{text-combine-upright:digits 2;}"];
+  [@css.blocks
+    [
+      (2, "_a_5qjqc9"),
+      (3, "_a_5q82ql"),
+      (4, "_a_dp14px"),
+      (5, "_a_dptajz"),
+      (6, "_a_dphxsn"),
+      (7, "_a_dp3xur"),
+      (8, "_a_dp30cq"),
+      (9, "_a_dp7z6r"),
+      (10, "_a_ehni7l"),
+      (11, "_a_ehrbdf"),
+      (12, "_a_ehuv7p"),
+      (13, "_a_cvc989"),
+      (14, "_a_cvjqux"),
+      (15, "_a_cvfrh6"),
+      (16, "_a_ceubm3"),
+      (17, "_a_cejtzu"),
+      (20, "_a_ehcjo4"),
+      (21, "_a_ehq5f9"),
+      (22, "_a_cefs5k"),
+    ]
+  ];
   
   CSS.make("_a_5qjqc9", []);
   CSS.make("_a_5q82ql", []);

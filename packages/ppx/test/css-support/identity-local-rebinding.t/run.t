@@ -25,6 +25,7 @@ byte-identical CSS (same atoms, same atomized class).
       ("Input.g", "_id_smthfn", "_a_4ekvmb"),
     ]
   ];
+  [@css.blocks [(2, "_id_fo0igp _a_4ekvmb"), (7, "_id_smthfn _a_4ekvmb")]];
   let f = () => {
     let a = CSS.make("label:a _id_fo0igp _a_4ekvmb", []);
     a;

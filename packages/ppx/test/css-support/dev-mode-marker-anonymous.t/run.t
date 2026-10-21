@@ -19,6 +19,9 @@ behavior; this keeps the two debug affordances symmetric.
   [@css "._a_4esm7b{color:blue;}"];
   [@css "._a_4ecoli{color:green;}"];
   [@css.bindings [("Input.named", "_id_1hum9uj", "_a_4ecoli")]];
+  [@css.blocks
+    [(9, "_a_4ekvmb"), (11, "_a_4esm7b"), (14, "_id_1hum9uj _a_4ecoli")]
+  ];
   
   let _ = CSS.make("_a_4ekvmb", []);
   

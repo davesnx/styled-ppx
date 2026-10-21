@@ -27,6 +27,11 @@ before popping, so the popped segment is always the rightmost compound.
        "_a_g79843h2ghsebco _a_x5lvq3h2ghstv1h _a_lf3m83h2ghscuwt");
     ("Input.single", "_id_1e50cws", "_a_x5lvq4en7y2");
     ("Input.compoundParent", "_id_16qcgjr", "_a_pkdux4woysu _a_rf47n4wkqg0")]]
+  [@@@css.blocks
+    [(12,
+       "_id_1me4lmu _a_g79843h2ghsebco _a_x5lvq3h2ghstv1h _a_lf3m83h2ghscuwt");
+    (26, "_id_1e50cws _a_x5lvq4en7y2");
+    (39, "_id_16qcgjr _a_pkdux4woysu _a_rf47n4wkqg0")]]
   let table =
     CSS.make
       "label:table _id_1me4lmu _a_g79843h2ghsebco _a_x5lvq3h2ghstv1h _a_lf3m83h2ghscuwt"

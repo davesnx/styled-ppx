@@ -49,6 +49,42 @@ If this test fails, the var() and cascading support is broken
   [@css "._a_65000wswxq{font-size:unset;}"];
   [@css "._a_65000wntfo{font-size:revert;}"];
   [@css "._a_65000wpi5f{font-size:revert-layer;}"];
+  [@css.blocks
+    [
+      (2, "_a_4en3kf"),
+      (3, "_a_390004fuqy"),
+      (4, "_a_7pcrrr"),
+      (5, "_a_947rr7"),
+      (6, "_a_65000wykz8"),
+      (7, "_a_ecra93"),
+      (8, "_a_6lqm6h"),
+      (11, "_a_4ey3yl"),
+      (12, "_a_4e8crh"),
+      (13, "_a_4eyg6i"),
+      (14, "_a_4ejbf2"),
+      (15, "_a_4e07lq"),
+      (17, "_a_5rvscd"),
+      (18, "_a_5rh118"),
+      (19, "_a_5rhxe5"),
+      (20, "_a_5rcx45"),
+      (21, "_a_5rojml"),
+      (23, "_a_7pqj8z"),
+      (24, "_a_7pgxfx"),
+      (25, "_a_7pzsk3"),
+      (26, "_a_7p2sph"),
+      (27, "_a_7pkzq5"),
+      (29, "_a_60nah6"),
+      (30, "_a_60c6td"),
+      (31, "_a_6042ms"),
+      (32, "_a_608jui"),
+      (33, "_a_604fps"),
+      (35, "_a_65000we5f8"),
+      (36, "_a_65000w53xd"),
+      (37, "_a_65000wswxq"),
+      (38, "_a_65000wntfo"),
+      (39, "_a_65000wpi5f"),
+    ]
+  ];
   
   CSS.make("_a_4en3kf", []);
   CSS.make("_a_390004fuqy", []);

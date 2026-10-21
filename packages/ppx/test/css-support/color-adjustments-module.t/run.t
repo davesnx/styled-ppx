@@ -33,6 +33,28 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_4jcn74{color-scheme:purple dark interesting;}"];
   [@css "._a_4jh2ut{color-scheme:none;}"];
   [@css "._a_4j6jec{color-scheme:light none;}"];
+  [@css.blocks
+    [
+      (2, "_a_4fjsr1"),
+      (3, "_a_4fuoce"),
+      (4, "_a_6ejaoo"),
+      (5, "_a_6eg3m8"),
+      (6, "_a_6esf9s"),
+      (7, "_a_4jmdkq"),
+      (8, "_a_4j0ddm"),
+      (9, "_a_4j8a77"),
+      (10, "_a_4jor4h"),
+      (11, "_a_4jsghk"),
+      (12, "_a_4j6avj"),
+      (13, "_a_4jbop6"),
+      (14, "_a_4j24tl"),
+      (15, "_a_4jd4nr"),
+      (16, "_a_4j2q1k"),
+      (17, "_a_4jcn74"),
+      (18, "_a_4jh2ut"),
+      (19, "_a_4j6jec"),
+    ]
+  ];
   
   CSS.make("_a_4fjsr1", []);
   CSS.make("_a_4fuoce", []);

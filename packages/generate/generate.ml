@@ -167,6 +167,7 @@ type input = {
   library : string option;
   protocol_errors : string list;
   references : string list;
+  blocks : Css_extraction.block list;
 }
 
 let extract_structure ~filename ~idx structure : input =
@@ -175,6 +176,7 @@ let extract_structure ~filename ~idx structure : input =
   let env = ref None in
   let library = ref None in
   let protocol_errors = ref [] in
+  let blocks = ref [] in
   let add_protocol_error attribute msg =
     protocol_errors :=
       Printf.sprintf "%s: malformed [@@@%s]: %s" filename attribute msg
@@ -199,6 +201,11 @@ let extract_structure ~filename ~idx structure : input =
         | Error (`Collision msg) ->
           protocol_errors :=
             Printf.sprintf "%s: %s" filename msg :: !protocol_errors)
+      | [%stri [@@@css.blocks [%e? value]]] ->
+        (match Css_extraction.decode_blocks_payload value with
+        | Ok entries -> blocks := List.rev_append entries !blocks
+        | Error msg ->
+          add_protocol_error Css_extraction.blocks_attribute_name msg)
       | [%stri [@@@css.config [%e? value]]] ->
         (match Css_extraction.decode_config_payload value with
         | Ok entries ->
@@ -220,6 +227,7 @@ let extract_structure ~filename ~idx structure : input =
     library = !library;
     protocol_errors = List.rev !protocol_errors;
     references = Order.references structure;
+    blocks = List.rev !blocks;
   }
 
 (** Read a post-PPX [.ml] file or its serialized [.pp.ml] AST into a ppxlib
@@ -588,8 +596,7 @@ let atom_class_and_end rule_text =
   scan 0
 
 (** The atom's own class name alone, dropping the end position
-    {!atom_class_and_end} also returns (used by {!rule_tier} to look at what
-    immediately follows the class token). *)
+    {!atom_class_and_end} also returns. *)
 let atom_class_name rule_text = Option.map fst (atom_class_and_end rule_text)
 
 (** Collision check for the new atom-class format: its value hash is only unique
@@ -635,50 +642,32 @@ let check_atom_class_collisions rules =
           None))
     rules
 
-(* -- Cascade tiers ---------------------------------------------------------
+(* -- Sheet order ---------------------------------------------------------
 
-   Every rule this aggregator ships shares the atomic invariant "one class,
-   no qualifiers", so two rules of EQUAL specificity for the same property
-   only ever compete by stylesheet position - the later one wins. Content-
-   hash dedup (and, before it, an atom's own author) has no say over WHERE
-   two such rules land relative to each other once they come from different
-   bindings, so a block's own `@media (min-width:...)` override could land
-   BEFORE its base declaration in the emitted sheet, making the base
-   declaration, unconditionally later, always win, even inside the media
-   query.
-
-   Fix: every rule that can compete for an element is emitted in one of
-   three fixed-order groups - `global` ([%styled.global] rules), `base` (an
-   atom's own, unconditional context), `conditional` (an atom wrapped in
-   `@media`/`@supports`/`@container`, or carrying a pseudo-class/pseudo-
-   element directly on its own selector - see {!rule_tier}) - each group
-   independently sorted by {!sort_by_shorthand_first} (descendant-shaped
-   rules first, then shorthand depth). No CSS layer separates the three:
-   ordinary CSS cascade rules apply, SPECIFICITY first, stylesheet position
-   only as the tie-break - which is exactly why a `conditional` rule still
-   wins a genuine tie against a `base` one (it is textually later), and why
-   a `[%styled.global]` rule with higher specificity than an atom now wins
-   outright, same as any two plain, unlayered CSS rules would (an accepted
-   consequence - see `global-tier.t`).
+   Content-hash dedup has no say over WHERE two rules of different bindings
+   land relative to each other, and two rules of equal specificity for the
+   same property compete by stylesheet position only. So the generator
+   orders the style rules itself: [%styled.global] rules first (sorted by
+   {!sort_by_shorthand_first}), then every atom rule in the order "Ordered
+   sheet" below defines. No CSS layer wraps anything: specificity decides
+   first, position only breaks a tie, so a [%styled.global] rule with higher
+   specificity than an atom wins outright (`global-tier.t`).
 
    Accepted, not fixed: two SEPARATE `styled-ppx.generate` invocations (two
    `<link>`s on one page) have no guaranteed relative order between their
-   own tiered rules, for the rare case where the two sheets share a class -
+   rules, for the rare case where the two sheets share a class -
    `--namespace` salts each library's atom classes (see `Hash_class.ml`),
    so two different libraries never mint the same one; sharing a class
    only happens for a native/Melange twin pair passing the same explicit
-   `--namespace`, or for two runs with no namespace at all. When it does
-   happen: each sheet's OWN tier order still holds internally
-   (`tiers-two-stylesheets.t`), but a tie between two DIFFERENT sheets'
-   rules depends on which `<link>` the browser loads first, exactly like
-   plain CSS always has. *)
+   `--namespace`, or for two runs with no namespace at all
+   (`tiers-two-stylesheets.t`). *)
 
 (** [@property]/[@keyframes]/[@font-face] are registrations, not style rules
     that compete for an element - a [@property] rule is a custom-property
     definition, a [@keyframes] rule is a name lookup, and [@font-face] has no
     per-element cascade to begin with - so none of the three take part in
-    tiering; they stay wherever dedup/ordering already placed them, ahead of
-    every tiered rule (see [run] below), exactly as [@import]/[@namespace]
+    ordering; they stay wherever dedup/ordering already placed them, ahead of
+    every style rule (see [run] below), exactly as [@import]/[@namespace]
     (hoisted separately, above) and dropped [@charset] do. A literal,
     user-authored [@layer] at-rule (statement form, ["@layer a, b;"], or block
     form, ["@layer name { ... }"]) stays there too, for a different reason: a
@@ -789,50 +778,6 @@ let is_descendant_shape rule_text =
   | Some (selector, _) ->
     has_top_level_combinator selector
     && not (String.contains (rightmost_compound selector) '.')
-
-(** [Conditional] or [Base] - a descendant-shaped rule (see
-    {!is_descendant_shape}) is neither: it stays in the tier of its own context,
-    exactly like any other rule, so specificity (not layer order) decides
-    between a parent's blind reach (".x *", ".x li") and the child's own atom,
-    the same way it did before tiers existed. [Descendant] used to be its own,
-    lowest tier - removed: sitting below [Base] unconditionally made an
-    ancestor's rule lose to EVERY child atom regardless of specificity, which
-    broke five real, more-specific-ancestor patterns ([".list li"],
-    [".field input"], [".clearButtonContainer span"], [":where(.stack) > *"],
-    [".field button"]) to fix the one (an ancestor selector genuinely tied in
-    specificity with a child's own atom, e.g. ".x *" tied at (0,1,0)) it was
-    meant for. {!sort_by_shorthand_first} now protects that one case instead, by
-    emitting descendant-shaped rules before own-element rules within whichever
-    tier they land in, so a genuine specificity TIE still resolves to the child
-    (later rule wins a tie); a real specificity difference is untouched by
-    stylesheet position either way. [Conditional] when [rule_text] only applies
-    under some extra condition beyond the plain presence of its own element:
-    wrapped in an at-rule ([@media]/[@supports]/[@container] are the only ones
-    that ever wrap an atom class - [@property]/[@keyframes]/[@font-face]/
-    [%styled.global] rules carry no atom class at all and never reach this
-    function, see the "no atom class" filter in {!run} below), or a
-    pseudo-class/pseudo-element attached DIRECTLY to the atom's own compound
-    selector (".x:hover", ".x::before", chained
-    ".x:focus-visible:not(:disabled)"). [Base] otherwise, including a
-    descendant/child selector whose subject DOES carry its own class (".x
-    .id-...", ".x .tiptap" - see {!is_descendant_shape}'s doc) and any rule with
-    no combinator at all. *)
-type tier =
-  | Base
-  | Conditional
-
-let rule_tier rule_text =
-  let trimmed = String.trim rule_text in
-  if String.length trimmed > 0 && trimmed.[0] = '@' then Conditional
-  else (
-    match atom_class_and_end rule_text with
-    | None ->
-      Base
-      (* unreachable here - callers only ask for tier-eligible rules, i.e. atom_class_name <> None *)
-    | Some (_, after) ->
-      if after < String.length rule_text && rule_text.[after] = ':' then
-        Conditional
-      else Base)
 
 (** The property name of each top-level (";"-separated) declaration in a
     declaration-block's text. CSS property names never contain [:] or [;]
@@ -951,270 +896,438 @@ let sort_by_shorthand_first rules =
   |> List.stable_sort compare_descendant_first_then_depth
   |> List.map (fun (_, _, r) -> r)
 
-(* -- Condition priority -----------------------------------------------
+(* -- Ordered sheet -------------------------------------------------------
 
-   Inside the [conditional] group only, a tie {!sort_by_shorthand_first}
-   leaves open between two conditions of otherwise-equal specificity
-   (":hover" vs ":focus"; "@supports" vs "@media") is now decided by a
-   fixed order between the conditions themselves, instead of falling
-   through to
-   `order_modules_within_scope`'s filename tie-break (see its doc) - so the
-   same pair of conditions always resolves the same way, everywhere,
-   including inside one block (a block's own declaration order no longer
-   decides between two conditions).
+   Atom rules (every rule with an `_a_`/`_in_` class) are emitted in one
+   topological order. Two atom rules need a fixed relative order only when
+   they COMPETE ({!competes}): equal importance, equal specificity, the same
+   subject element and pseudo-element, and at least one shared longhand. For
+   any other pair the cascade never reads the sheet position. The order
+   comes from, in priority:
 
-   Appended AFTER descendant-shape and depth, never before, for the same
-   reason depth comes after descendant-shape (see
-   {!compare_descendant_first_then_depth}'s doc): those two protect a real
-   specificity/override relationship (parent-vs-child, shorthand-vs-
-   longhand) that a condition-only tie-break must never reopen. Applied
-   ONLY to the [conditional] group, via {!sort_conditional_rules} below -
-   not [global] or [base]: a [global] rule never goes through {!rule_tier}
-   and can still be `@`-wrapped or bare, so this key has nothing
-   meaningful to decide for it.
+   1. Descendant-shaped rules first (see {!is_descendant_shape}): a parent's
+      blind reach (".x > *") loses a specificity tie to the child's own atom.
+      Such a rule only competes with rules of the same selector, so this key
+      never works against an edge.
+   2. Block edges: in one block's class list ([[@@@css.blocks]]), an earlier competing rule
+      comes first. One block then reads as plain CSS: the declaration written
+      last wins.
+   3. Definition order (the first time [ordered_rules] lists the rule) for
+      every pair the edges leave open. A [CSS.merge (a, b)] gets [b]'s rules
+      last when [b] is defined after [a] (later in the file, or in a file the
+      dependency order puts later).
 
-   The pseudo-class/pseudo-element and at-rule priority TABLES are
-   StyleX's `PSEUDO_CLASS_PRIORITIES`/`AT_RULE_PRIORITIES`/
-   `PSEUDO_ELEMENT_PRIORITY`
-   (`@stylexjs/shared/src/utils/property-priorities.js`), copied verbatim -
-   no reason to invent our own numbers for those. The COMPOSITION is not
-   StyleX's: real StyleX sums a rule's property/pseudo/at-rule weights into
-   one arithmetic total
-   (`@stylexjs/babel-plugin/src/shared/utils/generate-css-rule.js:106-110`),
-   so a heavy enough pseudo-class chain can outrank a light at-rule wrapper
-   (`:active` at 170 beats `@supports`-wrapped `:link` at 30+80=110 in real
-   StyleX). This key instead compares at-rule rank BEFORE pseudo rank as a
-   strict, two-level hierarchy - any at-rule wrapper unconditionally
-   outranks any bare pseudo-class tie, regardless of magnitude. That
-   hierarchy is this project's own choice, not ported from StyleX. Not
-   ported: StyleX turns this same priority into a CSS layer (or a
-   specificity bump) that can override a real specificity difference
-   between rules; this key never does - it only ever breaks a tie between
-   rules the browser already treats as equally specific. *)
+   There is no "shorthand before a longhand it covers" edge: through an
+   unrelated block's longhand in the same context, such an edge can pull a
+   merge's later argument ahead of the earlier one
+   (`ordered-sheet-monorepo-regressions.t`). [CSS.merge] already drops a
+   longhand that a later argument's shorthand covers.
 
-(** The leading `@...` prelude of an at-rule-wrapped rule (`"@media
-    (min-width:600px)"` from `"@media (min-width:600px){.x{color:red;}}"`),
-    or [None] when [rule_text] carries no at-rule wrapper at all. Only the
-    OUTERMOST prelude: {!rule_tier} already buckets any `@`-wrapped rule into
-    one [Conditional] group regardless of nesting. *)
-let outermost_at_rule_prelude rule_text =
-  let trimmed = String.trim rule_text in
-  if String.length trimmed = 0 || trimmed.[0] <> '@' then None
-  else
-    Option.map
-      (fun i -> String.trim (String.sub trimmed 0 i))
-      (String.index_opt trimmed '{')
+   The sheet is built from its END: among the rules whose successors are all
+   placed, the latest by priority is placed next. So a rule keeps its
+   definition position unless an edge pulls it ahead of a rule it must
+   precede.
 
-(** Fixed rank per at-rule kind - StyleX's `AT_RULE_PRIORITIES`, in the same
-    relative order (`@supports` < `@media` < `@container`; only the order
-    matters here, not StyleX's own raw numbers). 0 for no wrapper at all, so a
-    [Base]-tier rule (never `@`-wrapped, by {!rule_tier}'s own definition) is
-    never touched by this key. *)
-let at_rule_rank rule_text =
-  match outermost_at_rule_prelude rule_text with
-  | None -> 0
-  | Some p when String.starts_with ~prefix:"@supports" p -> 1
-  | Some p when String.starts_with ~prefix:"@media" p -> 2
-  | Some p when String.starts_with ~prefix:"@container" p -> 3
-  | Some _ -> 0
+   Two blocks that order the same two rules in opposite directions are a
+   conflict: generate warns, names both blocks, drops both edges and keeps
+   definition order for that pair. A longer cycle is cut at one rule, with a
+   warning that names the blocks whose order it drops.
 
-(** StyleX's `PSEUDO_CLASS_PRIORITIES`, ported verbatim (values unchanged;
-    camelCase keys respelled kebab-case to match real CSS syntax - `focusWithin`
-    -> `:focus-within`). Falls back to StyleX's own default (40, the
-    `:is`/`:where`/`:not` bucket) for anything not in the table, so this is
-    total, never partial. *)
-let pseudo_class_priority = function
-  | ":is" | ":where" | ":not" -> 40
-  | ":has" -> 45
-  | ":dir" -> 50
-  | ":lang" -> 51
-  | ":first-child" -> 52
-  | ":first-of-type" -> 53
-  | ":last-child" -> 54
-  | ":last-of-type" -> 55
-  | ":only-child" -> 56
-  | ":only-of-type" -> 57
-  | ":nth-child" -> 60
-  | ":nth-last-child" -> 61
-  | ":nth-of-type" -> 62
-  | ":nth-last-of-type" -> 63
-  | ":empty" -> 70
-  | ":link" -> 80
-  | ":any-link" -> 81
-  | ":local-link" -> 82
-  | ":target-within" -> 83
-  | ":target" -> 84
-  | ":visited" -> 85
-  | ":enabled" -> 91
-  | ":disabled" -> 92
-  | ":required" -> 93
-  | ":optional" -> 94
-  | ":read-only" -> 95
-  | ":read-write" -> 96
-  | ":placeholder-shown" -> 97
-  | ":in-range" -> 98
-  | ":out-of-range" -> 99
-  | ":default" -> 100
-  | ":checked" | ":indeterminate" -> 101
-  | ":blank" -> 102
-  | ":valid" -> 103
-  | ":invalid" -> 104
-  | ":user-invalid" -> 105
-  | ":autofill" -> 110
-  | ":picture-in-picture" -> 120
-  | ":modal" -> 121
-  | ":fullscreen" -> 122
-  | ":paused" -> 123
-  | ":playing" -> 124
-  | ":current" -> 125
-  | ":past" -> 126
-  | ":future" -> 127
-  | ":hover" -> 130
-  | ":focus-within" -> 140
-  | ":focus" -> 150
-  | ":focus-visible" -> 160
-  | ":active" -> 170
-  | _ -> 40
+   #616's base-before-condition tier and its pseudo-class and at-rule rank
+   tables are gone: a block edge or definition order decides those ties, and
+   a fixed rank overrode a block's own source order. *)
 
-(** StyleX's flat `PSEUDO_ELEMENT_PRIORITY`: every pseudo-element (`::before`,
-    `::after`, ...) gets the SAME weight, well above any pseudo-class. StyleX
-    does not disambiguate `::before` from `::after` either, so a tie between two
-    DIFFERENT pseudo-elements stays unresolved here too (falls through to
-    stable/file order). *)
-let pseudo_element_priority = 5000
-
-(** The chain of pseudo-class/pseudo-element parts directly on [selector]
-    (StyleX's `PSEUDO_PART_REGEX`, hand-rolled to match this file's own style of
-    manual scanning - see {!rightmost_compound}): split at each top-level `:`,
-    outside a functional pseudo-class's parenthesised argument (so
-    `:not(:disabled)` stays one part), without splitting `::before` in half. *)
-let pseudo_parts selector =
-  let n = String.length selector in
-  let parts = ref [] in
-  let depth = ref 0 in
-  let start = ref (-1) in
-  let flush upto =
-    if !start >= 0 && upto > !start then
-      parts := String.sub selector !start (upto - !start) :: !parts
+(** First index of [sub] in [s]. *)
+let find_substring s sub =
+  let n = String.length s
+  and m = String.length sub in
+  let rec go i =
+    if i + m > n then None
+    else if String.sub s i m = sub then Some i
+    else go (i + 1)
   in
+  go 0
+
+(** CSS specificity (ids, classes, types) of a selector text, as Selectors 4
+    defines it: [:where()] counts 0, [:is()]/[:not()]/[:has()] count their most
+    specific argument, [:nth-child(An+B of S)] counts one class plus S. *)
+module Specificity = struct
+  type t = int * int * int
+
+  let zero = 0, 0, 0
+  let add (a, b, c) (x, y, z) = a + x, b + y, c + z
+  let max a b = if compare a b >= 0 then a else b
+
+  let is_ident_char c =
+    (c >= 'a' && c <= 'z')
+    || (c >= 'A' && c <= 'Z')
+    || (c >= '0' && c <= '9')
+    || c = '-'
+    || c = '_'
+    || Char.code c >= 128
+
+  (* End of the identifier starting at [i]; a backslash escapes the next
+     character (`.md\:flex`), so it never ends the identifier. *)
+  let ident_end s i =
+    let n = String.length s in
+    let rec go i =
+      if i >= n then i
+      else if s.[i] = '\\' then go (i + 2)
+      else if is_ident_char s.[i] then go (i + 1)
+      else i
+    in
+    min n (go i)
+
+  (* Index just past the bracket that closes the one opened at [i]. Quoted
+     strings inside are skipped whole. *)
+  let matching s i =
+    let n = String.length s in
+    let rec go i depth quote =
+      if i >= n then n
+      else (
+        match quote, s.[i] with
+        | Some q, c when c = q -> go (i + 1) depth None
+        | Some _, '\\' -> go (i + 2) depth quote
+        | Some _, _ -> go (i + 1) depth quote
+        | None, (('"' | '\'') as q) -> go (i + 1) depth (Some q)
+        | None, ('(' | '[') -> go (i + 1) (depth + 1) None
+        | None, (')' | ']') ->
+          if depth = 1 then i + 1 else go (i + 1) (depth - 1) None
+        | None, _ -> go (i + 1) depth None)
+    in
+    go i 0 None
+
+  let split_top_level_commas s =
+    let n = String.length s in
+    let parts = ref [] in
+    let start = ref 0 in
+    let i = ref 0 in
+    while !i < n do
+      match s.[!i] with
+      | '(' | '[' -> i := matching s !i
+      | ',' ->
+        parts := String.sub s !start (!i - !start) :: !parts;
+        start := !i + 1;
+        incr i
+      | _ -> incr i
+    done;
+    List.rev (String.sub s !start (n - !start) :: !parts)
+
+  let legacy_pseudo_elements =
+    [ "before"; "after"; "first-line"; "first-letter" ]
+
+  let rec of_list s =
+    split_top_level_commas s |> List.map of_selector |> List.fold_left max zero
+
+  and of_selector s =
+    let n = String.length s in
+    let rec go i acc =
+      if i >= n then acc
+      else (
+        match s.[i] with
+        | '#' ->
+          let j = ident_end s (i + 1) in
+          go j (add acc (1, 0, 0))
+        | '.' ->
+          let j = ident_end s (i + 1) in
+          go j (add acc (0, 1, 0))
+        | '[' -> go (matching s i) (add acc (0, 1, 0))
+        | ':' when i + 1 < n && s.[i + 1] = ':' ->
+          let j = ident_end s (i + 2) in
+          let j = if j < n && s.[j] = '(' then matching s j else j in
+          go j (add acc (0, 0, 1))
+        | ':' ->
+          let j = ident_end s (i + 1) in
+          let name =
+            String.lowercase_ascii (String.sub s (i + 1) (j - i - 1))
+          in
+          if j < n && s.[j] = '(' then (
+            let close = matching s j in
+            let arg = String.sub s (j + 1) (max 0 (close - j - 2)) in
+            let own =
+              match name with
+              | "where" -> zero
+              | "is" | "not" | "has" | "matches" | "-webkit-any" | "-moz-any" ->
+                of_list arg
+              | "nth-child" | "nth-last-child" ->
+                let of_part =
+                  match find_substring arg " of " with
+                  | Some k ->
+                    of_list (String.sub arg (k + 4) (String.length arg - k - 4))
+                  | None -> zero
+                in
+                add (0, 1, 0) of_part
+              | _ -> 0, 1, 0
+            in
+            go close (add acc own))
+          else if List.mem name legacy_pseudo_elements then
+            go j (add acc (0, 0, 1))
+          else go j (add acc (0, 1, 0))
+        | '*' | '&' | ' ' | '\t' | '\n' | '>' | '+' | '~' | '|' | ')' ->
+          go (i + 1) acc
+        | '(' -> go (matching s i) acc
+        | c when is_ident_char c || c = '\\' ->
+          go (ident_end s i) (add acc (0, 0, 1))
+        | _ -> go (i + 1) acc)
+    in
+    go 0 zero
+end
+
+(** What the order needs to know about one atom rule. [subject] names the
+    element and pseudo-element the rule styles: ["own"] plus the pseudo-elements
+    after the atom class, or the whole selector (atom class written [&]) when a
+    combinator after the atom class reaches another element. [leaves] is the
+    sorted set of longhands the declarations set, a legacy alias read as its
+    canonical name ([all] kept apart in [sets_all]). *)
+type atom_rule = {
+  text : string;
+  descendant : bool;
+  specificity : Specificity.t;
+  important : bool;
+  subject : string;
+  leaves : string list;
+  sets_all : bool;
+}
+
+let replace_all ~sub ~by s =
+  let m = String.length sub in
+  if m = 0 then s
+  else (
+    let buf = Buffer.create (String.length s) in
+    let n = String.length s in
+    let rec go i =
+      if i > n - m then Buffer.add_string buf (String.sub s i (n - i))
+      else if String.sub s i m = sub then (
+        Buffer.add_string buf by;
+        go (i + m))
+      else (
+        Buffer.add_char buf s.[i];
+        go (i + 1))
+    in
+    go 0;
+    Buffer.contents buf)
+
+(** Pseudo-elements written at the top level of [tail]. *)
+let pseudo_elements tail =
+  let n = String.length tail in
+  let found = ref [] in
   let i = ref 0 in
   while !i < n do
-    match selector.[!i] with
-    | '(' ->
-      incr depth;
-      incr i
-    | ')' ->
-      decr depth;
-      incr i
-    | ':' when !depth = 0 ->
-      flush !i;
-      start := !i;
-      i := !i + if !i + 1 < n && selector.[!i + 1] = ':' then 2 else 1
+    match tail.[!i] with
+    | '(' | '[' -> i := Specificity.matching tail !i
+    | ':' ->
+      let double = !i + 1 < n && tail.[!i + 1] = ':' in
+      let start = if double then !i + 2 else !i + 1 in
+      let j = Specificity.ident_end tail start in
+      let name = String.lowercase_ascii (String.sub tail start (j - start)) in
+      if double || List.mem name Specificity.legacy_pseudo_elements then
+        found := name :: !found;
+      i := j
     | _ -> incr i
   done;
-  flush n;
-  List.rev !parts
+  List.rev !found
 
-(** One chain part's own weight: a pseudo-element (leading `::`) always scores
-    {!pseudo_element_priority}; a pseudo-class looks up {!pseudo_class_priority}
-    on its name with any functional argument stripped (`:not(:disabled)` ->
-    `:not`). *)
-let pseudo_part_weight part =
-  if String.length part >= 2 && part.[0] = ':' && part.[1] = ':' then
-    pseudo_element_priority
-  else (
-    match String.index_opt part '(' with
-    | Some i -> pseudo_class_priority (String.sub part 0 i)
-    | None -> pseudo_class_priority part)
-
-(** The end of the pseudo chain starting at [start] (right after the atom's
-    own class): the first top-level combinator (space, `>`, `+`, `~`, `,`) or
-    `{`, whichever comes first, outside a functional pseudo's parenthesised
-    argument (so `:nth-child(2n+1 of .x)`'s own space does not end the chain
-    early). `.x:hover ._id_y{...}` and `.x:hover > span{...}` both reach,
-    past `:hover`, for a DIFFERENT compound - only the leading `:hover` is
-    this atom's own condition; the rest is a combinator into unrelated
-    selector text that must never be summed into the same chain. *)
-let pseudo_chain_end rule_text start =
-  let n = String.length rule_text in
-  let depth = ref 0 in
-  let i = ref start in
+(** [s] without trailing whitespace; leading whitespace is a descendant
+    combinator in a selector tail, so it stays. *)
+let trim_right s =
+  let n = ref (String.length s) in
   while
-    !i < n
-    && rule_text.[!i] <> '{'
-    && not
-         (!depth = 0
-         && (is_combinator_char rule_text.[!i] || rule_text.[!i] = ','))
+    !n > 0 && (s.[!n - 1] = ' ' || s.[!n - 1] = '\t' || s.[!n - 1] = '\n')
   do
-    (match rule_text.[!i] with
-    | '(' -> incr depth
-    | ')' -> decr depth
-    | _ -> ());
-    incr i
+    decr n
   done;
-  !i
+  String.sub s 0 !n
 
-(** Sum of {!pseudo_part_weight} over the pseudo chain directly suffixed to the
-    ATOM'S OWN class token (StyleX's `getCompoundPseudoPriority`) - 0 for no
-    such suffix. Reads the chain from exactly where {!rule_tier} itself looks
-    (right after {!atom_class_and_end}'s own class) up to {!pseudo_chain_end},
-    NOT {!rightmost_compound} of the whole selector: for a descendant/child rule
-    (`.x > div:not(:last-child)`), the rightmost compound is a DIFFERENT
-    element's pseudo entirely, one {!rule_tier} already classifies [Base] -
-    reading it would reorder an atom over a pseudo it doesn't even carry
-    (`selector-ref-atom-collision.t` is exactly this shape). A chain mixing in a
-    functional pseudo-class opts out of summing, same as StyleX, falling back to
-    the shared default (40) rather than a number that would misrepresent the
-    chain. *)
-let pseudo_rank rule_text =
-  match atom_class_and_end rule_text with
-  | None -> 0
-  | Some (_, after) ->
-    if after >= String.length rule_text || rule_text.[after] <> ':' then 0
-    else (
-      let chain_end = pseudo_chain_end rule_text after in
-      match pseudo_parts (String.sub rule_text after (chain_end - after)) with
-      | [] -> 0
-      | [ only ] -> pseudo_part_weight only
-      | many when List.exists (fun p -> String.contains p '(') many -> 40
-      | many -> List.fold_left (fun acc p -> acc + pseudo_part_weight p) 0 many)
+let atom_rule_of_text text =
+  let selector, block =
+    match innermost_selector_and_block text with
+    | Some (selector, block) -> selector, block
+    | None -> "", ""
+  in
+  let class_name, tail =
+    match atom_class_and_end selector with
+    | Some (name, after) ->
+      name, String.sub selector after (String.length selector - after)
+    | None -> "", ""
+  in
+  let properties =
+    property_names_in_block block |> List.map Slot_key.normalize_property
+  in
+  let important =
+    find_substring (String.lowercase_ascii block) "!important" <> None
+  in
+  let amp = replace_all ~sub:("." ^ class_name) ~by:"&" in
+  {
+    text;
+    descendant = is_descendant_shape text;
+    specificity = Specificity.of_list selector;
+    important;
+    subject =
+      (if has_top_level_combinator (trim_right tail) then
+         "other:" ^ amp selector
+       else "own" ^ String.concat "" (pseudo_elements tail));
+    leaves =
+      properties
+      |> List.filter (fun p -> p <> "all")
+      |> List.concat_map (fun p ->
+        Slot_key.leaves_of (Slot_key.resolve_alias p))
+      |> List.sort_uniq String.compare;
+    sets_all = List.mem "all" properties;
+  }
 
-(** {!sort_by_shorthand_first}'s own two keys (descendant-shape, depth), then
-    two more for the [conditional] group ONLY: at-rule rank ({!at_rule_rank}),
-    then pseudo rank ({!pseudo_rank}) - a valid total order (every component a
-    plain [bool]/[int]). Two rules tied on all four fall through to
-    [List.stable_sort]'s own guarantee: whichever order they already had when
-    they reached this sort - library, then module dependency order, then a
-    module's own definition order (`order_modules_within_scope`'s doc) - the
-    same order a `CSS.merge`/`+++` call's right-hand (override) argument needs
-    to win, since the later-defined rule sorts last.
+let rec sorted_intersect a b =
+  match a, b with
+  | [], _ | _, [] -> false
+  | x :: xs, y :: ys ->
+    let c = String.compare x y in
+    if c = 0 then true
+    else if c < 0 then sorted_intersect xs b
+    else sorted_intersect a ys
 
-    A media-width tie-break (ascending `min-width`, descending `max-width`, kind
-    before value) used to sit here too. Removed by decision: a real monorepo
-    round found it got 2 of 4 real, shipped ties wrong - a
-    `min-width`/`max-width` RANGE tied against a plain `max-width` rule for the
-    same property has no reliable width-only answer, only definition order does,
-    since only the generator's own input order can ever encode which side a
-    `CSS.merge`/`+++` call meant as the override. Getting the other 2 of 4 right
-    was coincidence, not evidence the key was salvageable with a narrower fix.
-    Not a claim that every pair gets a DISTINCT key: two different `@supports`
-    conditions, or two different pseudo-elements, still tie and fall through to
-    stable/file order - out of scope here, same as StyleX (which has no
-    tie-break for either case). *)
-let sort_conditional_rules rules =
-  rules
-  |> List.map (fun rule_text ->
-    ( is_descendant_shape rule_text,
-      rule_depth rule_text,
-      at_rule_rank rule_text,
-      pseudo_rank rule_text,
-      rule_text ))
-  |> List.stable_sort (fun (da, deptha, ata, pa, _) (db, depthb, atb, pb, _) ->
-    if da <> db then compare db da
-    else if deptha <> depthb then compare deptha depthb
-    else if ata <> atb then compare ata atb
-    else compare pa pb)
-  |> List.map (fun (_, _, _, _, r) -> r)
+let resettable leaves =
+  List.exists (fun l -> not (Slot_key.excluded_from_all l)) leaves
+
+let overlaps a b =
+  (a.sets_all && (b.sets_all || resettable b.leaves))
+  || (b.sets_all && resettable a.leaves)
+  || sorted_intersect a.leaves b.leaves
+
+(** Two rules compete when the sheet position can decide between them: the
+    cascade reaches position only after importance and specificity, and only for
+    rules that style the same element and set the same longhand. *)
+let competes a b =
+  a.text <> b.text
+  && a.specificity = b.specificity
+  && a.important = b.important
+  && String.equal a.subject b.subject
+  && overlaps a b
+
+type order_stats = {
+  conflicts : int;  (** pairs two blocks order in opposite directions *)
+  cycles : int;  (** cycles cut at one rule each *)
+}
+
+(** Order [rules] (atom rule texts, in definition order) as described in
+    "Ordered sheet" above. [blocks] is every block's name and its rule texts in
+    source order. *)
+let order_atom_rules ~(blocks : (string * string list) list) rules =
+  let atoms = Array.of_list (List.map atom_rule_of_text rules) in
+  let n = Array.length atoms in
+  let index_of = Hashtbl.create n in
+  Array.iteri (fun i a -> Hashtbl.replace index_of a.text i) atoms;
+  (* (i, j) -> the block that puts rule i before rule j *)
+  let edges : (int * int, string) Hashtbl.t = Hashtbl.create n in
+  List.iter
+    (fun (name, texts) ->
+      let members =
+        texts
+        |> List.filter_map (Hashtbl.find_opt index_of)
+        |> List.fold_left
+             (fun acc i -> if List.mem i acc then acc else i :: acc)
+             []
+        |> List.rev
+        |> Array.of_list
+      in
+      let k = Array.length members in
+      for x = 0 to k - 1 do
+        for y = x + 1 to k - 1 do
+          let i = members.(x)
+          and j = members.(y) in
+          if competes atoms.(i) atoms.(j) && not (Hashtbl.mem edges (i, j)) then
+            Hashtbl.replace edges (i, j) name
+        done
+      done)
+    blocks;
+  let short text =
+    if String.length text <= 80 then text else String.sub text 0 77 ^ "..."
+  in
+  let conflicts =
+    Hashtbl.fold
+      (fun (i, j) a acc ->
+        match Hashtbl.find_opt edges (j, i) with
+        | Some b when i < j -> (i, j, a, b) :: acc
+        | _ -> acc)
+      edges []
+    |> List.sort compare
+  in
+  List.iter
+    (fun (i, j, a, b) ->
+      Logger.warning
+        "blocks %s and %s put two competing rules in opposite orders (%s and \
+         %s); the sheet keeps their definition order"
+        a b (short atoms.(i).text) (short atoms.(j).text);
+      Hashtbl.remove edges (i, j);
+      Hashtbl.remove edges (j, i))
+    conflicts;
+  (* The sheet is built from its end: a rule is placed once every rule that
+     must follow it is placed, and among those the latest by priority goes
+     first. So a rule stays at its definition position unless an edge pulls
+     it earlier, ahead of a rule it must precede. *)
+  let succ = Array.make n [] in
+  let pending = Array.make n 0 in
+  Hashtbl.iter
+    (fun (i, j) _ ->
+      succ.(j) <- i :: succ.(j);
+      pending.(i) <- pending.(i) + 1)
+    edges;
+  let priority i = ((if atoms.(i).descendant then 0 else 1) * n) + i in
+  let module Ready = Set.Make (Int) in
+  let ready = ref Ready.empty in
+  Array.iteri
+    (fun i p -> if p = 0 then ready := Ready.add (priority i) !ready)
+    pending;
+  let placed = Array.make n false in
+  let result = ref [] in
+  let count = ref 0 in
+  let place i =
+    placed.(i) <- true;
+    incr count;
+    result := atoms.(i).text :: !result;
+    List.iter
+      (fun j ->
+        if not placed.(j) then begin
+          pending.(j) <- pending.(j) - 1;
+          if pending.(j) = 0 then ready := Ready.add (priority j) !ready
+        end)
+      succ.(i)
+  in
+  let cycles = ref 0 in
+  while !count < n do
+    match Ready.max_elt_opt !ready with
+    | Some p ->
+      ready := Ready.remove p !ready;
+      place (if p >= n then p - n else p)
+    | None ->
+      (* A cycle. Place the rule that waits on the fewest edges, then the
+         latest by priority, and drop the edges it waits on. *)
+      let best = ref (-1) in
+      for i = 0 to n - 1 do
+        if
+          (not placed.(i))
+          && (!best < 0
+             || compare
+                  (pending.(i), -priority i)
+                  (pending.(!best), -priority !best)
+                < 0)
+        then best := i
+      done;
+      let i = !best in
+      let names =
+        Hashtbl.fold
+          (fun (from, to_) name acc ->
+            if from = i && not placed.(to_) then name :: acc else acc)
+          edges []
+        |> List.sort_uniq String.compare
+      in
+      incr cycles;
+      Logger.warning
+        "blocks %s order competing rules in a cycle; the sheet emits %s after \
+         rules those blocks put after it"
+        (String.concat ", " names) (short atoms.(i).text);
+      pending.(i) <- 0;
+      place i
+  done;
+  !result, { conflicts = List.length conflicts; cycles = !cycles }
 
 (** Collect, index, resolve, dedup, output. *)
 let run ~output_file ~order input_files =
@@ -1333,34 +1446,56 @@ let run ~output_file ~order input_files =
   in
   let statement_rules = import_rules @ namespace_rules in
 
-  (* Cascade tiers: split [other_rules] into what takes no part in tiering
+  (* Split [other_rules] into what takes no part in ordering
      ([@property]/[@keyframes]/[@font-face] registrations and a literal
-     [@layer] at-rule - see [is_registration_rule] - never atom-classed, and
-     never style rules that compete for an element either) and what does - a
-     [%styled.global] style rule, ALSO never atom-classed but a real,
-     cascading rule (`html{...}`, `*{...}`, `*::before{...}`, an author's own
-     global selector), is [global]; every real atom, [_a_] or [_in_] alike,
-     is [base] or [conditional] (no separate [descendant] tier - see
-     [rule_tier]'s doc for why it was removed: a descendant-shaped rule
-     stays in the tier of its own context instead, and
-     {!sort_by_shorthand_first} orders it before own-element rules within
-     that tier). Emission order below is [global], then [base], then
-     [conditional] - each group independently sorted by
-     {!sort_by_shorthand_first} - with no CSS layer around any of them:
-     specificity decides first, exactly as in plain CSS, position only as
-     the tie-break (see "Cascade tiers" above for the accepted
-     consequences). *)
+     [@layer] at-rule - see [is_registration_rule]), [%styled.global] style
+     rules (no atom class, but real, cascading rules) and atom rules ([_a_]
+     or [_in_]). Emission order: registrations, globals, then atoms in the
+     ordered-sheet order (see "Sheet order" and "Ordered sheet" above). *)
   let registrations, atomless_style_rules =
     List.partition is_registration_rule other_rules
   in
-  let global_rules, tier_eligible_rules =
+  let global_rules, atom_rule_texts =
     List.partition
       (fun rule -> atom_class_name rule = None)
       atomless_style_rules
   in
-  let base_rules, conditional_rules =
-    List.partition (fun rule -> rule_tier rule = Base) tier_eligible_rules
+  let rules_of_class : (string, string) Hashtbl.t = Hashtbl.create 256 in
+  List.iter
+    (fun rule ->
+      match atom_class_name rule with
+      | Some class_name -> Hashtbl.add rules_of_class class_name rule
+      | None -> ())
+    atom_rule_texts;
+  let block_name ~filename ({ line; class_string } : Css_extraction.block) =
+    let identity =
+      String.split_on_char ' ' class_string
+      |> List.find_map (fun token -> Hashtbl.find_opt idx.by_identity token)
+    in
+    match identity with
+    | Some (longident, _, _) -> longident
+    | None ->
+      let source =
+        if String.ends_with filename ~suffix:".pp.ml" then
+          String.sub filename 0 (String.length filename - String.length ".pp.ml")
+        else filename
+      in
+      Printf.sprintf "%s:%d" source line
   in
+  let blocks =
+    inputs
+    |> List.concat_map (fun input ->
+      List.map (fun block -> input.filename, block) input.blocks)
+    |> List.map (fun (filename, (block : Css_extraction.block)) ->
+      ( block_name ~filename block,
+        String.split_on_char ' ' block.class_string
+        |> List.concat_map (fun token ->
+          List.rev (Hashtbl.find_all rules_of_class token)) ))
+  in
+  let atom_rules, stats = order_atom_rules ~blocks atom_rule_texts in
+  if stats.conflicts + stats.cycles > 0 then
+    Logger.info "ordered sheet: %d block conflict(s), %d longer cycle(s)"
+      stats.conflicts stats.cycles;
 
   let minify = production_mode inputs in
   Logger.info "environment: %s"
@@ -1377,8 +1512,7 @@ let run ~output_file ~order input_files =
     List.iter emit statement_rules;
     List.iter emit registrations;
     List.iter emit (sort_by_shorthand_first global_rules);
-    List.iter emit (sort_by_shorthand_first base_rules);
-    List.iter emit (sort_conditional_rules conditional_rules);
+    List.iter emit atom_rules;
     Buffer.contents buffer
   in
   Logger.debug "stylesheet:\n%s" stylesheet;

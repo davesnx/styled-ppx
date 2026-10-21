@@ -20,6 +20,15 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_5riprk{display:ruby-text;}"];
   [@css "._a_5rp41v{display:ruby-base-container;}"];
   [@css "._a_5rjuuf{display:ruby-text-container;}"];
+  [@css.blocks
+    [
+      (2, "_a_5r3gy9"),
+      (3, "_a_5rb5b1"),
+      (4, "_a_5riprk"),
+      (5, "_a_5rp41v"),
+      (6, "_a_5rjuuf"),
+    ]
+  ];
   
   CSS.make("_a_5r3gy9", []);
   CSS.make("_a_5rb5b1", []);

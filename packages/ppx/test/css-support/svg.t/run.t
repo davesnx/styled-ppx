@@ -25,6 +25,20 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_9kii8d{pointer-events:stroke;}"];
   [@css "._a_9k7k7s{pointer-events:all;}"];
   [@css "._a_9kbp0l{pointer-events:none;}"];
+  [@css.blocks
+    [
+      (67, "_a_9k0k8p"),
+      (69, "_a_9k73s1"),
+      (70, "_a_9kle2q"),
+      (71, "_a_9k4ebn"),
+      (72, "_a_9ksh4e"),
+      (73, "_a_9k29yp"),
+      (74, "_a_9kh5dc"),
+      (75, "_a_9kii8d"),
+      (76, "_a_9k7k7s"),
+      (77, "_a_9kbp0l"),
+    ]
+  ];
   
   CSS.make("_a_9k0k8p", []);
   

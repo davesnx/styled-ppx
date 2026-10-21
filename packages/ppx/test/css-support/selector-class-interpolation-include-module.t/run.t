@@ -21,6 +21,9 @@ bare `$(marker)` resolves to the included `Css.marker` binding.
       ("Input.wrapper", "_id_4f6ye3", "_a_qye7h4eikep"),
     ]
   ];
+  [@css.blocks
+    [(2, "_id_zr2uk1 _a_4ekvmb"), (7, "_id_4f6ye3 _a_qye7h4eikep")]
+  ];
   module Css = {
     let marker = CSS.make("label:marker _id_zr2uk1 _a_4ekvmb", []);
   };

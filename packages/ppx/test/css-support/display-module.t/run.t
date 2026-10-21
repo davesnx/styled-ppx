@@ -18,6 +18,7 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_5r3jk8{display:run-in;}"];
   [@css "._a_5rlerk{display:flow;}"];
   [@css "._a_5rposs{display:flow-root;}"];
+  [@css.blocks [(2, "_a_5r3jk8"), (3, "_a_5rlerk"), (4, "_a_5rposs")]];
   
   CSS.make("_a_5r3jk8", []);
   CSS.make("_a_5rlerk", []);

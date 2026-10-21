@@ -15,6 +15,7 @@
       ),
     ]
   ];
+  [@css.blocks [(5, "_id_1hmg1vc _a_4e7bjx _a_5r08qs _a_390004g7ti")]];
   module DynamicComponent: {
     type makeProps('id, 'var);
     let make: makeProps(_, _) => React.element;

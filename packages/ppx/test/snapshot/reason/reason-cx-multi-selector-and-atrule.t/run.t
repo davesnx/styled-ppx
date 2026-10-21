@@ -32,6 +32,16 @@ selector chain into the at-rule's contents instead of dropping it.
     ("Input.mediaDeep", "_id_1xp2ctx", "_a_o95t84edogz");
     ("Input.mediaWithNested", "_id_sseoij",
       "_a_2sekz4ehjb1 _a_dft6c4ebng1 _a_yea404etxwe")]]
+  [@@@css.blocks
+    [(12, "_id_za05oi _a_2sekz4ey2q8 _a_bcuim4eyv6j");
+    (20, "_id_gymm1w _a_aofs04eam0t _a_gdpy14e0cim");
+    (31,
+      "_id_18oo9dc _a_eu1gr4evtx3 _a_rbso84eu78w _a_d7tqn4etzuk _a_mmzne4ejsnn");
+    (43,
+      "_id_kzpsx9 _a_2sekz4ey2q8 _a_bcuim4eyv6j _a_y066w4ej269 _a_mrd5q4er9ux");
+    (56, "_id_jnaeeh _a_a1ok24ei921");
+    (67, "_id_1xp2ctx _a_o95t84edogz");
+    (81, "_id_sseoij _a_2sekz4ehjb1 _a_dft6c4ebng1 _a_yea404etxwe")]]
   let multiTop =
     CSS.make "label:multiTop _id_za05oi _a_2sekz4ey2q8 _a_bcuim4eyv6j" []
   let multiNested =

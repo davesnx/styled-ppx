@@ -42,6 +42,7 @@ If this test fail means that the module is not in sync with the ppx
   [@css
     "._a_cfdqmz{-webkit-text-decoration:var(--cosas-112i897);text-decoration:var(--cosas-112i897);}"
   ];
+  [@css.blocks [(4, "_a_ecanqs _a_6i000gkbxn"), (10, "_a_cfdqmz")]];
   let cosas = `bold;
   
   CSS.make("_a_ecanqs _a_6i000gkbxn", []);

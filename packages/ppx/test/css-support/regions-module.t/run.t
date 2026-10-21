@@ -23,6 +23,18 @@ If this test fail means that the module is not in sync with the ppx
   [@css "._a_futzaz{flow-into:named-flow content;}"];
   [@css "._a_gc2igy{region-fragment:auto;}"];
   [@css "._a_gc95p4{region-fragment:break;}"];
+  [@css.blocks
+    [
+      (2, "_a_ftcf4s"),
+      (3, "_a_ftxqeo"),
+      (4, "_a_fuxqr6"),
+      (5, "_a_fuywcc"),
+      (6, "_a_fu8xd9"),
+      (7, "_a_futzaz"),
+      (8, "_a_gc2igy"),
+      (9, "_a_gc95p4"),
+    ]
+  ];
   
   CSS.make("_a_ftcf4s", []);
   CSS.make("_a_ftxqeo", []);

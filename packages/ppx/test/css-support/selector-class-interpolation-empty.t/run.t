@@ -49,6 +49,17 @@ is actually present on the element.
       ("Input.panel", "_id_1qtuyxa", "_a_5r08qs _a_2nhg94em44p"),
     ]
   ];
+  [@css.blocks
+    [
+      (15, "_id_1ofey90"),
+      (18, "_id_paugdl _a_393u2l _a_3lv8v39725c"),
+      (31, "_id_okzmy"),
+      (32, "_id_1jjszpn"),
+      (35, "_id_cpyuub _a_94fqw0 _a_4p0n23h0ef5cnv6 _a_rmeji39asz5"),
+      (51, "_id_rmf27x"),
+      (54, "_id_1qtuyxa _a_5r08qs _a_2nhg94em44p"),
+    ]
+  ];
   
   let active = CSS.make("label:active _id_1ofey90", []);
   

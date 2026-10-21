@@ -6,6 +6,7 @@
   [@css.bindings
     [("Output.MediaQueryCalc", "_id_1mcoche", "_a_aveay4e5m2e _a_h4c6e4el0w0")]
   ];
+  [@css.blocks [(3, "_id_1mcoche _a_aveay4e5m2e _a_h4c6e4el0w0")]];
   module MediaQueryCalc = {
     [@deriving abstract]
     [@warning "-69"]

@@ -52,6 +52,36 @@ invalid.re carries an out-of-grammar value, whose error names the property.
   [@css "._a_fiwojc{continue:auto;}"];
   [@css "._a_fiqcek{continue:discard;}"];
   [@css "._a_fi7h91{continue:collapse;}"];
+  [@css.blocks
+    [
+      (10, "_a_ex97cq"),
+      (11, "_a_exfkc3"),
+      (12, "_a_exkn1d"),
+      (13, "_a_eyx7rh"),
+      (14, "_a_ezg63m"),
+      (15, "_a_ezm66o"),
+      (16, "_a_f0mlxf"),
+      (22, "_a_8vfpxw"),
+      (23, "_a_8vc69b"),
+      (24, "_a_8vup3k"),
+      (25, "_a_8v0008dgxj"),
+      (26, "_a_8v0004wyzd"),
+      (27, "_a_8v00010ibw"),
+      (28, "_a_8v000240bh"),
+      (29, "_a_ga00025an2"),
+      (30, "_a_ga00012eib"),
+      (31, "_a_gb00021f55"),
+      (32, "_a_gb00013esx"),
+      (33, "_a_gavvhs"),
+      (34, "_a_gbd98n"),
+      (35, "_a_f1l93q"),
+      (36, "_a_f16sd1"),
+      (37, "_a_f1c6p5"),
+      (38, "_a_fiwojc"),
+      (39, "_a_fiqcek"),
+      (40, "_a_fi7h91"),
+    ]
+  ];
   
   CSS.make("_a_ex97cq", []);
   CSS.make("_a_exfkc3", []);

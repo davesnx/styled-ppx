@@ -8,6 +8,7 @@
   [@css.bindings
     [("Output.multi", "_id_wbeinp", "_a_5r08qs _a_4ekvmb _a_7peacs")]
   ];
+  [@css.blocks [(1, "_id_wbeinp _a_5r08qs _a_4ekvmb _a_7peacs")]];
   let multi =
     CSS.make("label:multi _id_wbeinp _a_5r08qs _a_4ekvmb _a_7peacs", []);
   module Globals = {
