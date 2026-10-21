@@ -47,7 +47,7 @@
 
 Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
 
-  $ refmt --parse re --print ml input.re > output.ml
+  $ refmt --parse re --print binary input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ cat output.ml
   [@@@css "@property --borderColor-1on39sz{syntax:\"*\";inherits:false;}"]
@@ -97,104 +97,104 @@ Pin the runtime bindings so the rule⟺CSS.make binding pairing is covered too.
   [@@@css "._a_390004pvpe{background-color:var(--bgColor-vilhl2);}"]
   [@@@css "._a_40ae1x{box-shadow:var(--shadow-giamln);}"]
   [@@@css.bindings
-    [("Output.simpleShadow", "_id_1ckmdi6", "_a_4085tv");
-    ("Output.multipleShadows", "_id_1urhidx", "_a_402iep");
-    ("Output.insetShadow", "_id_18o58m4", "_a_40fme5");
-    ("Output.noShadow", "_id_1u21xrq", "_a_40keqi");
-    ("Output.spreadShadow", "_id_8d8vql", "_a_402o9n");
-    ("Output.simpleBorder", "_id_1kct4wz", "_a_3h2auv");
-    ("Output.borderWithColor", "_id_tm1wv6", "_a_3h2qc1");
-    ("Output.borderTransparent", "_id_tbotla", "_a_3hjkge");
-    ("Output.noBorder", "_id_15bfnai", "_a_3hanm4");
-    ("Output.borderStyles", "_id_16nbulq",
+    [("Input.simpleShadow", "_id_1tvnrdi", "_a_4085tv");
+    ("Input.multipleShadows", "_id_1h6bea0", "_a_402iep");
+    ("Input.insetShadow", "_id_13yi0xn", "_a_40fme5");
+    ("Input.noShadow", "_id_g295y4", "_a_40keqi");
+    ("Input.spreadShadow", "_id_l90ggu", "_a_402o9n");
+    ("Input.simpleBorder", "_id_7h1wez", "_a_3h2auv");
+    ("Input.borderWithColor", "_id_1k3hs97", "_a_3h2qc1");
+    ("Input.borderTransparent", "_id_1xzg4nm", "_a_3hjkge");
+    ("Input.noBorder", "_id_1p1ili7", "_a_3hanm4");
+    ("Input.borderStyles", "_id_obe06a",
       "_a_3h2ghsmzmu _a_3h0b2879q1 _a_3h000779gh _a_3h01dswvke");
-    ("Output.borderSeparate", "_id_122xr42",
+    ("Input.borderSeparate", "_id_1tinaie",
       "_a_3h1lokq43j _a_3h0sua8w2v _a_3h0ef5kaed");
-    ("Output.borderWithRadius", "_id_1j83vme", "_a_3h257i _a_3n6otz");
-    ("Output.shadowAndBorder", "_id_3k5k4w", "_a_405761 _a_3hwm2g _a_3nkn84");
-    ("Output.cardStyle", "_id_1je20li", "_a_4039qm _a_3hxi5p _a_3nezfo");
-    ("Output.buttonBase", "_id_9kxo31", "_a_3hstvc _a_40ar9w _a_3n6otz");
-    ("Output.borderColorInterp", "_id_16k72sd", "_a_3hzctv");
-    ("Output.shadowInterp", "_id_9zd6fn", "_a_40u3s3");
-    ("Output.shadowFullInterp", "_id_bg3lpz", "_a_40jemk");
-    ("Output.borderWidthInterp", "_id_1h8tvcz", "_a_3hdrfm");
-    ("Output.mixedCard", "_id_10wtrx1",
+    ("Input.borderWithRadius", "_id_1i9ma3r", "_a_3h257i _a_3n6otz");
+    ("Input.shadowAndBorder", "_id_110n9nt", "_a_405761 _a_3hwm2g _a_3nkn84");
+    ("Input.cardStyle", "_id_11ecot9", "_a_4039qm _a_3hxi5p _a_3nezfo");
+    ("Input.buttonBase", "_id_vodsi5", "_a_3hstvc _a_40ar9w _a_3n6otz");
+    ("Input.borderColorInterp", "_id_uowaz3", "_a_3hzctv");
+    ("Input.shadowInterp", "_id_s7dtp0", "_a_40u3s3");
+    ("Input.shadowFullInterp", "_id_1xf3w8n", "_a_40jemk");
+    ("Input.borderWidthInterp", "_id_i3ccw2", "_a_3hdrfm");
+    ("Input.mixedCard", "_id_690qtu",
       "_a_390004pvpe _a_3hzctv _a_40ae1x _a_3nkn84")]]
   [@@@css.blocks
-    [(1, "_id_1ckmdi6 _a_4085tv");
-    (4, "_id_1urhidx _a_402iep");
-    (8, "_id_18o58m4 _a_40fme5");
-    (9, "_id_1u21xrq _a_40keqi");
-    (12, "_id_8d8vql _a_402o9n");
-    (13, "_id_1kct4wz _a_3h2auv");
-    (14, "_id_tm1wv6 _a_3h2qc1");
-    (15, "_id_tbotla _a_3hjkge");
-    (16, "_id_15bfnai _a_3hanm4");
-    (19, "_id_16nbulq _a_3h2ghsmzmu _a_3h0b2879q1 _a_3h000779gh _a_3h01dswvke");
-    (27, "_id_122xr42 _a_3h1lokq43j _a_3h0sua8w2v _a_3h0ef5kaed");
-    (33, "_id_1j83vme _a_3h257i _a_3n6otz");
-    (39, "_id_3k5k4w _a_405761 _a_3hwm2g _a_3nkn84");
-    (46, "_id_1je20li _a_4039qm _a_3hxi5p _a_3nezfo");
-    (53, "_id_9kxo31 _a_3hstvc _a_40ar9w _a_3n6otz");
-    (59, "_id_16k72sd _a_3hzctv");
-    (66, "_id_9zd6fn _a_40u3s3");
-    (67, "_id_bg3lpz _a_40jemk");
-    (69, "_id_1h8tvcz _a_3hdrfm");
-    (74, "_id_10wtrx1 _a_390004pvpe _a_3hzctv _a_40ae1x _a_3nkn84")]]
-  let simpleShadow = CSS.make "label:simpleShadow _id_1ckmdi6 _a_4085tv" []
+    [(6, "_id_1tvnrdi _a_4085tv");
+    (10, "_id_1h6bea0 _a_402iep");
+    (17, "_id_13yi0xn _a_40fme5");
+    (21, "_id_g295y4 _a_40keqi");
+    (25, "_id_l90ggu _a_402o9n");
+    (31, "_id_7h1wez _a_3h2auv");
+    (34, "_id_1k3hs97 _a_3h2qc1");
+    (37, "_id_1xzg4nm _a_3hjkge");
+    (40, "_id_1p1ili7 _a_3hanm4");
+    (44, "_id_obe06a _a_3h2ghsmzmu _a_3h0b2879q1 _a_3h000779gh _a_3h01dswvke");
+    (54, "_id_1tinaie _a_3h1lokq43j _a_3h0sua8w2v _a_3h0ef5kaed");
+    (63, "_id_1i9ma3r _a_3h257i _a_3n6otz");
+    (73, "_id_110n9nt _a_405761 _a_3hwm2g _a_3nkn84");
+    (82, "_id_11ecot9 _a_4039qm _a_3hxi5p _a_3nezfo");
+    (91, "_id_vodsi5 _a_3hstvc _a_40ar9w _a_3n6otz");
+    (102, "_id_uowaz3 _a_3hzctv");
+    (107, "_id_s7dtp0 _a_40u3s3");
+    (111, "_id_1xf3w8n _a_40jemk");
+    (115, "_id_i3ccw2 _a_3hdrfm");
+    (120, "_id_690qtu _a_390004pvpe _a_3hzctv _a_40ae1x _a_3nkn84")]]
+  let simpleShadow = CSS.make "label:simpleShadow _id_1tvnrdi _a_4085tv" []
   let multipleShadows =
-    CSS.make "label:multipleShadows _id_1urhidx _a_402iep" []
-  let insetShadow = CSS.make "label:insetShadow _id_18o58m4 _a_40fme5" []
-  let noShadow = CSS.make "label:noShadow _id_1u21xrq _a_40keqi" []
-  let spreadShadow = CSS.make "label:spreadShadow _id_8d8vql _a_402o9n" []
-  let simpleBorder = CSS.make "label:simpleBorder _id_1kct4wz _a_3h2auv" []
+    CSS.make "label:multipleShadows _id_1h6bea0 _a_402iep" []
+  let insetShadow = CSS.make "label:insetShadow _id_13yi0xn _a_40fme5" []
+  let noShadow = CSS.make "label:noShadow _id_g295y4 _a_40keqi" []
+  let spreadShadow = CSS.make "label:spreadShadow _id_l90ggu _a_402o9n" []
+  let simpleBorder = CSS.make "label:simpleBorder _id_7h1wez _a_3h2auv" []
   let borderWithColor =
-    CSS.make "label:borderWithColor _id_tm1wv6 _a_3h2qc1" []
+    CSS.make "label:borderWithColor _id_1k3hs97 _a_3h2qc1" []
   let borderTransparent =
-    CSS.make "label:borderTransparent _id_tbotla _a_3hjkge" []
-  let noBorder = CSS.make "label:noBorder _id_15bfnai _a_3hanm4" []
+    CSS.make "label:borderTransparent _id_1xzg4nm _a_3hjkge" []
+  let noBorder = CSS.make "label:noBorder _id_1p1ili7 _a_3hanm4" []
   let borderStyles =
     CSS.make
-      "label:borderStyles _id_16nbulq _a_3h2ghsmzmu _a_3h0b2879q1 _a_3h000779gh _a_3h01dswvke"
+      "label:borderStyles _id_obe06a _a_3h2ghsmzmu _a_3h0b2879q1 _a_3h000779gh _a_3h01dswvke"
       []
   let borderSeparate =
     CSS.make
-      "label:borderSeparate _id_122xr42 _a_3h1lokq43j _a_3h0sua8w2v _a_3h0ef5kaed"
+      "label:borderSeparate _id_1tinaie _a_3h1lokq43j _a_3h0sua8w2v _a_3h0ef5kaed"
       []
   let borderWithRadius =
-    CSS.make "label:borderWithRadius _id_1j83vme _a_3h257i _a_3n6otz" []
+    CSS.make "label:borderWithRadius _id_1i9ma3r _a_3h257i _a_3n6otz" []
   let shadowAndBorder =
-    CSS.make "label:shadowAndBorder _id_3k5k4w _a_405761 _a_3hwm2g _a_3nkn84"
+    CSS.make "label:shadowAndBorder _id_110n9nt _a_405761 _a_3hwm2g _a_3nkn84"
       []
   let cardStyle =
-    CSS.make "label:cardStyle _id_1je20li _a_4039qm _a_3hxi5p _a_3nezfo" []
+    CSS.make "label:cardStyle _id_11ecot9 _a_4039qm _a_3hxi5p _a_3nezfo" []
   let buttonBase =
-    CSS.make "label:buttonBase _id_9kxo31 _a_3hstvc _a_40ar9w _a_3n6otz" []
+    CSS.make "label:buttonBase _id_vodsi5 _a_3hstvc _a_40ar9w _a_3n6otz" []
   let borderColorInterp borderColor =
-    CSS.make "label:borderColorInterp _id_16k72sd _a_3hzctv"
+    CSS.make "label:borderColorInterp _id_uowaz3 _a_3hzctv"
       [("--borderColor-1on39sz", (CSS.Types.Color.toString borderColor))]
   let shadowInterp shadowX =
     fun shadowY ->
       fun blur ->
         fun spread ->
           fun shadowColor ->
-            CSS.make "label:shadowInterp _id_9zd6fn _a_40u3s3"
+            CSS.make "label:shadowInterp _id_s7dtp0 _a_40u3s3"
               [("--shadowX-11ljgmp", (CSS.Types.Length.toString shadowX));
               ("--shadowY-1qn6d0z", (CSS.Types.Length.toString shadowY));
               ("--blur-1bcbjmk", (CSS.Types.Length.toString blur));
               ("--spread-xxpef3", (CSS.Types.Length.toString spread));
               ("--shadowColor-1sod13t", (CSS.Types.Color.toString shadowColor))]
   let shadowFullInterp myShadow =
-    CSS.make "label:shadowFullInterp _id_bg3lpz _a_40jemk"
+    CSS.make "label:shadowFullInterp _id_1xf3w8n _a_40jemk"
       [("--myShadow-af5fmc", (CSS.Types.BoxShadows.toString myShadow))]
   let borderWidthInterp borderWidth =
-    CSS.make "label:borderWidthInterp _id_1h8tvcz _a_3hdrfm"
+    CSS.make "label:borderWidthInterp _id_i3ccw2 _a_3hdrfm"
       [("--borderWidth-apl5wd", (CSS.Types.LineWidth.toString borderWidth))]
   let mixedCard bgColor =
     fun borderColor ->
       fun shadow ->
         CSS.make
-          "label:mixedCard _id_10wtrx1 _a_390004pvpe _a_3hzctv _a_40ae1x _a_3nkn84"
+          "label:mixedCard _id_690qtu _a_390004pvpe _a_3hzctv _a_40ae1x _a_3nkn84"
           [("--bgColor-vilhl2", (CSS.Types.Color.toString bgColor));
           ("--borderColor-1on39sz", (CSS.Types.Color.toString borderColor));
           ("--shadow-giamln", (CSS.Types.BoxShadows.toString shadow))]
