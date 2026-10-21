@@ -13,35 +13,35 @@ emitted as a cross-module sentinel.
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb-marker{color:red;}"];
-  [@css ".css-3qknr-wrapper.css-tokvmb-marker{color:orange;}"];
-  [@css ".css-cb06ec-wrapper.css-tokvmb-marker{font-weight:bold;}"];
-  [@css ".css-bjcoli-marker{color:green;}"];
-  [@css ".css-59bkuc-wrapper.css-bjcoli-marker{color:blue;}"];
+  [@css "._a_4ekvmb{color:red;}"];
+  [@css "._a_qye7h4e56b5._id_zr2uk1{color:orange;}"];
+  [@css "._a_qye7h655m9ssyz4._id_zr2uk1{font-weight:bold;}"];
+  [@css "._a_4ecoli{color:green;}"];
+  [@css "._a_uisk84e7jnm._id_11dmi54{color:blue;}"];
   [@css.bindings
     [
-      ("Input.Css.marker", "css-tokvmb-marker"),
-      ("Input.Css.wrapper", "css-3qknr-wrapper"),
-      ("Input.wrapper", "css-cb06ec-wrapper"),
-      ("Input.Theme.Css.marker", "css-bjcoli-marker"),
-      ("Input.Theme.Components.wrapper", "css-59bkuc-wrapper"),
+      ("Input.Css.marker", "_id_zr2uk1", "_a_4ekvmb"),
+      ("Input.Css.wrapper", "_id_7sdyhq", "_a_qye7h4e56b5"),
+      ("Input.wrapper", "_id_4f6ye3", "_a_qye7h655m9ssyz4"),
+      ("Input.Theme.Css.marker", "_id_11dmi54", "_a_4ecoli"),
+      ("Input.Theme.Components.wrapper", "_id_1mhdtfv", "_a_uisk84e7jnm"),
     ]
   ];
   module Css = {
-    let marker = CSS.make("css-tokvmb-marker", []);
+    let marker = CSS.make("label:marker _id_zr2uk1 _a_4ekvmb", []);
   
-    let wrapper = CSS.make("css-3qknr-wrapper", []);
+    let wrapper = CSS.make("label:wrapper _id_7sdyhq _a_qye7h4e56b5", []);
   };
   
-  let wrapper = CSS.make("css-cb06ec-wrapper", []);
+  let wrapper = CSS.make("label:wrapper _id_4f6ye3 _a_qye7h655m9ssyz4", []);
   
   module Theme = {
     module Css = {
-      let marker = CSS.make("css-bjcoli-marker", []);
+      let marker = CSS.make("label:marker _id_11dmi54 _a_4ecoli", []);
     };
   
     module Components = {
-      let wrapper = CSS.make("css-59bkuc-wrapper", []);
+      let wrapper = CSS.make("label:wrapper _id_1mhdtfv _a_uisk84e7jnm", []);
     };
   };
   

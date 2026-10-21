@@ -82,6 +82,57 @@ module Property_background_repeat =
 let property_background_repeat : property_background_repeat Rule.rule =
   Property_background_repeat.rule
 
+(* CSS Backgrounds L4 § 2.1 (draft, standards-track but unimplemented in any
+   browser): https://drafts.csswg.org/css-backgrounds-4/#propdef-background-position-block
+   Logical (block/inline) counterparts of background-position-x/-y above -
+   same independent-registration convention (no shorthand links them; see
+   background-position-x/-y's own comment). *)
+module Property_background_position_block =
+  [%spec_module
+  "[ 'center' | [ 'start' | 'end' ]? [ <extended-length> | \
+   <extended-percentage> ]? ]#",
+  (module Css_types.BackgroundPositionBlock)]
+
+let property_background_position_block :
+  property_background_position_block Rule.rule =
+  Property_background_position_block.rule
+
+module Property_background_position_inline =
+  [%spec_module
+  "[ 'center' | [ 'start' | 'end' ]? [ <extended-length> | \
+   <extended-percentage> ]? ]#",
+  (module Css_types.BackgroundPositionInline)]
+
+let property_background_position_inline :
+  property_background_position_inline Rule.rule =
+  Property_background_position_inline.rule
+
+(* CSS Backgrounds L4 § 2.3 (draft, standards-track but unimplemented in any
+   browser): https://drafts.csswg.org/css-backgrounds-4/#propdef-background-repeat-block
+   Shares its propdef row with background-repeat-x/-y, which this codebase
+   deliberately does not register (implemented then removed from every
+   browser). <repetition> is
+   inlined here rather than named, matching Repeat_style's own convention
+   in Shared.ml (which inlines the same 4 keywords rather than naming a
+   fragment). *)
+module Property_background_repeat_block =
+  [%spec_module
+  "[ 'repeat' | 'space' | 'round' | 'no-repeat' ]#",
+  (module Css_types.BackgroundRepeat)]
+
+let property_background_repeat_block :
+  property_background_repeat_block Rule.rule =
+  Property_background_repeat_block.rule
+
+module Property_background_repeat_inline =
+  [%spec_module
+  "[ 'repeat' | 'space' | 'round' | 'no-repeat' ]#",
+  (module Css_types.BackgroundRepeat)]
+
+let property_background_repeat_inline :
+  property_background_repeat_inline Rule.rule =
+  Property_background_repeat_inline.rule
+
 module Property_background_size =
   [%spec_module
   "[ <bg-size> ]#", (module Css_types.BackgroundSize)]
@@ -92,7 +143,20 @@ let property_background_size : property_background_size Rule.rule =
 let entries : (kind * packed_rule) list =
   [
     Property "background-color", pack_module (module Property_background_color);
-    Property "background", pack_module (module Property_background);
+    (* Backgrounds and Borders L3 (background): https://www.w3.org/TR/css-backgrounds-3/#the-background *)
+    ( Shorthand
+        ( "background",
+          [
+            "background-image";
+            "background-position";
+            "background-size";
+            "background-repeat";
+            "background-origin";
+            "background-clip";
+            "background-attachment";
+            "background-color";
+          ] ),
+      pack_module (module Property_background) );
     ( Property "background-attachment",
       pack_module (module Property_background_attachment) );
     ( Property "background-blend-mode",
@@ -101,7 +165,10 @@ let entries : (kind * packed_rule) list =
     Property "background-image", pack_module (module Property_background_image);
     ( Property "background-origin",
       pack_module (module Property_background_origin) );
-    ( Property "background-position",
+    (* Backgrounds L4 draft, background-position-x/-y (shipped cross-browser for years before standardization): https://drafts.csswg.org/css-backgrounds-4/#the-background-position *)
+    ( Shorthand
+        ( "background-position",
+          [ "background-position-x"; "background-position-y" ] ),
       pack_module (module Property_background_position) );
     ( Property "background-position-x",
       pack_module (module Property_background_position_x) );
@@ -110,4 +177,12 @@ let entries : (kind * packed_rule) list =
     ( Property "background-repeat",
       pack_module (module Property_background_repeat) );
     Property "background-size", pack_module (module Property_background_size);
+    ( Property "background-position-block",
+      pack_module (module Property_background_position_block) );
+    ( Property "background-position-inline",
+      pack_module (module Property_background_position_inline) );
+    ( Property "background-repeat-block",
+      pack_module (module Property_background_repeat_block) );
+    ( Property "background-repeat-inline",
+      pack_module (module Property_background_repeat_inline) );
   ]

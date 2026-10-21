@@ -3,8 +3,8 @@ the `[@@@css.refs ...]` attribute, surfaced in the OCaml `File "..."`
 diagnostic format with a `styled-ppx:` prefix.
 
   $ cat > a.ml <<EOF
-  > [@@@css.bindings [("A.exists", "klass-existing")]]
-  > let exists = CSS.make "klass-existing" []
+  > [@@@css.bindings [("A.exists", "cid-existing", "klass-existing")]]
+  > let exists = CSS.make "cid-existing klass-existing" []
   > EOF
 
   $ cat > b.ml <<EOF

@@ -336,7 +336,14 @@ let entries : (kind * packed_rule) list =
       pack_module (module Property__webkit_appearance) );
     ( Property "-webkit-background-clip",
       pack_module (module Property__webkit_background_clip) );
-    ( Property "-webkit-border-before",
+    (* WebKit legacy (pre-standard logical border, superseded by border-block-start; own vendor family, not unified with it): non-standard, css-grammar Properties/Webkit.ml *)
+    ( Shorthand
+        ( "-webkit-border-before",
+          [
+            "-webkit-border-before-color";
+            "-webkit-border-before-style";
+            "-webkit-border-before-width";
+          ] ),
       pack_module (module Property__webkit_border_before) );
     ( Property "-webkit-border-before-style",
       pack_module (module Property__webkit_border_before_style) );
@@ -352,7 +359,20 @@ let entries : (kind * packed_rule) list =
       pack_module (module Property__webkit_column_break_inside) );
     ( Property "-webkit-line-clamp",
       pack_module (module Property__webkit_line_clamp) );
-    Property "-webkit-mask", pack_module (module Property__webkit_mask);
+    (* WebKit legacy mask model (pre-standard, superseded by `mask`; own vendor family, not unified with it): non-standard, css-grammar Properties/Webkit.ml *)
+    ( Shorthand
+        ( "-webkit-mask",
+          [
+            "-webkit-mask-attachment";
+            "-webkit-mask-clip";
+            "-webkit-mask-composite";
+            "-webkit-mask-image";
+            "-webkit-mask-origin";
+            "-webkit-mask-position";
+            "-webkit-mask-repeat";
+            "-webkit-mask-size";
+          ] ),
+      pack_module (module Property__webkit_mask) );
     ( Property "-webkit-mask-attachment",
       pack_module (module Property__webkit_mask_attachment) );
     ( Property "-webkit-mask-box-image",
@@ -365,13 +385,19 @@ let entries : (kind * packed_rule) list =
       pack_module (module Property__webkit_mask_image) );
     ( Property "-webkit-mask-origin",
       pack_module (module Property__webkit_mask_origin) );
-    ( Property "-webkit-mask-position",
+    (* WebKit legacy mask model (pre-standard, superseded by `mask`; own vendor family, not unified with it): non-standard, css-grammar Properties/Webkit.ml *)
+    ( Shorthand
+        ( "-webkit-mask-position",
+          [ "-webkit-mask-position-x"; "-webkit-mask-position-y" ] ),
       pack_module (module Property__webkit_mask_position) );
     ( Property "-webkit-mask-position-x",
       pack_module (module Property__webkit_mask_position_x) );
     ( Property "-webkit-mask-position-y",
       pack_module (module Property__webkit_mask_position_y) );
-    ( Property "-webkit-mask-repeat",
+    (* WebKit legacy mask model (pre-standard, superseded by `mask`; own vendor family, not unified with it): non-standard, css-grammar Properties/Webkit.ml *)
+    ( Shorthand
+        ( "-webkit-mask-repeat",
+          [ "-webkit-mask-repeat-x"; "-webkit-mask-repeat-y" ] ),
       pack_module (module Property__webkit_mask_repeat) );
     ( Property "-webkit-mask-repeat-x",
       pack_module (module Property__webkit_mask_repeat_x) );

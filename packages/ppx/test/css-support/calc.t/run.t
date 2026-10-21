@@ -13,15 +13,15 @@ If this test fail means that the module is not in sync with the ppx
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-hxo6vg{width:calc(50% + 4px);}"];
-  [@css ".css-1bjj19s{width:calc(20px - 10px);}"];
-  [@css ".css-12qo4ty{width:calc(100vh - calc(2rem + 120px));}"];
-  [@css ".css-1g5uhfp{width:calc(100vh * 2);}"];
-  [@css ".css-6t8hw4{width:calc(2 * 120px);}"];
-  CSS.make("css-hxo6vg", []);
-  CSS.make("css-1bjj19s", []);
-  CSS.make("css-12qo4ty", []);
-  CSS.make("css-1g5uhfp", []);
-  CSS.make("css-6t8hw4", []);
+  [@css "._a_eco6vg{width:calc(50% + 4px);}"];
+  [@css "._a_ecj19s{width:calc(20px - 10px);}"];
+  [@css "._a_eco4ty{width:calc(100vh - calc(2rem + 120px));}"];
+  [@css "._a_ecuhfp{width:calc(100vh * 2);}"];
+  [@css "._a_ec8hw4{width:calc(2 * 120px);}"];
+  CSS.make("_a_eco6vg", []);
+  CSS.make("_a_ecj19s", []);
+  CSS.make("_a_eco4ty", []);
+  CSS.make("_a_ecuhfp", []);
+  CSS.make("_a_ec8hw4", []);
 
   $ dune build

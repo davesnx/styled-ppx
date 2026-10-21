@@ -14,15 +14,18 @@ extracted CSS, and resolved selectors are byte-identical between
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-tokvmb-foo{color:red;}"];
-  [@css ".css-11o9qin-bar.css-tokvmb-foo{color:blue;}"];
+  [@css "._a_4ekvmb{color:red;}"];
+  [@css "._a_8s8tj4em6j7._id_zec317{color:blue;}"];
   [@css.bindings
-    [("Input.foo", "css-tokvmb-foo"), ("Input.bar", "css-11o9qin-bar")]
+    [
+      ("Input.foo", "_id_zec317", "_a_4ekvmb"),
+      ("Input.bar", "_id_1eelq62", "_a_8s8tj4em6j7"),
+    ]
   ];
   
-  let foo = CSS.make("cx-foo css-tokvmb-foo", []);
+  let foo = CSS.make("label:foo _id_zec317 _a_4ekvmb", []);
   
-  let bar = CSS.make("cx-bar css-11o9qin-bar", []);
+  let bar = CSS.make("label:bar _id_1eelq62 _a_8s8tj4em6j7", []);
   
   let _ = (foo, bar);
 

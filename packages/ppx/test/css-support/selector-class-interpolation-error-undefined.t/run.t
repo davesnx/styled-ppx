@@ -11,14 +11,11 @@ A selector ref can resolve to an earlier string literal binding.
   >  (preprocess (pps styled-ppx)))
   > EOF
 
-  $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-1wbqrk2-bad.css-foo{color:red;}"];
-  [@css.bindings [("Input.bad", "css-1wbqrk2-bad")]];
-  
+  $ dune describe pp ./input.re | sed '1,/^];$/d;/^$/d'
+  [@css "._a_c5f084ekx8h.css-foo{color:red;}"];
+  [@css.bindings [("Input.bad", "_id_1ztayl", "_a_c5f084ekx8h")]];
   let undefined = "css-foo";
-  
-  let bad = CSS.make("css-1wbqrk2-bad", []);
-  
+  let bad = CSS.make("label:bad _id_1ztayl _a_c5f084ekx8h", []);
   let _ = (undefined, bad);
 
   $ dune build

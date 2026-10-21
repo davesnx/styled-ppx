@@ -24,7 +24,13 @@ let property_place_self : property_place_self Rule.rule =
 
 let entries : (kind * packed_rule) list =
   [
-    Property "place-content", pack_module (module Property_place_content);
-    Property "place-items", pack_module (module Property_place_items);
-    Property "place-self", pack_module (module Property_place_self);
+    (* Box Alignment L3: https://www.w3.org/TR/css-align-3/#gap-shorthand, #place-content, #place-items, #place-self *)
+    ( Shorthand ("place-content", [ "align-content"; "justify-content" ]),
+      pack_module (module Property_place_content) );
+    (* Box Alignment L3: https://www.w3.org/TR/css-align-3/#gap-shorthand, #place-content, #place-items, #place-self *)
+    ( Shorthand ("place-items", [ "align-items"; "justify-items" ]),
+      pack_module (module Property_place_items) );
+    (* Box Alignment L3: https://www.w3.org/TR/css-align-3/#gap-shorthand, #place-content, #place-items, #place-self *)
+    ( Shorthand ("place-self", [ "align-self"; "justify-self" ]),
+      pack_module (module Property_place_self) );
   ]

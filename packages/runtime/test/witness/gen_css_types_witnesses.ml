@@ -23,7 +23,8 @@ let property_witness_paths : String_set.t =
   List.fold_left
     (fun acc entry ->
       match entry with
-      | ( Css_grammar.Property _,
+      | ( ( Css_grammar.Property _ | Css_grammar.Shorthand _
+          | Css_grammar.Alias _ ),
           Css_grammar.Pack_rule { runtime_module_path = Some path; _ } ) ->
         String_set.add path acc
       | _ -> acc)

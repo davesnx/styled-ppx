@@ -1,17 +1,16 @@
   $ refmt --parse re --print ml input.re > output.ml
   $ ../../../standalone.exe --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
-  [@css
-    "@media (min-width: 600px) {.css-99qt2j-SelectorsMediaQueries{background:blue;}}"
-  ];
-  [@css ".css-hxxfxf-SelectorsMediaQueries:hover{background:green;}"];
-  [@css ".css-qzw9gh-SelectorsMediaQueries > p{color:pink;}"];
-  [@css ".css-z0beaj-SelectorsMediaQueries > p{font-size:24px;}"];
+  [@css "@media (min-width: 600px) {._a_izob039qt2j{background:blue;}}"];
+  [@css "._a_qyw7u39xfxf:hover{background:green;}"];
+  [@css "._a_og90v4ew9gh > p{color:pink;}"];
+  [@css "._a_og90v65000wbeaj > p{font-size:24px;}"];
   [@css.bindings
     [
       (
         "Output.SelectorsMediaQueries",
-        "css-99qt2j-SelectorsMediaQueries css-hxxfxf-SelectorsMediaQueries css-qzw9gh-SelectorsMediaQueries css-z0beaj-SelectorsMediaQueries",
+        "_id_36wyir",
+        "_a_izob039qt2j _a_qyw7u39xfxf _a_og90v4ew9gh _a_og90v65000wbeaj",
       ),
     ]
   ];
@@ -1000,7 +999,7 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "css-99qt2j-SelectorsMediaQueries css-hxxfxf-SelectorsMediaQueries css-qzw9gh-SelectorsMediaQueries css-z0beaj-SelectorsMediaQueries",
+        "label:SelectorsMediaQueries _id_36wyir _a_izob039qt2j _a_qyw7u39xfxf _a_og90v4ew9gh _a_og90v65000wbeaj",
         [],
       );
     let make = (props: makeProps) => {

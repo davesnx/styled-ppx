@@ -65,6 +65,18 @@ let skip_whitespace stream =
     ()
   done
 
+(* CSS Syntax 3 (5.4.1): CDO/CDC tokens are discarded at the top level of a
+   stylesheet. They stay errors everywhere else. *)
+let skip_whitespace_and_cdx stream =
+  while
+    match current_tok stream with
+    | Tokens.WS | Tokens.CDO | Tokens.CDC -> true
+    | _ -> false
+  do
+    let _ = advance stream in
+    ()
+  done
+
 let accept_token stream expected =
   if current_is stream expected then Some (advance stream) else None
 
@@ -130,7 +142,7 @@ let next_significant_index tokens start =
   loop start
 
 let is_selector_start = function
-  | Tokens.DELIM ("." | "&" | "*")
+  | Tokens.DELIM ("." | "&" | "*" | "|")
   | Tokens.HASH _ | Tokens.LEFT_BRACKET | Tokens.INTERPOLATION _ ->
     true
   | _ -> false
@@ -345,9 +357,55 @@ let parse_attr_matcher stream =
     Attr_exact
   | _ -> raise_parse_error (current_token stream)
 
+(* Selectors 4 <ns-prefix>: `svg|circle`, `*|circle`, `|circle`. The prefix is
+   kept inside the name string. A `|` only qualifies when an identifier (or
+   `*` for type selectors) follows directly, so `[lang|=en]` keeps its
+   attribute matcher. Whitespace tokens never match, so `svg | x` is not a
+   qualified name. *)
+let namespace_local_name ~allow_universal stream =
+  let saved = snapshot stream in
+  let _ = advance stream in
+  match current_tok stream with
+  | Tokens.IDENT name ->
+    let _ = advance stream in
+    Some name
+  | Tokens.DELIM "*" when allow_universal ->
+    let _ = advance stream in
+    Some "*"
+  | _ ->
+    restore stream saved;
+    None
+
+let with_namespace ~allow_universal stream prefix =
+  match current_tok stream with
+  | Tokens.DELIM "|" ->
+    begin match namespace_local_name ~allow_universal stream with
+    | Some name -> Some (prefix ^ "|" ^ name)
+    | None -> None
+    end
+  | _ -> None
+
 let parse_wq_name stream =
-  let name, _ = expect_ident stream in
-  name
+  match current_tok stream with
+  | Tokens.DELIM "|" ->
+    begin match with_namespace ~allow_universal:false stream "" with
+    | Some name -> name
+    | None -> raise_parse_error (current_token stream)
+    end
+  | Tokens.DELIM "*" ->
+    let saved = snapshot stream in
+    let _ = advance stream in
+    begin match with_namespace ~allow_universal:false stream "*" with
+    | Some name -> name
+    | None ->
+      restore stream saved;
+      raise_parse_error (current_token stream)
+    end
+  | _ ->
+    let name, _ = expect_ident stream in
+    Option.value
+      (with_namespace ~allow_universal:false stream name)
+      ~default:name
 
 type nth_suffix =
   | Nth_suffix_n
@@ -522,13 +580,24 @@ let parse_type_selector stream =
     Ampersand
   | Tokens.DELIM "*" ->
     let _ = advance stream in
-    Universal
+    begin match with_namespace ~allow_universal:true stream "*" with
+    | Some name -> Type name
+    | None -> Universal
+    end
+  | Tokens.DELIM "|" ->
+    begin match with_namespace ~allow_universal:true stream "" with
+    | Some name -> Type name
+    | None -> raise_parse_error (current_token stream)
+    end
   | Tokens.INTERPOLATION (content, loc) ->
     let _ = advance stream in
     Variable (content, loc)
   | Tokens.IDENT name ->
     let _ = advance stream in
-    Type name
+    Type
+      (Option.value
+         (with_namespace ~allow_universal:true stream name)
+         ~default:name)
   | _ -> raise_parse_error (current_token stream)
 
 let rec parse_nth_payload ~function_name stream =
@@ -711,7 +780,8 @@ and parse_subclass_selector stream =
 and parse_non_complex_selector stream =
   let type_selector =
     match current_tok stream with
-    | Tokens.IDENT _ | Tokens.DELIM ("&" | "*") | Tokens.INTERPOLATION _ ->
+    | Tokens.IDENT _ | Tokens.DELIM ("&" | "*" | "|") | Tokens.INTERPOLATION _
+      ->
       Some (parse_type_selector stream)
     | _ -> None
   in
@@ -896,15 +966,16 @@ let parse_declaration_no_eof stream =
     loc = loc_from_start stream start_pos;
   }
 
-let parse_rule_list stream ~stop ~parse_one ~allow_empty =
-  skip_whitespace stream;
+let parse_rule_list ?(skip = skip_whitespace) stream ~stop ~parse_one
+  ~allow_empty =
+  skip stream;
   let start_pos = (current_token stream).start_pos in
   if stop stream then
     if allow_empty then [], eof_loc stream
     else raise_parse_error (current_token stream)
   else (
     let rec loop acc =
-      skip_whitespace stream;
+      skip stream;
       if stop stream then List.rev acc
       else (
         let rule = parse_one stream in
@@ -1135,7 +1206,7 @@ let parse_declaration input =
 let parse_stylesheet input =
   let stream = make_stream input in
   let rules, loc =
-    parse_rule_list stream
+    parse_rule_list ~skip:skip_whitespace_and_cdx stream
       ~stop:(fun stream -> current_is stream Tokens.EOF)
       ~parse_one:parse_stylesheet_rule ~allow_empty:true
   in

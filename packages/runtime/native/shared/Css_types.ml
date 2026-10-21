@@ -188,6 +188,7 @@ module Length = struct
     [ length
     | `min of t array
     | `max of t array
+    | `clamp of t * t * t
     | `add of calc_value * calc_value
     | `sub of calc_value * calc_value
     | `mult of calc_value * calc_value
@@ -204,6 +205,7 @@ module Length = struct
     | `calc of calc_value
     | `min of t array
     | `max of t array
+    | `clamp of t * t * t
     ]
 
   let ch (x : float) = `ch x
@@ -256,7 +258,7 @@ module Length = struct
     | `zero -> {js|0|js}
     | #Percentage.t as p -> Percentage.toString p
     | `calc calc -> calc_value_to_string calc
-    | (`min _ | `max _) as x -> minmax_to_string x
+    | (`min _ | `max _ | `clamp _) as x -> minmax_to_string x
     | #Var.t as x -> Var.toString x
 
   and calc_value_to_string x =
@@ -264,11 +266,19 @@ module Length = struct
     | #length as t -> toString t
     | `num x -> Kloth.Float.to_string x
     | `calc calc -> calc_value_to_string calc
-    | (`min _ | `max _) as x -> minmax_to_string x
+    | (`min _ | `max _ | `clamp _) as x -> minmax_to_string x
     | (`add _ | `sub _ | `mult _ | `div _) as x ->
       Calc.min_max_to_string calc_value_to_string minmax_to_string x
 
   and minmax_to_string = function
+    | `clamp (min, preferred, max) ->
+      {js|clamp(|js}
+      ^ toString min
+      ^ {js|, |js}
+      ^ toString preferred
+      ^ {js|, |js}
+      ^ toString max
+      ^ {js|)|js}
     | (`calc _ | `min _ | `max _ | `num _) as x ->
       Calc.min_max_num_to_string toString x
     | #length as l -> toString l
@@ -543,6 +553,27 @@ module Gap = struct
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
     | `normal -> {js|normal|js}
+    | #Percentage.t as p -> Percentage.toString p
+    | #Length.t as l -> Length.toString l
+end
+
+module FlowTolerance = struct
+  (* MDN syntax: 'normal' | <length-percentage> | 'infinite' *)
+  type t =
+    [ `normal
+    | `infinite
+    | Percentage.t
+    | Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
+    | `normal -> {js|normal|js}
+    | `infinite -> {js|infinite|js}
     | #Percentage.t as p -> Percentage.toString p
     | #Length.t as l -> Length.toString l
 end
@@ -2200,6 +2231,29 @@ module TextEmphasisPosition = struct
     | #Cascading.t as c -> Cascading.toString c
 end
 
+module TextEmphasisSkip = struct
+  (* MDN syntax: 'spaces' || 'punctuation' || 'symbols' || 'narrow' *)
+  type t =
+    [ `spaces
+    | `punctuation
+    | `symbols
+    | `narrow
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `spaces -> {js|spaces|js}
+    | `punctuation -> {js|punctuation|js}
+    | `symbols -> {js|symbols|js}
+    | `narrow -> {js|narrow|js}
+    | `value x -> x
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
+end
+
 module Position = struct
   module X = struct
     type t =
@@ -2867,6 +2921,298 @@ module Float = struct
     | #Cascading.t as c -> Cascading.toString c
 end
 
+(* CSS Page Floats: https://drafts.csswg.org/css-page-floats/ *)
+module FloatReference = struct
+  type t =
+    [ `inline
+    | `column
+    | `region
+    | `page
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `inline -> {js|inline|js}
+    | `column -> {js|column|js}
+    | `region -> {js|region|js}
+    | `page -> {js|page|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module FloatDefer = struct
+  type t =
+    [ `num of int
+    | `last
+    | None.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `num x -> Kloth.Int.to_string x
+    | `last -> {js|last|js}
+    | #None.t -> None.toString
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+(* CSS Generated Content L3: https://drafts.csswg.org/css-content-3/ *)
+module BookmarkLevel = struct
+  type t =
+    [ None.t
+    | `num of int
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #None.t -> None.toString
+    | `num x -> Kloth.Int.to_string x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module BookmarkState = struct
+  type t =
+    [ `open_
+    | `closed
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `open_ -> {js|open|js}
+    | `closed -> {js|closed|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module StringSet = struct
+  (* MDN syntax: 'none' | [ <custom-ident> <string>+ ]# - verbatim, like
+     GapRuleList and Border above: a comma list of (ident, string-list)
+     pairs is unlikely to be individually interpolated. *)
+  type t =
+    [ None.t
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #None.t -> None.toString
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+(* CSS Generated Content for Paged Media: https://drafts.csswg.org/css-gcpm/ *)
+module Running = struct
+  (* MDN syntax: <custom-ident> *)
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module FootnoteDisplay = struct
+  type t =
+    [ `block
+    | `inline
+    | `compact
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `block -> {js|block|js}
+    | `inline -> {js|inline|js}
+    | `compact -> {js|compact|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module FootnotePolicy = struct
+  type t =
+    [ `auto
+    | `line
+    | `block
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `line -> {js|line|js}
+    | `block -> {js|block|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+(* CSS Regions L1: https://drafts.csswg.org/css-regions/ *)
+module FlowInto = struct
+  (* MDN syntax: 'none' | <custom-ident> [ 'element' | 'content' ]? -
+     verbatim: the modifier keyword rarely stands alone as an interpolation
+     target, and the ident + optional-keyword pair together is the whole
+     meaningful value. *)
+  type t =
+    [ None.t
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #None.t -> None.toString
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module FlowFrom = struct
+  (* MDN syntax: <custom-ident> | 'none' *)
+  type t =
+    [ `value of string
+    | None.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #None.t -> None.toString
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module RegionFragment = struct
+  type t =
+    [ `auto
+    | `break_
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `break_ -> {js|break|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+(* CSS Spatial Navigation L1: https://drafts.csswg.org/css-spatial-nav-1/ *)
+module SpatialNavigationContain = struct
+  type t =
+    [ `auto
+    | `contain
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `contain -> {js|contain|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module SpatialNavigationAction = struct
+  type t =
+    [ `auto
+    | `focus
+    | `scroll
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `focus -> {js|focus|js}
+    | `scroll -> {js|scroll|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module SpatialNavigationFunction = struct
+  type t =
+    [ `normal
+    | `grid
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `grid -> {js|grid|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+(* CSS Form Control Styling L1: https://drafts.csswg.org/css-forms-1/#propdef-slider-orientation *)
+module SliderOrientation = struct
+  type t =
+    [ `auto
+    | `leftToRight
+    | `rightToLeft
+    | `topToBottom
+    | `bottomToTop
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `leftToRight -> {js|left-to-right|js}
+    | `rightToLeft -> {js|right-to-left|js}
+    | `topToBottom -> {js|top-to-bottom|js}
+    | `bottomToTop -> {js|bottom-to-top|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+(* CSS Image Animation L1: https://drafts.csswg.org/css-image-animation-1/#propdef-image-animation *)
+module ImageAnimation = struct
+  type t =
+    [ `normal
+    | `paused
+    | `stopped
+    | `running
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `paused -> {js|paused|js}
+    | `stopped -> {js|stopped|js}
+    | `running -> {js|running|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
 module Visibility = struct
   type t =
     [ `visible
@@ -2976,6 +3322,29 @@ module BoxSizing = struct
     match x with
     | `contentBox -> {js|content-box|js}
     | `borderBox -> {js|border-box|js}
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
+end
+
+module FrameSizing = struct
+  (* MDN syntax: 'auto' | 'content-width' | 'content-height' | 'content-block-size' | 'content-inline-size' *)
+  type t =
+    [ `auto
+    | `contentWidth
+    | `contentHeight
+    | `contentBlockSize
+    | `contentInlineSize
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `contentWidth -> {js|content-width|js}
+    | `contentHeight -> {js|content-height|js}
+    | `contentBlockSize -> {js|content-block-size|js}
+    | `contentInlineSize -> {js|content-inline-size|js}
     | #Var.t as va -> Var.toString va
     | #Cascading.t as c -> Cascading.toString c
 end
@@ -3580,6 +3949,265 @@ module FlexBasis = struct
     | #Value.t as x -> Value.toString x
 end
 
+(* CSS Box Sizing L4: https://drafts.csswg.org/css-sizing-4/#propdef-min-intrinsic-sizing *)
+module MinIntrinsicSizing = struct
+  (* MDN syntax: 'legacy' | 'zero-if-scroll' || 'zero-if-extrinsic' *)
+  type t =
+    [ `legacy
+    | `zeroIfScroll
+    | `zeroIfExtrinsic
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `legacy -> {js|legacy|js}
+    | `zeroIfScroll -> {js|zero-if-scroll|js}
+    | `zeroIfExtrinsic -> {js|zero-if-extrinsic|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+(* CSS Exclusions L1: https://drafts.csswg.org/css-exclusions/#propdef-wrap-flow *)
+module WrapFlow = struct
+  type t =
+    [ `auto
+    | `both
+    | `start
+    | `end_
+    | `minimum
+    | `maximum
+    | `clear
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `both -> {js|both|js}
+    | `start -> {js|start|js}
+    | `end_ -> {js|end|js}
+    | `minimum -> {js|minimum|js}
+    | `maximum -> {js|maximum|js}
+    | `clear -> {js|clear|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+(* CSS Round Display L1: https://drafts.csswg.org/css-round-display/#propdef-border-boundary *)
+module BorderBoundary = struct
+  type t =
+    [ `none
+    | `parent
+    | `display
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `parent -> {js|parent|js}
+    | `display -> {js|display|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+(* CSS Inline Layout L3: https://drafts.csswg.org/css-inline-3/#propdef-initial-letter-wrap *)
+module InitialLetterWrap = struct
+  type t =
+    [ `none
+    | `first
+    | `all
+    | `grid
+    | Percentage.t
+    | Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | `none -> {js|none|js}
+    | `first -> {js|first|js}
+    | `all -> {js|all|js}
+    | `grid -> {js|grid|js}
+    | #Percentage.t as x -> Percentage.toString x
+    | #Length.t as x -> Length.toString x
+end
+
+(* CSS Inline Layout L3: https://drafts.csswg.org/css-inline-3/#propdef-inline-sizing *)
+module InlineSizing = struct
+  type t =
+    [ `normal
+    | `stretch
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `stretch -> {js|stretch|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+(* CSS Fragmentation L4: https://drafts.csswg.org/css-break-4/#propdef-margin-break *)
+module MarginBreak = struct
+  type t =
+    [ `auto
+    | `keep
+    | `discard
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `keep -> {js|keep|js}
+    | `discard -> {js|discard|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+(* CSS Rhythmic Sizing L1: https://drafts.csswg.org/css-rhythm/ *)
+module BlockStepSize = struct
+  type t =
+    [ `none
+    | Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | `none -> {js|none|js}
+    | #Length.t as x -> Length.toString x
+end
+
+module BlockStepInsert = struct
+  type t =
+    [ `marginBox
+    | `paddingBox
+    | `contentBox
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `marginBox -> {js|margin-box|js}
+    | `paddingBox -> {js|padding-box|js}
+    | `contentBox -> {js|content-box|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module BlockStepAlign = struct
+  type t =
+    [ `auto
+    | `center
+    | `start
+    | `end_
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `center -> {js|center|js}
+    | `start -> {js|start|js}
+    | `end_ -> {js|end|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module BlockStepRound = struct
+  type t =
+    [ `up
+    | `down
+    | `nearest
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `up -> {js|up|js}
+    | `down -> {js|down|js}
+    | `nearest -> {js|nearest|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+(* CSS Line Grid L1: https://drafts.csswg.org/css-line-grid/ *)
+module LineGrid = struct
+  type t =
+    [ `matchParent
+    | `create
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `matchParent -> {js|match-parent|js}
+    | `create -> {js|create|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module LineSnap = struct
+  type t =
+    [ `none
+    | `baseline
+    | `contain
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `baseline -> {js|baseline|js}
+    | `contain -> {js|contain|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module BoxSnap = struct
+  type t =
+    [ `none
+    | `blockStart
+    | `blockEnd
+    | `center
+    | `baseline
+    | `lastBaseline
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `blockStart -> {js|block-start|js}
+    | `blockEnd -> {js|block-end|js}
+    | `center -> {js|center|js}
+    | `baseline -> {js|baseline|js}
+    | `lastBaseline -> {js|last-baseline|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
 module Height = struct
   type t =
     [ Auto.t
@@ -4059,6 +4687,16 @@ module ClipPath = struct
     | #None.t -> None.toString
     | #Url.t as u -> Url.toString u
     | #GeometryBox.t as gb -> GeometryBox.toString gb
+end
+
+module BorderShape = struct
+  (* MDN syntax: 'none' | [ <basic-shape> <geometry-box>? ]{1,2}
+     <geometry-box> can only follow a <basic-shape>, so it has no standalone
+     interpolation value here; <basic-shape> has no runtime type yet (same
+     limit as ClipPath), so only 'none' is interpolatable for now. *)
+  type t = None.t
+
+  let toString x = match x with #None.t -> None.toString
 end
 
 module BackfaceVisibility = struct
@@ -5707,6 +6345,24 @@ module BoxShadows = struct
     Kloth.Array.map_and_join ~sep:{js|, |js} ~f:Shadow.toString x
 end
 
+(* CSS Borders and Box Decorations L4:
+   https://drafts.csswg.org/css-borders-4/#propdef-box-shadow-position *)
+module BoxShadowPosition = struct
+  type t =
+    [ `outset
+    | `inset
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `outset -> {js|outset|js}
+    | `inset -> {js|inset|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
 module TextShadow = struct
   type t =
     [ `shadow of string
@@ -5777,6 +6433,41 @@ module BorderRadius = struct
   type t = Length.t
 
   let toString x = Length.toString x
+end
+
+(* CSS Borders and Box Decorations L4:
+   https://drafts.csswg.org/css-borders-4/#propdef-border-limit *)
+module BorderLimit = struct
+  type t =
+    [ `all
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `all -> {js|all|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+(* https://drafts.csswg.org/css-borders-4/#propdef-border-top-clip *)
+module BorderClip = struct
+  type t =
+    [ None.t
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #None.t -> None.toString
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
 end
 
 module BorderValue = struct
@@ -6005,6 +6696,27 @@ module BackgroundPositionY = struct
     | #Position.Y.t as pos -> Position.Y.toString pos
     | #Length.t as len -> Length.toString len
 end
+
+(* CSS Backgrounds L4 (draft): logical (block/inline) counterparts of
+   BackgroundPositionX/Y above - 'start'/'end' instead of a physical axis'
+   two keyword pairs, since block/inline each have only one direction. *)
+module BackgroundPositionBlock = struct
+  type t =
+    [ `center
+    | `start
+    | `end_
+    | Length.t
+    ]
+
+  let toString x =
+    match x with
+    | `center -> {js|center|js}
+    | `start -> {js|start|js}
+    | `end_ -> {js|end|js}
+    | #Length.t as len -> Length.toString len
+end
+
+module BackgroundPositionInline = BackgroundPositionBlock
 
 module BreakBefore = struct
   type t =
@@ -6569,6 +7281,101 @@ end
 module ColumnRuleStyle = BorderStyle
 module ColumnRuleWidth = LineWidth
 
+(* CSS Gaps L1 (css-grammar-gaps): https://drafts.csswg.org/css-gaps-1/
+   column-rule/row-rule/rule's own grammar (<gap-rule-list> | <gap-auto-rule-list>)
+   is a comma list of width/style/color triples with optional repeat()/
+   repeat(auto, ...); verbatim, like Border above and BorderSpacing/Page
+   elsewhere - a single interpolation hole rarely targets a whole list. *)
+module GapRuleList = struct
+  type t =
+    [ `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ColumnRuleBreak = struct
+  (* MDN syntax: 'none' | 'normal' | 'intersection' *)
+  type t =
+    [ `none
+    | `normal
+    | `intersection
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `normal -> {js|normal|js}
+    | `intersection -> {js|intersection|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ColumnRuleVisibilityItems = struct
+  (* MDN syntax: 'all' | 'around' | 'between' | 'normal' *)
+  type t =
+    [ `all
+    | `around
+    | `between
+    | `normal
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `all -> {js|all|js}
+    | `around -> {js|around|js}
+    | `between -> {js|between|js}
+    | `normal -> {js|normal|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module RuleOverlap = struct
+  (* MDN syntax: 'row-over-column' | 'column-over-row' *)
+  type t =
+    [ `rowOverColumn
+    | `columnOverRow
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `rowOverColumn -> {js|row-over-column|js}
+    | `columnOverRow -> {js|column-over-row|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module InsetValue = struct
+  (* MDN syntax: <length-percentage> | overlap-join *)
+  type t =
+    [ `overlapJoin
+    | Percentage.t
+    | Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | `overlapJoin -> {js|overlap-join|js}
+    | #Percentage.t as x -> Percentage.toString x
+    | #Length.t as x -> Length.toString x
+end
+
 module ColumnSpan = struct
   type t =
     [ `none
@@ -6762,23 +7569,6 @@ module ContainerName = struct
     | #Cascading.t as x -> Cascading.toString x
 end
 
-module ContainerNameComputed = struct
-  (* MDN syntax: 'none' | [ <custom-ident> ]# *)
-  type t =
-    [ `none
-    | `value of string
-    | Var.t
-    | Cascading.t
-    ]
-
-  let toString x =
-    match x with
-    | `none -> {js|none|js}
-    | `value x -> x
-    | #Var.t as x -> Var.toString x
-    | #Cascading.t as x -> Cascading.toString x
-end
-
 module ContainerType = struct
   type t =
     [ `normal
@@ -6938,6 +7728,115 @@ module FillRule = struct
     match x with
     | `nonzero -> {js|nonzero|js}
     | `evenodd -> {js|evenodd|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+(* CSS Fill and Stroke Module L3:
+   https://drafts.csswg.org/fill-stroke/ - shared by fill-break/stroke-break. *)
+module FillBreak = struct
+  (* MDN syntax: 'bounding-box' | 'slice' | 'clone' *)
+  type t =
+    [ `boundingBox
+    | `slice
+    | `clone
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `boundingBox -> {js|bounding-box|js}
+    | `slice -> {js|slice|js}
+    | `clone -> {js|clone|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+(* Shared by fill-origin/stroke-origin - not <geometry-box> (that also has
+   margin-box/view-box and lacks match-parent). *)
+module FillOrigin = struct
+  (* MDN syntax: 'match-parent' | 'fill-box' | 'stroke-box' | 'content-box' | 'padding-box' | 'border-box' *)
+  type t =
+    [ `matchParent
+    | `fillBox
+    | `strokeBox
+    | `contentBox
+    | `paddingBox
+    | `borderBox
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `matchParent -> {js|match-parent|js}
+    | `fillBox -> {js|fill-box|js}
+    | `strokeBox -> {js|stroke-box|js}
+    | `contentBox -> {js|content-box|js}
+    | `paddingBox -> {js|padding-box|js}
+    | `borderBox -> {js|border-box|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module StrokeAlign = struct
+  (* MDN syntax: 'center' | 'inset' | 'outset' *)
+  type t =
+    [ `center
+    | `inset
+    | `outset
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `center -> {js|center|js}
+    | `inset -> {js|inset|js}
+    | `outset -> {js|outset|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module StrokeDashCorner = struct
+  (* MDN syntax: 'none' | <length> *)
+  type t =
+    [ `none
+    | Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | `none -> {js|none|js}
+    | #Length.t as x -> Length.toString x
+end
+
+module StrokeDashJustify = struct
+  (* MDN syntax: 'none' | [ 'stretch' | 'compress' ] || [ 'dashes' || 'gaps' ] *)
+  type t =
+    [ `none
+    | `stretch
+    | `compress
+    | `dashes
+    | `gaps
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `stretch -> {js|stretch|js}
+    | `compress -> {js|compress|js}
+    | `dashes -> {js|dashes|js}
+    | `gaps -> {js|gaps|js}
+    | `value x -> x
     | #Var.t as x -> Var.toString x
     | #Cascading.t as x -> Cascading.toString x
 end
@@ -7595,6 +8494,23 @@ module Marker = ListStyleImage
 module MarkerEnd = ListStyleImage
 module MarkerMid = ListStyleImage
 module MarkerStart = ListStyleImage
+
+module MarkerSide = struct
+  (* MDN syntax: 'match-self' | 'match-parent' *)
+  type t =
+    [ `matchSelf
+    | `matchParent
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `matchSelf -> {js|match-self|js}
+    | `matchParent -> {js|match-parent|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
 
 module Marks = struct
   (* MDN syntax: 'none' | 'crop' || 'cross' *)
@@ -9275,6 +10191,7 @@ module ScrollTimelineAxis = struct
 end
 
 module ScrollTimelineName = AnimationName
+module ScrollAxisLock = FontOpticalSizing
 module ScrollbarColorLegacy = Color
 module ShapeImageThreshold = Opacity
 module ShapeMargin = Length
@@ -9656,6 +10573,111 @@ module TextEdge = struct
     | #Cascading.t as x -> Cascading.toString x
 end
 
+module LineFitEdge = struct
+  (* MDN syntax: 'leading' | [ 'text' | 'ideographic' | 'ideographic-ink' ] \
+     | [ 'text' | 'ideographic' | 'ideographic-ink' | 'cap' | 'ex' ] \
+     [ 'text' | 'ideographic' | 'ideographic-ink' | 'alphabetic' ] *)
+  type edge =
+    [ `text
+    | `ideographic
+    | `ideographicInk
+    | `cap
+    | `ex
+    | `alphabetic
+    ]
+
+  let edge_toString (x : edge) =
+    match x with
+    | `text -> {js|text|js}
+    | `ideographic -> {js|ideographic|js}
+    | `ideographicInk -> {js|ideographic-ink|js}
+    | `cap -> {js|cap|js}
+    | `ex -> {js|ex|js}
+    | `alphabetic -> {js|alphabetic|js}
+
+  (* [`pair] does not statically restrict which side a keyword can sit on
+     (the grammar above does: cap/ex first only, alphabetic second only) -
+     same permissiveness already accepted for BorderShape/ClipPath. *)
+  type t =
+    [ `leading
+    | edge
+    | `pair of edge * edge
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `leading -> {js|leading|js}
+    | `pair (a, b) -> edge_toString a ^ {js| |js} ^ edge_toString b
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+    | #edge as x -> edge_toString x
+end
+
+module LinePadding = struct
+  (* MDN syntax: <length> *)
+  type t =
+    [ Length.t
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | #Var.t as va -> Var.toString va
+    | #Cascading.t as c -> Cascading.toString c
+    | #Length.t as l -> Length.toString l
+end
+
+module TextGroupAlign = struct
+  (* MDN syntax: 'none' | 'start' | 'end' | 'left' | 'right' | 'center' *)
+  type t =
+    [ `none
+    | `start
+    | `end_
+    | `left
+    | `right
+    | `center
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `start -> {js|start|js}
+    | `end_ -> {js|end|js}
+    | `left -> {js|left|js}
+    | `right -> {js|right|js}
+    | `center -> {js|center|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module WhiteSpaceTrim = struct
+  (* MDN syntax: 'none' | 'discard-before' || 'discard-after' || 'discard-inner' *)
+  type t =
+    [ `none
+    | `discardBefore
+    | `discardAfter
+    | `discardInner
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `discardBefore -> {js|discard-before|js}
+    | `discardAfter -> {js|discard-after|js}
+    | `discardInner -> {js|discard-inner|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
 module TextEmphasis = struct
   (* MDN syntax: <'text-emphasis-style'> || <'text-emphasis-color'> *)
   type t =
@@ -9995,6 +11017,44 @@ module ViewTimelineInset = Margin
 module ViewTimelineName = AnimationName
 module ViewTransitionName = AnimationName
 
+module ViewTransitionGroup = struct
+  (* MDN syntax: 'normal' | 'contain' | 'nearest' | <custom-ident> *)
+  type t =
+    [ `normal
+    | `contain
+    | `nearest
+    | `value of string
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `normal -> {js|normal|js}
+    | `contain -> {js|contain|js}
+    | `nearest -> {js|nearest|js}
+    | `value x -> x
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module ViewTransitionScope = struct
+  (* MDN syntax: 'none' | 'all' *)
+  type t =
+    [ `none
+    | `all
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `all -> {js|all|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
 module VoiceBalance = struct
   type t =
     [ `left
@@ -10286,6 +11346,49 @@ end
 
 module WordWrap = OverflowWrap
 
+module WrapBefore = struct
+  (* MDN syntax: 'auto' | 'avoid' | 'avoid-line' | 'avoid-flex' | 'line' | 'flex'
+     wrap-after shares this exact type (one shared propdef table). *)
+  type t =
+    [ `auto
+    | `avoid
+    | `avoidLine
+    | `avoidFlex
+    | `line
+    | `flex
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `avoid -> {js|avoid|js}
+    | `avoidLine -> {js|avoid-line|js}
+    | `avoidFlex -> {js|avoid-flex|js}
+    | `line -> {js|line|js}
+    | `flex -> {js|flex|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module WrapInside = struct
+  (* MDN syntax: 'auto' | 'avoid' *)
+  type t =
+    [ `auto
+    | `avoid
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `auto -> {js|auto|js}
+    | `avoid -> {js|avoid|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
 module WritingMode = struct
   type t =
     [ `horizontalTb
@@ -10304,6 +11407,23 @@ module WritingMode = struct
     | `verticalLr -> {js|vertical-lr|js}
     | `sidewaysRl -> {js|sideways-rl|js}
     | `sidewaysLr -> {js|sideways-lr|js}
+    | #Var.t as x -> Var.toString x
+    | #Cascading.t as x -> Cascading.toString x
+end
+
+module WindowDrag = struct
+  (* MDN syntax: 'none' | 'move' *)
+  type t =
+    [ `none
+    | `move
+    | Var.t
+    | Cascading.t
+    ]
+
+  let toString x =
+    match x with
+    | `none -> {js|none|js}
+    | `move -> {js|move|js}
     | #Var.t as x -> Var.toString x
     | #Cascading.t as x -> Cascading.toString x
 end

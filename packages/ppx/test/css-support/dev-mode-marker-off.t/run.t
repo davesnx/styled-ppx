@@ -1,6 +1,6 @@
-Without --dev, [%css] output is identical to before: no marker class
-prepended to the className. Same input as dev-mode-marker.t but with
-the flag omitted, locking in that the marker is purely opt-in.
+Dev markers are on by default; `--env production` turns them off, same as
+`--minify`. Same input as dev-mode-marker.t but with production selected, to
+lock in that the marker disappears in production regardless of the default.
 
   $ cat > dune-project << EOF
   > (lang dune 3.10)
@@ -10,23 +10,24 @@ the flag omitted, locking in that the marker is purely opt-in.
   > (executable
   >  (name input)
   >  (libraries styled-ppx.native)
-  >  (preprocess (pps styled-ppx)))
+  >  (preprocess (pps styled-ppx -- --env production)))
   > EOF
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css ".css-k008qs-layout{display:flex;}"];
-  [@css ".css-38zrbw-layout{padding:12px;}"];
-  [@css ".css-tokvmb-button{color:red;}"];
+  [@css.config [("env", "production")]];
+  [@css "._a_5r08qs{display:flex;}"];
+  [@css "._a_94zrbw{padding:12px;}"];
+  [@css "._a_4ekvmb{color:red;}"];
   [@css.bindings
     [
-      ("Input.layout", "css-k008qs-layout css-38zrbw-layout"),
-      ("Input.button", "css-tokvmb-button"),
+      ("Input.layout", "_id_1jj5tmt", "_a_5r08qs _a_94zrbw"),
+      ("Input.button", "_id_l55coe", "_a_4ekvmb"),
     ]
   ];
   
-  let layout = CSS.make("css-k008qs-layout css-38zrbw-layout", []);
+  let layout = CSS.make("_id_1jj5tmt _a_5r08qs _a_94zrbw", []);
   
-  let button = CSS.make("css-tokvmb-button", []);
+  let button = CSS.make("_id_l55coe _a_4ekvmb", []);
   
   let _ = (layout, button);
 

@@ -26,75 +26,82 @@ deep nesting, and mixed compound/descendant inner chains.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css
-    ".css-1i2mold-_amp_pseudo_with_class_descendant:hover .child{color:red;}"
-  ];
-  [@css ".css-1pw74wv-_amp_pseudo_with_type_descendant:hover span{color:blue;}"];
-  [@css
-    ".css-5tdg3s-_amp_pseudo_with_explicit_ampersand_descendant:hover .child{color:green;}"
-  ];
-  [@css
-    ".css-1pzj0cc-_amp_pseudo_with_compound_inner:hover:focus{color:yellow;}"
-  ];
-  [@css
-    ".css-1cghiyt-_amp_pseudo_with_pseudo_element_inner:hover::after{color:orange;}"
-  ];
-  [@css
-    ".css-15g1xle-_amp_pseudo_three_levels:hover .child .grandchild{color:purple;}"
-  ];
-  [@css ".css-v719o0-_amp_pseudo_five_levels:hover .a .b .c .d{color:pink;}"];
-  [@css ".css-1d0scwj-_amp_pseudo_mixed_inner:hover .a:focus .b{color:brown;}"];
+  [@css "._a_d3qow4emold:hover .child{color:red;}"];
+  [@css "._a_dwogj4e74wv:hover span{color:blue;}"];
+  [@css "._a_d3qow4edg3s:hover .child{color:green;}"];
+  [@css "._a_rv9hg4ej0cc:hover:focus{color:yellow;}"];
+  [@css "._a_4ii3y4ehiyt:hover::after{color:orange;}"];
+  [@css "._a_yj7sa4e1xle:hover .child .grandchild{color:purple;}"];
+  [@css "._a_h0ece4e19o0:hover .a .b .c .d{color:pink;}"];
+  [@css "._a_t7s414escwj:hover .a:focus .b{color:brown;}"];
   [@css.bindings
     [
       (
         "Input._amp_pseudo_with_class_descendant",
-        "css-1i2mold-_amp_pseudo_with_class_descendant",
+        "_id_1mtruzt",
+        "_a_d3qow4emold",
       ),
       (
         "Input._amp_pseudo_with_type_descendant",
-        "css-1pw74wv-_amp_pseudo_with_type_descendant",
+        "_id_1l96rxg",
+        "_a_dwogj4e74wv",
       ),
       (
         "Input._amp_pseudo_with_explicit_ampersand_descendant",
-        "css-5tdg3s-_amp_pseudo_with_explicit_ampersand_descendant",
+        "_id_saeaxt",
+        "_a_d3qow4edg3s",
       ),
       (
         "Input._amp_pseudo_with_compound_inner",
-        "css-1pzj0cc-_amp_pseudo_with_compound_inner",
+        "_id_1gv0q8s",
+        "_a_rv9hg4ej0cc",
       ),
       (
         "Input._amp_pseudo_with_pseudo_element_inner",
-        "css-1cghiyt-_amp_pseudo_with_pseudo_element_inner",
+        "_id_1ogtbuw",
+        "_a_4ii3y4ehiyt",
       ),
-      (
-        "Input._amp_pseudo_three_levels",
-        "css-15g1xle-_amp_pseudo_three_levels",
-      ),
-      ("Input._amp_pseudo_five_levels", "css-v719o0-_amp_pseudo_five_levels"),
-      ("Input._amp_pseudo_mixed_inner", "css-1d0scwj-_amp_pseudo_mixed_inner"),
+      ("Input._amp_pseudo_three_levels", "_id_wnmhdk", "_a_yj7sa4e1xle"),
+      ("Input._amp_pseudo_five_levels", "_id_lhbok8", "_a_h0ece4e19o0"),
+      ("Input._amp_pseudo_mixed_inner", "_id_1tn24tq", "_a_t7s414escwj"),
     ]
   ];
   
   let _amp_pseudo_with_class_descendant =
-    CSS.make("css-1i2mold-_amp_pseudo_with_class_descendant", []);
+    CSS.make(
+      "label:_amp_pseudo_with_class_descendant _id_1mtruzt _a_d3qow4emold",
+      [],
+    );
   
   let _amp_pseudo_with_type_descendant =
-    CSS.make("css-1pw74wv-_amp_pseudo_with_type_descendant", []);
+    CSS.make(
+      "label:_amp_pseudo_with_type_descendant _id_1l96rxg _a_dwogj4e74wv",
+      [],
+    );
   
   let _amp_pseudo_with_explicit_ampersand_descendant =
-    CSS.make("css-5tdg3s-_amp_pseudo_with_explicit_ampersand_descendant", []);
+    CSS.make(
+      "label:_amp_pseudo_with_explicit_ampersand_descendant _id_saeaxt _a_d3qow4edg3s",
+      [],
+    );
   
   let _amp_pseudo_with_compound_inner =
-    CSS.make("css-1pzj0cc-_amp_pseudo_with_compound_inner", []);
+    CSS.make(
+      "label:_amp_pseudo_with_compound_inner _id_1gv0q8s _a_rv9hg4ej0cc",
+      [],
+    );
   
   let _amp_pseudo_with_pseudo_element_inner =
-    CSS.make("css-1cghiyt-_amp_pseudo_with_pseudo_element_inner", []);
+    CSS.make(
+      "label:_amp_pseudo_with_pseudo_element_inner _id_1ogtbuw _a_4ii3y4ehiyt",
+      [],
+    );
   
   let _amp_pseudo_three_levels =
-    CSS.make("css-15g1xle-_amp_pseudo_three_levels", []);
+    CSS.make("label:_amp_pseudo_three_levels _id_wnmhdk _a_yj7sa4e1xle", []);
   
   let _amp_pseudo_five_levels =
-    CSS.make("css-v719o0-_amp_pseudo_five_levels", []);
+    CSS.make("label:_amp_pseudo_five_levels _id_lhbok8 _a_h0ece4e19o0", []);
   
   let _amp_pseudo_mixed_inner =
-    CSS.make("css-1d0scwj-_amp_pseudo_mixed_inner", []);
+    CSS.make("label:_amp_pseudo_mixed_inner _id_1tn24tq _a_t7s414escwj", []);

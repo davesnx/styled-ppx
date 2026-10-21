@@ -1,4 +1,4 @@
-let marker_prefix = "cx-";
+let marker_prefix = "label:";
 
 let marker = name =>
   switch (Settings.Get.dev(), name) {

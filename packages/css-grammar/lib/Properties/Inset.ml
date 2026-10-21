@@ -60,13 +60,19 @@ let property_inset_area : property_inset_area Rule.rule =
 
 let entries : (kind * packed_rule) list =
   [
-    Property "inset", pack_module (module Property_inset);
+    (* Position L3 / Logical Properties L1 (inset): https://www.w3.org/TR/css-position-3/#inset-properties ; https://www.w3.org/TR/css-logical-1/#inset-properties *)
+    ( Shorthand ("inset", [ "top"; "right"; "bottom"; "left" ]),
+      pack_module (module Property_inset) );
     Property "inset-area", pack_module (module Property_inset_area);
-    Property "inset-block", pack_module (module Property_inset_block);
+    (* Position L3 / Logical Properties L1 (inset): https://www.w3.org/TR/css-position-3/#inset-properties ; https://www.w3.org/TR/css-logical-1/#inset-properties *)
+    ( Shorthand ("inset-block", [ "inset-block-start"; "inset-block-end" ]),
+      pack_module (module Property_inset_block) );
     Property "inset-block-end", pack_module (module Property_inset_block_end);
     ( Property "inset-block-start",
       pack_module (module Property_inset_block_start) );
-    Property "inset-inline", pack_module (module Property_inset_inline);
+    (* Position L3 / Logical Properties L1 (inset): https://www.w3.org/TR/css-position-3/#inset-properties ; https://www.w3.org/TR/css-logical-1/#inset-properties *)
+    ( Shorthand ("inset-inline", [ "inset-inline-start"; "inset-inline-end" ]),
+      pack_module (module Property_inset_inline) );
     Property "inset-inline-end", pack_module (module Property_inset_inline_end);
     ( Property "inset-inline-start",
       pack_module (module Property_inset_inline_start) );
