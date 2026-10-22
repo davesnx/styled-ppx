@@ -40,6 +40,8 @@ jobs:
 
       - name: Setup OCaml and dependencies
         uses: ml-in-barcelona/gh-ci-action@v1.2.0
+        env:
+          OPAMASSUMEDEPEXTS: true
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
           pins: |
