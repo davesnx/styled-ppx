@@ -8,3 +8,8 @@
  packages
  ; All folders inside packages/ except "editors" and "website"
  (dirs :standard \ editors website))
+
+(env
+ (_
+  (env-vars
+   (DUNE_CACHE disabled))))
