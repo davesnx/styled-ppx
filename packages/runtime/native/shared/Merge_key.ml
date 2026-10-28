@@ -9,9 +9,9 @@
    check); this module never needs to know WHAT a field means, only how
    wide it is and how two atoms' fields compare.
 
-   This is the single rule [Slot_key.removes] defines, minus the [bundle]
-   short-circuit (an [_in_] token never reaches {!parse_atom}'s callers in
-   the first place - see [merge_class_names] below).
+   This is the single rule [Slot_key.removes] defines. An [_in_] bundle
+   token never parses as an atom, so it is never dropped and never drops
+   anything (see [merge_class_names] below).
 
    Why this duplicates [Class_format]'s widths instead of depending on it:
    this module ships in the melange runtime bundle (real browser JS).
@@ -142,8 +142,8 @@ let mask_subset a b =
   | Some _, None -> true
   | Some ma, Some mb -> ma land mb = ma
 
-(* [removes ~former ~latter]: mirrors [Slot_key.removes] exactly (minus
-   the bundle check, already handled by the caller) - same context, then
+(* [removes ~former ~latter]: mirrors [Slot_key.removes] exactly - same
+   context, then
    either [latter]'s family is the [all] sentinel (former removed unless
    excluded), or the same family and [former]'s mask a subset of
    [latter]'s. *)

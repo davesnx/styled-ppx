@@ -1,11 +1,9 @@
-`!important` needs no special handling anywhere in this ordering - no
-`base`-vs-`conditional` case, no `global`-vs-either-atom-tier case - since
-none of the three is wrapped in a CSS layer: importance is compared
-before specificity or position exactly once, then two `!important`
-declarations on the same property compete exactly like two plain ones
-would - specificity first, emission position (tier order, then the
-shorthand-depth sort) as the tie-break (see `global-tier.t`'s own
-`!important` cases for the global-vs-atom pair).
+`!important` needs no special handling anywhere in this ordering, since
+nothing is wrapped in a CSS layer: importance is compared before
+specificity or position exactly once, then two `!important` declarations
+on the same property compete exactly like two plain ones would -
+specificity first, sheet position as the tie-break (see `global-first.t`'s
+own `!important` cases for the global-vs-atom pair).
 
 `label:noSidePadding`: a component's base padding, marked `!important` so
 a consumer's own CSS cannot accidentally override it, narrowed under a
@@ -24,9 +22,9 @@ properties, one class each.
 
 What the browser does now, and why: both rules are `!important` and
 equally specific (one class each), so the browser applies whichever one
-is textually LAST among those that currently match. `generate.ml` emits
-the base-tier rule before the conditional-tier one (see "Cascade tiers"
-in `generate.ml`), so between 768 and 1279px, where the media query
-matches, the narrower `._in_nospad_tablet` override wins - restoring the
-responsive override `!important` on its own cannot break, without any
-`!important`-specific machinery at all.
+is textually LAST among those that currently match. The two rules
+compete (same scope, both `!important`, shared longhands), no block orders
+them here, and definition order puts the base rule first (see "Ordered
+sheet" in `generate.ml`), so between 768 and 1279px, where the media
+query matches, the narrower `._in_nospad_tablet` override wins, without
+any `!important`-specific machinery at all.

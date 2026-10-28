@@ -633,13 +633,13 @@ let check_atom_class_collisions (rules : Css_extraction.rule list) =
    atom rule in the order "Ordered sheet" below defines. No CSS layer wraps
    anything: specificity decides first, position only breaks a tie, so a
    [%styled.global] rule with higher specificity than an atom wins outright
-   (`global-tier.t`).
+   (`global-first.t`).
 
    Class hashes take no library name (see `Hash_class.ml`), so two
    libraries that declare the same atom share its class. One run per app
    orders, dedups and collision-checks every library together. Two
    SEPARATE runs (two `<link>`s on one page) have no guaranteed relative
-   order between the rules they share (`tiers-two-stylesheets.t`). *)
+   order between the rules they share (`two-stylesheets.t`). *)
 
 (** [@property]/[@keyframes]/[@font-face] are registrations, not style rules
     that compete for an element - a [@property] rule is a custom-property
@@ -708,11 +708,27 @@ type order_stats = {
   cycles : int;  (** cycles cut at one rule each *)
 }
 
+let logical_physical_pairs =
+  let pairs = Hashtbl.create 64 in
+  List.iter
+    (fun (physical, logical) ->
+      let physical = Slot_key.family_to_string physical
+      and logical = Slot_key.family_to_string logical in
+      Hashtbl.replace pairs (physical, logical) ();
+      Hashtbl.replace pairs (logical, physical) ())
+    Slot_key.logical_physical_pairs;
+  pairs
+
 (** Two rules compete when the sheet position can decide between them: the
     cascade reaches position only after importance and specificity, and only for
-    rules that style the same element and set the same longhand. *)
+    rules that style the same element and set the same longhand. A logical
+    property ([margin-inline-start]) and the physical properties it can map to
+    ([margin-left], ...) count as setting the same longhand, whatever the
+    writing mode. *)
 let competes (a : Css_extraction.atom_key) (b : Css_extraction.atom_key) =
-  String.equal a.scope b.scope && Css_extraction.overlaps a b
+  String.equal a.scope b.scope
+  && (Css_extraction.overlaps a b
+     || Hashtbl.mem logical_physical_pairs (a.family, b.family))
 
 (** Order [atoms] (atom rule texts and keys, in definition order) as described
     in "Ordered sheet" above. [orders] is every block and merge: its name and

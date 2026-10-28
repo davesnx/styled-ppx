@@ -10,14 +10,12 @@ this shape. This fixture uses hand-written `[@@@css ...]` rules directly,
 skipping the PPX, to isolate `generate.ml`'s own behavior once two sheets
 DO share a class.
 
-`base` and `conditional` (and `global`) are ordinary, unlayered rules,
-each sheet ordering its OWN tiers by plain emission position, the same
-as `tiers-slider.t` shows for one sheet alone. That ordering is per
-STYLESHEET, not per page: two different `<link>`s just concatenate their
-rule text on the page in load order, the same as any two plain CSS files
-always have - so a tie between two DIFFERENT sheets' rules depends on
-which `<link>` the browser loads first, exactly like plain CSS with no
-tiers at all.
+Every rule is an ordinary, unlayered rule, and each sheet orders its OWN
+rules, the same as `block-order-slider.t` shows for one sheet alone. That
+ordering is per STYLESHEET, not per page: two different `<link>`s just
+concatenate their rule text on the page in load order, the same as any two
+plain CSS files always have - so a tie between two DIFFERENT sheets' rules
+depends on which `<link>` the browser loads first, exactly like plain CSS.
 
 The static sheet: its own `overflow-x: auto` plus its own narrowing
 override.
@@ -49,7 +47,7 @@ depends entirely on which `<link>` it loads first, since the two sheets'
 rules simply concatenate on the page in that order. If the static sheet
 loads first, its own rules (base then conditional) are followed by the
 toolkit sheet's rule, so the static sheet's OWN `@media` override still
-beats its own base atom (each sheet orders its OWN tiers correctly), and
+beats its own base atom (each sheet orders its OWN rules correctly), and
 the toolkit atom, being later than everything static contributed, would
 even beat static's own `@media` override on that shared property. If the
 toolkit sheet loads first instead, its plain `overflow-x: auto` comes
@@ -57,6 +55,5 @@ before all of static's rules, so static's own `@media` override - now
 later than the toolkit atom too - wins. Either way, ONE sheet's rule
 always ends up textually after the other's, but WHICH one depends
 entirely on `<link>` order, a page-authoring detail this aggregator has
-no visibility into - the accepted, current limitation of ordering
-`base`/`conditional` by per-invocation emission position instead of one
-guarantee spanning every sheet on the page.
+no visibility into - the accepted limitation of ordering each sheet on
+its own instead of one guarantee spanning every sheet on the page.

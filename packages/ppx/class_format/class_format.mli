@@ -1,26 +1,18 @@
-(** Merge-aware atom class names. Re-exported by [Hash_class] (the single source
-    of truth for every hashed identifier, per its own header comment)
-    - this module is standalone only so it can be unit-tested directly;
-      [Hash_class] is still where a real caller should reach for it once
-      [Css_file.re]'s atomization is taught to mint family atoms and calls into
-      this format for every atom, not just bundles.
-
-    Not wired into the real atomization/generate pipeline yet, EXCEPT
-    {!bundle_class}, which [Hash_class.bundle_class_and_namespace] already calls
-    for real: the atom class-name collision check
-    (`packages/generate/generate.ml`) needs a real, recognizable bundle prefix
-    to tell a legitimate shared bundle class apart from a genuine hash
-    collision.
+(** Merge-aware atom class names. [Hash_class.class_and_namespace] mints every
+    [_a_] atom class through {!slot_class}, and
+    [Hash_class.bundle_class_and_namespace] every [_in_] bundle class through
+    {!bundle_class}. Standalone so it can be unit-tested directly.
 
     Prefixes: [_a_] (any non-bundle atom, important or not - see below), [_in_]
-    (an interpolation bundle - see {!Slot_key.t.bundle}). Each prefix already
-    carries its own trailing delimiter (the second "_"), so no separate
-    separator is ever added at a call site. There is no separate important-atom
-    prefix: [!important] folds into {!Slot_key.context_key} instead (see
-    slot_key.mli's [context] doc), so an important atom is an ordinary [_a_]
-    atom whose context happens to be non-empty. [_a_] is never a prefix of
-    [_in_] or vice versa, so a literal-prefix match is unambiguous with no
-    lookahead beyond the prefix itself.
+    (an interpolation bundle: two or more declarations of a block that
+    interpolate the same value, sharing one class). Each prefix already carries
+    its own trailing delimiter (the second "_"), so no separate separator is
+    ever added at a call site. There is no separate important-atom prefix:
+    [!important] folds into {!Slot_key.context_key} instead (see slot_key.mli's
+    [context] doc), so an important atom is an ordinary [_a_] atom whose context
+    happens to be non-empty. [_a_] is never a prefix of [_in_] or vice versa, so
+    a literal-prefix match is unambiguous with no lookahead beyond the prefix
+    itself.
 
     A non-bundle atom ([_a_]) is its prefix followed by an optional context
     field, a family field, an optional extended-hash field, an optional mask
@@ -117,11 +109,8 @@ val to_base36_padded : width:int -> int -> string
     unlike [family]/[mask] which are already small bounded ints. *)
 val hashed_field : width:int -> string -> string
 
-(** The {!bundle_prefix} class for [content] directly - what {!slot_class}
-    delegates to for a bundle atom, exposed standalone so a caller that already
-    knows an atom is a bundle (e.g. [Hash_class], wiring [Css_file.re]'s
-    existing bundle path for real) doesn't need to build a full,
-    otherwise-unused {!Slot_key.t} just to reach it. *)
+(** The {!bundle_prefix} class for [content], the concatenated rendered text of
+    the bundle's rules. *)
 val bundle_class : string -> string
 
 (** [slot_class slot content] is [slot]'s full class name: [content] is the

@@ -146,6 +146,10 @@ type family_id =
 *)
 val family_marker : family_id -> int
 
+(** A [family_id] as the short string the ppx payload carries (["158"],
+    ["u<hash>"], ["c<hash>"], ["*"]). *)
+val family_to_string : family_id -> string
+
 (** [Some hash] for [Unregistered]/[UnregisteredCustom] - the real identity a
     marker in the family field says "look elsewhere for", encoded in its own
     extended-hash class-name field (present only when {!family_marker} is one of
@@ -186,22 +190,6 @@ type t = {
     (** [None] = the family's full mask (a plain shorthand, or any non-family
         property). [Some m] = a proper subset (a lone longhand, or a "family
         atom" mixing some-but-not-all members - see slot_key.ml's [of_atom]). *)
-  bundle : bool;
-    (** True when [Css_file.re] is treating this atom as part of a REAL bundle:
-        two or more interpolating declarations from the same block that
-        interpolate the SAME source path (transitively - see [Css_file.re]'s
-        [transform_rule_list]) sharing one class. A single interpolating
-        declaration, or one whose path no sibling declaration shares, is NOT a
-        bundle - it mints its own real, merge-participating slot-keyed class
-        instead (see [Class_format.slot_class]). {!of_atom} always returns
-        [false] here: bundle-hood depends on how many OTHER declarations in the
-        block share this atom's path, which one atom's own AST can't say, and
-        the real pipeline never needs it to say [true] either, since a genuine
-        bundle's class is minted directly by [Class_format.bundle_class],
-        bypassing this type entirely (see slot_key.ml's [of_atom] for the full
-        reasoning). {!removes} still exempts a bundle atom in both directions
-        when one is constructed with [bundle = true] by hand (a test does this
-        to exercise that exemption; nothing in the real pipeline does). *)
 }
 
 (** Build the slot key for one atomized rule, exactly as [Css_file.re]'s
@@ -209,31 +197,27 @@ type t = {
     [Declaration] group wrapped in a [&]-only [Style_rule], an atom wrapped in a
     resolved parent selector, any of those under one or more [At_rule] wrappers,
     or [!important] on some or all of a group's declarations (the group's own
-    {!context}.[important] is true if any member is). Once [Css_file.re] is
-    taught to emit *family atoms* - one atom for a binding that mixes a
-    shorthand with its own longhands in one context - this function already
-    handles that shape correctly today via the same multi-declaration-group path
-    used for same-property groups: their combined mask is the OR of every
-    declaration's own mask. Returns [None] only for a rule shape [atomize_rules]
-    never actually produces. The returned {!t.bundle} is always [false] - see
-    its own doc for why. *)
+    {!context}.[important] is true if any member is). A family atom (a shorthand
+    grouped with its own longhands in one context) takes the same
+    multi-declaration-group path: its mask is the OR of every declaration's own
+    mask. Returns [None] only for a rule shape [atomize_rules] never actually
+    produces. An [_in_] bundle has no [t]: its class is minted by
+    [Class_format.bundle_class], and [CSS.merge] never drops it. *)
 val of_atom : Styled_ppx_css_parser.Ast.rule -> t option
 
 (** [removes ~former ~latter] : true when, in a [CSS.merge] whose right argument
     is meant to override its left, [latter] should cause [former]'s class to be
     dropped from the left side.
 
-    [false] immediately if either side is a {!t.bundle} atom - bundles are
-    opaque to this decision in both directions. Otherwise: same contexts, then
-    if [latter.family = All], [former] is removed unless its own (single,
-    non-family) property is excluded from [all] (see {!excluded_from_all} -
-    carried here via [family_id]'s [UnregisteredCustom] constructor and two
-    fixed [direction]/ [unicode-bidi] registry entries, never a string).
-    Otherwise, same [family], and [former.mask] is a subset of [latter.mask]
-    under the convention that [None] means "full": [None]/[None] are equal
-    (removed - the base case, two values of the same plain property or the same
-    bare shorthand); [Some _]/[None] is always a subset (a later shorthand or
-    family atom safely absorbs an earlier lone longhand it covers);
+    Same contexts, then if [latter.family = All], [former] is removed unless its
+    own (single, non-family) property is excluded from [all] (see
+    {!excluded_from_all} - carried here via [family_id]'s [UnregisteredCustom]
+    constructor and two fixed [direction]/ [unicode-bidi] registry entries,
+    never a string). Otherwise, same [family], and [former.mask] is a subset of
+    [latter.mask] under the convention that [None] means "full": [None]/[None]
+    are equal (removed - the base case, two values of the same plain property or
+    the same bare shorthand); [Some _]/[None] is always a subset (a later
+    shorthand or family atom safely absorbs an earlier lone longhand it covers);
     [None]/[Some _] is never a subset (a lone longhand cannot remove a shorthand
     \- it would silently drop the shorthand's other legs; `merge(wide, narrow)`
     therefore stays a known, accepted limit that still depends on stylesheet
@@ -242,3 +226,9 @@ val of_atom : Styled_ppx_css_parser.Ast.rule -> t option
     [former]'s and [latter]'s importance must already agree for "same contexts"
     to hold at all. *)
 val removes : former:t -> latter:t -> bool
+
+(** Pairs of (physical, logical) families whose properties can set the same
+    computed value depending on writing mode and direction ([margin] and
+    [margin-inline], [width] and [inline-size], ...). Separate families for
+    {!removes}, related for sheet order. *)
+val logical_physical_pairs : (family_id * family_id) list

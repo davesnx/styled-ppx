@@ -17,11 +17,11 @@ CSS allows it anywhere in a stylesheet, and a layer's priority is fixed by
 its name's first occurrence across the whole page, so moving it could
 silently change which layer it introduces first - a hazard independent of
 whether this aggregator wraps anything in a layer of its own. A literal
-`@layer`-starting rule takes no part in tiering for exactly this reason,
-the same as an `@property`/`@keyframes`/`@font-face` registration (see
-"Cascade tiers" in the docs): it stays wherever dedup/ordering already
-placed it relative to the style rules around it (`a_styles.ml`'s
-`._a_styles`, tiered, ends up after it here).
+`@layer`-starting rule takes no part in the sheet order for exactly this
+reason, the same as an `@property`/`@keyframes`/`@font-face` registration
+(see "Sheet order" in the docs): it stays with the registrations, ahead of
+the style rules (`a_styles.ml`'s atom `._a_styles` ends up after it
+here).
 
   $ cat > a_styles.ml <<EOF
   > [@@@css ("._a_styles{color:red;}", "_a_styles", "0,1,0 own", "color", 1, false)]
@@ -74,7 +74,7 @@ since neither rule string contains a lone `{` outside the block) would move
 An `@import` URL that itself contains `{` must still be classified by its
 `@import ... ;` text, not by scanning for a literal `{`: the old classifier
 took any `{` as proof of a block rule and would have emitted this `@import`
-after the tiered rules instead of hoisting it.
+after the style rules instead of hoisting it.
 
   $ cat > d_import_brace.ml <<EOF
   > [@@@css "@import url(\"a{b.css\");"]

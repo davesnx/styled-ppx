@@ -271,14 +271,6 @@ let rec style_rule_of = (rule: rule) =>
   | Declaration(_) => None
   };
 
-let family_string = (family: Slot_key.family_id) =>
-  switch (family) {
-  | Slot_key.Registered(i) => string_of_int(i)
-  | Slot_key.Unregistered(h) => "u" ++ string_of_int(h)
-  | Slot_key.UnregisteredCustom(h) => "c" ++ string_of_int(h)
-  | Slot_key.All => Css_extraction.all_family
-  };
-
 /* [rule] is one lowered atom rule: a style rule on the atom's class,
    possibly under at-rules. Read from the AST before the autoprefixer, so a
    vendor-prefixed copy of a declaration never reaches the key. */
@@ -309,8 +301,8 @@ let of_rule = (~class_name, rule: rule): option(Css_extraction.atom_key) =>
       switch (slot.family) {
       | Slot_key.All => Css_extraction.all_family
       | family when List.for_all(Slot_key.excluded_from_all, properties) =>
-        "-" ++ family_string(family)
-      | family => family_string(family)
+        "-" ++ Slot_key.family_to_string(family)
+      | family => Slot_key.family_to_string(family)
       };
     let mask =
       switch (slot.family, slot.mask, properties) {

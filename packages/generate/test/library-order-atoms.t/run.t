@@ -1,9 +1,8 @@
 Two libraries, `z_base` and `a_app` (`a_app` depends on `z_base`, so
 `z_base`'s rules come first in dependency order), one invocation - each
-has one base atom and one conditional (`:hover`) atom. There is no
-base/conditional tier any more: no block orders these atoms and no two of
-them compete, so they keep definition order, library by library in
-dependency order.
+has one base atom and one conditional (`:hover`) atom. No block orders
+these atoms and no two of them compete, so they keep definition order,
+library by library in dependency order.
 
   $ mkdir a_app z_base
 

@@ -165,12 +165,8 @@ let class_of_content content = Printf.sprintf "_a_%s" (hash content)
    on the exact same rule value [content] renders (see its doc for why that
    shape match matters).
 
-   [slot.bundle] is always [false] here (see {!Slot_key.t.bundle}'s doc):
-   this function is [Css_file.re]'s NON-bundle path - a genuine, two-or-more
-   -declaration bundle mints its class directly via {!bundle_class_and_namespace}
-   below, never through this function or [Slot_key] at all - so
-   [Class_format.slot_class] always takes its real, structural encoding
-   here, never its [_in_] branch. *)
+   This is [Css_file.re]'s non-bundle path: a two-or-more-declaration bundle
+   mints its class through {!bundle_class_and_namespace} below. *)
 let class_and_namespace ~slot content =
   let var_namespace = namespace_of_content content in
   let class_name =
@@ -284,18 +280,6 @@ let keyframe_name rendered_body = Printf.sprintf "_k_%s" (hash rendered_body)
 
 (* Dedup key for a single [%styled.global] rule: `global-<hash(rule)>`. *)
 let global_key rendered_rule = Printf.sprintf "global-%s" (hash rendered_rule)
-
-(* -- Merge-aware atom class names --------------------------------------
-
-   Not wired into [class_and_namespace] yet - [Css_file.re]'s atomization
-   will call [slot_class] instead once it also mints family atoms.
-   Implementation lives in the standalone [Class_format] library
-   (unit-tested directly there; `packages/ppx/src` is a ppx_rewriter-kind,
-   wrapped library whose internal modules aren't cleanly reachable from an
-   external test executable) - re-exported here because this file is the
-   single source of truth for every hashed identifier this pipeline emits.
-   See `packages/ppx/class_format/class_format.mli` for the format. *)
-let slot_class = Class_format.slot_class
 
 (* The build-independent identity class for a named binding:
    `_id_<hash(module_name \0 scope \0 name [\0 occurrence])>`.

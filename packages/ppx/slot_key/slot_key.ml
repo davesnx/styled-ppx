@@ -979,6 +979,12 @@ let family_marker = function
   | UnregisteredCustom _ -> Registry.unregistered_custom_marker
   | All -> Registry.all_sentinel
 
+let family_to_string = function
+  | Registered n -> string_of_int n
+  | Unregistered n -> "u" ^ string_of_int n
+  | UnregisteredCustom n -> "c" ^ string_of_int n
+  | All -> "*"
+
 let extended_hash = function
   | Unregistered n | UnregisteredCustom n -> Some n
   | Registered _ | All -> None
@@ -1051,29 +1057,6 @@ type t = {
   context : context;
   family : family_id;
   mask : int option;
-  bundle : bool;
-    (** True when [Css_file.re] is treating this atom as part of a REAL bundle:
-        two or more interpolating declarations from the same block sharing one
-        class (see its [transform_rule_list]'s [bundle] computation). A single
-        interpolating declaration is NOT a bundle - it mints its own real,
-        merge-participating slot-keyed class instead, the same path a static
-        atom uses (see [Class_format.slot_class]).
-
-        Bundle-hood is a fact about the whole BLOCK (how many of its
-        declarations interpolate), not about any one atom's own AST, so
-        {!of_atom} - which only ever sees one atom - cannot determine it by
-        inspection the way it does {!family}/{!mask}: it always returns [false].
-        Nothing in the real pipeline ever needs it to return [true] either,
-        since a genuine bundle's class is minted directly by
-        [Class_format.bundle_class] ([Hash_class.bundle_class_and_namespace]),
-        bypassing [Slot_key]/[Class_format.slot_class] entirely - a real
-        bundle's content is the concatenation of every member declaration's
-        rendered text, not one atom's context/family/mask, so it was never
-        representable as a {!t} in the first place. The field stays on the type,
-        and {!removes} still exempts it in both directions, so a test can
-        construct a hypothetical bundle atom directly (e.g.
-        [{ (of_atom ... |> Option.get) with bundle = true }]) to exercise that
-        exemption in isolation. *)
 }
 
 (* Walks one atomized rule (Css_file.re's [atomize_rules] output shape),
@@ -1122,8 +1105,8 @@ let of_atom (rule : Ast.rule) : t option =
     let context =
       { at_rules; selector = Option.value selector ~default:""; important }
     in
-    (* A multi-declaration group (same-property today; a mixed shorthand +
-       longhand "family atom" once [Css_file.re]'s atomization mints them)
+    (* A multi-declaration group (a same-property repeat, or a shorthand
+       grouped with its own longhands)
        combines every declaration's own family/mask - they are always the
        same family by construction
        (that's what makes them one group), so the combined mask is the OR
@@ -1158,9 +1141,7 @@ let of_atom (rule : Ast.rule) : t option =
             if own = full then None else Some (acc_mask lor own))
         (Some 0) properties
     in
-    (* Always [false] - see {!t.bundle}'s doc for why this function cannot
-       determine bundle-hood from one atom's AST alone. *)
-    Some { context; family; mask; bundle = false }
+    Some { context; family; mask }
 
 let context_equal a b =
   a.at_rules = b.at_rules
@@ -1183,10 +1164,45 @@ let is_excluded_from_all = function
   | Unregistered _ | All -> false
 
 let removes ~former ~latter =
-  (not former.bundle)
-  && (not latter.bundle)
-  && context_equal former.context latter.context
+  context_equal former.context latter.context
   &&
   match latter.family with
   | All -> not (is_excluded_from_all former.family)
   | _ -> former.family = latter.family && mask_subset former.mask latter.mask
+
+(* CSS Logical Properties L1 maps each logical property to a physical one
+   through the writing mode and direction (css-logical-1 section 4), which
+   this module does not know at compile time. Each row lists physical
+   properties and the logical ones that can map to any of them. *)
+let logical_physical_groups =
+  [
+    [ "margin" ], [ "margin-inline"; "margin-block" ];
+    [ "padding" ], [ "padding-inline"; "padding-block" ];
+    [ "inset" ], [ "inset-inline"; "inset-block" ];
+    [ "border" ], [ "border-inline"; "border-block" ];
+    ( [ "border-radius" ],
+      [
+        "border-start-start-radius";
+        "border-start-end-radius";
+        "border-end-start-radius";
+        "border-end-end-radius";
+      ] );
+    [ "width"; "height" ], [ "inline-size"; "block-size" ];
+    [ "min-width"; "min-height" ], [ "min-inline-size"; "min-block-size" ];
+    [ "max-width"; "max-height" ], [ "max-inline-size"; "max-block-size" ];
+    [ "scroll-margin" ], [ "scroll-margin-inline"; "scroll-margin-block" ];
+    [ "scroll-padding" ], [ "scroll-padding-inline"; "scroll-padding-block" ];
+    [ "overflow" ], [ "overflow-inline"; "overflow-block" ];
+    ( [ "overscroll-behavior-x"; "overscroll-behavior-y" ],
+      [ "overscroll-behavior-inline"; "overscroll-behavior-block" ] );
+    ( [ "contain-intrinsic-width"; "contain-intrinsic-height" ],
+      [ "contain-intrinsic-inline-size"; "contain-intrinsic-block-size" ] );
+  ]
+
+let logical_physical_pairs =
+  List.concat_map
+    (fun (physical, logical) ->
+      List.concat_map
+        (fun p -> List.map (fun l -> family_id_of p, family_id_of l) logical)
+        physical)
+    logical_physical_groups

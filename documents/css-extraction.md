@@ -423,11 +423,14 @@ already ordered the two libraries relative to each other).
 
 Both levels call the same `Order.sort` (Kahn's algorithm, always advancing
 the alphabetically smallest ready key), so both get the same guarantees:
-files or libraries with no dependency relation keep their input order, and
-a cycle — which can't come from a real dune graph, only from this
-heuristic picking an edge a real build wouldn't have — never fails the
-build. The aggregator warns once naming the cycle's members, drops the
-blocking edge whose source sorts alphabetically last, and keeps going.
+files or libraries with no dependency relation come out in alphabetical
+order of their key (the file path, or the library name), whatever order
+dune passes them in, and a cycle — which can't come from a real dune
+graph, only from this heuristic picking an edge a real build wouldn't
+have — never fails the build. The aggregator warns once naming the cycle's
+members, drops one edge that lies on the cycle (both ends in one strongly
+connected component; the one whose source sorts alphabetically last), and
+keeps going. A node that only depends on the cycle keeps its edge.
 
 `--order source` skips all of this, ignoring references and `library`
 keys, and keeps the file order dune passes on the command line. It exists
@@ -558,7 +561,13 @@ with a rule of the same selector) and at least one shared longhand (equal
 family, masks that share a bit; `all` overlaps every property it resets).
 A legacy alias that css-grammar registers (`grid-gap`, `grid-row-gap`,
 `grid-column-gap`, `word-wrap`, `font-width`) counts as its canonical
-property, so `grid-gap: 40px` and a later `gap: 16px` compete.
+property, so `grid-gap: 40px` and a later `gap: 16px` compete. A logical
+property and the physical properties it can map to also compete
+(`margin-inline-start` and `margin-left`, `inline-size` and `width`, ...),
+whatever the writing mode, from one table, `Slot_key.logical_physical_pairs`
+(`packages/ppx/test/css-support/ordered-sheet-logical-physical.t`).
+`CSS.merge` still keeps them apart: it never drops a physical class for a
+logical one or the reverse.
 
 **Order keys**, in priority:
 
@@ -600,7 +609,7 @@ must precede.
 **Conflicts and cycles.** Two blocks or merges that order the same two
 rules in opposite directions: a warning names both (`block <longident>` or
 `block <file:line>`, `merge at <file:line>`), both edges are dropped, and
-the pair keeps definition order (`tiers-condition-tie-pseudo-class.t`). A
+the pair keeps definition order (`block-order-pseudo-class.t`). A
 longer cycle is cut at the rule that waits on the fewest edges, with a
 warning naming the blocks and merges whose order it drops
 (`ordered-sheet-cycle.t`).
@@ -616,7 +625,7 @@ order between their rules, when they share a class.** Class hashes take no
 library name (see "Atomization"), so two libraries that declare the same
 atom share its class. Run one `styled-ppx.generate` per app over all its
 libraries; two `<link>`s concatenate on the page in load order - see
-`tiers-two-stylesheets.t`.
+`two-stylesheets.t`.
 
 **Takes no part in ordering, always**: `@property`, `@keyframes`,
 `@font-face` registrations, hoisted `@import`/`@namespace`, dropped

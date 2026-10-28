@@ -125,7 +125,7 @@ follow, in one order that `styled-ppx.generate` builds from three sources:
    descendant (`.wrapper * { ... }`, `.list li { ... }`) is emitted before
    same-element rules, so a component's own class beats an ancestor's blind
    `* { ... }` reach on a `(0,1,0)` tie
-   (`packages/generate/test/descendant-tier.t`).
+   (`packages/generate/test/descendant-first.t`).
 2. **Edges.** Two atom rules *compete* when only the sheet position can
    decide between them: equal importance, equal specificity, the same
    element and pseudo-element, and at least one shared longhand. A legacy
@@ -138,7 +138,7 @@ follow, in one order that `styled-ppx.generate` builds from three sources:
      nested rule.
      `[%css "&:focus { color: blue; } &:hover { color: red; }"]` gives `red`
      when both apply, because `:hover` is written last
-     (`packages/generate/test/tiers-condition-tie-single-block.t`).
+     (`packages/generate/test/block-order-single-block.t`).
      `[%css "@media (max-width: 600px) { color: pink; } color: black;"]`
      gives `pink` under the media query: `color: black` is a declaration of
      the block, so it comes before the nested `@media` rule
@@ -156,7 +156,7 @@ The sheet is built from its end, so a rule stays at its definition position
 unless an edge pulls it ahead of a rule it must precede. Two blocks or
 merges that put the same two rules in opposite orders are a conflict: the
 build prints a warning that names both, and the pair keeps definition order
-(`packages/generate/test/tiers-condition-tie-pseudo-class.t`). A longer
+(`packages/generate/test/block-order-pseudo-class.t`). A longer
 cycle is cut at one rule, with a warning
 (`packages/generate/test/ordered-sheet-cycle.t`).
 
@@ -172,7 +172,7 @@ would pull `headerWithBanner`'s `padding` rules ahead of `header`'s, and
 **No CSS layer wraps any of this.** Specificity decides first, exactly
 like plain CSS; sheet position is only ever the tie-break, never an
 unconditional priority. A hand-written selector with higher specificity
-than an atom still wins outright (`packages/generate/test/global-tier.t`).
+than an atom still wins outright (`packages/generate/test/global-first.t`).
 
 ### Overlapping `@media` conditions in one block
 
@@ -240,7 +240,7 @@ libraries.
 Two separate runs (two `<link>`s) give no such guarantee: their rules
 concatenate on the page in load order, so a tie between two sheets that
 share a class depends on which one the browser loads first
-(`packages/generate/test/tiers-two-stylesheets.t`).
+(`packages/generate/test/two-stylesheets.t`).
 
 ## Known limits
 
@@ -261,7 +261,7 @@ share a class depends on which one the browser loads first
 - **`merge(wide, narrow)` keeps both classes.** Same fact as the
   shorthand-then-longhand example above — it depends on sheet order, not
   on `merge` itself, to pick the right one. A merge the ppx resolves gives
-  that order (`packages/generate/test/tiers-shorthand-sort.t`); see the
+  that order (`packages/generate/test/merge-bundle-longhands.t`); see the
   next limit for one it can not resolve.
 - **A merge the ppx can not resolve.** Merge edges need both arguments to
   name a `[%css]` block the ppx can see: a binding, or an inline `[%css]`.
@@ -275,10 +275,17 @@ share a class depends on which one the browser loads first
 - **Two orders that disagree.** Two blocks or merges that put the same two
   competing rules in opposite orders can not both hold; the build warns,
   names both, and keeps definition order for the pair
-  (`packages/generate/test/tiers-condition-tie-pseudo-class.t`). This
+  (`packages/generate/test/block-order-pseudo-class.t`). This
   includes `merge(a, b)` in one place and `merge(b, a)` elsewhere when
   both calls keep both classes; a call that drops a class orders nothing
   for it (`packages/ppx/test/css-support/ordered-sheet-merge-both-orders.t`).
+- **Logical and physical properties.** `merge(left, inline)` where `left`
+  sets `margin-left` and `inline` sets `margin-inline-start` keeps both
+  classes: which physical side a logical property sets depends on the
+  writing mode and direction, which `merge` does not know. The sheet orders
+  the two (a logical property competes with every physical property it can
+  map to, `packages/ppx/test/css-support/ordered-sheet-logical-physical.t`),
+  so the merge's or the block's order decides, in every writing mode.
 - **Rules of different specificity are not reordered.** An at-rule adds no
   specificity, a pseudo-class does: `&:hover` beats a bare `@media` atom
   whatever the order, as in plain CSS.

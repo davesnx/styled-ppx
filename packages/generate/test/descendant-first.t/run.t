@@ -1,20 +1,15 @@
-The separate `styled-ppx.descendant`
-tier is gone. It sat below `styled-ppx.base` unconditionally, so an ancestor's
-descendant-shaped rule (the `descendant` field of the rule's key, which the
-ppx computes: a combinator reaching for an unclassed subject: a bare element
-type, `*`, or a pseudo-class chain with no class of its own) always lost to a child's own atom regardless of
-specificity - fixing the one real tie (the ancestor-wildcard case below) by breaking five
-more patterns where the ancestor's rule is genuinely MORE specific and should
-win, same as it did before tiers existed. There are no tiers now: every atom
-rule is in one ordered list (see "Ordered sheet" in `generate.ml`), and real
+A descendant-shaped rule (the `descendant` field of the rule's key, which
+the ppx computes: a combinator reaching for an unclassed subject: a bare
+element type, `*`, or a pseudo-class chain with no class of its own) is
+emitted BEFORE own-element rules (the first key of the "Ordered sheet" in
+`generate.ml`), so a genuine specificity TIE resolves to the child's own
+atom, since the later rule in a tie wins. No CSS layer is involved: real
 specificity decides between rules of different specificity, whatever their
-position. The words `base` (unconditional) and `conditional` (wrapped in an
-at-rule, or a pseudo-class on the atom's own compound) below only describe a
-rule's context. A descendant-shaped rule is still emitted BEFORE own-element
-rules (the first key of the order), so the one case that needed the old tier
-- a genuine specificity TIE - still resolves to the child, since the later
-rule in a tie wins. A `[%styled.global]` rule is emitted before every atom,
-see `global-tier.t`.
+position, so an ancestor's rule that is genuinely MORE specific still wins
+(the patterns below). The words `base` (unconditional) and `conditional`
+(wrapped in an at-rule, or a pseudo-class on the atom's own compound) below
+only describe a rule's context. A `[%styled.global]` rule is emitted before
+every atom, see `global-first.t`.
 
 The ancestor-wildcard tie: a wrapper's
 descendant rule (`._in_j8vuse * { color }`, a bundle - no class of its own on
@@ -37,7 +32,7 @@ What the browser does now, and why: both rules are unconditional and
 unlayered. The descendant-shaped wrapper rule is emitted FIRST (the first key
 of the order), so on the (0,1,0) vs (0,1,0) tie the span's own `color:black`, being LATER,
 wins - restoring "an element's own class beats an ancestor's blind reach for
-`*`/an unclassed descendant" without needing a dedicated lower tier for it.
+`*`/an unclassed descendant" without a cascade layer.
 
 A subject WITH its own class - `.tiptap` here, or an `.id-...` class a
 `$(binding)` reference would resolve to - is not this shape: it targets a
@@ -91,7 +86,7 @@ atom. The wrapper's rule is wrapped in `@media`, so it is classified
 Neither is layered, so this IS a specificity question:
 `._a_menuwrap > :last-child` is one class plus one pseudo-class, (0,1,1),
 strictly more specific than the plain atom's (0,1,0) - the wrapper wins at
-that breakpoint by specificity, same as it would with no tiers at all. The
+that breakpoint by specificity, as in plain CSS. The
 ordered sheet puts the descendant-shaped rule first (see "Ordered sheet" in
 `generate.ml`), which would give a genuine tie to the item's own atom, but
 specificity alone already decides this pair.

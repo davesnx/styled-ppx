@@ -5,6 +5,7 @@
  (libraries
   css_extraction
   class_format
+  slot_key
   ppxlib
   ppxlib.astlib
   compiler-libs.common)

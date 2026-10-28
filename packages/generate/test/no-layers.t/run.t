@@ -1,7 +1,7 @@
 `styled-ppx.generate` emits no `@layer` at all: a page that links this
 output alongside anything else competes by ordinary CSS specificity and
 position, like plain CSS with no layers ever existing (see "Sheet order"
-in `generate.ml`, and `global-tier.t`/`descendant-tier.t` for the
+in `generate.ml`, and `global-first.t`/`descendant-first.t` for the
 consequences that accepts). The output order is still fixed - globals,
 then the atoms in the "Ordered sheet" order (parent-to-child shape, block
 edges, definition order) - but nothing wraps any of it in a

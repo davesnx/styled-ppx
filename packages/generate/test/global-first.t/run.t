@@ -1,6 +1,6 @@
 A `[%styled.global]` rule (`*{box-sizing:inherit;}` here -
 `html`/`body`/`*`/`*::before` are the same shape) carries no atom class, so
-it is `global`, emitted before every atom (see "Cascade tiers" in
+it is a global rule, emitted before every atom (see "Sheet order" in
 `generate.ml`) - but with no `@layer` around either group, that position is
 only ever a tie-break: ordinary CSS specificity decides first, same as any
 two plain, unlayered rules.
@@ -82,7 +82,8 @@ more specific atom out-specifies a global default even under
 `!important`, the same as plain CSS always allows.
 
 `@property`/`@keyframes`/`@font-face` registrations are unaffected - they
-take no part in tiering at all, so they are unchanged by any of this.
+take no part in the sheet order at all, so they are unchanged by any of
+this.
 
   $ cat > registration.ml <<EOF
   > [@@@css "@property --brand{syntax:\"<color>\";inherits:false;initial-value:red;}"]

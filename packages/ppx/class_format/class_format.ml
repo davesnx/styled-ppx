@@ -95,28 +95,26 @@ let possible_extra_lengths =
 let bundle_class content = bundle_prefix ^ Murmur2.default content
 
 let slot_class (slot : Slot_key.t) content =
-  if slot.bundle then bundle_class content
-  else (
-    (* No important-atom prefix (see the note above [floor_of_prefix]) - an
+  (* No important-atom prefix (see the note above [floor_of_prefix]) - an
        !important atom already pays for a real context field instead, since
        {!Slot_key.context_key} folds importance into the context. *)
-    let context_part =
-      let key = Slot_key.context_key slot.context in
-      if key = "" then "" else hashed_field ~width:context_width key
-    in
-    let family_part =
-      to_base36_padded ~width:family_width (Slot_key.family_marker slot.family)
-    in
-    let extended_part =
-      match Slot_key.extended_hash slot.family with
-      | None -> ""
-      | Some h -> to_base36_padded ~width:extended_width h
-    in
-    let mask_part =
-      match slot.mask with
-      | None -> ""
-      | Some m -> to_base36_padded ~width:mask_width m
-    in
-    let value_part = hashed_field ~width:value_width content in
-    Printf.sprintf "%s%s%s%s%s%s" atom_prefix context_part family_part
-      extended_part mask_part value_part)
+  let context_part =
+    let key = Slot_key.context_key slot.context in
+    if key = "" then "" else hashed_field ~width:context_width key
+  in
+  let family_part =
+    to_base36_padded ~width:family_width (Slot_key.family_marker slot.family)
+  in
+  let extended_part =
+    match Slot_key.extended_hash slot.family with
+    | None -> ""
+    | Some h -> to_base36_padded ~width:extended_width h
+  in
+  let mask_part =
+    match slot.mask with
+    | None -> ""
+    | Some m -> to_base36_padded ~width:mask_width m
+  in
+  let value_part = hashed_field ~width:value_width content in
+  Printf.sprintf "%s%s%s%s%s%s" atom_prefix context_part family_part
+    extended_part mask_part value_part

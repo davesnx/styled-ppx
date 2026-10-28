@@ -19,4 +19,4 @@ plain CSS reads it, whatever the definition order of the two rules:
 
 For an element that is both hovered and focused, `color: red` (hover, written
 last) wins. Two blocks that write the same pair in opposite orders are a
-conflict, see `tiers-condition-tie-pseudo-class.t`.
+conflict, see `block-order-pseudo-class.t`.
