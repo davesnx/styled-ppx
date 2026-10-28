@@ -1663,7 +1663,6 @@ module Css_transform = {
           let decl_string = render_declaration(decl);
           let (className, namespace) =
             Hash_class.class_and_namespace(
-              ~namespace=Settings.Get.namespace(),
               ~slot=Slot_key.of_atom(bare_rule),
               decl_string,
             );
@@ -1685,7 +1684,6 @@ module Css_transform = {
             });
           let (className, namespace) =
             Hash_class.class_and_namespace(
-              ~namespace=Settings.Get.namespace(),
               ~slot=Slot_key.of_atom(style_rule),
               group_string,
             );
@@ -1726,7 +1724,6 @@ module Css_transform = {
             let rule_string = render_rule(style_rule);
             let (className, namespace) =
               Hash_class.class_and_namespace(
-                ~namespace=Settings.Get.namespace(),
                 ~slot=Slot_key.of_atom(style_rule),
                 rule_string,
               );
@@ -1892,7 +1889,6 @@ module Css_transform = {
                  });
                let (new_className, new_namespace) =
                  Hash_class.class_and_namespace(
-                   ~namespace=Settings.Get.namespace(),
                    ~slot=Slot_key.of_atom(context_source),
                    wrapped_string,
                  );
@@ -2086,10 +2082,7 @@ module Css_transform = {
                  render_rule(rule);
                });
           let bundle_class_and_namespace =
-            Hash_class.bundle_class_and_namespace(
-              ~namespace=Settings.Get.namespace(),
-              String.concat("", seeds),
-            );
+            Hash_class.bundle_class_and_namespace(String.concat("", seeds));
           List.iter(
             k => {
               let (atomic_index, _) = interpolating_atoms[k];
@@ -2213,7 +2206,6 @@ let identity_of_name = (~main_module, ~scope, ~name: option(string)) =>
     let occurrence = next_identity_occurrence(~scope, ~name=n);
     Some(
       Hash_class.identity_class(
-        ~namespace=Settings.Get.namespace(),
         ~module_name=main_module,
         ~scope,
         ~name=n,

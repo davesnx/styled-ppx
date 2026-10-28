@@ -5,6 +5,7 @@
  (libraries
   styled-ppx
   css_extraction
+  class_format
   slot_key
   ppxlib
   ppxlib.astlib

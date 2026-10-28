@@ -24,16 +24,16 @@ top-level interpolation does. If the inline list is empty `[]` for the
   [@css "._a_wu9h64eac4l::placeholder{color:var(--c-gzgct8);}"];
   [@css.bindings
     [
-      ("Input.topLevel", "_id_1pfdov9", "_a_4exvk3"),
-      ("Input.hover", "_id_zu568x", "_a_qyw7u4eh0hp"),
-      ("Input.placeholder", "_id_1xk9ylj", "_a_wu9h64eac4l"),
+      ("Input.topLevel", "_id_1777i86", "_a_4exvk3"),
+      ("Input.hover", "_id_15yirr8", "_a_qyw7u4eh0hp"),
+      ("Input.placeholder", "_id_19g790e", "_a_wu9h64eac4l"),
     ]
   ];
   [@css.blocks
     [
-      (14, "_id_1pfdov9 _a_4exvk3"),
-      (17, "_id_zu568x _a_qyw7u4eh0hp"),
-      (20, "_id_1xk9ylj _a_wu9h64eac4l"),
+      (14, "_id_1777i86 _a_4exvk3"),
+      (17, "_id_15yirr8 _a_qyw7u4eh0hp"),
+      (20, "_id_19g790e _a_wu9h64eac4l"),
     ]
   ];
   
@@ -41,19 +41,19 @@ top-level interpolation does. If the inline list is empty `[]` for the
   
   let topLevel =
     CSS.make(
-      "label:topLevel _id_1pfdov9 _a_4exvk3",
+      "label:topLevel _id_1777i86 _a_4exvk3",
       [("--c-dq4mhq", CSS.Types.Color.toString(c))],
     );
   
   let hover =
     CSS.make(
-      "label:hover _id_zu568x _a_qyw7u4eh0hp",
+      "label:hover _id_15yirr8 _a_qyw7u4eh0hp",
       [("--c-11hlefi", CSS.Types.Color.toString(c))],
     );
   
   let placeholder =
     CSS.make(
-      "label:placeholder _id_1xk9ylj _a_wu9h64eac4l",
+      "label:placeholder _id_19g790e _a_wu9h64eac4l",
       [("--c-gzgct8", CSS.Types.Color.toString(c))],
     );
   

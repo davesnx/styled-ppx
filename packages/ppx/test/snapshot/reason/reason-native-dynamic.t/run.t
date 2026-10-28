@@ -10,12 +10,12 @@
     [
       (
         "Output.DynamicComponent",
-        "_id_1hmg1vc",
+        "_id_1sfnaz9",
         "_a_4e7bjx _a_5r08qs _a_390004g7ti",
       ),
     ]
   ];
-  [@css.blocks [(5, "_id_1hmg1vc _a_4e7bjx _a_5r08qs _a_390004g7ti")]];
+  [@css.blocks [(5, "_id_1sfnaz9 _a_4e7bjx _a_5r08qs _a_390004g7ti")]];
   module DynamicComponent: {
     type makeProps('id, 'var);
     let make: makeProps(_, _) => React.element;
@@ -975,7 +975,7 @@
       };
     let styles = (~var, ~id, _) =>
       CSS.make(
-        "label:DynamicComponent _id_1hmg1vc _a_4e7bjx _a_5r08qs _a_390004g7ti",
+        "label:DynamicComponent _id_1sfnaz9 _a_4e7bjx _a_5r08qs _a_390004g7ti",
         [
           ("--var-17zksex", CSS.Types.Color.toString(var)),
           ("--id-1s0m1fr", CSS.Types.Color.toString(id)),

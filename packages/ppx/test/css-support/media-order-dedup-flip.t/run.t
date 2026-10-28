@@ -24,15 +24,15 @@ the two blocks no longer collide and each keeps its own author order.
     "@media (min-width: 900px) and (not (min-width: 600px)){._a_mp5mk4exhzt{color:blue;}}"]
   [@@@css "@media (min-width: 600px) {._a_izob04e698n{color:red;}}"]
   [@@@css.bindings
-    [("Output.blockA", "_id_bitm25", "_a_izob04e6zo5 _a_mp5mk4et4n8");
-    ("Output.blockB", "_id_1kl48f", "_a_mp5mk4exhzt _a_izob04e698n")]]
+    [("Output.blockA", "_id_79p0dv", "_a_izob04e6zo5 _a_mp5mk4et4n8");
+    ("Output.blockB", "_id_64a5lb", "_a_mp5mk4exhzt _a_izob04e698n")]]
   [@@@css.blocks
-    [(3, "_id_bitm25 _a_izob04e6zo5 _a_mp5mk4et4n8");
-    (9, "_id_1kl48f _a_mp5mk4exhzt _a_izob04e698n")]]
+    [(3, "_id_79p0dv _a_izob04e6zo5 _a_mp5mk4et4n8");
+    (9, "_id_64a5lb _a_mp5mk4exhzt _a_izob04e698n")]]
   let blockA =
-    CSS.make "label:blockA _id_bitm25 _a_izob04e6zo5 _a_mp5mk4et4n8" []
+    CSS.make "label:blockA _id_79p0dv _a_izob04e6zo5 _a_mp5mk4et4n8" []
   let blockB =
-    CSS.make "label:blockB _id_1kl48f _a_mp5mk4exhzt _a_izob04e698n" []
+    CSS.make "label:blockB _id_64a5lb _a_mp5mk4exhzt _a_izob04e698n" []
   let _ = (blockA, blockB)
 
   $ styled-ppx.generate output.ml > styles.css

@@ -14,23 +14,23 @@ bare `$(marker)` resolves to the included `Css.marker` binding.
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css "._a_4ekvmb{color:red;}"];
-  [@css "._a_qye7h4eikep._id_zr2uk1{color:blue;}"];
+  [@css "._a_qiu8x4e3zf2._id_gfnxs2{color:blue;}"];
   [@css.bindings
     [
-      ("Input.Css.marker", "_id_zr2uk1", "_a_4ekvmb"),
-      ("Input.wrapper", "_id_4f6ye3", "_a_qye7h4eikep"),
+      ("Input.Css.marker", "_id_gfnxs2", "_a_4ekvmb"),
+      ("Input.wrapper", "_id_cuy74s", "_a_qiu8x4e3zf2"),
     ]
   ];
   [@css.blocks
-    [(2, "_id_zr2uk1 _a_4ekvmb"), (7, "_id_4f6ye3 _a_qye7h4eikep")]
+    [(2, "_id_gfnxs2 _a_4ekvmb"), (7, "_id_cuy74s _a_qiu8x4e3zf2")]
   ];
   module Css = {
-    let marker = CSS.make("label:marker _id_zr2uk1 _a_4ekvmb", []);
+    let marker = CSS.make("label:marker _id_gfnxs2 _a_4ekvmb", []);
   };
   
   include Css;
   
-  let wrapper = CSS.make("label:wrapper _id_4f6ye3 _a_qye7h4eikep", []);
+  let wrapper = CSS.make("label:wrapper _id_cuy74s _a_qiu8x4e3zf2", []);
   
   let _ = (Css.marker, wrapper);
 

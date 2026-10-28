@@ -201,38 +201,30 @@ when `b` sets the same property under the same written condition, even if
 
 ## Several libraries on one page
 
-`--namespace` (the ppx flag; defaults to the dune `library-name` cookie,
-so it needs no flag in the common case) salts every class with the
-compiling library's name. Two different libraries never mint the same
-class for the same declaration, so one library's sheet can never win a
-position tie against another's — each library's classes only ever compete
-with its own (`packages/ppx/test/css-support/atom-namespace-salt.t`).
+No class hash takes a library name. Two libraries that declare the same
+atom share its class, and a native build and its Melange twin of the same
+source mint identical classes with no configuration, so the
+server-rendered HTML matches the client stylesheet
+(`packages/ppx/test/css-support/library-twin-same-classes.t`).
 
-**A native build and its Melange twin of the same source** are the one
-exception on purpose: pass them the SAME explicit `--namespace=<name>`
-(one token — `--namespace demo` as two separate tokens in a dune `(pps
-...)` list fails, since dune then tries to resolve `demo` itself as a
-library) in both `(pps ...)` stanzas, or the server-rendered HTML and the
-client bundle mint different classes for what should be identical markup
-(`packages/ppx/test/css-support/atom-namespace-twin.t`; see
-`demo/melange/lib/native/dune`/`demo/melange/lib/js/dune` for a real
-example).
+Run one `styled-ppx.generate` per app, over every library the app links,
+and serve the one sheet it writes. That run orders every library's rules
+in library dependency order (a library's rules after the rules of every
+library it depends on, `--order dependency`, the default), keeps one copy
+of each shared atom, and fails on a class collision between any two
+libraries.
 
-Link every page's stylesheets in library dependency order (a library's
-sheet after the sheets of every library it depends on) — the same order
-`styled-ppx.generate` already uses to place rules within one sheet
-(`--order dependency`, the default). This doesn't fully guarantee
-cross-sheet ties: two different `<link>`s' rules simply concatenate on
-the page in load order, so a genuine tie between two sheets that DO
-share a class (a twin pair, or two libraries built with no namespace at
-all) still depends on which one the browser loads first
+Two separate runs (two `<link>`s) give no such guarantee: their rules
+concatenate on the page in load order, so a tie between two sheets that
+share a class depends on which one the browser loads first
 (`packages/generate/test/tiers-two-stylesheets.t`).
 
 ## Known limits
 
 - **Partial cover across libraries.** `merge(a, b)` where `a` sets
   `margin` and `b` sets only `margin-top` keeps both classes (the example
-  above) — correct as long as `b`'s library's sheet loads after `a`'s.
+  above) — correct as long as `b`'s library comes after `a`'s in the
+  sheet, which dependency order gives when `b`'s library depends on `a`'s.
 - **Interpolation bundles.** `merge` never drops an `_in_` bundle, so an
   override of a property inside a bundle is decided by specificity and
   sheet order, not by argument order (the `card` example above).

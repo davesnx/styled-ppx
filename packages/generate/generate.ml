@@ -79,11 +79,11 @@ let longident_head longident =
     mapping to the binding's identity class, so resolution is a direct
     [Hashtbl.find_opt]. [by_identity] is the reverse index used only to detect
     an identity collision: two different bindings whose identity classes
-    coincide (e.g. same module basename and binding name in two libraries,
-    without a distinguishing [--namespace]) but whose atomized content differs.
-    Two entries with the SAME identity and the SAME [class_string] are not a
-    collision — that's the same module compiled twice (native + melange
-    [copy_files], vendoring), which is expected and benign. *)
+    coincide (same module basename, submodule path and binding name in two
+    libraries) but whose atomized content differs. Two entries with the SAME
+    identity and the SAME [class_string] are not a collision — that's the same
+    module compiled twice (native + melange [copy_files], vendoring), which is
+    expected and benign. *)
 module Index = struct
   type t = {
     by_longident : (string, string) Hashtbl.t;
@@ -99,11 +99,12 @@ module Index = struct
     ~other:(other_longident, other_class_string, other_filename) =
     Printf.sprintf
       "identity collision: %S (in %s) and %S (in %s) both hash to identity %s, \
-       but carry different CSS (%S vs %S). Pass `--namespace <name>` to one \
-       library's (pps styled-ppx ...) stanza, identically on its native and \
-       melange stanzas."
+       but carry different CSS (%S vs %S). An identity hashes only the module \
+       name, the submodule path and the binding name, so two libraries that \
+       each define %s share it. Rename the module or the binding in one of \
+       them."
       other_longident other_filename entry.longident filename entry.identity
-      other_class_string entry.class_string
+      other_class_string entry.class_string entry.longident
 
   (* [`Malformed] is a payload the PPX could not have produced (a decode
      failure); [`Collision] is a well-formed payload that names a real
@@ -633,10 +634,14 @@ let check_atom_class_collisions rules =
           Some
             (Printf.sprintf
                "atom class collision: %S and %S both use class %S but render \
-                different CSS - a value-hash collision (astronomically \
-                unlikely by chance; rerun with a different --namespace on one \
-                side, or file an issue)."
-               other rule class_name)
+                different CSS. The class ends in a %d-character base-36 hash \
+                of the declaration (%d values per context, family and mask), \
+                so two different declarations can share it by chance. Write \
+                one of the two declarations differently (an equivalent value \
+                or unit), and report the pair at \
+                https://github.com/davesnx/styled-ppx/issues."
+               other rule class_name Class_format.value_width
+               (int_of_float (36. ** float_of_int Class_format.value_width)))
         | _ ->
           Hashtbl.replace seen class_name rule;
           None))
@@ -653,14 +658,11 @@ let check_atom_class_collisions rules =
    first, position only breaks a tie, so a [%styled.global] rule with higher
    specificity than an atom wins outright (`global-tier.t`).
 
-   Accepted, not fixed: two SEPARATE `styled-ppx.generate` invocations (two
-   `<link>`s on one page) have no guaranteed relative order between their
-   rules, for the rare case where the two sheets share a class -
-   `--namespace` salts each library's atom classes (see `Hash_class.ml`),
-   so two different libraries never mint the same one; sharing a class
-   only happens for a native/Melange twin pair passing the same explicit
-   `--namespace`, or for two runs with no namespace at all
-   (`tiers-two-stylesheets.t`). *)
+   Class hashes take no library name (see `Hash_class.ml`), so two
+   libraries that declare the same atom share its class. One run per app
+   orders, dedups and collision-checks every library together. Two
+   SEPARATE runs (two `<link>`s on one page) have no guaranteed relative
+   order between the rules they share (`tiers-two-stylesheets.t`). *)
 
 (** [@property]/[@keyframes]/[@font-face] are registrations, not style rules
     that compete for an element - a [@property] rule is a custom-property

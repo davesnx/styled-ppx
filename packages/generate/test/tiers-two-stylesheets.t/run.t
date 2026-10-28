@@ -4,12 +4,11 @@ generated stylesheets (the "static" sheet, which also narrows it under
 `@media (min-width:1280px)`, and an unrelated "toolkit" sheet, which
 doesn't). Each stylesheet comes from its OWN `styled-ppx.generate`
 invocation - dune builds them separately, and a real page loads both
-`<link>`s. In a real build, two DIFFERENT libraries never share an atom
-class this way - `--namespace` salts each one's classes - so this shape
-only arises for a native/Melange twin pair sharing one explicit
-`--namespace`, or for two runs with no namespace at all; this fixture
-uses hand-written `[@@@css ...]` rules directly, skipping the PPX, to
-isolate `generate.ml`'s own behavior once two sheets DO share a class.
+`<link>`s. Class hashes take no library name, so two libraries that
+declare the same atom share its class; one `generate` run per app avoids
+this shape. This fixture uses hand-written `[@@@css ...]` rules directly,
+skipping the PPX, to isolate `generate.ml`'s own behavior once two sheets
+DO share a class.
 
 `base` and `conditional` (and `global`) are ordinary, unlayered rules,
 each sheet ordering its OWN tiers by plain emission position, the same

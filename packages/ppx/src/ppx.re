@@ -1000,12 +1000,6 @@ let () = {
     ),
   );
 
-  Ppxlib.Driver.add_arg(
-    ~doc=Settings.namespace.doc,
-    Settings.namespace.flag,
-    Arg.String(Settings.Update.namespace),
-  );
-
   /* dune passes `--cookie library-name="<name>"` to every ppx run inside a
      (library ...) stanza. Recorded so the wire protocol can tell the
      aggregator which library a file's rules belong to. */

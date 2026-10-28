@@ -50,32 +50,32 @@ Comprehensive test for cx2 interpolation with various property types
   [@css "._a_4ekvmb{color:red;}"];
   [@css.bindings
     [
-      ("Output.test1", "_id_1jhxcqu", "_in_b8f0pi"),
-      ("Output.test2", "_id_zesghj", "_in_1swajk7"),
-      ("Output.test3", "_id_12rsoz0", "_a_6fvyy6"),
-      ("Output.test4", "_id_puktrw", "_in_1vzwmoy"),
-      ("Output.test5", "_id_1nw36ql", "_a_600001pa9s"),
-      ("Output.test6", "_id_7ivz4", "_in_1knt7y9"),
-      ("Output.test7", "_id_iq7p3", "_in_1d6x35p"),
-      ("Output.test8", "_id_yq2qob", "_a_ekxgpr"),
-      ("Output.test9", "_id_1u4o5z6", "_a_3h1lokzkxi"),
-      ("Output.test10", "_id_1egwgp0", "_in_zoi7e9"),
-      ("Output.test11", "_id_16lxxsk", "_a_eckyy8 _a_6lnay0 _a_4ekvmb"),
+      ("Output.test1", "_id_v2u9l", "_in_b8f0pi"),
+      ("Output.test2", "_id_nrr9j", "_in_1swajk7"),
+      ("Output.test3", "_id_2r01nv", "_a_6fvyy6"),
+      ("Output.test4", "_id_1j4dp7o", "_in_1vzwmoy"),
+      ("Output.test5", "_id_sz77bn", "_a_600001pa9s"),
+      ("Output.test6", "_id_uiyng3", "_in_1knt7y9"),
+      ("Output.test7", "_id_s2zlt2", "_in_1d6x35p"),
+      ("Output.test8", "_id_okdsc1", "_a_ekxgpr"),
+      ("Output.test9", "_id_1p3lcp2", "_a_3h1lokzkxi"),
+      ("Output.test10", "_id_bjx2e8", "_in_zoi7e9"),
+      ("Output.test11", "_id_9502q", "_a_eckyy8 _a_6lnay0 _a_4ekvmb"),
     ]
   ];
   [@css.blocks
     [
-      (7, "_id_1jhxcqu _in_b8f0pi"),
-      (15, "_id_zesghj _in_1swajk7"),
-      (23, "_id_12rsoz0 _a_6fvyy6"),
-      (30, "_id_puktrw _in_1vzwmoy"),
-      (36, "_id_1nw36ql _a_600001pa9s"),
-      (42, "_id_7ivz4 _in_1knt7y9"),
-      (47, "_id_iq7p3 _in_1d6x35p"),
-      (52, "_id_yq2qob _a_ekxgpr"),
-      (58, "_id_1u4o5z6 _a_3h1lokzkxi"),
-      (65, "_id_1egwgp0 _in_zoi7e9"),
-      (70, "_id_16lxxsk _a_eckyy8 _a_6lnay0 _a_4ekvmb"),
+      (7, "_id_v2u9l _in_b8f0pi"),
+      (15, "_id_nrr9j _in_1swajk7"),
+      (23, "_id_2r01nv _a_6fvyy6"),
+      (30, "_id_1j4dp7o _in_1vzwmoy"),
+      (36, "_id_sz77bn _a_600001pa9s"),
+      (42, "_id_uiyng3 _in_1knt7y9"),
+      (47, "_id_s2zlt2 _in_1d6x35p"),
+      (52, "_id_okdsc1 _a_ekxgpr"),
+      (58, "_id_1p3lcp2 _a_3h1lokzkxi"),
+      (65, "_id_bjx2e8 _in_zoi7e9"),
+      (70, "_id_9502q _a_eckyy8 _a_6lnay0 _a_4ekvmb"),
     ]
   ];
   let lengthVar = CSS.px(10);
@@ -84,7 +84,7 @@ Comprehensive test for cx2 interpolation with various property types
   let autoVar = `auto;
   let test1 =
     CSS.make(
-      "label:test1 _id_1jhxcqu _in_b8f0pi",
+      "label:test1 _id_v2u9l _in_b8f0pi",
       [
         ("--lengthVar-1fwod6p", CSS.Types.Width.toString(lengthVar)),
         ("--lengthVar-5g6bk9", CSS.Types.Height.toString(lengthVar)),
@@ -94,7 +94,7 @@ Comprehensive test for cx2 interpolation with various property types
     );
   let test2 =
     CSS.make(
-      "label:test2 _id_zesghj _in_1swajk7",
+      "label:test2 _id_nrr9j _in_1swajk7",
       [
         ("--lengthVar-oy21bt", CSS.Types.Margin.toString(lengthVar)),
         ("--lengthVar-1lpa833", CSS.Types.Length.toString(lengthVar)),
@@ -102,18 +102,18 @@ Comprehensive test for cx2 interpolation with various property types
     );
   let test3 =
     CSS.make(
-      "label:test3 _id_12rsoz0 _a_6fvyy6",
+      "label:test3 _id_2r01nv _a_6fvyy6",
       [("--lengthVar-vh1osb", CSS.Types.Gap.toString(lengthVar))],
     );
   let test4 =
     CSS.make(
-      "label:test4 _id_puktrw _in_1vzwmoy",
+      "label:test4 _id_1j4dp7o _in_1vzwmoy",
       [("--colorVar-14sye4i", CSS.Types.Color.toString(colorVar))],
     );
   let flexBasisVar = CSS.px(100);
   let test5 =
     CSS.make(
-      "label:test5 _id_1nw36ql _a_600001pa9s",
+      "label:test5 _id_sz77bn _a_600001pa9s",
       [
         ("--flexBasisVar-16vl5bp", CSS.Types.FlexBasis.toString(flexBasisVar)),
       ],
@@ -121,7 +121,7 @@ Comprehensive test for cx2 interpolation with various property types
   let gridLineVar = `auto;
   let test6 =
     CSS.make(
-      "label:test6 _id_7ivz4 _in_1knt7y9",
+      "label:test6 _id_uiyng3 _in_1knt7y9",
       [
         ("--gridLineVar-1qxvc00", CSS.Types.GridRowStart.toString(gridLineVar)),
         (
@@ -133,7 +133,7 @@ Comprehensive test for cx2 interpolation with various property types
   let topVar = CSS.px(20);
   let test7 =
     CSS.make(
-      "label:test7 _id_iq7p3 _in_1d6x35p",
+      "label:test7 _id_s2zlt2 _in_1d6x35p",
       [
         ("--topVar-1iqysbe", CSS.Types.Top.toString(topVar)),
         ("--topVar-10dkp5m", CSS.Types.Bottom.toString(topVar)),
@@ -142,13 +142,13 @@ Comprehensive test for cx2 interpolation with various property types
   let zIndexVar = `num(10);
   let test8 =
     CSS.make(
-      "label:test8 _id_yq2qob _a_ekxgpr",
+      "label:test8 _id_okdsc1 _a_ekxgpr",
       [("--zIndexVar-osv02l", CSS.Types.ZIndex.toString(zIndexVar))],
     );
   let borderWidthVar = `medium;
   let test9 =
     CSS.make(
-      "label:test9 _id_1u4o5z6 _a_3h1lokzkxi",
+      "label:test9 _id_1p3lcp2 _a_3h1lokzkxi",
       [
         (
           "--borderWidthVar-1nwhzbd",
@@ -159,7 +159,7 @@ Comprehensive test for cx2 interpolation with various property types
   let spacingVar = CSS.px(2);
   let test10 =
     CSS.make(
-      "label:test10 _id_1egwgp0 _in_zoi7e9",
+      "label:test10 _id_bjx2e8 _in_zoi7e9",
       [
         ("--spacingVar-15s0ecx", CSS.Types.LetterSpacing.toString(spacingVar)),
         ("--spacingVar-1m50b62", CSS.Types.WordSpacing.toString(spacingVar)),
@@ -167,6 +167,6 @@ Comprehensive test for cx2 interpolation with various property types
     );
   let test11 = width =>
     CSS.make(
-      "label:test11 _id_16lxxsk _a_eckyy8 _a_6lnay0 _a_4ekvmb",
+      "label:test11 _id_9502q _a_eckyy8 _a_6lnay0 _a_4ekvmb",
       [("--width-18c1xss", CSS.Types.Width.toString(width))],
     );

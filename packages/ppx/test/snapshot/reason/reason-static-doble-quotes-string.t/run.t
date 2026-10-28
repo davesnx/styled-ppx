@@ -4,9 +4,9 @@
   [@css "._a_5r08qs{display:flex;}"];
   [@css "._a_9h0002ndxa{justify-content:center;}"];
   [@css.bindings
-    [("Output.SingleQuoteStrings", "_id_ekh1sj", "_a_5r08qs _a_9h0002ndxa")]
+    [("Output.SingleQuoteStrings", "_id_ihvjd0", "_a_5r08qs _a_9h0002ndxa")]
   ];
-  [@css.blocks [(2, "_id_ekh1sj _a_5r08qs _a_9h0002ndxa")]];
+  [@css.blocks [(2, "_id_ihvjd0 _a_5r08qs _a_9h0002ndxa")]];
   module SingleQuoteStrings = {
     [@deriving abstract]
     [@warning "-69"]
@@ -992,7 +992,7 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "label:SingleQuoteStrings _id_ekh1sj _a_5r08qs _a_9h0002ndxa",
+        "label:SingleQuoteStrings _id_ihvjd0 _a_5r08qs _a_9h0002ndxa",
         [],
       );
     let make = (props: makeProps) => {

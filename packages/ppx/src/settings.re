@@ -40,19 +40,11 @@ let env = {
   defaultValue: "development",
 };
 
-let namespace = {
-  flag: "--namespace",
-  doc: "Mixed into every atom (`_a_`), bundle (`_in_`) and identity (`_id_`) class hash, so the same declaration in two libraries mints two different classes and never collides on a page that links both. Defaults to the dune `library-name` cookie (empty when neither the cookie nor this flag is present, e.g. the standalone driver with no `-cookie`). Pass an explicit value to override the cookie: give a native library and its melange twin the SAME value in both stanzas so they keep minting identical classes, or give two libraries with no dune cookie distinct values so their classes differ.",
-  value: None,
-  defaultValue: "",
-};
-
 type settings = {
   native: flag(bool),
   debug: flag(bool),
   minify: flag(bool),
   dev: flag(bool),
-  namespace: flag(string),
   /* Not a CLI flag: set from the dune `library-name` cookie
      (see Ppxlib.Driver.Cookies in ppx.re). */
   library: option(string),
@@ -64,7 +56,6 @@ let currentSettings =
     debug,
     minify,
     dev,
-    namespace,
     library: None,
   });
 
@@ -89,19 +80,6 @@ module Get = {
     currentSettings.contents.dev.value
     |> Option.value(~default=currentSettings.contents.dev.defaultValue);
   let library = () => currentSettings.contents.library;
-  /* An explicit `--namespace` always wins; absent that, default to the dune
-     `library-name` cookie (so each library salts its own classes without a
-     flag); absent both, the empty default (e.g. the standalone driver run
-     with no `-cookie`, as every css-support cram test does). */
-  let namespace = () =>
-    switch (currentSettings.contents.namespace.value) {
-    | Some(value) => value
-    | None =>
-      switch (currentSettings.contents.library) {
-      | Some(name) => name
-      | None => currentSettings.contents.namespace.defaultValue
-      }
-    };
 };
 
 module Update = {
@@ -155,15 +133,6 @@ module Update = {
     devExplicit := true;
     dev(true);
   };
-
-  let namespace = value =>
-    updateSettings({
-      ...currentSettings.contents,
-      namespace: {
-        ...currentSettings.contents.namespace,
-        value: Some(value),
-      },
-    });
 
   let library = value =>
     updateSettings({

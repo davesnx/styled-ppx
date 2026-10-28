@@ -19,17 +19,17 @@ rules last and they win the merge:
   [@@@css "._a_94ffde{padding:24px 40px 0;}"]
   [@@@css "@media (max-width: 1279px) {._a_9yyk894ee58{padding:24px 16px 0;}}"]
   [@@@css.bindings
-    [("Header.tableCell", "_id_35fetu", "_a_9yyk8940004gbj3");
-    ("Header.header", "_id_7ghz88", "_a_94rgou _a_5kutk94alsw");
-    ("Header.headerWithBanner", "_id_2hjyhj", "_a_94ffde _a_9yyk894ee58")]]
+    [("Header.tableCell", "_id_1v9j9bt", "_a_9yyk8940004gbj3");
+    ("Header.header", "_id_1qmbnko", "_a_94rgou _a_5kutk94alsw");
+    ("Header.headerWithBanner", "_id_3zqqw3", "_a_94ffde _a_9yyk894ee58")]]
   [@@@css.blocks
-    [(2, "_id_35fetu _a_9yyk8940004gbj3");
-    (7, "_id_7ghz88 _a_94rgou _a_5kutk94alsw");
-    (13, "_id_2hjyhj _a_94ffde _a_9yyk894ee58")]]
-  let tableCell = CSS.make "label:tableCell _id_35fetu _a_9yyk8940004gbj3" []
-  let header = CSS.make "label:header _id_7ghz88 _a_94rgou _a_5kutk94alsw" []
+    [(2, "_id_1v9j9bt _a_9yyk8940004gbj3");
+    (7, "_id_1qmbnko _a_94rgou _a_5kutk94alsw");
+    (13, "_id_3zqqw3 _a_94ffde _a_9yyk894ee58")]]
+  let tableCell = CSS.make "label:tableCell _id_1v9j9bt _a_9yyk8940004gbj3" []
+  let header = CSS.make "label:header _id_1qmbnko _a_94rgou _a_5kutk94alsw" []
   let headerWithBanner =
-    CSS.make "label:headerWithBanner _id_2hjyhj _a_94ffde _a_9yyk894ee58" []
+    CSS.make "label:headerWithBanner _id_3zqqw3 _a_94ffde _a_9yyk894ee58" []
   let _ = (tableCell, (CSS.merge header headerWithBanner))
 
   $ styled-ppx.generate header_out.ml
@@ -51,14 +51,14 @@ base rule, though `narrowGap` defined the shared `gap` atom first:
   [@@@css "@media (max-width: 767px) {._a_tlkns6fb9rt{gap:16px;}}"]
   [@@@css "._a_6f5vlj{grid-gap:40px;}"]
   [@@@css.bindings
-    [("Gap.narrowGap", "_id_1c81ebj", "_a_tlkns6fb9rt");
-    ("Gap.container", "_id_z98mbu", "_a_6f5vlj _a_tlkns6fb9rt")]]
+    [("Gap.narrowGap", "_id_cx513f", "_a_tlkns6fb9rt");
+    ("Gap.container", "_id_x8xmjd", "_a_6f5vlj _a_tlkns6fb9rt")]]
   [@@@css.blocks
-    [(1, "_id_1c81ebj _a_tlkns6fb9rt");
-    (3, "_id_z98mbu _a_6f5vlj _a_tlkns6fb9rt")]]
-  let narrowGap = CSS.make "label:narrowGap _id_1c81ebj _a_tlkns6fb9rt" []
+    [(1, "_id_cx513f _a_tlkns6fb9rt");
+    (3, "_id_x8xmjd _a_6f5vlj _a_tlkns6fb9rt")]]
+  let narrowGap = CSS.make "label:narrowGap _id_cx513f _a_tlkns6fb9rt" []
   let container =
-    CSS.make "label:container _id_z98mbu _a_6f5vlj _a_tlkns6fb9rt" []
+    CSS.make "label:container _id_x8xmjd _a_6f5vlj _a_tlkns6fb9rt" []
   let _ = (narrowGap, container)
 
   $ styled-ppx.generate gap_out.ml

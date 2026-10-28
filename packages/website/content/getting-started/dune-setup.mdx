@@ -33,6 +33,7 @@ The ppx leaves the extracted CSS inside the **post-ppx files** (`*.pp.ml`) that 
 - `(glob_files_rec *.pp.ml)` picks up every preprocessed file below the rule's directory. Place the rule at (or above) the root of the code that uses styled-ppx, or point the glob at it (e.g. `(glob_files_rec lib/*.pp.ml)`). Reason sources produce `<name>.re.pp.ml`.
 - `(mode promote)` copies `styles.css` back into your source tree so your dev server / bundler can serve it. Drop it if you consume the file straight from `_build`.
 - `--log info` prints the output path on every run; use `--log error` (the default) for silence.
+- Run one `styled-ppx.generate` per app, over every library the app uses, and serve the one `styles.css` it writes. Class names do not include the library name, so two libraries that declare the same declaration share its class. One run orders all libraries' rules in dependency order, keeps one copy of each shared rule, and reports a class collision between any two libraries. Two separate stylesheets on one page have no guaranteed order between the rules they share.
 
 The result is a plain static asset. Reference it from your HTML (or the document your server renders):
 
@@ -99,7 +100,7 @@ The stylesheet rule is [the same one](#the-stylesheet-rule): `styled-ppx.generat
 
 The same Reason/OCaml UI sources can compile twice (natively for server rendering and to JavaScript for the browser), sharing one `styles.css` and rendering identical markup on both sides.
 
-This works because of one invariant: the ppx extracts **identical CSS regardless of target**. Class names are content-addressed hashes of the CSS itself, and `--native` only changes the generated component *code*, never the extracted rules. Both builds agree on every class name in the markup.
+This works because of one invariant: the ppx extracts **identical CSS regardless of target**. An atom class is a hash of its CSS, and an identity class is a hash of the module, submodule and binding name. No class hash takes the dune library name or a flag, so `ui_native` and `ui` mint identical classes with no configuration. `--native` only changes the generated component *code*, never the extracted rules. Both builds agree on every class name in the markup.
 
 ### Project layout
 
@@ -135,7 +136,7 @@ Code inside `shared/` must only use APIs that exist on both sides (`CSS`, `React
 
 ### One stylesheet for both
 
-Because extraction is target-independent, **one `styled-ppx.generate` rule produces the stylesheet for both builds**. Globbing both build trees is harmless (rules are content-deduplicated), but pointing the glob at one is enough. The client bundle imports no CSS; the server links `/styles.css` in the document it renders.
+Because extraction is target-independent, **one `styled-ppx.generate` rule produces the stylesheet for both builds**, as part of the app's one run over all its libraries. Globbing both build trees is harmless (rules are content-deduplicated), but pointing the glob at one is enough. The client bundle imports no CSS; the server links `/styles.css` in the document it renders.
 
 The [repository demo](https://github.com/davesnx/styled-ppx/tree/main/demo/melange) is exactly this setup: `lib/native/shared/Main.re` renders in the browser through `lib_js` and to a string through the native `print` executable, with one promoted `public/styles.css` serving both.
 

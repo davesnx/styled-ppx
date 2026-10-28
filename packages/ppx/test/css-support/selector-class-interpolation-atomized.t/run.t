@@ -15,20 +15,23 @@ when referenced by another [%css]'s selector.
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css "._a_5r08qs{display:flex;}"];
   [@css "._a_6fq77g{gap:1rem;}"];
-  [@css "._a_a8tv84efvbl._id_9un6he{color:red;}"];
+  [@css "._a_7kpvt4e767h._id_4w7g4z{color:red;}"];
   [@css.bindings
     [
-      ("Input.composed", "_id_9un6he", "_a_5r08qs _a_6fq77g"),
-      ("Input.user", "_id_wa05kx", "_a_a8tv84efvbl"),
+      ("Input.composed", "_id_4w7g4z", "_a_5r08qs _a_6fq77g"),
+      ("Input.user", "_id_1hno2d0", "_a_7kpvt4e767h"),
     ]
   ];
   [@css.blocks
-    [(8, "_id_9un6he _a_5r08qs _a_6fq77g"), (13, "_id_wa05kx _a_a8tv84efvbl")]
+    [
+      (8, "_id_4w7g4z _a_5r08qs _a_6fq77g"),
+      (13, "_id_1hno2d0 _a_7kpvt4e767h"),
+    ]
   ];
   
-  let composed = CSS.make("label:composed _id_9un6he _a_5r08qs _a_6fq77g", []);
+  let composed = CSS.make("label:composed _id_4w7g4z _a_5r08qs _a_6fq77g", []);
   
-  let user = CSS.make("label:user _id_wa05kx _a_a8tv84efvbl", []);
+  let user = CSS.make("label:user _id_1hno2d0 _a_7kpvt4e767h", []);
   
   let _ = (composed, user);
 

@@ -26,19 +26,19 @@ selector-class-interpolation-empty.t for the full end-to-end behavior.
   $ dune build
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
-  [@css.bindings [("Input._a", "_id_1gt4t9l", "")]];
+  [@css.bindings [("Input._a", "_id_r89ft7", "")]];
   [@css.blocks
     [
       (1, ""),
       (2, ""),
       (3, ""),
       (6, ""),
-      (11, "_id_1quemw0"),
-      (12, "_id_s7r0d8"),
-      (13, "_id_g7564k"),
-      (15, "_id_i8v0tw"),
-      (19, "_id_gyvl29"),
-      (23, "_id_1gt4t9l"),
+      (11, "_id_1235v4k"),
+      (12, "_id_se5qro"),
+      (13, "_id_qaab8t"),
+      (15, "_id_18cz83j"),
+      (19, "_id_1xwq9hp"),
+      (23, "_id_r89ft7"),
     ]
   ];
   CSS.make("", []);
@@ -47,15 +47,15 @@ selector-class-interpolation-empty.t for the full end-to-end behavior.
   
   let _ = CSS.make("", []);
   
-  let _a = CSS.make("label:_a _id_1quemw0", []);
-  let _a = CSS.make("label:_a _id_s7r0d8", []);
-  let _a = CSS.make("label:_a _id_g7564k", []);
+  let _a = CSS.make("label:_a _id_1235v4k", []);
+  let _a = CSS.make("label:_a _id_se5qro", []);
+  let _a = CSS.make("label:_a _id_qaab8t", []);
   
-  let _a = CSS.make("label:_a _id_i8v0tw", []);
+  let _a = CSS.make("label:_a _id_18cz83j", []);
   
-  let _a = CSS.make("label:_a _id_gyvl29", []);
+  let _a = CSS.make("label:_a _id_1xwq9hp", []);
   
-  let _a = CSS.make("label:_a _id_1gt4t9l", []);
+  let _a = CSS.make("label:_a _id_r89ft7", []);
 
 
 

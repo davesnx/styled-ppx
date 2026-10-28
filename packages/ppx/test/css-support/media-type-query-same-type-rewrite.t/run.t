@@ -34,31 +34,31 @@ mixed or other types untouched), and a `not`-prefixed type.
   [@@@css
     "@media print and (max-width: 480px) {._a_iy5ye3h1lokcoyl{border-width:2px;}}"]
   [@@@css.bindings
-    [("Output.screenPair", "_id_dbqz2g", "_a_eod994eqxej _a_41qk84ejnqp");
-    ("Output.onlyPair", "_id_1qnsba9", "_a_hi5p165000waktn _a_vgp3865000wjlif");
-    ("Output.notScreenPair", "_id_1u5eua8", "_a_2qk2neczkzc _a_wd785ecogb2");
-    ("Output.commaMixedTypes", "_id_1vmtjrt", "_a_mxhpf6luuex _a_mp5mk6l2v22");
-    ("Output.differentTypesPair", "_id_rrgrr1",
+    [("Output.screenPair", "_id_1d7qz0s", "_a_eod994eqxej _a_41qk84ejnqp");
+    ("Output.onlyPair", "_id_1mm6qhp", "_a_hi5p165000waktn _a_vgp3865000wjlif");
+    ("Output.notScreenPair", "_id_69ev7p", "_a_2qk2neczkzc _a_wd785ecogb2");
+    ("Output.commaMixedTypes", "_id_wokrvf", "_a_mxhpf6luuex _a_mp5mk6l2v22");
+    ("Output.differentTypesPair", "_id_zggsu4",
       "_a_eod993h1lokug7y _a_iy5ye3h1lokcoyl")]]
   [@@@css.blocks
-    [(3, "_id_dbqz2g _a_eod994eqxej _a_41qk84ejnqp");
-    (9, "_id_1qnsba9 _a_hi5p165000waktn _a_vgp3865000wjlif");
-    (15, "_id_1u5eua8 _a_2qk2neczkzc _a_wd785ecogb2");
-    (21, "_id_1vmtjrt _a_mxhpf6luuex _a_mp5mk6l2v22");
-    (27, "_id_rrgrr1 _a_eod993h1lokug7y _a_iy5ye3h1lokcoyl")]]
+    [(3, "_id_1d7qz0s _a_eod994eqxej _a_41qk84ejnqp");
+    (9, "_id_1mm6qhp _a_hi5p165000waktn _a_vgp3865000wjlif");
+    (15, "_id_69ev7p _a_2qk2neczkzc _a_wd785ecogb2");
+    (21, "_id_wokrvf _a_mxhpf6luuex _a_mp5mk6l2v22");
+    (27, "_id_zggsu4 _a_eod993h1lokug7y _a_iy5ye3h1lokcoyl")]]
   let screenPair =
-    CSS.make "label:screenPair _id_dbqz2g _a_eod994eqxej _a_41qk84ejnqp" []
+    CSS.make "label:screenPair _id_1d7qz0s _a_eod994eqxej _a_41qk84ejnqp" []
   let onlyPair =
-    CSS.make "label:onlyPair _id_1qnsba9 _a_hi5p165000waktn _a_vgp3865000wjlif"
+    CSS.make "label:onlyPair _id_1mm6qhp _a_hi5p165000waktn _a_vgp3865000wjlif"
       []
   let notScreenPair =
-    CSS.make "label:notScreenPair _id_1u5eua8 _a_2qk2neczkzc _a_wd785ecogb2" []
+    CSS.make "label:notScreenPair _id_69ev7p _a_2qk2neczkzc _a_wd785ecogb2" []
   let commaMixedTypes =
-    CSS.make "label:commaMixedTypes _id_1vmtjrt _a_mxhpf6luuex _a_mp5mk6l2v22"
+    CSS.make "label:commaMixedTypes _id_wokrvf _a_mxhpf6luuex _a_mp5mk6l2v22"
       []
   let differentTypesPair =
     CSS.make
-      "label:differentTypesPair _id_rrgrr1 _a_eod993h1lokug7y _a_iy5ye3h1lokcoyl"
+      "label:differentTypesPair _id_zggsu4 _a_eod993h1lokug7y _a_iy5ye3h1lokcoyl"
       []
   let _ =
     (screenPair, onlyPair, notScreenPair, commaMixedTypes, differentTypesPair)

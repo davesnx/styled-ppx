@@ -33,36 +33,36 @@ same file so their relative sheet order is checked together:
   [@@@css "@media (max-width: 767px) {._a_tlkns85mrev{max-height:2000px;}}"]
   [@@@css "@media (max-width: 1279px) {._a_9yyk885k4cx{max-height:10000px;}}"]
   [@@@css.bindings
-    [("Input.toggleButton", "_id_3ymu7f", "_a_p6loh5rnofe");
-    ("Input.toggleButtonShowAtTablet", "_id_12oj7bj", "_a_5kutk5rhjfe");
-    ("Input.header", "_id_o6yfa8", "_in_yqjybn");
-    ("Input.headerWithBanner", "_id_181aa5d", "_in_11ru35y");
-    ("Input.praiseViewport", "_id_1qycs1i", "_a_5kutk850y8f");
-    ("Input.praiseViewportMobile", "_id_1apfsf0", "_a_tlkns85mrev");
-    ("Input.praiseViewportExpanded", "_id_5psizx", "_a_9yyk885k4cx")]]
+    [("Input.toggleButton", "_id_my2sdh", "_a_p6loh5rnofe");
+    ("Input.toggleButtonShowAtTablet", "_id_126medj", "_a_5kutk5rhjfe");
+    ("Input.header", "_id_1d8urtj", "_in_yqjybn");
+    ("Input.headerWithBanner", "_id_139wmul", "_in_11ru35y");
+    ("Input.praiseViewport", "_id_j9wooj", "_a_5kutk850y8f");
+    ("Input.praiseViewportMobile", "_id_x35n3b", "_a_tlkns85mrev");
+    ("Input.praiseViewportExpanded", "_id_kfijum", "_a_9yyk885k4cx")]]
   [@@@css.blocks
-    [(2, "_id_3ymu7f _a_p6loh5rnofe");
-    (7, "_id_12oj7bj _a_5kutk5rhjfe");
-    (12, "_id_o6yfa8 _in_yqjybn");
-    (17, "_id_181aa5d _in_11ru35y");
-    (22, "_id_1qycs1i _a_5kutk850y8f");
-    (26, "_id_1apfsf0 _a_tlkns85mrev");
-    (30, "_id_5psizx _a_9yyk885k4cx")]]
-  let toggleButton = CSS.make "label:toggleButton _id_3ymu7f _a_p6loh5rnofe" []
+    [(2, "_id_my2sdh _a_p6loh5rnofe");
+    (7, "_id_126medj _a_5kutk5rhjfe");
+    (12, "_id_1d8urtj _in_yqjybn");
+    (17, "_id_139wmul _in_11ru35y");
+    (22, "_id_j9wooj _a_5kutk850y8f");
+    (26, "_id_x35n3b _a_tlkns85mrev");
+    (30, "_id_kfijum _a_9yyk885k4cx")]]
+  let toggleButton = CSS.make "label:toggleButton _id_my2sdh _a_p6loh5rnofe" []
   let toggleButtonShowAtTablet =
-    CSS.make "label:toggleButtonShowAtTablet _id_12oj7bj _a_5kutk5rhjfe" []
+    CSS.make "label:toggleButtonShowAtTablet _id_126medj _a_5kutk5rhjfe" []
   let header ~pad =
-    CSS.make "label:header _id_o6yfa8 _in_yqjybn"
+    CSS.make "label:header _id_1d8urtj _in_yqjybn"
       [("--pad-g2wfjo", (CSS.Types.Length.toString pad))]
   let headerWithBanner ~pad =
-    CSS.make "label:headerWithBanner _id_181aa5d _in_11ru35y"
+    CSS.make "label:headerWithBanner _id_139wmul _in_11ru35y"
       [("--pad-160gt2j", (CSS.Types.Length.toString pad))]
   let praiseViewport =
-    CSS.make "label:praiseViewport _id_1qycs1i _a_5kutk850y8f" []
+    CSS.make "label:praiseViewport _id_j9wooj _a_5kutk850y8f" []
   let praiseViewportMobile =
-    CSS.make "label:praiseViewportMobile _id_1apfsf0 _a_tlkns85mrev" []
+    CSS.make "label:praiseViewportMobile _id_x35n3b _a_tlkns85mrev" []
   let praiseViewportExpanded =
-    CSS.make "label:praiseViewportExpanded _id_5psizx _a_9yyk885k4cx" []
+    CSS.make "label:praiseViewportExpanded _id_kfijum _a_9yyk885k4cx" []
   let _ =
     (toggleButton, toggleButtonShowAtTablet, header, headerWithBanner,
       praiseViewport, praiseViewportMobile, praiseViewportExpanded)

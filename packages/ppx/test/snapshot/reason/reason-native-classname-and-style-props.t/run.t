@@ -2,8 +2,8 @@
   $ ../../../standalone.exe --native --impl output.ml -o output.ml
   $ refmt --parse ml --print re output.ml
   [@css "._a_4ekvmb{color:red;}"];
-  [@css.bindings [("Output.Box", "_id_1l8coch", "_a_4ekvmb")]];
-  [@css.blocks [(1, "_id_1l8coch _a_4ekvmb")]];
+  [@css.bindings [("Output.Box", "_id_8rwzqt", "_a_4ekvmb")]];
+  [@css.blocks [(1, "_id_8rwzqt _a_4ekvmb")]];
   module Box: {
     type makeProps;
     let make: makeProps => React.element;
@@ -961,7 +961,7 @@
       | Some(str) => " " ++ str
       | None => ""
       };
-    let styles = CSS.make("label:Box _id_1l8coch _a_4ekvmb", []);
+    let styles = CSS.make("label:Box _id_8rwzqt _a_4ekvmb", []);
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(props.className)
       and style = snd(styles);

@@ -19,11 +19,11 @@ Dev markers are on by default; `--env production` turns them off for
   [@css "._a_4esjgz{color:var(--color-1a279q8);}"];
   [@css.bindings
     [
-      ("Input.Box", "_id_zugc0d", "_a_4ekvmb"),
-      ("Input.Button", "_id_1qldrk3", "_a_4esjgz"),
+      ("Input.Box", "_id_bdphdf", "_a_4ekvmb"),
+      ("Input.Button", "_id_15sg62n", "_a_4esjgz"),
     ]
   ];
-  [@css.blocks [(5, "_id_zugc0d _a_4ekvmb"), (8, "_id_1qldrk3 _a_4esjgz")]];
+  [@css.blocks [(5, "_id_bdphdf _a_4ekvmb"), (8, "_id_15sg62n _a_4esjgz")]];
   
   module Box = {
     [@deriving abstract]
@@ -1010,7 +1010,7 @@ Dev markers are on by default; `--env production` turns them off for
     external assign2: (Js.t({..}), makeProps, Js.t({..})) => Js.t({..}) =
       "Object.assign";
   
-    let styles = CSS.make("_id_zugc0d _a_4ekvmb", []);
+    let styles = CSS.make("_id_bdphdf _a_4ekvmb", []);
     let make = (props: makeProps) => {
       let className = fst(styles) ++ getOrEmpty(classNameGet(props))
       and style = snd(styles);
@@ -2020,7 +2020,7 @@ Dev markers are on by default; `--env production` turns them off for
   
     let styles = (~color: CSS.Types.Color.t, _) =>
       CSS.make(
-        "_id_1qldrk3 _a_4esjgz",
+        "_id_15sg62n _a_4esjgz",
         [("--color-1a279q8", CSS.Types.Color.toString(color))],
       );
     let make = (props: makeProps) => {

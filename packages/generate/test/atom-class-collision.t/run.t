@@ -14,7 +14,7 @@ colliding on the same hash already are (see identity-collision.t).
   > EOF
 
   $ styled-ppx.generate a.ml b.ml
-  styled-ppx: atom class collision: "._a_abchgt{color:red;}" and "._a_abchgt{color:blue;}" both use class "_a_abchgt" but render different CSS - a value-hash collision (astronomically unlikely by chance; rerun with a different --namespace on one side, or file an issue).
+  styled-ppx: atom class collision: "._a_abchgt{color:red;}" and "._a_abchgt{color:blue;}" both use class "_a_abchgt" but render different CSS. The class ends in a 4-character base-36 hash of the declaration (1679616 values per context, family and mask), so two different declarations can share it by chance. Write one of the two declarations differently (an equivalent value or unit), and report the pair at https://github.com/davesnx/styled-ppx/issues.
   [1]
 
 Same class, same content (the ordinary "same module compiled twice" case -

@@ -28,56 +28,56 @@ is actually present on the element.
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css "._a_393u2l{background:red;}"];
-  [@css "._a_3lv8v39725c._id_1ofey90{background:blue;}"];
+  [@css "._a_dp7m3390ev8._id_djcvv9{background:blue;}"];
   [@css "._a_94fqw0{padding:1rem;}"];
-  [@css "._a_4p0n23h0ef5cnv6._id_okzmy{border-color:blue;}"];
-  [@css "._a_rmeji39asz5._id_1jjszpn{background:yellow;}"];
+  [@css "._a_kbodp3h0ef5hi8t._id_1nlj7be{border-color:blue;}"];
+  [@css "._a_r1su339tl93._id_79qigv{background:yellow;}"];
   [@css "._a_5r08qs{display:flex;}"];
-  [@css "._a_2nhg94em44p ._id_rmf27x{color:black;}"];
+  [@css "._a_gmy164etpbt ._id_g2b8cb{color:black;}"];
   [@css.bindings
     [
-      ("Input.active", "_id_1ofey90", ""),
-      ("Input.container", "_id_paugdl", "_a_393u2l _a_3lv8v39725c"),
-      ("Input.selected", "_id_okzmy", ""),
-      ("Input.highlighted", "_id_1jjszpn", ""),
+      ("Input.active", "_id_djcvv9", ""),
+      ("Input.container", "_id_ls0dio", "_a_393u2l _a_dp7m3390ev8"),
+      ("Input.selected", "_id_1nlj7be", ""),
+      ("Input.highlighted", "_id_79qigv", ""),
       (
         "Input.card",
-        "_id_cpyuub",
-        "_a_94fqw0 _a_4p0n23h0ef5cnv6 _a_rmeji39asz5",
+        "_id_10ieij6",
+        "_a_94fqw0 _a_kbodp3h0ef5hi8t _a_r1su339tl93",
       ),
-      ("Input.actionButton", "_id_rmf27x", ""),
-      ("Input.panel", "_id_1qtuyxa", "_a_5r08qs _a_2nhg94em44p"),
+      ("Input.actionButton", "_id_g2b8cb", ""),
+      ("Input.panel", "_id_1w26e1r", "_a_5r08qs _a_gmy164etpbt"),
     ]
   ];
   [@css.blocks
     [
-      (15, "_id_1ofey90"),
-      (18, "_id_paugdl _a_393u2l _a_3lv8v39725c"),
-      (31, "_id_okzmy"),
-      (32, "_id_1jjszpn"),
-      (35, "_id_cpyuub _a_94fqw0 _a_4p0n23h0ef5cnv6 _a_rmeji39asz5"),
-      (51, "_id_rmf27x"),
-      (54, "_id_1qtuyxa _a_5r08qs _a_2nhg94em44p"),
+      (15, "_id_djcvv9"),
+      (18, "_id_ls0dio _a_393u2l _a_dp7m3390ev8"),
+      (31, "_id_1nlj7be"),
+      (32, "_id_79qigv"),
+      (35, "_id_10ieij6 _a_94fqw0 _a_kbodp3h0ef5hi8t _a_r1su339tl93"),
+      (51, "_id_g2b8cb"),
+      (54, "_id_1w26e1r _a_5r08qs _a_gmy164etpbt"),
     ]
   ];
   
-  let active = CSS.make("label:active _id_1ofey90", []);
+  let active = CSS.make("label:active _id_djcvv9", []);
   
   let container =
-    CSS.make("label:container _id_paugdl _a_393u2l _a_3lv8v39725c", []);
+    CSS.make("label:container _id_ls0dio _a_393u2l _a_dp7m3390ev8", []);
   
-  let selected = CSS.make("label:selected _id_okzmy", []);
-  let highlighted = CSS.make("label:highlighted _id_1jjszpn", []);
+  let selected = CSS.make("label:selected _id_1nlj7be", []);
+  let highlighted = CSS.make("label:highlighted _id_79qigv", []);
   
   let card =
     CSS.make(
-      "label:card _id_cpyuub _a_94fqw0 _a_4p0n23h0ef5cnv6 _a_rmeji39asz5",
+      "label:card _id_10ieij6 _a_94fqw0 _a_kbodp3h0ef5hi8t _a_r1su339tl93",
       [],
     );
   
-  let actionButton = CSS.make("label:actionButton _id_rmf27x", []);
+  let actionButton = CSS.make("label:actionButton _id_g2b8cb", []);
   
-  let panel = CSS.make("label:panel _id_1qtuyxa _a_5r08qs _a_2nhg94em44p", []);
+  let panel = CSS.make("label:panel _id_1w26e1r _a_5r08qs _a_gmy164etpbt", []);
   
   let _ = (active, container, selected, highlighted, card, actionButton, panel);
 

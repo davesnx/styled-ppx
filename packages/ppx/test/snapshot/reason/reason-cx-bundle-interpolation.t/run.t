@@ -33,20 +33,20 @@ mints its own real, slot-keyed `_a_` class instead.
   [@css "._a_qyw7u4ebwy0:hover{color:var(--color-4uzv5u);}"];
   [@css.bindings
     [
-      ("Output.multiVariant", "_id_1be0zju", "_in_1kbzua4"),
-      ("Output.mixed", "_id_11av61d", "_a_5r08qs _in_1upqar2"),
-      ("Output.twoTypes", "_id_1ybygzf", "_in_e286e6"),
-      ("Output.separateValues", "_id_1y219dc", "_a_4esjgz _a_39000412gx"),
-      ("Output.partialShare", "_id_r0r4jt", "_in_1upqar2 _a_39000412gx"),
+      ("Output.multiVariant", "_id_8hlpz9", "_in_1kbzua4"),
+      ("Output.mixed", "_id_1i6efdo", "_a_5r08qs _in_1upqar2"),
+      ("Output.twoTypes", "_id_ero4cc", "_in_e286e6"),
+      ("Output.separateValues", "_id_1vavuos", "_a_4esjgz _a_39000412gx"),
+      ("Output.partialShare", "_id_xgnn3y", "_in_1upqar2 _a_39000412gx"),
     ]
   ];
   [@css.blocks
     [
-      (6, "_id_1be0zju _in_1kbzua4"),
-      (17, "_id_11av61d _a_5r08qs _in_1upqar2"),
-      (25, "_id_1ybygzf _in_e286e6"),
-      (32, "_id_1y219dc _a_4esjgz _a_39000412gx"),
-      (38, "_id_r0r4jt _in_1upqar2 _a_39000412gx"),
+      (6, "_id_8hlpz9 _in_1kbzua4"),
+      (17, "_id_1i6efdo _a_5r08qs _in_1upqar2"),
+      (25, "_id_ero4cc _in_e286e6"),
+      (32, "_id_1vavuos _a_4esjgz _a_39000412gx"),
+      (38, "_id_xgnn3y _in_1upqar2 _a_39000412gx"),
       (45, "_a_4ekvmb _a_qyw7u4ebwy0"),
       (51, "_a_5r08qs _a_qyw7u4ebwy0"),
     ]
@@ -56,17 +56,17 @@ mints its own real, slot-keyed `_a_` class instead.
   let accent = CSS.Types.Color.toString(`hex("00A67D"));
   let multiVariant =
     CSS.make(
-      "label:multiVariant _id_1be0zju _in_1kbzua4",
+      "label:multiVariant _id_8hlpz9 _in_1kbzua4",
       [("--color-3f9mj1", CSS.Types.Color.toString(color))],
     );
   let mixed =
     CSS.make(
-      "label:mixed _id_11av61d _a_5r08qs _in_1upqar2",
+      "label:mixed _id_1i6efdo _a_5r08qs _in_1upqar2",
       [("--color-13vjntp", CSS.Types.Color.toString(color))],
     );
   let twoTypes =
     CSS.make(
-      "label:twoTypes _id_1ybygzf _in_e286e6",
+      "label:twoTypes _id_ero4cc _in_e286e6",
       [
         ("--width-1v9ua", CSS.Types.Width.toString(width)),
         ("--width-c62vcf", CSS.Types.Height.toString(width)),
@@ -74,7 +74,7 @@ mints its own real, slot-keyed `_a_` class instead.
     );
   let separateValues =
     CSS.make(
-      "label:separateValues _id_1y219dc _a_4esjgz _a_39000412gx",
+      "label:separateValues _id_1vavuos _a_4esjgz _a_39000412gx",
       [
         ("--color-1a279q8", CSS.Types.Color.toString(color)),
         ("--accent-1gxhmqu", CSS.Types.Color.toString(accent)),
@@ -82,7 +82,7 @@ mints its own real, slot-keyed `_a_` class instead.
     );
   let partialShare =
     CSS.make(
-      "label:partialShare _id_r0r4jt _in_1upqar2 _a_39000412gx",
+      "label:partialShare _id_xgnn3y _in_1upqar2 _a_39000412gx",
       [
         ("--color-13vjntp", CSS.Types.Color.toString(color)),
         ("--accent-1gxhmqu", CSS.Types.Color.toString(accent)),

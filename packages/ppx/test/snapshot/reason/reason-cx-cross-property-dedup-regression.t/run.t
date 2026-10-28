@@ -8,12 +8,12 @@ CSS runtime types. See input.re for the full rationale.
   [@css "@property --lengthVar-8edltm{syntax:\"*\";inherits:false;}"];
   [@css "._in_1mfmiq8{margin-left:var(--lengthVar-12br693);}"];
   [@css "._in_1mfmiq8{padding-left:var(--lengthVar-8edltm);}"];
-  [@css.bindings [("Output.layout", "_id_1b5eq77", "_in_1mfmiq8")]];
-  [@css.blocks [(3, "_id_1b5eq77 _in_1mfmiq8")]];
+  [@css.bindings [("Output.layout", "_id_98qkg2", "_in_1mfmiq8")]];
+  [@css.blocks [(3, "_id_98qkg2 _in_1mfmiq8")]];
   let lengthVar = CSS.px(10);
   let layout =
     CSS.make(
-      "label:layout _id_1b5eq77 _in_1mfmiq8",
+      "label:layout _id_98qkg2 _in_1mfmiq8",
       [
         ("--lengthVar-12br693", CSS.Types.Margin.toString(lengthVar)),
         ("--lengthVar-8edltm", CSS.Types.Length.toString(lengthVar)),

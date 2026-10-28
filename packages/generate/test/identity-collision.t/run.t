@@ -1,9 +1,8 @@
 Two different longidents that hash to the SAME identity (e.g. two
-libraries' modules sharing a basename and binding name, with no
-distinguishing `--namespace`) are a real collision only when their
-atomized content differs. The aggregator reports both input files, both
-longidents, the shared identity, and the `--namespace` remedy, then
-exits 1.
+libraries' modules sharing a basename and binding name) are a real
+collision only when their atomized content differs. The aggregator
+reports both input files, both longidents, the shared identity, and the
+rename remedy, then exits 1.
 
   $ cat > a.ml <<EOF
   > [@@@css ".css-a{color:red;}"]
@@ -18,7 +17,7 @@ exits 1.
   > EOF
 
   $ styled-ppx.generate a.ml b.ml
-  styled-ppx: b.ml: identity collision: "A.marker" (in a.ml) and "B.marker" (in b.ml) both hash to identity cid-shared, but carry different CSS ("css-a" vs "css-b"). Pass `--namespace <name>` to one library's (pps styled-ppx ...) stanza, identically on its native and melange stanzas.
+  styled-ppx: b.ml: identity collision: "A.marker" (in a.ml) and "B.marker" (in b.ml) both hash to identity cid-shared, but carry different CSS ("css-a" vs "css-b"). An identity hashes only the module name, the submodule path and the binding name, so two libraries that each define B.marker share it. Rename the module or the binding in one of them.
   [1]
 
 Same identity with the SAME atomized content is not a collision - it is

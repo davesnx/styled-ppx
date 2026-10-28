@@ -14,12 +14,12 @@ same as before.
   [@@@css "._a_94zrbw{padding:12px;}"]
   [@@@css "._a_4ekvmb{color:red;}"]
   [@@@css.bindings
-    [("Input.layout", "_id_1jj5tmt", "_a_5r08qs _a_94zrbw");
-    ("Input.button", "_id_l55coe", "_a_4ekvmb")]]
+    [("Input.layout", "_id_1xb8ads", "_a_5r08qs _a_94zrbw");
+    ("Input.button", "_id_1enkfbb", "_a_4ekvmb")]]
   [@@@css.blocks
-    [(1, "_id_1jj5tmt _a_5r08qs _a_94zrbw"); (2, "_id_l55coe _a_4ekvmb")]]
-  let layout = CSS.make "label:layout _id_1jj5tmt _a_5r08qs _a_94zrbw" []
-  let button = CSS.make "label:button _id_l55coe _a_4ekvmb" []
+    [(1, "_id_1xb8ads _a_5r08qs _a_94zrbw"); (2, "_id_1enkfbb _a_4ekvmb")]]
+  let layout = CSS.make "label:layout _id_1xb8ads _a_5r08qs _a_94zrbw" []
+  let button = CSS.make "label:button _id_1enkfbb _a_4ekvmb" []
   let _ = (layout, button)
 
 --minify --dev (the other order) keeps the marker too:
@@ -31,12 +31,12 @@ same as before.
   [@@@css "._a_94zrbw{padding:12px;}"]
   [@@@css "._a_4ekvmb{color:red;}"]
   [@@@css.bindings
-    [("Input.layout", "_id_1jj5tmt", "_a_5r08qs _a_94zrbw");
-    ("Input.button", "_id_l55coe", "_a_4ekvmb")]]
+    [("Input.layout", "_id_1xb8ads", "_a_5r08qs _a_94zrbw");
+    ("Input.button", "_id_1enkfbb", "_a_4ekvmb")]]
   [@@@css.blocks
-    [(1, "_id_1jj5tmt _a_5r08qs _a_94zrbw"); (2, "_id_l55coe _a_4ekvmb")]]
-  let layout = CSS.make "label:layout _id_1jj5tmt _a_5r08qs _a_94zrbw" []
-  let button = CSS.make "label:button _id_l55coe _a_4ekvmb" []
+    [(1, "_id_1xb8ads _a_5r08qs _a_94zrbw"); (2, "_id_1enkfbb _a_4ekvmb")]]
+  let layout = CSS.make "label:layout _id_1xb8ads _a_5r08qs _a_94zrbw" []
+  let button = CSS.make "label:button _id_1enkfbb _a_4ekvmb" []
   let _ = (layout, button)
 
 --dev --env production keeps the marker:
@@ -48,12 +48,12 @@ same as before.
   [@@@css "._a_94zrbw{padding:12px;}"]
   [@@@css "._a_4ekvmb{color:red;}"]
   [@@@css.bindings
-    [("Input.layout", "_id_1jj5tmt", "_a_5r08qs _a_94zrbw");
-    ("Input.button", "_id_l55coe", "_a_4ekvmb")]]
+    [("Input.layout", "_id_1xb8ads", "_a_5r08qs _a_94zrbw");
+    ("Input.button", "_id_1enkfbb", "_a_4ekvmb")]]
   [@@@css.blocks
-    [(1, "_id_1jj5tmt _a_5r08qs _a_94zrbw"); (2, "_id_l55coe _a_4ekvmb")]]
-  let layout = CSS.make "label:layout _id_1jj5tmt _a_5r08qs _a_94zrbw" []
-  let button = CSS.make "label:button _id_l55coe _a_4ekvmb" []
+    [(1, "_id_1xb8ads _a_5r08qs _a_94zrbw"); (2, "_id_1enkfbb _a_4ekvmb")]]
+  let layout = CSS.make "label:layout _id_1xb8ads _a_5r08qs _a_94zrbw" []
+  let button = CSS.make "label:button _id_1enkfbb _a_4ekvmb" []
   let _ = (layout, button)
 
 --env production --dev (the other order) keeps the marker too:
@@ -65,12 +65,12 @@ same as before.
   [@@@css "._a_94zrbw{padding:12px;}"]
   [@@@css "._a_4ekvmb{color:red;}"]
   [@@@css.bindings
-    [("Input.layout", "_id_1jj5tmt", "_a_5r08qs _a_94zrbw");
-    ("Input.button", "_id_l55coe", "_a_4ekvmb")]]
+    [("Input.layout", "_id_1xb8ads", "_a_5r08qs _a_94zrbw");
+    ("Input.button", "_id_1enkfbb", "_a_4ekvmb")]]
   [@@@css.blocks
-    [(1, "_id_1jj5tmt _a_5r08qs _a_94zrbw"); (2, "_id_l55coe _a_4ekvmb")]]
-  let layout = CSS.make "label:layout _id_1jj5tmt _a_5r08qs _a_94zrbw" []
-  let button = CSS.make "label:button _id_l55coe _a_4ekvmb" []
+    [(1, "_id_1xb8ads _a_5r08qs _a_94zrbw"); (2, "_id_1enkfbb _a_4ekvmb")]]
+  let layout = CSS.make "label:layout _id_1xb8ads _a_5r08qs _a_94zrbw" []
+  let button = CSS.make "label:button _id_1enkfbb _a_4ekvmb" []
   let _ = (layout, button)
 
 Without --dev, --minify alone still turns the marker off:
@@ -82,12 +82,12 @@ Without --dev, --minify alone still turns the marker off:
   [@@@css "._a_94zrbw{padding:12px;}"]
   [@@@css "._a_4ekvmb{color:red;}"]
   [@@@css.bindings
-    [("Input.layout", "_id_1jj5tmt", "_a_5r08qs _a_94zrbw");
-    ("Input.button", "_id_l55coe", "_a_4ekvmb")]]
+    [("Input.layout", "_id_1xb8ads", "_a_5r08qs _a_94zrbw");
+    ("Input.button", "_id_1enkfbb", "_a_4ekvmb")]]
   [@@@css.blocks
-    [(1, "_id_1jj5tmt _a_5r08qs _a_94zrbw"); (2, "_id_l55coe _a_4ekvmb")]]
-  let layout = CSS.make "_id_1jj5tmt _a_5r08qs _a_94zrbw" []
-  let button = CSS.make "_id_l55coe _a_4ekvmb" []
+    [(1, "_id_1xb8ads _a_5r08qs _a_94zrbw"); (2, "_id_1enkfbb _a_4ekvmb")]]
+  let layout = CSS.make "_id_1xb8ads _a_5r08qs _a_94zrbw" []
+  let button = CSS.make "_id_1enkfbb _a_4ekvmb" []
   let _ = (layout, button)
 
 Without --dev, --env production alone still turns the marker off:
@@ -99,10 +99,10 @@ Without --dev, --env production alone still turns the marker off:
   [@@@css "._a_94zrbw{padding:12px;}"]
   [@@@css "._a_4ekvmb{color:red;}"]
   [@@@css.bindings
-    [("Input.layout", "_id_1jj5tmt", "_a_5r08qs _a_94zrbw");
-    ("Input.button", "_id_l55coe", "_a_4ekvmb")]]
+    [("Input.layout", "_id_1xb8ads", "_a_5r08qs _a_94zrbw");
+    ("Input.button", "_id_1enkfbb", "_a_4ekvmb")]]
   [@@@css.blocks
-    [(1, "_id_1jj5tmt _a_5r08qs _a_94zrbw"); (2, "_id_l55coe _a_4ekvmb")]]
-  let layout = CSS.make "_id_1jj5tmt _a_5r08qs _a_94zrbw" []
-  let button = CSS.make "_id_l55coe _a_4ekvmb" []
+    [(1, "_id_1xb8ads _a_5r08qs _a_94zrbw"); (2, "_id_1enkfbb _a_4ekvmb")]]
+  let layout = CSS.make "_id_1xb8ads _a_5r08qs _a_94zrbw" []
+  let button = CSS.make "_id_1enkfbb _a_4ekvmb" []
   let _ = (layout, button)

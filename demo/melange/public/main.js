@@ -64464,7 +64464,7 @@ var AppGlobalStyles = {
   make: make8
 };
 var stack = make7(
-  "label:stack _id_1pxsjq1 _a_5r1fx4 _a_610001bumx",
+  "label:stack _id_1l67nxo _a_5r08qs _a_610001q59l",
   /* [] */
   0
 );
@@ -64477,7 +64477,7 @@ function getOrEmpty(str) {
 }
 function styles2(lolaOpt, param) {
   const lola = lolaOpt !== void 0 ? lolaOpt : px2(0);
-  return make7("label:Cositas _id_u5iy82 _a_5r1fx4 _a_610001bumx _a_6f6fnz", {
+  return make7("label:Cositas _id_g0rqa3 _a_5r08qs _a_610001q59l _a_6fvq9t", {
     hd: [
       "--lola-8erbae",
       Gap.toString(lola)
@@ -64509,38 +64509,38 @@ var Cositas = {
   make: make$12
 };
 var selectors = make7(
-  "label:selectors _id_xvj7x7 _a_4eh072 _a_qyw7u4e3f0l",
+  "label:selectors _id_g12xln _a_4ekvmb _a_qyw7u4enfjo",
   /* [] */
   0
 );
 var bounce = AnimationName.make(void 0, "_k_deb5ee");
 var clx = make7(
-  "label:clx _id_7f7nwl _a_650001iz7u _a_5lx1dp _a_6i000glaaa",
+  "label:clx _id_1611mlx _a_650001vzlw _a_5l0tf2 _a_6i000gjp3a",
   /* [] */
   0
 );
 var post = make7(
-  "label:post _id_1ouuv5z _a_3h7g4z _a_4v0002an9u",
+  "label:post _id_epau8g _a_3hr52a _a_4v0002zm71",
   /* [] */
   0
 );
 var card = make7(
-  "label:card _id_ekr4vx _a_7pscym _a_3hddty _a_65000w2eld",
+  "label:card _id_ugovml _a_7peacs _a_3hk368 _a_65000wuzg5",
   /* [] */
   0
 );
 var container = make7(
-  "label:container _id_3949vv _a_p3y4xec8xdh _a_p3y4x390004i85y _a_p3y4x65000ww99w _a_2grgh655m9szns1",
+  "label:container _id_1w9ali9 _a_p3y4xecqinc _a_p3y4x390004aeeb _a_p3y4x65000w3p37 _a_2grgh655m9swpj2",
   /* [] */
   0
 );
 var gradiend = make7(
-  "label:gradiend _id_whzzqa _a_94jps9 _a_390008j78y",
+  "label:gradiend _id_884kl8 _a_94yyxm _a_390008lxhy",
   /* [] */
   0
 );
 var tag = make7(
-  "label:tag _id_p2v853 _a_5r4ri2 _a_94atxh _a_7p0002nvj1 _a_3h86iq _a_3nhw0l",
+  "label:tag _id_1qw5s24 _a_5rulvz _a_94i1gv _a_7p0002emmb _a_3hft4e _a_3npnzt",
   /* [] */
   0
 );
@@ -64548,37 +64548,37 @@ var Labels = {
   tag
 };
 var childLabel = make7(
-  "label:childLabel _id_mapgd _a_655m9shrn5",
+  "label:childLabel _id_1304bky _a_655m9s3yi3",
   /* [] */
   0
 );
 var parentWithChildSelector = make7(
-  "label:parentWithChildSelector _id_1ec7v4x _a_3hgl9r _a_94ud5c _a_7p0001o874 _a_ozjdw4exogy _a_czcm139jbly",
+  "label:parentWithChildSelector _id_11qqmnp _a_3h2ik7 _a_94idj6 _a_7p0001m1lh _a_qamh84ervct _a_2xpoa39hlmu",
   /* [] */
   0
 );
 var modifierActive = make7(
-  "label:modifierActive _id_h03zfx _a_655m9shrn5",
+  "label:modifierActive _id_93s256 _a_655m9s3yi3",
   /* [] */
   0
 );
 var toggle = make7(
-  "label:toggle _id_8jiwri _a_5r4ri2 _a_94q2r6 _a_7p0004gtl7 _a_3hmfgf _a_3n9mlt _a_lmw1g39bg96 _a_lmw1g3h0ef5176a",
+  "label:toggle _id_16jh7q9 _a_5rulvz _a_94izlt _a_7p00040wuy _a_3h7z9l _a_3n71pq _a_t07jt393asa _a_t07jt3h0ef53hum",
   /* [] */
   0
 );
 var mergeLeftRed = make7(
-  "label:mergeLeftRed _id_gjsh3a _a_4eh072",
+  "label:mergeLeftRed _id_ifad15 _a_4ekvmb",
   /* [] */
   0
 );
 var mergeRightBlue = make7(
-  "label:mergeRightBlue _id_m3qi5s _a_4eh6o9",
+  "label:mergeRightBlue _id_1dncgno _a_4esm7b",
   /* [] */
   0
 );
 var heightAutoDecoy = make7(
-  "label:heightAutoDecoy _id_1t4jpe5 _a_6l4xtk",
+  "label:heightAutoDecoy _id_1gvzudc _a_6l7jm9",
   /* [] */
   0
 );
@@ -64586,117 +64586,117 @@ var FaqDecoy = {
   heightAutoDecoy
 };
 var faqOpenContent = make7(
-  "label:faqOpenContent _id_i37z3p _a_6l4xtk _a_8rbn5v",
+  "label:faqOpenContent _id_1kkokf _a_6l7jm9 _a_8rbazn",
   /* [] */
   0
 );
 var faqCollapsed = make7(
-  "label:faqCollapsed _id_18jlg2a _a_6lg8p2",
+  "label:faqCollapsed _id_1wo5ldk _a_6lvr0w",
   /* [] */
   0
 );
 var marginTopZero = make7(
-  "label:marginTopZero _id_o7aab6 _a_7p0008qkzl",
+  "label:marginTopZero _id_1rs3rwh _a_7p0008n4zf",
   /* [] */
   0
 );
 var marginAll10 = make7(
-  "label:marginAll10 _id_gxdbkr _a_7pscym",
+  "label:marginAll10 _id_jgl71r _a_7peacs",
   /* [] */
   0
 );
 var marginAll10Reversed = make7(
-  "label:marginAll10Reversed _id_1yplhg6 _a_7pscym",
+  "label:marginAll10Reversed _id_1svkgv6 _a_7peacs",
   /* [] */
   0
 );
 var marginTopZeroReversed = make7(
-  "label:marginTopZeroReversed _id_1oco6kb _a_7p0008qkzl",
+  "label:marginTopZeroReversed _id_1nunv2x _a_7p0008n4zf",
   /* [] */
   0
 );
 var differentColor = make7(
-  "label:differentColor _id_13uptrf _a_4eztwz",
+  "label:differentColor _id_y3owk6 _a_4e3x2f",
   /* [] */
   0
 );
 var differentBackground = make7(
-  "label:differentBackground _id_1inzoqv _a_39gotr",
+  "label:differentBackground _id_1v3409n _a_39zz22",
   /* [] */
   0
 );
 var hoverBaseColor = make7(
-  "label:hoverBaseColor _id_1w41sbo _a_4e0z6h",
+  "label:hoverBaseColor _id_1bo77ti _a_4ecoli",
   /* [] */
   0
 );
 var hoverOverride = make7(
-  "label:hoverOverride _id_1qmdt9z _a_qyw7u4e9doq",
+  "label:hoverOverride _id_5j6lls _a_qyw7u4eb4a5",
   /* [] */
   0
 );
 var hoverFirst = make7(
-  "label:hoverFirst _id_1fn4wpy _a_qyw7u4ed9rh",
+  "label:hoverFirst _id_1hwem91 _a_qyw7u4ego80",
   /* [] */
   0
 );
 var hoverSecond = make7(
-  "label:hoverSecond _id_df14js _a_qyw7u4eaunu",
+  "label:hoverSecond _id_9yv8d2 _a_qyw7u4em3mo",
   /* [] */
   0
 );
 var mediaFirst = make7(
-  "label:mediaFirst _id_11y1zoz _a_ftrjp4extel",
+  "label:mediaFirst _id_1qu8adg _a_ftrjp4eqtu6",
   /* [] */
   0
 );
 var mediaSecond = make7(
-  "label:mediaSecond _id_6b3yfa _a_ftrjp4e3z28",
+  "label:mediaSecond _id_4m2g9y _a_ftrjp4edjbj",
   /* [] */
   0
 );
 var importantRed = make7(
-  "label:importantRed _id_1n9qzma _a_oe8sa4et4wn",
+  "label:importantRed _id_1md7gck _a_oe8sa4eltzl",
   /* [] */
   0
 );
 var plainBlueForImportant = make7(
-  "label:plainBlueForImportant _id_ih7vk _a_4eh6o9",
+  "label:plainBlueForImportant _id_1vjs9u4 _a_4esm7b",
   /* [] */
   0
 );
 var plainRedForImportant = make7(
-  "label:plainRedForImportant _id_g5f20n _a_4eh072",
+  "label:plainRedForImportant _id_m1taea _a_4ekvmb",
   /* [] */
   0
 );
 var importantBlue = make7(
-  "label:importantBlue _id_1a4es1 _a_oe8sa4ewtrx",
+  "label:importantBlue _id_1l7ei7b _a_oe8sa4e3jtv",
   /* [] */
   0
 );
 var importantRedVsImportantBlue = make7(
-  "label:importantRedVsImportantBlue _id_n8j7un _a_oe8sa4et4wn",
+  "label:importantRedVsImportantBlue _id_38y5hc _a_oe8sa4eltzl",
   /* [] */
   0
 );
 var customXRed = make7(
-  "label:customXRed _id_18uow _a_zytx2ztfcnfo",
+  "label:customXRed _id_10xj5fz _a_zytx2ztfp7wt",
   /* [] */
   0
 );
 var customXBlue = make7(
-  "label:customXBlue _id_w9ursh _a_zytx2ztfw3nj",
+  "label:customXBlue _id_1myoo4f _a_zytx2ztfqbjc",
   /* [] */
   0
 );
 var useCustomX = make7(
-  "label:useCustomX _id_1u8h8xn _a_4e5kx1",
+  "label:useCustomX _id_1j5mheh _a_4e8w5r",
   /* [] */
   0
 );
 function dynColorA(color) {
-  return make7("label:dynColorA _id_162gyey _a_4eh6am", {
+  return make7("label:dynColorA _id_1vqivk5 _a_4esjgz", {
     hd: [
       "--color-1a279q8",
       Color.toString(color)
@@ -64708,7 +64708,7 @@ function dynColorA(color) {
   });
 }
 function dynColorB(color) {
-  return make7("label:dynColorB _id_ozn85o _a_4eh6am", {
+  return make7("label:dynColorB _id_1ccavll _a_4esjgz", {
     hd: [
       "--color-1a279q8",
       Color.toString(color)
@@ -64720,58 +64720,58 @@ function dynColorB(color) {
   });
 }
 var assocA = make7(
-  "label:assocA _id_1s5bsex _a_4eexrb",
+  "label:assocA _id_17qt81f _a_4efdvb",
   /* [] */
   0
 );
 var assocB = make7(
-  "label:assocB _id_szs5k0 _a_4ea0ny",
+  "label:assocB _id_1lwvdy _a_4et30w",
   /* [] */
   0
 );
 var assocC = make7(
-  "label:assocC _id_11i5qhe _a_4einwu",
+  "label:assocC _id_1sn8wpz _a_4efm8j",
   /* [] */
   0
 );
 var paddingBothZero = make7(
-  "label:paddingBothZero _id_w5knev _a_940002vk8k _a_940004mw5y",
+  "label:paddingBothZero _id_16qczff _a_940002yq1t _a_9400048fgp",
   /* [] */
   0
 );
 var paddingLeft4 = make7(
-  "label:paddingLeft4 _id_hmbwdd _a_9400029r9v",
+  "label:paddingLeft4 _id_qnid5f _a_940002wcsq",
   /* [] */
   0
 );
 var wordWrapBreak = make7(
-  "label:wordWrapBreak _id_hfivxa _a_8x0yi2",
+  "label:wordWrapBreak _id_7i8pf0 _a_8xpt08",
   /* [] */
   0
 );
 var overflowWrapNormal = make7(
-  "label:overflowWrapNormal _id_1232dja _a_8xpe22",
+  "label:overflowWrapNormal _id_1spgjl3 _a_8xlw6e",
   /* [] */
   0
 );
 var identityKeptColor = make7(
-  "label:identityKeptColor _id_1z0zv2z _a_4eheaa",
+  "label:identityKeptColor _id_1ogquzk _a_4enj2d",
   /* [] */
   0
 );
 var identityKeptOverride = make7(
-  "label:identityKeptOverride _id_1bmyckk _a_4eexrb",
+  "label:identityKeptOverride _id_1wotpwn _a_4efdvb",
   /* [] */
   0
 );
 var identityKeptHighlight = make7(
-  "label:identityKeptHighlight _id_12yv06b _a_8tr29cfn434",
+  "label:identityKeptHighlight _id_iuxfyv _a_nuw7acfr5za",
   /* [] */
   0
 );
 var primary = hex2("141414");
 function keyframeDemoShell(color) {
-  return make7("label:keyframeDemoShell _id_1370sl7 _a_940sqd _a_7p0001bzyn _a_3h86iq _a_3ngzf7 _a_39do0u _a_4eh6am _a_650001iz7u", {
+  return make7("label:keyframeDemoShell _id_12pkczv _a_94zrtu _a_7p00013pbo _a_3hft4e _a_3n1jeb _a_395zh2 _a_4esjgz _a_650001vzlw", {
     hd: [
       "--color-1a279q8",
       Color.toString(color)
@@ -64806,7 +64806,7 @@ var resize2 = AnimationName.make({
     )
   }
 }, "_k_1kt58w0");
-var keyframeDemoCard = make7("label:keyframeDemoCard _id_bm1n1z _a_2z001s49z5 _a_2z0008fc7i _a_2z01kw7a08 _a_2z000gllw7 _a_ec0v5o _a_8rbn5v _a_5r1fx4 _a_9i0001dmle _a_9h0002vhe1 _a_3njx05 _a_39wy1d _a_4eu7uq _a_40xf3p", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
+var keyframeDemoCard = make7("label:keyframeDemoCard _id_1pvpcx4 _a_2z001sbkao _a_2z0008ee5x _a_2z01kwa72f _a_2z000gvuyg _a_ecl4rb _a_8rbazn _a_5r08qs _a_9i0001xndt _a_9h0002ndxa _a_3n7svr _a_39fawg _a_4en7if _a_4092kl", AnimationName.toStyleVars("--resize-1jz21hk", resize2));
 function Main(Props) {
   return JsxRuntime.jsxs("main", {
     children: [

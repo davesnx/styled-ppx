@@ -412,13 +412,13 @@ compiler convention, so editors pick them up) and exits 1.
 
 **Identity collision.** While building the index (during Extract, not
 Resolve), two different bindings can hash to the same identity — e.g.
-two libraries whose modules share a basename and binding name, with no
-distinguishing `--namespace`. This is only an error when their
+two libraries whose modules share a basename and binding name. This is
+only an error when their
 `class_string` fingerprints differ: the same identity with the same
 atoms is the ordinary "same module compiled twice" case (native +
 melange, `copy_files`, vendoring) and is accepted. A real collision
 names both input files, both longidents, the shared identity, and the
-`--namespace` remedy, and is reported through the same protocol-error
+rename remedy, and is reported through the same protocol-error
 path as a
 malformed attribute (see `packages/generate/test/identity-collision.t`).
 
@@ -447,7 +447,13 @@ scans the deduplicated rules for two different, non-bundle atoms
 (`_a_` classes) that mint the same class name but render
 different CSS - the same shape as an identity collision above, applied
 to atom classes instead of `_id_` identities, and reported the same way
-(both rule bodies, the shared class, a `--namespace` remedy). `_in_`
+(both rule bodies, the shared class, the width of the value hash, and
+what to do). The value field is 4 base-36 characters, 1,679,616 values
+per (context, family, mask) bucket, so by the birthday bound a bucket
+with about 1,500 distinct declarations has an even chance of one
+collision. The repository's own tests and demo hold at most 101 (plain
+`color` values) in one bucket, about a 0.3% chance, and have no
+collision. One run per app checks every library at once. `_in_`
 (interpolation-bundle) classes are exempt in both directions: several
 different bundle bodies sharing one class is that mechanism working as
 designed (see "Atomization" above), never a collision (see
@@ -554,12 +560,11 @@ pseudo-class rank tables (StyleX's numbers). Block edges plus definition
 order decide those ties; a fixed rank overrode a block's own source order.
 
 **Accepted limit: two separate stylesheets have no guaranteed relative
-order between their rules, when they share a class.** `--namespace` (see
-"Atomization") salts each library's atom classes, so two different
-libraries never mint the same one; sharing a class only happens for a
-native/Melange twin pair passing the same explicit `--namespace`, or for two
-runs with no namespace at all. Two `<link>`s concatenate on the page in load
-order - see `tiers-two-stylesheets.t`.
+order between their rules, when they share a class.** Class hashes take no
+library name (see "Atomization"), so two libraries that declare the same
+atom share its class. Run one `styled-ppx.generate` per app over all its
+libraries; two `<link>`s concatenate on the page in load order - see
+`tiers-two-stylesheets.t`.
 
 **Takes no part in ordering, always**: `@property`, `@keyframes`,
 `@font-face` registrations, hoisted `@import`/`@namespace`, dropped
@@ -612,20 +617,16 @@ append-only table, an optional mask of which of the family's longhands
 this atom covers, and a short value hash unique only within that
 (context, family[, mask]) bucket - not globally, which is what lets it
 be short. The value hash is computed over the rendered declaration
-salted with `--namespace` (see "Identity classes" below - the same flag,
-defaulting the same way, now salts atom and bundle classes too, not just
-identities): two libraries with different namespaces never share an
-atom class for the same declaration, even byte-identical, so one
-library's stylesheet position can never decide a tie against another
-library's own override of it. `styled-ppx.generate` checks the
+alone, with no library name or flag, so a native library and its
+Melange twin mint the same class, and so do two libraries that declare
+the same atom. `styled-ppx.generate` checks the
 per-bucket uniqueness this leaves (see the atom class collision check
 under "Dedup and write" above). The binding's `let` name never appears
 in the class name either way; two bindings whose declarations render to
-the same CSS text in the same context AND namespace mint the same
-class, dev or production. Minting lives in `packages/ppx/src/Hash_class.ml`
+the same CSS text in the same context mint the same class, dev or
+production. Minting lives in `packages/ppx/src/Hash_class.ml`
 (`Class_format.slot_class`); the `(context, family, mask)` triple comes
-from `packages/ppx/slot_key` and is never itself salted - only the value
-field's hash input is.
+from `packages/ppx/slot_key`.
 An alias (`grid-row-gap` for `row-gap`, one of two legs of `gap`) resolves
 to its canonical name before its mask is computed too, the same redirect
 `Slot_key.depth_of` already does for sort order (see "Sheet order"
@@ -656,10 +657,8 @@ otherwise need separate custom-property namespaces for what is often the
 same value reused across `base`/`:hover`/`@media` variants. A bundle's own
 `var(--...)` target is unaffected by which prefix its class carries,
 since only the CLASS half of `Hash_class.class_and_namespace` differs
-between the two cases, never the namespace/variable-naming half - and
-that CLASS half is salted with `--namespace` exactly like a real atom's
-value field (`Hash_class.bundle_class_and_namespace`), so two libraries
-never share a bundle class either. The
+between the two cases, never the namespace/variable-naming half
+(`Hash_class.bundle_class_and_namespace`). The
 `_in_` prefix lets `CSS.merge` (see below) recognize a bundle atom and
 never drop it or let it drop another atom, and lets
 `styled-ppx.generate`'s atom-class collision check ("Dedup and write"
@@ -864,12 +863,11 @@ atoms the binding minted or whether it minted any at all. It is emitted
 first among the atoms in the className string (after the `label:<binding>`
 dev marker, when present): `label:<binding> _id_<hash> _a_<hash> ...`.
 
-**Inputs**, joined with `\0` and murmur2-hashed: the `--namespace` flag
-value (see below), the compilation-unit module name (the source
-file's basename, capitalized — never a physical path or dune library
-name, so a module compiled twice under different paths, e.g. a native
-and a Melange build via `copy_files`, mints the same identity when both
-share a namespace), the
+**Inputs**, joined with `\0` and murmur2-hashed: the compilation-unit
+module name (the source file's basename, capitalized — never a physical
+path or dune library name, so a module compiled twice under different
+paths or library names, e.g. a native and a Melange build via
+`copy_files`, mints the same identity), the
 enclosing submodule path, the binding name (or `[%styled.<tag>]` module
 name), and an occurrence index — folded in only when a
 `(scope, name)` pair repeats within one compilation unit (e.g. two
@@ -882,27 +880,14 @@ inside them is lowered), so the css under it takes the enclosing user
 binding's name for its label, dev marker and identity
 (`packages/ppx/test/css-support/styles-optional-className.t`).
 
-**`--namespace=<string>`** is a PPX flag, mixed into every identity
-(`_id_`), atom (`_a_`) and bundle (`_in_`) class hash in the same
-library-wide way as `--dev`/`--minify` (see "Atomization" above). In a
-dune `(pps ...)` list write it as one token, `--namespace=<string>`:
-dune reads a separate value token as a PPX library name. It defaults to the dune `library-name` cookie
-(`Settings.Get.namespace`, `packages/ppx/src/settings.re`) - the same
-cookie `[@@@css.config]`'s `library-name` entry already carries - so
-each dune library salts its own classes with no flag needed, and never
-collides with another library's byte-identical declaration on a page
-that links both (see "Class names" above). With neither the cookie nor
-the flag (e.g. the standalone driver run with no `-cookie`, as every
-css-support cram test does), the namespace is empty and adds nothing to
-the hash input. An explicit `--namespace` overrides the
-cookie: pass one shared value to both a native library and its Melange
-twin's `(pps styled-ppx ...)` stanzas (`copy_files` gives them different
-dune library names by default) so they keep minting identical atom and
-identity classes; pass two libraries with no dune cookie distinct
-values to tell them apart the way this flag always has
-(`packages/ppx/test/css-support/atom-namespace-twin.t`,
-`identity-library-namespace.t`). See "Identity collision" under Resolve
-for what happens when two libraries collide anyway.
+Two libraries that each have a module with the same basename and a
+binding with the same name share an identity. Run one
+`styled-ppx.generate` per app: it sees both and reports an identity
+collision when their CSS differs (see "Identity collision" under
+Resolve). Rename the module or the binding in one of them. The dune
+`library-name` cookie never reaches a hash; the ppx writes it only into
+`[@@@css.config]`, where `styled-ppx.generate` reads it to group modules
+for dependency order (`packages/ppx/test/css-support/library-twin-same-classes.t`).
 
 **Empty markers.** A named binding with no declarations (`let m = [%css
 {||}]`) still mints an identity — its `class_string` is `""` and no
@@ -946,7 +931,7 @@ three classes.
 ## See also
 
 - `documents/how-merging-works.md` — `CSS.merge`, sheet order, and
-  `--namespace`, for library users
+  several libraries in one sheet, for library users
 - `documents/design.md` — overall CSS pipeline (parsing, validation,
   generation) and the `[%styled.global]` / selector-interpolation
   design in depth

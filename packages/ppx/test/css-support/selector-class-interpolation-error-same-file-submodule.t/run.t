@@ -17,19 +17,19 @@ submodule instead of being emitted as a cross-module sentinel.
   [@css "._a_yvmv14evelu.plain-string-selector{color:blue;}"];
   [@css.bindings
     [
-      ("Input.Css.marker", "_id_zr2uk1", "_a_4ekvmb"),
-      ("Input.wrapper", "_id_4f6ye3", "_a_yvmv14evelu"),
+      ("Input.Css.marker", "_id_gfnxs2", "_a_4ekvmb"),
+      ("Input.wrapper", "_id_cuy74s", "_a_yvmv14evelu"),
     ]
   ];
   [@css.blocks
-    [(2, "_id_zr2uk1 _a_4ekvmb"), (6, "_id_4f6ye3 _a_yvmv14evelu")]
+    [(2, "_id_gfnxs2 _a_4ekvmb"), (6, "_id_cuy74s _a_yvmv14evelu")]
   ];
   module Css = {
-    let marker = CSS.make("label:marker _id_zr2uk1 _a_4ekvmb", []);
+    let marker = CSS.make("label:marker _id_gfnxs2 _a_4ekvmb", []);
     let notCx2 = "plain-string-selector";
   };
   
-  let wrapper = CSS.make("label:wrapper _id_4f6ye3 _a_yvmv14evelu", []);
+  let wrapper = CSS.make("label:wrapper _id_cuy74s _a_yvmv14evelu", []);
   
   let _ = (Css.marker, Css.notCx2, wrapper);
 

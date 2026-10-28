@@ -21,18 +21,18 @@ byte-identical CSS (same atoms, same atomized class).
   [@css "._a_4ekvmb{color:red;}"];
   [@css.bindings
     [
-      ("Input.f", "_id_fo0igp", "_a_4ekvmb"),
-      ("Input.g", "_id_smthfn", "_a_4ekvmb"),
+      ("Input.f", "_id_1yaoh1v", "_a_4ekvmb"),
+      ("Input.g", "_id_1fhj0s1", "_a_4ekvmb"),
     ]
   ];
-  [@css.blocks [(2, "_id_fo0igp _a_4ekvmb"), (7, "_id_smthfn _a_4ekvmb")]];
+  [@css.blocks [(2, "_id_1yaoh1v _a_4ekvmb"), (7, "_id_1fhj0s1 _a_4ekvmb")]];
   let f = () => {
-    let a = CSS.make("label:a _id_fo0igp _a_4ekvmb", []);
+    let a = CSS.make("label:a _id_1yaoh1v _a_4ekvmb", []);
     a;
   };
   
   let g = () => {
-    let a = CSS.make("label:a _id_smthfn _a_4ekvmb", []);
+    let a = CSS.make("label:a _id_1fhj0s1 _a_4ekvmb", []);
     a;
   };
   

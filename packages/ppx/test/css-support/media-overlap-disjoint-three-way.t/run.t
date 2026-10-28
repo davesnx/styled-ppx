@@ -12,10 +12,10 @@ at the cost of extra bytes.
     "@media (min-width: 768px) and (max-width: 1279px) and (not (min-width: 1280px)){._a_5kutk7pogdr{margin:8px;}}"]
   [@@@css "@media (min-width: 1280px) {._a_xyxs57p8n8o{margin:16px;}}"]
   [@@@css.bindings
-    [("Output.block", "_id_ovbeuh", "_a_7prbkv _a_5kutk7pogdr _a_xyxs57p8n8o")]]
-  [@@@css.blocks [(3, "_id_ovbeuh _a_7prbkv _a_5kutk7pogdr _a_xyxs57p8n8o")]]
+    [("Output.block", "_id_1n4allv", "_a_7prbkv _a_5kutk7pogdr _a_xyxs57p8n8o")]]
+  [@@@css.blocks [(3, "_id_1n4allv _a_7prbkv _a_5kutk7pogdr _a_xyxs57p8n8o")]]
   let block =
-    CSS.make "label:block _id_ovbeuh _a_7prbkv _a_5kutk7pogdr _a_xyxs57p8n8o"
+    CSS.make "label:block _id_1n4allv _a_7prbkv _a_5kutk7pogdr _a_xyxs57p8n8o"
       []
   let _ = block
 

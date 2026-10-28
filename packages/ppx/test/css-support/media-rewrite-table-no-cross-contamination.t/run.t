@@ -20,14 +20,14 @@ up independently:
   [@@@css
     "@media (min-width: 600px) and (orientation: portrait) {._a_p439r6lwrcv{height:2px;}}"]
   [@@@css.bindings
-    [("Output.block", "_id_ovbeuh",
+    [("Output.block", "_id_1n4allv",
        "_a_izob04e6zo5 _a_mp5mk4et4n8 _a_izob0ec7x8k _a_58at36l1y01 _a_p439r6lwrcv")]]
   [@@@css.blocks
     [(3,
-       "_id_ovbeuh _a_izob04e6zo5 _a_mp5mk4et4n8 _a_izob0ec7x8k _a_58at36l1y01 _a_p439r6lwrcv")]]
+       "_id_1n4allv _a_izob04e6zo5 _a_mp5mk4et4n8 _a_izob0ec7x8k _a_58at36l1y01 _a_p439r6lwrcv")]]
   let block =
     CSS.make
-      "label:block _id_ovbeuh _a_izob04e6zo5 _a_mp5mk4et4n8 _a_izob0ec7x8k _a_58at36l1y01 _a_p439r6lwrcv"
+      "label:block _id_1n4allv _a_izob04e6zo5 _a_mp5mk4et4n8 _a_izob0ec7x8k _a_58at36l1y01 _a_p439r6lwrcv"
       []
   let _ = block
 

@@ -16,23 +16,23 @@ merged styles cannot overwrite each other.
   ];
   [@css.bindings
     [
-      ("Output.common", "_id_45bzlz", "_a_390004vrad"),
-      ("Output.clickable", "_id_1d9eonh", "_a_qyw7u3900046meq"),
+      ("Output.common", "_id_cpi3ld", "_a_390004vrad"),
+      ("Output.clickable", "_id_htvdst", "_a_qyw7u3900046meq"),
     ]
   ];
   [@css.blocks
-    [(2, "_id_45bzlz _a_390004vrad"), (6, "_id_1d9eonh _a_qyw7u3900046meq")]
+    [(2, "_id_cpi3ld _a_390004vrad"), (6, "_id_htvdst _a_qyw7u3900046meq")]
   ];
   let common = backgroundColor =>
     CSS.make(
-      "label:common _id_45bzlz _a_390004vrad",
+      "label:common _id_cpi3ld _a_390004vrad",
       [
         ("--backgroundColor-ov3le6", CSS.Types.Color.toString(backgroundColor)),
       ],
     );
   let clickable = backgroundColor =>
     CSS.make(
-      "label:clickable _id_1d9eonh _a_qyw7u3900046meq",
+      "label:clickable _id_htvdst _a_qyw7u3900046meq",
       [
         ("--backgroundColor-7yjmr3", CSS.Types.Color.toString(backgroundColor)),
       ],

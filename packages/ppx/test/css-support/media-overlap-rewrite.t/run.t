@@ -10,10 +10,10 @@ conditions (both true at >=900px). The last one written must win at
     "@media (min-width: 600px) and (not (min-width: 900px)){._a_izob04e6zo5{color:red;}}"]
   [@@@css "@media (min-width: 900px) {._a_mp5mk4et4n8{color:blue;}}"]
   [@@@css.bindings
-    [("Output.block", "_id_ovbeuh", "_a_izob04e6zo5 _a_mp5mk4et4n8")]]
-  [@@@css.blocks [(3, "_id_ovbeuh _a_izob04e6zo5 _a_mp5mk4et4n8")]]
+    [("Output.block", "_id_1n4allv", "_a_izob04e6zo5 _a_mp5mk4et4n8")]]
+  [@@@css.blocks [(3, "_id_1n4allv _a_izob04e6zo5 _a_mp5mk4et4n8")]]
   let block =
-    CSS.make "label:block _id_ovbeuh _a_izob04e6zo5 _a_mp5mk4et4n8" []
+    CSS.make "label:block _id_1n4allv _a_izob04e6zo5 _a_mp5mk4et4n8" []
   let _ = block
 
   $ styled-ppx.generate output.ml > styles.css

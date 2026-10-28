@@ -25,20 +25,20 @@ This test captures cx2 regressions in an admin-style UI: border-side shorthands 
   [@css "._a_6lttxg{height:calc(100vh + var(--topMenuHeight-10ob2p1));}"];
   [@css.bindings
     [
-      ("Input._borderTop", "_id_k0smpx", "_a_3h2ghs9vd4"),
-      ("Input._borderBottom", "_id_4yz5wd", "_a_3h0007kb5g"),
-      ("Input._borderLeft", "_id_1w7n6a9", "_a_3h01ds4w3j"),
-      ("Input._boxShadow1", "_id_114a8u4", "_a_400dz6"),
-      ("Input._heightPlus", "_id_11xytn2", "_a_6lttxg"),
+      ("Input._borderTop", "_id_yiidb9", "_a_3h2ghs9vd4"),
+      ("Input._borderBottom", "_id_ugi43t", "_a_3h0007kb5g"),
+      ("Input._borderLeft", "_id_1wdp7tf", "_a_3h01ds4w3j"),
+      ("Input._boxShadow1", "_id_1eo8o80", "_a_400dz6"),
+      ("Input._heightPlus", "_id_1ul2fc1", "_a_6lttxg"),
     ]
   ];
   [@css.blocks
     [
-      (35, "_id_k0smpx _a_3h2ghs9vd4"),
-      (37, "_id_4yz5wd _a_3h0007kb5g"),
-      (39, "_id_1w7n6a9 _a_3h01ds4w3j"),
-      (41, "_id_114a8u4 _a_400dz6"),
-      (43, "_id_11xytn2 _a_6lttxg"),
+      (35, "_id_yiidb9 _a_3h2ghs9vd4"),
+      (37, "_id_ugi43t _a_3h0007kb5g"),
+      (39, "_id_1wdp7tf _a_3h01ds4w3j"),
+      (41, "_id_1eo8o80 _a_400dz6"),
+      (43, "_id_1ul2fc1 _a_6lttxg"),
     ]
   ];
   module Alias = {
@@ -77,12 +77,12 @@ This test captures cx2 regressions in an admin-style UI: border-side shorthands 
   
   let _borderTop =
     CSS.make(
-      "label:_borderTop _id_k0smpx _a_3h2ghs9vd4",
+      "label:_borderTop _id_yiidb9 _a_3h2ghs9vd4",
       [("--line-17j5in5", CSS.Types.Color.toString(Color.Border.line))],
     );
   let _borderBottom =
     CSS.make(
-      "label:_borderBottom _id_4yz5wd _a_3h0007kb5g",
+      "label:_borderBottom _id_ugi43t _a_3h0007kb5g",
       [
         (
           "--lineAlpha-1tmd8aq",
@@ -92,7 +92,7 @@ This test captures cx2 regressions in an admin-style UI: border-side shorthands 
     );
   let _borderLeft =
     CSS.make(
-      "label:_borderLeft _id_1w7n6a9 _a_3h01ds4w3j",
+      "label:_borderLeft _id_1wdp7tf _a_3h01ds4w3j",
       [
         (
           "--lineAlpha-k1tpqj",
@@ -103,7 +103,7 @@ This test captures cx2 regressions in an admin-style UI: border-side shorthands 
   
   let _boxShadow1 =
     CSS.make(
-      "label:_boxShadow1 _id_114a8u4 _a_400dz6",
+      "label:_boxShadow1 _id_1eo8o80 _a_400dz6",
       [
         (
           "--deprecated__elevation1-1jpikyl",
@@ -114,7 +114,7 @@ This test captures cx2 regressions in an admin-style UI: border-side shorthands 
   
   let _heightPlus =
     CSS.make(
-      "label:_heightPlus _id_11xytn2 _a_6lttxg",
+      "label:_heightPlus _id_1ul2fc1 _a_6lttxg",
       [("--topMenuHeight-10ob2p1", CSS.Types.Length.toString(topMenuHeight))],
     );
 

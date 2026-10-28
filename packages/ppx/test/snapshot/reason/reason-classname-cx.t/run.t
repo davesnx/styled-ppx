@@ -5,20 +5,20 @@
   [@css "._a_390004od7l{background-color:green;}"];
   [@css.bindings
     [
-      ("Output.cssRule", "_id_feg3n0", "_a_4esm7b"),
-      ("Output.classNameWithCss", "_id_wvmpur", "_a_390004od7l"),
+      ("Output.cssRule", "_id_4f3t99", "_a_4esm7b"),
+      ("Output.classNameWithCss", "_id_162zgi1", "_a_390004od7l"),
     ]
   ];
   [@css.blocks
-    [(4, "_id_feg3n0 _a_4esm7b"), (5, "_id_wvmpur _a_390004od7l")]
+    [(4, "_id_4f3t99 _a_4esm7b"), (5, "_id_162zgi1 _a_390004od7l")]
   ];
   let className = [%cx "display: block;"];
   let classNameWithMultiLine = [%cx {| display: block; |}];
   let classNameWithArray = [%cx [|cssProperty|]];
-  let cssRule = CSS.make("label:cssRule _id_feg3n0 _a_4esm7b", []);
+  let cssRule = CSS.make("label:cssRule _id_4f3t99 _a_4esm7b", []);
   let classNameWithCss = [%cx
     [|
       cssRule,
-      CSS.make("label:classNameWithCss _id_wvmpur _a_390004od7l", []),
+      CSS.make("label:classNameWithCss _id_162zgi1 _a_390004od7l", []),
     |]
   ];

@@ -9,7 +9,7 @@
     [
       (
         "Output.SelectorsMediaQueries",
-        "_id_36wyir",
+        "_id_p213nh",
         "_a_izob039qt2j _a_qyw7u39xfxf _a_og90v4ew9gh _a_og90v65000wbeaj",
       ),
     ]
@@ -18,7 +18,7 @@
     [
       (
         3,
-        "_id_36wyir _a_izob039qt2j _a_qyw7u39xfxf _a_og90v4ew9gh _a_og90v65000wbeaj",
+        "_id_p213nh _a_izob039qt2j _a_qyw7u39xfxf _a_og90v4ew9gh _a_og90v65000wbeaj",
       ),
     ]
   ];
@@ -1007,7 +1007,7 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "label:SelectorsMediaQueries _id_36wyir _a_izob039qt2j _a_qyw7u39xfxf _a_og90v4ew9gh _a_og90v65000wbeaj",
+        "label:SelectorsMediaQueries _id_p213nh _a_izob039qt2j _a_qyw7u39xfxf _a_og90v4ew9gh _a_og90v65000wbeaj",
         [],
       );
     let make = (props: makeProps) => {

@@ -12,10 +12,10 @@ last, sorts last and wins when both apply, as in plain CSS.
   [@@@css "._a_0lub34ebzcl:focus{color:blue;}"]
   [@@@css "._a_qyw7u4ego80:hover{color:red;}"]
   [@@@css.bindings
-    [("Input.danger", "_id_47cxs7", "_a_0lub34ebzcl _a_qyw7u4ego80")]]
-  [@@@css.blocks [(2, "_id_47cxs7 _a_0lub34ebzcl _a_qyw7u4ego80")]]
+    [("Input.danger", "_id_1156lfl", "_a_0lub34ebzcl _a_qyw7u4ego80")]]
+  [@@@css.blocks [(2, "_id_1156lfl _a_0lub34ebzcl _a_qyw7u4ego80")]]
   let danger =
-    CSS.make "label:danger _id_47cxs7 _a_0lub34ebzcl _a_qyw7u4ego80" []
+    CSS.make "label:danger _id_1156lfl _a_0lub34ebzcl _a_qyw7u4ego80" []
   let _ = danger
 
   $ styled-ppx.generate output.ml > styles.css

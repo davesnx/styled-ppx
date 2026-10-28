@@ -7,7 +7,7 @@ folded in - but its merge context must still read as plain
 `(min-width: 600px)`, exactly like `a`'s.
 
   $ ../media_merge_repro/print_merge.exe
-  a: label:a _id_10wtvz1 _a_izob04e698n
-  b: label:b _id_4tp6cw _a_izob04e8zzv _a_mp5mk4el0bp
-  merged: label:a _id_10wtvz1 label:b _id_4tp6cw _a_izob04e8zzv _a_mp5mk4el0bp
+  a: label:a _id_1awaa1p _a_izob04e698n
+  b: label:b _id_1ddibnm _a_izob04e8zzv _a_mp5mk4el0bp
+  merged: label:a _id_1awaa1p label:b _id_1ddibnm _a_izob04e8zzv _a_mp5mk4el0bp
   a's atom survives the merge: false

@@ -16,49 +16,49 @@ and the runtime `CSS.make` call must carry an empty list (no phantom
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css "._a_4ekvmb{color:red;}"];
-  [@css "._a_8s8tj4em6j7._id_zec317{color:blue;}"];
+  [@css "._a_y2fu14etqme._id_eealdg{color:blue;}"];
   [@css "._a_3900740mg9{background-size:1rem 1rem;}"];
   [@css
     "._a_2z00083gnv{-webkit-animation-duration:1000ms;animation-duration:1000ms;}"
   ];
   [@css "._a_390004xk9e{background-color:blue;}"];
   [@css
-    "._a_we4a1390004apm0:disabled:not(._a_we4a1390004apm0._id_1wqjj7x){background-color:gray;}"
+    "._a_rj4gd390004z2n1:disabled:not(._a_rj4gd390004z2n1._id_1v23wvr){background-color:gray;}"
   ];
   [@css.bindings
     [
-      ("Input.foo", "_id_zec317", "_a_4ekvmb"),
-      ("Input.bar", "_id_1eelq62", "_a_8s8tj4em6j7"),
+      ("Input.foo", "_id_eealdg", "_a_4ekvmb"),
+      ("Input.bar", "_id_1wtvg3d", "_a_y2fu14etqme"),
       (
         "Input.buttonLoadingAnimation",
-        "_id_1wqjj7x",
+        "_id_1v23wvr",
         "_a_3900740mg9 _a_2z00083gnv",
       ),
-      ("Input.colorAccent", "_id_qhdd42", "_a_390004xk9e _a_we4a1390004apm0"),
+      ("Input.colorAccent", "_id_1ljmqgf", "_a_390004xk9e _a_rj4gd390004z2n1"),
     ]
   ];
   [@css.blocks
     [
-      (7, "_id_zec317 _a_4ekvmb"),
-      (9, "_id_1eelq62 _a_8s8tj4em6j7"),
-      (15, "_id_1wqjj7x _a_3900740mg9 _a_2z00083gnv"),
-      (22, "_id_qhdd42 _a_390004xk9e _a_we4a1390004apm0"),
+      (7, "_id_eealdg _a_4ekvmb"),
+      (9, "_id_1wtvg3d _a_y2fu14etqme"),
+      (15, "_id_1v23wvr _a_3900740mg9 _a_2z00083gnv"),
+      (22, "_id_1ljmqgf _a_390004xk9e _a_rj4gd390004z2n1"),
     ]
   ];
   
-  let foo = CSS.make("label:foo _id_zec317 _a_4ekvmb", []);
+  let foo = CSS.make("label:foo _id_eealdg _a_4ekvmb", []);
   
-  let bar = CSS.make("label:bar _id_1eelq62 _a_8s8tj4em6j7", []);
+  let bar = CSS.make("label:bar _id_1wtvg3d _a_y2fu14etqme", []);
   
   let buttonLoadingAnimation =
     CSS.make(
-      "label:buttonLoadingAnimation _id_1wqjj7x _a_3900740mg9 _a_2z00083gnv",
+      "label:buttonLoadingAnimation _id_1v23wvr _a_3900740mg9 _a_2z00083gnv",
       [],
     );
   
   let colorAccent =
     CSS.make(
-      "label:colorAccent _id_qhdd42 _a_390004xk9e _a_we4a1390004apm0",
+      "label:colorAccent _id_1ljmqgf _a_390004xk9e _a_rj4gd390004z2n1",
       [],
     );
   

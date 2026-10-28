@@ -5,9 +5,9 @@
   [@css "._a_4e7bjx{color:var(--var-17zksex);}"];
   [@css "._a_5r7eu2{display:block;}"];
   [@css.bindings
-    [("Output.DynamicComponent", "_id_1hmg1vc", "_a_4e7bjx _a_5r7eu2")]
+    [("Output.DynamicComponent", "_id_1sfnaz9", "_a_4e7bjx _a_5r7eu2")]
   ];
-  [@css.blocks [(2, "_id_1hmg1vc _a_4e7bjx _a_5r7eu2")]];
+  [@css.blocks [(2, "_id_1sfnaz9 _a_4e7bjx _a_5r7eu2")]];
   module DynamicComponent = {
     [@deriving abstract]
     [@warning "-69"]
@@ -997,7 +997,7 @@
       "Object.assign";
     let styles = (~var, _) =>
       CSS.make(
-        "label:DynamicComponent _id_1hmg1vc _a_4e7bjx _a_5r7eu2",
+        "label:DynamicComponent _id_1sfnaz9 _a_4e7bjx _a_5r7eu2",
         [("--var-17zksex", CSS.Types.Color.toString(var))],
       );
     let make = (props: makeProps('var)) => {

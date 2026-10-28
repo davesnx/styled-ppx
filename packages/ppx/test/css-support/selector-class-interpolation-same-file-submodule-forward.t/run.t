@@ -18,20 +18,20 @@ referenced submodule binding above the selector interpolation.
   [@css "._a_4ekvmb{color:red;}"];
   [@css.bindings
     [
-      ("Input.wrapper", "_id_4f6ye3", "_a_ye3jo4ed103"),
-      ("Input.Css.marker", "_id_zr2uk1", "_a_4ekvmb"),
+      ("Input.wrapper", "_id_cuy74s", "_a_ye3jo4ed103"),
+      ("Input.Css.marker", "_id_gfnxs2", "_a_4ekvmb"),
     ]
   ];
   [@css.blocks
-    [(1, "_id_4f6ye3 _a_ye3jo4ed103"), (6, "_id_zr2uk1 _a_4ekvmb")]
+    [(1, "_id_cuy74s _a_ye3jo4ed103"), (6, "_id_gfnxs2 _a_4ekvmb")]
   ];
   [@css.refs [("Css.marker", "input.re", 2, 6, 16)]];
   
   let _ = Css.marker;
-  let wrapper = CSS.make("label:wrapper _id_4f6ye3 _a_ye3jo4ed103", []);
+  let wrapper = CSS.make("label:wrapper _id_cuy74s _a_ye3jo4ed103", []);
   
   module Css = {
-    let marker = CSS.make("label:marker _id_zr2uk1 _a_4ekvmb", []);
+    let marker = CSS.make("label:marker _id_gfnxs2 _a_4ekvmb", []);
   };
   
   let _ = (wrapper, Css.marker);

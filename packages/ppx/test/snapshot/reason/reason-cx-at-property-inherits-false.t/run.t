@@ -27,81 +27,81 @@ vars (top-level / &:hover / @media) and withheld for descendant-read vars.
   ];
   [@css.bindings
     [
-      ("Output.topLevel", "_id_1lkhdb3", "_a_4esjgz"),
-      ("Output.hover", "_id_ng6izt", "_a_qyw7u4ebwy0"),
-      ("Output.media", "_id_12d3e0w", "_a_5eyct4epxeg"),
-      ("Output.descendant", "_id_1g3dzrb", "_a_s19nz4ecfa1"),
-      ("Output.bundleSpan", "_id_ijx48y", "_in_1d8si03"),
-      ("Output.customFeeder", "_id_195hxjc", "_a_zytoc7ez6lcw"),
-      ("Output.pseudoElement", "_id_4p9l0t", "_a_wu9h64eqaxy"),
-      ("Output.legacyPseudoElement", "_id_4uo0i7", "_a_bzw494eluo3"),
-      ("Output.mixedPseudo", "_id_1rr25fw", "_in_i81g8d"),
-      ("Output.pseudoClassOnly", "_id_1f0poos", "_a_2f3u04e9ny0"),
+      ("Output.topLevel", "_id_1irk6xv", "_a_4esjgz"),
+      ("Output.hover", "_id_mr18po", "_a_qyw7u4ebwy0"),
+      ("Output.media", "_id_uamjpv", "_a_5eyct4epxeg"),
+      ("Output.descendant", "_id_1rit82z", "_a_s19nz4ecfa1"),
+      ("Output.bundleSpan", "_id_9xjcax", "_in_1d8si03"),
+      ("Output.customFeeder", "_id_1d4j48d", "_a_zytoc7ez6lcw"),
+      ("Output.pseudoElement", "_id_d6e0cy", "_a_wu9h64eqaxy"),
+      ("Output.legacyPseudoElement", "_id_ynlnh2", "_a_bzw494eluo3"),
+      ("Output.mixedPseudo", "_id_mkdw82", "_in_i81g8d"),
+      ("Output.pseudoClassOnly", "_id_z1a0vh", "_a_2f3u04e9ny0"),
     ]
   ];
   [@css.blocks
     [
-      (3, "_id_1lkhdb3 _a_4esjgz"),
-      (4, "_id_ng6izt _a_qyw7u4ebwy0"),
-      (5, "_id_12d3e0w _a_5eyct4epxeg"),
-      (6, "_id_1g3dzrb _a_s19nz4ecfa1"),
-      (7, "_id_ijx48y _in_1d8si03"),
-      (8, "_id_195hxjc _a_zytoc7ez6lcw"),
-      (9, "_id_4p9l0t _a_wu9h64eqaxy"),
-      (10, "_id_4uo0i7 _a_bzw494eluo3"),
-      (11, "_id_1rr25fw _in_i81g8d"),
-      (13, "_id_1f0poos _a_2f3u04e9ny0"),
+      (3, "_id_1irk6xv _a_4esjgz"),
+      (4, "_id_mr18po _a_qyw7u4ebwy0"),
+      (5, "_id_uamjpv _a_5eyct4epxeg"),
+      (6, "_id_1rit82z _a_s19nz4ecfa1"),
+      (7, "_id_9xjcax _in_1d8si03"),
+      (8, "_id_1d4j48d _a_zytoc7ez6lcw"),
+      (9, "_id_d6e0cy _a_wu9h64eqaxy"),
+      (10, "_id_ynlnh2 _a_bzw494eluo3"),
+      (11, "_id_mkdw82 _in_i81g8d"),
+      (13, "_id_z1a0vh _a_2f3u04e9ny0"),
     ]
   ];
   let color = CSS.Types.Color.toString(`hex("3A57FC"));
   let str = "literal";
   let topLevel =
     CSS.make(
-      "label:topLevel _id_1lkhdb3 _a_4esjgz",
+      "label:topLevel _id_1irk6xv _a_4esjgz",
       [("--color-1a279q8", CSS.Types.Color.toString(color))],
     );
   let hover =
     CSS.make(
-      "label:hover _id_ng6izt _a_qyw7u4ebwy0",
+      "label:hover _id_mr18po _a_qyw7u4ebwy0",
       [("--color-4uzv5u", CSS.Types.Color.toString(color))],
     );
   let media =
     CSS.make(
-      "label:media _id_12d3e0w _a_5eyct4epxeg",
+      "label:media _id_uamjpv _a_5eyct4epxeg",
       [("--color-km0lr0", CSS.Types.Color.toString(color))],
     );
   let descendant =
     CSS.make(
-      "label:descendant _id_1g3dzrb _a_s19nz4ecfa1",
+      "label:descendant _id_1rit82z _a_s19nz4ecfa1",
       [("--color-ump0qt", CSS.Types.Color.toString(color))],
     );
   let bundleSpan =
     CSS.make(
-      "label:bundleSpan _id_ijx48y _in_1d8si03",
+      "label:bundleSpan _id_9xjcax _in_1d8si03",
       [("--color-7srqv7", CSS.Types.Color.toString(color))],
     );
   let customFeeder =
     CSS.make(
-      "label:customFeeder _id_195hxjc _a_zytoc7ez6lcw",
+      "label:customFeeder _id_1d4j48d _a_zytoc7ez6lcw",
       [("--str-vye19e", str)],
     );
   let pseudoElement =
     CSS.make(
-      "label:pseudoElement _id_4p9l0t _a_wu9h64eqaxy",
+      "label:pseudoElement _id_d6e0cy _a_wu9h64eqaxy",
       [("--color-12r6fyr", CSS.Types.Color.toString(color))],
     );
   let legacyPseudoElement =
     CSS.make(
-      "label:legacyPseudoElement _id_4uo0i7 _a_bzw494eluo3",
+      "label:legacyPseudoElement _id_ynlnh2 _a_bzw494eluo3",
       [("--color-e7n16g", CSS.Types.Color.toString(color))],
     );
   let mixedPseudo =
     CSS.make(
-      "label:mixedPseudo _id_1rr25fw _in_i81g8d",
+      "label:mixedPseudo _id_mkdw82 _in_i81g8d",
       [("--color-xrtge", CSS.Types.Color.toString(color))],
     );
   let pseudoClassOnly =
     CSS.make(
-      "label:pseudoClassOnly _id_1f0poos _a_2f3u04e9ny0",
+      "label:pseudoClassOnly _id_z1a0vh _a_2f3u04e9ny0",
       [("--color-f5c7x", CSS.Types.Color.toString(color))],
     );

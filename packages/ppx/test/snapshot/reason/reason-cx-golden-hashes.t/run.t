@@ -23,28 +23,28 @@ the diff IS the blast radius.
   [@@@css "._a_8meee1{opacity:0.5;}"]
   [@@@css "._a_4e744k{color:var(--theme, blue);}"]
   [@@@css.bindings
-    [("Input.solid", "_id_ejsl7w", "_a_4ekvmb");
-    ("Input.multi", "_id_7orjvh", "_a_7peacs _a_94xp1v _a_4esm7b");
-    ("Input.hovered", "_id_18t9scx", "_a_4e3tth _a_qyw7u4ex7to");
-    ("Input.multiSel", "_id_j5w3l0", "_a_2sekz4e0myy _a_bcuim4eb45t");
-    ("Input.withMedia", "_id_1wbvjdi", "_a_a1ok24ei921");
-    ("Input.units", "_id_4x7ffc", "_a_ecpweu _a_8meee1");
-    ("Input.withFallback", "_id_asai3x", "_a_4e744k")]]
+    [("Input.solid", "_id_1ba4rip", "_a_4ekvmb");
+    ("Input.multi", "_id_1nhlj5e", "_a_7peacs _a_94xp1v _a_4esm7b");
+    ("Input.hovered", "_id_16rh7sm", "_a_4e3tth _a_qyw7u4ex7to");
+    ("Input.multiSel", "_id_11sz1d3", "_a_2sekz4e0myy _a_bcuim4eb45t");
+    ("Input.withMedia", "_id_abgzoq", "_a_a1ok24ei921");
+    ("Input.units", "_id_ns8d6", "_a_ecpweu _a_8meee1");
+    ("Input.withFallback", "_id_15mdavp", "_a_4e744k")]]
   [@@@css.blocks
-    [(12, "_id_ejsl7w _a_4ekvmb");
-    (15, "_id_7orjvh _a_7peacs _a_94xp1v _a_4esm7b");
-    (22, "_id_18t9scx _a_4e3tth _a_qyw7u4ex7to");
-    (30, "_id_j5w3l0 _a_2sekz4e0myy _a_bcuim4eb45t");
-    (39, "_id_1wbvjdi _a_a1ok24ei921");
-    (48, "_id_4x7ffc _a_ecpweu _a_8meee1");
-    (54, "_id_asai3x _a_4e744k")]]
-  let solid = CSS.make "label:solid _id_ejsl7w _a_4ekvmb" []
+    [(12, "_id_1ba4rip _a_4ekvmb");
+    (15, "_id_1nhlj5e _a_7peacs _a_94xp1v _a_4esm7b");
+    (22, "_id_16rh7sm _a_4e3tth _a_qyw7u4ex7to");
+    (30, "_id_11sz1d3 _a_2sekz4e0myy _a_bcuim4eb45t");
+    (39, "_id_abgzoq _a_a1ok24ei921");
+    (48, "_id_ns8d6 _a_ecpweu _a_8meee1");
+    (54, "_id_15mdavp _a_4e744k")]]
+  let solid = CSS.make "label:solid _id_1ba4rip _a_4ekvmb" []
   let multi =
-    CSS.make "label:multi _id_7orjvh _a_7peacs _a_94xp1v _a_4esm7b" []
+    CSS.make "label:multi _id_1nhlj5e _a_7peacs _a_94xp1v _a_4esm7b" []
   let hovered =
-    CSS.make "label:hovered _id_18t9scx _a_4e3tth _a_qyw7u4ex7to" []
+    CSS.make "label:hovered _id_16rh7sm _a_4e3tth _a_qyw7u4ex7to" []
   let multiSel =
-    CSS.make "label:multiSel _id_j5w3l0 _a_2sekz4e0myy _a_bcuim4eb45t" []
-  let withMedia = CSS.make "label:withMedia _id_1wbvjdi _a_a1ok24ei921" []
-  let units = CSS.make "label:units _id_4x7ffc _a_ecpweu _a_8meee1" []
-  let withFallback = CSS.make "label:withFallback _id_asai3x _a_4e744k" []
+    CSS.make "label:multiSel _id_11sz1d3 _a_2sekz4e0myy _a_bcuim4eb45t" []
+  let withMedia = CSS.make "label:withMedia _id_abgzoq _a_a1ok24ei921" []
+  let units = CSS.make "label:units _id_ns8d6 _a_ecpweu _a_8meee1" []
+  let withFallback = CSS.make "label:withFallback _id_15mdavp _a_4e744k" []

@@ -24,72 +24,72 @@ disjoint leaves, so they still get separate atoms.
   ];
   [@css.bindings
     [
-      ("Output.shorthandThenLonghand", "_id_1b2y2pm", "_a_7pow79"),
-      ("Output.longhandThenShorthand", "_id_9pf9ej", "_a_7p8lih"),
-      ("Output.threeMembers", "_id_5viu7a", "_a_7pp6yp"),
-      ("Output.unrelatedProperties", "_id_1eulq6f", "_a_4ekvmb _a_7p0008n4zf"),
+      ("Output.shorthandThenLonghand", "_id_1qpv0jm", "_a_7pow79"),
+      ("Output.longhandThenShorthand", "_id_uil9rv", "_a_7p8lih"),
+      ("Output.threeMembers", "_id_5lj0i7", "_a_7pp6yp"),
+      ("Output.unrelatedProperties", "_id_6fb8it", "_a_4ekvmb _a_7p0008n4zf"),
       (
         "Output.crossFamilyIndependence",
-        "_id_mz6ujm",
+        "_id_4irwce",
         "_a_7p0008n4zf _a_940008cand",
       ),
-      ("Output.underSelector", "_id_vkdvp6", "_a_qyw7u7po9vs"),
+      ("Output.underSelector", "_id_t76kqk", "_a_qyw7u7po9vs"),
       (
         "Output.sameFamilyDisjointLeaves",
-        "_id_ds74ar",
+        "_id_1jum1rn",
         "_a_940002yq1t _a_9400048fgp",
       ),
       (
         "Output.sameFamilyNoOverlap",
-        "_id_18fztpi",
+        "_id_1vbhcey",
         "_a_3h2ghsmzmu _a_3h00sgpy0o",
       ),
-      ("Output.sameFamilyOverlapViaShorthand", "_id_jjk2yk", "_a_3hu7ex"),
-      ("Output.transitiveBridge", "_id_1r4280b", "_a_3htdra"),
+      ("Output.sameFamilyOverlapViaShorthand", "_id_3jg85a", "_a_3hu7ex"),
+      ("Output.transitiveBridge", "_id_bhbjc9", "_a_3htdra"),
     ]
   ];
   [@css.blocks
     [
-      (1, "_id_1b2y2pm _a_7pow79"),
-      (5, "_id_9pf9ej _a_7p8lih"),
-      (10, "_id_5viu7a _a_7pp6yp"),
-      (15, "_id_1eulq6f _a_4ekvmb _a_7p0008n4zf"),
-      (19, "_id_mz6ujm _a_7p0008n4zf _a_940008cand"),
-      (24, "_id_vkdvp6 _a_qyw7u7po9vs"),
-      (31, "_id_ds74ar _a_940002yq1t _a_9400048fgp"),
-      (36, "_id_18fztpi _a_3h2ghsmzmu _a_3h00sgpy0o"),
-      (41, "_id_jjk2yk _a_3hu7ex"),
-      (47, "_id_1r4280b _a_3htdra"),
+      (1, "_id_1qpv0jm _a_7pow79"),
+      (5, "_id_uil9rv _a_7p8lih"),
+      (10, "_id_5lj0i7 _a_7pp6yp"),
+      (15, "_id_6fb8it _a_4ekvmb _a_7p0008n4zf"),
+      (19, "_id_4irwce _a_7p0008n4zf _a_940008cand"),
+      (24, "_id_t76kqk _a_qyw7u7po9vs"),
+      (31, "_id_1jum1rn _a_940002yq1t _a_9400048fgp"),
+      (36, "_id_1vbhcey _a_3h2ghsmzmu _a_3h00sgpy0o"),
+      (41, "_id_3jg85a _a_3hu7ex"),
+      (47, "_id_bhbjc9 _a_3htdra"),
     ]
   ];
   let shorthandThenLonghand =
-    CSS.make("label:shorthandThenLonghand _id_1b2y2pm _a_7pow79", []);
+    CSS.make("label:shorthandThenLonghand _id_1qpv0jm _a_7pow79", []);
   let longhandThenShorthand =
-    CSS.make("label:longhandThenShorthand _id_9pf9ej _a_7p8lih", []);
-  let threeMembers = CSS.make("label:threeMembers _id_5viu7a _a_7pp6yp", []);
+    CSS.make("label:longhandThenShorthand _id_uil9rv _a_7p8lih", []);
+  let threeMembers = CSS.make("label:threeMembers _id_5lj0i7 _a_7pp6yp", []);
   let unrelatedProperties =
     CSS.make(
-      "label:unrelatedProperties _id_1eulq6f _a_4ekvmb _a_7p0008n4zf",
+      "label:unrelatedProperties _id_6fb8it _a_4ekvmb _a_7p0008n4zf",
       [],
     );
   let crossFamilyIndependence =
     CSS.make(
-      "label:crossFamilyIndependence _id_mz6ujm _a_7p0008n4zf _a_940008cand",
+      "label:crossFamilyIndependence _id_4irwce _a_7p0008n4zf _a_940008cand",
       [],
     );
   let underSelector =
-    CSS.make("label:underSelector _id_vkdvp6 _a_qyw7u7po9vs", []);
+    CSS.make("label:underSelector _id_t76kqk _a_qyw7u7po9vs", []);
   let sameFamilyDisjointLeaves =
     CSS.make(
-      "label:sameFamilyDisjointLeaves _id_ds74ar _a_940002yq1t _a_9400048fgp",
+      "label:sameFamilyDisjointLeaves _id_1jum1rn _a_940002yq1t _a_9400048fgp",
       [],
     );
   let sameFamilyNoOverlap =
     CSS.make(
-      "label:sameFamilyNoOverlap _id_18fztpi _a_3h2ghsmzmu _a_3h00sgpy0o",
+      "label:sameFamilyNoOverlap _id_1vbhcey _a_3h2ghsmzmu _a_3h00sgpy0o",
       [],
     );
   let sameFamilyOverlapViaShorthand =
-    CSS.make("label:sameFamilyOverlapViaShorthand _id_jjk2yk _a_3hu7ex", []);
+    CSS.make("label:sameFamilyOverlapViaShorthand _id_3jg85a _a_3hu7ex", []);
   let transitiveBridge =
-    CSS.make("label:transitiveBridge _id_1r4280b _a_3htdra", []);
+    CSS.make("label:transitiveBridge _id_bhbjc9 _a_3htdra", []);

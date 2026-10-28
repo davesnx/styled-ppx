@@ -20,17 +20,17 @@ lock in that the marker disappears in production regardless of the default.
   [@css "._a_4ekvmb{color:red;}"];
   [@css.bindings
     [
-      ("Input.layout", "_id_1jj5tmt", "_a_5r08qs _a_94zrbw"),
-      ("Input.button", "_id_l55coe", "_a_4ekvmb"),
+      ("Input.layout", "_id_1xb8ads", "_a_5r08qs _a_94zrbw"),
+      ("Input.button", "_id_1enkfbb", "_a_4ekvmb"),
     ]
   ];
   [@css.blocks
-    [(6, "_id_1jj5tmt _a_5r08qs _a_94zrbw"), (8, "_id_l55coe _a_4ekvmb")]
+    [(6, "_id_1xb8ads _a_5r08qs _a_94zrbw"), (8, "_id_1enkfbb _a_4ekvmb")]
   ];
   
-  let layout = CSS.make("_id_1jj5tmt _a_5r08qs _a_94zrbw", []);
+  let layout = CSS.make("_id_1xb8ads _a_5r08qs _a_94zrbw", []);
   
-  let button = CSS.make("_id_l55coe _a_4ekvmb", []);
+  let button = CSS.make("_id_1enkfbb _a_4ekvmb", []);
   
   let _ = (layout, button);
 

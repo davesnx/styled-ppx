@@ -19,27 +19,27 @@ marshalled AST; `tr` keeps the output stable:
   $ dune describe pp ./input.re | tr -d '\r' | sed '1,/^];$/d'
   [@css "._a_4ekvmb{color:red;}"];
   [@css "._a_4esm7b{color:blue;}"];
-  [@css "._a_tb8ov655m9solf9._id_1mvyff1{font-weight:bold;}"];
+  [@css "._a_a6upz655m9sbqr7._id_1tr6yta{font-weight:bold;}"];
   [@css.bindings
     [
-      ("Input.foo", "_id_1mvyff1", "_a_4esm7b"),
-      ("Input.bar", "_id_1eelq62", "_a_tb8ov655m9solf9"),
+      ("Input.foo", "_id_1tr6yta", "_a_4esm7b"),
+      ("Input.bar", "_id_1wtvg3d", "_a_a6upz655m9sbqr7"),
     ]
   ];
   [@css.blocks
     [
-      (5, "_id_zec317 _a_4ekvmb"),
-      (8, "_id_1mvyff1 _a_4esm7b"),
-      (10, "_id_1eelq62 _a_tb8ov655m9solf9"),
+      (5, "_id_eealdg _a_4ekvmb"),
+      (8, "_id_1tr6yta _a_4esm7b"),
+      (10, "_id_1wtvg3d _a_a6upz655m9sbqr7"),
     ]
   ];
   
-  let foo = CSS.make("label:foo _id_zec317 _a_4ekvmb", []);
+  let foo = CSS.make("label:foo _id_eealdg _a_4ekvmb", []);
   let _ = foo;
   
-  let foo = CSS.make("label:foo _id_1mvyff1 _a_4esm7b", []);
+  let foo = CSS.make("label:foo _id_1tr6yta _a_4esm7b", []);
   
-  let bar = CSS.make("label:bar _id_1eelq62 _a_tb8ov655m9solf9", []);
+  let bar = CSS.make("label:bar _id_1wtvg3d _a_a6upz655m9sbqr7", []);
   
   let _ = (foo, bar);
 

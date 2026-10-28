@@ -12,32 +12,32 @@ verbatim - no Cascading.toString wrap.
   [@css "._a_zyqed1fpwqpt{--token:var(--value-13tu4ef);}"];
   [@css.bindings
     [
-      ("Output.row", "_id_z61k1z", "_a_zy7gz1zq54yy"),
-      ("Output.theme", "_id_r5u180", "_a_zy7gz1zq54yy _a_zy4gc55zkohh"),
-      ("Output.dyn", "_id_soz37v", "_a_zyqed1fpwqpt"),
+      ("Output.row", "_id_3o3lvw", "_a_zy7gz1zq54yy"),
+      ("Output.theme", "_id_1s07ooq", "_a_zy7gz1zq54yy _a_zy4gc55zkohh"),
+      ("Output.dyn", "_id_1gnvnw7", "_a_zyqed1fpwqpt"),
     ]
   ];
   [@css.blocks
     [
-      (3, "_id_z61k1z _a_zy7gz1zq54yy"),
-      (7, "_id_r5u180 _a_zy7gz1zq54yy _a_zy4gc55zkohh"),
-      (11, "_id_soz37v _a_zyqed1fpwqpt"),
+      (3, "_id_3o3lvw _a_zy7gz1zq54yy"),
+      (7, "_id_1s07ooq _a_zy7gz1zq54yy _a_zy4gc55zkohh"),
+      (11, "_id_1gnvnw7 _a_zyqed1fpwqpt"),
     ]
   ];
   let colorStr = CSS.Types.Color.toString(`hex("3A57FC"));
   let plainStr = "10px";
   let row =
     CSS.make(
-      "label:row _id_z61k1z _a_zy7gz1zq54yy",
+      "label:row _id_3o3lvw _a_zy7gz1zq54yy",
       [("--colorStr-t58soe", colorStr)],
     );
   let theme =
     CSS.make(
-      "label:theme _id_r5u180 _a_zy7gz1zq54yy _a_zy4gc55zkohh",
+      "label:theme _id_1s07ooq _a_zy7gz1zq54yy _a_zy4gc55zkohh",
       [("--colorStr-t58soe", colorStr), ("--plainStr-vbhzka", plainStr)],
     );
   let dyn = value =>
     CSS.make(
-      "label:dyn _id_soz37v _a_zyqed1fpwqpt",
+      "label:dyn _id_1gnvnw7 _a_zyqed1fpwqpt",
       [("--value-13tu4ef", value)],
     );

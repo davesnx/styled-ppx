@@ -14,43 +14,43 @@ emitted as a cross-module sentinel.
 
   $ dune describe pp ./input.re | sed '1,/^];$/d'
   [@css "._a_4ekvmb{color:red;}"];
-  [@css "._a_qye7h4e56b5._id_zr2uk1{color:orange;}"];
-  [@css "._a_qye7h655m9ssyz4._id_zr2uk1{font-weight:bold;}"];
+  [@css "._a_qiu8x4eggk2._id_gfnxs2{color:orange;}"];
+  [@css "._a_qiu8x655m9st0if._id_gfnxs2{font-weight:bold;}"];
   [@css "._a_4ecoli{color:green;}"];
-  [@css "._a_uisk84e7jnm._id_11dmi54{color:blue;}"];
+  [@css "._a_x5ved4ecubx._id_ing4zo{color:blue;}"];
   [@css.bindings
     [
-      ("Input.Css.marker", "_id_zr2uk1", "_a_4ekvmb"),
-      ("Input.Css.wrapper", "_id_7sdyhq", "_a_qye7h4e56b5"),
-      ("Input.wrapper", "_id_4f6ye3", "_a_qye7h655m9ssyz4"),
-      ("Input.Theme.Css.marker", "_id_11dmi54", "_a_4ecoli"),
-      ("Input.Theme.Components.wrapper", "_id_1mhdtfv", "_a_uisk84e7jnm"),
+      ("Input.Css.marker", "_id_gfnxs2", "_a_4ekvmb"),
+      ("Input.Css.wrapper", "_id_1q350bi", "_a_qiu8x4eggk2"),
+      ("Input.wrapper", "_id_cuy74s", "_a_qiu8x655m9st0if"),
+      ("Input.Theme.Css.marker", "_id_ing4zo", "_a_4ecoli"),
+      ("Input.Theme.Components.wrapper", "_id_1uo6vb2", "_a_x5ved4ecubx"),
     ]
   ];
   [@css.blocks
     [
-      (2, "_id_zr2uk1 _a_4ekvmb"),
-      (4, "_id_7sdyhq _a_qye7h4e56b5"),
-      (9, "_id_4f6ye3 _a_qye7h655m9ssyz4"),
-      (15, "_id_11dmi54 _a_4ecoli"),
-      (19, "_id_1mhdtfv _a_uisk84e7jnm"),
+      (2, "_id_gfnxs2 _a_4ekvmb"),
+      (4, "_id_1q350bi _a_qiu8x4eggk2"),
+      (9, "_id_cuy74s _a_qiu8x655m9st0if"),
+      (15, "_id_ing4zo _a_4ecoli"),
+      (19, "_id_1uo6vb2 _a_x5ved4ecubx"),
     ]
   ];
   module Css = {
-    let marker = CSS.make("label:marker _id_zr2uk1 _a_4ekvmb", []);
+    let marker = CSS.make("label:marker _id_gfnxs2 _a_4ekvmb", []);
   
-    let wrapper = CSS.make("label:wrapper _id_7sdyhq _a_qye7h4e56b5", []);
+    let wrapper = CSS.make("label:wrapper _id_1q350bi _a_qiu8x4eggk2", []);
   };
   
-  let wrapper = CSS.make("label:wrapper _id_4f6ye3 _a_qye7h655m9ssyz4", []);
+  let wrapper = CSS.make("label:wrapper _id_cuy74s _a_qiu8x655m9st0if", []);
   
   module Theme = {
     module Css = {
-      let marker = CSS.make("label:marker _id_11dmi54 _a_4ecoli", []);
+      let marker = CSS.make("label:marker _id_ing4zo _a_4ecoli", []);
     };
   
     module Components = {
-      let wrapper = CSS.make("label:wrapper _id_1mhdtfv _a_uisk84e7jnm", []);
+      let wrapper = CSS.make("label:wrapper _id_1uo6vb2 _a_x5ved4ecubx", []);
     };
   };
   

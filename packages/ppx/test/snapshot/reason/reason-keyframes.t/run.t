@@ -5,8 +5,8 @@
   [@css
     "._a_2z001s0iev{-webkit-animation-name:var(--animation-1sd4kiq);animation-name:var(--animation-1sd4kiq);}"
   ];
-  [@css.bindings [("Output.FadeIn", "_id_18tumag", "_a_2z001s0iev")]];
-  [@css.blocks [(5, "_id_18tumag _a_2z001s0iev")]];
+  [@css.bindings [("Output.FadeIn", "_id_mj8pqn", "_a_2z001s0iev")]];
+  [@css.blocks [(5, "_id_mj8pqn _a_2z001s0iev")]];
   let animation = CSS.Types.AnimationName.make("_k_m6pt8e");
   module FadeIn = {
     [@deriving abstract]
@@ -993,7 +993,7 @@
       "Object.assign";
     let styles =
       CSS.make(
-        "label:FadeIn _id_18tumag _a_2z001s0iev",
+        "label:FadeIn _id_mj8pqn _a_2z001s0iev",
         CSS.Types.AnimationName.toStyleVars("--animation-1sd4kiq", animation),
       );
     let make = (props: makeProps) => {

@@ -25,29 +25,29 @@ had no branch for the `of` keyword.
   [@css "._a_kj3e34es5ty:nth-last-child(odd of .a,.b){color:yellow;}"];
   [@css.bindings
     [
-      ("Input._part", "_id_3hanao", "_a_5r7jx4en809"),
-      ("Input._slotted", "_id_n06isq", "_a_wmvcz4ee6d9"),
-      ("Input._nth_child_of", "_id_1k5qaw3", "_a_da0h14e51rt"),
-      ("Input._nth_last_child_of_list", "_id_1vkw39v", "_a_kj3e34es5ty"),
+      ("Input._part", "_id_1munzu", "_a_5r7jx4en809"),
+      ("Input._slotted", "_id_2rmphz", "_a_wmvcz4ee6d9"),
+      ("Input._nth_child_of", "_id_yct85k", "_a_da0h14e51rt"),
+      ("Input._nth_last_child_of_list", "_id_xd3wqi", "_a_kj3e34es5ty"),
     ]
   ];
   [@css.blocks
     [
-      (7, "_id_3hanao _a_5r7jx4en809"),
-      (13, "_id_n06isq _a_wmvcz4ee6d9"),
-      (19, "_id_1k5qaw3 _a_da0h14e51rt"),
-      (25, "_id_1vkw39v _a_kj3e34es5ty"),
+      (7, "_id_1munzu _a_5r7jx4en809"),
+      (13, "_id_2rmphz _a_wmvcz4ee6d9"),
+      (19, "_id_yct85k _a_da0h14e51rt"),
+      (25, "_id_xd3wqi _a_kj3e34es5ty"),
     ]
   ];
   
-  let _part = CSS.make("label:_part _id_3hanao _a_5r7jx4en809", []);
+  let _part = CSS.make("label:_part _id_1munzu _a_5r7jx4en809", []);
   
-  let _slotted = CSS.make("label:_slotted _id_n06isq _a_wmvcz4ee6d9", []);
+  let _slotted = CSS.make("label:_slotted _id_2rmphz _a_wmvcz4ee6d9", []);
   
   let _nth_child_of =
-    CSS.make("label:_nth_child_of _id_1k5qaw3 _a_da0h14e51rt", []);
+    CSS.make("label:_nth_child_of _id_yct85k _a_da0h14e51rt", []);
   
   let _nth_last_child_of_list =
-    CSS.make("label:_nth_last_child_of_list _id_1vkw39v _a_kj3e34es5ty", []);
+    CSS.make("label:_nth_last_child_of_list _id_xd3wqi _a_kj3e34es5ty", []);
 
   $ dune build

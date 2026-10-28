@@ -4,9 +4,9 @@
   [@css "._a_5r08qs{display:flex;}"];
   [@css "._a_9h0002ndxa{justify-content:center;}"];
   [@css.bindings
-    [("Output.MultiLineStrings", "_id_11ddqpw", "_a_5r08qs _a_9h0002ndxa")]
+    [("Output.MultiLineStrings", "_id_110ofj1", "_a_5r08qs _a_9h0002ndxa")]
   ];
-  [@css.blocks [(2, "_id_11ddqpw _a_5r08qs _a_9h0002ndxa")]];
+  [@css.blocks [(2, "_id_110ofj1 _a_5r08qs _a_9h0002ndxa")]];
   module MultiLineStrings: {
     type makeProps;
     let make: makeProps => React.element;
@@ -966,7 +966,7 @@
       };
     let styles =
       CSS.make(
-        "label:MultiLineStrings _id_11ddqpw _a_5r08qs _a_9h0002ndxa",
+        "label:MultiLineStrings _id_110ofj1 _a_5r08qs _a_9h0002ndxa",
         [],
       );
     let make = (props: makeProps) => {

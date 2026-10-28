@@ -32,43 +32,43 @@ as the main subject, across properties that never repeat.
   [@@@css "._a_4ekvmb{color:red;}"]
   [@@@css "._a_7pzjs7{margin:0;margin:var(--c-kv4uq2);}"]
   [@@@css.bindings
-    [("Input.dup", "_id_1rqoi1k", "_a_4epkbn");
-    ("Input.fallback", "_id_1t6se51", "_a_5rx8u2");
-    ("Input.interleaved", "_id_8z5ze6", "_a_7p1gs8 _a_4eb7kq");
-    ("Input.mediaInterleaved", "_id_17s8jfs", "_a_izob04ep0x6 _a_4eb7kq");
-    ("Input.shorthandReset", "_id_18j0etq", "_a_7pjper");
-    ("Input.nested", "_id_swo4az", "_a_qyw7u4ebukr");
-    ("Input.twice", "_id_bxfxu3", "_a_qyw7u4ego80");
-    ("Input.custom", "_id_216v6m", "_a_zygl8yfjbrel _a_zy803csp5vyo");
-    ("Input.A.x", "_id_hplgo2", "_a_4ekvmb");
-    ("Input.B.x", "_id_i6ik4z", "_a_4eb7kq");
-    ("Input.vars", "_id_10jlpap", "_a_7pzjs7")]]
+    [("Input.dup", "_id_2frt8o", "_a_4epkbn");
+    ("Input.fallback", "_id_nhm3i7", "_a_5rx8u2");
+    ("Input.interleaved", "_id_uz1g5q", "_a_7p1gs8 _a_4eb7kq");
+    ("Input.mediaInterleaved", "_id_hqmvut", "_a_izob04ep0x6 _a_4eb7kq");
+    ("Input.shorthandReset", "_id_10g1958", "_a_7pjper");
+    ("Input.nested", "_id_12efak4", "_a_qyw7u4ebukr");
+    ("Input.twice", "_id_cxak1z", "_a_qyw7u4ego80");
+    ("Input.custom", "_id_z7kpur", "_a_zygl8yfjbrel _a_zy803csp5vyo");
+    ("Input.A.x", "_id_611hw4", "_a_4ekvmb");
+    ("Input.B.x", "_id_afgty5", "_a_4eb7kq");
+    ("Input.vars", "_id_815umz", "_a_7pzjs7")]]
   [@@@css.blocks
-    [(11, "_id_1rqoi1k _a_4epkbn");
-    (15, "_id_1t6se51 _a_5rx8u2");
-    (19, "_id_8z5ze6 _a_7p1gs8 _a_4eb7kq");
-    (27, "_id_17s8jfs _a_izob04ep0x6 _a_4eb7kq");
-    (35, "_id_18j0etq _a_7pjper");
-    (38, "_id_swo4az _a_qyw7u4ebukr");
-    (42, "_id_bxfxu3 _a_qyw7u4ego80");
-    (45, "_id_216v6m _a_zygl8yfjbrel _a_zy803csp5vyo");
-    (51, "_id_hplgo2 _a_4ekvmb");
-    (55, "_id_i6ik4z _a_4eb7kq");
-    (60, "_id_10jlpap _a_7pzjs7")]]
-  let dup = CSS.make "label:dup _id_1rqoi1k _a_4epkbn" []
-  let fallback = CSS.make "label:fallback _id_1t6se51 _a_5rx8u2" []
+    [(11, "_id_2frt8o _a_4epkbn");
+    (15, "_id_nhm3i7 _a_5rx8u2");
+    (19, "_id_uz1g5q _a_7p1gs8 _a_4eb7kq");
+    (27, "_id_hqmvut _a_izob04ep0x6 _a_4eb7kq");
+    (35, "_id_10g1958 _a_7pjper");
+    (38, "_id_12efak4 _a_qyw7u4ebukr");
+    (42, "_id_cxak1z _a_qyw7u4ego80");
+    (45, "_id_z7kpur _a_zygl8yfjbrel _a_zy803csp5vyo");
+    (51, "_id_611hw4 _a_4ekvmb");
+    (55, "_id_afgty5 _a_4eb7kq");
+    (60, "_id_815umz _a_7pzjs7")]]
+  let dup = CSS.make "label:dup _id_2frt8o _a_4epkbn" []
+  let fallback = CSS.make "label:fallback _id_nhm3i7 _a_5rx8u2" []
   let interleaved =
-    CSS.make "label:interleaved _id_8z5ze6 _a_7p1gs8 _a_4eb7kq" []
+    CSS.make "label:interleaved _id_uz1g5q _a_7p1gs8 _a_4eb7kq" []
   let mediaInterleaved =
-    CSS.make "label:mediaInterleaved _id_17s8jfs _a_izob04ep0x6 _a_4eb7kq" []
-  let shorthandReset = CSS.make "label:shorthandReset _id_18j0etq _a_7pjper" []
-  let nested = CSS.make "label:nested _id_swo4az _a_qyw7u4ebukr" []
-  let twice = CSS.make "label:twice _id_bxfxu3 _a_qyw7u4ego80" []
+    CSS.make "label:mediaInterleaved _id_hqmvut _a_izob04ep0x6 _a_4eb7kq" []
+  let shorthandReset = CSS.make "label:shorthandReset _id_10g1958 _a_7pjper" []
+  let nested = CSS.make "label:nested _id_12efak4 _a_qyw7u4ebukr" []
+  let twice = CSS.make "label:twice _id_cxak1z _a_qyw7u4ego80" []
   let custom =
-    CSS.make "label:custom _id_216v6m _a_zygl8yfjbrel _a_zy803csp5vyo" []
-  module A = struct let x = CSS.make "label:x _id_hplgo2 _a_4ekvmb" [] end
-  module B = struct let x = CSS.make "label:x _id_i6ik4z _a_4eb7kq" [] end
+    CSS.make "label:custom _id_z7kpur _a_zygl8yfjbrel _a_zy803csp5vyo" []
+  module A = struct let x = CSS.make "label:x _id_611hw4 _a_4ekvmb" [] end
+  module B = struct let x = CSS.make "label:x _id_afgty5 _a_4eb7kq" [] end
   let c = "10px"
   let vars =
-    CSS.make "label:vars _id_10jlpap _a_7pzjs7"
+    CSS.make "label:vars _id_815umz _a_7pzjs7"
       [("--c-kv4uq2", (CSS.Types.Margin.toString c))]

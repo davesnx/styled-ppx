@@ -12,14 +12,14 @@ of the CSS string, classes in source order) next to the named blocks:
   [@@@css "._a_qyw7u4ego80:hover{color:red;}"]
   [@@@css "._a_0lub34ebzcl:focus{color:blue;}"]
   [@@@css.bindings
-    [("Input.hover", "_id_zu568x", "_a_qyw7u4ego80");
-    ("Input.focus", "_id_56c3p2", "_a_0lub34ebzcl")]]
+    [("Input.hover", "_id_15yirr8", "_a_qyw7u4ego80");
+    ("Input.focus", "_id_npabso", "_a_0lub34ebzcl")]]
   [@@@css.blocks
-    [(1, "_id_zu568x _a_qyw7u4ego80");
-    (2, "_id_56c3p2 _a_0lub34ebzcl");
+    [(1, "_id_15yirr8 _a_qyw7u4ego80");
+    (2, "_id_npabso _a_0lub34ebzcl");
     (5, "_a_0lub34ebzcl _a_qyw7u4ego80")]]
-  let hover = CSS.make "label:hover _id_zu568x _a_qyw7u4ego80" []
-  let focus = CSS.make "label:focus _id_56c3p2 _a_0lub34ebzcl" []
+  let hover = CSS.make "label:hover _id_15yirr8 _a_qyw7u4ego80" []
+  let focus = CSS.make "label:focus _id_npabso _a_0lub34ebzcl" []
   let _ = CSS.className (CSS.make "_a_0lub34ebzcl _a_qyw7u4ego80" [])
   let _ = (hover, focus)
 

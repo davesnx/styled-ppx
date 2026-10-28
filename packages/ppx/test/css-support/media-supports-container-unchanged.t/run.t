@@ -11,13 +11,13 @@ shape that must not regress into being rewritten.
   [@@@css "@media (min-width: 900px) {._a_mp5mk4et4n8{color:blue;}}"]
   [@@@css "@supports (display: grid) {._a_159rq4e3jvj{color:green;}}"]
   [@@@css.bindings
-    [("Output.block", "_id_ovbeuh",
+    [("Output.block", "_id_1n4allv",
        "_a_izob04e6zo5 _a_mp5mk4et4n8 _a_159rq4e3jvj")]]
   [@@@css.blocks
-    [(3, "_id_ovbeuh _a_izob04e6zo5 _a_mp5mk4et4n8 _a_159rq4e3jvj")]]
+    [(3, "_id_1n4allv _a_izob04e6zo5 _a_mp5mk4et4n8 _a_159rq4e3jvj")]]
   let block =
     CSS.make
-      "label:block _id_ovbeuh _a_izob04e6zo5 _a_mp5mk4et4n8 _a_159rq4e3jvj" []
+      "label:block _id_1n4allv _a_izob04e6zo5 _a_mp5mk4et4n8 _a_159rq4e3jvj" []
   let _ = block
 
   $ styled-ppx.generate output.ml > styles.css
