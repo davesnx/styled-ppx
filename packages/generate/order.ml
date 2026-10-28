@@ -20,6 +20,91 @@ let references (structure : Ppxlib.structure) : string list =
   Depend.add_implementation Depend.String.Map.empty compiler_structure;
   Depend.String.Set.elements !Depend.free_structure_names
 
+(** The structure with every open scope cut out: the body of [M.( ... )] and
+    [let open M in ...], the pattern under [M.( ... )], and every item after a
+    structure-level or signature-level [open] or [include]. The opened module
+    itself stays. *)
+let without_open_scopes =
+  let loc = Ppxlib.Location.none in
+  object
+    inherit Ppxlib.Ast_traverse.map as super
+
+    method! expression e =
+      match e.pexp_desc with
+      | Pexp_open (declaration, _) ->
+        super#expression
+          { e with pexp_desc = Pexp_open (declaration, [%expr ()]) }
+      | _ -> super#expression e
+
+    method! pattern p =
+      match p.ppat_desc with
+      | Ppat_open (lid, _) ->
+        {
+          p with
+          ppat_desc = Ppat_open (lid, Ppxlib.Ast_builder.Default.ppat_any ~loc);
+        }
+      | _ -> super#pattern p
+
+    method! structure items =
+      let rec keep = function
+        | [] -> []
+        | ({ Ppxlib.pstr_desc = Pstr_open _ | Pstr_include _; _ } as item) :: _
+          ->
+          [ item ]
+        | item :: rest -> item :: keep rest
+      in
+      super#structure (keep items)
+
+    method! signature items =
+      let rec keep = function
+        | [] -> []
+        | ({ Ppxlib.psig_desc = Psig_open _ | Psig_include _; _ } as item) :: _
+          ->
+          [ item ]
+        | item :: rest -> item :: keep rest
+      in
+      super#signature (keep items)
+  end
+
+(** The module names of {!references} that occur outside any open scope. After
+    [open M], a bare [N] may be the submodule [M.N], so only these names can
+    name a module of another library. *)
+let references_outside_opens (structure : Ppxlib.structure) : string list =
+  references (without_open_scopes#structure structure)
+
+(** The line of the first longident whose head is each referenced module name,
+    for diagnostics. *)
+let first_lines (structure : Ppxlib.structure) : (string * int) list =
+  let lines = Hashtbl.create 64 in
+  let collector =
+    object
+      inherit Ppxlib.Ast_traverse.iter as super
+
+      method! longident_loc { txt; loc } =
+        let head =
+          match Ppxlib.Longident.flatten_exn txt with
+          | head :: _ :: _ -> Some head
+          | [ _ ] | [] -> None
+          | exception _ -> None
+        in
+        (match head with
+        | Some head when not (Hashtbl.mem lines head) ->
+          Hashtbl.add lines head loc.loc_start.pos_lnum
+        | _ -> ());
+        super#longident_loc { txt; loc }
+
+      method! module_expr m =
+        (match m.pmod_desc with
+        | Pmod_ident { txt = Lident head; loc }
+          when not (Hashtbl.mem lines head) ->
+          Hashtbl.add lines head loc.loc_start.pos_lnum
+        | _ -> ());
+        super#module_expr m
+    end
+  in
+  collector#structure structure;
+  Hashtbl.fold (fun name line acc -> (name, line) :: acc) lines []
+
 (** Strongly connected components (Tarjan). Maps each of [nodes] to the index of
     its component; two keys share an index exactly when each can reach the
     other. [edges k] must return only keys from [nodes]. *)
@@ -84,17 +169,18 @@ let components ~(nodes : string list) ~(edges : string -> string list) :
     ambiguous-name heuristic can pick an edge a real build wouldn't have). We
     never fail the build over an ordering problem: among the stuck edges that
     lie on a cycle (both ends in one strongly connected component), drop the one
-    whose dependent (source) key sorts alphabetically last, warn naming that
-    cycle's nodes, and keep going. A node that only depends on a cycle keeps its
-    edge. Dropping only ever removes edges from a finite graph, so this always
-    terminates.
+    with the fewest references ([edge_detail source dep], 1 when [None]), then
+    the one whose dependent (source) key sorts alphabetically last, warn naming
+    that cycle's nodes and the edge's detail, and keep going. A node that only
+    depends on a cycle keeps its edge. Dropping only ever removes edges from a
+    finite graph, so this always terminates.
 
     Two nodes sharing a [key] collapse into one (the later one in [nodes] wins,
     since [node_of_key] is filled with [Hashtbl.replace]); [node_count] below is
     therefore the number of distinct keys, not [List.length nodes], so the
     emission loop's termination bound matches what can actually be emitted. *)
-let sort (type a) ~(nodes : a list) ~(edges : a -> a list) ~(key : a -> string)
-  : a list =
+let sort (type a) ~(edge_detail : string -> string -> (int * string) option)
+  ~(nodes : a list) ~(edges : a -> a list) ~(key : a -> string) : a list =
   let module KeySet = Set.Make (String) in
   let node_of_key : (string, a) Hashtbl.t =
     Hashtbl.create (List.length nodes)
@@ -170,20 +256,33 @@ let sort (type a) ~(nodes : a list) ~(edges : a -> a list) ~(key : a -> string)
           |> List.filter (fun dep ->
             Hashtbl.find component dep = Hashtbl.find component k)
           |> List.map (fun dep -> k, dep))
-        |> List.sort (fun (s1, _) (s2, _) -> String.compare s2 s1)
+        |> List.map (fun (source, dep) -> (source, dep), edge_detail source dep)
+        |> List.sort (fun ((s1, _), d1) ((s2, _), d2) ->
+          let weight = function Some (n, _) -> n | None -> 1 in
+          match compare (weight d1) (weight d2) with
+          | 0 -> String.compare s2 s1
+          | c -> c)
       in
       (match blocking with
-      | (source, dep) :: _ ->
+      | ((source, dep), detail) :: _ ->
         let cycle =
           List.filter
             (fun k -> Hashtbl.find component k = Hashtbl.find component source)
             left_keys
         in
+        let why =
+          match detail with
+          | Some (count, example) ->
+            Printf.sprintf " (%d reference%s, e.g. %s)" count
+              (if count = 1 then "" else "s")
+              example
+          | None -> ""
+        in
         Printf.eprintf
           "styled-ppx: dependency cycle among %s; dropping the edge from %s to \
-           %s to keep a deterministic order\n\
+           %s%s to keep a deterministic order\n\
            %!"
-          (String.concat ", " cycle) source dep;
+          (String.concat ", " cycle) source dep why;
         let deps = Hashtbl.find pending source in
         deps := List.filter (fun d -> d <> dep) !deps;
         if !deps = [] then ready := KeySet.add source !ready

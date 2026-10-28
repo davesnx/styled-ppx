@@ -89,6 +89,7 @@
 - [FIX] `styled-ppx.generate` breaks a dependency cycle between files with an edge inside the cycle. It dropped the edge of a file that only depended on the cycle, so with `a` and `b` referencing each other and `z` referencing `a`, `z`'s CSS came before `a`'s. The warning now names only the files in the cycle (@davesnx)
 - [FIX] `dune test` runs the `slot_key` registry test with `seed.snapshot` as a dependency; it failed with `Sys_error("seed.snapshot: No such file or directory")` (@davesnx)
 - [FIX] A `$(x)` selector reference and a `CSS.merge`/`+++` argument no longer resolve to a `[%css]` binding named `x` when a function parameter, a local `let`, a pattern variable or a dynamic styled component's prop named `x` shadows it. `$(x)` then fails with an error that names the shadowing, and the merge argument is left out of `[@@@css.merges]` (@davesnx)
+- [FIX] `styled-ppx.generate` no longer adds a library edge for a bare module name used where an `open`, `include`, `let open` or `M.( ... )` is in scope, since that name may be a submodule of the opened module: `open Tooltips; ProjectBoost.x` in one library made a false edge to another library with its own `ProjectBoost`, and the false edges closed library cycles in the Ahrefs monorepo. When library references still close a cycle, the edge backed by the fewest references is dropped (before: the one whose source library sorts last, which often dropped a real dependency), and the warning names the reference count and one example reference (@davesnx)
 
 ## 0.61.0
 

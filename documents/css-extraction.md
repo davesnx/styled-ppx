@@ -413,6 +413,15 @@ file in library `L1` becomes a library edge `L1 -> L2` when:
 
 Anything else (zero or multiple candidates either way) means no edge.
 
+Only a reference outside every open scope counts here
+(`Order.references_outside_opens`). After `open M`, `include M`,
+`let open M in`, or inside `M.( ... )`, a bare `X` may be the submodule
+`M.X`; `ocamldep` cannot tell, and dune drops such names because `X` is not
+in the library's dependency closure, which generate does not know. So
+`open Tooltips; ProjectBoost.x` in one library never makes an edge to an
+unrelated library that has its own top-level `ProjectBoost`
+(`packages/generate/test/library-order-open-scope.t`).
+
 **Module level.** Inside a library, a file's rules come after the rules of
 every file in the *same* library it depends on — module resolution now
 never crosses a library boundary. Candidates for a referenced name are the
@@ -429,8 +438,14 @@ dune passes them in, and a cycle — which can't come from a real dune
 graph, only from this heuristic picking an edge a real build wouldn't
 have — never fails the build. The aggregator warns once naming the cycle's
 members, drops one edge that lies on the cycle (both ends in one strongly
-connected component; the one whose source sorts alphabetically last), and
-keeps going. A node that only depends on the cycle keeps its edge.
+connected component), and keeps going. At the library level it drops the
+edge backed by the fewest references, and the warning names that count and
+one example reference (module, file and line): a name that a library in
+the run happens to share with a module outside it tends to back one or two
+references against a real dependency's hundreds
+(`packages/generate/test/library-order-cycle-weak-edge.t`). Ties, and every
+module-level cycle, drop the edge whose source sorts alphabetically last. A
+node that only depends on the cycle keeps its edge.
 
 `--order source` skips all of this, ignoring references and `library`
 keys, and keeps the file order dune passes on the command line. It exists

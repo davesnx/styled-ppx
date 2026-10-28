@@ -168,6 +168,8 @@ type input = {
   library : string option;
   protocol_errors : string list;
   references : string list;
+  references_outside_opens : string list;
+  reference_lines : (string * int) list;
   blocks : Css_extraction.block list;
   merges : Css_extraction.merge list;
 }
@@ -257,6 +259,8 @@ let extract_structure ~filename ~idx structure : input =
     library = !library;
     protocol_errors = List.rev !protocol_errors;
     references = Order.references structure;
+    references_outside_opens = Order.references_outside_opens structure;
+    reference_lines = Order.first_lines structure;
     blocks = List.rev !blocks;
     merges = List.rev !merges;
   }
@@ -421,7 +425,11 @@ let order_modules_within_scope (scope : input list) :
       None
   in
   let edges h = List.filter_map (resolve h) h.references in
-  Order.sort ~nodes:scope ~edges ~key:(fun h -> h.filename), edges
+  ( Order.sort
+      ~edge_detail:(fun _ _ -> None)
+      ~nodes:scope ~edges
+      ~key:(fun h -> h.filename),
+    edges )
 
 (** One ordering group: every input that shares a {!group_key}. Returned in
     Hashtbl order, which {!Order.sort} downstream ties-break by key anyway, so
@@ -494,24 +502,45 @@ let order_by_dependency (inputs : input list) : input list =
   let library_edges_by_key : (string, library_group list) Hashtbl.t =
     Hashtbl.create (List.length groups)
   in
+  (* (source, target) -> references backing the edge, and the first one *)
+  let edge_details : (string * string, int ref * string) Hashtbl.t =
+    Hashtbl.create (List.length groups)
+  in
   List.iter
     (fun g ->
       let targets =
         g.inputs
-        |> List.concat_map (fun h -> h.references)
-        |> List.sort_uniq String.compare
-        |> List.filter_map
-             (library_edge_target
+        |> List.concat_map (fun h ->
+          List.filter_map
+            (fun name ->
+              library_edge_target
                 ~groups_with_module:(Hashtbl.find_all groups_with_module)
                 ~groups_with_alias:(Hashtbl.find_all groups_with_alias)
-                ~self:g)
+                ~self:g name
+              |> Option.map (fun target ->
+                (match Hashtbl.find_opt edge_details (g.key, target.key) with
+                | Some (count, _) -> incr count
+                | None ->
+                  let line =
+                    Option.value ~default:1
+                      (List.assoc_opt name h.reference_lines)
+                  in
+                  Hashtbl.add edge_details (g.key, target.key)
+                    (ref 1, Printf.sprintf "%s in %s:%d" name h.filename line));
+                target))
+            h.references_outside_opens)
         |> List.sort_uniq (fun a b -> String.compare a.key b.key)
       in
       Hashtbl.replace library_edges_by_key g.key targets)
     groups;
   let library_edges g = Hashtbl.find library_edges_by_key g.key in
+  let edge_detail source target =
+    Hashtbl.find_opt edge_details (source, target)
+    |> Option.map (fun (count, example) -> !count, example)
+  in
   let sorted_groups =
-    Order.sort ~nodes:groups ~edges:library_edges ~key:(fun g -> g.key)
+    Order.sort ~edge_detail ~nodes:groups ~edges:library_edges ~key:(fun g ->
+      g.key)
   in
   Logger.info "library order: %s"
     (String.concat ", " (List.map (fun g -> g.key) sorted_groups));
@@ -528,7 +557,12 @@ let order_by_dependency (inputs : input list) : input list =
   List.iter
     (fun g ->
       List.iter
-        (fun dep -> Logger.debug "library edge: %s -> %s" g.key dep.key)
+        (fun dep ->
+          match edge_detail g.key dep.key with
+          | Some (count, example) ->
+            Logger.debug "library edge: %s -> %s (%d, e.g. %s)" g.key dep.key
+              count example
+          | None -> Logger.debug "library edge: %s -> %s" g.key dep.key)
         (library_edges g))
     sorted_groups;
   List.iter
